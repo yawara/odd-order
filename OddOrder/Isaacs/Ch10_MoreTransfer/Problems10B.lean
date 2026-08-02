@@ -77,13 +77,17 @@ theorem orderOf_dvd_of_unitsMap_eq_one (hp : p.Prime) (hn : 0 < n)
   simpa using hd
 
 /-- **`1 + p` の `(ZMod (p^n))ˣ` での位数は `p^{n-1}` を割る** (だから `p` 冪). -/
-theorem orderOf_one_add_prime_dvd (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p ^ n))ˣ}
-    (hu : (u : ZMod (p ^ n)) = 1 + (p : ZMod (p ^ n))) : orderOf u ∣ p ^ (n - 1) := by
-  refine orderOf_dvd_of_unitsMap_eq_one hp hn ?_
+theorem unitsMap_one_add_prime (hn : 0 < n) {u : (ZMod (p ^ n))ˣ}
+    (hu : (u : ZMod (p ^ n)) = 1 + (p : ZMod (p ^ n))) :
+    ZMod.unitsMap (dvd_pow_self p hn.ne' : p ∣ p ^ n) u = 1 := by
   refine Units.ext ?_
   rw [ZMod.unitsMap_val, hu]
   change (ZMod.castHom (dvd_pow_self p hn.ne') (ZMod p)) (1 + (p : ZMod (p ^ n))) = 1
   rw [map_add, map_one, map_natCast, ZMod.natCast_self, add_zero]
+
+theorem orderOf_one_add_prime_dvd (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p ^ n))ˣ}
+    (hu : (u : ZMod (p ^ n)) = 1 + (p : ZMod (p ^ n))) : orderOf u ∣ p ^ (n - 1) :=
+  orderOf_dvd_of_unitsMap_eq_one hp hn (unitsMap_one_add_prime hn hu)
 
 /-- `ZMod (p^n) → ZMod p` の還元で `0` になる元は `p` で割り切れる. -/
 theorem prime_dvd_of_castHom_eq_zero (hp : p.Prime) (hn : 0 < n) {z : ZMod (p ^ n)}
@@ -410,6 +414,74 @@ theorem commutator_top_le_map_zpowers (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p 
     (SemidirectProduct.inl_left_mul_inr_right g).symm,
     commutatorElement_mul_left_eq_conj_mul]
   exact K.mul_mem (‹K.Normal›.conj_mem _ (hinr _ _) _) (hkey _ _)
+
+/-- **上からの評価**: `γ_{k+1} ≤ inl⟨x^{p^{k+1}}⟩`. -/
+theorem lowerCentralSeries_le_map_zpowers (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p ^ n))ˣ}
+    (hu : ZMod.unitsMap (dvd_pow_self p hn.ne' : p ∣ p ^ n) u = 1) (k : ℕ) :
+    (⊤ : Subgroup (problem10B1Group (p ^ n) u)).lowerCentralSeries (k + 1)
+      ≤ (Subgroup.zpowers (Multiplicative.ofAdd ((p : ZMod (p ^ n)) ^ (k + 1)))).map
+        (SemidirectProduct.inl : _ →* problem10B1Group (p ^ n) u) := by
+  induction k with
+  | zero =>
+    rw [Subgroup.lowerCentralSeries_succ]
+    exact commutator_top_le_map_zpowers hp hn hu
+  | succ k ih =>
+    rw [Subgroup.lowerCentralSeries_succ, Subgroup.commutator_le]
+    intro w hw g _
+    obtain ⟨v, hv, rfl⟩ := Subgroup.mem_map.mp (ih hw)
+    obtain ⟨i, hi⟩ := Subgroup.mem_zpowers_iff.mp hv
+    refine commutator_inl_mem_map_zpowers hp hn hu (k + 1)
+      (c := (i : ZMod (p ^ n))) ?_ g
+    rw [← hi, ← ofAdd_zsmul, toAdd_ofAdd, zsmul_eq_mul]
+
+/-! ## Isaacs Problem 10B.1 の結論 -/
+
+/-- **Isaacs Problem 10B.1** (書籍 p. 312) ⭐: `C = C_{p^n}` と `a : x ↦ x^{p+1}` について
+`P = C ⋊ ⟨a⟩` は **冪零類 `n`** の metacyclic `p`-群. -/
+theorem nilpotencyClass_problem10B1 (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p ^ n))ˣ}
+    (hu : (u : ZMod (p ^ n)) = 1 + (p : ZMod (p ^ n))) :
+    Group.nilpotencyClass (problem10B1Group (p ^ n) u) = n := by
+  haveI : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI : Finite (problem10B1Group (p ^ n) u) :=
+    Finite.of_equiv _ (SemidirectProduct.equivProd (φ :=
+      Subgroup.subtype (Subgroup.zpowers (unitAutHom (p ^ n) u)))).symm
+  haveI : Group.IsNilpotent (problem10B1Group (p ^ n) u) :=
+    (isPGroup_problem10B1 hp hn hu).isNilpotent
+  have hu' := unitsMap_one_add_prime hn hu
+  obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 := ⟨n - 1, by omega⟩
+  -- 上から: `γ_{m+1} = ⊥`
+  have hbot : (⊤ : Subgroup (problem10B1Group (p ^ (m + 1)) u)).lowerCentralSeries (m + 1)
+      = ⊥ := by
+    refine le_bot_iff.mp ((lowerCentralSeries_le_map_zpowers hp hn hu' m).trans ?_)
+    have hzero : ((p : ZMod (p ^ (m + 1))) ^ (m + 1)) = 0 := by
+      rw [← Nat.cast_pow, ZMod.natCast_self]
+    rw [hzero]
+    simp
+  -- 下から: `γ_m ≠ ⊥`
+  haveI : Fact (1 < p ^ (m + 1)) := ⟨Nat.one_lt_pow (by omega) hp.one_lt⟩
+  haveI : Nontrivial (problem10B1Group (p ^ (m + 1)) u) :=
+    (SemidirectProduct.inl_injective (N := Multiplicative (ZMod (p ^ (m + 1))))
+      (φ := Subgroup.subtype (Subgroup.zpowers (unitAutHom (p ^ (m + 1)) u)))).nontrivial
+  have hne : (⊤ : Subgroup (problem10B1Group (p ^ (m + 1)) u)).lowerCentralSeries m ≠ ⊥ := by
+    rcases Nat.eq_zero_or_pos m with rfl | hm
+    · exact top_ne_bot
+    obtain ⟨m', rfl⟩ : ∃ m', m = m' + 1 := ⟨m - 1, by omega⟩
+    intro h
+    have hmem := inl_ofAdd_pow_mem_lowerCentralSeries (p := p) (n := m' + 1 + 1) hu m'
+    rw [h, Subgroup.mem_bot] at hmem
+    have h1 : (Multiplicative.ofAdd ((p : ZMod (p ^ (m' + 1 + 1))) ^ (m' + 1))) = 1 :=
+      SemidirectProduct.inl_injective (by simpa using hmem)
+    have h2 : (((p ^ (m' + 1) : ℕ) : ZMod (p ^ (m' + 1 + 1)))) = 0 := by
+      rw [Nat.cast_pow]
+      simpa using congrArg Multiplicative.toAdd h1
+    have hdvd := (ZMod.natCast_eq_zero_iff _ _).mp h2
+    have := (Nat.pow_dvd_pow_iff_le_right hp.one_lt).mp hdvd
+    omega
+  refine le_antisymm ?_ ?_
+  · exact Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mp hbot
+  · by_contra hlt
+    exact hne (Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr (by omega))
 
 end
 
