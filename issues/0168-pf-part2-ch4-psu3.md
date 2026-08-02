@@ -8862,3 +8862,16 @@ inline に書かれていたものを抽出。
 * `hcent : V ⊓ U ≤ centralizer (C_{Q₀}(P))` — `inf_le_sup_W_of_centralizes` の入力
 * `hUC : U ≤ C(P)` — `U = O^{2′}(C_G(P))` から自明のはず
 * `hS : ∀ c ∈ P·Z(U), c·ω = ω·c` — `eq_P_of_centralizes` の入力
+
+### (207) `hUC : U ≤ C_G(P)` — 定義から即出
+
+`residualImage_le_centralizer`。`residualImage X` は
+`(O^{2′}(C_G(X))).map (C_G(X)).subtype` なので、元は `C_G(X)` の元の像。
+`rintro _ ⟨u, -, rfl⟩; exact u.2` の 2 行。
+
+⟹ §4 top-level に残る「書籍が structure of PSU(3,ℓ) で読み取る」入力は 2 つ:
+* `hcent : V ⊓ U ≤ centralizer (C_{Q₀}(P))` — 書籍
+  「(V ∩ U)/(P ∩ U) centralizes C_{Q₀}(P)」そのもの
+* `hS : ∀ c ∈ P·Z(U), c·ω = ω·c` — 書籍「P Z(U) centralizes C_Q(P)」
+両方とも §4 step (1)(2) の PSU(3,ℓ) 構造から読み取る内容で、
+top-level 定理では仮説として持つのが honest。

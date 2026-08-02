@@ -59,6 +59,7 @@ membership facts it needs on the model:
   — the `htη` and `hηord` of `sectionFour_mem_W`.
 * `Hypothesis.SectionFourSetup.exists_mem_P_mem_W_mul` — `P ⊔ W = P · W`, the `hfac` of
   `inf_le_sup_centralizer_W` and `eq_P_of_centralizes`.
+* `Hypothesis.residualImage_le_centralizer` — `U ≤ C_G(X)`, its `hUC`.
 * `conj_inv_eq_of_commute`, `cube_mul_eq_of_commute` — the book's refinement
   `ζ₁ ∈ ζ P` (p. 133): `ω^{ζ₁} = ω^ζ` and `ζ₁³ P = ζ³ P`.
 * `Hypothesis.sectionFour_mem_W` — **🎯🎯 the conclusion of §4: `η ∈ W` and `h(ω) ∈ W`.**
@@ -884,6 +885,15 @@ theorem SectionFourSetup.pow_odd_eq_one_of_mem_P (s4 : hyp.SectionFourSetup) {η
   have h2 := congrArg (Subtype.val (p := fun x => x ∈ s4.P)) h1
   simp only [SubmonoidClass.coe_pow, OneMemClass.coe_one] at h2
   exact h2
+
+omit [MulAction G Ω] [Finite G] in
+/-- **`U ≤ C_G(X)`** — `U = O^{2′}(C_G(X))` is by construction a subgroup of the
+centralizer, read in `G` along the inclusion.  This is the `hUC` of
+`inf_le_sup_centralizer_W`. -/
+theorem residualImage_le_centralizer {X : Subgroup G} :
+    residualImage (G := G) X ≤ Subgroup.centralizer ((X : Set G)) := by
+  rintro _ ⟨u, -, rfl⟩
+  exact u.2
 
 open scoped Pointwise in
 include hyp in
