@@ -8164,3 +8164,31 @@ commit `de912f257`。書籍 p.134 の最終ステップ (`μ² = 1` から `μ =
 
 ⟹ **p.134 の終盤 ((10) ⟹ `μ = 1` ⟹ `η ∈ W`) は 2 本の補題で閉じた**。
 残りは (3)〜(9) の導出で、これは §2 の (2)(3) と標準モデルの座標計算。
+
+### (176) ⚠ 自己訂正: §4 の体計算 (3)〜(10) は**既に形式化済**だった
+
+(174)(175) で `FixedPointDensity.lean` に足した 2 補題は
+`PSU3SectionFourArithmetic.lean` の既存補題と重複していたので**撤回**
+(commit `a5c5a3197`)。同ファイルには既に:
+
+| 書籍 | 既存補題 |
+|---|---|
+| (5)(6) の線形解 | `sectionFour_solve` |
+| (7) | `sectionFour_seven`, `sectionFour_seven_book` |
+| (8) | `sectionFour_eight`, `sectionFour_eight_book` |
+| (9) | `sectionFour_nine` |
+| (10) の shift trick | `sectionFour_fixed_of_shift` |
+| (10) ⟹ `μ² = id` | `sectionFour_sq_eq_id` |
+| `λ = 1` | `sectionFour_lambda_eq_one` (+ `eq_zero_of_add_mul_eq_zero`, `sq_add_traceCoeff_mul_add_one`) |
+| `μ² = 1` + 奇位数 ⟹ `μ = 1` | `eq_one_of_sq_eq_one_of_odd_pow` |
+
+⟹ **§4 の残りは「体計算」ではなく「群側の (3)(4) の導出と接続」**:
+* (3) `f(ωs^a)‾ = ζa⁻²·f(ωs^b)‾` — §2 の (2) から
+* (4) `a²·f(ωs^a)‾ = ζ⁻¹·(f(ωs^a)‾)^η + ω̄` — §2 の (2)(3) と `f∘f = id`
+* `η` の半線形性 (Appendix I Prop 2) で `μ` を取り出す部分
+* 上の既存補題群への配線 (`sectionFour_sq_eq_id` の `T` に
+  `{0, α^{2τ}, 1, α^{2τ}+1}` を与える等)
+
+⚠ 教訓 ([[grep-before-writing-transport-defs]]): 着手前に `PSU3SectionFour*` の
+**5 ファイル**を必ず確認する (Arithmetic / Setup / Model / CorollaryTwo / Intrinsic /
+StepThree)。ページ画像だけ見て「未形式化」と判断しない。
