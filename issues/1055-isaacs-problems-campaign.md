@@ -233,10 +233,10 @@ repo に `p`-length の定義が無かったので新設。
       `Problems8B/DihedralStructure.lean` で完結済 — 旧注記が stale だった) /
       §8C は 8C.1–8C.5 完済、**8C.6 は「⟸」の `|A| = 3` のみ** /
       §8D は **🎉 8D.1–8D.6 全問完済 (2026-07-28)**
-- [ ] Ch.9 More Subnormality — 9A ✅ / 9B ✅ / 9C ✅ / **9D.1–9D.3 ✅, 9D.4 進行中**
-      (紙の証明は本 issue「9D.4 の未解決 2 点を解決」節が正本。
-      **(F1) ✅ / (F2) ✅ 2026-08-03 `KegelHypothesis.map_mk` / (F3) ✅**、
-      残り = 極小反例 skeleton 1–4 → (I) `[S,N] = 1` → (II) `S` 非可換単純)
+- [x] **Ch.9 More Subnormality** — **🎉 完済 (2026-08-03)**: 9A ✅ / 9B ✅ / 9C ✅ /
+      **9D.1–9D.4 ✅**。9D.4 =
+      `isSimpleGroup_and_not_isMulCommutative_of_isKegelMinimalCounterexample`
+      (`Ch09_MoreSubnormality/KegelMinimalCounterexample.lean`, axiom-clean)
 - [ ] Ch.10 More Transfer — 10A.1/10A.2/10A.3 前半/10A.5–7/10B.2 ✅、
       **10A.3 後半 (A は基本可換) は紙の証明済・未形式化**
 
@@ -7211,6 +7211,30 @@ step 5 は Fitting 部分群でさらに簡単になり、しかも **`N` 非可
   `p`-群 ⟹ 従来の `O^p(G) ≤ S` 論法。
 
 ⟹ 元の「`N` 可換 / 非可換」の場合分けは **`F(G) ⊓ N = ⊥` / `N ≤ F(G)`** に置き換わる。
+
+## 🎉 9D.4 完済 (2026-08-03) — Ch.9 完済
+
+```
+Ch09.isSimpleGroup_and_not_isMulCommutative_of_isKegelMinimalCounterexample :
+  IsSimpleGroup G ∧ ¬IsMulCommutative G ∧ IsSimpleGroup ↥S ∧ ¬IsMulCommutative ↥S
+```
+
+最終的な証明は記録済の紙の証明より**かなり短くなった**。当初「必要」と見込んでいた
+以下がすべて**不要**だった:
+
+* 「`S_p`-不変な `Syl_p(N)` を p-群作用の不動点で取る」「`S_p N_p` が Sylow」の位数計算
+  → **retraction `π : G →* ↥S`** だけで `P ∩ S = π(P)` と `P^n ∩ S = P ∩ S` が出る。
+* 「半単純 `N` の正規部分群 = 因子の部分積」→ **Fitting 部分群** (`N ⊓ R` は `N` に正規な
+  冪零部分群 ⟹ subnormal かつ冪零 ⟹ `≤ F(G)`)。これで `N` 可換/非可換の場合分けが
+  **`F(G) ⊓ N = ⊥` / `N ≤ F(G)`** に置き換わる。
+* char-in-normal 補題 → 冪零な極小正規は `C_G(N) ⊓ N` の極小性で可換、可換な極小正規は
+  `N^p` の極小性で指数 `p` (どちらも `G`-正規部分群だけで回る)。
+* `O^p(G)` の API → **`normalCore S`** (`q ≠ p` の Sylow を全共役ごと含むので
+  `[G : normalCore S]` の素因数は `p` のみ)。
+
+(II) は `G` 単純が出た後なので短い: 真の `T ◁ S` は `KegelHypothesis.normalInSubgroup` で
+`(G,T)` も Kegel をみたし極小性で `T ◁◁ G`、`G` 単純で `T = ⊥`。非可換は
+`|S| = q` 素数だと `⟨S^G⟩ ≤ P` が非自明正規 ⟹ `G` が `q`-群 ⟹ 単純可解 = 可換 ⟹ 矛盾。
 
 ### 残り枝 `N ≤ F(G)` の設計 — `O^p` を名指ししない `normalCore` 経路 (2026-08-03)
 

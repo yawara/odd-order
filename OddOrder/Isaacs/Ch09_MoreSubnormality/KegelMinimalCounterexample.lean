@@ -723,6 +723,87 @@ theorem isSimpleGroup_subgroup_of_isKegelMinimalCounterexample : IsSimpleGroup �
     simp [Subgroup.subgroupOf]
   · exact hmc.ne_top (top_le_iff.mp (h ▸ hTS))
 
+/-- 極小反例の `G` は非可換 (可換なら `S ◁ G` で単純性に反する). -/
+theorem not_isMulCommutative_of_isKegelMinimalCounterexample : ¬ IsMulCommutative G := by
+  intro hcomm
+  haveI : IsSimpleGroup G := isSimpleGroup_of_isKegelMinimalCounterexample hmc
+  haveI : S.Normal := Subgroup.normal_of_isMulCommutative S
+  rcases ‹IsSimpleGroup G›.eq_bot_or_eq_top_of_normal S inferInstance with h | h
+  · exact hmc.ne_bot h
+  · exact hmc.ne_top h
+
+/-- **9D.4 の第三段**: 極小反例の `S` は非可換.
+
+`S` が可換なら単純性から `|S| = q` 素数. Kegel から任意の `P ∈ Syl_q(G)` で
+`(P ∩ S)` の `S` 内の指数は `q` を割らず `q` の約数なので `1`, すなわち `S ≤ P`.
+したがって `S` の共役もすべて `P` に入り `⟨S^G⟩ ≤ P`; これは非自明正規なので `G` 単純から
+`= ⊤`, ゆえに `P = ⊤` で `G` は `q`-群 ⟹ 冪零 ⟹ 可解 ⟹ 単純可解群は可換 ⟹
+`S` は `⊥` か `⊤` で矛盾. -/
+theorem not_isMulCommutative_subgroup_of_isKegelMinimalCounterexample :
+    ¬ IsMulCommutative ↥S := by
+  intro hcomm
+  haveI := hcomm
+  haveI : IsSimpleGroup G := isSimpleGroup_of_isKegelMinimalCounterexample hmc
+  haveI : IsSimpleGroup ↥S := isSimpleGroup_subgroup_of_isKegelMinimalCounterexample hmc
+  have hq : (Nat.card ↥S).Prime := Group.is_simple_iff_prime_card.mp inferInstance
+  haveI : Fact (Nat.card ↥S).Prime := ⟨hq⟩
+  -- どの Sylow にも `S` が入る
+  have hSP : ∀ P : Sylow (Nat.card ↥S) G, S ≤ (P : Subgroup G) := by
+    intro P
+    have hidx := hmc.kegel (Nat.card ↥S) ‹Fact _› P
+    rw [Subgroup.relIndex] at hidx
+    have hdvd : (((P : Subgroup G) ⊓ S).subgroupOf S).index ∣ Nat.card ↥S :=
+      Subgroup.index_dvd_card _
+    have h1 : (((P : Subgroup G) ⊓ S).subgroupOf S).index = 1 :=
+      ((Nat.dvd_prime hq).mp hdvd).resolve_right (fun h => hidx (by rw [h]))
+    have htop := Subgroup.index_eq_one.mp h1
+    intro x hx
+    have : (⟨x, hx⟩ : ↥S) ∈ ((P : Subgroup G) ⊓ S).subgroupOf S := by rw [htop]; trivial
+    exact this.1
+  obtain ⟨P⟩ := Sylow.nonempty (p := Nat.card ↥S) (G := G)
+  -- `⟨S^G⟩ ≤ P`
+  have hncl : Subgroup.normalClosure (S : Set G) ≤ (P : Subgroup G) := by
+    rw [Subgroup.normalClosure, Subgroup.closure_le]
+    rintro x hx
+    rw [Group.mem_conjugatesOfSet_iff] at hx
+    obtain ⟨a, ha, hconj⟩ := hx
+    obtain ⟨g, rfl⟩ := isConj_iff.mp hconj
+    have hmem := hSP (g⁻¹ • P) ha
+    rw [mem_smul_sylow_iff] at hmem
+    have hgr : (g⁻¹)⁻¹ * a * g⁻¹ = g * a * g⁻¹ := by group
+    rw [hgr] at hmem
+    exact hmem
+  have hncl_ne : Subgroup.normalClosure (S : Set G) ≠ ⊥ := fun h =>
+    hmc.ne_bot (le_bot_iff.mp (h ▸ Subgroup.le_normalClosure))
+  have hPtop : (P : Subgroup G) = ⊤ :=
+    top_le_iff.mp (((‹IsSimpleGroup G›.eq_bot_or_eq_top_of_normal _
+      Subgroup.normalClosure_normal).resolve_left hncl_ne) ▸ hncl)
+  -- `G` は `q`-群 ⟹ 冪零 ⟹ 可解 ⟹ 可換
+  have hGq : IsPGroup (Nat.card ↥S) G := by
+    intro g
+    obtain ⟨k, hk⟩ := P.isPGroup' ⟨g, hPtop.ge (Subgroup.mem_top g)⟩
+    exact ⟨k, by simpa using congrArg Subtype.val hk⟩
+  haveI : Group.IsNilpotent G := hGq.isNilpotent
+  have hGcomm : ∀ a b : G, a * b = b * a :=
+    IsSimpleGroup.comm_iff_isSolvable.mpr inferInstance
+  haveI : S.Normal := ⟨fun n hn g => by
+    rw [hGcomm g n, mul_assoc, mul_inv_cancel, mul_one]; exact hn⟩
+  rcases ‹IsSimpleGroup G›.eq_bot_or_eq_top_of_normal S inferInstance with h | h
+  · exact hmc.ne_bot h
+  · exact hmc.ne_top h
+
+/-- **Isaacs Problem 9D.4** (書籍 p. 294).
+
+Lemma 9.31 の逆 (Kegel 予想) の極小反例 `(G, S)` — すなわち `S ≤ G` が Kegel の仮説を
+みたすが subnormal でなく, `|T| + |H|` がより小さいどの対でも Kegel の仮説から
+subnormality が従うもの — では, **`G` も `S` も非可換単純**である. -/
+theorem isSimpleGroup_and_not_isMulCommutative_of_isKegelMinimalCounterexample :
+    IsSimpleGroup G ∧ ¬ IsMulCommutative G ∧ IsSimpleGroup ↥S ∧ ¬ IsMulCommutative ↥S :=
+  ⟨isSimpleGroup_of_isKegelMinimalCounterexample hmc,
+    not_isMulCommutative_of_isKegelMinimalCounterexample hmc,
+    isSimpleGroup_subgroup_of_isKegelMinimalCounterexample hmc,
+    not_isMulCommutative_subgroup_of_isKegelMinimalCounterexample hmc⟩
+
 end MinimalNormal
 
 end -- 9D.4

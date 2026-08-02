@@ -15224,3 +15224,5 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Isaacs.Ch09.KegelHypothesis.normalInSubgroup
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch09.isSimpleGroup_subgroup_of_isKegelMinimalCounterexample
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch09.isSimpleGroup_and_not_isMulCommutative_of_isKegelMinimalCounterexample
