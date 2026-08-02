@@ -161,8 +161,19 @@ fpf で切るしかなく、そのためには §2/§3 の `hVW` を fpf に一�
   `exists_mem_K_mem_W_mul hVW` で共役子 `c ∈ D` を `κ v` に割る。
   ⟹ step (9) と同じ処方: **仮説を `KW` の形で取る**
   (`hrel : f (ω₁ z) = (κ₀ v)⁻¹ (ω₂ w) (κ₀ v)`, `κ₀ ∈ K`, `v ∈ W`)。
-  呼び出し側 (`stepTwenty_snd` 318 / `stepTwenty_of_mem_D` 390) が `KW` 形を
-  供給できるか要確認 — 書籍 (7) より共役子は常に `KW` に居る。
+
+  **⚠ ただし呼び出し側の連鎖が深い** (2026-08-02 実測): `stepTwenty_snd` (318) /
+  `stepTwenty_of_mem_D` (390) の呼び出し元は `PSU3BarOrbit.lean` で、そこは
+  **`dOrbitRel` (= `D`-軌道)** で組まれている (`barOrbitRel_of_stepNine`,
+  `dOrbitRel_mul_of_barOrbitRel`, `y_eq_of_barOrbitRel`, …)。
+  一方**書籍 §2 の (7)–(9)・(19)–(20) はすべて `KW`-軌道**
+  (「`f(ω₁(0,x₁)) = (ω₂(0,x₂))^k` with `k ∈ K`」)。`D`-軌道で書けているのは
+  `D = KW` (= `V = W`) を仮定しているから。
+
+  ⟹ 残りの実作業 = **`PSU3BarOrbit.lean` の軌道を `D` から `KW` へ張り替える**
+  (7 宣言)。`PSU3StepEightKW.lean` の `KW` 版群がそのまま材料になる。
+  それが済めば `exists_f_eq_conj_inv` (§2 の閉じ Proposition) が `FreeD` で出て、
+  (2) は完了。
 
 ## 準備として済んでいること (2026-08-02)
 
