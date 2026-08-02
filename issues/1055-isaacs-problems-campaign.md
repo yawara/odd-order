@@ -237,9 +237,10 @@ repo に `p`-length の定義が無かったので新設。
       **9D.1–9D.4 ✅**。9D.4 =
       `isSimpleGroup_and_not_isMulCommutative_of_isKegelMinimalCounterexample`
       (`Ch09_MoreSubnormality/KegelMinimalCounterexample.lean`, axiom-clean)
-- [ ] Ch.10 More Transfer — 10A.1/10A.2/**10A.3 (前半+後半 ✅ 2026-08-03)**/10A.5–7/
-      10B.2 ✅。10A.3 後半 = `pow_eq_one_of_center_isComplement`。
-      残 = §10B/§10C の未着手分の実測 (10B.2 は Maschke 待ち)
+- [ ] Ch.10 More Transfer — **⚠ 実測で §10C は 6 問 (旧インベントリの「10C(1)」は誤り)**。
+      §10A (7 問): 10A.1/10A.2/**10A.3 前半+後半 ✅ (2026-08-03)**/10A.5/10A.6/10A.7 ✅、
+      **10A.4 未**。§10B (2 問): 10B.2 は骨格のみ (Maschke 待ち)、**10B.1 未**。
+      **§10C (6 問) は全部未着手**
 
 ## 方針
 
@@ -7212,6 +7213,35 @@ step 5 は Fitting 部分群でさらに簡単になり、しかも **`N` 非可
   `p`-群 ⟹ 従来の `O^p(G) ≤ S` 論法。
 
 ⟹ 元の「`N` 可換 / 非可換」の場合分けは **`F(G) ⊓ N = ⊥` / `N ≤ F(G)`** に置き換わる。
+
+## ⚠ scope 実測: Isaacs §10C は 6 問 (2026-08-03)
+
+旧インベントリの「10C(1) / 10C.1 未確認 (ページ画像未切り出し)」は**誤り**。
+`references/isaacs/finite-group-theory.pdftotext.txt` L15602- を読むと §10C
+(群環と principal ideal theorem, 書籍 pp. 313-320) の演習は **10C.1–10C.6** の 6 問:
+
+* **10C.1** 群準同型 `φ : G → H` は環準同型 `θ : ℤ[G] → ℤ[H]` に延び,
+  `Δ(N)ℤ[G] = ker θ = ℤ[G]Δ(N)` (`N = ker φ`, `Δ` は augmentation ideal)。
+* **10C.2** 有限生成自由アーベル群の ℤ-基底のサイズは一定 (hint: `A/pA` が `𝔽ₚ`-空間)。
+  ⟹ mathlib の階数不変性でほぼ直ちに出るはず。
+* **10C.3** `H ≤ U(ℤ[G])` が加法群 `ℤ[G]` の ℤ-基底なら, `K ≅ H` かつ `K` も ℤ-基底で
+  `δ(k) = 1` (`δ` = augmentation) なる `K ≤ U` がある。
+* **10C.4** 同じ状況で `G/G' ≅ H/H'`。
+* **10C.5** `G = {g₁,…,gₙ}`, `a ∈ ℤ[G]` に対し `M(a)` を `(i,j)` 成分 = `gᵢa` の `gⱼ` 係数
+  とする行列とすると `tr M(a) = n·e` (`e` は `a` の `1` の係数)。
+* **10C.6** さらに `aᵐ = 1` なら `M(a)` の固有値は 1 の冪根で `e ∈ {−1,0,1}`。
+
+⟹ **Ch.10 の残り = 10A.4 / 10B.1 / 10B.2 (Maschke) / 10C.1–10C.6 の 9 問**。
+文書順の次は 10A.4 (`P ∈ Syl₂(G)`, `P ≅ Q₈ × C₂` ⟹ `G' < G`)。
+
+### 10A.4 の設計メモ (2026-08-03 追記)
+
+Yoshida (`Ch10.exists_surjective_wreath_of_transfer_range_lt`, repo に有り) を使うには
+「`C₂ ≀ C₂ ≅ D₈` は `Q₈ × C₂` の準同型像でない」が要る。位数 8 の商 = 核が位数 2 で
+必然的に中心的 (`Z(Q₈ × C₂) = C₂ × C₂`), 中心の位数 2 部分群は 3 つ:
+* `⟨(−1,1)⟩` ⟹ 商は `C₂³` (可換なので `D₈` でない)、
+* `⟨(1,c)⟩` と `⟨(−1,c)⟩` ⟹ どちらも `Q₈ × 1` の像が全体なので商 `≅ Q₈`。
+`Q₈ ≇ D₈` は involution の個数 (1 対 5) で分かる。
 
 ## 次の frontier = 10A.3 後半 (2026-08-03 時点の Lean 側の入口)
 
