@@ -8321,3 +8321,23 @@ E 座標へ落とす段の設計を詰めた結果、`stepTwo_linear` をその�
 3. **`η` の共役は半線形** — `SemilinearField.lean:196` (Appendix I Prop 2(a)+(b)) で
    `η` の作用に付随する体自己同型 `μ` を取り出す。⚠ この補題の入力
    (可換群 `T` の作用等) を実測して、`η` の作用をその形に合わせるのが山場。
+
+### (183) Appendix I Prop 2(b) の入力を実測 — `η` の半線形性はこれで出る
+
+`exists_field_semilinear` (`SemilinearField.lean:196`):
+
+> `E` 基本可換、`ψ : T →* MulAut E` (`T` 可換) が既約 ⟹ 体 `F` (`E` は 1 次元) が在り、
+> **`T`-作用を正規化する任意の `g : MulAut E`** に対し体自己同型 `σ` があって
+> `g(a • x) = σ(a) • g(x)`
+
+⟹ §4 への当て方:
+* `E := Q/Q₀` (基本可換 — `LemmaFiveSetup.isplit` 系)
+* `T := actualKActor` (可換; 既約性は Lemma 5 の入力)
+* `g :=` `η` による共役。**`T`-作用の正規化**が要る = `η` が `K` を正規化すること
+  (`η ∈ D` かつ `K ⊴ D` から出るはず — 要実測)
+* 得られる `σ` が書籍の `μ`
+
+⚠ 山場は「`η` による共役が `MulAut (Q/Q₀)` として `T`-作用を正規化する」の形式化と、
+既存の `QuotientFieldModel` の体と `exists_field_semilinear` が返す体 `F` の同定
+(`FiniteField.ringEquivOfCardEq` 経由。`exists_center_coordinate_exponent` が
+中心について同じことをやっているので、それが手本)。
