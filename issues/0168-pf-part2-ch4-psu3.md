@@ -7758,3 +7758,7 @@ commit `e02a85891`。`corollaryTwo_of_isStandardModel_of_closing` を新設し�
 **(b) 内在 ULift 版 `intrinsicResidualQuotientULift`** (書籍の `f₁`,`h₁` に対応するのはこちら;
 (141) の四つ組照合同型で (a) から移送できる) にするか。
 (b) が最終的に要るが、(a) で先に閉じて移送する方が安全かもしれない。
+
+**(158) 追記 2 — `hcard` も解決**: `PSU3InductionTarget.one_lt_n : 1 < n`
+(`CentralizerInductionBridge.lean:74`) が構造フィールドなので `|F| = 2^n ≥ 4 ≥ 3`。
+⟹ **段 (2) 配線に未解決の材料は無い**。残るは (a)/(b) の配線先の選択と実装のみ。
