@@ -12,6 +12,8 @@ import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Push
 import Mathlib.Algebra.Group.Fin.Basic
 import Mathlib.Algebra.BigOperators.GroupWithZero.Action
+import Mathlib.GroupTheory.QuotientGroup.Defs
+import Mathlib.Tactic.Abel
 
 /-!
 # The noncommutative binomial expansion
@@ -358,6 +360,79 @@ theorem not_const_iterate_rotateWord {n : ℕ} {w : Fin (n + 1) → Bool} (hw : 
     (k : ℕ) : ¬ ∀ i j, (rotateWord^[k] w) i = (rotateWord^[k] w) j := fun hc =>
   hw (const_of_const_iterate_rotateWord k hc)
 
+/-- The constant words form a two-element finset. -/
+theorem filter_const_eq {n : ℕ} :
+    (Finset.univ.filter fun w : Fin (n + 1) → Bool => ∀ i j, w i = w j)
+      = {fun _ => true, fun _ => false} := by
+  classical
+  ext w
+  simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert,
+    Finset.mem_singleton]
+  constructor
+  · intro h
+    rcases Bool.eq_false_or_eq_true (w 0) with h0 | h0
+    · exact Or.inl (funext fun i => (h i 0).trans h0)
+    · exact Or.inr (funext fun i => (h i 0).trans h0)
+  · rintro (rfl | rfl) <;> intro i j <;> rfl
+
+/-- **Freshman's dream modulo commutators.**  In a ring of prime characteristic `p`, the map
+`z ↦ z ^ p` is additive modulo any additive subgroup containing all commutators.
+
+The non-constant words of length `p` fall into rotation orbits of size exactly `p` — rotation
+does not change a word product modulo `T`, and the orbits are free because `p` is prime — so
+their total contribution is `p` times something, which vanishes in characteristic `p`.  The two
+constant words contribute `x ^ p` and `y ^ p`. -/
+theorem add_pow_prime_sub_sub_mem {R : Type*} [Ring R] (x y : R) {p : ℕ} (hp : p.Prime)
+    (hchar : (p : R) = 0) (T : AddSubgroup R) (hT : ∀ a b : R, a * b - b * a ∈ T) :
+    (x + y) ^ p - x ^ p - y ^ p ∈ T := by
+  classical
+  obtain ⟨n, rfl⟩ : ∃ n, p = n + 1 := ⟨p - 1, by have := hp.pos; omega⟩
+  set π : R →+ R ⧸ T := QuotientAddGroup.mk' T with hπ
+  set f : (Fin (n + 1) → Bool) → R ⧸ T := fun w => π (wordProd x y w) with hf
+  -- rotation does not change `f`
+  have hfinv : ∀ w, f (rotateWord w) = f w := by
+    intro w
+    rw [hf, hπ]
+    exact QuotientAddGroup.eq_iff_sub_mem.mpr (wordProd_rotateWord_sub_mem x y w T hT)
+  -- scalars: `p` annihilates the quotient
+  have hkill : ∀ q : R ⧸ T, (n + 1) • q = 0 := by
+    intro q
+    obtain ⟨r, rfl⟩ := QuotientAddGroup.mk'_surjective T q
+    rw [← map_nsmul, nsmul_eq_mul, hchar, zero_mul, map_zero]
+  -- split the words
+  have hsplit := Finset.sum_filter_add_sum_filter_not
+    (Finset.univ : Finset (Fin (n + 1) → Bool)) (fun w => ∀ i j, w i = w j) f
+  have hconst : ∑ w ∈ Finset.univ.filter (fun w : Fin (n + 1) → Bool => ∀ i j, w i = w j), f w
+      = π (x ^ (n + 1)) + π (y ^ (n + 1)) := by
+    rw [filter_const_eq, Finset.sum_insert (by simp [funext_iff]), Finset.sum_singleton,
+      hf]
+    simp only [wordProd_const]
+    norm_num
+  obtain ⟨z, hz⟩ := exists_nsmul_sum_of_free rotateWord (Nat.succ_pos n)
+    isPeriodicPt_rotateWord
+    (Finset.univ.filter fun w : Fin (n + 1) → Bool => ¬ ∀ i j, w i = w j) f hfinv
+    (fun w hw => by
+      intro v hv
+      obtain ⟨k, _, rfl⟩ := mem_iterateOrbit_iff.mp hv
+      exact Finset.mem_filter.mpr ⟨Finset.mem_univ _,
+        not_const_iterate_rotateWord (Finset.mem_filter.mp hw).2 k⟩)
+    (fun w hw k hk hfix => by
+      by_contra hk0
+      exact (Finset.mem_filter.mp hw).2
+        (const_of_iterate_rotateWord_eq hp rfl (fun hd => hk0 (Nat.eq_zero_of_dvd_of_lt hd hk
+          |>.symm ▸ rfl)) hfix))
+  rw [hconst, hz, hkill, add_zero] at hsplit
+  have htot : ∑ w : Fin (n + 1) → Bool, f w = π ((x + y) ^ (n + 1)) := by
+    rw [hf, hπ, ← map_sum, ← add_pow_eq_sum_wordProd]
+  rw [htot] at hsplit
+  refine (QuotientAddGroup.eq_zero_iff _).mp ?_
+  have : π ((x + y) ^ (n + 1) - x ^ (n + 1) - y ^ (n + 1)) = 0 := by
+    rw [map_sub, map_sub, ← hsplit]
+    abel
+  simpa [hπ] using this
+
 end Freshman
+
+
 
 end OddOrder
