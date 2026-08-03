@@ -15668,3 +15668,7 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.MatrixModule.exists_scalar_of_mem_center
 #assert_only_allowed_axioms
   OddOrder.MatrixModule.centralCharacter
+#assert_only_allowed_axioms
+  OddOrder.MatrixModule.centralCharacterPi_eq_zero_iff
+#assert_only_allowed_axioms
+  OddOrder.MatrixModule.sameBlock_equivalence

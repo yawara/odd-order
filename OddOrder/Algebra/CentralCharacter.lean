@@ -24,6 +24,8 @@ point to the block decomposition.
 
 * `OddOrder.MatrixModule.exists_scalar_of_mem_center`
 * `OddOrder.MatrixModule.centralCharacter`
+* `OddOrder.MatrixModule.centralCharacterPi_eq_zero_iff`
+* `OddOrder.MatrixModule.SameBlock`
 -/
 
 namespace OddOrder.MatrixModule
@@ -80,5 +82,53 @@ noncomputable def centralCharacter (hπ : Function.Surjective π) :
     simp [centralScalar, hzw]
   map_zero' := by simp [centralScalar]
   map_add' z w := by simp [centralScalar]
+
+@[simp]
+theorem centralCharacter_apply (hπ : Function.Surjective π) (z : Subring.center A) :
+    centralCharacter π i hπ z = centralScalar π i (z : A) := rfl
+
+/-! ### Blocks -/
+
+section Blocks
+
+variable [∀ i, Nonempty (nn i)]
+
+variable (nn) in
+/-- The tuple of central characters. -/
+noncomputable def centralCharacterPi (π : A →+* ∀ j, Matrix (nn j) (nn j) k)
+    (hπ : Function.Surjective π) : Subring.center A →+* (ι → k) :=
+  RingHom.pi fun i => centralCharacter π i hπ
+
+/-- **The central characters see exactly `Z(A)` modulo the kernel of the splitting.**  For
+`A = kG` the kernel is `J(kG)`, so `Z(kG) ⧸ (Z(kG) ∩ J)` embeds in `∏_i k`; this is what makes
+the block decomposition a decomposition of the centre. -/
+theorem centralCharacterPi_eq_zero_iff (π : A →+* ∀ j, Matrix (nn j) (nn j) k)
+    (hπ : Function.Surjective π) (z : Subring.center A) :
+    centralCharacterPi nn π hπ z = 0 ↔ π (z : A) = 0 := by
+  constructor
+  · intro h
+    funext j
+    have hj : centralScalar π j (z : A) = 0 := congrFun h j
+    rw [scalar_centralScalar π j hπ z.2, hj]
+    simp
+  · intro h
+    funext j
+    have hj : π (z : A) j = 0 := by rw [h]; rfl
+    simp [centralCharacterPi, RingHom.pi, centralScalar, hj]
+
+variable (nn) in
+/-- **Two blocks lie in the same block of `A`** when their central characters agree.  This is
+the standard definition of the block partition. -/
+def SameBlock (π : A →+* ∀ j, Matrix (nn j) (nn j) k) (hπ : Function.Surjective π) (i j : ι) :
+    Prop :=
+  centralCharacter π i hπ = centralCharacter π j hπ
+
+theorem sameBlock_equivalence (π : A →+* ∀ j, Matrix (nn j) (nn j) k)
+    (hπ : Function.Surjective π) : Equivalence (SameBlock nn π hπ) where
+  refl _ := rfl
+  symm h := h.symm
+  trans h h' := h.trans h'
+
+end Blocks
 
 end OddOrder.MatrixModule
