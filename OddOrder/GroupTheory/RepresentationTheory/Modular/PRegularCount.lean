@@ -8,19 +8,29 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorQuotient
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularRadical
 
 /-!
-# The `p`-regular classes span `kG ⧸ T'`
+# The `p`-regular classes are a basis of `kG ⧸ T'`
 
 Every group element is congruent, modulo the `p`-radical `T'` of the commutator span, to the
 chosen representative of the conjugacy class of its `p'`-part (`PRegularRadical`).  Hence
 `kG ⧸ T'` is spanned by as many elements as there are `p`-regular classes.
 
-This is the upper bound in Brauer's count; the matching lower bound comes from the semilinear
-Frobenius on `kG ⧸ [kG, kG]`.
+Those spanning vectors are moreover independent: an element of `T'` is killed by some iterate of
+the semilinear Frobenius on `kG ⧸ [kG, kG]`, and after inflating the number of iterations to a
+multiple of the uniform exponent that iterate *fixes* every `p`-regular class while raising the
+coefficients to a `p`-power.  So a relation among the `p`-regular classes modulo `T'` becomes a
+relation among the conjugacy classes modulo `[kG, kG]`, where they are independent.
+
+`dim_k (kG ⧸ T')` is therefore exactly the number of `p`-regular classes.  This is one of the two
+halves of Brauer's count of the irreducible modular representations; the other half identifies
+`T'` with `J(kG) + [kG, kG]`.
 
 ## Main results
 
 * `OddOrder.RepresentationTheory.Modular.span_range_mkQ_pRegular_eq_top`
 * `OddOrder.RepresentationTheory.Modular.finrank_quotient_commutatorRadical_le`
+* `OddOrder.RepresentationTheory.Modular.linearIndependent_mkQ_pRegular`
+* `OddOrder.RepresentationTheory.Modular.basisPRegularQuotient`
+* `OddOrder.RepresentationTheory.Modular.finrank_quotient_commutatorRadical`
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -143,5 +153,121 @@ theorem iterate_frobQuotient_mem_pRegularClassSpan {m : ℕ}
   | hsmul c x hx =>
     rw [Submodule.Quotient.mk_smul, OddOrder.iterate_frobQuotient_smul]
     exact Submodule.smul_mem _ _ hx
+
+/-! ### The `p`-regular classes are a basis of `kG ⧸ T'`
+
+The lower bound matching `finrank_quotient_commutatorRadical_le`.  If a combination of
+`p`-regular class representatives lies in the `p`-radical `T'`, some iterate of the Frobenius
+kills its class in `kG ⧸ [kG, kG]`.  Inflating the number of iterations to a *multiple* of the
+uniform exponent makes that iterate fix each `p`-regular class while raising each coefficient to
+a `p`-power, so the independence of the conjugacy classes in `kG ⧸ [kG, kG]`
+(`linearIndependent_mkQ_out`) forces every coefficient to vanish.
+-/
+
+omit [Finite G] in
+/-- Being fixed by `x ↦ x ^ p ^ m` propagates to every multiple of `m`. -/
+theorem pow_prime_pow_mul_eq_self {m : ℕ} {h : G} (hfix : h ^ p ^ m = h) (t : ℕ) :
+    h ^ p ^ (t * m) = h := by
+  induction t with
+  | zero => simp
+  | succ t ih => rw [Nat.succ_mul, pow_add, pow_mul, ih, hfix]
+
+omit [Finite G] in
+/-- The iterated Frobenius **fixes** the class of a `p`-regular element as soon as the number of
+iterations is a multiple of the uniform exponent. -/
+theorem iterate_frobQuotient_mk_single_of_isPRegular {m : ℕ}
+    (hm : ∀ g : G, g ^ p ^ m = pRegularPart p g) {h : G} (hh : IsPRegular p h) (t : ℕ) :
+    (OddOrder.frobQuotient hp hchar)^[t * m]
+        (Submodule.Quotient.mk (single h (1 : k)) :
+          MonoidAlgebra k G ⧸ OddOrder.commutatorSpan k (MonoidAlgebra k G))
+      = Submodule.Quotient.mk (single h 1) := by
+  have hfix : h ^ p ^ m = h := by
+    rw [hm h, pRegularPart_eq_self_of_isPRegular hp hh]
+  rw [OddOrder.iterate_frobQuotient_mk, single_pow, one_pow, pow_prime_pow_mul_eq_self hfix t]
+
+/-- **A combination of `p`-regular classes lying in the `p`-radical is trivial.**  This is the
+heart of the lower bound: iterate the Frobenius `j · m` times, where the `p ^ j`-th power already
+lands in `[kG, kG]` and `m` is the uniform exponent, so that the iterate is simultaneously zero
+and the identity on the `p`-regular classes. -/
+theorem eq_zero_of_sum_smul_mem_commutatorRadical
+    [Fintype {C : ConjClasses G // IsPRegularClass p C}]
+    (c : {C : ConjClasses G // IsPRegularClass p C} → k)
+    (hmem : ∑ D, c D • single (D : ConjClasses G).out (1 : k)
+      ∈ OddOrder.commutatorRadical (k := k) hp hchar) (C) : c C = 0 := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  obtain ⟨m, hmpos, hm⟩ := exists_uniform_pow_prime_pow_eq_pRegularPart (G := G) hp
+  obtain ⟨j, hj⟩ := (OddOrder.mem_commutatorRadical_iff hp hchar).mp hmem
+  -- the class of the combination in `kG ⧸ [kG, kG]`
+  have hmk : (Submodule.Quotient.mk (∑ D, c D • single (D : ConjClasses G).out (1 : k)) :
+        MonoidAlgebra k G ⧸ OddOrder.commutatorSpan k (MonoidAlgebra k G))
+      = ∑ D, c D • (Submodule.Quotient.mk (single (D : ConjClasses G).out (1 : k)) :
+          MonoidAlgebra k G ⧸ OddOrder.commutatorSpan k (MonoidAlgebra k G)) := by
+    rw [← Submodule.mkQ_apply, map_sum]
+    simp only [map_smul, Submodule.mkQ_apply]
+  -- some iterate of the Frobenius kills it, hence so does every later one
+  have hzero : ∀ n, j ≤ n → (OddOrder.frobQuotient hp hchar)^[n]
+      (Submodule.Quotient.mk (∑ D, c D • single (D : ConjClasses G).out (1 : k)) :
+        MonoidAlgebra k G ⧸ OddOrder.commutatorSpan k (MonoidAlgebra k G)) = 0 := by
+    intro n hn
+    have hj0 : (OddOrder.frobQuotient hp hchar)^[j]
+        (Submodule.Quotient.mk (∑ D, c D • single (D : ConjClasses G).out (1 : k)) :
+          MonoidAlgebra k G ⧸ OddOrder.commutatorSpan k (MonoidAlgebra k G)) = 0 := by
+      rw [OddOrder.iterate_frobQuotient_mk]
+      exact (Submodule.Quotient.mk_eq_zero _).mpr hj
+    rw [show n = (n - j) + j by omega, Function.iterate_add_apply, hj0,
+      OddOrder.iterate_frobQuotient_zero]
+  -- `j · m` iterations: the classes are fixed, the coefficients get raised to `p ^ (j · m)`
+  have hfrob : ∑ D, (c D) ^ p ^ (j * m) •
+      (Submodule.Quotient.mk (single (D : ConjClasses G).out (1 : k)) :
+        MonoidAlgebra k G ⧸ OddOrder.commutatorSpan k (MonoidAlgebra k G)) = 0 := by
+    rw [← hzero (j * m) (Nat.le_mul_of_pos_right j hmpos), hmk,
+      OddOrder.iterate_frobQuotient_sum]
+    refine Finset.sum_congr rfl fun D _ => ?_
+    rw [OddOrder.iterate_frobQuotient_smul,
+      iterate_frobQuotient_mk_single_of_isPRegular hp hchar (fun g => (hm g).1)
+        (isPRegular_out D.2) j]
+  -- independence of the conjugacy classes in `kG ⧸ [kG, kG]`
+  have hli : LinearIndependent k fun D : {C : ConjClasses G // IsPRegularClass p C} =>
+      (Submodule.Quotient.mk (single (D : ConjClasses G).out (1 : k)) :
+        MonoidAlgebra k G ⧸ OddOrder.commutatorSpan k (MonoidAlgebra k G)) :=
+    (linearIndependent_mkQ_out (k := k) (G := G)).comp
+      (fun D : {C : ConjClasses G // IsPRegularClass p C} => (D : ConjClasses G))
+      Subtype.val_injective
+  have := Fintype.linearIndependent_iff.mp hli (fun D => (c D) ^ p ^ (j * m)) hfrob C
+  exact pow_eq_zero_iff (pow_ne_zero _ hp.pos.ne') |>.mp this
+
+/-- **The `p`-regular classes are linearly independent in `kG ⧸ T'`.** -/
+theorem linearIndependent_mkQ_pRegular :
+    LinearIndependent k fun C : {C : ConjClasses G // IsPRegularClass p C} =>
+      (OddOrder.commutatorRadical (k := k) hp hchar).mkQ
+        (single (C : ConjClasses G).out (1 : k)) := by
+  classical
+  haveI : Fintype {C : ConjClasses G // IsPRegularClass p C} := Fintype.ofFinite _
+  refine Fintype.linearIndependent_iff.mpr fun c hc C => ?_
+  refine eq_zero_of_sum_smul_mem_commutatorRadical hp hchar c ?_ C
+  have hmk : (OddOrder.commutatorRadical (k := k) hp hchar).mkQ
+      (∑ D, c D • single (D : ConjClasses G).out (1 : k)) = 0 := by
+    rw [map_sum]
+    simp only [map_smul]
+    exact hc
+  exact (Submodule.Quotient.mk_eq_zero _).mp hmk
+
+/-- **The `p`-regular classes are a basis of `kG ⧸ T'`.** -/
+noncomputable def basisPRegularQuotient :
+    Module.Basis {C : ConjClasses G // IsPRegularClass p C} k
+      (MonoidAlgebra k G ⧸ OddOrder.commutatorRadical (k := k) hp hchar) :=
+  Module.Basis.mk (linearIndependent_mkQ_pRegular hp hchar)
+    (span_range_mkQ_pRegular_eq_top hp hchar).ge
+
+/-- **`dim_k (kG ⧸ T')` is the number of `p`-regular classes of `G`.**  This is the
+linear-algebra half of Brauer's count of the irreducible modular representations; what remains
+is to identify `T'` with `J(kG) + [kG, kG]`. -/
+theorem finrank_quotient_commutatorRadical :
+    Module.finrank k (MonoidAlgebra k G ⧸ OddOrder.commutatorRadical (k := k) hp hchar)
+      = Nat.card {C : ConjClasses G // IsPRegularClass p C} := by
+  classical
+  haveI : Fintype {C : ConjClasses G // IsPRegularClass p C} := Fintype.ofFinite _
+  rw [Module.finrank_eq_card_basis (basisPRegularQuotient hp hchar), Nat.card_eq_fintype_card]
 
 end OddOrder.RepresentationTheory.Modular

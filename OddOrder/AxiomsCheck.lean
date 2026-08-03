@@ -15515,3 +15515,17 @@ eventually kills, which turns the count into a Fitting-type analysis. -/
   OddOrder.RepresentationTheory.Modular.linearIndependent_mkQ_out
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.iterate_frobQuotient_mem_pRegularClassSpan
+
+/-! **`dim_k (kG ⧸ T') = #{p`-regular classes`}`** (issue 9506) — the linear-algebra half of
+Brauer's count of the irreducible modular representations. -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isPRegular_out
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_zero_of_sum_smul_mem_commutatorRadical
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.linearIndependent_mkQ_pRegular
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.basisPRegularQuotient
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.finrank_quotient_commutatorRadical

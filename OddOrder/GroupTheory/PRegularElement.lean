@@ -356,6 +356,20 @@ theorem pRegularPartClass_of_isPRegularClass (hp : p.Prime) {C : ConjClasses G}
   induction C using Quotient.inductionOn with
   | h g => exact congrArg ConjClasses.mk (pRegularPart_eq_self_of_isPRegular hp hC)
 
+/-- **The chosen representative of a `p`-regular class is `p`-regular.**  Needed whenever one
+indexes a family by the `p`-regular classes and has to pick group elements. -/
+theorem isPRegular_out {C : ConjClasses G} (hC : IsPRegularClass p C) : IsPRegular p C.out := by
+  induction C using Quotient.inductionOn with
+  | h g =>
+    obtain ⟨b, hb⟩ := isConj_iff.mp (ConjClasses.mk_eq_mk_iff_isConj.mp
+      (Quotient.out_eq (ConjClasses.mk g)))
+    have hord : orderOf (Quotient.out (ConjClasses.mk g)) = orderOf g := by
+      conv_rhs => rw [← hb]
+      rw [orderOf_conj]
+    change ¬ p ∣ orderOf (Quotient.out (ConjClasses.mk g))
+    rw [hord]
+    exact hC
+
 end PRegularClasses
 
 end OddOrder.GroupTheory

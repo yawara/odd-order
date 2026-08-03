@@ -274,6 +274,17 @@ theorem iterate_frobQuotient_zero (hp : p.Prime) (hchar : (p : A) = 0) (m : ℕ)
   rw [zero_pow (pow_ne_zero m hp.pos.ne')] at h
   simpa using h
 
+/-- The iterated Frobenius commutes with finite sums. -/
+theorem iterate_frobQuotient_sum (hp : p.Prime) (hchar : (p : A) = 0) (m : ℕ) {ι : Type*}
+    (s : Finset ι) (u : ι → A ⧸ commutatorSpan k A) :
+    (frobQuotient hp hchar)^[m] (∑ i ∈ s, u i)
+      = ∑ i ∈ s, (frobQuotient hp hchar)^[m] (u i) := by
+  classical
+  induction s using Finset.induction with
+  | empty => simpa using iterate_frobQuotient_zero (k := k) hp hchar m
+  | insert a s ha ih =>
+    rw [Finset.sum_insert ha, iterate_frobQuotient_add, ih, Finset.sum_insert ha]
+
 end Frobenius
 
 end OddOrder

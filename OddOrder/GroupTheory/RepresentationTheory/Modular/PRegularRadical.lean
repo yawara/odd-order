@@ -60,21 +60,25 @@ theorem exists_pow_prime_pow_eq_pRegularPart (hp : p.Prime) {g : G} (hg : IsOfFi
 
 variable [Finite G]
 
-/-- **A single exponent works for every element of a finite group.**  Taking `m = a · φ(d)`
-with `p ^ a` the `p`-part and `d` the `p'`-part of `|G|` kills every `p`-part and fixes every
-`p'`-part at once. -/
+/-- **A single positive exponent works for every element of a finite group.**  Taking
+`m = max a 1 · φ(d)` with `p ^ a` the `p`-part and `d` the `p'`-part of `|G|` kills every
+`p`-part and fixes every `p'`-part at once.
+
+The `max` with `1` matters: when `p ∤ |G|` the naive exponent `a · φ(d)` is `0`, and downstream
+one needs `m > 0` in order to inflate an arbitrary exponent to a *multiple* of `m`. -/
 theorem exists_uniform_pow_prime_pow_eq_pRegularPart (hp : p.Prime) :
-    ∃ m : ℕ, ∀ g : G, g ^ p ^ m = pRegularPart p g ∧
+    ∃ m : ℕ, 0 < m ∧ ∀ g : G, g ^ p ^ m = pRegularPart p g ∧
       (pRegularPart p g) ^ p ^ m = pRegularPart p g := by
   classical
   set n := Nat.card G with hn
-  set A := n.factorization p with hA
+  set A := max (n.factorization p) 1 with hA
   set D := ordCompl[p] n with hD
   have hn0 : n ≠ 0 := Nat.card_pos.ne'
   have hcopD : Nat.Coprime p D := (Nat.Prime.coprime_iff_not_dvd hp).mpr
     (Nat.not_dvd_ordCompl hp hn0)
-  refine ⟨A * D.totient, fun g => ?_⟩
   have hDpos : 0 < D := Nat.ordCompl_pos p hn0
+  have hApos : 0 < A := lt_of_lt_of_le Nat.one_pos (le_max_right _ 1)
+  refine ⟨A * D.totient, Nat.mul_pos hApos (Nat.totient_pos.mpr hDpos), fun g => ?_⟩
   have hmodeq : p ^ (A * D.totient) ≡ 1 [MOD D] := by
     rw [mul_comm A D.totient, pow_mul]
     simpa using (Nat.ModEq.pow_totient hcopD).pow A
@@ -101,8 +105,9 @@ theorem exists_uniform_pow_prime_pow_eq_pRegularPart (hp : p.Prime) :
     have hord : (pPart p g) ^ p ^ A = 1 := by
       have h1 : (pPart p g) ^ ordProj[p] (orderOf g) = 1 := pPart_pow_ordProj g
       have h2 : ordProj[p] (orderOf g) ∣ p ^ A :=
-        pow_dvd_pow p (Nat.factorization_le_iff_dvd (orderOf_pos_iff.mpr
+        pow_dvd_pow p (le_trans (Nat.factorization_le_iff_dvd (orderOf_pos_iff.mpr
           (isOfFinOrder_of_finite g)).ne' hn0 |>.mpr (orderOf_dvd_natCard g) p)
+          (le_max_left _ 1))
       obtain ⟨c, hc⟩ := h2
       rw [hc, pow_mul, h1, one_pow]
     obtain ⟨c, hc⟩ : p ^ A ∣ p ^ (A * D.totient) :=
