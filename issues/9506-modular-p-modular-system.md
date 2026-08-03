@@ -316,6 +316,11 @@ leaf の層構造・mathlib 実測 (使えたもの/無かったもの)・設計
       段 71 `Algebra/CentralIdempotentModule.lean` の一般補題
       (中心冪等元の完全直交族による局在; 段 47 をその系に書き換え) /
       🎯 `existsUnique_block_smul_eq_self` (**単純加群はただ 1 つの block に属する**)。
+- [x] **原始冪等元分解と block 分解** — 完了 (2026-08-03、段 73-74)。
+      `Algebra/PrimitiveIdempotent.lean` の 🎯 `completeOrthogonalIdempotents_matrixUnit` /
+      🎯 `exists_completeOrthogonalIdempotents_lift` (`1 = ∑ f_x`、`A f_x` が射影不可分) と
+      `BlockIdempotent.lean` の 🎯🎯 **`blockRingEquiv`** (`A ≃+* ∏_B (e_B A e_B)`、
+      mathlib の `ringEquivOfIsMulCentral`)。
 - [ ] Cartan 行列 `C = DᵀD` (射影被覆が要る) / Brauer 対応 /
       2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。
 

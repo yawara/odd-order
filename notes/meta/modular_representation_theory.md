@@ -88,7 +88,8 @@ L3 と L4 を突き合わせて `.../Modular/BrauerCount.lean`:
 | `.../Modular/DecompositionMatrix.lean` | 🎯🎯 **`exists_decomposition_trace`** = 分解行列 `D` (通常指標側) |
 | `Algebra/CentralCharacter.lean` | 🎯 **`centralCharacter`** `ω_i : Z(A) →+* k` / `SameBlock` / 核 = `Z(A) ∩ ker π` |
 | `Algebra/SeparatingSubalgebra.lean` | 🎯 分離部分代数は全体 |
-| `Algebra/BlockIdempotent.lean` | 🎯🎯 **block 冪等元** `e_B` / 完全直交性 / 単純加群の block 帰属 |
+| `Algebra/BlockIdempotent.lean` | 🎯🎯 **block 冪等元** `e_B` / 完全直交性 / 🎯🎯 **`A ≃+* ∏_B` (block 分解)** / 単純加群の block 帰属 |
+| `Algebra/PrimitiveIdempotent.lean` | 行列単位の持ち上げ = 原始冪等元分解 (Cartan 行列の入口) |
 | `Algebra/CentralIdempotentModule.lean` | 中心冪等元の完全直交族による局在 (段 47 の一般版) |
 
 ## 2. mathlib 実測 (使えたもの / 無かったもの)
@@ -146,5 +147,7 @@ L3 と L4 を突き合わせて `.../Modular/BrauerCount.lean`:
 4. block 論は段 64-72 で**基本構造まで到達**:
    中心指標 → `SameBlock` → 分離部分代数 → 冪等元持ち上げ → 完全直交性 →
    **単純加群はただ 1 つの block に属する**。
-   次: Cartan 行列 `C = DᵀD` (射影被覆が要る) / Brauer 対応 /
+   さらに段 73-74 で **原始冪等元分解** (`1 = ∑ f_x`、`A f_x` が射影不可分) と
+   **`A ≃+* ∏_B (e_B A e_B)`** (block 分解) まで到達。
+   次: Cartan 行列 `C = DᵀD` (`A f_x` の組成因子を数える) / Brauer 対応 /
    2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。
