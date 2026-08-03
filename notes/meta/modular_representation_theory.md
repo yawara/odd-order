@@ -77,7 +77,7 @@ L3 と L4 を突き合わせて `.../Modular/BrauerCount.lean`:
 | `.../Modular/BrauerLinearIndependence.lean` | 🎯🎯 **一次独立性** (Nakayama) |
 | `.../Modular/StandardSystem.lean` | `𝕎(𝔽̄_p)` — 代数閉かつ全 `p'`-乗根、非空虚性証明書 |
 
-### L7 分解定理
+### L7 分解定理 / block 論の入口
 
 | leaf | 内容 |
 |---|---|
@@ -86,6 +86,7 @@ L3 と L4 を突き合わせて `.../Modular/BrauerCount.lean`:
 | `.../Modular/IrreducibleIsBlock.lean` | 🎯 既約表現の Brauer 指標は `IBr(G)` のどれか |
 | `.../Modular/BrauerDecomposition.lean` | 🎯🎯 **`exists_decomposition`** = 分解数 |
 | `.../Modular/DecompositionMatrix.lean` | 🎯🎯 **`exists_decomposition_trace`** = 分解行列 `D` (通常指標側) |
+| `Algebra/CentralCharacter.lean` | 🎯 **`centralCharacter`** `ω_i : Z(A) →+* k` (block の定義に要る) |
 
 ## 2. mathlib 実測 (使えたもの / 無かったもの)
 
@@ -139,5 +140,7 @@ L3 と L4 を突き合わせて `.../Modular/BrauerCount.lean`:
    `trace_eq_brauerCharacter_reduction` (段 32) と `exists_decomposition` (段 62) を繋ぐだけ。
    ⚠ 原始根を上下 2 つ取る (`ω : 𝒪` はトレースを Brauer 指標形にするのに、
    `ω' : ResidueField 𝒪` は還元を組成因子に割るのに)。どちらも段 58 が供給。
-4. 次: Cartan 行列 `C = DᵀD` (射影被覆が要る) / block (中心冪等元) / Brauer 対応 /
+4. block 論の入口は段 64 (`centralCharacter`) で開いた。
+   次: 「同じ block ⟺ 中心指標が一致」で block を定義 → 中心冪等元 →
+   Cartan 行列 `C = DᵀD` (射影被覆が要る) / Brauer 対応 /
    2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。
