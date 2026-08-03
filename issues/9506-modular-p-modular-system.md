@@ -377,10 +377,16 @@ Z\*-定理 (Ch.7) までに要るものを、手持ちとの差分で:
       `IsAdicComplete` 版の持ち上げが要る) が入口。
 - [x] ~~**相対トレース `Tr^G_H`**~~ — 段 75-77 で完了 (上記)。
 - [x] ~~**Brauer 準同型 `Br_P`**~~ — 段 78-79 で完了 (上記、乗法性まで)。
-- [ ] **defect group** — block 冪等元 `e_B ∈ Z(𝒪G) = (𝒪G)^G` が `A^G_D` に入る極小の `D`。
-      道具 (段 75-76, 81) は全部揃った。残るは **Rosenberg の補題**
-      (原始冪等元がイデアルの和に入れば 1 つのイデアルに入る) と Mackey 公式、および
-      段 69 の block 冪等元を `Z(k[G])` に配線すること (段 80 の類和経由)。
+- [x] **defect group の存在と `p`-群性** — 完了 (2026-08-03、段 82
+      `Algebra/DefectGroup.lean`)。`IsDefectGroup b D` /
+      🎯 `exists_isDefectGroup` (部分群束の整礎性 + `A^G_G = A^G`) /
+      🎯🎯 **`isPGroup_of_isDefectGroup`** (`D` の Sylow `p`-部分群 `Q` は
+      `[D:Q]` が `p` と素 ⟹ `A^G_Q = A^G_D` ⟹ 極小性で `Q = D`)。
+- [ ] **defect group の共役性** — **Rosenberg の補題**
+      (原始冪等元がイデアルの和に入れば 1 つのイデアルに入る) + Mackey 公式。
+- [ ] **block 冪等元を `Z(k[G])` に配線** — 段 69 の一般論 (`existsUnique_blockIdempotent`)
+      と段 80 の類和・段 58 の分裂データを繋ぐ。これで `IsDefectGroup e_B D` が
+      Brauer の意味の defect group になる。
 - [ ] **Mackey 公式** — `Tr^H_L` を `K` に制限すると `∑_{KgL} Tr^K_{K ∩ ᵍL} ∘ ᵍ(-)`。
       defect group の共役性 (`A^G_D · A^G_{D'} ⊆ ∑_g A^G_{D ∩ ᵍD'}`) に要る。
       段 75 の `sum_smul_eq_relTrace` は任意添字型なので、軌道分解を食わせればよい。
