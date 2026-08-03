@@ -68,11 +68,22 @@ system」を**実際に構成する**ところまでを本 issue のスコープ
       ⚠ **非空虚性**: `ℤ_[p]` が instance (`instIsPModularSystemPadicInt`)。
       そのために `henselianLocalRing_of_isAdicComplete` (完備局所環は Henselian) を
       補った — mathlib は `HenselianRing R I` 版しか持たない (実測)。
-- [ ] **分裂 p-modular system の具体構成** (`|G|_{p'}` 乗根を剰余体が含むもの)。
-      `ℤ_[p]` は剰余体が素体 `ZMod p` なので分裂しない。次の一手はこれ:
-      不分岐拡大 `W(𝔽_{p^f})` か、`ℤ[ζ_n]` を `p` 上の極大イデアルで局所化 →
-      henselization/完備化。mathlib の資産 (`IsDedekindDomain.HeightOneSpectrum.adicCompletion` /
-      `WittVector`) の当たりを付けるところから。
+- [x] **分裂 p-modular system の具体構成** (2026-08-03)。**不分岐拡大 = Witt ベクトル**を採用。
+      2 leaf:
+      * `.../Modular/WittVectorSystem.lean` — `k` が標数 `p` の完全体なら `𝕎 k` は
+        `p`-modular system で **剰余体が `k` 自身** (`wittVectorResidueFieldEquiv`)。
+        mathlib の `WittVector.quotientPEquiv` (`𝕎 k ⧸ (p) ≃+* k`) +
+        `isAdicCompleteIdealSpanP` + `isDiscreteValuationRing` から
+        `maximalIdeal (𝕎 k) = (p)` → Henselian を組む。`CharZero (𝕎 k)` は
+        `n = p^a · m` 分解 + `p`-torsion freeness + 定数項が単元、で自前。
+      * `.../Modular/SplittingSystem.lean` — **`SplittingSystem p n = 𝕎 (GF(p^φ(n)))`**。
+        Euler (`p^φ(n) ≡ 1 mod n`) で `n ∣ |GF| − 1` ⟹ 有限体が `μ_n` を全部持つ ⟹
+        剰余体経由で `HasEnoughRootsOfUnity (SplittingSystem p n) n`
+        (**`rootsOfUnityEquivResidue_of_not_dvd` で `𝒪` 自身へ持ち上げ**)。
+        非空虚性の決定打 = `natCard_rootsOfUnity_splittingSystem : Nat.card μ_n(𝒪) = n`。
+      ⚠ 「分裂」を新クラスにはしない — 条件は mathlib の
+      `HasEnoughRootsOfUnity (ResidueField 𝒪) n` そのものなので、下流は
+      `[HasEnoughRootsOfUnity (ResidueField 𝒪) n]` と書く (ラッパー方針)。
 - [ ] Brauer 指標 `IBr`: `k G`-加群の `p`-regular 元でのトレースを `U` 経由で char 0 へ持ち上げ
 - [ ] `|IBr G| = p`-regular 類の個数
 
