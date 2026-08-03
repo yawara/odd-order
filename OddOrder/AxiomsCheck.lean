@@ -166,6 +166,7 @@ import OddOrder.Algebra.WordExpansion
 import OddOrder.Algebra.CommutatorSpan
 import OddOrder.Algebra.MatrixCommutator
 import OddOrder.Algebra.CommutatorSpanHom
+import OddOrder.Algebra.SplitSemisimpleCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
 import OddOrder.GroupTheory.RepresentationTheory.Modular.Reduction
@@ -15553,3 +15554,16 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.map_mem_commutatorRadical
 #assert_only_allowed_axioms
   OddOrder.mem_commutatorRadical_of_map_mem
+
+/-! **`dim (A ⧸ T')` = 分裂半単純商のブロック数** (issue 9506). -/
+
+#assert_only_allowed_axioms
+  OddOrder.commutatorSpan_pi
+#assert_only_allowed_axioms
+  OddOrder.commutatorRadical_pi_eq
+#assert_only_allowed_axioms
+  OddOrder.ker_traceTuple
+#assert_only_allowed_axioms
+  OddOrder.commutatorRadical_matrixPi_eq
+#assert_only_allowed_axioms
+  OddOrder.finrank_quotient_commutatorRadical_eq_card
