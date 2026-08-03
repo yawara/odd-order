@@ -36,7 +36,9 @@ representatives gives the same answer, and every structural property is deduced 
 * `OddOrder.GAlgebra.relTrace_trans` — transitivity `Tr^H_K ∘ Tr^K_L = Tr^H_L`.
 * `OddOrder.GAlgebra.relTrace_mul_of_fixed`, `OddOrder.GAlgebra.mul_relTrace_of_fixed` —
   the projection (Frobenius) formula: `Tr^H_K` is `A^H`-bilinear.
+* `OddOrder.GAlgebra.relTrace_conj` — conjugation equivariance.
 * `OddOrder.GAlgebra.relTrace_one` — `Tr^H_K(1) = [H : K] · 1`.
+* `OddOrder.GAlgebra.relTrace_mul_eq_self` — `A^H_K = A^H` when `[H : K]` is invertible.
 
 ## Implementation notes
 
@@ -210,6 +212,57 @@ theorem relTrace_trans {L K H : Subgroup G} (hLK : L ≤ K) (hKH : K ≤ H) {a :
   rw [← sum_smul_eq_relTrace ha f hf hbij]
   simp only [relTrace, Fintype.sum_prod_type, hfdef, mul_smul, Finset.smul_sum]
 
+open scoped Pointwise in
+/-- **Conjugation equivariance**: `c · Tr^H_K(a) = Tr^{cHc⁻¹}_{cKc⁻¹}(c · a)`.
+
+This is what makes the family of ideals `A^H_K` behave under conjugation, and hence what makes
+defect groups a single conjugacy class. -/
+theorem relTrace_conj (c : G) {K H : Subgroup G} {a : A} (ha : ∀ g ∈ K, g • a = a) :
+    relTrace (MulAut.conj c • K) (MulAut.conj c • H) (c • a) = c • relTrace K H a := by
+  letI := Fintype.ofFinite (↥H ⧸ K.subgroupOf H)
+  have hconj : ∀ x : G, (MulAut.conj c) • x = c * x * c⁻¹ := fun _ => rfl
+  have hmemK : ∀ x : G, c * x * c⁻¹ ∈ MulAut.conj c • K ↔ x ∈ K := fun x => by
+    rw [← hconj]; exact Subgroup.smul_mem_pointwise_smul_iff
+  have hmemH : ∀ x : G, c * x * c⁻¹ ∈ MulAut.conj c • H ↔ x ∈ H := fun x => by
+    rw [← hconj]; exact Subgroup.smul_mem_pointwise_smul_iff
+  have ha' : ∀ g ∈ MulAut.conj c • K, g • (c • a) = c • a := by
+    intro g hg
+    obtain ⟨k, hk, rfl⟩ := Subgroup.mem_smul_pointwise_iff_exists g (MulAut.conj c) K |>.mp hg
+    rw [hconj, ← mul_smul, inv_mul_cancel_right, mul_smul, ha k hk]
+  set f : ↥H ⧸ K.subgroupOf H → G := fun x => c * ((x.out : ↥H) : G) * c⁻¹ with hfdef
+  have hf : ∀ x, f x ∈ MulAut.conj c • H := fun x => (hmemH _).mpr (x.out).2
+  have hbij : Function.Bijective fun x =>
+      (QuotientGroup.mk ⟨f x, hf x⟩ :
+        ↥(MulAut.conj c • H) ⧸ (MulAut.conj c • K).subgroupOf (MulAut.conj c • H)) := by
+    constructor
+    · intro x₁ x₂ hEq
+      rw [mk_eq_mk_iff_mem] at hEq
+      simp only [hfdef] at hEq
+      have hrewrite : (c * ((x₁.out : ↥H) : G) * c⁻¹)⁻¹ * (c * ((x₂.out : ↥H) : G) * c⁻¹)
+          = c * (((x₁.out : ↥H) : G)⁻¹ * ((x₂.out : ↥H) : G)) * c⁻¹ := by group
+      rw [hrewrite, hmemK] at hEq
+      have h := (mk_eq_mk_iff_mem (K := K) (u := x₁.out) (v := x₂.out)).mpr hEq
+      simpa only [QuotientGroup.out_eq'] using h
+    · intro z
+      obtain ⟨w, rfl⟩ := QuotientGroup.mk_surjective z
+      have hw : c⁻¹ * (w : G) * c ∈ H := by
+        refine (hmemH _).mp ?_
+        have : c * (c⁻¹ * (w : G) * c) * c⁻¹ = (w : G) := by group
+        rw [this]; exact w.2
+      refine ⟨QuotientGroup.mk ⟨c⁻¹ * (w : G) * c, hw⟩, ?_⟩
+      rw [mk_eq_mk_iff_mem]
+      have hK : (((QuotientGroup.mk ⟨c⁻¹ * (w : G) * c, hw⟩ :
+          ↥H ⧸ K.subgroupOf H).out : ↥H) : G)⁻¹ * (c⁻¹ * (w : G) * c) ∈ K :=
+        (mk_eq_mk_iff_mem (K := K)).mp (QuotientGroup.out_eq' _)
+      have hrewrite : (f (QuotientGroup.mk ⟨c⁻¹ * (w : G) * c, hw⟩))⁻¹ * (w : G)
+          = c * ((((QuotientGroup.mk ⟨c⁻¹ * (w : G) * c, hw⟩ :
+              ↥H ⧸ K.subgroupOf H).out : ↥H) : G)⁻¹ * (c⁻¹ * (w : G) * c)) * c⁻¹ := by
+        simp only [hfdef]; group
+      rw [hrewrite, hmemK]
+      exact hK
+  rw [← sum_smul_eq_relTrace ha' f hf hbij]
+  simp only [hfdef, relTrace, Finset.smul_sum, ← mul_smul, inv_mul_cancel_right]
+
 end DistribMulAction
 
 section Semiring
@@ -236,6 +289,20 @@ theorem mul_relTrace_of_fixed {K H : Subgroup G} {b : A} (hb : ∀ g ∈ H, g �
   letI := Fintype.ofFinite (↥H ⧸ K.subgroupOf H)
   simp only [relTrace, Finset.mul_sum, smul_mul']
   exact Finset.sum_congr rfl fun x _ => by rw [hb _ (x.out).2]
+
+/-- **Invertible index criterion.**  If `[H : K] · 1` has an `H`-fixed inverse `v`, then every
+`H`-fixed element is a relative trace from `K`, i.e. `A^H_K = A^H`.
+
+Applied with `A` an algebra over a field of characteristic `p` and `p ∤ [H : K]`, this is the
+reason a defect group may always be shrunk to a `p`-subgroup. -/
+theorem relTrace_mul_eq_self {K H : Subgroup G} {a v : A} (ha : ∀ g ∈ H, g • a = a)
+    (hv : ∀ g ∈ H, g • v = v) (hvinv : ((K.relIndex H : ℕ) • (1 : A)) * v = 1) :
+    relTrace K H (v * a) = a := by
+  have hfix : ∀ g ∈ H, g • (v * a) = v * a := fun g hg => by
+    rw [smul_mul', hv g hg, ha g hg]
+  have hproj := relTrace_mul_of_fixed (K := K) hfix (1 : A)
+  rw [one_mul] at hproj
+  rw [hproj, relTrace_one, ← mul_assoc, hvinv, one_mul]
 
 end Semiring
 
