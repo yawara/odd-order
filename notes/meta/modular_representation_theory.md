@@ -151,3 +151,26 @@ L3 と L4 を突き合わせて `.../Modular/BrauerCount.lean`:
    **`A ≃+* ∏_B (e_B A e_B)`** (block 分解) まで到達。
    次: Cartan 行列 `C = DᵀD` (`A f_x` の組成因子を数える) / Brauer 対応 /
    2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。
+
+### L8 相対トレース / block 論の群環側 (段 75-79)
+
+| leaf | 内容 |
+|---|---|
+| `Algebra/RelativeTrace.lean` | 🎯 `sum_smul_eq_relTrace` (代表元非依存) / 🎯 **`relTrace_trans`** (推移性) / 射影公式 / 🎯 `relTrace_conj` / `relTrace_one` / `relTrace_mul_eq_self` |
+| `Algebra/GroupAlgebraConjugation.lean` | `R[G]` の共役 `G`-代数構造 (scoped instance) / `smul_eq_conj` / 🎯 **`forall_smul_eq_iff_mem_center`** (`(R[G])^G = Z(R[G])`) |
+| `Algebra/PGroupOrbitSum.lean` | 🎯 **`sum_eq_sum_fixedPoints`** (標数 `p` で軌道上定数な和は固定点の和) |
+| `Algebra/BrauerHomomorphism.lean` | `brauerProj` / 🎯🎯 **`brauerProj_mul_of_invariant`** (`Br_P` は `(k[G])^P` 上の環準同型) |
+
+**設計上の判断 (段 75-79)**:
+
+* **`Fintype` を statement に漏らさない**。`relTrace` の剰余類和は `Fintype.ofFinite` を
+  定義の内側で使う (mathlib の `Subgroup.leftTransversals.diff` と同じ)。代わりに
+  「任意の添字型 + 全単射」版の `sum_smul_eq_relTrace` を 1 本立て、構造法則
+  (不変性・推移性・共役同変性) は全てその適用として書く。Fintype instance の diamond を
+  一切踏まない。
+* **`p`-群の軌道数え上げを独立の補題に切り出す**。`Br_P` の乗法性は「係数の和が軌道上で
+  定数」+ この補題、の 2 行になる。固定点集合は `MulAction.fixedPoints` でなく
+  **`Finset` + 特徴づけ仮説**で受け取り、decidability を statement に持ち込まない。
+* **群作用の instance は scoped / 局所**。`R[G]` への共役作用は `scoped[OddOrder.Conjugation]`、
+  `P` の `G` への共役作用は証明内の `letI` (`ConjAct` 経由) — どちらも mathlib の既定
+  (左乗法) と衝突するため。

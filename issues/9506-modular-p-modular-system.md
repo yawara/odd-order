@@ -321,6 +321,36 @@ leaf の層構造・mathlib 実測 (使えたもの/無かったもの)・設計
       🎯 `exists_completeOrthogonalIdempotents_lift` (`1 = ∑ f_x`、`A f_x` が射影不可分) と
       `BlockIdempotent.lean` の 🎯🎯 **`blockRingEquiv`** (`A ≃+* ∏_B (e_B A e_B)`、
       mathlib の `ringEquivOfIsMulCentral`)。
+- [x] **相対トレース `Tr^H_K` と `G`-代数の基本法則** — 完了 (2026-08-03、段 75-77)。
+      * 段 75 `Algebra/RelativeTrace.lean` — `relTrace K H a = ∑_{xK ⊆ H} x • a`
+        (`MulSemiringAction G A`、`K ≤ H ≤ G`)。
+        🎯 `sum_smul_eq_relTrace` (代表元非依存; 任意の添字型でよいのでこれ 1 本から全部出る) /
+        `smul_relTrace` (`K`-不変 ⟹ 値は `H`-不変) / `relTrace_self` /
+        🎯 **`relTrace_trans`** (推移性 `Tr^H_K ∘ Tr^K_L = Tr^H_L`; 単射性 +
+        `Subgroup.relIndex_mul_relIndex` の濃度) / `relTrace_mul_of_fixed`・
+        `mul_relTrace_of_fixed` (射影公式 ⟹ `A^H_K` は `A^H` のイデアル) /
+        `relTrace_one` (`= [H:K]·1`) / `sum_out_smul_eq_relTrace_top`。
+        ⚠ `Fintype` は `Fintype.ofFinite` で**定義の内側に閉じ込め** statement に漏らさない
+        (mathlib の `leftTransversals.diff` と同じ流儀)。
+        ⚠ mathlib は `Finite G` から `Finite (G ⧸ H)` を出す instance を持たないので補った。
+      * 段 76 — 🎯 `relTrace_conj` (共役同変性 ⟹ defect group が 1 共役類になる根拠) /
+        `relTrace_mul_eq_self` (`[H:K]·1` 可逆なら `A^H_K = A^H` ⟹ defect group を
+        `p`-部分群へ縮められる根拠)。
+      * 段 77 `Algebra/GroupAlgebraConjugation.lean` — **carrier**: `R[G]` への `G` の
+        共役作用 (`conjRingAut` / **scoped** `conjMulSemiringAction`; global instance に
+        しない)。`conj_smul_apply`/`conj_smul_single` / `smul_eq_conj` (代数内部の共役) /
+        `smul_eq_self_iff_apply`・`forall_mem_smul_eq_iff_apply` (`(R[G])^H` の係数記述) /
+        🎯 **`forall_smul_eq_iff_mem_center`** (`(R[G])^G = Z(R[G])`、可換係数)。
+- [x] **Brauer 準同型 `Br_P`** — 完了 (2026-08-03、段 78-79)。
+      * 段 78 `Algebra/PGroupOrbitSum.lean` — 🎯 **`sum_eq_sum_fixedPoints`**:
+        `p`-群の作用で軌道上定数な関数の和は、`p` が係数を零化するなら**固定点の和に等しい**
+        (`IsPGroup.card_modEq_card_fixedPoints` の加法版)。固定点は `Finset` +
+        特徴づけ仮説で受け取り statement に decidability を持ち込まない。
+      * 段 79 `Algebra/BrauerHomomorphism.lean` — `brauerProj P` (`C_G(P)` への台の切り詰め) と
+        🎯🎯 **`brauerProj_mul_of_invariant`** (`(k[G])^P` 上で環準同型)。
+        `c ∈ C_G(P)` の係数 `∑_a x_a y_{a⁻¹c}` の被和関数が `P`-共役軌道上で定数、を
+        段 78 に食わせるだけ。⚠ `P` の共役作用は `ConjAct` 経由の局所 instance。
+
 ### Z\* までの残り (2026-08-03 時点の見取り図)
 
 ここまでで Navarro **Ch.1-2 は完備**、**Ch.3 (block) は基本構造まで**到達した。
@@ -334,11 +364,17 @@ Z\*-定理 (Ch.7) までに要るものを、手持ちとの差分で:
       Brauer 対応は `𝒪G` の block (= `kG` の block と 1 対 1) で書くのが標準。
       冪等元の持ち上げ (`J(𝒪G)` は冪零でないが `𝒪` が完備なので
       `IsAdicComplete` 版の持ち上げが要る) が入口。
-- [ ] **相対トレース `Tr^G_H` と defect group** — `(𝒪G)^G = Z(𝒪G)` 上の
-      `Tr^G_H : (𝒪G)^H → (𝒪G)^G`。defect group は block 冪等元が
-      `Tr^G_D((𝒪G)^D)` に入る極小の `D`。
-- [ ] **Brauer 準同型 `Br_P : (kG)^P → k C_G(P)`** — `p`-部分群 `P` の共役固定点から
-      `C_G(P)` 成分への射影。**乗法性が本体** (mod `p` の数え上げ)。Brauer 対応の入口。
+- [x] ~~**相対トレース `Tr^G_H`**~~ — 段 75-77 で完了 (上記)。
+- [x] ~~**Brauer 準同型 `Br_P`**~~ — 段 78-79 で完了 (上記、乗法性まで)。
+- [ ] **defect group** — block 冪等元 `e_B ∈ Z(𝒪G) = (𝒪G)^G` が `Tr^G_D((𝒪G)^D)` に
+      入る極小の `D`。段 75-76 が道具を全部供給済 (推移性 = 単調性、射影公式 =
+      イデアル性、`relTrace_self` = `D = G` で非空、`relTrace_mul_eq_self` =
+      `p`-部分群へ縮小、`relTrace_conj` = 共役類)。残るは **Rosenberg の補題**
+      (原始冪等元がイデアルの和に入れば 1 つのイデアルに入る) と Mackey 公式。
+- [ ] **Mackey 公式** — `Tr^H_L` を `K` に制限すると `∑_{KgL} Tr^K_{K ∩ ᵍL} ∘ ᵍ(-)`。
+      defect group の共役性 (`A^G_D · A^G_{D'} ⊆ ∑_g A^G_{D ∩ ᵍD'}`) に要る。
+      段 75 の `sum_smul_eq_relTrace` は任意添字型なので、軌道分解を食わせればよい。
+- [ ] **`Br_P` の核** = `∑_{Q < P} Tr^P_Q((kG)^Q)` — Mackey が要る。
 - [ ] **2nd/3rd main theorem** → **Z\*-定理** → Q₈ bridge。
 
 ⚠ 上の 3-5 は `kG`/`𝒪G` の**群環固有**の構造 (共役作用・部分群・相対トレース) を使う。
