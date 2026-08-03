@@ -164,6 +164,8 @@ import OddOrder.Algebra.EigenspaceDecomposition
 import OddOrder.Algebra.LagrangeInterpolationRing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
 import OddOrder.GroupTheory.RepresentationTheory.Modular.Reduction
+import OddOrder.GroupTheory.RepresentationTheory.Modular.InvariantLattice
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorQuotient
 import OddOrder.BG.Ch1_Preliminary.PLengthPComplement
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04_Lem45c_Prop46
@@ -15430,3 +15432,20 @@ Brauer characters. -/
   OddOrder.RepresentationTheory.Modular.finrank_eigenspace_baseChange
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.trace_eq_sum_finrank_baseChange_eigenspace
+
+/-! **The decomposition map for representations, invariant lattices, and the commutator
+subspace of a group algebra** (issue 9506).  Together these are the ordinary-to-modular bridge
+and the first half of Brauer's count of irreducible modular representations. -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.trace_eq_brauerCharacter_reduction
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_invariant_lattice
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.commutatorSubmodule_eq_span_conj
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.classCoeffSum_eq_zero_of_mem_commutatorSubmodule
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.finrank_quotient_commutatorSubmodule
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.pRegularPartClass_of_isPRegularClass
