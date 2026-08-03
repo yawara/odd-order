@@ -302,21 +302,15 @@ leaf の層構造・mathlib 実測 (使えたもの/無かったもの)・設計
 
 ## 次の段 (frontier, 2026-08-03 更新)
 
-- [ ] **block 冪等元 `e_B` の構成**。手順は確定済み (部品は全部揃っている):
-      1. `[Algebra k A]` を仮定し、`Subring.center A` を `k`-部分代数として扱う
-         (`Subalgebra.center k A`)。`centralCharacter` はそこからの `k`-代数準同型。
-      2. `SameBlock` で `ι` を割った `ι' := Quotient` を作り、
-         `Φ : Z(A) →ₐ[k] (ι' → k)` を `Quotient.liftOn` で誘導 (well-defined はまさに
-         `SameBlock` の定義)。
-      3. `Φ` の像は `ι'` の全座標を分離する (`c ≠ c'` なら代表の中心指標が違う) ので
-         **段 67 `Subalgebra.eq_top_of_separates` で `Φ` は全射**。
-      4. `ker Φ = Z(A) ∩ ker π` は冪零 (`A = kG` では `J(kG)`)。mathlib の
-         `existsUnique_isIdempotentElem_eq_of_ker_isNilpotent` (可換環版) または
-         `CompleteOrthogonalIdempotents.lift_of_isNilpotent_ker` で
-         `Pi.single c 1` を `Z(A)` の冪等元に**一意に持ち上げる** ⟹ `e_B`。
-      5. 完全直交性 (`∑_B e_B = 1`, `e_B e_{B'} = 0`) は
-         `CompleteOrthogonalIdempotents.lift_of_isNilpotent_ker` が直接与える。
-      ⚠ mathlib 側の冪等元持ち上げは実測済 (`Mathlib/RingTheory/Idempotents.lean`)。
+- [x] **block 冪等元 `e_B`** — 完了 (2026-08-03、段 68-69)。
+      * 段 68 `centralCharacterAlg` — 中心指標を `Subalgebra.center k A →ₐ[k] k` に
+        (段 67 が `k`-部分代数を要求するため)
+      * 段 69 `Algebra/BlockIdempotent.lean` — `blockSetoid` / `Block` /
+        🎯 **`surjective_blockCharacterPi`** (段 67 で全射) /
+        🎯🎯 **`existsUnique_blockIdempotent`** (mathlib の
+        `existsUnique_isIdempotentElem_eq_of_ker_isNilpotent` で一意に持ち上げ)
+      ⚠ `AlgHom → RingHom` の強制を暗黙に任せると `whnf` heartbeat 超過。
+        `toRingHom` 明示 + 全射性/冪等性を先に `have` で切り出して解消。
 - [ ] Cartan 行列 `C = DᵀD` (射影被覆が要る) / Brauer 対応 /
       2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。
 
