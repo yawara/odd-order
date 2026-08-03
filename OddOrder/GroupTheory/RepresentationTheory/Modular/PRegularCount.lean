@@ -111,4 +111,37 @@ theorem mk_single_mem_range_iterate_frobQuotient {m : ℕ}
   rw [iterate_frobQuotient_mk_single hp hchar hm h,
     pRegularPart_eq_self_of_isPRegular hp hh]
 
+variable (p) in
+/-- The span of the `p`-regular classes inside `kG ⧸ [kG, kG]`. -/
+noncomputable def pRegularClassSpan :
+    Submodule k (MonoidAlgebra k G ⧸ OddOrder.commutatorSpan k (MonoidAlgebra k G)) :=
+  Submodule.span k {u | ∃ h : G, IsPRegular p h ∧
+    u = Submodule.Quotient.mk (single h (1 : k))}
+
+omit [Finite G] in
+theorem mk_single_mem_pRegularClassSpan {h : G} (hh : IsPRegular p h) :
+    (Submodule.Quotient.mk (single h (1 : k)) :
+      MonoidAlgebra k G ⧸ OddOrder.commutatorSpan k (MonoidAlgebra k G))
+      ∈ pRegularClassSpan (k := k) (G := G) p :=
+  Submodule.subset_span ⟨h, hh, rfl⟩
+
+/-- **The image of the iterated Frobenius lands in the span of the `p`-regular classes.**
+Bilinear reduction to group elements, where the Frobenius literally takes the `p'`-part. -/
+theorem iterate_frobQuotient_mem_pRegularClassSpan {m : ℕ}
+    (hm : ∀ g : G, g ^ p ^ m = pRegularPart p g)
+    (u : MonoidAlgebra k G ⧸ OddOrder.commutatorSpan k (MonoidAlgebra k G)) :
+    (OddOrder.frobQuotient hp hchar)^[m] u ∈ pRegularClassSpan (k := k) (G := G) p := by
+  obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ u
+  induction x using MonoidAlgebra.induction_on with
+  | hM a =>
+    rw [MonoidAlgebra.of_apply, iterate_frobQuotient_mk_single hp hchar hm]
+    exact mk_single_mem_pRegularClassSpan
+      (isPRegular_pRegularPart hp (isOfFinOrder_of_finite a))
+  | hadd x y hx hy =>
+    rw [Submodule.Quotient.mk_add, OddOrder.iterate_frobQuotient_add]
+    exact Submodule.add_mem _ hx hy
+  | hsmul c x hx =>
+    rw [Submodule.Quotient.mk_smul, OddOrder.iterate_frobQuotient_smul]
+    exact Submodule.smul_mem _ _ hx
+
 end OddOrder.RepresentationTheory.Modular
