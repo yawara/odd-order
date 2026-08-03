@@ -3,6 +3,7 @@ import OddOrder.Algebra.AugmentationIdeal
 import OddOrder.Algebra.ChevalleyWarning
 import OddOrder.Algebra.CommutatorSpan
 import OddOrder.Algebra.MatrixCommutator
+import OddOrder.Algebra.CommutatorSpanHom
 import OddOrder.Algebra.EigenspaceDecomposition
 import OddOrder.Algebra.WordExpansion
 import OddOrder.Algebra.LagrangeInterpolationRing

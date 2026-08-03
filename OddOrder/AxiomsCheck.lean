@@ -165,6 +165,7 @@ import OddOrder.Algebra.LagrangeInterpolationRing
 import OddOrder.Algebra.WordExpansion
 import OddOrder.Algebra.CommutatorSpan
 import OddOrder.Algebra.MatrixCommutator
+import OddOrder.Algebra.CommutatorSpanHom
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
 import OddOrder.GroupTheory.RepresentationTheory.Modular.Reduction
@@ -15540,3 +15541,15 @@ trace-zero subspace, whence `tr (M ^ p) = (tr M) ^ p` in characteristic `p`. -/
   OddOrder.mem_commutatorSpan_matrix_iff
 #assert_only_allowed_axioms
   OddOrder.trace_pow_prime
+#assert_only_allowed_axioms
+  OddOrder.commutatorRadical_matrix_eq
+
+/-! **Descent to the semisimple quotient** (issue 9506).  `T` is the image of `T`; `T'` is the
+preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
+
+#assert_only_allowed_axioms
+  OddOrder.map_commutatorSpan
+#assert_only_allowed_axioms
+  OddOrder.map_mem_commutatorRadical
+#assert_only_allowed_axioms
+  OddOrder.mem_commutatorRadical_of_map_mem

@@ -99,19 +99,45 @@ theorem single_diag_pow (i : n) (c : R) : ∀ m : ℕ,
   | m + 1 => by
     rw [pow_succ, single_diag_pow i c m, single_mul_single_same, ← pow_succ]
 
+omit [Fintype n] in
+/-- Characteristic `p` passes from the base ring to the matrix algebra. -/
+theorem natCast_matrix_eq_zero {p : ℕ} (hchar : (p : R) = 0) :
+    ((p : ℕ) : Matrix n n R) = 0 := by
+  rw [← diagonal_natCast, hchar, diagonal_zero]
+
 /-- **In characteristic `p` the trace of a `p`-th power is the `p`-th power of the trace.**
 Modulo commutators `M` is the scalar `tr M`, and the `p`-power map on `A ⧸ [A, A]` is semilinear
 over the Frobenius of `R` — so no eigenvalues or base change are needed. -/
 theorem trace_pow_prime [Nonempty n] {p : ℕ} (hp : p.Prime) (hchar : (p : R) = 0)
     (M : Matrix n n R) : (M ^ p).trace = M.trace ^ p := by
   inhabit n
-  have hcharM : ((p : ℕ) : Matrix n n R) = 0 := by
-    rw [← map_natCast (algebraMap R (Matrix n n R)) p, hchar, map_zero]
   obtain ⟨q, rfl⟩ : ∃ q, p = q + 1 := ⟨p - 1, by have := hp.pos; omega⟩
-  have hpow := pow_sub_pow_mem_of_sub_mem (k := R) hp hcharM
+  have hpow := pow_sub_pow_mem_of_sub_mem (k := R) hp (natCast_matrix_eq_zero hchar)
     (sub_single_trace_mem_commutatorSpan (default : n) M)
   rw [single_diag_pow] at hpow
   have htr := mem_commutatorSpan_matrix_iff.mp hpow
   rwa [trace_sub, trace_single_eq_same, sub_eq_zero] at htr
+
+/-- Iterating `trace_pow_prime`. -/
+theorem trace_pow_prime_pow [Nonempty n] {p : ℕ} (hp : p.Prime) (hchar : (p : R) = 0)
+    (M : Matrix n n R) (m : ℕ) : (M ^ p ^ m).trace = M.trace ^ p ^ m := by
+  induction m with
+  | zero => simp
+  | succ m ih => rw [pow_succ p m, pow_mul, pow_mul, trace_pow_prime hp hchar, ih]
+
+/-- **A matrix algebra over a reduced ring has no `p`-radical**: if some `p`-power of `M` is a
+sum of commutators then so is `M`.  Indeed `(tr M) ^ (p ^ m) = tr (M ^ (p ^ m)) = 0`.
+
+This is the reason the count of irreducible modular representations can be read off the
+semisimple quotient: on a split semisimple algebra `T'` collapses to `T`. -/
+theorem commutatorRadical_matrix_eq [Nonempty n] [IsReduced R] {p : ℕ} (hp : p.Prime)
+    (hchar : (p : R) = 0) :
+    commutatorRadical (k := R) hp (natCast_matrix_eq_zero (n := n) hchar)
+      = commutatorSpan R (Matrix n n R) := by
+  refine le_antisymm (fun M hM => ?_) (commutatorSpan_le_commutatorRadical _ _)
+  obtain ⟨m, hm⟩ := hM
+  refine mem_commutatorSpan_matrix_iff.mpr (IsReduced.eq_zero _ ⟨p ^ m, ?_⟩)
+  rw [← trace_pow_prime_pow hp hchar]
+  exact mem_commutatorSpan_matrix_iff.mp hm
 
 end OddOrder
