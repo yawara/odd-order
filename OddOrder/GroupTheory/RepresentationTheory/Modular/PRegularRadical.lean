@@ -6,7 +6,8 @@ Authors: Yawara Ishida
 import Mathlib.FieldTheory.Finite.Basic
 import OddOrder.Algebra.CommutatorSpan
 import OddOrder.GroupTheory.PRegularElement
-import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorSubspace
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorQuotient
+import Mathlib.LinearAlgebra.Dimension.Constructions
 
 /-!
 # Group elements and their `p'`-parts agree in the `p`-radical
@@ -74,5 +75,10 @@ theorem single_sub_single_pRegularPart_mem (hp : p.Prime) (hchar : (p : MonoidAl
   obtain ⟨m, hgm, hym⟩ := exists_pow_prime_pow_eq_pRegularPart hp hg
   refine OddOrder.sub_mem_commutatorRadical_of_pow_eq hp hchar (m := m) ?_
   simp [single_pow, hgm, hym]
+
+/-- The commutator subspace of a group algebra is the commutator span of the algebra. -/
+theorem commutatorSubmodule_eq_commutatorSpan :
+    commutatorSubmodule k G = OddOrder.commutatorSpan k (MonoidAlgebra k G) := rfl
+
 
 end OddOrder.RepresentationTheory.Modular

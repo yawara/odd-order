@@ -109,6 +109,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorSubspace
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InvariantLattice
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularRadical
 import OddOrder.GroupTheory.RepresentationTheory.Modular.Reduction
 import OddOrder.GroupTheory.RepresentationTheory.Modular.RootsOfUnityLift
