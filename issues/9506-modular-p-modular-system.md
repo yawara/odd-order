@@ -218,15 +218,27 @@ system」を**実際に構成する**ところまでを本 issue のスコープ
       * `Algebra/PiMatrixSimpleModules.lean` (段 49) — 🎯 `isSimpleModule_piNatural` /
         `idem_smul_piNatural` / 🎯 `nonempty_linearEquiv_natural_of_idem`
 
-      **残る配線 (次の frontier)**: 上記は `∏ M_{n_j}(k)`-加群の話であり、`kG`-加群への
-      橋渡しがまだ:
-      1. `J(kG)` は任意の単純 `kG`-加群を零化する ⟹ 単純 `kG`-加群 = 単純 `kG ⧸ J`-加群
-      2. 代数同型 `e : kG ⧸ J ≃ₐ[k] ∏ M_{d_i}(k)` に沿った単純加群の対応
-      これを繋げば `BrauerCount.lean` docstring の「未形式化」注記を解消できる。
+      **`kG` への配線も完了 (2026-08-03、段 50)**:
+      * `Algebra/ModuleAlongSurjection.lean` — 全射 `f : A ↠ B` に沿った加群の往復。
+        `isSimpleModule_compHom` (引き戻し) / **`moduleOfSurjective`**
+        (核が零化するなら押し出せる、`RingHom.liftOfRightInverse` で
+        `Module.toAddMonoidEnd` を持ち上げ) / `isSimpleModule_of_surjective`
+      * `Algebra/PiMatrixSimpleModules.lean` — `blockModule` /
+        🎯 `isSimpleModule_blockModule` / 🎯 `exists_linearEquiv_blockModule`
+      * `.../Modular/BrauerCount.lean` — 🎯🎯 **`exists_surjective_blocks_card_eq`**:
+        代数閉体上で `π : kG ↠ ∏_{i<n} M_{d_i}(k)` 全射・**`ker π = J(kG)`**・
+        `n = #p`-正則類。`J(kG)` は単純加群を零化する (mathlib
+        `IsSemisimpleModule.jacobson_le_annihilator`) ので上の 3 本が直接適用でき、
+        **ブロック ↔ 既約 `kG`-加群 (同型を除き 1 対 1)**。
+      ⟹ **`|IBr(G)| = #p`-正則類 (Brauer) が完全に形式化された**。
 
-- [ ] **`IBr(G)` の定義と Brauer 指標の一次独立性** (Navarro 2.7)。単純加群の Brauer 指標が
-      `p`-正則類上の類関数として独立。`brauerCharacter` (段 27) は既にあるので、単純加群側を
-      繋ぐだけ。
+- [ ] **`IBr(G)` の定義** (Navarro 2.x)。段 50 でブロック ↔ 既約加群が閉じたので、
+      `IBr(G)` = ブロック `V_i` の Brauer 指標の族、として定義できる。
+      ⚠ 配線の要: 本リポの `brauerCharacter` (段 27) は **`Representation k G V`** に対して
+      定義されているのに対し、段 45-50 は **`Module (kG) M`** で書かれている。
+      mathlib の `Representation.asModule` / `Representation.ofModule` で往復させる。
+- [ ] **Brauer 指標の一次独立性** (Navarro 2.7)。単純加群の Brauer 指標が
+      `p`-正則類上の類関数として独立。
 - [ ] **分解行列 `D` の表現論的包装**: `G`-不変 `𝒪`-束の存在 (段 30 `exists_invariant_lattice`)
       → `χ|_{p-reg} = ∑_φ d_{χφ} φ`。加法性 (段 29) は済んでいるので組成因子への分解は取れる。
 
