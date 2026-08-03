@@ -8,6 +8,7 @@ import OddOrder.Algebra.PiSimpleModule
 import OddOrder.Algebra.ModuleAlongSurjection
 import OddOrder.Algebra.PiMatrixSimpleModules
 import OddOrder.Algebra.CentralCharacter
+import OddOrder.Algebra.SeparatingSubalgebra
 import OddOrder.Algebra.CommutatorSpanHom
 import OddOrder.Algebra.CommutatorSpanPi
 import OddOrder.Algebra.SplitSemisimpleCount
