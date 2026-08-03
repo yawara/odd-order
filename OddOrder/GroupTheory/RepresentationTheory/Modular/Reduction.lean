@@ -32,20 +32,20 @@ decomposition-map identity is that these containments are equalities on dimensio
 
 namespace OddOrder.RepresentationTheory.Modular
 
-open IsLocalRing TensorProduct
+open IsLocalRing Polynomial TensorProduct
 
-variable {𝒪 : Type*} [CommRing 𝒪] [IsLocalRing 𝒪]
+variable {𝒪 : Type*} [CommRing 𝒪]
 variable {L : Type*} [AddCommGroup L] [Module 𝒪 L]
 
 /-- Reduction preserves the order of an endomorphism: base change is an algebra map. -/
-theorem baseChange_pow_eq_one {A : Module.End 𝒪 L} {n : ℕ} (hA : A ^ n = 1) :
+theorem baseChange_pow_eq_one [IsLocalRing 𝒪] {A : Module.End 𝒪 L} {n : ℕ} (hA : A ^ n = 1) :
     (A.baseChange (ResidueField 𝒪)) ^ n = 1 := by
   have h := congrArg (Module.End.baseChangeHom 𝒪 (ResidueField 𝒪) L) hA
   rwa [map_pow, map_one] at h
 
 /-- **The reduction of an eigen-submodule lands in the eigenspace of the reduced operator.**
 An eigenvector for `ζ` upstairs reduces to an eigenvector for the residue of `ζ`. -/
-theorem baseChange_eigenspace_le (A : Module.End 𝒪 L) (ζ : 𝒪) :
+theorem baseChange_eigenspace_le [IsLocalRing 𝒪] (A : Module.End 𝒪 L) (ζ : 𝒪) :
     (Module.End.eigenspace A ζ).baseChange (ResidueField 𝒪)
       ≤ Module.End.eigenspace (A.baseChange (ResidueField 𝒪)) (residue 𝒪 ζ) := by
   rw [Submodule.baseChange_eq_span, Submodule.span_le]
@@ -58,7 +58,7 @@ theorem baseChange_eigenspace_le (A : Module.End 𝒪 L) (ζ : 𝒪) :
     ← IsLocalRing.ResidueField.algebraMap_eq, algebraMap_smul]
 
 /-- The reduction of a free eigen-submodule has the same dimension as its rank. -/
-theorem finrank_baseChange_eigenspace (A : Module.End 𝒪 L) (ζ : 𝒪)
+theorem finrank_baseChange_eigenspace [IsLocalRing 𝒪] (A : Module.End 𝒪 L) (ζ : 𝒪)
     [Module.Free 𝒪 (Module.End.eigenspace A ζ)] [Module.Finite 𝒪 (Module.End.eigenspace A ζ)] :
     Module.finrank (ResidueField 𝒪) (ResidueField 𝒪 ⊗[𝒪] (Module.End.eigenspace A ζ))
       = Module.finrank 𝒪 (Module.End.eigenspace A ζ) :=
@@ -93,7 +93,6 @@ section BaseChangeSup
 
 variable (k : Type*) [Field k] [Algebra 𝒪 k]
 
-omit [IsLocalRing 𝒪] in
 /-- Base change of a supremum of submodules is contained in the supremum of the base changes. -/
 theorem baseChange_iSup_le {ι : Sort*} (N : ι → Submodule 𝒪 L) :
     (⨆ i, N i).baseChange k ≤ ⨆ i, (N i).baseChange k := by
@@ -110,7 +109,6 @@ theorem baseChange_iSup_le {ι : Sort*} (N : ι → Submodule 𝒪 L) :
     rw [this]
     exact Submodule.add_mem _ hx hy
 
-omit [IsLocalRing 𝒪] in
 /-- If a family of submodules spans, so do their base changes. -/
 theorem iSup_baseChange_eq_top {ι : Sort*} {N : ι → Submodule 𝒪 L} (hN : ⨆ i, N i = ⊤) :
     ⨆ i, (N i).baseChange k = ⊤ :=
@@ -118,6 +116,102 @@ theorem iSup_baseChange_eq_top {ι : Sort*} {N : ι → Submodule 𝒪 L} (hN : 
     rw [← Submodule.baseChange_top (A := k) (M := L), ← hN]
     exact baseChange_iSup_le k N)
 
+/-- The `Finset`-indexed form of `iSup_baseChange_eq_top`. -/
+theorem iSup_baseChange_biSup_eq_top {ι : Type*} (t : Finset ι) (N : ι → Submodule 𝒪 L)
+    (hN : (⨆ i ∈ t, N i) = ⊤) : (⨆ i ∈ t, (N i).baseChange k) = ⊤ :=
+  eq_top_iff.mpr <| by
+    rw [← Submodule.baseChange_top (A := k) (M := L), ← hN]
+    exact le_trans (baseChange_iSup_le k _)
+      (iSup_mono fun i => baseChange_iSup_le k _)
+
 end BaseChangeSup
+
+/-! ### The decomposition-map identity
+
+Two squeezes turn the containments above into equalities of dimensions, without invoking
+Nakayama or the splitting criterion: for each root of unity the reduction of the
+eigen-submodule has the *same* dimension as the rank upstairs, and it exhausts the eigenspace
+downstairs. -/
+
+section Decomposition
+
+variable {p : ℕ} [HenselianLocalRing 𝒪] [IsPModularSystem p 𝒪] [IsDomain 𝒪]
+  [IsPrincipalIdealRing 𝒪]
+variable [Module.Free 𝒪 L] [Module.Finite 𝒪 L]
+variable {n : ℕ} (hn : ¬ p ∣ n) (hn0 : 0 < n) {ω : 𝒪} (hω : IsPrimitiveRoot ω n)
+include hn hn0 hω
+
+omit [IsDomain 𝒪] [IsPrincipalIdealRing 𝒪] [Module.Free 𝒪 L]
+  [Module.Finite 𝒪 L] hn0 in
+/-- A primitive `n`-th root of unity of `𝒪` stays primitive in the residue field, for `p ∤ n`:
+a smaller power that becomes `1` downstairs was already `1` upstairs, by separatedness. -/
+theorem isPrimitiveRoot_residue : IsPrimitiveRoot (residue 𝒪 ω) n := by
+  refine ⟨by rw [← map_pow, hω.pow_eq_one, map_one], fun l hl => ?_⟩
+  refine hω.dvd_of_pow_eq_one l ?_
+  refine eq_of_pow_eq_one_of_sub_mem (isUnit_natCast_of_not_dvd (p := p) hn)
+    (by rw [← pow_mul, mul_comm, pow_mul, hω.pow_eq_one, one_pow]) (one_pow n) ?_
+  refine (residue_eq_zero_iff _).mp ?_
+  rw [map_sub, map_one, map_pow, hl, sub_self]
+
+variable {A : Module.End 𝒪 L} (hA : A ^ n = 1)
+include hA
+
+/-- **Reduction does not lose dimension**: the base change of a `ζ`-eigen-submodule has
+dimension equal to its rank, and fills the whole `ζ̄`-eigenspace of the reduced operator. -/
+theorem finrank_eigenspace_baseChange {ζ : 𝒪} (hζ : ζ ∈ nthRootsFinset n (1 : 𝒪)) :
+    Module.finrank (ResidueField 𝒪)
+        (Module.End.eigenspace (A.baseChange (ResidueField 𝒪)) (residue 𝒪 ζ))
+      = Module.finrank 𝒪 (Module.End.eigenspace A ζ) := by
+  classical
+  set k := ResidueField 𝒪
+  set s := nthRootsFinset n (1 : 𝒪) with hs
+  -- squeeze 1: the base changes of the eigen-submodules have the right dimensions
+  have hbc_le : ∀ η ∈ s, Module.finrank k ((Module.End.eigenspace A η).baseChange k)
+      ≤ Module.finrank 𝒪 (Module.End.eigenspace A η) := by
+    intro η _
+    rw [Submodule.baseChange, ← Module.finrank_baseChange (R := k) (S := 𝒪)
+      (M' := Module.End.eigenspace A η)]
+    exact LinearMap.finrank_range_le _
+  have htop : (⨆ η ∈ s, (Module.End.eigenspace A η).baseChange k) = ⊤ :=
+    iSup_baseChange_biSup_eq_top k s _
+      (iSup_eigenspace_eq_top_of_pow (p := p) hn hn0 hω hA)
+  have hDsum : Module.finrank k (k ⊗[𝒪] L)
+      ≤ ∑ η ∈ s, Module.finrank k ((Module.End.eigenspace A η).baseChange k) := by
+    calc Module.finrank k (k ⊗[𝒪] L)
+        = Module.finrank k ↥(⨆ η ∈ s, (Module.End.eigenspace A η).baseChange k) := by
+          rw [htop, finrank_top]
+      _ ≤ _ := finrank_biSup_le_sum s _
+  have hrank : ∑ η ∈ s, Module.finrank 𝒪 (Module.End.eigenspace A η) = Module.finrank 𝒪 L :=
+    sum_finrank_eigenspace_of_pow (p := p) hn hn0 hω hA
+  have hbc_eq : ∀ η ∈ s, Module.finrank k ((Module.End.eigenspace A η).baseChange k)
+      = Module.finrank 𝒪 (Module.End.eigenspace A η) := by
+    refine (Finset.sum_eq_sum_iff_of_le hbc_le).mp
+      (le_antisymm (Finset.sum_le_sum hbc_le) ?_)
+    rw [hrank, ← Module.finrank_baseChange (R := k) (S := 𝒪) (M' := L)]
+    exact hDsum
+  -- squeeze 2: those base changes exhaust the eigenspaces downstairs
+  have hle : ∀ η ∈ s, Module.finrank 𝒪 (Module.End.eigenspace A η)
+      ≤ Module.finrank k (Module.End.eigenspace (A.baseChange k) (residue 𝒪 η)) := by
+    intro η hη
+    rw [← hbc_eq η hη]
+    exact Submodule.finrank_mono (baseChange_eigenspace_le A η)
+  refine ((Finset.sum_eq_sum_iff_of_le hle).mp ?_ ζ hζ).symm
+  rw [hrank, sum_nthRootsFinset_residue hn hn0
+    (fun c => Module.finrank k (Module.End.eigenspace (A.baseChange k) c)),
+    OddOrder.sum_finrank_eigenspace_of_pow hn0 (isPrimitiveRoot_residue hn hω)
+      (baseChange_pow_eq_one hA),
+    Module.finrank_baseChange]
+
+/-- **The decomposition-map identity at the level of operators.**  The trace of a finite-order
+lattice endomorphism is the Brauer-character expression of its reduction. -/
+theorem trace_eq_sum_finrank_baseChange_eigenspace :
+    LinearMap.trace 𝒪 L A
+      = ∑ ζ ∈ nthRootsFinset n (1 : 𝒪),
+          Module.finrank (ResidueField 𝒪)
+            (Module.End.eigenspace (A.baseChange (ResidueField 𝒪)) (residue 𝒪 ζ)) • ζ := by
+  rw [trace_eq_sum_finrank_smul_of_pow (p := p) hn hn0 hω hA]
+  exact Finset.sum_congr rfl fun ζ hζ => by rw [finrank_eigenspace_baseChange hn hn0 hω hA hζ]
+
+end Decomposition
 
 end OddOrder.RepresentationTheory.Modular
