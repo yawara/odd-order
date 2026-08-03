@@ -156,16 +156,52 @@ system」を**実際に構成する**ところまでを本 issue のスコープ
         * **`mem_commutatorRadical_iff_frobQuotient`**: `T'/T = ker F^∞`
         * `exists_uniform_pow_prime_pow_eq_pRegularPart`: 全元に効く一様な `m`
         * `iterate_frobQuotient_mk_single`: `F^[m][g] = [g_{p'}]` (類基底上)
-        残タスク (次 session の pickup 点):
-        1. `Im F^m = S := span{[h] : h p-正則}` (⊇ は済、⊆ は上の類基底作用から)
-        2. `F^m` は `S` 上で半線型全単射 (`h^{p^m} = h` + Frobenius が `k` で全単射)
-           ⟹ `ker F^{2m} = ker F^m` ⟹ `ker F^∞ = ker F^m`
-        3. `kG/T' ≅ Im F^m = S` ⟹ `dim = #p-正則類` (段 19 の `classCoeffSum` で
-           `p`-正則類基底の独立性)
-        ⟹ (b) 完成。以降 (c)(d) は `Ring.jacobson` / Wedderburn-Artin を使う別段。
-      * (c) `dim kG/(J + T) = #単純加群` (分裂体) — 未。mathlib の
-        `Ring.jacobson` / `IsSemisimpleRing` / Wedderburn–Artin が使える。
-      * (d) `T' = J + T` — 未。
+        **(b) 完成** (2026-08-03、段 40 `.../Modular/PRegularCount.lean`):
+        当初の pickup メモは「`F^m` が `Im F^m` 上で半線型全単射 ⟹ `ker F^∞ = ker F^m`
+        ⟹ `kG/T' ≅ Im F^m`」という Fitting 型の道筋だったが、**半線型写像の階数・
+        退化次数を経由せず直接独立性が出る**ので短くなった:
+        `x = ∑_C c_C h_C ∈ T'` ⟹ `∃ j, F^[j][x] = 0`。反復回数を**一様指数 `m` の倍数**
+        `j·m` まで増やすと同じ反復が (i) `p`-正則類を**固定**し (ii) 係数を
+        `c ↦ c^{p^{jm}}` に上げる ⟹ `0 = ∑_C c_C^{p^{jm}}[h_C]` を `kG ⧸ [kG,kG]` 内で
+        得て、そこでの類代表の独立性 (段 39) から `c_C = 0`。
+        * `eq_zero_of_sum_smul_mem_commutatorRadical` (核) /
+          `linearIndependent_mkQ_pRegular` / **`basisPRegularQuotient`** (基底!) /
+          🎯 **`finrank_quotient_commutatorRadical`**
+        * 一様指数を `m > 0` に強化 (`max a 1 · φ(d)`)。`p ∤ |G|` で素朴な `a·φ(d)` が
+          0 になり「倍数まで膨らませる」が効かなくなるため。
+      * **(c)(d) は 1 本にまとめて完成** (2026-08-03、段 41-43)。教科書 (Navarro 2.9) は
+        (c) `dim A/(J+T) = #単純加群` と (d) `T' = J+T` を別々に立てるが、`J + T` を
+        明示的に作らず**核の同定 1 回**で済ませた。
+        🎯 **`Algebra/SplitSemisimpleCount.lean` の
+        `finrank_quotient_commutatorRadical_eq_card`**:
+        体 `k` (標数 `p`) 上の代数 `A` に対し `π : A ↠ B` が全射で**核が一様冪零**
+        (`∀ y, π y = 0 → y^N = 0`)、`e : B ≃ₐ[k] ∏_{i∈ι} M_{n_i}(k)` なら
+        **`dim_k (A ⧸ T') = #ι`**。証明は「還元 → 分裂 → 各ブロックのトレース」という
+        全射 `Ψ : A → (ι → k)` を 1 本作り、その核が `T'` であることを 3 段で確認:
+        * `Algebra/MatrixCommutator.lean` (段 41) — `[M_n(R), M_n(R)] = ker tr`
+          (`sub_single_trace_mem_commutatorSpan` / `mem_commutatorSpan_matrix_iff`) と
+          `tr(M^p) = (tr M)^p` (`trace_pow_prime`)。
+          ⚠ 標準証明は代数閉包で固有値を使うが、ここでは
+          `M ≡ tr M·E₀₀ (mod [A,A])` + 商上 Frobenius の半線型性で済む。
+          ⟹ `commutatorRadical_matrix_eq` (被約環上の行列環では `T' = T`)
+        * `Algebra/CommutatorSpanPi.lean` (段 43) — `commutatorSpan_pi` /
+          `commutatorRadical_pi_eq` (積は因子ごと)
+        * `Algebra/CommutatorSpanHom.lean` (段 42) — `map_commutatorSpan` (`T` は像) /
+          **`mem_commutatorRadical_of_map_mem`** (核が一様冪零なら `T'` は**逆像**)。
+          逆向きは形式的でなく、反復 Freshman で `x^{p^{m+r}} ≡ t^{p^r} ∈ T(A)`。
+
+## 次の段 (frontier, 2026-08-03)
+
+`A = kG` に対して上記の 2 つの仮説を**実際に供給する**:
+
+- [ ] **`J(kG)` の一様冪零性**: `kG` は有限次元 ⟹ artinian ⟹ `J` 冪零。
+      mathlib の `IsSemiprimaryRing` / `Ring.jacobson` 周りを実測して使う。
+- [ ] **分裂性 `kG ⧸ J ≃ₐ[k] ∏ M_{n_i}(k)`**: mathlib の
+      `isSemisimpleRing_iff_pi_matrix_divisionRing` は**斜体**上の行列環しか出さないので、
+      「分裂体」の定義 (単純加群の自己準同型環が `k`) を入れて `D_i = k` に落とす必要が
+      ある。`exists_algEquiv_pi_matrix_end_mulOpposite` が起点。
+- [ ] 合わせて **`#ブロック = #p`-正則類** (Brauer)。
+      ⚠ 「ブロック ↔ 既約加群」の対応 (Artin–Wedderburn の一意性側) は別途。
 
 以降 (別 issue に分割予定): 分解行列 `D` / Cartan 行列 `C = DᵀD` / block / Brauer 対応 /
 2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。
