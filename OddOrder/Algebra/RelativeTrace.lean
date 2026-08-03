@@ -39,6 +39,8 @@ representatives gives the same answer, and every structural property is deduced 
 * `OddOrder.GAlgebra.relTrace_conj` — conjugation equivariance.
 * `OddOrder.GAlgebra.relTrace_one` — `Tr^H_K(1) = [H : K] · 1`.
 * `OddOrder.GAlgebra.relTrace_mul_eq_self` — `A^H_K = A^H` when `[H : K]` is invertible.
+* `OddOrder.GAlgebra.relTraceIdeal` and `relTraceIdeal_mono`, `mul_mem_relTraceIdeal`,
+  `smul_mem_relTraceIdeal_conj` — the trace ideals `A^H_K` and their lattice/ideal structure.
 
 ## Implementation notes
 
@@ -228,6 +230,16 @@ theorem relTrace_trans {L K H : Subgroup G} (hLK : L ≤ K) (hKH : K ≤ H) {a :
   rw [← sum_smul_eq_relTrace ha f hf hbij]
   simp only [relTrace, Fintype.sum_prod_type, hfdef, mul_smul, Finset.smul_sum]
 
+omit [Finite G] in
+open scoped Pointwise in
+/-- The conjugate of a `K`-fixed element is `cKc⁻¹`-fixed. -/
+theorem forall_conj_smul_eq {K : Subgroup G} {a : A} (ha : ∀ g ∈ K, g • a = a) (c : G) :
+    ∀ g ∈ MulAut.conj c • K, g • (c • a) = c • a := by
+  intro g hg
+  obtain ⟨u, hu, rfl⟩ := (Subgroup.mem_smul_pointwise_iff_exists g (MulAut.conj c) K).mp hg
+  change (c * u * c⁻¹) • (c • a) = c • a
+  rw [← mul_smul, inv_mul_cancel_right, mul_smul, ha u hu]
+
 open scoped Pointwise in
 /-- **Conjugation equivariance**: `c · Tr^H_K(a) = Tr^{cHc⁻¹}_{cKc⁻¹}(c · a)`.
 
@@ -241,10 +253,7 @@ theorem relTrace_conj (c : G) {K H : Subgroup G} {a : A} (ha : ∀ g ∈ K, g �
     rw [← hconj]; exact Subgroup.smul_mem_pointwise_smul_iff
   have hmemH : ∀ x : G, c * x * c⁻¹ ∈ MulAut.conj c • H ↔ x ∈ H := fun x => by
     rw [← hconj]; exact Subgroup.smul_mem_pointwise_smul_iff
-  have ha' : ∀ g ∈ MulAut.conj c • K, g • (c • a) = c • a := by
-    intro g hg
-    obtain ⟨k, hk, rfl⟩ := Subgroup.mem_smul_pointwise_iff_exists g (MulAut.conj c) K |>.mp hg
-    rw [hconj, ← mul_smul, inv_mul_cancel_right, mul_smul, ha k hk]
+  have ha' : ∀ g ∈ MulAut.conj c • K, g • (c • a) = c • a := forall_conj_smul_eq ha c
   set f : ↥H ⧸ K.subgroupOf H → G := fun x => c * ((x.out : ↥H) : G) * c⁻¹ with hfdef
   have hf : ∀ x, f x ∈ MulAut.conj c • H := fun x => (hmemH _).mpr (x.out).2
   have hbij : Function.Bijective fun x =>
@@ -321,5 +330,77 @@ theorem relTrace_mul_eq_self {K H : Subgroup G} {a v : A} (ha : ∀ g ∈ H, g �
   rw [hproj, relTrace_one, ← mul_assoc, hvinv, one_mul]
 
 end Semiring
+
+section Ring
+
+variable [Ring A] [MulSemiringAction G A]
+
+theorem relTrace_neg (K H : Subgroup G) (a : A) : relTrace K H (-a) = -relTrace K H a :=
+  map_neg (relTraceHom K H) a
+
+/-- The **relative trace ideal** `A^H_K = Tr^H_K(A^K)`.  For `A = 𝒪G` with `G` acting by
+conjugation these are the ideals of `Z(𝒪G)` whose minimal members define the defect groups of a
+block. -/
+def relTraceIdeal (K H : Subgroup G) : AddSubgroup A where
+  carrier := {b | ∃ a : A, (∀ g ∈ K, g • a = a) ∧ relTrace K H a = b}
+  add_mem' := by
+    rintro b c ⟨a, ha, rfl⟩ ⟨a', ha', rfl⟩
+    exact ⟨a + a', fun g hg => by rw [smul_add, ha g hg, ha' g hg], relTrace_add K H a a'⟩
+  zero_mem' := ⟨0, fun _ _ => smul_zero _, relTrace_zero K H⟩
+  neg_mem' := by
+    rintro b ⟨a, ha, rfl⟩
+    exact ⟨-a, fun g hg => by rw [smul_neg, ha g hg], relTrace_neg K H a⟩
+
+theorem mem_relTraceIdeal {K H : Subgroup G} {b : A} :
+    b ∈ relTraceIdeal K H ↔ ∃ a : A, (∀ g ∈ K, g • a = a) ∧ relTrace K H a = b := Iff.rfl
+
+/-- Elements of `A^H_K` are `H`-fixed. -/
+theorem smul_of_mem_relTraceIdeal {K H : Subgroup G} {b : A} (hb : b ∈ relTraceIdeal K H)
+    {g : G} (hg : g ∈ H) : g • b = b := by
+  obtain ⟨a, ha, rfl⟩ := hb
+  exact smul_relTrace ha hg
+
+/-- **The trace ideals grow with `K`**: `A^H_L ≤ A^H_K` for `L ≤ K ≤ H`.  This is transitivity of
+the relative trace, and it is what makes "minimal `D` with `e ∈ A^G_D`" a meaningful notion. -/
+theorem relTraceIdeal_mono {L K H : Subgroup G} (hLK : L ≤ K) (hKH : K ≤ H) :
+    relTraceIdeal (A := A) L H ≤ relTraceIdeal K H := by
+  rintro b ⟨a, ha, rfl⟩
+  exact ⟨relTrace L K a, fun g hg => smul_relTrace ha hg, relTrace_trans hLK hKH ha⟩
+
+/-- `A^H_K` is a right ideal of `A^H`. -/
+theorem mul_mem_relTraceIdeal {K H : Subgroup G} (hKH : K ≤ H) {b c : A}
+    (hb : b ∈ relTraceIdeal K H) (hc : ∀ g ∈ H, g • c = c) : b * c ∈ relTraceIdeal K H := by
+  obtain ⟨a, ha, rfl⟩ := hb
+  exact ⟨a * c, fun g hg => by rw [smul_mul', ha g hg, hc g (hKH hg)],
+    relTrace_mul_of_fixed hc a⟩
+
+/-- `A^H_K` is a left ideal of `A^H`. -/
+theorem mem_relTraceIdeal_mul {K H : Subgroup G} (hKH : K ≤ H) {b c : A}
+    (hb : b ∈ relTraceIdeal K H) (hc : ∀ g ∈ H, g • c = c) : c * b ∈ relTraceIdeal K H := by
+  obtain ⟨a, ha, rfl⟩ := hb
+  exact ⟨c * a, fun g hg => by rw [smul_mul', ha g hg, hc g (hKH hg)],
+    mul_relTrace_of_fixed hc a⟩
+
+/-- `A^H_H = A^H`. -/
+theorem mem_relTraceIdeal_self {H : Subgroup G} {b : A} :
+    b ∈ relTraceIdeal H H ↔ ∀ g ∈ H, g • b = b :=
+  ⟨fun hb _ hg => smul_of_mem_relTraceIdeal hb hg, fun hb => ⟨b, hb, relTrace_self hb⟩⟩
+
+open scoped Pointwise in
+/-- The trace ideals are permuted by conjugation. -/
+theorem smul_mem_relTraceIdeal_conj {K H : Subgroup G} {b : A} (hb : b ∈ relTraceIdeal K H)
+    (c : G) : c • b ∈ relTraceIdeal (MulAut.conj c • K) (MulAut.conj c • H) := by
+  obtain ⟨a, ha, rfl⟩ := hb
+  exact ⟨c • a, forall_conj_smul_eq ha c, relTrace_conj c ha⟩
+
+/-- If `[H : K]` is invertible then `A^H_K` is all of `A^H`.  For a block idempotent this is what
+lets a defect group be taken inside a Sylow `p`-subgroup. -/
+theorem mem_relTraceIdeal_of_index_inv {K H : Subgroup G} (hKH : K ≤ H) {a v : A}
+    (ha : ∀ g ∈ H, g • a = a) (hv : ∀ g ∈ H, g • v = v)
+    (hvinv : ((K.relIndex H : ℕ) • (1 : A)) * v = 1) : a ∈ relTraceIdeal K H :=
+  ⟨v * a, fun g hg => by rw [smul_mul', hv g (hKH hg), ha g (hKH hg)],
+    relTrace_mul_eq_self ha hv hvinv⟩
+
+end Ring
 
 end OddOrder.GAlgebra
