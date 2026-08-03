@@ -128,6 +128,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularRadical
 import OddOrder.GroupTheory.RepresentationTheory.Modular.Reduction
 import OddOrder.GroupTheory.RepresentationTheory.Modular.RootsOfUnityLift
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
+import OddOrder.GroupTheory.RepresentationTheory.Modular.StandardSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.WittVectorSystem
 import OddOrder.GroupTheory.RepresentationTheory.PiAlgebraAut
 import OddOrder.GroupTheory.RepresentationTheory.CenterSplitting

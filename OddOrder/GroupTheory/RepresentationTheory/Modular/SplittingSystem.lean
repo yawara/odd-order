@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.FieldTheory.IsAlgClosed.Basic
 import Mathlib.RingTheory.RootsOfUnity.EnoughRootsOfUnity
 import OddOrder.GroupTheory.RepresentationTheory.Modular.WittVectorSystem
 
@@ -79,12 +80,13 @@ theorem dvd_pow_totient_sub_one {p n : ℕ} (hp : p.Prime) (hpn : ¬ p ∣ n) :
 
 /-! ### Transporting the splitting condition -/
 
-/-- Roots of unity transport along an isomorphism of fields. -/
-theorem hasEnoughRootsOfUnity_of_ringEquiv {F E : Type*} [Field F] [Field E] {n : ℕ} [NeZero n]
-    [HasEnoughRootsOfUnity F n] (e : F ≃+* E) : HasEnoughRootsOfUnity E n where
+/-- **Roots of unity transport along any homomorphism of fields** (which is injective, so a
+primitive root stays primitive; cyclicity is automatic in a field). -/
+theorem hasEnoughRootsOfUnity_of_ringHom {F E : Type*} [Field F] [Field E] {n : ℕ} [NeZero n]
+    [HasEnoughRootsOfUnity F n] (f : F →+* E) : HasEnoughRootsOfUnity E n where
   prim := by
     obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot F n
-    exact ⟨e ζ, hζ.map_of_injective e.injective⟩
+    exact ⟨f ζ, hζ.map_of_injective f.injective⟩
   cyc := rootsOfUnity.isCyclic E n
 
 /-- **Splitting is inherited by `𝒪` from its residue field.**  For `p ∤ n` the reduction map is
@@ -127,7 +129,7 @@ theorem hasEnoughRootsOfUnity_residueField_splittingSystem (hp : ¬ p ∣ n) (hn
     HasEnoughRootsOfUnity (ResidueField (SplittingSystem p n)) n := by
   haveI : NeZero n := ⟨hn⟩
   haveI := hasEnoughRootsOfUnity_galoisField p n hp hn
-  exact hasEnoughRootsOfUnity_of_ringEquiv (splittingSystemResidueFieldEquiv p n).symm
+  exact hasEnoughRootsOfUnity_of_ringHom (splittingSystemResidueFieldEquiv p n).symm.toRingHom
 
 /-- **The standard splitting system itself contains all `n`-th roots of unity** — they lift
 from the residue field through the Henselian ring. -/
@@ -150,5 +152,26 @@ theorem exists_isPrimitiveRoot_splittingSystem (hp : ¬ p ∣ n) (hn : n ≠ 0) 
   haveI : NeZero n := ⟨hn⟩
   haveI := hasEnoughRootsOfUnity_splittingSystem p n hp hn
   exact HasEnoughRootsOfUnity.exists_primitiveRoot _ n
+
+/-! ### Algebraically closed residue fields
+
+The counting side of Brauer's theorem needs the residue field to be a splitting field, and the
+easiest sufficient condition is that it be algebraically closed; the Brauer characters need it to
+contain the `n`-th roots of unity.  Both hold for `𝕎(𝔽̄_p)`, because an algebraically closed
+field of characteristic `p` contains the finite field `GF(p ^ φ(n))`, which already has all the
+`n`-th roots of unity for `p ∤ n`.
+-/
+
+/-- **An algebraically closed field of characteristic `p` has all `n`-th roots of unity** for
+`p ∤ n`: they already live in the finite subfield `GF(p ^ φ(n))`. -/
+theorem hasEnoughRootsOfUnity_of_isAlgClosed (K : Type*) [Field K] [IsAlgClosed K] [CharP K p]
+    (hp : ¬ p ∣ n) (hn : n ≠ 0) : HasEnoughRootsOfUnity K n := by
+  haveI : NeZero n := ⟨hn⟩
+  haveI := hasEnoughRootsOfUnity_galoisField p n hp hn
+  letI : Algebra (ZMod p) K := ZMod.algebra K p
+  haveI : Algebra.IsAlgebraic (ZMod p) (GaloisField p n.totient) :=
+    Algebra.IsAlgebraic.of_finite _ _
+  have f : GaloisField p n.totient →ₐ[ZMod p] K := IsAlgClosed.lift
+  exact hasEnoughRootsOfUnity_of_ringHom f.toRingHom
 
 end OddOrder.RepresentationTheory.Modular

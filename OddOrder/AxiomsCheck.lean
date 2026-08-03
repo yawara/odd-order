@@ -174,6 +174,7 @@ import OddOrder.Algebra.SplitSemisimpleCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
+import OddOrder.GroupTheory.RepresentationTheory.Modular.StandardSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterIndependence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerIndependence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerLinearIndependence
@@ -15637,3 +15638,9 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.RepresentationTheory.Modular.eq_zero_of_sum_irreducibleBrauerCharacter
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.brauerCharacter_congr
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.hasEnoughRootsOfUnity_of_isAlgClosed
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_isPrimitiveRoot_pRegularExponent_standardSystem
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_surjective_blocks_card_eq_standardSystem
