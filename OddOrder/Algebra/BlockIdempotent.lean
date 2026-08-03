@@ -26,6 +26,7 @@ idempotent** `e_B`.
 * `OddOrder.MatrixModule.surjective_blockCharacterPi`
 * `OddOrder.MatrixModule.existsUnique_blockIdempotent`
 * `OddOrder.MatrixModule.exists_completeOrthogonalIdempotents_block`
+* `OddOrder.MatrixModule.existsUnique_block_smul_eq_self`
 -/
 
 namespace OddOrder.MatrixModule
@@ -122,5 +123,17 @@ theorem exists_completeOrthogonalIdempotents_block
     (CompleteOrthogonalIdempotents.single fun _ : Block π hπ hlin => k)
     (fun c => hsurj _)
   exact ⟨e, he, fun c => congrFun hfe c⟩
+
+omit [Finite ι] in
+/-- **Every simple `A`-module belongs to exactly one block**: exactly one block idempotent acts
+on it as the identity, and the others act as zero. -/
+theorem existsUnique_block_smul_eq_self [Fintype (Block π hπ hlin)]
+    {ee : Block π hπ hlin → Subalgebra.center k A}
+    (hee : CompleteOrthogonalIdempotents ee)
+    {M : Type*} [AddCommGroup M] [Module A M] [IsSimpleModule A M] :
+    ∃! c : Block π hπ hlin, ∀ s : M, (ee c : A) • s = s :=
+  OddOrder.exists_unique_smul_eq_self_of_completeOrthogonal
+    (hee.map ((Subalgebra.center k A).val : Subalgebra.center k A →ₐ[k] A).toRingHom)
+    fun _ => mem_center_of_mem_centerSubalgebra
 
 end OddOrder.MatrixModule

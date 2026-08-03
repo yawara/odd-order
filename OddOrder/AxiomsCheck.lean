@@ -15691,3 +15691,5 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.MatrixModule.exists_completeOrthogonalIdempotents_block
 #assert_only_allowed_axioms
   OddOrder.exists_unique_smul_eq_self_of_completeOrthogonal
+#assert_only_allowed_axioms
+  OddOrder.MatrixModule.existsUnique_block_smul_eq_self
