@@ -232,15 +232,37 @@ system」を**実際に構成する**ところまでを本 issue のスコープ
         **ブロック ↔ 既約 `kG`-加群 (同型を除き 1 対 1)**。
       ⟹ **`|IBr(G)| = #p`-正則類 (Brauer) が完全に形式化された**。
 
-- [ ] **`IBr(G)` の定義** (Navarro 2.x)。段 50 でブロック ↔ 既約加群が閉じたので、
-      `IBr(G)` = ブロック `V_i` の Brauer 指標の族、として定義できる。
-      ⚠ 配線の要: 本リポの `brauerCharacter` (段 27) は **`Representation k G V`** に対して
-      定義されているのに対し、段 45-50 は **`Module (kG) M`** で書かれている。
-      mathlib の `Representation.asModule` / `Representation.ofModule` で往復させる。
-- [ ] **Brauer 指標の一次独立性** (Navarro 2.7)。単純加群の Brauer 指標が
-      `p`-正則類上の類関数として独立。
-- [ ] **分解行列 `D` の表現論的包装**: `G`-不変 `𝒪`-束の存在 (段 30 `exists_invariant_lattice`)
-      → `χ|_{p-reg} = ∑_φ d_{χφ} φ`。加法性 (段 29) は済んでいるので組成因子への分解は取れる。
+- [x] **`IBr(G)` の定義** (2026-08-03、段 51-52)。
+      * `.../Modular/BlockRepresentation.lean` (段 51) — **`blockRepresentation π i`**
+        (ブロックが担う `Representation k G (nn i → k)`)。
+        `Module (kG) M` の言葉 (段 45-50) と `Representation k G V` の言葉 (段 27) の橋。
+      * `.../Modular/WittVectorSystem.lean` (段 51) —
+        **`instIsAlgClosedResidueFieldWittVector`**: `k` 代数閉 ⟹ `ResidueField (𝕎 k)` も代数閉。
+        ⟹ `𝒪 = 𝕎(𝔽̄_p)` は p-modular system かつ剰余体が分裂体 (設定が空虚でない)。
+      * `.../Modular/IrreducibleBrauerCharacter.lean` (段 52) —
+        🎯 **`irreducibleBrauerCharacter π i`** = 第 `i` ブロックの Brauer 指標。
+        `_conj` (類関数) / `_one` (次数 = ブロックの大きさ) /
+        🎯 `residue_irreducibleBrauerCharacter` (`p`-正則元での剰余 = ブロックのトレース)。
+- [x] **Brauer 指標の一次独立性 — 表現論的な中身** (2026-08-03、段 53-55)。
+      * 段 53 (refactor) — `Algebra/SplitSemisimpleCount.lean` が次元の等式でなく
+        🎯🎯 **`blockTraceQuotientEquiv : A ⧸ T' ≃ₗ[k] (ι → k)`** を公開するようにした
+        (`blockTrace` / `surjective_blockTrace` / 🎯 `ker_blockTrace`)。
+        次元一致だけでは「汎関数が双対の基底」に届かないため。
+      * 段 54 — `.../Modular/BrauerIndependence.lean`:
+        🎯 **`eq_zero_of_sum_blockTrace_pRegular_eq_zero`**
+        (`τ_i` は `p`-正則元上で一次独立)。`τ_i` は `T'` を殺し、`p`-正則類は
+        `kG ⧸ T'` を張る (段 40) ので、そこで消える汎関数は恒等的に 0。
+      * 段 55 — `.../Modular/BrauerCharacterIndependence.lean`:
+        🎯 **`mem_maximalIdeal_of_sum_irreducibleBrauerCharacter`**
+        (`∑ c_i φ_i = 0` なら全ての `c_i ∈ 𝔪`)。剰余に落として段 54。
+
+## 次の段 (frontier, 2026-08-03)
+
+- [ ] **一次独立性の arithmetic descent**: 段 55 から `c = 0` へ。DVR (`𝕎 k` は instance)
+      で一様化元を括り出して帰納 → `c_i ∈ ⋂_n 𝔪^n = 0` (Krull 交叉)。
+      表現論はもう無く純粋に可換環論。
+- [ ] **分解行列 `D`**: `G`-不変 `𝒪`-束の存在 (段 30 `exists_invariant_lattice`) →
+      `χ|_{p-reg} = ∑_φ d_{χφ} φ`。加法性 (段 29) は済んでいるので組成因子への分解は取れる。
 
 以降 (別 issue に分割予定): Cartan 行列 `C = DᵀD` / block / Brauer 対応 /
 2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。
