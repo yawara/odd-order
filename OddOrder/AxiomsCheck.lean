@@ -162,6 +162,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
 import OddOrder.Algebra.EigenspaceDecomposition
 import OddOrder.Algebra.LagrangeInterpolationRing
+import OddOrder.Algebra.WordExpansion
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
 import OddOrder.GroupTheory.RepresentationTheory.Modular.Reduction
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InvariantLattice
@@ -15449,3 +15450,21 @@ and the first half of Brauer's count of irreducible modular representations. -/
   OddOrder.RepresentationTheory.Modular.finrank_quotient_commutatorSubmodule
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.pRegularPartClass_of_isPRegularClass
+
+/-! **Freshman's dream modulo commutators** (`Algebra.WordExpansion`, issue 9506).  In
+characteristic `p` the `p`-th power map is additive modulo the commutator subspace; this is the
+engine of Brauer's count `|IBr G| = #{p`-regular classes`}`.  mathlib's `add_pow_char` needs
+commutativity, so the word/rotation argument is developed here from scratch. -/
+
+#assert_only_allowed_axioms
+  OddOrder.add_pow_eq_sum_wordProd
+#assert_only_allowed_axioms
+  OddOrder.wordProd_rotateWord_sub_mem
+#assert_only_allowed_axioms
+  OddOrder.const_of_iterate_rotateWord_eq
+#assert_only_allowed_axioms
+  OddOrder.card_iterateOrbit
+#assert_only_allowed_axioms
+  OddOrder.exists_nsmul_sum_of_free
+#assert_only_allowed_axioms
+  OddOrder.add_pow_prime_sub_sub_mem

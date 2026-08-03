@@ -130,12 +130,17 @@ system」を**実際に構成する**ところまでを本 issue のスコープ
 - [ ] **`|IBr G| = p`-regular 類の個数** (Brauer)。証明は
       `T = [kG,kG]` と `T' = {x : x^{p^m} ∈ T}` を経由する:
       * (a) `dim kG/T = #共役類` — **済** (`CommutatorSubspace` + `CommutatorQuotient`)
-      * (b) `dim kG/T' = #p-正則類` — **未**。核は標数 `p` の
-        **`(x+y)^p ≡ x^p + y^p mod [R,R]`** (語の巡回回転で軌道分解し、
-        非定数語の軌道長が `p` ゆえ消える)。⚠ mathlib に無く、語の組合せ論を
-        自前で書く必要があるので単独で数 iteration 規模。
-        `p`-正則類側の道具 (`IsPRegularClass` / `pRegularPartClass` = 類の `p'`-部分) は
-        **済** (`PRegularElement.lean`)。
+      * (b) `dim kG/T' = #p-正則類` — **核の Freshman's dream は済**
+        (2026-08-03、`Algebra/WordExpansion.lean` 438 行):
+        **`add_pow_prime_sub_sub_mem`** = 標数 `p` で
+        `(x+y)^p - x^p - y^p ∈ T` (T は交換子を含む任意の加法部分群)。
+        部品 = 非可換二項展開 (`add_pow_eq_sum_wordProd`) / 回転は交換子だけ動かす
+        (`wordProd_rotateWord_sub_mem`) / 非定数語の周期は `p`
+        (`const_of_iterate_rotateWord_eq`、`Function.minimalPeriod` 経由) /
+        自由軌道の和は `p` 倍 (`exists_nsmul_sum_of_free`)。
+        ⚠ mathlib の `add_pow_char` は可換性必須なので**非可換版は新規**。
+        `p`-正則類側の道具 (`IsPRegularClass` / `pRegularPartClass`) も済。
+        残 = `T'` を部分空間として定義し `dim kG/T' = #p-正則類` を出す組み立て。
       * (c) `dim kG/(J + T) = #単純加群` (分裂体) — 未。mathlib の
         `Ring.jacobson` / `IsSemisimpleRing` / Wedderburn–Artin が使える。
       * (d) `T' = J + T` — 未。
