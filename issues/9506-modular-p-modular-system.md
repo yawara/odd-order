@@ -115,9 +115,18 @@ system」を**実際に構成する**ところまでを本 issue のスコープ
 
 ## 次の段 (別 issue へ分割予定)
 
-- [ ] **分解行列 `D`**: `𝒪`-束 `L` 上の `A` (位数 `n`) について
-      `trace_𝒪(A) = brauerTrace(Ā)` — 上の `𝒪` 分解 + 各固有部分加群の rank と
-      還元の次元が一致することから。`𝒪` は DVR なので部分加群は自由。
+- [x] **分解写像の恒等式 (作用素レベル)** (2026-08-03)。
+      `trace_eq_sum_finrank_baseChange_eigenspace`:
+      `tr_𝒪 A = ∑_{ζ ∈ μ_n(𝒪)} dim_k(還元の ζ̄-固有空間) • ζ`
+      = `brauerCharacter_eq_sum_nthRootsFinset` と同じ形。
+      * `Algebra/LagrangeInterpolationRing.lean` / `EigenspaceDecomposition` の
+        PID 版 (`trace_eq_sum_finrank_smul`) / `LatticeEigenspaces` (`𝒪` 側の分解と
+        `μ_n(𝒪) ≃ μ_n(k)`) / `Reduction.lean` (底変換と 2 段 squeeze)。
+      ⚠ **Nakayama も splitting criterion も使っていない** — 各項の不等号 +
+      総和一致で `Finset.sum_eq_sum_iff_of_le` が termwise 等号を出す、を 2 回。
+- [ ] **分解行列 `D` の表現論的包装**: `G`-不変 `𝒪`-束の存在 (完備 DVR + 有限群なので
+      `∑_{g} g·(格子)` で構成) → `χ|_{p-reg} = ∑_φ d_{χφ} φ`。加法性は済んでいるので
+      組成因子への分解は既に取れる。
 - [ ] `|IBr G| = p`-regular 類の個数 (`kG` の Jacobson radical / 半単純商が要る。
       mathlib に `Ring.jacobson` / `IsSemisimpleRing` / Wedderburn–Artin は在る)
 

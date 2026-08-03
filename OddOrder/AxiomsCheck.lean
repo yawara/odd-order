@@ -163,6 +163,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
 import OddOrder.Algebra.EigenspaceDecomposition
 import OddOrder.Algebra.LagrangeInterpolationRing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
+import OddOrder.GroupTheory.RepresentationTheory.Modular.Reduction
 import OddOrder.BG.Ch1_Preliminary.PLengthPComplement
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04_Lem45c_Prop46
@@ -413,7 +414,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 15400
+set_option linter.style.longFile 15600
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -15407,3 +15408,25 @@ the coefficient ring `𝒪` of a `p`-modular system, which is not a field. -/
   OddOrder.RepresentationTheory.Modular.residue_brauerCharacter_of_isPRegular
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.brauerCharacter_quotient_add_subrepresentation
+
+/-! **The decomposition-map identity** (`GroupTheory.RepresentationTheory.Modular.Reduction`,
+issue 9506).  The trace of a finite-order endomorphism of an `𝒪`-lattice is exactly the
+Brauer-character expression of its reduction — the identity that ties ordinary characters to
+Brauer characters. -/
+
+#assert_only_allowed_axioms
+  OddOrder.trace_eq_sum_finrank_smul
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.trace_eq_sum_finrank_smul_of_pow
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.image_residue_nthRootsFinset
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.brauerCharacter_eq_sum_nthRootsFinset
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.baseChange_eigenspace_le
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.isPrimitiveRoot_residue
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.finrank_eigenspace_baseChange
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.trace_eq_sum_finrank_baseChange_eigenspace
