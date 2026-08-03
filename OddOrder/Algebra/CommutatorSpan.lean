@@ -249,6 +249,31 @@ theorem mem_commutatorRadical_iff_frobQuotient (hp : p.Prime) (hchar : (p : A) =
     rw [hiter] at hm
     exact ⟨m, (Submodule.Quotient.mk_eq_zero _).mp hm⟩
 
+theorem iterate_frobQuotient_add (hp : p.Prime) (hchar : (p : A) = 0) (m : ℕ)
+    (u v : A ⧸ commutatorSpan k A) :
+    (frobQuotient hp hchar)^[m] (u + v)
+      = (frobQuotient hp hchar)^[m] u + (frobQuotient hp hchar)^[m] v := by
+  induction m generalizing u v with
+  | zero => simp
+  | succ m ih =>
+    rw [Function.iterate_succ_apply, Function.iterate_succ_apply,
+      Function.iterate_succ_apply, frobQuotient_add, ih]
+
+theorem iterate_frobQuotient_smul (hp : p.Prime) (hchar : (p : A) = 0) (m : ℕ) (c : k)
+    (u : A ⧸ commutatorSpan k A) :
+    (frobQuotient hp hchar)^[m] (c • u) = c ^ p ^ m • (frobQuotient hp hchar)^[m] u := by
+  induction m generalizing c u with
+  | zero => simp
+  | succ m ih =>
+    rw [Function.iterate_succ_apply, Function.iterate_succ_apply, frobQuotient_smul, ih,
+      ← pow_mul, ← pow_succ']
+
+theorem iterate_frobQuotient_zero (hp : p.Prime) (hchar : (p : A) = 0) (m : ℕ) :
+    (frobQuotient hp hchar)^[m] (0 : A ⧸ commutatorSpan k A) = 0 := by
+  have h := iterate_frobQuotient_mk (k := k) hp hchar m (0 : A)
+  rw [zero_pow (pow_ne_zero m hp.pos.ne')] at h
+  simpa using h
+
 end Frobenius
 
 end OddOrder
