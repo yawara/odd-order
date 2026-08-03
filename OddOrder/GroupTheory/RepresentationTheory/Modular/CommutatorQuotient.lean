@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.LinearAlgebra.Pi
 import Mathlib.LinearAlgebra.Dimension.Constructions
+import Mathlib.LinearAlgebra.Dimension.OrzechProperty
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorSubspace
 
 /-!
@@ -123,5 +124,20 @@ theorem finrank_quotient_commutatorSubmodule :
       exact ⟨(commutatorSubmodule k G).mkQ x, hx⟩
     have := LinearMap.finrank_le_finrank_of_surjective hsurj
     simpa [Nat.card_eq_fintype_card, Module.finrank_pi] using this
+
+omit [DecidableEq (ConjClasses G)] in
+-- `[Fintype G]` is used through `finrank_quotient_commutatorSubmodule`.
+set_option linter.unusedFintypeInType false in
+/-- **The class representatives are a basis of `kG ⧸ [kG, kG]`.**  They span
+(`span_range_mkQ_out_eq_top`) and there are `dim` of them
+(`finrank_quotient_commutatorSubmodule`), so they are independent. -/
+theorem linearIndependent_mkQ_out :
+    LinearIndependent k fun C : ConjClasses G =>
+      (commutatorSubmodule k G).mkQ (single C.out (1 : k)) := by
+  classical
+  have _ : Fintype (ConjClasses G) := Fintype.ofFinite _
+  refine linearIndependent_of_top_le_span_of_card_eq_finrank ?_ ?_
+  · rw [span_range_mkQ_out_eq_top]
+  · rw [finrank_quotient_commutatorSubmodule (k := k) (G := G), Nat.card_eq_fintype_card]
 
 end OddOrder.RepresentationTheory.Modular
