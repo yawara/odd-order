@@ -282,4 +282,38 @@ theorem pRegularPart_conj (g x : G) :
 
 end Uniqueness
 
+/-! ### The `p'`-part of the group order -/
+
+section PRegularExponent
+
+variable {p : ℕ} {G : Type*} [Group G]
+
+/-- The **`p'`-part of the order of `G`**: the largest divisor of `|G|` prime to `p`.  This is
+the exponent at which Brauer characters of `G` are taken, because every `p`-regular element of
+`G` has order dividing it (`orderOf_dvd_pRegularExponent`). -/
+noncomputable def pRegularExponent (p : ℕ) (G : Type*) [Group G] : ℕ :=
+  ordCompl[p] (Nat.card G)
+
+theorem not_dvd_pRegularExponent [Finite G] (hp : p.Prime) : ¬ p ∣ pRegularExponent p G :=
+  Nat.not_dvd_ordCompl hp Nat.card_pos.ne'
+
+theorem pRegularExponent_pos [Finite G] : 0 < pRegularExponent p G :=
+  Nat.ordCompl_pos p Nat.card_pos.ne'
+
+/-- **Every `p`-regular element has order dividing the `p'`-part of `|G|`.**  Lagrange gives
+`orderOf g ∣ |G| = p ^ a * m`, and `p ∤ orderOf g` forces the `p`-power factor out. -/
+theorem orderOf_dvd_pRegularExponent (hp : p.Prime) {g : G} (hg : IsPRegular p g) :
+    orderOf g ∣ pRegularExponent p G := by
+  have hcop : Nat.Coprime (orderOf g) (ordProj[p] (Nat.card G)) :=
+    Nat.Coprime.pow_right _ ((Nat.Prime.coprime_iff_not_dvd hp).mpr hg).symm
+  refine hcop.dvd_of_dvd_mul_left ?_
+  rw [pRegularExponent, Nat.ordProj_mul_ordCompl_eq_self]
+  exact orderOf_dvd_natCard g
+
+theorem pow_pRegularExponent_eq_one (hp : p.Prime) {g : G} (hg : IsPRegular p g) :
+    g ^ pRegularExponent p G = 1 :=
+  orderOf_dvd_iff_pow_eq_one.mp (orderOf_dvd_pRegularExponent hp hg)
+
+end PRegularExponent
+
 end OddOrder.GroupTheory

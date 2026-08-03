@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.RepresentationTheory.Basic
 import Mathlib.Algebra.DirectSum.LinearMap
 import OddOrder.Algebra.EigenspaceDecomposition
+import OddOrder.GroupTheory.PRegularElement
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
 
 /-!
@@ -216,5 +217,45 @@ theorem residue_brauerCharacter [FiniteDimensional (ResidueField 𝒪) V]
     (fun ζ => Module.finrank (ResidueField 𝒪) (Module.End.eigenspace (ρ g) ζ) • ζ)).symm
 
 end BrauerCharacter
+
+/-! ### `p`-regular elements of a finite group
+
+Brauer characters of a finite group `G` are taken at the exponent `n = |G|_{p'}`
+(`pRegularExponent`): every `p`-regular element has order dividing it, so no hypothesis on
+`ρ g` has to be carried around. -/
+
+section PRegular
+
+open OddOrder.GroupTheory
+
+variable {p : ℕ} {𝒪 : Type*} [CommRing 𝒪] [HenselianLocalRing 𝒪] [IsPModularSystem p 𝒪]
+variable {G V : Type*} [Group G] [Finite G] [AddCommGroup V] [Module (ResidueField 𝒪) V]
+variable (ρ : Representation (ResidueField 𝒪) G V)
+
+omit [IsPModularSystem p 𝒪] [Finite G] in
+/-- A `p`-regular element acts with `ρ g ^ |G|_{p'} = 1`, so its eigenvalues are `|G|_{p'}`-th
+roots of unity — exactly the hypothesis the Brauer character needs. -/
+theorem rep_pow_pRegularExponent_eq_one (hp : p.Prime) {g : G} (hg : IsPRegular p g) :
+    (ρ g) ^ pRegularExponent p G = 1 := by
+  rw [← map_pow, pow_pRegularExponent_eq_one hp hg, map_one]
+
+/-- **Reduction of the Brauer character at a `p`-regular element is the ordinary trace.**
+Unlike `residue_brauerCharacter` this carries no hypothesis on `ρ g`: `p`-regularity of `g`
+supplies it. -/
+theorem residue_brauerCharacter_of_isPRegular [FiniteDimensional (ResidueField 𝒪) V]
+    (hp : p.Prime) {ω : ResidueField 𝒪} (hω : IsPrimitiveRoot ω (pRegularExponent p G))
+    {g : G} (hg : IsPRegular p g) :
+    residue 𝒪 (brauerCharacter (𝒪 := 𝒪) (pRegularExponent p G) ρ g)
+      = LinearMap.trace (ResidueField 𝒪) V (ρ g) :=
+  residue_brauerCharacter (hn := not_dvd_pRegularExponent hp) (hn0 := pRegularExponent_pos)
+    (ρ := ρ) (hω := hω) (hg := rep_pow_pRegularExponent_eq_one ρ hp hg)
+
+/-- The Brauer character of a finite group at the identity is the dimension. -/
+theorem brauerCharacter_pRegularExponent_one (hp : p.Prime) :
+    brauerCharacter (𝒪 := 𝒪) (pRegularExponent p G) ρ 1
+      = (Module.finrank (ResidueField 𝒪) V : 𝒪) :=
+  brauerCharacter_one (hn := not_dvd_pRegularExponent hp) (hn0 := pRegularExponent_pos) (ρ := ρ)
+
+end PRegular
 
 end OddOrder.RepresentationTheory.Modular
