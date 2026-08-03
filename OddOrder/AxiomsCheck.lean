@@ -173,6 +173,7 @@ import OddOrder.Algebra.PiSimpleModule
 import OddOrder.Algebra.SplitSemisimpleCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
+import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleIsBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.StandardSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterIndependence
@@ -15644,3 +15645,7 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.RepresentationTheory.Modular.exists_isPrimitiveRoot_pRegularExponent_standardSystem
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_surjective_blocks_card_eq_standardSystem
+#assert_only_allowed_axioms
+  OddOrder.MatrixModule.isScalarTower_blockModule
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_irreducibleBrauerCharacter_eq

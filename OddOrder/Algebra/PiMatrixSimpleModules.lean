@@ -102,6 +102,18 @@ theorem blockModule_smul (π : A →+* ∀ j, Matrix (nn j) (nn j) k) (i : ι) (
     letI := blockModule nn π i
     a • v = π a i *ᵥ v := rfl
 
+/-- **The block action is compatible with the scalars** when the surjection is `k`-linear.  This
+is what lets a `A`-linear map between blocks be restricted to a `k`-linear one, and hence what
+connects the module classification to Brauer characters. -/
+theorem isScalarTower_blockModule [Algebra k A] {π : A →+* ∀ j, Matrix (nn j) (nn j) k}
+    (hπ : ∀ (c : k) (a : A), π (c • a) = c • π a) (i : ι) :
+    letI := blockModule nn π i
+    IsScalarTower k A (nn i → k) := by
+  letI := blockModule nn π i
+  refine ⟨fun c a v => ?_⟩
+  change π (c • a) i *ᵥ v = c • (π a i *ᵥ v)
+  rw [hπ, Pi.smul_apply, Matrix.smul_mulVec]
+
 /-- **Each block is a simple module over the source ring.** -/
 theorem isSimpleModule_blockModule [∀ i, Nonempty (nn i)]
     {π : A →+* ∀ j, Matrix (nn j) (nn j) k} (hπ : Function.Surjective π) (i : ι) :
