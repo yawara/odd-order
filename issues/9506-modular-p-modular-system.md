@@ -321,8 +321,29 @@ leaf の層構造・mathlib 実測 (使えたもの/無かったもの)・設計
       🎯 `exists_completeOrthogonalIdempotents_lift` (`1 = ∑ f_x`、`A f_x` が射影不可分) と
       `BlockIdempotent.lean` の 🎯🎯 **`blockRingEquiv`** (`A ≃+* ∏_B (e_B A e_B)`、
       mathlib の `ringEquivOfIsMulCentral`)。
-- [ ] Cartan 行列 `C = DᵀD` (射影被覆が要る) / Brauer 対応 /
-      2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。
+### Z\* までの残り (2026-08-03 時点の見取り図)
+
+ここまでで Navarro **Ch.1-2 は完備**、**Ch.3 (block) は基本構造まで**到達した。
+Z\*-定理 (Ch.7) までに要るものを、手持ちとの差分で:
+
+- [ ] **Cartan 行列 `C = DᵀD`** — Z\* の必須経路ではない**枝**。
+      形式化には Jordan–Hölder の**重複度関数**が要る (mathlib は `CompositionSeries` は
+      持つが多重度は未確認)。代替として split 代数では `c_{xy} = dim_k (f_x A f_y)` を
+      定義に採る手もある。段 73 の `f_x` は既にある。
+- [ ] **`𝒪G` 側への移行** — block 論は `kG` 上で組んだが、Ch.4 以降の defect group /
+      Brauer 対応は `𝒪G` の block (= `kG` の block と 1 対 1) で書くのが標準。
+      冪等元の持ち上げ (`J(𝒪G)` は冪零でないが `𝒪` が完備なので
+      `IsAdicComplete` 版の持ち上げが要る) が入口。
+- [ ] **相対トレース `Tr^G_H` と defect group** — `(𝒪G)^G = Z(𝒪G)` 上の
+      `Tr^G_H : (𝒪G)^H → (𝒪G)^G`。defect group は block 冪等元が
+      `Tr^G_D((𝒪G)^D)` に入る極小の `D`。
+- [ ] **Brauer 準同型 `Br_P : (kG)^P → k C_G(P)`** — `p`-部分群 `P` の共役固定点から
+      `C_G(P)` 成分への射影。**乗法性が本体** (mod `p` の数え上げ)。Brauer 対応の入口。
+- [ ] **2nd/3rd main theorem** → **Z\*-定理** → Q₈ bridge。
+
+⚠ 上の 3-5 は `kG`/`𝒪G` の**群環固有**の構造 (共役作用・部分群・相対トレース) を使う。
+段 40-74 は「分裂半単純商を持つ有限次元代数」の一般論だったので、ここから先は
+群論側の道具立てが増える。
 
 以降 (別 issue に分割予定): Cartan 行列 `C = DᵀD` / block / Brauer 対応 /
 2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。
