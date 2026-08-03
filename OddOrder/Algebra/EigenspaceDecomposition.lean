@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.LinearAlgebra.Lagrange
 import Mathlib.LinearAlgebra.Eigenspace.Basic
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Basic
+import Mathlib.Algebra.DirectSum.LinearMap
 import OddOrder.Algebra.LagrangeInterpolationRing
 
 /-!
@@ -38,6 +39,8 @@ That is what makes Brauer characters well defined.
 * `OddOrder.sum_finrank_eigenspace_of_pow` — the eigenspace dimensions add up to `dim V`
 * `OddOrder.finrank_eigenspace_eq_quotient_add` — eigenspace dimensions are additive along an
   invariant subspace, eigenvalue by eigenvalue
+* `OddOrder.trace_eq_sum_finrank_smul` — over a principal ideal domain, the trace is the sum of
+  the eigenvalues weighted by the ranks of the eigen-submodules
 -/
 
 namespace OddOrder
@@ -139,6 +142,69 @@ theorem sum_finrank_eigenspace_of_pow [FiniteDimensional F V]
   rw [← he.finrank_eq, Module.finrank_directSum, Finset.univ_eq_attach]
   exact (Finset.sum_attach (nthRootsFinset m (1 : F))
     (fun ζ => Module.finrank F (A.eigenspace ζ))).symm
+
+/-! ### Ranks and the trace, over a domain
+
+Over a principal ideal domain — the case of interest is the coefficient ring `𝒪` of a
+`p`-modular system, a complete DVR — the eigen-submodules of a finite free module are again
+finite free, so the decomposition can be read off in ranks and in the trace.  This is the
+`𝒪`-side of the comparison that defines the decomposition matrix.
+-/
+
+section Domain
+
+variable {R M : Type*} [CommRing R] [IsDomain R]
+  [AddCommGroup M] [Module R M] [Module.IsTorsionFree R M]
+
+/-- The eigen-decomposition of `iSup_eigenspace_eq_top_of_separated` is an internal direct
+sum. -/
+theorem isInternal_eigenspace_of_separated [DecidableEq R] {A : Module.End R M} {s : Finset R}
+    (hs : SeparatedNodes s) (hA : aeval A (∏ η ∈ s, (X - C η)) = 0) :
+    DirectSum.IsInternal fun ζ : s => A.eigenspace (ζ : R) := by
+  rw [DirectSum.isInternal_submodule_iff_iSupIndep_and_iSup_eq_top]
+  refine ⟨A.eigenspaces_iSupIndep.comp Subtype.val_injective, eq_top_iff.mpr ?_⟩
+  rw [← iSup_eigenspace_eq_top_of_separated hs hA]
+  exact iSup₂_le fun ζ hζ => le_iSup (fun ζ : s => A.eigenspace (ζ : R)) ⟨ζ, hζ⟩
+
+variable [IsPrincipalIdealRing R] [Module.Finite R M]
+
+/-- The ranks of the eigen-submodules add up to the rank of the module. -/
+theorem sum_finrank_eigenspace_of_separated {A : Module.End R M} {s : Finset R}
+    (hs : SeparatedNodes s) (hA : aeval A (∏ η ∈ s, (X - C η)) = 0) :
+    ∑ ζ ∈ s, Module.finrank R (A.eigenspace ζ) = Module.finrank R M := by
+  classical
+  have he := LinearEquiv.ofBijective (DirectSum.coeLinearMap
+    (fun ζ : s => A.eigenspace (ζ : R))) (isInternal_eigenspace_of_separated hs hA)
+  rw [← he.finrank_eq, Module.finrank_directSum, Finset.univ_eq_attach]
+  exact (Finset.sum_attach s (fun ζ => Module.finrank R (A.eigenspace ζ))).symm
+
+/-- **The trace is the sum of the eigenvalues weighted by the ranks of the eigen-submodules.**
+Over the coefficient ring of a `p`-modular system this is the statement that the trace of a
+lattice endomorphism of order prime to `p` is literally the Brauer-character expression. -/
+theorem trace_eq_sum_finrank_smul [Module.Free R M] {A : Module.End R M} {s : Finset R}
+    (hs : SeparatedNodes s) (hA : aeval A (∏ η ∈ s, (X - C η)) = 0) :
+    LinearMap.trace R M A = ∑ ζ ∈ s, Module.finrank R (A.eigenspace ζ) • ζ := by
+  classical
+  have hmaps : ∀ ζ : s, Set.MapsTo A (A.eigenspace (ζ : R)) (A.eigenspace (ζ : R)) := by
+    intro ζ v hv
+    rw [SetLike.mem_coe, mem_eigenspace_iff] at hv ⊢
+    rw [hv, map_smul, hv]
+  have hrestrict : ∀ ζ : s, LinearMap.trace R _ (A.restrict (hmaps ζ))
+      = Module.finrank R (A.eigenspace (ζ : R)) • (ζ : R) := by
+    intro ζ
+    have hid : A.restrict (hmaps ζ) = (ζ : R) • LinearMap.id := by
+      refine LinearMap.ext fun v => Subtype.ext ?_
+      have hv := v.2
+      rw [mem_eigenspace_iff] at hv
+      simpa [LinearMap.restrict_apply] using hv
+    rw [hid, map_smul, LinearMap.trace_id, smul_eq_mul, nsmul_eq_mul]
+    exact mul_comm _ _
+  rw [LinearMap.trace_eq_sum_trace_restrict (isInternal_eigenspace_of_separated hs hA) hmaps]
+  simp only [hrestrict, Finset.univ_eq_attach]
+  exact Finset.sum_attach s (fun ζ => Module.finrank R (A.eigenspace ζ) • ζ)
+
+end Domain
+
 
 /-! ### Invariant subspaces: the eigenspace dimensions are additive
 

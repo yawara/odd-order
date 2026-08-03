@@ -24,11 +24,22 @@ difference is a unit.  That is exactly the hypothesis of
 * `OddOrder.RepresentationTheory.Modular.separatedNodes_of_pow_eq_one` — roots of unity of
   order prime to `p` are separated nodes
 * `OddOrder.RepresentationTheory.Modular.iSup_eigenspace_eq_top_of_pow` — the decomposition
+* `OddOrder.RepresentationTheory.Modular.trace_eq_sum_finrank_smul_of_pow` — the trace of a
+  finite-order lattice endomorphism, in Brauer-character shape
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
 
 open IsLocalRing Polynomial
+
+/-- `X ^ n - 1` factors into the `n`-th roots of unity, so an operator of order dividing `n` is
+annihilated by that product. -/
+theorem prod_X_sub_C_nthRootsFinset_aeval_eq_zero {R : Type*} [CommRing R] [IsDomain R]
+    {n : ℕ} (hn0 : 0 < n) {ω : R} (hω : IsPrimitiveRoot ω n)
+    {M : Type*} [AddCommGroup M] [Module R M] {A : Module.End R M} (hA : A ^ n = 1) :
+    aeval A (∏ η ∈ nthRootsFinset n (1 : R), (X - C η)) = 0 := by
+  rw [← X_pow_sub_one_eq_prod hn0 hω]
+  simp [hA]
 
 variable {p : ℕ} {𝒪 : Type*} [CommRing 𝒪] [HenselianLocalRing 𝒪] [IsPModularSystem p 𝒪]
 
@@ -51,11 +62,44 @@ theorem iSup_eigenspace_eq_top_of_pow [IsDomain 𝒪] {n : ℕ} (hn : ¬ p ∣ n
     {ω : 𝒪} (hω : IsPrimitiveRoot ω n) {M : Type*} [AddCommGroup M] [Module 𝒪 M]
     {A : Module.End 𝒪 M} (hA : A ^ n = 1) :
     ⨆ ζ ∈ nthRootsFinset n (1 : 𝒪), A.eigenspace ζ = ⊤ := by
-  refine OddOrder.iSup_eigenspace_eq_top_of_separated
-    (separatedNodes_of_pow_eq_one (p := p) hn
-      (fun a ha => (mem_nthRootsFinset hn0 _).mp ha)) ?_
-  rw [← X_pow_sub_one_eq_prod hn0 hω]
-  simp [hA]
+  exact OddOrder.iSup_eigenspace_eq_top_of_separated
+    (separatedNodes_of_pow_eq_one (p := p) hn fun _ ha => (mem_nthRootsFinset hn0 _).mp ha)
+    (prod_X_sub_C_nthRootsFinset_aeval_eq_zero hn0 hω hA)
+
+/-! ### Ranks and the trace of a lattice endomorphism -/
+
+section Lattice
+
+variable [IsDomain 𝒪] [IsPrincipalIdealRing 𝒪] {n : ℕ} (hn : ¬ p ∣ n) (hn0 : 0 < n)
+  {ω : 𝒪} (hω : IsPrimitiveRoot ω n)
+  {L : Type*} [AddCommGroup L] [Module 𝒪 L] [Module.Free 𝒪 L] [Module.Finite 𝒪 L]
+  {A : Module.End 𝒪 L} (hA : A ^ n = 1)
+include hn hn0 hω hA
+
+/-- The ranks of the eigen-submodules of a finite-order lattice endomorphism add up to the rank
+of the lattice. -/
+theorem sum_finrank_eigenspace_of_pow :
+    ∑ ζ ∈ nthRootsFinset n (1 : 𝒪), Module.finrank 𝒪 (A.eigenspace ζ) = Module.finrank 𝒪 L :=
+  OddOrder.sum_finrank_eigenspace_of_separated
+    (separatedNodes_of_pow_eq_one (p := p) hn fun _ ha => (mem_nthRootsFinset hn0 _).mp ha)
+    (prod_X_sub_C_nthRootsFinset_aeval_eq_zero hn0 hω hA)
+
+/-- **The trace of a finite-order lattice endomorphism is already the Brauer-character
+expression**, computed upstairs in `𝒪`: the `n`-th roots of unity weighted by the ranks of the
+eigen-submodules.
+
+Comparing this with `brauerCharacter` — which is the same expression with the ranks replaced by
+the dimensions of the eigenspaces of the reduction — is what makes the decomposition matrix an
+identity between ordinary characters and Brauer characters. -/
+theorem trace_eq_sum_finrank_smul_of_pow :
+    LinearMap.trace 𝒪 L A
+      = ∑ ζ ∈ nthRootsFinset n (1 : 𝒪), Module.finrank 𝒪 (A.eigenspace ζ) • ζ :=
+  OddOrder.trace_eq_sum_finrank_smul
+    (separatedNodes_of_pow_eq_one (p := p) hn fun _ ha => (mem_nthRootsFinset hn0 _).mp ha)
+    (prod_X_sub_C_nthRootsFinset_aeval_eq_zero hn0 hω hA)
+
+end Lattice
+
 
 /-! ### The standard splitting system
 
