@@ -15679,3 +15679,5 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.exists_mem_eq_one_eq_zero
 #assert_only_allowed_axioms
   OddOrder.Subalgebra.eq_top_of_separates
+#assert_only_allowed_axioms
+  OddOrder.MatrixModule.centralCharacterAlg

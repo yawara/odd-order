@@ -100,6 +100,46 @@ theorem centralScalar_smul (hπ : Function.Surjective π) {z : A} (hz : z ∈ Se
   funext j
   simp [Matrix.mulVec, Matrix.diagonal, dotProduct]
 
+/-! ### The centre as a `k`-algebra -/
+
+section Alg
+
+variable [Algebra k A]
+
+theorem mem_center_of_mem_centerSubalgebra {z : Subalgebra.center k A} :
+    (z : A) ∈ Set.center A :=
+  Semigroup.mem_center_iff.mpr (Subalgebra.mem_center_iff.mp z.2)
+
+/-- **The central character as a `k`-algebra homomorphism** on the centre.  The extra hypothesis
+is that the splitting surjection is `k`-linear, which is what makes it fix the scalars. -/
+noncomputable def centralCharacterAlg (hπ : Function.Surjective π)
+    (hlin : ∀ (c : k) (a : A), π (c • a) = c • π a) :
+    Subalgebra.center k A →ₐ[k] k where
+  toFun z := centralScalar π i (z : A)
+  map_one' := by
+    have h1 : π (1 : A) i = 1 := by rw [map_one]; rfl
+    simp [centralScalar, h1]
+  map_mul' z w := by
+    have hzw : π ((z : A) * w) i
+        = Matrix.scalar (nn i) (centralScalar π i z) *
+          Matrix.scalar (nn i) (centralScalar π i w) := by
+      rw [map_mul, Pi.mul_apply,
+        scalar_centralScalar π i hπ (mem_center_of_mem_centerSubalgebra (z := z)),
+        scalar_centralScalar π i hπ (mem_center_of_mem_centerSubalgebra (z := w))]
+    simp [centralScalar, hzw]
+  map_zero' := by simp [centralScalar]
+  map_add' z w := by simp [centralScalar]
+  commutes' r := by
+    have hr : π (algebraMap k A r) i = Matrix.scalar (nn i) r := by
+      rw [Algebra.algebraMap_eq_smul_one, hlin, Pi.smul_apply, map_one]
+      ext a b
+      by_cases h : a = b
+      · subst h; simp [Matrix.scalar_apply]
+      · simp [Matrix.scalar_apply, Matrix.one_apply_ne h, Matrix.diagonal_apply_ne _ h]
+    simp [centralScalar, hr, Matrix.scalar_apply]
+
+end Alg
+
 /-! ### Blocks -/
 
 section Blocks
