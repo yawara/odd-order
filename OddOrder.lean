@@ -18,6 +18,8 @@ import OddOrder.Algebra.MackeyFormula
 import OddOrder.Algebra.Rosenberg
 import OddOrder.Algebra.DefectGroupConjugacy
 import OddOrder.Algebra.GroupAlgebraDefectGroup
+import OddOrder.Algebra.AlgClosedSplitting
+import OddOrder.Algebra.GroupAlgebraBlocks
 import OddOrder.Algebra.BlockIdempotent
 import OddOrder.Algebra.CentralIdempotentModule
 import OddOrder.Algebra.PrimitiveIdempotent

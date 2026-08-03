@@ -88,6 +88,22 @@ theorem surjective_blockCharacterPi : Function.Surjective (blockCharacterPi π h
     exact hne (AlgHom.ext hcon)
   exact ⟨blockCharacterPi π hπ hlin z, ⟨z, rfl⟩, hz⟩
 
+omit [Finite ι] in
+/-- **A central element is killed by all block characters exactly when the splitting kills it.**
+So the nil-kernel hypothesis of `existsUnique_blockIdempotent` is implied by nilness of
+`RingHom.ker π`, which is what `exists_algHom_pi_matrix_of_isAlgClosed` supplies. -/
+theorem blockCharacterPi_eq_zero_iff {z : Subalgebra.center k A} :
+    blockCharacterPi π hπ hlin z = 0 ↔ π (z : A) = 0 := by
+  rw [← centralCharacterPi_eq_zero_iff π hπ ⟨(z : A), mem_center_of_mem_centerSubalgebra⟩]
+  constructor
+  · intro h
+    funext i
+    exact congrFun h (Quotient.mk (blockSetoid π hπ hlin) i)
+  · intro h
+    funext c
+    induction c using Quotient.ind with | _ i =>
+    exact congrFun h i
+
 /-- **The block idempotents.**  If the kernel of the splitting is nil — for `A = kG` it is the
 Jacobson radical — then the indicator of each block lifts uniquely to a central idempotent. -/
 theorem existsUnique_blockIdempotent

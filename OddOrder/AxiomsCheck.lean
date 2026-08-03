@@ -171,6 +171,7 @@ import OddOrder.Algebra.ModuleAlongSurjection
 import OddOrder.Algebra.BlockIdempotent
 import OddOrder.Algebra.DefectGroupConjugacy
 import OddOrder.Algebra.GroupAlgebraDefectGroup
+import OddOrder.Algebra.GroupAlgebraBlocks
 import OddOrder.Algebra.CentralIdempotentModule
 import OddOrder.Algebra.PrimitiveIdempotent
 import OddOrder.Algebra.CentralCharacter
@@ -15730,3 +15731,9 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.MatrixModule.blockIdempotent_ne_zero
 #assert_only_allowed_axioms
   OddOrder.MatrixModule.eq_zero_or_eq_of_mul_eq_of_isIdempotentElem
+#assert_only_allowed_axioms
+  OddOrder.MatrixModule.blockCharacterPi_eq_zero_iff
+#assert_only_allowed_axioms
+  OddOrder.exists_algHom_pi_matrix_of_isAlgClosed
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.exists_blockIdempotents_defectGroups_conj

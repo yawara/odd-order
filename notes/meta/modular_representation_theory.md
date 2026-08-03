@@ -242,7 +242,22 @@ Brauer の定理が仮説付きでなく**中心の原始性だけ**を要求す
 (mathlib `eq_of_isNilpotent_sub_of_isIdempotentElem`)、後者は段 69 の一意性で `u = e_B`。
 ⟹ **段 85 の `hprim` / `hb0` が block 冪等元に対して閉じた**。
 
-**次の frontier**: `k[G]` の分裂データ `π : k[G] →+* ∏ M_{n_i}(k)` (nil 核) の供給
-= `k[G]/J(k[G])` の Artin–Wedderburn。これが入ると段 85 の Brauer の定理が
-`k[G]` の block に対して仮説無しで発火する → `Br_P` の核 → Brauer 対応 →
-2nd/3rd main theorem → Z\*。
+段 87 追加:
+
+| leaf | 内容 |
+|---|---|
+| `Algebra/AlgClosedSplitting.lean` | 🎯 **`exists_algHom_pi_matrix_of_isAlgClosed`** (代数閉体上の有限次元代数 → nil 核を持つ行列積への全射) |
+| `Algebra/BlockIdempotent.lean` (追記) | `blockCharacterPi_eq_zero_iff` (段 69 の `hnil` を `ker π` の nil 性へ接続) |
+| `Algebra/GroupAlgebraBlocks.lean` | 🎯🎯 **`exists_blockIdempotents_defectGroups_conj`** (`k` 代数閉・`G` 有限のみで block 分解 + Brauer の定理) |
+
+**設計上の判断 (段 87)**: 段 69 以来 block 論が仮説で受けていた分裂データは、
+**代数閉体上なら mathlib だけで供給できる**: 有限次元 ⟹ `IsArtinianRing.of_finite` ⟹
+`IsSemiprimaryRing.isNilpotent` (`J(A)` 冪零) + `IsSemisimpleRing (A ⧸ Ring.jacobson A)`
+(instance) ⟹ `IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed`。
+⚠ 「分裂体」を一般に扱おうとすると単純加群の自己準同型環が `k` という条件を
+universe を跨いで量化する羽目になる。代数閉に限れば mathlib の Wedderburn がそのまま
+使え、しかも **`k = 𝔽̄_p` は段 58 の `𝕎(𝔽̄_p)` の剰余体で実際に使う設定**なので損が無い。
+有限体 `GF(p^φ(n))` 版は Brauer の分裂体定理が要る (別項目に繰延)。
+
+**次の frontier**: `Br_P` の核 `= ∑_{Q<P} Tr^P_Q((kG)^Q)` (Mackey = 段 83 が要る) →
+Brauer 対応 (第 1 主定理) → 2nd/3rd main theorem → Z\*。

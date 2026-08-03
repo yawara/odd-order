@@ -422,10 +422,21 @@ Z\*-定理 (Ch.7) までに要るものを、手持ちとの差分で:
       台を `B` に閉じ込める ⟹ `Φ u = 0` か `Pi.single c 1`。前者は核が nil ゆえ `u = 0`、
       後者は段 69 の一意性で `u = e_B`。`blockIdempotent_ne_zero` も (段 85 の `hb0`)。
       ⟹ **段 85 の `hprim`/`hb0` は block 冪等元に対して閉じた**。
-- [ ] **`k[G]` の分裂データ `π : k[G] →+* ∏ M_{n_i}(k)`** — 段 69/86 の block 論は
-      「nil 核を持つ行列積への全射」を仮説で受けている。`A = k[G]` でそれを供給するには
-      `k[G]/J(k[G])` の Artin–Wedderburn (分裂体上) が要る。これが入ると
-      段 85 の Brauer の定理が `k[G]` の block に対して仮説無しで発火する。
+- [x] **分裂データの供給 + 無仮説版 Brauer** — 完了 (2026-08-03、段 87)。
+      * `Algebra/AlgClosedSplitting.lean` — 🎯 **`exists_algHom_pi_matrix_of_isAlgClosed`**:
+        **代数閉体上の有限次元代数は nil 核を持つ行列積への全射を持つ**。
+        有限次元 ⟹ Artin ⟹ `J(A)` 冪零 (`IsSemiprimaryRing.isNilpotent`) かつ
+        `A/J(A)` は半単純 ⟹ 代数閉体上の Artin–Wedderburn
+        (`IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed`)。
+      * `Algebra/BlockIdempotent.lean` に `blockCharacterPi_eq_zero_iff`
+        (中心指標が全部消える ⟺ `π` で消える; 段 69 の `hnil` を `ker π` の nil 性に接続)。
+      * `Algebra/GroupAlgebraBlocks.lean` — 🎯🎯
+        **`exists_blockIdempotents_defectGroups_conj`**:
+        **`k` 代数閉・`G` 有限のみを仮定して**、`k[G]` の block 冪等元の完全直交族が存在し
+        (各々中心・非零)、**各 block の defect group は 1 つの `G`-共役類をなす**。
+        ⚠ `k = 𝔽̄_p` は実際に使う設定 — 段 58 の `𝕎(𝔽̄_p)` の剰余体そのもの。
+- [ ] **分裂体版 (代数閉でない `k`)** — 上は `IsAlgClosed k` を使う。有限体
+      `GF(p^φ(n))` (段 58) で同じことを言うには **Brauer の分裂体定理**が要る (別項目)。
 - [ ] **`Br_P` の核** = `∑_{Q < P} Tr^P_Q((kG)^Q)` — Mackey (段 83) が要る。
 - [ ] **2nd/3rd main theorem** → **Z\*-定理** → Q₈ bridge。
 
