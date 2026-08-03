@@ -167,6 +167,7 @@ import OddOrder.Algebra.CommutatorSpan
 import OddOrder.Algebra.MatrixCommutator
 import OddOrder.Algebra.CommutatorSpanHom
 import OddOrder.Algebra.MatrixNaturalModule
+import OddOrder.Algebra.PiMatrixSimpleModules
 import OddOrder.Algebra.PiSimpleModule
 import OddOrder.Algebra.SplitSemisimpleCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
@@ -425,7 +426,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 15600
+set_option linter.style.longFile 15800
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -15592,3 +15593,9 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.PiModule.smul_eq_single_smul
 #assert_only_allowed_axioms
   OddOrder.PiModule.isSimpleModule_factor
+#assert_only_allowed_axioms
+  OddOrder.MatrixModule.isSimpleModule_piNatural
+#assert_only_allowed_axioms
+  OddOrder.MatrixModule.idem_smul_piNatural
+#assert_only_allowed_axioms
+  OddOrder.MatrixModule.nonempty_linearEquiv_natural_of_idem

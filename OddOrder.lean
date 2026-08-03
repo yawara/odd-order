@@ -5,6 +5,7 @@ import OddOrder.Algebra.CommutatorSpan
 import OddOrder.Algebra.MatrixCommutator
 import OddOrder.Algebra.MatrixNaturalModule
 import OddOrder.Algebra.PiSimpleModule
+import OddOrder.Algebra.PiMatrixSimpleModules
 import OddOrder.Algebra.CommutatorSpanHom
 import OddOrder.Algebra.CommutatorSpanPi
 import OddOrder.Algebra.SplitSemisimpleCount
