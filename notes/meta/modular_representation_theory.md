@@ -259,5 +259,26 @@ universe を跨いで量化する羽目になる。代数閉に限れば mathlib
 使え、しかも **`k = 𝔽̄_p` は段 58 の `𝕎(𝔽̄_p)` の剰余体で実際に使う設定**なので損が無い。
 有限体 `GF(p^φ(n))` 版は Brauer の分裂体定理が要る (別項目に繰延)。
 
-**次の frontier**: `Br_P` の核 `= ∑_{Q<P} Tr^P_Q((kG)^Q)` (Mackey = 段 83 が要る) →
-Brauer 対応 (第 1 主定理) → 2nd/3rd main theorem → Z\*。
+段 88 追加:
+
+| leaf | 内容 |
+|---|---|
+| `Algebra/ClassSum.lean` (一般化) | 🎯 **`relTrace_single_apply`** (`Tr^P_{P⊓C_G(g)}(c·g)` = `P`-軌道和); 段 80 の類和版は `P = ⊤` の系に |
+| `GroupTheory/PGroupRelIndex.lean` | `p`-群の真部分群は指数が `p` で割れる (Isaacs Ch09 との重複を解消して移設) |
+| `Algebra/BrauerKernel.lean` | 🎯 `brauerProj_relTrace_eq_zero` / 🎯🎯 **`brauerProj_eq_zero_iff`** (`ker Br_P = ∑_{Q<P} Tr^P_Q((kG)^Q)`) |
+
+**設計上の判断 (段 88)**:
+
+* **Mackey は使わなかった**。核の記述に要るのは「単項式の相対トレース = 軌道和」だけで、
+  これは段 80 の類和の議論を `G` から `P` へ一般化すれば出る。⊆ 方向は
+  **台の大きさに関する帰納法**: `b` の台の元 `g` は `Br_P b = 0` ゆえ `C_G(P)` の外にあり、
+  安定化群 `Q = P ⊓ C_G(g)` は真部分群。`Tr^P_Q(b_g·g)` を引くと軌道 1 本が丸ごと台から消える。
+* ⚠ `set Q := ...` した部分群は**商型 `↥P ⧸ Q.subgroupOf P` の型に現れる**ので
+  `rw [hQ]` が motive not type correct で落ちる。membership 補題
+  (`hQmem`/`hQcomm`) を先に立てて `Q` を書き換えないで済ませる。
+* ⚠ `k[G]` は `Finsupp` の型シノニムなので `Finsupp.sub_apply` / `finsetSum_apply` の
+  `rw` が型不一致で落ちることがある。`have ... := rfl` / 明示型の `have` で回避。
+* ⚠ `if` の `Decidable` インスタンスが `Fintype.decidableExistsFintype` と
+  `Classical.propDecidable` で食い違うので、`if_pos`/`if_neg` 済みの 2 本に分けて渡す。
+
+**次の frontier**: Brauer 対応 (第 1 主定理) → 2nd/3rd main theorem → Z\*。

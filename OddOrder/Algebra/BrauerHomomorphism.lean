@@ -27,6 +27,7 @@ on `P`-conjugation orbits, and the orbits that are not singletons have size divi
 ## Main definitions
 
 * `OddOrder.GroupAlgebra.brauerProj` — the truncation `Br_P`.
+* `OddOrder.GroupAlgebra.brauerProjHom` — the same map bundled as an additive homomorphism.
 
 ## Main results
 
@@ -77,6 +78,16 @@ theorem brauerProj_add (P : Subgroup G) (x y : MonoidAlgebra k G) :
 theorem brauerProj_smul (P : Subgroup G) (r : k) (x : MonoidAlgebra k G) :
     brauerProj P (r • x) = r • brauerProj P x := by
   classical exact Finsupp.filter_smul
+
+/-- `Br_P` as an additive homomorphism, so that its kernel is an `AddSubgroup`. -/
+noncomputable def brauerProjHom (P : Subgroup G) : MonoidAlgebra k G →+ MonoidAlgebra k G where
+  toFun := brauerProj P
+  map_zero' := brauerProj_zero P
+  map_add' := brauerProj_add P
+
+@[simp]
+theorem brauerProjHom_apply (P : Subgroup G) (x : MonoidAlgebra k G) :
+    brauerProjHom P x = brauerProj P x := rfl
 
 @[simp]
 theorem brauerProj_one (P : Subgroup G) : brauerProj P (1 : MonoidAlgebra k G) = 1 := by

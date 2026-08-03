@@ -172,6 +172,7 @@ import OddOrder.Algebra.BlockIdempotent
 import OddOrder.Algebra.DefectGroupConjugacy
 import OddOrder.Algebra.GroupAlgebraDefectGroup
 import OddOrder.Algebra.GroupAlgebraBlocks
+import OddOrder.Algebra.BrauerKernel
 import OddOrder.Algebra.CentralIdempotentModule
 import OddOrder.Algebra.PrimitiveIdempotent
 import OddOrder.Algebra.CentralCharacter
@@ -1422,7 +1423,7 @@ Appendix III type-A Suzuki 2-group structure. -/
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.normalizer_le_setwiseStabilizer_kappaSet
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.centralizer_le_pointwiseStabilizer_kappaSet
 -- p-群の真部分群は指数が p で割れる (Step 4 の Sylow 結論部の道具)。
-#assert_only_allowed_axioms OddOrder.Isaacs.Ch09.dvd_relIndex_of_lt_of_isPGroup
+#assert_only_allowed_axioms OddOrder.dvd_relIndex_of_lt_of_isPGroup
 -- P が M の Sylow p で N_G(P) ≤ M なら P は G の Sylow p (Step 4 の結論部)。
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch09.not_dvd_index_of_normalizer_le
 
@@ -15737,3 +15738,9 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.exists_algHom_pi_matrix_of_isAlgClosed
 #assert_only_allowed_axioms
   OddOrder.GroupAlgebra.exists_blockIdempotents_defectGroups_conj
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.relTrace_single_apply
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.brauerProj_relTrace_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.brauerProj_eq_zero_iff

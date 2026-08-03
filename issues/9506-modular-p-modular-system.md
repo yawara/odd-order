@@ -437,7 +437,17 @@ Z\*-定理 (Ch.7) までに要るものを、手持ちとの差分で:
         ⚠ `k = 𝔽̄_p` は実際に使う設定 — 段 58 の `𝕎(𝔽̄_p)` の剰余体そのもの。
 - [ ] **分裂体版 (代数閉でない `k`)** — 上は `IsAlgClosed k` を使う。有限体
       `GF(p^φ(n))` (段 58) で同じことを言うには **Brauer の分裂体定理**が要る (別項目)。
-- [ ] **`Br_P` の核** = `∑_{Q < P} Tr^P_Q((kG)^Q)` — Mackey (段 83) が要る。
+- [x] **`Br_P` の核** = `∑_{Q < P} Tr^P_Q((kG)^Q)` — 完了 (2026-08-03、段 88)。
+      * `Algebra/ClassSum.lean` を一般化: 🎯 **`relTrace_single_apply`**
+        (`Tr^P_{P ⊓ C_G(g)}(c·g)` は `P`-軌道和 = 各共役に係数 `c`)。
+        段 80 の `relTrace_single_eq_classSum` (`K̂ = Tr^G_{C_G(g)}(g)`) は `P = ⊤` の系に。
+      * `GroupTheory/PGroupRelIndex.lean` — `p`-群の真部分群は指数が `p` で割れる
+        (Isaacs Ch09 `SubnormalClosure.lean` にあった重複を共有 leaf へ移設)。
+      * `Algebra/BrauerKernel.lean` — 🎯 `brauerProj_relTrace_eq_zero` (⊇ 方向:
+        `C_G(P)` 上の係数は `[P:Q]·a c` で `p ∣ [P:Q]`) と
+        🎯🎯 **`brauerProj_eq_zero_iff`** (⊆ 方向は台の大きさに関する帰納法 —
+        `g` の安定化群 `Q = P ⊓ C_G(g) < P` で `Tr^P_Q(b_g·g)` を引くと軌道 1 本が消える)。
+      ⟹ **Brauer の第 1 主定理の計算部分が揃った**。
 - [ ] **2nd/3rd main theorem** → **Z\*-定理** → Q₈ bridge。
 
 ⚠ 上の 3-5 は `kG`/`𝒪G` の**群環固有**の構造 (共役作用・部分群・相対トレース) を使う。

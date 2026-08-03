@@ -27,7 +27,8 @@ turns statements about defect groups (`e_B ∈ Tr^G_D((𝒪G)^D)`) into statemen
 
 ## Main results
 
-* `OddOrder.GroupAlgebra.relTrace_single_eq_classSum` — `K̂ = Tr^G_{C_G(g)}(g)`.
+* `OddOrder.GroupAlgebra.relTrace_single_apply` — `Tr^P_{P ∩ C_G(g)}(c·g)` is the `P`-orbit sum.
+* `OddOrder.GroupAlgebra.relTrace_single_eq_classSum` — `K̂ = Tr^G_{C_G(g)}(g)`, the case `P = ⊤`.
 * `OddOrder.GroupAlgebra.smul_classSum` — class sums are central.
 * `OddOrder.GroupAlgebra.mem_span_classSum` — the centre is spanned by the class sums.
 -/
@@ -89,64 +90,91 @@ theorem smul_single_of_mem_centralizer {g u : G} (hu : u ∈ Subgroup.centralize
   have h := Subgroup.mem_centralizer_iff.mp hu g (Set.mem_singleton g)
   rw [← h, mul_assoc, mul_inv_cancel, mul_one]
 
-/-- **The class sum is a relative trace**: `K̂ = Tr^G_{C_G(g)}(g)`. -/
-theorem relTrace_single_eq_classSum (g : G) :
-    GAlgebra.relTrace (Subgroup.centralizer ({g} : Set G)) ⊤ (single g (1 : k))
-      = classSum k g := by
+open scoped Classical in
+/-- **The relative trace of a monomial is its orbit sum.**  Under the conjugation action of a
+subgroup `P`, the stabiliser of `g` is `P ∩ C_G(g)`, and the trace from it spreads the
+coefficient `c` evenly over the `P`-conjugates of `g`:
+
+`Tr^P_{P ∩ C_G(g)} (c · g) = c · ∑_{u ∈ P} ᵘg`.
+
+For `P = ⊤` this is the class sum identity `K̂ = Tr^G_{C_G(g)}(g)`
+(`relTrace_single_eq_classSum`); for a `p`-subgroup `P` it is what identifies the kernel of the
+Brauer homomorphism. -/
+theorem relTrace_single_apply (P : Subgroup G) (g : G) (c : k) (n : G) :
+    GAlgebra.relTrace (P ⊓ Subgroup.centralizer ({g} : Set G)) P (single g c) n
+      = if ∃ u ∈ P, u * g * u⁻¹ = n then c else 0 := by
   classical
-  letI : Fintype (G ⧸ Subgroup.centralizer ({g} : Set G)) := Fintype.ofFinite _
-  have hfix : ∀ u ∈ Subgroup.centralizer ({g} : Set G),
-      u • (single g (1 : k) : MonoidAlgebra k G) = single g 1 :=
-    fun _ hu => smul_single_of_mem_centralizer hu 1
-  rw [← GAlgebra.sum_out_smul_eq_relTrace_top hfix]
-  refine Finsupp.ext fun n => ?_
-  have hterm : ∀ x : G ⧸ Subgroup.centralizer ({g} : Set G),
-      ((x.out : G) • (single g (1 : k) : MonoidAlgebra k G)) n
-        = if (x.out : G) * g * (x.out : G)⁻¹ = n then 1 else 0 := by
-    intro x
-    rw [conj_smul_single, MonoidAlgebra.single_apply]
-  have hsplit : (∑ x : G ⧸ Subgroup.centralizer ({g} : Set G),
-        ((x.out : G) • (single g (1 : k) : MonoidAlgebra k G))) n
-      = ∑ x : G ⧸ Subgroup.centralizer ({g} : Set G),
-        ((x.out : G) • (single g (1 : k) : MonoidAlgebra k G)) n :=
+  set Q : Subgroup G := P ⊓ Subgroup.centralizer ({g} : Set G) with hQ
+  letI : Fintype (↥P ⧸ Q.subgroupOf P) := Fintype.ofFinite _
+  set rep : ↥P ⧸ Q.subgroupOf P → G := fun x => ((x.out : ↥P) : G) with hrep
+  have hrepP : ∀ x, rep x ∈ P := fun x => (x.out : ↥P).2
+  -- Membership in the stabiliser, stated so that `Q` never has to be rewritten (it occurs in the
+  -- type of the quotient, so `rw` would break the motive).
+  have hQmem : ∀ w : G, w ∈ P → g * w = w * g → w ∈ Q := fun w hw hcomm =>
+    Subgroup.mem_inf.mpr ⟨hw, Subgroup.mem_centralizer_iff.mpr fun h hh => by
+      rw [Set.mem_singleton_iff.mp hh]; exact hcomm⟩
+  have hQcomm : ∀ w : G, w ∈ Q → g * w = w * g := fun w hw =>
+    Subgroup.mem_centralizer_iff.mp (Subgroup.mem_inf.mp hw).2 g (Set.mem_singleton g)
+  have hR : GAlgebra.relTrace Q P (single g c : MonoidAlgebra k G)
+      = ∑ x : ↥P ⧸ Q.subgroupOf P, rep x • (single g c : MonoidAlgebra k G) := rfl
+  have hsplit : (∑ x : ↥P ⧸ Q.subgroupOf P, rep x • (single g c : MonoidAlgebra k G)) n
+      = ∑ x : ↥P ⧸ Q.subgroupOf P, (rep x • (single g c : MonoidAlgebra k G)) n :=
     Finsupp.finsetSum_apply _ _ _
-  rw [hsplit, Finset.sum_congr rfl fun x _ => hterm x, classSum_apply]
-  -- Distinct cosets give distinct conjugates, so at most one term survives.
-  have huniq : ∀ x y : G ⧸ Subgroup.centralizer ({g} : Set G),
-      (x.out : G) * g * (x.out : G)⁻¹ = (y.out : G) * g * (y.out : G)⁻¹ → x = y := by
+  have hterm : ∀ x : ↥P ⧸ Q.subgroupOf P,
+      (rep x • (single g c : MonoidAlgebra k G)) n
+        = if rep x * g * (rep x)⁻¹ = n then c else 0 :=
+    fun x => by rw [conj_smul_single, MonoidAlgebra.single_apply]
+  rw [hR, hsplit, Finset.sum_congr rfl fun x _ => hterm x]
+  -- Distinct cosets of the stabiliser give distinct conjugates, so at most one term survives.
+  have huniq : ∀ x y : ↥P ⧸ Q.subgroupOf P,
+      rep x * g * (rep x)⁻¹ = rep y * g * (rep y)⁻¹ → x = y := by
     intro x y hxy
-    have hmem : (x.out : G)⁻¹ * (y.out : G) ∈ Subgroup.centralizer ({g} : Set G) := by
-      refine Subgroup.mem_centralizer_iff.mpr fun h hh => ?_
-      rw [Set.mem_singleton_iff.mp hh]
-      have h1 : (x.out : G)⁻¹ * ((y.out : G) * g * (y.out : G)⁻¹) * (x.out : G) = g := by
-        rw [← hxy]; group
-      calc g * ((x.out : G)⁻¹ * (y.out : G))
-          = ((x.out : G)⁻¹ * ((y.out : G) * g * (y.out : G)⁻¹) * (x.out : G))
-            * ((x.out : G)⁻¹ * (y.out : G)) := by rw [h1]
-        _ = ((x.out : G)⁻¹ * (y.out : G)) * g := by group
+    have hmem : ((x.out : ↥P)⁻¹ * (y.out : ↥P)) ∈ Q.subgroupOf P := by
+      rw [Subgroup.mem_subgroupOf]
+      refine hQmem _ (P.mul_mem (P.inv_mem (hrepP x)) (hrepP y)) ?_
+      have h1 : (rep x)⁻¹ * (rep y * g * (rep y)⁻¹) * rep x = g := by rw [← hxy]; group
+      calc g * ((rep x)⁻¹ * rep y)
+          = ((rep x)⁻¹ * (rep y * g * (rep y)⁻¹) * rep x) * ((rep x)⁻¹ * rep y) := by rw [h1]
+        _ = ((rep x)⁻¹ * rep y) * g := by group
     have := QuotientGroup.eq.mpr hmem
     simpa only [QuotientGroup.out_eq'] using this
-  by_cases hc : IsConj g n
+  by_cases hc : ∃ u ∈ P, u * g * u⁻¹ = n
   · rw [if_pos hc]
-    obtain ⟨c, hcn⟩ := isConj_iff.mp hc
-    set x₀ : G ⧸ Subgroup.centralizer ({g} : Set G) := QuotientGroup.mk c with hx₀
-    have hx₀val : (x₀.out : G) * g * (x₀.out : G)⁻¹ = n := by
-      have hmem : c⁻¹ * (x₀.out : G) ∈ Subgroup.centralizer ({g} : Set G) :=
+    obtain ⟨u, hu, hun⟩ := hc
+    set x₀ : ↥P ⧸ Q.subgroupOf P := QuotientGroup.mk ⟨u, hu⟩ with hx₀
+    have hx₀val : rep x₀ * g * (rep x₀)⁻¹ = n := by
+      have hmem : (⟨u, hu⟩ : ↥P)⁻¹ * (x₀.out : ↥P) ∈ Q.subgroupOf P :=
         QuotientGroup.eq.mp (QuotientGroup.out_eq' _).symm
-      have hg := Subgroup.mem_centralizer_iff.mp hmem g (Set.mem_singleton g)
-      have hstep : (x₀.out : G) * g * (x₀.out : G)⁻¹ = c * g * c⁻¹ := by
-        have : c * (c⁻¹ * (x₀.out : G)) = (x₀.out : G) := by group
-        calc (x₀.out : G) * g * (x₀.out : G)⁻¹
-            = (c * (c⁻¹ * (x₀.out : G))) * g * (c * (c⁻¹ * (x₀.out : G)))⁻¹ := by rw [this]
-          _ = c * ((c⁻¹ * (x₀.out : G)) * g * (c⁻¹ * (x₀.out : G))⁻¹) * c⁻¹ := by group
-          _ = c * g * c⁻¹ := by rw [← hg]; group
-      rw [hstep, hcn]
+      rw [Subgroup.mem_subgroupOf] at hmem
+      have hg : g * (u⁻¹ * rep x₀) = (u⁻¹ * rep x₀) * g := hQcomm _ hmem
+      have hstep : rep x₀ * g * (rep x₀)⁻¹ = u * g * u⁻¹ := by
+        have hu' : u * (u⁻¹ * rep x₀) = rep x₀ := by group
+        calc rep x₀ * g * (rep x₀)⁻¹
+            = (u * (u⁻¹ * rep x₀)) * g * (u * (u⁻¹ * rep x₀))⁻¹ := by rw [hu']
+          _ = u * ((u⁻¹ * rep x₀) * g * (u⁻¹ * rep x₀)⁻¹) * u⁻¹ := by group
+          _ = u * g * u⁻¹ := by rw [← hg]; group
+      rw [hstep, hun]
     refine (Finset.sum_eq_single x₀ (fun y _ hy => ?_)
       (fun h => absurd (Finset.mem_univ _) h)).trans (by rw [if_pos hx₀val])
     exact if_neg fun hyn => hy (huniq y x₀ (hyn.trans hx₀val.symm))
   · rw [if_neg hc]
-    refine Finset.sum_eq_zero fun x _ => if_neg fun hxn => hc ?_
-    exact isConj_iff.mpr ⟨(x.out : G), hxn⟩
+    exact Finset.sum_eq_zero fun x _ => if_neg fun hxn => hc ⟨rep x, hrepP x, hxn⟩
+
+/-- **The class sum is a relative trace**: `K̂ = Tr^G_{C_G(g)}(g)`.  This is the case `P = ⊤` of
+`relTrace_single_apply`. -/
+theorem relTrace_single_eq_classSum (g : G) :
+    GAlgebra.relTrace (Subgroup.centralizer ({g} : Set G)) ⊤ (single g (1 : k))
+      = classSum k g := by
+  classical
+  refine Finsupp.ext fun n => ?_
+  have hQ : (⊤ : Subgroup G) ⊓ Subgroup.centralizer ({g} : Set G)
+      = Subgroup.centralizer ({g} : Set G) := top_inf_eq _
+  rw [← hQ, relTrace_single_apply, classSum_apply]
+  have hiff : (∃ u ∈ (⊤ : Subgroup G), u * g * u⁻¹ = n) ↔ IsConj g n := by
+    simp only [Subgroup.mem_top, true_and, isConj_iff]
+  by_cases h : IsConj g n
+  · rw [if_pos h, if_pos (hiff.mpr h)]
+  · rw [if_neg h, if_neg fun hh => h (hiff.mp hh)]
 
 section Span
 
