@@ -14,6 +14,7 @@ import OddOrder.Algebra.GroupAlgebraConjugation
 import OddOrder.Algebra.BrauerHomomorphism
 import OddOrder.Algebra.ClassSum
 import OddOrder.Algebra.DefectGroup
+import OddOrder.Algebra.MackeyFormula
 import OddOrder.Algebra.BlockIdempotent
 import OddOrder.Algebra.CentralIdempotentModule
 import OddOrder.Algebra.PrimitiveIdempotent
