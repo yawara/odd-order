@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.LinearAlgebra.Lagrange
 import Mathlib.LinearAlgebra.Eigenspace.Basic
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Basic
+import OddOrder.Algebra.LagrangeInterpolationRing
 
 /-!
 # Diagonalisability from a split squarefree annihilating polynomial
@@ -29,7 +30,9 @@ That is what makes Brauer characters well defined.
 
 ## Main results
 
-* `OddOrder.iSup_eigenspace_eq_top_of_aeval_prod_eq_zero` — the general statement
+* `OddOrder.iSup_eigenspace_eq_top_of_separated` — the general statement, over a commutative
+  ring whose node set has unit pairwise differences
+* `OddOrder.iSup_eigenspace_eq_top_of_aeval_prod_eq_zero` — the field case
 * `OddOrder.iSup_eigenspace_eq_top_of_pow` — the finite-order case
 * `OddOrder.isInternal_eigenspace_of_pow` — the eigenspace decomposition is a direct sum
 * `OddOrder.sum_finrank_eigenspace_of_pow` — the eigenspace dimensions add up to `dim V`
@@ -43,60 +46,64 @@ open Polynomial Module.End
 
 variable {F V : Type*} [Field F] [AddCommGroup V] [Module F V]
 
-/-- The Lagrange basis polynomial at a node `ζ` is the normalised product of `X - η` over the
-other nodes. -/
-theorem lagrangeBasis_eq_C_mul_prod [DecidableEq F] (s : Finset F) (ζ : F) :
-    Lagrange.basis s id ζ
-      = C (∏ η ∈ s.erase ζ, (ζ - η)⁻¹) * ∏ η ∈ s.erase ζ, (X - C η) := by
-  rw [Lagrange.basis, map_prod]
-  simp only [id_eq, Lagrange.basisDivisor]
-  rw [Finset.prod_mul_distrib]
+/-! ### The general statement, over any commutative ring with separated nodes -/
 
-/-- `(X - ζ) · L_ζ` is a constant multiple of `∏_{η ∈ s} (X - η)`: multiplying the Lagrange
-basis polynomial by its missing factor restores the full product. -/
-theorem X_sub_C_mul_lagrangeBasis [DecidableEq F] {s : Finset F} {ζ : F} (hζ : ζ ∈ s) :
-    (X - C ζ) * Lagrange.basis s id ζ
-      = C (∏ η ∈ s.erase ζ, (ζ - η)⁻¹) * ∏ η ∈ s, (X - C η) := by
-  rw [lagrangeBasis_eq_C_mul_prod, ← Finset.mul_prod_erase s (fun η => X - C η) hζ]
-  ring
+section CommRing
 
-/-- **Diagonalisability from a split squarefree annihilator.**  If `A` is killed by
-`∏_{ζ ∈ s} (X - ζ)` for a finite set `s` of scalars, then `V` is spanned by the eigenspaces of
-`A` at the members of `s`. -/
-theorem iSup_eigenspace_eq_top_of_aeval_prod_eq_zero {A : Module.End F V} {s : Finset F}
-    (hA : aeval A (∏ η ∈ s, (X - C η)) = 0) :
+variable {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M]
+
+open scoped Classical in
+/-- **Diagonalisability from a split squarefree annihilator, over a commutative ring.**  If `A`
+is killed by `∏_{ζ ∈ s} (X - ζ)` for a finite set `s` of scalars whose pairwise differences are
+units, then `M` is spanned by the eigen-submodules of `A` at the members of `s`.
+
+The node set that matters in modular representation theory is `μ_n(𝒪)` inside the coefficient
+ring of a `p`-modular system: it is separated because distinct roots of unity have distinct
+residues, even though `𝒪` is not a field. -/
+theorem iSup_eigenspace_eq_top_of_separated {A : Module.End R M} {s : Finset R}
+    (hs : SeparatedNodes s) (hA : aeval A (∏ η ∈ s, (X - C η)) = 0) :
     ⨆ ζ ∈ s, A.eigenspace ζ = ⊤ := by
-  classical
-  rcases s.eq_empty_or_nonempty with rfl | hs
-  · -- The empty product is `1`, so `A` lives on the zero space and every submodule is `⊤`.
+  rcases s.eq_empty_or_nonempty with rfl | hne
+  · -- The empty product is `1`, so `A` lives on the zero module and every submodule is `⊤`.
     simp only [Finset.prod_empty, map_one] at hA
-    have hsub : Subsingleton V := by
+    have hsub : Subsingleton M := by
       refine ⟨fun x y => ?_⟩
-      have hx : ∀ z : V, z = 0 := fun z => by
-        simpa using congrArg (fun T : Module.End F V => T z) hA
+      have hx : ∀ z : M, z = 0 := fun z => by
+        simpa using congrArg (fun T : Module.End R M => T z) hA
       rw [hx x, hx y]
     exact Subsingleton.elim _ _
   refine eq_top_iff.mpr fun v _ => ?_
   -- `∑_{ζ ∈ s} L_ζ = 1`, so `v` is the sum of the vectors `L_ζ(A) v`.
-  have hsum : ∑ ζ ∈ s, Lagrange.basis s id ζ = 1 :=
-    Lagrange.sum_basis (Set.injOn_id _) hs
-  have hv : v = ∑ ζ ∈ s, (aeval A (Lagrange.basis s id ζ)) v := by
-    have h := congrArg (fun q : F[X] => (aeval A q) v) hsum
+  have hv : v = ∑ ζ ∈ s, (aeval A (ringLagrangeBasis s ζ)) v := by
+    have h := congrArg (fun q : R[X] => (aeval A q) v) (sum_ringLagrangeBasis hs hne)
     simpa [map_sum, LinearMap.sum_apply] using h.symm
   -- Each summand is a `ζ`-eigenvector, because `(X - ζ) · L_ζ` is a multiple of the annihilator.
-  have hmem : ∀ ζ ∈ s, (aeval A (Lagrange.basis s id ζ)) v ∈ ⨆ ζ ∈ s, A.eigenspace ζ := by
+  have hmem : ∀ ζ ∈ s, (aeval A (ringLagrangeBasis s ζ)) v ∈ ⨆ ζ ∈ s, A.eigenspace ζ := by
     intro ζ hζ
     refine Submodule.mem_iSup_of_mem ζ (Submodule.mem_iSup_of_mem hζ ?_)
     rw [mem_eigenspace_iff]
-    have hkill : aeval A ((X - C ζ) * Lagrange.basis s id ζ) = 0 := by
-      rw [X_sub_C_mul_lagrangeBasis hζ, map_mul, hA, mul_zero]
+    have hkill : aeval A ((X - C ζ) * ringLagrangeBasis s ζ) = 0 := by
+      rw [X_sub_C_mul_ringLagrangeBasis hζ, map_mul, hA, mul_zero]
     rw [map_mul, map_sub, aeval_X, aeval_C] at hkill
-    have happ := congrArg (fun T : Module.End F V => T v) hkill
+    have happ := congrArg (fun T : Module.End R M => T v) hkill
     simp only [Module.End.mul_apply, LinearMap.sub_apply, LinearMap.zero_apply,
       Module.algebraMap_end_apply] at happ
     exact sub_eq_zero.mp happ
   rw [hv]
   exact Submodule.sum_mem _ hmem
+
+end CommRing
+
+/-- Over a field every finite set of nodes is separated. -/
+theorem separatedNodes_of_field (s : Finset F) : SeparatedNodes s :=
+  fun _ _ _ _ hne => isUnit_iff_ne_zero.mpr (sub_ne_zero.mpr hne)
+
+/-- **Diagonalisability from a split squarefree annihilator** over a field: the special case of
+`iSup_eigenspace_eq_top_of_separated` in which separatedness is automatic. -/
+theorem iSup_eigenspace_eq_top_of_aeval_prod_eq_zero {A : Module.End F V} {s : Finset F}
+    (hA : aeval A (∏ η ∈ s, (X - C η)) = 0) :
+    ⨆ ζ ∈ s, A.eigenspace ζ = ⊤ :=
+  iSup_eigenspace_eq_top_of_separated (separatedNodes_of_field s) hA
 
 /-- **The finite-order case.**  If `A ^ m = 1` and the base field contains a primitive `m`-th
 root of unity, then `V` is spanned by the eigenspaces of `A` at the `m`-th roots of unity. -/
