@@ -89,4 +89,25 @@ theorem finrank_quotient_commutatorRadical_le :
   rw [Set.finrank, span_range_mkQ_pRegular_eq_top hp hchar, finrank_top] at h
   simpa [Nat.card_eq_fintype_card] using h
 
+/-! ### The Frobenius sends a class to the class of its `p'`-part -/
+
+omit [Finite G] in
+theorem iterate_frobQuotient_mk_single {m : ℕ}
+    (hm : ∀ g : G, g ^ p ^ m = pRegularPart p g) (g : G) :
+    (OddOrder.frobQuotient hp hchar)^[m]
+        (Submodule.Quotient.mk (single g (1 : k)) :
+          MonoidAlgebra k G ⧸ OddOrder.commutatorSpan k (MonoidAlgebra k G))
+      = Submodule.Quotient.mk (single (pRegularPart p g) 1) := by
+  rw [OddOrder.iterate_frobQuotient_mk, single_pow, one_pow, hm g]
+
+/-- The image of the iterated Frobenius contains every `p`-regular class. -/
+theorem mk_single_mem_range_iterate_frobQuotient {m : ℕ}
+    (hm : ∀ g : G, g ^ p ^ m = pRegularPart p g) {h : G} (hh : IsPRegular p h) :
+    (Submodule.Quotient.mk (single h (1 : k)) :
+        MonoidAlgebra k G ⧸ OddOrder.commutatorSpan k (MonoidAlgebra k G))
+      ∈ Set.range (OddOrder.frobQuotient hp hchar)^[m] := by
+  refine ⟨Submodule.Quotient.mk (single h (1 : k)), ?_⟩
+  rw [iterate_frobQuotient_mk_single hp hchar hm h,
+    pRegularPart_eq_self_of_isPRegular hp hh]
+
 end OddOrder.RepresentationTheory.Modular

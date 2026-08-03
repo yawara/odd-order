@@ -226,21 +226,22 @@ theorem frobQuotient_smul (hp : p.Prime) (hchar : (p : A) = 0) (c : k)
   rw [Algebra.smul_def, Algebra.smul_def, map_pow]
   exact Commute.mul_pow (Algebra.commutes c x) p
 
+/-- Iterating the Frobenius raises to the corresponding `p`-power. -/
+theorem iterate_frobQuotient_mk (hp : p.Prime) (hchar : (p : A) = 0) (m : ℕ) (y : A) :
+    (frobQuotient hp hchar)^[m] (Submodule.Quotient.mk y : A ⧸ commutatorSpan k A)
+      = Submodule.Quotient.mk (y ^ p ^ m) := by
+  induction m generalizing y with
+  | zero => simp
+  | succ m ih =>
+    rw [Function.iterate_succ_apply, frobQuotient_mk, ih, ← pow_mul, ← pow_succ']
+
 /-- **The `p`-radical is exactly what the Frobenius eventually kills.** -/
 theorem mem_commutatorRadical_iff_frobQuotient (hp : p.Prime) (hchar : (p : A) = 0)
     {x : A} :
     x ∈ commutatorRadical (k := k) hp hchar
       ↔ ∃ m, (frobQuotient hp hchar)^[m]
           (Submodule.Quotient.mk x : A ⧸ commutatorSpan k A) = 0 := by
-  have hiter : ∀ (m : ℕ) (y : A),
-      (frobQuotient hp hchar)^[m] (Submodule.Quotient.mk y : A ⧸ commutatorSpan k A)
-        = Submodule.Quotient.mk (y ^ p ^ m) := by
-    intro m
-    induction m with
-    | zero => intro y; simp
-    | succ m ih =>
-      intro y
-      rw [Function.iterate_succ_apply, frobQuotient_mk, ih, ← pow_mul, ← pow_succ']
+  have hiter := iterate_frobQuotient_mk (k := k) hp hchar
   constructor
   · rintro ⟨m, hm⟩
     exact ⟨m, by rw [hiter, (Submodule.Quotient.mk_eq_zero _).mpr hm]⟩
