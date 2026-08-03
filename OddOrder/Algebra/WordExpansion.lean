@@ -11,6 +11,7 @@ import Mathlib.Dynamics.PeriodicPts.Lemmas
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Push
 import Mathlib.Algebra.Group.Fin.Basic
+import Mathlib.Algebra.BigOperators.GroupWithZero.Action
 
 /-!
 # The noncommutative binomial expansion
@@ -242,6 +243,86 @@ theorem iterateOrbit_of_mem (σ : α → α) {p : ℕ} (hp : 0 < p) (hper : ∀ 
     {w v : α} (hv : v ∈ iterateOrbit σ p w) : iterateOrbit σ p v = iterateOrbit σ p w := by
   obtain ⟨k, _, rfl⟩ := mem_iterateOrbit_iff.mp hv
   exact iterateOrbit_iterate σ hp hper k w
+
+omit [DecidableEq α] in
+theorem injective_of_period (σ : α → α) {p : ℕ} (hp : 0 < p) (hper : ∀ v, σ^[p] v = v) :
+    Function.Injective σ := by
+  intro a b hab
+  have ha : σ^[p - 1] (σ a) = a := by
+    rw [← Function.iterate_succ_apply, Nat.succ_eq_add_one, Nat.sub_add_cancel hp, hper]
+  have hb : σ^[p - 1] (σ b) = b := by
+    rw [← Function.iterate_succ_apply, Nat.succ_eq_add_one, Nat.sub_add_cancel hp, hper]
+  rw [← ha, ← hb, hab]
+
+/-- **A free orbit has exactly `p` elements.** -/
+theorem card_iterateOrbit (σ : α → α) {p : ℕ} (hp : 0 < p) (hper : ∀ v, σ^[p] v = v) {w : α}
+    (hfree : ∀ k < p, σ^[k] w = w → k = 0) : (iterateOrbit σ p w).card = p := by
+  rw [iterateOrbit, Finset.card_image_of_injOn, Finset.card_range]
+  intro a ha b hb hab
+  rw [Finset.coe_range, Set.mem_Iio] at ha hb
+  rcases le_total a b with hle | hle
+  · have hcancel : σ^[b - a] w = w := by
+      refine (Function.Injective.iterate (injective_of_period σ hp hper) a) ?_
+      rw [← Function.iterate_add_apply, Nat.add_sub_cancel' hle]
+      exact hab.symm
+    have := hfree (b - a) (by omega) hcancel
+    omega
+  · have hcancel : σ^[a - b] w = w := by
+      refine (Function.Injective.iterate (injective_of_period σ hp hper) b) ?_
+      rw [← Function.iterate_add_apply, Nat.add_sub_cancel' hle]
+      exact hab
+    have := hfree (a - b) (by omega) hcancel
+    omega
+
+variable {M : Type*} [AddCommMonoid M]
+
+theorem exists_nsmul_sum_of_forall {β : Type*} (t : Finset β) (F : β → M) (p : ℕ)
+    (h : ∀ b ∈ t, ∃ z, F b = p • z) : ∃ Z, ∑ b ∈ t, F b = p • Z := by
+  classical
+  choose z hz using h
+  refine ⟨∑ b ∈ t.attach, z b b.2, ?_⟩
+  rw [Finset.smul_sum, ← Finset.sum_attach t F]
+  exact Finset.sum_congr rfl fun b _ => hz b b.2
+
+/-- **A sum over a free orbit is `p` times something.** -/
+theorem exists_nsmul_sum_iterateOrbit (σ : α → α) {p : ℕ} (hp : 0 < p)
+    (hper : ∀ v, σ^[p] v = v) (f : α → M) (hinv : ∀ v, f (σ v) = f v) {w : α}
+    (hfree : ∀ k < p, σ^[k] w = w → k = 0) :
+    ∃ z : M, ∑ v ∈ iterateOrbit σ p w, f v = p • z := by
+  refine ⟨f w, ?_⟩
+  have hconst : ∀ v ∈ iterateOrbit σ p w, f v = f w := by
+    intro v hv
+    obtain ⟨k, hk, rfl⟩ := mem_iterateOrbit_iff.mp hv
+    clear hv hk
+    induction k with
+    | zero => rfl
+    | succ k ih => rw [Function.iterate_succ_apply', hinv, ih]
+  rw [Finset.sum_congr rfl hconst, Finset.sum_const, card_iterateOrbit σ hp hper hfree]
+
+/-- **A sum over a union of free orbits is `p` times something.** -/
+theorem exists_nsmul_sum_of_free (σ : α → α) {p : ℕ} (hp : 0 < p) (hper : ∀ v, σ^[p] v = v)
+    (s : Finset α) (f : α → M) (hinv : ∀ v, f (σ v) = f v)
+    (hs : ∀ w ∈ s, iterateOrbit σ p w ⊆ s)
+    (hfree : ∀ w ∈ s, ∀ k < p, σ^[k] w = w → k = 0) :
+    ∃ z : M, ∑ w ∈ s, f w = p • z := by
+  classical
+  rw [← Finset.sum_fiberwise_of_maps_to (g := fun w => iterateOrbit σ p w)
+    (t := s.image fun w => iterateOrbit σ p w) (fun w hw => Finset.mem_image_of_mem _ hw) f]
+  refine exists_nsmul_sum_of_forall _ _ p fun O hO => ?_
+  obtain ⟨w₀, hw₀, rfl⟩ := Finset.mem_image.mp hO
+  have hfib : (s.filter fun w => iterateOrbit σ p w = iterateOrbit σ p w₀)
+      = iterateOrbit σ p w₀ := by
+    ext v
+    simp only [Finset.mem_filter]
+    constructor
+    · rintro ⟨_, hv⟩
+      rw [← hv]
+      exact self_mem_iterateOrbit σ hp v
+    · intro hv
+      exact ⟨hs w₀ hw₀ hv, iterateOrbit_of_mem σ hp hper hv⟩
+  rw [hfib]
+  exact exists_nsmul_sum_iterateOrbit σ hp hper f hinv (hfree w₀ hw₀)
+
 
 end Orbits
 
