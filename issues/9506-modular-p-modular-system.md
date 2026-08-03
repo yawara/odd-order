@@ -311,6 +311,11 @@ leaf の層構造・mathlib 実測 (使えたもの/無かったもの)・設計
         `existsUnique_isIdempotentElem_eq_of_ker_isNilpotent` で一意に持ち上げ)
       ⚠ `AlgHom → RingHom` の強制を暗黙に任せると `whnf` heartbeat 超過。
         `toRingHom` 明示 + 全射性/冪等性を先に `have` で切り出して解消。
+- [x] **block 分解の基本構造** — 完了 (2026-08-03、段 70-72)。
+      🎯🎯 `exists_completeOrthogonalIdempotents_block` (`∑_B e_B = 1`) /
+      段 71 `Algebra/CentralIdempotentModule.lean` の一般補題
+      (中心冪等元の完全直交族による局在; 段 47 をその系に書き換え) /
+      🎯 `existsUnique_block_smul_eq_self` (**単純加群はただ 1 つの block に属する**)。
 - [ ] Cartan 行列 `C = DᵀD` (射影被覆が要る) / Brauer 対応 /
       2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。
 
