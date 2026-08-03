@@ -293,9 +293,31 @@ leaf の層構造・mathlib 実測 (使えたもの/無かったもの)・設計
       `.../Modular/DecompositionMatrix.lean` の 🎯🎯 `exists_decomposition_trace`:
       `tr_𝒪 (ρ g) = ∑_i d_i φ_i(g)` (`p`-正則 `g`)。段 32 + 段 62 を繋ぐだけ。
 
+- [x] **block 論の入口** (2026-08-03、段 64-67):
+      * `Algebra/CentralCharacter.lean` — 🎯 `exists_scalar_of_mem_center` (中心元は各
+        ブロック上でスカラー) / 🎯 **`centralCharacter`** `ω_i : Z(A) →+* k` /
+        `centralScalar_smul` (中心はブロック上で `ω_i` 倍) /
+        🎯 `centralCharacterPi_eq_zero_iff` (核 = `Z(A) ∩ ker π`) / `SameBlock`
+      * `Algebra/SeparatingSubalgebra.lean` (段 67) — 🎯 `Subalgebra.eq_top_of_separates`
+
 ## 次の段 (frontier, 2026-08-03 更新)
 
-- [ ] Cartan 行列 `C = DᵀD` (射影被覆が要る) / block (中心冪等元) / Brauer 対応 /
+- [ ] **block 冪等元 `e_B` の構成**。手順は確定済み (部品は全部揃っている):
+      1. `[Algebra k A]` を仮定し、`Subring.center A` を `k`-部分代数として扱う
+         (`Subalgebra.center k A`)。`centralCharacter` はそこからの `k`-代数準同型。
+      2. `SameBlock` で `ι` を割った `ι' := Quotient` を作り、
+         `Φ : Z(A) →ₐ[k] (ι' → k)` を `Quotient.liftOn` で誘導 (well-defined はまさに
+         `SameBlock` の定義)。
+      3. `Φ` の像は `ι'` の全座標を分離する (`c ≠ c'` なら代表の中心指標が違う) ので
+         **段 67 `Subalgebra.eq_top_of_separates` で `Φ` は全射**。
+      4. `ker Φ = Z(A) ∩ ker π` は冪零 (`A = kG` では `J(kG)`)。mathlib の
+         `existsUnique_isIdempotentElem_eq_of_ker_isNilpotent` (可換環版) または
+         `CompleteOrthogonalIdempotents.lift_of_isNilpotent_ker` で
+         `Pi.single c 1` を `Z(A)` の冪等元に**一意に持ち上げる** ⟹ `e_B`。
+      5. 完全直交性 (`∑_B e_B = 1`, `e_B e_{B'} = 0`) は
+         `CompleteOrthogonalIdempotents.lift_of_isNilpotent_ker` が直接与える。
+      ⚠ mathlib 側の冪等元持ち上げは実測済 (`Mathlib/RingTheory/Idempotents.lean`)。
+- [ ] Cartan 行列 `C = DᵀD` (射影被覆が要る) / Brauer 対応 /
       2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。
 
 以降 (別 issue に分割予定): Cartan 行列 `C = DᵀD` / block / Brauer 対応 /

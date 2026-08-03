@@ -86,7 +86,8 @@ L3 と L4 を突き合わせて `.../Modular/BrauerCount.lean`:
 | `.../Modular/IrreducibleIsBlock.lean` | 🎯 既約表現の Brauer 指標は `IBr(G)` のどれか |
 | `.../Modular/BrauerDecomposition.lean` | 🎯🎯 **`exists_decomposition`** = 分解数 |
 | `.../Modular/DecompositionMatrix.lean` | 🎯🎯 **`exists_decomposition_trace`** = 分解行列 `D` (通常指標側) |
-| `Algebra/CentralCharacter.lean` | 🎯 **`centralCharacter`** `ω_i : Z(A) →+* k` (block の定義に要る) |
+| `Algebra/CentralCharacter.lean` | 🎯 **`centralCharacter`** `ω_i : Z(A) →+* k` / `SameBlock` / 核 = `Z(A) ∩ ker π` |
+| `Algebra/SeparatingSubalgebra.lean` | 🎯 分離部分代数は全体 (block 冪等元の存在に要る) |
 
 ## 2. mathlib 実測 (使えたもの / 無かったもの)
 
@@ -140,7 +141,9 @@ L3 と L4 を突き合わせて `.../Modular/BrauerCount.lean`:
    `trace_eq_brauerCharacter_reduction` (段 32) と `exists_decomposition` (段 62) を繋ぐだけ。
    ⚠ 原始根を上下 2 つ取る (`ω : 𝒪` はトレースを Brauer 指標形にするのに、
    `ω' : ResidueField 𝒪` は還元を組成因子に割るのに)。どちらも段 58 が供給。
-4. block 論の入口は段 64 (`centralCharacter`) で開いた。
-   次: 「同じ block ⟺ 中心指標が一致」で block を定義 → 中心冪等元 →
-   Cartan 行列 `C = DᵀD` (射影被覆が要る) / Brauer 対応 /
+4. block 論の入口は段 64-67 で開いた (中心指標 / `SameBlock` / 分離部分代数)。
+   次 = **block 冪等元 `e_B` の構成**。手順は issue 9506 の frontier に確定手順として
+   記録済み (`Subalgebra.center` → `Quotient` で誘導 → 段 67 で全射 →
+   mathlib の冪等元持ち上げ)。部品は全部揃っており、残るは配線。
+   以降: Cartan 行列 `C = DᵀD` (射影被覆) / Brauer 対応 /
    2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。
