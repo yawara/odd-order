@@ -33,6 +33,8 @@ That is what makes Brauer characters well defined.
 * `OddOrder.iSup_eigenspace_eq_top_of_pow` — the finite-order case
 * `OddOrder.isInternal_eigenspace_of_pow` — the eigenspace decomposition is a direct sum
 * `OddOrder.sum_finrank_eigenspace_of_pow` — the eigenspace dimensions add up to `dim V`
+* `OddOrder.finrank_eigenspace_eq_quotient_add` — eigenspace dimensions are additive along an
+  invariant subspace, eigenvalue by eigenvalue
 -/
 
 namespace OddOrder
@@ -130,5 +132,134 @@ theorem sum_finrank_eigenspace_of_pow [FiniteDimensional F V]
   rw [← he.finrank_eq, Module.finrank_directSum, Finset.univ_eq_attach]
   exact (Finset.sum_attach (nthRootsFinset m (1 : F))
     (fun ζ => Module.finrank F (A.eigenspace ζ))).symm
+
+/-! ### Invariant subspaces: the eigenspace dimensions are additive
+
+For a diagonalisable `A` and an `A`-invariant subspace `W`, the eigenspace dimensions of `W`
+and of `V ⧸ W` add up to those of `V` — *for each eigenvalue separately*.  The proof avoids
+constructing the spectral projections: the obvious inequality holds for each `ζ`, and the three
+total-dimension identities force all of them to be equalities at once.
+-/
+
+section Invariant
+
+variable {A : Module.End F V} {W : Submodule F V} (hq : W ≤ W.comap A)
+include hq
+
+/-- Powers of a restricted endomorphism are the restrictions of its powers. -/
+theorem coe_restrict_pow (m : ℕ) (w : W) :
+    (((A.restrict hq) ^ m) w : V) = (A ^ m) (w : V) := by
+  induction m generalizing w with
+  | zero => simp
+  | succ j ih =>
+    rw [pow_succ, Module.End.mul_apply, ih, LinearMap.coe_restrict_apply, pow_succ,
+      Module.End.mul_apply]
+
+theorem restrict_pow_eq_one {m : ℕ} (hA : A ^ m = 1) : (A.restrict hq) ^ m = 1 :=
+  LinearMap.ext fun w => Subtype.ext (by rw [coe_restrict_pow hq, hA]; rfl)
+
+/-- Powers of the endomorphism induced on the quotient are induced by the powers. -/
+theorem mapQ_pow_apply (m : ℕ) (v : V) :
+    ((W.mapQ W A hq) ^ m) (W.mkQ v) = W.mkQ ((A ^ m) v) := by
+  induction m generalizing v with
+  | zero => simp
+  | succ j ih =>
+    rw [pow_succ, Module.End.mul_apply, Submodule.mkQ_apply, Submodule.mapQ_apply,
+      ← Submodule.mkQ_apply, ih, pow_succ, Module.End.mul_apply]
+
+theorem mapQ_pow_eq_one {m : ℕ} (hA : A ^ m = 1) :
+    (W.mapQ W A hq) ^ m = 1 := by
+  refine LinearMap.ext fun q => ?_
+  obtain ⟨v, rfl⟩ := W.mkQ_surjective q
+  rw [mapQ_pow_apply hq, hA]
+  rfl
+
+/-- The `ζ`-eigenspace of the restriction sits inside `V` as `V_ζ ⊓ W`. -/
+theorem map_subtype_eigenspace_restrict (ζ : F) :
+    Submodule.map W.subtype (Module.End.eigenspace (A.restrict hq) ζ)
+      = Module.End.eigenspace A ζ ⊓ W := by
+  ext v
+  constructor
+  · rintro ⟨w, hw, rfl⟩
+    rw [SetLike.mem_coe, mem_eigenspace_iff] at hw
+    refine ⟨mem_eigenspace_iff.mpr ?_, w.2⟩
+    have hcoe := congrArg (fun z : W => (z : V)) hw
+    rwa [LinearMap.coe_restrict_apply] at hcoe
+  · rintro ⟨hv, hvW⟩
+    refine ⟨⟨v, hvW⟩, ?_, rfl⟩
+    rw [SetLike.mem_coe, mem_eigenspace_iff]
+    exact Subtype.ext (by rw [LinearMap.coe_restrict_apply]; exact mem_eigenspace_iff.mp hv)
+
+theorem finrank_eigenspace_restrict (ζ : F) :
+    Module.finrank F (Module.End.eigenspace (A.restrict hq) ζ)
+      = Module.finrank F (Module.End.eigenspace A ζ ⊓ W : Submodule F V) := by
+  rw [← map_subtype_eigenspace_restrict hq ζ]
+  exact (Submodule.equivMapOfInjective _ W.injective_subtype _).finrank_eq
+
+/-- Passing to the quotient can only lose the eigenvectors that already lay in `W`. -/
+theorem finrank_eigenspace_le_quotient_add [FiniteDimensional F V] (ζ : F) :
+    Module.finrank F (Module.End.eigenspace A ζ)
+      ≤ Module.finrank F (Module.End.eigenspace (W.mapQ W A hq) ζ)
+        + Module.finrank F (Module.End.eigenspace (A.restrict hq) ζ) := by
+  classical
+  set Aq := W.mapQ W A hq with hAq
+  -- `mkQ` maps the `ζ`-eigenspace of `A` into that of the induced map …
+  have hmaps : ∀ v ∈ Module.End.eigenspace A ζ, W.mkQ v ∈ Module.End.eigenspace Aq ζ := by
+    intro v hv
+    rw [mem_eigenspace_iff] at hv ⊢
+    rw [hAq, Submodule.mkQ_apply, Submodule.mapQ_apply, hv]
+    rfl
+  let f : (Module.End.eigenspace A ζ) →ₗ[F] (Module.End.eigenspace Aq ζ) :=
+    LinearMap.restrict W.mkQ hmaps
+  -- … and its kernel consists of eigenvectors already in `W`.
+  have hkerle : LinearMap.ker f
+      ≤ Submodule.comap (Module.End.eigenspace A ζ).subtype
+          (Module.End.eigenspace A ζ ⊓ W) := by
+    intro v hv
+    rw [LinearMap.mem_ker] at hv
+    refine Submodule.mem_comap.mpr ⟨v.2, ?_⟩
+    have hz := congrArg (fun z : Module.End.eigenspace Aq ζ => (z : V ⧸ W)) hv
+    simp only [f, LinearMap.coe_restrict_apply, Submodule.mkQ_apply,
+      ZeroMemClass.coe_zero] at hz
+    exact (Submodule.Quotient.mk_eq_zero W).mp hz
+  have hkerrank : Module.finrank F (LinearMap.ker f)
+      ≤ Module.finrank F (Module.End.eigenspace A ζ ⊓ W : Submodule F V) :=
+    le_trans (Submodule.finrank_mono hkerle)
+      (le_of_eq (Submodule.comapSubtypeEquivOfLe
+        (inf_le_left : Module.End.eigenspace A ζ ⊓ W ≤ Module.End.eigenspace A ζ)).finrank_eq)
+  have hle : Module.finrank F (LinearMap.range f)
+      ≤ Module.finrank F (Module.End.eigenspace Aq ζ) := Submodule.finrank_le _
+  calc Module.finrank F (Module.End.eigenspace A ζ)
+      = Module.finrank F (LinearMap.range f) + Module.finrank F (LinearMap.ker f) :=
+        (LinearMap.finrank_range_add_finrank_ker f).symm
+    _ ≤ Module.finrank F (Module.End.eigenspace Aq ζ)
+        + Module.finrank F (Module.End.eigenspace (A.restrict hq) ζ) := by
+        rw [finrank_eigenspace_restrict hq ζ]
+        exact Nat.add_le_add hle hkerrank
+
+/-- **Eigenspace dimensions are additive in a short exact sequence** of diagonalisable
+operators.  Equality for every `ζ` at once follows from the pointwise inequality plus the three
+total-dimension counts. -/
+theorem finrank_eigenspace_eq_quotient_add [FiniteDimensional F V] {m : ℕ} (hm : 0 < m)
+    {ω : F} (hω : IsPrimitiveRoot ω m) (hA : A ^ m = 1) {ζ : F}
+    (hζ : ζ ∈ nthRootsFinset m (1 : F)) :
+    Module.finrank F (Module.End.eigenspace A ζ)
+      = Module.finrank F (Module.End.eigenspace (W.mapQ W A hq) ζ)
+        + Module.finrank F (Module.End.eigenspace (A.restrict hq) ζ) := by
+  classical
+  have hsum : ∑ η ∈ nthRootsFinset m (1 : F),
+      Module.finrank F (Module.End.eigenspace A η)
+        = ∑ η ∈ nthRootsFinset m (1 : F),
+            (Module.finrank F
+                (Module.End.eigenspace (W.mapQ W A hq) η)
+              + Module.finrank F (Module.End.eigenspace (A.restrict hq) η)) := by
+    rw [Finset.sum_add_distrib, sum_finrank_eigenspace_of_pow hm hω hA,
+      sum_finrank_eigenspace_of_pow hm hω (mapQ_pow_eq_one hq hA),
+      sum_finrank_eigenspace_of_pow hm hω (restrict_pow_eq_one hq hA),
+      Submodule.finrank_quotient_add_finrank]
+  exact (Finset.sum_eq_sum_iff_of_le
+    (fun η _ => finrank_eigenspace_le_quotient_add hq η)).mp hsum ζ hζ
+
+end Invariant
 
 end OddOrder

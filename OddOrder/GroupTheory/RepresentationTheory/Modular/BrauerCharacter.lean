@@ -39,6 +39,7 @@ genuine lift of the Brauer-trace, not an unrelated formula.
 * `brauerCharacter_one` — the value at `1` is the dimension
 * `brauerCharacter_conj` — Brauer characters are class functions
 * `residue_brauerCharacter` — reduction is the ordinary trace
+* `brauerCharacter_quotient_add_subrepresentation` — additivity in short exact sequences
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -144,6 +145,26 @@ theorem brauerCharacter_conj (g h : G) :
 
 variable (hn : ¬ p ∣ n) (hn0 : 0 < n)
 include hn hn0
+
+omit [IsPModularSystem p 𝒪] hn in
+/-- **Brauer characters are additive in short exact sequences.**  For a `G`-invariant subspace
+`W ≤ V`, the Brauer character of `V` is the sum of those of `V ⧸ W` and of `W`.
+
+This is what makes a Brauer character depend only on the composition factors of the module, and
+hence what makes the decomposition matrix well defined.  The proof is the eigenvalue-by-
+eigenvalue dimension count `finrank_eigenspace_eq_quotient_add`. -/
+theorem brauerCharacter_quotient_add_subrepresentation [FiniteDimensional (ResidueField 𝒪) V]
+    (W : Submodule (ResidueField 𝒪) V) (hW : ∀ g : G, W ≤ W.comap (ρ g))
+    {ω : ResidueField 𝒪} (hω : IsPrimitiveRoot ω n) {g : G} (hg : (ρ g) ^ n = 1) :
+    brauerCharacter (𝒪 := 𝒪) n ρ g
+      = brauerCharacter (𝒪 := 𝒪) n (ρ.quotient W hW) g
+        + brauerCharacter (𝒪 := 𝒪) n (ρ.subrepresentation W hW) g := by
+  classical
+  rw [brauerCharacter, brauerCharacter, brauerCharacter, ← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl fun ζ hζ => ?_
+  rw [OddOrder.finrank_eigenspace_eq_quotient_add (hW g) hn0 hω hg hζ, add_nsmul]
+  rfl
+
 
 /-- **The Brauer character at the identity is the dimension.** -/
 theorem brauerCharacter_one :
