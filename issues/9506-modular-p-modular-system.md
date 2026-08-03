@@ -256,13 +256,34 @@ system」を**実際に構成する**ところまでを本 issue のスコープ
         🎯 **`mem_maximalIdeal_of_sum_irreducibleBrauerCharacter`**
         (`∑ c_i φ_i = 0` なら全ての `c_i ∈ 𝔪`)。剰余に落として段 54。
 
+- [x] **一次独立性の arithmetic descent** (2026-08-03、段 56)。
+      `.../Modular/BrauerLinearIndependence.lean`:
+      🎯🎯 **`eq_zero_of_sum_irreducibleBrauerCharacter`** (`𝒪` が DVR なら `c = 0`)。
+      ⚠ Krull 交叉での帰納でなく **Nakayama** 一撃: 関係式の全体 `S` は
+      一様化元で割れる (整域) ので `S ≤ 𝔪 • S`、`S` は f.g.、`𝔪 = jacobson ⊥`。
+      ⚠ 主張は `𝒪` 上。商体上は分母を払えば出るが未形式化 (docstring に明記)。
+- [x] **Brauer 指標の同型不変性** (2026-08-03、段 57) — `brauerCharacter_congr`。
+      分解数が well-defined になるための部品 (段 29 の加法性と対)。
+
+## アーキテクチャ地図
+
+leaf の層構造・mathlib 実測 (使えたもの/無かったもの)・設計判断は
+[`notes/meta/modular_representation_theory.md`](../notes/meta/modular_representation_theory.md)
+に集約 (本 issue は時系列ログ)。
+
 ## 次の段 (frontier, 2026-08-03)
 
-- [ ] **一次独立性の arithmetic descent**: 段 55 から `c = 0` へ。DVR (`𝕎 k` は instance)
-      で一様化元を括り出して帰納 → `c_i ∈ ⋂_n 𝔪^n = 0` (Krull 交叉)。
-      表現論はもう無く純粋に可換環論。
-- [ ] **分解行列 `D`**: `G`-不変 `𝒪`-束の存在 (段 30 `exists_invariant_lattice`) →
-      `χ|_{p-reg} = ∑_φ d_{χφ} φ`。加法性 (段 29) は済んでいるので組成因子への分解は取れる。
+- [ ] **`HasEnoughRootsOfUnity 𝔽̄_p n` (`p ∤ n`)** — 小穴。これが無いと
+      **数え上げ側 (代数閉が要る) と Brauer 指標側 (根が要る) が同じ体の上で繋がらない**。
+      現状 L6 の定理群は `IsPrimitiveRoot ω (pRegularExponent p G)` を仮説で取っており、
+      `𝕎(𝔽̄_p)` での具体 instantiation はまだ書いていない。
+      候補: (a) `GaloisField p φ(n)` からの埋め込みで既存
+      `hasEnoughRootsOfUnity_galoisField` を移送 / (b) `X^n-1` の分離性 +
+      `HasEnoughRootsOfUnity.of_card_le`。
+- [ ] **分解行列 `D`**: 有限次元表現を組成列に分解 → 各因子は L5 のブロック →
+      `brauerCharacter_congr` で指標に翻訳 → `χ|_{p-reg} = ∑_φ d_{χφ} φ`。
+      ⚠ 障害は `Representation k G V` と `Module (kG) M` の往復
+      (`Representation.ofModule'` が `IsScalarTower k kG M` を要求)。
 
 以降 (別 issue に分割予定): Cartan 行列 `C = DᵀD` / block / Brauer 対応 /
 2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。

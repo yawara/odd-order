@@ -1,0 +1,126 @@
+# modular 表現論 — アーキテクチャ地図 (2026-08-03)
+
+issue [9506](../../issues/9506-modular-p-modular-system.md) の作業ログは**時系列**なので、ここには
+**層構造**を置く。0147 (Q₈ Brauer–Suzuki, Navarro 1998 spine) の bottom-up 第 1 段として
+2026-08-03 に一気に積んだ 30 弱の leaf がどう積み重なっているか。
+
+## 0. 到達点
+
+* **Brauer の数え上げ**: 標数 `p` の代数閉体 `k` 上で
+  `kG ⧸ J(kG) ≃ₐ[k] ∏_{i<n} M_{d_i}(k)` かつ **`n = #{p`-正則類`}`**。
+  ブロックは既約 `kG`-加群と同型を除いて 1 対 1 なので `|IBr(G)| = #p`-正則類。
+* **既約 Brauer 指標 `IBr(G)`** の定義と、`p`-正則類上での**一次独立性**。
+* 非空虚性: `𝒪 = 𝕎(𝔽̄_p)` が DVR・Henselian・p-modular system で剰余体が代数閉。
+
+## 1. 層 (下から)
+
+### L1 群論の下ごしらえ
+
+| leaf | 内容 |
+|---|---|
+| `GroupTheory/PRegularElement.lean` | `IsPRegular` / `pPart` / `pRegularPart` / `pRegularExponent p G = \|G\|_{p'}` / `IsPRegularClass` / `isPRegular_out` |
+
+### L2 可換代数・線型代数
+
+| leaf | 内容 |
+|---|---|
+| `Algebra/WordExpansion.lean` | **非可換 Freshman**: 標数 `p` で `(x+y)^p - x^p - y^p ∈ T` (回転軌道) |
+| `Algebra/CommutatorSpan.lean` | `commutatorSpan` / **`commutatorRadical` = `T'`** / 商上の半線型 Frobenius |
+| `Algebra/MatrixCommutator.lean` | **`[M_n(R),M_n(R)] = ker tr`** / `tr(M^p) = (tr M)^p` / `T'(M_n) = T` |
+| `Algebra/CommutatorSpanPi.lean` | 積は因子ごと (`commutatorSpan_pi` / `commutatorRadical_pi_eq`) |
+| `Algebra/CommutatorSpanHom.lean` | 全射に沿った `T` の像・`T'` の**逆像** (核が一様冪零) |
+| `Algebra/LagrangeInterpolationRing.lean`, `Algebra/EigenspaceDecomposition.lean` | 可換環 Lagrange / 分裂零化多項式での固有空間分解 |
+
+### L3 分裂半単純商の数え上げ
+
+`Algebra/SplitSemisimpleCount.lean` — `π : A ↠ B`, `e : B ≃ₐ ∏ M_{n_i}(k)` に対し
+
+* `blockTrace` = 還元 → 分裂 → 各ブロックのトレース
+* 🎯 `ker_blockTrace` = `T'` (L2 の 4 leaf が全部ここに集約)
+* 🎯 **`blockTraceQuotientEquiv : A ⧸ T' ≃ₗ[k] (ι → k)`**
+  (次元の等式でなく**同型**。双対基底として使うので必須)
+
+### L4 `kG` 側の数え上げ
+
+| leaf | 内容 |
+|---|---|
+| `.../Modular/CommutatorSubspace.lean`, `CommutatorQuotient.lean` | `dim kG/[kG,kG] = #共役類`、類代表が基底 |
+| `.../Modular/PRegularRadical.lean` | 一様指数 `m > 0` (`max a 1 · φ(d)`)、`g - g_{p'} ∈ T'` |
+| `.../Modular/PRegularCount.lean` | 🎯 **`basisPRegularQuotient`** / `finrank_quotient_commutatorRadical` = `#p`-正則類 |
+
+L3 と L4 を突き合わせて `.../Modular/BrauerCount.lean`:
+`card_split_blocks_eq_card_pRegularClass` / **`exists_wedderburn_pi_matrix_card_eq`** /
+**`exists_surjective_blocks_card_eq`** (`ker π = J(kG)` 付き)。
+
+### L5 Artin–Wedderburn の一意性側 (ブロック ↔ 既約加群)
+
+| leaf | 内容 |
+|---|---|
+| `Algebra/MatrixNaturalModule.lean` | scoped `Module (Matrix n n k) (n → k)` / 単純性 / **単純 artin 環の単純加群は 1 つ** |
+| `Algebra/PiSimpleModule.lean` | 中心冪等元 `e_i`、**単純加群では一意の `e_i` が恒等** / `factorModule` |
+| `Algebra/ModuleAlongSurjection.lean` | 全射に沿った加群の引き戻し・押し出しと単純性 |
+| `Algebra/PiMatrixSimpleModules.lean` | 🎯 `isSimpleModule_blockModule` / 🎯 **`exists_linearEquiv_blockModule`** |
+
+### L6 Brauer 指標
+
+| leaf | 内容 |
+|---|---|
+| `.../Modular/RootsOfUnityLift.lean`, `PModularSystem.lean`, `WittVectorSystem.lean`, `SplittingSystem.lean` | `IsPModularSystem` と具体構成、剰余体の代数閉性 |
+| `.../Modular/BrauerCharacter.lean` | **`brauerCharacter`** / 類関数 / 次数 / **剰余 = 通常トレース** / 加法性 / **同型不変性** |
+| `.../Modular/BlockRepresentation.lean` | `Module (kG) M` ↔ `Representation k G V` の橋 |
+| `.../Modular/IrreducibleBrauerCharacter.lean` | 🎯 **`irreducibleBrauerCharacter`** = `IBr(G)` |
+| `.../Modular/BrauerIndependence.lean` | 🎯 ブロックトレースは `p`-正則元上で独立 |
+| `.../Modular/BrauerCharacterIndependence.lean` | 関係式の係数は `𝔪` に入る |
+| `.../Modular/BrauerLinearIndependence.lean` | 🎯🎯 **一次独立性** (Nakayama) |
+
+## 2. mathlib 実測 (使えたもの / 無かったもの)
+
+**使えた** (自前で作らずに済んだ):
+
+* `IsSimpleModule (Module.End R M) M` — 自然加群の単純性はこれの移送で済む
+* `IsSimpleRing.isIsotypic` — 単純 artin 環上の単純加群が 1 つ、はこれ 1 本
+* `IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed` — 代数閉体版 Wedderburn
+  (⚠ 段 44 で**自前に組んでから**気付いて置換した。claim-before-build の教訓)
+* `instIsSemiprimaryRingOfIsArtinianRing` — artinian ⟹ `J` 冪零 + 商が半単純
+* `IsSemisimpleModule.jacobson_le_annihilator` — `J` は単純加群を零化
+* `Submodule.eq_bot_of_le_smul_of_le_jacobson_bot` (Nakayama) — Krull 交叉より短い
+* `RingHom.liftOfRightInverse` — 全射に沿った加群構造の押し出し
+* `IsAlgClosed.of_ringEquiv` / `IsAlgClosed.algebraMap_bijective_of_isIntegral`
+
+**無かった** (自前):
+
+* 非可換 Freshman `(x+y)^p ≡ x^p + y^p` (`add_pow_char` は可換必須)
+* `[M_n(R), M_n(R)] = ker tr` と `tr(M^p) = (tr M)^p`
+* `Module (Matrix n n k) (n → k)` の instance — mathlib は**意図的に置いていない**
+  (`n → k` は既に `k`-加群)。本リポでは scoped instance
+* Brauer 指標・分解行列・block 論一式 (mathlib の表現論は char 0 の ordinary のみ)
+* 群の元 1 個の `p`/`p'` 分解
+
+## 3. 設計上の判断
+
+* **`tr(M^p) = (tr M)^p` を固有値で証明しない**。`M ≡ tr M·E₀₀ (mod [A,A])` +
+  商上 Frobenius の半線型性で済む。代数閉包も底変換も不要。
+* **(c)(d) を分けない**。教科書 (Navarro 2.9) は `dim A/(J+T) = #単純加群` と `T' = J+T` を
+  別々に立てるが、`J+T` を作らず**全射 1 本の核の同定**で済ませた。
+* **数え上げは同型で公開する**。次元の等式だけでは「ブロックトレース汎関数が双対の基底」に
+  届かず、一次独立性が出ない (段 53 で refactor)。
+* **代数閉体は分裂性のためだけ**に使う。`𝕎(𝔽̄_p)` は完全体上の Witt ベクトルなので
+  p-modular system 構成と両立する。
+
+## 4. frontier (2026-08-03 時点)
+
+1. **`HasEnoughRootsOfUnity 𝔽̄_p n` (`p ∤ n`)** — これが無いと Brauer 指標側の仮説
+   (`IsPrimitiveRoot ω (pRegularExponent p G)`) を `𝕎(𝔽̄_p)` で満たせず、
+   **数え上げ側 (代数閉が要る) と指標側 (根が要る) が同じ体の上で繋がらない**。
+   候補ルート: (a) `GaloisField p φ(n)` から代数閉体への埋め込みで
+   `hasEnoughRootsOfUnity_galoisField` (既存) を移送、
+   (b) `X^n - 1` の分離性から `Nat.card μ_n = n` を出して
+   `HasEnoughRootsOfUnity.of_card_le`。
+   ⚠ 現状これは**未着手の小穴**で、L6 の定理群は仮説として `hω` を取っている
+   (空虚ではないが、具体構成での instantiation はまだ書いていない)。
+2. **分解行列 `D`** — 有限次元表現を組成列に分解し、各因子が L5 のブロックのどれかと
+   同型であることを `brauerCharacter_congr` (段 57) で指標に翻訳 →
+   `χ|_{p-reg} = ∑_φ d_{χφ} φ`。⚠ 障害は `Representation k G V` と `Module (kG) M` の
+   往復 (`Representation.ofModule'` は `IsScalarTower k kG M` を要求)。
+3. 以降: Cartan 行列 `C = DᵀD` / block / Brauer 対応 / 2nd・3rd main theorem /
+   Z\*-定理 → Q₈ bridge。
