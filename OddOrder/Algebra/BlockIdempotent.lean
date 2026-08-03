@@ -25,6 +25,7 @@ idempotent** `e_B`.
 
 * `OddOrder.MatrixModule.surjective_blockCharacterPi`
 * `OddOrder.MatrixModule.existsUnique_blockIdempotent`
+* `OddOrder.MatrixModule.exists_completeOrthogonalIdempotents_block`
 -/
 
 namespace OddOrder.MatrixModule
@@ -102,5 +103,24 @@ theorem existsUnique_blockIdempotent
     · simp [Pi.single_eq_of_ne (Ne.symm h)]
   exact existsUnique_isIdempotentElem_eq_of_ker_isNilpotent f
     (fun x hx => hnil x (RingHom.mem_ker.mp hx)) _ (hsurj _) hidem
+
+/-- **The block idempotents are a complete orthogonal family**: `∑_B e_B = 1` and
+`e_B e_{B'} = 0` for `B ≠ B'`.  This is the block decomposition of the centre, and through it of
+`A` itself. -/
+theorem exists_completeOrthogonalIdempotents_block
+    [Fintype (Block π hπ hlin)] [DecidableEq (Block π hπ hlin)]
+    (hnil : ∀ x : Subalgebra.center k A,
+      blockCharacterPi π hπ hlin x = 0 → IsNilpotent x) :
+    ∃ e : Block π hπ hlin → Subalgebra.center k A,
+      CompleteOrthogonalIdempotents e ∧
+      ∀ c, blockCharacterPi π hπ hlin (e c) = Pi.single c 1 := by
+  set f : Subalgebra.center k A →+* (Block π hπ hlin → k) :=
+    (blockCharacterPi π hπ hlin).toRingHom with hf
+  have hsurj : Function.Surjective f := surjective_blockCharacterPi π hπ hlin
+  obtain ⟨e, he, hfe⟩ := CompleteOrthogonalIdempotents.lift_of_isNilpotent_ker f
+    (fun x hx => hnil x (RingHom.mem_ker.mp hx))
+    (CompleteOrthogonalIdempotents.single fun _ : Block π hπ hlin => k)
+    (fun c => hsurj _)
+  exact ⟨e, he, fun c => congrFun hfe c⟩
 
 end OddOrder.MatrixModule
