@@ -167,6 +167,7 @@ import OddOrder.Algebra.CommutatorSpan
 import OddOrder.Algebra.MatrixCommutator
 import OddOrder.Algebra.CommutatorSpanHom
 import OddOrder.Algebra.SplitSemisimpleCount
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
 import OddOrder.GroupTheory.RepresentationTheory.Modular.Reduction
@@ -15567,3 +15568,10 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.commutatorRadical_matrixPi_eq
 #assert_only_allowed_axioms
   OddOrder.finrank_quotient_commutatorRadical_eq_card
+
+/-! **Brauer の数え上げ** (issue 9506): `kG ⧸ J(kG)` の行列ブロック数 = `p`-正則類の個数。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_split_blocks_eq_card_pRegularClass
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_wedderburn_pi_matrix_card_eq
