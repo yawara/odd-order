@@ -297,10 +297,25 @@ universe を跨いで量化する羽目になる。代数閉に限れば mathlib
 🎯🎯 `brauerProj_eq_iff_sub_mem` (段 88 の核と合わせて商の同一視)。
 土台 = `conj_mem_centralizer_iff` (`N_G(P)` の元による共役は `C_G(P)` を保つ)。
 
-**次の frontier**: 第 1 主定理の難しい半分 `Br_D(e_B) ≠ 0` — ⚠ **文献待ち**。
-要は `A^G_D ∩ ker Br_D ⊆ ∑_{Q <_G D} A^G_Q` で、これがあれば Rosenberg (段 84) +
-`D` の極小性で閉じる。素朴な Mackey 分解 (`b = Tr^N_D(a) + junk`, `N = N_G(D)`) は
-「`c ∈ A^N ∩ A^D_{<D}` から `Tr^G_N(c) ∈ A^G_{<D}`」の段で詰まる
-(`p ∣ [N_G(D):D]` があり得るので `Tr^N_D` による平均化が効かない)。
-参照可能な原典に block 論が無い (実測) ので **Navarro Ch.4 の PDF 待ち** (issue 0147)。
-それまでは block 論の他の枝 (Cartan 行列 / `𝒪G` への移行 / 分裂体定理) が候補。
+段 91 追加 (`Algebra/BrauerFirstMain.lean`): 🎯🎯 **`brauerProj_ne_zero_of_isDefectGroup`**
+(= **第 1 主定理の難しい半分** `Br_D(e_B) ≠ 0`)。文献無しで再構成した。
+
+**設計上の判断 (段 91) — 経路選択がすべて**:
+
+* ⚠ **`N_G(D)` の Mackey 分解ルートは詰まる**。`A^G_D ∩ ker Br_D ⊆ ∑_{Q<_G D} A^G_Q` を
+  `b = Tr^N_D(a) + junk` (`N = N_G(D)`) から出そうとすると
+  「`c ∈ A^N ∩ A^D_{<D}` から `Tr^G_N(c) ∈ A^G_{<D}`」で止まる —
+  `p ∣ [N_G(D):D]` があり得るので `Tr^N_D` による平均化が効かない。
+* **類和基底で回すと通る**: `Br_D(e) = 0` ⟹ `C_G(D)` と交わる類の係数が全部 0 ⟹
+  `e` は「`D ≰ ᵍS_K` なる類和 `K̂`」の一次結合。各 `K̂` は `C_G(x)` の Sylow `p`-部分群
+  `S` からの相対トレース (段 80 + 段 85 の可逆指数 + 推移性) なので、`e = e·e` に
+  段 83 (`A^G_D · A^G_S ⊆ ∑_g A^G_{D⊓ᵍS}`) を食わせると**全項が `D` の真部分群から**。
+  Rosenberg (段 84) で 1 つに落ちて極小性に矛盾。
+* 支持補題: `relTrace_smul` / `smul_mem_relTraceIdeal` (トレースイデアルは `k`-部分加群 —
+  段 83 の積を係数付き類和に使うのに要る) / `eq_sum_classSum` (段 80 の証明から抽出) /
+  `GAlgebra.exists_mem_relTraceIdeal_of_sum_eq` (Rosenberg のトレースイデアル版)。
+
+⟹ 段 89 と合わせて **defect group = `Br_P(e) ≠ 0` なる極大 `p`-部分群** (Brauer の特徴づけ)。
+
+**次の frontier**: Brauer 対応 (`Br_D` で `G` の block と `N_G(D)` の block を対応させる) →
+2nd/3rd main theorem → Z\*。他の枝: Cartan 行列 / `𝒪G` への移行 / 分裂体定理。

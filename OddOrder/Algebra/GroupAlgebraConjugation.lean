@@ -82,6 +82,11 @@ theorem conj_smul_single (g h : G) (r : R) :
   change mapDomainRingEquiv R (MulAut.conj g) (single h r) = _
   simp
 
+/-- Conjugation is `R`-linear. -/
+theorem conj_smul_smul (g : G) (r : R) (x : MonoidAlgebra R G) : g • (r • x) = r • (g • x) := by
+  refine Finsupp.ext fun n => ?_
+  rw [conj_smul_apply, MonoidAlgebra.smul_apply, MonoidAlgebra.smul_apply, conj_smul_apply]
+
 /-- The conjugation action is conjugation *inside* the algebra, by the unit `single g 1`. -/
 theorem smul_eq_conj (g : G) (x : MonoidAlgebra R G) :
     g • x = single g 1 * x * single g⁻¹ 1 := by

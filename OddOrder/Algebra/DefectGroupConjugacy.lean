@@ -69,6 +69,33 @@ theorem IsDefectGroup.conj {b : A} (hbfix : ∀ g : G, g • b = b) {D : Subgrou
 
 end Conj
 
+/-- **Rosenberg's lemma for relative trace ideals.**  If the idempotent `b` — with local corner
+inside `A^G`, as expressed by `N` and `hdich` — is a finite sum of elements of trace ideals
+`A^G_{Q i}`, then it already lies in one of them.
+
+This is `exists_mem_of_sum_eq_of_local` with the coefficient set taken to be `A^G`, using that the
+trace ideals are two-sided ideals there. -/
+theorem exists_mem_relTraceIdeal_of_sum_eq {b : A} (hbfix : ∀ g : G, g • b = b)
+    (hb : IsIdempotentElem b) (hb0 : b ≠ 0)
+    {N : A → Prop} (hNadd : ∀ x y, N x → N y → N (x + y)) (hNb : ¬ N b)
+    (hdich : ∀ x : A, (∀ g : G, g • x = x) →
+      N (b * x * b) ∨ ∃ u : A, (∀ g : G, g • u = u) ∧ u * (b * x * b) = b)
+    {ι : Type*} {s : Finset ι} {Q : ι → Subgroup G} {c : ι → A}
+    (hc : ∀ i ∈ s, c i ∈ relTraceIdeal (Q i) ⊤) (hsum : ∑ i ∈ s, c i = b) :
+    ∃ i ∈ s, b ∈ relTraceIdeal (Q i) ⊤ :=
+  exists_mem_of_sum_eq_of_local (I := fun i => relTraceIdeal (Q i) (⊤ : Subgroup G))
+    hb hb0 hNadd hNb (U := {x : A | ∀ g : G, g • x = x}) hbfix
+    (fun _ u hu x hx => mem_relTraceIdeal_mul le_top hx fun w _ => hu w)
+    (fun _ u hu x hx => mul_mem_relTraceIdeal le_top hx fun w _ => hu w)
+    hc
+    (fun i hi => by
+      have hfix : ∀ g : G, g • c i = c i := fun g =>
+        smul_of_mem_relTraceIdeal (hc i hi) (Subgroup.mem_top g)
+      rcases hdich (c i) hfix with h | ⟨u, hu, hub⟩
+      · exact Or.inl h
+      · exact Or.inr ⟨u, hu, hub⟩)
+    hsum
+
 /-- **Brauer's theorem on defect groups**: they form a single `G`-conjugacy class.
 
 The hypotheses `hNadd`, `hNb`, `hdich` say that the corner of `b` inside `A^G` is a local ring,
@@ -84,19 +111,8 @@ theorem exists_conj_eq_of_isDefectGroup {b : A} (hbfix : ∀ g : G, g • b = b)
   obtain ⟨s, c, hc, hbsum⟩ := exists_mul_eq_sum_relTraceIdeal_inf hD.mem hD'.mem
   rw [hb.eq] at hbsum
   -- Rosenberg: `b` already lies in one of them.
-  obtain ⟨g, -, hmem⟩ := exists_mem_of_sum_eq_of_local (ι := G) (s := s)
-    (I := fun g => relTraceIdeal (D ⊓ MulAut.conj g • D') (⊤ : Subgroup G)) (c := c)
-    hb hb0 hNadd hNb (U := {x : A | ∀ g : G, g • x = x}) hbfix
-    (fun _ u hu x hx => mem_relTraceIdeal_mul le_top hx fun w _ => hu w)
-    (fun _ u hu x hx => mul_mem_relTraceIdeal le_top hx fun w _ => hu w)
-    hc
-    (fun i hi => by
-      have hfix : ∀ g : G, g • c i = c i := fun g =>
-        smul_of_mem_relTraceIdeal (hc i hi) (Subgroup.mem_top g)
-      rcases hdich (c i) hfix with h | ⟨u, hu, hub⟩
-      · exact Or.inl h
-      · exact Or.inr ⟨u, hu, hub⟩)
-    hbsum.symm
+  obtain ⟨g, -, hmem⟩ :=
+    exists_mem_relTraceIdeal_of_sum_eq hbfix hb hb0 hNadd hNb hdich hc hbsum.symm
   -- Minimality of `D` turns `D ∩ ᵍD'` into `D`.
   have hDle : D ≤ MulAut.conj g • D' := by
     have hinf : D ⊓ MulAut.conj g • D' = D := by

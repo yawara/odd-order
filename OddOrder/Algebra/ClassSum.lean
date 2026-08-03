@@ -30,6 +30,7 @@ turns statements about defect groups (`e_B ∈ Tr^G_D((𝒪G)^D)`) into statemen
 * `OddOrder.GroupAlgebra.relTrace_single_apply` — `Tr^P_{P ∩ C_G(g)}(c·g)` is the `P`-orbit sum.
 * `OddOrder.GroupAlgebra.relTrace_single_eq_classSum` — `K̂ = Tr^G_{C_G(g)}(g)`, the case `P = ⊤`.
 * `OddOrder.GroupAlgebra.smul_classSum` — class sums are central.
+* `OddOrder.GroupAlgebra.eq_sum_classSum` — the class sum expansion `x = ∑_K x_K · K̂`.
 * `OddOrder.GroupAlgebra.mem_span_classSum` — the centre is spanned by the class sums.
 -/
 
@@ -178,42 +179,52 @@ theorem relTrace_single_eq_classSum (g : G) :
 
 section Span
 
+omit [Fintype G] in
+/-- A `G`-fixed element of `k[G]` is a class function: its coefficients are constant on
+conjugacy classes. -/
+theorem apply_eq_of_isConj {x : MonoidAlgebra k G} (hx : ∀ g : G, g • x = x) {a b : G}
+    (hab : IsConj a b) : x a = x b := by
+  obtain ⟨c, hc⟩ := isConj_iff.mp hab
+  rw [← hc, ← (smul_eq_self_iff_apply c x).mp (hx c) (c * a * c⁻¹)]
+  congr 1
+  group
+
+open scoped Classical in
+/-- **The class sum expansion of a central element**: `x = ∑_K x_K · K̂`. -/
+theorem eq_sum_classSum [Fintype (ConjClasses G)] {x : MonoidAlgebra k G}
+    (hx : ∀ g : G, g • x = x) : x = ∑ C : ConjClasses G, x C.out • classSum k C.out := by
+  classical
+  have hxconj : ∀ a b : G, IsConj a b → x a = x b := fun _ _ => apply_eq_of_isConj hx
+  refine Finsupp.ext fun n => ?_
+  have hsplit : (∑ C : ConjClasses G, x C.out • (classSum k C.out : MonoidAlgebra k G)) n
+      = ∑ C : ConjClasses G, (x C.out • (classSum k C.out : MonoidAlgebra k G)) n :=
+    Finsupp.finsetSum_apply _ _ _
+  rw [hsplit]
+  have hmkout : ∀ C : ConjClasses G, ConjClasses.mk C.out = C := fun C => by
+    rw [← ConjClasses.quotient_mk_eq_mk]; exact Quotient.out_eq C
+  have hterm : ∀ C : ConjClasses G,
+      (x C.out • (classSum k C.out : MonoidAlgebra k G)) n
+        = if C = ConjClasses.mk n then x n else 0 := by
+    intro C
+    rw [MonoidAlgebra.smul_apply, smul_eq_mul, classSum_apply]
+    by_cases hC : C = ConjClasses.mk n
+    · have hcn : IsConj C.out n := by
+        rw [← ConjClasses.mk_eq_mk_iff_isConj, hmkout]; exact hC
+      rw [if_pos hcn, if_pos hC, mul_one, hxconj _ _ hcn]
+    · have hcn : ¬ IsConj C.out n := by
+        intro h
+        exact hC (by rw [← hmkout C, ConjClasses.mk_eq_mk_iff_isConj]; exact h)
+      rw [if_neg hcn, if_neg hC, mul_zero]
+  rw [Finset.sum_congr rfl fun C _ => hterm C]
+  simp
+
 /-- **The centre of `k[G]` is spanned by the class sums.** -/
 theorem mem_span_classSum {x : MonoidAlgebra k G} (hx : ∀ g : G, g • x = x) :
     x ∈ Submodule.span k (Set.range (classSum k : G → MonoidAlgebra k G)) := by
   classical
   haveI : Finite (ConjClasses G) := Quotient.finite _
   letI : Fintype (ConjClasses G) := Fintype.ofFinite _
-  have hxconj : ∀ a b : G, IsConj a b → x a = x b := by
-    intro a b hab
-    obtain ⟨c, hc⟩ := isConj_iff.mp hab
-    rw [← hc, ← (smul_eq_self_iff_apply c x).mp (hx c) (c * a * c⁻¹)]
-    congr 1
-    group
-  have hsum : x = ∑ C : ConjClasses G, x C.out • classSum k C.out := by
-    refine Finsupp.ext fun n => ?_
-    have hsplit : (∑ C : ConjClasses G, x C.out • (classSum k C.out : MonoidAlgebra k G)) n
-        = ∑ C : ConjClasses G, (x C.out • (classSum k C.out : MonoidAlgebra k G)) n :=
-      Finsupp.finsetSum_apply _ _ _
-    rw [hsplit]
-    have hmkout : ∀ C : ConjClasses G, ConjClasses.mk C.out = C := fun C => by
-      rw [← ConjClasses.quotient_mk_eq_mk]; exact Quotient.out_eq C
-    have hterm : ∀ C : ConjClasses G,
-        (x C.out • (classSum k C.out : MonoidAlgebra k G)) n
-          = if C = ConjClasses.mk n then x n else 0 := by
-      intro C
-      rw [MonoidAlgebra.smul_apply, smul_eq_mul, classSum_apply]
-      by_cases hC : C = ConjClasses.mk n
-      · have hcn : IsConj C.out n := by
-          rw [← ConjClasses.mk_eq_mk_iff_isConj, hmkout]; exact hC
-        rw [if_pos hcn, if_pos hC, mul_one, hxconj _ _ hcn]
-      · have hcn : ¬ IsConj C.out n := by
-          intro h
-          exact hC (by rw [← hmkout C, ConjClasses.mk_eq_mk_iff_isConj]; exact h)
-        rw [if_neg hcn, if_neg hC, mul_zero]
-    rw [Finset.sum_congr rfl fun C _ => hterm C]
-    simp
-  rw [hsum]
+  rw [eq_sum_classSum hx]
   exact Submodule.sum_mem _ fun C _ =>
     Submodule.smul_mem _ _ (Submodule.subset_span ⟨C.out, rfl⟩)
 

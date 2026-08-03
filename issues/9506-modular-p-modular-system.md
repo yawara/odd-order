@@ -464,14 +464,26 @@ Z\*-定理 (Ch.7) までに要るものを、手持ちとの差分で:
       `k[C_G(P)]^{N_G(P)}` へ送る = Brauer 対応の舞台)。
       `BrauerKernel.lean` に 🎯🎯 **`brauerProj_eq_iff_sub_mem`**:
       `(k[G])^P / ∑_{Q<P} Tr^P_Q ≅ k[C_G(P)]` (段 88 の核 + 上の全射性)。
-- [ ] **第 1 主定理の難しい半分** = `Br_D(e_B) ≠ 0` (`D` = defect group)。
-      ⚠ **文献待ち**。要となる補題は `A^G_D ∩ ker Br_D ⊆ ∑_{Q <_G D} A^G_Q` だが、
-      素朴な Mackey 分解 (`b = Tr^N_D(a) + junk`, `N = N_G(D)`) では
-      「`c ∈ A^N ∩ A^D_{<D}` から `Tr^G_N(c) ∈ A^G_{<D}` を出す」段で詰まる
-      (`p ∣ [N_G(D):D]` があり得るので平均化が効かない)。
-      2026-08-03 時点で参照可能な原典 (Isaacs/BG/Peterfalvi/Gorenstein) はいずれも
-      block 論を扱っていない (実測: Gorenstein は文献表に "cyclic defect groups" の
-      引用があるのみ)。**Navarro Ch.4 の PDF が入り次第着手** (issue 0147 の PDF gate)。
+- [x] **第 1 主定理の難しい半分** = `Br_D(e_B) ≠ 0` — 完了 (2026-08-03、段 91
+      `Algebra/BrauerFirstMain.lean`)。**文献無しで自力再構成した**。
+      ⚠ `A^G_D ∩ ker Br_D ⊆ ∑_{Q<_G D} A^G_Q` を `N_G(D)` の Mackey 分解で出そうとすると
+      「`c ∈ A^N ∩ A^D_{<D}` から `Tr^G_N(c) ∈ A^G_{<D}`」で詰まる
+      (`p ∣ [N_G(D):D]` があり得るので平均化が効かない)。**類和基底で回すと通る**:
+      * 🎯 **`exists_isPGroup_le_centralizer_classSum_mem`** — 類和 `K̂` は
+        `C_G(x)` の Sylow `p`-部分群 `S` からの相対トレース
+        (`K̂ = Tr^G_{C_G(x)}(x)` (段 80) + `[C_G(x):S]` 可逆 (段 85) + 推移性)。
+      * `mem_centralizer_of_le_conj` — `D ≤ ᵍS ≤ ᵍC_G(x)` なら `ᵍx ∈ C_G(D)`。
+      * `Br_D(e) = 0` ⟹ `C_G(D)` と交わる類の係数が全部 0 ⟹ `e` は
+        「`D ≰ ᵍS_K` なる `K̂`」の一次結合。
+      * `e = e·e` に段 83 (`A^G_D · A^G_S ⊆ ∑_g A^G_{D⊓ᵍS}`) を食わせると
+        **全項が `D` の真部分群からのトレース**。
+      * Rosenberg (段 84) で 1 つに落ちて `D` の極小性に矛盾。
+      支持補題: `relTrace_smul` / `smul_mem_relTraceIdeal` (トレースイデアルは `k`-部分加群) /
+      `eq_sum_classSum` (段 80 の証明から抽出) /
+      `GAlgebra.exists_mem_relTraceIdeal_of_sum_eq` (Rosenberg のトレースイデアル版、
+      段 84 の適用を 1 本に括り出し)。
+      ⟹ 段 89 と合わせて **defect group = `Br_P(e) ≠ 0` なる極大 `p`-部分群**
+      (Brauer の特徴づけ)。
       これがあれば Rosenberg (段 84) + `D` の極小性で閉じる。
 - [ ] **2nd/3rd main theorem** → **Z\*-定理** → Q₈ bridge。
 

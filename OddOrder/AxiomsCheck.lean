@@ -174,6 +174,7 @@ import OddOrder.Algebra.GroupAlgebraDefectGroup
 import OddOrder.Algebra.GroupAlgebraBlocks
 import OddOrder.Algebra.BrauerKernel
 import OddOrder.Algebra.BrauerDefect
+import OddOrder.Algebra.BrauerFirstMain
 import OddOrder.Algebra.CentralIdempotentModule
 import OddOrder.Algebra.PrimitiveIdempotent
 import OddOrder.Algebra.CentralCharacter
@@ -15757,3 +15758,13 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.GroupAlgebra.brauerProj_conj_smul
 #assert_only_allowed_axioms
   OddOrder.GroupAlgebra.brauerProj_eq_iff_sub_mem
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.eq_sum_classSum
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.smul_mem_relTraceIdeal
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.exists_isPGroup_le_centralizer_classSum_mem
+#assert_only_allowed_axioms
+  OddOrder.GAlgebra.exists_mem_relTraceIdeal_of_sum_eq
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.brauerProj_ne_zero_of_isDefectGroup
