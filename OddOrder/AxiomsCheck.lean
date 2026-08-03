@@ -15496,3 +15496,17 @@ issue 9506).  The upper bound in Brauer's count of irreducible modular represent
   OddOrder.RepresentationTheory.Modular.span_range_mkQ_pRegular_eq_top
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.finrank_quotient_commutatorRadical_le
+
+/-! **The semilinear Frobenius on `A ⧸ [A, A]`** (issue 9506).  `T' / T` is exactly what it
+eventually kills, which turns the count into a Fitting-type analysis. -/
+
+#assert_only_allowed_axioms
+  OddOrder.frobQuotient_add
+#assert_only_allowed_axioms
+  OddOrder.frobQuotient_smul
+#assert_only_allowed_axioms
+  OddOrder.mem_commutatorRadical_iff_frobQuotient
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.exists_uniform_pow_prime_pow_eq_pRegularPart
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.iterate_frobQuotient_mk_single

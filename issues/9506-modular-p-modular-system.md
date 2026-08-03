@@ -150,12 +150,19 @@ system」を**実際に構成する**ところまでを本 issue のスコープ
         `g^{p^m} = g_{p'} = (g_{p'})^{p^m}`) →
         `single_sub_single_pRegularPart_mem` (`g - g_{p'} ∈ T'`) →
         **`finrank_quotient_commutatorRadical_le : dim (kG ⧸ T') ≤ #p-正則類`**。
-        残 = **下からの評価** (`p`-正則類が `T'` を法として独立)。
-        方針 = `kG ⧸ T` 上の**半線型 Frobenius** `F([g]) = [g^p]` を作り
-        (`(single g 1)^p = single (g^p) 1` なので類基底では `p` 乗写像)、
-        Fitting 分解で `T'/T = ker F^∞`、その次元が
-        `#共役類 - #p-正則類` であることを示す
-        (`ker F^∞` は「`p'`-部分の類が等しい」類の差で張られる)。
+        **下からの評価の枠組みも済** (2026-08-03):
+        * `frobQuotient` = `A ⧸ T` 上の**半線型 Frobenius** `[x] ↦ [x^p]`
+          (加法的 = Freshman、`F(c•u) = c^p•F(u)`)
+        * **`mem_commutatorRadical_iff_frobQuotient`**: `T'/T = ker F^∞`
+        * `exists_uniform_pow_prime_pow_eq_pRegularPart`: 全元に効く一様な `m`
+        * `iterate_frobQuotient_mk_single`: `F^[m][g] = [g_{p'}]` (類基底上)
+        残タスク (次 session の pickup 点):
+        1. `Im F^m = S := span{[h] : h p-正則}` (⊇ は済、⊆ は上の類基底作用から)
+        2. `F^m` は `S` 上で半線型全単射 (`h^{p^m} = h` + Frobenius が `k` で全単射)
+           ⟹ `ker F^{2m} = ker F^m` ⟹ `ker F^∞ = ker F^m`
+        3. `kG/T' ≅ Im F^m = S` ⟹ `dim = #p-正則類` (段 19 の `classCoeffSum` で
+           `p`-正則類基底の独立性)
+        ⟹ (b) 完成。以降 (c)(d) は `Ring.jacobson` / Wedderburn-Artin を使う別段。
       * (c) `dim kG/(J + T) = #単純加群` (分裂体) — 未。mathlib の
         `Ring.jacobson` / `IsSemisimpleRing` / Wedderburn–Artin が使える。
       * (d) `T' = J + T` — 未。
