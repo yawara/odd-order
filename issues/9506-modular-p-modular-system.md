@@ -206,7 +206,30 @@ system」を**実際に構成する**ところまでを本 issue のスコープ
 - [ ] **ブロック ↔ 既約加群の対応** (Artin–Wedderburn の**一意性側**)。現状 `n` は
       「行列ブロックの個数」であって「既約 `kG`-加群の同型類の個数」とは**まだ結ばれていない**
       (docstring に明記済)。`∏_{i<n} M_{d_i}(k)` 上の単純加群の同型類がちょうど `n` 個、を示す。
-      mathlib に既存があるか未実測。
+
+      **mathlib 実測 (2026-08-03、着手前調査)**:
+      * ✅ **`IsSimpleModule (Module.End R M) M`** は instance で存在
+        (`Mathlib/RingTheory/SimpleModule/Basic.lean:542`、`[DivisionRing R] [Nontrivial M]`
+        だけで良く `FiniteDimensional` すら不要)。`Module.End.applyModule` も instance。
+        ⟹ **「自然加群は単純」は自前で証明しなくてよい**。
+      * ❌ **`Module (Matrix n n k) (n → k)` の instance は無い** (実測)。
+        `Matrix.toLinAlgEquiv'` (`Matrix n n R ≃ₐ[R] Module.End R (n → R)`) 経由で
+        `Module.compHom` で作る (scoped instance にする — `n → k` は既に `k`-加群なので
+        大域 instance にはしない)。
+      * ✅ 商への降下は `isSimpleModule_iff_isSimpleModule_of_algebraMap_surjective` /
+        `LinearMap.isSimpleModule_iff_of_bijective` (`SimpleModule/Basic.lean:97,101`)。
+      * 同型類の「個数」の型付けは mathlib の **`isotypicComponents R R`**
+        (`SimpleModule/Isotypic.lean`) が正準 — Wedderburn の `n` はまさに
+        `Nat.card (isotypicComponents R R)` として取られている (証明中で
+        `Finite.equivFin` を噛ませているが外には出ていない)。
+        半単純環では `isotypicComponents R R` = 両側イデアル束の atom
+        (`isFullyInvariant_iff_isTwoSided`)。
+
+      **手順案**: `V_i := Fin (d_i) → k` を射影経由で `R`-加群にし、(i) 単純性 (上の 2 つ)、
+      (ii) `i ≠ j` で `V_i ≇ V_j` (零化イデアルが違う)、(iii) 任意の単純 `R`-加群がどれかと
+      同型 (極大左イデアルによる商 + `R ≅ ⊕_i V_i^{d_i}`)。
+      ⚠ 代案として「`IBr(G)` を Wedderburn ブロックの添字集合として**定義**する」設計もある
+      (抽象的分類を回避できるが定義的選択になる)。hub 裁定事項。
 - [ ] **`IBr(G)` の定義と Brauer 指標の一次独立性** (Navarro 2.7)。単純加群の Brauer 指標が
       `p`-正則類上の類関数として独立。`brauerCharacter` (段 27) は既にあるので、単純加群側を
       繋ぐだけ。
