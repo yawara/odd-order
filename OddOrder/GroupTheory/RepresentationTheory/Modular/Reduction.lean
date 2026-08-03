@@ -28,6 +28,11 @@ decomposition-map identity is that these containments are equalities on dimensio
 * `OddOrder.RepresentationTheory.Modular.baseChange_pow_eq_one`
 * `OddOrder.RepresentationTheory.Modular.baseChange_eigenspace_le`
 * `OddOrder.RepresentationTheory.Modular.finrank_baseChange_eigenspace`
+* `OddOrder.RepresentationTheory.Modular.trace_eq_sum_finrank_baseChange_eigenspace` — the
+  decomposition-map identity at the level of operators
+* `OddOrder.RepresentationTheory.Modular.reduction` and
+  `OddOrder.RepresentationTheory.Modular.trace_eq_brauerCharacter_reduction` — the same
+  identity for representations
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -213,5 +218,48 @@ theorem trace_eq_sum_finrank_baseChange_eigenspace :
   exact Finset.sum_congr rfl fun ζ hζ => by rw [finrank_eigenspace_baseChange hn hn0 hω hA hζ]
 
 end Decomposition
+
+/-! ### The decomposition map, in representation form -/
+
+section Representation
+
+variable {G : Type*} [Group G]
+
+/-- **The reduction of an `𝒪`-representation** modulo the maximal ideal: base change along
+`𝒪 → k`.  It is a homomorphism because `Module.End.baseChangeHom` is an algebra map. -/
+noncomputable def reduction [IsLocalRing 𝒪] (ρ : Representation 𝒪 G L) :
+    Representation (ResidueField 𝒪) G (ResidueField 𝒪 ⊗[𝒪] L) :=
+  MonoidHom.comp (Module.End.baseChangeHom 𝒪 (ResidueField 𝒪) L).toRingHom.toMonoidHom ρ
+
+@[simp]
+theorem reduction_apply [IsLocalRing 𝒪] (ρ : Representation 𝒪 G L) (g : G) :
+    reduction ρ g = (ρ g).baseChange (ResidueField 𝒪) := rfl
+
+/-- A `p`-regular element of a finite group satisfies the finite-order hypothesis at the
+canonical exponent `|G|_{p'}`. -/
+theorem rep_pow_pRegularExponent_eq_one' {p : ℕ} [Finite G] (ρ : Representation 𝒪 G L)
+    (hp : p.Prime) {g : G} (hg : OddOrder.GroupTheory.IsPRegular p g) :
+    (ρ g) ^ OddOrder.GroupTheory.pRegularExponent p G = 1 := by
+  rw [← map_pow, OddOrder.GroupTheory.pow_pRegularExponent_eq_one hp hg, map_one]
+
+variable {p : ℕ} [HenselianLocalRing 𝒪] [IsPModularSystem p 𝒪] [IsDomain 𝒪]
+  [IsPrincipalIdealRing 𝒪] [Module.Free 𝒪 L] [Module.Finite 𝒪 L]
+variable {n : ℕ} (hn : ¬ p ∣ n) (hn0 : 0 < n) {ω : 𝒪} (hω : IsPrimitiveRoot ω n)
+  (ρ : Representation 𝒪 G L)
+include hn hn0 hω
+
+/-- **The decomposition map.**  The ordinary character of an `𝒪`-lattice representation — the
+trace over `𝒪`, which is the character of the associated representation over the fraction
+field — agrees with the Brauer character of its reduction.
+
+This is the identity `χ = ∑_φ d_{χφ} φ` before the reduction is broken into composition
+factors; the breaking up is `brauerCharacter_quotient_add_subrepresentation`. -/
+theorem trace_eq_brauerCharacter_reduction {g : G} (hg : (ρ g) ^ n = 1) :
+    LinearMap.trace 𝒪 L (ρ g) = brauerCharacter (𝒪 := 𝒪) n (reduction ρ) g := by
+  rw [brauerCharacter_eq_sum_nthRootsFinset hn hn0,
+    trace_eq_sum_finrank_baseChange_eigenspace hn hn0 hω hg]
+  exact Finset.sum_congr rfl fun ζ _ => by rw [reduction_apply]
+
+end Representation
 
 end OddOrder.RepresentationTheory.Modular
