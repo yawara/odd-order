@@ -38,6 +38,7 @@ genuine lift of the Brauer-trace, not an unrelated formula.
 * `rootLift_unique`, `rootLift_one` — the lift is characterised by its residue
 * `brauerCharacter_one` — the value at `1` is the dimension
 * `brauerCharacter_conj` — Brauer characters are class functions
+* `brauerCharacter_congr` — they depend only on the isomorphism class
 * `residue_brauerCharacter` — reduction is the ordinary trace
 * `brauerCharacter_quotient_add_subrepresentation` — additivity in short exact sequences
 -/
@@ -141,6 +142,31 @@ theorem brauerCharacter_conj (g h : G) :
       have h2 := congrArg (fun x : V => (ρ h⁻¹) x) key
       simp only [hinv, map_smul] at h2
       exact h2
+  rw [← hmap, LinearEquiv.finrank_map_eq]
+
+omit [IsPModularSystem p 𝒪] in
+/-- **The Brauer character only depends on the isomorphism class of the representation.**  An
+intertwining isomorphism carries eigenspaces to eigenspaces, so every multiplicity is unchanged.
+
+This is what lets the Brauer character of a module be read off any composition series, and hence
+what makes the decomposition numbers well defined. -/
+theorem brauerCharacter_congr {V' : Type*} [AddCommGroup V'] [Module (ResidueField 𝒪) V']
+    (ρ' : Representation (ResidueField 𝒪) G V') (f : V ≃ₗ[ResidueField 𝒪] V')
+    (hf : ∀ (g : G) (v : V), f ((ρ g) v) = (ρ' g) (f v)) (g : G) :
+    brauerCharacter (𝒪 := 𝒪) n ρ g = brauerCharacter (𝒪 := 𝒪) n ρ' g := by
+  refine Finset.sum_congr rfl fun ζ _ => ?_
+  congr 1
+  have hmap : Submodule.map (f : V →ₗ[ResidueField 𝒪] V') (Module.End.eigenspace (ρ g) ζ)
+      = Module.End.eigenspace (ρ' g) ζ := by
+    refine le_antisymm ?_ fun w hw => ⟨f.symm w, ?_, by simp⟩
+    · rintro _ ⟨v, hv, rfl⟩
+      rw [SetLike.mem_coe, mem_eigenspace_iff] at hv
+      simp only [LinearEquiv.coe_coe, mem_eigenspace_iff]
+      rw [← hf, hv, map_smul]
+    · rw [mem_eigenspace_iff] at hw
+      simp only [SetLike.mem_coe, mem_eigenspace_iff]
+      refine f.injective ?_
+      rw [hf, f.apply_symm_apply, hw, map_smul, f.apply_symm_apply]
   rw [← hmap, LinearEquiv.finrank_map_eq]
 
 variable (hn : ¬ p ∣ n) (hn0 : 0 < n)

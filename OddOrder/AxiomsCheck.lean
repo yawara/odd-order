@@ -15635,3 +15635,5 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.RepresentationTheory.Modular.mem_maximalIdeal_of_sum_irreducibleBrauerCharacter
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.eq_zero_of_sum_irreducibleBrauerCharacter
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.brauerCharacter_congr
