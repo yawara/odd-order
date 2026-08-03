@@ -8,6 +8,7 @@ import OddOrder.Algebra.PiSimpleModule
 import OddOrder.Algebra.ModuleAlongSurjection
 import OddOrder.Algebra.PiMatrixSimpleModules
 import OddOrder.Algebra.CentralCharacter
+import OddOrder.Algebra.PGroupOrbitSum
 import OddOrder.Algebra.RelativeTrace
 import OddOrder.Algebra.GroupAlgebraConjugation
 import OddOrder.Algebra.BlockIdempotent
