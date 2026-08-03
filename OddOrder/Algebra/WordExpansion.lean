@@ -7,6 +7,10 @@ import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Algebra.BigOperators.Ring.Finset
 import Mathlib.Algebra.Ring.Defs
 import Mathlib.Algebra.Group.Subgroup.Defs
+import Mathlib.Dynamics.PeriodicPts.Lemmas
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.Push
+import Mathlib.Algebra.Group.Fin.Basic
 
 /-!
 # The noncommutative binomial expansion
@@ -88,5 +92,89 @@ theorem wordProd_rotateWord_sub_mem (x y : R) (w : Fin (n + 1) → Bool) (T : Ad
   exact hT _ _
 
 end Rotate
+
+/-! ### Rotation is the cyclic shift, and its periods -/
+
+section Period
+
+variable {n : ℕ}
+
+theorem rotateWord_apply (w : Fin (n + 1) → Bool) (i : Fin (n + 1)) :
+    rotateWord w i = w (i + 1) := by
+  refine Fin.lastCases ?_ ?_ i
+  · rw [rotateWord, Fin.snoc_last]
+    congr 1
+    ext
+    simp
+  · intro j
+    rw [rotateWord, Fin.snoc_castSucc]
+    change w j.succ = _
+    congr 1
+    ext
+    simp [Fin.val_succ]
+
+/-- Iterating the shift on indices. -/
+theorem val_iterate_add_one (i : Fin (n + 1)) (m : ℕ) :
+    ((fun j : Fin (n + 1) => j + 1)^[m] i).val = (i.val + m) % (n + 1) := by
+  induction m with
+  | zero => simp [Nat.mod_eq_of_lt i.isLt]
+  | succ m ih =>
+    rw [Function.iterate_succ_apply', Fin.val_add, ih, Fin.val_one', ← Nat.add_mod,
+      Nat.add_assoc]
+
+theorem iterate_rotateWord_apply (w : Fin (n + 1) → Bool) (m : ℕ) (i : Fin (n + 1)) :
+    rotateWord^[m] w i = w ((fun j : Fin (n + 1) => j + 1)^[m] i) := by
+  induction m generalizing w with
+  | zero => simp
+  | succ m ih =>
+    rw [Function.iterate_succ_apply, ih, Function.iterate_succ_apply', rotateWord_apply]
+
+/-- A full turn is the identity. -/
+theorem isPeriodicPt_rotateWord (w : Fin (n + 1) → Bool) :
+    Function.IsPeriodicPt rotateWord (n + 1) w := by
+  funext i
+  rw [iterate_rotateWord_apply]
+  congr 1
+  refine Fin.ext ?_
+  rw [val_iterate_add_one, Nat.add_mod_right, Nat.mod_eq_of_lt i.isLt]
+
+/-- A word fixed by one rotation is constant. -/
+theorem const_of_isFixedPt_rotateWord {w : Fin (n + 1) → Bool} (h : rotateWord w = w)
+    (i j : Fin (n + 1)) : w i = w j := by
+  have hiter : ∀ (m : ℕ) (i : Fin (n + 1)),
+      w ((fun j : Fin (n + 1) => j + 1)^[m] i) = w i := by
+    intro m
+    induction m with
+    | zero => simp
+    | succ m ih =>
+      intro i
+      rw [Function.iterate_succ_apply, ih]
+      have hi := congrFun h i
+      rw [rotateWord_apply] at hi
+      exact hi
+  have key : ∀ j : Fin (n + 1), w j = w 0 := by
+    intro j
+    have hj : (fun j : Fin (n + 1) => j + 1)^[j.val] 0 = j := by
+      refine Fin.ext ?_
+      rw [val_iterate_add_one]
+      simp [Nat.mod_eq_of_lt j.isLt]
+    rw [← hj, hiter]
+  rw [key i, key j]
+
+/-- **Non-constant words have full rotation period.**  If some rotation by an amount prime to
+`p` fixes a word of length `p`, the word is constant. -/
+theorem const_of_iterate_rotateWord_eq {p : ℕ} (hp : p.Prime) (hn : n + 1 = p)
+    {w : Fin (n + 1) → Bool} {k : ℕ} (hk : ¬ p ∣ k) (h : rotateWord^[k] w = w)
+    (i j : Fin (n + 1)) : w i = w j := by
+  have hdvdk : Function.minimalPeriod rotateWord w ∣ k :=
+    Function.isPeriodicPt_iff_minimalPeriod_dvd.mp h
+  have hdvdp : Function.minimalPeriod rotateWord w ∣ p :=
+    hn ▸ Function.isPeriodicPt_iff_minimalPeriod_dvd.mp (isPeriodicPt_rotateWord w)
+  rcases (Nat.dvd_prime hp).mp hdvdp with h1 | hpe
+  · exact const_of_isFixedPt_rotateWord
+      (Function.minimalPeriod_eq_one_iff_isFixedPt.mp h1) i j
+  · exact absurd (hpe ▸ hdvdk) hk
+
+end Period
 
 end OddOrder
