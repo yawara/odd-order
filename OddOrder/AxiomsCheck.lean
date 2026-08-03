@@ -164,6 +164,7 @@ import OddOrder.Algebra.EigenspaceDecomposition
 import OddOrder.Algebra.LagrangeInterpolationRing
 import OddOrder.Algebra.WordExpansion
 import OddOrder.Algebra.CommutatorSpan
+import OddOrder.Algebra.MatrixCommutator
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
 import OddOrder.GroupTheory.RepresentationTheory.Modular.Reduction
@@ -15529,3 +15530,13 @@ Brauer's count of the irreducible modular representations. -/
   OddOrder.RepresentationTheory.Modular.basisPRegularQuotient
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.finrank_quotient_commutatorRadical
+
+/-! **The matrix factor of the semisimple quotient** (issue 9506).  `[M_n(R), M_n(R)]` is the
+trace-zero subspace, whence `tr (M ^ p) = (tr M) ^ p` in characteristic `p`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.sub_single_trace_mem_commutatorSpan
+#assert_only_allowed_axioms
+  OddOrder.mem_commutatorSpan_matrix_iff
+#assert_only_allowed_axioms
+  OddOrder.trace_pow_prime

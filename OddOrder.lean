@@ -2,6 +2,7 @@ import OddOrder.Algebra.PowSubOneDvd
 import OddOrder.Algebra.AugmentationIdeal
 import OddOrder.Algebra.ChevalleyWarning
 import OddOrder.Algebra.CommutatorSpan
+import OddOrder.Algebra.MatrixCommutator
 import OddOrder.Algebra.EigenspaceDecomposition
 import OddOrder.Algebra.WordExpansion
 import OddOrder.Algebra.LagrangeInterpolationRing
