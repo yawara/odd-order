@@ -15510,3 +15510,8 @@ eventually kills, which turns the count into a Fitting-type analysis. -/
   OddOrder.GroupTheory.exists_uniform_pow_prime_pow_eq_pRegularPart
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.iterate_frobQuotient_mk_single
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.linearIndependent_mkQ_out
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.iterate_frobQuotient_mem_pRegularClassSpan
