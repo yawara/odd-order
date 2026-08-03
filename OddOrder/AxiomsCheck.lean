@@ -163,6 +163,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
 import OddOrder.Algebra.EigenspaceDecomposition
 import OddOrder.Algebra.LagrangeInterpolationRing
 import OddOrder.Algebra.WordExpansion
+import OddOrder.Algebra.CommutatorSpan
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
 import OddOrder.GroupTheory.RepresentationTheory.Modular.Reduction
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InvariantLattice
@@ -15468,3 +15469,17 @@ commutativity, so the word/rotation argument is developed here from scratch. -/
   OddOrder.exists_nsmul_sum_of_free
 #assert_only_allowed_axioms
   OddOrder.add_pow_prime_sub_sub_mem
+
+/-! **The `p`-radical of the commutator span** (`Algebra.CommutatorSpan`, issue 9506).  The
+structural heart of Brauer's count: `T' = {x | ∃ m, x ^ (p ^ m) ∈ [A, A]}` is a subspace. -/
+
+#assert_only_allowed_axioms
+  OddOrder.mul_pow_sub_mul_pow_mem
+#assert_only_allowed_axioms
+  OddOrder.commutator_pow_mem
+#assert_only_allowed_axioms
+  OddOrder.pow_mem_commutatorSpan
+#assert_only_allowed_axioms
+  OddOrder.add_pow_prime_pow_sub_sub_mem
+#assert_only_allowed_axioms
+  OddOrder.commutatorSpan_le_commutatorRadical

@@ -140,7 +140,14 @@ system」を**実際に構成する**ところまでを本 issue のスコープ
         自由軌道の和は `p` 倍 (`exists_nsmul_sum_of_free`)。
         ⚠ mathlib の `add_pow_char` は可換性必須なので**非可換版は新規**。
         `p`-正則類側の道具 (`IsPRegularClass` / `pRegularPartClass`) も済。
-        残 = `T'` を部分空間として定義し `dim kG/T' = #p-正則類` を出す組み立て。
+        **`T'` の部分空間性も済** (2026-08-03、`Algebra/CommutatorSpan.lean`):
+        `pow_mem_commutatorSpan` (`T` は `p` 乗で閉じる — 交換子の `p` 乗が
+        交換子であることと Freshman から) →
+        `add_pow_prime_pow_sub_sub_mem` (反復 Freshman) →
+        **`commutatorRadical hp hchar : Submodule k A`** = `T'`。
+        残 = **数え上げ本体** `dim_k (kG ⧸ T') = #p-正則類`
+        (`kG/T` の共役類基底 (済) から `T'/T` が非 `p`-正則類の張る部分を
+        ちょうど潰すことを示す)。
       * (c) `dim kG/(J + T) = #単純加群` (分裂体) — 未。mathlib の
         `Ring.jacobson` / `IsSemisimpleRing` / Wedderburn–Artin が使える。
       * (d) `T' = J + T` — 未。
