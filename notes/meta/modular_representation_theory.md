@@ -222,6 +222,19 @@ defect group の共役性と `Br_P` の核 `∑_{Q<P} Tr^P_Q((kG)^Q)` に要る�
   (`exists_pow_eq_pow_mul`、`IsArtinian.monotone_stabilizes` を `Ideal.span {y^(m+1)}`
   の降鎖に食わせる) は別補題にした。`Z(kG)` を環型で実現したあと差し込むだけになる。
 
-**次の frontier**: 段 69 の block 冪等元を `Z(k[G])` へ配線 (段 84 の `hdich` を
-Artin 性で閉じるには `A^G` を環型で実現する必要がある) → `Br_P` の核 → Brauer 対応 →
+段 85 追加:
+
+| leaf | 内容 |
+|---|---|
+| `Algebra/GroupAlgebraDefectGroup.lean` | 一般論を `A = k[G]` (共役作用) へ特殊化。`commute_of_forall_smul_eq` / 🎯 `exists_fixed_nsmul_one_inv` / 🎯 `isPGroup_of_isDefectGroup` / 🎯🎯 `isNilpotent_or_exists_fixed_mul_eq` / 🎯🎯 **`exists_conj_eq_of_isDefectGroup`** (= Brauer の定理) |
+
+**設計上の判断 (段 85)**: `A^G` を環型で実現する必要があったが、**群環の場合は
+`Subalgebra.center k (k[G])` がそのまま使える** (段 77 の `forall_smul_eq_iff_mem_center`
+で `A^G = Z(k[G])`)。mathlib は `Subalgebra.center` に `CommRing` instance を持つので
+diamond を踏まない。有限次元性は `Module.Finite.of_injective` (部分加群の subtype) から、
+Artin 性は `IsArtinianRing.of_finite k _` から。⟹ 段 84 の `hdich` が実際に閉じ、
+Brauer の定理が仮説付きでなく**中心の原始性だけ**を要求する形になった。
+
+**次の frontier**: 段 69 の block 冪等元 `e_B` が段 85 の `hprim` (中心での原始性) を
+満たすことを示す (完全直交族の各元の原始性) → `Br_P` の核 → Brauer 対応 →
 2nd/3rd main theorem → Z\*。

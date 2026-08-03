@@ -170,6 +170,7 @@ import OddOrder.Algebra.MatrixNaturalModule
 import OddOrder.Algebra.ModuleAlongSurjection
 import OddOrder.Algebra.BlockIdempotent
 import OddOrder.Algebra.DefectGroupConjugacy
+import OddOrder.Algebra.GroupAlgebraDefectGroup
 import OddOrder.Algebra.CentralIdempotentModule
 import OddOrder.Algebra.PrimitiveIdempotent
 import OddOrder.Algebra.CentralCharacter
@@ -15717,3 +15718,11 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.GAlgebra.exists_conj_eq_of_isDefectGroup
 #assert_only_allowed_axioms
   OddOrder.GAlgebra.exists_conj_eq_of_isDefectGroup_of_commute
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.exists_fixed_nsmul_one_inv
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.isPGroup_of_isDefectGroup
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.isNilpotent_or_exists_fixed_mul_eq
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.exists_conj_eq_of_isDefectGroup

@@ -406,11 +406,20 @@ Z\*-定理 (Ch.7) までに要るものを、手持ちとの差分で:
       `ᵍD'` の極小性で `D = ᵍD'`) /
       🎯🎯 **`exists_conj_eq_of_isDefectGroup_of_commute`** (`A^G` 可換版 =
       `A = kG` 共役作用で `A^G = Z(kG)` のとき使う形; `N` = 冪零 ∧ `G`-不変)。
+- [x] **群環への特殊化 (`A = k[G]`, 共役作用)** — 完了 (2026-08-03、段 85
+      `Algebra/GroupAlgebraDefectGroup.lean`)。一般論の仮説 3 本を全部落とした:
+      `commute_of_forall_smul_eq` (`A^G = Z(k[G])` は可換) /
+      🎯 `exists_fixed_nsmul_one_inv` (`char k = p`, `p ∤ n` ⟹ `n·1` はスカラー
+      `(n:k)⁻¹` で可逆かつ `G`-不変) ⟹ 🎯 **`isPGroup_of_isDefectGroup`** /
+      🎯🎯 **`isNilpotent_or_exists_fixed_mul_eq`** (`Z(k[G])` は有限次元可換 ⟹ Artin
+      ⟹ 段 84 の Fitting 二分律; `Subalgebra.center k (k[G])` を環型として使い
+      `Module.Finite` → `IsArtinianRing.of_finite`) ⟹
+      🎯🎯 **`exists_conj_eq_of_isDefectGroup`** = **Brauer の定理**
+      (`Z(k[G])` の原始冪等元の defect group は 1 共役類)。
 - [ ] **block 冪等元を `Z(k[G])` に配線** — 段 69 の一般論 (`existsUnique_blockIdempotent`)
-      と段 80 の類和・段 58 の分裂データを繋ぐ。これで `IsDefectGroup e_B D` が
-      Brauer の意味の defect group になる。段 84 の `hdich` (corner の局所性) は
-      `Z(kG)` が有限次元 ⟹ Artin ⟹ 段 84 の `isNilpotent_or_exists_mul_eq_of_isArtinian`
-      で閉じる — そのために `A^G` を環型として実現する必要がある。
+      と段 80 の類和・段 58 の分裂データを繋ぐ。段 85 で受け皿 (`hprim` = 中心の原始性
+      だけを要求する形) は完成しているので、残るは「段 69 の `e_B` が段 85 の `hprim` を
+      満たす」= 完全直交族の各元が原始的、を示すこと。
 - [ ] **`Br_P` の核** = `∑_{Q < P} Tr^P_Q((kG)^Q)` — Mackey (段 83) が要る。
 - [ ] **2nd/3rd main theorem** → **Z\*-定理** → Q₈ bridge。
 
