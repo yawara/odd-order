@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.BigOperators.Pi
+import Mathlib.Algebra.Module.End
 import Mathlib.Algebra.Ring.Pi
 import Mathlib.RingTheory.SimpleModule.Basic
 
@@ -20,6 +21,8 @@ factors through that single factor.
 
 * `OddOrder.PiModule.exists_unique_idem_smul_eq_self` — exactly one `e_i` acts as the identity
 * `OddOrder.PiModule.smul_eq_single_smul` — the action then factors through the `i`-th factor
+* `OddOrder.PiModule.factorModule` — the resulting `R i`-module structure
+* `OddOrder.PiModule.isSimpleModule_factor` — which has the same submodules, hence is simple
 -/
 
 namespace OddOrder.PiModule
@@ -57,6 +60,19 @@ theorem idem_mul_idem_of_ne {i j : ι} (h : i ≠ j) : idem R i * idem R j = 0 :
 theorem sum_idem [Fintype ι] : ∑ i : ι, idem R i = 1 := by
   funext j
   simp [idem, Finset.sum_apply]
+
+/-- The `i`-th coordinate embedding is multiplicative (it is a non-unital ring map). -/
+theorem single_mul_single (i : ι) (a b : R i) :
+    (Pi.single i a : ∀ j, R j) * Pi.single i b = Pi.single i (a * b) := by
+  funext j
+  by_cases h : i = j
+  · subst h; simp
+  · simp [h]
+
+omit [DecidableEq ι] in
+theorem surjective_evalRingHom (i : ι) : Function.Surjective (Pi.evalRingHom R i) := by
+  classical
+  exact fun a => ⟨Pi.single i a, by simp⟩
 
 end Idem
 
@@ -111,6 +127,41 @@ theorem exists_unique_idem_smul_eq_self [Finite ι] [IsSimpleModule (∀ j, R j)
   have hzero : idem R j • s = 0 := by
     rw [← hid s, smul_smul, idem_mul_idem_of_ne hne, zero_smul]
   exact hs ((hj s).symm.trans hzero)
+
+/-! ### Viewing the module over the factor it lives on -/
+
+variable (M) in
+/-- The action of the `i`-th factor on a module on which `e_i` acts as the identity. -/
+def factorEndHom {i : ι} (hi : ∀ s : M, idem R i • s = s) : R i →+* AddMonoid.End M where
+  toFun a := Module.toAddMonoidEnd (∀ j, R j) M (Pi.single i a)
+  map_one' := by ext s; exact hi s
+  map_mul' a b := by rw [← single_mul_single, map_mul]
+  map_zero' := by rw [Pi.single_zero, map_zero]
+  map_add' a b := by rw [Pi.single_add, map_add]
+
+variable (M) in
+/-- **A module on which `e_i` acts as the identity is a module over the `i`-th factor.** -/
+@[reducible] def factorModule {i : ι} (hi : ∀ s : M, idem R i • s = s) : Module (R i) M :=
+  Module.compHom M (factorEndHom M hi)
+
+theorem factorModule_smul {i : ι} (hi : ∀ s : M, idem R i • s = s) (a : R i) (s : M) :
+    letI := factorModule M hi
+    a • s = (Pi.single i a : ∀ j, R j) • s := rfl
+
+/-- **The factor sees the same submodules**, so simplicity is inherited.  The `R i`-module
+structure is supplied by the caller (typically `factorModule`) together with its compatibility
+with the ambient action. -/
+theorem isSimpleModule_factor {i : ι} [Module (R i) M] [IsSimpleModule (∀ j, R j) M]
+    (hi : ∀ s : M, idem R i • s = s)
+    (hcompat : ∀ (a : R i) (s : M), a • s = (Pi.single i a : ∀ j, R j) • s) :
+    IsSimpleModule (R i) M := by
+  haveI : RingHomSurjective (Pi.evalRingHom R i) := ⟨surjective_evalRingHom i⟩
+  let l : M →ₛₗ[Pi.evalRingHom R i] M :=
+    { toFun := id
+      map_add' := fun _ _ => rfl
+      map_smul' := fun r s => by
+        simpa [hcompat (r i) s] using smul_eq_single_smul hi r s }
+  exact (l.isSimpleModule_iff_of_bijective Function.bijective_id).mp inferInstance
 
 end Module
 

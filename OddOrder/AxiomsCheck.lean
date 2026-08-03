@@ -15590,3 +15590,5 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.PiModule.exists_unique_idem_smul_eq_self
 #assert_only_allowed_axioms
   OddOrder.PiModule.smul_eq_single_smul
+#assert_only_allowed_axioms
+  OddOrder.PiModule.isSimpleModule_factor
