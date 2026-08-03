@@ -2,6 +2,7 @@ import OddOrder.Algebra.PowSubOneDvd
 import OddOrder.Algebra.AugmentationIdeal
 import OddOrder.Algebra.ChevalleyWarning
 import OddOrder.Algebra.EigenspaceDecomposition
+import OddOrder.Algebra.LagrangeInterpolationRing
 import OddOrder.Algebra.FiniteIndexAnnihilator
 import OddOrder.Algebra.FixedPointDensity
 import OddOrder.Algebra.FixedPointsGalois
