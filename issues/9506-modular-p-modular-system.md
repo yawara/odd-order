@@ -124,10 +124,7 @@ system」を**実際に構成する**ところまでを本 issue のスコープ
         `μ_n(𝒪) ≃ μ_n(k)`) / `Reduction.lean` (底変換と 2 段 squeeze)。
       ⚠ **Nakayama も splitting criterion も使っていない** — 各項の不等号 +
       総和一致で `Finset.sum_eq_sum_iff_of_le` が termwise 等号を出す、を 2 回。
-- [ ] **分解行列 `D` の表現論的包装**: `G`-不変 `𝒪`-束の存在 (完備 DVR + 有限群なので
-      `∑_{g} g·(格子)` で構成) → `χ|_{p-reg} = ∑_φ d_{χφ} φ`。加法性は済んでいるので
-      組成因子への分解は既に取れる。
-- [ ] **`|IBr G| = p`-regular 類の個数** (Brauer)。証明は
+- [x] **ブロック数 = `p`-regular 類の個数** (Brauer、2026-08-03 完了)。証明は
       `T = [kG,kG]` と `T' = {x : x^{p^m} ∈ T}` を経由する:
       * (a) `dim kG/T = #共役類` — **済** (`CommutatorSubspace` + `CommutatorQuotient`)
       * (b) `dim kG/T' = #p-正則類` — **核の Freshman's dream は済**
@@ -190,20 +187,33 @@ system」を**実際に構成する**ところまでを本 issue のスコープ
           **`mem_commutatorRadical_of_map_mem`** (核が一様冪零なら `T'` は**逆像**)。
           逆向きは形式的でなく、反復 Freshman で `x^{p^{m+r}} ≡ t^{p^r} ∈ T(A)`。
 
+      * **仮説の供給まで完了** (2026-08-03、段 44 `.../Modular/BrauerCount.lean`)。
+        `card_split_blocks_eq_card_pRegularClass` (抽象的な分裂データからの数え上げ) と、
+        🎯🎯 **`exists_wedderburn_pi_matrix_card_eq`** — 標数 `p` の**代数閉体** `k` 上で
+        `kG ⧸ J(kG) ≃ₐ[k] ∏_{i<n} M_{d_i}(k)` かつ **`n = #p`-正則類**。
+        供給した仮説 (すべて mathlib 実測で足りた):
+        * `IsArtinianRing (kG)` = `isArtinian_of_tower k` (有限次元)
+        * `IsSemiprimaryRing` (artinian ⟹ semiprimary の instance) ⟹ `J` 冪零 +
+          `kG ⧸ J` 半単純。一様冪零性は `Ideal.pow_mem_pow` + `J^N = ⊥`
+        * Artin–Wedderburn = `IsSemisimpleRing.exists_algEquiv_pi_matrix_divisionRing_finite`
+          → 代数閉体上の有限次元斜体は `k` 自身
+          (`IsAlgClosed.algebraMap_bijective_of_isIntegral`) → `AlgEquiv.mapMatrix`
+        ⚠ 代数閉体は**分裂性のためだけ**に使う。`𝕎(𝔽̄_p)` は完全体上の Witt ベクトルなので
+        段 26 の p-modular system 構成とそのまま両立する。
+
 ## 次の段 (frontier, 2026-08-03)
 
-`A = kG` に対して上記の 2 つの仮説を**実際に供給する**:
+- [ ] **ブロック ↔ 既約加群の対応** (Artin–Wedderburn の**一意性側**)。現状 `n` は
+      「行列ブロックの個数」であって「既約 `kG`-加群の同型類の個数」とは**まだ結ばれていない**
+      (docstring に明記済)。`∏_{i<n} M_{d_i}(k)` 上の単純加群の同型類がちょうど `n` 個、を示す。
+      mathlib に既存があるか未実測。
+- [ ] **`IBr(G)` の定義と Brauer 指標の一次独立性** (Navarro 2.7)。単純加群の Brauer 指標が
+      `p`-正則類上の類関数として独立。`brauerCharacter` (段 27) は既にあるので、単純加群側を
+      繋ぐだけ。
+- [ ] **分解行列 `D` の表現論的包装**: `G`-不変 `𝒪`-束の存在 (段 30 `exists_invariant_lattice`)
+      → `χ|_{p-reg} = ∑_φ d_{χφ} φ`。加法性 (段 29) は済んでいるので組成因子への分解は取れる。
 
-- [ ] **`J(kG)` の一様冪零性**: `kG` は有限次元 ⟹ artinian ⟹ `J` 冪零。
-      mathlib の `IsSemiprimaryRing` / `Ring.jacobson` 周りを実測して使う。
-- [ ] **分裂性 `kG ⧸ J ≃ₐ[k] ∏ M_{n_i}(k)`**: mathlib の
-      `isSemisimpleRing_iff_pi_matrix_divisionRing` は**斜体**上の行列環しか出さないので、
-      「分裂体」の定義 (単純加群の自己準同型環が `k`) を入れて `D_i = k` に落とす必要が
-      ある。`exists_algEquiv_pi_matrix_end_mulOpposite` が起点。
-- [ ] 合わせて **`#ブロック = #p`-正則類** (Brauer)。
-      ⚠ 「ブロック ↔ 既約加群」の対応 (Artin–Wedderburn の一意性側) は別途。
-
-以降 (別 issue に分割予定): 分解行列 `D` / Cartan 行列 `C = DᵀD` / block / Brauer 対応 /
+以降 (別 issue に分割予定): Cartan 行列 `C = DᵀD` / block / Brauer 対応 /
 2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。
 
 ## PDF gate について
