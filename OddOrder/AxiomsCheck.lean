@@ -15622,3 +15622,7 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.RepresentationTheory.Modular.irreducibleBrauerCharacter_one
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.residue_irreducibleBrauerCharacter
+#assert_only_allowed_axioms
+  OddOrder.ker_blockTrace
+#assert_only_allowed_axioms
+  OddOrder.blockTraceQuotientEquiv
