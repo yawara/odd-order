@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Algebra.Defs
 import Mathlib.LinearAlgebra.Span.Basic
+import Mathlib.LinearAlgebra.Quotient.Basic
 import OddOrder.Algebra.WordExpansion
 
 /-!
@@ -166,5 +167,87 @@ theorem sub_mem_commutatorRadical_of_pow_eq {p : ℕ} (hp : p.Prime) (hchar : (p
   have hsub := sub_pow_prime_pow_sub_add_mem (k := k) hp hchar m x y
   rw [h] at hsub
   simpa using hsub
+
+/-! ### The Frobenius on the quotient
+
+The `p`-power map descends to `A ⧸ [A, A]`; it is additive (freshman's dream) and semilinear
+over the Frobenius of `k`.  The `p`-radical is exactly the set of elements eventually killed by
+it, so counting `dim (A ⧸ T')` becomes a Fitting-type analysis of this map.
+-/
+
+section Frobenius
+
+variable {p : ℕ}
+
+/-- Congruent elements have congruent `p`-th powers. -/
+theorem pow_sub_pow_mem_of_sub_mem (hp : p.Prime) (hchar : (p : A) = 0) {x y : A}
+    (h : x - y ∈ commutatorSpan k A) :
+    x ^ p - y ^ p ∈ commutatorSpan k A := by
+  have hxy : x = y + (x - y) := by abel
+  have hfr : (y + (x - y)) ^ p - y ^ p - (x - y) ^ p ∈ commutatorSpan k A :=
+    add_pow_prime_sub_sub_mem _ _ hp hchar _ commutator_mem_toAddSubgroup
+  have hpow : (x - y) ^ p ∈ commutatorSpan k A := pow_mem_commutatorSpan hp hchar h
+  have hsum : x ^ p - y ^ p
+      = ((y + (x - y)) ^ p - y ^ p - (x - y) ^ p) + (x - y) ^ p := by
+    rw [← hxy]; abel
+  rw [hsum]
+  exact Submodule.add_mem _ hfr hpow
+
+/-- **The `p`-power map on `A ⧸ [A, A]`.** -/
+noncomputable def frobQuotient (hp : p.Prime) (hchar : (p : A) = 0) :
+    (A ⧸ commutatorSpan k A) → (A ⧸ commutatorSpan k A) :=
+  Quotient.map' (fun x => x ^ p) fun _ _ hxy =>
+    (Submodule.quotientRel_def _).mpr
+      (pow_sub_pow_mem_of_sub_mem hp hchar ((Submodule.quotientRel_def _).mp hxy))
+
+@[simp]
+theorem frobQuotient_mk (hp : p.Prime) (hchar : (p : A) = 0) (x : A) :
+    frobQuotient hp hchar (Submodule.Quotient.mk x : A ⧸ commutatorSpan k A)
+      = Submodule.Quotient.mk (x ^ p) := rfl
+
+/-- The Frobenius on the quotient is additive: this is the freshman's dream. -/
+theorem frobQuotient_add (hp : p.Prime) (hchar : (p : A) = 0)
+    (u v : A ⧸ commutatorSpan k A) :
+    frobQuotient hp hchar (u + v) = frobQuotient hp hchar u + frobQuotient hp hchar v := by
+  obtain ⟨x, rfl⟩ := (commutatorSpan k A).mkQ_surjective u
+  obtain ⟨y, rfl⟩ := (commutatorSpan k A).mkQ_surjective v
+  simp only [Submodule.mkQ_apply, ← Submodule.Quotient.mk_add, frobQuotient_mk]
+  refine (Submodule.Quotient.eq _).mpr ?_
+  rw [show (x + y) ^ p - (x ^ p + y ^ p) = (x + y) ^ p - x ^ p - y ^ p by abel]
+  exact add_pow_prime_sub_sub_mem _ _ hp hchar _ commutator_mem_toAddSubgroup
+
+/-- The Frobenius on the quotient is semilinear over the Frobenius of `k`. -/
+theorem frobQuotient_smul (hp : p.Prime) (hchar : (p : A) = 0) (c : k)
+    (u : A ⧸ commutatorSpan k A) :
+    frobQuotient hp hchar (c • u) = c ^ p • frobQuotient hp hchar u := by
+  obtain ⟨x, rfl⟩ := (commutatorSpan k A).mkQ_surjective u
+  simp only [Submodule.mkQ_apply, ← Submodule.Quotient.mk_smul, frobQuotient_mk]
+  congr 1
+  rw [Algebra.smul_def, Algebra.smul_def, map_pow]
+  exact Commute.mul_pow (Algebra.commutes c x) p
+
+/-- **The `p`-radical is exactly what the Frobenius eventually kills.** -/
+theorem mem_commutatorRadical_iff_frobQuotient (hp : p.Prime) (hchar : (p : A) = 0)
+    {x : A} :
+    x ∈ commutatorRadical (k := k) hp hchar
+      ↔ ∃ m, (frobQuotient hp hchar)^[m]
+          (Submodule.Quotient.mk x : A ⧸ commutatorSpan k A) = 0 := by
+  have hiter : ∀ (m : ℕ) (y : A),
+      (frobQuotient hp hchar)^[m] (Submodule.Quotient.mk y : A ⧸ commutatorSpan k A)
+        = Submodule.Quotient.mk (y ^ p ^ m) := by
+    intro m
+    induction m with
+    | zero => intro y; simp
+    | succ m ih =>
+      intro y
+      rw [Function.iterate_succ_apply, frobQuotient_mk, ih, ← pow_mul, ← pow_succ']
+  constructor
+  · rintro ⟨m, hm⟩
+    exact ⟨m, by rw [hiter, (Submodule.Quotient.mk_eq_zero _).mpr hm]⟩
+  · rintro ⟨m, hm⟩
+    rw [hiter] at hm
+    exact ⟨m, (Submodule.Quotient.mk_eq_zero _).mp hm⟩
+
+end Frobenius
 
 end OddOrder
