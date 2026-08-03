@@ -100,6 +100,7 @@ theorem iterate_frobQuotient_mk_single {m : ℕ}
       = Submodule.Quotient.mk (single (pRegularPart p g) 1) := by
   rw [OddOrder.iterate_frobQuotient_mk, single_pow, one_pow, hm g]
 
+omit [Finite G] in
 /-- The image of the iterated Frobenius contains every `p`-regular class. -/
 theorem mk_single_mem_range_iterate_frobQuotient {m : ℕ}
     (hm : ∀ g : G, g ^ p ^ m = pRegularPart p g) {h : G} (hh : IsPRegular p h) :
