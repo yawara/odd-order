@@ -15581,3 +15581,7 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
 
 #assert_only_allowed_axioms
   OddOrder.MatrixModule.isSimpleModule_matrix
+#assert_only_allowed_axioms
+  OddOrder.MatrixModule.linearEquiv_of_isSimpleRing
+#assert_only_allowed_axioms
+  OddOrder.MatrixModule.linearEquiv_natural_of_isSimpleModule
