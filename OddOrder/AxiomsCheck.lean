@@ -167,6 +167,7 @@ import OddOrder.Algebra.CommutatorSpan
 import OddOrder.Algebra.MatrixCommutator
 import OddOrder.Algebra.CommutatorSpanHom
 import OddOrder.Algebra.MatrixNaturalModule
+import OddOrder.Algebra.ModuleAlongSurjection
 import OddOrder.Algebra.PiMatrixSimpleModules
 import OddOrder.Algebra.PiSimpleModule
 import OddOrder.Algebra.SplitSemisimpleCount
@@ -15599,3 +15600,13 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.MatrixModule.idem_smul_piNatural
 #assert_only_allowed_axioms
   OddOrder.MatrixModule.nonempty_linearEquiv_natural_of_idem
+#assert_only_allowed_axioms
+  OddOrder.isSimpleModule_compHom
+#assert_only_allowed_axioms
+  OddOrder.isSimpleModule_of_surjective
+#assert_only_allowed_axioms
+  OddOrder.MatrixModule.isSimpleModule_blockModule
+#assert_only_allowed_axioms
+  OddOrder.MatrixModule.exists_linearEquiv_blockModule
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_surjective_blocks_card_eq

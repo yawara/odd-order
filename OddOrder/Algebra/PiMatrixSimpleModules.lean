@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Algebra.MatrixNaturalModule
+import OddOrder.Algebra.ModuleAlongSurjection
 import OddOrder.Algebra.PiSimpleModule
 
 /-!
@@ -25,6 +26,8 @@ turn the block count of Brauer's theorem into a count of irreducible modules.
 * `OddOrder.MatrixModule.piNaturalModule` — the `R`-module structure on the `i`-th block
 * `OddOrder.MatrixModule.isSimpleModule_piNatural`, `OddOrder.MatrixModule.idem_smul_piNatural`
 * `OddOrder.MatrixModule.nonempty_linearEquiv_natural_of_idem`
+* `OddOrder.MatrixModule.blockModule`, `OddOrder.MatrixModule.isSimpleModule_blockModule`
+* `OddOrder.MatrixModule.exists_linearEquiv_blockModule`
 -/
 
 namespace OddOrder.MatrixModule
@@ -78,5 +81,64 @@ theorem nonempty_linearEquiv_natural_of_idem [DecidableEq ι] [∀ i, Nonempty (
   haveI : IsSimpleModule (Matrix (nn i) (nn i) k) M :=
     PiModule.isSimpleModule_factor hi fun _ _ => rfl
   exact linearEquiv_natural_of_isSimpleModule M
+
+/-! ### Blocks as modules over a ring mapping onto the product
+
+This is the form in which the classification is used for `A = kG`: the surjection is
+`kG ↠ kG ⧸ J(kG) ≅ ∏_i M_{d_i}(k)`, whose kernel `J(kG)` annihilates every simple module.
+-/
+
+variable {A : Type*} [Ring A]
+
+variable (nn) in
+/-- The `i`-th block of the product, as a module over a ring mapping onto the product. -/
+@[reducible] noncomputable def blockModule (π : A →+* ∀ j, Matrix (nn j) (nn j) k) (i : ι) :
+    Module A (nn i → k) :=
+  Module.compHom _ ((toEndRingHom k (nn i)).comp
+    ((Pi.evalRingHom (fun j => Matrix (nn j) (nn j) k) i).comp π))
+
+theorem blockModule_smul (π : A →+* ∀ j, Matrix (nn j) (nn j) k) (i : ι) (a : A)
+    (v : nn i → k) :
+    letI := blockModule nn π i
+    a • v = π a i *ᵥ v := rfl
+
+/-- **Each block is a simple module over the source ring.** -/
+theorem isSimpleModule_blockModule [∀ i, Nonempty (nn i)]
+    {π : A →+* ∀ j, Matrix (nn j) (nn j) k} (hπ : Function.Surjective π) (i : ι) :
+    letI := blockModule nn π i
+    IsSimpleModule A (nn i → k) := by
+  letI := piNaturalModule k nn i
+  haveI := isSimpleModule_piNatural (k := k) (nn := nn) i
+  exact isSimpleModule_compHom π hπ
+
+/-- **Every simple module is a block.**  Combined with `isSimpleModule_blockModule` and the
+uniqueness in `PiModule.exists_unique_idem_smul_eq_self`, the simple `A`-modules are indexed by
+`ι` without repetition. -/
+theorem exists_linearEquiv_blockModule [Finite ι] [∀ i, Nonempty (nn i)]
+    {M : Type*} [AddCommGroup M] [Module A M] [IsSimpleModule A M]
+    {π : A →+* ∀ j, Matrix (nn j) (nn j) k} (hπ : Function.Surjective π)
+    (h : RingHom.ker π ≤ Module.annihilator A M) :
+    ∃ i : ι, letI := blockModule nn π i
+      Nonempty (M ≃ₗ[A] (nn i → k)) := by
+  classical
+  letI := moduleOfSurjective π hπ h
+  haveI := isSimpleModule_of_surjective π hπ h
+  obtain ⟨i, hi, -⟩ := PiModule.exists_unique_idem_smul_eq_self
+    (R := fun j => Matrix (nn j) (nn j) k) (M := M)
+  letI := PiModule.factorModule M hi
+  haveI : IsSimpleModule (Matrix (nn i) (nn i) k) M :=
+    PiModule.isSimpleModule_factor hi fun _ _ => rfl
+  obtain ⟨e⟩ := linearEquiv_natural_of_isSimpleModule (k := k) (n := nn i) M
+  letI := blockModule nn π i
+  have hsmul : ∀ (a : A) (m : M), e (a • m) = a • e m := by
+    intro a m
+    have hfac : a • m = (π a i) • m := by
+      rw [← moduleOfSurjective_smul π hπ h a m, PiModule.smul_eq_single_smul hi]
+      rfl
+    rw [hfac, e.map_smul]
+    rfl
+  exact ⟨i, ⟨LinearEquiv.ofBijective
+    ({ toFun := e, map_add' := e.map_add, map_smul' := hsmul } : M →ₗ[A] (nn i → k))
+    e.bijective⟩⟩
 
 end OddOrder.MatrixModule

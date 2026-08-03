@@ -21,9 +21,9 @@ Put the two halves together.  For a finite group `G` and a field `k` of characte
   reached by a surjection with uniformly nilpotent kernel (`SplitSemisimpleCount`).
 
 Hence the number of matrix blocks of the split semisimple quotient of `kG` is the number of
-`p`-regular classes of `G`.  This is **Brauer's theorem** `|IBr(G)| = #{p`-regular classes`}`,
-modulo the (unformalised) uniqueness half of Artin–Wedderburn identifying blocks with
-irreducible modules.
+`p`-regular classes of `G`.  Since the blocks *are* the simple `kG`-modules
+(`Algebra/PiMatrixSimpleModules`, via `J(kG)` annihilating them), this is **Brauer's theorem**
+`|IBr(G)| = #{p`-regular classes`}`.
 
 Over an *algebraically closed* `k` the splitting datum is produced here rather than assumed:
 `kG` is finite-dimensional hence Artinian hence semiprimary, so `J(kG)` is nilpotent and
@@ -37,6 +37,9 @@ algebras over `k`.
   from an abstract splitting datum
 * `OddOrder.RepresentationTheory.Modular.exists_wedderburn_pi_matrix_card_eq` — the datum,
   and hence the count, for an algebraically closed `k`
+* `OddOrder.RepresentationTheory.Modular.exists_surjective_blocks_card_eq` — the same, packaged
+  as a surjection of `kG` with kernel `J(kG)`, which is the form the module classification of
+  `Algebra/PiMatrixSimpleModules` consumes
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -74,8 +77,9 @@ of matrix algebras over `k` (`IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAl
 semisimple quotient `kG ⧸ J(kG)` is a product of exactly `#{p`-regular classes of `G}` matrix
 algebras over `k`.
 
-By the uniqueness half of Artin–Wedderburn (not formalised here) the blocks correspond to the
-irreducible `kG`-modules, so this is `|IBr(G)| = #{p`-regular classes`}`. -/
+The blocks correspond to the irreducible `kG`-modules — see
+`exists_surjective_blocks_card_eq` for the packaging that makes that correspondence usable —
+so this is `|IBr(G)| = #{p`-regular classes`}`. -/
 theorem exists_wedderburn_pi_matrix_card_eq [IsAlgClosed k] (hp : p.Prime) (hk : (p : k) = 0) :
     ∃ (n : ℕ) (d : Fin n → ℕ), (∀ i, NeZero (d i)) ∧
       Nonempty ((MonoidAlgebra k G ⧸ Ring.jacobson (MonoidAlgebra k G))
@@ -104,5 +108,28 @@ theorem exists_wedderburn_pi_matrix_card_eq [IsAlgClosed k] (hp : p.Prime) (hk :
   have hcount := card_split_blocks_eq_card_pRegularClass (k := k) (G := G) hp hk
     (Ideal.Quotient.mkₐ k _) (Ideal.Quotient.mkₐ_surjective k _) hker e'
   simpa using hcount
+
+/-- **Brauer's theorem, module form.**  Over an algebraically closed field of characteristic `p`
+there is a surjection of `kG` onto a product of `n` matrix algebras whose kernel is exactly
+`J(kG)`, with `n` the number of `p`-regular classes of `G`.
+
+Since `J(kG)` annihilates every simple `kG`-module
+(`IsSemisimpleModule.jacobson_le_annihilator`), the blocks of this surjection *are* the simple
+`kG`-modules: each is simple (`MatrixModule.isSimpleModule_blockModule`), every simple module is
+one of them (`MatrixModule.exists_linearEquiv_blockModule`), and no two coincide
+(`PiModule.exists_unique_idem_smul_eq_self`).  So this is `|IBr(G)| = #{p`-regular classes`}`. -/
+theorem exists_surjective_blocks_card_eq [IsAlgClosed k] (hp : p.Prime) (hk : (p : k) = 0) :
+    ∃ (n : ℕ) (d : Fin n → ℕ) (_ : ∀ i, NeZero (d i))
+      (π : MonoidAlgebra k G →+* ∀ i, Matrix (Fin (d i)) (Fin (d i)) k),
+      Function.Surjective π ∧ RingHom.ker π = Ring.jacobson (MonoidAlgebra k G) ∧
+      n = Nat.card {C : ConjClasses G // IsPRegularClass p C} := by
+  obtain ⟨n, d, hd, ⟨e⟩, hn⟩ := exists_wedderburn_pi_matrix_card_eq (k := k) (G := G) hp hk
+  refine ⟨n, d, hd, e.toRingEquiv.toRingHom.comp
+    (Ideal.Quotient.mk (Ring.jacobson (MonoidAlgebra k G))), ?_, ?_, hn⟩
+  · exact e.surjective.comp Ideal.Quotient.mk_surjective
+  · ext a
+    simp only [RingHom.mem_ker, RingHom.coe_comp, Function.comp_apply]
+    rw [← Ideal.Quotient.eq_zero_iff_mem]
+    exact ⟨fun ha => e.injective (by simpa using ha), fun ha => by rw [ha]; simp⟩
 
 end OddOrder.RepresentationTheory.Modular
