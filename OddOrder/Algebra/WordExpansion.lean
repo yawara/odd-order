@@ -14,6 +14,7 @@ import Mathlib.Algebra.Group.Fin.Basic
 import Mathlib.Algebra.BigOperators.GroupWithZero.Action
 import Mathlib.GroupTheory.QuotientGroup.Defs
 import Mathlib.Tactic.Abel
+import Mathlib.Tactic.NoncommRing
 
 /-!
 # The noncommutative binomial expansion
@@ -434,5 +435,60 @@ theorem add_pow_prime_sub_sub_mem {R : Type*} [Ring R] (x y : R) {p : ℕ} (hp :
 end Freshman
 
 
+
+/-! ### The commutator subgroup is closed under `p`-th powers
+
+For `T'` — the set of elements some `p`-power of which is a commutator sum — to be a subspace,
+one needs `t ∈ T ⟹ t ^ p ∈ T`.  The two steps are `(ab)^p - (ba)^p ∈ T` (it is literally a
+commutator) and `(ab - ba)^p ≡ (ab)^p - (ba)^p` by the freshman's dream.
+-/
+
+section PowerClosed
+
+variable {R : Type*} [Ring R]
+
+/-- `(a b) ^ (m+1) = a ((b a) ^ m b)`: the two products are cyclic rotations of each other. -/
+theorem mul_pow_succ_eq (a b : R) (m : ℕ) : (a * b) ^ (m + 1) = a * ((b * a) ^ m * b) := by
+  induction m with
+  | zero => simp
+  | succ m ih =>
+    rw [pow_succ, ih, pow_succ]
+    noncomm_ring
+
+/-- **`(ab)^p - (ba)^p` is a commutator.** -/
+theorem mul_pow_sub_mul_pow_mem (a b : R) {m : ℕ} (hm : 0 < m) (T : AddSubgroup R)
+    (hT : ∀ u v : R, u * v - v * u ∈ T) : (a * b) ^ m - (b * a) ^ m ∈ T := by
+  obtain ⟨j, rfl⟩ : ∃ j, m = j + 1 := ⟨m - 1, by omega⟩
+  have hz : (a * b) ^ (j + 1) - (b * a) ^ (j + 1)
+      = a * ((b * a) ^ j * b) - ((b * a) ^ j * b) * a := by
+    rw [mul_pow_succ_eq, pow_succ]
+    noncomm_ring
+  rw [hz]
+  exact hT _ _
+
+/-- **The `p`-th power of a commutator is again in `T`.** -/
+theorem commutator_pow_mem (a b : R) {p : ℕ} (hp : p.Prime) (hchar : (p : R) = 0)
+    (T : AddSubgroup R) (hT : ∀ u v : R, u * v - v * u ∈ T) :
+    (a * b - b * a) ^ p ∈ T := by
+  have hneg : ((-1 : R)) ^ p = -1 := by
+    rcases hp.eq_two_or_odd' with rfl | hodd
+    · have h2 : (1 : R) + 1 = 0 := by simpa [one_add_one_eq_two] using hchar
+      have hone : (1 : R) = -1 := eq_neg_of_add_eq_zero_left h2
+      rw [← hone]
+      simp
+    · exact hodd.neg_one_pow
+  have hsplit : (a * b + -(b * a)) ^ p - (a * b) ^ p - (-(b * a)) ^ p ∈ T :=
+    add_pow_prime_sub_sub_mem (a * b) (-(b * a)) hp hchar T hT
+  have hnegpow : (-(b * a)) ^ p = -((b * a) ^ p) := by
+    rw [neg_pow, hneg, neg_one_mul]
+  rw [hnegpow, sub_neg_eq_add, ← sub_eq_add_neg] at hsplit
+  have hsplit' : (a * b - b * a) ^ p - ((a * b) ^ p - (b * a) ^ p) ∈ T := by
+    rw [show (a * b - b * a) ^ p - ((a * b) ^ p - (b * a) ^ p)
+        = (a * b - b * a) ^ p - (a * b) ^ p + (b * a) ^ p by abel]
+    exact hsplit
+  have hfin := T.add_mem hsplit' (mul_pow_sub_mul_pow_mem a b hp.pos T hT)
+  rwa [sub_add_cancel] at hfin
+
+end PowerClosed
 
 end OddOrder
