@@ -109,15 +109,14 @@ L3 と L4 を突き合わせて `.../Modular/BrauerCount.lean`:
 
 ## 4. frontier (2026-08-03 時点)
 
-1. **`HasEnoughRootsOfUnity 𝔽̄_p n` (`p ∤ n`)** — これが無いと Brauer 指標側の仮説
-   (`IsPrimitiveRoot ω (pRegularExponent p G)`) を `𝕎(𝔽̄_p)` で満たせず、
-   **数え上げ側 (代数閉が要る) と指標側 (根が要る) が同じ体の上で繋がらない**。
-   候補ルート: (a) `GaloisField p φ(n)` から代数閉体への埋め込みで
-   `hasEnoughRootsOfUnity_galoisField` (既存) を移送、
-   (b) `X^n - 1` の分離性から `Nat.card μ_n = n` を出して
-   `HasEnoughRootsOfUnity.of_card_le`。
-   ⚠ 現状これは**未着手の小穴**で、L6 の定理群は仮説として `hω` を取っている
-   (空虚ではないが、具体構成での instantiation はまだ書いていない)。
+1. ~~`HasEnoughRootsOfUnity 𝔽̄_p n`~~ — **解決済 (段 58)**。ルート (a) を採用:
+   `IsAlgClosed.lift` で `GaloisField p φ(n)` を代数閉体に埋め込み、既存の
+   `hasEnoughRootsOfUnity_galoisField` を `hasEnoughRootsOfUnity_of_ringHom`
+   (ringEquiv 版から一般化) で移送。
+   `.../Modular/StandardSystem.lean` に **`StandardSystem p = 𝕎(𝔽̄_p)`** を置き、
+   `exists_isPrimitiveRoot_pRegularExponent_standardSystem` (L6 の `hω` を供給) と
+   🎯 `exists_surjective_blocks_card_eq_standardSystem` (有限群 `G` と素数 `p` だけから
+   全部出る非空虚性証明書) を得た。
 2. **分解行列 `D`** — 有限次元表現を組成列に分解し、各因子が L5 のブロックのどれかと
    同型であることを `brauerCharacter_congr` (段 57) で指標に翻訳 →
    `χ|_{p-reg} = ∑_φ d_{χφ} φ`。⚠ 障害は `Representation k G V` と `Module (kG) M` の

@@ -273,13 +273,12 @@ leaf の層構造・mathlib 実測 (使えたもの/無かったもの)・設計
 
 ## 次の段 (frontier, 2026-08-03)
 
-- [ ] **`HasEnoughRootsOfUnity 𝔽̄_p n` (`p ∤ n`)** — 小穴。これが無いと
-      **数え上げ側 (代数閉が要る) と Brauer 指標側 (根が要る) が同じ体の上で繋がらない**。
-      現状 L6 の定理群は `IsPrimitiveRoot ω (pRegularExponent p G)` を仮説で取っており、
-      `𝕎(𝔽̄_p)` での具体 instantiation はまだ書いていない。
-      候補: (a) `GaloisField p φ(n)` からの埋め込みで既存
-      `hasEnoughRootsOfUnity_galoisField` を移送 / (b) `X^n-1` の分離性 +
-      `HasEnoughRootsOfUnity.of_card_le`。
+- [x] **`HasEnoughRootsOfUnity 𝔽̄_p n`** — 解決済 (2026-08-03、段 58)。
+      `hasEnoughRootsOfUnity_of_isAlgClosed` (`IsAlgClosed.lift` で `GF(p^φ(n))` を
+      埋め込み、`hasEnoughRootsOfUnity_of_ringHom` で移送) +
+      `.../Modular/StandardSystem.lean` の **`StandardSystem p = 𝕎(𝔽̄_p)`**。
+      🎯🎯 `exists_surjective_blocks_card_eq_standardSystem` で、有限群 `G` と素数 `p`
+      だけから分裂データ・ブロックと既約加群の同定・数え上げが全部出る。
 - [ ] **分解行列 `D`**: 有限次元表現を組成列に分解 → 各因子は L5 のブロック →
       `brauerCharacter_congr` で指標に翻訳 → `χ|_{p-reg} = ∑_φ d_{χφ} φ`。
       ⚠ 障害は `Representation k G V` と `Module (kG) M` の往復
