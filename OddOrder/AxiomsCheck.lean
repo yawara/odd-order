@@ -170,6 +170,7 @@ import OddOrder.Algebra.MatrixNaturalModule
 import OddOrder.Algebra.ModuleAlongSurjection
 import OddOrder.Algebra.BlockIdempotent
 import OddOrder.Algebra.CentralIdempotentModule
+import OddOrder.Algebra.PrimitiveIdempotent
 import OddOrder.Algebra.CentralCharacter
 import OddOrder.Algebra.SeparatingSubalgebra
 import OddOrder.Algebra.PiMatrixSimpleModules
@@ -15693,3 +15694,7 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.exists_unique_smul_eq_self_of_completeOrthogonal
 #assert_only_allowed_axioms
   OddOrder.MatrixModule.existsUnique_block_smul_eq_self
+#assert_only_allowed_axioms
+  OddOrder.completeOrthogonalIdempotents_matrixUnit
+#assert_only_allowed_axioms
+  OddOrder.exists_completeOrthogonalIdempotents_lift

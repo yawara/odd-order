@@ -10,6 +10,7 @@ import OddOrder.Algebra.PiMatrixSimpleModules
 import OddOrder.Algebra.CentralCharacter
 import OddOrder.Algebra.BlockIdempotent
 import OddOrder.Algebra.CentralIdempotentModule
+import OddOrder.Algebra.PrimitiveIdempotent
 import OddOrder.Algebra.SeparatingSubalgebra
 import OddOrder.Algebra.CommutatorSpanHom
 import OddOrder.Algebra.CommutatorSpanPi
