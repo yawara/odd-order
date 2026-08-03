@@ -84,8 +84,19 @@ system」を**実際に構成する**ところまでを本 issue のスコープ
       ⚠ 「分裂」を新クラスにはしない — 条件は mathlib の
       `HasEnoughRootsOfUnity (ResidueField 𝒪) n` そのものなので、下流は
       `[HasEnoughRootsOfUnity (ResidueField 𝒪) n]` と書く (ラッパー方針)。
-- [ ] Brauer 指標 `IBr`: `k G`-加群の `p`-regular 元でのトレースを `U` 経由で char 0 へ持ち上げ
-- [ ] `|IBr G| = p`-regular 類の個数
+- [x] **対角化可能性** = `OddOrder/Algebra/EigenspaceDecomposition.lean` (2026-08-03)。
+      分裂した無平方零化多項式 `∏_{ζ ∈ s}(X - ζ)` で消える自己準同型は固有空間で張られる
+      (`iSup_eigenspace_eq_top_of_aeval_prod_eq_zero`、証明 = Lagrange 補間)。
+      系: `A^m = 1` + 原始 `m` 乗根 ⟹ 分解 + 内部直和 + `∑_ζ dim V_ζ = dim V`。
+      ⚠ mathlib の `IsSemisimple.iSup_eigenspace_eq_top` は `IsAlgClosed` 前提で**使えない**
+      (modular では係数体は「ちょうど足りる有限体」なので代数閉にできない)。
+- [x] **Brauer 指標** = `.../Modular/BrauerCharacter.lean` (2026-08-03)。
+      `rootLift n : k → 𝒪` (全域関数化した持ち上げ、`Finset k` 上の和で使うため) と
+      `brauerCharacter n ρ g = ∑_{ζ ∈ μ_n(k)} dim_k V_ζ · ζ̂`。
+      `brauerCharacter_one` (= `dim_k V`) / `brauerCharacter_conj` (類関数) /
+      **`residue_brauerCharacter` (剰余 = 通常のトレース)** が定義の正当性を固定する。
+- [ ] `|IBr G| = p`-regular 類の個数 (次の段。既約 `kG`-加群の枚数を数える必要があり、
+      `kG` の Jacobson radical / 半単純商の議論が要る)
 
 以降 (別 issue に分割予定): 分解行列 `D` / Cartan 行列 `C = DᵀD` / block / Brauer 対応 /
 2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。
