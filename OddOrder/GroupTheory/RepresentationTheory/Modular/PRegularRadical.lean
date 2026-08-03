@@ -58,6 +58,59 @@ theorem exists_pow_prime_pow_eq_pRegularPart (hp : p.Prime) {g : G} (hg : IsOfFi
     rw [hc, pow_mul, hord, one_pow]
   rw [hfac, hcomm.mul_pow, hple, hyfix, mul_one]
 
+variable [Finite G]
+
+/-- **A single exponent works for every element of a finite group.**  Taking `m = a · φ(d)`
+with `p ^ a` the `p`-part and `d` the `p'`-part of `|G|` kills every `p`-part and fixes every
+`p'`-part at once. -/
+theorem exists_uniform_pow_prime_pow_eq_pRegularPart (hp : p.Prime) :
+    ∃ m : ℕ, ∀ g : G, g ^ p ^ m = pRegularPart p g ∧
+      (pRegularPart p g) ^ p ^ m = pRegularPart p g := by
+  classical
+  set n := Nat.card G with hn
+  set A := n.factorization p with hA
+  set D := ordCompl[p] n with hD
+  have hn0 : n ≠ 0 := Nat.card_pos.ne'
+  have hcopD : Nat.Coprime p D := (Nat.Prime.coprime_iff_not_dvd hp).mpr
+    (Nat.not_dvd_ordCompl hp hn0)
+  refine ⟨A * D.totient, fun g => ?_⟩
+  have hDpos : 0 < D := Nat.ordCompl_pos p hn0
+  have hmodeq : p ^ (A * D.totient) ≡ 1 [MOD D] := by
+    rw [mul_comm A D.totient, pow_mul]
+    simpa using (Nat.ModEq.pow_totient hcopD).pow A
+  -- the `p'`-part is fixed
+  have hyfix : ∀ y : G, IsPRegular p y → orderOf y ∣ n → y ^ p ^ (A * D.totient) = y := by
+    intro y hy hyn
+    have hdvd : orderOf y ∣ D :=
+      Nat.Coprime.dvd_of_dvd_mul_left
+        (Nat.Coprime.pow_right _ ((Nat.Prime.coprime_iff_not_dvd hp).mpr hy).symm)
+        (by rw [hD, Nat.ordProj_mul_ordCompl_eq_self]; exact hyn)
+    have hmod : p ^ (A * D.totient) % orderOf y = 1 % orderOf y :=
+      Nat.ModEq.of_dvd hdvd hmodeq
+    calc y ^ p ^ (A * D.totient) = y ^ (p ^ (A * D.totient) % orderOf y) :=
+          (pow_mod_orderOf y _).symm
+      _ = y ^ (1 % orderOf y) := by rw [hmod]
+      _ = y ^ 1 := pow_mod_orderOf y 1
+      _ = y := pow_one y
+  have hyval : (pRegularPart p g) ^ p ^ (A * D.totient) = pRegularPart p g :=
+    hyfix _ (isPRegular_pRegularPart hp (isOfFinOrder_of_finite g))
+      (orderOf_dvd_natCard _)
+  refine ⟨?_, hyval⟩
+  -- the `p`-part dies
+  have hple : (pPart p g) ^ p ^ (A * D.totient) = 1 := by
+    have hord : (pPart p g) ^ p ^ A = 1 := by
+      have h1 : (pPart p g) ^ ordProj[p] (orderOf g) = 1 := pPart_pow_ordProj g
+      have h2 : ordProj[p] (orderOf g) ∣ p ^ A :=
+        pow_dvd_pow p (Nat.factorization_le_iff_dvd (orderOf_pos_iff.mpr
+          (isOfFinOrder_of_finite g)).ne' hn0 |>.mpr (orderOf_dvd_natCard g) p)
+      obtain ⟨c, hc⟩ := h2
+      rw [hc, pow_mul, h1, one_pow]
+    obtain ⟨c, hc⟩ : p ^ A ∣ p ^ (A * D.totient) :=
+      pow_dvd_pow p (Nat.le_mul_of_pos_right A (Nat.totient_pos.mpr hDpos))
+    rw [hc, pow_mul, hord, one_pow]
+  conv_lhs => rw [← pRegularPart_mul_pPart hp (isOfFinOrder_of_finite g)]
+  rw [(commute_pRegularPart_pPart g).mul_pow, hple, hyval, mul_one]
+
 end OddOrder.GroupTheory
 
 namespace OddOrder.RepresentationTheory.Modular
