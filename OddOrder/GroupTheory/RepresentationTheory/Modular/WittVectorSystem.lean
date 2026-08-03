@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.RingTheory.WittVector.Complete
 import Mathlib.RingTheory.WittVector.DiscreteValuationRing
 import Mathlib.Algebra.CharP.Algebra
+import Mathlib.FieldTheory.IsAlgClosed.Basic
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
 
 /-!
@@ -29,6 +30,7 @@ Everything rests on two mathlib results about a perfect `k` of characteristic `p
 
 * `OddOrder.RepresentationTheory.Modular.maximalIdeal_wittVector` — `𝔪(𝕎 k) = (p)`
 * `OddOrder.RepresentationTheory.Modular.wittVectorResidueFieldEquiv` — `ResidueField (𝕎 k) ≃+* k`
+* `OddOrder.RepresentationTheory.Modular.instIsAlgClosedResidueFieldWittVector`
 * `OddOrder.RepresentationTheory.Modular.instIsPModularSystemWittVector` — the system itself
 -/
 
@@ -74,6 +76,13 @@ noncomputable def wittVectorResidueFieldEquiv : ResidueField (WittVector p k) �
 
 instance instCharPResidueFieldWittVector : CharP (ResidueField (WittVector p k)) p :=
   charP_of_injective_ringHom (wittVectorResidueFieldEquiv k).symm.toRingHom.injective p
+
+/-- **The residue field inherits algebraic closedness.**  Taking `k` algebraically closed makes
+`𝕎 k` a `p`-modular system whose residue field splits every group algebra, which is the setting
+of Brauer's count. -/
+instance instIsAlgClosedResidueFieldWittVector [IsAlgClosed k] :
+    IsAlgClosed (ResidueField (WittVector p k)) :=
+  IsAlgClosed.of_ringEquiv k _ (wittVectorResidueFieldEquiv k).symm
 
 /-- A nonzero natural number stays nonzero in `𝕎 k`.
 

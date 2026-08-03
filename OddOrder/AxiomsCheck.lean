@@ -171,6 +171,7 @@ import OddOrder.Algebra.ModuleAlongSurjection
 import OddOrder.Algebra.PiMatrixSimpleModules
 import OddOrder.Algebra.PiSimpleModule
 import OddOrder.Algebra.SplitSemisimpleCount
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
@@ -15610,3 +15611,7 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.MatrixModule.exists_linearEquiv_blockModule
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_surjective_blocks_card_eq
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.instIsAlgClosedResidueFieldWittVector
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockRepresentation
