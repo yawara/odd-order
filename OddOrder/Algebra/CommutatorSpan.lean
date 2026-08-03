@@ -141,4 +141,30 @@ theorem commutatorSpan_le_commutatorRadical {p : ℕ} (hp : p.Prime) (hchar : (p
     commutatorSpan k A ≤ commutatorRadical (k := k) hp hchar := fun _ hx =>
   ⟨0, by simpa using hx⟩
 
+/-- `(-1) ^ (p ^ m) = -1` in characteristic `p`. -/
+theorem neg_one_pow_prime_pow {p : ℕ} (hp : p.Prime) (hchar : (p : A) = 0) (m : ℕ) :
+    (-1 : A) ^ p ^ m = -1 := by
+  induction m with
+  | zero => simp
+  | succ m ih => rw [pow_succ, pow_mul, ih, neg_one_pow_prime hp hchar]
+
+/-- The subtraction form of the iterated freshman's dream. -/
+theorem sub_pow_prime_pow_sub_add_mem {p : ℕ} (hp : p.Prime) (hchar : (p : A) = 0) (m : ℕ)
+    (x y : A) : (x - y) ^ p ^ m - x ^ p ^ m + y ^ p ^ m ∈ commutatorSpan k A := by
+  have hneg : (-y) ^ p ^ m = -(y ^ p ^ m) := by
+    rw [neg_pow, neg_one_pow_prime_pow hp hchar, neg_one_mul]
+  have h := add_pow_prime_pow_sub_sub_mem (k := k) hp hchar m x (-y)
+  rw [hneg, ← sub_eq_add_neg, sub_neg_eq_add] at h
+  exact h
+
+/-- **If some `p`-power of `x - y` vanishes, then `x - y` lies in the `p`-radical.**  This is the
+form used for group elements: `g` and its `p'`-part have equal `p`-power. -/
+theorem sub_mem_commutatorRadical_of_pow_eq {p : ℕ} (hp : p.Prime) (hchar : (p : A) = 0)
+    {x y : A} {m : ℕ} (h : x ^ p ^ m = y ^ p ^ m) :
+    x - y ∈ commutatorRadical (k := k) hp hchar := by
+  refine ⟨m, ?_⟩
+  have hsub := sub_pow_prime_pow_sub_add_mem (k := k) hp hchar m x y
+  rw [h] at hsub
+  simpa using hsub
+
 end OddOrder
