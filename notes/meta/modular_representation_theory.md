@@ -11,7 +11,8 @@ issue [9506](../../issues/9506-modular-p-modular-system.md) の作業ログは**
   ブロックは既約 `kG`-加群と同型を除いて 1 対 1 なので `|IBr(G)| = #p`-正則類。
 * **既約 Brauer 指標 `IBr(G)`** の定義と、`p`-正則類上での**一次独立性**。
 * **分解定理**: 任意の有限次元表現の Brauer 指標は `p`-正則類上で `IBr(G)` の
-  ℕ 係数一次結合 (= 分解数)。
+  ℕ 係数一次結合 (= 分解数)。通常指標側も
+  `χ|_{p-reg} = ∑_φ d_{χφ} φ` (= 分解行列 `D`)。
 * 非空虚性: `𝒪 = 𝕎(𝔽̄_p)` が DVR・Henselian・p-modular system で剰余体が代数閉。
 
 ## 1. 層 (下から)
@@ -84,6 +85,7 @@ L3 と L4 を突き合わせて `.../Modular/BrauerCount.lean`:
 | `.../Modular/MinimalSubrepresentation.lean` | **極小**非零不変部分空間の存在と既約性 |
 | `.../Modular/IrreducibleIsBlock.lean` | 🎯 既約表現の Brauer 指標は `IBr(G)` のどれか |
 | `.../Modular/BrauerDecomposition.lean` | 🎯🎯 **`exists_decomposition`** = 分解数 |
+| `.../Modular/DecompositionMatrix.lean` | 🎯🎯 **`exists_decomposition_trace`** = 分解行列 `D` (通常指標側) |
 
 ## 2. mathlib 実測 (使えたもの / 無かったもの)
 
@@ -133,5 +135,9 @@ L3 と L4 を突き合わせて `.../Modular/BrauerCount.lean`:
    帰納にした (部分表現の不変部分空間の対応は `Submodule.map W.subtype` の単射性だけで
    済み、商だと束の移送が要るため)。`Representation ↔ Module` の往復は
    `asModule` 側 (`AsModuleSimple.lean`) で処理。
-3. 次: Cartan 行列 `C = DᵀD` / block (中心冪等元) / Brauer 対応 /
+3. ~~分解行列 `D` (通常指標側)~~ — **解決済 (段 63)**。
+   `trace_eq_brauerCharacter_reduction` (段 32) と `exists_decomposition` (段 62) を繋ぐだけ。
+   ⚠ 原始根を上下 2 つ取る (`ω : 𝒪` はトレースを Brauer 指標形にするのに、
+   `ω' : ResidueField 𝒪` は還元を組成因子に割るのに)。どちらも段 58 が供給。
+4. 次: Cartan 行列 `C = DᵀD` (射影被覆が要る) / block (中心冪等元) / Brauer 対応 /
    2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。

@@ -289,9 +289,13 @@ leaf の層構造・mathlib 実測 (使えたもの/無かったもの)・設計
       ⚠ 等式が `p`-正則元上限定なのは加法性 (段 29) が `(ρ g)^n = 1` を要求するため
       (= Brauer 指標が意味を持つ範囲そのもの)。
 
+- [x] **分解行列 `D` (通常指標側)** — 完了 (2026-08-03、段 63)。
+      `.../Modular/DecompositionMatrix.lean` の 🎯🎯 `exists_decomposition_trace`:
+      `tr_𝒪 (ρ g) = ∑_i d_i φ_i(g)` (`p`-正則 `g`)。段 32 + 段 62 を繋ぐだけ。
+
 ## 次の段 (frontier, 2026-08-03 更新)
 
-- [ ] Cartan 行列 `C = DᵀD` / block (中心冪等元) / Brauer 対応 /
+- [ ] Cartan 行列 `C = DᵀD` (射影被覆が要る) / block (中心冪等元) / Brauer 対応 /
       2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。
 
 以降 (別 issue に分割予定): Cartan 行列 `C = DᵀD` / block / Brauer 対応 /
