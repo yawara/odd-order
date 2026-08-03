@@ -104,6 +104,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
+import OddOrder.GroupTheory.RepresentationTheory.Modular.Reduction
 import OddOrder.GroupTheory.RepresentationTheory.Modular.RootsOfUnityLift
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.WittVectorSystem
