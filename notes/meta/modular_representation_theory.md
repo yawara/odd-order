@@ -289,8 +289,18 @@ universe を跨いで量化する羽目になる。代数閉に限れば mathlib
 = **Brauer の第 1 主定理の易しい半分** (block が「見る」`p`-部分群は defect group に
 部分共役なものだけ)。
 
-**次の frontier**: 第 1 主定理の難しい半分 `Br_D(e_B) ≠ 0`。要は
-**`A^G_D ∩ ker Br_D ⊆ ∑_{Q <_G D} A^G_Q`** で、これがあれば Rosenberg (段 84) +
-`D` の極小性で閉じる。段 88 の核は `(kG)^D` 全体の記述なので、`A^G_D` に制限した版には
-`Br_D ∘ Tr^G_D = Tr^{N_G(D)}_D ∘ Br_D` (Mackey の二重剰余類を `N_G(D)` で切る) が要る。
-その先: Brauer 対応 → 2nd/3rd main theorem → Z\*。
+段 90 追加 (`BrauerHomomorphism.lean` / `BrauerKernel.lean` に追記): **Brauer 構成**
+`A(P) = (k[G])^P / ∑_{Q<P} Tr^P_Q ≅ k[C_G(P)]`。
+🎯 `exists_forall_smul_eq_brauerProj_eq` (全射性 + 切断: `C_G(P)` 上に台を持つ元は
+そもそも `P`-不変なので `Br_P` の切断が自明に取れる) / 🎯 `brauerProj_conj_smul`
+(`N_G(P)`-同変 ⟹ `Z(k[G])` を `k[C_G(P)]^{N_G(P)}` へ送る) /
+🎯🎯 `brauerProj_eq_iff_sub_mem` (段 88 の核と合わせて商の同一視)。
+土台 = `conj_mem_centralizer_iff` (`N_G(P)` の元による共役は `C_G(P)` を保つ)。
+
+**次の frontier**: 第 1 主定理の難しい半分 `Br_D(e_B) ≠ 0` — ⚠ **文献待ち**。
+要は `A^G_D ∩ ker Br_D ⊆ ∑_{Q <_G D} A^G_Q` で、これがあれば Rosenberg (段 84) +
+`D` の極小性で閉じる。素朴な Mackey 分解 (`b = Tr^N_D(a) + junk`, `N = N_G(D)`) は
+「`c ∈ A^N ∩ A^D_{<D}` から `Tr^G_N(c) ∈ A^G_{<D}`」の段で詰まる
+(`p ∣ [N_G(D):D]` があり得るので `Tr^N_D` による平均化が効かない)。
+参照可能な原典に block 論が無い (実測) ので **Navarro Ch.4 の PDF 待ち** (issue 0147)。
+それまでは block 論の他の枝 (Cartan 行列 / `𝒪G` への移行 / 分裂体定理) が候補。

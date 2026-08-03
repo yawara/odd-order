@@ -33,6 +33,7 @@ of `G` with blocks of `N_G(P)`.
 
 * `OddOrder.GroupAlgebra.brauerProj_relTrace_eq_zero`
 * `OddOrder.GroupAlgebra.brauerProj_eq_zero_iff` — the kernel description.
+* `OddOrder.GroupAlgebra.brauerProj_eq_iff_sub_mem` — the Brauer quotient.
 -/
 
 namespace OddOrder.GroupAlgebra
@@ -173,6 +174,23 @@ theorem brauerProj_eq_zero_iff [Finite G] [Fact p.Prime] (hchar : (p : k) = 0)
       exact AddMonoidHom.mem_ker.mpr
         (brauerProj_relTrace_eq_zero hchar (dvd_relIndex_of_lt_of_isPGroup hP Q.2) a)
     exact AddMonoidHom.mem_ker.mp (SetLike.le_def.mp hle hmem)
+
+/-- **The Brauer quotient.**  Two `P`-fixed elements have the same image under `Br_P` exactly
+when they differ by a sum of relative traces from proper subgroups of `P`.  Together with the
+section `exists_forall_smul_eq_brauerProj_eq` this identifies
+
+`(k[G])^P / ∑_{Q<P} Tr^P_Q ((k[G])^Q) ≅ k[C_G(P)]`,
+
+the Brauer construction. -/
+theorem brauerProj_eq_iff_sub_mem [Finite G] [Fact p.Prime] (hchar : (p : k) = 0)
+    {P : Subgroup G} (hP : IsPGroup p ↥P) {x y : MonoidAlgebra k G}
+    (hx : ∀ u ∈ P, u • x = x) (hy : ∀ u ∈ P, u • y = y) :
+    brauerProj P x = brauerProj P y ↔
+      x - y ∈ ⨆ Q : {Q : Subgroup G // Q < P}, GAlgebra.relTraceIdeal (Q : Subgroup G) P := by
+  have hsub : ∀ u ∈ P, u • (x - y) = x - y := fun u hu => by
+    rw [smul_sub, hx u hu, hy u hu]
+  rw [← brauerProj_eq_zero_iff hchar hP hsub, sub_eq_add_neg, brauerProj_add,
+    ← neg_one_smul k y, brauerProj_smul, neg_one_smul, ← sub_eq_add_neg, sub_eq_zero]
 
 end Kernel
 

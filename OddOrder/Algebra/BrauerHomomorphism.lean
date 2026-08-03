@@ -32,6 +32,9 @@ on `P`-conjugation orbits, and the orbits that are not singletons have size divi
 ## Main results
 
 * `OddOrder.GroupAlgebra.brauerProj_mul_of_invariant` — `Br_P` is multiplicative on `(k[G])^P`.
+* `OddOrder.GroupAlgebra.exists_forall_smul_eq_brauerProj_eq` — `Br_P` is onto `k[C_G(P)]`, with
+  a section landing in `(k[G])^P`.
+* `OddOrder.GroupAlgebra.brauerProj_conj_smul` — `Br_P` is `N_G(P)`-equivariant.
 * `OddOrder.GroupAlgebra.brauerProj_one`, `brauerProj_add`, `brauerProj_smul`.
 -/
 
@@ -101,6 +104,78 @@ theorem brauerProj_one (P : Subgroup G) : brauerProj P (1 : MonoidAlgebra k G) =
     exact hg (Subgroup.centralizer (P : Set G)).one_mem
 
 end Defs
+
+section Section
+
+/-- **Conjugation by a normaliser element permutes the centraliser.** -/
+theorem conj_mem_centralizer_iff {P : Subgroup G} {n : G} (hn : n ∈ Subgroup.normalizer P)
+    (c : G) : n⁻¹ * c * n ∈ Subgroup.centralizer (P : Set G)
+      ↔ c ∈ Subgroup.centralizer (P : Set G) := by
+  have key : ∀ m : G, m ∈ Subgroup.normalizer P → ∀ c : G,
+      c ∈ Subgroup.centralizer (P : Set G) → m⁻¹ * c * m ∈ Subgroup.centralizer (P : Set G) := by
+    intro m hm c hc
+    refine Subgroup.mem_centralizer_iff.mpr fun v hv => ?_
+    have hvP : m * v * m⁻¹ ∈ P := (Subgroup.mem_normalizer_iff.mp hm v).mp hv
+    have hcv := Subgroup.mem_centralizer_iff.mp hc (m * v * m⁻¹) hvP
+    calc v * (m⁻¹ * c * m) = m⁻¹ * ((m * v * m⁻¹) * c) * m := by group
+      _ = m⁻¹ * (c * (m * v * m⁻¹)) * m := by rw [hcv]
+      _ = (m⁻¹ * c * m) * v := by group
+  refine ⟨fun h => ?_, key n hn c⟩
+  have h' := key n⁻¹ (Subgroup.inv_mem _ hn) _ h
+  have hrw : n⁻¹⁻¹ * (n⁻¹ * c * n) * n⁻¹ = c := by group
+  rwa [hrw] at h'
+
+/-- **An element supported on `C_G(P)` is `P`-fixed.**  Together with `brauerProj_eq_self` this
+says that `Br_P` maps `(k[G])^P` *onto* the elements supported on the centraliser: the Brauer
+quotient `(k[G])^P / ∑_{Q<P} Tr^P_Q` is `k[C_G(P)]`. -/
+theorem forall_smul_eq_of_support_subset {P : Subgroup G} {x : MonoidAlgebra k G}
+    (hx : ∀ g : G, g ∉ Subgroup.centralizer (P : Set G) → x g = 0) : ∀ u ∈ P, u • x = x := by
+  intro u hu
+  refine Finsupp.ext fun n => ?_
+  rw [conj_smul_apply]
+  by_cases hn : n ∈ Subgroup.centralizer (P : Set G)
+  · congr 1
+    have hcomm := Subgroup.mem_centralizer_iff.mp hn u hu
+    calc u⁻¹ * n * u = u⁻¹ * (u * n) := by rw [hcomm]; group
+      _ = n := by group
+  · rw [hx _ hn, hx _ ?_]
+    rw [conj_mem_centralizer_iff (Subgroup.le_normalizer hu)]
+    exact hn
+
+/-- `Br_P` is the identity on elements supported on the centraliser. -/
+theorem brauerProj_eq_self {P : Subgroup G} {x : MonoidAlgebra k G}
+    (hx : ∀ g : G, g ∉ Subgroup.centralizer (P : Set G) → x g = 0) : brauerProj P x = x := by
+  classical
+  refine Finsupp.ext fun g => ?_
+  rw [brauerProj_apply]
+  by_cases hg : g ∈ Subgroup.centralizer (P : Set G)
+  · rw [if_pos hg]
+  · rw [if_neg hg, hx g hg]
+
+/-- `Br_P` is idempotent. -/
+theorem brauerProj_brauerProj (P : Subgroup G) (x : MonoidAlgebra k G) :
+    brauerProj P (brauerProj P x) = brauerProj P x :=
+  brauerProj_eq_self fun _ hg => brauerProj_apply_of_notMem hg x
+
+/-- **`Br_P` is surjective onto `k[C_G(P)]`, with a section inside `(k[G])^P`.** -/
+theorem exists_forall_smul_eq_brauerProj_eq {P : Subgroup G} {y : MonoidAlgebra k G}
+    (hy : ∀ g : G, g ∉ Subgroup.centralizer (P : Set G) → y g = 0) :
+    ∃ x : MonoidAlgebra k G, (∀ u ∈ P, u • x = x) ∧ brauerProj P x = y :=
+  ⟨y, forall_smul_eq_of_support_subset hy, brauerProj_eq_self hy⟩
+
+/-- **`Br_P` is `N_G(P)`-equivariant.**  So it carries `(k[G])^{N_G(P)}` — in particular the
+centre `Z(k[G])` — into the `N_G(P)`-fixed part of `k[C_G(P)]`, which is where the Brauer
+correspondence of blocks takes place. -/
+theorem brauerProj_conj_smul {P : Subgroup G} {n : G} (hn : n ∈ Subgroup.normalizer P)
+    (x : MonoidAlgebra k G) : brauerProj P (n • x) = n • brauerProj P x := by
+  classical
+  refine Finsupp.ext fun c => ?_
+  rw [brauerProj_apply, conj_smul_apply, conj_smul_apply, brauerProj_apply]
+  by_cases hc : c ∈ Subgroup.centralizer (P : Set G)
+  · rw [if_pos hc, if_pos ((conj_mem_centralizer_iff hn c).mpr hc)]
+  · rw [if_neg hc, if_neg fun h => hc ((conj_mem_centralizer_iff hn c).mp h)]
+
+end Section
 
 section Mul
 

@@ -455,11 +455,24 @@ Z\*-定理 (Ch.7) までに要るものを、手持ちとの差分で:
       `P ⊓ ᵍD < P` の項は全部核に落ちる。対偶が
       🎯 `exists_le_conj_of_brauerProj_ne_zero` (`Br_P b ≠ 0 ⟹ ∃g, P ≤ ᵍD`) と
       `card_le_card_of_brauerProj_ne_zero` (`|P| ≤ |D|`)。
+- [x] **Brauer 構成 `A(P) ≅ k[C_G(P)]`** — 完了 (2026-08-03、段 90)。
+      `BrauerHomomorphism.lean` に `conj_mem_centralizer_iff` (正規化元による共役は
+      `C_G(P)` を保つ) / `forall_smul_eq_of_support_subset` (`C_G(P)` 上に台を持つ元は
+      `P`-不変) / `brauerProj_eq_self` / 🎯 **`exists_forall_smul_eq_brauerProj_eq`**
+      (`Br_P` は `(k[G])^P` から `k[C_G(P)]` へ**全射**、切断つき) /
+      🎯 **`brauerProj_conj_smul`** (`Br_P` は `N_G(P)`-同変 ⟹ `Z(k[G])` を
+      `k[C_G(P)]^{N_G(P)}` へ送る = Brauer 対応の舞台)。
+      `BrauerKernel.lean` に 🎯🎯 **`brauerProj_eq_iff_sub_mem`**:
+      `(k[G])^P / ∑_{Q<P} Tr^P_Q ≅ k[C_G(P)]` (段 88 の核 + 上の全射性)。
 - [ ] **第 1 主定理の難しい半分** = `Br_D(e_B) ≠ 0` (`D` = defect group)。
-      要となる補題は **`A^G_D ∩ ker Br_D ⊆ ∑_{Q <_G D} A^G_Q`** —
+      ⚠ **文献待ち**。要となる補題は `A^G_D ∩ ker Br_D ⊆ ∑_{Q <_G D} A^G_Q` だが、
+      素朴な Mackey 分解 (`b = Tr^N_D(a) + junk`, `N = N_G(D)`) では
+      「`c ∈ A^N ∩ A^D_{<D}` から `Tr^G_N(c) ∈ A^G_{<D}` を出す」段で詰まる
+      (`p ∣ [N_G(D):D]` があり得るので平均化が効かない)。
+      2026-08-03 時点で参照可能な原典 (Isaacs/BG/Peterfalvi/Gorenstein) はいずれも
+      block 論を扱っていない (実測: Gorenstein は文献表に "cyclic defect groups" の
+      引用があるのみ)。**Navarro Ch.4 の PDF が入り次第着手** (issue 0147 の PDF gate)。
       これがあれば Rosenberg (段 84) + `D` の極小性で閉じる。
-      ⚠ 段 88 の核は `(kG)^D` 全体での記述なので、`A^G_D` に制限した版は
-      `N_G(D)` 側の bookkeeping (`Br_D ∘ Tr^G_D = Tr^{N_G(D)}_D ∘ Br_D`) が要る。
 - [ ] **2nd/3rd main theorem** → **Z\*-定理** → Q₈ bridge。
 
 ⚠ 上の 3-5 は `kG`/`𝒪G` の**群環固有**の構造 (共役作用・部分群・相対トレース) を使う。

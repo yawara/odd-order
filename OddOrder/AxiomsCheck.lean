@@ -15751,3 +15751,9 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.GroupAlgebra.exists_le_conj_of_brauerProj_ne_zero
 #assert_only_allowed_axioms
   OddOrder.GroupAlgebra.card_le_card_of_brauerProj_ne_zero
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.exists_forall_smul_eq_brauerProj_eq
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.brauerProj_conj_smul
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.brauerProj_eq_iff_sub_mem
