@@ -167,6 +167,7 @@ import OddOrder.Algebra.CommutatorSpan
 import OddOrder.Algebra.MatrixCommutator
 import OddOrder.Algebra.CommutatorSpanHom
 import OddOrder.Algebra.MatrixNaturalModule
+import OddOrder.Algebra.PiSimpleModule
 import OddOrder.Algebra.SplitSemisimpleCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
@@ -15585,3 +15586,7 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.MatrixModule.linearEquiv_of_isSimpleRing
 #assert_only_allowed_axioms
   OddOrder.MatrixModule.linearEquiv_natural_of_isSimpleModule
+#assert_only_allowed_axioms
+  OddOrder.PiModule.exists_unique_idem_smul_eq_self
+#assert_only_allowed_axioms
+  OddOrder.PiModule.smul_eq_single_smul
