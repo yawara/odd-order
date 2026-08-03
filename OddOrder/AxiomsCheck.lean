@@ -166,6 +166,7 @@ import OddOrder.Algebra.WordExpansion
 import OddOrder.Algebra.CommutatorSpan
 import OddOrder.Algebra.MatrixCommutator
 import OddOrder.Algebra.CommutatorSpanHom
+import OddOrder.Algebra.MatrixNaturalModule
 import OddOrder.Algebra.SplitSemisimpleCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
@@ -15575,3 +15576,8 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.RepresentationTheory.Modular.card_split_blocks_eq_card_pRegularClass
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_wedderburn_pi_matrix_card_eq
+
+/-! **行列環の自然加群は単純** (issue 9506) — Artin-Wedderburn の一意性側の第 1 歩。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.MatrixModule.isSimpleModule_matrix

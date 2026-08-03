@@ -3,6 +3,7 @@ import OddOrder.Algebra.AugmentationIdeal
 import OddOrder.Algebra.ChevalleyWarning
 import OddOrder.Algebra.CommutatorSpan
 import OddOrder.Algebra.MatrixCommutator
+import OddOrder.Algebra.MatrixNaturalModule
 import OddOrder.Algebra.CommutatorSpanHom
 import OddOrder.Algebra.CommutatorSpanPi
 import OddOrder.Algebra.SplitSemisimpleCount
