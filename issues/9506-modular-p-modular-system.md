@@ -145,9 +145,17 @@ system」を**実際に構成する**ところまでを本 issue のスコープ
         交換子であることと Freshman から) →
         `add_pow_prime_pow_sub_sub_mem` (反復 Freshman) →
         **`commutatorRadical hp hchar : Submodule k A`** = `T'`。
-        残 = **数え上げ本体** `dim_k (kG ⧸ T') = #p-正則類`
-        (`kG/T` の共役類基底 (済) から `T'/T` が非 `p`-正則類の張る部分を
-        ちょうど潰すことを示す)。
+        **上からの評価も済** (2026-08-03、`.../Modular/PRegularCount.lean`):
+        `exists_pow_prime_pow_eq_pRegularPart` (`m = a·φ(d)` で
+        `g^{p^m} = g_{p'} = (g_{p'})^{p^m}`) →
+        `single_sub_single_pRegularPart_mem` (`g - g_{p'} ∈ T'`) →
+        **`finrank_quotient_commutatorRadical_le : dim (kG ⧸ T') ≤ #p-正則類`**。
+        残 = **下からの評価** (`p`-正則類が `T'` を法として独立)。
+        方針 = `kG ⧸ T` 上の**半線型 Frobenius** `F([g]) = [g^p]` を作り
+        (`(single g 1)^p = single (g^p) 1` なので類基底では `p` 乗写像)、
+        Fitting 分解で `T'/T = ker F^∞`、その次元が
+        `#共役類 - #p-正則類` であることを示す
+        (`ker F^∞` は「`p'`-部分の類が等しい」類の差で張られる)。
       * (c) `dim kG/(J + T) = #単純加群` (分裂体) — 未。mathlib の
         `Ring.jacobson` / `IsSemisimpleRing` / Wedderburn–Artin が使える。
       * (d) `T' = J + T` — 未。

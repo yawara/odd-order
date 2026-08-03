@@ -164,6 +164,7 @@ import OddOrder.Algebra.EigenspaceDecomposition
 import OddOrder.Algebra.LagrangeInterpolationRing
 import OddOrder.Algebra.WordExpansion
 import OddOrder.Algebra.CommutatorSpan
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
 import OddOrder.GroupTheory.RepresentationTheory.Modular.Reduction
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InvariantLattice
@@ -15483,3 +15484,15 @@ structural heart of Brauer's count: `T' = {x | ∃ m, x ^ (p ^ m) ∈ [A, A]}` i
   OddOrder.add_pow_prime_pow_sub_sub_mem
 #assert_only_allowed_axioms
   OddOrder.commutatorSpan_le_commutatorRadical
+
+/-! **The `p`-regular classes span `kG ⧸ T'`** (`…Modular.{PRegularRadical,PRegularCount}`,
+issue 9506).  The upper bound in Brauer's count of irreducible modular representations. -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.exists_pow_prime_pow_eq_pRegularPart
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.single_sub_single_pRegularPart_mem
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.span_range_mkQ_pRegular_eq_top
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.finrank_quotient_commutatorRadical_le
