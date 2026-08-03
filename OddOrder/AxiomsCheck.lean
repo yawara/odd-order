@@ -15726,3 +15726,7 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.GroupAlgebra.isNilpotent_or_exists_fixed_mul_eq
 #assert_only_allowed_axioms
   OddOrder.GroupAlgebra.exists_conj_eq_of_isDefectGroup
+#assert_only_allowed_axioms
+  OddOrder.MatrixModule.blockIdempotent_ne_zero
+#assert_only_allowed_axioms
+  OddOrder.MatrixModule.eq_zero_or_eq_of_mul_eq_of_isIdempotentElem

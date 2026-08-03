@@ -235,6 +235,14 @@ diamond を踏まない。有限次元性は `Module.Finite.of_injective` (部�
 Artin 性は `IsArtinianRing.of_finite k _` から。⟹ 段 84 の `hdich` が実際に閉じ、
 Brauer の定理が仮説付きでなく**中心の原始性だけ**を要求する形になった。
 
-**次の frontier**: 段 69 の block 冪等元 `e_B` が段 85 の `hprim` (中心での原始性) を
-満たすことを示す (完全直交族の各元の原始性) → `Br_P` の核 → Brauer 対応 →
+段 86 追加 (`Algebra/BlockIdempotent.lean` に追記): 🎯 **`eq_zero_or_eq_of_mul_eq_of_isIdempotentElem`**
+(**block 冪等元は中心で原始的**) + `blockIdempotent_ne_zero`。
+中心指標 `Φ` を通すと `Φ u` は `blocks → k` の冪等元 = 指示関数で、`e_B u = u` が台を
+`B` に閉じ込める ⟹ `Φ u ∈ {0, Pi.single c 1}`。前者は核が nil ゆえ `u = 0`
+(mathlib `eq_of_isNilpotent_sub_of_isIdempotentElem`)、後者は段 69 の一意性で `u = e_B`。
+⟹ **段 85 の `hprim` / `hb0` が block 冪等元に対して閉じた**。
+
+**次の frontier**: `k[G]` の分裂データ `π : k[G] →+* ∏ M_{n_i}(k)` (nil 核) の供給
+= `k[G]/J(k[G])` の Artin–Wedderburn。これが入ると段 85 の Brauer の定理が
+`k[G]` の block に対して仮説無しで発火する → `Br_P` の核 → Brauer 対応 →
 2nd/3rd main theorem → Z\*。

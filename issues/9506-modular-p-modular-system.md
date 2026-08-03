@@ -416,10 +416,16 @@ Z\*-定理 (Ch.7) までに要るものを、手持ちとの差分で:
       `Module.Finite` → `IsArtinianRing.of_finite`) ⟹
       🎯🎯 **`exists_conj_eq_of_isDefectGroup`** = **Brauer の定理**
       (`Z(k[G])` の原始冪等元の defect group は 1 共役類)。
-- [ ] **block 冪等元を `Z(k[G])` に配線** — 段 69 の一般論 (`existsUnique_blockIdempotent`)
-      と段 80 の類和・段 58 の分裂データを繋ぐ。段 85 で受け皿 (`hprim` = 中心の原始性
-      だけを要求する形) は完成しているので、残るは「段 69 の `e_B` が段 85 の `hprim` を
-      満たす」= 完全直交族の各元が原始的、を示すこと。
+- [x] **block 冪等元の原始性** — 完了 (2026-08-03、段 86 `Algebra/BlockIdempotent.lean`)。
+      🎯 **`eq_zero_or_eq_of_mul_eq_of_isIdempotentElem`** (`e_B u = u` な中心冪等元 `u` は
+      `0` か `e_B`)。証明: `Φ u` は `blocks → k` の冪等元 = 指示関数で、`e_B u = u` が
+      台を `B` に閉じ込める ⟹ `Φ u = 0` か `Pi.single c 1`。前者は核が nil ゆえ `u = 0`、
+      後者は段 69 の一意性で `u = e_B`。`blockIdempotent_ne_zero` も (段 85 の `hb0`)。
+      ⟹ **段 85 の `hprim`/`hb0` は block 冪等元に対して閉じた**。
+- [ ] **`k[G]` の分裂データ `π : k[G] →+* ∏ M_{n_i}(k)`** — 段 69/86 の block 論は
+      「nil 核を持つ行列積への全射」を仮説で受けている。`A = k[G]` でそれを供給するには
+      `k[G]/J(k[G])` の Artin–Wedderburn (分裂体上) が要る。これが入ると
+      段 85 の Brauer の定理が `k[G]` の block に対して仮説無しで発火する。
 - [ ] **`Br_P` の核** = `∑_{Q < P} Tr^P_Q((kG)^Q)` — Mackey (段 83) が要る。
 - [ ] **2nd/3rd main theorem** → **Z\*-定理** → Q₈ bridge。
 

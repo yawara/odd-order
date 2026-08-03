@@ -45,15 +45,9 @@ variable {R : Type*} [Ring R] {ι : Type*}
 
 /-- An idempotent `≠ 0` is not nilpotent. -/
 theorem not_isNilpotent_of_isIdempotentElem {e : R} (he : IsIdempotentElem e) (he0 : e ≠ 0) :
-    ¬ IsNilpotent e := by
-  rintro ⟨n, hn⟩
-  cases n with
-  | zero =>
-    rw [pow_zero] at hn
-    exact he0 (by rw [← one_mul e, hn, zero_mul])
-  | succ m =>
-    rw [he.pow_succ_eq] at hn
-    exact he0 hn
+    ¬ IsNilpotent e := fun h =>
+  he0 (eq_of_isNilpotent_sub_of_isIdempotentElem_of_commute he .zero (by simpa using h)
+    (Commute.zero_right e))
 
 /-- **Rosenberg's lemma.**
 

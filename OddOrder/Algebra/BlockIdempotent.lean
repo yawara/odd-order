@@ -25,6 +25,8 @@ idempotent** `e_B`.
 
 * `OddOrder.MatrixModule.surjective_blockCharacterPi`
 * `OddOrder.MatrixModule.existsUnique_blockIdempotent`
+* `OddOrder.MatrixModule.blockIdempotent_ne_zero`
+* `OddOrder.MatrixModule.eq_zero_or_eq_of_mul_eq_of_isIdempotentElem` — `e_B` is primitive
 * `OddOrder.MatrixModule.exists_completeOrthogonalIdempotents_block`
 * `OddOrder.MatrixModule.blockRingEquiv` — `A` is the product of its blocks
 * `OddOrder.MatrixModule.existsUnique_block_smul_eq_self`
@@ -105,6 +107,59 @@ theorem existsUnique_blockIdempotent
     · simp [Pi.single_eq_of_ne (Ne.symm h)]
   exact existsUnique_isIdempotentElem_eq_of_ker_isNilpotent f
     (fun x hx => hnil x (RingHom.mem_ker.mp hx)) _ (hsurj _) hidem
+
+omit [Finite ι] in
+/-- **A block idempotent is nonzero**, since its central character on its own block is `1`. -/
+theorem blockIdempotent_ne_zero [DecidableEq (Block π hπ hlin)] {c : Block π hπ hlin}
+    {e : Subalgebra.center k A} (hec : blockCharacterPi π hπ hlin e = Pi.single c 1) :
+    e ≠ 0 := by
+  intro h
+  rw [h, map_zero] at hec
+  have hcc := congrFun hec c
+  rw [Pi.single_eq_same] at hcc
+  exact one_ne_zero hcc.symm
+
+/-- **Block idempotents are primitive in the centre.**  A central idempotent `u` with
+`e_B u = u` — a piece split off the block `B` — is either `0` or `e_B` itself.
+
+The central characters see `u` as an idempotent of `blocks → k`, that is as an indicator
+function, and `e_B u = u` confines its support to `B`.  So `Φ u` is `0` or the indicator of `B`;
+in the first case `u` lies in the nil kernel and an idempotent there is `0`, in the second
+uniqueness of the block idempotent gives `u = e_B`.
+
+This is the primitivity hypothesis of `GroupAlgebra.exists_conj_eq_of_isDefectGroup`: it is what
+makes the defect groups of a block a single conjugacy class. -/
+theorem eq_zero_or_eq_of_mul_eq_of_isIdempotentElem
+    (hnil : ∀ x : Subalgebra.center k A,
+      blockCharacterPi π hπ hlin x = 0 → IsNilpotent x)
+    [DecidableEq (Block π hπ hlin)] {c : Block π hπ hlin} {e : Subalgebra.center k A}
+    (he : IsIdempotentElem e) (hec : blockCharacterPi π hπ hlin e = Pi.single c 1)
+    {u : Subalgebra.center k A} (hu : IsIdempotentElem u) (heu : e * u = u) :
+    u = 0 ∨ u = e := by
+  classical
+  -- `Φ u` is supported at `c`, because `Φ e = Pi.single c 1` kills every other coordinate.
+  have hsupp : ∀ d, d ≠ c → blockCharacterPi π hπ hlin u d = 0 := by
+    intro d hd
+    have hmul : blockCharacterPi π hπ hlin e * blockCharacterPi π hπ hlin u
+        = blockCharacterPi π hπ hlin u := by rw [← map_mul, heu]
+    have := congrFun hmul d
+    rwa [hec, Pi.mul_apply, Pi.single_eq_of_ne hd, zero_mul, eq_comm] at this
+  -- And its value at `c` is an idempotent of the field `k`.
+  have hidem : IsIdempotentElem (blockCharacterPi π hπ hlin u c) := by
+    have h : blockCharacterPi π hπ hlin u * blockCharacterPi π hπ hlin u
+        = blockCharacterPi π hπ hlin u := by rw [← map_mul, hu.eq]
+    exact congrFun h c
+  rcases IsIdempotentElem.iff_eq_zero_or_one.mp hidem with h0 | h1
+  · refine Or.inl (eq_of_isNilpotent_sub_of_isIdempotentElem hu .zero ?_)
+    refine (sub_zero u).symm ▸ hnil u (funext fun d => ?_)
+    by_cases hd : d = c
+    · subst hd; exact h0
+    · exact hsupp d hd
+  · refine Or.inr ((existsUnique_blockIdempotent π hπ hlin hnil c).unique ⟨hu, ?_⟩ ⟨he, hec⟩)
+    funext d
+    by_cases hd : d = c
+    · subst hd; rw [h1, Pi.single_eq_same]
+    · rw [hsupp d hd, Pi.single_eq_of_ne hd]
 
 /-- **The block idempotents are a complete orthogonal family**: `∑_B e_B = 1` and
 `e_B e_{B'} = 0` for `B ≠ B'`.  This is the block decomposition of the centre, and through it of
