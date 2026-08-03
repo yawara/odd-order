@@ -351,6 +351,17 @@ leaf の層構造・mathlib 実測 (使えたもの/無かったもの)・設計
         `c ∈ C_G(P)` の係数 `∑_a x_a y_{a⁻¹c}` の被和関数が `P`-共役軌道上で定数、を
         段 78 に食わせるだけ。⚠ `P` の共役作用は `ConjAct` 経由の局所 instance。
 
+- [x] **類和と `Z(k[G])`** — 完了 (2026-08-03、段 80 `Algebra/ClassSum.lean`)。
+      `classSum k g` (= `K̂`) / 🎯 **`relTrace_single_eq_classSum`** (`K̂ = Tr^G_{C_G(g)}(g)`;
+      相対トレースの添字集合 `G/C_G(g)` が共役類そのもの) / `smul_classSum` /
+      🎯 **`mem_span_classSum`** (`Z(k[G])` は類和で張られる)。
+      ⟹ defect group の主張が類和の言葉に翻訳でき、段 64-69 の中心指標 `ω_B` と繋がる。
+- [x] **相対トレースイデアル `A^H_K`** — 完了 (2026-08-03、段 81)。
+      `relTraceIdeal K H : AddSubgroup A` と 🎯 `relTraceIdeal_mono` (`L ≤ K` で増える) /
+      両側イデアル性 / `A^H_H = A^H` (⟹ `D = G` は常に候補) / 共役同変性 /
+      `mem_relTraceIdeal_of_index_inv` (⟹ Sylow `p`-部分群へ縮小)。
+      **defect group の定義に必要な性質はこれで全部揃った**。
+
 ### Z\* までの残り (2026-08-03 時点の見取り図)
 
 ここまでで Navarro **Ch.1-2 は完備**、**Ch.3 (block) は基本構造まで**到達した。
@@ -366,11 +377,10 @@ Z\*-定理 (Ch.7) までに要るものを、手持ちとの差分で:
       `IsAdicComplete` 版の持ち上げが要る) が入口。
 - [x] ~~**相対トレース `Tr^G_H`**~~ — 段 75-77 で完了 (上記)。
 - [x] ~~**Brauer 準同型 `Br_P`**~~ — 段 78-79 で完了 (上記、乗法性まで)。
-- [ ] **defect group** — block 冪等元 `e_B ∈ Z(𝒪G) = (𝒪G)^G` が `Tr^G_D((𝒪G)^D)` に
-      入る極小の `D`。段 75-76 が道具を全部供給済 (推移性 = 単調性、射影公式 =
-      イデアル性、`relTrace_self` = `D = G` で非空、`relTrace_mul_eq_self` =
-      `p`-部分群へ縮小、`relTrace_conj` = 共役類)。残るは **Rosenberg の補題**
-      (原始冪等元がイデアルの和に入れば 1 つのイデアルに入る) と Mackey 公式。
+- [ ] **defect group** — block 冪等元 `e_B ∈ Z(𝒪G) = (𝒪G)^G` が `A^G_D` に入る極小の `D`。
+      道具 (段 75-76, 81) は全部揃った。残るは **Rosenberg の補題**
+      (原始冪等元がイデアルの和に入れば 1 つのイデアルに入る) と Mackey 公式、および
+      段 69 の block 冪等元を `Z(k[G])` に配線すること (段 80 の類和経由)。
 - [ ] **Mackey 公式** — `Tr^H_L` を `K` に制限すると `∑_{KgL} Tr^K_{K ∩ ᵍL} ∘ ᵍ(-)`。
       defect group の共役性 (`A^G_D · A^G_{D'} ⊆ ∑_g A^G_{D ∩ ᵍD'}`) に要る。
       段 75 の `sum_smul_eq_relTrace` は任意添字型なので、軌道分解を食わせればよい。

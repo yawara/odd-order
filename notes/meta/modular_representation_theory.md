@@ -174,3 +174,15 @@ L3 と L4 を突き合わせて `.../Modular/BrauerCount.lean`:
 * **群作用の instance は scoped / 局所**。`R[G]` への共役作用は `scoped[OddOrder.Conjugation]`、
   `P` の `G` への共役作用は証明内の `letI` (`ConjAct` 経由) — どちらも mathlib の既定
   (左乗法) と衝突するため。
+
+段 80-81 追加:
+
+| leaf | 内容 |
+|---|---|
+| `Algebra/ClassSum.lean` | `classSum` / 🎯 **`relTrace_single_eq_classSum`** (`K̂ = Tr^G_{C_G(g)}(g)`) / 🎯 `mem_span_classSum` (`Z(k[G])` は類和で張られる) |
+| `Algebra/RelativeTrace.lean` (Ring 節) | **`relTraceIdeal K H`** = `A^H_K` / 🎯 `relTraceIdeal_mono` / 両側イデアル性 / 共役同変性 / 可逆指数判定 |
+
+**次の frontier**: (i) Mackey 公式 (`Res_K Tr^H_L = ∑_{KgL} Tr^K_{K ∩ ᵍL} ∘ ᵍ(-)`;
+`sum_smul_eq_relTrace` が任意添字型なので `K`-軌道分解を食わせればよい) —
+defect group の共役性と `Br_P` の核 `∑_{Q<P} Tr^P_Q((kG)^Q)` に要る。
+(ii) Rosenberg の補題。(iii) 段 69 の block 冪等元を `Z(k[G])` に配線 (段 80 の類和経由)。
