@@ -281,4 +281,16 @@ universe を跨いで量化する羽目になる。代数閉に限れば mathlib
 * ⚠ `if` の `Decidable` インスタンスが `Fintype.decidableExistsFintype` と
   `Classical.propDecidable` で食い違うので、`if_pos`/`if_neg` 済みの 2 本に分けて渡す。
 
-**次の frontier**: Brauer 対応 (第 1 主定理) → 2nd/3rd main theorem → Z\*。
+段 89 追加 (`Algebra/BrauerDefect.lean`): 🎯 **`brauerProj_eq_zero_of_forall_not_le`**
+(`b ∈ A^G_D` で `P` がどの `ᵍD` にも入らないなら `Br_P b = 0`) と対偶
+🎯 `exists_le_conj_of_brauerProj_ne_zero` / `card_le_card_of_brauerProj_ne_zero`。
+**ここで段 83 の Mackey が効く**: `Res_P Tr^G_D(a) = ∑_g Tr^P_{P⊓ᵍD}(g·a)` に段 88 の核を
+かけると `P ⊓ ᵍD < P` の項が全滅し、生き残るのは `P ≤ ᵍD` の項だけ。
+= **Brauer の第 1 主定理の易しい半分** (block が「見る」`p`-部分群は defect group に
+部分共役なものだけ)。
+
+**次の frontier**: 第 1 主定理の難しい半分 `Br_D(e_B) ≠ 0`。要は
+**`A^G_D ∩ ker Br_D ⊆ ∑_{Q <_G D} A^G_Q`** で、これがあれば Rosenberg (段 84) +
+`D` の極小性で閉じる。段 88 の核は `(kG)^D` 全体の記述なので、`A^G_D` に制限した版には
+`Br_D ∘ Tr^G_D = Tr^{N_G(D)}_D ∘ Br_D` (Mackey の二重剰余類を `N_G(D)` で切る) が要る。
+その先: Brauer 対応 → 2nd/3rd main theorem → Z\*。

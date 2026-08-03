@@ -448,6 +448,18 @@ Z\*-定理 (Ch.7) までに要るものを、手持ちとの差分で:
         🎯🎯 **`brauerProj_eq_zero_iff`** (⊆ 方向は台の大きさに関する帰納法 —
         `g` の安定化群 `Q = P ⊓ C_G(g) < P` で `Tr^P_Q(b_g·g)` を引くと軌道 1 本が消える)。
       ⟹ **Brauer の第 1 主定理の計算部分が揃った**。
+- [x] **`Br_P` と defect group の接続 (第 1 主定理の易しい半分)** — 完了 (2026-08-03、段 89
+      `Algebra/BrauerDefect.lean`)。🎯 **`brauerProj_eq_zero_of_forall_not_le`**
+      (`b ∈ A^G_D` で `P` がどの `ᵍD` にも入らないなら `Br_P b = 0`)。
+      証明 = **Mackey (段 83) + 核 (段 88)**: `Res_P Tr^G_D(a) = ∑_g Tr^P_{P⊓ᵍD}(g·a)` で
+      `P ⊓ ᵍD < P` の項は全部核に落ちる。対偶が
+      🎯 `exists_le_conj_of_brauerProj_ne_zero` (`Br_P b ≠ 0 ⟹ ∃g, P ≤ ᵍD`) と
+      `card_le_card_of_brauerProj_ne_zero` (`|P| ≤ |D|`)。
+- [ ] **第 1 主定理の難しい半分** = `Br_D(e_B) ≠ 0` (`D` = defect group)。
+      要となる補題は **`A^G_D ∩ ker Br_D ⊆ ∑_{Q <_G D} A^G_Q`** —
+      これがあれば Rosenberg (段 84) + `D` の極小性で閉じる。
+      ⚠ 段 88 の核は `(kG)^D` 全体での記述なので、`A^G_D` に制限した版は
+      `N_G(D)` 側の bookkeeping (`Br_D ∘ Tr^G_D = Tr^{N_G(D)}_D ∘ Br_D`) が要る。
 - [ ] **2nd/3rd main theorem** → **Z\*-定理** → Q₈ bridge。
 
 ⚠ 上の 3-5 は `kG`/`𝒪G` の**群環固有**の構造 (共役作用・部分群・相対トレース) を使う。

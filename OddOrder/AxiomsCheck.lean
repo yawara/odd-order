@@ -173,6 +173,7 @@ import OddOrder.Algebra.DefectGroupConjugacy
 import OddOrder.Algebra.GroupAlgebraDefectGroup
 import OddOrder.Algebra.GroupAlgebraBlocks
 import OddOrder.Algebra.BrauerKernel
+import OddOrder.Algebra.BrauerDefect
 import OddOrder.Algebra.CentralIdempotentModule
 import OddOrder.Algebra.PrimitiveIdempotent
 import OddOrder.Algebra.CentralCharacter
@@ -15744,3 +15745,9 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.GroupAlgebra.brauerProj_relTrace_eq_zero
 #assert_only_allowed_axioms
   OddOrder.GroupAlgebra.brauerProj_eq_zero_iff
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.brauerProj_eq_zero_of_forall_not_le
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.exists_le_conj_of_brauerProj_ne_zero
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.card_le_card_of_brauerProj_ne_zero

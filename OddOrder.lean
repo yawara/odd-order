@@ -14,6 +14,7 @@ import OddOrder.Algebra.GroupAlgebraConjugation
 import OddOrder.Algebra.BrauerHomomorphism
 import OddOrder.Algebra.ClassSum
 import OddOrder.Algebra.BrauerKernel
+import OddOrder.Algebra.BrauerDefect
 import OddOrder.GroupTheory.PGroupRelIndex
 import OddOrder.Algebra.DefectGroup
 import OddOrder.Algebra.MackeyFormula
