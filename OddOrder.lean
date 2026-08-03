@@ -102,6 +102,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CenterModuleDecomp
 import OddOrder.GroupTheory.RepresentationTheory.CenterProjConjugation
 import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorSubspace
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InvariantLattice
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
