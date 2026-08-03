@@ -87,6 +87,19 @@ noncomputable def centralCharacter (hπ : Function.Surjective π) :
 theorem centralCharacter_apply (hπ : Function.Surjective π) (z : Subring.center A) :
     centralCharacter π i hπ z = centralScalar π i (z : A) := rfl
 
+/-- **The central character is the scalar by which the centre acts on the block.**  This is the
+representation-theoretic content of the definition: it is why two blocks with the same central
+character cannot be separated by the centre. -/
+theorem centralScalar_smul (hπ : Function.Surjective π) {z : A} (hz : z ∈ Set.center A)
+    (v : nn i → k) :
+    letI := blockModule nn π i
+    z • v = centralScalar π i z • v := by
+  letI := blockModule nn π i
+  change π z i *ᵥ v = _
+  rw [scalar_centralScalar π i hπ hz, Matrix.scalar_apply]
+  funext j
+  simp [Matrix.mulVec, Matrix.diagonal, dotProduct]
+
 /-! ### Blocks -/
 
 section Blocks
