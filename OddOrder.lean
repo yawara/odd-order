@@ -124,6 +124,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.InvariantLattice
 import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleIsBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
+import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularRadical

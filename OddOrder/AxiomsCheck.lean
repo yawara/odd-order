@@ -175,6 +175,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.AsModuleSimple
 import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleIsBlock
+import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.StandardSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterIndependence
@@ -15652,3 +15653,7 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.RepresentationTheory.Modular.exists_irreducibleBrauerCharacter_eq
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.isSimpleModule_asModule
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_minimal_invariant
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.isSimpleModule_subrepresentation_of_minimal
