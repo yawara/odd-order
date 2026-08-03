@@ -388,16 +388,30 @@ Z\*-定理 (Ch.7) までに要るものを、手持ちとの差分で:
       全単射 `(Σ ω, K ⧸ (K⊓ᵍL)) ≃ G ⧸ L` を直接構成) /
       🎯🎯 **`exists_mul_eq_sum_relTraceIdeal_inf`**
       (`A^G_D · A^G_{D'} ⊆ ∑_g A^G_{D⊓ᵍD'}`)。
-- [ ] **defect group の共役性** — 残るは **Rosenberg の補題**
-      (原始冪等元がイデアルの和に入れば 1 つのイデアルに入る) のみ。
-      段 83 の `exists_mul_eq_sum_relTraceIdeal_inf` に `e = e·e` を食わせればよい。
+- [x] **Rosenberg の補題** — 完了 (2026-08-03、段 84 `Algebra/Rosenberg.lean`)。
+      🎯🎯 **`exists_mem_of_sum_eq_of_local`** (冪等元 `e` の corner `eRe` が局所環なら、
+      `e` がイデアルの有限和に入るとき既に 1 つのイデアルに入る)。
+      局所性は**述語 `N` (corner の非単元) を引数で受ける** — 実際に適用したいのは
+      大きい環 `A` の中の**固定部分環 `A^G`** なので、型に束ねてまた解くのは純粋な摩擦。
+      係数側も集合 `U ⊆ R` で受ける。可換版 `exists_mem_of_sum_eq_of_isNilpotent`
+      (`N` = 冪零)、Fitting の二分律 🎯 `isNilpotent_or_exists_mul_eq`
+      (`u = (ex)^n b` が冪等 ⟹ 原始性で `0` か `e` ⟹ 冪零か corner で可逆)、
+      その Artin 環版 `exists_pow_eq_pow_mul` / `exists_mem_of_sum_eq_of_isArtinian`
+      (= 仮説が充足可能であることの実証) まで。
+- [x] **defect group の共役性** — 完了 (2026-08-03、段 84
+      `Algebra/DefectGroupConjugacy.lean`)。
+      🎯 `IsDefectGroup.conj` (共役は defect group; 段 81 の共役同変性から) /
+      🎯🎯 **`exists_conj_eq_of_isDefectGroup`** (`b = b·b` に段 83 を食わせ
+      Rosenberg で 1 つの `A^G_{D⊓ᵍD'}` に落とし、`D` の極小性で `D ≤ ᵍD'`、
+      `ᵍD'` の極小性で `D = ᵍD'`) /
+      🎯🎯 **`exists_conj_eq_of_isDefectGroup_of_commute`** (`A^G` 可換版 =
+      `A = kG` 共役作用で `A^G = Z(kG)` のとき使う形; `N` = 冪零 ∧ `G`-不変)。
 - [ ] **block 冪等元を `Z(k[G])` に配線** — 段 69 の一般論 (`existsUnique_blockIdempotent`)
       と段 80 の類和・段 58 の分裂データを繋ぐ。これで `IsDefectGroup e_B D` が
-      Brauer の意味の defect group になる。
-- [ ] **Mackey 公式** — `Tr^H_L` を `K` に制限すると `∑_{KgL} Tr^K_{K ∩ ᵍL} ∘ ᵍ(-)`。
-      defect group の共役性 (`A^G_D · A^G_{D'} ⊆ ∑_g A^G_{D ∩ ᵍD'}`) に要る。
-      段 75 の `sum_smul_eq_relTrace` は任意添字型なので、軌道分解を食わせればよい。
-- [ ] **`Br_P` の核** = `∑_{Q < P} Tr^P_Q((kG)^Q)` — Mackey が要る。
+      Brauer の意味の defect group になる。段 84 の `hdich` (corner の局所性) は
+      `Z(kG)` が有限次元 ⟹ Artin ⟹ 段 84 の `isNilpotent_or_exists_mul_eq_of_isArtinian`
+      で閉じる — そのために `A^G` を環型として実現する必要がある。
+- [ ] **`Br_P` の核** = `∑_{Q < P} Tr^P_Q((kG)^Q)` — Mackey (段 83) が要る。
 - [ ] **2nd/3rd main theorem** → **Z\*-定理** → Q₈ bridge。
 
 ⚠ 上の 3-5 は `kG`/`𝒪G` の**群環固有**の構造 (共役作用・部分群・相対トレース) を使う。

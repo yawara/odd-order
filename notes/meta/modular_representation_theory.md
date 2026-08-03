@@ -199,5 +199,29 @@ defect group の共役性と `Br_P` の核 `∑_{Q<P} Tr^P_Q((kG)^Q)` に要る�
 短い (equiv の `symm` を展開する手間が消える)。単射性 = 軌道類の一致 + 固定化群補題、
 全射性 = 軌道の定義、で各 5 行。
 
-**次の frontier**: Rosenberg の補題 (これで defect group の共役性が閉じる) →
-段 69 の block 冪等元を `Z(k[G])` へ配線 → Brauer 対応 → 2nd/3rd main theorem → Z\*。
+段 84 追加:
+
+| leaf | 内容 |
+|---|---|
+| `Algebra/Rosenberg.lean` | 🎯🎯 **`exists_mem_of_sum_eq_of_local`** (Rosenberg) / 可換版 (`N` = 冪零) / 🎯 Fitting の二分律 `isNilpotent_or_exists_mul_eq` / Artin 環版 `exists_pow_eq_pow_mul` |
+| `Algebra/DefectGroupConjugacy.lean` | 🎯 `IsDefectGroup.conj` / 🎯🎯 **`exists_conj_eq_of_isDefectGroup`** (defect group は 1 共役類) / 可換 `A^G` 版 |
+
+**設計上の判断 (段 84)**:
+
+* **corner の局所性を型でなく述語で受ける**。Rosenberg を適用したい環は `A` の中の
+  **固定部分環 `A^G`** であって `A` 自身ではない (`relTraceIdeal D ⊤` は `A` のイデアル
+  ではなく `A^G` のイデアル)。`A^G` を `Subring` に束ねて `IsIdempotentElem.Corner` を
+  取り `IsLocalRing` を課すと、instance diamond と transport が両方乗る。代わりに
+  「非単元を表す述語 `N`」と「係数集合 `U ⊆ R`」を引数にした: `N` が加法で閉じ `e` を
+  避ける = corner が局所環、そのもの。⚠ `N` は**加法閉性を全域で要求する**ので、
+  非可換 `A` に `N = IsNilpotent` を渡すと偽になる — 可換版の適用では
+  `N z := IsNilpotent z ∧ ∀ g, g • z = z` と `G`-不変性を抱き合わせ、
+  `A^G` の可換性から加法閉性を出す。
+* **Fitting の二分律を Artin 性から独立に立てる**。`isNilpotent_or_exists_mul_eq` は
+  「`(ex)^n = (ex)^{2n} b` となる `n ≥ 1` がある」だけを仮定する。Artin 環からの供給
+  (`exists_pow_eq_pow_mul`、`IsArtinian.monotone_stabilizes` を `Ideal.span {y^(m+1)}`
+  の降鎖に食わせる) は別補題にした。`Z(kG)` を環型で実現したあと差し込むだけになる。
+
+**次の frontier**: 段 69 の block 冪等元を `Z(k[G])` へ配線 (段 84 の `hdich` を
+Artin 性で閉じるには `A^G` を環型で実現する必要がある) → `Br_P` の核 → Brauer 対応 →
+2nd/3rd main theorem → Z\*。
