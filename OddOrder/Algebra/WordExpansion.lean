@@ -326,4 +326,38 @@ theorem exists_nsmul_sum_of_free (σ : α → α) {p : ℕ} (hp : 0 < p) (hper :
 
 end Orbits
 
+/-! ### Freshman's dream modulo commutators -/
+
+section Freshman
+
+variable {R : Type*} [Ring R]
+
+theorem wordProd_const (x y : R) (n : ℕ) (b : Bool) :
+    wordProd x y (fun _ : Fin n => b) = (if b then x else y) ^ n := by
+  rw [wordProd, List.ofFn_const, List.prod_replicate]
+
+/-- If a rotated word is constant then so was the original. -/
+theorem const_of_const_rotateWord {n : ℕ} {w : Fin (n + 1) → Bool}
+    (h : ∀ i j, rotateWord w i = rotateWord w j) (i j : Fin (n + 1)) : w i = w j := by
+  have h1 : rotateWord w (i - 1) = w i := by rw [rotateWord_apply, sub_add_cancel]
+  have h2 : rotateWord w (j - 1) = w j := by rw [rotateWord_apply, sub_add_cancel]
+  rw [← h1, ← h2]
+  exact h _ _
+
+theorem const_of_const_iterate_rotateWord {n : ℕ} (k : ℕ) : ∀ {w : Fin (n + 1) → Bool},
+    (∀ i j, (rotateWord^[k] w) i = (rotateWord^[k] w) j) → ∀ i j, w i = w j := by
+  induction k with
+  | zero => intro w h; exact h
+  | succ k ih =>
+    intro w h
+    rw [Function.iterate_succ_apply] at h
+    exact fun i j => const_of_const_rotateWord (ih h) i j
+
+/-- Non-constant words are stable under rotation. -/
+theorem not_const_iterate_rotateWord {n : ℕ} {w : Fin (n + 1) → Bool} (hw : ¬ ∀ i j, w i = w j)
+    (k : ℕ) : ¬ ∀ i j, (rotateWord^[k] w) i = (rotateWord^[k] w) j := fun hc =>
+  hw (const_of_const_iterate_rotateWord k hc)
+
+end Freshman
+
 end OddOrder
