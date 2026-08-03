@@ -186,3 +186,18 @@ L3 と L4 を突き合わせて `.../Modular/BrauerCount.lean`:
 `sum_smul_eq_relTrace` が任意添字型なので `K`-軌道分解を食わせればよい) —
 defect group の共役性と `Br_P` の核 `∑_{Q<P} Tr^P_Q((kG)^Q)` に要る。
 (ii) Rosenberg の補題。(iii) 段 69 の block 冪等元を `Z(k[G])` に配線 (段 80 の類和経由)。
+
+段 82-83 追加:
+
+| leaf | 内容 |
+|---|---|
+| `Algebra/DefectGroup.lean` | `IsDefectGroup` / 🎯 存在 / 🎯🎯 **`p`-群性** |
+| `Algebra/MackeyFormula.lean` | 🎯 固定化群 = `K ⊓ ᵍL` / 🎯🎯 **Mackey 公式** / 🎯🎯 `A^G_D · A^G_{D'} ⊆ ∑_g A^G_{D⊓ᵍD'}` |
+
+⚠ Mackey の軌道分解は mathlib の `selfEquivSigmaOrbitsQuotientStabilizer` を使うより
+**全単射 `Φ : (Σ ω, K ⧸ (K⊓ᵍL)) → G ⧸ L`, `⟨ω,k⟩ ↦ k.out • ω.out` を手で構成**した方が
+短い (equiv の `symm` を展開する手間が消える)。単射性 = 軌道類の一致 + 固定化群補題、
+全射性 = 軌道の定義、で各 5 行。
+
+**次の frontier**: Rosenberg の補題 (これで defect group の共役性が閉じる) →
+段 69 の block 冪等元を `Z(k[G])` へ配線 → Brauer 対応 → 2nd/3rd main theorem → Z\*。

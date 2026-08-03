@@ -382,8 +382,15 @@ Z\*-定理 (Ch.7) までに要るものを、手持ちとの差分で:
       🎯 `exists_isDefectGroup` (部分群束の整礎性 + `A^G_G = A^G`) /
       🎯🎯 **`isPGroup_of_isDefectGroup`** (`D` の Sylow `p`-部分群 `Q` は
       `[D:Q]` が `p` と素 ⟹ `A^G_Q = A^G_D` ⟹ 極小性で `Q = D`)。
-- [ ] **defect group の共役性** — **Rosenberg の補題**
-      (原始冪等元がイデアルの和に入れば 1 つのイデアルに入る) + Mackey 公式。
+- [x] **Mackey 公式** — 完了 (2026-08-03、段 83 `Algebra/MackeyFormula.lean`)。
+      🎯 `smul_mk_eq_iff_mem_inf_conj` (`gL` の `K`-固定化群 = `K ⊓ ᵍL`) /
+      🎯🎯 **`exists_mackey`** (`Tr^G_L(a) = ∑_{[K\G/L]} Tr^K_{K⊓ᵍL}(g·a)`;
+      全単射 `(Σ ω, K ⧸ (K⊓ᵍL)) ≃ G ⧸ L` を直接構成) /
+      🎯🎯 **`exists_mul_eq_sum_relTraceIdeal_inf`**
+      (`A^G_D · A^G_{D'} ⊆ ∑_g A^G_{D⊓ᵍD'}`)。
+- [ ] **defect group の共役性** — 残るは **Rosenberg の補題**
+      (原始冪等元がイデアルの和に入れば 1 つのイデアルに入る) のみ。
+      段 83 の `exists_mul_eq_sum_relTraceIdeal_inf` に `e = e·e` を食わせればよい。
 - [ ] **block 冪等元を `Z(k[G])` に配線** — 段 69 の一般論 (`existsUnique_blockIdempotent`)
       と段 80 の類和・段 58 の分裂データを繋ぐ。これで `IsDefectGroup e_B D` が
       Brauer の意味の defect group になる。
