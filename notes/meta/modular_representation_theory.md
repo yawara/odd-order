@@ -10,6 +10,8 @@ issue [9506](../../issues/9506-modular-p-modular-system.md) の作業ログは**
   `kG ⧸ J(kG) ≃ₐ[k] ∏_{i<n} M_{d_i}(k)` かつ **`n = #{p`-正則類`}`**。
   ブロックは既約 `kG`-加群と同型を除いて 1 対 1 なので `|IBr(G)| = #p`-正則類。
 * **既約 Brauer 指標 `IBr(G)`** の定義と、`p`-正則類上での**一次独立性**。
+* **分解定理**: 任意の有限次元表現の Brauer 指標は `p`-正則類上で `IBr(G)` の
+  ℕ 係数一次結合 (= 分解数)。
 * 非空虚性: `𝒪 = 𝕎(𝔽̄_p)` が DVR・Henselian・p-modular system で剰余体が代数閉。
 
 ## 1. 層 (下から)
@@ -72,6 +74,16 @@ L3 と L4 を突き合わせて `.../Modular/BrauerCount.lean`:
 | `.../Modular/BrauerIndependence.lean` | 🎯 ブロックトレースは `p`-正則元上で独立 |
 | `.../Modular/BrauerCharacterIndependence.lean` | 関係式の係数は `𝔪` に入る |
 | `.../Modular/BrauerLinearIndependence.lean` | 🎯🎯 **一次独立性** (Nakayama) |
+| `.../Modular/StandardSystem.lean` | `𝕎(𝔽̄_p)` — 代数閉かつ全 `p'`-乗根、非空虚性証明書 |
+
+### L7 分解定理
+
+| leaf | 内容 |
+|---|---|
+| `.../Modular/AsModuleSimple.lean` | 既約表現 ⟹ `asModule` 単純 (不変部分空間 ↔ `kG`-部分加群) |
+| `.../Modular/MinimalSubrepresentation.lean` | **極小**非零不変部分空間の存在と既約性 |
+| `.../Modular/IrreducibleIsBlock.lean` | 🎯 既約表現の Brauer 指標は `IBr(G)` のどれか |
+| `.../Modular/BrauerDecomposition.lean` | 🎯🎯 **`exists_decomposition`** = 分解数 |
 
 ## 2. mathlib 実測 (使えたもの / 無かったもの)
 
@@ -117,9 +129,9 @@ L3 と L4 を突き合わせて `.../Modular/BrauerCount.lean`:
    `exists_isPrimitiveRoot_pRegularExponent_standardSystem` (L6 の `hω` を供給) と
    🎯 `exists_surjective_blocks_card_eq_standardSystem` (有限群 `G` と素数 `p` だけから
    全部出る非空虚性証明書) を得た。
-2. **分解行列 `D`** — 有限次元表現を組成列に分解し、各因子が L5 のブロックのどれかと
-   同型であることを `brauerCharacter_congr` (段 57) で指標に翻訳 →
-   `χ|_{p-reg} = ∑_φ d_{χφ} φ`。⚠ 障害は `Representation k G V` と `Module (kG) M` の
-   往復 (`Representation.ofModule'` は `IsScalarTower k kG M` を要求)。
-3. 以降: Cartan 行列 `C = DᵀD` / block / Brauer 対応 / 2nd・3rd main theorem /
-   Z\*-定理 → Q₈ bridge。
+2. ~~分解行列 `D`~~ — **解決済 (段 59-62)**。組成列でなく**極小**不変部分空間を切り出す
+   帰納にした (部分表現の不変部分空間の対応は `Submodule.map W.subtype` の単射性だけで
+   済み、商だと束の移送が要るため)。`Representation ↔ Module` の往復は
+   `asModule` 側 (`AsModuleSimple.lean`) で処理。
+3. 次: Cartan 行列 `C = DᵀD` / block (中心冪等元) / Brauer 対応 /
+   2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。

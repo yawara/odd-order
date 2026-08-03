@@ -279,10 +279,20 @@ leaf の層構造・mathlib 実測 (使えたもの/無かったもの)・設計
       `.../Modular/StandardSystem.lean` の **`StandardSystem p = 𝕎(𝔽̄_p)`**。
       🎯🎯 `exists_surjective_blocks_card_eq_standardSystem` で、有限群 `G` と素数 `p`
       だけから分裂データ・ブロックと既約加群の同定・数え上げが全部出る。
-- [ ] **分解行列 `D`**: 有限次元表現を組成列に分解 → 各因子は L5 のブロック →
-      `brauerCharacter_congr` で指標に翻訳 → `χ|_{p-reg} = ∑_φ d_{χφ} φ`。
-      ⚠ 障害は `Representation k G V` と `Module (kG) M` の往復
-      (`Representation.ofModule'` が `IsScalarTower k kG M` を要求)。
+- [x] **分解行列 `D`** — 完了 (2026-08-03、段 59-62)。
+      `IrreducibleIsBlock.lean` (既約表現の指標は `IBr(G)` のどれか) /
+      `AsModuleSimple.lean` (表現の既約性 ⟹ `asModule` 単純) /
+      `MinimalSubrepresentation.lean` (**極小**非零不変部分空間) /
+      🎯🎯 `BrauerDecomposition.lean` の **`exists_decomposition`**:
+      `∃ d : ι → ℕ, ∀ p`-正則 `g`, `φ_ρ(g) = ∑_i d_i φ_i(g)`。
+      ⚠ 組成列でなく極小不変部分空間を切り出す帰納 (部分表現側の対応が商より易しい)。
+      ⚠ 等式が `p`-正則元上限定なのは加法性 (段 29) が `(ρ g)^n = 1` を要求するため
+      (= Brauer 指標が意味を持つ範囲そのもの)。
+
+## 次の段 (frontier, 2026-08-03 更新)
+
+- [ ] Cartan 行列 `C = DᵀD` / block (中心冪等元) / Brauer 対応 /
+      2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。
 
 以降 (別 issue に分割予定): Cartan 行列 `C = DᵀD` / block / Brauer 対応 /
 2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。
