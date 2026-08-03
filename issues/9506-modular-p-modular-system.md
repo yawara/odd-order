@@ -127,8 +127,18 @@ system」を**実際に構成する**ところまでを本 issue のスコープ
 - [ ] **分解行列 `D` の表現論的包装**: `G`-不変 `𝒪`-束の存在 (完備 DVR + 有限群なので
       `∑_{g} g·(格子)` で構成) → `χ|_{p-reg} = ∑_φ d_{χφ} φ`。加法性は済んでいるので
       組成因子への分解は既に取れる。
-- [ ] `|IBr G| = p`-regular 類の個数 (`kG` の Jacobson radical / 半単純商が要る。
-      mathlib に `Ring.jacobson` / `IsSemisimpleRing` / Wedderburn–Artin は在る)
+- [ ] **`|IBr G| = p`-regular 類の個数** (Brauer)。証明は
+      `T = [kG,kG]` と `T' = {x : x^{p^m} ∈ T}` を経由する:
+      * (a) `dim kG/T = #共役類` — **済** (`CommutatorSubspace` + `CommutatorQuotient`)
+      * (b) `dim kG/T' = #p-正則類` — **未**。核は標数 `p` の
+        **`(x+y)^p ≡ x^p + y^p mod [R,R]`** (語の巡回回転で軌道分解し、
+        非定数語の軌道長が `p` ゆえ消える)。⚠ mathlib に無く、語の組合せ論を
+        自前で書く必要があるので単独で数 iteration 規模。
+        `p`-正則類側の道具 (`IsPRegularClass` / `pRegularPartClass` = 類の `p'`-部分) は
+        **済** (`PRegularElement.lean`)。
+      * (c) `dim kG/(J + T) = #単純加群` (分裂体) — 未。mathlib の
+        `Ring.jacobson` / `IsSemisimpleRing` / Wedderburn–Artin が使える。
+      * (d) `T' = J + T` — 未。
 
 以降 (別 issue に分割予定): 分解行列 `D` / Cartan 行列 `C = DᵀD` / block / Brauer 対応 /
 2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。

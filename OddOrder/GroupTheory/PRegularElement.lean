@@ -316,4 +316,46 @@ theorem pow_pRegularExponent_eq_one (hp : p.Prime) {g : G} (hg : IsPRegular p g)
 
 end PRegularExponent
 
+/-! ### `p`-regular conjugacy classes -/
+
+section PRegularClasses
+
+variable {p : ℕ} {G : Type*} [Group G]
+
+/-- Being `p`-regular is a conjugacy invariant, so it descends to conjugacy classes. -/
+def IsPRegularClass (p : ℕ) (C : ConjClasses G) : Prop :=
+  Quotient.liftOn C (fun g => IsPRegular p g) fun a b hab => by
+    obtain ⟨c, hc⟩ := isConj_iff.mp hab
+    have hord : orderOf b = orderOf a := by rw [← hc, orderOf_conj]
+    exact propext (by rw [IsPRegular, IsPRegular, hord])
+
+@[simp]
+theorem isPRegularClass_mk {g : G} : IsPRegularClass p (ConjClasses.mk g) ↔ IsPRegular p g :=
+  Iff.rfl
+
+/-- The `p'`-part of a conjugacy class: well defined because taking `p'`-parts commutes with
+conjugation (`pRegularPart_conj`). -/
+noncomputable def pRegularPartClass (p : ℕ) (C : ConjClasses G) : ConjClasses G :=
+  Quotient.liftOn C (fun g => ConjClasses.mk (pRegularPart p g)) fun a b hab => by
+    obtain ⟨c, hc⟩ := isConj_iff.mp hab
+    rw [← hc, pRegularPart_conj]
+    exact ConjClasses.mk_eq_mk_iff_isConj.mpr (isConj_iff.mpr ⟨c, rfl⟩)
+
+@[simp]
+theorem pRegularPartClass_mk (g : G) :
+    pRegularPartClass p (ConjClasses.mk g) = ConjClasses.mk (pRegularPart p g) := rfl
+
+/-- The `p'`-part of a class is a `p`-regular class. -/
+theorem isPRegularClass_pRegularPartClass (hp : p.Prime) {g : G} (hg : IsOfFinOrder g) :
+    IsPRegularClass p (pRegularPartClass p (ConjClasses.mk g)) :=
+  isPRegularClass_mk.mpr (isPRegular_pRegularPart hp hg)
+
+/-- On `p`-regular classes the `p'`-part map is the identity. -/
+theorem pRegularPartClass_of_isPRegularClass (hp : p.Prime) {C : ConjClasses G}
+    (hC : IsPRegularClass p C) : pRegularPartClass p C = C := by
+  induction C using Quotient.inductionOn with
+  | h g => exact congrArg ConjClasses.mk (pRegularPart_eq_self_of_isPRegular hp hC)
+
+end PRegularClasses
+
 end OddOrder.GroupTheory
