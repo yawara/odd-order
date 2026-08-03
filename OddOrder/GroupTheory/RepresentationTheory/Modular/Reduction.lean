@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.RingTheory.LocalRing.Module
 import Mathlib.LinearAlgebra.TensorProduct.Tower
+import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
 
 /-!
@@ -62,5 +63,61 @@ theorem finrank_baseChange_eigenspace (A : Module.End 𝒪 L) (ζ : 𝒪)
     Module.finrank (ResidueField 𝒪) (ResidueField 𝒪 ⊗[𝒪] (Module.End.eigenspace A ζ))
       = Module.finrank 𝒪 (Module.End.eigenspace A ζ) :=
   Module.finrank_baseChange
+
+/-! ### Two counting helpers -/
+
+section Counting
+
+variable {K W : Type*} [Field K] [AddCommGroup W] [Module K W] [FiniteDimensional K W]
+
+/-- The dimension of a finite supremum of subspaces is at most the sum of the dimensions.  With
+the reverse inequality supplied by a spanning argument this pins each summand down. -/
+theorem finrank_biSup_le_sum {ι : Type*} (t : Finset ι) (q : ι → Submodule K W) :
+    Module.finrank K ↥(⨆ i ∈ t, q i) ≤ ∑ i ∈ t, Module.finrank K (q i) := by
+  classical
+  induction t using Finset.induction with
+  | empty => simp
+  | insert a t ha ih =>
+    have hins : (⨆ i ∈ insert a t, q i) = q a ⊔ ⨆ i ∈ t, q i := by
+      simp only [Finset.mem_insert, iSup_or, iSup_sup_eq, iSup_iSup_eq_left]
+    rw [Finset.sum_insert ha, hins]
+    refine le_trans ?_ (Nat.add_le_add_left ih _)
+    have h := Submodule.finrank_sup_add_finrank_inf_eq (q a) (⨆ i ∈ t, q i)
+    omega
+
+end Counting
+
+/-! ### Base change and suprema -/
+
+section BaseChangeSup
+
+variable (k : Type*) [Field k] [Algebra 𝒪 k]
+
+omit [IsLocalRing 𝒪] in
+/-- Base change of a supremum of submodules is contained in the supremum of the base changes. -/
+theorem baseChange_iSup_le {ι : Sort*} (N : ι → Submodule 𝒪 L) :
+    (⨆ i, N i).baseChange k ≤ ⨆ i, (N i).baseChange k := by
+  rw [Submodule.baseChange_eq_span, Submodule.span_le]
+  rintro _ ⟨v, hv, rfl⟩
+  induction hv using Submodule.iSup_induction' with
+  | mem i x hx =>
+    exact Submodule.mem_iSup_of_mem i (Submodule.tmul_mem_baseChange_of_mem 1 hx)
+  | zero => simp
+  | add x y _ _ hx hy =>
+    have : (TensorProduct.mk 𝒪 k L 1) (x + y)
+        = (TensorProduct.mk 𝒪 k L 1) x + (TensorProduct.mk 𝒪 k L 1) y := map_add _ _ _
+    rw [SetLike.mem_coe] at hx hy ⊢
+    rw [this]
+    exact Submodule.add_mem _ hx hy
+
+omit [IsLocalRing 𝒪] in
+/-- If a family of submodules spans, so do their base changes. -/
+theorem iSup_baseChange_eq_top {ι : Sort*} {N : ι → Submodule 𝒪 L} (hN : ⨆ i, N i = ⊤) :
+    ⨆ i, (N i).baseChange k = ⊤ :=
+  eq_top_iff.mpr (by
+    rw [← Submodule.baseChange_top (A := k) (M := L), ← hN]
+    exact baseChange_iSup_le k N)
+
+end BaseChangeSup
 
 end OddOrder.RepresentationTheory.Modular
