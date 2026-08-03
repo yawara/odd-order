@@ -95,8 +95,31 @@ system」を**実際に構成する**ところまでを本 issue のスコープ
       `brauerCharacter n ρ g = ∑_{ζ ∈ μ_n(k)} dim_k V_ζ · ζ̂`。
       `brauerCharacter_one` (= `dim_k V`) / `brauerCharacter_conj` (類関数) /
       **`residue_brauerCharacter` (剰余 = 通常のトレース)** が定義の正当性を固定する。
-- [ ] `|IBr G| = p`-regular 類の個数 (次の段。既約 `kG`-加群の枚数を数える必要があり、
-      `kG` の Jacobson radical / 半単純商の議論が要る)
+- [x] **`p`-正則元との接続** (2026-08-03)。`pRegularExponent p G = |G|_{p'}` を導入し
+      `orderOf_dvd_pRegularExponent` (Lagrange + `p ∤ orderOf g`) ⟹
+      `residue_brauerCharacter_of_isPRegular` は `ρ g` への仮説なしで成立。
+- [x] **加法性** (2026-08-03)。`brauerCharacter_quotient_add_subrepresentation`:
+      `G`-不変 `W ≤ V` で `φ_V = φ_{V/W} + φ_W` ⟹ **組成因子だけで決まる**。
+      核 = `finrank_eigenspace_eq_quotient_add` (各固有値ごとの次元加法性)。
+      ⚠ スペクトル射影を作らず、**各 ζ の不等号 + 3 本の全次元恒等式で総和を squeeze**
+      (`Finset.sum_eq_sum_iff_of_le`) して全項同時に等号にした。
+- [x] **`𝒪` 上の固有空間分解** (2026-08-03)。分解行列 `D` は `𝒪`-束の還元を経由するので
+      体でなく `𝒪` 上で分解する必要がある。
+      * `Algebra/LagrangeInterpolationRing.lean` — 可換環 Lagrange (節点差が単元 =
+        `SeparatedNodes`)。`eq_zero_of_degree_lt_card_of_eval_eq_zero` +
+        `sum_ringLagrangeBasis`。
+      * `iSup_eigenspace_eq_top_of_separated` — 体版はこの特殊化になった。
+      * `.../Modular/LatticeEigenspaces.lean` — `separatedNodes_of_pow_eq_one`
+        (**相異なる `n` 乗根は剰余が相異なる ⟹ 差が単元**、これが `𝒪` が体でなくても
+        回る理由) + `iSup_eigenspace_eq_top_of_pow` / `_splittingSystem`。
+
+## 次の段 (別 issue へ分割予定)
+
+- [ ] **分解行列 `D`**: `𝒪`-束 `L` 上の `A` (位数 `n`) について
+      `trace_𝒪(A) = brauerTrace(Ā)` — 上の `𝒪` 分解 + 各固有部分加群の rank と
+      還元の次元が一致することから。`𝒪` は DVR なので部分加群は自由。
+- [ ] `|IBr G| = p`-regular 類の個数 (`kG` の Jacobson radical / 半単純商が要る。
+      mathlib に `Ring.jacobson` / `IsSemisimpleRing` / Wedderburn–Artin は在る)
 
 以降 (別 issue に分割予定): 分解行列 `D` / Cartan 行列 `C = DᵀD` / block / Brauer 対応 /
 2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。

@@ -161,6 +161,8 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.WittVectorSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
 import OddOrder.Algebra.EigenspaceDecomposition
+import OddOrder.Algebra.LagrangeInterpolationRing
+import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
 import OddOrder.BG.Ch1_Preliminary.PLengthPComplement
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04_Lem45c_Prop46
@@ -15376,3 +15378,32 @@ returns the ordinary trace. -/
   OddOrder.RepresentationTheory.Modular.brauerCharacter_conj
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.residue_brauerCharacter
+
+/-! **Lagrange interpolation over a commutative ring with separated nodes**
+(`Algebra.LagrangeInterpolationRing`, issue 9506).  What lets the eigen-decomposition run over
+the coefficient ring `𝒪` of a `p`-modular system, which is not a field. -/
+
+#assert_only_allowed_axioms
+  OddOrder.eq_zero_of_degree_lt_card_of_eval_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.sum_ringLagrangeBasis
+#assert_only_allowed_axioms
+  OddOrder.iSup_eigenspace_eq_top_of_separated
+#assert_only_allowed_axioms
+  OddOrder.finrank_eigenspace_eq_quotient_add
+
+/-! **Eigen-decomposition over `𝒪` and the `p`-regular packaging of Brauer characters**
+(`GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces`, issue 9506). -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.orderOf_dvd_pRegularExponent
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.separatedNodes_of_pow_eq_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.iSup_eigenspace_eq_top_of_pow
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.iSup_eigenspace_eq_top_splittingSystem
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.residue_brauerCharacter_of_isPRegular
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.brauerCharacter_quotient_add_subrepresentation
