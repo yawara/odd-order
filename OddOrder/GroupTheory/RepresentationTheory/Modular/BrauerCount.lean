@@ -3,11 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.FieldTheory.IsAlgClosed.Basic
 import Mathlib.RingTheory.Artinian.Ring
 import Mathlib.RingTheory.Ideal.Quotient.Operations
 import Mathlib.RingTheory.Jacobson.Semiprimary
-import Mathlib.RingTheory.SimpleModule.WedderburnArtin
+import Mathlib.RingTheory.SimpleModule.IsAlgClosed
 import OddOrder.Algebra.SplitSemisimpleCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
 
@@ -28,8 +27,9 @@ irreducible modules.
 
 Over an *algebraically closed* `k` the splitting datum is produced here rather than assumed:
 `kG` is finite-dimensional hence Artinian hence semiprimary, so `J(kG)` is nilpotent and
-`kG ⧸ J(kG)` is semisimple, and Artin–Wedderburn splits the latter into matrix algebras over
-finite-dimensional division algebras — which over an algebraically closed field are `k` itself.
+`kG ⧸ J(kG)` is semisimple, and mathlib's Artin–Wedderburn over an algebraically closed field
+(`IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed`) splits the latter into matrix
+algebras over `k`.
 
 ## Main results
 
@@ -67,7 +67,7 @@ theorem card_split_blocks_eq_card_pRegularClass (hp : p.Prime) (hk : (p : k) = 0
 Over an algebraically closed `k` the hypotheses of `card_split_blocks_eq_card_pRegularClass` are
 automatic: `kG` is finite-dimensional, hence Artinian, hence semiprimary — so `J(kG)` is
 nilpotent and `kG ⧸ J(kG)` is semisimple — and Artin–Wedderburn writes the latter as a product
-of matrix algebras over finite-dimensional division algebras, each of which is `k` itself.
+of matrix algebras over `k` (`IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed`).
 -/
 
 /-- **Brauer's theorem.**  Over an algebraically closed field of characteristic `p`, the
@@ -86,16 +86,9 @@ theorem exists_wedderburn_pi_matrix_card_eq [IsAlgClosed k] (hp : p.Prime) (hk :
   haveI : Module.Finite k (MonoidAlgebra k G ⧸ Ring.jacobson (MonoidAlgebra k G)) :=
     Module.Finite.of_surjective (Ideal.Quotient.mkₐ k _).toLinearMap
       (Ideal.Quotient.mkₐ_surjective k _)
-  obtain ⟨n, D, d, _, _, _, hd, ⟨e⟩⟩ :=
-    IsSemisimpleRing.exists_algEquiv_pi_matrix_divisionRing_finite (R₀ := k)
-      (R := MonoidAlgebra k G ⧸ Ring.jacobson (MonoidAlgebra k G))
-  -- a finite-dimensional division algebra over an algebraically closed field is the field
-  have hDk : ∀ i, D i ≃ₐ[k] k := fun i =>
-    (AlgEquiv.ofBijective (Algebra.ofId k (D i))
-      (IsAlgClosed.algebraMap_bijective_of_isIntegral (k := k) (K := D i))).symm
-  have e' : (MonoidAlgebra k G ⧸ Ring.jacobson (MonoidAlgebra k G))
-      ≃ₐ[k] ∀ i, Matrix (Fin (d i)) (Fin (d i)) k :=
-    e.trans (AlgEquiv.piCongrRight fun i => (hDk i).mapMatrix)
+  obtain ⟨n, d, hd, ⟨e'⟩⟩ :=
+    IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed k
+      (MonoidAlgebra k G ⧸ Ring.jacobson (MonoidAlgebra k G))
   refine ⟨n, d, hd, ⟨e'⟩, ?_⟩
   -- the Jacobson radical is nilpotent, uniformly on elements
   obtain ⟨N, hN⟩ := IsSemiprimaryRing.isNilpotent (R := MonoidAlgebra k G)
