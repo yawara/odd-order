@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Algebra.EigenspaceDecomposition
-import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
 
 /-!
 # Eigen-decomposition over the coefficient ring of a `p`-modular system
@@ -26,6 +26,10 @@ difference is a unit.  That is exactly the hypothesis of
 * `OddOrder.RepresentationTheory.Modular.iSup_eigenspace_eq_top_of_pow` — the decomposition
 * `OddOrder.RepresentationTheory.Modular.trace_eq_sum_finrank_smul_of_pow` — the trace of a
   finite-order lattice endomorphism, in Brauer-character shape
+* `OddOrder.RepresentationTheory.Modular.image_residue_nthRootsFinset` — reduction is a
+  bijection `μ_n(𝒪) → μ_n(k)`
+* `OddOrder.RepresentationTheory.Modular.brauerCharacter_eq_sum_nthRootsFinset` — the Brauer
+  character reindexed over `μ_n(𝒪)`, matching the shape of the `𝒪`-side trace
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -99,6 +103,75 @@ theorem trace_eq_sum_finrank_smul_of_pow :
     (prod_X_sub_C_nthRootsFinset_aeval_eq_zero hn0 hω hA)
 
 end Lattice
+
+
+/-! ### Reduction is a bijection on `n`-th roots of unity
+
+The trace computed over `𝒪` is indexed by `μ_n(𝒪)`, the Brauer character by `μ_n(k)`.  For
+`p ∤ n` reduction identifies the two index sets, so both are sums over the same finite set and
+the only remaining difference is rank versus dimension. -/
+
+section RootsBijection
+
+variable [IsDomain 𝒪] {n : ℕ} (hn : ¬ p ∣ n) (hn0 : 0 < n)
+include hn0
+
+/-- Reduction sends `n`-th roots of unity of `𝒪` to `n`-th roots of unity of the residue
+field. -/
+theorem residue_mem_nthRootsFinset {ζ : 𝒪} (hζ : ζ ∈ nthRootsFinset n (1 : 𝒪)) :
+    residue 𝒪 ζ ∈ nthRootsFinset n (1 : ResidueField 𝒪) := by
+  rw [mem_nthRootsFinset hn0] at hζ ⊢
+  rw [← map_pow, hζ, map_one]
+
+include hn
+
+/-- Reduction is injective on `n`-th roots of unity: this is the separatedness of the nodes. -/
+theorem injOn_residue_nthRootsFinset :
+    Set.InjOn (residue 𝒪) (nthRootsFinset n (1 : 𝒪)) := by
+  intro x hx y hy hxy
+  refine eq_of_pow_eq_one_of_sub_mem (isUnit_natCast_of_not_dvd (p := p) hn)
+    ((mem_nthRootsFinset hn0 _).mp hx) ((mem_nthRootsFinset hn0 _).mp hy) ?_
+  exact (residue_eq_zero_iff _).mp (by rw [map_sub, hxy, sub_self])
+
+open scoped Classical in
+/-- **Reduction maps `μ_n(𝒪)` onto `μ_n(k)`.**  Surjectivity is the Henselian lifting of roots
+of unity. -/
+theorem image_residue_nthRootsFinset :
+    (nthRootsFinset n (1 : 𝒪)).image (residue 𝒪) = nthRootsFinset n (1 : ResidueField 𝒪) := by
+  refine Finset.Subset.antisymm ?_ fun c hc => ?_
+  · intro c hc
+    obtain ⟨ζ, hζ, rfl⟩ := Finset.mem_image.mp hc
+    exact residue_mem_nthRootsFinset hn0 hζ
+  · obtain ⟨a, ha, hres⟩ := exists_pow_eq_one_residue_eq (isUnit_natCast_of_not_dvd (p := p) hn)
+      hn0.ne' ((mem_nthRootsFinset hn0 _).mp hc)
+    exact Finset.mem_image.mpr ⟨a, (mem_nthRootsFinset hn0 _).mpr ha, hres⟩
+
+open scoped Classical in
+/-- A sum over `μ_n(k)` is a sum over `μ_n(𝒪)` composed with reduction. -/
+theorem sum_nthRootsFinset_residue {M : Type*} [AddCommMonoid M] (f : ResidueField 𝒪 → M) :
+    ∑ ζ ∈ nthRootsFinset n (1 : 𝒪), f (residue 𝒪 ζ)
+      = ∑ c ∈ nthRootsFinset n (1 : ResidueField 𝒪), f c := by
+  rw [← image_residue_nthRootsFinset hn hn0,
+    Finset.sum_image fun x hx y hy h => injOn_residue_nthRootsFinset hn hn0 hx hy h]
+
+end RootsBijection
+
+/-! ### The Brauer character, indexed over `𝒪`
+
+Rewriting `brauerCharacter` over `μ_n(𝒪)` puts it in exactly the shape of
+`trace_eq_sum_finrank_smul_of_pow`. -/
+
+theorem brauerCharacter_eq_sum_nthRootsFinset [IsDomain 𝒪] {n : ℕ} (hn : ¬ p ∣ n) (hn0 : 0 < n)
+    {G V : Type*} [Group G] [AddCommGroup V] [Module (ResidueField 𝒪) V]
+    (ρ : Representation (ResidueField 𝒪) G V) (g : G) :
+    brauerCharacter (𝒪 := 𝒪) n ρ g
+      = ∑ ζ ∈ nthRootsFinset n (1 : 𝒪),
+          Module.finrank (ResidueField 𝒪)
+            (Module.End.eigenspace (ρ g) (residue 𝒪 ζ)) • ζ := by
+  rw [brauerCharacter, ← sum_nthRootsFinset_residue hn hn0
+    (fun c => Module.finrank (ResidueField 𝒪) (Module.End.eigenspace (ρ g) c) • rootLift n c)]
+  refine Finset.sum_congr rfl fun ζ hζ => ?_
+  rw [rootLift_unique hn hn0.ne' ((mem_nthRootsFinset hn0 _).mp hζ)]
 
 
 /-! ### The standard splitting system
