@@ -9,6 +9,7 @@ import OddOrder.Algebra.ModuleAlongSurjection
 import OddOrder.Algebra.PiMatrixSimpleModules
 import OddOrder.Algebra.CentralCharacter
 import OddOrder.Algebra.RelativeTrace
+import OddOrder.Algebra.GroupAlgebraConjugation
 import OddOrder.Algebra.BlockIdempotent
 import OddOrder.Algebra.CentralIdempotentModule
 import OddOrder.Algebra.PrimitiveIdempotent

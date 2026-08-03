@@ -142,6 +142,22 @@ theorem smul_relTrace {K H : Subgroup G} {a : A} (ha : ∀ g ∈ K, g • a = a)
         simp only [relTrace, Finset.smul_sum, mul_smul]
     _ = relTrace K H a := sum_smul_eq_relTrace ha _ hf hbij
 
+/-- The absolute trace `Tr^G_K` is the sum over `G ⧸ K` in the familiar sense.  (The definition
+uses `↥⊤ ⧸ K.subgroupOf ⊤`, which this identifies with `G ⧸ K`.) -/
+theorem sum_out_smul_eq_relTrace_top {K : Subgroup G} {a : A} (ha : ∀ g ∈ K, g • a = a)
+    [Fintype (G ⧸ K)] : ∑ x : G ⧸ K, ((x.out : G)) • a = relTrace K ⊤ a := by
+  refine sum_smul_eq_relTrace ha (fun x : G ⧸ K => (x.out : G)) (fun _ => Subgroup.mem_top _) ?_
+  constructor
+  · intro x y hxy
+    rw [mk_eq_mk_iff_mem] at hxy
+    have h := QuotientGroup.eq.mpr hxy
+    simpa only [QuotientGroup.out_eq'] using h
+  · intro z
+    obtain ⟨w, rfl⟩ := QuotientGroup.mk_surjective z
+    refine ⟨QuotientGroup.mk (w : G), ?_⟩
+    rw [mk_eq_mk_iff_mem]
+    exact QuotientGroup.eq.mp (QuotientGroup.out_eq' _)
+
 /-- `Tr^H_H` is the identity on `H`-fixed elements. -/
 theorem relTrace_self {H : Subgroup G} {a : A} (ha : ∀ g ∈ H, g • a = a) :
     relTrace H H a = a := by
