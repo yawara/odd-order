@@ -117,6 +117,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorQuotient
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorSubspace
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InvariantLattice
+import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
