@@ -157,6 +157,10 @@ import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10C
 import OddOrder.GroupTheory.PRegularElement
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.RootsOfUnityLift
+import OddOrder.GroupTheory.RepresentationTheory.Modular.WittVectorSystem
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
+import OddOrder.Algebra.EigenspaceDecomposition
 import OddOrder.BG.Ch1_Preliminary.PLengthPComplement
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04_Lem45c_Prop46
@@ -15331,3 +15335,44 @@ issue 9506).  `ℤ_[p]` is the base example, so the notion is not vacuous. -/
   OddOrder.GroupTheory.normal_map_subtype_of_conj_invariant
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.exists_isCompl_invariant
+
+/-! **Witt vectors as a `p`-modular system** and the **standard splitting system**
+(`GroupTheory.RepresentationTheory.Modular.{WittVectorSystem,SplittingSystem}`, issue 9506).
+`𝕎 (GF(p ^ φ(n)))` is a `p`-modular system whose `n`-th roots of unity are all present — the
+carrier is constructed, not posited. -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.maximalIdeal_wittVector
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.wittVectorResidueFieldEquiv
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.instIsPModularSystemWittVector
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.hasEnoughRootsOfUnity_of_residueField
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.hasEnoughRootsOfUnity_splittingSystem
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.natCard_rootsOfUnity_splittingSystem
+
+/-! **Diagonalisability from a split squarefree annihilator** (`Algebra.EigenspaceDecomposition`,
+issue 9506).  What replaces mathlib's `IsAlgClosed`-bound eigenspace decomposition. -/
+
+#assert_only_allowed_axioms
+  OddOrder.iSup_eigenspace_eq_top_of_aeval_prod_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.iSup_eigenspace_eq_top_of_pow
+#assert_only_allowed_axioms
+  OddOrder.sum_finrank_eigenspace_of_pow
+
+/-! **Brauer characters** (`GroupTheory.RepresentationTheory.Modular.BrauerCharacter`,
+issue 9506).  `residue_brauerCharacter` is the fact that pins the definition down: reduction
+returns the ordinary trace. -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.rootLift_unique
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.brauerCharacter_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.brauerCharacter_conj
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.residue_brauerCharacter
