@@ -177,4 +177,72 @@ theorem const_of_iterate_rotateWord_eq {p : ℕ} (hp : p.Prime) (hn : n + 1 = p)
 
 end Period
 
+/-! ### Orbits of a map of finite order
+
+A sum over a set on which iteration of `σ` acts freely with period `p` is `p` times something;
+in a ring of characteristic `p` such a sum vanishes.  This is what kills the non-constant words
+in the expansion of `(x + y) ^ p`.
+-/
+
+section Orbits
+
+variable {α : Type*}
+
+/-- Iterating a map of period `p` only depends on the exponent modulo `p`. -/
+theorem iterate_mod_of_period (σ : α → α) {p : ℕ} (hper : ∀ v, σ^[p] v = v) (m : ℕ) (w : α) :
+    σ^[m] w = σ^[m % p] w := by
+  conv_lhs => rw [← Nat.mod_add_div m p]
+  rw [Function.iterate_add_apply, Function.iterate_mul]
+  congr 1
+  induction m / p with
+  | zero => simp
+  | succ j ih => rw [Function.iterate_succ_apply', ih]; exact hper _
+
+variable [DecidableEq α]
+
+/-- The orbit of `w` under the first `p` iterates of `σ`. -/
+def iterateOrbit (σ : α → α) (p : ℕ) (w : α) : Finset α :=
+  (Finset.range p).image fun k => σ^[k] w
+
+theorem mem_iterateOrbit_iff {σ : α → α} {p : ℕ} {w v : α} :
+    v ∈ iterateOrbit σ p w ↔ ∃ k < p, σ^[k] w = v := by
+  simp [iterateOrbit, Finset.mem_image, Finset.mem_range]
+
+theorem self_mem_iterateOrbit (σ : α → α) {p : ℕ} (hp : 0 < p) (w : α) :
+    w ∈ iterateOrbit σ p w :=
+  mem_iterateOrbit_iff.mpr ⟨0, hp, rfl⟩
+
+theorem iterate_mem_iterateOrbit (σ : α → α) {p : ℕ} (hp : 0 < p) (hper : ∀ v, σ^[p] v = v)
+    (m : ℕ) (w : α) : σ^[m] w ∈ iterateOrbit σ p w :=
+  mem_iterateOrbit_iff.mpr ⟨m % p, Nat.mod_lt _ hp, (iterate_mod_of_period σ hper m w).symm⟩
+
+/-- The orbit finset does not change along the action. -/
+theorem iterateOrbit_apply (σ : α → α) {p : ℕ} (hp : 0 < p) (hper : ∀ v, σ^[p] v = v) (w : α) :
+    iterateOrbit σ p (σ w) = iterateOrbit σ p w := by
+  ext v
+  rw [mem_iterateOrbit_iff, mem_iterateOrbit_iff]
+  constructor
+  · rintro ⟨k, hk, rfl⟩
+    rw [← Function.iterate_succ_apply]
+    exact ⟨(k + 1) % p, Nat.mod_lt _ hp, (iterate_mod_of_period σ hper (k + 1) w).symm⟩
+  · rintro ⟨j, hj, rfl⟩
+    refine ⟨(j + (p - 1)) % p, Nat.mod_lt _ hp, ?_⟩
+    rw [← Function.iterate_succ_apply, iterate_mod_of_period σ hper _ w,
+      Nat.succ_eq_add_one, Nat.mod_add_mod, show j + (p - 1) + 1 = j + p by omega,
+      Nat.add_mod_right, ← iterate_mod_of_period σ hper j w]
+
+theorem iterateOrbit_iterate (σ : α → α) {p : ℕ} (hp : 0 < p) (hper : ∀ v, σ^[p] v = v)
+    (k : ℕ) (w : α) : iterateOrbit σ p (σ^[k] w) = iterateOrbit σ p w := by
+  induction k with
+  | zero => rfl
+  | succ k ih => rw [Function.iterate_succ_apply', iterateOrbit_apply σ hp hper, ih]
+
+/-- The orbit of any of its own members is the same finset. -/
+theorem iterateOrbit_of_mem (σ : α → α) {p : ℕ} (hp : 0 < p) (hper : ∀ v, σ^[p] v = v)
+    {w v : α} (hv : v ∈ iterateOrbit σ p w) : iterateOrbit σ p v = iterateOrbit σ p w := by
+  obtain ⟨k, _, rfl⟩ := mem_iterateOrbit_iff.mp hv
+  exact iterateOrbit_iterate σ hp hper k w
+
+end Orbits
+
 end OddOrder
