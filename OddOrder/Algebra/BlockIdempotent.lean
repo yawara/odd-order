@@ -26,6 +26,7 @@ idempotent** `e_B`.
 * `OddOrder.MatrixModule.surjective_blockCharacterPi`
 * `OddOrder.MatrixModule.existsUnique_blockIdempotent`
 * `OddOrder.MatrixModule.exists_completeOrthogonalIdempotents_block`
+* `OddOrder.MatrixModule.blockRingEquiv` — `A` is the product of its blocks
 * `OddOrder.MatrixModule.existsUnique_block_smul_eq_self`
 -/
 
@@ -123,6 +124,26 @@ theorem exists_completeOrthogonalIdempotents_block
     (CompleteOrthogonalIdempotents.single fun _ : Block π hπ hlin => k)
     (fun c => hsurj _)
   exact ⟨e, he, fun c => congrFun hfe c⟩
+
+omit [Finite ι] in
+/-- The block idempotents, viewed inside `A`. -/
+theorem completeOrthogonalIdempotents_val [Fintype (Block π hπ hlin)]
+    {ee : Block π hπ hlin → Subalgebra.center k A}
+    (hee : CompleteOrthogonalIdempotents ee) :
+    CompleteOrthogonalIdempotents fun c => (ee c : A) :=
+  hee.map ((Subalgebra.center k A).val : Subalgebra.center k A →ₐ[k] A).toRingHom
+
+omit [Finite ι] in
+/-- **The block decomposition of `A`**: the algebra is the direct product of its blocks
+`e_B A e_B`.  This is what makes block theory a genuine reduction — every question about
+`A`-modules splits into independent questions, one per block. -/
+noncomputable def blockRingEquiv [Fintype (Block π hπ hlin)]
+    {ee : Block π hπ hlin → Subalgebra.center k A}
+    (hee : CompleteOrthogonalIdempotents ee) :
+    A ≃+* ∀ c : Block π hπ hlin,
+      ((completeOrthogonalIdempotents_val π hπ hlin hee).idem c).Corner :=
+  (completeOrthogonalIdempotents_val π hπ hlin hee).ringEquivOfIsMulCentral fun _ =>
+    Set.mem_center_iff.mp mem_center_of_mem_centerSubalgebra
 
 omit [Finite ι] in
 /-- **Every simple `A`-module belongs to exactly one block**: exactly one block idempotent acts

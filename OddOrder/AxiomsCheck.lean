@@ -15698,3 +15698,5 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.completeOrthogonalIdempotents_matrixUnit
 #assert_only_allowed_axioms
   OddOrder.exists_completeOrthogonalIdempotents_lift
+#assert_only_allowed_axioms
+  OddOrder.MatrixModule.blockRingEquiv
