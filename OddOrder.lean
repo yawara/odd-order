@@ -114,6 +114,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterIndependence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerIndependence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorQuotient
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorSubspace

@@ -174,6 +174,7 @@ import OddOrder.Algebra.SplitSemisimpleCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterIndependence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerIndependence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
@@ -15629,3 +15630,5 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.blockTraceQuotientEquiv
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.eq_zero_of_sum_blockTrace_pRegular_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.mem_maximalIdeal_of_sum_irreducibleBrauerCharacter
