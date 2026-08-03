@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Algebra.BigOperators.Ring.Finset
 import Mathlib.Algebra.Ring.Defs
+import Mathlib.Algebra.Group.Subgroup.Defs
 
 /-!
 # The noncommutative binomial expansion
@@ -53,5 +54,39 @@ theorem add_pow_eq_sum_wordProd (x y : R) (n : ℕ) :
         (Fin.consEquiv fun _ : Fin (n + 1) => Bool) (b, v) = Fin.cons b v := fun _ _ => rfl
     simp only [hcons, wordProd_cons, Fintype.sum_bool, ← Finset.sum_add_distrib]
     exact Finset.sum_congr rfl fun v _ => by simp [add_mul]
+
+/-! ### Cyclic rotation -/
+
+section Rotate
+
+variable {n : ℕ}
+
+/-- Rotating a word: move the first letter to the end. -/
+def rotateWord (w : Fin (n + 1) → Bool) : Fin (n + 1) → Bool :=
+  Fin.snoc (Fin.tail w) (w 0)
+
+theorem wordProd_snoc (x y : R) (v : Fin n → Bool) (b : Bool) :
+    wordProd x y (Fin.snoc v b) = wordProd x y v * (if b then x else y) := by
+  rw [wordProd, wordProd, List.ofFn_succ']
+  simp
+
+theorem wordProd_eq_head_mul (x y : R) (w : Fin (n + 1) → Bool) :
+    wordProd x y w = (if w 0 then x else y) * wordProd x y (Fin.tail w) := by
+  conv_lhs => rw [← Fin.cons_self_tail w]
+  rw [wordProd_cons]
+
+theorem wordProd_rotateWord (x y : R) (w : Fin (n + 1) → Bool) :
+    wordProd x y (rotateWord w) = wordProd x y (Fin.tail w) * (if w 0 then x else y) := by
+  rw [rotateWord, wordProd_snoc]
+
+/-- **Cyclic rotation changes a word product by a commutator.**  Modulo any additive subgroup
+containing all commutators, the product along a word depends only on its cyclic class. -/
+theorem wordProd_rotateWord_sub_mem (x y : R) (w : Fin (n + 1) → Bool) (T : AddSubgroup R)
+    (hT : ∀ a b : R, a * b - b * a ∈ T) :
+    wordProd x y (rotateWord w) - wordProd x y w ∈ T := by
+  rw [wordProd_rotateWord, wordProd_eq_head_mul]
+  exact hT _ _
+
+end Rotate
 
 end OddOrder
