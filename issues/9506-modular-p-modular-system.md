@@ -1077,6 +1077,21 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         - [x] ⟹ 🎯🎯🎯 **`centralCharacterAlg_eq_of_decompositionNumber_ne_zero`**
               (`DecompositionNumber.lean`) = **分解数の block 対角性**。
               `exists_decomposition` / `exists_decomposition_trace` にも conjunct を通した。
+        - [x] `x ∈ Z(H)` の中心元化 — `GroupAlgebra.single_mem_center_of_forall_commute`
+              (2026-08-04)。`H = C_G(x)` なので `single x 1 ∈ Z(𝒪H)`、これを絶対既約格子の
+              中心指標に食わせれば `x` は `ψ(x)/ψ(1)` 倍として作用する ((5.2) の step (ii))。
+        - [ ] **残り = 通常指標側の分解** ((5.2) の step (i))。
+              `y ↦ χ(f_{b'} x y)` の `IBr(H)` 展開が `IBr(b')` に台を持つことを言うには、
+              `K[H]`-加群の `Irr(H)` への重複度分解 `tr_V(g) = Σ_i n_i χ_i(g)` が要る。
+              **設計** (`BrauerDecomposition` の帰納法をそのまま移す):
+              次元の帰納 → 極小不変部分空間 `W` (単純) → Maschke 補元 `W'` (repo
+              `MaschkeComplement.lean`) → `IsInternal {W, W'}` + mathlib
+              `LinearMap.trace_eq_sum_trace_restrict` で `tr_V = tr_W + tr_{W'}` →
+              `W` は Wedderburn 分解 `e : K[H] ≃ₐ ∏ Matrix` のどれか
+              (`exists_linearEquiv_blockModule`、`ker e = ⊥` ゆえ annihilator 条件は自明) →
+              `W'` に帰納。⚠ 商でなく**不変補元**を使うのが要点 (標数 0 なので Maschke が
+              効き、SES に沿ったトレース加法性を自作せずに済む)。
+              block 対角性の conjunct も同じ帰納法に乗る。
         - [ ] ⟹ (5.2) 本体の組み立て (上の 1.–3. を結線する)
 - [ ] **98: `(5.8)` + `(5.13.b,c,d)` (一般化分解数の直交関係) + block orthogonality**
 - [ ] **99: 🎯 第三主定理 `(6.7)`** — Okuyama の証明 ((6.1)–(6.6) 経由、非常に一般な形)

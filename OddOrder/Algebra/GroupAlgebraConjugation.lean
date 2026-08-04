@@ -145,6 +145,19 @@ section CommSemiring
 
 variable {R : Type*} [CommSemiring R] {G : Type*} [Group G]
 
+/-- **A central group element gives a central monomial.**  Navarro's proof of the second main
+theorem takes `H = C_G(x)`, so `x ∈ Z(H)` and `single x 1` is central in `𝒪H`; feeding it to the
+central character of an absolutely irreducible lattice is what makes `x` act by the scalar
+`ψ(x)/ψ(1)`. -/
+theorem single_mem_center_of_forall_commute {x : G} (hx : ∀ g : G, x * g = g * x) (r : R) :
+    MonoidAlgebra.single x r ∈ Subalgebra.center R (MonoidAlgebra R G) := by
+  refine Subalgebra.mem_center_iff.mpr fun b => ?_
+  induction b using MonoidAlgebra.induction_linear with
+  | zero => rw [zero_mul, mul_zero]
+  | add u v hu hv => rw [add_mul, mul_add, hu, hv]
+  | single g s =>
+    rw [MonoidAlgebra.single_mul_single, MonoidAlgebra.single_mul_single, hx g, mul_comm s r]
+
 /-- **The `G`-fixed points of `R[G]` under conjugation are exactly the centre.**
 
 This is what identifies `(R[G])^G` with `Z(R[G])`, the ring in which block idempotents live. -/

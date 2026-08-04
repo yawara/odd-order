@@ -16366,3 +16366,5 @@ block 冪等元 `f_B` を `H`-部分と `G ∖ H`-部分に割るための道具
   OddOrder.RepresentationTheory.Modular.quotient_asAlgebraHom_eq_smul
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.centralCharacterAlg_eq_of_decompositionNumber_ne_zero
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.single_mem_center_of_forall_commute
