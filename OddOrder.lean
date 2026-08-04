@@ -18,6 +18,7 @@ import OddOrder.Algebra.GroupAlgebraIdeal
 import OddOrder.Algebra.BlockCornerInverse
 import OddOrder.Algebra.BlockCornerLift
 import OddOrder.Algebra.SubgroupTruncation
+import OddOrder.Algebra.TraceIsCompl
 import OddOrder.Algebra.AdicCompletePi
 import OddOrder.Algebra.IdempotentLift
 import OddOrder.Algebra.CenterGroupAlgebraHenselian

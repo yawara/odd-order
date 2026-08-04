@@ -1092,6 +1092,12 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               `W'` に帰納。⚠ 商でなく**不変補元**を使うのが要点 (標数 0 なので Maschke が
               効き、SES に沿ったトレース加法性を自作せずに済む)。
               block 対角性の conjunct も同じ帰納法に乗る。
+              - [x] **トレースの分裂** — 完了 (2026-08-04、`Algebra/TraceIsCompl.lean`)。
+                    🎯 `trace_eq_add_trace_restrict_of_isCompl`: 互いに補な不変部分空間
+                    `IsCompl W W'` に沿って `tr f = tr f|_W + tr f|_{W'}`。
+                    mathlib の `DirectSum.isInternal_submodule_iff_isCompl` (`Fin 2` 添字) →
+                    `LinearMap.trace_eq_sum_trace_restrict` → `Fin.sum_univ_two` の 3 手。
+                    帰納法のエンジン。
         - [ ] ⟹ (5.2) 本体の組み立て (上の 1.–3. を結線する)
 - [ ] **98: `(5.8)` + `(5.13.b,c,d)` (一般化分解数の直交関係) + block orthogonality**
 - [ ] **99: 🎯 第三主定理 `(6.7)`** — Okuyama の証明 ((6.1)–(6.6) 経由、非常に一般な形)

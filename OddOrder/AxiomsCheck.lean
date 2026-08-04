@@ -214,6 +214,7 @@ import OddOrder.Algebra.EigenTraceVanishing
 import OddOrder.Algebra.GroupAlgebraIdeal
 import OddOrder.Algebra.BlockCornerInverse
 import OddOrder.Algebra.BlockCornerLift
+import OddOrder.Algebra.TraceIsCompl
 import OddOrder.Algebra.AdicCompletePi
 import OddOrder.Algebra.IdempotentLift
 import OddOrder.Algebra.CenterGroupAlgebraHenselian
@@ -16368,3 +16369,5 @@ block 冪等元 `f_B` を `H`-部分と `G ∖ H`-部分に割るための道具
   OddOrder.RepresentationTheory.Modular.centralCharacterAlg_eq_of_decompositionNumber_ne_zero
 #assert_only_allowed_axioms
   OddOrder.GroupAlgebra.single_mem_center_of_forall_commute
+#assert_only_allowed_axioms
+  OddOrder.trace_eq_add_trace_restrict_of_isCompl
