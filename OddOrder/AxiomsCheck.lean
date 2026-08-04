@@ -16469,3 +16469,5 @@ system で証明される. -/
   OddOrder.RepresentationTheory.Modular.exists_isIdempotentElem_blockCharacterPi_eq_single
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_eq_zero_of_inducedBlockOfCentralizer_ne
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_generalizedDecompositionNumber_inducedBlockOfCentralizer

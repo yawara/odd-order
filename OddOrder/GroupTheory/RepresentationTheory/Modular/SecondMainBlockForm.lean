@@ -32,6 +32,8 @@ decomposition numbers of `χ ∈ Irr(B)` are supported on the blocks of `C_G(x)`
   — Navarro (5.8)
 * `..._eq_zero_of_inducedBlockOfCentralizer_ne` — Navarro (5.8), with the block idempotents
   produced rather than assumed
+* `..._sum_generalizedDecompositionNumber_inducedBlockOfCentralizer` — Navarro (5.8) as the
+  textbook states it, as a sum over the blocks inducing the block of `χ`
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -238,5 +240,60 @@ theorem generalizedDecompositionNumber_eq_zero_of_inducedBlockOfCentralizer_ne (
     hnilH hnilG hω hω' hζ hζk hζK σ hLinv hEnd hfBi hfBcc hfbi hfbcc
     (blockCharacter_toLinearMap_inducedBlockOfCentralizer x π hπ hlin πG hπG hlinG hnilG hp hx _)
     hj.symm rfl
+
+set_option maxHeartbeats 1000000 in
+-- As above.
+open scoped Classical in
+/-- **Navarro (5.8), as the textbook states it.**  For `y ∈ C_G(x)` a `p'`-element,
+
+`χ(xy) = ∑ d^x_{χμ} μ(y)`,  the sum over `μ ∈ IBr(b)` for the blocks `b` of `C_G(x)` inducing the
+block of `χ`.
+
+This is (5.1) — which expands `χ(xy)` over all of `IBr(C_G(x))` — with the terms outside those
+blocks deleted by `generalizedDecompositionNumber_eq_zero_of_inducedBlockOfCentralizer_ne`. -/
+theorem sum_generalizedDecompositionNumber_inducedBlockOfCentralizer (hp : p.Prime)
+    {x : G} (hx : IsPElement p x) [Fintype ↥(centralizerOf x)]
+    (e : MonoidAlgebra K ↥(centralizerOf x) ≃ₐ[K] ∀ i, Matrix (m i) (m i) K)
+    {πG : MonoidAlgebra (ResidueField 𝒪) G →+* ∀ j, Matrix (nnG j) (nnG j) (ResidueField 𝒪)}
+    (hπG : Function.Surjective πG)
+    (hlinG : ∀ (c : ResidueField 𝒪) (a : MonoidAlgebra (ResidueField 𝒪) G), πG (c • a) = c • πG a)
+    {π : MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf x) →+*
+      ∀ j, Matrix (nn j) (nn j) (ResidueField 𝒪)}
+    (hπ : Function.Surjective π)
+    (hlin : ∀ (c : ResidueField 𝒪) (a : MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf x)),
+      π (c • a) = c • π a)
+    (hkerJ : RingHom.ker π = Ring.jacobson (MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf x)))
+    (hnilH : ∀ z : Subalgebra.center (ResidueField 𝒪)
+      (MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf x)),
+      blockCharacterPi π hπ hlin z = 0 → IsNilpotent z)
+    (hnilG : ∀ z : Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) G),
+      blockCharacterPi πG hπG hlinG z = 0 → IsNilpotent z)
+    {ω : 𝒪} (hω : IsPrimitiveRoot ω (pRegularExponent p ↥(centralizerOf x)))
+    {ω' : ResidueField 𝒪} (hω' : IsPrimitiveRoot ω' (pRegularExponent p ↥(centralizerOf x)))
+    {ζ : 𝒪} (hζ : ζ ^ p = 1) (hζk : residue 𝒪 ζ = 1) (hζK : algebraMap 𝒪 K ζ ≠ 1)
+    (σ : Representation K G V) {L : Submodule 𝒪 V} [L.IsLattice K] [Nontrivial ↥L]
+    (hLinv : ∀ (g : G), ∀ v ∈ L, σ g v ∈ L)
+    (hEnd : ∀ E : Module.End K (K ⊗[𝒪] ↥L),
+      (∀ a : MonoidAlgebra 𝒪 G, E * LinearMap.baseChange K
+          ((latticeRepresentation σ hLinv).asAlgebraHom a)
+        = LinearMap.baseChange K ((latticeRepresentation σ hLinv).asAlgebraHom a) * E) →
+      ∃ c : K, E = c • LinearMap.id)
+    {y : ↥(centralizerOf x)} (hy : IsPRegular p y) :
+    ∑ φ ∈ Finset.univ.filter (fun φ : ι =>
+        inducedBlockOfCentralizer x π hπ hlin πG hπG hlinG hnilG hp hx
+            (Quotient.mk (blockSetoid π hπ hlin) φ)
+          = blockOfLattice K ((latticeRepresentation σ hLinv).asAlgebraHom) hEnd
+              residue_surjective πG hπG hlinG hnilG),
+      generalizedDecompositionNumber (𝒪 := 𝒪) (nn := nn) x hp hω' hπ hlin hkerJ
+          (fun g => LinearMap.trace K V (σ g))
+          (fun _ _ hgh => character_eq_of_isConj σ hgh) φ
+        * algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π φ y)
+      = LinearMap.trace K V (σ (x * (y : G))) := by
+  rw [Finset.sum_filter_of_ne fun φ _ hne => ?_]
+  · exact sum_generalizedDecompositionNumber x hp hω' hπ hlin hkerJ _ _ hy
+  · by_contra hcon
+    exact hne (by
+      rw [generalizedDecompositionNumber_eq_zero_of_inducedBlockOfCentralizer_ne hp hx e hπG hlinG
+        hπ hlin hkerJ hnilH hnilG hω hω' hζ hζk hζK σ hLinv hEnd hcon, zero_mul])
 
 end OddOrder.RepresentationTheory.Modular
