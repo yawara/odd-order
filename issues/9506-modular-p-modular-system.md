@@ -1342,9 +1342,35 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         - **Okuyama 経路 ((6.6)) の前提を精読 (2026-08-05)**: (6.3)–(6.6) は Chapter 2 の
           `~` 関数と Lemma (2.15)、Chapter 3 の (3.20)/(3.21) 付値/(3.22)/(3.24) height を
           使う。**defect group と height の理論一式**が前提になる (重い)。
-        - **⚠ 近道は無い (検討済)**: 「`Br_P(f_{B_0}) = f_{b_0}`」に帰着させる古典的な形も、
-          `Br_P(f_{B_0}) = Σ_{b^G = B_0} f_b` までしか出ず循環する。逆向きは genuine に
-          height (or それに代わる理論) を要求する。
+        - **⚠⚠ 訂正 (2026-08-05): 近道はあった — Külshammer 経路** (原文 p.128 で発見)。
+          Navarro 自身が (6.14) の直後に明記している:
+          「As we will see in the Problems, this gives an **alternative proof of the third main
+          theorem** (for subgroups `Q C_G(Q) ⊆ H ⊆ N_G(Q)`)」。
+          ⟹ **Okuyama / height / `~` 関数 / Brauer の指標判定法 (誘導定理) を一切通らない**。
+          しかも BS が使うのは `Q = ⟨t⟩` (`t` は involution)、`H = C_G(t) = C_G(Q)` なので
+          仮説 `Q C_G(Q) ⊆ H ⊆ N_G(Q)` はそのまま成立する。
+          **経路**:
+          * 🎯 **(6.14) Külshammer の公式**: `|G⁰|* e_{B₀} = π(Ĝ_p · Ĝ⁰)`、すなわち
+            `p`-正則な `g` で `e_g = |G⁰|*⁻¹ |{(x,y) ∈ G_p × G⁰ : xy = g}|*`、`p`-singular で `0`。
+            (`π : Z(FG) → Z(FG)` は `p`-正則類へ切り詰める線型射影。)
+          * **Problem (6.1)**: `g ∈ C_G(Q)` で
+            `|{(x,y) ∈ G_p × G⁰ : xy = g}| ≡ |{(x,y) ∈ C_G(Q)_p × C_G(Q)⁰ : xy = g}| (mod p)`。
+            ⚠ **`Q` の共役作用の固定点数え上げそのもの** = 既存の
+            `IsPGroup.card_modEq_card_fixedPoints` (`ClassCentralizerCount.lean` と同技法)。
+          * `|G⁰| ≡ |C_G(Q)⁰| (mod p)` も同じ数え上げ (固定点 = `C_G(Q)⁰`)。
+          * ⟹ `Br_Q(e_{B₀}) = e_{b₀}`。一方
+            `λ_b(Br_Q(e_{B₀})) = λ_b^G(e_{B₀}) = [b^G = B₀]` なので、
+            `b^G = B₀ ⟹ λ_b(e_{b₀}) = 1 ⟹ b = b₀`。**第三主定理の逆向き**。
+          **(6.14) の上流** (これが残る仕事):
+          * (4.22) `Ĝ_p = Σ_{P ∈ Syl_p(G)} P̂` (`Q` が Sylow に含まれる個数 ≡ 1 mod p)
+          * **Robinson 写像は定義**: `R(x) = Σ_{B} λ_B(x) e_B` (定理でない、原文 p.91)
+          * (4.19) `p`-正則類 `K` と類 `L` に対する `Σ_B λ_B(L̂) a_B(K)` の係数公式
+            (**Burnside の類積公式 + 直交関係**; ここが技術的中心)
+          * (4.23) `R(z) = π(Ĝ_p z)`
+          * (3.32) `u_χ f_B` の補題 ⟹ `λ_B(Ĝ⁰) = 0` (`B ≠ B₀`)、`λ_{B₀}(Ĝ⁰) = |G⁰|*`
+            (後者は既存の `aug_classSumCenter` + `not_dvd_card_isPRegular` で済む)
+          ⟹ **段 99(c) は「Brauer 誘導定理が要る」という見積りが誤りだった**。
+          初等的だが多段の古典計算 (Burnside 公式・Sylow 数え上げ) に置き換わる。
         - ⟹ **次の上流は Chapter 3 の defect / height**。(6.6) だけでなく (6.10)–(6.13) や
           Chapter 7 も height を使うので、いずれ通る道。
         - **既存の土台 (実測 2026-08-05)**: `Algebra/DefectGroup.lean` に
