@@ -1526,6 +1526,18 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               無償の特殊化債務だった)。
               ⟹ `(P̂·L̂)_u = |{x∈P : x⁻¹u ∈ L}|` から `u ∈ K` で和を取れば
               `|FactorThrough P K L|` になる。
+              [x] 🎯🎯🎯 **配線 (i) 完了 (2026-08-05、`RepresentationTheory/SylowSumClassCoeff`)**:
+              `sum_class_coeff_sylowSum_mul` —
+              **`∑_{u∈K}(W·L̂)(u) = |Syl_p|·∑_{x∈S}(K̂'·L̂)(x)`**。
+              ⚠⚠ **数え上げの全単射は不要だった**。両辺を「1 での係数」に書き直す
+              (`coeff_classSum_inv_mul_one` / `coeff_subgroupSum_mul_one`、いずれも
+              「和を単項式に分解して係数を読む」だけ) と、あとは `W` を展開して
+              各 `P̂` を共役で `Ŝ` に戻すだけの**純粋な代数**になる
+              (1 での係数は共役不変 = `coeff_conj_smul_one`、`K̂'`・`L̂` は中心的で動かない)。
+              当初見込んだ `FactorThrough`/`CosetPairs` の突き合わせ 3 本が丸ごと消えた。
+              残り = (ii) (4.19) の `𝒪` 版と合わせて `|K|` を約す (整域なので
+              `|K| ≠ 0` から素直)、(iii) `|Syl_p| ≡ 1 (mod p)` で還元、
+              (iv) `π` (p-正則類への切り詰め) と `R` の同定。
               ⚠ **設計上の注意 (2026-08-05 に検算)**: `Ĝ_p` を使って
               `|G|(Ĝ_p L̂)_g = ∑_i ω_i(L̂)(∑_{x∈G_p}χ_i(x))χ_i(g⁻¹)` と書く道もあるが、
               左辺の `|G|` に `p` が残るので還元で潰れる。**単一の Sylow `S` を使って
