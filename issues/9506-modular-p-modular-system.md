@@ -510,18 +510,56 @@ theorem"、(7.2)–(7.6) → 書籍 pp.139–146 が本証明)、**そのあと*
 `Cor (6.13)` / `Cor (5.8)` + 第三主定理 / `Lemma (5.13.b,c,d)` / block orthogonality /
 `(7.2)`–`(7.6)`。ここから逆に辿った**残り slice (段 92 以降)**:
 
-- [ ] **92: Cartan 行列 `C = DᵀD`** (段 63 の `D` から; 旧チェックリストの筆頭)
-- [ ] **93: block の完全な API + Brauer 対応 `b^G`** (段 88–91 の `Br_P` / defect group から。
+- [x] **92: 分解行列 `D` の well-defined 化** — 完了 (2026-08-04、`Modular/DecompositionNumber.lean`)。
+      段 63 の `exists_decomposition_trace` は `∃ d` までしか言わないので、`D` を行列にするには
+      一意性が要る。中身は段 56 の一次独立性で、実作業は配管 2 本:
+      🎯 `exists_pow_eq_zero_of_ker_eq_jacobson` (`ker π = J(kG)` → 核の一様冪零性。
+      `kG` は体上有限次元 ⟹ Artin ⟹ semiprimary、`isArtinian_of_tower` が要る) と
+      `AlgHom.mk'` + `AlgEquiv.refl` による bare `RingHom` の詰め替え。
+      🎯 `eq_of_sum_irreducibleBrauerCharacter_eq` / `existsUnique_decomposition_trace` /
+      `decompositionNumber` / `trace_eq_sum_decompositionNumber` / `eq_decompositionNumber`。
+
+### ⚠ 依存の訂正 (2026-08-04、実測) — Cartan 行列より **ordinary 側**が上流
+
+上のリストは当初「92 = Cartan 行列」を筆頭に置いたが、**それは順序として誤り**。
+Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cartan 行列を作るには
+`D` の行添字 = **`Irr(G)`** が要る。ところが repo の modular 側は今のところ
+「1 つの格子表現 `ρ` の分解数」までしか持たず、`Irr(G)` を添字集合として持っていない。
+さらに `(6.13)` が要求する `Irr(B)` (ブロックごとの ordinary 指標) には
+**`Irr(G) → Bl(G)` の block 写像**が要る。⟹ **ordinary 側の整備が Cartan 行列の上流**。
+
+**着手前調査の結果 (2026-08-04 実測、再調査不要)** — 素材は思ったより揃っている:
+
+* `OddOrder/Algebra/CentralCharacter.lean` — 中心指標 `ω_i : Z(A) →+* k` は
+  **任意の体・任意の行列積への全射**で構築済 (`exists_scalar_of_mem_center` /
+  `centralCharacter` / `SameBlock`)。
+* `OddOrder/Algebra/BlockIdempotent.lean` — `Block π hπ hlin` = Wedderburn 添字を
+  「中心指標が一致」で割った商。ブロック冪等元・原始性・完全直交系・defect group まで。
+* `RepresentationTheory/CenterClassSumBasis.lean` — `Z(k[G])` の類和基底 (`centerBasis`)。
+  **一般体で書かれている** (2026-08-04 の dedup で `CommSemiring` まで一般化)。
+* `Modular/InvariantLattice.lean` — `exists_invariant_lattice` (`K`-表現は `𝒪`-格子を持つ)。
+  repo で `K = Frac(𝒪)` 側に触れている唯一のファイル。
+* repo の ordinary 指標論 116 leaf のうち **約半数 (50) は `[Field k]` で一般体**、
+  58 が ℂ 固定。`Center*` クラスタは前者。
+
+**⟹ 次の段 (93) = `𝒪`-側の中心指標と ordinary 指標の block**。`𝒪`-格子表現の中心指標が
+`𝒪` 値であることは、`ρ` が `K` 上絶対既約なら Schur で `K`-スカラーになり、格子を保つので
+基底で見て `𝒪` に入る、で出る (Navarro の「代数的整数だから」という議論は `𝒪`-格子の
+定式化では不要になる)。そのあと `mod 𝔪` で `Z(kG)` の中心指標 = ブロックが決まる。
+
+- [ ] **93: `𝒪`-側の中心指標 → `Irr(G) → Bl(G)` の block 写像** (上記; Cartan 行列の上流)
+- [ ] **94: Cartan 行列 `C = DᵀD`** + `([φ,θ]⁰)` が逆行列であること ((7.6) が使う)
+- [ ] **95: Brauer 対応 `b^G`** (段 88–91 の `Br_P` / defect group から。
       `(5.6)`/`(5.7)` = `b^G` の well-defined 性)
-- [ ] **94: 一般化分解数 `d^x_{χμ}`** (`p`-元 `x` について。`(5.1)` = `p`-section 上の展開)
-- [ ] **95: 🎯 第二主定理 `(5.2)`** — `χ(xy) = Σ_μ d^x_{χμ} μ(y)`。
+- [ ] **96: 一般化分解数 `d^x_{χμ}`** (`p`-元 `x` について。`(5.1)` = `p`-section 上の展開)
+- [ ] **97: 🎯 第二主定理 `(5.2)`** — `χ(xy) = Σ_μ d^x_{χμ} μ(y)`。
       Navarro は Isaacs による "elementary" proof (Juhász–Tsushima 由来) を採用 (Preface)
-- [ ] **96: `(5.8)` + `(5.13.b,c,d)` (一般化分解数の直交関係) + block orthogonality**
-- [ ] **97: 🎯 第三主定理 `(6.7)`** — Okuyama の証明 ((6.1)–(6.6) 経由、非常に一般な形)
-- [ ] **98: `(6.10)` `ker(B) = O_{p'}(ker χ)` → `(6.12)` → 🎯 `(6.13)`**
+- [ ] **98: `(5.8)` + `(5.13.b,c,d)` (一般化分解数の直交関係) + block orthogonality**
+- [ ] **99: 🎯 第三主定理 `(6.7)`** — Okuyama の証明 ((6.1)–(6.6) 経由、非常に一般な形)
+- [ ] **100: `(6.10)` `ker(B) = O_{p'}(ker χ)` → `(6.12)` → 🎯 `(6.13)`**
       (normal `p`-complement ⟺ `IBr(B₀)` 単元、Cartan 行列 `(|G|_p)`)
-- [ ] **99: `(7.2)` Klein four Sylow-2 / `(7.3)` basic set / `(7.4)` / `(7.5)` / `(7.6)`**
-- [ ] **100: 🎯🎯🎯 BS 本証明 (pp.139–146)** → `brauerSuzuki_quaternionSylow_q8` の `sorry` 置換
+- [ ] **101: `(7.2)` Klein four Sylow-2 / `(7.3)` basic set / `(7.4)` / `(7.5)` / `(7.6)`**
+- [ ] **102: 🎯🎯🎯 BS 本証明 (pp.139–146)** → `brauerSuzuki_quaternionSylow_q8` の `sorry` 置換
 
 ⚠ 上記の番号は Navarro の結果番号であって段番号ではない (段番号は連番で振り直す)。
 ⚠ 数式は OCR 崩れが重いので、各段の statement は `references/navarro/pages/*.png` で確定する
