@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.Algebra.AugmentationIdeal
 import OddOrder.GroupTheory.RepresentationTheory.CenterSplitting
 import OddOrder.GroupTheory.RepresentationTheory.PiAlgebraAut
 
@@ -206,10 +207,10 @@ coordinate `i₀`; invariance then forces `simplesAction φ α i₀ = i₀` for 
 /-- The **augmentation** of `Z(k[G])`: `MonoidAlgebra.lift 1` (sending `single g c ↦ c`) restricted
 to the centre — the trivial central character, as a `k`-algebra hom `Z(k[G]) →ₐ[k] k`. -/
 noncomputable def aug : Subalgebra.center k (MonoidAlgebra k G) →ₐ[k] k :=
-  (MonoidAlgebra.lift k k G 1).comp (Subalgebra.center k (MonoidAlgebra k G)).val
+  (OddOrder.Algebra.augmentation k G).comp (Subalgebra.center k (MonoidAlgebra k G)).val
 
 theorem aug_apply (z : Subalgebra.center k (MonoidAlgebra k G)) :
-    aug z = MonoidAlgebra.lift k k G 1 (z : MonoidAlgebra k G) := rfl
+    aug z = OddOrder.Algebra.augmentation k G (z : MonoidAlgebra k G) := rfl
 
 /-- The augmentation `MonoidAlgebra.lift 1` is unchanged by the basis permutation `domCongrAut α`:
 both algebra homs `k[G] →ₐ[k] k` send each `single g 1 ↦ 1`. -/

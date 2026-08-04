@@ -256,11 +256,11 @@ theorem IsUnitBasis.basis_apply (hb : IsUnitBasis H) (h : H) :
 
 /-- 増大写像 `δ` が単元群の上に誘導する準同型 `U(ℤ[G]) →* ℤˣ = {±1}`。 -/
 noncomputable def augUnits : (MonoidAlgebra ℤ G)ˣ →* ℤˣ :=
-  Units.map (augmentation G : MonoidAlgebra ℤ G →+* ℤ)
+  Units.map (augmentation ℤ G : MonoidAlgebra ℤ G →+* ℤ)
 
 @[simp]
 theorem augUnits_coe (u : (MonoidAlgebra ℤ G)ˣ) :
-    ((augUnits u : ℤˣ) : ℤ) = augmentation G (u : MonoidAlgebra ℤ G) := rfl
+    ((augUnits u : ℤˣ) : ℤ) = augmentation ℤ G (u : MonoidAlgebra ℤ G) := rfl
 
 /-- `ℤˣ` を `ℤ[G]` の (中心的な) 単元として埋め込む。 -/
 noncomputable def unitsAlgebraMap : ℤˣ →* (MonoidAlgebra ℤ G)ˣ :=
@@ -308,7 +308,7 @@ theorem coe_augNormalize (u : (MonoidAlgebra ℤ G)ˣ) :
 
 /-- 正規化した単元の増大は `1`: `δ(δ(u) u) = δ(u)² = 1`. -/
 theorem augmentation_augNormalize (u : (MonoidAlgebra ℤ G)ˣ) :
-    augmentation G ((augNormalize u : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G)
+    augmentation ℤ G ((augNormalize u : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G)
       = 1 := by
   rw [coe_augNormalize, map_smul, smul_eq_mul, ← augUnits_coe]
   rcases Int.units_eq_one_or (augUnits u) with h | h <;> rw [h] <;> decide
@@ -323,7 +323,7 @@ theorem IsUnitBasis.neg_one_notMem (hb : IsUnitBasis H) :
     have : ((-1 : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G) = 1 := by rw [h, Units.val_one]
     rw [Units.val_neg, Units.val_one] at this
     exact (by decide : ¬ (-1 : ℤ) = 1)
-      (by simpa using congrArg (augmentation G) this)
+      (by simpa using congrArg (augmentation ℤ G) this)
   set i : H := ⟨-1, hmem⟩ with hi
   set j : H := ⟨1, H.one_mem⟩ with hj
   have hij : i ≠ j := fun h => hne (congrArg Subtype.val h)
@@ -360,7 +360,7 @@ theorem IsUnitBasis.injective_augNormalize (hb : IsUnitBasis H) :
 `ℤ`-基底でもあり増大がすべて `1` の部分群 `K ≤ U(ℤ[G])` が存在する。 -/
 theorem exists_isUnitBasis_augmentation_eq_one (hb : IsUnitBasis H) :
     ∃ K : Subgroup (MonoidAlgebra ℤ G)ˣ, Nonempty (H ≃* K) ∧ IsUnitBasis K ∧
-      ∀ k ∈ K, augmentation G ((k : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G)
+      ∀ k ∈ K, augmentation ℤ G ((k : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G)
         = 1 := by
   classical
   set f : H →* (MonoidAlgebra ℤ G)ˣ := augNormalize.comp H.subtype with hf
@@ -442,9 +442,9 @@ theorem bijective_unitBasisAlgHom (hb : IsUnitBasis H) :
 
 /-- 増大の正規化 `δ_G(h) = 1` のもとで `δ_G ∘ Φ = δ_H`。 -/
 theorem augmentation_comp_unitBasisAlgHom
-    (hδ : ∀ h : H, augmentation G ((h : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G)
+    (hδ : ∀ h : H, augmentation ℤ G ((h : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G)
       = 1) :
-    (augmentation G).comp (unitBasisAlgHom H) = augmentation ↥H := by
+    (augmentation ℤ G).comp (unitBasisAlgHom H) = augmentation ℤ ↥H := by
   refine MonoidAlgebra.algHom_ext ?_ (Subsingleton.elim _ _)
   intro h
   have h1 : MonoidAlgebra.single h (1 : ℤ) = MonoidAlgebra.of ℤ ↥H h := rfl
@@ -463,28 +463,28 @@ theorem unitBasisLinearEquiv_apply (hb : IsUnitBasis H)
 
 /-- `Φ (Δ(H)) = Δ(G)`. -/
 theorem map_augmentationIdeal (hb : IsUnitBasis H)
-    (hδ : ∀ h : H, augmentation G ((h : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G)
+    (hδ : ∀ h : H, augmentation ℤ G ((h : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G)
       = 1) :
     Submodule.map (unitBasisLinearEquiv hb).toLinearMap (augmentationIdeal ↥H)
       = augmentationIdeal G := by
   have hcomm : ∀ α : MonoidAlgebra ℤ ↥H,
-      augmentation G (unitBasisAlgHom H α) = augmentation ↥H α := fun α =>
+      augmentation ℤ G (unitBasisAlgHom H α) = augmentation ℤ ↥H α := fun α =>
     congrArg (fun f => f α) (augmentation_comp_unitBasisAlgHom hδ)
   apply le_antisymm
   · rintro _ ⟨α, hα, rfl⟩
-    have hα' : augmentation ↥H α = 0 := hα
-    have hgoal : augmentation G (unitBasisAlgHom H α) = 0 := by rw [hcomm, hα']
+    have hα' : augmentation ℤ ↥H α = 0 := hα
+    have hgoal : augmentation ℤ G (unitBasisAlgHom H α) = 0 := by rw [hcomm, hα']
     exact hgoal
   · intro y hy
     obtain ⟨α, rfl⟩ := (bijective_unitBasisAlgHom hb).2 y
     refine ⟨α, ?_, rfl⟩
-    change augmentation ↥H α = 0
+    change augmentation ℤ ↥H α = 0
     rw [← hcomm]
     exact hy
 
 /-- `Δ(H)` から `Δ(G)` への `Φ` の制限 (線形同値)。 -/
 noncomputable def augmentationIdealEquiv (hb : IsUnitBasis H)
-    (hδ : ∀ h : H, augmentation G ((h : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G)
+    (hδ : ∀ h : H, augmentation ℤ G ((h : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G)
       = 1) :
     ↥(augmentationIdeal ↥H) ≃ₗ[ℤ] ↥(augmentationIdeal G) :=
   (Submodule.equivMapOfInjective (unitBasisLinearEquiv hb).toLinearMap
@@ -493,14 +493,14 @@ noncomputable def augmentationIdealEquiv (hb : IsUnitBasis H)
 
 @[simp]
 theorem augmentationIdealEquiv_coe (hb : IsUnitBasis H)
-    (hδ : ∀ h : H, augmentation G ((h : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G)
+    (hδ : ∀ h : H, augmentation ℤ G ((h : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G)
       = 1) (α : ↥(augmentationIdeal ↥H)) :
     ((augmentationIdealEquiv hb hδ α : ↥(augmentationIdeal G)) :
       MonoidAlgebra ℤ G) = unitBasisAlgHom H (α : MonoidAlgebra ℤ ↥H) := rfl
 
 /-- `Φ (Δ(H)Δ(H)) = Δ(G)Δ(G)`. -/
 theorem map_mul_augmentationIdeal (hb : IsUnitBasis H)
-    (hδ : ∀ h : H, augmentation G ((h : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G)
+    (hδ : ∀ h : H, augmentation ℤ G ((h : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G)
       = 1) :
     Submodule.map (unitBasisAlgHom H).toLinearMap
         (augmentationIdeal ↥H * augmentationIdeal ↥H)
@@ -526,7 +526,7 @@ theorem map_mul_augmentationIdeal (hb : IsUnitBasis H)
 
 /-- `Φ (Δ(H)²) = Δ(G)²` (部分加群 `augmentationIdealSq` のレベルで)。 -/
 theorem map_augmentationIdealSq (hb : IsUnitBasis H)
-    (hδ : ∀ h : H, augmentation G ((h : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G)
+    (hδ : ∀ h : H, augmentation ℤ G ((h : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G)
       = 1) :
     Submodule.map (augmentationIdealEquiv hb hδ).toLinearMap
         (augmentationIdealSq ↥H)
@@ -549,7 +549,7 @@ theorem map_augmentationIdealSq (hb : IsUnitBasis H)
 
 /-- `Δ(H)/Δ(H)² ≅ Δ(G)/Δ(G)²`. -/
 noncomputable def augmentationQuotientEquiv (hb : IsUnitBasis H)
-    (hδ : ∀ h : H, augmentation G ((h : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G)
+    (hδ : ∀ h : H, augmentation ℤ G ((h : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G)
       = 1) :
     AugmentationQuotient ↥H ≃ₗ[ℤ] AugmentationQuotient G :=
   Submodule.Quotient.equiv _ _ (augmentationIdealEquiv hb hδ)
@@ -558,7 +558,7 @@ noncomputable def augmentationQuotientEquiv (hb : IsUnitBasis H)
 /-- **Isaacs Problem 10C.4 (正規化された場合)**: `δ_G(h) = 1` (`∀ h ∈ H`) なら
 `H/H' ≅ G/G'`。 -/
 noncomputable def abelianizationEquivOfNormalized (hb : IsUnitBasis H)
-    (hδ : ∀ h : H, augmentation G ((h : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G)
+    (hδ : ∀ h : H, augmentation ℤ G ((h : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G)
       = 1) :
     Abelianization ↥H ≃* Abelianization G :=
   (abelianizationEquivAugmentationQuotient ↥H).trans

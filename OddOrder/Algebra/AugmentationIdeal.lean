@@ -24,7 +24,7 @@ principal ideal theorem (Thm 10.18, Furtwängler) と Alperin-Kuo (Cor 10.28) �
 
 ## Main definitions
 
-* `augmentation G : MonoidAlgebra ℤ G →ₐ[ℤ] ℤ` — 係数和の環準同型。
+* `augmentation ℤ G : MonoidAlgebra ℤ G →ₐ[ℤ] ℤ` — 係数和の環準同型。
 * `augmentationIdeal G : Submodule ℤ (MonoidAlgebra ℤ G)` — `Δ(G) = ker δ`。
   Isaacs の議論は加法群+積 (`Submodule.mul`) レベルなので、非可換群環でも
   扱える `ℤ`-submodule として持つ (two-sided ideal 性は補題で)。
@@ -41,30 +41,40 @@ namespace OddOrder.Algebra
 
 open MonoidAlgebra
 
-variable (G : Type*) [Group G]
+section Augmentation
 
-/-- The **augmentation homomorphism** `δ : ℤ[G] → ℤ`, summing the coefficients:
+variable (R : Type*) [CommRing R] (G : Type*) [Group G]
+
+/-- The **augmentation homomorphism** `δ : R[G] → R`, summing the coefficients:
 `δ (∑ e_g · g) = ∑ e_g`. Realized as the lift of the trivial homomorphism
-`G →* ℤ`. -/
-noncomputable def augmentation : MonoidAlgebra ℤ G →ₐ[ℤ] ℤ :=
-  MonoidAlgebra.lift ℤ ℤ G 1
+`G →* R`.
+
+The integral group ring (`R = ℤ`) is the case Isaacs §10C uses; over a general base the
+restriction to the centre is the trivial central character, which names the principal block
+(`OddOrder.GroupTheory.CenterSimplesOrbit.aug`). -/
+noncomputable def augmentation : MonoidAlgebra R G →ₐ[R] R :=
+  MonoidAlgebra.lift R R G 1
 
 @[simp]
-theorem augmentation_of (g : G) : augmentation G (MonoidAlgebra.of ℤ G g) = 1 := by
+theorem augmentation_of (g : G) : augmentation R G (MonoidAlgebra.of R G g) = 1 := by
   simp [augmentation]
 
 @[simp]
-theorem augmentation_single (g : G) (c : ℤ) :
-    augmentation G (MonoidAlgebra.single g c) = c := by
+theorem augmentation_single (g : G) (c : R) :
+    augmentation R G (MonoidAlgebra.single g c) = c := by
   rw [augmentation, MonoidAlgebra.lift_single]
   simp
 
+end Augmentation
+
+variable (G : Type*) [Group G]
+
 /-- The **augmentation ideal** `Δ(G) = ker δ`, as a `ℤ`-submodule of `ℤ[G]`. -/
 noncomputable def augmentationIdeal : Submodule ℤ (MonoidAlgebra ℤ G) :=
-  LinearMap.ker (augmentation G).toLinearMap
+  LinearMap.ker (augmentation ℤ G).toLinearMap
 
 theorem mem_augmentationIdeal_iff {G : Type*} [Group G] {α : MonoidAlgebra ℤ G} :
-    α ∈ augmentationIdeal G ↔ augmentation G α = 0 := Iff.rfl
+    α ∈ augmentationIdeal G ↔ augmentation ℤ G α = 0 := Iff.rfl
 
 theorem sub_one_mem_augmentationIdeal (g : G) :
     MonoidAlgebra.of ℤ G g - 1 ∈ augmentationIdeal G := by
@@ -74,13 +84,13 @@ theorem sub_one_mem_augmentationIdeal (g : G) :
 of the `g - 1` (key computation for Lemma 10.19). -/
 theorem sub_augmentation_smul_one_mem_span {G : Type*} [Group G]
     (α : MonoidAlgebra ℤ G) :
-    α - (augmentation G α) • 1
+    α - (augmentation ℤ G α) • 1
       ∈ Submodule.span ℤ (Set.range fun g : G => MonoidAlgebra.of ℤ G g - 1) := by
   induction α using MonoidAlgebra.induction_linear with
   | zero => simp
   | add f g hf hg =>
-    have h1 : f + g - (augmentation G (f + g)) • 1
-        = (f - (augmentation G f) • 1) + (g - (augmentation G g) • 1) := by
+    have h1 : f + g - (augmentation ℤ G (f + g)) • 1
+        = (f - (augmentation ℤ G f) • 1) + (g - (augmentation ℤ G g) • 1) := by
       rw [map_add, add_smul]
       abel
     rw [h1]
@@ -90,7 +100,7 @@ theorem sub_augmentation_smul_one_mem_span {G : Type*} [Group G]
       simp only [MonoidAlgebra.of_apply]
       exact (MonoidAlgebra.smul_single' c g 1).trans (by rw [mul_one])
     have h1 : MonoidAlgebra.single g c
-        - (augmentation G (MonoidAlgebra.single g c)) • 1
+        - (augmentation ℤ G (MonoidAlgebra.single g c)) • 1
         = c • (MonoidAlgebra.of ℤ G g - 1) := by
       rw [augmentation_single, ← h2]
       exact (smul_sub c _ _).symm

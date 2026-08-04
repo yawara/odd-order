@@ -761,12 +761,12 @@ theorem augmentationCoquotientAlgHom_mapDomain (x : MonoidAlgebra ℤ G) :
 
 /-- The projection `π : ℤ[G] → ℤ[G/K]` preserves the augmentation. -/
 theorem augmentation_mapDomain (x : MonoidAlgebra ℤ G) :
-    augmentation (G ⧸ K)
+    augmentation ℤ (G ⧸ K)
         (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K) x)
-      = augmentation G x := by
-  have hcomp : (augmentation (G ⧸ K)).comp
+      = augmentation ℤ G x := by
+  have hcomp : (augmentation ℤ (G ⧸ K)).comp
       (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K))
-      = augmentation G := by
+      = augmentation ℤ G := by
     refine MonoidAlgebra.algHom_ext (fun g => ?_) (Subsingleton.elim _ _)
     simp only [AlgHom.coe_comp, Function.comp_apply,
       MonoidAlgebra.mapDomainAlgHom_apply, MonoidAlgebra.mapDomain_single,
@@ -917,10 +917,10 @@ def quotientCommGroup (h : _root_.commutator G ≤ K) : CommGroup (G ⧸ K) :=
 (Isaacs' `U` in the proof of Theorem 10.25). -/
 noncomputable def augmentationRingIdeal :
     Ideal (MonoidAlgebra ℤ (G ⧸ K)) :=
-  RingHom.ker (augmentation (G ⧸ K)).toRingHom
+  RingHom.ker (augmentation ℤ (G ⧸ K)).toRingHom
 
 theorem mem_augmentationRingIdeal {γ : MonoidAlgebra ℤ (G ⧸ K)} :
-    γ ∈ augmentationRingIdeal G K ↔ augmentation (G ⧸ K) γ = 0 :=
+    γ ∈ augmentationRingIdeal G K ↔ augmentation ℤ (G ⧸ K) γ = 0 :=
   RingHom.mem_ker
 
 /-- The augmentation ring ideal `Δ(G/K)` and the `ℤ`-submodule
@@ -1230,10 +1230,10 @@ coefficients: `δ(∑_q e_q·f(q)) = ∑_q e_q`. -/
 theorem augmentation_sectionWeightedSum [K.FiniteIndex] (e : G ⧸ K → ℤ)
     (f : G ⧸ K → G) :
     letI := K.fintypeQuotientOfFiniteIndex
-    augmentation G (sectionWeightedSum G K e f) = ∑ q : G ⧸ K, e q := by
+    augmentation ℤ G (sectionWeightedSum G K e f) = ∑ q : G ⧸ K, e q := by
   letI := K.fintypeQuotientOfFiniteIndex
   rw [sectionWeightedSum, map_sum]
-  exact Finset.sum_congr rfl fun q _ => augmentation_single G (f q) (e q)
+  exact Finset.sum_congr rfl fun q _ => augmentation_single ℤ G (f q) (e q)
 
 /-- **Isaacs Theorem 10.25** (core, pp. 316-317): there is `c` with
 `|G:K|·c = |G:G'|` such that `c` annihilates `Ξ = transferXi`. -/
@@ -1272,15 +1272,15 @@ theorem exists_annihilator_transferXi [Finite G] (h : _root_.commutator G ≤ K)
   have hconst : ∀ q, e q = c :=
     fun q => sectionWeightedSum_coeff_const G K hf hεann q _
   -- `δ(ε) = c·|G:K|` and `δ(ε) = δ(γ) = |G:G'|`
-  have hδε : augmentation G (sectionWeightedSum G K e f)
+  have hδε : augmentation ℤ G (sectionWeightedSum G K e f)
       = (Nat.card (G ⧸ K) : ℤ) * c := by
     rw [augmentation_sectionWeightedSum G K e f]
     rw [Finset.sum_congr rfl fun q _ => hconst q, Finset.sum_const,
       Finset.card_univ, Nat.card_eq_fintype_card, nsmul_eq_mul]
-  have hδγ : augmentation G (sectionWeightedSum G K e f)
+  have hδγ : augmentation ℤ G (sectionWeightedSum G K e f)
       = (Nat.card (Abelianization G) : ℤ) := by
     rw [← augmentation_mapDomain G K, hπε]
-    have hmem : augmentation (G ⧸ K) (γ
+    have hmem : augmentation ℤ (G ⧸ K) (γ
         - (Nat.card (Abelianization G) : MonoidAlgebra ℤ (G ⧸ K))) = 0 :=
       (mem_augmentationRingIdeal G K).mp hγcong
     rw [map_sub, sub_eq_zero] at hmem

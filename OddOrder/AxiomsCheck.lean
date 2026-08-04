@@ -16516,7 +16516,7 @@ Wedderburn 成分に対して**証明**する. -/
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_character_blockOfIrr_eq_zero
 #assert_only_allowed_axioms
-  OddOrder.RepresentationTheory.Modular.principalCentralCharacter_classSumCenter
+  OddOrder.RepresentationTheory.Modular.aug_classSumCenter
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.principalBlock
 #assert_only_allowed_axioms

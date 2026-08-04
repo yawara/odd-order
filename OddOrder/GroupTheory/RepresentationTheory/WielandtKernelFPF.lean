@@ -179,7 +179,9 @@ theorem symm_single_eq_average {i₀ : Fin N} (haug : ∀ z, φ z i₀ = aug z) 
   have hstep : a * φ.symm (Pi.single i₀ 1) = a := by
     apply Subtype.ext
     change average k G * ((φ.symm (Pi.single i₀ 1) : _) : MonoidAlgebra k G) = average k G
-    rw [average_mul, ← aug_apply, haug1, one_smul]
+    rw [average_mul, show MonoidAlgebra.lift k k G 1
+        ((φ.symm (Pi.single i₀ 1) : Subalgebra.center k (MonoidAlgebra k G)) : MonoidAlgebra k G)
+        = aug (φ.symm (Pi.single i₀ 1)) from rfl, haug1, one_smul]
   -- Apply `φ`: `φ a * Pi.single i₀ 1 = φ a`, hence `φ a = Pi.single i₀ (φ a i₀)`.
   have hφstep : φ a * Pi.single i₀ 1 = φ a := by
     conv_lhs => rw [show (Pi.single i₀ 1 : Fin N → k) = φ (φ.symm (Pi.single i₀ 1)) from
