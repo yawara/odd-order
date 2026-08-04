@@ -216,6 +216,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionOfOrdinary
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIdempotent
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrrCount

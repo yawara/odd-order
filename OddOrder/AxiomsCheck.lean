@@ -247,6 +247,7 @@ import OddOrder.GroupTheory.PFactorPairCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
 import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIdempotent
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
 import OddOrder.Algebra.PElementSum
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
@@ -16843,3 +16844,10 @@ Navarro (4.19) がブロックごとに再編する係数の出どころ。 -/
   OddOrder.RepresentationTheory.Modular.sum_ordinaryIdempotent
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.eq_sum_centralScalar_smul_ordinaryIdempotent
+
+/-! **2 つの中心指標の一致** (`Modular/CentralScalarBridge`) —
+格子側 `ω^L_i` (`𝒪` 値、`blockOfIrr` の定義に使う) と Wedderburn 側 `ω^K_i` (`K` 値、
+Burnside 公式が使う) は `algebraMap` で一致する。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.algebraMap_centralScalar_eq
