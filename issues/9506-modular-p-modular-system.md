@@ -1436,8 +1436,17 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               🎯🎯 `eq_sum_centralScalar_smul_ordinaryIdempotent` (**`z = ∑_i ω_i(z) e_{χ_i}`**)。
               ⚠ 後者は「**通常側の Robinson 写像は恒等写像**」ということ (`Z(K[G])` が
               半単純だから)。剰余体側で恒等でなくなる分が (4.23) の中身。
-              残り = `e_B = (Σ_{χ∈Irr(B)} e_χ)` の還元 (= ブロック冪等元の整数性、Ch.3)、
+              [x] **2 つの中心指標の一致 (2026-08-05、`Modular/CentralScalarBridge.lean`)**:
+              🎯🎯 `algebraMap_centralScalar_eq` — 格子側 `ω^L_i` (`𝒪` 値、`blockOfIrr` の定義)
+              と Wedderburn 側 `ω^K_i` (`K` 値、Burnside 公式) が `algebraMap` で一致。
+              ⚠ **格子側で定義された `blockOfIrr` の分割を Wedderburn 側で読むための橋**。
+              証明は「格子は張る」の定型 (既存 `asAlgebraHom_eq_zero_of_latticeRepresentation`
+              + `asAlgebraHom_wedderburnRepresentation`)。
+              残り = `e_B = (Σ_{χ∈Irr(B)} e_χ)` の還元 (= ブロック冪等元の整数性)、
               類の defect `d(K)` の付値計算、そして (4.19) の組み立て。
+              ⚠ 前者は既存の `BlockIdempotentLift.exists_isIdempotentElem_blockCharacterPi_eq_single`
+              (`e_B` の `Z(𝒪G)` への持ち上げ) + スペクトル分解 + 上の橋で
+              「持ち上げの `K` 像 = `Σ_{i ∈ Irr(B)} e_{χ_i}`」を出す道筋になる。
           * [ ] (3.32) `u_χ f_B` の補題 ⟹ `λ_B(Ĝ⁰) = 0` (`B ≠ B₀`)。
             `λ_{B₀}(Ĝ⁰) = |G⁰|*` は既存の `aug` + `not_dvd_card_isPRegular` で済む。
           ⟹ **見通し**: (4.19) が 2-3 段、(4.23)+(3.32)+(6.14)+(6.1) で 3-4 段。
