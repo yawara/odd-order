@@ -16390,3 +16390,7 @@ block 冪等元 `f_B` を `H`-部分と `G ∖ H`-部分に割るための道具
   OddOrder.RepresentationTheory.Modular.blockRepresentation_asAlgebraHom_center
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.trace_asAlgebraHom_center_mul
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.trace_asAlgebraHom_center_center_mul
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.centralCharacterAlg_eq_zero_or_one_of_isIdempotentElem

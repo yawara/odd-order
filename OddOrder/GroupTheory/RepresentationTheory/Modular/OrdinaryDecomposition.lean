@@ -234,6 +234,43 @@ theorem trace_asAlgebraHom_center_mul {V : Type*} [AddCommGroup V] [Module K V]
     map_smul, smul_eq_mul]
   ring
 
+omit hkerJ [Finite G] [NeZero (Nat.card G : K)] in
+/-- **Two central factors scale each term twice.**  Navarro (5.2) needs exactly this shape: `f_b`
+picks out the constituents in `b` and `x ∈ Z(H)` contributes the scalar `χ_i(x)/χ_i(1)`. -/
+theorem trace_asAlgebraHom_center_center_mul {V : Type*} [AddCommGroup V] [Module K V]
+    [FiniteDimensional K V] {ρ : Representation K G V} {d : ι → ℕ}
+    (hd : ∀ g : G, LinearMap.trace K V (ρ g)
+      = ∑ i, (d i : K) * LinearMap.trace K (nn i → K) (blockRepresentation π i g))
+    (z w : Subalgebra.center K (MonoidAlgebra K G)) (g : G) :
+    LinearMap.trace K V
+        (ρ.asAlgebraHom ((z : MonoidAlgebra K G) * ((w : MonoidAlgebra K G) * single g 1)))
+      = ∑ i, (d i : K) * MatrixModule.centralCharacterAlg π i hπ hlin z
+          * MatrixModule.centralCharacterAlg π i hπ hlin w
+          * LinearMap.trace K (nn i → K) (blockRepresentation π i g) := by
+  rw [trace_asAlgebraHom_center_mul hπ hlin hd z]
+  refine Finset.sum_congr rfl fun i _ => ?_
+  rw [map_mul, blockRepresentation_asAlgebraHom_center hπ hlin i w, smul_mul_assoc,
+    show (LinearMap.id : (nn i → K) →ₗ[K] (nn i → K))
+      * (blockRepresentation π i).asAlgebraHom (single g 1)
+      = (blockRepresentation π i).asAlgebraHom (single g 1) from one_mul _,
+    map_smul, smul_eq_mul, Representation.asAlgebraHom_single_one]
+  ring
+
+omit hkerJ [Finite G] [NeZero (Nat.card G : K)] [Fintype ι] in
+/-- **A central idempotent has central character `0` or `1`.**  This is what makes `f_b` select a
+sub-sum: over a field the only idempotents are the trivial ones. -/
+theorem centralCharacterAlg_eq_zero_or_one_of_isIdempotentElem (i : ι)
+    {f : Subalgebra.center K (MonoidAlgebra K G)} (hf : IsIdempotentElem f) :
+    MatrixModule.centralCharacterAlg π i hπ hlin f = 0 ∨
+      MatrixModule.centralCharacterAlg π i hπ hlin f = 1 := by
+  have h := congrArg (MatrixModule.centralCharacterAlg π i hπ hlin) hf
+  rw [map_mul] at h
+  set c := MatrixModule.centralCharacterAlg π i hπ hlin f with hc
+  have h0 : c * (c - 1) = 0 := by rw [mul_sub, mul_one, h, sub_self]
+  rcases mul_eq_zero.mp h0 with h1 | h1
+  · exact Or.inl h1
+  · exact Or.inr (sub_eq_zero.mp h1)
+
 end Decomposition
 
 end OddOrder.RepresentationTheory.Modular

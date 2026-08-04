@@ -1106,6 +1106,13 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               `OrdinaryDecomposition.lean`: 🎯🎯 `trace_asAlgebraHom_center_mul` —
               `tr(ρ(z·a)) = Σ_i d_i · ω_i(z) · tr(blockRep_i(a))`。
               `z = f_{b'}` に取ると `ω_i(f_{b'}) ∈ {0,1}` が `Irr(b')` を切り出す。
+        - [x] **二重の中心因子 + 冪等元の値** — 完了 (2026-08-04)。
+              🎯🎯 `trace_asAlgebraHom_center_center_mul`:
+              `tr(ρ(z·(w·g))) = Σ_i d_i ω_i(z) ω_i(w) χ_i(g)`。
+              `z = f_b`, `w = single x 1` に取ると Navarro の
+              `Σ_{ψ∈Irr(b)} [χ_H,ψ] (ψ(x)/ψ(1)) ψ(y)` の形になる。
+              🎯 `centralCharacterAlg_eq_zero_or_one_of_isIdempotentElem` (体上の冪等元は
+              `0` か `1`) — `ω_i(f_b)` が `Irr(b)` の指示関数であること。
         - [x] (旧計画メモ) 残り = 通常指標側の分解 ((5.2) の step (i))。
               `y ↦ χ(f_{b'} x y)` の `IBr(H)` 展開が `IBr(b')` に台を持つことを言うには、
               `K[H]`-加群の `Irr(H)` への重複度分解 `tr_V(g) = Σ_i n_i χ_i(g)` が要る。
