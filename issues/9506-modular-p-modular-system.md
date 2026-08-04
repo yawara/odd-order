@@ -1392,8 +1392,13 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               (既存 `sum_character_inv_mul_character`) を使うと右辺が
               `a_{K,L,cl(z)} · |cl(z)| · |C_G(z)| = a_{K,L,cl(z)} · |G|` に潰れ、
               左辺が `|K||L| Σ_i χ_i(x_K)χ_i(x_L)χ_i(z⁻¹)/χ_i(1)` になる ⟹ Burnside。
-              **必要な新規部品は `ω_i(K̂) χ_i(1) = |K| χ_i(x_K)` のみ**
-              (`ρ_i(K̂) = ω_i(K̂)·id` のトレースを 2 通りに読むだけ)。他は既存。
+              **必要な新規部品は `ω_i(K̂) χ_i(1) = |K| χ_i(x_K)` のみ** — [x] **完了
+              (2026-08-05、`Modular/CentralCharacterTrace.lean`)**:
+              🎯 `trace_apply_single` (`χ_i(g)` は行列 `e(g)_i` のトレース) +
+              🎯🎯 `centralScalar_classSum_mul_character_one`
+              (`e(K̂)_i = Matrix.scalar (ω_i(K̂))` のトレースを 2 通りに読む)。
+              ⟹ Burnside 本体は「構造定数 `a_{KLM}` の導入 + 上記 2 本 + 既存の第二直交関係」
+              の組み立てのみ。ℂ 版の係数環一般化は不要と確定。
             - `Σ_{x ∈ P} χ(x⁻¹) = |P| [χ_P, 1_P]` (制限の自明成分の重複度)。
               ⚠ 共役を使わない形なので抽象体でも書ける。
             - **類の defect `d(K)`** と `p^{a-d(K)}` による正規化 (Ch.3 の材料、未整備)。
