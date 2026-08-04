@@ -1476,11 +1476,26 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         ⚠ 教科書は (6.12) 経由で `⋂_{φ∈IBr(B₀)} ker φ = O_{p'p}(G)` を出してから (6.13) に
         至るが、主ブロックの中心指標 = 添加写像を使えば **(6.12) の重い側を通らずに**
         BS が使う向きだけ取れる。
-  - [ ] **(6.13) の残り**: `|IBr(B₀)| = 1` (block 内で単純加群の同型類は一意 —
-        段 47-49 の `exists_unique_idem_smul_eq_self` / `nonempty_linearEquiv_natural_of_idem`
-        が材料。自明作用の単純加群は 1 次元なので 2 つあれば同型 ⟹ 矛盾) と
-        **Cartan 行列 `= (|G|_p)`** (`Σ_{χ∈Irr(B₀)} χ(1)² = |G/O_{p'}(G)| = |G|_p`)。
+  - [x] 🎯🎯🎯 **`IBr(B₀) = {1_{G⁰}}` — 完了 (2026-08-05)**。段 47-49 の同型類議論は不要で、
+        **全射性だけ**で出た (`Algebra/NormalPSubgroupTrivialAction`):
+        * 🎯 `pi_eq_scalar_augmentation` — `π(g)_i = 1` (∀g) なら `π(x)_i = scalar(ε(x))`
+        * 🎯 `subsingleton_of_forall_pi_single_eq_one` — **次数 1** (像がスカラーだけなのに
+          `π` は全射 ⟹ 非対角の `Matrix.single a b 1` が取れない)
+        * 🎯🎯 `eq_of_forall_pi_single_eq_one` — **高々 1 つ** (2 つあると両成分とも `ε(x)` で
+          分離できないが、全射性は `Pi.single i 1` を出す ⟹ `ε(x) = 1` かつ `= 0`)
+        * `Modular/PrincipalBlockKernel`: 🎯🎯🎯 `eq_of_principalBlock_of_normalPComplement` /
+          `subsingleton_of_principalBlock_of_normalPComplement`
+  - [ ] **(6.13) の残り = Cartan 行列 `= (|G|_p)`** (`Σ_{χ∈Irr(B₀)} χ(1)² = |G|_p`)。
         BS は「`C` が正規 2-補群を持つ ⟹ `b₀` の Cartan 行列は `(4)`」の形で引く。
+        **設計は確定 (2026-08-05)**: `u = |N|⁻¹ N̂` (中心冪等元) の左乗法のトレースを 2 通りに
+        数える。土台は `Algebra/TraceMulLeft.lean` (新設、完了):
+        * 🎯 `trace_mulLeft_monoidAlgebra` — `tr(L_a) = |G| · a(1)` ⟹ `tr(L_u) = |G|/|N|`
+        * 🎯 `trace_mulLeft_pi_matrix` — `tr(L_v) = Σ_i m_i · tr(v_i)` ⟹ `e(u)` の各成分が
+          中心冪等 = `0` か `1` なので `Σ_{ω_i(u)=1} m_i²`
+        ⚠ **冪等元の階数 = トレース** という線型代数 (mathlib に無い) を経由しない。
+        残りの配線: (a) トレースが代数同型で不変、(b) `∏ M_{m_i}(K)` の中心冪等元は
+        成分ごとに `0`/`1`、(c) `ω_i(N̂) = |N| ⟺ N ≤ ker χ_i ⟺ i ∈ Irr(B₀)`
+        (⟸ は `eq_of_forall_pi_single_eq_one` で「`G` を潰すブロックは一意」から)。
   - [ ] **(6.12) 本体 (後半)**。原文 p.127 の証明が要求するのは
         (i) `ker(B) ≤ ker φ` (`φ ∈ IBr(B)`) — 上の逆包含の **`k` 側版**
         (`λ_B(N̂*) = |N|*` ≠ 0 ⟹ block 表現上で `N̂` が単元 ⟹ 核判定) でほぼ同型に書ける、
