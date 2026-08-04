@@ -735,8 +735,43 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         `[Φ_θ,φ]⁰` の定義 (`(1/|G|) Σ_{g ∈ G°}`) をどう置くかが最初の設計判断。
 </details>
 - [ ] **94: Cartan 行列 `C = DᵀD`** + `([φ,θ]⁰)` が逆行列であること ((7.6) が使う)
-- [ ] **95: Brauer 対応 `b^G`** (段 88–91 の `Br_P` / defect group から。
-      `(5.6)`/`(5.7)` = `b^G` の well-defined 性)
+### 段 95 (Brauer 対応 `b^G`) の進行 — 2026-08-04
+
+⚠ **原文確認で構造が判明** (Navarro (4.13) 直前): `b^G` は `Br_P` からでなく
+**中心指標の拡張**で定義される。`λ_b^G(K̂) = λ_b(Σ_{x ∈ K ∩ H} x)` が代数準同型に
+なるとき `b^G` が「定義される」。`Br_P` が出てくるのは (4.14)
+(`P·C_G(P) ≤ H ≤ N_G(P)` なら常に定義され `λ_b^G = λ_b ∘ Br_P`) の段階。
+⚠ 誘導 block には非同値な定義が複数 (Brauer 版 / Alperin–Burry 版)。Navarro は Brauer 版。
+
+  - [x] **`Σ_{x ∈ K ∩ H} x` が `Z(k[H])` の元** — 完了 (`Modular/TruncClassSum.lean`)。
+        `truncClassSum` / 🎯 `coeff_truncClassSum` / 🎯 `truncClassSum_mem_center`。
+  - [x] **`centerTrunc : Z(kG) →ₗ[k] Z(kH)` と `λ_b^G`** — 完了 (同ファイル)。
+        類和基底の上で `Basis.constr`。⚠ **線型なだけ**で乗法性は別問題。
+        `inducedCentralCharacter H λ_b = λ_b ∘ centerTrunc H`。
+  - [x] **中心指標 → 一意な block (Navarro (3.11))** — 完了
+        (`Algebra/CentralCharacterBlock.lean`)。
+        🎯 `existsUnique_blockIdempotent_map_eq_one` /
+        🎯🎯 `existsUnique_blockCharacter_eq` / `blockOfCentralCharacter`。
+  - [x] **誘導 block `b^G` の定義** — 完了 (`Modular/InducedBlock.lean`)。
+        🎯🎯 `inducedBlock` / 🎯 `blockCharacter_inducedBlock_classSumCenter` (定義性質) /
+        🎯 `eq_inducedBlock`。乗法性は教科書どおり仮説。
+
+  - [ ] **Navarro (4.14)**: `P` が `p`-部分群で `P·C_G(P) ≤ H ≤ N_G(P)` なら
+        `b^G` は**常に定義され** `λ_b^G = λ_b ∘ Br_P`。
+        証明 (原文 p.88) の構造:
+        * `Σ_{x∈K∩H} x = Σ_{x∈K∩C} x + Σ_{x∈(K∩H)∖C} x` (`C = C_G(P)`)。
+        * `K∩C` は `H` で正規化される (`H ≤ N_G(P)` ゆえ `H` は `C` を正規化) ので
+          残りは `H`-類の合併。
+        * その各 `H`-類 `L` は `C_H(O_p(H)) ∩ L = ∅` を満たす (`P ≤ O_p(H)` かつ
+          `C_H(O_p(H)) ⊆ C`) ので **Lemma (4.7)** で `L̂` は冪零 ⟹ `λ_b(L̂) = 0`。
+        ⚠ **依存**: Lemma (4.7) 「`K ∩ C_G(O_p(G)) = ∅` なら `K̂ ∈ J(Z(kG))`」。
+          その証明はさらに **(2.32)「`O_p(G)` は任意の既約 `kG`-加群に自明に作用」**に依存
+          (`P`-軌道が長さ `p` の倍数 + `X` が `xP` 上定数 ⟹ `X(K̂) = 0`)。
+        ⚠ **repo 実測 (2026-08-04)**: `Br_P` 本体 (`Algebra/BrauerHomomorphism.lean`) と
+          その核 (`Algebra/BrauerKernel.lean`) は在るが、**(4.7) も (2.32) も無い**。
+          `Algebra/AugmentationIdeal.lean` は ℤ 係数で別物。着手は (2.32) → (4.7) → (4.14)。
+
+- [ ] **95 続き: `(5.6)`/`(5.7)`** (第二主定理が使う `b^G` の性質)
 - [ ] **96: 一般化分解数 `d^x_{χμ}`** (`p`-元 `x` について。`(5.1)` = `p`-section 上の展開)
 - [ ] **97: 🎯 第二主定理 `(5.2)`** — `χ(xy) = Σ_μ d^x_{χμ} μ(y)`。
       Navarro は Isaacs による "elementary" proof (Juhász–Tsushima 由来) を採用 (Preface)
