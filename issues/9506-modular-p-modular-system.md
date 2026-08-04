@@ -1064,10 +1064,20 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               `BlockOfSimpleModule` の移送パターン 4 行を足すだけ。
               ⚠ **`exists_eq_centralCharacterAlg_of_forall_smul_eq` を別に呼ぶのでは駄目**
               — あちらは別の `∃ i'` を返すので `i = i'` が言えない。同じ `e` から取るのが要。
-        - [ ] `Representation.quotient` へのスカラー作用の降下 (`quotient_asAlgebraHom_eq_smul`)
-        - [ ] `exists_decomposition_of_finrank_le` を「中心が `λ` 倍で作用するなら
-              `d i = 0` unless `centralCharacterAlg π i = λ`」付きに強化 (帰納法にそのまま乗る)
-        - [ ] ⟹ `decompositionNumber` の block 対角性 ⟹ (5.2)
+        - [x] `Representation.quotient` へのスカラー作用の降下 — 完了 (2026-08-04、
+              `MinimalSubrepresentation.lean`): 🎯 `quotient_asAlgebraHom_mk` /
+              🎯 `quotient_asAlgebraHom_eq_smul`。部分表現版と対で、合成列の帰納法が
+              中心指標を保つための両輪。
+        - [x] **`exists_decomposition_of_finrank_le` の強化** — 完了 (2026-08-04)。
+              結論に「`d i ≠ 0` かつ中心元 `z` がスカラー `c` 倍で作用するなら
+              `c = centralCharacterAlg π i z`」を追加。仮説を増やさない**無条件の形**にしたので
+              下流はそのまま。帰納法は base で vacuous、step は
+              新構成因子側 = 強化した `exists_irreducibleBrauerCharacter_eq`、
+              商側 = `quotient_asAlgebraHom_eq_smul` + 帰納法の仮定。
+        - [x] ⟹ 🎯🎯🎯 **`centralCharacterAlg_eq_of_decompositionNumber_ne_zero`**
+              (`DecompositionNumber.lean`) = **分解数の block 対角性**。
+              `exists_decomposition` / `exists_decomposition_trace` にも conjunct を通した。
+        - [ ] ⟹ (5.2) 本体の組み立て (上の 1.–3. を結線する)
 - [ ] **98: `(5.8)` + `(5.13.b,c,d)` (一般化分解数の直交関係) + block orthogonality**
 - [ ] **99: 🎯 第三主定理 `(6.7)`** — Okuyama の証明 ((6.1)–(6.6) 経由、非常に一般な形)
 - [ ] **100: `(6.10)` `ker(B) = O_{p'}(ker χ)` → `(6.12)` → 🎯 `(6.13)`**

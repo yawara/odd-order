@@ -16356,3 +16356,13 @@ block 冪等元 `f_B` を `H`-部分と `G ∖ H`-部分に割るための道具
   OddOrder.RepresentationTheory.Modular.apply_eq_zero_of_blockOfLattice_ne
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.apply_eq_id_of_blockOfLattice_eq
+
+/-! **分解数の block 対角性** (`Modular.BrauerDecomposition` / `DecompositionNumber`) —
+中心がスカラーで作用するなら、実際に現れる構成因子の中心指標は同じ. -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.quotient_asAlgebraHom_mk
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.quotient_asAlgebraHom_eq_smul
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.centralCharacterAlg_eq_of_decompositionNumber_ne_zero

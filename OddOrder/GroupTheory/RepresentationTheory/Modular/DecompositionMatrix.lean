@@ -48,14 +48,18 @@ theorem exists_decomposition_trace (hp : p.Prime)
     (hlin : ∀ (c : ResidueField 𝒪) (a : MonoidAlgebra (ResidueField 𝒪) G), π (c • a) = c • π a)
     (hkerJ : RingHom.ker π = Ring.jacobson (MonoidAlgebra (ResidueField 𝒪) G))
     (ρ : Representation 𝒪 G L) :
-    ∃ d : ι → ℕ, ∀ g : G, IsPRegular p g →
-      LinearMap.trace 𝒪 L (ρ g)
-        = ∑ i, (d i : 𝒪) * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π i g := by
+    ∃ d : ι → ℕ, (∀ g : G, IsPRegular p g →
+        LinearMap.trace 𝒪 L (ρ g)
+          = ∑ i, (d i : 𝒪) * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π i g) ∧
+      ∀ (i : ι) {z : Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) G)}
+        {c : ResidueField 𝒪}, d i ≠ 0 →
+        (reduction ρ).asAlgebraHom (z : MonoidAlgebra (ResidueField 𝒪) G) = c • LinearMap.id →
+        c = MatrixModule.centralCharacterAlg π i hπ hlin z := by
   haveI : Module.Finite (ResidueField 𝒪) (ResidueField 𝒪 ⊗[𝒪] L) :=
     Module.Finite.of_basis
       (Module.Basis.baseChange (S := ResidueField 𝒪) (Module.Free.chooseBasis 𝒪 L))
-  obtain ⟨d, hd⟩ := exists_decomposition (nn := nn) hp hω' hπ hlin hkerJ (reduction ρ)
-  refine ⟨d, fun g hg => ?_⟩
+  obtain ⟨d, hd, hdc⟩ := exists_decomposition (nn := nn) hp hω' hπ hlin hkerJ (reduction ρ)
+  refine ⟨d, fun g hg => ?_, hdc⟩
   rw [trace_eq_brauerCharacter_reduction (not_dvd_pRegularExponent hp) pRegularExponent_pos hω ρ
     (rep_pow_pRegularExponent_eq_one' ρ hp hg)]
   exact hd g hg

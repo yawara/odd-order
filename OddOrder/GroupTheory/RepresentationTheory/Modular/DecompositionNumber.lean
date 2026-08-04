@@ -119,7 +119,7 @@ theorem existsUnique_decomposition_trace
     ∃! d : ι → ℕ, ∀ g : G, IsPRegular p g →
       LinearMap.trace 𝒪 L (ρ g)
         = ∑ i, (d i : 𝒪) * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π i g := by
-  obtain ⟨d, hd⟩ := exists_decomposition_trace (nn := nn) hp hω hω' hπ hlin hkerJ ρ
+  obtain ⟨d, hd, -⟩ := exists_decomposition_trace (nn := nn) hp hω hω' hπ hlin hkerJ ρ
   refine ⟨d, hd, fun d' hd' => ?_⟩
   exact eq_of_sum_irreducibleBrauerCharacter_eq hp hω' hπ hlin hkerJ
     (fun g hg => by rw [← hd' g hg, hd g hg])
@@ -159,6 +159,25 @@ theorem eq_decompositionNumber {d : ι → ℕ}
         = ∑ i, (d i : 𝒪) * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π i g) :
     d = decompositionNumber (nn := nn) hp hω hω' hπ hlin hkerJ ρ :=
   (existsUnique_decomposition_trace (nn := nn) hp hω hω' hπ hlin hkerJ ρ).choose_spec.2 d hd
+
+/-- **The decomposition numbers are block-diagonal.**  If the centre of `kG` acts on the reduction
+by a single scalar — which it does when `ρ` is an absolutely irreducible lattice, the scalar being
+`λ_χ` — then every constituent that actually occurs has that same central character, hence lies in
+the block of `χ`.
+
+This is what makes `d_{χφ} = 0` unless `φ ∈ IBr(B)`, and it is the last ingredient of Brauer's
+second main theorem (5.2). -/
+theorem centralCharacterAlg_eq_of_decompositionNumber_ne_zero {i : ι}
+    (hi : decompositionNumber (nn := nn) hp hω hω' hπ hlin hkerJ ρ i ≠ 0)
+    {z : Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) G)}
+    {c : ResidueField 𝒪}
+    (hz : (reduction ρ).asAlgebraHom (z : MonoidAlgebra (ResidueField 𝒪) G)
+      = c • LinearMap.id) :
+    c = MatrixModule.centralCharacterAlg π i hπ hlin z := by
+  obtain ⟨d, hd, hdc⟩ := exists_decomposition_trace (nn := nn) hp hω hω' hπ hlin hkerJ ρ
+  have hdeq : d = decompositionNumber (nn := nn) hp hω hω' hπ hlin hkerJ ρ :=
+    eq_decompositionNumber (nn := nn) hp hω hω' hπ hlin hkerJ ρ hd
+  exact hdc i (by rw [hdeq]; exact hi) hz
 
 end DecompositionNumber
 

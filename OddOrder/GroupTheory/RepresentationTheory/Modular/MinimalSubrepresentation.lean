@@ -94,4 +94,26 @@ theorem subrepresentation_asAlgebraHom_eq_smul {W : Submodule k V}
   rw [coe_subrepresentation_asAlgebraHom, hx]
   simp
 
+/-- **A quotient representation carries the quotient of the group-algebra action.** -/
+theorem quotient_asAlgebraHom_mk {W : Submodule k V}
+    (hW : ∀ g : G, W ≤ W.comap (ρ g)) (x : MonoidAlgebra k G) (v : V) :
+    (ρ.quotient W hW).asAlgebraHom x (Submodule.Quotient.mk v)
+      = Submodule.Quotient.mk (ρ.asAlgebraHom x v) := by
+  induction x using MonoidAlgebra.induction_linear with
+  | zero => simp
+  | add x y hx hy => simp [hx, hy]
+  | single g r => simp [Representation.asAlgebraHom_single, Representation.quotient]
+
+/-- **A scalar action descends to a quotient representation.**  Together with
+`subrepresentation_asAlgebraHom_eq_smul` this is what lets an induction along a composition series
+keep track of the central character. -/
+theorem quotient_asAlgebraHom_eq_smul {W : Submodule k V}
+    (hW : ∀ g : G, W ≤ W.comap (ρ g)) {x : MonoidAlgebra k G} {c : k}
+    (hx : ρ.asAlgebraHom x = c • LinearMap.id) (v : V ⧸ W) :
+    (ρ.quotient W hW).asAlgebraHom x v = c • v := by
+  induction v using Submodule.Quotient.induction_on with
+  | H v =>
+    rw [quotient_asAlgebraHom_mk, hx]
+    simp
+
 end OddOrder.RepresentationTheory.Modular
