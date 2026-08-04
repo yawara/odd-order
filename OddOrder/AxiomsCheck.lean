@@ -202,6 +202,8 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogona
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ProjectiveCharacterVanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularClassIndex
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerBasis
+import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.TruncClassSum
 import OddOrder.Algebra.CentralCharacterBlock
 import OddOrder.Algebra.ClassSumOffCentralizer
@@ -16096,3 +16098,23 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.RepresentationTheory.Modular.inducedBlockOfNormalizer
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.blockCharacter_inducedBlockOfNormalizer
+
+/-! **IBr は p-正則類関数の基底** + **一般化分解数 `d^x_{χφ}`** — Navarro (5.1)
+(`Modular.BrauerBasis` / `Modular.GeneralizedDecomposition`). -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_isConj_pRegularRep
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_zero_of_vecMul_brauerCharacterMatrix
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.isUnit_det_brauerCharacterMatrix
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.existsUnique_coeff_irreducibleBrauerCharacter
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.isConj_mul_of_isConj
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.existsUnique_generalizedDecomposition
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_generalizedDecompositionNumber
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_generalizedDecompositionNumber

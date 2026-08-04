@@ -813,7 +813,22 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
 第二主定理 ((5.2)) はこれらを使わないので、先に段 96–97 へ進んでよい。
 
 - [ ] **95 続き: `(5.6)`/`(5.7)`** (第二主定理が使う `b^G` の性質)
-- [ ] **96: 一般化分解数 `d^x_{χμ}`** (`p`-元 `x` について。`(5.1)` = `p`-section 上の展開)
+- [x] **96: 一般化分解数 `d^x_{χμ}`** — 完了 (2026-08-04)。
+  - `Modular/BrauerBasis.lean`: **IBr は `p`-正則類関数の基底**。
+    🎯 `exists_isConj_pRegularRep` / `brauerCharacterMatrix` (表 `φ(x_j)`) /
+    🎯🎯 `eq_zero_of_vecMul_brauerCharacterMatrix` (行の `K` 上一次独立 — `𝒪` 上の既存
+    `eq_zero_of_sum_irreducibleBrauerCharacter_ringHom` を
+    `IsLocalization.exist_integer_multiples_of_finite` で分母払いして持ち上げる) /
+    🎯🎯 `isUnit_det_brauerCharacterMatrix` (正方 `|IBr| = #cl(G°)` + 独立 ⟹ 可逆) /
+    🎯🎯🎯 `existsUnique_coeff_irreducibleBrauerCharacter`。
+  - `Modular/GeneralizedDecomposition.lean`: **Navarro (5.1)**。
+    🎯 `isConj_mul_of_isConj` / 🎯🎯🎯 `existsUnique_generalizedDecomposition` /
+    `generalizedDecompositionNumber` (= `d^x_{χφ}`) /
+    🎯 `sum_generalizedDecompositionNumber` / 🎯 `eq_generalizedDecompositionNumber`。
+  - ⚠ **原文より一般**: `x` が `p`-元であることは使っていない (`H = C_G(x)` でありさえすれば
+    `y ↦ χ(xy)` は `H`-類関数)。原文は `χ|_H` を `Irr(H)` に分解し `x ∈ Z(H)` がスカラー
+    作用することを使う経路で、そちらは `d^x_{χφ} ∈ ℤ[ζ]` (整性) も出す。
+    **整性は本 commit では出していない** — 必要になった段で別途。
 - [ ] **97: 🎯 第二主定理 `(5.2)`** — `χ(xy) = Σ_μ d^x_{χμ} μ(y)`。
       Navarro は Isaacs による "elementary" proof (Juhász–Tsushima 由来) を採用 (Preface)
 - [ ] **98: `(5.8)` + `(5.13.b,c,d)` (一般化分解数の直交関係) + block orthogonality**

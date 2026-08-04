@@ -167,6 +167,8 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogona
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ProjectiveCharacterVanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularClassIndex
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerBasis
+import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.TruncClassSum
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
