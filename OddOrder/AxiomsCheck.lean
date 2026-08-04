@@ -207,6 +207,8 @@ import OddOrder.Algebra.CentralCharacterBlock
 import OddOrder.Algebra.ClassSumOffCentralizer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerTruncation
+import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockDefined
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
@@ -16074,3 +16076,23 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.RepresentationTheory.Modular.pi_truncClassSum_eq_centralizerTrunc
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.blockCharacter_truncClassSumCenter_eq
+
+/-! **`Br_P : Z(kG) →ₐ[k] Z(kH)` と `b^G` の存在** — Navarro (4.14) 第二部
+(`Modular.BrauerTruncation` / `Modular.InducedBlockDefined`). -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.inclusionHom_brauerTrunc
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.brauerTrunc_mem_center
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.brauerTrunc_mul_of_mem_center
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.brauerTrunc_classSum
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.brauerCenterHom
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.inducedCentralCharacterAlgHom_toLinearMap
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.inducedBlockOfNormalizer
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockCharacter_inducedBlockOfNormalizer

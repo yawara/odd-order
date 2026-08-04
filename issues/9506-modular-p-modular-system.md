@@ -788,13 +788,29 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         なお仮説は `P ≤ H ≤ N_G(P)` のみで、`C_G(P) ≤ H` は不要 (次の段で使う)。
         補助: `ClassSumCore.sum_ite_mem_center` (共役不変集合の指示和は中心的) を新設。
 
-  - [ ] **95 続き: (4.14) 第二部** — `λ_b^G` の**乗法性** ⟹ `b^G` は常に定義される。
-        `centralizerTruncClassSum` を `k[H] ↪ k[G]` で送ると既存の
-        `GroupAlgebra.brauerProj P` (`Algebra/BrauerHomomorphism.lean`) に一致するはずで、
-        中心元は `P`-不変ゆえ `brauerProj_mul_of_invariant` が乗法性を与える。
-        ⟹ `inducedCentralCharacter H λ_b` が `AlgHom` に持ち上がり `inducedBlock` の
-        仮説 `lam` が構成できる。必要な部品 = `MonoidAlgebra.mapDomain` 版の
-        `k[H] →ₐ[k] k[G]` (単射) と、その像が `brauerProj` に一致することの確認。
+  - [x] **Navarro (4.14) 第二部** `λ_b^G` の乗法性 ⟹ **`b^G` は常に定義される** — 完了
+        (`Modular/BrauerTruncation.lean` + `Modular/InducedBlockDefined.lean`)。
+        * `brauerTrunc P H : k[G] → k[H]` (`C_G(P)` を外す係数を落とす) + `coeff_brauerTrunc` /
+          `brauerTrunc_zero/add/smul/one`。
+        * `inclusionHom H : k[H] →+* k[G]` (`MonoidAlgebra.mapDomainRingHom`) +
+          🎯 `inclusionHom_injective` + `coeff_inclusionHom_of_mem/notMem` /
+          🎯🎯 `inclusionHom_brauerTrunc` (`C_G(P) ≤ H` なら既存 `brauerProj P` に一致)。
+        * 🎯 `brauerTrunc_mem_center` (中心元の切り落としは中心的; `H ≤ N_G(P)` を使う) /
+          🎯🎯 `brauerTrunc_mul_of_mem_center` (**乗法性** — 中心元は `P`-不変ゆえ既存
+          `brauerProj_mul_of_invariant` が使え、単射 `inclusionHom` で引き戻す) /
+          `brauerTrunc_classSum` (類和では第一部の `centralizerTruncClassSum` に一致)。
+        * 🎯🎯 `brauerCenterHom : Z(kG) →ₐ[k] Z(kH)` /
+          🎯🎯 `inducedCentralCharacterAlgHom` (= `λ_b ∘ Br_P`) /
+          🎯🎯🎯 `inducedCentralCharacterAlgHom_toLinearMap` (**これが Navarro の `λ_b^G` に
+          一致** — 両辺線型なので類和基底で比べればよく、第一部がその比較) /
+          🎯🎯🎯 `inducedBlockOfNormalizer` (= `b^G`、乗法性の仮説**なし**で構成) /
+          🎯 `blockCharacter_inducedBlockOfNormalizer` (`λ_{b^G}(K̂) = λ_b(Br_P(K̂))`)。
+
+**⟹ 段 95 の (4.14) 本体は完了 (2026-08-04)。** `P·C_G(P) ≤ H ≤ N_G(P)` なら誘導 block
+`b^G` は常に定義され、その中心指標は `λ_b ∘ Br_P`。
+⚠ (4.14) の**後半 2 文** (`B = b^G` ⟺ `P` が `B` のある defect group に含まれる、
+および `Br_P(e_B) = Σ_{b^G = B} e_b`) は未着手 — (4.8)/(4.11)/(4.13) に依存する。
+第二主定理 ((5.2)) はこれらを使わないので、先に段 96–97 へ進んでよい。
 
 - [ ] **95 続き: `(5.6)`/`(5.7)`** (第二主定理が使う `b^G` の性質)
 - [ ] **96: 一般化分解数 `d^x_{χμ}`** (`p`-元 `x` について。`(5.1)` = `p`-section 上の展開)
