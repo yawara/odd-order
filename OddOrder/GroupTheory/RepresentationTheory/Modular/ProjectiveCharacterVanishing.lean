@@ -24,6 +24,7 @@ irreducible Brauer characters are linearly independent on the `p`-regular classe
 ## Main results
 
 * `OddOrder.RepresentationTheory.Modular.isPRegular_of_isConj`
+* `OddOrder.RepresentationTheory.Modular.algebraMap_sum_projectiveIndecomposableCharacter_mul_inv`
 * `OddOrder.RepresentationTheory.Modular.projectiveIndecomposableCharacter_eq_zero`
 -/
 
@@ -77,6 +78,31 @@ theorem sum_projectiveIndecomposableCharacter_mul (x : G) {g : G} (hg : IsPRegul
   refine Finset.sum_congr rfl fun ψ _ => ?_
   rw [projectiveIndecomposableCharacter, Finset.sum_mul]
   exact Finset.sum_congr rfl fun i _ => by ring
+
+open scoped Classical in
+/-- **The defining relation of the projective indecomposable characters** — Navarro (2.13):
+for `y` `p`-regular and *any* `x`,
+
+`∑_φ Φ_φ(x) φ(y⁻¹) = |C_G(y)| δ_{y ~ x}`.
+
+Expand the ordinary characters at the `p`-regular element `y⁻¹` and apply column orthogonality.
+This is the matrix identity that inverts the Cartan matrix. -/
+theorem algebraMap_sum_projectiveIndecomposableCharacter_mul_inv (x : G) {y : G}
+    (hy : IsPRegular p y) :
+    algebraMap 𝒪 K (∑ ψ, projectiveIndecomposableCharacter hp hω hω' hπ hlin hkerJ e ψ x
+        * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π ψ y⁻¹)
+      = if IsConj y x then (Nat.card (Subgroup.centralizer ({y} : Set G)) : K) else 0 := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  rw [sum_projectiveIndecomposableCharacter_mul hp hω hω' hπ hlin hkerJ e x hy.inv, map_sum,
+    show (∑ i : ι', algebraMap 𝒪 K
+        (ordinaryCharacter (𝒪 := 𝒪) e i y⁻¹ * ordinaryCharacter (𝒪 := 𝒪) e i x))
+      = ∑ i : ι', (wedderburnRepresentation e i).character y⁻¹
+          * (wedderburnRepresentation e i).character x from
+      Finset.sum_congr rfl fun i _ => by
+        rw [map_mul, algebraMap_ordinaryCharacter, algebraMap_ordinaryCharacter]; rfl]
+  convert sum_character_inv_mul_character e y x using 2
 
 /-- **The projective indecomposable characters vanish off the `p`-regular classes** — Navarro
 (2.13), analytic half. -/

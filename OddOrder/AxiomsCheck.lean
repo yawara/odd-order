@@ -15975,4 +15975,6 @@ counting a basis of `Z(K[G])`. -/
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_projectiveIndecomposableCharacter_mul
 #assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.algebraMap_sum_projectiveIndecomposableCharacter_mul_inv
+#assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.projectiveIndecomposableCharacter_eq_zero
