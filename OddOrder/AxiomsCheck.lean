@@ -232,6 +232,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainCore
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainTheorem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBaseChange
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockForm
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBlockIdempotent
@@ -16485,3 +16486,9 @@ Wedderburn 成分に対して**証明**する. -/
   OddOrder.RepresentationTheory.Modular.latticeBaseChangeEquiv_baseChange
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_smul_id_of_commute_baseChange
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.nontrivial_of_isLattice
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_smul_id_of_commute_wedderburnLattice
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockOfIrr
