@@ -9,6 +9,7 @@ import OddOrder.Algebra.ModuleAlongSurjection
 import OddOrder.Algebra.PiMatrixSimpleModules
 import OddOrder.Algebra.CentralCharacter
 import OddOrder.Algebra.BlockOfSimpleModule
+import OddOrder.Algebra.PGroupFixedVector
 import OddOrder.Algebra.PGroupOrbitSum
 import OddOrder.Algebra.RelativeTrace
 import OddOrder.Algebra.GroupAlgebraConjugation

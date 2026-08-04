@@ -204,6 +204,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularClassIndex
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
 import OddOrder.GroupTheory.RepresentationTheory.Modular.TruncClassSum
 import OddOrder.Algebra.CentralCharacterBlock
+import OddOrder.Algebra.PGroupFixedVector
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
@@ -16046,3 +16047,11 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.RepresentationTheory.Modular.blockCharacter_inducedBlock_classSumCenter
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.eq_inducedBlock
+
+/-! **標数 p で p-冪位数の作用素は非零ベクトルを固定する** — Navarro (2.32) のエンジン
+(`Algebra.PGroupFixedVector`). -/
+
+#assert_only_allowed_axioms
+  OddOrder.charP_moduleEnd
+#assert_only_allowed_axioms
+  OddOrder.exists_ne_zero_fixed_of_pow_eq_one
