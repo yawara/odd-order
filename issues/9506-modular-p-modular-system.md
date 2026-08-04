@@ -901,8 +901,17 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
                     (**`Z(FG)` の冪等元は `Z(𝒪G)` へ一意に持ち上がる** = block 冪等元 `f_B`)。
                     全射性は既存の `Modular/CenterReduction.lean`
                     (`exists_mem_center_mapRingHom_eq`) がそのまま使えた。
-              - [ ] **次**: `f_B` を使って (5.4) → (5.5) → (5.6) → (5.7) → 🎯 (5.2)。
-                    併せて (3.13) `χ ∉ B ⟹ M f_B = 0` / (3.31) `ψ(f_b z)` も必要。
+  - [x] **(5.4)** — 完了 (`Algebra/CornerInverse.lean`)。
+        🎯 `isUnit_one_add_of_mem_ringJacobson` (**非可換環で `1 + J` は単元**;
+        mathlib の `Ideal.isUnit_of_sub_one_mem_jacobson_bot` は可換仮定) /
+        🎯 `map_maximalIdeal_le_ringJacobson` / 🎯🎯 `exists_corner_inverse`。
+        ⚠ **原文と違う証明**: 教科書は `f(𝒪G)f` を単位元 `f` の環と見て (5.3) を当てるが、
+        「単位元が `f` の環」の形式化は面倒。代わりに `u = x + (1 - f)` と置くと
+        `u - 1 = x - f ∈ 𝔪·𝒪G ⊆ J(𝒪G)` なので **`u` は `𝒪G` の単元**で、
+        `f u = u f = x` を確かめれば corner の逆元は `f u⁻¹ f` で済む。corner 環も
+        corner に対する (5.3) も不要。
+  - [ ] **次**: (5.5) → (5.6) → (5.7) → 🎯 (5.2)。
+        併せて (3.13) `χ ∉ B ⟹ M f_B = 0` / (3.31) `ψ(f_b z)` も必要。
   - [ ] **(5.5)** / **(5.6)** / **(5.7)**。
         (5.7) は `⟨h⟩` の `supp(w)` への軌道が長さ `p` の倍数であること + 固有空間の
         次元比較 (乗算 `s` が単射) という組み合わせ論 + 線型代数。

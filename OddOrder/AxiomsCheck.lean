@@ -208,6 +208,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.TruncClassSum
 import OddOrder.Algebra.CentralCharacterBlock
 import OddOrder.Algebra.ClassSumOffCentralizer
 import OddOrder.Algebra.JacobsonCentralSubring
+import OddOrder.Algebra.CornerInverse
 import OddOrder.Algebra.AdicCompletePi
 import OddOrder.Algebra.IdempotentLift
 import OddOrder.Algebra.CenterGroupAlgebraHenselian
@@ -16131,6 +16132,15 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.algebraMap_mem_ringJacobson
 #assert_only_allowed_axioms
   OddOrder.algebraMap_maximalIdeal_mem_ringJacobson
+
+/-! **corner `fAf` での可逆性** — Navarro (5.4) (`Algebra.CornerInverse`). -/
+
+#assert_only_allowed_axioms
+  OddOrder.isUnit_one_add_of_mem_ringJacobson
+#assert_only_allowed_axioms
+  OddOrder.map_maximalIdeal_le_ringJacobson
+#assert_only_allowed_axioms
+  OddOrder.exists_corner_inverse
 
 /-! **Henselian イデアルに沿った冪等元の持ち上げ** (`Algebra.IdempotentLift`) —
 `𝒪G` の block 冪等元を得るための一段. -/
