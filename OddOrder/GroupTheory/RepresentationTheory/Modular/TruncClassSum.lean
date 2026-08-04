@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.Algebra.SubgroupTruncation
 import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
 
 /-!
@@ -132,6 +133,34 @@ theorem inducedCentralCharacter_classSumCenter
     (lam : ↥(Subalgebra.center k (MonoidAlgebra k H)) →ₗ[k] k) (C : ConjClasses G) :
     inducedCentralCharacter H lam (classSumCenter C) = lam (truncClassSumCenter (k := k) H C) := by
   rw [inducedCentralCharacter, LinearMap.comp_apply, centerTrunc_classSumCenter]
+
+/-! ### `centerTrunc` is coefficient truncation
+
+`centerTrunc` is defined on the class-sum basis, which is what makes `λ_b^G` easy to write down,
+but the proof of Navarro (5.6) needs to know that it is nothing but "forget the coefficients
+outside `H`".  Both descriptions are `k`-linear, so it is enough to compare them on class sums. -/
+
+omit [Fintype (ConjClasses G)] in
+theorem subgroupTrunc_classSum (C : ConjClasses G) :
+    OddOrder.GroupAlgebra.subgroupTrunc H (classSum (k := k) C) = truncClassSum H C :=
+  MonoidAlgebra.ext (Finsupp.ext fun x => by
+    rw [OddOrder.GroupAlgebra.coeff_subgroupTrunc, coeff_classSum, coeff_truncClassSum])
+
+/-- **`centerTrunc` truncates coefficients.**  This is the description used in Navarro (5.6),
+where the block idempotent `f_B` is split into its `H`-part and its `G ∖ H`-part. -/
+theorem coe_centerTrunc (z : ↥(Subalgebra.center k (MonoidAlgebra k G))) :
+    ((centerTrunc (k := k) H z : ↥(Subalgebra.center k (MonoidAlgebra k ↥H))) :
+        MonoidAlgebra k ↥H)
+      = OddOrder.GroupAlgebra.subgroupTrunc H (z : MonoidAlgebra k G) := by
+  have hext : (Subalgebra.center k (MonoidAlgebra k ↥H)).val.toLinearMap.comp
+        (centerTrunc (k := k) H)
+      = (OddOrder.GroupAlgebra.subgroupTruncₗ (R := k) H).comp
+        (Subalgebra.center k (MonoidAlgebra k G)).val.toLinearMap := by
+    refine (centerBasis (k := k) (G := G)).ext fun C => ?_
+    rw [LinearMap.comp_apply, LinearMap.comp_apply, centerBasis_apply, centerTrunc_classSumCenter]
+    exact (subgroupTrunc_classSum H C).symm
+  exact congrFun (congrArg (fun f : ↥(Subalgebra.center k (MonoidAlgebra k G)) →ₗ[k]
+    MonoidAlgebra k ↥H => f.toFun) hext) z
 
 end Basis
 

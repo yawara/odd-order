@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Algebra.BrauerHomomorphism
+import OddOrder.Algebra.SubgroupTruncation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
 
 /-!
@@ -22,7 +23,6 @@ homomorphism, hence the induced block `b^G` is defined.
 ## Main definitions
 
 * `OddOrder.RepresentationTheory.Modular.brauerTrunc` — `Br_P : k[G] → k[H]`
-* `OddOrder.RepresentationTheory.Modular.inclusionHom` — `k[H] ↪ k[G]`
 
 ## Main results
 
@@ -127,26 +127,9 @@ theorem brauerTrunc_one : brauerTrunc P H (1 : MonoidAlgebra k G) = 1 := by
   · have hn' : (n : G) ≠ 1 := fun h => hn (Subtype.ext h)
     rw [if_neg hn', if_neg hn, ite_self]
 
-/-! ### Comparison with `brauerProj` through the inclusion `k[H] ↪ k[G]` -/
+/-! ### Comparison with `brauerProj` through the inclusion `k[H] ↪ k[G]`
 
-variable (H) in
-/-- The inclusion `k[H] ↪ k[G]` induced by `H ≤ G`. -/
-noncomputable def inclusionHom : MonoidAlgebra k ↥H →+* MonoidAlgebra k G :=
-  MonoidAlgebra.mapDomainRingHom k H.subtype
-
-omit [Fintype ↥H] in
-theorem inclusionHom_injective : Function.Injective (inclusionHom (k := k) H) :=
-  MonoidAlgebra.mapDomain_injective Subtype.val_injective
-
-omit [Fintype ↥H] in
-theorem coeff_inclusionHom_of_mem {n : G} (hn : n ∈ H) (a : MonoidAlgebra k ↥H) :
-    (inclusionHom H a).coeff n = a.coeff ⟨n, hn⟩ :=
-  Finsupp.mapDomain_apply Subtype.val_injective a.coeff ⟨n, hn⟩
-
-omit [Fintype ↥H] in
-theorem coeff_inclusionHom_of_notMem {n : G} (hn : n ∉ H) (a : MonoidAlgebra k ↥H) :
-    (inclusionHom H a).coeff n = 0 :=
-  Finsupp.mapDomain_notin_range a.coeff n (by rintro ⟨y, rfl⟩; exact hn y.2)
+The inclusion itself is `OddOrder.GroupAlgebra.inclusionHom`, available over any semiring. -/
 
 /-- **The two Brauer truncations agree.**  Under `C_G(P) ≤ H` the image of `brauerTrunc P H x` in
 `k[G]` is exactly `brauerProj P x`. -/

@@ -219,6 +219,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerTruncation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockDefined
+import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockWitness
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
@@ -16207,3 +16208,31 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.centerReduce
 #assert_only_allowed_axioms
   OddOrder.mem_centerIdeal_iff_centerReduce_eq_zero
+
+/-! **部分群に沿った `R[G]` の分解** (`Algebra.SubgroupTruncation`) — Navarro (5.6) が
+block 冪等元 `f_B` を `H`-部分と `G ∖ H`-部分に割るための道具. -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.inclusionHom
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.subgroupTrunc
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.subgroupTrunc_mem_center
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.mapRingHom_subgroupTrunc
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.coeff_mul_inclusionHom_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.commute_single_inclusionHom
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.coeff_inclusionHom_subgroupTrunc_sub
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.CenterClassSum.coe_centerTrunc
+
+/-! **Navarro (5.6)** (`Modular.InducedBlockWitness`) — `b^G = B` から
+`H` に中心化され `G ∖ H` に台を持つ `w` を作る. 第二主定理 (5.2) の直前の一段. -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.centerReduce_subgroupTrunc
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_inducedBlock_witness

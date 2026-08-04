@@ -940,11 +940,30 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         block 枠組 (`[Field k]` 要求) と繋がらなかったため。
   - [ ] **(5.5) の仮説について**: `[IsAdicComplete (maximalIdeal 𝒪) 𝒪]` を要求する
         (block 冪等元の持ち上げ由来)。一般の henselian `𝒪` への緩和は Stacks 09XI 待ち。
-  - [ ] その後 (5.6) → (5.7) → 🎯 (5.2)。
-        併せて (3.13) `χ ∉ B ⟹ M f_B = 0` / (3.31) `ψ(f_b z)` も必要。
-  - [ ] **(5.5)** / **(5.6)** / **(5.7)**。
-        (5.7) は `⟨h⟩` の `supp(w)` への軌道が長さ `p` の倍数であること + 固有空間の
-        次元比較 (乗算 `s` が単射) という組み合わせ論 + 線型代数。
+  - [x] **(5.6)** — 完了 (2026-08-04)。
+        `Algebra/SubgroupTruncation.lean` (新設; `H ≤ G` に沿った `R[G]` の分解):
+        🎯 `inclusionHom` (`BrauerTruncation` の `[Field k]` 版から一般環へ移設・dedup) /
+        🎯 `subgroupTrunc` (係数の `H` への制限) / 🎯 `subgroupTrunc_mem_center` /
+        🎯 `mapRingHom_subgroupTrunc` (還元と可換) /
+        🎯🎯 `coeff_mul_inclusionHom_eq_zero` (`(G∖H)·H ⊆ G∖H`) /
+        🎯 `commute_single_inclusionHom` (`H` は `ι(Z(RH))` を中心化)。
+        `Modular/TruncClassSum.lean`: 🎯🎯 `coe_centerTrunc` — **類和基底で定義された
+        `centerTrunc` は係数截断そのもの**。これが無いと `λ_b^G` の定義 (基底経由) と
+        `f_B` の `H`-部分 (係数経由) が繋がらない。
+        `Modular/InducedBlockWitness.lean` (新設):
+        🎯 `centerReduce_subgroupTrunc` /
+        🎯🎯🎯 `exists_inducedBlock_witness` — `b^G = B` なら `w ∈ 𝒪G` が在って
+        (a) `(1-f_B)f_b = (1-f_B)w`、(b) `w f_b = w`、(c) `H` が `w` を中心化、
+        (d) `supp w ⊆ G∖H`。
+        ⚠ 教科書どおりの証明: `f_B = a - c` (`a` = `H`-部分、`c` = `G∖H`-部分) と割り、
+        `b^G = B` が `λ_b(a*) = λ_B(e_B) = 1` を与えるので (5.5) が `a y = f_b` なる
+        `y ∈ f_b Z(𝒪H)` を返す。`w = c·ι(y)` が全部を満たす。
+        ⚠ 仮説 `b^G = B` は `(blockCharacter B).toLinearMap = inducedCentralCharacter H
+        (blockCharacter b).toLinearMap` の形で持つ (`InducedBlock.lean` と同じ idiom)。
+  - [ ] **(5.7)**。`⟨h⟩` の `supp(w)` への軌道が長さ `p` の倍数であること + 固有空間の
+        次元比較 (乗算 `s = Σ ω^{-i} w_i` が単射) という組み合わせ論 + 線型代数。
+        (5.6) の (b)(c)(d) が軌道勘定に、(a) が最後の `s* = w*` に効く。
+  - [ ] その後 🎯 (5.2)。併せて (3.13) `χ ∉ B ⟹ M f_B = 0` / (3.31) `ψ(f_b z)` も必要。
   - [ ] 併せて必要: **(3.13)** `χ ∉ B ⟹ M f_B = 0` / **(3.31)** `ψ(f_b z) = ψ(z)`
         (`ψ ∈ Irr(b)`), `= 0` (otherwise)。どちらも `Irr(B)` の帰属を `𝒪G` の冪等元で
         言い換えるもので、(5.4) と同じ前提に乗る。

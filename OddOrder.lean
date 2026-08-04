@@ -14,6 +14,7 @@ import OddOrder.Algebra.JacobsonCentralSubring
 import OddOrder.Algebra.CornerInverse
 import OddOrder.Algebra.BlockCornerInverse
 import OddOrder.Algebra.BlockCornerLift
+import OddOrder.Algebra.SubgroupTruncation
 import OddOrder.Algebra.AdicCompletePi
 import OddOrder.Algebra.IdempotentLift
 import OddOrder.Algebra.CenterGroupAlgebraHenselian
@@ -182,6 +183,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerTruncation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockDefined
+import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockWitness
 import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexSystem
