@@ -155,6 +155,8 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharac
 import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleIsBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeRepresentation
+import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionOfOrdinary
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
 import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexSystem

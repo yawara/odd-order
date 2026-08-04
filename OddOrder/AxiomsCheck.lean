@@ -194,6 +194,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeRepresentation
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
@@ -15882,3 +15883,21 @@ numbers depend on the character and not on the chosen lattice. -/
   OddOrder.RepresentationTheory.Modular.algebraMap_trace_latticeRepresentation
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_isLattice_invariant
+
+/-! **`Irr(G)` and the decomposition matrix**
+(`GroupTheory.RepresentationTheory.Modular.{DecompositionOfOrdinary,OrdinaryIrreducibles}`,
+issue 9506 段 94).  The rows of `D` are the Wedderburn components of `K[G]`, and the entries do
+not depend on the invariant lattice used to compute them. -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.trace_latticeRepresentation_eq
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.decompositionNumber_latticeRepresentation_eq
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.wedderburnRepresentation_apply
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.trace_eq_sum_decompositionMatrix
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_decompositionMatrix
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.decompositionMatrix_eq_of_invariant_lattice
