@@ -1372,7 +1372,8 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
             `(uxu⁻¹)(uyu⁻¹) = ugu⁻¹ = g` の 1 箇所)、固定点は両成分が `C_G(Q)` の対
             (🎯 `mem_fixedPoints_pFactorPairs_iff`)。`ClassCentralizerCount.lean` と同じ型紙。
             ⚠ (6.14) 本体より**下流**だが自己完結なので先行 landing した。
-          * `|G⁰| ≡ |C_G(Q)⁰| (mod p)` も同じ数え上げ (固定点 = `C_G(Q)⁰`)。
+          * [x] 🎯 **`|G⁰| ≡ |C_G(Q)⁰| (mod p)` 完了 (2026-08-05、`PFactorPairCount`)**:
+            `card_pRegular_modEq_centralizer` (固定点 = `C_G(Q)⁰`)。Problem (6.1) と対の正規化。
           * ⟹ `Br_Q(e_{B₀}) = e_{b₀}`。一方
             `λ_b(Br_Q(e_{B₀})) = λ_b^G(e_{B₀}) = [b^G = B₀]` なので、
             `b^G = B₀ ⟹ λ_b(e_{b₀}) = 1 ⟹ b = b₀`。**第三主定理の逆向き**。
