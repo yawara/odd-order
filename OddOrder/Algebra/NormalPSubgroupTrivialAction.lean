@@ -138,6 +138,86 @@ theorem blockRepresentation_eq_one_of_mem_normal_pSubgroup {p : ℕ} [Fact p.Pri
     exact (hmemW v).mp hvW' u hu
   exact LinearMap.ext fun v => by rw [Module.End.one_apply]; exact hfix v
 
+/-- **A simple module on which `N` acts trivially and whose remaining quotient is a `p`-group is
+the trivial module.**
+
+If `N ≤ G` acts trivially on a simple `kG`-module and `G = N·P` for a `p`-subgroup `P`, then all
+of `G` acts trivially.  The point is that the `P`-fixed space is automatically `G`-fixed — writing
+`g = n x` gives `g · w = n · (x · w) = n · w = w` — so it is a nonzero submodule and simplicity
+finishes.
+
+Passing to `G/N` and invoking `blockRepresentation_eq_one_of_mem_normal_pSubgroup` there would say
+the same thing; keeping everything inside `G` avoids transporting the splitting `π` along the
+quotient map.  This is what turns "`G` has a normal `p`-complement" into "`IBr(B₀)` is trivial" in
+Navarro (6.13). -/
+theorem blockRepresentation_eq_one_of_sup_eq_top {p : ℕ} [Fact p.Prime] [CharP k p]
+    (hπ : Function.Surjective π)
+    (hlin : ∀ (c : k) (a : MonoidAlgebra k G), π (c • a) = c • π a)
+    {N P : Subgroup G} [N.Normal] (hP : IsPGroup p ↥P) (hsup : N ⊔ P = ⊤)
+    (i : ι) (hNtriv : ∀ u ∈ N, blockRepresentation π i u = 1) (g : G) :
+    blockRepresentation π i g = 1 := by
+  classical
+  letI := blockModule nn π i
+  haveI := isScalarTower_blockModule hlin i
+  haveI hsimple : IsSimpleModule (MonoidAlgebra k G) (nn i → k) :=
+    isSimpleModule_blockModule hπ i
+  set ρ : Representation k G (nn i → k) := blockRepresentation π i with hρ
+  -- every element of `G` is `n * x` with `n ∈ N`, `x ∈ P`
+  have hdecomp : ∀ y : G, ∃ n ∈ N, ∃ x ∈ P, y = n * x := by
+    intro y
+    have hy : y ∈ (↑(N ⊔ P) : Set G) := by rw [hsup]; trivial
+    rw [Subgroup.normal_mul] at hy
+    obtain ⟨n, hn, x, hx, hnx⟩ := hy
+    exact ⟨n, hn, x, hx, hnx.symm⟩
+  -- the `P`-fixed vectors are already `G`-fixed
+  have hfix : ∀ v : nn i → k, (∀ x : P, ρ (x : G) v = v) → ∀ y : G, ρ y v = v := by
+    intro v hv y
+    obtain ⟨n, hn, x, hx, rfl⟩ := hdecomp y
+    rw [map_mul, Module.End.mul_apply, hv ⟨x, hx⟩, hNtriv n hn, Module.End.one_apply]
+  -- so `V^G` is nonzero
+  set W : Submodule k (nn i → k) := ρ.invariants with hWdef
+  have hWne : W ≠ ⊥ := by
+    intro hbot
+    refine hP.invariants_ne_bot (ρ.comp P.subtype : Representation k ↥P (nn i → k)) top_ne_bot ?_
+    rw [Submodule.eq_bot_iff]
+    intro v hv
+    have : v ∈ W := (Representation.mem_invariants ρ v).mpr
+      (hfix v fun x => (Representation.mem_invariants _ v).mp hv x)
+    rw [hbot] at this
+    simpa using this
+  -- and it is a `kG`-submodule, hence everything
+  have hstable : ∀ (a : MonoidAlgebra k G) {v : nn i → k}, v ∈ W → a • v ∈ W := by
+    intro a
+    induction a using MonoidAlgebra.induction_on with
+    | hM y =>
+      intro v hv
+      have hyv : (of k G y : MonoidAlgebra k G) • v = ρ y v :=
+        (blockRepresentation_eq_smul π i y v).symm
+      rw [hyv]
+      exact (Representation.mem_invariants ρ _).mpr fun z => by
+        rw [← Module.End.mul_apply, ← map_mul]
+        simp only [(Representation.mem_invariants ρ v).mp hv]
+    | hadd u w hu hw => intro v hv; rw [add_smul]; exact W.add_mem (hu hv) (hw hv)
+    | hsmul c u hu => intro v hv; rw [smul_assoc]; exact W.smul_mem c (hu hv)
+  let W' : Submodule (MonoidAlgebra k G) (nn i → k) :=
+    { carrier := (W : Set (nn i → k))
+      add_mem' := W.add_mem
+      zero_mem' := W.zero_mem
+      smul_mem' := fun a _ hv => hstable a hv }
+  have hW'top : W' = ⊤ := by
+    rcases hsimple.eq_bot_or_eq_top W' with h | h
+    · refine absurd ?_ hWne
+      rw [Submodule.eq_bot_iff]
+      intro v hv
+      have hvW' : v ∈ W' := hv
+      rw [h] at hvW'
+      simpa using hvW'
+    · exact h
+  refine LinearMap.ext fun v => ?_
+  have hvW' : v ∈ W' := by rw [hW'top]; exact Submodule.mem_top
+  rw [Module.End.one_apply]
+  exact (Representation.mem_invariants ρ v).mp hvW' g
+
 /-- **Navarro (2.32)**, matrix form: for `u` in a normal `p`-subgroup the operator
 `π (single u 1) i` is the identity matrix. -/
 theorem pi_single_eq_one_of_mem_normal_pSubgroup {p : ℕ} [Fact p.Prime] [CharP k p]

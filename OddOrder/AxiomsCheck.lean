@@ -240,6 +240,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
 import OddOrder.Algebra.SubgroupSumBlockAction
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockKernel
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ClassCentralizerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockDefect
@@ -16689,3 +16690,13 @@ Sylow `p`-部分群の共役作用 + `C_G(P)` の Sylow が中心的、の 2 段
   OddOrder.RepresentationTheory.Modular.blockCharacter_subgroupSum
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.pi_single_eq_one_of_blockOfIrr
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.blockRepresentation_eq_one_of_sup_eq_top
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockCharacter_principalBlock_subgroupSum
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.pi_single_eq_one_principalBlock
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.pi_single_eq_one_principalBlock_of_sup_eq_top
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.pi_single_eq_one_principalBlock_of_normalPComplement
