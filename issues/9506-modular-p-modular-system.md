@@ -1142,6 +1142,18 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               `ω^K_i(f_b) = 1` (本橋)。
               ⚠ 同一視 (`e` と `hint`) は**仮説**にした — Wedderburn 成分に対して供給するのは
               `OrdinaryIrreducibles.wedderburnLattice` 側の別作業。
+        - [ ] ⚠ **設計の訂正 (2026-08-04)**: `hblock` の連鎖に **`hEnd` は不要**だった。
+              `hEnd` (絶対既約性) が要るのは「一般の中心元 `z` に対しスカラーを**作る**」ため
+              (`exists_smul_id_of_mem_center_of_absolutelyIrreducible`) だが、(5.2) が使うのは
+              `z = f_b` **だけ**で、そのスカラーは block 構造から直接出る
+              (`MatrixModule.centralScalar_smul`; `f_b` の像は `K[H]` で中心的なので `π` 経由で
+              第 `i` 成分に定数倍として作用する)。あとは既存の整数性補題
+              `eq_smul_of_baseChange_eq_smul` に食わせれば `ω^K_i(f_b) ∈ 𝒪` と格子上の作用が出る。
+              さらに `ω^K_i(f_b)` は**体の冪等元 = 0 か 1** なので `𝒪` への所属も剰余の一致も自明。
+              ⟹ instantiation では `hEnd` も `centralCharacter` も `centralScalar` も経由せず、
+              `centralScalar_smul` + `eq_smul_of_baseChange_eq_smul` + 冪等元の 2 値性で足りる。
+              (commit 116 の `exists_smul_id_of_commute_blockAction` は汎用 infra として有用だが
+              (5.2) の必須経路ではない。)
         - [ ] **(5.2) の instantiation**。核は上で証明済み。残りは実際の `p`-modular system で
               仮説を discharge する配線 (`hd` = 通常分解、`hD` = `trace_eq_sum_decompositionMatrix`、
               `hindep` = `BrauerBasis`、`hvanish` = (5.7) = `InducedBlockTrace`、
