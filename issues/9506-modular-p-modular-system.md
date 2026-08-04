@@ -1117,7 +1117,23 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               `tr(ρ(f·a)) = Σ_{i : ω_i(f) = 1} d_i · tr(blockRep_i(a))`。
               `ω_i(f) ∈ {0,1}` なので和が `Irr(b)` に落ちる、を `Finset.filter` の形で述べたもの。
               (5.2) の最終段が消費する形。
-        - [ ] **(5.2) 最終組み立て**。素材は全部揃った。残りは配線のみ:
+        - [x] 🎯🎯🎯 **(5.2) の核** — 完了 (2026-08-04、`Modular/SecondMainCore.lean`)。
+              `blockCoeff` (中心元 `g` が `IBr` 展開に寄与する係数
+              `c^g_φ = Σ_i d_i ω_i(g) ω_i(w) D_{iφ}`) / `blockCoeff_add` /
+              🎯🎯 `sum_blockCoeff_eq_trace` (`Σ_φ c^g_φ φ(y) = tr(ρ(g·w·y))`; 中心 2 因子 +
+              各既約指標の Brauer 分解 + 和の入れ替え) /
+              🎯🎯🎯 `blockCoeff_eq_zero_of_vanishing` = **(5.2) の核**。
+              ⚠ **`f` と `1 - f` の 2 つの中心冪等元だけで済む**。教科書は暗に
+              `Σ_{b'} f_{b'} = 1` と全 block にわたる和を取るが、必要なのは
+              `c^1 = c^f + c^{1-f}` の 2 項分解だけ:
+              `c^f = 0` ((5.7) + Brauer 指標の一次独立性)、`c^{1-f}_φ = 0` for `φ ∈ IBr(b)`
+              (block 対角性) ⟹ `c^1_φ = 0`。block の族を扱わずに済む。
+        - [ ] **(5.2) の instantiation**。核は上で証明済み。残りは実際の `p`-modular system で
+              仮説を discharge する配線 (`hd` = 通常分解、`hD` = `trace_eq_sum_decompositionMatrix`、
+              `hindep` = `BrauerBasis`、`hvanish` = (5.7) = `InducedBlockTrace`、
+              `hblock` = `centralCharacterAlg_eq_of_decompositionNumber_ne_zero` +
+              `BlockOfLattice`、`hfidem` = `centralCharacterAlg_eq_zero_or_one_of_isIdempotentElem`)。
+              旧メモ: 素材は全部揃った。残りは配線のみ:
               `Irr(b)` 上の和 (上記) × `χ_ψ(y) = Σ_φ D_{ψφ} φ(y)`
               (`OrdinaryIrreducibles.trace_eq_sum_decompositionMatrix`) × 分解数の block 対角性
               (`centralCharacterAlg_eq_of_decompositionNumber_ne_zero`) →

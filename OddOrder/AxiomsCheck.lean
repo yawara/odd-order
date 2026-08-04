@@ -227,6 +227,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockWitness
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockTrace
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfLattice
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainCore
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBlockIdempotent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
@@ -492,7 +493,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 16400
+set_option linter.style.longFile 16600
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -16396,3 +16397,15 @@ block 冪等元 `f_B` を `H`-部分と `G ∖ H`-部分に割るための道具
   OddOrder.RepresentationTheory.Modular.centralCharacterAlg_eq_zero_or_one_of_isIdempotentElem
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.trace_asAlgebraHom_blockIdempotent_mul
+
+/-! **Navarro (5.2) の核** (`Modular.SecondMainCore`) — `f` と `1-f` の 2 つの中心冪等元だけで
+一般化分解数の消滅が出る. -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockCoeff
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockCoeff_add
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_blockCoeff_eq_trace
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockCoeff_eq_zero_of_vanishing
