@@ -32,6 +32,8 @@ column relation.
 * `OddOrder.RepresentationTheory.Modular.characterMatrixInv_mul_characterMatrix` — `W · X = 1`
 * `OddOrder.RepresentationTheory.Modular.sum_character_inv_mul_character_classRep` — the column
   relation itself, on class representatives
+* `OddOrder.RepresentationTheory.Modular.sum_character_inv_mul_character` — the same for
+  arbitrary elements
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -73,6 +75,30 @@ theorem isUnit_conjugacyClassSize {K : Type*} [Field K] [Finite G]
   refine isUnit_of_mul_isUnit_left (y := (Nat.card (Subgroup.centralizer ({g} : Set G)) : K)) ?_
   rw [hprod]
   exact isUnit_of_invertible _
+
+/-- **Conjugate elements have centralizers of the same size.**  Their conjugacy classes coincide,
+and `|C| · |C_G(x)| = |G|` with `|C| > 0`. -/
+theorem card_centralizer_eq_of_isConj [Finite G] {x y : G} (h : IsConj x y) :
+    Nat.card (Subgroup.centralizer ({x} : Set G))
+      = Nat.card (Subgroup.centralizer ({y} : Set G)) := by
+  have hmk : ConjClasses.mk x = ConjClasses.mk y := ConjClasses.mk_eq_mk_iff_isConj.mpr h
+  have hx := conjugacyClassSize_mk_mul_card_centralizer (G := G) x
+  have hy := conjugacyClassSize_mk_mul_card_centralizer (G := G) y
+  rw [hmk] at hx
+  exact Nat.eq_of_mul_eq_mul_left (conjugacyClassSize_pos _) (hx.trans hy.symm)
+
+/-- **Inverses of conjugate elements are conjugate.** -/
+theorem IsConj.inv' {x y : G} (h : IsConj x y) : IsConj x⁻¹ y⁻¹ := by
+  obtain ⟨u, hu⟩ := h
+  have hh : (u : G) * x * ((u : G))⁻¹ = y := by rw [hu.eq]; group
+  exact ⟨u, by rw [SemiconjBy, ← hh]; group⟩
+
+/-- **Characters are class functions.** -/
+theorem character_eq_of_isConj {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
+    (ρ : Representation K G V) {x y : G} (h : IsConj x y) : ρ.character x = ρ.character y := by
+  obtain ⟨u, hu⟩ := h
+  have hh : (u : G) * x * ((u : G))⁻¹ = y := by rw [hu.eq]; group
+  rw [← hh, Representation.char_conj]
 
 /-! ### The character table as a square matrix -/
 
@@ -174,5 +200,42 @@ theorem sum_character_inv_mul_character_classRep (j j' : ι') :
   refine hcs.mul_left_cancel ?_
   rw [hkey, ← hcent]
   rcases eq_or_ne j j' with h | h <;> simp [h]
+
+omit [Fintype (ConjClasses G)] [DecidableEq ι'] in
+open scoped Classical in
+/-- **Second (column) orthogonality over the splitting field**, for arbitrary elements:
+
+`∑_{χ ∈ Irr(G)} χ(x⁻¹) χ(y) = |C_G(x)|` if `x ~ y`, and `0` otherwise.
+
+Transport `sum_character_inv_mul_character_classRep` along the conjugacies `x ~ classRep j`,
+`y ~ classRep j'`, using that characters are class functions and that conjugate elements have
+equinumerous centralizers. -/
+theorem sum_character_inv_mul_character (x y : G) :
+    ∑ i : ι', (wedderburnRepresentation e i).character x⁻¹
+        * (wedderburnRepresentation e i).character y
+      = if IsConj x y then (Nat.card (Subgroup.centralizer ({x} : Set G)) : K) else 0 := by
+  classical
+  letI : DecidableEq ι' := Classical.decEq ι'
+  letI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  set j := (equivConjClasses e).symm (ConjClasses.mk x) with hj
+  set j' := (equivConjClasses e).symm (ConjClasses.mk y) with hj'
+  have hxc : IsConj x (classRep e j) := by
+    refine ConjClasses.mk_eq_mk_iff_isConj.mp ?_
+    rw [classRep, conjugacyClassRepresentative_mk_eq, hj, Equiv.apply_symm_apply]
+  have hyc : IsConj y (classRep e j') := by
+    refine ConjClasses.mk_eq_mk_iff_isConj.mp ?_
+    rw [classRep, conjugacyClassRepresentative_mk_eq, hj', Equiv.apply_symm_apply]
+  have hrw : ∀ i : ι', (wedderburnRepresentation e i).character x⁻¹
+      * (wedderburnRepresentation e i).character y
+      = (wedderburnRepresentation e i).character (classRep e j)⁻¹
+        * (wedderburnRepresentation e i).character (classRep e j') := fun i => by
+    rw [character_eq_of_isConj _ (IsConj.inv' hxc), character_eq_of_isConj _ hyc]
+  rw [Finset.sum_congr rfl fun i _ => hrw i, sum_character_inv_mul_character_classRep,
+    card_centralizer_eq_of_isConj hxc]
+  have hiff : (j = j') ↔ IsConj x y := by
+    rw [hj, hj', Equiv.symm_apply_eq, Equiv.apply_symm_apply, ConjClasses.mk_eq_mk_iff_isConj]
+  by_cases h : IsConj x y
+  · rw [if_pos (hiff.mpr h), if_pos h]
+  · rw [if_neg (fun hc => h (hiff.mp hc)), if_neg h]
 
 end OddOrder.RepresentationTheory.Modular

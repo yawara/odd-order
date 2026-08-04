@@ -15957,3 +15957,9 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.RepresentationTheory.Modular.characterMatrixInv_mul_characterMatrix
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_character_inv_mul_character_classRep
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_centralizer_eq_of_isConj
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.character_eq_of_isConj
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_character_inv_mul_character
