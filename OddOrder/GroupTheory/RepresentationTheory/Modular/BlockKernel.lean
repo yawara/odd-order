@@ -294,6 +294,54 @@ theorem blockCharacter_subgroupSum {B : Block πG hπG hlinG} {i₀ : ι'}
   rw [← hi₀, hval, hc0, map_natCast]
 
 set_option maxHeartbeats 1000000 in
+-- The lattice central character and the lattice/ambient bridge carry long instance chains.
+-- `Fintype G` is what makes `subgroupSum` (which needs `Finite G`) elaborate in the statement;
+-- the section fixes it, so it cannot be replaced by `Finite` here.
+set_option linter.unusedFintypeInType false in
+omit [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)] in
+/-- **A block on which `N̂` acts invertibly kills `N`** — the ordinary-lattice form.
+
+The absorption `n · N̂ = N̂` cancels the unit `ω_i(N̂)` on the lattice, and a lattice spans, so the
+conclusion transfers to the ambient `K`-space.  Isolated from
+`le_blockKernel_of_normal_of_forall_eq_one` because the principal-block statements reach the
+hypothesis by a different route (the central character of `B_0` is the augmentation). -/
+theorem forall_eq_one_of_residue_centralScalar_ne_zero {N : Subgroup G} (hN : N.Normal) (i : ι')
+    (hne : residue 𝒪 (centralScalar K
+        ((wedderburnLatticeRepresentation (𝒪 := 𝒪) e i).asAlgebraHom)
+        (exists_smul_id_of_commute_wedderburnLattice e i)
+        ⟨GroupAlgebra.subgroupSum 𝒪 N, GroupAlgebra.subgroupSum_mem_center hN⟩) ≠ 0) :
+    ∀ n ∈ N, wedderburnRepresentation e i n = 1 := by
+  classical
+  intro n hn
+  set zN : Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G) :=
+    ⟨GroupAlgebra.subgroupSum 𝒪 N, GroupAlgebra.subgroupSum_mem_center hN⟩ with hzNdef
+  set c : 𝒪 := centralScalar K
+    ((wedderburnLatticeRepresentation (𝒪 := 𝒪) e i).asAlgebraHom)
+    (exists_smul_id_of_commute_wedderburnLattice e i) zN with hcdef
+  have hunit : IsUnit c := by
+    rw [← IsLocalRing.notMem_maximalIdeal]
+    exact fun hmem => hne (Ideal.Quotient.eq_zero_iff_mem.mpr hmem)
+  have hψ : ((wedderburnLatticeRepresentation (𝒪 := 𝒪) e i).asAlgebraHom)
+      (GroupAlgebra.subgroupSum 𝒪 N) = c • LinearMap.id :=
+    apply_center_eq_centralScalar_smul K _
+      (exists_smul_id_of_commute_wedderburnLattice e i) zN
+  have hψunit : IsUnit (((wedderburnLatticeRepresentation (𝒪 := 𝒪) e i).asAlgebraHom)
+      (GroupAlgebra.subgroupSum 𝒪 N)) := by
+    rw [hψ, ← Module.algebraMap_end_eq_smul_id]
+    exact hunit.map _
+  have hkill : ((wedderburnLatticeRepresentation (𝒪 := 𝒪) e i).asAlgebraHom)
+      (MonoidAlgebra.single n (1 : 𝒪)) = 1 :=
+    GroupAlgebra.map_single_eq_one_of_isUnit_map_subgroupSum _ hψunit hn
+  -- push the vanishing of `single n 1 - 1` from the lattice up to the ambient space
+  have hzero : ((wedderburnLatticeRepresentation (𝒪 := 𝒪) e i).asAlgebraHom)
+      (MonoidAlgebra.single n (1 : 𝒪) - 1) = 0 := by rw [map_sub, hkill, map_one, sub_self]
+  have hamb := asAlgebraHom_eq_zero_of_latticeRepresentation (wedderburnRepresentation e i)
+    (invariant_wedderburnLattice e i) hzero
+  rw [map_sub, map_one, MonoidAlgebra.mapRingHom_single, map_one, map_sub, map_one,
+    Representation.asAlgebraHom_single_one, sub_eq_zero] at hamb
+  exact hamb
+
+set_option maxHeartbeats 1000000 in
 -- The two central characters and the lattice/ambient bridge carry long instance chains.
 /-- **Navarro (6.10), the reverse inclusion**: a normal `p'`-subgroup `N` lying in the kernel of
 *one* `χ ∈ Irr(B)` lies in the kernel of *all* of them, i.e. `N ≤ ker(B)`.
@@ -344,29 +392,8 @@ theorem le_blockKernel_of_normal_of_forall_eq_one {B : Block πG hπG hlinG} {i�
   intro n hn
   rw [mem_blockKernel_iff]
   intro i hi
-  have hci : residue 𝒪 (c i) ≠ 0 := by rw [hres i hi]; exact hcard
-  have hunit : IsUnit (c i) := by
-    rw [← IsLocalRing.notMem_maximalIdeal]
-    exact fun hmem => hci (Ideal.Quotient.eq_zero_iff_mem.mpr hmem)
-  have hψ : ((wedderburnLatticeRepresentation (𝒪 := 𝒪) e i).asAlgebraHom)
-      (GroupAlgebra.subgroupSum 𝒪 N) = c i • LinearMap.id :=
-    apply_center_eq_centralScalar_smul K _
-      (exists_smul_id_of_commute_wedderburnLattice e i) zN
-  have hψunit : IsUnit (((wedderburnLatticeRepresentation (𝒪 := 𝒪) e i).asAlgebraHom)
-      (GroupAlgebra.subgroupSum 𝒪 N)) := by
-    rw [hψ, ← Module.algebraMap_end_eq_smul_id]
-    exact hunit.map _
-  have hkill : ((wedderburnLatticeRepresentation (𝒪 := 𝒪) e i).asAlgebraHom)
-      (MonoidAlgebra.single n (1 : 𝒪)) = 1 :=
-    GroupAlgebra.map_single_eq_one_of_isUnit_map_subgroupSum _ hψunit hn
-  -- push the vanishing of `single n 1 - 1` from the lattice up to the ambient space
-  have hzero : ((wedderburnLatticeRepresentation (𝒪 := 𝒪) e i).asAlgebraHom)
-      (MonoidAlgebra.single n (1 : 𝒪) - 1) = 0 := by rw [map_sub, hkill, map_one, sub_self]
-  have hamb := asAlgebraHom_eq_zero_of_latticeRepresentation (wedderburnRepresentation e i)
-    (invariant_wedderburnLattice e i) hzero
-  rw [map_sub, map_one, MonoidAlgebra.mapRingHom_single, map_one, map_sub, map_one,
-    Representation.asAlgebraHom_single_one, sub_eq_zero] at hamb
-  exact hamb
+  exact forall_eq_one_of_residue_centralScalar_ne_zero e hN i
+    (by rw [hres i hi]; exact hcard) n hn
 
 set_option maxHeartbeats 800000 in
 -- The block character and the ordinary central character both carry long instance chains.
