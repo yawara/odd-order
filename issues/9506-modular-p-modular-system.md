@@ -1347,6 +1347,12 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
           height (or それに代わる理論) を要求する。
         - ⟹ **次の上流は Chapter 3 の defect / height**。(6.6) だけでなく (6.10)–(6.13) や
           Chapter 7 も height を使うので、いずれ通る道。
+        - **既存の土台 (実測 2026-08-05)**: `Algebra/DefectGroup.lean` に
+          `IsDefectGroup b D` (相対トレースイデアル `A^G_D` に属する極小な `D`) と
+          `exists_isDefectGroup` / defect group が `p`-群であること /
+          `exists_blockIdempotents_defectGroups_conj` (共役性) が**既にある**。
+          ⟹ 新規に要るのは **defect 数 `d(B)` (`|D| = p^d`) と height**
+          (`ν(χ(1)) = ν(|G|) - d(B) + ht(χ)`)、および Chapter 3 の (3.20)-(3.24)。
 - [ ] **100: `(6.10)` `ker(B) = O_{p'}(ker χ)` → `(6.12)` → 🎯 `(6.13)`**
       (normal `p`-complement ⟺ `IBr(B₀)` 単元、Cartan 行列 `(|G|_p)`)
 - [ ] **101: `(7.2)` Klein four Sylow-2 / `(7.3)` basic set / `(7.4)` / `(7.5)` / `(7.6)`**
