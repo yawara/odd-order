@@ -201,6 +201,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrrCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ProjectiveCharacterVanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularClassIndex
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
@@ -15992,3 +15993,15 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.RepresentationTheory.Modular.isPRegular_pRegularRep
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.pRegularRep_isConj_iff
+
+/-! **`[Φ_θ, φ]⁰ = δ_{θφ}` の行列内容** — Navarro (2.13)
+(`GroupTheory.RepresentationTheory.Modular.CartanInverse`). -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.isUnit_card_centralizer
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.projMatrix_mul_brauerMatrix
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.brauerMatrix_mul_projMatrix
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_brauer_mul_projectiveIndecomposableCharacter
