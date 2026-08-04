@@ -229,6 +229,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfLattice
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryLatticeCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainCore
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainTheorem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBlockIdempotent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
@@ -16414,3 +16415,31 @@ block 冪等元 `f_B` を `H`-部分と `G ∖ H`-部分に割るための道具
   OddOrder.MatrixModule.exists_smul_id_of_commute_blockAction
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.centralCharacterAlg_eq_algebraMap_centralScalar
+
+/-! **Navarro (5.2) 本体** (`Modular.SecondMainTheorem`) — `𝒪G` / `K[H]` / `𝒪H` の 3 つの群環を
+往復する配管 (`SecondMainBridge`) と、通常分裂 = block 分裂の同一視 (`OrdinaryBlockSplitting`)、
+仮説の充足 (`SecondMainWiring`) を経て、**一般化分解数 `d^x_{χφ}` の消滅**が実際の `p`-modular
+system で証明される. -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.asAlgebraHom_comp_subtype
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.mapRingHom_inclusionHom
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.coe_latticeRepresentation_asAlgebraHom
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.latticeRepresentation_asAlgebraHom_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockRepresentation_algEquiv
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.ker_algEquiv_eq_jacobson
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.trace_wedderburn_eq_sum_decompositionMatrix
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_zero_of_sum_algebraMap_irreducibleBrauerCharacter
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.centralCharacterAlg_eq_one_of_decompositionMatrix_ne_zero
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.pPart_mul_eq_of_isPElement
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_eq_zero
