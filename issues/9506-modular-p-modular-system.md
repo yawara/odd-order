@@ -1696,8 +1696,17 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               **逆行列もブロック対角**。共役論法でなく**解の一意性**で済んだ:
               `b` を `φ` のブロックに切り詰めた `b'` も同じ方程式を満たし、`C` 可逆ゆえ `b = b'`。
             ⟹ `ψ = 1_G` で **`χ ∉ Irr(B₀)` ⟹ `∑_{g∈G⁰}χ(g) = 0`**。
-            残り = `[χ,1_G]⁰` を `∑_{g∈G⁰}χ(g)` と同定し、
-            `centralScalar_pRegularSum_mul_character_one` と繋いで `λ_B(Ĝ⁰) = 0`。
+            [x] 🎯🎯🎯 **(3.32) の実質 完了 (2026-08-05)**:
+            `sum_pRegular_trace_eq_zero_of_centralCharacterAlg_ne` (`PairingZeroBlock`) —
+            **`∑_{g∈G⁰}χ(g) = 0`** ((3.20) を自明指標と組むだけ; `[χ,1]⁰ = |G|⁻¹∑_{g∈G⁰}χ(g)`、
+            `|G|⁻¹ ≠ 0` と `algebraMap` 単射で `𝒪` の等式に) と
+            `centralScalar_pRegularSum_eq_zero` (`PRegularSumVanishing`、新設) —
+            **`ω_χ(Ĝ⁰) = 0`** (`ω_χ(Ĝ⁰)χ(1) = ∑_{g∈G⁰}χ(g) = 0`、`χ(1) = dim ≠ 0`)。
+            ⚠ 自明指標は「トレースが恒等的に 1 の格子表現 σ」として仮説パラメータ化。
+            残り = 還元して `λ_B(Ĝ⁰) = 0` にする配線
+            (`algebraMap_centralScalar_eq` + `blockCharacter_blockOfLattice_mapRingHom` +
+            `mapRingHom_pRegularSum` が要る — 最後のは未作成)。
+            ⟹ そこまで来れば (4.23) に `z = Ĝ⁰` を入れて **(6.14) Külshammer**。
             ⚠ 検算: `ω_χ(Ĝ⁰) = (1/χ(1))∑_{g∈G⁰}χ(g)` は `χ ∉ Irr(B₀)` で **`K` の中で厳密に 0**
             (還元して 0 ではない)。`Z_q` (p∤q) / `S_3` (p=3) で確認済。
           ⟹ **見通し**: (4.19) が 2-3 段、(4.23)+(3.32)+(6.14)+(6.1) で 3-4 段。
