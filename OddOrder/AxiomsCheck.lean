@@ -191,6 +191,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
+import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.StandardSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterIndependence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerIndependence
@@ -15685,6 +15686,12 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.RepresentationTheory.Modular.trace_eq_sum_decompositionNumber
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.eq_decompositionNumber
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_smul_of_baseChange_eq_smul
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.smul_id_injective
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_smul_id_of_mem_center
 #assert_only_allowed_axioms
   OddOrder.MatrixModule.exists_scalar_of_mem_center
 #assert_only_allowed_axioms
