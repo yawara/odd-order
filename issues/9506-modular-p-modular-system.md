@@ -1080,7 +1080,16 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         - [x] `x ∈ Z(H)` の中心元化 — `GroupAlgebra.single_mem_center_of_forall_commute`
               (2026-08-04)。`H = C_G(x)` なので `single x 1 ∈ Z(𝒪H)`、これを絶対既約格子の
               中心指標に食わせれば `x` は `ψ(x)/ψ(1)` 倍として作用する ((5.2) の step (ii))。
-        - [ ] **残り = 通常指標側の分解** ((5.2) の step (i))。
+        - [x] **通常指標側の分解** ((5.2) の step (i)) — 完了 (2026-08-04、
+              `Modular/OrdinaryDecomposition.lean`)。
+              🎯🎯 `exists_ordinaryCharacter_eq` (単純表現は `i` 番目のブロック表現と同じ指標を
+              持ち、**同じ `i`** で中心指標も返す — Brauer 側の強化と同型) /
+              🎯🎯🎯 `exists_ordinary_decomposition_of_finrank_le` ·
+              `exists_ordinary_decomposition` (`tr_V(g) = Σ_i d_i χ_i(g)` + block 対角性)。
+              ⚠ 予想どおり **Maschke 補元**で帰納が回り、商もトレース加法性の自作も不要だった。
+              仮説は `hkerJ : ker π = Ring.jacobson (K[G])` の**同じ形**で足りる
+              (標数 0 では `Ring.jacobson (K[G]) = ⊥` なので Wedderburn 同型を意味する)。
+        - [x] (旧計画メモ) 残り = 通常指標側の分解 ((5.2) の step (i))。
               `y ↦ χ(f_{b'} x y)` の `IBr(H)` 展開が `IBr(b')` に台を持つことを言うには、
               `K[H]`-加群の `Irr(H)` への重複度分解 `tr_V(g) = Σ_i n_i χ_i(g)` が要る。
               **設計** (`BrauerDecomposition` の帰納法をそのまま移す):

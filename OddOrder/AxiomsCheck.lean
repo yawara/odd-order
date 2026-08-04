@@ -226,6 +226,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockDefined
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockWitness
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockTrace
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfLattice
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBlockIdempotent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
@@ -16371,3 +16372,13 @@ block 冪等元 `f_B` を `H`-部分と `G ∖ H`-部分に割るための道具
   OddOrder.GroupAlgebra.single_mem_center_of_forall_commute
 #assert_only_allowed_axioms
   OddOrder.trace_eq_add_trace_restrict_of_isCompl
+
+/-! **通常指標の重複度分解** (`Modular.OrdinaryDecomposition`) — 標数 0 側で
+`tr_V = Σ_i d_i χ_i`、block 対角性つき. (5.2) の step (i). -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_ordinaryCharacter_eq
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_ordinary_decomposition_of_finrank_le
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_ordinary_decomposition
