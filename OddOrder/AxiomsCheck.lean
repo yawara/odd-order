@@ -17035,3 +17035,11 @@ Külshammer の公式の数え上げ側。 -/
   OddOrder.GroupAlgebra.coeff_pElementSum_mul
 #assert_only_allowed_axioms
   OddOrder.GroupAlgebra.coeff_pElementSum_mul_pRegularSum
+
+/-! **部分群への数え上げの移送** (`GroupTheory/PFactorPairCount`) —
+`Ω_H(g) ≃ Ω_G(g) ∩ (H×H)` と `H⁰ ≃ G⁰ ∩ H` (位数は包含で不変)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.pFactorPairsSubgroupEquiv
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.pRegularSubgroupEquiv

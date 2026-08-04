@@ -26,6 +26,8 @@ same action applied to `G⁰` itself gives `|G⁰| ≡ |C_G(Q)⁰| (mod p)`
 
 * `OddOrder.GroupTheory.card_pFactorPairs_modEq_centralizer` — Navarro, Problem (6.1)
 * `OddOrder.GroupTheory.card_pRegular_modEq_centralizer` — `|G⁰| ≡ |C_G(Q)⁰| (mod p)`
+* `OddOrder.GroupTheory.pFactorPairsSubgroupEquiv`, `OddOrder.GroupTheory.pRegularSubgroupEquiv` —
+  the same counts taken inside a subgroup
 -/
 
 namespace OddOrder.GroupTheory
@@ -171,5 +173,39 @@ theorem card_pRegular_modEq_centralizer [Finite G] (hp : p.Prime) (hQ : IsPGroup
     Nat.card_congr (Equiv.subtypeEquivRight fun y => mem_fixedPoints_pRegular_iff y)
   rw [← hcard]
   exact hQ.card_modEq_card_fixedPoints _
+
+/-! ### Transfer along a subgroup inclusion -/
+
+section Subgroup
+
+variable (p) {H : Subgroup G}
+
+/-- **`Ω_H(g) ≃ Ω_G(g) ∩ (H × H)`**: a factorisation inside `H` is a factorisation in `G` with
+both entries in `H`, because orders are unchanged by the inclusion. -/
+def pFactorPairsSubgroupEquiv (g : ↥H) :
+    PFactorPairs p g
+      ≃ {q : PFactorPairs p ((g : G)) // (q : G × G).1 ∈ H ∧ (q : G × G).2 ∈ H} where
+  toFun q := ⟨⟨(((q : ↥H × ↥H).1 : G), ((q : ↥H × ↥H).2 : G)),
+      isPElement_coe_iff.mpr q.2.1, isPRegular_coe_iff.mpr q.2.2.1,
+      congrArg Subtype.val q.2.2.2⟩,
+    (q : ↥H × ↥H).1.2, (q : ↥H × ↥H).2.2⟩
+  invFun q := ⟨(⟨((q : PFactorPairs p ((g : G))) : G × G).1, q.2.1⟩,
+      ⟨((q : PFactorPairs p ((g : G))) : G × G).2, q.2.2⟩),
+    (isPElement_coe_iff (H := H)).mp (q : PFactorPairs p ((g : G))).2.1,
+    (isPRegular_coe_iff (H := H)).mp (q : PFactorPairs p ((g : G))).2.2.1,
+    Subtype.ext (q : PFactorPairs p ((g : G))).2.2.2⟩
+  left_inv _ := Subtype.ext (Prod.ext (Subtype.ext rfl) (Subtype.ext rfl))
+  right_inv _ := Subtype.ext (Subtype.ext (Prod.ext rfl rfl))
+
+/-- **`H⁰ ≃ G⁰ ∩ H`**, again because orders are unchanged. -/
+def pRegularSubgroupEquiv :
+    {y : ↥H // IsPRegular p y} ≃ {y : {y : G // IsPRegular p y} // (y : G) ∈ H} where
+  toFun y := ⟨⟨((y : ↥H) : G), isPRegular_coe_iff.mpr y.2⟩, (y : ↥H).2⟩
+  invFun y := ⟨⟨((y : {y : G // IsPRegular p y}) : G), y.2⟩,
+    (isPRegular_coe_iff (H := H)).mp (y : {y : G // IsPRegular p y}).2⟩
+  left_inv _ := Subtype.ext (Subtype.ext rfl)
+  right_inv _ := Subtype.ext (Subtype.ext rfl)
+
+end Subgroup
 
 end OddOrder.GroupTheory
