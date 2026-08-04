@@ -1050,10 +1050,24 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         🎯🎯🎯 `apply_eq_zero_of_blockOfLattice_ne` (**`χ ∉ B` ⟹ `L f_B = 0`**) /
         🎯🎯🎯 `apply_eq_id_of_blockOfLattice_eq` (**`χ ∈ B` ⟹ `f_B` は恒等**)。
         ⟹ (5.7)/(5.2) の仮説「`χ ∉ B`」が **`blockOfLattice ≠ B` という等式**として書ける。
-  - [ ] その後 🎯 (5.2) 本体。残るのは Navarro の計算
-        `0 = χ(f_b x y) = Σ_{φ∈IBr(b)} d^x_{χφ} φ(y)` の中辺→右辺で、
-        `χ|_H` の `Irr(H)` 分解・`x ∈ Z(H)` のスカラー作用・分解数 `d_{ψφ}` を要する
-        (repo の `OrdinaryOrthogonality` / `DecompositionOfOrdinary` / `BrauerBasis` が素材)。
+  - [ ] その後 🎯 (5.2) 本体。**着手済 (2026-08-04)**。
+        最短経路の設計 (原文の計算を repo の一意性補題に載せ替える):
+        1. `y ↦ χ(f_b x y)` は `H`-類関数 ⟹ `existsUnique_coeff_irreducibleBrauerCharacter`
+           で `IBr(H)` に一意展開。(5.7) よりその係数 `c^b` は **0**。
+        2. `Σ_{b'} f_{b'} = 1` ⟹ 一意性で `d^x_{χφ} = Σ_{b'} c^{b'}_φ`。
+        3. ⟹ 残る唯一の欠落は **分解数の block 対角性**:
+           `φ ∈ IBr(b'')` かつ `b'' ≠ b'` なら `c^{b'}_φ = 0`。
+        - [x] **block 対角性の第一歩** — `exists_irreducibleBrauerCharacter_eq` を強化
+              (2026-08-04)。単純加群が `i` 番目の Brauer 指標を持つとき、**同じ `i`** について
+              「中心が `c` 倍で作用するなら `c = centralCharacterAlg π i`」も返すようにした。
+              証明中に既に `kG`-線型同値 `e : ρ.asModule ≃ₗ blockModule π i` があるので、
+              `BlockOfSimpleModule` の移送パターン 4 行を足すだけ。
+              ⚠ **`exists_eq_centralCharacterAlg_of_forall_smul_eq` を別に呼ぶのでは駄目**
+              — あちらは別の `∃ i'` を返すので `i = i'` が言えない。同じ `e` から取るのが要。
+        - [ ] `Representation.quotient` へのスカラー作用の降下 (`quotient_asAlgebraHom_eq_smul`)
+        - [ ] `exists_decomposition_of_finrank_le` を「中心が `λ` 倍で作用するなら
+              `d i = 0` unless `centralCharacterAlg π i = λ`」付きに強化 (帰納法にそのまま乗る)
+        - [ ] ⟹ `decompositionNumber` の block 対角性 ⟹ (5.2)
 - [ ] **98: `(5.8)` + `(5.13.b,c,d)` (一般化分解数の直交関係) + block orthogonality**
 - [ ] **99: 🎯 第三主定理 `(6.7)`** — Okuyama の証明 ((6.1)–(6.6) 経由、非常に一般な形)
 - [ ] **100: `(6.10)` `ker(B) = O_{p'}(ker χ)` → `(6.12)` → 🎯 `(6.13)`**

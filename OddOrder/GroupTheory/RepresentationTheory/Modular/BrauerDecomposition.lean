@@ -76,7 +76,7 @@ theorem exists_decomposition_of_finrank_le (m : ℕ) :
     haveI : Nontrivial W := Submodule.nontrivial_iff_ne_bot.mpr hWne
     haveI := isSimpleModule_subrepresentation_of_minimal ρ hWinv hWne hWmin
     -- the minimal piece is one of the irreducibles
-    obtain ⟨i, hi⟩ := exists_irreducibleBrauerCharacter_eq (nn := nn)
+    obtain ⟨i, hi, -⟩ := exists_irreducibleBrauerCharacter_eq (nn := nn)
       (ρ.subrepresentation W hWinv) hπ hlin
       (hkerJ ▸ IsSemisimpleModule.jacobson_le_annihilator _ _)
     -- the quotient is smaller
