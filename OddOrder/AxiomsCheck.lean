@@ -16998,3 +16998,10 @@ Navarro (4.19) がブロックごとに再編する係数 `a_B(K̂)` の正体�
   OddOrder.RepresentationTheory.Modular.sum_pRegular_trace_eq_zero_of_centralCharacterAlg_ne
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.centralScalar_pRegularSum_eq_zero
+
+/-! 🎯🎯🎯 **`λ_B(Ĝ⁰) = 0` (B ≠ B₀)** (`Modular/PRegularSumVanishing`) — (3.32) の剰余体版。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.mapRingHom_pRegularSum
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockCharacter_blockOfIrr_pRegularSum_eq_zero

@@ -34,6 +34,7 @@ runs on.
 * `OddOrder.GroupAlgebra.coeff_pElementSum`, `OddOrder.GroupAlgebra.coeff_pRegularSum`
 * `OddOrder.GroupAlgebra.pElementSum_eq_sum_sylow` — Navarro (4.22)
 * `OddOrder.GroupAlgebra.pRegularSum_mem_center`, `OddOrder.GroupAlgebra.pElementSum_mem_center`
+* `OddOrder.GroupAlgebra.mapRingHom_pRegularSum`, `OddOrder.GroupAlgebra.mapRingHom_pElementSum`
 * `OddOrder.GroupAlgebra.sum_sylow_subgroupSum_mem_center` — `∑_P P̂` is central over any base
 -/
 
@@ -98,6 +99,23 @@ theorem coeff_pRegularSum (g : G) :
     intro b hb
     rw [MonoidAlgebra.coeff_single, Finsupp.single_apply, if_neg]
     exact fun h => hg (h ▸ (Finset.mem_filter.mp hb).2)
+
+open scoped Classical in
+/-- **`Ĝ⁰` survives a coefficient change**: its coefficients are `0` and `1` only. -/
+theorem mapRingHom_pRegularSum {S : Type*} [Semiring S] (f : R →+* S) :
+    MonoidAlgebra.mapRingHom G f (pRegularSum p R) = pRegularSum p S := by
+  classical
+  rw [pRegularSum, pRegularSum, map_sum]
+  exact Finset.sum_congr rfl fun g _ => by rw [MonoidAlgebra.mapRingHom_single, map_one]
+
+open scoped Classical in
+/-- **`Ĝ_p` survives a coefficient change.** -/
+theorem mapRingHom_pElementSum {S : Type*} [Semiring S] (f : R →+* S) :
+    MonoidAlgebra.mapRingHom G f (pElementSum p R) = pElementSum p S := by
+  classical
+  rw [pElementSum, pElementSum, map_sum]
+  exact Finset.sum_congr rfl fun g _ => by rw [MonoidAlgebra.mapRingHom_single, map_one]
+
 
 section Center
 

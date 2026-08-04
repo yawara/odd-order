@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroBlock
 
@@ -21,6 +22,8 @@ character.  Since `χ(1)` is a positive integer and `K` has characteristic zero,
 ## Main results
 
 * `OddOrder.RepresentationTheory.Modular.centralScalar_pRegularSum_eq_zero`
+* `OddOrder.RepresentationTheory.Modular.blockCharacter_blockOfIrr_pRegularSum_eq_zero` —
+  `λ_B(Ĝ⁰) = 0` for `B ≠ B_0`
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -30,7 +33,8 @@ open IsLocalRing Matrix MonoidAlgebra OddOrder.GroupAlgebra OddOrder.GroupTheory
 variable {p : ℕ} {𝒪 K : Type*} [CommRing 𝒪] [IsDomain 𝒪] [ValuationRing 𝒪]
   [HenselianLocalRing 𝒪] [IsPModularSystem p 𝒪]
   [Field K] [CharZero K] [Algebra 𝒪 K] [IsFractionRing 𝒪 K] [FaithfulSMul 𝒪 K]
-variable {G ι : Type*} [Group G] [Fintype G] {nn : ι → Type*}
+variable {G ι : Type*} [Group G] [Fintype G] [DecidableEq (ConjClasses G)]
+  [Fintype (ConjClasses G)] {nn : ι → Type*}
   [∀ i, Fintype (nn i)] [∀ i, DecidableEq (nn i)] [Fintype ι] [DecidableEq ι]
   [∀ i, Nonempty (nn i)]
 variable {ι' : Type*} [Fintype ι'] {m : ι' → Type*}
@@ -43,12 +47,15 @@ variable (hp : p.Prime) {ω : 𝒪} (hω : IsPrimitiveRoot ω (pRegularExponent 
   (hπ : Function.Surjective π)
   (hlin : ∀ (c : ResidueField 𝒪) (a : MonoidAlgebra (ResidueField 𝒪) G), π (c • a) = c • π a)
   (hkerJ : RingHom.ker π = Ring.jacobson (MonoidAlgebra (ResidueField 𝒪) G))
+  (hnil : ∀ z : Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) G),
+    MatrixModule.blockCharacterPi π hπ hlin z = 0 → IsNilpotent z)
   (e : MonoidAlgebra K G ≃ₐ[K] ∀ j, Matrix (m j) (m j) K)
 
 set_option maxHeartbeats 800000 in
 -- The character sum, its descent and the cancellation run under the same instance chains.
 set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
+omit [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)] in
 include hp hω hω' hπ hlin hkerJ in
 open scoped Classical in
 /-- **`ω_χ(Ĝ⁰) = 0` for `χ` outside the block of the trivial character.**  This is Navarro (3.32)
@@ -79,5 +86,38 @@ theorem centralScalar_pRegularSum_eq_zero (i : ι') (σ : Representation 𝒪 G 
     exact Nat.cast_ne_zero.mpr Fintype.card_ne_zero
   refine (mul_eq_zero.mp ?_).resolve_right hone0
   rw [centralScalar_pRegularSum_mul_character_one e i p, hsum]
+
+set_option maxHeartbeats 1200000 in
+-- The descent of `ω_χ(Ĝ⁰)` and the block character are elaborated under the same chains.
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+include hp hω hω' hπ hlin hkerJ in
+open scoped Classical in
+/-- **Navarro (3.32): `λ_B(Ĝ⁰) = 0` for `B ≠ B_0`.**  The lattice central character of `Ĝ⁰`
+vanishes for `χ` outside the trivial character's block, hence so does its reduction, which is the
+block character. -/
+theorem blockCharacter_blockOfIrr_pRegularSum_eq_zero (i : ι') (σ : Representation 𝒪 G L')
+    (hσ : ∀ g : G, LinearMap.trace 𝒪 L' (σ g) = 1)
+    (hne : ∀ φ μ : ι,
+      decompositionMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e i φ ≠ 0 →
+      decompositionNumber (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ σ μ ≠ 0 →
+      MatrixModule.centralCharacterAlg π φ hπ hlin
+        ≠ MatrixModule.centralCharacterAlg π μ hπ hlin) :
+    MatrixModule.blockCharacter π hπ hlin (blockOfIrr e hπ hlin hnil i)
+      ⟨pRegularSum p (ResidueField 𝒪), pRegularSum_mem_center⟩ = 0 := by
+  classical
+  -- the lattice central character of `Ĝ⁰` is zero, because its image in `K` is
+  have hlat : centralScalar K ((wedderburnLatticeRepresentation (𝒪 := 𝒪) e i).asAlgebraHom)
+      (exists_smul_id_of_commute_wedderburnLattice e i)
+      ⟨pRegularSum p 𝒪, pRegularSum_mem_center⟩ = 0 := by
+    refine FaithfulSMul.algebraMap_injective 𝒪 K ?_
+    rw [map_zero, algebraMap_centralScalar_eq e i ⟨pRegularSum p 𝒪, pRegularSum_mem_center⟩,
+      mapRingHom_pRegularSum]
+    exact centralScalar_pRegularSum_eq_zero hp hω hω' hπ hlin hkerJ e i σ hσ hne
+  rw [blockOfIrr, blockCharacter_blockOfLattice_mapRingHom K _
+    (exists_smul_id_of_commute_wedderburnLattice e i) residue_surjective π hπ hlin hnil
+    ⟨pRegularSum p 𝒪, pRegularSum_mem_center⟩
+    (z' := ⟨pRegularSum p (ResidueField 𝒪), pRegularSum_mem_center⟩)
+    (mapRingHom_pRegularSum (residue 𝒪)), hlat, map_zero]
 
 end OddOrder.RepresentationTheory.Modular
