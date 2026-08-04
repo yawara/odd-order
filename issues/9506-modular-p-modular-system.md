@@ -1036,9 +1036,24 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         (`eq_zero_of_apply_eq_zero_of_corner_inverse`) — (5.7) の加群は `K`-空間で `𝒪G` は
         `KG` 経由で作用するので、`Module (MonoidAlgebra 𝒪 G) M` を作る方が遠回りになる。
   ⟹ **(5.7) 完了 (2026-08-04)**。
-  - [ ] その後 🎯 (5.2)。併せて **(3.31)** `ψ(f_b z) = ψ(z)` (`ψ ∈ Irr(b)`), `= 0`
-        (otherwise) も必要 ((3.13.a) の直接の系: `f_b` が恒等か零で作用するのでトレースが
-        そのまま出る)。
+  - [x] **(3.31)** — **形式化不要と判定 (2026-08-04)**。`ψ(f_b z) = ψ(z)` (`ψ ∈ Irr(b)`),
+        `= 0` (otherwise) は、本 repo の定式化では (3.13.a) から `map_mul` 一手で出る:
+        `ρ f_b` が `1` か `0` なので `tr(ρ(f_b z)) = tr(ρ(f_b) ρ(z))` がそのまま `tr(ρ z)` か
+        `0`。**独立の補題として書くと薄いラッパーになる**ので書かない (CLAUDE.md ラッパー方針)。
+        教科書で (3.31) が独立の補題なのは `f_B = Σ e_χ` 経由で `Irr(B)` を経由するため。
+  - [x] **通常指標の block を函数にした** — 完了 (2026-08-04、`Modular/BlockOfLattice.lean`)。
+        `CenterReduction` に 🎯 `reducedCentralCharacter_smul` + 🎯 `reducedCentralCharacterAlg`
+        (`λ_χ` を `Z(FG) →ₐ[F] F` に束ねる; `blockOfCentralCharacter` が AlgHom を要求するため)。
+        🎯🎯 `blockOfLattice` (= `χ` の属する block、Navarro (3.11) 経由) /
+        🎯 `blockCharacter_blockOfLattice` / 🎯 `blockCharacter_blockOfLattice_mapRingHom` /
+        🎯🎯 `reduce_centralScalar_blockIdempotent` (`ω_χ(f_B)^* = δ_{blockOfLattice, B}`) /
+        🎯🎯🎯 `apply_eq_zero_of_blockOfLattice_ne` (**`χ ∉ B` ⟹ `L f_B = 0`**) /
+        🎯🎯🎯 `apply_eq_id_of_blockOfLattice_eq` (**`χ ∈ B` ⟹ `f_B` は恒等**)。
+        ⟹ (5.7)/(5.2) の仮説「`χ ∉ B`」が **`blockOfLattice ≠ B` という等式**として書ける。
+  - [ ] その後 🎯 (5.2) 本体。残るのは Navarro の計算
+        `0 = χ(f_b x y) = Σ_{φ∈IBr(b)} d^x_{χφ} φ(y)` の中辺→右辺で、
+        `χ|_H` の `Irr(H)` 分解・`x ∈ Z(H)` のスカラー作用・分解数 `d_{ψφ}` を要する
+        (repo の `OrdinaryOrthogonality` / `DecompositionOfOrdinary` / `BrauerBasis` が素材)。
 - [ ] **98: `(5.8)` + `(5.13.b,c,d)` (一般化分解数の直交関係) + block orthogonality**
 - [ ] **99: 🎯 第三主定理 `(6.7)`** — Okuyama の証明 ((6.1)–(6.6) 経由、非常に一般な形)
 - [ ] **100: `(6.10)` `ker(B) = O_{p'}(ker χ)` → `(6.12)` → 🎯 `(6.13)`**

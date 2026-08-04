@@ -179,6 +179,36 @@ theorem reducedCentralCharacter_eq {z : Subalgebra.center k' (MonoidAlgebra k' G
     reducedCentralCharacter hf ω z = f (ω w) :=
   apply_eq_of_mapRingHom_eq f ω (by rw [mapRingHom_centerLift, hw])
 
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+/-- **`λ` is `k'`-linear.**  A scalar `c ∈ k'` lifts to `c₀ ∈ k`, and `c₀ • w` is a lift of
+`c • z`. -/
+theorem reducedCentralCharacter_smul (c : k') (z : Subalgebra.center k' (MonoidAlgebra k' G)) :
+    reducedCentralCharacter hf ω (c • z) = c * reducedCentralCharacter hf ω z := by
+  obtain ⟨c₀, rfl⟩ := hf c
+  rw [reducedCentralCharacter_eq hf ω (w := c₀ • centerLift hf z) ?_,
+    reducedCentralCharacter_eq hf ω (w := centerLift hf z) (mapRingHom_centerLift hf z),
+    map_smul, smul_eq_mul, map_mul]
+  · rw [show ((c₀ • centerLift hf z : Subalgebra.center k (MonoidAlgebra k G)) :
+        MonoidAlgebra k G) = c₀ • (centerLift hf z : MonoidAlgebra k G) from rfl,
+      mapRingHom_smul, mapRingHom_centerLift]
+    rfl
+
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+/-- **`λ` as a `k'`-algebra homomorphism.**  This is the form `blockOfCentralCharacter` consumes,
+so it is what attaches a block to an ordinary character. -/
+noncomputable def reducedCentralCharacterAlg :
+    Subalgebra.center k' (MonoidAlgebra k' G) →ₐ[k'] k' :=
+  AlgHom.mk' (reducedCentralCharacter hf ω) fun c z => by
+    rw [reducedCentralCharacter_smul, smul_eq_mul]
+
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+@[simp]
+theorem reducedCentralCharacterAlg_apply (z : Subalgebra.center k' (MonoidAlgebra k' G)) :
+    reducedCentralCharacterAlg hf ω z = reducedCentralCharacter hf ω z := rfl
+
 end Reduced
 
 end OddOrder.GroupTheory.CenterClassSum

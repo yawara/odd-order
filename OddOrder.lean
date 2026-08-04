@@ -157,6 +157,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfLattice
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBlockIdempotent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation

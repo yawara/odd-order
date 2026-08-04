@@ -224,6 +224,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerTruncation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockDefined
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockWitness
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockTrace
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfLattice
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBlockIdempotent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
@@ -16339,3 +16340,19 @@ block 冪等元 `f_B` を `H`-部分と `G ∖ H`-部分に割るための道具
   OddOrder.RepresentationTheory.Modular.commute_inclusionHom_of_forall_single
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.trace_blockIdempotent_mul_eq_zero
+
+/-! **通常指標の block** (`Modular.BlockOfLattice`) — `λ_χ = ω_χ mod 𝔪` の属する block を
+函数として与え、(3.13.a) を「`χ ∈ B` か否か」の形にする. -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.CenterClassSum.reducedCentralCharacterAlg
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockOfLattice
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockCharacter_blockOfLattice
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.reduce_centralScalar_blockIdempotent
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.apply_eq_zero_of_blockOfLattice_ne
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.apply_eq_id_of_blockOfLattice_eq
