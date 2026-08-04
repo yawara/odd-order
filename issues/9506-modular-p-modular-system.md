@@ -1350,7 +1350,13 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
           しかも BS が使うのは `Q = ⟨t⟩` (`t` は involution)、`H = C_G(t) = C_G(Q)` なので
           仮説 `Q C_G(Q) ⊆ H ⊆ N_G(Q)` はそのまま成立する。
           **経路**:
-          * 🎯 **(6.14) Külshammer の公式**: `|G⁰|* e_{B₀} = π(Ĝ_p · Ĝ⁰)`、すなわち
+          * 🎯 **(6.14) Külshammer の公式** — **骨格完了 (2026-08-05、`Modular/KulshammerFormula`)**:
+            `pRegularSum_eq_sum_classSum` (`Ĝ⁰ = ∑_{C p-正則類} Ĉ`) と
+            🎯🎯🎯 `coeff_pElementSum_mul_pRegularSum`
+            (**`(Ĝ_p·Ĝ⁰)(x_C) = ∑_B λ_B(Ĝ⁰)·e_B(x_C)`** — (4.23) は `z` について加法的なので
+            類和ごとに適用して足し直すだけ)。
+            残り = `λ_{B₀}(Ĝ⁰) = |G⁰|*` (済) と `λ_B(Ĝ⁰) = 0` (済) を代入する 1 段。
+            `|G⁰|* e_{B₀} = π(Ĝ_p · Ĝ⁰)`、すなわち
             `p`-正則な `g` で `e_g = |G⁰|*⁻¹ |{(x,y) ∈ G_p × G⁰ : xy = g}|*`、`p`-singular で `0`。
             (`π : Z(FG) → Z(FG)` は `p`-正則類へ切り詰める線型射影。)
           * [x] **Problem (6.1) 完了 (2026-08-05、`GroupTheory/PFactorPairCount.lean`)**:
