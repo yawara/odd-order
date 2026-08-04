@@ -15716,6 +15716,14 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.CenterClassSum.apply_eq_of_mapRingHom_eq
 #assert_only_allowed_axioms
+  OddOrder.GroupTheory.CenterClassSum.centerLift
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.CenterClassSum.mapRingHom_centerLift
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.CenterClassSum.reducedCentralCharacter
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.CenterClassSum.reducedCentralCharacter_eq
+#assert_only_allowed_axioms
   OddOrder.MatrixModule.exists_scalar_of_mem_center
 #assert_only_allowed_axioms
   OddOrder.MatrixModule.centralCharacter

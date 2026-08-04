@@ -19,10 +19,15 @@ fixed by any coefficient map, and the class sums span the centre over *any* comm
 element downstairs is a combination of class sums, and lifting its coefficients one at a time
 lifts it.
 
+The two halves this needs are *existence* of a lift and *independence* of the choice; together
+they produce `λ` as a ring homomorphism.
+
 ## Main results
 
-* `OddOrder.GroupTheory.CenterClassSum.mapRingHom_classSum`
-* `OddOrder.GroupTheory.CenterClassSum.exists_mem_center_mapRingHom_eq`
+* `OddOrder.GroupTheory.CenterClassSum.mapRingHom_classSum` — class sums survive reduction
+* `OddOrder.GroupTheory.CenterClassSum.exists_mem_center_mapRingHom_eq` — a lift exists
+* `OddOrder.GroupTheory.CenterClassSum.apply_eq_of_mapRingHom_eq` — the value is lift-independent
+* `OddOrder.GroupTheory.CenterClassSum.reducedCentralCharacter` — `λ : Z(k'G) →+* k'`
 -/
 
 namespace OddOrder.GroupTheory.CenterClassSum
@@ -120,5 +125,60 @@ theorem apply_eq_of_mapRingHom_eq (f : k →+* k')
     rw [Subalgebra.coe_sub, map_sub, h, sub_self]
   rw [map_sub, map_sub, sub_eq_zero] at hzero
   exact hzero
+
+/-! ### The reduced central character `λ` -/
+
+section Reduced
+
+variable {f : k →+* k'} (hf : Function.Surjective f)
+  (ω : Subalgebra.center k (MonoidAlgebra k G) →ₐ[k] k)
+
+/-- A lift of a central element along the coefficient reduction. -/
+noncomputable def centerLift (z : Subalgebra.center k' (MonoidAlgebra k' G)) :
+    Subalgebra.center k (MonoidAlgebra k G) :=
+  ⟨(exists_mem_center_mapRingHom_eq hf z.2).choose,
+    (exists_mem_center_mapRingHom_eq hf z.2).choose_spec.1⟩
+
+theorem mapRingHom_centerLift (z : Subalgebra.center k' (MonoidAlgebra k' G)) :
+    MonoidAlgebra.mapRingHom G f (centerLift hf z : MonoidAlgebra k G) = z :=
+  (exists_mem_center_mapRingHom_eq hf z.2).choose_spec.2
+
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+/-- **The reduced central character `λ`.**  Navarro's `λ_χ(K̂) = ω_χ(K̂)^*`, obtained by lifting a
+central element of `k'[G]`, applying `ω`, and reducing.
+
+Well defined by `apply_eq_of_mapRingHom_eq`; the ring-homomorphism laws all follow from
+`reducedCentralCharacter_eq` because a lift of a product/sum is the product/sum of lifts. -/
+noncomputable def reducedCentralCharacter :
+    Subalgebra.center k' (MonoidAlgebra k' G) →+* k' where
+  toFun z := f (ω (centerLift hf z))
+  map_one' := by
+    rw [apply_eq_of_mapRingHom_eq f ω (w₂ := 1)
+      (by rw [mapRingHom_centerLift]; simp)]
+    simp
+  map_mul' z₁ z₂ := by
+    rw [apply_eq_of_mapRingHom_eq f ω (w₂ := centerLift hf z₁ * centerLift hf z₂)
+      (by simp [mapRingHom_centerLift])]
+    rw [map_mul, map_mul]
+  map_zero' := by
+    rw [apply_eq_of_mapRingHom_eq f ω (w₂ := 0)
+      (by rw [mapRingHom_centerLift]; simp)]
+    simp
+  map_add' z₁ z₂ := by
+    rw [apply_eq_of_mapRingHom_eq f ω (w₂ := centerLift hf z₁ + centerLift hf z₂)
+      (by simp [mapRingHom_centerLift])]
+    rw [map_add, map_add]
+
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+/-- **`λ` may be computed on any lift.**  The form in which it gets used. -/
+theorem reducedCentralCharacter_eq {z : Subalgebra.center k' (MonoidAlgebra k' G)}
+    {w : Subalgebra.center k (MonoidAlgebra k G)}
+    (hw : MonoidAlgebra.mapRingHom G f (w : MonoidAlgebra k G) = z) :
+    reducedCentralCharacter hf ω z = f (ω w) :=
+  apply_eq_of_mapRingHom_eq f ω (by rw [mapRingHom_centerLift, hw])
+
+end Reduced
 
 end OddOrder.GroupTheory.CenterClassSum
