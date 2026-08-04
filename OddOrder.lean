@@ -12,6 +12,8 @@ import OddOrder.Algebra.BlockOfSimpleModule
 import OddOrder.Algebra.PGroupOrbitSum
 import OddOrder.Algebra.JacobsonCentralSubring
 import OddOrder.Algebra.CornerInverse
+import OddOrder.Algebra.EigenCornerInverse
+import OddOrder.Algebra.GroupAlgebraIdeal
 import OddOrder.Algebra.BlockCornerInverse
 import OddOrder.Algebra.BlockCornerLift
 import OddOrder.Algebra.SubgroupTruncation

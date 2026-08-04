@@ -209,6 +209,8 @@ import OddOrder.Algebra.CentralCharacterBlock
 import OddOrder.Algebra.ClassSumOffCentralizer
 import OddOrder.Algebra.JacobsonCentralSubring
 import OddOrder.Algebra.CornerInverse
+import OddOrder.Algebra.EigenCornerInverse
+import OddOrder.Algebra.GroupAlgebraIdeal
 import OddOrder.Algebra.BlockCornerInverse
 import OddOrder.Algebra.BlockCornerLift
 import OddOrder.Algebra.AdicCompletePi
@@ -16307,3 +16309,15 @@ block 冪等元 `f_B` を `H`-部分と `G ∖ H`-部分に割るための道具
   OddOrder.GroupTheory.corner_twistedSum
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.exists_conj_eigen_corner
+
+/-! **Navarro (5.7) の単射性** (`Algebra.GroupAlgebraIdeal` / `Algebra.EigenCornerInverse`) —
+`(1-f_B) s` が corner で可逆ゆえ `s` は `V = M f_b` 上単射. -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.sum_single_coeff
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.mem_groupAlgebraIdeal_iff_mapRingHom_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.exists_corner_inverse_eigen
+#assert_only_allowed_axioms
+  OddOrder.eq_zero_of_smul_eq_zero_of_corner_inverse

@@ -1001,10 +1001,22 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         🎯🎯🎯 `exists_conj_eigen_corner` — **組み立て**: `h` で固定され `f` の corner に等しく
         `C_G(h_p)` を外れた台を持つ `w` から、`h • s = ζ • s` ∧ `f s f = s` ∧ `s* = w*` なる
         `s` を作る。(5.7) の代数側はこれで尽き、残るは加群側だけ。
-  - [ ] (iii) (5.4)+(5.6.a)+(3.13.a) による右乗算 `·s` の `V = M f_b` 上での単射性、
-        (iv) 固有空間 `U_α → U_{αω}` の次元比較 ⟹ 固有値の和 = 0 ⟹ `χ(f_b h) = 0`。
-        (iii) には「`𝒪G` の全係数が `𝔪` に入る ⟺ `𝔪·𝒪G` に入る」の補題が要る
-        (中心版 `mem_centerIdeal_iff_mapRingHom_eq_zero` の全代数版)。
+  - [x] **(iii) `s` の単射性** — 完了 (2026-08-04)。
+        `Algebra/GroupAlgebraIdeal.lean`: 🎯 `sum_single_coeff` (群基底での展開) +
+        🎯🎯 `mem_groupAlgebraIdeal_iff_mapRingHom_eq_zero` (**`I·R[G]` = 係数還元の核**;
+        中心版 `mem_centerIdeal_iff_mapRingHom_eq_zero` の全代数版で、基底が類和でなく `G`
+        そのものなので短い)。
+        `Algebra/EigenCornerInverse.lean`: 🎯🎯 `exists_corner_inverse_eigen` —
+        `c` 中心冪等元・`e` 冪等元・`(1-c)e = (1-c)w`・`s ≡ w (mod 𝔪)`・`e s e = s` から
+        `(1-c)s` が corner `f = (1-c)e` で両側可逆。/
+        🎯🎯 `eq_zero_of_smul_eq_zero_of_corner_inverse` — `e v = v` かつ `c v = 0` なる `v`
+        について `s v = 0 ⟹ v = 0`。
+        ⚠ **左加群で書いた** (repo の `Representation` が左作用ゆえ)。教科書は右加群
+        (`M f_b`, `vs`) だが、`f_b ∈ Z(𝒪H)` は `h` と可換なので左右どちらでも同じ論法が通る。
+        ⚠ 中心元 `1-c` の結合律さばきは補題 `hstep : ((1-c)a)((1-c)b) = (1-c)(ab)` 一本に
+        まとめると 3 つの検証 (冪等性・corner 性・差の評価) が各 1 行になる。
+  - [ ] (iv) 固有空間 `U_α → U_{αω}` の次元比較 ⟹ 固有値の和 = 0 ⟹ `χ(f_b h) = 0`。
+        ここだけが残りで、`K` 上の加群 `M`・`h` の固有空間・トレースを扱う唯一の段。
   - [ ] その後 🎯 (5.2)。併せて **(3.31)** `ψ(f_b z) = ψ(z)` (`ψ ∈ Irr(b)`), `= 0`
         (otherwise) も必要 ((3.13.a) の直接の系: `f_b` が恒等か零で作用するのでトレースが
         そのまま出る)。
