@@ -848,10 +848,26 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         当てる — `r ∈ J(R)`, `y ∈ A` に対し `u = y·r+1` と置くと `A = A·u + r·A` なので
         Nakayama で `A·u = A`、すなわち `u` は左可逆。これは `Ideal.mem_jacobson_iff`
         そのものなので、単純加群を量化せずに済む。
-  - [ ] **(5.4)** — ⚠ **前提が repo に無い**: `𝒪G` の block 冪等元 `f_b`
-        (`FG` の `e_b` を持ち上げたもの)。既存 `Algebra/BlockIdempotent.lean` は体 `k` 上の
-        `π : A → ∏Matrix` 設定で、`𝒪` 上の持ち上げは未整備。`HenselianLocalRing 𝒪` は
-        あるので冪等元持ち上げ自体は出せるはず。**次に着手するのはここ**。
+  - [x] **(5.3) の局所版** — `algebraMap_maximalIdeal_mem_ringJacobson` (`𝔪·A ⊆ J(A)`)。
+        (5.4) が使う形。
+  - [ ] **(5.4)** — ⚠ **真の隘路 = `𝒪G` の block 冪等元 `f_b` (`FG` の `e_b` の持ち上げ)**。
+        **実測 (2026-08-04)**:
+        * repo に無い。既存 `Algebra/BlockIdempotent.lean` は体 `k` 上の
+          `π : A → ∏Matrix` 設定で、`𝒪` 側の持ち上げは未整備。
+        * **mathlib にも無い**。`RingTheory/Idempotents.lean` の持ち上げ
+          (`CompleteOrthogonalIdempotents.lift_of_isNilpotent_ker` /
+          `existsUnique_isIdempotentElem_eq_of_ker_isNilpotent`) は**核が冪零**の場合のみ。
+          `𝒪G → FG` の核 `𝔪·𝒪G` は冪零でない。
+        * **adic 完備性も使えない**: `IsPModularSystem` は `HenselianLocalRing` しか要求せず、
+          実際 `𝓞_ℂ_[p]` は値群が可除ゆえ **`𝔪² = 𝔪`** で、`𝔪`-adic 完備性は
+          `𝔪 = 0` を意味してしまう。Newton 反復は使えない。
+        * mathlib の `HenselianLocalRing` は**単根の持ち上げのみ** (`TFAE` の 3 条件とも
+          root lifting の言い換え)。**Hensel の因数分解補題**も「henselian 局所環上の
+          有限代数は局所環の積」も無い。
+        ⟹ **次の作業 = 「henselian 局所環 `𝒪` 上 module-finite な可換環 `C` について
+        `C → C/𝔪C` で冪等元が持ち上がる」を作る** (Hensel 因数分解経由)。
+        `C = Z(𝒪G)` は類和を基底とする**自由** `𝒪`-加群なので適用できる。
+        複数 file になる見込み。(3.13)/(3.31) も同じ前提に乗る。
   - [ ] **(5.5)** / **(5.6)** / **(5.7)**。
         (5.7) は `⟨h⟩` の `supp(w)` への軌道が長さ `p` の倍数であること + 固有空間の
         次元比較 (乗算 `s` が単射) という組み合わせ論 + 線型代数。

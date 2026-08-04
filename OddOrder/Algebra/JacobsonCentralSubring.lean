@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
 import Mathlib.RingTheory.Nakayama
 import Mathlib.RingTheory.Finiteness.Basic
 
@@ -30,6 +31,7 @@ This is the first of the lemmas Navarro uses for Brauer's second main theorem: (
 ## Main results
 
 * `OddOrder.algebraMap_mem_ringJacobson`
+* `OddOrder.algebraMap_maximalIdeal_mem_ringJacobson` — the local case, `𝔪·A ⊆ J(A)`
 -/
 
 namespace OddOrder
@@ -75,5 +77,16 @@ theorem algebraMap_mem_ringJacobson {r : R} (hr : r ∈ Ring.jacobson R) :
   rw [hu, mul_add, mul_one, ← mul_assoc] at hzu
   rw [← hzu]
   abel
+
+/-- **The local case of Navarro (5.3)**: over a local ring the Jacobson radical is the maximal
+ideal, so `𝔪·A ⊆ J(A)` for every `A` finite over `R`.  This is the form in which (5.4) uses it:
+an element of `𝒪G` congruent to an idempotent `f` modulo `𝔪` differs from it by an element of
+`J(𝒪G)`, hence is invertible in `f(𝒪G)f`. -/
+theorem algebraMap_maximalIdeal_mem_ringJacobson [IsLocalRing R] [Nontrivial A] {r : R}
+    (hr : r ∈ IsLocalRing.maximalIdeal R) :
+    algebraMap R A r ∈ Ring.jacobson A := by
+  refine algebraMap_mem_ringJacobson ?_
+  rw [← Ideal.jacobson_bot, IsLocalRing.jacobson_eq_maximalIdeal (⊥ : Ideal R) bot_ne_top]
+  exact hr
 
 end OddOrder

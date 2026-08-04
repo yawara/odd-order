@@ -16125,3 +16125,5 @@ counting a basis of `Z(K[G])`. -/
 
 #assert_only_allowed_axioms
   OddOrder.algebraMap_mem_ringJacobson
+#assert_only_allowed_axioms
+  OddOrder.algebraMap_maximalIdeal_mem_ringJacobson
