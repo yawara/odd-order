@@ -243,6 +243,7 @@ import OddOrder.Algebra.SubgroupSumBlockAction
 import OddOrder.Algebra.TraceMulLeft
 import OddOrder.GroupTheory.SylowContaining
 import OddOrder.GroupTheory.PFactorPairCount
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
 import OddOrder.Algebra.PElementSum
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
@@ -16783,3 +16784,12 @@ Külshammer の公式 `Ĝ_p = ∑_{P ∈ Syl_p} P̂` の係数計算に使う。
   OddOrder.GroupTheory.mem_fixedPoints_pFactorPairs_iff
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.card_pFactorPairs_modEq_centralizer
+
+/-! **類和の中心指標とトレース** (`Modular/CentralCharacterTrace`) —
+`ω_i(K̂) · χ_i(1) = ∑_{g ∈ K} χ_i(g)`。Burnside の類積公式を `K`-Wedderburn 設定で
+回すための唯一の新規部品 (Navarro (4.19) の上流)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.trace_apply_single
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.centralScalar_classSum_mul_character_one
