@@ -107,6 +107,7 @@ noncomputable def centerRep :
 
 variable [Fintype G] [DecidableEq G] [Fintype (ConjClasses G)] [DecidableEq (ConjClasses G)]
 
+omit [DecidableEq G] in
 /-- `centerRep` permutes the class-sum basis according to the `MulAut G`-action on classes:
 `centerRep α (centerBasis C) = centerBasis (α • C)`.  This is `domCongr_classSum` transported to the
 centre subalgebra. -/
@@ -143,6 +144,7 @@ noncomputable def centerRep' : Representation k (MulAut G) (CenterCarrier k G) :
 /-- `centerBasis` retyped over the carrier synonym. -/
 noncomputable def centerBasis' : Basis (ConjClasses G) k (CenterCarrier k G) := centerBasis
 
+omit [DecidableEq G] in
 theorem centerRep'_apply_centerBasis' (α : MulAut G) (C : ConjClasses G) :
     centerRep' (k := k) α (centerBasis' (k := k) C) = centerBasis' (k := k) (α • C) :=
   centerRep_apply_centerBasis α C

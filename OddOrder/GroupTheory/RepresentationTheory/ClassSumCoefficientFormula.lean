@@ -16,6 +16,9 @@ column orthogonality theorem, avoiding an import cycle in `ClassSumAlgebra`.
 
 namespace OddOrder.RepresentationTheory
 
+-- 類和の中核 (`classSum` ほか) は `ClassSumCore` の一般係数環版。
+open OddOrder.GroupTheory.CenterClassSum
+
 variable {G : Type*} [Group G]
 
 /-- The chosen representative of a conjugacy class lies in that class. -/

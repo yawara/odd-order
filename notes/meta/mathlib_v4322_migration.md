@@ -57,7 +57,33 @@ v4.33.0-rc2 は 2026-08-03 リリースの新しい rc なので、重い方を�
 4. **lint 純ゼロの維持** — `Pi.algHom` / `AlgEquiv.coe_algHom` の非推奨、unusedSimpArgs 3 件、
    `simpa`→`simp` 1 件、長すぎる行 7 件を解消。
 
+## 後続で解消した重複 (2026-08-04、同日)
+
+`ClassSumSections.classSum` (ℂ 版) と `CenterClassSumBasis.classSum` (一般体版) が
+**定義も証明もほぼ同一の重複**だった。重複していたのは正確に 3 宣言
+(`classSum` / `coeff_classSum` / `classSum_mem_center`) で、残りは各ファイル固有。
+
+[`OddOrder/GroupTheory/RepresentationTheory/ClassSumCore.lean`](../../OddOrder/GroupTheory/RepresentationTheory/ClassSumCore.lean)
+に 1 本化し、両ファイルが import する形にした。副産物:
+
+- **一般化**: 中核は `Field k` を必要とせず `CommSemiring k` で足りる。類和が任意の可換係数
+  半環上で使えるようになった (特殊化債務の解消)。
+- **過剰 instance の露出と解消**: `CenterClassSumBasis` の
+  `linter.unusedSectionVars` / `unusedFintypeInType` / `unusedDecidableInType` 抑制 3 本は
+  「共有 `variable` ブロックの instance は全部 `classSum` が要る」ことを根拠にしていた。
+  中核を外に出したら根拠が消え、抑制を外すと `DecidableEq G` が**全宣言で未使用**、
+  `Fintype (ConjClasses G)` も大半で未使用だと判明。variable ブロックを段階導入に再構成して
+  **抑制 3 本すべて除去**。`CenterOrbitCount` にも波及した 2 件は `omit` で対応。
+- 差し引き **−71 行** (新 leaf の docstring を含む正味)。
+
+⚠ 注意点: 中核が `k` について多相になったため、ℂ 固定を当てにしていた
+`(classSum Ci * classSum Cj).coeff w` 形が `k` 不定になる (`CommSemiring ?m` が stuck)。
+消費側 7 ファイルで `(… : ℂ[G]).coeff` の型注釈により固定した — ただし
+`open scoped MonoidAlgebra` していないファイルでは `ℂ[G]` が配列添字と解釈されるので
+`(… : MonoidAlgebra ℂ G).coeff` と綴る必要がある。
+
 ## 未着手 (別 issue 候補)
 
-- `ClassSumSections.classSum` (ℂ 版) と `CenterClassSumBasis.classSum` (一般体版) が
-  **定義も証明もほぼ同一の重複**。一般体版が ℂ 版を包含するので統合できる。
+- `OddOrder.GroupAlgebra.classSum` (`OddOrder/Algebra/ClassSum.lean`) は**群の元**で添字づけた
+  3 つ目の類和で、`classSum (ConjClasses.mk g)` と一致するはずだが添字型が違うため未統合。
+  相対トレース機構と一体で発展しているので、統合するなら別途設計判断が要る。
