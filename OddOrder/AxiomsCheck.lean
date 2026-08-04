@@ -209,6 +209,7 @@ import OddOrder.Algebra.CentralCharacterBlock
 import OddOrder.Algebra.ClassSumOffCentralizer
 import OddOrder.Algebra.JacobsonCentralSubring
 import OddOrder.Algebra.CornerInverse
+import OddOrder.Algebra.BlockCornerInverse
 import OddOrder.Algebra.AdicCompletePi
 import OddOrder.Algebra.IdempotentLift
 import OddOrder.Algebra.CenterGroupAlgebraHenselian
@@ -16145,6 +16146,8 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.exists_corner_inverse_of_isNilpotent
 #assert_only_allowed_axioms
   OddOrder.exists_corner_inverse
+#assert_only_allowed_axioms
+  OddOrder.MatrixModule.exists_corner_inverse_of_blockCharacter_eq_one
 
 /-! **Henselian イデアルに沿った冪等元の持ち上げ** (`Algebra.IdempotentLift`) —
 `𝒪G` の block 冪等元を得るための一段. -/

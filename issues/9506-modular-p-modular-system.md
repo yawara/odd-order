@@ -914,14 +914,15 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         単元なら corner の逆元は `f u⁻¹ f`」)。標数 `p` 版
         `exists_corner_inverse_of_isNilpotent` (`x - f` が冪零) も同時に用意 —
         (5.5) が `Z(FG)` で使う形。
-  - [ ] **次: (5.5)**。`x ∈ Z(𝒪G)`, `λ_B(x*) = 1` ⟹ `∃ y ∈ f_B Z(𝒪G)`, `x y = f_B`。
-        **手順は確定済**: `Z(FG)` で `w := e_B x* + (1 - e_B)` と置くと
-        **全ての block 指標 `λ_{B'}` が `w - 1` を殺す** (`B'=B` なら `1·1+1-1=1`、
-        `B'≠B` なら `0+1-0=1`) ので、repo の `hnil` 仮説から `w - 1` は冪零 ⟹
-        `exists_corner_inverse_of_isNilpotent` で `e_B x*` は corner で可逆。
-        それを `centerLift` で `𝒪` に持ち上げて (5.4) を当てる。
-        ⟹ 必要な interfacing = repo の block 枠組 (`Block`/`blockCharacter`/
-        `blockCharacterPi_eq_zero_iff`/`hnil`) と `centerReduceHom` の接続。
+  - [x] **(5.5) の標数 `p` 半分** — 完了 (`Algebra/BlockCornerInverse.lean`)。
+        🎯🎯 `exists_corner_inverse_of_blockCharacter_eq_one`:
+        `e` が block `c` の冪等元で `λ_c(x) = 1` なら `e x` は corner で両側可逆。
+        理由は `e x - e = e(x-1)` を**全ての** block 指標が殺すこと
+        (`λ_c` は `λ_c(x)=1` ゆえ、他は `e` を殺すゆえ) ⟹ `hnil` で冪零 ⟹
+        前 commit の `exists_corner_inverse_of_isNilpotent`。
+  - [ ] **次: (5.5) の 𝒪 への持ち上げ**。上の corner 逆元を `centerLift` で `Z(𝒪G)` に
+        持ち上げ、`(x u)* = e_B` を得て (5.4) を当てる。
+        必要な接続 = `centerReduceHom` (核 = `𝔪·Z(𝒪G)`) と `f_B` (`CenterIdempotentLift`)。
   - [ ] その後 (5.6) → (5.7) → 🎯 (5.2)。
         併せて (3.13) `χ ∉ B ⟹ M f_B = 0` / (3.31) `ψ(f_b z)` も必要。
   - [ ] **(5.5)** / **(5.6)** / **(5.7)**。

@@ -12,6 +12,7 @@ import OddOrder.Algebra.BlockOfSimpleModule
 import OddOrder.Algebra.PGroupOrbitSum
 import OddOrder.Algebra.JacobsonCentralSubring
 import OddOrder.Algebra.CornerInverse
+import OddOrder.Algebra.BlockCornerInverse
 import OddOrder.Algebra.AdicCompletePi
 import OddOrder.Algebra.IdempotentLift
 import OddOrder.Algebra.CenterGroupAlgebraHenselian
