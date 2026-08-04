@@ -273,6 +273,7 @@ import OddOrder.Mathlib.QuotientGroup
 import OddOrder.Mathlib.SchurZassenhausConj
 import OddOrder.Mathlib.SemidirectProduct
 import OddOrder.Mathlib.Subgroup
+import OddOrder.Mathlib.MonoidAlgebra
 import OddOrder.Mathlib.CyclicSubgroupUnique
 import OddOrder.Mathlib.Sylow
 import OddOrder.Isaacs.Ch01_Sylow.Main

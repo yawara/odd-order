@@ -15741,7 +15741,7 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
 #assert_only_allowed_axioms
   OddOrder.GroupAlgebra.exists_blockIdempotents_defectGroups_conj
 #assert_only_allowed_axioms
-  OddOrder.GroupAlgebra.relTrace_single_apply
+  OddOrder.GroupAlgebra.coeff_relTrace_single
 #assert_only_allowed_axioms
   OddOrder.GroupAlgebra.brauerProj_relTrace_eq_zero
 #assert_only_allowed_axioms

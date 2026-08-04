@@ -10,6 +10,7 @@ import Mathlib.LinearAlgebra.Matrix.Trace
 import Mathlib.LinearAlgebra.Matrix.Reindex
 import Mathlib.LinearAlgebra.Matrix.Charpoly.Eigs
 import Mathlib.Analysis.Complex.Polynomial.Basic
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # Isaacs, *Finite Group Theory*, Problems 10C (pp. 324)
@@ -133,7 +134,7 @@ theorem ker_mapDomainAlgHom_eq_mul_top :
       rw [fiberRep_eq_comp, show (MonoidAlgebra.mapDomain
           (Function.invFun (φ : G → H) ∘ (φ : G → H)) α : MonoidAlgebra ℤ G)
           = MonoidAlgebra.mapDomain (Function.invFun (φ : G → H))
-              (MonoidAlgebra.mapDomain (φ : G → H) α) from Finsupp.mapDomain_comp]
+              (MonoidAlgebra.mapDomain (φ : G → H) α) from MonoidAlgebra.mapDomain_comp α]
       have : (MonoidAlgebra.mapDomain (φ : G → H) α : MonoidAlgebra ℤ H) = 0 := hα
       rw [this, MonoidAlgebra.mapDomain_zero]
     have hmem := sub_mapDomain_fiberRep_mem φ
@@ -176,7 +177,7 @@ theorem ker_mapDomainAlgHom_eq_top_mul :
       rw [fiberRep_eq_comp, show (MonoidAlgebra.mapDomain
           (Function.invFun (φ : G → H) ∘ (φ : G → H)) α : MonoidAlgebra ℤ G)
           = MonoidAlgebra.mapDomain (Function.invFun (φ : G → H))
-              (MonoidAlgebra.mapDomain (φ : G → H) α) from Finsupp.mapDomain_comp]
+              (MonoidAlgebra.mapDomain (φ : G → H) α) from MonoidAlgebra.mapDomain_comp α]
       have : (MonoidAlgebra.mapDomain (φ : G → H) α : MonoidAlgebra ℤ H) = 0 := hα
       rw [this, MonoidAlgebra.mapDomain_zero]
     have hmem := sub_mapDomain_fiberRep_mem φ
@@ -304,7 +305,6 @@ theorem coe_augNormalize (u : (MonoidAlgebra ℤ G)ˣ) :
   change ((unitsAlgebraMap (augUnits u) : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G)
       * (u : MonoidAlgebra ℤ G) = _
   rw [unitsAlgebraMap_coe, Algebra.algebraMap_eq_smul_one, smul_mul_assoc, one_mul]
-  rfl
 
 /-- 正規化した単元の増大は `1`: `δ(δ(u) u) = δ(u)² = 1`. -/
 theorem augmentation_augNormalize (u : (MonoidAlgebra ℤ G)ˣ) :
@@ -445,7 +445,7 @@ theorem augmentation_comp_unitBasisAlgHom
     (hδ : ∀ h : H, augmentation G ((h : (MonoidAlgebra ℤ G)ˣ) : MonoidAlgebra ℤ G)
       = 1) :
     (augmentation G).comp (unitBasisAlgHom H) = augmentation ↥H := by
-  refine MonoidAlgebra.algHom_ext ?_
+  refine MonoidAlgebra.algHom_ext ?_ (Subsingleton.elim _ _)
   intro h
   have h1 : MonoidAlgebra.single h (1 : ℤ) = MonoidAlgebra.of ℤ ↥H h := rfl
   rw [h1, AlgHom.comp_apply, unitBasisAlgHom_of, hδ h, augmentation_of]
@@ -588,7 +588,7 @@ variable {G : Type*} [Group G] [Fintype G] [DecidableEq G]
 
   `tr M(a) = n e`,  `e` = `a` における `1` の係数。
 
-対角成分は `gᵢ a` における `gᵢ` の係数 = `a (gᵢ⁻¹ gᵢ) = a 1 = e` で `i` によらない。
+対角成分は `gᵢ a` における `gᵢ` の係数 = `a (gᵢ⁻¹ gᵢ) = a.coeff 1 = e` で `i` によらない。
 (番号付け `Fin n ≃ G` は本質でないので添字集合は `G` 自身にとる。) -/
 
 /-- Isaacs 10C.5/10C.6 の行列 `M(a)`: `(i, j)` 成分は `gᵢ a` における `gⱼ` の係数
@@ -609,19 +609,19 @@ theorem regularMatrixHom_apply (a : MonoidAlgebra ℤ G) :
     regularMatrixHom a = regularMatrix a := rfl
 
 theorem regularMatrix_apply (a : MonoidAlgebra ℤ G) (i j : G) :
-    regularMatrix a i j = a (i⁻¹ * j) := by
+    regularMatrix a i j = a.coeff (i⁻¹ * j) := by
   rw [regularMatrix, regularMatrixHom]
-  simp only [AlgHom.comp_apply, AlgEquiv.coe_algHom,
+  simp only [AlgHom.comp_apply, AlgEquiv.coe_toAlgHom,
     Matrix.coe_reindexAlgEquiv, Matrix.reindex_apply, Matrix.submatrix_apply,
     Equiv.inv_symm, Equiv.inv_apply, LinearMap.toMatrixAlgEquiv_apply,
     MonoidAlgebra.basis_apply]
-  change (a * MonoidAlgebra.single j⁻¹ (1 : ℤ)) i⁻¹ = _
-  rw [MonoidAlgebra.mul_single_apply, mul_one, inv_inv]
+  change (a * MonoidAlgebra.single j⁻¹ (1 : ℤ)).coeff i⁻¹ = _
+  rw [MonoidAlgebra.coeff_mul_single_apply, mul_one, inv_inv]
 
 /-- **Isaacs Problem 10C.5**: `tr M(a) = n e`, ここで `n = |G|`,
-`e` は `a` における `1` の係数。対角成分はどれも `a (gᵢ⁻¹ gᵢ) = a 1 = e`。 -/
+`e` は `a` における `1` の係数。対角成分はどれも `a.coeff (gᵢ⁻¹ gᵢ) = a.coeff 1 = e`。 -/
 theorem trace_regularMatrix (a : MonoidAlgebra ℤ G) :
-    (regularMatrix a).trace = (Fintype.card G : ℤ) * a 1 := by
+    (regularMatrix a).trace = (Fintype.card G : ℤ) * a.coeff 1 := by
   rw [Matrix.trace]
   simp only [Matrix.diag_apply, regularMatrix_apply, inv_mul_cancel]
   rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
@@ -721,7 +721,7 @@ theorem pow_eq_one_of_isRoot_charpoly_regularMatrixC (a : MonoidAlgebra ℤ G)
   pow_eq_one_of_isRoot_charpoly (regularMatrixC_pow a ha) hμ
 
 theorem trace_regularMatrixC (a : MonoidAlgebra ℤ G) :
-    (regularMatrixC a).trace = ((Fintype.card G : ℤ) * a 1 : ℤ) := by
+    (regularMatrixC a).trace = ((Fintype.card G : ℤ) * a.coeff 1 : ℤ) := by
   rw [← trace_regularMatrix a, regularMatrixC, Matrix.trace, Matrix.trace]
   push_cast
   rfl
@@ -734,22 +734,22 @@ section Problem10C6Conclusion
 `a` における `1` の係数 `e` は `-1, 0, 1` のいずれか。 -/
 theorem coeff_one_of_pow_eq_one {G : Type*} [Group G] [Finite G]
     (a : MonoidAlgebra ℤ G) {m : ℕ} (hm : 0 < m)
-    (ha : a ^ m = 1) : a 1 = -1 ∨ a 1 = 0 ∨ a 1 = 1 := by
+    (ha : a ^ m = 1) : a.coeff 1 = -1 ∨ a.coeff 1 = 0 ∨ a.coeff 1 = 1 := by
   classical
   have _ : Fintype G := Fintype.ofFinite G
   have hn : 0 < Fintype.card G := Fintype.card_pos
   have hbound := norm_trace_le_of_pow_eq_one (A := regularMatrixC a) hm
     (regularMatrixC_pow a ha)
   rw [trace_regularMatrixC] at hbound
-  have hreal : |((Fintype.card G : ℤ) * a 1 : ℤ)| ≤ (Fintype.card G : ℤ) := by
-    have : |(((Fintype.card G : ℤ) * a 1 : ℤ) : ℝ)| ≤ (Fintype.card G : ℝ) := by
+  have hreal : |((Fintype.card G : ℤ) * a.coeff 1 : ℤ)| ≤ (Fintype.card G : ℤ) := by
+    have : |(((Fintype.card G : ℤ) * a.coeff 1 : ℤ) : ℝ)| ≤ (Fintype.card G : ℝ) := by
       simpa [Complex.norm_intCast] using hbound
     exact_mod_cast this
   rw [abs_mul, abs_of_nonneg (by positivity : (0 : ℤ) ≤ (Fintype.card G : ℤ))] at hreal
   have hcard : (0 : ℤ) < (Fintype.card G : ℤ) := by exact_mod_cast hn
-  have habs : |a 1| ≤ 1 := le_of_mul_le_mul_left (by linarith) hcard
-  have h1 : -1 ≤ a 1 := (abs_le.mp habs).1
-  have h2 : a 1 ≤ 1 := (abs_le.mp habs).2
+  have habs : |a.coeff 1| ≤ 1 := le_of_mul_le_mul_left (by linarith) hcard
+  have h1 : -1 ≤ a.coeff 1 := (abs_le.mp habs).1
+  have h2 : a.coeff 1 ≤ 1 := (abs_le.mp habs).2
   omega
 
 end Problem10C6Conclusion

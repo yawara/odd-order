@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import OddOrder.Algebra.GroupAlgebraConjugation
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # Class sums and the centre of the group algebra
@@ -27,7 +28,7 @@ turns statements about defect groups (`e_B ∈ Tr^G_D((𝒪G)^D)`) into statemen
 
 ## Main results
 
-* `OddOrder.GroupAlgebra.relTrace_single_apply` — `Tr^P_{P ∩ C_G(g)}(c·g)` is the `P`-orbit sum.
+* `OddOrder.GroupAlgebra.coeff_relTrace_single` — `Tr^P_{P ∩ C_G(g)}(c·g)` is the `P`-orbit sum.
 * `OddOrder.GroupAlgebra.relTrace_single_eq_classSum` — `K̂ = Tr^G_{C_G(g)}(g)`, the case `P = ⊤`.
 * `OddOrder.GroupAlgebra.smul_classSum` — class sums are central.
 * `OddOrder.GroupAlgebra.eq_sum_classSum` — the class sum expansion `x = ∑_K x_K · K̂`.
@@ -48,29 +49,33 @@ noncomputable def classSum (g : G) : MonoidAlgebra k G :=
   ∑ x ∈ Finset.univ.filter fun x => IsConj g x, single x 1
 
 open scoped Classical in
-theorem classSum_apply (g n : G) :
-    (classSum k g : MonoidAlgebra k G) n = if IsConj g n then 1 else 0 := by
-  have h : (classSum k g : MonoidAlgebra k G) n
-      = ∑ x ∈ Finset.univ.filter fun x => IsConj g x, (single x (1 : k) : MonoidAlgebra k G) n :=
-    Finsupp.finsetSum_apply _ _ _
+theorem coeff_classSum (g n : G) :
+    (classSum k g : MonoidAlgebra k G).coeff n = if IsConj g n then 1 else 0 := by
+  have h : (classSum k g : MonoidAlgebra k G).coeff n
+      = ∑ x ∈ Finset.univ.filter fun x => IsConj g x,
+          (single x (1 : k) : MonoidAlgebra k G).coeff n := by
+    rw [classSum]
+    exact MonoidAlgebra.coeff_finsetSum _ _ _
   rw [h]
-  simp [MonoidAlgebra.single_apply]
+  simp only [MonoidAlgebra.coeff_single, Finsupp.single_apply]
+  rw [Finset.sum_ite_eq' (Finset.univ.filter fun x => IsConj g x) n (fun _ => (1 : k))]
+  simp
 
 variable {k}
 
-theorem classSum_apply_of_isConj {g n : G} (h : IsConj g n) :
-    (classSum k g : MonoidAlgebra k G) n = 1 := by
-  classical rw [classSum_apply, if_pos h]
+theorem coeff_classSum_of_isConj {g n : G} (h : IsConj g n) :
+    (classSum k g : MonoidAlgebra k G).coeff n = 1 := by
+  classical rw [coeff_classSum, if_pos h]
 
-theorem classSum_apply_of_not_isConj {g n : G} (h : ¬ IsConj g n) :
-    (classSum k g : MonoidAlgebra k G) n = 0 := by
-  classical rw [classSum_apply, if_neg h]
+theorem coeff_classSum_of_not_isConj {g n : G} (h : ¬ IsConj g n) :
+    (classSum k g : MonoidAlgebra k G).coeff n = 0 := by
+  classical rw [coeff_classSum, if_neg h]
 
 /-- Class sums are invariant under conjugation, i.e. they lie in the centre. -/
 theorem smul_classSum (h g : G) : h • (classSum k g : MonoidAlgebra k G) = classSum k g := by
   classical
-  refine Finsupp.ext fun n => ?_
-  rw [conj_smul_apply, classSum_apply, classSum_apply]
+  ext n
+  rw [coeff_conj_smul, coeff_classSum, coeff_classSum]
   congr 1
   simp only [eq_iff_iff]
   constructor
@@ -101,8 +106,8 @@ coefficient `c` evenly over the `P`-conjugates of `g`:
 For `P = ⊤` this is the class sum identity `K̂ = Tr^G_{C_G(g)}(g)`
 (`relTrace_single_eq_classSum`); for a `p`-subgroup `P` it is what identifies the kernel of the
 Brauer homomorphism. -/
-theorem relTrace_single_apply (P : Subgroup G) (g : G) (c : k) (n : G) :
-    GAlgebra.relTrace (P ⊓ Subgroup.centralizer ({g} : Set G)) P (single g c) n
+theorem coeff_relTrace_single (P : Subgroup G) (g : G) (c : k) (n : G) :
+    (GAlgebra.relTrace (P ⊓ Subgroup.centralizer ({g} : Set G)) P (single g c)).coeff n
       = if ∃ u ∈ P, u * g * u⁻¹ = n then c else 0 := by
   classical
   set Q : Subgroup G := P ⊓ Subgroup.centralizer ({g} : Set G) with hQ
@@ -118,13 +123,13 @@ theorem relTrace_single_apply (P : Subgroup G) (g : G) (c : k) (n : G) :
     Subgroup.mem_centralizer_iff.mp (Subgroup.mem_inf.mp hw).2 g (Set.mem_singleton g)
   have hR : GAlgebra.relTrace Q P (single g c : MonoidAlgebra k G)
       = ∑ x : ↥P ⧸ Q.subgroupOf P, rep x • (single g c : MonoidAlgebra k G) := rfl
-  have hsplit : (∑ x : ↥P ⧸ Q.subgroupOf P, rep x • (single g c : MonoidAlgebra k G)) n
-      = ∑ x : ↥P ⧸ Q.subgroupOf P, (rep x • (single g c : MonoidAlgebra k G)) n :=
-    Finsupp.finsetSum_apply _ _ _
+  have hsplit : (∑ x : ↥P ⧸ Q.subgroupOf P, rep x • (single g c : MonoidAlgebra k G)).coeff n
+      = ∑ x : ↥P ⧸ Q.subgroupOf P, (rep x • (single g c : MonoidAlgebra k G)).coeff n := by
+    exact MonoidAlgebra.coeff_finsetSum _ _ _
   have hterm : ∀ x : ↥P ⧸ Q.subgroupOf P,
-      (rep x • (single g c : MonoidAlgebra k G)) n
+      (rep x • (single g c : MonoidAlgebra k G)).coeff n
         = if rep x * g * (rep x)⁻¹ = n then c else 0 :=
-    fun x => by rw [conj_smul_single, MonoidAlgebra.single_apply]
+    fun x => by rw [conj_smul_single, MonoidAlgebra.coeff_single, Finsupp.single_apply]
   rw [hR, hsplit, Finset.sum_congr rfl fun x _ => hterm x]
   -- Distinct cosets of the stabiliser give distinct conjugates, so at most one term survives.
   have huniq : ∀ x y : ↥P ⧸ Q.subgroupOf P,
@@ -162,15 +167,15 @@ theorem relTrace_single_apply (P : Subgroup G) (g : G) (c : k) (n : G) :
     exact Finset.sum_eq_zero fun x _ => if_neg fun hxn => hc ⟨rep x, hrepP x, hxn⟩
 
 /-- **The class sum is a relative trace**: `K̂ = Tr^G_{C_G(g)}(g)`.  This is the case `P = ⊤` of
-`relTrace_single_apply`. -/
+`coeff_relTrace_single`. -/
 theorem relTrace_single_eq_classSum (g : G) :
     GAlgebra.relTrace (Subgroup.centralizer ({g} : Set G)) ⊤ (single g (1 : k))
       = classSum k g := by
   classical
-  refine Finsupp.ext fun n => ?_
+  ext n
   have hQ : (⊤ : Subgroup G) ⊓ Subgroup.centralizer ({g} : Set G)
       = Subgroup.centralizer ({g} : Set G) := top_inf_eq _
-  rw [← hQ, relTrace_single_apply, classSum_apply]
+  rw [← hQ, coeff_relTrace_single, coeff_classSum]
   have hiff : (∃ u ∈ (⊤ : Subgroup G), u * g * u⁻¹ = n) ↔ IsConj g n := by
     simp only [Subgroup.mem_top, true_and, isConj_iff]
   by_cases h : IsConj g n
@@ -182,31 +187,33 @@ section Span
 omit [Fintype G] in
 /-- A `G`-fixed element of `k[G]` is a class function: its coefficients are constant on
 conjugacy classes. -/
-theorem apply_eq_of_isConj {x : MonoidAlgebra k G} (hx : ∀ g : G, g • x = x) {a b : G}
-    (hab : IsConj a b) : x a = x b := by
+theorem coeff_eq_of_isConj {x : MonoidAlgebra k G} (hx : ∀ g : G, g • x = x) {a b : G}
+    (hab : IsConj a b) : x.coeff a = x.coeff b := by
   obtain ⟨c, hc⟩ := isConj_iff.mp hab
-  rw [← hc, ← (smul_eq_self_iff_apply c x).mp (hx c) (c * a * c⁻¹)]
+  rw [← hc, ← (smul_eq_self_iff_coeff c x).mp (hx c) (c * a * c⁻¹)]
   congr 1
   group
 
 open scoped Classical in
 /-- **The class sum expansion of a central element**: `x = ∑_K x_K · K̂`. -/
 theorem eq_sum_classSum [Fintype (ConjClasses G)] {x : MonoidAlgebra k G}
-    (hx : ∀ g : G, g • x = x) : x = ∑ C : ConjClasses G, x C.out • classSum k C.out := by
+    (hx : ∀ g : G, g • x = x) : x = ∑ C : ConjClasses G, x.coeff C.out • classSum k C.out := by
   classical
-  have hxconj : ∀ a b : G, IsConj a b → x a = x b := fun _ _ => apply_eq_of_isConj hx
-  refine Finsupp.ext fun n => ?_
-  have hsplit : (∑ C : ConjClasses G, x C.out • (classSum k C.out : MonoidAlgebra k G)) n
-      = ∑ C : ConjClasses G, (x C.out • (classSum k C.out : MonoidAlgebra k G)) n :=
-    Finsupp.finsetSum_apply _ _ _
+  have hxconj : ∀ a b : G, IsConj a b → x.coeff a = x.coeff b := fun _ _ => coeff_eq_of_isConj hx
+  ext n
+  have hsplit :
+      (∑ C : ConjClasses G, x.coeff C.out • (classSum k C.out : MonoidAlgebra k G)).coeff n
+        = ∑ C : ConjClasses G,
+            (x.coeff C.out • (classSum k C.out : MonoidAlgebra k G)).coeff n := by
+    exact MonoidAlgebra.coeff_finsetSum _ _ _
   rw [hsplit]
   have hmkout : ∀ C : ConjClasses G, ConjClasses.mk C.out = C := fun C => by
     rw [← ConjClasses.quotient_mk_eq_mk]; exact Quotient.out_eq C
   have hterm : ∀ C : ConjClasses G,
-      (x C.out • (classSum k C.out : MonoidAlgebra k G)) n
-        = if C = ConjClasses.mk n then x n else 0 := by
+      (x.coeff C.out • (classSum k C.out : MonoidAlgebra k G)).coeff n
+        = if C = ConjClasses.mk n then x.coeff n else 0 := by
     intro C
-    rw [MonoidAlgebra.smul_apply, smul_eq_mul, classSum_apply]
+    rw [MonoidAlgebra.coeff_smul_apply, smul_eq_mul, coeff_classSum]
     by_cases hC : C = ConjClasses.mk n
     · have hcn : IsConj C.out n := by
         rw [← ConjClasses.mk_eq_mk_iff_isConj, hmkout]; exact hC

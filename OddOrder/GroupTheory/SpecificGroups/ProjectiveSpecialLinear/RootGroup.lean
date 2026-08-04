@@ -44,9 +44,9 @@ noncomputable def rootHom : Multiplicative F →*
     have hz : (Matrix.SpecialLinearGroup.transvection (ι := Fin 2)
         Fin.zero_ne_one (0 : F) : Matrix.SpecialLinearGroup (Fin 2) F) = 1 := by
       ext i j
-      simp [Matrix.SpecialLinearGroup.transvection_coe]
-    simpa using congrArg
-      (QuotientGroup.mk' (Subgroup.center (Matrix.SpecialLinearGroup (Fin 2) F))) hz
+      simp
+    rw [hz]
+    simp
   map_mul' x y := by
     change QuotientGroup.mk' _ (Matrix.SpecialLinearGroup.transvection Fin.zero_ne_one
       (x.toAdd + y.toAdd)) = _

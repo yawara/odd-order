@@ -431,7 +431,8 @@ free-action decomposition `β ≃ (β / Γ) × Γ` (`MulAction.selfEquivOrbitsQu
 theorem card_dvd_of_stabilizer_eq_bot {Γ : Type*} [Group Γ] [Finite Γ] {β : Type*} [Finite β]
     [MulAction Γ β] (h : ∀ b : β, MulAction.stabilizer Γ b = ⊥) :
     Nat.card Γ ∣ Nat.card β := by
-  have e := MulAction.selfEquivOrbitsQuotientProd (α := Γ) (β := β) h
+  -- 名前付き implicit (`α := Γ`) は mathlib 側の変数名リネームで壊れるので、`h` から推論させる。
+  have e := MulAction.selfEquivOrbitsQuotientProd h
   rw [Nat.card_congr e, Nat.card_prod]
   exact Dvd.intro_left _ rfl
 

@@ -11,6 +11,7 @@ import Mathlib.RingTheory.Ideal.Maps
 import Mathlib.RingTheory.Finiteness.Finsupp
 import OddOrder.Algebra.AugmentationIdeal
 import OddOrder.Algebra.FiniteIndexAnnihilator
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # Towards the principal ideal theorem: `Δ(K)Δ(G)` for a normal subgroup
@@ -749,7 +750,7 @@ theorem augmentationCoquotientAlgHom_mapDomain (x : MonoidAlgebra ℤ G) :
   have hcomp : (augmentationCoquotientAlgHom G K).comp
       (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K))
       = augmentationCoquotientAlgHomG G K := by
-    refine MonoidAlgebra.algHom_ext fun g => ?_
+    refine MonoidAlgebra.algHom_ext (fun g => ?_) (Subsingleton.elim _ _)
     simp only [AlgHom.coe_comp, Function.comp_apply,
       MonoidAlgebra.mapDomainAlgHom_apply, MonoidAlgebra.mapDomain_single,
       QuotientGroup.mk'_apply]
@@ -766,7 +767,7 @@ theorem augmentation_mapDomain (x : MonoidAlgebra ℤ G) :
   have hcomp : (augmentation (G ⧸ K)).comp
       (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K))
       = augmentation G := by
-    refine MonoidAlgebra.algHom_ext fun g => ?_
+    refine MonoidAlgebra.algHom_ext (fun g => ?_) (Subsingleton.elim _ _)
     simp only [AlgHom.coe_comp, Function.comp_apply,
       MonoidAlgebra.mapDomainAlgHom_apply, MonoidAlgebra.mapDomain_single,
       QuotientGroup.mk'_apply]
@@ -933,7 +934,7 @@ theorem mem_augmentationRingIdeal_iff_mem_augmentationIdeal
 theorem mapDomainAlgHom_surjective :
     Function.Surjective (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K) :
       MonoidAlgebra ℤ G → MonoidAlgebra ℤ (G ⧸ K)) :=
-  Finsupp.mapDomain_surjective (QuotientGroup.mk'_surjective K)
+  MonoidAlgebra.mapDomain_surjective (QuotientGroup.mk'_surjective K)
 
 /-- The `ℤ[G/K]`-action of `π(x)` on `Δ(G)‾` is the `ℤ[G]`-action of `x`. -/
 theorem augmentationCoquotientModule_mapDomain_smul (h : _root_.commutator G ≤ K)
@@ -1036,7 +1037,7 @@ omit [hK : K.Normal] in
 theorem moduleFinite_augmentationCoquotient [Finite G] :
     Module.Finite ℤ (AugmentationCoquotient G K) := by
   letI : Module.Finite ℤ (MonoidAlgebra ℤ G) :=
-    inferInstanceAs (Module.Finite ℤ (G →₀ ℤ))
+    Module.Finite.equiv (MonoidAlgebra.coeffLinearEquiv (R := ℤ) (S := ℤ) (M := G)).symm
   letI : Module.Finite ℤ (augmentationIdeal G) := inferInstance
   exact Module.Finite.of_surjective (augmentationCorel G K).mkQ
     (Submodule.mkQ_surjective _)
@@ -1055,7 +1056,7 @@ theorem fg_top_augmentationCoquotient [Finite G] :
 theorem fg_augmentationRingIdeal [Finite G] :
     (augmentationRingIdeal G K).toAddSubgroup.FG := by
   letI : Module.Finite ℤ (MonoidAlgebra ℤ (G ⧸ K)) :=
-    inferInstanceAs (Module.Finite ℤ ((G ⧸ K) →₀ ℤ))
+    Module.Finite.equiv (MonoidAlgebra.coeffLinearEquiv (R := ℤ) (S := ℤ) (M := G ⧸ K)).symm
   have h : ((augmentationRingIdeal G K).restrictScalars ℤ).FG :=
     IsNoetherian.noetherian _
   rw [Submodule.fg_iff_addSubgroup_fg] at h
@@ -1087,15 +1088,15 @@ argument pushes `ε(g-1) ∈ Δ(K)Δ(G)` through the projection `π : ℤ[G] →
 of a finite group ring has constant coefficients. -/
 
 /-- A right-invariant element of a group ring has constant coefficients:
-`η·s = η` for all `s` forces `η a = η b`. -/
-theorem apply_eq_of_forall_mul_of_eq {H : Type*} [Group H]
+`η·s = η` for all `s` forces `η.coeff a = η.coeff b`. -/
+theorem coeff_eq_of_forall_mul_of_eq {H : Type*} [Group H]
     {η : MonoidAlgebra ℤ H}
     (hinv : ∀ s : H, η * MonoidAlgebra.of ℤ H s = η) (a b : H) :
-    η a = η b := by
-  have key : ∀ s : H, η (a * s⁻¹) = η a := by
+    η.coeff a = η.coeff b := by
+  have key : ∀ s : H, η.coeff (a * s⁻¹) = η.coeff a := by
     intro s
-    have h1 : (η * MonoidAlgebra.of ℤ H s) a = η (a * s⁻¹) := by
-      rw [MonoidAlgebra.of_apply, MonoidAlgebra.mul_single_apply, mul_one]
+    have h1 : (η * MonoidAlgebra.of ℤ H s).coeff a = η.coeff (a * s⁻¹) := by
+      rw [MonoidAlgebra.of_apply, MonoidAlgebra.coeff_mul_single_apply, mul_one]
     rw [hinv s] at h1
     exact h1.symm
   have h2 := key (b⁻¹ * a)
@@ -1155,7 +1156,7 @@ noncomputable def sectionWeightedSum (e : G ⧸ K → ℤ) (f : G ⧸ K → G) :
 theorem mapDomain_sectionWeightedSum (e : G ⧸ K → ℤ) {f : G ⧸ K → G}
     (hf : ∀ q, (↑(f q) : G ⧸ K) = q) (q : G ⧸ K) :
     (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K)
-        (sectionWeightedSum G K e f)) q = e q := by
+        (sectionWeightedSum G K e f)).coeff q = e q := by
   letI := K.fintypeQuotientOfFiniteIndex
   rw [sectionWeightedSum, map_sum]
   have hterm : ∀ p : G ⧸ K,
@@ -1166,8 +1167,8 @@ theorem mapDomain_sectionWeightedSum (e : G ⧸ K → ℤ) {f : G ⧸ K → G}
     rw [MonoidAlgebra.mapDomainAlgHom_apply, MonoidAlgebra.mapDomain_single,
       QuotientGroup.mk'_apply, hf p]
   simp_rw [hterm]
-  change (∑ p : G ⧸ K, (Finsupp.single p (e p) : (G ⧸ K) →₀ ℤ)) q = e q
-  rw [Finsupp.finsetSum_apply]
+  rw [MonoidAlgebra.coeff_finsetSum]
+  simp only [MonoidAlgebra.coeff_single]
   refine Eq.trans (Finset.sum_eq_single q ?_ ?_) Finsupp.single_eq_same
   · intro p _ hp
     exact Finsupp.single_eq_of_ne hp.symm
@@ -1204,7 +1205,7 @@ theorem sectionWeightedSum_coeff_const
     · rw [MonoidAlgebra.of_apply, MonoidAlgebra.mapDomainAlgHom_apply,
         MonoidAlgebra.mapDomain_single, QuotientGroup.mk'_apply,
         ← MonoidAlgebra.of_apply]
-  have hcoeff := apply_eq_of_forall_mul_of_eq hinv q₁ q₂
+  have hcoeff := coeff_eq_of_forall_mul_of_eq hinv q₁ q₂
   rwa [mapDomain_sectionWeightedSum G K e hf q₁,
     mapDomain_sectionWeightedSum G K e hf q₂] at hcoeff
 
@@ -1252,11 +1253,11 @@ theorem exists_annihilator_transferXi [Finite G] (h : _root_.commutator G ≤ K)
   -- coset representatives and the lift `ε`
   set f : G ⧸ K → G := Quotient.out with hf_def
   have hf : ∀ q, (↑(f q) : G ⧸ K) = q := fun q => Quotient.out_eq' q
-  set e : G ⧸ K → ℤ := fun q => γ q with he_def
+  set e : G ⧸ K → ℤ := fun q => γ.coeff q with he_def
   -- `π ε = γ`
   have hπε : MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K)
       (sectionWeightedSum G K e f) = γ := by
-    refine Finsupp.ext fun q => ?_
+    ext q
     rw [mapDomain_sectionWeightedSum G K e hf q]
   -- `Ξ_ε = 0`
   have hεann : augmentationCoquotientMulLeft G K hK

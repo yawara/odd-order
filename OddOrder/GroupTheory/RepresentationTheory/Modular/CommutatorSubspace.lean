@@ -116,12 +116,13 @@ variable [Fintype G] [DecidableEq (ConjClasses G)]
 
 /-- Summing the coefficients of an element of `kG` over a conjugacy class. -/
 noncomputable def classCoeffSum (C : ConjClasses G) : MonoidAlgebra k G →ₗ[k] k where
-  toFun x := ∑ g ∈ Finset.univ.filter (fun g : G => ConjClasses.mk g = C), x g
+  toFun x := ∑ g ∈ Finset.univ.filter (fun g : G => ConjClasses.mk g = C), x.coeff g
   map_add' x y := by simp [Finset.sum_add_distrib]
   map_smul' c x := by simp [Finset.mul_sum]
 
 theorem classCoeffSum_apply (C : ConjClasses G) (x : MonoidAlgebra k G) :
-    classCoeffSum C x = ∑ g ∈ Finset.univ.filter (fun g : G => ConjClasses.mk g = C), x g := rfl
+    classCoeffSum C x
+      = ∑ g ∈ Finset.univ.filter (fun g : G => ConjClasses.mk g = C), x.coeff g := rfl
 
 @[simp]
 theorem classCoeffSum_single (C : ConjClasses G) (a : G) (c : k) :

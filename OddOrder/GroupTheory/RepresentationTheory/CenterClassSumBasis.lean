@@ -8,6 +8,7 @@ import Mathlib.Algebra.Algebra.Subalgebra.Basic
 import Mathlib.Algebra.Group.Conj
 import Mathlib.LinearAlgebra.Basis.Basic
 import Mathlib.Tactic.Group
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # The class-sum basis of the centre of a group algebra (general field)
@@ -44,18 +45,18 @@ noncomputable def classSum (C : ConjClasses G) : MonoidAlgebra k G :=
   ∑ g : G, if ConjClasses.mk g = C then MonoidAlgebra.of k G g else 0
 
 /-- The coefficient of `classSum C` at `x ∈ G` is `1` if `x ∈ C` and `0` otherwise. -/
-theorem classSum_apply (C : ConjClasses G) (x : G) :
-    classSum (k := k) C x = if ConjClasses.mk x = C then 1 else 0 := by
-  have hsum : classSum (k := k) C x
-      = ∑ g : G, (if ConjClasses.mk g = C then MonoidAlgebra.of k G g else 0) x := by
-    rw [classSum]; exact map_sum (Finsupp.applyAddHom x) _ Finset.univ
-  have hzero : ∀ y : G, (0 : MonoidAlgebra k G) y = 0 := fun _ => rfl
+theorem coeff_classSum (C : ConjClasses G) (x : G) :
+    (classSum (k := k) C).coeff x = if ConjClasses.mk x = C then 1 else 0 := by
+  have hsum : (classSum (k := k) C).coeff x
+      = ∑ g : G, (if ConjClasses.mk g = C then MonoidAlgebra.of k G g else 0).coeff x := by
+    rw [classSum]; exact MonoidAlgebra.coeff_finsetSum _ _ _
+  have hzero : ((0 : MonoidAlgebra k G)).coeff x = 0 := rfl
   have hterm : ∀ g : G,
-      (if ConjClasses.mk g = C then MonoidAlgebra.of k G g else 0) x
+      (if ConjClasses.mk g = C then MonoidAlgebra.of k G g else 0).coeff x
       = if g = x then (if ConjClasses.mk g = C then (1 : k) else 0) else 0 := by
     intro g
-    rw [apply_ite (fun f : MonoidAlgebra k G => f x), MonoidAlgebra.of_apply,
-      MonoidAlgebra.single_apply, hzero x]
+    rw [apply_ite (fun f : MonoidAlgebra k G => f.coeff x), MonoidAlgebra.of_apply,
+      MonoidAlgebra.coeff_single, Finsupp.single_apply, hzero]
     by_cases hg : g = x
     · rw [if_pos hg, if_pos hg]
     · rw [if_neg hg, if_neg hg, ite_self]
@@ -104,54 +105,52 @@ theorem classSum_linearIndependent :
   have hmk : ConjClasses.mk (C.out) = C := by
     rw [← ConjClasses.quotient_mk_eq_mk]; exact Quotient.out_eq C
   have key : ∀ C' : ConjClasses G,
-      (a C' • classSum (k := k) C') C.out = if C = C' then a C' else 0 := by
+      (a C' • classSum (k := k) C').coeff C.out = if C = C' then a C' else 0 := by
     intro C'
-    rw [MonoidAlgebra.smul_apply, classSum_apply, hmk, smul_eq_mul]
+    rw [MonoidAlgebra.coeff_smul_apply, coeff_classSum, hmk, smul_eq_mul]
     split <;> simp_all
-  have hx : ∑ C' : ConjClasses G, (a C' • classSum (k := k) C') C.out = 0 := by
-    have h0 : (∑ C' : ConjClasses G, a C' • classSum (k := k) C') C.out = 0 := by rw [ha]; rfl
+  have hx : ∑ C' : ConjClasses G, (a C' • classSum (k := k) C').coeff C.out = 0 := by
+    have h0 : (∑ C' : ConjClasses G, a C' • classSum (k := k) C').coeff C.out = 0 := by
+      rw [ha]; rfl
     rw [← h0]
-    exact (map_sum (Finsupp.applyAddHom C.out)
-      (fun C' => a C' • classSum (k := k) C') Finset.univ).symm
+    exact (MonoidAlgebra.coeff_finsetSum _ _ _).symm
   rw [Finset.sum_congr rfl (fun C' _ => key C'), Finset.sum_ite_eq Finset.univ C a] at hx
   simpa using hx
 
 /-- A central element of `k[G]` has class-constant coefficients: `z (h * x * h⁻¹) = z x`.
 Conjugation by `h` permutes the support of `z` without changing the coefficients (this is the
 content of `z` commuting with `single h 1`). -/
-theorem center_apply_conj {z : MonoidAlgebra k G}
+theorem coeff_center_conj {z : MonoidAlgebra k G}
     (hz : z ∈ Subalgebra.center k (MonoidAlgebra k G)) (h x : G) :
-    (z (h * x * h⁻¹) : k) = z x := by
-  have key := (Finsupp.ext_iff.mp
-    ((Subalgebra.mem_center_iff.mp hz) (MonoidAlgebra.single h 1))) (h * x)
-  rw [MonoidAlgebra.single_mul_apply, MonoidAlgebra.mul_single_apply, one_mul, mul_one,
+    (z.coeff (h * x * h⁻¹) : k) = z.coeff x := by
+  have key := (Finsupp.ext_iff.mp (congrArg MonoidAlgebra.coeff
+    ((Subalgebra.mem_center_iff.mp hz) (MonoidAlgebra.single h 1)))) (h * x)
+  rw [MonoidAlgebra.coeff_single_mul_apply, MonoidAlgebra.coeff_mul_single_apply, one_mul, mul_one,
     inv_mul_cancel_left] at key
   exact key.symm
 
 /-- A central element is constant along a conjugacy class: `mk a = mk b ⟹ z a = z b`. -/
-theorem center_apply_of_mk_eq {z : MonoidAlgebra k G}
+theorem coeff_center_of_mk_eq {z : MonoidAlgebra k G}
     (hz : z ∈ Subalgebra.center k (MonoidAlgebra k G)) {a b : G}
-    (hab : ConjClasses.mk a = ConjClasses.mk b) : (z a : k) = z b := by
+    (hab : ConjClasses.mk a = ConjClasses.mk b) : (z.coeff a : k) = z.coeff b := by
   obtain ⟨h, rfl⟩ := isConj_iff.mp (ConjClasses.mk_eq_mk_iff_isConj.mp hab)
-  exact (center_apply_conj hz h a).symm
+  exact (coeff_center_conj hz h a).symm
 
 /-- **The class-sum expansion of a central element**: `z = ∑_C z(C.out) • classSum C`.
 Reading off the coefficient at `y`, only the class `C = mk y` contributes, with value
 `z (mk y).out = z y` (central ⟹ class-constant).  This is the spanning half of the basis. -/
 theorem center_eq_sum_classSum {z : MonoidAlgebra k G}
     (hz : z ∈ Subalgebra.center k (MonoidAlgebra k G)) :
-    z = ∑ C : ConjClasses G, z (C.out) • classSum (k := k) C := by
-  refine Finsupp.ext fun y => ?_
-  have hrhs : (∑ C : ConjClasses G, z (C.out) • classSum (k := k) C) y
-      = ∑ C : ConjClasses G, (z (C.out) • classSum (k := k) C) y :=
-    map_sum (Finsupp.applyAddHom y) (fun C => z (C.out) • classSum (k := k) C) Finset.univ
-  rw [hrhs]
-  simp only [MonoidAlgebra.smul_apply, smul_eq_mul, classSum_apply, mul_ite, mul_one, mul_zero]
-  rw [Finset.sum_ite_eq Finset.univ (ConjClasses.mk y) (fun C => z (C.out)),
+    z = ∑ C : ConjClasses G, z.coeff (C.out) • classSum (k := k) C := by
+  ext y
+  rw [MonoidAlgebra.coeff_finsetSum]
+  simp only [MonoidAlgebra.coeff_smul_apply, smul_eq_mul, coeff_classSum, mul_ite, mul_one,
+    mul_zero]
+  rw [Finset.sum_ite_eq Finset.univ (ConjClasses.mk y) (fun C => z.coeff (C.out)),
     if_pos (Finset.mem_univ _)]
   have hmk : ConjClasses.mk ((ConjClasses.mk y).out) = ConjClasses.mk y := by
     rw [← ConjClasses.quotient_mk_eq_mk]; exact Quotient.out_eq _
-  exact (center_apply_of_mk_eq hz hmk).symm
+  exact (coeff_center_of_mk_eq hz hmk).symm
 
 /-- The class sum `classSum C`, packaged as an element of the centre subalgebra. -/
 noncomputable def classSumCenter (C : ConjClasses G) :
@@ -173,7 +172,7 @@ noncomputable def centerBasis :
     (by
       intro z _
       have hsum : z = ∑ C : ConjClasses G,
-          (z : MonoidAlgebra k G) (C.out) • classSumCenter (k := k) C := by
+          (z : MonoidAlgebra k G).coeff (C.out) • classSumCenter (k := k) C := by
         apply Subtype.ext
         rw [AddSubmonoidClass.coe_finsetSum]
         simp only [SetLike.val_smul, classSumCenter_coe]
@@ -194,11 +193,11 @@ conjugacy relation both ways).  This is the `σ_e`-permutation feeding the corne
 theorem domCongr_classSum (α : G ≃* G) (C : ConjClasses G) :
     MonoidAlgebra.domCongr k k α (classSum (k := k) C)
       = classSum (k := k) (ConjClasses.map (α : G →* G) C) := by
-  refine Finsupp.ext fun y => ?_
-  rw [MonoidAlgebra.domCongr_apply]
+  ext y
+  rw [MonoidAlgebra.coeff_domCongr]
   obtain ⟨c, rfl⟩ := ConjClasses.mk_surjective C
   have hmap : ConjClasses.map (α : G →* G) (ConjClasses.mk c) = ConjClasses.mk (α c) := rfl
-  simp only [classSum_apply, hmap]
+  simp only [coeff_classSum, hmap]
   have hiff : (ConjClasses.mk (α.symm y) = ConjClasses.mk c)
       ↔ (ConjClasses.mk y = ConjClasses.mk (α c)) := by
     rw [ConjClasses.mk_eq_mk_iff_isConj, ConjClasses.mk_eq_mk_iff_isConj]

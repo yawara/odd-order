@@ -64,7 +64,7 @@ theorem blockCharacter_mk (i : ι) :
 /-- The central characters of all blocks, assembled. -/
 noncomputable def blockCharacterPi :
     Subalgebra.center k A →ₐ[k] (Block π hπ hlin → k) :=
-  Pi.algHom _ _ fun c => blockCharacter π hπ hlin c
+  AlgHom.pi fun c => blockCharacter π hπ hlin c
 
 omit [Finite ι] in
 @[simp]

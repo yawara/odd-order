@@ -717,7 +717,7 @@ theorem twMul_central_iff {K : Type*} [Field K] [Finite K]
   have hBroots : B = rootsOfUnity d2 K := by
     refine Subgroup.eq_of_le_of_card_ge (fun u hu => ?_) ?_
     · rw [mem_rootsOfUnity]; exact hBpow u hu
-    · rw [Nat.card_eq_fintype_card]; exact card_rootsOfUnity K d2
+    · exact card_rootsOfUnity K d2
   let Fu : Subgroup Kˣ :=
     { carrier := {u | σ (u : K) = u}
       one_mem' := by simp

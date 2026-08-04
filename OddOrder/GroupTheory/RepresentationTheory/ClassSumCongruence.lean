@@ -415,19 +415,20 @@ local notation3 "ω" ρ:max C:max => centralCharacterOfRep ρ ⟨classSum C, cla
 
 /-- **The product rule for central-character values.** Because `ω_ρ` is a `ℂ`-algebra hom and
 `C_i · C_j = ∑_s m_s · C_s` (`classSum_mul`), the value `ω_ρ(C_i) · ω_ρ(C_j)` is a linear
-combination of the values `ω_ρ(C_s)` whose coefficients `(classSum Ci * classSum Cj) C_s.out` are
+combination of the values `ω_ρ(C_s)` whose coefficients
+`(classSum Ci * classSum Cj).coeff C_s.out` are
 *natural numbers* (factorization counts), the key fact making the generated `ℤ`-subalgebra closed
 under multiplication. -/
 theorem centralCharacterOfRep_classSum_mul (ρ : Representation ℂ G V) [IsIrreducible ρ]
     (Ci Cj : ConjClasses G) :
     (ω ρ Ci) * (ω ρ Cj) =
-      ∑ Cs : ConjClasses G, ((classSum Ci * classSum Cj) Cs.out) • (ω ρ Cs) := by
+      ∑ Cs : ConjClasses G, ((classSum Ci * classSum Cj).coeff Cs.out) • (ω ρ Cs) := by
   classical
   -- `ω` is multiplicative, and the product of the two class sums is the stated combination.
   have hcenter : (⟨classSum Ci, classSum_mem_center Ci⟩ : Subalgebra.center ℂ (ℂ[G]))
         * ⟨classSum Cj, classSum_mem_center Cj⟩
       = ∑ Cs : ConjClasses G,
-          ((classSum Ci * classSum Cj) Cs.out) •
+          ((classSum Ci * classSum Cj).coeff Cs.out) •
             (⟨classSum Cs, classSum_mem_center Cs⟩ : Subalgebra.center ℂ (ℂ[G])) := by
     apply Subtype.ext
     rw [Subalgebra.coe_mul, AddSubmonoidClass.coe_finsetSum]
@@ -438,11 +439,11 @@ theorem centralCharacterOfRep_classSum_mul (ρ : Representation ℂ G V) [IsIrre
           (⟨classSum Ci, classSum_mem_center Ci⟩ * ⟨classSum Cj, classSum_mem_center Cj⟩) := by
         rw [map_mul]
     _ = centralCharacterOfRep ρ
-          (∑ Cs : ConjClasses G, ((classSum Ci * classSum Cj) Cs.out) •
+          (∑ Cs : ConjClasses G, ((classSum Ci * classSum Cj).coeff Cs.out) •
             (⟨classSum Cs, classSum_mem_center Cs⟩ : Subalgebra.center ℂ (ℂ[G]))) := by
         rw [hcenter]
     _ = ∑ Cs : ConjClasses G,
-          ((classSum Ci * classSum Cj) Cs.out) • (ω ρ Cs) := by
+          ((classSum Ci * classSum Cj).coeff Cs.out) • (ω ρ Cs) := by
         rw [map_sum]; exact Finset.sum_congr rfl fun Cs _ => map_smul _ _ _
 
 omit [Fintype (ConjClasses G)] [DecidableEq (ConjClasses G)] [FiniteDimensional ℂ V] [Fintype G] in
@@ -594,7 +595,7 @@ theorem centralCharacterOfRep_classSum_isIntegral (ρ : Representation ℂ G V) 
     Submodule.subset_span (Set.mem_insert_of_mem _ ⟨Cs, rfl⟩)
   -- A factorization-count coefficient times a generator lands in `N` (`ℕ`-smul of a member).
   have hcoeff_smul : ∀ (Ci Cj Cs : ConjClasses G),
-      ((classSum Ci * classSum Cj) Cs.out) • (ω ρ Cs) ∈ N := by
+      ((classSum Ci * classSum Cj).coeff Cs.out) • (ω ρ Cs) ∈ N := by
     intro Ci Cj Cs
     rw [classSum_mul_apply, Nat.cast_smul_eq_nsmul]
     exact nsmul_mem (hgen_mem Cs) _
@@ -878,18 +879,19 @@ local notation3 "ω" ρ:max C:max => centralCharacterOfRep ρ ⟨classSum C, cla
 
 omit [DecidableEq G] [Fintype (ConjClasses G)] in
 /-- **The per-element factorization count times the class size is the pair count** (cast to `ℂ`).
-The structure coefficient `a_{ijs} = (classSum Ci * classSum Cj) Cs.out` (constant on the class)
+The structure coefficient `a_{ijs} = (classSum Ci * classSum Cj).coeff Cs.out` (constant on the
+class)
 times `|C_s|` equals the pair-count `classSumCoeff Ci Cj Cs = a_{ijs}|C_s|`.  This reconciles the
 *class-sum* coefficient of `classSum_mul` with Peterfalvi's pair-count `a_{ijs}|{\cal C}_s|` of
 (6.7.1). -/
 theorem coeff_mul_card_eq_classSumCoeff (Ci Cj Cs : ConjClasses G) :
-    (classSum Ci * classSum Cj) Cs.out *
+    (classSum Ci * classSum Cj).coeff Cs.out *
         (Nat.card { x : G // ConjClasses.mk x = Cs } : ℂ) = (classSumCoeff Ci Cj Cs : ℂ) := by
   classical
   -- `classSumCoeff` counts pairs; fiber the pair set over the class of the product `u·v`.
   have hsum : (classSumCoeff Ci Cj Cs : ℂ)
       = ∑ w ∈ Finset.univ.filter (fun w : G => ConjClasses.mk w = Cs),
-          (classSum Ci * classSum Cj) w := by
+          (classSum Ci * classSum Cj).coeff w := by
     rw [classSumCoeff]
     -- The pair set with `mk (u·v) = Cs` is the disjoint union over `w ∈ Cs` of `{u·v = w}` sets.
     have hcard : (Finset.univ.filter (fun p : G × G =>
@@ -913,9 +915,9 @@ theorem coeff_mul_card_eq_classSumCoeff (Ci Cj Cs : ConjClasses G) :
     rw [hcard, Nat.cast_sum]
     exact Finset.sum_congr rfl fun w _ => (classSum_mul_apply Ci Cj w).symm
   rw [hsum]
-  -- Each summand is the constant value `(classSum Ci * classSum Cj) Cs.out`.
+  -- Each summand is the constant value `(classSum Ci * classSum Cj).coeff Cs.out`.
   have hconst : ∀ w ∈ Finset.univ.filter (fun w : G => ConjClasses.mk w = Cs),
-      (classSum Ci * classSum Cj) w = (classSum Ci * classSum Cj) Cs.out := by
+      (classSum Ci * classSum Cj).coeff w = (classSum Ci * classSum Cj).coeff Cs.out := by
     intro w hw
     rw [Finset.mem_filter] at hw
     rw [classSum_mul_apply_out, hw.2]
@@ -928,7 +930,7 @@ omit [DecidableEq G] [Fintype (ConjClasses G)] in
 `classSum Ci * classSum Cj` is the identity-class pair count `classSumCoeff Ci Cj 1`, since the
 identity conjugacy class has one element. -/
 theorem classSum_mul_apply_one_eq_classSumCoeff_one (Ci Cj : ConjClasses G) :
-    (classSum Ci * classSum Cj) (1 : G) = (classSumCoeff Ci Cj 1 : ℂ) := by
+    (classSum Ci * classSum Cj).coeff (1 : G) = (classSumCoeff Ci Cj 1 : ℂ) := by
   classical
   have hcard : Nat.card { x : G // ConjClasses.mk x = (1 : ConjClasses G) } = 1 := by
     rw [Nat.card_eq_one_iff_unique]
@@ -936,8 +938,8 @@ theorem classSum_mul_apply_one_eq_classSumCoeff_one (Ci Cj : ConjClasses G) :
     have ha : (a : G) = 1 := mk_eq_one_iff_eq_one.mp a.2
     have hb : (b : G) = 1 := mk_eq_one_iff_eq_one.mp b.2
     rw [ha, hb]
-  have hout : (classSum Ci * classSum Cj) (1 : ConjClasses G).out
-      = (classSum Ci * classSum Cj) (1 : G) := by
+  have hout : (classSum Ci * classSum Cj).coeff (1 : ConjClasses G).out
+      = (classSum Ci * classSum Cj).coeff (1 : G) := by
     simpa [ConjClasses.one_eq_mk_one] using (classSum_mul_apply_out Ci Cj (1 : G)).symm
   have h := coeff_mul_card_eq_classSumCoeff Ci Cj (1 : ConjClasses G)
   rw [hcard, Nat.cast_one, mul_one, hout] at h
@@ -947,7 +949,7 @@ omit [DecidableEq G] [Fintype (ConjClasses G)] in
 /-- The sum of per-element class-sum coefficients over any finite family of conjugacy classes is an
 algebraic integer. -/
 theorem isIntegral_sum_classSum_mul_coeff (Ci Cj : ConjClasses G) (s : Finset (ConjClasses G)) :
-    IsIntegral ℤ (∑ Cs ∈ s, (classSum Ci * classSum Cj) Cs.out) := by
+    IsIntegral ℤ (∑ Cs ∈ s, (classSum Ci * classSum Cj).coeff Cs.out) := by
   classical
   refine IsIntegral.sum _ fun Cs _ => ?_
   rw [classSum_mul_apply]
@@ -961,7 +963,7 @@ noncomputable def nonidentityZClassCoeffSum (Z : Subgroup G) (Ci Cj : ConjClasse
   classical
   exact ∑ Cs ∈ Finset.univ.filter
       (fun Cs : ConjClasses G => ∃ w : G, ConjClasses.mk w = Cs ∧ w ∈ Z ∧ w ≠ 1),
-    (classSum Ci * classSum Cj) Cs.out
+    (classSum Ci * classSum Cj).coeff Cs.out
 
 /-- The nonidentity `Z`-class coefficient sum is an algebraic integer. -/
 theorem nonidentityZClassCoeffSum_isIntegral (Z : Subgroup G) (Ci Cj : ConjClasses G) :
@@ -974,10 +976,10 @@ omit [DecidableEq G] [Fintype (ConjClasses G)] in
 irreducible representation `ρ` with character `ψ = χ_ρ`, the contribution of class `C_s` to
 `ψ(1)·ω(C_i)·ω(C_j)` is `χ_ρ(1)·a_{ijs}·ω_ρ(C_s) = (a_{ijs}|C_s|)·χ_ρ(C_s.out)`, where
 `a_{ijs}|C_s| = classSumCoeff Ci Cj Cs` is the pair count.  (Here `a_{ijs}` is the per-element
-factorization count `(classSum Ci * classSum Cj) Cs.out`.) -/
+factorization count `(classSum Ci * classSum Cj).coeff Cs.out`.) -/
 theorem character_one_mul_coeff_mul_centralChar (ρ : Representation ℂ G V) [IsIrreducible ρ]
     (Ci Cj Cs : ConjClasses G) :
-    ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * (ω ρ Cs))
+    ρ.character 1 * (((classSum Ci * classSum Cj).coeff Cs.out : ℂ) * (ω ρ Cs))
       = (classSumCoeff Ci Cj Cs : ℂ) * ρ.character Cs.out := by
   classical
   haveI := nontrivial_of_isIrreducible ρ
@@ -993,9 +995,9 @@ theorem character_one_mul_coeff_mul_centralChar (ρ : Representation ℂ G V) [I
   -- `a_{ijs}·|C_s| = classSumCoeff` (cast to `ℂ`).
   have hcoeff := coeff_mul_card_eq_classSumCoeff Ci Cj Cs
   -- `χ(1) * (m_s * (|C_s|·χ(out)/χ(1))) = m_s·|C_s|·χ(out) = classSumCoeff·χ(out)`.
-  rw [show ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ)
+  rw [show ρ.character 1 * (((classSum Ci * classSum Cj).coeff Cs.out : ℂ)
         * ((Nat.card { x : G // ConjClasses.mk x = Cs } : ℂ) * ρ.character Cs.out / ρ.character 1))
-      = (((classSum Ci * classSum Cj) Cs.out : ℂ)
+      = (((classSum Ci * classSum Cj).coeff Cs.out : ℂ)
           * (Nat.card { x : G // ConjClasses.mk x = Cs } : ℂ) * ρ.character Cs.out)
           * (ρ.character 1 / ρ.character 1) by ring, div_self hd, mul_one, hcoeff]
 
@@ -1008,7 +1010,7 @@ algebraic-integer multiple of `m`. -/
 theorem character_one_mul_coeff_mul_centralChar_cong_zero (ρ : Representation ℂ G V)
     [IsIrreducible ρ] [Finite G] {m : ℤ} (Ci Cj Cs : ConjClasses G)
     (hdvd : m ∣ (classSumCoeff Ci Cj Cs : ℤ)) (hm : (m : ℂ) ≠ 0) :
-    ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * (ω ρ Cs)) ≡ 0 [ALGMOD m] := by
+    ρ.character 1 * (((classSum Ci * classSum Cj).coeff Cs.out : ℂ) * (ω ρ Cs)) ≡ 0 [ALGMOD m] := by
   rw [character_one_mul_coeff_mul_centralChar]
   -- `classSumCoeff = m · k` (as integers); the term is `m · (k · χ(out))`, integral over `ℤ`.
   obtain ⟨k, hk⟩ := hdvd
@@ -1038,12 +1040,13 @@ theorem centralCharacterOfRep_classSum_mul_cong [Finite G] (ρ : Representation 
     (hm : (m : ℂ) ≠ 0) :
     ρ.character 1 * ((ω ρ Ci) * (ω ρ Cj))
       ≡ ∑ Cs ∈ Finset.univ.filter inZ,
-          ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * (ω ρ Cs)) [ALGMOD m] := by
+          ρ.character 1 * (((classSum Ci * classSum Cj).coeff Cs.out : ℂ) * (ω ρ Cs))
+            [ALGMOD m] := by
   classical
   -- Expand `ψ(1)·ω(Ci)·ω(Cj)` as `∑_s ψ(1)·m_s·ω(C_s)` (product rule × ψ(1)).
   have hexpand : ρ.character 1 * ((ω ρ Ci) * (ω ρ Cj))
       = ∑ Cs : ConjClasses G,
-          ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * (ω ρ Cs)) := by
+          ρ.character 1 * (((classSum Ci * classSum Cj).coeff Cs.out : ℂ) * (ω ρ Cs)) := by
     rw [centralCharacterOfRep_classSum_mul, Finset.mul_sum]
     refine Finset.sum_congr rfl fun Cs _ => ?_
     rw [smul_eq_mul]
@@ -1052,9 +1055,9 @@ theorem centralCharacterOfRep_classSum_mul_cong [Finite G] (ρ : Representation 
   rw [← Finset.sum_filter_add_sum_filter_not Finset.univ inZ]
   -- Reduce `(A + B) ≡ A` to `B ≡ 0`, then sum the per-class vanishing.
   have hsplit := (Cong.refl m (∑ Cs ∈ Finset.univ.filter inZ,
-      ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * (ω ρ Cs)))).add
+      ρ.character 1 * (((classSum Ci * classSum Cj).coeff Cs.out : ℂ) * (ω ρ Cs)))).add
     (show (∑ Cs ∈ Finset.univ.filter (fun Cs => ¬ inZ Cs),
-        ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * (ω ρ Cs)))
+        ρ.character 1 * (((classSum Ci * classSum Cj).coeff Cs.out : ℂ) * (ω ρ Cs)))
       ≡ 0 [ALGMOD m] from ?_)
   · simpa using hsplit
   · -- `∑_{¬inZ} term ≡ 0` by the per-class vanishing (sum of `≡0` terms is `≡0`).
@@ -1090,7 +1093,7 @@ theorem centralCharacterOfRep_classSum_mul_cong_of_isTISubset [Finite G]
     (hCj : ∃ z : G, z ∈ Z ∧ z ≠ 1 ∧ ConjClasses.mk z = Cj) :
     ρ.character 1 * ((ω ρ Ci) * (ω ρ Cj))
       ≡ ∑ Cs ∈ Finset.univ.filter (fun Cs => ∃ w : G, ConjClasses.mk w = Cs ∧ w ∈ Z),
-          ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * (ω ρ Cs))
+          ρ.character 1 * (((classSum Ci * classSum Cj).coeff Cs.out : ℂ) * (ω ρ Cs))
         [ALGMOD (Nat.card (P : Subgroup G) : ℤ)] := by
   classical
   -- The modulus `|P|` is a nonzero complex number (`P` is a finite group, hence nonempty).
@@ -1121,16 +1124,16 @@ theorem centralCharacterOfRep_sum_inZ_eq_identity_add_nonidentity
     (Ci Cj : ConjClasses G) {α : ℂ}
     (hα : ∀ ⦃w : G⦄, w ∈ Z → w ≠ 1 → ω ρ(ConjClasses.mk w) = α) :
     (∑ Cs ∈ Finset.univ.filter (fun Cs => ∃ w : G, ConjClasses.mk w = Cs ∧ w ∈ Z),
-        ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * (ω ρ Cs)))
+        ρ.character 1 * (((classSum Ci * classSum Cj).coeff Cs.out : ℂ) * (ω ρ Cs)))
       = ρ.character 1 *
-          (((classSum Ci * classSum Cj) (1 : G) : ℂ)
+          (((classSum Ci * classSum Cj).coeff (1 : G) : ℂ)
             + nonidentityZClassCoeffSum Z Ci Cj * α) := by
   classical
   let inZ : ConjClasses G → Prop := fun Cs => ∃ w : G, ConjClasses.mk w = Cs ∧ w ∈ Z
   let inZsharp : ConjClasses G → Prop :=
     fun Cs => ∃ w : G, ConjClasses.mk w = Cs ∧ w ∈ Z ∧ w ≠ 1
   let term : ConjClasses G → ℂ := fun Cs =>
-    ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * (ω ρ Cs))
+    ρ.character 1 * (((classSum Ci * classSum Cj).coeff Cs.out : ℂ) * (ω ρ Cs))
   have hfilters :
       (Finset.univ.filter inZ).filter (fun Cs : ConjClasses G => Cs ≠ 1)
         = Finset.univ.filter inZsharp := by
@@ -1147,14 +1150,15 @@ theorem centralCharacterOfRep_sum_inZ_eq_identity_add_nonidentity
       exact hw1 (mk_eq_one_iff_eq_one.mp (by simpa [hCs1] using hwCs))
   have hid :
       (∑ Cs ∈ (Finset.univ.filter inZ).filter (fun Cs : ConjClasses G => Cs = 1), term Cs)
-        = ρ.character 1 * ((classSum Ci * classSum Cj) (1 : G)) := by
+        = ρ.character 1 * ((classSum Ci * classSum Cj).coeff (1 : G)) := by
     rw [Finset.sum_eq_single (1 : ConjClasses G)]
-    · have hout : (classSum Ci * classSum Cj) (1 : ConjClasses G).out
-          = (classSum Ci * classSum Cj) (1 : G) := by
+    · have hout : (classSum Ci * classSum Cj).coeff (1 : ConjClasses G).out
+          = (classSum Ci * classSum Cj).coeff (1 : G) := by
         simpa [ConjClasses.one_eq_mk_one] using (classSum_mul_apply_out Ci Cj (1 : G)).symm
       change ρ.character 1 *
-          (((classSum Ci * classSum Cj) (1 : ConjClasses G).out : ℂ) * (ω ρ (1 : ConjClasses G)))
-        = ρ.character 1 * ((classSum Ci * classSum Cj) (1 : G))
+          (((classSum Ci * classSum Cj).coeff (1 : ConjClasses G).out : ℂ)
+            * (ω ρ (1 : ConjClasses G)))
+        = ρ.character 1 * ((classSum Ci * classSum Cj).coeff (1 : G))
       rw [hout, centralCharacterOfRep_one]
       ring
     · intro Cs hCs hne
@@ -1172,36 +1176,36 @@ theorem centralCharacterOfRep_sum_inZ_eq_identity_add_nonidentity
         = ρ.character 1 * (nonidentityZClassCoeffSum Z Ci Cj * α) := by
     rw [hfilters, nonidentityZClassCoeffSum]
     have hterm : ∀ Cs ∈ Finset.univ.filter inZsharp,
-        term Cs = ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * α) := by
+        term Cs = ρ.character 1 * (((classSum Ci * classSum Cj).coeff Cs.out : ℂ) * α) := by
       intro Cs hCs
       rw [Finset.mem_filter] at hCs
       obtain ⟨w, hwCs, hwZ, hw1⟩ := hCs.2
       have hω : ω ρ Cs = α := by
         simpa [hwCs] using hα hwZ hw1
-      change ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * (ω ρ Cs))
-        = ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * α)
+      change ρ.character 1 * (((classSum Ci * classSum Cj).coeff Cs.out : ℂ) * (ω ρ Cs))
+        = ρ.character 1 * (((classSum Ci * classSum Cj).coeff Cs.out : ℂ) * α)
       rw [hω]
     calc
       (∑ Cs ∈ Finset.univ.filter inZsharp, term Cs)
           = ∑ Cs ∈ Finset.univ.filter inZsharp,
-              ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * α) :=
+              ρ.character 1 * (((classSum Ci * classSum Cj).coeff Cs.out : ℂ) * α) :=
         Finset.sum_congr rfl hterm
       _ = ρ.character 1 *
-          ((∑ Cs ∈ Finset.univ.filter inZsharp, (classSum Ci * classSum Cj) Cs.out) * α) := by
+          ((∑ Cs ∈ Finset.univ.filter inZsharp, (classSum Ci * classSum Cj).coeff Cs.out) * α) := by
         rw [Finset.sum_mul, Finset.mul_sum]
   calc
     (∑ Cs ∈ Finset.univ.filter (fun Cs => ∃ w : G, ConjClasses.mk w = Cs ∧ w ∈ Z),
-        ρ.character 1 * (((classSum Ci * classSum Cj) Cs.out : ℂ) * (ω ρ Cs)))
+        ρ.character 1 * (((classSum Ci * classSum Cj).coeff Cs.out : ℂ) * (ω ρ Cs)))
         = ∑ Cs ∈ Finset.univ.filter inZ, term Cs := rfl
     _ = (∑ Cs ∈ (Finset.univ.filter inZ).filter (fun Cs : ConjClasses G => Cs = 1), term Cs)
         + ∑ Cs ∈ (Finset.univ.filter inZ).filter (fun Cs : ConjClasses G => Cs ≠ 1),
             term Cs := by
           rw [← Finset.sum_filter_add_sum_filter_not (Finset.univ.filter inZ)
             (fun Cs : ConjClasses G => Cs = 1)]
-    _ = ρ.character 1 * ((classSum Ci * classSum Cj) (1 : G))
+    _ = ρ.character 1 * ((classSum Ci * classSum Cj).coeff (1 : G))
         + ρ.character 1 * (nonidentityZClassCoeffSum Z Ci Cj * α) := by rw [hid, hnon]
     _ = ρ.character 1 *
-          (((classSum Ci * classSum Cj) (1 : G) : ℂ)
+          (((classSum Ci * classSum Cj).coeff (1 : G) : ℂ)
             + nonidentityZClassCoeffSum Z Ci Cj * α) := by ring
 
 /-- **Peterfalvi (6.7.2), collapsed geometric form.**  This combines the geometric product-rule
@@ -1224,7 +1228,7 @@ theorem centralCharacterOfRep_classSum_mul_cong_collapse_of_isTISubset [Finite G
     {α : ℂ} (hα : ∀ ⦃w : G⦄, w ∈ Z → w ≠ 1 → ω ρ(ConjClasses.mk w) = α) :
     ρ.character 1 * ((ω ρ Ci) * (ω ρ Cj))
       ≡ ρ.character 1 *
-          (((classSum Ci * classSum Cj) (1 : G) : ℂ)
+          (((classSum Ci * classSum Cj).coeff (1 : G) : ℂ)
             + nonidentityZClassCoeffSum Z Ci Cj * α)
         [ALGMOD (Nat.card (P : Subgroup G) : ℤ)] := by
   classical

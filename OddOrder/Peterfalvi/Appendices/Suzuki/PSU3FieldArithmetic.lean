@@ -228,7 +228,7 @@ theorem card_rootsOfUnity_ge {E : Type*} [Field E] [Finite E] {r : ℕ} (hr : r 
     exact pow_card_eq_one'
   -- its kernel is the `r`-th roots of unity, so has at most `r` elements
   have hkercard : Nat.card ↥(powMonoidHom r : Eˣ →* Eˣ).ker ≤ r := by
-    rw [← rootsOfUnity_eq_ker, Nat.card_eq_fintype_card]
+    rw [← rootsOfUnity_eq_ker]
     exact card_rootsOfUnity (k := r) (R := E)
   have hidx : Nat.card ↥(powMonoidHom r : Eˣ →* Eˣ).range
       = (powMonoidHom r : Eˣ →* Eˣ).ker.index :=

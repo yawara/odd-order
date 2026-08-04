@@ -149,30 +149,30 @@ theorem brauerProj_ne_zero_of_isDefectGroup (p : ℕ) [Fact p.Prime] [CharP k p]
   -- The classes that meet `C_G(D)` have coefficient `0` in `e`.
   set T : Finset (ConjClasses G) :=
     Finset.univ.filter fun C => ∀ g : G, ¬ D ≤ MulAut.conj g • S C.out with hT
-  have hcoeff : ∀ C : ConjClasses G, C ∉ T → e C.out = 0 := by
+  have hcoeff : ∀ C : ConjClasses G, C ∉ T → e.coeff C.out = 0 := by
     intro C hCT
     simp only [hT, Finset.mem_filter, Finset.mem_univ, true_and, not_forall,
       Classical.not_not] at hCT
     obtain ⟨g, hg⟩ := hCT
     have hmemc : g * C.out * g⁻¹ ∈ Subgroup.centralizer (D : Set G) :=
       mem_centralizer_of_le_conj (hSC C.out) hg
-    have h0 : e (g * C.out * g⁻¹) = 0 := by
-      rw [← brauerProj_apply_of_mem hmemc e, hbr]; rfl
-    rwa [apply_eq_of_isConj hefix (isConj_iff.mpr ⟨g, rfl⟩)]
+    have h0 : e.coeff (g * C.out * g⁻¹) = 0 := by
+      rw [← coeff_brauerProj_of_mem hmemc e, hbr]; rfl
+    rwa [coeff_eq_of_isConj hefix (isConj_iff.mpr ⟨g, rfl⟩)]
   -- So `e` is a combination of the surviving class sums.
-  have hesum : e = ∑ C ∈ T, e C.out • classSum k C.out := by
+  have hesum : e = ∑ C ∈ T, e.coeff C.out • classSum k C.out := by
     refine (eq_sum_classSum hefix).trans
-      (Finset.sum_subset (f := fun C : ConjClasses G => e C.out • classSum k C.out)
+      (Finset.sum_subset (f := fun C : ConjClasses G => e.coeff C.out • classSum k C.out)
         (Finset.subset_univ T) fun C _ hCT => ?_).symm
     rw [hcoeff C hCT, zero_smul]
   -- Multiplying by `e` and applying Mackey puts `e` in a sum of trace ideals from proper
   -- subgroups of `D`.
   have hterm : ∀ C ∈ T, ∃ (s : Finset G) (c : G → MonoidAlgebra k G),
       (∀ g ∈ s, c g ∈ relTraceIdeal (D ⊓ MulAut.conj g • S C.out) ⊤) ∧
-        e * (e C.out • classSum k C.out) = ∑ g ∈ s, c g := by
+        e * (e.coeff C.out • classSum k C.out) = ∑ g ∈ s, c g := by
     intro C _
     exact exists_mul_eq_sum_relTraceIdeal_inf hD.mem
-      (smul_mem_relTraceIdeal (hSmem C.out) (e C.out))
+      (smul_mem_relTraceIdeal (hSmem C.out) (e.coeff C.out))
   choose ss cc hcc hccsum using hterm
   -- Assemble the doubly-indexed sum.
   set U : Finset (Σ _ : ConjClasses G, G) := T.sigma (fun C => if h : C ∈ T then ss C h else ∅)
@@ -181,7 +181,7 @@ theorem brauerProj_ne_zero_of_isDefectGroup (p : ℕ) [Fact p.Prime] [CharP k p]
       if h : x.1 ∈ T then cc x.1 h x.2 else 0) x = e := by
     rw [hU, Finset.sum_sigma]
     have : ∀ C ∈ T, (∑ g ∈ (if h : C ∈ T then ss C h else ∅),
-        (if h : C ∈ T then cc C h g else 0)) = e * (e C.out • classSum k C.out) := by
+        (if h : C ∈ T then cc C h g else 0)) = e * (e.coeff C.out • classSum k C.out) := by
       intro C hC
       simp only [dif_pos hC]
       exact (hccsum C hC).symm

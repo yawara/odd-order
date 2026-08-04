@@ -14,6 +14,7 @@ import Mathlib.GroupTheory.PGroup
 import Mathlib.GroupTheory.Sylow
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.GroupTheory.GroupAction.Quotient
+import OddOrder.Mathlib.MonoidAlgebra
 import OddOrder.GroupTheory.TISubset
 import OddOrder.Algebra.AlgInt
 import OddOrder.GroupTheory.FreeActionOrbitCount
@@ -62,20 +63,20 @@ noncomputable def classSum (C : ConjClasses G) : ℂ[G] :=
 
 /-- The coefficient of `classSum C` at a group element `x` is `1` if `x` lies in the class `C`
 and `0` otherwise. -/
-theorem classSum_apply (C : ConjClasses G) (x : G) :
-    classSum C x = if ConjClasses.mk x = C then 1 else 0 := by
+theorem coeff_classSum (C : ConjClasses G) (x : G) :
+    (classSum C).coeff x = if ConjClasses.mk x = C then 1 else 0 := by
   classical
-  have hsum : classSum C x
-      = ∑ g : G, (if ConjClasses.mk g = C then MonoidAlgebra.of ℂ G g else 0) x := by
-    rw [classSum]; exact map_sum (Finsupp.applyAddHom x) _ Finset.univ
-  -- `(0 : ℂ[G]) y = 0` (the `MonoidAlgebra` zero coefficient), used below.
-  have hzero : ∀ y : G, (0 : MonoidAlgebra ℂ G) y = 0 := fun _ => rfl
+  have hsum : (classSum C).coeff x
+      = ∑ g : G, (if ConjClasses.mk g = C then MonoidAlgebra.of ℂ G g else 0).coeff x := by
+    rw [classSum]; exact MonoidAlgebra.coeff_finsetSum _ _ _
+  -- `(0 : ℂ[G]).coeff y = 0` (the `MonoidAlgebra` zero coefficient), used below.
+  have hzero : ((0 : MonoidAlgebra ℂ G)).coeff x = 0 := rfl
   -- The coefficient of each summand at `x`: `1` if `g = x` and `mk g = C`, else `0`.
-  have hterm : ∀ g : G, (if ConjClasses.mk g = C then MonoidAlgebra.of ℂ G g else 0) x
+  have hterm : ∀ g : G, (if ConjClasses.mk g = C then MonoidAlgebra.of ℂ G g else 0).coeff x
       = if g = x then (if ConjClasses.mk g = C then (1 : ℂ) else 0) else 0 := by
     intro g
-    rw [apply_ite (fun f : MonoidAlgebra ℂ G => f x), MonoidAlgebra.of_apply,
-      MonoidAlgebra.single_apply, hzero x]
+    rw [apply_ite (fun f : MonoidAlgebra ℂ G => f.coeff x), MonoidAlgebra.of_apply,
+      MonoidAlgebra.coeff_single, Finsupp.single_apply, hzero]
     by_cases hg : g = x
     · rw [if_pos hg, if_pos hg]
     · rw [if_neg hg, if_neg hg, ite_self]
@@ -139,20 +140,20 @@ noncomputable def classSumCoeff (Ci Cj Cs : ConjClasses G) : ℕ :=
 (This per-element count is constant on each conjugacy class; summing it over a class `C_s` recovers
 the structure coefficient `classSumCoeff Ci Cj Cs`.) -/
 theorem classSum_mul_apply (Ci Cj : ConjClasses G) (w : G) :
-    (classSum Ci * classSum Cj) w =
+    (classSum Ci * classSum Cj).coeff w =
       (Finset.univ.filter (fun p : G × G =>
         ConjClasses.mk p.1 = Ci ∧ ConjClasses.mk p.2 = Cj ∧ p.1 * p.2 = w)).card := by
   classical
   -- Expand the product coefficient over all pairs `(u, v)` with `u * v = w`.
-  have hexp := MonoidAlgebra.mul_apply_antidiagonal (classSum Ci) (classSum Cj) w
+  have hexp := MonoidAlgebra.coeff_mul_antidiag (classSum Ci) (classSum Cj) w
     (Finset.univ.filter (fun p : G × G => p.1 * p.2 = w)) (by intro p; simp)
   rw [hexp]
   -- Each summand is the product of two `0/1` indicators; combine into a single indicator.
   have hbody : ∀ p : G × G,
-      (classSum Ci p.1) * (classSum Cj p.2)
+      (classSum Ci).coeff p.1 * (classSum Cj).coeff p.2
         = if ConjClasses.mk p.1 = Ci ∧ ConjClasses.mk p.2 = Cj then (1 : ℂ) else 0 := by
     intro p
-    rw [classSum_apply, classSum_apply, ite_and]
+    rw [coeff_classSum, coeff_classSum, ite_and]
     by_cases h1 : ConjClasses.mk p.1 = Ci <;> by_cases h2 : ConjClasses.mk p.2 = Cj <;>
       simp [h1, h2]
   rw [Finset.sum_congr rfl (fun p _ => hbody p)]
@@ -172,12 +173,12 @@ private theorem mk_conj_eq (h g : G) : ConjClasses.mk (h * g * h⁻¹) = ConjCla
   ConjClasses.mk_eq_mk_iff_isConj.mpr (isConj_iff.mpr ⟨h⁻¹, by group⟩)
 
 omit [DecidableEq G] in
-/-- The per-element product coefficient `(classSum Ci * classSum Cj) w` is a **class function** of
-`w`: conjugating `w` by any group element leaves the number of factorizations unchanged.  (The
-bijection `(u, v) ↦ (h u h⁻¹, h v h⁻¹)` preserves the class of each factor and maps `u·v = w` to
-`(h u h⁻¹)·(h v h⁻¹) = h w h⁻¹`.) -/
+/-- The per-element product coefficient `(classSum Ci * classSum Cj).coeff w` is a **class
+function** of `w`: conjugating `w` by any group element leaves the number of factorizations
+unchanged.  (The bijection `(u, v) ↦ (h u h⁻¹, h v h⁻¹)` preserves the class of each factor and
+maps `u·v = w` to `(h u h⁻¹)·(h v h⁻¹) = h w h⁻¹`.) -/
 theorem classSum_mul_apply_conj (Ci Cj : ConjClasses G) (h w : G) :
-    (classSum Ci * classSum Cj) (h * w * h⁻¹) = (classSum Ci * classSum Cj) w := by
+    (classSum Ci * classSum Cj).coeff (h * w * h⁻¹) = (classSum Ci * classSum Cj).coeff w := by
   classical
   rw [classSum_mul_apply, classSum_mul_apply]
   norm_cast
@@ -205,7 +206,8 @@ omit [DecidableEq G] in
 /-- The per-element product coefficient equals the count taken at the chosen class representative
 `(ConjClasses.mk w).out`. -/
 theorem classSum_mul_apply_out (Ci Cj : ConjClasses G) (w : G) :
-    (classSum Ci * classSum Cj) w = (classSum Ci * classSum Cj) (ConjClasses.mk w).out := by
+    (classSum Ci * classSum Cj).coeff w
+      = (classSum Ci * classSum Cj).coeff (ConjClasses.mk w).out := by
   classical
   -- `(mk w).out` is conjugate to `w`, so write it as `h * w * h⁻¹` and apply class-invariance.
   have hmk : ConjClasses.mk (ConjClasses.mk w).out = ConjClasses.mk w := by
@@ -220,34 +222,29 @@ variable [Fintype (ConjClasses G)]
 omit [DecidableEq G] in
 /-- **Product of class sums as an integer combination of class sums** (Isaacs §3; Peterfalvi
 (6.7.2)): `C_i · C_j = ∑_s a_{ijs}^∘ · C_s`, where the coefficient of `C_s` is the per-element
-factorization count `(classSum Ci * classSum Cj) (out C_s)` — a natural number that is *constant*
-on the class (this is the coefficient that is actually consistent with `classSum_mul_apply`, **not**
-the pair-count `classSumCoeff` divided by `|C_s|`). -/
+factorization count `(classSum Ci * classSum Cj).coeff (out C_s)` — a natural number that is
+*constant* on the class (this is the coefficient that is actually consistent with
+`classSum_mul_apply`, **not** the pair-count `classSumCoeff` divided by `|C_s|`). -/
 theorem classSum_mul (Ci Cj : ConjClasses G) :
     classSum Ci * classSum Cj =
-      ∑ Cs : ConjClasses G, ((classSum Ci * classSum Cj) Cs.out : ℂ) • classSum Cs := by
+      ∑ Cs : ConjClasses G, ((classSum Ci * classSum Cj).coeff Cs.out : ℂ) • classSum Cs := by
   classical
   -- Compare coefficients at an arbitrary group element `w`.
-  apply MonoidAlgebra.ext
-  intro w
-  -- Push the coefficient evaluation `· w` through the finite sum (as an additive hom).
-  have hrhs : (∑ Cs : ConjClasses G,
-        ((classSum Ci * classSum Cj) Cs.out : ℂ) • classSum Cs) w
-      = ∑ Cs : ConjClasses G, (((classSum Ci * classSum Cj) Cs.out : ℂ) • classSum Cs) w :=
-    map_sum (Finsupp.applyAddHom w) _ Finset.univ
-  rw [hrhs]
+  ext w
+  -- Push the coefficient evaluation `· w` through the finite sum.
+  rw [MonoidAlgebra.coeff_finsetSum]
   -- RHS coefficient at `w`: only the `Cs = mk w` term survives, contributing `κ((mk w).out)`.
   have hterm : ∀ Cs : ConjClasses G,
-      (((classSum Ci * classSum Cj) Cs.out : ℂ) • classSum Cs) w
-        = if Cs = ConjClasses.mk w then (classSum Ci * classSum Cj) Cs.out else 0 := by
+      (((classSum Ci * classSum Cj).coeff Cs.out : ℂ) • classSum Cs).coeff w
+        = if Cs = ConjClasses.mk w then (classSum Ci * classSum Cj).coeff Cs.out else 0 := by
     intro Cs
-    rw [MonoidAlgebra.smul_apply, classSum_apply, smul_eq_mul]
+    rw [MonoidAlgebra.coeff_smul_apply, coeff_classSum, smul_eq_mul]
     by_cases hCs : ConjClasses.mk w = Cs
     · rw [if_pos hCs, if_pos hCs.symm, mul_one]
     · rw [if_neg hCs, if_neg (fun h => hCs h.symm), mul_zero]
   rw [Finset.sum_congr rfl (fun Cs _ => hterm Cs),
     Finset.sum_ite_eq' Finset.univ (ConjClasses.mk w)
-      (fun Cs => (classSum Ci * classSum Cj) Cs.out)]
+      (fun Cs => (classSum Ci * classSum Cj).coeff Cs.out)]
   rw [if_pos (Finset.mem_univ _)]
   exact classSum_mul_apply_out Ci Cj w
 
