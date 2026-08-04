@@ -16409,3 +16409,5 @@ block 冪等元 `f_B` を `H`-部分と `G ∖ H`-部分に割るための道具
   OddOrder.RepresentationTheory.Modular.sum_blockCoeff_eq_trace
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.blockCoeff_eq_zero_of_vanishing
+#assert_only_allowed_axioms
+  OddOrder.MatrixModule.exists_smul_id_of_commute_blockAction

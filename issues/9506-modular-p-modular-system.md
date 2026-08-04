@@ -1128,6 +1128,11 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               `c^1 = c^f + c^{1-f}` の 2 項分解だけ:
               `c^f = 0` ((5.7) + Brauer 指標の一次独立性)、`c^{1-f}_φ = 0` for `φ ∈ IBr(b)`
               (block 対角性) ⟹ `c^1_φ = 0`。block の族を扱わずに済む。
+        - [x] **block の commutant はスカラー** — 完了 (2026-08-04、`Algebra/CentralCharacter.lean`)。
+              🎯 `exists_smul_id_of_commute_blockAction`: `π` が全射なので `A` の像は第 `i` 成分で
+              全行列環を覆い、それと可換な `k`-自己準同型は中心的行列 = スカラー。
+              これが `LatticeCentralCharacter.centralCharacter` の要求する **`hEnd`
+              (絶対既約性)** の中身。ordinary 側の Wedderburn 成分に `ω^𝒪` を付けるのに要る。
         - [ ] **(5.2) の instantiation**。核は上で証明済み。残りは実際の `p`-modular system で
               仮説を discharge する配線 (`hd` = 通常分解、`hD` = `trace_eq_sum_decompositionMatrix`、
               `hindep` = `BrauerBasis`、`hvanish` = (5.7) = `InducedBlockTrace`、

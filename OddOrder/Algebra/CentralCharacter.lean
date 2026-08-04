@@ -23,6 +23,7 @@ point to the block decomposition.
 ## Main results
 
 * `OddOrder.MatrixModule.exists_scalar_of_mem_center`
+* `OddOrder.MatrixModule.exists_smul_id_of_commute_blockAction` — the commutant of a block is `k`
 * `OddOrder.MatrixModule.centralCharacter`
 * `OddOrder.MatrixModule.centralCharacterPi_eq_zero_iff`
 * `OddOrder.MatrixModule.SameBlock`
@@ -51,6 +52,39 @@ theorem exists_scalar_of_mem_center {π : A →+* ∀ j, Matrix (nn j) (nn j) k}
   rw [Matrix.center_eq_range] at hmem
   obtain ⟨c, hc⟩ := hmem
   exact ⟨c, hc.symm⟩
+
+/-- **The commutant of a block is the scalars.**  A `k`-endomorphism of `nn i → k` commuting with
+the whole image of `A` commutes with every matrix, because `π` is onto; hence it is a scalar.
+
+This is absolute irreducibility of the `i`-th block, in the form
+`LatticeCentralCharacter.centralCharacter` asks for. -/
+theorem exists_smul_id_of_commute_blockAction {π : A →+* ∀ j, Matrix (nn j) (nn j) k}
+    (hπ : Function.Surjective π) (i : ι) (E : (nn i → k) →ₗ[k] (nn i → k))
+    (hE : ∀ (a : A) (v : nn i → k), E (π a i *ᵥ v) = π a i *ᵥ E v) :
+    ∃ c : k, E = c • LinearMap.id := by
+  classical
+  have hcomm : ∀ M : Matrix (nn i) (nn i) k, ∀ v, E (M *ᵥ v) = M *ᵥ E v := by
+    intro M v
+    obtain ⟨a, ha⟩ := hπ (Pi.single i M)
+    have hM : π a i = M := by rw [ha]; simp
+    rw [← hM]; exact hE a v
+  have hmem : LinearMap.toMatrix' E ∈ Set.center (Matrix (nn i) (nn i) k) := by
+    rw [Semigroup.mem_center_iff]
+    intro M
+    refine Matrix.toLin'.injective ?_
+    rw [Matrix.toLin'_mul, Matrix.toLin'_mul, Matrix.toLin'_toMatrix']
+    refine LinearMap.ext fun v => ?_
+    simp only [LinearMap.coe_comp, Function.comp_apply, Matrix.toLin'_apply]
+    exact (hcomm M v).symm
+  rw [Matrix.center_eq_range] at hmem
+  obtain ⟨c, hc⟩ := hmem
+  refine ⟨c, ?_⟩
+  have hE' := congrArg Matrix.toLin' hc
+  rw [Matrix.toLin'_toMatrix'] at hE'
+  refine LinearMap.ext fun v => ?_
+  rw [← hE']
+  refine funext fun j => ?_
+  simp [Matrix.toLin'_apply, Matrix.scalar, Matrix.mulVec_diagonal]
 
 variable (π : A →+* ∀ j, Matrix (nn j) (nn j) k) (i : ι) [Nonempty (nn i)]
 
