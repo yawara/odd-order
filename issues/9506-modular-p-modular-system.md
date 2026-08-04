@@ -1414,7 +1414,15 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               ⟹ `[χ_P,1_P] = dim V^P` が**非負整数**であることが従い、`|P| = p^a` で
               割った後も付値環に留まる (剰余体への還元の要点)。
             - **類の defect `d(K)`** と `p^{a-d(K)}` による正規化 (Ch.3 の材料、未整備)。
-          * [ ] (4.23) `R(z) = π(Ĝ_p z)`
+          * [ ] (4.23) `R(z) = π(Ĝ_p z)`。
+            - [x] **組合せ半分 完了 (2026-08-05、`GroupTheory/SylowCosetPairs.lean`)**:
+              🎯 `factorThroughEquivCosetPairs` (`(x,y) ↦ (xy,y)` が
+              `{(x,y) : x ∈ P, y ∈ T, xy ∈ S}` と
+              **`Ω = {(u,y) ∈ S×T : u y⁻¹ ∈ P}`** の全単射) /
+              `card_factorThrough_eq_card_cosetPairs` /
+              🎯 `cosetPairsEquivConj` (`Ω` は Sylow の取り方に依らない)。
+              (4.22) と合わせて `π(Ĝ_p L̂)` の `K̂`-係数 = `|Ω_{K,L}|/|K|`。
+            - [ ] 指標側 (`R(L̂)` の `K̂`-係数も同じ値) = (4.19) 本体。
           * [ ] (3.32) `u_χ f_B` の補題 ⟹ `λ_B(Ĝ⁰) = 0` (`B ≠ B₀`)。
             `λ_{B₀}(Ĝ⁰) = |G⁰|*` は既存の `aug` + `not_dvd_card_isPRegular` で済む。
           ⟹ **見通し**: (4.19) が 2-3 段、(4.23)+(3.32)+(6.14)+(6.1) で 3-4 段。
