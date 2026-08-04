@@ -16140,6 +16140,10 @@ counting a basis of `Z(K[G])`. -/
 #assert_only_allowed_axioms
   OddOrder.map_maximalIdeal_le_ringJacobson
 #assert_only_allowed_axioms
+  OddOrder.exists_corner_inverse_of_isUnit
+#assert_only_allowed_axioms
+  OddOrder.exists_corner_inverse_of_isNilpotent
+#assert_only_allowed_axioms
   OddOrder.exists_corner_inverse
 
 /-! **Henselian イデアルに沿った冪等元の持ち上げ** (`Algebra.IdempotentLift`) —

@@ -910,7 +910,19 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         `u - 1 = x - f ∈ 𝔪·𝒪G ⊆ J(𝒪G)` なので **`u` は `𝒪G` の単元**で、
         `f u = u f = x` を確かめれば corner の逆元は `f u⁻¹ f` で済む。corner 環も
         corner に対する (5.3) も不要。
-  - [ ] **次**: (5.5) → (5.6) → (5.7) → 🎯 (5.2)。
+        論法の核は `exists_corner_inverse_of_isUnit` に切り出した (「`u = x + (1-f)` が
+        単元なら corner の逆元は `f u⁻¹ f`」)。標数 `p` 版
+        `exists_corner_inverse_of_isNilpotent` (`x - f` が冪零) も同時に用意 —
+        (5.5) が `Z(FG)` で使う形。
+  - [ ] **次: (5.5)**。`x ∈ Z(𝒪G)`, `λ_B(x*) = 1` ⟹ `∃ y ∈ f_B Z(𝒪G)`, `x y = f_B`。
+        **手順は確定済**: `Z(FG)` で `w := e_B x* + (1 - e_B)` と置くと
+        **全ての block 指標 `λ_{B'}` が `w - 1` を殺す** (`B'=B` なら `1·1+1-1=1`、
+        `B'≠B` なら `0+1-0=1`) ので、repo の `hnil` 仮説から `w - 1` は冪零 ⟹
+        `exists_corner_inverse_of_isNilpotent` で `e_B x*` は corner で可逆。
+        それを `centerLift` で `𝒪` に持ち上げて (5.4) を当てる。
+        ⟹ 必要な interfacing = repo の block 枠組 (`Block`/`blockCharacter`/
+        `blockCharacterPi_eq_zero_iff`/`hnil`) と `centerReduceHom` の接続。
+  - [ ] その後 (5.6) → (5.7) → 🎯 (5.2)。
         併せて (3.13) `χ ∉ B ⟹ M f_B = 0` / (3.31) `ψ(f_b z)` も必要。
   - [ ] **(5.5)** / **(5.6)** / **(5.7)**。
         (5.7) は `⟨h⟩` の `supp(w)` への軌道が長さ `p` の倍数であること + 固有空間の

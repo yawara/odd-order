@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.RingTheory.Nilpotent.Basic
 import OddOrder.Algebra.JacobsonCentralSubring
 
 /-!
@@ -22,11 +23,17 @@ unit of `𝒪G`, and one checks `f u = u f = x`.  The corner inverse is then sim
 only ring theory used is that `1 + J` consists of units, proved here for a possibly
 noncommutative ring since mathlib's version assumes commutativity.
 
+The unit hypothesis is isolated as `exists_corner_inverse_of_isUnit`, since (5.5) needs the same
+argument in characteristic `p`, where `u` is a unit because `u - 1` is *nilpotent* rather than in
+the radical.
+
 ## Main results
 
 * `OddOrder.isUnit_one_add_of_mem_ringJacobson`
+* `OddOrder.exists_corner_inverse_of_isUnit` — the core
 * `OddOrder.map_maximalIdeal_le_ringJacobson`
 * `OddOrder.exists_corner_inverse` — Navarro (5.4)
+* `OddOrder.exists_corner_inverse_of_isNilpotent` — the characteristic-`p` variant
 -/
 
 namespace OddOrder
@@ -58,36 +65,18 @@ theorem isUnit_one_add_of_mem_ringJacobson {A : Type*} [Ring A] {j : A}
       _ = 1 + j := by rw [hw, one_mul]
   exact ⟨⟨1 + j, z, by rw [← hwz]; exact hw, hz⟩, rfl⟩
 
-variable {𝒪 A : Type*} [CommRing 𝒪] [IsLocalRing 𝒪] [Ring A] [Algebra 𝒪 A] [Module.Finite 𝒪 A]
-  [Nontrivial A]
-
-/-- `𝔪·A` sits inside the Jacobson radical — Navarro (5.3), in ideal form. -/
-theorem map_maximalIdeal_le_ringJacobson :
-    (IsLocalRing.maximalIdeal 𝒪).map (algebraMap 𝒪 A) ≤ Ring.jacobson A := by
-  rw [Ideal.map_le_iff_le_comap]
-  intro a ha
-  exact algebraMap_maximalIdeal_mem_ringJacobson ha
-
-/-- **Navarro (5.4).**  An element of the corner `fAf` congruent to `f` modulo `𝔪·A` has a
-two-sided inverse in that corner. -/
-theorem exists_corner_inverse {f x : A} (hf : IsIdempotentElem f) (hx : x = f * x * f)
-    (hxf : f - x ∈ (IsLocalRing.maximalIdeal 𝒪).map (algebraMap 𝒪 A)) :
+/-- **The core of Navarro (5.4).**  If `x` lies in the corner `fAf` and `u = x + (1 - f)` is a
+unit of `A`, then `f u⁻¹ f` is a two-sided inverse of `x` in that corner.  No ring structure on
+the corner is needed. -/
+theorem exists_corner_inverse_of_isUnit {A : Type*} [Ring A] {f x : A} (hf : IsIdempotentElem f)
+    (hx : x = f * x * f) (hunit : IsUnit (x + (1 - f))) :
     ∃ y : A, y = f * y * f ∧ x * y = f ∧ y * x = f := by
   have hff : f * f = f := hf
-  -- `u = x + (1 - f)` is a unit, being `1` modulo `𝔪·A`
   set u : A := x + (1 - f) with hu
-  have hu1 : u = 1 + (x - f) := by rw [hu]; abel
-  have hunit : IsUnit u := by
-    rw [hu1]
-    refine isUnit_one_add_of_mem_ringJacobson ?_
-    have hneg : x - f = -(f - x) := by abel
-    rw [hneg]
-    exact Submodule.neg_mem _ (map_maximalIdeal_le_ringJacobson (𝒪 := 𝒪) hxf)
   obtain ⟨U, hU⟩ := hunit
   set v : A := ((U⁻¹ : Aˣ) : A) with hv
   have huv : u * v = 1 := by rw [hv, ← hU]; exact U.mul_inv
   have hvu : v * u = 1 := by rw [hv, ← hU]; exact U.inv_mul
-  -- `f` absorbs `x` on both sides
   have hfx : f * x = x := by rw [hx, ← mul_assoc, ← mul_assoc, hff]
   have hxfe : x * f = x := by
     conv_lhs => rw [hx]
@@ -103,5 +92,39 @@ theorem exists_corner_inverse {f x : A} (hf : IsIdempotentElem f) (hx : x = f * 
   · calc f * v * f * x = f * v * x := by rw [mul_assoc, hfx]
       _ = f * v * (u * f) := by rw [huf]
       _ = f := by rw [mul_assoc, ← mul_assoc v u f, hvu, one_mul, hff]
+
+/-- **The characteristic-`p` variant.**  If `x - f` is nilpotent then `u = x + (1 - f)` is a unit,
+so `x` is again invertible in the corner.  This is what Navarro (5.5) uses in `Z(FG)`, where
+`e_B x - e_B` is nilpotent because every block character kills it. -/
+theorem exists_corner_inverse_of_isNilpotent {A : Type*} [Ring A] {f x : A}
+    (hf : IsIdempotentElem f) (hx : x = f * x * f) (hnil : IsNilpotent (x - f)) :
+    ∃ y : A, y = f * y * f ∧ x * y = f ∧ y * x = f := by
+  refine exists_corner_inverse_of_isUnit hf hx ?_
+  have hrw : x + (1 - f) = 1 + (x - f) := by abel
+  rw [hrw]
+  exact hnil.isUnit_one_add
+
+variable {𝒪 A : Type*} [CommRing 𝒪] [IsLocalRing 𝒪] [Ring A] [Algebra 𝒪 A] [Module.Finite 𝒪 A]
+  [Nontrivial A]
+
+/-- `𝔪·A` sits inside the Jacobson radical — Navarro (5.3), in ideal form. -/
+theorem map_maximalIdeal_le_ringJacobson :
+    (IsLocalRing.maximalIdeal 𝒪).map (algebraMap 𝒪 A) ≤ Ring.jacobson A := by
+  rw [Ideal.map_le_iff_le_comap]
+  intro a ha
+  exact algebraMap_maximalIdeal_mem_ringJacobson ha
+
+/-- **Navarro (5.4).**  An element of the corner `fAf` congruent to `f` modulo `𝔪·A` has a
+two-sided inverse in that corner. -/
+theorem exists_corner_inverse {f x : A} (hf : IsIdempotentElem f) (hx : x = f * x * f)
+    (hxf : f - x ∈ (IsLocalRing.maximalIdeal 𝒪).map (algebraMap 𝒪 A)) :
+    ∃ y : A, y = f * y * f ∧ x * y = f ∧ y * x = f := by
+  refine exists_corner_inverse_of_isUnit hf hx ?_
+  have hrw : x + (1 - f) = 1 + (x - f) := by abel
+  rw [hrw]
+  refine isUnit_one_add_of_mem_ringJacobson ?_
+  have hneg : x - f = -(f - x) := by abel
+  rw [hneg]
+  exact Submodule.neg_mem _ (map_maximalIdeal_le_ringJacobson (𝒪 := 𝒪) hxf)
 
 end OddOrder
