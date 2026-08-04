@@ -198,6 +198,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrrCount
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
@@ -15941,3 +15942,18 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.RepresentationTheory.Modular.centerAlgEquivPi
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.card_eq_card_conjClasses
+
+/-! **Second (column) orthogonality over the splitting field**
+(`GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality`, Navarro (2.13) の feeder).
+第一直交を共役類でまとめて行列等式にし、指標表が正方であることで片側逆を両側逆にする。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_eq_sum_conjClasses
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.isUnit_conjugacyClassSize
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.characterMatrix_mul_characterMatrixInv
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.characterMatrixInv_mul_characterMatrix
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_character_inv_mul_character_classRep
