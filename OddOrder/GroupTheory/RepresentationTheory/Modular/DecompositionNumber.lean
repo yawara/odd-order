@@ -113,4 +113,42 @@ theorem existsUnique_decomposition_trace
   exact eq_of_sum_irreducibleBrauerCharacter_eq hp hω' hπ hlin hkerJ
     (fun g hg => by rw [← hd' g hg, hd g hg])
 
+section DecompositionNumber
+
+variable {L : Type*} [AddCommGroup L] [Module 𝒪 L] [Module.Free 𝒪 L] [Module.Finite 𝒪 L]
+  (hp : p.Prime) {ω : 𝒪} (hω : IsPrimitiveRoot ω (pRegularExponent p G))
+  {ω' : ResidueField 𝒪} (hω' : IsPrimitiveRoot ω' (pRegularExponent p G))
+  {π : MonoidAlgebra (ResidueField 𝒪) G →+* ∀ j, Matrix (nn j) (nn j) (ResidueField 𝒪)}
+  (hπ : Function.Surjective π)
+  (hlin : ∀ (c : ResidueField 𝒪) (a : MonoidAlgebra (ResidueField 𝒪) G), π (c • a) = c • π a)
+  (hkerJ : RingHom.ker π = Ring.jacobson (MonoidAlgebra (ResidueField 𝒪) G))
+  (ρ : Representation 𝒪 G L)
+
+/-- **The decomposition numbers `d_{χφ}` of a lattice representation.**  Ranging `ρ` over
+representatives of `Irr(G)` this is the row of the decomposition matrix `D` at `χ`; the Cartan
+matrix is `C = DᵀD`.
+
+Well defined by `existsUnique_decomposition_trace`. -/
+noncomputable def decompositionNumber : ι → ℕ :=
+  (existsUnique_decomposition_trace (nn := nn) hp hω hω' hπ hlin hkerJ ρ).choose
+
+/-- **The defining property of the decomposition numbers**: on the `p`-regular classes the
+ordinary character is the `ℕ`-combination of the irreducible Brauer characters they prescribe. -/
+theorem trace_eq_sum_decompositionNumber (g : G) (hg : IsPRegular p g) :
+    LinearMap.trace 𝒪 L (ρ g)
+      = ∑ i, (decompositionNumber (nn := nn) hp hω hω' hπ hlin hkerJ ρ i : 𝒪)
+          * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π i g :=
+  (existsUnique_decomposition_trace (nn := nn) hp hω hω' hπ hlin hkerJ ρ).choose_spec.1 g hg
+
+/-- **Anything satisfying the defining property *is* the family of decomposition numbers.**  This
+is the form in which uniqueness gets used: identify `d` by exhibiting one decomposition. -/
+theorem eq_decompositionNumber {d : ι → ℕ}
+    (hd : ∀ g : G, IsPRegular p g →
+      LinearMap.trace 𝒪 L (ρ g)
+        = ∑ i, (d i : 𝒪) * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π i g) :
+    d = decompositionNumber (nn := nn) hp hω hω' hπ hlin hkerJ ρ :=
+  (existsUnique_decomposition_trace (nn := nn) hp hω hω' hπ hlin hkerJ ρ).choose_spec.2 d hd
+
+end DecompositionNumber
+
 end OddOrder.RepresentationTheory.Modular
