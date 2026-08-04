@@ -38,6 +38,8 @@ of the inner sum.
   page-93 evaluation of the inner sum
 * `OddOrder.RepresentationTheory.Modular.ordCompl_mul_coeff_blockIdempotentLift` — the same over
   `𝒪`, in terms of a lift of the block idempotent
+* `OddOrder.RepresentationTheory.Modular.coeff_pElementSum_mul_classSum` — **Navarro (4.23)**,
+  in coefficient form
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -312,6 +314,60 @@ theorem ordCompl_mul_coeff_blockIdempotentLift [Fact p.Prime] (S : Sylow p G)
   rw [← MonoidAlgebra.coeff_mapRingHom,
     mapRingHom_blockIdempotent_eq_sum (K := K) e hπG hlinG hnilG hidem hf hB]
 
+
+set_option maxHeartbeats 1200000 in
+-- The two halves of (4.23) and the cancellation run under the same instance chains.
+open scoped Classical in
+/-- **Navarro (4.23), coefficient form.**  For a class `C` on which weak block orthogonality
+applies (in particular any `p`-regular class) and any class sum `L̂`,
+
+`(Ĝ_p · L̂)(x_C) = ∑_B λ_B(L̂) · e_B(x_C)`,
+
+i.e. the `x_C`-coefficient of `π(Ĝ_p L̂)` equals that of `R(L̂) = ∑_B λ_B(L̂) e_B`.
+
+Both sides of `residue_ordCompl_mul_coeff_pElementSum_mul` carry the factor `|G|_{p'}*` — the
+counting side by construction, the character side by the page-93 evaluation — and `p ∤ |G|_{p'}`,
+so it cancels. -/
+theorem coeff_pElementSum_mul_classSum [Fact p.Prime]
+    [Fintype (MatrixModule.Block πG hπG hlinG)] (S : Sylow p G) (C L : ConjClasses G)
+    {F : MatrixModule.Block πG hπG hlinG → Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)}
+    {F' : MatrixModule.Block πG hπG hlinG →
+      Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) G)}
+    (hidem : ∀ B, IsIdempotentElem (F B))
+    (hf : ∀ B, MonoidAlgebra.mapRingHom G (residue 𝒪) ((F B : MonoidAlgebra 𝒪 G))
+      = ((F' B : MonoidAlgebra (ResidueField 𝒪) G)))
+    (hB : ∀ B, MatrixModule.blockCharacterPi πG hπG hlinG (F' B) = Pi.single B 1)
+    (hweak : ∀ B : MatrixModule.Block πG hπG hlinG, ∀ x : ↥(S : Subgroup G), (x : G) ≠ 1 →
+      ∑ i ∈ Finset.univ.filter (fun i => blockOfIrr e hπG hlinG hnilG i = B),
+        (wedderburnRepresentation e i).character C.out⁻¹
+          * (wedderburnRepresentation e i).character (x : G) = 0) :
+    (pElementSum p (ResidueField 𝒪) (G := G) * classSum L).coeff C.out
+      = ∑ B : MatrixModule.Block πG hπG hlinG,
+          MatrixModule.blockCharacter πG hπG hlinG B
+              ⟨classSum (k := ResidueField 𝒪) L, classSum_mem_center L⟩
+            * ((F' B : MonoidAlgebra (ResidueField 𝒪) G)).coeff C.out := by
+  classical
+  -- `p ∤ |G|_{p'}`, so the common factor is invertible in the residue field
+  have hne : residue 𝒪 ((ordCompl[p] (Nat.card G) : ℕ) : 𝒪) ≠ 0 := by
+    rw [map_natCast]
+    refine fun h => Nat.not_dvd_ordCompl (Fact.out (p := p.Prime)) (Nat.card_pos (α := G)).ne' ?_
+    exact (CharP.cast_eq_zero_iff (ResidueField 𝒪) p _).mp h
+  refine mul_left_cancel₀ hne ?_
+  rw [residue_ordCompl_mul_coeff_pElementSum_mul e hπG hlinG hnilG S C L, Finset.mul_sum]
+  refine Finset.sum_congr rfl fun B _ => ?_
+  -- page 93, reduced: the inner sum is `|G|_{p'}*` times the block idempotent's coefficient
+  have h93 := congrArg (residue 𝒪)
+    (ordCompl_mul_coeff_blockIdempotentLift e hπG hlinG hnilG S (hidem B) (hf B) (hB B) C.out
+      (hweak B))
+  rw [map_sum, map_mul, map_natCast] at h93
+  have hFcoeff : residue 𝒪 ((F B : MonoidAlgebra 𝒪 G).coeff C.out)
+      = ((F' B : MonoidAlgebra (ResidueField 𝒪) G)).coeff C.out := by
+    rw [← MonoidAlgebra.coeff_mapRingHom, hf B]
+  rw [hFcoeff] at h93
+  rw [Finset.sum_congr rfl fun i (_ : i ∈ _) => (map_mul (residue 𝒪) _ _).trans
+    (congrArg _ (map_natCast (residue 𝒪) _))] at h93
+  rw [h93, map_natCast]
+  ring
 
 end Reduction
 

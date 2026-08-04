@@ -16942,3 +16942,9 @@ Navarro (4.19) がブロックごとに再編する係数 `a_B(K̂)` の正体�
   OddOrder.RepresentationTheory.Modular.sum_block_character_mul_finrank_invariants
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.ordCompl_mul_coeff_blockIdempotentLift
+
+/-! 🎯🎯🎯 **Navarro (4.23) 完成** (`Modular/SylowSumReduction`) —
+`(Ĝ_p·L̂)(x_C) = ∑_B λ_B(L̂)·e_B(x_C)`。両辺の `|G|_{p'}*` が約せる。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.coeff_pElementSum_mul_classSum
