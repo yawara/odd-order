@@ -72,4 +72,53 @@ theorem exists_mem_center_mapRingHom_eq {f : k →+* k'} (hf : Function.Surjecti
     exact Finset.sum_congr rfl fun C _ => by
       rw [mapRingHom_smul, mapRingHom_classSum, ha C]
 
+/-- The class-sum expansion, inside the centre subalgebra rather than in `k[G]`. -/
+theorem eq_sum_classSumCenter (w : Subalgebra.center k (MonoidAlgebra k G)) :
+    w = ∑ C : ConjClasses G, (w : MonoidAlgebra k G).coeff C.out • classSumCenter (k := k) C := by
+  refine Subtype.ext ?_
+  push_cast
+  exact center_eq_sum_classSum w.2
+
+-- Same as above: the instances are consumed by the class-sum expansion in the proof.
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+/-- **The well-definedness of the reduced central character.**  If a central element dies under
+coefficient reduction then so does its central-character value.
+
+This is what makes `λ_χ` well defined: two lifts of the same central element of `k'[G]` differ by
+something killed by the reduction, so `f ∘ ω` takes the same value on both.  The proof is the
+class-sum expansion — `ω` is `k`-linear, and each coefficient of `w` is killed by `f`. -/
+theorem apply_eq_zero_of_mapRingHom_eq_zero (f : k →+* k')
+    (ω : Subalgebra.center k (MonoidAlgebra k G) →ₐ[k] k)
+    {w : Subalgebra.center k (MonoidAlgebra k G)}
+    (hw : MonoidAlgebra.mapRingHom G f (w : MonoidAlgebra k G) = 0) :
+    f (ω w) = 0 := by
+  have hcoeff : ∀ C : ConjClasses G, f ((w : MonoidAlgebra k G).coeff C.out) = 0 := by
+    intro C
+    have := congrArg (fun x => MonoidAlgebra.coeff x C.out) hw
+    simpa [MonoidAlgebra.coeff_mapRingHom] using this
+  conv_lhs => rw [eq_sum_classSumCenter w]
+  rw [map_sum, map_sum]
+  refine Finset.sum_eq_zero fun C _ => ?_
+  rw [map_smul, smul_eq_mul, map_mul, hcoeff C, zero_mul]
+
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+/-- **`f ∘ ω` factors through the reduction.**  Central elements with the same image have the
+same reduced central-character value, so `λ_χ` may be computed on *any* lift.
+
+Together with `exists_mem_center_mapRingHom_eq` (which supplies a lift) this is exactly what is
+needed to define `λ_χ : Z(kG) → k` from `ω_χ : Z(𝒪G) → 𝒪`. -/
+theorem apply_eq_of_mapRingHom_eq (f : k →+* k')
+    (ω : Subalgebra.center k (MonoidAlgebra k G) →ₐ[k] k)
+    {w₁ w₂ : Subalgebra.center k (MonoidAlgebra k G)}
+    (h : MonoidAlgebra.mapRingHom G f (w₁ : MonoidAlgebra k G)
+       = MonoidAlgebra.mapRingHom G f (w₂ : MonoidAlgebra k G)) :
+    f (ω w₁) = f (ω w₂) := by
+  have hzero : f (ω (w₁ - w₂)) = 0 := by
+    refine apply_eq_zero_of_mapRingHom_eq_zero f ω ?_
+    rw [Subalgebra.coe_sub, map_sub, h, sub_self]
+  rw [map_sub, map_sub, sub_eq_zero] at hzero
+  exact hzero
+
 end OddOrder.GroupTheory.CenterClassSum
