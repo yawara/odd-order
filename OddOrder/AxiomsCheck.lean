@@ -250,6 +250,7 @@ import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIdempotent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockSumOverPSubgroup
 import OddOrder.Algebra.PElementSum
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
@@ -16870,3 +16871,9 @@ Navarro (4.19) がブロックごとに再編する係数 `a_B(K̂)` の正体�
   OddOrder.GroupTheory.classDefect_add_factorization_conjugacyClassSize
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.ordProj_conjugacyClassSize_mul_pow_classDefect
+
+/-! **ブロックを `p`-部分群上で和すると単位元だけ残る** (`Modular/BlockSumOverPSubgroup`)
+— Navarro (4.19) 原文 p.93 の段。弱ブロック直交性が `x ≠ 1` の項を全部殺す。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_pSubgroup_sum_block_character
