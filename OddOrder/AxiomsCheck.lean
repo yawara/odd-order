@@ -202,6 +202,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogona
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ProjectiveCharacterVanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularClassIndex
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
+import OddOrder.GroupTheory.RepresentationTheory.Modular.TruncClassSum
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
@@ -16013,3 +16014,11 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.RepresentationTheory.Modular.pairingZero_projectiveIndecomposableCharacter
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_cartanMatrix_mul_pairingZero
+
+/-! **`G`-類の部分群への切り落とし** — Brauer 対応 `b^G` の土台 (段 95、Navarro (4.13) 前)
+(`GroupTheory.RepresentationTheory.Modular.TruncClassSum`). -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.CenterClassSum.coeff_truncClassSum
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.CenterClassSum.truncClassSum_mem_center
