@@ -1662,11 +1662,24 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               `Finset.sum_eq_zero` + `Nat.mul_ne_zero_iff` + 各 `z` について
               `centralCharacterAlg_eq_of_decompositionNumber_ne_zero` を 2 回
               (`c` が共通なので両者が一致) + `AlgHom.ext`/`Quotient.sound`。
-              ⚠ **足りない部品**: 「`z ∈ Z(k[G])` に対し `(reduction ρ).asAlgebraHom z = c • id`
-              なる `c` が存在する」という形の補題が見つからなかった
-              (`exists_smul_id_of_commute_wedderburnLattice` は `K` 側)。
-              `BlockOfLattice.lean` の `blockOfLattice`/`blockCharacter_blockOfLattice` が
-              その `c` を持っているはずなので、そこから取り出すのが最短。
+              ⚠⚠ **より良い道 (2026-08-05 に発見)**: `(reduction ρ).asAlgebraHom z = c • id`
+              の `c` を自分で作る必要はない。`πG := π` / `ιG := ι` と取れば
+              **`blockOfIrr e hπ hlin hnil i : Block π hπ hlin = Quotient (blockSetoid π hπ hlin)`**
+              がそのまま「`χ_i` のブロック」なので、欲しいのは
+
+              > `d_{iμ} ≠ 0 ⟹ Quotient.mk (blockSetoid π hπ hlin) μ = blockOfIrr e hπ hlin hnil i`
+
+              の 1 本。橋は 2 つとも既存:
+              `blockCharacter_mk π hπ hlin i` (`Algebra/BlockIdempotent.lean:60`、
+              `blockCharacter (mk i) = centralCharacterAlg π i`) と
+              `blockCharacter_blockOfLattice` (`BlockOfLattice.lean:72`、
+              `blockCharacter (blockOfLattice …) = reducedCentralCharacterAlg (centralCharacter K ψ)`)。
+              ⟹ `centralCharacterAlg π μ = reducedCentralCharacterAlg (ω_{χ_i})` を示せば
+              `blockCharacter` が単射なので両ブロックが一致。
+              その等式が `centralCharacterAlg_eq_of_decompositionNumber_ne_zero` の内容
+              (`d_{iμ} ≠ 0` なら `μ` の中心指標が `χ_i` の還元中心指標)。
+              ⚠ 現状 `blockOfIrr` と `decompositionMatrix` を結ぶ補題は repo に**無い** (grep 実測)。
+              これが (b) の実装の入口。
             [x] (c) **既存**: `centralCharacterAlg_eq_of_decompositionNumber_ne_zero`
             (`DecompositionNumber.lean`) — `d_{χφ} ≠ 0` なら `φ` の中心指標は `χ` のそれ。
             ⚠ 検算: `ω_χ(Ĝ⁰) = (1/χ(1))∑_{g∈G⁰}χ(g)` は `χ ∉ Irr(B₀)` で **`K` の中で厳密に 0**
