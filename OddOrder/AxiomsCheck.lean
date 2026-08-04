@@ -16933,3 +16933,12 @@ Navarro (4.19) がブロックごとに再編する係数 `a_B(K̂)` の正体�
   OddOrder.RepresentationTheory.Modular.ordCompl_mul_coeff_sylowSum_mul_over
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.residue_ordCompl_mul_coeff_pElementSum_mul
+
+/-! **(4.23) p.93 の評価** (`Modular/SylowSumReduction`) —
+`∑_{χ∈Irr(B)} χ(y⁻¹)·dim V_χ^S = |G|_{p'}·(∑_{χ∈Irr(B)} e_χ)(y)` とその `𝒪` 版
+(ブロック冪等元の持ち上げ `f` を使った形)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_block_character_mul_finrank_invariants
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.ordCompl_mul_coeff_blockIdempotentLift

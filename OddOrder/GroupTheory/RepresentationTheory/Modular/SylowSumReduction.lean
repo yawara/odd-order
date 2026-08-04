@@ -3,7 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockSumOverPSubgroup
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIdempotent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideReduction
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideSylowSum
 
@@ -31,6 +34,10 @@ of the inner sum.
 
 * `OddOrder.RepresentationTheory.Modular.ordCompl_mul_coeff_sylowSum_mul_over`
 * `OddOrder.RepresentationTheory.Modular.residue_ordCompl_mul_coeff_pElementSum_mul`
+* `OddOrder.RepresentationTheory.Modular.sum_block_character_mul_finrank_invariants` — the
+  page-93 evaluation of the inner sum
+* `OddOrder.RepresentationTheory.Modular.ordCompl_mul_coeff_blockIdempotentLift` — the same over
+  `𝒪`, in terms of a lift of the block idempotent
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -177,6 +184,134 @@ theorem residue_ordCompl_mul_coeff_pElementSum_mul [Fact p.Prime]
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl fun i hi => ?_
   rw [(Finset.mem_filter.mp hi).2]
+
+set_option maxHeartbeats 800000 in
+-- The Sylow cardinality, the invariants count and the idempotent coefficients are unified at once.
+omit [IsPModularSystem p 𝒪] in
+open scoped Classical in
+/-- **Navarro (4.19), page 93, evaluated.**  Summing the block's characters over a Sylow
+`p`-subgroup collapses to the identity term (`sum_pSubgroup_sum_block_character`), and the inner
+sums are the multiplicities of the trivial character:
+
+`∑_{χ ∈ Irr(B)} χ(y⁻¹) · dim V_χ^S = |G|_{p'} · (∑_{χ ∈ Irr(B)} e_χ)(y)`.
+
+The right-hand side is `|G|_{p'}` times the `y`-coefficient of the *lift* of the block idempotent
+(`mapRingHom_blockIdempotent_eq_sum`), so this is exactly the factor of `|G|_{p'}` that cancels
+against the one on the counting side of (4.23). -/
+theorem sum_block_character_mul_finrank_invariants [Fact p.Prime] (S : Sylow p G)
+    (B : MatrixModule.Block πG hπG hlinG) (y : G)
+    (hweak : ∀ x : ↥(S : Subgroup G), (x : G) ≠ 1 →
+      ∑ i ∈ Finset.univ.filter (fun i => blockOfIrr e hπG hlinG hnilG i = B),
+        (wedderburnRepresentation e i).character y⁻¹
+          * (wedderburnRepresentation e i).character (x : G) = 0) :
+    ∑ i ∈ Finset.univ.filter (fun i => blockOfIrr e hπG hlinG hnilG i = B),
+        (wedderburnRepresentation e i).character y⁻¹
+          * (Module.finrank K (Representation.invariants
+              ((wedderburnRepresentation e i).comp (S : Subgroup G).subtype)) : K)
+      = ((ordCompl[p] (Nat.card G) : ℕ) : K)
+        * (∑ i ∈ Finset.univ.filter (fun i => blockOfIrr e hπG hlinG hnilG i = B),
+            ordinaryIdempotent e i).coeff y := by
+  classical
+  letI := Fintype.ofFinite ↥(S : Subgroup G)
+  have hcard : Fintype.card ↥(S : Subgroup G) = ordProj[p] (Nat.card G) := by
+    rw [← Nat.card_eq_fintype_card]; exact S.card_eq_multiplicity
+  have hne : ((ordProj[p] (Nat.card G) : ℕ) : K) ≠ 0 :=
+    Nat.cast_ne_zero.mpr (pow_ne_zero _ (Fact.out (p := p.Prime)).pos.ne')
+  refine mul_left_cancel₀ hne ?_
+  -- the inner sum over `S` is `|S|` times the multiplicity of the trivial character
+  have hinner : ∀ i : ι', ∑ x : ↥(S : Subgroup G),
+      (wedderburnRepresentation e i).character (x : G)
+      = (Fintype.card ↥(S : Subgroup G) : K)
+        * (Module.finrank K (Representation.invariants
+            ((wedderburnRepresentation e i).comp (S : Subgroup G).subtype)) : K) := by
+    intro i
+    rw [← OddOrder.RepresentationTheory.sum_character_eq_card_mul_finrank_invariants]
+    exact Finset.sum_congr rfl fun x _ => rfl
+  -- `|G|` splits, and the coefficient of `∑ e_χ` is the character sum
+  have hcoeff : (∑ i ∈ Finset.univ.filter
+      (fun i => blockOfIrr e hπG hlinG hnilG i = B), ordinaryIdempotent e i).coeff y
+      = ∑ i ∈ Finset.univ.filter (fun i => blockOfIrr e hπG hlinG hnilG i = B),
+        ⅟(Nat.card G : K) * (wedderburnRepresentation e i).character 1
+          * (wedderburnRepresentation e i).character y⁻¹ := by
+    rw [MonoidAlgebra.coeff_finsetSum]
+    exact Finset.sum_congr rfl fun i _ => coeff_ordinaryIdempotent e i y
+  have hinv : ((ordProj[p] (Nat.card G) : ℕ) : K) * ((ordCompl[p] (Nat.card G) : ℕ) : K)
+      * ⅟(Nat.card G : K) = 1 := by
+    rw [← Nat.cast_mul, Nat.ordProj_mul_ordCompl_eq_self, mul_invOf_self]
+  calc ((ordProj[p] (Nat.card G) : ℕ) : K)
+        * ∑ i ∈ Finset.univ.filter (fun i => blockOfIrr e hπG hlinG hnilG i = B),
+          (wedderburnRepresentation e i).character y⁻¹
+            * (Module.finrank K (Representation.invariants
+                ((wedderburnRepresentation e i).comp (S : Subgroup G).subtype)) : K)
+      = ∑ i ∈ Finset.univ.filter (fun i => blockOfIrr e hπG hlinG hnilG i = B),
+          (wedderburnRepresentation e i).character y⁻¹
+            * ∑ x : ↥(S : Subgroup G), (wedderburnRepresentation e i).character (x : G) := by
+        rw [Finset.mul_sum]
+        refine Finset.sum_congr rfl fun i _ => ?_
+        rw [hinner i, hcard]; ring
+    _ = ∑ x : ↥(S : Subgroup G),
+          ∑ i ∈ Finset.univ.filter (fun i => blockOfIrr e hπG hlinG hnilG i = B),
+            (wedderburnRepresentation e i).character y⁻¹
+              * (wedderburnRepresentation e i).character (x : G) := by
+        simp only [Finset.mul_sum]
+        exact Finset.sum_comm
+    _ = ∑ i ∈ Finset.univ.filter (fun i => blockOfIrr e hπG hlinG hnilG i = B),
+          (wedderburnRepresentation e i).character y⁻¹
+            * (wedderburnRepresentation e i).character 1 :=
+        sum_pSubgroup_sum_block_character e hπG hlinG hnilG (S : Subgroup G) B y hweak
+    _ = ((ordProj[p] (Nat.card G) : ℕ) : K)
+          * (((ordCompl[p] (Nat.card G) : ℕ) : K)
+            * (∑ i ∈ Finset.univ.filter (fun i => blockOfIrr e hπG hlinG hnilG i = B),
+                ordinaryIdempotent e i).coeff y) := by
+        rw [hcoeff, Finset.mul_sum, Finset.mul_sum]
+        refine Finset.sum_congr rfl fun i _ => ?_
+        linear_combination (-((wedderburnRepresentation e i).character 1
+          * (wedderburnRepresentation e i).character y⁻¹)) * hinv
+
+set_option maxHeartbeats 800000 in
+-- The descent and the identification of the idempotent lift run under the same instance chains.
+omit [IsPModularSystem p 𝒪] in
+open scoped Classical in
+/-- **The page-93 evaluation over `𝒪`.**  With `f` an idempotent of `Z(𝒪G)` lifting the block
+idempotent `e_B`, `mapRingHom_blockIdempotent_eq_sum` identifies its image in `K[G]` with
+`∑_{χ ∈ Irr(B)} e_χ`, so the previous lemma reads
+
+`∑_{χ ∈ Irr(B)} χ(y⁻¹) · dim V_χ^S = |G|_{p'} · f(y)`
+
+as an identity in the valuation ring. -/
+theorem ordCompl_mul_coeff_blockIdempotentLift [Fact p.Prime] (S : Sylow p G)
+    {B : MatrixModule.Block πG hπG hlinG} {f : Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)}
+    (hidem : IsIdempotentElem f)
+    {f' : Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) G)}
+    (hf : MonoidAlgebra.mapRingHom G (residue 𝒪) (f : MonoidAlgebra 𝒪 G)
+      = (f' : MonoidAlgebra (ResidueField 𝒪) G))
+    (hB : MatrixModule.blockCharacterPi πG hπG hlinG f' = Pi.single B 1) (y : G)
+    (hweak : ∀ x : ↥(S : Subgroup G), (x : G) ≠ 1 →
+      ∑ i ∈ Finset.univ.filter (fun i => blockOfIrr e hπG hlinG hnilG i = B),
+        (wedderburnRepresentation e i).character y⁻¹
+          * (wedderburnRepresentation e i).character (x : G) = 0) :
+    ∑ i ∈ Finset.univ.filter (fun i => blockOfIrr e hπG hlinG hnilG i = B),
+        ordinaryCharacter (𝒪 := 𝒪) e i y⁻¹
+          * (Module.finrank K (Representation.invariants
+              ((wedderburnRepresentation e i).comp (S : Subgroup G).subtype)) : 𝒪)
+      = ((ordCompl[p] (Nat.card G) : ℕ) : 𝒪) * (f : MonoidAlgebra 𝒪 G).coeff y := by
+  refine FaithfulSMul.algebraMap_injective 𝒪 K ?_
+  have hterm : ∀ i : ι', algebraMap 𝒪 K (ordinaryCharacter (𝒪 := 𝒪) e i y⁻¹
+        * (Module.finrank K (Representation.invariants
+            ((wedderburnRepresentation e i).comp (S : Subgroup G).subtype)) : 𝒪))
+      = (wedderburnRepresentation e i).character y⁻¹
+        * (Module.finrank K (Representation.invariants
+            ((wedderburnRepresentation e i).comp (S : Subgroup G).subtype)) : K) := by
+    intro i
+    rw [map_mul, map_natCast, algebraMap_ordinaryCharacter]
+    rfl
+  rw [map_sum, map_mul, map_natCast,
+    Finset.sum_congr rfl fun i (_ : i ∈ _) => hterm i,
+    sum_block_character_mul_finrank_invariants e hπG hlinG hnilG S B y hweak]
+  refine congrArg _ ?_
+  rw [← MonoidAlgebra.coeff_mapRingHom,
+    mapRingHom_blockIdempotent_eq_sum (K := K) e hπG hlinG hnilG hidem hf hB]
+
 
 end Reduction
 
