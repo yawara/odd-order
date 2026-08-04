@@ -1493,9 +1493,21 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         * 🎯 `trace_mulLeft_pi_matrix` — `tr(L_v) = Σ_i m_i · tr(v_i)` ⟹ `e(u)` の各成分が
           中心冪等 = `0` か `1` なので `Σ_{ω_i(u)=1} m_i²`
         ⚠ **冪等元の階数 = トレース** という線型代数 (mathlib に無い) を経由しない。
-        残りの配線: (a) トレースが代数同型で不変、(b) `∏ M_{m_i}(K)` の中心冪等元は
-        成分ごとに `0`/`1`、(c) `ω_i(N̂) = |N| ⟺ N ≤ ker χ_i ⟺ i ∈ Irr(B₀)`
-        (⟸ は `eq_of_forall_pi_single_eq_one` で「`G` を潰すブロックは一意」から)。
+        * [x] **代数的な中身は完了 (2026-08-05、`Algebra/SubgroupSumWedderburn.lean`)**:
+          `apply_subgroupSum_eq_scalar` (`e(N̂)_i = ω_i(N̂)·1`) /
+          🎯 `centralScalar_subgroupSum_eq_zero_or_card` (**`ω_i(N̂) ∈ {0, |N|}`**、
+          `N̂² = |N|·N̂` + 体) / 🎯 `sum_sq_centralScalar_subgroupSum`
+          (**`Σ_i m_i² ω_i(N̂) = |G|`**) / 🎯🎯 `card_mul_sum_sq_eq_card`
+          (**`|N| · Σ_{ω_i(N̂)≠0} m_i² = |G|`**)。
+          支持: `SubgroupSum` に `subgroupSum_mul_subgroupSum` / `coeff_subgroupSum_one`、
+          `TraceMulLeft` に 🎯 `trace_mulLeft_algEquiv`。
+        * [ ] **残り = `{i : ω_i(N̂) ≠ 0} = Irr(B₀)` の同定**。
+          (⊆) `ω_i(N̂) = |N| ⟹ N ≤ ker χ_i` ⟹ (剰余で) そのブロックが `N` を潰す ⟹
+          `G = N·P` なら `G` 全体を潰す ⟹ 既存 `eq_of_forall_pi_single_eq_one`
+          (「`G` を潰すブロックは一意」) で `B₀`。
+          (⊇) は既存の `le_blockKernel_of_normal_of_forall_eq_one` の系。
+          ⚠ ただし前者は**通常側 (`K`) の `ω_i`** と**剰余体側 (`k`) のブロック**を
+          繋ぐので `blockOfIrr` 経由の配管が要る (`blockCharacter_subgroupSum` が既にある)。
   - [ ] **(6.12) 本体 (後半)**。原文 p.127 の証明が要求するのは
         (i) `ker(B) ≤ ker φ` (`φ ∈ IBr(B)`) — 上の逆包含の **`k` 側版**
         (`λ_B(N̂*) = |N|*` ≠ 0 ⟹ block 表現上で `N̂` が単元 ⟹ 核判定) でほぼ同型に書ける、
