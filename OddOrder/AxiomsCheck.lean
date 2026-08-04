@@ -254,6 +254,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockSumOverPSubgroup
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnside
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideReduction
 import OddOrder.Algebra.PElementSum
+import OddOrder.Algebra.PElementSumCount
 import OddOrder.GroupTheory.RepresentationTheory.SylowSumClassCoeff
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideSylowSum
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanBlockDiagonal
@@ -17026,3 +17027,11 @@ Problem (6.1) と対になる正規化。 -/
 
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.card_pRegular_modEq_centralizer
+
+/-! 🎯🎯 **`(Ĝ_p·Ĝ⁰)(g) = |Ω(g)|`** (`Algebra/PElementSumCount`) —
+Külshammer の公式の数え上げ側。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.coeff_pElementSum_mul
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.coeff_pElementSum_mul_pRegularSum
