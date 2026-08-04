@@ -222,6 +222,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideReduction
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideSylowSum
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanBlockDiagonal
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIdempotent

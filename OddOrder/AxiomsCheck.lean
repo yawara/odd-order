@@ -258,6 +258,7 @@ import OddOrder.GroupTheory.RepresentationTheory.SylowSumClassCoeff
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideSylowSum
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanBlockDiagonal
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
 import OddOrder.Algebra.SubgroupSumWedderburn
@@ -16979,3 +16980,12 @@ Navarro (4.19) がブロックごとに再編する係数 `a_B(K̂)` の正体�
   OddOrder.RepresentationTheory.Modular.centralCharacterAlg_eq_of_decompositionMatrix_ne_zero
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.cartanMatrix_eq_zero_of_centralCharacterAlg_ne
+
+/-! 🎯🎯🎯 **Navarro (3.20)** (`Modular/PairingZeroBlock`) —
+逆 Cartan 行列もブロック対角 (`[φ,μ]⁰ = 0`)、ゆえに
+異なるブロックの通常指標に対し `[χ,ψ]⁰ = 0`。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.pairingZero_eq_zero_of_centralCharacterAlg_ne
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.pairingZero_trace_eq_zero_of_centralCharacterAlg_ne
