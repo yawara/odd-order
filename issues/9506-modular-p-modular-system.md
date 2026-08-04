@@ -1519,6 +1519,13 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               **`|K|` の約分を還元の前に整域 `𝒪` の中で行える**。
               残りの配線: (i) `|K|(W L̂)_{x_K} = |Syl_p||Ω|` (類上定数 + `Ω` の Sylow 非依存)、
               (ii) (4.19) の `𝒪` 版と合わせて `|K|` を約す、(iii) `|Syl_p| ≡ 1` で還元。
+              [x] **(i) の入口 完了 (2026-08-05)**:
+              🎯 `coeff_subgroupSum_mul` (`(N̂·w)(g) = ∑_{x∈N} w(x⁻¹g)`、`Algebra/SubgroupSum`) と
+              **`classSum_mul_apply` の係数環一般化** (`ClassSumSections.lean`; ℂ 固定だった
+              構造定数公式 `(Ĉ·D̂)(w) = |{(u,v) : u∈C, v∈D, uv=w}|` を `[CommRing k]` へ。
+              無償の特殊化債務だった)。
+              ⟹ `(P̂·L̂)_u = |{x∈P : x⁻¹u ∈ L}|` から `u ∈ K` で和を取れば
+              `|FactorThrough P K L|` になる。
               ⚠ **設計上の注意 (2026-08-05 に検算)**: `Ĝ_p` を使って
               `|G|(Ĝ_p L̂)_g = ∑_i ω_i(L̂)(∑_{x∈G_p}χ_i(x))χ_i(g⁻¹)` と書く道もあるが、
               左辺の `|G|` に `p` が残るので還元で潰れる。**単一の Sylow `S` を使って
