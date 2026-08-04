@@ -579,7 +579,10 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
 `𝒪` を `ζ_{exp G}` を含むように**分岐拡大**する (`𝕎(𝔽̄_p)[ζ_{p^a}]` 等) か、
 局所体の整数環として splitting p-modular system を構成する。
 `IsPModularSystem` 自体は分裂を要求していないので class の変更は不要 — 別の instance を作る話。
-  - [ ] `ω : Z(𝒪G) →+* 𝒪` の AlgHom 化 (一意性から加法性・乗法性)
+  - [x] **`ω` の AlgHom 化** — 完了 (2026-08-04)。
+        🎯 `centralCharacter : Subalgebra.center 𝒪 A →ₐ[𝒪] 𝒪`
+        (+ `centralScalar` / `apply_center_eq_centralScalar_smul` / `eq_centralScalar`)。
+        Navarro の `ω_χ` そのものだが**初めから `𝒪` 値**。
   - [ ] `mod 𝔪` → `λ_χ : Z(kG) → k` → `BlockIdempotent.lean` の `blockSetoid` と接続。
         Navarro (3.3) 「`d_{χφ} ≠ 0` ⟹ `λ_χ = λ_φ`」が block 写像の well-defined 性
 - [ ] **94: Cartan 行列 `C = DᵀD`** + `([φ,θ]⁰)` が逆行列であること ((7.6) が使う)
