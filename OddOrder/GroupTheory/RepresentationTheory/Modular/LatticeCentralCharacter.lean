@@ -19,12 +19,20 @@ change — which is what Schur's lemma gives when `ρ_K` is absolutely irreducib
 scalar already lies in `𝒪`, simply because `L` is free and the matrix of `ρ(z)` has entries in
 `𝒪`.  No integrality theorem is needed.
 
-That is the content of this file: `eq_smul_of_baseChange_eq_smul`.  It is stated for a bare
-`𝒪`-linear endomorphism, with no group in sight.
+That is the content of this file.  The integrality core,
+`eq_smul_of_baseChange_eq_smul`, is stated for a bare `𝒪`-linear endomorphism with no group in
+sight; Schur then supplies its hypothesis, and the two combine into the central character
+`ω : Z(A) →ₐ[𝒪] 𝒪`.
+
+Absolute irreducibility is phrased **per module** rather than as "`K` splits `K[G]`", because the
+latter is not available: `Frac(𝕎(𝔽̄_p))` is the completion of the maximal *unramified* extension
+of `ℚ_p`, so it misses `ζ_p` and is in general not a splitting field (issue 9506).
 
 ## Main results
 
-* `OddOrder.RepresentationTheory.Modular.eq_smul_of_baseChange_eq_smul`
+* `OddOrder.RepresentationTheory.Modular.eq_smul_of_baseChange_eq_smul` — the integrality core
+* `OddOrder.RepresentationTheory.Modular.exists_baseChange_smul_of_mem_center` — Schur
+* `OddOrder.RepresentationTheory.Modular.centralCharacter` — `ω : Z(A) →ₐ[𝒪] 𝒪`
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -139,5 +147,60 @@ theorem exists_smul_id_of_mem_center_of_absolutelyIrreducible (φ : A →ₐ[�
     ∃ c' : 𝒪, φ z = c' • LinearMap.id :=
   exists_smul_id_of_mem_center (K := K) φ
     (fun _ hw => exists_baseChange_smul_of_mem_center (K := K) φ hEnd hw) hz
+
+/-! ### `ω` as an algebra homomorphism -/
+
+section CentralCharacter
+
+variable (K)
+variable (φ : A →ₐ[𝒪] Module.End 𝒪 L)
+  (hEnd : ∀ F : Module.End K (K ⊗[𝒪] L),
+    (∀ a : A, F * LinearMap.baseChange K (φ a) = LinearMap.baseChange K (φ a) * F) →
+    ∃ c : K, F = c • LinearMap.id)
+
+/-- The scalar by which a central element acts on the lattice. -/
+noncomputable def centralScalar (z : Subalgebra.center 𝒪 A) : 𝒪 :=
+  (exists_smul_id_of_mem_center_of_absolutelyIrreducible (K := K) φ hEnd z.2).choose
+
+theorem apply_center_eq_centralScalar_smul (z : Subalgebra.center 𝒪 A) :
+    φ z = centralScalar K φ hEnd z • LinearMap.id :=
+  (exists_smul_id_of_mem_center_of_absolutelyIrreducible (K := K) φ hEnd z.2).choose_spec
+
+/-- Identify `centralScalar` by exhibiting the scalar — the form in which uniqueness is used. -/
+theorem eq_centralScalar {z : Subalgebra.center 𝒪 A} {c : 𝒪}
+    (h : φ z = c • LinearMap.id) : c = centralScalar K φ hEnd z :=
+  smul_id_injective (h ▸ apply_center_eq_centralScalar_smul K φ hEnd z)
+
+omit [Module.Free 𝒪 L] [Nontrivial L] in
+private theorem smul_id_mul_smul_id (c₁ c₂ : 𝒪) :
+    (c₁ • LinearMap.id : Module.End 𝒪 L) * (c₂ • LinearMap.id) = (c₁ * c₂) • LinearMap.id := by
+  ext x; simp [Module.End.mul_apply, smul_smul, mul_comm]
+
+/-- **The central character `ω : Z(A) → 𝒪` of an absolutely irreducible lattice
+representation.**
+
+This is Navarro's `ω_χ`, already valued in `𝒪` — the algebraic-integrality step of Chapter 3 is
+subsumed by `eq_smul_of_baseChange_eq_smul`.  Reducing it modulo the maximal ideal of `𝒪` is
+what attaches a block to `χ`. -/
+noncomputable def centralCharacter : Subalgebra.center 𝒪 A →ₐ[𝒪] 𝒪 where
+  toFun := centralScalar K φ hEnd
+  map_one' := (eq_centralScalar K φ hEnd (z := 1) (by simp [Module.End.one_eq_id])).symm
+  map_mul' z w := (eq_centralScalar K φ hEnd (z := z * w) (by
+    rw [Subalgebra.coe_mul, map_mul, apply_center_eq_centralScalar_smul K φ hEnd z,
+      apply_center_eq_centralScalar_smul K φ hEnd w, smul_id_mul_smul_id])).symm
+  map_zero' := (eq_centralScalar K φ hEnd (z := 0) (by simp)).symm
+  map_add' z w := (eq_centralScalar K φ hEnd (z := z + w) (by
+    rw [Subalgebra.coe_add, map_add, apply_center_eq_centralScalar_smul K φ hEnd z,
+      apply_center_eq_centralScalar_smul K φ hEnd w, ← add_smul])).symm
+  commutes' r := (eq_centralScalar K φ hEnd (z := algebraMap 𝒪 _ r) (by
+    rw [show ((algebraMap 𝒪 (Subalgebra.center 𝒪 A) r : Subalgebra.center 𝒪 A) : A)
+        = algebraMap 𝒪 A r from rfl, AlgHom.commutes]
+    ext x; simp)).symm
+
+@[simp]
+theorem centralCharacter_apply (z : Subalgebra.center 𝒪 A) :
+    centralCharacter K φ hEnd z = centralScalar K φ hEnd z := rfl
+
+end CentralCharacter
 
 end OddOrder.RepresentationTheory.Modular

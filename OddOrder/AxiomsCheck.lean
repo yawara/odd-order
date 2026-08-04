@@ -451,7 +451,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 15800
+set_option linter.style.longFile 16000
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -15696,6 +15696,14 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.RepresentationTheory.Modular.exists_baseChange_smul_of_mem_center
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_smul_id_of_mem_center_of_absolutelyIrreducible
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.centralScalar
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.apply_center_eq_centralScalar_smul
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_centralScalar
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.centralCharacter
 #assert_only_allowed_axioms
   OddOrder.MatrixModule.exists_scalar_of_mem_center
 #assert_only_allowed_axioms
