@@ -184,6 +184,35 @@ theorem exists_ordinary_decomposition {V : Type*} [AddCommGroup V] [Module K V]
         c = MatrixModule.centralCharacterAlg π i hπ hlin z :=
   exists_ordinary_decomposition_of_finrank_le hπ hlin hkerJ _ ρ le_rfl
 
+/-! ### The decomposition at the level of the group algebra
+
+Navarro (5.2) evaluates `χ` not at a group element but at `f_b x y ∈ 𝒪H`, so the decomposition
+has to hold for every element of the group algebra.  Both sides are `K`-linear and agree on the
+monomials, so this is an induction. -/
+
+omit hπ hlin hkerJ [∀ i, Nonempty (nn i)] [Finite G] [NeZero (Nat.card G : K)] in
+/-- **The decomposition holds on all of `KG`, not just on `G`.**  Applied to `a = f_b · g` this is
+what lets a block idempotent be inserted into a character value: it acts on the `i`-th constituent
+by the scalar `ω_i(f_b)`, which is `1` for `i ∈ Irr(b)` and `0` otherwise. -/
+theorem trace_asAlgebraHom_eq_sum {V : Type*} [AddCommGroup V] [Module K V]
+    [FiniteDimensional K V] {ρ : Representation K G V} {d : ι → ℕ}
+    (hd : ∀ g : G, LinearMap.trace K V (ρ g)
+      = ∑ i, (d i : K) * LinearMap.trace K (nn i → K) (blockRepresentation π i g))
+    (a : MonoidAlgebra K G) :
+    LinearMap.trace K V (ρ.asAlgebraHom a)
+      = ∑ i, (d i : K)
+          * LinearMap.trace K (nn i → K) ((blockRepresentation π i).asAlgebraHom a) := by
+  induction a using MonoidAlgebra.induction_linear with
+  | zero => simp
+  | add u v hu hv =>
+    simp only [map_add, hu, hv, mul_add]
+    rw [Finset.sum_add_distrib]
+  | single g r =>
+    rw [Representation.asAlgebraHom_single, map_smul, hd g, Finset.smul_sum]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    rw [Representation.asAlgebraHom_single, map_smul, smul_eq_mul, smul_eq_mul]
+    ring
+
 end Decomposition
 
 end OddOrder.RepresentationTheory.Modular
