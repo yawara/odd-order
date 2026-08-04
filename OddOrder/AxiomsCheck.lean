@@ -256,6 +256,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideReduction
 import OddOrder.Algebra.PElementSum
 import OddOrder.GroupTheory.RepresentationTheory.SylowSumClassCoeff
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideSylowSum
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartan
@@ -16923,3 +16924,12 @@ Navarro (4.19) がブロックごとに再編する係数 `a_B(K̂)` の正体�
   OddOrder.RepresentationTheory.conjugacyClassSize_mk_inv
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.ordCompl_mul_coeff_sylowSum_mul
+
+/-! **Navarro (4.23) の `𝒪` 降下と剰余体還元** (`Modular/SylowSumReduction`) —
+`|G|_{p'}*·(Ĝ_p·L̂)*(x_K) = ∑_B λ_B(L̂)·∑_{χ∈Irr(B)}(χ(x_K⁻¹)·dim V_χ^S)*`。
+還元で `|Syl_p| → 1` (Sylow 第三定理)、`W → Ĝ_p` ((4.22))。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.ordCompl_mul_coeff_sylowSum_mul_over
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.residue_ordCompl_mul_coeff_pElementSum_mul

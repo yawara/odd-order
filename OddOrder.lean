@@ -220,6 +220,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnside
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideReduction
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideSylowSum
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIdempotent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
