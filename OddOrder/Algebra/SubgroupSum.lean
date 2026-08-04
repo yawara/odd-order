@@ -30,6 +30,8 @@ needed only for the direction that uses it.
 
 * `OddOrder.GroupAlgebra.single_mul_subgroupSum`, `subgroupSum_mul_single` — absorption
 * `OddOrder.GroupAlgebra.conj_smul_subgroupSum` — `N̂` is conjugation-invariant for `N ⊴ G`
+* `OddOrder.GroupAlgebra.subgroupSum_mul_subgroupSum` — `N̂² = |N| · N̂`
+* `OddOrder.GroupAlgebra.coeff_subgroupSum_one` — the coefficient at `1` is `1`
 * `OddOrder.GroupAlgebra.mapRingHom_subgroupSum` — `N̂` survives a coefficient change
 * `OddOrder.GroupAlgebra.subgroupSum_mem_center` — `N̂ ∈ Z(R[G])` for `N ⊴ G`
 * `OddOrder.GroupAlgebra.map_subgroupSum_of_forall_map_single_eq_one`
@@ -94,6 +96,33 @@ theorem conj_smul_subgroupSum {N : Subgroup G} (hN : N.Normal) (g : G) :
   · intro b
     have hb : g⁻¹ * (b : G) * g ∈ N := by simpa using hN.conj_mem _ b.2 g⁻¹
     exact ⟨⟨g⁻¹ * (b : G) * g, hb⟩, Subtype.ext (by group)⟩
+
+/-- **`N̂² = |N| · N̂`.**  Each of the `|N|` left translates of `N̂` is `N̂` again. -/
+theorem subgroupSum_mul_subgroupSum (N : Subgroup G) :
+    subgroupSum R N * subgroupSum R N = (Nat.card ↥N : ℕ) • subgroupSum R N := by
+  letI := Fintype.ofFinite ↥N
+  have hL : subgroupSum R N * subgroupSum R N
+      = (∑ n : ↥N, single (n : G) (1 : R)) * subgroupSum R N := rfl
+  rw [hL, Finset.sum_mul,
+    Finset.sum_congr rfl fun (n : ↥N) _ => single_mul_subgroupSum n.2,
+    Finset.sum_const, Finset.card_univ, ← Nat.card_eq_fintype_card]
+
+/-- **The coefficient of `N̂` at `1` is `1`.** -/
+theorem coeff_subgroupSum_one (N : Subgroup G) :
+    (subgroupSum R N).coeff 1 = 1 := by
+  classical
+  letI := Fintype.ofFinite ↥N
+  have hL : (subgroupSum R N).coeff 1
+      = ∑ n : ↥N, (single (n : G) (1 : R)).coeff 1 := by
+    change ((∑ n : ↥N, single (n : G) (1 : R)) : MonoidAlgebra R G).coeff 1 = _
+    simp
+  rw [hL, Finset.sum_eq_single (1 : ↥N)]
+  · simp
+  · intro b _ hb
+    rw [MonoidAlgebra.coeff_single, Finsupp.single_apply, if_neg]
+    exact fun h => hb (Subtype.ext (by simpa using h))
+  · intro h
+    exact absurd (Finset.mem_univ _) h
 
 /-- **`N̂` is transported by a coefficient change**: it has coefficients `0` and `1` only. -/
 theorem mapRingHom_subgroupSum {S : Type*} [Semiring S] (f : R →+* S) (N : Subgroup G) :

@@ -24,6 +24,7 @@ matrix of the principal block.
 ## Main results
 
 * `OddOrder.Algebra.trace_mulLeft_monoidAlgebra` — `tr(L_a) = |G| · a(1)`
+* `OddOrder.Algebra.trace_mulLeft_algEquiv` — `tr(L_a)` is an algebra invariant
 * `OddOrder.Algebra.trace_mulLeft_pi_matrix` — `tr(L_v) = ∑_i m_i · tr(v_i)`
 -/
 
@@ -50,6 +51,18 @@ theorem trace_mulLeft_monoidAlgebra {K G : Type*} [CommRing K] [Group G] [Fintyp
         · rintro rfl; rw [one_mul]
     simp [MonoidAlgebra.basis, hcoeff]
   simp only [Matrix.diag_apply, hdiag, Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+
+/-- **The trace of left multiplication is an algebra invariant.**  `L_{e a}` is the conjugate of
+`L_a` by `e`. -/
+theorem trace_mulLeft_algEquiv {K A B : Type*} [CommRing K] [Ring A] [Ring B] [Algebra K A]
+    [Algebra K B] [Module.Free K A] [Module.Finite K A] (e : A ≃ₐ[K] B) (a : A) :
+    LinearMap.trace K B (LinearMap.mulLeft K (e a))
+      = LinearMap.trace K A (LinearMap.mulLeft K a) := by
+  rw [← LinearMap.trace_conj' (LinearMap.mulLeft K a) e.toLinearEquiv]
+  congr 1
+  refine LinearMap.ext fun b => ?_
+  rw [LinearEquiv.conj_apply]
+  simp
 
 /-- **The trace of left multiplication on a product of matrix algebras.**  In the matrix-unit
 basis the diagonal entry at `(i, a, c)` is `(v_i)_{aa}`, and `c` ranges over `m i`. -/

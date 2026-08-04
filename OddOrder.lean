@@ -28,6 +28,7 @@ import OddOrder.Algebra.RelativeTraceCharacter
 import OddOrder.Algebra.RootsOfUnitySum
 import OddOrder.Algebra.SubgroupSum
 import OddOrder.Algebra.SubgroupSumBlockAction
+import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.Algebra.TraceMulLeft
 import OddOrder.Algebra.GroupAlgebraConjugation
 import OddOrder.Algebra.BrauerHomomorphism
