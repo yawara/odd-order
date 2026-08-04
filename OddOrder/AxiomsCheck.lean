@@ -257,6 +257,7 @@ import OddOrder.Algebra.PElementSum
 import OddOrder.GroupTheory.RepresentationTheory.SylowSumClassCoeff
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideSylowSum
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
@@ -16961,3 +16962,9 @@ Navarro (4.19) がブロックごとに再編する係数 `a_B(K̂)` の正体�
   OddOrder.RepresentationTheory.Modular.centralScalar_pRegularSum_mul_character_one
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.blockCharacter_principalBlock_pRegularSum
+
+/-! **`[χ,ψ]⁰` の分解行列展開** (`Modular/PairingZeroDecomposition`) —
+`[χ,ψ]⁰ = ∑_{φ,μ} d_{χφ} d_{ψμ} [φ,μ]⁰` (Navarro (3.20) の核)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.pairingZero_trace_eq_sum_decompositionNumber
