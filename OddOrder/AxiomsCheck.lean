@@ -232,6 +232,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainCore
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainTheorem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
+import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBaseChange
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockForm
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBlockIdempotent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
@@ -16471,3 +16472,16 @@ system で証明される. -/
   OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_eq_zero_of_inducedBlockOfCentralizer_ne
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_generalizedDecompositionNumber_inducedBlockOfCentralizer
+
+/-! **格子の基底変換** (`Modular.LatticeBaseChange`) — `K ⊗_𝒪 L ≃ V`。`BlockOfLattice` /
+`OrdinaryLatticeCharacter` が仮説で担いでいた同一視を実際に構成し、`hEnd` (絶対既約性) を
+Wedderburn 成分に対して**証明**する. -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.latticeBaseChangeEquiv
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.latticeBaseChangeEquiv_tmul
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.latticeBaseChangeEquiv_baseChange
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_smul_id_of_commute_baseChange
