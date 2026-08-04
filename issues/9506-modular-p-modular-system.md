@@ -829,8 +829,10 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
     `y ↦ χ(xy)` は `H`-類関数)。原文は `χ|_H` を `Irr(H)` に分解し `x ∈ Z(H)` がスカラー
     作用することを使う経路で、そちらは `d^x_{χφ} ∈ ℤ[ζ]` (整性) も出す。
     **整性は本 commit では出していない** — 必要になった段で別途。
-- [ ] **97: 🎯 第二主定理 `(5.2)`** (**(5.3)–(5.7) は完了、残りは (5.2) 本体 + (3.31)**) — `x` が `p`-元、`b ∈ Bl(C_G(x))`、`χ ∈ Irr(G)` が
+- [x] **97: 🎯🎯🎯 第二主定理 `(5.2)` — 完了 (2026-08-04)** — `x` が `p`-元、`b ∈ Bl(C_G(x))`、`χ ∈ Irr(G)` が
       `Irr(b^G)` に属さないなら、全ての `φ ∈ IBr(b)` について `d^x_{χφ} = 0`。
+      `Modular/SecondMainTheorem.lean` の `generalizedDecompositionNumber_eq_zero` (axiom-clean)。
+      ((5.3)–(5.7) + (5.2) 本体すべて完了。(3.31) は下記のとおり形式化不要と判定済。)
 
   **依存関係 (2026-08-04 に原文 pp.100–104 を精読して確定)**:
   ```
@@ -1050,7 +1052,7 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         🎯🎯🎯 `apply_eq_zero_of_blockOfLattice_ne` (**`χ ∉ B` ⟹ `L f_B = 0`**) /
         🎯🎯🎯 `apply_eq_id_of_blockOfLattice_eq` (**`χ ∈ B` ⟹ `f_B` は恒等**)。
         ⟹ (5.7)/(5.2) の仮説「`χ ∉ B`」が **`blockOfLattice ≠ B` という等式**として書ける。
-  - [ ] その後 🎯 (5.2) 本体。**着手済 (2026-08-04)**。
+  - [x] 🎯🎯🎯 その後 (5.2) 本体。**完了 (2026-08-04)**。
         最短経路の設計 (原文の計算を repo の一意性補題に載せ替える):
         1. `y ↦ χ(f_b x y)` は `H`-類関数 ⟹ `existsUnique_coeff_irreducibleBrauerCharacter`
            で `IBr(H)` に一意展開。(5.7) よりその係数 `c^b` は **0**。
@@ -1142,7 +1144,7 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               `ω^K_i(f_b) = 1` (本橋)。
               ⚠ 同一視 (`e` と `hint`) は**仮説**にした — Wedderburn 成分に対して供給するのは
               `OrdinaryIrreducibles.wedderburnLattice` 側の別作業。
-        - [ ] ⚠ **設計の訂正 (2026-08-04)**: `hblock` の連鎖に **`hEnd` は不要**だった。
+        - [x] ⚠ **設計の訂正 (2026-08-04)**: `hblock` の連鎖に **`hEnd` は不要**だった。
               `hEnd` (絶対既約性) が要るのは「一般の中心元 `z` に対しスカラーを**作る**」ため
               (`exists_smul_id_of_mem_center_of_absolutelyIrreducible`) だが、(5.2) が使うのは
               `z = f_b` **だけ**で、そのスカラーは block 構造から直接出る
@@ -1154,11 +1156,31 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               `centralScalar_smul` + `eq_smul_of_baseChange_eq_smul` + 冪等元の 2 値性で足りる。
               (commit 116 の `exists_smul_id_of_commute_blockAction` は汎用 infra として有用だが
               (5.2) の必須経路ではない。)
-        - [ ] **(5.2) の instantiation**。核は上で証明済み。残りは実際の `p`-modular system で
-              仮説を discharge する配線 (`hd` = 通常分解、`hD` = `trace_eq_sum_decompositionMatrix`、
-              `hindep` = `BrauerBasis`、`hvanish` = (5.7) = `InducedBlockTrace`、
-              `hblock` = `centralCharacterAlg_eq_of_decompositionNumber_ne_zero` +
-              `BlockOfLattice`、`hfidem` = `centralCharacterAlg_eq_zero_or_one_of_isIdempotentElem`)。
+        - [x] 🎯🎯🎯 **(5.2) の instantiation — 完了 (2026-08-04)**。
+              `Modular/SecondMainTheorem.lean` の `generalizedDecompositionNumber_eq_zero`
+              (axiom-clean)。仮説の供給元は `hd` = `exists_ordinary_decomposition` /
+              `hD` = `trace_wedderburn_eq_sum_decompositionMatrix` /
+              `hindep` = `eq_zero_of_sum_algebraMap_irreducibleBrauerCharacter` /
+              `hvanish` = (5.7) `trace_blockIdempotent_mul_eq_zero` /
+              `hblock` = `centralCharacterAlg_eq_one_of_decompositionMatrix_ne_zero` /
+              `hfidem` = `centralCharacterAlg_eq_zero_or_one_of_isIdempotentElem`。
+              最後に `eq_generalizedDecompositionNumber` で `blockCoeff … 1 w` を `d^x_{χφ}` と同定。
+              新設 leaf 3 つ:
+              * `SecondMainBridge.lean` — `𝒪G` / `K[H]` / `𝒪H` の 3 群環を往復する配管
+                (`asAlgebraHom_comp_subtype` / `mapRingHom_inclusionHom` /
+                `coe_latticeRepresentation_asAlgebraHom` /
+                `latticeRepresentation_asAlgebraHom_eq_zero`)
+              * `OrdinaryBlockSplitting.lean` — 標数 0 では Wedderburn 同型 `e` の block 表現が
+                通常既約 (`blockRepresentation_algEquiv`, `rfl`)、`ker e = J(K[G]) = ⊥`
+                (Maschke)、`D` の定義性質を `K` で読む
+                (`trace_wedderburn_eq_sum_decompositionMatrix`)
+              * `SecondMainWiring.lean` — `hindep` と `hblock`
+              ⚠ **`hEnd` は本当に不要だった**。`ω^K_i(f)` が 0 なら `f` は第 `i` 通常既約 →
+              その格子 → 剰余 を順に潰し、
+              `centralCharacterAlg_eq_of_decompositionNumber_ne_zero` が `0 = ω^k_j(f̄) = 1`
+              を出して矛盾、で足りる (`centralScalar` 経路も不要だった)。
+              ⚠ `p`-元仮説を使うのは `(xy)_p = x` (`pPart_mul_eq_of_isPElement`) の 1 箇所のみ。
+              (旧メモ: 当初の配線見積り)
               旧メモ: 素材は全部揃った。残りは配線のみ:
               `Irr(b)` 上の和 (上記) × `χ_ψ(y) = Σ_φ D_{ψφ} φ(y)`
               (`OrdinaryIrreducibles.trace_eq_sum_decompositionMatrix`) × 分解数の block 対角性
@@ -1186,7 +1208,7 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
                     mathlib の `DirectSum.isInternal_submodule_iff_isCompl` (`Fin 2` 添字) →
                     `LinearMap.trace_eq_sum_trace_restrict` → `Fin.sum_univ_two` の 3 手。
                     帰納法のエンジン。
-        - [ ] ⟹ (5.2) 本体の組み立て (上の 1.–3. を結線する)
+        - [x] ⟹ (5.2) 本体の組み立て — 完了 (上記 instantiation)
 - [ ] **98: `(5.8)` + `(5.13.b,c,d)` (一般化分解数の直交関係) + block orthogonality**
 - [ ] **99: 🎯 第三主定理 `(6.7)`** — Okuyama の証明 ((6.1)–(6.6) 経由、非常に一般な形)
 - [ ] **100: `(6.10)` `ker(B) = O_{p'}(ker χ)` → `(6.12)` → 🎯 `(6.13)`**
