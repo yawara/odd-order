@@ -24,6 +24,8 @@ had `c_{μθ} = 0`, and for `θ` outside it both sides vanish.  Since `C` is inv
 * `OddOrder.RepresentationTheory.Modular.pairingZero_eq_zero_of_centralCharacterAlg_ne`
 * `OddOrder.RepresentationTheory.Modular.pairingZero_trace_eq_zero_of_centralCharacterAlg_ne` —
   Navarro (3.20): `[χ, ψ]⁰ = 0` for ordinary characters in different blocks
+* `OddOrder.RepresentationTheory.Modular.sum_pRegular_trace_eq_zero_of_centralCharacterAlg_ne` —
+  `∑_{g ∈ G⁰} χ(g) = 0` for `χ ∉ Irr(B_0)`
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -159,5 +161,47 @@ theorem pairingZero_trace_eq_zero_of_centralCharacterAlg_ne (ρ : Representation
   · rw [hμ]; simp
   rw [pairingZero_eq_zero_of_centralCharacterAlg_ne hp hω hω' hπ hlin hkerJ e
     (hne φ μ hφ hμ), mul_zero]
+
+set_option maxHeartbeats 800000 in
+-- The pairing, the trivial character and the descent to `𝒪` are elaborated under the same chains.
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+include hp hω hω' hπ hlin hkerJ e in
+open scoped Classical in
+/-- **Navarro (3.32), in the form it is used.**  Pairing an ordinary character `χ` of a
+non-principal block against the trivial character gives `[χ, 1]⁰ = 0`, and `[χ, 1]⁰` is
+`|G|⁻¹ ∑_{g ∈ G⁰} χ(g)`.  So
+
+`∑_{g ∈ G⁰} χ(g) = 0`  for `χ ∉ Irr(B_0)`.
+
+The trivial character enters as any lattice representation `σ` with constant trace `1`; the
+hypothesis `hne` says that no Brauer constituent of `χ` shares a central character with one of
+`σ`, i.e. that `χ` is not in `σ`'s block. -/
+theorem sum_pRegular_trace_eq_zero_of_centralCharacterAlg_ne (ρ : Representation 𝒪 G L)
+    (σ : Representation 𝒪 G L') (hσ : ∀ g : G, LinearMap.trace 𝒪 L' (σ g) = 1)
+    (hne : ∀ φ μ : ι,
+      decompositionNumber (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ ρ φ ≠ 0 →
+      decompositionNumber (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ σ μ ≠ 0 →
+      MatrixModule.centralCharacterAlg π φ hπ hlin
+        ≠ MatrixModule.centralCharacterAlg π μ hπ hlin) :
+    ∑ g ∈ Finset.univ.filter (fun g : G => IsPRegular p g), LinearMap.trace 𝒪 L (ρ g) = 0 := by
+  classical
+  have hpair := pairingZero_trace_eq_zero_of_centralCharacterAlg_ne hp hω hω' hπ hlin hkerJ e
+    (K := K) ρ σ hne
+  rw [pairingZero] at hpair
+  have hterm : ∀ g ∈ Finset.univ.filter (fun g : G => IsPRegular p g),
+      algebraMap 𝒪 K (LinearMap.trace 𝒪 L (ρ g) * LinearMap.trace 𝒪 L' (σ g⁻¹))
+        = algebraMap 𝒪 K (LinearMap.trace 𝒪 L (ρ g)) := fun g _ => by
+    rw [hσ g⁻¹, mul_one]
+  rw [Finset.sum_congr rfl hterm] at hpair
+  have hne0 : ((Nat.card G : K))⁻¹ ≠ 0 := inv_ne_zero (Invertible.ne_zero _)
+  have hsum : ∑ g ∈ Finset.univ.filter (fun g : G => IsPRegular p g),
+      algebraMap 𝒪 K (LinearMap.trace 𝒪 L (ρ g)) = 0 := by
+    rcases mul_eq_zero.mp hpair with h | h
+    · exact absurd h hne0
+    · exact h
+  refine FaithfulSMul.algebraMap_injective 𝒪 K ?_
+  rw [map_sum, map_zero]
+  exact hsum
 
 end OddOrder.RepresentationTheory.Modular
