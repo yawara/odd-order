@@ -70,4 +70,28 @@ theorem isSimpleModule_subrepresentation_of_minimal {W : Submodule k V}
     exact Submodule.map_injective_of_injective W.injective_subtype
       (h.trans (Submodule.map_subtype_top W).symm)
 
+/-- **A subrepresentation carries the restricted group-algebra action**, not just the restricted
+group action: the `asAlgebraHom` of the subrepresentation is the restriction of the ambient one.
+
+Both sides are additive in `x` and agree on `single g r`, so this is an induction. -/
+theorem coe_subrepresentation_asAlgebraHom {W : Submodule k V}
+    (hW : ∀ g : G, W ≤ W.comap (ρ g)) (x : MonoidAlgebra k G) (w : W) :
+    (((ρ.subrepresentation W hW).asAlgebraHom x) w : V) = ρ.asAlgebraHom x (w : V) := by
+  induction x using MonoidAlgebra.induction_linear with
+  | zero => simp
+  | add x y hx hy => simp [hx, hy]
+  | single g r => simp [Representation.asAlgebraHom_single, Representation.subrepresentation]
+
+/-- **A scalar action restricts to a subrepresentation.**  If `x` acts on the whole space by the
+scalar `c`, it acts on any invariant subspace by `c` as well.
+
+This is what carries the central character of a reduction down to a simple constituent. -/
+theorem subrepresentation_asAlgebraHom_eq_smul {W : Submodule k V}
+    (hW : ∀ g : G, W ≤ W.comap (ρ g)) {x : MonoidAlgebra k G} {c : k}
+    (hx : ρ.asAlgebraHom x = c • LinearMap.id) (w : W) :
+    (ρ.subrepresentation W hW).asAlgebraHom x w = c • w := by
+  refine Subtype.ext ?_
+  rw [coe_subrepresentation_asAlgebraHom, hx]
+  simp
+
 end OddOrder.RepresentationTheory.Modular

@@ -15675,6 +15675,10 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.isSimpleModule_subrepresentation_of_minimal
 #assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.coe_subrepresentation_asAlgebraHom
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.subrepresentation_asAlgebraHom_eq_smul
+#assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_decomposition
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_decomposition_trace
