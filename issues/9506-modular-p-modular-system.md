@@ -1362,13 +1362,32 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
             `λ_b(Br_Q(e_{B₀})) = λ_b^G(e_{B₀}) = [b^G = B₀]` なので、
             `b^G = B₀ ⟹ λ_b(e_{b₀}) = 1 ⟹ b = b₀`。**第三主定理の逆向き**。
           **(6.14) の上流** (これが残る仕事):
-          * (4.22) `Ĝ_p = Σ_{P ∈ Syl_p(G)} P̂` (`Q` が Sylow に含まれる個数 ≡ 1 mod p)
+          * [x] **(4.22) 完了 (2026-08-05)**: `GroupTheory/SylowContaining.lean`
+            (🎯 `card_sylow_containing_modEq_one` — `Q` を含む Sylow の個数 ≡ 1 mod p;
+            mathlib `IsPGroup.sylow_mem_fixedPoints_iff` + Sylow 第三定理) と
+            `Algebra/PElementSum.lean` (`pElementSum` = `Ĝ_p` / `pRegularSum` = `Ĝ⁰` +
+            係数補題、🎯🎯 `pElementSum_eq_sum_sylow` = **`Ĝ_p = Σ_{P ∈ Syl_p} P̂`**)。
+            支持: `coeff_subgroupSum` (`N̂` の係数 = 指示関数)、
+            `isPGroup_zpowers_of_isPElement` / `isPElement_of_mem_of_isPGroup` を
+            `PRegularElement.lean` へ集約 (重複解消)。
           * **Robinson 写像は定義**: `R(x) = Σ_{B} λ_B(x) e_B` (定理でない、原文 p.91)
-          * (4.19) `p`-正則類 `K` と類 `L` に対する `Σ_B λ_B(L̂) a_B(K)` の係数公式
-            (**Burnside の類積公式 + 直交関係**; ここが技術的中心)
-          * (4.23) `R(z) = π(Ĝ_p z)`
-          * (3.32) `u_χ f_B` の補題 ⟹ `λ_B(Ĝ⁰) = 0` (`B ≠ B₀`)、`λ_{B₀}(Ĝ⁰) = |G⁰|*`
-            (後者は既存の `aug_classSumCenter` + `not_dvd_card_isPRegular` で済む)
+          * [ ] **(4.19) が技術的中心** (原文 p.92 で実測、2026-08-05):
+            `(|Ω_{K,L}|/|K|)* = Σ_B λ_B(L̂) a_B(K̂)`
+            (`Ω_{K,L} = {(y,z) ∈ K × L : P y = P z}`、`a_B(K̂)` = `e_B` の類和基底での係数)。
+            必要な部品:
+            - **Burnside の類積公式**を**一般の分裂体 `K` (標数 0) 上で**。
+              ⚠ repo には ℂ 上の版が既にある
+              (`RepresentationTheory/ClassSumCoefficientFormula.lean` の
+              `classSumCoeff_mul_centralizer_card_eq_sum_irreducibleCharacter`、BG App.C 用)
+              が、Külshammer 経路は p-modular system の `K` を使うので**係数環の一般化**が要る。
+            - `Σ_{x ∈ P} χ(x⁻¹) = |P| [χ_P, 1_P]` (制限の自明成分の重複度)。
+              ⚠ 共役を使わない形なので抽象体でも書ける。
+            - **類の defect `d(K)`** と `p^{a-d(K)}` による正規化 (Ch.3 の材料、未整備)。
+          * [ ] (4.23) `R(z) = π(Ĝ_p z)`
+          * [ ] (3.32) `u_χ f_B` の補題 ⟹ `λ_B(Ĝ⁰) = 0` (`B ≠ B₀`)。
+            `λ_{B₀}(Ĝ⁰) = |G⁰|*` は既存の `aug` + `not_dvd_card_isPRegular` で済む。
+          ⟹ **見通し**: (4.19) が 2-3 段、(4.23)+(3.32)+(6.14)+(6.1) で 3-4 段。
+          Brauer 誘導定理は不要のまま。
           ⟹ **段 99(c) は「Brauer 誘導定理が要る」という見積りが誤りだった**。
           初等的だが多段の古典計算 (Burnside 公式・Sylow 数え上げ) に置き換わる。
         - ⟹ **次の上流は Chapter 3 の defect / height**。(6.6) だけでなく (6.10)–(6.13) や
