@@ -1633,9 +1633,19 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
             が既にある。`Modular/CartanMatrix.lean` に `cartanMatrix = DᵀD` /
             `projectiveIndecomposableCharacter` / `ordinaryCharacter`。
             **残る新規部品は 3 本**:
-            (a) `[χ,ψ]⁰ = ∑_{φ,μ} d_{χφ} d_{ψμ} [φ,μ]⁰` (`χ⁰ = ∑_φ d_{χφ}φ` を両側に入れるだけ)
-            (b) `[φ,μ]⁰ ≠ 0 ⟹ φ,μ 同ブロック` (逆行列のブロック対角性)
-            (c) `d_{χφ} ≠ 0 ⟹ χ,φ 同ブロック`
+            [x] (a) 🎯 **完了 (2026-08-05、`Modular/PairingZeroDecomposition`)**:
+            `pairingZero_trace_eq_sum_decompositionNumber` —
+            `[χ,ψ]⁰ = ∑_{φ,μ} d_{χφ} d_{ψμ} [φ,μ]⁰`。`[·,·]⁰` は p-正則元しか見ず、
+            そこでは `χ = ∑_φ d_{χφ}φ` なので双線型性だけ (`g` p-正則 ⟹ `g⁻¹` p-正則)。
+            [ ] (b) `[φ,μ]⁰ ≠ 0 ⟹ φ,μ 同ブロック` (逆行列のブロック対角性)。
+            ⚠ **これが残る唯一の実質**。`C = DᵀD` はブロック対角
+            (`d_{χφ}≠0 ⟹ χ~φ` から `C_{φμ} = ∑_χ d_{χφ}d_{χμ} = 0` for `φ≁μ`)、
+            その逆 `B = ([μ,φ]⁰)` もブロック対角。標準論法 =
+            ブロック射影 `P` は `C` と可換 ⟹ `PB = PC⁻¹ = C⁻¹P = BP` ⟹ `B` もブロック対角。
+            現行の `sum_cartanMatrix_mul_pairingZero` は和の形なので、
+            `Matrix` に持ち上げてから可換性論法を回すのが素直。
+            [x] (c) **既存**: `centralCharacterAlg_eq_of_decompositionNumber_ne_zero`
+            (`DecompositionNumber.lean`) — `d_{χφ} ≠ 0` なら `φ` の中心指標は `χ` のそれ。
             ⚠ 検算: `ω_χ(Ĝ⁰) = (1/χ(1))∑_{g∈G⁰}χ(g)` は `χ ∉ Irr(B₀)` で **`K` の中で厳密に 0**
             (還元して 0 ではない)。`Z_q` (p∤q) / `S_3` (p=3) で確認済。
           ⟹ **見通し**: (4.19) が 2-3 段、(4.23)+(3.32)+(6.14)+(6.1) で 3-4 段。
