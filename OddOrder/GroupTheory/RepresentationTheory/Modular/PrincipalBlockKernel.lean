@@ -34,6 +34,9 @@ of trivial Brauer characters.
 * `OddOrder.RepresentationTheory.Modular.pi_single_eq_one_principalBlock_of_sup_eq_top`
 * `OddOrder.RepresentationTheory.Modular.pi_single_eq_one_principalBlock_of_normalPComplement` —
   Navarro (6.13) in the form Brauer–Suzuki cites it
+* `OddOrder.RepresentationTheory.Modular.eq_of_principalBlock_of_normalPComplement`,
+  `OddOrder.RepresentationTheory.Modular.subsingleton_of_principalBlock_of_normalPComplement` —
+  `IBr(B_0) = {1_{G^0}}`
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -108,5 +111,28 @@ theorem pi_single_eq_one_principalBlock_of_normalPComplement {p : ℕ} [Fact p.P
   refine pi_single_eq_one_principalBlock_of_sup_eq_top π hπ hlin hnil hNp S.isPGroup' ?_ hiB g
   rw [sup_comm]
   exact OddOrder.GroupTheory.sylow_sup_eq_top_of_isPGroup_quotient hquot S
+
+/-- **Navarro (6.13): `IBr(B_0) = {1_{G^0}}`.**  If `G` has a normal `p`-complement, the principal
+block has exactly one irreducible Brauer character.
+
+Both statements come out of the trivial action: a block killing `G` is the augmentation, so it has
+degree one and there is at most one of it. -/
+theorem eq_of_principalBlock_of_normalPComplement {p : ℕ} [Fact p.Prime] [CharP k p]
+    {N : Subgroup G} [N.Normal] (hNp : ¬ p ∣ Nat.card ↥N) (hquot : IsPGroup p (G ⧸ N))
+    (S : Sylow p G) {i j : ι}
+    (hiB : Quotient.mk (blockSetoid π hπ hlin) i = principalBlock π hπ hlin hnil)
+    (hjB : Quotient.mk (blockSetoid π hπ hlin) j = principalBlock π hπ hlin hnil) : i = j :=
+  eq_of_forall_pi_single_eq_one π hπ hlin
+    (pi_single_eq_one_principalBlock_of_normalPComplement π hπ hlin hnil hNp hquot S hiB)
+    (pi_single_eq_one_principalBlock_of_normalPComplement π hπ hlin hnil hNp hquot S hjB)
+
+/-- **Navarro (6.13): the unique Brauer character of `B_0` has degree one.** -/
+theorem subsingleton_of_principalBlock_of_normalPComplement {p : ℕ} [Fact p.Prime] [CharP k p]
+    {N : Subgroup G} [N.Normal] (hNp : ¬ p ∣ Nat.card ↥N) (hquot : IsPGroup p (G ⧸ N))
+    (S : Sylow p G) {i : ι}
+    (hiB : Quotient.mk (blockSetoid π hπ hlin) i = principalBlock π hπ hlin hnil) :
+    Subsingleton (nn i) :=
+  subsingleton_of_forall_pi_single_eq_one π hπ hlin
+    (pi_single_eq_one_principalBlock_of_normalPComplement π hπ hlin hnil hNp hquot S hiB)
 
 end OddOrder.RepresentationTheory.Modular

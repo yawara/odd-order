@@ -16700,3 +16700,13 @@ Sylow `p`-部分群の共役作用 + `C_G(P)` の Sylow が中心的、の 2 段
   OddOrder.RepresentationTheory.Modular.pi_single_eq_one_principalBlock_of_sup_eq_top
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.pi_single_eq_one_principalBlock_of_normalPComplement
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.pi_eq_scalar_augmentation
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.subsingleton_of_forall_pi_single_eq_one
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.eq_of_forall_pi_single_eq_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_of_principalBlock_of_normalPComplement
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.subsingleton_of_principalBlock_of_normalPComplement

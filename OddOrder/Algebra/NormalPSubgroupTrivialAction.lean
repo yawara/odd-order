@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.LinearAlgebra.Matrix.ToLin
+import OddOrder.Algebra.AugmentationIdeal
 import OddOrder.Algebra.PiMatrixSimpleModules
 import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
 
@@ -35,6 +36,11 @@ Brauer correspondence (4.14).
 
 * `OddOrder.GroupAlgebra.blockRepresentation_eq_one_of_mem_normal_pSubgroup`
 * `OddOrder.GroupAlgebra.pi_single_eq_one_of_mem_normal_pSubgroup`
+* `OddOrder.GroupAlgebra.blockRepresentation_eq_one_of_sup_eq_top` — `G = N·P` with `N` acting
+  trivially and `P` a `p`-group
+* `OddOrder.GroupAlgebra.subsingleton_of_forall_pi_single_eq_one`,
+  `OddOrder.GroupAlgebra.eq_of_forall_pi_single_eq_one` — a block killing `G` has degree one, and
+  there is at most one such block
 -/
 
 namespace OddOrder.GroupAlgebra
@@ -217,6 +223,69 @@ theorem blockRepresentation_eq_one_of_sup_eq_top {p : ℕ} [Fact p.Prime] [CharP
   have hvW' : v ∈ W' := by rw [hW'top]; exact Submodule.mem_top
   rw [Module.End.one_apply]
   exact (Representation.mem_invariants ρ v).mp hvW' g
+
+/-! ### Blocks on which `G` acts trivially -/
+
+section TrivialAction
+
+omit [∀ (i : ι), Nonempty (nn i)] [Finite G] in
+/-- **A block killing `G` is the augmentation.**  If `π(g) i = 1` for every `g ∈ G`, then the
+`i`-th component of `π` is the scalar matrix of the augmentation, since both sides agree on the
+basis `single g c`. -/
+theorem pi_eq_scalar_augmentation
+    (hlin : ∀ (c : k) (a : MonoidAlgebra k G), π (c • a) = c • π a)
+    {i : ι} (hi : ∀ g : G, π (single g (1 : k)) i = 1) (x : MonoidAlgebra k G) :
+    π x i = Matrix.scalar (nn i) (_root_.OddOrder.Algebra.augmentation k G x) := by
+  induction x using MonoidAlgebra.induction_linear with
+  | zero => simp
+  | add u v hu hv => rw [map_add, Pi.add_apply, hu, hv, map_add, map_add]
+  | single g c =>
+    have hsc : (single g c : MonoidAlgebra k G) = c • single g (1 : k) := by
+      rw [MonoidAlgebra.smul_single, smul_eq_mul, mul_one]
+    rw [hsc, hlin, Pi.smul_apply, hi g, map_smul,
+      _root_.OddOrder.Algebra.augmentation_single k G g 1, smul_eq_mul, mul_one]
+    ext a b
+    by_cases h : a = b <;> simp [h, Matrix.scalar_apply, Matrix.one_apply_ne]
+
+omit [∀ (i : ι), Nonempty (nn i)] [Finite G] in
+/-- **A block killing `G` has degree one.**  Its image is the scalars, and `π` is onto. -/
+theorem subsingleton_of_forall_pi_single_eq_one (hπ : Function.Surjective π)
+    (hlin : ∀ (c : k) (a : MonoidAlgebra k G), π (c • a) = c • π a)
+    {i : ι} (hi : ∀ g : G, π (single g (1 : k)) i = 1) : Subsingleton (nn i) := by
+  classical
+  rw [← not_nontrivial_iff_subsingleton]
+  rintro ⟨a, b, hab⟩
+  obtain ⟨x, hx⟩ := hπ (Pi.single i (Matrix.single a b (1 : k)))
+  have h1 : π x i = Matrix.single a b (1 : k) := by rw [hx]; simp
+  rw [pi_eq_scalar_augmentation π hlin hi x] at h1
+  have h2 := congrFun (congrFun h1 a) b
+  rw [Matrix.scalar_apply, Matrix.diagonal_apply_ne _ hab] at h2
+  simp at h2
+
+omit [Finite G] in
+/-- **Two blocks killing `G` coincide.**  Both components of `π` are the augmentation, so they can
+never be separated; but `π` is onto, so distinct components can be separated. -/
+theorem eq_of_forall_pi_single_eq_one (hπ : Function.Surjective π)
+    (hlin : ∀ (c : k) (a : MonoidAlgebra k G), π (c • a) = c • π a)
+    {i j : ι} (hi : ∀ g : G, π (single g (1 : k)) i = 1)
+    (hj : ∀ g : G, π (single g (1 : k)) j = 1) : i = j := by
+  classical
+  by_contra hne
+  obtain ⟨x, hx⟩ := hπ (Pi.single i 1)
+  have hxi : Matrix.scalar (nn i) (_root_.OddOrder.Algebra.augmentation k G x) = 1 := by
+    rw [← pi_eq_scalar_augmentation π hlin hi x, hx]; simp
+  have hxj : Matrix.scalar (nn j) (_root_.OddOrder.Algebra.augmentation k G x) = 0 := by
+    rw [← pi_eq_scalar_augmentation π hlin hj x, hx, Pi.single_eq_of_ne (Ne.symm hne)]
+  have h1 : _root_.OddOrder.Algebra.augmentation k G x = 1 := by
+    have := congrFun (congrFun hxi (Classical.arbitrary (nn i))) (Classical.arbitrary (nn i))
+    simpa [Matrix.scalar_apply] using this
+  have h0 : _root_.OddOrder.Algebra.augmentation k G x = 0 := by
+    have := congrFun (congrFun hxj (Classical.arbitrary (nn j))) (Classical.arbitrary (nn j))
+    simpa [Matrix.scalar_apply] using this
+  rw [h1] at h0
+  exact one_ne_zero h0
+
+end TrivialAction
 
 /-- **Navarro (2.32)**, matrix form: for `u` in a normal `p`-subgroup the operator
 `π (single u 1) i` is the identity matrix. -/
