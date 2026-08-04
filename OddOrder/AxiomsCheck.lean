@@ -8,6 +8,7 @@ import Lean.Util.CollectAxioms
 import OddOrder.Algebra.PowSubOneDvd
 import OddOrder.Algebra.AlgInt
 import OddOrder.Algebra.RootsOfUnitySum
+import OddOrder.Algebra.SubgroupSum
 import OddOrder.Algebra.GaloisRationalInteger
 import OddOrder.Algebra.FixedPointsGalois
 import OddOrder.Algebra.QuadraticFrobenius
@@ -162,6 +163,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.RootsOfUnityLift
 import OddOrder.GroupTheory.RepresentationTheory.Modular.WittVectorSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterKernel
 import OddOrder.Algebra.EigenspaceDecomposition
 import OddOrder.Algebra.LagrangeInterpolationRing
 import OddOrder.Algebra.WordExpansion
@@ -16625,3 +16627,24 @@ Sylow `p`-部分群の共役作用 + `C_G(P)` の Sylow が中心的、の 2 段
 
 #assert_only_allowed_axioms
   OddOrder.Algebra.eq_one_of_pow_eq_one_of_sum_eq_card
+
+/-! **部分群和 `N̂` と Brauer 指標の核** (`Algebra/SubgroupSum`, `Modular/BrauerCharacterKernel`)
+— Navarro (6.10) の核判定 (`ρ(N̂) = |N|·1` ⟺ `ρ` が `N` を潰す) と
+(6.11) (`p`-正則な `g` で `φ(g) = φ(1)` ⟺ `g ∈ ker φ`)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.subgroupSum
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.single_mul_subgroupSum
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.conj_smul_subgroupSum
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.map_subgroupSum_of_forall_map_single_eq_one
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.map_single_eq_one_of_map_subgroupSum
+#assert_only_allowed_axioms
+  OddOrder.Algebra.eq_one_of_pow_eq_one_of_sum_eq_card'
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_one_of_brauerCharacter_eq_finrank
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.rep_eq_one_iff_brauerCharacter_eq

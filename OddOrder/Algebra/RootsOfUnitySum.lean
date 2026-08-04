@@ -3,8 +3,10 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.Algebra.CharP.Algebra
 import Mathlib.Analysis.Complex.Polynomial.Basic
 import Mathlib.FieldTheory.IsAlgClosed.Basic
+import Mathlib.RingTheory.Localization.FractionRing
 import OddOrder.Algebra.AlgInt
 
 /-!
@@ -28,7 +30,9 @@ of characteristic zero in which the statement is already known.
 
 ## Main results
 
-* `OddOrder.Algebra.eq_one_of_pow_eq_one_of_sum_eq_card`
+* `OddOrder.Algebra.eq_one_of_pow_eq_one_of_sum_eq_card` — over a field
+* `OddOrder.Algebra.eq_one_of_pow_eq_one_of_sum_eq_card'` — over an integral domain, which is
+  the shape a `p`-modular system provides
 -/
 
 namespace OddOrder.Algebra
@@ -98,5 +102,21 @@ theorem eq_one_of_pow_eq_one_of_sum_eq_card {ι : Type*} [Fintype ι] {m : ℕ} 
         mul_one] at himg
       exact himg
     exact hm (by exact_mod_cast hm0)
+
+/-- **Roots of unity summing to their count are all `1`**, over any integral domain of
+characteristic zero — the shape in which a `p`-modular system supplies the eigenvalue lifts.
+Pass to the fraction field. -/
+theorem eq_one_of_pow_eq_one_of_sum_eq_card' {R : Type*} [CommRing R] [IsDomain R] [CharZero R]
+    {ι : Type*} [Fintype ι] {m : ℕ} (hm : m ≠ 0) {ε : ι → R} (hε : ∀ i, ε i ^ m = 1)
+    (hsum : ∑ i, ε i = (Fintype.card ι : R)) (i : ι) : ε i = 1 := by
+  haveI : CharZero (FractionRing R) :=
+    charZero_of_injective_algebraMap (IsFractionRing.injective R (FractionRing R))
+  have hinj := IsFractionRing.injective R (FractionRing R)
+  refine hinj ?_
+  rw [map_one]
+  refine eq_one_of_pow_eq_one_of_sum_eq_card hm
+    (ε := fun j => algebraMap R (FractionRing R) (ε j)) (fun j => ?_) ?_ i
+  · rw [← map_pow, hε j, map_one]
+  · rw [← map_sum, hsum, map_natCast]
 
 end OddOrder.Algebra

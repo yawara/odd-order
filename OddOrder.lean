@@ -26,6 +26,7 @@ import OddOrder.Algebra.CenterIdempotentLift
 import OddOrder.Algebra.RelativeTrace
 import OddOrder.Algebra.RelativeTraceCharacter
 import OddOrder.Algebra.RootsOfUnitySum
+import OddOrder.Algebra.SubgroupSum
 import OddOrder.Algebra.GroupAlgebraConjugation
 import OddOrder.Algebra.BrauerHomomorphism
 import OddOrder.Algebra.ClassSum
@@ -156,6 +157,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CenterModuleDecomp
 import OddOrder.GroupTheory.RepresentationTheory.CenterProjConjugation
 import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterKernel
 import OddOrder.GroupTheory.RepresentationTheory.Modular.AsModuleSimple
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
