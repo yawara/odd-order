@@ -251,6 +251,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIdempotent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockSumOverPSubgroup
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnside
 import OddOrder.Algebra.PElementSum
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
@@ -16877,3 +16878,9 @@ Navarro (4.19) がブロックごとに再編する係数 `a_B(K̂)` の正体�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_pSubgroup_sum_block_character
+
+/-! **Navarro (4.19) の除算なし版** (`Modular/OmegaBurnside`) —
+`|G| · ∑_{x∈P} (K̂·L̂')_x = |P| · ∑_χ ω_χ(K̂) ω_χ(L̂') χ(1) · dim V_χ^P`。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_pSubgroup_coeff_classSum_mul
