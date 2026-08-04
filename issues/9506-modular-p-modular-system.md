@@ -1637,7 +1637,7 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
             `pairingZero_trace_eq_sum_decompositionNumber` —
             `[χ,ψ]⁰ = ∑_{φ,μ} d_{χφ} d_{ψμ} [φ,μ]⁰`。`[·,·]⁰` は p-正則元しか見ず、
             そこでは `χ = ∑_φ d_{χφ}φ` なので双線型性だけ (`g` p-正則 ⟹ `g⁻¹` p-正則)。
-            [ ] (b) `[φ,μ]⁰ ≠ 0 ⟹ φ,μ 同ブロック` (逆行列のブロック対角性)。
+            [x] (b) 🎯🎯🎯 **完了 (2026-08-05、`Modular/CartanBlockDiagonal` + `Modular/PairingZeroBlock`)**。
             ⚠ **これが残る唯一の実質**。`C = DᵀD` はブロック対角
             (`d_{χφ}≠0 ⟹ χ~φ` から `C_{φμ} = ∑_χ d_{χφ}d_{χμ} = 0` for `φ≁μ`)、
             その逆 `B = ([μ,φ]⁰)` もブロック対角。標準論法 =
@@ -1682,6 +1682,22 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               これが (b) の実装の入口。
             [x] (c) **既存**: `centralCharacterAlg_eq_of_decompositionNumber_ne_zero`
             (`DecompositionNumber.lean`) — `d_{χφ} ≠ 0` なら `φ` の中心指標は `χ` のそれ。
+
+            ⟹ 🎯🎯🎯 **(3.20) 完了 (2026-08-05)**:
+            `pairingZero_trace_eq_zero_of_centralCharacterAlg_ne` —
+            **`χ` と `ψ` が異なるブロックなら `[χ,ψ]⁰ = 0`**。内訳:
+            * `exists_smul_id_asAlgebraHom_reduction` (`CartanBlockDiagonal`) —
+              「足りない部品」だった「`(reduction ρ).asAlgebraHom z = c • id` なる `c`」は
+              既存部品の合成だった (`centerLift` で `Z(𝒪G)` に上げ
+              `apply_center_eq_centralScalar_smul` → `asAlgebraHom_reduction_mapRingHom` で降ろす)。
+            * `centralCharacterAlg_eq_of_decompositionMatrix_ne_zero` /
+              `cartanMatrix_eq_zero_of_centralCharacterAlg_ne` — `C = DᵀD` はブロック対角。
+            * `pairingZero_eq_zero_of_centralCharacterAlg_ne` (`PairingZeroBlock`) —
+              **逆行列もブロック対角**。共役論法でなく**解の一意性**で済んだ:
+              `b` を `φ` のブロックに切り詰めた `b'` も同じ方程式を満たし、`C` 可逆ゆえ `b = b'`。
+            ⟹ `ψ = 1_G` で **`χ ∉ Irr(B₀)` ⟹ `∑_{g∈G⁰}χ(g) = 0`**。
+            残り = `[χ,1_G]⁰` を `∑_{g∈G⁰}χ(g)` と同定し、
+            `centralScalar_pRegularSum_mul_character_one` と繋いで `λ_B(Ĝ⁰) = 0`。
             ⚠ 検算: `ω_χ(Ĝ⁰) = (1/χ(1))∑_{g∈G⁰}χ(g)` は `χ ∉ Irr(B₀)` で **`K` の中で厳密に 0**
             (還元して 0 ではない)。`Z_q` (p∤q) / `S_3` (p=3) で確認済。
           ⟹ **見通し**: (4.19) が 2-3 段、(4.23)+(3.32)+(6.14)+(6.1) で 3-4 段。
