@@ -19,12 +19,13 @@ fixed points are the pairs with both entries in `C_G(Q)`.  A `p`-group has `p`-p
 
 This is **Navarro, Problem (6.1) (Külshammer)**, the counting step that turns Külshammer's formula
 for the principal block idempotent into the third main theorem for `Q C_G(Q) ≤ H ≤ N_G(Q)`.  The
-same action applied to `G⁰` itself will give `|G⁰| ≡ |C_G(Q)⁰| (mod p)`, matching the
-normalisations on the two sides; that is left for when Külshammer's formula is in place.
+same action applied to `G⁰` itself gives `|G⁰| ≡ |C_G(Q)⁰| (mod p)`
+(`card_pRegular_modEq_centralizer`), matching the normalisations on the two sides.
 
 ## Main results
 
 * `OddOrder.GroupTheory.card_pFactorPairs_modEq_centralizer` — Navarro, Problem (6.1)
+* `OddOrder.GroupTheory.card_pRegular_modEq_centralizer` — `|G⁰| ≡ |C_G(Q)⁰| (mod p)`
 -/
 
 namespace OddOrder.GroupTheory
@@ -114,6 +115,60 @@ theorem card_pFactorPairs_modEq_centralizer [Finite G] (hp : p.Prime) (hQ : IsPG
           (q : G × G).1 ∈ Subgroup.centralizer (Q : Set G) ∧
             (q : G × G).2 ∈ Subgroup.centralizer (Q : Set G)} :=
     Nat.card_congr (Equiv.subtypeEquivRight fun q => mem_fixedPoints_pFactorPairs_iff hg q)
+  rw [← hcard]
+  exact hQ.card_modEq_card_fixedPoints _
+
+/-! ### The same count on `G⁰` itself -/
+
+variable {Q}
+
+/-- **`Q` acts on the `p`-regular elements by conjugation.** -/
+@[reducible] def mulActionPRegular (p : ℕ) (Q : Subgroup G) :
+    MulAction ↥Q {y : G // IsPRegular p y} where
+  smul u y := ⟨(u : G) * (y : G) * (u : G)⁻¹, y.2.conj _⟩
+  one_smul y := Subtype.ext (by
+    change ((1 : ↥Q) : G) * (y : G) * (((1 : ↥Q) : G))⁻¹ = (y : G)
+    push_cast
+    group)
+  mul_smul u v y := Subtype.ext (by
+    change ((u * v : ↥Q) : G) * _ * (((u * v : ↥Q) : G))⁻¹
+      = (u : G) * ((v : G) * (y : G) * (v : G)⁻¹) * (u : G)⁻¹
+    push_cast; group)
+
+/-- The fixed points are the `p`-regular elements of `C_G(Q)`. -/
+theorem mem_fixedPoints_pRegular_iff (y : {y : G // IsPRegular p y}) :
+    letI := mulActionPRegular p Q
+    y ∈ fixedPoints ↥Q {y : G // IsPRegular p y}
+      ↔ (y : G) ∈ Subgroup.centralizer (Q : Set G) := by
+  letI := mulActionPRegular p Q
+  simp only [Subgroup.mem_centralizer_iff]
+  constructor
+  · intro h u hu
+    have hy : u * (y : G) * u⁻¹ = (y : G) := congrArg Subtype.val (h ⟨u, hu⟩)
+    calc u * (y : G) = u * (y : G) * u⁻¹ * u := by group
+      _ = (y : G) * u := by rw [hy]
+  · intro h u
+    refine Subtype.ext ?_
+    change (u : G) * (y : G) * (u : G)⁻¹ = (y : G)
+    rw [h (u : G) u.2]
+    group
+
+variable (Q)
+
+/-- **`|G⁰| ≡ |C_G(Q)⁰| (mod p)`.**  The `p`-group `Q` acts on the `p`-regular elements by
+conjugation and its fixed points are the `p`-regular elements of `C_G(Q)`.  This is the
+normalisation matching Navarro, Problem (6.1): both sides of Külshammer's formula are divided by
+the number of `p`-regular elements. -/
+theorem card_pRegular_modEq_centralizer [Finite G] (hp : p.Prime) (hQ : IsPGroup p ↥Q) :
+    Nat.card {y : G // IsPRegular p y}
+      ≡ Nat.card {y : {y : G // IsPRegular p y} //
+          (y : G) ∈ Subgroup.centralizer (Q : Set G)} [MOD p] := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  letI := mulActionPRegular p Q
+  have hcard : Nat.card (fixedPoints ↥Q {y : G // IsPRegular p y})
+      = Nat.card {y : {y : G // IsPRegular p y} //
+          (y : G) ∈ Subgroup.centralizer (Q : Set G)} :=
+    Nat.card_congr (Equiv.subtypeEquivRight fun y => mem_fixedPoints_pRegular_iff y)
   rw [← hcard]
   exact hQ.card_modEq_card_fixedPoints _
 

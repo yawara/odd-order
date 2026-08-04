@@ -17020,3 +17020,9 @@ Navarro (4.19) がブロックごとに再編する係数 `a_B(K̂)` の正体�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.coeff_pElementSum_mul_pRegularSum_principalBlock
+
+/-! **`|G⁰| ≡ |C_G(Q)⁰| (mod p)`** (`GroupTheory/PFactorPairCount`) —
+Problem (6.1) と対になる正規化。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.card_pRegular_modEq_centralizer
