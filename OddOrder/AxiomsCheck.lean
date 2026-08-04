@@ -223,6 +223,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerTruncation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockDefined
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockWitness
+import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockTrace
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBlockIdempotent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
@@ -16321,7 +16322,7 @@ block 冪等元 `f_B` を `H`-部分と `G ∖ H`-部分に割るための道具
 #assert_only_allowed_axioms
   OddOrder.exists_corner_inverse_eigen
 #assert_only_allowed_axioms
-  OddOrder.eq_zero_of_smul_eq_zero_of_corner_inverse
+  OddOrder.eq_zero_of_apply_eq_zero_of_corner_inverse
 
 /-! **Navarro (5.7) の結論** (`Algebra.EigenTraceVanishing`) — `χ(f_b h) = 0`.
 教科書の固有値の重複度勘定を「`H` と `ζH` が相似」に置き換えた版. -/
@@ -16330,3 +16331,11 @@ block 冪等元 `f_B` を `H`-部分と `G ∖ H`-部分に割るための道具
   OddOrder.trace_eq_zero_of_conj_smul
 #assert_only_allowed_axioms
   OddOrder.trace_idempotent_mul_eq_zero
+
+/-! **Navarro (5.7) の組み立て** (`Modular.InducedBlockTrace`) — (5.6) の witness から
+`χ(f_b h) = 0` まで、`𝒪G`・表現 `ρ` の設定で結線したもの. -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.commute_inclusionHom_of_forall_single
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.trace_blockIdempotent_mul_eq_zero

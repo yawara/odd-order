@@ -190,6 +190,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerTruncation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockDefined
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockWitness
+import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockTrace
 import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexSystem

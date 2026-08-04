@@ -23,7 +23,7 @@ legitimate here because `f_b` commutes with `h` — the argument is:
 ## Main results
 
 * `OddOrder.exists_corner_inverse_eigen` — the corner inverse of `(1 - c) s`
-* `OddOrder.eq_zero_of_smul_eq_zero_of_corner_inverse` — injectivity on the module
+* `OddOrder.eq_zero_of_apply_eq_zero_of_corner_inverse` — injectivity on the module
 -/
 
 namespace OddOrder
@@ -70,17 +70,25 @@ end CornerInverse
 
 section Module
 
-variable {A : Type*} [Ring A] {M : Type*} [AddCommGroup M] [Module A M]
+variable {A : Type*} [Ring A] {K M : Type*} [CommRing K] [AddCommGroup M] [Module K M]
 
 /-- **Navarro (5.7), injectivity on the module.**  If `y (1 - c) s = (1 - c) e` and `v` satisfies
-`e v = v`, `c v = 0`, then `s v = 0` forces `v = 0`. -/
-theorem eq_zero_of_smul_eq_zero_of_corner_inverse {c e s y : A}
+`e v = v`, `c v = 0`, then `s v = 0` forces `v = 0`.
+
+Phrased through a representation `ρ : A →+* Module.End K M` rather than a `Module A M` instance,
+because the module in Navarro (5.7) is a `K`-space on which `𝒪G` acts through `KG`. -/
+theorem eq_zero_of_apply_eq_zero_of_corner_inverse (ρ : A →+* Module.End K M) {c e s y : A}
     (hy : y * ((1 - c) * s) = (1 - c) * e)
-    {v : M} (hve : e • v = v) (hvc : c • v = 0) (hsv : s • v = 0) : v = 0 := by
-  have h1 : ((1 - c) * e) • v = v := by
-    rw [mul_smul, hve, sub_smul, one_smul, hvc, sub_zero]
-  have h2 : ((1 - c) * e) • v = 0 := by
-    rw [← hy, mul_smul, mul_smul, hsv, smul_zero, smul_zero]
+    {v : M} (hve : ρ e v = v) (hvc : ρ c v = 0) (hsv : ρ s v = 0) : v = 0 := by
+  have hone : ρ (1 - c) v = v := by
+    rw [map_sub, map_one]
+    change v - ρ c v = v
+    rw [hvc, sub_zero]
+  have h1 : ρ ((1 - c) * e) v = v := by rw [map_mul]; change ρ (1 - c) (ρ e v) = v; rw [hve, hone]
+  have h2 : ρ ((1 - c) * e) v = 0 := by
+    rw [← hy, map_mul, map_mul]
+    change ρ y (ρ (1 - c) (ρ s v)) = 0
+    rw [hsv, map_zero, map_zero]
   rw [← h1, h2]
 
 end Module
