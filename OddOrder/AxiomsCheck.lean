@@ -242,6 +242,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
 import OddOrder.Algebra.SubgroupSumBlockAction
 import OddOrder.Algebra.TraceMulLeft
 import OddOrder.GroupTheory.SylowContaining
+import OddOrder.GroupTheory.SylowCosetPairs
 import OddOrder.GroupTheory.PFactorPairCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
 import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
@@ -16808,3 +16809,13 @@ Külshammer の公式 `Ĝ_p = ∑_{P ∈ Syl_p} P̂` の係数計算に使う。
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.sum_character_eq_card_mul_finrank_invariants
+
+/-! **同じ剰余類にある対** (`GroupTheory/SylowCosetPairs`) — Navarro (4.23) の組合せ半分:
+`{(x,y) : x ∈ P, y ∈ T, xy ∈ S} ≃ Ω = {(u,y) ∈ S × T : u y⁻¹ ∈ P}`。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.factorThroughEquivCosetPairs
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.card_factorThrough_eq_card_cosetPairs
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.cosetPairsEquivConj
