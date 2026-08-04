@@ -172,6 +172,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainCore
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainWiring
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ClassCentralizerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockDefect
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainEasy
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainTheorem

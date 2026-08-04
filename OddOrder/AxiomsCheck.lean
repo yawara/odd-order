@@ -236,6 +236,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ClassCentralizerCount
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockDefect
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainEasy
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBasis
@@ -16544,3 +16545,11 @@ Wedderburn 成分に対して**証明**する. -/
   OddOrder.GAlgebra.card_defectGroup
 #assert_only_allowed_axioms
   OddOrder.GAlgebra.card_eq_of_isDefectGroup
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockIdempotentOf
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockCharacterPi_blockIdempotentOf
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockDefect
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_defectGroup_blockIdempotentOf
