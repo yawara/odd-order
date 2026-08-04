@@ -32,6 +32,7 @@ needed only for the direction that uses it.
 * `OddOrder.GroupAlgebra.conj_smul_subgroupSum` — `N̂` is conjugation-invariant for `N ⊴ G`
 * `OddOrder.GroupAlgebra.subgroupSum_mul_subgroupSum` — `N̂² = |N| · N̂`
 * `OddOrder.GroupAlgebra.coeff_subgroupSum` — the coefficients are the indicator of `N`
+* `OddOrder.GroupAlgebra.coeff_subgroupSum_mul` — `(N̂ · w)(g) = ∑_{x ∈ N} w(x⁻¹ g)`
 * `OddOrder.GroupAlgebra.mapRingHom_subgroupSum` — `N̂` survives a coefficient change
 * `OddOrder.GroupAlgebra.subgroupSum_mem_center` — `N̂ ∈ Z(R[G])` for `N ⊴ G`
 * `OddOrder.GroupAlgebra.map_subgroupSum_of_forall_map_single_eq_one`
@@ -136,6 +137,25 @@ theorem coeff_subgroupSum_one (N : Subgroup G) :
     (subgroupSum R N).coeff 1 = 1 := by
   classical
   rw [coeff_subgroupSum, if_pos N.one_mem]
+
+/-- **Left multiplication by `N̂` sums the coefficients over the coset.**
+`(N̂ · w)(g) = ∑_{x ∈ N} w(x⁻¹ g)`. -/
+theorem coeff_subgroupSum_mul (N : Subgroup G) (w : MonoidAlgebra R G) (g : G) :
+    (subgroupSum R N * w).coeff g
+      = letI := Fintype.ofFinite ↥N
+        ∑ x : ↥N, w.coeff ((x : G)⁻¹ * g) := by
+  classical
+  letI := Fintype.ofFinite ↥N
+  have hL : subgroupSum R N * w = ∑ x : ↥N, single (x : G) (1 : R) * w := by
+    change (∑ x : ↥N, single (x : G) (1 : R)) * w = _
+    rw [Finset.sum_mul]
+  rw [hL, MonoidAlgebra.coeff_sum]
+  rw [Finset.sum_apply']
+  refine Finset.sum_congr rfl fun x _ => ?_
+  rw [coeff_single_mul_eq_mul_coeff ((x : G)⁻¹ * g) (fun m' _ => ?_), one_mul]
+  constructor
+  · intro h; rw [← h]; group
+  · rintro rfl; group
 
 /-- **`N̂` is transported by a coefficient change**: it has coefficients `0` and `1` only. -/
 theorem mapRingHom_subgroupSum {S : Type*} [Semiring S] (f : R →+* S) (N : Subgroup G) :
