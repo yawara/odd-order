@@ -1353,10 +1353,14 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
           * 🎯 **(6.14) Külshammer の公式**: `|G⁰|* e_{B₀} = π(Ĝ_p · Ĝ⁰)`、すなわち
             `p`-正則な `g` で `e_g = |G⁰|*⁻¹ |{(x,y) ∈ G_p × G⁰ : xy = g}|*`、`p`-singular で `0`。
             (`π : Z(FG) → Z(FG)` は `p`-正則類へ切り詰める線型射影。)
-          * **Problem (6.1)**: `g ∈ C_G(Q)` で
-            `|{(x,y) ∈ G_p × G⁰ : xy = g}| ≡ |{(x,y) ∈ C_G(Q)_p × C_G(Q)⁰ : xy = g}| (mod p)`。
-            ⚠ **`Q` の共役作用の固定点数え上げそのもの** = 既存の
-            `IsPGroup.card_modEq_card_fixedPoints` (`ClassCentralizerCount.lean` と同技法)。
+          * [x] **Problem (6.1) 完了 (2026-08-05、`GroupTheory/PFactorPairCount.lean`)**:
+            🎯🎯 `card_pFactorPairs_modEq_centralizer` —
+            `|Ω(g)| ≡ |Ω(g) ∩ (C_G(Q) × C_G(Q))| (mod p)`。
+            `Q` が `Ω(g) = {(x,y) : x は p-元, y は p-正則, xy = g}` に**同時共役**で作用
+            (`mulActionPFactorPairs`; `g ∈ C_G(Q)` を使うのは
+            `(uxu⁻¹)(uyu⁻¹) = ugu⁻¹ = g` の 1 箇所)、固定点は両成分が `C_G(Q)` の対
+            (🎯 `mem_fixedPoints_pFactorPairs_iff`)。`ClassCentralizerCount.lean` と同じ型紙。
+            ⚠ (6.14) 本体より**下流**だが自己完結なので先行 landing した。
           * `|G⁰| ≡ |C_G(Q)⁰| (mod p)` も同じ数え上げ (固定点 = `C_G(Q)⁰`)。
           * ⟹ `Br_Q(e_{B₀}) = e_{b₀}`。一方
             `λ_b(Br_Q(e_{B₀})) = λ_b^G(e_{B₀}) = [b^G = B₀]` なので、
