@@ -261,6 +261,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumVanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerFormula
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
@@ -17005,3 +17006,11 @@ Navarro (4.19) がブロックごとに再編する係数 `a_B(K̂)` の正体�
   OddOrder.GroupAlgebra.mapRingHom_pRegularSum
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.blockCharacter_blockOfIrr_pRegularSum_eq_zero
+
+/-! 🎯🎯🎯 **(4.23) at `z = Ĝ⁰`** (`Modular/KulshammerFormula`) —
+`(Ĝ_p·Ĝ⁰)(x_C) = ∑_B λ_B(Ĝ⁰)·e_B(x_C)`。(6.14) Külshammer の骨格。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.pRegularSum_eq_sum_classSum
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.coeff_pElementSum_mul_pRegularSum
