@@ -1454,7 +1454,34 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
           `Ring.toSemiring` 経由と一致せず `AlgHom` の型が unify しなかった。
         * `GroupTheory/PRegularElement` に `isPRegular_of_pPart_eq_one` /
           `isPRegular_iff_pPart_eq_one` (既存 `pPart_eq_one_of_isPRegular` の逆)。
-  - [ ] **(6.12) 本体**。原文 p.127 の証明が要求するのは
+  - [x] **(6.12) 前半 + (6.13) の BS が引く向き — 完了 (2026-08-05)**。
+        * `Algebra/SubgroupSumBlockAction.lean` (新設) = **(2.32) の `p'` 版**:
+          🎯 `pi_single_eq_one_of_isUnit_centralScalar` — `ω_i(N̂)` が単元なら第 `i`
+          ブロックは `N` を潰す (吸収律 `n·N̂ = N̂` から可逆スカラー行列を約すだけ)。
+        * `Modular/BlockKernel.lean`: 🎯 `blockCharacter_subgroupSum` (= `λ_B(N̂*) = |N|`、
+          (6.10) の核を補題に括り出し) と 🎯🎯 `pi_single_eq_one_of_blockOfIrr`
+          (= **(6.12) 前半** `ker(B) ≤ ker φ`, `φ ∈ IBr(B)`)。
+        * `Algebra/NormalPSubgroupTrivialAction.lean`:
+          🎯 `blockRepresentation_eq_one_of_sup_eq_top` — `N` が自明作用 + `G = N·P`
+          (`P` が `p`-部分群) ⟹ `G` 全体が自明作用。`P`-固定空間が自動的に `G`-固定
+          (`g = n x` ⟹ `g·w = n·(x·w) = w`) ゆえ非零部分加群 ⟹ 単純性。
+          ⚠ `G/N` で (2.32) を使うのと同値だが**商へ `π` を移送せずに済む**。
+        * `Modular/PrincipalBlockKernel.lean` (新設) — **主ブロックでは全部初等的**:
+          中心指標が添加写像そのものなので 🎯 `blockCharacter_principalBlock_subgroupSum`
+          (`λ_{B₀}(N̂) = |N|`, 任意の正規部分群) が**通常指標も格子も `𝒪` も経由せず**出る。
+          ⟹ 🎯🎯 `pi_single_eq_one_principalBlock` ⟹
+          🎯🎯🎯 **`pi_single_eq_one_principalBlock_of_normalPComplement`** =
+          **(6.13) の BS が引く向き**: `G` が正規 `p`-補群を持てば主ブロックの単純加群は
+          全部自明。`G = N·S` は既存 `GroupTheory.sylow_sup_eq_top_of_isPGroup_quotient`。
+        ⚠ 教科書は (6.12) 経由で `⋂_{φ∈IBr(B₀)} ker φ = O_{p'p}(G)` を出してから (6.13) に
+        至るが、主ブロックの中心指標 = 添加写像を使えば **(6.12) の重い側を通らずに**
+        BS が使う向きだけ取れる。
+  - [ ] **(6.13) の残り**: `|IBr(B₀)| = 1` (block 内で単純加群の同型類は一意 —
+        段 47-49 の `exists_unique_idem_smul_eq_self` / `nonempty_linearEquiv_natural_of_idem`
+        が材料。自明作用の単純加群は 1 次元なので 2 つあれば同型 ⟹ 矛盾) と
+        **Cartan 行列 `= (|G|_p)`** (`Σ_{χ∈Irr(B₀)} χ(1)² = |G/O_{p'}(G)| = |G|_p`)。
+        BS は「`C` が正規 2-補群を持つ ⟹ `b₀` の Cartan 行列は `(4)`」の形で引く。
+  - [ ] **(6.12) 本体 (後半)**。原文 p.127 の証明が要求するのは
         (i) `ker(B) ≤ ker φ` (`φ ∈ IBr(B)`) — 上の逆包含の **`k` 側版**
         (`λ_B(N̂*) = |N|*` ≠ 0 ⟹ block 表現上で `N̂` が単元 ⟹ 核判定) でほぼ同型に書ける、
         (ii) **Lemma (2.32)** `O_p(G)` は単純 `kG`-加群を潰す — ✅ **既に存在した**
