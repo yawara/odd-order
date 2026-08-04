@@ -1133,6 +1133,15 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               全行列環を覆い、それと可換な `k`-自己準同型は中心的行列 = スカラー。
               これが `LatticeCentralCharacter.centralCharacter` の要求する **`hEnd`
               (絶対既約性)** の中身。ordinary 側の Wedderburn 成分に `ω^𝒪` を付けるのに要る。
+        - [x] **`ω^K` と `ω^𝒪` の橋** — 完了 (2026-08-04、`Modular/OrdinaryLatticeCharacter.lean`)。
+              🎯🎯 `centralCharacterAlg_eq_algebraMap_centralScalar`:
+              格子の base change が第 `i` ブロックと (作用を絡める `K`-線型同値で) 同一視されるなら
+              `ω^K_i = algebraMap ∘ ω^𝒪_i`。
+              これで `hblock` の連鎖が繋がる: `D i j ≠ 0` + `j ∈ IBr(b)` ⟹
+              `λ_i(e_b) = 1` (block 対角性) ⟹ `ω^𝒪_i(f_b) = 1` (局所環の冪等元) ⟹
+              `ω^K_i(f_b) = 1` (本橋)。
+              ⚠ 同一視 (`e` と `hint`) は**仮説**にした — Wedderburn 成分に対して供給するのは
+              `OrdinaryIrreducibles.wedderburnLattice` 側の別作業。
         - [ ] **(5.2) の instantiation**。核は上で証明済み。残りは実際の `p`-modular system で
               仮説を discharge する配線 (`hd` = 通常分解、`hD` = `trace_eq_sum_decompositionMatrix`、
               `hindep` = `BrauerBasis`、`hvanish` = (5.7) = `InducedBlockTrace`、
