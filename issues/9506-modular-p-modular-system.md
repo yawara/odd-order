@@ -1353,6 +1353,34 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
           `exists_blockIdempotents_defectGroups_conj` (共役性) が**既にある**。
           ⟹ 新規に要るのは **defect 数 `d(B)` (`|D| = p^d`) と height**
           (`ν(χ(1)) = ν(|G|) - d(B) + ht(χ)`)、および Chapter 3 の (3.20)-(3.24)。
+        - [x] **defect 数 `d(B)`** — 完了 (2026-08-05、`Algebra/DefectNumber` +
+              `Modular/BlockDefect`)。
+        - [x] 🎯🎯 **height の非負性 `ν(χ(1)) ≥ ν(|G|) - d(B)`** — 完了 (2026-08-05)。
+              **⚠ Chapter 3 の足場 ((3.20)-(3.24)・`~` 関数・Brauer の指標判定法・付値論)
+              を一切使わずに landing した**。Alperin 流の 2 行の論法:
+              `f_B = Tr^G_D(c)` (defect group の定義) に**指標が類関数であること**を当てると
+              `[G:D]` 個の共役和が指数倍に潰れ、`f_B` が `B` の表現で恒等に作用するから
+              `χ(1) = [G:D]·χ(c)`、`χ(c) ∈ 𝒪` ⟹ `[G:D] ∣ χ(1)`。
+              * `Algebra/RelativeTrace`: 🎯 `map_relTrace` (軌道不変な加法写像は
+                `χ(Tr^H_K a) = [H:K]•χ(a)`; `a` の固定性すら不要)
+              * `Algebra/RelativeTraceCharacter` (新設、**任意の可換環上**):
+                対称加法写像 `τ` (`τ(xy)=τ(yx)`) と代数準同型の合成は共役不変 ⟹
+                🎯 `index_dvd_finrank` (`f ∈ R[G]^G_D` が恒等に作用 ⟹ `[G:D] ∣ χ(1)`)
+              * `Modular/PModularSystem`: 🎯 `pow_dvd_of_natCast_pow_dvd`
+                (`p` 冪の整除は `𝒪` で判定してよい。**整域性不要** — 局所環で
+                `1 - p^{i-e}t` が単元ゆえ `p^e = 0` となり `CharZero` に矛盾)
+              * `Modular/BlockHeight` (新設): 🎯🎯 `pow_defect_dvd_finrank`
+              ⟹ height `ht(χ) = ν(χ(1)) - ν(|G|) + d(B)` が自然数として定義可能。
+        - [x] 🎯 **`p ∤ |G⁰|`** — 完了 (2026-08-05、`GroupTheory/PRegularElementCount`)。
+              `not_dvd_card_isPRegular`。これは **`1_G` が主ブロックで height 0** である
+              ことの具体形 (Navarro の `[1̃_G, 1_G] = |G⁰|/|G|_{p'}` が `p` で単元)。
+              (6.6) の Okuyama 証明で (3.24) が供給する入力が、指標論抜きで得られた。
+              論法: Sylow `P` の共役作用で `|G⁰| ≡ |C_G(P)⁰| (mod p)`、
+              `C_G(P)` では全 `p`-元が `P` に入り `P ∩ C` は中心的 Sylow ⟹
+              `C⁰ ≃ C/(P ∩ C)` で指数は `p` と素。
+        - [ ] **次**: `d(B₀) = ν(|G|)` (主ブロックの defect group は Sylow) —
+              `inducedBlockOfNormalizer_principalBlock` から `Br_P(e_{B₀}) ≠ 0` が出るので、
+              「defect group = `Br_P(e) ≠ 0` なる極大 `p`-部分群」(段 89-90) と合わせる。
 - [ ] **100: `(6.10)` `ker(B) = O_{p'}(ker χ)` → `(6.12)` → 🎯 `(6.13)`**
       (normal `p`-complement ⟺ `IBr(B₀)` 単元、Cartan 行列 `(|G|_p)`)
 - [ ] **101: `(7.2)` Klein four Sylow-2 / `(7.3)` basic set / `(7.4)` / `(7.5)` / `(7.6)`**
