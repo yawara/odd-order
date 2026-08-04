@@ -1406,8 +1406,13 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               残りは `|cl(z)|·|C_G(z)| = |G|` 倍。
               支持: `eq_sum_single` / `centralScalar_mul_character_one` (任意の中心元版)。
               ℂ 版の係数環一般化は不要だった (共役を一切使わない)。
-            - `Σ_{x ∈ P} χ(x⁻¹) = |P| [χ_P, 1_P]` (制限の自明成分の重複度)。
-              ⚠ 共役を使わない形なので抽象体でも書ける。
+            - [x] **`Σ_{x ∈ P} χ(x⁻¹) = |P| [χ_P, 1_P]` 完了 (2026-08-05、
+              `RepresentationTheory/SumCharacterInvariants.lean`)**:
+              🎯 `sum_character_eq_card_mul_finrank_invariants` (`∑_{h∈H} χ_ρ(h) = |H|·dim V^H`)。
+              平均化写像は不変部分空間への射影 (mathlib `Representation.isProj_averageMap`)、
+              射影のトレースは像の次元 (mathlib `LinearMap.IsProj.trace`)。
+              ⟹ `[χ_P,1_P] = dim V^P` が**非負整数**であることが従い、`|P| = p^a` で
+              割った後も付値環に留まる (剰余体への還元の要点)。
             - **類の defect `d(K)`** と `p^{a-d(K)}` による正規化 (Ch.3 の材料、未整備)。
           * [ ] (4.23) `R(z) = π(Ĝ_p z)`
           * [ ] (3.32) `u_χ f_B` の補題 ⟹ `λ_B(Ĝ⁰) = 0` (`B ≠ B₀`)。
