@@ -206,6 +206,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.TruncClassSum
 import OddOrder.Algebra.CentralCharacterBlock
 import OddOrder.Algebra.ClassSumOffCentralizer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlock
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
@@ -16061,3 +16062,15 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.GroupAlgebra.pi_classSum_eq_zero_of_notMem_centralizer
 #assert_only_allowed_axioms
   OddOrder.GroupAlgebra.blockCharacter_classSumCenter_eq_zero
+
+/-! **誘導中心指標は Brauer 準同型** — Navarro (4.14) 第一部
+(`GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence`). -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.mem_centralizer_conj_iff
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.centralizerTruncClassSum_mem_center
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.pi_truncClassSum_eq_centralizerTrunc
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockCharacter_truncClassSumCenter_eq

@@ -756,20 +756,45 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         🎯🎯 `inducedBlock` / 🎯 `blockCharacter_inducedBlock_classSumCenter` (定義性質) /
         🎯 `eq_inducedBlock`。乗法性は教科書どおり仮説。
 
-  - [ ] **Navarro (4.14)**: `P` が `p`-部分群で `P·C_G(P) ≤ H ≤ N_G(P)` なら
-        `b^G` は**常に定義され** `λ_b^G = λ_b ∘ Br_P`。
-        証明 (原文 p.88) の構造:
-        * `Σ_{x∈K∩H} x = Σ_{x∈K∩C} x + Σ_{x∈(K∩H)∖C} x` (`C = C_G(P)`)。
-        * `K∩C` は `H` で正規化される (`H ≤ N_G(P)` ゆえ `H` は `C` を正規化) ので
-          残りは `H`-類の合併。
-        * その各 `H`-類 `L` は `C_H(O_p(H)) ∩ L = ∅` を満たす (`P ≤ O_p(H)` かつ
-          `C_H(O_p(H)) ⊆ C`) ので **Lemma (4.7)** で `L̂` は冪零 ⟹ `λ_b(L̂) = 0`。
-        ⚠ **依存**: Lemma (4.7) 「`K ∩ C_G(O_p(G)) = ∅` なら `K̂ ∈ J(Z(kG))`」。
-          その証明はさらに **(2.32)「`O_p(G)` は任意の既約 `kG`-加群に自明に作用」**に依存
-          (`P`-軌道が長さ `p` の倍数 + `X` が `xP` 上定数 ⟹ `X(K̂) = 0`)。
-        ⚠ **repo 実測 (2026-08-04)**: `Br_P` 本体 (`Algebra/BrauerHomomorphism.lean`) と
-          その核 (`Algebra/BrauerKernel.lean`) は在るが、**(4.7) も (2.32) も無い**。
-          `Algebra/AugmentationIdeal.lean` は ℤ 係数で別物。着手は (2.32) → (4.7) → (4.14)。
+  - [x] **Navarro (2.32)** 「正規 `p`-部分群は単純 `kG`-加群に自明に作用」— 完了
+        (`Algebra/NormalPSubgroupTrivialAction.lean`)。
+        `blockRepresentation` (splitting `π` の第 `i` ブロックを `G` の表現として見る) /
+        🎯 `blockRepresentation_eq_one_of_mem_normal_pSubgroup` /
+        🎯 `pi_single_eq_one_of_mem_normal_pSubgroup` (`π (single u 1) i = 1`)。
+        ⚠ **エンジンは repo に既存だった**: `V^N ≠ 0` (char `p` の `p`-群固定ベクトル) は
+        `GroupTheory/RepresentationTheory/PGroupFixedVector.lean` の
+        `IsPGroup.invariants_ne_bot` (BG §2 由来、帰納法済) がそのまま使える。
+        `Algebra/PGroupFixedVector.lean` として再実装しかけたが重複ゆえ削除した
+        (着手前の grep 漏れ)。残りは「`V^N` が `kG`-部分加群 (`N ⊴ G`) + 単純性」だけ。
+  - [x] **Navarro (4.7)** 「`K ∩ C_G(O_p(G)) = ∅` なら `K̂` は中心指標に殺される」— 完了
+        (`Algebra/ClassSumOffCentralizer.lean`)。
+        🎯 `pi_sum_ite_single_eq_zero` (**一般形**: `N`-共役不変で `C_G(N)` を外す任意の
+        部分集合 `S` について `π(Σ_{x∈S} x) = 0`) /
+        🎯🎯 `pi_classSum_eq_zero_of_notMem_centralizer` (`S` = 類の場合 = 原文の (4.7)) /
+        🎯 `blockCharacter_classSumCenter_eq_zero`。
+        論法 = (2.32) で `π(single · 1)` が `N`-共役軌道上定数 ⟹ 軌道長は全て `p` の倍数
+        ⟹ 既存 `sum_eq_sum_fixedPoints` で消える。
+  - [x] **Navarro (4.14) 第一部** `λ_b^G = λ_b ∘ Br_P` — 完了
+        (`Modular/BrauerCorrespondence.lean`)。
+        🎯 `mem_centralizer_conj_iff` (`N_G(P)` は `C_G(P)` を保つ) /
+        `centralizerTruncClassSum` (= `Br_P(K̂)` を `k[H]` の中で見たもの
+        `Σ_{x ∈ K∩H∩C_G(P)} x`) / 🎯 `centralizerTruncClassSum_mem_center` /
+        🎯🎯 `pi_truncClassSum_eq_centralizerTrunc` /
+        🎯🎯 `blockCharacter_truncClassSumCenter_eq` (`λ_b(Σ_{x∈K∩H} x) = λ_b(Br_P(K̂))`)。
+        ⚠ **原文より短い経路を採った**: Navarro は残差を `H`-類に分解し `O_p(H)` に対する
+        (4.7) を各類へ適用するが、ここでは `P ⊴ H` (∵ `H ≤ N_G(P)`) ゆえ **`P` 自身**で
+        同じ軌道勘定が回る — 上の一般形 `pi_sum_ite_single_eq_zero` に
+        `S = {h ∈ H : mk h = K ∧ h ∉ C_G(P)}` を入れて一発。`H`-類分解も `O_p(H)` も不要。
+        なお仮説は `P ≤ H ≤ N_G(P)` のみで、`C_G(P) ≤ H` は不要 (次の段で使う)。
+        補助: `ClassSumCore.sum_ite_mem_center` (共役不変集合の指示和は中心的) を新設。
+
+  - [ ] **95 続き: (4.14) 第二部** — `λ_b^G` の**乗法性** ⟹ `b^G` は常に定義される。
+        `centralizerTruncClassSum` を `k[H] ↪ k[G]` で送ると既存の
+        `GroupAlgebra.brauerProj P` (`Algebra/BrauerHomomorphism.lean`) に一致するはずで、
+        中心元は `P`-不変ゆえ `brauerProj_mul_of_invariant` が乗法性を与える。
+        ⟹ `inducedCentralCharacter H λ_b` が `AlgHom` に持ち上がり `inducedBlock` の
+        仮説 `lam` が構成できる。必要な部品 = `MonoidAlgebra.mapDomain` 版の
+        `k[H] →ₐ[k] k[G]` (単射) と、その像が `brauerProj` に一致することの確認。
 
 - [ ] **95 続き: `(5.6)`/`(5.7)`** (第二主定理が使う `b^G` の性質)
 - [ ] **96: 一般化分解数 `d^x_{χμ}`** (`p`-元 `x` について。`(5.1)` = `p`-section 上の展開)
