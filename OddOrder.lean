@@ -169,6 +169,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBlockSplitting
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainCore
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainWiring
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainTheorem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift

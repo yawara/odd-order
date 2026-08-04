@@ -234,6 +234,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBasis
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBaseChange
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockForm
@@ -16514,3 +16515,9 @@ Wedderburn 成分に対して**証明**する. -/
   OddOrder.RepresentationTheory.Modular.isConj_pPart
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_character_blockOfIrr_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.principalCentralCharacter_classSumCenter
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.principalBlock
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockCharacter_principalBlock
