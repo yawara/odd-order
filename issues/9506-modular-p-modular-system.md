@@ -1596,7 +1596,27 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               ブロックごとにまとめたまま `d(K)` の付値で分母を管理する Navarro の
               手順が必要。
           * [ ] (3.32) `u_χ f_B` の補題 ⟹ `λ_B(Ĝ⁰) = 0` (`B ≠ B₀`)。
-            `λ_{B₀}(Ĝ⁰) = |G⁰|*` は既存の `aug` + `not_dvd_card_isPRegular` で済む。
+            [x] **`λ_{B₀}(Ĝ⁰) = |G⁰|*` 完了 (2026-08-05、`Modular/PRegularSumBlock`)**:
+            🎯 `blockCharacter_principalBlock_pRegularSum` (`λ_{B₀}` = augmentation) +
+            `pRegularSum_mem_center` / `pElementSum_mem_center` (`Ĝ⁰`・`Ĝ_p` は任意の可換係数環で
+            中心的 — p-正則性・p-元性は位数だけで決まるので共役不変) +
+            🎯 `centralScalar_pRegularSum_mul_character_one`
+            (**`ω_χ(Ĝ⁰)·χ(1) = ∑_{g∈G⁰} χ(g)`**)。
+            ⚠⚠ **(3.32) の原文を確定 (2026-08-05、ページ画像
+            `references/navarro/pages/navarro-p073.png`。text は OCR 崩壊で読めなかった)**:
+
+            > (3.32) LEMMA. If `χ ∈ cf(G)`, `u_χ = ∑_{g∈G⁰} χ(g⁻¹)g` and `B ∈ Bl(G)`, then
+            > `u_χ f_B = |G|_{p'} ∑_{ψ∈Irr(B)} ([χ̃,ψ]/ψ(1)) e_ψ = u_{χ_B}`.
+
+            **和は p-正則元上**である点が肝 (`Ĝ`ではなく`Ĝ⁰`)。`χ = 1_G` を入れると
+            `u_1 = Ĝ⁰` で、`1_G ∈ Irr(B₀)` ゆえ `(1_G)_{B₀} = 1_G` ⟹ **`Ĝ⁰ f_{B₀} = Ĝ⁰`**。
+            そこから `λ_B(Ĝ⁰) = λ_B(Ĝ⁰ e_{B₀}) = λ_B(Ĝ⁰)δ_{B,B₀}` で `B ≠ B₀` は 0。
+            ⟹ **残る本体は Lemma (3.20)** (原文 p.68 付近):
+            「`χ ∈ Irr(B)` なら `χ̃` (= `χ|_{G⁰}` の 0 拡張、`|G|_p` 倍) は `Irr(B)` の ℤ-結合」。
+            これは分解行列 `d_{χφ}` がブロックを跨がないこと + Cartan 逆行列から出る
+            (repo に `CartanMatrix` / `DecompositionOfOrdinary` / `CartanInverse` が既にある)。
+            ⚠ 検算: `ω_χ(Ĝ⁰) = (1/χ(1))∑_{g∈G⁰}χ(g)` は `χ ∉ Irr(B₀)` で **`K` の中で厳密に 0**
+            (還元して 0 ではない)。`Z_q` (p∤q) / `S_3` (p=3) で確認済。
           ⟹ **見通し**: (4.19) が 2-3 段、(4.23)+(3.32)+(6.14)+(6.1) で 3-4 段。
           Brauer 誘導定理は不要のまま。
           ⟹ **段 99(c) は「Brauer 誘導定理が要る」という見積りが誤りだった**。
