@@ -252,6 +252,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockSumOverPSubgroup
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnside
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideReduction
 import OddOrder.Algebra.PElementSum
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
@@ -16886,3 +16887,9 @@ Navarro (4.19) がブロックごとに再編する係数 `a_B(K̂)` の正体�
   OddOrder.RepresentationTheory.Modular.sum_pSubgroup_coeff_classSum_mul
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.ordCompl_mul_sum_sylow_coeff_classSum_mul
+
+/-! **Navarro (4.19) が `𝒪` に降りる** (`Modular/OmegaBurnsideReduction`) —
+`K` の恒等式の全項が `𝒪` の元の像なので、付値環上の等式になる。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.ordCompl_mul_sum_sylow_coeff_classSum_mul_over
