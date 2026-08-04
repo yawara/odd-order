@@ -241,6 +241,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
 import OddOrder.Algebra.SubgroupSumBlockAction
 import OddOrder.Algebra.TraceMulLeft
+import OddOrder.GroupTheory.SylowContaining
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartan
@@ -16742,3 +16743,11 @@ Sylow `p`-部分群の共役作用 + `C_G(P)` の Sylow が中心的、の 2 段
   OddOrder.RepresentationTheory.Modular.forall_eq_one_iff_blockOfIrr_eq_principalBlock
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.card_mul_sum_sq_principalBlock
+
+/-! **`Q` を含む Sylow の個数** (`GroupTheory/SylowContaining`) — Navarro (4.22) 前半。
+Külshammer の公式 `Ĝ_p = ∑_{P ∈ Syl_p} P̂` の係数計算に使う。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.card_sylow_containing_modEq_one
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.card_sylow_mem_modEq_one

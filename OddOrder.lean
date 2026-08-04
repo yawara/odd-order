@@ -145,6 +145,7 @@ import OddOrder.GroupTheory.CyclicSylowBurnside
 import OddOrder.GroupTheory.OddOrderInvolution
 import OddOrder.GroupTheory.OmegaSubgroup
 import OddOrder.GroupTheory.OpResidual
+import OddOrder.GroupTheory.SylowContaining
 import OddOrder.GroupTheory.PrimeComplementResidual
 import OddOrder.GroupTheory.PrimeDegreeTwoTransitive
 import OddOrder.GroupTheory.PRank
