@@ -16835,3 +16835,11 @@ Navarro (4.19) がブロックごとに再編する係数の出どころ。 -/
   OddOrder.RepresentationTheory.Modular.centralScalar_ordinaryIdempotent
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.apply_ordinaryIdempotent
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.ordinaryIdempotent_mul
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.isIdempotentElem_ordinaryIdempotent
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_ordinaryIdempotent
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_sum_centralScalar_smul_ordinaryIdempotent

@@ -31,6 +31,9 @@ so this is the entry point to the character side of Külshammer's formula.
 
 * `OddOrder.RepresentationTheory.Modular.centralScalar_ordinaryIdempotent` — `ω_j(e_i) = δ_{ij}`
 * `OddOrder.RepresentationTheory.Modular.apply_ordinaryIdempotent` — `e(e_i) = Pi.single i 1`
+* `OddOrder.RepresentationTheory.Modular.sum_ordinaryIdempotent` — they sum to `1`
+* `OddOrder.RepresentationTheory.Modular.eq_sum_centralScalar_smul_ordinaryIdempotent` — the
+  spectral decomposition of `Z(K[G])`
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -137,6 +140,81 @@ theorem apply_ordinaryIdempotent : e (ordinaryIdempotent e i) = Pi.single i 1 :=
     · simp [Matrix.scalar_apply, Matrix.diagonal_apply_ne _ hab, Matrix.one_apply_ne hab]
   · rw [if_neg hij, Pi.single_eq_of_ne (Ne.symm hij)]
     simp
+
+/-! ### The `e_{χ_i}` form a complete orthogonal family -/
+
+theorem ordinaryIdempotent_mul (j : ι') :
+    ordinaryIdempotent e i * ordinaryIdempotent e j
+      = if i = j then ordinaryIdempotent e i else 0 := by
+  refine e.injective ?_
+  rw [map_mul, apply_ordinaryIdempotent, apply_ordinaryIdempotent, apply_ite e, map_zero]
+  by_cases hij : i = j
+  · subst hij
+    rw [if_pos rfl, apply_ordinaryIdempotent]
+    funext a
+    by_cases ha : a = i
+    · subst ha; simp
+    · simp [Pi.single_eq_of_ne ha]
+  · rw [if_neg hij]
+    funext a
+    by_cases ha : a = i
+    · subst ha
+      simp [Pi.single_eq_of_ne hij]
+    · simp [Pi.single_eq_of_ne ha]
+
+omit [DecidableEq ι'] in
+theorem isIdempotentElem_ordinaryIdempotent :
+    IsIdempotentElem (ordinaryIdempotent e i) := by
+  classical
+  have h := ordinaryIdempotent_mul e i i
+  rwa [if_pos rfl] at h
+
+variable [Fintype ι']
+
+omit [DecidableEq ι'] in
+/-- **The `e_{χ_i}` sum to `1`.** -/
+theorem sum_ordinaryIdempotent : ∑ j : ι', ordinaryIdempotent e j = 1 := by
+  classical
+  refine e.injective ?_
+  rw [map_sum, map_one]
+  funext a
+  rw [Finset.sum_apply, Finset.sum_congr rfl fun j (_ : j ∈ Finset.univ) =>
+    congrFun (apply_ordinaryIdempotent e j) a]
+  rw [Finset.sum_eq_single a]
+  · rw [Pi.single_eq_same, Pi.one_apply]
+  · intro b _ hb
+    rw [Pi.single_eq_of_ne (Ne.symm hb)]
+  · intro h
+    exact absurd (Finset.mem_univ a) h
+
+omit [DecidableEq ι'] in
+/-- **The spectral decomposition of `Z(K[G])`**: a central element is the sum of its
+central-character values against the primitive idempotents. -/
+theorem eq_sum_centralScalar_smul_ordinaryIdempotent (z : MonoidAlgebra K G)
+    (hz : z ∈ Subalgebra.center K (MonoidAlgebra K G)) :
+    z = ∑ j : ι', MatrixModule.centralScalar e.toAlgHom.toRingHom j z • ordinaryIdempotent e j := by
+  classical
+  refine e.injective ?_
+  funext a
+  rw [map_sum, Finset.sum_apply]
+  have hcomp : ∀ j : ι',
+      e (MatrixModule.centralScalar e.toAlgHom.toRingHom j z • ordinaryIdempotent e j) a
+        = MatrixModule.centralScalar e.toAlgHom.toRingHom j z
+          • (Pi.single j (1 : Matrix (m j) (m j) K) : ∀ b, Matrix (m b) (m b) K) a := fun j => by
+    rw [map_smul, Pi.smul_apply, apply_ordinaryIdempotent]
+  rw [Finset.sum_congr rfl fun j (_ : j ∈ Finset.univ) => hcomp j]
+  rw [Finset.sum_eq_single a]
+  · rw [Pi.single_eq_same]
+    exact MatrixModule.scalar_centralScalar e.toAlgHom.toRingHom a e.surjective
+      (Semigroup.mem_center_iff.mpr (Subalgebra.mem_center_iff.mp hz)) |>.trans (by
+        ext r c
+        by_cases hrc : r = c
+        · subst hrc; simp [Matrix.scalar_apply, Matrix.one_apply_eq]
+        · simp [Matrix.scalar_apply, Matrix.diagonal_apply_ne _ hrc, Matrix.one_apply_ne hrc])
+  · intro b _ hb
+    rw [Pi.single_eq_of_ne (Ne.symm hb), smul_zero]
+  · intro h
+    exact absurd (Finset.mem_univ a) h
 
 end Orthogonality
 
