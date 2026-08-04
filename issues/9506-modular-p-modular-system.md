@@ -1306,9 +1306,15 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
   - [x] (a) **主ブロックの定義** — 完了 (2026-08-05、`PrincipalBlock.lean`)。
         `augmentation k` (一般の可換環上) / `principalCentralCharacter` = `ε|_{Z(kG)}` /
         🎯 `principalBlock` / 🎯 `principalCentralCharacter_classSumCenter` (`λ_{B_0}(K̂) = |K|·1`)。
-        ⚠ **特殊化債務**: `OddOrder.augmentation` (`Algebra/AugmentationIdeal`) は同じものの
-        `ℤ` 版で、一般化すれば包摂できる (~70 call site / 8 file)。今回は繰延し docstring と
-        background task に記録。
+        ⚠ **特殊化債務は同日中に解消** (ユーザー指示): `OddOrder.Algebra.augmentation` を
+        任意の可換環 `(R) (G)` へ一般化し、呼び出し側 3 file (~30 箇所) を `augmentation ℤ G`
+        形へ更新。さらに **`CenterSimplesOrbit.aug` が `principalCentralCharacter` と完全に
+        同一だった**ことが判明したので、自前定義を全て削除して `aug` を使う形に統一
+        (`aug` 自身も `Algebra.augmentation` 経由に再定義)。
+        ⟹ 群環の添加写像は repo 全体で 1 定義。
+        ⚠ **教訓**: 「repo に無い」と判断する前に、記法 (`MonoidAlgebra.lift _ _ _ 1`) と
+        概念名 (`aug`) の**両方**で grep すること — 今回 `augmentation` だけで grep して
+        `aug` を見落とした ([[grep-concept-names-not-book-notation]] の再発)。
   - [ ] (b) **🎯 `b_0^G = B_0`** (第三主定理の易しい向き): 上の数え上げ。
         `Br_P` の像の添加が `|K ∩ C_G(P)|*` であること + `card_modEq_card_fixedPoints`。
   - [ ] (c) 逆向き (`b^G = B_0 ⟹ b = b_0`) は Okuyama or 古典的 Brauer の証明が要る。
