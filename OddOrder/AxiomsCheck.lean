@@ -16510,3 +16510,7 @@ Wedderburn 成分に対して**証明**する. -/
   OddOrder.RepresentationTheory.Modular.sum_blockPart
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.blockPart_eq_zero_of_forall_pSection
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.isConj_pPart
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_character_blockOfIrr_eq_zero

@@ -51,6 +51,11 @@ theorem pRegularPart_mul_eq_of_isPElement (hp : p.Prime) {x y : G} (hcomm : Comm
     (hx : IsPElement p x) (hy : IsPRegular p y) : pRegularPart p (x * y) = y :=
   (eq_pPart_of_commute hp hcomm hx hy hcomm.eq.symm).2.symm
 
+/-- **Conjugate elements have conjugate `p`-parts.** -/
+theorem isConj_pPart {a b : G} (h : IsConj a b) : IsConj (pPart p a) (pPart p b) := by
+  obtain ⟨c, hc⟩ := isConj_iff.mp h
+  exact isConj_iff.mpr ⟨c, by rw [← pPart_conj, hc]⟩
+
 /-- **`p`-regularity does not see the ambient group.** -/
 theorem isPRegular_coe_iff {H : Subgroup G} {y : ↥H} :
     IsPRegular p ((y : G)) ↔ IsPRegular p y := by

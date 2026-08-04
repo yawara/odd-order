@@ -26,9 +26,14 @@ theorem (5.8) kills one of the two halves of that sum:
 * if it does, then `d^x_{χφ} = 0` for `χ ∉ Irr(B)`, so the inner sum is the whole sum, which is
   zero.
 
+Navarro (5.11) — **block orthogonality** — follows at once: apply (5.10) to
+`θ = ∑_χ χ(h⁻¹) χ`, which by the second orthogonality relation vanishes off the class of `h`, in
+particular on the `p`-section of `g_p` when `g_p` and `h_p` are not conjugate.
+
 ## Main results
 
 * `OddOrder.RepresentationTheory.Modular.blockPart_eq_zero_of_forall_pSection` — Navarro (5.10)
+* `OddOrder.RepresentationTheory.Modular.sum_character_blockOfIrr_eq_zero` — Navarro (5.11)
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -156,5 +161,69 @@ theorem blockPart_eq_zero_of_forall_pSection (hp : p.Prime) {x : G} (hx : IsPEle
   refine Finset.sum_eq_zero fun j _ => ?_
   rw [Finset.sum_congr rfl fun i _ => (mul_assoc (c i) (d i j) _).symm, ← Finset.sum_mul,
     hfilter j, zero_mul]
+
+set_option maxHeartbeats 1600000 in
+-- Same instance chains as (5.10).
+set_option linter.unusedFintypeInType false in
+open scoped Classical in
+/-- **Navarro (5.11), block orthogonality.**  If the `p`-parts of `g` and `h` are not conjugate,
+then the block-`B` part of the second orthogonality relation vanishes on its own:
+
+`∑_{χ ∈ Irr(B)} χ(h⁻¹) χ(g) = 0`.
+
+Apply (5.10) to `θ = ∑_{χ ∈ Irr(G)} χ(h⁻¹) χ`: by the second orthogonality relation `θ` is
+supported on the class of `h`, which misses the `p`-section of `g_p`. -/
+theorem sum_character_blockOfIrr_eq_zero (hp : p.Prime) {g h : G}
+    (hgh : ¬ IsConj (pPart p g) (pPart p h)) [Fintype ↥(centralizerOf (pPart p g))]
+    (e : MonoidAlgebra K G ≃ₐ[K] ∀ i, Matrix (m i) (m i) K)
+    (eH : MonoidAlgebra K ↥(centralizerOf (pPart p g)) ≃ₐ[K] ∀ i, Matrix (mH i) (mH i) K)
+    {πG : MonoidAlgebra (ResidueField 𝒪) G →+* ∀ j, Matrix (nnG j) (nnG j) (ResidueField 𝒪)}
+    (hπG : Function.Surjective πG)
+    (hlinG : ∀ (c : ResidueField 𝒪) (a : MonoidAlgebra (ResidueField 𝒪) G), πG (c • a) = c • πG a)
+    (hnilG : ∀ z : Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) G),
+      blockCharacterPi πG hπG hlinG z = 0 → IsNilpotent z)
+    {π : MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf (pPart p g)) →+*
+      ∀ j, Matrix (nn j) (nn j) (ResidueField 𝒪)}
+    (hπ : Function.Surjective π)
+    (hlin : ∀ (c : ResidueField 𝒪)
+      (a : MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf (pPart p g))), π (c • a) = c • π a)
+    (hkerJ : RingHom.ker π
+      = Ring.jacobson (MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf (pPart p g))))
+    (hnilH : ∀ z : Subalgebra.center (ResidueField 𝒪)
+      (MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf (pPart p g))),
+      blockCharacterPi π hπ hlin z = 0 → IsNilpotent z)
+    {ω : 𝒪} (hω : IsPrimitiveRoot ω (pRegularExponent p ↥(centralizerOf (pPart p g))))
+    {ω' : ResidueField 𝒪}
+    (hω' : IsPrimitiveRoot ω' (pRegularExponent p ↥(centralizerOf (pPart p g))))
+    {ζ : 𝒪} (hζ : ζ ^ p = 1) (hζk : residue 𝒪 ζ = 1) (hζK : algebraMap 𝒪 K ζ ≠ 1)
+    (B : Block πG hπG hlinG) :
+    ∑ i ∈ Finset.univ.filter (fun i => blockOfIrr e hπG hlinG hnilG i = B),
+        (wedderburnRepresentation e i).character h⁻¹
+          * (wedderburnRepresentation e i).character g = 0 := by
+  classical
+  set θ : G → K := fun u => ∑ i, (wedderburnRepresentation e i).character h⁻¹
+    * (wedderburnRepresentation e i).character u with hθdef
+  have hθ : ∀ a b : G, IsConj a b → θ a = θ b := fun a b hab =>
+    Finset.sum_congr rfl fun i _ =>
+      congrArg ((wedderburnRepresentation e i).character h⁻¹ * ·)
+        (character_eq_of_isConj (wedderburnRepresentation e i) hab)
+  -- `θ` is supported on the class of `h`, which misses `S(g_p)`
+  have hvanish : ∀ u ∈ pSection p (pPart p g), θ u = 0 := by
+    intro u hu
+    simp only [hθdef]
+    rw [sum_character_inv_mul_character e h u, if_neg]
+    intro hconj
+    exact hgh
+      (((isConj_pPart hconj).trans (mem_pSection_iff_isConj_pPart.mp hu)).symm)
+  -- the coefficients of `θ` are the values `χ(h⁻¹)`
+  have hcoeff : ordinaryCoeff e θ hθ = fun i => (wedderburnRepresentation e i).character h⁻¹ :=
+    (eq_ordinaryCoeff e θ hθ fun _ => rfl).symm
+  have hzero : ∑ i ∈ Finset.univ.filter (fun i => blockOfIrr e hπG hlinG hnilG i = B),
+      ordinaryCoeff e θ hθ i * (wedderburnRepresentation e i).character g = 0 :=
+    blockPart_eq_zero_of_forall_pSection hp (isPElement_pPart hp g) e eH hπG hlinG hnilG hπ hlin
+      hkerJ hnilH hω hω' hζ hζk hζK θ hθ hvanish B g
+      (mem_pSection_iff_isConj_pPart.mpr (IsConj.refl _))
+  rw [hcoeff] at hzero
+  exact hzero
 
 end OddOrder.RepresentationTheory.Modular
