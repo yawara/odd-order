@@ -16384,3 +16384,9 @@ block 冪等元 `f_B` を `H`-部分と `G ∖ H`-部分に割るための道具
   OddOrder.RepresentationTheory.Modular.exists_ordinary_decomposition
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.trace_asAlgebraHom_eq_sum
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockRepresentation_asAlgebraHom_smul
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockRepresentation_asAlgebraHom_center
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.trace_asAlgebraHom_center_mul

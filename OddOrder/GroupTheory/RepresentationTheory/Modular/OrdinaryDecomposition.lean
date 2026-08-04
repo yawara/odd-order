@@ -213,6 +213,27 @@ theorem trace_asAlgebraHom_eq_sum {V : Type*} [AddCommGroup V] [Module K V]
     rw [Representation.asAlgebraHom_single, map_smul, smul_eq_mul, smul_eq_mul]
     ring
 
+omit hkerJ [Finite G] [NeZero (Nat.card G : K)] in
+/-- **A central element scales each term of the decomposition by its central character.**  With
+`z = f_b` this is the step that makes a block idempotent select the constituents in `b`: the
+scalar `ω_i(f_b)` is an idempotent of `K`, hence `0` or `1`. -/
+theorem trace_asAlgebraHom_center_mul {V : Type*} [AddCommGroup V] [Module K V]
+    [FiniteDimensional K V] {ρ : Representation K G V} {d : ι → ℕ}
+    (hd : ∀ g : G, LinearMap.trace K V (ρ g)
+      = ∑ i, (d i : K) * LinearMap.trace K (nn i → K) (blockRepresentation π i g))
+    (z : Subalgebra.center K (MonoidAlgebra K G)) (a : MonoidAlgebra K G) :
+    LinearMap.trace K V (ρ.asAlgebraHom ((z : MonoidAlgebra K G) * a))
+      = ∑ i, (d i : K) * MatrixModule.centralCharacterAlg π i hπ hlin z
+          * LinearMap.trace K (nn i → K) ((blockRepresentation π i).asAlgebraHom a) := by
+  rw [trace_asAlgebraHom_eq_sum hd]
+  refine Finset.sum_congr rfl fun i _ => ?_
+  rw [map_mul, blockRepresentation_asAlgebraHom_center hπ hlin i z, smul_mul_assoc,
+    show (LinearMap.id : (nn i → K) →ₗ[K] (nn i → K))
+      * (blockRepresentation π i).asAlgebraHom a = (blockRepresentation π i).asAlgebraHom a from
+      one_mul _,
+    map_smul, smul_eq_mul]
+  ring
+
 end Decomposition
 
 end OddOrder.RepresentationTheory.Modular
