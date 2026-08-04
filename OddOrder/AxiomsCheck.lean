@@ -192,6 +192,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
 import OddOrder.GroupTheory.RepresentationTheory.Modular.StandardSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterIndependence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerIndependence
@@ -15704,6 +15705,10 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.RepresentationTheory.Modular.eq_centralScalar
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.centralCharacter
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.CenterClassSum.mapRingHom_classSum
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.CenterClassSum.exists_mem_center_mapRingHom_eq
 #assert_only_allowed_axioms
   OddOrder.MatrixModule.exists_scalar_of_mem_center
 #assert_only_allowed_axioms

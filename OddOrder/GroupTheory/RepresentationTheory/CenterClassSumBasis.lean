@@ -31,7 +31,7 @@ open scoped MonoidAlgebra
 
 open Module
 
-variable {k G : Type*} [Field k] [Group G]
+variable {k G : Type*} [CommRing k] [Group G]
 
 /-! ### 中心元の係数は共役類上一定 (有限性・decidability 不要) -/
 
