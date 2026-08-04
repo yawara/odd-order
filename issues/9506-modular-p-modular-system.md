@@ -1255,8 +1255,15 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
           🎯 `blockOfIrr e i : Bl(G)` = **`χ_i` のブロック** (Navarro (3.11))。
           `nontrivial_of_isLattice` (非零空間の格子は非零) で `[Nontrivial L]` も供給。
           ⟹ `Irr(B) = {i | blockOfIrr e i = B}` が定義可能。
-    - [ ] **前提 3: 類関数の `B`-部分 `θ_B = Σ_{χ ∈ Irr(B)} [θ,χ] χ`**。
-          repo の `ClassFunction` / 内積 API と `blockOfIrr` を繋ぐ。(5.10) の主語。
+    - [x] **前提 3: 類関数の `B`-部分 `θ_B`** — 完了 (2026-08-05)。
+          ⚠ **内積は使わなかった**。`K` は抽象的な分数体なので共役が無く内積が書けないが、
+          Navarro の `θ_B = Σ_{χ ∈ Irr(B)} [θ,χ] χ` は「`Irr(G)` 展開の `Irr(B)` 部分」と
+          読めば内積抜きで定義できる。
+          * `OrdinaryBasis.lean` (新設) — 指標表が可逆正方行列なので類関数は `Irr(G)` に
+            一意展開 (🎯 `existsUnique_coeff_ordinaryCharacter` / `ordinaryCoeff`)。
+            `BrauerBasis` の標数 0 版。
+          * `BlockOfIrreducible.lean` — 🎯 `blockPart` = `θ_B`、`blockPart_eq_of_isConj`
+            (類関数性)、🎯 `sum_blockPart` (`Σ_B θ_B = θ`, `Finset.sum_fiberwise`)。
     - [ ] **前提 4: `p`-section `S(x)` と「`xy_i` が `S(x)` の類代表」**。(5.11)/(5.13) が使う。
   - [ ] (5.10)/(5.11)/(5.12)/(5.13) は `Irr(B)` の**族**と類関数の `B`-部分 `θ_B`、
         第二直交関係、`p`-section が要る。(5.8) より重い足場なので後回し。
