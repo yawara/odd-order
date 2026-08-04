@@ -885,12 +885,18 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               - [x] `Algebra/AdicCompletePi.lean`: 🎯 `mem_pow_smul_top_self_iff` /
                     🎯 `mem_pow_smul_top_pi_iff` / 🎯🎯 `isAdicComplete_pi`
                     (有限直積の adic 完備性。mathlib に直積の instance が無かった)。
-              - [ ] 類和基底 (`centerBasis`、`[CommRing k]` なので `𝒪` で使える) による
-                    `C ≃ₗ[𝒪] (ConjClasses G → 𝒪)` で `IsAdicComplete 𝔪 C` を移送。
-              - [ ] mathlib `IsAdicComplete.map_algebraMap_iff` で
-                    `IsAdicComplete (𝔪.map (algebraMap 𝒪 C)) C`。
-              - [ ] mathlib `IsAdicComplete.henselianRing` で `HenselianRing C (𝔪C)`。
-              - [ ] `exists_isIdempotentElem_sub_mem` を当てて block 冪等元 `f_B`。
+              - [x] `Algebra/AdicCompletePi.lean` 続き: 🎯 `map_equiv_pow_smul_top` /
+                    🎯🎯 `isAdicComplete_of_linearEquiv` /
+                    🎯🎯 `isAdicComplete_of_basis` (有限自由加群は完備環上で完備)。
+              - [x] `Algebra/CenterGroupAlgebraHenselian.lean`:
+                    🎯 `isAdicComplete_centerGroupAlgebra` (類和基底で移送) /
+                    🎯 `isAdicComplete_centerIdeal` (mathlib `map_algebraMap_iff`) /
+                    🎯🎯 `henselianRing_centerGroupAlgebra` /
+                    🎯🎯🎯 `existsUnique_isIdempotentElem_centerGroupAlgebra`
+                    (**`Z(𝒪G)` で冪等元が一意に持ち上がる**)。
+              - [ ] **次**: 還元写像 `Z(𝒪G) → Z(FG)` を作り、その核が `𝔪·Z(𝒪G)` で全射
+                    であることを類和基底で確認 ⟹ `Z(FG)` の block 冪等元 `e_B` の持ち上げ
+                    `f_B ∈ Z(𝒪G)` を得る。そのうえで (5.4)→(5.7)→(5.2)。
   - [ ] **(5.5)** / **(5.6)** / **(5.7)**。
         (5.7) は `⟨h⟩` の `supp(w)` への軌道が長さ `p` の倍数であること + 固有空間の
         次元比較 (乗算 `s` が単射) という組み合わせ論 + 線型代数。
