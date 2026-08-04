@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfLattice
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBaseChange
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBasis
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBlockSplitting
 
 /-!
@@ -20,14 +21,20 @@ construction applies to the ordinary irreducibles themselves:
 This is what makes `Irr(B) = {i | blockOfIrr e i = B}` a definable set, and hence what the
 `B`-parts of class functions in Navarro (5.10)–(5.13) are indexed by.
 
+Once `Irr(B)` is a set, the **`B`-part** of a class function is the part of its `Irr(G)`-expansion
+(`OrdinaryBasis`) supported on `Irr(B)`.  This is Navarro's `θ_B`, and no inner product is needed
+to define it.
+
 ## Main definitions
 
 * `OddOrder.RepresentationTheory.Modular.blockOfIrr` — the block of `χ_i`
+* `OddOrder.RepresentationTheory.Modular.blockPart` — the `B`-part `θ_B` of a class function
 
 ## Main results
 
 * `OddOrder.RepresentationTheory.Modular.nontrivial_of_isLattice` — a lattice in a nonzero space
   is nonzero
+* `OddOrder.RepresentationTheory.Modular.sum_blockPart` — `∑_B θ_B = θ`
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -108,6 +115,47 @@ whose central character is the reduction of `ω_{χ_i}`. -/
 noncomputable def blockOfIrr (i : ι') : Block πG hπG hlinG :=
   blockOfLattice K ((wedderburnLatticeRepresentation (𝒪 := 𝒪) e i).asAlgebraHom)
     (exists_smul_id_of_commute_wedderburnLattice e i) residue_surjective πG hπG hlinG hnilG
+
+/-! ### The `B`-part of a class function -/
+
+section BlockPart
+
+variable [Fintype ι'] [Invertible (Nat.card G : K)]
+
+open scoped Classical in
+/-- **The `B`-part of a class function**, Navarro's `θ_B = ∑_{χ ∈ Irr(B)} [θ,χ] χ`.  The
+coefficients are those of the (unique) expansion in `Irr(G)`; `Irr(B)` is cut out by
+`blockOfIrr`. -/
+noncomputable def blockPart (B : Block πG hπG hlinG) (f : G → K)
+    (hf : ∀ g h : G, IsConj g h → f g = f h) : G → K := fun g =>
+  ∑ i ∈ Finset.univ.filter (fun i => blockOfIrr e hπG hlinG hnilG i = B),
+    ordinaryCoeff e f hf i * (wedderburnRepresentation e i).character g
+
+open scoped Classical in
+/-- The `B`-part is again a class function. -/
+theorem blockPart_eq_of_isConj (B : Block πG hπG hlinG) (f : G → K)
+    (hf : ∀ g h : G, IsConj g h → f g = f h) {g h : G} (hgh : IsConj g h) :
+    blockPart e hπG hlinG hnilG B f hf g = blockPart e hπG hlinG hnilG B f hf h :=
+  Finset.sum_congr rfl fun i _ =>
+    congrArg (ordinaryCoeff e f hf i * ·)
+      (character_eq_of_isConj (wedderburnRepresentation e i) hgh)
+
+open scoped Classical in
+/-- **A class function is the sum of its block parts.**  The blocks partition `Irr(G)`, so summing
+the fibres of `blockOfIrr` recovers the whole expansion. -/
+theorem sum_blockPart [Fintype (Block πG hπG hlinG)] (f : G → K)
+    (hf : ∀ g h : G, IsConj g h → f g = f h) (g : G) :
+    ∑ B, blockPart e hπG hlinG hnilG B f hf g = f g := by
+  classical
+  rw [show ∑ B, blockPart e hπG hlinG hnilG B f hf g
+      = ∑ B : Block πG hπG hlinG, ∑ i ∈ Finset.univ.filter
+        (fun i => blockOfIrr e hπG hlinG hnilG i = B),
+        ordinaryCoeff e f hf i * (wedderburnRepresentation e i).character g from rfl,
+    Finset.sum_fiberwise Finset.univ (blockOfIrr e hπG hlinG hnilG)
+      (fun i => ordinaryCoeff e f hf i * (wedderburnRepresentation e i).character g)]
+  exact sum_ordinaryCoeff e f hf g
+
+end BlockPart
 
 end BlockOfIrr
 
