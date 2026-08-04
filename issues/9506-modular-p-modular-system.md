@@ -960,13 +960,28 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         `y ∈ f_b Z(𝒪H)` を返す。`w = c·ι(y)` が全部を満たす。
         ⚠ 仮説 `b^G = B` は `(blockCharacter B).toLinearMap = inducedCentralCharacter H
         (blockCharacter b).toLinearMap` の形で持つ (`InducedBlock.lean` と同じ idiom)。
+  - [x] **(3.13.a)** — 完了 (2026-08-04、`Modular/LatticeBlockIdempotent.lean`)。
+        🎯 `eq_zero_or_one_of_isIdempotentElem` (局所環の冪等元は `0` か `1`) /
+        🎯 `isIdempotentElem_centralScalar` / 🎯🎯 `centralScalar_eq_zero_or_one` /
+        🎯🎯 `apply_eq_zero_of_reduce_centralScalar_eq_zero` (= `χ ∉ B ⟹ L f_B = 0`) /
+        🎯🎯 `apply_eq_id_of_reduce_centralScalar_ne_zero` (= `χ ∈ B ⟹ f_B` は恒等) /
+        🎯 `baseChange_apply_eq_zero_of_reduce_centralScalar_eq_zero` (= `M f_B = 0`)。
+        ⚠ **`f_B = Σ_{χ ∈ Irr(B)} e_χ` を経由しない**。教科書は通常指標の中心冪等元の和として
+        `f_B` を書き `X(f_B)` を計算するが、`𝒪`-格子の定式化では `ω_χ(f_B)` が **`𝒪` の冪等元**
+        であること 1 点で済む — 局所環ゆえ `0` か `1` で、どちらかは剰余 (= `λ_χ(e_B)`) が決める。
+        これが「mod `𝔪` の情報を `𝒪` 上の等式へ持ち上げる」段で、(5.7) が `M f_B = 0` を
+        使うところの本体。`λ_χ` が実際にどれかの block 指標であることは段 93 の
+        `exists_eq_centralCharacterAlg_of_asAlgebraHom_eq_smul` が与える。
   - [ ] **(5.7)**。`⟨h⟩` の `supp(w)` への軌道が長さ `p` の倍数であること + 固有空間の
         次元比較 (乗算 `s = Σ ω^{-i} w_i` が単射) という組み合わせ論 + 線型代数。
         (5.6) の (b)(c)(d) が軌道勘定に、(a) が最後の `s* = w*` に効く。
-  - [ ] その後 🎯 (5.2)。併せて (3.13) `χ ∉ B ⟹ M f_B = 0` / (3.31) `ψ(f_b z)` も必要。
-  - [ ] 併せて必要: **(3.13)** `χ ∉ B ⟹ M f_B = 0` / **(3.31)** `ψ(f_b z) = ψ(z)`
-        (`ψ ∈ Irr(b)`), `= 0` (otherwise)。どちらも `Irr(B)` の帰属を `𝒪G` の冪等元で
-        言い換えるもので、(5.4) と同じ前提に乗る。
+        残り部品: (i) `w = Σ_{i=1}^p w_i`、`w_i^h = w_{i+1}`、`f_b w_i f_b = w_i` の構成
+        (自己完結の組み合わせ論 — `C_G(h_p) ⊆ H` と `supp w ⊆ G∖H` から `⟨h⟩`-軌道長が
+        `p` の倍数 ⟹ 固定部分群 ⊆ `⟨h^p⟩` ⟹ `ℤ/p` が自由に作用 ⟹ 基本領域が取れる)、
+        (ii) 固有空間の次元比較、(iii) (5.4)+(5.6.a)+(3.13.a) による `s` の単射性。
+  - [ ] その後 🎯 (5.2)。併せて **(3.31)** `ψ(f_b z) = ψ(z)` (`ψ ∈ Irr(b)`), `= 0`
+        (otherwise) も必要 ((3.13.a) の直接の系: `f_b` が恒等か零で作用するのでトレースが
+        そのまま出る)。
 - [ ] **98: `(5.8)` + `(5.13.b,c,d)` (一般化分解数の直交関係) + block orthogonality**
 - [ ] **99: 🎯 第三主定理 `(6.7)`** — Okuyama の証明 ((6.1)–(6.6) 経由、非常に一般な形)
 - [ ] **100: `(6.10)` `ker(B) = O_{p'}(ker χ)` → `(6.12)` → 🎯 `(6.13)`**

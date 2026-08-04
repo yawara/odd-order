@@ -220,6 +220,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerTruncation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockDefined
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockWitness
+import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBlockIdempotent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
@@ -16236,3 +16237,23 @@ block 冪等元 `f_B` を `H`-部分と `G ∖ H`-部分に割るための道具
   OddOrder.RepresentationTheory.Modular.centerReduce_subgroupTrunc
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_inducedBlock_witness
+
+/-! **Navarro (3.13.a)** (`Modular.LatticeBlockIdempotent`) — block 冪等元は絶対既約格子の上で
+`0` か `1` として作用する. (5.7) が `M f_B = 0` を得るのに使う. -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_zero_or_one_of_isIdempotentElem
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.isIdempotentElem_centralScalar
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.centralScalar_eq_zero_or_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.apply_eq_zero_of_mem_maximalIdeal
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.apply_eq_id_of_notMem_maximalIdeal
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.apply_eq_zero_of_reduce_centralScalar_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.apply_eq_id_of_reduce_centralScalar_ne_zero
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.baseChange_apply_eq_zero_of_reduce_centralScalar_eq_zero
