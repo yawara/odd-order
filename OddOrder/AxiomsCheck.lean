@@ -239,6 +239,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockKernel
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ClassCentralizerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockDefect
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockHeight
@@ -16648,3 +16649,24 @@ Sylow `p`-部分群の共役作用 + `C_G(P)` の Sylow が中心的、の 2 段
   OddOrder.RepresentationTheory.Modular.eq_one_of_brauerCharacter_eq_finrank
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.rep_eq_one_iff_brauerCharacter_eq
+
+/-! **ブロックの核 `ker(B)`** (`Modular/BlockKernel`) — Navarro (6.9) の定義と
+(6.10) の初等的な半分 (`ker(B)` は `p`-正則元からなる ⟹ 正規 `p'`-部分群 ⟹ `O_{p'}(G)` 以下)、
+および弱ブロック直交性 ((5.11) の `h = 1`)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockKernel
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.mem_blockKernel_iff
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockKernel_normal
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.isPRegular_of_mem_blockKernel
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.not_dvd_card_blockKernel
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockKernel_le_opPi
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_character_one_mul_character_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isPRegular_of_pPart_eq_one

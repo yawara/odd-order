@@ -286,6 +286,20 @@ theorem pRegularPart_eq_self_of_isPRegular (hp : p.Prime) {g : G} (hg : IsPRegul
     pRegularPart p g = g :=
   ((eq_pPart_of_commute hp (Commute.one_left g) (isPElement_one p) hg (mul_one g)).2).symm
 
+/-- The converse of `pPart_eq_one_of_isPRegular`: a trivial `p`-part means `g` *is* its own
+`p'`-part, hence is `p`-regular. -/
+theorem isPRegular_of_pPart_eq_one (hp : p.Prime) {g : G} (hg : IsOfFinOrder g)
+    (h : pPart p g = 1) : IsPRegular p g := by
+  have hgeq : pRegularPart p g = g := by
+    have hfac := pRegularPart_mul_pPart (p := p) hp hg
+    rwa [h, mul_one] at hfac
+  exact hgeq ▸ isPRegular_pRegularPart hp hg
+
+/-- `p`-regularity is exactly the triviality of the `p`-part. -/
+theorem isPRegular_iff_pPart_eq_one (hp : p.Prime) {g : G} (hg : IsOfFinOrder g) :
+    IsPRegular p g ↔ pPart p g = 1 :=
+  ⟨pPart_eq_one_of_isPRegular hp, isPRegular_of_pPart_eq_one hp hg⟩
+
 /-- Both parts are conjugation equivariant (they are given by a formula in `g` alone). -/
 theorem pPart_conj (g x : G) : pPart p (x * g * x⁻¹) = x * pPart p g * x⁻¹ := by
   rw [pPart, pPart, orderOf_conj, conj_zpow]
