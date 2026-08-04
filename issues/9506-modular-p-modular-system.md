@@ -1264,7 +1264,15 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
             `BrauerBasis` の標数 0 版。
           * `BlockOfIrreducible.lean` — 🎯 `blockPart` = `θ_B`、`blockPart_eq_of_isConj`
             (類関数性)、🎯 `sum_blockPart` (`Σ_B θ_B = θ`, `Finset.sum_fiberwise`)。
-    - [ ] **前提 4: `p`-section `S(x)` と「`xy_i` が `S(x)` の類代表」**。(5.11)/(5.13) が使う。
+    - [x] **前提 4: `p`-section `S(x)`** — 完了 (2026-08-05、`PSection.lean`)。
+          🎯 `mem_pSection_iff` (`u ∈ S(x)` ⟺ `∃ y ∈ C_G(x)` `p`-正則で `u ~ xy`) と
+          🎯 `forall_pSection_iff` (類関数が `S(x)` 上で消える ⟺ 全ての `p`-正則
+          `y ∈ C_G(x)` で `f(xy) = 0`)。(5.10) の仮説を一般化分解数が見る形に翻訳する。
+    - [ ] ⟹ **足場は全て揃った。次は (5.10) 本体**:
+          `θ` が `S(x)` 上で消えるなら `θ_B` も消える。証明は
+          `θ_B(xy) = Σ_{χ∈Irr(B)} [θ,χ] χ(xy)` を一般化分解数で展開し、
+          `Σ_B θ_B = θ` (`sum_blockPart`) と `IBr(C_G(x))` の一次独立性で各 `B` の項を分離、
+          `b^G ≠ B` の寄与は (5.8) で消える、という流れ (原文 pp.105-106)。
   - [ ] (5.10)/(5.11)/(5.12)/(5.13) は `Irr(B)` の**族**と類関数の `B`-部分 `θ_B`、
         第二直交関係、`p`-section が要る。(5.8) より重い足場なので後回し。
 - [ ] **99: 🎯 第三主定理 `(6.7)`** — Okuyama の証明 ((6.1)–(6.6) 経由、非常に一般な形)
