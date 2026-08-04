@@ -255,6 +255,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnside
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideReduction
 import OddOrder.Algebra.PElementSum
 import OddOrder.GroupTheory.RepresentationTheory.SylowSumClassCoeff
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideSylowSum
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartan
@@ -16911,3 +16912,14 @@ Navarro (4.19) がブロックごとに再編する係数 `a_B(K̂)` の正体�
   OddOrder.GroupAlgebra.coeff_conj_smul_one
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.sum_class_coeff_sylowSum_mul
+
+/-! **Navarro (4.23) — `|K|` を整域の中で約す** (`Modular/OmegaBurnsideSylowSum`) —
+`|G|_{p'}·(W·L̂)(x_K) = |Syl_p|·∑_χ χ(x_K⁻¹) ω_χ(L̂) dim V_χ^S`。
+数え上げ側の `|K|` と Burnside 側の `|K|` が同じ因子なので、`ℚ` に出ずに消える。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.sum_class_coeff_of_mem_center
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.conjugacyClassSize_mk_inv
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.ordCompl_mul_coeff_sylowSum_mul

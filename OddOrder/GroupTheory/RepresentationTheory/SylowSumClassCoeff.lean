@@ -4,7 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Algebra.PElementSum
-import OddOrder.GroupTheory.RepresentationTheory.ClassSumCore
+import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
+import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
 
 /-!
 # The class sum of `W · L̂` in terms of a single Sylow subgroup
@@ -26,6 +27,9 @@ This is the step that lets Navarro (4.23) compare `π(Ĝ_p L̂)` with the `|Ω_{
 ## Main results
 
 * `OddOrder.RepresentationTheory.sum_class_coeff_sylowSum_mul`
+* `OddOrder.RepresentationTheory.sum_class_coeff_of_mem_center` — summing a central element's
+  coefficients over a class multiplies by the class size
+* `OddOrder.RepresentationTheory.conjugacyClassSize_mk_inv`
 -/
 
 namespace OddOrder.RepresentationTheory
@@ -39,12 +43,12 @@ variable {p : ℕ} [Fact p.Prime]
 
 open scoped Classical in
 /-- **`∑_{u ∈ K}(W · L̂)(u) = |Syl_p| · ∑_{x ∈ S}(K̂' · L̂)(x)`.** -/
-theorem sum_class_coeff_sylowSum_mul (S : Sylow p G) (K L : ConjClasses G) :
+theorem sum_class_coeff_sylowSum_mul (S : Sylow p G) [Fintype ↥(S : Subgroup G)]
+    (K L : ConjClasses G) :
     ∑ u ∈ Finset.univ.filter (fun u : G => ConjClasses.mk u = K),
         ((∑ P : Sylow p G, subgroupSum k (P : Subgroup G)) * classSum L).coeff u
       = (Nat.card (Sylow p G) : k)
-        * letI := Fintype.ofFinite ↥(S : Subgroup G)
-          ∑ x : ↥(S : Subgroup G),
+        * ∑ x : ↥(S : Subgroup G),
             (classSum (k := k) (ConjClasses.mk K.out⁻¹) * classSum (k := k) L).coeff (x : G) := by
   classical
   set Kinv : MonoidAlgebra k G := classSum (ConjClasses.mk K.out⁻¹) with hKinv
@@ -77,5 +81,40 @@ theorem sum_class_coeff_sylowSum_mul (S : Sylow p G) (K L : ConjClasses G) :
     rw [← mul_assoc, ← mul_assoc, hcomm]
   rw [Finset.sum_congr rfl fun P (_ : P ∈ Finset.univ) => hterm P, Finset.sum_const,
     Finset.card_univ, ← Nat.card_eq_fintype_card, nsmul_eq_mul]
+
+open scoped Classical in
+/-- **The coefficients of a central element are constant on a class**, so summing over the class
+multiplies by its size. -/
+theorem sum_class_coeff_of_mem_center {w : MonoidAlgebra k G}
+    (hw : w ∈ Subalgebra.center k (MonoidAlgebra k G)) (C : ConjClasses G) :
+    ∑ u ∈ Finset.univ.filter (fun u : G => ConjClasses.mk u = C), w.coeff u
+      = (OddOrder.RepresentationTheory.conjugacyClassSize C : k) * w.coeff C.out := by
+  classical
+  have hmk : ConjClasses.mk C.out = C := by
+    rw [← ConjClasses.quotient_mk_eq_mk, Quotient.out_eq]
+  have hterm : ∀ u ∈ Finset.univ.filter (fun u : G => ConjClasses.mk u = C),
+      w.coeff u = w.coeff C.out := fun u hu =>
+    coeff_center_of_mk_eq hw (((Finset.mem_filter.mp hu).2).trans hmk.symm)
+  rw [Finset.sum_congr rfl hterm, Finset.sum_const, nsmul_eq_mul]
+  congr 1
+  rw [OddOrder.RepresentationTheory.conjugacyClassSize, Nat.card_eq_fintype_card,
+    ← Set.toFinset_card]
+  refine congrArg Nat.cast (congrArg Finset.card (Finset.ext fun g => ?_))
+  simp only [Finset.mem_filter, Finset.mem_univ, true_and, Set.mem_toFinset,
+    ConjClasses.mem_carrier_iff_mk_eq]
+
+omit [Fintype G] [DecidableEq (ConjClasses G)] in
+/-- **Inversion preserves class sizes.** -/
+theorem conjugacyClassSize_mk_inv (g : G) :
+    OddOrder.RepresentationTheory.conjugacyClassSize (ConjClasses.mk g⁻¹)
+      = OddOrder.RepresentationTheory.conjugacyClassSize (ConjClasses.mk g) := by
+  classical
+  have hiff : ∀ a : G, a ∈ (ConjClasses.mk g⁻¹).carrier ↔ a⁻¹ ∈ (ConjClasses.mk g).carrier := by
+    intro a
+    simp only [ConjClasses.mem_carrier_iff_mk_eq]
+    constructor
+    · intro h; have := mk_inv_of_mk_eq h; rwa [inv_inv] at this
+    · intro h; have := mk_inv_of_mk_eq h; rwa [inv_inv] at this
+  exact Nat.card_congr (Equiv.subtypeEquiv (Equiv.inv G) hiff)
 
 end OddOrder.RepresentationTheory

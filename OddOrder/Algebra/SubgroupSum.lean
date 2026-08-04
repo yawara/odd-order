@@ -160,15 +160,14 @@ theorem coeff_subgroupSum_mul (N : Subgroup G) (w : MonoidAlgebra R G) (g : G) :
 
 /-- **`(N̂ · w)(1) = ∑_{x ∈ N} w(x)`.**  The coefficient at `1` of `N̂ · w` collects the
 coefficients of `w` over `N` (the reindexing `x ↦ x⁻¹` is a bijection of `N`). -/
-theorem coeff_subgroupSum_mul_one (N : Subgroup G) (w : MonoidAlgebra R G) :
-    (subgroupSum R N * w).coeff 1
-      = letI := Fintype.ofFinite ↥N
-        ∑ x : ↥N, w.coeff (x : G) := by
+theorem coeff_subgroupSum_mul_one (N : Subgroup G) [Fintype ↥N] (w : MonoidAlgebra R G) :
+    (subgroupSum R N * w).coeff 1 = ∑ x : ↥N, w.coeff (x : G) := by
   classical
-  letI := Fintype.ofFinite ↥N
   rw [coeff_subgroupSum_mul]
   rw [← Equiv.sum_comp (Equiv.inv ↥N) (fun x : ↥N => w.coeff (x : G))]
-  refine Finset.sum_congr rfl fun x _ => ?_
+  -- `coeff_subgroupSum_mul` sums over `Fintype.ofFinite ↥N`, the statement over the ambient
+  -- instance; `Fintype` is a subsingleton, so the index sets agree
+  refine Finset.sum_congr (congrArg (@Finset.univ ↥N) (Subsingleton.elim _ _)) fun x _ => ?_
   rw [mul_one]
   rfl
 
