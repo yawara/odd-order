@@ -16198,3 +16198,9 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.mem_centerIdeal_iff_mapRingHom_eq_zero
 #assert_only_allowed_axioms
   OddOrder.existsUnique_isIdempotentElem_mapRingHom_eq
+#assert_only_allowed_axioms
+  OddOrder.mapRingHom_mem_center
+#assert_only_allowed_axioms
+  OddOrder.centerReduce
+#assert_only_allowed_axioms
+  OddOrder.mem_centerIdeal_iff_centerReduce_eq_zero

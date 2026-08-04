@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Algebra.CenterGroupAlgebraHenselian
+import OddOrder.Algebra.GroupAlgebraConjugation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
 
 /-!
@@ -19,6 +20,8 @@ second main theorem (5.2) is proved with.
 
 ## Main results
 
+* `OddOrder.mapRingHom_mem_center` — reduction keeps central elements central
+* `OddOrder.centerReduce` — the reduction `Z(𝒪G) →+* Z(FG)`
 * `OddOrder.mem_centerIdeal_iff_mapRingHom_eq_zero` — the kernel is `I·Z(𝒪G)`
 * `OddOrder.existsUnique_isIdempotentElem_mapRingHom_eq` — idempotents lift uniquely
 -/
@@ -109,5 +112,70 @@ theorem existsUnique_isIdempotentElem_mapRingHom_eq (hG : Finite G)
     exact hzero
   · refine huniq e' ⟨he'.1, ?_⟩
     rw [mem_centerIdeal_iff_mapRingHom_eq_zero, map_sub, he'.2, hccred, sub_self]
+
+/-! ### The reduction as a map of centres
+
+Navarro's (5.5)–(5.7) evaluate block characters on reductions of central elements, so the
+reduction has to be available as a map `Z(𝒪G) → Z(FG)`.  Centrality is preserved because, by
+`GroupAlgebra.forall_smul_eq_iff_mem_center`, being central means having coefficients constant on
+conjugacy classes — a condition visibly preserved by a coefficient map.
+-/
+
+section Center
+
+open scoped OddOrder.Conjugation
+
+variable {k k' : Type*} [CommRing k] [CommRing k']
+
+omit [Fintype G] [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)] in
+/-- **Coefficient reduction preserves centrality.** -/
+theorem mapRingHom_mem_center (f : k →+* k') {w : MonoidAlgebra k G}
+    (hw : w ∈ Subalgebra.center k (MonoidAlgebra k G)) :
+    MonoidAlgebra.mapRingHom G f w ∈ Subalgebra.center k' (MonoidAlgebra k' G) := by
+  have hfix : ∀ g : G, g • w = w :=
+    OddOrder.GroupAlgebra.forall_smul_eq_iff_mem_center.mpr
+      fun z => ((Subalgebra.mem_center_iff.mp hw) z).symm
+  rw [Subalgebra.mem_center_iff]
+  refine fun b => (OddOrder.GroupAlgebra.forall_smul_eq_iff_mem_center.mp (fun g => ?_) b).symm
+  refine (OddOrder.GroupAlgebra.smul_eq_self_iff_coeff g _).mpr fun n => ?_
+  rw [MonoidAlgebra.coeff_mapRingHom, MonoidAlgebra.coeff_mapRingHom]
+  congr 1
+  exact (OddOrder.GroupAlgebra.smul_eq_self_iff_coeff g w).mp (hfix g) n
+
+/-- **The reduction of centres** `Z(𝒪G) →+* Z(FG)`. -/
+noncomputable def centerReduce :
+    ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)) →+*
+      ↥(Subalgebra.center (𝒪 ⧸ I) (MonoidAlgebra (𝒪 ⧸ I) G)) where
+  toFun w := ⟨centerReduceHom I w, mapRingHom_mem_center _ w.2⟩
+  map_one' := Subtype.ext (map_one (centerReduceHom I))
+  map_mul' _ _ := Subtype.ext (map_mul (centerReduceHom I) _ _)
+  map_zero' := Subtype.ext (map_zero (centerReduceHom I))
+  map_add' _ _ := Subtype.ext (map_add (centerReduceHom I) _ _)
+
+omit [Fintype G] [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)]
+  [IsAdicComplete I 𝒪] in
+@[simp]
+theorem coe_centerReduce (w : ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G))) :
+    ((centerReduce I w : ↥(Subalgebra.center (𝒪 ⧸ I) (MonoidAlgebra (𝒪 ⧸ I) G))) :
+        MonoidAlgebra (𝒪 ⧸ I) G)
+      = centerReduceHom I w := rfl
+
+-- The finiteness instances are consumed through the kernel description.
+omit [IsAdicComplete I 𝒪] in
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+/-- The kernel of `centerReduce` is again `I·Z(𝒪G)`. -/
+theorem mem_centerIdeal_iff_centerReduce_eq_zero
+    (w : ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G))) :
+    w ∈ centerIdeal (G := G) I ↔ centerReduce I w = 0 := by
+  rw [mem_centerIdeal_iff_mapRingHom_eq_zero]
+  constructor
+  · intro h; exact Subtype.ext (by rw [coe_centerReduce, h]; rfl)
+  · intro h
+    have := congrArg (fun z : ↥(Subalgebra.center (𝒪 ⧸ I) (MonoidAlgebra (𝒪 ⧸ I) G)) =>
+      (z : MonoidAlgebra (𝒪 ⧸ I) G)) h
+    rwa [coe_centerReduce] at this
+
+end Center
 
 end OddOrder

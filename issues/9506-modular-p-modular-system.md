@@ -924,10 +924,16 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         🎯🎯 `exists_corner_inverse_of_approx`: 可換 `A` (𝒪 上有限、𝒪 局所) で
         corner の `w` が `x w ≡ f (mod 𝔪·A)` を満たすなら、corner の**厳密な**逆元が取れる
         ((5.4) が誤差を吸収する)。
+  - [x] **中心の還元を中心値の環準同型にした** (`Algebra/CenterIdempotentLift.lean`)。
+        🎯 `mapRingHom_mem_center` (係数写像は中心性を保つ — 中心性は
+        「係数が共役類上定数」なので明らか) / `centerReduce : Z(𝒪G) →+* Z(FG)` /
+        🎯 `mem_centerIdeal_iff_centerReduce_eq_zero`。
+        block 指標は `Z(FG)` の元にしか適用できないので、(5.5)–(5.7) にはこの形が要る。
   - [ ] **次: (5.5) の組み立て**。標数 `p` 側の corner 逆元 `ȳ` を `centerLift` で
-        `Z(𝒪G)` へ持ち上げて `w` とし、`f_B - (f_B x) w ∈ 𝔪·Z(𝒪G)` を
-        `centerReduceHom` の核描像で確認して `exists_corner_inverse_of_approx` を当てる。
-        残りは block 枠組を `MonoidAlgebra F G` に instantiate する配線のみ。
+        `Z(𝒪G)` へ持ち上げて `w` とし、`f_B - (f_B x) w` が核に入ることを
+        `mem_centerIdeal_iff_centerReduce_eq_zero` で見て
+        `exists_corner_inverse_of_approx` を当てる。部品は全て揃っており配線のみ。
+        必要な instance = `Module.Finite 𝒪 Z(𝒪G)` (類和基底) と `Nontrivial Z(𝒪G)`。
   - [ ] その後 (5.6) → (5.7) → 🎯 (5.2)。
         併せて (3.13) `χ ∉ B ⟹ M f_B = 0` / (3.31) `ψ(f_b z)` も必要。
   - [ ] **(5.5)** / **(5.6)** / **(5.7)**。
