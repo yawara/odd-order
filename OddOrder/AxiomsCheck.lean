@@ -16011,3 +16011,5 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.RepresentationTheory.Modular.pairingZero_eq_sum_pRegularRep
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.pairingZero_projectiveIndecomposableCharacter
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_cartanMatrix_mul_pairingZero

@@ -31,6 +31,11 @@ over the `p`-regular classes.
 * `OddOrder.RepresentationTheory.Modular.brauerMatrix_mul_projMatrix` — `B · A = 1`
 * `OddOrder.RepresentationTheory.Modular.sum_brauer_mul_projectiveIndecomposableCharacter` —
   `∑_j |C_G(x_j)|⁻¹ φ(x_j⁻¹) Φ_θ(x_j) = δ_{φθ}`
+* `OddOrder.RepresentationTheory.Modular.pairingZero` — Navarro's `[a, b]⁰`
+* `OddOrder.RepresentationTheory.Modular.pairingZero_projectiveIndecomposableCharacter` —
+  `[Φ_θ, φ]⁰ = δ_{φθ}`
+* `OddOrder.RepresentationTheory.Modular.sum_cartanMatrix_mul_pairingZero` — `([μ,φ]⁰)` inverts
+  the Cartan matrix
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -275,5 +280,50 @@ theorem pairingZero_projectiveIndecomposableCharacter [Fintype G] (φ θ : ι) :
       (fun g h hc => irreducibleBrauerCharacter_eq_of_isConj φ hc),
     ← sum_brauer_mul_projectiveIndecomposableCharacter hp hω hω' hπ hlin hkerJ e φ θ]
   exact Finset.sum_congr rfl fun j _ => by rw [mul_comm (irreducibleBrauerCharacter _ _ _)]
+
+include hp hπ hlin hkerJ in
+/-- **`([μ,φ]⁰)` is the inverse of the Cartan matrix** — Navarro (2.13).  Substitute
+`Φ_θ|_{G°} = ∑_μ c_{μθ} μ` into `[Φ_θ, φ]⁰ = δ_{φθ}`. -/
+theorem sum_cartanMatrix_mul_pairingZero [Fintype G] (φ θ : ι) :
+    ∑ μ, ((cartanMatrix hp hω hω' hπ hlin hkerJ e μ θ : ℕ) : K) *
+        pairingZero (𝒪 := 𝒪) p K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π μ)
+          (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π φ)
+      = if φ = θ then 1 else 0 := by
+  classical
+  have hexp : ∀ μ : ι, pairingZero (𝒪 := 𝒪) p K
+      (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π μ)
+      (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π φ)
+      = ∑ j : ι, (Nat.card (Subgroup.centralizer
+            ({pRegularRep hp hπ hlin hkerJ j} : Set G)) : K)⁻¹ *
+          algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π μ
+              (pRegularRep hp hπ hlin hkerJ j)
+            * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π φ
+              (pRegularRep hp hπ hlin hkerJ j)⁻¹) := fun μ =>
+    pairingZero_eq_sum_pRegularRep hp hπ hlin hkerJ _ _
+      (fun _ _ hc => irreducibleBrauerCharacter_eq_of_isConj μ hc)
+      (fun _ _ hc => irreducibleBrauerCharacter_eq_of_isConj φ hc)
+  rw [← pairingZero_projectiveIndecomposableCharacter hp hω hω' hπ hlin hkerJ e φ θ,
+    pairingZero_eq_sum_pRegularRep hp hπ hlin hkerJ _ _
+      (fun _ _ hc => projectiveIndecomposableCharacter_eq_of_isConj hp hω hω' hπ hlin hkerJ e θ hc)
+      (fun _ _ hc => irreducibleBrauerCharacter_eq_of_isConj φ hc),
+    Finset.sum_congr rfl fun μ (_ : μ ∈ Finset.univ) => by rw [hexp μ, Finset.mul_sum],
+    Finset.sum_comm]
+  refine Finset.sum_congr rfl fun j _ => ?_
+  set x := pRegularRep hp hπ hlin hkerJ j with hx
+  have hxreg : IsPRegular p x := isPRegular_pRegularRep hp hπ hlin hkerJ j
+  rw [Finset.sum_congr rfl fun μ (_ : μ ∈ Finset.univ) =>
+      show ((cartanMatrix hp hω hω' hπ hlin hkerJ e μ θ : ℕ) : K) *
+          ((Nat.card (Subgroup.centralizer ({x} : Set G)) : K)⁻¹ *
+            algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π μ x
+              * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π φ x⁻¹))
+        = (Nat.card (Subgroup.centralizer ({x} : Set G)) : K)⁻¹ *
+          algebraMap 𝒪 K ((cartanMatrix hp hω hω' hπ hlin hkerJ e μ θ : 𝒪) *
+            irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π μ x
+            * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π φ x⁻¹) from by
+        simp only [map_mul, map_natCast]; ring,
+    ← Finset.mul_sum, ← map_sum]
+  congr 2
+  rw [← Finset.sum_mul,
+    ← projectiveIndecomposableCharacter_eq_sum_cartanMatrix hp hω hω' hπ hlin hkerJ e θ x hxreg]
 
 end OddOrder.RepresentationTheory.Modular
