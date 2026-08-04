@@ -1442,11 +1442,18 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               ⚠ **格子側で定義された `blockOfIrr` の分割を Wedderburn 側で読むための橋**。
               証明は「格子は張る」の定型 (既存 `asAlgebraHom_eq_zero_of_latticeRepresentation`
               + `asAlgebraHom_wedderburnRepresentation`)。
-              残り = `e_B = (Σ_{χ∈Irr(B)} e_χ)` の還元 (= ブロック冪等元の整数性)、
-              類の defect `d(K)` の付値計算、そして (4.19) の組み立て。
-              ⚠ 前者は既存の `BlockIdempotentLift.exists_isIdempotentElem_blockCharacterPi_eq_single`
-              (`e_B` の `Z(𝒪G)` への持ち上げ) + スペクトル分解 + 上の橋で
-              「持ち上げの `K` 像 = `Σ_{i ∈ Irr(B)} e_{χ_i}`」を出す道筋になる。
+              [x] 🎯🎯🎯 **ブロック冪等元の整数性 完了 (2026-08-05、
+              `Modular/BlockIdempotentOrdinary.lean`)**:
+              `mapRingHom_blockIdempotent_eq_sum` — `e_B` の `Z(𝒪G)` への持ち上げの
+              `K[G]` 像は **`∑_{χ∈Irr(B)} e_χ`**。
+              (i) `ω^K_i(f)` は体の冪等元 ⟹ `0` か `1`、
+              (ii) `= algebraMap(ω^L_i(f))` でその還元がブロック指標 ⟹ `Irr(B)` で `1`、
+              (iii) スペクトル分解で組み立て。
+              ⟹ **`a_B(K̂)` の正体 = `∑_{χ∈Irr(B)} (χ(1)/|G|) χ(x_K⁻¹)` の還元**。
+              ⚠ 途中で `mapRingHom_mem_center` を書きかけたが既存だった
+              (`Algebra/CenterIdempotentLift.lean`、任意の環準同型版)。**重複 3 例目** —
+              新規補題は必ず概念名で先に grep する。
+              残り = 類の defect `d(K)` の付値計算 + (4.19) の組み立て。
           * [ ] (3.32) `u_χ f_B` の補題 ⟹ `λ_B(Ĝ⁰) = 0` (`B ≠ B₀`)。
             `λ_{B₀}(Ĝ⁰) = |G⁰|*` は既存の `aug` + `not_dvd_card_isPRegular` で済む。
           ⟹ **見通し**: (4.19) が 2-3 段、(4.23)+(3.32)+(6.14)+(6.1) で 3-4 段。
