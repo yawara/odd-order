@@ -1303,10 +1303,12 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
   * これは **`P` が `K` に共役で作用し、固定点が `K ∩ C_G(P)`、軌道は `p`-冪サイズ**
     という数え上げそのもの = mathlib の `IsPGroup.card_modEq_card_fixedPoints`。
 
-  - [ ] (a) **主ブロックの定義**: `principalBlock` = 添加写像 (augmentation) を中心に制限した
-        代数準同型 `Z(kG) →ₐ[k] k` に `blockOfCentralCharacter` を適用したもの。
-        (repo に `principal` は現状ゼロ件、新規。)
-        `λ_{B_0}(classSumCenter K) = |K|*` を定義性質として出す。
+  - [x] (a) **主ブロックの定義** — 完了 (2026-08-05、`PrincipalBlock.lean`)。
+        `augmentation k` (一般の可換環上) / `principalCentralCharacter` = `ε|_{Z(kG)}` /
+        🎯 `principalBlock` / 🎯 `principalCentralCharacter_classSumCenter` (`λ_{B_0}(K̂) = |K|·1`)。
+        ⚠ **特殊化債務**: `OddOrder.augmentation` (`Algebra/AugmentationIdeal`) は同じものの
+        `ℤ` 版で、一般化すれば包摂できる (~70 call site / 8 file)。今回は繰延し docstring と
+        background task に記録。
   - [ ] (b) **🎯 `b_0^G = B_0`** (第三主定理の易しい向き): 上の数え上げ。
         `Br_P` の像の添加が `|K ∩ C_G(P)|*` であること + `card_modEq_card_fixedPoints`。
   - [ ] (c) 逆向き (`b^G = B_0 ⟹ b = b_0`) は Okuyama or 古典的 Brauer の証明が要る。
