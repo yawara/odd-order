@@ -16793,3 +16793,11 @@ Külshammer の公式 `Ĝ_p = ∑_{P ∈ Syl_p} P̂` の係数計算に使う。
   OddOrder.RepresentationTheory.Modular.trace_apply_single
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.centralScalar_classSum_mul_character_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_sum_single
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.centralScalar_mul_character_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.centralScalar_mul
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_centralScalar_mul_character_eq_card_mul_coeff
