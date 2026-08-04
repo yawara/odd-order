@@ -248,6 +248,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
 import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIdempotent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
 import OddOrder.Algebra.PElementSum
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
@@ -16851,3 +16852,10 @@ Burnside 公式が使う) は `algebraMap` で一致する。 -/
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.algebraMap_centralScalar_eq
+
+/-! **ブロック冪等元の整数性** (`Modular/BlockIdempotentOrdinary`) —
+`e_B` の `Z(𝒪G)` への持ち上げの `K` 像は `∑_{χ ∈ Irr(B)} e_χ`。
+Navarro (4.19) がブロックごとに再編する係数 `a_B(K̂)` の正体。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.mapRingHom_blockIdempotent_eq_sum

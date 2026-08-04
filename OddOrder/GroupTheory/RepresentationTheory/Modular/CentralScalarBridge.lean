@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.Algebra.CenterIdempotentLift
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBridge
@@ -80,23 +81,10 @@ theorem algebraMap_centralScalar_eq (z : Subalgebra.center 𝒪 (MonoidAlgebra �
     ext v
     simp [Matrix.scalar, Matrix.mulVec, dotProduct, Matrix.diagonal, Finset.sum_ite_eq,
       Algebra.smul_def]
-  -- the image of a central element is central
   have hcentral : (MonoidAlgebra.mapRingHom G (algebraMap 𝒪 K) (z : MonoidAlgebra 𝒪 G))
-      ∈ Set.center (MonoidAlgebra K G) := by
-    refine Semigroup.mem_center_iff.mpr fun y => ?_
-    induction y using MonoidAlgebra.induction_linear with
-    | zero => rw [zero_mul, mul_zero]
-    | add u v hu hv => rw [add_mul, mul_add, hu, hv]
-    | single g r =>
-      have hz := (Subalgebra.mem_center_iff.mp z.2) (MonoidAlgebra.single g 1)
-      have hsm : (MonoidAlgebra.single g r : MonoidAlgebra K G)
-          = r • MonoidAlgebra.single g 1 := by
-        rw [MonoidAlgebra.smul_single, smul_eq_mul, mul_one]
-      rw [hsm, smul_mul_assoc, mul_smul_comm]
-      congr 1
-      have := congrArg (MonoidAlgebra.mapRingHom G (algebraMap 𝒪 K)) hz
-      rw [map_mul, map_mul, MonoidAlgebra.mapRingHom_single, map_one] at this
-      exact this
+      ∈ Set.center (MonoidAlgebra K G) :=
+    Semigroup.mem_center_iff.mpr
+      (Subalgebra.mem_center_iff.mp (OddOrder.mapRingHom_mem_center (algebraMap 𝒪 K) z.2))
   have hscal := MatrixModule.scalar_centralScalar e.toAlgHom.toRingHom i e.surjective hcentral
   have hboth : Matrix.scalar (m i) (MatrixModule.centralScalar e.toAlgHom.toRingHom i
       (MonoidAlgebra.mapRingHom G (algebraMap 𝒪 K) (z : MonoidAlgebra 𝒪 G)))
