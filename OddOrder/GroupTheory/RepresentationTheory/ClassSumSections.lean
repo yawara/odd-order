@@ -70,19 +70,19 @@ noncomputable def classSumCoeff (Ci Cj Cs : ConjClasses G) : ℕ :=
 `classSum Ci * classSum Cj` is the number of factorizations `w = u·v` with `u ∈ C_i` and `v ∈ C_j`.
 (This per-element count is constant on each conjugacy class; summing it over a class `C_s` recovers
 the structure coefficient `classSumCoeff Ci Cj Cs`.) -/
-theorem classSum_mul_apply (Ci Cj : ConjClasses G) (w : G) :
-    (classSum Ci * classSum Cj : ℂ[G]).coeff w =
+theorem classSum_mul_apply {k : Type*} [CommRing k] (Ci Cj : ConjClasses G) (w : G) :
+    (classSum Ci * classSum Cj : k[G]).coeff w =
       (Finset.univ.filter (fun p : G × G =>
         ConjClasses.mk p.1 = Ci ∧ ConjClasses.mk p.2 = Cj ∧ p.1 * p.2 = w)).card := by
   classical
   -- Expand the product coefficient over all pairs `(u, v)` with `u * v = w`.
-  have hexp := MonoidAlgebra.coeff_mul_antidiag (classSum (k := ℂ) Ci) (classSum (k := ℂ) Cj) w
+  have hexp := MonoidAlgebra.coeff_mul_antidiag (classSum (k := k) Ci) (classSum (k := k) Cj) w
     (Finset.univ.filter (fun p : G × G => p.1 * p.2 = w)) (by intro p; simp)
   rw [hexp]
   -- Each summand is the product of two `0/1` indicators; combine into a single indicator.
   have hbody : ∀ p : G × G,
-      (classSum Ci).coeff p.1 * (classSum Cj).coeff p.2
-        = if ConjClasses.mk p.1 = Ci ∧ ConjClasses.mk p.2 = Cj then (1 : ℂ) else 0 := by
+      (classSum (k := k) Ci).coeff p.1 * (classSum (k := k) Cj).coeff p.2
+        = if ConjClasses.mk p.1 = Ci ∧ ConjClasses.mk p.2 = Cj then (1 : k) else 0 := by
     intro p
     rw [coeff_classSum, coeff_classSum, ite_and]
     by_cases h1 : ConjClasses.mk p.1 = Ci <;> by_cases h2 : ConjClasses.mk p.2 = Cj <;>
@@ -90,9 +90,8 @@ theorem classSum_mul_apply (Ci Cj : ConjClasses G) (w : G) :
   rw [Finset.sum_congr rfl (fun p _ => hbody p)]
   -- Sum of a `0/1` indicator over the antidiagonal is the cardinality of the counted set.
   rw [Finset.sum_ite, Finset.sum_const_zero, add_zero, Finset.sum_const, nsmul_eq_mul, mul_one]
-  norm_cast
-  apply congrArg Finset.card
-  ext p
+  refine congrArg Nat.cast (congrArg Finset.card (Finset.ext fun p => ?_))
+  show p ∈ _ ↔ p ∈ _
   simp only [Finset.mem_filter, Finset.mem_univ, true_and]
   constructor
   · rintro ⟨hw, hi, hj⟩; exact ⟨hi, hj, hw⟩
