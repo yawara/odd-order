@@ -1479,6 +1479,12 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               ⚠ Navarro の `|Ω|/p^{a-d(K)}` 正規化は、これに
               `|K| = p^{a-d(K)}|K|_{p'}` と `ω_χ(K̂)χ(1) = |K|χ(x_K)` を代入したものに
               一致する (検算済)。**本形式化は割り算を導入せずに同じ内容を持つ**。
+              [x] 🎯🎯 **`𝒪` への降下 完了 (2026-08-05、
+              `Modular/OmegaBurnsideReduction.lean`)**:
+              `ordCompl_mul_sum_sylow_coeff_classSum_mul_over` — `K` 上の恒等式は
+              **全項が `𝒪` の元の像**なので `FaithfulSMul.algebraMap_injective` で降りる
+              (係数は `mapRingHom_classSum` で転送、`ω_χ` は前段の橋、`χ(1)`/`dim V^S` は自然数)。
+              ⟹ **剰余体への還元が可能になった**。
               残り = 上記を**還元してブロックごとにまとめる**段 (p.93 の段は landing 済) と
               (4.23) の組み立て。
               ⚠ **設計上の注意 (2026-08-05 に検算)**: `Ĝ_p` を使って
