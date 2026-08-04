@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockTrace
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainCore
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainWiring
 
@@ -46,26 +47,6 @@ namespace OddOrder.RepresentationTheory.Modular
 
 open IsLocalRing Matrix MonoidAlgebra OddOrder.GroupTheory
 open OddOrder.GroupAlgebra (inclusionHom)
-
-/-! ### The `p`-part of `x · y` -/
-
-section PPart
-
-variable {p : ℕ} {G : Type*} [Group G]
-
-/-- **`(xy)_p = x`** when `x` is a `p`-element, `y` is `p`-regular and the two commute.  This is
-what makes `C_G((xy)_p) = C_G(x) = H`, the hypothesis under which (5.7) applies. -/
-theorem pPart_mul_eq_of_isPElement (hp : p.Prime) {x y : G} (hcomm : Commute x y)
-    (hx : IsPElement p x) (hy : IsPRegular p y) : pPart p (x * y) = x :=
-  (eq_pPart_of_commute hp hcomm hx hy hcomm.eq.symm).1.symm
-
-/-- **A `p`-regular element of a subgroup is `p`-regular in the ambient group.** -/
-theorem isPRegular_coe {H : Subgroup G} {y : ↥H} (hy : IsPRegular p y) :
-    IsPRegular p ((y : G)) := by
-  have : orderOf ((y : G)) = orderOf y := Subgroup.orderOf_coe y
-  exact fun hdvd => hy (this ▸ hdvd)
-
-end PPart
 
 /-! ### The second main theorem -/
 

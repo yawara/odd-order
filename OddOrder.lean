@@ -168,6 +168,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBlockSplitting
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainCore
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainWiring
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainTheorem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
