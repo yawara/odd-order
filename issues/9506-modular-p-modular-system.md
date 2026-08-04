@@ -1419,9 +1419,52 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         `N̂ = ∑_{n∈N} n` を導入し 🎯 `ρ(N̂) = |N|·1 ⟺ ρ が N を潰す`
         (**任意の可換環・任意の対象代数**、半単純性も標数仮定も不要)。
         Navarro p.126 の `u = |N|⁻¹ Σ_{n∈N} n` の議論がこれに当たる。
-  - [ ] **(6.10) の残り**: `Irr(B)` 族上の `ker(B) = ⋂ ker χ` の定義、
-        `Ξ = Σ_{χ∈Irr(B)} χ(1)χ` が `p`-singular で消えること (既存の (5.11) から)、
-        `ker(B)` が `p'`-群であること、`O_{p'}` との突き合わせ。
+  - [x] 🎯🎯🎯 **(6.10) 完成 (2026-08-05、`Modular/BlockKernel.lean` + `Algebra/SubgroupSum`)**。
+        * 🎯 `blockKernel` = **(6.9)** `ker(B) = ⋂_{χ∈Irr(B)} ker χ`。`Irr(B)` は
+          `blockOfIrr` のファイバーなので添字 subtype 上の `⨅` で書ける。ordinary
+          irreducible が Wedderburn 成分そのものゆえ「ker χ」は `MonoidHom.ker` そのもの
+          ⟹ 教科書が使う初等指標論 (「ker(B) は `Ξ = Σ χ(1)χ` の核」) は**定義に
+          組み込まれて別段が不要**になった。
+        * 🎯🎯 `isPRegular_of_mem_blockKernel` = **前半** (`ker(B)` は `p`-正則元からなる)。
+          `Ξ(g) = Σ_{χ∈Irr(B)} χ(1)²` は標数 0 の `K` で非零 (自然数の和)、
+          弱ブロック直交性は `p`-singular で 0。⚠ `p.Prime` は不要だった (linter が指摘)。
+        * `not_dvd_card_blockKernel` (Cauchy) / `isPiSubgroup_blockKernel` /
+          `blockKernel_le_opPi` (`ker(B) ≤ O_{p'}(G)`)
+        * 🎯 `sum_character_one_mul_character_eq_zero` = 弱ブロック直交性
+          = (5.11) の `h = 1`。⚠ (5.11) は `C_G(g_p)` の分裂データを担ぐので `g` ごとに
+          変わる ⟹ 本体は `hweak` を仮説で受け、この補題が単一の `g` で discharge。
+        * 🎯🎯 `le_blockKernel_of_normal_of_forall_eq_one` = **逆包含、Clifford 不要**。
+          教科書 (p.126) は `u = |N|⁻¹ N̂` の中心指標を `[ψ_N,1_N]/ψ(1)` と同定して
+          Clifford を当てるが、`N̂` を中心指標に直接通す方が短い:
+          `N ⊴ G` ⟹ `N̂` 中心 ⟹ 各絶対既約格子上でスカラー `ω_i(N̂) ∈ 𝒪`;
+          同じブロック ⟹ **還元が一致**; `χ_{i₀}` 上では `ω(N̂) = |N|` で `p ∤ |N|` ゆえ
+          剰余体で非零 ⟹ `ω_i(N̂)` は局所環の単元 ⟹ 吸収律 `n·N̂ = N̂` で約せる。
+          格子→周囲は `single n 1 - 1` を既存の
+          `asAlgebraHom_eq_zero_of_latticeRepresentation` に通すだけ。
+          ⚠ `|N|` を `𝒪` の中で逆にする必要すら無い。
+        * 🎯🎯🎯 `isGreatest_blockKernel` = **(6.10) の完全形**: `ker(B)` は `ker χ` に
+          含まれる `G`-正規 `p'`-部分群のうち最大 = `O_{p'}(ker χ)`
+          (`O_{p'}(ker χ)` は `ker χ ⊴ G` で特性的ゆえ `G`-正規、逆に `ker χ` 内の
+          `G`-正規 `p'`-部分群は `ker χ`-正規 ⟹ 最大元は同一。この形なら `ker χ` の
+          部分群を `G` へ押し出す配管が要らない)。
+        * `Algebra/SubgroupSum` に `mapRingHom_subgroupSum` / `subgroupSum_mem_center` /
+          🎯 `map_single_eq_one_of_isUnit_map_subgroupSum` (核判定を「`ρ(N̂)` が単元」へ
+          一般化) を追加し、`[Ring A]` → `[Semiring A]` へ一般化。
+          ⚠ 一般化は必要だった: `Module.End 𝒪 L` の `Semiring` インスタンス経路が
+          `Ring.toSemiring` 経由と一致せず `AlgHom` の型が unify しなかった。
+        * `GroupTheory/PRegularElement` に `isPRegular_of_pPart_eq_one` /
+          `isPRegular_iff_pPart_eq_one` (既存 `pPart_eq_one_of_isPRegular` の逆)。
+  - [ ] **(6.12) 本体**。原文 p.127 の証明が要求するのは
+        (i) `ker(B) ≤ ker φ` (`φ ∈ IBr(B)`) — 上の逆包含の **`k` 側版**
+        (`λ_B(N̂*) = |N|*` ≠ 0 ⟹ block 表現上で `N̂` が単元 ⟹ 核判定) でほぼ同型に書ける、
+        (ii) **Lemma (2.32)** `O_p(G)` は単純 `kG`-加群を潰す — 素材は既存の
+        `RepresentationTheory/PGroupFixedVector.lean`
+        (`IsPGroup.invariants_ne_bot` / `exists_fixed_vector_ne_zero`) で、
+        `O_p(G) ⊴ G` ゆえ固定部分空間が `G`-不変 ⟹ 単純性で全体、
+        (iii) `M/ker(B)` が `p`-群 — `x ∈ M` が `p`-正則なら `χ(x) = χ(1)` を経由するので
+        **通常指標版の (6.11)** (`χ(x) = χ(1) ⟹ ρ(x) = 1`, 標数 0) が要る。
+        `Algebra/RootsOfUnitySum` の抽象体版補題は使えるが、`K` が `p'`-乗根を
+        十分持つかは設定依存 (`ℂ_p` なら自明)。
 - [ ] **101: `(7.2)` Klein four Sylow-2 / `(7.3)` basic set / `(7.4)` / `(7.5)` / `(7.6)`**
 - [ ] **102: 🎯🎯🎯 BS 本証明 (pp.139–146)** → `brauerSuzuki_quaternionSylow_q8` の `sorry` 置換
 
