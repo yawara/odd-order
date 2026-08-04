@@ -1210,6 +1210,23 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
                     帰納法のエンジン。
         - [x] ⟹ (5.2) 本体の組み立て — 完了 (上記 instantiation)
 - [ ] **98: `(5.8)` + `(5.13.b,c,d)` (一般化分解数の直交関係) + block orthogonality**
+
+  **設計 (2026-08-04、(5.2) landing 直後に確定)**。(5.8) は「`χ ∈ Irr(B)` なら `d^x_{χφ}` の台は
+  `⋃_{b^G = B} IBr(b)` に入る」= (5.2) の対偶を block の族に渡したもの。2 段で組む:
+
+  - [ ] **(a) (5.2) の block 形**。今の `generalizedDecompositionNumber_eq_zero` は witness `w` と
+        `hσB` (= `f_B` が `V` を潰す) を**仮説**で取っている。これを block 言語に包む:
+        `exists_inducedBlock_witness` (= (5.6)) が `w` の 4 条件を
+        「`fB`/`fb` が持ち上げられた block 冪等元 + `λ_B = λ_b^G`」から出すので、
+        それを内部で呼ぶ wrapper を書く。`hj` (= `φ_j ∈ IBr(b)`) も
+        `blockCharacterPi (centerReduce φ fb) = Pi.single b 1` から出る。
+        ⟹ 仮説は「block データ + `f_B` が `V` を潰す」だけになる。
+  - [ ] **(b) (5.8) 本体**。`χ ∈ Irr(B)` (= `blockOfLattice = B`) と `b'^G ≠ B` から
+        (3.13.a) `apply_eq_zero_of_blockOfLattice_ne` で `f_{b'^G}` が格子を潰す ⟹ (a) が使える。
+        ⚠ ここで初めて **`hEnd` (絶対既約性) が要る** — `blockOfLattice` の定義が使うため。
+        `BlockOfLattice.lean` と同じく `hEnd` を仮説に並べる方式でよい。
+  - [ ] (5.10)/(5.11)/(5.12)/(5.13) は `Irr(B)` の**族**と類関数の `B`-部分 `θ_B`、
+        第二直交関係、`p`-section が要る。(5.8) より重い足場なので後回し。
 - [ ] **99: 🎯 第三主定理 `(6.7)`** — Okuyama の証明 ((6.1)–(6.6) 経由、非常に一般な形)
 - [ ] **100: `(6.10)` `ker(B) = O_{p'}(ker χ)` → `(6.12)` → 🎯 `(6.13)`**
       (normal `p`-complement ⟺ `IBr(B₀)` 単元、Cartan 行列 `(|G|_p)`)
