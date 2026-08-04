@@ -200,6 +200,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrrCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ProjectiveCharacterVanishing
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularClassIndex
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
@@ -15978,3 +15979,16 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.RepresentationTheory.Modular.algebraMap_sum_projectiveIndecomposableCharacter_mul_inv
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.projectiveIndecomposableCharacter_eq_zero
+
+/-! **`IBr(G)` を p-正則類で添字づける**
+(`GroupTheory.RepresentationTheory.Modular.PRegularClassIndex`). Navarro (2.13) の締めが
+正方行列問題になるための土台。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_eq_card_pRegularClass
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.equivPRegularClass
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.isPRegular_pRegularRep
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.pRegularRep_isConj_iff
