@@ -548,6 +548,18 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
 定式化では不要になる)。そのあと `mod 𝔪` で `Z(kG)` の中心指標 = ブロックが決まる。
 
 - [ ] **93: `𝒪`-側の中心指標 → `Irr(G) → Bl(G)` の block 写像** (上記; Cartan 行列の上流)
+  - [x] **整数性の核** — 完了 (2026-08-04、`Modular/LatticeCentralCharacter.lean`)。
+        🎯 `eq_smul_of_baseChange_eq_smul`: 自由 `𝒪`-加群の自己準同型が base change で
+        `c • id` なら `c` は初めから `𝒪` に入り、写像は既にその `𝒪`-スカラー。
+        ⟹ **Navarro が引く「`ω_χ(K̂)` は代数的整数」(Isaacs Characters (3.7)) が不要になる**。
+        + `smul_id_injective` (スカラーの一意性) + `exists_smul_id_of_mem_center`。
+  - [ ] `hscalar` (base change が `K`-スカラー) を Schur で discharge。
+        `K` が `K[G]` を分裂させるときの標準事実。repo の
+        `Algebra/CentralCharacter.lean` の `exists_scalar_of_mem_center` が
+        「行列積への全射」の形で既に持っているので、`K`-側の Wedderburn 分解と繋ぐ。
+  - [ ] `ω : Z(𝒪G) →+* 𝒪` の AlgHom 化 (一意性から加法性・乗法性)
+  - [ ] `mod 𝔪` → `λ_χ : Z(kG) → k` → `BlockIdempotent.lean` の `blockSetoid` と接続。
+        Navarro (3.3) 「`d_{χφ} ≠ 0` ⟹ `λ_χ = λ_φ`」が block 写像の well-defined 性
 - [ ] **94: Cartan 行列 `C = DᵀD`** + `([φ,θ]⁰)` が逆行列であること ((7.6) が使う)
 - [ ] **95: Brauer 対応 `b^G`** (段 88–91 の `Br_P` / defect group から。
       `(5.6)`/`(5.7)` = `b^G` の well-defined 性)
