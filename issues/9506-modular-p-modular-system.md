@@ -1315,8 +1315,21 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         ⚠ **教訓**: 「repo に無い」と判断する前に、記法 (`MonoidAlgebra.lift _ _ _ 1`) と
         概念名 (`aug`) の**両方**で grep すること — 今回 `augmentation` だけで grep して
         `aug` を見落とした ([[grep-concept-names-not-book-notation]] の再発)。
-  - [ ] (b) **🎯 `b_0^G = B_0`** (第三主定理の易しい向き): 上の数え上げ。
-        `Br_P` の像の添加が `|K ∩ C_G(P)|*` であること + `card_modEq_card_fixedPoints`。
+  - [ ] (b) **🎯 `b_0^G = B_0`** (第三主定理の易しい向き)。
+    - [x] **数え上げ — 完了 (2026-08-05、`ClassCentralizerCount.lean`)**。
+          🎯 `card_conjClass_modEq_card_centralizer`: `|K| ≡ |K ∩ C_G(P)| (mod p)`。
+          `P` の共役作用の固定点が `K ∩ C_G(P)` (`mem_fixedPoints_conjClassCarrier_iff`) +
+          `IsPGroup.card_modEq_card_fixedPoints`。
+    - [ ] **残り = 配線**。使う既存補題は特定済み:
+          * `inducedCentralCharacterAlgHom_toLinearMap` + `inducedCentralCharacter_classSumCenter`
+            ⟹ `λ_b^G(K̂) = λ_b(truncClassSumCenter H K)`
+          * `blockCharacter_truncClassSumCenter_eq` (= Navarro (4.14) 前半) ⟹
+            `λ_b(trunc) = λ_b(centralizerTrunc)` — `H`-切断でなく `C_G(P)`-切断で読める
+          * `blockCharacter_principalBlock` ⟹ `b = b_0` なら `λ_b = aug`
+          * `aug_classSumCenter` の `H` 版 ⟹ `aug(centralizerTrunc) = |K ∩ C_G(P)|·1`
+          * `CharP.natCast_eq_natCast` で上の合同式を `k` の等式に
+          * `Z(kG)` の類和基底 (`centerBasis`) 上で 2 つの AlgHom が一致 ⟹
+            `blockOfCentralCharacter` の一意性 (`eq_blockOfCentralCharacter`) で結論。
   - [ ] (c) 逆向き (`b^G = B_0 ⟹ b = b_0`) は Okuyama or 古典的 Brauer の証明が要る。
         height 理論の投資判断は (b) 完了後に改めて行う。
 - [ ] **100: `(6.10)` `ker(B) = O_{p'}(ker χ)` → `(6.12)` → 🎯 `(6.13)`**
