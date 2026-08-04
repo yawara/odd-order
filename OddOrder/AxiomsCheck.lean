@@ -208,6 +208,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.TruncClassSum
 import OddOrder.Algebra.CentralCharacterBlock
 import OddOrder.Algebra.ClassSumOffCentralizer
 import OddOrder.Algebra.JacobsonCentralSubring
+import OddOrder.Algebra.IdempotentLift
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerTruncation
@@ -16127,3 +16128,15 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.algebraMap_mem_ringJacobson
 #assert_only_allowed_axioms
   OddOrder.algebraMap_maximalIdeal_mem_ringJacobson
+
+/-! **Henselian イデアルに沿った冪等元の持ち上げ** (`Algebra.IdempotentLift`) —
+`𝒪G` の block 冪等元を得るための一段. -/
+
+#assert_only_allowed_axioms
+  OddOrder.isUnit_two_mul_sub_one_of_sub_mem
+#assert_only_allowed_axioms
+  OddOrder.exists_isIdempotentElem_sub_mem
+#assert_only_allowed_axioms
+  OddOrder.eq_of_isIdempotentElem_of_sub_mem
+#assert_only_allowed_axioms
+  OddOrder.existsUnique_isIdempotentElem_sub_mem

@@ -11,6 +11,7 @@ import OddOrder.Algebra.CentralCharacter
 import OddOrder.Algebra.BlockOfSimpleModule
 import OddOrder.Algebra.PGroupOrbitSum
 import OddOrder.Algebra.JacobsonCentralSubring
+import OddOrder.Algebra.IdempotentLift
 import OddOrder.Algebra.RelativeTrace
 import OddOrder.Algebra.GroupAlgebraConjugation
 import OddOrder.Algebra.BrauerHomomorphism

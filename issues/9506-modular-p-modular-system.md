@@ -864,10 +864,20 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         * mathlib の `HenselianLocalRing` は**単根の持ち上げのみ** (`TFAE` の 3 条件とも
           root lifting の言い換え)。**Hensel の因数分解補題**も「henselian 局所環上の
           有限代数は局所環の積」も無い。
-        ⟹ **次の作業 = 「henselian 局所環 `𝒪` 上 module-finite な可換環 `C` について
-        `C → C/𝔪C` で冪等元が持ち上がる」を作る** (Hensel 因数分解経由)。
-        `C = Z(𝒪G)` は類和を基底とする**自由** `𝒪`-加群なので適用できる。
-        複数 file になる見込み。(3.13)/(3.31) も同じ前提に乗る。
+        - [x] **冪等元の持ち上げ = 根の持ち上げに帰着した** (`Algebra/IdempotentLift.lean`)。
+              🎯 `isUnit_two_mul_sub_one_of_sub_mem` / 🎯🎯 `exists_isIdempotentElem_sub_mem` /
+              🎯 `eq_of_isIdempotentElem_of_sub_mem` (一意性) /
+              🎯 `existsUnique_isIdempotentElem_sub_mem`。
+              近似冪等元 `c` (`c² - c ∈ I`) は `X² - X` の**単根**である —
+              `(2c-1)² = 4(c²-c) + 1 ≡ 1 (mod I)` なので導関数 `2c-1` は法 `I` で自分自身が
+              逆元。よって mathlib の `HenselianRing.is_henselian` がそのまま使える。
+              完備性は一切不要。一意性は `d = e - f` が `d³ = d` を満たし
+              `d ∈ I ≤ J(R)` から `d² - 1` が単元になることから。
+        - [ ] **残る隘路 = `HenselianRing C (𝔪·C)`** (`C = Z(𝒪G)`)。
+              `jac` フィールド (`𝔪C ≤ J(C)`) は上の (5.3) 局所版で済んでいるので、
+              **欠けているのは `C[X]` の根の持ち上げだけ**。これは
+              「henselian 局所環上 module-finite な代数は henselian pair」
+              (Stacks 04GG / 0DYD) で、mathlib に無い。次はここ。
   - [ ] **(5.5)** / **(5.6)** / **(5.7)**。
         (5.7) は `⟨h⟩` の `supp(w)` への軌道が長さ `p` の倍数であること + 固有空間の
         次元比較 (乗算 `s` が単射) という組み合わせ論 + 線型代数。
