@@ -929,11 +929,17 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         「係数が共役類上定数」なので明らか) / `centerReduce : Z(𝒪G) →+* Z(FG)` /
         🎯 `mem_centerIdeal_iff_centerReduce_eq_zero`。
         block 指標は `Z(FG)` の元にしか適用できないので、(5.5)–(5.7) にはこの形が要る。
-  - [ ] **次: (5.5) の組み立て**。標数 `p` 側の corner 逆元 `ȳ` を `centerLift` で
-        `Z(𝒪G)` へ持ち上げて `w` とし、`f_B - (f_B x) w` が核に入ることを
-        `mem_centerIdeal_iff_centerReduce_eq_zero` で見て
-        `exists_corner_inverse_of_approx` を当てる。部品は全て揃っており配線のみ。
-        必要な instance = `Module.Finite 𝒪 Z(𝒪G)` (類和基底) と `Nontrivial Z(𝒪G)`。
+  - [x] **(5.5)** — 完了 (`Algebra/BlockCornerLift.lean`)。
+        🎯🎯🎯 `exists_corner_inverse_blockCharacter`:
+        `f` が block `c` の冪等元、`x ∈ Z(𝒪G)` が `λ_c(x*) = 1` なら
+        `f x` は corner `f Z(𝒪G)` で可逆。
+        剰余体での corner 逆元 → 持ち上げると近似逆元 → (5.4) で補正、の 3 段。
+        ⚠ `Algebra/CenterIdempotentLift.lean` を「任意の全射 `φ : 𝒪 →+* F` で
+        `RingHom.ker φ = I`」にパラメータ化した — `IsLocalRing.ResidueField` は
+        `abbrev` でなく `def` なので `𝒪 ⧸ 𝔪` に `Field` instance が付かず、
+        block 枠組 (`[Field k]` 要求) と繋がらなかったため。
+  - [ ] **(5.5) の仮説について**: `[IsAdicComplete (maximalIdeal 𝒪) 𝒪]` を要求する
+        (block 冪等元の持ち上げ由来)。一般の henselian `𝒪` への緩和は Stacks 09XI 待ち。
   - [ ] その後 (5.6) → (5.7) → 🎯 (5.2)。
         併せて (3.13) `χ ∉ B ⟹ M f_B = 0` / (3.31) `ψ(f_b z)` も必要。
   - [ ] **(5.5)** / **(5.6)** / **(5.7)**。

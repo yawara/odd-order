@@ -30,35 +30,35 @@ namespace OddOrder
 
 open OddOrder.GroupTheory.CenterClassSum
 
-variable {𝒪 G : Type*} [CommRing 𝒪] [Group G] [Fintype G] [DecidableEq (ConjClasses G)]
-  [Fintype (ConjClasses G)]
-variable (I : Ideal 𝒪)
+variable {𝒪 F G : Type*} [CommRing 𝒪] [CommRing F] [Group G] [Fintype G]
+  [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)]
+variable (I : Ideal 𝒪) (φ : 𝒪 →+* F)
 
 /-- The reduction of the centre, as a ring homomorphism into the reduced group algebra.  Its
 image is central, but for the kernel computation only the ring structure is needed. -/
 noncomputable def centerReduceHom :
-    ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)) →+* MonoidAlgebra (𝒪 ⧸ I) G :=
-  (MonoidAlgebra.mapRingHom G (Ideal.Quotient.mk I)).comp
+    ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)) →+* MonoidAlgebra F G :=
+  (MonoidAlgebra.mapRingHom G φ).comp
     (Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)).val.toRingHom
 
 omit [Fintype G] [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)] in
 @[simp]
 theorem centerReduceHom_apply (w : ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G))) :
-    centerReduceHom I w
-      = MonoidAlgebra.mapRingHom G (Ideal.Quotient.mk I) (w : MonoidAlgebra 𝒪 G) := rfl
+    centerReduceHom φ w
+      = MonoidAlgebra.mapRingHom G φ (w : MonoidAlgebra 𝒪 G) := rfl
 
 -- The finiteness instances are consumed by the class-sum expansion in the proof.
 set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
 /-- **The kernel of the reduction of the centre is the extended ideal.**  One inclusion is that
 `I` reduces to `0`; the other is the class-sum expansion, whose coefficients must land in `I`. -/
-theorem mem_centerIdeal_iff_mapRingHom_eq_zero
+theorem mem_centerIdeal_iff_mapRingHom_eq_zero (hker : RingHom.ker φ = I)
     (w : ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G))) :
-    w ∈ centerIdeal (G := G) I ↔ centerReduceHom I w = 0 := by
+    w ∈ centerIdeal (G := G) I ↔ centerReduceHom φ w = 0 := by
   classical
   constructor
   · intro hw
-    have hle : centerIdeal (G := G) I ≤ RingHom.ker (centerReduceHom (G := G) I) := by
+    have hle : centerIdeal (G := G) I ≤ RingHom.ker (centerReduceHom (G := G) φ) := by
       rw [Ideal.map_le_iff_le_comap]
       intro a ha
       simp only [Ideal.mem_comap, RingHom.mem_ker, centerReduceHom_apply]
@@ -66,12 +66,13 @@ theorem mem_centerIdeal_iff_mapRingHom_eq_zero
           ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G))) : MonoidAlgebra 𝒪 G)
           = a • (1 : MonoidAlgebra 𝒪 G) := by
         rw [Algebra.algebraMap_eq_smul_one]; rfl
-      rw [hval, mapRingHom_smul, (Ideal.Quotient.eq_zero_iff_mem).mpr ha, zero_smul]
+      have haz : φ a = 0 := RingHom.mem_ker.mp (by rw [hker]; exact ha)
+      rw [hval, mapRingHom_smul, haz, zero_smul]
     exact hle hw
   · intro hw
     have hcoeff : ∀ C : ConjClasses G, (w : MonoidAlgebra 𝒪 G).coeff C.out ∈ I := by
       intro C
-      rw [← Ideal.Quotient.eq_zero_iff_mem, ← MonoidAlgebra.coeff_mapRingHom]
+      rw [← hker, RingHom.mem_ker, ← MonoidAlgebra.coeff_mapRingHom]
       rw [centerReduceHom_apply] at hw
       rw [hw]
       rfl
@@ -91,27 +92,27 @@ set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
 /-- **Idempotents of `Z(FG)` lift uniquely to `Z(𝒪G)`.**  This is what produces Navarro's block
 idempotents `f_B ∈ Z(𝒪G)` from the block idempotents `e_B ∈ Z(FG)`. -/
-theorem existsUnique_isIdempotentElem_mapRingHom_eq (hG : Finite G)
-    {z : MonoidAlgebra (𝒪 ⧸ I) G} (hzc : z ∈ Subalgebra.center (𝒪 ⧸ I) (MonoidAlgebra (𝒪 ⧸ I) G))
+theorem existsUnique_isIdempotentElem_mapRingHom_eq (hφ : Function.Surjective φ)
+    (hker : RingHom.ker φ = I) (hG : Finite G)
+    {z : MonoidAlgebra F G} (hzc : z ∈ Subalgebra.center F (MonoidAlgebra F G))
     (hz : z * z = z) :
     ∃! e : ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)),
-      IsIdempotentElem e ∧ centerReduceHom I e = z := by
+      IsIdempotentElem e ∧ centerReduceHom φ e = z := by
   classical
-  obtain ⟨c, hcmem, hc⟩ :=
-    exists_mem_center_mapRingHom_eq (G := G) Ideal.Quotient.mk_surjective hzc
+  obtain ⟨c, hcmem, hc⟩ := exists_mem_center_mapRingHom_eq (G := G) hφ hzc
   set cc : ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)) := ⟨c, hcmem⟩ with hcc
-  have hccred : centerReduceHom I cc = z := hc
+  have hccred : centerReduceHom φ cc = z := hc
   have happrox : cc * cc - cc ∈ centerIdeal (G := G) I := by
-    rw [mem_centerIdeal_iff_mapRingHom_eq_zero, map_sub, map_mul, hccred, hz, sub_self]
+    rw [mem_centerIdeal_iff_mapRingHom_eq_zero I φ hker, map_sub, map_mul, hccred, hz, sub_self]
   obtain ⟨e, ⟨he, hec⟩, huniq⟩ :=
     existsUnique_isIdempotentElem_centerGroupAlgebra (G := G) I hG happrox
   refine ⟨e, ⟨he, ?_⟩, fun e' he' => ?_⟩
-  · have hzero : centerReduceHom I (e - cc) = 0 :=
-      (mem_centerIdeal_iff_mapRingHom_eq_zero I _).mp hec
+  · have hzero : centerReduceHom φ (e - cc) = 0 :=
+      (mem_centerIdeal_iff_mapRingHom_eq_zero I φ hker _).mp hec
     rw [map_sub, hccred, sub_eq_zero] at hzero
     exact hzero
   · refine huniq e' ⟨he'.1, ?_⟩
-    rw [mem_centerIdeal_iff_mapRingHom_eq_zero, map_sub, he'.2, hccred, sub_self]
+    rw [mem_centerIdeal_iff_mapRingHom_eq_zero I φ hker, map_sub, he'.2, hccred, sub_self]
 
 /-! ### The reduction as a map of centres
 
@@ -145,36 +146,35 @@ theorem mapRingHom_mem_center (f : k →+* k') {w : MonoidAlgebra k G}
 /-- **The reduction of centres** `Z(𝒪G) →+* Z(FG)`. -/
 noncomputable def centerReduce :
     ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)) →+*
-      ↥(Subalgebra.center (𝒪 ⧸ I) (MonoidAlgebra (𝒪 ⧸ I) G)) where
-  toFun w := ⟨centerReduceHom I w, mapRingHom_mem_center _ w.2⟩
-  map_one' := Subtype.ext (map_one (centerReduceHom I))
-  map_mul' _ _ := Subtype.ext (map_mul (centerReduceHom I) _ _)
-  map_zero' := Subtype.ext (map_zero (centerReduceHom I))
-  map_add' _ _ := Subtype.ext (map_add (centerReduceHom I) _ _)
+      ↥(Subalgebra.center F (MonoidAlgebra F G)) where
+  toFun w := ⟨centerReduceHom φ w, mapRingHom_mem_center _ w.2⟩
+  map_one' := Subtype.ext (map_one (centerReduceHom φ))
+  map_mul' _ _ := Subtype.ext (map_mul (centerReduceHom φ) _ _)
+  map_zero' := Subtype.ext (map_zero (centerReduceHom φ))
+  map_add' _ _ := Subtype.ext (map_add (centerReduceHom φ) _ _)
 
 omit [Fintype G] [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)]
   [IsAdicComplete I 𝒪] in
 @[simp]
 theorem coe_centerReduce (w : ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G))) :
-    ((centerReduce I w : ↥(Subalgebra.center (𝒪 ⧸ I) (MonoidAlgebra (𝒪 ⧸ I) G))) :
-        MonoidAlgebra (𝒪 ⧸ I) G)
-      = centerReduceHom I w := rfl
+    ((centerReduce φ w : ↥(Subalgebra.center F (MonoidAlgebra F G))) : MonoidAlgebra F G)
+      = centerReduceHom φ w := rfl
 
 -- The finiteness instances are consumed through the kernel description.
 omit [IsAdicComplete I 𝒪] in
 set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
 /-- The kernel of `centerReduce` is again `I·Z(𝒪G)`. -/
-theorem mem_centerIdeal_iff_centerReduce_eq_zero
+theorem mem_centerIdeal_iff_centerReduce_eq_zero (hker : RingHom.ker φ = I)
     (w : ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G))) :
-    w ∈ centerIdeal (G := G) I ↔ centerReduce I w = 0 := by
-  rw [mem_centerIdeal_iff_mapRingHom_eq_zero]
+    w ∈ centerIdeal (G := G) I ↔ centerReduce φ w = 0 := by
+  rw [mem_centerIdeal_iff_mapRingHom_eq_zero I φ hker]
   constructor
   · intro h; exact Subtype.ext (by rw [coe_centerReduce, h]; rfl)
   · intro h
-    have := congrArg (fun z : ↥(Subalgebra.center (𝒪 ⧸ I) (MonoidAlgebra (𝒪 ⧸ I) G)) =>
-      (z : MonoidAlgebra (𝒪 ⧸ I) G)) h
-    rwa [coe_centerReduce] at this
+    have hv := congrArg (fun z : ↥(Subalgebra.center F (MonoidAlgebra F G)) =>
+      (z : MonoidAlgebra F G)) h
+    rwa [coe_centerReduce] at hv
 
 end Center
 
