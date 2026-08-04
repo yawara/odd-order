@@ -1430,8 +1430,14 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               `ω_j(w)χ_j(1) = ∑_g w(g)χ_j(g)` に第一直交関係を食わせるだけ) /
               🎯 `apply_ordinaryIdempotent` (`e(e_{χ_i}) = Pi.single i 1`)。
               ⟹ `a_B(K̂)` の出どころ (`e_B` は `Irr(B)` 上の `e_χ` の和の還元)。
-              残り = `e_B = (Σ_{χ∈Irr(B)} e_χ)` の還元、類の defect `d(K)` の付値計算、
-              そして (4.19) の組み立て。
+              [x] **完全直交族 + スペクトル分解も完了 (2026-08-05)**:
+              `ordinaryIdempotent_mul` / `isIdempotentElem_ordinaryIdempotent` /
+              🎯 `sum_ordinaryIdempotent` (`∑_i e_{χ_i} = 1`) /
+              🎯🎯 `eq_sum_centralScalar_smul_ordinaryIdempotent` (**`z = ∑_i ω_i(z) e_{χ_i}`**)。
+              ⚠ 後者は「**通常側の Robinson 写像は恒等写像**」ということ (`Z(K[G])` が
+              半単純だから)。剰余体側で恒等でなくなる分が (4.23) の中身。
+              残り = `e_B = (Σ_{χ∈Irr(B)} e_χ)` の還元 (= ブロック冪等元の整数性、Ch.3)、
+              類の defect `d(K)` の付値計算、そして (4.19) の組み立て。
           * [ ] (3.32) `u_χ f_B` の補題 ⟹ `λ_B(Ĝ⁰) = 0` (`B ≠ B₀`)。
             `λ_{B₀}(Ĝ⁰) = |G⁰|*` は既存の `aug` + `not_dvd_card_isPRegular` で済む。
           ⟹ **見通し**: (4.19) が 2-3 段、(4.23)+(3.32)+(6.14)+(6.1) で 3-4 段。
