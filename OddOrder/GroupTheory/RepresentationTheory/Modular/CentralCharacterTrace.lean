@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.RepresentationTheory.Character
 import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
 
 /-!
 # The central character of a class sum, read off the character
@@ -27,6 +28,8 @@ runs on.
 * `OddOrder.RepresentationTheory.Modular.trace_apply_single` — `χ_i(g)` is the matrix trace
 * `OddOrder.RepresentationTheory.Modular.centralScalar_mul_character_one` — for any central `w`
 * `OddOrder.RepresentationTheory.Modular.centralScalar_classSum_mul_character_one`
+* `OddOrder.RepresentationTheory.Modular.centralScalar_classSum_mul_character_one_out` —
+  `ω_i(K̂) χ_i(1) = |K| χ_i(x_K)`
 * `OddOrder.RepresentationTheory.Modular.centralScalar_mul` — multiplicativity on the centre
 * `OddOrder.RepresentationTheory.Modular.sum_centralScalar_mul_character_eq_card_mul_coeff` —
   Burnside's class-multiplication formula
@@ -115,6 +118,40 @@ theorem centralScalar_classSum_mul_character_one (C : ConjClasses G) :
   by_cases h : ConjClasses.mk g = C
   · rw [if_pos h, if_pos h, one_mul]
   · rw [if_neg h, if_neg h, zero_mul]
+
+open scoped Classical in
+/-- **`ω_i(K̂) · χ_i(1) = |K| · χ_i(x_K)`.**  The character is constant on the class, so the sum
+`∑_{g ∈ K} χ_i(g)` is `|K|` copies of its value at a representative.  This is the form in which
+Navarro's `p^{a-d(K)}` normalisation extracts the `p`-part of `|K|`. -/
+theorem centralScalar_classSum_mul_character_one_out (C : ConjClasses G) :
+    MatrixModule.centralScalar e.toAlgHom.toRingHom i (classSum C)
+        * (wedderburnRepresentation e i).character 1
+      = (OddOrder.RepresentationTheory.conjugacyClassSize C : K)
+        * (wedderburnRepresentation e i).character C.out := by
+  classical
+  rw [centralScalar_classSum_mul_character_one e i C]
+  have hmk : ConjClasses.mk C.out = C := by
+    rw [← ConjClasses.quotient_mk_eq_mk, Quotient.out_eq]
+  have hterm : ∀ g : G,
+      (if ConjClasses.mk g = C then (wedderburnRepresentation e i).character g else 0)
+        = if ConjClasses.mk g = C then (wedderburnRepresentation e i).character C.out else 0 := by
+    intro g
+    by_cases hg : ConjClasses.mk g = C
+    · rw [if_pos hg, if_pos hg]
+      exact character_eq_of_isConj (wedderburnRepresentation e i)
+        (ConjClasses.mk_eq_mk_iff_isConj.mp (hg.trans hmk.symm))
+    · rw [if_neg hg, if_neg hg]
+  rw [Finset.sum_congr rfl fun g _ => hterm g, Finset.sum_ite, Finset.sum_const_zero, add_zero,
+    Finset.sum_const, nsmul_eq_mul]
+  congr 1
+  have hcard : (Finset.univ.filter (fun g : G => ConjClasses.mk g = C)).card
+      = OddOrder.RepresentationTheory.conjugacyClassSize C := by
+    rw [OddOrder.RepresentationTheory.conjugacyClassSize, Nat.card_eq_fintype_card,
+      ← Set.toFinset_card]
+    refine congrArg Finset.card (Finset.ext fun g => ?_)
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Set.mem_toFinset,
+      ConjClasses.mem_carrier_iff_mk_eq]
+  rw [hcard]
 
 /-! ### Burnside's class-multiplication formula -/
 
