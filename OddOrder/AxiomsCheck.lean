@@ -195,6 +195,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
@@ -15901,3 +15902,13 @@ not depend on the invariant lattice used to compute them. -/
   OddOrder.RepresentationTheory.Modular.eq_decompositionMatrix
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.decompositionMatrix_eq_of_invariant_lattice
+
+/-! **The Cartan matrix `C = DᵀD` and the projective indecomposable characters**
+(`GroupTheory.RepresentationTheory.Modular.CartanMatrix`, Navarro p. 25, issue 9506 段 94). -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.algebraMap_ordinaryCharacter
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.cartanMatrix_comm
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.projectiveIndecomposableCharacter_eq_sum_cartanMatrix
