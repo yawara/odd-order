@@ -1417,7 +1417,7 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               `classDefect p C = ν_p(|C_G(x_K)|)` / 🎯
               `classDefect_add_factorization_conjugacyClassSize` (**`d(K) + ν_p(|K|) = ν_p(|G|)`**)
               / `ordProj_conjugacyClassSize_mul_pow_classDefect` (`|K|_p · p^{d(K)} = |G|_p`)。
-          * [ ] (4.23) `R(z) = π(Ĝ_p z)`。
+          * [x] 🎯🎯🎯 **(4.23) `R(z) = π(Ĝ_p z)` 完了 (2026-08-05)**。
             - [x] **組合せ半分 完了 (2026-08-05、`GroupTheory/SylowCosetPairs.lean`)**:
               🎯 `factorThroughEquivCosetPairs` (`(x,y) ↦ (xy,y)` が
               `{(x,y) : x ∈ P, y ∈ T, xy ∈ S}` と
@@ -1554,9 +1554,24 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               **`|G|_{p'}*·(Ĝ_p·L̂)*(x_K) = ∑_B λ_B(L̂)·∑_{χ∈Irr(B)}(χ(x_K⁻¹)·dim V_χ^S)*`**
               (`|Syl_p| → 1` = Sylow 第三定理、`W → Ĝ_p` = (4.22)、
               `∑_{Irr(G)}` は `blockOfIrr` の fiber ごとにまとまる)。
-              残り = (iv) p.93 の評価
-              `∑_{χ∈Irr(B)} χ(x_K⁻¹)·dim V_χ^S = |G|_{p'}·(f_B)_{x_K}` を入れて
-              `|G|_{p'}*` を約す ⟹ `(Ĝ_p L̂)*(x_K) = ∑_B λ_B(L̂)(e_B)_{x_K}` = (4.23)。
+              [x] 🎯🎯🎯 **(4.23) 完成 (2026-08-05、`Modular/SylowSumReduction`)**:
+              `coeff_pElementSum_mul_classSum` —
+              **`(Ĝ_p·L̂)(x_C) = ∑_B λ_B(L̂)·e_B(x_C)`**。
+              最後の 2 段 = p.93 の評価
+              (`sum_block_character_mul_finrank_invariants`:
+              `∑_{χ∈Irr(B)} χ(y⁻¹)·dim V_χ^S = |G|_{p'}·(∑_{χ∈Irr(B)} e_χ)(y)`。
+              `|S|` を掛けて `∑_{x∈S}χ(x) = |S|dim V^S` で開き、p.93 の崩壊
+              `sum_pSubgroup_sum_block_character` で `x ≠ 1` を消す。右辺は
+              `(e_χ)_y = (χ(1)/|G|)χ(y⁻¹)` と `|G| = |S||G|_{p'}`) と、その `𝒪` 版
+              (`ordCompl_mul_coeff_blockIdempotentLift`、
+              `mapRingHom_blockIdempotent_eq_sum` で `f_B ↦ ∑_{Irr(B)} e_χ`)。
+              ⟹ 両辺に `|G|_{p'}*` が立ち、`p ∤ |G|_{p'}` ゆえ剰余体で約せる。
+              ⚠ **`ℚ` に一度も出ない 5 段構成**になった (Navarro は p.92-93 で 2 回割る)。
+              ⚠ ブロック冪等元の持ち上げ族 `F`/`F'` と弱ブロック直交性 `hweak` は仮説として
+              パラメータ化 ((5.11) は `C_G(g_p)` の分裂データを運ぶので展開すると
+              statement が使えなくなる — `sum_pSubgroup_sum_block_character` と同じ設計)。
+              `hweak` は `C` が p-正則なら (5.11) から出る
+              (`pPart p x_C⁻¹ = 1 ≠ x = pPart p x`)。
               ⚠ **設計上の注意 (2026-08-05 に検算)**: `Ĝ_p` を使って
               `|G|(Ĝ_p L̂)_g = ∑_i ω_i(L̂)(∑_{x∈G_p}χ_i(x))χ_i(g⁻¹)` と書く道もあるが、
               左辺の `|G|` に `p` が残るので還元で潰れる。**単一の Sylow `S` を使って
