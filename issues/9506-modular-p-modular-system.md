@@ -611,18 +611,29 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         🎯 `asAlgebraHom_reduction_mapRingHom` (`Modular/Reduction.lean`):
         還元は群の元だけでなく群環の作用全体と両立する。中心指標を下へ運ぶ足場。
 
+  - [x] **単純加群 → ブロック** — 完了 (2026-08-04、`Algebra/BlockOfSimpleModule.lean`)。
+        🎯 `exists_eq_centralCharacterAlg_of_forall_smul_eq`。
+        ⚠ 仮説は `algebraMap k A c • m` の形 (`M` は自前の `k`-構造を持たず、
+        `A`-線型同値は `A`-作用しか尊重しないため)。
+  - [x] **スカラー作用が部分表現へ降りる** — 完了 (2026-08-04、`MinimalSubrepresentation.lean`)。
+        🎯 `coe_subrepresentation_asAlgebraHom` (部分表現は群環の作用全体の制限を担う) +
+        🎯 `subrepresentation_asAlgebraHom_eq_smul`。
+
 ### 次にやること (2026-08-04 時点の frontier)
 
-段 93 の**数学的な中身は両端とも証明済み**。残るのは接続の plumbing 1 本:
+**段 93 の部品は 4 つとも揃った。残るのは組み立て 1 本。**
 
-- [ ] **還元 `k ⊗ L` の単純構成因子を Wedderburn 添字として取り出す**。
-      これがあれば `λ_χ = centralCharacterAlg π i` が両端の合成で出て、
-      `Irr(G) → Bl(G)` の block 写像が閉じる (= Navarro (3.1)(3.3))。
-      素材: `Modular/MinimalSubrepresentation.lean` (極小不変部分空間) /
-      `Modular/AsModuleSimple.lean` (`isSimpleModule_asModule`) /
-      `Modular/IrreducibleIsBlock.lean` (⚠ これは **Brauer 指標**の等式を返す形で、
-      中心指標用の hook ではない — 2026-08-04 実測)。
-      `Algebra/PiMatrixSimpleModules.lean` の `blockModule` と繋ぐ。
+- [ ] 4 部品を繋いで `∃ i, λ_χ = centralCharacterAlg π i` を出す:
+      1. `exists_minimal_invariant` (極小不変部分空間 `W`)
+      2. `isSimpleModule_subrepresentation_of_minimal` (`W` の部分表現が単純)
+      3. `subrepresentation_asAlgebraHom_eq_smul` (`λ` が `W` へ降りる)
+      4. `exists_eq_centralCharacterAlg_of_forall_smul_eq` (単純加群 → ブロック)
+      ⚠ 注意点 2 つ: **(a)** `Representation.asModule` の `smul` と `asAlgebraHom` の
+      対応を経由する必要がある。**(b)** `ker π ≤ Module.annihilator` は
+      `ker π = J(kG)` + `IsSemisimpleModule.jacobson_le_annihilator` で出る
+      (`BrauerDecomposition.lean` に同じ使い方の前例あり)。
+      素材の所在: `Modular/IrreducibleIsBlock.lean` は **Brauer 指標**の等式を返す形で
+      中心指標用の hook では**ない** (2026-08-04 実測、探し直さないこと)。
 
 そのあと段 94 (Cartan 行列) 以降へ。
 - [ ] **94: Cartan 行列 `C = DᵀD`** + `([φ,θ]⁰)` が逆行列であること ((7.6) が使う)
