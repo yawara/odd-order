@@ -16884,3 +16884,5 @@ Navarro (4.19) がブロックごとに再編する係数 `a_B(K̂)` の正体�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_pSubgroup_coeff_classSum_mul
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.ordCompl_mul_sum_sylow_coeff_classSum_mul

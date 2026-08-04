@@ -27,6 +27,8 @@ statement holds over the splitting field with no valuation bookkeeping.
 ## Main results
 
 * `OddOrder.RepresentationTheory.Modular.sum_pSubgroup_coeff_classSum_mul`
+* `OddOrder.RepresentationTheory.Modular.ordCompl_mul_sum_sylow_coeff_classSum_mul` — with the
+  `p`-part cancelled
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -75,5 +77,38 @@ theorem sum_pSubgroup_coeff_classSum_mul (P : Subgroup G) [Fintype ↥P] (C D : 
     exact Finset.sum_congr rfl fun x _ => rfl
   rw [hinv, OddOrder.RepresentationTheory.sum_character_eq_card_mul_finrank_invariants]
   ring
+
+/-! ### Cancelling the `p`-part -/
+
+set_option maxHeartbeats 800000 in
+-- The Sylow cardinality and the cancellation are done under the same instance chains.
+/-- **Navarro (4.19), with the `p`-part cancelled.**  For a Sylow `p`-subgroup `S` the two `p^a`
+factors in `sum_pSubgroup_coeff_classSum_mul` cancel, leaving
+
+`|G|_{p'} · |Ω_{K,L}| = ∑_χ ω_χ(K̂) ω_χ(L̂') χ(1) · dim V_χ^S`,
+
+an identity between elements of the valuation ring with no `p` in sight.  This is the form in
+which Navarro's `|Ω_{K,L}|/p^{a-d(K)}` normalisation is used. -/
+theorem ordCompl_mul_sum_sylow_coeff_classSum_mul {p : ℕ} [Fact p.Prime] (S : Sylow p G)
+    [Fintype ↥(S : Subgroup G)] (C D : ConjClasses G) :
+    ((ordCompl[p] (Nat.card G) : ℕ) : K)
+        * ∑ x : ↥(S : Subgroup G), (classSum (k := K) C * classSum (k := K) D).coeff (x : G)
+      = ∑ i : ι', MatrixModule.centralScalar e.toAlgHom.toRingHom i (classSum C)
+          * MatrixModule.centralScalar e.toAlgHom.toRingHom i (classSum D)
+          * (wedderburnRepresentation e i).character 1
+          * (Module.finrank K (Representation.invariants
+              ((wedderburnRepresentation e i).comp (S : Subgroup G).subtype)) : K) := by
+  classical
+  have hbase := sum_pSubgroup_coeff_classSum_mul e (S : Subgroup G) C D
+  have hcard : Fintype.card ↥(S : Subgroup G) = ordProj[p] (Nat.card G) := by
+    rw [← Nat.card_eq_fintype_card]
+    exact S.card_eq_multiplicity
+  have hsplit : (Nat.card G : K)
+      = ((ordProj[p] (Nat.card G) : ℕ) : K) * ((ordCompl[p] (Nat.card G) : ℕ) : K) := by
+    rw [← Nat.cast_mul, Nat.ordProj_mul_ordCompl_eq_self]
+  have hne : ((ordProj[p] (Nat.card G) : ℕ) : K) ≠ 0 :=
+    Nat.cast_ne_zero.mpr (pow_ne_zero _ (Fact.out (p := p.Prime)).pos.ne')
+  refine mul_left_cancel₀ hne ?_
+  rw [← mul_assoc, ← hsplit, hbase, hcard]
 
 end OddOrder.RepresentationTheory.Modular
