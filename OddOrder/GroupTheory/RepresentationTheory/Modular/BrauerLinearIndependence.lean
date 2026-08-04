@@ -3,17 +3,22 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.RingTheory.DiscreteValuationRing.Basic
-import Mathlib.RingTheory.Nakayama
+import Mathlib.RingTheory.Valuation.ValuationRing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterIndependence
 
 /-!
 # The irreducible Brauer characters are linearly independent
 
 `mem_maximalIdeal_of_sum_irreducibleBrauerCharacter` says every relation among the `φ_i` on the
-`p`-regular classes has all coefficients in `𝔪`.  Over a discrete valuation ring that upgrades to
-`c = 0`: the relations form a submodule `S` of `ι → 𝒪`, and dividing a relation by a uniformiser
-again gives a relation, so `S ≤ 𝔪 • S`.  Nakayama then forces `S = ⊥`.
+`p`-regular classes has all coefficients in `𝔪`.  Over a valuation ring that upgrades to `c = 0`:
+divisibility is a total relation, so among finitely many coefficients one of them, say `c_j ≠ 0`,
+divides all the others.  Dividing the relation through by `c_j` is again a relation, and its `j`-th
+coefficient is `1` — which the one-step statement says lies in `𝔪`.
+
+The classical argument runs over a *discrete* valuation ring, dividing by a uniformiser and
+invoking Nakayama.  Taking the divisibility-minimal coefficient instead needs neither a uniformiser
+nor Noetherianness, which matters because the splitting `p`-modular system `𝓞_ℂ_[p]`
+(`PadicComplexSystem`) has divisible value group and is not Noetherian.
 
 No representation theory enters here — the input is exactly the one-step statement above.
 
@@ -22,23 +27,47 @@ denominators, which is not recorded here.
 
 ## Main results
 
-* `OddOrder.RepresentationTheory.Modular.eq_zero_of_sum_irreducibleBrauerCharacter`
+* `OddOrder.RepresentationTheory.Modular.exists_dvd_forall_of_valuationRing`
+* `OddOrder.RepresentationTheory.Modular.eq_zero_of_sum_irreducibleBrauerCharacter
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
 
 open IsLocalRing Matrix MonoidAlgebra OddOrder.GroupTheory
 
-variable {p : ℕ} {𝒪 : Type*} [CommRing 𝒪] [IsDomain 𝒪] [IsDiscreteValuationRing 𝒪]
+/-- **A finite family in a valuation ring has a member dividing all of them.**  Divisibility is a
+total relation there, so this is just the existence of a minimum. -/
+theorem exists_dvd_forall_of_valuationRing {R ι : Type*} [CommRing R] [IsDomain R]
+    [ValuationRing R] (c : ι → R) :
+    ∀ s : Finset ι, s.Nonempty → ∃ j ∈ s, ∀ i ∈ s, c j ∣ c i := by
+  classical
+  intro s
+  induction s using Finset.induction_on with
+  | empty => simp
+  | insert a s ha ih =>
+    intro _
+    rcases s.eq_empty_or_nonempty with rfl | hs
+    · exact ⟨a, Finset.mem_insert_self _ _, by simp⟩
+    obtain ⟨j, hj, hjmin⟩ := ih hs
+    rcases ValuationRing.dvd_total (c a) (c j) with h | h
+    · refine ⟨a, Finset.mem_insert_self _ _, fun i hi => ?_⟩
+      rcases Finset.mem_insert.mp hi with rfl | hi
+      · exact dvd_rfl
+      · exact h.trans (hjmin i hi)
+    · refine ⟨j, Finset.mem_insert_of_mem hj, fun i hi => ?_⟩
+      rcases Finset.mem_insert.mp hi with rfl | hi
+      · exact h
+      · exact hjmin i hi
+
+variable {p : ℕ} {𝒪 : Type*} [CommRing 𝒪] [IsDomain 𝒪] [ValuationRing 𝒪]
   [HenselianLocalRing 𝒪] [IsPModularSystem p 𝒪]
 variable {G ι : Type*} [Group G] [Finite G] {nn : ι → Type*}
   [∀ i, Fintype (nn i)] [∀ i, DecidableEq (nn i)] [Fintype ι] [∀ i, Nonempty (nn i)]
 
 /-- **The irreducible Brauer characters are linearly independent on the `p`-regular classes.**
 
-Over a discrete valuation ring the one-step divisibility of
-`mem_maximalIdeal_of_sum_irreducibleBrauerCharacter` becomes `S ≤ 𝔪 • S` for the module `S` of
-relations, and Nakayama kills it. -/
+Take a coefficient `c_j ≠ 0` dividing all the others; then `c_i / c_j` is again a relation, so
+`mem_maximalIdeal_of_sum_irreducibleBrauerCharacter` puts its `j`-th coefficient `1` in `𝔪`. -/
 theorem eq_zero_of_sum_irreducibleBrauerCharacter (hp : p.Prime)
     {ω : ResidueField 𝒪} (hω : IsPrimitiveRoot ω (pRegularExponent p G))
     {B : Type*} [Ring B] [Algebra (ResidueField 𝒪) B]
@@ -50,47 +79,32 @@ theorem eq_zero_of_sum_irreducibleBrauerCharacter (hp : p.Prime)
         (e.toAlgHom.comp π).toRingHom i g = 0) :
     c = 0 := by
   classical
-  -- the relations form a submodule of `ι → 𝒪`
-  set Φ : (ι → 𝒪) →ₗ[𝒪] ({g : G // IsPRegular p g} → 𝒪) :=
-    { toFun := fun d g => ∑ i, d i * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪)
-        (e.toAlgHom.comp π).toRingHom i g.1
-      map_add' := fun u v => by funext g; simp [add_mul, Finset.sum_add_distrib]
-      map_smul' := fun a u => by funext g; simp [Finset.mul_sum, mul_assoc] } with hΦ
-  set S := LinearMap.ker Φ with hS
-  have hmemS : ∀ d : ι → 𝒪, d ∈ S ↔ ∀ g : G, IsPRegular p g →
+  by_contra hc
+  -- some coefficient is nonzero, and among those one divides all the others
+  obtain ⟨i₀, hi₀⟩ := Function.ne_iff.mp hc
+  have hne : (Finset.univ.filter fun i => c i ≠ 0).Nonempty :=
+    ⟨i₀, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hi₀⟩⟩
+  obtain ⟨j, hjmem, hjmin⟩ := exists_dvd_forall_of_valuationRing c _ hne
+  have hcj : c j ≠ 0 := (Finset.mem_filter.mp hjmem).2
+  have hdvdall : ∀ i, c j ∣ c i := by
+    intro i
+    by_cases hi : c i = 0
+    · exact hi ▸ dvd_zero _
+    · exact hjmin i (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hi⟩)
+  choose d hd using hdvdall
+  -- dividing through by `c j` leaves a relation whose `j`-th coefficient is `1`
+  have hdj : d j = 1 := (mul_left_cancel₀ hcj (by rw [← hd j, mul_one])).symm
+  have hdrel : ∀ g : G, IsPRegular p g →
       ∑ i, d i * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪)
         (e.toAlgHom.comp π).toRingHom i g = 0 := by
-    intro d
-    constructor
-    · intro hd g hg
-      exact congrFun hd ⟨g, hg⟩
-    · intro hd
-      funext g
-      exact hd g.1 g.2
-  -- a relation divided by a uniformiser is again a relation
-  obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible 𝒪
-  have hmax : maximalIdeal 𝒪 = Ideal.span {ϖ} := hϖ.maximalIdeal_eq
-  have hstep : S ≤ maximalIdeal 𝒪 • S := by
-    intro d hd
-    have hmem : ∀ i, d i ∈ maximalIdeal 𝒪 := fun i =>
-      mem_maximalIdeal_of_sum_irreducibleBrauerCharacter hp hω hπ hker e d
-        ((hmemS d).mp hd) i
-    choose d' hd' using fun i => Ideal.mem_span_singleton'.mp (hmax ▸ hmem i)
-    have hd'S : d' ∈ S := by
-      refine (hmemS d').mpr fun g hg => ?_
-      have hrel := (hmemS d).mp hd g hg
-      have hfac : ϖ * ∑ i, d' i * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪)
-          (e.toAlgHom.comp π).toRingHom i g = 0 := by
-        rw [Finset.mul_sum, ← hrel]
-        exact Finset.sum_congr rfl fun i _ => by rw [← hd' i]; ring
-      exact (mul_eq_zero.mp hfac).resolve_left hϖ.ne_zero
-    have hdeq : d = ϖ • d' := by funext i; rw [← hd' i]; simp [mul_comm]
-    rw [hdeq]
-    exact Submodule.smul_mem_smul (hmax ▸ Ideal.mem_span_singleton_self ϖ) hd'S
-  -- Nakayama
-  have hSbot : S = ⊥ :=
-    Submodule.eq_bot_of_le_smul_of_le_jacobson_bot _ S (IsNoetherian.noetherian S) hstep
-      (le_of_eq (IsLocalRing.jacobson_eq_maximalIdeal ⊥ bot_ne_top).symm)
-  exact (Submodule.mem_bot _).mp (hSbot ▸ (hmemS c).mpr h)
+    intro g hg
+    have hfac : c j * ∑ i, d i * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪)
+        (e.toAlgHom.comp π).toRingHom i g = 0 := by
+      rw [Finset.mul_sum, ← h g hg]
+      exact Finset.sum_congr rfl fun i _ => by rw [hd i]; ring
+    exact (mul_eq_zero.mp hfac).resolve_left hcj
+  have hmem := mem_maximalIdeal_of_sum_irreducibleBrauerCharacter hp hω hπ hker e d hdrel j
+  rw [hdj] at hmem
+  exact (maximalIdeal.isMaximal 𝒪).ne_top ((Ideal.eq_top_iff_one _).mpr hmem)
 
 end OddOrder.RepresentationTheory.Modular

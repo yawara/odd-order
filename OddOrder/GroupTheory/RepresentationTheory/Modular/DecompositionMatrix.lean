@@ -29,7 +29,7 @@ namespace OddOrder.RepresentationTheory.Modular
 open IsLocalRing Matrix MonoidAlgebra TensorProduct OddOrder.GroupTheory
 
 variable {p : ℕ} {𝒪 : Type*} [CommRing 𝒪] [HenselianLocalRing 𝒪] [IsPModularSystem p 𝒪]
-  [IsDomain 𝒪] [IsPrincipalIdealRing 𝒪]
+  [IsDomain 𝒪] [ValuationRing 𝒪]
 variable {G ι : Type*} [Group G] [Finite G] {nn : ι → Type*}
   [∀ i, Fintype (nn i)] [∀ i, DecidableEq (nn i)] [Fintype ι] [∀ i, Nonempty (nn i)]
 variable {L : Type*} [AddCommGroup L] [Module 𝒪 L] [Module.Free 𝒪 L] [Module.Finite 𝒪 L]

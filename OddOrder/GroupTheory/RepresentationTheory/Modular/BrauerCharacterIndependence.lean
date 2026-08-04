@@ -14,8 +14,8 @@ reduces modulo the maximal ideal to a relation among the block traces
 (`residue_irreducibleBrauerCharacter`), and those are independent
 (`eq_zero_of_sum_blockTrace_pRegular_eq_zero`).  So every coefficient lies in the maximal ideal.
 
-This is the whole content of the linear independence of `IBr(G)`: over a discrete valuation ring
-one then divides by a uniformiser and repeats, so no nonzero relation survives.  The step
+This is the whole content of the linear independence of `IBr(G)`: over a valuation ring one then
+divides by the divisibility-minimal coefficient, so no nonzero relation survives.  The step
 recorded here is the one that carries the representation theory; the descent is arithmetic.
 
 ## Main results

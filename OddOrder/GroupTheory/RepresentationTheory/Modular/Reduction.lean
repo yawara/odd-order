@@ -141,12 +141,12 @@ downstairs. -/
 section Decomposition
 
 variable {p : ℕ} [HenselianLocalRing 𝒪] [IsPModularSystem p 𝒪] [IsDomain 𝒪]
-  [IsPrincipalIdealRing 𝒪]
+  [ValuationRing 𝒪]
 variable [Module.Free 𝒪 L] [Module.Finite 𝒪 L]
 variable {n : ℕ} (hn : ¬ p ∣ n) (hn0 : 0 < n) {ω : 𝒪} (hω : IsPrimitiveRoot ω n)
 include hn hn0 hω
 
-omit [IsDomain 𝒪] [IsPrincipalIdealRing 𝒪] [Module.Free 𝒪 L]
+omit [IsDomain 𝒪] [ValuationRing 𝒪] [Module.Free 𝒪 L]
   [Module.Finite 𝒪 L] hn0 in
 /-- A primitive `n`-th root of unity of `𝒪` stays primitive in the residue field, for `p ∤ n`:
 a smaller power that becomes `1` downstairs was already `1` upstairs, by separatedness. -/
@@ -173,7 +173,9 @@ theorem finrank_eigenspace_baseChange {ζ : 𝒪} (hζ : ζ ∈ nthRootsFinset n
   -- squeeze 1: the base changes of the eigen-submodules have the right dimensions
   have hbc_le : ∀ η ∈ s, Module.finrank k ((Module.End.eigenspace A η).baseChange k)
       ≤ Module.finrank 𝒪 (Module.End.eigenspace A η) := by
-    intro η _
+    intro η hη
+    haveI := free_eigenspace_of_pow (p := p) hn hn0 hω hA hη
+    haveI := finite_eigenspace_of_pow (p := p) hn hn0 hω hA hη
     rw [Submodule.baseChange, ← Module.finrank_baseChange (R := k) (S := 𝒪)
       (M' := Module.End.eigenspace A η)]
     exact LinearMap.finrank_range_le _
@@ -262,7 +264,7 @@ theorem rep_pow_pRegularExponent_eq_one' {p : ℕ} [Finite G] (ρ : Representati
   rw [← map_pow, OddOrder.GroupTheory.pow_pRegularExponent_eq_one hp hg, map_one]
 
 variable {p : ℕ} [HenselianLocalRing 𝒪] [IsPModularSystem p 𝒪] [IsDomain 𝒪]
-  [IsPrincipalIdealRing 𝒪] [Module.Free 𝒪 L] [Module.Finite 𝒪 L]
+  [ValuationRing 𝒪] [Module.Free 𝒪 L] [Module.Finite 𝒪 L]
 variable {n : ℕ} (hn : ¬ p ∣ n) (hn0 : 0 < n) {ω : 𝒪} (hω : IsPrimitiveRoot ω n)
   (ρ : Representation 𝒪 G L)
 include hn hn0 hω

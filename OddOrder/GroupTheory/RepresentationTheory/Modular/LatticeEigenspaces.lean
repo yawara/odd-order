@@ -74,11 +74,29 @@ theorem iSup_eigenspace_eq_top_of_pow [IsDomain 𝒪] {n : ℕ} (hn : ¬ p ∣ n
 
 section Lattice
 
-variable [IsDomain 𝒪] [IsPrincipalIdealRing 𝒪] {n : ℕ} (hn : ¬ p ∣ n) (hn0 : 0 < n)
+variable [IsDomain 𝒪] [ValuationRing 𝒪] {n : ℕ} (hn : ¬ p ∣ n) (hn0 : 0 < n)
   {ω : 𝒪} (hω : IsPrimitiveRoot ω n)
   {L : Type*} [AddCommGroup L] [Module 𝒪 L] [Module.Free 𝒪 L] [Module.Finite 𝒪 L]
   {A : Module.End 𝒪 L} (hA : A ^ n = 1)
 include hn hn0 hω hA
+
+omit [ValuationRing 𝒪] in
+/-- **Each eigen-submodule of a finite-order lattice endomorphism is finitely generated**: it is a
+retract of the lattice. -/
+theorem finite_eigenspace_of_pow {ζ : 𝒪} (hζ : ζ ∈ nthRootsFinset n (1 : 𝒪)) :
+    Module.Finite 𝒪 (A.eigenspace ζ) :=
+  OddOrder.finite_eigenspace_of_separated
+    (separatedNodes_of_pow_eq_one (p := p) hn fun _ ha => (mem_nthRootsFinset hn0 _).mp ha)
+    (prod_X_sub_C_nthRootsFinset_aeval_eq_zero hn0 hω hA) ⟨ζ, hζ⟩
+
+/-- **Each eigen-submodule of a finite-order lattice endomorphism is free.**  Over a valuation
+ring this replaces the classical "submodules of a free module over a PID are free": the
+eigen-submodule is finitely generated and torsion-free, hence flat, hence free. -/
+theorem free_eigenspace_of_pow {ζ : 𝒪} (hζ : ζ ∈ nthRootsFinset n (1 : 𝒪)) :
+    Module.Free 𝒪 (A.eigenspace ζ) :=
+  OddOrder.free_eigenspace_of_separated
+    (separatedNodes_of_pow_eq_one (p := p) hn fun _ ha => (mem_nthRootsFinset hn0 _).mp ha)
+    (prod_X_sub_C_nthRootsFinset_aeval_eq_zero hn0 hω hA) ⟨ζ, hζ⟩
 
 /-- The ranks of the eigen-submodules of a finite-order lattice endomorphism add up to the rank
 of the lattice. -/

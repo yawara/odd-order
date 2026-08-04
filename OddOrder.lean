@@ -23,6 +23,7 @@ import OddOrder.Algebra.MackeyFormula
 import OddOrder.Algebra.Rosenberg
 import OddOrder.Algebra.DefectGroupConjugacy
 import OddOrder.Algebra.GroupAlgebraDefectGroup
+import OddOrder.Algebra.AlgClosedFractionField
 import OddOrder.Algebra.AlgClosedSplitting
 import OddOrder.Algebra.GroupAlgebraBlocks
 import OddOrder.Algebra.BlockIdempotent
@@ -154,6 +155,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleIsBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
 import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularRadical
 import OddOrder.GroupTheory.RepresentationTheory.Modular.Reduction

@@ -34,12 +34,12 @@ namespace OddOrder.RepresentationTheory.Modular
 
 open IsLocalRing Matrix MonoidAlgebra OddOrder.GroupTheory
 
-variable {p : ℕ} {𝒪 : Type*} [CommRing 𝒪] [IsDomain 𝒪] [IsDiscreteValuationRing 𝒪]
+variable {p : ℕ} {𝒪 : Type*} [CommRing 𝒪] [IsDomain 𝒪] [ValuationRing 𝒪]
   [HenselianLocalRing 𝒪] [IsPModularSystem p 𝒪]
 variable {G ι : Type*} [Group G] [Finite G] {nn : ι → Type*}
   [∀ i, Fintype (nn i)] [∀ i, DecidableEq (nn i)] [Fintype ι] [∀ i, Nonempty (nn i)]
 
-omit [IsDomain 𝒪] [IsDiscreteValuationRing 𝒪] [Fintype ι] [∀ i, Nonempty (nn i)] in
+omit [IsDomain 𝒪] [ValuationRing 𝒪] [Fintype ι] [∀ i, Nonempty (nn i)] in
 /-- **A kernel equal to the Jacobson radical is uniformly nilpotent.**  `kG` is a finite
 dimensional algebra over a field, hence Artinian, hence semiprimary, so `J(kG)^N = 0` for a
 single `N`. -/

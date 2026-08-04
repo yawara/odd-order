@@ -192,6 +192,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
@@ -15835,3 +15836,33 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.GAlgebra.exists_mem_relTraceIdeal_of_sum_eq
 #assert_only_allowed_axioms
   OddOrder.GroupAlgebra.brauerProj_ne_zero_of_isDefectGroup
+
+/-! **A splitting `p`-modular system**: the valuation ring `𝓞_ℂ_[p]` of the `p`-adic complex
+numbers (`Algebra.AlgClosedFractionField`,
+`GroupTheory.RepresentationTheory.Modular.PadicComplexSystem`, issue 9507).  Both the fraction
+field and the residue field are algebraically closed, so `K[G]` and `k[G]` both split with no
+appeal to Brauer's splitting field theorem — which `𝕎(𝔽̄_p)` cannot deliver, its fraction field
+missing the `p`-power roots of unity. -/
+
+#assert_only_allowed_axioms
+  OddOrder.exists_isRoot_of_monic
+#assert_only_allowed_axioms
+  OddOrder.exists_isRoot_sub_mem_maximalIdeal
+#assert_only_allowed_axioms
+  OddOrder.isAlgClosed_residueField
+#assert_only_allowed_axioms
+  OddOrder.henselianLocalRing_of_isAlgClosed
+#assert_only_allowed_axioms
+  OddOrder.free_eigenspace_of_separated
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.natCast_mem_maximalIdeal_padicComplexInt
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.instIsPModularSystemPadicComplexInt
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.instIsAlgClosedResidueFieldPadicComplexInt
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_isPrimitiveRoot_padicComplexInt
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_isPrimitiveRoot_residueField_padicComplexInt
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_algEquiv_pi_matrix_padicComplex
