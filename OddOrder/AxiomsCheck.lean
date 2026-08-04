@@ -207,6 +207,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositio
 import OddOrder.GroupTheory.RepresentationTheory.Modular.TruncClassSum
 import OddOrder.Algebra.CentralCharacterBlock
 import OddOrder.Algebra.ClassSumOffCentralizer
+import OddOrder.Algebra.JacobsonCentralSubring
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerTruncation
@@ -16118,3 +16119,9 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.RepresentationTheory.Modular.sum_generalizedDecompositionNumber
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.eq_generalizedDecompositionNumber
+
+/-! **中心部分環の根基** — Navarro (5.3) (`Algebra.JacobsonCentralSubring`)、
+第二主定理 (5.2) の補題連鎖の最上流. -/
+
+#assert_only_allowed_axioms
+  OddOrder.algebraMap_mem_ringJacobson
