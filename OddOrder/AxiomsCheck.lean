@@ -16022,3 +16022,7 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.GroupTheory.CenterClassSum.coeff_truncClassSum
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.CenterClassSum.truncClassSum_mem_center
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.CenterClassSum.centerTrunc_classSumCenter
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.CenterClassSum.inducedCentralCharacter_classSumCenter

@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import OddOrder.GroupTheory.RepresentationTheory.ClassSumCore
+import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
 
 /-!
 # The trace of a `G`-class on a subgroup
@@ -18,20 +18,23 @@ file supplies: `K ∩ H` is stable under `H`-conjugation (conjugating inside `H`
 inside `G`), so the sum is central in `kH` and `λ_b` can be applied to it.
 
 The class sums of `G` are a basis of `Z(kG)` (`CenterClassSum.centerBasis`), so
-`K̂ ↦ ∑_{x ∈ K ∩ H} x` determines a `k`-linear map `Z(kG) → Z(kH)`; that is the next step.
+`K̂ ↦ ∑_{x ∈ K ∩ H} x` determines a `k`-linear map `centerTrunc : Z(kG) → Z(kH)`; composing a
+central character of `H` with it gives Navarro's `λ_b^G`.
 
 ## Main results
 
 * `OddOrder.GroupTheory.CenterClassSum.truncClassSum` — `∑_{x ∈ K ∩ H} x`, as an element of `kH`
 * `OddOrder.GroupTheory.CenterClassSum.coeff_truncClassSum`
 * `OddOrder.GroupTheory.CenterClassSum.truncClassSum_mem_center`
+* `OddOrder.GroupTheory.CenterClassSum.centerTrunc` — the induced linear map `Z(kG) → Z(kH)`
+* `OddOrder.GroupTheory.CenterClassSum.inducedCentralCharacter` — `λ_b^G`
 -/
 
 namespace OddOrder.GroupTheory.CenterClassSum
 
 open scoped MonoidAlgebra
 
-variable {k G : Type*} [CommSemiring k] [Group G] [DecidableEq (ConjClasses G)]
+variable {k G : Type*} [CommRing k] [Group G] [DecidableEq (ConjClasses G)]
 variable (H : Subgroup G) [Fintype H]
 
 /-- **The trace of a `G`-class on a subgroup**: `∑_{x ∈ K ∩ H} x ∈ k[H]`. -/
@@ -94,5 +97,42 @@ theorem truncClassSum_mem_center (C : ConjClasses G) :
       congr 1
       group
     · simp [h0]
+
+/-- The central element `∑_{x ∈ K ∩ H} x` of `k[H]`, bundled into the centre. -/
+noncomputable def truncClassSumCenter (C : ConjClasses G) :
+    ↥(Subalgebra.center k (MonoidAlgebra k H)) :=
+  ⟨truncClassSum H C, truncClassSum_mem_center H C⟩
+
+section Basis
+
+variable [Fintype G] [Fintype (ConjClasses G)]
+
+/-- **The truncation map `Z(kG) → Z(kH)`**, `K̂ ↦ ∑_{x ∈ K ∩ H} x`, defined on the class-sum
+basis of the centre.  It is only `k`-linear — multiplicativity is exactly the condition under
+which the induced block `b^G` is defined, and it does not always hold. -/
+noncomputable def centerTrunc : ↥(Subalgebra.center k (MonoidAlgebra k G)) →ₗ[k]
+    ↥(Subalgebra.center k (MonoidAlgebra k H)) :=
+  (centerBasis (k := k) (G := G)).constr k (truncClassSumCenter (k := k) H)
+
+@[simp]
+theorem centerTrunc_classSumCenter (C : ConjClasses G) :
+    centerTrunc (k := k) H (classSumCenter C) = truncClassSumCenter (k := k) H C := by
+  rw [centerTrunc, ← centerBasis_apply (k := k) (G := G) C, Module.Basis.constr_basis]
+
+/-- **Navarro's induced central character** `λ_b^G = λ_b ∘ centerTrunc`.  When this linear map
+happens to be an algebra homomorphism it is the central character of a unique block `b^G` of `G`,
+the *induced block*. -/
+noncomputable def inducedCentralCharacter
+    (lam : ↥(Subalgebra.center k (MonoidAlgebra k H)) →ₗ[k] k) :
+    ↥(Subalgebra.center k (MonoidAlgebra k G)) →ₗ[k] k :=
+  lam.comp (centerTrunc H)
+
+@[simp]
+theorem inducedCentralCharacter_classSumCenter
+    (lam : ↥(Subalgebra.center k (MonoidAlgebra k H)) →ₗ[k] k) (C : ConjClasses G) :
+    inducedCentralCharacter H lam (classSumCenter C) = lam (truncClassSumCenter (k := k) H C) := by
+  rw [inducedCentralCharacter, LinearMap.comp_apply, centerTrunc_classSumCenter]
+
+end Basis
 
 end OddOrder.GroupTheory.CenterClassSum
