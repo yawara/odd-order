@@ -15,19 +15,21 @@ field `K` of the `p`-modular system, not over `ℂ`, so the repository's
 `RepresentationTheory/ColumnOrthogonality` (which is stated over `ℂ` with complex conjugation)
 does not apply and the relations have to be available over `K`.
 
-This file proves the **off-diagonal first orthogonality**
+This file proves the **first orthogonality relation**
 
-`∑_{g ∈ G} χ_j(g) χ_i(g⁻¹) = 0`  for `i ≠ j`,
+`∑_{g ∈ G} χ_j(g) χ_i(g⁻¹) = |G| δ_{ij}`.
 
-which is the part that needs no algebraic closedness at all.  The mechanism is the central
-idempotent: `K[G] ≃ ∏_l M_{m_l}(K)` carries `Pi.single i 1` back to an element of `K[G]` that acts
-as the identity on the `i`-th block and as zero on every other, so an intertwining map between
-different blocks is forced to vanish.  mathlib's
-`Representation.card_inv_mul_sum_char_mul_char_eq_finrank` then reads the character sum off the
-dimension of the space of intertwining maps.
+mathlib's `Representation.card_inv_mul_sum_char_mul_char_eq_finrank` turns the character sum into
+the dimension of the space of intertwining maps, so everything reduces to computing that
+dimension for two Wedderburn blocks.  Both computations are elementary here, because the blocks
+are *full* matrix algebras over `K` — that is what the splitting hypothesis buys, and it is why no
+algebraic closedness argument appears anywhere below:
 
-The diagonal case `i = j` needs `End` of a simple module to be `K`, i.e. Schur's lemma plus
-algebraic closedness, and is not done here.
+* **off-diagonal**: `K[G] ≃ ∏_l M_{m_l}(K)` carries `Pi.single i 1` back to an element of `K[G]`
+  acting as the identity on the `i`-th block and as zero on every other, so an intertwining map
+  between different blocks vanishes;
+* **diagonal**: a self-intertwining map commutes with every matrix of the block, and the matrix
+  units `E_{b a₀}` pin it down to a scalar — Schur's lemma for the natural module of `M_n(K)`.
 
 ## Main results
 
@@ -37,12 +39,15 @@ algebraic closedness, and is not done here.
   idempotent, pulled back to `K[G]`
 * `OddOrder.RepresentationTheory.Modular.subsingleton_intertwiningMap_of_ne` — no nonzero
   intertwining maps between different blocks
-* `OddOrder.RepresentationTheory.Modular.sum_character_mul_character_inv_eq_zero`
+* `OddOrder.RepresentationTheory.Modular.exists_eq_smul_id_of_intertwiningMap` — Schur for a
+  block
+* `OddOrder.RepresentationTheory.Modular.sum_character_mul_character_inv` — first orthogonality
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
 
 open Module Representation
+open scoped Matrix
 
 variable {K G : Type*} [Field K] [Group G] {ι' : Type*} {m : ι' → Type*}
   [∀ i, Fintype (m i)] [∀ i, DecidableEq (m i)]
@@ -105,7 +110,57 @@ theorem subsingleton_intertwiningMap_of_ne {i j : ι'} (h : i ≠ j) :
     simpa using hcomm
   exact ⟨fun f f' => IntertwiningMap.ext ((hzero f).trans (hzero f').symm)⟩
 
-/-! ### Off-diagonal first orthogonality -/
+/-! ### Endomorphisms of a block: Schur -/
+
+/-- Every matrix of the `i`-th block is realised by an element of `K[G]`. -/
+theorem exists_asAlgebraHom_eq_toLin (i : ι') (M : Matrix (m i) (m i) K) :
+    ∃ a : MonoidAlgebra K G,
+      (wedderburnRepresentation e i).asAlgebraHom a = Matrix.toLinAlgEquiv' M := by
+  classical
+  refine ⟨e.symm (Pi.single i M), ?_⟩
+  rw [asAlgebraHom_wedderburnRepresentation]
+  simp
+
+/-- **A self-intertwining map of a block is a scalar.**  It commutes with every matrix of the
+block, and the matrix units `E_{b a₀}` then force it to be multiplication by
+`c = f(Pi.single a₀ 1) a₀` on every standard basis vector.
+
+This is Schur's lemma for the natural module of `M_n(K)` — no algebraic closedness is needed,
+because the block is already a *full* matrix algebra over `K`; that is exactly what the splitting
+hypothesis on `K` buys. -/
+theorem exists_eq_smul_id_of_intertwiningMap [∀ i, Nonempty (m i)] {i : ι'}
+    (f : IntertwiningMap (wedderburnRepresentation e i) (wedderburnRepresentation e i)) :
+    ∃ c : K, f = c • IntertwiningMap.id _ := by
+  classical
+  have hcomm : ∀ (M : Matrix (m i) (m i) K) (v : m i → K),
+      f.toLinearMap (M *ᵥ v) = M *ᵥ f.toLinearMap v := by
+    intro M v
+    obtain ⟨a, ha⟩ := exists_asAlgebraHom_eq_toLin e i M
+    have := map_asAlgebraHom_of_intertwiningMap f a v
+    rwa [ha] at this
+  set a₀ := Classical.arbitrary (m i) with ha₀
+  refine ⟨f.toLinearMap (Pi.single a₀ 1) a₀, ?_⟩
+  refine IntertwiningMap.ext ((Pi.basisFun K (m i)).ext fun b => ?_)
+  have hb := hcomm (Matrix.single b a₀ 1) (Pi.single a₀ 1)
+  rw [Matrix.single_mulVec_eq, Matrix.single_mulVec_eq] at hb
+  simp only [Pi.single_eq_same, mul_one, one_smul, one_mul] at hb
+  simp [hb]
+
+/-- The space of self-intertwining maps of a block is one-dimensional. -/
+theorem finrank_intertwiningMap_self [∀ i, Nonempty (m i)] (i : ι') :
+    finrank K
+      (IntertwiningMap (wedderburnRepresentation e i) (wedderburnRepresentation e i)) = 1 := by
+  classical
+  refine finrank_eq_one (IntertwiningMap.id _) ?_ fun w => ?_
+  · intro hid
+    have := congrArg (fun f : IntertwiningMap (wedderburnRepresentation e i)
+      (wedderburnRepresentation e i) =>
+        f.toLinearMap (Pi.single (Classical.arbitrary (m i)) (1 : K))) hid
+    simp at this
+  · obtain ⟨c, hc⟩ := exists_eq_smul_id_of_intertwiningMap e w
+    exact ⟨c, hc.symm⟩
+
+/-! ### First orthogonality -/
 
 variable [Fintype G] [Invertible (Nat.card G : K)]
 
@@ -121,5 +176,30 @@ theorem sum_character_mul_character_inv_eq_zero {i j : ι'} (h : i ≠ j) :
   have hinv : ((Nat.card G : K))⁻¹ ≠ 0 := by
     simpa using (isUnit_of_invertible (Nat.card G : K)).ne_zero
   exact (mul_eq_zero.mp hfin).resolve_left hinv
+
+/-- **Diagonal first orthogonality over the splitting field.** -/
+theorem sum_character_mul_character_inv_self [∀ i, Nonempty (m i)] (i : ι') :
+    ∑ g : G, (wedderburnRepresentation e i).character g
+      * (wedderburnRepresentation e i).character g⁻¹ = (Nat.card G : K) := by
+  have hfin := Representation.card_inv_mul_sum_char_mul_char_eq_finrank
+    (wedderburnRepresentation e i) (wedderburnRepresentation e i)
+  rw [finrank_intertwiningMap_self e i, Nat.cast_one] at hfin
+  have hunit : IsUnit ((Nat.card G : K)) := isUnit_of_invertible _
+  set S := ∑ g : G, (wedderburnRepresentation e i).character g
+    * (wedderburnRepresentation e i).character g⁻¹ with hS
+  calc S = (Nat.card G : K) * ((Nat.card G : K)⁻¹ * S) := by
+          rw [← mul_assoc, mul_inv_cancel₀ hunit.ne_zero, one_mul]
+    _ = (Nat.card G : K) * 1 := by rw [hfin]
+    _ = (Nat.card G : K) := mul_one _
+
+/-- **First orthogonality over the splitting field**, in one statement. -/
+theorem sum_character_mul_character_inv [∀ i, Nonempty (m i)] [DecidableEq ι'] (i j : ι') :
+    ∑ g : G, (wedderburnRepresentation e j).character g
+        * (wedderburnRepresentation e i).character g⁻¹
+      = if i = j then (Nat.card G : K) else 0 := by
+  split
+  · subst ‹i = j›
+    exact sum_character_mul_character_inv_self e i
+  · exact sum_character_mul_character_inv_eq_zero e ‹i ≠ j›
 
 end OddOrder.RepresentationTheory.Modular

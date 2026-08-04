@@ -15925,3 +15925,9 @@ not depend on the invariant lattice used to compute them. -/
   OddOrder.RepresentationTheory.Modular.map_asAlgebraHom_of_intertwiningMap
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_character_mul_character_inv_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_eq_smul_id_of_intertwiningMap
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.finrank_intertwiningMap_self
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_character_mul_character_inv
