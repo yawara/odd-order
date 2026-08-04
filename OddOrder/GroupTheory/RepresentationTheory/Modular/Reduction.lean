@@ -235,6 +235,25 @@ noncomputable def reduction [IsLocalRing 𝒪] (ρ : Representation 𝒪 G L) :
 theorem reduction_apply [IsLocalRing 𝒪] (ρ : Representation 𝒪 G L) (g : G) :
     reduction ρ g = (ρ g).baseChange (ResidueField 𝒪) := rfl
 
+/-- **Reduction is compatible with the whole group-algebra action**, not just with group
+elements: the `k[G]`-action on the reduction is the base change of the `𝒪[G]`-action, along the
+coefficient reduction `𝒪[G] → k[G]`.
+
+This is what carries the central character down.  If `z ∈ Z(𝒪G)` acts on `L` by `ω(z)`, then
+`z̄` acts on the reduction by `residue (ω z) = λ(z̄)` — so every constituent of the reduction has
+the centre acting by the same character, which is Navarro (3.3). -/
+theorem asAlgebraHom_reduction_mapRingHom [IsLocalRing 𝒪] (ρ : Representation 𝒪 G L)
+    (x : MonoidAlgebra 𝒪 G) :
+    (reduction ρ).asAlgebraHom (MonoidAlgebra.mapRingHom G (residue 𝒪) x)
+      = LinearMap.baseChange (ResidueField 𝒪) (ρ.asAlgebraHom x) := by
+  induction x using MonoidAlgebra.induction_linear with
+  | zero => simp
+  | add x y hx hy => simp [hx, hy]
+  | single g r =>
+    rw [MonoidAlgebra.mapRingHom_single, Representation.asAlgebraHom_single,
+      Representation.asAlgebraHom_single, LinearMap.baseChange_smul, reduction_apply,
+      ← IsLocalRing.ResidueField.algebraMap_eq, algebraMap_smul]
+
 /-- A `p`-regular element of a finite group satisfies the finite-order hypothesis at the
 canonical exponent `|G|_{p'}`. -/
 theorem rep_pow_pRegularExponent_eq_one' {p : ℕ} [Finite G] (ρ : Representation 𝒪 G L)
