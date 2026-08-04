@@ -1335,8 +1335,18 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
           * `CharP.natCast_eq_natCast` で上の合同式を `k` の等式に
           * `Z(kG)` の類和基底 (`centerBasis`) 上で 2 つの AlgHom が一致 ⟹
             `blockOfCentralCharacter` の一意性 (`eq_blockOfCentralCharacter`) で結論。
-  - [ ] (c) 逆向き (`b^G = B_0 ⟹ b = b_0`) は Okuyama or 古典的 Brauer の証明が要る。
-        height 理論の投資判断は (b) 完了後に改めて行う。
+  - [ ] (c) 逆向き (`b^G = B_0 ⟹ b = b_0`)。**⚠ BS/Z\* の spine が実際に使うのはこの向き**
+        (2026-08-05 に原文 p.145 (7.7) で確認): `χ ∈ Irr(B_0)`, `u` が `p`-元のとき
+        `χ(uw) = Σ_{μ ∈ IBr(b_0)} d^u_{χμ} μ(w)` — (5.8) の和が `b_0` の項だけに潰れる、
+        という主張なので、他の `b` を**排除**する逆向きが要る。
+        - **Okuyama 経路 ((6.6)) の前提を精読 (2026-08-05)**: (6.3)–(6.6) は Chapter 2 の
+          `~` 関数と Lemma (2.15)、Chapter 3 の (3.20)/(3.21) 付値/(3.22)/(3.24) height を
+          使う。**defect group と height の理論一式**が前提になる (重い)。
+        - **⚠ 近道は無い (検討済)**: 「`Br_P(f_{B_0}) = f_{b_0}`」に帰着させる古典的な形も、
+          `Br_P(f_{B_0}) = Σ_{b^G = B_0} f_b` までしか出ず循環する。逆向きは genuine に
+          height (or それに代わる理論) を要求する。
+        - ⟹ **次の上流は Chapter 3 の defect / height**。(6.6) だけでなく (6.10)–(6.13) や
+          Chapter 7 も height を使うので、いずれ通る道。
 - [ ] **100: `(6.10)` `ker(B) = O_{p'}(ker χ)` → `(6.12)` → 🎯 `(6.13)`**
       (normal `p`-complement ⟺ `IBr(B₀)` 単元、Cartan 行列 `(|G|_p)`)
 - [ ] **101: `(7.2)` Klein four Sylow-2 / `(7.3)` basic set / `(7.4)` / `(7.5)` / `(7.6)`**
