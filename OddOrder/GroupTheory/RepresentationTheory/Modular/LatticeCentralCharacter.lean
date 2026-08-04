@@ -201,6 +201,20 @@ noncomputable def centralCharacter : Subalgebra.center 𝒪 A →ₐ[𝒪] 𝒪 
 theorem centralCharacter_apply (z : Subalgebra.center 𝒪 A) :
     centralCharacter K φ hEnd z = centralScalar K φ hEnd z := rfl
 
+/-- **The reduction still has the centre acting by a scalar**, namely the reduced one.
+
+Base change of `c • id` is `(algebraMap c) • id`, so for `k` the residue field this says the
+reduction of an absolutely irreducible lattice has `Z(A)` acting through `λ = residue ∘ ω`.  That
+is the first half of the bridge to the block partition: whichever simple constituents the
+reduction has, the centre acts on all of them by this one character, so they all lie in the same
+block (Navarro (3.3)). -/
+theorem baseChange_apply_center (k : Type*) [CommRing k] [Algebra 𝒪 k]
+    (z : Subalgebra.center 𝒪 A) :
+    LinearMap.baseChange k (φ z)
+      = algebraMap 𝒪 k (centralScalar K φ hEnd z) • LinearMap.id := by
+  rw [apply_center_eq_centralScalar_smul K φ hEnd z, LinearMap.baseChange_smul,
+    LinearMap.baseChange_id, Algebra.algebraMap_eq_smul_one, smul_assoc, one_smul]
+
 end CentralCharacter
 
 end OddOrder.RepresentationTheory.Modular

@@ -592,12 +592,31 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
           `Z(kG)` へ持ち上がる (類和は係数 `0`/`1` なので還元で不変、が鍵)。
         * 🎯 `apply_eq_zero_of_mapRingHom_eq_zero` / 🎯 `apply_eq_of_mapRingHom_eq` —
           **値は持ち上げに依らない** = `λ_χ` が well-defined。
-  - [ ] **残り**: `λ` を `Z(kG) →+* k` として bundle し、`BlockIdempotent.lean` の
-        `blockSetoid` (= 中心指標が一致) と同一視する。さらに Navarro **(3.3)**
-        「`d_{χφ} ≠ 0` ⟹ `λ_χ = λ_φ`」が `Irr(G) → Bl(G)` の well-defined 性。
-        ⚠ (3.3) は ordinary 側の `ω` (本 leaf) と Brauer 側の中心指標
-        (`Algebra/CentralCharacter.lean` の `MatrixModule.centralCharacter`) を**繋ぐ**必要が
-        あるので、`k`-側の分裂 `π` との橋渡しが実質的な中身。
+  - [x] **`λ` の bundle** — 完了 (2026-08-04)。
+        🎯 `reducedCentralCharacter : Subalgebra.center k' (k'[G]) →+* k'`
+        (+ `centerLift` / `mapRingHom_centerLift` / `reducedCentralCharacter_eq`)。
+        Navarro の `λ_χ(K̂) = ω_χ(K̂)^*` そのもの。
+  - [x] **橋渡しの前半** — 完了 (2026-08-04)。
+        🎯 `baseChange_apply_center`: 絶対既約格子の**還元でも中心はスカラー作用**し、
+        そのスカラーは `algebraMap 𝒪 k (ω z)` (= `λ`)。⟹ 還元の**どの単純構成因子でも
+        中心は同じ指標で作用する**ので、全部同じブロックに入る (Navarro (3.3) の核心)。
+
+### 次にやること (段 93 の締め、2026-08-04 時点の frontier)
+
+**橋渡しの後半** = `λ_χ` を `BlockIdempotent.lean` の `centralCharacterAlg π i` と同一視する。
+必要なのは「`k ⊗ L` の単純構成因子に対応する Wedderburn 添字 `i` について
+`centralCharacterAlg π i = λ_χ`」。`baseChange_apply_center` で左辺の作用が
+スカラー `λ_χ` だと分かっているので、あとは
+
+* `k ⊗ L` の単純構成因子 ↔ 分裂 `π` の添字 (repo に `IrreducibleIsBlock.lean` /
+  `AsModuleSimple.lean` / `blockModule` がある) を使い、
+* `MatrixModule.centralScalar_smul` (「中心は `centralScalar π i` でスカラー作用」)
+  と突き合わせて、非零加群上で 2 つのスカラーが一致することを言う。
+
+⚠ 設計上の要点: `φ : A →ₐ[𝒪] End 𝒪 L` (ordinary 側) と
+`π : k[G] →+* ∏ Matrix` (Brauer 側) を**どう関係づけるか**がこの段の実質。
+`A = MonoidAlgebra 𝒪 G` を固定し、`mapRingHom G (residue 𝒪)` で `k[G]` に落として
+`π` と繋ぐのが素直な線。
 - [ ] **94: Cartan 行列 `C = DᵀD`** + `([φ,θ]⁰)` が逆行列であること ((7.6) が使う)
 - [ ] **95: Brauer 対応 `b^G`** (段 88–91 の `Br_P` / defect group から。
       `(5.6)`/`(5.7)` = `b^G` の well-defined 性)
