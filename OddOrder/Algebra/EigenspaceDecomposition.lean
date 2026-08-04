@@ -7,9 +7,8 @@ import Mathlib.LinearAlgebra.Lagrange
 import Mathlib.LinearAlgebra.Eigenspace.Basic
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Basic
 import Mathlib.Algebra.DirectSum.LinearMap
-import Mathlib.RingTheory.Flat.TorsionFree
-import Mathlib.RingTheory.LocalRing.Module
 import OddOrder.Algebra.LagrangeInterpolationRing
+import OddOrder.Algebra.ValuationRingFreeModule
 
 /-!
 # Diagonalisability from a split squarefree annihilating polynomial
@@ -196,10 +195,7 @@ theorem free_eigenspace_of_separated {A : Module.End R M} {s : Finset R}
     (hs : SeparatedNodes s) (hA : aeval A (∏ η ∈ s, (X - C η)) = 0) (ζ : s) :
     Module.Free R (A.eigenspace (ζ : R)) := by
   haveI := finite_eigenspace_of_separated hs hA ζ
-  haveI : Module.Flat R (A.eigenspace (ζ : R)) :=
-    Module.Flat.flat_iff_torsion_eq_bot_of_isBezout.mpr
-      (Submodule.isTorsionFree_iff_torsion_eq_bot.mp inferInstance)
-  exact Module.free_of_flat_of_isLocalRing
+  exact free_of_isTorsionFree
 
 /-- The ranks of the eigen-submodules add up to the rank of the module. -/
 theorem sum_finrank_eigenspace_of_separated {A : Module.End R M} {s : Finset R}

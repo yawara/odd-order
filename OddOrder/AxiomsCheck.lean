@@ -193,6 +193,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexSystem
+import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
@@ -15866,3 +15867,18 @@ missing the `p`-power roots of unity. -/
   OddOrder.RepresentationTheory.Modular.exists_isPrimitiveRoot_residueField_padicComplexInt
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_algEquiv_pi_matrix_padicComplex
+
+/-! **Invariant lattices and the ordinary character**
+(`Algebra.ValuationRingFreeModule`,
+`GroupTheory.RepresentationTheory.Modular.LatticeRepresentation`, issue 9506 段 94).
+The trace of the lattice representation *is* the ordinary character, so the decomposition
+numbers depend on the character and not on the chosen lattice. -/
+
+#assert_only_allowed_axioms
+  OddOrder.free_of_isTorsionFree
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.repr_extendOfIsLattice
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.algebraMap_trace_latticeRepresentation
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_isLattice_invariant
