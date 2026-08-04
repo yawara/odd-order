@@ -197,6 +197,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrrCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
@@ -15914,7 +15915,7 @@ not depend on the invariant lattice used to compute them. -/
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.projectiveIndecomposableCharacter_eq_sum_cartanMatrix
 
-/-! **Off-diagonal first orthogonality over the splitting field**
+/-! **First orthogonality over the splitting field**
 (`GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality`, Navarro (2.13) の feeder). -/
 
 #assert_only_allowed_axioms
@@ -15931,3 +15932,12 @@ not depend on the invariant lattice used to compute them. -/
   OddOrder.RepresentationTheory.Modular.finrank_intertwiningMap_self
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_character_mul_character_inv
+
+/-! **The character table over a splitting field is square**
+(`GroupTheory.RepresentationTheory.Modular.OrdinaryIrrCount`): `|Irr(G)| = |cl(G)|`, both
+counting a basis of `Z(K[G])`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.centerAlgEquivPi
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_eq_card_conjClasses
