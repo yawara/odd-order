@@ -583,8 +583,21 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         🎯 `centralCharacter : Subalgebra.center 𝒪 A →ₐ[𝒪] 𝒪`
         (+ `centralScalar` / `apply_center_eq_centralScalar_smul` / `eq_centralScalar`)。
         Navarro の `ω_χ` そのものだが**初めから `𝒪` 値**。
-  - [ ] `mod 𝔪` → `λ_χ : Z(kG) → k` → `BlockIdempotent.lean` の `blockSetoid` と接続。
-        Navarro (3.3) 「`d_{χφ} ≠ 0` ⟹ `λ_χ = λ_φ`」が block 写像の well-defined 性
+  - [x] **`mod 𝔪` の道具立て** — 完了 (2026-08-04、`Modular/CenterReduction.lean`)。
+        `λ_χ` を定めるのに要る**存在**と**一意性**の両側が揃った:
+        * 前提として `CenterClassSumBasis` を `Field k` → `CommRing k` へ一般化
+          (体の演算を一切使っていなかった = 無償の特殊化債務。本文無変更・消費側無変更で通った)。
+          ⟹ 類和基底と `center_eq_sum_classSum` が **`𝒪` 上でも使える**。
+        * 🎯 `exists_mem_center_mapRingHom_eq` — 係数写像が全射なら `Z(k'G)` の元は
+          `Z(kG)` へ持ち上がる (類和は係数 `0`/`1` なので還元で不変、が鍵)。
+        * 🎯 `apply_eq_zero_of_mapRingHom_eq_zero` / 🎯 `apply_eq_of_mapRingHom_eq` —
+          **値は持ち上げに依らない** = `λ_χ` が well-defined。
+  - [ ] **残り**: `λ` を `Z(kG) →+* k` として bundle し、`BlockIdempotent.lean` の
+        `blockSetoid` (= 中心指標が一致) と同一視する。さらに Navarro **(3.3)**
+        「`d_{χφ} ≠ 0` ⟹ `λ_χ = λ_φ`」が `Irr(G) → Bl(G)` の well-defined 性。
+        ⚠ (3.3) は ordinary 側の `ω` (本 leaf) と Brauer 側の中心指標
+        (`Algebra/CentralCharacter.lean` の `MatrixModule.centralCharacter`) を**繋ぐ**必要が
+        あるので、`k`-側の分裂 `π` との橋渡しが実質的な中身。
 - [ ] **94: Cartan 行列 `C = DᵀD`** + `([φ,θ]⁰)` が逆行列であること ((7.6) が使う)
 - [ ] **95: Brauer 対応 `b^G`** (段 88–91 の `Br_P` / defect group から。
       `(5.6)`/`(5.7)` = `b^G` の well-defined 性)
