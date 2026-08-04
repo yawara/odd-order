@@ -243,6 +243,7 @@ import OddOrder.Algebra.SubgroupSumBlockAction
 import OddOrder.Algebra.TraceMulLeft
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartan
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockKernel
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ClassCentralizerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockDefect
@@ -16733,3 +16734,11 @@ Sylow `p`-部分群の共役作用 + `C_G(P)` の Sylow が中心的、の 2 段
   OddOrder.GroupAlgebra.sum_sq_centralScalar_subgroupSum
 #assert_only_allowed_axioms
   OddOrder.GroupAlgebra.card_mul_sum_sq_eq_card
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.forall_eq_one_of_residue_centralScalar_ne_zero
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.centralScalar_subgroupSum_ne_zero_iff
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.forall_eq_one_iff_blockOfIrr_eq_principalBlock
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_mul_sum_sq_principalBlock
