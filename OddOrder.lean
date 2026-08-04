@@ -303,6 +303,7 @@ import OddOrder.GroupTheory.RepresentationTheory.RepresentationDeterminant
 import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
 import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.SylowSumClassCoeff
 import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
 import OddOrder.GroupTheory.RepresentationTheory.SimpleSubmoduleIndependence
 import OddOrder.GroupTheory.PrimitivePrimeDivisor

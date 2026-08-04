@@ -90,6 +90,14 @@ theorem conj_smul_single (g h : G) (r : R) :
   change mapDomainRingEquiv R (MulAut.conj g) (single h r) = _
   simp
 
+/-- **The coefficient at `1` is conjugation invariant.** -/
+@[simp]
+theorem coeff_conj_smul_one (g : G) (x : MonoidAlgebra R G) :
+    (g • x).coeff 1 = x.coeff 1 := by
+  rw [coeff_conj_smul]
+  congr 1
+  group
+
 /-- Conjugation is `R`-linear. -/
 theorem conj_smul_smul (g : G) (r : R) (x : MonoidAlgebra R G) : g • (r • x) = r • (g • x) := by
   ext n

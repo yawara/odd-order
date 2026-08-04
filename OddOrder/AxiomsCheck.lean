@@ -254,6 +254,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockSumOverPSubgroup
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnside
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideReduction
 import OddOrder.Algebra.PElementSum
+import OddOrder.GroupTheory.RepresentationTheory.SylowSumClassCoeff
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartan
@@ -16901,3 +16902,12 @@ Navarro (4.19) がブロックごとに再編する係数 `a_B(K̂)` の正体�
   OddOrder.RepresentationTheory.Modular.ordCompl_mul_sum_sylow_coeff_classSum_mul_over
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.residue_ordCompl_mul_sum_sylow_coeff
+
+/-! **`W = ∑_P P̂` を単一 Sylow に落とす** (`RepresentationTheory/SylowSumClassCoeff`) —
+`∑_{u∈K}(W·L̂)(u) = |Syl_p|·∑_{x∈S}(K̂'·L̂)(x)`。Navarro (4.23) が `|K|` で割らずに
+(4.19) と突き合わせられる理由。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.coeff_conj_smul_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.sum_class_coeff_sylowSum_mul
