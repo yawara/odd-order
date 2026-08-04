@@ -485,21 +485,47 @@ Z\*-定理 (Ch.7) までに要るものを、手持ちとの差分で:
       ⟹ 段 89 と合わせて **defect group = `Br_P(e) ≠ 0` なる極大 `p`-部分群**
       (Brauer の特徴づけ)。
       これがあれば Rosenberg (段 84) + `D` の極小性で閉じる。
-- [ ] **2nd/3rd main theorem** → **Z\*-定理** → Q₈ bridge。
+- [ ] **残り slice** = 下記「★ PDF gate 解除後の slice 確定」の 9 段。
 
 ⚠ 上の 3-5 は `kG`/`𝒪G` の**群環固有**の構造 (共役作用・部分群・相対トレース) を使う。
 段 40-74 は「分裂半単純商を持つ有限次元代数」の一般論だったので、ここから先は
 群論側の道具立てが増える。
 
-以降 (別 issue に分割予定): Cartan 行列 `C = DᵀD` / block / Brauer 対応 /
-2nd・3rd main theorem / Z\*-定理 → Q₈ bridge。
+## ★ PDF gate 解除 + slice 確定 (2026-08-04)
 
-## PDF gate について
+**PDF が届いた** (`references/navarro/`、issue 0147 参照)。本 issue が待っていた
+「Ch.5–7 を精読して以降の段の範囲を確定する」を実施した結果:
 
-0147 の pickup 手順 step 1「Navarro Ch.5–7 を精読して Ch.1–4 の slice を絞る」は **PDF 待ち**
-(ユーザー購入手配中)。ただし step 2 の**最初の段 (p-modular system / Brauer 指標) は
-標準的な内容で slice 絞りに依存しない**ので、そこから着手する。
-PDF が入り次第 Ch.5–7 を読んで以降の段の範囲を確定する。
+### ⚠ 経路訂正 — **Z\*-定理は不要**
+
+旧チェックリスト末尾の「2nd/3rd main theorem → **Z\*-定理** → Q₈ bridge」は**誤り**。
+Navarro Ch.7 は **BS を先に直接証明**し (冒頭 "First, we need to prove the Brauer–Suzuki
+theorem"、(7.2)–(7.6) → 書籍 pp.139–146 が本証明)、**そのあと** (7.7)(7.8) を足して (7.9) Z\*。
+⟹ **Z\* と「Z\* → Q₈ bridge」は経路から落ちる**。しかも Navarro は Q₈ を名指しで狙い
+`|S| > 8` は Isaacs に外出ししているので、repo 側の分担 (`|S| ≥ 16` 済) と教科書が一致する。
+詳細 = `notes/meta/q8_modular_char_theory_frozen_project.md` §2''。
+
+### BS 本証明 (pp.139–146) が直接引く結果
+
+`Cor (6.13)` / `Cor (5.8)` + 第三主定理 / `Lemma (5.13.b,c,d)` / block orthogonality /
+`(7.2)`–`(7.6)`。ここから逆に辿った**残り slice (段 92 以降)**:
+
+- [ ] **92: Cartan 行列 `C = DᵀD`** (段 63 の `D` から; 旧チェックリストの筆頭)
+- [ ] **93: block の完全な API + Brauer 対応 `b^G`** (段 88–91 の `Br_P` / defect group から。
+      `(5.6)`/`(5.7)` = `b^G` の well-defined 性)
+- [ ] **94: 一般化分解数 `d^x_{χμ}`** (`p`-元 `x` について。`(5.1)` = `p`-section 上の展開)
+- [ ] **95: 🎯 第二主定理 `(5.2)`** — `χ(xy) = Σ_μ d^x_{χμ} μ(y)`。
+      Navarro は Isaacs による "elementary" proof (Juhász–Tsushima 由来) を採用 (Preface)
+- [ ] **96: `(5.8)` + `(5.13.b,c,d)` (一般化分解数の直交関係) + block orthogonality**
+- [ ] **97: 🎯 第三主定理 `(6.7)`** — Okuyama の証明 ((6.1)–(6.6) 経由、非常に一般な形)
+- [ ] **98: `(6.10)` `ker(B) = O_{p'}(ker χ)` → `(6.12)` → 🎯 `(6.13)`**
+      (normal `p`-complement ⟺ `IBr(B₀)` 単元、Cartan 行列 `(|G|_p)`)
+- [ ] **99: `(7.2)` Klein four Sylow-2 / `(7.3)` basic set / `(7.4)` / `(7.5)` / `(7.6)`**
+- [ ] **100: 🎯🎯🎯 BS 本証明 (pp.139–146)** → `brauerSuzuki_quaternionSylow_q8` の `sorry` 置換
+
+⚠ 上記の番号は Navarro の結果番号であって段番号ではない (段番号は連番で振り直す)。
+⚠ 数式は OCR 崩れが重いので、各段の statement は `references/navarro/pages/*.png` で確定する
+(BS 証明の pp.139–146 は取得済)。
 
 ## 完了条件
 

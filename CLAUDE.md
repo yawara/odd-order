@@ -227,6 +227,7 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
 | `bin/` | 雑用スクリプト (`new-issue` 等) |
 | `references/` (gitignored) | PDF + `pdftotext -layout` 抽出 text — 別 private リポ `odd-order-references` |
 | `references/{isaacs,bg,gorenstein}/*.pdf`, `*.pdftotext.txt` | 原典/補助原典と検索用 text (フラット) |
+| `references/navarro/characters-and-blocks.{pdf,pdftotext.txt}` | Navarro 1998 *Characters and Blocks of Finite Groups* (LMS LNS 250)。**Q₈ Brauer–Suzuki の modular character theory 専用の補助原典** (issue 0147; Gorenstein と同じ「行間参照のみ・独立の形式化対象ではない」posture)。⚠ **PDF ページ = 書籍ページ + 10**、数式は OCR 崩れ大 |
 | `references/peterfalvi/pdf/*.pdf`, `references/peterfalvi/pdftotext/*.txt` | Peterfalvi だけ章別 PDF/text を各ディレクトリに集約 (text は `bin/pdf-glyph-join.py` で再構成) |
 | `references/<book>/pages/*.png` | 切り出したページ画像 (捨てずに残す規約, 2026-07-26) |
 | `references/bin/pdf-glyph-join.py` | グリフ bbox から本文を組み直すツール (Peterfalvi 専用) |

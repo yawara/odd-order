@@ -35,6 +35,9 @@ is an integer (`OddOrder.AlgInt.isIntegral_rat_imp_int`).
 
 namespace OddOrder.RepresentationTheory
 
+-- 類和の中核 (`classSum` ほか) は `ClassSumCore` の一般係数環版。
+open OddOrder.GroupTheory.CenterClassSum
+
 open OddOrder.AlgInt
 
 local notation3 "ω" ρ:max C:max => centralCharacterOfRep ρ ⟨classSum C, classSum_mem_center C⟩
@@ -89,12 +92,12 @@ theorem nonidentityZClassCoeffSum_cong_of_isTISubset [Finite G]
   have hC₁ : ∃ y : G, y ∈ Z ∧ y ≠ 1 ∧ ConjClasses.mk y = C₁ := ⟨z, hzZ, hz1, rfl⟩
   have hC₂ : ∃ y : G, y ∈ Z ∧ y ≠ 1 ∧ ConjClasses.mk y = C₂ :=
     ⟨z⁻¹, Z.inv_mem hzZ, inv_ne_one.mpr hz1, rfl⟩
-  have hcoeff11 : (classSum C₁ * classSum C₁).coeff (1 : G) = 0 := by
+  have hcoeff11 : (classSum C₁ * classSum C₁ : MonoidAlgebra ℂ G).coeff (1 : G) = 0 := by
     rw [classSum_mul_apply_one_eq_classSumCoeff_one]
     rw [show classSumCoeff C₁ C₁ 1 = 0 by
       simpa [C₁] using classSumCoeff_self_one_eq_zero z hreal]
     norm_num
-  have hcoeff12 : (classSum C₁ * classSum C₂).coeff (1 : G) = (q : ℂ) := by
+  have hcoeff12 : (classSum C₁ * classSum C₂ : MonoidAlgebra ℂ G).coeff (1 : G) = (q : ℂ) := by
     rw [classSum_mul_apply_one_eq_classSumCoeff_one]
     rw [show classSumCoeff C₁ C₂ 1 = Nat.card { x : G // ConjClasses.mk x = C₁ } by
       simpa [C₁, C₂] using classSumCoeff_self_inv_one_eq_card z]

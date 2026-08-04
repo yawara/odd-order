@@ -38,6 +38,9 @@ Only two ingredients are Sylow-specific in the original:
 
 namespace OddOrder.RepresentationTheory
 
+-- 類和の中核 (`classSum` ほか) は `ClassSumCore` の一般係数環版。
+open OddOrder.GroupTheory.CenterClassSum
+
 open scoped MonoidAlgebra
 open OddOrder.GroupTheory
 
@@ -197,7 +200,7 @@ theorem centralCharacterOfRep_classSum_mul_cong_collapse_hall [Finite G]
     {α : ℂ} (hα : ∀ ⦃w : G⦄, w ∈ Z → w ≠ 1 → ω ρ(ConjClasses.mk w) = α) :
     ρ.character 1 * ((ω ρ Ci) * (ω ρ Cj))
       ≡ ρ.character 1 *
-          (((classSum Ci * classSum Cj).coeff (1 : G) : ℂ)
+          (((classSum Ci * classSum Cj : ℂ[G]).coeff (1 : G) : ℂ)
             + nonidentityZClassCoeffSum Z Ci Cj * α)
         [ALGMOD (Nat.card ↥Q : ℤ)] := by
   classical
@@ -255,11 +258,11 @@ theorem peterfalvi_67_hall [Finite G] (ρ : Representation ℂ G V) [ρ.IsIrredu
   have hC₁ : ∃ y : G, y ∈ Z ∧ y ≠ 1 ∧ ConjClasses.mk y = C₁ := ⟨z, hzZ, hz1, rfl⟩
   have hC₂ : ∃ y : G, y ∈ Z ∧ y ≠ 1 ∧ ConjClasses.mk y = C₂ :=
     ⟨z⁻¹, Z.inv_mem hzZ, inv_ne_one.mpr hz1, rfl⟩
-  have hcoeff11 : (classSum C₁ * classSum C₁).coeff (1 : G) = 0 := by
+  have hcoeff11 : (classSum C₁ * classSum C₁ : ℂ[G]).coeff (1 : G) = 0 := by
     rw [classSum_mul_apply_one_eq_classSumCoeff_one]
     rw [show classSumCoeff C₁ C₁ 1 = 0 by simpa [C₁] using classSumCoeff_self_one_eq_zero z hreal]
     norm_num
-  have hcoeff12 : (classSum C₁ * classSum C₂).coeff (1 : G) = (q : ℂ) := by
+  have hcoeff12 : (classSum C₁ * classSum C₂ : ℂ[G]).coeff (1 : G) = (q : ℂ) := by
     rw [classSum_mul_apply_one_eq_classSumCoeff_one]
     rw [show classSumCoeff C₁ C₂ 1 = Nat.card { x : G // ConjClasses.mk x = C₁ } by
       simpa [C₁, C₂] using classSumCoeff_self_inv_one_eq_card z]
@@ -328,12 +331,12 @@ theorem nonidentityZClassCoeffSum_cong_hall [Finite G] {H Q Z : Subgroup G}
   have hC₁ : ∃ y : G, y ∈ Z ∧ y ≠ 1 ∧ ConjClasses.mk y = C₁ := ⟨z, hzZ, hz1, rfl⟩
   have hC₂ : ∃ y : G, y ∈ Z ∧ y ≠ 1 ∧ ConjClasses.mk y = C₂ :=
     ⟨z⁻¹, Z.inv_mem hzZ, inv_ne_one.mpr hz1, rfl⟩
-  have hcoeff11 : (classSum C₁ * classSum C₁).coeff (1 : G) = 0 := by
+  have hcoeff11 : (classSum C₁ * classSum C₁ : ℂ[G]).coeff (1 : G) = 0 := by
     rw [classSum_mul_apply_one_eq_classSumCoeff_one]
     rw [show classSumCoeff C₁ C₁ 1 = 0 by
       simpa [C₁] using classSumCoeff_self_one_eq_zero z hreal]
     norm_num
-  have hcoeff12 : (classSum C₁ * classSum C₂).coeff (1 : G) = (q : ℂ) := by
+  have hcoeff12 : (classSum C₁ * classSum C₂ : ℂ[G]).coeff (1 : G) = (q : ℂ) := by
     rw [classSum_mul_apply_one_eq_classSumCoeff_one]
     rw [show classSumCoeff C₁ C₂ 1 = Nat.card { x : G // ConjClasses.mk x = C₁ } by
       simpa [C₁, C₂] using classSumCoeff_self_inv_one_eq_card z]

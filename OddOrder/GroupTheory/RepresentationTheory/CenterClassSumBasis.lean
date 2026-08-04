@@ -8,7 +8,7 @@ import Mathlib.Algebra.Algebra.Subalgebra.Basic
 import Mathlib.Algebra.Group.Conj
 import Mathlib.LinearAlgebra.Basis.Basic
 import Mathlib.Tactic.Group
-import OddOrder.Mathlib.MonoidAlgebra
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumCore
 
 /-!
 # The class-sum basis of the centre of a group algebra (general field)
@@ -31,75 +31,43 @@ open scoped MonoidAlgebra
 
 open Module
 
--- The shared `variable` block below serves lemmas with differing instance usage; suppress the
--- section-variable hygiene linters (the instances are all genuinely needed by `classSum`).
-set_option linter.unusedSectionVars false
-set_option linter.unusedFintypeInType false
-set_option linter.unusedDecidableInType false
+variable {k G : Type*} [Field k] [Group G]
 
-variable {k G : Type*} [Field k] [Group G] [Fintype G] [DecidableEq G]
-  [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)]
+/-! ### 中心元の係数は共役類上一定 (有限性・decidability 不要) -/
 
-/-- The **class sum** `classSum C = ∑_{x ∈ C} x ∈ k[G]` of a conjugacy class `C`. -/
-noncomputable def classSum (C : ConjClasses G) : MonoidAlgebra k G :=
-  ∑ g : G, if ConjClasses.mk g = C then MonoidAlgebra.of k G g else 0
+section CenterCoeff
 
-/-- The coefficient of `classSum C` at `x ∈ G` is `1` if `x ∈ C` and `0` otherwise. -/
-theorem coeff_classSum (C : ConjClasses G) (x : G) :
-    (classSum (k := k) C).coeff x = if ConjClasses.mk x = C then 1 else 0 := by
-  have hsum : (classSum (k := k) C).coeff x
-      = ∑ g : G, (if ConjClasses.mk g = C then MonoidAlgebra.of k G g else 0).coeff x := by
-    rw [classSum]; exact MonoidAlgebra.coeff_finsetSum _ _ _
-  have hzero : ((0 : MonoidAlgebra k G)).coeff x = 0 := rfl
-  have hterm : ∀ g : G,
-      (if ConjClasses.mk g = C then MonoidAlgebra.of k G g else 0).coeff x
-      = if g = x then (if ConjClasses.mk g = C then (1 : k) else 0) else 0 := by
-    intro g
-    rw [apply_ite (fun f : MonoidAlgebra k G => f.coeff x), MonoidAlgebra.of_apply,
-      MonoidAlgebra.coeff_single, Finsupp.single_apply, hzero]
-    by_cases hg : g = x
-    · rw [if_pos hg, if_pos hg]
-    · rw [if_neg hg, if_neg hg, ite_self]
-  rw [hsum, Finset.sum_congr rfl (fun g _ => hterm g),
-    Finset.sum_ite_eq' Finset.univ x (fun g => if ConjClasses.mk g = C then (1 : k) else 0)]
-  simp
+/-- A central element of `k[G]` has class-constant coefficients:
+`z.coeff (h * x * h⁻¹) = z.coeff x`.  Conjugation by `h` permutes the support of `z` without
+changing the coefficients (this is the content of `z` commuting with `single h 1`). -/
+theorem coeff_center_conj {z : MonoidAlgebra k G}
+    (hz : z ∈ Subalgebra.center k (MonoidAlgebra k G)) (h x : G) :
+    (z.coeff (h * x * h⁻¹) : k) = z.coeff x := by
+  have key := (Finsupp.ext_iff.mp (congrArg MonoidAlgebra.coeff
+    ((Subalgebra.mem_center_iff.mp hz) (MonoidAlgebra.single h 1)))) (h * x)
+  rw [MonoidAlgebra.coeff_single_mul_apply, MonoidAlgebra.coeff_mul_single_apply, one_mul, mul_one,
+    inv_mul_cancel_left] at key
+  exact key.symm
 
-/-- Each class sum is central in `k[G]`: `classSum C` commutes with every `of k G h` (conjugation
-permutes the class `C`), hence with all of `k[G]` by linearity. -/
-theorem classSum_mem_center (C : ConjClasses G) :
-    classSum (k := k) C ∈ Subalgebra.center k (MonoidAlgebra k G) := by
-  classical
-  rw [Subalgebra.mem_center_iff]
-  intro a
-  induction a using MonoidAlgebra.induction_linear with
-  | zero => simp
-  | add x y hx hy => rw [add_mul, mul_add, hx, hy]
-  | single h r =>
-    have hof : (MonoidAlgebra.single h r : MonoidAlgebra k G) = r • MonoidAlgebra.of k G h := by
-      rw [MonoidAlgebra.of_apply, MonoidAlgebra.smul_single, smul_eq_mul, mul_one]
-    rw [hof, smul_mul_assoc, mul_smul_comm]
-    congr 1
-    rw [classSum, Finset.mul_sum, Finset.sum_mul]
-    rw [← Equiv.sum_comp (MulAut.conj h).toEquiv
-      (fun g => (if ConjClasses.mk g = C then MonoidAlgebra.of k G g else 0) *
-        MonoidAlgebra.of k G h)]
-    refine Finset.sum_congr rfl fun g _ => ?_
-    have hconj : (MulAut.conj h).toEquiv g = h * g * h⁻¹ := by simp [MulAut.conj_apply]
-    rw [hconj]
-    have hclass : ConjClasses.mk (h * g * h⁻¹) = ConjClasses.mk g :=
-      ConjClasses.mk_eq_mk_iff_isConj.mpr (isConj_iff.mpr ⟨h⁻¹, by group⟩)
-    rw [hclass]
-    by_cases h0 : ConjClasses.mk g = C
-    · simp only [h0, if_true]
-      rw [← map_mul, ← map_mul]
-      congr 1
-      group
-    · simp [h0]
+/-- A central element is constant along a conjugacy class:
+`mk a = mk b ⟹ z.coeff a = z.coeff b`. -/
+theorem coeff_center_of_mk_eq {z : MonoidAlgebra k G}
+    (hz : z ∈ Subalgebra.center k (MonoidAlgebra k G)) {a b : G}
+    (hab : ConjClasses.mk a = ConjClasses.mk b) : (z.coeff a : k) = z.coeff b := by
+  obtain ⟨h, rfl⟩ := isConj_iff.mp (ConjClasses.mk_eq_mk_iff_isConj.mp hab)
+  exact (coeff_center_conj hz h a).symm
+
+end CenterCoeff
+
+variable [Fintype G] [DecidableEq (ConjClasses G)]
 
 /-- The class sums are `k`-linearly independent: distinct classes have disjoint supports, so the
 `C.out`-coordinate of `∑_C a_C • classSum C` reads off `a_C`. -/
 theorem classSum_linearIndependent :
     LinearIndependent k (classSum (k := k) (G := G)) := by
+  -- `Fintype (ConjClasses G)` は型には現れないので証明内で `Finite` から作る。
+  haveI : Finite (ConjClasses G) := Quotient.finite _
+  letI : Fintype (ConjClasses G) := Fintype.ofFinite _
   rw [Fintype.linearIndependent_iff]
   intro a ha C
   have hmk : ConjClasses.mk (C.out) = C := by
@@ -117,24 +85,15 @@ theorem classSum_linearIndependent :
   rw [Finset.sum_congr rfl (fun C' _ => key C'), Finset.sum_ite_eq Finset.univ C a] at hx
   simpa using hx
 
-/-- A central element of `k[G]` has class-constant coefficients: `z (h * x * h⁻¹) = z x`.
-Conjugation by `h` permutes the support of `z` without changing the coefficients (this is the
-content of `z` commuting with `single h 1`). -/
-theorem coeff_center_conj {z : MonoidAlgebra k G}
-    (hz : z ∈ Subalgebra.center k (MonoidAlgebra k G)) (h x : G) :
-    (z.coeff (h * x * h⁻¹) : k) = z.coeff x := by
-  have key := (Finsupp.ext_iff.mp (congrArg MonoidAlgebra.coeff
-    ((Subalgebra.mem_center_iff.mp hz) (MonoidAlgebra.single h 1)))) (h * x)
-  rw [MonoidAlgebra.coeff_single_mul_apply, MonoidAlgebra.coeff_mul_single_apply, one_mul, mul_one,
-    inv_mul_cancel_left] at key
-  exact key.symm
+/-- The class sum `classSum C`, packaged as an element of the centre subalgebra. -/
+noncomputable def classSumCenter (C : ConjClasses G) :
+    ↥(Subalgebra.center k (MonoidAlgebra k G)) :=
+  ⟨classSum C, classSum_mem_center C⟩
 
-/-- A central element is constant along a conjugacy class: `mk a = mk b ⟹ z a = z b`. -/
-theorem coeff_center_of_mk_eq {z : MonoidAlgebra k G}
-    (hz : z ∈ Subalgebra.center k (MonoidAlgebra k G)) {a b : G}
-    (hab : ConjClasses.mk a = ConjClasses.mk b) : (z.coeff a : k) = z.coeff b := by
-  obtain ⟨h, rfl⟩ := isConj_iff.mp (ConjClasses.mk_eq_mk_iff_isConj.mp hab)
-  exact (coeff_center_conj hz h a).symm
+@[simp] theorem classSumCenter_coe (C : ConjClasses G) :
+    (classSumCenter (k := k) C : MonoidAlgebra k G) = classSum C := rfl
+
+variable [Fintype (ConjClasses G)]
 
 /-- **The class-sum expansion of a central element**: `z = ∑_C z(C.out) • classSum C`.
 Reading off the coefficient at `y`, only the class `C = mk y` contributes, with value
@@ -151,14 +110,6 @@ theorem center_eq_sum_classSum {z : MonoidAlgebra k G}
   have hmk : ConjClasses.mk ((ConjClasses.mk y).out) = ConjClasses.mk y := by
     rw [← ConjClasses.quotient_mk_eq_mk]; exact Quotient.out_eq _
   exact (coeff_center_of_mk_eq hz hmk).symm
-
-/-- The class sum `classSum C`, packaged as an element of the centre subalgebra. -/
-noncomputable def classSumCenter (C : ConjClasses G) :
-    ↥(Subalgebra.center k (MonoidAlgebra k G)) :=
-  ⟨classSum C, classSum_mem_center C⟩
-
-@[simp] theorem classSumCenter_coe (C : ConjClasses G) :
-    (classSumCenter (k := k) C : MonoidAlgebra k G) = classSum C := rfl
 
 /-- **The class-sum basis of the centre `Z(k[G])`** over an arbitrary field, indexed by conjugacy
 classes.  Linear independence is inherited from the ambient `k[G]` (disjoint supports); spanning is
@@ -185,6 +136,7 @@ noncomputable def centerBasis :
     centerBasis (k := k) (G := G) C = classSumCenter C :=
   Basis.mk_apply _ _ C
 
+omit [Fintype (ConjClasses G)] in
 /-- A group automorphism `α` of `G` acts on conjugacy classes compatibly with the algebra
 automorphism `MonoidAlgebra.domCongr α` of `k[G]`: it **permutes the class-sum basis**,
 `domCongr α (classSum C) = classSum (map α C)`.  Reading off the coefficient at `y`, both sides are
