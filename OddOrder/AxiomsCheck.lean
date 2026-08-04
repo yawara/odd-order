@@ -204,7 +204,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularClassIndex
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
 import OddOrder.GroupTheory.RepresentationTheory.Modular.TruncClassSum
 import OddOrder.Algebra.CentralCharacterBlock
-import OddOrder.Algebra.PGroupFixedVector
+import OddOrder.Algebra.ClassSumOffCentralizer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
@@ -16048,10 +16048,16 @@ counting a basis of `Z(K[G])`. -/
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.eq_inducedBlock
 
-/-! **標数 p で p-冪位数の作用素は非零ベクトルを固定する** — Navarro (2.32) のエンジン
-(`Algebra.PGroupFixedVector`). -/
+/-! **正規 p-部分群は単純加群に自明に作用する** — Navarro (2.32)
+(`Algebra.NormalPSubgroupTrivialAction`) と、その帰結である
+**`C_G(O_p(G))` を外す類和は中心指標に殺される** — Navarro (4.7)
+(`Algebra.ClassSumOffCentralizer`). -/
 
 #assert_only_allowed_axioms
-  OddOrder.charP_moduleEnd
+  OddOrder.GroupAlgebra.blockRepresentation_eq_one_of_mem_normal_pSubgroup
 #assert_only_allowed_axioms
-  OddOrder.exists_ne_zero_fixed_of_pow_eq_one
+  OddOrder.GroupAlgebra.pi_single_eq_one_of_mem_normal_pSubgroup
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.pi_classSum_eq_zero_of_notMem_centralizer
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.blockCharacter_classSumCenter_eq_zero
