@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
 
 /-!
@@ -22,6 +23,8 @@ Külshammer's formula is what this becomes once the two values of `λ_B(Ĝ⁰)` 
 
 * `OddOrder.RepresentationTheory.Modular.pRegularSum_eq_sum_classSum`
 * `OddOrder.RepresentationTheory.Modular.coeff_pElementSum_mul_pRegularSum`
+* `OddOrder.RepresentationTheory.Modular.coeff_pElementSum_mul_pRegularSum_principalBlock` —
+  **Navarro (6.14)**
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -117,5 +120,44 @@ theorem coeff_pElementSum_mul_pRegularSum [Fact p.Prime]
     Finset.sum_comm]
   refine Finset.sum_congr rfl fun B _ => ?_
   rw [hchar B, Finset.sum_mul]
+
+set_option maxHeartbeats 1600000 in
+-- The collapse of the block sum runs under the same instance chains as (4.23).
+set_option linter.unusedFintypeInType false in
+open scoped Classical in
+/-- **Navarro (6.14), Külshammer's formula** (coefficient form).  Only the principal block
+survives in `∑_B λ_B(Ĝ⁰) e_B`, with `λ_{B_0}(Ĝ⁰) = |G⁰|*`:
+
+`(Ĝ_p · Ĝ⁰)(x_C) = |G⁰|* · e_{B_0}(x_C)`,
+
+i.e. `π(Ĝ_p Ĝ⁰) = |G⁰|* e_{B_0}`.  Since `p ∤ |G⁰|` this determines the coefficients of the
+principal block idempotent. -/
+theorem coeff_pElementSum_mul_pRegularSum_principalBlock [Fact p.Prime]
+    [Fintype (MatrixModule.Block πG hπG hlinG)] (S : Sylow p G) (C : ConjClasses G)
+    {F : MatrixModule.Block πG hπG hlinG → Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)}
+    {F' : MatrixModule.Block πG hπG hlinG →
+      Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) G)}
+    (hidem : ∀ B, IsIdempotentElem (F B))
+    (hf : ∀ B, MonoidAlgebra.mapRingHom G (residue 𝒪) ((F B : MonoidAlgebra 𝒪 G))
+      = ((F' B : MonoidAlgebra (ResidueField 𝒪) G)))
+    (hB : ∀ B, MatrixModule.blockCharacterPi πG hπG hlinG (F' B) = Pi.single B 1)
+    (hweak : ∀ B : MatrixModule.Block πG hπG hlinG, ∀ x : ↥(S : Subgroup G), (x : G) ≠ 1 →
+      ∑ i ∈ Finset.univ.filter (fun i => blockOfIrr e hπG hlinG hnilG i = B),
+        (wedderburnRepresentation e i).character C.out⁻¹
+          * (wedderburnRepresentation e i).character (x : G) = 0)
+    (hvanish : ∀ B : MatrixModule.Block πG hπG hlinG,
+      B ≠ principalBlock πG hπG hlinG hnilG →
+      MatrixModule.blockCharacter πG hπG hlinG B
+        ⟨pRegularSum p (ResidueField 𝒪), pRegularSum_mem_center⟩ = 0) :
+    (pElementSum p (ResidueField 𝒪) (G := G) * pRegularSum p (ResidueField 𝒪)).coeff C.out
+      = ((Finset.univ.filter (fun g : G => IsPRegular p g)).card : ResidueField 𝒪)
+        * ((F' (principalBlock πG hπG hlinG hnilG) :
+            MonoidAlgebra (ResidueField 𝒪) G)).coeff C.out := by
+  classical
+  rw [coeff_pElementSum_mul_pRegularSum e hπG hlinG hnilG S C hidem hf hB hweak,
+    Finset.sum_eq_single (principalBlock πG hπG hlinG hnilG)
+      (fun B _ hBne => by rw [hvanish B hBne, zero_mul])
+      (fun h => absurd (Finset.mem_univ _) h),
+    blockCharacter_principalBlock_pRegularSum πG hπG hlinG hnilG p]
 
 end OddOrder.RepresentationTheory.Modular

@@ -17014,3 +17014,9 @@ Navarro (4.19) がブロックごとに再編する係数 `a_B(K̂)` の正体�
   OddOrder.RepresentationTheory.Modular.pRegularSum_eq_sum_classSum
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.coeff_pElementSum_mul_pRegularSum
+
+/-! 🎯🎯🎯🎯 **Navarro (6.14) Külshammer の公式** (`Modular/KulshammerFormula`) —
+`(Ĝ_p·Ĝ⁰)(x_C) = |G⁰|*·e_{B₀}(x_C)`、すなわち `π(Ĝ_p Ĝ⁰) = |G⁰|* e_{B₀}`。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.coeff_pElementSum_mul_pRegularSum_principalBlock
