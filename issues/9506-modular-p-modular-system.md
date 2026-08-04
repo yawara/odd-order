@@ -619,23 +619,25 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         🎯 `coe_subrepresentation_asAlgebraHom` (部分表現は群環の作用全体の制限を担う) +
         🎯 `subrepresentation_asAlgebraHom_eq_smul`。
 
+  - [x] **組み立て** — 完了 (2026-08-04、`Modular/BlockOfRepresentation.lean`)。
+        🎯🎯 `exists_eq_centralCharacterAlg_of_asAlgebraHom_eq_smul`:
+        **`Z(k[G])` が表現上でスカラー `c` 倍なら `c` はどれかのブロックの中心指標**。
+        ⚠ `M := (ρ.subrepresentation W hWinv).asModule` を明示しないと
+        `IsSemisimpleModule` の instance 解決が metavariable で詰まる。
+
+**⟹ 段 93 完了 (2026-08-04)。ordinary → block の橋が通った。**
+絶対既約 `𝒪`-格子について: `ω_χ` (整数性つき) → 還元で中心はスカラー `λ_χ` 作用 →
+`λ_χ = centralCharacterAlg π i` = **`χ` の属するブロック** (Navarro (3.1)(3.3))。
+
 ### 次にやること (2026-08-04 時点の frontier)
 
-**段 93 の部品は 4 つとも揃った。残るのは組み立て 1 本。**
-
-- [ ] 4 部品を繋いで `∃ i, λ_χ = centralCharacterAlg π i` を出す:
-      1. `exists_minimal_invariant` (極小不変部分空間 `W`)
-      2. `isSimpleModule_subrepresentation_of_minimal` (`W` の部分表現が単純)
-      3. `subrepresentation_asAlgebraHom_eq_smul` (`λ` が `W` へ降りる)
-      4. `exists_eq_centralCharacterAlg_of_forall_smul_eq` (単純加群 → ブロック)
-      ⚠ 注意点 2 つ: **(a)** `Representation.asModule` の `smul` と `asAlgebraHom` の
-      対応を経由する必要がある。**(b)** `ker π ≤ Module.annihilator` は
-      `ker π = J(kG)` + `IsSemisimpleModule.jacobson_le_annihilator` で出る
-      (`BrauerDecomposition.lean` に同じ使い方の前例あり)。
-      素材の所在: `Modular/IrreducibleIsBlock.lean` は **Brauer 指標**の等式を返す形で
-      中心指標用の hook では**ない** (2026-08-04 実測、探し直さないこと)。
-
-そのあと段 94 (Cartan 行列) 以降へ。
+- [ ] **段 94: Cartan 行列 `C = DᵀD`** + `([φ,θ]⁰)` が逆行列であること ((7.6) が使う)。
+      段 92 の `decompositionNumber` と段 93 の block 写像が揃ったので着手可能。
+      ⚠ `D` の行添字 = `Irr(G)` を**添字集合として**持つ必要がまだある
+      (段 92 は「1 つの格子表現の分解数」まで)。`Irr(G)` の枚挙をどう持つかが最初の設計判断。
+      ⚠⚠ ここで「`StandardSystem` は ordinary 側の分裂体として不十分」(上記) が効くはず —
+      `Irr(G)` を数えるには `K` が `K[G]` を分裂させる必要があるため。分岐拡大の構成が
+      必要になったらそこで着手する。
 - [ ] **94: Cartan 行列 `C = DᵀD`** + `([φ,θ]⁰)` が逆行列であること ((7.6) が使う)
 - [ ] **95: Brauer 対応 `b^G`** (段 88–91 の `Br_P` / defect group から。
       `(5.6)`/`(5.7)` = `b^G` の well-defined 性)
