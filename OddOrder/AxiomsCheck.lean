@@ -16760,6 +16760,8 @@ Sylow `p`-部分群の共役作用 + `C_G(P)` の Sylow が中心的、の 2 段
 #assert_only_allowed_axioms
   OddOrder.GroupAlgebra.coeff_subgroupSum_mul
 #assert_only_allowed_axioms
+  OddOrder.GroupTheory.CenterClassSum.coeff_classSum_mul
+#assert_only_allowed_axioms
   OddOrder.GroupAlgebra.centralScalar_subgroupSum_eq_zero_or_card
 #assert_only_allowed_axioms
   OddOrder.GroupAlgebra.sum_sq_centralScalar_subgroupSum

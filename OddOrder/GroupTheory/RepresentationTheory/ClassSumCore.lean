@@ -107,6 +107,31 @@ theorem coeff_classSum (C : ConjClasses G) (x : G) :
     Finset.sum_ite_eq' Finset.univ x (fun g => if ConjClasses.mk g = C then (1 : k) else 0)]
   simp
 
+open scoped Classical in
+/-- **Left multiplication by a class sum sums the coefficients over the class.**
+`(K̂ · w)(g) = ∑_{v ∈ K} w(v⁻¹ g)`. -/
+theorem coeff_classSum_mul (C : ConjClasses G) (w : MonoidAlgebra k G) (g : G) :
+    (classSum (k := k) C * w).coeff g
+      = ∑ v ∈ Finset.univ.filter (fun v : G => ConjClasses.mk v = C), w.coeff (v⁻¹ * g) := by
+  classical
+  have hL : classSum (k := k) C * w
+      = ∑ v ∈ Finset.univ.filter (fun v : G => ConjClasses.mk v = C),
+        MonoidAlgebra.single v (1 : k) * w := by
+    rw [classSum, Finset.sum_mul]
+    rw [Finset.sum_congr rfl fun v (_ : v ∈ Finset.univ) =>
+      show (if ConjClasses.mk v = C then (MonoidAlgebra.of k G) v else 0) * w
+          = if ConjClasses.mk v = C then MonoidAlgebra.single v (1 : k) * w else 0 by
+        by_cases h : ConjClasses.mk v = C
+        · rw [if_pos h, if_pos h]; rfl
+        · rw [if_neg h, if_neg h, zero_mul]]
+    rw [← Finset.sum_filter]
+  rw [hL, MonoidAlgebra.coeff_sum, Finset.sum_apply']
+  refine Finset.sum_congr rfl fun v _ => ?_
+  rw [MonoidAlgebra.coeff_single_mul_eq_mul_coeff (v⁻¹ * g) (fun m' _ => ?_), one_mul]
+  constructor
+  · intro h; rw [← h]; group
+  · rintro rfl; group
+
 /-- Each class sum is central in `k[G]`: `classSum C` commutes with every `of k G h` (conjugation
 permutes the class `C`), hence with all of `k[G]` by linearity. -/
 theorem classSum_mem_center (C : ConjClasses G) :
