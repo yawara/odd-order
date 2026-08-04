@@ -100,6 +100,27 @@ theorem centralScalar_smul (hπ : Function.Surjective π) {z : A} (hz : z ∈ Se
   funext j
   simp [Matrix.mulVec, Matrix.diagonal, dotProduct]
 
+/-- **The central character is *the* scalar**: any scalar by which a central element acts on the
+`i`-th block is its central-character value.
+
+This is the last step of the bridge from an ordinary character to its block.  The reduction of an
+absolutely irreducible `𝒪`-lattice has the centre acting by `λ_χ`
+(`Modular.baseChange_apply_center` plus `Modular.asAlgebraHom_reduction_mapRingHom`); if a
+constituent of that reduction is the `i`-th block, this identifies `λ_χ` with
+`centralCharacter π i`, i.e. tells us which block `χ` lies in. -/
+theorem eq_centralScalar_of_forall_smul_eq (hπ : Function.Surjective π) {z : A}
+    (hz : z ∈ Set.center A) {c : k}
+    (h : letI := blockModule nn π i; ∀ v : nn i → k, z • v = c • v) :
+    c = centralScalar π i z := by
+  classical
+  letI := blockModule nn π i
+  set a := Classical.arbitrary (nn i) with ha
+  have hv : (c : k) • (Pi.single a 1 : nn i → k)
+      = centralScalar π i z • (Pi.single a 1 : nn i → k) := by
+    rw [← h (Pi.single a 1), centralScalar_smul π i hπ hz]
+  have := congrFun hv a
+  simpa using this
+
 /-! ### The centre as a `k`-algebra -/
 
 section Alg
@@ -137,6 +158,16 @@ noncomputable def centralCharacterAlg (hπ : Function.Surjective π)
       · subst h; simp [Matrix.scalar_apply]
       · simp [Matrix.scalar_apply, Matrix.one_apply_ne h, Matrix.diagonal_apply_ne _ h]
     simp [centralScalar, hr, Matrix.scalar_apply]
+
+/-- **The algebra-homomorphism form of `eq_centralScalar_of_forall_smul_eq`.**  This is the shape
+the block partition is stated in (`blockSetoid` compares `centralCharacterAlg`), so it is the
+form in which "χ lies in block `i`" gets proved. -/
+theorem eq_centralCharacterAlg_of_forall_smul_eq (hπ : Function.Surjective π)
+    (hlin : ∀ (c : k) (a : A), π (c • a) = c • π a)
+    {z : Subalgebra.center k A} {c : k}
+    (h : letI := blockModule nn π i; ∀ v : nn i → k, (z : A) • v = c • v) :
+    c = centralCharacterAlg π i hπ hlin z :=
+  eq_centralScalar_of_forall_smul_eq π i hπ mem_center_of_mem_centerSubalgebra h
 
 end Alg
 

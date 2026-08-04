@@ -15738,6 +15738,10 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
 #assert_only_allowed_axioms
   OddOrder.MatrixModule.centralScalar_smul
 #assert_only_allowed_axioms
+  OddOrder.MatrixModule.eq_centralScalar_of_forall_smul_eq
+#assert_only_allowed_axioms
+  OddOrder.MatrixModule.eq_centralCharacterAlg_of_forall_smul_eq
+#assert_only_allowed_axioms
   OddOrder.exists_mem_eq_one_eq_zero
 #assert_only_allowed_axioms
   OddOrder.Subalgebra.eq_top_of_separates
