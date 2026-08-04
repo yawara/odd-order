@@ -1413,7 +1413,10 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               射影のトレースは像の次元 (mathlib `LinearMap.IsProj.trace`)。
               ⟹ `[χ_P,1_P] = dim V^P` が**非負整数**であることが従い、`|P| = p^a` で
               割った後も付値環に留まる (剰余体への還元の要点)。
-            - **類の defect `d(K)`** と `p^{a-d(K)}` による正規化 (Ch.3 の材料、未整備)。
+            - [x] **類の defect `d(K)` 完了 (2026-08-05、`GroupTheory/ClassDefect.lean`)**:
+              `classDefect p C = ν_p(|C_G(x_K)|)` / 🎯
+              `classDefect_add_factorization_conjugacyClassSize` (**`d(K) + ν_p(|K|) = ν_p(|G|)`**)
+              / `ordProj_conjugacyClassSize_mul_pow_classDefect` (`|K|_p · p^{d(K)} = |G|_p`)。
           * [ ] (4.23) `R(z) = π(Ĝ_p z)`。
             - [x] **組合せ半分 完了 (2026-08-05、`GroupTheory/SylowCosetPairs.lean`)**:
               🎯 `factorThroughEquivCosetPairs` (`(x,y) ↦ (xy,y)` が
@@ -1453,7 +1456,17 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               ⚠ 途中で `mapRingHom_mem_center` を書きかけたが既存だった
               (`Algebra/CenterIdempotentLift.lean`、任意の環準同型版)。**重複 3 例目** —
               新規補題は必ず概念名で先に grep する。
-              残り = 類の defect `d(K)` の付値計算 + (4.19) の組み立て。
+              残り = **(4.19) の組み立てのみ** (部品はすべて揃った)。
+              ⚠ **組み立ての設計メモ (2026-08-05)**: (4.23) は係数比較で書くのが素直。
+              右辺 `π(Ĝ_p L̂)` の `g`-係数は整数 `|{(x,y) ∈ G_p × L : xy = g}|` の還元
+              (割り算不要)。左辺 `Σ_B λ_B(L̂) e_B` の `g`-係数は
+              `Σ_B λ_B(L̂) · residue((f_B)_g)` で、`(f_B)_g ∈ 𝒪` は
+              `mapRingHom_blockIdempotent_eq_sum` により `K` で
+              `Σ_{χ∈Irr(B)}(χ(1)/|G|)χ(g⁻¹)` に等しい。
+              ⚠ ここで `ω_i(L̂)` はブロック内で**還元してからしか**一致しないので、
+              `Σ_i` にまとめると `(L̂)_g` になってしまい情報が消える (実際に検算した)。
+              ブロックごとにまとめたまま `d(K)` の付値で分母を管理する Navarro の
+              手順が必要。
           * [ ] (3.32) `u_χ f_B` の補題 ⟹ `λ_B(Ĝ⁰) = 0` (`B ≠ B₀`)。
             `λ_{B₀}(Ĝ⁰) = |G⁰|*` は既存の `aug` + `not_dvd_card_isPRegular` で済む。
           ⟹ **見通し**: (4.19) が 2-3 段、(4.23)+(3.32)+(6.14)+(6.1) で 3-4 段。
