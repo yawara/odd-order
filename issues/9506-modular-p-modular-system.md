@@ -1244,6 +1244,20 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         `B`-部分 `θ_B`、第二直交関係、`p`-section が要る。(5.8) より重い足場。
         ⚠ BS 本証明 (段 102) が直接引くのは **(5.8) + 第三主定理 (6.7)** なので、
         文書順どおりなら次は段 99 (第三主定理) を先に進める判断もありうる。
+    - [x] **前提 1: `hEnd` (絶対既約性) の証明** — 完了 (2026-08-05、`LatticeBaseChange.lean`)。
+          `BlockOfLattice` / `OrdinaryLatticeCharacter` が仮説で担いでいた同一視
+          `K ⊗_𝒪 L ≃ₗ[K] V` を `latticeBaseChangeEquiv` で構成 (基底を
+          `Module.Basis.baseChange` と `Module.Basis.extendOfIsLattice` で突き合わせ)、
+          `exists_smul_id_of_commute_blockAction` を転送して
+          🎯 `exists_smul_id_of_commute_baseChange` = `hEnd`。
+          ⚠ 要点: `𝒪G` の像だけでは足りず、単項式から `K`-線型性で `K[G]` 全体へ広げる帰納。
+    - [x] **前提 2: `blockOfIrr`** — 完了 (2026-08-05、`BlockOfIrreducible.lean`)。
+          🎯 `blockOfIrr e i : Bl(G)` = **`χ_i` のブロック** (Navarro (3.11))。
+          `nontrivial_of_isLattice` (非零空間の格子は非零) で `[Nontrivial L]` も供給。
+          ⟹ `Irr(B) = {i | blockOfIrr e i = B}` が定義可能。
+    - [ ] **前提 3: 類関数の `B`-部分 `θ_B = Σ_{χ ∈ Irr(B)} [θ,χ] χ`**。
+          repo の `ClassFunction` / 内積 API と `blockOfIrr` を繋ぐ。(5.10) の主語。
+    - [ ] **前提 4: `p`-section `S(x)` と「`xy_i` が `S(x)` の類代表」**。(5.11)/(5.13) が使う。
   - [ ] (5.10)/(5.11)/(5.12)/(5.13) は `Irr(B)` の**族**と類関数の `B`-部分 `θ_B`、
         第二直交関係、`p`-section が要る。(5.8) より重い足場なので後回し。
 - [ ] **99: 🎯 第三主定理 `(6.7)`** — Okuyama の証明 ((6.1)–(6.6) 経由、非常に一般な形)
