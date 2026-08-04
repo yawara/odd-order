@@ -1535,9 +1535,28 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               各 `P̂` を共役で `Ŝ` に戻すだけの**純粋な代数**になる
               (1 での係数は共役不変 = `coeff_conj_smul_one`、`K̂'`・`L̂` は中心的で動かない)。
               当初見込んだ `FactorThrough`/`CosetPairs` の突き合わせ 3 本が丸ごと消えた。
-              残り = (ii) (4.19) の `𝒪` 版と合わせて `|K|` を約す (整域なので
-              `|K| ≠ 0` から素直)、(iii) `|Syl_p| ≡ 1 (mod p)` で還元、
-              (iv) `π` (p-正則類への切り詰め) と `R` の同定。
+              [x] 🎯🎯🎯 **配線 (ii) 完了 (2026-08-05、`Modular/OmegaBurnsideSylowSum`)**:
+              `ordCompl_mul_coeff_sylowSum_mul` —
+              **`|G|_{p'}·(W·L̂)(x_K) = |Syl_p|·∑_χ χ(x_K⁻¹) ω_χ(L̂) dim V_χ^S`**。
+              `|K|` は**両側に同じ因子として立つ** — 数え上げ側は「中心元の係数は類上一定」
+              (`sum_class_coeff_of_mem_center`)、指標側は Burnside
+              (`ω_χ(K̂')χ(1) = |K'|χ(x_{K'})`、`|K'| = |K|` は
+              `conjugacyClassSize_mk_inv`) — ので、標数 0 の `|K| ≠ 0` で
+              `mul_left_cancel₀` するだけ。**`ℚ` に出ない**。
+              ⚠ 副産物: `coeff_subgroupSum_mul_one` / `sum_class_coeff_sylowSum_mul` の
+              statement 内 `letI := Fintype.ofFinite` を instance binder に変更
+              ((4.19) 側と instance を揃えるため; `Fintype` は subsingleton なので
+              証明側は `Subsingleton.elim` 1 本で吸収)。
+              [x] 🎯🎯 **配線 (iii) 完了 (2026-08-05、`Modular/SylowSumReduction`)**:
+              `ordCompl_mul_coeff_sylowSum_mul_over` (`𝒪` へ降下: `χ(x_K⁻¹)` は格子トレース
+              `ordinaryCharacter`、`ω_χ(L̂)` は `algebraMap_centralScalar_eq`) と
+              🎯🎯 `residue_ordCompl_mul_coeff_pElementSum_mul` —
+              **`|G|_{p'}*·(Ĝ_p·L̂)*(x_K) = ∑_B λ_B(L̂)·∑_{χ∈Irr(B)}(χ(x_K⁻¹)·dim V_χ^S)*`**
+              (`|Syl_p| → 1` = Sylow 第三定理、`W → Ĝ_p` = (4.22)、
+              `∑_{Irr(G)}` は `blockOfIrr` の fiber ごとにまとまる)。
+              残り = (iv) p.93 の評価
+              `∑_{χ∈Irr(B)} χ(x_K⁻¹)·dim V_χ^S = |G|_{p'}·(f_B)_{x_K}` を入れて
+              `|G|_{p'}*` を約す ⟹ `(Ĝ_p L̂)*(x_K) = ∑_B λ_B(L̂)(e_B)_{x_K}` = (4.23)。
               ⚠ **設計上の注意 (2026-08-05 に検算)**: `Ĝ_p` を使って
               `|G|(Ĝ_p L̂)_g = ∑_i ω_i(L̂)(∑_{x∈G_p}χ_i(x))χ_i(g⁻¹)` と書く道もあるが、
               左辺の `|G|` に `p` が残るので還元で潰れる。**単一の Sylow `S` を使って
