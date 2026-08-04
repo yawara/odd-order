@@ -1501,13 +1501,20 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
           (**`|N| · Σ_{ω_i(N̂)≠0} m_i² = |G|`**)。
           支持: `SubgroupSum` に `subgroupSum_mul_subgroupSum` / `coeff_subgroupSum_one`、
           `TraceMulLeft` に 🎯 `trace_mulLeft_algEquiv`。
-        * [ ] **残り = `{i : ω_i(N̂) ≠ 0} = Irr(B₀)` の同定**。
-          (⊆) `ω_i(N̂) = |N| ⟹ N ≤ ker χ_i` ⟹ (剰余で) そのブロックが `N` を潰す ⟹
-          `G = N·P` なら `G` 全体を潰す ⟹ 既存 `eq_of_forall_pi_single_eq_one`
-          (「`G` を潰すブロックは一意」) で `B₀`。
-          (⊇) は既存の `le_blockKernel_of_normal_of_forall_eq_one` の系。
-          ⚠ ただし前者は**通常側 (`K`) の `ω_i`** と**剰余体側 (`k`) のブロック**を
-          繋ぐので `blockOfIrr` 経由の配管が要る (`blockCharacter_subgroupSum` が既にある)。
+        * [x] 🎯🎯🎯 **完了 (2026-08-05、`Modular/PrincipalBlockCartan.lean`)**。
+          `G = N·P` (正規 `p`-補群の形) のとき:
+          - 🎯 `centralScalar_subgroupSum_ne_zero_iff` (通常側: `ω_i(N̂) ≠ 0 ⟺ N ≤ ker χ_i`)
+          - 🎯🎯🎯 `forall_eq_one_iff_blockOfIrr_eq_principalBlock`
+            (**`Irr(B₀) = {χ_i : N ≤ ker χ_i}`**)。(⟸) は主ブロックの中心指標 = 添加写像
+            ⟹ `λ_{B₀}(N̂*) = |N|* ≠ 0`; (⟹) は「そのブロックが `N` を潰す ⟹ `G = N·P` で
+            `G` 全体を潰す ⟹ `eq_of_forall_pi_single_eq_one` で一意」
+          - 🎯🎯🎯 `card_mul_sum_sq_principalBlock` = **`|N| · Σ_{χ∈Irr(B₀)} χ(1)² = |G|`**
+          支持: `BlockKernel` の `forall_eq_one_of_residue_centralScalar_ne_zero`
+          ((6.10) 逆包含の核を括り出したもの)。
+  - [x] ⟹ **段 100 = (6.10)/(6.11)/(6.12 前半)/(6.13) 完了 (2026-08-05)**。
+        BS 本証明が「`C` が正規 2-補群を持つ ⟹ `b₀` の Cartan 行列は `(4)`」の形で引く部分が揃った。
+        残る (6.12) 後半 (`M/ker(B)` が `p`-群) は BS 経路では不要 (主ブロックの中心指標 =
+        添加写像で迂回済)。
   - [ ] **(6.12) 本体 (後半)**。原文 p.127 の証明が要求するのは
         (i) `ker(B) ≤ ker φ` (`φ ∈ IBr(B)`) — 上の逆包含の **`k` 側版**
         (`λ_B(N̂*) = |N|*` ≠ 0 ⟹ block 表現上で `N̂` が単元 ⟹ 核判定) でほぼ同型に書ける、
