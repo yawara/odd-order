@@ -700,7 +700,26 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         p-正則な `y` と任意の `x` で `Σ_φ Φ_φ(x) φ(y⁻¹) = |C_G(y)| δ_{y~x}` /
         🎯🎯 `projectiveIndecomposableCharacter_eq_zero` (`x` が p-特異なら `Φ_φ(x) = 0`)。
 
-  - [ ] **`[Φ_θ,φ]⁰ = δ_{θφ}` → `([θ,φ]⁰)` が `C` の逆行列** ((2.13) の締め)。
+  - [x] **`[Φ_θ,φ]⁰ = δ_{θφ}` → `([θ,φ]⁰)` が `C` の逆行列** — 完了 (2026-08-04)。
+        `Modular/PRegularClassIndex.lean`: 🎯 `card_eq_card_pRegularClass`
+        (repo 既存の Brauer 数え上げを `π : →+*` 形へ bridge) + `equivPRegularClass` +
+        `pRegularRep` + 🎯 `pRegularRep_isConj_iff`。
+        `Modular/CartanInverse.lean`: 🎯 `isUnit_card_centralizer` /
+        🎯🎯 `projMatrix_mul_brauerMatrix` (`A·B = 1`) /
+        🎯🎯 `brauerMatrix_mul_projMatrix` (正方性で `B·A = 1`) /
+        🎯🎯 `sum_brauer_mul_projectiveIndecomposableCharacter` /
+        🎯 `sum_eq_sum_pRegularRep` · `sum_pRegular_eq_sum_pRegularRep` (類分解) /
+        3 種の指標の `IsConj` 形類関数性 / `pairingZero` (Navarro の `[a,b]⁰`、
+        ⚠ `|G|` は 𝒪 で可逆でないので値は `K`) /
+        🎯 `pairingZero_eq_sum_pRegularRep` /
+        🎯🎯🎯 `pairingZero_projectiveIndecomposableCharacter` (`[Φ_θ,φ]⁰ = δ`) /
+        🎯🎯🎯 `sum_cartanMatrix_mul_pairingZero` (`Σ_μ c_{μθ} [μ,φ]⁰ = δ`)。
+
+**⟹ 段 94 完了 (2026-08-04)。** 分解行列 `D`・Cartan 行列 `C = DᵀD`・射影不可分解指標
+`Φ_φ`・分裂体上の第一/第二直交関係・Navarro (2.13) (`([μ,φ]⁰) = C⁻¹`) が揃った。
+
+<details><summary>着手時の計画 (参考)</summary>
+
         材料は全部揃っている:
         * 行列等式 `A·B = I`。`x` を p-正則類の代表 `x_L` に走らせ
           `A_{L,φ} := Φ_φ(x_L)`、`B_{φ,K} := φ(x_K⁻¹) / |C_G(x_K)|` と置くと
@@ -714,6 +733,7 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
           `C · ([μ,φ]⁰) = I`。
         ⚠ p-正則類の代表を取る仕掛け (`conjugacyClassRepresentative` の p-正則版) と
         `[Φ_θ,φ]⁰` の定義 (`(1/|G|) Σ_{g ∈ G°}`) をどう置くかが最初の設計判断。
+</details>
 - [ ] **94: Cartan 行列 `C = DᵀD`** + `([φ,θ]⁰)` が逆行列であること ((7.6) が使う)
 - [ ] **95: Brauer 対応 `b^G`** (段 88–91 の `Br_P` / defect group から。
       `(5.6)`/`(5.7)` = `b^G` の well-defined 性)
