@@ -210,6 +210,7 @@ import OddOrder.Algebra.ClassSumOffCentralizer
 import OddOrder.Algebra.JacobsonCentralSubring
 import OddOrder.Algebra.CornerInverse
 import OddOrder.Algebra.EigenCornerInverse
+import OddOrder.Algebra.EigenTraceVanishing
 import OddOrder.Algebra.GroupAlgebraIdeal
 import OddOrder.Algebra.BlockCornerInverse
 import OddOrder.Algebra.BlockCornerLift
@@ -16321,3 +16322,11 @@ block 冪等元 `f_B` を `H`-部分と `G ∖ H`-部分に割るための道具
   OddOrder.exists_corner_inverse_eigen
 #assert_only_allowed_axioms
   OddOrder.eq_zero_of_smul_eq_zero_of_corner_inverse
+
+/-! **Navarro (5.7) の結論** (`Algebra.EigenTraceVanishing`) — `χ(f_b h) = 0`.
+教科書の固有値の重複度勘定を「`H` と `ζH` が相似」に置き換えた版. -/
+
+#assert_only_allowed_axioms
+  OddOrder.trace_eq_zero_of_conj_smul
+#assert_only_allowed_axioms
+  OddOrder.trace_idempotent_mul_eq_zero
