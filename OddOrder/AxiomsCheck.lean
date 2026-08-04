@@ -16777,22 +16777,6 @@ Külshammer の公式 `Ĝ_p = ∑_{P ∈ Syl_p} P̂` の係数計算に使う。
   OddOrder.GroupTheory.card_sylow_containing_modEq_one
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.card_sylow_mem_modEq_one
-#assert_only_allowed_axioms
-  OddOrder.GroupTheory.isPElement_of_mem_of_isPGroup
-#assert_only_allowed_axioms
-  OddOrder.GroupAlgebra.pElementSum
-#assert_only_allowed_axioms
-  OddOrder.GroupAlgebra.pRegularSum
-#assert_only_allowed_axioms
-  OddOrder.GroupAlgebra.coeff_pElementSum
-#assert_only_allowed_axioms
-  OddOrder.GroupAlgebra.coeff_pRegularSum
-#assert_only_allowed_axioms
-  OddOrder.GroupAlgebra.pElementSum_eq_sum_sylow
-#assert_only_allowed_axioms
-  OddOrder.GroupAlgebra.conj_smul_subgroupSum_pointwise
-#assert_only_allowed_axioms
-  OddOrder.GroupAlgebra.sum_sylow_subgroupSum_mem_center
 
 /-! **Navarro Problem (6.1) (Külshammer)** (`GroupTheory/PFactorPairCount`) —
 `|Ω(g)| ≡ |Ω(g) ∩ (C_G(Q) × C_G(Q))| (mod p)`。第三主定理の逆向きの数え上げ段。 -/
