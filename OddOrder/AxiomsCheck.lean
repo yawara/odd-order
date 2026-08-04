@@ -243,6 +243,7 @@ import OddOrder.Algebra.SubgroupSumBlockAction
 import OddOrder.Algebra.TraceMulLeft
 import OddOrder.GroupTheory.SylowContaining
 import OddOrder.GroupTheory.SylowCosetPairs
+import OddOrder.GroupTheory.ClassDefect
 import OddOrder.GroupTheory.PFactorPairCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
 import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
@@ -16859,3 +16860,13 @@ Navarro (4.19) がブロックごとに再編する係数 `a_B(K̂)` の正体�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.mapRingHom_blockIdempotent_eq_sum
+
+/-! **共役類の `p`-defect** (`GroupTheory/ClassDefect`) — `|C_G(x_K)|_p = p^{d(K)}` と
+`d(K) + ν_p(|K|) = ν_p(|G|)`。Navarro (4.19) の `p^{a-d(K)}` 正規化。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.classDefect
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.classDefect_add_factorization_conjugacyClassSize
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.ordProj_conjugacyClassSize_mul_pow_classDefect

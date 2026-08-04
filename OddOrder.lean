@@ -148,6 +148,7 @@ import OddOrder.GroupTheory.OmegaSubgroup
 import OddOrder.GroupTheory.OpResidual
 import OddOrder.GroupTheory.SylowContaining
 import OddOrder.GroupTheory.SylowCosetPairs
+import OddOrder.GroupTheory.ClassDefect
 import OddOrder.GroupTheory.PFactorPairCount
 import OddOrder.GroupTheory.PrimeComplementResidual
 import OddOrder.GroupTheory.PrimeDegreeTwoTransitive
