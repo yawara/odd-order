@@ -16531,3 +16531,5 @@ Wedderburn 成分に対して**証明**する. -/
   OddOrder.RepresentationTheory.Modular.aug_centralizerTruncClassSumCenter
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.card_filter_centralizer_eq
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.inducedBlockOfNormalizer_principalBlock
