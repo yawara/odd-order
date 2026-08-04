@@ -242,6 +242,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
 import OddOrder.Algebra.SubgroupSumBlockAction
 import OddOrder.Algebra.TraceMulLeft
 import OddOrder.GroupTheory.SylowContaining
+import OddOrder.GroupTheory.PFactorPairCount
 import OddOrder.Algebra.PElementSum
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
@@ -16774,3 +16775,11 @@ Külshammer の公式 `Ĝ_p = ∑_{P ∈ Syl_p} P̂` の係数計算に使う。
   OddOrder.GroupAlgebra.coeff_pRegularSum
 #assert_only_allowed_axioms
   OddOrder.GroupAlgebra.pElementSum_eq_sum_sylow
+
+/-! **Navarro Problem (6.1) (Külshammer)** (`GroupTheory/PFactorPairCount`) —
+`|Ω(g)| ≡ |Ω(g) ∩ (C_G(Q) × C_G(Q))| (mod p)`。第三主定理の逆向きの数え上げ段。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.mem_fixedPoints_pFactorPairs_iff
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.card_pFactorPairs_modEq_centralizer
