@@ -1320,7 +1320,12 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
           🎯 `card_conjClass_modEq_card_centralizer`: `|K| ≡ |K ∩ C_G(P)| (mod p)`。
           `P` の共役作用の固定点が `K ∩ C_G(P)` (`mem_fixedPoints_conjClassCarrier_iff`) +
           `IsPGroup.card_modEq_card_fixedPoints`。
-    - [ ] **残り = 配線**。使う既存補題は特定済み:
+    - [x] 🎯🎯🎯 **配線 — 完了 (2026-08-05、`ThirdMainEasy.lean`)**。
+          `inducedBlockOfNormalizer_principalBlock`: `P C_G(P) ≤ H ≤ N_G(P)` なら
+          **`b_0^G = B_0`** (axiom-clean)。⚠ **height 理論を一切使っていない**。
+          補助: `aug_centralizerTruncClassSumCenter` (`λ_{b_0}(Br_P K̂) = |K ∩ H ∩ C_G(P)|·1`) /
+          `card_filter_centralizer_eq` / `card_filter_conjClass_eq`。
+          (使った既存補題:)
           * `inducedCentralCharacterAlgHom_toLinearMap` + `inducedCentralCharacter_classSumCenter`
             ⟹ `λ_b^G(K̂) = λ_b(truncClassSumCenter H K)`
           * `blockCharacter_truncClassSumCenter_eq` (= Navarro (4.14) 前半) ⟹
