@@ -601,22 +601,30 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         そのスカラーは `algebraMap 𝒪 k (ω z)` (= `λ`)。⟹ 還元の**どの単純構成因子でも
         中心は同じ指標で作用する**ので、全部同じブロックに入る (Navarro (3.3) の核心)。
 
-### 次にやること (段 93 の締め、2026-08-04 時点の frontier)
+  - [x] **橋渡しの後半** — 完了 (2026-08-04)。
+        🎯 `MatrixModule.eq_centralScalar_of_forall_smul_eq` /
+        🎯 `MatrixModule.eq_centralCharacterAlg_of_forall_smul_eq`:
+        中心元が第 `i` ブロック上でスカラー `c` 倍なら `c` はその中心指標値。
+        `centralScalar_smul` と突き合わせて `Pi.single a 1` で評価するだけ。
+        `centralCharacterAlg` の形にしたのは `blockSetoid` がこれを比較しているため。
+  - [x] **還元と群環作用の両立** — 完了 (2026-08-04)。
+        🎯 `asAlgebraHom_reduction_mapRingHom` (`Modular/Reduction.lean`):
+        還元は群の元だけでなく群環の作用全体と両立する。中心指標を下へ運ぶ足場。
 
-**橋渡しの後半** = `λ_χ` を `BlockIdempotent.lean` の `centralCharacterAlg π i` と同一視する。
-必要なのは「`k ⊗ L` の単純構成因子に対応する Wedderburn 添字 `i` について
-`centralCharacterAlg π i = λ_χ`」。`baseChange_apply_center` で左辺の作用が
-スカラー `λ_χ` だと分かっているので、あとは
+### 次にやること (2026-08-04 時点の frontier)
 
-* `k ⊗ L` の単純構成因子 ↔ 分裂 `π` の添字 (repo に `IrreducibleIsBlock.lean` /
-  `AsModuleSimple.lean` / `blockModule` がある) を使い、
-* `MatrixModule.centralScalar_smul` (「中心は `centralScalar π i` でスカラー作用」)
-  と突き合わせて、非零加群上で 2 つのスカラーが一致することを言う。
+段 93 の**数学的な中身は両端とも証明済み**。残るのは接続の plumbing 1 本:
 
-⚠ 設計上の要点: `φ : A →ₐ[𝒪] End 𝒪 L` (ordinary 側) と
-`π : k[G] →+* ∏ Matrix` (Brauer 側) を**どう関係づけるか**がこの段の実質。
-`A = MonoidAlgebra 𝒪 G` を固定し、`mapRingHom G (residue 𝒪)` で `k[G]` に落として
-`π` と繋ぐのが素直な線。
+- [ ] **還元 `k ⊗ L` の単純構成因子を Wedderburn 添字として取り出す**。
+      これがあれば `λ_χ = centralCharacterAlg π i` が両端の合成で出て、
+      `Irr(G) → Bl(G)` の block 写像が閉じる (= Navarro (3.1)(3.3))。
+      素材: `Modular/MinimalSubrepresentation.lean` (極小不変部分空間) /
+      `Modular/AsModuleSimple.lean` (`isSimpleModule_asModule`) /
+      `Modular/IrreducibleIsBlock.lean` (⚠ これは **Brauer 指標**の等式を返す形で、
+      中心指標用の hook ではない — 2026-08-04 実測)。
+      `Algebra/PiMatrixSimpleModules.lean` の `blockModule` と繋ぐ。
+
+そのあと段 94 (Cartan 行列) 以降へ。
 - [ ] **94: Cartan 行列 `C = DᵀD`** + `([φ,θ]⁰)` が逆行列であること ((7.6) が使う)
 - [ ] **95: Brauer 対応 `b^G`** (段 88–91 の `Br_P` / defect group から。
       `(5.6)`/`(5.7)` = `b^G` の well-defined 性)
