@@ -16151,3 +16151,9 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.mem_pow_smul_top_pi_iff
 #assert_only_allowed_axioms
   OddOrder.isAdicComplete_pi
+#assert_only_allowed_axioms
+  OddOrder.map_equiv_pow_smul_top
+#assert_only_allowed_axioms
+  OddOrder.isAdicComplete_of_linearEquiv
+#assert_only_allowed_axioms
+  OddOrder.isAdicComplete_of_basis

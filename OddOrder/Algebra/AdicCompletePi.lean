@@ -27,6 +27,8 @@ an instance it would be reported as unused.
 * `OddOrder.mem_pow_smul_top_self_iff`
 * `OddOrder.mem_pow_smul_top_pi_iff`
 * `OddOrder.isAdicComplete_pi`
+* `OddOrder.isAdicComplete_of_linearEquiv`
+* `OddOrder.isAdicComplete_of_basis` — a finite free module over a complete ring is complete
 -/
 
 namespace OddOrder
@@ -95,5 +97,60 @@ theorem isPrecomplete_pi (hι : Finite ι) [IsPrecomplete I R] : IsPrecomplete I
 theorem isAdicComplete_pi (hι : Finite ι) [IsAdicComplete I R] : IsAdicComplete I (ι → R) where
   toIsHausdorff := isHausdorff_pi I hι
   toIsPrecomplete := isPrecomplete_pi I hι
+
+/-! ### Transfer along a linear equivalence -/
+
+variable {M N : Type*} [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
+
+/-- A linear equivalence identifies the filtrations `I ^ n • ⊤`. -/
+theorem map_equiv_pow_smul_top (e : M ≃ₗ[R] N) (n : ℕ) :
+    Submodule.map (e : M →ₗ[R] N) (I ^ n • ⊤ : Submodule R M) = (I ^ n • ⊤ : Submodule R N) := by
+  rw [Submodule.map_smul'', Submodule.map_top, LinearMap.range_eq_top.mpr e.surjective]
+
+/-- Membership in the filtration is preserved by a linear equivalence. -/
+theorem mem_pow_smul_top_equiv_iff (e : M ≃ₗ[R] N) {n : ℕ} (x : M) :
+    e x ∈ (I ^ n • ⊤ : Submodule R N) ↔ x ∈ (I ^ n • ⊤ : Submodule R M) := by
+  rw [← map_equiv_pow_smul_top I e n, Submodule.mem_map_equiv]
+  simp
+
+/-- **Completeness transfers along a linear equivalence.** -/
+theorem isAdicComplete_of_linearEquiv (e : M ≃ₗ[R] N) [IsAdicComplete I M] :
+    IsAdicComplete I N where
+  haus' x hx := by
+    have hsymm : e.symm x = 0 := by
+      refine IsHausdorff.haus' (I := I) (e.symm x) fun n => ?_
+      rw [SModEq.sub_mem, sub_zero, ← mem_pow_smul_top_equiv_iff I e]
+      have hrw : e (e.symm x) = x := by simp
+      rw [hrw]
+      have hn := hx n
+      rw [SModEq.sub_mem, sub_zero] at hn
+      exact hn
+    simpa using congrArg e hsymm
+  prec' f hf := by
+    have hcauchy : ∀ {m n : ℕ}, m ≤ n →
+        e.symm (f m) ≡ e.symm (f n) [SMOD (I ^ m • ⊤ : Submodule R M)] := by
+      intro m n hmn
+      have hmn' := hf hmn
+      rw [SModEq.sub_mem] at hmn' ⊢
+      rw [← mem_pow_smul_top_equiv_iff I e]
+      have hrw : e (e.symm (f m) - e.symm (f n)) = f m - f n := by simp
+      rw [hrw]
+      exact hmn'
+    obtain ⟨L, hL⟩ := IsPrecomplete.prec' (I := I) (fun n => e.symm (f n)) hcauchy
+    refine ⟨e L, fun n => ?_⟩
+    rw [SModEq.sub_mem]
+    have hrw : f n - e L = e (e.symm (f n) - L) := by simp
+    rw [hrw, mem_pow_smul_top_equiv_iff]
+    have hn := hL n
+    rw [SModEq.sub_mem] at hn
+    exact hn
+
+/-- **A finite free module over a complete ring is complete.** -/
+theorem isAdicComplete_of_basis {ι : Type*} (hι : Finite ι) (b : Module.Basis ι R M)
+    [IsAdicComplete I R] : IsAdicComplete I M := by
+  haveI := hι
+  haveI : Fintype ι := Fintype.ofFinite ι
+  haveI : IsAdicComplete I (ι → R) := isAdicComplete_pi I hι
+  exact isAdicComplete_of_linearEquiv I b.equivFun.symm
 
 end OddOrder
