@@ -647,13 +647,50 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
           「有限生成 (レトラクト) + 捩れ無し ⟹ Bézout で平坦 ⟹ 局所で自由」に置換。
           DVR は局所+Bézout ゆえ `StandardSystem` 側は無変更で通る。
 
-- [ ] **段 94: Cartan 行列 `C = DᵀD`** + `([φ,θ]⁰)` が逆行列であること ((7.6) が使う)。
-      段 92 の `decompositionNumber`・段 93 の block 写像・段 94 gate の分裂系が揃った。
-      `Irr(G)` の添字集合は `exists_algEquiv_pi_matrix_padicComplex` の `Fin n`
-      (= `ℂ_[p][G]` の Wedderburn 成分) を使う。
-      ⚠ 次の設計判断: 各成分から `𝒪`-格子 (`Module.Free 𝒪 L` な `Representation 𝒪 G L`) を
-      作る必要がある — `decompositionNumber` は格子表現に対して定義されているため。
-      `InvariantLattice.lean` が既にあるので、まずそれが使えるかを実測すること。
+### 段 94 (Cartan 行列) の進行 — 2026-08-04
+
+  - [x] **不変格子上の表現と、その指標 = 通常指標** — 完了
+        (`Modular/LatticeRepresentation.lean` + `Algebra/ValuationRingFreeModule.lean`)。
+        🎯 `free_of_isTorsionFree` (付値環上の有限生成捩れ無しは自由) /
+        `Submodule.IsLattice.free_of_valuationRing` (mathlib の同名は PID を要求) /
+        🎯 `repr_extendOfIsLattice` (mathlib の `Basis.extendOfIsLattice` が作る `K`-基底は
+        格子ベクトルの上で `𝒪`-座標をそのまま読む) /
+        🎯🎯 `algebraMap_trace_latticeRepresentation`
+        (`algebraMap 𝒪 K (tr_𝒪 L (ρ_L g)) = tr_K V (ρ g)`) /
+        🎯 `exists_isLattice_invariant`。
+  - [x] **分解数は格子に依らない** — 完了 (`Modular/DecompositionOfOrdinary.lean`)。
+        🎯🎯 `decompositionNumber_latticeRepresentation_eq` = 分解写像
+        `Irr(G) → ℤ IBr(G)` の well-defined 性 (Navarro (2.9) / Isaacs Ch.15)。
+  - [x] **分解行列 `D` を `Irr(G)` 添字で定義** — 完了
+        (`Modular/OrdinaryIrreducibles.lean`)。行添字 = `K[G] ≃ ∏ M_{m_j}(K)` の成分。
+        `wedderburnRepresentation` / `wedderburnLattice` / 🎯🎯 `decompositionMatrix` /
+        定義性質・一意性・任意の不変格子で同じ。
+  - [x] **Cartan 行列 `C = DᵀD` と `Φ_φ`** — 完了 (`Modular/CartanMatrix.lean`)。
+        ⚠ **Navarro p.25 では `C = DᵗD` は定理でなく定義** ("we say that C = DᵗD is the
+        Cartan matrix")。よって `D` が揃った時点で定義できる。
+        `ordinaryCharacter` (不変格子上のトレースゆえ初めから `𝒪` 値) /
+        `cartanMatrix` + `cartanMatrix_comm` / `projectiveIndecomposableCharacter` /
+        🎯 `projectiveIndecomposableCharacter_eq_sum_cartanMatrix`
+        (p-正則類上で `Φ_φ = Σ_μ c_{μφ} μ`) = **(2.13) の代数側の半分**。
+  - [x] **分裂体 `K` 上の非対角第一直交関係** — 完了
+        (`Modular/OrdinaryOrthogonality.lean`)。
+        🎯 `asAlgebraHom_wedderburnRepresentation` / 🎯 `exists_asAlgebraHom_eq_id_eq_zero`
+        (中心冪等元の引き戻し) / 🎯 `map_asAlgebraHom_of_intertwiningMap` /
+        🎯 `subsingleton_intertwiningMap_of_ne` /
+        🎯🎯 `sum_character_mul_character_inv_eq_zero` (`i ≠ j` で `Σ_g χ_j(g)χ_i(g⁻¹) = 0`)。
+        ⚠ **代数閉性を一切使わない**のが非対角側の特徴。
+
+  - [ ] **第一直交の対角成分** (`i = j` で `Σ_g χ_i(g)χ_i(g⁻¹) = |G|`)。
+        `finrank K (IntertwiningMap ρ_i ρ_i) = 1`、すなわち
+        **単純加群の `End` が `K`** = Schur + 代数閉性。
+        mathlib の `IsAlgClosed.algebraMap_bijective_of_isIntegral` が使える見込み
+        (`SimpleModule/IsAlgClosed.lean` の Wedderburn 証明が同じ道具を使っている)。
+        repo 側の `PiMatrixSimpleModules.lean` (`isSimpleModule_piNatural`) が土台。
+  - [ ] **第二 (列) 直交関係**。第一直交 + 指標表が正方であること
+        (`|ι'| = |ConjClasses G|`; `CenterClassSumBasis` から `dim Z(K[G])` を両側で数える)
+        → 行列の逆による標準論法。⚠ repo の `ColumnOrthogonality.lean` は ℂ 上で使えない。
+  - [ ] **Navarro (2.13) の残り半分**: `Φ_φ` が p-特異類で消えること + `[Φ_θ,φ]⁰ = δ_{θφ}`
+        → `([θ,φ]⁰)` が `C` の逆行列。
 - [ ] **94: Cartan 行列 `C = DᵀD`** + `([φ,θ]⁰)` が逆行列であること ((7.6) が使う)
 - [ ] **95: Brauer 対応 `b^G`** (段 88–91 の `Br_P` / defect group から。
       `(5.6)`/`(5.7)` = `b^G` の well-defined 性)
