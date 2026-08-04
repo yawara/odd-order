@@ -16621,6 +16621,10 @@ Sylow `p`-部分群の共役作用 + `C_G(P)` の Sylow が中心的、の 2 段
 #assert_only_allowed_axioms
   OddOrder.GroupAlgebra.pElementSum_eq_sum_sylow
 #assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.conj_smul_subgroupSum_pointwise
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.sum_sylow_subgroupSum_mem_center
+#assert_only_allowed_axioms
   OddOrder.GroupTheory.card_isPRegular_modEq_centralizer
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.card_isPRegular_eq_index
@@ -16785,6 +16789,10 @@ Külshammer の公式 `Ĝ_p = ∑_{P ∈ Syl_p} P̂` の係数計算に使う。
   OddOrder.GroupAlgebra.coeff_pRegularSum
 #assert_only_allowed_axioms
   OddOrder.GroupAlgebra.pElementSum_eq_sum_sylow
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.conj_smul_subgroupSum_pointwise
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.sum_sylow_subgroupSum_mem_center
 
 /-! **Navarro Problem (6.1) (Külshammer)** (`GroupTheory/PFactorPairCount`) —
 `|Ω(g)| ≡ |Ω(g) ∩ (C_G(Q) × C_G(Q))| (mod p)`。第三主定理の逆向きの数え上げ段。 -/

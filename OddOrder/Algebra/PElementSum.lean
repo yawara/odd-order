@@ -33,6 +33,7 @@ runs on.
 
 * `OddOrder.GroupAlgebra.coeff_pElementSum`, `OddOrder.GroupAlgebra.coeff_pRegularSum`
 * `OddOrder.GroupAlgebra.pElementSum_eq_sum_sylow` — Navarro (4.22)
+* `OddOrder.GroupAlgebra.sum_sylow_subgroupSum_mem_center` — `∑_P P̂` is central over any base
 -/
 
 namespace OddOrder.GroupAlgebra
@@ -126,5 +127,61 @@ theorem pElementSum_eq_sum_sylow {k : Type*} [Field k] [Fact p.Prime] [CharP k p
       (card_sylow_mem_modEq_one (isPGroup_zpowers_of_isPElement hg)).symm)
   · rw [if_neg hg, Finset.filter_eq_empty_iff.mpr, Finset.card_empty, Nat.cast_zero]
     exact fun P _ hmem => hg (isPElement_of_mem_of_isPGroup P.isPGroup' hmem)
+
+/-! ### The sum of the Sylow sums is central over any base ring -/
+
+section SylowSum
+
+open scoped Pointwise OddOrder.Conjugation
+
+variable {p : ℕ} [Fact p.Prime] {R : Type*} [CommRing R]
+
+-- `Fintype G` is what makes `subgroupSum` (which needs `Finite G`) elaborate in the statement;
+-- the section fixes it, so it cannot be replaced by `Finite` here.
+set_option linter.unusedFintypeInType false in
+omit [Fact p.Prime] in
+/-- Conjugating `N̂` gives the sum of the conjugate subgroup. -/
+theorem conj_smul_subgroupSum_pointwise (g : G) (N : Subgroup G) :
+    (g • subgroupSum R N : MonoidAlgebra R G) = subgroupSum R ((MulAut.conj g) • N) := by
+  classical
+  letI := Fintype.ofFinite ↥N
+  letI := Fintype.ofFinite ↥((MulAut.conj g) • N)
+  change g • (∑ n : ↥N, single (n : G) (1 : R))
+    = ∑ n : ↥((MulAut.conj g) • N), single (n : G) (1 : R)
+  rw [Finset.smul_sum]
+  have hmem : ∀ n : ↥N, g * (n : G) * g⁻¹ ∈ (MulAut.conj g) • N := fun n =>
+    ⟨(n : G), n.2, by simp [MulAut.conj_apply]⟩
+  refine Fintype.sum_bijective (fun n : ↥N => (⟨g * (n : G) * g⁻¹, hmem n⟩ :
+    ↥((MulAut.conj g) • N))) ?_ _ _ fun n => conj_smul_single g (n : G) 1
+  constructor
+  · intro a b hab
+    have h : g * (a : G) * g⁻¹ = g * (b : G) * g⁻¹ := congrArg Subtype.val hab
+    exact Subtype.ext (mul_left_cancel (mul_right_cancel h))
+  · rintro ⟨b, hb⟩
+    obtain ⟨w, hw, hwb⟩ := hb
+    refine ⟨⟨w, hw⟩, Subtype.ext ?_⟩
+    simpa [MulAut.conj_apply] using hwb
+
+omit [Fact p.Prime] in
+/-- **`∑_{P ∈ Syl_p(G)} P̂` is central** over any base ring: conjugation permutes the Sylow
+subgroups.  This is the integral lift of `Ĝ_p` (they agree in characteristic `p`,
+`pElementSum_eq_sum_sylow`) and, unlike `Ĝ_p`, it comes with the exact factor `|P| = p^a` in
+`∑_{x ∈ P} χ(x)`. -/
+theorem sum_sylow_subgroupSum_mem_center :
+    (∑ P : Sylow p G, subgroupSum R (P : Subgroup G))
+      ∈ Subalgebra.center R (MonoidAlgebra R G) := by
+  classical
+  have hfix : ∀ g : G, g • (∑ P : Sylow p G, subgroupSum R (P : Subgroup G))
+      = ∑ P : Sylow p G, subgroupSum R (P : Subgroup G) := by
+    intro g
+    rw [Finset.smul_sum]
+    refine Fintype.sum_bijective (fun P : Sylow p G => g • P) (MulAction.bijective g) _ _ ?_
+    intro P
+    rw [conj_smul_subgroupSum_pointwise]
+    rfl
+  exact Subalgebra.mem_center_iff.mpr fun y =>
+    (forall_smul_eq_iff_mem_center.mp hfix y).symm
+
+end SylowSum
 
 end OddOrder.GroupAlgebra
