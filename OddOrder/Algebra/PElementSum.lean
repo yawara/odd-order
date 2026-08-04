@@ -33,6 +33,7 @@ runs on.
 
 * `OddOrder.GroupAlgebra.coeff_pElementSum`, `OddOrder.GroupAlgebra.coeff_pRegularSum`
 * `OddOrder.GroupAlgebra.pElementSum_eq_sum_sylow` — Navarro (4.22)
+* `OddOrder.GroupAlgebra.pRegularSum_mem_center`, `OddOrder.GroupAlgebra.pElementSum_mem_center`
 * `OddOrder.GroupAlgebra.sum_sylow_subgroupSum_mem_center` — `∑_P P̂` is central over any base
 -/
 
@@ -97,6 +98,43 @@ theorem coeff_pRegularSum (g : G) :
     intro b hb
     rw [MonoidAlgebra.coeff_single, Finsupp.single_apply, if_neg]
     exact fun h => hg (h ▸ (Finset.mem_filter.mp hb).2)
+
+section Center
+
+variable {S : Type*} [CommSemiring S]
+
+open scoped OddOrder.Conjugation in
+open scoped Classical in
+/-- **`Ĝ⁰` is central.**  Being `p`-regular depends only on the order, hence only on the
+conjugacy class. -/
+theorem pRegularSum_mem_center :
+    pRegularSum p S (G := G) ∈ Subalgebra.center S (MonoidAlgebra S G) := by
+  classical
+  refine Subalgebra.mem_center_iff.mpr fun b =>
+    ((forall_smul_eq_iff_mem_center (x := pRegularSum p S (G := G))).mp ?_ b).symm
+  intro g
+  refine MonoidAlgebra.coeff_injective (Finsupp.ext fun n => ?_)
+  rw [coeff_conj_smul, coeff_pRegularSum, coeff_pRegularSum]
+  have hord : orderOf (g⁻¹ * n * g) = orderOf n := by
+    rw [show g⁻¹ * n * g = g⁻¹ * n * g⁻¹⁻¹ by group, orderOf_conj]
+  exact if_congr (by rw [IsPRegular, IsPRegular, hord]) rfl rfl
+
+open scoped OddOrder.Conjugation in
+open scoped Classical in
+/-- **`Ĝ_p` is central.**  Being a `p`-element depends only on the order. -/
+theorem pElementSum_mem_center :
+    pElementSum p S (G := G) ∈ Subalgebra.center S (MonoidAlgebra S G) := by
+  classical
+  refine Subalgebra.mem_center_iff.mpr fun b =>
+    ((forall_smul_eq_iff_mem_center (x := pElementSum p S (G := G))).mp ?_ b).symm
+  intro g
+  refine MonoidAlgebra.coeff_injective (Finsupp.ext fun n => ?_)
+  rw [coeff_conj_smul, coeff_pElementSum, coeff_pElementSum]
+  have hord : orderOf (g⁻¹ * n * g) = orderOf n := by
+    rw [show g⁻¹ * n * g = g⁻¹ * n * g⁻¹⁻¹ by group, orderOf_conj]
+  exact if_congr (by rw [IsPElement, IsPElement, hord]) rfl rfl
+
+end Center
 
 /-! ### Navarro (4.22): `Ĝ_p` as a sum over the Sylow subgroups -/
 

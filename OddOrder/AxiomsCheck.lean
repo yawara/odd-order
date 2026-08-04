@@ -256,6 +256,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideReduction
 import OddOrder.Algebra.PElementSum
 import OddOrder.GroupTheory.RepresentationTheory.SylowSumClassCoeff
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OmegaBurnsideSylowSum
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
@@ -16948,3 +16949,15 @@ Navarro (4.19) がブロックごとに再編する係数 `a_B(K̂)` の正体�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.coeff_pElementSum_mul_classSum
+
+/-! **`Ĝ⁰` の中心性とブロック指標** (`Modular/PRegularSumBlock`) —
+`ω_χ(Ĝ⁰)χ(1) = ∑_{g∈G⁰}χ(g)` と `λ_{B₀}(Ĝ⁰) = |G⁰|*` ((6.14) の入口)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.pRegularSum_mem_center
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.pElementSum_mem_center
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.centralScalar_pRegularSum_mul_character_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockCharacter_principalBlock_pRegularSum
