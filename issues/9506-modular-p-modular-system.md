@@ -1226,9 +1226,24 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         `asAlgebraHom_eq_zero_of_latticeRepresentation` (格子は `K` 上張るので周囲も潰れる、
         `Submodule.IsLattice.span_eq_top`) で周囲空間へ持ち上げて (a) に食わせる。
         予告どおり **`hEnd` は (b) で初めて要る** (`blockOfLattice` の定義が使う)。
-  - [ ] (c) 教科書の (5.8) の**和の形** (`χ(xy) = Σ_{b^G = B} Σ_{μ ∈ IBr(b)} d^x_{χμ} μ(y)`)。
-        消滅 (b) と (5.1) の展開を合わせるだけだが、`Bl(H)` の族と `IBr(b)` の分割
-        (`Quotient.mk` のファイバー) 上の和の入れ替えが要る。
+  - [x] (c) 教科書の (5.8) の**和の形** — 完了 (2026-08-05)。
+        `sum_generalizedDecompositionNumber_inducedBlockOfCentralizer`。
+        実装上は「和の入れ替え」でなく `Finset.filter` + `Finset.sum_filter_of_ne` で済んだ
+        (`IBr(b)` の分割を明示的に扱う必要がない)。
+        そのために新設した 2 つの土台:
+        * `InducedBlockCentralizer.lean` — **`b^G` は側条件なしで定義される**。
+          Brauer の定理 (`inducedBlockOfNormalizer`) の `P C_G(P) ≤ H ≤ N_G(P)` は
+          `P = ⟨x⟩`, `H = C_G(x)` で全部成立 (`isPGroup_zpowers_of_isPElement` /
+          `zpowers_le_centralizerOf` / `centralizer_zpowers_le_centralizerOf` /
+          `centralizerOf_le_normalizer_zpowers`) ⟹ 🎯 `inducedBlockOfCentralizer`。
+        * `BlockIdempotentLift.lean` — `Z(kG)` の block 冪等元を `Z(𝒪G)` へ持ち上げ
+          (`exists_isIdempotentElem_blockCharacterPi_eq_single` = Navarro の `f_B`)。
+        ⟹ 消滅定理 `..._eq_zero_of_inducedBlockOfCentralizer_ne` は
+        「`φ_j` の block の誘導 ≠ `χ` の block」だけを仮説にする最終形になった。
+  - [ ] **段 98 の残り = (5.10)/(5.11)/(5.12)/(5.13)**。`Irr(B)` の**族**と類関数の
+        `B`-部分 `θ_B`、第二直交関係、`p`-section が要る。(5.8) より重い足場。
+        ⚠ BS 本証明 (段 102) が直接引くのは **(5.8) + 第三主定理 (6.7)** なので、
+        文書順どおりなら次は段 99 (第三主定理) を先に進める判断もありうる。
   - [ ] (5.10)/(5.11)/(5.12)/(5.13) は `Irr(B)` の**族**と類関数の `B`-部分 `θ_B`、
         第二直交関係、`p`-section が要る。(5.8) より重い足場なので後回し。
 - [ ] **99: 🎯 第三主定理 `(6.7)`** — Okuyama の証明 ((6.1)–(6.6) 経由、非常に一般な形)
