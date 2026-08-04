@@ -196,6 +196,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrreducibles
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
@@ -15912,3 +15913,15 @@ not depend on the invariant lattice used to compute them. -/
   OddOrder.RepresentationTheory.Modular.cartanMatrix_comm
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.projectiveIndecomposableCharacter_eq_sum_cartanMatrix
+
+/-! **Off-diagonal first orthogonality over the splitting field**
+(`GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality`, Navarro (2.13) の feeder). -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.asAlgebraHom_wedderburnRepresentation
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_asAlgebraHom_eq_id_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.map_asAlgebraHom_of_intertwiningMap
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_character_mul_character_inv_eq_zero
