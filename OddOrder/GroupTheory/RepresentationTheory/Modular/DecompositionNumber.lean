@@ -57,6 +57,29 @@ theorem exists_pow_eq_zero_of_ker_eq_jacobson
   rw [hN] at hpow
   simpa using hpow
 
+/-- **The irreducible Brauer characters are linearly independent, for a bare ring hom.**  Same
+content as `eq_zero_of_sum_irreducibleBrauerCharacter`, repackaged for the `π : →+*` form in which
+the decomposition matrix is stated: `AlgHom.mk'` promotes `π` to an algebra hom and
+`AlgEquiv.refl` supplies the (trivial) splitting. -/
+theorem eq_zero_of_sum_irreducibleBrauerCharacter_ringHom (hp : p.Prime)
+    {ω : ResidueField 𝒪} (hω : IsPrimitiveRoot ω (pRegularExponent p G))
+    {π : MonoidAlgebra (ResidueField 𝒪) G →+* ∀ j, Matrix (nn j) (nn j) (ResidueField 𝒪)}
+    (hπ : Function.Surjective π)
+    (hlin : ∀ (c : ResidueField 𝒪) (a : MonoidAlgebra (ResidueField 𝒪) G), π (c • a) = c • π a)
+    (hkerJ : RingHom.ker π = Ring.jacobson (MonoidAlgebra (ResidueField 𝒪) G))
+    (c : ι → 𝒪)
+    (h : ∀ g : G, IsPRegular p g →
+      ∑ i, c i * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π i g = 0) :
+    c = 0 := by
+  classical
+  obtain ⟨N, hN⟩ := exists_pow_eq_zero_of_ker_eq_jacobson hkerJ
+  set πA : MonoidAlgebra (ResidueField 𝒪) G →ₐ[ResidueField 𝒪]
+      (∀ j, Matrix (nn j) (nn j) (ResidueField 𝒪)) := AlgHom.mk' π hlin with hπA
+  have hcoe : ((AlgEquiv.refl (A₁ := ∀ j, Matrix (nn j) (nn j) (ResidueField 𝒪))
+      (R := ResidueField 𝒪)).toAlgHom.comp πA).toRingHom = π := rfl
+  exact eq_zero_of_sum_irreducibleBrauerCharacter (𝒪 := 𝒪) (nn := nn) hp hω
+    (π := πA) hπ hN (AlgEquiv.refl) c fun g hg => by rw [hcoe]; exact h g hg
+
 /-- **The decomposition numbers are unique.**  Two `ℕ`-coefficient families that give the same
 values on the `p`-regular classes are equal, because their difference is a relation among the
 irreducible Brauer characters. -/
@@ -72,23 +95,11 @@ theorem eq_of_sum_irreducibleBrauerCharacter_eq (hp : p.Prime)
         = ∑ i, (d' i : 𝒪) * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π i g) :
     d = d' := by
   classical
-  obtain ⟨N, hN⟩ := exists_pow_eq_zero_of_ker_eq_jacobson hkerJ
-  -- package the bare ring hom as an algebra hom onto the matrix product
-  set πA : MonoidAlgebra (ResidueField 𝒪) G →ₐ[ResidueField 𝒪]
-      (∀ j, Matrix (nn j) (nn j) (ResidueField 𝒪)) := AlgHom.mk' π hlin with hπA
-  have hcoe : ((AlgEquiv.refl (A₁ := ∀ j, Matrix (nn j) (nn j) (ResidueField 𝒪))
-      (R := ResidueField 𝒪)).toAlgHom.comp πA).toRingHom = π := rfl
   -- the difference of the two families is a relation, hence zero
-  have hrel : ∀ g : G, IsPRegular p g →
-      ∑ i, ((d i : 𝒪) - (d' i : 𝒪)) * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪)
-        ((AlgEquiv.refl (A₁ := ∀ j, Matrix (nn j) (nn j) (ResidueField 𝒪))
-          (R := ResidueField 𝒪)).toAlgHom.comp πA).toRingHom i g = 0 := by
-    intro g hg
-    rw [hcoe]
-    simp only [sub_mul, Finset.sum_sub_distrib]
-    rw [h g hg, sub_self]
-  have hzero := eq_zero_of_sum_irreducibleBrauerCharacter (𝒪 := 𝒪) (nn := nn) hp hω
-    (π := πA) hπ hN (AlgEquiv.refl) _ hrel
+  have hzero := eq_zero_of_sum_irreducibleBrauerCharacter_ringHom (𝒪 := 𝒪) (nn := nn) hp hω
+    hπ hlin hkerJ (fun i => (d i : 𝒪) - (d' i : 𝒪)) fun g hg => by
+      simp only [sub_mul, Finset.sum_sub_distrib]
+      rw [h g hg, sub_self]
   funext i
   have hi : (d i : 𝒪) - (d' i : 𝒪) = 0 := congrFun hzero i
   exact_mod_cast sub_eq_zero.mp hi

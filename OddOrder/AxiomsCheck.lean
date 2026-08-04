@@ -199,6 +199,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrrCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.Modular.ProjectiveCharacterVanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
@@ -15963,3 +15964,15 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.RepresentationTheory.Modular.character_eq_of_isConj
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_character_inv_mul_character
+
+/-! **`Φ_φ` は p-正則類の外で消える** — Navarro (2.13) の解析側
+(`GroupTheory.RepresentationTheory.Modular.ProjectiveCharacterVanishing`). -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_zero_of_sum_irreducibleBrauerCharacter_ringHom
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.isPRegular_of_isConj
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_projectiveIndecomposableCharacter_mul
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.projectiveIndecomposableCharacter_eq_zero
