@@ -166,6 +166,8 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBlockSplitting
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainCore
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainWiring
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainTheorem
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
+import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockForm
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBlockIdempotent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter

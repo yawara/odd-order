@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfLattice
+import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockWitness
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainTheorem
 
@@ -28,6 +30,8 @@ decomposition numbers of `χ ∈ Irr(B)` are supported on the blocks of `C_G(x)`
 * `OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_eq_zero_of_inducedBlock`
 * `OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_eq_zero_of_blockOfLattice`
   — Navarro (5.8)
+* `..._eq_zero_of_inducedBlockOfCentralizer_ne` — Navarro (5.8), with the block idempotents
+  produced rather than assumed
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -176,5 +180,63 @@ theorem generalizedDecompositionNumber_eq_zero_of_blockOfLattice (hp : p.Prime) 
   exact asAlgebraHom_eq_zero_of_latticeRepresentation σ hLinv
     (apply_eq_zero_of_blockOfLattice_ne K _ hEnd residue_surjective πG hπG hlinG hnilG
       ker_residue hfB rfl hfBc hne)
+
+/-! ### Navarro (5.8), with nothing left to supply -/
+
+set_option maxHeartbeats 1000000 in
+-- As above, plus the induced block and the two lifted block idempotents.
+/-- **Navarro (5.8).**  For a `p`-element `x`, every block `b` of `C_G(x)` induces a block `b^G` of
+`G` (`inducedBlockOfCentralizer`, Brauer's theorem for `P = ⟨x⟩`), and the block idempotents
+`f_b ∈ Z(𝒪 C_G(x))`, `f_{b^G} ∈ Z(𝒪G)` exist (`exists_isIdempotentElem_blockCharacterPi_eq_single`).
+So the only hypothesis left is the one that carries the content: `b^G` is not the block of `χ`.
+
+Together with (5.1) this says that the generalized decomposition numbers of `χ ∈ Irr(B)` are
+supported on `⋃_{b^G = B} IBr(b)`. -/
+theorem generalizedDecompositionNumber_eq_zero_of_inducedBlockOfCentralizer_ne (hp : p.Prime)
+    {x : G} (hx : IsPElement p x) [Fintype ↥(centralizerOf x)]
+    (e : MonoidAlgebra K ↥(centralizerOf x) ≃ₐ[K] ∀ i, Matrix (m i) (m i) K)
+    {πG : MonoidAlgebra (ResidueField 𝒪) G →+* ∀ j, Matrix (nnG j) (nnG j) (ResidueField 𝒪)}
+    (hπG : Function.Surjective πG)
+    (hlinG : ∀ (c : ResidueField 𝒪) (a : MonoidAlgebra (ResidueField 𝒪) G), πG (c • a) = c • πG a)
+    {π : MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf x) →+*
+      ∀ j, Matrix (nn j) (nn j) (ResidueField 𝒪)}
+    (hπ : Function.Surjective π)
+    (hlin : ∀ (c : ResidueField 𝒪) (a : MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf x)),
+      π (c • a) = c • π a)
+    (hkerJ : RingHom.ker π = Ring.jacobson (MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf x)))
+    (hnilH : ∀ z : Subalgebra.center (ResidueField 𝒪)
+      (MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf x)),
+      blockCharacterPi π hπ hlin z = 0 → IsNilpotent z)
+    (hnilG : ∀ z : Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) G),
+      blockCharacterPi πG hπG hlinG z = 0 → IsNilpotent z)
+    {ω : 𝒪} (hω : IsPrimitiveRoot ω (pRegularExponent p ↥(centralizerOf x)))
+    {ω' : ResidueField 𝒪} (hω' : IsPrimitiveRoot ω' (pRegularExponent p ↥(centralizerOf x)))
+    {ζ : 𝒪} (hζ : ζ ^ p = 1) (hζk : residue 𝒪 ζ = 1) (hζK : algebraMap 𝒪 K ζ ≠ 1)
+    (σ : Representation K G V) {L : Submodule 𝒪 V} [L.IsLattice K] [Nontrivial ↥L]
+    (hLinv : ∀ (g : G), ∀ v ∈ L, σ g v ∈ L)
+    (hEnd : ∀ E : Module.End K (K ⊗[𝒪] ↥L),
+      (∀ a : MonoidAlgebra 𝒪 G, E * LinearMap.baseChange K
+          ((latticeRepresentation σ hLinv).asAlgebraHom a)
+        = LinearMap.baseChange K ((latticeRepresentation σ hLinv).asAlgebraHom a) * E) →
+      ∃ c : K, E = c • LinearMap.id)
+    -- the block of `φ_j` does not induce the block of `χ`
+    {j : ι}
+    (hj : inducedBlockOfCentralizer x π hπ hlin πG hπG hlinG hnilG hp hx
+          (Quotient.mk (blockSetoid π hπ hlin) j)
+        ≠ blockOfLattice K ((latticeRepresentation σ hLinv).asAlgebraHom) hEnd
+            residue_surjective πG hπG hlinG hnilG) :
+    generalizedDecompositionNumber (𝒪 := 𝒪) (nn := nn) x hp hω' hπ hlin hkerJ
+        (fun g => LinearMap.trace K V (σ g))
+        (fun _ _ hgh => character_eq_of_isConj σ hgh) j = 0 := by
+  classical
+  obtain ⟨fb, hfbi, hfbcc⟩ := exists_isIdempotentElem_blockCharacterPi_eq_single π hπ hlin hnilH
+    (Quotient.mk (blockSetoid π hπ hlin) j)
+  obtain ⟨fB, hfBi, hfBcc⟩ := exists_isIdempotentElem_blockCharacterPi_eq_single πG hπG hlinG
+    hnilG (inducedBlockOfCentralizer x π hπ hlin πG hπG hlinG hnilG hp hx
+      (Quotient.mk (blockSetoid π hπ hlin) j))
+  exact generalizedDecompositionNumber_eq_zero_of_blockOfLattice hp hx e hπG hlinG hπ hlin hkerJ
+    hnilH hnilG hω hω' hζ hζk hζK σ hLinv hEnd hfBi hfBcc hfbi hfbcc
+    (blockCharacter_toLinearMap_inducedBlockOfCentralizer x π hπ hlin πG hπG hlinG hnilG hp hx _)
+    hj.symm rfl
 
 end OddOrder.RepresentationTheory.Modular

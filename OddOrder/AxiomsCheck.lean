@@ -230,6 +230,8 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryLatticeCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainCore
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainTheorem
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
+import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockForm
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBlockIdempotent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
@@ -16455,3 +16457,15 @@ system で証明される. -/
   OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_eq_zero_of_inducedBlock
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_eq_zero_of_blockOfLattice
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.isPGroup_zpowers_of_isPElement
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.centralizerOf_le_normalizer_zpowers
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.inducedBlockOfCentralizer
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockCharacter_toLinearMap_inducedBlockOfCentralizer
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_isIdempotentElem_blockCharacterPi_eq_single
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_eq_zero_of_inducedBlockOfCentralizer_ne
