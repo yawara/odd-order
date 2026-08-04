@@ -271,6 +271,35 @@ theorem centralCharacterAlg_eq_zero_or_one_of_isIdempotentElem (i : ι)
   · exact Or.inl h1
   · exact Or.inr (sub_eq_zero.mp h1)
 
+open scoped Classical in
+omit hkerJ [Finite G] [NeZero (Nat.card G : K)] in
+/-- **A block idempotent restricts the decomposition to its own block.**  Since `ω_i(f)` is `0`
+or `1`, inserting `f` deletes every term outside `{i | ω_i(f) = 1}` — which for `f = f_b` is
+`Irr(b)`.  This is the shape Navarro (5.2) consumes. -/
+theorem trace_asAlgebraHom_blockIdempotent_mul {V : Type*} [AddCommGroup V] [Module K V]
+    [FiniteDimensional K V] {ρ : Representation K G V} {d : ι → ℕ}
+    (hd : ∀ g : G, LinearMap.trace K V (ρ g)
+      = ∑ i, (d i : K) * LinearMap.trace K (nn i → K) (blockRepresentation π i g))
+    {f : Subalgebra.center K (MonoidAlgebra K G)} (hf : IsIdempotentElem f)
+    (a : MonoidAlgebra K G) :
+    LinearMap.trace K V (ρ.asAlgebraHom ((f : MonoidAlgebra K G) * a))
+      = ∑ i ∈ Finset.univ.filter
+          (fun i => MatrixModule.centralCharacterAlg π i hπ hlin f = 1),
+        (d i : K)
+          * LinearMap.trace K (nn i → K) ((blockRepresentation π i).asAlgebraHom a) := by
+  classical
+  rw [trace_asAlgebraHom_center_mul hπ hlin hd]
+  have hfilter := Finset.sum_filter_of_ne (s := (Finset.univ : Finset ι))
+    (p := fun i => MatrixModule.centralCharacterAlg π i hπ hlin f = 1)
+    (f := fun i => (d i : K) * MatrixModule.centralCharacterAlg π i hπ hlin f
+      * LinearMap.trace K (nn i → K) ((blockRepresentation π i).asAlgebraHom a))
+    (fun i _ hne => by
+      rcases centralCharacterAlg_eq_zero_or_one_of_isIdempotentElem hπ hlin i hf with h0 | h1
+      · exact absurd (by rw [h0, mul_zero, zero_mul]) hne
+      · exact h1)
+  rw [← hfilter]
+  exact Finset.sum_congr rfl fun i hi => by rw [(Finset.mem_filter.mp hi).2, mul_one]
+
 end Decomposition
 
 end OddOrder.RepresentationTheory.Modular

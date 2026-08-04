@@ -1113,6 +1113,19 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               `Σ_{ψ∈Irr(b)} [χ_H,ψ] (ψ(x)/ψ(1)) ψ(y)` の形になる。
               🎯 `centralCharacterAlg_eq_zero_or_one_of_isIdempotentElem` (体上の冪等元は
               `0` か `1`) — `ω_i(f_b)` が `Irr(b)` の指示関数であること。
+        - [x] 🎯🎯 `trace_asAlgebraHom_blockIdempotent_mul` (2026-08-04) —
+              `tr(ρ(f·a)) = Σ_{i : ω_i(f) = 1} d_i · tr(blockRep_i(a))`。
+              `ω_i(f) ∈ {0,1}` なので和が `Irr(b)` に落ちる、を `Finset.filter` の形で述べたもの。
+              (5.2) の最終段が消費する形。
+        - [ ] **(5.2) 最終組み立て**。素材は全部揃った。残りは配線のみ:
+              `Irr(b)` 上の和 (上記) × `χ_ψ(y) = Σ_φ D_{ψφ} φ(y)`
+              (`OrdinaryIrreducibles.trace_eq_sum_decompositionMatrix`) × 分解数の block 対角性
+              (`centralCharacterAlg_eq_of_decompositionNumber_ne_zero`) →
+              `IBr(b)` 上の和 → 一般化分解数の一意性 (`eq_generalizedDecompositionNumber`) →
+              (5.7) の 0 と突き合わせ。
+              ⚠ 署名が大きい (通常側の分裂 `π_K` と剰余体側の `π_k` の両方 + 格子 +
+              `IsPModularSystem`)。`InducedBlockTrace.lean` と同じ「仮説を全部並べる」方式で
+              書くのが素直。
         - [x] (旧計画メモ) 残り = 通常指標側の分解 ((5.2) の step (i))。
               `y ↦ χ(f_{b'} x y)` の `IBr(H)` 展開が `IBr(b')` に台を持つことを言うには、
               `K[H]`-加群の `Irr(H)` への重複度分解 `tr_V(g) = Σ_i n_i χ_i(g)` が要る。
