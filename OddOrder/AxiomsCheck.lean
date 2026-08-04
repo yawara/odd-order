@@ -240,6 +240,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
 import OddOrder.Algebra.SubgroupSumBlockAction
+import OddOrder.Algebra.TraceMulLeft
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockKernel
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ClassCentralizerCount
@@ -16710,3 +16711,12 @@ Sylow `p`-部分群の共役作用 + `C_G(P)` の Sylow が中心的、の 2 段
   OddOrder.RepresentationTheory.Modular.eq_of_principalBlock_of_normalPComplement
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.subsingleton_of_principalBlock_of_normalPComplement
+
+/-! **左乗法のトレース** (`Algebra/TraceMulLeft`) — 群環側 `|G|·a(1)` と
+行列積側 `∑ m_i · tr(v_i)`。Wedderburn 分裂を挟んで比較すると中心冪等元が切り出す
+次元が読める (Navarro (6.13) の Cartan 行列)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.Algebra.trace_mulLeft_monoidAlgebra
+#assert_only_allowed_axioms
+  OddOrder.Algebra.trace_mulLeft_pi_matrix
