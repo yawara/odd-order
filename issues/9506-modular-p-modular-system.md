@@ -553,10 +553,32 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         `c • id` なら `c` は初めから `𝒪` に入り、写像は既にその `𝒪`-スカラー。
         ⟹ **Navarro が引く「`ω_χ(K̂)` は代数的整数」(Isaacs Characters (3.7)) が不要になる**。
         + `smul_id_injective` (スカラーの一意性) + `exists_smul_id_of_mem_center`。
-  - [ ] `hscalar` (base change が `K`-スカラー) を Schur で discharge。
-        `K` が `K[G]` を分裂させるときの標準事実。repo の
-        `Algebra/CentralCharacter.lean` の `exists_scalar_of_mem_center` が
-        「行列積への全射」の形で既に持っているので、`K`-側の Wedderburn 分解と繋ぐ。
+  - [x] **`hscalar` を Schur で discharge** — 完了 (2026-08-04)。
+        🎯 `exists_baseChange_smul_of_mem_center` (base change の乗法性 → 中心元は像と可換
+        → 絶対既約性でスカラー) + 🎯 `exists_smul_id_of_mem_center_of_absolutelyIrreducible`
+        (整数性との合成 = **絶対既約 ⟹ 中心指標が `𝒪` 値**)。
+
+### ⚠⚠ 発見 (2026-08-04): `StandardSystem` は ordinary 側の分裂体として**不十分**
+
+`StandardSystem p = 𝕎(𝔽̄_p)` の商体 `K = Frac(𝕎(𝔽̄_p))` は **`ℚ_p` の最大不分岐拡大の完備化**。
+⟹ `p'`-乗根はすべて含むが **`ζ_p` を含まない** (`ℚ_p(ζ_p)/ℚ_p` は次数 `p−1` の完全分岐拡大)。
+`p = 2` なら `i = ζ_4 ∉ K`。
+
+* `StandardSystem.lean` の docstring が主張しているのは**剰余体側**の 2 条件だけ
+  (`k` が群環を分裂させる = 代数閉、`k` が `|G|_{p'}` 乗根を持つ) で、**`K` の分裂には触れていない**。
+  段 92 までは剰余体側しか使っていなかったので問題が表面化しなかった。
+* ordinary 側 (`Irr(G)`・中心指標・分解行列の行添字) は `K` が `K[G]` を分裂させることを使う。
+  Brauer の定理より `ℚ(ζ_{exp G})` は分裂体だが、`exp G` の `p`-部分に対応する乗根は
+  **分岐**するので `Frac(𝕎(𝔽̄_p))` には入らない。
+
+**⟹ 採った方針**: 絶対既約性を「**加群ごと**」の仮説として述べる (`hEnd`)。
+「`K` が `K[G]` を分裂させる」という大域的仮説を置かないので、分岐拡大を作らずに先へ進める。
+必要になった時点で個別に discharge する。
+
+**⟹ 将来必要になる作業** (BS 本証明で `Irr(B₀)` を数える段で効くはず):
+`𝒪` を `ζ_{exp G}` を含むように**分岐拡大**する (`𝕎(𝔽̄_p)[ζ_{p^a}]` 等) か、
+局所体の整数環として splitting p-modular system を構成する。
+`IsPModularSystem` 自体は分裂を要求していないので class の変更は不要 — 別の instance を作る話。
   - [ ] `ω : Z(𝒪G) →+* 𝒪` の AlgHom 化 (一意性から加法性・乗法性)
   - [ ] `mod 𝔪` → `λ_χ : Z(kG) → k` → `BlockIdempotent.lean` の `blockSetoid` と接続。
         Navarro (3.3) 「`d_{χφ} ≠ 0` ⟹ `λ_χ = λ_φ`」が block 写像の well-defined 性
