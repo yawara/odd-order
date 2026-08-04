@@ -132,6 +132,37 @@ theorem coeff_classSum_mul (C : ConjClasses G) (w : MonoidAlgebra k G) (g : G) :
   · intro h; rw [← h]; group
   · rintro rfl; group
 
+omit [Fintype G] [DecidableEq (ConjClasses G)] in
+/-- Conjugacy is preserved by inversion. -/
+theorem mk_inv_of_mk_eq {a b : G} (h : ConjClasses.mk a = ConjClasses.mk b) :
+    ConjClasses.mk a⁻¹ = ConjClasses.mk b⁻¹ := by
+  rw [ConjClasses.mk_eq_mk_iff_isConj] at h ⊢
+  obtain ⟨c, hc⟩ := isConj_iff.mp h
+  exact isConj_iff.mpr ⟨c, by rw [← hc]; group⟩
+
+open scoped Classical in
+/-- **`(K̂' · w)(1) = ∑_{u ∈ K} w(u)`** where `K'` is the class of the inverses.  The reindexing
+`v ↦ v⁻¹` matches the two classes. -/
+theorem coeff_classSum_inv_mul_one (C : ConjClasses G) (w : MonoidAlgebra k G) :
+    (classSum (k := k) (ConjClasses.mk C.out⁻¹) * w).coeff 1
+      = ∑ u ∈ Finset.univ.filter (fun u : G => ConjClasses.mk u = C), w.coeff u := by
+  classical
+  rw [coeff_classSum_mul]
+  have hmk : ConjClasses.mk C.out = C := by
+    rw [← ConjClasses.quotient_mk_eq_mk, Quotient.out_eq]
+  refine Finset.sum_nbij' (fun v : G => v⁻¹) (fun u : G => u⁻¹) ?_ ?_ ?_ ?_ ?_
+  · intro v hv
+    refine Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_⟩
+    have h := mk_inv_of_mk_eq (Finset.mem_filter.mp hv).2
+    rwa [inv_inv, hmk] at h
+  · intro u hu
+    refine Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_⟩
+    have h := mk_inv_of_mk_eq (((Finset.mem_filter.mp hu).2).trans hmk.symm)
+    exact h
+  · intro v _; simp
+  · intro u _; simp
+  · intro v _; rw [mul_one]
+
 /-- Each class sum is central in `k[G]`: `classSum C` commutes with every `of k G h` (conjugation
 permutes the class `C`), hence with all of `k[G]` by linearity. -/
 theorem classSum_mem_center (C : ConjClasses G) :
