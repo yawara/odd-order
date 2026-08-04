@@ -34,6 +34,7 @@ the radical.
 * `OddOrder.map_maximalIdeal_le_ringJacobson`
 * `OddOrder.exists_corner_inverse` — Navarro (5.4)
 * `OddOrder.exists_corner_inverse_of_isNilpotent` — the characteristic-`p` variant
+* `OddOrder.exists_corner_inverse_of_approx` — an approximate corner inverse can be corrected
 -/
 
 namespace OddOrder
@@ -126,5 +127,38 @@ theorem exists_corner_inverse {f x : A} (hf : IsIdempotentElem f) (hx : x = f * 
   have hneg : x - f = -(f - x) := by abel
   rw [hneg]
   exact Submodule.neg_mem _ (map_maximalIdeal_le_ringJacobson (𝒪 := 𝒪) hxf)
+
+/-! ### Correcting an approximate corner inverse
+
+This is how Navarro (5.5) passes from the residue field to `𝒪`: an inverse found modulo `𝔪` is
+only approximate upstairs, and (5.4) turns it into an exact one.  The centre of a group algebra
+is commutative, so the corner condition simplifies to `x = f x`.
+-/
+
+section Comm
+
+variable {𝒪 A : Type*} [CommRing 𝒪] [IsLocalRing 𝒪] [CommRing A] [Algebra 𝒪 A]
+  [Module.Finite 𝒪 A] [Nontrivial A]
+
+/-- **An approximate corner inverse can be corrected.**  If `x` lies in the corner of the
+idempotent `f` and some `w` in that corner satisfies `x w ≡ f` modulo `𝔪·A`, then `x` has an
+exact inverse in the corner. -/
+theorem exists_corner_inverse_of_approx {f x w : A} (hf : IsIdempotentElem f)
+    (hx : x = f * x) (hw : w = f * w)
+    (happrox : f - x * w ∈ (IsLocalRing.maximalIdeal 𝒪).map (algebraMap 𝒪 A)) :
+    ∃ y : A, y = f * y ∧ x * y = f ∧ y * x = f := by
+  have hff : f * f = f := hf
+  have hcorner : x * w = f * (x * w) * f := by
+    conv_lhs => rw [hx]
+    rw [mul_comm (f * (x * w)) f, ← mul_assoc, hff, ← mul_assoc]
+  obtain ⟨v, hvc, hv1, hv2⟩ := exists_corner_inverse (𝒪 := 𝒪) hf hcorner happrox
+  refine ⟨w * v, ?_, ?_, ?_⟩
+  · conv_lhs => rw [hw]
+    rw [mul_assoc]
+  · rw [← mul_assoc]; exact hv1
+  · rw [show w * v * x = x * w * v by ring]
+    exact hv1
+
+end Comm
 
 end OddOrder

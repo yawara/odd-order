@@ -920,9 +920,14 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         理由は `e x - e = e(x-1)` を**全ての** block 指標が殺すこと
         (`λ_c` は `λ_c(x)=1` ゆえ、他は `e` を殺すゆえ) ⟹ `hnil` で冪零 ⟹
         前 commit の `exists_corner_inverse_of_isNilpotent`。
-  - [ ] **次: (5.5) の 𝒪 への持ち上げ**。上の corner 逆元を `centerLift` で `Z(𝒪G)` に
-        持ち上げ、`(x u)* = e_B` を得て (5.4) を当てる。
-        必要な接続 = `centerReduceHom` (核 = `𝔪·Z(𝒪G)`) と `f_B` (`CenterIdempotentLift`)。
+  - [x] **持ち上げの原理** — 完了 (`Algebra/CornerInverse.lean` の `Comm` 節)。
+        🎯🎯 `exists_corner_inverse_of_approx`: 可換 `A` (𝒪 上有限、𝒪 局所) で
+        corner の `w` が `x w ≡ f (mod 𝔪·A)` を満たすなら、corner の**厳密な**逆元が取れる
+        ((5.4) が誤差を吸収する)。
+  - [ ] **次: (5.5) の組み立て**。標数 `p` 側の corner 逆元 `ȳ` を `centerLift` で
+        `Z(𝒪G)` へ持ち上げて `w` とし、`f_B - (f_B x) w ∈ 𝔪·Z(𝒪G)` を
+        `centerReduceHom` の核描像で確認して `exists_corner_inverse_of_approx` を当てる。
+        残りは block 枠組を `MonoidAlgebra F G` に instantiate する配線のみ。
   - [ ] その後 (5.6) → (5.7) → 🎯 (5.2)。
         併せて (3.13) `χ ∉ B ⟹ M f_B = 0` / (3.31) `ψ(f_b z)` も必要。
   - [ ] **(5.5)** / **(5.6)** / **(5.7)**。
