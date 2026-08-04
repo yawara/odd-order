@@ -1595,7 +1595,7 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               `Σ_i` にまとめると `(L̂)_g` になってしまい情報が消える (実際に検算した)。
               ブロックごとにまとめたまま `d(K)` の付値で分母を管理する Navarro の
               手順が必要。
-          * [ ] (3.32) `u_χ f_B` の補題 ⟹ `λ_B(Ĝ⁰) = 0` (`B ≠ B₀`)。
+          * [x] 🎯🎯🎯 **(3.32) 完了 (2026-08-05)** — `λ_B(Ĝ⁰) = 0` (`B ≠ B₀`)。
             [x] **`λ_{B₀}(Ĝ⁰) = |G⁰|*` 完了 (2026-08-05、`Modular/PRegularSumBlock`)**:
             🎯 `blockCharacter_principalBlock_pRegularSum` (`λ_{B₀}` = augmentation) +
             `pRegularSum_mem_center` / `pElementSum_mem_center` (`Ĝ⁰`・`Ĝ_p` は任意の可換係数環で
@@ -1703,10 +1703,14 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
             `centralScalar_pRegularSum_eq_zero` (`PRegularSumVanishing`、新設) —
             **`ω_χ(Ĝ⁰) = 0`** (`ω_χ(Ĝ⁰)χ(1) = ∑_{g∈G⁰}χ(g) = 0`、`χ(1) = dim ≠ 0`)。
             ⚠ 自明指標は「トレースが恒等的に 1 の格子表現 σ」として仮説パラメータ化。
-            残り = 還元して `λ_B(Ĝ⁰) = 0` にする配線
-            (`algebraMap_centralScalar_eq` + `blockCharacter_blockOfLattice_mapRingHom` +
-            `mapRingHom_pRegularSum` が要る — 最後のは未作成)。
-            ⟹ そこまで来れば (4.23) に `z = Ĝ⁰` を入れて **(6.14) Külshammer**。
+            [x] 🎯🎯🎯 **剰余体への配線も完了 (2026-08-05)**:
+            `blockCharacter_blockOfIrr_pRegularSum_eq_zero` (`PRegularSumVanishing`) —
+            **`λ_B(Ĝ⁰) = 0` (`B ≠ B₀`)**。
+            `mapRingHom_pRegularSum`/`mapRingHom_pElementSum` (`Algebra/PElementSum`) を新設し、
+            `algebraMap_centralScalar_eq` で `K` 側と繋ぎ
+            `blockCharacter_blockOfLattice_mapRingHom` で剰余体へ降ろす。
+            ⟹ **(3.32) 完成**。次 = (4.23) に `z = Ĝ⁰` を入れて **(6.14) Külshammer**
+            `π(Ĝ_p·Ĝ⁰) = ∑_B λ_B(Ĝ⁰) e_B = |G⁰|* e_{B₀}`。
             ⚠ 検算: `ω_χ(Ĝ⁰) = (1/χ(1))∑_{g∈G⁰}χ(g)` は `χ ∉ Irr(B₀)` で **`K` の中で厳密に 0**
             (還元して 0 ではない)。`Z_q` (p∤q) / `S_3` (p=3) で確認済。
           ⟹ **見通し**: (4.19) が 2-3 段、(4.23)+(3.32)+(6.14)+(6.1) で 3-4 段。
