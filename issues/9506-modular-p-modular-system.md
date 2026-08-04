@@ -1384,6 +1384,16 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               (`RepresentationTheory/ClassSumCoefficientFormula.lean` の
               `classSumCoeff_mul_centralizer_card_eq_sum_irreducibleCharacter`、BG App.C 用)
               が、Külshammer 経路は p-modular system の `K` を使うので**係数環の一般化**が要る。
+              **⚠ ただし `K`-Wedderburn 設定で直接導出する方が短い見込み (2026-08-05 に検討)**:
+              `a_{K,L,M}` を `K̂ · L̂ = Σ_M a_{KLM} M̂` の構造定数とすると
+              `ω_i(K̂) ω_i(L̂) = Σ_M a_{KLM} ω_i(M̂)` (中心指標は環準同型)。
+              両辺に `χ_i(1) χ_i(z⁻¹)` を掛けて `i` で和を取り、
+              `ω_i(M̂) χ_i(1) = |M| χ_i(x_M)` と**第二 (列) 直交関係**
+              (既存 `sum_character_inv_mul_character`) を使うと右辺が
+              `a_{K,L,cl(z)} · |cl(z)| · |C_G(z)| = a_{K,L,cl(z)} · |G|` に潰れ、
+              左辺が `|K||L| Σ_i χ_i(x_K)χ_i(x_L)χ_i(z⁻¹)/χ_i(1)` になる ⟹ Burnside。
+              **必要な新規部品は `ω_i(K̂) χ_i(1) = |K| χ_i(x_K)` のみ**
+              (`ρ_i(K̂) = ω_i(K̂)·id` のトレースを 2 通りに読むだけ)。他は既存。
             - `Σ_{x ∈ P} χ(x⁻¹) = |P| [χ_P, 1_P]` (制限の自明成分の重複度)。
               ⚠ 共役を使わない形なので抽象体でも書ける。
             - **類の defect `d(K)`** と `p^{a-d(K)}` による正規化 (Ch.3 の材料、未整備)。
