@@ -225,6 +225,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ConjugationLayers
+import OddOrder.GroupTheory.RepresentationTheory.Modular.TwistedLayerSum
 import OddOrder.GroupTheory.RepresentationTheory.Modular.StandardSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterIndependence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerIndependence
@@ -16284,3 +16285,25 @@ block 冪等元 `f_B` を `H`-部分と `G ∖ H`-部分に割るための道具
   OddOrder.GroupTheory.sum_conjLayer
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.conjLayer_conj_smul
+
+/-! **Navarro (5.7) の固有ベクトル `s = Σ ω^{-i} w_i`** (`Modular.TwistedLayerSum`) —
+`s^h = ω s` / `f s f = s` / `s* = w*`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.eq_one_of_pow_eq_one_expChar
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.pow_mod_eq_pow
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.pow_val_add
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.conj_smul_twistedSum
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.mapRingHom_twistedSum
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.sum_corner
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.conj_smul_corner
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.corner_twistedSum
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.exists_conj_eigen_corner
