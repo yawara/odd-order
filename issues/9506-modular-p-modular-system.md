@@ -635,9 +635,12 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
       段 92 の `decompositionNumber` と段 93 の block 写像が揃ったので着手可能。
       ⚠ `D` の行添字 = `Irr(G)` を**添字集合として**持つ必要がまだある
       (段 92 は「1 つの格子表現の分解数」まで)。`Irr(G)` の枚挙をどう持つかが最初の設計判断。
-      ⚠⚠ ここで「`StandardSystem` は ordinary 側の分裂体として不十分」(上記) が効くはず —
-      `Irr(G)` を数えるには `K` が `K[G]` を分裂させる必要があるため。分岐拡大の構成が
-      必要になったらそこで着手する。
+      ⚠⚠ **ここで「`StandardSystem` は ordinary 側の分裂体として不十分」(上記) が効く** —
+      `Irr(G)` を数えるには `K` が `K[G]` を分裂させる必要がある。
+      **⟹ 段 94 は [issue 9507](9507-splitting-p-modular-system.md) (分裂 `p`-modular
+      system の構成) に gate されている。** 2026-08-04 の実測で mathlib には
+      DVR/Henselian の拡大論も C₁ 体も無く、`𝕎(𝔽̄_p)[ζ_{p^a}]` の構成は mathlib 規模の
+      仕事になることが判明した。route の選択肢 3 つと着手前の確認事項は 9507 に記録。
 - [ ] **94: Cartan 行列 `C = DᵀD`** + `([φ,θ]⁰)` が逆行列であること ((7.6) が使う)
 - [ ] **95: Brauer 対応 `b^G`** (段 88–91 の `Br_P` / defect group から。
       `(5.6)`/`(5.7)` = `b^G` の well-defined 性)
