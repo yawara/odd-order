@@ -7,7 +7,7 @@ created: 2026-08-04
 
 # 分裂 `p`-modular system の構成
 
-**claim**: hub / main session (9500 band) / **状態**: 調査済・未着手 (2026-08-04)
+**claim**: hub / main session (9500 band) / **状態**: ✅ 完了 (2026-08-04)
 
 ## なぜ要るか
 
@@ -88,3 +88,66 @@ mathlib に**必要な拡大論が無い**:
 - 親: [9506](9506-modular-p-modular-system.md) (段 94 の gate)
 - 祖父: [0147](0147-q8-modular-char-theory-frozen.md) (Q₈ Brauer–Suzuki)
 - 現行 system: `OddOrder/GroupTheory/RepresentationTheory/Modular/StandardSystem.lean`
+
+
+---
+
+## ✅ 解決 (2026-08-04) — 上の 3 案のどれでもない route
+
+**採ったのは `𝓞_ℂ_[p]` = `ℂ_[p]` の付値環**。mathlib の
+`Mathlib/NumberTheory/Padics/Complex.lean` に `ℂ_[p] = PadicComplex p` と
+その付値環 `PadicComplexInt p` が既にある (2025 年追加, María Inés de Frutos-Fernández)。
+
+### なぜこれで全部片付くのか
+
+**`Frac(𝓞_ℂ_[p]) = ℂ_[p]` は代数閉**。したがって
+
+* `K[G]` の分裂 = Maschke (char 0) + mathlib の
+  `IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed` で**即座に**出る。
+* **剰余体も代数閉** (monic を持ち上げ→根 (整閉性で `A` 内)→還元)。
+  ⟹ `k[G]` 側も既存の `exists_algHom_pi_matrix_of_isAlgClosed` で無条件。
+
+**⟹ Brauer の分裂体定理も Lang の定理 (C₁) も一切要らない。**
+選択肢 1・2 が重かったのは、離散付値を保とうとすると分裂性を別途証明する必要が
+あったから。**離散性のほうを捨てる**と分裂性がタダになる。
+
+さらに **Henselian も完備性なしで出る**: 代数閉な商体の上では monic の根は
+初めから `A` に在るので、`f(a₀) ∈ 𝔪` から線型因子を 1 本ずつ剥がして
+`𝔪` が素であることを使えば `a₀` と同じ剰余類の根が取れる (Newton 反復不要)。
+⟹ `IsPModularSystem` の class 定義は**無変更**のまま instance が付く。
+
+### 代償と、それに対して行った一般化
+
+`𝓞_ℂ_[p]` は Noether でも DVR でもない (値群が可除で `𝔪 = 𝔪²`)。既存の
+Brauer 機構は DVR / PID を仮定していたので、次の 2 箇所を**本質的に一般化**した
+(どちらも DVR 側は無変更で通る — DVR は局所 + Bézout ゆえ `ValuationRing` の instance を持つ)。
+
+1. **`BrauerLinearIndependence`** — 一様化元 + Nakayama を捨て、
+   「割り切りが全順序」だけを使う: 非零係数のうち他を全部割るもの `c_j` を取り、
+   `c_j` で割った関係式の第 `j` 係数は `1`。one-step 補題がそれを `𝔪` に入れるので矛盾。
+   Noether 性不要。補助 = `exists_dvd_forall_of_valuationRing`。
+2. **`EigenspaceDecomposition`** — PID の「自由加群の部分加群は自由」を、
+   `finite_eigenspace_of_separated` (内部直和のレトラクト ⟹ 有限生成) +
+   `free_eigenspace_of_separated` (捩れ無し ⟹ Bézout で平坦 ⟹ 局所で自由) に置換。
+   `LatticeEigenspaces` / `Reduction` / `DecompositionMatrix` / `DecompositionNumber`
+   も `IsPrincipalIdealRing` → `ValuationRing` へ。
+
+⚠ 「着手前にやること」に挙げた 3 項目は**この route では不要になった**ので未実施
+(選択肢 1 の Noether 弱化・選択肢 2 の Hensel 迂回はいずれも採らなかった)。
+ただし調査で得た事実 —
+`BrauerLinearIndependence` の DVR 使用は「一様化元による割り算 + Nakayama」だけ、
+`HenselianLocalRing` の使用は `RootsOfUnityLift` の全射性 1 箇所だけ —
+は上の一般化の設計に直接効いた。
+
+### 成果物
+
+| ファイル | 内容 |
+|---|---|
+| `OddOrder/Algebra/AlgClosedFractionField.lean` | 整閉整域 + 代数閉な商体: 根の存在 / 剰余類指定の根 / 剰余体の代数閉性 / Henselian |
+| `OddOrder/GroupTheory/RepresentationTheory/Modular/PadicComplexSystem.lean` | `IsPModularSystem p 𝓞_ℂ_[p]`、剰余体代数閉、`p'`-乗根 (上下)、`ℂ_[p]` の分裂 |
+
+build green / `bin/check-warnings --strict` clean / AxiomsCheck 新規 11 件すべて
+allowlist 内 (`propext`/`Classical.choice`/`Quot.sound` のみ)。
+
+**⟹ 段 94 の gate は外れた。** `Irr(G)` の添字化は
+`exists_algEquiv_pi_matrix_padicComplex` の `Fin n` を使う。

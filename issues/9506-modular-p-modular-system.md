@@ -631,16 +631,29 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
 
 ### 次にやること (2026-08-04 時点の frontier)
 
+  - [x] **分裂 `p`-modular system の構成** — 完了 (2026-08-04、
+        [issue 9507 closed](closed/9507-splitting-p-modular-system.md))。
+        🎯🎯 **`𝓞_ℂ_[p]` = `ℂ_[p]` の付値環**を採用 (mathlib
+        `NumberTheory/Padics/Complex.lean` に既存)。商体 `ℂ_[p]` が**代数閉**なので
+        `K[G]` の分裂は Wedderburn–Artin で即得られ、**剰余体も代数閉**なので `k[G]` 側も
+        無条件 — **Brauer の分裂体定理も Lang (C₁) も使わない**。
+        Henselian も完備性なしで出る (代数閉な商体では monic の根が初めから `A` に在り、
+        `𝔪` が素であることで `a₀` と同じ剰余類の根が選べる)。
+        * 新 leaf: `Algebra/AlgClosedFractionField.lean` /
+          `Modular/PadicComplexSystem.lean`
+        * 代償 = 離散性 (値群が可除)。既存機構を **DVR → `ValuationRing` に一般化**:
+          `BrauerLinearIndependence` は一様化元+Nakayama を「割り切りの全順序」に置換、
+          `EigenspaceDecomposition` は PID の構造定理を
+          「有限生成 (レトラクト) + 捩れ無し ⟹ Bézout で平坦 ⟹ 局所で自由」に置換。
+          DVR は局所+Bézout ゆえ `StandardSystem` 側は無変更で通る。
+
 - [ ] **段 94: Cartan 行列 `C = DᵀD`** + `([φ,θ]⁰)` が逆行列であること ((7.6) が使う)。
-      段 92 の `decompositionNumber` と段 93 の block 写像が揃ったので着手可能。
-      ⚠ `D` の行添字 = `Irr(G)` を**添字集合として**持つ必要がまだある
-      (段 92 は「1 つの格子表現の分解数」まで)。`Irr(G)` の枚挙をどう持つかが最初の設計判断。
-      ⚠⚠ **ここで「`StandardSystem` は ordinary 側の分裂体として不十分」(上記) が効く** —
-      `Irr(G)` を数えるには `K` が `K[G]` を分裂させる必要がある。
-      **⟹ 段 94 は [issue 9507](9507-splitting-p-modular-system.md) (分裂 `p`-modular
-      system の構成) に gate されている。** 2026-08-04 の実測で mathlib には
-      DVR/Henselian の拡大論も C₁ 体も無く、`𝕎(𝔽̄_p)[ζ_{p^a}]` の構成は mathlib 規模の
-      仕事になることが判明した。route の選択肢 3 つと着手前の確認事項は 9507 に記録。
+      段 92 の `decompositionNumber`・段 93 の block 写像・段 94 gate の分裂系が揃った。
+      `Irr(G)` の添字集合は `exists_algEquiv_pi_matrix_padicComplex` の `Fin n`
+      (= `ℂ_[p][G]` の Wedderburn 成分) を使う。
+      ⚠ 次の設計判断: 各成分から `𝒪`-格子 (`Module.Free 𝒪 L` な `Representation 𝒪 G L`) を
+      作る必要がある — `decompositionNumber` は格子表現に対して定義されているため。
+      `InvariantLattice.lean` が既にあるので、まずそれが使えるかを実測すること。
 - [ ] **94: Cartan 行列 `C = DᵀD`** + `([φ,θ]⁰)` が逆行列であること ((7.6) が使う)
 - [ ] **95: Brauer 対応 `b^G`** (段 88–91 の `Br_P` / defect group から。
       `(5.6)`/`(5.7)` = `b^G` の well-defined 性)
