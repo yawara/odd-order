@@ -107,4 +107,37 @@ theorem exists_smul_id_of_mem_center (φ : A →ₐ[𝒪] Module.End 𝒪 L)
   obtain ⟨c', -, hc'⟩ := eq_smul_of_baseChange_eq_smul (K := K) hc
   exact ⟨c', hc'⟩
 
+omit [FaithfulSMul 𝒪 K] [Module.Free 𝒪 L] [Nontrivial L] in
+/-- **Schur, in the form that discharges `hscalar`.**  If the base-changed module is *absolutely
+irreducible* — every `K`-endomorphism commuting with the action is a scalar — then a central
+element automatically acts by a `K`-scalar, because base change is multiplicative.
+
+Phrasing absolute irreducibility per module (rather than asking `K` to split all of `K[G]`) is
+deliberate: `Frac(𝕎(𝔽̄_p))` is the completion of the *maximal unramified* extension of `ℚ_p`, so
+it contains the `p'`-th roots of unity but **not** `ζ_p`, and is in general **not** a splitting
+field.  See the note in issue 9506.
+
+Note this half needs neither freeness nor faithfulness — only the *integrality* half
+(`eq_smul_of_baseChange_eq_smul`) does. -/
+theorem exists_baseChange_smul_of_mem_center (φ : A →ₐ[𝒪] Module.End 𝒪 L)
+    (hEnd : ∀ F : Module.End K (K ⊗[𝒪] L),
+      (∀ a : A, F * LinearMap.baseChange K (φ a) = LinearMap.baseChange K (φ a) * F) →
+      ∃ c : K, F = c • LinearMap.id)
+    {z : A} (hz : z ∈ Subalgebra.center 𝒪 A) :
+    ∃ c : K, LinearMap.baseChange K (φ z) = c • LinearMap.id := by
+  refine hEnd _ fun a => ?_
+  rw [← LinearMap.baseChange_mul, ← LinearMap.baseChange_mul]
+  exact congrArg _ (by rw [← map_mul, ← map_mul, Subalgebra.mem_center_iff.mp hz a])
+
+/-- **The full descent**: absolute irreducibility over `K` gives a central character valued in
+`𝒪`.  This is Navarro's `ω_χ` together with its integrality, in one step. -/
+theorem exists_smul_id_of_mem_center_of_absolutelyIrreducible (φ : A →ₐ[𝒪] Module.End 𝒪 L)
+    (hEnd : ∀ F : Module.End K (K ⊗[𝒪] L),
+      (∀ a : A, F * LinearMap.baseChange K (φ a) = LinearMap.baseChange K (φ a) * F) →
+      ∃ c : K, F = c • LinearMap.id)
+    {z : A} (hz : z ∈ Subalgebra.center 𝒪 A) :
+    ∃ c' : 𝒪, φ z = c' • LinearMap.id :=
+  exists_smul_id_of_mem_center (K := K) φ
+    (fun _ hw => exists_baseChange_smul_of_mem_center (K := K) φ hEnd hw) hz
+
 end OddOrder.RepresentationTheory.Modular

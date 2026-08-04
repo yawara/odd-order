@@ -15693,6 +15693,10 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_smul_id_of_mem_center
 #assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_baseChange_smul_of_mem_center
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_smul_id_of_mem_center_of_absolutelyIrreducible
+#assert_only_allowed_axioms
   OddOrder.MatrixModule.exists_scalar_of_mem_center
 #assert_only_allowed_axioms
   OddOrder.MatrixModule.centralCharacter
