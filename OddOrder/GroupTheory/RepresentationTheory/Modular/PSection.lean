@@ -58,15 +58,6 @@ theorem isConj_pPart {a b : G} (h : IsConj a b) : IsConj (pPart p a) (pPart p b)
   obtain ⟨c, hc⟩ := isConj_iff.mp h
   exact isConj_iff.mpr ⟨c, by rw [← pPart_conj, hc]⟩
 
-/-- **`p`-regularity does not see the ambient group.** -/
-theorem isPRegular_coe_iff {H : Subgroup G} {y : ↥H} :
-    IsPRegular p ((y : G)) ↔ IsPRegular p y := by
-  rw [IsPRegular, IsPRegular, Subgroup.orderOf_coe]
-
-/-- **A `p`-regular element of a subgroup is `p`-regular in the ambient group.** -/
-theorem isPRegular_coe {H : Subgroup G} {y : ↥H} (hy : IsPRegular p y) :
-    IsPRegular p ((y : G)) := isPRegular_coe_iff.mpr hy
-
 end PPart
 
 section PSection

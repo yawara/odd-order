@@ -155,6 +155,7 @@ import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10A
 import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10B
 import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10C
 import OddOrder.GroupTheory.PRegularElement
+import OddOrder.GroupTheory.PRegularElementCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.RootsOfUnityLift
 import OddOrder.GroupTheory.RepresentationTheory.Modular.WittVectorSystem
@@ -16579,3 +16580,16 @@ Navarro (3.24) の数値内容 `ν(χ(1)) ≥ ν(|G|) - d(B)`. 付値論・一�
   OddOrder.RepresentationTheory.Modular.pow_dvd_finrank_of_mem_relTraceIdeal
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.pow_defect_dvd_finrank
+
+/-! **`p`-正則元の個数は `p` と素** (`GroupTheory.PRegularElementCount`) —
+`1_G` が主ブロックで height 0 であることの具体形 (`[1̃_G, 1_G] = |G⁰|/|G|_{p'}` が `p` で単元).
+Sylow `p`-部分群の共役作用 + `C_G(P)` の Sylow が中心的、の 2 段で出る (指標論を使わない). -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isPElement_of_mem_of_isPGroup
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.card_isPRegular_modEq_centralizer
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.card_isPRegular_eq_index
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.not_dvd_card_isPRegular

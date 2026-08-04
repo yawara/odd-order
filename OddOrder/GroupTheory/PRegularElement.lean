@@ -107,6 +107,20 @@ theorem eq_one_of_isPElement_of_isPRegular {p : ℕ} {g : G}
     exact orderOf_eq_one_iff.mp hk
   · exact absurd (hk ▸ dvd_pow_self p hk0.ne') hy
 
+/-- **`p`-regularity does not see the ambient group.** -/
+theorem isPRegular_coe_iff {p : ℕ} {H : Subgroup G} {y : ↥H} :
+    IsPRegular p ((y : G)) ↔ IsPRegular p y := by
+  rw [IsPRegular, IsPRegular, Subgroup.orderOf_coe]
+
+/-- **A `p`-regular element of a subgroup is `p`-regular in the ambient group.** -/
+theorem isPRegular_coe {p : ℕ} {H : Subgroup G} {y : ↥H} (hy : IsPRegular p y) :
+    IsPRegular p ((y : G)) := isPRegular_coe_iff.mpr hy
+
+/-- Being a `p`-element does not see the ambient group either. -/
+theorem isPElement_coe_iff {p : ℕ} {H : Subgroup G} {y : ↥H} :
+    IsPElement p ((y : G)) ↔ IsPElement p y := by
+  rw [IsPElement, IsPElement, Subgroup.orderOf_coe]
+
 /-! ### The `p` / `p'` decomposition
 
 Write `n = orderOf g`, `q = ordProj[p] n = p ^ (n.factorization p)` and `m = ordCompl[p] n = n / q`,
