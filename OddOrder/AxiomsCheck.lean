@@ -208,6 +208,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.TruncClassSum
 import OddOrder.Algebra.CentralCharacterBlock
 import OddOrder.Algebra.ClassSumOffCentralizer
 import OddOrder.Algebra.JacobsonCentralSubring
+import OddOrder.Algebra.AdicCompletePi
 import OddOrder.Algebra.IdempotentLift
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
@@ -16140,3 +16141,13 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.eq_of_isIdempotentElem_of_sub_mem
 #assert_only_allowed_axioms
   OddOrder.existsUnique_isIdempotentElem_sub_mem
+
+/-! **有限直積の adic 完備性** (`Algebra.AdicCompletePi`) — 完備な `𝒪` について
+`Z(𝒪G)` が `𝔪`-adic 完備であることを出すための一段. -/
+
+#assert_only_allowed_axioms
+  OddOrder.mem_pow_smul_top_self_iff
+#assert_only_allowed_axioms
+  OddOrder.mem_pow_smul_top_pi_iff
+#assert_only_allowed_axioms
+  OddOrder.isAdicComplete_pi

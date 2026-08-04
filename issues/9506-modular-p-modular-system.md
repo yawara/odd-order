@@ -875,9 +875,22 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               `d ∈ I ≤ J(R)` から `d² - 1` が単元になることから。
         - [ ] **残る隘路 = `HenselianRing C (𝔪·C)`** (`C = Z(𝒪G)`)。
               `jac` フィールド (`𝔪C ≤ J(C)`) は上の (5.3) 局所版で済んでいるので、
-              **欠けているのは `C[X]` の根の持ち上げだけ**。これは
-              「henselian 局所環上 module-finite な代数は henselian pair」
-              (Stacks 04GG / 0DYD) で、mathlib に無い。次はここ。
+              **欠けているのは `C[X]` の根の持ち上げだけ**。
+              一般の henselian `𝒪` については「module-finite な代数は henselian pair」
+              (Stacks 09XI / 04GG) が要るが、これは mathlib に無く、単根持ち上げからの
+              導出には多変数 Hensel (Bourbaki) が要る**別プロジェクト**。
+              ⟹ **`𝒪` が `𝔪`-adic 完備な場合を先に通す** (`ℤ_p`・`W(𝔽̄_p)` は該当。
+              `𝓞_ℂ_[p]` は `𝔪²=𝔪` ゆえ該当しないので、その一般化は上の別プロジェクト送り)。
+              残る手順:
+              - [x] `Algebra/AdicCompletePi.lean`: 🎯 `mem_pow_smul_top_self_iff` /
+                    🎯 `mem_pow_smul_top_pi_iff` / 🎯🎯 `isAdicComplete_pi`
+                    (有限直積の adic 完備性。mathlib に直積の instance が無かった)。
+              - [ ] 類和基底 (`centerBasis`、`[CommRing k]` なので `𝒪` で使える) による
+                    `C ≃ₗ[𝒪] (ConjClasses G → 𝒪)` で `IsAdicComplete 𝔪 C` を移送。
+              - [ ] mathlib `IsAdicComplete.map_algebraMap_iff` で
+                    `IsAdicComplete (𝔪.map (algebraMap 𝒪 C)) C`。
+              - [ ] mathlib `IsAdicComplete.henselianRing` で `HenselianRing C (𝔪C)`。
+              - [ ] `exists_isIdempotentElem_sub_mem` を当てて block 冪等元 `f_B`。
   - [ ] **(5.5)** / **(5.6)** / **(5.7)**。
         (5.7) は `⟨h⟩` の `supp(w)` への軌道が長さ `p` の倍数であること + 固有空間の
         次元比較 (乗算 `s` が単射) という組み合わせ論 + 線型代数。
