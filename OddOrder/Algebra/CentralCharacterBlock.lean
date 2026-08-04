@@ -24,6 +24,7 @@ killed by `λ`; expanding gives `λ z = blockCharacter c₀ z`.
 ## Main results
 
 * `OddOrder.MatrixModule.existsUnique_blockCharacter_eq`
+* `OddOrder.MatrixModule.blockOfCentralCharacter` — the block it singles out
 -/
 
 namespace OddOrder.MatrixModule
@@ -111,5 +112,28 @@ theorem existsUnique_blockCharacter_eq
   have hcc : blockCharacter π hπ hlin c (ee c) = 1 := by
     rw [← blockCharacterPi_apply, hval c, Pi.single_eq_same]
   exact hc₀uniq c (hc ▸ hcc)
+
+/-- **The block with a given central character.**  Well defined by
+`existsUnique_blockCharacter_eq`. -/
+noncomputable def blockOfCentralCharacter
+    (hnil : ∀ x : Subalgebra.center k A,
+      blockCharacterPi π hπ hlin x = 0 → IsNilpotent x)
+    (lam : Subalgebra.center k A →ₐ[k] k) : Block π hπ hlin :=
+  (existsUnique_blockCharacter_eq π hπ hlin hnil lam).choose
+
+@[simp]
+theorem blockCharacter_blockOfCentralCharacter
+    (hnil : ∀ x : Subalgebra.center k A,
+      blockCharacterPi π hπ hlin x = 0 → IsNilpotent x)
+    (lam : Subalgebra.center k A →ₐ[k] k) :
+    blockCharacter π hπ hlin (blockOfCentralCharacter π hπ hlin hnil lam) = lam :=
+  (existsUnique_blockCharacter_eq π hπ hlin hnil lam).choose_spec.1
+
+theorem eq_blockOfCentralCharacter
+    (hnil : ∀ x : Subalgebra.center k A,
+      blockCharacterPi π hπ hlin x = 0 → IsNilpotent x)
+    {lam : Subalgebra.center k A →ₐ[k] k} {c : Block π hπ hlin}
+    (hc : blockCharacter π hπ hlin c = lam) : c = blockOfCentralCharacter π hπ hlin hnil lam :=
+  (existsUnique_blockCharacter_eq π hπ hlin hnil lam).choose_spec.2 c hc
 
 end OddOrder.MatrixModule

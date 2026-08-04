@@ -204,6 +204,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularClassIndex
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
 import OddOrder.GroupTheory.RepresentationTheory.Modular.TruncClassSum
 import OddOrder.Algebra.CentralCharacterBlock
+import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
@@ -16035,3 +16036,13 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.MatrixModule.existsUnique_blockIdempotent_map_eq_one
 #assert_only_allowed_axioms
   OddOrder.MatrixModule.existsUnique_blockCharacter_eq
+
+/-! **誘導 block `b^G` (Brauer 対応)**
+(`GroupTheory.RepresentationTheory.Modular.InducedBlock`, Navarro (4.13) 前). -/
+
+#assert_only_allowed_axioms
+  OddOrder.MatrixModule.blockCharacter_blockOfCentralCharacter
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockCharacter_inducedBlock_classSumCenter
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_inducedBlock
