@@ -178,6 +178,7 @@ import OddOrder.Algebra.BrauerFirstMain
 import OddOrder.Algebra.CentralIdempotentModule
 import OddOrder.Algebra.PrimitiveIdempotent
 import OddOrder.Algebra.CentralCharacter
+import OddOrder.Algebra.BlockOfSimpleModule
 import OddOrder.Algebra.SeparatingSubalgebra
 import OddOrder.Algebra.PiMatrixSimpleModules
 import OddOrder.Algebra.PiSimpleModule
@@ -15741,6 +15742,8 @@ preimage of `T'` as soon as the kernel is uniformly nilpotent. -/
   OddOrder.MatrixModule.eq_centralScalar_of_forall_smul_eq
 #assert_only_allowed_axioms
   OddOrder.MatrixModule.eq_centralCharacterAlg_of_forall_smul_eq
+#assert_only_allowed_axioms
+  OddOrder.MatrixModule.exists_eq_centralCharacterAlg_of_forall_smul_eq
 #assert_only_allowed_axioms
   OddOrder.exists_mem_eq_one_eq_zero
 #assert_only_allowed_axioms
