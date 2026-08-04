@@ -65,6 +65,30 @@ theorem symmMap_relTrace (ψ : MonoidAlgebra R G →ₐ[R] E) (τ : E →+ M)
   GAlgebra.map_relTrace (τ.comp (ψ : MonoidAlgebra R G →+* E).toAddMonoidHom)
     (symmMap_comp_conj ψ τ hτ) K H a
 
+/-- **A one-dimensional representation forces `[H : K]` to be invertible.**  If `f ∈ R[G]^H_K` is
+sent to `1` by an algebra map into a *commutative* ring, then `1 = [H : K] · ψ(a)`.
+
+For `f = f_{B_0}` the principal block idempotent and `ψ` the augmentation this says that the
+defect group of the principal block has index prime to `p`, i.e. that it is a Sylow
+`p`-subgroup — the block-theoretic statement that `B_0` has full defect. -/
+theorem isUnit_relIndex_of_mem_relTraceIdeal {E' : Type*} [CommRing E'] [Algebra R E']
+    (ψ : MonoidAlgebra R G →ₐ[R] E') {K H : Subgroup G} {f : MonoidAlgebra R G}
+    (hf : f ∈ GAlgebra.relTraceIdeal K H) (hψ : ψ f = 1) :
+    IsUnit ((K.relIndex H : ℕ) : E') := by
+  obtain ⟨a, -, rfl⟩ := hf
+  have h := symmMap_relTrace ψ (AddMonoidHom.id E') (fun x y => mul_comm x y) K H a
+  simp only [AddMonoidHom.id_apply] at h
+  have hmul : ((K.relIndex H : ℕ) : E') * ψ a = 1 := by rw [← nsmul_eq_mul, ← h, hψ]
+  exact ⟨⟨_, ψ a, hmul, (mul_comm _ _).trans hmul⟩, rfl⟩
+
+/-- The `H = ⊤` case: `[G : K]` is invertible. -/
+theorem isUnit_index_of_mem_relTraceIdeal {E' : Type*} [CommRing E'] [Algebra R E']
+    (ψ : MonoidAlgebra R G →ₐ[R] E') {D : Subgroup G} {f : MonoidAlgebra R G}
+    (hf : f ∈ GAlgebra.relTraceIdeal D ⊤) (hψ : ψ f = 1) :
+    IsUnit ((D.index : ℕ) : E') := by
+  rw [← Subgroup.relIndex_top_right]
+  exact isUnit_relIndex_of_mem_relTraceIdeal ψ hf hψ
+
 variable {L : Type*} [AddCommGroup L] [Module R L] [Module.Free R L] [Module.Finite R L]
 
 /-- **The height inequality.**  If `f` lies in the relative trace ideal `R[G]^H_K` and acts as the

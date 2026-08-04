@@ -239,6 +239,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ClassCentralizerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockDefect
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockHeight
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockDefect
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainEasy
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBasis
@@ -509,7 +510,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 16600
+set_option linter.style.longFile 16800
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -16593,3 +16594,26 @@ Sylow `p`-部分群の共役作用 + `C_G(P)` の Sylow が中心的、の 2 段
   OddOrder.GroupTheory.card_isPRegular_eq_index
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.not_dvd_card_isPRegular
+
+/-! **主ブロックは full defect** (`Modular/PrincipalBlockDefect`) — `d(B₀) = ν(|G|)`.
+`f_{B₀}` の添加写像は還元後も `λ_{B₀}(e_{B₀}) = 1` ゆえ `[G:D]` は `𝒪` で単元、
+すなわち `D` は Sylow. ⟹ 次数 1 の `1_G` は `B₀` で height 0. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Algebra.augmentation_mapRingHom
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.isUnit_relIndex_of_mem_relTraceIdeal
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.isUnit_index_of_mem_relTraceIdeal
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.not_dvd_of_isUnit_natCast
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.defect_eq_factorization_of_apply_eq_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_one_of_isIdempotentElem_of_residue_ne_zero
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.defect_eq_factorization_of_residue_augmentation_ne_zero
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.defect_eq_factorization_of_blockCharacterPi_principal
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_isIdempotentElem_defect_principalBlock

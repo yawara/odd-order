@@ -65,6 +65,18 @@ theorem augmentation_single (g : G) (c : R) :
   rw [augmentation, MonoidAlgebra.lift_single]
   simp
 
+variable {R G}
+
+/-- **The augmentation commutes with a change of coefficients.**  Both sides sum the coefficients
+of `x` and then apply `φ`, in the two possible orders. -/
+theorem augmentation_mapRingHom {S : Type*} [CommRing S] (φ : R →+* S) (x : MonoidAlgebra R G) :
+    augmentation S G (MonoidAlgebra.mapRingHom G φ x) = φ (augmentation R G x) := by
+  classical
+  induction x using MonoidAlgebra.induction_linear with
+  | zero => simp
+  | add x y hx hy => simp only [map_add, hx, hy]
+  | single g c => simp
+
 end Augmentation
 
 variable (G : Type*) [Group G]
