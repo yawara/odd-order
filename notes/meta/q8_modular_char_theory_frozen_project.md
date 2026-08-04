@@ -1,7 +1,10 @@
 # 【長期プロジェクト（2026-07-25 解凍）】Q₈ Brauer–Suzuki のための modular character theory 整備
 
-> **状態: THAWED（ユーザー裁定 2026-07-25）** — 書籍選定確定（spine = **Navarro 1998** Ch.1–7、§2）、
-> PDF 確保（ユーザー購入手配中）待ち。担当レーンは未割当（着手時に hub/ユーザーが指定）。
+> **状態: THAWED（ユーザー裁定 2026-07-25）** — 書籍選定確定（spine = **Navarro 1998**、§2）、
+> **PDF 確保済（2026-08-04、`references/navarro/`）** ⟹ 着手可能。
+> 担当レーンは未割当（着手時に hub/ユーザーが指定）。
+> ⚠ **経路訂正（2026-08-04 原文実測、§2''）**: 必要 slice は **Ch.1–6 + Ch.7 前半**で、
+> **Z\*-定理は不要**（BS は Z\* の系ではなく前提）。
 > 本 note は本プロジェクトの **project spec**（目的・書籍選定・infra 内訳・pickup 手順）。
 > （旧状態: FROZEN、ユーザー裁定 2026-07-23 — §1 の凍結根拠は経緯の記録として保持。）
 
@@ -11,7 +14,8 @@ Peterfalvi Appendix C Proposition 1（`rankOne_affine_nearField`）に残る唯�
 **Brauer–Suzuki 定理の Q₈（`|S| = 8`）ケース**を閉じるには、mathlib に**皆無**の
 **modular character theory（Brauer 指標・p-blocks・分解行列・defect group）を一から整備**する必要がある。
 これは 3 冊の残作業とは**別スケールの独立プロジェクト**。2026-07-23 に凍結 → **2026-07-25 に解凍・
-書籍選定確定（spine = Navarro 1998 Ch.1–7、Z\*-定理経由; §2）**。
+書籍選定確定（spine = Navarro 1998; §2）** → **2026-08-04 に PDF 確保 + 経路確定
+（Ch.1–6 + Ch.7 前半、Z\* 不要; §2''）**。
 
 ## 1. 凍結の経緯（ユーザー裁定 2026-07-23 の根拠 — 2026-07-25 に解凍、記録として保持）
 
@@ -34,28 +38,58 @@ Peterfalvi Appendix C Proposition 1（`rankOne_affine_nearField`）に残る唯�
 
 ## 2. 書籍選定 — ★確定（ユーザー裁定 2026-07-25）
 
-**spine = Navarro, *Characters and Blocks of Finite Groups*（Cambridge LMS LNS 250, 1998）の
-Ch.1–7 一冊のみ。endgame は Z\*-定理経由**（旧案「infra + 証明本体の 2 source」は不要になった）。
+**spine = Navarro, *Characters and Blocks of Finite Groups*（Cambridge LMS LNS 250, 1998）
+一冊のみ**（旧案「infra + 証明本体の 2 source」は不要になった）。
 
-- **章構成（Cambridge TOC 実測 2026-07-25）**: 1 Algebras / 2 Brauer Characters / 3 Blocks /
-  4–6 Brauer 三大定理 / **7 The Z\*-Theorem（フル証明）** / 8–11 は発展（本件には不要）。
-  全 ~300pp 中、必要 slice = Ch.1–7 ≈ 180pp。
-- **Q₈ への bridge は初等**: 一般化四元数（Q₈ 含む）Sylow-2 の唯一の involution `z` は isolated →
-  Z\* で `z` の像が `Z(G/O(G))` に入る → `z^g ≡ z (mod O(G))` と `O(G)⟨z⟩` 内の Sylow 共役で
-  `G = O_{2'}(G)·C_G(z)` = `brauerSuzuki_quaternionSylow_q8` の statement そのもの。
-  必要な道具（Sylow 共役・coprime）は repo 既存。副産物として `|S| ≥ 16` も同時被覆
-  （既存 ordinary route の独立検算になる; 置換はしない）。
+- **章構成（手元 PDF の目次で実測 2026-08-04、書籍ページ）**: 1 Algebras p.1 / 2 Brauer
+  Characters p.16 / 3 Blocks p.48 / 4 第一主定理 p.80 / 5 第二主定理 p.99 / 6 第三主定理 p.119 /
+  **7 The Z\*-Theorem p.131** / 8 p.150 / 9 p.192 / 10 p.222 / 11 p.243（8–11 は本件に不要）。
+  2026-07-25 の Cambridge TOC と一致。
+- ~~**Q₈ への bridge は初等**: Z\* で `z` の像が `Z(G/O(G))` に入る → …~~
+  **⟹ 不要（§2'' の経路訂正）**。BS は Z\* を経由せず Ch.7 で直接証明される。
 - **Dade 1971 / Brauer 1964 / Feit 1982 は併読に降格**（Gorenstein と同じ posture =
   行間補完・証明戦略の参照専用）。quaternion-defect block 分析の形式化は不要。
 - **再サーベイ不要（2026-07-25 web 実測）**: Navarro 2018（McKay 本）にブロック章は無い。
   2020 年代の新刊教科書も無い。より新しい系統違いは Linckelmann 2018（module 圏・source algebra 系、
   行間補完 reference 向き）/ Craven 2019（証明なし survey）/ Webb 2016・Schneider 2013（入門どまり、
   三大定理・Z\* に届かない）。character-theoretic block 論の教科書としては Navarro 1998 が現在も最新。
-- **PDF**: 正規の無料版は存在しない（著者ページにも無し）。入手 = Cambridge Core digital（£92、
-  章別 PDF DL 可）or 紙 + スキャン。**ユーザーが購入手配（2026-07-25）**。references 側
-  （別 private リポ）に `references/navarro/` として収納 → `pdftotext -layout` 抽出
-  （Peterfalvi 式 per-book dir）。無料の併読素材: J. Miquel Martínez の Valencia 講義ノート
-  （Navarro 流 modular rep、uv.es 公開）。
+- **PDF: ★確保済（2026-08-04）** — ユーザーが手配（正規無料版は無し）。
+  `references/navarro/characters-and-blocks.pdf` + `.pdftotext.txt` + `SOURCE.md`
+  （ISBN 978-0-521-59513-1 / DOI 10.1017/CBO9780511526015 / SHA-256 は SOURCE.md）。
+  無料の併読素材: J. Miquel Martínez の Valencia 講義ノート（Navarro 流 modular rep、uv.es 公開）。
+  - **⚠ PDF ページ = 書籍ページ + 10**（書籍 p.1 = PDF p.11、書籍 p.131 = PDF p.141 で実測）。
+  - スキャン（300 dpi bitonal）+ OCR レイヤ。**Peterfalvi 型のグリフ分解は無い**
+    （single-char token 率 20.8% = 正常域）ので素の `pdftotext -layout` で散文が読め grep も効く。
+  - ⚠ **数式・記号の OCR 崩れは重い**: `∈`→`G`/`£`/`e`、`N`→`TV`、`R`→`ii`/`i?`、`→`→`—>`、
+    `Irr`→`IYT`、`1_B`→`!#`、`Q_8`→`Qs`。**statement・添字・仮定の確定はページ画像で**
+    （切り出したら `references/navarro/pages/navarro-p<書籍ページ>.png` に残す）。
+
+### 2''. ★経路の訂正（2026-08-04、Ch.7 原文の実測）— **Z\*-定理は経路から落ちる**
+
+PDF 到着後に Ch.7 を実際に読んだ結果、**当初計画（Q₈ BS = Z\* の系、bridge は初等）は逆だった**。
+Navarro の Ch.7 は BS を**先に**証明し、それを使って Z\* に進む:
+
+| 書籍 pp. | 内容 |
+|---|---|
+| 131 | Ch.7 冒頭 "we finally give a proof of Glauberman's Z\*-theorem. **First, we need to prove the Brauer–Suzuki theorem**" / (7.1) BS statement |
+| 131 | "The deep part of the theorem involves the case when the Sylow 2-subgroup is the **quaternion group of order 8**, and this is what we will focus on here"（`|S| > 8` は Isaacs *Characters* Thm 7.8 に外出し） |
+| 133–138 | (7.2) Klein four Sylow-2 / (7.3) basic set の定義 / (7.4) / (7.5) / (7.6) — BS の feeder |
+| **139–146** | **"Proof of the Brauer–Suzuki Theorem"**（Q₈ 本証明。y での解析 → t での解析 → 主 block の非自明指標が t を kernel に含む） |
+| 146 | "To prove Glauberman's Z\*-theorem, **we need one more result**…" → (7.7) / (7.8) |
+| 146–149 | (7.9) Z\*-THEOREM（Glauberman） |
+
+**帰結**:
+
+- **必要 slice = Ch.1–6 + (7.1)–(7.6) + BS 本証明（pp.139–146）**。
+  **(7.7)–(7.9) と「Z\* → Q₈ bridge」は不要**（bridge の初等補題を書く手間も消える）。
+- Navarro が名指しで狙っているのが**まさに Q₈ ケース**で、`|S| > 8` は Isaacs に外出ししている
+  ⟹ repo 側の既存分担（`brauerSuzuki_of_quaternionSylow` が `|S| ≥ 16` を被覆、Q₈ だけ残 sorry）と
+  **教科書の分担が一致**する。橋渡しの設計を考える必要が無い。
+- BS 本証明が直接引く結果: **Cor (6.13)**（normal 2-complement な群の主 block: `IBr(b₀)` 単元・
+  Cartan 行列 (4)）/ **Cor (5.8) + 第三主定理** / **Lemma (5.13.b)** / **block orthogonality** /
+  (7.2) の Klein four ケース / (7.3) basic set。
+- 副作用として「`|S| ≥ 16` も同時被覆され既存 ordinary route の独立検算になる」という旧 §2 の
+  見込みは**消える**（Navarro は `|S| > 8` を証明しないため）。既存 route の置換は元々しない方針。
 
 ### 2'. 選定の経緯（候補比較、2026-07-23 時点の記録 — 上記★確定で supersede）
 
