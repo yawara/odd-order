@@ -39,11 +39,6 @@ open MulAction
 
 variable {G : Type*} [Group G] {p : ℕ}
 
-/-- Every element of a `p`-subgroup is a `p`-element. -/
-theorem isPElement_of_mem_of_isPGroup [Fact p.Prime] {H : Subgroup G} (hH : IsPGroup p ↥H)
-    {x : G} (hx : x ∈ H) : IsPElement p x :=
-  isPElement_coe_iff.mpr (IsPGroup.iff_orderOf.mp hH ⟨x, hx⟩)
-
 /-- The `p`-regular elements of `G`, as a type. -/
 abbrev PRegularCarrier (p : ℕ) (G : Type*) [Group G] : Type _ := {g : G // IsPRegular p g}
 

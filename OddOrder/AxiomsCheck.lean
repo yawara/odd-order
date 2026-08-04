@@ -242,6 +242,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
 import OddOrder.Algebra.SubgroupSumBlockAction
 import OddOrder.Algebra.TraceMulLeft
 import OddOrder.GroupTheory.SylowContaining
+import OddOrder.Algebra.PElementSum
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartan
@@ -16488,7 +16489,7 @@ system で証明される. -/
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_eq_zero_of_blockOfLattice
 #assert_only_allowed_axioms
-  OddOrder.RepresentationTheory.Modular.isPGroup_zpowers_of_isPElement
+  OddOrder.GroupTheory.isPGroup_zpowers_of_isPElement
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.centralizerOf_le_normalizer_zpowers
 #assert_only_allowed_axioms
@@ -16598,6 +16599,16 @@ Sylow `p`-部分群の共役作用 + `C_G(P)` の Sylow が中心的、の 2 段
 
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.isPElement_of_mem_of_isPGroup
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.pElementSum
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.pRegularSum
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.coeff_pElementSum
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.coeff_pRegularSum
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.pElementSum_eq_sum_sylow
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.card_isPRegular_modEq_centralizer
 #assert_only_allowed_axioms
@@ -16751,3 +16762,15 @@ Külshammer の公式 `Ĝ_p = ∑_{P ∈ Syl_p} P̂` の係数計算に使う。
   OddOrder.GroupTheory.card_sylow_containing_modEq_one
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.card_sylow_mem_modEq_one
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isPElement_of_mem_of_isPGroup
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.pElementSum
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.pRegularSum
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.coeff_pElementSum
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.coeff_pRegularSum
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.pElementSum_eq_sum_sylow

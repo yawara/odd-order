@@ -31,7 +31,7 @@ needed only for the direction that uses it.
 * `OddOrder.GroupAlgebra.single_mul_subgroupSum`, `subgroupSum_mul_single` — absorption
 * `OddOrder.GroupAlgebra.conj_smul_subgroupSum` — `N̂` is conjugation-invariant for `N ⊴ G`
 * `OddOrder.GroupAlgebra.subgroupSum_mul_subgroupSum` — `N̂² = |N| · N̂`
-* `OddOrder.GroupAlgebra.coeff_subgroupSum_one` — the coefficient at `1` is `1`
+* `OddOrder.GroupAlgebra.coeff_subgroupSum` — the coefficients are the indicator of `N`
 * `OddOrder.GroupAlgebra.mapRingHom_subgroupSum` — `N̂` survives a coefficient change
 * `OddOrder.GroupAlgebra.subgroupSum_mem_center` — `N̂ ∈ Z(R[G])` for `N ⊴ G`
 * `OddOrder.GroupAlgebra.map_subgroupSum_of_forall_map_single_eq_one`
@@ -107,22 +107,35 @@ theorem subgroupSum_mul_subgroupSum (N : Subgroup G) :
     Finset.sum_congr rfl fun (n : ↥N) _ => single_mul_subgroupSum n.2,
     Finset.sum_const, Finset.card_univ, ← Nat.card_eq_fintype_card]
 
+open scoped Classical in
+/-- **The coefficients of `N̂`** are the indicator function of `N`. -/
+theorem coeff_subgroupSum (N : Subgroup G) (g : G) :
+    (subgroupSum R N).coeff g = if g ∈ N then 1 else 0 := by
+  classical
+  letI := Fintype.ofFinite ↥N
+  have hL : (subgroupSum R N).coeff g
+      = ∑ n : ↥N, (single (n : G) (1 : R)).coeff g := by
+    change ((∑ n : ↥N, single (n : G) (1 : R)) : MonoidAlgebra R G).coeff g = _
+    simp
+  rw [hL]
+  by_cases hg : g ∈ N
+  · rw [if_pos hg, Finset.sum_eq_single (⟨g, hg⟩ : ↥N)]
+    · simp
+    · intro b _ hb
+      rw [MonoidAlgebra.coeff_single, Finsupp.single_apply, if_neg]
+      exact fun h => hb (Subtype.ext h)
+    · intro h
+      exact absurd (Finset.mem_univ _) h
+  · rw [if_neg hg, Finset.sum_eq_zero]
+    intro b _
+    rw [MonoidAlgebra.coeff_single, Finsupp.single_apply, if_neg]
+    exact fun h => hg (h ▸ b.2)
+
 /-- **The coefficient of `N̂` at `1` is `1`.** -/
 theorem coeff_subgroupSum_one (N : Subgroup G) :
     (subgroupSum R N).coeff 1 = 1 := by
   classical
-  letI := Fintype.ofFinite ↥N
-  have hL : (subgroupSum R N).coeff 1
-      = ∑ n : ↥N, (single (n : G) (1 : R)).coeff 1 := by
-    change ((∑ n : ↥N, single (n : G) (1 : R)) : MonoidAlgebra R G).coeff 1 = _
-    simp
-  rw [hL, Finset.sum_eq_single (1 : ↥N)]
-  · simp
-  · intro b _ hb
-    rw [MonoidAlgebra.coeff_single, Finsupp.single_apply, if_neg]
-    exact fun h => hb (Subtype.ext (by simpa using h))
-  · intro h
-    exact absurd (Finset.mem_univ _) h
+  rw [coeff_subgroupSum, if_pos N.one_mem]
 
 /-- **`N̂` is transported by a coefficient change**: it has coefficients `0` and `1` only. -/
 theorem mapRingHom_subgroupSum {S : Type*} [Semiring S] (f : R →+* S) (N : Subgroup G) :

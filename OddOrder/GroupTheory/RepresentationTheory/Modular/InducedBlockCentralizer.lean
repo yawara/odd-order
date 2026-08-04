@@ -29,7 +29,6 @@ once.
 
 ## Main results
 
-* `OddOrder.RepresentationTheory.Modular.isPGroup_zpowers_of_isPElement`
 * `OddOrder.RepresentationTheory.Modular.centralizerOf_le_normalizer_zpowers`
 * `OddOrder.RepresentationTheory.Modular.blockCharacter_toLinearMap_inducedBlockOfCentralizer` —
   the defining property `λ_{b^G} = λ_b^G`
@@ -45,15 +44,6 @@ open OddOrder.GroupTheory.CenterClassSum (inducedCentralCharacter)
 section Zpowers
 
 variable {p : ℕ} {G : Type*} [Group G] (x : G)
-
-/-- **`⟨x⟩` is a `p`-group** when `x` is a `p`-element: every element of `⟨x⟩` has order dividing
-that of `x`. -/
-theorem isPGroup_zpowers_of_isPElement (hx : IsPElement p x) :
-    IsPGroup p ↥(Subgroup.zpowers x) := by
-  obtain ⟨a, ha⟩ := hx
-  refine fun g => ⟨a, Subtype.ext ?_⟩
-  rw [SubmonoidClass.coe_pow, OneMemClass.coe_one, ← ha, ← orderOf_dvd_iff_pow_eq_one]
-  exact orderOf_dvd_of_mem_zpowers g.2
 
 /-- `x` centralises itself. -/
 theorem mem_centralizerOf_self : x ∈ centralizerOf x :=
@@ -107,7 +97,7 @@ applies with `P = ⟨x⟩`, so this needs no side condition. -/
 noncomputable def inducedBlockOfCentralizer (b : Block π hπ hlin) : Block πG hπG hlinG :=
   haveI : Fact p.Prime := ⟨hp⟩
   inducedBlockOfNormalizer π hπ hlin πG hπG hlinG hnilG
-    (isPGroup_zpowers_of_isPElement x hx) (zpowers_le_centralizerOf x)
+    (OddOrder.GroupTheory.isPGroup_zpowers_of_isPElement hx) (zpowers_le_centralizerOf x)
     (centralizer_zpowers_le_centralizerOf x) (centralizerOf_le_normalizer_zpowers x) b
 
 open scoped Classical in
@@ -120,7 +110,7 @@ theorem blockCharacter_toLinearMap_inducedBlockOfCentralizer (b : Block π hπ h
   rw [inducedBlockOfCentralizer, inducedBlockOfNormalizer, inducedBlock,
     blockCharacter_blockOfCentralCharacter]
   exact inducedCentralCharacterAlgHom_toLinearMap π hπ hlin
-    (isPGroup_zpowers_of_isPElement x hx) (zpowers_le_centralizerOf x)
+    (OddOrder.GroupTheory.isPGroup_zpowers_of_isPElement hx) (zpowers_le_centralizerOf x)
     (centralizer_zpowers_le_centralizerOf x) (centralizerOf_le_normalizer_zpowers x) b
 
 end InducedBlock

@@ -27,6 +27,7 @@ import OddOrder.Algebra.RelativeTrace
 import OddOrder.Algebra.RelativeTraceCharacter
 import OddOrder.Algebra.RootsOfUnitySum
 import OddOrder.Algebra.SubgroupSum
+import OddOrder.Algebra.PElementSum
 import OddOrder.Algebra.SubgroupSumBlockAction
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.Algebra.TraceMulLeft

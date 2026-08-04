@@ -70,6 +70,15 @@ theorem IsPRegular.isOfFinOrder {p : ℕ} {g : G} (h : IsPRegular p g) : IsOfFin
 
 theorem isPElement_one (p : ℕ) : IsPElement p (1 : G) := ⟨0, by simp⟩
 
+/-- **`⟨x⟩` is a `p`-group** when `x` is a `p`-element: every element of `⟨x⟩` has order dividing
+that of `x`. -/
+theorem isPGroup_zpowers_of_isPElement {p : ℕ} {x : G} (hx : IsPElement p x) :
+    IsPGroup p ↥(Subgroup.zpowers x) := by
+  obtain ⟨a, ha⟩ := hx
+  refine fun g => ⟨a, Subtype.ext ?_⟩
+  rw [SubmonoidClass.coe_pow, OneMemClass.coe_one, ← ha, ← orderOf_dvd_iff_pow_eq_one]
+  exact orderOf_dvd_of_mem_zpowers g.2
+
 theorem isPRegular_one {p : ℕ} (hp : p.Prime) : IsPRegular p (1 : G) := by
   rw [IsPRegular, orderOf_one]
   intro h
@@ -120,6 +129,11 @@ theorem isPRegular_coe {p : ℕ} {H : Subgroup G} {y : ↥H} (hy : IsPRegular p 
 theorem isPElement_coe_iff {p : ℕ} {H : Subgroup G} {y : ↥H} :
     IsPElement p ((y : G)) ↔ IsPElement p y := by
   rw [IsPElement, IsPElement, Subgroup.orderOf_coe]
+
+/-- Every element of a `p`-subgroup is a `p`-element. -/
+theorem isPElement_of_mem_of_isPGroup {p : ℕ} [Fact p.Prime] {H : Subgroup G}
+    (hH : IsPGroup p ↥H) {x : G} (hx : x ∈ H) : IsPElement p x :=
+  isPElement_coe_iff.mpr (IsPGroup.iff_orderOf.mp hH ⟨x, hx⟩)
 
 /-! ### The `p` / `p'` decomposition
 
