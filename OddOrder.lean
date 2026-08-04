@@ -161,6 +161,8 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfLattice
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryLatticeCharacter
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBridge
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBlockSplitting
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainCore
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBlockIdempotent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
