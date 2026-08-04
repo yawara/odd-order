@@ -16005,3 +16005,9 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.RepresentationTheory.Modular.brauerMatrix_mul_projMatrix
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_brauer_mul_projectiveIndecomposableCharacter
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_pRegular_eq_sum_pRegularRep
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.pairingZero_eq_sum_pRegularRep
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.pairingZero_projectiveIndecomposableCharacter

@@ -110,6 +110,74 @@ theorem brauerMatrix_mul_projMatrix :
     brauerMatrix hp hπ hlin hkerJ * projMatrix hp hω hω' hπ hlin hkerJ e = 1 :=
   mul_eq_one_comm.mp (projMatrix_mul_brauerMatrix hp hω hω' hπ hlin hkerJ e)
 
+/-! ### Summing over the `p`-regular elements -/
+
+omit [IsDomain 𝒪] [ValuationRing 𝒪] [DecidableEq ι] in
+include hp hπ hlin hkerJ in
+/-- **A class function vanishing off `G°` is summed over `G` by its `p`-regular class
+representatives**, weighted by class size. -/
+theorem sum_eq_sum_pRegularRep [Fintype G] {M : Type*} [AddCommMonoid M] (f : G → M)
+    (hf : ∀ g h : G, IsConj g h → f g = f h) (hv : ∀ g : G, ¬ IsPRegular p g → f g = 0) :
+    ∑ g : G, f g
+      = ∑ j : ι, conjugacyClassSize (ConjClasses.mk (pRegularRep hp hπ hlin hkerJ j))
+          • f (pRegularRep hp hπ hlin hkerJ j) := by
+  classical
+  haveI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  have hzero : ∀ C : ConjClasses G, C ∈ Finset.univ →
+      C ∉ Finset.univ.filter (fun C : ConjClasses G => IsPRegularClass p C) →
+      conjugacyClassSize C • f (conjugacyClassRepresentative C) = 0 := by
+    intro C _ hC
+    have hCreg : ¬ IsPRegularClass p C := by simpa using hC
+    have : ¬ IsPRegular p (conjugacyClassRepresentative C) := by
+      rw [← isPRegularClass_mk (p := p), conjugacyClassRepresentative_mk_eq]
+      exact hCreg
+    rw [hv _ this, smul_zero]
+  have h1 : ∑ g : G, f g
+      = ∑ C ∈ Finset.univ.filter (fun C : ConjClasses G => IsPRegularClass p C),
+        conjugacyClassSize C • f (conjugacyClassRepresentative C) := by
+    rw [sum_eq_sum_conjClasses f hf]
+    exact (Finset.sum_subset (Finset.subset_univ _) hzero).symm
+  have h2 : ∑ C ∈ Finset.univ.filter (fun C : ConjClasses G => IsPRegularClass p C),
+        conjugacyClassSize C • f (conjugacyClassRepresentative C)
+      = ∑ C : {C : ConjClasses G // IsPRegularClass p C},
+        conjugacyClassSize (C : ConjClasses G) • f (conjugacyClassRepresentative C) :=
+    Finset.sum_subtype _ (fun C => by simp) _
+  rw [h1, h2, ← Equiv.sum_comp (equivPRegularClass hp hπ hlin hkerJ)]
+  refine Finset.sum_congr rfl fun j _ => ?_
+  have hmk := mk_pRegularRep hp hπ hlin hkerJ j
+  have hconj : IsConj (conjugacyClassRepresentative
+      (equivPRegularClass hp hπ hlin hkerJ j : ConjClasses G))
+      (pRegularRep hp hπ hlin hkerJ j) := by
+    refine ConjClasses.mk_eq_mk_iff_isConj.mp ?_
+    rw [conjugacyClassRepresentative_mk_eq, hmk]
+  rw [hmk, hf _ _ hconj]
+
+omit [IsDomain 𝒪] [ValuationRing 𝒪] [DecidableEq ι] in
+include hp hπ hlin hkerJ in
+open scoped Classical in
+/-- **A class function summed over the `p`-regular elements** is the class-size-weighted sum over
+the `p`-regular class representatives. -/
+theorem sum_pRegular_eq_sum_pRegularRep [Fintype G] {M : Type*} [AddCommMonoid M] (f : G → M)
+    (hf : ∀ g h : G, IsConj g h → f g = f h) :
+    ∑ g ∈ Finset.univ.filter (fun g : G => IsPRegular p g), f g
+      = ∑ j : ι, conjugacyClassSize (ConjClasses.mk (pRegularRep hp hπ hlin hkerJ j))
+          • f (pRegularRep hp hπ hlin hkerJ j) := by
+  classical
+  have hclass : ∀ g h : G, IsConj g h →
+      (if IsPRegular p g then f g else 0) = (if IsPRegular p h then f h else 0) := by
+    intro g h hc
+    by_cases hg : IsPRegular p g
+    · rw [if_pos hg, if_pos (isPRegular_of_isConj hg hc), hf _ _ hc]
+    · rw [if_neg hg, if_neg fun hh => hg (isPRegular_of_isConj hh hc.symm)]
+  have hvan : ∀ g : G, ¬ IsPRegular p g → (if IsPRegular p g then f g else 0) = 0 :=
+    fun g hg => if_neg hg
+  have hkey := sum_eq_sum_pRegularRep hp hπ hlin hkerJ
+    (fun g => if IsPRegular p g then f g else 0) hclass hvan
+  rw [← Finset.sum_filter] at hkey
+  rw [hkey]
+  exact Finset.sum_congr rfl fun j _ => by
+    rw [if_pos (isPRegular_pRegularRep hp hπ hlin hkerJ j)]
+
 /-- **`[Φ_θ, φ]⁰ = δ_{φθ}`, as a sum over the `p`-regular classes** — the matrix content of
 Navarro (2.13). -/
 theorem sum_brauer_mul_projectiveIndecomposableCharacter (φ θ : ι) :
@@ -127,5 +195,85 @@ theorem sum_brauer_mul_projectiveIndecomposableCharacter (φ θ : ι) :
   exact Finset.sum_congr rfl fun j _ => by
     simp only [projMatrix, brauerMatrix, map_mul]
     ring
+
+/-! ### Navarro's pairing `[a, b]⁰` -/
+
+omit [HenselianLocalRing 𝒪] [DecidableEq ι] [Fintype ι'] [∀ (i : ι'), Nonempty (m i)]
+  [Invertible (Nat.card G : K)] in
+/-- The ordinary characters are class functions. -/
+theorem ordinaryCharacter_eq_of_isConj (i : ι') {g h : G} (hc : IsConj g h) :
+    ordinaryCharacter (𝒪 := 𝒪) e i g = ordinaryCharacter (𝒪 := 𝒪) e i h := by
+  refine IsFractionRing.injective 𝒪 K ?_
+  rw [algebraMap_ordinaryCharacter, algebraMap_ordinaryCharacter]
+  exact character_eq_of_isConj _ hc
+
+omit [IsDomain 𝒪] [ValuationRing 𝒪] [IsPModularSystem p 𝒪] [Finite G] [Fintype ι]
+  [DecidableEq ι] [∀ (i : ι), Nonempty (nn i)] in
+/-- The irreducible Brauer characters are class functions, in `IsConj` form. -/
+theorem irreducibleBrauerCharacter_eq_of_isConj (φ : ι) {g h : G} (hc : IsConj g h) :
+    irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π φ g
+      = irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π φ h := by
+  obtain ⟨u, hu⟩ := hc
+  have hh : (u : G) * g * ((u : G))⁻¹ = h := by rw [hu.eq]; group
+  rw [← hh, irreducibleBrauerCharacter_conj]
+
+omit [DecidableEq ι] [∀ (i : ι'), Nonempty (m i)] [Invertible (Nat.card G : K)] in
+/-- The projective indecomposable characters are class functions. -/
+theorem projectiveIndecomposableCharacter_eq_of_isConj (θ : ι) {g h : G} (hc : IsConj g h) :
+    projectiveIndecomposableCharacter hp hω hω' hπ hlin hkerJ e θ g
+      = projectiveIndecomposableCharacter hp hω hω' hπ hlin hkerJ e θ h :=
+  Finset.sum_congr rfl fun i _ => by rw [ordinaryCharacter_eq_of_isConj e i hc]
+
+open scoped Classical in
+/-- **Navarro's pairing** `[a, b]⁰ = (1/|G|) ∑_{g ∈ G°} a(g) b(g⁻¹)`, for `𝒪`-valued class
+functions, with values in the fraction field (`|G|` is not invertible in `𝒪`). -/
+noncomputable def pairingZero (p : ℕ) (K : Type*) [Field K] [Algebra 𝒪 K] [Fintype G]
+    [Invertible (Nat.card G : K)] (a b : G → 𝒪) : K :=
+  (Nat.card G : K)⁻¹ * ∑ g ∈ Finset.univ.filter (fun g : G => IsPRegular p g),
+    algebraMap 𝒪 K (a g * b g⁻¹)
+
+omit [IsDomain 𝒪] [ValuationRing 𝒪] [IsFractionRing 𝒪 K] [DecidableEq ι] in
+include hp hπ hlin hkerJ in
+open scoped Classical in
+/-- **The pairing as a sum over the `p`-regular classes**, with the class sizes traded for
+centralizer orders through `|C| · |C_G| = |G|`. -/
+theorem pairingZero_eq_sum_pRegularRep [Fintype G] (a b : G → 𝒪)
+    (ha : ∀ g h : G, IsConj g h → a g = a h) (hb : ∀ g h : G, IsConj g h → b g = b h) :
+    pairingZero (𝒪 := 𝒪) p K a b
+      = ∑ j : ι, (Nat.card (Subgroup.centralizer
+            ({pRegularRep hp hπ hlin hkerJ j} : Set G)) : K)⁻¹ *
+          algebraMap 𝒪 K (a (pRegularRep hp hπ hlin hkerJ j)
+            * b (pRegularRep hp hπ hlin hkerJ j)⁻¹) := by
+  classical
+  have hclass : ∀ g h : G, IsConj g h →
+      algebraMap 𝒪 K (a g * b g⁻¹) = algebraMap 𝒪 K (a h * b h⁻¹) := fun g h hc => by
+    rw [ha _ _ hc, hb _ _ (IsConj.inv' hc)]
+  rw [pairingZero, sum_pRegular_eq_sum_pRegularRep hp hπ hlin hkerJ _ hclass, Finset.mul_sum]
+  refine Finset.sum_congr rfl fun j _ => ?_
+  set x := pRegularRep hp hπ hlin hkerJ j with hx
+  have hsize : (conjugacyClassSize (ConjClasses.mk x) : K)
+      * (Nat.card (Subgroup.centralizer ({x} : Set G)) : K) = (Nat.card G : K) :=
+    mod_cast congrArg (Nat.cast : ℕ → K) (conjugacyClassSize_mk_mul_card_centralizer (G := G) x)
+  have hGunit : ((Nat.card G : K)) ≠ 0 := (isUnit_of_invertible (Nat.card G : K)).ne_zero
+  have hCunit : ((Nat.card (Subgroup.centralizer ({x} : Set G)) : K)) ≠ 0 :=
+    (isUnit_card_centralizer (K := K) x).ne_zero
+  rw [nsmul_eq_mul, ← mul_assoc]
+  congr 1
+  field_simp
+  linear_combination hsize
+
+include hp hπ hlin hkerJ in
+/-- **`[Φ_θ, φ]⁰ = δ_{φθ}`** — Navarro (2.13). -/
+theorem pairingZero_projectiveIndecomposableCharacter [Fintype G] (φ θ : ι) :
+    pairingZero (𝒪 := 𝒪) p K
+        (projectiveIndecomposableCharacter hp hω hω' hπ hlin hkerJ e θ)
+        (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π φ)
+      = if φ = θ then 1 else 0 := by
+  classical
+  rw [pairingZero_eq_sum_pRegularRep hp hπ hlin hkerJ _ _
+      (fun g h hc => projectiveIndecomposableCharacter_eq_of_isConj hp hω hω' hπ hlin hkerJ e θ hc)
+      (fun g h hc => irreducibleBrauerCharacter_eq_of_isConj φ hc),
+    ← sum_brauer_mul_projectiveIndecomposableCharacter hp hω hω' hπ hlin hkerJ e φ θ]
+  exact Finset.sum_congr rfl fun j _ => by rw [mul_comm (irreducibleBrauerCharacter _ _ _)]
 
 end OddOrder.RepresentationTheory.Modular
