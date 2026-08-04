@@ -170,6 +170,7 @@ import OddOrder.Algebra.MatrixNaturalModule
 import OddOrder.Algebra.ModuleAlongSurjection
 import OddOrder.Algebra.BlockIdempotent
 import OddOrder.Algebra.DefectGroupConjugacy
+import OddOrder.Algebra.DefectNumber
 import OddOrder.Algebra.GroupAlgebraDefectGroup
 import OddOrder.Algebra.GroupAlgebraBlocks
 import OddOrder.Algebra.BrauerKernel
@@ -16533,3 +16534,13 @@ Wedderburn 成分に対して**証明**する. -/
   OddOrder.RepresentationTheory.Modular.card_filter_centralizer_eq
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.inducedBlockOfNormalizer_principalBlock
+
+/-! **ブロックの defect 数** (`Algebra/DefectNumber`) — defect group は既存 (`DefectGroup`)、
+その位数 `p^d` の指数 `d` を取り出す. height が測る基準. -/
+
+#assert_only_allowed_axioms
+  OddOrder.GAlgebra.defect
+#assert_only_allowed_axioms
+  OddOrder.GAlgebra.card_defectGroup
+#assert_only_allowed_axioms
+  OddOrder.GAlgebra.card_eq_of_isDefectGroup

@@ -34,6 +34,7 @@ import OddOrder.Algebra.BrauerDefect
 import OddOrder.Algebra.BrauerFirstMain
 import OddOrder.GroupTheory.PGroupRelIndex
 import OddOrder.Algebra.DefectGroup
+import OddOrder.Algebra.DefectNumber
 import OddOrder.Algebra.MackeyFormula
 import OddOrder.Algebra.Rosenberg
 import OddOrder.Algebra.DefectGroupConjugacy
