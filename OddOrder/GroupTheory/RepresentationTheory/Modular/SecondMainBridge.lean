@@ -115,6 +115,29 @@ theorem latticeRepresentation_asAlgebraHom_eq_zero (ρ : Representation K G V)
     rw [coe_latticeRepresentation_asAlgebraHom ρ hL a v, ha]
     simp
 
+omit [IsDomain 𝒪] [ValuationRing 𝒪] [IsFractionRing 𝒪 K] in
+/-- **An element of `𝒪G` killing the lattice kills the ambient space.**  The converse of
+`latticeRepresentation_asAlgebraHom_eq_zero`: a lattice spans, so a `K`-linear map vanishing on it
+vanishes.  This is what turns Navarro (3.13.a) — which is a statement about the lattice — into the
+hypothesis `χ ∉ Irr(B)` of the second main theorem, which is about the ambient module. -/
+theorem asAlgebraHom_eq_zero_of_latticeRepresentation (ρ : Representation K G V)
+    {L : Submodule 𝒪 V} [L.IsLattice K] (hL : ∀ (g : G), ∀ v ∈ L, ρ g v ∈ L)
+    {a : MonoidAlgebra 𝒪 G} (ha : (latticeRepresentation ρ hL).asAlgebraHom a = 0) :
+    ρ.asAlgebraHom (MonoidAlgebra.mapRingHom G (algebraMap 𝒪 K) a) = 0 := by
+  refine LinearMap.ext fun v => ?_
+  rw [LinearMap.zero_apply]
+  have hspan : v ∈ Submodule.span K (L : Set V) := by
+    rw [Submodule.IsLattice.span_eq_top (A := K)]
+    trivial
+  induction hspan using Submodule.span_induction with
+  | mem w hw =>
+    have hcoe := coe_latticeRepresentation_asAlgebraHom ρ hL a ⟨w, hw⟩
+    rw [ha] at hcoe
+    simpa using hcoe.symm
+  | zero => rw [map_zero]
+  | add u w _ _ hu hw => rw [map_add, hu, hw, add_zero]
+  | smul c u _ hu => rw [map_smul, hu, smul_zero]
+
 end Lattice
 
 end OddOrder.RepresentationTheory.Modular

@@ -230,6 +230,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryLatticeCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainCore
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainTheorem
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockForm
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBlockIdempotent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
@@ -16443,3 +16444,14 @@ system で証明される. -/
   OddOrder.RepresentationTheory.Modular.pPart_mul_eq_of_isPElement
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_eq_zero
+
+/-! **Navarro (5.8)** (`Modular.SecondMainBlockForm`) — (5.2) を block 言語で述べ直し、
+さらに消滅仮説を「`χ` のブロック ≠ `b^G`」に置き換えたもの. (5.6) の witness と `f_b` の
+各化身はここで内部生成される. -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.asAlgebraHom_eq_zero_of_latticeRepresentation
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_eq_zero_of_inducedBlock
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_eq_zero_of_blockOfLattice
