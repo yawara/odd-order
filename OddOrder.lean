@@ -25,6 +25,7 @@ import OddOrder.Algebra.CenterGroupAlgebraHenselian
 import OddOrder.Algebra.CenterIdempotentLift
 import OddOrder.Algebra.RelativeTrace
 import OddOrder.Algebra.RelativeTraceCharacter
+import OddOrder.Algebra.RootsOfUnitySum
 import OddOrder.Algebra.GroupAlgebraConjugation
 import OddOrder.Algebra.BrauerHomomorphism
 import OddOrder.Algebra.ClassSum

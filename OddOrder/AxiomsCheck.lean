@@ -7,6 +7,7 @@ import Lean.Elab.Command
 import Lean.Util.CollectAxioms
 import OddOrder.Algebra.PowSubOneDvd
 import OddOrder.Algebra.AlgInt
+import OddOrder.Algebra.RootsOfUnitySum
 import OddOrder.Algebra.GaloisRationalInteger
 import OddOrder.Algebra.FixedPointsGalois
 import OddOrder.Algebra.QuadraticFrobenius
@@ -16617,3 +16618,10 @@ Sylow `p`-部分群の共役作用 + `C_G(P)` の Sylow が中心的、の 2 段
   OddOrder.RepresentationTheory.Modular.defect_eq_factorization_of_blockCharacterPi_principal
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_isIdempotentElem_defect_principalBlock
+
+/-! **1 の冪根 `n` 個の和が `n` なら全部 1** (`Algebra/RootsOfUnitySum`) — 任意の標数 0 の体上。
+三角不等式の等号条件 (ℂ 版は `all_eq_one_of_norm_eq_one_of_sum_eq_card`) を、
+「冪根が生成する部分代数は ℚ 上整 ⟹ ℂ へ埋まる」で移送する。Navarro (6.11) の前提。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.Algebra.eq_one_of_pow_eq_one_of_sum_eq_card
