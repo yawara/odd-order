@@ -27,6 +27,7 @@ import OddOrder.Algebra.AlgClosedFractionField
 import OddOrder.Algebra.AlgClosedSplitting
 import OddOrder.Algebra.GroupAlgebraBlocks
 import OddOrder.Algebra.BlockIdempotent
+import OddOrder.Algebra.CentralCharacterBlock
 import OddOrder.Algebra.CentralIdempotentModule
 import OddOrder.Algebra.PrimitiveIdempotent
 import OddOrder.Algebra.SeparatingSubalgebra
