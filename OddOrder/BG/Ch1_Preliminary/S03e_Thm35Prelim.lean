@@ -909,10 +909,10 @@ theorem false_of_two_weights (ρ : Representation F G W) [FiniteDimensional F W]
       rw [← hcr]; exact hh
   -- the common orbit size divides `|K|` and `|R|`.
   have hcardK : Nat.card ↥(MulAction.orbit ↥K χ₁) ∣ Nat.card ↥K := by
-    rw [Nat.card_congr (MulAction.orbitEquivQuotientStabilizer (α := ↥K) χ₁)]
+    rw [Nat.card_congr (MulAction.orbitEquivQuotientStabilizer (G := ↥K) χ₁)]
     exact (MulAction.stabilizer ↥K χ₁).index_dvd_card
   have hcardR : Nat.card ↥(MulAction.orbit ↥R χ₁) ∣ Nat.card ↥R := by
-    rw [Nat.card_congr (MulAction.orbitEquivQuotientStabilizer (α := ↥R) χ₁)]
+    rw [Nat.card_congr (MulAction.orbitEquivQuotientStabilizer (G := ↥R) χ₁)]
     exact (MulAction.stabilizer ↥R χ₁).index_dvd_card
   rw [horbK] at hcardK
   rw [horbR] at hcardR

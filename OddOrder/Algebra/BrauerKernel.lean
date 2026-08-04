@@ -16,7 +16,7 @@ For a `p`-subgroup `P ≤ G` and a coefficient ring of characteristic `p`, the B
 `ker Br_P = ∑_{Q < P} Tr^P_Q ((k[G])^Q)`.
 
 Both inclusions are elementary once the relative trace of a monomial is known to be an orbit sum
-(`relTrace_single_apply`):
+(`coeff_relTrace_single`):
 
 * `⊇` — the coefficient of `Tr^P_Q(a)` at a point `c` of `C_G(P)` is `[P : Q] · a c`, because
   every representative conjugates `c` to itself; and `p ∣ [P : Q]` for `Q < P` inside a
@@ -58,18 +58,19 @@ theorem brauerProj_relTrace_eq_zero [Finite G] (hchar : (p : k) = 0) {P Q : Subg
   have hindex : (Q.relIndex P : k) = 0 := by
     obtain ⟨t, ht⟩ := hdvd
     rw [ht, Nat.cast_mul, hchar, zero_mul]
-  refine Finsupp.ext fun n => ?_
-  rw [brauerProj_apply]
+  ext n
+  rw [coeff_brauerProj]
   by_cases hn : n ∈ Subgroup.centralizer (P : Set G)
   · rw [if_pos hn]
     set rep : ↥P ⧸ Q.subgroupOf P → G := fun x => ((x.out : ↥P) : G) with hrep
     have hR : GAlgebra.relTrace Q P a = ∑ x : ↥P ⧸ Q.subgroupOf P, rep x • a := rfl
-    have hsplit : (∑ x : ↥P ⧸ Q.subgroupOf P, rep x • a) n
-        = ∑ x : ↥P ⧸ Q.subgroupOf P, (rep x • a) n := Finsupp.finsetSum_apply _ _ _
-    -- Every representative fixes `n`, so all the terms are `a n`.
-    have hterm : ∀ x : ↥P ⧸ Q.subgroupOf P, (rep x • a) n = a n := by
+    have hsplit : (∑ x : ↥P ⧸ Q.subgroupOf P, rep x • a).coeff n
+        = ∑ x : ↥P ⧸ Q.subgroupOf P, (rep x • a).coeff n :=
+      MonoidAlgebra.coeff_finsetSum _ _ _
+    -- Every representative fixes `n`, so all the terms are `a.coeff n`.
+    have hterm : ∀ x : ↥P ⧸ Q.subgroupOf P, (rep x • a).coeff n = a.coeff n := by
       intro x
-      rw [conj_smul_apply]
+      rw [coeff_conj_smul]
       congr 1
       have hcomm := (Subgroup.mem_centralizer_iff.mp hn) (rep x) (x.out : ↥P).2
       rw [mul_assoc, ← hcomm, ← mul_assoc, inv_mul_cancel, one_mul]
@@ -92,27 +93,28 @@ theorem brauerProj_eq_zero_iff [Finite G] [Fact p.Prime] (hchar : (p : k) = 0)
   constructor
   · -- Peel off one `P`-orbit at a time.
     intro hbr
-    suffices H : ∀ m : ℕ, ∀ c : MonoidAlgebra k G, c.support.card ≤ m →
+    suffices H : ∀ m : ℕ, ∀ c : MonoidAlgebra k G, c.coeff.support.card ≤ m →
         (∀ u ∈ P, u • c = c) → brauerProj P c = 0 →
         c ∈ ⨆ Q : {Q : Subgroup G // Q < P}, GAlgebra.relTraceIdeal (Q : Subgroup G) P from
-      H b.support.card b le_rfl hb hbr
+      H b.coeff.support.card b le_rfl hb hbr
     intro m
     induction m with
     | zero =>
       intro c hcard _ _
-      have hc0 : c = 0 :=
-        Finsupp.support_eq_empty.mp (Finset.card_eq_zero.mp (Nat.le_zero.mp hcard))
+      have hc0 : c = 0 := MonoidAlgebra.coeff_eq_zero.mp
+        (Finsupp.support_eq_empty.mp (Finset.card_eq_zero.mp (Nat.le_zero.mp hcard)))
       exact hc0 ▸ zero_mem _
     | succ m ih =>
       intro c hcard hcfix hcbr
       rcases eq_or_ne c 0 with rfl | hc0
       · exact zero_mem _
-      obtain ⟨g, hg⟩ := Finsupp.support_nonempty_iff.mpr hc0
+      obtain ⟨g, hg⟩ := Finsupp.support_nonempty_iff.mpr
+        (fun h => hc0 (MonoidAlgebra.coeff_eq_zero.mp h))
       rw [Finsupp.mem_support_iff] at hg
       -- `g` is off the centraliser, so its stabiliser in `P` is proper.
       have hgc : g ∉ Subgroup.centralizer (P : Set G) := by
         intro hmem
-        exact hg (by rw [← brauerProj_apply_of_mem hmem c, hcbr]; rfl)
+        exact hg (by rw [← coeff_brauerProj_of_mem hmem c, hcbr]; rfl)
       set Q : Subgroup G := P ⊓ Subgroup.centralizer ({g} : Set G) with hQ
       have hQlt : Q < P := by
         refine lt_of_le_of_ne inf_le_left fun hQP => hgc ?_
@@ -121,19 +123,20 @@ theorem brauerProj_eq_zero_iff [Finite G] [Fact p.Prime] (hchar : (p : k) = 0)
         exact ((Subgroup.mem_centralizer_iff.mp (Subgroup.mem_inf.mp huQ).2)
           g (Set.mem_singleton g)).symm
       -- The orbit sum of `g` with coefficient `c g`.
-      set t : MonoidAlgebra k G := GAlgebra.relTrace Q P (single g (c g)) with ht
-      have htfix : ∀ u ∈ Q, u • (single g (c g) : MonoidAlgebra k G) = single g (c g) :=
+      set t : MonoidAlgebra k G := GAlgebra.relTrace Q P (single g (c.coeff g)) with ht
+      have htfix : ∀ u ∈ Q, u • (single g (c.coeff g) : MonoidAlgebra k G)
+          = single g (c.coeff g) :=
         fun u hu => smul_single_of_mem_centralizer (Subgroup.mem_inf.mp hu).2 _
-      have htmem : t ∈ GAlgebra.relTraceIdeal Q P := ⟨single g (c g), htfix, rfl⟩
-      have htapp_pos : ∀ n : G, (∃ u ∈ P, u * g * u⁻¹ = n) → t n = c g := by
+      have htmem : t ∈ GAlgebra.relTraceIdeal Q P := ⟨single g (c.coeff g), htfix, rfl⟩
+      have htapp_pos : ∀ n : G, (∃ u ∈ P, u * g * u⁻¹ = n) → t.coeff n = c.coeff g := by
         letI := Fintype.ofFinite G
         intro n horb
-        have h := relTrace_single_apply P g (c g) n
+        have h := coeff_relTrace_single P g (c.coeff g) n
         rwa [if_pos horb] at h
-      have htapp_neg : ∀ n : G, ¬ (∃ u ∈ P, u * g * u⁻¹ = n) → t n = 0 := by
+      have htapp_neg : ∀ n : G, ¬ (∃ u ∈ P, u * g * u⁻¹ = n) → t.coeff n = 0 := by
         letI := Fintype.ofFinite G
         intro n horb
-        have h := relTrace_single_apply P g (c g) n
+        have h := coeff_relTrace_single P g (c.coeff g) n
         rwa [if_neg horb] at h
       -- `c - t` is still fixed, still killed by `Br_P`, and has a smaller support.
       have hdfix : ∀ u ∈ P, u • (c - t) = c - t := by
@@ -143,10 +146,10 @@ theorem brauerProj_eq_zero_iff [Finite G] [Fact p.Prime] (hchar : (p : k) = 0)
       have hdbr : brauerProj P (c - t) = 0 := by
         rw [sub_eq_add_neg, brauerProj_add, hcbr, ht, ← neg_one_smul k (GAlgebra.relTrace _ _ _),
           brauerProj_smul, brauerProj_relTrace_eq_zero hchar hdvdQ, smul_zero, add_zero]
-      have hcconj : ∀ u ∈ P, ∀ x : G, c (u * x * u⁻¹) = c x :=
-        (forall_mem_smul_eq_iff_apply P c).mp hcfix
-      have hsub : ∀ n : G, (c - t) n = c n - t n := fun _ => rfl
-      have hsupp : (c - t).support ⊆ c.support.erase g := by
+      have hcconj : ∀ u ∈ P, ∀ x : G, c.coeff (u * x * u⁻¹) = c.coeff x :=
+        (forall_mem_smul_eq_iff_coeff P c).mp hcfix
+      have hsub : ∀ n : G, (c - t).coeff n = c.coeff n - t.coeff n := fun _ => rfl
+      have hsupp : (c - t).coeff.support ⊆ c.coeff.support.erase g := by
         intro n hn
         rw [Finsupp.mem_support_iff, hsub n] at hn
         by_cases horb : ∃ u ∈ P, u * g * u⁻¹ = n
@@ -156,7 +159,7 @@ theorem brauerProj_eq_zero_iff [Finite G] [Fact p.Prime] (hchar : (p : k) = 0)
         · rw [htapp_neg n horb, sub_zero] at hn
           refine Finset.mem_erase.mpr ⟨fun hng => horb ⟨1, P.one_mem, by rw [hng]; group⟩, ?_⟩
           exact Finsupp.mem_support_iff.mpr hn
-      have hdcard : (c - t).support.card ≤ m := by
+      have hdcard : (c - t).coeff.support.card ≤ m := by
         have h1 := Finset.card_le_card hsupp
         rw [Finset.card_erase_of_mem (Finsupp.mem_support_iff.mpr hg)] at h1
         omega

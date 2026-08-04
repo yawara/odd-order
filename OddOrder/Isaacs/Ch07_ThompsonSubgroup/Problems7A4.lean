@@ -48,8 +48,7 @@ variable {F : Type*} [Field F]
 noncomputable def transvectionHom : Multiplicative F →* SL(2, F) where
   toFun b := Matrix.SpecialLinearGroup.transvection
     (zero_ne_one : (0 : Fin 2) ≠ 1) b.toAdd
-  map_one' := Subtype.ext (by
-    simp [Matrix.SpecialLinearGroup.transvection_coe])
+  map_one' := Subtype.ext (by simp)
   map_mul' x y := Matrix.SpecialLinearGroup.transvection_add _ _ _
 
 @[simp]

@@ -59,9 +59,8 @@ theorem hasEnoughRootsOfUnity_card_sub_one (F : Type*) [Field F] [Fintype F] :
     ext u
     simpa [Units.ext_iff] using FiniteField.pow_card_sub_one_eq_one (u : F) (Units.ne_zero u)
   have hnc := Nat.card_congr (MulEquiv.subgroupCongr htop).toEquiv
-  rw [Nat.card_eq_fintype_card] at hnc
   rw [hnc]
-  simp [Fintype.card_units]
+  simp [Nat.card_eq_fintype_card, Fintype.card_units]
 
 /-- A finite field has all `n`-th roots of unity as soon as `n ∣ |F| - 1`. -/
 theorem hasEnoughRootsOfUnity_of_dvd_card_sub_one (F : Type*) [Field F] [Fintype F] {n : ℕ}

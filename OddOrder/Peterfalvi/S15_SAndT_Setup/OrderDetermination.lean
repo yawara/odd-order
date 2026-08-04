@@ -1192,7 +1192,7 @@ theorem cyclotomic_quotient_prime_dvd_modEq_one_of_not_modEq_one {p q r : ℕ}
 theorem modEq_one_of_forall_primeFactors_modEq_one {x q : ℕ} (hx : x ≠ 0)
     (h : ∀ r ∈ x.primeFactors, r ≡ 1 [MOD q]) :
     x ≡ 1 [MOD q] := by
-  rw [Nat.prod_pow_primeFactors_factorization hx]
+  rw [Nat.prod_primeFactors_coe_pow_factorization hx]
   have hprod :
       (∏ r ∈ x.primeFactors, r ^ x.factorization r) ≡
         ∏ r ∈ x.primeFactors, 1 [MOD q] :=

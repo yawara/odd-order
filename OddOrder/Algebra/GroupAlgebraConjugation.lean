@@ -28,7 +28,7 @@ structures in mathlib and conjugation is not the expected default.  It lives in 
 
 ## Main results
 
-* `OddOrder.GroupAlgebra.conj_smul_single`, `OddOrder.GroupAlgebra.conj_smul_apply` — the action
+* `OddOrder.GroupAlgebra.conj_smul_single`, `OddOrder.GroupAlgebra.coeff_conj_smul` — the action
   on a monomial and on coefficients.
 * `OddOrder.GroupAlgebra.smul_eq_conj` — the action really is conjugation *inside* `R[G]`.
 * `OddOrder.GroupAlgebra.forall_smul_eq_iff_mem_center` — over a commutative base the `G`-fixed
@@ -45,15 +45,22 @@ variable (R : Type*) [Semiring R] (G : Type*) [Group G]
 noncomputable def conjRingAut : G →* RingAut (MonoidAlgebra R G) where
   toFun g := mapDomainRingEquiv R (MulAut.conj g)
   map_one' := by
-    refine RingEquiv.ext fun x => Finsupp.ext fun n => ?_
-    rw [mapDomainRingEquiv_apply]
-    change x ((1 : G)⁻¹ * n * 1) = x n
+    refine RingEquiv.ext fun x => ?_
+    ext n
+    change (mapDomainRingEquiv R (MulAut.conj 1) x).coeff n = x.coeff n
+    rw [coeff_mapDomainRingEquiv, Finsupp.equivMapDomain_apply]
+    -- `MulEquiv.coe_toEquiv_symm` は `rfl` なので `Equiv` 側の `symm` を `MulEquiv` 側に読み替える
+    change x.coeff ((MulAut.conj (1 : G)).symm n) = x.coeff n
+    rw [MulAut.conj_symm_apply]
     simp
   map_mul' g h := by
-    refine RingEquiv.ext fun x => Finsupp.ext fun n => ?_
-    change mapDomainRingEquiv R (MulAut.conj (g * h)) x n
-        = mapDomainRingEquiv R (MulAut.conj g) (mapDomainRingEquiv R (MulAut.conj h) x) n
-    rw [mapDomainRingEquiv_apply, mapDomainRingEquiv_apply, mapDomainRingEquiv_apply]
+    refine RingEquiv.ext fun x => ?_
+    ext n
+    change (mapDomainRingEquiv R (MulAut.conj (g * h)) x).coeff n
+        = (mapDomainRingEquiv R (MulAut.conj g)
+            (mapDomainRingEquiv R (MulAut.conj h) x)).coeff n
+    rw [coeff_mapDomainRingEquiv, coeff_mapDomainRingEquiv, coeff_mapDomainRingEquiv]
+    simp only [Finsupp.equivMapDomain_apply]
     congr 1
     change (g * h)⁻¹ * n * (g * h) = h⁻¹ * (g⁻¹ * n * g) * h
     group
@@ -72,8 +79,9 @@ open scoped OddOrder.Conjugation
 variable {R G}
 
 @[simp]
-theorem conj_smul_apply (g : G) (x : MonoidAlgebra R G) (n : G) : (g • x) n = x (g⁻¹ * n * g) := by
-  change mapDomainRingEquiv R (MulAut.conj g) x n = _
+theorem coeff_conj_smul (g : G) (x : MonoidAlgebra R G) (n : G) :
+    (g • x).coeff n = x.coeff (g⁻¹ * n * g) := by
+  change (mapDomainRingEquiv R (MulAut.conj g) x).coeff n = _
   simp
 
 @[simp]
@@ -84,35 +92,37 @@ theorem conj_smul_single (g h : G) (r : R) :
 
 /-- Conjugation is `R`-linear. -/
 theorem conj_smul_smul (g : G) (r : R) (x : MonoidAlgebra R G) : g • (r • x) = r • (g • x) := by
-  refine Finsupp.ext fun n => ?_
-  rw [conj_smul_apply, MonoidAlgebra.smul_apply, MonoidAlgebra.smul_apply, conj_smul_apply]
+  ext n
+  rw [coeff_conj_smul, MonoidAlgebra.coeff_smul_apply, MonoidAlgebra.coeff_smul_apply,
+    coeff_conj_smul]
 
 /-- The conjugation action is conjugation *inside* the algebra, by the unit `single g 1`. -/
 theorem smul_eq_conj (g : G) (x : MonoidAlgebra R G) :
     g • x = single g 1 * x * single g⁻¹ 1 := by
-  refine Finsupp.ext fun n => ?_
-  rw [conj_smul_apply, MonoidAlgebra.mul_single_apply, MonoidAlgebra.single_mul_apply]
+  ext n
+  rw [coeff_conj_smul, MonoidAlgebra.coeff_mul_single_apply,
+    MonoidAlgebra.coeff_single_mul_apply]
   simp [mul_assoc]
 
 /-- Conjugation by `g` fixes `x` exactly when the coefficient function of `x` is invariant. -/
-theorem smul_eq_self_iff_apply (g : G) (x : MonoidAlgebra R G) :
-    g • x = x ↔ ∀ n : G, x (g⁻¹ * n * g) = x n := by
+theorem smul_eq_self_iff_coeff (g : G) (x : MonoidAlgebra R G) :
+    g • x = x ↔ ∀ n : G, x.coeff (g⁻¹ * n * g) = x.coeff n := by
   constructor
   · intro h n
-    rw [← conj_smul_apply g x n, h]
+    rw [← coeff_conj_smul g x n, h]
   · intro h
-    exact Finsupp.ext fun n => by rw [conj_smul_apply, h]
+    exact MonoidAlgebra.ext <| Finsupp.ext fun n => by rw [coeff_conj_smul, h]
 
 /-- `x` is fixed by all of `H` exactly when its coefficient function is constant on
 `H`-conjugacy classes.  This is the working description of `(R[G])^H`. -/
-theorem forall_mem_smul_eq_iff_apply (H : Subgroup G) (x : MonoidAlgebra R G) :
-    (∀ g ∈ H, g • x = x) ↔ ∀ g ∈ H, ∀ n : G, x (g * n * g⁻¹) = x n := by
+theorem forall_mem_smul_eq_iff_coeff (H : Subgroup G) (x : MonoidAlgebra R G) :
+    (∀ g ∈ H, g • x = x) ↔ ∀ g ∈ H, ∀ n : G, x.coeff (g * n * g⁻¹) = x.coeff n := by
   constructor
   · intro h g hg n
-    have := (smul_eq_self_iff_apply g⁻¹ x).mp (h g⁻¹ (H.inv_mem hg)) n
+    have := (smul_eq_self_iff_coeff g⁻¹ x).mp (h g⁻¹ (H.inv_mem hg)) n
     simpa using this
   · intro h g hg
-    refine (smul_eq_self_iff_apply g x).mpr fun n => ?_
+    refine (smul_eq_self_iff_coeff g x).mpr fun n => ?_
     have := h g⁻¹ (H.inv_mem hg) n
     simpa using this
 

@@ -8,6 +8,7 @@ import Mathlib.RepresentationTheory.Maschke
 import Mathlib.LinearAlgebra.Trace
 import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
+import OddOrder.Mathlib.MonoidAlgebra
 
 /-!
 # Completeness of irreducible characters (work in progress)
@@ -543,13 +544,14 @@ a semisimple `ℂ[G]`-module, hence the supremum of its simple submodules is `�
 submodule `N` the corresponding subrepresentation is irreducible (`ofSubmodulePrime_isIrreducible`),
 so Schur's lemma forces `T` to vanish there (`classFunctionOperator_eq_zero_of_sum_eq_zero`, fed by
 `sum_classFunctionInv_character_eq_zero`). Therefore `ker T = ⊤`, i.e. `T = 0`. Evaluating `T` at
-`Finsupp.single 1 1` reads off `f(g⁻¹) = 0` for every `g`, so `f = 0`. -/
+`MonoidAlgebra.single 1 1` reads off `f(g⁻¹) = 0` for every `g`, so `f = 0`. -/
 theorem classFunction_eq_zero_of_orthogonal (f : ClassFunction G ℂ)
     (hf : ∀ χ : IrreducibleCharacter G, ClassFunction.inner f (χ : ClassFunction G ℂ) = 0) :
     f = 0 := by
   haveI : Finite G := Finite.of_fintype G
   haveI : NeZero (Nat.card G : ℂ) := ⟨Invertible.ne_zero _⟩
-  let reg : Representation ℂ G (G →₀ ℂ) := Representation.ofMulAction ℂ G G
+  -- `Representation.ofMulAction` の対象は v4.32 で `G →₀ ℂ` から `ℂ[G]` (structure) になった。
+  let reg : Representation ℂ G (MonoidAlgebra ℂ G) := Representation.ofMulAction ℂ G G
   have hreg : reg = Representation.ofMulAction ℂ G G := rfl
   -- The intertwiner `T = ∑_g f(g⁻¹) • reg g`, packaged as a `ℂ[G]`-linear `End` of `asModule`.
   set Ti : reg.asModule →ₗ[ℂ[G]] reg.asModule :=
@@ -612,16 +614,17 @@ theorem classFunction_eq_zero_of_orthogonal (f : ClassFunction G ℂ)
   intro k
   classical
   have hcoeff : ∀ x : G, (classFunctionOperator (classFunctionInv f) reg
-      (Finsupp.single (1 : G) 1)) x = f x⁻¹ := by
+      (MonoidAlgebra.single (1 : G) (1 : ℂ))).coeff x = f x⁻¹ := by
     intro x
     rw [classFunctionOperator]
-    have hterm : ∀ g : G, (classFunctionInv f g • reg g) (Finsupp.single (1 : G) (1 : ℂ)) x
-        = if g = x then f g⁻¹ else 0 := by
+    have hterm : ∀ g : G,
+        ((classFunctionInv f g • reg g) (MonoidAlgebra.single (1 : G) (1 : ℂ))).coeff x
+          = if g = x then f g⁻¹ else 0 := by
       intro g
-      rw [LinearMap.smul_apply, hreg, Representation.ofMulAction_single, Finsupp.smul_single,
-        smul_eq_mul, mul_one, Finsupp.single_apply, smul_eq_mul, mul_one, classFunctionInv_apply,
-        eq_comm]
-    rw [LinearMap.sum_apply, Finset.sum_apply',
+      rw [LinearMap.smul_apply, hreg, Representation.ofMulAction_single,
+        MonoidAlgebra.smul_single, smul_eq_mul, mul_one, MonoidAlgebra.coeff_single,
+        Finsupp.single_apply, smul_eq_mul, mul_one, classFunctionInv_apply, eq_comm]
+    rw [LinearMap.sum_apply, MonoidAlgebra.coeff_finsetSum,
       Finset.sum_congr rfl (fun g _ => hterm g), Finset.sum_ite_eq' Finset.univ x]
     simp
   have := hcoeff k⁻¹

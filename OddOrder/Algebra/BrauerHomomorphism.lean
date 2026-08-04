@@ -36,6 +36,8 @@ on `P`-conjugation orbits, and the orbits that are not singletons have size divi
   a section landing in `(k[G])^P`.
 * `OddOrder.GroupAlgebra.brauerProj_conj_smul` — `Br_P` is `N_G(P)`-equivariant.
 * `OddOrder.GroupAlgebra.brauerProj_one`, `brauerProj_add`, `brauerProj_smul`.
+* `OddOrder.GroupAlgebra.coeff_brauerProj` — 係数での記述 (`MonoidAlgebra` は v4.32 で
+  `Finsupp` の別名でなく `coeff` フィールドを持つ構造体になった)。
 -/
 
 namespace OddOrder.GroupAlgebra
@@ -53,34 +55,35 @@ open scoped Classical in
 centraliser of `P`.  It is only a ring homomorphism on the `P`-fixed elements
 (`brauerProj_mul_of_invariant`); as a map on all of `k[G]` it is merely `k`-linear. -/
 noncomputable def brauerProj (P : Subgroup G) (x : MonoidAlgebra k G) : MonoidAlgebra k G :=
-  Finsupp.filter (fun g => g ∈ Subgroup.centralizer (P : Set G)) x
+  .ofCoeff <| Finsupp.filter (fun g => g ∈ Subgroup.centralizer (P : Set G)) x.coeff
 
 open scoped Classical in
-theorem brauerProj_apply (P : Subgroup G) (x : MonoidAlgebra k G) (g : G) :
-    brauerProj P x g = if g ∈ Subgroup.centralizer (P : Set G) then x g else 0 := by
-  rw [brauerProj, Finsupp.filter_apply]
+theorem coeff_brauerProj (P : Subgroup G) (x : MonoidAlgebra k G) (g : G) :
+    (brauerProj P x).coeff g
+      = if g ∈ Subgroup.centralizer (P : Set G) then x.coeff g else 0 := by
+  rw [brauerProj, MonoidAlgebra.coeff_ofCoeff, Finsupp.filter_apply]
 
-theorem brauerProj_apply_of_mem {P : Subgroup G} {g : G}
+theorem coeff_brauerProj_of_mem {P : Subgroup G} {g : G}
     (hg : g ∈ Subgroup.centralizer (P : Set G)) (x : MonoidAlgebra k G) :
-    brauerProj P x g = x g := by
-  classical rw [brauerProj_apply, if_pos hg]
+    (brauerProj P x).coeff g = x.coeff g := by
+  classical rw [coeff_brauerProj, if_pos hg]
 
-theorem brauerProj_apply_of_notMem {P : Subgroup G} {g : G}
+theorem coeff_brauerProj_of_notMem {P : Subgroup G} {g : G}
     (hg : g ∉ Subgroup.centralizer (P : Set G)) (x : MonoidAlgebra k G) :
-    brauerProj P x g = 0 := by
-  classical rw [brauerProj_apply, if_neg hg]
+    (brauerProj P x).coeff g = 0 := by
+  classical rw [coeff_brauerProj, if_neg hg]
 
 @[simp]
 theorem brauerProj_zero (P : Subgroup G) : brauerProj P (0 : MonoidAlgebra k G) = 0 := by
-  classical exact Finsupp.filter_zero _
+  classical exact congrArg MonoidAlgebra.ofCoeff (Finsupp.filter_zero _)
 
 theorem brauerProj_add (P : Subgroup G) (x y : MonoidAlgebra k G) :
     brauerProj P (x + y) = brauerProj P x + brauerProj P y := by
-  classical exact Finsupp.filter_add
+  classical exact congrArg MonoidAlgebra.ofCoeff Finsupp.filter_add
 
 theorem brauerProj_smul (P : Subgroup G) (r : k) (x : MonoidAlgebra k G) :
     brauerProj P (r • x) = r • brauerProj P x := by
-  classical exact Finsupp.filter_smul
+  classical exact congrArg MonoidAlgebra.ofCoeff Finsupp.filter_smul
 
 /-- `Br_P` as an additive homomorphism, so that its kernel is an `AddSubgroup`. -/
 noncomputable def brauerProjHom (P : Subgroup G) : MonoidAlgebra k G →+ MonoidAlgebra k G where
@@ -95,11 +98,11 @@ theorem brauerProjHom_apply (P : Subgroup G) (x : MonoidAlgebra k G) :
 @[simp]
 theorem brauerProj_one (P : Subgroup G) : brauerProj P (1 : MonoidAlgebra k G) = 1 := by
   classical
-  refine Finsupp.ext fun g => ?_
-  rw [brauerProj_apply]
+  ext g
+  rw [coeff_brauerProj]
   by_cases hg : g ∈ Subgroup.centralizer (P : Set G)
   · rw [if_pos hg]
-  · rw [if_neg hg, MonoidAlgebra.one_def, MonoidAlgebra.single_apply, if_neg]
+  · rw [if_neg hg, MonoidAlgebra.one_def, MonoidAlgebra.coeff_single, Finsupp.single_apply, if_neg]
     rintro rfl
     exact hg (Subgroup.centralizer (P : Set G)).one_mem
 
@@ -129,10 +132,10 @@ theorem conj_mem_centralizer_iff {P : Subgroup G} {n : G} (hn : n ∈ Subgroup.n
 says that `Br_P` maps `(k[G])^P` *onto* the elements supported on the centraliser: the Brauer
 quotient `(k[G])^P / ∑_{Q<P} Tr^P_Q` is `k[C_G(P)]`. -/
 theorem forall_smul_eq_of_support_subset {P : Subgroup G} {x : MonoidAlgebra k G}
-    (hx : ∀ g : G, g ∉ Subgroup.centralizer (P : Set G) → x g = 0) : ∀ u ∈ P, u • x = x := by
+    (hx : ∀ g : G, g ∉ Subgroup.centralizer (P : Set G) → x.coeff g = 0) : ∀ u ∈ P, u • x = x := by
   intro u hu
-  refine Finsupp.ext fun n => ?_
-  rw [conj_smul_apply]
+  ext n
+  rw [coeff_conj_smul]
   by_cases hn : n ∈ Subgroup.centralizer (P : Set G)
   · congr 1
     have hcomm := Subgroup.mem_centralizer_iff.mp hn u hu
@@ -144,10 +147,10 @@ theorem forall_smul_eq_of_support_subset {P : Subgroup G} {x : MonoidAlgebra k G
 
 /-- `Br_P` is the identity on elements supported on the centraliser. -/
 theorem brauerProj_eq_self {P : Subgroup G} {x : MonoidAlgebra k G}
-    (hx : ∀ g : G, g ∉ Subgroup.centralizer (P : Set G) → x g = 0) : brauerProj P x = x := by
+    (hx : ∀ g : G, g ∉ Subgroup.centralizer (P : Set G) → x.coeff g = 0) : brauerProj P x = x := by
   classical
-  refine Finsupp.ext fun g => ?_
-  rw [brauerProj_apply]
+  ext g
+  rw [coeff_brauerProj]
   by_cases hg : g ∈ Subgroup.centralizer (P : Set G)
   · rw [if_pos hg]
   · rw [if_neg hg, hx g hg]
@@ -155,11 +158,11 @@ theorem brauerProj_eq_self {P : Subgroup G} {x : MonoidAlgebra k G}
 /-- `Br_P` is idempotent. -/
 theorem brauerProj_brauerProj (P : Subgroup G) (x : MonoidAlgebra k G) :
     brauerProj P (brauerProj P x) = brauerProj P x :=
-  brauerProj_eq_self fun _ hg => brauerProj_apply_of_notMem hg x
+  brauerProj_eq_self fun _ hg => coeff_brauerProj_of_notMem hg x
 
 /-- **`Br_P` is surjective onto `k[C_G(P)]`, with a section inside `(k[G])^P`.** -/
 theorem exists_forall_smul_eq_brauerProj_eq {P : Subgroup G} {y : MonoidAlgebra k G}
-    (hy : ∀ g : G, g ∉ Subgroup.centralizer (P : Set G) → y g = 0) :
+    (hy : ∀ g : G, g ∉ Subgroup.centralizer (P : Set G) → y.coeff g = 0) :
     ∃ x : MonoidAlgebra k G, (∀ u ∈ P, u • x = x) ∧ brauerProj P x = y :=
   ⟨y, forall_smul_eq_of_support_subset hy, brauerProj_eq_self hy⟩
 
@@ -169,8 +172,8 @@ correspondence of blocks takes place. -/
 theorem brauerProj_conj_smul {P : Subgroup G} {n : G} (hn : n ∈ Subgroup.normalizer P)
     (x : MonoidAlgebra k G) : brauerProj P (n • x) = n • brauerProj P x := by
   classical
-  refine Finsupp.ext fun c => ?_
-  rw [brauerProj_apply, conj_smul_apply, conj_smul_apply, brauerProj_apply]
+  ext c
+  rw [coeff_brauerProj, coeff_conj_smul, coeff_conj_smul, coeff_brauerProj]
   by_cases hc : c ∈ Subgroup.centralizer (P : Set G)
   · rw [if_pos hc, if_pos ((conj_mem_centralizer_iff hn c).mpr hc)]
   · rw [if_neg hc, if_neg fun h => hc ((conj_mem_centralizer_iff hn c).mp h)]
@@ -180,9 +183,9 @@ end Section
 section Mul
 
 /-- The coefficient of a product, as a sum over the whole group. -/
-theorem mul_apply_sum [Fintype G] (x y : MonoidAlgebra k G) (c : G) :
-    (x * y) c = ∑ a : G, x a * y (a⁻¹ * c) := by
-  rw [MonoidAlgebra.mul_apply_left]
+theorem coeff_mul_sum [Fintype G] (x y : MonoidAlgebra k G) (c : G) :
+    (x * y).coeff c = ∑ a : G, x.coeff a * y.coeff (a⁻¹ * c) := by
+  rw [MonoidAlgebra.coeff_mul_apply_left]
   exact Finsupp.sum_fintype _ _ fun _ => by simp
 
 variable {p : ℕ}
@@ -217,30 +220,30 @@ theorem brauerProj_mul_of_invariant [Finite G] (hp : p.Prime) (hchar : (p : k) =
   have hchar' : ∀ v : k, p • v = 0 := fun v => by
     rw [nsmul_eq_mul, hchar, zero_mul]
   -- Coefficient-wise invariance of `x` and `y`.
-  have hxc : ∀ (u : G), u ∈ P → ∀ n : G, x (u * n * u⁻¹) = x n :=
-    (forall_mem_smul_eq_iff_apply P x).mp hx
-  have hyc : ∀ (u : G), u ∈ P → ∀ n : G, y (u * n * u⁻¹) = y n :=
-    (forall_mem_smul_eq_iff_apply P y).mp hy
-  refine Finsupp.ext fun c => ?_
+  have hxc : ∀ (u : G), u ∈ P → ∀ n : G, x.coeff (u * n * u⁻¹) = x.coeff n :=
+    (forall_mem_smul_eq_iff_coeff P x).mp hx
+  have hyc : ∀ (u : G), u ∈ P → ∀ n : G, y.coeff (u * n * u⁻¹) = y.coeff n :=
+    (forall_mem_smul_eq_iff_coeff P y).mp hy
+  ext c
   by_cases hc : c ∈ Subgroup.centralizer (P : Set G)
   · -- The interesting case.
-    rw [brauerProj_apply_of_mem hc, mul_apply_sum, mul_apply_sum]
-    have hRHS : ∀ a : G, brauerProj P x a * brauerProj P y (a⁻¹ * c)
-        = if a ∈ C then x a * y (a⁻¹ * c) else 0 := by
+    rw [coeff_brauerProj_of_mem hc, coeff_mul_sum, coeff_mul_sum]
+    have hRHS : ∀ a : G, (brauerProj P x).coeff a * (brauerProj P y).coeff (a⁻¹ * c)
+        = if a ∈ C then x.coeff a * y.coeff (a⁻¹ * c) else 0 := by
       intro a
       by_cases ha : a ∈ Subgroup.centralizer (P : Set G)
       · have hac : a⁻¹ * c ∈ Subgroup.centralizer (P : Set G) :=
           Subgroup.mul_mem _ (Subgroup.inv_mem _ ha) hc
-        rw [brauerProj_apply_of_mem ha, brauerProj_apply_of_mem hac, if_pos]
+        rw [coeff_brauerProj_of_mem ha, coeff_brauerProj_of_mem hac, if_pos]
         simpa [hC] using ha
-      · rw [brauerProj_apply_of_notMem ha, zero_mul, if_neg]
+      · rw [coeff_brauerProj_of_notMem ha, zero_mul, if_neg]
         simpa [hC] using ha
     rw [Finset.sum_congr rfl fun a _ => hRHS a, Finset.sum_ite_mem, Finset.univ_inter]
     -- Now apply the orbit-counting lemma.
-    refine sum_eq_sum_fixedPoints hp hP hchar' (fun a => x a * y (a⁻¹ * c)) ?_ C hCmem
+    refine sum_eq_sum_fixedPoints hp hP hchar' (fun a => x.coeff a * y.coeff (a⁻¹ * c)) ?_ C hCmem
     intro u a
     rw [hsmul]
-    have h1 : x ((u : G) * a * (u : G)⁻¹) = x a := hxc (u : G) u.2 a
+    have h1 : x.coeff ((u : G) * a * (u : G)⁻¹) = x.coeff a := hxc (u : G) u.2 a
     have h2 : ((u : G) * a * (u : G)⁻¹)⁻¹ * c = (u : G) * (a⁻¹ * c) * (u : G)⁻¹ := by
       have hcu : (u : G)⁻¹ * c = c * (u : G)⁻¹ := by
         exact (Subgroup.mem_centralizer_iff.mp hc) (u : G)⁻¹ (P.inv_mem u.2)
@@ -248,14 +251,14 @@ theorem brauerProj_mul_of_invariant [Finite G] (hp : p.Prime) (hchar : (p : k) =
       group
     rw [h1, h2, hyc (u : G) u.2]
   · -- Outside the centraliser both sides vanish.
-    rw [brauerProj_apply_of_notMem hc, mul_apply_sum]
+    rw [coeff_brauerProj_of_notMem hc, coeff_mul_sum]
     refine (Finset.sum_eq_zero fun a _ => ?_).symm
     by_cases ha : a ∈ Subgroup.centralizer (P : Set G)
     · have hac : a⁻¹ * c ∉ Subgroup.centralizer (P : Set G) := by
         intro hmem
         exact hc (by simpa using Subgroup.mul_mem _ ha hmem)
-      rw [brauerProj_apply_of_notMem hac, mul_zero]
-    · rw [brauerProj_apply_of_notMem ha, zero_mul]
+      rw [coeff_brauerProj_of_notMem hac, mul_zero]
+    · rw [coeff_brauerProj_of_notMem ha, zero_mul]
 
 end Mul
 

@@ -217,7 +217,7 @@ theorem lift_one_comp_domCongrAut (α : MulAut G) :
     (MonoidAlgebra.lift k k G 1).comp
         (MonoidAlgebra.domCongrAut (R := k) (A := k) α).toAlgHom
       = MonoidAlgebra.lift k k G 1 := by
-  refine MonoidAlgebra.algHom_ext fun g => ?_
+  refine MonoidAlgebra.algHom_ext (fun g => ?_) (Subsingleton.elim _ _)
   rw [AlgHom.comp_apply, AlgEquiv.toAlgHom_apply,
     show MonoidAlgebra.domCongrAut (R := k) (A := k) α (MonoidAlgebra.single g (1 : k))
         = MonoidAlgebra.single (α g) (1 : k) from MonoidAlgebra.domCongr_single α g 1,
