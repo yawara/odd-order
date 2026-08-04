@@ -680,17 +680,40 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         🎯🎯 `sum_character_mul_character_inv_eq_zero` (`i ≠ j` で `Σ_g χ_j(g)χ_i(g⁻¹) = 0`)。
         ⚠ **代数閉性を一切使わない**のが非対角側の特徴。
 
-  - [ ] **第一直交の対角成分** (`i = j` で `Σ_g χ_i(g)χ_i(g⁻¹) = |G|`)。
-        `finrank K (IntertwiningMap ρ_i ρ_i) = 1`、すなわち
-        **単純加群の `End` が `K`** = Schur + 代数閉性。
-        mathlib の `IsAlgClosed.algebraMap_bijective_of_isIntegral` が使える見込み
-        (`SimpleModule/IsAlgClosed.lean` の Wedderburn 証明が同じ道具を使っている)。
-        repo 側の `PiMatrixSimpleModules.lean` (`isSimpleModule_piNatural`) が土台。
-  - [ ] **第二 (列) 直交関係**。第一直交 + 指標表が正方であること
-        (`|ι'| = |ConjClasses G|`; `CenterClassSumBasis` から `dim Z(K[G])` を両側で数える)
-        → 行列の逆による標準論法。⚠ repo の `ColumnOrthogonality.lean` は ℂ 上で使えない。
-  - [ ] **Navarro (2.13) の残り半分**: `Φ_φ` が p-特異類で消えること + `[Φ_θ,φ]⁰ = δ_{θφ}`
-        → `([θ,φ]⁰)` が `C` の逆行列。
+  - [x] **第一直交関係を K 上で完成** — 完了 (`Modular/OrdinaryOrthogonality.lean`)。
+        `Σ_g χ_j(g) χ_i(g⁻¹) = |G| δ_{ij}`。
+        ⚠ **代数閉性は不要だった** (前回の見通しは過大見積もり) — 分裂性を仮定した時点で
+        ブロックは `K` 上の*完全*行列環なので、行列単位 `E_{b a₀}` 一発で Schur が出る
+        (`exists_eq_smul_id_of_intertwiningMap`)。
+  - [x] **指標表の正方性** — 完了 (`Modular/OrdinaryIrrCount.lean`)。
+        🎯 `card_eq_card_conjClasses` (`|Irr(G)| = |cl(G)|`; どちらも `Z(K[G])` の基底を数える)
+        + `centerAlgEquivPi` + `equivConjClasses`。
+  - [x] **第二 (列) 直交関係** — 完了 (`Modular/OrdinaryColumnOrthogonality.lean`)。
+        `sum_eq_sum_conjClasses` (体に依らない類分解) / `isUnit_conjugacyClassSize`
+        (⚠ 標数 p でも `|C|` は 0 になりうるので `|C|·|C_G| = |G|` から可逆性を出す) /
+        `characterMatrix` · `characterMatrixInv` = 1 → 正方性で両側逆 →
+        🎯🎯 `sum_character_inv_mul_character` (`Σ_χ χ(x⁻¹)χ(y) = |C_G(x)| δ_{x~y}`)。
+  - [x] **Navarro (2.13) の解析側** — 完了
+        (`Modular/ProjectiveCharacterVanishing.lean` + `DecompositionNumber` に
+        🎯 `eq_zero_of_sum_irreducibleBrauerCharacter_ringHom` を追加)。
+        🎯🎯 `algebraMap_sum_projectiveIndecomposableCharacter_mul_inv` —
+        p-正則な `y` と任意の `x` で `Σ_φ Φ_φ(x) φ(y⁻¹) = |C_G(y)| δ_{y~x}` /
+        🎯🎯 `projectiveIndecomposableCharacter_eq_zero` (`x` が p-特異なら `Φ_φ(x) = 0`)。
+
+  - [ ] **`[Φ_θ,φ]⁰ = δ_{θφ}` → `([θ,φ]⁰)` が `C` の逆行列** ((2.13) の締め)。
+        材料は全部揃っている:
+        * 行列等式 `A·B = I`。`x` を p-正則類の代表 `x_L` に走らせ
+          `A_{L,φ} := Φ_φ(x_L)`、`B_{φ,K} := φ(x_K⁻¹) / |C_G(x_K)|` と置くと
+          `algebraMap_sum_projectiveIndecomposableCharacter_mul_inv` がそのまま `A·B = I`。
+        * **正方性** `|IBr(G)| = #{p-正則類}` は repo 既存 =
+          `Modular/BrauerCount.lean` の `card_split_blocks_eq_card_pRegularClass`
+          (`Nat.card ι = Nat.card {C : ConjClasses G // IsPRegularClass p C}`)。
+        * `mul_eq_one_comm` で `B·A = I`、これが `[Φ_θ,φ]⁰ = δ_{θφ}`。
+        * 最後に `Φ_θ|_{G°} = Σ_μ c_{μθ} μ`
+          (= `projectiveIndecomposableCharacter_eq_sum_cartanMatrix`、既済) を代入して
+          `C · ([μ,φ]⁰) = I`。
+        ⚠ p-正則類の代表を取る仕掛け (`conjugacyClassRepresentative` の p-正則版) と
+        `[Φ_θ,φ]⁰` の定義 (`(1/|G|) Σ_{g ∈ G°}`) をどう置くかが最初の設計判断。
 - [ ] **94: Cartan 行列 `C = DᵀD`** + `([φ,θ]⁰)` が逆行列であること ((7.6) が使う)
 - [ ] **95: Brauer 対応 `b^G`** (段 88–91 の `Br_P` / defect group から。
       `(5.6)`/`(5.7)` = `b^G` の well-defined 性)
