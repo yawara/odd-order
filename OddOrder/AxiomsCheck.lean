@@ -246,6 +246,7 @@ import OddOrder.GroupTheory.SylowCosetPairs
 import OddOrder.GroupTheory.PFactorPairCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
 import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIdempotent
 import OddOrder.Algebra.PElementSum
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
@@ -16819,3 +16820,18 @@ Külshammer の公式 `Ĝ_p = ∑_{P ∈ Syl_p} P̂` の係数計算に使う。
   OddOrder.GroupTheory.card_factorThrough_eq_card_cosetPairs
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.cosetPairsEquivConj
+
+/-! **通常既約の原始中心冪等元** (`Modular/OrdinaryIdempotent`) —
+`e_{χ_i} = (χ_i(1)/|G|) ∑_g χ_i(g⁻¹) g` と `e(e_{χ_i}) = Pi.single i 1`。
+Navarro (4.19) がブロックごとに再編する係数の出どころ。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.ordinaryIdempotent
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.coeff_ordinaryIdempotent
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.ordinaryIdempotent_mem_center
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.centralScalar_ordinaryIdempotent
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.apply_ordinaryIdempotent
