@@ -16670,3 +16670,13 @@ Sylow `p`-部分群の共役作用 + `C_G(P)` の Sylow が中心的、の 2 段
   OddOrder.RepresentationTheory.Modular.sum_character_one_mul_character_eq_zero
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.isPRegular_of_pPart_eq_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.le_blockKernel_of_normal_of_forall_eq_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.isGreatest_blockKernel
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.subgroupSum_mem_center
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.mapRingHom_subgroupSum
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.map_single_eq_one_of_isUnit_map_subgroupSum

@@ -30,8 +30,11 @@ needed only for the direction that uses it.
 
 * `OddOrder.GroupAlgebra.single_mul_subgroupSum`, `subgroupSum_mul_single` — absorption
 * `OddOrder.GroupAlgebra.conj_smul_subgroupSum` — `N̂` is conjugation-invariant for `N ⊴ G`
+* `OddOrder.GroupAlgebra.mapRingHom_subgroupSum` — `N̂` survives a coefficient change
+* `OddOrder.GroupAlgebra.subgroupSum_mem_center` — `N̂ ∈ Z(R[G])` for `N ⊴ G`
 * `OddOrder.GroupAlgebra.map_subgroupSum_of_forall_map_single_eq_one`
-* `OddOrder.GroupAlgebra.map_single_eq_one_of_map_subgroupSum` — the kernel criterion
+* `OddOrder.GroupAlgebra.map_single_eq_one_of_isUnit_map_subgroupSum` — the kernel criterion
+* `OddOrder.GroupAlgebra.map_single_eq_one_of_map_subgroupSum` — its `|N| · 1` form
 -/
 
 namespace OddOrder.GroupAlgebra
@@ -92,11 +95,32 @@ theorem conj_smul_subgroupSum {N : Subgroup G} (hN : N.Normal) (g : G) :
     have hb : g⁻¹ * (b : G) * g ∈ N := by simpa using hN.conj_mem _ b.2 g⁻¹
     exact ⟨⟨g⁻¹ * (b : G) * g, hb⟩, Subtype.ext (by group)⟩
 
+/-- **`N̂` is transported by a coefficient change**: it has coefficients `0` and `1` only. -/
+theorem mapRingHom_subgroupSum {S : Type*} [Semiring S] (f : R →+* S) (N : Subgroup G) :
+    MonoidAlgebra.mapRingHom G f (subgroupSum R N) = subgroupSum S N := by
+  letI := Fintype.ofFinite ↥N
+  change MonoidAlgebra.mapRingHom G f (∑ n : ↥N, single (n : G) (1 : R))
+    = ∑ n : ↥N, single (n : G) (1 : S)
+  rw [map_sum]
+  exact Finset.sum_congr rfl fun n _ => by rw [MonoidAlgebra.mapRingHom_single, map_one]
+
 end Basic
+
+section Center
+
+variable {R : Type*} [CommSemiring R] {G : Type*} [Group G] [Finite G]
+
+/-- **`N̂` is central for `N ⊴ G`.**  This is what lets `N̂` be fed to a central character. -/
+theorem subgroupSum_mem_center {N : Subgroup G} (hN : N.Normal) :
+    subgroupSum R N ∈ Subalgebra.center R (MonoidAlgebra R G) :=
+  Subalgebra.mem_center_iff.mpr fun y =>
+    (forall_smul_eq_iff_mem_center.mp (fun g => conj_smul_subgroupSum hN g) y).symm
+
+end Center
 
 section AlgHom
 
-variable {R : Type*} [CommRing R] {G : Type*} [Group G] [Finite G] {A : Type*} [Ring A]
+variable {R : Type*} [CommSemiring R] {G : Type*} [Group G] [Finite G] {A : Type*} [Semiring A]
   [Algebra R A]
 
 /-- If `ρ` kills `N`, then `ρ(N̂) = |N| · 1`. -/
@@ -110,22 +134,29 @@ theorem map_subgroupSum_of_forall_map_single_eq_one
   rw [Finset.sum_congr rfl fun (m : ↥N) _ => h (m : G) m.2]
   rw [Finset.sum_const, Finset.card_univ, ← Nat.card_eq_fintype_card]
 
-/-- **The kernel criterion.**  If `ρ(N̂) = |N| · 1` and `|N|` is invertible, then `ρ` kills `N`.
+/-- **The kernel criterion.**  If `ρ(N̂)` is a unit then `ρ` kills `N`.
 
 This is what identifies `ker(B)` in Navarro (6.10): for an absolutely irreducible representation
-`ρ` in the block `B`, the central element `N̂` acts by the scalar `ω(N̂)`, and `ω(N̂) = |N|` forces
-`N ≤ ker ρ`. -/
+`ρ` in the block `B`, the central element `N̂` acts by the scalar `ω(N̂)`, and that scalar being a
+unit forces `N ≤ ker ρ`.  The only input is the absorption `n · N̂ = N̂`. -/
+theorem map_single_eq_one_of_isUnit_map_subgroupSum
+    (ρ : MonoidAlgebra R G →ₐ[R] A) {N : Subgroup G}
+    (hinv : IsUnit (ρ (subgroupSum R N)))
+    {n : G} (hn : n ∈ N) : ρ (single n (1 : R)) = 1 := by
+  have key : ρ (single n (1 : R)) * ρ (subgroupSum R N) = ρ (subgroupSum R N) := by
+    rw [← map_mul, single_mul_subgroupSum hn]
+  obtain ⟨u, hu⟩ := hinv
+  have h2 : ρ (single n (1 : R)) * (u : A) = 1 * (u : A) := by rw [one_mul, hu, key]
+  simpa using congrArg (· * (↑u⁻¹ : A)) h2
+
+/-- **The kernel criterion** in the form Navarro states it: `ρ(N̂) = |N| · 1` with `|N|`
+invertible. -/
 theorem map_single_eq_one_of_map_subgroupSum
     (ρ : MonoidAlgebra R G →ₐ[R] A) {N : Subgroup G}
     (hinv : IsUnit ((Nat.card ↥N : ℕ) • (1 : A)))
     (h : ρ (subgroupSum R N) = (Nat.card ↥N : ℕ) • (1 : A))
-    {n : G} (hn : n ∈ N) : ρ (single n (1 : R)) = 1 := by
-  have key : ρ (single n (1 : R)) * ((Nat.card ↥N : ℕ) • (1 : A))
-      = (Nat.card ↥N : ℕ) • (1 : A) := by
-    rw [← h, ← map_mul, single_mul_subgroupSum hn]
-  obtain ⟨u, hu⟩ := hinv
-  have : ρ (single n (1 : R)) * (u : A) = 1 * (u : A) := by rw [one_mul, hu, key]
-  simpa using congrArg (· * (↑u⁻¹ : A)) this
+    {n : G} (hn : n ∈ N) : ρ (single n (1 : R)) = 1 :=
+  map_single_eq_one_of_isUnit_map_subgroupSum ρ (h ▸ hinv) hn
 
 end AlgHom
 
