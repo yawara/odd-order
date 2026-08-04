@@ -1642,8 +1642,31 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
             (`d_{χφ}≠0 ⟹ χ~φ` から `C_{φμ} = ∑_χ d_{χφ}d_{χμ} = 0` for `φ≁μ`)、
             その逆 `B = ([μ,φ]⁰)` もブロック対角。標準論法 =
             ブロック射影 `P` は `C` と可換 ⟹ `PB = PC⁻¹ = C⁻¹P = BP` ⟹ `B` もブロック対角。
-            現行の `sum_cartanMatrix_mul_pairingZero` は和の形なので、
-            `Matrix` に持ち上げてから可換性論法を回すのが素直。
+            ⚠ **より短い論法 (2026-08-05 に設計、可換性論法より軽い)**: 行列 `P` を経由せず
+            **解の一意性**で済む。`b_μ := [μ,φ]⁰` は `∑_μ C_{μθ} b_μ = δ_{φθ}` (∀θ) を満たす。
+            `X := {μ : μ ~ φ}` として `b' := b·1_X` (X の外を 0 に潰したもの) を作ると、
+            `C` のブロック対角性から `b'` **も同じ方程式を満たす**
+            (θ∈X なら X 外の項は `C_{μθ}=0` で落ちるので和が変わらない;
+            θ∉X なら両辺 0)。`C` は可逆 (`Bᵀ C = 1` から `Matrix.mul_eq_one_comm`) なので
+            `b = b'`、すなわち `μ ∉ X` で `b_μ = 0`。
+            **必要な Matrix API**: `Matrix.mul_eq_one_comm` / `Matrix.mulVec_mulVec` /
+            `Matrix.one_mulVec` のみ。
+
+            **実装メモ (API 実測 2026-08-05)**:
+            * `cartanMatrix hp hω hω' hπ hlin hkerJ e μ φ = ∑_{i:ι'} D_{iμ} D_{iφ}`
+              (`CartanMatrix.lean:91`)、`decompositionMatrix ... e i = decompositionNumber ...
+              (wedderburnLatticeRepresentation e i)` (`OrdinaryIrreducibles.lean:116`)。
+            * ブロック同値 = `blockSetoid π hπ hlin` (`Algebra/BlockIdempotent.lean:47`):
+              `i ~ j ↔ centralCharacterAlg π i hπ hlin = centralCharacterAlg π j hπ hlin`。
+            * ⟹ `cartanMatrix_eq_zero_of_ne_block` は
+              `Finset.sum_eq_zero` + `Nat.mul_ne_zero_iff` + 各 `z` について
+              `centralCharacterAlg_eq_of_decompositionNumber_ne_zero` を 2 回
+              (`c` が共通なので両者が一致) + `AlgHom.ext`/`Quotient.sound`。
+              ⚠ **足りない部品**: 「`z ∈ Z(k[G])` に対し `(reduction ρ).asAlgebraHom z = c • id`
+              なる `c` が存在する」という形の補題が見つからなかった
+              (`exists_smul_id_of_commute_wedderburnLattice` は `K` 側)。
+              `BlockOfLattice.lean` の `blockOfLattice`/`blockCharacter_blockOfLattice` が
+              その `c` を持っているはずなので、そこから取り出すのが最短。
             [x] (c) **既存**: `centralCharacterAlg_eq_of_decompositionNumber_ne_zero`
             (`DecompositionNumber.lean`) — `d_{χφ} ≠ 0` なら `φ` の中心指標は `χ` のそれ。
             ⚠ 検算: `ω_χ(Ĝ⁰) = (1/χ(1))∑_{g∈G⁰}χ(g)` は `χ ∉ Irr(B₀)` で **`K` の中で厳密に 0**
