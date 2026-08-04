@@ -165,6 +165,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBridge
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBaseChange
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBasis
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBlockSplitting
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainCore
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainWiring
