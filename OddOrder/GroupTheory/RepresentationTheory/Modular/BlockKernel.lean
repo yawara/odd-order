@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Algebra.SubgroupSum
+import OddOrder.Algebra.SubgroupSumBlockAction
 import OddOrder.GroupTheory.OpResidual
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
 
@@ -54,6 +55,9 @@ halves say `ker(B)` is the **largest normal `p'`-subgroup of `G` inside `ker χ`
   inclusion of Navarro (6.10)
 * `OddOrder.RepresentationTheory.Modular.isGreatest_blockKernel` — Navarro (6.10) in full:
   `ker(B) = O_{p'}(ker χ)`
+* `OddOrder.RepresentationTheory.Modular.blockCharacter_subgroupSum` — `λ_B(N̂*) = |N|`
+* `OddOrder.RepresentationTheory.Modular.pi_single_eq_one_of_blockOfIrr` — Navarro (6.12), first
+  half: `ker(B) ≤ ker φ` for `φ ∈ IBr(B)`
 * `OddOrder.RepresentationTheory.Modular.sum_character_one_mul_character_eq_zero` — weak block
   orthogonality, i.e. (5.11) at `h = 1`
 -/
@@ -235,6 +239,61 @@ variable (e : MonoidAlgebra K G ≃ₐ[K] ∀ i, Matrix (m i) (m i) K)
     blockCharacterPi πG hπG hlinG z = 0 → IsNilpotent z)
 
 set_option maxHeartbeats 1000000 in
+-- The two central characters carry long instance chains.
+/-- **`λ_B(N̂*) = |N|`.**  If a normal subgroup `N` lies in the kernel of one `χ ∈ Irr(B)`, the
+block character of `B` sends the reduction of `N̂ = ∑_{n ∈ N} n` to `|N|`.
+
+This is the one computation both halves of Navarro (6.10)/(6.12) need: `ω_χ(N̂) = |N|` because
+`N ≤ ker χ`, and block membership says every other `χ' ∈ Irr(B)`, and every `φ ∈ IBr(B)`, sees the
+same value after reduction. -/
+theorem blockCharacter_subgroupSum {B : Block πG hπG hlinG} {i₀ : ι'}
+    (hi₀ : blockOfIrr e hπG hlinG hnilG i₀ = B)
+    {N : Subgroup G} (hN : N.Normal)
+    (hker : ∀ n ∈ N, wedderburnRepresentation e i₀ n = 1) :
+    MatrixModule.blockCharacter πG hπG hlinG B
+        ⟨GroupAlgebra.subgroupSum (ResidueField 𝒪) N, GroupAlgebra.subgroupSum_mem_center hN⟩
+      = ((Nat.card ↥N : ℕ) : ResidueField 𝒪) := by
+  classical
+  set zN : Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G) :=
+    ⟨GroupAlgebra.subgroupSum 𝒪 N, GroupAlgebra.subgroupSum_mem_center hN⟩ with hzNdef
+  have hmap : MonoidAlgebra.mapRingHom G (residue 𝒪) (zN : MonoidAlgebra 𝒪 G)
+      = ((⟨GroupAlgebra.subgroupSum (ResidueField 𝒪) N,
+          GroupAlgebra.subgroupSum_mem_center hN⟩ :
+        Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) G)) :
+          MonoidAlgebra (ResidueField 𝒪) G) :=
+    GroupAlgebra.mapRingHom_subgroupSum _ N
+  -- `N ≤ ker χ_{i₀}` makes the scalar by which `N̂` acts on `χ_{i₀}` equal to `|N|`
+  have hone : ∀ n ∈ N, ((wedderburnLatticeRepresentation (𝒪 := 𝒪) e i₀).asAlgebraHom)
+      (MonoidAlgebra.single n (1 : 𝒪)) = 1 := by
+    intro n hn
+    rw [Representation.asAlgebraHom_single_one]
+    refine LinearMap.ext fun v => Subtype.ext ?_
+    have hcoe : (((wedderburnLatticeRepresentation (𝒪 := 𝒪) e i₀) n v : _) : m i₀ → K)
+        = wedderburnRepresentation e i₀ n (v : m i₀ → K) :=
+      coe_latticeRepresentation_apply _ (invariant_wedderburnLattice e i₀) n v
+    rw [hcoe, hker n hn]
+    rfl
+  have hact : ((wedderburnLatticeRepresentation (𝒪 := 𝒪) e i₀).asAlgebraHom)
+      (GroupAlgebra.subgroupSum 𝒪 N)
+      = (Nat.card ↥N : ℕ) • (1 : Module.End 𝒪 ↥(wedderburnLattice (𝒪 := 𝒪) e i₀)) :=
+    GroupAlgebra.map_subgroupSum_of_forall_map_single_eq_one _ hone
+  have hc0 : centralScalar K ((wedderburnLatticeRepresentation (𝒪 := 𝒪) e i₀).asAlgebraHom)
+      (exists_smul_id_of_commute_wedderburnLattice e i₀) zN = ((Nat.card ↥N : ℕ) : 𝒪) := by
+    refine (eq_centralScalar K _ (exists_smul_id_of_commute_wedderburnLattice e i₀) ?_).symm
+    rw [show ((zN : MonoidAlgebra 𝒪 G)) = GroupAlgebra.subgroupSum 𝒪 N from rfl, hact,
+      Module.End.one_eq_id, Nat.cast_smul_eq_nsmul]
+  -- and the block character of `B` at `N̂*` is the reduction of that scalar
+  have hval : MatrixModule.blockCharacter πG hπG hlinG (blockOfIrr e hπG hlinG hnilG i₀)
+      ⟨GroupAlgebra.subgroupSum (ResidueField 𝒪) N, GroupAlgebra.subgroupSum_mem_center hN⟩
+      = residue 𝒪 (centralScalar K
+          ((wedderburnLatticeRepresentation (𝒪 := 𝒪) e i₀).asAlgebraHom)
+          (exists_smul_id_of_commute_wedderburnLattice e i₀) zN) :=
+    blockCharacter_blockOfLattice_mapRingHom K _
+      (exists_smul_id_of_commute_wedderburnLattice e i₀) residue_surjective πG hπG hlinG hnilG
+      zN hmap
+  rw [← hi₀, hval, hc0, map_natCast]
+
+set_option maxHeartbeats 1000000 in
 -- The two central characters and the lattice/ambient bridge carry long instance chains.
 /-- **Navarro (6.10), the reverse inclusion**: a normal `p'`-subgroup `N` lying in the kernel of
 *one* `χ ∈ Irr(B)` lies in the kernel of *all* of them, i.e. `N ≤ ker(B)`.
@@ -260,52 +319,32 @@ theorem le_blockKernel_of_normal_of_forall_eq_one {B : Block πG hπG hlinG} {i�
   -- `N̂` as a central element of `𝒪G`, and its reduction in `Z(kG)`
   set zN : Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G) :=
     ⟨GroupAlgebra.subgroupSum 𝒪 N, GroupAlgebra.subgroupSum_mem_center hN⟩ with hzNdef
-  set zN' : Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) G) :=
-    ⟨GroupAlgebra.subgroupSum (ResidueField 𝒪) N, GroupAlgebra.subgroupSum_mem_center hN⟩
-    with hzN'def
   have hmap : MonoidAlgebra.mapRingHom G (residue 𝒪) (zN : MonoidAlgebra 𝒪 G)
-      = (zN' : MonoidAlgebra (ResidueField 𝒪) G) :=
+      = ((⟨GroupAlgebra.subgroupSum (ResidueField 𝒪) N,
+          GroupAlgebra.subgroupSum_mem_center hN⟩ :
+        Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) G)) :
+          MonoidAlgebra (ResidueField 𝒪) G) :=
     GroupAlgebra.mapRingHom_subgroupSum _ N
   -- the scalar by which `N̂` acts on the `i`-th ordinary irreducible
   set c : ι' → 𝒪 := fun i => centralScalar K
     ((wedderburnLatticeRepresentation (𝒪 := 𝒪) e i).asAlgebraHom)
     (exists_smul_id_of_commute_wedderburnLattice e i) zN with hcdef
-  -- block membership pins the reduction of that scalar
+  -- block membership pins the reduction of that scalar, and `Irr(B) ∋ χ_{i₀}` evaluates it
   have hres : ∀ i, blockOfIrr e hπG hlinG hnilG i = B →
-      residue 𝒪 (c i) = MatrixModule.blockCharacter πG hπG hlinG B zN' := by
+      residue 𝒪 (c i) = ((Nat.card ↥N : ℕ) : ResidueField 𝒪) := by
     intro i hi
-    rw [← hi]
+    rw [← blockCharacter_subgroupSum e hπG hlinG hnilG hi₀ hN hker, ← hi]
     exact (blockCharacter_blockOfLattice_mapRingHom K _
       (exists_smul_id_of_commute_wedderburnLattice e i) residue_surjective πG hπG hlinG hnilG
       zN hmap).symm
-  -- on `χ_{i₀}` the scalar is `|N|`
-  have hone : ∀ n ∈ N, ((wedderburnLatticeRepresentation (𝒪 := 𝒪) e i₀).asAlgebraHom)
-      (MonoidAlgebra.single n (1 : 𝒪)) = 1 := by
-    intro n hn
-    rw [Representation.asAlgebraHom_single_one]
-    refine LinearMap.ext fun v => Subtype.ext ?_
-    have hcoe : (((wedderburnLatticeRepresentation (𝒪 := 𝒪) e i₀) n v : _) : m i₀ → K)
-        = wedderburnRepresentation e i₀ n (v : m i₀ → K) :=
-      coe_latticeRepresentation_apply _ (invariant_wedderburnLattice e i₀) n v
-    rw [hcoe, hker n hn]
-    rfl
-  have hact : ((wedderburnLatticeRepresentation (𝒪 := 𝒪) e i₀).asAlgebraHom)
-      (GroupAlgebra.subgroupSum 𝒪 N)
-      = (Nat.card ↥N : ℕ) • (1 : Module.End 𝒪 ↥(wedderburnLattice (𝒪 := 𝒪) e i₀)) :=
-    GroupAlgebra.map_subgroupSum_of_forall_map_single_eq_one _ hone
-  have hc0 : c i₀ = ((Nat.card ↥N : ℕ) : 𝒪) := by
-    refine (eq_centralScalar K _ (exists_smul_id_of_commute_wedderburnLattice e i₀) ?_).symm
-    rw [show ((zN : MonoidAlgebra 𝒪 G)) = GroupAlgebra.subgroupSum 𝒪 N from rfl, hact,
-      Module.End.one_eq_id, Nat.cast_smul_eq_nsmul]
   -- `|N|` is invertible in the residue field
   have hcard : ((Nat.card ↥N : ℕ) : ResidueField 𝒪) ≠ 0 := fun h =>
     hNp ((CharP.cast_eq_zero_iff (ResidueField 𝒪) p _).mp h)
-  have hres0 : residue 𝒪 (c i₀) ≠ 0 := by rw [hc0, map_natCast]; exact hcard
   -- conclude, block member by block member
   intro n hn
   rw [mem_blockKernel_iff]
   intro i hi
-  have hci : residue 𝒪 (c i) ≠ 0 := by rw [hres i hi, ← hres i₀ hi₀]; exact hres0
+  have hci : residue 𝒪 (c i) ≠ 0 := by rw [hres i hi]; exact hcard
   have hunit : IsUnit (c i) := by
     rw [← IsLocalRing.notMem_maximalIdeal]
     exact fun hmem => hci (Ideal.Quotient.eq_zero_iff_mem.mpr hmem)
@@ -328,6 +367,35 @@ theorem le_blockKernel_of_normal_of_forall_eq_one {B : Block πG hπG hlinG} {i�
   rw [map_sub, map_one, MonoidAlgebra.mapRingHom_single, map_one, map_sub, map_one,
     Representation.asAlgebraHom_single_one, sub_eq_zero] at hamb
   exact hamb
+
+set_option maxHeartbeats 800000 in
+-- The block character and the ordinary central character both carry long instance chains.
+/-- **Navarro (6.12), first half**: `ker(B)` lies in the kernel of every `φ ∈ IBr(B)`.
+
+Concretely, if a normal `p'`-subgroup `N` is killed by one `χ ∈ Irr(B)`, then every block of `kG`
+belonging to `B` kills `N` as well.  Same mechanism as the ordinary statement
+(`le_blockKernel_of_normal_of_forall_eq_one`), read on the residue side: `λ_B(N̂*) = |N|*`
+(`blockCharacter_subgroupSum`) is nonzero because `p ∤ |N|`, and the absorption `n · N̂ = N̂`
+cancels it. -/
+theorem pi_single_eq_one_of_blockOfIrr {B : Block πG hπG hlinG} {i₀ : ι'}
+    (hi₀ : blockOfIrr e hπG hlinG hnilG i₀ = B)
+    {N : Subgroup G} (hN : N.Normal) (hNp : ¬ p ∣ Nat.card ↥N)
+    (hker : ∀ n ∈ N, wedderburnRepresentation e i₀ n = 1)
+    {i : ιG} (hiB : Quotient.mk (blockSetoid πG hπG hlinG) i = B) {u : G} (hu : u ∈ N) :
+    πG (MonoidAlgebra.single u (1 : ResidueField 𝒪)) i = 1 := by
+  refine GroupAlgebra.pi_single_eq_one_of_isUnit_centralScalar πG i hπG hN ?_ hu
+  have hscal : MatrixModule.centralScalar πG i (GroupAlgebra.subgroupSum (ResidueField 𝒪) N)
+      = ((Nat.card ↥N : ℕ) : ResidueField 𝒪) := by
+    have hcc : MatrixModule.centralScalar πG i
+        (GroupAlgebra.subgroupSum (ResidueField 𝒪) N)
+        = MatrixModule.centralCharacterAlg πG i hπG hlinG
+          ⟨GroupAlgebra.subgroupSum (ResidueField 𝒪) N,
+            GroupAlgebra.subgroupSum_mem_center hN⟩ := rfl
+    rw [hcc, ← MatrixModule.blockCharacter_mk πG hπG hlinG i, hiB,
+      blockCharacter_subgroupSum e hπG hlinG hnilG hi₀ hN hker]
+  rw [hscal, isUnit_iff_ne_zero]
+  exact fun h => hNp ((CharP.cast_eq_zero_iff (ResidueField 𝒪) p _).mp h)
+
 
 open scoped Classical in
 /-- **Navarro (6.10)**, in full: for `χ ∈ Irr(B)`, `ker(B)` is the *largest* normal `p'`-subgroup
