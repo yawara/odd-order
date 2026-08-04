@@ -1355,7 +1355,12 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
             🎯🎯🎯 `coeff_pElementSum_mul_pRegularSum`
             (**`(Ĝ_p·Ĝ⁰)(x_C) = ∑_B λ_B(Ĝ⁰)·e_B(x_C)`** — (4.23) は `z` について加法的なので
             類和ごとに適用して足し直すだけ)。
-            残り = `λ_{B₀}(Ĝ⁰) = |G⁰|*` (済) と `λ_B(Ĝ⁰) = 0` (済) を代入する 1 段。
+            [x] 🎯🎯🎯🎯 **(6.14) 完了 (2026-08-05)**:
+            `coeff_pElementSum_mul_pRegularSum_principalBlock` —
+            **`(Ĝ_p·Ĝ⁰)(x_C) = |G⁰|*·e_{B₀}(x_C)`**。
+            ⚠ `λ_B(Ĝ⁰) = 0` は仮説 `hvanish` としてパラメータ化 (証明済の
+            `blockCharacter_blockOfIrr_pRegularSum_eq_zero` を各ブロックに適用する側は
+            「B に属する既約 χ を取る」段が要るので呼び出し側に置く)。
             `|G⁰|* e_{B₀} = π(Ĝ_p · Ĝ⁰)`、すなわち
             `p`-正則な `g` で `e_g = |G⁰|*⁻¹ |{(x,y) ∈ G_p × G⁰ : xy = g}|*`、`p`-singular で `0`。
             (`π : Z(FG) → Z(FG)` は `p`-正則類へ切り詰める線型射影。)
