@@ -1457,10 +1457,13 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
   - [ ] **(6.12) 本体**。原文 p.127 の証明が要求するのは
         (i) `ker(B) ≤ ker φ` (`φ ∈ IBr(B)`) — 上の逆包含の **`k` 側版**
         (`λ_B(N̂*) = |N|*` ≠ 0 ⟹ block 表現上で `N̂` が単元 ⟹ 核判定) でほぼ同型に書ける、
-        (ii) **Lemma (2.32)** `O_p(G)` は単純 `kG`-加群を潰す — 素材は既存の
-        `RepresentationTheory/PGroupFixedVector.lean`
-        (`IsPGroup.invariants_ne_bot` / `exists_fixed_vector_ne_zero`) で、
-        `O_p(G) ⊴ G` ゆえ固定部分空間が `G`-不変 ⟹ 単純性で全体、
+        (ii) **Lemma (2.32)** `O_p(G)` は単純 `kG`-加群を潰す — ✅ **既に存在した**
+        (`Algebra/NormalPSubgroupTrivialAction.lean` の
+        `blockRepresentation_eq_one_of_mem_normal_pSubgroup` /
+        `pi_single_eq_one_of_mem_normal_pSubgroup`、Navarro (4.7) 用に段 xx で整備済)。
+        ⚠ 2026-08-05 に一度書き直しかけて重複に気付いた — 教科書番号 ((2.32)) でなく
+        概念名 (`normal_pSubgroup` / `invariants`) で grep すべきだった
+        ([[grep-concept-names-not-book-notation]] の再発)。
         (iii) `M/ker(B)` が `p`-群 — `x ∈ M` が `p`-正則なら `χ(x) = χ(1)` を経由するので
         **通常指標版の (6.11)** (`χ(x) = χ(1) ⟹ ρ(x) = 1`, 標数 0) が要る。
         `Algebra/RootsOfUnitySum` の抽象体版補題は使えるが、`K` が `p'`-乗根を
