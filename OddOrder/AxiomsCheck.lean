@@ -211,6 +211,7 @@ import OddOrder.Algebra.JacobsonCentralSubring
 import OddOrder.Algebra.AdicCompletePi
 import OddOrder.Algebra.IdempotentLift
 import OddOrder.Algebra.CenterGroupAlgebraHenselian
+import OddOrder.Algebra.CenterIdempotentLift
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCorrespondence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerTruncation
@@ -16170,3 +16171,11 @@ counting a basis of `Z(K[G])`. -/
   OddOrder.henselianRing_centerGroupAlgebra
 #assert_only_allowed_axioms
   OddOrder.existsUnique_isIdempotentElem_centerGroupAlgebra
+
+/-! **`Z(FG)` の冪等元は `Z(𝒪G)` へ一意に持ち上がる** (`Algebra.CenterIdempotentLift`)
+— Navarro の block 冪等元 `f_B`. -/
+
+#assert_only_allowed_axioms
+  OddOrder.mem_centerIdeal_iff_mapRingHom_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.existsUnique_isIdempotentElem_mapRingHom_eq

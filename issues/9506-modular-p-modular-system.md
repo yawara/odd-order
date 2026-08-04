@@ -894,9 +894,15 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
                     🎯🎯 `henselianRing_centerGroupAlgebra` /
                     🎯🎯🎯 `existsUnique_isIdempotentElem_centerGroupAlgebra`
                     (**`Z(𝒪G)` で冪等元が一意に持ち上がる**)。
-              - [ ] **次**: 還元写像 `Z(𝒪G) → Z(FG)` を作り、その核が `𝔪·Z(𝒪G)` で全射
-                    であることを類和基底で確認 ⟹ `Z(FG)` の block 冪等元 `e_B` の持ち上げ
-                    `f_B ∈ Z(𝒪G)` を得る。そのうえで (5.4)→(5.7)→(5.2)。
+              - [x] `Algebra/CenterIdempotentLift.lean`: `centerReduceHom` /
+                    🎯🎯 `mem_centerIdeal_iff_mapRingHom_eq_zero` (**還元の核 = `I·Z(𝒪G)`**;
+                    ⊆ は `I` が `0` に落ちること、⊇ は類和展開の係数が `I` に入ること) /
+                    🎯🎯🎯 `existsUnique_isIdempotentElem_mapRingHom_eq`
+                    (**`Z(FG)` の冪等元は `Z(𝒪G)` へ一意に持ち上がる** = block 冪等元 `f_B`)。
+                    全射性は既存の `Modular/CenterReduction.lean`
+                    (`exists_mem_center_mapRingHom_eq`) がそのまま使えた。
+              - [ ] **次**: `f_B` を使って (5.4) → (5.5) → (5.6) → (5.7) → 🎯 (5.2)。
+                    併せて (3.13) `χ ∉ B ⟹ M f_B = 0` / (3.31) `ψ(f_b z)` も必要。
   - [ ] **(5.5)** / **(5.6)** / **(5.7)**。
         (5.7) は `⟨h⟩` の `supp(w)` への軌道が長さ `p` の倍数であること + 固有空間の
         次元比較 (乗算 `s` が単射) という組み合わせ論 + 線型代数。

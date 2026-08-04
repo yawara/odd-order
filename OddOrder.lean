@@ -14,6 +14,7 @@ import OddOrder.Algebra.JacobsonCentralSubring
 import OddOrder.Algebra.AdicCompletePi
 import OddOrder.Algebra.IdempotentLift
 import OddOrder.Algebra.CenterGroupAlgebraHenselian
+import OddOrder.Algebra.CenterIdempotentLift
 import OddOrder.Algebra.RelativeTrace
 import OddOrder.Algebra.GroupAlgebraConjugation
 import OddOrder.Algebra.BrauerHomomorphism
