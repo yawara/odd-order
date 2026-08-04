@@ -1378,9 +1378,35 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               論法: Sylow `P` の共役作用で `|G⁰| ≡ |C_G(P)⁰| (mod p)`、
               `C_G(P)` では全 `p`-元が `P` に入り `P ∩ C` は中心的 Sylow ⟹
               `C⁰ ≃ C/(P ∩ C)` で指数は `p` と素。
-        - [ ] **次**: `d(B₀) = ν(|G|)` (主ブロックの defect group は Sylow) —
-              `inducedBlockOfNormalizer_principalBlock` から `Br_P(e_{B₀}) ≠ 0` が出るので、
-              「defect group = `Br_P(e) ≠ 0` なる極大 `p`-部分群」(段 89-90) と合わせる。
+        - [x] 🎯🎯 **`d(B₀) = ν(|G|)` (主ブロックは full defect)** — 完了 (2026-08-05)。
+              ⚠ `Br_P` 経由でなく**1 次元表現**で出た (より短い): 可換環への代数準同型 `ψ` を
+              `f = Tr^G_D(c)` に当てると `1 = ψ(f) = [G:D]·ψ(c)` ⟹ `[G:D]` は単元。
+              * `Algebra/RelativeTraceCharacter`: 🎯 `isUnit_index_of_mem_relTraceIdeal`
+              * `Algebra/AugmentationIdeal`: `augmentation_mapRingHom` (係数変換と可換)
+              * `Modular/BlockHeight`: 🎯🎯 `defect_eq_factorization_of_apply_eq_one` /
+                `eq_one_of_isIdempotentElem_of_residue_ne_zero`
+              * `Modular/PrincipalBlockDefect` (新設): 🎯 主ブロック冪等元 lift での実例 +
+                🎯 `exists_isIdempotentElem_defect_principalBlock` (**充足可能性の実証**)
+              ⟹ 次数 1 の `1_G` は `B₀` で height 0。
+
+        **🧭 残りの道筋 (2026-08-05 に原文精読で確定)**。段 99 (c) までに要るものと難所:
+        - **(6.10) `ker(B) = O_{p'}(ker χ)`** — 原文 p.126 の証明は**初等的で height 不要**:
+          weak block orthogonality (= 既存の (5.11) `sum_character_blockOfIrr_eq_zero`) で
+          `Ξ = Σ_{χ∈Irr(B)}χ(1)χ` が `p`-singular で消える ⟹ `ker(B)` は `p'`-群、
+          `u = |N|⁻¹ Σ_{n∈N} n ∈ Z(SG)` の中心指標が `[ψ_N,1_N]/ψ(1)` に等しい ⟹
+          Clifford で `N ≤ ker ψ`。**新規に要るのは `ker(B)`・`Irr(B)` 族・Clifford**。
+        - **⚠ (6.11) は archimedean な入力を要求する**: `φ ∈ IBr(G)`, `g` `p`-正則で
+          `φ(g) = φ(1)` ⟹ `g ∈ ker φ` の証明は「絶対値 1 の根 `n` 個の和が `n` ⟹ 全部 1」
+          (三角不等式の等号条件)。repo の既存版 `all_eq_one_of_norm_eq_one_of_sum_eq_card`
+          は **`Multiset ℂ` 上**で、抽象 `𝒪` (実体は `𝓞_ℂ_[p]`) には直接使えない。
+          抽象体版を出すには「1 の冪根が生成する部分体 ≅ ℚ(ζ_d) を ℂ へ埋め込む」が要る
+          (`IsPrimitiveRoot` + 円分多項式の既約性)。**これは独立の infra 項目**。
+        - **(6.6) Okuyama (第三主定理の両向き)** は (6.5) → (6.3) → **(3.20)/(3.22)/(3.24)**
+          を要求し、そこで `~` 関数 (Navarro (2.15)) が要る。(2.15) の証明は
+          **Brauer の指標判定法** (mathlib に無い; Brauer 誘導定理) を使う。
+          ⟹ ここが最大の壁。ただし **(3.24) の数値内容 (height ≥ 0 / full defect /
+          `p ∤ |G⁰|`) は上記 3 件で回避済**なので、残るのは
+          「`[χ̃, ξ]` の付値」という形の部分だけ。
 - [ ] **100: `(6.10)` `ker(B) = O_{p'}(ker χ)` → `(6.12)` → 🎯 `(6.13)`**
       (normal `p`-complement ⟺ `IBr(B₀)` 単元、Cartan 行列 `(|G|_p)`)
 - [ ] **101: `(7.2)` Klein four Sylow-2 / `(7.3)` basic set / `(7.4)` / `(7.5)` / `(7.6)`**
