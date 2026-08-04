@@ -1397,8 +1397,15 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               🎯 `trace_apply_single` (`χ_i(g)` は行列 `e(g)_i` のトレース) +
               🎯🎯 `centralScalar_classSum_mul_character_one`
               (`e(K̂)_i = Matrix.scalar (ω_i(K̂))` のトレースを 2 通りに読む)。
-              ⟹ Burnside 本体は「構造定数 `a_{KLM}` の導入 + 上記 2 本 + 既存の第二直交関係」
-              の組み立てのみ。ℂ 版の係数環一般化は不要と確定。
+              ⟹ [x] 🎯🎯🎯 **Burnside 本体も完了 (2026-08-05)**:
+              `sum_centralScalar_mul_character_eq_card_mul_coeff` (**除算なしの形**)
+              `Σ_i ω_i(Ĉ) ω_i(D̂) χ_i(1) χ_i(z⁻¹) = |G| · (Ĉ·D̂)(z)`。
+              組み立て 3 段 = (i) `centralScalar_mul` (乗法性) + 上記トレース公式、
+              (ii) 和の入れ替え + 既存の第二直交関係、
+              (iii) 中心元の係数が類上定数 (既存 `coeff_center_of_mk_eq`) ⟹
+              残りは `|cl(z)|·|C_G(z)| = |G|` 倍。
+              支持: `eq_sum_single` / `centralScalar_mul_character_one` (任意の中心元版)。
+              ℂ 版の係数環一般化は不要だった (共役を一切使わない)。
             - `Σ_{x ∈ P} χ(x⁻¹) = |P| [χ_P, 1_P]` (制限の自明成分の重複度)。
               ⚠ 共役を使わない形なので抽象体でも書ける。
             - **類の defect `d(K)`** と `p^{a-d(K)}` による正規化 (Ch.3 の材料、未整備)。
