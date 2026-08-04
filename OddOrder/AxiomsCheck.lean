@@ -244,6 +244,7 @@ import OddOrder.Algebra.TraceMulLeft
 import OddOrder.GroupTheory.SylowContaining
 import OddOrder.GroupTheory.PFactorPairCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
+import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
 import OddOrder.Algebra.PElementSum
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
@@ -16801,3 +16802,9 @@ Külshammer の公式 `Ĝ_p = ∑_{P ∈ Syl_p} P̂` の係数計算に使う。
   OddOrder.RepresentationTheory.Modular.centralScalar_mul
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_centralScalar_mul_character_eq_card_mul_coeff
+
+/-! **指標の群上の和は不変部分空間の次元** (`RepresentationTheory/SumCharacterInvariants`) —
+`∑_{h∈H} χ_ρ(h) = |H| · dim V^H`。Navarro (4.19) の `|P|[χ_P,1_P]` の整数性。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.sum_character_eq_card_mul_finrank_invariants
