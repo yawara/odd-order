@@ -224,6 +224,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBlockIdempotent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
+import OddOrder.GroupTheory.RepresentationTheory.Modular.ConjugationLayers
 import OddOrder.GroupTheory.RepresentationTheory.Modular.StandardSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterIndependence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerIndependence
@@ -16257,3 +16258,29 @@ block 冪等元 `f_B` を `H`-部分と `G ∖ H`-部分に割るための道具
   OddOrder.RepresentationTheory.Modular.apply_eq_id_of_reduce_centralScalar_ne_zero
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.baseChange_apply_eq_zero_of_reduce_centralScalar_eq_zero
+
+/-! **Navarro (5.7) の組み合わせ半分** (`Modular.ConjugationLayers`) — `C_G(h_p)` を外れた台の上で
+`⟨h⟩`-軌道は長さ `p` の倍数ゆえ、`h`-不変元は `p` 枚の巡回層に割れる. -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.commute_pPart_zpow
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.pPart_mem_zpowers_zpow
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.dvd_of_commute_zpow
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.commute_pPart_conj_iff
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.exists_conjRep
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.conjRep_conj
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.conjLevel_eq
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.conjLevel_conj
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.coeff_conjLayer
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.sum_conjLayer
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.conjLayer_conj_smul

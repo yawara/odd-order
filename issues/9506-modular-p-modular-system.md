@@ -975,10 +975,22 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
   - [ ] **(5.7)**。`⟨h⟩` の `supp(w)` への軌道が長さ `p` の倍数であること + 固有空間の
         次元比較 (乗算 `s = Σ ω^{-i} w_i` が単射) という組み合わせ論 + 線型代数。
         (5.6) の (b)(c)(d) が軌道勘定に、(a) が最後の `s* = w*` に効く。
-        残り部品: (i) `w = Σ_{i=1}^p w_i`、`w_i^h = w_{i+1}`、`f_b w_i f_b = w_i` の構成
-        (自己完結の組み合わせ論 — `C_G(h_p) ⊆ H` と `supp w ⊆ G∖H` から `⟨h⟩`-軌道長が
-        `p` の倍数 ⟹ 固定部分群 ⊆ `⟨h^p⟩` ⟹ `ℤ/p` が自由に作用 ⟹ 基本領域が取れる)、
-        (ii) 固有空間の次元比較、(iii) (5.4)+(5.6.a)+(3.13.a) による `s` の単射性。
+        残り部品:
+  - [x] **(i) 巡回層への分割** — 完了 (2026-08-04、`Modular/ConjugationLayers.lean`)。
+        🎯 `pPart_mem_zpowers_zpow` (`p ∤ k` なら `h_p ∈ ⟨h^k⟩`; `d = gcd(k, ord h)` が `p` と
+        素 ⟹ `d ∣ ord h` の `p'`-部分 ⟹ `d ∣ h_p` の指数、Bézout で `kℤ + (ord h)ℤ` に入る) /
+        🎯 `dvd_of_commute_zpow` (⟹ `C_G(h_p)` を外れた点の固定部分群は `⟨h^p⟩` の中) /
+        🎯 `commute_pPart_conj_iff` / `conjBySetoid` · `conjRep` · 🎯🎯 `conjLevel`
+        (軌道代表元へ戻す `h` の指数 mod `p`) / 🎯🎯 `conjLevel_eq` (well-defined) /
+        🎯🎯 `conjLevel_conj` (`lev(h x h⁻¹) = lev(x) + 1`) /
+        🎯 `conjLayer` (level 集合への制限) + `coeff_conjLayer` /
+        🎯🎯🎯 `sum_conjLayer` (`Σ_i w_i = w`) /
+        🎯🎯🎯 `conjLayer_conj_smul` (`h • w_i = w_{i+1}`)。
+        ⚠ **剰余類の勘定でなく level 関数**で組んだ。教科書は `⟨h^p⟩ mod C_⟨h⟩(x)` の右剰余類を
+        並べて `Δ^{h^i}` を作るが、ここでは「軌道代表元へ戻す指数 mod `p`」を直接定義し、
+        well-definedness (= 固定部分群 ⊆ `⟨h^p⟩`) だけ示す。層は level 集合そのもの。
+  - [ ] (ii) 固有空間の次元比較、(iii) (5.4)+(5.6.a)+(3.13.a) による `s` の単射性、
+        (iv) `f_b w_i f_b = w_i` への正規化 (組み立て時)。
   - [ ] その後 🎯 (5.2)。併せて **(3.31)** `ψ(f_b z) = ψ(z)` (`ψ ∈ Irr(b)`), `= 0`
         (otherwise) も必要 ((3.13.a) の直接の系: `f_b` が恒等か零で作用するのでトレースが
         そのまま出る)。

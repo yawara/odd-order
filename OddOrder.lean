@@ -158,6 +158,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBlockIdempotent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeCentralCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CenterReduction
+import OddOrder.GroupTheory.RepresentationTheory.Modular.ConjugationLayers
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterIndependence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerIndependence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerLinearIndependence
