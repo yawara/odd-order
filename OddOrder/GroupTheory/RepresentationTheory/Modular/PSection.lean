@@ -30,6 +30,8 @@ decomposition numbers see.
 * `OddOrder.RepresentationTheory.Modular.pPart_mul_eq_of_isPElement` — `(xy)_p = x`
 * `OddOrder.RepresentationTheory.Modular.mem_pSection_iff` — the parametrisation of `S(x)`
 * `OddOrder.RepresentationTheory.Modular.forall_pSection_iff` — vanishing on `S(x)`, restated
+* `OddOrder.RepresentationTheory.Modular.isConj_centralizer_of_isConj_mul` — the parametrisation
+  is injective: `x y₁ ~_G x y₂` forces `y₁ ~_{C_G(x)} y₂`
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -123,6 +125,33 @@ theorem forall_pSection_iff {K : Type*} [Zero K] (hp : p.Prime) {x : G} (hx : Is
     obtain ⟨y, hymem, hyreg, hconj⟩ := (mem_pSection_iff hp hx).mp hu
     rw [hf u _ hconj]
     exact h ⟨y, hymem⟩ (isPRegular_coe_iff.mp hyreg)
+
+omit [Finite G] in
+/-- **The parametrisation of `S(x)` is injective.**  If `x y₁` and `x y₂` are `G`-conjugate, with
+`y₁, y₂` `p`-regular in `C_G(x)`, then the conjugating element already lies in `C_G(x)` and
+conjugates `y₁` to `y₂`.  Uniqueness of the `p`/`p'` factorisation: the conjugator must send the
+`p`-part `x` to the `p`-part `x`, and the `p'`-parts to each other.
+
+Together with `mem_pSection_iff` this says that `{x y_i}` runs over the `G`-classes inside `S(x)`
+exactly once as `y_i` runs over the `p`-regular classes of `C_G(x)`. -/
+theorem isConj_centralizer_of_isConj_mul (hp : p.Prime) {x y₁ y₂ : G} (hx : IsPElement p x)
+    (hy₁ : IsPRegular p y₁) (hy₂ : IsPRegular p y₂)
+    (h₁ : y₁ ∈ centralizerOf x) (h₂ : y₂ ∈ centralizerOf x)
+    (h : IsConj (x * y₁) (x * y₂)) :
+    ∃ g ∈ centralizerOf x, g * y₁ * g⁻¹ = y₂ := by
+  obtain ⟨g, hg⟩ := isConj_iff.mp h
+  have hcomm₁ : Commute x y₁ := (Subgroup.mem_centralizer_iff.mp h₁) x rfl
+  have hcomm₂ : Commute x y₂ := (Subgroup.mem_centralizer_iff.mp h₂) x rfl
+  have hpx : g * x * g⁻¹ = x := by
+    have h1 : pPart p (g * (x * y₁) * g⁻¹) = pPart p (x * y₂) := by rw [hg]
+    rwa [pPart_conj, pPart_mul_eq_of_isPElement hp hcomm₁ hx hy₁,
+      pPart_mul_eq_of_isPElement hp hcomm₂ hx hy₂] at h1
+  refine ⟨g, Subgroup.mem_centralizer_iff.mpr ?_, ?_⟩
+  · rintro z rfl
+    exact (mul_inv_eq_iff_eq_mul.mp hpx).symm
+  · have h2 : pRegularPart p (g * (x * y₁) * g⁻¹) = pRegularPart p (x * y₂) := by rw [hg]
+    rwa [pRegularPart_conj, pRegularPart_mul_eq_of_isPElement hp hcomm₁ hx hy₁,
+      pRegularPart_mul_eq_of_isPElement hp hcomm₂ hx hy₂] at h2
 
 end PSection
 

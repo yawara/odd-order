@@ -16460,6 +16460,8 @@ system で証明される. -/
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.forall_pSection_iff
 #assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.isConj_centralizer_of_isConj_mul
+#assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_eq_zero
 
 /-! **Navarro (5.8)** (`Modular.SecondMainBlockForm`) — (5.2) を block 言語で述べ直し、
