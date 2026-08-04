@@ -76,6 +76,49 @@ theorem isUnit_natCast_of_not_dvd {n : ℕ} (hn : ¬ p ∣ n) : IsUnit ((n : ℕ
   intro h
   exact hn ((CharP.cast_eq_zero_iff (ResidueField 𝒪) p n).mp h)
 
+/-- `p` itself is not a unit: its residue is `0` because the residue field has characteristic
+`p`. -/
+theorem natCast_prime_mem_maximalIdeal : ((p : ℕ) : 𝒪) ∈ maximalIdeal 𝒪 := by
+  rw [mem_maximalIdeal, mem_nonunits_iff, isUnit_iff_residue_ne_zero, not_not, map_natCast]
+  exact CharP.cast_eq_zero (ResidueField 𝒪) p
+
+/-- **Divisibility by a power of `p` may be tested in `𝒪`.**  If `p^i` divides `n` after mapping
+to `𝒪`, then it already divides `n` in `ℕ`.
+
+This is what turns the ring-theoretic height inequality (`[G : D] ∣ χ(1)` in `𝒪`) into the
+arithmetic statement `ν(χ(1)) ≥ ν(|G|) - d(B)`.  Only locality and characteristic `0` are used:
+if `p^i ∤ n` then, after cancelling the exact `p`-power in `n` — whose cofactor is a unit — one
+gets `p^e · (1 - p^{i-e}t) = 0` with `1 - p^{i-e}t` a unit, forcing `p^e = 0` in `𝒪`. -/
+theorem pow_dvd_of_natCast_pow_dvd (hp : p.Prime) {i n : ℕ}
+    (h : ((p ^ i : ℕ) : 𝒪) ∣ ((n : ℕ) : 𝒪)) : p ^ i ∣ n := by
+  rcases eq_or_ne n 0 with rfl | hn
+  · exact dvd_zero _
+  by_contra hcon
+  have hlt : n.factorization p < i := by
+    by_contra hle
+    exact hcon ((Nat.Prime.pow_dvd_iff_le_factorization hp hn).mpr (not_lt.mp hle))
+  -- cancel the unit `ordCompl[p] n`
+  have hunit : IsUnit ((ordCompl[p] n : ℕ) : 𝒪) :=
+    isUnit_natCast_of_not_dvd (p := p) (Nat.not_dvd_ordCompl hp hn)
+  rw [← Nat.ordProj_mul_ordCompl_eq_self n p, Nat.cast_mul, hunit.dvd_mul_right] at h
+  obtain ⟨t, ht⟩ := h
+  push_cast at ht
+  set e := n.factorization p with he
+  -- `p^e = p^e * (p^(i-e) * t)`, and the second factor lies in the maximal ideal
+  have hsplit : ((p : 𝒪)) ^ i = (p : 𝒪) ^ e * (p : 𝒪) ^ (i - e) := by
+    rw [← pow_add, Nat.add_sub_cancel' hlt.le]
+  rw [hsplit, mul_assoc] at ht
+  have hmem : (p : 𝒪) ^ (i - e) * t ∈ maximalIdeal 𝒪 := by
+    obtain ⟨j, hj⟩ : ∃ j, i - e = j + 1 := ⟨i - e - 1, by omega⟩
+    rw [hj, pow_succ, mul_assoc]
+    exact Ideal.mul_mem_left _ _ (Ideal.mul_mem_right _ _ natCast_prime_mem_maximalIdeal)
+  have hu : IsUnit (1 - ((p : 𝒪) ^ (i - e) * t)) :=
+    isUnit_one_sub_self_of_mem_nonunits _ ((mem_maximalIdeal _).mp hmem)
+  have hcancel : (p : 𝒪) ^ e * (1 - ((p : 𝒪) ^ (i - e) * t)) = 0 := by linear_combination ht
+  have hzero : ((p : 𝒪)) ^ e = 0 := hu.mul_left_eq_zero.mp hcancel
+  have hne : ((p ^ e : ℕ) : 𝒪) ≠ 0 := Nat.cast_ne_zero.mpr (pow_ne_zero _ hp.pos.ne')
+  exact hne (by push_cast; exact hzero)
+
 /-- **Reduction transports `n`-th roots of unity** for every `n` prime to `p`.  This is the
 device that lets a Brauer character read off eigenvalues in characteristic `p` and evaluate
 them in characteristic `0`. -/

@@ -237,6 +237,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ClassCentralizerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockDefect
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockHeight
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainEasy
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBasis
@@ -16555,3 +16556,26 @@ Wedderburn 成分に対して**証明**する. -/
   OddOrder.RepresentationTheory.Modular.blockDefect
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.card_defectGroup_blockIdempotentOf
+
+/-! **高さの非負性** (`Algebra/RelativeTraceCharacter` / `Modular/BlockHeight`) —
+Navarro (3.24) の数値内容 `ν(χ(1)) ≥ ν(|G|) - d(B)`. 付値論・一般指標・`~` 関数は不要で、
+「指標は共役不変ゆえ相対トレースを指数倍に潰す」だけで出る. -/
+
+#assert_only_allowed_axioms
+  OddOrder.GAlgebra.map_relTrace
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.symmMap_comp_conj
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.symmMap_relTrace
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.relIndex_dvd_finrank
+#assert_only_allowed_axioms
+  OddOrder.GroupAlgebra.index_dvd_finrank
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.natCast_prime_mem_maximalIdeal
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.pow_dvd_of_natCast_pow_dvd
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.pow_dvd_finrank_of_mem_relTraceIdeal
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.pow_defect_dvd_finrank

@@ -24,6 +24,7 @@ import OddOrder.Algebra.IdempotentLift
 import OddOrder.Algebra.CenterGroupAlgebraHenselian
 import OddOrder.Algebra.CenterIdempotentLift
 import OddOrder.Algebra.RelativeTrace
+import OddOrder.Algebra.RelativeTraceCharacter
 import OddOrder.Algebra.GroupAlgebraConjugation
 import OddOrder.Algebra.BrauerHomomorphism
 import OddOrder.Algebra.ClassSum
@@ -173,6 +174,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainWiring
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ClassCentralizerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockDefect
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockHeight
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainEasy
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainTheorem

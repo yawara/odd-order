@@ -124,6 +124,21 @@ theorem relTrace_smul {R : Type*} [Monoid R] [DistribMulAction R A] [SMulCommCla
     (K H : Subgroup G) (r : R) (a : A) : relTrace K H (r • a) = r • relTrace K H a := by
   simp [relTrace, smul_comm, Finset.smul_sum]
 
+/-- **An orbit-invariant additive map turns a relative trace into multiplication by the index**:
+`χ (Tr^H_K a) = [H : K] • χ a`.
+
+No hypothesis on `a` is needed — the sum defining `Tr^H_K` has `[H : K]` terms, all of which `χ`
+collapses to `χ a`.  This is the engine of the height inequality: the character of a
+representation is such a `χ` on `𝒪[G]` under conjugation, so writing a block idempotent as
+`Tr^G_D(a)` exhibits `[G : D]` as a divisor of `χ(1)`. -/
+theorem map_relTrace {M : Type*} [AddCommMonoid M] (χ : A →+ M)
+    (hχ : ∀ (g : G) (a : A), χ (g • a) = χ a) (K H : Subgroup G) (a : A) :
+    χ (relTrace K H a) = (K.relIndex H) • χ a := by
+  letI := Fintype.ofFinite (↥H ⧸ K.subgroupOf H)
+  simp only [relTrace, map_sum, hχ, Finset.sum_const, Finset.card_univ]
+  rw [← Nat.card_eq_fintype_card]
+  rfl
+
 /-- `Tr^H_K(a)` is fixed by `H` whenever `a` is fixed by `K`. -/
 theorem smul_relTrace {K H : Subgroup G} {a : A} (ha : ∀ g ∈ K, g • a = a) {g : G} (hg : g ∈ H) :
     g • relTrace K H a = relTrace K H a := by
