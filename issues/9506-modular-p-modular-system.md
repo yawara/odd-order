@@ -2201,16 +2201,21 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
           `Equiv.Perm` の位数計算も要らない — downstream で要るのは
           「`N_G(P)/C_G(P)` は奇位数」(`P` が可換 Sylow-2 ゆえ) だけ。
           支持 = `eq_of_fixed_two_of_klein` / `forall_cube_eq_self_of_klein`。
-        - [ ] **⏸ 次 = 第 1 部の群論的組み立て**:
-          (i) `P ≤ C_G(P)` (`P` 可換) ゆえ `|N_G(P) : C_G(P)|` は奇数
-              (`P` は `C_G(P)` でも Sylow-2)、
-          (ii) `g ∈ N_G(P) ∖ C_G(P)` に対し共役写像 `f` は `f^[m] = id` (`m` = `g` の
-              `N/C` での位数、奇数) を満たし非自明 ⟹ 段 180 で `P` の 3 つの involution が
-              `G`-共役、
-          (iii) 任意の involution は Sylow で `P` の元に共役 ⟹ 類は 1 個。
-          `N_G(P) = C_G(P)` の場合は既存の Burnside
-          (`Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer`) で
-          正規 2-補群 ⟹ 類は 3 個。
+        - [x] 🎯🎯 **第 1 部の主内容 完了 (2026-08-05、段 181、`GroupTheory/KleinFourSylowFusion`)**:
+          `isConj_of_klein_sylow` =「`P` が Klein 四元群 Sylow-2 で `N_G(P)` に `P` を
+          中心化しない**奇位数**の元があれば `G` の任意の 2 つの involution は共役」。
+          支持 = `exists_conj_mem_sylow_of_mul_self_eq_one` (任意の involution は
+          Sylow-2 の中へ共役)。⚠ 仮説を「`N_G(P) ≠ C_G(P)`」でなく「奇位数の `g` が在る」
+          の形にした (両者の同値性 = `|N_G(P) : C_G(P)|` が奇数、は独立した Sylow の勘定)。
+        - [ ] **⏸ 次 = 残りの群論的組み立て**:
+          (i) 段 181 の仮説「`P` を中心化しない奇位数の `g ∈ N_G(P)` が在る」を
+              「`N_G(P) ≠ C_G(P)`」から導く。**経路案 (2026-08-05)**: `g ∈ N ∖ C` を取り
+              `g = g₂ · g₂'` と分解すると、`P` は `N_G(P)` の唯一の Sylow-2 (正規かつ Sylow)
+              なので 2-元 `g₂ ∈ P ≤ C_G(P)` (P 可換)。ゆえに `g₂' ∉ C` で奇位数。
+              ⟹ `|N:C|` の奇数性の勘定 (relindex/Sylow) を経由せずに済む見込み。
+          (ii) `N_G(P) = C_G(P)` の場合は既存の Burnside
+              (`Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer`) で
+              正規 2-補群 ⟹ 類は 3 個。
         ⚠ (5.12)/(5.13) は Ch.5 なので**文書順で先**。上流優先で (5.13)(b) →
         (5.12) → (7.2) の順に当たる。
         - [x] 🎯🎯 **(5.13)(a) 前半 完了 (2026-08-05、段 173)**:
