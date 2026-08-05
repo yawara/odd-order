@@ -446,20 +446,43 @@ set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
 omit [DecidableEq κ] [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [Fact p.Prime] [CharP (ResidueField 𝒪) p]
   [Fintype ↥(centralizerOf t)] in
+-- `Invertible (Nat.card G : K)` / `Fintype κ` / `DecidableEq ιG` are not used here, but omitting
+-- them makes the `K`-valued instance below unable to apply this statement.
+set_option linter.unusedSectionVars false in
 /-- **The row of `D_B U` at `χ_i ∉ Irr(B_0)` vanishes.**  A nonzero term needs `d_{iμ} ≠ 0`, which
 puts `μ` in the block of `χ_i`, and `u_{μj} ≠ 0`, which puts `μ` in `B_0`. -/
+theorem sum_decompositionMatrix_mul_basicSetMatrixOf_eq_zero {a : ιG → κ → K}
+    (ha0 : ∀ (ν : ιG) (l : κ), blockOfIrr eG hπG hlinG hnilG l
+      ≠ Quotient.mk (blockSetoid πG hπG hlinG) ν → a ν l = 0) (u : G)
+    {j₀ : κ} (hj₀ : blockOfIrr eG hπG hlinG hnilG j₀ = principalBlock πG hπG hlinG hnilG)
+    {i : κ} (hi : blockOfIrr eG hπG hlinG hnilG i ≠ principalBlock πG hπG hlinG hnilG)
+    {j : κ} (hj : blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG) :
+    (∑ μ : ιG, (decompositionMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG i μ : K)
+        * basicSetMatrixOf eG a u j₀ μ j) = 0 := by
+  refine Finset.sum_eq_zero fun μ _ => ?_
+  by_cases hμ : Quotient.mk (blockSetoid πG hπG hlinG) μ = principalBlock πG hπG hlinG hnilG
+  · rw [decompositionMatrix_eq_zero_of_blockOfIrr_ne hp hωG hω'G hπG hlinG hkerJG hnilG eG i
+      (by rw [hμ]; exact fun hc => hi hc.symm), Nat.cast_zero, zero_mul]
+  · rw [basicSetMatrixOf_eq_zero_of_ne_principalBlock (ha0 := ha0) (u := u) (hj₀ := hj₀)
+      (hμ := hμ) (hj := hj), mul_zero]
+
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+omit [DecidableEq κ] [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [Fact p.Prime] [CharP (ResidueField 𝒪) p]
+  [Fintype ↥(centralizerOf t)] in
+/-- The same for the `K`-valued family of `BrauerFromOrdinary`. -/
 theorem sum_decompositionMatrix_mul_principalBasicSetMatrix_eq_zero
     {j₀ : κ} (hj₀ : blockOfIrr eG hπG hlinG hnilG j₀ = principalBlock πG hπG hlinG hnilG)
     {i : κ} (hi : blockOfIrr eG hπG hlinG hnilG i ≠ principalBlock πG hπG hlinG hnilG)
     {j : κ} (hj : blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG) :
     (∑ μ : ιG, (decompositionMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG i μ : K)
         * principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ j) = 0 := by
-  refine Finset.sum_eq_zero fun μ _ => ?_
-  by_cases hμ : Quotient.mk (blockSetoid πG hπG hlinG) μ = principalBlock πG hπG hlinG hnilG
-  · rw [decompositionMatrix_eq_zero_of_blockOfIrr_ne hp hωG hω'G hπG hlinG hkerJG hnilG eG i
-      (by rw [hμ]; exact fun hc => hi hc.symm), Nat.cast_zero, zero_mul]
-  · rw [principalBasicSetMatrix_eq_zero_of_ne_principalBlock hp eG hπG hlinG hnilG hωG hω'G
-      hkerJG hj₀ hμ hj, mul_zero]
+  simp only [principalBasicSetMatrix]
+  exact sum_decompositionMatrix_mul_basicSetMatrixOf_eq_zero (hp := hp) (hωG := hωG)
+    (hω'G := hω'G) (hkerJG := hkerJG)
+    (a := ordinaryCombinationCoeff hp hωG hω'G hπG hlinG hkerJG eG)
+    (ha0 := fun ν l hl => ordinaryCombinationCoeff_eq_zero_of_blockOfIrr_ne hp hωG hω'G hπG hlinG
+      hkerJG eG hnilG ν hl) (u := t) (hj₀ := hj₀) (hi := hi) (hj := hj)
 
 set_option maxHeartbeats 1000000 in
 -- Both the `(7.2)` independence statement and the `G`-side datum carry their full chains.
