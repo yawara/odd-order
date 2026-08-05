@@ -7,6 +7,7 @@ import OddOrder.GroupTheory.BrauerSuzukiEndgame
 import OddOrder.GroupTheory.CardSupInf
 import OddOrder.GroupTheory.SubgroupInAmbient
 import OddOrder.Isaacs.Ch05_Transfer.Main
+import Mathlib.Algebra.Group.Action.Pointwise.Finset
 
 /-!
 # Brauer–Suzuki: the `Q₈` case (Navarro, *Characters and Blocks*, pp. 139–146)
@@ -53,6 +54,8 @@ contains `t` in its kernel".
 -/
 
 open OddOrder.Isaacs.Ch03
+
+open scoped Pointwise
 
 namespace OddOrder.GroupTheory
 
@@ -727,6 +730,41 @@ theorem exists_mem_normalizer_conj_mem_zpowers (T : Sylow 2 G)
     rw [← hg]; group
   rw [hrw]
   exact (Subgroup.mem_normalizer_iff.mp h.2 z).mp (Subgroup.mem_zpowers z)
+
+/-- **Navarro p. 139: one fusion of inverse pairs fuses all three.**  `N_G(T)` acts on the three
+inverse pairs by conjugation (mathlib's `MulDistribMulAction (normalizer H) H`); `T` lies in the
+stabilizer of each (`image_eq_self_of_conj`) and has odd index in `N_G(T)`
+(`not_two_dvd_relIndex_normalizer`), so the orbit has odd size — hence `1` or `3`.  A single
+nontrivial move therefore makes the action transitive.
+
+This is the substitute for Navarro's `Aut(Q₈) = Sym(4)` step.
+
+⚠ `Subgroup.normalizer` takes a **`Set`**, so the sort has to be written with the coercion
+`((T : Subgroup G) : Set G)` spelled out; and the induced action on `Finset` lives in the
+`Pointwise` scope. -/
+theorem exists_smul_eq_of_mem_inversePairs (T : Sylow 2 G)
+    [Fintype ↥(T : Subgroup G)] [DecidableEq ↥(T : Subgroup G)]
+    (e : ↥(T : Subgroup G) ≃* QuaternionGroup 2)
+    {S : Finset ↥(T : Subgroup G)} (hS : S ∈ inversePairs ↥(T : Subgroup G))
+    (hmove : ∃ u : ↥(Subgroup.normalizer ((T : Subgroup G) : Set G)), u • S ≠ S) :
+    ∀ S' ∈ inversePairs ↥(T : Subgroup G),
+      ∃ u : ↥(Subgroup.normalizer ((T : Subgroup G) : Set G)), u • S = S' := by
+  classical
+  have hsmul : ∀ u : ↥(Subgroup.normalizer ((T : Subgroup G) : Set G)),
+      u • S = S.image (Subgroup.normalizerMonoidHom (T : Subgroup G) u) := fun _ => rfl
+  have hsub : ∀ u : ↥(Subgroup.normalizer ((T : Subgroup G) : Set G)),
+      u • S ∈ inversePairs ↥(T : Subgroup G) := fun u => by
+    rw [hsmul u]; exact image_mem_inversePairs _ hS
+  have hstab : ((T : Subgroup G).subgroupOf (Subgroup.normalizer ((T : Subgroup G) : Set G)))
+      ≤ MulAction.stabilizer _ S := by
+    intro u hu
+    change u • S = S
+    rw [hsmul u]
+    exact image_eq_self_of_conj e (t := ⟨(u : G), hu⟩) (fun s => rfl) hS
+  have hodd : ¬ 2 ∣ (MulAction.stabilizer
+      ↥(Subgroup.normalizer ((T : Subgroup G) : Set G)) S).index :=
+    fun h => not_two_dvd_relIndex_normalizer T (h.trans (Subgroup.index_dvd_of_le hstab))
+  exact orbit_eq_of_odd_of_subset_card_three hodd (card_inversePairs_of_quaternionTwo e) hsub hmove
 
 /-- **Navarro pp. 139–146, the character-theoretic core** (issue 9506, `sorry`): when the
 quaternion Sylow `2`-subgroup is proper, its involution lies in a proper normal subgroup.

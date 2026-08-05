@@ -2704,27 +2704,27 @@ p.139 の残り = 「位数 4 の元は全て `G`-共役 (実は `C_G(t)`-共役
 **「対 `{w, w⁻¹}` の `Finset` を集めた `Finset`」**で表すと `decide` で濃度 3 が出る
 (部分群の集合は decidable に列挙できない)。
 
-**⚠ 2026-08-06 に判明した elaboration の罠 (次 session はここから)**:
-`↥(Subgroup.normalizer (T : Subgroup G))` を**ソート位置**に書くと、mathlib の `normalizer` が
-`Set` 引数版に解決されてしまい (`Subgroup.normalizer ↑↑T`)、mathlib の
-**`instance : MulDistribMulAction (normalizer H : Subgroup G) H`**
-(`Mathlib/GroupTheory/Subgroup/Centralizer.lean:186`、`g • h = ⟨g * h * g⁻¹, _⟩`) が発火しない。
-型注釈 (`: Subgroup G`) も dot notation (`(T : Subgroup G).normalizer`) も効かなかった。
-⟹ **作用を載せる段はこの綴り方を先に解決すること** (候補: `variable` で
-`N : Subgroup G` を導入して `hN : N = ...` を持つ / mathlib 側の正確な綴りを
-`Centralizer.lean` の instance 宣言からコピーする / `MulAction.compHom` で
-`Subgroup.normalizerMonoidHom` から明示的に作る)。
-数学的な段取りは下記のとおり確定していて、詰まっているのは綴りだけ。
+- `exists_smul_eq_of_mem_inversePairs` (2026-08-06 完成) = **`Aut(Q₈) = Sym(4)` 段の代替**:
+  `N_G(T)` は 3 つの inverse pair に共役で作用し、`T` が各対の安定化群に入り
+  `[N_G(T):T]` が奇なので軌道は奇位数 ⟹ 1 か 3 ⟹ **1 つでも動けば推移的**。
+
+⚠ **綴りの罠 2 つ (解決済、再発注意)**:
+(a) `Subgroup.normalizer` は **`Set` 引数**なので、ソート位置では
+`↥(Subgroup.normalizer ((T : Subgroup G) : Set G))` と coercion を明示する
+(型注釈も dot notation も効かない)。
+(b) `Finset` への誘導作用 (`Finset.mulActionFinset`) は
+`Mathlib.Algebra.Group.Action.Pointwise.Finset` の **scoped instance** なので、
+その import と `open scoped Pointwise` の両方が要る (`SMul` だけは別ファイルにあるので
+`MulAction` だけ落ちる、という紛らわしい失敗をする)。
 
 **残る組み立て** (次 session の着手点):
-1. `Ω` を `↥T` 側で上の形に作り、`e` で `QuaternionGroup 2` へ移して濃度 3 を得る。
-2. `N_G(T)` の `Ω` への共役作用を定義 (対 `{w,w⁻¹}` は共役で対に移る = Hamiltonian 性)。
-3. 核が `T·C_G(T)` を含む ⟹ 作用は奇位数商を経由 ⟹
-   `orbit_eq_univ_of_odd_of_card_eq_three` で「1 つ融合すれば全部融合」。
-4. 融合の存在は `not_controlsOwnFusion_of_oPiCore_eq_bot` から、
-   融合元の `N_G(T)` への補正は `exists_mem_normalizer_conj_mem_zpowers` から。
-⟹ 「位数 4 の元は全て `G`-共役 (実は `C_G(t)`-共役)」が出る。そこから p.140 以降の
-"Analysis at y" / "Analysis at t" へ。
+1. 融合の存在 (`not_controlsOwnFusion_of_oPiCore_eq_bot`) から「動く `u`」を作る
+   — fusion 非制御の定義をほどいて `y^g = z` を取り出し、
+   `exists_mem_normalizer_conj_mem_zpowers` で `u ∈ N_G(T)` に直し、
+   `u • {y,y⁻¹} ≠ {y,y⁻¹}` を出す。
+2. `exists_smul_eq_of_mem_inversePairs` で全対が融合 ⟹
+   **「位数 4 の元は全て `G`-共役」**。
+3. そこから p.140 以降の "Analysis at y" / "Analysis at t" へ。
 
 必要な群論的事実 (原文 p.138 が列挙):
 ~~`Aut(Q₈) = Sym(4)`~~ (上記で不要) / 巡回 Sylow 2 なら正規 2-補群 /

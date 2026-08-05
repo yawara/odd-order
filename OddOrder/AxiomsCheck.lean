@@ -13423,6 +13423,16 @@ characteristic ⟹ 既存の `normal_map_subtype_of_characteristic` で `G` で�
 #assert_only_allowed_axioms OddOrder.GroupTheory.image_inversePairs
 #assert_only_allowed_axioms OddOrder.GroupTheory.image_mem_inversePairs
 #assert_only_allowed_axioms OddOrder.GroupTheory.card_inversePairs_of_quaternionTwo
+
+/-! 🎯 `exists_smul_eq_of_mem_inversePairs` = **Navarro p.139 の `Aut(Q₈) = Sym(4)` 段の代替、完成形**。
+`N_G(T)` は 3 つの inverse pair に共役で作用し (mathlib `MulDistribMulAction (normalizer H) H`)、
+`T` は各対の安定化群に入り (`image_eq_self_of_conj`) しかも `[N_G(T):T]` が奇
+(`not_two_dvd_relIndex_normalizer`) なので軌道は奇位数 ⟹ 1 か 3。1 つでも動けば推移的。
+⚠ 綴りの罠 2 つ: `Subgroup.normalizer` は **`Set` 引数**なのでソート位置では
+`((T : Subgroup G) : Set G)` と明示する; `Finset` への誘導作用は
+`Mathlib.Algebra.Group.Action.Pointwise.Finset` の scoped instance なので import + `open scoped
+Pointwise` が要る。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.exists_smul_eq_of_mem_inversePairs
 /-! `sylowQ8_le_normalizer_zpowers` = 原文「every subgroup of `P` is normal in `P`」を `G` の中で
 `T ≤ N_G(⟨w⟩)` の形にしたもの。これが「`T` と `T^g` が `N_G(⟨z⟩)` の Sylow-2 ⟹ Sylow 共役で
 `g` を `N_G(T)` に取り直せる」段の入口。 -/
