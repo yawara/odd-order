@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.GroupTheory.BrauerSuzukiEndgame
 import OddOrder.GroupTheory.CardSupInf
 import OddOrder.GroupTheory.SubgroupInAmbient
+import OddOrder.Isaacs.Ch05_Transfer.Main
 
 /-!
 # Brauer–Suzuki: the `Q₈` case (Navarro, *Characters and Blocks*, pp. 139–146)
@@ -425,6 +426,37 @@ theorem oPiCore_subgroup_eq_bot {N : Subgroup G} [N.Normal] (hO : oPiCore {p | p
   have hmem : (y : G) ∈ K.map N.subtype := ⟨y, hy, rfl⟩
   rw [hbot, Subgroup.mem_bot] at hmem
   exact Subgroup.mem_bot.mpr (Subtype.ext hmem)
+
+/-! ### Navarro p. 139: `T` does not control its own fusion
+
+The first step of the character-theoretic argument: because `O_{2'}(G) = 1` and `T < G`, the group
+`G` has no normal `2`-complement, so by Isaacs Thm 5.25 the Sylow `2`-subgroup cannot control its
+own fusion — which is what forces two distinct `T`-classes of elements of order `4` to fuse in
+`G`. -/
+
+/-- **`G` has no normal `2`-complement** when `O_{2'}(G) = 1` and the Sylow `2`-subgroup is
+proper: such a complement is a normal subgroup of odd order, hence trivial, forcing `T = G`. -/
+theorem not_hasNormalPComplement_of_oPiCore_eq_bot (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 2 G)
+    (hTG : (T : Subgroup G) ≠ ⊤) : ¬ OddOrder.Isaacs.Ch05.HasNormalPComplement 2 G := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  rintro ⟨N, hNnorm, hcompl⟩
+  haveI := hNnorm
+  have hc := hcompl T
+  have hodd : ¬ 2 ∣ Nat.card ↥N := by
+    rw [← hc.index_eq_card]; exact T.not_dvd_index
+  have hpi : Subgroup.IsPiGroup {p | p ≠ 2} N := fun p hp (h2 : p = 2) =>
+    hodd (h2 ▸ Nat.dvd_of_mem_primeFactors hp)
+  have hNbot : N = ⊥ := le_bot_iff.mp (hO ▸ Subgroup.IsPiGroup.le_oPiCore hpi)
+  have hsup := hc.sup_eq_top
+  rw [hNbot, bot_sup_eq] at hsup
+  exact hTG hsup
+
+/-- **`T` does not control its own `G`-fusion** (Navarro p. 139), by Isaacs Thm 5.25. -/
+theorem not_controlsOwnFusion_of_oPiCore_eq_bot (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 2 G)
+    (hTG : (T : Subgroup G) ≠ ⊤) : ¬ T.ControlsOwnFusion := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  exact fun h => not_hasNormalPComplement_of_oPiCore_eq_bot hO T hTG
+    ((OddOrder.Isaacs.Ch05.hasNormalPComplement_iff_controlsOwnFusion T).mpr h)
 
 /-- **Navarro pp. 139–146, the character-theoretic core** (issue 9506, `sorry`): when the
 quaternion Sylow `2`-subgroup is proper, its involution lies in a proper normal subgroup.

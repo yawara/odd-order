@@ -13385,6 +13385,13 @@ characteristic ⟹ 既存の `normal_map_subtype_of_characteristic` で `G` で�
 これで Navarro p.139 の帰納法が組め、BS の `Q₈` 分枝に残る数学は
 `q8_exists_proper_normal` (「z を含む真の正規部分群の存在」= 指標論の核 pp.139-146) だけになった。 -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.oPiCore_subgroup_eq_bot
+/-! `not_controlsOwnFusion_of_oPiCore_eq_bot` = Navarro p.139 の指標論部分の第 1 歩。
+`O_{2'}(G) = 1` かつ Sylow-2 が真部分群なら正規 2-補群は奇位数の正規部分群ゆえ自明になり
+`T = ⊤` を強いるので矛盾 ⟹ Isaacs Thm 5.25 (`hasNormalPComplement_iff_controlsOwnFusion`) で
+`T` は自分の fusion を制御できない。これが「位数 4 の元の 2 つの `T`-類が `G` で融合する」を
+出す当のもの。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.not_hasNormalPComplement_of_oPiCore_eq_bot
+#assert_only_allowed_axioms OddOrder.GroupTheory.not_controlsOwnFusion_of_oPiCore_eq_bot
 
 /-! ### lean-eval 提出候補の登録 (issue 0050, 2026-07-22).
 
