@@ -271,6 +271,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionSum
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionClassCount
 import OddOrder.Algebra.BlockPartitionedMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionMatrix
+import OddOrder.GroupTheory.KleinFourAutomorphism
 import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterCount
@@ -555,7 +556,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 17400
+set_option linter.style.longFile 17500
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -17387,3 +17388,18 @@ Navarro (5.12) の "in particular, notice that the matrix `J` is regular"。
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.exists_intCast_character_of_mul_self_eq_one
+
+/-! 🎯 **Klein 四元群の位数 3 の自己同型は 3 つの involution を巡回する**
+(`GroupTheory/KleinFourAutomorphism`) — Navarro (7.2) 第 1 部で
+`N_G(P)/C_G(P)` の位数が 3 のとき `P` の 3 つの involution が `G`-共役になる根拠。
+`Aut(Z₂×Z₂) ≅ Sym(3)` 全体は作らず、必要な巡回性だけを出す。
+土台は「Klein 四元群は任意の相異なる involution `a`, `b` に対し `{1, a, b, ab}`」。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.eq_one_or_eq_or_eq_or_eq_of_klein
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.eq_of_fixed_of_klein
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.eq_or_eq_or_eq_iterate_of_klein
