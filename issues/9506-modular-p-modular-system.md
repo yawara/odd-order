@@ -2561,18 +2561,39 @@ Navarro の証明は **(2.15)** (`θ ∈ ℤ[Irr(G)] ∪ ℤ[IBr(G)]` なら `θ
 - 代替案 (`det C_{b̄₀} = 4` から `det V = ±1` を出す Cauchy–Binet ルート) も検討したが、
   `det C` の値自体がブロック論の別結果を要するので短くならない。
 
+### (7.6) の進捗 (段 210-211、2026-08-05)
+
+原文 p.137 の証明を 4 段に分けたうち **(i) と (ii) が完了**。
+
+- **段 210** = (i) `x ↦ x̄` が `G⁰ → Ḡ⁰` の全単射 (`GroupTheory/PRegularQuotient`、新 leaf)。
+  全射は任意の正規部分群で成立 (原像 `g` の `p`-部分の像は `p`-元かつ `ȳ` の冪 = `p`-正則 ⟹ 1)。
+  単射だけが仮説を使う: `mem_of_isPRegular_of_isPGroup_quotient` (「`G/N` が `p`-群なら
+  `p`-正則元は `N` に入る」) を `N = C_G(P)` に当てて `G⁰ ⊆ C_G(P)` を出し、
+  `x⁻¹y ∈ P` が可換な 2 つの `p`-正則元の積 = `p`-正則 かつ `p`-元 ⟹ 1。
+  `bijOn_mk_isPRegular` / `commute_of_isPRegular_of_le_center` (BS の `P ≤ Z(G)` の場合)。
+- **段 211** = (ii) `k[G/N]` の分裂を `k[G]` の分裂から誘導 (`Modular/QuotientSplitting`、新 leaf)。
+  ⚠ **(2.32) は repo に既にあった** (`Algebra/NormalPSubgroupTrivialAction`,
+  `pi_single_eq_one_of_mem_normal_pSubgroup`: 正規 `p`-部分群は全単純 `kG`-加群に自明作用)。
+  そこで `blockPiHom π : g ↦ π(single g 1)` が `N` を潰す ⟹ `G/N` を経由 ⟹ 群環の普遍性で
+  `quotientPi : k[G/N] →ₐ ∏_j M_{n_j}(k)`。**添字集合 `ι` と行列サイズが `π` と同一**なのが
+  原文の「`φ ↦ φ̄` が `IBr(G) → IBr(Ḡ)` の全単射」の形式化。
+  `ker_quotientPi : ker π̄ = J(k[G/N])` は `ker π̄ = f(ker π)` + `ker f ≤ ker π = J(kG)` +
+  `Ring.map_jacobson_of_ker_le`。
+
 ### ⏸ 次 session の着手点 (2026-08-05 session 終了時点)
 
-1. **(7.6)** (`P ⊴ G` が `p`-部分群で `G/C_G(P)` が `p`-群 ⟹ `Bl(G/P) ≃ Bl(G)`,
-   `IBr` 一致, `C_B = |P| C_B̄`) — 未着手の最大の塊。**Chapter 7 の文書順で (7.5) の次**、かつ
-   BS の式 (3) `(D^t_i,D^t_j) = 2(1+δ_ij)` の「2 倍」がここから来るので迂回不能。
-   原文 p.137 の証明構成:
-   (i) `x ↦ x̄` が `G⁰ → Ḡ⁰` の全単射 (全射は `xP` が `p'`-元 ⟺ `x_p ∈ P`;
-       単射は `G⁰ ⊆ C_G(P)` から `o(yz) = o(y)o(z)`);
-   (ii) `P ⊆ O_p(G) ⊆ ker φ` (`φ ∈ IBr(G)`) ⟹ `IBr(G) ≃ IBr(Ḡ)`;
-   (iii) `[φ,θ]⁰_G = (1/|P|)[φ̄,θ̄]⁰_Ḡ` ⟹ Cartan の逆が `|P|` 倍 ⟹ `C = |P| C̄`;
-   (iv) ブロックの全単射 (p.137-138)。
-   ⚠ BS が使うのは `P = ⟨t⟩ ≤ Z(C_G(t))` の場合なので `G/C_G(P) = 1` は自明。
+1. **(7.6) の残り (iii)(iv)**:
+   - (iii) `[φ,θ]⁰_G = (1/|P|)[φ̄,θ̄]⁰_Ḡ` ⟹ Cartan の逆が `1/|P|` 倍 ⟹ **`C = |P| C̄`**。
+     必要な補助段:
+     (a) `irreducibleBrauerCharacter (quotientPi …) j (mk g) = irreducibleBrauerCharacter π j g`
+         (`p`-正則 `g`)。行列そのものは `quotientPi_single` で一致するので、
+         残るのは **`pRegularExponent p (G ⧸ N) = pRegularExponent p G`** の照合。
+         ⚠ `x` が `p`-正則なら `⟨x⟩ ∩ N = 1` (⟨x⟩ の元は `p`-正則・`N` の元は `p`-元) ゆえ
+         `orderOf (mk x) = orderOf x`。段 210 の全単射と合わせて指数が一致する。
+     (b) `pairingZero` の `1/|P|` 倍: 段 210 の全単射で `G⁰` 上の和を `Ḡ⁰` 上の和に移す
+         (ファイバーが `|P|` 個でなく **1 対 1**、係数 `1/|G|` vs `1/|Ḡ|` の差が `1/|P|`)。
+     (c) Cartan が pairing の逆 (既存 `sum_cartanMatrix_mul_pairingZero`) から `C = |P| C̄`。
+   - (iv) ブロックの全単射 (p.137-138)。BS で実際に要るのは主ブロック同士の対応だけ。
 2. **Brauer の指標判定 → (2.15) → (2.16) → (3.16)** (上記の節)。共有インフラ。
 3. その後 BS 本証明 pp.141-146 の残り (`Q₈` の指標表 / `Aut(Q₈)` 相当 / 二面体群)。
 
