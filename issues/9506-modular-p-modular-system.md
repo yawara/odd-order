@@ -2755,6 +2755,18 @@ p.139 の残り = 「位数 4 の元は全て `G`-共役 (実は `C_G(t)`-共役
 `hconjall` に相当する仮説を `isConj_of_orderFour` (2026-08-06 完成) が供給する
 — ここが p.139 の成果と p.140 の接続点。
 
+⚠⚠ **ただし包装済の `card_blockOfIrr_principal_eq_four_and_character_involution` は
+そのままでは `y` に使えない (2026-08-06 実測)**: section 変数 `ht : t * t = 1` を
+`include` しているので**対合専用**。中身の部品のうち平方和だけが `t*t=1` を使っていて、
+それは既に一般化されている:
+**`sum_sq_character_eq_cartanMatrix_of_isConj_inv (hinv : ∃ c, c * t * c⁻¹ = t⁻¹)`**
+(`PrincipalBlockInvolution:206`、段 197-198)。`Q₈` の位数 4 の元は `T` 内で反転されるので
+(`exists_conj_eq_inv_of_quaternionTwo`) この仮説は満たせる。
+⟹ **次の実装単位** = `card_blockOfIrr_principal_eq_four_and_character_involution` の
+`y`-版を、`ht` を `hinv` に差し替えて組み直すこと (残りの部品は既に `x` について一般)。
+⚠ 当該ファイルは仮説鎖が長く `maxHeartbeats 1000000` 級なので、
+`include` 行の差し替えを 1 つずつ leaf build で回すこと (段 I の refactor と同じ要領)。
+
 
 - "Analysis at y" (p.139 末-140): `⟨y⟩` が `C_G(y)` の Sylow-2 ⟹ 正規 2-補群 ⟹
   `IBr(b₀) = {1}` ⟹ `χ_i(y) = d^y_{χ_i 1}` … 部品は段 185-200 で既出 (9506 の該当節参照)。
