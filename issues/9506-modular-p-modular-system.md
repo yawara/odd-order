@@ -2736,8 +2736,17 @@ p.139 の残り = 「位数 4 の元は全て `G`-共役 (実は `C_G(t)`-共役
    (⚠ `zpow` のまま `%` を扱おうとすると煩雑になる — **ℕ 冪に移してから** `% 4` する)。
 4. **`exists_smul_eq_of_mem_inversePairs`** で全対が融合 ⟹
    **「位数 4 の元は全て `G`-共役」**(原文の "the claim has been proven")。
-   `Z(T) = {1,t} ⊴ N_G(T)` から `u ∈ C_G(t)` も出る (原文の最後の注意)。
-5. そこから p.140 以降の "Analysis at y" / "Analysis at t" へ。
+
+✅ **(1)-(4) は 2026-08-06 に完了** (`isConj_of_orderFour`)。⟹ p.139 は
+`q8_exists_proper_normal` の sorry を除いて**全部形式化済**。
+
+**次の段 = p.140 以降**:
+- "Analysis at y" (p.139 末-140): `⟨y⟩` が `C_G(y)` の Sylow-2 ⟹ 正規 2-補群 ⟹
+  `IBr(b₀) = {1}` ⟹ `χ_i(y) = d^y_{χ_i 1}` … 部品は段 185-200 で既出 (9506 の該当節参照)。
+- "Analysis at t" (p.141-142): `C_G(t)/⟨t⟩` が Klein four Sylow-2 ⟹ (7.4) の basic set、
+  (7.6) で `C_G(t)` へ持ち上げ、(7.5) で `d^t` の列。**整数性は issue 9508 で完済**
+  (`intBasicSetMatrix` / `sum_intBasicSetMatrix_mul_cartanMatrix`)。
+- `Z(T) = {1,t} ⊴ N_G(T)` から `u ∈ C_G(t)` (原文 p.139 末の注意) は必要になった時点で足す。
 
 必要な群論的事実 (原文 p.138 が列挙):
 ~~`Aut(Q₈) = Sym(4)`~~ (上記で不要) / 巡回 Sylow 2 なら正規 2-補群 /

@@ -13445,6 +13445,13 @@ Pointwise` が要る。 -/
 `x, y` が `T`-共役 (`T` は反転元を含む) となって仮定に矛盾。
 これと `exists_smul_eq_of_mem_inversePairs` で「位数 4 の元は全て `G`-共役」が出る。 -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.exists_smul_ne_of_oPiCore_eq_bot
+
+/-! 🎯🎯 `isConj_of_orderFour` = **Navarro p.139 の第 1 主張「`G` は位数 4 の元の類を 1 つしか
+持たない」が完成**。3 つの inverse pair が `N_G(T)` の下で融合し (`exists_smul_ne_of_oPiCore_eq_bot`
++ `exists_smul_eq_of_mem_inversePairs`)、`T` 自身が `w` と `w⁻¹` を融合するので、
+`T` の位数 4 の元はどの 2 つも `G`-共役。⚠ 原文が `Aut(Q₈) = Sym(4)` で通す段を
+index の偶奇だけで置き換えた route の**終着点**。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.isConj_of_orderFour
 /-! `sylowQ8_le_normalizer_zpowers` = 原文「every subgroup of `P` is normal in `P`」を `G` の中で
 `T ≤ N_G(⟨w⟩)` の形にしたもの。これが「`T` と `T^g` が `N_G(⟨z⟩)` の Sylow-2 ⟹ Sylow 共役で
 `g` を `N_G(T)` に取り直せる」段の入口。 -/

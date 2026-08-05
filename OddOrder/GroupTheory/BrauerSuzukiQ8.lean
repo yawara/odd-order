@@ -51,6 +51,8 @@ contains `t` in its kernel".
 * `OddOrder.GroupTheory.q8_mem_center_of_mem_center_normal` — the **branch `P ≤ N`**
 * `OddOrder.GroupTheory.q8_mem_center_of_oPiCore_eq_bot` — the induction assembled
 * `OddOrder.GroupTheory.q8_mk_mem_center` / `OddOrder.GroupTheory.brauerSuzuki_q8`
+* `OddOrder.GroupTheory.isConj_of_orderFour` — Navarro's first claim on p. 139: `G` has a single
+  class of elements of order `4`
 -/
 
 open OddOrder.Isaacs.Ch03
@@ -900,6 +902,54 @@ theorem exists_smul_ne_of_oPiCore_eq_bot (hO : oPiCore {p | p ≠ 2} G = ⊥) (T
   · rcases hUmem with h | h
     · exact hfinal (Or.inr (congrArg Subtype.val (inv_eq_iff_eq_inv.mp h)))
     · exact hfinal (Or.inl (congrArg Subtype.val (inv_injective h)))
+
+/-- **Navarro p. 139: `G` has a single class of elements of order `4`** ("the claim has been
+proven").  All three inverse pairs of `T` fuse under `N_G(T)`
+(`exists_smul_eq_of_mem_inversePairs` fed by `exists_smul_ne_of_oPiCore_eq_bot`), and `T` itself
+fuses `w` with `w⁻¹`, so any two elements of order `4` of `T` are `G`-conjugate. -/
+theorem isConj_of_orderFour (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 2 G)
+    (e : ↥(T : Subgroup G) ≃* QuaternionGroup 2) (hTG : (T : Subgroup G) ≠ ⊤)
+    {v w : G} (hv : v ∈ (T : Subgroup G)) (hw : w ∈ (T : Subgroup G))
+    (hv2 : v ^ 2 ≠ 1) (hw2 : w ^ 2 ≠ 1) : ∃ g : G, g * v * g⁻¹ = w := by
+  classical
+  letI : Fintype ↥(T : Subgroup G) := Fintype.ofFinite _
+  set V : ↥(T : Subgroup G) := ⟨v, hv⟩ with hVdef
+  set W : ↥(T : Subgroup G) := ⟨w, hw⟩ with hWdef
+  have hV2 : V ^ 2 ≠ 1 := fun h => hv2 (congrArg Subtype.val h)
+  have hW2 : W ^ 2 ≠ 1 := fun h => hw2 (congrArg Subtype.val h)
+  have hVmem : ({V, V⁻¹} : Finset ↥(T : Subgroup G)) ∈ inversePairs ↥(T : Subgroup G) :=
+    Finset.mem_image.mpr ⟨V, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hV2⟩, rfl⟩
+  have hWmem : ({W, W⁻¹} : Finset ↥(T : Subgroup G)) ∈ inversePairs ↥(T : Subgroup G) :=
+    Finset.mem_image.mpr ⟨W, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hW2⟩, rfl⟩
+  obtain ⟨S₀, hS₀, u₀, hmove⟩ := exists_smul_ne_of_oPiCore_eq_bot hO T e hTG
+  have htrans := exists_smul_eq_of_mem_inversePairs T e hS₀ ⟨u₀, hmove⟩
+  obtain ⟨a, ha⟩ := htrans _ hVmem
+  obtain ⟨b, hb⟩ := htrans _ hWmem
+  have hba : (b * a⁻¹) • ({V, V⁻¹} : Finset ↥(T : Subgroup G)) = {W, W⁻¹} := by
+    rw [mul_smul, ← ha, inv_smul_smul, hb]
+  have hmem : (b * a⁻¹) • V ∈ ({W, W⁻¹} : Finset ↥(T : Subgroup G)) := by
+    rw [← hba]
+    exact Finset.smul_mem_smul_finset (Finset.mem_insert_self _ _)
+  rw [Finset.mem_insert, Finset.mem_singleton] at hmem
+  have hcv : ((b * a⁻¹ : ↥(Subgroup.normalizer ((T : Subgroup G) : Set G))) : G) * v
+      * ((b * a⁻¹ : ↥(Subgroup.normalizer ((T : Subgroup G) : Set G))) : G)⁻¹
+      = ((b * a⁻¹) • V : ↥(T : Subgroup G)) := rfl
+  rcases hmem with h | h
+  · exact ⟨_, hcv.trans (congrArg Subtype.val h)⟩
+  · obtain ⟨d, hd⟩ := exists_conj_eq_inv_of_quaternionTwo e hW2
+    have hdG : (d : G) * w * (d : G)⁻¹ = w⁻¹ := congrArg Subtype.val hd
+    refine ⟨(d : G)⁻¹ * ((b * a⁻¹ : ↥(Subgroup.normalizer ((T : Subgroup G) : Set G))) : G), ?_⟩
+    have hstep : ((b * a⁻¹ : ↥(Subgroup.normalizer ((T : Subgroup G) : Set G))) : G) * v
+        * ((b * a⁻¹ : ↥(Subgroup.normalizer ((T : Subgroup G) : Set G))) : G)⁻¹ = w⁻¹ :=
+      hcv.trans (congrArg Subtype.val h)
+    calc (d : G)⁻¹ * ((b * a⁻¹ : ↥(Subgroup.normalizer ((T : Subgroup G) : Set G))) : G) * v
+          * ((d : G)⁻¹ * ((b * a⁻¹ : ↥(Subgroup.normalizer
+            ((T : Subgroup G) : Set G))) : G))⁻¹
+        = (d : G)⁻¹ * (((b * a⁻¹ : ↥(Subgroup.normalizer ((T : Subgroup G) : Set G))) : G) * v
+          * ((b * a⁻¹ : ↥(Subgroup.normalizer ((T : Subgroup G) : Set G))) : G)⁻¹)
+          * (d : G) := by group
+      _ = (d : G)⁻¹ * w⁻¹ * (d : G) := by rw [hstep]
+      _ = w := by rw [← hdG]; group
 
 /-- **Navarro pp. 139–146, the character-theoretic core** (issue 9506, `sorry`): when the
 quaternion Sylow `2`-subgroup is proper, its involution lies in a proper normal subgroup.
