@@ -170,6 +170,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CenterModuleDecomp
 import OddOrder.GroupTheory.RepresentationTheory.CenterProjConjugation
 import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterExponent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterKernel
 import OddOrder.GroupTheory.RepresentationTheory.Modular.AsModuleSimple
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation

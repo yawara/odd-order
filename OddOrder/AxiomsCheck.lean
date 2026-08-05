@@ -186,6 +186,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.RootsOfUnityLift
 import OddOrder.GroupTheory.RepresentationTheory.Modular.WittVectorSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacter
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterExponent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterKernel
 import OddOrder.Algebra.EigenspaceDecomposition
 import OddOrder.Algebra.LagrangeInterpolationRing
@@ -18441,3 +18442,24 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.irreducibleBrauerCharacter_mem_virtualCharacters
+
+/-! 🎯 **issue 9508 段 H2e 後半 (1/2)**: Brauer 指標は取る指数に依らない
+(`Modular/BrauerCharacterExponent`)。部分群への制限で必要になる — `G` の Brauer 指標は
+`|G|_{p'}` で、`H ≤ G` のそれは `|H|_{p'}` で取られ、両者は一般に等しくない
+(段 212 の商の場合は等しかったので不要だった)。
+
+- `rootLift_eq_rootLift_of_dvd`: `m` 乗根としての持ち上げは `n` 乗根でもあり剰余が同じ ⟹
+  `n` 乗根の持ち上げの一意性 (`rootLift_unique`) で一致。
+- `eigenspace_eq_bot_of_pow_ne_one`: `ρ g ^ m = 1` なら固有値は `m` 乗根に限る
+  (固有ベクトルに `(ρ g)^m` を当てて `ζ^m = 1`)。
+- `brauerCharacter_eq_of_dvd`: `m ∣ n`・`p ∤ n`・`ρ g ^ m = 1` ⟹ 両指数で同じ値
+  (余分な `n` 乗根の固有空間は 0)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.rootLift_eq_rootLift_of_dvd
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eigenspace_eq_bot_of_pow_ne_one
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.brauerCharacter_eq_of_dvd

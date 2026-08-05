@@ -263,11 +263,15 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
     - [x] **H2e 前半 完了** (2026-08-05): `irreducibleBrauerCharacter_mem_virtualCharacters` —
       `IBr(Q)` の値 (`K` に押し出したもの) は `ch(Q)` に入る
       (`φ = Σ_χ d_{χφ} χ` と `mem_virtualCharacters_wedderburnRepresentation` から `nsmul_mem`)。
-    - [ ] **H2e 後半**: 制限。`θ|_Q` (`θ` は `G` の Brauer 指標) が `IBr(Q)` の **ℕ**-結合であること。
-      要点は 2 つ: (i) 制限加群の Brauer 指標 = Brauer 指標の制限、
-      (ii) ⚠ **指数が違う** — `brauerCharacter` は `pRegularExponent p G` で取るが `Q` 側は
-      `pRegularExponent p Q`。`ρ g ^ n = 1` を満たす任意の `n` で同じ値になることが要る
-      (段 212 の `pRegularExponent_quotient` と同型の問題)。
+    - [x] **H2e 後半 (1/2) 完了** (2026-08-05, `Modular/BrauerCharacterExponent.lean`):
+      **指数非依存** `brauerCharacter_eq_of_dvd` (`m ∣ n`・`p ∤ n`・`ρ g ^ m = 1` ⟹ 両指数で同値)。
+      支持 = `rootLift_eq_rootLift_of_dvd` (持ち上げの一意性) と
+      `eigenspace_eq_bot_of_pow_ne_one` (余分な `n` 乗根の固有空間は 0)。
+      ⚠ 段 212 (商) では指数が literally 等しかったので不要だったが、部分群では
+      `|H|_{p'} ∣ |G|_{p'}` で等号は成り立たないのでこの補題が要る。
+    - [ ] **H2e 後半 (2/2)**: 制限加群の Brauer 指標 = Brauer 指標の制限 と、
+      `Q` 側の分解 (`exists_decomposition_trace` を `Q` に適用) で `θ|_Q` が `IBr(Q)` の
+      **ℕ**-結合になること。そこに H2e 前半を当てて `θ|_Q ∈ ch(Q)`。
 
     ⟹ **H2 は複数 session 規模**。上流から H2a → H2b → H2c → H2d → H2e。
 
