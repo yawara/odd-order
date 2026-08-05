@@ -2687,6 +2687,19 @@ p.139 の残り = 「位数 4 の元は全て `G`-共役 (実は `C_G(t)`-共役
 **奇位数の商** (`not_two_dvd_relIndex_sup_centralizer`) を経由し、`Sym(3)` の奇位数部分群は
 自明か推移的 ⟹ 1 つ融合すれば 3 つとも融合する。段 218 で材料を証明済。
 
+**段 218-219 で証明済の材料** (`BrauerSuzukiQ8.lean`、全て AxiomsCheck 登録済):
+- `quaternionTwo_conj_eq_self_or_inv` (decide) → `zpowers_normal_of_quaternionTwo`
+  (= 原文「every subgroup of `P` is normal in `P`」)
+- `quaternionTwo_exists_conj_eq_inv` (decide) → `conj_eq_iff_of_quaternionTwo`
+  (= 位数 4 の元の `T`-共役類はちょうど `{w, w⁻¹}` の 2 元 = **ブロック構造**)
+- `not_two_dvd_relIndex_sup_centralizer` (= `[N_G(T) : T·C_G(T)]` は奇数)
+- `orbit_eq_univ_of_odd_of_card_eq_three` (= 奇位数群の 3 元集合への作用は固定か推移)
+
+**残る組み立て**: 3 つの位数 4 巡回部分群の集合 `Ω` (3 元) を型として作り、`N_G(T)` の作用が
+`T·C_G(T)` を核に含む ⟹ 奇位数商を経由 ⟹ 上の 4 本目で「1 つ融合すれば全部融合」。
+その前に原文の「`g` を `N_G(T)` へ取り直す」段 (`⟨y⟩^g = ⟨z⟩` ⟹ `T, T^g ∈ Syl_2(N_G(⟨z⟩))`
+⟹ Sylow 共役) が要る。
+
 必要な群論的事実 (原文 p.138 が列挙):
 ~~`Aut(Q₈) = Sym(4)`~~ (上記で不要) / 巡回 Sylow 2 なら正規 2-補群 /
 対合 2 つが生成する群は二面体 /
