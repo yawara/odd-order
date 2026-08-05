@@ -1958,7 +1958,24 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         `ordProj_dvd_finrank_of_character_eq_zero` — `p`-singular で消える指標は
         `|G|_p ∣ χ(1)`。Sylow `S` 上で和が `χ(1)` に潰れ = `|S|·dim V^S`。
         ⚠ `p`-modular system 不要 (標数 0 の体だけ)。
-  - [ ] **⏸ 次の一手 = 「主ブロックの χ は `p`-singular 元で全消滅しない」**
+  - [x] 🎯🎯 **「主ブロックの χ は `p`-singular 元で全消滅しない」完了
+        (2026-08-05、段 156 `Modular/PrincipalBlockNonvanishing`)**:
+        `not_dvd_card_of_character_eq_zero_of_pSingular` /
+        `exists_not_isPRegular_character_ne_zero`。新規に要ったのは予告どおり
+        🎯 `forall_apply_eq_of_invariants_ne_bot` (不変ベクトルがあれば Wedderburn
+        表現は自明) 1 本のみ + `isUnit_centralScalar_pRegularSum_of_blockOfIrr_principal`。
+        `card_filter_isPRegular` は `PRegularElementCount` へ移設 (2 箇所で使用)。
+  - [ ] **⏸ 次の一手 = (7.2) 本体の残り部品**。原文 p.131-132 (`pages/navarro-p131,132.png`)
+        より、まだ repo に無いもの:
+        * **Burnside の正規 `p`-補群定理** (`N_G(P) = C_G(P)` ⟹ 正規 `p`-補群) —
+          Isaacs Ch.5/7 にあるはずなので**着手前に grep**
+        * `Aut(Z₂×Z₂) ≅ S₃` と「位数 3 の自己同型は 3 つの involution を巡回」
+        * **(5.12)** `k(B) = Σ_i Σ_{b ∈ Bl(C_G(x_i)), b^G = B} l(b)` (第二主定理の系)
+        * **(5.13)(b)** 一般化分解数の直交性 `Σ_χ d^x_{χμ} d^x_{χφ} = c^b_{μφ}`
+        * involution に付く一般化分解数が**有理整数**であること
+        ⚠ (5.12)/(5.13) は Ch.5 なので**文書順で先**。上流優先で (5.13)(b) →
+        (5.12) → (7.2) の順に当たる。
+  - [ ] (旧) 次の一手の詳細 (2026-08-05 に確定した経路、実装済):
         (2026-08-05 に原文 p.62 のページ画像で (3.18) の証明を確定した結果、
         **教科書の (d)⟹(e) 経由 (`e_χ ∈ Z(𝒪G)` + Thm (3.9)) より短い道**が見えた)。
         `p ∣ |G|`・`blockOfIrr i = B₀`・「`χ_i` が全 `p`-singular 元で 0」から矛盾:
