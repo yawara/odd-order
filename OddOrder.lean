@@ -241,6 +241,8 @@ import OddOrder.GroupTheory.KleinFourNormalComplement
 import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterCount
+import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction

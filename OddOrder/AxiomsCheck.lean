@@ -277,6 +277,8 @@ import OddOrder.GroupTheory.KleinFourNormalComplement
 import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterCount
+import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
@@ -17461,3 +17463,34 @@ Klein 四元群 Sylow-2 を持つ群は単一類になれない ((7.2) が `C = 
 
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.exists_not_isConj_of_mem_center
+
+/-! 🎯 **分解行列 `D` はブロック対角** (`Modular/DecompositionBlockDiagonal`) —
+`d_{χφ} ≠ 0` なら `φ` は `χ` のブロックに入る。`CartanBlockDiagonal` の
+「同じ `χ` に現れる 2 つは中心指標が等しい」を、2 つのブロック分割を結ぶ形へ強めたもの。
+中心は `χ` の束の還元に `λ_χ` で作用する (`asAlgebraHom_reduction_center_eq` =
+`exists_smul_id_asAlgebraHom_reduction` の witness を明示した版) ので、
+`centralCharacterAlg_eq_of_decompositionNumber_ne_zero` からその scalar が `λ_φ` と分かり、
+`eq_blockOfCentralCharacter` で中心指標の一致がブロックの一致になる。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.asAlgebraHom_reduction_center_eq
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockOfIrr_eq_of_decompositionMatrix_ne_zero
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.decompositionMatrix_eq_zero_of_blockOfIrr_ne
+
+/-! 🎯🎯 **Navarro (6.13) の Cartan 行列版**: 正規 `p`-補群 `N` を持つ群では
+`|N| · c_{φ₀φ₀} = |G|`、つまり `B₀` の Cartan 行列は `1 × 1` の `(|G|_p)`
+(`Modular/PrincipalBlockCartanEntry`) — (7.2) が `C_G(t)` に適用してくる形。
+既存の `card_mul_sum_sq_principalBlock` (`Σ_{χ∈Irr(B₀)} χ(1)² = |G|_p`) と同じ主張であることは
+`D` の第 `φ₀` 列を決めれば分かる: ブロック対角性で `Irr(B₀)` の外では 0、
+`Irr(B₀)` の中では `χ⁰` を `1` で展開して `d_{χφ₀} = χ(1)` (他の列は `φ₀` が `B₀` の唯一の
+既約 Brauer 指標ゆえ消え、`φ₀(1) = 1`)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.decompositionMatrix_principalBlock_eq_card
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_mul_cartanMatrix_principalBlock
