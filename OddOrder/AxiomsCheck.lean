@@ -13392,6 +13392,17 @@ characteristic ⟹ 既存の `normal_map_subtype_of_characteristic` で `G` で�
 出す当のもの。 -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.not_hasNormalPComplement_of_oPiCore_eq_bot
 #assert_only_allowed_axioms OddOrder.GroupTheory.not_controlsOwnFusion_of_oPiCore_eq_bot
+/-! Navarro p.139「位数 4 の元は全て `G`-共役」の材料 2 つ。
+`quaternionTwo_conj_eq_self_or_inv` (`decide`) = **`Q₈` は Hamiltonian** (共役は固定か反転) ⟹
+`zpowers_normal_of_quaternionTwo` (全ての巡回部分群が正規) と、`T`-共役類が `{w, w⁻¹}` であること。
+`not_two_dvd_relIndex_sup_centralizer` = `[N_G(T) : T·C_G(T)]` は奇数
+(`T` は `N_G(T)` の Sylow-2 で `[N_G(T):T] ∣ [G:T]`) ⟹ `N_G(T)` の位数 4 巡回部分群 3 つへの
+作用は**奇位数の商**を経由する。`Sym(3)` の奇位数部分群は自明か推移的なので、
+1 つ融合すれば 3 つとも融合する — `Aut(Q₈) ≅ Sym(4)` を作らずに済む route。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.quaternionTwo_conj_eq_self_or_inv
+#assert_only_allowed_axioms OddOrder.GroupTheory.conj_eq_self_or_inv_of_quaternionTwo
+#assert_only_allowed_axioms OddOrder.GroupTheory.zpowers_normal_of_quaternionTwo
+#assert_only_allowed_axioms OddOrder.GroupTheory.not_two_dvd_relIndex_sup_centralizer
 
 /-! ### lean-eval 提出候補の登録 (issue 0050, 2026-07-22).
 

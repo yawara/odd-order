@@ -458,6 +458,71 @@ theorem not_controlsOwnFusion_of_oPiCore_eq_bot (hO : oPiCore {p | p ≠ 2} G = 
   exact fun h => not_hasNormalPComplement_of_oPiCore_eq_bot hO T hTG
     ((OddOrder.Isaacs.Ch05.hasNormalPComplement_iff_controlsOwnFusion T).mpr h)
 
+/-! ### Navarro p. 139: the fusion of the three cyclic subgroups of order `4`
+
+Two ingredients of the "all elements of order `4` are `G`-conjugate" argument.  `Q₈` is
+Hamiltonian, so every subgroup is normal and `T`-conjugacy on elements of order `4` is just
+`w ↦ w^{±1}`; and `N_G(T)` acts on the three cyclic subgroups of order `4` through a quotient of
+**odd** order, because `T·C_G(T)` already acts trivially and contains a Sylow `2`-subgroup of
+`N_G(T)`.  An odd-order subgroup of `Sym(3)` is trivial or transitive — which is why a single
+fusion forces all three to fuse. -/
+
+/-- **`Q₈` is Hamiltonian**: conjugation fixes or inverts every element. -/
+theorem quaternionTwo_conj_eq_self_or_inv :
+    ∀ w g : QuaternionGroup 2, g * w * g⁻¹ = w ∨ g * w * g⁻¹ = w⁻¹ := by decide
+
+/-- The same in a group isomorphic to `Q₈`. -/
+theorem conj_eq_self_or_inv_of_quaternionTwo {P : Type*} [Group P]
+    (e : P ≃* QuaternionGroup 2) (w g : P) : g * w * g⁻¹ = w ∨ g * w * g⁻¹ = w⁻¹ := by
+  rcases quaternionTwo_conj_eq_self_or_inv (e w) (e g) with h | h
+  · exact Or.inl (e.injective (by rw [map_mul, map_mul, map_inv]; exact h))
+  · exact Or.inr (e.injective (by rw [map_mul, map_mul, map_inv, map_inv]; exact h))
+
+/-- **Every cyclic subgroup of a group isomorphic to `Q₈` is normal.** -/
+theorem zpowers_normal_of_quaternionTwo {P : Type*} [Group P] (e : P ≃* QuaternionGroup 2)
+    (w : P) : (Subgroup.zpowers w).Normal := by
+  refine ⟨fun a ha g => ?_⟩
+  obtain ⟨k, rfl⟩ := ha
+  rcases conj_eq_self_or_inv_of_quaternionTwo e w g with h | h
+  · refine ⟨k, ?_⟩
+    calc (w ^ k : P) = (g * w * g⁻¹) ^ k := by rw [h]
+      _ = g * w ^ k * g⁻¹ := by simp [conj_zpow]
+  · refine ⟨-k, ?_⟩
+    calc (w ^ (-k) : P) = (w⁻¹) ^ k := by rw [zpow_neg, ← inv_zpow]
+      _ = (g * w * g⁻¹) ^ k := by rw [h]
+      _ = g * w ^ k * g⁻¹ := by simp [conj_zpow]
+
+/-- **`T·C_G(T)` has odd index in `N_G(T)`**: it contains the Sylow `2`-subgroup `T`, whose index
+in `N_G(T)` divides the odd number `[G : T]`.
+
+This is what makes the action of `N_G(T)` on the three cyclic subgroups of order `4` factor
+through a group of odd order. -/
+theorem not_two_dvd_relIndex_sup_centralizer (T : Sylow 2 G) :
+    ¬ 2 ∣ (((T : Subgroup G) ⊔ Subgroup.centralizer (T : Set G)).relIndex
+      (Subgroup.normalizer (T : Subgroup G))) := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hle1 : (T : Subgroup G) ≤ (T : Subgroup G) ⊔ Subgroup.centralizer (T : Set G) := le_sup_left
+  have hcle : Subgroup.centralizer (T : Set G) ≤ Subgroup.normalizer (T : Subgroup G) := by
+    intro c hc
+    have key : ∀ m : G, m ∈ (T : Subgroup G) → c * m * c⁻¹ = m := by
+      intro m hm
+      rw [← Subgroup.mem_centralizer_iff.mp hc m hm, mul_inv_cancel_right]
+    rw [Subgroup.mem_normalizer_iff]
+    intro n
+    refine ⟨fun hn => by rw [key n hn]; exact hn, fun hn => ?_⟩
+    have hfix := key _ hn
+    have h2 : c * n * c⁻¹ = n := by
+      calc c * n * c⁻¹ = c⁻¹ * (c * (c * n * c⁻¹) * c⁻¹) * c := by group
+        _ = c⁻¹ * (c * n * c⁻¹) * c := by rw [hfix]
+        _ = n := by group
+    rwa [h2] at hn
+  have hle2 : (T : Subgroup G) ⊔ Subgroup.centralizer (T : Set G)
+      ≤ Subgroup.normalizer (T : Subgroup G) := sup_le Subgroup.le_normalizer hcle
+  have hmul := Subgroup.relIndex_mul_relIndex _ _ _ hle1 hle2
+  have hodd : ¬ 2 ∣ (T : Subgroup G).relIndex (Subgroup.normalizer (T : Subgroup G)) := fun h =>
+    T.not_dvd_index (h.trans (Subgroup.relIndex_dvd_index_of_le Subgroup.le_normalizer))
+  exact fun h => hodd (hmul ▸ Dvd.dvd.mul_left h _)
+
 /-- **Navarro pp. 139–146, the character-theoretic core** (issue 9506, `sorry`): when the
 quaternion Sylow `2`-subgroup is proper, its involution lies in a proper normal subgroup.
 
