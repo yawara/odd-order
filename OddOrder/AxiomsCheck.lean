@@ -263,6 +263,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumVanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerFormula
+import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
@@ -17043,3 +17044,17 @@ Külshammer の公式の数え上げ側。 -/
   OddOrder.GroupTheory.pFactorPairsSubgroupEquiv
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.pRegularSubgroupEquiv
+
+/-! 🎯🎯🎯 **`Br_Q(e_{B₀}) = e_{b₀}`** (`Modular/KulshammerThirdMain`) —
+Külshammer 経路の第三主定理: `Q` が `p`-部分群で `g ∈ C_G(Q)` なら
+`e_{B₀}^G(g) = e_{b₀}^{C_G(Q)}(g)`。(6.14) を数え上げの形に直し、
+Problem (6.1) の 2 本の合同で `G` 側と `C_G(Q)` 側を突き合わせる。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_filter_isPRegular
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_of_card_pRegular_mul_eq
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_pRegular_mul_coeff_principalBlock
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.coeff_principalBlock_eq_centralizer
