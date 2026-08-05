@@ -217,6 +217,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.AsModuleSimple
 import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleIsBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderSemisimple
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
@@ -18374,3 +18375,25 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
 
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.not_dvd_card_of_forall_isPRegular
+
+/-! 🎯 **issue 9508 段 H2a/H2b**: `p ∤ |Q|` なら `k[Q]` は分裂半単純
+(`Modular/PPrimeOrderSemisimple`)。Navarro (2.12) (`p'`-群のモジュラー理論 = 通常理論) の出発点。
+
+- `isSemisimpleRing_monoidAlgebra_of_not_dvd_card`: `char k = p ∤ |Q|` ⟹ `|Q|` が `k` で可逆
+  ⟹ mathlib の Maschke (`IsSemisimpleModule k[G] V`) がそのまま効く。
+  ⚠ `BrauerCount` は `Mathlib.RepresentationTheory.Maschke` を推移的に import しないので
+  この leaf で明示 import している (無いと instance が見つからない)。
+- `exists_algEquiv_pi_matrix_of_not_dvd_card`: `J(k[Q]) = ⊥` ⟹ `BrauerCount` の分裂
+  (代数閉 `k`) が**単射**になり `k[Q] ≅ ∏_j M_{d_j}(k)`。ブロック数 = 共役類数
+  (`p'`-群では全元が `p`-正則)。
+- `sum_sq_eq_card_of_not_dvd_card`: `∑_j d_j² = |Q|`。これが段 H2c
+  (`p'`-群の Cartan 行列 = 単位行列) の数え上げの片側。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.isSemisimpleRing_monoidAlgebra_of_not_dvd_card
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_algEquiv_pi_matrix_of_not_dvd_card
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_sq_eq_card_of_not_dvd_card

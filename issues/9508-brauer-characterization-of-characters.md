@@ -238,12 +238,13 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
     `BrauerFromOrdinary` (`a_χ = Σ_τ d_{χτ}[τ,μ₀]⁰`) の係数を `a_χ = d_{χμ₀} ∈ ℕ` に落とす。
 
     **H2 の分解** (repo の既存 stack を使う):
-    - **H2a**: `p ∤ |Q|` ⟹ `k[Q]` は半単純。mathlib の Maschke
-      (`instance : IsSemisimpleRing k[G]`、仮説 `[Finite G] [NeZero (Nat.card G : k)]`) がそのまま。
-      `NeZero (Nat.card Q : k)` は `p ∤ |Q|` と `CharP k p` から。
-    - **H2b**: `k` 代数閉なら `IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed` で
-      分裂 `π : k[Q] ≃ₐ ∏_j M_{n_j}(k)` を**構成**でき、`ker π = ⊥ = J(k[Q])`。
-      ⟹ H2/H3 は分裂データを仮説で受けずに済む (代わりに `[IsAlgClosed (ResidueField 𝒪)]`)。
+    - [x] **H2a/H2b 完了** (2026-08-05, `Modular/PPrimeOrderSemisimple.lean`):
+      `isSemisimpleRing_monoidAlgebra_of_not_dvd_card` (Maschke、mathlib instance がそのまま;
+      ⚠ `BrauerCount` は `Mathlib.RepresentationTheory.Maschke` を推移 import しないので明示 import
+      が要る — 無いと instance が見つからず 3 手戻る) /
+      `jacobson_monoidAlgebra_eq_bot` / `exists_algEquiv_pi_matrix_of_not_dvd_card`
+      (代数閉 `k` で `BrauerCount` の分裂が**単射**になり `k[Q] ≅ ∏_j M_{d_j}(k)`、
+      ブロック数 = 共役類数) / `sum_sq_eq_card_of_not_dvd_card` (`∑_j d_j² = |Q|`)。
       ⚠ BS の具体系 `PadicComplexSystem` の剰余体は `F̄_p` = 代数閉 ✓
       (`SplittingSystem p n = 𝕎(GF(p^φ(n)))` は代数閉でないので、そちらでは使えない)。
     - **H2c**: `C = I`。数え上げで出る:
