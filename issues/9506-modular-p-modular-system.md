@@ -2207,15 +2207,19 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
           支持 = `exists_conj_mem_sylow_of_mul_self_eq_one` (任意の involution は
           Sylow-2 の中へ共役)。⚠ 仮説を「`N_G(P) ≠ C_G(P)`」でなく「奇位数の `g` が在る」
           の形にした (両者の同値性 = `|N_G(P) : C_G(P)|` が奇数、は独立した Sylow の勘定)。
-        - [ ] **⏸ 次 = 残りの群論的組み立て**:
-          (i) 段 181 の仮説「`P` を中心化しない奇位数の `g ∈ N_G(P)` が在る」を
-              「`N_G(P) ≠ C_G(P)`」から導く。**経路案 (2026-08-05)**: `g ∈ N ∖ C` を取り
-              `g = g₂ · g₂'` と分解すると、`P` は `N_G(P)` の唯一の Sylow-2 (正規かつ Sylow)
-              なので 2-元 `g₂ ∈ P ≤ C_G(P)` (P 可換)。ゆえに `g₂' ∉ C` で奇位数。
-              ⟹ `|N:C|` の奇数性の勘定 (relindex/Sylow) を経由せずに済む見込み。
-          (ii) `N_G(P) = C_G(P)` の場合は既存の Burnside
+        - [x] 🎯🎯 **第 1 部 完了 (2026-08-05、段 182)**:
+          `isConj_of_klein_sylow_of_not_centralizes` =「`N_G(P)` が `P` を中心化しない
+          ⟹ involution の類は 1 個」。支持 = `exists_odd_not_centralizes` (証人は奇位数に
+          取り直せる) + `mem_of_isPElement_of_mem_normalizer` (`p`-元が Sylow `p`-部分群を
+          正規化するならその中に入る — mathlib の `IsPGroup.inf_normalizer_sylow` から)。
+          ⚠ **経路案どおり `|N:C|` の奇数性の勘定 (relindex/Sylow 指数) を丸ごと回避できた**。
+        - [ ] **⏸ 次 = (7.2) 残り**:
+          (i) `N_G(P) = C_G(P)` (すなわち `N_G(P) ≤ C_G(P)`) の場合は既存の Burnside
               (`Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer`) で
-              正規 2-補群 ⟹ 類は 3 個。
+              正規 2-補群。「正規 2-補群 ⟹ involution の類は 3 個」の側は未着手。
+          (ii) **第 2 部 (指標側)** = `k(B₀) − l(B₀) = l(b₀) = 1` から
+              `Irr(B₀) = {1_G, χ₁, χ₂, χ₃}`、`χ_i(t) = ε_i = ±1`、`χ_i(1) ≡ ε_i mod 4`、
+              `1 + Σ ε_i χ_i(s) = 0`。部品 (段 100/155/156/172/173/177/178) は揃っている。
         ⚠ (5.12)/(5.13) は Ch.5 なので**文書順で先**。上流優先で (5.13)(b) →
         (5.12) → (7.2) の順に当たる。
         - [x] 🎯🎯 **(5.13)(a) 前半 完了 (2026-08-05、段 173)**:
