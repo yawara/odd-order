@@ -608,6 +608,51 @@ theorem sylowQ8_le_normalizer_zpowers (T : Sylow 2 G) (e : ↥(T : Subgroup G) �
     rw [hk'] at hback
     simpa [mul_assoc] using hback
 
+/-- **Navarro p. 139: the fusing element may be taken in `N_G(T)`.**  If `y, z ∈ T` are
+`G`-conjugate then `T` and `T^g` both normalize `⟨z⟩`, so both are Sylow `2`-subgroups of
+`N_G(⟨z⟩)`; Sylow conjugacy inside `N_G(⟨z⟩)` corrects `g` to an element of `N_G(T)`, which still
+carries `y` into `⟨z⟩`. -/
+theorem exists_mem_normalizer_conj_mem_zpowers (T : Sylow 2 G)
+    (e : ↥(T : Subgroup G) ≃* QuaternionGroup 2)
+    {y z : G} (hyT : y ∈ (T : Subgroup G)) (hzT : z ∈ (T : Subgroup G))
+    {g : G} (hg : g * y * g⁻¹ = z) :
+    ∃ u, u ∈ Subgroup.normalizer (T : Subgroup G) ∧ u * y * u⁻¹ ∈ Subgroup.zpowers z := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  classical
+  have hpow : ∀ k : ℤ, z ^ k = g * y ^ k * g⁻¹ := by
+    intro k; rw [← hg]; simp [conj_zpow]
+  set Hz : Subgroup G := Subgroup.normalizer (Subgroup.zpowers z) with hHz
+  have h1 : (T : Subgroup G) ≤ Hz := sylowQ8_le_normalizer_zpowers T e hzT
+  have hTy : (T : Subgroup G) ≤ Subgroup.normalizer (Subgroup.zpowers y) :=
+    sylowQ8_le_normalizer_zpowers T e hyT
+  have hmove : ∀ s : G, s ∈ (T : Subgroup G) →
+      ∀ n ∈ Subgroup.zpowers z, g * s * g⁻¹ * n * (g * s * g⁻¹)⁻¹ ∈ Subgroup.zpowers z := by
+    intro s hs n hn
+    obtain ⟨k, hk⟩ := hn
+    have hk' : z ^ k = n := hk
+    have hmem : s * y ^ k * s⁻¹ ∈ Subgroup.zpowers y :=
+      (Subgroup.mem_normalizer_iff.mp (hTy hs) (y ^ k)).mp
+        (Subgroup.zpow_mem _ (Subgroup.mem_zpowers y) k)
+    obtain ⟨m, hm⟩ := hmem
+    have hm' : y ^ m = s * y ^ k * s⁻¹ := hm
+    refine ⟨m, ?_⟩
+    change z ^ m = _
+    rw [hpow m, hm', ← hk', hpow k]
+    group
+  have h2 : ((g • T : Sylow 2 G) : Subgroup G) ≤ Hz := by
+    rintro - ⟨s, hs, rfl⟩
+    rw [hHz, Subgroup.mem_normalizer_iff]
+    refine fun n => ⟨fun hn => hmove s hs n hn, fun hn => ?_⟩
+    have hb := hmove s⁻¹ (inv_mem hs) _ hn
+    simpa [mul_assoc] using hb
+  obtain ⟨h, hh⟩ := MulAction.exists_smul_eq ↥Hz ((g • T).subtype h2) (T.subtype h1)
+  simp_rw [Sylow.smul_subtype, Subgroup.smul_def, smul_smul] at hh
+  refine ⟨(h : G) * g, Sylow.smul_eq_iff_mem_normalizer.mp (Sylow.subtype_injective hh), ?_⟩
+  have hrw : (h : G) * g * y * ((h : G) * g)⁻¹ = (h : G) * z * (h : G)⁻¹ := by
+    rw [← hg]; group
+  rw [hrw]
+  exact (Subgroup.mem_normalizer_iff.mp h.2 z).mp (Subgroup.mem_zpowers z)
+
 /-- **Navarro pp. 139–146, the character-theoretic core** (issue 9506, `sorry`): when the
 quaternion Sylow `2`-subgroup is proper, its involution lies in a proper normal subgroup.
 

@@ -13417,6 +13417,12 @@ characteristic ⟹ 既存の `normal_map_subtype_of_characteristic` で `G` で�
 `T ≤ N_G(⟨w⟩)` の形にしたもの。これが「`T` と `T^g` が `N_G(⟨z⟩)` の Sylow-2 ⟹ Sylow 共役で
 `g` を `N_G(T)` に取り直せる」段の入口。 -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.sylowQ8_le_normalizer_zpowers
+/-! `exists_mem_normalizer_conj_mem_zpowers` = Navarro p.139「融合元 `g` は `N_G(T)` に取り直せる」。
+`T` と `T^g` はどちらも `⟨z⟩` を正規化する (前者は `sylowQ8_le_normalizer_zpowers`、後者は
+`z^k = g y^k g⁻¹` と `T ≤ N_G(⟨y⟩)`) ので `N_G(⟨z⟩)` の Sylow-2 になり、そこでの Sylow 共役
+(mathlib `Sylow.subtype` + `MulAction.exists_smul_eq`) が `g` を補正する。
+補正後も `y` は `⟨z⟩` の中へ送られる。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.exists_mem_normalizer_conj_mem_zpowers
 
 /-! ### lean-eval 提出候補の登録 (issue 0050, 2026-07-22).
 
