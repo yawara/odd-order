@@ -384,6 +384,7 @@ import OddOrder.GroupTheory.RepresentationTheory.UnitCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedIndicator
 import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCount
 import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCharacter
+import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetInduction
 import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.GroupTheory.SCN
 import OddOrder.GroupTheory.SemiDihedral

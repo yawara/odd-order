@@ -127,6 +127,7 @@ import OddOrder.GroupTheory.RepresentationTheory.UnitCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedIndicator
 import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCount
 import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCharacter
+import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetInduction
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
@@ -18226,3 +18227,28 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.cosetCharacter_apply_eq_iff
+
+/-! 🎯🎯🎯 **Brauer 指標判定 (issue 9508 段 E 完了) = Gorenstein Lemma 7.6**
+(`RepresentationTheory/PRegularCosetInduction`)。`u` を `p`-正則元、`P` を `u` を中心化する
+`p`-部分群、`H = ⟨u⟩P`、`n = orderOf u` として `ψ = n·1_{uP} : H → K` を取ると:
+- `cosetIndicator_mem_adjoinSpan`: `ψ ∈ ch_R(H)` (`ψ` は線形指標 `λ` のファイバー `λ⁻¹(ζ)` の
+  `n` 倍で、`λ` の冪の `ℤ[ω]`-結合)。
+- `induceFun_cosetIndicator` = **(i)** `ψ*(y) = σ(y)/|P|` は整数。
+- `induceFun_cosetIndicator_eq_zero` = **(ii)** `u` の p-class の外で 0。
+- `induceFun_cosetIndicator_self` = **(iii)** `ψ*(u) = |C_G(u)|/|P| = |C_G(u):P|`
+  (`P` が `C_G(u)` の Sylow `p` なら `p` と素)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.inv_pow_eq_pow_of_pow_eq_one
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.cosetIndicator_mem_adjoinSpan
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.induceFun_cosetIndicator
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.induceFun_cosetIndicator_eq_zero
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.induceFun_cosetIndicator_self
