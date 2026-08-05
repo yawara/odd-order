@@ -8,6 +8,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInverse
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
+import OddOrder.GroupTheory.RepresentationTheory.CharacterOrderFour
 
 /-!
 # Navarro (7.2), character side: `Irr(B_0) = {1_G, χ_1, χ_2, χ_3}` and `χ_i(t) = ±1`
@@ -311,13 +312,14 @@ theorem nontrivial_blockOfIrr_principal
 set_option maxHeartbeats 1000000 in
 -- The integer chosen for each `χ(t)` is threaded through the same modular-datum chain.
 open scoped Classical in
-include hp hx hω hω' e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ ht in
+include hp hx hω hω' e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ in
 /-- **Navarro (7.2), character side.**  `|Irr(B_0)| = 4` and `χ(t) = ±1` for every
 `χ ∈ Irr(B_0)`.
 
 `∑_{χ ∈ Irr(B_0)} χ(t)² = c_{φ_0 φ_0} = 4` with every `χ(t)` a nonzero rational integer, and
 `|Irr(B_0)| ≠ 1` by weak block orthogonality; `OddOrder.Algebra.SumSquaresFour` closes it. -/
 theorem card_blockOfIrr_principal_eq_four_and_character_involution
+    (hy4 : t ^ 4 = 1) (hinv : ∃ c : G, c * t * c⁻¹ = t⁻¹)
     (hconjall : ∀ v : G, IsPElement p v → v ≠ 1 → IsConj t v) (ht1 : t ≠ 1)
     (hweak : (∑ j ∈ Finset.univ.filter
         (fun j => blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG),
@@ -339,15 +341,19 @@ theorem card_blockOfIrr_principal_eq_four_and_character_involution
   -- the integer value of `χ(t)`
   obtain ⟨a, hav⟩ : ∃ a : κ → ℤ,
       ∀ j : κ, (wedderburnRepresentation eG j).character t = ((a j : ℤ) : K) := by
+    have hreal : ∀ j : κ, (wedderburnRepresentation eG j).character t⁻¹
+        = (wedderburnRepresentation eG j).character t := by
+      obtain ⟨c, hc⟩ := hinv
+      exact fun j => by rw [← hc, Representation.char_conj]
     choose a ha using fun j : κ =>
-      exists_intCast_character_of_mul_self_eq_one (wedderburnRepresentation eG j) h2 ht
+      exists_intCast_character_of_pow_four_eq_one (wedderburnRepresentation eG j) h2 hy4 (hreal j)
     exact ⟨a, ha⟩
   -- the sum of squares is `4`, over `ℤ`
   have hsumZ : (∑ j : Subtype P, a (j : κ) ^ 2) = 4 := by
     have hK : (∑ j ∈ Finset.univ.filter P, ((a j : ℤ) : K) ^ 2) = ((4 : ℤ) : K) := by
       rw [Finset.sum_congr rfl fun j _ => by rw [← hav j],
-        sum_sq_character_involution_eq_cartanMatrix hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil
-          hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ ht, hcart]
+        sum_sq_character_eq_cartanMatrix_of_isConj_inv hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil
+          hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hinv, hcart]
       norm_num
     rw [← Finset.sum_subtype (Finset.univ.filter P) hmem (fun j => a j ^ 2)]
     have : (((∑ j ∈ Finset.univ.filter P, a j ^ 2 : ℤ)) : K) = ((4 : ℤ) : K) := by
@@ -630,7 +636,10 @@ theorem exists_character_involution_eq_neg_one
   by_contra hcon
   push Not at hcon
   obtain ⟨hcard, hpm⟩ := card_blockOfIrr_principal_eq_four_and_character_involution hp hx hω e eG
-    hπG hlinG hπ hlin hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ ht hconjall ht1
+    hπG hlinG hπ hlin hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀
+    (by have h2 : t ^ 2 = 1 := by rw [sq]; exact ht
+        rw [show (4 : ℕ) = 2 * 2 from rfl, pow_mul, h2, one_pow])
+    ⟨1, by simpa using (inv_eq_of_mul_eq_one_right ht).symm⟩ hconjall ht1
     hweak hcart
   -- every `χ(t)` is `+1`
   have hall : ∀ j ∈ Finset.univ.filter

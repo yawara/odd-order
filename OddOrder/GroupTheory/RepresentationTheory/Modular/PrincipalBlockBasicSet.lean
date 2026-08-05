@@ -250,7 +250,10 @@ theorem character_involution_mul_self
       = 1 := by
   classical
   obtain ⟨-, hpm⟩ := card_blockOfIrr_principal_eq_four_and_character_involution hp hx hω e eG
-    hπG hlinG hπ hlin hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ ht hconjall ht1
+    hπG hlinG hπ hlin hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀
+    (by have h2 : t ^ 2 = 1 := by rw [sq]; exact ht
+        rw [show (4 : ℕ) = 2 * 2 from rfl, pow_mul, h2, one_pow])
+    ⟨1, by simpa using (inv_eq_of_mul_eq_one_right ht).symm⟩ hconjall ht1
     (sum_character_mul_character_involution_eq_zero hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil
       hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ ht1 (isPRegular_one hp)) hcart
   rcases hpm j hj with h | h <;> rw [h] <;> norm_num
