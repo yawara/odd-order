@@ -17114,3 +17114,12 @@ BS が実際に使う向きで、Okuyama (6.6) / height 理論を通らない。
   OddOrder.RepresentationTheory.Modular.pi_classSum_subgroup_eq_zero_of_notMem_centralizer
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.blockCharacter_eq_of_coeff_eq_on_centralizer
+
+/-! **中間部分群版の突き合わせ** (`Modular/KulshammerThirdMain`) —
+`Q C_G(Q) ≤ H` について `e_{b₀}^H(g) = e_{b₀}^{C_G(Q)}(g)` (`g ∈ C_G(Q)`)。
+第三主定理を `H = C_G(Q)` 固定でなく一般の `H` で出すための第 2 段。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_of_card_pRegular_mul_eq_intermediate
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.coeff_principalBlock_eq_centralizer_intermediate

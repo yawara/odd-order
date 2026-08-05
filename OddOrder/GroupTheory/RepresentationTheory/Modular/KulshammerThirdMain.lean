@@ -55,6 +55,10 @@ so `b^G = B_0` — which makes the left side `λ_{B_0}(e_{B_0}) = 1` — forces 
   `e_{B_0}^G(g) = e_{b_0}^{C_G(Q)}(g)`
 * `OddOrder.RepresentationTheory.Modular.eq_principalBlock_of_inducedBlockOfNormalizer_eq` —
   the converse of the third main theorem for `H = C_G(Q)`, `Q` abelian
+* `OddOrder.RepresentationTheory.Modular.eq_of_card_pRegular_mul_eq_intermediate`,
+  `OddOrder.RepresentationTheory.Modular.coeff_principalBlock_eq_centralizer_intermediate` —
+  the same comparison between `C_G(Q)` and an arbitrary intermediate `Q C_G(Q) ≤ H`, which is
+  what removes the restriction to `H = C_G(Q)`
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -108,6 +112,54 @@ theorem eq_of_card_pRegular_mul_eq (hp : p.Prime) (hQ : IsPGroup p ↥Q)
     (CharP.natCast_eq_natCast k p).mpr hreg
   have hne : (Nat.card (PRegularCarrier p G) : k) ≠ 0 := fun h =>
     not_dvd_card_isPRegular (G := G) hp ((CharP.cast_eq_zero_iff k p _).mp h)
+  refine mul_left_cancel₀ hne ?_
+  rw [ha, hΩk, ← hb, hregk]
+
+/-- **The comparison step run inside an intermediate subgroup** `Q C_G(Q) ≤ H`.
+
+Identical to `eq_of_card_pRegular_mul_eq` with `G` replaced by `H`: the `Q`-action on the
+factorisations with entries in `H` again has the pairs in `C_G(Q)` as fixed points
+(`card_pFactorPairsMem_modEq_centralizer`), and likewise on the `p`-regular elements. -/
+theorem eq_of_card_pRegular_mul_eq_intermediate (hp : p.Prime) (hQ : IsPGroup p ↥Q)
+    {H : Subgroup G} (hQH : Q ≤ H) (hCH : Subgroup.centralizer (Q : Set G) ≤ H)
+    (g : ↥(Subgroup.centralizer (Q : Set G))) {a b : k}
+    (ha : (Nat.card (PRegularCarrier p ↥H) : k) * a
+      = (Nat.card (PFactorPairs p (⟨(g : G), hCH g.2⟩ : ↥H)) : k))
+    (hb : (Nat.card (PRegularCarrier p ↥(Subgroup.centralizer (Q : Set G))) : k) * b
+      = (Nat.card (PFactorPairs p g) : k)) :
+    a = b := by
+  -- `|Ω_H(g)| ≡ |Ω_{C_G(Q)}(g)|`
+  have heqH : Nat.card (PFactorPairs p (⟨(g : G), hCH g.2⟩ : ↥H))
+      = Nat.card {q : PFactorPairs p ((g : G)) //
+          (q : G × G).1 ∈ H ∧ (q : G × G).2 ∈ H} :=
+    Nat.card_congr (pFactorPairsSubgroupEquiv (H := H) p ⟨(g : G), hCH g.2⟩)
+  have heqC : Nat.card (PFactorPairs p g)
+      = Nat.card {q : PFactorPairs p ((g : G)) //
+          (q : G × G).1 ∈ Subgroup.centralizer (Q : Set G) ∧
+            (q : G × G).2 ∈ Subgroup.centralizer (Q : Set G)} :=
+    Nat.card_congr (pFactorPairsSubgroupEquiv (H := Subgroup.centralizer (Q : Set G)) p g)
+  have hΩ : Nat.card (PFactorPairs p (⟨(g : G), hCH g.2⟩ : ↥H))
+      ≡ Nat.card (PFactorPairs p g) [MOD p] := by
+    rw [heqH, heqC]
+    exact card_pFactorPairsMem_modEq_centralizer hp hQ hQH hCH g.2
+  -- `|H⁰| ≡ |C_G(Q)⁰|`
+  have hregH : Nat.card (PRegularCarrier p ↥H)
+      = Nat.card {y : PRegularCarrier p G // (y : G) ∈ H} :=
+    Nat.card_congr (pRegularSubgroupEquiv (H := H) p)
+  have hregC : Nat.card (PRegularCarrier p ↥(Subgroup.centralizer (Q : Set G)))
+      = Nat.card {y : PRegularCarrier p G // (y : G) ∈ Subgroup.centralizer (Q : Set G)} :=
+    Nat.card_congr (pRegularSubgroupEquiv (H := Subgroup.centralizer (Q : Set G)) p)
+  have hreg : Nat.card (PRegularCarrier p ↥H)
+      ≡ Nat.card (PRegularCarrier p ↥(Subgroup.centralizer (Q : Set G))) [MOD p] := by
+    rw [hregH, hregC]
+    exact card_pRegularMem_modEq_centralizer hp hQ hQH hCH
+  have hΩk : (Nat.card (PFactorPairs p (⟨(g : G), hCH g.2⟩ : ↥H)) : k)
+      = (Nat.card (PFactorPairs p g) : k) := (CharP.natCast_eq_natCast k p).mpr hΩ
+  have hregk : (Nat.card (PRegularCarrier p ↥H) : k)
+      = (Nat.card (PRegularCarrier p ↥(Subgroup.centralizer (Q : Set G))) : k) :=
+    (CharP.natCast_eq_natCast k p).mpr hreg
+  have hne : (Nat.card (PRegularCarrier p ↥H) : k) ≠ 0 := fun h =>
+    not_dvd_card_isPRegular (G := ↥H) hp ((CharP.cast_eq_zero_iff k p _).mp h)
   refine mul_left_cancel₀ hne ?_
   rw [ha, hΩk, ← hb, hregk]
 
@@ -280,6 +332,112 @@ theorem coeff_principalBlock_eq_centralizer (hp : p.Prime) (hQ : IsPGroup p ↥Q
       hidemC hfC hBC hweakC hvanishC)
 
 end ThirdMain
+
+/-! ### The same coefficient identity between an intermediate subgroup and `C_G(Q)` -/
+
+section IntermediateCoeff
+
+variable {Q : Subgroup G} {H : Subgroup G}
+variable [Fintype ↥H] [DecidableEq (ConjClasses ↥H)] [Fintype (ConjClasses ↥H)]
+  [Invertible (Nat.card ↥H : K)]
+variable {ι'H : Type*} {mH : ι'H → Type*} [∀ i, Fintype (mH i)] [∀ i, DecidableEq (mH i)]
+  [∀ i, Nonempty (mH i)] [Fintype ι'H]
+variable (eH : MonoidAlgebra K ↥H ≃ₐ[K] ∀ i, Matrix (mH i) (mH i) K)
+variable {ιH : Type*} [Finite ιH] {nnH : ιH → Type*} [∀ j, Fintype (nnH j)]
+  [∀ j, DecidableEq (nnH j)] [∀ j, Nonempty (nnH j)]
+variable {πH : MonoidAlgebra (ResidueField 𝒪) ↥H →+*
+    ∀ j, Matrix (nnH j) (nnH j) (ResidueField 𝒪)}
+  (hπH : Function.Surjective πH)
+  (hlinH : ∀ (c : ResidueField 𝒪) (a : MonoidAlgebra (ResidueField 𝒪) ↥H),
+    πH (c • a) = c • πH a)
+  (hnilH : ∀ z : Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) ↥H),
+    MatrixModule.blockCharacterPi πH hπH hlinH z = 0 → IsNilpotent z)
+variable [Fintype ↥(Subgroup.centralizer (Q : Set G))]
+  [DecidableEq (ConjClasses ↥(Subgroup.centralizer (Q : Set G)))]
+  [Fintype (ConjClasses ↥(Subgroup.centralizer (Q : Set G)))]
+  [Invertible (Nat.card ↥(Subgroup.centralizer (Q : Set G)) : K)]
+variable {ι'C : Type*} {mC : ι'C → Type*} [∀ i, Fintype (mC i)] [∀ i, DecidableEq (mC i)]
+  [∀ i, Nonempty (mC i)] [Fintype ι'C]
+variable (eC : MonoidAlgebra K ↥(Subgroup.centralizer (Q : Set G)) ≃ₐ[K]
+    ∀ i, Matrix (mC i) (mC i) K)
+variable {ιC : Type*} [Finite ιC] {nnC : ιC → Type*} [∀ j, Fintype (nnC j)]
+  [∀ j, DecidableEq (nnC j)] [∀ j, Nonempty (nnC j)]
+variable {πC : MonoidAlgebra (ResidueField 𝒪) ↥(Subgroup.centralizer (Q : Set G)) →+*
+    ∀ j, Matrix (nnC j) (nnC j) (ResidueField 𝒪)}
+  (hπC : Function.Surjective πC)
+  (hlinC : ∀ (c : ResidueField 𝒪)
+    (a : MonoidAlgebra (ResidueField 𝒪) ↥(Subgroup.centralizer (Q : Set G))),
+    πC (c • a) = c • πC a)
+  (hnilC : ∀ z : Subalgebra.center (ResidueField 𝒪)
+      (MonoidAlgebra (ResidueField 𝒪) ↥(Subgroup.centralizer (Q : Set G))),
+    MatrixModule.blockCharacterPi πC hπC hlinC z = 0 → IsNilpotent z)
+
+set_option maxHeartbeats 1600000 in
+-- Two full copies of the splitting data of (6.14), one for `H` and one for `C_G(Q)`; the
+-- ambient `G` only supplies the subgroups, so its own splitting data is not in play.
+omit [DecidableEq (ConjClasses G)] [Invertible (Nat.card G : K)] [Fintype (ConjClasses G)] in
+set_option linter.unusedFintypeInType false in
+open scoped Classical in
+/-- **`e_{b_0}^H(g) = e_{b_0}^{C_G(Q)}(g)`** for `g ∈ C_G(Q)`, when `Q C_G(Q) ≤ H`.
+
+Identical to `coeff_principalBlock_eq_centralizer` with `G` replaced by `H`: Külshammer's formula
+holds in `H` just as in `G` (it involves no subgroup at all), and the two counts it compares are
+again seen by `Q` only through `C_G(Q)` (`eq_of_card_pRegular_mul_eq_intermediate`). -/
+theorem coeff_principalBlock_eq_centralizer_intermediate [Fact p.Prime]
+    (hp : p.Prime) (hQ : IsPGroup p ↥Q) (hQH : Q ≤ H)
+    (hCH : Subgroup.centralizer (Q : Set G) ≤ H)
+    [Fintype (MatrixModule.Block πH hπH hlinH)] [Fintype (MatrixModule.Block πC hπC hlinC)]
+    (SH : Sylow p ↥H) (SC : Sylow p ↥(Subgroup.centralizer (Q : Set G)))
+    (g : ↥(Subgroup.centralizer (Q : Set G)))
+    {FH : MatrixModule.Block πH hπH hlinH → Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 ↥H)}
+    {F'H : MatrixModule.Block πH hπH hlinH →
+      Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) ↥H)}
+    (hidemH : ∀ B, IsIdempotentElem (FH B))
+    (hfH : ∀ B, MonoidAlgebra.mapRingHom ↥H (residue 𝒪) ((FH B : MonoidAlgebra 𝒪 ↥H))
+      = ((F'H B : MonoidAlgebra (ResidueField 𝒪) ↥H)))
+    (hBH : ∀ B, MatrixModule.blockCharacterPi πH hπH hlinH (F'H B) = Pi.single B 1)
+    (hweakH : ∀ B : MatrixModule.Block πH hπH hlinH, ∀ x : ↥(SH : Subgroup ↥H),
+        (x : ↥H) ≠ 1 →
+      ∑ i ∈ Finset.univ.filter (fun i => blockOfIrr eH hπH hlinH hnilH i = B),
+        (wedderburnRepresentation eH i).character (⟨(g : G), hCH g.2⟩ : ↥H)⁻¹
+          * (wedderburnRepresentation eH i).character (x : ↥H) = 0)
+    (hvanishH : ∀ B : MatrixModule.Block πH hπH hlinH,
+      B ≠ principalBlock πH hπH hlinH hnilH →
+      MatrixModule.blockCharacter πH hπH hlinH B
+        ⟨pRegularSum p (ResidueField 𝒪), pRegularSum_mem_center⟩ = 0)
+    {FC : MatrixModule.Block πC hπC hlinC →
+      Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 ↥(Subgroup.centralizer (Q : Set G)))}
+    {FC' : MatrixModule.Block πC hπC hlinC →
+      Subalgebra.center (ResidueField 𝒪)
+        (MonoidAlgebra (ResidueField 𝒪) ↥(Subgroup.centralizer (Q : Set G)))}
+    (hidemC : ∀ B, IsIdempotentElem (FC B))
+    (hfC : ∀ B, MonoidAlgebra.mapRingHom ↥(Subgroup.centralizer (Q : Set G)) (residue 𝒪)
+        ((FC B : MonoidAlgebra 𝒪 ↥(Subgroup.centralizer (Q : Set G))))
+      = ((FC' B : MonoidAlgebra (ResidueField 𝒪) ↥(Subgroup.centralizer (Q : Set G)))))
+    (hBC : ∀ B, MatrixModule.blockCharacterPi πC hπC hlinC (FC' B) = Pi.single B 1)
+    (hweakC : ∀ B : MatrixModule.Block πC hπC hlinC,
+      ∀ x : ↥(SC : Subgroup ↥(Subgroup.centralizer (Q : Set G))),
+        (x : ↥(Subgroup.centralizer (Q : Set G))) ≠ 1 →
+      ∑ i ∈ Finset.univ.filter (fun i => blockOfIrr eC hπC hlinC hnilC i = B),
+        (wedderburnRepresentation eC i).character g⁻¹
+          * (wedderburnRepresentation eC i).character
+              (x : ↥(Subgroup.centralizer (Q : Set G))) = 0)
+    (hvanishC : ∀ B : MatrixModule.Block πC hπC hlinC,
+      B ≠ principalBlock πC hπC hlinC hnilC →
+      MatrixModule.blockCharacter πC hπC hlinC B
+        ⟨pRegularSum p (ResidueField 𝒪), pRegularSum_mem_center⟩ = 0) :
+    ((F'H (principalBlock πH hπH hlinH hnilH) :
+        MonoidAlgebra (ResidueField 𝒪) ↥H)).coeff (⟨(g : G), hCH g.2⟩ : ↥H)
+      = ((FC' (principalBlock πC hπC hlinC hnilC) :
+          MonoidAlgebra (ResidueField 𝒪) ↥(Subgroup.centralizer (Q : Set G)))).coeff g := by
+  classical
+  exact eq_of_card_pRegular_mul_eq_intermediate (k := ResidueField 𝒪) hp hQ hQH hCH g
+    (card_pRegular_mul_coeff_principalBlock eH hπH hlinH hnilH SH ⟨(g : G), hCH g.2⟩
+      hidemH hfH hBH hweakH hvanishH)
+    (card_pRegular_mul_coeff_principalBlock eC hπC hlinC hnilC SC g
+      hidemC hfC hBC hweakC hvanishC)
+
+end IntermediateCoeff
 
 /-! ### The converse of the third main theorem for `H = C_G(Q)` -/
 
