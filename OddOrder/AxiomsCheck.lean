@@ -13416,6 +13416,8 @@ characteristic ⟹ 既存の `normal_map_subtype_of_characteristic` で `G` で�
 /-! `quaternionTwo_card_inversePairs` = **`Q₈` の位数 4 巡回部分群はちょうど 3 個**
 (`{w, w⁻¹}` の対として `decide` で数える)。融合論法の 3 元集合 `Ω` の濃度がこれ。 -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.quaternionTwo_card_inversePairs
+#assert_only_allowed_axioms OddOrder.GroupTheory.image_inversePairs
+#assert_only_allowed_axioms OddOrder.GroupTheory.card_inversePairs_of_quaternionTwo
 /-! `sylowQ8_le_normalizer_zpowers` = 原文「every subgroup of `P` is normal in `P`」を `G` の中で
 `T ≤ N_G(⟨w⟩)` の形にしたもの。これが「`T` と `T^g` が `N_G(⟨z⟩)` の Sylow-2 ⟹ Sylow 共役で
 `g` を `N_G(T)` に取り直せる」段の入口。 -/

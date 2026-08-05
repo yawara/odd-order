@@ -558,6 +558,38 @@ theorem quaternionTwo_card_inversePairs :
     ((Finset.univ.filter fun w : QuaternionGroup 2 => w ^ 2 ≠ 1).image
       fun w => ({w, w⁻¹} : Finset (QuaternionGroup 2))).card = 3 := by decide
 
+/-- **The "inverse pairs" `{w, w⁻¹}` of elements of order `4`.**  For `P ≅ Q₈` these index the
+three cyclic subgroups of order `4`; they are the blocks of the fusion argument, because `P` fuses
+`w` exactly with `w⁻¹` (`conj_eq_iff_of_quaternionTwo`).
+
+They are represented as a `Finset (Finset P)` rather than as a set of subgroups, because the
+former is decidable and the cardinality `3` can then be checked by `decide`. -/
+def inversePairs (P : Type*) [Group P] [Fintype P] [DecidableEq P] : Finset (Finset P) :=
+  (Finset.univ.filter fun w : P => w ^ 2 ≠ 1).image fun w => ({w, w⁻¹} : Finset P)
+
+/-- Inverse pairs transport along an isomorphism. -/
+theorem image_inversePairs {P Q : Type*} [Group P] [Fintype P] [DecidableEq P] [Group Q]
+    [Fintype Q] [DecidableEq Q] (e : P ≃* Q) :
+    (inversePairs P).image (Finset.image e) = inversePairs Q := by
+  ext S
+  simp only [inversePairs, Finset.mem_image, Finset.mem_filter, Finset.mem_univ, true_and]
+  constructor
+  · rintro ⟨-, ⟨w, hw, rfl⟩, rfl⟩
+    refine ⟨e w, fun hc => hw (e.injective (by rw [map_pow, hc, map_one])), ?_⟩
+    simp [Finset.image_insert, Finset.image_singleton]
+  · rintro ⟨v, hv, rfl⟩
+    refine ⟨{e.symm v, (e.symm v)⁻¹}, ⟨e.symm v, fun hc => hv ?_, rfl⟩, ?_⟩
+    · rw [← e.apply_symm_apply v, ← map_pow, hc, map_one]
+    · simp [Finset.image_insert, Finset.image_singleton]
+
+/-- **`P ≅ Q₈` has exactly three inverse pairs of elements of order `4`.** -/
+theorem card_inversePairs_of_quaternionTwo {P : Type*} [Group P] [Fintype P] [DecidableEq P]
+    (e : P ≃* QuaternionGroup 2) : (inversePairs P).card = 3 := by
+  have hinj : Function.Injective (Finset.image (e : P → QuaternionGroup 2)) :=
+    Finset.image_injective e.injective
+  rw [← Finset.card_image_of_injective _ hinj, image_inversePairs e]
+  exact quaternionTwo_card_inversePairs
+
 /-- **`T·C_G(T)` has odd index in `N_G(T)`**: it contains the Sylow `2`-subgroup `T`, whose index
 in `N_G(T)` divides the odd number `[G : T]`.
 
