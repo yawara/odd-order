@@ -46,7 +46,7 @@ variable {G K : Type*} [Group G] [Fintype G] [Field K] [CharZero K]
 `|G|` lies in `v_R(G)`. -/
 theorem mem_adjoinSpan_inducedVirtualCharacters_of_card_dvd (h𝒳 : IsElementaryFamily 𝒳)
     (hN : N ≠ 0) (hgN : ∀ g : G, g ^ N = 1) (hω : IsPrimitiveRoot ω N) {θ : G → K}
-    (hclass : ∀ y w : G, θ (w * y * w⁻¹) = θ y)
+    (hclass : ∀ y z : G, IsConj y z → θ y = θ z)
     (hdvd : ∀ y : G, ∃ d : ℤ, θ y = (d : K) * (Nat.card G : K)) :
     θ ∈ adjoinSpan ω (inducedVirtualCharacters K 𝒳) := by
   classical
@@ -98,8 +98,7 @@ theorem mem_adjoinSpan_inducedVirtualCharacters_of_card_dvd (h𝒳 : IsElementar
     have hχ : χ C₀ y = (Nat.card ↥(Subgroup.centralizer ({C₀.out} : Set G)) : K) := by
       rw [hcf C₀ y C₀.out hIsConj, hself C₀, Subgroup.card_bot, Nat.div_one]
     have hθ : θ y = (d C₀.out : K) * (Nat.card G : K) := by
-      obtain ⟨w, hw⟩ := isConj_iff.mp hIsConj
-      rw [← hclass y w, hw, hd C₀.out]
+      rw [hclass y C₀.out hIsConj, hd C₀.out]
     rw [hcollapse, Pi.smul_apply, hχ, zsmul_eq_mul, hθ, hc,
       ← Subgroup.card_mul_index (Subgroup.centralizer ({C₀.out} : Set G))]
     push_cast

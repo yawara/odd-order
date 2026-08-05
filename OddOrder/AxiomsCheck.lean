@@ -18319,3 +18319,39 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_congr_one_mod_prime
+
+/-! 🎯🎯🎯 **Brauer's characterization of characters (Brauer–Tate) 完成 — issue 9508 段 F/G**
+(`Modular/BrauerInductionTheorem`)。
+
+**Lemma 7.9** `zsmul_one_mem_inducedVirtualCharacters`: `|G| = m p^a` (`p ∤ m`) ⟹
+`m·1_G ∈ v(G)`。段 7.8 の `χ` を `p^a` 乗して `ζ ≡ 1 (mod p^a)` を作り (`v_R(G)` が `ch_R(G)` の
+イデアル = `mul_mem_adjoinSpan_inducedVirtualCharacters`、mathlib `dvd_sub_pow_of_dvd_sub`)、
+`m(1_G − ζ)` の値が `m p^a = |G|` で割れるので **Lemma 7.7**、最後に**段 C の Lemma 7.4** で降下。
+
+**Lemma 7.10** `inducedVirtualCharacters_eq_virtualCharacters`: `v(G) = ch(G)`。
+`{k : ℤ | k·1_G ∈ v(G)}` は ℤ のイデアルで、全素数 `q` の `ordCompl[q] |G|` を含む
+(`one_mem_inducedVirtualCharacters`)。その gcd は 1 — 共通素因数 `q` があれば
+`q ∣ ordCompl[q] |G|` となって矛盾。`insert 2 (primeFactors |G|)` を使うと `|G| = 1` も一様に落ちる。
+
+**Theorem 7.1** `mem_inducedVirtualCharacters_of_restrict`: 類関数 `θ` の `𝒳` の各元への制限が
+仮想指標なら `θ ∈ v(G)`。`θ = 1_G · θ` に**段 B の Lemma 7.2** (projection formula) を当てる
+(`mul_mem_inducedVirtualCharacters_of_restrict`)。
+⚠ `θ` の類関数性は落とせない — projection formula がそれを要求する。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.mul_mem_adjoinSpan_inducedVirtualCharacters
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.zsmul_one_mem_inducedVirtualCharacters
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.one_mem_inducedVirtualCharacters
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.inducedVirtualCharacters_eq_virtualCharacters
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.mul_mem_inducedVirtualCharacters_of_restrict
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.mem_inducedVirtualCharacters_of_restrict
