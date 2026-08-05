@@ -2057,18 +2057,39 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
             `k(G) = Σ_{[x] : p-元類} #cl(C_G(x)⁰)`。`p`-部分の類が `[x]` の `G`-類は
             `C_G(x)` の `p`-正則類と全単射 (`pSectionClassEquiv`)。`p`-元類の代表は選ばず
             `pPartClass` のファイバーで分割する。⟹ 一般化分解行列 `J` が正方の片側。
-          - [ ] **⏸ 第二段 = `J` の組み立てと正則性**。⚠ **設計上の障害 (2026-08-05 判明)**:
-            `J` を全 `p`-元類にわたって組むには、**各中心化群の分裂データ**
-            (`ι`, `nn`, `π`, `hπ`, `hlin`, `hkerJ`, `ω`, `ω'`, `ι'`, `m`, `e`) を
-            **添字づけられた族**として持つ必要がある。repo には現在そのような
-            **束ね構造 (structure) が無い** (`Modular/*.lean` に `structure` は
-            `IsPModularSystem` のみ)。⟹ `ModularSplitting p 𝒪 K H` 相当の structure を
-            新設するのが次の一手 (universe 引数付き、~20 フィールド)。
-            その上で: `J̄ᵗ J = diag(Cartan)` (段 172/173 から) ⟹ `J` 正則、
-            (5.8) でブロック対角、各対角ブロックが正方 ⟹ (5.12)。
-            **正方性の線型代数**は `Aᵗ A` が正則なら `#col ≤ #row` (rank 論法) を各ブロックに
-            適用し、総和が一致することから等号を出すのが最短
-            (「正則なブロック対角行列の各ブロックは正方」を直接やるより軽い)。
+          - [x] 🎯🎯 **第二段 完了 (2026-08-05、段 175-176)**。
+            **⚠ 前回書いた「束ね structure が必要」という設計判断は誤りだった** —
+            族は素の `variable` (依存型の族 `ι : PElementClass p G → Type*` 等) で足りる。
+            さらに **Navarro の経路 (`J̄ᵗ J = diag(Cartan)` = (5.13) 経由) を採らない方が短い**:
+            * `Modular/GeneralizedDecompositionMatrix` (新 leaf):
+              `generalizedDecompositionMatrix` = `J` (行 `Irr(G)`、列 `(D, μ)`) /
+              `sectionCharacterMatrix` = `E`, `E_{χ,(D,n)} = χ(x_D z_{D,n})` /
+              🎯 `sectionCharacterMatrix_eq_mul_blockDiagonal` = **`E = J·diag(B)`**
+              (中身は (5.1) の定義式を行列の言葉に直しただけ) /
+              `sectionClassIndexEquiv` (段 174 を `IBr` の添字づけへ移送) /
+              `sectionCharacterMatrix_submatrix` (`E` は列を並べ替えると **`G` の通常指標表**) /
+              🎯🎯 `isUnit_det_generalizedDecompositionMatrix` = **`J` は正則**。
+              ⟹ **(5.13) も `x⁻¹` 側の数も使わない**。
+              ⚠ mathlib に `Matrix.det_blockDiagonal'` (可変サイズ版) が無いので
+              ブロックごとの逆行列を明示する。
+            * `Algebra/BlockPartitionedMatrix` (新設、純線型代数):
+              🎯 `card_eq_card_of_det_ne_zero` = 「行を `f`、列を `g` で分割し対角ブロック外が
+              0 の正方行列の行列式が非零なら各ブロックの大きさは一致」。
+              ⚠ **rank 論法でなく Leibniz 展開** — 非零行列式から `M (σ j) j ≠ 0` を全 `j` で
+              満たす置換 `σ` が取れ、その `σ` が 2 つの分割を突き合わせる。前回書いた
+              「rank 論法が最短」より短く、`Aᵗ A` も (5.13) も要らない。
+          - [ ] **⏸ 第三段 = ブロック対角性 ((5.8)) を上の線型代数に食わせる**。
+            必要なのは
+            `f : ι' → Block πG`, `f i = blockOfIrr eG hπG hlinG hnilG i` と
+            `g : (Σ D, ι D) → Block πG`, `g ⟨D,μ⟩ = inducedBlockOfCentralizer (bl μ)` に対し
+            `f i ≠ g c → J i c = 0`。
+            ⚠ **調査事項 (2026-08-05 時点)**: (5.8) の repo 版
+            `generalizedDecompositionNumber_eq_zero_of_inducedBlockOfCentralizer_ne`
+            (`Modular/SecondMainBlockForm.lean:197`) は**表現 `σ` と束 `L` の言葉**で
+            述べられており、`blockOfIrr` (= Wedderburn 束表現での特殊化) 版の系がまだ無い。
+            また列側の「`μ` を含むブロック」を与える写像 (`ι D → Block (π D)`) が
+            repo にあるか未確認 (`blockOfBrauer` 相当を grep すること)。
+            この 2 つを繋げば `card_eq_card_of_det_ne_zero` の適用で (5.12) が出る。
         * **(5.13)(b)** 一般化分解数の直交性 — ✅ **完了 (段 172)**。
           **⚠ 設計上の懸案は解決 (2026-08-05)**: 原文 (p.107 のページ画像で確定) は
           `Σ_{χ∈Irr(G)} conj(d^x_{χμ}) d^x_{χφ} = c_{μφ}` と**複素共役**で書くが、
