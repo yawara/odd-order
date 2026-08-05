@@ -287,6 +287,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositio
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
 import OddOrder.Algebra.SumSquaresFour
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolution
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockBasicSet
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
@@ -17778,3 +17779,49 @@ Navarro Lemma (3.16) の `K` 版。係数は `a_χ = Σ_τ d_{χτ} [τ, μ₀]�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_ordinaryCombination_block_eq_irreducibleBrauerCharacter
+
+/-! 🎯 **単一の符号関係から basic set が出る** (`Modular/PrincipalBlockBasicSet`) —
+`{c_i}_{i∈S}` の関係が `Σ_{i∈S} ε_i c_i = 0` (`ε_i² = 1`) 1 本だけなら、添字 `j₀` を 1 つ落とした
+`𝓑 = {ε_j c_j : j ≠ j₀}` が基底になり、分解行列は
+`(D_𝓑)_{ij} = δ_{ij} ε_j − δ_{i j₀} ε_{j₀}` (単位行列に `i = j₀` の行 `(−ε_{j₀},…)` を縁付けた形)。
+Gram 行列は `C_𝓑 = D_𝓑ᵗD_𝓑 = 1 + δ` (対角 2・非対角 1)。純代数で、モジュラーの語彙を使わない。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_signRelationRow_mul
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_mul_signRelationRow
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_signRelationRow_mul_signRelationRow
+
+/-! 🎯🎯 **Navarro (7.4): `𝓑 = {ε_j χ_j⁰ : j ≠ j₀}` は `B₀` の basic set**
+(`Modular/PrincipalBlockBasicSet`)。(7.2) の `Irr(B₀) = {χ_0,…,χ_3}`, `χ_i(t) = ε_i = ±1` と
+唯一の関係 `Σ_i ε_i χ_i⁰ = 0` (段 195) に上の純代数を当てる:
+ - `χ_i⁰ = Σ_j (D_𝓑)_{ij} η_j` (`η_j = ε_j χ_j⁰`);
+ - (7.3) の変換行列 `U` は段 206 の係数から `u_{μj} = a_{μj} ε_j − a_{μj₀} ε_{j₀}` と書け、
+   実際に `φ_μ = Σ_j u_{μj} η_j` (`μ ∈ IBr(B₀)`, `g` は p-正則);
+ - `D_𝓑 = D_B U` (両辺が `χ_i⁰` の 𝓑-座標で、𝓑 は `G⁰` 上独立 = 段 202);
+ - ⟹ **`C_𝓑 = UᵗCU = 1 + δ`**。これが (7.5)(c) と噛み合う形。
+⚠ `U` は `K` 値 (整数性 = Navarro (3.16) 本体は未証明)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.character_involution_mul_self
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.character_eq_sum_signRelationRow_mul_principalBasicSet
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.principalBasicSetMatrix_eq_zero_of_ne_principalBlock
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_principalBasicSetMatrix_mul_principalBasicSet
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_decompositionMatrix_mul_principalBasicSetMatrix_eq_zero
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_decompositionMatrix_mul_principalBasicSetMatrix
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_principalBasicSetMatrix_mul_cartanMatrix
