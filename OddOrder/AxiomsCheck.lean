@@ -174,6 +174,7 @@ import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10C
 import OddOrder.GroupTheory.PRegularElement
 import OddOrder.GroupTheory.PRegularQuotient
 import OddOrder.GroupTheory.CosetInvariantCard
+import OddOrder.GroupTheory.PRegularCosetSubgroup
 import OddOrder.GroupTheory.PRegularElementCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.RootsOfUnityLift
@@ -18252,3 +18253,15 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.induceFun_cosetIndicator_self
+
+/-! 🎯 **Brauer 指標判定 (issue 9508 段 F 準備)**: 部分群 `⟨u⟩P`
+(`GroupTheory/PRegularCosetSubgroup`)。`P` が `u` を中心化するので積集合が既に部分群になり
+(`pRegularProd`; 有限性を要さないよう **ℤ 冪**で定義)、位数が互いに素なので分解 `h = u^a v` が
+一意で `|⟨u⟩P| = orderOf u · |P|` (`card_pRegularProd`)。
+これが `PRegularCosetInduction` の仮説 `hgen` / `hcard` を構成的に供給する。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.mem_pRegularProd_nat
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.card_pRegularProd
