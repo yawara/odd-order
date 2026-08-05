@@ -766,6 +766,36 @@ theorem exists_smul_eq_of_mem_inversePairs (T : Sylow 2 G)
     fun h => not_two_dvd_relIndex_normalizer T (h.trans (Subgroup.index_dvd_of_le hstab))
   exact orbit_eq_of_odd_of_subset_card_three hodd (card_inversePairs_of_quaternionTwo e) hsub hmove
 
+/-- **Navarro p. 139: two elements of order `4` in `T` that fuse in `G` but not in `T`.**
+Unfolding the failure of fusion control (`not_controlsOwnFusion_of_oPiCore_eq_bot`); the two
+elements must have order `4` because `Q₈` has a *unique* involution, so involutions cannot fuse
+nontrivially. -/
+theorem exists_orderFour_fused (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 2 G)
+    (e : ↥(T : Subgroup G) ≃* QuaternionGroup 2) (hTG : (T : Subgroup G) ≠ ⊤) :
+    ∃ x y : G, ∃ _ : x ∈ (T : Subgroup G), ∃ _ : y ∈ (T : Subgroup G), x ^ 2 ≠ 1 ∧
+      (∃ g : G, g * x * g⁻¹ = y) ∧ ∀ u ∈ (T : Subgroup G), u * x * u⁻¹ ≠ y := by
+  have hnc := not_controlsOwnFusion_of_oPiCore_eq_bot hO T hTG
+  rw [Sylow.ControlsOwnFusion, Subgroup.ControlsFusionIn] at hnc
+  push Not at hnc
+  obtain ⟨x, y, hx, hy, ⟨g, hg⟩, hno⟩ := hnc
+  refine ⟨x, y, hx, hy, ?_, ⟨g, hg⟩, fun u hu h => hno u hu h⟩
+  intro hx2
+  -- an involution (or the identity) of `Q₈` is fixed by every conjugation
+  have hy2 : y ^ 2 = 1 := by
+    rw [← hg, show g * x * g⁻¹ = MulAut.conj g x from rfl, ← map_pow, hx2, map_one]
+  have hxy : x = y := by
+    rcases eq_or_ne x 1 with rfl | hx1
+    · rw [← hg]; group
+    · have hy1 : y ≠ 1 := by
+        rw [← hg]
+        exact fun h => hx1 ((MulAut.conj g).injective (h.trans (map_one (MulAut.conj g)).symm))
+      have := eq_of_sq_eq_one_of_quaternionTwo e (a := (⟨x, hx⟩ : ↥(T : Subgroup G)))
+        (b := ⟨y, hy⟩) (Subtype.ext (by push_cast; exact hx2))
+        (fun h => hx1 (congrArg Subtype.val h)) (Subtype.ext (by push_cast; exact hy2))
+        (fun h => hy1 (congrArg Subtype.val h))
+      exact congrArg Subtype.val this
+  exact hno 1 (Subgroup.one_mem _) (by rw [hxy]; group)
+
 /-- **Navarro pp. 139–146, the character-theoretic core** (issue 9506, `sorry`): when the
 quaternion Sylow `2`-subgroup is proper, its involution lies in a proper normal subgroup.
 
