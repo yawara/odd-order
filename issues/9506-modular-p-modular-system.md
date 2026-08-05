@@ -2087,28 +2087,51 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               (`|C_G(x)| • Σ_{u∈S(x)} f = |G| • Σ_{y∈C⁰} f(xy)`, `f` 類関数)
             * 段 168 `card_centralizerOf_smul_sum_sectionProjectiveCharacter` (内積の前半)
             * 段 169 `centralizerOf_inv` (`C_G(x⁻¹) = C_G(x)`)
-          - [ ] **⏸ 次 = 内積計算の後半** `[Φ^x_μ, χ] = d^{x⁻¹}_{χμ}`。
-            残りは `χ((xy)⁻¹) = χ(x⁻¹y⁻¹) = Σ_τ d^{x⁻¹}_{χτ} τ(y⁻¹)` ((5.1) を `x⁻¹` で)
-            を代入し (2.13) `pairingZero_projectiveIndecomposableCharacter` で潰す段。
-            ⚠⚠ **未解決の技術的障害**: (5.1) を `x⁻¹` で使うと `C_G(x)` 側のデータ
-            (`π`, `e`, `ω`, …) が **`↥(centralizerOf x⁻¹)` 上**で要求される。段 169 で
-            部分群としては等しい (`centralizerOf_inv`) が**型としては別**なので移送が要る。
-            **⟹ 解決済 (2026-08-05、定式化)**: `x⁻¹` 側の分裂データを一切持ち込まず、
-            **`d : ι → K` を引数で受け、その特徴づけを `C_G(x)` の中だけで書く**:
-            `hd : ∀ y ∈ C_G(x)⁰, Σ_τ d τ · μ_τ(y⁻¹) = χ((xy)⁻¹)`。
-            これは `d^{x⁻¹}` の定義 `χ(x⁻¹z) = Σ_τ d_τ μ_τ(z)` を `z = y⁻¹` で読んだもので
-            (`C_G(x⁻¹) = C_G(x)` = 段 169)、`y⁻¹` は部分群の中の逆元なので**型が 1 つで済む**。
-            ⚠ (b) 単独は不可 — `pairingZero a b` は `a b` が同じ群上でないと型が付かない。
-            **⏸ 実装は未完 (2026-08-05)**: statement は上で確定し証明の筋も通ったが、
-            **`Finset.filter` の `Decidable` インスタンス不一致**で `rw` が刺さらない
-            (`pairingZero` の定義内の filter / 段 168 の statement 内の filter / 証明中で
-            自分が書いた filter が、表示は同じでもインスタンスが違う)。
-            次の一手 = filter を自分で書かず、`pairingZero` と段 168 の**両 statement から
-            前向きに**式を組む (あるいは `Finset.filter_congr_decidable` で正規化する)。
-            旧選択肢: (a) `centralizerOf_inv ▸` で移送 — 上の定式化で不要になった。
-            ⚠ (c) の素朴な案 (`χ̌(g) := χ(g⁻¹)` を `x` 側で展開) は**不可** —
-            `Σ_τ d^x_{χ̌τ} τ(y)` となり `pairingZero` の `b(y⁻¹)` と噛み合わない
-            (`pairingZero a b = (|C|)⁻¹ Σ_{y∈C⁰} a(y)·b(y⁻¹)`)。実測 (2026-08-05): (5.1) `generalizedDecompositionNumber` /
+          - [x] 🎯🎯 **内積計算の後半 完了 (2026-08-05、段 170)**
+            `inner_sectionProjectiveCharacter_eq` = `[Φ^x_μ, χ] = d^{x⁻¹}_{χμ}`。
+            `x⁻¹` 側の分裂データを一切持ち込まず、**`d : ι → K` を引数で受け、その
+            特徴づけを `C_G(x)` の中だけで書く**: `hd : ∀ y ∈ C_G(x)⁰,
+            Σ_τ d τ · μ_τ(y⁻¹) = χ((xy)⁻¹)`。これは `d^{x⁻¹}` の定義
+            `χ(x⁻¹z) = Σ_τ d_τ μ_τ(z)` を `z = y⁻¹` で読んだもので
+            (`C_G(x⁻¹) = C_G(x)` = 段 169)、`y⁻¹` は部分群の中の逆元なので型が 1 つで済む。
+            ✅ **前 session の `Finset.filter` `Decidable` インスタンス障害の解法**:
+            filter を自分で書いて `rw` しようとするのが誤り。**`pairingZero` 側の filter と
+            段 168 側の filter を `Finset.sum_congr` + `Finset.ext` + `isPRegular_coe_iff` で
+            一度だけ橋渡し**すればよい ([[lean-instance-defeq-traps]] に近い罠)。
+          - [x] 🎯 **段 171 (refactor)**: 上の中核を `CartanInverse` の
+            `sum_projectiveIndecomposableCharacter_mul_eq` に括り出した —
+            「`p`-正則類上で `F(y) = Σ_τ d_τ τ(y⁻¹)` と展開される任意の `F`」について
+            `Σ_{y∈G⁰} Φ_μ(y) F(y) = |G| d_μ`。⚠ **和の範囲を `Finset.filter` でなく
+            `p`-正則性で特徴づけられた抽象 `Finset s` で受ける** ので、呼び出し側が
+            `pairingZero` の `Decidable` インスタンスに合わせる必要が消える。
+            以降 (5.13) の全ステップがこの 1 本で書ける。
+          - [x] 🎯🎯🎯 **(5.13)(b) 完了 (2026-08-05、段 172、新 leaf
+            `Modular/GeneralizedDecompositionOrthogonality.lean`)**:
+            `sum_mul_generalizedDecompositionNumber_eq_cartanMatrix` =
+            **`Σ_{χ∈Irr(G)} d^{x⁻¹}_{χμ} · d^x_{χφ} = c_{μφ}`**。
+            `x⁻¹` 側の数は `C_G(x)` の中で書いた定義式を満たす族 `dinv` として受け取る
+            (移送ゼロ)。**教科書と違い `Φ^{x⁻¹}_φ` を作らない**経路:
+            * 両方の一般化分解数を段 171 で `C_G(x)⁰` 上の和に直す
+              (🎯 `card_centralizerOf_mul_generalizedDecompositionNumber` =
+              `|C_G(x)| d^x_{χφ} = Σ_{z∈C⁰} Φ_φ(z) χ(x z⁻¹)`)
+            * 生じた二重和を `G` の**第二直交関係** `sum_character_inv_mul_character`
+              (`Modular/OrdinaryColumnOrthogonality`、既存) で潰す
+            * 🎯🎯 `sum_character_mul_generalizedDecompositionNumber` =
+              `Σ_χ χ((xy)⁻¹) d^x_{χφ} = Φ_φ(y⁻¹)` (= `Φ^{x⁻¹}_φ` の section 上の値を
+              その関数を作らずに計算したもの)
+            * 重み `|C_G(xy)| = |C_{C_G(x)}(y)|` が `y⁻¹` の `C_G(x)`-類の大きさを
+              `|C_G(x)|` に対して打ち消す (🎯 `PSection` の
+              `card_centralizerOf_mul_eq_card_centralizer_subtype` = **段 164
+              `C_G(xy) = C_G(x) ⊓ C_G(y)` の初めての消費点**; 段 164 の「未使用」注記は解消)
+            支持: `OrdinaryColumnOrthogonality` に `sum_eq_card_smul_of_forall_isConj` /
+            `card_mul_card_centralizer_of_forall_isConj` (共役で切り出した `Finset` での
+            類の勘定) を新設。
+            ⚠ **`Finset` を `set` で置くと `Finset.sum_filter` が let-値を透かして
+            誤爆する** — 抽象化したい `Finset` は `obtain ⟨s, hs⟩ : ∃ s, ∀ z, z ∈ s ↔ P z`
+            で不透明に取る。
+            ⚠ `IsConj` は `def` なので `rw` 後に `∃ c, SemiconjBy …` へ展開されることがあり、
+            `h.inv'` / `h.symm` のドット記法が壊れる → `IsConj.inv' h` と明示する。
+          実測 (2026-08-05): (5.1) `generalizedDecompositionNumber` /
           (5.2) `generalizedDecompositionNumber_eq_zero` / (5.8)
           `..._sum_generalizedDecompositionNumber_inducedBlockOfCentralizer` は**既存**
           (`Modular/GeneralizedDecomposition.lean`, `SecondMainTheorem.lean`,
@@ -2117,6 +2140,8 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         * involution に付く一般化分解数が**有理整数**であること
         ⚠ (5.12)/(5.13) は Ch.5 なので**文書順で先**。上流優先で (5.13)(b) →
         (5.12) → (7.2) の順に当たる。
+        **⏸ 次の一手 = (5.12)** (`k(B) = Σ_i Σ_{b ∈ Bl(C_G(x_i)), b^G = B} l(b)`)。
+        (5.13)(b) は 2026-08-05 に完了 (段 172)。
   - [ ] (旧) 次の一手の詳細 (2026-08-05 に確定した経路、実装済):
         (2026-08-05 に原文 p.62 のページ画像で (3.18) の証明を確定した結果、
         **教科書の (d)⟹(e) 経由 (`e_χ ∈ Z(𝒪G)` + Thm (3.9)) より短い道**が見えた)。
