@@ -264,6 +264,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerFormula
 import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
+import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
@@ -17068,3 +17069,10 @@ BS が実際に使う向きで、Okuyama (6.6) / height 理論を通らない。
   OddOrder.RepresentationTheory.Modular.brauerTrunc_eq_of_coeff_eq
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.eq_principalBlock_of_inducedBlockOfNormalizer_eq
+
+/-! **Navarro (3.18) (b) ⟹ (c)** (`Modular/DefectZeroDegree`) —
+`p`-singular元で消える指標は次数が `|G|_p` で割れる。Sylow `S` 上の指標和が
+`χ(1)` に潰れ、他方 `|S|·dim V^S` に等しい。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.ordProj_dvd_finrank_of_character_eq_zero
