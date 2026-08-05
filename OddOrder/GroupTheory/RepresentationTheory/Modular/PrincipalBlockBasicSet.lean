@@ -488,12 +488,20 @@ set_option maxHeartbeats 1000000 in
 -- Both the `(7.2)` independence statement and the `G`-side datum carry their full chains.
 set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
+-- `DecidableEq ιG` is unused here but omitting it would stop the `K`-valued instance below from
+-- applying this statement.
+set_option linter.unusedSectionVars false in
 open scoped Classical in
 include hp hx hω hω' e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ ht in
 /-- **`D_𝓑 = D_B U`.**  Both `∑_μ d_{iμ} u_{μ·}` and `(D_𝓑)_{i·}` express `χ_i⁰` in the basic set,
 and the basic set is independent on `G⁰` (`eq_zero_of_vanishing_on_pRegular_of_apply_eq_zero`), so
 the two coordinate vectors agree. -/
-theorem sum_decompositionMatrix_mul_principalBasicSetMatrix
+theorem sum_decompositionMatrix_mul_basicSetMatrixOf {coef : ιG → κ → K}
+    (hasum : ∀ (ν : ιG) {y : G}, IsPRegular p y →
+      (∑ l ∈ Finset.univ.filter (fun l => blockOfIrr eG hπG hlinG hnilG l
+          = Quotient.mk (blockSetoid πG hπG hlinG) ν),
+        coef ν l * algebraMap 𝒪 K (ordinaryCharacter (𝒪 := 𝒪) eG l y))
+        = algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) πG ν y))
     (hconjall : ∀ v : G, IsPElement p v → v ≠ 1 → IsConj t v) (ht1 : t ≠ 1)
     (hcart : cartanMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e φ₀ φ₀ = 4)
     {j₀ : κ} (hj₀ : blockOfIrr eG hπG hlinG hnilG j₀ = principalBlock πG hπG hlinG hnilG)
@@ -501,7 +509,7 @@ theorem sum_decompositionMatrix_mul_principalBasicSetMatrix
     {j : κ} (hjB : blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG)
     (hjne : j ≠ j₀) :
     (∑ μ : ιG, (decompositionMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG i μ : K)
-        * principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ j)
+        * basicSetMatrixOf eG coef t j₀ μ j)
       = signRelationRow (fun l => (wedderburnRepresentation eG l).character t) j₀ i j := by
   classical
   set Sirr : Finset κ := Finset.univ.filter
@@ -515,7 +523,7 @@ theorem sum_decompositionMatrix_mul_principalBasicSetMatrix
   set a : κ → K := fun l =>
     if l ∈ Sirr.erase j₀ then
       ((∑ μ : ιG, (decompositionMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG i μ : K)
-            * principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ l)
+            * basicSetMatrixOf eG coef t j₀ μ l)
           - signRelationRow (fun l => (wedderburnRepresentation eG l).character t) j₀ i l)
         * (wedderburnRepresentation eG l).character t
     else 0 with hadef
@@ -529,7 +537,7 @@ theorem sum_decompositionMatrix_mul_principalBasicSetMatrix
     have hkey : ∀ l : κ, a l * (wedderburnRepresentation eG l).character g
         = ((∑ μ : ιG,
               (decompositionMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG i μ : K)
-                * principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ l)
+                * basicSetMatrixOf eG coef t j₀ μ l)
             - signRelationRow (fun l => (wedderburnRepresentation eG l).character t) j₀ i l)
           * principalBasicSet eG hπG hlinG hnilG t j₀ l g := by
       intro l
@@ -550,7 +558,7 @@ theorem sum_decompositionMatrix_mul_principalBasicSetMatrix
     -- the first sum is `∑_μ d_{iμ} φ_μ(g) = χ_i(g)`
     have hswap : (∑ l : κ, (∑ μ : ιG,
           (decompositionMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG i μ : K)
-            * principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ l)
+            * basicSetMatrixOf eG coef t j₀ μ l)
           * principalBasicSet eG hπG hlinG hnilG t j₀ l g)
         = ∑ μ : ιG,
             (decompositionMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG i μ : K)
@@ -558,12 +566,10 @@ theorem sum_decompositionMatrix_mul_principalBasicSetMatrix
       rw [Finset.sum_congr rfl fun l _ => Finset.sum_mul _ _ _, Finset.sum_comm]
       refine Finset.sum_congr rfl fun μ _ => ?_
       by_cases hμ : Quotient.mk (blockSetoid πG hπG hlinG) μ = principalBlock πG hπG hlinG hnilG
-      · simp only [principalBasicSetMatrix]
-        rw [Finset.sum_congr rfl fun l _ => mul_assoc _ _ _, ← Finset.mul_sum,
+      · rw [Finset.sum_congr rfl fun l _ => mul_assoc _ _ _, ← Finset.mul_sum,
           sum_basicSetMatrixOf_mul_principalBasicSet hp hx hω e eG hπG hlinG hπ hlin
-            hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ ht
-            (fun ν y hy => sum_ordinaryCombination_block_eq_irreducibleBrauerCharacter hp hωG
-              hω'G hπG hlinG hkerJG eG hnilG ν hy) hconjall ht1 hcart hj₀ hμ hg]
+            hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ ht hasum hconjall ht1 hcart
+            hj₀ hμ hg]
       · rw [decompositionMatrix_eq_zero_of_blockOfIrr_ne hp hωG hω'G hπG hlinG hkerJG hnilG eG i
           (by rw [hi]; exact fun hc => hμ hc), Nat.cast_zero, zero_mul]
         exact Finset.sum_eq_zero fun l _ => by rw [zero_mul, zero_mul]
@@ -594,6 +600,28 @@ theorem sum_decompositionMatrix_mul_principalBasicSetMatrix
     rw [hc, mul_zero] at this
     exact zero_ne_one this
   exact sub_eq_zero.mp ((mul_eq_zero.mp hj).resolve_right hεj)
+set_option maxHeartbeats 1000000 in
+-- Same chain as the generalised statement it instantiates.
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+open scoped Classical in
+include hp hx hω hω' e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ ht in
+/-- The same for the `K`-valued family of `BrauerFromOrdinary`. -/
+theorem sum_decompositionMatrix_mul_principalBasicSetMatrix
+    (hconjall : ∀ v : G, IsPElement p v → v ≠ 1 → IsConj t v) (ht1 : t ≠ 1)
+    (hcart : cartanMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e φ₀ φ₀ = 4)
+    {j₀ : κ} (hj₀ : blockOfIrr eG hπG hlinG hnilG j₀ = principalBlock πG hπG hlinG hnilG)
+    {i : κ} (hi : blockOfIrr eG hπG hlinG hnilG i = principalBlock πG hπG hlinG hnilG)
+    {j : κ} (hjB : blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG)
+    (hjne : j ≠ j₀) :
+    (∑ μ : ιG, (decompositionMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG i μ : K)
+        * principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ j)
+      = signRelationRow (fun l => (wedderburnRepresentation eG l).character t) j₀ i j := by
+  simp only [principalBasicSetMatrix]
+  exact sum_decompositionMatrix_mul_basicSetMatrixOf hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil
+    hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ ht hωG hω'G hkerJG
+    (fun ν y hy => sum_ordinaryCombination_block_eq_irreducibleBrauerCharacter hp hωG hω'G hπG
+      hlinG hkerJG eG hnilG ν hy) hconjall ht1 hcart hj₀ hi hjB hjne
 
 set_option maxHeartbeats 1000000 in
 -- Same chain as the two row statements it combines.

@@ -345,7 +345,20 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
   - [x] **段 I (1/2) 完了** (2026-08-05): `basicSetMatrixOf a` (抽象係数族版) を導入し、
     `basicSetMatrixOf_eq_zero_of_ne_principalBlock` (仮説は「族がブロック外で 0」だけ) を
     一般化済。`principalBasicSetMatrix` は段 204 の族での instance として残してある。
-  - [ ] **段 I (2/2)**: `sum_basicSetMatrixOf_mul_principalBasicSet` は一般化済 (2026-08-05)。残り 2 定理 (`sum_principalBasicSetMatrix_mul_principalBasicSet` /
+  - [x] **段 I (2/2) — 4 定理中 3 つ完了** (2026-08-05):
+    `sum_basicSetMatrixOf_mul_principalBasicSet` /
+    `sum_decompositionMatrix_mul_basicSetMatrixOf_eq_zero` /
+    `sum_decompositionMatrix_mul_basicSetMatrixOf` を抽象係数族へ一般化済。
+    `K` 値族での旧版は instance として存置してあるので下流は無変更。
+    ⚠ **判明した罠 4 つ** (次 session はこれを前提に): (a) `omit ... in` は宣言 1 つにしか
+    掛からないので挿入時は複製する、(b) 一般化すると `hωG hω'G hkerJG` が binder から落ちるので
+    位置引数で呼ぶ下流はそこを削る、(c) 全名前付き引数で呼ぶときは section 変数と係数族も明示
+    しないとメタ変数が残り `IsPModularSystem ?m 𝒪` で stuck、(d) 一般化側で不要になった instance を
+    `omit` すると `K` 値 instance 版が適用できなくなるので `set_option
+    linter.unusedSectionVars false` + 理由コメントにする。
+    ⚠ `sum_decompositionMatrix_mul_basicSetMatrixOf` の証明は**ローカルに `a : κ → K` を使う**ので、
+    パラメータ名は `coef` にした (他 2 つは `a`)。
+  - [ ] **段 I (2/2) 残り 1 定理** (`sum_principalBasicSetMatrix_mul_principalBasicSet` /
     `sum_decompositionMatrix_mul_principalBasicSetMatrix{,_eq_zero}` /
     `sum_principalBasicSetMatrix_mul_cartanMatrix`) を `basicSetMatrixOf a` + 2 仮説へ一般化し、
     段 H5 の整数族で instantiate。⚠ `omit` 行は宣言 1 つにしか掛からないので、
