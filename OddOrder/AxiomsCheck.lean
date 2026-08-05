@@ -125,6 +125,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicModEq
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CharacterPClassCongruence
 import OddOrder.GroupTheory.RepresentationTheory.UnitCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedAdjoinSpan
+import OddOrder.GroupTheory.RepresentationTheory.PClassIndicator
 import OddOrder.GroupTheory.RepresentationTheory.InducedIndicator
 import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCount
 import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCharacter
@@ -18278,3 +18279,15 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.induceFun_mem_adjoinSpan_inducedVirtualCharacters
+
+/-! 🎯🎯 **Brauer 指標判定 (issue 9508 段 F)**: Gorenstein Lemma 7.6 のパッケージ化
+(`RepresentationTheory/PClassIndicator`)。Lemma 7.7/7.8 は 7.6 を常に同じ形でしか使わないので、
+「素数 `p`・`p`-正則元 `u`・`u` を中心化する `p`-部分群 `P` に対し、整数値で `u` の p-class の外で
+0 で `u` での値が `|C_G(u)|/|P|` な `v_R(G)` の元が在る」を一度だけ組む
+(`exists_pClassIndicator`)。1 の冪根は周囲の原始 `N` 乗根 `ω` から `ζ = ω^(N/orderOf u)` と取り、
+`H = ⟨u⟩P` は `pRegularProd` で作る。
+族 `𝒳` に要求するのは「全ての `⟨u⟩P` を含む」(`IsElementaryFamily`) だけで、これは指標判定の
+消費者が仮説を検証すべき対象そのもの。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_pClassIndicator

@@ -230,10 +230,11 @@ keep their original `OddOrder.RepresentationTheory` namespace so existing call s
 
 namespace OddOrder.RepresentationTheory
 
-/-- **A root of unity is an algebraic integer.** If `x : ℂ` satisfies `x ^ n = 1` with `n ≠ 0`,
-then `x` is integral over `ℤ` — it is a root of the monic polynomial `X ^ n - 1`. -/
-theorem isIntegral_of_pow_eq_one {x : ℂ} {n : ℕ} (hn : n ≠ 0) (hx : x ^ n = 1) :
-    IsIntegral ℤ x := by
+/-- **A root of unity is an algebraic integer.** If `x` in a commutative ring satisfies
+`x ^ n = 1` with `n ≠ 0`, then `x` is integral over `ℤ` — it is a root of the monic polynomial
+`X ^ n - 1`. -/
+theorem isIntegral_of_pow_eq_one {R : Type*} [CommRing R] {x : R} {n : ℕ} (hn : n ≠ 0)
+    (hx : x ^ n = 1) : IsIntegral ℤ x := by
   refine ⟨Polynomial.X ^ n - Polynomial.C 1, ?_, ?_⟩
   · exact Polynomial.monic_X_pow_sub_C 1 hn
   · simp [hx]
