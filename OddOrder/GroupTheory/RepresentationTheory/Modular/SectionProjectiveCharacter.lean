@@ -44,6 +44,8 @@ definition.
   function
 * `OddOrder.RepresentationTheory.Modular.card_centralizerOf_smul_sum_sectionProjectiveCharacter` —
   the inner-product sum against `Φ^x_μ` collapses to a sum over `C_G(x)⁰`
+* `OddOrder.RepresentationTheory.Modular.inner_sectionProjectiveCharacter_eq` —
+  `[Φ^x_μ, χ] = d^{x⁻¹}_{χμ}`
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -205,9 +207,9 @@ That is the defining property of `d^{x⁻¹}_{χ·}` read at `z = y⁻¹`, legit
 the whole splitting datum along an equality of subgroups that is not an equality of types.
 
 The computation is: `card_centralizerOf_smul_sum_sectionProjectiveCharacter` turns the sum over
-`G` into a sum over the `p`-regular elements of `C_G(x)`, the hypothesis expands `χ((x y)⁻¹)` in
-the irreducible Brauer characters of `C_G(x)`, and `[Φ_μ, τ]⁰ = δ_{τμ}`
-(`pairingZero_projectiveIndecomposableCharacter`) collapses the resulting double sum. -/
+`G` into a sum over the `p`-regular elements of `C_G(x)`, and
+`sum_projectiveIndecomposableCharacter_mul_eq` — that is `[Φ_μ, τ]⁰ = δ_{τμ}` — collapses that
+sum against the expansion of `χ((x y)⁻¹)`. -/
 theorem inner_sectionProjectiveCharacter_eq [Fintype G] [∀ i, Nonempty (m i)]
     [Invertible (Nat.card G : K)] (hx : IsPElement p x) (μ : ι)
     (χ : G → K) (hχ : ∀ a b : G, IsConj a b → χ a = χ b) (d : ι → K)
@@ -225,45 +227,9 @@ theorem inner_sectionProjectiveCharacter_eq [Fintype G] [∀ i, Nonempty (m i)]
   have step2 := card_centralizerOf_smul_sum_sectionProjectiveCharacter
     hpC hω hω' hπ hlin hkerJ e hx μ χ hχ
   rw [nsmul_eq_mul, nsmul_eq_mul] at step2
-  set R : Finset ↥(centralizerOf x) :=
-    Finset.univ.filter (fun y : ↥(centralizerOf x) => IsPRegular p ((y : G))) with hR
-  -- `∑_{y ∈ C⁰} Φ_μ(y) τ(y⁻¹) = |C_G(x)| δ_{τμ}` — Navarro (2.13), with the filter of the
-  -- `p`-section computation traded for the filter of `pairingZero`.
-  have hpair : ∀ τ : ι,
-      (∑ y ∈ R, algebraMap 𝒪 K
-          (projectiveIndecomposableCharacter hpC hω hω' hπ hlin hkerJ e μ y
-            * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π τ y⁻¹))
-        = (Nat.card ↥(centralizerOf x) : K) * (if τ = μ then 1 else 0) := by
-    intro τ
-    rw [← pairingZero_projectiveIndecomposableCharacter hpC hω hω' hπ hlin hkerJ e τ μ,
-      pairingZero, ← mul_assoc, mul_inv_cancel₀ hCne, one_mul, hR]
-    exact Finset.sum_congr (Finset.ext fun y => by simp [isPRegular_coe_iff]) fun _ _ => rfl
-  -- the sum over `C_G(x)⁰` is `|C_G(x)| d_μ`
-  have step1 : (∑ y ∈ R,
-        algebraMap 𝒪 K (projectiveIndecomposableCharacter hpC hω hω' hπ hlin hkerJ e μ y)
-          * χ ((x * (y : G))⁻¹))
-      = (Nat.card ↥(centralizerOf x) : K) * d μ := by
-    have hterm : ∀ y ∈ R,
-        algebraMap 𝒪 K (projectiveIndecomposableCharacter hpC hω hω' hπ hlin hkerJ e μ y)
-            * χ ((x * (y : G))⁻¹)
-          = ∑ τ, d τ * algebraMap 𝒪 K
-              (projectiveIndecomposableCharacter hpC hω hω' hπ hlin hkerJ e μ y
-                * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π τ y⁻¹) := by
-      intro y hy
-      rw [← hd y (isPRegular_coe_iff.mp (by rw [hR] at hy; exact (Finset.mem_filter.mp hy).2)),
-        Finset.mul_sum]
-      exact Finset.sum_congr rfl fun τ _ => by rw [map_mul]; ring
-    rw [Finset.sum_congr rfl hterm, Finset.sum_comm]
-    calc (∑ τ, ∑ y ∈ R, d τ * algebraMap 𝒪 K
-            (projectiveIndecomposableCharacter hpC hω hω' hπ hlin hkerJ e μ y
-              * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π τ y⁻¹))
-        = ∑ τ, d τ * ((Nat.card ↥(centralizerOf x) : K) * (if τ = μ then 1 else 0)) :=
-          Finset.sum_congr rfl fun τ _ => by rw [← Finset.mul_sum, hpair τ]
-      _ = (Nat.card ↥(centralizerOf x) : K) * d μ := by
-          simp only [mul_ite, mul_one, mul_zero, Finset.sum_ite_eq' Finset.univ μ,
-            Finset.mem_univ, if_true]
-          ring
-  rw [step1] at step2
+  rw [sum_projectiveIndecomposableCharacter_mul_eq hpC hω hω' hπ hlin hkerJ e μ
+      (fun y : ↥(centralizerOf x) => χ ((x * (y : G))⁻¹)) d hd _
+      (fun y => by simp [isPRegular_coe_iff])] at step2
   have hSu : (∑ u : G, algebraMap 𝒪 K
         (sectionProjectiveCharacter hpC hω hω' hπ hlin hkerJ e hx μ u) * χ u⁻¹)
       = (Nat.card G : K) * d μ :=

@@ -281,6 +281,51 @@ theorem pairingZero_projectiveIndecomposableCharacter [Fintype G] (φ θ : ι) :
     ← sum_brauer_mul_projectiveIndecomposableCharacter hp hω hω' hπ hlin hkerJ e φ θ]
   exact Finset.sum_congr rfl fun j _ => by rw [mul_comm (irreducibleBrauerCharacter _ _ _)]
 
+omit [DecidableEq ι] in
+include hp hω hω' hπ hlin hkerJ in
+open scoped Classical in
+/-- **`[Φ_μ, F]⁰ = d_μ`** for any function `F` that is given on the `p`-regular elements by an
+expansion `F(y) = ∑_τ d_τ τ(y⁻¹)` in the irreducible Brauer characters:
+
+`∑_{y ∈ G⁰} Φ_μ(y) F(y) = |G| d_μ`.
+
+This is the only way `[Φ_θ, φ]⁰ = δ_{θφ}` gets used downstream.  The sum runs over an arbitrary
+`Finset` cut out by `p`-regularity rather than over a literal `Finset.filter`, so that callers
+never have to match the decidability instance baked into `pairingZero`. -/
+theorem sum_projectiveIndecomposableCharacter_mul_eq (μ : ι)
+    (F : G → K) (d : ι → K)
+    (hF : ∀ y : G, IsPRegular p y →
+      ∑ τ, d τ * algebraMap 𝒪 K
+        (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π τ y⁻¹) = F y)
+    (s : Finset G) (hs : ∀ y : G, y ∈ s ↔ IsPRegular p y) :
+    ∑ y ∈ s, algebraMap 𝒪 K
+        (projectiveIndecomposableCharacter hp hω hω' hπ hlin hkerJ e μ y) * F y
+      = (Nat.card G : K) * d μ := by
+  letI : Fintype G := Fintype.ofFinite G
+  have hGne : (Nat.card G : K) ≠ 0 := (isUnit_of_invertible _).ne_zero
+  have hpair : ∀ τ : ι, (∑ y ∈ s, algebraMap 𝒪 K
+        (projectiveIndecomposableCharacter hp hω hω' hπ hlin hkerJ e μ y
+          * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π τ y⁻¹))
+      = (Nat.card G : K) * (if τ = μ then 1 else 0) := fun τ => by
+    rw [← pairingZero_projectiveIndecomposableCharacter hp hω hω' hπ hlin hkerJ e τ μ,
+      pairingZero, ← mul_assoc, mul_inv_cancel₀ hGne, one_mul]
+    exact Finset.sum_congr (Finset.ext fun y => by simp [hs y]) fun _ _ => rfl
+  calc (∑ y ∈ s, algebraMap 𝒪 K
+        (projectiveIndecomposableCharacter hp hω hω' hπ hlin hkerJ e μ y) * F y)
+      = ∑ y ∈ s, ∑ τ, d τ * algebraMap 𝒪 K
+          (projectiveIndecomposableCharacter hp hω hω' hπ hlin hkerJ e μ y
+            * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π τ y⁻¹) := by
+        refine Finset.sum_congr rfl fun y hy => ?_
+        rw [← hF y ((hs y).mp hy), Finset.mul_sum]
+        exact Finset.sum_congr rfl fun τ _ => by rw [map_mul]; ring
+    _ = ∑ τ, d τ * ((Nat.card G : K) * (if τ = μ then 1 else 0)) := by
+        rw [Finset.sum_comm]
+        exact Finset.sum_congr rfl fun τ _ => by rw [← Finset.mul_sum, hpair τ]
+    _ = (Nat.card G : K) * d μ := by
+        simp only [mul_ite, mul_one, mul_zero, Finset.sum_ite_eq' Finset.univ μ,
+          Finset.mem_univ, if_true]
+        ring
+
 include hp hπ hlin hkerJ in
 /-- **`([μ,φ]⁰)` is the inverse of the Cartan matrix** — Navarro (2.13).  Substitute
 `Φ_θ|_{G°} = ∑_μ c_{μθ} μ` into `[Φ_θ, φ]⁰ = δ_{φθ}`. -/
