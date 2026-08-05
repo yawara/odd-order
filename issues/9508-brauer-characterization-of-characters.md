@@ -132,14 +132,28 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
 - [ ] **段 D**: Lemma 7.5 (`χ ∈ ch_R(G)` が整数値なら `χ mod p` は各 **p-class** 上で一定)
       - **用途 (2026-08-05 確認)**: Lemma 7.8 で「`ζ_j` が p-class `L_j` 上で mod p 一定かつ p と素」
         を使うところ。7.6/7.7 では使わない。
-      - **設計**: Gorenstein 原文は `χ|_Y` (`Y = ⟨y⟩` 巡回) を `Irr(Y)` に展開するが、それだと `Y` の
-        分裂データが要る。**固有値経由で回避できる**: `ρ y` は有限位数なので
-        `trace (ρ y) = Σ_ζ dim(eigenspace ζ)·ζ` (汎用版 `OddOrder.trace_eq_sum_finrank_smul` が
-        repo に在り、`Modular/LatticeEigenspaces.trace_eq_sum_finrank_smul_of_pow` が 𝒪 上の実例)。
-        `y = uv` (`u` = `p'`-部分, `v` = `p`-部分, `|v| = p^m`) のとき各固有値 `ε` は `ε = ζ·η`
-        (`|ζ| ∣ |u|`, `|η| ∣ p^m`) と分解して `ε^{p^m} = ζ^{p^m}`、`ζ` は `ρ u` の固有値。
-        ⟹ Frobenius (多項定理 mod p) で `χ(y)^{p^m} ≡ χ(u)^{p^m} (mod pR)`、
-        `ℤ ∩ pR = pℤ` (power basis) と Fermat で `χ(y) ≡ χ(u) (mod p)`。
+      - [x] **前半** (`RepresentationTheory/CharacterEigenvalues.lean`): `A^m = 1` のとき
+        `tr(A^k) = Σ_ζ dim(eigenspace A ζ)·ζ^k` (既存 `isInternal_eigenspace_of_pow` +
+        `LinearMap.trace_eq_sum_trace_restrict`)、指標版、`character_mem_adjoin`。
+        ⚠ **重複度を `ρ g` のものに固定して `k` に依らない形**にしたのが要点
+        (`ρ g` と `ρ (g^k)` の固有空間比較を回避 — `A^k` の固有空間は融合しうる)。
+        却下した 2 案: (a) `tr(A^p) ≡ (tr A)^p` (repo に `OddOrder.trace_pow_prime` が在るが
+        標数 `p` の成分が要り、`G`-不変 `ℤ[ω]`-束の構成が必要になる)、(b) 原文どおり `χ|_Y` を
+        `Irr(Y)` 展開 (巡回部分群ごとの分裂データが要る)。
+      - [x] **中盤** (`Modular/CyclotomicIntegerModP.lean`): `adjoinPrimeIdeal ω p = p·ℤ[ω]`、
+        `ℤ ∩ pℤ[ω] = pℤ`、`CharP (ℤ[ω]/p) p`。
+      - [ ] **後半 (Lemma 7.5 本体)**。設計:
+        `Q := ℤ[ω] ⧸ p·ℤ[ω]`、`frobRed := iterateFrobenius Q p s ∘ Ideal.Quotient.mk`
+        (`CharP` + `Fact p.Prime` から `ExpChar Q p`) は **ring hom**。
+        `CongrAt χ := ∃ (hy : χ y ∈ ℤ[ω]) (hu : χ u ∈ ℤ[ω]), frobRed ⟨χ y,hy⟩ = frobRed ⟨χ u,hu⟩`
+        と**存在で所属証明を包む**ことで、`CongrAt` が加法部分群条件 (0/+/−) で閉じる
+        (ring hom の加法性 + `⟨a+b,_⟩ = ⟨a,_⟩+⟨b,_⟩`)。⟹ `AddSubgroup.closure_induction` 2 段
+        (`adjoinSpan` の生成元 `ω^j • θ` は乗法性で `θ` の場合に帰着、`virtualCharacters` の
+        生成元は真の指標) で `ch_R(G)` 全体に持ち上がる。
+        真の指標での核心: `frobRed ⟨χ_V(y)⟩ = mk ⟨χ_V(y^{p^s})⟩`
+        (`character_pow_eq_sum_finrank_smul` の `k=1` と `k=p^s` を Frobenius で繋ぐ;
+        重複度 `d_ζ` は `(d:Q)^{p^s} = (d:Q)` で消える)。`y^{p^s} = u^{p^s}` (`v^{p^s}=1`) で終わり。
+        最後に `ℤ ∩ pR = pℤ` + Fermat `n^{p^s} ≡ n` で `χ(y) ≡ χ(u) (mod p)`。
 - [ ] **段 E**: Lemma 7.6 (核心の構成)
 - [ ] **段 F**: Lemma 7.7–7.10 ⟹ `v(G) = ch(G)`
 - [ ] **段 G**: Brauer's characterization 本体
