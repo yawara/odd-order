@@ -126,6 +126,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.CharacterPClassCongruen
 import OddOrder.GroupTheory.RepresentationTheory.UnitCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedIndicator
 import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCount
+import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
@@ -18205,3 +18206,23 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.conjugateCount_self
+
+/-! 🎯🎯 **Brauer 指標判定 (issue 9508 段 E)**: `H = ⟨u⟩P` の線形指標 `λ`
+(`RepresentationTheory/PRegularCosetCharacter`)。Gorenstein Lemma 7.6 の `ψ_i` は
+「`P` を核に含む `U × P` の既約指標」だが、段 E 準備で見たとおり **1 本 `λ` とその冪**で足りる。
+`h = u^a v` の分解で `u^a` が `h` の `p'`-部分に強制される (`pRegularPart_pow_mul`) ので
+`a` は `mod orderOf u` で一意 ⟹ `λ h := ζ^a` が well-defined な準同型になる。
+⚠ **巡回群の指標論は一切使わない** — 可換な `p'`×`p` 分解の一意性だけで済む。
+`cosetCharacter_apply_eq_iff`: `λ h = ζ ⟺ h ∈ uP` (fibre indicator の台がちょうど余類)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.pRegularPart_pow_mul
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.pow_eq_pow_of_pow_mul_eq
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.cosetCharacter_apply
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.cosetCharacter_apply_eq_iff
