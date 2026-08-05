@@ -2588,23 +2588,36 @@ Navarro の証明は **(2.15)** (`θ ∈ ℤ[Irr(G)] ∪ ℤ[IBr(G)]` なら `θ
   段 210 の全単射で `p`-正則和 `Σ a(g)b(g⁻¹)` は**そのまま**移り (`sum_pRegular_quotient`)、
   違うのは正規化因子だけ ⟹ `card_mul_pairingZero_quotient : |N|·[a,b]⁰_G = [ā,b̄]⁰_Ḡ`。
 
+### ✅ (7.6) 完成 (段 214-215、2026-08-05)
+
+- **段 214** = (iii)(c) **`C = |P| C̄`** (`Modular/QuotientCartan`、新 leaf)。
+  純線型代数の補題 `eq_of_sum_mul_eq_ite` (「同じ行列を右逆に持つ 2 つの族は一致」を
+  `sum_cartanMatrix_mul_pairingZero` が供給する添字形 `Σ_μ c_{μθ} P_{μφ} = δ` で述べ、
+  転置して `Matrix.inv_eq_left_inv` の一意性に落とす) に、
+  `card_mul_pairingZero_irreducibleBrauerCharacter_quotientPi`
+  (段 212 の `φ(g)=φ̄(ḡ)` を段 213 の pairing 恒等式に食わせた `|N|·[φ,θ]⁰_G = [φ̄,θ̄]⁰_Ḡ`) を
+  合わせる。ℕ 版は `CharZero K` (= `CharZero 𝒪` + `IsFractionRing` の単射) で K 版から戻す。
+- **段 215** = 原文 p.138 の remark、**basic set 版 `C_𝓑 = |P| C_𝓑̄`**
+  (`sum_sum_mul_cartanMatrix_quotientPi`)。IBr が同じ `ι` で値も一致 ⟹ 変換行列 `U` が共通に
+  取れる ⟹ (7.5)(c) の congruent 行列 `UᵗCU` も `|N|` 倍。**BS 証明 p.141 が引くのはこの形**
+  (`H = C_G(t)`, `N = ⟨t⟩` で「Cartan 不変量が 2 倍」)。
+
+⚠ **(iv) のブロック全単射 `Bl(Ḡ) ≃ Bl(G)` は形式化しない**。原文 p.138 の証明は
+Problem (3.4) (ブロックの Cartan 行列は分解不能) を使うが、**BS 証明が実際に要るのは
+主ブロック同士の対応だけ**で、それは「自明指標を含む」ことから直接出る。上記 (iii)(c) と
+段 215 が解析的な内容の全部。
+
 ### ⏸ 次 session の着手点 (2026-08-05 session 終了時点)
 
-1. **(7.6) の残り**:
-   - (iii)(c) **`C_B = |P| C_B̄`**。材料は揃った: 段 212 (`φ(g) = φ̄(ḡ)`) を段 213 の
-     `card_mul_pairingZero_quotient` に食わせると `|N| · [φ,θ]⁰_G = [φ̄,θ̄]⁰_Ḡ`。
-     既存 `sum_cartanMatrix_mul_pairingZero` (`Σ_μ c_{μθ}[μ,φ]⁰ = δ`) で
-     「pairing 行列は Cartan の逆」なので、逆行列が `1/|N|` 倍 ⟹ Cartan が `|N|` 倍。
-     ⚠ Cartan 行列の定義には `hω`/`hω'` (1 の原始 `pRegularExponent` 乗根) と
-     `hkerJ` が要る — 段 211 の `ker_quotientPi` と段 212 の `pRegularExponent_quotient` で
-     `G/N` 側の datum は全て供給できる (`hω`/`hω'` は指数が同じなので同じ元が使える)。
-   - (iv) ブロックの全単射 (p.137-138)。BS で実際に要るのは主ブロック同士の対応だけ。
-2. **Brauer の指標判定 → (2.15) → (2.16) → (3.16)** (上記の節)。共有インフラ。
-3. その後 BS 本証明 pp.141-146 の残り (`Q₈` の指標表 / `Aut(Q₈)` 相当 / 二面体群)。
-
-さらに p.141 末: `P = Q₈` の指標表から `τ(t) ≡ τ(y) mod 2` (⟹ `ξ(t) ≡ ξ(y) mod 2`) を使う。
-これは前記 (B) の「`Q₈` の指標表」に対応する。
-  (`Aut(Q₈)` 相当・二面体・`Q₈` 指標表) → BS 本体。
+1. **[issue 9508](9508-brauer-characterization-of-characters.md) = Brauer's characterization
+   of characters (Brauer–Tate)**。これが 9506 に残る**唯一の本質的な上流前提**
+   (BS p.141-142 の「`D^t_j` は整数列」→ `U` の整数性 → (3.16) → (2.16) → (2.15) →
+   Brauer 指標判定)。原典は Gorenstein 1968 §4.7 (書籍 pp.160-170、ページ画像取得済)。
+   アーキテクチャ判断・段分けは 9508 に記載。
+2. その後 BS 本証明 pp.139-146 の残り。必要な群論的事実 (原文 p.138 が列挙):
+   `Aut(Q₈) = Sym(4)` / 巡回 Sylow 2 なら正規 2-補群 / 対合 2 つが生成する群は二面体 /
+   `P` が `G`-fusion を制御 ⟺ 正規 p-補群 / `Q₈` の指標表 (p.138 に掲載)。
+   さらに p.141 末: `τ(t) ≡ τ(y) mod 2` (`Q₈` の指標表から)。
 
 ⚠ 上記の番号は Navarro の結果番号であって段番号ではない (段番号は連番で振り直す)。
 ⚠ 数式は OCR 崩れが重いので、各段の statement は `references/navarro/pages/*.png` で確定する
