@@ -13452,6 +13452,10 @@ Pointwise` が要る。 -/
 `T` の位数 4 の元はどの 2 つも `G`-共役。⚠ 原文が `Aut(Q₈) = Sym(4)` で通す段を
 index の偶奇だけで置き換えた route の**終着点**。 -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.isConj_of_orderFour
+/-! `normalizer_le_centralizer_involution` = 原文 p.139 末の注意「`{1,t} = Z(P) ⊴ N_G(P)` ゆえ
+`g ∈ C_G(t)`」。`N_G(T)` の元による `t` の共役は再び `T` の対合で、`Q₈` の対合は一意ゆえ `t` 自身。
+⟹ p.139 の主張は「位数 4 の元は全て **`C_G(t)`**-共役」まで言える。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.normalizer_le_centralizer_involution
 /-! `sylowQ8_le_normalizer_zpowers` = 原文「every subgroup of `P` is normal in `P`」を `G` の中で
 `T ≤ N_G(⟨w⟩)` の形にしたもの。これが「`T` と `T^g` が `N_G(⟨z⟩)` の Sylow-2 ⟹ Sylow 共役で
 `g` を `N_G(T)` に取り直せる」段の入口。 -/

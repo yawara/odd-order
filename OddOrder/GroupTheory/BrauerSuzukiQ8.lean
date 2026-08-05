@@ -951,6 +951,32 @@ theorem isConj_of_orderFour (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 2 G)
       _ = (d : G)⁻¹ * w⁻¹ * (d : G) := by rw [hstep]
       _ = w := by rw [← hdG]; group
 
+omit [Finite G] in
+/-- **`N_G(T) ≤ C_G(t)`** for the involution `t` of `T ≅ Q₈` (Navarro p. 139, "since
+`{1,t} = Z(P) ⊴ N_G(P)`, it follows that `g ∈ C_G(t)`").  A conjugate of `t` by an element of
+`N_G(T)` is again an involution of `T`, and `Q₈` has only one. -/
+theorem normalizer_le_centralizer_involution (T : Sylow 2 G)
+    (e : ↥(T : Subgroup G) ≃* QuaternionGroup 2) {t : G} (htT : t ∈ (T : Subgroup G))
+    (ht2 : t ^ 2 = 1) (ht1 : t ≠ 1) :
+    Subgroup.normalizer ((T : Subgroup G) : Set G) ≤ Subgroup.centralizer {t} := by
+  intro u hu
+  have huT : u * t * u⁻¹ ∈ (T : Subgroup G) := ((Subgroup.mem_normalizer_iff.mp hu) t).mp htT
+  have hsq : (u * t * u⁻¹) ^ 2 = 1 := by
+    rw [show u * t * u⁻¹ = MulAut.conj u t from rfl, ← map_pow, ht2, map_one]
+  have hne : u * t * u⁻¹ ≠ 1 := fun h =>
+    ht1 ((MulAut.conj u).injective (h.trans (map_one (MulAut.conj u)).symm))
+  have hkey : (⟨u * t * u⁻¹, huT⟩ : ↥(T : Subgroup G)) = ⟨t, htT⟩ :=
+    eq_of_sq_eq_one_of_quaternionTwo e (Subtype.ext (by push_cast; exact hsq))
+      (fun h => hne (congrArg Subtype.val h)) (Subtype.ext (by push_cast; exact ht2))
+      (fun h => ht1 (congrArg Subtype.val h))
+  have hut : u * t * u⁻¹ = t := congrArg Subtype.val hkey
+  rw [Subgroup.mem_centralizer_iff]
+  rintro m hm
+  rw [Set.mem_singleton_iff] at hm
+  subst hm
+  calc m * u = u * m * u⁻¹ * u := by rw [hut]
+    _ = u * m := by group
+
 /-- **Navarro pp. 139–146, the character-theoretic core** (issue 9506, `sorry`): when the
 quaternion Sylow `2`-subgroup is proper, its involution lies in a proper normal subgroup.
 
