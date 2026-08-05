@@ -148,7 +148,21 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
         `character_pow_prime_pow` → `AddSubgroup.closure_induction` 2 段で `ch_R(G)` へ →
         `exists_pow_prime_pow_eq_pRegularPart` (`y^{p^s} = (p'-部分)^{p^s}`) →
         `intModEq_of_mem_adjoinSpan` = **Lemma 7.5** 本体。
-- [ ] **段 E**: Lemma 7.6 (核心の構成)
+- [x] **段 E 完了** (2026-08-05): Lemma 7.6 の核心構成。leaf 5 本:
+      - `RepresentationTheory/UnitCharacter.lean`: `λ : H →* Kˣ` からの 1 次元表現、
+        等比数列和 `Σ_{i<n} ζ^{-i} x^i = n·[x = ζ]`、`fibreIndicator_mem_adjoinSpan`
+        (`n·1_{λ⁻¹(ζ)} ∈ ch_R(H)`)。⚠ 原文の「`P` を核に含む既約指標**全体**」でなく
+        **`λ` 1 本とその冪**で足りるので、巡回群の指標群の構成が不要になる。
+      - `GroupTheory/CosetInvariantCard.lean`: `A·P ⊆ A` なら `|P| ∣ |A|`。
+      - `RepresentationTheory/InducedIndicator.lean`: `(Ind_H^G (c·1_S))(y) = (c/|H|)·σ(y)`
+        と **(i)** の整数性。⚠ 誘導和を `x⁻¹ y x` の向きで読むと計数集合が**右**移動で閉じ、
+        mathlib の `G ⧸ P` (左剰余類) にそのまま乗る。
+      - `RepresentationTheory/PRegularCosetCount.lean`: **(ii)** (可換 `p'`×`p` 分解の一意性)
+        と **(iii)** (`σ(u) = |C_G(u)|`; 位数の乗法性で `v = 1`)。
+      - `RepresentationTheory/PRegularCosetCharacter.lean`: `λ` の構成。
+        ⚠ **巡回群の指標論を使わない** — `h = u^a v` で `u^a` が `p'`-部分に強制されるので
+        `a` が `mod n` で一意になり `λ h := ζ^a` が準同型になる。
+      - `RepresentationTheory/PRegularCosetInduction.lean`: 組み立て = **Lemma 7.6** 本体。
 - [ ] **段 F**: Lemma 7.7–7.10 ⟹ `v(G) = ch(G)`
 - [ ] **段 G**: Brauer's characterization 本体
 - [ ] **段 H**: Navarro (2.15) → (2.16) → (3.16) (ブロック局所化は段 205-206 の型を反復)
