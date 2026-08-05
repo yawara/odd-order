@@ -36,6 +36,8 @@ Navarro's "it suffices to prove that `t ∈ Z(G)`" under `O_{2'}(G) = 1`.
   reduction on p. 139 finish
 * `OddOrder.GroupTheory.isCyclic_of_ne_top_of_quaternionTwo` — every proper subgroup of `Q₈` is
   cyclic, the dichotomy "`P ∩ N` is cyclic or `P ⊆ N`" that opens that reduction
+* `OddOrder.GroupTheory.q8_mem_center_of_mem_normal_of_not_le` — the **cyclic branch** of that
+  reduction, proved in full
 * `OddOrder.GroupTheory.q8_mk_mem_center` / `OddOrder.GroupTheory.brauerSuzuki_q8`
 -/
 
@@ -185,6 +187,116 @@ theorem isCyclic_of_ne_top_of_quaternionTwo {P : Type*} [Group P] [Finite P]
     · exact fun h => ha1 (Subtype.ext h)
     · exact congrArg Subtype.val hb
     · exact fun h => hb1 (Subtype.ext h)
+
+/-! ### Navarro p. 139: the cyclic branch of the reduction -/
+
+/-- **`T ⊓ N` has odd index in a normal subgroup `N`.**  By the second isomorphism theorem
+`|T|·[N : T ⊓ N] = |T ⊔ N|`, which divides `|G| = |T|·[G : T]`, so `[N : T ⊓ N]` divides the odd
+number `[G : T]`. -/
+theorem not_two_dvd_index_inf_subgroupOf (T : Sylow 2 G) (N : Subgroup G) [N.Normal] :
+    ¬ 2 ∣ (((T : Subgroup G) ⊓ N).subgroupOf N).index := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  set S := ((T : Subgroup G) ⊓ N).subgroupOf N with hS
+  have hcard : Nat.card ↥S = Nat.card ↥((T : Subgroup G) ⊓ N) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (H := (T : Subgroup G) ⊓ N) inf_le_right).toEquiv
+  have h1 : Nat.card ↥S * S.index = Nat.card ↥N := Subgroup.card_mul_index S
+  have h2 := card_sup_mul_card_inf_eq (T : Subgroup G) N
+  have hpos : 0 < Nat.card ↥((T : Subgroup G) ⊓ N) := Nat.card_pos
+  have h3 : Nat.card ↥(T : Subgroup G) * S.index = Nat.card ↥((T : Subgroup G) ⊔ N) := by
+    refine Nat.eq_of_mul_eq_mul_right hpos ?_
+    calc Nat.card ↥(T : Subgroup G) * S.index * Nat.card ↥((T : Subgroup G) ⊓ N)
+        = Nat.card ↥(T : Subgroup G) * (Nat.card ↥S * S.index) := by rw [hcard]; ring
+      _ = Nat.card ↥(T : Subgroup G) * Nat.card ↥N := by rw [h1]
+      _ = Nat.card ↥((T : Subgroup G) ⊔ N) * Nat.card ↥((T : Subgroup G) ⊓ N) := h2.symm
+  -- `|T|·index = |T ⊔ N|` divides `|G| = |T|·[G:T]`
+  have h4 : Nat.card ↥(T : Subgroup G) * S.index
+      ∣ Nat.card ↥(T : Subgroup G) * (T : Subgroup G).index := by
+    rw [h3, Subgroup.card_mul_index]
+    exact Subgroup.card_subgroup_dvd_card _
+  have h5 : S.index ∣ (T : Subgroup G).index :=
+    (mul_dvd_mul_iff_left (Nat.card_pos (α := ↥(T : Subgroup G))).ne').mp h4
+  exact fun hdvd => T.not_dvd_index (hdvd.trans h5)
+
+/-- **Navarro p. 139, the cyclic branch.**  If the involution `z` lies in a normal subgroup `N`
+that does not contain the whole Sylow `2`-subgroup, then `z` is central.
+
+`T ⊓ N` is a Sylow `2`-subgroup of `N` (odd index) and is a *proper* subgroup of `T ≅ Q₈`, hence
+cyclic.  Burnside then gives `N` a normal `2`-complement `L`, consisting exactly of the
+odd-order elements of `N` — so `L` is normal in `G`, hence inside `O_{2'}(G) = 1`.  Therefore `N`
+is its own Sylow `2`-subgroup, a cyclic group, and `mem_center_of_normal_of_isCyclic` applies. -/
+theorem q8_mem_center_of_mem_normal_of_not_le (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 2 G)
+    (e : ↥(T : Subgroup G) ≃* QuaternionGroup 2) {z : G} (hz : orderOf z = 2)
+    {N : Subgroup G} [N.Normal] (hTN : ¬ (T : Subgroup G) ≤ N) (hzN : z ∈ N) :
+    z ∈ Subgroup.center G := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  -- `T ⊓ N` is a Sylow `2`-subgroup of `N`
+  have hpgTN : IsPGroup 2 ↥((T : Subgroup G) ⊓ N) := T.isPGroup'.to_le inf_le_left
+  have hpg : IsPGroup 2 ↥(((T : Subgroup G) ⊓ N).subgroupOf N) :=
+    hpgTN.of_equiv (Subgroup.subgroupOfEquivOfLe (H := (T : Subgroup G) ⊓ N) inf_le_right).symm
+  set P : Sylow 2 ↥N := hpg.toSylow (not_two_dvd_index_inf_subgroupOf T N) with hP
+  have hPcoe : (P : Subgroup ↥N) = ((T : Subgroup G) ⊓ N).subgroupOf N :=
+    hpg.toSylow_coe (not_two_dvd_index_inf_subgroupOf T N)
+  -- it is cyclic, being a proper subgroup of `T ≅ Q₈`
+  have hne : N.subgroupOf (T : Subgroup G) ≠ ⊤ := fun h =>
+    hTN (Subgroup.subgroupOf_eq_top.mp h)
+  have hcycT : IsCyclic ↥(N.subgroupOf (T : Subgroup G)) :=
+    isCyclic_of_ne_top_of_quaternionTwo e hne
+  have hstep : ((T : Subgroup G) ⊓ N).subgroupOf (T : Subgroup G)
+      = N.subgroupOf (T : Subgroup G) := by
+    rw [show (T : Subgroup G) ⊓ N = N ⊓ (T : Subgroup G) from inf_comm _ _]
+    exact Subgroup.inf_subgroupOf_right N (T : Subgroup G)
+  haveI hcycInf : IsCyclic ↥((T : Subgroup G) ⊓ N) := by
+    haveI := hcycT
+    exact isCyclic_of_surjective
+      ((MulEquiv.subgroupCongr hstep).symm.trans
+        (Subgroup.subgroupOfEquivOfLe (H := (T : Subgroup G) ⊓ N) inf_le_left)).toMonoidHom
+      (MulEquiv.surjective _)
+  have hcyc : IsCyclic ↥(P : Subgroup ↥N) := by
+    rw [hPcoe]
+    exact isCyclic_of_surjective
+      (Subgroup.subgroupOfEquivOfLe (H := (T : Subgroup G) ⊓ N) inf_le_right).symm.toMonoidHom
+      (MulEquiv.surjective _)
+  -- Burnside: a normal `2`-complement `L`, the odd-order elements
+  have hev : 2 ∣ Nat.card ↥N := by
+    have hord : orderOf (⟨z, hzN⟩ : ↥N) = 2 := by rw [Subgroup.orderOf_mk]; exact hz
+    exact hord ▸ orderOf_dvd_natCard (⟨z, hzN⟩ : ↥N)
+  obtain ⟨L, hLnorm, hLodd, hLmem, hLsup⟩ :=
+    exists_oddComplement_of_isCyclic_sylowTwo P hcyc hev
+  -- `L` maps to a normal odd-order subgroup of `G`, hence into `O_{2'}(G) = ⊥`
+  have hLgmem : ∀ x : G, x ∈ L.map N.subtype ↔ ∃ hx : x ∈ N, Odd (orderOf x) := by
+    intro x
+    constructor
+    · rintro ⟨⟨y, hyN⟩, hyL, rfl⟩
+      refine ⟨hyN, ?_⟩
+      have := (hLmem ⟨y, hyN⟩).mp hyL
+      rwa [Subgroup.orderOf_mk] at this
+    · rintro ⟨hxN, hodd⟩
+      exact ⟨⟨x, hxN⟩, (hLmem ⟨x, hxN⟩).mpr (by rwa [Subgroup.orderOf_mk]), rfl⟩
+  haveI hLgnorm : (L.map N.subtype).Normal := by
+    refine ⟨fun x hx g => ?_⟩
+    obtain ⟨hxN, hodd⟩ := (hLgmem x).mp hx
+    refine (hLgmem _).mpr ⟨Subgroup.Normal.conj_mem ‹N.Normal› x hxN g, ?_⟩
+    rwa [← orderOf_eq_of_isConj (isConj_iff.mpr ⟨g, rfl⟩)]
+  have hLgpi : Subgroup.IsPiGroup {p | p ≠ 2} (L.map N.subtype) := by
+    intro p hp
+    have hcard : Nat.card ↥(L.map N.subtype) = Nat.card ↥L :=
+      Nat.card_congr (Subgroup.equivMapOfInjective L N.subtype N.subtype_injective).symm.toEquiv
+    rw [hcard] at hp
+    exact fun (h : p = 2) => hLodd (h ▸ Nat.dvd_of_mem_primeFactors hp)
+  have hLgbot : L.map N.subtype = ⊥ :=
+    le_bot_iff.mp (hO ▸ Subgroup.IsPiGroup.le_oPiCore hLgpi)
+  have hLbot : L = ⊥ := by
+    refine le_bot_iff.mp fun y hy => ?_
+    have : (y : G) ∈ L.map N.subtype := ⟨y, hy, rfl⟩
+    rw [hLgbot, Subgroup.mem_bot] at this
+    exact Subgroup.mem_bot.mpr (Subtype.ext this)
+  -- so `N` is its own Sylow `2`-subgroup: cyclic
+  have hPtop : (P : Subgroup ↥N) = ⊤ := by rw [← hLsup, hLbot, bot_sup_eq]
+  haveI : IsCyclic ↥N :=
+    isCyclic_of_surjective ((MulEquiv.subgroupCongr hPtop).trans Subgroup.topEquiv).toMonoidHom
+      (MulEquiv.surjective _)
+  exact mem_center_of_normal_of_isCyclic hzN hz
 
 /-- **Brauer–Suzuki for `Q₈`, the residual statement** (Navarro pp. 139–146; issue 9506): with
 `O_{2'}(G) = 1`, the involution of a quaternion Sylow `2`-subgroup of order `8` is central.

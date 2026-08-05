@@ -13361,6 +13361,14 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.isCyclic_of_card_dvd_four_of_unique_involution
 #assert_only_allowed_axioms OddOrder.GroupTheory.isCyclic_of_ne_top_of_quaternionTwo
+/-! `q8_mem_center_of_mem_normal_of_not_le` = Navarro p.139 reduction の**巡回分枝**。
+`not_two_dvd_index_inf_subgroupOf` (第二同型定理から `|T|·[N:T⊓N] = |T⊔N| ∣ |G|` ⟹
+`[N:T⊓N] ∣ [G:T]` は奇数) で `T ⊓ N` が `N` の Sylow-2 になり、それは `T ≅ Q₈` の真部分群ゆえ
+巡回 ⟹ Burnside (`exists_oddComplement_of_isCyclic_sylowTwo`) で正規 2-補群 `L` = `N` の
+奇位数元全体 ⟹ `L` は `G` でも正規 ⟹ `L ≤ O_{2'}(G) = ⊥` ⟹ `N` は自分自身の Sylow-2 = 巡回
+⟹ `mem_center_of_normal_of_isCyclic`。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.not_two_dvd_index_inf_subgroupOf
+#assert_only_allowed_axioms OddOrder.GroupTheory.q8_mem_center_of_mem_normal_of_not_le
 
 /-! ### lean-eval 提出候補の登録 (issue 0050, 2026-07-22).
 
