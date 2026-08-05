@@ -13352,6 +13352,15 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 ⟹ 残る数学は `q8_mem_center_of_oPiCore_eq_bot` (= Navarro pp.139-146) の 1 文のみ。 -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.sylowTwo_inf_oPiCore_eq_bot
 #assert_only_allowed_axioms OddOrder.GroupTheory.mem_center_of_normal_of_isCyclic
+/-! `isCyclic_of_ne_top_of_quaternionTwo` = Navarro p.139 の「`P ∩ N` は巡回か `P ⊆ N`」。
+`Q₈` の対合が一意 (`quaternionTwo_sq_eq_one`、8 元なので `decide`) ことと、
+汎用補題 `isCyclic_of_card_dvd_four_of_unique_involution` (位数が 4 を割り対合が高々 1 個なら巡回;
+`x^n = 1` の解は位数が `gcd(n,4)` を割る元で高々 `gcd(n,4) ≤ n` 個) の合成。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.quaternionTwo_sq_eq_one
+#assert_only_allowed_axioms OddOrder.GroupTheory.eq_of_sq_eq_one_of_quaternionTwo
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isCyclic_of_card_dvd_four_of_unique_involution
+#assert_only_allowed_axioms OddOrder.GroupTheory.isCyclic_of_ne_top_of_quaternionTwo
 
 /-! ### lean-eval 提出候補の登録 (issue 0050, 2026-07-22).
 

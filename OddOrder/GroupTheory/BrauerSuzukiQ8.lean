@@ -34,6 +34,8 @@ Navarro's "it suffices to prove that `t ∈ Z(G)`" under `O_{2'}(G) = 1`.
   (issue 9506, `sorry`)
 * `OddOrder.GroupTheory.mem_center_of_normal_of_isCyclic` — how both branches of Navarro's
   reduction on p. 139 finish
+* `OddOrder.GroupTheory.isCyclic_of_ne_top_of_quaternionTwo` — every proper subgroup of `Q₈` is
+  cyclic, the dichotomy "`P ∩ N` is cyclic or `P ⊆ N`" that opens that reduction
 * `OddOrder.GroupTheory.q8_mk_mem_center` / `OddOrder.GroupTheory.brauerSuzuki_q8`
 -/
 
@@ -88,6 +90,101 @@ theorem mem_center_of_normal_of_isCyclic {N : Subgroup G} [N.Normal] [IsCyclic �
   have hgz : g * z * g⁻¹ = z := congrArg Subtype.val hkey
   calc g * z = g * z * g⁻¹ * g := by group
     _ = z * g := by rw [hgz]
+
+/-! ### Proper subgroups of `Q₈` are cyclic
+
+Navarro's reduction opens with "`P ∩ N` is cyclic or `P ⊆ N`", which is exactly this. -/
+
+/-- **`Q₈` has a unique involution**, namely `a 2`. -/
+theorem quaternionTwo_sq_eq_one : ∀ g : QuaternionGroup 2,
+    g ^ 2 = 1 → g = 1 ∨ g = QuaternionGroup.a 2 := by decide
+
+/-- **A group isomorphic to `Q₈` has a unique involution.** -/
+theorem eq_of_sq_eq_one_of_quaternionTwo {P : Type*} [Group P]
+    (e : P ≃* QuaternionGroup 2) {a b : P} (ha : a ^ 2 = 1) (ha1 : a ≠ 1) (hb : b ^ 2 = 1)
+    (hb1 : b ≠ 1) : a = b := by
+  have key : ∀ c : P, c ^ 2 = 1 → c ≠ 1 → e c = QuaternionGroup.a 2 := by
+    intro c hc hc1
+    refine (quaternionTwo_sq_eq_one (e c) (by rw [← map_pow, hc, map_one])).resolve_left ?_
+    exact fun h => hc1 (e.injective (h.trans (map_one e).symm))
+  exact e.injective ((key a ha ha1).trans (key b hb hb1).symm)
+
+/-- **A finite group of order dividing `4` with at most one involution is cyclic.**  For every
+`n > 0` the solutions of `xⁿ = 1` are the elements whose order divides `gcd(n, 4)`, of which there
+are at most `gcd(n, 4) ≤ n`; so `isCyclic_of_card_pow_eq_one_le` applies. -/
+theorem isCyclic_of_card_dvd_four_of_unique_involution {H : Type*} [Group H] [Finite H]
+    (hcard : Nat.card H ∣ 4)
+    (huniq : ∀ a b : H, a ^ 2 = 1 → a ≠ 1 → b ^ 2 = 1 → b ≠ 1 → a = b) : IsCyclic H := by
+  classical
+  letI := Fintype.ofFinite H
+  refine isCyclic_of_card_pow_eq_one_le fun n hn => ?_
+  set d := Nat.gcd n 4 with hd
+  have hd4 : d ∣ 4 := Nat.gcd_dvd_right n 4
+  have hsub : (Finset.univ.filter fun a : H => a ^ n = 1)
+      ⊆ Finset.univ.filter fun a : H => a ^ d = 1 := by
+    intro a ha
+    rw [Finset.mem_filter] at ha ⊢
+    refine ⟨Finset.mem_univ a, orderOf_dvd_iff_pow_eq_one.mp ?_⟩
+    exact Nat.dvd_gcd (orderOf_dvd_iff_pow_eq_one.mpr ha.2)
+      ((orderOf_dvd_natCard a).trans hcard)
+  have hdn : d ≤ n := Nat.le_of_dvd hn (Nat.gcd_dvd_left n 4)
+  refine le_trans (le_trans (Finset.card_le_card hsub) ?_) hdn
+  have hcase : d = 1 ∨ d = 2 ∨ d = 4 := by
+    have h1 : d ≤ 4 := Nat.le_of_dvd (by norm_num) hd4
+    have h2 : d ≠ 0 := by rintro h; rw [h] at hd4; simp at hd4
+    have h3 : d ≠ 3 := by rintro h; rw [h] at hd4; norm_num at hd4
+    omega
+  rcases hcase with h | h | h
+  · rw [h]
+    refine le_trans (Finset.card_le_card (fun a ha => ?_ : _ ⊆ ({1} : Finset H))) (by simp)
+    rw [Finset.mem_filter] at ha
+    rw [Finset.mem_singleton, ← pow_one a]
+    exact ha.2
+  · rw [h]
+    by_cases hex : ∃ w : H, w ^ 2 = 1 ∧ w ≠ 1
+    · obtain ⟨w, hw, hw1⟩ := hex
+      refine le_trans (Finset.card_le_card (fun a ha => ?_ : _ ⊆ ({1, w} : Finset H))) ?_
+      · rw [Finset.mem_filter] at ha
+        rw [Finset.mem_insert, Finset.mem_singleton]
+        rcases eq_or_ne a 1 with rfl | ha1
+        · exact Or.inl rfl
+        · exact Or.inr (huniq a w ha.2 ha1 hw hw1)
+      · exact le_trans (Finset.card_insert_le _ _) (by simp)
+    · push Not at hex
+      refine le_trans (Finset.card_le_card (fun a ha => ?_ : _ ⊆ ({1} : Finset H))) (by simp)
+      rw [Finset.mem_filter] at ha
+      exact Finset.mem_singleton.mpr (hex a ha.2)
+  · rw [h]
+    refine le_trans (Finset.card_le_univ _) ?_
+    rw [← Nat.card_eq_fintype_card]
+    exact Nat.le_of_dvd (by norm_num) hcard
+
+/-- **Every proper subgroup of a group isomorphic to `Q₈` is cyclic.**  Its order divides `4`, and
+it inherits the unique involution of `Q₈`. -/
+theorem isCyclic_of_ne_top_of_quaternionTwo {P : Type*} [Group P] [Finite P]
+    (e : P ≃* QuaternionGroup 2) {H : Subgroup P} (hH : H ≠ ⊤) : IsCyclic ↥H := by
+  classical
+  have hP8 : Nat.card P = 8 := by
+    rw [Nat.card_congr e.toEquiv, Nat.card_eq_fintype_card, QuaternionGroup.card]
+  have hdvd : Nat.card ↥H ∣ 2 ^ 3 := by
+    have := Subgroup.card_subgroup_dvd_card H
+    rwa [hP8, show (8 : ℕ) = 2 ^ 3 from rfl] at this
+  have hne : Nat.card ↥H ≠ 8 := fun h =>
+    hH (Subgroup.eq_top_of_card_eq H (by rw [h, hP8]))
+  refine isCyclic_of_card_dvd_four_of_unique_involution ?_ ?_
+  · obtain ⟨j, hjle, hjc⟩ := (Nat.dvd_prime_pow Nat.prime_two).mp hdvd
+    have hj2 : j ≤ 2 := by
+      by_contra hgt
+      have hj3 : j = 3 := by omega
+      exact hne (by rw [hjc, hj3]; norm_num)
+    rw [hjc, show (4 : ℕ) = 2 ^ 2 from rfl]
+    exact pow_dvd_pow 2 hj2
+  · intro a b ha ha1 hb hb1
+    refine Subtype.ext (eq_of_sq_eq_one_of_quaternionTwo e ?_ ?_ ?_ ?_)
+    · exact congrArg Subtype.val ha
+    · exact fun h => ha1 (Subtype.ext h)
+    · exact congrArg Subtype.val hb
+    · exact fun h => hb1 (Subtype.ext h)
 
 /-- **Brauer–Suzuki for `Q₈`, the residual statement** (Navarro pp. 139–146; issue 9506): with
 `O_{2'}(G) = 1`, the involution of a quaternion Sylow `2`-subgroup of order `8` is central.
