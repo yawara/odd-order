@@ -17168,3 +17168,11 @@ well-defined 性は `isConj_centralizer_of_isConj_mul` (助変数化の単射性
   OddOrder.GroupTheory.commute_pPart_of_commute
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.centralizerOf_mul_eq_inf
+
+/-! **助変数化の単射性の「具体的な共役元」版** (`Modular/PSection`) —
+`g(xy₁)g⁻¹ = xy₂` なら `g` 自身が `C_G(x)` に入り `g y₁ g⁻¹ = y₂`。
+`isConj_centralizer_of_isConj_mul` はこの系。(5.13) の内積計算でファイバーを
+`C_G(x)` と同定するのに使う。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.mem_centralizerOf_and_conj_of_conj_mul

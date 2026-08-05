@@ -30,6 +30,8 @@ decomposition numbers see.
 * `OddOrder.RepresentationTheory.Modular.pPart_mul_eq_of_isPElement` — `(xy)_p = x`
 * `OddOrder.RepresentationTheory.Modular.mem_pSection_iff` — the parametrisation of `S(x)`
 * `OddOrder.RepresentationTheory.Modular.forall_pSection_iff` — vanishing on `S(x)`, restated
+* `OddOrder.RepresentationTheory.Modular.mem_centralizerOf_and_conj_of_conj_mul` — a *specific*
+  conjugator taking `x y₁` to `x y₂` already lies in `C_G(x)` and takes `y₁` to `y₂`
 * `OddOrder.RepresentationTheory.Modular.isConj_centralizer_of_isConj_mul` — the parametrisation
   is injective: `x y₁ ~_G x y₂` forces `y₁ ~_{C_G(x)} y₂`
 * `OddOrder.RepresentationTheory.Modular.centralizerOf_mul_eq_inf` — `C_G(xy) = C_G(x) ⊓ C_G(y)`
@@ -174,10 +176,28 @@ theorem pSection_eq_of_isConj {x₁ x₂ : G} (h : IsConj x₁ x₂) :
       ((mem_pSection_iff_isConj_pPart.mp hu).trans h.symm)⟩
 
 omit [Finite G] in
+theorem mem_centralizerOf_and_conj_of_conj_mul (hp : p.Prime) {x y₁ y₂ : G}
+    (hx : IsPElement p x) (hy₁ : IsPRegular p y₁) (hy₂ : IsPRegular p y₂)
+    (h₁ : y₁ ∈ centralizerOf x) (h₂ : y₂ ∈ centralizerOf x)
+    {g : G} (hg : g * (x * y₁) * g⁻¹ = x * y₂) :
+    g ∈ centralizerOf x ∧ g * y₁ * g⁻¹ = y₂ := by
+  have hcomm₁ : Commute x y₁ := (Subgroup.mem_centralizer_iff.mp h₁) x rfl
+  have hcomm₂ : Commute x y₂ := (Subgroup.mem_centralizer_iff.mp h₂) x rfl
+  have hpx : g * x * g⁻¹ = x := by
+    have h1 : pPart p (g * (x * y₁) * g⁻¹) = pPart p (x * y₂) := by rw [hg]
+    rwa [pPart_conj, pPart_mul_eq_of_isPElement hp hcomm₁ hx hy₁,
+      pPart_mul_eq_of_isPElement hp hcomm₂ hx hy₂] at h1
+  refine ⟨Subgroup.mem_centralizer_iff.mpr ?_, ?_⟩
+  · rintro z rfl
+    exact (mul_inv_eq_iff_eq_mul.mp hpx).symm
+  · have h2 : pRegularPart p (g * (x * y₁) * g⁻¹) = pRegularPart p (x * y₂) := by rw [hg]
+    rwa [pRegularPart_conj, pRegularPart_mul_eq_of_isPElement hp hcomm₁ hx hy₁,
+      pRegularPart_mul_eq_of_isPElement hp hcomm₂ hx hy₂] at h2
+
+omit [Finite G] in
 /-- **The parametrisation of `S(x)` is injective.**  If `x y₁` and `x y₂` are `G`-conjugate, with
 `y₁, y₂` `p`-regular in `C_G(x)`, then the conjugating element already lies in `C_G(x)` and
-conjugates `y₁` to `y₂`.  Uniqueness of the `p`/`p'` factorisation: the conjugator must send the
-`p`-part `x` to the `p`-part `x`, and the `p'`-parts to each other.
+conjugates `y₁` to `y₂`.
 
 Together with `mem_pSection_iff` this says that `{x y_i}` runs over the `G`-classes inside `S(x)`
 exactly once as `y_i` runs over the `p`-regular classes of `C_G(x)`. -/
@@ -187,18 +207,9 @@ theorem isConj_centralizer_of_isConj_mul (hp : p.Prime) {x y₁ y₂ : G} (hx : 
     (h : IsConj (x * y₁) (x * y₂)) :
     ∃ g ∈ centralizerOf x, g * y₁ * g⁻¹ = y₂ := by
   obtain ⟨g, hg⟩ := isConj_iff.mp h
-  have hcomm₁ : Commute x y₁ := (Subgroup.mem_centralizer_iff.mp h₁) x rfl
-  have hcomm₂ : Commute x y₂ := (Subgroup.mem_centralizer_iff.mp h₂) x rfl
-  have hpx : g * x * g⁻¹ = x := by
-    have h1 : pPart p (g * (x * y₁) * g⁻¹) = pPart p (x * y₂) := by rw [hg]
-    rwa [pPart_conj, pPart_mul_eq_of_isPElement hp hcomm₁ hx hy₁,
-      pPart_mul_eq_of_isPElement hp hcomm₂ hx hy₂] at h1
-  refine ⟨g, Subgroup.mem_centralizer_iff.mpr ?_, ?_⟩
-  · rintro z rfl
-    exact (mul_inv_eq_iff_eq_mul.mp hpx).symm
-  · have h2 : pRegularPart p (g * (x * y₁) * g⁻¹) = pRegularPart p (x * y₂) := by rw [hg]
-    rwa [pRegularPart_conj, pRegularPart_mul_eq_of_isPElement hp hcomm₁ hx hy₁,
-      pRegularPart_mul_eq_of_isPElement hp hcomm₂ hx hy₂] at h2
+  obtain ⟨hmem, hconj⟩ :=
+    mem_centralizerOf_and_conj_of_conj_mul hp hx hy₁ hy₂ h₁ h₂ hg
+  exact ⟨g, hmem, hconj⟩
 
 end PSection
 
