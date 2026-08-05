@@ -81,11 +81,30 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
 
 ## やること
 
-- [ ] **段 A**: `K` 側 generalized character `ch(G)` の定義と基本性質
-      (`ℤ`-span of `ordinaryCharacter e i` / 内積の整数性による特徴づけ / `Res` で閉じる)
-- [ ] **段 B**: `Ind`/`Res` の Frobenius 相互律と projection formula (Gorenstein Lemma 7.2)
-      を `K` 係数の類関数で。`Ind(ch(H)) ⊆ ch(G)` (段 A の特徴づけ経由)
+- [x] **段 A** (2026-08-05, `RepresentationTheory/VirtualCharacter.lean`): 分裂データを持たない
+      `virtualCharacters K H : AddSubgroup (H → K)` (= `ch(H)`)。`IsRepCharacter` は標準空間
+      `Fin n → K` 上の表現の指標として定義し (universe 単一化)、`isRepCharacter_of_finite`
+      (基底を取って `transportRepresentation` で移送) で一般性を回復。`1 ∈`・テンソル積による
+      積閉性・群準同型による引き戻し (`Res` がその特殊化)。
+- [x] **段 B** (2026-08-05, `VirtualCharacterPairing.lean` + `VirtualCharacterInduction.lean`):
+      `charPairing K a b = (1/|G|) Σ_g a(g⁻¹)b(g)`、`charPairing_isRepCharacter`
+      (= `dim Hom_{KG}(V,W)`、mathlib `card_inv_mul_sum_char_mul_char_eq_finrank`)、
+      `charPairing_mem_intRange`。`extendByZero` / `induceFun`、
+      `induceFun_mul_restrict` (= **Lemma 7.2** projection formula)、
+      `charPairing_induceFun` (= **Frobenius 相互律**)。
+      ⚠ `Ind(ch(H)) ⊆ ch(G)` は「ch(G) の内積による特徴づけ」が要るので段 C 以降に回す
+      (特徴づけには `G` の分裂 `e` が必要 — 非分裂だと `⟨χ_i,χ_i⟩ = dim End > 1` になりうる)。
 - [ ] **段 C**: `v(G)` の定義とイデアル性 (Lemma 7.3)、`R = ℤ[ω]` 係数版と Lemma 7.4
+      - **調査済 (2026-08-05)**: 降下 (`ch(G) ∩ v_R(G) = v(G)`) の鍵 = 「`1,ω,…,ω^{n−1}` が
+        `ℤ[ω]` の ℤ-基底」。mathlib に **`Algebra.adjoin.powerBasis' (hx : IsIntegral R x) :
+        PowerBasis R (Algebra.adjoin R {x})`** (`FieldTheory/Minpoly/IsIntegrallyClosed.lean`)
+        があり、`R = ℤ` (integrally closed)・`S = K` (domain, char 0) で使える。
+        `ω^N = 1` (`N = |G|`) から `IsIntegral ℤ ω` は `X^N − 1` が monic で即。
+      - ⚠ 代替案 (`R` を `{ω^j : j < N}` の ℤ-span に取る) は **不可**: 生成系が ℤ-独立でないので
+        `v_R = ⊕_j ω^j v` の直和分解が壊れ、降下が成立しない。
+      - ⚠ R 層そのものを回避する案も検討したが**不可**: Lemma 7.6 の `ψ = Σ_i ζ^{-i} ψ_i`
+        (= `|U|·1_{uP}`) は ℤ 係数では書けず (`⟨ψ,ψ_i⟩ = ζ^{-i} ∉ ℤ`)、ℤ 係数に留めると
+        台が「ℤ-類」に粗くなって Lemma 7.7 (任意の整数値類関数の展開) が壊れる。
 - [ ] **段 D**: Lemma 7.5 (p-class 上の mod p 一定性)
 - [ ] **段 E**: Lemma 7.6 (核心の構成)
 - [ ] **段 F**: Lemma 7.7–7.10 ⟹ `v(G) = ch(G)`
