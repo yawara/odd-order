@@ -32,6 +32,10 @@ decomposition numbers see.
 * `OddOrder.RepresentationTheory.Modular.forall_pSection_iff` — vanishing on `S(x)`, restated
 * `OddOrder.RepresentationTheory.Modular.isConj_centralizer_of_isConj_mul` — the parametrisation
   is injective: `x y₁ ~_G x y₂` forces `y₁ ~_{C_G(x)} y₂`
+* `OddOrder.RepresentationTheory.Modular.mem_pSection_pPart`,
+  `OddOrder.RepresentationTheory.Modular.isConj_of_mem_pSection_of_mem_pSection`,
+  `OddOrder.RepresentationTheory.Modular.pSection_eq_of_isConj` — the `p`-sections partition `G`,
+  indexed by the `G`-classes of `p`-elements
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -116,6 +120,28 @@ theorem forall_pSection_iff {K : Type*} [Zero K] (hp : p.Prime) {x : G} (hx : Is
     obtain ⟨y, hymem, hyreg, hconj⟩ := (mem_pSection_iff hp hx).mp hu
     rw [hf u _ hconj]
     exact h ⟨y, hymem⟩ (isPRegular_coe_iff.mp hyreg)
+
+omit [Finite G] in
+/-- **Every element lies in the section of its own `p`-part.**  Together with
+`isConj_of_mem_pSection_of_mem_pSection` this says the `p`-sections partition `G`. -/
+theorem mem_pSection_pPart (u : G) : u ∈ pSection p (pPart p u) :=
+  mem_pSection_iff_isConj_pPart.mpr (IsConj.refl _)
+
+omit [Finite G] in
+/-- **Distinct `p`-sections are disjoint.**  If `u` lies in `S(x₁)` and in `S(x₂)` then `x₁` and
+`x₂` are both conjugate to the `p`-part of `u`, hence to each other. -/
+theorem isConj_of_mem_pSection_of_mem_pSection {x₁ x₂ u : G} (h₁ : u ∈ pSection p x₁)
+    (h₂ : u ∈ pSection p x₂) : IsConj x₁ x₂ :=
+  (mem_pSection_iff_isConj_pPart.mp h₁).symm.trans (mem_pSection_iff_isConj_pPart.mp h₂)
+
+omit [Finite G] in
+/-- **The `p`-section of `x` depends only on the class of `x`.** -/
+theorem pSection_eq_of_isConj {x₁ x₂ : G} (h : IsConj x₁ x₂) :
+    pSection p x₁ = pSection p x₂ :=
+  Set.ext fun _ => ⟨fun hu => mem_pSection_iff_isConj_pPart.mpr
+      ((mem_pSection_iff_isConj_pPart.mp hu).trans h),
+    fun hu => mem_pSection_iff_isConj_pPart.mpr
+      ((mem_pSection_iff_isConj_pPart.mp hu).trans h.symm)⟩
 
 omit [Finite G] in
 /-- **The parametrisation of `S(x)` is injective.**  If `x y₁` and `x y₂` are `G`-conjugate, with

@@ -17134,3 +17134,14 @@ BS が実際に使う向きで、Okuyama (6.6) / height 理論を通らない。
   OddOrder.RepresentationTheory.Modular.eq_principalBlock_of_blockOfCentralCharacter_eq_intermediate
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.eq_principalBlock_of_inducedBlockOfNormalizer_eq_intermediate
+
+/-! **`p`-section は `G` を分割する** (`Modular/PSection`) —
+`u ∈ S(u_p)` かつ `S(x₁) ∩ S(x₂) ≠ ∅ ⟹ IsConj x₁ x₂`。
+(5.12)/(5.13) の内積計算がこの分割の上で走る。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.mem_pSection_pPart
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.isConj_of_mem_pSection_of_mem_pSection
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.pSection_eq_of_isConj
