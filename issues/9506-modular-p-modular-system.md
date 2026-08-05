@@ -2042,12 +2042,12 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         表現は自明) 1 本のみ + `isUnit_centralScalar_pRegularSum_of_blockOfIrr_principal`。
         `card_filter_isPRegular` は `PRegularElementCount` へ移設 (2 箇所で使用)。
   - [ ] **⏸ 次の一手 = (7.2) 本体の残り部品**。原文 p.131-132 (`pages/navarro-p131,132.png`)
-        より、まだ repo に無いもの:
+        より、まだ repo に無いもの (**2026-08-05 現在の残り = ★ の 2 件のみ**):
         * ~~**Burnside の正規 `p`-補群定理**~~ — ✅ **既存 (2026-08-05 実測)**:
           `OddOrder.Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer`
           (`Isaacs/Ch05_Transfer/Basic.lean:491`、`N_G(P) ≤ C_G(P) ⟹ HasNormalPComplement p G`、
           mathlib の `MonoidHom.transferSylow` 経由)。新規形式化は不要。
-        * `Aut(Z₂×Z₂) ≅ S₃` と「位数 3 の自己同型は 3 つの involution を巡回」
+        * ★ `Aut(Z₂×Z₂) ≅ S₃` と「位数 3 の自己同型は 3 つの involution を巡回」
           — **実測で repo に無い (2026-08-05)**。`KleinFour` の定義は
           `Isaacs/Ch06_FrobeniusActions/Problems6B3.lean` にあるが反例用で `Aut` は扱わない。
           (7.2) が要るのは全体の同型でなく「位数 4・指数 2 の群の位数 3 の自己同型は
@@ -2078,18 +2078,20 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               ⚠ **rank 論法でなく Leibniz 展開** — 非零行列式から `M (σ j) j ≠ 0` を全 `j` で
               満たす置換 `σ` が取れ、その `σ` が 2 つの分割を突き合わせる。前回書いた
               「rank 論法が最短」より短く、`Aᵗ A` も (5.13) も要らない。
-          - [ ] **⏸ 第三段 = ブロック対角性 ((5.8)) を上の線型代数に食わせる**。
-            必要なのは
-            `f : ι' → Block πG`, `f i = blockOfIrr eG hπG hlinG hnilG i` と
-            `g : (Σ D, ι D) → Block πG`, `g ⟨D,μ⟩ = inducedBlockOfCentralizer (bl μ)` に対し
-            `f i ≠ g c → J i c = 0`。
-            ⚠ **調査事項 (2026-08-05 時点)**: (5.8) の repo 版
-            `generalizedDecompositionNumber_eq_zero_of_inducedBlockOfCentralizer_ne`
-            (`Modular/SecondMainBlockForm.lean:197`) は**表現 `σ` と束 `L` の言葉**で
-            述べられており、`blockOfIrr` (= Wedderburn 束表現での特殊化) 版の系がまだ無い。
-            また列側の「`μ` を含むブロック」を与える写像 (`ι D → Block (π D)`) が
-            repo にあるか未確認 (`blockOfBrauer` 相当を grep すること)。
-            この 2 つを繋げば `card_eq_card_of_det_ne_zero` の適用で (5.12) が出る。
+          - [x] 🎯🎯🎯 **第三段 完了 = (5.12) 本体 (2026-08-05、段 177)**:
+            `card_blockOfIrr_eq_card_inducedBlockOfCentralizer` (`Modular/BlockCharacterCount`)。
+            * 🎯 (5.8) の `Irr(G)` 版 = `Modular/SecondMainBlockOfIrr` の
+              `generalizedDecompositionNumber_eq_zero_of_blockOfIrr_ne`。
+              **調査事項の答**: repo の第二主定理ブロック形は「表現 `σ` + 不変束 `L`」で
+              述べられているが、通常既約は正準な束 `wedderburnLattice` を持ち
+              `wedderburnLatticeRepresentation = latticeRepresentation (wedderburnRepresentation)`
+              が **definitional** なので、`blockOfIrr` 版は **1 行の cite で特殊化できた**
+              (`Representation.character = LinearMap.trace` も定義通り)。
+            * 列側の「`μ` を含むブロック」写像は新規に要らなかった —
+              `Block π hπ hlin` は `ι` の商なので `Quotient.mk (blockSetoid π hπ hlin) μ` が
+              そのまま使える (`blockOfBrauer` 相当は不要)。
+            * 仕上げは `inducedBlockOfColumn` を定義して
+              `card_eq_card_of_det_ne_zero` に食わせるだけ。
         * **(5.13)(b)** 一般化分解数の直交性 — ✅ **完了 (段 172)**。
           **⚠ 設計上の懸案は解決 (2026-08-05)**: 原文 (p.107 のページ画像で確定) は
           `Σ_{χ∈Irr(G)} conj(d^x_{χμ}) d^x_{χφ} = c_{μφ}` と**複素共役**で書くが、
@@ -2180,7 +2182,13 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
           (`Modular/GeneralizedDecomposition.lean`, `SecondMainTheorem.lean`,
           `SecondMainBlockForm.lean`)。Cartan 行列 `cartanMatrix` も既存
           (`Modular/CartanMatrix.lean`)。⟹ (5.13) は「既存の 2 つを繋ぐ」段。
-        * involution に付く一般化分解数が**有理整数**であること
+        * ★ involution に付く一般化分解数が**有理整数**であること
+          (原文 p.132 は (5.1) の定義の直後の注 — `d^x_{χφ} ∈ ℤ[ζ]`, `ζ` は `o(x)` 乗根 —
+          を involution `o(x)=2` に適用して `ℤ` を得る。repo の (5.1)
+          `existsUnique_generalizedDecomposition` は基底論法なのでこの整数性を見ていない
+          (`GeneralizedDecomposition.lean` の docstring に明記済) ⟹ **新規に要る**。
+          Navarro 自身の論法 = `χ|_H` を `Irr(H)` に分解し `x ∈ Z(H)` が各既約表現で
+          スカラー (= `o(x)` 乗根) として作用することを使う。)
         ⚠ (5.12)/(5.13) は Ch.5 なので**文書順で先**。上流優先で (5.13)(b) →
         (5.12) → (7.2) の順に当たる。
         - [x] 🎯🎯 **(5.13)(a) 前半 完了 (2026-08-05、段 173)**:
