@@ -1428,10 +1428,12 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
                 `card_pRegularMem_modEq_centralizer` (`|H⁰| ≡ |C_G(Q)⁰|`)。
                 ⚠ `↥H` を新しい ambient 群に立て直す (subgroupOf 移送) 必要はなく、
                 `G` の中の `Q` の作用を `H` 制限 subtype に載せ替えるだけで済んだ。
-              - [ ] **第 2 段 = `e^H_g = e^C_g` (`g ∈ C`)**: Külshammer (段 153) を `G := ↥H`
-                で instantiate (これは `Q` を含まないので移送不要) + 第 1 段の 2 合同。
-                ⟹ `e^G_g = e^H_g`、すなわち `Br_Q^{G→H}(e_{B₀(G)}) = T(e_{B₀(H)})`
-                (`T` = `C_G(Q)` への切り詰め)。
+              - [x] **第 2 段 完了 (2026-08-05、段 160)**: `eq_of_card_pRegular_mul_eq_intermediate`
+                / 🎯🎯 `coeff_principalBlock_eq_centralizer_intermediate`
+                (`e_{b₀}^H(g) = e_{b₀}^{C_G(Q)}(g)`, `g ∈ C_G(Q)`)。
+                Külshammer (段 153) は部分群を含まないので `G := ↥H` にそのまま
+                instantiate でき、予想どおり subgroupOf 移送は不要だった。
+                ⟹ 段 153 と合わせて `e^G` と `e^H` は `C_G(Q)` 上で一致。
               - [x] **第 3 段 完了 (2026-08-05、段 159 `Modular/BlockCharacterOffCentralizer`)**:
                 🎯 `pi_classSum_subgroup_eq_zero_of_notMem_centralizer` (`C_G(P)` と交わらない
                 `H`-類の類和は `π_H` の核) / 🎯🎯
