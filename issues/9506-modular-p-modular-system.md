@@ -2140,8 +2140,38 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         * involution に付く一般化分解数が**有理整数**であること
         ⚠ (5.12)/(5.13) は Ch.5 なので**文書順で先**。上流優先で (5.13)(b) →
         (5.12) → (7.2) の順に当たる。
+        - [x] 🎯🎯 **(5.13)(a) 前半 完了 (2026-08-05、段 173)**:
+          `sum_mul_generalizedDecompositionNumber_eq_zero` =
+          「`x`, `y` が共役でない `p`-元なら `Σ_{χ∈Irr(G)} d^{x⁻¹}_{χμ} · d^y_{χφ} = 0`」。
+          支持 = 🎯 `sum_character_mul_generalizedDecompositionNumber_eq_zero`
+          (`v⁻¹ ∉ S(y)` なら `Σ_χ χ(v) d^y_{χφ} = 0` = `Φ^{y⁻¹}_φ` の section 外での消滅) +
+          `BrauerBasis` の `eq_zero_of_sum_irreducibleBrauerCharacter_eq_zero`
+          (**`IBr` の線型独立性**)。
+          ⚠ **どちらも射影不可分指標を使わない** — 係数は `IBr` の線型独立性で決まるので、
+          各中心化群について必要なのは modular datum `π` だけで Wedderburn 分解 `e` は不要。
+          Navarro 自身の論法 ("by the linear independence of the elements of IBr(H)") と同じ。
+          結果として仮定が減り `unusedFintypeInType` lint も自然に解消した
+          (**linter が数学的により良い証明を指していた**例)。
         **⏸ 次の一手 = (5.12)** (`k(B) = Σ_i Σ_{b ∈ Bl(C_G(x_i)), b^G = B} l(b)`)。
-        (5.13)(b) は 2026-08-05 に完了 (段 172)。
+        (5.13)(b) は 2026-08-05 に完了 (段 172)、(5.13)(a) 前半も同日 (段 173)。
+        **(5.12) の証明 (原文 p.110、ページ画像で確認済)**:
+        * `R_i` = `C_G(x_i)` の `p`-正則類の代表系とすると `{x_i y}_{i, y∈R_i}` が
+          `G` の共役類の完全代表系 ⟹ `k(G) = Σ_i |IBr(C_G(x_i))|`
+          (`p`-section が `G` を分割する = 段 162、section の助変数化 = `mem_pSection_iff` +
+          `isConj_centralizer_of_isConj_mul`、`|IBr(H)| = #cl(H⁰)` = `OrdinaryIrrCount` 既存)
+        * `k(G) × k(G)` 行列 `J = (d^{x_i}_{χμ})` を作ると (5.13) より
+          `J̄ᵗ J = diag(C^{(x_1)}, …, C^{(x_k)})` ⟹ **`J` は正則**
+          (Cartan 行列が正則 = `sum_cartanMatrix_mul_pairingZero` から従うはず)
+        * 第二主定理 (5.8 = `..._eq_zero_of_inducedBlockOfCentralizer_ne`、既存) より
+          `J` は `Irr(B_s)` × `{(x_i,μ) : bl(μ)^G = B_s}` でブロック対角
+        * 正則なブロック対角行列の各ブロックは正方 ⟹ `k(B) = Σ_i Σ_{b^G=B} l(b)`
+        ⚠ 必要な新規インフラ: (i) 全 `p`-元類にわたる添字型と `J` の構成、
+        (ii) 「正則なブロック対角行列の各対角ブロックは正方」の線型代数、
+        (iii) `Irr(G)` / `∐_i IBr(C_G(x_i))` のブロック別分割。
+        **(7.2) が (5.12) を使う形 (原文 p.132)**: `p = 2`、`P = Z₂×Z₂` が Sylow で
+        involution が 1 類のとき `k(B₀) − l(B₀) = l(b₀) = 1`
+        (2-元の類は `1` と `t` の 2 つだけ; `C_G(t)` は正規 2-補群を持つので
+        `IBr(b₀) = {1}` = 段 100 の (6.13))。
   - [ ] (旧) 次の一手の詳細 (2026-08-05 に確定した経路、実装済):
         (2026-08-05 に原文 p.62 のページ画像で (3.18) の証明を確定した結果、
         **教科書の (d)⟹(e) 経由 (`e_χ ∈ Z(𝒪G)` + Thm (3.9)) より短い道**が見えた)。
