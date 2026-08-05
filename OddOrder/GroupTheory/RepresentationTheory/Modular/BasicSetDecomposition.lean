@@ -34,9 +34,13 @@ group with a Klein four Sylow `2`-subgroup.
 ## Main results
 
 * `OddOrder.RepresentationTheory.Modular.basicDecompositionNumber_eq_zero` — (7.5)(a)
+* `OddOrder.RepresentationTheory.Modular.sum_basicDecompositionNumber` — the defining expansion
+  `χ(x w) = ∑_φ d^x_{χφ} η_φ(w)`
 * `OddOrder.RepresentationTheory.Modular.sum_mul_basicDecompositionNumber` — the `U`-congruence
 * `OddOrder.RepresentationTheory.Modular.sum_mul_basicDecompositionNumber_eq_cartanMatrix` —
   (7.5)(c)
+* `OddOrder.RepresentationTheory.Modular.sum_basicDecompositionNumber_eq_character` —
+  `χ(x w) = ∑_φ d^x_{χφ} η_φ(w)` (the display on p. 141)
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -88,6 +92,27 @@ theorem sum_mul_basicDecompositionNumber {dinv d : J → ι → K} {u : ι → �
     _ = ∑ μ : ι, ∑ τ : ι, (u μ φ : K) * c μ τ * (u τ η : K) :=
         Finset.sum_congr rfl fun μ _ => Finset.sum_congr rfl fun τ _ => by rw [hc μ τ]
 
+/-- **The defining expansion in the basic set.**  If `U` expresses each irreducible Brauer
+character in the basic set — `μ = ∑_φ u_{μφ} η_φ` — then the basic-set numbers reproduce the
+expansion: `∑_φ d^x_{χφ} η_φ = ∑_μ d^x_{χμ} μ`.
+
+This is the form Navarro uses in the "analysis at `t`" (p. 141): `χ(t u) = ∑_j d^t_{χ ψ_j} ψ_j(u)`
+for a basic set `{ψ_0, ψ_1, ψ_2}` of the principal block of `C_G(t)`. -/
+theorem sum_basicDecompositionNumber [Fintype ι₂] {d : ι → K} {u : ι → ι₂ → ℤ}
+    {μval : ι → K} {ηval : ι₂ → K} (hu : ∀ μ : ι, μval μ = ∑ φ : ι₂, (u μ φ : K) * ηval φ) :
+    (∑ φ : ι₂, basicDecompositionNumber d u φ * ηval φ) = ∑ μ : ι, d μ * μval μ := by
+  classical
+  calc (∑ φ : ι₂, basicDecompositionNumber d u φ * ηval φ)
+      = ∑ φ : ι₂, ∑ μ : ι, d μ * ((u μ φ : K) * ηval φ) := by
+        refine Finset.sum_congr rfl fun φ _ => ?_
+        rw [basicDecompositionNumber, Finset.sum_mul]
+        exact Finset.sum_congr rfl fun μ _ => by ring
+    _ = ∑ μ : ι, d μ * ∑ φ : ι₂, (u μ φ : K) * ηval φ := by
+        rw [Finset.sum_comm]
+        exact Finset.sum_congr rfl fun μ _ => (Finset.mul_sum _ _ _).symm
+    _ = ∑ μ : ι, d μ * μval μ :=
+        Finset.sum_congr rfl fun μ _ => by rw [hu μ]
+
 end Generic
 
 /-! ### Navarro (7.5)(c) -/
@@ -136,6 +161,23 @@ theorem sum_mul_basicDecompositionNumber_eq_cartanMatrix {ι₂ : Type*} (u : ι
           * (cartanMatrix hpC hω hω' hπ hlin hkerJ e μ τ : K) * (u τ η : K) :=
   sum_mul_basicDecompositionNumber (J := J) φ η _ fun μ τ =>
     sum_mul_generalizedDecompositionNumberInv_eq_cartanMatrix hpC hω hω' hπ hlin hkerJ e eG hx μ τ
+
+omit [Invertible (Nat.card G : K)] in
+include hpC hω' hπ hlin hkerJ in
+/-- **`χ(x w) = ∑_φ d^x_{χφ} η_φ(w)`** for a basic set `η` given by the integer matrix `U`
+expressing `IBr(C_G(x))` in it.  This is Navarro's display on p. 141. -/
+theorem sum_basicDecompositionNumber_eq_character {ι₂ : Type*} [Fintype ι₂] (u : ι → ι₂ → ℤ)
+    (η : ι₂ → ↥(centralizerOf x) → K)
+    (hu : ∀ (μ : ι) (w : ↥(centralizerOf x)), IsPRegular p w →
+      algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π μ w)
+        = ∑ φ : ι₂, (u μ φ : K) * η φ w)
+    (χ : G → K) (hχ : ∀ g h : G, IsConj g h → χ g = χ h)
+    {w : ↥(centralizerOf x)} (hw : IsPRegular p w) :
+    (∑ φ : ι₂, basicDecompositionNumber
+        (generalizedDecompositionNumber x hpC hω' hπ hlin hkerJ χ hχ) u φ * η φ w)
+      = χ (x * (w : G)) := by
+  rw [sum_basicDecompositionNumber (fun μ => hu μ w hw)]
+  exact sum_generalizedDecompositionNumber x hpC hω' hπ hlin hkerJ χ hχ hw
 
 end Cartan
 

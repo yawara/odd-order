@@ -17731,3 +17731,9 @@ basic set `𝓑` は `IBr(b)` から整数行列 `U = (u_{μφ})` (整数逆行�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_mul_basicDecompositionNumber_eq_cartanMatrix
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_basicDecompositionNumber
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_basicDecompositionNumber_eq_character
