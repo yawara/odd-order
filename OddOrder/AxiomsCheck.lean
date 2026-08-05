@@ -124,6 +124,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicIntegerModP
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicModEq
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CharacterPClassCongruence
 import OddOrder.GroupTheory.RepresentationTheory.UnitCharacter
+import OddOrder.GroupTheory.RepresentationTheory.InducedAdjoinSpan
 import OddOrder.GroupTheory.RepresentationTheory.InducedIndicator
 import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCount
 import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCharacter
@@ -18265,3 +18266,15 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
 
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.card_pRegularProd
+
+/-! 🎯 **Brauer 指標判定 (issue 9508 段 F)**: 誘導が `ℤ[ω]·ch(H)` を `ℤ[ω]·v(G)` に送る
+(`RepresentationTheory/InducedAdjoinSpan`)。`v(G)` は定義上 virtual character の誘導で
+生成されるが、Lemma 7.6 の類関数は `ch(H)` でなく `ch_R(H)` に居るので `ℤ[ω]` 係数版が要る。
+`Ind_H^G` の K-線形性 (`induceFun_add` / `induceFun_smul`、`VirtualCharacterInduction` に追加)
+から closure induction 一発。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.induceFun_smul
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.induceFun_mem_adjoinSpan_inducedVirtualCharacters

@@ -60,6 +60,30 @@ theorem extendByZero_of_mem (ψ : ↥H → K) {g : G} (hg : g ∈ H) :
 theorem extendByZero_of_not_mem (ψ : ↥H → K) {g : G} (hg : g ∉ H) :
     extendByZero H ψ g = 0 := dif_neg hg
 
+theorem extendByZero_add (ψ₁ ψ₂ : ↥H → K) :
+    extendByZero H (ψ₁ + ψ₂) = extendByZero H ψ₁ + extendByZero H ψ₂ := by
+  funext g
+  by_cases hg : g ∈ H
+  · rw [Pi.add_apply, extendByZero_of_mem _ hg, extendByZero_of_mem _ hg,
+      extendByZero_of_mem _ hg]
+    rfl
+  · rw [Pi.add_apply, extendByZero_of_not_mem _ hg, extendByZero_of_not_mem _ hg,
+      extendByZero_of_not_mem _ hg, add_zero]
+
+theorem extendByZero_smul (c : K) (ψ : ↥H → K) :
+    extendByZero H (c • ψ) = c • extendByZero H ψ := by
+  funext g
+  by_cases hg : g ∈ H
+  · rw [Pi.smul_apply, extendByZero_of_mem _ hg, extendByZero_of_mem _ hg]
+    rfl
+  · rw [Pi.smul_apply, extendByZero_of_not_mem _ hg, extendByZero_of_not_mem _ hg, smul_zero]
+
+theorem extendByZero_zero : extendByZero H (0 : ↥H → K) = 0 := by
+  funext g
+  by_cases hg : g ∈ H
+  · rw [extendByZero_of_mem _ hg]; rfl
+  · rw [extendByZero_of_not_mem _ hg]; rfl
+
 variable [Fintype G]
 
 /-- Summing an extension by zero over `G` is summing the original function over `H`. -/
@@ -86,6 +110,29 @@ theorem induceFun_conj (ψ : ↥H → K) (g h : G) :
     Fintype.sum_equiv (Equiv.mulRight h) _ _ fun x =>
       congrArg _ (by simp only [Equiv.coe_mulRight]; group)
   simp only [induceFun, hre]
+
+/-! ### Linearity -/
+
+theorem induceFun_add (ψ₁ ψ₂ : ↥H → K) :
+    induceFun H (ψ₁ + ψ₂) = induceFun H ψ₁ + induceFun H ψ₂ := by
+  funext g
+  simp only [induceFun, Pi.add_apply, extendByZero_add, Finset.sum_add_distrib, mul_add]
+
+theorem induceFun_smul (c : K) (ψ : ↥H → K) :
+    induceFun H (c • ψ) = c • induceFun H ψ := by
+  funext g
+  simp only [induceFun, Pi.smul_apply, extendByZero_smul, smul_eq_mul, ← Finset.mul_sum]
+  ring
+
+theorem induceFun_zero : induceFun H (0 : ↥H → K) = 0 := by
+  funext g
+  simp only [induceFun, extendByZero_zero, Pi.zero_apply, Finset.sum_const_zero, mul_zero]
+
+theorem induceFun_neg (ψ : ↥H → K) : induceFun H (-ψ) = -induceFun H ψ := by
+  have hne : (-ψ) = (-1 : K) • ψ := by funext h; simp
+  rw [hne, induceFun_smul]
+  funext g
+  simp
 
 /-! ### The projection formula -/
 
