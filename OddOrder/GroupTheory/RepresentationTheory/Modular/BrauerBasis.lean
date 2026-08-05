@@ -165,4 +165,18 @@ theorem existsUnique_coeff_irreducibleBrauerCharacter (f : G → K)
       _ = (d ᵥ* M) ᵥ* M⁻¹ := (Matrix.vecMul_vecMul d M M⁻¹).symm
       _ = fv ᵥ* M⁻¹ := by rw [(hkey d).mp hd]
 
+omit [DecidableEq ι] in
+include hp hω hπ hlin hkerJ in
+/-- **Linear independence of `IBr(G)`**: a combination vanishing on the `p`-regular elements has
+zero coefficients.  This is the uniqueness half of
+`existsUnique_coeff_irreducibleBrauerCharacter` applied to the zero class function. -/
+theorem eq_zero_of_sum_irreducibleBrauerCharacter_eq_zero (a : ι → K)
+    (ha : ∀ g : G, IsPRegular p g →
+      ∑ φ, a φ * algebraMap 𝒪 K
+        (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π φ g) = 0) :
+    a = 0 := by
+  classical
+  exact (existsUnique_coeff_irreducibleBrauerCharacter hp hω hπ hlin hkerJ (fun _ => (0 : K))
+    (fun _ _ _ => rfl)).unique ha (fun _ _ => by simp)
+
 end OddOrder.RepresentationTheory.Modular

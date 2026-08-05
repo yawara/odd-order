@@ -7,7 +7,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogona
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SectionProjectiveCharacter
 
 /-!
-# The orthogonality of the generalized decomposition numbers — Navarro (5.13)(b)
+# The orthogonality of the generalized decomposition numbers — Navarro (5.13)
 
 For a `p`-element `x` and `μ, φ ∈ IBr(C_G(x))`, Navarro (5.13)(b) reads
 
@@ -46,6 +46,10 @@ the `C_G(x)`-class of `y`.
   `∑_{χ ∈ Irr(G)} χ((x y)⁻¹) d^x_{χφ} = Φ_φ(y⁻¹)`, i.e. the value of `Φ^{x⁻¹}_φ` on the section
 * `OddOrder.RepresentationTheory.Modular.sum_mul_generalizedDecompositionNumber_eq_cartanMatrix` —
   Navarro (5.13)(b)
+* `OddOrder.RepresentationTheory.Modular.sum_character_mul_generalizedDecompositionNumber_eq_zero` —
+  the same class function vanishes off the section
+* `OddOrder.RepresentationTheory.Modular.sum_mul_generalizedDecompositionNumber_eq_zero` —
+  Navarro (5.13)(a), first part
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -270,5 +274,141 @@ theorem sum_mul_generalizedDecompositionNumber_eq_cartanMatrix
         rw [projectiveIndecomposableCharacter_eq_sum_cartanMatrix hpC hω hω' hπ hlin hkerJ e φ
           y⁻¹ hy.inv, map_sum]
         exact Finset.sum_congr rfl fun τ _ => by rw [map_mul, map_natCast]
+
+/-! ### Navarro (5.13)(a): two `p`-sections
+
+Two `p`-elements that are not `G`-conjugate have disjoint `p`-sections, and that alone kills the
+whole pairing.  Neither statement below mentions a projective indecomposable character: the
+coefficients are pinned by the **linear independence of `IBr`**
+(`eq_zero_of_sum_irreducibleBrauerCharacter_eq_zero`), so only the modular datum `π` of each
+centralizer is needed, not its Wedderburn splitting. -/
+
+section TwoSections
+
+variable {y : G}
+variable {κ : Type*} {nnY : κ → Type*} [∀ i, Fintype (nnY i)] [∀ i, DecidableEq (nnY i)]
+  [Fintype κ] [∀ i, Nonempty (nnY i)]
+variable {ωY' : ResidueField 𝒪}
+  (hωY' : IsPrimitiveRoot ωY' (pRegularExponent p ↥(centralizerOf y)))
+  {πY : MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf y) →+*
+    ∀ j, Matrix (nnY j) (nnY j) (ResidueField 𝒪)}
+  (hπY : Function.Surjective πY)
+  (hlinY : ∀ (c : ResidueField 𝒪) (a : MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf y)),
+    πY (c • a) = c • πY a)
+  (hkerJY : RingHom.ker πY
+    = Ring.jacobson (MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf y)))
+
+include hpC hωY' hπY hlinY hkerJY in
+/-- **`Φ^{y⁻¹}_φ` vanishes off the `p`-section of `y⁻¹`**, in the form it is used:
+
+`∑_{χ ∈ Irr(G)} χ(v) d^y_{χφ} = 0`   whenever `v⁻¹ ∉ S(y)`.
+
+Expanding `∑_φ (∑_χ χ(v) d^y_{χφ}) φ(w)` by the defining property of the generalized
+decomposition numbers gives `∑_χ χ(v) χ(y w)`, which second orthogonality kills because
+`y w ∈ S(y)` while `v⁻¹ ∉ S(y)`; the coefficients then vanish by linear independence of `IBr`.
+
+Together with `sum_character_mul_generalizedDecompositionNumber` this determines the class
+function `∑_χ d^y_{χφ} χ` completely — it is `Φ^{y⁻¹}_φ` — without that function being built. -/
+theorem sum_character_mul_generalizedDecompositionNumber_eq_zero
+    (hy : IsPElement p y) (φ : κ) {v : G} (hv : v⁻¹ ∉ pSection p y) :
+    (∑ j : J, (wedderburnRepresentation eG j).character v
+        * generalizedDecompositionNumber y hpC hωY' hπY hlinY hkerJY
+            ((wedderburnRepresentation eG j).character)
+            (fun _ _ h => character_eq_of_isConj _ h) φ) = 0 := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  refine congrFun (eq_zero_of_sum_irreducibleBrauerCharacter_eq_zero hpC hωY' hπY hlinY hkerJY
+    (fun τ => ∑ j : J, (wedderburnRepresentation eG j).character v
+      * generalizedDecompositionNumber y hpC hωY' hπY hlinY hkerJY
+          ((wedderburnRepresentation eG j).character)
+          (fun _ _ h => character_eq_of_isConj _ h) τ) ?_) φ
+  intro w hw
+  calc ∑ τ, (∑ j : J, (wedderburnRepresentation eG j).character v
+          * generalizedDecompositionNumber y hpC hωY' hπY hlinY hkerJY
+              ((wedderburnRepresentation eG j).character)
+              (fun _ _ h => character_eq_of_isConj _ h) τ)
+        * algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) πY τ w)
+      = ∑ j : J, (wedderburnRepresentation eG j).character v *
+          ∑ τ, generalizedDecompositionNumber y hpC hωY' hπY hlinY hkerJY
+              ((wedderburnRepresentation eG j).character)
+              (fun _ _ h => character_eq_of_isConj _ h) τ
+            * algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) πY τ w) := by
+        simp only [Finset.sum_mul, Finset.mul_sum]
+        rw [Finset.sum_comm]
+        exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
+    _ = ∑ j : J, (wedderburnRepresentation eG j).character v
+          * (wedderburnRepresentation eG j).character (y * (w : G)) :=
+        Finset.sum_congr rfl fun j _ => by
+          rw [sum_generalizedDecompositionNumber y hpC hωY' hπY hlinY hkerJY _ _ hw]
+    _ = 0 := by
+        have horth := sum_character_inv_mul_character eG v⁻¹ (y * (w : G))
+        rw [inv_inv] at horth
+        rw [horth, if_neg]
+        intro hc
+        refine hv (mem_pSection_iff_isConj_pPart.mpr ?_)
+        have hmem : y * (w : G) ∈ pSection p y :=
+          mul_mem_pSection hpC ((Subgroup.mem_centralizer_iff.mp w.2) y rfl) hy
+            (isPRegular_coe hw)
+        exact (isConj_pPart hc).trans (mem_pSection_iff_isConj_pPart.mp hmem)
+
+include hpC hω' hπ hlin hkerJ hωY' hπY hlinY hkerJY in
+/-- **Navarro (5.13)(a)** (first part): `∑_{χ ∈ Irr(G)} d^{x⁻¹}_{χμ} d^y_{χφ} = 0` when the
+`p`-elements `x` and `y` are not `G`-conjugate.
+
+Expanding `∑_μ (∑_χ d^{x⁻¹}_{χμ} d^y_{χφ}) μ(w)` by the defining property of `dinv` gives
+`∑_χ χ((x w⁻¹)⁻¹) d^y_{χφ}`, and `x w⁻¹ ∈ S(x)` is not in `S(y)` because the `p`-sections of
+non-conjugate `p`-elements are disjoint; the previous lemma applies, and linear independence of
+`IBr(C_G(x))` finishes. -/
+theorem sum_mul_generalizedDecompositionNumber_eq_zero
+    (hx : IsPElement p x) (hy : IsPElement p y) (hxy : ¬ IsConj x y)
+    (μ : ι) (φ : κ) (dinv : J → ι → K)
+    (hdinv : ∀ (j : J) (w : ↥(centralizerOf x)), IsPRegular p w →
+      ∑ τ, dinv j τ * algebraMap 𝒪 K
+          (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π τ w⁻¹)
+        = (wedderburnRepresentation eG j).character ((x * (w : G))⁻¹)) :
+    (∑ j : J, dinv j μ * generalizedDecompositionNumber y hpC hωY' hπY hlinY hkerJY
+        ((wedderburnRepresentation eG j).character)
+        (fun _ _ h => character_eq_of_isConj _ h) φ) = 0 := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  refine congrFun (eq_zero_of_sum_irreducibleBrauerCharacter_eq_zero hpC hω' hπ hlin hkerJ
+    (fun τ => ∑ j : J, dinv j τ * generalizedDecompositionNumber y hpC hωY' hπY hlinY hkerJY
+      ((wedderburnRepresentation eG j).character)
+      (fun _ _ h => character_eq_of_isConj _ h) φ) ?_) μ
+  intro g hg
+  calc ∑ τ, (∑ j : J, dinv j τ *
+          generalizedDecompositionNumber y hpC hωY' hπY hlinY hkerJY
+            ((wedderburnRepresentation eG j).character)
+            (fun _ _ h => character_eq_of_isConj _ h) φ)
+        * algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π τ g)
+      = ∑ j : J, (∑ τ, dinv j τ *
+            algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π τ g)) *
+          generalizedDecompositionNumber y hpC hωY' hπY hlinY hkerJY
+            ((wedderburnRepresentation eG j).character)
+            (fun _ _ h => character_eq_of_isConj _ h) φ := by
+        simp only [Finset.sum_mul]
+        rw [Finset.sum_comm]
+        exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
+    _ = ∑ j : J, (wedderburnRepresentation eG j).character
+            ((x * ((g⁻¹ : ↥(centralizerOf x)) : G))⁻¹) *
+          generalizedDecompositionNumber y hpC hωY' hπY hlinY hkerJY
+            ((wedderburnRepresentation eG j).character)
+            (fun _ _ h => character_eq_of_isConj _ h) φ :=
+        Finset.sum_congr rfl fun j _ => by
+          have hexp := hdinv j g⁻¹ hg.inv
+          rw [inv_inv] at hexp
+          rw [hexp]
+    _ = 0 := by
+        refine sum_character_mul_generalizedDecompositionNumber_eq_zero hpC eG hωY' hπY hlinY
+          hkerJY hy φ ?_
+        rw [inv_inv]
+        intro hmemY
+        exact hxy (isConj_of_mem_pSection_of_mem_pSection
+          (mul_mem_pSection hpC
+            ((Subgroup.mem_centralizer_iff.mp (g⁻¹ : ↥(centralizerOf x)).2) x rfl) hx
+            (isPRegular_coe hg.inv))
+          hmemY)
+
+end TwoSections
 
 end OddOrder.RepresentationTheory.Modular

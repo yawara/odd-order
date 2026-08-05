@@ -17269,3 +17269,25 @@ Navarro (5.13) の証明の内積計算。`x⁻¹` 側の分裂データを持�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_mul_generalizedDecompositionNumber_eq_cartanMatrix
+
+/-! **`IBr(G)` の線型独立性** (`Modular/BrauerBasis`) — `p`-正則元上で消える一次結合は
+係数がすべて 0。`existsUnique_coeff_irreducibleBrauerCharacter` の一意性を零類関数に適用しただけ。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_zero_of_sum_irreducibleBrauerCharacter_eq_zero
+
+/-! 🎯 **`Φ^{y⁻¹}_φ` は `S(y⁻¹)` の外で消える** (`Modular/GeneralizedDecompositionOrthogonality`) —
+`v⁻¹ ∉ S(y)` なら `Σ_{χ∈Irr(G)} χ(v) d^y_{χφ} = 0`。
+`Σ_φ (…) φ(w)` を (5.1) の定義式で展開すると `Σ_χ χ(v) χ(y w)` になり、`y w ∈ S(y)` かつ
+`v⁻¹ ∉ S(y)` なので第二直交関係で 0。あとは `IBr` の線型独立性。
+⚠ 射影不可分指標を使わないので `C_G(y)` の Wedderburn 分解 (`eY`) は不要。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_character_mul_generalizedDecompositionNumber_eq_zero
+
+/-! 🎯🎯 **Navarro (5.13)(a) 前半**: `x`, `y` が共役でない `p`-元なら
+`Σ_{χ∈Irr(G)} d^{x⁻¹}_{χμ} · d^y_{χφ} = 0` (`Modular/GeneralizedDecompositionOrthogonality`)。
+共役でない `p`-元の `p`-section は交わらない、という一点で落ちる。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_mul_generalizedDecompositionNumber_eq_zero
