@@ -1422,7 +1422,27 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               ⚠ **訂正**: `hQab` は repo 側の特殊化ではなく**書籍の仮説 `Q C_G(Q) ⊆ H` を
               `H = C_G(Q)` に代入したもの** (`Q C_G(Q) ⊆ C_G(Q) ⟺ Q 可換`)。
               `λ_b ∘ Br_Q = λ_b^G` (Navarro (4.14)) の同定にしか要らない。
-            - [ ] **残る債務 = `H = C_G(Q)` 固定 → 一般 `Q C_G(Q) ≤ H ≤ N_G(Q)`**。
+            - [ ] **残る債務 = `H = C_G(Q)` 固定 → 一般 `Q C_G(Q) ≤ H ≤ N_G(Q)`** (着手中)。
+              - [x] **第 1 段 = 数え上げ側 完了 (2026-08-05、段 158)**:
+                `card_pFactorPairsMem_modEq_centralizer` (`|Ω_H(g)| ≡ |Ω_{C_G(Q)}(g)|`) /
+                `card_pRegularMem_modEq_centralizer` (`|H⁰| ≡ |C_G(Q)⁰|`)。
+                ⚠ `↥H` を新しい ambient 群に立て直す (subgroupOf 移送) 必要はなく、
+                `G` の中の `Q` の作用を `H` 制限 subtype に載せ替えるだけで済んだ。
+              - [ ] **第 2 段 = `e^H_g = e^C_g` (`g ∈ C`)**: Külshammer (段 153) を `G := ↥H`
+                で instantiate (これは `Q` を含まないので移送不要) + 第 1 段の 2 合同。
+                ⟹ `e^G_g = e^H_g`、すなわち `Br_Q^{G→H}(e_{B₀(G)}) = T(e_{B₀(H)})`
+                (`T` = `C_G(Q)` への切り詰め)。
+              - [ ] **第 3 段 = `λ_b ∘ T = λ_b` on `Z(k[↥H])`** = (4.14) の **`H`-類版**。
+                既存 `pi_truncClassSum_eq_centralizerTrunc` は `G`-類で添字されているので
+                そのままでは足りないが、engine の `pi_sum_ite_single_eq_zero` は
+                **任意の `Q`-共役不変述語**を取るので、述語を「`H`-類 `L` に属する ∧
+                `C_G(Q)` に入らない」に替えるだけで同じ証明が通る。
+              - [ ] **第 4 段 = 組み立て**: `λ_b(Br_Q^{G→H}(e_{B₀(G)})) = 1` (仮説) と
+                第 2 段で `λ_b(T(e_{B₀(H)})) = 1`、第 3 段で `λ_b(e_{B₀(H)}) = 1`
+                ⟹ `b = B₀(H)`。
+              ⚠ **`b_C` を経由する当初の 6 段案は不要になった** — `Br_Q^{H→C}` を
+              代数準同型として作る (= `↥H` を ambient にして subgroupOf 移送する) 必要が
+              消え、4 段で閉じる。
               **経路は 2026-08-05 に確定** (原文 p.128-130 の Problems を精読;
               `pages/navarro-p129,130.png` を新規レンダリング)。`C := C_G(Q)` として:
               1. `Br_Q^{H→C} ∘ Br_Q^{G→H} = Br_Q^{G→C}` (係数の切り詰めの合成、自明)
