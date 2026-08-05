@@ -266,6 +266,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerFormula
 import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterOffCentralizer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SectionProjectiveCharacter
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionSum
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
@@ -17186,3 +17187,11 @@ well-defined 性は `isConj_centralizer_of_isConj_mul` (助変数化の単射性
   OddOrder.RepresentationTheory.Modular.fiberEquivCentralizerOf
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.card_fiber_eq_card_centralizerOf
+
+/-! 🎯 **`p`-section 上の和の再添字づけ** (`Modular/PSectionSum`) —
+類関数 `f` について `|C_G(x)| • Σ_{u∈S(x)} f(u) = |G| • Σ_{y∈C_G(x)⁰} f(xy)`。
+二重和 `Σ_{(g,y)} f(g(xy)g⁻¹)` を 2 通りに読む (類関数性 / ファイバー濃度 段 166)。
+Navarro (5.13) が暗黙に行う付け替えで、類代表を選ばないので類の大きさの計算が要らない。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_centralizerOf_smul_sum_pSection
