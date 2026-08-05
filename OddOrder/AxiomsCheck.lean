@@ -118,6 +118,7 @@ import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacterPairing
 import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacterInduction
 import OddOrder.GroupTheory.RepresentationTheory.BrauerInductionIdeal
 import OddOrder.GroupTheory.RepresentationTheory.Modular.VirtualCharacterSplitting
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionDescent
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
@@ -18017,3 +18018,28 @@ projection formula = Gorenstein Lemma 7.2 (`v(G)` が `ch(G)` のイデアルで
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.inducedVirtualCharacters_le_virtualCharacters
+
+/-! 🎯🎯 **Brauer 指標判定 (issue 9508 段 C 後半) = Gorenstein Lemma 7.4 の降下**
+(`Modular/BrauerInductionDescent`)。Brauer-Tate の議論は `v_R(G) = ℤ[ω]·v(G)` の中で走る
+(Lemma 7.6 の `ψ = Σ_i ζ^{-i} ψ_i` は係数が 1 の冪根で整数でない) ので、最後に ℤ へ戻す必要がある。
+`ℤ[ω]` の power basis (mathlib `Algebra.adjoin.powerBasis'`) を `K` へ移送して
+「`1,ω,…,ω^{n-1}` が ℤ-基底」を得、係数抽出は**内積経由**で行う:
+`θ = Σ_{j<n} ω^j • u_j` なら `(θ,χ_i) = Σ_j ω^j (u_j,χ_i)` で両辺の係数は有理整数
+(`v(G) ⊆ ch(G)` + `charPairing_mem_intRange`) ⟹ ℤ-一次独立から `ω^0` の係数が `(θ,χ_i)`、
+残りは 0 ⟹ `u_0` と `θ` は全 `χ_i` との内積が一致 ⟹ `eq_of_charPairing_eq` で `θ = u_0 ∈ v(G)`。
+⟹ `Irr(G)` の一次独立性を別途用意する必要がない。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.natDegree_minpoly_int_pos
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_intCast_sum_pow
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.eq_zero_of_sum_intCast_pow_eq_zero
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_sum_pow_smul_of_mem_adjoinSpan
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.mem_inducedVirtualCharacters_of_mem_adjoinSpan
