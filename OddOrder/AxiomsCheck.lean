@@ -157,6 +157,7 @@ import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10A
 import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10B
 import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10C
 import OddOrder.GroupTheory.PRegularElement
+import OddOrder.GroupTheory.PRegularQuotient
 import OddOrder.GroupTheory.PRegularElementCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.RootsOfUnityLift
@@ -17825,3 +17826,22 @@ Gram 行列は `C_𝓑 = D_𝓑ᵗD_𝓑 = 1 + δ` (対角 2・非対角 1)。�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_principalBasicSetMatrix_mul_cartanMatrix
+
+/-! 🎯 **Navarro (7.6) 第 1 段: `p`-正則元は `G⁰ → (G/P)⁰` で全単射に写る**
+(`GroupTheory/PRegularQuotient`)。全射は任意の正規部分群で成立 (原像 `g` の `p`-部分は
+`p`-元かつ `ȳ` の冪 = `p`-正則ゆえ 1)。単射だけが仮説を使い、`G/C_G(P)` が `p`-群なら
+`p`-正則元は全て `C_G(P)` に入る (`mem_of_isPRegular_of_isPGroup_quotient`) ので、
+`x⁻¹y ∈ P` は可換な 2 つの `p`-正則元の積 = `p`-正則、かつ `p`-元 ⟹ 1。
+BS が使うのは `P = ⟨t⟩ ≤ Z(C_G(t))` の場合で、仮説は自明 (`commute_of_isPRegular_of_le_center`)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.mem_of_isPRegular_of_isPGroup_quotient
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.exists_isPRegular_mk_eq
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.eq_of_isPRegular_of_mk_eq
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.bijOn_mk_isPRegular
