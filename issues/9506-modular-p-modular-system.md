@@ -2779,6 +2779,16 @@ p.139 の残り = 「位数 4 の元は全て `G`-共役 (実は `C_G(t)`-共役
 ⚠ 当該ファイルは仮説鎖が長く `maxHeartbeats 1000000` 級なので、
 `include` 行の差し替えを 1 つずつ leaf build で回すこと (段 I の refactor と同じ要領)。
 
+**実装方針 = その場で一般化 (複製しない)**。呼び出し側は **2 箇所だけ** (実測):
+`PrincipalBlockInvolution:632` と `PrincipalBlockBasicSet:252`。
+`ht : t * t = 1` を `(hy4 : t ^ 4 = 1) (hinv : ∃ c, c * t * c⁻¹ = t⁻¹)` に差し替え、
+`include` から `ht` を外す。対合での instance 化は
+`hy4 := by rw [show (4:ℕ) = 2*2 from rfl, pow_mul, sq, ht, one_pow]`、
+`hinv := ⟨1, by simpa using (inv_eq_of_mul_eq_one_right ht).symm⟩`。
+⚠ `exists_intCast_character_of_pow_four_eq_one` が要求する `hreal : χ(t⁻¹) = χ(t)` は
+`hinv` + 指標の類関数性から出る (`χ(c t c⁻¹) = χ(t)`) — **この橋渡し補題の所在を
+先に grep すること** (`Representation.character` の共役不変性)。
+
 
 - "Analysis at y" (p.139 末-140): `⟨y⟩` が `C_G(y)` の Sylow-2 ⟹ 正規 2-補群 ⟹
   `IBr(b₀) = {1}` ⟹ `χ_i(y) = d^y_{χ_i 1}` … 部品は段 185-200 で既出 (9506 の該当節参照)。
