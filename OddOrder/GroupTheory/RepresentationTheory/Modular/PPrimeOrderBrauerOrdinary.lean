@@ -3,6 +3,8 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterExponent
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerFromOrdinary
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderCartan
 import OddOrder.GroupTheory.RepresentationTheory.Modular.VirtualCharacterSplitting
@@ -29,6 +31,8 @@ character has to be recognised as an ordinary one.
   `φ = ∑_χ d_{χφ} χ`
 * `OddOrder.RepresentationTheory.Modular.irreducibleBrauerCharacter_mem_virtualCharacters` —
   `IBr(G) ⊆ ch(G)`
+* `OddOrder.RepresentationTheory.Modular.brauerCharacter_mem_virtualCharacters_of_not_dvd_card` —
+  every Brauer character of a `p'`-group is a virtual character, at any admissible exponent
 
 ## References
 
@@ -133,5 +137,39 @@ theorem irreducibleBrauerCharacter_mem_virtualCharacters [IsAlgClosed (ResidueFi
   rw [hfun]
   exact AddSubgroup.sum_mem _ fun i _ =>
     AddSubgroup.nsmul_mem _ (mem_virtualCharacters_wedderburnRepresentation e i) _
+
+-- Instances driving the Cartan/decomposition matrices, as above.
+set_option linter.unusedDecidableInType false in
+set_option linter.unusedFintypeInType false in
+include hp hω hω' hπ hlin hkerJ e in
+/-- **Every Brauer character of a `p'`-group is a virtual character.**  Decompose the
+representation into simple modules (`exists_decomposition`) and apply
+`irreducibleBrauerCharacter_mem_virtualCharacters` to each factor.
+
+The exponent `N` is arbitrary — only `|G|_{p'} ∣ N` is asked, so that a representation restricted
+from a bigger group, whose Brauer character is taken at the bigger exponent, is covered
+(`brauerCharacter_eq_of_dvd`). -/
+theorem brauerCharacter_mem_virtualCharacters_of_not_dvd_card [IsAlgClosed (ResidueField 𝒪)]
+    (hG : ¬ p ∣ Nat.card G) {N : ℕ} (hNdvd : pRegularExponent p G ∣ N) (hN : ¬ p ∣ N) (hN0 : N ≠ 0)
+    {V : Type*} [AddCommGroup V] [Module (ResidueField 𝒪) V]
+    [FiniteDimensional (ResidueField 𝒪) V] (ρ : Representation (ResidueField 𝒪) G V) :
+    (fun g => algebraMap 𝒪 K (brauerCharacter (𝒪 := 𝒪) N ρ g)) ∈ virtualCharacters K G := by
+  classical
+  obtain ⟨d, hd, -⟩ := exists_decomposition hp hω' hπ hlin hkerJ ρ
+  have hreg : ∀ g : G, IsPRegular p g := fun g hdvd => hG (hdvd.trans (orderOf_dvd_natCard g))
+  have hfun : (fun g => algebraMap 𝒪 K (brauerCharacter (𝒪 := 𝒪) N ρ g))
+      = ∑ i : ι, d i •
+          (fun g => algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π i g)) := by
+    funext g
+    have hexp : brauerCharacter (𝒪 := 𝒪) N ρ g
+        = brauerCharacter (𝒪 := 𝒪) (pRegularExponent p G) ρ g :=
+      (brauerCharacter_eq_of_dvd ρ hNdvd hN hN0 (pRegularExponent_pos (p := p) (G := G)).ne'
+        (rep_pow_pRegularExponent_eq_one ρ hp (hreg g))).symm
+    rw [hexp, hd g (hreg g), map_sum, Finset.sum_apply]
+    exact Finset.sum_congr rfl fun i _ => by
+      rw [Pi.smul_apply, nsmul_eq_mul, map_mul, map_natCast]
+  rw [hfun]
+  exact AddSubgroup.sum_mem _ fun i _ => AddSubgroup.nsmul_mem _
+    (irreducibleBrauerCharacter_mem_virtualCharacters hp hω hω' hπ hlin hkerJ e hG i) _
 
 end OddOrder.RepresentationTheory.Modular

@@ -269,9 +269,14 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
       `eigenspace_eq_bot_of_pow_ne_one` (余分な `n` 乗根の固有空間は 0)。
       ⚠ 段 212 (商) では指数が literally 等しかったので不要だったが、部分群では
       `|H|_{p'} ∣ |G|_{p'}` で等号は成り立たないのでこの補題が要る。
-    - [ ] **H2e 後半 (2/2)**: 制限加群の Brauer 指標 = Brauer 指標の制限 と、
-      `Q` 側の分解 (`exists_decomposition_trace` を `Q` に適用) で `θ|_Q` が `IBr(Q)` の
-      **ℕ**-結合になること。そこに H2e 前半を当てて `θ|_Q ∈ ch(Q)`。
+    - [x] **H2e 後半 (2/2) 完了 ⟹ 段 H2 完了** (2026-08-05):
+      `brauerCharacter_mem_virtualCharacters_of_not_dvd_card` — `p'`-群の**任意の** Brauer 指標が
+      仮想指標。`exists_decomposition` (`BrauerDecomposition`, `exists_decomposition_trace` では
+      なくこちら — 後者は `𝒪`-格子表現用) で単純加群に分解し各因子に H2e 前半。
+      ⚠ 指数 `N` を任意 (`|G|_{p'} ∣ N` のみ) にしたのが要点 — 大きい群から制限した表現の
+      Brauer 指標は大きい指数で取られているので、そこを `brauerCharacter_eq_of_dvd` で吸収する。
+      ⟹ 「制限加群の Brauer 指標 = Brauer 指標の制限」は使用側で `rfl`
+      (`(ρ.comp Q.subtype) x = ρ (x : G)` なので固有空間が literally 同じ)。
 
     ⟹ **H2 は複数 session 規模**。上流から H2a → H2b → H2c → H2d → H2e。
 

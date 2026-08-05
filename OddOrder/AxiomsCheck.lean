@@ -18463,3 +18463,12 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.brauerCharacter_eq_of_dvd
+
+/-! 🎯🎯 **issue 9508 段 H2 完了**: `p'`-群の Brauer 指標は仮想指標
+(`brauerCharacter_mem_virtualCharacters_of_not_dvd_card`)。`exists_decomposition` で単純加群に
+分解し、各因子に H2e 前半を当てる。⚠ 指数 `N` は任意 (`|G|_{p'} ∣ N` だけ要求) — 大きい群から
+制限してきた表現の Brauer 指標が大きい指数で取られているのを `brauerCharacter_eq_of_dvd` で
+吸収するため。これが段 H3 (Navarro (2.15)) が elementary 部分群の `p'`-部分で消費する形。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.brauerCharacter_mem_virtualCharacters_of_not_dvd_card
