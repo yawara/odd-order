@@ -2043,11 +2043,33 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         `card_filter_isPRegular` は `PRegularElementCount` へ移設 (2 箇所で使用)。
   - [ ] **⏸ 次の一手 = (7.2) 本体の残り部品**。原文 p.131-132 (`pages/navarro-p131,132.png`)
         より、まだ repo に無いもの:
-        * **Burnside の正規 `p`-補群定理** (`N_G(P) = C_G(P)` ⟹ 正規 `p`-補群) —
-          Isaacs Ch.5/7 にあるはずなので**着手前に grep**
+        * ~~**Burnside の正規 `p`-補群定理**~~ — ✅ **既存 (2026-08-05 実測)**:
+          `OddOrder.Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer`
+          (`Isaacs/Ch05_Transfer/Basic.lean:491`、`N_G(P) ≤ C_G(P) ⟹ HasNormalPComplement p G`、
+          mathlib の `MonoidHom.transferSylow` 経由)。新規形式化は不要。
         * `Aut(Z₂×Z₂) ≅ S₃` と「位数 3 の自己同型は 3 つの involution を巡回」
+          — **実測で repo に無い (2026-08-05)**。`KleinFour` の定義は
+          `Isaacs/Ch06_FrobeniusActions/Problems6B3.lean` にあるが反例用で `Aut` は扱わない。
+          (7.2) が要るのは全体の同型でなく「位数 4・指数 2 の群の位数 3 の自己同型は
+          3 つの involution を巡回する」だけ。
         * **(5.12)** `k(B) = Σ_i Σ_{b ∈ Bl(C_G(x_i)), b^G = B} l(b)` (第二主定理の系)
-        * **(5.13)(b)** 一般化分解数の直交性 ⟵ **次の実装対象**。
+          - [x] 🎯🎯 **第一段 完了 (2026-08-05、段 174、`Modular/PSectionClassCount`)**:
+            `k(G) = Σ_{[x] : p-元類} #cl(C_G(x)⁰)`。`p`-部分の類が `[x]` の `G`-類は
+            `C_G(x)` の `p`-正則類と全単射 (`pSectionClassEquiv`)。`p`-元類の代表は選ばず
+            `pPartClass` のファイバーで分割する。⟹ 一般化分解行列 `J` が正方の片側。
+          - [ ] **⏸ 第二段 = `J` の組み立てと正則性**。⚠ **設計上の障害 (2026-08-05 判明)**:
+            `J` を全 `p`-元類にわたって組むには、**各中心化群の分裂データ**
+            (`ι`, `nn`, `π`, `hπ`, `hlin`, `hkerJ`, `ω`, `ω'`, `ι'`, `m`, `e`) を
+            **添字づけられた族**として持つ必要がある。repo には現在そのような
+            **束ね構造 (structure) が無い** (`Modular/*.lean` に `structure` は
+            `IsPModularSystem` のみ)。⟹ `ModularSplitting p 𝒪 K H` 相当の structure を
+            新設するのが次の一手 (universe 引数付き、~20 フィールド)。
+            その上で: `J̄ᵗ J = diag(Cartan)` (段 172/173 から) ⟹ `J` 正則、
+            (5.8) でブロック対角、各対角ブロックが正方 ⟹ (5.12)。
+            **正方性の線型代数**は `Aᵗ A` が正則なら `#col ≤ #row` (rank 論法) を各ブロックに
+            適用し、総和が一致することから等号を出すのが最短
+            (「正則なブロック対角行列の各ブロックは正方」を直接やるより軽い)。
+        * **(5.13)(b)** 一般化分解数の直交性 — ✅ **完了 (段 172)**。
           **⚠ 設計上の懸案は解決 (2026-08-05)**: 原文 (p.107 のページ画像で確定) は
           `Σ_{χ∈Irr(G)} conj(d^x_{χμ}) d^x_{χφ} = c_{μφ}` と**複素共役**で書くが、
           抽象的な分裂体 `K` には共役が無い。**共役は不要**と分かった:
