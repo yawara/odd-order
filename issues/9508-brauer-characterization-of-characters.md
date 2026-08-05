@@ -342,6 +342,16 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
   `a : ιG → κ → K` でパラメータ化し、上の 2 つを仮説にする**のが正しい refactor。
   段 204 の族も段 H5 の族も instance になり、整数性は H5 の族で instantiate して出す。
 
+  - [x] **段 I (1/2) 完了** (2026-08-05): `basicSetMatrixOf a` (抽象係数族版) を導入し、
+    `basicSetMatrixOf_eq_zero_of_ne_principalBlock` (仮説は「族がブロック外で 0」だけ) を
+    一般化済。`principalBasicSetMatrix` は段 204 の族での instance として残してある。
+  - [ ] **段 I (2/2)**: 残り 3 定理 (`sum_principalBasicSetMatrix_mul_principalBasicSet` /
+    `sum_decompositionMatrix_mul_principalBasicSetMatrix{,_eq_zero}` /
+    `sum_principalBasicSetMatrix_mul_cartanMatrix`) を `basicSetMatrixOf a` + 2 仮説へ一般化し、
+    段 H5 の整数族で instantiate。⚠ `omit` 行は宣言 1 つにしか掛からないので、
+    定理を挿入すると直後の宣言から `omit` が外れて `IsAdicComplete` 等の instance 解決が
+    下流で壊れる (段 I (1/2) で実際に起きた) — 挿入時は `omit` 行を複製すること。
+
   ⚠ 4 定理はいずれも `maxHeartbeats 800000–1000000` の重い証明で仮説鎖が長い。
   refactor は「def のシグネチャ変更 → 4 定理の仮説差し替え」を 1 つずつ leaf build で回すこと。
 

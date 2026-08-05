@@ -218,15 +218,22 @@ noncomputable def principalBasicSet (u : G) (j₀ j : κ) (g : G) : K :=
     (wedderburnRepresentation eG j).character u * (wedderburnRepresentation eG j).character g
   else 0
 
-/-- **The change-of-basis matrix `U` of Navarro (7.3)** for the basic set `𝓑`: writing
-`φ_μ = ∑_{i ∈ Irr(B_0)} a_{μi} χ_i⁰`
-(`sum_ordinaryCombination_block_eq_irreducibleBrauerCharacter`), the coordinates of `φ_μ` in `𝓑`
-are `u_{μj} = a_{μj} ε_j - a_{μj₀} ε_{j₀}` (`sum_mul_signRelationRow`). -/
+/-- **The change-of-basis matrix `U` of Navarro (7.3)** for the basic set `𝓑`, for an abstract
+family `a` expressing `φ_μ = ∑_{i ∈ Irr(B_0)} a_{μi} χ_i⁰`: the coordinates of `φ_μ` in `𝓑` are
+`u_{μj} = a_{μj} ε_j - a_{μj₀} ε_{j₀}` (`sum_mul_signRelationRow`).
+
+⚠ Keeping `a` abstract is what makes an **integral** `U` reachable.  The `K`-valued family of
+`BrauerFromOrdinary` — `a_{μi} = ∑_τ d_{iτ} [τ,μ]⁰`, i.e. `D C⁻¹` with `C = DᵀD` — is a
+pseudo-inverse and is *not* integral in general (`D = (1,1)ᵀ` gives `(1/2, 1/2)ᵀ`); the family of
+`exists_int_block_sum_eq_irreducibleBrauerCharacter` is, and the two are genuinely different
+because the `χ_i⁰` are not linearly independent on the `p`-regular classes. -/
+noncomputable def basicSetMatrixOf (a : ιG → κ → K) (u : G) (j₀ : κ) (μ : ιG) (j : κ) : K :=
+  a μ j * (wedderburnRepresentation eG j).character u
+    - a μ j₀ * (wedderburnRepresentation eG j₀).character u
+
+/-- `U` for the `K`-valued family of `BrauerFromOrdinary`. -/
 noncomputable def principalBasicSetMatrix (u : G) (j₀ : κ) (μ : ιG) (j : κ) : K :=
-  ordinaryCombinationCoeff hp hωG hω'G hπG hlinG hkerJG eG μ j *
-      (wedderburnRepresentation eG j).character u
-    - ordinaryCombinationCoeff hp hωG hω'G hπG hlinG hkerJG eG μ j₀ *
-      (wedderburnRepresentation eG j₀).character u
+  basicSetMatrixOf eG (ordinaryCombinationCoeff hp hωG hω'G hπG hlinG hkerJG eG) u j₀ μ j
 
 set_option maxHeartbeats 1000000 in
 -- The sign is read off Navarro (7.2), which carries the full modular-datum chain.
@@ -309,15 +316,30 @@ set_option maxHeartbeats 800000 in
 set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
 omit [DecidableEq κ] [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [Fact p.Prime] [CharP (ResidueField 𝒪) p]
+  [Fintype ↥(centralizerOf t)] [Invertible (Nat.card G : K)] [Fintype κ] [DecidableEq ιG] in
+/-- **`u_{μj} = 0` for `μ ∉ IBr(B_0)` and `j ∈ Irr(B_0)`.**  Both coefficients of `u_{μj}` sit at
+indices in `Irr(B_0)`, and the family vanishes off the block of `μ`. -/
+theorem basicSetMatrixOf_eq_zero_of_ne_principalBlock {a : ιG → κ → K}
+    (ha0 : ∀ (ν : ιG) (i : κ), blockOfIrr eG hπG hlinG hnilG i
+      ≠ Quotient.mk (blockSetoid πG hπG hlinG) ν → a ν i = 0) (u : G)
+    {j₀ : κ} (hj₀ : blockOfIrr eG hπG hlinG hnilG j₀ = principalBlock πG hπG hlinG hnilG)
+    {μ : ιG} (hμ : Quotient.mk (blockSetoid πG hπG hlinG) μ ≠ principalBlock πG hπG hlinG hnilG)
+    {j : κ} (hj : blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG) :
+    basicSetMatrixOf eG a u j₀ μ j = 0 := by
+  rw [basicSetMatrixOf, ha0 μ j (by rw [hj]; exact fun hc => hμ hc.symm),
+    ha0 μ j₀ (by rw [hj₀]; exact fun hc => hμ hc.symm), zero_mul, zero_mul, sub_zero]
+
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+omit [DecidableEq κ] [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [Fact p.Prime] [CharP (ResidueField 𝒪) p]
   [Fintype ↥(centralizerOf t)] in
-/-- **`u_{μj} = 0` for `μ ∉ IBr(B_0)` and `j ∈ Irr(B_0)`.**  Both coefficients of `u_{μj}` are
-`ordinaryCombinationCoeff`s at indices in `Irr(B_0)`, and those vanish off the block of `μ`. -/
+/-- The same for the `K`-valued family of `BrauerFromOrdinary`. -/
 theorem principalBasicSetMatrix_eq_zero_of_ne_principalBlock
     {j₀ : κ} (hj₀ : blockOfIrr eG hπG hlinG hnilG j₀ = principalBlock πG hπG hlinG hnilG)
     {μ : ιG} (hμ : Quotient.mk (blockSetoid πG hπG hlinG) μ ≠ principalBlock πG hπG hlinG hnilG)
     {j : κ} (hj : blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG) :
     principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ j = 0 := by
-  rw [principalBasicSetMatrix,
+  rw [principalBasicSetMatrix, basicSetMatrixOf,
     ordinaryCombinationCoeff_eq_zero_of_blockOfIrr_ne hp hωG hω'G hπG hlinG hkerJG eG hnilG μ
       (by rw [hj]; exact fun hc => hμ hc.symm),
     ordinaryCombinationCoeff_eq_zero_of_blockOfIrr_ne hp hωG hω'G hπG hlinG hkerJG eG hnilG μ
