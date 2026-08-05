@@ -1972,6 +1972,12 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         * `Aut(Z₂×Z₂) ≅ S₃` と「位数 3 の自己同型は 3 つの involution を巡回」
         * **(5.12)** `k(B) = Σ_i Σ_{b ∈ Bl(C_G(x_i)), b^G = B} l(b)` (第二主定理の系)
         * **(5.13)(b)** 一般化分解数の直交性 `Σ_χ d^x_{χμ} d^x_{χφ} = c^b_{μφ}`
+          ⟵ **次の実装対象**。実測 (2026-08-05): (5.1) `generalizedDecompositionNumber` /
+          (5.2) `generalizedDecompositionNumber_eq_zero` / (5.8)
+          `..._sum_generalizedDecompositionNumber_inducedBlockOfCentralizer` は**既存**
+          (`Modular/GeneralizedDecomposition.lean`, `SecondMainTheorem.lean`,
+          `SecondMainBlockForm.lean`)。Cartan 行列 `cartanMatrix` も既存
+          (`Modular/CartanMatrix.lean`)。⟹ (5.13) は「既存の 2 つを繋ぐ」段。
         * involution に付く一般化分解数が**有理整数**であること
         ⚠ (5.12)/(5.13) は Ch.5 なので**文書順で先**。上流優先で (5.13)(b) →
         (5.12) → (7.2) の順に当たる。
