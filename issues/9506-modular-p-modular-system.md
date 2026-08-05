@@ -1380,20 +1380,35 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
             さらに `pFactorPairsSubgroupEquiv` (`Ω_H(g) ≃ Ω_G(g) ∩ (H×H)`) /
             `pRegularSubgroupEquiv` (`H⁰ ≃ G⁰ ∩ H`) で部分群内部の数え上げと同定
             (`PFactorPairCount.lean`)。
-          * **⏸ 次の一手 (2026-08-05 時点の frontier)** = 以下 3 本の合同を突き合わせて
-            `g ∈ C_G(Q)` かつ p-正則で `e_{B₀}^G(g) = e_{b₀}^{C_G(Q)}(g)` を出す:
-            (i) `|G⁰|*·e_{B₀}^G(g) = |Ω_G(g)|*` ((6.14) + 数え上げ側、G に適用)
-            (ii) 同じものを `C_G(Q)` に適用
-            (iii) `|Ω_G(g)| ≡ |Ω_{C_G(Q)}(g)|` (Problem (6.1) + `pFactorPairsSubgroupEquiv`) と
-            `|G⁰| ≡ |C_G(Q)⁰|` (`card_pRegular_modEq_centralizer` + `pRegularSubgroupEquiv`)
-            ⟹ `|G⁰|*` (≠ 0) で約す。
-            ⚠ statement は `G` 側と `C_G(Q)` 側で**別々の p-modular データ** (πG / πC) を取るので
-            引数が多い。`Br_Q` (Brauer 準同型) は repo 未定義 —
-            係数レベルで書くのが素直 (定義してから使うのでもよいが、
-            (6.14) の帰結は係数の等式なので直接書ける)。
-          * ⟹ `Br_Q(e_{B₀}) = e_{b₀}`。一方
+          * [x] 🎯🎯🎯 **`Br_Q(e_{B₀}) = e_{b₀}` 完了 (2026-08-05、
+            `Modular/KulshammerThirdMain.lean`)**。3 本の合同の突き合わせ:
+            - 🎯 `card_pRegular_mul_coeff_principalBlock` = **(6.14) の数え上げ形**
+              `|G⁰|*·e_{B₀}(g) = |Ω(g)|*` を**任意の `g`** で。(6.14) は類代表 `C.out`
+              での主張なので、`Ĝ_p·Ĝ⁰` と `e_{B₀}` がともに中心元 (係数が共役類上一定、
+              `coeff_center_of_mk_eq`) で `g` へ移送し、左辺を数え上げ側
+              (`GroupAlgebra.coeff_pElementSum_mul_pRegularSum`) に置換。
+              仮説 `hweak` も `C.out⁻¹` → `g⁻¹` (指標は類関数、`character_eq_of_isConj`)。
+            - 🎯🎯 `eq_of_card_pRegular_mul_eq` = **突き合わせ本体**。ブロックのデータを
+              一切担がず**数え上げだけ**で書けた: `|G⁰|*·a = |Ω_G(g)|*` かつ
+              `|C_G(Q)⁰|*·b = |Ω_{C_G(Q)}(g)|*` なら `a = b`。
+              合同 2 本 (Problem (6.1) + `pFactorPairsSubgroupEquiv` /
+              `card_pRegular_modEq_centralizer` + `pRegularSubgroupEquiv`) は標数 `p` で
+              等式になり、`p ∤ |G⁰|` (`not_dvd_card_isPRegular`) で約す。
+            - 🎯🎯🎯 `coeff_principalBlock_eq_centralizer` =
+              **`e_{B₀}^G(g) = e_{b₀}^{C_G(Q)}(g)`** (`Q` が `p`-部分群, `g ∈ C_G(Q)`)。
+              上の 2 本の合成。`G` 側と `C_G(Q)` 側で別々の分裂データ (πG/πC) を取るので
+              引数は多いが、内容は 3 行。
+            ⚠ **`p`-正則性は不要だった** — `g ∈ C_G(Q)` だけで成立する
+              (両辺とも `p`-singular では `0` になる)。
+            ⚠ `Br_Q` (Brauer 準同型) を新たに定義せず**係数レベルの等式**にした。
+              (6.14) の帰結が係数の等式なので、間に定義を挟むと往復が増えるだけ。
+          * **⏸ 次の一手 (2026-08-05 時点の frontier)** = 上を第三主定理の逆向きに変換:
             `λ_b(Br_Q(e_{B₀})) = λ_b^G(e_{B₀}) = [b^G = B₀]` なので、
-            `b^G = B₀ ⟹ λ_b(e_{b₀}) = 1 ⟹ b = b₀`。**第三主定理の逆向き**。
+            `b^G = B₀ ⟹ λ_b(e_{b₀}) = 1 ⟹ b = b₀`。
+            必要なのは「`C_G(Q)` の中心指標 `λ_b` を `e_{B₀}` の `C_G(Q)`-切断に当てる」形で、
+            部品は既存: `inducedCentralCharacter_classSumCenter` /
+            `blockCharacter_truncClassSumCenter_eq` (= (4.14) 前半) /
+            `eq_blockOfCentralCharacter` (`ThirdMainEasy.lean` の (b) 方向で使った 3 本)。
           **(6.14) の上流** (これが残る仕事):
           * [x] **(4.22) 完了 (2026-08-05)**: `GroupTheory/SylowContaining.lean`
             (🎯 `card_sylow_containing_modEq_one` — `Q` を含む Sylow の個数 ≡ 1 mod p;
@@ -1404,7 +1419,8 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
             `isPGroup_zpowers_of_isPElement` / `isPElement_of_mem_of_isPGroup` を
             `PRegularElement.lean` へ集約 (重複解消)。
           * **Robinson 写像は定義**: `R(x) = Σ_{B} λ_B(x) e_B` (定理でない、原文 p.91)
-          * [ ] **(4.19) が技術的中心** (原文 p.92 で実測、2026-08-05):
+          * [x] **(4.19) が技術的中心** (原文 p.92 で実測、2026-08-05; **完了は下の
+            `residue_ordCompl_mul_sum_sylow_coeff` 項**):
             `(|Ω_{K,L}|/|K|)* = Σ_B λ_B(L̂) a_B(K̂)`
             (`Ω_{K,L} = {(y,z) ∈ K × L : P y = P z}`、`a_B(K̂)` = `e_B` の類和基底での係数)。
             必要な部品:
