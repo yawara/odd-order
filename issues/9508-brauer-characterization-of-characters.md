@@ -345,7 +345,7 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
   - [x] **段 I (1/2) 完了** (2026-08-05): `basicSetMatrixOf a` (抽象係数族版) を導入し、
     `basicSetMatrixOf_eq_zero_of_ne_principalBlock` (仮説は「族がブロック外で 0」だけ) を
     一般化済。`principalBasicSetMatrix` は段 204 の族での instance として残してある。
-  - [ ] **段 I (2/2)**: 残り 3 定理 (`sum_principalBasicSetMatrix_mul_principalBasicSet` /
+  - [ ] **段 I (2/2)**: `sum_basicSetMatrixOf_mul_principalBasicSet` は一般化済 (2026-08-05)。残り 2 定理 (`sum_principalBasicSetMatrix_mul_principalBasicSet` /
     `sum_decompositionMatrix_mul_principalBasicSetMatrix{,_eq_zero}` /
     `sum_principalBasicSetMatrix_mul_cartanMatrix`) を `basicSetMatrixOf a` + 2 仮説へ一般化し、
     段 H5 の整数族で instantiate。⚠ `omit` 行は宣言 1 つにしか掛からないので、

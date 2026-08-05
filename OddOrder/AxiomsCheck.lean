@@ -17846,8 +17846,6 @@ Gram 行列は `C_𝓑 = D_𝓑ᵗD_𝓑 = 1 + δ` (対角 2・非対角 1)。�
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.principalBasicSetMatrix_eq_zero_of_ne_principalBlock
 
-#assert_only_allowed_axioms
-  OddOrder.RepresentationTheory.Modular.sum_principalBasicSetMatrix_mul_principalBasicSet
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_decompositionMatrix_mul_principalBasicSetMatrix_eq_zero
@@ -18519,3 +18517,6 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.basicSetMatrixOf_eq_zero_of_ne_principalBlock
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_basicSetMatrixOf_mul_principalBasicSet

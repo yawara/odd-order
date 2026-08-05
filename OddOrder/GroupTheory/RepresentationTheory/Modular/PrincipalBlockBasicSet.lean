@@ -350,6 +350,7 @@ set_option maxHeartbeats 1000000 in
 -- Both halves (the `G`-side coefficients and the `(7.2)` signs) carry their full chains.
 set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
+omit [DecidableEq ιG] in
 open scoped Classical in
 include hp hx hω hω' e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ ht in
 /-- **`U` really expresses `IBr(B_0)` in the basic set**: `φ_μ = ∑_j u_{μj} η_j` on `G⁰`.
@@ -358,13 +359,18 @@ include hp hx hω hω' e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S h
 (`sum_ordinaryCombination_block_eq_irreducibleBrauerCharacter`, the `K`-form of Navarro (3.16)),
 and `∑_i a_{μi} (D_𝓑)_{ij} = a_{μj} ε_j - a_{μj₀} ε_{j₀} = u_{μj}` is precisely how `U` was
 defined. -/
-theorem sum_principalBasicSetMatrix_mul_principalBasicSet
+theorem sum_basicSetMatrixOf_mul_principalBasicSet {a : ιG → κ → K}
+    (hasum : ∀ (ν : ιG) {y : G}, IsPRegular p y →
+      (∑ i ∈ Finset.univ.filter (fun i => blockOfIrr eG hπG hlinG hnilG i
+          = Quotient.mk (blockSetoid πG hπG hlinG) ν),
+        a ν i * algebraMap 𝒪 K (ordinaryCharacter (𝒪 := 𝒪) eG i y))
+        = algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) πG ν y))
     (hconjall : ∀ v : G, IsPElement p v → v ≠ 1 → IsConj t v) (ht1 : t ≠ 1)
     (hcart : cartanMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e φ₀ φ₀ = 4)
     {j₀ : κ} (hj₀ : blockOfIrr eG hπG hlinG hnilG j₀ = principalBlock πG hπG hlinG hnilG)
     {μ : ιG} (hμ : Quotient.mk (blockSetoid πG hπG hlinG) μ = principalBlock πG hπG hlinG hnilG)
     {g : G} (hg : IsPRegular p g) :
-    (∑ j : κ, principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ j
+    (∑ j : κ, basicSetMatrixOf eG a t j₀ μ j
         * principalBasicSet eG hπG hlinG hnilG t j₀ j g)
       = algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) πG μ g) := by
   classical
@@ -376,7 +382,7 @@ theorem sum_principalBasicSetMatrix_mul_principalBasicSet
     rw [hSirr, Finset.mem_filter]
     exact ⟨fun h => h.2, fun h => ⟨Finset.mem_univ _, h⟩⟩
   have hout : ∀ j ∈ (Finset.univ : Finset κ), j ∉ Sirr.erase j₀ →
-      principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ j
+      basicSetMatrixOf eG a t j₀ μ j
         * principalBasicSet eG hπG hlinG hnilG t j₀ j g = 0 := by
     intro j _ hj
     rw [principalBasicSet, if_neg (fun hc => hj (Finset.mem_erase.mpr ⟨hc.2, (hmem j).mpr hc.1⟩)),
@@ -398,24 +404,24 @@ theorem sum_principalBasicSetMatrix_mul_principalBasicSet
     rw [principalBasicSet, if_pos ⟨(hmem j).mp (Finset.mem_of_mem_erase hj),
       Finset.ne_of_mem_erase hj⟩]
   have hU : ∀ j ∈ Sirr.erase j₀,
-      principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ j
-        = ∑ i ∈ Sirr, ordinaryCombinationCoeff hp hωG hω'G hπG hlinG hkerJG eG μ i
+      basicSetMatrixOf eG a t j₀ μ j
+        = ∑ i ∈ Sirr, a μ i
             * signRelationRow (fun l => (wedderburnRepresentation eG l).character t) j₀ i j :=
     fun j hj => by
-      rw [principalBasicSetMatrix]
+      rw [basicSetMatrixOf]
       exact (sum_mul_signRelationRow (S := Sirr)
         (ε := fun l => (wedderburnRepresentation eG l).character t)
-        (a := fun i => ordinaryCombinationCoeff hp hωG hω'G hπG hlinG hkerJG eG μ i)
+        (a := fun i => a μ i)
         ((hmem j₀).mpr hj₀) (Finset.mem_of_mem_erase hj)).symm
   rw [← Finset.sum_subset (Finset.subset_univ (Sirr.erase j₀)) hout,
     Finset.sum_congr rfl fun j hj => by rw [hη j hj, hU j hj]]
   -- swap the two sums and collapse the inner one with the basic-set decomposition
   have hswap : (∑ j ∈ Sirr.erase j₀,
-        (∑ i ∈ Sirr, ordinaryCombinationCoeff hp hωG hω'G hπG hlinG hkerJG eG μ i
+        (∑ i ∈ Sirr, a μ i
           * signRelationRow (fun l => (wedderburnRepresentation eG l).character t) j₀ i j)
         * ((wedderburnRepresentation eG j).character t
             * (wedderburnRepresentation eG j).character g))
-      = ∑ i ∈ Sirr, ordinaryCombinationCoeff hp hωG hω'G hπG hlinG hkerJG eG μ i
+      = ∑ i ∈ Sirr, a μ i
           * (wedderburnRepresentation eG i).character g := by
     rw [Finset.sum_congr rfl fun j _ => Finset.sum_mul _ _ _, Finset.sum_comm]
     refine Finset.sum_congr rfl fun i hi => ?_
@@ -426,14 +432,12 @@ theorem sum_principalBasicSetMatrix_mul_principalBasicSet
     exact Finset.sum_congr rfl fun j _ => by ring
   rw [hswap]
   -- and read the result off the `K`-form of Navarro (3.16)
-  have h316 := sum_ordinaryCombination_block_eq_irreducibleBrauerCharacter hp hωG hω'G hπG hlinG
-    hkerJG eG hnilG μ hg
+  have h316 := hasum μ hg
   simp only [hμ] at h316
   rw [← hSirr] at h316
   rw [← h316]
   exact Finset.sum_congr rfl fun i _ => by
     rw [algebraMap_ordinaryCharacter (𝒪 := 𝒪) eG i g]; rfl
-
 /-! ### `D_𝓑 = D_B U`, and the Gram matrix `UᵗCU = 1 + δ` -/
 
 set_option maxHeartbeats 800000 in
@@ -531,10 +535,12 @@ theorem sum_decompositionMatrix_mul_principalBasicSetMatrix
       rw [Finset.sum_congr rfl fun l _ => Finset.sum_mul _ _ _, Finset.sum_comm]
       refine Finset.sum_congr rfl fun μ _ => ?_
       by_cases hμ : Quotient.mk (blockSetoid πG hπG hlinG) μ = principalBlock πG hπG hlinG hnilG
-      · rw [Finset.sum_congr rfl fun l _ => mul_assoc _ _ _, ← Finset.mul_sum,
-          sum_principalBasicSetMatrix_mul_principalBasicSet hp hx hω e eG hπG hlinG hπ hlin
-            hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ ht hωG hω'G hkerJG hconjall ht1
-            hcart hj₀ hμ hg]
+      · simp only [principalBasicSetMatrix]
+        rw [Finset.sum_congr rfl fun l _ => mul_assoc _ _ _, ← Finset.mul_sum,
+          sum_basicSetMatrixOf_mul_principalBasicSet hp hx hω e eG hπG hlinG hπ hlin
+            hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ ht
+            (fun ν y hy => sum_ordinaryCombination_block_eq_irreducibleBrauerCharacter hp hωG
+              hω'G hπG hlinG hkerJG eG hnilG ν hy) hconjall ht1 hcart hj₀ hμ hg]
       · rw [decompositionMatrix_eq_zero_of_blockOfIrr_ne hp hωG hω'G hπG hlinG hkerJG hnilG eG i
           (by rw [hi]; exact fun hc => hμ hc), Nat.cast_zero, zero_mul]
         exact Finset.sum_eq_zero fun l _ => by rw [zero_mul, zero_mul]
