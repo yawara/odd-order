@@ -842,6 +842,65 @@ theorem exists_orderFour_fused (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 2
       exact congrArg Subtype.val this
   exact hno 1 (Subgroup.one_mem _) (by rw [hxy]; group)
 
+/-- **Navarro p. 139: some element of `N_G(T)` genuinely moves an inverse pair.**
+
+Take `x, y ∈ T` of order `4`, `G`-conjugate but not `T`-conjugate
+(`exists_orderFour_fused`), and correct the conjugator into `N_G(T)`
+(`exists_mem_normalizer_conj_mem_zpowers`).  If the corrected `u` fixed the pair `{x, x⁻¹}` then
+`u x u⁻¹ ∈ {x, x⁻¹}`; but it also lies in `⟨y⟩`, hence equals `y` or `y⁻¹`
+(`eq_or_eq_inv_of_mem_zpowers_of_quaternionTwo`).  Either way `y ∈ {x, x⁻¹}`, and then `x` and `y`
+*are* `T`-conjugate (`T` contains an inverting element) — a contradiction. -/
+theorem exists_smul_ne_of_oPiCore_eq_bot (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 2 G)
+    [Fintype ↥(T : Subgroup G)] [DecidableEq ↥(T : Subgroup G)]
+    (e : ↥(T : Subgroup G) ≃* QuaternionGroup 2) (hTG : (T : Subgroup G) ≠ ⊤) :
+    ∃ S ∈ inversePairs ↥(T : Subgroup G),
+      ∃ u : ↥(Subgroup.normalizer ((T : Subgroup G) : Set G)), u • S ≠ S := by
+  classical
+  obtain ⟨x, y, hx, hy, hx2, ⟨g, hg⟩, hno⟩ := exists_orderFour_fused hO T e hTG
+  set X : ↥(T : Subgroup G) := ⟨x, hx⟩ with hX
+  set Y : ↥(T : Subgroup G) := ⟨y, hy⟩ with hY
+  have hX2 : X ^ 2 ≠ 1 := fun h => hx2 (congrArg Subtype.val h)
+  have hY2 : Y ^ 2 ≠ 1 := by
+    intro h
+    refine hx2 ?_
+    have hyc : y ^ 2 = 1 := congrArg Subtype.val h
+    rw [← hg, show g * x * g⁻¹ = MulAut.conj g x from rfl, ← map_pow] at hyc
+    exact (MulAut.conj g).injective (hyc.trans (map_one (MulAut.conj g)).symm)
+  -- `x` and `y` are not `T`-conjugate, so `y ∉ {x, x⁻¹}`
+  have hfinal : y = x ∨ y = x⁻¹ → False := by
+    rintro (h | h)
+    · exact hno 1 (Subgroup.one_mem _) (by rw [h]; group)
+    · obtain ⟨V, hV⟩ := exists_conj_eq_inv_of_quaternionTwo e hX2
+      refine hno (V : G) V.2 ?_
+      rw [h]
+      exact congrArg Subtype.val hV
+  obtain ⟨u, hu, hmem⟩ := exists_mem_normalizer_conj_mem_zpowers T e hx hy hg
+  refine ⟨{X, X⁻¹}, Finset.mem_image.mpr ⟨X, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hX2⟩, rfl⟩,
+    ⟨u, hu⟩, fun hcontra => ?_⟩
+  -- the conjugate of `X` lies in the pair and in `⟨Y⟩`
+  have hUmem : (⟨u, hu⟩ : ↥(Subgroup.normalizer ((T : Subgroup G) : Set G))) • X
+      ∈ ({X, X⁻¹} : Finset ↥(T : Subgroup G)) := by
+    rw [← hcontra]
+    exact Finset.smul_mem_smul_finset (Finset.mem_insert_self _ _)
+  have hUzp : (⟨u, hu⟩ : ↥(Subgroup.normalizer ((T : Subgroup G) : Set G))) • X
+      ∈ Subgroup.zpowers Y := by
+    obtain ⟨k, hk⟩ := hmem
+    exact ⟨k, Subtype.ext hk⟩
+  have hU2 : ((⟨u, hu⟩ : ↥(Subgroup.normalizer ((T : Subgroup G) : Set G))) • X) ^ 2 ≠ 1 := by
+    intro h
+    refine hX2 (?_ : X ^ 2 = 1)
+    have : (u * x * u⁻¹) ^ 2 = 1 := congrArg Subtype.val h
+    rw [show u * x * u⁻¹ = MulAut.conj u x from rfl, ← map_pow] at this
+    exact Subtype.ext ((MulAut.conj u).injective (this.trans (map_one (MulAut.conj u)).symm))
+  rcases eq_or_eq_inv_of_mem_zpowers_of_quaternionTwo e hU2 hY2 hUzp with hUY | hUY <;>
+    rw [Finset.mem_insert, Finset.mem_singleton, hUY] at hUmem
+  · rcases hUmem with h | h
+    · exact hfinal (Or.inl (congrArg Subtype.val h))
+    · exact hfinal (Or.inr (congrArg Subtype.val h))
+  · rcases hUmem with h | h
+    · exact hfinal (Or.inr (congrArg Subtype.val (inv_eq_iff_eq_inv.mp h)))
+    · exact hfinal (Or.inl (congrArg Subtype.val (inv_injective h)))
+
 /-- **Navarro pp. 139–146, the character-theoretic core** (issue 9506, `sorry`): when the
 quaternion Sylow `2`-subgroup is proper, its involution lies in a proper normal subgroup.
 

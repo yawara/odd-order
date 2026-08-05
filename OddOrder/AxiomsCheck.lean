@@ -604,7 +604,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 18700
+set_option linter.style.longFile 18900
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -13440,6 +13440,11 @@ Pointwise` が要る。 -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.quaternionTwo_pow_four
 #assert_only_allowed_axioms OddOrder.GroupTheory.eq_or_eq_inv_of_mem_zpowers_of_quaternionTwo
 #assert_only_allowed_axioms OddOrder.GroupTheory.exists_orderFour_fused
+/-! 🎯 `exists_smul_ne_of_oPiCore_eq_bot` = Navarro p.139「`N_G(T)` の元が inverse pair を実際に
+動かす」。`u` が `{x,x⁻¹}` を固定するなら `u x u⁻¹ ∈ {x,x⁻¹}` かつ `∈ ⟨y⟩` ⟹ `y ∈ {x,x⁻¹}` ⟹
+`x, y` が `T`-共役 (`T` は反転元を含む) となって仮定に矛盾。
+これと `exists_smul_eq_of_mem_inversePairs` で「位数 4 の元は全て `G`-共役」が出る。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.exists_smul_ne_of_oPiCore_eq_bot
 /-! `sylowQ8_le_normalizer_zpowers` = 原文「every subgroup of `P` is normal in `P`」を `G` の中で
 `T ≤ N_G(⟨w⟩)` の形にしたもの。これが「`T` と `T^g` が `N_G(⟨z⟩)` の Sylow-2 ⟹ Sylow 共役で
 `g` を `N_G(T)` に取り直せる」段の入口。 -/
