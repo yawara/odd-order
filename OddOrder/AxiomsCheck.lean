@@ -13320,9 +13320,14 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
   2-nilpotent (Burnside), and its image in `Ḡ = G/O_{2'}(G)` is a **cyclic 2-group**.
 * `zbar_central` — the image `z̄` of the central involution is **central in `Ḡ`** (unique
   involution of the normal cyclic image of `M`).
+* `oPiCore_sup_centralizer_eq_top_of_mk_mem_center` — the **endgame proper**, extracted
+  (2026-08-06) from `brauerSuzuki_of_quaternionSylow` because it uses nothing about the Sylow
+  `2`-subgroup: for *any* involution `z` whose image is central in `Ḡ`, a Frattini argument on
+  `N = ⟨z⟩·O_{2'}(G)` gives `G = O_{2'}(G)·C_G(z)`.  Both branches of Brauer–Suzuki end here, so
+  the `Q₈` case (`GroupTheory/BrauerSuzukiQ8`) reduces to `z̄ ∈ Z(Ḡ)` alone.
 * `brauerSuzuki_of_quaternionSylow` — **`G = O_{2'}(G)·C_G(z)`** (`oPiCore ⊔ centralizer {z} = ⊤`),
-  Gorenstein Theorem 1.1, via a Frattini argument on `N = ⟨z⟩·O_{2'}(G)`.  (The `Q₈` case
-  `|S| = 8` needs modular character theory and remains a separate gap.) -/
+  Gorenstein Theorem 1.1 = the above applied to `zbar_central`.  (The `Q₈` case `|S| = 8` needs
+  modular character theory and remains a separate gap, issue 9506.) -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.involutionClosure_normal
 #assert_only_allowed_axioms OddOrder.GroupTheory.QuaternionSylowSetup.smSetup
 #assert_only_allowed_axioms
@@ -13332,6 +13337,9 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.QuaternionSylowSetup.image_M_isCyclic_and_isPGroup
 #assert_only_allowed_axioms OddOrder.GroupTheory.QuaternionSylowSetup.zbar_central
+#assert_only_allowed_axioms OddOrder.GroupTheory.notMem_oPiCore_of_orderOf_eq_two
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.oPiCore_sup_centralizer_eq_top_of_mk_mem_center
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.QuaternionSylowSetup.brauerSuzuki_of_quaternionSylow
 

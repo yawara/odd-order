@@ -91,6 +91,7 @@ import OddOrder.GroupTheory.BrauerSuzukiCharacter
 import OddOrder.GroupTheory.BrauerSuzukiInvolutions
 import OddOrder.GroupTheory.BrauerSuzukiCounting
 import OddOrder.GroupTheory.BrauerSuzukiEndgame
+import OddOrder.GroupTheory.BrauerSuzukiQ8
 import OddOrder.GroupTheory.CentralCommutatorPower
 import OddOrder.GroupTheory.CentralElementaryExtension
 import OddOrder.GroupTheory.CentralExtensionAutomorphisms

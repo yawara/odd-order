@@ -12,6 +12,7 @@ import OddOrder.GroupTheory.NearFieldFromSharplyTransitive
 import OddOrder.GroupTheory.SolvableTwoTransitive
 import OddOrder.GroupTheory.BrauerSuzuki
 import OddOrder.GroupTheory.BrauerSuzukiEndgame
+import OddOrder.GroupTheory.BrauerSuzukiQ8
 
 /-!
 # Peterfalvi Appendix C, Proposition 1 — the affine near-field model of a rank-one group
@@ -299,8 +300,8 @@ for every involution `z` of that Sylow subgroup. -/
 theorem brauerSuzuki_quaternionSylow_q8 {G : Type*} [Group G] [Finite G]
     (T : Sylow 2 G) (hq : Nonempty (↥(T : Subgroup G) ≃* QuaternionGroup 2))
     {z : G} (hz : z ∈ (T : Subgroup G)) (hz2 : z ^ 2 = 1) (hzne : z ≠ 1) :
-    OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G ⊔ Subgroup.centralizer {z} = ⊤ := by
-  sorry
+    OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G ⊔ Subgroup.centralizer {z} = ⊤ :=
+  OddOrder.GroupTheory.brauerSuzuki_q8 T hq hz (orderOf_eq_prime hz2 hzne)
 
 /-- **Brauer–Suzuki for the rank-one group** (Peterfalvi App. C, Prop 1, prerequisite (ii)):
 `O_{2'}(G) ⊔ C_G(t) = ⊤` for the distinguished involution `t`.  The Sylow `2`-subgroup `T`

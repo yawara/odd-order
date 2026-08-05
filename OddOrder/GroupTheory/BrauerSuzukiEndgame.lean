@@ -119,6 +119,123 @@ theorem exists_oddComplement_of_isCyclic_sylowTwo {H : Type*} [Group H] [Finite 
     have hone : orderOf ((QuotientGroup.mk' L) c) = 1 := by rw [hj, hj0, pow_zero]
     exact (QuotientGroup.eq_one_iff c).mp (orderOf_eq_one_iff.mp hone)
 
+/-! ### The endgame, for any involution central mod `O_{2'}(G)`
+
+The last step of Brauer–Suzuki uses nothing about the Sylow `2`-subgroup: given *any* involution
+`z` whose image in `Ḡ = G/O_{2'}(G)` is central, one gets `G = O_{2'}(G)·C_G(z)`.  Both branches
+of the theorem (generalized quaternion of order `≥ 16`, and `Q₈`) end here, so it is stated
+separately. -/
+
+/-- **An involution is never in the odd core.**  `O_{2'}(G)` has odd order. -/
+theorem notMem_oPiCore_of_orderOf_eq_two [Finite G] {z : G} (hz : orderOf z = 2) :
+    z ∉ oPiCore {p | p ≠ 2} G := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  intro hmem
+  have hz2 : orderOf (⟨z, hmem⟩ : ↥(oPiCore {p | p ≠ 2} G)) = 2 := by
+    rw [Subgroup.orderOf_mk]; exact hz
+  have hd := orderOf_dvd_natCard (⟨z, hmem⟩ : ↥(oPiCore {p | p ≠ 2} G))
+  rw [hz2] at hd
+  exact (oPiCore.isPiGroup {p | p ≠ 2}) 2
+    (Nat.mem_primeFactors.mpr ⟨Nat.prime_two, hd, Nat.card_pos.ne'⟩) rfl
+
+/-- **`z̄ ∈ Z(G/O_{2'}(G))` implies `G = O_{2'}(G)·C_G(z)`** for an involution `z` (Gorenstein
+Ch. 12, p. 377).
+
+With `K = O_{2'}(G)`, the preimage `N = ⟨z⟩·K` of the central `⟨z̄⟩` is normal in `G`, and `⟨z⟩`
+is a Sylow `2`-subgroup of it because `|N| = 2|K|` with `|K|` odd.  Frattini's argument gives
+`N_G(⟨z⟩)·N = G`; and `N_G(⟨z⟩) ≤ C_G(z)` because `⟨z⟩` is cyclic of order `2`, so its involution
+is unique, while `N ≤ K ⊔ C_G(z)` because `z` centralizes itself. -/
+theorem oPiCore_sup_centralizer_eq_top_of_mk_mem_center [Finite G] {z : G} (hz : orderOf z = 2)
+    (hcentral : QuotientGroup.mk' (oPiCore {p | p ≠ 2} G) z
+      ∈ Subgroup.center (G ⧸ oPiCore {p | p ≠ 2} G)) :
+    oPiCore {p | p ≠ 2} G ⊔ Subgroup.centralizer {z} = ⊤ := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hz_sq : z ^ 2 = 1 := by rw [← hz]; exact pow_orderOf_eq_one z
+  have hz_ne_one : z ≠ 1 := fun h => by simp [h] at hz
+  set K := oPiCore {p | p ≠ 2} G with hKdef
+  have hKodd : ¬ 2 ∣ Nat.card ↥K := fun h2 =>
+    (oPiCore.isPiGroup {p | p ≠ 2}) 2
+      (Nat.mem_primeFactors.mpr ⟨Nat.prime_two, h2, Nat.card_pos.ne'⟩) rfl
+  set zbar := QuotientGroup.mk' K z with hzbar
+  have hzbar_sq : zbar ^ 2 = 1 := by rw [hzbar, ← map_pow, hz_sq, map_one]
+  have hzbar_ne : zbar ≠ 1 := by
+    rw [hzbar, Ne, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+    exact notMem_oPiCore_of_orderOf_eq_two hz
+  have hzbar_ord : orderOf zbar = 2 := orderOf_eq_prime hzbar_sq hzbar_ne
+  -- `N = ⟨z⟩ ⊔ K`, the preimage of the central subgroup `⟨z̄⟩`.
+  have hzpm : Subgroup.zpowers zbar = (Subgroup.zpowers z).map (QuotientGroup.mk' K) := by
+    rw [hzbar, ← MonoidHom.map_zpowers]
+  set N := Subgroup.zpowers z ⊔ K with hNdef
+  have hNeq : (Subgroup.zpowers zbar).comap (QuotientGroup.mk' K) = N := by
+    rw [hzpm, Subgroup.comap_map_eq, QuotientGroup.ker_mk', hNdef]
+  -- `N ⊴ G` since `⟨z̄⟩ ≤ center` is normal.
+  haveI hzbarZp_normal : (Subgroup.zpowers zbar).Normal := by
+    refine ⟨fun n hn g => ?_⟩
+    have hcomm := Subgroup.mem_center_iff.mp (Subgroup.zpowers_le.mpr hcentral hn) g
+    rw [hcomm, mul_inv_cancel_right]; exact hn
+  haveI hNnorm : N.Normal := by rw [← hNeq]; exact hzbarZp_normal.comap _
+  have hzpN : Subgroup.zpowers z ≤ N := le_sup_left
+  -- `|N| = 2·|K|`, so `⟨z⟩` (order 2) is a Sylow 2-subgroup of `N`.
+  have hzbarNcard : Nat.card ↥(Subgroup.zpowers zbar) = 2 := by rw [Nat.card_zpowers, hzbar_ord]
+  have hNcard : Nat.card ↥N = 2 * Nat.card ↥K := by
+    have e1 : Nat.card ↥N * N.index = Nat.card G := Subgroup.card_mul_index N
+    have e2 : Nat.card ↥K * Nat.card (G ⧸ K) = Nat.card G := by
+      rw [← Subgroup.index_eq_card]; exact Subgroup.card_mul_index K
+    have e3 : Nat.card ↥(Subgroup.zpowers zbar) * (Subgroup.zpowers zbar).index
+        = Nat.card (G ⧸ K) := Subgroup.card_mul_index _
+    have e4 : N.index = (Subgroup.zpowers zbar).index := by
+      rw [← hNeq]
+      exact Subgroup.index_comap_of_surjective (Subgroup.zpowers zbar)
+        (QuotientGroup.mk'_surjective K)
+    have hkey : Nat.card ↥N * N.index = 2 * Nat.card ↥K * N.index := by
+      rw [e1, ← e2, ← e3, hzbarNcard, e4]; ring
+    exact Nat.eq_of_mul_eq_mul_right
+      (Nat.pos_of_ne_zero (Subgroup.index_ne_zero_of_finite)) hkey
+  have hzpZcard : Nat.card ↥((Subgroup.zpowers z).subgroupOf N) = 2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hzpN).toEquiv, Nat.card_zpowers, hz]
+  have hidxK : ((Subgroup.zpowers z).subgroupOf N).index = Nat.card ↥K := by
+    have h := Subgroup.card_mul_index ((Subgroup.zpowers z).subgroupOf N)
+    rw [hzpZcard, hNcard] at h
+    exact Nat.eq_of_mul_eq_mul_left (by norm_num) h
+  have hpg : IsPGroup 2 ((Subgroup.zpowers z).subgroupOf N) :=
+    IsPGroup.of_card (n := 1) (by rw [hzpZcard, pow_one])
+  set P : Sylow 2 ↥N := hpg.toSylow (by rw [hidxK]; exact hKodd) with hP
+  have hPmap : (P : Subgroup ↥N).map N.subtype = Subgroup.zpowers z := by
+    rw [hP, IsPGroup.toSylow_coe, Subgroup.subgroupOf_map_subtype, inf_of_le_left hzpN]
+  -- Frattini's argument.
+  have hfrat := Sylow.normalizer_sup_eq_top P
+  rw [hPmap] at hfrat
+  -- `N_G(⟨z⟩) ≤ C_G(z)` (unique involution of the cyclic `⟨z⟩`).
+  have hnorm_le : Subgroup.normalizer (Subgroup.zpowers z) ≤ Subgroup.centralizer {z} := by
+    intro g hg
+    rw [Subgroup.mem_normalizer_iff] at hg
+    have hconj : g * z * g⁻¹ ∈ Subgroup.zpowers z := (hg z).mp (Subgroup.mem_zpowers _)
+    have hgz : g * z * g⁻¹ = z := by
+      have hsq : (g * z * g⁻¹) ^ 2 = 1 := by
+        rw [show g * z * g⁻¹ = MulAut.conj g z from rfl, ← map_pow, hz_sq, map_one]
+      have hne : g * z * g⁻¹ ≠ 1 := fun h =>
+        hz_ne_one ((MulAut.conj g).injective (h.trans (map_one (MulAut.conj g)).symm))
+      have hkey := eq_of_sq_eq_one_of_isCyclic (C := ↥(Subgroup.zpowers z))
+        (a := ⟨g * z * g⁻¹, hconj⟩) (b := ⟨z, Subgroup.mem_zpowers _⟩)
+        (Subtype.ext (by push_cast; exact hsq)) (by simpa using hne)
+        (Subtype.ext (by push_cast; exact hz_sq)) (by simpa using hz_ne_one)
+      exact congrArg Subtype.val hkey
+    rw [Subgroup.mem_centralizer_iff]
+    rintro w hw
+    rw [Set.mem_singleton_iff] at hw
+    have hgz2 : g * w = w * g := by
+      rw [hw]
+      calc g * z = g * z * g⁻¹ * g := by group
+        _ = z * g := by rw [hgz]
+    exact hgz2.symm
+  -- assemble: `⊤ = N_G(⟨z⟩) ⊔ N ≤ K ⊔ C_G(z)`.
+  rw [eq_top_iff, ← hfrat]
+  refine sup_le (hnorm_le.trans le_sup_right) ?_
+  rw [hNdef]
+  refine sup_le (le_sup_of_le_right ?_) le_sup_left
+  exact Subgroup.zpowers_le.mpr (Subgroup.mem_centralizer_iff.mpr
+    (fun m hm => by rw [Set.mem_singleton_iff] at hm; subst hm; rfl))
+
 variable [Finite G] (Q : QuaternionSylowSetup G)
 
 namespace QuaternionSylowSetup
@@ -292,15 +409,8 @@ theorem sylowTwoM_isCyclic (PM : Sylow 2 ↥(involutionClosure G)) :
   exact (Subgroup.equivMapOfInjective _ _ _).symm.surjective
 
 /-- The odd core `K = O_{2'}(G)` has odd order, so the central involution `z` is not in it. -/
-theorem z_notMem_oPiCore : Q.z ∉ oPiCore {p | p ≠ 2} G := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  intro hz
-  have hz2 : orderOf (⟨Q.z, hz⟩ : ↥(oPiCore {p | p ≠ 2} G)) = 2 := by
-    rw [Subgroup.orderOf_mk]; exact Q.orderOf_z
-  have hd := orderOf_dvd_natCard (⟨Q.z, hz⟩ : ↥(oPiCore {p | p ≠ 2} G))
-  rw [hz2] at hd
-  exact (oPiCore.isPiGroup {p | p ≠ 2}) 2
-    (Nat.mem_primeFactors.mpr ⟨Nat.prime_two, hd, Nat.card_pos.ne'⟩) rfl
+theorem z_notMem_oPiCore : Q.z ∉ oPiCore {p | p ≠ 2} G :=
+  notMem_oPiCore_of_orderOf_eq_two Q.orderOf_z
 
 include Q in
 /-- **The image of `M = ⟨involutions⟩` in `Ḡ = G / O_{2'}(G)` is a cyclic `2`-group.**  By Burnside
@@ -421,89 +531,8 @@ so `N := K·⟨z⟩ = ⟨z⟩ ⊔ K` is normal in `G` with `⟨z⟩` a Sylow `2`
 odd).  Frattini's argument gives `N_G(⟨z⟩) ⊔ N = ⊤`, and `N_G(⟨z⟩) ≤ C_G(z)` (unique involution),
 `N ≤ K ⊔ ⟨z⟩ ≤ K ⊔ C_G(z)`, whence `K ⊔ C_G(z) = ⊤`. -/
 theorem brauerSuzuki_of_quaternionSylow :
-    oPiCore {p | p ≠ 2} G ⊔ Subgroup.centralizer {Q.z} = ⊤ := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  set K := oPiCore {p | p ≠ 2} G with hKdef
-  have hKodd : ¬ 2 ∣ Nat.card ↥K := fun h2 =>
-    (oPiCore.isPiGroup {p | p ≠ 2}) 2
-      (Nat.mem_primeFactors.mpr ⟨Nat.prime_two, h2, Nat.card_pos.ne'⟩) rfl
-  set zbar := QuotientGroup.mk' K Q.z with hzbar
-  have hzbar_sq : zbar ^ 2 = 1 := by rw [hzbar, ← map_pow, Q.z_sq, map_one]
-  have hzbar_ne : zbar ≠ 1 := by
-    rw [hzbar, Ne, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]; exact Q.z_notMem_oPiCore
-  have hzbar_ord : orderOf zbar = 2 := orderOf_eq_prime hzbar_sq hzbar_ne
-  -- `N = ⟨z⟩ ⊔ K`, the preimage of the central subgroup `⟨z̄⟩`.
-  have hzpm : Subgroup.zpowers zbar = (Subgroup.zpowers Q.z).map (QuotientGroup.mk' K) := by
-    rw [hzbar, ← MonoidHom.map_zpowers]
-  set N := Subgroup.zpowers Q.z ⊔ K with hNdef
-  have hNeq : (Subgroup.zpowers zbar).comap (QuotientGroup.mk' K) = N := by
-    rw [hzpm, Subgroup.comap_map_eq, QuotientGroup.ker_mk', hNdef]
-  -- `N ⊴ G` since `⟨z̄⟩ ≤ center` is normal.
-  haveI hzbarZp_normal : (Subgroup.zpowers zbar).Normal := by
-    refine ⟨fun n hn g => ?_⟩
-    have hcomm := Subgroup.mem_center_iff.mp (Subgroup.zpowers_le.mpr Q.zbar_central hn) g
-    rw [hcomm, mul_inv_cancel_right]; exact hn
-  haveI hNnorm : N.Normal := by rw [← hNeq]; exact hzbarZp_normal.comap _
-  have hzpN : Subgroup.zpowers Q.z ≤ N := le_sup_left
-  -- `|N| = 2·|K|`, so `⟨z⟩` (order 2) is a Sylow 2-subgroup of `N`.
-  have hzbarNcard : Nat.card ↥(Subgroup.zpowers zbar) = 2 := by rw [Nat.card_zpowers, hzbar_ord]
-  have hNcard : Nat.card ↥N = 2 * Nat.card ↥K := by
-    have e1 : Nat.card ↥N * N.index = Nat.card G := Subgroup.card_mul_index N
-    have e2 : Nat.card ↥K * Nat.card (G ⧸ K) = Nat.card G := by
-      rw [← Subgroup.index_eq_card]; exact Subgroup.card_mul_index K
-    have e3 : Nat.card ↥(Subgroup.zpowers zbar) * (Subgroup.zpowers zbar).index
-        = Nat.card (G ⧸ K) := Subgroup.card_mul_index _
-    have e4 : N.index = (Subgroup.zpowers zbar).index := by
-      rw [← hNeq]
-      exact Subgroup.index_comap_of_surjective (Subgroup.zpowers zbar)
-        (QuotientGroup.mk'_surjective K)
-    have hkey : Nat.card ↥N * N.index = 2 * Nat.card ↥K * N.index := by
-      rw [e1, ← e2, ← e3, hzbarNcard, e4]; ring
-    exact Nat.eq_of_mul_eq_mul_right
-      (Nat.pos_of_ne_zero (Subgroup.index_ne_zero_of_finite)) hkey
-  have hzpZcard : Nat.card ↥((Subgroup.zpowers Q.z).subgroupOf N) = 2 := by
-    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hzpN).toEquiv, Nat.card_zpowers, Q.orderOf_z]
-  have hidxK : ((Subgroup.zpowers Q.z).subgroupOf N).index = Nat.card ↥K := by
-    have h := Subgroup.card_mul_index ((Subgroup.zpowers Q.z).subgroupOf N)
-    rw [hzpZcard, hNcard] at h
-    exact Nat.eq_of_mul_eq_mul_left (by norm_num) h
-  have hpg : IsPGroup 2 ((Subgroup.zpowers Q.z).subgroupOf N) :=
-    IsPGroup.of_card (n := 1) (by rw [hzpZcard, pow_one])
-  set P : Sylow 2 ↥N := hpg.toSylow (by rw [hidxK]; exact hKodd) with hP
-  have hPmap : (P : Subgroup ↥N).map N.subtype = Subgroup.zpowers Q.z := by
-    rw [hP, IsPGroup.toSylow_coe, Subgroup.subgroupOf_map_subtype, inf_of_le_left hzpN]
-  -- Frattini's argument.
-  have hfrat := Sylow.normalizer_sup_eq_top P
-  rw [hPmap] at hfrat
-  -- `N_G(⟨z⟩) ≤ C_G(z)` (unique involution of the cyclic `⟨z⟩`).
-  have hnorm_le : Subgroup.normalizer (Subgroup.zpowers Q.z) ≤ Subgroup.centralizer {Q.z} := by
-    intro g hg
-    rw [Subgroup.mem_normalizer_iff] at hg
-    have hconj : g * Q.z * g⁻¹ ∈ Subgroup.zpowers Q.z := (hg Q.z).mp (Subgroup.mem_zpowers _)
-    have hgz : g * Q.z * g⁻¹ = Q.z := by
-      have hsq : (g * Q.z * g⁻¹) ^ 2 = 1 := by
-        rw [show g * Q.z * g⁻¹ = MulAut.conj g Q.z from rfl, ← map_pow, Q.z_sq, map_one]
-      have hne : g * Q.z * g⁻¹ ≠ 1 := fun h =>
-        Q.z_ne_one ((MulAut.conj g).injective (h.trans (map_one (MulAut.conj g)).symm))
-      have hkey := eq_of_sq_eq_one_of_isCyclic (C := ↥(Subgroup.zpowers Q.z))
-        (a := ⟨g * Q.z * g⁻¹, hconj⟩) (b := ⟨Q.z, Subgroup.mem_zpowers _⟩)
-        (Subtype.ext (by push_cast; exact hsq)) (by simpa using hne)
-        (Subtype.ext (by push_cast; exact Q.z_sq)) (by simpa using Q.z_ne_one)
-      exact congrArg Subtype.val hkey
-    rw [Subgroup.mem_centralizer_iff]
-    rintro w hw
-    rw [Set.mem_singleton_iff] at hw; subst hw
-    have hgz2 : g * Q.z = Q.z * g := by
-      calc g * Q.z = g * Q.z * g⁻¹ * g := by group
-        _ = Q.z * g := by rw [hgz]
-    exact hgz2.symm
-  -- assemble: `⊤ = N_G(⟨z⟩) ⊔ N ≤ K ⊔ C_G(z)`.
-  rw [eq_top_iff, ← hfrat]
-  refine sup_le (hnorm_le.trans le_sup_right) ?_
-  rw [hNdef]
-  refine sup_le (le_sup_of_le_right ?_) le_sup_left
-  exact Subgroup.zpowers_le.mpr (Subgroup.mem_centralizer_iff.mpr
-    (fun m hm => by rw [Set.mem_singleton_iff] at hm; subst hm; rfl))
+    oPiCore {p | p ≠ 2} G ⊔ Subgroup.centralizer {Q.z} = ⊤ :=
+  oPiCore_sup_centralizer_eq_top_of_mk_mem_center Q.orderOf_z Q.zbar_central
 
 end QuaternionSylowSetup
 
