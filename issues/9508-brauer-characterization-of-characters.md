@@ -358,12 +358,11 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
     linter.unusedSectionVars false` + 理由コメントにする。
     ⚠ `sum_decompositionMatrix_mul_basicSetMatrixOf` の証明は**ローカルに `a : κ → K` を使う**ので、
     パラメータ名は `coef` にした (他 2 つは `a`)。
-  - [ ] **段 I (2/2) 残り 1 定理** (`sum_principalBasicSetMatrix_mul_principalBasicSet` /
-    `sum_decompositionMatrix_mul_principalBasicSetMatrix{,_eq_zero}` /
-    `sum_principalBasicSetMatrix_mul_cartanMatrix`) を `basicSetMatrixOf a` + 2 仮説へ一般化し、
-    段 H5 の整数族で instantiate。⚠ `omit` 行は宣言 1 つにしか掛からないので、
-    定理を挿入すると直後の宣言から `omit` が外れて `IsAdicComplete` 等の instance 解決が
-    下流で壊れる (段 I (1/2) で実際に起きた) — 挿入時は `omit` 行を複製すること。
+  - [x] **段 I (2/2) 完了 — 4 定理すべて一般化済** (2026-08-06):
+    最後の `sum_basicSetMatrixOf_mul_cartanMatrix` (Navarro (7.4) `UᵗCU = 1 + δ`) を
+    `ha0` + `hasum` の 2 仮説へ一般化。`sum_principalBasicSetMatrix_mul_cartanMatrix` は
+    段 204 の `K` 値族での instance として存置 (下流は無変更)。
+    ⟹ **`PrincipalBlockBasicSet` は係数族に対して完全に抽象**になった。
 
   ⚠ 4 定理はいずれも `maxHeartbeats 800000–1000000` の重い証明で仮説鎖が長い。
   refactor は「def のシグネチャ変更 → 4 定理の仮説差し替え」を 1 つずつ leaf build で回すこと。

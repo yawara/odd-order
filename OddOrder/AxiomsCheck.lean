@@ -18509,11 +18509,13 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_int_block_sum_eq_irreducibleBrauerCharacter
 
-/-! 🎯 **issue 9508 段 I (1/2)**: `U` の抽象化 (`Modular/PrincipalBlockBasicSet`)。
+/-! 🎯 **issue 9508 段 I**: `U` の抽象化 (`Modular/PrincipalBlockBasicSet`)。
 `basicSetMatrixOf a` は基本集合 `𝓑` における座標 `u_{μj} = a_{μj} ε_j − a_{μj₀} ε_{j₀}` を
 **抽象係数族 `a`** で取る。段 204 の `K` 値族 (`D C⁻¹` = 擬似逆行列、整数でない) と
 段 H5 の整数族の両方が instance になり、整数性は後者で instantiate して出す。
-`basicSetMatrixOf_eq_zero_of_ne_principalBlock` は「族がブロック外で 0」だけを仮説にする。 -/
+`basicSetMatrixOf_eq_zero_of_ne_principalBlock` は「族がブロック外で 0」だけを仮説にし、
+Navarro (7.3)/(7.4) の 3 定理は加えて「族が `φ_ν` を `Irr(B)` 上で表す」だけを仮説にする
+(それ以外は `signRelationRow` の純線型代数で係数族の形に依らない)。 -/
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.basicSetMatrixOf_eq_zero_of_ne_principalBlock
@@ -18526,3 +18528,6 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_decompositionMatrix_mul_basicSetMatrixOf
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_basicSetMatrixOf_mul_cartanMatrix

@@ -629,19 +629,27 @@ set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
 open scoped Classical in
 include hp hx hω hω' e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ ht in
-/-- **Navarro (7.4): `C_𝓑 = UᵗCU = 1 + δ`.**  Expanding `C = D_BᵗD_B` and collecting by the
-ordinary index turns `UᵗCU` into the Gram matrix of `D_𝓑 = D_B U`, whose rows are
+/-- **Navarro (7.4): `C_𝓑 = UᵗCU = 1 + δ`**, for an abstract family `a` expressing
+`φ_μ = ∑_{i ∈ Irr(B_0)} a_{μi} χ_i⁰`.  Expanding `C = D_BᵗD_B` and collecting by the ordinary
+index turns `UᵗCU` into the Gram matrix of `D_𝓑 = D_B U`, whose rows are
 `δ_{ij} ε_j - δ_{i j₀} ε_{j₀}` on `Irr(B_0)` and zero off it. -/
-theorem sum_principalBasicSetMatrix_mul_cartanMatrix
+theorem sum_basicSetMatrixOf_mul_cartanMatrix {a : ιG → κ → K}
+    (ha0 : ∀ (ν : ιG) (l : κ), blockOfIrr eG hπG hlinG hnilG l
+      ≠ Quotient.mk (blockSetoid πG hπG hlinG) ν → a ν l = 0)
+    (hasum : ∀ (ν : ιG) {y : G}, IsPRegular p y →
+      (∑ l ∈ Finset.univ.filter (fun l => blockOfIrr eG hπG hlinG hnilG l
+          = Quotient.mk (blockSetoid πG hπG hlinG) ν),
+        a ν l * algebraMap 𝒪 K (ordinaryCharacter (𝒪 := 𝒪) eG l y))
+        = algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) πG ν y))
     (hconjall : ∀ v : G, IsPElement p v → v ≠ 1 → IsConj t v) (ht1 : t ≠ 1)
     (hcart : cartanMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e φ₀ φ₀ = 4)
     {j₀ : κ} (hj₀ : blockOfIrr eG hπG hlinG hnilG j₀ = principalBlock πG hπG hlinG hnilG)
     {j : κ} (hjB : blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG)
     (hjne : j ≠ j₀) {k : κ}
     (hkB : blockOfIrr eG hπG hlinG hnilG k = principalBlock πG hπG hlinG hnilG) (hkne : k ≠ j₀) :
-    (∑ μ : ιG, ∑ τ : ιG, principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ j
+    (∑ μ : ιG, ∑ τ : ιG, basicSetMatrixOf eG a t j₀ μ j
         * (cartanMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG μ τ : K)
-        * principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ τ k)
+        * basicSetMatrixOf eG a t j₀ τ k)
       = 1 + (if j = k then 1 else 0) := by
   classical
   set Sirr : Finset κ := Finset.univ.filter
@@ -653,59 +661,85 @@ theorem sum_principalBasicSetMatrix_mul_cartanMatrix
     exact ⟨fun h => h.2, fun h => ⟨Finset.mem_univ _, h⟩⟩
   -- `UᵗCU` is the Gram matrix of `D_B U`
   have hstep : ∀ μ τ : ιG,
-      principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ j
+      basicSetMatrixOf eG a t j₀ μ j
           * (cartanMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG μ τ : K)
-          * principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ τ k
+          * basicSetMatrixOf eG a t j₀ τ k
         = ∑ i : κ,
             ((decompositionMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG i μ : K)
-              * principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ j)
+              * basicSetMatrixOf eG a t j₀ μ j)
             * ((decompositionMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG i τ : K)
-              * principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ τ k) := by
+              * basicSetMatrixOf eG a t j₀ τ k) := by
     intro μ τ
     rw [cartanMatrix, Nat.cast_sum, Finset.mul_sum, Finset.sum_mul]
     exact Finset.sum_congr rfl fun i _ => by push_cast; ring
   have hgram : (∑ μ : ιG, ∑ τ : ιG,
-        principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ j
+        basicSetMatrixOf eG a t j₀ μ j
           * (cartanMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG μ τ : K)
-          * principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ τ k)
+          * basicSetMatrixOf eG a t j₀ τ k)
       = ∑ i : κ,
           (∑ μ : ιG,
             (decompositionMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG i μ : K)
-              * principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ j)
+              * basicSetMatrixOf eG a t j₀ μ j)
           * ∑ τ : ιG,
             (decompositionMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG i τ : K)
-              * principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ τ k :=
+              * basicSetMatrixOf eG a t j₀ τ k :=
     calc (∑ μ : ιG, ∑ τ : ιG,
-          principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ j
+          basicSetMatrixOf eG a t j₀ μ j
             * (cartanMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG μ τ : K)
-            * principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ τ k)
+            * basicSetMatrixOf eG a t j₀ τ k)
         = ∑ μ : ιG, ∑ τ : ιG, ∑ i : κ,
             ((decompositionMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG i μ : K)
-              * principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ j)
+              * basicSetMatrixOf eG a t j₀ μ j)
             * ((decompositionMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG i τ : K)
-              * principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ τ k) :=
+              * basicSetMatrixOf eG a t j₀ τ k) :=
           Finset.sum_congr rfl fun μ _ => Finset.sum_congr rfl fun τ _ => hstep μ τ
       _ = ∑ i : κ, ∑ μ : ιG, ∑ τ : ιG,
             ((decompositionMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG i μ : K)
-              * principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ j)
+              * basicSetMatrixOf eG a t j₀ μ j)
             * ((decompositionMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG i τ : K)
-              * principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ τ k) := by
+              * basicSetMatrixOf eG a t j₀ τ k) := by
           rw [Finset.sum_congr rfl fun μ (_ : μ ∈ Finset.univ) => Finset.sum_comm, Finset.sum_comm]
       _ = _ := Finset.sum_congr rfl fun i _ => (Finset.sum_mul_sum _ _ _ _).symm
   rw [hgram, ← Finset.sum_subset (Finset.subset_univ Sirr) fun i _ hi => by
-    rw [sum_decompositionMatrix_mul_principalBasicSetMatrix_eq_zero hp eG hπG hlinG hnilG hωG hω'G
-      hkerJG hj₀ (fun hc => hi ((hmem i).mpr hc)) hjB, zero_mul],
+    rw [sum_decompositionMatrix_mul_basicSetMatrixOf_eq_zero hp eG hπG hlinG hnilG hωG hω'G
+      hkerJG ha0 t hj₀ (fun hc => hi ((hmem i).mpr hc)) hjB, zero_mul],
     Finset.sum_congr rfl fun i hi => by
-      rw [sum_decompositionMatrix_mul_principalBasicSetMatrix hp hx hω e eG hπG hlinG hπ hlin
-          hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ ht hωG hω'G hkerJG hconjall ht1
-          hcart hj₀ ((hmem i).mp hi) hjB hjne,
-        sum_decompositionMatrix_mul_principalBasicSetMatrix hp hx hω e eG hπG hlinG hπ hlin
-          hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ ht hωG hω'G hkerJG hconjall ht1
-          hcart hj₀ ((hmem i).mp hi) hkB hkne]]
+      rw [sum_decompositionMatrix_mul_basicSetMatrixOf hp hx hω e eG hπG hlinG hπ hlin
+          hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ ht hωG hω'G hkerJG hasum hconjall
+          ht1 hcart hj₀ ((hmem i).mp hi) hjB hjne,
+        sum_decompositionMatrix_mul_basicSetMatrixOf hp hx hω e eG hπG hlinG hπ hlin
+          hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ ht hωG hω'G hkerJG hasum hconjall
+          ht1 hcart hj₀ ((hmem i).mp hi) hkB hkne]]
   exact sum_signRelationRow_mul_signRelationRow ((hmem j₀).mpr hj₀)
     (fun l hl => character_involution_mul_self hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil hnilG
       hω' hζ hζk hζK hconv hNp hquot S hφ₀ ht hconjall ht1 hcart ((hmem l).mp hl))
     ((hmem j).mpr hjB) hjne hkne
+
+set_option maxHeartbeats 1000000 in
+-- Same chain as the generalised statement it instantiates.
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+open scoped Classical in
+include hp hx hω hω' e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ ht in
+/-- The same for the `K`-valued family of `BrauerFromOrdinary`. -/
+theorem sum_principalBasicSetMatrix_mul_cartanMatrix
+    (hconjall : ∀ v : G, IsPElement p v → v ≠ 1 → IsConj t v) (ht1 : t ≠ 1)
+    (hcart : cartanMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e φ₀ φ₀ = 4)
+    {j₀ : κ} (hj₀ : blockOfIrr eG hπG hlinG hnilG j₀ = principalBlock πG hπG hlinG hnilG)
+    {j : κ} (hjB : blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG)
+    (hjne : j ≠ j₀) {k : κ}
+    (hkB : blockOfIrr eG hπG hlinG hnilG k = principalBlock πG hπG hlinG hnilG) (hkne : k ≠ j₀) :
+    (∑ μ : ιG, ∑ τ : ιG, principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ j
+        * (cartanMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG μ τ : K)
+        * principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ τ k)
+      = 1 + (if j = k then 1 else 0) := by
+  simp only [principalBasicSetMatrix]
+  exact sum_basicSetMatrixOf_mul_cartanMatrix hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil hnilG
+    hω' hζ hζk hζK hconv hNp hquot S hφ₀ ht hωG hω'G hkerJG
+    (fun ν l hl => ordinaryCombinationCoeff_eq_zero_of_blockOfIrr_ne hp hωG hω'G hπG hlinG
+      hkerJG eG hnilG ν hl)
+    (fun ν y hy => sum_ordinaryCombination_block_eq_irreducibleBrauerCharacter hp hωG hω'G hπG
+      hlinG hkerJG eG hnilG ν hy) hconjall ht1 hcart hj₀ hjB hjne hkB hkne
 
 end KleinFour
 
