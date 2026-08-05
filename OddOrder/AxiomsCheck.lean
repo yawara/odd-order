@@ -13413,6 +13413,9 @@ characteristic ⟹ 既存の `normal_map_subtype_of_characteristic` で `G` で�
 奇位数群が 3 元集合に作用するとき、軌道の位数は群位数を割る (orbit-stabilizer) ので奇数、
 かつ ≤ 3 ⟹ 1 か 3。固定点でない軌道は全体。 -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.orbit_eq_univ_of_odd_of_card_eq_three
+/-! `quaternionTwo_card_inversePairs` = **`Q₈` の位数 4 巡回部分群はちょうど 3 個**
+(`{w, w⁻¹}` の対として `decide` で数える)。融合論法の 3 元集合 `Ω` の濃度がこれ。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.quaternionTwo_card_inversePairs
 /-! `sylowQ8_le_normalizer_zpowers` = 原文「every subgroup of `P` is normal in `P`」を `G` の中で
 `T ≤ N_G(⟨w⟩)` の形にしたもの。これが「`T` と `T^g` が `N_G(⟨z⟩)` の Sylow-2 ⟹ Sylow 共役で
 `g` を `N_G(T)` に取り直せる」段の入口。 -/

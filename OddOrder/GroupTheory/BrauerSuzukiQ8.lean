@@ -547,6 +547,17 @@ theorem orbit_eq_univ_of_odd_of_card_eq_three {H Ω : Type*} [Group H] [Finite H
     Finset.eq_univ_of_card _ (by rw [Set.toFinset_card, hcard, hΩ])
   exact Set.mem_toFinset.mp (hfin ▸ Finset.mem_univ y)
 
+/-- **`Q₈` has exactly three cyclic subgroups of order `4`**, presented as the three pairs
+`{w, w⁻¹}` of elements of order `4` (i.e. of elements whose square is not `1`).
+
+These pairs are the blocks of the fusion argument: `T` fuses `w` only with `w⁻¹`
+(`conj_eq_iff_of_quaternionTwo`), and `N_G(T)` permutes the three pairs through a quotient of odd
+order (`not_two_dvd_relIndex_sup_centralizer`), so a single fusion makes the action transitive
+(`orbit_eq_univ_of_odd_of_card_eq_three`). -/
+theorem quaternionTwo_card_inversePairs :
+    ((Finset.univ.filter fun w : QuaternionGroup 2 => w ^ 2 ≠ 1).image
+      fun w => ({w, w⁻¹} : Finset (QuaternionGroup 2))).card = 3 := by decide
+
 /-- **`T·C_G(T)` has odd index in `N_G(T)`**: it contains the Sylow `2`-subgroup `T`, whose index
 in `N_G(T)` divides the odd number `[G : T]`.
 
