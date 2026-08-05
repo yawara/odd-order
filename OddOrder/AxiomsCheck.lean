@@ -548,7 +548,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 17200
+set_option linter.style.longFile 17400
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -17195,3 +17195,10 @@ Navarro (5.13) が暗黙に行う付け替えで、類代表を選ばないの�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.card_centralizerOf_smul_sum_pSection
+
+/-! 🎯 **`Φ^x_μ` に対する内積和の潰し** (`Modular/SectionProjectiveCharacter`) —
+`Φ^x_μ(u)·χ(u⁻¹)` は `S(x)` の外で 0 の類関数なので、段 167 の再添字づけで
+`Σ_{y∈C_G(x)⁰} Φ_μ(y)·χ((xy)⁻¹)` に落ちる。Navarro (5.13) の `[Φ^x_μ, χ]` 計算の前半。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_centralizerOf_smul_sum_sectionProjectiveCharacter

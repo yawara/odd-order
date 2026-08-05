@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PSection
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionSum
 
 /-!
 # `Φ^x_μ`: a projective indecomposable character of `C_G(x)` spread over the `p`-section
@@ -41,6 +42,8 @@ definition.
 * `OddOrder.RepresentationTheory.Modular.sectionProjectiveCharacter_mul` — `Φ^x_μ(x y) = Φ_μ(y)`
 * `OddOrder.RepresentationTheory.Modular.sectionProjectiveCharacter_eq_of_isConj` — it is a class
   function
+* `OddOrder.RepresentationTheory.Modular.card_centralizerOf_smul_sum_sectionProjectiveCharacter` —
+  the inner-product sum against `Φ^x_μ` collapses to a sum over `C_G(x)⁰`
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -139,5 +142,51 @@ theorem sectionProjectiveCharacter_eq_of_isConj (hx : IsPElement p x) (μ : ι) 
         ((isConj_pPart huv).trans (mem_pSection_iff_isConj_pPart.mp hv)))
     rw [sectionProjectiveCharacter_eq_zero hpC hω hω' hπ hlin hkerJ e hx μ hu,
       sectionProjectiveCharacter_eq_zero hpC hω hω' hπ hlin hkerJ e hx μ hv]
+
+/-! ### The inner-product sum -/
+
+open scoped Classical in
+/-- **The inner-product sum against `Φ^x_μ` collapses to `C_G(x)`.**
+
+`Φ^x_μ(u) χ(u⁻¹)` is a class function vanishing off `S(x)`, so
+`card_centralizerOf_smul_sum_pSection` rewrites its sum over `G` as a sum over the `p`-regular
+elements of `C_G(x)`, where `Φ^x_μ(x y) = Φ_μ(y)`.
+
+This is the first half of Navarro's computation of `[Φ^x_μ, χ]` in the proof of (5.13). -/
+theorem card_centralizerOf_smul_sum_sectionProjectiveCharacter [Fintype G]
+    (hx : IsPElement p x) (μ : ι)
+    (χ : G → K) (hχ : ∀ a b : G, IsConj a b → χ a = χ b) :
+    Nat.card ↥(centralizerOf x)
+        • (∑ u : G, algebraMap 𝒪 K
+            (sectionProjectiveCharacter hpC hω hω' hπ hlin hkerJ e hx μ u) * χ u⁻¹)
+      = Nat.card G
+        • (∑ y ∈ Finset.univ.filter (fun y : ↥(centralizerOf x) => IsPRegular p ((y : G))),
+            algebraMap 𝒪 K (projectiveIndecomposableCharacter hpC hω hω' hπ hlin hkerJ e μ y)
+              * χ ((x * (y : G))⁻¹)) := by
+  classical
+  set F : G → K := fun u => algebraMap 𝒪 K
+    (sectionProjectiveCharacter hpC hω hω' hπ hlin hkerJ e hx μ u) * χ u⁻¹ with hF
+  have hinv : ∀ a b : G, IsConj a b → IsConj a⁻¹ b⁻¹ := by
+    intro a b h
+    obtain ⟨c, hc⟩ := isConj_iff.mp h
+    exact isConj_iff.mpr ⟨c, by rw [← hc]; group⟩
+  have hclass : ∀ a b : G, IsConj a b → F a = F b := fun a b h => by
+    simp only [hF]
+    rw [sectionProjectiveCharacter_eq_of_isConj hpC hω hω' hπ hlin hkerJ e hx μ h,
+      hχ _ _ (hinv a b h)]
+  -- the sum over `G` is the sum over `S(x)`
+  have hrestrict : (∑ u : G, F u)
+      = ∑ u ∈ Finset.univ.filter (fun u : G => u ∈ pSection p x), F u := by
+    refine (Finset.sum_subset (Finset.filter_subset _ _) fun u _ hu => ?_).symm
+    have hnot : u ∉ pSection p x := fun h =>
+      hu (Finset.mem_filter.mpr ⟨Finset.mem_univ _, h⟩)
+    simp only [hF]
+    rw [sectionProjectiveCharacter_eq_zero hpC hω hω' hπ hlin hkerJ e hx μ hnot,
+      map_zero, zero_mul]
+  rw [hrestrict, card_centralizerOf_smul_sum_pSection hpC hx F hclass]
+  refine congrArg _ (Finset.sum_congr rfl fun y hy => ?_)
+  simp only [hF]
+  rw [sectionProjectiveCharacter_mul hpC hω hω' hπ hlin hkerJ e hx μ
+    (Finset.mem_filter.mp hy).2]
 
 end OddOrder.RepresentationTheory.Modular
