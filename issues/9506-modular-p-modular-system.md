@@ -2259,19 +2259,27 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
                   `χ ∈ Irr(B₀)`, `x ≠ 1` なら `d^x_{χφ₀} ≠ 0` (対偶 + Navarro (3.18))。
                   ⚠ 原文は「involution で消える」から (3.18) へ飛ぶが、(3.18) が要るのは
                   **全 2-特異元での消滅**なので段 189 を先に経由する必要がある。
-          - [ ] **⏸ 次 = 段 191 ((7.2) 第 2 部の組み立て)**:
-                (a) 段 186 の `Σ_{j:Irr(G)} (d^t_{χ_jφ₀})² = c_{φ₀φ₀}` を段 188 で
-                    `Irr(B₀)` 上の和に絞る (filter 和 → subtype 和)。
-                (b) `c_{φ₀φ₀} = 4` = 段 185 に `|C_G(t)| = 4|N|` を入れる。
-                (c) 段 187 (`y = 1`) で `d^t_{χφ₀} = χ(t)`、段 178
-                    (`exists_intCast_character_of_mul_self_eq_one`) で `χ(t) ∈ ℤ` の像。
-                    `K` は標数 0 なので `Σ n_χ² = 4` が **ℤ で**成り立つ。
-                (d) `n_χ ≠ 0` = 段 190。`|Irr(B₀)| ≠ 1` = **弱ブロック直交性**
-                    (`BlockKernel.sum_character_one_mul_character_eq_zero`:
-                    `Σ_{χ∈Irr(B₀)} χ(1)χ(t) = 0`; 単元集合なら `χ(t) = 0` で段 190 に矛盾)。
-                (e) `Algebra/SumSquaresFour` で `|Irr(B₀)| = 4` と `χ_i(t) = ±1`。
-                その後: `χ_i(1) ≡ ε_i mod 4` (`[(χ_i)_P, 1_P] = (χ_i(1) + 3ε_i)/4` が整数) と
-                `1 + Σ ε_i χ_i(s) = 0` (ブロック直交性 (5.11))。
+          - [x] 🎯🎯🎯 **段 191-192 完了 (2026-08-05、`Modular/PrincipalBlockInvolution`)**:
+                * `sum_sq_character_involution_eq_cartanMatrix`:
+                  `Σ_{χ∈Irr(B₀)} χ(t)² = c_{φ₀φ₀}` (段 186 + 段 188 + 段 187 を `y=1` で読む)。
+                * `nontrivial_blockOfIrr_principal`: `|Irr(B₀)| ≠ 1`。弱ブロック直交性
+                  `Σ_{χ∈Irr(B₀)} χ(1)χ(t) = 0` ((5.11) の `h=1`) が単元集合を許さない。
+                  ⟹ **自明指標の添字を Wedderburn 分解から取り出す必要が無い** (当初想定より短い)。
+                * `card_blockOfIrr_principal_eq_four_and_character_involution`:
+                  **`|Irr(B₀)| = 4` かつ `χ(t) = ±1`** (段 178 の整数性 + 段 190 の非零性 +
+                  `Algebra/SumSquaresFour`)。
+                * `intCast_card_add_three_mul_character_involution` /
+                  `card_modEq_character_involution`: **`χ(1) ≡ ε mod 4`**。
+                  内積を作らず既存の `sum_character_eq_card_mul_finrank_invariants`
+                  (`Σ_{h∈H} χ(h) = |H|·dim V^H`) を `ρ|_P` に適用する (整数性が次元から自動)。
+                ⚠ 実装メモ: `Finset.sum_subtype s h f : Σ_{a∈s} f a = Σ_{a:Subtype p} f ↑a` を
+                使うので、整数値の族は **`κ` 上の関数**として取る (subtype 上に取ると滑る)。
+                ⚠ 最後の等式 `1 + Σ ε_i χ_i(s) = 0` は既存のブロック直交性 (5.11)
+                (`sum_character_blockOfIrr_eq_zero`) を `g = t`, `h = s` で読むだけなので
+                新規補題は不要。
+          - [ ] **残りの仕上げ (低優先)**: `|IBr(B₀)| = 3` だけが (5.12) 経由の
+                `k(B₀) − l(B₀) = l(b₀) = 1` を要する。BS 本証明が実際にこの数を使うかは
+                pp.139-146 を読んで確認してから着手する。
         ⚠ (5.12)/(5.13) は Ch.5 なので**文書順で先**。上流優先で (5.13)(b) →
         (5.12) → (7.2) の順に当たる。
         - [x] 🎯🎯 **(5.13)(a) 前半 完了 (2026-08-05、段 173)**:
@@ -2362,8 +2370,9 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
   最初の段は「位数 4 の元は全て `G`-共役 (実は `C_G(t)`-共役)」で、
   ここで fusion 制御 + `Aut(P) = Sym(4)` を使う。以降 "Analysis at y" (p.139-) と続く。
 
-  ⟹ **次 session の着手順** (文書順): (7.2) 第 2 部 → (7.3) basic set → (7.4) → (7.5) → (7.6)
-  → 上記 (B) の群論 3 件 (`Aut(Q₈)` 相当・二面体・`Q₈` 指標表) → BS 本体。
+  ⟹ **着手順** (文書順): ~~(7.2) 第 2 部~~ (2026-08-05 完了、段 184-192) →
+  **(7.3) basic set → (7.4) → (7.5) → (7.6)** → 上記 (B) の群論 3 件
+  (`Aut(Q₈)` 相当・二面体・`Q₈` 指標表) → BS 本体。
 
 ⚠ 上記の番号は Navarro の結果番号であって段番号ではない (段番号は連番で振り直す)。
 ⚠ 数式は OCR 崩れが重いので、各段の statement は `references/navarro/pages/*.png` で確定する
