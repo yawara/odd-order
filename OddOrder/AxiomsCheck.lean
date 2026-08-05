@@ -120,6 +120,7 @@ import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacterInduction
 import OddOrder.GroupTheory.RepresentationTheory.BrauerInductionIdeal
 import OddOrder.GroupTheory.RepresentationTheory.Modular.VirtualCharacterSplitting
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionDescent
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicIntegerModP
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
@@ -18062,3 +18063,16 @@ projection formula = Gorenstein Lemma 7.2 (`v(G)` が `ch(G)` のイデアルで
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.character_mem_adjoin
+
+/-! 🎯 **Brauer 指標判定 (issue 9508 段 D 中盤)**: 剰余環 `ℤ[ω]/p` とその標数
+(`Modular/CyclotomicIntegerModP`)。Gorenstein Lemma 7.5 は `mod pR` で走り、最後に
+**`ℤ ∩ pR = pℤ`** で有理整数どうしの合同に落とす。同じ事実から `R/pR` の標数がちょうど `p` と
+分かるので (`charP_quotient_adjoinPrimeIdeal`)、Frobenius が使えて和を項別に `p^s` 乗できる。
+どちらも段 C 後半で建てた `ℤ[ω]` の ℤ-基底 `1,ω,…,ω^{n-1}` から出る。
+⚠ 標数の主張自体に `p` の素数性は不要 (ℤ-基底だけで出る)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.intCast_dvd_of_mem_adjoinPrimeIdeal
+
+#assert_only_allowed_axioms
+  OddOrder.charP_quotient_adjoinPrimeIdeal
