@@ -125,6 +125,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicModEq
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CharacterPClassCongruence
 import OddOrder.GroupTheory.RepresentationTheory.UnitCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedIndicator
+import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCount
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
@@ -18185,3 +18186,22 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.induceFun_indicator_eq_natCast
+
+/-! 🎯 **Brauer 指標判定 (issue 9508 段 E)**: 余類 `uP` への共役の計数
+(`RepresentationTheory/PRegularCosetCount`) = Gorenstein Lemma 7.6 の (ii)(iii)。
+`u` を `p'`-元、`P` を `u` を中心化する `p`-部分群として:
+- **(ii)** `x⁻¹ y x = u v` (`v ∈ P`) なら、可換な `p'`×`p` 積の分解の一意性
+  (`eq_pPart_of_commute`) から `u` が `x⁻¹ y x` の `p'`-部分。⟹ `y` の `p'`-部分が `u` と共役。
+  対偶で「`u` の p-class の外では `σ(y) = 0`」。
+- **(iii)** `y = u` では `v = 1` しかない (さもないと `u` と `uv` の位数が食い違う)。
+  ⟹ 計数集合はちょうど `C_G(u)` で `σ(u) = |C_G(u)|`。
+これらを `induceFun_indicator_eq_natCast` と合わせると Lemma 7.6 が揃う。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.eq_pRegularPart_of_mem_leftCosetOf
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.conjugateCount_eq_zero_of_not_isConj
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.conjugateCount_self
