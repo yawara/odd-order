@@ -196,7 +196,7 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
       `θ ∈ v(G)`。`θ = 1_G · θ` に**段 B の Lemma 7.2** (projection formula) を当てるだけ。
       ⚠ `θ` の類関数性は落とせない (projection formula がそれを要求する)。
       ⚠ Thm 7.11 は予定どおり**不要**だった。
-- [ ] **段 H**: Navarro (2.15) → (2.16) → (3.16) (ブロック局所化は段 205-206 の型を反復)
+- [x] **段 H 完了** (2026-08-05): Navarro (2.15) → (2.16) → (3.16)
 
   **原文の確定** (2026-08-05, `references/navarro/pages/navarro-p0{27,28}.png` を読了):
   - `θ̃(x) = p^a θ(x)` (`x ∈ G⁰`)・0 (それ以外)、`θ̂(x) = θ(x_{p'})` (`x ∈ G`)。
@@ -294,7 +294,7 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
     H3 の `θ̂ ∈ v(G)` に段 F の `v(G) = ch(G)` を当てて `θ̂ ∈ ch(G)`、
     `eq_sum_charPairing_wedderburnRepresentation` で展開し係数の整数性は
     `charPairing_mem_intRange` (段 B)、最後に `p`-正則なら `θ̂ = θ`。
-  - [ ] **H5**: (3.16) = ブロック局所化 (段 205-206 の型を ℤ 係数で反復)。
+  - [x] **H5 完了 ⟹ 段 H 完了** (2026-08-05, `Modular/BlockIntegralCombination.lean`): (3.16)。
 
     ⚠⚠ **`ordinaryCombinationCoeff` 自体は整数ではない (2026-08-05 確定、反例あり)**。
     段 204 の係数は `a_{iμ} = Σ_τ d_{iτ}[τ,μ]⁰` = 行列で書くと **`D C⁻¹`** (`C = DᵀD`)。

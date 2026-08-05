@@ -392,6 +392,7 @@ import OddOrder.GroupTheory.RepresentationTheory.PClassIndicator
 import OddOrder.GroupTheory.RepresentationTheory.DivisibleClassFunction
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionTheorem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularPartCharacter
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIntegralCombination
 import OddOrder.GroupTheory.RepresentationTheory.InducedIndicator
 import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCount
 import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCharacter

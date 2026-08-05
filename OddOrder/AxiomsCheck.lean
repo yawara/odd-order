@@ -129,6 +129,7 @@ import OddOrder.GroupTheory.RepresentationTheory.PClassIndicator
 import OddOrder.GroupTheory.RepresentationTheory.DivisibleClassFunction
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionTheorem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularPartCharacter
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIntegralCombination
 import OddOrder.GroupTheory.RepresentationTheory.InducedIndicator
 import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCount
 import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCharacter
@@ -601,7 +602,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 18500
+set_option linter.style.longFile 18700
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -18493,3 +18494,19 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_int_sum_wedderburnRepresentation
+
+/-! 🎯🎯🎯 **issue 9508 段 H5 = Navarro (3.16) — 段 H 完了**
+(`Modular/BlockIntegralCombination`)。`μ₀ ∈ IBr(B)` は `{χ⁰ : χ ∈ Irr(B)}` の **ℤ**-結合。
+
+段 H4 の整数係数 `a_i` を `a'_i = if blockOfIrr i = block(μ₀) then a_i else 0` に切り詰める。
+`IBr` 座標で検算: `χ_i⁰ = Σ_μ d_{iμ} φ_μ` と展開して IBr の一次独立性
+(`eq_zero_of_sum_irreducibleBrauerCharacter_ringHom`、𝒪 係数版) から `Σ_i a_i d_{iμ} = δ_{μμ₀}`、
+切り詰めても不変 (`d_{iμ} ≠ 0 ⟹ block(μ) = blockOfIrr i`):
+`μ ∈ B` なら捨てた項が `d_{iμ} = 0`、`μ ∉ B` なら残した項が `d_{iμ} = 0` で右辺も 0。
+
+⚠⚠ **係数を `ordinaryCombinationCoeff` に取ることはできない** — それは `D C⁻¹` (`C = DᵀD`)
+= 擬似逆行列で一般に整数でない (`D = (1,1)ᵀ` なら `(1/2,1/2)ᵀ`)。また `{χ_i⁰}` は `p`-正則類上で
+一次独立でない (個数が多い) ので係数は一意でなく、ここの族は段 204 のものとは別物。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_int_block_sum_eq_irreducibleBrauerCharacter
