@@ -134,6 +134,16 @@ theorem sq_eq_one_of_mem_center_of_quaternionTwo {P : Type*} [Group P]
     _ = e (w * e.symm g) := by rw [this]
     _ = e w * g := by rw [map_mul, e.apply_symm_apply]
 
+/-- **Once one Sylow `2`-subgroup is `Q₈`, all of them are** — they are conjugate. -/
+theorem nonempty_mulEquiv_quaternionTwo_of_sylow (T S : Sylow 2 G)
+    (e : ↥(T : Subgroup G) ≃* QuaternionGroup 2) :
+    Nonempty (↥(S : Subgroup G) ≃* QuaternionGroup 2) := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G T S
+  have hcoe : (S : Subgroup G) = MulAut.conj g • (T : Subgroup G) := by rw [← hg]; rfl
+  exact ⟨((MulEquiv.subgroupCongr hcoe).trans
+    (Subgroup.equivSMul (MulAut.conj g) (T : Subgroup G)).symm).trans e⟩
+
 /-- **A group isomorphic to `Q₈` has a unique involution.** -/
 theorem eq_of_sq_eq_one_of_quaternionTwo {P : Type*} [Group P]
     (e : P ≃* QuaternionGroup 2) {a b : P} (ha : a ^ 2 = 1) (ha1 : a ≠ 1) (hb : b ^ 2 = 1)
