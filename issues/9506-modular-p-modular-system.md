@@ -2740,7 +2740,22 @@ p.139 の残り = 「位数 4 の元は全て `G`-共役 (実は `C_G(t)`-共役
 ✅ **(1)-(4) は 2026-08-06 に完了** (`isConj_of_orderFour`)。⟹ p.139 は
 `q8_exists_proper_normal` の sorry を除いて**全部形式化済**。
 
-**次の段 = p.140 以降**:
+**次の段 = p.140 以降** (2026-08-06 実測: 部品はすべて `Modular/PrincipalBlock*` に在る):
+
+| 原文 | 供給する既存定理 | 場所 |
+|---|---|---|
+| (7.2) `|Irr(B₀)| = 4`, `χ(t) = ±1` | `card_blockOfIrr_principal_eq_four_and_character_involution` | `PrincipalBlockInvolution:320` |
+| 弱ブロック直交 `Σ χ(1)χ(t) = 0` | `sum_character_mul_character_involution_eq_zero` | 同 `:492` |
+| `ε_j² = 1` | `character_involution_mul_self` | `PrincipalBlockBasicSet:245` |
+| (7.4) basic set + `UᵗCU = 1+δ` | `sum_basicSetMatrixOf_mul_cartanMatrix` ほか 4 定理 | 同 |
+| `U` の整数性 | `intBasicSetMatrix` / `sum_intBasicSetMatrix_mul_cartanMatrix` | `IntegralBasicSetMatrix` (issue 9508) |
+
+⚠ **(7.2) の機械は `t` を「唯一の対合類の代表」として受け取る形** (`hconjall` と
+`hcart : cartanMatrix … = 4` が仮説)。"Analysis at y" は同じ機械を**位数 4 の元 `y`** で回すので、
+`hconjall` に相当する仮説を `isConj_of_orderFour` (2026-08-06 完成) が供給する
+— ここが p.139 の成果と p.140 の接続点。
+
+
 - "Analysis at y" (p.139 末-140): `⟨y⟩` が `C_G(y)` の Sylow-2 ⟹ 正規 2-補群 ⟹
   `IBr(b₀) = {1}` ⟹ `χ_i(y) = d^y_{χ_i 1}` … 部品は段 185-200 で既出 (9506 の該当節参照)。
 - "Analysis at t" (p.141-142): `C_G(t)/⟨t⟩` が Klein four Sylow-2 ⟹ (7.4) の basic set、
