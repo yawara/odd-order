@@ -275,6 +275,7 @@ import OddOrder.GroupTheory.KleinFourAutomorphism
 import OddOrder.GroupTheory.KleinFourSylowFusion
 import OddOrder.GroupTheory.KleinFourNormalComplement
 import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
+import OddOrder.GroupTheory.RepresentationTheory.CharacterOrderFour
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
@@ -565,7 +566,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 17700
+set_option linter.style.longFile 17900
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -17675,3 +17676,24 @@ Klein 四元群 `P` (非自明元は全て 2-特異) の上で `[(χ)_P, 1_P] = 
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_sq_character_eq_cartanMatrix_of_isConj_inv
+
+/-! 🎯🎯 **位数 4 (を割る) の実な元での指標値は有理整数**
+(`RepresentationTheory/CharacterOrderFour`) — BS 本証明 p.140 の
+「since the irreducible characters of `P` are integer valued, it follows that `χ_i(y) ∈ ℤ`」。
+`y⁴ = 1` なら `u = (ρy + ρy⁻¹)/2` が **`u³ = u`** を満たす
+(`(A+A³)³ = A³ + 3A⁵ + 3A⁷ + A⁹ = 4(A+A³)`)。よって `e_± = (u² ± u)/2` は冪等で
+`e₊ − e₋ = u`、`χ(y) + χ(y⁻¹) = 2 tr(u) = 2(dim im e₊ − dim im e₋)`。
+`y` が `y⁻¹` に共役 (四元数群の位数 4 の元) なら左辺は `2χ(y)`。
+⚠ 段 178 (対合版) と同じく**代数的整数論も 1 の冪根も使わない** — 標数 ≠ 2 だけ。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.pow_three_realProj
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.isIdempotentElem_realProjPos
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.character_add_character_inv_eq
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_intCast_character_of_pow_four_eq_one

@@ -239,6 +239,7 @@ import OddOrder.GroupTheory.KleinFourAutomorphism
 import OddOrder.GroupTheory.KleinFourSylowFusion
 import OddOrder.GroupTheory.KleinFourNormalComplement
 import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
+import OddOrder.GroupTheory.RepresentationTheory.CharacterOrderFour
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
