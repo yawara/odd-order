@@ -2791,7 +2791,15 @@ p.139 の残り = 「位数 4 の元は全て `G`-共役 (実は `C_G(t)`-共役
 
 
 - "Analysis at y" (p.139 末-140): `⟨y⟩` が `C_G(y)` の Sylow-2 ⟹ 正規 2-補群 ⟹
-  `IBr(b₀) = {1}` ⟹ `χ_i(y) = d^y_{χ_i 1}` … 部品は段 185-200 で既出 (9506 の該当節参照)。
+  `IBr(b₀) = {1}` ⟹ `χ_i(y) = d^y_{χ_i 1}` … 部品は段 185-200 で既出。
+  **2026-08-06 実測の所在**: 正規 2-補群は
+  `GroupTheory/CentralSylowComplement.hasNormalPComplement_of_sylow_le_center` (段 200;
+  `y` は自分の中心化群で中心的なので仮説が自動)、Cartan 値は
+  `Modular/PrincipalBlockCartan.card_mul_sum_sq_principalBlock` (`:157`)。
+  ⟹ **次の実装単位** = この 2 つで `hcart : cartanMatrix … = 4` を `C_G(y)` について供給し、
+  一般化済 (7.2) (段 277) に食わせる。⚠ 「`C_G(y)` の Sylow-2 は位数 8 になれない」
+  (原文 p.139 末: 四元数群は位数 4 の中心元を持たない) は別途要る — `Q₈` の中心が
+  `{1,t}` であることの `decide` 版で出せるはず (`quaternionTwo_sq_eq_one` の隣に置く)。
 - "Analysis at t" (p.141-142): `C_G(t)/⟨t⟩` が Klein four Sylow-2 ⟹ (7.4) の basic set、
   (7.6) で `C_G(t)` へ持ち上げ、(7.5) で `d^t` の列。**整数性は issue 9508 で完済**
   (`intBasicSetMatrix` / `sum_intBasicSetMatrix_mul_cartanMatrix`)。
