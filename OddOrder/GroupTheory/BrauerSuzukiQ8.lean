@@ -492,6 +492,29 @@ theorem zpowers_normal_of_quaternionTwo {P : Type*} [Group P] (e : P ≃* Quater
       _ = (g * w * g⁻¹) ^ k := by rw [h]
       _ = g * w ^ k * g⁻¹ := by simp [conj_zpow]
 
+/-- **In `Q₈` every element of order `4` is inverted by some element.**  (An element has order `4`
+exactly when its square is not `1`.) -/
+theorem quaternionTwo_exists_conj_eq_inv : ∀ w : QuaternionGroup 2, w ^ 2 ≠ 1 →
+    ∃ g : QuaternionGroup 2, g * w * g⁻¹ = w⁻¹ := by decide
+
+/-- The same in a group isomorphic to `Q₈`. -/
+theorem exists_conj_eq_inv_of_quaternionTwo {P : Type*} [Group P] (e : P ≃* QuaternionGroup 2)
+    {w : P} (hw : w ^ 2 ≠ 1) : ∃ g : P, g * w * g⁻¹ = w⁻¹ := by
+  obtain ⟨h, hh⟩ := quaternionTwo_exists_conj_eq_inv (e w) fun hc => hw
+    (e.injective (by rw [map_pow, hc, map_one]))
+  refine ⟨e.symm h, e.injective ?_⟩
+  rw [map_mul, map_mul, map_inv, map_inv, e.apply_symm_apply]
+  exact hh
+
+/-- **The `P`-class of an element of order `4` in `P ≅ Q₈` is exactly `{w, w⁻¹}`, of size two.**
+This is the block structure that the fusion argument on p. 139 runs on: `T` fuses `w` with `w⁻¹`
+and nothing else, so the three cyclic subgroups of order `4` are the blocks. -/
+theorem conj_eq_iff_of_quaternionTwo {P : Type*} [Group P] (e : P ≃* QuaternionGroup 2)
+    {w : P} (hw : w ^ 2 ≠ 1) :
+    (∀ g : P, g * w * g⁻¹ = w ∨ g * w * g⁻¹ = w⁻¹) ∧ (∃ g : P, g * w * g⁻¹ = w⁻¹) ∧ w ≠ w⁻¹ :=
+  ⟨fun g => conj_eq_self_or_inv_of_quaternionTwo e w g, exists_conj_eq_inv_of_quaternionTwo e hw,
+    fun h => hw (by rw [sq]; exact mul_eq_one_iff_eq_inv.mpr h)⟩
+
 /-- **`T·C_G(T)` has odd index in `N_G(T)`**: it contains the Sylow `2`-subgroup `T`, whose index
 in `N_G(T)` divides the odd number `[G : T]`.
 

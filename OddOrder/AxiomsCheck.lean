@@ -13403,6 +13403,12 @@ characteristic ⟹ 既存の `normal_map_subtype_of_characteristic` で `G` で�
 #assert_only_allowed_axioms OddOrder.GroupTheory.conj_eq_self_or_inv_of_quaternionTwo
 #assert_only_allowed_axioms OddOrder.GroupTheory.zpowers_normal_of_quaternionTwo
 #assert_only_allowed_axioms OddOrder.GroupTheory.not_two_dvd_relIndex_sup_centralizer
+/-! `conj_eq_iff_of_quaternionTwo` = 位数 4 の元 `w` の `T`-共役類はちょうど `{w, w⁻¹}` (2 元)。
+これが p.139 の融合論法が乗る**ブロック構造** — `T` は `w` と `w⁻¹` だけを融合するので、
+位数 4 の巡回部分群 3 つがブロックになる。反転元の存在は `Q₈` 上で `decide`。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.quaternionTwo_exists_conj_eq_inv
+#assert_only_allowed_axioms OddOrder.GroupTheory.exists_conj_eq_inv_of_quaternionTwo
+#assert_only_allowed_axioms OddOrder.GroupTheory.conj_eq_iff_of_quaternionTwo
 
 /-! ### lean-eval 提出候補の登録 (issue 0050, 2026-07-22).
 
