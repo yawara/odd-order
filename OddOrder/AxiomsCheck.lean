@@ -124,6 +124,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicIntegerModP
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicModEq
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CharacterPClassCongruence
 import OddOrder.GroupTheory.RepresentationTheory.UnitCharacter
+import OddOrder.GroupTheory.RepresentationTheory.InducedIndicator
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
@@ -18171,3 +18172,16 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
 
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.card_subgroup_dvd_card_of_mul_mem
+
+/-! 🎯 **Brauer 指標判定 (issue 9508 段 E)**: 部分集合の指示関数の誘導
+(`RepresentationTheory/InducedIndicator`) = Gorenstein (7.14)-(7.15)。
+`S ⊆ H` と `ψ = c·1_S` に対し `(Ind_H^G ψ)(y) = (c/|H|)·#{x | x⁻¹ y x ∈ S}`。
+誘導の和を `x⁻¹ y x` の向きで読むと計数集合が **右**移動で閉じ、
+`card_subgroup_dvd_card_of_mul_mem` がそのまま効く。`c = |H|/|P|` なら値は整数 `σ(y)/|P|`
+(`induceFun_indicator_eq_natCast` = **Lemma 7.6(i)**)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.induceFun_indicator
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.induceFun_indicator_eq_natCast
