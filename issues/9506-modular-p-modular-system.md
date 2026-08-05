@@ -2763,7 +2763,19 @@ p.139 の残り = 「位数 4 の元は全て `G`-共役 (実は `C_G(t)`-共役
 (`PrincipalBlockInvolution:206`、段 197-198)。`Q₈` の位数 4 の元は `T` 内で反転されるので
 (`exists_conj_eq_inv_of_quaternionTwo`) この仮説は満たせる。
 ⟹ **次の実装単位** = `card_blockOfIrr_principal_eq_four_and_character_involution` の
-`y`-版を、`ht` を `hinv` に差し替えて組み直すこと (残りの部品は既に `x` について一般)。
+`y`-版を、`ht` を `hinv` に差し替えて組み直すこと。**証明本体で `ht` を使うのは 2 箇所だけ**
+(2026-08-06 に proof を読んで確定):
+
+| `t`-版 (対合) | `y`-版 (位数 4) で使う置換先 |
+|---|---|
+| `exists_intCast_character_of_mul_self_eq_one σ h2 ht` (`χ(t) ∈ ℤ`) | **`exists_intCast_character_of_pow_four_eq_one σ h2 (hy : y^4 = 1) (hreal : σ.character y⁻¹ = σ.character y)`** (`RepresentationTheory/CharacterOrderFour:162`、段 199) |
+| `sum_sq_character_involution_eq_cartanMatrix … ht` (平方和 = 4) | **`sum_sq_character_eq_cartanMatrix_of_isConj_inv (hinv : ∃ c, c * t * c⁻¹ = t⁻¹)`** (`PrincipalBlockInvolution:206`、段 197-198) |
+
+`hreal` (`χ(y⁻¹) = χ(y)`) と `hinv` はどちらも「`y` が `y⁻¹` と共役」から出て、それは
+`Q₈` の Hamiltonian 性 (`exists_conj_eq_inv_of_quaternionTwo`、2026-08-06) が供給する。
+`hy : y^4 = 1` は `quaternionTwo_pow_four` から。
+残り (`hane` 以降の非零性・`Nontrivial`・`SumSquaresFour`) は `t` に依らない。
+
 ⚠ 当該ファイルは仮説鎖が長く `maxHeartbeats 1000000` 級なので、
 `include` 行の差し替えを 1 つずつ leaf build で回すこと (段 I の refactor と同じ要領)。
 
