@@ -289,7 +289,11 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
     ⚠ 仮説は「`p'`-**部分群**への制限が仮想指標」であって `E` 自身ではない
     (応用では `θ|_E` は仮想指標でない — `p`-部分を潰して初めて通常指標)。
     ⚠ `θ` は任意の類関数でよく、Brauer 指標である必要はない (一般化して述べた)。
-  - [ ] **H4**: (2.16) = `φ = Σ_χ a_χ χ⁰` (`a_χ ∈ ℤ`)。`φ̂ ∈ ℤ[Irr(G)]` を `G⁰` に制限するだけ。
+  - [x] **H4 完了** (2026-08-05, 同 leaf) = **Navarro (2.16)**:
+    `exists_int_sum_wedderburnRepresentation` — `p`-正則類上で `θ = Σ_i a_i χ_i` (`a_i ∈ ℤ`)。
+    H3 の `θ̂ ∈ v(G)` に段 F の `v(G) = ch(G)` を当てて `θ̂ ∈ ch(G)`、
+    `eq_sum_charPairing_wedderburnRepresentation` で展開し係数の整数性は
+    `charPairing_mem_intRange` (段 B)、最後に `p`-正則なら `θ̂ = θ`。
   - [ ] **H5**: (3.16) = ブロック局所化 (段 205-206 の型を ℤ 係数で反復)。
 - [ ] **段 I**: `PrincipalBlockBasicSet` の `U` を ℤ 値に戻し、9506 の BS 本証明へ供給
 

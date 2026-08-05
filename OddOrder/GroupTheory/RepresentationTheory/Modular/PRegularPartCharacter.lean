@@ -31,6 +31,8 @@ ordinary after the `p`-part has been projected away).
 
 * `OddOrder.RepresentationTheory.Modular.pRegularPart_mem_inducedVirtualCharacters` —
   **Navarro (2.15)**
+* `OddOrder.RepresentationTheory.Modular.exists_int_sum_wedderburnRepresentation` —
+  **Navarro (2.16)**
 
 ## References
 
@@ -75,5 +77,40 @@ theorem pRegularPart_mem_inducedVirtualCharacters (hN : N ≠ 0) (hgN : ∀ g : 
     simp only [Function.comp_apply, Subgroup.coe_subtype, MonoidHom.coe_rangeRestrict, hf x]
   rw [hcomp]
   exact comp_mem_virtualCharacters _ (hsub f.range hrange)
+
+-- `[Fintype G]` runs the pairing in the proof; the conclusion only mentions `θ` and the block
+-- characters, so it does not surface in the type.
+set_option linter.unusedFintypeInType false in
+include e in
+/-- **Navarro (2.16)**, in the shape the decomposition matrix needs: on the `p`-regular classes
+`θ` is a `ℤ`-combination of the ordinary irreducible characters.
+
+`θ̂` is a virtual character (`pRegularPart_mem_inducedVirtualCharacters` and `v(G) = ch(G)`), so it
+expands as `∑_i (θ̂, χ_i) χ_i` with rational-integer coefficients; and `θ̂ = θ` on `G⁰`. -/
+theorem exists_int_sum_wedderburnRepresentation (hN : N ≠ 0) (hgN : ∀ g : G, g ^ N = 1)
+    (hωN : IsPrimitiveRoot ω N) (hp : p.Prime) [Fintype ι'] {θ : G → K}
+    (hcl : ∀ g h : G, θ (h * g * h⁻¹) = θ g)
+    (hsub : ∀ Q : Subgroup G, ¬ p ∣ Nat.card ↥Q → θ ∘ Q.subtype ∈ virtualCharacters K ↥Q) :
+    ∃ a : ι' → ℤ, ∀ g : G, IsPRegular p g →
+      θ g = ∑ i : ι', (a i : K) * (wedderburnRepresentation e i).character g := by
+  classical
+  -- `θ̂` is a virtual character
+  have hhat : (fun g => θ (pRegularPart p g)) ∈ virtualCharacters K G :=
+    inducedVirtualCharacters_le_virtualCharacters e _
+      (pRegularPart_mem_inducedVirtualCharacters e hN hgN hωN hp hcl hsub)
+  have hhatcl : ∀ g h : G, (fun g => θ (pRegularPart p g)) (h * g * h⁻¹)
+      = (fun g => θ (pRegularPart p g)) g := fun g h => by
+    simp only
+    rw [pRegularPart_conj]
+    exact hcl _ h
+  -- expand it in the block characters, with integer coefficients
+  choose a ha using fun i : ι' => charPairing_mem_intRange hhat
+    (mem_virtualCharacters_wedderburnRepresentation e i)
+  refine ⟨a, fun g hg => ?_⟩
+  have hexp := congrFun (eq_sum_charPairing_wedderburnRepresentation
+    (θ := fun g => θ (pRegularPart p g)) e hhatcl) g
+  simp only [pRegularPart_eq_self_of_isPRegular hp hg] at hexp
+  rw [hexp]
+  exact Finset.sum_congr rfl fun i _ => by rw [← ha i]; rfl
 
 end OddOrder.RepresentationTheory.Modular
