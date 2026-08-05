@@ -235,6 +235,8 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionSum
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionClassCount
 import OddOrder.Algebra.BlockPartitionedMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionMatrix
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction

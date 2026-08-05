@@ -271,6 +271,8 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionSum
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionClassCount
 import OddOrder.Algebra.BlockPartitionedMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionMatrix
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
@@ -17347,3 +17349,26 @@ Navarro (5.12) の "in particular, notice that the matrix `J` is regular"。
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.isUnit_det_generalizedDecompositionMatrix
+
+/-! 🎯 **Navarro (5.8) の `Irr(G)` 版** (`Modular/SecondMainBlockOfIrr`) —
+第二主定理のブロック形は「表現 + 不変束」で述べられているが、通常既約は正準な束
+(`wedderburnLattice`) を持ちそのブロックが `blockOfIrr` なので、何も補わずに特殊化できる:
+`d^x_{χ_i μ} = 0` (`μ` のブロックが `χ_i` のブロックを誘導しない限り)。
+これが一般化分解行列のブロック対角性。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_eq_zero_of_blockOfIrr_ne
+
+/-! 🎯🎯🎯 **Navarro (5.12)**: `k(B) = Σ_i Σ_{b ∈ Bl(C_G(x_i)), b^G = B} l(b)`
+(`Modular/BlockCharacterCount`) — ブロック `B` の通常既約指標の個数は、`p`-元の `G`-類の
+代表の中心化群のブロックで `B` を誘導するものに属する既約 Brauer 指標の総数に等しい。
+
+証明は Navarro のものだが 2 箇所を短縮:
+ - `J` の正則性は `E = J·diag(B)` (`E` = 通常指標表) から。教科書の `J̄ᵗ J = diag(Cartan)`
+   (= (5.13)) を経由しない。
+ - 「`J` が正則だから各 `J_{B_i}` は正方」は rank 論法でなく Leibniz 展開
+   (`OddOrder.Matrix.card_eq_card_of_det_ne_zero`)。
+ブロック対角性は (5.8) の `Irr(G)` 版。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_blockOfIrr_eq_card_inducedBlockOfCentralizer
