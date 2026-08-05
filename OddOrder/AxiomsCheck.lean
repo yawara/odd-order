@@ -18004,7 +18004,16 @@ projection formula = Gorenstein Lemma 7.2 (`v(G)` が `ch(G)` のイデアルで
   OddOrder.RepresentationTheory.Modular.exists_eq_sum_wedderburnRepresentation
 
 #assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_sum_charPairing_wedderburnRepresentation
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_of_charPairing_eq
+
+#assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.mem_virtualCharacters_iff
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.induceFun_mem_virtualCharacters
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.inducedVirtualCharacters_le_virtualCharacters

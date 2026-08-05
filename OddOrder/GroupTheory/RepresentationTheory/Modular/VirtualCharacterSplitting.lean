@@ -124,6 +124,53 @@ theorem exists_eq_sum_wedderburnRepresentation [Fintype ι'] {θ : G → K}
             Matrix.one_apply_eq, mul_one]
 
 omit [Finite G] in
+/-- **The expansion of a class function in the block characters**: the coefficients are the
+pairings.  Together with orthonormality this is the whole linear algebra of the character table.
+-/
+theorem eq_sum_charPairing_wedderburnRepresentation [Fintype G] [Fintype ι'] {θ : G → K}
+    (hθ : ∀ g h : G, θ (h * g * h⁻¹) = θ g) :
+    θ = fun g => ∑ i : ι', charPairing K θ (wedderburnRepresentation e i).character
+      * (wedderburnRepresentation e i).character g := by
+  classical
+  obtain ⟨a, ha⟩ := exists_eq_sum_wedderburnRepresentation e hθ
+  have hcoeff : ∀ i' : ι', a i'
+      = charPairing K θ (wedderburnRepresentation e i').character := by
+    intro i'
+    rw [funext ha, charPairing]
+    have hexp : ∀ g : G, (∑ i : ι', a i * (wedderburnRepresentation e i).character g⁻¹)
+        * (wedderburnRepresentation e i').character g
+        = ∑ i : ι', a i * ((wedderburnRepresentation e i).character g⁻¹
+          * (wedderburnRepresentation e i').character g) := fun g => by
+      rw [Finset.sum_mul]
+      exact Finset.sum_congr rfl fun i _ => by ring
+    rw [Finset.sum_congr rfl fun g (_ : g ∈ Finset.univ) => hexp g, Finset.sum_comm,
+      Finset.mul_sum]
+    rw [Finset.sum_congr rfl fun i (_ : i ∈ Finset.univ) =>
+      show (Nat.card G : K)⁻¹ * ∑ g : G, a i * ((wedderburnRepresentation e i).character g⁻¹
+            * (wedderburnRepresentation e i').character g)
+          = a i * charPairing K (wedderburnRepresentation e i).character
+            (wedderburnRepresentation e i').character from by
+        rw [charPairing, ← Finset.mul_sum]; ring,
+      Finset.sum_congr rfl fun i (_ : i ∈ Finset.univ) => by
+        rw [charPairing_wedderburnRepresentation e i i']]
+    simp
+  funext g
+  rw [ha g]
+  exact Finset.sum_congr rfl fun i _ => by rw [hcoeff i]
+
+omit [Finite G] in
+/-- **A class function is determined by its pairings against the block characters.** -/
+theorem eq_of_charPairing_eq [Fintype G] [Finite ι'] {θ θ' : G → K}
+    (hθ : ∀ g h : G, θ (h * g * h⁻¹) = θ g) (hθ' : ∀ g h : G, θ' (h * g * h⁻¹) = θ' g)
+    (h : ∀ i : ι', charPairing K θ (wedderburnRepresentation e i).character
+      = charPairing K θ' (wedderburnRepresentation e i).character) : θ = θ' := by
+  classical
+  letI : Fintype ι' := Fintype.ofFinite ι'
+  rw [eq_sum_charPairing_wedderburnRepresentation e hθ,
+    eq_sum_charPairing_wedderburnRepresentation e hθ']
+  exact funext fun g => Finset.sum_congr rfl fun i _ => by rw [h i]
+
+omit [Finite G] in
 /-- **The integrality criterion for `ch(G)`.**  A class function is a virtual character exactly
 when all of its pairings against the block characters are rational integers. -/
 theorem mem_virtualCharacters_iff [Fintype G] [Finite ι'] {θ : G → K} :
@@ -132,49 +179,19 @@ theorem mem_virtualCharacters_iff [Fintype G] [Finite ι'] {θ : G → K} :
         ∈ (Int.castRingHom K).range := by
   classical
   letI : Fintype ι' := Fintype.ofFinite ι'
-  constructor
-  · intro hθ
-    exact ⟨fun g h => virtualCharacters_conj hθ g h, fun i =>
-      charPairing_mem_intRange hθ (mem_virtualCharacters_wedderburnRepresentation e i)⟩
-  · rintro ⟨hclass, hint⟩
-    obtain ⟨a, ha⟩ := exists_eq_sum_wedderburnRepresentation e hclass
-    -- the coefficients are the pairings, hence integers
-    have hcoeff : ∀ i' : ι', a i'
-        = charPairing K θ (wedderburnRepresentation e i').character := by
-      intro i'
-      rw [funext ha, charPairing]
-      have hexp : ∀ g : G, (∑ i : ι', a i * (wedderburnRepresentation e i).character g⁻¹)
-          * (wedderburnRepresentation e i').character g
-          = ∑ i : ι', a i * ((wedderburnRepresentation e i).character g⁻¹
-            * (wedderburnRepresentation e i').character g) := fun g => by
-        rw [Finset.sum_mul]
-        exact Finset.sum_congr rfl fun i _ => by ring
-      rw [Finset.sum_congr rfl fun g (_ : g ∈ Finset.univ) => hexp g, Finset.sum_comm,
-        Finset.mul_sum]
-      rw [Finset.sum_congr rfl fun i (_ : i ∈ Finset.univ) =>
-        show (Nat.card G : K)⁻¹ * ∑ g : G, a i * ((wedderburnRepresentation e i).character g⁻¹
-              * (wedderburnRepresentation e i').character g)
-            = a i * charPairing K (wedderburnRepresentation e i).character
-              (wedderburnRepresentation e i').character from by
-          rw [charPairing, ← Finset.mul_sum]; ring,
-        Finset.sum_congr rfl fun i (_ : i ∈ Finset.univ) => by
-          rw [charPairing_wedderburnRepresentation e i i']]
-      simp
-    -- so `θ` is a `ℤ`-combination of the block characters
-    have hsplit : θ = ∑ i : ι', (fun g => a i * (wedderburnRepresentation e i).character g) := by
-      funext g
-      rw [ha g]
-      simp
-    rw [hsplit]
-    refine sum_mem fun i _ => ?_
-    obtain ⟨n, hn⟩ := hint i
-    rw [hcoeff i, ← hn]
-    have hz : (fun g => (Int.castRingHom K) n * (wedderburnRepresentation e i).character g)
-        = n • (wedderburnRepresentation e i).character := by
-      funext g
-      simp [zsmul_eq_mul]
-    rw [hz]
-    exact zsmul_mem (mem_virtualCharacters_wedderburnRepresentation e i) n
+  refine ⟨fun hθ => ⟨fun g h => virtualCharacters_conj hθ g h, fun i =>
+    charPairing_mem_intRange hθ (mem_virtualCharacters_wedderburnRepresentation e i)⟩, ?_⟩
+  rintro ⟨hclass, hint⟩
+  rw [eq_sum_charPairing_wedderburnRepresentation e hclass,
+    show (fun g => ∑ i : ι', charPairing K θ (wedderburnRepresentation e i).character
+        * (wedderburnRepresentation e i).character g)
+      = ∑ i : ι', (fun g => charPairing K θ (wedderburnRepresentation e i).character
+        * (wedderburnRepresentation e i).character g) from by funext g; simp]
+  refine sum_mem fun i _ => ?_
+  obtain ⟨n, hn⟩ := hint i
+  rw [← hn, show (fun g => (Int.castRingHom K) n * (wedderburnRepresentation e i).character g)
+    = n • (wedderburnRepresentation e i).character from by funext g; simp [zsmul_eq_mul]]
+  exact zsmul_mem (mem_virtualCharacters_wedderburnRepresentation e i) n
 
 omit [Finite G] in
 include e in
@@ -191,5 +208,14 @@ theorem induceFun_mem_virtualCharacters [Fintype G] [Finite ι'] {H : Subgroup G
     virtualCharacters_conj (mem_virtualCharacters_wedderburnRepresentation e i) g h)]
   exact charPairing_mem_intRange hψ
     (comp_mem_virtualCharacters H.subtype (mem_virtualCharacters_wedderburnRepresentation e i))
+
+omit [Finite G] in
+include e in
+/-- **`v(G) ⊆ ch(G)`** for any family `𝒳` of subgroups. -/
+theorem inducedVirtualCharacters_le_virtualCharacters [Fintype G] [Finite ι']
+    (𝒳 : Set (Subgroup G)) : inducedVirtualCharacters K 𝒳 ≤ virtualCharacters K G := by
+  rw [inducedVirtualCharacters, AddSubgroup.closure_le]
+  rintro w ⟨E, -, ψ, hψ, rfl⟩
+  exact induceFun_mem_virtualCharacters e hψ
 
 end OddOrder.RepresentationTheory.Modular
