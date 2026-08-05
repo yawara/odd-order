@@ -2622,9 +2622,33 @@ characters → Navarro (2.15)/(2.16)/(3.16) → `U` の整数性) を **closed**
   (`D_𝓑 = D_B U` over ℤ) + `sum_intBasicSetMatrix_mul_cartanMatrix` (`UᵗCU = 1 + δ` over ℤ)
   ⟹ **p.141-142 の「`D^t_j` は整数列」の土台**
 
+### 段 216 (2026-08-06): **BS endgame を Sylow 非依存に抽出 — frontier が 1 点になった**
+
+`brauerSuzuki_of_quaternionSylow` (|S|≥16) の証明を読み直したところ、**Sylow 2-部分群について
+何も使っていなかった** — 使うのは `orderOf z = 2` と `z̄ ∈ Z(Ḡ)` (`Ḡ = G/O_{2'}(G)`) だけ。
+⟹ `oPiCore_sup_centralizer_eq_top_of_mk_mem_center` として抽出 (`BrauerSuzukiEndgame.lean`)。
+
+⟹ 新 leaf **`GroupTheory/BrauerSuzukiQ8.lean`**: Q₈ 分枝に残る数学が
+
+> `q8_mk_mem_center` : Sylow-2 が `Q₈` なら `z̄ ∈ Z(G/O_{2'}(G))`
+
+**の一点だけ**になった (= Navarro pp.139-146 の中身そのもの)。
+`brauerSuzuki_quaternionSylow_q8` (RankOneAffineModel) はその適用に置換済で、
+**sorry は移動しただけ (増減なし)**。以後 pp.139-146 の形式化はこの 1 文を埋める作業。
+
+⚠ Navarro は `O_{2'}(G) = 1` の下で `t ∈ Z(G)` を示す。一般形にするには `Ḡ` へ移して
+「`O_{2'}(Ḡ) = 1`」と「`Ḡ` の Sylow-2 も `Q₈`」(奇核は Sylow-2 と自明に交わる) が要る
+— これも `q8_mk_mem_center` の証明の中で処理する。
+
 ### ⏸ 次 session の着手点 (2026-08-06 更新)
 
-**BS 本証明 pp.139-146 の残り**。必要な群論的事実 (原文 p.138 が列挙):
+**`q8_mk_mem_center` を埋める = BS 本証明 pp.139-146**。
+p.139 の第 1-2 段落 (reduction) は純群論で、`t ∈ N` なる真の正規部分群があれば済む:
+`P ∩ N` は巡回か `P ≤ N` (Q₈ の真部分群は全部巡回) → 前者なら Burnside で正規 2-補群 →
+`O_{2'}(N) ≤ O_{2'}(G) = 1` ⟹ `N` は巡回 2-群 ⟹ `t` が唯一の対合 ⟹ `t ∈ Z(G)`;
+後者は `|G|` の帰納法。⟹ **帰納法の骨格 + 「Q₈ の真部分群は巡回」から着手するのが文書順**。
+
+必要な群論的事実 (原文 p.138 が列挙):
 `Aut(Q₈) = Sym(4)` / 巡回 Sylow 2 なら正規 2-補群 / 対合 2 つが生成する群は二面体 /
 `P` が `G`-fusion を制御 ⟺ 正規 p-補群 / `Q₈` の指標表 (p.138 に掲載)。
 さらに p.141 末: `τ(t) ≡ τ(y) mod 2` (`Q₈` の指標表から)。
