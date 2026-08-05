@@ -17556,3 +17556,15 @@ Klein 四元群 Sylow-2 を持つ群は単一類になれない ((7.2) が `C = 
 
 #assert_only_allowed_axioms
   OddOrder.Algebra.card_eq_four_of_sum_sq_eq_four
+
+/-! 🎯🎯 **`χ` は `p`-特異元上で定数 `d^x_{χφ₀}` + その非零性**
+(`Modular/SecondMainPrincipalBlock`)。「非自明な `p`-元は全て `x` に共役」という仮定の下で
+`u = u_p u_{p'}` を `c` で戻せば `c⁻¹ u c = x (c⁻¹ u_{p'} c)` となり段 187 が使える。
+非零性は対偶: `d^x_{χφ₀} = 0` なら `χ` が全 `p`-特異元で消え、Navarro (3.18)
+(`not_dvd_card_of_character_eq_zero_of_pSingular`) が `p ∤ |G|` を出すが、`x ≠ 1` は `p`-元。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.character_eq_generalizedDecompositionNumber_of_not_isPRegular
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_ne_zero_of_blockOfIrr_principal

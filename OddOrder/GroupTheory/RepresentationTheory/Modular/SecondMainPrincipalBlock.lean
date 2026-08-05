@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterKernel
 import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainEasy
 
@@ -270,6 +271,84 @@ theorem generalizedDecompositionNumber_principalBlock_eq_zero_of_blockOfIrr_ne {
     hkerJ hnil hnilG hω hω' hζ hζk hζK ?_
   rw [hφ₀, inducedBlockOfCentralizer_principalBlock π hπ hlin hnil πG hπG hlinG hnilG hp hx]
   exact fun h => hi h.symm
+
+set_option maxHeartbeats 1000000 in
+-- The `p`-section expansion is elaborated under the same chains as the results above.
+omit [Finite κ] in
+include hp hx hω e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ in
+/-- **`χ` is constant on the `p`-singular elements**, with value `d^x_{χ φ_0}`, as soon as every
+nontrivial `p`-element is conjugate to `x`.
+
+Write `u = u_p u_{p'}`.  The `p`-part is nontrivial (that is what `p`-singular means), so
+`u_p = c x c⁻¹`, and conjugating back puts `u` in the `p`-section of `x`:
+`c⁻¹ u c = x (c⁻¹ u_{p'} c)` with `c⁻¹ u_{p'} c` a `p`-regular element of `C_G(x)`.  Characters
+are class functions, so `character_mul_eq_generalizedDecompositionNumber` applies. -/
+theorem character_eq_generalizedDecompositionNumber_of_not_isPRegular
+    (hconjall : ∀ v : G, IsPElement p v → v ≠ 1 → IsConj x v) {i : κ}
+    (hi : blockOfIrr eG hπG hlinG hnilG i = principalBlock πG hπG hlinG hnilG)
+    {u : G} (hu : ¬ IsPRegular p u) :
+    (wedderburnRepresentation eG i).character u
+      = generalizedDecompositionNumber (𝒪 := 𝒪) (nn := nn) x hp hω' hπ hlin hkerJ
+          ((wedderburnRepresentation eG i).character)
+          (fun _ _ hgh => character_eq_of_isConj _ hgh) φ₀ := by
+  classical
+  have hufin : IsOfFinOrder u := isOfFinOrder_of_finite u
+  have hane : pPart p u ≠ 1 := fun h => hu (isPRegular_of_pPart_eq_one hp hufin h)
+  obtain ⟨c, hc⟩ := isConj_iff.mp (hconjall (pPart p u) (isPElement_pPart hp u) hane)
+  have hx' : x = c⁻¹ * pPart p u * c := by rw [← hc]; group
+  have hcomm : Commute (pRegularPart p u) (pPart p u) := commute_pRegularPart_pPart u
+  have hmem : c⁻¹ * pRegularPart p u * c ∈ centralizerOf x := by
+    simp only [centralizerOf, Subgroup.mem_centralizer_iff, Set.mem_singleton_iff, forall_eq]
+    rw [hx']
+    calc c⁻¹ * pPart p u * c * (c⁻¹ * pRegularPart p u * c)
+        = c⁻¹ * (pPart p u * pRegularPart p u) * c := by group
+      _ = c⁻¹ * (pRegularPart p u * pPart p u) * c := by rw [hcomm.eq]
+      _ = c⁻¹ * pRegularPart p u * c * (c⁻¹ * pPart p u * c) := by group
+  have hyreg : IsPRegular p (⟨c⁻¹ * pRegularPart p u * c, hmem⟩ : ↥(centralizerOf x)) := by
+    refine isPRegular_coe_iff.mp ?_
+    have h := (isPRegular_pRegularPart hp hufin).conj c⁻¹
+    rwa [inv_inv] at h
+  have hconjeq : IsConj u
+      (x * ((⟨c⁻¹ * pRegularPart p u * c, hmem⟩ : ↥(centralizerOf x)) : G)) := by
+    refine isConj_iff.mpr ⟨c⁻¹, ?_⟩
+    change c⁻¹ * u * c⁻¹⁻¹ = x * (c⁻¹ * pRegularPart p u * c)
+    rw [hx']
+    calc c⁻¹ * u * c⁻¹⁻¹
+        = c⁻¹ * (pPart p u * pRegularPart p u) * c := by
+          rw [pPart_mul_pRegularPart hp hufin]; group
+      _ = c⁻¹ * pPart p u * c * (c⁻¹ * pRegularPart p u * c) := by group
+  rw [character_eq_of_isConj _ hconjeq,
+    character_mul_eq_generalizedDecompositionNumber hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil
+      hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hi hyreg]
+
+set_option maxHeartbeats 1000000 in
+-- Same chains as the constancy statement it contraposes.
+omit [Finite κ] in
+include hp hx hω e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ in
+/-- **`d^x_{χ φ_0} ≠ 0` for `χ ∈ Irr(B_0)`.**  Otherwise `χ` vanishes on every `p`-singular
+element by the previous result, and Navarro (3.18)
+(`not_dvd_card_of_character_eq_zero_of_pSingular`) makes `p ∤ |G|` — impossible, since `x` is a
+nontrivial `p`-element. -/
+theorem generalizedDecompositionNumber_ne_zero_of_blockOfIrr_principal
+    (hconjall : ∀ v : G, IsPElement p v → v ≠ 1 → IsConj x v) (hx1 : x ≠ 1) {i : κ}
+    (hi : blockOfIrr eG hπG hlinG hnilG i = principalBlock πG hπG hlinG hnilG) :
+    generalizedDecompositionNumber (𝒪 := 𝒪) (nn := nn) x hp hω' hπ hlin hkerJ
+        ((wedderburnRepresentation eG i).character)
+        (fun _ _ hgh => character_eq_of_isConj _ hgh) φ₀ ≠ 0 := by
+  classical
+  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  intro hzero
+  refine not_dvd_card_of_character_eq_zero_of_pSingular eG hπG hlinG hnilG i hi
+    (fun u hu => by
+      rw [character_eq_generalizedDecompositionNumber_of_not_isPRegular hp hx hω e eG hπG hlinG
+        hπ hlin hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hconjall hi hu, hzero]) ?_
+  -- `x` is a nontrivial `p`-element, so `p` divides `|G|`
+  obtain ⟨k, hk⟩ := id hx
+  have hord : orderOf x ∣ Nat.card G := orderOf_dvd_natCard x
+  have hk0 : k ≠ 0 := by
+    rintro rfl
+    exact hx1 (orderOf_eq_one_iff.mp (by simpa using hk))
+  exact dvd_trans (by rw [hk]; exact dvd_pow_self p hk0) hord
 
 end Section
 
