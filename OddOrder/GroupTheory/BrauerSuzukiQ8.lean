@@ -595,6 +595,33 @@ theorem card_inversePairs_of_quaternionTwo {P : Type*} [Group P] [Fintype P] [De
   rw [← Finset.card_image_of_injective _ hinj, image_inversePairs e]
   exact quaternionTwo_card_inversePairs
 
+/-- **Inner automorphisms of `T ≅ Q₈` fix every inverse pair.**  Conjugation sends `w` to `w` or
+to `w⁻¹` (Hamiltonian), and in either case `{w, w⁻¹}` is preserved.
+
+This is why the action of `N_G(T)` on the three pairs has `T` inside the stabilizer, so that the
+stabilizer has odd index (`T` being a Sylow `2`-subgroup of `N_G(T)`). -/
+theorem image_eq_self_of_conj {P : Type*} [Group P] [Fintype P] [DecidableEq P]
+    (e : P ≃* QuaternionGroup 2) {σ : P ≃* P} {t : P} (hσ : ∀ s, σ s = t * s * t⁻¹)
+    {S : Finset P} (hS : S ∈ inversePairs P) : S.image σ = S := by
+  classical
+  rw [inversePairs, Finset.mem_image] at hS
+  obtain ⟨w, -, rfl⟩ := hS
+  have hconj := conj_eq_self_or_inv_of_quaternionTwo e w t
+  rw [← hσ w] at hconj
+  rcases hconj with h | h
+  · rw [Finset.image_insert, Finset.image_singleton, h, map_inv, h]
+  · rw [Finset.image_insert, Finset.image_singleton, h, map_inv, h, inv_inv]
+    exact Finset.pair_comm _ _
+
+/-- **`T` has odd index in `N_G(T)`**: it is a Sylow `2`-subgroup there, and its relative index
+divides the odd number `[G : T]`.  This is the form the fusion argument uses, `T` being inside the
+stabilizer of every inverse pair (`image_eq_self_of_conj`). -/
+theorem not_two_dvd_relIndex_normalizer (T : Sylow 2 G) :
+    ¬ 2 ∣ (T : Subgroup G).relIndex (Subgroup.normalizer (T : Subgroup G)) := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  exact fun h =>
+    T.not_dvd_index (h.trans (Subgroup.relIndex_dvd_index_of_le Subgroup.le_normalizer))
+
 /-- **`T·C_G(T)` has odd index in `N_G(T)`**: it contains the Sylow `2`-subgroup `T`, whose index
 in `N_G(T)` divides the odd number `[G : T]`.
 
