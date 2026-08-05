@@ -388,11 +388,25 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
   - ⚠ `Invertible` は Prop でないので `theorem` にできない — `(Nat.card ↥Q : K) ≠ 0`
     (`natCard_subgroup_ne_zero`) を出して呼び出し側で `invertibleOfNonzero` する。
 
+- [x] **段 J 完了** (2026-08-06, `Modular/IntegralBasicSetMatrix.lean`) = **`U` の整数性**。
+  - `exists_intBlockCoeff`: 段 H3b で無条件になった (3.16) を全 `μ` について `choose` で集めて
+    1 つの整数行列 `A : IBr → Irr → ℤ` にする。これが**段 I の `ha0`/`hasum` そのもの**
+    (ブロック外で 0 なので、全体和とブロック内和が `Finset.sum_subset` で一致する)。
+  - `basicSetSign` / `intBasicSetMatrix`: 符号 `ε_j = χ_j(t)` は `ε_j² = 1` (Navarro (7.2)) と
+    **`K` の標数 0** から `±1` に確定するので整数として持てる (`CharZero K` は
+    `CharZero 𝒪` + `IsFractionRing` の単射から)。`U` を `ℤ` 上で書き直す。
+  - `sum_decompositionMatrix_mul_intBasicSetMatrix` / `sum_intBasicSetMatrix_mul_cartanMatrix`:
+    Navarro (7.3)/(7.4) を `ℤ` へ降ろす (`Int.cast_injective` で `K` 版から)。
+  ⟹ **BS 証明 p.141-142 が要求する「`D^t_j` は整数列」の土台が揃った** (9506 段 102 へ)。
+
 ## 完了条件
 
 `v(G) = ch(G)` と Brauer's characterization が sorry-free で、Navarro (2.16)/(3.16) が
 そこから導かれ、`principalBasicSetMatrix` の整数性が使える形になること。
 build green + AxiomsCheck 登録 + sorry 非退行。
+
+**⟹ 2026-08-06 に全条件を満たした** (段 A–J 完了)。9506 側 (BS 本証明 pp.139–146) が
+この issue の成果を消費する段階に入る。
 
 ## 参照
 

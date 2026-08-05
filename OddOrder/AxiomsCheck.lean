@@ -224,6 +224,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderSemisimple
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderCartan
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderBrauerOrdinary
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeSubgroupRestriction
+import OddOrder.GroupTheory.RepresentationTheory.Modular.IntegralBasicSetMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
@@ -18555,3 +18556,27 @@ Navarro (7.3)/(7.4) の 3 定理は加えて「族が `φ_ν` を `Irr(B)` 上�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_int_block_sum_eq_irreducibleBrauerCharacter_of_isAlgClosed
+
+/-! 🎯🎯 **issue 9508 段 J**: `U` の整数性 (`Modular/IntegralBasicSetMatrix`)。
+段 H3b で無条件になった (3.16) を全 `μ` について集めて 1 つの整数行列
+`A : IBr → Irr → ℤ` にし (`exists_intBlockCoeff`; これが段 I の `ha0`/`hasum` そのもの)、
+`U` を整数行列 `intBasicSetMatrix` として書き直す。符号 `ε_j = χ_j(t)` は `ε_j² = 1`
+(Navarro (7.2)) と **`K` の標数 0** から `±1` に確定するので、`basicSetSign` が
+`ε_j` を整数として持てる。⟹ Navarro (7.3)/(7.4) が `ℤ` へ降りる
+(`ℤ → K` の単射性で `K` 版から降ろす)。**BS 証明 p.141-142 が要求する
+「`D^t_j` が整数列」の土台**がこれ。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_intBlockCoeff
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.intCast_basicSetSign
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.intCast_intBasicSetMatrix
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_decompositionMatrix_mul_intBasicSetMatrix
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_intBasicSetMatrix_mul_cartanMatrix
