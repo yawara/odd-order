@@ -1432,7 +1432,15 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
                 で instantiate (これは `Q` を含まないので移送不要) + 第 1 段の 2 合同。
                 ⟹ `e^G_g = e^H_g`、すなわち `Br_Q^{G→H}(e_{B₀(G)}) = T(e_{B₀(H)})`
                 (`T` = `C_G(Q)` への切り詰め)。
-              - [ ] **第 3 段 = `λ_b ∘ T = λ_b` on `Z(k[↥H])`** = (4.14) の **`H`-類版**。
+              - [x] **第 3 段 完了 (2026-08-05、段 159 `Modular/BlockCharacterOffCentralizer`)**:
+                🎯 `pi_classSum_subgroup_eq_zero_of_notMem_centralizer` (`C_G(P)` と交わらない
+                `H`-類の類和は `π_H` の核) / 🎯🎯
+                `blockCharacter_eq_of_coeff_eq_on_centralizer` (`z, w ∈ Z(k[↥H])` が `C_G(P)`
+                上で同係数なら `λ_b z = λ_b w`)。
+                ⚠ **engine を再実行しかけたが、既存
+                `GroupAlgebra.pi_classSum_eq_zero_of_notMem_centralizer` (= (4.7)) を `↥H` の
+                中で呼ぶだけで済んだ** (重複 4 例目、直後に refactor 済)。
+              - [ ] ~~第 3 段 = `λ_b ∘ T = λ_b` on `Z(k[↥H])`~~ (旧記述)。
                 既存 `pi_truncClassSum_eq_centralizerTrunc` は `G`-類で添字されているので
                 そのままでは足りないが、engine の `pi_sum_ite_single_eq_zero` は
                 **任意の `Q`-共役不変述語**を取るので、述語を「`H`-類 `L` に属する ∧
