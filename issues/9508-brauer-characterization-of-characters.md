@@ -94,7 +94,28 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
       `charPairing_induceFun` (= **Frobenius 相互律**)。
       ⚠ `Ind(ch(H)) ⊆ ch(G)` は「ch(G) の内積による特徴づけ」が要るので段 C 以降に回す
       (特徴づけには `G` の分裂 `e` が必要 — 非分裂だと `⟨χ_i,χ_i⟩ = dim End > 1` になりうる)。
-- [ ] **段 C**: `v(G)` の定義とイデアル性 (Lemma 7.3)、`R = ℤ[ω]` 係数版と Lemma 7.4
+- [x] **段 C 前半** (2026-08-05, `BrauerInductionIdeal.lean` + `Modular/VirtualCharacterSplitting.lean`):
+      `inducedVirtualCharacters K 𝒳` (= `v(G)`) と **Lemma 7.3** (`ch(G)` のイデアル)。
+      族 `𝒳` は elementary に固定せず**パラメータ**にした。
+      分裂 `e` を通した `ch(G)` の特徴づけ: `charPairing_wedderburnRepresentation` (直交正規性、
+      既存の第一直交関係の読み替え) / `exists_eq_sum_wedderburnRepresentation` (ブロック指標が
+      類関数を張る) / `eq_sum_charPairing_wedderburnRepresentation` (`θ = Σ_i (θ,χ_i)χ_i`) /
+      `eq_of_charPairing_eq` / `mem_virtualCharacters_iff` / **`induceFun_mem_virtualCharacters`**
+      (`Ind_H^G(ch(H)) ⊆ ch(G)`、Frobenius で H 側に移して分裂不要の整数性) /
+      `inducedVirtualCharacters_le_virtualCharacters` (`v(G) ⊆ ch(G)`)。
+      併せて段 B の仮説を `[CharZero K]` → `[Invertible (Nat.card G : K)]` に緩和。
+- [ ] **段 C 後半**: `R = ℤ[ω]` 係数版 `v_R(G)` と **Lemma 7.4** の降下
+      `ch(G) ∩ v_R(G) = v(G)`。
+      - **設計 (2026-08-05 に精密化)**: 係数抽出を **`charPairing` 経由**にすると降下が軽くなる。
+        `θ ∈ ch(G)` かつ `θ = Σ_{j<n} ω^j • u_j` (`u_j ∈ v(G)`) とすると、双線型性から
+        `(θ,χ_i) = Σ_j ω^j (u_j,χ_i)` で `(u_j,χ_i) = b_{ij} ∈ ℤ`、`(θ,χ_i) = α_i ∈ ℤ`。
+        `{ω^j}_{j<n}` の **ℤ-一次独立**から `b_{i0} = α_i`・`b_{ij} = 0 (j≥1)` ⟹
+        `u_0` と `θ` は全 `χ_i` との内積が一致 ⟹ `eq_of_charPairing_eq` で `θ = u_0 ∈ v(G)`。
+        ⟹ 必要なのは **`{ω^j}_{j<n}` が `ℤ[ω]` の ℤ-基底**であること (張る + 独立) だけで、
+        `Irr(G)` の一次独立性は別途要らない (展開補題が代行)。
+      - `v_R(G) ⊆ W := {Σ_{j<n} ω^j • u_j | u_j ∈ v(G)}` は `W` が加法部分群で生成元を含むことから。
+      - power basis は mathlib `Algebra.adjoin.powerBasis' (hx : IsIntegral ℤ ω)`
+        (`FieldTheory/Minpoly/IsIntegrallyClosed`) を `↥(Algebra.adjoin ℤ {ω}) ↪ K` で K へ移送。
       - **調査済 (2026-08-05)**: 降下 (`ch(G) ∩ v_R(G) = v(G)`) の鍵 = 「`1,ω,…,ω^{n−1}` が
         `ℤ[ω]` の ℤ-基底」。mathlib に **`Algebra.adjoin.powerBasis' (hx : IsIntegral R x) :
         PowerBasis R (Algebra.adjoin R {x})`** (`FieldTheory/Minpoly/IsIntegrallyClosed.lean`)
