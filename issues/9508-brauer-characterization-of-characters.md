@@ -163,25 +163,39 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
         ⚠ **巡回群の指標論を使わない** — `h = u^a v` で `u^a` が `p'`-部分に強制されるので
         `a` が `mod n` で一意になり `λ h := ζ^a` が準同型になる。
       - `RepresentationTheory/PRegularCosetInduction.lean`: 組み立て = **Lemma 7.6** 本体。
-- [ ] **段 F**: Lemma 7.7–7.10 ⟹ `v(G) = ch(G)`
+- [x] **段 F 完了** (2026-08-05): Lemma 7.7–7.10 ⟹ **`v(G) = ch(G)`**
       - [x] **準備 1** `GroupTheory/PRegularCosetSubgroup.lean`: `pRegularProd u P hcomm` = `⟨u⟩P`
         (⚠ **ℤ 冪**で定義 — ℕ 冪だと `inv_mem'` に `0 < orderOf u` が要り `Finite G` が def の
         引数に混ざって下流の `omit` が詰まる) と `card_pRegularProd` (`|⟨u⟩P| = orderOf u·|P|`)。
         段 E が仮説として受けていた `hgen` / `hcard` を構成的に供給する。
       - [x] **準備 2** `RepresentationTheory/InducedAdjoinSpan.lean` + `induceFun` の線形性:
         `Ind_H^G(ch_R(H)) ⊆ v_R(G)` (Lemma 7.6 の `ψ` は `ch(H)` でなく `ch_R(H)` に居る)。
-      - [ ] **Lemma 7.6 パッケージ**: 原始 `N` 乗根 `ω` (`exp G ∣ N`) を持つ `K` で、`p`-正則元 `u` と
-        `p`-部分群 `P ≤ C_G(u)` に対し `χ = Ind(ψ) ∈ v_R(G)` で整数値・`u` の p-class 外で 0・
-        `χ(u) = |C_G(u)|/|P|` を出す単一定理。`ζ := ω^(N/orderOf u)`、`𝒳` は
-        `IsElementaryFamily` (全ての `p` と `⟨u⟩P` を含む族) として仮説化する。
-      - [ ] **Lemma 7.7**: 整数値類関数で全値が `|G|` で割れるものは `v_R(G)` に入る
-        (`p ∤ |G|` を取ると `P = ⊥`・p-class = 共役類で、各類の `χ_j` の線型結合)。
-      - [ ] **Lemma 7.8**: 各 `p` に対し整数値 `χ ∈ v_R(G)` で `χ ≡ 1 (mod p)`
-        (Lemma 7.6 の `ζ_j` を p-class ごとに取り、**段 D の Lemma 7.5** で p-class 上 mod p 一定)。
-      - [ ] **Lemma 7.9**: `|G| = m p^a`, `(m,p)=1` ⟹ `m·1_G ∈ v(G)`
-        (`ζ = χ^{p^a}`、`m(1−ζ)` の値が `|G|` で割れるので 7.7、最後に段 C の降下)。
-      - [ ] **Lemma 7.10**: `m_i = |G|/p_i^{a_i}` が互いに素 ⟹ `1_G ∈ v(G)` ⟹ `v(G) = ch(G)`。
-- [ ] **段 G**: Brauer's characterization 本体
+      - [x] **Lemma 7.6 パッケージ** `RepresentationTheory/PClassIndicator.lean`:
+        `exists_pClassIndicator`。`ζ := ω^(N/orderOf u)`、`H = ⟨u⟩P = pRegularProd`、`𝒳` は
+        `IsElementaryFamily` (全ての `p` と `⟨u⟩P` を含む族) として仮説化。
+        結論に**類関数性**も入れた (7.7/7.8 とも代表元での値を類全体へ広げるので毎回要る;
+        支持補題 `conjugateCount_conj`)。
+      - [x] **Lemma 7.7** `RepresentationTheory/DivisibleClassFunction.lean`:
+        `mem_adjoinSpan_inducedVirtualCharacters_of_card_dvd`。`p > |G|` を取ると
+        (i) 全元が `p`-正則 ⟹ p-class = 共役類、(ii) `P = ⊥` が許容、が同時に潰れる。
+        係数 `θ(C.out)/|G| · [G : C_G(C.out)]` は整数。
+      - [x] **Lemma 7.8** `Modular/BrauerInductionTheorem.lean`: `exists_congr_one_mod_prime`。
+        p-正則類ごとに `P ∈ Syl_p(C_G(u_C))` ⟹ `χ_C(u_C) = [C_G(u_C):P]` が `p` と素
+        (Sylow の位数 = `ordProj[p]` ⟹ 指数 = `ordCompl[p]`)、Bézout で mod `p` の逆元。
+        代表元の外へは**段 D の Lemma 7.5** で広げる ⟹ `v_R(G) ⊆ ch_R(G)` が要り
+        (`adjoinSpan_mono` + 分裂 `e` 経由)、7.8 以降は `Modular` 名前空間。
+      - [x] **Lemma 7.9** `zsmul_one_mem_inducedVirtualCharacters`: `ζ = χ^{p^a}` は
+        `mul_mem_adjoinSpan_inducedVirtualCharacters` (= 7.3 の `ℤ[ω]` 係数版) で `v_R(G)` に留まり、
+        `ζ ≡ 1 (mod p^a)` は mathlib `dvd_sub_pow_of_dvd_sub` 一発。`m(1−ζ)` に 7.7、最後に段 C 降下。
+      - [x] **Lemma 7.10** `inducedVirtualCharacters_eq_virtualCharacters` = **`v(G) = ch(G)`**。
+        `{k : ℤ | k·1_G ∈ v(G)}` は ℤ のイデアルで全素数 `q` の `ordCompl[q] |G|` を含み、gcd は 1
+        (共通素因数 `q` ⟹ `q ∣ ordCompl[q] |G|` で矛盾)。Bézout は Finset 帰納で 2 元ずつ、
+        添字を `insert 2 (primeFactors |G|)` に取ると `|G| = 1` も一様に落ちる。
+- [x] **段 G 完了** (2026-08-05): Brauer's characterization 本体
+      `mem_inducedVirtualCharacters_of_restrict` — 類関数 `θ` の `𝒳` の各元への制限が仮想指標なら
+      `θ ∈ v(G)`。`θ = 1_G · θ` に**段 B の Lemma 7.2** (projection formula) を当てるだけ。
+      ⚠ `θ` の類関数性は落とせない (projection formula がそれを要求する)。
+      ⚠ Thm 7.11 は予定どおり**不要**だった。
 - [ ] **段 H**: Navarro (2.15) → (2.16) → (3.16) (ブロック局所化は段 205-206 の型を反復)
 - [ ] **段 I**: `PrincipalBlockBasicSet` の `U` を ℤ 値に戻し、9506 の BS 本証明へ供給
 
