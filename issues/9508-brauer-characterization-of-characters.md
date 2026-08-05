@@ -312,8 +312,18 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
       (`blockOfIrr_eq_of_decompositionMatrix_ne_zero`) なので和は不変。
     - `μ ∉ B` のとき: `a'_i ≠ 0` は `i ∈ B` を要し `d_{iμ} ≠ 0` は `μ ∈ block(i) = B` を要する
       ので全項 0。右辺も `δ_{μμ₀} = 0` (`μ₀ ∈ B`)。
-    IBr の一次独立性 (`eq_zero_of_sum_irreducibleBrauerCharacter`) で
-    `Σ_i a'_i χ_i⁰ = φ_{μ₀}` が従う。
+    IBr の一次独立性で `Σ_i a'_i χ_i⁰ = φ_{μ₀}` が従う。
+
+    **使う補題 (実測済、探索不要)**:
+    - `eq_zero_of_sum_irreducibleBrauerCharacter_ringHom` (`Modular/DecompositionNumber`) —
+      **`𝒪` 係数**で bare `RingHom` + `hkerJ` の形。`BrauerLinearIndependence` の
+      `eq_zero_of_sum_irreducibleBrauerCharacter` は `AlgHom`+`AlgEquiv` 形なので、
+      plumbing 済のこちらを使う。⚠ `eq_of_sum_irreducibleBrauerCharacter_eq` は **ℕ** 係数版で
+      今回は使えない。
+    - `blockOfIrr_eq_of_decompositionMatrix_ne_zero` (`Modular/DecompositionBlockDiagonal`) —
+      `d_{iφ} ≠ 0 ⟹ block(φ) = blockOfIrr i`。
+    - `trace_eq_sum_decompositionMatrix` (`Modular/OrdinaryIrreducibles`) — `χ_i⁰` の IBr 展開。
+    - `algebraMap 𝒪 K` の単射性 (`IsFractionRing.injective`) で `K` の等式を `𝒪` に降ろす。
 - [ ] **段 I**: `PrincipalBlockBasicSet` の `U` を ℤ 値に戻し、9506 の BS 本証明へ供給
 
 ## 完了条件
