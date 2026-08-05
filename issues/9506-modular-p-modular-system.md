@@ -2580,19 +2580,24 @@ Navarro の証明は **(2.15)** (`θ ∈ ℤ[Irr(G)] ∪ ℤ[IBr(G)]` なら `θ
   `ker_quotientPi : ker π̄ = J(k[G/N])` は `ker π̄ = f(ker π)` + `ker f ≤ ker π = J(kG)` +
   `Ring.map_jacobson_of_ker_le`。
 
+- **段 212** = (iii)(a) `IBr(G)` と `IBr(G/N)` の**値の一致** (`Modular/QuotientSplitting`)。
+  `pRegularExponent_quotient` (`|G| = |G/N|·|N|` で `|N|` が `p` 冪 ⟹ `p'`-部分不変) で
+  両者の Brauer 指標が同じ 1 の冪根で取られ、`blockRepresentation_quotientPi` で作用素が
+  literally 同一なので `irreducibleBrauerCharacter_quotientPi : φ(g) = φ̄(ḡ)`。
+- **段 213** = (iii)(b) pairing 恒等式 (`Modular/QuotientPairing`、新 leaf)。
+  段 210 の全単射で `p`-正則和 `Σ a(g)b(g⁻¹)` は**そのまま**移り (`sum_pRegular_quotient`)、
+  違うのは正規化因子だけ ⟹ `card_mul_pairingZero_quotient : |N|·[a,b]⁰_G = [ā,b̄]⁰_Ḡ`。
+
 ### ⏸ 次 session の着手点 (2026-08-05 session 終了時点)
 
-1. **(7.6) の残り (iii)(iv)**:
-   - (iii) `[φ,θ]⁰_G = (1/|P|)[φ̄,θ̄]⁰_Ḡ` ⟹ Cartan の逆が `1/|P|` 倍 ⟹ **`C = |P| C̄`**。
-     必要な補助段:
-     (a) `irreducibleBrauerCharacter (quotientPi …) j (mk g) = irreducibleBrauerCharacter π j g`
-         (`p`-正則 `g`)。行列そのものは `quotientPi_single` で一致するので、
-         残るのは **`pRegularExponent p (G ⧸ N) = pRegularExponent p G`** の照合。
-         ⚠ `x` が `p`-正則なら `⟨x⟩ ∩ N = 1` (⟨x⟩ の元は `p`-正則・`N` の元は `p`-元) ゆえ
-         `orderOf (mk x) = orderOf x`。段 210 の全単射と合わせて指数が一致する。
-     (b) `pairingZero` の `1/|P|` 倍: 段 210 の全単射で `G⁰` 上の和を `Ḡ⁰` 上の和に移す
-         (ファイバーが `|P|` 個でなく **1 対 1**、係数 `1/|G|` vs `1/|Ḡ|` の差が `1/|P|`)。
-     (c) Cartan が pairing の逆 (既存 `sum_cartanMatrix_mul_pairingZero`) から `C = |P| C̄`。
+1. **(7.6) の残り**:
+   - (iii)(c) **`C_B = |P| C_B̄`**。材料は揃った: 段 212 (`φ(g) = φ̄(ḡ)`) を段 213 の
+     `card_mul_pairingZero_quotient` に食わせると `|N| · [φ,θ]⁰_G = [φ̄,θ̄]⁰_Ḡ`。
+     既存 `sum_cartanMatrix_mul_pairingZero` (`Σ_μ c_{μθ}[μ,φ]⁰ = δ`) で
+     「pairing 行列は Cartan の逆」なので、逆行列が `1/|N|` 倍 ⟹ Cartan が `|N|` 倍。
+     ⚠ Cartan 行列の定義には `hω`/`hω'` (1 の原始 `pRegularExponent` 乗根) と
+     `hkerJ` が要る — 段 211 の `ker_quotientPi` と段 212 の `pRegularExponent_quotient` で
+     `G/N` 側の datum は全て供給できる (`hω`/`hω'` は指数が同じなので同じ元が使える)。
    - (iv) ブロックの全単射 (p.137-138)。BS で実際に要るのは主ブロック同士の対応だけ。
 2. **Brauer の指標判定 → (2.15) → (2.16) → (3.16)** (上記の節)。共有インフラ。
 3. その後 BS 本証明 pp.141-146 の残り (`Q₈` の指標表 / `Aut(Q₈)` 相当 / 二面体群)。
