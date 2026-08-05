@@ -184,6 +184,13 @@ theorem pRegularPart_mul_pPart (hp : p.Prime) {g : G} (hg : IsOfFinOrder g) :
     bezout_ordProj_ordCompl hp (orderOf_pos_iff.mpr hg).ne', zpow_one]
 
 /-- The two factors commute (both are powers of `g`). -/
+theorem commute_pPart_of_commute {a g : G} (h : Commute a g) : Commute a (pPart p g) := by
+  rw [pPart]; exact h.zpow_right _
+
+theorem commute_pRegularPart_of_commute {a g : G} (h : Commute a g) :
+    Commute a (pRegularPart p g) := by
+  rw [pRegularPart]; exact h.zpow_right _
+
 theorem commute_pRegularPart_pPart (g : G) : Commute (pRegularPart p g) (pPart p g) :=
   (Commute.refl g).zpow_zpow _ _
 

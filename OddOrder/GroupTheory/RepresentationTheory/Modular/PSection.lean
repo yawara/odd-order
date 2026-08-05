@@ -32,6 +32,7 @@ decomposition numbers see.
 * `OddOrder.RepresentationTheory.Modular.forall_pSection_iff` — vanishing on `S(x)`, restated
 * `OddOrder.RepresentationTheory.Modular.isConj_centralizer_of_isConj_mul` — the parametrisation
   is injective: `x y₁ ~_G x y₂` forces `y₁ ~_{C_G(x)} y₂`
+* `OddOrder.RepresentationTheory.Modular.centralizerOf_mul_eq_inf` — `C_G(xy) = C_G(x) ⊓ C_G(y)`
 * `OddOrder.RepresentationTheory.Modular.mem_pSection_pPart`,
   `OddOrder.RepresentationTheory.Modular.isConj_of_mem_pSection_of_mem_pSection`,
   `OddOrder.RepresentationTheory.Modular.pSection_eq_of_isConj` — the `p`-sections partition `G`,
@@ -120,6 +121,35 @@ theorem forall_pSection_iff {K : Type*} [Zero K] (hp : p.Prime) {x : G} (hx : Is
     obtain ⟨y, hymem, hyreg, hconj⟩ := (mem_pSection_iff hp hx).mp hu
     rw [hf u _ hconj]
     exact h ⟨y, hymem⟩ (isPRegular_coe_iff.mp hyreg)
+
+omit [Finite G] in
+/-- **`C_G(x y) = C_G(x) ⊓ C_G(y)`** for a commuting `p`-element `x` and `p`-regular `y`.
+
+Both parts of `x y` are *powers* of `x y` (that is how `pPart` and `pRegularPart` are defined), so
+anything centralising `x y` centralises them; the converse is immediate.  This is the identity
+that matches the two class-size weights when a sum over the `p`-section `S(x)` is rewritten as a
+sum over the `p`-regular classes of `C_G(x)`. -/
+theorem centralizerOf_mul_eq_inf (hp : p.Prime) {x y : G} (hcomm : Commute x y)
+    (hx : IsPElement p x) (hy : IsPRegular p y) :
+    centralizerOf (x * y) = centralizerOf x ⊓ centralizerOf y := by
+  refine le_antisymm (fun z hz => ?_) (fun z hz => ?_)
+  · have hzc : Commute z (x * y) :=
+      (Subgroup.mem_centralizer_iff.mp hz (x * y) rfl).symm
+    have hzx : Commute z x := by
+      have := commute_pPart_of_commute (p := p) hzc
+      rwa [pPart_mul_eq_of_isPElement hp hcomm hx hy] at this
+    have hzy : Commute z y := by
+      have := commute_pRegularPart_of_commute (p := p) hzc
+      rwa [pRegularPart_mul_eq_of_isPElement hp hcomm hx hy] at this
+    exact Subgroup.mem_inf.mpr
+      ⟨Subgroup.mem_centralizer_iff.mpr fun _ h => h ▸ hzx.symm,
+        Subgroup.mem_centralizer_iff.mpr fun _ h => h ▸ hzy.symm⟩
+  · obtain ⟨hzx, hzy⟩ := Subgroup.mem_inf.mp hz
+    refine Subgroup.mem_centralizer_iff.mpr fun w hw => ?_
+    rw [show w = x * y from hw]
+    have h1 : Commute z x := (Subgroup.mem_centralizer_iff.mp hzx x rfl).symm
+    have h2 : Commute z y := (Subgroup.mem_centralizer_iff.mp hzy y rfl).symm
+    exact ((h1.mul_right h2).symm).symm.symm
 
 omit [Finite G] in
 /-- **Every element lies in the section of its own `p`-part.**  Together with

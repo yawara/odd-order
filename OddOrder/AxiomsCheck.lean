@@ -17159,3 +17159,12 @@ well-defined 性は `isConj_centralizer_of_isConj_mul` (助変数化の単射性
   OddOrder.RepresentationTheory.Modular.sectionProjectiveCharacter_mul
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sectionProjectiveCharacter_eq_of_isConj
+
+/-! **`C_G(xy) = C_G(x) ⊓ C_G(y)`** (`Modular/PSection`) — `p`-部分と `p'`-部分は
+どちらも `xy` の冪なので中心化群が分解する。`p`-section 上の和を `C_G(x)` の
+`p`-正則類上の和に書き直すときの重みの一致がこれ。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.commute_pPart_of_commute
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.centralizerOf_mul_eq_inf
