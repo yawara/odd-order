@@ -2284,6 +2284,41 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         通らなくてよい** — (7.2) が要るのは矛盾だけ。
 - [ ] **102: 🎯🎯🎯 BS 本証明 (pp.139–146)** → `brauerSuzuki_quaternionSylow_q8` の `sorry` 置換
 
+  ### 依存の洗い出し (2026-08-05、原文 p.138-139 の前置きと本文から確定)
+
+  ⚠ これまで「BS 本証明 8 ページの中身は未読 = 唯一の未知」と flag していた件の答え。
+
+  **(A) modular 側の引用** (本文中に現れるもの): (3.9) / (5.8)×2 / (5.10) /
+  (6.10) / (6.11) / (6.12) / (6.13)×2 / **(7.4)** / **(7.6)**。
+  ⟹ **Ch.5 側は本 session で全て揃った**。Ch.6 も (6.10)-(6.13) は段 100 で完了。
+  残る modular 依存は **(7.4) と (7.6)** だけ (どちらも (7.3) basic set の上に乗る)。
+
+  **(B) 群論側の標準事実** — Navarro が p.138 で「several standard group theoretic facts」
+  として明示的に列挙しているもの。repo 実測 (2026-08-05):
+  * `Aut(Q₈) ≅ Sym(4)` — **部分的**。`Isaacs/Ch03_SplitExtensions/Problems3F.lean` に
+    `quaternionSwapIJAut` / `quaternionSwapIKAut` / `quaternionTwo_exists_mulAut_map_zpowers`
+    (`Aut(Q₈)` の推移性) はあるが `≅ Sym(4)` 全体は無い。
+    BS が使うのは「`N_G(P)/C_G(P) ≤ Sym(4)`」+「その Sylow-2 は `PC_G(P)/C_G(P)` が唯一」
+    +「位数 3 の元が取れる」なので、段 179-180 と同じく**全同型を作らずに済む可能性が高い**。
+  * 巡回 Sylow-2 ⟹ 正規 2-補群 — `Isaacs.Ch05.hasNormalPComplement_of_isCyclic_sylow_of_dvd_index`
+    (`Problems5C12.lean:61`) が近い。仮説の形を要確認。
+  * 「involution 2 つが生成する群は位数 `2·o(t₁t₂)` の二面体群」— **無い**。
+    (`Isaacs/Ch06_FrobeniusActions/Main.lean` の
+    `dihedralOrQuaternionOrSemiDihedral_of_...` は別の主張。)
+  * 「正規 `p`-補群 ⟺ `P` が `G`-fusion を制御」— ✅ **既存**
+    (`Isaacs.Ch05.hasNormalPComplement_iff_controlsOwnFusion` = Isaacs Thm 5.25)。
+  * `Q₈` の指標表 (5 類、1 次 4 個 + 2 次 1 個) — **無い**。
+
+  **(C) 証明の骨格** (p.139): `P` を位数 8 の四元数 Sylow-2、`t` をその involution とし
+  `t ∈ Z(G)` を示す。真の正規部分群 `N` で `t ∈ N` なるものが取れれば、`P ⊓ N` が巡回なら
+  `N` は正規 2-補群を持ち `O_{2'}(G) = 1` から `N` は巡回 2-群 ⟹ `t ∈ Z(G)`;
+  `P ≤ N` なら `|G|` の帰納法。⟹ **目標は「`t` を核に含む主ブロックの非自明指標を見つける」**。
+  最初の段は「位数 4 の元は全て `G`-共役 (実は `C_G(t)`-共役)」で、
+  ここで fusion 制御 + `Aut(P) = Sym(4)` を使う。以降 "Analysis at y" (p.139-) と続く。
+
+  ⟹ **次 session の着手順** (文書順): (7.2) 第 2 部 → (7.3) basic set → (7.4) → (7.5) → (7.6)
+  → 上記 (B) の群論 3 件 (`Aut(Q₈)` 相当・二面体・`Q₈` 指標表) → BS 本体。
+
 ⚠ 上記の番号は Navarro の結果番号であって段番号ではない (段番号は連番で振り直す)。
 ⚠ 数式は OCR 崩れが重いので、各段の statement は `references/navarro/pages/*.png` で確定する
 (BS 証明の pp.139–146 は取得済)。
