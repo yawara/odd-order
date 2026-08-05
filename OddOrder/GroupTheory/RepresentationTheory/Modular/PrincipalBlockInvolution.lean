@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Algebra.SumSquaresFour
 import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
+import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInverse
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
 
@@ -124,6 +125,104 @@ theorem character_eq_character_involution_of_not_isPRegular
       hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hj]
 
 /-! ### `∑_{χ ∈ Irr(B_0)} χ(t)² = c_{φ_0 φ_0}` -/
+
+set_option maxHeartbeats 1000000 in
+-- Same chain as the `p`-section value it feeds into the uniqueness of the expansion.
+set_option linter.unusedFintypeInType false in
+omit [Invertible (Nat.card G : K)] [Fintype κ] ht in
+open scoped Classical in
+include hp hx hω hω' e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ in
+/-- **`d^{t⁻¹}_{χ φ_0} = d^t_{χ φ_0}` when `t` is conjugate to `t⁻¹`** and `χ ∈ Irr(B_0)`.
+
+Write `t⁻¹ = c t c⁻¹`.  For `p`-regular `w ∈ C_G(t)` the element `c⁻¹ w c` is again a `p`-regular
+element of `C_G(t)`, and `χ(t⁻¹ w) = χ(t · c⁻¹ w c) = d^t_{χ φ_0}` by
+`character_mul_eq_generalizedDecompositionNumber`.  So the expansion of `w ↦ χ(t⁻¹ w)` in
+`IBr(C_G(t))` is the constant `d^t_{χ φ_0}`, which is the expansion of `d^t_{χ φ_0} · φ_0`
+(Navarro (6.13): `φ_0` is the constant `1`).  Uniqueness identifies the two families. -/
+theorem generalizedDecompositionNumberInv_principalBlock_eq
+    (hinv : ∃ c : G, c * t * c⁻¹ = t⁻¹) {j : κ}
+    (hj : blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG) :
+    generalizedDecompositionNumberInv (x := t) hp hω' hπ hlin hkerJ
+        ((wedderburnRepresentation eG j).character)
+        (fun _ _ hgh => character_eq_of_isConj _ hgh) φ₀
+      = generalizedDecompositionNumber (𝒪 := 𝒪) (nn := nn) t hp hω' hπ hlin hkerJ
+          ((wedderburnRepresentation eG j).character)
+          (fun _ _ hgh => character_eq_of_isConj _ hgh) φ₀ := by
+  classical
+  obtain ⟨c, hc⟩ := hinv
+  set d : K := generalizedDecompositionNumber (𝒪 := 𝒪) (nn := nn) t hp hω' hπ hlin hkerJ
+    ((wedderburnRepresentation eG j).character)
+    (fun _ _ hgh => character_eq_of_isConj _ hgh) φ₀ with hd
+  have hfam : (fun τ : ι => if τ = φ₀ then d else 0)
+      = generalizedDecompositionNumberInv (x := t) hp hω' hπ hlin hkerJ
+        ((wedderburnRepresentation eG j).character)
+        (fun _ _ hgh => character_eq_of_isConj _ hgh) := by
+    refine eq_generalizedDecompositionNumberInv hp hω' hπ hlin hkerJ _ _ fun w hw => ?_
+    -- the left side collapses to `d · φ_0(w) = d`
+    rw [Finset.sum_eq_single φ₀ (fun τ _ hne => by rw [if_neg hne, zero_mul])
+        (fun h => absurd (Finset.mem_univ φ₀) h), if_pos rfl,
+      irreducibleBrauerCharacter_principalBlock_eq_one hπ hlin hnil hp hω' hNp hquot S hφ₀ hw,
+      map_one, mul_one]
+    -- the right side is `χ(t · c⁻¹ w c)`, a `p`-section value
+    have hmem : c⁻¹ * (w : G) * c ∈ centralizerOf t := by
+      simp only [centralizerOf, Subgroup.mem_centralizer_iff, Set.mem_singleton_iff, forall_eq]
+      have ht' : t = c⁻¹ * t⁻¹ * c := by rw [← hc]; group
+      have hcw : Commute t (w : G) := (Subgroup.mem_centralizer_iff.mp w.2) t rfl
+      have hwt : t⁻¹ * (w : G) = (w : G) * t⁻¹ := hcw.inv_left.eq
+      calc t * (c⁻¹ * (w : G) * c)
+          = (c⁻¹ * t⁻¹ * c) * (c⁻¹ * (w : G) * c) := by rw [← ht']
+        _ = c⁻¹ * (t⁻¹ * (w : G)) * c := by group
+        _ = c⁻¹ * ((w : G) * t⁻¹) * c := by rw [hwt]
+        _ = (c⁻¹ * (w : G) * c) * (c⁻¹ * t⁻¹ * c) := by group
+        _ = (c⁻¹ * (w : G) * c) * t := by rw [← ht']
+    have hreg : IsPRegular p (⟨c⁻¹ * (w : G) * c, hmem⟩ : ↥(centralizerOf t)) := by
+      refine isPRegular_coe_iff.mp ?_
+      have h := (isPRegular_coe hw).conj c⁻¹
+      rwa [inv_inv] at h
+    have hval := character_mul_eq_generalizedDecompositionNumber hp hx hω e eG hπG hlinG hπ hlin
+      hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hj (y := ⟨_, hmem⟩) hreg
+    rw [hd, ← hval]
+    refine character_eq_of_isConj _ ?_
+    refine isConj_iff.mpr ⟨c, ?_⟩
+    change c * (t * (c⁻¹ * (w : G) * c)) * c⁻¹ = t⁻¹ * (w : G)
+    rw [← hc]
+    group
+  rw [← hfam]
+  simp
+
+set_option maxHeartbeats 1000000 in
+-- Same chain as the identification of the two columns.
+set_option linter.unusedFintypeInType false in
+omit ht in
+open scoped Classical in
+include hp hx hω hω' e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ in
+/-- **`∑_{χ ∈ Irr(B_0)} χ(t)² = c_{φ_0 φ_0}` for any `p`-element conjugate to its inverse.**
+
+This is (5.13)(b) with the numbers at `t⁻¹` built by `generalizedDecompositionNumberInv`; the
+columns outside `Irr(B_0)` vanish, and on `Irr(B_0)` both columns are `χ(t)`.  The involution
+case `t⁻¹ = t` is `sum_sq_character_involution_eq_cartanMatrix`; the case that Brauer–Suzuki
+needs beyond it is an element of order `4` in a quaternion group, which is conjugate to its
+inverse. -/
+theorem sum_sq_character_eq_cartanMatrix_of_isConj_inv (hinv : ∃ c : G, c * t * c⁻¹ = t⁻¹) :
+    (∑ j ∈ Finset.univ.filter
+        (fun j => blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG),
+      ((wedderburnRepresentation eG j).character t) ^ 2)
+      = (cartanMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e φ₀ φ₀ : K) := by
+  classical
+  rw [← sum_mul_generalizedDecompositionNumberInv_eq_cartanMatrix (x := t) hp hω hω' hπ hlin
+    hkerJ e eG hx φ₀ φ₀]
+  refine Eq.trans (Finset.sum_congr rfl fun j hj => ?_)
+    (Finset.sum_subset (Finset.filter_subset _ Finset.univ) fun j _ hj => ?_)
+  · have hjB := (Finset.mem_filter.mp hj).2
+    rw [generalizedDecompositionNumberInv_principalBlock_eq hp hx hω e eG hπG hlinG hπ hlin
+        hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hinv hjB,
+      character_involution_eq_generalizedDecompositionNumber hp hx hω e eG hπG hlinG hπ hlin
+        hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hjB, sq]
+  · rw [generalizedDecompositionNumber_principalBlock_eq_zero_of_blockOfIrr_ne hp hx hω e eG hπG
+      hlinG hπ hlin hkerJ hnil hnilG hω' hζ hζk hζK hφ₀
+      (fun hcon => hj (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hcon⟩)), mul_zero]
+
+/-! ### `∑_{χ ∈ Irr(B_0)} χ(t)² = c_{φ_0 φ_0}` (continued) -/
 
 set_option maxHeartbeats 1000000 in
 -- The three inputs (the involution form of (5.13.b), the vanishing off `Irr(B_0)` and the

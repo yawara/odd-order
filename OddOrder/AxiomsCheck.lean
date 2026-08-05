@@ -278,6 +278,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
+import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInverse
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
 import OddOrder.Algebra.SumSquaresFour
@@ -17642,3 +17643,35 @@ Klein 四元群 `P` (非自明元は全て 2-特異) の上で `[(χ)_P, 1_P] = 
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.eq_zero_of_vanishing_on_pRegular_of_apply_eq_zero
+
+/-! 🎯🎯 **(5.13)(b) を任意の `p`-元へ** (`Modular/GeneralizedDecompositionInverse`) —
+(5.13)(b) は `x⁻¹` 側の数を「`C_G(x)` の中で読んだ」抽象族 `dinv` として受け取る
+(`centralizerOf x⁻¹ = centralizerOf x` が命題的等式なので carrier 型が入れ替えられない) が、
+本 leaf はその族を**任意の `x` に対して構成する**: `x⁻¹` は `C_G(x)` を中心化するので
+`y ↦ χ(x⁻¹ y)` は `C_G(x)` の類関数で、`IBr(C_G(x))` に一意展開される。
+`y⁻¹` で読めば `(x y)⁻¹ = x⁻¹ y⁻¹` から `hdinv` がそのまま出る。
+⟹ Brauer–Suzuki の "Analysis at y" (原文 p.140、位数 4 の元) が対合版なしで扱える。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.isConj_inv_mul_of_isConj
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumberInv
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_generalizedDecompositionNumberInv_inv
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_mul_generalizedDecompositionNumberInv_eq_cartanMatrix
+
+/-! 🎯🎯 **`Σ_{χ∈Irr(B₀)} χ(x)² = c_{φ₀φ₀}` — `x` が `x⁻¹` に共役なら十分**
+(`Modular/PrincipalBlockInvolution`)。`x⁻¹ = c x c⁻¹` と書くと `p`-正則な `w ∈ C_G(x)` に対し
+`χ(x⁻¹ w) = χ(x · c⁻¹wc)` で、これは段 187 より定数 `d^x_{χφ₀}`。
+`φ₀` は `p`-正則類上で定数 1 なので、展開の一意性から `d^{x⁻¹}_{χφ₀} = d^x_{χφ₀}`。
+⟹ 対合という仮定は不要で、**四元数群の位数 4 の元** (自分の逆元と共役) にも効く。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumberInv_principalBlock_eq
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_sq_character_eq_cartanMatrix_of_isConj_inv
