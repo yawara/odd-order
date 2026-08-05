@@ -13409,6 +13409,10 @@ characteristic ⟹ 既存の `normal_map_subtype_of_characteristic` で `G` で�
 #assert_only_allowed_axioms OddOrder.GroupTheory.quaternionTwo_exists_conj_eq_inv
 #assert_only_allowed_axioms OddOrder.GroupTheory.exists_conj_eq_inv_of_quaternionTwo
 #assert_only_allowed_axioms OddOrder.GroupTheory.conj_eq_iff_of_quaternionTwo
+/-! `orbit_eq_univ_of_odd_of_card_eq_three` = **`Aut(Q₈) = Sym(4)` の代替**の核。
+奇位数群が 3 元集合に作用するとき、軌道の位数は群位数を割る (orbit-stabilizer) ので奇数、
+かつ ≤ 3 ⟹ 1 か 3。固定点でない軌道は全体。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.orbit_eq_univ_of_odd_of_card_eq_three
 
 /-! ### lean-eval 提出候補の登録 (issue 0050, 2026-07-22).
 

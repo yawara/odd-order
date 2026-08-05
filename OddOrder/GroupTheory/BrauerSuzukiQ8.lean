@@ -515,6 +515,38 @@ theorem conj_eq_iff_of_quaternionTwo {P : Type*} [Group P] (e : P ≃* Quaternio
   ⟨fun g => conj_eq_self_or_inv_of_quaternionTwo e w g, exists_conj_eq_inv_of_quaternionTwo e hw,
     fun h => hw (by rw [sq]; exact mul_eq_one_iff_eq_inv.mpr h)⟩
 
+/-- **A group of odd order acting on a three-element type moves a point to everything or to
+nothing.**  Orbits have size dividing the (odd) group order, so each has size `1` or `3`; an orbit
+that is not a fixed point is therefore the whole set.
+
+This replaces Navarro's appeal to `Aut(Q₈) = Sym(4)`: the three cyclic subgroups of order `4` of
+`T` carry an action of `N_G(T)` through a quotient of odd order
+(`not_two_dvd_relIndex_sup_centralizer`), so one fusion forces all three to fuse. -/
+theorem orbit_eq_univ_of_odd_of_card_eq_three {H Ω : Type*} [Group H] [Finite H] [Fintype Ω]
+    [MulAction H Ω] (hodd : ¬ 2 ∣ Nat.card H) (hΩ : Fintype.card Ω = 3) {x : Ω}
+    (hx : ∃ h : H, h • x ≠ x) : MulAction.orbit H x = Set.univ := by
+  classical
+  letI := Fintype.ofFinite H
+  letI : Fintype (MulAction.orbit H x) := Fintype.ofFinite _
+  letI : Fintype (MulAction.stabilizer H x) := Fintype.ofFinite _
+  have hos := MulAction.card_orbit_mul_card_stabilizer_eq_card_group H x
+  have hdvd : Fintype.card (MulAction.orbit H x) ∣ Nat.card H := by
+    rw [Nat.card_eq_fintype_card, ← hos]
+    exact Dvd.intro _ rfl
+  have hle : Fintype.card (MulAction.orbit H x) ≤ 3 := by
+    rw [← hΩ]
+    exact Fintype.card_le_of_injective _ Subtype.val_injective
+  have hgt : 1 < Fintype.card (MulAction.orbit H x) := by
+    obtain ⟨h, hh⟩ := hx
+    refine Fintype.one_lt_card_iff.mpr ⟨⟨h • x, MulAction.mem_orbit x h⟩,
+      ⟨x, MulAction.mem_orbit_self x⟩, fun hc => hh (congrArg Subtype.val hc)⟩
+  have hne2 : Fintype.card (MulAction.orbit H x) ≠ 2 := fun h => hodd (h ▸ hdvd)
+  have hcard : Fintype.card (MulAction.orbit H x) = 3 := by omega
+  refine Set.eq_univ_of_forall fun y => ?_
+  have hfin : (MulAction.orbit H x).toFinset = Finset.univ :=
+    Finset.eq_univ_of_card _ (by rw [Set.toFinset_card, hcard, hΩ])
+  exact Set.mem_toFinset.mp (hfin ▸ Finset.mem_univ y)
+
 /-- **`T·C_G(T)` has odd index in `N_G(T)`**: it contains the Sylow `2`-subgroup `T`, whose index
 in `N_G(T)` divides the odd number `[G : T]`.
 
