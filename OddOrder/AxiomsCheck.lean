@@ -273,6 +273,7 @@ import OddOrder.Algebra.BlockPartitionedMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionMatrix
 import OddOrder.GroupTheory.KleinFourAutomorphism
 import OddOrder.GroupTheory.KleinFourSylowFusion
+import OddOrder.GroupTheory.KleinFourNormalComplement
 import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterCount
@@ -17447,3 +17448,16 @@ Navarro (5.12) の "in particular, notice that the matrix `J` is regular"。
 
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.isConj_of_klein_sylow_of_not_centralizes
+
+/-! 🎯🎯 **共役でない involution が 2 つあれば正規 2-補群** (`GroupTheory/KleinFourNormalComplement`)
+— Navarro (7.2) 第 1 部の対偶で、Brauer–Suzuki の証明が実際に使う向き。
+`isConj_of_klein_sylow_of_not_centralizes` の対偶で `N_G(P) ≤ C_G(P)` が出て、
+既存の Burnside (`Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer`) が効く。
+`exists_not_isConj_of_mem_center` = 中心的 involution `t` の類は `{t}` なので
+Klein 四元群 Sylow-2 を持つ群は単一類になれない ((7.2) が `C = C_G(t)` に適用する形)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.hasNormalPComplement_of_not_isConj
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.exists_not_isConj_of_mem_center
