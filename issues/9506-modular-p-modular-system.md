@@ -2047,8 +2047,27 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
           Isaacs Ch.5/7 にあるはずなので**着手前に grep**
         * `Aut(Z₂×Z₂) ≅ S₃` と「位数 3 の自己同型は 3 つの involution を巡回」
         * **(5.12)** `k(B) = Σ_i Σ_{b ∈ Bl(C_G(x_i)), b^G = B} l(b)` (第二主定理の系)
-        * **(5.13)(b)** 一般化分解数の直交性 `Σ_χ d^x_{χμ} d^x_{χφ} = c^b_{μφ}`
-          ⟵ **次の実装対象**。実測 (2026-08-05): (5.1) `generalizedDecompositionNumber` /
+        * **(5.13)(b)** 一般化分解数の直交性 ⟵ **次の実装対象**。
+          **⚠ 設計上の懸案は解決 (2026-08-05)**: 原文 (p.107 のページ画像で確定) は
+          `Σ_{χ∈Irr(G)} conj(d^x_{χμ}) d^x_{χφ} = c_{μφ}` と**複素共役**で書くが、
+          抽象的な分裂体 `K` には共役が無い。**共役は不要**と分かった:
+          - Brauer 指標は `μ(y⁻¹) = conj(μ(y))` (固有値の持ち上げが逆元で逆元になる)
+          - `χ(xy) = Σ_μ d^x_{χμ} μ(y)` を共役すると
+            `χ(x⁻¹z) = Σ_μ conj(d^x_{χμ}) μ(z)` (`z = y⁻¹`、`C_G(x⁻¹) = C_G(x)`)
+          - (5.1) の一意性より ⟹ **`conj(d^x_{χμ}) = d^{x⁻¹}_{χμ}`**
+          ⟹ 抽象版の statement は
+          **`Σ_{χ∈Irr(G)} d^{x⁻¹}_{χμ} · d^{x}_{χφ} = c_{μφ}`** (共役ゼロ)。
+          BS が使うのは `x = t` (involution) で `x⁻¹ = x` ゆえ
+          `Σ_χ (d^t_{χμ})(d^t_{χφ}) = c_{μφ}` になる。
+          **証明経路** (原文 p.108): `Φ^x_μ ∈ cf(G)` = `C_G(x)` の射影不可分指標を
+          `p`-section `S(x)` へゼロ拡張したもの、を作り
+          `[Φ^x_μ, χ] = conj(d^x_{χμ})` を示して `[Φ^x_μ, Φ^x_φ]` を 2 通りに計算する。
+          **既存で使えるもの**: `Modular/PSection.lean` (`pSection` / `mem_pSection_iff` /
+          `isConj_centralizer_of_isConj_mul` = 助変数化の単射性 = `Φ^x_μ` の well-defined 性) /
+          `CartanMatrix.projectiveIndecomposableCharacter` (`Φ_φ`、`x = 1` の場合) /
+          `CartanInverse.pairingZero_projectiveIndecomposableCharacter` (= (2.13)
+          `[Φ_θ,φ]⁰ = δ`) / `ProjectiveCharacterVanishing` (`Φ_φ` は `p`-singular で 0)。
+          **新規**: `Φ^x_μ` (一般 `x` へのゼロ拡張) とその 2 性質。実測 (2026-08-05): (5.1) `generalizedDecompositionNumber` /
           (5.2) `generalizedDecompositionNumber_eq_zero` / (5.8)
           `..._sum_generalizedDecompositionNumber_inducedBlockOfCentralizer` は**既存**
           (`Modular/GeneralizedDecomposition.lean`, `SecondMainTheorem.lean`,
