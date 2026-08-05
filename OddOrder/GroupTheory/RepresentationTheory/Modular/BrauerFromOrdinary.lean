@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanBlockDiagonal
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
 
 /-!
@@ -47,6 +48,67 @@ variable (hp : p.Prime) {ω : 𝒪} (hω : IsPrimitiveRoot ω (pRegularExponent 
   (hlin : ∀ (c : ResidueField 𝒪) (a : MonoidAlgebra (ResidueField 𝒪) G), π (c • a) = c • π a)
   (hkerJ : RingHom.ker π = Ring.jacobson (MonoidAlgebra (ResidueField 𝒪) G))
   (e : MonoidAlgebra K G ≃ₐ[K] ∀ j, Matrix (m j) (m j) K)
+
+/-! ### The inverse of the Cartan matrix is block diagonal -/
+
+set_option maxHeartbeats 800000 in
+-- The two matrices carry the full modular-datum chain; `Fintype ι` / `Fintype ι'` are what make
+-- the Cartan matrix and its inverse elaborate, and the section fixes them.
+set_option linter.unusedDecidableInType false in
+set_option linter.unusedFintypeInType false in
+open scoped Classical in
+include hp hω hω' hkerJ e in
+/-- **`([τ,μ]⁰)` is block diagonal.**  It is the inverse of the Cartan matrix, which is block
+diagonal (`cartanMatrix_eq_zero_of_centralCharacterAlg_ne`); zeroing out the off-block entries of
+a right inverse of a block-diagonal matrix leaves a right inverse, and the inverse is unique. -/
+theorem pairingZero_irreducibleBrauerCharacter_eq_zero_of_centralCharacterAlg_ne {τ μ₀ : ι}
+    (hne : MatrixModule.centralCharacterAlg π τ hπ hlin
+      ≠ MatrixModule.centralCharacterAlg π μ₀ hπ hlin) :
+    pairingZero (𝒪 := 𝒪) p K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π τ)
+        (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π μ₀) = 0 := by
+  classical
+  set cc : ι → _ := fun μ => MatrixModule.centralCharacterAlg π μ hπ hlin with hcc
+  set C : Matrix ι ι K := fun μ φ =>
+    ((cartanMatrix hp hω hω' hπ hlin hkerJ e μ φ : ℕ) : K) with hC
+  set P : Matrix ι ι K := fun μ φ =>
+    pairingZero (𝒪 := 𝒪) p K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π μ)
+      (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π φ) with hP
+  set P' : Matrix ι ι K := fun μ φ => if cc μ = cc φ then P μ φ else 0 with hP'
+  have hCzero : ∀ μ φ : ι, cc μ ≠ cc φ → C μ φ = 0 := fun μ φ h => by
+    rw [hC]
+    simp only
+    rw [cartanMatrix_eq_zero_of_centralCharacterAlg_ne hp hω hω' hπ hlin hkerJ e h, Nat.cast_zero]
+  have hCP : Cᵀ * P = 1 := by
+    ext θ φ
+    rw [Matrix.mul_apply, Matrix.one_apply]
+    simp only [Matrix.transpose_apply, hC, hP]
+    rw [sum_cartanMatrix_mul_pairingZero hp hω hω' hπ hlin hkerJ e φ θ]
+    exact if_congr eq_comm rfl rfl
+  have hCP' : Cᵀ * P' = 1 := by
+    ext θ φ
+    by_cases hθφ : cc θ = cc φ
+    · rw [← hCP, Matrix.mul_apply, Matrix.mul_apply]
+      refine Finset.sum_congr rfl fun μ _ => ?_
+      by_cases hμθ : cc μ = cc θ
+      · simp only [hP', if_pos (hμθ.trans hθφ)]
+      · rw [Matrix.transpose_apply, hCzero μ θ hμθ, zero_mul, zero_mul]
+    · rw [Matrix.mul_apply, Matrix.one_apply, if_neg (fun h => hθφ (by rw [h]))]
+      refine Finset.sum_eq_zero fun μ _ => ?_
+      by_cases hμθ : cc μ = cc θ
+      · simp only [hP', if_neg (fun hc => hθφ (hμθ.symm.trans hc)), mul_zero]
+      · rw [Matrix.transpose_apply, hCzero μ θ hμθ, zero_mul]
+  have hPP' : P' = P := by
+    have hPC : P * Cᵀ = 1 := mul_eq_one_comm.mp hCP
+    calc P' = 1 * P' := (Matrix.one_mul _).symm
+      _ = (P * Cᵀ) * P' := by rw [hPC]
+      _ = P * (Cᵀ * P') := Matrix.mul_assoc _ _ _
+      _ = P := by rw [hCP', Matrix.mul_one]
+  have hzero : P' τ μ₀ = 0 := by
+    simp only [hP']
+    exact if_neg hne
+  have hval := congrFun (congrFun hPP' τ) μ₀
+  rw [hzero] at hval
+  exact hval.symm
 
 /-- The coefficients expressing `μ_0 ∈ IBr(G)` in the ordinary characters:
 `a_χ = ∑_τ d_{χτ} [τ, μ_0]⁰`. -/

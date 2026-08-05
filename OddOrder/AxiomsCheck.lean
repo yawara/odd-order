@@ -17756,3 +17756,13 @@ Navarro Lemma (3.16) の `K` 版。係数は `a_χ = Σ_τ d_{χτ} [τ, μ₀]�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_ordinaryCombination_eq_irreducibleBrauerCharacter
+
+/-! 🎯 **Cartan 行列の逆もブロック対角** (`Modular/BrauerFromOrdinary`) —
+`([τ,μ]⁰)` は Cartan 行列 `C` の逆で、`C` はブロック対角
+(`cartanMatrix_eq_zero_of_centralCharacterAlg_ne`)。ブロック外を 0 にした `P'` も
+`CᵀP' = 1` を満たす (対角外の項はどちらかの因子が 0) ので、逆の一意性から `P' = P`。
+⟹ 段 204 の結合係数 `a_χ = Σ_τ d_{χτ}[τ,μ₀]⁰` は `χ ∉ Irr(B)` で消える
+(`d_{χτ} ≠ 0 ⟹ τ ∈ B(χ)` と合わせて)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.pairingZero_irreducibleBrauerCharacter_eq_zero_of_centralCharacterAlg_ne
