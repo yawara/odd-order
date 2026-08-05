@@ -13380,6 +13380,11 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.mem_sylow_of_mem_center_of_orderOf_eq_two
 #assert_only_allowed_axioms OddOrder.GroupTheory.q8_mem_center_of_mem_center_normal
+/-! `oPiCore_subgroup_eq_bot` = 「`O_{2'}(G) = 1` は正規部分群に遺伝」(`O_{2'}(N)` は `N` で
+characteristic ⟹ 既存の `normal_map_subtype_of_characteristic` で `G` で正規 ⟹ `O_{2'}(G)` の中)。
+これで Navarro p.139 の帰納法が組め、BS の `Q₈` 分枝に残る数学は
+`q8_exists_proper_normal` (「z を含む真の正規部分群の存在」= 指標論の核 pp.139-146) だけになった。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.oPiCore_subgroup_eq_bot
 
 /-! ### lean-eval 提出候補の登録 (issue 0050, 2026-07-22).
 

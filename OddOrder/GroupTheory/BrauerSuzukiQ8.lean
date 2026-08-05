@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.BrauerSuzukiEndgame
 import OddOrder.GroupTheory.CardSupInf
+import OddOrder.GroupTheory.SubgroupInAmbient
 
 /-!
 # Brauer–Suzuki: the `Q₈` case (Navarro, *Characters and Blocks*, pp. 139–146)
@@ -25,12 +26,19 @@ Navarro's own statement:
   the Sylow `2`-subgroups of `Ḡ` are again `Q₈` — the odd core meets `T` trivially
   (`sylowTwo_inf_oPiCore_eq_bot`).
 
-So the whole content of the `Q₈` case is `q8_mem_center_of_oPiCore_eq_bot`, which is verbatim
-Navarro's "it suffices to prove that `t ∈ Z(G)`" under `O_{2'}(G) = 1`.
+The reduction paragraph of p. 139 is then carried out in full, by induction on `|G|`: if the
+Sylow `2`-subgroup is all of `G` the involution is central because `Z(Q₈) ≠ 1`; otherwise a
+proper normal subgroup `N` containing `z` either misses part of `T` — then `T ⊓ N` is a cyclic
+Sylow `2`-subgroup of `N`, Burnside makes `N` a cyclic `2`-group and `z` central — or contains
+`T`, and induction on `N` puts `z` in `Z(N)`, whence in `Z(G)`.
+
+So the whole content of the `Q₈` case is `q8_exists_proper_normal`: the existence of that proper
+normal subgroup, i.e. Navarro's "find a nontrivial character in the principal block of `G` which
+contains `t` in its kernel".
 
 ## Main results
 
-* `OddOrder.GroupTheory.q8_mem_center_of_oPiCore_eq_bot` — **the remaining mathematics**
+* `OddOrder.GroupTheory.q8_exists_proper_normal` — **the remaining mathematics**
   (issue 9506, `sorry`)
 * `OddOrder.GroupTheory.mem_center_of_normal_of_isCyclic` — how both branches of Navarro's
   reduction on p. 139 finish
@@ -38,8 +46,8 @@ Navarro's "it suffices to prove that `t ∈ Z(G)`" under `O_{2'}(G) = 1`.
   cyclic, the dichotomy "`P ∩ N` is cyclic or `P ⊆ N`" that opens that reduction
 * `OddOrder.GroupTheory.q8_mem_center_of_mem_normal_of_not_le` — the **cyclic branch** of that
   reduction, proved in full
-* `OddOrder.GroupTheory.q8_mem_center_of_mem_center_normal` — the **branch `P ≤ N`**, given what
-  induction on `|G|` supplies
+* `OddOrder.GroupTheory.q8_mem_center_of_mem_center_normal` — the **branch `P ≤ N`**
+* `OddOrder.GroupTheory.q8_mem_center_of_oPiCore_eq_bot` — the induction assembled
 * `OddOrder.GroupTheory.q8_mk_mem_center` / `OddOrder.GroupTheory.brauerSuzuki_q8`
 -/
 
@@ -397,6 +405,99 @@ theorem q8_mem_center_of_mem_center_normal (T : Sylow 2 G)
   calc g * z = g * z * g⁻¹ * g := by group
     _ = z * g := by rw [← hw, hgz]
 
+/-! ### Navarro p. 139: the induction -/
+
+/-- **`O_{2'}(G) = 1` is inherited by normal subgroups.**  `O_{2'}(N)` is characteristic in `N`,
+hence normal in `G`, and it is a `2'`-group, so it sits inside `O_{2'}(G)`. -/
+theorem oPiCore_subgroup_eq_bot {N : Subgroup G} [N.Normal] (hO : oPiCore {p | p ≠ 2} G = ⊥) :
+    oPiCore {p | p ≠ 2} ↥N = ⊥ := by
+  set K : Subgroup ↥N := oPiCore {p | p ≠ 2} ↥N with hK
+  haveI : K.Characteristic := oPiCore.characteristic _ _
+  haveI : (K.map N.subtype).Normal := normal_map_subtype_of_characteristic ‹K.Characteristic›
+  have hcard : Nat.card ↥(K.map N.subtype) = Nat.card ↥K :=
+    Nat.card_congr (Subgroup.equivMapOfInjective K N.subtype N.subtype_injective).symm.toEquiv
+  have hpi : Subgroup.IsPiGroup {p | p ≠ 2} (K.map N.subtype) := by
+    intro p hp
+    rw [hcard] at hp
+    exact oPiCore.isPiGroup (G := ↥N) {p | p ≠ 2} p hp
+  have hbot : K.map N.subtype = ⊥ := le_bot_iff.mp (hO ▸ Subgroup.IsPiGroup.le_oPiCore hpi)
+  refine le_bot_iff.mp fun y hy => ?_
+  have hmem : (y : G) ∈ K.map N.subtype := ⟨y, hy, rfl⟩
+  rw [hbot, Subgroup.mem_bot] at hmem
+  exact Subgroup.mem_bot.mpr (Subtype.ext hmem)
+
+/-- **Navarro pp. 139–146, the character-theoretic core** (issue 9506, `sorry`): when the
+quaternion Sylow `2`-subgroup is proper, its involution lies in a proper normal subgroup.
+
+This is Navarro's "our objective is to find a nontrivial character in the principal block of `G`
+which contains `t` in its kernel" — the kernel of such a character is the proper normal subgroup.
+The proof occupies the eight pages pp. 139–146: a unique `G`-class of elements of order `4`
+(fusion control plus `Aut(Q₈) = Sym(4)`), then the "analysis at `y`" and "analysis at `t`" with
+the principal-block basic set of Navarro (7.3)/(7.4), for which the integral change-of-basis
+matrix `intBasicSetMatrix` (issue 9508, closed) is the prerequisite. -/
+theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 2 G)
+    (e : ↥(T : Subgroup G) ≃* QuaternionGroup 2) (hTG : (T : Subgroup G) ≠ ⊤)
+    {z : G} (hzT : z ∈ (T : Subgroup G)) (hz : orderOf z = 2) :
+    ∃ N : Subgroup G, N.Normal ∧ N ≠ ⊤ ∧ z ∈ N := by
+  sorry
+
+universe u
+
+private theorem q8_mem_center_aux (n : ℕ) : ∀ {H : Type u} [Group H] [Finite H],
+    Nat.card H ≤ n → oPiCore {p | p ≠ 2} H = ⊥ → ∀ T : Sylow 2 H,
+    Nonempty (↥(T : Subgroup H) ≃* QuaternionGroup 2) → ∀ {z : H}, z ∈ (T : Subgroup H) →
+    orderOf z = 2 → z ∈ Subgroup.center H := by
+  induction n with
+  | zero =>
+    intro H _ _ hcard
+    have := Nat.card_pos (α := H)
+    omega
+  | succ n ih =>
+    intro H _ _ hcard hO T hq z hzT hz
+    haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+    obtain ⟨e⟩ := hq
+    have hz2 : z ^ 2 = 1 := by
+      have h := pow_orderOf_eq_one z
+      rwa [hz] at h
+    have hz1 : z ≠ 1 := fun h => by simp [h] at hz
+    by_cases hTop : (T : Subgroup H) = ⊤
+    · -- `H` itself is `Q₈`, whose involution is central
+      exact mem_center_of_sq_eq_one_of_quaternionTwo
+        (Subgroup.topEquiv.symm.trans ((MulEquiv.subgroupCongr hTop).symm.trans e)) hz2 hz1
+    -- otherwise the character theory gives a proper normal subgroup containing `z`
+    obtain ⟨N, hNnorm, hNtop, hzN⟩ := q8_exists_proper_normal hO T e hTop hzT hz
+    haveI := hNnorm
+    by_cases hTN : (T : Subgroup H) ≤ N
+    · -- `P ≤ N`: induct on `N`
+      have hidx : 1 < N.index := Subgroup.one_lt_index_of_ne_top hNtop
+      have hcardN : Nat.card ↥N ≤ n := by
+        have h := Subgroup.card_mul_index N
+        have hpos : 0 < Nat.card ↥N := Nat.card_pos
+        nlinarith [h, hcard, hidx, hpos]
+      have hON : oPiCore {p | p ≠ 2} ↥N = ⊥ := oPiCore_subgroup_eq_bot hO
+      -- `T` is a Sylow `2`-subgroup of `N`
+      have hinf : (T : Subgroup H) ⊓ N = (T : Subgroup H) := inf_eq_left.mpr hTN
+      have hpgT : IsPGroup 2 ↥((T : Subgroup H) ⊓ N) := T.isPGroup'.to_le inf_le_left
+      have hpg : IsPGroup 2 ↥(((T : Subgroup H) ⊓ N).subgroupOf N) :=
+        hpgT.of_equiv (Subgroup.subgroupOfEquivOfLe (H := (T : Subgroup H) ⊓ N) inf_le_right).symm
+      set TN : Sylow 2 ↥N := hpg.toSylow (not_two_dvd_index_inf_subgroupOf T N) with hTNdef
+      have hTNcoe : (TN : Subgroup ↥N) = ((T : Subgroup H) ⊓ N).subgroupOf N :=
+        hpg.toSylow_coe (not_two_dvd_index_inf_subgroupOf T N)
+      have hqN : Nonempty (↥(TN : Subgroup ↥N) ≃* QuaternionGroup 2) :=
+        ⟨(MulEquiv.subgroupCongr hTNcoe).trans
+          (((Subgroup.subgroupOfEquivOfLe (H := (T : Subgroup H) ⊓ N) inf_le_right).trans
+            (MulEquiv.subgroupCongr hinf)).trans e)⟩
+      have hzTN : (⟨z, hzN⟩ : ↥N) ∈ (TN : Subgroup ↥N) := by
+        rw [hTNcoe, Subgroup.mem_subgroupOf]
+        exact ⟨hzT, hzN⟩
+      have hzord : orderOf (⟨z, hzN⟩ : ↥N) = 2 := by rw [Subgroup.orderOf_mk]; exact hz
+      have hcen := ih hcardN hON TN hqN hzTN hzord
+      refine q8_mem_center_of_mem_center_normal T e hz hTN hzN fun x hx => ?_
+      have := Subgroup.mem_center_iff.mp hcen ⟨x, hx⟩
+      exact congrArg Subtype.val this
+    · -- `P ⊄ N`: the cyclic branch
+      exact q8_mem_center_of_mem_normal_of_not_le hO T e hz hTN hzN
+
 /-- **Brauer–Suzuki for `Q₈`, the residual statement** (Navarro pp. 139–146; issue 9506): with
 `O_{2'}(G) = 1`, the involution of a quaternion Sylow `2`-subgroup of order `8` is central.
 
@@ -408,8 +509,8 @@ principal-block basic set of Navarro (7.3)/(7.4) — for which the integral chan
 theorem q8_mem_center_of_oPiCore_eq_bot (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 2 G)
     (hq : Nonempty (↥(T : Subgroup G) ≃* QuaternionGroup 2))
     {z : G} (hzT : z ∈ (T : Subgroup G)) (hz : orderOf z = 2) :
-    z ∈ Subgroup.center G := by
-  sorry
+    z ∈ Subgroup.center G :=
+  q8_mem_center_aux (Nat.card G) le_rfl hO T hq hzT hz
 
 /-- **Brauer–Suzuki for `Q₈`, in the form the endgame consumes**: the image of the involution is
 central modulo the odd core.
