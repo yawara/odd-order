@@ -244,6 +244,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
+import OddOrder.Algebra.SumSquaresFour
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing

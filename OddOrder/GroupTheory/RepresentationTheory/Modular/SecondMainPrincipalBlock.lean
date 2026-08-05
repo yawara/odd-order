@@ -7,6 +7,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterKernel
 import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
+import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainEasy
 
 /-!
 # `χ(x y) = d^x_{χ φ_0}` when `C_G(x)` has a normal `p`-complement
@@ -141,6 +142,18 @@ theorem eq_principalBlock_of_inducedBlockOfCentralizer_eq (hp : p.Prime) (hx : I
     (centralizerOf_le_normalizer_zpowers x) hB hBH hcoeff b ?_
   exact hind
 
+omit [DecidableEq (ConjClasses ↥(centralizerOf x))] [Fintype (ConjClasses ↥(centralizerOf x))] in
+open scoped Classical in
+/-- **Brauer's third main theorem, easy half, at a `p`-element**: `b_0(C_G(x))^G = B_0(G)`.
+`inducedBlockOfCentralizer` is `inducedBlockOfNormalizer` for `Q = ⟨x⟩`. -/
+theorem inducedBlockOfCentralizer_principalBlock (hp : p.Prime) (hx : IsPElement p x) :
+    inducedBlockOfCentralizer x π hπ hlin πG hπG hlinG hnilG hp hx
+        (principalBlock π hπ hlin hnil)
+      = principalBlock πG hπG hlinG hnilG :=
+  inducedBlockOfNormalizer_principalBlock hπ hlin hnil hπG hlinG hnilG
+    (OddOrder.GroupTheory.isPGroup_zpowers_of_isPElement hx) (zpowers_le_centralizerOf x)
+    (centralizer_zpowers_le_centralizerOf x) (centralizerOf_le_normalizer_zpowers x)
+
 end Converse
 
 /-! ### The `p`-section of `x` sees only the column `φ_0` -/
@@ -237,6 +250,26 @@ theorem character_mul_eq_generalizedDecompositionNumber {i : κ}
     (fun h => absurd (Finset.mem_univ φ₀) h)]
   rw [irreducibleBrauerCharacter_principalBlock_eq_one hπ hlin hnil hp hω' hNp hquot S hφ₀ hy,
     map_one, mul_one]
+
+set_option maxHeartbeats 1000000 in
+-- Same cost as the (5.8) specialisation it invokes; `Fintype ↥(centralizerOf x)` is what makes
+-- the induced block in that specialisation elaborate, and the section fixes it.
+set_option linter.unusedFintypeInType false in
+omit [Finite κ] in
+include hp hx hω e hπG hlinG hkerJ hnil hζ hζk hζK hφ₀ in
+/-- **Off `Irr(B_0(G))` the column `φ_0` vanishes.**  The block of `φ_0` is `b_0(C_G(x))`, which
+induces `B_0(G)` by the easy half of the third main theorem, so the second main theorem kills
+`d^x_{χ_i φ_0}` whenever `χ_i` is outside `B_0(G)`. -/
+theorem generalizedDecompositionNumber_principalBlock_eq_zero_of_blockOfIrr_ne {i : κ}
+    (hi : blockOfIrr eG hπG hlinG hnilG i ≠ principalBlock πG hπG hlinG hnilG) :
+    generalizedDecompositionNumber (𝒪 := 𝒪) (nn := nn) x hp hω' hπ hlin hkerJ
+        ((wedderburnRepresentation eG i).character)
+        (fun _ _ hgh => character_eq_of_isConj _ hgh) φ₀ = 0 := by
+  classical
+  refine generalizedDecompositionNumber_eq_zero_of_blockOfIrr_ne hp hx e eG hπG hlinG hπ hlin
+    hkerJ hnil hnilG hω hω' hζ hζk hζK ?_
+  rw [hφ₀, inducedBlockOfCentralizer_principalBlock π hπ hlin hnil πG hπG hlinG hnilG hp hx]
+  exact fun h => hi h.symm
 
 end Section
 

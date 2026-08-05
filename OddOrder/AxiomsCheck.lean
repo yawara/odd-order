@@ -280,6 +280,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
+import OddOrder.Algebra.SumSquaresFour
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
@@ -17534,3 +17535,24 @@ Klein 四元群 Sylow-2 を持つ群は単一類になれない ((7.2) が `C = 
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.character_mul_eq_generalizedDecompositionNumber
+
+/-! 🎯 **第三主定理の易しい向きの `p`-元版 + `Irr(B₀)` の外での消滅**
+(`Modular/SecondMainPrincipalBlock`)。`inducedBlockOfCentralizer_principalBlock` は既存の
+`inducedBlockOfNormalizer_principalBlock` を `Q = ⟨x⟩` へ特殊化しただけ。これを (5.8) に入れると
+`χ_i ∉ Irr(B₀(G))` に対し `d^x_{χ_i φ₀} = 0` — つまり段 186 の平方和が `Irr(B₀)` 上の和になる。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.inducedBlockOfCentralizer_principalBlock
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_principalBlock_eq_zero_of_blockOfIrr_ne
+
+/-! 🎯 **平方和が 4 で 1 を含むなら全項が ±1 で項数 4** (`Algebra/SumSquaresFour`) —
+(7.2) の算術段。`Σ_i a_i² = 4` (`a_i ∈ ℤ`, 全て非零) は「4 項の ±1」か「1 項の ±2」しかなく、
+`a_{i₀} = 1` が後者を排除する。⟹ `Irr(B₀) = {1_G, χ₁, χ₂, χ₃}` と `χ_i(t) = ±1`。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.Algebra.eq_one_or_neg_one_of_sum_sq_eq_four
+
+#assert_only_allowed_axioms
+  OddOrder.Algebra.card_eq_four_of_sum_sq_eq_four
