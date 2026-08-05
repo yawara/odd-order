@@ -276,6 +276,7 @@ import OddOrder.GroupTheory.KleinFourSylowFusion
 import OddOrder.GroupTheory.KleinFourNormalComplement
 import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
 import OddOrder.GroupTheory.RepresentationTheory.CharacterOrderFour
+import OddOrder.GroupTheory.CentralSylowComplement
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
@@ -17697,3 +17698,16 @@ Klein 四元群 `P` (非自明元は全て 2-特異) の上で `[(χ)_P, 1_P] = 
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.exists_intCast_character_of_pow_four_eq_one
+
+/-! 🎯 **中心的な Sylow `p`-部分群 ⟹ 正規 `p`-補群** (`GroupTheory/CentralSylowComplement`) —
+`P ≤ Z(G)` なら `C_G(P) = G ⊇ N_G(P)` なので既存の Burnside
+(`Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer`) がそのまま効く。
+BS が使う形は `G = C_G(x)`, `P = ⟨x⟩`: `x` は自分の中心化群の中心にいるのでその冪も同様。
+原文 p.139-140 は位数 4 の `y` に対しこれを引く (四元数群 `Q₈` には位数 4 の中心元が無いので
+`C_G(y)` の Sylow-2 は位数 8 になれず、`⟨y⟩` がそれ)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.hasNormalPComplement_of_sylow_le_center
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.hasNormalPComplement_centralizer_of_sylow_zpowers
