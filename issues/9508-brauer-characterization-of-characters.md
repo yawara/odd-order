@@ -164,6 +164,23 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
         `a` が `mod n` で一意になり `λ h := ζ^a` が準同型になる。
       - `RepresentationTheory/PRegularCosetInduction.lean`: 組み立て = **Lemma 7.6** 本体。
 - [ ] **段 F**: Lemma 7.7–7.10 ⟹ `v(G) = ch(G)`
+      - [x] **準備 1** `GroupTheory/PRegularCosetSubgroup.lean`: `pRegularProd u P hcomm` = `⟨u⟩P`
+        (⚠ **ℤ 冪**で定義 — ℕ 冪だと `inv_mem'` に `0 < orderOf u` が要り `Finite G` が def の
+        引数に混ざって下流の `omit` が詰まる) と `card_pRegularProd` (`|⟨u⟩P| = orderOf u·|P|`)。
+        段 E が仮説として受けていた `hgen` / `hcard` を構成的に供給する。
+      - [x] **準備 2** `RepresentationTheory/InducedAdjoinSpan.lean` + `induceFun` の線形性:
+        `Ind_H^G(ch_R(H)) ⊆ v_R(G)` (Lemma 7.6 の `ψ` は `ch(H)` でなく `ch_R(H)` に居る)。
+      - [ ] **Lemma 7.6 パッケージ**: 原始 `N` 乗根 `ω` (`exp G ∣ N`) を持つ `K` で、`p`-正則元 `u` と
+        `p`-部分群 `P ≤ C_G(u)` に対し `χ = Ind(ψ) ∈ v_R(G)` で整数値・`u` の p-class 外で 0・
+        `χ(u) = |C_G(u)|/|P|` を出す単一定理。`ζ := ω^(N/orderOf u)`、`𝒳` は
+        `IsElementaryFamily` (全ての `p` と `⟨u⟩P` を含む族) として仮説化する。
+      - [ ] **Lemma 7.7**: 整数値類関数で全値が `|G|` で割れるものは `v_R(G)` に入る
+        (`p ∤ |G|` を取ると `P = ⊥`・p-class = 共役類で、各類の `χ_j` の線型結合)。
+      - [ ] **Lemma 7.8**: 各 `p` に対し整数値 `χ ∈ v_R(G)` で `χ ≡ 1 (mod p)`
+        (Lemma 7.6 の `ζ_j` を p-class ごとに取り、**段 D の Lemma 7.5** で p-class 上 mod p 一定)。
+      - [ ] **Lemma 7.9**: `|G| = m p^a`, `(m,p)=1` ⟹ `m·1_G ∈ v(G)`
+        (`ζ = χ^{p^a}`、`m(1−ζ)` の値が `|G|` で割れるので 7.7、最後に段 C の降下)。
+      - [ ] **Lemma 7.10**: `m_i = |G|/p_i^{a_i}` が互いに素 ⟹ `1_G ∈ v(G)` ⟹ `v(G) = ch(G)`。
 - [ ] **段 G**: Brauer's characterization 本体
 - [ ] **段 H**: Navarro (2.15) → (2.16) → (3.16) (ブロック局所化は段 205-206 の型を反復)
 - [ ] **段 I**: `PrincipalBlockBasicSet` の `U` を ℤ 値に戻し、9506 の BS 本証明へ供給
