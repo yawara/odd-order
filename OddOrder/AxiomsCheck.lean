@@ -17202,3 +17202,10 @@ Navarro (5.13) が暗黙に行う付け替えで、類代表を選ばないの�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.card_centralizerOf_smul_sum_sectionProjectiveCharacter
+
+/-! **`C_G(x⁻¹) = C_G(x)`** (`Modular/GeneralizedDecomposition`) —
+`x` と `x⁻¹` と可換であることは同値なので、`x` と `x⁻¹` の一般化分解数は
+同じ `IBr(C_G(x))` で添字づけられる ((5.13) の内積計算で使う)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.centralizerOf_inv

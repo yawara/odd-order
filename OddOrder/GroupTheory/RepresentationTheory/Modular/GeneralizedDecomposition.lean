@@ -51,6 +51,15 @@ variable (x : G)
 /-- `C_G(x)`, the group over which the generalized decomposition numbers are indexed. -/
 abbrev centralizerOf : Subgroup G := Subgroup.centralizer ({x} : Set G)
 
+omit [Finite G] in
+/-- **`C_G(x⁻¹) = C_G(x)`.**  Commuting with `x` and with `x⁻¹` are the same condition, so the
+generalized decomposition numbers at `x` and at `x⁻¹` are indexed by the same `IBr(C_G(x))`. -/
+theorem centralizerOf_inv : centralizerOf x⁻¹ = centralizerOf x := by
+  ext z
+  simp only [centralizerOf, Subgroup.mem_centralizer_iff, Set.mem_singleton_iff, forall_eq]
+  exact ⟨fun h => (Commute.inv_left_iff.mp (h : Commute x⁻¹ z) : Commute x z),
+    fun h => (Commute.inv_left_iff.mpr (h : Commute x z) : Commute x⁻¹ z)⟩
+
 variable (hp : p.Prime)
   {ω : ResidueField 𝒪} (hω : IsPrimitiveRoot ω (pRegularExponent p ↥(centralizerOf x)))
   {π : MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf x) →+*
