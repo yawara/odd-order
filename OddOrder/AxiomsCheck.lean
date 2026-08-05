@@ -121,6 +121,7 @@ import OddOrder.GroupTheory.RepresentationTheory.BrauerInductionIdeal
 import OddOrder.GroupTheory.RepresentationTheory.Modular.VirtualCharacterSplitting
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionDescent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicIntegerModP
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicModEq
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
@@ -582,7 +583,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 18100
+set_option linter.style.longFile 18300
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -18076,3 +18077,31 @@ projection formula = Gorenstein Lemma 7.2 (`v(G)` が `ch(G)` のイデアルで
 
 #assert_only_allowed_axioms
   OddOrder.charP_quotient_adjoinPrimeIdeal
+
+/-! 🎯 **Brauer 指標判定 (issue 9508 段 D 後半その 1)**: `p·ℤ[ω]` を法とする合同
+(`Modular/CyclotomicModEq`)。指標値は `ℤ[ω] ⊆ K` に住むが計算は `K` の元として行いたいので、
+`CyclotomicModEq ω p x y ↔ x − y ∈ p·ℤ[ω]` を `K` 上の関係として立てる。
+同値関係 + 加法 + `ℤ[ω]` 元による乗法で閉じ、標数 `p` の 2 事実
+(**freshman's dream** `(x+y)^{p^s} ≡ x^{p^s}+y^{p^s}` と **Fermat** `n^{p^s} ≡ n`) は
+剰余環 `ℤ[ω]/p` (標数 `p`) へ渡って Frobenius を読むことで得る。
+`(-x)^{p^s} ≡ -(x^{p^s})` も `x + (-x) = 0` に freshman's dream を当てて **`p = 2` 込みで一様に**
+出す (`p^s` の偶奇の場合分けが要らない)。
+最後に `ℤ ∩ pR = pℤ` で `Int.ModEq` へ降ろす (`CyclotomicModEq.intCast`)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.cyclotomicModEq_iff_quotient
+
+#assert_only_allowed_axioms
+  OddOrder.CyclotomicModEq.add_pow_prime_pow
+
+#assert_only_allowed_axioms
+  OddOrder.CyclotomicModEq.natCast_pow_prime_pow
+
+#assert_only_allowed_axioms
+  OddOrder.CyclotomicModEq.neg_pow_prime_pow
+
+#assert_only_allowed_axioms
+  OddOrder.CyclotomicModEq.sum_pow_prime_pow
+
+#assert_only_allowed_axioms
+  OddOrder.CyclotomicModEq.intCast
