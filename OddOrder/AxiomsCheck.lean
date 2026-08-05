@@ -114,6 +114,8 @@ import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
 import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
 import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacter
+import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacterPairing
+import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacterInduction
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
@@ -17947,3 +17949,29 @@ universe を単一に保つため生成集合は標準空間 `Fin n → K` 上�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.comp_mem_virtualCharacters
+
+/-! 🎯 **Brauer 指標判定の土台 (issue 9508 段 B)**: 指標の双線型内積 `(a,b)_G` とその整数性
+(`RepresentationTheory/VirtualCharacterPairing`)、誘導・Frobenius 相互律・projection formula
+(`RepresentationTheory/VirtualCharacterInduction`)。
+`(χ_V, χ_W)_G = dim Hom_{KG}(V,W)` (mathlib `card_inv_mul_sum_char_mul_char_eq_finrank`) から
+**分裂体も正規直交基底も使わずに**整数性が出る。これと Frobenius 相互律の組合せが
+「Ind が指標を指標に送る」を代替し、誘導加群 `K[G] ⊗_{K[H]} V` の構成とトレース計算を不要にする。
+projection formula = Gorenstein Lemma 7.2 (`v(G)` が `ch(G)` のイデアルであることの本体)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.charPairing_isRepCharacter
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.charPairing_mem_intRange
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.sum_extendByZero
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.induceFun_conj
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.induceFun_mul_restrict
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.charPairing_induceFun
