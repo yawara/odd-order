@@ -2640,6 +2640,35 @@ characters → Navarro (2.15)/(2.16)/(3.16) → `U` の整数性) を **closed**
 「`O_{2'}(Ḡ) = 1`」と「`Ḡ` の Sylow-2 も `Q₈`」(奇核は Sylow-2 と自明に交わる) が要る
 — これも `q8_mk_mem_center` の証明の中で処理する。
 
+### 段 217 (2026-08-06): **p.139 の reduction を全部証明 — frontier は指標論の 1 文**
+
+`GroupTheory/BrauerSuzukiQ8.lean` に p.139 の第 1-2 段落を**帰納法込みで全部**入れた。
+現在の鎖 (下から上へ、`sorry` は 1 箇所だけ):
+
+| 名前 | 状態 |
+|---|---|
+| `q8_exists_proper_normal` | ⚠ **sorry** = Navarro pp.139-146 の指標論 |
+| `q8_mem_center_of_oPiCore_eq_bot` | ✅ `Nat.card G` の帰納法で組立 |
+| `q8_mk_mem_center` | ✅ `Ḡ = G/O_{2'}(G)` への移行 |
+| `brauerSuzuki_q8` | ✅ endgame (|S|≥16 と共有) |
+| `brauerSuzuki_quaternionSylow_q8` | ✅ 上の適用 (RankOneAffineModel) |
+
+支持補題 (すべて証明済・AxiomsCheck 登録済):
+- `sylowTwo_inf_oPiCore_eq_bot` / `oPiCore_subgroup_eq_bot` (奇核の遺伝)
+- `quaternionTwo_sq_eq_one` (`Q₈` の対合は一意、`decide`) /
+  `quaternionTwo_a_two_mem_center` (中心的、`decide`) /
+  `isCyclic_of_card_dvd_four_of_unique_involution` (汎用) /
+  `isCyclic_of_ne_top_of_quaternionTwo` (真部分群は巡回)
+- `not_two_dvd_index_inf_subgroupOf` (`T ⊓ N` が `N` の Sylow-2) /
+  `q8_mem_center_of_mem_normal_of_not_le` (巡回分枝) /
+  `mem_sylow_of_mem_center_of_orderOf_eq_two` + `q8_mem_center_of_mem_center_normal` (`P ≤ N` 分枝)
+- `not_hasNormalPComplement_of_oPiCore_eq_bot` / `not_controlsOwnFusion_of_oPiCore_eq_bot`
+  (指標論パートの第 1 歩)
+
+⚠ **設計上の省力点**: Navarro が `Z(N) = {1,t}` を経由する所は、`Z(N)` を部分群として構成せず
+「`N` の中心的対合は `⟨u⟩` が正規 2-部分群ゆえ全 Sylow-2 に入る ⟹ `T ≅ Q₈` の唯一の対合に一致」
+で直接落とした (mathlib `IsPGroup.le_sylow_of_normal`)。
+
 ### ⏸ 次 session の着手点 (2026-08-06 更新)
 
 **`q8_mk_mem_center` を埋める = BS 本証明 pp.139-146**。
