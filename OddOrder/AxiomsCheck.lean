@@ -289,6 +289,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBloc
 import OddOrder.Algebra.SumSquaresFour
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockBasicSet
+import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
@@ -17845,3 +17846,27 @@ BS が使うのは `P = ⟨t⟩ ≤ Z(C_G(t))` の場合で、仮説は自明 (`
 
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.bijOn_mk_isPRegular
+
+/-! 🎯🎯 **Navarro (7.6) 第 2 段: `k[G/N]` の分裂は `k[G]` の分裂から誘導される**
+(`Modular/QuotientSplitting`)。`N ⊴ G` が `p`-部分群で `char k = p` なら
+正規 `p`-部分群は全ての単純 `kG`-加群に自明に作用する (既存 `NormalPSubgroupTrivialAction`
+= Navarro (2.32)) ので、`g ↦ π(single g 1)` は `N` を潰し `G/N` を経由する。群環の普遍性で
+`π̄ : k[G/N] →ₐ ∏_j M_{n_j}(k)` が得られ、**添字集合 `ι` と行列サイズが `π` と同一**。
+`π̄ ∘ f = π` (`f : kG ↠ k[G/N]`) / 全射性 / `ker π̄ = J(k[G/N])`
+(`f` が全射で `ker f ≤ ker π = J(kG)` ゆえ `Ring.map_jacobson_of_ker_le`) を証明。
+⟹ 原文の「`φ ↦ φ̄` は `IBr(G) → IBr(Ḡ)` の全単射」= 同じ `ι` で添字付けられること。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.quotientMap_surjective
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.quotientPi_single
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.quotientPi_mapDomain
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.quotientPi_surjective
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.ker_quotientPi
