@@ -179,6 +179,7 @@ import OddOrder.GroupTheory.PRegularElement
 import OddOrder.GroupTheory.PRegularQuotient
 import OddOrder.GroupTheory.CosetInvariantCard
 import OddOrder.GroupTheory.PRegularCosetSubgroup
+import OddOrder.GroupTheory.PRegularProjection
 import OddOrder.GroupTheory.PRegularElementCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.RootsOfUnityLift
@@ -18355,3 +18356,21 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.mem_inducedVirtualCharacters_of_restrict
+
+/-! 🎯 **issue 9508 段 H1**: `E = ⟨u⟩P` 上で `x ↦ x_{p'}` が群準同型
+(`GroupTheory/PRegularProjection`)。Navarro (2.15) は elementary 部分群上で
+`θ̂|_{P×Q} = 1_P × θ_Q` と計算するが、これが指標になる根拠が「`p'`-部分への射影が準同型」。
+
+⚠ **冪零群の Sylow 分解を経由しない**のが要点。`M ≡ 0 (mod |E|_p)`・`M ≡ 1 (mod |E|_{p'})`
+を CRT で取ると**全ての `z ∈ E` で `z_{p'} = z^M`** (`pRegularPart_eq_pow`) になり、
+`(xy)^M = x^M y^M` は `x = u^a v` と `u` の中心性で `P` 上の等式に落ちる。`P` は `q`-群なので
+**`q = p` なら `v^M = 1`・`q ≠ p` なら `v^M = v`** の 2 択で、どちらも乗法的。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.pRegularPart_eq_pow
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.exists_pRegularPart_hom
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.not_dvd_card_of_forall_isPRegular
