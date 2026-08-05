@@ -1416,7 +1416,30 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               `e_{B₀}` で評価して左辺 `= 1` (`hB`)、右辺 `= λ_b(e_{b₀}) = δ_{b b₀}` (`hBC`)。
             ⚠ **Okuyama (6.6) / height 理論 / `~` 関数 / Brauer の指標判定法を一切通らない**
               — 段 99 の「(c) は重い」という見立ては Külshammer 経路で完全に回避された。
-            ⚠⚠ **特殊化債務 (2026-08-05 記録、要一般化)**:
+            - [x] **`Q` 可換仮定は除去済 (2026-08-05、段 157)**。
+              🎯 `eq_principalBlock_of_blockOfCentralCharacter_eq` (`hQab` なし) を主定理にし、
+              `..._of_inducedBlockOfNormalizer_eq` はその系 (`hQab` 付き) にした。
+              ⚠ **訂正**: `hQab` は repo 側の特殊化ではなく**書籍の仮説 `Q C_G(Q) ⊆ H` を
+              `H = C_G(Q)` に代入したもの** (`Q C_G(Q) ⊆ C_G(Q) ⟺ Q 可換`)。
+              `λ_b ∘ Br_Q = λ_b^G` (Navarro (4.14)) の同定にしか要らない。
+            - [ ] **残る債務 = `H = C_G(Q)` 固定 → 一般 `Q C_G(Q) ≤ H ≤ N_G(Q)`**。
+              **経路は 2026-08-05 に確定** (原文 p.128-130 の Problems を精読;
+              `pages/navarro-p129,130.png` を新規レンダリング)。`C := C_G(Q)` として:
+              1. `Br_Q^{H→C} ∘ Br_Q^{G→H} = Br_Q^{G→C}` (係数の切り詰めの合成、自明)
+              2. `λ_b ∘ Br_Q^{H→H} = λ_b` (∀`b ∈ Bl(H)`) — 既存
+                 `inducedCentralCharacterAlgHom_toLinearMap` を `G := H, H := H` で使う
+                 (`inducedCentralCharacter H θ = θ`)。⟹ `Br_Q^{H→C}(e_b) ≠ 0`。
+              3. ⟹ ∃`b_C ∈ Bl(C)` で `λ_{b_C} ∘ Br_Q^{H→C} = λ_b` (`hnilC` で
+                 `blockCharacterPi` が faithful、冪等元なので値は 0 か 1)
+              4. 1+3 ⟹ `λ_{b_C} ∘ Br_Q^{G→C} = λ_b ∘ Br_Q^{G→H} = λ_{B₀(G)}`
+              5. 段 157 (`H = C` の場合) ⟹ `b_C = B₀(C)`
+              6. **easy half を `H` の中で**: `λ_{B₀(C)} ∘ Br_Q^{H→C} = aug_H = λ_{B₀(H)}`
+                 (`|L| ≡ |L ∩ C_H(Q)| mod p`、`Q ≤ H` のみ使う ⟹ `Q` 可換不要)
+                 ⟹ `λ_b = λ_{B₀(H)}` ⟹ `b = B₀(H)`
+              ⚠ 6 は既存 `inducedBlockOfNormalizer_principalBlock` が `hPH : P ≤ H` を
+              担いでいるが、その**証明本体 (`hlam`) は `hPH` を使っていない** ——
+              `hlam` を独立の補題として切り出せば `Q` 可換なしで使える。
+            ⚠⚠ **特殊化債務 (2026-08-05 記録、`H = C_G(Q)` 固定の分が残存)**:
               `eq_principalBlock_of_inducedBlockOfNormalizer_eq` は書籍 (原文 p.128 の注記
               「for subgroups `Q C_G(Q) ⊆ H ⊆ N_G(Q)`」) より**狭い**:
               * 書籍 = `Q C_G(Q) ≤ H ≤ N_G(Q)` の任意の `H` / 本形式化 = **`H = C_G(Q)` 固定**
