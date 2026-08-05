@@ -264,6 +264,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerFormula
 import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterOffCentralizer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
@@ -17104,3 +17105,12 @@ BS が実際に使う向きで、Okuyama (6.6) / height 理論を通らない。
   OddOrder.GroupTheory.card_pFactorPairsMem_modEq_centralizer
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.card_pRegularMem_modEq_centralizer
+
+/-! **(4.14) の `H`-類版** (`Modular/BlockCharacterOffCentralizer`) —
+`C_G(P)` と交わらない `H`-類の類和は `π_H` で消える ⟹ `H` のブロック指標は
+`C_G(P)` 上の係数だけで決まる。第三主定理を一般の中間部分群で出すための部品。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.pi_classSum_eq_zero_of_notMem_centralizer
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockCharacter_eq_of_coeff_eq_on_centralizer
