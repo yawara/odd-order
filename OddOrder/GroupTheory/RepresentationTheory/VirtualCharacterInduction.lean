@@ -110,11 +110,12 @@ theorem induceFun_mul_restrict (ψ : ↥H → K) {θ : G → K}
 /-- **Frobenius reciprocity** `(Ind_H^G ψ, θ)_G = (ψ, Res_H θ)_H`, for `θ` a class function on
 `G`.  Reindexing the double sum by `g ↦ x⁻¹ g⁻¹ x` makes the inner sum independent of `x`, and the
 `|G|` copies cancel the `1/|G|`. -/
-theorem charPairing_induceFun [CharZero K] [Fintype ↥H] (ψ : ↥H → K) {θ : G → K}
+theorem charPairing_induceFun [Invertible (Nat.card G : K)] [Fintype ↥H] (ψ : ↥H → K)
+    {θ : G → K}
     (hθ : ∀ g h : G, θ (h * g * h⁻¹) = θ g) :
     charPairing K (induceFun H ψ) θ = charPairing K ψ (θ ∘ H.subtype) := by
   classical
-  have hGne : (Nat.card G : K) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have hGne : (Nat.card G : K) ≠ 0 := (isUnit_of_invertible (Nat.card G : K)).ne_zero
   set S : K := ∑ h : G, extendByZero H ψ h * θ h⁻¹ with hS
   -- the inner sum does not depend on `x`
   have hinner : ∀ x : G, (∑ g : G, extendByZero H ψ (x * g⁻¹ * x⁻¹) * θ g) = S := by

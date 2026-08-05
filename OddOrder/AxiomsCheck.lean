@@ -116,6 +116,8 @@ import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacter
 import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacterPairing
 import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacterInduction
+import OddOrder.GroupTheory.RepresentationTheory.BrauerInductionIdeal
+import OddOrder.GroupTheory.RepresentationTheory.Modular.VirtualCharacterSplitting
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
@@ -17975,3 +17977,34 @@ projection formula = Gorenstein Lemma 7.2 (`v(G)` が `ch(G)` のイデアルで
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.charPairing_induceFun
+
+/-! 🎯 **Brauer 指標判定の土台 (issue 9508 段 C)**: `v(G) = Σ_{E ∈ 𝒳} ch(E)^*` のイデアル性
+(= Gorenstein Lemma 7.3、`RepresentationTheory/BrauerInductionIdeal`) と、分裂 `e` を通した
+`ch(G)` の**内積による特徴づけ** (`Modular/VirtualCharacterSplitting`)。
+族 𝒳 は固定せずパラメータにしてある (Navarro (2.15) は elementary より広い
+「p-群 × p'-群」の形の部分群で仮説を検証するので、その方が使いやすい)。
+特徴づけは Brauer-Tate 開発で**分裂が要る唯一の場所**で、そこから
+`Ind_H^G (ch(H)) ⊆ ch(G)` が誘導加群なしに出る (Frobenius 相互律で H 側の内積に移す)。
+⚠ 非分裂体では `(χ_i,χ_i) = dim End(V_i) > 1` になりうるので、内積の整数性は
+`ℤ[Irr(G)]` より**大きい**格子しか与えない — 分裂は本質的。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.virtualCharacters_conj
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.mul_mem_inducedVirtualCharacters
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.inducedVirtualCharacters_conj
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.charPairing_wedderburnRepresentation
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_eq_sum_wedderburnRepresentation
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.mem_virtualCharacters_iff
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.induceFun_mem_virtualCharacters

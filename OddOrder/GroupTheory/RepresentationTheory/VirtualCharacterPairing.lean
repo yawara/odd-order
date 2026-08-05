@@ -71,24 +71,33 @@ theorem charPairing_zero_left (b : G → K) : charPairing K (0 : G → K) b = 0 
 theorem charPairing_zero_right (a : G → K) : charPairing K a (0 : G → K) = 0 := by
   simp [charPairing]
 
+omit [Fintype G] in
+/-- **The order of a subgroup is invertible too**: it divides `|G|`, which is invertible in the
+field `K`. -/
+theorem natCast_card_subgroup_ne_zero [Invertible (Nat.card G : K)] (H : Subgroup G) :
+    (Nat.card ↥H : K) ≠ 0 := by
+  obtain ⟨k, hk⟩ := Subgroup.card_subgroup_dvd_card H
+  intro h
+  have hG : (Nat.card G : K) ≠ 0 := (isUnit_of_invertible (Nat.card G : K)).ne_zero
+  exact hG (by rw [hk, Nat.cast_mul, h, zero_mul])
+
 /-! ### Integrality -/
 
 /-- **The pairing of two genuine characters is the dimension of the intertwiner space.**  This is
 `Representation.card_inv_mul_sum_char_mul_char_eq_finrank`; in particular the value is a natural
 number, with no orthonormality and no splitting field in sight. -/
-theorem charPairing_isRepCharacter [CharZero K] {a b : G → K} (ha : IsRepCharacter K a)
-    (hb : IsRepCharacter K b) : ∃ n : ℕ, charPairing K a b = (n : K) := by
+theorem charPairing_isRepCharacter [Invertible (Nat.card G : K)] {a b : G → K}
+    (ha : IsRepCharacter K a) (hb : IsRepCharacter K b) :
+    ∃ n : ℕ, charPairing K a b = (n : K) := by
   obtain ⟨n, ρ, rfl⟩ := ha
   obtain ⟨m, σ, rfl⟩ := hb
-  haveI : Invertible (Nat.card G : K) :=
-    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   refine ⟨finrank K (Representation.IntertwiningMap ρ σ), ?_⟩
   rw [← Representation.card_inv_mul_sum_char_mul_char_eq_finrank ρ σ, charPairing]
   exact congrArg _ (Finset.sum_congr rfl fun g _ => mul_comm _ _)
 
 /-- **The pairing of two virtual characters is a rational integer.**  Bilinearity plus the
 previous result. -/
-theorem charPairing_mem_intRange [CharZero K] {a b : G → K}
+theorem charPairing_mem_intRange [Invertible (Nat.card G : K)] {a b : G → K}
     (ha : a ∈ virtualCharacters K G) (hb : b ∈ virtualCharacters K G) :
     charPairing K a b ∈ (Int.castRingHom K).range := by
   induction ha using AddSubgroup.closure_induction with

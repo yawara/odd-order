@@ -372,6 +372,8 @@ import OddOrder.GroupTheory.RepresentationTheory.ZIrr
 import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacter
 import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacterPairing
 import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacterInduction
+import OddOrder.GroupTheory.RepresentationTheory.BrauerInductionIdeal
+import OddOrder.GroupTheory.RepresentationTheory.Modular.VirtualCharacterSplitting
 import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.GroupTheory.SCN
 import OddOrder.GroupTheory.SemiDihedral
