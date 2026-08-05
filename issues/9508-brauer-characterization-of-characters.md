@@ -217,9 +217,44 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
   - ⟹ `θ̂|_E = (θ|_{E'}) ∘ π` で `comp_mem_virtualCharacters` (段 A) に乗る。
   - ⚠ `θ|_E ∈ ch(E)` ではない — 落とす先は **`E'` (p'-部分)** であって `E` ではない。
 
-  - [ ] **H2** (段 H の実質): `Q ≤ G` が `p'`-群、`θ ∈ ℤ[IBr(G)]` ⟹ `θ|_Q ∈ ch(Q)`。
-  `k[Q]` は半単純なので `Q` の Brauer 指標は通常指標 — repo の modular stack
-  (`Modular/BrauerCharacter` 他 121 leaf) に既存分がどれだけあるか要実測。
+  - [ ] **H2** (段 H の実質) = **Navarro (2.12)**: `Q` が `p'`-群 ⟹ `IBr(Q) = Irr(Q)`
+    (よって `θ ∈ ℤ[IBr(G)]` の制限 `θ|_Q` は `ch(Q)` に入る)。
+
+    **設計調査 (2026-08-05、実測込み)**。潰した近道 2 本を先に記録する:
+
+    - ❌ **「`E_{p'}` は巡回だから easy」は成立しない**。`E = ⟨u⟩P` が `q`-elementary のとき
+      `E_{p'}` が巡回になるのは **`q = p` のときだけ** (`E_{p'} = ⟨u⟩`)。`q ≠ p` では
+      `E_{p'} = ⟨u_{p'}⟩ × P` で `P` は非可換な `q`-群でありうる。
+      巡回なら Brauer 指標は `φ|_{⟨z⟩} = Σ_ζ d_ζ λ_ζ` (`λ_ζ : z^j ↦ ζ̂^j` は `K` 上の線形指標) で
+      即終わるが、一般の `p'`-群ではこれが効かない。
+    - ❌ **`p`-elementary だけで済ませる route も不可**。Lemma 7.9 (素数 `p`) が使う族は
+      「全巡回部分群 + `p`-elementary」だけで、どちらも `p'`-部分が巡回 ⟹ `m_p θ̂ ∈ ch(G)`
+      (`p ∤ m_p`) までは巡回だけで出る。しかし `θ̂ ∈ ch(G)` に上げるには
+      「`ℤIBr(G)/ℤ{χ⁰}` が `p`-群」= **`det C` が `p` 冪** (Brauer) が要り、
+      それは (2.16) と circular になりうるので短くならない。
+      (なお `Φ_φ⁰ = Σ_μ c_{μφ} μ` から `ℤIBr/L` は `det C` で消えることは出る。)
+
+    ⟹ **採用 route = `p'`-群の Cartan 行列が単位行列**であることを示し、段 204 の
+    `BrauerFromOrdinary` (`a_χ = Σ_τ d_{χτ}[τ,μ₀]⁰`) の係数を `a_χ = d_{χμ₀} ∈ ℕ` に落とす。
+
+    **H2 の分解** (repo の既存 stack を使う):
+    - **H2a**: `p ∤ |Q|` ⟹ `k[Q]` は半単純。mathlib の Maschke
+      (`instance : IsSemisimpleRing k[G]`、仮説 `[Finite G] [NeZero (Nat.card G : k)]`) がそのまま。
+      `NeZero (Nat.card Q : k)` は `p ∤ |Q|` と `CharP k p` から。
+    - **H2b**: `k` 代数閉なら `IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed` で
+      分裂 `π : k[Q] ≃ₐ ∏_j M_{n_j}(k)` を**構成**でき、`ker π = ⊥ = J(k[Q])`。
+      ⟹ H2/H3 は分裂データを仮説で受けずに済む (代わりに `[IsAlgClosed (ResidueField 𝒪)]`)。
+      ⚠ BS の具体系 `PadicComplexSystem` の剰余体は `F̄_p` = 代数閉 ✓
+      (`SplittingSystem p n = 𝕎(GF(p^φ(n)))` は代数閉でないので、そちらでは使えない)。
+    - **H2c**: `C = I`。数え上げで出る:
+      `Σ_j n_j² = |Q| = Σ_i m_i²` (両側の Wedderburn) と `m_i = Σ_j d_{ij} n_j` から
+      `Σ_{j,j'} c_{jj'} n_j n_{j'} = Σ_j n_j²`、各 `c_{jj} ≥ 1` (正則指標の比較で列が非零)
+      かつ `c_{jj'} ≥ 0` ⟹ 全項が潰れて `c_{jj} = 1`, `c_{jj'} = 0`。
+    - **H2d**: `C = I` ⟹ `C⁻¹ = ([τ,μ]⁰) = I` ⟹ 段 204 の `a_χ = d_{χμ₀} ∈ ℕ`。
+      `p'`-群では全元が `p`-正則なので `χ⁰ = χ` ⟹ `φ = Σ_χ d_{χφ} χ ∈ ch(Q)`。
+    - **H2e**: 制限。`θ|_Q` は制限加群の Brauer 指標 = `IBr(Q)` の **ℕ**-結合。
+
+    ⟹ **H2 は複数 session 規模**。上流から H2a → H2b → H2c → H2d → H2e。
 
   - [ ] **H3**: (2.15) の組み立て (`θ̂ ∈ ch(G)`、`φ ∈ IBr(G)` の場合のみ)。
   - [ ] **H4**: (2.16) = `φ = Σ_χ a_χ χ⁰` (`a_χ ∈ ℤ`)。`φ̂ ∈ ℤ[Irr(G)]` を `G⁰` に制限するだけ。
