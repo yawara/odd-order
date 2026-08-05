@@ -2077,10 +2077,27 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
             (`Φ^x_μ(xy) = Φ_μ(y)`) / 🎯 `_eq_of_isConj` (類関数)。
             well-defined 性の核 = `projectiveIndecomposableCharacter_eq_of_isConj_mul`。
             ⚠ 以降 definition を unfold せず `_of_isConj_mul` を使う。
-          - [ ] **次 = 内積計算**: `[Φ^x_μ, χ] = d^{x⁻¹}_{χμ}` (原文 p.108 の 3 行計算 —
-            `S(x)` 上の和を `p`-正則類で助変数化し、(2.13)
-            `pairingZero_projectiveIndecomposableCharacter` で潰す) →
-            `[Φ^x_μ, Φ^x_φ] = c_{μφ}` → (5.13)(b)。実測 (2026-08-05): (5.1) `generalizedDecompositionNumber` /
+          - [x] **内積計算の土台 完了 (2026-08-05、段 164-169)**:
+            * 段 164 `centralizerOf_mul_eq_inf` (`C_G(xy) = C_G(x) ⊓ C_G(y)`)
+              ⚠ 結果的にこの経路では**未使用** (二重和にしたら類の大きさが要らなくなった)
+            * 段 165 `mem_centralizerOf_and_conj_of_conj_mul` (具体的な共役元版)
+            * 段 166 `fiberEquivCentralizerOf` / `card_fiber_eq_card_centralizerOf`
+              (`(g,y) ↦ g(xy)g⁻¹` のファイバー ≃ `C_G(x)`)
+            * 段 167 `card_centralizerOf_smul_sum_pSection`
+              (`|C_G(x)| • Σ_{u∈S(x)} f = |G| • Σ_{y∈C⁰} f(xy)`, `f` 類関数)
+            * 段 168 `card_centralizerOf_smul_sum_sectionProjectiveCharacter` (内積の前半)
+            * 段 169 `centralizerOf_inv` (`C_G(x⁻¹) = C_G(x)`)
+          - [ ] **⏸ 次 = 内積計算の後半** `[Φ^x_μ, χ] = d^{x⁻¹}_{χμ}`。
+            残りは `χ((xy)⁻¹) = χ(x⁻¹y⁻¹) = Σ_τ d^{x⁻¹}_{χτ} τ(y⁻¹)` ((5.1) を `x⁻¹` で)
+            を代入し (2.13) `pairingZero_projectiveIndecomposableCharacter` で潰す段。
+            ⚠⚠ **未解決の技術的障害**: (5.1) を `x⁻¹` で使うと `C_G(x)` 側のデータ
+            (`π`, `e`, `ω`, …) が **`↥(centralizerOf x⁻¹)` 上**で要求される。段 169 で
+            部分群としては等しい (`centralizerOf_inv`) が**型としては別**なので移送が要る。
+            選択肢: (a) `centralizerOf_inv ▸` で移送、(b) `x⁻¹` 側のデータを別引数で
+            受けて識別を仮説にする、(c) `x⁻¹` を避ける再定式化。
+            ⚠ (c) の素朴な案 (`χ̌(g) := χ(g⁻¹)` を `x` 側で展開) は**不可** —
+            `Σ_τ d^x_{χ̌τ} τ(y)` となり `pairingZero` の `b(y⁻¹)` と噛み合わない
+            (`pairingZero a b = (|C|)⁻¹ Σ_{y∈C⁰} a(y)·b(y⁻¹)`)。実測 (2026-08-05): (5.1) `generalizedDecompositionNumber` /
           (5.2) `generalizedDecompositionNumber_eq_zero` / (5.8)
           `..._sum_generalizedDecompositionNumber_inducedBlockOfCentralizer` は**既存**
           (`Modular/GeneralizedDecomposition.lean`, `SecondMainTheorem.lean`,
