@@ -13343,6 +13343,16 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.QuaternionSylowSetup.brauerSuzuki_of_quaternionSylow
 
+/-! 🎯 **BS の `Q₈` 分枝の 2 つの reduction** (`GroupTheory/BrauerSuzukiQ8`, 2026-08-06)。
+`sylowTwo_inf_oPiCore_eq_bot` (奇核は Sylow-2 と自明に交わる) で `T → Ḡ = G/O_{2'}(G)` が
+単射になり、`Sylow.mapSurjective` の像が `Ḡ` の Sylow-2 で `T` と同型 ⟹
+`q8_mk_mem_center` (endgame が消費する形) が **`O_{2'}(G) = 1` 版から従う**。
+`mem_center_of_normal_of_isCyclic` は Navarro p.139 の reduction の**両分枝の締め**
+(`N` が巡回 2-群 / `Z(N) = ⟨t⟩` のどちらでも、正規巡回部分群の対合は中心的)。
+⟹ 残る数学は `q8_mem_center_of_oPiCore_eq_bot` (= Navarro pp.139-146) の 1 文のみ。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.sylowTwo_inf_oPiCore_eq_bot
+#assert_only_allowed_axioms OddOrder.GroupTheory.mem_center_of_normal_of_isCyclic
+
 /-! ### lean-eval 提出候補の登録 (issue 0050, 2026-07-22).
 
 「AxiomsCheck 未登録だが `#print axioms` では clean」だった提出候補を機械ゲートに載せる
