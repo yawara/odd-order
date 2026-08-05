@@ -17095,3 +17095,12 @@ BS が実際に使う向きで、Okuyama (6.6) / height 理論を通らない。
   OddOrder.RepresentationTheory.Modular.not_dvd_card_of_character_eq_zero_of_pSingular
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_not_isPRegular_character_ne_zero
+
+/-! **Problem (6.1) を中間部分群 `Q C_G(Q) ≤ H` の中で** (`GroupTheory/PFactorPairCount`) —
+`|Ω_H(g)| ≡ |Ω_{C_G(Q)}(g)|` と `|H⁰| ≡ |C_G(Q)⁰|` (mod p)。第三主定理を
+`H = C_G(Q)` 固定でなく一般の `H` で出すための数え上げ側。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.card_pFactorPairsMem_modEq_centralizer
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.card_pRegularMem_modEq_centralizer

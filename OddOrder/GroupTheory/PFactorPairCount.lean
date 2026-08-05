@@ -28,6 +28,10 @@ same action applied to `G⁰` itself gives `|G⁰| ≡ |C_G(Q)⁰| (mod p)`
 * `OddOrder.GroupTheory.card_pRegular_modEq_centralizer` — `|G⁰| ≡ |C_G(Q)⁰| (mod p)`
 * `OddOrder.GroupTheory.pFactorPairsSubgroupEquiv`, `OddOrder.GroupTheory.pRegularSubgroupEquiv` —
   the same counts taken inside a subgroup
+* `OddOrder.GroupTheory.card_pFactorPairsMem_modEq_centralizer`,
+  `OddOrder.GroupTheory.card_pRegularMem_modEq_centralizer` — the same two congruences run inside
+  an intermediate subgroup `Q C_G(Q) ≤ H`, which is what the third main theorem needs for a
+  general `H` rather than only for `H = C_G(Q)`
 -/
 
 namespace OddOrder.GroupTheory
@@ -207,5 +211,105 @@ def pRegularSubgroupEquiv :
   right_inv _ := Subtype.ext (Subtype.ext rfl)
 
 end Subgroup
+
+/-! ### The same count taken inside an intermediate subgroup
+
+For `Q C_G(Q) ≤ H` the whole comparison can be run inside `H`: `Q` still acts on the
+factorisations with both entries in `H`, and the fixed points are again the pairs in `C_G(Q)`
+because `C_G(Q) ≤ H`.  This is what lets Külshammer's route reach the third main theorem for a
+general intermediate subgroup, not just for `H = C_G(Q)`. -/
+
+section Intermediate
+
+variable {Q : Subgroup G} {g : G} {H : Subgroup G}
+
+/-- **`Q` acts on the factorisations of `g` with both entries in `H`**, when `Q ≤ H`. -/
+@[reducible] def mulActionPFactorPairsMem (hQH : Q ≤ H)
+    (hg : g ∈ Subgroup.centralizer (Q : Set G)) :
+    MulAction ↥Q {q : PFactorPairs p g // (q : G × G).1 ∈ H ∧ (q : G × G).2 ∈ H} :=
+  letI := mulActionPFactorPairs (p := p) hg
+  { smul := fun u q => ⟨u • (q : PFactorPairs p g), by
+      rw [coe_smul_pFactorPairs]
+      exact ⟨H.mul_mem (H.mul_mem (hQH u.2) q.2.1) (H.inv_mem (hQH u.2)),
+        H.mul_mem (H.mul_mem (hQH u.2) q.2.2) (H.inv_mem (hQH u.2))⟩⟩
+    one_smul := fun q => Subtype.ext (one_smul ↥Q (q : PFactorPairs p g))
+    mul_smul := fun u v q => Subtype.ext (mul_smul u v (q : PFactorPairs p g)) }
+
+/-- The fixed points are again the pairs in `C_G(Q)`. -/
+theorem mem_fixedPoints_pFactorPairsMem_iff (hQH : Q ≤ H)
+    (hg : g ∈ Subgroup.centralizer (Q : Set G))
+    (q : {q : PFactorPairs p g // (q : G × G).1 ∈ H ∧ (q : G × G).2 ∈ H}) :
+    letI := mulActionPFactorPairsMem (p := p) hQH hg
+    q ∈ fixedPoints ↥Q {q : PFactorPairs p g // (q : G × G).1 ∈ H ∧ (q : G × G).2 ∈ H}
+      ↔ ((q : PFactorPairs p g) : G × G).1 ∈ Subgroup.centralizer (Q : Set G) ∧
+          ((q : PFactorPairs p g) : G × G).2 ∈ Subgroup.centralizer (Q : Set G) := by
+  letI := mulActionPFactorPairs (p := p) hg
+  letI := mulActionPFactorPairsMem (p := p) hQH hg
+  rw [← mem_fixedPoints_pFactorPairs_iff hg]
+  exact ⟨fun h u => Subtype.ext_iff.mp (h u), fun h u => Subtype.ext (h u)⟩
+
+/-- **Navarro, Problem (6.1), inside an intermediate subgroup.**  For `Q C_G(Q) ≤ H` and
+`g ∈ C_G(Q)`, `|Ω_H(g)| ≡ |Ω_{C_G(Q)}(g)| (mod p)`. -/
+theorem card_pFactorPairsMem_modEq_centralizer [Finite G] (hp : p.Prime) (hQ : IsPGroup p ↥Q)
+    (hQH : Q ≤ H) (hCH : Subgroup.centralizer (Q : Set G) ≤ H)
+    (hg : g ∈ Subgroup.centralizer (Q : Set G)) :
+    Nat.card {q : PFactorPairs p g // (q : G × G).1 ∈ H ∧ (q : G × G).2 ∈ H}
+      ≡ Nat.card {q : PFactorPairs p g //
+          (q : G × G).1 ∈ Subgroup.centralizer (Q : Set G) ∧
+            (q : G × G).2 ∈ Subgroup.centralizer (Q : Set G)} [MOD p] := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  letI := mulActionPFactorPairsMem (p := p) hQH hg
+  have hcard : Nat.card (fixedPoints ↥Q
+        {q : PFactorPairs p g // (q : G × G).1 ∈ H ∧ (q : G × G).2 ∈ H})
+      = Nat.card {q : PFactorPairs p g //
+          (q : G × G).1 ∈ Subgroup.centralizer (Q : Set G) ∧
+            (q : G × G).2 ∈ Subgroup.centralizer (Q : Set G)} :=
+    Nat.card_congr
+      { toFun := fun z => ⟨(z.1 : PFactorPairs p g),
+          (mem_fixedPoints_pFactorPairsMem_iff (p := p) hQH hg z.1).mp z.2⟩
+        invFun := fun q => ⟨⟨(q : PFactorPairs p g), hCH q.2.1, hCH q.2.2⟩,
+          (mem_fixedPoints_pFactorPairsMem_iff (p := p) hQH hg _).mpr q.2⟩
+        left_inv := fun _ => rfl
+        right_inv := fun _ => rfl }
+  rw [← hcard]
+  exact hQ.card_modEq_card_fixedPoints _
+
+/-- **`Q` acts on the `p`-regular elements of `H`**, when `Q ≤ H`. -/
+@[reducible] def mulActionPRegularMem (p : ℕ) (Q H : Subgroup G) (hQH : Q ≤ H) :
+    MulAction ↥Q {y : {y : G // IsPRegular p y} // (y : G) ∈ H} :=
+  letI := mulActionPRegular p Q
+  { smul := fun u y => ⟨u • (y : {y : G // IsPRegular p y}),
+      H.mul_mem (H.mul_mem (hQH u.2) y.2) (H.inv_mem (hQH u.2))⟩
+    one_smul := fun y => Subtype.ext (one_smul ↥Q (y : {y : G // IsPRegular p y}))
+    mul_smul := fun u v y => Subtype.ext (mul_smul u v (y : {y : G // IsPRegular p y})) }
+
+/-- **`|H⁰| ≡ |C_G(Q)⁰| (mod p)`** for `Q C_G(Q) ≤ H`: the normalisation matching
+`card_pFactorPairsMem_modEq_centralizer`. -/
+theorem card_pRegularMem_modEq_centralizer [Finite G] (hp : p.Prime) (hQ : IsPGroup p ↥Q)
+    (hQH : Q ≤ H) (hCH : Subgroup.centralizer (Q : Set G) ≤ H) :
+    Nat.card {y : {y : G // IsPRegular p y} // (y : G) ∈ H}
+      ≡ Nat.card {y : {y : G // IsPRegular p y} //
+          (y : G) ∈ Subgroup.centralizer (Q : Set G)} [MOD p] := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  letI := mulActionPRegular p Q
+  letI := mulActionPRegularMem p Q H hQH
+  have hfix : ∀ y : {y : {y : G // IsPRegular p y} // (y : G) ∈ H},
+      y ∈ fixedPoints ↥Q {y : {y : G // IsPRegular p y} // (y : G) ∈ H}
+        ↔ ((y : {y : G // IsPRegular p y}) : G) ∈ Subgroup.centralizer (Q : Set G) := by
+    intro y
+    rw [← mem_fixedPoints_pRegular_iff (p := p) (Q := Q) (y : {y : G // IsPRegular p y})]
+    exact ⟨fun h u => Subtype.ext_iff.mp (h u), fun h u => Subtype.ext (h u)⟩
+  have hcard : Nat.card (fixedPoints ↥Q {y : {y : G // IsPRegular p y} // (y : G) ∈ H})
+      = Nat.card {y : {y : G // IsPRegular p y} //
+          (y : G) ∈ Subgroup.centralizer (Q : Set G)} :=
+    Nat.card_congr
+      { toFun := fun z => ⟨(z.1 : {y : G // IsPRegular p y}), (hfix z.1).mp z.2⟩
+        invFun := fun y => ⟨⟨(y : {y : G // IsPRegular p y}), hCH y.2⟩, (hfix _).mpr y.2⟩
+        left_inv := fun _ => rfl
+        right_inv := fun _ => rfl }
+  rw [← hcard]
+  exact hQ.card_modEq_card_fixedPoints _
+
+end Intermediate
 
 end OddOrder.GroupTheory
