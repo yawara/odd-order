@@ -2290,10 +2290,20 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
                 `IBr(C_G(x_D))` で添字づけられており、`D = [1]` では `C_G(1) = ⊤` なので
                 `↥⊤` 上の modular datum になる。必要なのは:
                   (i) `pElementRep [1] = 1` (`Quotient.out` の類が `[1]` ゆえ 1);
-                  (ii) `π D₀` を `G` の datum の `Subgroup.topEquiv` 沿いの引き戻しに取る
-                       (5.12 は任意の datum で成り立つので instantiate してよい) ⟹ 添字型が一致;
+                  (ii) `π D₀` を `G` の datum の**引き戻し**に取る (5.12 は任意の datum で成り立つ
+                       ので instantiate してよい) ⟹ 添字型 `ι D₀ = ιG` が**構成的に一致**し、
+                       `IBr(↥C_G(1)) ↔ IBr(G)` の対応が自明になる。
+                       道具 = `MonoidAlgebra.domCongr k k f : k[H] ≃ₐ[k] k[G]`
+                       (mathlib、`domCongr_single` / `coeff_domCongr` 付き)、
+                       `f : ↥(centralizerOf 1) ≃* G` は
+                       `Subgroup.equivOfEq (centralizerOf_one) ≪≫* Subgroup.topEquiv`。
+                       ⟹ **一般の `MulEquiv` 沿いの modular datum 移送**として新 leaf 化するのが
+                       筋 (`hπ`/`hlin`/`hkerJ`/`hnil` が全て機械的に移る)。
                   (iii) `Q = ⟨1⟩ = ⊥` に対し `Br_⊥ = id` (`brauerTrunc` の台が `C_G(⊥) = ⊤`)
                        ⟹ `b^G = b`、つまり `D = [1]` の列は通常の分解数。
+                ⚠ **`D = [t]` 側だけなら移送不要**: 2-元類がちょうど 2 個なので
+                `card{D₀ の列} = k(B₀) − card{D₁ の列} = 4 − 1 = 3` は移送なしで出る。
+                移送が要るのはそれを **`G` 側の `|IBr(B₀)|`** と同一視する所だけ。
         ⚠ (5.12)/(5.13) は Ch.5 なので**文書順で先**。上流優先で (5.13)(b) →
         (5.12) → (7.2) の順に当たる。
         - [x] 🎯🎯 **(5.13)(a) 前半 完了 (2026-08-05、段 173)**:
