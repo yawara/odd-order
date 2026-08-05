@@ -104,9 +104,12 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
       (`Ind_H^G(ch(H)) ⊆ ch(G)`、Frobenius で H 側に移して分裂不要の整数性) /
       `inducedVirtualCharacters_le_virtualCharacters` (`v(G) ⊆ ch(G)`)。
       併せて段 B の仮説を `[CharZero K]` → `[Invertible (Nat.card G : K)]` に緩和。
-- [ ] **段 C 後半**: `R = ℤ[ω]` 係数版 `v_R(G)` と **Lemma 7.4** の降下
-      `ch(G) ∩ v_R(G) = v(G)`。
-      - **設計 (2026-08-05 に精密化)**: 係数抽出を **`charPairing` 経由**にすると降下が軽くなる。
+- [x] **段 C 後半** (2026-08-05, `Modular/BrauerInductionDescent.lean`): `adjoinSpan ω M` (= `ℤ[ω]·M`)、
+      正規形 `exists_sum_pow_smul_of_mem_adjoinSpan`、power basis の `K` への移送
+      (`coe_adjoin_powerBasis_basis` / `exists_intCast_sum_pow` /
+      `eq_zero_of_sum_intCast_pow_eq_zero`)、**Lemma 7.4** =
+      `mem_inducedVirtualCharacters_of_mem_adjoinSpan` (`ch(G) ∩ v_R(G) = v(G)`)。
+      - **実装した設計**: 係数抽出を **`charPairing` 経由**にすると降下が軽くなる。
         `θ ∈ ch(G)` かつ `θ = Σ_{j<n} ω^j • u_j` (`u_j ∈ v(G)`) とすると、双線型性から
         `(θ,χ_i) = Σ_j ω^j (u_j,χ_i)` で `(u_j,χ_i) = b_{ij} ∈ ℤ`、`(θ,χ_i) = α_i ∈ ℤ`。
         `{ω^j}_{j<n}` の **ℤ-一次独立**から `b_{i0} = α_i`・`b_{ij} = 0 (j≥1)` ⟹
@@ -126,7 +129,17 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
       - ⚠ R 層そのものを回避する案も検討したが**不可**: Lemma 7.6 の `ψ = Σ_i ζ^{-i} ψ_i`
         (= `|U|·1_{uP}`) は ℤ 係数では書けず (`⟨ψ,ψ_i⟩ = ζ^{-i} ∉ ℤ`)、ℤ 係数に留めると
         台が「ℤ-類」に粗くなって Lemma 7.7 (任意の整数値類関数の展開) が壊れる。
-- [ ] **段 D**: Lemma 7.5 (p-class 上の mod p 一定性)
+- [ ] **段 D**: Lemma 7.5 (`χ ∈ ch_R(G)` が整数値なら `χ mod p` は各 **p-class** 上で一定)
+      - **用途 (2026-08-05 確認)**: Lemma 7.8 で「`ζ_j` が p-class `L_j` 上で mod p 一定かつ p と素」
+        を使うところ。7.6/7.7 では使わない。
+      - **設計**: Gorenstein 原文は `χ|_Y` (`Y = ⟨y⟩` 巡回) を `Irr(Y)` に展開するが、それだと `Y` の
+        分裂データが要る。**固有値経由で回避できる**: `ρ y` は有限位数なので
+        `trace (ρ y) = Σ_ζ dim(eigenspace ζ)·ζ` (汎用版 `OddOrder.trace_eq_sum_finrank_smul` が
+        repo に在り、`Modular/LatticeEigenspaces.trace_eq_sum_finrank_smul_of_pow` が 𝒪 上の実例)。
+        `y = uv` (`u` = `p'`-部分, `v` = `p`-部分, `|v| = p^m`) のとき各固有値 `ε` は `ε = ζ·η`
+        (`|ζ| ∣ |u|`, `|η| ∣ p^m`) と分解して `ε^{p^m} = ζ^{p^m}`、`ζ` は `ρ u` の固有値。
+        ⟹ Frobenius (多項定理 mod p) で `χ(y)^{p^m} ≡ χ(u)^{p^m} (mod pR)`、
+        `ℤ ∩ pR = pℤ` (power basis) と Fermat で `χ(y) ≡ χ(u) (mod p)`。
 - [ ] **段 E**: Lemma 7.6 (核心の構成)
 - [ ] **段 F**: Lemma 7.7–7.10 ⟹ `v(G) = ch(G)`
 - [ ] **段 G**: Brauer's characterization 本体
