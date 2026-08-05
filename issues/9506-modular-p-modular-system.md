@@ -2047,11 +2047,12 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
           `OddOrder.Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer`
           (`Isaacs/Ch05_Transfer/Basic.lean:491`、`N_G(P) ≤ C_G(P) ⟹ HasNormalPComplement p G`、
           mathlib の `MonoidHom.transferSylow` 経由)。新規形式化は不要。
-        * ★ `Aut(Z₂×Z₂) ≅ S₃` と「位数 3 の自己同型は 3 つの involution を巡回」
-          — **実測で repo に無い (2026-08-05)**。`KleinFour` の定義は
-          `Isaacs/Ch06_FrobeniusActions/Problems6B3.lean` にあるが反例用で `Aut` は扱わない。
-          (7.2) が要るのは全体の同型でなく「位数 4・指数 2 の群の位数 3 の自己同型は
-          3 つの involution を巡回する」だけ。
+        * [x] 🎯 **完了 (2026-08-05、段 179、`GroupTheory/KleinFourAutomorphism`)**:
+          `eq_or_eq_or_eq_iterate_of_klein` = 「位数 3 の自己同型に対し任意の involution `b` は
+          `a`, `f a`, `f² a` のいずれか」。支持 = `eq_one_or_eq_or_eq_or_eq_of_klein`
+          (Klein 四元群は `{1,a,b,ab}`) / `exists_ne_ne_one_of_klein` /
+          `eq_of_fixed_of_klein` (3 乗が恒等で involution を 1 つ固定すれば恒等)。
+          ⚠ `Aut(Z₂×Z₂) ≅ Sym(3)` 全体は作らない (必要なのは巡回性だけ)。
         * **(5.12)** `k(B) = Σ_i Σ_{b ∈ Bl(C_G(x_i)), b^G = B} l(b)` (第二主定理の系)
           - [x] 🎯🎯 **第一段 完了 (2026-08-05、段 174、`Modular/PSectionClassCount`)**:
             `k(G) = Σ_{[x] : p-元類} #cl(C_G(x)⁰)`。`p`-部分の類が `[x]` の `G`-類は
@@ -2182,13 +2183,18 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
           (`Modular/GeneralizedDecomposition.lean`, `SecondMainTheorem.lean`,
           `SecondMainBlockForm.lean`)。Cartan 行列 `cartanMatrix` も既存
           (`Modular/CartanMatrix.lean`)。⟹ (5.13) は「既存の 2 つを繋ぐ」段。
-        * ★ involution に付く一般化分解数が**有理整数**であること
-          (原文 p.132 は (5.1) の定義の直後の注 — `d^x_{χφ} ∈ ℤ[ζ]`, `ζ` は `o(x)` 乗根 —
-          を involution `o(x)=2` に適用して `ℤ` を得る。repo の (5.1)
-          `existsUnique_generalizedDecomposition` は基底論法なのでこの整数性を見ていない
-          (`GeneralizedDecomposition.lean` の docstring に明記済) ⟹ **新規に要る**。
-          Navarro 自身の論法 = `χ|_H` を `Irr(H)` に分解し `x ∈ Z(H)` が各既約表現で
-          スカラー (= `o(x)` 乗根) として作用することを使う。)
+        * [x] 🎯 **完了 (2026-08-05、段 178、`RepresentationTheory/CharacterInvolution`)**:
+          `exists_intCast_character_of_mul_self_eq_one` = 「`t² = 1` なら `χ(t) ∈ ℤ` の像」
+          (`character_eq_of_mul_self_eq_one`: `χ(t) = 2·dim V₊ − dim V`、
+          `(1 + ρ t)/2` が `+1`-固有空間への射影)。
+          ⚠ **設計判断**: 原文の注 `d^x_{χφ} ∈ ℤ[ζ]` は `χ|_H` の `Irr(H)` 分解を要するが、
+          (7.2) がそれを使うのは involution `t` の `d^t_{χ1} = χ(t)` の形だけなので、
+          **対合の指標値の整数性を直接示す方が短く、標数 ≠ 2 の任意の体で成り立つ**
+          (代数的整数論も 1 の冪根も不要)。repo の (5.1) が基底論法ゆえ整数性を
+          見ていない件はこの経路では問題にならない。
+        ⟹ **(7.2) の部品は 2026-08-05 に全て揃った**。次は (7.2) 本体の組み立て:
+        第 1 部 (involution の類が 1 個か 3 個) と第 2 部
+        (`k(B₀) − l(B₀) = 1` から `Irr(B₀) = {1_G, χ₁, χ₂, χ₃}` と `χ_i(t) = ±1`)。
         ⚠ (5.12)/(5.13) は Ch.5 なので**文書順で先**。上流優先で (5.13)(b) →
         (5.12) → (7.2) の順に当たる。
         - [x] 🎯🎯 **(5.13)(a) 前半 完了 (2026-08-05、段 173)**:
