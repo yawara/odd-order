@@ -2806,8 +2806,15 @@ p.139 の残り = 「位数 4 の元は全て `G`-共役 (実は `C_G(t)`-共役
   mathlib `IsPGroup.le_sylow_of_normal` で `⟨y⟩ ≤ S`、よって `4 ∣ |S|`。
   `|S| = 8` なら `|G|_2 = 8` ゆえ `S` は `G` の Sylow-2 でもあり `T` と共役 ⟹ `S ≅ Q₈`;
   一方 `y ∈ Z(S)` (中心性) かつ `y² ≠ 1` で段 278 に矛盾。⟹ `|S| = 4 = |⟨y⟩|` ⟹ `⟨y⟩ = S`。
-  ⚠ 要る配管: 「位数 8 の 2-部分群は `G` の Sylow-2」(`|G|_2 = 8` から) と
-  Sylow 共役による `≅ Q₈` の移送。
+  ⚠ 要る配管: 「位数 8 の 2-部分群は `G` の Sylow-2」(`|G|_2 = 8` から)。
+  Sylow 共役による `≅ Q₈` の移送は **段 279 で完了**
+  (`nonempty_mulEquiv_quaternionTwo_of_sylow`)。
+
+⚠ **`GroupTheory/BrauerSuzukiQ8.lean` は 2026-08-06 時点で 1141 行** (上限 1500)。
+"Analysis at y" の本体を足す前に、`Q₈` 固有の decidable 事実群
+(`quaternionTwo_*` と同型移送版、~250 行) を `GroupTheory/QuaternionTwoFacts.lean` 等へ
+prefix-split するのが素直 (CLAUDE.md「ファイル粒度」= 新 leaf は同じ commit で
+`OddOrder.lean` に配線)。
 - "Analysis at t" (p.141-142): `C_G(t)/⟨t⟩` が Klein four Sylow-2 ⟹ (7.4) の basic set、
   (7.6) で `C_G(t)` へ持ち上げ、(7.5) で `d^t` の列。**整数性は issue 9508 で完済**
   (`intBasicSetMatrix` / `sum_intBasicSetMatrix_mul_cartanMatrix`)。
