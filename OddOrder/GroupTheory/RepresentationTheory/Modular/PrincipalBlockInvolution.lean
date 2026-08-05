@@ -32,6 +32,7 @@ then forces four characters, each with `χ(t) = ±1`.
 * `OddOrder.RepresentationTheory.Modular.sum_sq_character_involution_eq_cartanMatrix`
 * `OddOrder.RepresentationTheory.Modular.nontrivial_blockOfIrr_principal`
 * `OddOrder.RepresentationTheory.Modular.card_blockOfIrr_principal_eq_four_and_character_involution`
+* `OddOrder.RepresentationTheory.Modular.card_modEq_character_involution` — `χ(1) ≡ ε mod 4`
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -243,5 +244,94 @@ theorem card_blockOfIrr_principal_eq_four_and_character_involution
   · rcases OddOrder.Algebra.eq_one_or_neg_one_of_sum_sq_eq_four hsumZ hane ⟨j, hj⟩ with h | h
     · left; rw [hav j, h, Int.cast_one]
     · right; rw [hav j, h]; norm_num
+
+/-! ### `χ(1) ≡ ε mod 4` -/
+
+set_option maxHeartbeats 1000000 in
+-- The restriction of the Wedderburn block to `P` is elaborated under the same chain.
+-- `Fintype ι` / `Fintype ι'` are what make the generalized decomposition numbers and the
+-- splitting of `C_G(t)` elaborate; the section fixes them.
+set_option linter.unusedFintypeInType false in
+omit [Invertible (Nat.card G : K)] [Fintype κ] ht in
+open scoped Classical in
+include hp hx hω hω' e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ in
+/-- **Navarro (7.2): `χ(1) ≡ ε mod 4`.**  For a Klein four subgroup `P` — every nontrivial
+element of which is `p`-singular — the multiplicity `[(χ)_P, 1_P] = (χ(1) + 3ε)/4` is the
+dimension of the `P`-invariants, hence a natural number:
+
+`χ(1) + 3ε = |P| · dim V^P = 4 · dim V^P`.
+
+Here `ε = χ(t)` is the common value of `χ` on the `p`-singular elements
+(`character_eq_generalizedDecompositionNumber_of_not_isPRegular`). -/
+theorem intCast_card_add_three_mul_character_involution
+    (hconjall : ∀ v : G, IsPElement p v → v ≠ 1 → IsConj t v)
+    {j : κ} (hj : blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG)
+    (P : Subgroup G) [Fintype ↥P] (hPcard : Fintype.card ↥P = 4)
+    (hPsing : ∀ h : ↥P, (h : G) ≠ 1 → ¬ IsPRegular p (h : G)) :
+    ∃ d : ℕ, (Fintype.card (mG j) : K)
+        + 3 * (wedderburnRepresentation eG j).character t = 4 * (d : K) := by
+  classical
+  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  haveI : Invertible ((Fintype.card ↥P : ℕ) : K) :=
+    invertibleOfNonzero (by rw [hPcard]; norm_num)
+  -- the average over `P` computes the invariants
+  set ρP : Representation K ↥P (mG j → K) :=
+    MonoidHom.comp (wedderburnRepresentation eG j) P.subtype with hρP
+  have havg := OddOrder.RepresentationTheory.sum_character_eq_card_mul_finrank_invariants ρP
+  -- split off the identity and use that `χ` is constant on the `p`-singular elements
+  have hval : ∀ h : ↥P, (h : G) ≠ 1 →
+      ρP.character h = (wedderburnRepresentation eG j).character t := by
+    intro h hh
+    change (wedderburnRepresentation eG j).character (h : G) = _
+    rw [character_eq_generalizedDecompositionNumber_of_not_isPRegular hp hx hω e eG hπG hlinG
+        hπ hlin hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hconjall hj (hPsing h hh)]
+    have hval1 := character_mul_eq_generalizedDecompositionNumber hp hx hω e eG hπG hlinG hπ hlin
+      hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hj
+      (y := (1 : ↥(centralizerOf t))) (isPRegular_one hp)
+    rw [show ((1 : ↥(centralizerOf t)) : G) = 1 from rfl, mul_one] at hval1
+    rw [hval1]
+  have hone : ρP.character 1 = (Fintype.card (mG j) : K) := by
+    change (wedderburnRepresentation eG j).character ((1 : ↥P) : G) = _
+    rw [show ((1 : ↥P) : G) = 1 from rfl, Representation.char_one,
+      Module.finrank_fintype_fun_eq_card]
+  have hsplit : (∑ h : ↥P, ρP.character h)
+      = (Fintype.card (mG j) : K) + 3 * (wedderburnRepresentation eG j).character t := by
+    rw [← Finset.add_sum_erase _ _ (Finset.mem_univ (1 : ↥P)), hone,
+      Finset.sum_congr rfl fun h hh =>
+        hval h (fun hcon => (Finset.mem_erase.mp hh).1 (Subtype.ext hcon)),
+      Finset.sum_const, Finset.card_erase_of_mem (Finset.mem_univ _), Finset.card_univ, hPcard]
+    push_cast
+    ring
+  refine ⟨Module.finrank K ρP.invariants, ?_⟩
+  rw [← hsplit, havg, hPcard]
+  push_cast
+  ring
+
+set_option maxHeartbeats 1000000 in
+-- Same chain as the identity it casts.
+set_option linter.unusedFintypeInType false in
+omit [Invertible (Nat.card G : K)] [Fintype κ] ht in
+open scoped Classical in
+include hp hx hω hω' e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ in
+/-- **Navarro (7.2): `χ(1) ≡ ε mod 4`**, as a congruence of integers.  `K` has characteristic
+zero, so `χ(1) + 3ε = 4 dim V^P` may be read in `ℤ`, and `ε - χ(1) = 4(ε - dim V^P)`. -/
+theorem card_modEq_character_involution
+    (hconjall : ∀ v : G, IsPElement p v → v ≠ 1 → IsConj t v)
+    {j : κ} (hj : blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG)
+    (P : Subgroup G) [Fintype ↥P] (hPcard : Fintype.card ↥P = 4)
+    (hPsing : ∀ h : ↥P, (h : G) ≠ 1 → ¬ IsPRegular p (h : G))
+    {n : ℤ} (hn : (wedderburnRepresentation eG j).character t = (n : K)) :
+    (Fintype.card (mG j) : ℤ) ≡ n [ZMOD 4] := by
+  classical
+  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  obtain ⟨d, hd⟩ := intCast_card_add_three_mul_character_involution hp hx hω e eG hπG hlinG
+    hπ hlin hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hconjall hj P hPcard hPsing
+  rw [hn] at hd
+  have hZ : (Fintype.card (mG j) : ℤ) + 3 * n = 4 * (d : ℤ) := by
+    have hcast : (((Fintype.card (mG j) : ℤ) + 3 * n : ℤ) : K) = ((4 * (d : ℤ) : ℤ) : K) := by
+      push_cast
+      exact hd
+    exact_mod_cast hcast
+  exact Int.modEq_iff_dvd.mpr ⟨n - (d : ℤ), by linarith⟩
 
 end OddOrder.RepresentationTheory.Modular

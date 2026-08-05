@@ -17589,3 +17589,15 @@ Klein 四元群 Sylow-2 を持つ群は単一類になれない ((7.2) が `C = 
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.card_blockOfIrr_principal_eq_four_and_character_involution
+
+/-! 🎯🎯 **Navarro (7.2): `χ(1) ≡ ε mod 4`** (`Modular/PrincipalBlockInvolution`)。
+Klein 四元群 `P` (非自明元は全て 2-特異) の上で `[(χ)_P, 1_P] = (χ(1) + 3ε)/4` は
+`P`-不変部分空間の次元ゆえ自然数: `χ(1) + 3ε = |P|·dim V^P = 4·dim V^P`
+(既存 `sum_character_eq_card_mul_finrank_invariants` を制限表現 `ρ|_P` に適用)。
+`ε = χ(t)` は段 189 で `p`-特異元上の共通値。標数 0 なので ℤ の合同式に落ちる。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.intCast_card_add_three_mul_character_involution
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_modEq_character_involution
