@@ -271,6 +271,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionSum
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionClassCount
 import OddOrder.Algebra.BlockPartitionedMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionMatrix
+import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
@@ -17372,3 +17373,17 @@ Navarro (5.12) の "in particular, notice that the matrix `J` is regular"。
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.card_blockOfIrr_eq_card_inducedBlockOfCentralizer
+
+/-! 🎯 **involution での指標値は有理整数** (`RepresentationTheory/CharacterInvolution`) —
+`t² = 1` なら `ρ t` は対合なので `(1 + ρ t)/2` は `+1`-固有空間への射影で
+`χ(t) = 2·dim V₊ − dim V`。標数 ≠ 2 の任意の体で成り立ち、代数的整数論も 1 の冪根も要らない。
+
+⚠ Navarro (5.1) 直後の注はもっと強く「`d^x_{χφ} ∈ ℤ[ζ]` (`ζ` は `o(x)` 乗根)」と述べるが、
+(7.2) がそれを使うのは involution `t` に対する `d^t_{χ1} = χ(t)` の形だけなので、
+本補題が直接それを供給する (制限指標の分解機構が不要になる)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.character_eq_of_mul_self_eq_one
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_intCast_character_of_mul_self_eq_one
