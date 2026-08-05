@@ -1335,7 +1335,8 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
           * `CharP.natCast_eq_natCast` で上の合同式を `k` の等式に
           * `Z(kG)` の類和基底 (`centerBasis`) 上で 2 つの AlgHom が一致 ⟹
             `blockOfCentralCharacter` の一意性 (`eq_blockOfCentralCharacter`) で結論。
-  - [ ] (c) 逆向き (`b^G = B_0 ⟹ b = b_0`)。**⚠ BS/Z\* の spine が実際に使うのはこの向き**
+  - [x] 🎯🎯🎯 **(c) 逆向き (`b^G = B_0 ⟹ b = b_0`) — 完了 (2026-08-05、段 154)**。
+        **⚠ BS/Z\* の spine が実際に使うのはこの向き**
         (2026-08-05 に原文 p.145 (7.7) で確認): `χ ∈ Irr(B_0)`, `u` が `p`-元のとき
         `χ(uw) = Σ_{μ ∈ IBr(b_0)} d^u_{χμ} μ(w)` — (5.8) の和が `b_0` の項だけに潰れる、
         という主張なので、他の `b` を**排除**する逆向きが要る。
@@ -1402,13 +1403,19 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               (両辺とも `p`-singular では `0` になる)。
             ⚠ `Br_Q` (Brauer 準同型) を新たに定義せず**係数レベルの等式**にした。
               (6.14) の帰結が係数の等式なので、間に定義を挟むと往復が増えるだけ。
-          * **⏸ 次の一手 (2026-08-05 時点の frontier)** = 上を第三主定理の逆向きに変換:
-            `λ_b(Br_Q(e_{B₀})) = λ_b^G(e_{B₀}) = [b^G = B₀]` なので、
-            `b^G = B₀ ⟹ λ_b(e_{b₀}) = 1 ⟹ b = b₀`。
-            必要なのは「`C_G(Q)` の中心指標 `λ_b` を `e_{B₀}` の `C_G(Q)`-切断に当てる」形で、
-            部品は既存: `inducedCentralCharacter_classSumCenter` /
-            `blockCharacter_truncClassSumCenter_eq` (= (4.14) 前半) /
-            `eq_blockOfCentralCharacter` (`ThirdMainEasy.lean` の (b) 方向で使った 3 本)。
+          * [x] 🎯🎯🎯 **逆向きへの変換 完了 (2026-08-05、段 154、同 leaf の `Converse` 節)**:
+            - `brauerTrunc_eq_of_coeff_eq` — `H = C_G(Q)` では `Br_Q` は台の `H` への
+              制限そのもの (`coeff_brauerTrunc` の条件が `y.2` で自明に成立) ⟹
+              段 153 の係数等式が `Z(k[G]) →ₐ Z(k[C_G(Q)])` の等式
+              **`Br_Q(e_{B₀}) = e_{b₀}`** になる。
+            - 🎯🎯🎯 `eq_principalBlock_of_inducedBlockOfNormalizer_eq` —
+              `Q` が**可換** `p`-部分群 (BS では `Q = ⟨t⟩` ゆえ自動; `Q C_G(Q) ≤ C_G(Q)`
+              に必要) で `b` が `C_G(Q)` のブロック、`b^G = B₀` なら `b = b₀`。
+              `b^G = blockOfCentralCharacter(λ_b^G)` は定義なので
+              `blockCharacter_blockOfCentralCharacter` で `λ_{B₀} = λ_b ∘ Br_Q`;
+              `e_{B₀}` で評価して左辺 `= 1` (`hB`)、右辺 `= λ_b(e_{b₀}) = δ_{b b₀}` (`hBC`)。
+            ⚠ **Okuyama (6.6) / height 理論 / `~` 関数 / Brauer の指標判定法を一切通らない**
+              — 段 99 の「(c) は重い」という見立ては Külshammer 経路で完全に回避された。
           **(6.14) の上流** (これが残る仕事):
           * [x] **(4.22) 完了 (2026-08-05)**: `GroupTheory/SylowContaining.lean`
             (🎯 `card_sylow_containing_modEq_one` — `Q` を含む Sylow の個数 ≡ 1 mod p;
