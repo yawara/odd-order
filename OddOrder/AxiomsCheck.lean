@@ -17058,3 +17058,13 @@ Problem (6.1) の 2 本の合同で `G` 側と `C_G(Q)` 側を突き合わせる
   OddOrder.RepresentationTheory.Modular.card_pRegular_mul_coeff_principalBlock
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.coeff_principalBlock_eq_centralizer
+
+/-! 🎯🎯🎯 **第三主定理の逆向き** (`Modular/KulshammerThirdMain`) —
+`Q` が可換 `p`-部分群のとき、`C_G(Q)` のブロック `b` が `b^G = B₀` なら `b = b₀`。
+`Br_Q(e_{B₀}) = e_{b₀}` を誘導中心指標に食わせて `λ_b(e_{b₀}) = δ_{b b₀}` にする。
+BS が実際に使う向きで、Okuyama (6.6) / height 理論を通らない。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.brauerTrunc_eq_of_coeff_eq
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_principalBlock_of_inducedBlockOfNormalizer_eq

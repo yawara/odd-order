@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Algebra.PElementSumCount
 import OddOrder.GroupTheory.PRegularElementCount
+import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockDefined
 import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerFormula
 
 /-!
@@ -37,6 +38,13 @@ i.e. `Br_Q(e_{B_0}) = e_{b_0}`.  This is the computation behind the **third main
 `Q C_G(Q) ≤ H ≤ N_G(Q)`, and it bypasses Okuyama's argument ((6.6)) together with the height
 theory and Brauer's characterisation of characters that it needs.
 
+Feeding it back into the central characters gives the **converse** half of the third main
+theorem, which is the direction Brauer–Suzuki uses: for `b` a block of `C_G(Q)`,
+
+`λ_b^G(e_{B_0}) = λ_b(Br_Q(e_{B_0})) = λ_b(e_{b_0}) = δ_{b b_0}`,
+
+so `b^G = B_0` — which makes the left side `λ_{B_0}(e_{B_0}) = 1` — forces `b = b_0`.
+
 ## Main results
 
 * `OddOrder.RepresentationTheory.Modular.card_pRegular_mul_coeff_principalBlock` — Külshammer's
@@ -45,6 +53,8 @@ theory and Brauer's characterisation of characters that it needs.
   stated on the two counts alone
 * `OddOrder.RepresentationTheory.Modular.coeff_principalBlock_eq_centralizer` —
   `e_{B_0}^G(g) = e_{b_0}^{C_G(Q)}(g)`
+* `OddOrder.RepresentationTheory.Modular.eq_principalBlock_of_inducedBlockOfNormalizer_eq` —
+  the converse of the third main theorem for `H = C_G(Q)`, `Q` abelian
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -279,5 +289,107 @@ theorem coeff_principalBlock_eq_centralizer (hp : p.Prime) (hQ : IsPGroup p ↥Q
       hidemC hfC hBC hweakC hvanishC)
 
 end ThirdMain
+
+/-! ### The converse of the third main theorem for `H = C_G(Q)` -/
+
+section Converse
+
+variable {k G : Type*} [Field k] [Group G] [Fintype G] [DecidableEq (ConjClasses G)]
+  [Fintype (ConjClasses G)] {p : ℕ} [Fact p.Prime] [CharP k p]
+variable {Q : Subgroup G} [Fintype ↥(Subgroup.centralizer (Q : Set G))]
+  [DecidablePred fun g : G => g ∈ Subgroup.centralizer (Q : Set G)]
+
+omit [Fintype G] [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)] [Fact p.Prime]
+  [CharP k p] in
+/-- **`Br_Q(x) = y`** as soon as `x` and `y` have the same coefficients on `C_G(Q)`: for
+`H = C_G(Q)` the Brauer homomorphism is exactly the restriction of the support to `H`. -/
+theorem brauerTrunc_eq_of_coeff_eq (x : MonoidAlgebra k G)
+    (y : MonoidAlgebra k ↥(Subgroup.centralizer (Q : Set G)))
+    (h : ∀ g : ↥(Subgroup.centralizer (Q : Set G)), x.coeff (g : G) = y.coeff g) :
+    brauerTrunc Q (Subgroup.centralizer (Q : Set G)) x = y := by
+  refine MonoidAlgebra.coeff_injective (Finsupp.ext fun g => ?_)
+  rw [coeff_brauerTrunc, if_pos g.2]
+  exact h g
+
+variable {ιC : Type*} [Finite ιC] {nnC : ιC → Type*} [∀ i, Fintype (nnC i)]
+  [∀ i, DecidableEq (nnC i)] [∀ i, Nonempty (nnC i)]
+variable (πC : MonoidAlgebra k ↥(Subgroup.centralizer (Q : Set G)) →+*
+    ∀ j, Matrix (nnC j) (nnC j) k)
+  (hπC : Function.Surjective πC)
+  (hlinC : ∀ (c : k) (a : MonoidAlgebra k ↥(Subgroup.centralizer (Q : Set G))),
+    πC (c • a) = c • πC a)
+  (hnilC : ∀ z : Subalgebra.center k (MonoidAlgebra k ↥(Subgroup.centralizer (Q : Set G))),
+    MatrixModule.blockCharacterPi πC hπC hlinC z = 0 → IsNilpotent z)
+variable {ιG : Type*} [Finite ιG] {nnG : ιG → Type*} [∀ j, Fintype (nnG j)]
+  [∀ j, DecidableEq (nnG j)] [∀ j, Nonempty (nnG j)]
+variable (πG : MonoidAlgebra k G →+* ∀ j, Matrix (nnG j) (nnG j) k)
+  (hπG : Function.Surjective πG)
+  (hlinG : ∀ (c : k) (a : MonoidAlgebra k G), πG (c • a) = c • πG a)
+  (hnilG : ∀ z : Subalgebra.center k (MonoidAlgebra k G),
+    MatrixModule.blockCharacterPi πG hπG hlinG z = 0 → IsNilpotent z)
+
+-- keep the `Pi.single` hypotheses in the same (classical) decidability shape as (6.14)
+open scoped Classical in
+/-- **The converse half of Brauer's third main theorem** for `H = C_G(Q)` with `Q` an abelian
+`p`-subgroup: a block `b` of `C_G(Q)` with `b^G = B_0` is the principal block.
+
+This is the direction the Brauer–Suzuki argument uses, and Külshammer's route reaches it without
+Okuyama's argument: `Br_Q(e_{B_0}) = e_{b_0}` (`hcoeff`, supplied by
+`coeff_principalBlock_eq_centralizer`) turns the induced central character into
+`λ_b(e_{b_0}) = δ_{b b_0}`, while `b^G = B_0` forces it to be `λ_{B_0}(e_{B_0}) = 1`. -/
+theorem eq_principalBlock_of_inducedBlockOfNormalizer_eq
+    (hQ : IsPGroup p ↥Q) (hQab : Q ≤ Subgroup.centralizer (Q : Set G))
+    {F' : MatrixModule.Block πG hπG hlinG → Subalgebra.center k (MonoidAlgebra k G)}
+    {FC' : MatrixModule.Block πC hπC hlinC →
+      Subalgebra.center k (MonoidAlgebra k ↥(Subgroup.centralizer (Q : Set G)))}
+    (hB : ∀ B, MatrixModule.blockCharacterPi πG hπG hlinG (F' B) = Pi.single B 1)
+    (hBC : ∀ B, MatrixModule.blockCharacterPi πC hπC hlinC (FC' B) = Pi.single B 1)
+    (hcoeff : ∀ g : ↥(Subgroup.centralizer (Q : Set G)),
+      ((F' (principalBlock πG hπG hlinG hnilG) : MonoidAlgebra k G)).coeff (g : G)
+        = ((FC' (principalBlock πC hπC hlinC hnilC) :
+            MonoidAlgebra k ↥(Subgroup.centralizer (Q : Set G)))).coeff g)
+    (b : MatrixModule.Block πC hπC hlinC)
+    (hind : inducedBlockOfNormalizer πC hπC hlinC πG hπG hlinG hnilG hQ hQab le_rfl
+        (Subgroup.centralizer_le_normalizer _) b
+      = principalBlock πG hπG hlinG hnilG) :
+    b = principalBlock πC hπC hlinC hnilC := by
+  classical
+  -- `Br_Q(e_{B_0}) = e_{b_0}`
+  have hbr : brauerCenterHom Q (Subgroup.centralizer (Q : Set G)) hQ le_rfl
+        (Subgroup.centralizer_le_normalizer _) (F' (principalBlock πG hπG hlinG hnilG))
+      = FC' (principalBlock πC hπC hlinC hnilC) :=
+    Subtype.ext (by
+      rw [coe_brauerCenterHom_apply]
+      exact brauerTrunc_eq_of_coeff_eq _ _ hcoeff)
+  -- `b^G = B_0` means `λ_{B_0} = λ_b ∘ Br_Q`
+  have hdef : inducedBlockOfNormalizer πC hπC hlinC πG hπG hlinG hnilG hQ hQab le_rfl
+        (Subgroup.centralizer_le_normalizer _) b
+      = MatrixModule.blockOfCentralCharacter πG hπG hlinG hnilG
+        (inducedCentralCharacterAlgHom πC hπC hlinC hQ le_rfl
+          (Subgroup.centralizer_le_normalizer _) b) := rfl
+  have hchar : MatrixModule.blockCharacter πG hπG hlinG (principalBlock πG hπG hlinG hnilG)
+      = inducedCentralCharacterAlgHom πC hπC hlinC hQ le_rfl
+          (Subgroup.centralizer_le_normalizer _) b := by
+    rw [← hind, hdef]
+    exact MatrixModule.blockCharacter_blockOfCentralCharacter πG hπG hlinG hnilG _
+  -- evaluate at `e_{B_0}`
+  have heval := DFunLike.congr_fun hchar (F' (principalBlock πG hπG hlinG hnilG))
+  have hL : MatrixModule.blockCharacter πG hπG hlinG (principalBlock πG hπG hlinG hnilG)
+      (F' (principalBlock πG hπG hlinG hnilG)) = 1 := by
+    rw [← MatrixModule.blockCharacterPi_apply, hB, Pi.single_eq_same]
+  have hR : inducedCentralCharacterAlgHom πC hπC hlinC hQ le_rfl
+        (Subgroup.centralizer_le_normalizer _) b (F' (principalBlock πG hπG hlinG hnilG))
+      = if b = principalBlock πC hπC hlinC hnilC then (1 : k) else 0 := by
+    change MatrixModule.blockCharacter πC hπC hlinC b
+      (brauerCenterHom Q (Subgroup.centralizer (Q : Set G)) hQ le_rfl
+        (Subgroup.centralizer_le_normalizer _)
+        (F' (principalBlock πG hπG hlinG hnilG))) = _
+    rw [hbr, ← MatrixModule.blockCharacterPi_apply, hBC, Pi.single_apply]
+  rw [hL, hR] at heval
+  by_contra hne
+  rw [if_neg hne] at heval
+  exact one_ne_zero heval
+
+end Converse
 
 end OddOrder.RepresentationTheory.Modular
