@@ -282,6 +282,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInverse
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerFromOrdinary
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
 import OddOrder.Algebra.SumSquaresFour
@@ -17745,3 +17746,13 @@ basic set `𝓑` は `IBr(b)` から整数行列 `U = (u_{μφ})` (整数逆行�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_character_involution_eq_neg_one
+
+/-! 🎯🎯 **各既約 Brauer 指標は通常指標の `K`-結合** (`Modular/BrauerFromOrdinary`) —
+Navarro Lemma (3.16) の `K` 版。係数は `a_χ = Σ_τ d_{χτ} [τ, μ₀]⁰` で、
+`Σ_χ d_{χτ}d_{χμ} = c_{τμ}` (Cartan の定義) と「`([τ,μ]⁰)` が Cartan の逆」
+(既存 `sum_cartanMatrix_mul_pairingZero`) から和が `μ₀` に潰れる。
+⟹ (7.3) の基底変換行列 `U` が **`K` 上で存在する**根拠 (basic set は block の `IBr` と
+同じ空間を張る)。⚠ `U` の**整数性**は (3.16) 本体で、ここでは示していない。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_ordinaryCombination_eq_irreducibleBrauerCharacter
