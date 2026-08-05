@@ -17069,6 +17069,8 @@ BS が実際に使う向きで、Okuyama (6.6) / height 理論を通らない。
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.brauerTrunc_eq_of_coeff_eq
 #assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_principalBlock_of_blockOfCentralCharacter_eq
+#assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.eq_principalBlock_of_inducedBlockOfNormalizer_eq
 
 /-! **Navarro (3.18) (b) ⟹ (c)** (`Modular/DefectZeroDegree`) —

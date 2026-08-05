@@ -320,16 +320,23 @@ variable (πG : MonoidAlgebra k G →+* ∀ j, Matrix (nnG j) (nnG j) k)
     MatrixModule.blockCharacterPi πG hπG hlinG z = 0 → IsNilpotent z)
 
 -- keep the `Pi.single` hypotheses in the same (classical) decidability shape as (6.14)
+omit [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)] in
 open scoped Classical in
-/-- **The converse half of Brauer's third main theorem** for `H = C_G(Q)` with `Q` an abelian
-`p`-subgroup: a block `b` of `C_G(Q)` with `b^G = B_0` is the principal block.
+/-- **The converse half of Brauer's third main theorem** for `H = C_G(Q)`: a block `b` of
+`C_G(Q)` whose induced central character `λ_b ∘ Br_Q` names the principal block of `G` *is* the
+principal block of `C_G(Q)`.
 
 This is the direction the Brauer–Suzuki argument uses, and Külshammer's route reaches it without
 Okuyama's argument: `Br_Q(e_{B_0}) = e_{b_0}` (`hcoeff`, supplied by
 `coeff_principalBlock_eq_centralizer`) turns the induced central character into
-`λ_b(e_{b_0}) = δ_{b b_0}`, while `b^G = B_0` forces it to be `λ_{B_0}(e_{B_0}) = 1`. -/
-theorem eq_principalBlock_of_inducedBlockOfNormalizer_eq
-    (hQ : IsPGroup p ↥Q) (hQab : Q ≤ Subgroup.centralizer (Q : Set G))
+`λ_b(e_{b_0}) = δ_{b b_0}`, while `b^G = B_0` forces it to be `λ_{B_0}(e_{B_0}) = 1`.
+
+⚠ The hypothesis is phrased on `blockOfCentralCharacter (λ_b ∘ Br_Q)` rather than on
+`inducedBlockOfNormalizer`, so that **no abelianness of `Q` is needed**: identifying
+`λ_b ∘ Br_Q` with Navarro's `λ_b^G` is (4.14), which asks for `Q C_G(Q) ≤ H` and hence — with
+`H = C_G(Q)` — for `Q ≤ C_G(Q)`.  That identification is only needed to *read* the hypothesis as
+`b^G = B_0`; see `eq_principalBlock_of_inducedBlockOfNormalizer_eq`. -/
+theorem eq_principalBlock_of_blockOfCentralCharacter_eq (hQ : IsPGroup p ↥Q)
     {F' : MatrixModule.Block πG hπG hlinG → Subalgebra.center k (MonoidAlgebra k G)}
     {FC' : MatrixModule.Block πC hπC hlinC →
       Subalgebra.center k (MonoidAlgebra k ↥(Subgroup.centralizer (Q : Set G)))}
@@ -340,8 +347,9 @@ theorem eq_principalBlock_of_inducedBlockOfNormalizer_eq
         = ((FC' (principalBlock πC hπC hlinC hnilC) :
             MonoidAlgebra k ↥(Subgroup.centralizer (Q : Set G)))).coeff g)
     (b : MatrixModule.Block πC hπC hlinC)
-    (hind : inducedBlockOfNormalizer πC hπC hlinC πG hπG hlinG hnilG hQ hQab le_rfl
-        (Subgroup.centralizer_le_normalizer _) b
+    (hind : MatrixModule.blockOfCentralCharacter πG hπG hlinG hnilG
+        (inducedCentralCharacterAlgHom πC hπC hlinC hQ le_rfl
+          (Subgroup.centralizer_le_normalizer _) b)
       = principalBlock πG hπG hlinG hnilG) :
     b = principalBlock πC hπC hlinC hnilC := by
   classical
@@ -353,15 +361,10 @@ theorem eq_principalBlock_of_inducedBlockOfNormalizer_eq
       rw [coe_brauerCenterHom_apply]
       exact brauerTrunc_eq_of_coeff_eq _ _ hcoeff)
   -- `b^G = B_0` means `λ_{B_0} = λ_b ∘ Br_Q`
-  have hdef : inducedBlockOfNormalizer πC hπC hlinC πG hπG hlinG hnilG hQ hQab le_rfl
-        (Subgroup.centralizer_le_normalizer _) b
-      = MatrixModule.blockOfCentralCharacter πG hπG hlinG hnilG
-        (inducedCentralCharacterAlgHom πC hπC hlinC hQ le_rfl
-          (Subgroup.centralizer_le_normalizer _) b) := rfl
   have hchar : MatrixModule.blockCharacter πG hπG hlinG (principalBlock πG hπG hlinG hnilG)
       = inducedCentralCharacterAlgHom πC hπC hlinC hQ le_rfl
           (Subgroup.centralizer_le_normalizer _) b := by
-    rw [← hind, hdef]
+    rw [← hind]
     exact MatrixModule.blockCharacter_blockOfCentralCharacter πG hπG hlinG hnilG _
   -- evaluate at `e_{B_0}`
   have heval := DFunLike.congr_fun hchar (F' (principalBlock πG hπG hlinG hnilG))
@@ -380,6 +383,33 @@ theorem eq_principalBlock_of_inducedBlockOfNormalizer_eq
   by_contra hne
   rw [if_neg hne] at heval
   exact one_ne_zero heval
+
+-- keep the `Pi.single` hypotheses in the same (classical) decidability shape as (6.14)
+open scoped Classical in
+/-- **The converse half of Brauer's third main theorem** in Navarro's own reading `b^G = B_0`.
+
+`inducedBlockOfNormalizer` is by definition the block named by `λ_b ∘ Br_Q`, so this is
+`eq_principalBlock_of_blockOfCentralCharacter_eq` verbatim; the extra hypothesis `hQab` is what
+Navarro's `Q C_G(Q) ≤ H ≤ N_G(Q)` becomes at `H = C_G(Q)`, and it is used only to know that
+`λ_b ∘ Br_Q` really is the induced central character (Navarro (4.14)). -/
+theorem eq_principalBlock_of_inducedBlockOfNormalizer_eq
+    (hQ : IsPGroup p ↥Q) (hQab : Q ≤ Subgroup.centralizer (Q : Set G))
+    {F' : MatrixModule.Block πG hπG hlinG → Subalgebra.center k (MonoidAlgebra k G)}
+    {FC' : MatrixModule.Block πC hπC hlinC →
+      Subalgebra.center k (MonoidAlgebra k ↥(Subgroup.centralizer (Q : Set G)))}
+    (hB : ∀ B, MatrixModule.blockCharacterPi πG hπG hlinG (F' B) = Pi.single B 1)
+    (hBC : ∀ B, MatrixModule.blockCharacterPi πC hπC hlinC (FC' B) = Pi.single B 1)
+    (hcoeff : ∀ g : ↥(Subgroup.centralizer (Q : Set G)),
+      ((F' (principalBlock πG hπG hlinG hnilG) : MonoidAlgebra k G)).coeff (g : G)
+        = ((FC' (principalBlock πC hπC hlinC hnilC) :
+            MonoidAlgebra k ↥(Subgroup.centralizer (Q : Set G)))).coeff g)
+    (b : MatrixModule.Block πC hπC hlinC)
+    (hind : inducedBlockOfNormalizer πC hπC hlinC πG hπG hlinG hnilG hQ hQab le_rfl
+        (Subgroup.centralizer_le_normalizer _) b
+      = principalBlock πG hπG hlinG hnilG) :
+    b = principalBlock πC hπC hlinC hnilC :=
+  eq_principalBlock_of_blockOfCentralCharacter_eq πC hπC hlinC hnilC πG hπG hlinG hnilG hQ
+    hB hBC hcoeff b hind
 
 end Converse
 
