@@ -2717,14 +2717,22 @@ p.139 の残り = 「位数 4 の元は全て `G`-共役 (実は `C_G(t)`-共役
 その import と `open scoped Pointwise` の両方が要る (`SMul` だけは別ファイルにあるので
 `MulAction` だけ落ちる、という紛らわしい失敗をする)。
 
-**残る組み立て** (次 session の着手点):
-1. 融合の存在 (`not_controlsOwnFusion_of_oPiCore_eq_bot`) から「動く `u`」を作る
-   — fusion 非制御の定義をほどいて `y^g = z` を取り出し、
-   `exists_mem_normalizer_conj_mem_zpowers` で `u ∈ N_G(T)` に直し、
-   `u • {y,y⁻¹} ≠ {y,y⁻¹}` を出す。
-2. `exists_smul_eq_of_mem_inversePairs` で全対が融合 ⟹
-   **「位数 4 の元は全て `G`-共役」**。
-3. そこから p.140 以降の "Analysis at y" / "Analysis at t" へ。
+**残る組み立て** (次 session の着手点、論法は 2026-08-06 に確定済):
+
+`¬ T.ControlsOwnFusion` (段 217) をほどくと `x, y ∈ T` で `G`-共役だが `T`-共役でないものが取れる
+(`Subgroup.ControlsFusionIn` の定義 = `Ch05_Transfer/Basic.lean:872`)。そこから:
+
+1. **`x² ≠ 1` が従う** — `x = 1` なら `y = 1` で `u = 1` が効く; `x` が対合なら `Q₈` の対合の
+   一意性 (`eq_of_sq_eq_one_of_quaternionTwo`) で `y = x` となりやはり `u = 1`。⟹ 位数 4。
+2. **`{y, y⁻¹} ≠ {x, x⁻¹}`** — `T`-共役類がちょうど `{x, x⁻¹}` (`conj_eq_iff_of_quaternionTwo`)
+   なので、`y` がそこに入れば `T`-共役になってしまう。
+3. **動く `u`** — `exists_mem_normalizer_conj_mem_zpowers` で `u ∈ N_G(T)`、`u x u⁻¹ ∈ ⟨y⟩`。
+   `u x u⁻¹` は位数 4 で `⟨y⟩` は位数 4 の巡回群なので `u x u⁻¹ ∈ {y, y⁻¹}` ⟹
+   `u • {x,x⁻¹} = {y,y⁻¹} ≠ {x,x⁻¹}`。
+4. **`exists_smul_eq_of_mem_inversePairs`** で全対が融合 ⟹
+   **「位数 4 の元は全て `G`-共役」**(原文の "the claim has been proven")。
+   `Z(T) = {1,t} ⊴ N_G(T)` から `u ∈ C_G(t)` も出る (原文の最後の注意)。
+5. そこから p.140 以降の "Analysis at y" / "Analysis at t" へ。
 
 必要な群論的事実 (原文 p.138 が列挙):
 ~~`Aut(Q₈) = Sym(4)`~~ (上記で不要) / 巡回 Sylow 2 なら正規 2-補群 /
