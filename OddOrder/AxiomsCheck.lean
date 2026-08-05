@@ -13369,6 +13369,17 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 ⟹ `mem_center_of_normal_of_isCyclic`。 -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.not_two_dvd_index_inf_subgroupOf
 #assert_only_allowed_axioms OddOrder.GroupTheory.q8_mem_center_of_mem_normal_of_not_le
+/-! `q8_mem_center_of_mem_center_normal` = Navarro p.139 reduction の**分枝 `P ≤ N`**
+(帰納法が `z ∈ Z(N)` を供給した後の部分)。`z` の `G`-共役 `w` も `N` の中心的対合ゆえ、
+`mem_sylow_of_mem_center_of_orderOf_eq_two` (`⟨u⟩` は `N` の正規 2-部分群 ⟹ mathlib
+`IsPGroup.le_sylow_of_normal` で全ての Sylow-2 に含まれる) で両方 `T ≅ Q₈` に入り、
+`Q₈` の対合の一意性で `w = z`。`Q₈` の対合が中心的であること
+(`mem_center_of_sq_eq_one_of_quaternionTwo`) は `T = ⊤` の場合に使う。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.quaternionTwo_a_two_mem_center
+#assert_only_allowed_axioms OddOrder.GroupTheory.mem_center_of_sq_eq_one_of_quaternionTwo
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.mem_sylow_of_mem_center_of_orderOf_eq_two
+#assert_only_allowed_axioms OddOrder.GroupTheory.q8_mem_center_of_mem_center_normal
 
 /-! ### lean-eval 提出候補の登録 (issue 0050, 2026-07-22).
 

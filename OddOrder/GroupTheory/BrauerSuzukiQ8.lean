@@ -38,6 +38,8 @@ Navarro's "it suffices to prove that `t ∈ Z(G)`" under `O_{2'}(G) = 1`.
   cyclic, the dichotomy "`P ∩ N` is cyclic or `P ⊆ N`" that opens that reduction
 * `OddOrder.GroupTheory.q8_mem_center_of_mem_normal_of_not_le` — the **cyclic branch** of that
   reduction, proved in full
+* `OddOrder.GroupTheory.q8_mem_center_of_mem_center_normal` — the **branch `P ≤ N`**, given what
+  induction on `|G|` supplies
 * `OddOrder.GroupTheory.q8_mk_mem_center` / `OddOrder.GroupTheory.brauerSuzuki_q8`
 -/
 
@@ -297,6 +299,103 @@ theorem q8_mem_center_of_mem_normal_of_not_le (hO : oPiCore {p | p ≠ 2} G = �
     isCyclic_of_surjective ((MulEquiv.subgroupCongr hPtop).trans Subgroup.topEquiv).toMonoidHom
       (MulEquiv.surjective _)
   exact mem_center_of_normal_of_isCyclic hzN hz
+
+/-! ### Navarro p. 139: the branch `P ≤ N` -/
+
+/-- **The involution of `Q₈` is central.** -/
+theorem quaternionTwo_a_two_mem_center :
+    ∀ g : QuaternionGroup 2, QuaternionGroup.a 2 * g = g * QuaternionGroup.a 2 := by decide
+
+/-- **The involution of a group isomorphic to `Q₈` is central.** -/
+theorem mem_center_of_sq_eq_one_of_quaternionTwo {P : Type*} [Group P]
+    (e : P ≃* QuaternionGroup 2) {u : P} (hu : u ^ 2 = 1) (hu1 : u ≠ 1) :
+    u ∈ Subgroup.center P := by
+  have hval : e u = QuaternionGroup.a 2 := by
+    refine (quaternionTwo_sq_eq_one (e u) (by rw [← map_pow, hu, map_one])).resolve_left ?_
+    exact fun h => hu1 (e.injective (h.trans (map_one e).symm))
+  rw [Subgroup.mem_center_iff]
+  intro g
+  refine e.injective ?_
+  rw [map_mul, map_mul, hval]
+  exact (quaternionTwo_a_two_mem_center (e g)).symm
+
+/-- **A central involution of a normal subgroup lies in the Sylow `2`-subgroup.**  `⟨u⟩` is a
+normal `2`-subgroup of `N`, hence contained in every Sylow `2`-subgroup of `N`
+(`IsPGroup.le_sylow_of_normal`), and `T` is one when `T ≤ N`. -/
+theorem mem_sylow_of_mem_center_of_orderOf_eq_two (T : Sylow 2 G) {N : Subgroup G} [N.Normal]
+    (hTN : (T : Subgroup G) ≤ N) {u : G} (huN : u ∈ N) (hu : orderOf u = 2)
+    (huc : ∀ x ∈ N, x * u = u * x) : u ∈ (T : Subgroup G) := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hinf : (T : Subgroup G) ⊓ N = (T : Subgroup G) := inf_eq_left.mpr hTN
+  -- `T.subgroupOf N` is a Sylow `2`-subgroup of `N`
+  have hpgT : IsPGroup 2 ↥((T : Subgroup G) ⊓ N) := T.isPGroup'.to_le inf_le_left
+  have hpg : IsPGroup 2 ↥(((T : Subgroup G) ⊓ N).subgroupOf N) :=
+    hpgT.of_equiv (Subgroup.subgroupOfEquivOfLe (H := (T : Subgroup G) ⊓ N) inf_le_right).symm
+  set P : Sylow 2 ↥N := hpg.toSylow (not_two_dvd_index_inf_subgroupOf T N) with hP
+  have hPcoe : (P : Subgroup ↥N) = ((T : Subgroup G) ⊓ N).subgroupOf N :=
+    hpg.toSylow_coe (not_two_dvd_index_inf_subgroupOf T N)
+  -- `⟨u⟩` is a normal `2`-subgroup of `N`
+  set v : ↥N := ⟨u, huN⟩ with hv
+  have hvord : orderOf v = 2 := by rw [hv, Subgroup.orderOf_mk]; exact hu
+  have hvc : v ∈ Subgroup.center ↥N := by
+    rw [Subgroup.mem_center_iff]
+    exact fun g => Subtype.ext (huc (g : G) g.2)
+  haveI hnorm : (Subgroup.zpowers v).Normal := by
+    refine ⟨fun a ha g => ?_⟩
+    have hcomm := Subgroup.mem_center_iff.mp (Subgroup.zpowers_le.mpr hvc ha) g
+    rw [hcomm, mul_inv_cancel_right]
+    exact ha
+  have hpgv : IsPGroup 2 ↥(Subgroup.zpowers v) :=
+    IsPGroup.of_card (n := 1) (by rw [Nat.card_zpowers, hvord, pow_one])
+  have hle : Subgroup.zpowers v ≤ (P : Subgroup ↥N) := hpgv.le_sylow_of_normal P
+  have hvP : v ∈ ((T : Subgroup G) ⊓ N).subgroupOf N := by
+    rw [← hPcoe]; exact hle (Subgroup.mem_zpowers v)
+  have := (Subgroup.mem_subgroupOf).mp hvP
+  rw [hinf] at this
+  exact this
+
+/-- **Navarro p. 139, the branch `P ≤ N`.**  If the involution `z` is *central* in the normal
+subgroup `N` containing the Sylow `2`-subgroup — which is what induction on `|G|` supplies — then
+it is central in `G`.
+
+Every `G`-conjugate `w` of `z` is again a central involution of `N`, so both `z` and `w` lie in
+`T ≅ Q₈` (`mem_sylow_of_mem_center_of_orderOf_eq_two`), whose involution is unique. -/
+theorem q8_mem_center_of_mem_center_normal (T : Sylow 2 G)
+    (e : ↥(T : Subgroup G) ≃* QuaternionGroup 2) {z : G} (hz : orderOf z = 2)
+    {N : Subgroup G} [N.Normal] (hTN : (T : Subgroup G) ≤ N) (hzN : z ∈ N)
+    (hzc : ∀ x ∈ N, x * z = z * x) : z ∈ Subgroup.center G := by
+  have hz2 : z ^ 2 = 1 := by
+    have h := pow_orderOf_eq_one z
+    rwa [hz] at h
+  have hz1 : z ≠ 1 := fun h => by simp [h] at hz
+  have hzT := mem_sylow_of_mem_center_of_orderOf_eq_two T hTN hzN hz hzc
+  rw [Subgroup.mem_center_iff]
+  intro g
+  -- the conjugate is again a central involution of `N`
+  set w := g * z * g⁻¹ with hw
+  have hwN : w ∈ N := Subgroup.Normal.conj_mem ‹N.Normal› z hzN g
+  have hw2 : w ^ 2 = 1 := by
+    rw [hw, show g * z * g⁻¹ = MulAut.conj g z from rfl, ← map_pow, hz2, map_one]
+  have hw1 : w ≠ 1 := fun h =>
+    hz1 ((MulAut.conj g).injective (h.trans (map_one (MulAut.conj g)).symm))
+  have hword : orderOf w = 2 := orderOf_eq_prime hw2 hw1
+  have hwc : ∀ x ∈ N, x * w = w * x := by
+    intro x hxN
+    have hgx : g⁻¹ * x * g ∈ N := by
+      simpa using Subgroup.Normal.conj_mem ‹N.Normal› x hxN g⁻¹
+    have := hzc _ hgx
+    calc x * w = g * ((g⁻¹ * x * g) * z) * g⁻¹ := by rw [hw]; group
+      _ = g * (z * (g⁻¹ * x * g)) * g⁻¹ := by rw [this]
+      _ = w * x := by rw [hw]; group
+  have hwT := mem_sylow_of_mem_center_of_orderOf_eq_two T hTN hwN hword hwc
+  -- both are involutions of `T ≅ Q₈`
+  have hkey : (⟨w, hwT⟩ : ↥(T : Subgroup G)) = ⟨z, hzT⟩ :=
+    eq_of_sq_eq_one_of_quaternionTwo e (Subtype.ext (by push_cast; exact hw2))
+      (fun h => hw1 (congrArg Subtype.val h)) (Subtype.ext (by push_cast; exact hz2))
+      (fun h => hz1 (congrArg Subtype.val h))
+  have hgz : w = z := congrArg Subtype.val hkey
+  calc g * z = g * z * g⁻¹ * g := by group
+    _ = z * g := by rw [← hw, hgz]
 
 /-- **Brauer–Suzuki for `Q₈`, the residual statement** (Navarro pp. 139–146; issue 9506): with
 `O_{2'}(G) = 1`, the involution of a quaternion Sylow `2`-subgroup of order `8` is central.
