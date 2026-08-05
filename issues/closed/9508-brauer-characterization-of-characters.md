@@ -405,8 +405,26 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
 そこから導かれ、`principalBasicSetMatrix` の整数性が使える形になること。
 build green + AxiomsCheck 登録 + sorry 非退行。
 
-**⟹ 2026-08-06 に全条件を満たした** (段 A–J 完了)。9506 側 (BS 本証明 pp.139–146) が
-この issue の成果を消費する段階に入る。
+**⟹ 2026-08-06 に全条件を満たした** (段 A–J 完了、full build green / AxiomsCheck 全 OK /
+lint --strict clean)。9506 側 (BS 本証明 pp.139–146) がこの issue の成果を消費する段階に入る。
+
+⚠ **完了条件の文言 1 箇所は起票時に誤っていた**: 「`principalBasicSetMatrix` の整数性」は
+**偽**で達成不能 (段 H5 で反例確定 — その族は `D C⁻¹` = 擬似逆行列)。正しくは
+「`U` が整数の形で下流に供給されること」で、それは段 I (係数族の抽象化) + 段 J
+(整数族での instantiate = `intBasicSetMatrix`) で達成した。
+
+## 成果物 (下流が使うもの)
+
+| 名前 | 内容 |
+|---|---|
+| `inducedVirtualCharacters_eq_virtualCharacters` | `v(G) = ch(G)` (Gorenstein Lemma 7.10) |
+| `mem_inducedVirtualCharacters_of_restrict` | Brauer's characterization of characters |
+| `exists_int_sum_wedderburnRepresentation` | Navarro (2.16) |
+| `exists_int_block_sum_eq_irreducibleBrauerCharacter{,_of_isAlgClosed}` | Navarro (3.16) |
+| `basicSetMatrixOf` + 4 定理 | (7.3)/(7.4) を抽象係数族で |
+| `exists_intBlockCoeff` / `intBasicSetMatrix` | 整数係数族と整数 `U` |
+| `sum_decompositionMatrix_mul_intBasicSetMatrix` | `D_𝓑 = D_B U` (ℤ) |
+| `sum_intBasicSetMatrix_mul_cartanMatrix` | `UᵗCU = 1 + δ` (ℤ) |
 
 ## 参照
 

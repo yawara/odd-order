@@ -2607,17 +2607,28 @@ Problem (3.4) (ブロックの Cartan 行列は分解不能) を使うが、**BS
 主ブロック同士の対応だけ**で、それは「自明指標を含む」ことから直接出る。上記 (iii)(c) と
 段 215 が解析的な内容の全部。
 
-### ⏸ 次 session の着手点 (2026-08-05 session 終了時点)
+### ✅ issue 9508 完了 (2026-08-06) — 上流前提はもう無い
 
-1. **[issue 9508](9508-brauer-characterization-of-characters.md) = Brauer's characterization
-   of characters (Brauer–Tate)**。これが 9506 に残る**唯一の本質的な上流前提**
-   (BS p.141-142 の「`D^t_j` は整数列」→ `U` の整数性 → (3.16) → (2.16) → (2.15) →
-   Brauer 指標判定)。原典は Gorenstein 1968 §4.7 (書籍 pp.160-170、ページ画像取得済)。
-   アーキテクチャ判断・段分けは 9508 に記載。
-2. その後 BS 本証明 pp.139-146 の残り。必要な群論的事実 (原文 p.138 が列挙):
-   `Aut(Q₈) = Sym(4)` / 巡回 Sylow 2 なら正規 2-補群 / 対合 2 つが生成する群は二面体 /
-   `P` が `G`-fusion を制御 ⟺ 正規 p-補群 / `Q₈` の指標表 (p.138 に掲載)。
-   さらに p.141 末: `τ(t) ≡ τ(y) mod 2` (`Q₈` の指標表から)。
+[9508](closed/9508-brauer-characterization-of-characters.md) (Brauer's characterization of
+characters → Navarro (2.15)/(2.16)/(3.16) → `U` の整数性) を **closed**。9506 に残っていた
+**唯一の本質的な上流前提が消えた**。下流が使える形:
+
+- `inducedVirtualCharacters_eq_virtualCharacters` = `v(G) = ch(G)`
+- `mem_inducedVirtualCharacters_of_restrict` = Brauer の指標判定本体
+- `exists_int_block_sum_eq_irreducibleBrauerCharacter_of_isAlgClosed` = **(3.16) 無条件版**
+  (`[IsAlgClosed (ResidueField 𝒪)]` + `[IsAlgClosed K]` だけ; BS の具体系
+  `PadicComplexSystem` は両方満たす)
+- `intBasicSetMatrix` + `sum_decompositionMatrix_mul_intBasicSetMatrix`
+  (`D_𝓑 = D_B U` over ℤ) + `sum_intBasicSetMatrix_mul_cartanMatrix` (`UᵗCU = 1 + δ` over ℤ)
+  ⟹ **p.141-142 の「`D^t_j` は整数列」の土台**
+
+### ⏸ 次 session の着手点 (2026-08-06 更新)
+
+**BS 本証明 pp.139-146 の残り**。必要な群論的事実 (原文 p.138 が列挙):
+`Aut(Q₈) = Sym(4)` / 巡回 Sylow 2 なら正規 2-補群 / 対合 2 つが生成する群は二面体 /
+`P` が `G`-fusion を制御 ⟺ 正規 p-補群 / `Q₈` の指標表 (p.138 に掲載)。
+さらに p.141 末: `τ(t) ≡ τ(y) mod 2` (`Q₈` の指標表から)。
+⚠ 着手前に repo 実測で再確認する (上の (B) 節の実測は 2026-08-05 時点)。
 
 ⚠ 上記の番号は Navarro の結果番号であって段番号ではない (段番号は連番で振り直す)。
 ⚠ 数式は OCR 崩れが重いので、各段の statement は `references/navarro/pages/*.png` で確定する
