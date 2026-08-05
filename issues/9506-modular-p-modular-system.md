@@ -2250,19 +2250,28 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
                 (段 186 の平方和が `Irr(B₀)` 上の和になる) +
                 `Algebra/SumSquaresFour` (`Σ a_i² = 4`, 全非零, ある `a_{i₀} = 1`
                 ⟹ 全項 ±1 かつ項数 4)。
-          - [ ] **⏸ 次 = 残り 3 段**:
-                * **段 189 (非零性)**: `χ ∈ Irr(B₀)` なら `d^t_{χφ₀} ≠ 0`。
-                  さもなくば段 187 と「2-特異元の 2-部分は involution で全て `t` に共役」から
-                  `χ` が全 2-特異元で消え、`PrincipalBlockNonvanishing`
-                  (`not_dvd_card_of_character_eq_zero_of_pSingular`) が `2 ∤ |G|` を出して矛盾。
-                * **段 190 (整数性 + `d^t_{1_G,1} = 1`)**: 段 187 を `y = 1` で使って
-                  `d^t_{χφ₀} = χ(t)`、段 178 で `χ(t) ∈ ℤ` の像。
-                  ⚠ **未調査**: 自明指標の添字 `j₀ : κ` が `blockOfIrr eG j₀ = principalBlock` を
-                  満たすこと (repo に既存かは要 grep)。
-                * **段 191 ((7.2) 第 2 部の組み立て)**: 上を `SumSquaresFour` に入れて
-                  `k(B₀) = 4` と `χ_i(t) = ±1`。続けて `χ_i(1) ≡ ε_i mod 4`
-                  (`[(χ_i)_P, 1_P] = (χ_i(1) + 3ε_i)/4` が整数) と
-                  `1 + Σ ε_i χ_i(s) = 0` (ブロック直交性 (5.11))。
+          - [x] 🎯🎯 **段 189-190 (`Modular/SecondMainPrincipalBlock`)**:
+                * `character_eq_generalizedDecompositionNumber_of_not_isPRegular`:
+                  「非自明な `p`-元は全て `x` に共役」の下で**全 `p`-特異元** `u` に対し
+                  `χ(u) = d^x_{χφ₀}` (`u = u_p u_{p'}` を `c` で戻して段 187)。
+                  ⚠ `rw` は `⟨_, hmem⟩` の証明部が `x` 依存で motive が壊れる → `change` 経由。
+                * `generalizedDecompositionNumber_ne_zero_of_blockOfIrr_principal`:
+                  `χ ∈ Irr(B₀)`, `x ≠ 1` なら `d^x_{χφ₀} ≠ 0` (対偶 + Navarro (3.18))。
+                  ⚠ 原文は「involution で消える」から (3.18) へ飛ぶが、(3.18) が要るのは
+                  **全 2-特異元での消滅**なので段 189 を先に経由する必要がある。
+          - [ ] **⏸ 次 = 段 191 ((7.2) 第 2 部の組み立て)**:
+                (a) 段 186 の `Σ_{j:Irr(G)} (d^t_{χ_jφ₀})² = c_{φ₀φ₀}` を段 188 で
+                    `Irr(B₀)` 上の和に絞る (filter 和 → subtype 和)。
+                (b) `c_{φ₀φ₀} = 4` = 段 185 に `|C_G(t)| = 4|N|` を入れる。
+                (c) 段 187 (`y = 1`) で `d^t_{χφ₀} = χ(t)`、段 178
+                    (`exists_intCast_character_of_mul_self_eq_one`) で `χ(t) ∈ ℤ` の像。
+                    `K` は標数 0 なので `Σ n_χ² = 4` が **ℤ で**成り立つ。
+                (d) `n_χ ≠ 0` = 段 190。`|Irr(B₀)| ≠ 1` = **弱ブロック直交性**
+                    (`BlockKernel.sum_character_one_mul_character_eq_zero`:
+                    `Σ_{χ∈Irr(B₀)} χ(1)χ(t) = 0`; 単元集合なら `χ(t) = 0` で段 190 に矛盾)。
+                (e) `Algebra/SumSquaresFour` で `|Irr(B₀)| = 4` と `χ_i(t) = ±1`。
+                その後: `χ_i(1) ≡ ε_i mod 4` (`[(χ_i)_P, 1_P] = (χ_i(1) + 3ε_i)/4` が整数) と
+                `1 + Σ ε_i χ_i(s) = 0` (ブロック直交性 (5.11))。
         ⚠ (5.12)/(5.13) は Ch.5 なので**文書順で先**。上流優先で (5.13)(b) →
         (5.12) → (7.2) の順に当たる。
         - [x] 🎯🎯 **(5.13)(a) 前半 完了 (2026-08-05、段 173)**:
