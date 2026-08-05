@@ -114,6 +114,7 @@ import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
 import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
 import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacter
+import OddOrder.GroupTheory.RepresentationTheory.CharacterEigenvalues
 import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacterPairing
 import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacterInduction
 import OddOrder.GroupTheory.RepresentationTheory.BrauerInductionIdeal
@@ -18043,3 +18044,21 @@ projection formula = Gorenstein Lemma 7.2 (`v(G)` が `ch(G)` のイデアルで
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.mem_inducedVirtualCharacters_of_mem_adjoinSpan
+
+/-! 🎯 **Brauer 指標判定 (issue 9508 段 D 前半)**: 指標値を 1 の冪根の和として読む
+(`RepresentationTheory/CharacterEigenvalues`)。`g^m = 1` かつ `K` が原始 `m` 乗根を含むなら
+`ρ g` は対角化可能 (既存 `OddOrder.isInternal_eigenspace_of_pow`) なので
+`χ_ρ(g^k) = Σ_ζ dim(eigenspace (ρ g) ζ)·ζ^k` が**全ての `k` で同じ重複度**を使って成立する。
+`k = 1` と `k = p^s` を同時に読むと標数 `p` の Frobenius で
+`χ(g)^{p^s} ≡ χ(g^{p^s}) (mod p)` (= Gorenstein Lemma 7.5 の解析的核心) が出る。
+⚠ `ρ g` と `ρ (g^k)` の固有空間を比較する必要が無い点が要 (`A^k` の固有空間は融合しうる)。
+併せて `character_mem_adjoin` (指標値は `ℤ[ω]` の元) — Lemma 7.5 の「mod pR」の舞台。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.trace_pow_eq_sum_finrank_smul
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.character_pow_eq_sum_finrank_smul
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.character_mem_adjoin
