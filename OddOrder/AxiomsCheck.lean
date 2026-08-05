@@ -278,6 +278,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
+import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
@@ -560,7 +561,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 17500
+set_option linter.style.longFile 17700
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -17494,3 +17495,18 @@ Klein 四元群 Sylow-2 を持つ群は単一類になれない ((7.2) が `C = 
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.card_mul_cartanMatrix_principalBlock
+
+/-! 🎯🎯 **Navarro (5.13)(b) の対合版**: `Σ_{χ∈Irr(G)} (d^t_{χφ})² = c_{φφ}`
+(`Modular/GeneralizedDecompositionInvolution`)。(5.13)(b) は `x⁻¹` 側の数を別の族 `dinv` として
+受け取るが、`t` が involution なら `t⁻¹ = t` ゆえ**同じ族**が条件を満たす:
+`y ∈ C_G(t)` に対し `(t y)⁻¹ = y⁻¹ t⁻¹ = y⁻¹ t = t y⁻¹`
+(`inv_mul_eq_mul_inv_of_mul_self_eq_one`) なので、`y⁻¹` での定義式がそのまま
+`χ((t y)⁻¹)` の展開になる。⟹ 右辺が Cartan 行列の対角成分になり、
+段 185 の `card_mul_cartanMatrix_principalBlock` と噛み合う ((7.2) 原文 p.132 の
+`Σ_{χ∈Irr(B₀)} |d^t_{χ1}|² = 4`)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.inv_mul_eq_mul_inv_of_mul_self_eq_one
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_sq_generalizedDecompositionNumber_of_involution
