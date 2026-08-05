@@ -245,6 +245,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiago
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
 import OddOrder.Algebra.SumSquaresFour
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing

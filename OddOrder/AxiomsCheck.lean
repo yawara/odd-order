@@ -281,6 +281,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiago
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
 import OddOrder.Algebra.SumSquaresFour
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
@@ -17568,3 +17569,23 @@ Klein 四元群 Sylow-2 を持つ群は単一類になれない ((7.2) が `C = 
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_ne_zero_of_blockOfIrr_principal
+
+/-! 🎯🎯🎯 **Navarro (7.2) 指標側**: `|Irr(B₀)| = 4` かつ `χ(t) = ±1`
+(`Modular/PrincipalBlockInvolution`)。仮定は「非自明な 2-元は全て `t` に共役」
+(= Klein 四元群 Sylow-2 + involution の類 1 個) と `C_G(t)` が正規 2-補群を持つこと。
+ - `sum_sq_character_involution_eq_cartanMatrix`: `Σ_{χ∈Irr(B₀)} χ(t)² = c_{φ₀φ₀}`
+   (段 186 の対合版 (5.13)(b) + 段 188 の `Irr(B₀)` 外での消滅 + 段 187 を `y = 1` で読む)。
+ - `nontrivial_blockOfIrr_principal`: 弱ブロック直交性 `Σ_{χ∈Irr(B₀)} χ(1)χ(t) = 0`
+   (Navarro (5.11) の `h = 1`) は `|Irr(B₀)| = 1` を許さない — 単元なら `χ(t) = 0` になり
+   段 190 に反する。⟹ 自明指標の添字を repo から取り出す必要が無い。
+ - 組み立て: `χ(t)` は有理整数 (段 178) で非零 (段 190)、平方和は `c_{φ₀φ₀} = 4`。
+   `Algebra/SumSquaresFour` が `|Irr(B₀)| = 4` と `χ(t) = ±1` を出す。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_sq_character_involution_eq_cartanMatrix
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.nontrivial_blockOfIrr_principal
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_blockOfIrr_principal_eq_four_and_character_involution
