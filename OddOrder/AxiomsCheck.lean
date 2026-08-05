@@ -17766,3 +17766,15 @@ Navarro Lemma (3.16) の `K` 版。係数は `a_χ = Σ_τ d_{χτ} [τ, μ₀]�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.pairingZero_irreducibleBrauerCharacter_eq_zero_of_centralCharacterAlg_ne
+
+/-! 🎯🎯 **`μ₀ ∈ IBr(B)` は `{χ⁰ : χ ∈ Irr(B)}` の `K`-結合** (`Modular/BrauerFromOrdinary`) —
+(3.16) の `K` 版の**ブロック局所形**。段 204 の係数 `a_χ = Σ_τ d_{χτ}[τ,μ₀]⁰` は
+`χ ∉ Irr(B)` で消える: 非零項には `d_{χτ} ≠ 0` (⟹ `τ ∈ B(χ)`、段 184) と
+`[τ,μ₀]⁰ ≠ 0` (⟹ `τ ∈ B(μ₀)`、段 205) の両方が要る。
+⟹ **basic set は block の `IBr` と同じ `K`-空間を張る** = (7.3) の `U` が `K` 上で存在する。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.ordinaryCombinationCoeff_eq_zero_of_blockOfIrr_ne
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_ordinaryCombination_block_eq_irreducibleBrauerCharacter

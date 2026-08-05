@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanBlockDiagonal
+import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
 
 /-!
@@ -174,5 +175,60 @@ theorem sum_ordinaryCombination_eq_irreducibleBrauerCharacter (μ₀ : ι) {g : 
         rw [Finset.sum_congr rfl fun μ _ => by
           rw [sum_cartanMatrix_mul_pairingZero hp hω hω' hπ hlin hkerJ e μ₀ μ]]
         simp
+
+/-! ### The combination is supported on `Irr(B)` -/
+
+section Block
+
+variable [FaithfulSMul 𝒪 K] [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)]
+  (hnil : ∀ z : Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) G),
+    MatrixModule.blockCharacterPi π hπ hlin z = 0 → IsNilpotent z)
+
+set_option maxHeartbeats 800000 in
+-- Both block-diagonality statements carry the full modular-datum chain; `DecidableEq ι` is what
+-- makes the Cartan inverse elaborate.
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+include hp hω hω' hkerJ e hnil in
+/-- **The coefficients vanish off `Irr(B)`.**  A nonzero term needs both `d_{χτ} ≠ 0` — which puts
+`τ` in the block of `χ` (`blockOfIrr_eq_of_decompositionMatrix_ne_zero`) — and `[τ,μ_0]⁰ ≠ 0`,
+which puts `τ` in the block of `μ_0` (`pairingZero_..._of_centralCharacterAlg_ne`). -/
+theorem ordinaryCombinationCoeff_eq_zero_of_blockOfIrr_ne (μ₀ : ι) {i : ι'}
+    (hi : blockOfIrr e hπ hlin hnil i ≠ Quotient.mk (MatrixModule.blockSetoid π hπ hlin) μ₀) :
+    ordinaryCombinationCoeff hp hω hω' hπ hlin hkerJ e μ₀ i = 0 := by
+  classical
+  refine Finset.sum_eq_zero fun τ _ => ?_
+  by_cases hd : decompositionMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e i τ = 0
+  · rw [hd, Nat.cast_zero, zero_mul]
+  by_cases hcc : MatrixModule.centralCharacterAlg π τ hπ hlin
+      = MatrixModule.centralCharacterAlg π μ₀ hπ hlin
+  · exact absurd ((blockOfIrr_eq_of_decompositionMatrix_ne_zero hp hω hω' hπ hlin hkerJ hnil e i
+      hd).symm.trans (Quotient.sound hcc)) hi
+  · rw [pairingZero_irreducibleBrauerCharacter_eq_zero_of_centralCharacterAlg_ne hp hω hω' hπ hlin
+      hkerJ e hcc, mul_zero]
+
+set_option maxHeartbeats 800000 in
+-- Same chain as the two results it combines.
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+open scoped Classical in
+include hp hω hω' hkerJ e hnil in
+/-- **`μ_0 ∈ IBr(B)` is a `K`-combination of `{χ⁰ : χ ∈ Irr(B)}`.**  This is the block-local form
+of the `K`-version of Navarro (3.16), and it is what makes a basic set of `B` span the same space
+as `IBr(B)` — i.e. what makes the change-of-basis matrix `U` of (7.3) exist over `K`. -/
+theorem sum_ordinaryCombination_block_eq_irreducibleBrauerCharacter (μ₀ : ι) {g : G}
+    (hg : IsPRegular p g) :
+    (∑ i ∈ Finset.univ.filter (fun i => blockOfIrr e hπ hlin hnil i
+        = Quotient.mk (MatrixModule.blockSetoid π hπ hlin) μ₀),
+      ordinaryCombinationCoeff hp hω hω' hπ hlin hkerJ e μ₀ i *
+        algebraMap 𝒪 K (ordinaryCharacter (𝒪 := 𝒪) e i g))
+      = algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π μ₀ g) := by
+  classical
+  rw [Finset.sum_subset (Finset.filter_subset _ Finset.univ) fun i _ hi => by
+    rw [ordinaryCombinationCoeff_eq_zero_of_blockOfIrr_ne hp hω hω' hπ hlin hkerJ e hnil μ₀
+      (fun hcon => hi (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hcon⟩)), zero_mul]]
+  exact sum_ordinaryCombination_eq_irreducibleBrauerCharacter hp hω hω' hπ hlin hkerJ e μ₀ hg
+
+end Block
 
 end OddOrder.RepresentationTheory.Modular
