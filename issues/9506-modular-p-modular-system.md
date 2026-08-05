@@ -2468,9 +2468,26 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
 ⟹ **BS "Analysis at y" (p.140) の 4 部品は全て揃った**:
   `χ_i(y) = d^y_{χ_i1}` (段 187) / `b₀` の Cartan `(4)` (段 185) /
   `Σ_i χ_i(y)² = 4` (段 197-198) / `Σ_i χ_i(y)χ_i(1) = 0` (段 195)。
-  残るのは「`⟨y⟩` が `C_G(y)` の Sylow-2 ⟹ 正規 2-補群」(巡回 Sylow-2、既存に近いものあり:
-  `Isaacs.Ch05.hasNormalPComplement_of_isCyclic_sylow_of_dvd_index`) と、
-  p.140 以降 (pp.141-146) の読解。
+  ~~「`⟨y⟩` が `C_G(y)` の Sylow-2 ⟹ 正規 2-補群」~~ → **段 200 で完了**
+  (`GroupTheory/CentralSylowComplement`: `P ≤ Z(G)` なら `N_G(P) ≤ C_G(P) = G` で既存 Burnside)。
+  ⚠ `hasNormalPComplement_of_isCyclic_sylow_of_dvd_index` は別物 (`N ⊴ G` 用) で使わない。
+
+### ⚠ "Analysis at t" (p.141) の読解 — **basic set の枠組みが本当に要る所**
+
+`C_G(t)/⟨t⟩` は Klein 四元群 Sylow-2 を持ち involution の類は 1 個 (`P` の位数 4 の元が
+`C_G(t)`-共役だから) なので **(7.4) がそこで使える**: `b̄₀` の basic set `{1, ψ₁, ψ₂}`
+(奇数次数) と Cartan `c_ij = 1 + δ_ij` が得られる。次に **(7.6)** で `C_G(t)` 自身の `b₀` へ
+持ち上げる (同じ basic set、Cartan は `|⟨t⟩| = 2` 倍)。そのうえで **(7.5)(a)** と第三主定理から
+  `χ_i(tu) = Σ_{j=0}^{2} d^t_{χ_iψ_j} ψ_j(u)`  (`u ∈ C_G(t)⁰`)
+となり、(7.5)(b,c,d) が `(D^t_i, D^t_j) = 2(1+δ_ij)`, `(D^y_0, D^t_j) = 0`,
+`(χ(1), D^t_j) = 0` を与える。
+
+⟹ **(7.3) basic set の定義層 + (7.5) の basic-set 版一般化分解数 + (7.6) は迂回できない**
+(段 195-196 で (7.4) の「3 つが独立」だけは (5.12) 抜きで済んだが、(7.5)/(7.6) は本体が要る)。
+次の大きな作業単位はこれ。
+
+さらに p.141 末: `P = Q₈` の指標表から `τ(t) ≡ τ(y) mod 2` (⟹ `ξ(t) ≡ ξ(y) mod 2`) を使う。
+これは前記 (B) の「`Q₈` の指標表」に対応する。
   (`Aut(Q₈)` 相当・二面体・`Q₈` 指標表) → BS 本体。
 
 ⚠ 上記の番号は Navarro の結果番号であって段番号ではない (段番号は連番で振り直す)。
