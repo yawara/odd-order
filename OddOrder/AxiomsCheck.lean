@@ -18438,3 +18438,6 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_decompositionMatrix_mul_ordinaryCharacter
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.irreducibleBrauerCharacter_mem_virtualCharacters

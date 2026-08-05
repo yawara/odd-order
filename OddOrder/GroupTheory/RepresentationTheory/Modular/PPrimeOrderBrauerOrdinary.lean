@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerFromOrdinary
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderCartan
+import OddOrder.GroupTheory.RepresentationTheory.Modular.VirtualCharacterSplitting
 
 /-!
 # `IBr(G) ⊆ ℕ · Irr(G)` for a `p'`-group
@@ -26,6 +27,8 @@ character has to be recognised as an ordinary one.
 * `OddOrder.RepresentationTheory.Modular.ordinaryCombinationCoeff_eq_natCast_of_not_dvd_card`
 * `OddOrder.RepresentationTheory.Modular.sum_decompositionMatrix_mul_ordinaryCharacter` —
   `φ = ∑_χ d_{χφ} χ`
+* `OddOrder.RepresentationTheory.Modular.irreducibleBrauerCharacter_mem_virtualCharacters` —
+  `IBr(G) ⊆ ch(G)`
 
 ## References
 
@@ -105,5 +108,30 @@ theorem sum_decompositionMatrix_mul_ordinaryCharacter [IsAlgClosed (ResidueField
   rw [← sum_ordinaryCombination_eq_irreducibleBrauerCharacter hp hω hω' hπ hlin hkerJ e μ₀ hg]
   exact Finset.sum_congr rfl fun i _ => by
     rw [ordinaryCombinationCoeff_eq_natCast_of_not_dvd_card hp hω hω' hπ hlin hkerJ e hG μ₀ i]
+
+-- Instances driving the Cartan/decomposition matrices, as above.
+set_option linter.unusedDecidableInType false in
+set_option linter.unusedFintypeInType false in
+include hp hω hω' hπ hlin hkerJ e in
+/-- **An irreducible Brauer character of a `p'`-group is a virtual character** — indeed a genuine
+character, being the `ℕ`-combination `∑_χ d_{χφ} χ`.  This is the form Brauer's characterization
+of characters consumes on the `p'`-part of an elementary subgroup. -/
+theorem irreducibleBrauerCharacter_mem_virtualCharacters [IsAlgClosed (ResidueField 𝒪)]
+    (hG : ¬ p ∣ Nat.card G) (μ₀ : ι) :
+    (fun g => algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π μ₀ g))
+      ∈ virtualCharacters K G := by
+  classical
+  have hfun : (fun g => algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π μ₀ g))
+      = ∑ i : ι', (decompositionMatrix hp hω hω' hπ hlin hkerJ e i μ₀)
+          • (wedderburnRepresentation e i).character := by
+    funext g
+    rw [← sum_decompositionMatrix_mul_ordinaryCharacter hp hω hω' hπ hlin hkerJ e hG μ₀ g,
+      Finset.sum_apply]
+    exact Finset.sum_congr rfl fun i _ => by
+      rw [Pi.smul_apply, nsmul_eq_mul, Representation.character,
+        ← algebraMap_ordinaryCharacter (𝒪 := 𝒪) e i g]
+  rw [hfun]
+  exact AddSubgroup.sum_mem _ fun i _ =>
+    AddSubgroup.nsmul_mem _ (mem_virtualCharacters_wedderburnRepresentation e i) _
 
 end OddOrder.RepresentationTheory.Modular

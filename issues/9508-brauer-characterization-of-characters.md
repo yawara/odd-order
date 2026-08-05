@@ -260,7 +260,14 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
       `ordinaryCombinationCoeff_eq_natCast_of_not_dvd_card` (段 204 の `a_χ = d_{χμ₀} ∈ ℕ`) →
       `sum_decompositionMatrix_mul_ordinaryCharacter` = **Navarro (2.12)** `φ = Σ_χ d_{χφ} χ`。
       ⚠ `g` の `p`-正則性は仮説に要らない (`p'`-群では自動)。
-    - **H2e**: 制限。`θ|_Q` は制限加群の Brauer 指標 = `IBr(Q)` の **ℕ**-結合。
+    - [x] **H2e 前半 完了** (2026-08-05): `irreducibleBrauerCharacter_mem_virtualCharacters` —
+      `IBr(Q)` の値 (`K` に押し出したもの) は `ch(Q)` に入る
+      (`φ = Σ_χ d_{χφ} χ` と `mem_virtualCharacters_wedderburnRepresentation` から `nsmul_mem`)。
+    - [ ] **H2e 後半**: 制限。`θ|_Q` (`θ` は `G` の Brauer 指標) が `IBr(Q)` の **ℕ**-結合であること。
+      要点は 2 つ: (i) 制限加群の Brauer 指標 = Brauer 指標の制限、
+      (ii) ⚠ **指数が違う** — `brauerCharacter` は `pRegularExponent p G` で取るが `Q` 側は
+      `pRegularExponent p Q`。`ρ g ^ n = 1` を満たす任意の `n` で同じ値になることが要る
+      (段 212 の `pRegularExponent_quotient` と同型の問題)。
 
     ⟹ **H2 は複数 session 規模**。上流から H2a → H2b → H2c → H2d → H2e。
 
