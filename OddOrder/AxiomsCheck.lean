@@ -17176,3 +17176,13 @@ well-defined 性は `isConj_centralizer_of_isConj_mul` (助変数化の単射性
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.mem_centralizerOf_and_conj_of_conj_mul
+
+/-! **`p`-section の助変数化のファイバー** (`Modular/PSection`) —
+`(g,y) ↦ g(xy)g⁻¹` の `u ∈ S(x)` 上のファイバーは `C_G(x)` と全単射
+(他の逆像は `(g₀h, h⁻¹y₀h)`, `h ∈ C_G(x)` のみ)。
+(5.13) の内積で `S(x)` 上の和を `C_G(x)⁰` 上の和へ書き直す核。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.fiberEquivCentralizerOf
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_fiber_eq_card_centralizerOf

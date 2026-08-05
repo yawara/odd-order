@@ -30,6 +30,9 @@ decomposition numbers see.
 * `OddOrder.RepresentationTheory.Modular.pPart_mul_eq_of_isPElement` — `(xy)_p = x`
 * `OddOrder.RepresentationTheory.Modular.mem_pSection_iff` — the parametrisation of `S(x)`
 * `OddOrder.RepresentationTheory.Modular.forall_pSection_iff` — vanishing on `S(x)`, restated
+* `OddOrder.RepresentationTheory.Modular.fiberEquivCentralizerOf`,
+  `OddOrder.RepresentationTheory.Modular.card_fiber_eq_card_centralizerOf` — every fibre of
+  `(g, y) ↦ g (x y) g⁻¹` over `S(x)` has exactly `|C_G(x)|` elements
 * `OddOrder.RepresentationTheory.Modular.mem_centralizerOf_and_conj_of_conj_mul` — a *specific*
   conjugator taking `x y₁` to `x y₂` already lies in `C_G(x)` and takes `y₁` to `y₂`
 * `OddOrder.RepresentationTheory.Modular.isConj_centralizer_of_isConj_mul` — the parametrisation
@@ -210,6 +213,65 @@ theorem isConj_centralizer_of_isConj_mul (hp : p.Prime) {x y₁ y₂ : G} (hx : 
   obtain ⟨hmem, hconj⟩ :=
     mem_centralizerOf_and_conj_of_conj_mul hp hx hy₁ hy₂ h₁ h₂ hg
   exact ⟨g, hmem, hconj⟩
+
+/-! ### The fibres of the parametrisation
+
+The map `(g, y) ↦ g (x y) g⁻¹` from `G × C_G(x)⁰` onto the `p`-section `S(x)` has all fibres of
+size `|C_G(x)|`: if `g₀ (x y₀) g₀⁻¹ = u` is one preimage, the others are exactly
+`(g₀ h, h⁻¹ y₀ h)` for `h ∈ C_G(x)`.  This is what turns a sum over `S(x)` into a sum over the
+`p`-regular elements of `C_G(x)`. -/
+
+/-- **The fibre over `u = g₀ (x y₀) g₀⁻¹` of `(g, y) ↦ g (x y) g⁻¹` is a copy of `C_G(x)`**:
+the other preimages are exactly `(g₀ h, h⁻¹ y₀ h)` for `h ∈ C_G(x)`. -/
+noncomputable def fiberEquivCentralizerOf (hp : p.Prime) {x : G} (hx : IsPElement p x)
+    {u g₀ y₀ : G} (hy₀mem : y₀ ∈ centralizerOf x) (hy₀reg : IsPRegular p y₀)
+    (hg₀ : g₀ * (x * y₀) * g₀⁻¹ = u) :
+    {q : G × ↥(centralizerOf x) //
+        IsPRegular p ((q.2 : G)) ∧ q.1 * (x * (q.2 : G)) * q.1⁻¹ = u}
+      ≃ ↥(centralizerOf x) := by
+  classical
+  -- for a preimage `q`, the element `h := g₀⁻¹ q.1` lies in `C_G(x)` and moves `q.2` to `y₀`
+  have key : ∀ q : {q : G × ↥(centralizerOf x) //
+      IsPRegular p ((q.2 : G)) ∧ q.1 * (x * (q.2 : G)) * q.1⁻¹ = u},
+      g₀⁻¹ * q.1.1 ∈ centralizerOf x ∧
+        (g₀⁻¹ * q.1.1) * (q.1.2 : G) * (g₀⁻¹ * q.1.1)⁻¹ = y₀ := by
+    intro q
+    refine mem_centralizerOf_and_conj_of_conj_mul hp hx q.2.1 hy₀reg q.1.2.2 hy₀mem ?_
+    calc (g₀⁻¹ * q.1.1) * (x * (q.1.2 : G)) * (g₀⁻¹ * q.1.1)⁻¹
+        = g₀⁻¹ * (q.1.1 * (x * (q.1.2 : G)) * q.1.1⁻¹) * g₀ := by group
+      _ = g₀⁻¹ * u * g₀ := by rw [q.2.2]
+      _ = x * y₀ := by rw [← hg₀]; group
+  refine
+    { toFun := fun q => ⟨g₀⁻¹ * q.1.1, (key q).1⟩
+      invFun := fun h => ⟨(g₀ * (h : G), ⟨(h : G)⁻¹ * y₀ * (h : G), ?_⟩), ?_, ?_⟩
+      left_inv := fun q => ?_
+      right_inv := fun h => ?_ }
+  · exact (centralizerOf x).mul_mem
+      ((centralizerOf x).mul_mem ((centralizerOf x).inv_mem h.2) hy₀mem) h.2
+  · have hc := hy₀reg.conj (h : G)⁻¹
+    rwa [inv_inv] at hc
+  · have hxh : (h : G) * x * (h : G)⁻¹ = x := by
+      have hcx := (Subgroup.mem_centralizer_iff.mp h.2) x rfl
+      rw [← hcx]; group
+    change (g₀ * (h : G)) * (x * ((h : G)⁻¹ * y₀ * (h : G))) * (g₀ * (h : G))⁻¹ = u
+    calc (g₀ * (h : G)) * (x * ((h : G)⁻¹ * y₀ * (h : G))) * (g₀ * (h : G))⁻¹
+        = g₀ * (((h : G) * x * (h : G)⁻¹) * y₀) * g₀⁻¹ := by group
+      _ = g₀ * (x * y₀) * g₀⁻¹ := by rw [hxh]
+      _ = u := hg₀
+  · refine Subtype.ext (Prod.ext (by group) (Subtype.ext ?_))
+    change (g₀⁻¹ * q.1.1)⁻¹ * y₀ * (g₀⁻¹ * q.1.1) = (q.1.2 : G)
+    rw [← (key q).2]; group
+  · exact Subtype.ext (by change g₀⁻¹ * (g₀ * (h : G)) = (h : G); group)
+
+/-- **All fibres over the `p`-section have exactly `|C_G(x)|` elements.** -/
+theorem card_fiber_eq_card_centralizerOf (hp : p.Prime) {x : G} (hx : IsPElement p x) {u : G}
+    (hu : u ∈ pSection p x) :
+    Nat.card {q : G × ↥(centralizerOf x) //
+        IsPRegular p ((q.2 : G)) ∧ q.1 * (x * (q.2 : G)) * q.1⁻¹ = u}
+      = Nat.card ↥(centralizerOf x) := by
+  obtain ⟨y₀, hy₀mem, hy₀reg, hy₀conj⟩ := (mem_pSection_iff hp hx).mp hu
+  obtain ⟨g₀, hg₀⟩ := isConj_iff.mp hy₀conj.symm
+  exact Nat.card_congr (fiberEquivCentralizerOf hp hx hy₀mem hy₀reg hg₀)
 
 end PSection
 
