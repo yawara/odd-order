@@ -219,6 +219,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentatio
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderSemisimple
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderCartan
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderBrauerOrdinary
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
@@ -18419,3 +18420,21 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.cartanMatrix_eq_ite_of_not_dvd_card
+
+/-! 🎯🎯 **issue 9508 段 H2d**: `p'`-群では `IBr(G) ⊆ ℕ·Irr(G)`
+(`Modular/PPrimeOrderBrauerOrdinary`)。段 H2c (`C = I`) の payoff。
+
+- `pairingZero_eq_ite_of_not_dvd_card`: `([τ,μ]⁰)` は `C` の逆行列で、`C = I` なので `[τ,μ]⁰ = δ`。
+- `ordinaryCombinationCoeff_eq_natCast_of_not_dvd_card`: 段 204 の係数
+  `a_χ = Σ_τ d_{χτ}[τ,μ₀]⁰` が **`d_{χμ₀} ∈ ℕ`** に潰れる。
+- `sum_decompositionMatrix_mul_ordinaryCharacter` = **Navarro (2.12)**:
+  `φ = Σ_χ d_{χφ} χ`。⚠ `g` の `p`-正則性は仮説に要らない (`p'`-群では自動)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.pairingZero_eq_ite_of_not_dvd_card
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.ordinaryCombinationCoeff_eq_natCast_of_not_dvd_card
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_decompositionMatrix_mul_ordinaryCharacter

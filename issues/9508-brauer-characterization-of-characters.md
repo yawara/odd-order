@@ -255,8 +255,11 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
       ⚠ **`c_{jj} ≥ 1` は「正則指標の比較」でなく `C` の可逆性から出た** (`one_le_cartanMatrix_self`):
       `c_{jj} = Σ_i d_{ij}² = 0` なら列 `d_{·j}` が全消し ⟹ `C` の `j`-列が全消し ⟹
       `sum_cartanMatrix_mul_pairingZero` に矛盾。正則加群の Brauer 指標を作る必要がない。
-    - **H2d**: `C = I` ⟹ `C⁻¹ = ([τ,μ]⁰) = I` ⟹ 段 204 の `a_χ = d_{χμ₀} ∈ ℕ`。
-      `p'`-群では全元が `p`-正則なので `χ⁰ = χ` ⟹ `φ = Σ_χ d_{χφ} χ ∈ ch(Q)`。
+    - [x] **H2d 完了** (2026-08-05, `Modular/PPrimeOrderBrauerOrdinary.lean`):
+      `pairingZero_eq_ite_of_not_dvd_card` (`[τ,μ]⁰ = δ`) →
+      `ordinaryCombinationCoeff_eq_natCast_of_not_dvd_card` (段 204 の `a_χ = d_{χμ₀} ∈ ℕ`) →
+      `sum_decompositionMatrix_mul_ordinaryCharacter` = **Navarro (2.12)** `φ = Σ_χ d_{χφ} χ`。
+      ⚠ `g` の `p`-正則性は仮説に要らない (`p'`-群では自動)。
     - **H2e**: 制限。`θ|_Q` は制限加群の Brauer 指標 = `IBr(Q)` の **ℕ**-結合。
 
     ⟹ **H2 は複数 session 規模**。上流から H2a → H2b → H2c → H2d → H2e。
