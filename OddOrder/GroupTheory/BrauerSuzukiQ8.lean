@@ -772,6 +772,46 @@ reduces to this because `y ^ 4 = 1`. -/
 theorem quaternionTwo_eq_or_eq_inv_of_mem_powers : ∀ x y : QuaternionGroup 2, x ^ 2 ≠ 1 →
     y ^ 2 ≠ 1 → (x = 1 ∨ x = y ∨ x = y ^ 2 ∨ x = y ^ 3) → x = y ∨ x = y⁻¹ := by decide
 
+/-- **Every element of `Q₈` has order dividing `4`.** -/
+theorem quaternionTwo_pow_four : ∀ w : QuaternionGroup 2, w ^ 4 = 1 := by decide
+
+/-- **In a group isomorphic to `Q₈`, an element of order `4` inside `⟨y⟩` is `y` or `y⁻¹`.**
+The bridge from `Subgroup.zpowers` to the decidable list of powers goes through
+`mem_powers_iff_mem_zpowers` (so the exponent is a natural number) and `pow_mod_orderOf`. -/
+theorem eq_or_eq_inv_of_mem_zpowers_of_quaternionTwo {P : Type*} [Group P] [Finite P]
+    (e : P ≃* QuaternionGroup 2) {x y : P} (hx : x ^ 2 ≠ 1) (hy : y ^ 2 ≠ 1)
+    (hmem : x ∈ Subgroup.zpowers y) : x = y ∨ x = y⁻¹ := by
+  have hy4 : y ^ 4 = 1 := e.injective (by rw [map_pow, quaternionTwo_pow_four (e y), map_one])
+  have hy1 : y ≠ 1 := fun h => hy (by rw [h, one_pow])
+  have horder : orderOf y = 4 := by
+    have hdvd : orderOf y ∣ 4 := orderOf_dvd_of_pow_eq_one hy4
+    have hle : orderOf y ≤ 4 := Nat.le_of_dvd (by norm_num) hdvd
+    have h0 : orderOf y ≠ 0 := fun h => by rw [h] at hdvd; norm_num at hdvd
+    have h1 : orderOf y ≠ 1 := fun h => hy1 (orderOf_eq_one_iff.mp h)
+    have h2 : orderOf y ≠ 2 := fun h => hy (by rw [← h]; exact pow_orderOf_eq_one y)
+    have h3 : orderOf y ≠ 3 := fun h => by rw [h] at hdvd; norm_num at hdvd
+    omega
+  obtain ⟨n, hn⟩ := Submonoid.mem_powers_iff x y |>.mp (mem_powers_iff_mem_zpowers.mpr hmem)
+  have hmod : x = y ^ (n % 4) := by rw [← hn, ← horder, pow_mod_orderOf]
+  have hlist : x = 1 ∨ x = y ∨ x = y ^ 2 ∨ x = y ^ 3 := by
+    have hcase : n % 4 = 0 ∨ n % 4 = 1 ∨ n % 4 = 2 ∨ n % 4 = 3 := by omega
+    rcases hcase with h | h | h | h <;> rw [hmod, h]
+    · exact Or.inl (pow_zero y)
+    · exact Or.inr (Or.inl (pow_one y))
+    · exact Or.inr (Or.inr (Or.inl rfl))
+    · exact Or.inr (Or.inr (Or.inr rfl))
+  have hex : (e x) = 1 ∨ (e x) = e y ∨ (e x) = (e y) ^ 2 ∨ (e x) = (e y) ^ 3 := by
+    rcases hlist with h | h | h | h
+    · exact Or.inl (by rw [h, map_one])
+    · exact Or.inr (Or.inl (by rw [h]))
+    · exact Or.inr (Or.inr (Or.inl (by rw [h, map_pow])))
+    · exact Or.inr (Or.inr (Or.inr (by rw [h, map_pow])))
+  rcases quaternionTwo_eq_or_eq_inv_of_mem_powers (e x) (e y)
+    (fun hc => hx (e.injective (by rw [map_pow, hc, map_one])))
+    (fun hc => hy (e.injective (by rw [map_pow, hc, map_one]))) hex with h | h
+  · exact Or.inl (e.injective h)
+  · exact Or.inr (e.injective (by rw [h, map_inv]))
+
 /-- **Navarro p. 139: two elements of order `4` in `T` that fuse in `G` but not in `T`.**
 Unfolding the failure of fusion control (`not_controlsOwnFusion_of_oPiCore_eq_bot`); the two
 elements must have order `4` because `Q₈` has a *unique* involution, so involutions cannot fuse

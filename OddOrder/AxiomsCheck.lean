@@ -13437,6 +13437,8 @@ Pointwise` が要る。 -/
 取り出したもの。**位数 4 であることまで込み** — `Q₈` の対合は一意なので、対合どうしは
 非自明に融合できない (`x = 1` なら `y = 1`、`x` が対合なら `y = x` で、どちらも `u = 1` が効く)。 -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.quaternionTwo_eq_or_eq_inv_of_mem_powers
+#assert_only_allowed_axioms OddOrder.GroupTheory.quaternionTwo_pow_four
+#assert_only_allowed_axioms OddOrder.GroupTheory.eq_or_eq_inv_of_mem_zpowers_of_quaternionTwo
 #assert_only_allowed_axioms OddOrder.GroupTheory.exists_orderFour_fused
 /-! `sylowQ8_le_normalizer_zpowers` = 原文「every subgroup of `P` is normal in `P`」を `G` の中で
 `T ≤ N_G(⟨w⟩)` の形にしたもの。これが「`T` と `T^g` が `N_G(⟨z⟩)` の Sylow-2 ⟹ Sylow 共役で
