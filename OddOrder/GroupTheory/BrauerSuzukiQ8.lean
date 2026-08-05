@@ -515,16 +515,17 @@ theorem conj_eq_iff_of_quaternionTwo {P : Type*} [Group P] (e : P ≃* Quaternio
   ⟨fun g => conj_eq_self_or_inv_of_quaternionTwo e w g, exists_conj_eq_inv_of_quaternionTwo e hw,
     fun h => hw (by rw [sq]; exact mul_eq_one_iff_eq_inv.mpr h)⟩
 
-/-- **A group of odd order acting on a three-element type moves a point to everything or to
-nothing.**  Orbits have size dividing the (odd) group order, so each has size `1` or `3`; an orbit
-that is not a fixed point is therefore the whole set.
+/-- **A group of odd order acting with an orbit inside a three-element set is transitive on it.**
+Orbits have size dividing the (odd) group order, so an orbit contained in a `3`-element set has
+size `1` or `3`; if it is not a fixed point it is the whole set.
 
-This replaces Navarro's appeal to `Aut(Q₈) = Sym(4)`: the three cyclic subgroups of order `4` of
-`T` carry an action of `N_G(T)` through a quotient of odd order
+This replaces Navarro's appeal to `Aut(Q₈) = Sym(4)`: the three inverse pairs of elements of
+order `4` in `T` carry an action of `N_G(T)` through a quotient of odd order
 (`not_two_dvd_relIndex_sup_centralizer`), so one fusion forces all three to fuse. -/
-theorem orbit_eq_univ_of_odd_of_card_eq_three {H Ω : Type*} [Group H] [Finite H] [Fintype Ω]
-    [MulAction H Ω] (hodd : ¬ 2 ∣ Nat.card H) (hΩ : Fintype.card Ω = 3) {x : Ω}
-    (hx : ∃ h : H, h • x ≠ x) : MulAction.orbit H x = Set.univ := by
+theorem orbit_eq_of_odd_of_subset_card_three {H α : Type*} [Group H] [Finite H] [Finite α]
+    [MulAction H α] {s : Finset α} (hodd : ¬ 2 ∣ Nat.card H) (hs : s.card = 3)
+    {x : α} (hsub : ∀ h : H, h • x ∈ s) (hne : ∃ h : H, h • x ≠ x) :
+    ∀ y ∈ s, ∃ h : H, h • x = y := by
   classical
   letI := Fintype.ofFinite H
   letI : Fintype (MulAction.orbit H x) := Fintype.ofFinite _
@@ -533,30 +534,25 @@ theorem orbit_eq_univ_of_odd_of_card_eq_three {H Ω : Type*} [Group H] [Finite H
   have hdvd : Fintype.card (MulAction.orbit H x) ∣ Nat.card H := by
     rw [Nat.card_eq_fintype_card, ← hos]
     exact Dvd.intro _ rfl
-  have hle : Fintype.card (MulAction.orbit H x) ≤ 3 := by
-    rw [← hΩ]
-    exact Fintype.card_le_of_injective _ Subtype.val_injective
-  have hgt : 1 < Fintype.card (MulAction.orbit H x) := by
-    obtain ⟨h, hh⟩ := hx
-    refine Fintype.one_lt_card_iff.mpr ⟨⟨h • x, MulAction.mem_orbit x h⟩,
-      ⟨x, MulAction.mem_orbit_self x⟩, fun hc => hh (congrArg Subtype.val hc)⟩
-  have hne2 : Fintype.card (MulAction.orbit H x) ≠ 2 := fun h => hodd (h ▸ hdvd)
-  have hcard : Fintype.card (MulAction.orbit H x) = 3 := by omega
-  refine Set.eq_univ_of_forall fun y => ?_
-  have hfin : (MulAction.orbit H x).toFinset = Finset.univ :=
-    Finset.eq_univ_of_card _ (by rw [Set.toFinset_card, hcard, hΩ])
-  exact Set.mem_toFinset.mp (hfin ▸ Finset.mem_univ y)
-
-/-- **`Q₈` has exactly three cyclic subgroups of order `4`**, presented as the three pairs
-`{w, w⁻¹}` of elements of order `4` (i.e. of elements whose square is not `1`).
-
-These pairs are the blocks of the fusion argument: `T` fuses `w` only with `w⁻¹`
-(`conj_eq_iff_of_quaternionTwo`), and `N_G(T)` permutes the three pairs through a quotient of odd
-order (`not_two_dvd_relIndex_sup_centralizer`), so a single fusion makes the action transitive
-(`orbit_eq_univ_of_odd_of_card_eq_three`). -/
-theorem quaternionTwo_card_inversePairs :
-    ((Finset.univ.filter fun w : QuaternionGroup 2 => w ^ 2 ≠ 1).image
-      fun w => ({w, w⁻¹} : Finset (QuaternionGroup 2))).card = 3 := by decide
+  have hle : (MulAction.orbit H x).toFinset ⊆ s := by
+    intro y hy
+    rw [Set.mem_toFinset] at hy
+    obtain ⟨h, rfl⟩ := hy
+    exact hsub h
+  have hcardeq : (MulAction.orbit H x).toFinset.card = Fintype.card (MulAction.orbit H x) :=
+    Set.toFinset_card _
+  have hgt : 1 < (MulAction.orbit H x).toFinset.card := by
+    obtain ⟨h, hh⟩ := hne
+    refine Finset.one_lt_card.mpr ⟨h • x, Set.mem_toFinset.mpr (MulAction.mem_orbit x h), x,
+      Set.mem_toFinset.mpr (MulAction.mem_orbit_self x), hh⟩
+  have hne2 : (MulAction.orbit H x).toFinset.card ≠ 2 := fun h => hodd (by
+    rw [hcardeq] at h; exact h ▸ hdvd)
+  have hleq : (MulAction.orbit H x).toFinset.card ≤ 3 := hs ▸ Finset.card_le_card hle
+  have heq : (MulAction.orbit H x).toFinset = s :=
+    Finset.eq_of_subset_of_card_le hle (by omega)
+  intro y hy
+  rw [← heq, Set.mem_toFinset] at hy
+  exact hy
 
 /-- **The "inverse pairs" `{w, w⁻¹}` of elements of order `4`.**  For `P ≅ Q₈` these index the
 three cyclic subgroups of order `4`; they are the blocks of the fusion argument, because `P` fuses
@@ -581,6 +577,11 @@ theorem image_inversePairs {P Q : Type*} [Group P] [Fintype P] [DecidableEq P] [
     refine ⟨{e.symm v, (e.symm v)⁻¹}, ⟨e.symm v, fun hc => hv ?_, rfl⟩, ?_⟩
     · rw [← e.apply_symm_apply v, ← map_pow, hc, map_one]
     · simp [Finset.image_insert, Finset.image_singleton]
+
+/-- **`Q₈` has exactly three inverse pairs of elements of order `4`** — equivalently, exactly
+three cyclic subgroups of order `4`. -/
+theorem quaternionTwo_card_inversePairs : (inversePairs (QuaternionGroup 2)).card = 3 := by
+  decide
 
 /-- **`P ≅ Q₈` has exactly three inverse pairs of elements of order `4`.** -/
 theorem card_inversePairs_of_quaternionTwo {P : Type*} [Group P] [Fintype P] [DecidableEq P]

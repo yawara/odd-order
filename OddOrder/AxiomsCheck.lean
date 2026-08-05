@@ -13410,9 +13410,9 @@ characteristic ⟹ 既存の `normal_map_subtype_of_characteristic` で `G` で�
 #assert_only_allowed_axioms OddOrder.GroupTheory.exists_conj_eq_inv_of_quaternionTwo
 #assert_only_allowed_axioms OddOrder.GroupTheory.conj_eq_iff_of_quaternionTwo
 /-! `orbit_eq_univ_of_odd_of_card_eq_three` = **`Aut(Q₈) = Sym(4)` の代替**の核。
-奇位数群が 3 元集合に作用するとき、軌道の位数は群位数を割る (orbit-stabilizer) ので奇数、
-かつ ≤ 3 ⟹ 1 か 3。固定点でない軌道は全体。 -/
-#assert_only_allowed_axioms OddOrder.GroupTheory.orbit_eq_univ_of_odd_of_card_eq_three
+奇位数群の軌道の位数は群位数を割る (orbit-stabilizer) ので奇数、3 元集合に含まれるなら 1 か 3。
+固定点でない軌道はその 3 元集合全体になる。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.orbit_eq_of_odd_of_subset_card_three
 /-! `quaternionTwo_card_inversePairs` = **`Q₈` の位数 4 巡回部分群はちょうど 3 個**
 (`{w, w⁻¹}` の対として `decide` で数える)。融合論法の 3 元集合 `Ω` の濃度がこれ。 -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.quaternionTwo_card_inversePairs
