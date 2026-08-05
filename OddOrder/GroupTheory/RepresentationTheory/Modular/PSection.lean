@@ -157,6 +157,40 @@ theorem centralizerOf_mul_eq_inf (hp : p.Prime) {x y : G} (hcomm : Commute x y)
     exact ((h1.mul_right h2).symm).symm.symm
 
 omit [Finite G] in
+/-- **`|C_G(x y)| = |C_{C_G(x)}(y)|`** for a `p`-element `x` and a `p`-regular `y ∈ C_G(x)`.
+
+By `centralizerOf_mul_eq_inf` the left-hand group is `C_G(x) ⊓ C_G(y)`, and that is exactly the
+image in `G` of the centralizer of `y` taken inside the subgroup `C_G(x)`.  This is the class-size
+weight that appears when the second orthogonality relation of `G` is evaluated on the coset
+`x C_G(x)⁰`. -/
+theorem card_centralizerOf_mul_eq_card_centralizer_subtype (hp : p.Prime) {x : G}
+    (hx : IsPElement p x) {y : ↥(centralizerOf x)} (hy : IsPRegular p ((y : G))) :
+    Nat.card ↥(centralizerOf (x * (y : G)))
+      = Nat.card ↥(Subgroup.centralizer ({y} : Set ↥(centralizerOf x))) := by
+  have hcomm : Commute x (y : G) := (Subgroup.mem_centralizer_iff.mp y.2) x rfl
+  rw [centralizerOf_mul_eq_inf hp hcomm hx hy]
+  have hbwd : ∀ w : ↥(Subgroup.centralizer ({y} : Set ↥(centralizerOf x))),
+      ((w : ↥(centralizerOf x)) : G) ∈ centralizerOf x ⊓ centralizerOf ((y : G)) := fun w =>
+    Subgroup.mem_inf.mpr ⟨(w : ↥(centralizerOf x)).2,
+      Subgroup.mem_centralizer_iff.mpr fun _ hz => by
+        rw [Set.mem_singleton_iff] at hz
+        rw [hz]
+        exact congrArg Subtype.val (Subgroup.mem_centralizer_iff.mp w.2 y rfl)⟩
+  have hfwd : ∀ v : ↥(centralizerOf x ⊓ centralizerOf ((y : G)) : Subgroup G),
+      (⟨(v : G), (Subgroup.mem_inf.mp v.2).1⟩ : ↥(centralizerOf x))
+        ∈ Subgroup.centralizer ({y} : Set ↥(centralizerOf x)) := fun v =>
+    Subgroup.mem_centralizer_iff.mpr fun _ hz => by
+      rw [Set.mem_singleton_iff] at hz
+      rw [hz]
+      exact Subtype.ext
+        (Subgroup.mem_centralizer_iff.mp (Subgroup.mem_inf.mp v.2).2 (y : G) rfl)
+  exact (Nat.card_congr
+    { toFun := fun v => ⟨⟨(v : G), (Subgroup.mem_inf.mp v.2).1⟩, hfwd v⟩
+      invFun := fun w => ⟨((w : ↥(centralizerOf x)) : G), hbwd w⟩
+      left_inv := fun _ => rfl
+      right_inv := fun _ => rfl })
+
+omit [Finite G] in
 /-- **Every element lies in the section of its own `p`-part.**  Together with
 `isConj_of_mem_pSection_of_mem_pSection` this says the `p`-sections partition `G`. -/
 theorem mem_pSection_pPart (u : G) : u ∈ pSection p (pPart p u) :=

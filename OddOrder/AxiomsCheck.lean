@@ -266,6 +266,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerFormula
 import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterOffCentralizer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SectionProjectiveCharacter
+import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionSum
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
@@ -17209,3 +17210,62 @@ Navarro (5.13) が暗黙に行う付け替えで、類代表を選ばないの�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.centralizerOf_inv
+
+/-! 🎯 **`[Φ_μ, F]⁰ = d_μ`** (`Modular/CartanInverse`) — `p`-正則類上で
+`F(y) = Σ_τ d_τ τ(y⁻¹)` と展開される任意の `F` について
+`Σ_{y∈G⁰} Φ_μ(y) F(y) = |G| d_μ`。Navarro (2.13) `[Φ_θ,φ]⁰ = δ` の下流での唯一の使い方で、
+和の範囲を `p`-正則性で特徴づけた抽象 `Finset` で受けるので、呼び出し側が
+`pairingZero` の `Decidable` インスタンスに合わせる必要がない。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_projectiveIndecomposableCharacter_mul_eq
+
+/-! 🎯🎯 **内積 `[Φ^x_μ, χ] = d^{x⁻¹}_{χμ}`** (`Modular/SectionProjectiveCharacter`) —
+Navarro (5.13) の証明の内積計算。`x⁻¹` 側の分裂データを持ち込まず、係数族 `d` を引数で受けて
+その特徴づけ `Σ_τ d_τ μ_τ(y⁻¹) = χ((xy)⁻¹)` を `C_G(x)` の中だけで書く
+(`C_G(x⁻¹) = C_G(x)` を型の等式でなく部分群の等式として使う)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.inner_sectionProjectiveCharacter_eq
+
+/-! **`|C_G(xy)| = |C_{C_G(x)}(y)|`** (`Modular/PSection`) — 段 164 `C_G(xy) = C_G(x) ⊓ C_G(y)`
+の濃度版。`C_G(x)` の中で取った `y` の中心化群が、`G` の中の `C_G(x) ⊓ C_G(y)` に一致する。
+第二直交関係を剰余類 `x C_G(x)⁰` 上で読んだときに出る類の重み。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_centralizerOf_mul_eq_card_centralizer_subtype
+
+/-! **共役類上の類関数の和と `|class(w)|·|C_G(w)| = |G|`**
+(`Modular/OrdinaryColumnOrthogonality`) — 共役で切り出された任意の `Finset` の形で述べる。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_eq_card_smul_of_forall_isConj
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_mul_card_centralizer_of_forall_isConj
+
+/-! 🎯 **`|C_G(x)| d^x_{χφ} = Σ_{z∈C_G(x)⁰} Φ_φ(z) χ(x z⁻¹)`**
+(`Modular/GeneralizedDecompositionOrthogonality`) — 一般化分解数の内積表示。
+(5.1) の定義式 `χ(x z⁻¹) = Σ_τ d^x_{χτ} τ(z⁻¹)` を代入して `[Φ_φ, τ]⁰ = δ` で潰す。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_centralizerOf_mul_generalizedDecompositionNumber
+
+/-! 🎯🎯 **`Σ_{χ∈Irr(G)} χ((xy)⁻¹) d^x_{χφ} = Φ_φ(y⁻¹)`**
+(`Modular/GeneralizedDecompositionOrthogonality`) — 左辺は Fourier 係数が `d^x_{·φ}` である
+`G` の類関数 (= `Φ^{x⁻¹}_φ`) の値だが、その関数を作らずに計算する: 各 `d^x_{χφ}` を上の内積表示で
+展開し、`G` の**第二直交関係**を `Σ_χ χ((xy)⁻¹) χ(x z⁻¹)` に適用する。生き残る `z` は `y⁻¹` の
+`C_G(x)`-共役ちょうどで、そこで `Φ_φ` は定数。第二直交が出す重み `|C_G(xy)|` が
+その類の大きさを `|C_G(x)|` に対して打ち消す。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_character_mul_generalizedDecompositionNumber
+
+/-! 🎯🎯🎯 **Navarro (5.13)(b)**: `Σ_{χ∈Irr(G)} d^{x⁻¹}_{χμ} · d^x_{χφ} = c_{μφ}`
+(`Modular/GeneralizedDecompositionOrthogonality`) — 一般化分解数の直交性。
+抽象分裂体には複素共役が無いので、教科書の `conj(d^x_{χμ})` は `d^{x⁻¹}_{χμ}` に読み替える
+(Brauer 指標が `μ(y⁻¹) = conj(μ(y))` を満たすことによる)。`x⁻¹` 側の数は `C_G(x)` の中で書いた
+定義式を満たす族 `dinv` として受け取るので、`C_G(x⁻¹) = C_G(x)` に沿った分裂データの移送が要らない。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_mul_generalizedDecompositionNumber_eq_cartanMatrix

@@ -63,6 +63,25 @@ theorem sum_eq_sum_conjClasses {M : Type*} [AddCommMonoid M] [Fintype G]
   congr 1
   rw [conjugacyClassSize, Nat.card_eq_fintype_card]
 
+/-- **A class function is constant on a conjugacy class**, so its sum over any `Finset` cut out
+by conjugacy to `w` is `#t • f w`. -/
+theorem sum_eq_card_smul_of_forall_isConj {M : Type*} [AddCommMonoid M] (f : G → M)
+    (hf : ∀ a b : G, IsConj a b → f a = f b) (w : G) (t : Finset G)
+    (ht : ∀ z : G, z ∈ t ↔ IsConj z w) :
+    ∑ z ∈ t, f z = t.card • f w := by
+  rw [Finset.sum_congr rfl fun z hz => hf z w ((ht z).mp hz), Finset.sum_const]
+
+/-- **`|class(w)| · |C_G(w)| = |G|`**, for the conjugacy class presented as an arbitrary `Finset`
+cut out by conjugacy to `w`. -/
+theorem card_mul_card_centralizer_of_forall_isConj [Finite G] (w : G) (t : Finset G)
+    (ht : ∀ z : G, z ∈ t ↔ IsConj z w) :
+    t.card * Nat.card ↥(Subgroup.centralizer ({w} : Set G)) = Nat.card G := by
+  rw [← conjugacyClassSize_mk_mul_card_centralizer (G := G) w]
+  congr 1
+  rw [conjugacyClassSize, ← Nat.card_eq_finsetCard]
+  exact Nat.card_congr (Equiv.subtypeEquivRight fun z => (ht z).trans
+    (ConjClasses.mem_carrier_iff_mk_eq.trans ConjClasses.mk_eq_mk_iff_isConj).symm)
+
 /-- The size of a conjugacy class is invertible in `K`: it divides `|G|`, which is. -/
 theorem isUnit_conjugacyClassSize {K : Type*} [Field K] [Finite G]
     [Invertible (Nat.card G : K)] (C : ConjClasses G) :
