@@ -175,6 +175,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.AsModuleSimple
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderSemisimple
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderCartan
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber

@@ -218,6 +218,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleIsBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.MinimalSubrepresentation
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderSemisimple
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderCartan
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
@@ -18386,7 +18387,7 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
 - `exists_algEquiv_pi_matrix_of_not_dvd_card`: `J(k[Q]) = ⊥` ⟹ `BrauerCount` の分裂
   (代数閉 `k`) が**単射**になり `k[Q] ≅ ∏_j M_{d_j}(k)`。ブロック数 = 共役類数
   (`p'`-群では全元が `p`-正則)。
-- `sum_sq_eq_card_of_not_dvd_card`: `∑_j d_j² = |Q|`。これが段 H2c
+- `sum_sq_card_eq_card_of_bijective`: `∑_j n_j² = |Q|` (分裂があれば `p` に依らない)。これが段 H2c
   (`p'`-群の Cartan 行列 = 単位行列) の数え上げの片側。 -/
 
 #assert_only_allowed_axioms
@@ -18396,4 +18397,25 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
   OddOrder.RepresentationTheory.Modular.exists_algEquiv_pi_matrix_of_not_dvd_card
 
 #assert_only_allowed_axioms
-  OddOrder.RepresentationTheory.Modular.sum_sq_eq_card_of_not_dvd_card
+  OddOrder.RepresentationTheory.Modular.sum_sq_card_eq_card_of_bijective
+
+/-! 🎯🎯 **issue 9508 段 H2c = Navarro (2.12)**: `p'`-群の Cartan 行列は単位行列
+(`Modular/PPrimeOrderCartan`)。加群論でなく**次元の数え上げ**で出る:
+
+- `∑_φ n_φ² = |G| = ∑_i m_i²` (`k[G] ≅ ∏ M_{n_φ}(k)` は Maschke で `ker = J(kG) = ⊥`、
+  `K[G] ≅ ∏ M_{m_i}(K)` は Wedderburn) — 両側とも `sum_sq_card_eq_card_of_bijective`。
+- `sum_decompositionMatrix_mul_card_eq`: `m_i = ∑_φ d_{iφ} n_φ` (`g = 1` での分解;
+  `trace_one` と `irreducibleBrauerCharacter_one`、`CharZero K` で ℕ に戻す)。
+- `one_le_cartanMatrix_self`: `c_{φφ} = ∑_i d_{iφ}² = 0` なら列 `d_{·φ}` が全消し ⟹ `C` の
+  `φ`-列が全消し ⟹ `sum_cartanMatrix_mul_pairingZero` (C の可逆性) に矛盾。
+- 展開 `∑_{φ,μ} c_{φμ} n_φ n_μ = ∑_φ n_φ²` に上の 2 つを入れると全項が潰れて
+  `c_{φφ} = 1`, `c_{φμ} = 0` (`cartanMatrix_eq_ite_of_not_dvd_card`)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_decompositionMatrix_mul_card_eq
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.one_le_cartanMatrix_self
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.cartanMatrix_eq_ite_of_not_dvd_card

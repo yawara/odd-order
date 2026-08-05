@@ -247,10 +247,14 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
       ブロック数 = 共役類数) / `sum_sq_eq_card_of_not_dvd_card` (`∑_j d_j² = |Q|`)。
       ⚠ BS の具体系 `PadicComplexSystem` の剰余体は `F̄_p` = 代数閉 ✓
       (`SplittingSystem p n = 𝕎(GF(p^φ(n)))` は代数閉でないので、そちらでは使えない)。
-    - **H2c**: `C = I`。数え上げで出る:
-      `Σ_j n_j² = |Q| = Σ_i m_i²` (両側の Wedderburn) と `m_i = Σ_j d_{ij} n_j` から
-      `Σ_{j,j'} c_{jj'} n_j n_{j'} = Σ_j n_j²`、各 `c_{jj} ≥ 1` (正則指標の比較で列が非零)
-      かつ `c_{jj'} ≥ 0` ⟹ 全項が潰れて `c_{jj} = 1`, `c_{jj'} = 0`。
+    - [x] **H2c 完了** (2026-08-05, `Modular/PPrimeOrderCartan.lean`) = **Navarro (2.12)**:
+      `cartanMatrix_eq_ite_of_not_dvd_card`。`Σ_j n_j² = |Q| = Σ_i m_i²` と
+      `m_i = Σ_j d_{ij} n_j` (`sum_decompositionMatrix_mul_card_eq`, `g = 1` での分解) から
+      `Σ_{j,j'} c_{jj'} n_j n_{j'} = Σ_j n_j²`、各 `c_{jj} ≥ 1` かつ `c_{jj'} ≥ 0` ⟹
+      全項が潰れて `c_{jj} = 1`, `c_{jj'} = 0`。
+      ⚠ **`c_{jj} ≥ 1` は「正則指標の比較」でなく `C` の可逆性から出た** (`one_le_cartanMatrix_self`):
+      `c_{jj} = Σ_i d_{ij}² = 0` なら列 `d_{·j}` が全消し ⟹ `C` の `j`-列が全消し ⟹
+      `sum_cartanMatrix_mul_pairingZero` に矛盾。正則加群の Brauer 指標を作る必要がない。
     - **H2d**: `C = I` ⟹ `C⁻¹ = ([τ,μ]⁰) = I` ⟹ 段 204 の `a_χ = d_{χμ₀} ∈ ℕ`。
       `p'`-群では全元が `p`-正則なので `χ⁰ = χ` ⟹ `φ = Σ_χ d_{χφ} χ ∈ ch(Q)`。
     - **H2e**: 制限。`θ|_Q` は制限加群の Brauer 指標 = `IBr(Q)` の **ℕ**-結合。

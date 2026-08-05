@@ -26,7 +26,7 @@ Cartan matrix of a `p'`-group to be the identity.
 
 * `OddOrder.RepresentationTheory.Modular.isSemisimpleRing_monoidAlgebra_of_not_dvd_card`
 * `OddOrder.RepresentationTheory.Modular.exists_algEquiv_pi_matrix_of_not_dvd_card`
-* `OddOrder.RepresentationTheory.Modular.sum_sq_eq_card_of_not_dvd_card` — `∑_j d_j ^ 2 = |Q|`
+* `OddOrder.RepresentationTheory.Modular.sum_sq_card_eq_card_of_bijective` — `∑_j n_j ^ 2 = |Q|`
 
 ## References
 
@@ -74,15 +74,16 @@ theorem exists_algEquiv_pi_matrix_of_not_dvd_card [IsAlgClosed k] (hp : p.Prime)
   · rw [hn]
     exact Nat.card_congr (Equiv.subtypeUnivEquiv (isPRegularClass_of_not_dvd_card hQ))
 
-/-- **`∑_j d_j ^ 2 = |Q|`** for a `p'`-group: comparing `k`-dimensions across
-`k[Q] ≅ ∏_j M_{d_j}(k)`. -/
-theorem sum_sq_eq_card_of_not_dvd_card {n : ℕ} {d : Fin n → ℕ}
-    (π : MonoidAlgebra k Q →+* ∀ i, Matrix (Fin (d i)) (Fin (d i)) k)
-    (hπ : Function.Bijective π) (hlin : ∀ (c : k) (x : MonoidAlgebra k Q), π (c • x) = c • π x) :
-    ∑ i, d i ^ 2 = Nat.card Q := by
+/-- **`∑_j (dim block j) ^ 2 = |Q|`** whenever `k[Q] ≅ ∏_j M_{n_j}(k)`: comparing `k`-dimensions.
+Nothing here is about `p` — it applies equally to the `K`-side Wedderburn splitting. -/
+theorem sum_sq_card_eq_card_of_bijective {ι : Type*} [Fintype ι] {n : ι → Type*}
+    [∀ j, Fintype (n j)] [∀ j, DecidableEq (n j)]
+    (π : MonoidAlgebra k Q →+* ∀ j, Matrix (n j) (n j) k) (hπ : Function.Bijective π)
+    (hlin : ∀ (c : k) (x : MonoidAlgebra k Q), π (c • x) = c • π x) :
+    ∑ j, Fintype.card (n j) ^ 2 = Nat.card Q := by
   classical
   letI : Fintype Q := Fintype.ofFinite Q
-  let e : MonoidAlgebra k Q ≃ₗ[k] ∀ i, Matrix (Fin (d i)) (Fin (d i)) k :=
+  let e : MonoidAlgebra k Q ≃ₗ[k] ∀ j, Matrix (n j) (n j) k :=
     { toFun := π, map_add' := π.map_add, map_smul' := hlin,
       invFun := Function.surjInv hπ.2,
       left_inv := fun x => hπ.1 (Function.surjInv_eq hπ.2 (π x)),
@@ -93,7 +94,7 @@ theorem sum_sq_eq_card_of_not_dvd_card {n : ℕ} {d : Fin n → ℕ}
     rw [Module.finrank_eq_card_basis (MonoidAlgebra.basis Q k), Nat.card_eq_fintype_card]
   rw [hleft] at hdim
   rw [hdim]
-  exact Finset.sum_congr rfl fun i _ => by
+  exact Finset.sum_congr rfl fun j _ => by
     simp [Module.finrank_matrix, pow_two]
 
 end OddOrder.RepresentationTheory.Modular
