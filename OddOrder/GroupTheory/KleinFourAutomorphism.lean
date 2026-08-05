@@ -23,8 +23,14 @@ involutions `a`, `b`.
 * `OddOrder.GroupTheory.eq_one_or_eq_or_eq_or_eq_of_klein` — `P = {1, a, b, ab}`
 * `OddOrder.GroupTheory.eq_of_fixed_of_klein` — an endomorphism whose cube is the identity and
   which fixes an involution is the identity
+* `OddOrder.GroupTheory.eq_of_fixed_two_of_klein` — an endomorphism fixing two distinct
+  involutions is the identity
+* `OddOrder.GroupTheory.forall_cube_eq_self_of_klein` — a nontrivial endomorphism with an odd
+  iterate equal to the identity has cube the identity
 * `OddOrder.GroupTheory.eq_or_eq_or_eq_iterate_of_klein` — an automorphism of order `3` is
   transitive on the involutions
+* `OddOrder.GroupTheory.eq_or_eq_or_eq_iterate_of_odd_of_klein` — the two combined, in the form
+  Navarro (7.2) uses
 -/
 
 namespace OddOrder.GroupTheory
@@ -77,6 +83,81 @@ theorem exists_ne_ne_one_of_klein (hcard : Nat.card P = 4) {a : P} (ha : a ≠ 1
     rw [← hcard, Nat.card_eq_fintype_card, ← Finset.card_univ, ← huniv,
       Finset.card_insert_of_notMem (by simp [Ne.symm ha]), Finset.card_singleton]
   exact absurd h2 (by decide)
+
+/-- **An endomorphism fixing two distinct involutions is the identity**: they generate. -/
+theorem eq_of_fixed_two_of_klein (hcard : Nat.card P = 4) (hexp : ∀ x : P, x * x = 1)
+    (f : P →* P) {a b : P} (ha : a ≠ 1) (hb : b ≠ 1) (hab : a ≠ b) (hfa : f a = a)
+    (hfb : f b = b) (z : P) : f z = z := by
+  rcases eq_one_or_eq_or_eq_or_eq_of_klein hcard hexp ha hb hab z with h | h | h | h
+  · rw [h, map_one]
+  · rw [h, hfa]
+  · rw [h, hfb]
+  · rw [h, map_mul, hfa, hfb]
+
+/-- **A nontrivial endomorphism of a Klein four group with an odd iterate equal to the identity
+has cube the identity.**  This is `Aut(ℤ/2 × ℤ/2) ≅ Sym(3)` in the only form Navarro's (7.2)
+needs: the image of `N_G(P)` in `Aut(P)` has odd order, so a nontrivial element of it cubes to
+`1`.
+
+If `f` moved `a` but `f² a = a`, then `f²` would fix the two distinct involutions `a` and `f a`,
+hence be the identity, and an odd iterate of an involution is itself — so `f` would be the
+identity. -/
+theorem forall_cube_eq_self_of_klein (hcard : Nat.card P = 4) (hexp : ∀ x : P, x * x = 1)
+    (f : P →* P) {m : ℕ} (hm : Odd m) (hfm : ∀ x : P, (⇑f)^[m] x = x)
+    (hfne : ∃ x : P, f x ≠ x) (z : P) : f (f (f z)) = z := by
+  obtain ⟨k, hk⟩ := hm
+  subst hk
+  have hfinj : Function.Injective f := by
+    have hleft : Function.LeftInverse ((⇑f)^[2 * k]) f := fun u => by
+      have hu := hfm u
+      rw [Function.iterate_add_apply, Function.iterate_one] at hu
+      exact hu
+    exact hleft.injective
+  obtain ⟨a, hfa⟩ := hfne
+  have ha : a ≠ 1 := fun h => hfa (by rw [h, map_one])
+  have hfa1 : f a ≠ 1 := fun h => ha (hfinj (h.trans (map_one f).symm))
+  have hne1 : f a ≠ a := hfa
+  -- `f²` cannot fix `a`
+  have hne2 : f (f a) ≠ a := by
+    intro h
+    have hsq : ∀ z : P, f (f z) = z :=
+      eq_of_fixed_two_of_klein hcard hexp (f.comp f) ha hfa1 (Ne.symm hne1) h
+        (by simpa using congrArg f h)
+    have hiter : ∀ n : ℕ, ∀ z : P, (⇑f)^[2 * n] z = z := by
+      intro n
+      induction n with
+      | zero => intro z; simp
+      | succ n ih =>
+          intro z
+          rw [Nat.mul_succ, Function.iterate_add_apply,
+            show (⇑f)^[2] z = f (f z) from rfl, hsq z]
+          exact ih z
+    exact hne1 (by
+      have hfin := hfm a
+      rw [Function.iterate_add_apply, Function.iterate_one, hiter k (f a)] at hfin
+      exact hfin)
+  have hne3 : f (f a) ≠ f a := fun h => hne1 (hfinj h)
+  have hffa1 : f (f a) ≠ 1 := fun h => hfa1 (hfinj (h.trans (map_one f).symm))
+  -- `f³` fixes `a`
+  have hcube : f (f (f a)) = a := by
+    have hne4 : f (f (f a)) ≠ f a := fun h => hne2 (hfinj h)
+    have hne5 : f (f (f a)) ≠ f (f a) := fun h => hne3 (hfinj h)
+    have hfff1 : f (f (f a)) ≠ 1 := fun h => hffa1 (hfinj (h.trans (map_one f).symm))
+    rcases eq_one_or_eq_or_eq_or_eq_of_klein hcard hexp ha hfa1 (Ne.symm hne1)
+      (f (f (f a))) with h | h | h | h
+    · exact absurd h hfff1
+    · exact h
+    · exact absurd h hne4
+    · exfalso
+      refine hne5 (h.trans ?_)
+      rcases eq_one_or_eq_or_eq_or_eq_of_klein hcard hexp ha hfa1 (Ne.symm hne1)
+        (f (f a)) with h' | h' | h' | h'
+      · exact absurd h' hffa1
+      · exact absurd h' hne2
+      · exact absurd h' hne3
+      · exact h'.symm
+  exact eq_of_fixed_two_of_klein hcard hexp (f.comp (f.comp f)) ha hfa1 (Ne.symm hne1) hcube
+    (by simpa using congrArg f hcube) z
 
 /-- **An endomorphism whose cube is the identity and which fixes an involution is the identity.**
 It then fixes a companion involution too: the only other possibility sends `y` to `xy`, and then
@@ -147,5 +228,16 @@ theorem eq_or_eq_or_eq_iterate_of_klein (hcard : Nat.card P = 4) (hexp : ∀ x :
     · exact absurd h' hne3
     · exact absurd h' hne2
     · rw [h, h']
+
+/-- **A nontrivial endomorphism of odd order is transitive on the involutions.**  This is the
+form Navarro (7.2) uses: `N_G(P)/C_G(P)` has odd order, so a `g ∈ N_G(P)` not centralising `P`
+conjugates the three involutions of `P` cyclically. -/
+theorem eq_or_eq_or_eq_iterate_of_odd_of_klein (hcard : Nat.card P = 4)
+    (hexp : ∀ x : P, x * x = 1) (f : P →* P) {m : ℕ} (hm : Odd m)
+    (hfm : ∀ x : P, (⇑f)^[m] x = x) (hfne : ∃ x : P, f x ≠ x)
+    {a b : P} (ha : a ≠ 1) (hb : b ≠ 1) :
+    b = a ∨ b = f a ∨ b = f (f a) :=
+  eq_or_eq_or_eq_iterate_of_klein hcard hexp f
+    (forall_cube_eq_self_of_klein hcard hexp f hm hfm hfne) hfne ha hb
 
 end OddOrder.GroupTheory

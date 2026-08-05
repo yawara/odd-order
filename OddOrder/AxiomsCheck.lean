@@ -17403,3 +17403,19 @@ Navarro (5.12) の "in particular, notice that the matrix `J` is regular"。
 
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.eq_or_eq_or_eq_iterate_of_klein
+
+/-! 🎯 **奇位数の非自明な自己準同型は involution 上で推移的**
+(`GroupTheory/KleinFourAutomorphism`) — Navarro (7.2) が使う形。
+`N_G(P)/C_G(P)` は奇位数なので、`P` を中心化しない `g ∈ N_G(P)` による共役は
+`P` の 3 つの involution を巡回させる。
+`f` が `a` を動かすのに `f² a = a` なら `f²` は相異なる 2 つの involution `a`, `f a` を
+固定して恒等になり、対合の奇数回反復は自分自身なので `f` が恒等になってしまう。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.eq_of_fixed_two_of_klein
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.forall_cube_eq_self_of_klein
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.eq_or_eq_or_eq_iterate_of_odd_of_klein
