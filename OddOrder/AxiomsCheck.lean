@@ -281,6 +281,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInverse
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
 import OddOrder.Algebra.SumSquaresFour
@@ -17711,3 +17712,22 @@ BS が使う形は `G = C_G(x)`, `P = ⟨x⟩`: `x` は自分の中心化群の�
 
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.hasNormalPComplement_centralizer_of_sylow_zpowers
+
+/-! 🎯🎯 **Navarro (7.5): basic set に関する一般化分解数** (`Modular/BasicSetDecomposition`)。
+basic set `𝓑` は `IBr(b)` から整数行列 `U = (u_{μφ})` (整数逆行列を持つ) で移った基底なので、
+原文 p.135 の式 (1) `d^x_{χφ} = Σ_μ d^x_{χμ} u_{μφ}` を**定義**に採ると (7.5) は
+既存の `IBr` 版の上の**双線型代数**になる:
+ - (a) `u_{μφ} ≠ 0` なる全ての `μ` で `d^x_{χμ} = 0` なら `d^x_{χφ} = 0`
+   (第二主定理 + `U` のブロック対角性);
+ - (b)(c) 2 列の内積は `IBr` 列の内積行列の `U`-合同 `UᵗcU`
+   (`sum_mul_basicDecompositionNumber`)。段 197 の (5.13)(b) を入れると `UᵗCU`。
+⟹ basic set の選択 (= `U`) は呼び出し側 ((7.4)) の仕事で、格子や基底の型を作らずに済む。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.basicDecompositionNumber_eq_zero
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_mul_basicDecompositionNumber
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_mul_basicDecompositionNumber_eq_cartanMatrix
