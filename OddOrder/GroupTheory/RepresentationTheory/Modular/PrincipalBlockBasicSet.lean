@@ -292,6 +292,117 @@ theorem character_eq_sum_signRelationRow_mul_principalBasicSet
         hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ ht1 hg)
     ((hmem i).mpr hi)
 
+/-! ### The change-of-basis matrix `U` -/
+
+set_option maxHeartbeats 800000 in
+-- The coefficients carry the `G`-side modular datum; `DecidableEq ιG` is what makes the Cartan
+-- inverse inside `ordinaryCombinationCoeff` elaborate.
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+omit [DecidableEq κ] [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [Fact p.Prime] [CharP (ResidueField 𝒪) p]
+  [Fintype ↥(centralizerOf t)] in
+/-- **`u_{μj} = 0` for `μ ∉ IBr(B_0)` and `j ∈ Irr(B_0)`.**  Both coefficients of `u_{μj}` are
+`ordinaryCombinationCoeff`s at indices in `Irr(B_0)`, and those vanish off the block of `μ`. -/
+theorem principalBasicSetMatrix_eq_zero_of_ne_principalBlock
+    {j₀ : κ} (hj₀ : blockOfIrr eG hπG hlinG hnilG j₀ = principalBlock πG hπG hlinG hnilG)
+    {μ : ιG} (hμ : Quotient.mk (blockSetoid πG hπG hlinG) μ ≠ principalBlock πG hπG hlinG hnilG)
+    {j : κ} (hj : blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG) :
+    principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ j = 0 := by
+  rw [principalBasicSetMatrix,
+    ordinaryCombinationCoeff_eq_zero_of_blockOfIrr_ne hp hωG hω'G hπG hlinG hkerJG eG hnilG μ
+      (by rw [hj]; exact fun hc => hμ hc.symm),
+    ordinaryCombinationCoeff_eq_zero_of_blockOfIrr_ne hp hωG hω'G hπG hlinG hkerJG eG hnilG μ
+      (by rw [hj₀]; exact fun hc => hμ hc.symm),
+    zero_mul, zero_mul, sub_zero]
+
+set_option maxHeartbeats 1000000 in
+-- Both halves (the `G`-side coefficients and the `(7.2)` signs) carry their full chains.
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+open scoped Classical in
+include hp hx hω hω' e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ ht in
+/-- **`U` really expresses `IBr(B_0)` in the basic set**: `φ_μ = ∑_j u_{μj} η_j` on `G⁰`.
+
+`φ_μ` is the combination `∑_{i ∈ Irr(B_0)} a_{μi} χ_i⁰`
+(`sum_ordinaryCombination_block_eq_irreducibleBrauerCharacter`, the `K`-form of Navarro (3.16)),
+and `∑_i a_{μi} (D_𝓑)_{ij} = a_{μj} ε_j - a_{μj₀} ε_{j₀} = u_{μj}` is precisely how `U` was
+defined. -/
+theorem sum_principalBasicSetMatrix_mul_principalBasicSet
+    (hconjall : ∀ v : G, IsPElement p v → v ≠ 1 → IsConj t v) (ht1 : t ≠ 1)
+    (hcart : cartanMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e φ₀ φ₀ = 4)
+    {j₀ : κ} (hj₀ : blockOfIrr eG hπG hlinG hnilG j₀ = principalBlock πG hπG hlinG hnilG)
+    {μ : ιG} (hμ : Quotient.mk (blockSetoid πG hπG hlinG) μ = principalBlock πG hπG hlinG hnilG)
+    {g : G} (hg : IsPRegular p g) :
+    (∑ j : κ, principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ j
+        * principalBasicSet eG hπG hlinG hnilG t j₀ j g)
+      = algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) πG μ g) := by
+  classical
+  set Sirr : Finset κ := Finset.univ.filter
+    (fun j => blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG) with hSirr
+  have hmem : ∀ j : κ, j ∈ Sirr ↔
+      blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG := by
+    intro j
+    rw [hSirr, Finset.mem_filter]
+    exact ⟨fun h => h.2, fun h => ⟨Finset.mem_univ _, h⟩⟩
+  have hout : ∀ j ∈ (Finset.univ : Finset κ), j ∉ Sirr.erase j₀ →
+      principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ j
+        * principalBasicSet eG hπG hlinG hnilG t j₀ j g = 0 := by
+    intro j _ hj
+    rw [principalBasicSet, if_neg (fun hc => hj (Finset.mem_erase.mpr ⟨hc.2, (hmem j).mpr hc.1⟩)),
+      mul_zero]
+  have hεsq : ∀ l ∈ Sirr, (wedderburnRepresentation eG l).character t
+      * (wedderburnRepresentation eG l).character t = 1 := fun l hl =>
+    character_involution_mul_self hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil hnilG hω' hζ hζk hζK
+      hconv hNp hquot S hφ₀ ht hconjall ht1 hcart ((hmem l).mp hl)
+  have hrel : (∑ l ∈ Sirr, (wedderburnRepresentation eG l).character t
+      * (wedderburnRepresentation eG l).character g) = 0 := by
+    rw [Finset.sum_congr rfl fun l _ =>
+      mul_comm ((wedderburnRepresentation eG l).character t)
+        ((wedderburnRepresentation eG l).character g)]
+    exact sum_character_mul_character_involution_eq_zero hp hx hω e eG hπG hlinG hπ hlin hkerJ
+      hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ ht1 hg
+  have hη : ∀ j ∈ Sirr.erase j₀, principalBasicSet eG hπG hlinG hnilG t j₀ j g
+      = (wedderburnRepresentation eG j).character t
+        * (wedderburnRepresentation eG j).character g := fun j hj => by
+    rw [principalBasicSet, if_pos ⟨(hmem j).mp (Finset.mem_of_mem_erase hj),
+      Finset.ne_of_mem_erase hj⟩]
+  have hU : ∀ j ∈ Sirr.erase j₀,
+      principalBasicSetMatrix hp eG hπG hlinG hωG hω'G hkerJG t j₀ μ j
+        = ∑ i ∈ Sirr, ordinaryCombinationCoeff hp hωG hω'G hπG hlinG hkerJG eG μ i
+            * signRelationRow (fun l => (wedderburnRepresentation eG l).character t) j₀ i j :=
+    fun j hj => by
+      rw [principalBasicSetMatrix]
+      exact (sum_mul_signRelationRow (S := Sirr)
+        (ε := fun l => (wedderburnRepresentation eG l).character t)
+        (a := fun i => ordinaryCombinationCoeff hp hωG hω'G hπG hlinG hkerJG eG μ i)
+        ((hmem j₀).mpr hj₀) (Finset.mem_of_mem_erase hj)).symm
+  rw [← Finset.sum_subset (Finset.subset_univ (Sirr.erase j₀)) hout,
+    Finset.sum_congr rfl fun j hj => by rw [hη j hj, hU j hj]]
+  -- swap the two sums and collapse the inner one with the basic-set decomposition
+  have hswap : (∑ j ∈ Sirr.erase j₀,
+        (∑ i ∈ Sirr, ordinaryCombinationCoeff hp hωG hω'G hπG hlinG hkerJG eG μ i
+          * signRelationRow (fun l => (wedderburnRepresentation eG l).character t) j₀ i j)
+        * ((wedderburnRepresentation eG j).character t
+            * (wedderburnRepresentation eG j).character g))
+      = ∑ i ∈ Sirr, ordinaryCombinationCoeff hp hωG hω'G hπG hlinG hkerJG eG μ i
+          * (wedderburnRepresentation eG i).character g := by
+    rw [Finset.sum_congr rfl fun j _ => Finset.sum_mul _ _ _, Finset.sum_comm]
+    refine Finset.sum_congr rfl fun i hi => ?_
+    rw [← sum_signRelationRow_mul (S := Sirr)
+      (ε := fun l => (wedderburnRepresentation eG l).character t)
+      (c := fun l => (wedderburnRepresentation eG l).character g) ((hmem j₀).mpr hj₀) hεsq hrel
+      hi, Finset.mul_sum]
+    exact Finset.sum_congr rfl fun j _ => by ring
+  rw [hswap]
+  -- and read the result off the `K`-form of Navarro (3.16)
+  have h316 := sum_ordinaryCombination_block_eq_irreducibleBrauerCharacter hp hωG hω'G hπG hlinG
+    hkerJG eG hnilG μ hg
+  simp only [hμ] at h316
+  rw [← hSirr] at h316
+  rw [← h316]
+  exact Finset.sum_congr rfl fun i _ => by
+    rw [algebraMap_ordinaryCharacter (𝒪 := 𝒪) eG i g]; rfl
+
 end KleinFour
 
 end OddOrder.RepresentationTheory.Modular
