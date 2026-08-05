@@ -169,6 +169,7 @@ import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10B
 import OddOrder.Isaacs.Ch10_MoreTransfer.Problems10C
 import OddOrder.GroupTheory.PRegularElement
 import OddOrder.GroupTheory.PRegularQuotient
+import OddOrder.GroupTheory.CosetInvariantCard
 import OddOrder.GroupTheory.PRegularElementCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PModularSystem
 import OddOrder.GroupTheory.RepresentationTheory.Modular.RootsOfUnityLift
@@ -18158,3 +18159,15 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.smul_mem_adjoinSpan_of_mem_adjoin
+
+/-! 🎯 **Brauer 指標判定 (issue 9508 段 E 準備 2)**: 部分群による右移動で閉じた集合は
+位数が割り切れる (`GroupTheory/CosetInvariantCard`)。`A·P ⊆ A` なら `A` は左剰余類 `xP` の
+和なので `|P| ∣ |A|`。Gorenstein Lemma 7.6(i) の計数段:
+`{x ∈ G | x⁻¹ y x ∈ uP}` は `x ↦ x v` (`v ∈ P`) で閉じる (`v` は `u` を中心化し `P` を正規化)
+ので `ψ*(y) = σ(y)/|P|` が整数になる。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.card_filter_quotientMk_eq
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.card_subgroup_dvd_card_of_mul_mem

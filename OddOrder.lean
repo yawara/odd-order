@@ -76,6 +76,7 @@ import OddOrder.Algebra.QuadraticMapCoordinates
 import OddOrder.GroupTheory.AInvariantComplement
 import OddOrder.GroupTheory.PRegularElement
 import OddOrder.GroupTheory.PRegularQuotient
+import OddOrder.GroupTheory.CosetInvariantCard
 import OddOrder.GroupTheory.PRegularElementCount
 import OddOrder.GroupTheory.QuaternionRecognition
 import OddOrder.GroupTheory.SolvablePrimeIndex
