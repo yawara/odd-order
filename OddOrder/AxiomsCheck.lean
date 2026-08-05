@@ -269,6 +269,8 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.SectionProjectiveCharac
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionSum
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionClassCount
+import OddOrder.Algebra.BlockPartitionedMatrix
+import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
@@ -17304,3 +17306,44 @@ Navarro (5.12) の証明の出発点 `k(G) = Σ_i |IBr(C_G(x_i))|`。
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.card_conjClasses_eq_sum_card_pRegularClass
+
+/-! 🎯 **ブロック分割された正則行列のブロックは正方** (`Algebra/BlockPartitionedMatrix`) —
+行を `f`、列を `g` で分割し、対角ブロック外が 0 の正方行列の行列式が非零なら
+各ブロックの大きさは一致する。証明は rank 論法でなく **Leibniz 展開**:
+行列式が非零なら `M (σ j) j ≠ 0` を全 `j` で満たす置換 `σ` が存在し、
+その `σ` が 2 つの分割をブロックごとに突き合わせる。
+Navarro (5.12) の「`J` は正則だから各 `J_{B_i}` は正方」の段。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.Matrix.exists_perm_forall_ne_zero
+
+#assert_only_allowed_axioms
+  OddOrder.Matrix.card_eq_card_of_det_ne_zero
+
+/-! 🎯 **`E = J · diag(B)`** (`Modular/GeneralizedDecompositionMatrix`) —
+一般化分解行列 `J` (行 `Irr(G)`、列 `(D, μ)`) と `p`-section 助変数化で読んだ通常指標表 `E`。
+中身は (5.1) の定義式 `χ(x_D z) = Σ_μ d^{x_D}_{χμ} μ(z)` を行列の言葉に直したもの。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sectionCharacterMatrix_eq_mul_blockDiagonal
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.isUnit_det_blockDiagonal_brauerCharacterMatrix
+
+/-! **`J` の列は `G` の共役類** (`Modular/GeneralizedDecompositionMatrix`) —
+段 174 の `pSectionClassEquiv` を `IBr(C_G(x_D))` の `p`-正則類による添字づけへ移送したもの。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sectionClassIndexEquiv
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sectionCharacterMatrix_submatrix
+
+/-! 🎯🎯 **一般化分解行列 `J` は正則** (`Modular/GeneralizedDecompositionMatrix`) —
+Navarro (5.12) の "in particular, notice that the matrix `J` is regular"。
+⚠ 教科書は `J̄ᵗ J = diag(Cartan)` (= (5.13)) から出すが、本経路は
+**(5.13) も `x⁻¹` 側の数も使わない**: `E` は `G` の通常指標表 (列を並べ替えたもの) ゆえ正則、
+各 Brauer 指標表 `B` も正則、`E = J·diag(B)` ゆえ `J` も正則。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.isUnit_det_generalizedDecompositionMatrix
