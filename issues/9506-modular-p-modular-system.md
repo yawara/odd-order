@@ -1374,6 +1374,23 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
             ⚠ (6.14) 本体より**下流**だが自己完結なので先行 landing した。
           * [x] 🎯 **`|G⁰| ≡ |C_G(Q)⁰| (mod p)` 完了 (2026-08-05、`PFactorPairCount`)**:
             `card_pRegular_modEq_centralizer` (固定点 = `C_G(Q)⁰`)。Problem (6.1) と対の正規化。
+          * [x] **数え上げ側 完了 (2026-08-05)**: `Algebra/PElementSumCount.lean` —
+            🎯🎯 `coeff_pElementSum_mul_pRegularSum` (**`(Ĝ_p·Ĝ⁰)(g) = |Ω(g)|`**)、
+            支持 `coeff_pElementSum_mul` / `pFactorPairsEquivPElement` (分解は p-部分で決まる)。
+            さらに `pFactorPairsSubgroupEquiv` (`Ω_H(g) ≃ Ω_G(g) ∩ (H×H)`) /
+            `pRegularSubgroupEquiv` (`H⁰ ≃ G⁰ ∩ H`) で部分群内部の数え上げと同定
+            (`PFactorPairCount.lean`)。
+          * **⏸ 次の一手 (2026-08-05 時点の frontier)** = 以下 3 本の合同を突き合わせて
+            `g ∈ C_G(Q)` かつ p-正則で `e_{B₀}^G(g) = e_{b₀}^{C_G(Q)}(g)` を出す:
+            (i) `|G⁰|*·e_{B₀}^G(g) = |Ω_G(g)|*` ((6.14) + 数え上げ側、G に適用)
+            (ii) 同じものを `C_G(Q)` に適用
+            (iii) `|Ω_G(g)| ≡ |Ω_{C_G(Q)}(g)|` (Problem (6.1) + `pFactorPairsSubgroupEquiv`) と
+            `|G⁰| ≡ |C_G(Q)⁰|` (`card_pRegular_modEq_centralizer` + `pRegularSubgroupEquiv`)
+            ⟹ `|G⁰|*` (≠ 0) で約す。
+            ⚠ statement は `G` 側と `C_G(Q)` 側で**別々の p-modular データ** (πG / πC) を取るので
+            引数が多い。`Br_Q` (Brauer 準同型) は repo 未定義 —
+            係数レベルで書くのが素直 (定義してから使うのでもよいが、
+            (6.14) の帰結は係数の等式なので直接書ける)。
           * ⟹ `Br_Q(e_{B₀}) = e_{b₀}`。一方
             `λ_b(Br_Q(e_{B₀})) = λ_b^G(e_{B₀}) = [b^G = B₀]` なので、
             `b^G = B₀ ⟹ λ_b(e_{b₀}) = 1 ⟹ b = b₀`。**第三主定理の逆向き**。
