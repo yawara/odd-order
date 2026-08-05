@@ -2222,10 +2222,47 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
           class of involutions (because t is central in C)" に対応)。
           ⟹ **BS が要求する「`C_G(t)` は正規 2-補群を持つ」が繋がった**。
           ⚠ 「正規 2-補群 ⟹ 類はちょうど 3 個」の側は BS では使わないので未着手 (低優先)。
-        - [ ] **⏸ 次 = (7.2) 残り**:
-          (ii) **第 2 部 (指標側)** = `k(B₀) − l(B₀) = l(b₀) = 1` から
-              `Irr(B₀) = {1_G, χ₁, χ₂, χ₃}`、`χ_i(t) = ε_i = ±1`、`χ_i(1) ≡ ε_i mod 4`、
-              `1 + Σ ε_i χ_i(s) = 0`。部品 (段 100/155/156/172/173/177/178) は揃っている。
+        - [ ] **第 2 部 (指標側)** = `Irr(B₀) = {1_G, χ₁, χ₂, χ₃}`、`χ_i(t) = ε_i = ±1`、
+              `χ_i(1) ≡ ε_i mod 4`、`1 + Σ ε_i χ_i(s) = 0`。
+          **⚠ 経路の短縮 (2026-08-05 に確定)**: `k(B₀) = 4` に (5.12) は要らない。
+          (5.13)(b) の対合版 + `b₀` の Cartan 行列 `(4)` + 非零性 + 整数性 + `d^t_{1_G,1} = 1`
+          だけで `Σ_{χ∈Irr(B₀)} (d^t_{χ1})² = 4` の分解が `4 = 1+1+1+1` に限られる。
+          `|IBr(B₀)| = 3` の側だけが `k(B₀) − l(B₀) = l(b₀) = 1` = (5.12) を要する。
+          - [x] 🎯🎯 **段 184 (`Modular/DecompositionBlockDiagonal`)**: `D` はブロック対角
+                (`d_{χφ} ≠ 0 ⟹ φ ∈ B(χ)`)。既存 `CartanBlockDiagonal` は 2 つの Brauer 指標の
+                中心指標が等しいまでで、`blockOfIrr` と `Quotient.mk blockSetoid` を結ぶ形が
+                無かった。支持 = `asAlgebraHom_reduction_center_eq`。
+          - [x] 🎯🎯 **段 185 (`Modular/PrincipalBlockCartanEntry`)**: (6.13) の Cartan 行列版
+                `|N| · c_{φ₀φ₀} = |G|` (= `b₀` の Cartan 行列は `1×1` の `(|G|_p)`)。
+          - [x] 🎯🎯 **段 186 (`Modular/GeneralizedDecompositionInvolution`)**:
+                (5.13)(b) の対合版 `Σ_{χ∈Irr(G)} (d^t_{χφ})² = c_{φφ}`
+                (`t⁻¹ = t` ゆえ同じ族が `dinv` の条件を満たす)。
+          - [x] 🎯🎯 **段 187 (`Modular/SecondMainPrincipalBlock`)**: `χ(x y) = d^x_{χφ₀}`
+                (原文 p.132「By Corollary (5.8) and the third main theorem」)。
+                = (5.8) + **第三主定理の逆** (`eq_principalBlock_of_inducedBlockOfCentralizer_eq`
+                = 既存 Külshammer 版を `Q = ⟨x⟩` へ特殊化) + (6.13)
+                (`irreducibleBrauerCharacter_principalBlock_eq_one`: `B₀` の唯一の Brauer 指標は
+                `p`-正則類上で定数 1)。
+                ⚠ `[DecidablePred (· ∈ C_G(⟨x⟩))]` を section 変数にすると
+                `inducedBlockOfCentralizer` 内部の `Classical` 実例と食い違って defeq が壊れる。
+          - [x] 🎯 **段 188**: 第三主定理の**易しい向き**の `p`-元版
+                (`inducedBlockOfCentralizer_principalBlock`) ⟹ `Irr(B₀)` の外で `d^t_{χφ₀} = 0`
+                (段 186 の平方和が `Irr(B₀)` 上の和になる) +
+                `Algebra/SumSquaresFour` (`Σ a_i² = 4`, 全非零, ある `a_{i₀} = 1`
+                ⟹ 全項 ±1 かつ項数 4)。
+          - [ ] **⏸ 次 = 残り 3 段**:
+                * **段 189 (非零性)**: `χ ∈ Irr(B₀)` なら `d^t_{χφ₀} ≠ 0`。
+                  さもなくば段 187 と「2-特異元の 2-部分は involution で全て `t` に共役」から
+                  `χ` が全 2-特異元で消え、`PrincipalBlockNonvanishing`
+                  (`not_dvd_card_of_character_eq_zero_of_pSingular`) が `2 ∤ |G|` を出して矛盾。
+                * **段 190 (整数性 + `d^t_{1_G,1} = 1`)**: 段 187 を `y = 1` で使って
+                  `d^t_{χφ₀} = χ(t)`、段 178 で `χ(t) ∈ ℤ` の像。
+                  ⚠ **未調査**: 自明指標の添字 `j₀ : κ` が `blockOfIrr eG j₀ = principalBlock` を
+                  満たすこと (repo に既存かは要 grep)。
+                * **段 191 ((7.2) 第 2 部の組み立て)**: 上を `SumSquaresFour` に入れて
+                  `k(B₀) = 4` と `χ_i(t) = ±1`。続けて `χ_i(1) ≡ ε_i mod 4`
+                  (`[(χ_i)_P, 1_P] = (χ_i(1) + 3ε_i)/4` が整数) と
+                  `1 + Σ ε_i χ_i(s) = 0` (ブロック直交性 (5.11))。
         ⚠ (5.12)/(5.13) は Ch.5 なので**文書順で先**。上流優先で (5.13)(b) →
         (5.12) → (7.2) の順に当たる。
         - [x] 🎯🎯 **(5.13)(a) 前半 完了 (2026-08-05、段 173)**:
