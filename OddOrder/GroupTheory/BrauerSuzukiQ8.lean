@@ -523,17 +523,15 @@ This replaces Navarro's appeal to `Aut(Q₈) = Sym(4)`: the three inverse pairs 
 order `4` in `T` carry an action of `N_G(T)` through a quotient of odd order
 (`not_two_dvd_relIndex_sup_centralizer`), so one fusion forces all three to fuse. -/
 theorem orbit_eq_of_odd_of_subset_card_three {H α : Type*} [Group H] [Finite H] [Finite α]
-    [MulAction H α] {s : Finset α} (hodd : ¬ 2 ∣ Nat.card H) (hs : s.card = 3)
-    {x : α} (hsub : ∀ h : H, h • x ∈ s) (hne : ∃ h : H, h • x ≠ x) :
+    [MulAction H α] {s : Finset α} {x : α} (hodd : ¬ 2 ∣ (MulAction.stabilizer H x).index)
+    (hs : s.card = 3) (hsub : ∀ h : H, h • x ∈ s) (hne : ∃ h : H, h • x ≠ x) :
     ∀ y ∈ s, ∃ h : H, h • x = y := by
   classical
   letI := Fintype.ofFinite H
   letI : Fintype (MulAction.orbit H x) := Fintype.ofFinite _
-  letI : Fintype (MulAction.stabilizer H x) := Fintype.ofFinite _
-  have hos := MulAction.card_orbit_mul_card_stabilizer_eq_card_group H x
-  have hdvd : Fintype.card (MulAction.orbit H x) ∣ Nat.card H := by
-    rw [Nat.card_eq_fintype_card, ← hos]
-    exact Dvd.intro _ rfl
+  have hcard : Fintype.card (MulAction.orbit H x) = (MulAction.stabilizer H x).index := by
+    rw [← Nat.card_eq_fintype_card, Nat.card_congr (MulAction.orbitEquivQuotientStabilizer H x),
+      Subgroup.index_eq_card]
   have hle : (MulAction.orbit H x).toFinset ⊆ s := by
     intro y hy
     rw [Set.mem_toFinset] at hy
@@ -543,10 +541,10 @@ theorem orbit_eq_of_odd_of_subset_card_three {H α : Type*} [Group H] [Finite H]
     Set.toFinset_card _
   have hgt : 1 < (MulAction.orbit H x).toFinset.card := by
     obtain ⟨h, hh⟩ := hne
-    refine Finset.one_lt_card.mpr ⟨h • x, Set.mem_toFinset.mpr (MulAction.mem_orbit x h), x,
+    exact Finset.one_lt_card.mpr ⟨h • x, Set.mem_toFinset.mpr (MulAction.mem_orbit x h), x,
       Set.mem_toFinset.mpr (MulAction.mem_orbit_self x), hh⟩
   have hne2 : (MulAction.orbit H x).toFinset.card ≠ 2 := fun h => hodd (by
-    rw [hcardeq] at h; exact h ▸ hdvd)
+    rw [hcardeq, hcard] at h; exact h ▸ dvd_rfl)
   have hleq : (MulAction.orbit H x).toFinset.card ≤ 3 := hs ▸ Finset.card_le_card hle
   have heq : (MulAction.orbit H x).toFinset = s :=
     Finset.eq_of_subset_of_card_le hle (by omega)
@@ -577,6 +575,12 @@ theorem image_inversePairs {P Q : Type*} [Group P] [Fintype P] [DecidableEq P] [
     refine ⟨{e.symm v, (e.symm v)⁻¹}, ⟨e.symm v, fun hc => hv ?_, rfl⟩, ?_⟩
     · rw [← e.apply_symm_apply v, ← map_pow, hc, map_one]
     · simp [Finset.image_insert, Finset.image_singleton]
+
+/-- **Automorphisms permute the inverse pairs.** -/
+theorem image_mem_inversePairs {P : Type*} [Group P] [Fintype P] [DecidableEq P] (σ : P ≃* P)
+    {S : Finset P} (hS : S ∈ inversePairs P) : S.image σ ∈ inversePairs P := by
+  rw [← image_inversePairs σ]
+  exact Finset.mem_image_of_mem _ hS
 
 /-- **`Q₈` has exactly three inverse pairs of elements of order `4`** — equivalently, exactly
 three cyclic subgroups of order `4`. -/

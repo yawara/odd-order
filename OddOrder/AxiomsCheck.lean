@@ -13410,13 +13410,16 @@ characteristic ⟹ 既存の `normal_map_subtype_of_characteristic` で `G` で�
 #assert_only_allowed_axioms OddOrder.GroupTheory.exists_conj_eq_inv_of_quaternionTwo
 #assert_only_allowed_axioms OddOrder.GroupTheory.conj_eq_iff_of_quaternionTwo
 /-! `orbit_eq_univ_of_odd_of_card_eq_three` = **`Aut(Q₈) = Sym(4)` の代替**の核。
-奇位数群の軌道の位数は群位数を割る (orbit-stabilizer) ので奇数、3 元集合に含まれるなら 1 か 3。
-固定点でない軌道はその 3 元集合全体になる。 -/
+軌道の位数 = 安定化群の指数 (orbit-stabilizer)。それが奇数で軌道が 3 元 Finset に含まれるなら
+1 か 3 で、固定点でなければその Finset 全体。⚠ 仮説を「群位数が奇」でなく
+「**安定化群の指数が奇**」にしてあるのが要点 — 実際に作用する `N_G(T)` は偶位数だが、
+`T·C_G(T)` が固定するので指数は奇数になる。 -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.orbit_eq_of_odd_of_subset_card_three
 /-! `quaternionTwo_card_inversePairs` = **`Q₈` の位数 4 巡回部分群はちょうど 3 個**
 (`{w, w⁻¹}` の対として `decide` で数える)。融合論法の 3 元集合 `Ω` の濃度がこれ。 -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.quaternionTwo_card_inversePairs
 #assert_only_allowed_axioms OddOrder.GroupTheory.image_inversePairs
+#assert_only_allowed_axioms OddOrder.GroupTheory.image_mem_inversePairs
 #assert_only_allowed_axioms OddOrder.GroupTheory.card_inversePairs_of_quaternionTwo
 /-! `sylowQ8_le_normalizer_zpowers` = 原文「every subgroup of `P` is normal in `P`」を `G` の中で
 `T ≤ N_G(⟨w⟩)` の形にしたもの。これが「`T` と `T^g` が `N_G(⟨z⟩)` の Sylow-2 ⟹ Sylow 共役で
