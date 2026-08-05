@@ -73,6 +73,10 @@ theorem add (h : CyclotomicModEq ω p x y) (h' : CyclotomicModEq ω p x' y') :
   obtain ⟨r', hr', h'⟩ := h'
   exact ⟨r + r', Subalgebra.add_mem _ hr hr', by rw [mul_add, ← h, ← h']; ring⟩
 
+theorem neg (h : CyclotomicModEq ω p x y) : CyclotomicModEq ω p (-x) (-y) := by
+  obtain ⟨r, hr, h⟩ := h
+  exact ⟨-r, Subalgebra.neg_mem _ hr, by rw [mul_neg, ← h]; ring⟩
+
 theorem mul_left {c : K} (hc : c ∈ Algebra.adjoin ℤ ({ω} : Set K))
     (h : CyclotomicModEq ω p x y) : CyclotomicModEq ω p (c * x) (c * y) := by
   obtain ⟨r, hr, h⟩ := h

@@ -122,6 +122,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.VirtualCharacterSplitti
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionDescent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicIntegerModP
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicModEq
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CharacterPClassCongruence
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
@@ -18105,3 +18106,30 @@ projection formula = Gorenstein Lemma 7.2 (`v(G)` が `ch(G)` のイデアルで
 
 #assert_only_allowed_axioms
   OddOrder.CyclotomicModEq.intCast
+
+/-! 🎯🎯 **Brauer 指標判定 (issue 9508 段 D 完了) = Gorenstein Lemma 7.5**
+(`Modular/CharacterPClassCongruence`)。整数値な `χ ∈ ch_R(G)` は `p`-class 上で mod p 一定:
+`χ(y) ≡ χ(u) (mod p)` (`u` = `y` の `p'`-部分)。
+- `character_pow_prime_pow` (真の指標での核心): `character_pow_eq_sum_finrank_smul` を
+  `k = 1` と `k = p^s` で読み、freshman's dream と Fermat で繋ぐ。**重複度が両辺で同一**
+  なのが効く (段 D 前半で `k` を自由にした理由)。
+- `pow_prime_pow_congr_of_mem_{virtualCharacters,adjoinSpan}`: 性質
+  「`χ(y)^{p^s} ≡ χ(u)^{p^s}`」が `0`/`+`/`−` と `ω` 冪倍で閉じるので
+  `AddSubgroup.closure_induction` 2 段で `ch_R(G)` 全体へ持ち上がる。
+- `exists_pow_prime_pow_eq_pRegularPart`: `y^{p^s} = (p'-部分)^{p^s}` (`p^s` = `p`-部分の位数)。
+- `intModEq_of_mem_adjoinSpan` = **Lemma 7.5** 本体 (`ℤ ∩ pR = pℤ` と ℤ での Fermat で指数を外す)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.character_pow_prime_pow
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.mem_adjoin_of_mem_adjoinSpan_virtualCharacters
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.pow_prime_pow_congr_of_mem_adjoinSpan
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_pow_prime_pow_eq_pRegularPart
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.intModEq_of_mem_adjoinSpan
