@@ -17431,3 +17431,19 @@ Navarro (5.12) の "in particular, notice that the matrix `J` is regular"。
 
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.isConj_of_klein_sylow
+
+/-! 🎯🎯 **Navarro (7.2) 第 1 部**: `P` が Klein 四元群 Sylow-2 で `N_G(P)` が `P` を
+中心化しないなら `G` の involution の類は 1 個 (`GroupTheory/KleinFourSylowFusion`)。
+⚠ 証人は**奇位数に取り直せる** (`exists_odd_not_centralizes`) — 任意の `g ∈ N_G(P)` の
+2-部分は `P` の唯一性 (`mem_of_isPElement_of_mem_normalizer`) から `P` に入り、`P` は可換なので
+`P` を中心化する。動かしているのは `2'`-部分。これで通常の
+「`|N_G(P) : C_G(P)|` は奇数」の勘定 (relindex/Sylow 指数) を回避できる。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.mem_of_isPElement_of_mem_normalizer
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.exists_odd_not_centralizes
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isConj_of_klein_sylow_of_not_centralizes

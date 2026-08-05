@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Sylow
 import OddOrder.GroupTheory.KleinFourAutomorphism
+import OddOrder.GroupTheory.PRegularElement
 
 /-!
 # A single class of involutions for a Klein four Sylow `2`-subgroup
@@ -16,15 +17,20 @@ Every involution of `G` is conjugate into `P` (Sylow), and an element of `N_G(P)
 centralising `P` conjugates the three involutions of `P` cyclically
 (`eq_or_eq_or_eq_iterate_of_odd_of_klein`).
 
-The hypothesis is stated as "there is an odd-order `g ∈ N_G(P)` not centralising `P`" rather than
-"`N_G(P) ≠ C_G(P)`"; the two are equivalent because `|N_G(P) : C_G(P)|` is odd, which is a
-separate piece of Sylow bookkeeping.
+The witness may be taken of odd order: the `2`-part of any `g ∈ N_G(P)` lies in `P`, because `P`
+is the unique Sylow `2`-subgroup of `N_G(P)` (`mem_of_isPElement_of_mem_normalizer`), and `P` is
+abelian — so it is the `2'`-part of `g` that moves the involutions.  This replaces the usual
+appeal to "`|N_G(P) : C_G(P)|` is odd".
 
 ## Main results
 
 * `OddOrder.GroupTheory.exists_conj_mem_sylow_of_mul_self_eq_one` — an involution is conjugate
   into any Sylow `2`-subgroup
 * `OddOrder.GroupTheory.isConj_of_klein_sylow` — all involutions of `G` are conjugate
+* `OddOrder.GroupTheory.mem_of_isPElement_of_mem_normalizer` — a `p`-element normalising a Sylow
+  `p`-subgroup lies in it
+* `OddOrder.GroupTheory.exists_odd_not_centralizes` — the witness may be taken of odd order
+* `OddOrder.GroupTheory.isConj_of_klein_sylow_of_not_centralizes` — Navarro (7.2), first part
 -/
 
 namespace OddOrder.GroupTheory
@@ -114,5 +120,79 @@ theorem isConj_of_klein_sylow (P : Sylow 2 G) (hcard : Nat.card ↥(P : Subgroup
   have hcc : IsConj u (c * u * c⁻¹) := isConj_iff.mpr ⟨c, rfl⟩
   have hdd : IsConj v (d * v * d⁻¹) := isConj_iff.mpr ⟨d, rfl⟩
   exact hcc.trans ((key _ _ hcu hdv).trans hdd.symm)
+
+/-! ### From `N_G(P) ≠ C_G(P)` to an odd-order witness -/
+
+variable {p : ℕ}
+
+omit [Finite G] in
+/-- **A `p`-element normalising a Sylow `p`-subgroup lies in it.**  `IsPGroup.inf_normalizer_sylow`
+says a `p`-subgroup meets the normalizer of a Sylow `p`-subgroup inside that subgroup. -/
+theorem mem_of_isPElement_of_mem_normalizer [Fact p.Prime] (Q : Sylow p G) {x : G}
+    (hx : IsPElement p x) (hxN : x ∈ Subgroup.normalizer ((Q : Subgroup G) : Set G)) :
+    x ∈ (Q : Subgroup G) := by
+  obtain ⟨k, hk⟩ := hx
+  have hzp : IsPGroup p (Subgroup.zpowers x) :=
+    IsPGroup.of_card (n := k) (by rw [Nat.card_zpowers, hk])
+  have hinf := hzp.inf_normalizer_sylow Q
+  have hmem : x ∈ Subgroup.zpowers x ⊓ Subgroup.normalizer (Q : Set G) := by
+    refine ⟨Subgroup.mem_zpowers x, ?_⟩
+    rw [← Sylow.coe_coe]
+    exact hxN
+  rw [hinf] at hmem
+  exact hmem.2
+
+/-- **An element of `N_G(P)` not centralising a Klein four Sylow `2`-subgroup can be taken of odd
+order.**  Its `2`-part lies in `P` (`mem_of_isPElement_of_mem_normalizer`) and so centralises the
+abelian `P`, hence the `2'`-part is the one doing the moving. -/
+theorem exists_odd_not_centralizes (P : Sylow 2 G) (hexp : ∀ x : ↥(P : Subgroup G), x * x = 1)
+    {g : G} (hgN : g ∈ Subgroup.normalizer ((P : Subgroup G) : Set G))
+    (hgnc : ∃ x ∈ (P : Subgroup G), g * x * g⁻¹ ≠ x) :
+    ∃ h ∈ Subgroup.normalizer ((P : Subgroup G) : Set G), Odd (orderOf h) ∧
+      ∃ x ∈ (P : Subgroup G), h * x * h⁻¹ ≠ x := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hfin : IsOfFinOrder g := isOfFinOrder_of_finite g
+  set g₂ : G := pPart 2 g with hg₂
+  set g' : G := pRegularPart 2 g with hg'
+  have hg₂N : g₂ ∈ Subgroup.normalizer ((P : Subgroup G) : Set G) := by
+    rw [hg₂, pPart]; exact Subgroup.zpow_mem _ hgN _
+  have hg'N : g' ∈ Subgroup.normalizer ((P : Subgroup G) : Set G) := by
+    rw [hg', pRegularPart]; exact Subgroup.zpow_mem _ hgN _
+  have hg₂P : g₂ ∈ (P : Subgroup G) :=
+    mem_of_isPElement_of_mem_normalizer P (isPElement_pPart Nat.prime_two g) hg₂N
+  -- `P` has exponent `2`, hence is abelian, so its elements centralise it
+  have hcent : ∀ x ∈ (P : Subgroup G), g₂ * x * g₂⁻¹ = x := by
+    intro x hx
+    have hcomm : (⟨g₂, hg₂P⟩ : ↥(P : Subgroup G)) * ⟨x, hx⟩ = ⟨x, hx⟩ * ⟨g₂, hg₂P⟩ := by
+      have h1 := hexp (⟨g₂, hg₂P⟩ * ⟨x, hx⟩)
+      have h2 := hexp (⟨g₂, hg₂P⟩ : ↥(P : Subgroup G))
+      have h3 := hexp (⟨x, hx⟩ : ↥(P : Subgroup G))
+      calc (⟨g₂, hg₂P⟩ : ↥(P : Subgroup G)) * ⟨x, hx⟩
+          = (⟨g₂, hg₂P⟩ * ⟨x, hx⟩)⁻¹ := (inv_eq_of_mul_eq_one_left h1).symm
+        _ = (⟨x, hx⟩ : ↥(P : Subgroup G))⁻¹ * (⟨g₂, hg₂P⟩ : ↥(P : Subgroup G))⁻¹ := mul_inv_rev _ _
+        _ = (⟨x, hx⟩ : ↥(P : Subgroup G)) * ⟨g₂, hg₂P⟩ := by
+              rw [inv_eq_of_mul_eq_one_left h3, inv_eq_of_mul_eq_one_left h2]
+    have : g₂ * x = x * g₂ := congrArg Subtype.val hcomm
+    rw [this, mul_assoc, mul_inv_cancel, mul_one]
+  refine ⟨g', hg'N, ?_, ?_⟩
+  · have hreg : IsPRegular 2 g' := isPRegular_pRegularPart Nat.prime_two hfin
+    exact Nat.odd_iff.mpr (Nat.two_dvd_ne_zero.mp hreg)
+  · obtain ⟨x, hxP, hxne⟩ := hgnc
+    refine ⟨x, hxP, fun h => hxne ?_⟩
+    have hfac : g = g₂ * g' := (pPart_mul_pRegularPart Nat.prime_two hfin).symm
+    have hgx : g * x * g⁻¹ = g₂ * (g' * x * g'⁻¹) * g₂⁻¹ := by
+      rw [hfac]; group
+    rw [hgx, h, hcent x hxP]
+
+/-- **Navarro (7.2), first part.**  If the Sylow `2`-subgroup `P` is a Klein four group and
+`N_G(P)` does not centralise `P`, then `G` has a single class of involutions. -/
+theorem isConj_of_klein_sylow_of_not_centralizes (P : Sylow 2 G)
+    (hcard : Nat.card ↥(P : Subgroup G) = 4) (hexp : ∀ x : ↥(P : Subgroup G), x * x = 1)
+    {g : G} (hgN : g ∈ Subgroup.normalizer ((P : Subgroup G) : Set G))
+    (hgnc : ∃ x ∈ (P : Subgroup G), g * x * g⁻¹ ≠ x)
+    {u v : G} (hu : u ≠ 1) (hu2 : u * u = 1) (hv : v ≠ 1) (hv2 : v * v = 1) :
+    IsConj u v := by
+  obtain ⟨h, hhN, hhodd, hhnc⟩ := exists_odd_not_centralizes P hexp hgN hgnc
+  exact isConj_of_klein_sylow P hcard hexp hhN hhodd hhnc hu hu2 hv hv2
 
 end OddOrder.GroupTheory
