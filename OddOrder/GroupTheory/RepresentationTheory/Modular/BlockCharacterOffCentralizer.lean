@@ -16,9 +16,9 @@ subgroup one needs the same statement one `H`-class at a time:
 
 `π_H(L̂) = 0`  for every `H`-class `L` disjoint from `C_G(P)`,
 
-which is the same application of `pi_sum_ite_single_eq_zero` — the engine only asks for a
-predicate invariant under `P`-conjugation and disjoint from `C_H(P)`, and an `H`-class is such a
-predicate just as well as the trace of a `G`-class.
+which is just Navarro (4.7) (`OddOrder.GroupAlgebra.pi_classSum_eq_zero_of_notMem_centralizer`)
+applied inside `H` to the normal `p`-subgroup `P.subgroupOf H`, once the hypothesis is restated
+with the centraliser taken in `G`.
 
 The consequence used downstream is that a block character of `H` is determined by the
 coefficients on `C_G(P)`:
@@ -27,7 +27,7 @@ coefficients on `C_G(P)`:
 
 ## Main results
 
-* `OddOrder.RepresentationTheory.Modular.pi_classSum_eq_zero_of_notMem_centralizer`
+* `OddOrder.RepresentationTheory.Modular.pi_classSum_subgroup_eq_zero_of_notMem_centralizer`
 * `OddOrder.RepresentationTheory.Modular.blockCharacter_eq_of_coeff_eq_on_centralizer`
 -/
 
@@ -47,10 +47,11 @@ omit [Fintype G] [Fintype (ConjClasses ↥H)] [Finite ι] in
 open scoped Classical in
 /-- **`π_H` kills the class sum of an `H`-class disjoint from `C_G(P)`.**
 
-`P`, seen inside `H`, is a normal `p`-subgroup (this is where `P ≤ H ≤ N_G(P)` is used), and
-belonging to a fixed `H`-class is invariant under conjugating by it, so the whole class sum lies
-in the kernel by `pi_sum_ite_single_eq_zero`. -/
-theorem pi_classSum_eq_zero_of_notMem_centralizer {p : ℕ} [Fact p.Prime] [CharP k p]
+This is Navarro (4.7) (`OddOrder.GroupAlgebra.pi_classSum_eq_zero_of_notMem_centralizer`) read
+inside `H`: `P.subgroupOf H` is a normal `p`-subgroup of `H` (this is where `P ≤ H ≤ N_G(P)` is
+used), and an element of `C_H(P.subgroupOf H)` centralises `P` in `G`, so the hypothesis stated
+with `C_G(P)` is the one (4.7) wants. -/
+theorem pi_classSum_subgroup_eq_zero_of_notMem_centralizer {p : ℕ} [Fact p.Prime] [CharP k p]
     (hπ : Function.Surjective πH)
     (hlin : ∀ (c : k) (a : MonoidAlgebra k ↥H), πH (c • a) = c • πH a)
     (hP : IsPGroup p ↥P) (hPH : P ≤ H) (hHN : H ≤ Subgroup.normalizer (P : Set G))
@@ -58,7 +59,6 @@ theorem pi_classSum_eq_zero_of_notMem_centralizer {p : ℕ} [Fact p.Prime] [Char
     (hL : ∀ h : ↥H, ConjClasses.mk h = L → (h : G) ∉ Subgroup.centralizer (P : Set G)) :
     πH (classSum (k := k) L) = 0 := by
   classical
-  -- `P`, viewed inside `H`, is a normal `p`-subgroup.
   set Q : Subgroup ↥H := P.subgroupOf H with hQ
   have hmemQ : ∀ y : ↥H, y ∈ Q ↔ (y : G) ∈ P := fun _ => Iff.rfl
   haveI hQnormal : Q.Normal := by
@@ -68,22 +68,14 @@ theorem pi_classSum_eq_zero_of_notMem_centralizer {p : ℕ} [Fact p.Prime] [Char
     rw [hcoe]
     exact (Subgroup.mem_normalizer_iff.mp (hHN g.2) (n : G)).mp hn
   have hQp : IsPGroup p ↥Q := hP.comap_of_injective H.subtype Subtype.val_injective
-  have hrw : (classSum (k := k) L : MonoidAlgebra k ↥H)
-      = ∑ h : ↥H, if ConjClasses.mk h = L then single h (1 : k) else 0 := by
-    rw [classSum]
-    exact Finset.sum_congr rfl fun h _ => by split <;> simp [MonoidAlgebra.of_apply]
-  rw [hrw]
-  refine pi_sum_ite_single_eq_zero πH hπ hlin hQp _ (fun u _ x => ?_) fun x hx hmem => ?_
-  · have hc : ConjClasses.mk (u * x * u⁻¹) = ConjClasses.mk x :=
-      ConjClasses.mk_eq_mk_iff_isConj.mpr (isConj_iff.mpr ⟨u⁻¹, by group⟩)
-    rw [hc]
-  · -- an element of `C_H(Q)` centralises `P`, contradicting `hL`
-    refine hL x hx ?_
-    rw [Subgroup.mem_centralizer_iff]
-    intro z hz
-    have hzH : z ∈ H := hPH hz
-    have hzQ : (⟨z, hzH⟩ : ↥H) ∈ Q := hz
-    exact congrArg Subtype.val ((Subgroup.mem_centralizer_iff.mp hmem) (⟨z, hzH⟩ : ↥H) hzQ)
+  refine OddOrder.GroupAlgebra.pi_classSum_eq_zero_of_notMem_centralizer πH hπ hlin hQp
+    fun x hx hmem => hL x hx ?_
+  -- an element of `C_H(P.subgroupOf H)` centralises `P` in `G`
+  rw [Subgroup.mem_centralizer_iff]
+  intro z hz
+  have hzH : z ∈ H := hPH hz
+  have hzQ : (⟨z, hzH⟩ : ↥H) ∈ Q := hz
+  exact congrArg Subtype.val ((Subgroup.mem_centralizer_iff.mp hmem) (⟨z, hzH⟩ : ↥H) hzQ)
 
 omit [Fintype G] [Finite ι] in
 -- The class-sum expansion of the centre needs the finiteness and decidability of `cl(H)`, which
@@ -126,7 +118,7 @@ theorem blockCharacter_eq_of_coeff_eq_on_centralizer {p : ℕ} [Fact p.Prime] [C
           (by rw [← ConjClasses.quotient_mk_eq_mk, Quotient.out_eq, hhL]), hzero h hhC]
       rw [hout, zero_smul, map_zero]
     · push Not at hmeet
-      rw [hlin, pi_classSum_eq_zero_of_notMem_centralizer hπ hlin hP hPH hHN
+      rw [hlin, pi_classSum_subgroup_eq_zero_of_notMem_centralizer hπ hlin hP hPH hHN
         (fun h hh => hmeet h hh), smul_zero]
   have := congrFun hd b
   rw [blockCharacterPi_apply, map_sub, Pi.zero_apply, sub_eq_zero] at this

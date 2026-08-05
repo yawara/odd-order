@@ -17111,6 +17111,6 @@ BS が実際に使う向きで、Okuyama (6.6) / height 理論を通らない。
 `C_G(P)` 上の係数だけで決まる。第三主定理を一般の中間部分群で出すための部品。 -/
 
 #assert_only_allowed_axioms
-  OddOrder.RepresentationTheory.Modular.pi_classSum_eq_zero_of_notMem_centralizer
+  OddOrder.RepresentationTheory.Modular.pi_classSum_subgroup_eq_zero_of_notMem_centralizer
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.blockCharacter_eq_of_coeff_eq_on_centralizer
