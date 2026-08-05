@@ -13413,6 +13413,10 @@ characteristic ⟹ 既存の `normal_map_subtype_of_characteristic` で `G` で�
 奇位数群が 3 元集合に作用するとき、軌道の位数は群位数を割る (orbit-stabilizer) ので奇数、
 かつ ≤ 3 ⟹ 1 か 3。固定点でない軌道は全体。 -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.orbit_eq_univ_of_odd_of_card_eq_three
+/-! `sylowQ8_le_normalizer_zpowers` = 原文「every subgroup of `P` is normal in `P`」を `G` の中で
+`T ≤ N_G(⟨w⟩)` の形にしたもの。これが「`T` と `T^g` が `N_G(⟨z⟩)` の Sylow-2 ⟹ Sylow 共役で
+`g` を `N_G(T)` に取り直せる」段の入口。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.sylowQ8_le_normalizer_zpowers
 
 /-! ### lean-eval 提出候補の登録 (issue 0050, 2026-07-22).
 
