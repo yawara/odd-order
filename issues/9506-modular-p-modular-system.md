@@ -2195,6 +2195,22 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         ⟹ **(7.2) の部品は 2026-08-05 に全て揃った**。次は (7.2) 本体の組み立て:
         第 1 部 (involution の類が 1 個か 3 個) と第 2 部
         (`k(B₀) − l(B₀) = 1` から `Irr(B₀) = {1_G, χ₁, χ₂, χ₃}` と `χ_i(t) = ±1`)。
+        - [x] 🎯 **第 1 部の核 完了 (2026-08-05、段 180)**:
+          `eq_or_eq_or_eq_iterate_of_odd_of_klein` =「**奇数回反復が恒等**な非自明自己準同型は
+          Klein 四元群の involution 上で推移的」。⚠ `Aut(Z₂×Z₂) ≅ Sym(3)` も `|Aut(P)| = 6` も
+          `Equiv.Perm` の位数計算も要らない — downstream で要るのは
+          「`N_G(P)/C_G(P)` は奇位数」(`P` が可換 Sylow-2 ゆえ) だけ。
+          支持 = `eq_of_fixed_two_of_klein` / `forall_cube_eq_self_of_klein`。
+        - [ ] **⏸ 次 = 第 1 部の群論的組み立て**:
+          (i) `P ≤ C_G(P)` (`P` 可換) ゆえ `|N_G(P) : C_G(P)|` は奇数
+              (`P` は `C_G(P)` でも Sylow-2)、
+          (ii) `g ∈ N_G(P) ∖ C_G(P)` に対し共役写像 `f` は `f^[m] = id` (`m` = `g` の
+              `N/C` での位数、奇数) を満たし非自明 ⟹ 段 180 で `P` の 3 つの involution が
+              `G`-共役、
+          (iii) 任意の involution は Sylow で `P` の元に共役 ⟹ 類は 1 個。
+          `N_G(P) = C_G(P)` の場合は既存の Burnside
+          (`Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer`) で
+          正規 2-補群 ⟹ 類は 3 個。
         ⚠ (5.12)/(5.13) は Ch.5 なので**文書順で先**。上流優先で (5.13)(b) →
         (5.12) → (7.2) の順に当たる。
         - [x] 🎯🎯 **(5.13)(a) 前半 完了 (2026-08-05、段 173)**:
