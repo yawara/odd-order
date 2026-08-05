@@ -295,6 +295,25 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
     `eq_sum_charPairing_wedderburnRepresentation` で展開し係数の整数性は
     `charPairing_mem_intRange` (段 B)、最後に `p`-正則なら `θ̂ = θ`。
   - [ ] **H5**: (3.16) = ブロック局所化 (段 205-206 の型を ℤ 係数で反復)。
+
+    ⚠⚠ **`ordinaryCombinationCoeff` 自体は整数ではない (2026-08-05 確定、反例あり)**。
+    段 204 の係数は `a_{iμ} = Σ_τ d_{iτ}[τ,μ]⁰` = 行列で書くと **`D C⁻¹`** (`C = DᵀD`)。
+    これは擬似逆行列で、一般に整数にならない — 例えば `D = (1,1)ᵀ` (2×1) なら `C = (2)` で
+    `D C⁻¹ = (1/2, 1/2)ᵀ`。⟹ **`principalBasicSetMatrix` を
+    `ordinaryCombinationCoeff` で定義したままでは整数性は証明できない** (偽なので)。
+    これが段 I (「`PrincipalBlockBasicSet` の `U` を ℤ 値に戻す」) が要る理由。
+    ⚠ 「H4 の係数 = 段 204 の係数」も**成り立たない** — `{χ_i⁰}` は `p`-正則類上で
+    一次独立でない (Irr の個数 > `p`-正則類の個数) ので係数は一意でない。
+
+    **H5 の議論** (段 H4 の整数係数 `a_i` をブロックの外で 0 に落とす):
+    `a'_i := if blockOfIrr i = block(μ₀) then a_i else 0` と置くと、IBr 展開で
+    `Σ_i a'_i d_{iμ} = Σ_i a_i d_{iμ} = δ_{μμ₀}` が全ての `μ` で成り立つ:
+    - `μ ∈ B` のとき: 落とした項は `i ∉ B` で `d_{iμ} = 0`
+      (`blockOfIrr_eq_of_decompositionMatrix_ne_zero`) なので和は不変。
+    - `μ ∉ B` のとき: `a'_i ≠ 0` は `i ∈ B` を要し `d_{iμ} ≠ 0` は `μ ∈ block(i) = B` を要する
+      ので全項 0。右辺も `δ_{μμ₀} = 0` (`μ₀ ∈ B`)。
+    IBr の一次独立性 (`eq_zero_of_sum_irreducibleBrauerCharacter`) で
+    `Σ_i a'_i χ_i⁰ = φ_{μ₀}` が従う。
 - [ ] **段 I**: `PrincipalBlockBasicSet` の `U` を ℤ 値に戻し、9506 の BS 本証明へ供給
 
 ## 完了条件
