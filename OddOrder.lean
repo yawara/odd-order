@@ -384,6 +384,8 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.CharacterPClassCongruen
 import OddOrder.GroupTheory.RepresentationTheory.UnitCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedAdjoinSpan
 import OddOrder.GroupTheory.RepresentationTheory.PClassIndicator
+import OddOrder.GroupTheory.RepresentationTheory.DivisibleClassFunction
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionTheorem
 import OddOrder.GroupTheory.RepresentationTheory.InducedIndicator
 import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCount
 import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCharacter

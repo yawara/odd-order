@@ -56,6 +56,7 @@ theorem exists_pClassIndicator (h𝒳 : IsElementaryFamily 𝒳) (hN : N ≠ 0)
     {P : Subgroup G} (hPp : IsPGroup p ↥P) (hcomm : ∀ v ∈ P, Commute u v) :
     ∃ χ : G → K, χ ∈ adjoinSpan ω (inducedVirtualCharacters K 𝒳) ∧
       (∀ y : G, χ y = ((conjugateCount (leftCosetOf u P) y / Nat.card ↥P : ℕ) : K)) ∧
+      (∀ y z : G, IsConj y z → χ y = χ z) ∧
       (∀ y : G, ¬ IsConj (pRegularPart p y) u → χ y = 0) ∧
       χ u = ((Nat.card ↥(Subgroup.centralizer ({u} : Set G)) / Nat.card ↥P : ℕ) : K) := by
   classical
@@ -82,12 +83,17 @@ theorem exists_pClassIndicator (h𝒳 : IsElementaryFamily 𝒳) (hN : N ≠ 0)
   have hgen : ∀ h : G, h ∈ H → ∃ (a : ℕ) (v : G), v ∈ P ∧ h = u ^ a * v := fun h hh =>
     (mem_pRegularProd_nat hcomm).mp hh
   have hcard : Nat.card ↥H = orderOf u * Nat.card ↥P := card_pRegularProd hp hu hPp hcomm
-  refine ⟨induceFun H (cosetIndicator u P H K), ?_, ?_, ?_, ?_⟩
+  have hform : ∀ y : G, induceFun H (cosetIndicator u P H K) y
+      = ((conjugateCount (leftCosetOf u P) y / Nat.card ↥P : ℕ) : K) :=
+    fun y => induceFun_cosetIndicator hcomm (self_mem_pRegularProd hcomm)
+      (le_pRegularProd hcomm) hcard y
+  refine ⟨induceFun H (cosetIndicator u P H K), ?_, hform, ?_, ?_, ?_⟩
   · exact induceFun_mem_adjoinSpan_inducedVirtualCharacters hmemH
       (cosetIndicator_mem_adjoinSpan hp hu hPp hcomm hord hgen hωint
         (by rw [hcoe]; exact Subalgebra.pow_mem _ (Algebra.self_mem_adjoin_singleton ℤ ω) _))
-  · exact fun y => induceFun_cosetIndicator hcomm (self_mem_pRegularProd hcomm)
-      (le_pRegularProd hcomm) hcard y
+  · intro y z hyz
+    obtain ⟨w, hw⟩ := isConj_iff.mp hyz
+    rw [hform y, ← hw, hform, conjugateCount_conj]
   · exact fun y hy => induceFun_cosetIndicator_eq_zero hp hu hPp hcomm
       (self_mem_pRegularProd hcomm) (le_pRegularProd hcomm) hcard hy
   · exact induceFun_cosetIndicator_self hp hu hPp hcomm (self_mem_pRegularProd hcomm)

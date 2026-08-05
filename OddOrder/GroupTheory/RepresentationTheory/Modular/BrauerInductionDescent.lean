@@ -117,6 +117,9 @@ theorem pow_smul_mem_adjoinSpan (j : ℕ) {w : V} (hw : w ∈ M) : ω ^ j • w 
 theorem le_adjoinSpan : M ≤ adjoinSpan ω M := fun w hw => by
   simpa using pow_smul_mem_adjoinSpan (ω := ω) 0 hw
 
+theorem adjoinSpan_mono {M' : AddSubgroup V} (h : M ≤ M') : adjoinSpan ω M ≤ adjoinSpan ω M' :=
+  AddSubgroup.closure_mono <| by rintro f ⟨j, w, hw, rfl⟩; exact ⟨j, w, h hw, rfl⟩
+
 variable [CharZero K] (hω : IsIntegral ℤ ω)
 
 include hω in

@@ -126,6 +126,8 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.CharacterPClassCongruen
 import OddOrder.GroupTheory.RepresentationTheory.UnitCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedAdjoinSpan
 import OddOrder.GroupTheory.RepresentationTheory.PClassIndicator
+import OddOrder.GroupTheory.RepresentationTheory.DivisibleClassFunction
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionTheorem
 import OddOrder.GroupTheory.RepresentationTheory.InducedIndicator
 import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCount
 import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCharacter
@@ -593,7 +595,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 18300
+set_option linter.style.longFile 18500
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -18291,3 +18293,29 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.exists_pClassIndicator
+
+/-! 🎯🎯 **Brauer 指標判定 (issue 9508 段 F)**: Lemma 7.6 の 2 つの消費者。
+
+**Lemma 7.7** (`RepresentationTheory/DivisibleClassFunction`): 整数値類関数で全値が `|G|` で
+割れるものは `v_R(G)` に入る。`p > |G|` を取ると (i) 全元が `p`-正則ゆえ p-class = 共役類、
+(ii) `P = ⊥` が許容される `p`-部分群、の 2 つが同時に潰れて、各共役類 `C` の指示関数
+`χ_C ∈ v_R(G)` (`χ_C(C.out) = |C_G(C.out)|`) が得られる。係数
+`θ(C.out)/|G| · [G : C_G(C.out)]` は整数。
+
+**Lemma 7.8** (`Modular/BrauerInductionTheorem`): 各素数 `p` に対し整数値 `χ ∈ v_R(G)` で
+`χ ≡ 1 (mod p)`。p-正則類ごとに `P ∈ Syl_p(C_G(u_C))` を取ると `χ_C(u_C) = [C_G(u_C):P]` が
+`p` と素なので mod `p` の逆元で scale して足す。代表元の外へ広げるのに**段 D の Lemma 7.5**
+(整数値 `ch_R(G)` 元は p-class 上 mod `p` 一定) を使う — そこで `v_R(G) ⊆ ch_R(G)`
+(`adjoinSpan_mono` + 分裂 `e` 経由の `v(G) ⊆ ch(G)`) が要る。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.conjugateCount_conj
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.adjoinSpan_mono
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.mem_adjoinSpan_inducedVirtualCharacters_of_card_dvd
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_congr_one_mod_prime

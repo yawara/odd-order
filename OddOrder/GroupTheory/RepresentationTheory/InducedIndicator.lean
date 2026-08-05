@@ -44,6 +44,26 @@ noncomputable def conjugateCount (S : Set G) (y : G) : ℕ :=
   (Finset.univ.filter fun x : G => x⁻¹ * y * x ∈ S).card
 
 open scoped Classical in
+/-- **`conjugateCount S` is a class function**: reindexing `x ↦ w⁻¹ x` matches the two counted
+sets, because `(w⁻¹ x)⁻¹ y (w⁻¹ x) = x⁻¹ (w y w⁻¹) x`. -/
+theorem conjugateCount_conj (S : Set G) (y w : G) :
+    conjugateCount S (w * y * w⁻¹) = conjugateCount S y := by
+  classical
+  have hinj : Function.Injective (fun x : G => w⁻¹ * x) := fun a b h => by simpa using h
+  have hcard := Finset.card_image_of_injective
+    (Finset.univ.filter fun x : G => x⁻¹ * (w * y * w⁻¹) * x ∈ S) hinj
+  rw [conjugateCount, conjugateCount, ← hcard]
+  congr 1
+  ext z
+  simp only [Finset.mem_image, Finset.mem_filter, Finset.mem_univ, true_and]
+  constructor
+  · rintro ⟨x, hx, rfl⟩
+    rwa [show (w⁻¹ * x)⁻¹ * y * (w⁻¹ * x) = x⁻¹ * (w * y * w⁻¹) * x from by group]
+  · intro hz
+    exact ⟨w * z, by rwa [show (w * z)⁻¹ * (w * y * w⁻¹) * (w * z) = z⁻¹ * y * z from by group],
+      by group⟩
+
+open scoped Classical in
 /-- **Gorenstein (7.14)–(7.15)**: inducing `c · 1_S` from `H` counts conjugates landing in `S`. -/
 theorem induceFun_indicator (S : Set G) (hS : S ⊆ (H : Set G)) (c : K) (y : G) :
     induceFun H (fun h : ↥H => if (h : G) ∈ S then c else 0) y
