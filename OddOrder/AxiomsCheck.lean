@@ -279,6 +279,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
@@ -17510,3 +17511,26 @@ Klein 四元群 Sylow-2 を持つ群は単一類になれない ((7.2) が `C = 
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_sq_generalizedDecompositionNumber_of_involution
+
+/-! 🎯🎯 **`χ(x y) = d^x_{χ φ₀}`** — `C_G(x)` が正規 `p`-補群を持つときの `p`-section 上の値
+(`Modular/SecondMainPrincipalBlock`)。Navarro (7.2) が「(5.8) と第三主定理より
+`χ(ts) = d^t_{χ 1_{C⁰}}`」と書く段。3 つが合わさる:
+ - **第二主定理** (`generalizedDecompositionNumber_eq_zero_of_blockOfIrr_ne`):
+   `d^x_{χμ} = 0` (`μ` のブロックが `χ` のブロックを誘導しない限り);
+ - **第三主定理の逆** (Külshammer 経路、`eq_principalBlock_of_inducedBlockOfCentralizer_eq` =
+   既存の `..._intermediate` を `Q = ⟨x⟩` へ特殊化したもの);
+ - **(6.13)**: `C_G(x)` が正規 `p`-補群を持てば `IBr(b₀) = {1_{C⁰}}` で、その Brauer 指標は
+   `p`-正則類上で定数 1 (`irreducibleBrauerCharacter_principalBlock_eq_one`)。
+⟹ 展開 `χ(xy) = Σ_μ d^x_{χμ} μ(y)` が `μ = φ₀` の 1 項に潰れる。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.irreducibleBrauerCharacter_principalBlock_eq_one
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_principalBlock_of_inducedBlockOfCentralizer_eq
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_eq_zero_of_ne_principal
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.character_mul_eq_generalizedDecompositionNumber
