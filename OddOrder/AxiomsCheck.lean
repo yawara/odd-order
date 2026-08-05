@@ -113,6 +113,7 @@ import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
 import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
 import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
@@ -17923,3 +17924,26 @@ literally 同一であることから、`φ(g) = φ̄(ḡ)` が Brauer 指標の
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.cartanMatrix_quotientPi
+
+/-! 🎯 **Brauer 指標判定の土台 (issue 9508 段 A)**: 一般の体 `K` 上の virtual character
+`ch(H)` (`RepresentationTheory/VirtualCharacter`)。Gorenstein §4.7 の `ch(G)`。
+**分裂データを持たない定義** — Brauer の定理は全ての elementary 部分群 `E ≤ G` を走るので、
+各 `E` に `K[E]` の Wedderburn 分裂を与えるのは不要かつ苦痛。分裂が要るのは最後に
+「Irr(G) との内積が全部整数 ⟹ 所属」を使う `G` 自身のところだけ。
+universe を単一に保つため生成集合は標準空間 `Fin n → K` 上の表現の指標に取り、
+`isRepCharacter_of_finite` (基底を取って `transportRepresentation` で移送) で一般性を回復する。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.character_transportRepresentation
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.isRepCharacter_of_finite
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsRepCharacter.mul
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.mul_mem_virtualCharacters
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.comp_mem_virtualCharacters

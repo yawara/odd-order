@@ -369,6 +369,7 @@ import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
 import OddOrder.GroupTheory.RepresentationTheory.WielandtKernelFPF
 import OddOrder.GroupTheory.RepresentationTheory.ZIrr
+import OddOrder.GroupTheory.RepresentationTheory.VirtualCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.GroupTheory.SCN
 import OddOrder.GroupTheory.SemiDihedral
