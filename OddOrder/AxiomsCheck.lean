@@ -265,6 +265,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroDecompositio
 import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerFormula
 import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterOffCentralizer
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SectionProjectiveCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
@@ -17145,3 +17146,16 @@ BS が実際に使う向きで、Okuyama (6.6) / height 理論を通らない。
   OddOrder.RepresentationTheory.Modular.isConj_of_mem_pSection_of_mem_pSection
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.pSection_eq_of_isConj
+
+/-! **`Φ^x_μ`** (`Modular/SectionProjectiveCharacter`) — `C_G(x)` の射影不可分指標を
+`p`-section `S(x)` へ移送してゼロ拡張した `G` 上の類関数。Navarro (5.13) の証明の主役。
+well-defined 性は `isConj_centralizer_of_isConj_mul` (助変数化の単射性)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.projectiveIndecomposableCharacter_eq_of_isConj_mul
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sectionProjectiveCharacter
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sectionProjectiveCharacter_mul
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sectionProjectiveCharacter_eq_of_isConj
