@@ -2695,10 +2695,24 @@ p.139 の残り = 「位数 4 の元は全て `G`-共役 (実は `C_G(t)`-共役
 - `not_two_dvd_relIndex_sup_centralizer` (= `[N_G(T) : T·C_G(T)]` は奇数)
 - `orbit_eq_univ_of_odd_of_card_eq_three` (= 奇位数群の 3 元集合への作用は固定か推移)
 
-**残る組み立て**: 3 つの位数 4 巡回部分群の集合 `Ω` (3 元) を型として作り、`N_G(T)` の作用が
-`T·C_G(T)` を核に含む ⟹ 奇位数商を経由 ⟹ 上の 4 本目で「1 つ融合すれば全部融合」。
-その前に原文の「`g` を `N_G(T)` へ取り直す」段 (`⟨y⟩^g = ⟨z⟩` ⟹ `T, T^g ∈ Syl_2(N_G(⟨z⟩))`
-⟹ Sylow 共役) が要る。
+- `sylowQ8_le_normalizer_zpowers` (= `T ≤ N_G(⟨w⟩)`、原文「every subgroup of `P` is normal」)
+- `exists_mem_normalizer_conj_mem_zpowers` (= **融合元 `g` を `N_G(T)` に取り直せる**;
+  `T, T^g ∈ Syl_2(N_G(⟨z⟩))` + Sylow 共役)
+- `quaternionTwo_card_inversePairs` (= `Q₈` の位数 4 巡回部分群はちょうど 3 個)
+
+⚠ **`Ω` の表し方 (2026-08-06 に確定)**: 「部分群の集合」ではなく
+**「対 `{w, w⁻¹}` の `Finset` を集めた `Finset`」**で表すと `decide` で濃度 3 が出る
+(部分群の集合は decidable に列挙できない)。
+
+**残る組み立て** (次 session の着手点):
+1. `Ω` を `↥T` 側で上の形に作り、`e` で `QuaternionGroup 2` へ移して濃度 3 を得る。
+2. `N_G(T)` の `Ω` への共役作用を定義 (対 `{w,w⁻¹}` は共役で対に移る = Hamiltonian 性)。
+3. 核が `T·C_G(T)` を含む ⟹ 作用は奇位数商を経由 ⟹
+   `orbit_eq_univ_of_odd_of_card_eq_three` で「1 つ融合すれば全部融合」。
+4. 融合の存在は `not_controlsOwnFusion_of_oPiCore_eq_bot` から、
+   融合元の `N_G(T)` への補正は `exists_mem_normalizer_conj_mem_zpowers` から。
+⟹ 「位数 4 の元は全て `G`-共役 (実は `C_G(t)`-共役)」が出る。そこから p.140 以降の
+"Analysis at y" / "Analysis at t" へ。
 
 必要な群論的事実 (原文 p.138 が列挙):
 ~~`Aut(Q₈) = Sym(4)`~~ (上記で不要) / 巡回 Sylow 2 なら正規 2-補群 /
