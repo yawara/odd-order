@@ -290,6 +290,7 @@ import OddOrder.Algebra.SumSquaresFour
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockBasicSet
 import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
+import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientPairing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
@@ -572,7 +573,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 17900
+set_option linter.style.longFile 18100
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -17885,3 +17886,15 @@ literally 同一であることから、`φ(g) = φ̄(ḡ)` が Brauer 指標の
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.irreducibleBrauerCharacter_quotientPi
+
+/-! 🎯 **(7.6) の pairing 恒等式**: `|N| · [a,b]⁰_G = [ā,b̄]⁰_Ḡ` (`Modular/QuotientPairing`)。
+段 210 の全単射 `G⁰ → Ḡ⁰` で `p`-正則和 `Σ a(g)b(g⁻¹)` がそのまま移り
+(`sum_pRegular_quotient`)、違うのは正規化因子だけ。`|G| = |Ḡ|·|N|` を入れると
+原文 p.137 の `[φ,θ]⁰_G = (1/|P|)[φ̄,θ̄]⁰_Ḡ` になる。
+⟹ `([φ,θ]⁰)` が Cartan の逆 (既存 `sum_cartanMatrix_mul_pairingZero`) なので `C_B = |P| C_B̄`。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_pRegular_quotient
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_mul_pairingZero_quotient

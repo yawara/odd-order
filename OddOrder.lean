@@ -254,6 +254,7 @@ import OddOrder.Algebra.SumSquaresFour
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockBasicSet
 import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
+import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientPairing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
