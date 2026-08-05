@@ -1416,6 +1416,19 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
               `e_{B₀}` で評価して左辺 `= 1` (`hB`)、右辺 `= λ_b(e_{b₀}) = δ_{b b₀}` (`hBC`)。
             ⚠ **Okuyama (6.6) / height 理論 / `~` 関数 / Brauer の指標判定法を一切通らない**
               — 段 99 の「(c) は重い」という見立ては Külshammer 経路で完全に回避された。
+            ⚠⚠ **特殊化債務 (2026-08-05 記録、要一般化)**:
+              `eq_principalBlock_of_inducedBlockOfNormalizer_eq` は書籍 (原文 p.128 の注記
+              「for subgroups `Q C_G(Q) ⊆ H ⊆ N_G(Q)`」) より**狭い**:
+              * 書籍 = `Q C_G(Q) ≤ H ≤ N_G(Q)` の任意の `H` / 本形式化 = **`H = C_G(Q)` 固定**
+              * その結果 **`Q` 可換** (`hQab : Q ≤ C_G(Q)`) を仮定している
+                (`Q C_G(Q) ≤ H = C_G(Q)` から強制される。一般 `H` に広げれば自動で落ちる)
+              **理由**: Problem (6.1) の固定点が `C_G(Q) × C_G(Q)` の対なので、数え上げが
+              比較するのは `G` と `C_G(Q)` であって `H` ではない。一般 `H` では
+              `Br_Q(e_{B₀})` は `C_G(Q)` 上に台を持つまま `H` の主ブロック冪等元と
+              一致することを別途言う必要があり (`C_G(Q) ⊴ H` を使う一段)、係数比較だけでは
+              閉じない。
+              **BS への影響なし** (`Q = ⟨t⟩` 巡回・`H = C_G(t) = C_G(Q)`) ゆえ低優先だが、
+              CLAUDE.md「特殊化債務はできる限り一般化する」の対象として残す。
           **(6.14) の上流** (これが残る仕事):
           * [x] **(4.22) 完了 (2026-08-05)**: `GroupTheory/SylowContaining.lean`
             (🎯 `card_sylow_containing_modEq_one` — `Q` を含む Sylow の個数 ≡ 1 mod p;
