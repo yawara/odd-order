@@ -232,6 +232,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterOffCentra
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SectionProjectiveCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionSum
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionClassCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction

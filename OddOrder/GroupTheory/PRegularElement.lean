@@ -307,6 +307,11 @@ theorem pRegularPart_eq_self_of_isPRegular (hp : p.Prime) {g : G} (hg : IsPRegul
     pRegularPart p g = g :=
   ((eq_pPart_of_commute hp (Commute.one_left g) (isPElement_one p) hg (mul_one g)).2).symm
 
+/-- A `p`-element is its own `p`-part. -/
+theorem pPart_eq_self_of_isPElement (hp : p.Prime) {g : G} (hg : IsPElement p g) :
+    pPart p g = g :=
+  ((eq_pPart_of_commute hp (Commute.one_right g) hg (isPRegular_one hp) (one_mul g)).1).symm
+
 /-- The converse of `pPart_eq_one_of_isPRegular`: a trivial `p`-part means `g` *is* its own
 `p'`-part, hence is `p`-regular. -/
 theorem isPRegular_of_pPart_eq_one (hp : p.Prime) {g : G} (hg : IsOfFinOrder g)
@@ -418,6 +423,48 @@ theorem isPRegular_out {C : ConjClasses G} (hC : IsPRegularClass p C) : IsPRegul
     change ¬ p ∣ orderOf (Quotient.out (ConjClasses.mk g))
     rw [hord]
     exact hC
+
+/-- `ConjClasses.mk` of a chosen representative is the class again.  Stated for
+`ConjClasses.mk` rather than `Quotient.mk` so that it rewrites in the places where classes are
+built by `ConjClasses.mk`. -/
+theorem conjClasses_mk_out (C : ConjClasses G) : ConjClasses.mk (Quotient.out C) = C := by
+  rw [← ConjClasses.quotient_mk_eq_mk]
+  exact Quotient.out_eq _
+
+/-- Being a `p`-element is a conjugacy invariant, so it descends to conjugacy classes. -/
+def IsPElementClass (p : ℕ) (C : ConjClasses G) : Prop :=
+  Quotient.liftOn C (fun g => IsPElement p g) fun a b hab => by
+    obtain ⟨c, hc⟩ := isConj_iff.mp hab
+    have hord : orderOf b = orderOf a := by rw [← hc, orderOf_conj]
+    exact propext (by rw [IsPElement, IsPElement, hord])
+
+@[simp]
+theorem isPElementClass_mk {g : G} : IsPElementClass p (ConjClasses.mk g) ↔ IsPElement p g :=
+  Iff.rfl
+
+/-- The `p`-part of a conjugacy class: well defined because taking `p`-parts commutes with
+conjugation (`pPart_conj`). -/
+noncomputable def pPartClass (p : ℕ) (C : ConjClasses G) : ConjClasses G :=
+  Quotient.liftOn C (fun g => ConjClasses.mk (pPart p g)) fun a b hab => by
+    obtain ⟨c, hc⟩ := isConj_iff.mp hab
+    rw [← hc, pPart_conj]
+    exact ConjClasses.mk_eq_mk_iff_isConj.mpr (isConj_iff.mpr ⟨c, rfl⟩)
+
+@[simp]
+theorem pPartClass_mk (g : G) :
+    pPartClass p (ConjClasses.mk g) = ConjClasses.mk (pPart p g) := rfl
+
+/-- The `p`-part of a class is a `p`-element class. -/
+theorem isPElementClass_pPartClass (hp : p.Prime) (C : ConjClasses G) :
+    IsPElementClass p (pPartClass p C) := by
+  induction C using Quotient.inductionOn with
+  | h g => exact isPElementClass_mk.mpr (isPElement_pPart hp g)
+
+/-- On `p`-element classes the `p`-part map is the identity. -/
+theorem pPartClass_of_isPElementClass (hp : p.Prime) {C : ConjClasses G}
+    (hC : IsPElementClass p C) : pPartClass p C = C := by
+  induction C using Quotient.inductionOn with
+  | h g => exact congrArg ConjClasses.mk (pPart_eq_self_of_isPElement hp hC)
 
 end PRegularClasses
 

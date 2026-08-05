@@ -268,6 +268,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterOffCentra
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SectionProjectiveCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionSum
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionClassCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
@@ -17291,3 +17292,15 @@ Navarro (5.13) の証明の内積計算。`x⁻¹` 側の分裂データを持�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_mul_generalizedDecompositionNumber_eq_zero
+
+/-! 🎯🎯 **`p`-section は共役類を分割する** (`Modular/PSectionClassCount`) —
+Navarro (5.12) の証明の出発点 `k(G) = Σ_i |IBr(C_G(x_i))|`。
+`p`-部分の類が `[x]` である `G`-類は `C_G(x)` の `p`-正則類と全単射 (`[y] ↦ [x y]`)。
+全射性は代表元の `p`-部分を `x` へ移してから `p`/`p'` 分解、単射性は
+`isConj_centralizer_of_isConj_mul`。⚠ `p`-元類の代表は選ばない (和は類自身の上で走る)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.pSectionClassEquiv
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_conjClasses_eq_sum_card_pRegularClass
