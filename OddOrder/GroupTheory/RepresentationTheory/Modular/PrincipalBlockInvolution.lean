@@ -90,10 +90,28 @@ set_option linter.unusedFintypeInType false in
 omit [Invertible (Nat.card G : K)] [Fintype κ] ht in
 open scoped Classical in
 include hp hx hω hω' e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ in
+/-- **`χ(t) = d^t_{χ φ_0}`** for `χ ∈ Irr(B_0)`: the `p`-section value
+(`character_mul_eq_generalizedDecompositionNumber`) read at `y = 1`. -/
+theorem character_involution_eq_generalizedDecompositionNumber {j : κ}
+    (hj : blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG) :
+    (wedderburnRepresentation eG j).character t
+      = generalizedDecompositionNumber (𝒪 := 𝒪) (nn := nn) t hp hω' hπ hlin hkerJ
+          ((wedderburnRepresentation eG j).character)
+          (fun _ _ hgh => character_eq_of_isConj _ hgh) φ₀ := by
+  have hval := character_mul_eq_generalizedDecompositionNumber hp hx hω e eG hπG hlinG hπ hlin
+    hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hj
+    (y := (1 : ↥(centralizerOf t))) (isPRegular_one hp)
+  rwa [show ((1 : ↥(centralizerOf t)) : G) = 1 from rfl, mul_one] at hval
+
+set_option maxHeartbeats 1000000 in
+-- Same chain as the value it composes with.
+set_option linter.unusedFintypeInType false in
+omit [Invertible (Nat.card G : K)] [Fintype κ] ht in
+open scoped Classical in
+include hp hx hω hω' e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ in
 /-- **`χ(u) = χ(t)` for every `p`-singular `u`**, when `χ ∈ Irr(B_0)` and every nontrivial
 `p`-element is conjugate to `t`.  Both sides are the generalized decomposition number
-`d^t_{χ φ_0}`: the left by `character_eq_generalizedDecompositionNumber_of_not_isPRegular`, the
-right by `character_mul_eq_generalizedDecompositionNumber` at `y = 1`. -/
+`d^t_{χ φ_0}`. -/
 theorem character_eq_character_involution_of_not_isPRegular
     (hconjall : ∀ v : G, IsPElement p v → v ≠ 1 → IsConj t v) {j : κ}
     (hj : blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG)
@@ -101,12 +119,9 @@ theorem character_eq_character_involution_of_not_isPRegular
     (wedderburnRepresentation eG j).character u
       = (wedderburnRepresentation eG j).character t := by
   rw [character_eq_generalizedDecompositionNumber_of_not_isPRegular hp hx hω e eG hπG hlinG
-    hπ hlin hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hconjall hj hu]
-  have hval := character_mul_eq_generalizedDecompositionNumber hp hx hω e eG hπG hlinG hπ hlin
-    hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hj
-    (y := (1 : ↥(centralizerOf t))) (isPRegular_one hp)
-  rw [show ((1 : ↥(centralizerOf t)) : G) = 1 from rfl, mul_one] at hval
-  rw [hval]
+    hπ hlin hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hconjall hj hu,
+    character_involution_eq_generalizedDecompositionNumber hp hx hω e eG hπG hlinG hπ hlin
+      hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hj]
 
 /-! ### `∑_{χ ∈ Irr(B_0)} χ(t)² = c_{φ_0 φ_0}` -/
 
@@ -360,6 +375,54 @@ theorem card_modEq_character_involution
     exact_mod_cast hcast
   exact Int.modEq_iff_dvd.mpr ⟨n - (d : ℤ), by linarith⟩
 
+/-! ### The relation `∑_{χ ∈ Irr(B_0)} χ(t) χ(s) = 0` on the `p`-regular classes -/
+
+set_option maxHeartbeats 1000000 in
+-- Same chain as the `p`-section vanishing it specialises.
+set_option linter.unusedFintypeInType false in
+omit ht in
+open scoped Classical in
+include hp hx hω hω' e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ in
+/-- **Block orthogonality between the section of `t` and the `p`-regular classes**:
+`∑_{χ ∈ Irr(B_0)} χ(s) χ(t) = 0` for every `p`-regular `s`.
+
+This is Navarro's `1 + ε₁χ₁(s) + ε₂χ₂(s) + ε₃χ₃(s) = 0`, in the form that does not name the
+trivial character.  It is `sum_character_mul_generalizedDecompositionNumber_eq_zero`
+(`Φ^{t⁻¹}_{φ_0}` vanishes off the section of `t`) at `v = s`, once the column `φ_0` is read as
+`χ(t)` on `Irr(B_0)` and as `0` off it. -/
+theorem sum_character_mul_character_involution_eq_zero (ht1 : t ≠ 1) {s : G}
+    (hs : IsPRegular p s) :
+    (∑ j ∈ Finset.univ.filter
+        (fun j => blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG),
+      (wedderburnRepresentation eG j).character s *
+        (wedderburnRepresentation eG j).character t) = 0 := by
+  classical
+  have hv : s⁻¹ ∉ pSection p t := by
+    intro hmem
+    rw [mem_pSection_iff_isConj_pPart, pPart_eq_one_of_isPRegular hp hs.inv] at hmem
+    obtain ⟨c, hc⟩ := isConj_iff.mp hmem
+    exact ht1 (by simpa using hc.symm)
+  have hzero := sum_character_mul_generalizedDecompositionNumber_eq_zero hp eG hω' hπ hlin
+    hkerJ hx φ₀ hv
+  have hstep : (∑ j ∈ Finset.univ.filter
+      (fun j => blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG),
+      (wedderburnRepresentation eG j).character s *
+        (wedderburnRepresentation eG j).character t)
+      = ∑ j ∈ Finset.univ.filter
+          (fun j => blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG),
+        (wedderburnRepresentation eG j).character s *
+          generalizedDecompositionNumber (𝒪 := 𝒪) (nn := nn) t hp hω' hπ hlin hkerJ
+            ((wedderburnRepresentation eG j).character)
+            (fun _ _ hgh => character_eq_of_isConj _ hgh) φ₀ :=
+    Finset.sum_congr rfl fun j hj => by
+      rw [character_involution_eq_generalizedDecompositionNumber hp hx hω e eG hπG hlinG hπ hlin
+        hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ (Finset.mem_filter.mp hj).2]
+  rw [hstep, Finset.sum_subset (Finset.filter_subset _ Finset.univ) fun j _ hj => by
+    rw [generalizedDecompositionNumber_principalBlock_eq_zero_of_blockOfIrr_ne hp hx hω e eG hπG
+      hlinG hπ hlin hkerJ hnil hnilG hω' hζ hζk hζK hφ₀
+      (fun hcon => hj (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hcon⟩)), mul_zero]]
+  exact hzero
+
 /-! ### The relation lattice of `Irr(B_0)` on the `p`-regular classes is at most a line -/
 
 set_option maxHeartbeats 1000000 in
@@ -440,5 +503,86 @@ theorem smul_eq_smul_of_vanishing_on_pRegular
   have := congrFun hdiff j
   simp only [Pi.zero_apply, sub_eq_zero] at this
   simpa [Pi.smul_apply, smul_eq_mul] using this
+
+/-! ### Any three of the four restrictions are independent -/
+
+set_option maxHeartbeats 1000000 in
+-- Same chain as the two relation lemmas it combines.
+set_option linter.unusedFintypeInType false in
+omit ht in
+open scoped Classical in
+include hp hx hω hω' e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ in
+/-- **Dropping any one of `Irr(B_0)` leaves an independent family on `G⁰`.**  The relation lattice
+is the line spanned by `(χ(t))_{χ ∈ Irr(B_0)}` (`smul_eq_smul_of_vanishing_on_pRegular` plus the
+relation `sum_character_mul_character_involution_eq_zero`), and that vector has *no* zero
+coordinate (`generalizedDecompositionNumber_ne_zero_of_blockOfIrr_principal`); so no nonzero
+relation avoids a given `χ_{j₀}`.
+
+With `|Irr(B_0)| = 4` this is exactly the independence half of Navarro (7.4): any three of the
+four restrictions `χ⁰` form a basic set for `B_0`. -/
+theorem eq_zero_of_vanishing_on_pRegular_of_apply_eq_zero
+    (hconjall : ∀ v : G, IsPElement p v → v ≠ 1 → IsConj t v) (ht1 : t ≠ 1)
+    (hcart : cartanMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e φ₀ φ₀ = 4)
+    (ht : t * t = 1) {a : κ → K}
+    (hsupp : ∀ j : κ,
+      blockOfIrr eG hπG hlinG hnilG j ≠ principalBlock πG hπG hlinG hnilG → a j = 0)
+    (hvan : ∀ g : G, IsPRegular p g →
+      (∑ j : κ, a j * (wedderburnRepresentation eG j).character g) = 0)
+    {j₀ : κ} (hj₀ : blockOfIrr eG hπG hlinG hnilG j₀ = principalBlock πG hπG hlinG hnilG)
+    (ha₀ : a j₀ = 0) :
+    a = 0 := by
+  classical
+  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  -- the reference relation `a' = (χ(t))` supported on `Irr(B_0)`
+  set a' : κ → K := fun j =>
+    if blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG
+      then (wedderburnRepresentation eG j).character t else 0 with ha'
+  have hsupp' : ∀ j : κ,
+      blockOfIrr eG hπG hlinG hnilG j ≠ principalBlock πG hπG hlinG hnilG → a' j = 0 :=
+    fun j hj => by rw [ha']; exact if_neg hj
+  have hfil : ∀ (f : κ → K),
+      (∑ j : κ, a' j * f j)
+        = ∑ j ∈ Finset.univ.filter
+            (fun j => blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG),
+          (wedderburnRepresentation eG j).character t * f j := by
+    intro f
+    rw [← Finset.sum_subset (Finset.filter_subset _ Finset.univ)
+      (f := fun j => a' j * f j) (fun j _ hj => by
+        rw [hsupp' j (fun hcon => hj (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hcon⟩)),
+          zero_mul])]
+    refine Finset.sum_congr rfl fun j hj => ?_
+    simp only [ha']
+    rw [if_pos (Finset.mem_filter.mp hj).2]
+  have hvan' : ∀ g : G, IsPRegular p g →
+      (∑ j : κ, a' j * (wedderburnRepresentation eG j).character g) = 0 := by
+    intro g hg
+    rw [hfil]
+    rw [Finset.sum_congr rfl fun j _ =>
+      mul_comm ((wedderburnRepresentation eG j).character t) _]
+    exact sum_character_mul_character_involution_eq_zero hp hx hω e eG hπG hlinG hπ hlin hkerJ
+      hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ ht1 hg
+  -- the constant of the reference relation is the Cartan entry, hence `4`
+  have hc' : (∑ j : κ, a' j * (wedderburnRepresentation eG j).character t) = 4 := by
+    rw [hfil, Finset.sum_congr rfl fun j _ => (sq _).symm,
+      sum_sq_character_involution_eq_cartanMatrix hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil
+        hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ ht, hcart]
+    norm_num
+  have hprop := smul_eq_smul_of_vanishing_on_pRegular hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil
+    hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hconjall hsupp hsupp' hvan hvan'
+  rw [hc'] at hprop
+  -- evaluate at `j₀`
+  have hj₀val := congrFun hprop j₀
+  simp only [Pi.smul_apply, smul_eq_mul, ha₀, mul_zero, ha'] at hj₀val
+  rw [if_pos hj₀] at hj₀val
+  have hne := generalizedDecompositionNumber_ne_zero_of_blockOfIrr_principal hp hx hω e eG hπG
+    hlinG hπ hlin hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hconjall ht1 hj₀
+  have hchi : (wedderburnRepresentation eG j₀).character t ≠ 0 := by
+    rw [character_involution_eq_generalizedDecompositionNumber hp hx hω e eG hπG hlinG hπ hlin
+      hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hj₀]
+    exact hne
+  have hc0 : (∑ j : κ, a j * (wedderburnRepresentation eG j).character t) = 0 :=
+    (mul_eq_zero.mp hj₀val.symm).resolve_right hchi
+  exact eq_zero_of_vanishing_on_pRegular hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil hnilG hω'
+    hζ hζk hζK hconv hNp hquot S hφ₀ hconjall hsupp hvan hc0
 
 end OddOrder.RepresentationTheory.Modular

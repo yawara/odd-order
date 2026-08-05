@@ -17620,3 +17620,25 @@ Klein 四元群 `P` (非自明元は全て 2-特異) の上で `[(χ)_P, 1_P] = 
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.smul_eq_smul_of_vanishing_on_pRegular
+
+/-! 🎯🎯 **(7.4) の独立性部分**: `Irr(B₀)` から 1 つ落とせば `G⁰` 上で線型独立
+(`Modular/PrincipalBlockInvolution`)。
+ - `sum_character_mul_character_involution_eq_zero` = `Σ_{χ∈Irr(B₀)} χ(s)χ(t) = 0`
+   (`s` は `p`-正則)。原文 p.133 の `1 + ε₁χ₁(s) + ε₂χ₂(s) + ε₃χ₃(s) = 0` を自明指標を
+   名指しせずに書いたもの。⚠ (5.11) は `C_G(pPart p g)` 上の datum を要求して型が合わないので、
+   代わりに既存の `sum_character_mul_generalizedDecompositionNumber_eq_zero`
+   (`Φ^{t⁻¹}_{φ₀}` は `t` の section の外で消える) を `v = s` で使う — こちらは
+   `C_G(t)` 上の datum のままで通る。
+ - `eq_zero_of_vanishing_on_pRegular_of_apply_eq_zero`: 関係式の空間は
+   `(χ(t))_{χ∈Irr(B₀)}` の張る直線 (段 194) で、そのベクトルは**どの座標も非零** (段 190)。
+   よって `j₀` 座標が 0 の関係式は 0。`|Irr(B₀)| = 4` と合わせ、
+   **4 つの `χ⁰` のうち任意の 3 つが basic set** ((7.4) の独立性)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.character_involution_eq_generalizedDecompositionNumber
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_character_mul_character_involution_eq_zero
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_zero_of_vanishing_on_pRegular_of_apply_eq_zero
