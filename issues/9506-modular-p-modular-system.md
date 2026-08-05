@@ -2067,7 +2067,20 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
           `CartanMatrix.projectiveIndecomposableCharacter` (`Φ_φ`、`x = 1` の場合) /
           `CartanInverse.pairingZero_projectiveIndecomposableCharacter` (= (2.13)
           `[Φ_θ,φ]⁰ = δ`) / `ProjectiveCharacterVanishing` (`Φ_φ` は `p`-singular で 0)。
-          **新規**: `Φ^x_μ` (一般 `x` へのゼロ拡張) とその 2 性質。実測 (2026-08-05): (5.1) `generalizedDecompositionNumber` /
+          **新規**: `Φ^x_μ` (一般 `x` へのゼロ拡張) とその 2 性質。
+          - [x] **`p`-section の分割 完了 (2026-08-05、段 162)**: `mem_pSection_pPart` /
+            `isConj_of_mem_pSection_of_mem_pSection` / `pSection_eq_of_isConj`。
+          - [x] 🎯 **`Φ^x_μ` 完了 (2026-08-05、段 163
+            `Modular/SectionProjectiveCharacter.lean`)**:
+            `sectionProjectiveCharacter` (choice で定義、`S(x)` の外は 0) と
+            `_eq_zero` / 🎯 `_of_isConj_mul` (インタフェース) / `_mul`
+            (`Φ^x_μ(xy) = Φ_μ(y)`) / 🎯 `_eq_of_isConj` (類関数)。
+            well-defined 性の核 = `projectiveIndecomposableCharacter_eq_of_isConj_mul`。
+            ⚠ 以降 definition を unfold せず `_of_isConj_mul` を使う。
+          - [ ] **次 = 内積計算**: `[Φ^x_μ, χ] = d^{x⁻¹}_{χμ}` (原文 p.108 の 3 行計算 —
+            `S(x)` 上の和を `p`-正則類で助変数化し、(2.13)
+            `pairingZero_projectiveIndecomposableCharacter` で潰す) →
+            `[Φ^x_μ, Φ^x_φ] = c_{μφ}` → (5.13)(b)。実測 (2026-08-05): (5.1) `generalizedDecompositionNumber` /
           (5.2) `generalizedDecompositionNumber_eq_zero` / (5.8)
           `..._sum_generalizedDecompositionNumber_inducedBlockOfCentralizer` は**既存**
           (`Modular/GeneralizedDecomposition.lean`, `SecondMainTheorem.lean`,
