@@ -24,6 +24,7 @@ and it is exactly what a consumer of Brauer's characterization has to check its 
 ## Main definitions
 
 * `OddOrder.RepresentationTheory.IsElementaryFamily`
+* `OddOrder.RepresentationTheory.elementarySubgroups` — the smallest such family
 
 ## Main results
 
@@ -47,6 +48,21 @@ centralising it, for every prime `p`. -/
 def IsElementaryFamily : Prop :=
   ∀ p : ℕ, p.Prime → ∀ u : G, IsPRegular p u → ∀ P : Subgroup G, IsPGroup p ↥P →
     ∀ hcomm : ∀ v ∈ P, Commute u v, pRegularProd u P hcomm ∈ 𝒳
+
+variable (G) in
+/-- **The smallest family satisfying `IsElementaryFamily`**: the subgroups `⟨u⟩ P` themselves.
+
+Brauer's characterization is stated for a *parameter* family, which is the right generality for
+the induction; but its consumers have to check a hypothesis for every member, so they need to know
+the shape of the members.  Instantiating with this family gives both. -/
+def elementarySubgroups : Set (Subgroup G) :=
+  {H | ∃ (q : ℕ) (u : G) (P : Subgroup G), q.Prime ∧ IsPRegular q u ∧ IsPGroup q ↥P ∧
+    ∃ hcomm : ∀ v ∈ P, Commute u v, H = pRegularProd u P hcomm}
+
+omit [Fintype G] in
+theorem isElementaryFamily_elementarySubgroups :
+    IsElementaryFamily (elementarySubgroups G) :=
+  fun q hq u hu P hP hcomm => ⟨q, u, P, hq, hu, hP, hcomm, rfl⟩
 
 /-- **Gorenstein Lemma 7.6, packaged.**  An element of `v_R(G)` supported on the `p`-class of `u`,
 integer-valued, with value `|C_G(u)| / |P|` at `u`. -/

@@ -128,6 +128,7 @@ import OddOrder.GroupTheory.RepresentationTheory.InducedAdjoinSpan
 import OddOrder.GroupTheory.RepresentationTheory.PClassIndicator
 import OddOrder.GroupTheory.RepresentationTheory.DivisibleClassFunction
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionTheorem
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularPartCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedIndicator
 import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCount
 import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCharacter
@@ -18472,3 +18473,20 @@ Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.brauerCharacter_mem_virtualCharacters_of_not_dvd_card
+
+/-! 🎯🎯 **issue 9508 段 H3 = Navarro (2.15)**: `θ̂(x) = θ(x_{p'})` は仮想指標
+(`Modular/PRegularPartCharacter`)。段 G の指標判定で `𝒳 = elementarySubgroups G`
+(`IsElementaryFamily` を満たす最小の族 — 消費者は member の形を知る必要があるので
+パラメータでなくこれで instantiate する) に落とし、各 `E = ⟨u⟩P` で
+
+`θ̂|_E = (θ|_{f.range}) ∘ f`  (`f` = 段 H1 の `p'`-射影、`f.range` は `p'`-群)
+
+と `comp_mem_virtualCharacters` (段 A) で閉じる。
+⚠ 仮説は `p'`-**部分群**への制限であって `E` 自身ではない — 応用では `θ` は Brauer 指標で、
+`θ|_E` は仮想指標**でない** (`p`-部分を射影で潰して初めて通常指標になる)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.isElementaryFamily_elementarySubgroups
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.pRegularPart_mem_inducedVirtualCharacters

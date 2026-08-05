@@ -280,7 +280,15 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
 
     ⟹ **H2 は複数 session 規模**。上流から H2a → H2b → H2c → H2d → H2e。
 
-  - [ ] **H3**: (2.15) の組み立て (`θ̂ ∈ ch(G)`、`φ ∈ IBr(G)` の場合のみ)。
+  - [x] **H3 完了** (2026-08-05, `Modular/PRegularPartCharacter.lean`) = **Navarro (2.15)**:
+    `pRegularPart_mem_inducedVirtualCharacters`。段 G の指標判定を
+    `𝒳 = elementarySubgroups G` (`IsElementaryFamily` を満たす**最小**の族; パラメータ族のままだと
+    member の形が分からず `hres` が示せないので、この族で instantiate する — `PClassIndicator` に
+    追加) で使い、各 `E = ⟨u⟩P` で `θ̂|_E = (θ|_{f.range}) ∘ f` (段 H1) と
+    `comp_mem_virtualCharacters` (段 A)。
+    ⚠ 仮説は「`p'`-**部分群**への制限が仮想指標」であって `E` 自身ではない
+    (応用では `θ|_E` は仮想指標でない — `p`-部分を潰して初めて通常指標)。
+    ⚠ `θ` は任意の類関数でよく、Brauer 指標である必要はない (一般化して述べた)。
   - [ ] **H4**: (2.16) = `φ = Σ_χ a_χ χ⁰` (`a_χ ∈ ℤ`)。`φ̂ ∈ ℤ[Irr(G)]` を `G⁰` に制限するだけ。
   - [ ] **H5**: (3.16) = ブロック局所化 (段 205-206 の型を ℤ 係数で反復)。
 - [ ] **段 I**: `PrincipalBlockBasicSet` の `U` を ℤ 値に戻し、9506 の BS 本証明へ供給
