@@ -66,17 +66,8 @@ open IsLocalRing Matrix MonoidAlgebra OddOrder.GroupAlgebra OddOrder.GroupTheory
 
 section Counting
 
-variable {p : ℕ} {G : Type*} [Group G]
-
-open scoped Classical in
-/-- The `Finset.card` form of `|G⁰|` used by the block statements is `Nat.card` of the
-`p`-regular carrier. -/
-theorem card_filter_isPRegular [Fintype G] :
-    (Finset.univ.filter (fun g : G => IsPRegular p g)).card = Nat.card (PRegularCarrier p G) := by
-  classical
-  rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
-
-variable [Finite G] {Q : Subgroup G} {k : Type*} [Field k] [CharP k p]
+variable {p : ℕ} {G : Type*} [Group G] [Finite G] {Q : Subgroup G}
+  {k : Type*} [Field k] [CharP k p]
 
 /-- **The comparison step of Külshammer's route to the third main theorem.**
 

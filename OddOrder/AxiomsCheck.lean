@@ -265,6 +265,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroDecompositio
 import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerFormula
 import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
 import OddOrder.Algebra.SubgroupSumWedderburn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockKernel
@@ -17052,7 +17053,7 @@ Külshammer 経路の第三主定理: `Q` が `p`-部分群で `g ∈ C_G(Q)` �
 Problem (6.1) の 2 本の合同で `G` 側と `C_G(Q)` 側を突き合わせる。 -/
 
 #assert_only_allowed_axioms
-  OddOrder.RepresentationTheory.Modular.card_filter_isPRegular
+  OddOrder.GroupTheory.card_filter_isPRegular
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.eq_of_card_pRegular_mul_eq
 #assert_only_allowed_axioms
@@ -17076,3 +17077,19 @@ BS が実際に使う向きで、Okuyama (6.6) / height 理論を通らない。
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.ordProj_dvd_finrank_of_character_eq_zero
+
+/-! 🎯🎯 **主ブロックの指標は `p`-singular 元で全消滅しない** (`Modular/PrincipalBlockNonvanishing`)
+— `p ∣ |G|` と `χ ∈ Irr(B₀)` なら `χ(x) ≠ 0` なる `p`-singular `x` がある。
+`ω_χ(Ĝ⁰)` が 𝒪 の単元 (`residue = λ_{B₀}(Ĝ⁰) = |G⁰|*`、`p ∤ |G⁰|`) であることから
+`dim V^G` で場合分け。Navarro (3.18)(d)⟹(e) (Thm (3.9)) を通らない。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.mulVec_eq_augmentation_smul
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.forall_apply_eq_of_invariants_ne_bot
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.isUnit_centralScalar_pRegularSum_of_blockOfIrr_principal
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.not_dvd_card_of_character_eq_zero_of_pSingular
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_not_isPRegular_character_ne_zero

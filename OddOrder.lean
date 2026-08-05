@@ -229,6 +229,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroDecompositio
 import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerFormula
 import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIdempotent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge

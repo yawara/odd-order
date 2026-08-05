@@ -30,6 +30,7 @@ valuations) at this point of the development.
 * `OddOrder.GroupTheory.card_isPRegular_modEq_centralizer` — `|G⁰| ≡ |G⁰ ∩ C_G(P)| (mod p)`
 * `OddOrder.GroupTheory.card_isPRegular_eq_index` — `|C⁰| = [C : Q]` when every `p`-element of
   `C` lies in the central `p`-subgroup `Q`
+* `OddOrder.GroupTheory.card_filter_isPRegular` — the `Finset` form of `|G⁰|`
 * `OddOrder.GroupTheory.not_dvd_card_isPRegular` — **`p ∤ |G⁰|`**
 -/
 
@@ -117,6 +118,14 @@ theorem card_isPRegular_eq_index {C : Type*} [Group C] [Finite C] (hp : p.Prime)
       exact (pRegularPart_mul_pPart hp (isOfFinOrder_of_finite x)).symm
     rw [hx]
     exact hQall _ (isPElement_pPart hp x)
+
+open scoped Classical in
+/-- The `Finset.card` form of `|G⁰|` used by the block statements is `Nat.card` of the
+`p`-regular carrier. -/
+theorem card_filter_isPRegular [Fintype G] :
+    (Finset.univ.filter (fun g : G => IsPRegular p g)).card = Nat.card (PRegularCarrier p G) := by
+  classical
+  rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
 
 /-- **`p ∤ |G⁰|`**: the number of `p`-regular elements of a finite group is prime to `p`. -/
 theorem not_dvd_card_isPRegular [Finite G] (hp : p.Prime) :
