@@ -2213,10 +2213,16 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
           取り直せる) + `mem_of_isPElement_of_mem_normalizer` (`p`-元が Sylow `p`-部分群を
           正規化するならその中に入る — mathlib の `IsPGroup.inf_normalizer_sylow` から)。
           ⚠ **経路案どおり `|N:C|` の奇数性の勘定 (relindex/Sylow 指数) を丸ごと回避できた**。
+        - [x] 🎯🎯 **第 1 部の BS 向き 完了 (2026-08-05、段 183、
+          `GroupTheory/KleinFourNormalComplement`)**:
+          `hasNormalPComplement_of_not_isConj` =「共役でない involution が 2 つあれば
+          正規 2-補群」(段 182 の対偶 + 既存 Burnside)。
+          `exists_not_isConj_of_mem_center` =「中心的 involution `t` の類は `{t}` なので
+          Klein 四元群 Sylow-2 を持つ群は単一類を持てない」(原文 "C cannot have a unique
+          class of involutions (because t is central in C)" に対応)。
+          ⟹ **BS が要求する「`C_G(t)` は正規 2-補群を持つ」が繋がった**。
+          ⚠ 「正規 2-補群 ⟹ 類はちょうど 3 個」の側は BS では使わないので未着手 (低優先)。
         - [ ] **⏸ 次 = (7.2) 残り**:
-          (i) `N_G(P) = C_G(P)` (すなわち `N_G(P) ≤ C_G(P)`) の場合は既存の Burnside
-              (`Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer`) で
-              正規 2-補群。「正規 2-補群 ⟹ involution の類は 3 個」の側は未着手。
           (ii) **第 2 部 (指標側)** = `k(B₀) − l(B₀) = l(b₀) = 1` から
               `Irr(B₀) = {1_G, χ₁, χ₂, χ₃}`、`χ_i(t) = ε_i = ±1`、`χ_i(1) ≡ ε_i mod 4`、
               `1 + Σ ε_i χ_i(s) = 0`。部品 (段 100/155/156/172/173/177/178) は揃っている。
