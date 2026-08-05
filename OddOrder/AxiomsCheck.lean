@@ -223,6 +223,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderSemisimple
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderCartan
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderBrauerOrdinary
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeSubgroupRestriction
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
@@ -18531,3 +18532,26 @@ Navarro (7.3)/(7.4) の 3 定理は加えて「族が `φ_ν` を `Irr(B)` 上�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_basicSetMatrixOf_mul_cartanMatrix
+
+/-! 🎯🎯 **issue 9508 段 H3b**: `p'`-部分群への制限 (`Modular/PPrimeSubgroupRestriction`)。
+段 H5 (Navarro (3.16)) が仮説にしていた `hsub` (「Brauer 指標の `p'`-部分群への制限が仮想指標」) を
+供給する。`p'`-群では**群環自体が半単純** (Maschke) ゆえ Jacobson 商を経ずに Artin–Wedderburn が
+直接効き、分裂が**代数**同型として出る — これが `hlin` を供給する
+(`exists_surjective_blocks_card_eq` は `k[G] ⧸ J` 経由なので RingHom に落ちて `hlin` を失う)。
+1 の冪根は作り直さず継承する: `|Q|_{p'} ∣ |G|_{p'}` ゆえ `ω^(|G|_{p'}/|Q|_{p'})` が
+原始 `|Q|_{p'}` 乗根。制限そのものは補題不要 —
+`brauerCharacter n (ρ.comp Q.subtype) x` と `brauerCharacter n ρ ↑x` は同じ固有値重複度の和で、
+指数だけ `|G|_{p'}` のまま持ち上がる (H2e で指数を任意にしておいたのが効く)。
+⟹ **Navarro (3.16) が代数閉の仮定だけで無条件に出る**。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_algEquiv_pi_matrix_monoidAlgebra
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_splitting_of_not_dvd_card
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.restrict_irreducibleBrauerCharacter_mem_virtualCharacters
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_int_block_sum_eq_irreducibleBrauerCharacter_of_isAlgClosed

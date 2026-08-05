@@ -367,9 +367,26 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
   ⚠ 4 定理はいずれも `maxHeartbeats 800000–1000000` の重い証明で仮説鎖が長い。
   refactor は「def のシグネチャ変更 → 4 定理の仮説差し替え」を 1 つずつ leaf build で回すこと。
 
-  **その後**: H5 の `hsub` (Brauer 指標の `p'`-部分群への制限が仮想指標) を供給する **H3b**
-  (各 `p'`-部分群 `Q` の分裂データ `π_Q, ω_Q, ω'_Q, e_Q` を `[IsAlgClosed (ResidueField 𝒪)]` +
-  `[IsAlgClosed K]` から構成; `π_Q` は段 H2b、`ω_Q` は `ω^(e(G)/e(Q))`) が要る。
+- [x] **段 H3b 完了** (2026-08-06, `Modular/PPrimeSubgroupRestriction.lean`): H5 の `hsub`
+  (Brauer 指標の `p'`-部分群への制限が仮想指標) を供給。⟹ **Navarro (3.16) が
+  `[IsAlgClosed (ResidueField 𝒪)]` + `[IsAlgClosed K]` だけで無条件に出る**
+  (`exists_int_block_sum_eq_irreducibleBrauerCharacter_of_isAlgClosed`)。
+
+  想定より遥かに短かった (1 session)。効いた点 3 つ:
+  - **`p'`-群では群環自体が半単純** (Maschke) ⟹ Jacobson 商を経ず `k[Q]` に直接
+    Artin–Wedderburn (`IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed`) が効き、
+    分裂が **`AlgEquiv`** で出る。これが `hlin` を無料で供給する
+    (`exists_surjective_blocks_card_eq` は `k[G] ⧸ J` 経由なので `RingHom` に落ちて `hlin` を失い、
+    そのままでは使えなかった)。同じ補題が `K` 側 (`Invertible (Nat.card Q : K)` から半単純) にも
+    そのまま効くので、`e_Q` も同じ 1 本 (`exists_algEquiv_pi_matrix_monoidAlgebra`) で済む。
+  - **1 の冪根は継承**: `|Q|_{p'} ∣ |G|_{p'}` (Lagrange + `Nat.ordCompl_dvd_ordCompl_of_dvd`) ⟹
+    `IsPrimitiveRoot.pow` で `ω^(|G|_{p'}/|Q|_{p'})`。𝒪 側・剰余体側とも同じ 1 行。
+  - **制限は補題不要 (`rfl`)**: `brauerCharacter n (ρ.comp Q.subtype) x` と
+    `brauerCharacter n ρ ↑x` は同じ固有値重複度の和。指数は `|G|_{p'}` のまま持ち上がる
+    (段 H2e で `brauerCharacter_mem_virtualCharacters_of_not_dvd_card` の指数を任意
+    (`pRegularExponent p Q ∣ N` のみ) にしておいたのが、ここで効いた)。
+  - ⚠ `Invertible` は Prop でないので `theorem` にできない — `(Nat.card ↥Q : K) ≠ 0`
+    (`natCard_subgroup_ne_zero`) を出して呼び出し側で `invertibleOfNonzero` する。
 
 ## 完了条件
 
