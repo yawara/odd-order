@@ -766,6 +766,12 @@ theorem exists_smul_eq_of_mem_inversePairs (T : Sylow 2 G)
     fun h => not_two_dvd_relIndex_normalizer T (h.trans (Subgroup.index_dvd_of_le hstab))
   exact orbit_eq_of_odd_of_subset_card_three hodd (card_inversePairs_of_quaternionTwo e) hsub hmove
 
+/-- **In `Q₈`, an element of order `4` inside `⟨y⟩` is `y` or `y⁻¹`** (with `y` of order `4`).
+Stated with the powers listed explicitly so that it is decidable; membership in `zpowers y`
+reduces to this because `y ^ 4 = 1`. -/
+theorem quaternionTwo_eq_or_eq_inv_of_mem_powers : ∀ x y : QuaternionGroup 2, x ^ 2 ≠ 1 →
+    y ^ 2 ≠ 1 → (x = 1 ∨ x = y ∨ x = y ^ 2 ∨ x = y ^ 3) → x = y ∨ x = y⁻¹ := by decide
+
 /-- **Navarro p. 139: two elements of order `4` in `T` that fuse in `G` but not in `T`.**
 Unfolding the failure of fusion control (`not_controlsOwnFusion_of_oPiCore_eq_bot`); the two
 elements must have order `4` because `Q₈` has a *unique* involution, so involutions cannot fuse

@@ -2729,6 +2729,11 @@ p.139 の残り = 「位数 4 の元は全て `G`-共役 (実は `C_G(t)`-共役
 3. **動く `u`** — `exists_mem_normalizer_conj_mem_zpowers` で `u ∈ N_G(T)`、`u x u⁻¹ ∈ ⟨y⟩`。
    `u x u⁻¹` は位数 4 で `⟨y⟩` は位数 4 の巡回群なので `u x u⁻¹ ∈ {y, y⁻¹}` ⟹
    `u • {x,x⁻¹} = {y,y⁻¹} ≠ {x,x⁻¹}`。
+   ⚠ **`⟨y⟩` の位数 4 の元は `y, y⁻¹` だけ**の部分は `quaternionTwo_eq_or_eq_inv_of_mem_powers`
+   (`decide`、冪を `1, y, y², y³` と列挙した形) が済んでいる。残るのは
+   `x ∈ Subgroup.zpowers y` からこの列挙形へ落とす橋渡しだけで、
+   `mem_powers_iff_mem_zpowers` (有限群) + `pow_mod_orderOf` + `orderOf y = 4` で出る
+   (⚠ `zpow` のまま `%` を扱おうとすると煩雑になる — **ℕ 冪に移してから** `% 4` する)。
 4. **`exists_smul_eq_of_mem_inversePairs`** で全対が融合 ⟹
    **「位数 4 の元は全て `G`-共役」**(原文の "the claim has been proven")。
    `Z(T) = {1,t} ⊴ N_G(T)` から `u ∈ C_G(t)` も出る (原文の最後の注意)。
