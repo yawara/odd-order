@@ -189,4 +189,85 @@ theorem card_centralizerOf_smul_sum_sectionProjectiveCharacter [Fintype G]
   rw [sectionProjectiveCharacter_mul hpC hω hω' hπ hlin hkerJ e hx μ
     (Finset.mem_filter.mp hy).2]
 
+/-! ### The inner product `[Φ^x_μ, χ]` -/
+
+open scoped Classical in
+/-- **`[Φ^x_μ, χ] = d^{x⁻¹}_{χμ}`** — the second half of Navarro's computation in the proof of
+(5.13).
+
+The coefficient family is not taken from a splitting datum at `x⁻¹`: it is passed as a plain
+`d : IBr(C_G(x)) → K` characterised **inside `C_G(x)`** by
+
+`∑_τ d_τ τ(y⁻¹) = χ((x y)⁻¹)`   for `p`-regular `y ∈ C_G(x)`.
+
+That is the defining property of `d^{x⁻¹}_{χ·}` read at `z = y⁻¹`, legitimate because
+`C_G(x⁻¹) = C_G(x)` (`centralizerOf_inv`); keeping `y⁻¹` inside the subgroup avoids transporting
+the whole splitting datum along an equality of subgroups that is not an equality of types.
+
+The computation is: `card_centralizerOf_smul_sum_sectionProjectiveCharacter` turns the sum over
+`G` into a sum over the `p`-regular elements of `C_G(x)`, the hypothesis expands `χ((x y)⁻¹)` in
+the irreducible Brauer characters of `C_G(x)`, and `[Φ_μ, τ]⁰ = δ_{τμ}`
+(`pairingZero_projectiveIndecomposableCharacter`) collapses the resulting double sum. -/
+theorem inner_sectionProjectiveCharacter_eq [Fintype G] [∀ i, Nonempty (m i)]
+    [Invertible (Nat.card G : K)] (hx : IsPElement p x) (μ : ι)
+    (χ : G → K) (hχ : ∀ a b : G, IsConj a b → χ a = χ b) (d : ι → K)
+    (hd : ∀ y : ↥(centralizerOf x), IsPRegular p y →
+      ∑ τ, d τ * algebraMap 𝒪 K
+          (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π τ y⁻¹)
+        = χ ((x * (y : G))⁻¹)) :
+    (Nat.card G : K)⁻¹ * ∑ u : G, algebraMap 𝒪 K
+        (sectionProjectiveCharacter hpC hω hω' hπ hlin hkerJ e hx μ u) * χ u⁻¹
+      = d μ := by
+  haveI : Invertible ((Nat.card ↥(centralizerOf x) : K)) :=
+    (isUnit_card_centralizer (K := K) x).invertible
+  have hGne : (Nat.card G : K) ≠ 0 := (isUnit_of_invertible _).ne_zero
+  have hCne : (Nat.card ↥(centralizerOf x) : K) ≠ 0 := (isUnit_of_invertible _).ne_zero
+  have step2 := card_centralizerOf_smul_sum_sectionProjectiveCharacter
+    hpC hω hω' hπ hlin hkerJ e hx μ χ hχ
+  rw [nsmul_eq_mul, nsmul_eq_mul] at step2
+  set R : Finset ↥(centralizerOf x) :=
+    Finset.univ.filter (fun y : ↥(centralizerOf x) => IsPRegular p ((y : G))) with hR
+  -- `∑_{y ∈ C⁰} Φ_μ(y) τ(y⁻¹) = |C_G(x)| δ_{τμ}` — Navarro (2.13), with the filter of the
+  -- `p`-section computation traded for the filter of `pairingZero`.
+  have hpair : ∀ τ : ι,
+      (∑ y ∈ R, algebraMap 𝒪 K
+          (projectiveIndecomposableCharacter hpC hω hω' hπ hlin hkerJ e μ y
+            * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π τ y⁻¹))
+        = (Nat.card ↥(centralizerOf x) : K) * (if τ = μ then 1 else 0) := by
+    intro τ
+    rw [← pairingZero_projectiveIndecomposableCharacter hpC hω hω' hπ hlin hkerJ e τ μ,
+      pairingZero, ← mul_assoc, mul_inv_cancel₀ hCne, one_mul, hR]
+    exact Finset.sum_congr (Finset.ext fun y => by simp [isPRegular_coe_iff]) fun _ _ => rfl
+  -- the sum over `C_G(x)⁰` is `|C_G(x)| d_μ`
+  have step1 : (∑ y ∈ R,
+        algebraMap 𝒪 K (projectiveIndecomposableCharacter hpC hω hω' hπ hlin hkerJ e μ y)
+          * χ ((x * (y : G))⁻¹))
+      = (Nat.card ↥(centralizerOf x) : K) * d μ := by
+    have hterm : ∀ y ∈ R,
+        algebraMap 𝒪 K (projectiveIndecomposableCharacter hpC hω hω' hπ hlin hkerJ e μ y)
+            * χ ((x * (y : G))⁻¹)
+          = ∑ τ, d τ * algebraMap 𝒪 K
+              (projectiveIndecomposableCharacter hpC hω hω' hπ hlin hkerJ e μ y
+                * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π τ y⁻¹) := by
+      intro y hy
+      rw [← hd y (isPRegular_coe_iff.mp (by rw [hR] at hy; exact (Finset.mem_filter.mp hy).2)),
+        Finset.mul_sum]
+      exact Finset.sum_congr rfl fun τ _ => by rw [map_mul]; ring
+    rw [Finset.sum_congr rfl hterm, Finset.sum_comm]
+    calc (∑ τ, ∑ y ∈ R, d τ * algebraMap 𝒪 K
+            (projectiveIndecomposableCharacter hpC hω hω' hπ hlin hkerJ e μ y
+              * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π τ y⁻¹))
+        = ∑ τ, d τ * ((Nat.card ↥(centralizerOf x) : K) * (if τ = μ then 1 else 0)) :=
+          Finset.sum_congr rfl fun τ _ => by rw [← Finset.mul_sum, hpair τ]
+      _ = (Nat.card ↥(centralizerOf x) : K) * d μ := by
+          simp only [mul_ite, mul_one, mul_zero, Finset.sum_ite_eq' Finset.univ μ,
+            Finset.mem_univ, if_true]
+          ring
+  rw [step1] at step2
+  have hSu : (∑ u : G, algebraMap 𝒪 K
+        (sectionProjectiveCharacter hpC hω hω' hπ hlin hkerJ e hx μ u) * χ u⁻¹)
+      = (Nat.card G : K) * d μ :=
+    mul_left_cancel₀ hCne (by linear_combination step2)
+  rw [hSu, inv_mul_cancel_left₀ hGne]
+
 end OddOrder.RepresentationTheory.Modular
