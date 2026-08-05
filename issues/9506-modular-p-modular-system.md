@@ -2704,6 +2704,18 @@ p.139 の残り = 「位数 4 の元は全て `G`-共役 (実は `C_G(t)`-共役
 **「対 `{w, w⁻¹}` の `Finset` を集めた `Finset`」**で表すと `decide` で濃度 3 が出る
 (部分群の集合は decidable に列挙できない)。
 
+**⚠ 2026-08-06 に判明した elaboration の罠 (次 session はここから)**:
+`↥(Subgroup.normalizer (T : Subgroup G))` を**ソート位置**に書くと、mathlib の `normalizer` が
+`Set` 引数版に解決されてしまい (`Subgroup.normalizer ↑↑T`)、mathlib の
+**`instance : MulDistribMulAction (normalizer H : Subgroup G) H`**
+(`Mathlib/GroupTheory/Subgroup/Centralizer.lean:186`、`g • h = ⟨g * h * g⁻¹, _⟩`) が発火しない。
+型注釈 (`: Subgroup G`) も dot notation (`(T : Subgroup G).normalizer`) も効かなかった。
+⟹ **作用を載せる段はこの綴り方を先に解決すること** (候補: `variable` で
+`N : Subgroup G` を導入して `hN : N = ...` を持つ / mathlib 側の正確な綴りを
+`Centralizer.lean` の instance 宣言からコピーする / `MulAction.compHom` で
+`Subgroup.normalizerMonoidHom` から明示的に作る)。
+数学的な段取りは下記のとおり確定していて、詰まっているのは綴りだけ。
+
 **残る組み立て** (次 session の着手点):
 1. `Ω` を `↥T` 側で上の形に作り、`e` で `QuaternionGroup 2` へ移して濃度 3 を得る。
 2. `N_G(T)` の `Ω` への共役作用を定義 (対 `{w,w⁻¹}` は共役で対に移る = Hamiltonian 性)。
