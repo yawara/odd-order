@@ -17601,3 +17601,22 @@ Klein 四元群 `P` (非自明元は全て 2-特異) の上で `[(χ)_P, 1_P] = 
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.card_modEq_character_involution
+
+/-! 🎯🎯 **`Irr(B₀)` の `G⁰` 上の関係式は高々 1 次元** (`Modular/PrincipalBlockInvolution`) —
+これが (7.4) の「3 元集合が basic set」を支える所で、**(5.12) も `C_G(1) = ⊤` の移送も要らない**。
+`Σ_χ a_χ χ` が `G⁰` で消えるとき、`p`-特異元上では各 `χ ∈ Irr(B₀)` が `χ(t)` を取る
+(`character_eq_character_involution_of_not_isPRegular` = 段 189 + 段 187 の `y=1`) ので
+`Σ a_χ χ` は `G` 全体で定数 `c = Σ a_χ χ(t)` 倍の 2-特異元指示関数になる。
+⟹ `c = 0` なら `Irr(G)` の線型独立性で `a = 0` (`eq_zero_of_vanishing_on_pRegular`)、
+一般には `c' • a = c • a'` (`smul_eq_smul_of_vanishing_on_pRegular`)。
+つまり関係式の空間は `a ↦ c` で単射に埋まるので高々 1 次元、
+`|Irr(B₀)| = 4` と合わせて `{χ⁰}` の張る格子は階数 3。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.character_eq_character_involution_of_not_isPRegular
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_zero_of_vanishing_on_pRegular
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.smul_eq_smul_of_vanishing_on_pRegular

@@ -82,6 +82,32 @@ variable (hp : p.Prime) (hx : IsPElement p t)
   {φ₀ : ι} (hφ₀ : Quotient.mk (blockSetoid π hπ hlin) φ₀ = principalBlock π hπ hlin hnil)
   (ht : t * t = 1)
 
+/-! ### `χ` is constant on the `p`-singular elements, with value `χ(t)` -/
+
+set_option maxHeartbeats 1000000 in
+-- The `p`-section value is elaborated under the full modular-datum chain.
+set_option linter.unusedFintypeInType false in
+omit [Invertible (Nat.card G : K)] [Fintype κ] ht in
+open scoped Classical in
+include hp hx hω hω' e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ in
+/-- **`χ(u) = χ(t)` for every `p`-singular `u`**, when `χ ∈ Irr(B_0)` and every nontrivial
+`p`-element is conjugate to `t`.  Both sides are the generalized decomposition number
+`d^t_{χ φ_0}`: the left by `character_eq_generalizedDecompositionNumber_of_not_isPRegular`, the
+right by `character_mul_eq_generalizedDecompositionNumber` at `y = 1`. -/
+theorem character_eq_character_involution_of_not_isPRegular
+    (hconjall : ∀ v : G, IsPElement p v → v ≠ 1 → IsConj t v) {j : κ}
+    (hj : blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG)
+    {u : G} (hu : ¬ IsPRegular p u) :
+    (wedderburnRepresentation eG j).character u
+      = (wedderburnRepresentation eG j).character t := by
+  rw [character_eq_generalizedDecompositionNumber_of_not_isPRegular hp hx hω e eG hπG hlinG
+    hπ hlin hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hconjall hj hu]
+  have hval := character_mul_eq_generalizedDecompositionNumber hp hx hω e eG hπG hlinG hπ hlin
+    hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hj
+    (y := (1 : ↥(centralizerOf t))) (isPRegular_one hp)
+  rw [show ((1 : ↥(centralizerOf t)) : G) = 1 from rfl, mul_one] at hval
+  rw [hval]
+
 /-! ### `∑_{χ ∈ Irr(B_0)} χ(t)² = c_{φ_0 φ_0}` -/
 
 set_option maxHeartbeats 1000000 in
@@ -333,5 +359,86 @@ theorem card_modEq_character_involution
       exact hd
     exact_mod_cast hcast
   exact Int.modEq_iff_dvd.mpr ⟨n - (d : ℤ), by linarith⟩
+
+/-! ### The relation lattice of `Irr(B_0)` on the `p`-regular classes is at most a line -/
+
+set_option maxHeartbeats 1000000 in
+-- Same chain as the constancy statement it uses.
+set_option linter.unusedFintypeInType false in
+omit ht in
+open scoped Classical in
+include hp hx hω hω' e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ in
+/-- **A relation among `Irr(B_0)` on `G⁰` is determined by its value on the `p`-singular
+classes.**  If `∑_χ a_χ χ` vanishes on `G⁰` *and* at `t`, it vanishes on all of `G`: off `G⁰`
+every `χ ∈ Irr(B_0)` takes its value at `t`
+(`character_eq_character_involution_of_not_isPRegular`).  Linear independence of `Irr(G)` then
+forces `a = 0`. -/
+theorem eq_zero_of_vanishing_on_pRegular
+    (hconjall : ∀ v : G, IsPElement p v → v ≠ 1 → IsConj t v) {a : κ → K}
+    (hsupp : ∀ j : κ,
+      blockOfIrr eG hπG hlinG hnilG j ≠ principalBlock πG hπG hlinG hnilG → a j = 0)
+    (hvan : ∀ g : G, IsPRegular p g →
+      (∑ j : κ, a j * (wedderburnRepresentation eG j).character g) = 0)
+    (hzero : (∑ j : κ, a j * (wedderburnRepresentation eG j).character t) = 0) :
+    a = 0 := by
+  classical
+  have hall : ∀ g : G, (∑ j : κ, a j * (wedderburnRepresentation eG j).character g)
+      = (0 : G → K) g := by
+    intro g
+    by_cases hg : IsPRegular p g
+    · exact hvan g hg
+    · refine Eq.trans (Finset.sum_congr rfl fun j _ => ?_) hzero
+      by_cases hj : blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG
+      · rw [character_eq_character_involution_of_not_isPRegular hp hx hω e eG hπG hlinG hπ hlin
+          hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hconjall hj hg]
+      · rw [hsupp j hj, zero_mul, zero_mul]
+  have hzeroFam : ∀ g : G, (∑ j : κ, (0 : κ → K) j *
+      (wedderburnRepresentation eG j).character g) = (0 : G → K) g := by
+    intro g; simp
+  rw [eq_ordinaryCoeff eG (0 : G → K) (fun _ _ _ => rfl) hall,
+    ← eq_ordinaryCoeff eG (0 : G → K) (fun _ _ _ => rfl) hzeroFam]
+
+set_option maxHeartbeats 1000000 in
+-- Same chain as the vanishing statement it uses.
+set_option linter.unusedFintypeInType false in
+omit ht in
+open scoped Classical in
+include hp hx hω hω' e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ in
+/-- **Any two relations among `Irr(B_0)` on `G⁰` are proportional.**  The relation lattice is
+therefore at most one-dimensional, so the `4` restrictions `χ⁰` span a lattice of rank `3`.
+This is what makes a three-element subset of `Irr(B_0)` a basic set in Navarro (7.4) — no
+computation of `l(B_0)` (and hence no (5.12)) is needed. -/
+theorem smul_eq_smul_of_vanishing_on_pRegular
+    (hconjall : ∀ v : G, IsPElement p v → v ≠ 1 → IsConj t v) {a a' : κ → K}
+    (hsupp : ∀ j : κ,
+      blockOfIrr eG hπG hlinG hnilG j ≠ principalBlock πG hπG hlinG hnilG → a j = 0)
+    (hsupp' : ∀ j : κ,
+      blockOfIrr eG hπG hlinG hnilG j ≠ principalBlock πG hπG hlinG hnilG → a' j = 0)
+    (hvan : ∀ g : G, IsPRegular p g →
+      (∑ j : κ, a j * (wedderburnRepresentation eG j).character g) = 0)
+    (hvan' : ∀ g : G, IsPRegular p g →
+      (∑ j : κ, a' j * (wedderburnRepresentation eG j).character g) = 0) :
+    (∑ j : κ, a' j * (wedderburnRepresentation eG j).character t) • a
+      = (∑ j : κ, a j * (wedderburnRepresentation eG j).character t) • a' := by
+  classical
+  set c : K := ∑ j : κ, a j * (wedderburnRepresentation eG j).character t with hc
+  set c' : K := ∑ j : κ, a' j * (wedderburnRepresentation eG j).character t with hc'
+  have hlin2 : ∀ g : G,
+      (∑ j : κ, (c' * a j - c * a' j) * (wedderburnRepresentation eG j).character g)
+        = c' * (∑ j : κ, a j * (wedderburnRepresentation eG j).character g)
+          - c * (∑ j : κ, a' j * (wedderburnRepresentation eG j).character g) := by
+    intro g
+    rw [Finset.mul_sum, Finset.mul_sum, ← Finset.sum_sub_distrib]
+    exact Finset.sum_congr rfl fun j _ => by ring
+  have hdiff : (fun j => c' * a j - c * a' j) = 0 :=
+    eq_zero_of_vanishing_on_pRegular hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil hnilG hω'
+      hζ hζk hζK hconv hNp hquot S hφ₀ hconjall
+      (fun j hj => by rw [hsupp j hj, hsupp' j hj, mul_zero, mul_zero, sub_zero])
+      (fun g hg => by rw [hlin2 g, hvan g hg, hvan' g hg, mul_zero, mul_zero, sub_zero])
+      (by rw [hlin2 t, ← hc, ← hc', mul_comm c' c, sub_self])
+  funext j
+  have := congrFun hdiff j
+  simp only [Pi.zero_apply, sub_eq_zero] at this
+  simpa [Pi.smul_apply, smul_eq_mul] using this
 
 end OddOrder.RepresentationTheory.Modular
