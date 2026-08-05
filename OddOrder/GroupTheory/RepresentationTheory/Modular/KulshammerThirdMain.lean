@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Algebra.PElementSumCount
 import OddOrder.GroupTheory.PRegularElementCount
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterOffCentralizer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockDefined
 import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerFormula
 
@@ -57,8 +58,15 @@ so `b^G = B_0` — which makes the left side `λ_{B_0}(e_{B_0}) = 1` — forces 
   the converse of the third main theorem for `H = C_G(Q)`, `Q` abelian
 * `OddOrder.RepresentationTheory.Modular.eq_of_card_pRegular_mul_eq_intermediate`,
   `OddOrder.RepresentationTheory.Modular.coeff_principalBlock_eq_centralizer_intermediate` —
-  the same comparison between `C_G(Q)` and an arbitrary intermediate `Q C_G(Q) ≤ H`, which is
-  what removes the restriction to `H = C_G(Q)`
+  the same comparison between `C_G(Q)` and an arbitrary intermediate `Q C_G(Q) ≤ H`
+* `..._of_inducedBlockOfNormalizer_eq_intermediate` — the converse of the third main theorem for
+  a general `Q C_G(Q) ≤ H ≤ N_G(Q)`
+
+⚠ The two converse statements have *incomparable* hypotheses.  The `H = C_G(Q)` one needs no
+`Q ≤ H`, because there `Br_Q(e_{B_0}) = e_{b_0}` on the nose; the general one needs `Q ≤ H` (it
+goes through Navarro (4.7) inside `H`), which at `H = C_G(Q)` would force `Q` abelian.  Together
+they cover Navarro's range `Q C_G(Q) ⊆ H ⊆ N_G(Q)` and, in addition, `H = C_G(Q)` for
+non-abelian `Q`.
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -570,5 +578,119 @@ theorem eq_principalBlock_of_inducedBlockOfNormalizer_eq
     hB hBC hcoeff b hind
 
 end Converse
+
+/-! ### The converse of the third main theorem for a general intermediate subgroup -/
+
+section ConverseIntermediate
+
+variable {k G : Type*} [Field k] [Group G] [Fintype G] [DecidableEq (ConjClasses G)]
+  [Fintype (ConjClasses G)] {p : ℕ} [Fact p.Prime] [CharP k p]
+variable {Q H : Subgroup G} [Fintype ↥H] [DecidableEq (ConjClasses ↥H)]
+  [Fintype (ConjClasses ↥H)]
+  [DecidablePred fun g : G => g ∈ Subgroup.centralizer (Q : Set G)]
+variable {ιH : Type*} [Finite ιH] {nnH : ιH → Type*} [∀ i, Fintype (nnH i)]
+  [∀ i, DecidableEq (nnH i)] [∀ i, Nonempty (nnH i)]
+variable (πH : MonoidAlgebra k ↥H →+* ∀ j, Matrix (nnH j) (nnH j) k)
+  (hπH : Function.Surjective πH)
+  (hlinH : ∀ (c : k) (a : MonoidAlgebra k ↥H), πH (c • a) = c • πH a)
+  (hnilH : ∀ z : Subalgebra.center k (MonoidAlgebra k ↥H),
+    MatrixModule.blockCharacterPi πH hπH hlinH z = 0 → IsNilpotent z)
+variable {ιG : Type*} [Finite ιG] {nnG : ιG → Type*} [∀ j, Fintype (nnG j)]
+  [∀ j, DecidableEq (nnG j)] [∀ j, Nonempty (nnG j)]
+variable (πG : MonoidAlgebra k G →+* ∀ j, Matrix (nnG j) (nnG j) k)
+  (hπG : Function.Surjective πG)
+  (hlinG : ∀ (c : k) (a : MonoidAlgebra k G), πG (c • a) = c • πG a)
+  (hnilG : ∀ z : Subalgebra.center k (MonoidAlgebra k G),
+    MatrixModule.blockCharacterPi πG hπG hlinG z = 0 → IsNilpotent z)
+
+-- keep the `Pi.single` hypotheses in the same (classical) decidability shape as (6.14);
+-- the class-sum expansion of `Z(kH)` needs `cl(H)` finite and decidable, which the statement
+-- itself does not mention
+omit [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)] in
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+open scoped Classical in
+/-- **The converse half of Brauer's third main theorem**, for a general intermediate subgroup
+`Q C_G(Q) ≤ H ≤ N_G(Q)`: a block `b` of `H` whose induced central character `λ_b ∘ Br_Q` names
+the principal block of `G` is the principal block of `H`.
+
+Same three lines as the `H = C_G(Q)` case, with one extra ingredient.  There
+`Br_Q(e_{B_0(G)}) = e_{b_0}` *on the nose*; here `e_{B_0(H)}` need not be supported on `C_G(Q)`,
+so the two agree only **on `C_G(Q)`** (`hcoeff`, supplied by
+`coeff_principalBlock_eq_centralizer` together with
+`coeff_principalBlock_eq_centralizer_intermediate`).  That is enough, because a block character
+of `H` only sees the coefficients on `C_G(Q)` — Navarro (4.7) in `H`-class form
+(`blockCharacter_eq_of_coeff_eq_on_centralizer`). -/
+theorem eq_principalBlock_of_blockOfCentralCharacter_eq_intermediate
+    (hQ : IsPGroup p ↥Q) (hQH : Q ≤ H)
+    (hCH : Subgroup.centralizer (Q : Set G) ≤ H)
+    (hHN : H ≤ Subgroup.normalizer (Q : Set G))
+    {F' : MatrixModule.Block πG hπG hlinG → Subalgebra.center k (MonoidAlgebra k G)}
+    {F'H : MatrixModule.Block πH hπH hlinH → Subalgebra.center k (MonoidAlgebra k ↥H)}
+    (hB : ∀ B, MatrixModule.blockCharacterPi πG hπG hlinG (F' B) = Pi.single B 1)
+    (hBH : ∀ B, MatrixModule.blockCharacterPi πH hπH hlinH (F'H B) = Pi.single B 1)
+    (hcoeff : ∀ h : ↥H, (h : G) ∈ Subgroup.centralizer (Q : Set G) →
+      ((F' (principalBlock πG hπG hlinG hnilG) : MonoidAlgebra k G)).coeff (h : G)
+        = ((F'H (principalBlock πH hπH hlinH hnilH) : MonoidAlgebra k ↥H)).coeff h)
+    (b : MatrixModule.Block πH hπH hlinH)
+    (hind : MatrixModule.blockOfCentralCharacter πG hπG hlinG hnilG
+        (inducedCentralCharacterAlgHom πH hπH hlinH hQ hCH hHN b)
+      = principalBlock πG hπG hlinG hnilG) :
+    b = principalBlock πH hπH hlinH hnilH := by
+  classical
+  -- `b^G = B_0(G)` means `λ_{B_0(G)} = λ_b ∘ Br_Q`
+  have hchar : MatrixModule.blockCharacter πG hπG hlinG (principalBlock πG hπG hlinG hnilG)
+      = inducedCentralCharacterAlgHom πH hπH hlinH hQ hCH hHN b := by
+    rw [← hind]
+    exact MatrixModule.blockCharacter_blockOfCentralCharacter πG hπG hlinG hnilG _
+  have heval := DFunLike.congr_fun hchar (F' (principalBlock πG hπG hlinG hnilG))
+  have hL : MatrixModule.blockCharacter πG hπG hlinG (principalBlock πG hπG hlinG hnilG)
+      (F' (principalBlock πG hπG hlinG hnilG)) = 1 := by
+    rw [← MatrixModule.blockCharacterPi_apply, hB, Pi.single_eq_same]
+  -- `Br_Q(e_{B_0(G)})` and `e_{B_0(H)}` agree on `C_G(Q)`, which is all `λ_b` sees
+  have hR : inducedCentralCharacterAlgHom πH hπH hlinH hQ hCH hHN b
+        (F' (principalBlock πG hπG hlinG hnilG))
+      = if b = principalBlock πH hπH hlinH hnilH then (1 : k) else 0 := by
+    change MatrixModule.blockCharacter πH hπH hlinH b
+      (brauerCenterHom Q H hQ hCH hHN (F' (principalBlock πG hπG hlinG hnilG))) = _
+    rw [blockCharacter_eq_of_coeff_eq_on_centralizer (P := Q) hπH hlinH hQ hQH hHN b
+        (w := F'H (principalBlock πH hπH hlinH hnilH))
+        (fun h hh => by
+          rw [coe_brauerCenterHom_apply, coeff_brauerTrunc, if_pos hh]
+          exact hcoeff h hh),
+      ← MatrixModule.blockCharacterPi_apply, hBH, Pi.single_apply]
+  rw [hL, hR] at heval
+  by_contra hne
+  rw [if_neg hne] at heval
+  exact one_ne_zero heval
+
+-- keep the `Pi.single` hypotheses in the same (classical) decidability shape as (6.14)
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+open scoped Classical in
+/-- **Brauer's third main theorem, converse half, in Navarro's own reading `b^G = B_0`**, for
+`Q C_G(Q) ≤ H ≤ N_G(Q)`.
+
+`inducedBlockOfNormalizer` is by definition the block named by `λ_b ∘ Br_Q`, so this is
+`eq_principalBlock_of_blockOfCentralCharacter_eq_intermediate` verbatim. -/
+theorem eq_principalBlock_of_inducedBlockOfNormalizer_eq_intermediate
+    (hQ : IsPGroup p ↥Q) (hQH : Q ≤ H)
+    (hCH : Subgroup.centralizer (Q : Set G) ≤ H)
+    (hHN : H ≤ Subgroup.normalizer (Q : Set G))
+    {F' : MatrixModule.Block πG hπG hlinG → Subalgebra.center k (MonoidAlgebra k G)}
+    {F'H : MatrixModule.Block πH hπH hlinH → Subalgebra.center k (MonoidAlgebra k ↥H)}
+    (hB : ∀ B, MatrixModule.blockCharacterPi πG hπG hlinG (F' B) = Pi.single B 1)
+    (hBH : ∀ B, MatrixModule.blockCharacterPi πH hπH hlinH (F'H B) = Pi.single B 1)
+    (hcoeff : ∀ h : ↥H, (h : G) ∈ Subgroup.centralizer (Q : Set G) →
+      ((F' (principalBlock πG hπG hlinG hnilG) : MonoidAlgebra k G)).coeff (h : G)
+        = ((F'H (principalBlock πH hπH hlinH hnilH) : MonoidAlgebra k ↥H)).coeff h)
+    (b : MatrixModule.Block πH hπH hlinH)
+    (hind : inducedBlockOfNormalizer πH hπH hlinH πG hπG hlinG hnilG hQ hQH hCH hHN b
+      = principalBlock πG hπG hlinG hnilG) :
+    b = principalBlock πH hπH hlinH hnilH :=
+  eq_principalBlock_of_blockOfCentralCharacter_eq_intermediate πH hπH hlinH hnilH πG hπG hlinG
+    hnilG hQ hQH hCH hHN hB hBH hcoeff b hind
+
+end ConverseIntermediate
 
 end OddOrder.RepresentationTheory.Modular
