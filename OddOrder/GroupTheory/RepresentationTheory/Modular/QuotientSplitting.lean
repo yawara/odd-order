@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Algebra.NormalPSubgroupTrivialAction
+import OddOrder.GroupTheory.PRegularQuotient
+import OddOrder.GroupTheory.RepresentationTheory.Modular.IrreducibleBrauerCharacter
 
 /-!
 # The splitting of `k[G/P]` induced by a splitting of `k[G]`
@@ -34,11 +36,14 @@ The Jacobson condition transports because `f : kG ↠ k[G/N]` is surjective with
 * `OddOrder.RepresentationTheory.Modular.quotientPi_mapDomain` — `π̄ ∘ f = π`
 * `OddOrder.RepresentationTheory.Modular.quotientPi_surjective`
 * `OddOrder.RepresentationTheory.Modular.ker_quotientPi`
+* `OddOrder.RepresentationTheory.Modular.irreducibleBrauerCharacter_quotientPi` — `φ(g) = φ̄(ḡ)`
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
 
 open Matrix MonoidAlgebra
+
+section GeneralField
 
 variable {k ι G : Type*} [Field k] [Group G] {nn : ι → Type*}
   [∀ i, Fintype (nn i)] [∀ i, DecidableEq (nn i)]
@@ -157,5 +162,58 @@ theorem ker_quotientPi (hkerJ : RingHom.ker π = Ring.jacobson (MonoidAlgebra k 
     rw [← quotientPi_mapDomain π hπ hlin hN x,
       show quotientMap (k := k) (G := G) (N := N) x = 0 from hx, map_zero]
   rw [ker_quotientPi_eq_map π hπ hlin hN, hkerJ, Ring.map_jacobson_of_ker_le hle]
+
+end GeneralField
+
+/-! ### The irreducible Brauer characters correspond -/
+
+section BrauerCharacter
+
+variable {p : ℕ} {𝒪 : Type*} [CommRing 𝒪] [HenselianLocalRing 𝒪] [IsPModularSystem p 𝒪]
+  {G ι : Type*} [Group G] [Finite G] {nn : ι → Type*}
+  [∀ i, Fintype (nn i)] [∀ i, DecidableEq (nn i)] [∀ i, Nonempty (nn i)]
+  [Fact p.Prime] [CharP (IsLocalRing.ResidueField 𝒪) p]
+  {N : Subgroup G} [N.Normal]
+  (π : MonoidAlgebra (IsLocalRing.ResidueField 𝒪) G →+*
+    ∀ j, Matrix (nn j) (nn j) (IsLocalRing.ResidueField 𝒪))
+  (hπ : Function.Surjective π)
+  (hlin : ∀ (c : IsLocalRing.ResidueField 𝒪) (a : MonoidAlgebra (IsLocalRing.ResidueField 𝒪) G),
+    π (c • a) = c • π a)
+  (hN : IsPGroup p ↥N)
+
+omit [IsPModularSystem p 𝒪] in
+include hπ hlin hN in
+/-- **The block representations correspond**: the matrix attached to `ḡ` by the induced splitting
+is the one attached to `g` by `π`. -/
+theorem blockRepresentation_quotientPi (i : ι) (g : G) :
+    blockRepresentation (quotientPi π hπ hlin hN).toRingHom i (QuotientGroup.mk g : G ⧸ N)
+      = blockRepresentation π i g := by
+  rw [show blockRepresentation (quotientPi π hπ hlin hN).toRingHom i
+        (QuotientGroup.mk g : G ⧸ N)
+      = Matrix.mulVecLin ((quotientPi π hπ hlin hN).toRingHom
+          (MonoidAlgebra.single (QuotientGroup.mk g : G ⧸ N)
+            (1 : IsLocalRing.ResidueField 𝒪)) i) from rfl,
+    show blockRepresentation π i g
+      = Matrix.mulVecLin (π (MonoidAlgebra.single g (1 : IsLocalRing.ResidueField 𝒪)) i) from rfl,
+    show (quotientPi π hπ hlin hN).toRingHom
+      (MonoidAlgebra.single (QuotientGroup.mk g : G ⧸ N) (1 : IsLocalRing.ResidueField 𝒪))
+      = π (MonoidAlgebra.single g (1 : IsLocalRing.ResidueField 𝒪)) from
+    quotientPi_single π hπ hlin hN g]
+
+omit [IsPModularSystem p 𝒪] in
+include hπ hlin hN in
+/-- **Navarro (7.6): `φ(g) = φ̄(ḡ)`.**  The irreducible Brauer characters of `G` and of `G/N` are
+indexed by the same set and take the same values under `g ↦ ḡ`: the two `p`-regular exponents
+agree (`pRegularExponent_quotient`) and the operators are literally the same
+(`blockRepresentation_quotientPi`). -/
+theorem irreducibleBrauerCharacter_quotientPi (i : ι) (g : G) :
+    irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) (quotientPi π hπ hlin hN).toRingHom i
+        (QuotientGroup.mk g : G ⧸ N)
+      = irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π i g := by
+  rw [irreducibleBrauerCharacter, irreducibleBrauerCharacter, brauerCharacter, brauerCharacter,
+    OddOrder.GroupTheory.pRegularExponent_quotient hN,
+    blockRepresentation_quotientPi π hπ hlin hN i g]
+
+end BrauerCharacter
 
 end OddOrder.RepresentationTheory.Modular

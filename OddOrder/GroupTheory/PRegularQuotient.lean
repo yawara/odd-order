@@ -137,6 +137,18 @@ theorem bijOn_mk_isPRegular [Finite G] (hp : p.Prime) (hNp : IsPGroup p ↥N)
       obtain ⟨x, hx, hxy⟩ := exists_isPRegular_mk_eq hp hy
       exact ⟨x, hx, hxy⟩⟩
 
+/-- **The `p'`-part of the group order is unchanged by a quotient by a `p`-subgroup.**  This is
+what makes the Brauer characters of `G` and of `G/N` be taken at the *same* root of unity, so that
+the correspondence `φ ↦ φ̄` is literally an equality of values. -/
+theorem pRegularExponent_quotient [Finite G] [Fact p.Prime] (hN : IsPGroup p ↥N) :
+    pRegularExponent p (G ⧸ N) = pRegularExponent p G := by
+  obtain ⟨a, ha⟩ := hN.exists_card_eq
+  have hcard : Nat.card G = Nat.card (G ⧸ N) * Nat.card ↥N :=
+    (Subgroup.card_eq_card_quotient_mul_card_subgroup N)
+  rw [pRegularExponent, pRegularExponent, hcard, ha, Nat.ordCompl_mul,
+    Nat.Prime.factorization_pow (Fact.out : p.Prime), Finsupp.single_eq_same,
+    Nat.div_self (pow_pos (Fact.out : p.Prime).pos a), mul_one]
+
 omit [N.Normal] in
 /-- The hypothesis of (7.6) in the shape the Brauer–Suzuki argument supplies it: a central
 `p`-subgroup is centralised by everything. -/

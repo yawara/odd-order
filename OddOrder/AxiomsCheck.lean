@@ -17870,3 +17870,18 @@ BS が使うのは `P = ⟨t⟩ ≤ Z(C_G(t))` の場合で、仮説は自明 (`
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.ker_quotientPi
+
+/-! 🎯 **(7.6): `IBr(G)` と `IBr(G/N)` は同じ添字で値も一致** (`Modular/QuotientSplitting`) —
+`pRegularExponent p (G/N) = pRegularExponent p G` (`GroupTheory/PRegularQuotient`: `|G| = |G/N|·|N|`
+で `|N|` が `p` 冪ゆえ `p'`-部分が不変) と、ブロック表現の行列が `quotientPi_single` で
+literally 同一であることから、`φ(g) = φ̄(ḡ)` が Brauer 指標の定義の展開だけで出る。
+⟹ 原文 p.137 の「`φ ↦ φ̄` は `IBr(G) → IBr(Ḡ)` の全単射」。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.pRegularExponent_quotient
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockRepresentation_quotientPi
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.irreducibleBrauerCharacter_quotientPi
