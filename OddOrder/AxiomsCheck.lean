@@ -272,6 +272,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionClassCount
 import OddOrder.Algebra.BlockPartitionedMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionMatrix
 import OddOrder.GroupTheory.KleinFourAutomorphism
+import OddOrder.GroupTheory.KleinFourSylowFusion
 import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterCount
@@ -17419,3 +17420,14 @@ Navarro (5.12) の "in particular, notice that the matrix `J` is regular"。
 
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.eq_or_eq_or_eq_iterate_of_odd_of_klein
+
+/-! 🎯🎯 **Klein 四元群 Sylow-2 なら involution の類は 1 個** (`GroupTheory/KleinFourSylowFusion`)
+— Navarro (7.2) 第 1 部の主内容。`N_G(P)` に `P` を中心化しない奇位数の元があれば
+`G` の任意の 2 つの involution は共役。任意の involution は Sylow で `P` に共役に移り
+(`exists_conj_mem_sylow_of_mul_self_eq_one`)、`P` の 3 つの involution は段 180 で巡回される。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.exists_conj_mem_sylow_of_mul_self_eq_one
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isConj_of_klein_sylow

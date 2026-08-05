@@ -236,6 +236,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PSectionClassCount
 import OddOrder.Algebra.BlockPartitionedMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionMatrix
 import OddOrder.GroupTheory.KleinFourAutomorphism
+import OddOrder.GroupTheory.KleinFourSylowFusion
 import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterCount
