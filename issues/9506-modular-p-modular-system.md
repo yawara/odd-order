@@ -1954,6 +1954,32 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
         `Algebra/RootsOfUnitySum` の抽象体版補題は使えるが、`K` が `p'`-乗根を
         十分持つかは設定依存 (`ℂ_p` なら自明)。
 - [ ] **101: `(7.2)` Klein four Sylow-2 / `(7.3)` basic set / `(7.4)` / `(7.5)` / `(7.6)`**
+  - [x] **(3.18)(b)⟹(c) 完了 (2026-08-05、段 155 `Modular/DefectZeroDegree`)**:
+        `ordProj_dvd_finrank_of_character_eq_zero` — `p`-singular で消える指標は
+        `|G|_p ∣ χ(1)`。Sylow `S` 上で和が `χ(1)` に潰れ = `|S|·dim V^S`。
+        ⚠ `p`-modular system 不要 (標数 0 の体だけ)。
+  - [ ] **⏸ 次の一手 = 「主ブロックの χ は `p`-singular 元で全消滅しない」**
+        (2026-08-05 に原文 p.62 のページ画像で (3.18) の証明を確定した結果、
+        **教科書の (d)⟹(e) 経由 (`e_χ ∈ Z(𝒪G)` + Thm (3.9)) より短い道**が見えた)。
+        `p ∣ |G|`・`blockOfIrr i = B₀`・「`χ_i` が全 `p`-singular 元で 0」から矛盾:
+        * `Σ_{g∈G⁰} χ(g) = Σ_{g∈G} χ(g) = |G|·d`, `d = dim V^G`
+          (`sum_character_eq_card_mul_finrank_invariants` を `H = G` で)
+        * `ω^L_i(Ĝ⁰)` は **𝒪 の単元**: `blockCharacter_blockOfLattice_mapRingHom` で
+          `residue(ω^L_i(Ĝ⁰)) = λ_{B₀}(Ĝ⁰*) = |G⁰|*`、`p ∤ |G⁰|`
+          (`not_dvd_card_isPRegular`) ゆえ非零。
+        * `centralScalar_pRegularSum_mul_character_one` で
+          `ω_χ(Ĝ⁰)·χ(1) = Σ_{g∈G⁰}χ(g) = |G|·d`。
+        * **`d = 0` の場合**: 左辺は単元×`χ(1) ≠ 0` で非零、右辺 0 ⟹ 矛盾。
+        * **`d ≠ 0` の場合**: `V^G ≠ ⊥` ⟹ 表現が自明 ⟹ `χ(g) = χ(1) ≠ 0` (∀g)。
+          Cauchy で位数 `p` の元 (= `p`-singular) を取ると仮説に矛盾。
+        **新規に要るのは 1 本だけ** = 🔨 `wedderburnRepresentation e i` が
+        `V^G ≠ ⊥` なら自明であること。証明は module の単純性を経由せず:
+        不変ベクトル `v ≠ 0` に対し `(e a i).mulVec v = ε(a)•v` (∀`a ∈ K[G]`、
+        `single g 1` 上で確認して線型性)、`e` の全射性で任意の行列単位 `E_{l j}`
+        (`v j ≠ 0` なる `j`) を取ると `Pi.single l 1 ∈ span{v}` ⟹ `card (m i) = 1`
+        ⟹ スカラーで `ρ g v = v` ⟹ `ρ g = 1`。
+        ⚠ **教科書の (d)⟹(e) (`e_χ` の整数性 + Thm (3.9) で `Irr(B) = {χ}`) は
+        通らなくてよい** — (7.2) が要るのは矛盾だけ。
 - [ ] **102: 🎯🎯🎯 BS 本証明 (pp.139–146)** → `brauerSuzuki_quaternionSylow_q8` の `sorry` 置換
 
 ⚠ 上記の番号は Navarro の結果番号であって段番号ではない (段番号は連番で振り直す)。
