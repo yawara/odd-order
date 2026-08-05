@@ -379,6 +379,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionDescent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicIntegerModP
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicModEq
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CharacterPClassCongruence
+import OddOrder.GroupTheory.RepresentationTheory.UnitCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.GroupTheory.SCN
 import OddOrder.GroupTheory.SemiDihedral

@@ -120,6 +120,19 @@ theorem le_adjoinSpan : M ≤ adjoinSpan ω M := fun w hw => by
 variable [CharZero K] (hω : IsIntegral ℤ ω)
 
 include hω in
+/-- **Multiplying by a cyclotomic integer stays inside `ℤ[ω] · M`.** -/
+theorem smul_mem_adjoinSpan_of_mem_adjoin {r : K} (hr : r ∈ Algebra.adjoin ℤ ({ω} : Set K))
+    {w : V} (hw : w ∈ M) : r • w ∈ adjoinSpan ω M := by
+  classical
+  obtain ⟨c, hc⟩ := exists_intCast_sum_pow hω hr
+  rw [hc, Finset.sum_smul]
+  refine sum_mem fun i _ => ?_
+  rw [mul_smul]
+  rw [show ((c i : ℤ) : K) • (ω ^ (i : ℕ) • w) = (c i) • (ω ^ (i : ℕ) • w) from
+    Int.cast_smul_eq_zsmul K (c i) (ω ^ (i : ℕ) • w)]
+  exact zsmul_mem (pow_smul_mem_adjoinSpan _ hw) _
+
+include hω in
 /-- **Normal form in `ℤ[ω] · M`**: every element is `∑_{j < n} ω^j • u j` with `u j ∈ M`. -/
 theorem exists_sum_pow_smul_of_mem_adjoinSpan {x : V} (hx : x ∈ adjoinSpan ω M) :
     ∃ u : Fin (minpoly ℤ ω).natDegree → V, (∀ j, u j ∈ M) ∧

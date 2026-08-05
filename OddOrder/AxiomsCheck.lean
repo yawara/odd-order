@@ -123,6 +123,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerInductionDescent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicIntegerModP
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CyclotomicModEq
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CharacterPClassCongruence
+import OddOrder.GroupTheory.RepresentationTheory.UnitCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
@@ -18133,3 +18134,27 @@ projection formula = Gorenstein Lemma 7.2 (`v(G)` が `ch(G)` のイデアルで
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.intModEq_of_mem_adjoinSpan
+
+/-! 🎯 **Brauer 指標判定 (issue 9508 段 E 準備)**: 一般の体 `K` 上の線形指標と余類の指示関数
+(`RepresentationTheory/UnitCharacter`)。`λ : H →* Kˣ` から 1 次元表現を作り、その指標が
+`h ↦ (λ h : K)` であることを見る (`isRepCharacter_unitCharacter`)。
+Gorenstein Lemma 7.6 の (7.12)-(7.13) は、`ζ` を原始 `n` 乗根として
+`Σ_{i<n} ζ^{-i} (λ h)^i = n` if `λ h = ζ` else `0` という**素の等比数列和** —
+すなわち `n · 1_{λ⁻¹(ζ)}` が `{λ^i}` の `ℤ[ω]`-結合として `ch_R(H)` に入る、という主張。
+⚠ 原文は「`P` を核に含む `U × P` の既約指標 `ψ_i` 全体」を取るが、**`λ` 1 本とその冪**で足りる
+(`ψ_i = λ^i`) ので、巡回群の既約指標の全数構成が要らない。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.character_unitRepresentation
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.isRepCharacter_unitCharacter
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.sum_inv_pow_mul_pow
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.fibreIndicator_mem_adjoinSpan
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.smul_mem_adjoinSpan_of_mem_adjoin
