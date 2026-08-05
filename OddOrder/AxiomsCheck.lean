@@ -17737,3 +17737,11 @@ basic set `𝓑` は `IBr(b)` から整数行列 `U = (u_{μφ})` (整数逆行�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_basicDecompositionNumber_eq_character
+
+/-! 🎯 **(7.4) の符号正規化**: `Irr(B₀)` のどれかは `χ(t) = −1`
+(`Modular/PrincipalBlockInvolution`)。段 195 を `s = 1` で読むと
+`Σ_{χ∈Irr(B₀)} χ(1)χ(t) = 0` で、全て `+1` なら `Σ χ(1) = 0` = 4 個の正整数の和 = 0 で矛盾。
+原文 p.134 の「by setting `s = 1` we see that there should be two different signs」。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_character_involution_eq_neg_one

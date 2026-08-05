@@ -603,6 +603,59 @@ theorem smul_eq_smul_of_vanishing_on_pRegular
   simp only [Pi.zero_apply, sub_eq_zero] at this
   simpa [Pi.smul_apply, smul_eq_mul] using this
 
+/-! ### Both signs occur among the `ε_χ` -/
+
+set_option maxHeartbeats 1000000 in
+-- Same chain as the two results it combines.
+set_option linter.unusedFintypeInType false in
+open scoped Classical in
+include hp hx hω hω' e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ ht in
+/-- **Some `χ ∈ Irr(B_0)` has `χ(t) = −1`.**  Block orthogonality at `s = 1`
+(`sum_character_mul_character_involution_eq_zero`) gives `∑_{χ ∈ Irr(B_0)} χ(1) χ(t) = 0`; if
+every `χ(t)` were `+1` the sum would be `∑ χ(1)`, a sum of four positive integers.
+
+This is Navarro's "by setting `s = 1` we see that there should be two different signs" (p. 134),
+the normalisation step of (7.4). -/
+theorem exists_character_involution_eq_neg_one
+    (hconjall : ∀ v : G, IsPElement p v → v ≠ 1 → IsConj t v) (ht1 : t ≠ 1)
+    (hweak : (∑ j ∈ Finset.univ.filter
+        (fun j => blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG),
+      (wedderburnRepresentation eG j).character 1 *
+        (wedderburnRepresentation eG j).character t) = 0)
+    (hcart : cartanMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e φ₀ φ₀ = 4) :
+    ∃ j : κ, blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG
+      ∧ (wedderburnRepresentation eG j).character t = -1 := by
+  classical
+  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  by_contra hcon
+  push Not at hcon
+  obtain ⟨hcard, hpm⟩ := card_blockOfIrr_principal_eq_four_and_character_involution hp hx hω e eG
+    hπG hlinG hπ hlin hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ ht hconjall ht1
+    hweak hcart
+  -- every `χ(t)` is `+1`
+  have hall : ∀ j ∈ Finset.univ.filter
+      (fun j => blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG),
+      (wedderburnRepresentation eG j).character t = 1 := fun j hj =>
+    (hpm j (Finset.mem_filter.mp hj).2).resolve_right (hcon j (Finset.mem_filter.mp hj).2)
+  -- block orthogonality at `s = 1` then reads `∑ χ(1) = 0`
+  have h0 := sum_character_mul_character_involution_eq_zero hp hx hω e eG hπG hlinG hπ hlin hkerJ
+    hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ ht1 (isPRegular_one hp)
+  rw [Finset.sum_congr rfl fun j hj => by
+      rw [hall j hj, mul_one,
+        show (wedderburnRepresentation eG j).character 1 = (Fintype.card (mG j) : K) from by
+          rw [Representation.char_one, Module.finrank_fintype_fun_eq_card]]] at h0
+  rw [← Nat.cast_sum] at h0
+  have hzero : (∑ j ∈ Finset.univ.filter
+      (fun j => blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG),
+      Fintype.card (mG j)) = 0 := by exact_mod_cast h0
+  -- but the filter has four elements, each contributing at least `1`
+  have hpos : ∀ j ∈ Finset.univ.filter
+      (fun j => blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG),
+      1 ≤ Fintype.card (mG j) := fun j _ => Fintype.card_pos
+  have hle := Finset.card_nsmul_le_sum _ _ 1 hpos
+  rw [hzero, smul_eq_mul, mul_one, hcard] at hle
+  omega
+
 /-! ### Any three of the four restrictions are independent -/
 
 set_option maxHeartbeats 1000000 in
