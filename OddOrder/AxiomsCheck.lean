@@ -291,6 +291,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolutio
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockBasicSet
 import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
 import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientPairing
+import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientCartan
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
@@ -17898,3 +17899,24 @@ literally 同一であることから、`φ(g) = φ̄(ḡ)` が Brauer 指標の
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.card_mul_pairingZero_quotient
+
+/-! 🎯🎯 **(7.6) の Cartan 行列**: `C = |P| C̄` (`Modular/QuotientCartan`)。
+段 212 の値の一致 (`irreducibleBrauerCharacter_quotientPi`) を段 213 の pairing 恒等式に食わせると
+`|N| · [φ,θ]⁰_G = [φ̄,θ̄]⁰_Ḡ` になる。`([μ,φ]⁰)` は Cartan 行列の両側逆
+(`sum_cartanMatrix_mul_pairingZero` + 正方性)、しかも逆行列は一意なので、`C` と `|N| C̄` は
+同じ行列を逆に持つ ⟹ 一致する。ブロック版 `C_B = |P| C_B̄` は Cartan が block diagonal
+(`cartanMatrix_eq_zero_of_centralCharacterAlg_ne`) ゆえ添字の制限にすぎない。
+⚠ 通常指標側の分裂 `e'` は `G` のものと無関係 (Irr(Ḡ) ⊊ Irr(G)) で、1 の冪根も別に取ってよい —
+共有されるのは `IBr` の添字集合 `ι` だけで、それが (7.6) の内容。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_of_sum_mul_eq_ite
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_mul_pairingZero_irreducibleBrauerCharacter_quotientPi
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.natCast_cartanMatrix_quotientPi
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.cartanMatrix_quotientPi
