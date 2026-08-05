@@ -326,6 +326,29 @@ Gorenstein の構成 (記号: `ch(G)` = generalized characters, `v(G) = Σ_{E �
     - `algebraMap 𝒪 K` の単射性 (`IsFractionRing.injective`) で `K` の等式を `𝒪` に降ろす。
 - [ ] **段 I**: `PrincipalBlockBasicSet` の `U` を ℤ 値に戻し、9506 の BS 本証明へ供給
 
+  **実測 (2026-08-05)**: `principalBasicSetMatrix` の消費者は `PrincipalBlockBasicSet.lean`
+  (633 行) の**内部 4 定理だけ**で、外部消費者はまだ無い。`ordinaryCombinationCoeff` の出現は 10 箇所。
+  - `principalBasicSetMatrix_eq_zero_of_ne_principalBlock` (315)
+  - `sum_principalBasicSetMatrix_mul_principalBasicSet` (339)
+  - `sum_decompositionMatrix_mul_principalBasicSetMatrix{,_eq_zero}` (425/447)
+  - `sum_principalBasicSetMatrix_mul_cartanMatrix` (556)
+
+  **証明が実際に使っている性質は 2 つだけ** (proof を読んで確認):
+  1. `ordinaryCombinationCoeff_eq_zero_of_blockOfIrr_ne` — `blockOfIrr i ≠ block(μ)` なら係数 0
+  2. `sum_ordinaryCombination_block_eq_irreducibleBrauerCharacter` — `Σ_{i ∈ Irr(B)} a_{μi} χ_i⁰ = φ_μ`
+
+  他は `signRelationRow` の純線型代数 (`sum_mul_signRelationRow` / `sum_signRelationRow_mul`) で
+  係数族の形に依らない。⟹ **`principalBasicSetMatrix` を抽象係数族
+  `a : ιG → κ → K` でパラメータ化し、上の 2 つを仮説にする**のが正しい refactor。
+  段 204 の族も段 H5 の族も instance になり、整数性は H5 の族で instantiate して出す。
+
+  ⚠ 4 定理はいずれも `maxHeartbeats 800000–1000000` の重い証明で仮説鎖が長い。
+  refactor は「def のシグネチャ変更 → 4 定理の仮説差し替え」を 1 つずつ leaf build で回すこと。
+
+  **その後**: H5 の `hsub` (Brauer 指標の `p'`-部分群への制限が仮想指標) を供給する **H3b**
+  (各 `p'`-部分群 `Q` の分裂データ `π_Q, ω_Q, ω'_Q, e_Q` を `[IsAlgClosed (ResidueField 𝒪)]` +
+  `[IsAlgClosed K]` から構成; `π_Q` は段 H2b、`ω_Q` は `ω^(e(G)/e(Q))`) が要る。
+
 ## 完了条件
 
 `v(G) = ch(G)` と Brauer's characterization が sorry-free で、Navarro (2.16)/(3.16) が
