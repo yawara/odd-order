@@ -139,6 +139,29 @@ theorem natCast_cartanMatrix_quotientPi (μ θ : ι) :
   ring
 
 include hcent in
+/-- **The basic-set form of (7.6)** — the remark after the proof, p. 138.  Because `IBr(G)` and
+`IBr(Ḡ)` are indexed by the same `ι` and take the same values, one and the same matrix `U`
+expresses both families in a basic set; so the congruent matrices `UᵗCU` of Navarro (7.5)(c) scale
+by `|N|` exactly as the Cartan matrices do.
+
+This is the form the Brauer–Suzuki proof cites on p. 141: for `H = C_G(t)` and `N = ⟨t⟩` the basic
+set of the principal block of `H/⟨t⟩` with `UᵗC̄U = 1 + δ` gives a basic set of the principal block
+of `H` whose Cartan invariants are *twice* those, i.e. `UᵗCU = 2(1 + δ)`. -/
+theorem sum_sum_mul_cartanMatrix_quotientPi {ι₂ : Type*} (u : ι → ι₂ → K) (φ η : ι₂) :
+    (∑ μ : ι, ∑ τ : ι, u μ φ
+        * (cartanMatrix hpF.out hω hω' hπ hlin hkerJ e μ τ : K) * u τ η)
+      = (Nat.card ↥N : K) * ∑ μ : ι, ∑ τ : ι, u μ φ
+          * (cartanMatrix hpF.out hϖ hϖ' (quotientPi_surjective π hπ hlin hN)
+              (quotientPi_smul π hπ hlin hN) (ker_quotientPi π hπ hlin hN hkerJ) e' μ τ : K)
+          * u τ η := by
+  rw [Finset.mul_sum]
+  refine Finset.sum_congr rfl fun μ _ => ?_
+  rw [Finset.mul_sum]
+  refine Finset.sum_congr rfl fun τ _ => ?_
+  rw [natCast_cartanMatrix_quotientPi hω hω' hϖ hϖ' hπ hlin hkerJ e e' hN hcent μ τ]
+  ring
+
+include hcent in
 /-- **Navarro (7.6): `C = |P| C̄`.**  The `ℕ`-valued form; `K` has characteristic zero, so the
 identity of `natCast_cartanMatrix_quotientPi` transfers back. -/
 theorem cartanMatrix_quotientPi (μ θ : ι) :

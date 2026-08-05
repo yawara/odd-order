@@ -17919,4 +17919,7 @@ literally 同一であることから、`φ(g) = φ̄(ḡ)` が Brauer 指標の
   OddOrder.RepresentationTheory.Modular.natCast_cartanMatrix_quotientPi
 
 #assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_sum_mul_cartanMatrix_quotientPi
+
+#assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.cartanMatrix_quotientPi
