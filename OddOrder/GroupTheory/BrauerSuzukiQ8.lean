@@ -117,6 +117,23 @@ Navarro's reduction opens with "`P ∩ N` is cyclic or `P ⊆ N`", which is exac
 theorem quaternionTwo_sq_eq_one : ∀ g : QuaternionGroup 2,
     g ^ 2 = 1 → g = 1 ∨ g = QuaternionGroup.a 2 := by decide
 
+/-- **`Q₈` has no central element of order `4`** (Navarro p. 139: "the quaternion group does not
+have a central element of order `4`").  This is what forces the Sylow `2`-subgroups of `C_G(y)`
+to be smaller than `T` when `y` has order `4`. -/
+theorem quaternionTwo_sq_eq_one_of_central :
+    ∀ w : QuaternionGroup 2, (∀ g : QuaternionGroup 2, g * w = w * g) → w ^ 2 = 1 := by decide
+
+/-- The same in a group isomorphic to `Q₈`. -/
+theorem sq_eq_one_of_mem_center_of_quaternionTwo {P : Type*} [Group P]
+    (e : P ≃* QuaternionGroup 2) {w : P} (hw : w ∈ Subgroup.center P) : w ^ 2 = 1 := by
+  refine e.injective ?_
+  rw [map_pow, map_one]
+  refine quaternionTwo_sq_eq_one_of_central (e w) fun g => ?_
+  have := Subgroup.mem_center_iff.mp hw (e.symm g)
+  calc g * e w = e (e.symm g * w) := by rw [map_mul, e.apply_symm_apply]
+    _ = e (w * e.symm g) := by rw [this]
+    _ = e w * g := by rw [map_mul, e.apply_symm_apply]
+
 /-- **A group isomorphic to `Q₈` has a unique involution.** -/
 theorem eq_of_sq_eq_one_of_quaternionTwo {P : Type*} [Group P]
     (e : P ≃* QuaternionGroup 2) {a b : P} (ha : a ^ 2 = 1) (ha1 : a ≠ 1) (hb : b ^ 2 = 1)

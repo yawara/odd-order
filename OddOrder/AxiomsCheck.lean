@@ -13358,6 +13358,11 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 `x^n = 1` の解は位数が `gcd(n,4)` を割る元で高々 `gcd(n,4) ≤ n` 個) の合成。 -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.quaternionTwo_sq_eq_one
 #assert_only_allowed_axioms OddOrder.GroupTheory.eq_of_sq_eq_one_of_quaternionTwo
+/-! `sq_eq_one_of_mem_center_of_quaternionTwo` = 原文 p.139 末「四元数群は位数 4 の中心元を
+持たない」。"Analysis at y" で `C_G(y)` の Sylow-2 が位数 8 になれないことを出すのに使う
+(`y` は `C_G(y)` で中心的なので、Sylow-2 が `Q₈` なら `y` はその中心に入って位数 ≤ 2)。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.quaternionTwo_sq_eq_one_of_central
+#assert_only_allowed_axioms OddOrder.GroupTheory.sq_eq_one_of_mem_center_of_quaternionTwo
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.isCyclic_of_card_dvd_four_of_unique_involution
 #assert_only_allowed_axioms OddOrder.GroupTheory.isCyclic_of_ne_top_of_quaternionTwo
