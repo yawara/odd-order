@@ -3524,7 +3524,28 @@ instance が段 317 側 (`classical`) と食い違って `rw` が刺さらない
 
 ⟹ (5.11) が要求する **per-`x` の `C_G(x)` datum** はこれで供給できる。
 
-#### ⟹ 残り = 段 319c (`hcoeff` の場合分け合成) → 段 320 (`hconv`)
+### ✅ 段 319c-1 完了 (2026-08-06) — `hcoeff` の `p`-特異側
+
+`KulshammerThirdMain.coeff_principalBlock_eq_centralizer_intermediate_of_not_isPRegular` —
+`g` が `p`-特異なら両辺 0 で一致 (Osima = 段 318 を `H` 側と `C_G(Q)` 側に 1 回ずつ)。
+
+⚠ 段 318 は `decompositionMatrix` 経由なので `hkerJ`/`ω`/`ω'` を要する。`IntermediateCoeff`
+節はそれらを持たないので**両側ぶんを仮説に足した** (供給は段 319b + 段 292 から)。
+
+⟹ **`p`-正則 (Külshammer) と合わせて全ての `g` が覆われた**。
+
+#### ⟹ 残り = 段 319c-2 (2 つを `∀ g` に束ねる) → 段 320 (`hconv`)
+
+* **段 319c-2**: `by_cases IsPRegular p (g : G)` で
+  `coeff_principalBlock_eq_centralizer_intermediate` (正則) と
+  `..._of_not_isPRegular` (特異) を束ね、`∀ g` の `hcoeff` を作る。
+  ⚠ 正則側の 8 仮説のうち `hweak` は段 319a + 段 319b で供給する
+  (Sylow の元が `p`-元であることは `IsPGroup` から)。
+* **段 320**: `hconv` = `eq_principalBlock_of_blockOfCentralCharacter_eq`
+  (`KulshammerThirdMain.lean:503`) に段 319c-2 を食わせ、
+  `C_G(⟨x⟩)` と `centralizerOf x` の項を同一視する。
+
+#### 旧メモ: 段 319c の見通し
 
 **`p`-正則側**: `coeff_principalBlock_eq_centralizer_intermediate` の 8 仮説を埋める。
 * `hidem`/`hf`/`hB` — `exists_blockIdempotentFamily` (両側)
