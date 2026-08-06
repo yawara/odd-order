@@ -3541,6 +3541,20 @@ instance が段 317 側 (`classical`) と食い違って `rw` が刺さらない
   `..._of_not_isPRegular` (特異) を束ね、`∀ g` の `hcoeff` を作る。
   ⚠ 正則側の 8 仮説のうち `hweak` は段 319a + 段 319b で供給する
   (Sylow の元が `p`-元であることは `IsPGroup` から)。
+
+  ⚠⚠ **`hweak` は `g` ごとの仮説** (`coeff_principalBlock_eq_centralizer_intermediate` の
+  signature で `g` が `hweakH` より先に来る)。⟹ 束ねた版の仮説は
+  `∀ g, IsPRegular p (g:G) → ∀ B ∀ x, … = 0` の形になる。段 319a はまさにこれを供給する。
+
+  ⚠⚠ **`FH` は族、`_of_not_isPRegular` の `FH` は単元**。束ねるときは
+  `FH (principalBlock …)` を渡す (`hidemH B` から単元版が出る)。
+
+  ✅ **前提 1 件を追加済 (2026-08-06)**: (5.11) は Sylow の各 `x` について
+  `C_G(x)` の**通常側の分裂 `eH`** を要求し、それは `IsAlgClosed K` から出るが
+  鎖の binder には `IsAlgClosed (FractionRing 𝒪)` しか無い。
+  ⟹ `AlgClosedFractionField.isAlgClosed_of_isAlgClosed_fractionRing` で移送する
+  (⚠ `A` と `K` は同一 universe — mathlib の `IsAlgClosed.of_ringEquiv` の制約。
+  `𝓞_ℂ_[p]` / `ℂ_[p]` は両方 `Type` なので実害なし)。
 * **段 320**: `hconv` = `eq_principalBlock_of_blockOfCentralCharacter_eq`
   (`KulshammerThirdMain.lean:503`) に段 319c-2 を食わせ、
   `C_G(⟨x⟩)` と `centralizerOf x` の項を同一視する。

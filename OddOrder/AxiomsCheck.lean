@@ -608,7 +608,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 19400
+set_option linter.style.longFile 19600
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -19385,3 +19385,20 @@ Osima (段 318) を `H` 側と `C_G(Q)` 側に 1 回ずつ適用するだけ。
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.coeff_principalBlock_eq_centralizer_intermediate_of_not_isPRegular
+
+/-! 🎯 **issue 9506 段 319c-2 の下ごしらえ**: `IsAlgClosed K` の移送
+(`AlgClosedFractionField.isAlgClosed_of_isAlgClosed_fractionRing`)。
+
+鎖は仮説を**正準な `FractionRing 𝒪`** の上で担ぐ (抽象 `K` は instance 解決で
+metavariable になるため、段 314 の設計) が、消費するのは自分の係数体 `K` の上。
+`FractionRing.algEquiv` で移す。
+
+⚠ `A` と `K` は同一 universe。mathlib の `IsAlgClosed.of_ringEquiv` が
+universe をまたげないため。実際の使用箇所 (`𝓞_ℂ_[p]` / `ℂ_[p]`) は両方 `Type` なので制約にならない。
+
+**なぜ要るか**: 段 319c-2 の `p`-正則側は (5.11) を経由し、(5.11) は Sylow の各元 `x` について
+`C_G(x)` の**通常側の分裂 `eH`** を要求する。それは `IsAlgClosed K` から
+`IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed` で出るが、
+鎖の binder には `IsAlgClosed K` が無い — この補題がその橋渡し。 -/
+
+#assert_only_allowed_axioms OddOrder.isAlgClosed_of_isAlgClosed_fractionRing

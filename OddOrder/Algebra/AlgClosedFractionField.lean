@@ -35,6 +35,8 @@ closed field, with no appeal to Brauer's splitting field theorem.
 * `OddOrder.exists_isRoot_sub_mem_maximalIdeal` — the root can be chosen near a given `a₀`
 * `OddOrder.isAlgClosed_residueField` — the residue field is algebraically closed
 * `OddOrder.henselianLocalRing_of_isAlgClosed` — `A` is Henselian
+* `OddOrder.isAlgClosed_of_isAlgClosed_fractionRing` — any fraction field of `A` is algebraically
+  closed once `FractionRing A` is
 -/
 
 namespace OddOrder
@@ -156,5 +158,24 @@ theorem henselianLocalRing_of_isAlgClosed (K : Type*) [Field K] [Algebra A K] [I
     [IsAlgClosed K] : HenselianLocalRing A :=
   { ‹IsLocalRing A› with
     is_henselian := fun f hf a₀ h₁ _ => exists_isRoot_sub_mem_maximalIdeal K hf a₀ h₁ }
+
+/-! ### Transporting algebraic closedness along the fraction field -/
+
+/-- **Any fraction field of `A` is algebraically closed once `FractionRing A` is.**
+
+The modular chain states the hypothesis on the canonical `FractionRing 𝒪` — an abstract `K` would
+be a metavariable for instance resolution — but consumes it on its own coefficient field `K`.  The
+two are canonically isomorphic (`FractionRing.algEquiv`), so this moves it across.
+
+Not an instance: `IsAlgClosed K` is exactly the kind of goal that would make instance search
+revisit every fraction field in scope.
+
+⚠ `A` and `K` share a universe, because mathlib's `IsAlgClosed.of_ringEquiv` transports only
+within one.  That is no restriction where this is used — the coefficient ring `𝓞_ℂ_[p]` and its
+fraction field `ℂ_[p]` both live in `Type`. -/
+theorem isAlgClosed_of_isAlgClosed_fractionRing.{u} (A : Type u) [CommRing A] [IsDomain A]
+    (K : Type u) [Field K] [Algebra A K] [IsFractionRing A K] [IsAlgClosed (FractionRing A)] :
+    IsAlgClosed K :=
+  IsAlgClosed.of_ringEquiv (FractionRing A) K (FractionRing.algEquiv (A := A) K).toRingEquiv
 
 end OddOrder
