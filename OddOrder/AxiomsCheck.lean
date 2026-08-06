@@ -273,6 +273,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionClassBurnside
+import OddOrder.GroupTheory.RepresentationTheory.Modular.WedderburnKernel
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionDecompositionIntegral
 import OddOrder.GroupTheory.RepresentationTheory.Modular.TrivialCharacterBasicSet
 import OddOrder.Algebra.SubgroupSumBlockAction
@@ -19865,3 +19866,22 @@ modular 鎖と同じ分裂体 `K` の中で完結する (**係数体の橋渡し
 #assert_only_allowed_axioms OddOrder.Algebra.sum_mul_halfSum_eq_zero
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_classSquareCoeff_mul_basicDecompositionNumber_eq_zero
+
+/-! 🎯 **issue 9506 段 337 (残タスク G)**: 見つけた指標の核 = 求める正規部分群
+(`Modular/WedderburnKernel`)。
+
+* `representationKernel` — 表現の核を部分群として (`Module.End K V` は群でないので
+  `MonoidHom.ker` は使えない; `σ g` が可逆であることで逆元閉性を出す)。正規性も instance。
+* `mem_representationKernel_of_character_eq` — 🎯 **対合 `t` で `χ(t) = χ(1)` ⟹ `t ∈ ker χ`**。
+  `χ(t) = 2 dim V₊ − dim V` と `χ(1) = dim V` から `V₊ = V` ⟹ `σ t = 1`。
+* `representationKernel_ne_top` — **自明成分でない Wedderburn 成分の核は真部分群**。
+  自明に作用すれば指標が定数 ⟹ 自明指標の定数倍 ⟹ 指標表の可逆性 (`eq_ordinaryCoeff`) に矛盾。
+* `exists_proper_normal_of_character_eq` — 🎯🎯 **原文 p.139 の "our objective" を
+  `∃ N, N.Normal ∧ N ≠ ⊤ ∧ t ∈ N` の形で出す** (= `q8_exists_proper_normal` の結論の形)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.mem_representationKernel_of_character_eq
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.representationKernel_ne_top
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_proper_normal_of_character_eq

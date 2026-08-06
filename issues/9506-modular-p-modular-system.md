@@ -4475,3 +4475,27 @@ modular datum を作り、上の 6 種の入力を実際に供給して `exists_
 
 ⟹ **F に残るのは datum の instantiation と (7.2)/(7.4)/(7.6) の群論的仮説だけ**。
 pp.139-145 の数学は列の供給まで含めて全部 Lean に在る。
+
+### ✅✅ 段 337 完了 (2026-08-06) — **残タスク G**: 見つけた指標の核 = 求める正規部分群
+
+`Modular/WedderburnKernel.lean` (168 行):
+
+| 名前 | 内容 |
+|---|---|
+| `representationKernel` | 表現の核を部分群として (+ `Normal` instance) |
+| `mem_representationKernel_of_character_eq` | 🎯 対合 `t` で `χ(t) = χ(1)` ⟹ **`t ∈ ker χ`** |
+| `representationKernel_ne_top` | 自明成分でない Wedderburn 成分の核は**真部分群** |
+| `exists_proper_normal_of_character_eq` | 🎯🎯 **原文 p.139 の "our objective"** を `∃ N, N.Normal ∧ N ≠ ⊤ ∧ t ∈ N` の形で |
+
+* `Module.End K V` は群でないので `MonoidHom.ker` が使えない — `σ g` が可逆
+  (`σ g⁻¹ * σ g = 1`) であることで逆元閉性を出す。
+* `t ∈ ker χ` は `character_eq_of_mul_self_eq_one` (`χ(t) = 2 dim V₊ − dim V`) と
+  `char_one` (`χ(1) = dim V`) から `dim V₊ = dim V` ⟹ `V₊ = ⊤` ⟹ `σ t = 1`。
+  **1 の冪根の議論は要らない** (対合だから)。
+* 真部分群性: 自明に作用すれば指標が定数 ⟹ 自明指標の定数倍 ⟹ `eq_ordinaryCoeff` の
+  一意性で `Pi.single k 1 = (i₀ 支持の族)` となり `k ≠ i₀` に矛盾。
+
+⟹ **段 337 の結論は `q8_exists_proper_normal` の結論そのもの**。
+残るのは段 332 の `exists_eq_of_columns_of_odd_degrees` の出力
+(`∃ k ≠ i₀, g k = T k` = `χ_k(1) = χ_k(t)`) を段 337 に渡す配線と、
+その上流の modular datum instantiation だけ。
