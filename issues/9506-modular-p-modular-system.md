@@ -4330,3 +4330,28 @@ eq_ite_of_sum_principalBasicSet_eq_one …                       -- ⟹ D_φ = �
 ⟹ **残るは F の配線のみ**: `𝓞_ℂ_[2]` で `G` / `C_G(t)` / `C_G(y)` / `C_G(t)/⟨t⟩` の
 modular datum を作り、上の 6 種の入力を実際に供給して `exists_eq_of_columns` を呼び、
 `ker χ` を取る (= G)。
+
+### ✅ 段 333a (2026-08-06) — 対合での一般化分解数の整数性: 線型代数の部分
+
+⚠ **F の着手で判明した最大の欠落**: `exists_eq_of_columns` (段 332) は列が **ℤ 値**であることを
+要求するが、`D^t_j(χ) = ∑_μ d^t_{χμ} u_{μj}` の `d^t_{χμ}` は `K` 値で、
+**整数性は repo に無かった** (`GeneralizedDecomposition.lean` の docstring が明記:
+「Navarro は `d^x_{χφ} ∈ ℤ[ζ_{o(x)}]` を言うが、本 repo の基底論法はそれを見ておらず未証明」)。
+
+`RepresentationTheory/CharacterInvolution` に 2 本追加 (既存 `involutionProj` の一般化):
+
+* `trace_comp_eq_trace_restrict_range` — **`tr(P f) = tr(f|_{im P})`** (`P` 冪等、`f` が
+  `im P` を保つ)。`P∘f = ι ∘ (P∘f)ᶜ` に `LinearMap.trace_comp_comm'` を当てるだけ。
+  ⚠ **`P` と `f` の可換性は不要** — `im P` の不変性だけで出る。
+* `character_involution_mul_eq` — 🎯 **`χ(t y) = 2·χ_{V₊}(y) − χ(y)`**
+  (`t` 対合、`y` は `t` と可換、`V₊ = im (1+σt)/2`)。
+  既存 `character_eq_of_mul_self_eq_one` (`χ(t) = 2 dim V₊ − dim V`) に `σ y` を挿入した形。
+
+⟹ 右辺は両方とも `C_G(t)` の**通常指標**なので `p`-正則類上で `IBr(C_G(t))` の `ℕ`-結合
+(`decompositionNumber` は**任意の格子表現**に対して定義済 = `DecompositionNumber.lean`)。
+よって `d^t_{χμ} = 2 n⁺_μ − m_μ` は**有理整数**。
+
+**次 (段 333b)**: `V₊` の `C_G(t)`-不変格子を取って `decompositionNumber` を 2 つ作り、
+`eq_generalizedDecompositionNumber` で `d^t_{χμ} = 2n⁺_μ − m_μ` を確定する。
+部品は全部在る (`exists_isLattice_invariant` / `latticeRepresentation` /
+`algebraMap_trace_latticeRepresentation` / `trace_eq_sum_decompositionNumber`)。

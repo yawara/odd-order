@@ -17590,6 +17590,22 @@ Navarro (5.12) の "in particular, notice that the matrix `J` is regular"。
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.exists_intCast_character_of_mul_self_eq_one
 
+/-! 🎯 **issue 9506 段 333a**: 対合での一般化分解数の整数性 — 線型代数の部分。
+
+`RepresentationTheory/CharacterInvolution` に 2 本追加:
+* `trace_comp_eq_trace_restrict_range` — **`tr(P f) = tr(f|_{im P})`** (`P` 冪等、
+  `f` が `im P` を保つ)。`P∘f = ι ∘ (P∘f)ᶜ` と `trace_comp_comm'` だけ (可換性は不要)。
+* `character_involution_mul_eq` — 🎯 **`χ(t y) = 2·χ_{V₊}(y) − χ(y)`**
+  (`t` 対合、`y` は `t` と可換、`V₊ = im (1+σt)/2`)。
+
+⟹ 右辺は両方とも `C_G(t)` の**通常指標**なので、`p`-正則類上では両方 `IBr(C_G(t))` の
+`ℕ`-結合。よって `d^t_{χφ}` は自然数の差 = **有理整数**。
+(原文 (5.1) 後の注は `d^x_{χφ} ∈ ℤ[ζ_{o(x)}]` を主張するが、対合なら `ζ = −1` で `ℤ`。) -/
+
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.trace_comp_eq_trace_restrict_range
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.range_involutionProj_invariant
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.character_involution_mul_eq
+
 /-! 🎯 **Klein 四元群の位数 3 の自己同型は 3 つの involution を巡回する**
 (`GroupTheory/KleinFourAutomorphism`) — Navarro (7.2) 第 1 部で
 `N_G(P)/C_G(P)` の位数が 3 のとき `P` の 3 つの involution が `G`-共役になる根拠。
