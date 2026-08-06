@@ -324,6 +324,7 @@ import OddOrder.Algebra.SumSquaresFour
 import OddOrder.Algebra.ThreeNormColumn
 import OddOrder.Algebra.HalfSumColumns
 import OddOrder.Algebra.SignRelationSolution
+import OddOrder.Algebra.BasicSetColumnShape
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockBasicSet
 import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
@@ -19619,3 +19620,31 @@ import が要る (無いと `![-1,-1,1]` が `Bool` の `!` として parse さ�
 modular 鎖は `K = ℂ_[p]` と `wedderburnRepresentation` を使う — **係数体の橋渡しが要る**。 -/
 
 #assert_only_allowed_axioms OddOrder.Algebra.eq_of_sign_relations
+
+/-! 🎯 **issue 9506 段 327**: 原文 p.143 — 列 `D^t_j` を読み取って (6)(7) を出す。
+
+`Algebra.eq_zero_of_dotProduct_eq_one` / `sign_relation_six` / `exists_sign_relations`
+(`BasicSetColumnShape`)。
+
+* **p.142 の主張** `(u_2)_3 = (u_3)_3 = (1,0,0)`: `u_1` が `{i₀,i,j}` に台を持ち
+  値が `1, δ_1, δ_2` (`δ_1δ_2 = −1`) なので `(u_1,u_2) = 1` は `δ_1(v_i − v_j) = 0` と読め、
+  `v_i = v_j`。`v` の非零成分は `{1,1,−1}` (段 324) なので、等しい 2 成分が `+1` と `−1` を
+  同時に埋めることはできず `v_i = v_j = 0`。
+* **(6)**: `D^t_1 = u_3 − u_1`, `D^t_2 = u_2 − u_1`, `D^t_0 = 2u_1 − D^y_0 + D^t_1 + D^t_2` から
+  `χ(t)_i = −a_i − δ_1(ψ_1(1)+ψ_2(1))`, `χ(t)_j = −δ_2(ψ_1(1)+ψ_2(1))` ⟹
+  `1 + δ_1χ(t)_i − δ_2χ(t)_j = 1 − δ_1a_i`、これは `(D^y_0,u_1) = 2` から `0`。
+* **(7)** は `(χ(1),u_1) = 0` を `u_1` の台で展開しただけ。
+* 原文の「記号を選ぶ」2 箇所を明示化: 1 つ目は `u_1` の 2 つの台添字に**名前を付ける**だけ
+  (⟹ `δ_1,δ_2` はその成分そのもの)、2 つ目は `D^y_0` のどちらが非零かの**本当の場合分け**で、
+  `(i,δ_1)` と `(j,δ_2)` の交換で解消する (`exists_sign_relations`)。
+
+⚠ 実装知見: `omit [Fintype S] in` は **docstring の前**に置く (後ろだと
+"unexpected token 'omit'; expected 'lemma'")。
+⚠ `Mathlib.Data.Int.Units` は現行 mathlib に無い。`δ₁δ₂ = −1 ⟹ δ_i = ±1` は
+`natAbs` + `Nat.dvd_one` + `Int.natAbs_eq_iff` で初等的に出る。 -/
+
+#assert_only_allowed_axioms OddOrder.Algebra.eq_zero_of_dotProduct_eq_one
+
+#assert_only_allowed_axioms OddOrder.Algebra.sign_relation_six
+
+#assert_only_allowed_axioms OddOrder.Algebra.exists_sign_relations
