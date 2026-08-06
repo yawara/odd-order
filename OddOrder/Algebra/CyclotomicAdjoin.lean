@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.RingTheory.AdicCompletion.LocalRing
 import Mathlib.RingTheory.AdjoinRoot
 import Mathlib.RingTheory.LocalRing.ResidueField.Defs
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Basic
@@ -41,6 +42,8 @@ the hypothesis that the block idempotents are lifted along.
 * `OddOrder.Algebra.ker_cyclotomicToResidueField_le` /
   `OddOrder.Algebra.ker_cyclotomicToResidueField_isMaximal` — the kernel is maximal and sits
   inside `𝔪_A·B ⊔ ⟨ζ - 1⟩`
+* `OddOrder.Algebra.isAdicComplete_ker_cyclotomicToResidueField` /
+  `OddOrder.Algebra.isLocalRing_cyclotomicAdjoin` — **`B` is a complete local ring**
 -/
 
 namespace OddOrder.Algebra
@@ -203,5 +206,56 @@ theorem ker_cyclotomicToResidueField_isMaximal {A : Type*} [CommRing A] [IsLocal
     {q k : ℕ} [Fact (Nat.Prime q)] [CharP (ResidueField A) q] (hk : 0 < k) :
     (RingHom.ker (cyclotomicToResidueField (A := A) (q := q) (k := k) hk)).IsMaximal :=
   RingHom.ker_isMaximal_of_surjective _ (cyclotomicToResidueField_surjective hk)
+
+/-! ### `B` is local, and `𝔪_B`-adically complete -/
+
+open IsLocalRing in
+/-- **`B` is `ker(B → k)`-adically complete.**  The kernel `N` satisfies `𝔪_A·B ≤ N` and
+`N^{φ(q^k)} ≤ 𝔪_A·B` (段 302/304/305), so the two filtrations are cofinal and
+`isAdicComplete_of_le_of_pow_le` transfers the completeness that `B` has as a finite free
+`A`-module. -/
+theorem isAdicComplete_ker_cyclotomicToResidueField {A : Type*} [CommRing A] [IsLocalRing A]
+    {q k : ℕ} [Fact (Nat.Prime q)] [CharP (ResidueField A) q]
+    [IsAdicComplete (maximalIdeal A) A] (hk : 0 < k) :
+    IsAdicComplete (RingHom.ker (cyclotomicToResidueField (A := A) (q := q) (k := k) hk))
+      (AdjoinRoot (cyclotomic (q ^ k) A)) := by
+  set B := AdjoinRoot (cyclotomic (q ^ k) A)
+  set I : Ideal B := Ideal.map (algebraMap A B) (maximalIdeal A) with hI
+  set J : Ideal B := Ideal.span {AdjoinRoot.root (cyclotomic (q ^ k) A) - 1} with hJ
+  set N := RingHom.ker (cyclotomicToResidueField (A := A) (q := q) (k := k) hk) with hN
+  haveI : IsAdicComplete I B :=
+    (IsAdicComplete.map_algebraMap_iff (I := maximalIdeal A) (M := B)).mpr
+      (isAdicComplete_cyclotomicAdjoin (q ^ k) A (maximalIdeal A))
+  have hφ : q ^ k - q ^ (k - 1) ≠ 0 := by
+    obtain ⟨j, rfl⟩ := Nat.exists_eq_succ_of_ne_zero hk.ne'
+    have hlt : q ^ j < q ^ j.succ :=
+      Nat.pow_lt_pow_right (Fact.out : Nat.Prime q).one_lt (Nat.lt_succ_self j)
+    simp only [Nat.succ_sub_one]
+    omega
+  have hIN : I ≤ N := by
+    rw [hI, hN, Ideal.map_le_iff_le_comap]
+    intro a ha
+    rw [Ideal.mem_comap, RingHom.mem_ker, AdjoinRoot.algebraMap_eq,
+      cyclotomicToResidueField_of hk a, ← RingHom.mem_ker, ker_residue]
+    exact ha
+  have hJφ : J ^ (q ^ k - q ^ (k - 1)) ≤ I := by
+    rw [hJ, Ideal.span_singleton_pow, Ideal.span_le, Set.singleton_subset_iff]
+    exact sub_one_pow_mem_map_maximalIdeal hk
+  have hNφ : N ^ (q ^ k - q ^ (k - 1)) ≤ I :=
+    le_trans (pow_le_pow_left' (ker_cyclotomicToResidueField_le hk) _)
+      (le_trans (Ideal.sup_pow_le I J _) (sup_le le_rfl hJφ))
+  exact isAdicComplete_of_le_of_pow_le hφ hNφ hIN
+
+open IsLocalRing in
+/-- **`A[ζ_{q^k}]` is a local ring** with maximal ideal `ker(B → k)` — the adic completeness of
+`isAdicComplete_ker_cyclotomicToResidueField` at a *maximal* ideal forces locality. -/
+theorem isLocalRing_cyclotomicAdjoin {A : Type*} [CommRing A] [IsLocalRing A]
+    {q k : ℕ} [Fact (Nat.Prime q)] [CharP (ResidueField A) q]
+    [IsAdicComplete (maximalIdeal A) A] (hk : 0 < k) :
+    IsLocalRing (AdjoinRoot (cyclotomic (q ^ k) A)) := by
+  haveI := ker_cyclotomicToResidueField_isMaximal (A := A) (q := q) (k := k) hk
+  haveI := isAdicComplete_ker_cyclotomicToResidueField (A := A) (q := q) (k := k) hk
+  exact isLocalRing_of_isAdicComplete_maximal
+    (RingHom.ker (cyclotomicToResidueField (A := A) (q := q) (k := k) hk))
 
 end OddOrder.Algebra

@@ -19136,3 +19136,23 @@ mathlib `isLocalRing_of_isAdicComplete_maximal` で `IsLocalRing B`。 -/
 #assert_only_allowed_axioms OddOrder.Algebra.ker_cyclotomicToResidueField_le
 
 #assert_only_allowed_axioms OddOrder.Algebra.ker_cyclotomicToResidueField_isMaximal
+
+/-! 🎯🎯 **issue 9506 段 306**: `B = A[ζ_{q^k}]` は完備局所環
+(`Algebra/CyclotomicAdjoin`)。
+
+段 300-305 の組み立て。`N := ker(B → k)` について
+- `𝔪_A·B ≤ N` (定数は `𝔪_A` なら像が消える)
+- `N^{φ(q^k)} ≤ 𝔪_A·B` (段 305 の包含 + 段 304 の `(I ⊔ J)^n ≤ I ⊔ J^n`
+  + 段 302 の `(ζ−1)^φ ∈ 𝔪_A·B`)
+⟹ 段 300 の `isAdicComplete_of_le_of_pow_le` で
+`isAdicComplete_ker_cyclotomicToResidueField`。
+さらに `N` は極大 (段 305) なので mathlib
+`isLocalRing_of_isAdicComplete_maximal` で `isLocalRing_cyclotomicAdjoin`。
+
+⟹ **係数環 `𝕎(𝔽̄_p)[ζ_{p^a}]` の「完備局所環」部分が完成**。
+剰余体が `k` であること (段 303 の全射性 + 核が極大) と `Frac(B)` の分裂が残り。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.Algebra.isAdicComplete_ker_cyclotomicToResidueField
+
+#assert_only_allowed_axioms OddOrder.Algebra.isLocalRing_cyclotomicAdjoin
