@@ -228,6 +228,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterIndepend
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerIndependence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerLinearIndependence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ColumnsAtInvolution
+import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionColumnExpansion
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorQuotient
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorSubspace
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InvariantLattice
