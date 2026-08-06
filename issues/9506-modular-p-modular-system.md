@@ -3439,6 +3439,53 @@ Sylow の元 `x ≠ 1` について `∑_{i ∈ B} χ_i(g⁻¹) · χ_i(x) = 0`�
 4. `hconv` = `SecondMainPrincipalBlock.eq_principalBlock_of_inducedBlockOfCentralizer_eq` +
    `hcoeff` + `C_G(⟨x⟩)` と `centralizerOf x` の項の同一視。
 
+### ⚠⚠⚠ 訂正 (2026-08-06): `hcoeff` は「純粋な配管」ではない — **Osima の定理が要る**
+
+上の段 316 下ごしらえを実装しようとして判明。**「残りは純粋な配管」という評価は誤り**だった。
+
+#### 実測した論理
+
+1. **`hweak` は実質「`g` が `p`-正則」と同値**。`hweak` は任意の `x ∈ S`, `x ≠ 1` について
+   `∑_{i ∈ B} χ_i(g⁻¹)χ_i(x) = 0` を要求するが、(5.11) の非共役条件は
+   `¬ IsConj x (pPart p g)` である。`g` が `p`-特異なら `pPart p g ≠ 1` は
+   Sylow `S` の元に共役なので、その `x` で成り立たない。
+2. **`hcoeff` は全ての `g` について要る**。消費点
+   `KulshammerThirdMain.eq_principalBlock_of_blockOfCentralCharacter_eq` (`.lean:503`) の
+   `hcoeff` は `∀ g : C_G(Q)` で、`brauerTrunc_eq_of_coeff_eq` が全係数の一致を要求する。
+3. ⟹ **`p`-特異な `g` は Külshammer 経由では扱えない**。必要なのは
+   **ブロック冪等元が `p`-特異元で消えること** = **Osima の定理**。
+   ⚠ 迂回不可: `brauerTrunc_eq_of_coeff_eq` を `p`-正則に制限する版を作っても、
+   両辺が `p`-正則台であることを言うのに結局同じ定理が要る。
+
+#### 実測: repo にも mathlib にも Osima は無い (`grep -i osima` → 0 件)
+
+#### 📖 原典 = **Navarro (3.8) COROLLARY (Osima)** (`characters-and-blocks.pdftotext.txt:2424`)
+
+> Suppose that `A` is a union of connected components of the Brauer graph. Then `f_A ∈ Z(SG)`.
+> … Furthermore, **`f_A(K) = 0` if `K` does not consist of `p`-regular elements.**
+
+依存: **(3.6) THEOREM (Osima)** (`:2371`) / **(3.7) COROLLARY (Weak Block Orthogonality)** (`:2411`) /
+Dickson の定理 / `Φ_φ` が `p`-正則元の外で消えること。
+
+#### 🎯 規模の実測 — **要るのは半分だけで、部品はほぼ揃っている**
+
+Navarro の (3.8) の証明は 2 つの主張を同時に出すが、**我々が要るのは消滅の側だけ**:
+
+> "Since `Φ_φ` vanishes off `p`-regular elements, we see that `f_A(K)` is zero if `p` divides
+> the order of `x`."
+
+⟹ **消滅の側は `Φ_φ` の消滅だけで出る。Dickson の定理は整数性 (`f_A(K) ∈ S`) の側にしか要らない**
+(そちらは不要)。そして部品は repo に在る:
+
+| 部品 | repo | 状態 |
+|---|---|---|
+| `Φ_φ` が `p`-正則元の外で消える | `ProjectiveCharacterVanishing.projectiveIndecomposableCharacter_eq_zero` | ✅ |
+| Navarro (2.13) `∑_φ Φ_φ(x) φ(y⁻¹) = |C_G(y)| δ` | `ProjectiveCharacterVanishing.algebraMap_sum_projectiveIndecomposableCharacter_mul_inv` (`.lean:90`) | ✅ |
+| Dickson (`|G|_p ∣ Φ_φ(1)`) | — | ❌ **だが不要** |
+
+⟹ **次の着手 = Navarro (3.6) → (3.8) の消滅半分**。新しい大物ではなく、
+既存の `Φ_φ` 機構の上に載る。
+
 ## 完了条件
 
 上記チェックボックスが全て埋まり、**具体構成による instance が存在**し、
