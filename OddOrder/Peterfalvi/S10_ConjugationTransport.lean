@@ -23,8 +23,8 @@ variable {G : Type*} [Group G]
 /-! ### (8.15) assembly for type I
 
 Shallow facts about the support `A(M) = typeIA M data` (membership, sharpness, `M`-invariance,
-nonemptiness), the two genuinely-deep (8.13) obligations as precise `sorry` pins, and the faithful
-(8.15) construction assembled from them.  The pins are exactly the pieces Peterfalvi's (8.15) proof
+nonemptiness), the two genuinely-deep (8.13) obligations as precise pins, and the faithful (8.15)
+construction assembled from them.  The pins are exactly the pieces Peterfalvi's (8.15) proof
 cites: "Statements (2.2.a, b, c) hold by (8.13.a, c1, c2)" — (8.13) = BG §16 Theorem II +
 Theorem B(5) + Theorem D(4) (Coq `FTsupport_facts`, PFsection8). -/
 

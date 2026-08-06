@@ -800,9 +800,8 @@ This is exactly the opening sentence of the proof of (10.3) ("By Theorem (8.8), 
 subgroup `S` of `G` of Type II such that `|S:[S,S]| = w₂`"): the type-`P` maximal `M` of (10.1)
 participates in the case-(b) configuration of Theorem (8.8), one of whose two maximal subgroups is
 of Type II and shares the cyclic factor order `w₂`.  Tying the generic case-(b) datum
-(`theorem88_caseB_holds`) to the *given* `M` is the content of (8.8)/(8.13) applied to `M`; it is
-recorded here as a faithful obligation (its proof is currently a `sorry`, gated on the BG §16
-partner-existence behind `theorem88_caseB_holds`). -/
+(`theorem88_caseB_holds`) to the *given* `M` is the content of (8.8)/(8.13) applied to `M`; it goes
+through the BG §16 partner-existence behind `theorem88_caseB_holds`. -/
 theorem Hypothesis.exists_typeII_maximal_with_w2 [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
     ∃ S : Subgroup G, S ∈ maximalSubgroups G ∧ IsTypeII S ∧

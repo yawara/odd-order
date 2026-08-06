@@ -732,10 +732,10 @@ type-`P` 機構 (`typeP_kstar_in_mf` / `typeP_derivedInG_inf_centralizer_kappaEl
 `M := T`, `K := W₂`, `K* := W₁`) が `reconciled_typePData_T` の両 field を discharge する:
 `W₁ ≤ Q ⊓ T''` (`W2_le` field) と `∀ x ∈ W₂#, T' ⊓ C(x) = W₁` (`centralizer_W1` field)。
 
-これは gated-endpoint skeleton (issue 9073): 2 sorry を **精密な pairing 2 facts** (κ-Hall + Kstar 同定)
-に還元し、その **十分性を実証明で verify**。残余 Fact A + Fact B は `typeP_partner_structure` を `S` に
-適用 (κ-Hall `W₁`, `Kstar = M_σ(S)⊓C(W₁) = W₂`) すれば partner `Mstar = T` に対し供給される
-(S-side κ-Hall setup + Z-family covering の wiring が次段)。 -/
+これは gated-endpoint skeleton (issue 9073): 2 つの残 obligation を **精密な pairing 2 facts**
+(κ-Hall + Kstar 同定) に還元し、その **十分性を実証明で verify** したもの。Fact A + Fact B は
+`typeP_partner_structure` を `S` に適用 (κ-Hall `W₁`, `Kstar = M_σ(S)⊓C(W₁) = W₂`) すれば
+partner `Mstar = T` に対し供給される。 -/
 theorem Hypothesis.reconciled_residuals_of_pairing_facts [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hFactA : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa hyp.T)

@@ -48,8 +48,8 @@ The mathematically substantive fields are the genuine §13 grid:
 These are *not* consumed on the FT critical path: the §13/§16 contradiction in
 `Peterfalvi.S16` (`S16_NonExistenceG`) is routed entirely through `eta = τ₃ ∘ ω` (the W-side
 Dade grid), never through the S/T-side maximal-coherent isometries `τ_S, τ_T`.  The only
-references to `tauS`/`tauT` are the (currently `sorry`-stubbed, *uncited*) coherence-wiring
-lemmas in `S15_SAndT_Setup`, which lie off the FT path.  `Hypothesis` itself places no `Prop`
+references to `tauS`/`tauT` are the *uncited* coherence-wiring lemmas in `S15_SAndT_Setup`,
+which lie off the FT path.  `Hypothesis` itself places no `Prop`
 constraint on these six fields, so the placeholders introduce no unsound dependency — they are
 genuine values of the right type for fields the formalized contradiction does not read.  (User
 decision 2026-06-24, issue 1004: close the producer on the verified-vestigial finding rather

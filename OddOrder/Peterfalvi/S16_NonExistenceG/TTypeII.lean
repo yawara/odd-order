@@ -340,8 +340,8 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- carrier is now supplied, so this theorem carries **no local `sorry`**.  The last residual —
   -- the Coq (11.8) `FTtype34_not_ortho_cycTIiso` non-orthogonality `hnotZeroRowProjection` — is now
   -- discharged by transporting the canonical narrow-`𝒮(H₀C)` refuter through the global σ/η grid
-  -- identification ((3.9)(a) rigidity).  Upstream gates persist only transitively through the cited
-  -- sorried lemmas (Type-P₁ `A₀`-normed-TI, (13.18.a) β-support, §11 zero-column projection).
+  -- identification ((3.9)(a) rigidity).  The upstream inputs it cites (Type-P₁ `A₀`-normed-TI,
+  -- (13.18.a) β-support, §11 zero-column projection) are all proved.
   classical
   have hc1 : hyp.base.c = 1 :=
     hyp.base.c_eq_one_of_lambda_dichotomy hG hyp.nuGridSupply

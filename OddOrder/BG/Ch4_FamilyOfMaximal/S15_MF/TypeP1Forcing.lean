@@ -29,10 +29,9 @@ variable {G : Type*} [Group G]
 The structural content of Theorem 15.2 (`mf_ne_msigma_typeP1_structure`, mmd L4190-4202) is built
 up here as **sorry-free conditional helpers** that take the §14-gated facts (type-`P1`, `K`'s prime
 action on `M_σ`, `q = |K*|` prime — Lemma 14.1 / Theorem 14.7(f) / Proposition 14.2(a)) as explicit
-hypotheses.  Once Lane H lands those §14 results the wrapper `mf_ne_msigma_typeP1_structure`
-discharges each hypothesis by a single citation and assembles these helpers (net `-1` sorry then).
-The proof's first §3 gate, BG **Theorem 3.8** (`S03h.thm38`), is now formalized, unblocking
-step 2. -/
+hypotheses.  Those §14 results have since landed, and the wrapper `mf_ne_msigma_typeP1_structure`
+discharges each hypothesis by a single citation and assembles these helpers.  The proof's first §3
+gate, BG **Theorem 3.8** (`S03h.thm38`), is likewise formalized. -/
 
 /-- **Theorem 15.2, step 2 entry** (mmd L4192, "By Lemma 6.3(a), `M_σ = [M_σ, K]`"): in a
 type-`P1` factorization `M = K M_σ` (so `M_σ` is a complement of `K` in `M`), the σ-core is its

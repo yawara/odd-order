@@ -92,3 +92,17 @@ blueprint が提供したい情報 (何が statement 化され・何が証明済
 
 blueprint 逆生成はユーザー裁定で凍結。実装計画 (§設計・Phase 分割) は本文に保存済み —
 解凍時はそこから再開。forward TeX 不採用の方針 (CLAUDE.md「やらないこと」) は不変。
+
+---
+
+## ✅ CLOSED (2026-08-07、ユーザー裁定)
+
+blueprint 逆生成は**やらない**ことに決定 (2026-07-24 の凍結 → 08-07 に close)。
+
+実装計画 (§設計・Phase 分割) は本文に記録として残す。再考する価値が出るとすれば
+「教科書番号 ↔ Lean 宣言の対応表」と「証明項から取った依存 DAG」だが、いずれも
+必要になった時点で単発ツールとして書けばよく、tracker を open にしておく理由はない。
+
+**方針は不変**: CLAUDE.md「やらないこと」の
+**forward TeX blueprint は不採用 / reverse (Lean → blueprint) 自体は禁止でない**、
+逆生成物を作る場合は常に Lean から再生成し手編集で第二の source of truth にしない。

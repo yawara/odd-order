@@ -1380,9 +1380,10 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact ⟨Y, hYcyc, hYτ₂, h3, h4, h5, h6, h7, h8, h9, h10, h11⟩
 
 /-- **§14-independent assembly of BG Corollary 15.6** from its §14/§15 inputs taken as
-hypotheses.  This packages the *logic* of Corollary 15.6 (mmd L4232) with no fragile citation of
-the still-`sorry` §14 scaffold: once §14 lands, `typeP_kstar_in_mf` discharges each hypothesis by
-a single citation and applies this skeleton.  Hypothesis provenance (mmd L4434 dependency table):
+hypotheses.  This packages the *logic* of Corollary 15.6 (mmd L4232) with no citation of the §14
+scaffold at all — it was written while §14 was still a `sorry`-stated skeleton.  §14 has since
+landed, and `typeP_kstar_in_mf` discharges each hypothesis by a single citation and applies this
+skeleton.  Hypothesis provenance (mmd L4434 dependency table):
 
 * `hKne` (`K* ≠ 1`) ← Proposition 14.2(c) (`typeP_structure`, conjunct `Kstar ≠ ⊥`);
 * `hcyc` (`K K*` cyclic) ← Theorem 14.7(d) (`typeP_duality`, conjunct `IsCyclic (K ⊔ Kstar)`);

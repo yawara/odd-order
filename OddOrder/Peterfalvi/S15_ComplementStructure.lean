@@ -113,8 +113,8 @@ with the complement containing `W₁` — Peterfalvi's "let `E` be a complement 
 that `W₁ ⊂ E`".  Since `W₁ ≤ N_G(U) ≤ L` is coprime to the kernel (`q ∤ |L_F|`,
 `q_not_dvd_kernel`), Schur–Zassenhaus complement conjugacy
 (`exists_conj_le_of_isComplement'_of_coprime`) places `W₁` in a conjugate `E₀^x` of any complement
-`E₀`, which is again a Frobenius complement (`IsFrobeniusGroup.conjComplement`).  The only `sorry`
-is the coprimality, gated on the opaque `kernel_eq_MF` carrier. -/
+`E₀`, which is again a Frobenius complement (`IsFrobeniusGroup.conjComplement`).  The coprimality
+goes through the `kernel_eq_MF` carrier. -/
 theorem exists_typeIFrobeniusData_W1_le [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)

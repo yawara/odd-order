@@ -536,8 +536,8 @@ theorem per_q_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
 /-- **BG Theorem 13.4** (mmd L3576): `p ∈ τ₁(M)`, `P ∈ ℰ_p¹(E)`, `r ∈ π(E)`, `R ∈ ℰ_r¹(C_E(P))`
 なら `C_{M_σ}(P) ⊆ C_{M_σ}(R)`。✅ **完全証明** (2026-06-14): outer reduction
 `msigma_centralizer_le_of_invariant_sylow_centralized` + per-q core `per_q_centralizes` (step 7 の
-`C_{M_α}(P)=C_{M_α}(R)` は `alpha_fixed_le_fixed` [uniform exclusion] で解決)。axiom-clean; sorryAx は
-§12 scaffold (Cor 12.16 / Prop 12.15 / Thm 12.13) 由来のみ、Lane F 完成で自動 unconditional 化。 -/
+`C_{M_α}(P)=C_{M_α}(R)` は `alpha_fixed_le_fixed` [uniform exclusion] で解決)。axiom-clean。
+上流引用は §12 の Cor 12.16 / Prop 12.15 / Thm 12.13 のみで、いずれも証明済。 -/
 theorem centralizer_le_centralizer_of_tau1 [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p r : ℕ}
     [Fact p.Prime] [Fact r.Prime] (hp : p ∈ tau1 M) (hr : r ∈ (Nat.card ↥E).primeFactors)

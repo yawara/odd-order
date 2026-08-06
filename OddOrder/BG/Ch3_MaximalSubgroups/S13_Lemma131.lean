@@ -20,14 +20,15 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
 ## BG Corollary 12.16(a)(b) 依存 (de-axiom 済, issue 8000/0065)
 
 Lemma 13.1 は **BG Cor 12.16(a)(b)** (rank bound `r_p(N_H(Y)) ≤ 1` / π-bound
-`p∈τ₁(M) ⟹ p∉π(N_H(Y)')`) を本質的に使う。これらは §12 の結果で、Lane F が S12_E に faithful な
-sorry'd statement (`sigma_subgroup_pRank_normalizer_le_one` /
-`sigma_subgroup_not_mem_primeFactors_derived_of_tau1`, issue 0065) として露出済み。
+`p∈τ₁(M) ⟹ p∉π(N_H(Y)')`) を本質的に使う。これらは §12 の結果で、S12_E の
+`sigma_subgroup_pRank_normalizer_le_one` /
+`sigma_subgroup_not_mem_primeFactors_derived_of_tau1` (issue 0065) として露出されている
+(当初は faithful statement + `sorry` の scaffold として着地し、その後証明された)。
 
 当初 (2026-06-12 Lane G session 1) は両者が repo に未露出だったため provisional forward axiom
 で進めたが、F の statement 着地 (2026-06-12, commit `e876f29b`) を受けて **de-axiom 済**
 (2026-06-13): cite 先を S12_E の上記 2 定理へ差し替え、forward axiom は削除。これにより §13 は
-新規 axiom 0 となり、§12 cascade が S12_E の proof を埋めた時点で自動的に unconditional 化する
+新規 axiom 0 となり、§12 cascade が S12_E の proof を埋めた時点で自動的に unconditional 化した
 (repo 標準の scaffold-sorry 規約に準拠)。
 
 → 詳細: `issues/8000-s13-blocked-cor1216ab.md`, `issues/0065-cor1216-faithful-statement.md`,
@@ -315,8 +316,8 @@ decomposition `M* = K ⊔ N_{M*}(Y)` with `K = O_{β(M*)∪{q}}(M*') ⊴ M*` and
 `M*'`. Since `p ∉ β(M*)` (`τ₂ ∩ σ = ∅ ⊇ β`) and `p ≠ q` (`p ∈ π(E)`, `q ∈ σ(M)`,
 `π(E) ∩ σ(M) = ∅`), the `{β(M*)∪{q}}`-group `K` has order prime to `p`, so `[M* : N_{M*}(Y)]`
 is prime to `p` and `r_p(N_{M*}(Y)) = r_p(M*) = 2`. But Lemma 12.1(g) gives `p ∉ β(G)`, so
-Corollary 12.16(a) forces `r_p(N_{M*}(Y)) ≤ 1` — a contradiction. Cites the S12_E sorry'd
-statement `sigma_subgroup_pRank_normalizer_le_one`. -/
+Corollary 12.16(a) forces `r_p(N_{M*}(Y)) ≤ 1` — a contradiction. Cites the S12_E statement
+`sigma_subgroup_pRank_normalizer_le_one`. -/
 theorem not_mem_tau2_of_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
     {Mstar : Subgroup G} (hMstar : Mstar ∈ maximalSubgroups G)

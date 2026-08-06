@@ -601,9 +601,9 @@ theorem exists_hypothesis_of_typeIIIorIVorV [Finite G]
     Nonempty (Hypothesis M) := by
   obtain ⟨data⟩ := typePData_of_isTypeNonI (Or.inr hType)
   -- Types III/IV/V are `P₁` (classification): III/IV via `(III∨IV) ↔ (P₁ ∧ M_F≠M_σ)`, V via
-  -- `V ↔ (P₁ ∧ M_F=M_σ)`.  This routes the `A_0(M)` datum through the *`sorry`-free* type-`P₁`
-  -- construction `dadeSupportHypothesisData_typePA0_of_isTypeP1` (not the general
-  -- `dadeSupportHypotheses_typeP`, whose type-`P₂` branches are still `sorry`).
+  -- `V ↔ (P₁ ∧ M_F=M_σ)`.  This routes the `A_0(M)` datum through the type-`P₁` construction
+  -- `dadeSupportHypothesisData_typePA0_of_isTypeP1` rather than the general
+  -- `dadeSupportHypotheses_typeP`, whose type-`P₂` branches were the later-landing side.
   have hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M := by
     have hcls := OddOrder.BG.Ch4.S16.proposition_type_classification hG hM
     rcases hType with h | h | h
@@ -1287,8 +1287,8 @@ def typePData_toS06Hypothesis [Finite G] {M : Subgroup G} (data : TypePData M)
 
 /-- The §10 Hypothesis (10.1) for a type III/IV/V maximal subgroup `M` exhibits `M` as a *BG*
 type-`P` maximal (`(κ(M)).Nonempty`).  By BG Proposition 16.1
-(`proposition_type_classification`, cited even though it currently carries a `sorry`), each
-Peterfalvi type III/IV/V maps to `S14.IsTypeP1`, hence to `S14.IsTypeP`.  This is the BG type-`P`
+(`proposition_type_classification`), each Peterfalvi type III/IV/V maps to `S14.IsTypeP1`,
+hence to `S14.IsTypeP`.  This is the BG type-`P`
 input needed to discharge the Hall coprimality `typePData_W1_hall_coprime`. -/
 theorem Hypothesis.bgTypeP [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hyp : Hypothesis M) : OddOrder.BG.Ch4.S14.IsTypeP M := by

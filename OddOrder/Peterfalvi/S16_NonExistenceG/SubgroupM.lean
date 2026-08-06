@@ -1160,7 +1160,7 @@ T-side/S-side cyclotomic size data, `main_size_bounds` (14.11.1) supplies
 `k > 2 p v`, and `normCascadeBound_of_charData` (14.11.2)--(14.11.3) supplies the
 displayed norm inequality.  The arithmetic consumer
 `norm_cascade_contradiction_of_caseB_outputs_main_size_bounds` then closes the
-cascade.  The only remaining genuine `sorry`s are the named producers above. -/
+cascade.  The named producers above carry the substance. -/
 theorem contradiction_of_K_ne_V [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)

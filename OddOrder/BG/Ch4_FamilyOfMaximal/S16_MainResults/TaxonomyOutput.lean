@@ -327,17 +327,17 @@ theorem theoremII_conjunct1_of_inputs {M K U : Subgroup G}
 own body).  `A(M)`/`A_0(M)` are tamely embedded — the BG form of the centralizer-control input used
 by Peterfalvi (8.12)--(8.13).
 
-The body is the full Theorem II proof; it still cites the (`sorry`-bearing) §16 structure theorems
-A--D and Proposition 16.1 inline, so it is *not* axiom-clean (it depends transitively on `sorryAx`
-through them).  What this skeleton isolates are the two obligations *beyond* that standard A--D
-suite, as named hypotheses (cf. `theoremII_conjunct1_of_inputs`):
+The body is the full Theorem II proof, citing the §16 structure theorems A--D and Proposition 16.1
+inline (those were `sorry`-stated when this skeleton was written and have since been proved).  What
+the skeleton isolates are the two obligations *beyond* that standard A--D suite, as named hypotheses
+(cf. `theoremII_conjunct1_of_inputs`):
 * `hPieceInv` — the conjunct-1 cross-piece exclusion: `G`-conjugate elements of `X` share `M_σ`-
   and `A(M)`-membership (the "distinct orders across pieces" content of BG Theorem E);
 * `hMaxUnique` — the conjunct-3 uniqueness `|ℳ(C_G(x))| = 1` for an escaping centralizer
   (BG §9--§10 Uniqueness), which pins the Type I/II maximal overgroup of `C_G(x)` to Theorem
   D(4)'s `N(x)`.
 
-The wrapper `theoremII_tame_embedding` cites this with both obligations as `sorry`. -/
+The wrapper `theoremII_tame_embedding` cites this with both obligations discharged. -/
 theorem theoremII_tame_embedding_of_inputs [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
@@ -569,8 +569,8 @@ centralizer-control input used by Peterfalvi (8.12)--(8.13).  Cites the gated-en
 Theorem E cross-piece exclusion `hPieceInv` via the order-determined `M_σ`/`A(M)`-membership
 (`mem_Msigma_iff_isPiElement_sigma` / `mem_U_sup_Msigma_iff_isPiElement_kappa_compl`), and the BG
 §9--§10 maximal-overgroup uniqueness `hMaxUnique` via the signalizer uniqueness
-(`maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`).  (Not axiom-clean: the
-`_of_inputs` skeleton still cites the `sorry`-bearing §16 structure theorems A--D inline.) -/
+(`maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`).  The `_of_inputs`
+skeleton cites the §16 structure theorems A--D inline; those are proved. -/
 theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))

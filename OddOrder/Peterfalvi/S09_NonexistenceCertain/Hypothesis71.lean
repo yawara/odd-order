@@ -44,8 +44,8 @@ The headline results **(7.10)** and **(7.11)** have purely group-theoretic
 **not** reference the Dade isometry, so they are statable independently of the
 character-theory layer.  Their *proofs* require (7.1)-(7.9) and hence the
 `OddOrder.RepresentationTheory` Dade/coherence machinery (§4-§8), which is why
-they are left `sorry` here.  Results (7.1)-(7.9) — the `ℂ`-valued proof apparatus
-— are documented but not yet stated, to avoid coupling to the in-progress
+they were originally left `sorry` here.  Results (7.1)-(7.9) — the `ℂ`-valued proof
+apparatus — are documented rather than stated separately, to avoid coupling to the
 coherence numerical layer.
 
 ## Relation to BG Appendix C  ⚠️

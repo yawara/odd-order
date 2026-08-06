@@ -612,8 +612,8 @@ datum (`TypeVData.alternative_transfer`, moved onto `hyp.typeP`) splits:
   `S = S₁ ∪ {μ_j}`, and the (5.7) coherence `SHC_isCoherent` of `S₁` feeds the sorry-free
   (10.10.4) engine `typeV_caseC_coherence_engine`.
 
-The **only** `sorry`s below this theorem are the three (6.5) gate lemmas (issue 2022); the
-assembly itself and the whole case-(c) package are sorry-free. -/
+The assembly and the whole case-(c) package are `sorry`-free, as are the three (6.5) gate
+lemmas this theorem used to be gated on (issue 2022, since closed). -/
 theorem typeV_forces_coherence_v2 [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hyp : Hypothesis M) (hV : IsTypeV M) :
@@ -737,8 +737,8 @@ open scoped FiniteInduce in
 /-- **Peterfalvi (10.10), unconditional**: `G` has no maximal subgroup of type V — the
 `S12.no_typeV_maximal` conclusion re-founded on the unconditional (10.8)
 (`S_not_coherent_unconditional`) and the three-branch (10.10.1)–(10.10.4) assembly
-`typeV_forces_coherence_v2` (issue 1021), whose only remaining `sorry`s are the (6.5) gate
-lemmas (issue 2022). -/
+`typeV_forces_coherence_v2` (issue 1021); the (6.5) gate lemmas it was once gated on
+(issue 2022) are proved. -/
 theorem no_typeV_maximal_unconditional [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeV M := by
@@ -749,7 +749,7 @@ theorem no_typeV_maximal_unconditional [Finite G]
 /-- **Peterfalvi (10.10) type dichotomy, unconditional**: the §11 hypothesis on a maximal `M`
 forces type III or IV — the honest heir of `S12.Hypothesis.isTypeIIIorIV` (`S13_SixTwoBridge`),
 with the type-V branch excluded by the axiom-clean `no_typeV_maximal_unconditional` instead of the
-legacy `no_typeV_maximal` (whose `typeV_forces_coherence` is a bare `sorry`).  This is
+legacy `no_typeV_maximal` (whose `typeV_forces_coherence` was a bare `sorry`).  This is
 `#print axioms`-clean and is the type-determination input threaded into the
 `card_kappaHall_lt_of_isTypeIIIorIV` spine (issue 1025). -/
 theorem isTypeIIIorIV_unconditional [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)

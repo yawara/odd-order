@@ -1115,7 +1115,7 @@ theorem typeP_hall_frobenius_factor [Finite G] (hG : OddOrder.BG.IsMinimalSimple
       (fun p hp => typeP_hall_regular_component_at_prime hG hM hUM hUab hU hp)
 
 /-- **Forward lemma: the `§14`-gated structural content of BG Lemma 15.1** (faithful to mmd L4116,
-proof deferred).  Bundles the conjuncts of Lemma 15.1 that depend on the still-`sorry` §14 results
+proof deferred).  Bundles the conjuncts of Lemma 15.1 that depend on the §14 results
 (Proposition 14.2(a)'s normal complement `M = K U M_σ`, Theorem 14.7(d)(h)) and Theorem 12.12:
 
 * `K ≠ ⊥ → M' = U M_σ ∧ U` abelian (mmd 15.1(b), Theorem 14.7(h) + Corollary 12.10(b));
@@ -1127,9 +1127,9 @@ proof deferred).  Bundles the conjuncts of Lemma 15.1 that depend on the still-`
   construction for `K ≠ 1`).
 
 These are isolated here so that `typeP_auxiliary_structure` discharges conjuncts 3 (`M_σ ≤ M'`) and
-4 (`M'' ≤ M_σ`) with no `sorry` of its own, citing this lemma only for the §14-gated parts.  Once
-§14 (Prop 14.2(a), Thm 14.7(h)) and the Theorem 12.12 `K ≠ 1` Frobenius construction land, this
-forward lemma is the single discharge point. -/
+4 (`M'' ≤ M_σ`) with no `sorry` of its own, citing this lemma only for the §14 parts.  §14
+(Prop 14.2(a), Thm 14.7(h)) and the Theorem 12.12 `K ≠ 1` Frobenius construction have landed, and
+this forward lemma is the single discharge point. -/
 theorem typeP_auxiliary_structure_gated [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
@@ -1189,11 +1189,11 @@ qualifiers in the historical status below are stale.  Original (Lane G 2026-06-1
 * **Conjunct 2** (`K` cyclic): `K = ⊥` sorry-free; `K ≠ ⊥` cites the (sorried) §14 `typeP_duality`
   (Thm 14.7(d)), with `IsTypeP M` derived from `K ≠ ⊥`
   (`isTypeP_of_isHall_kappa_subgroupOf_ne_bot`).
-* **Conjunct 5** (`K ≠ ⊥` package): `IsComplement'` + coprimality cite the (sorried) §14
+* **Conjunct 5** (`K ≠ ⊥` package): `IsComplement'` + coprimality cite the §14
   `typeP_duality` (Thm 14.7(h)); `M' = U M_σ` and `U` abelian come from the forward lemma.
 * **Conjuncts 6** (Cor 14.3 funnel — the `X` cyclic-`τ₂` step needs `X` abelian, which routes
-  through Hall-`τ₂`-conjugacy for `K = ⊥`), **7**, and **8** are gated on the still-`sorry` §14
-  results (Prop 14.2(a) normal complement, Thm 14.7) and Theorem 12.12.
+  through Hall-`τ₂`-conjugacy for `K = ⊥`), **7**, and **8** route through the §14 results
+  (Prop 14.2(a) normal complement, Thm 14.7) and Theorem 12.12.
 
 All of the `§14`-structural content is isolated in the single faithful forward lemma
 `typeP_auxiliary_structure_gated`; this theorem itself introduces no `sorry` of its own. -/

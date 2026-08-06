@@ -549,8 +549,8 @@ theorem exists_isFrobeniusGroup_map_quotient_congr {M N K : Subgroup G}
 > **Corollary 1.6.** If `G` is a solvable CN-group and `O_p(G) ≠ 1`, then either `O_p(G)` is an
 > `S_p`-subgroup of `G` or `G` is a 3-step group with respect to `p`.
 
-Theorem 1.5 is stated below (`solvableCN_nilpotent_or_frobenius_or_threeStep`) and is the only
-remaining `sorry` of this file; Corollary 1.6 is derived from it `sorry`-free.
+Theorem 1.5 is proved below (`solvableCN_nilpotent_or_frobenius_or_threeStep`); Corollary 1.6 is
+derived from it.
 
 The two cases of Theorem 1.5 that do *not* immediately hand back a 3-step group both produce a
 normal nilpotent subgroup of index prime to `p` — all of `G` in case (i), the Fitting subgroup
@@ -604,9 +604,8 @@ with respect to some prime.
 **Book-strength debt.**  Gorenstein's clause (ii) additionally pins the Frobenius complement
 down to "cyclic, or the direct product of a cyclic group of odd order and a generalized
 quaternion group" (his Theorem 1.3.1(ii)).  That refinement is omitted here because the
-repository has no `IsGeneralizedQuaternion` predicate yet and Corollary 1.6 does not consume it;
-stating the weaker disjunct keeps this `sorry` conservative.  Restoring the full clause is
-tracked in issue 9133.
+repository has no `IsGeneralizedQuaternion` predicate yet and Corollary 1.6 does not consume it.
+Restoring the full clause is tracked in issue 9133.
 
 **Proof route** (Gorenstein's, with the `Ā ⊴ Ḡ` gap between the lines filled; issue 9133).
 Set `F = F(G)`; if `F = ⊤` then (i).  Otherwise take a Hall `π(F)'`-subgroup `A`

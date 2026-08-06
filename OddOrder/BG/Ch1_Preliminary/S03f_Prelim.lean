@@ -13,8 +13,8 @@ import OddOrder.BG.Ch1_Preliminary.PLengthTransfer
 # BG §3: standalone preliminaries for Theorem 3.6
 
 Committable, reusable helper lemmas extracted from the Theorem 3.6 development (`S03f_Thm36`).
-Kept separate from the (multi-session, `sorry`-bearing) assembly scaffold so that finished pieces
-can land on their own.
+Kept separate from the multi-session assembly scaffold in `S03f_Thm36` so that finished pieces
+could land on their own.
 
 ## Main results
 

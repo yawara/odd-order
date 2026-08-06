@@ -29,9 +29,9 @@ Proposition 16.1 is the bridge from the BG-local `κ`/`σ`/`M_F` taxonomy to the
 Type I--V predicates; the genuinely gated content is the *construction* of each `TypeXData`
 structure from the local classification.  This engine isolates those constructions (and the few
 structural facts the source proof uses to combine them) as named hypotheses and discharges the full
-six-clause conjunction `sorry`-free; when the §15--§16 structural theory lands, the wrapper
-`proposition_type_classification` cites it and applies this skeleton (the gated-endpoint pattern,
-cf. `theoremD_msigma_conjugacy_and_centralizers_of_inputs`).
+six-clause conjunction `sorry`-free.  The §15--§16 structural theory has since landed, and the
+wrapper `proposition_type_classification` cites it and applies this skeleton (the gated-endpoint
+pattern, cf. `theoremD_msigma_conjugacy_and_centralizers_of_inputs`).
 
 The named obligations, with their BG sources:
 
@@ -264,7 +264,7 @@ The construction (Coq `BGsection16.v:1031`): `p ∈ κ(M) ⟹ p ∉ σ(M)` (`kap
 `exponent U₀ = exponent U`,
 `p ∈ π(U₀)`, giving a Sylow `p`-subgroup `X ≤ U₀`, `X ≠ ⊥`.  Then `X` is a `κ`-group, so Hall's
 theorem in the solvable `M` (`hall_E_exists` + Hall conjugacy) places it in a `κ(M)`-Hall `K`.  This
-is the only residual; the rest of `isTypeF_of_isTypeI` is `sorry`-free modulo this. -/
+was the last residual of `isTypeF_of_isTypeI`, which is now `sorry`-free throughout. -/
 theorem typeFData_exists_kappaElement_le_kappaHall [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (td : OddOrder.GroupTheory.TypeFData M)

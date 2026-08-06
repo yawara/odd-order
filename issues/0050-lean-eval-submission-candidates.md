@@ -84,3 +84,11 @@ self-contained / 証明が難しく mathlib 未収録。詳細と全候補は正
 lean-eval への proof submit / proposal 活動はユーザー裁定でいったん凍結。
 正本 (`notes/meta/lean_eval_submission.md` — playbook・候補全表・reject 記録) は保存済みで、
 解凍時はそこと本 checklist から再開。
+
+---
+
+## 🔓 2026-08-07 REOPENED (ユーザー指示)
+
+2026-07-24 の凍結を解除。正本 (`notes/meta/lean_eval_submission.md` — playbook・候補全表
+§2.5・reject 記録) はそのまま使える。⚠ 再開時の注意 = **用語** (submit = proof submit のみ、
+新規問題は proposal) と **「他者 solved 済みは候補外」ではない** (per-account sticky) の 2 点。

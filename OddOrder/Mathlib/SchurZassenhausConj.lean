@@ -320,8 +320,8 @@ private theorem step_restriction
 
 /-! ### Step 2 (Factor) / Case A (N solvable) / Case B (G/N solvable)
 
-These are still in progress. The skeleton below defines the statements and the main_aux
-assembly; the bodies (marked `sorry`) need to be filled. -/
+The skeleton below defines the statements and the `main_aux` assembly, with the bodies
+filled in. -/
 
 omit [Finite G] in
 /-- Conjugation `mk'_comp_conj`: in `G ⧸ L`, conjugation by `mk' g` agrees with `mk'` applied

@@ -89,9 +89,9 @@ character reduction `w₂ < w₁` (`S13.w2_lt_w1_of_hypothesis_H0C_unconditional
 narrow-`𝒮(H₀C)` route on the unconditional (11.3), issues 1019/1020; the deprecated wide
 `S12.w2_lt_w1_of_hypothesis` and its false uniform-degree lemma have been retired).  All of
 (i)/(ii) and the reduction spine of (iii) are proven; the residual is the genuine Peterfalvi
-(11.8) non-orthogonality (`S13.exists_zeta_residual_not_orthogonal_H0C_of_refuter`), whose
-remaining `sorry`s are the §14 Sibley glue `(6.7)`/`(5.8)` and the `(9.11)` caseA refuter
-(the former `(10.8)` residual is discharged by `S_not_coherent_unconditional`). -/
+(11.8) non-orthogonality (`S13.exists_zeta_residual_not_orthogonal_H0C_of_refuter`), which
+rests on the §14 Sibley glue `(6.7)`/`(5.8)` and the `(9.11)` caseA refuter (the `(10.8)`
+residual is discharged by `S_not_coherent_unconditional`).  All of these are now proved. -/
 theorem card_kappaHall_lt_of_isTypeIIIorIV {G : Type*} [Group G] [Finite G]
     (hG : IsMinimalSimpleOdd G) {S K Kstar : Subgroup G}
     (hS : S ∈ maximalSubgroups G) (hSP : BG.Ch4.S14.IsTypeP S) (hKS : K ≤ S)
@@ -142,8 +142,8 @@ this is "`S` of Type III ⟹ `q > p`".
 **Type-V exclusion via the unconditional Theorem (10.10)** (issue 1020 Phase 3 relayering): by
 the type dictionary `proposition_type_classification`, a type-`P₁` `S` is Type III/IV (if
 `M_F ≠ M_σ`) or Type V (if `M_F = M_σ`); the latter is impossible by
-`no_typeV_maximal_unconditional` (`S12_Noncoherence` — the honest (10.8) → (10.10) chain, whose
-only remaining `sorry`s are the (6.5) gate lemmas, issue 2022), so `S` is Type III/IV and the
+`no_typeV_maximal_unconditional` (`S12_Noncoherence` — the honest (10.8) → (10.10) chain,
+including the (6.5) gate lemmas of issue 2022), so `S` is Type III/IV and the
 genuinely §11 character core `card_kappaHall_lt_of_isTypeIIIorIV` ((11.9.b)) applies.  Consumed
 by `isTypeP2_of_typeP_kappaHall_lt`. -/
 theorem card_kappaHall_lt_of_isTypeP1 {G : Type*} [Group G] [Finite G]

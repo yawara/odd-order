@@ -801,8 +801,8 @@ Proof
 * STEP 7 — reparametrising yields `e(v)·e(w v w⁻¹) ≡ 1` for `w = b₀⁻¹ a₀`, whence
   `chain_exponent_eq_one`-style inversion; `σ = conjNormal w`, `m = orderOf w` odd (`|G|` odd).
 
-The one remaining `sorry` excludes the type-II disjunct of the general `TypesIIIIIIVSetup` (needed
-only for `|W₂| = chief.p`); Peterfalvi (11.7) is a type III/IV statement and the caller supplies the
+The type-II disjunct of the general `TypesIIIIIIVSetup` is excluded here (it is needed only for
+`|W₂| = chief.p`); Peterfalvi (11.7) is a type III/IV statement and the caller supplies the
 restriction. -/
 theorem caseA_commutator_chain [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G}

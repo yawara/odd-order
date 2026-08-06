@@ -1436,10 +1436,11 @@ end OddOrder.Peterfalvi.S14
 #print axioms OddOrder.Peterfalvi.S14.coherent_extension_mem_span_imageFamily
 #print axioms OddOrder.Peterfalvi.S14.coherent_extension_constituent_mem_span_Rset
 #print axioms OddOrder.Peterfalvi.S14.constituent_diffImage_inner_zero_of_disjoint
--- `coherent_extension_constituent_orthogonal_Rset_of_nonconjugate` is sorry-free in its own body
--- but transitively cites `nonconjugate_typeI_R_orthogonal` (12.3).  The (12.3) bar-trick descent
+-- `coherent_extension_constituent_orthogonal_Rset_of_nonconjugate` transitively cites
+-- `nonconjugate_typeI_R_orthogonal` (12.3).  The (12.3) bar-trick descent
 -- (`constituent_diffImage_inner_zero_of_disjoint`, axiom-clean, 2026-07-03) closed the geometric
--- obligation `nonconjugate_diffImage_inner_zero`; its residual transitive `sorryAx` comes from the
--- §10 (8.18.c)/(8.15) support pins (§16-gated) and the (12.2.a) constituent obligation
--- `typeI_induced_char_constituents` ((8.2.c)); so it stays *out* of the axiom-clean block above.
+-- obligation `nonconjugate_diffImage_inner_zero`; the rest of its chain runs through the §10
+-- (8.18.c)/(8.15) support pins and the (12.2.a) constituent obligation
+-- `typeI_induced_char_constituents` ((8.2.c)).  Those were `sorry`-stated when this block was
+-- written and have since been proved, so the exclusion below is now only historical.
 

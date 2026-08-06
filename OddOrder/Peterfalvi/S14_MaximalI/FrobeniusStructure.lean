@@ -1086,10 +1086,9 @@ The textbook proof **case-splits** on the type-I trichotomy `Definition (8.3)` (
 (Peterfalvi (12.10): its `H^#` is *not* TI), so the (6.8) route alone is insufficient — the earlier
 single-`sibleyTarget_frobI` proof was unsound (issue 2032).  This assembly carries no `sorry` of its
 own.  Cases (b) `frobenius_typeI_coherent_of_abelianKernel` and (c)
-`frobenius_typeI_coherent_of_cyclicQuotient` are now `sorry`-free; the only residual gap is in case
-(a), the sorried (6.8) target `sibleyTarget_frobI` (the (8.18.c) obligation
-`nonconjugate_diffImage_inner_zero` itself is proven since the (12.3) bar-trick descent,
-2026-07-03). -/
+`frobenius_typeI_coherent_of_cyclicQuotient` are `sorry`-free, as is case (a) via the (6.8) target
+`sibleyTarget_frobI` (its (8.18.c) obligation `nonconjugate_diffImage_inner_zero` was closed by the
+(12.3) bar-trick descent, 2026-07-03). -/
 theorem frobenius_typeI_coherent [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G}
     (hyp : Hypothesis L)

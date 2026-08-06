@@ -640,8 +640,8 @@ is trivial, `F(M)` is a TI-subgroup of `G`, and `|K| = p` is prime.  Combines th
 `FittingIsTI` clause (`S15.fitting_isTI_of_mf_ne_msigma`, the contrapositive of the `M_F = M_σ`
 conclusion of Theorem 15.7(a)).  This is the full conjunction
 `theoremA_maximal_structure_faithful` carries
-for the `M_F ≠ M_σ` case; it is `sorry`-free modulo the single deep §15 rank-theoretic residual
-`S15.piSet_mf_inf_beta_disjoint_of_not_fittingIsTI` (Theorem 15.7(a) core). -/
+for the `M_F ≠ M_σ` case.  Its one deep upstream citation is the §15 rank-theoretic core
+`S15.piSet_mf_inf_beta_disjoint_of_not_fittingIsTI` (Theorem 15.7(a)). -/
 theorem theoremA8_structure [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar U : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M)

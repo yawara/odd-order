@@ -271,9 +271,9 @@ the Frobenius group `U W₁ ⊆ L` (from (13.2.a)) would act fixed-point-freely 
 (`U, W₁ ≤ L ≤ N_G(L_F)`, a coprime action), so Wielandt's formula (9.1)
 `wielandt_fixedPoint_frobenius` would force `|L_F| = 1`, against type-`I` `L_F ≠ 1`
 (`TypeFData.H_nontrivial`); hence `U ∩ L_F ≠ 1` and `U ⊆ C_L(U ∩ L_F) ⊆ L_F`
-(`le_kernel_of_isMulCommutative_of_inf_ne_bot`).  The isolated deep residual of gate 4: the
-`CoprimeFrobeniusAction (U W₁) (L_F)` construction plus the (still sorried) Wielandt formula.
-`:= sorry`; see issue 2009 / `notes/peterfalvi/s13_17_structural_program.md`. -/
+(`le_kernel_of_isMulCommutative_of_inf_ne_bot`).  The deep part of gate 4 is the
+`CoprimeFrobeniusAction (U W₁) (L_F)` construction together with the Wielandt formula; both are
+proved.  See issue 2009 / `notes/peterfalvi/s13_17_structural_program.md`. -/
 theorem typeI_U_le_fitting_of_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (_hSTypeII : IsTypeII hyp.S) {L : Subgroup G}

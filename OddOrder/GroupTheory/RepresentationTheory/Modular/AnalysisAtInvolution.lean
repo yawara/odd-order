@@ -21,8 +21,8 @@ The columns are indexed by all of `Irr(G)`, not just by `Irr(B_0)`: outside the 
 they are zero, which changes none of the sums.  That avoids carrying a subtype of `Irr(G)` and its
 inclusion around.
 
-Everything below is hypothesis-parameterised and `sorry`-free; what remains for the `Q₈` case is to
-*supply* those hypotheses from a `2`-modular system over `𝓞_ℂ_[2]` (issue 9506, task F).
+Everything below is hypothesis-parameterised and `sorry`-free; the `Q₈` case *supplies* those
+hypotheses from a `2`-modular system over `𝓞_ℂ_[2]` (issue 9506).
 
 ## Main results
 

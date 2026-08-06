@@ -572,8 +572,8 @@ coherent extension `ν` of `τ` to `ℤ[S(HC)]` for which the normalized (11.8.4
 `(μ₀ − ζ)^τ = ∑_r ω_{r0}^σ − ν.extension ζ` holds.  In the generic (first-branch) case `ν` is the
 canonical `SHC_isCoherent`; in the degenerate `S(HC) = {ζ, ζ̄}` case `ν` is the conjugate-swap
 `SHC_swap` — Peterfalvi's "we may assume `(μ₀ − ζ)^τ = ∑ω_{i0}^σ − ζ^{τ₁}`" (p. 66), now a clean
-`∃`-statement with no residual sorry.  This is the interface the (11.8.5) capstone consumes once its
-`τ₁`-machinery is taken over an arbitrary coherent extension. -/
+`∃`-statement.  This is the interface the (11.8.5) capstone consumes, with its `τ₁`-machinery
+taken over an arbitrary coherent extension. -/
 theorem Hypothesis.exists_coherent_extension_h114_of_orthogonal [Finite G] {M : Subgroup G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)

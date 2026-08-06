@@ -469,8 +469,8 @@ theorem chief_H0_eq_bot_of_noncoherent [Finite G] (hG : OddOrder.BG.IsMinimalSim
     have hcent := Subgroup.mem_centralizer_iff.mp (U_centralizes_H0 hyp huU) (n : G) hnH0
     rw [← hcent]; group
   · -- **case (a)**: `U` fixes the order-`p` factor `S₀` pointwise.  The commutator-form chain
-    -- (`caseA_commutator_chain`, Peterfalvi's non-Galois `D`-antisymmetry — the sole remaining
-    -- sorry) supplies the inverting automorphism `σ` (conjugation by the specific `W₁`-element
+    -- (`caseA_commutator_chain`, Peterfalvi's non-Galois `D`-antisymmetry — the deepest step
+    -- here) supplies the inverting automorphism `σ` (conjugation by the specific `W₁`-element
     -- `w₁ w₂⁻¹`) with the chain relation; the exponent reduction (`caseA_fixes_of_action_chain`)
     -- and `caseA_fixed_contradiction` are proven.
     have hAodd : Odd (Nat.card ↥(hyp.s11Setup.typeP.U.subgroupOf

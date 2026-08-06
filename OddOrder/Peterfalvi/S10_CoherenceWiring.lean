@@ -14,7 +14,7 @@ The Pf §10–16 maximal-subgroup spine repeatedly asserts that a maximal-subgro
 family `S` is **coherent** (Peterfalvi (9.11), (10.4), (13.2.d), …).  In the textbook these
 are all one and the same fact — the Sibley coherence theorem (6.8) — applied to the Dade
 setup attached to the maximal subgroup.  In the formalization the §10–16 spine was written
-**before** §8 exposed a citeable interface, so each such rider currently stands as a free
+**before** §8 exposed a citeable interface, so each such rider originally stood as a free
 `sorry` over an opaque integral character map / family / support.
 
 This file supplies the **single reusable bridge** that turns any such rider into a *cite* of

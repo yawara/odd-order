@@ -9,11 +9,10 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
 # BG §12: The Subgroup `E` — active scaffold leaf
 
 **スコープ**: BG Chapter III §12 (pp. 79-90), mmd L3023-3483, 全 19 結果のうち
-**残 16 結果の faithful statement + `sorry` scaffold** (Prop 12.4(a) / Thm 12.5–12.13 /
-Cor 12.6–12.16 / Lem 12.11/12.18 ほか)。定義層 (`SubgroupESetup` 等) と証明済み結果
-(12.1/12.2(a)/12.17/12.19+12.18 building block) は `S12_ECore.lean` (import 済)。
-**大半は Lemma 10.13 にブロックされている** (D-lane triage: 着手可能 5 件は証明済み、
-残 14 件が 10.13 待ち) — 10.13 着地後に Lane F がここを進める。
+**16 結果** (Prop 12.4(a) / Thm 12.5–12.13 / Cor 12.6–12.16 / Lem 12.11/12.18 ほか)。
+定義層 (`SubgroupESetup` 等) と残り (12.1/12.2(a)/12.17/12.19+12.18 building block) は
+`S12_ECore.lean` (import 済)。当初は faithful statement + `sorry` の scaffold leaf として
+着地し、大半が Lemma 10.13 待ちだった — 10.13 着地後にすべて証明済。
 
 ## Lane proof-gate notes
 

@@ -56,11 +56,10 @@ is mathlib's `(⊤ : Subgroup G).lowerCentralSeries (r - 1)`.
 ## Status
 
 The framework below is complete and `sorry`-free.  The general collection
-theorem itself is **not** proved here; see
-`OddOrder.BG.AppE.hallCollection` (statement, still `sorry`) and
-`OddOrder.BG.AppE.hallCollection_of_class_le_three` (proved) for the current
-state, and the module docstring of `OddOrder/BG/AppE_FurtherResults.lean` for
-the precise obstruction.
+theorem itself is proved elsewhere: `OddOrder.BG.AppE.hallCollection`
+(`AppE_CollectionFormula.lean`, via `GroupTheory/HallPetresco.lean`), with the
+sharper class-`≤ 2` / class-`≤ 3` forms in the same file.  See the module
+docstring of `OddOrder/BG/AppE_FurtherResults.lean` for the per-result table.
 -/
 
 namespace OddOrder.GroupTheory

@@ -18,8 +18,8 @@ Peterfalvi side to *consume these endpoints through the shared type predicates*
 such shared-notation layer.  This file (Lane H owned) is that layer: it restates
 the BG endpoints in the shared notation `OddOrder.Peterfalvi.S10` uses, citing the
 BG-internal originals.  No new axioms are introduced — every lemma cites an
-existing (currently `sorry`) BG §16 endpoint, so it becomes unconditional exactly
-when BG §16 is proved.
+existing BG §16 endpoint.  (Those endpoints were `sorry`-stated when this layer was
+written; they have since been proved, so the lemmas here are unconditional.)
 
 ## Coverage note (measured 2026-06-12, session 1)
 
@@ -27,9 +27,9 @@ The cleanly-bridgeable part is the *taxonomy dictionary* below.  The remaining
 S10 wirings (8.11)--(8.18) additionally need *structural* bridges — that the
 shared type-data complement equals the BG `(κ ∪ σ)ᶜ`-Hall complement, that
 `A_1(M)`/`A_0(M)` (shared) equal `ASet`/`A0Set` (BG), that `σ(M) = π(M_σ)` —
-for which BG §16 exposes no citeable statement; they bottom out on the (still
-`sorry`) BG §14--§15 structure.  Those wirings are therefore gated on BG §14--§16
-being *proved*, not merely stated.  See
+for which BG §16 exposes no citeable statement; they bottom out on the BG §14--§15
+structure directly.  That structure is now proved, so what those wirings still lack is
+the citeable bridge, not an unproved upstream.  See
 `notes/peterfalvi/s10_13_maximal_structure.md` §5.
 -/
 
@@ -86,12 +86,12 @@ theorem isHall_primeFactors {π : Set ℕ} {H : Subgroup G}
 `M_F` (`maxNilpotentNormalHall`) is a Hall subgroup of `G` for the primes dividing
 its order.  Proof: for type I/II, `M_F = M_σ` (Proposition 16.1) and `M_σ` is the
 σ-Hall subgroup (BG Theorem 10.2, `Msigma_isHall`), which is Hall for its own
-prime factors by `isHall_primeFactors`.  No new axiom (cites the still-`sorry`
-Proposition 16.1; the §10 Hall structure is already proved).
+prime factors by `isHall_primeFactors`.  No new axiom (cites Proposition 16.1; the
+§10 Hall structure is already proved).
 
 The full (8.11) additionally needs the type III/IV case, where `M_s = M'` and `M_F`
-is a *proper* Hall subgroup of `M_σ`; that requires the (still `sorry`) BG §14--§15
-structure and is therefore deferred. -/
+is a *proper* Hall subgroup of `M_σ`; that goes through the BG §14--§15 structure and
+is not assembled here. -/
 theorem maxNilpotentNormalHall_isHall_of_typeI_or_II [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (hType : IsTypeI M ∨ IsTypeII M) :
@@ -192,8 +192,8 @@ BG's `\widetilde M = M_σ#` (`sigmaSharp`).  For types I/II, `M_s = M_F = M_σ`
 
 This is a genuine support-set equality — but a special one: the larger support sets
 `A(M)`/`A_0(M)` (built from BG's `hatMsigma = {a ∈ M | M_σ ⊓ C(a) ≠ 1}`) are *not*
-of this `sharpSubgroup` form, so they have no analogous bridge and stay gated on the
-(still `sorry`) BG §14--§15 structure. -/
+of this `sharpSubgroup` form, so they have no analogous bridge and would have to go
+through the BG §14--§15 structure directly. -/
 theorem A1_eq_sigmaSharp_of_typeI_or_II [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (hType : IsTypeI M ∨ IsTypeII M)

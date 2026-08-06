@@ -98,9 +98,9 @@ provable:
 * the Dade character grids `ω, μ, ν` with the induction identities (13.1.e), the
   signs `δ, δ'`, and the integral maps `τ_S, τ_T, τ₃` — Pf §3–§9.
 
-The residual `sorry` of `sectionSixteenHypothesis_of_isMinimalSimpleOdd` is exactly
-"produce a `Section16Inputs G`"; i.e. it localizes the one remaining gap to this
-explicit menu rather than to an opaque `Peterfalvi.S16.Hypothesis`. -/
+`sectionSixteenHypothesis_of_isMinimalSimpleOdd` reduces to exactly "produce a
+`Section16Inputs G`": the design localizes the obligation to this explicit menu rather
+than to an opaque `Peterfalvi.S16.Hypothesis`, and the menu is now fully supplied. -/
 structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   S : Subgroup G
   T : Subgroup G
@@ -360,7 +360,8 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
 `Section16Inputs G` bundles three logically distinct outputs of the §7–§16
 program.  To let the corresponding lanes work in parallel without editing the same
 region, we split the menu into three dependently-chained structures, give each its
-own `sorry`'d producer, and assemble `Section16Inputs` from them `sorry`-free. -/
+own producer, and assemble `Section16Inputs` from them.  (The producers started as
+`sorry`'d statements, one per lane; all three are now proved.) -/
 
 
 /-- **Peterfalvi §13 coherent Dade-grid output** — *owned by lane-b*.
@@ -859,10 +860,11 @@ Given the maximal pair, constructs the cyclic structure `W = W₁W₂`, the comp
 In gated-endpoint-skeleton form (issue 7005), with `mp` now carrying the canonical partner
 witness: the **W-side** (the pairing `S ∩ T = K × K*` cyclic, `K ⊓ K* = 1`, commuting) is
 discharged `sorry`-free from `mp`'s κ-Hall data via `typeP_pair_W_structure` (BG Theorem 14.7).
-The single remaining `sorry` is localized to the **U-side residual menu**: the semidirect
-complements `U, V` with `M' = M_F ⊔ U` and `K ≤ N_G(U)` (Peterfalvi (13.1.b), "remark following
-Def (8.4)"), the primality of `|K|, |K*|` (BG Theorem C(10); type II–IV via the type data,
-Type-V via the partner argument), and the ordering `q < p` (Peterfalvi (13.2.a)). -/
+The design localized the rest to the **U-side menu** — the semidirect complements `U, V` with
+`M' = M_F ⊔ U` and `K ≤ N_G(U)` (Peterfalvi (13.1.b), "remark following Def (8.4)"), the
+primality of `|K|, |K*|` (BG Theorem C(10); type II–IV via the type data, Type-V via the
+partner argument), and the ordering `q < p` (Peterfalvi (13.2.a)) — and that menu is now
+supplied in full. -/
 noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Group G] [Finite G]
     (hG : IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeV M)

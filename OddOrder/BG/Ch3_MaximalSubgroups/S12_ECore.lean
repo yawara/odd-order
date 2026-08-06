@@ -23,7 +23,7 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 §12 の**定義層** (`tau1/tau2/tau3`, `SubgroupESetup`) と**証明済み結果** — Lem 12.1 (a)-(g) /
 Lem 12.2(a) / Lem 12.17 / Lem 12.19 / Lem 12.18 building block
 (`rank_centralizer_Malpha_le_one_of_not_uniqueMaximal`) とその支持補題群 — を持つ。
-残 16 結果の faithful statement + `sorry` scaffold は leaf 側 `S12_E.lean`。
+残り 16 結果は leaf 側 `S12_E.lean` (当初は `sorry` scaffold として着地し、その後証明された)。
 
 ## 定義 (BG → repo, mmd L3029)
 

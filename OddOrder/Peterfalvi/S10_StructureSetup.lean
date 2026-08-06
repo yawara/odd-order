@@ -40,12 +40,12 @@ structural consequences consumed by Peterfalvi Sections 11--16.
 The actual type definitions live in `OddOrder.GroupTheory.MaximalSubgroupType`
 because BG Chapter IV uses the same taxonomy.  This file provides the
 Peterfalvi-numbered entry points and the main scaffold statements.  Those of
-(8.11), (8.12), (8.13) quote BG Theorems A--E / Theorems I--II, which are now
-stated (still `sorry`) in `OddOrder.BG.Ch4.S16` and are cited here as the
-Peterfalvi-facing wiring is built; (8.8) is already wired to BG Theorem I
-(`theoremI_nilpotentHall_conjugacy_and_type_dichotomy`).  The remaining `sorry`s
-reduce to those BG endpoints plus a notation dictionary, not to new axioms;
-see `notes/peterfalvi/s10_13_maximal_structure.md`.
+(8.11), (8.12), (8.13) quote BG Theorems A--E / Theorems I--II from
+`OddOrder.BG.Ch4.S16`; (8.8) is wired to BG Theorem I
+(`theoremI_nilpotentHall_conjugacy_and_type_dichotomy`).  Those BG endpoints were
+`sorry`-stated when this wiring was written and have since been proved; what the
+wirings needed beyond them is a notation dictionary, not new axioms.  See
+`notes/peterfalvi/s10_13_maximal_structure.md`.
 
 The Nougat extract drops the statements around (8.14)--(8.17).  The PDF page
 has now been recovered; this file records the `R(x)`/thickened-support notation,

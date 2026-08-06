@@ -89,8 +89,8 @@ the `W₁`-conjugation action on `H = M'.subgroupOf M` with `M'' = ⁅H,H⁆`); 
 `M'' < M'` (`M'` solvable nontrivial, `IsSolvable.commutator_lt_top_of_nontrivial`) this forces
 `|M':M''| ≥ 2w₁+1` (`S08.two_mul_add_one_le_of_odd_dvd`).  Then `|M'| = |M''|·|M':M''| ≥ w₂·(2w₁+1)`
 (`Subgroup.index_mul_card`) since `w₂ = |W₂| ≤ |M''|` (`W₂ ⊆ M''`).  Genuine group theory,
-**proven**
-(sorryAx only via the upstream `typePData_W1_hall_coprime`, the shared §10 type-P coprimality). -/
+**proven**; the one upstream citation is `typePData_W1_hall_coprime`, the shared §10 type-P
+coprimality. -/
 theorem Hypothesis.card_derived_ge [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
     (2 * hyp.w1 + 1) * hyp.w2 ≤ Nat.card ↥(derivedInG M) := by

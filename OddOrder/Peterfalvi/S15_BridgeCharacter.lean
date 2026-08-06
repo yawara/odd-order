@@ -169,11 +169,11 @@ fell in the arbitrary linear-extension region and the statement was **unprovable
 `'A0`-Dade correction fixes that (`dadeHypS0` inherits one deep FT-support pin,
 `S10.not_isConj_typePACore_typePV`).
 
-Remaining to discharge the `sorry` (rigidity engine now available): `X := τ_S(μ-diff)` has
-`‖X‖² = 2` (Dade isometry) and `X ∈ ZIrr`; it agrees with `η_{0j} − η_{01}` on the regular set via
-`τ_S = Ind_S^G` on `A₀`-supported (`normedTI 'A0`, `H = ⊥`) + the prime-`TI` `μ`-value
-`μ_{0j}|_V = ω`-value (Coq `prTIirr_id`, prime-`TI` theory — not yet ported, cf. 9014); then
-`X = η_{0j} − η_{01}` by `S16.eta_diff_rigidity` (Peterfalvi (3.8), issue 9076 piece 4b). -/
+The route: `X := τ_S(μ-diff)` has `‖X‖² = 2` (Dade isometry) and `X ∈ ZIrr`; it agrees with
+`η_{0j} − η_{01}` on the regular set via `τ_S = Ind_S^G` on `A₀`-supported (`normedTI 'A0`,
+`H = ⊥`) + the prime-`TI` `μ`-value `μ_{0j}|_V = ω`-value (Coq `prTIirr_id`, prime-`TI` theory,
+cf. 9014); then `X = η_{0j} − η_{01}` by `S16.eta_diff_rigidity` (Peterfalvi (3.8), issue 9076
+piece 4b). -/
 theorem tauS_mu_row0_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (_hj : (j : ℕ) ≠ 0) :

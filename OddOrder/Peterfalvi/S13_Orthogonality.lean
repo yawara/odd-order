@@ -1021,12 +1021,11 @@ the
   such μ-column image pin — this is the honest heir of the old `hDτ` sorry, §14/§9-gated.
 
 Two further bridge inputs (`hφY : dζ ∈ ℤ[S(HC)]`, `hbridge_supp : ∑ᵢ μ_{i1} − dζ` `A₀`-supported)
-are TRUE but currently `sorry`ed because they need `ζ ∈ S(HC)` and the degree match
-`(∑ᵢ μ_{i1})(1) = d·ζ(1)`, which the *signature* does not carry (only
-`ζ ∈ inducedFamily M ⊋ S(HC)`);
-both are caller-supplied facts (`ζ` irreducible of degree `w₁`; `secondDerived_eq_HC` +
-`SOf_secondDerived_eq`; `degree_independent`).  Threading `ζ ∈ hyp.SOf hyp.HC` (+ degree) into the
-signature closes them, leaving only `hmixed`/`hbridge_τ`.  See issue 1019 update¹³. -/
+need `ζ ∈ S(HC)` and the degree match `(∑ᵢ μ_{i1})(1) = d·ζ(1)`, which the *signature* does not
+carry (only `ζ ∈ inducedFamily M ⊋ S(HC)`); both are caller-supplied facts (`ζ` irreducible of
+degree `w₁`; `secondDerived_eq_HC` + `SOf_secondDerived_eq`; `degree_independent`).  Threading
+`ζ ∈ hyp.SOf hyp.HC` (+ degree) into the signature is what discharges them.  See issue 1019
+update¹³. -/
 theorem coherent_SOf_H0C_of_column_identities [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     [NeZero (Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1)]

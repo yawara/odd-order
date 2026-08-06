@@ -26,7 +26,7 @@ Thm 13.4/13.5/13.9/13.10)。
 - `ActsPrimeOn N X`: `X` が `N` に prime 作用 (`C_N(g)=C_N(X)` ∀g∈X#)。
 - `ActsRegularlyOn N X`: `X` が `N` に regular 作用 (`C_N(g)=1` ∀g∈X#)。
 - `M_σ`/σ/τ_i 等は §10/§12 を再利用 (`S10.*`, `tau1/tau2/tau3`, `SubgroupESetup`)。
-- 固定 G `(hG : IsMinimalSimpleOdd G)` を明示 thread。proof は全て `sorry` (scaffold)。
+- 固定 G `(hG : IsMinimalSimpleOdd G)` を明示 thread。
 
 **注**: Thm 13.10/Cor 13.11 の結論 bullet は Nougat が脱落 → PDF p.102-103 を画像読みで復元
 (`notes/meta/nougat_missing_page_recovery.md`)。
@@ -41,8 +41,8 @@ Thm 13.4/13.5/13.9/13.10)。
 - Theorem 13.4 uses Theorem 12.13 and Lemma 12.18 (mmd L3552/L3568);
   these are centralizer-control interfaces, not new assumptions on `ActsPrimeOn`.
 - Lemma 13.8 and Theorem 13.10 use `S10.normalizer_le_of_nontrivial_beta_subgroup`
-  (BG Prop 10.14(d)) and Lemma 12.18 (mmd L3646/L3656/L3692). This gate is now
-  exposed in §10 as a theorem with `sorry`, not as a downstream hypothesis or setup field.
+  (BG Prop 10.14(d)) and Lemma 12.18 (mmd L3646/L3656/L3692). This gate is exposed in §10
+  as a theorem, not as a downstream hypothesis or setup field.
 - The §12 path into §13 also depends on the newly exposed §10 surfaces
   `S10.beta_complement_normalizer_derived_contains_sylow` (Cor 10.9(a)(3)),
   `S10.beta_factorization_of_sylow_normalizer_in_intersection` (Cor 10.9(b)), and
@@ -411,7 +411,7 @@ theorem cyclicSylow_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)
       _ ≤ Subgroup.centralizer (E₃ : Set G) := hMMcE3
 
 -- **BG Theorem 13.4** (`centralizer_le_centralizer_of_tau1`) は leaf `S13_Theorem134.lean` へ
--- 移動 (上で import)。outer reduction は完全証明、per-q core steps 4-9 は scaffold sorry。
+-- 移動 (上で import)。outer reduction・per-q core steps 4-9 とも証明済。
 
 /-- **BG Theorem 13.5** (mmd L3570): `E₁ ≠ 1` なら `E₁` は `M_σ` に prime 作用。
 

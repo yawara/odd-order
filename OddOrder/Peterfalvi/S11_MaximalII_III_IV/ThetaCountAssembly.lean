@@ -955,8 +955,7 @@ former vacuous `u ∣ qu` (always true) and the false `(𝒮(H₀)).ncard = p-1`
 irreducibles) are replaced by the genuine (9.9.a)/(9.9.b) statements; the (9.9.c) trigger is
 "contains no irreducible" (not `ncard = 0`: in the exceptional case `𝒮(H₀C') = 𝒮(H₀)` is
 nonempty).  The `C = ⊥` half of (c) is the pair-character argument
-`caseB_no_irreducible_forces_C_bot`; the `u`-formula half (the `C = 1` Frobenius count) remains
-`sorry`. -/
+`caseB_no_irreducible_forces_C_bot`; the `u`-formula half is the `C = 1` Frobenius count. -/
 theorem caseB_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars) :
