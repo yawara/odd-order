@@ -37,7 +37,9 @@ relation (10) is an identity between integers again.
 ## Main results
 
 * `OddOrder.Algebra.sign_relation_ten` — `(w, u_1) = 0` becomes Navarro's (10)
+* `OddOrder.Algebra.exists_halfSum_columns` — the half-sums exist over `ℤ`
 * `OddOrder.Algebra.exists_eq_of_columns` — the whole endgame
+* `OddOrder.Algebra.exists_eq_of_columns_of_odd_degrees` — the same, from textbook inputs only
 -/
 
 namespace OddOrder.Algebra
@@ -90,6 +92,37 @@ theorem sign_relation_ten {R : Type*} [CommRing R] [IsDomain R] {w g T u : S →
         rw [hwg i, hwg j]; ring
     _ = (m + (w i * δ₁ + w j * δ₂)) * (g i * g j) := by ring
     _ = 0 := by rw [hzero, zero_mul]
+
+/-! ### The half-sums are integer columns -/
+
+omit [Fintype S] in
+/-- **The four columns are congruent mod `2`.**  Navarro's inputs are `χ(t) ≡ χ(y) mod 2` and that
+the basic-set degrees `ψ_1(1), ψ_2(1)` are odd; since `χ(t) = D^t_0 + ψ_1(1) D^t_1 + ψ_2(1) D^t_2`,
+the second turns `χ(t)` into `D^t_0 + D^t_1 + D^t_2` mod `2`. -/
+theorem two_dvd_sum_of_odd_degrees {a b c d T : S → ℤ} {s₁ s₂ : ℤ} (hs₁ : Odd s₁) (hs₂ : Odd s₂)
+    (hT : ∀ k, T k = b k + s₁ * c k + s₂ * d k) (hcong : ∀ k, (2 : ℤ) ∣ (a k + T k)) (k : S) :
+    (2 : ℤ) ∣ (a k + b k + c k + d k) := by
+  obtain ⟨r, hr⟩ := hs₁
+  obtain ⟨q, hq⟩ := hs₂
+  obtain ⟨m, hm⟩ := hcong k
+  refine ⟨m - r * c k - q * d k, ?_⟩
+  have hTk := hT k
+  rw [hr, hq] at hTk
+  linarith [hm, hTk]
+
+omit [Fintype S] in
+/-- **The three half-sums of Navarro p. 142 exist as integer columns.**  Each of
+`a + b − c − d`, `a + b − c + d`, `a + b + c − d` differs from `a + b + c + d` by twice an integer
+column, so the single congruence `2 ∣ a + b + c + d` produces all three. -/
+theorem exists_halfSum_columns {a b c d : S → ℤ}
+    (h : ∀ k, (2 : ℤ) ∣ (a k + b k + c k + d k)) :
+    ∃ u₁ u₂ u₃ : S → ℤ,
+      (∀ k, 2 * u₁ k = a k + b k - c k - d k) ∧
+      (∀ k, 2 * u₂ k = a k + b k - c k + d k) ∧
+      (∀ k, 2 * u₃ k = a k + b k + c k - d k) := by
+  choose m hm using h
+  refine ⟨fun k => m k - c k - d k, fun k => m k - c k, fun k => m k - d k,
+    fun k => ?_, fun k => ?_, fun k => ?_⟩ <;> linarith [hm k]
 
 /-! ### The whole endgame -/
 
@@ -197,5 +230,34 @@ theorem exists_eq_of_columns
     · exact hii₀
     · exact hji₀
   · rcases hnaming with ⟨rfl, rfl, rfl, rfl⟩ | ⟨rfl, rfl, rfl, rfl⟩ <;> linarith [hten]
+
+/-- **Navarro pp. 142–145, from the textbook inputs only.**  The three half-sums are not asked for
+as data: they are produced from the single congruence `χ(t) ≡ χ(y) mod 2` together with the
+oddness of the basic-set degrees (`two_dvd_sum_of_odd_degrees`, `exists_halfSum_columns`).
+
+This is the form the "analysis at `t`" supplies: every hypothesis is a statement about the four
+columns, the degrees and `χ(t)`, with no auxiliary column to construct by hand.  `h10` is
+quantified over the half-sum because its supplier — Burnside's relation (9) halved — works for any
+column with that defining equation. -/
+theorem exists_eq_of_columns_of_odd_degrees
+    (haa : ∑ k, a k * a k = 4) (hbb : ∑ k, b k * b k = 4) (hcc : ∑ k, c k * c k = 4)
+    (hdd : ∑ k, d k * d k = 4) (hab : ∑ k, a k * b k = 0) (hac : ∑ k, a k * c k = 0)
+    (had : ∑ k, a k * d k = 0) (hbc : ∑ k, b k * c k = 2) (hbd : ∑ k, b k * d k = 2)
+    (hcd : ∑ k, c k * d k = 2)
+    (hga : ∑ k, g k * a k = 0) (hgb : ∑ k, g k * b k = 0) (hgc : ∑ k, g k * c k = 0)
+    (hgd : ∑ k, g k * d k = 0)
+    (hg0 : g i₀ = 1) (hgpos : ∀ k, 1 ≤ g k)
+    (ha0 : a i₀ = 1) (hb0 : b i₀ = 1) (hc0 : c i₀ = 0) (hd0 : d i₀ = 0)
+    (hT : ∀ k, T k = b k + s₁ * c k + s₂ * d k) (hs₁ : Odd s₁) (hs₂ : Odd s₂)
+    (hcong : ∀ k, (2 : ℤ) ∣ (a k + T k))
+    (h10 : ∀ v : S → ℤ, (∀ k, 2 * v k = a k + b k - c k - d k) →
+      ∀ i j : S, i ≠ i₀ → j ≠ i₀ → i ≠ j → v i = 1 → v j = -1 →
+        (∀ k, k ≠ i₀ → k ≠ i → k ≠ j → v k = 0) →
+        g i * g j + T i ^ 2 * g j - T j ^ 2 * g i = 0) :
+    ∃ k : S, k ≠ i₀ ∧ g k = T k := by
+  obtain ⟨v₁, v₂, v₃, hh₁, hh₂, hh₃⟩ :=
+    exists_halfSum_columns (two_dvd_sum_of_odd_degrees hs₁ hs₂ hT hcong)
+  exact exists_eq_of_columns haa hbb hcc hdd hab hac had hbc hbd hcd hga hgb hgc hgd hh₁ hh₂ hh₃
+    hg0 hgpos ha0 hb0 hc0 hd0 hT (h10 v₁ hh₁)
 
 end OddOrder.Algebra

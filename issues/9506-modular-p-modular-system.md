@@ -4416,3 +4416,20 @@ modular datum を作り、上の 6 種の入力を実際に供給して `exists_
 | (10) | 段 330 + `sign_relation_ten` | ✅ |
 | **modular datum 一式** (`G` / `C_G(t)` / `C_G(y)` / `C_G(t)/⟨t⟩`) | `exists_modularDatum` + `PadicComplexSystem` | ⏭ **残り** |
 | (7.2)/(7.4)/(7.6) の群論的仮説 (Klein four Sylow of `C_G(t)/⟨t⟩` 等) | Q₈ の構造から | ⏭ **残り** |
+
+### ✅ 段 334 完了 (2026-08-06) — endgame を「教科書の入力だけ」で呼べる形に
+
+`Algebra/BrauerSuzukiEndgame` に 3 本追加:
+
+* `two_dvd_sum_of_odd_degrees` — `χ(t) ≡ χ(y) mod 2` (段 289) + `ψ_i(1)` が奇数
+  (`card_modEq_character_involution` + (7.2)) ⟹ **`2 ∣ D^y_0 + D^t_0 + D^t_1 + D^t_2`**。
+* `exists_halfSum_columns` — その **1 本の合同から半和 3 本が整数列として存在**する
+  (`a+b−c−d`, `a+b−c+d`, `a+b+c−d` はどれも `a+b+c+d` と偶数列だけ違う)。
+* `exists_eq_of_columns_of_odd_degrees` — 🎯 **半和を data で要求しない endgame**。
+  仮説が全部「4 本の列・次数列・`χ(t)`」についての教科書レベルの主張になった。
+
+⚠ `h10` は半和について量化する (`∀ v, (∀k, 2·v k = a+b−c−d) → …`)。供給側
+(Burnside (9) を半分にしたもの) はその定義式を満たす任意の列で動くので損が無い。
+
+⟹ **F に残るのは modular datum の instantiation と (7.2)/(7.4)/(7.6) の群論的仮説だけ**。
+ℤ 側の endgame は「教科書の主張を渡すだけ」の 1 本になった。

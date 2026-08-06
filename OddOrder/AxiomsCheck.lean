@@ -19819,3 +19819,19 @@ modular 鎖と同じ分裂体 `K` の中で完結する (**係数体の橋渡し
   OddOrder.RepresentationTheory.Modular.intCast_basicDecompositionNumber
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_mul_eq_of_intCast
+
+/-! 🎯 **issue 9506 段 334**: endgame を「教科書の入力だけ」で呼べる形に。
+
+`Algebra/BrauerSuzukiEndgame`:
+* `two_dvd_sum_of_odd_degrees` — `χ(t) ≡ χ(y) mod 2` (段 289) + `ψ_i(1)` が奇数 ⟹
+  **`2 ∣ D^y_0 + D^t_0 + D^t_1 + D^t_2`**。
+* `exists_halfSum_columns` — その 1 本の合同から**半和 3 本が整数列として存在**する。
+* `exists_eq_of_columns_of_odd_degrees` — 🎯 半和を data で要求しない endgame。
+  仮説は全部「4 本の列・次数列・`χ(t)`」についての教科書レベルの主張になった。
+
+⚠ `h10` は半和について量化する (`∀ v, (∀k, 2 v k = a+b−c−d) → …`) — 供給側
+(Burnside (9) を半分にしたもの) はその定義式を満たす任意の列で動くので損が無い。 -/
+
+#assert_only_allowed_axioms OddOrder.Algebra.two_dvd_sum_of_odd_degrees
+#assert_only_allowed_axioms OddOrder.Algebra.exists_halfSum_columns
+#assert_only_allowed_axioms OddOrder.Algebra.exists_eq_of_columns_of_odd_degrees
