@@ -988,3 +988,18 @@ subagent fan-out) を行って裁定し**、結果を issue (HUB 宛 issue / 該
 
 > 📜 旧世代 (list 形式) の tick 記録は全て [`log/merge_monitor_ticks.md`](log/merge_monitor_ticks.md) の
 > 「旧『現状メモ』ログ」節へ退避 (0139、2026-07-24)。現況は冒頭の直近 tick を見る。
+
+### ⚠ フルビルドの検証で踏んだ罠 2 件 (2026-08-07, hub session)
+
+1. **`lake build | tail` は EXIT を隠す**。`timeout N lake build OddOrder 2>&1 | tail -6` の
+   終了コードは `tail` のもので常に 0。実際には build が失敗していたのに「green」と
+   報告してしまった。⟹ **ログをファイルに落として `echo "EXIT=$?"` で捕る**:
+   `lake build OddOrder > log 2>&1; echo "EXIT=$?"`。
+   (CLAUDE.md の「hub tick gate の罠」に既出だが、background 実行の task-notification が
+   返す exit code も**パイプ後のもの**なので同じ罠にかかる。)
+
+2. **同一 worktree で leaf build と full build を並行させない**。background の
+   `lake build OddOrder` が走っている最中に leaf を `lake build <Module>` すると、
+   leaf の olean が一時的に消えて full build 側が
+   `failed to open file '….olean': No such file or directory` で落ちる。
+   **偽の赤**なので原因を誤診しやすい。⟹ full build は他のビルドを止めてから逐次で回す。
