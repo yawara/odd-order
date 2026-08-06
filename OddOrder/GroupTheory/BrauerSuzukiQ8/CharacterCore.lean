@@ -27,6 +27,7 @@ instantiated for the `Q₈` configuration (issue 9506).
 -/
 
 open OddOrder.Isaacs.Ch03
+open OddOrder.RepresentationTheory.Modular
 
 namespace OddOrder.GroupTheory
 
@@ -51,13 +52,13 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
   -- the datum of `G` over `𝓞_ℂ_[2]`
   obtain ⟨ι'G, _, mG, _, _, _, eG, ιG, _, nnG, _, _, _, πG, hπG, hlinG, ωG, ω'G,
     hkerJG, hnilG, hωG, hω'G⟩ :=
-    OddOrder.RepresentationTheory.Modular.exists_datum_padicComplex 2 G
+    exists_datum_padicComplex 2 G
   -- the centraliser of the involution, and its datum
   set C : Subgroup G := Subgroup.centralizer ({z} : Set G) with hC
   haveI : Finite ↥C := Subtype.finite
   obtain ⟨ι'C, _, mC, _, _, _, eC, ιC, _, nnC, _, _, _, πC, hπC, hlinC, ωC, ω'C,
     hkerJC, hnilC, hωC, hω'C⟩ :=
-    OddOrder.RepresentationTheory.Modular.exists_datum_padicComplex 2 ↥C
+    exists_datum_padicComplex 2 ↥C
   -- the central subgroup `⟨z⟩ ⊴ C_G(z)` and the quotient `Q = C_G(z)/⟨z⟩`
   have hzC : z ∈ C := Subgroup.mem_centralizer_iff.mpr fun w hw => by
     rw [Set.mem_singleton_iff] at hw; subst hw; rfl
@@ -72,18 +73,18 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
   -- the ordinary splitting of `Q`; its *modular* splitting must be `quotientPi` of that of `C`,
   -- so that `IBr(Q)` and `IBr(C)` share their index type (Navarro (7.6))
   obtain ⟨ι'Q, _, mQ, _, _, _, eQ, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -⟩ :=
-    OddOrder.RepresentationTheory.Modular.exists_datum_padicComplex 2 (↥C ⧸ Nz)
+    exists_datum_padicComplex 2 (↥C ⧸ Nz)
   obtain ⟨ϖ, hϖ⟩ :=
-    OddOrder.RepresentationTheory.Modular.exists_isPrimitiveRoot_pRegularExponent 2 (↥C ⧸ Nz)
+    exists_isPrimitiveRoot_pRegularExponent 2 (↥C ⧸ Nz)
   obtain ⟨ϖ', hϖ'⟩ :=
-    OddOrder.RepresentationTheory.Modular.exists_isPrimitiveRoot_residueField_pRegularExponent 2
+    exists_isPrimitiveRoot_residueField_pRegularExponent 2
       (↥C ⧸ Nz)
-  have hkerJQ := OddOrder.RepresentationTheory.Modular.ker_quotientPi πC hπC hlinC hNzP hkerJC
+  have hkerJQ := ker_quotientPi πC hπC hlinC hNzP hkerJC
   have hnilQ := fun w hw =>
     OddOrder.GroupAlgebra.isNilpotent_of_blockCharacterPi_eq_zero
-      (OddOrder.RepresentationTheory.Modular.quotientPi πC hπC hlinC hNzP).toRingHom
-      (OddOrder.RepresentationTheory.Modular.quotientPi_surjective πC hπC hlinC hNzP)
-      (OddOrder.RepresentationTheory.Modular.quotientPi_smul πC hπC hlinC hNzP) hkerJQ w hw
+      (quotientPi πC hπC hlinC hNzP).toRingHom
+      (quotientPi_surjective πC hπC hlinC hNzP)
+      (quotientPi_smul πC hπC hlinC hNzP) hkerJQ w hw
   -- an involution `ȳ` of `Q`: its Sylow `2`-subgroups have order `4`
   have hz2 : z ^ 2 = 1 := by rw [← hz]; exact pow_orderOf_eq_one z
   have hz1 : z ≠ 1 := fun h => by simp [h] at hz
@@ -112,6 +113,23 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
     Sylow.nonempty
   have hSylC4 : Nat.card ↥(SylC : Subgroup ↥(Subgroup.centralizer ({yb} : Set (↥C ⧸ Nz)))) = 4 :=
     card_sylow_centralizer_of_card_sylow_four SQ hSQ4 hyb1 hyb2 SylC
+  -- the datum of `C_Q(ȳ)`, and the index of its principal block
+  haveI : Finite ↥(Subgroup.centralizer ({yb} : Set (↥C ⧸ Nz))) := Subtype.finite
+  obtain ⟨ι'Y, _, mY, _, _, _, eY, ιY, _, nnY, _, _, _, πY, hπY, hlinY, ωY, ω'Y,
+    hkerJY, hnilY, hωY, hω'Y⟩ :=
+    exists_datum_padicComplex 2
+      ↥(Subgroup.centralizer ({yb} : Set (↥C ⧸ Nz)))
+  obtain ⟨φ₀, hφ₀⟩ := Quotient.exists_rep
+    (principalBlock πY hπY hlinY hnilY)
+  -- Navarro (6.13): the Cartan invariant of the principal block of `C_Q(ȳ)` is `|Sylow| = 4`
+  haveI : Fintype ↥(Subgroup.centralizer ({yb} : Set (↥C ⧸ Nz))) := Fintype.ofFinite _
+  have hcart : cartanMatrix
+      (𝒪 := 𝓞_ℂ_[2]) (nn := nnY) Nat.prime_two hωY hω'Y hπY hlinY hkerJY eY φ₀ φ₀ = 4 := by
+    rw [cartanMatrix_principalBlock_eq_card_sylow_of_hasNormalPComplement Nat.prime_two hωY hω'Y
+      hπY hlinY hkerJY hnilY eY hcompl SylC hφ₀, hSylC4]
+  -- the `p`-th root of unity separating the `p`-part
+  obtain ⟨ζ, hζ, hζk, hζK⟩ :=
+    exists_pow_eq_one_residue_eq_one_padicComplexInt 2
   sorry
 
 end OddOrder.GroupTheory
