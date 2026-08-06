@@ -5081,3 +5081,27 @@ repo に `Z(𝒪[G])` の order 構造・`𝔪`-進完備性まわりの資産�
 ⚠ **既存資産の再確認が要る**: repo の `Modular/OsimaBlockSupport.lean` は
 「ブロック冪等元が `p`-特異元で消える」= (3.8) の後半に相当する可能性が高い。
 着手前に (3.6)/(3.8) が部分的に既に在るか実測すること。
+
+#### 既存資産の実測 (2026-08-06) — `OsimaBlockSupport` は **`A = Irr(B)` の場合しか無い**
+
+`Modular/OsimaBlockSupport.lean` (205 行) が持っているもの:
+
+* `sum_decompositionMatrix_mul_ordinaryCharacter_eq_zero` — `∑_{i∈Irr(B)} d_{iφ}χ_i(g) = 0`
+  (`g` が `p`-特異)。= (3.6)+(3.8) の **`p`-特異半分**を `A = Irr(B)` で。
+* `sum_ordinaryCharacter_one_mul_eq_zero_of_not_isPRegular` — `∑_{i∈Irr(B)}χ_i(1)χ_i(g) = 0`
+  (`g` が `p`-特異) = (3.7) Weak Block Orthogonality の `A = Irr(B)` 版。
+* `coeff_blockIdempotent_eq_zero_of_not_isPRegular` — ブロック冪等元の係数は `p`-特異元で 0。
+
+⟹ **`p`-特異半分は `A = Irr(B)` について済んでいる**。足りないのは:
+
+1. **`A` を「連結成分の合併」へ一般化** ((3.9) が要求するのは `Irr(B)` より真に小さいかも
+   しれない `A`)。上の 2 本は `blockOfIrr = B` の filter で書かれているので、
+   **述語 `P : ι' → Prop` (linking で閉じている) に一般化**するのが実作業。
+   証明の中身 (`Φ_φ` が `p`-特異元で消える) は変わらない。
+2. **`p`-正則半分 = Dickson `|G|_p ∣ Φ_φ(1)`** — 完全に新規。
+3. ⟹ `f_A ∈ Z(𝒪G)` を**係数で直接**構成する ((3.8))。
+   ⚠ repo の既存ルートは「冪等元持ち上げでブロック冪等元を作り、その `K` 像が
+   `∑_{χ∈Irr(B)} e_χ` (`mapRingHom_blockIdempotent_eq_sum`)」なので、
+   **ブロックについてしか `f_A` を与えない**。(3.9) にはこの逆 (係数から作る) が要る。
+
+⟹ 次の着手 = **(2) Dickson** (独立・新規・小さい)、次に **(1) の一般化**、最後に (3)。
