@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.RingTheory.AdjoinRoot
 import Mathlib.RingTheory.LocalRing.ResidueField.Defs
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Basic
+import Mathlib.RingTheory.Polynomial.Cyclotomic.Eval
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Expand
 import OddOrder.Algebra.AdicCompletePi
 
@@ -34,6 +35,8 @@ the hypothesis that the block idempotents are lifted along.
   characteristic `p` (the exponent is `φ(p^k)`)
 * `OddOrder.Algebra.sub_one_pow_mem_map_maximalIdeal` — the totally ramified estimate
   `(ζ - 1)^{φ(p^k)} ∈ 𝔪_A·B`
+* `OddOrder.Algebra.cyclotomicToResidueField` — the reduction `B → k` at `ζ ↦ 1`, and its
+  surjectivity
 -/
 
 namespace OddOrder.Algebra
@@ -103,5 +106,44 @@ theorem sub_one_pow_mem_map_maximalIdeal {A : Type*} [CommRing A] [IsLocalRing A
   refine Ideal.sum_mem _ fun i _ => ?_
   rw [Algebra.smul_def]
   exact Ideal.mul_mem_right _ _ (Ideal.mem_map_of_mem _ (hcoeff i))
+
+/-! ### The reduction `B → k` at `ζ ↦ 1` -/
+
+open IsLocalRing in
+/-- **The ring map `B → k` sending `ζ` to `1`.**  It is well defined because
+`Φ_{q^k}(1) = q` (`Polynomial.eval_one_cyclotomic_prime_pow`), which is `0` in the residue field.
+
+Its kernel is the maximal ideal of `B`; that is what makes `B` local with residue field `k`. -/
+noncomputable def cyclotomicToResidueField {A : Type*} [CommRing A] [IsLocalRing A]
+    {q k : ℕ} [Fact (Nat.Prime q)] [CharP (ResidueField A) q] (hk : 0 < k) :
+    AdjoinRoot (cyclotomic (q ^ k) A) →+* ResidueField A :=
+  AdjoinRoot.lift (residue A) 1 (by
+    obtain ⟨j, hj⟩ := Nat.exists_eq_succ_of_ne_zero hk.ne'
+    rw [Polynomial.eval₂_eq_eval_map, map_cyclotomic, hj,
+      eval_one_cyclotomic_prime_pow (R := ResidueField A) j]
+    exact CharP.cast_eq_zero _ q)
+
+open IsLocalRing in
+@[simp]
+theorem cyclotomicToResidueField_of {A : Type*} [CommRing A] [IsLocalRing A]
+    {q k : ℕ} [Fact (Nat.Prime q)] [CharP (ResidueField A) q] (hk : 0 < k) (a : A) :
+    cyclotomicToResidueField hk (AdjoinRoot.of (cyclotomic (q ^ k) A) a) = residue A a :=
+  AdjoinRoot.lift_of _
+
+open IsLocalRing in
+@[simp]
+theorem cyclotomicToResidueField_root {A : Type*} [CommRing A] [IsLocalRing A]
+    {q k : ℕ} [Fact (Nat.Prime q)] [CharP (ResidueField A) q] (hk : 0 < k) :
+    cyclotomicToResidueField hk (AdjoinRoot.root (cyclotomic (q ^ k) A)) = 1 :=
+  AdjoinRoot.lift_root _
+
+open IsLocalRing in
+/-- **`B → k` is onto** — it already is on the constants. -/
+theorem cyclotomicToResidueField_surjective {A : Type*} [CommRing A] [IsLocalRing A]
+    {q k : ℕ} [Fact (Nat.Prime q)] [CharP (ResidueField A) q] (hk : 0 < k) :
+    Function.Surjective (cyclotomicToResidueField (A := A) (q := q) (k := k) hk) := by
+  intro y
+  obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective y
+  exact ⟨AdjoinRoot.of _ a, cyclotomicToResidueField_of hk a⟩
 
 end OddOrder.Algebra

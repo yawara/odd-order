@@ -19095,3 +19095,17 @@ BS の鎖は元々この instance を仮定しているので整合。
 (issue 9506 の「`B` の局所性」節) で一番重い部分を回避する鍵。 -/
 
 #assert_only_allowed_axioms OddOrder.Algebra.sub_one_pow_mem_map_maximalIdeal
+
+/-! 🎯 **issue 9506 段 303**: 還元 `B → k` (`ζ ↦ 1`)
+(`cyclotomicToResidueField`, `Algebra/CyclotomicAdjoin`)。
+
+well-defined 条件は `Φ_{q^k}(1) = q`
+(🎯 mathlib `Polynomial.eval_one_cyclotomic_prime_pow`) が剰余体 (標数 `q`) で `0` になること。
+定数の上で既に全射なので `B → k` は全射。
+
+⟹ `B` の局所性の段取り (issue 9506) のステップ 1 完了。次はその核 `N` が極大であること
+(`A → B/N` が全射で核が `𝔪_A`) と `N^φ ⊆ 𝔪_A·B` (段 302 + 二項展開)。 -/
+
+#assert_only_allowed_axioms OddOrder.Algebra.cyclotomicToResidueField
+
+#assert_only_allowed_axioms OddOrder.Algebra.cyclotomicToResidueField_surjective
