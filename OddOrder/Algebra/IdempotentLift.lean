@@ -72,9 +72,12 @@ theorem exists_isIdempotentElem_sub_mem {c : R} (hc : c * c - c ∈ I) :
   change e * e = e
   rw [← pow_two]; exact h2
 
-/-- **The lift is unique.**  Two idempotents congruent modulo a Henselian ideal are equal: their
-difference `d` satisfies `d³ = d`, and `d ∈ I ≤ J(R)` makes `d² - 1` a unit. -/
-theorem eq_of_isIdempotentElem_of_sub_mem (I) [HenselianRing R I] {e f : R}
+/-- **The lift is unique.**  Two idempotents congruent modulo an ideal inside the Jacobson radical
+are equal: their difference `d` satisfies `d³ = d`, and `d ∈ I ≤ J(R)` makes `d² - 1` a unit.
+
+Only `I ≤ J(R)` is used, not Henselianness — the same uniqueness therefore applies to the
+non-complete coefficient rings of `AlgClosedIdempotentLift`. -/
+theorem eq_of_isIdempotentElem_of_sub_mem (I) (hjac : I ≤ Ideal.jacobson (⊥ : Ideal R)) {e f : R}
     (he : IsIdempotentElem e)
     (hf : IsIdempotentElem f) (hef : e - f ∈ I) : e = f := by
   have h1 : e * e = e := he
@@ -83,7 +86,7 @@ theorem eq_of_isIdempotentElem_of_sub_mem (I) [HenselianRing R I] {e f : R}
     linear_combination (e + 1 - 3 * f) * h1 + (3 * e - f - 1) * h2
   have hunit : IsUnit ((e - f) * (e - f) - 1) := by
     have hmem : (e - f) * (e - f) ∈ Ideal.jacobson (⊥ : Ideal R) :=
-      Ideal.mul_mem_left _ _ (HenselianRing.jac hef)
+      Ideal.mul_mem_left _ _ (hjac hef)
     have hu := (Ideal.mem_jacobson_bot.mp hmem) (-1)
     have hrw : ((e - f) * (e - f) * (-1) + 1) = -((e - f) * (e - f) - 1) := by ring
     rw [hrw] at hu
@@ -96,7 +99,7 @@ theorem existsUnique_isIdempotentElem_sub_mem {c : R} (hc : c * c - c ∈ I) :
     ∃! e : R, IsIdempotentElem e ∧ e - c ∈ I := by
   obtain ⟨e, he, hec⟩ := exists_isIdempotentElem_sub_mem I hc
   refine ⟨e, ⟨he, hec⟩, fun f hfx => ?_⟩
-  refine eq_of_isIdempotentElem_of_sub_mem I hfx.1 he ?_
+  refine eq_of_isIdempotentElem_of_sub_mem I HenselianRing.jac hfx.1 he ?_
   have hrw : f - e = (f - c) - (e - c) := by ring
   rw [hrw]
   exact Ideal.sub_mem _ hfx.2 hec

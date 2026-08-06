@@ -19249,8 +19249,14 @@ ordinary 側を分裂させる係数環 `𝓞_ℂ_[p]` は値群が可除ゆえ 
 
 ⟹ これで `𝓞_ℂ_[p]` が **`IsAdicComplete` 以外の全要求 (分裂・剰余体代数閉・Henselian・
 `IsFractionRing`) を既に満たす**ことと合わせ、Brauer の分裂体定理も Schur 指数も
-分岐拡大も要らなくなる見込み。 -/
+分岐拡大も要らなくなる見込み。
+
+⚠ **一意性は完備性を要らない**: `𝔪B` が Jacobson 根基に入る (`map_maximalIdeal_le_jacobson_bot`、
+中山) だけで足りるので、`IdempotentLift.eq_of_isIdempotentElem_of_sub_mem` の
+`[HenselianRing R I]` を `I ≤ jacobson ⊥` に弱めた (呼び出し側は `HenselianRing.jac` を渡す)。 -/
 
 #assert_only_allowed_axioms OddOrder.exists_multiset_prod_X_sub_C
 #assert_only_allowed_axioms OddOrder.exists_isIdempotentElem_sub_mem_of_multiset_prod_eq_zero
+#assert_only_allowed_axioms OddOrder.map_maximalIdeal_le_jacobson_bot
 #assert_only_allowed_axioms OddOrder.exists_isIdempotentElem_sub_mem_of_isAlgClosed
+#assert_only_allowed_axioms OddOrder.existsUnique_isIdempotentElem_sub_mem_of_isAlgClosed

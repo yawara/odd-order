@@ -5,7 +5,9 @@ Authors: Yawara Ishida
 -/
 import Mathlib.LinearAlgebra.Charpoly.Basic
 import Mathlib.RingTheory.Coprime.Lemmas
+import Mathlib.RingTheory.Nakayama
 import OddOrder.Algebra.AlgClosedFractionField
+import OddOrder.Algebra.IdempotentLift
 
 /-!
 # Idempotents lift over a coefficient ring whose fraction field is algebraically closed
@@ -35,8 +37,10 @@ by `b` modulo `𝔪B` identifies it with `b`.
 
 * `OddOrder.exists_isIdempotentElem_sub_mem_of_multiset_prod_eq_zero` — the ring-theoretic core:
   a split annihilating polynomial with at least one root in `𝔪` produces the idempotent
+* `OddOrder.map_maximalIdeal_le_jacobson_bot` — what makes the lift unique
 * `OddOrder.exists_isIdempotentElem_sub_mem_of_isAlgClosed` — idempotents lift along
   `B ↠ B/𝔪B`
+* `OddOrder.existsUnique_isIdempotentElem_sub_mem_of_isAlgClosed` — uniquely so
 -/
 
 namespace OddOrder
@@ -59,9 +63,46 @@ theorem isCoprime_multiset_prod_right {R : Type*} [CommSemiring R] {s : Multiset
   simpa only [isCoprime_comm] using
     isCoprime_multiset_prod_left (fun y hy => (isCoprime_comm).mp (h y hy))
 
-/-! ### The core construction -/
+/-! ### The extended maximal ideal lies in the Jacobson radical
+
+This is what makes the lift *unique*; it needs only module-finiteness, no completeness. -/
 
 variable {A B : Type*} [CommRing A] [IsLocalRing A] [CommRing B] [Algebra A B]
+
+/-- **`1 + w` is a unit for `w ∈ 𝔪B`**, when `B` is module-finite over the local ring `A`.  If the
+ideal `(1 + w)` were proper, the quotient `B/(1+w)` would be a nonzero finite `A`-module equal to
+`𝔪` times itself — `1 = -w` there — which Nakayama forbids. -/
+theorem isUnit_one_add_of_mem_map_maximalIdeal [Module.Finite A B] {w : B}
+    (hw : w ∈ (maximalIdeal A).map (algebraMap A B)) : IsUnit (1 + w) := by
+  rw [← Ideal.span_singleton_eq_top]
+  by_contra hne
+  set I : Ideal B := Ideal.span {1 + w} with hI
+  haveI : Nontrivial (B ⧸ I) := Ideal.Quotient.nontrivial_iff.mpr hne
+  haveI : Module.Finite A (B ⧸ I) :=
+    Module.Finite.of_surjective (Ideal.Quotient.mkₐ A I).toLinearMap Ideal.Quotient.mk_surjective
+  refine Submodule.top_ne_ideal_smul_of_le_jacobson_annihilator (M := B ⧸ I)
+    (IsLocalRing.maximalIdeal_le_jacobson (Module.annihilator A (B ⧸ I))) ?_
+  have hmk : (Ideal.Quotient.mk I) w ∈ (maximalIdeal A).map (algebraMap A (B ⧸ I)) := by
+    rw [IsScalarTower.algebraMap_eq A B (B ⧸ I), ← Ideal.map_map]
+    exact Ideal.mem_map_of_mem _ hw
+  have hone : (1 : B ⧸ I) ∈ (maximalIdeal A).map (algebraMap A (B ⧸ I)) := by
+    have h0 : (Ideal.Quotient.mk I) (1 + w) = 0 :=
+      Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.subset_span rfl)
+    rw [map_add, map_one] at h0
+    rw [eq_neg_of_add_eq_zero_left h0]
+    exact neg_mem hmk
+  have htop : (maximalIdeal A).map (algebraMap A (B ⧸ I)) = ⊤ := (Ideal.eq_top_iff_one _).mpr hone
+  rw [Ideal.smul_top_eq_map, htop]
+  rfl
+
+/-- **The extended maximal ideal is inside the Jacobson radical.** -/
+theorem map_maximalIdeal_le_jacobson_bot [Module.Finite A B] :
+    (maximalIdeal A).map (algebraMap A B) ≤ Ideal.jacobson (⊥ : Ideal B) := by
+  intro x hx
+  refine Ideal.mem_jacobson_bot.mpr fun y => ?_
+  simpa [add_comm] using isUnit_one_add_of_mem_map_maximalIdeal (Ideal.mul_mem_right y _ hx)
+
+/-! ### The core construction -/
 
 /-- **Idempotents lift, given a split annihilating polynomial.**  If `∏_{λ ∈ s} (b - λ) = 0` with
 `s` containing at least one element of `𝔪`, and `b² ≡ b` modulo `𝔪B`, then some idempotent of `B`
@@ -186,5 +227,19 @@ theorem exists_isIdempotentElem_sub_mem_of_isAlgClosed (K : Type*) [Field K] [Al
     congr 1
     exact Multiset.map_congr rfl fun l _ => by simp
   rw [Multiset.map_cons, Multiset.prod_cons, ← hval s, ← hs, hfb, mul_zero]
+
+/-- **Idempotents lift uniquely along `B ↠ B/𝔪B`.**  Uniqueness needs only that `𝔪B` sits inside
+the Jacobson radical, which is Nakayama and holds for any module-finite `B`. -/
+theorem existsUnique_isIdempotentElem_sub_mem_of_isAlgClosed (K : Type*) [Field K] [Algebra A K]
+    [IsFractionRing A K] [IsAlgClosed K] [Module.Free A B] [Module.Finite A B]
+    {b : B} (hb : b * b - b ∈ (maximalIdeal A).map (algebraMap A B)) :
+    ∃! e : B, IsIdempotentElem e ∧ e - b ∈ (maximalIdeal A).map (algebraMap A B) := by
+  obtain ⟨e, he, heb⟩ := exists_isIdempotentElem_sub_mem_of_isAlgClosed K hb
+  refine ⟨e, ⟨he, heb⟩, fun f hf => ?_⟩
+  refine eq_of_isIdempotentElem_of_sub_mem _
+    (map_maximalIdeal_le_jacobson_bot (A := A) (B := B)) hf.1 he ?_
+  have hrw : f - e = (f - b) - (e - b) := by ring
+  rw [hrw]
+  exact Ideal.sub_mem _ hf.2 heb
 
 end OddOrder
