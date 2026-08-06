@@ -2819,13 +2819,41 @@ p.139 の残り = 「位数 4 の元は全て `G`-共役 (実は `C_G(t)`-共役
   `index_eq_card_sylow_of_isPGroup_quotient` (`GroupTheory/ThreeStepGroup.lean`) も新設
   (`S ⊔ N = ⊤` + `S ⊓ N = ⊥` ⟹ `|G| = |S|·|N|`)。
 
-  ⟹ **次の実装単位** = `C_G(y)` について (7.2) の仮説一式を組む:
-  `hcart` は段 281+282 の合成 (`|Sylow of C_G(y)| = |⟨y⟩| = 4`)、
-  `hconjall` は `isConj_of_orderFour` (段 276)、`hinv`/`hy4` は `Q₈` の Hamiltonian 性。
+  ⚠⚠ **「(7.2) の機械を `y` でそのまま回す」は誤りだった (段 283 で p.140 を画像実読して訂正)**。
+  (7.2) の `hconjall` (全ての `p`-元が `t` に共役) は **`y` には成り立たない** — 位数 4 の元は
+  2 つある `2`-元の類の片方でしかないので、「どの `χ(y)` も 0 でない」が言えず
+  `|Irr(B₀)| = 4` は出ない。原文が実際に書いているのは
+  「the nonzero entries of the integer column `χ(y)` are necessarily **four ±1**」で、
+  `±2` の排除には `hconjall` でなく**列の先頭成分が 1 (自明指標)** を使う。
+
+  ✅ **"Analysis at y" の指標側 = 段 283-285 で完了**:
+  - 段 283 `card_character_ne_zero_eq_four_of_isConj_inv` (`PrincipalBlockInvolution`) =
+    `∑_{Irr(B₀)} χ(y)² = 4` (段 197-198 + `hcart`) + `χ(y) ∈ ℤ` (段 199) を
+    **0 を許す算術版** (`Algebra/SumSquaresFour` に新設:
+    `eq_zero_or_one_or_neg_one_of_sum_sq_eq_four` /
+    `card_filter_ne_zero_eq_four_of_sum_sq_eq_four`) に噛ませる。
+  - 段 284 `exists_trivial_wedderburn_index` (`PrincipalBlockNonvanishing`) =
+    自明表現は任意の Wedderburn 分解に 1×1 ブロックとして現れる
+    (`Ĝ` の非零成分の列が不変ベクトル ⟹ 既存 `forall_apply_eq_of_invariants_ne_bot`)。
+  - 段 285 `blockOfIrr_eq_principalBlock_of_trivial` (新 leaf
+    `Modular/PrincipalBlockTrivial.lean`) = その成分のブロックは `B₀`
+    (中心指標を類和基底 `centerBasis` 上で比較: `ω(K̂) = |K|` → 格子側も `|K| ∈ 𝒪` →
+    剰余 `|K|*` = `aug(K̂)`)。⟹ 段 283 の signature から `{j₁}` 系の仮説が消えた。
 
 ✅ **`BrauerSuzukiQ8.lean` の prefix-split = 段 280 で完了**:
 `Q₈` 固有の事実 24 宣言を `GroupTheory/QuaternionTwoFacts.lean` (388 行) へ分離、
 本体は 811 行に (段 281 追加後 933 行)。`OddOrder.lean` 配線済。
+
+⟹ **次の実装単位 = p.141 "Analysis at t" の群論的入力** (2026-08-06 に p.141 を画像実読):
+  1. `T` (≅ `Q₈`) は `C_G(t)` の Sylow-2 (`t ∈ Z(T)` ゆえ `T ≤ C_G(t)`、`[G:T]` 奇)
+  2. ⟹ `C_G(t)/⟨t⟩` の Sylow-2 は `Q₈/Z(Q₈) ≅ Z₂ × Z₂` (Klein four)
+  3. `C_G(t)/⟨t⟩` の対合は全て共役 (`T` の位数 4 の元が `C_G(t)`-共役だから;
+     対合は Sylow へ共役で送れる + `T̄` の 3 つの対合は位数 4 の元の像)
+  ⟹ これで Cor (7.4) (段 207-209) の仮説が揃い、basic set `{1=ψ₀,ψ₁,ψ₂}` と
+  Cartan `c_ij = 1 + δ_ij` が出る。(7.6) (段 214-215) で `C_G(t)` へ持ち上げると
+  Cartan は 2 倍。以降 (7.5.a) で `χ_i(tu) = ∑_j d^t_{χ_i ψ_j} ψ_j(u)`、
+  (7.5.b,c,d) で (3) `(D^t_i, D^t_j) = 2(1+δ_ij)` / (4) `(D^y_0, D^t_j) = 0` /
+  (5) `(χ(1), D^t_j) = 0`。最後に `Q₈` の指標表から `τ(t) ≡ τ(y) mod 2`。
 - "Analysis at t" (p.141-142): `C_G(t)/⟨t⟩` が Klein four Sylow-2 ⟹ (7.4) の basic set、
   (7.6) で `C_G(t)` へ持ち上げ、(7.5) で `d^t` の列。**整数性は issue 9508 で完済**
   (`intBasicSetMatrix` / `sum_intBasicSetMatrix_mul_cartanMatrix`)。
