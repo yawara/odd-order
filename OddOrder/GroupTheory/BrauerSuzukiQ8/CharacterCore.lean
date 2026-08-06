@@ -8,6 +8,7 @@ import OddOrder.GroupTheory.CentralInvolutionNormalComplement
 import OddOrder.GroupTheory.RepresentationTheory.Modular.AnalysisAtInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionColumnExpansion
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexDatum
+import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainConverseSupply
 
 /-!
 # Brauer–Suzuki, the `Q₈` case: the character-theoretic core (Navarro pp. 139–146)
@@ -130,6 +131,24 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
   -- the `p`-th root of unity separating the `p`-part
   obtain ⟨ζ, hζ, hζk, hζK⟩ :=
     exists_pow_eq_one_residue_eq_one_padicComplexInt 2
+  -- the converse of Brauer's third main theorem, for both pairs
+  have hzP : IsPElement 2 z := ⟨1, by rw [hz, pow_one]⟩
+  have hybP : IsPElement 2 yb := ⟨1, by
+    rw [pow_one]
+    exact orderOf_eq_prime (by rw [pow_two]; exact hyb2) hyb1⟩
+  have hroot : ∀ n : ℕ, ¬ 2 ∣ n → n ≠ 0 → ∃ ζ' : 𝓞_ℂ_[2], IsPrimitiveRoot ζ' n :=
+    fun n hn hn0 => exists_isPrimitiveRoot_padicComplexInt 2 hn hn0
+  have hroot' : ∀ n : ℕ, ¬ 2 ∣ n → n ≠ 0 →
+      ∃ ζ' : IsLocalRing.ResidueField 𝓞_ℂ_[2], IsPrimitiveRoot ζ' n :=
+    fun n hn hn0 => exists_isPrimitiveRoot_residueField_padicComplexInt 2 hn hn0
+  haveI : DecidableEq (ConjClasses G) := Classical.decEq _
+  haveI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  have hconvG := fun b hind =>
+    eq_principalBlock_of_inducedBlockOfCentralizer_eq_of_roots (K := ℂ_[2]) Nat.prime_two hzP
+      hroot hroot' hζ hζk hζK eG eC hπG hlinG hnilG hkerJG hπC hlinC hnilC hkerJC b hind
+  -- the centrality of `⟨z⟩` in `C_G(z)`, as the `p`-regular commutation the chain asks for
+  have hcent : ∀ w : ↥C, IsPRegular 2 w → ∀ v ∈ Nz, Commute w v := fun w _ v hv =>
+    Subgroup.mem_center_iff.mp (zpowers_self_le_center_centralizer z hzC hv) w
   sorry
 
 end OddOrder.GroupTheory
