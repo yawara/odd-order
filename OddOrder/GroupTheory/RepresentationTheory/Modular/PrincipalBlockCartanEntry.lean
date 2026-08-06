@@ -34,6 +34,8 @@ So `c_{φ_0 φ_0} = ∑_χ d_{χ φ_0}² = ∑_{χ ∈ Irr(B_0)} χ(1)²`.
   `d_{χ φ_0} = χ(1)` on `Irr(B_0)`
 * `OddOrder.RepresentationTheory.Modular.card_mul_cartanMatrix_principalBlock` —
   `|N| · c_{φ_0 φ_0} = |G|`
+* `OddOrder.RepresentationTheory.Modular.cartanMatrix_principalBlock_eq_card_sylow` —
+  **`c_{φ_0 φ_0} = |G|_p`**, the form the Brauer–Suzuki argument cites (`hcart`)
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -146,5 +148,25 @@ theorem card_mul_cartanMatrix_principalBlock :
   rw [hsum]
   exact card_mul_sum_sq_principalBlock e hπ hlin hnil ‹N.Normal› hNp S.isPGroup'
     (by rw [sup_comm]; exact sylow_sup_eq_top_of_isPGroup_quotient hquot S)
+
+-- `Fintype G` and `Fintype (ConjClasses G)` are what make `principalBlock` elaborate; the section
+-- fixes them, so they cannot be replaced by `Finite` here.
+set_option linter.unusedFintypeInType false in
+omit [DecidableEq (ConjClasses G)] in
+include hp hω hω' hkerJ hnil hNp hquot S hφ₀ in
+/-- **Navarro (6.13) in the form the Brauer–Suzuki argument cites**: for `G` with a normal
+`p`-complement, the single Cartan invariant of the principal block is `c_{φ_0 φ_0} = |G|_p`.
+
+`K` has characteristic zero, so `|N| · c_{φ_0 φ_0} = |G|` may be read in `ℕ`; cancelling `|N|`
+against `|N| · [G : N] = |G|` leaves `c_{φ_0 φ_0} = [G : N] = |S|`. -/
+theorem cartanMatrix_principalBlock_eq_card_sylow :
+    cartanMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e φ₀ φ₀
+      = Nat.card ↥(S : Subgroup G) := by
+  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have hK := card_mul_cartanMatrix_principalBlock hp hω hω' hπ hlin hkerJ hnil e hNp hquot S hφ₀
+  have hN : Nat.card ↥N * cartanMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e φ₀ φ₀
+      = Nat.card G := by exact_mod_cast hK
+  refine Nat.eq_of_mul_eq_mul_left (Nat.card_pos (α := ↥N)) ?_
+  rw [hN, ← index_eq_card_sylow_of_isPGroup_quotient hNp hquot S, Subgroup.card_mul_index N]
 
 end OddOrder.RepresentationTheory.Modular

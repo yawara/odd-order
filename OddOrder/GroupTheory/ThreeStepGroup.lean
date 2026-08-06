@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import OddOrder.GroupTheory.CardSupInf
 import OddOrder.GroupTheory.SubgroupInAmbient
 
 /-!
@@ -185,6 +186,30 @@ theorem sylow_sup_eq_top_of_isPGroup_quotient [Finite G] {p : ℕ} [Fact p.Prime
   have := Subgroup.comap_map_eq (QuotientGroup.mk' N) (S : Subgroup G)
   rw [hmap, QuotientGroup.ker_mk'] at this
   simpa using this.symm
+
+/-- **The index of a normal `p`-complement is the order of a Sylow `p`-subgroup.**  `S ⊔ N = ⊤`
+(`sylow_sup_eq_top_of_isPGroup_quotient`) and `S ⊓ N = ⊥`, its order dividing both a power of `p`
+and the `p`-free number `|N|`; so `|G| = |S| · |N|`. -/
+theorem index_eq_card_sylow_of_isPGroup_quotient [Finite G] {p : ℕ} [Fact p.Prime]
+    {N : Subgroup G} [N.Normal] (hNp : ¬ p ∣ Nat.card ↥N) (hN : IsPGroup p (G ⧸ N))
+    (S : Sylow p G) : N.index = Nat.card ↥(S : Subgroup G) := by
+  have hdisj : (S : Subgroup G) ⊓ N = ⊥ := by
+    refine Subgroup.card_eq_one.mp ?_
+    by_contra hne
+    obtain ⟨n, hn⟩ := S.isPGroup'.exists_card_eq
+    have hdvdS : Nat.card ↥((S : Subgroup G) ⊓ N) ∣ p ^ n := by
+      rw [← hn]; exact card_dvd_card_of_le inf_le_left
+    have hdvdN : Nat.card ↥((S : Subgroup G) ⊓ N) ∣ Nat.card ↥N :=
+      card_dvd_card_of_le inf_le_right
+    obtain ⟨j, -, hj⟩ := (Nat.dvd_prime_pow (Fact.out : p.Prime)).mp hdvdS
+    have hj0 : j ≠ 0 := fun h => hne (by rw [hj, h, pow_zero])
+    exact hNp (((hj ▸ dvd_pow_self p hj0)).trans hdvdN)
+  have hcard : Nat.card G = Nat.card ↥(S : Subgroup G) * Nat.card ↥N := by
+    rw [← card_sup_eq_mul_of_disjoint_normal hdisj,
+      sylow_sup_eq_top_of_isPGroup_quotient hN S]
+    exact (Nat.card_congr Subgroup.topEquiv.toEquiv).symm
+  refine Nat.eq_of_mul_eq_mul_left (Nat.card_pos (α := ↥N)) ?_
+  rw [Subgroup.card_mul_index N, hcard, Nat.mul_comm]
 
 /-- A Sylow `p`-subgroup meets `O_{p,p'}(G)` exactly in `O_p(G)`: the quotient
 `O_{p,p'}(G)/O_p(G)` is a `p'`-group, so it can absorb nothing more of `S`. -/
