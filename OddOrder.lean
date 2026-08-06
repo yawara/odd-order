@@ -261,6 +261,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
 import OddOrder.GroupTheory.RepresentationTheory.CharacterOrderFour
 import OddOrder.GroupTheory.CentralSylowComplement
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainBlockOfIrr
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockConnected
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInverse
