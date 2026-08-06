@@ -3815,6 +3815,49 @@ p.141 の (3)(4)(5) が揃ったので、次は原文 p.142 の中核:
    内積表を仮定して 3 本の `u_j` の内積表を出す)。
 3. その後 p.143 の `(D^t_j)_3` の決定 → (6)(7)。
 
+### ✅ 段 325 完了 (2026-08-06) — p.142 の半和列の内積表。**p.142 は 2 file で尽きた**
+
+`Algebra/HalfSumColumns.lean`: `dotProduct_of_halfSum` / `dotProduct_degree_of_halfSum`。
+`a = D^y_0`、`b,c,d = D^t_0,D^t_1,D^t_2` の内積表 (`(a,a)=(b,b)=(c,c)=(d,d)=4`,
+`(b,c)=(b,d)=(c,d)=2`, `(a,b)=(a,c)=(a,d)=0`) と次数列 `g` の直交から、
+`2u_1 = a+b−c−d` / `2u_2 = a+b−c+d` / `2u_3 = a+b+c−d` について
+**`(u_i,u_j) = 1 + 2δ_ij`、`(g,u_i) = 0`、`(a,u_i) = 2`**。
+
+⚠ 4 つ目の符号 `(+,+)` は除外される: ノルムは `16 + 4(εc+εd+εcεd)` で `(1,1)` のみ `28` (= 7)。
+
+⚠ 実装知見: 3 本を `Fin 3` 添字の族にまとめ、符号を `![-1,-1,1]` / `![-1,1,-1]` の
+ベクトル記法で担がせると 9 通りの `(i,j)` が展開補題 1 本の instance で片付く。
+`![…]` は `Mathlib.Data.Fin.VecNotation`、`fin_cases` は `Mathlib.Tactic.FinCases` の
+import が要る (無いと `![-1,-1,1]` が `Bool` の `!` として parse され、
+"List ?m … but is expected to have type Bool" という無関係に見えるエラーになる)。
+
+⟹ **段 324 + 段 325 で p.142 の数学は尽きた** (どちらも表現論を含まない ℤ 上の補題)。
+
+### ⏭ 段 326 の着手点 — 段 324/325 の**仮説の供給**
+
+残るのは表現論側から 8 種の入力を作ること。**7 種は所在確定、1 種は要確認**:
+
+| 入力 | supplier | 状態 |
+|---|---|---|
+| `(D^t_i,D^t_j) = 2(1+δ)` | (7.5)(c) `sum_mul_basicDecompositionNumber_eq_cartanMatrix` × 段 322 | ✅ 2 行の合成 |
+| `(D^y_0,D^t_j) = 0` | 段 323 `sum_mul_basicDecompositionNumber_eq_zero` | ✅ |
+| `(χ(1),D^t_j) = 0` | 段 323 `sum_mul_basicDecompositionNumber_left_eq_zero` | ✅ |
+| `(D^y_0,D^y_0) = 4` | "analysis at y" の Cartan `(4)` = 段 185 | ✅ |
+| `(χ(1),D^y_0) = 0` | 弱ブロック直交 = 段 195 | ✅ |
+| `D^t_0` の先頭 = 1、`D^t_1,D^t_2` の先頭 = 0 | 一般化分解数の一意性 (原文 p.141: `d^t_{00}=1, d^t_{01}=d^t_{02}=0`) | ⚠ **要実測** |
+| `D^y_0` の先頭 = 1 | 同上 (`χ_0 = 1_G`) | ⚠ **要実測** |
+| **`2 ∣ (a+b+c+d)`** (半和が整数列) | `ξ(t) ≡ ξ(y) mod 2` = 段 289 + `ψ_i(1)` が奇数 | ✅ **確認済** |
+
+✅ **「`ψ_i(1)` が奇数」は供給できる (2026-08-06 実測)**:
+`PrincipalBlockInvolution.card_modEq_character_involution` (`.lean:569`) が
+`χ_j(1) ≡ χ_j(t) [ZMOD 4]` を与え、`χ_j(t) = ±1` (段 (7.2)) なので `χ_j(1)` は奇数。
+仮説の `P` (位数 4 で非単位元がすべて `p`-特異) は Klein four Sylow ゆえ満たされる。
+⟹ **前段で flag した唯一の未知は解消**。
+
+⟹ 次の実装単位 = **`d^t_{00} = 1`, `d^t_{01} = d^t_{02} = 0`, `d^y_{00} = 1` の供給**
+(一般化分解数の一意性; 自明指標の `p`-section 値から出るはず)。着手時に
+`GeneralizedDecomposition*` を実測すること。その後 p.143 の `(D^t_j)_3` 決定 → (6)(7)。
+
 #### 最終組み立ての形 (2026-08-06 実測)
 
 `hconv` の discharge は**既存の**
