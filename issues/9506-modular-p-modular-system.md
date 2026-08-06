@@ -2885,10 +2885,29 @@ BS の鎖が長らく**仮説として持ち回っていた**もののうち、s
 | `hζ`/`hζk`/`hζK` | `exists_pow_eq_one_residue_eq_one_padicComplexInt` (ℂ_[p] の原始 p 乗根) | 292 |
 | `hlin`/`hnil` | `exists_splitting_datum` (旧 `exists_surjective_blocks_card_eq` は両方落としていた) | 293 |
 
-⟹ **残る未供給仮説は `hconv`** (`inducedBlockOfCentralizer … = principalBlock → b = principalBlock`
-= Brauer 第 3 主定理の収束条件) **と、datum 一式を実際に `obtain` して組む assembly**。
+⟹ **残るは `hconv` と、datum 一式を実際に `obtain` して組む assembly**。
 `hp`/`hx`/`hω`/`hω'`/`e`/`eG`/`Invertible` は既に supplier がある
 (`exists_isPrimitiveRoot_padicComplexInt` / `exists_algEquiv_pi_matrix_padicComplex` / 標数 0)。
+
+### `hconv` は gap ではなく assembly (2026-08-06 実測)
+
+`hconv` (= Brauer 第 3 主定理の逆向き) の**本体は既に在る**:
+`SecondMainPrincipalBlock.eq_principalBlock_of_inducedBlockOfCentralizer_eq`
+(Külshammer route の `eq_principalBlock_of_inducedBlockOfNormalizer_eq_intermediate` を
+`Q = ⟨x⟩` / `H = C_G(x)` に特殊化したもの)。⟹ **新しい数学は要らない**。
+
+ただし `∀ b, … → b = principalBlock` の形 (= `hconv` そのもの) にするには 3 つ供給が要る:
+1. `hB` / `hBH` — ブロック冪等元の族 `F'` with `blockCharacterPi (F' B) = Pi.single B 1`。
+   `MatrixModule.exists_completeOrthogonalIdempotents_block` (`Algebra/BlockIdempotent:183`)
+   が出す。**ほぼ機械的**。
+2. `hcoeff` — `e_{B₀}^G(g) = e_{b₀}^{C_G(x)}(g)`。本体は
+   `KulshammerThirdMain.coeff_principalBlock_eq_centralizer_intermediate` だが、
+   ⚠ **こちらが仮説を大量に持つ** (`hidemH`/`hfH`/`hBH`/`hweakH`/`hvanishH` +
+   両側の Sylow + 𝒪 側への持ち上げ)。⟹ **ここが本当の assembly コスト**。
+3. `C_G(⟨x⟩)` と `centralizerOf x` の項の同一視 (同じ部分群だが syntactic に別)。
+
+⟹ 次に着手するときは **2 の `hweakH`/`hvanishH`/`hfH` の supplier から**当たること。
+
 - "Analysis at t" (p.141-142): `C_G(t)/⟨t⟩` が Klein four Sylow-2 ⟹ (7.4) の basic set、
   (7.6) で `C_G(t)` へ持ち上げ、(7.5) で `d^t` の列。**整数性は issue 9508 で完済**
   (`intBasicSetMatrix` / `sum_intBasicSetMatrix_mul_cartanMatrix`)。
