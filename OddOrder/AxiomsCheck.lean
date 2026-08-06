@@ -19667,3 +19667,25 @@ modular 鎖は `K = ℂ_[p]` と `wedderburnRepresentation` を使う — **係�
 
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.odd_orderOf_mul_of_involution_of_unique_involution
+
+/-! 🎯 **issue 9506 段 329**: (5.10) の前半を抽出 — 残タスク D を消した部品。
+
+`BlockPartVanishing.sum_ordinaryCoeff_mul_generalizedDecompositionNumber_eq_zero` —
+`θ = ∑_χ c_χ χ` が `x` の `p`-section 上で消えるなら
+**`∑_χ c_χ d^x_{χμ} = 0` が全ての `μ ∈ IBr(C_G(x))` で成立**。
+
+`θ(xy) = ∑_μ (∑_χ c_χ d^x_{χμ}) μ(y)` (一般化分解数の定義) と
+`IBr(C_G(x))` の一次独立性 (`BrauerBasis`) だけで出る。
+
+⚠ **(5.10) 本体より仮説がずっと少ない** — 第二主定理も `K C_G(x)` の通常分裂
+(`eH`/`hnilH`/`hζ`/`hω`) も要らない。`omit` で
+`IsIntegrallyClosed`/`IsAlgClosed (FractionRing 𝒪)`/`FaithfulSMul`/`DecidableEq (ConjClasses G)`
+も落ちた。`blockPart_eq_zero_of_forall_pSection` はこれを呼ぶ形に書き換え済 (証明は 1 本)。
+
+⟹ **これが原文 p.144 の「3×3 可逆行列」を不要にする**: 係数が**全ての `μ` について
+一斉に 0** になるので、`α,β,γ` を解いて `u_1` を 2-特異列の結合に書く必要が無い。
+その先は 段 323 (`sum_mul_basicDecompositionNumber_left_eq_zero`) と
+段 325 (`two_mul_sum_mul_of_halfSum`) がそのまま噛み合う。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_ordinaryCoeff_mul_generalizedDecompositionNumber_eq_zero

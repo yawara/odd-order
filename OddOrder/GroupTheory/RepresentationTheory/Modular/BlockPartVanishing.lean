@@ -32,6 +32,9 @@ particular on the `p`-section of `g_p` when `g_p` and `h_p` are not conjugate.
 
 ## Main results
 
+* `OddOrder.RepresentationTheory.Modular`
+  `.sum_ordinaryCoeff_mul_generalizedDecompositionNumber_eq_zero` — the first half of (5.10):
+  all the generalized decomposition sums vanish
 * `OddOrder.RepresentationTheory.Modular.blockPart_eq_zero_of_forall_pSection` — Navarro (5.10)
 * `OddOrder.RepresentationTheory.Modular.sum_character_blockOfIrr_eq_zero` — Navarro (5.11)
 -/
@@ -58,6 +61,64 @@ variable {ιH : Type*} {mH : ιH → Type*} [∀ i, Fintype (mH i)] [∀ i, Deci
 -- `Bl(G)`
 variable {ιG : Type*} {nnG : ιG → Type*} [∀ i, Fintype (nnG i)] [∀ i, DecidableEq (nnG i)]
   [Finite ιG] [∀ i, Nonempty (nnG i)]
+
+omit [IsIntegrallyClosed 𝒪] [IsAlgClosed (FractionRing 𝒪)] [FaithfulSMul 𝒪 K]
+  [DecidableEq (ConjClasses G)] in
+set_option linter.unusedFintypeInType false in
+open scoped Classical in
+/-- **A class function vanishing on the `p`-section of `x` has all its generalized decomposition
+sums zero.**
+
+Writing `θ = ∑_χ c_χ χ` in `Irr(G)` and each `χ(x y) = ∑_μ d^x_{χμ} μ(y)` gives
+
+`θ(x y) = ∑_μ (∑_χ c_χ d^x_{χμ}) μ(y)`  for `p`-regular `y ∈ C_G(x)`,
+
+and `x y` runs over the `p`-section of `x`, where `θ` vanishes.  Linear independence of
+`IBr(C_G(x))` then kills every coefficient.
+
+This is the first half of Navarro (5.10) — the half that needs neither the second main theorem
+nor the ordinary splitting of `K C_G(x)`.  Navarro's Brauer–Suzuki argument on p. 144 uses it
+directly: it is what makes the "elementary linear algebra" step with an invertible `3 × 3` matrix
+unnecessary, since the coefficients vanish for *every* `μ` at once. -/
+theorem sum_ordinaryCoeff_mul_generalizedDecompositionNumber_eq_zero (hp : p.Prime) {x : G}
+    [Fintype ↥(centralizerOf x)]
+    (e : MonoidAlgebra K G ≃ₐ[K] ∀ i, Matrix (m i) (m i) K)
+    {π : MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf x) →+*
+      ∀ j, Matrix (nn j) (nn j) (ResidueField 𝒪)}
+    (hπ : Function.Surjective π)
+    (hlin : ∀ (c : ResidueField 𝒪) (a : MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf x)),
+      π (c • a) = c • π a)
+    (hkerJ : RingHom.ker π = Ring.jacobson (MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf x)))
+    {ω' : ResidueField 𝒪} (hω' : IsPrimitiveRoot ω' (pRegularExponent p ↥(centralizerOf x)))
+    (θ : G → K) (hθ : ∀ g h : G, IsConj g h → θ g = θ h)
+    (hvanish : ∀ u ∈ pSection p x, θ u = 0) (hx : IsPElement p x) (j : ι) :
+    ∑ i, ordinaryCoeff e θ hθ i * generalizedDecompositionNumber (𝒪 := 𝒪) (nn := nn) x hp hω'
+        hπ hlin hkerJ (wedderburnRepresentation e i).character
+        (fun _ _ hgh => character_eq_of_isConj (wedderburnRepresentation e i) hgh) j = 0 := by
+  classical
+  set d : ι' → ι → K := fun i =>
+    generalizedDecompositionNumber (𝒪 := 𝒪) (nn := nn) x hp hω' hπ hlin hkerJ
+      (wedderburnRepresentation e i).character
+      (fun _ _ hgh => character_eq_of_isConj (wedderburnRepresentation e i) hgh) with hd
+  set c : ι' → K := ordinaryCoeff e θ hθ with hc
+  have hexp : ∀ y : ↥(centralizerOf x), IsPRegular p y →
+      ∑ j, (∑ i, c i * d i j) * algebraMap 𝒪 K
+        (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π j y) = θ (x * (y : G)) := by
+    intro y hy
+    rw [Finset.sum_congr rfl fun j _ => Finset.sum_mul _ _ _, Finset.sum_comm,
+      ← sum_ordinaryCoeff e θ hθ (x * (y : G))]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    rw [← sum_generalizedDecompositionNumber (𝒪 := 𝒪) (nn := nn) x hp hω' hπ hlin hkerJ
+        (wedderburnRepresentation e i).character
+        (fun _ _ hgh => character_eq_of_isConj (wedderburnRepresentation e i) hgh) hy,
+      Finset.mul_sum]
+    exact Finset.sum_congr rfl fun j _ => mul_assoc _ _ _
+  have hkey := eq_zero_of_sum_algebraMap_irreducibleBrauerCharacter (K := K) hp hω' hπ hlin
+    hkerJ (fun j => ∑ i, c i * d i j) fun y hy => by
+      rw [hexp y hy]
+      exact hvanish _ (mul_mem_pSection hp ((Subgroup.mem_centralizer_iff.mp y.2) x rfl) hx
+        (isPRegular_coe hy))
+  exact congrFun hkey j
 
 set_option maxHeartbeats 1600000 in
 -- The statement carries the two ordinary splittings, the two modular splittings and the block
@@ -123,13 +184,9 @@ theorem blockPart_eq_zero_of_forall_pSection (hp : p.Prime) {x : G} (hx : IsPEle
       Finset.mul_sum]
     exact Finset.sum_congr rfl fun j _ => mul_assoc _ _ _
   -- independence of `IBr(C_G(x))` pins the coefficients to zero
-  have hzero : ∀ j, ∑ i, c i * d i j = 0 := by
-    have hkey := eq_zero_of_sum_algebraMap_irreducibleBrauerCharacter (K := K) hp hω' hπ hlin
-      hkerJ (fun j => ∑ i, c i * d i j) fun y hy => by
-        rw [hexp y hy]
-        exact hvanish _ (mul_mem_pSection hp ((Subgroup.mem_centralizer_iff.mp y.2) x rfl) hx
-          (isPRegular_coe hy))
-    exact fun j => congrFun hkey j
+  have hzero : ∀ j, ∑ i, c i * d i j = 0 := fun j =>
+    sum_ordinaryCoeff_mul_generalizedDecompositionNumber_eq_zero hp e hπ hlin hkerJ hω' θ hθ
+      hvanish hx j
   -- the sums restricted to `Irr(B)` vanish too
   have hfilter : ∀ j : ι,
       ∑ i ∈ Finset.univ.filter (fun i => blockOfIrr e hπG hlinG hnilG i = B), c i * d i j = 0 := by
