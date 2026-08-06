@@ -19205,3 +19205,19 @@ modular 側が要求する `IsAlgClosed (ResidueField ·)` と `CharP (ResidueFi
 (= Brauer の分裂体定理も Schur 指数も不要)。 -/
 
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.Modular.eq_zero_of_vecMul_map
+
+/-! 🎯🎯 **issue 9506 段 310**: Brauer 指標表の一次独立性が `Frac 𝒪` を要らなくなった
+(`eq_zero_of_vecMul_brauerCharacterMatrix{,_fractionRing}`, `Modular/BrauerBasis`)。
+
+段 309 の (a) 側 + 合成。`_fractionRing` 版が従来の証明
+(`IsLocalization.exist_integer_multiples_of_finite` で共通分母を払う) をそのまま持ち、
+一般版は「行列の成分は `algebraMap 𝒪 K` の像 ⟹ 一意の埋め込み `Frac 𝒪 ↪ K`
+(`IsFractionRing.lift`) に沿った `map`」と見て段 309 で移す。
+
+⟹ **`BrauerBasis` の binder が `[IsFractionRing 𝒪 K]` → `[FaithfulSMul 𝒪 K]` に弱まった**
+(`IsFractionRing` から `FaithfulSMul` は priority-100 instance なので下流は無変更で通る —
+フルビルド 5413 jobs green で確認)。repo 中 `IsLocalization` の実使用はこれが唯一だったので、
+**鎖全体から `IsFractionRing` を外す障害はもう無い**。残りは 53 file の binder 掃除。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_zero_of_vecMul_brauerCharacterMatrix_fractionRing

@@ -80,7 +80,7 @@ theorem eq_zero_of_vecMul_map {F L ι' κ : Type*} [Field F] [Field L] [Algebra 
 
 variable {p : ℕ} {𝒪 K : Type*} [CommRing 𝒪] [IsDomain 𝒪] [ValuationRing 𝒪]
   [HenselianLocalRing 𝒪] [IsPModularSystem p 𝒪]
-  [Field K] [Algebra 𝒪 K] [IsFractionRing 𝒪 K]
+  [Field K] [Algebra 𝒪 K] [FaithfulSMul 𝒪 K]
 variable {G ι : Type*} [Group G] [Finite G] {nn : ι → Type*}
   [∀ i, Fintype (nn i)] [∀ i, DecidableEq (nn i)] [Finite ι] [Fintype ι] [DecidableEq ι]
   [∀ i, Nonempty (nn i)]
@@ -90,7 +90,7 @@ variable (hp : p.Prime) {ω : ResidueField 𝒪} (hω : IsPrimitiveRoot ω (pReg
   (hlin : ∀ (c : ResidueField 𝒪) (a : MonoidAlgebra (ResidueField 𝒪) G), π (c • a) = c • π a)
   (hkerJ : RingHom.ker π = Ring.jacobson (MonoidAlgebra (ResidueField 𝒪) G))
 
-omit [IsDomain 𝒪] [ValuationRing 𝒪] [Field K] [Algebra 𝒪 K] [IsFractionRing 𝒪 K]
+omit [IsDomain 𝒪] [ValuationRing 𝒪] [Field K] [Algebra 𝒪 K] [FaithfulSMul 𝒪 K]
   [Fintype ι] [DecidableEq ι] in
 include hp hπ hlin hkerJ in
 /-- Every `p`-regular element is conjugate to one of the chosen class representatives. -/
@@ -108,35 +108,40 @@ noncomputable def brauerCharacterMatrix : Matrix ι ι K := fun φ j =>
   algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π φ
     (pRegularRep hp hπ hlin hkerJ j))
 
-omit [DecidableEq ι] in
+omit [Field K] [Algebra 𝒪 K] [FaithfulSMul 𝒪 K] [DecidableEq ι] in
 include hp hω hπ hlin hkerJ in
-/-- **The rows of the Brauer character table are independent over `K`.**  Independence over `𝒪` is
-`eq_zero_of_sum_irreducibleBrauerCharacter_ringHom`; a relation over `K` becomes one over `𝒪`
-after multiplying by a common denominator. -/
-theorem eq_zero_of_vecMul_brauerCharacterMatrix {d : ι → K}
-    (hd : d ᵥ* brauerCharacterMatrix (K := K) hp hπ hlin hkerJ = 0) : d = 0 := by
+/-- **The rows of the Brauer character table are independent over `Frac 𝒪`.**  Independence over
+`𝒪` is `eq_zero_of_sum_irreducibleBrauerCharacter_ringHom`; a relation over `Frac 𝒪` becomes one
+over `𝒪` after multiplying by a common denominator.
+
+This is the *only* place in the modular theory where the coefficient field has to be the fraction
+field of `𝒪`; `eq_zero_of_vecMul_brauerCharacterMatrix` transports it to an arbitrary extension. -/
+theorem eq_zero_of_vecMul_brauerCharacterMatrix_fractionRing {d : ι → FractionRing 𝒪}
+    (hd : d ᵥ* brauerCharacterMatrix (K := FractionRing 𝒪) hp hπ hlin hkerJ = 0) : d = 0 := by
   classical
-  have hinj : Function.Injective (algebraMap 𝒪 K) := IsFractionRing.injective 𝒪 K
+  have hinj : Function.Injective (algebraMap 𝒪 (FractionRing 𝒪)) :=
+    IsFractionRing.injective 𝒪 (FractionRing 𝒪)
   obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors 𝒪) d
   simp only [IsLocalization.IsInteger] at hb
   choose c hc using hb
-  -- `hc i : algebraMap 𝒪 K (c i) = (b : 𝒪) • d i`
+  -- `hc i : algebraMap 𝒪 (Frac 𝒪) (c i) = (b : 𝒪) • d i`
   have hrel : ∀ g : G, IsPRegular p g →
       ∑ i, c i * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π i g = 0 := by
     intro g hg
     obtain ⟨j, hj⟩ := exists_isConj_pRegularRep hp hπ hlin hkerJ hg
     refine hinj ?_
     rw [map_sum, map_zero]
-    have hterm : ∀ i : ι, algebraMap 𝒪 K
+    have hterm : ∀ i : ι, algebraMap 𝒪 (FractionRing 𝒪)
         (c i * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π i g)
-        = algebraMap 𝒪 K (b : 𝒪) *
-          (d i * brauerCharacterMatrix (K := K) hp hπ hlin hkerJ i j) := by
+        = algebraMap 𝒪 (FractionRing 𝒪) (b : 𝒪) *
+          (d i * brauerCharacterMatrix (K := FractionRing 𝒪) hp hπ hlin hkerJ i j) := by
       intro i
       rw [map_mul, hc i, Algebra.smul_def, brauerCharacterMatrix,
         irreducibleBrauerCharacter_eq_of_isConj (𝒪 := 𝒪) i hj]
       ring
     rw [Finset.sum_congr rfl fun i _ => hterm i, ← Finset.mul_sum]
-    have hzero : ∑ i, d i * brauerCharacterMatrix (K := K) hp hπ hlin hkerJ i j = 0 :=
+    have hzero :
+        ∑ i, d i * brauerCharacterMatrix (K := FractionRing 𝒪) hp hπ hlin hkerJ i j = 0 :=
       congrFun hd j
     rw [hzero, mul_zero]
   have hc0 := eq_zero_of_sum_irreducibleBrauerCharacter_ringHom hp hω hπ hlin hkerJ c hrel
@@ -144,9 +149,34 @@ theorem eq_zero_of_vecMul_brauerCharacterMatrix {d : ι → K}
   have hi := hc i
   rw [hc0] at hi
   rw [Pi.zero_apply, map_zero, Algebra.smul_def] at hi
-  have hbne : algebraMap 𝒪 K (b : 𝒪) ≠ 0 := fun h =>
+  have hbne : algebraMap 𝒪 (FractionRing 𝒪) (b : 𝒪) ≠ 0 := fun h =>
     (nonZeroDivisors.coe_ne_zero b) (hinj (by rw [h, map_zero]))
   exact (mul_eq_zero.mp hi.symm).resolve_left hbne
+
+omit [DecidableEq ι] in
+include hp hω hπ hlin hkerJ in
+/-- **The rows of the Brauer character table are independent over `K`**, for *any* field `K` into
+which `𝒪` embeds — `K` need not be the fraction field.
+
+The entries lie in the image of `𝒪`, so the matrix is defined over `Frac 𝒪`; the previous lemma
+gives independence there and `eq_zero_of_vecMul_map` carries it along the (unique) embedding
+`Frac 𝒪 ↪ K`.  This is what lets the coefficient field be taken algebraically closed, where the
+Wedderburn splitting of `K[G]` is free (issue 9506). -/
+theorem eq_zero_of_vecMul_brauerCharacterMatrix {d : ι → K}
+    (hd : d ᵥ* brauerCharacterMatrix (K := K) hp hπ hlin hkerJ = 0) : d = 0 := by
+  classical
+  have hinj : Function.Injective (algebraMap 𝒪 K) := FaithfulSMul.algebraMap_injective 𝒪 K
+  letI : Algebra (FractionRing 𝒪) K := (IsFractionRing.lift hinj).toAlgebra
+  have halg : ∀ x : 𝒪, algebraMap (FractionRing 𝒪) K (algebraMap 𝒪 (FractionRing 𝒪) x)
+      = algebraMap 𝒪 K x := fun x => IsFractionRing.lift_algebraMap hinj x
+  have hmap : brauerCharacterMatrix (K := K) hp hπ hlin hkerJ
+      = (brauerCharacterMatrix (K := FractionRing 𝒪) hp hπ hlin hkerJ).map
+        (algebraMap (FractionRing 𝒪) K) := by
+    funext φ j
+    exact (halg _).symm
+  rw [hmap] at hd
+  exact eq_zero_of_vecMul_map
+    (fun c hc => eq_zero_of_vecMul_brauerCharacterMatrix_fractionRing hp hω hπ hlin hkerJ hc) hd
 
 include hp hω hπ hlin hkerJ in
 /-- **The Brauer character table is invertible**: it is square (`|IBr(G)| = #cl(G°)`) with
