@@ -5390,3 +5390,72 @@ theorem mk_eq_principalBlock_quotientPi_of_mem [Fact p.Prime] {μ : ι}
    供給して 段 340 `exists_proper_normal_of_columns` を呼ぶ ⟹ `q8_exists_proper_normal`。
 
 段 340 の 9 種の仮説はすべて supplier 確定済で、残るのは配線のみ。
+
+### ✅ 段 366 完了 (2026-08-07) — ⚠ **段 340 の `hT`/`hcong` は充足不能だった** (修正)
+
+`hT` に取り掛かる前に supplier の実在を検算したところ、**段 340 の仮説が 2 本
+supply できない形**になっていた ([[check-hypothesis-satisfiability-before-building-on-it]])。
+
+* 列添字は `Irr(G)` 全体 (部分型回避のための意図的設計)。
+* `k ∉ Irr(B₀(G))` では 4 本の列 `a,b,c,d` は第二主定理で消えるが、
+  **`Tval k = χ_k(t)` は消えない** (消えるのは defect 0 のブロックだけ)。
+* ⟹ `hT k : Tval k = b k + s₁ c k + s₂ d k` は `χ_k(t) = 0` を要求してしまう。
+  `hcong k : 2 ∣ a k + Tval k` も同様に `2 ∣ χ_k(t)` を要求する。
+* 原文 p.141 の展開は `χ ∈ Irr(B₀)` でしか成り立たない (段 350 で確認済) から当然。
+
+**修正**: 述語 `Q` (適用時は `blockOfIrr eG χ = B₀(G)`) を導入し
+
+| 旧 | 新 |
+|---|---|
+| `hT : ∀ k, …` | `hT : ∀ k, Q k → …` |
+| `hcong : ∀ k, …` | `hcong : ∀ k, Q k → …` |
+| — | `hzero : ∀ k, ¬ Q k → a k = 0 ∧ b k = 0 ∧ c k = 0 ∧ d k = 0` |
+
+`Q = fun _ => True` で旧版に戻るので**真の一般化**。⚠ 内積表 (`haa`…`hgd`) は
+`Irr(G)` 全体のままでよい (列が外で消えるので和が同じ) — `Irr(B₀)` の部分型に
+切り替えると内積 10 本の全てに `hzero` が要るので、こちらが軽い。
+
+* `two_dvd_sum_of_odd_degrees` — `¬ Q k` では 4 列とも 0 ゆえ自明。
+* `exists_eq_of_columns` — `hT` が要るのは `u₁` の台の 2 点だけで、
+  `2 u₁ k = a+b−c−d` ゆえ `u₁ k ≠ 0 ⟹ Q k`。
+* `sign_relation_six` / `exists_sign_relations` — `hT` を 2 点 `hTi`/`hTj` へ弱めた。
+
+併せて 段 346 の 3 項展開を 段 350 の台限定版の上に載せ替え。
+
+### ✅ 段 367-369 完了 (2026-08-07) — `hT` / `hzero` / `hb0`-`hd0` の supplier
+
+`Modular/InvolutionColumnExpansion.lean` (新, 404 行)。
+
+| 定理 | 段 340 の仮説 |
+|---|---|
+| `character_eq_add_add_basicDecompositionNumber` | 🎯 `hT` |
+| `basicDecompositionNumber_eq_zero_of_blockOfIrr_ne` | `hzero` の `b`/`c`/`d` 側 |
+| `basicDecompositionNumber_trivial_eq_ite` | 🎯 `hb0`/`hc0`/`hd0` |
+
+* **`hT`** = 段 366 (3 項化+台限定) + 段 351 (`hu`) + 段 365 (`hd`) + 段 331
+  (`ψ₀(1) = 1` ゆえ第 1 項に係数が付かない)。`u = 1` が使えるのは `1` が `p`-正則で
+  `x·1 = x` だから。
+* **`hzero`** の `a` 側は既存
+  (`generalizedDecompositionNumber_principalBlock_eq_zero_of_blockOfIrr_ne`;
+  `φ₀` が section variable なので主ブロックの任意の `μ` にそのまま適用できた)。
+  `b`/`c`/`d` 側は `U_{μl} ≠ 0 ⟹ μ ∈ IBr(B₀(Q))` (`A` のブロック対角性) →
+  (7.6) 易しい向き → 第二/第三主定理。
+* **`hb0`-`hd0`** は 段 331 の `eq_ite_of_sum_principalBasicSet_eq_one` に自明指標の
+  展開を食わせるだけ。⚠ 段 331 は商群の**全ての** `p`-正則類を要求するので
+  `exists_isPRegular_mk_eq` (既存) で `C_G(t)` 側から持ち上げる。
+
+⚠ **実装知見**: section variable が 30 本超の補題の適用は**名前付き引数** (`(hπ := hπ)`)
+で書く。引数順は `include` の並びでなく `variable` の**宣言順**なので positional は外す。
+
+### ⏭ 段 370 — 残るは **ℤ への降下 + 5 群 datum の組み立て**
+
+段 340 の 9 種の仮説は**すべて K 上で supplier が揃った**。残作業は
+
+1. **ℤ 降下**: `exists_intCast_generalizedDecompositionNumber` (段 333b) +
+   `intCast_basicDecompositionNumber` (段 333c) で 4 列を ℤ 列として `choose` し、
+   `sum_mul_eq_of_intCast` で内積 10 本と `hT`/`hb0`-`hd0` を ℤ へ移す。
+2. **5 群 datum**: `G`/`C_G(t)`/`C_G(t)/⟨t⟩`/`C_{C_G(t)/⟨t⟩}(ȳ)`/`C_G(y)` を
+   `exists_datum_padicComplex` (段 344) で obtain。
+3. **群論的仮説**: 段 338 (Q₈ の対合一意) / 段 339 (`C_G(t)/⟨t⟩` の 2-元は対合) /
+   段 290-291 / 段 321b。
+4. `exists_proper_normal_of_columns` を呼ぶ ⟹ `q8_exists_proper_normal`。
