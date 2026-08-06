@@ -77,6 +77,15 @@ theorem blockCharacter_principalBlock :
     blockCharacter π hπ hlin (principalBlock π hπ hlin hnil) = aug :=
   blockCharacter_blockOfCentralCharacter π hπ hlin hnil _
 
+/-- **A Brauer character whose central character is the augmentation lies in `B_0`.**  This is the
+converse reading of the definition, and it is how the trivial representation is recognised: the
+group algebra acts on it through the augmentation (`asAlgebraHom_trivial`), so every irreducible
+Brauer constituent of its reduction has central character `aug`. -/
+theorem mk_eq_principalBlock_of_centralCharacterAlg_eq (i : ι)
+    (h : centralCharacterAlg π i hπ hlin = aug) :
+    Quotient.mk (blockSetoid π hπ hlin) i = principalBlock π hπ hlin hnil :=
+  eq_blockOfCentralCharacter π hπ hlin hnil ((blockCharacter_mk π hπ hlin i).trans h)
+
 end PrincipalBlock
 
 end OddOrder.RepresentationTheory.Modular

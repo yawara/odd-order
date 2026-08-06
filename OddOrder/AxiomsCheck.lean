@@ -19006,3 +19006,13 @@ Külshammer の公式と第 3 主定理が `𝒪` 側で持ち回る 3 仮説
 `hvanishH` を任意の `B ≠ B₀` に降ろすのに使う (`hne` の discharge)。 -/
 
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.Modular.asAlgebraHom_trivial
+
+/-! 🎯 **issue 9506 段 297**: 中心指標が増大射なら主ブロック
+(`mk_eq_principalBlock_of_centralCharacterAlg_eq`, `Modular/PrincipalBlock`)。
+
+`principalBlock` の定義 (中心指標 = 増大射) の逆読み。段 296 の
+`asAlgebraHom_trivial` と組むと「自明表現の還元の既約 Brauer 構成因子は全て主ブロック」
+が出る。これが `hvanishH` の `hne` を潰す最後の部品。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.mk_eq_principalBlock_of_centralCharacterAlg_eq
