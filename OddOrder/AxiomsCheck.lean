@@ -323,6 +323,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBloc
 import OddOrder.Algebra.SumSquaresFour
 import OddOrder.Algebra.ThreeNormColumn
 import OddOrder.Algebra.HalfSumColumns
+import OddOrder.Algebra.SignRelationSolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockBasicSet
 import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
@@ -19592,3 +19593,29 @@ import が要る (無いと `![-1,-1,1]` が `Bool` の `!` として parse さ�
 #assert_only_allowed_axioms OddOrder.Algebra.dotProduct_of_halfSum
 
 #assert_only_allowed_axioms OddOrder.Algebra.dotProduct_degree_of_halfSum
+
+/-! 🎯🎯 **issue 9506 段 326**: BS 証明の**最後の一歩** — 3 本の符号関係から `χ_1(t) = χ_1(1)`。
+
+`Algebra.eq_of_sign_relations` (`SignRelationSolution`)。原文 p.145:
+
+* (6) `1 + δ_1χ_1(t) − δ_2χ_2(t) = 0`
+* (7) `1 + δ_1χ_1(1) + δ_2χ_2(1) = 0`
+* (10) `χ_1(1)χ_2(1) + δ_1χ_1(t)²χ_2(1) + δ_2χ_2(t)²χ_1(1) = 0`
+
+(6)(7) を `χ_2(t)` / `χ_2(1)` について解いて (10) に代入すると
+**`−δ_2δ_1(χ_1(1) − χ_1(t))² = 0`** に潰れる ⟹ `t ∈ ker χ_1`。
+`ker χ_1` が `q8_exists_proper_normal` の要求する真の正規部分群。
+
+⚠ **群論を含まない 6 元の環等式**として切り出した (側条件は `δ_i² = 1` のみ)。
+⚠ `linarith` は使えない (`R` は順序体でなく整域) — `sub_eq_zero.mp (pow_eq_zero_iff …)` で閉じる。
+
+📖 **原文 pp.144-145 の実読で確定 (2026-08-06)**: **BS の証明は p.145 で終わる**
+(p.145 後半の (7.7) と p.146 は Z\*-定理用で、issue 0147 のスコープ外)。
+(10) の出所は **Burnside の類和公式** (Isaacs *Characters* Problem (3.9)) を
+`t` の類に適用したもの — 「2 つの対合の積は奇位数」ゆえ 2-特異元はその積にならない。
+✅ **Burnside の公式は repo に在る**:
+`ClassSumCoefficientFormula.classSumCoeff_mul_centralizer_card_eq_sum_irreducibleCharacter`
+(`.lean:121`)。⚠ ただし `ℂ` と repo の `IrreducibleCharacter G` で述べられており、
+modular 鎖は `K = ℂ_[p]` と `wedderburnRepresentation` を使う — **係数体の橋渡しが要る**。 -/
+
+#assert_only_allowed_axioms OddOrder.Algebra.eq_of_sign_relations
