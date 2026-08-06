@@ -384,6 +384,20 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
       (hπG := hπG) (hlinG := hlinG) (hπ := hπW) (hlin := hlinW) (hkerJ := hkerJW)
       (hnil := hnilW) (hnilG := hnilG) (hζ := hζ) (hζk := hζk) (hζK := hζK) (hconv := hconvW)
       (hNp := hMWp) (hquot := hquotMW) (S := SylW) (hφ₀ := hφ₀W) (hj := hk)).symm
+  -- `χ(y) ≡ χ(t) mod 2` (段 289), hence `hcong`
+  obtain ⟨ωG', hωG'⟩ : ∃ v : ℂ_[2], IsPrimitiveRoot v (Nat.card G) :=
+    exists_isPrimitiveRoot_padicComplex 2 Nat.card_pos.ne'
+  have hcong : ∀ k, blockOfIrr eG hπG hlinG hnilG k = principalBlock πG hπG hlinG hnilG →
+      (2 : ℤ) ∣ (a k + Tval k) := by
+    intro k hk
+    refine OddOrder.Algebra.two_dvd_add_of_modEq ?_
+    exact OddOrder.RepresentationTheory.intModEq_of_isPElement_of_isPElement
+      (hm := Nat.card_pos) (hωm := hωG') (hgm := fun g => pow_card_eq_one')
+      (hω := hωG'.isIntegral Nat.card_pos) (hp := Nat.prime_two)
+      (hχ := OddOrder.RepresentationTheory.le_adjoinSpan
+        (mem_virtualCharacters_wedderburnRepresentation eG k))
+      (hu := hwP) (hv := hzP) (ha := (havaB k hk).symm) (hb := (hTval k).symm)
+      (hc := (character_one_eq_card eG k))
   sorry
 
 end OddOrder.GroupTheory
