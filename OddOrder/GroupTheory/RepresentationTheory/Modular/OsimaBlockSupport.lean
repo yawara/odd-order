@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ProjectiveCharacterVanishing
 
@@ -33,6 +34,8 @@ of `Φ_φ(g) = 0`, or it does not, in which case every term vanishes separately.
 ## Main results
 
 * `OddOrder.RepresentationTheory.Modular.sum_ordinaryCharacter_one_mul_eq_zero_of_not_isPRegular`
+* `OddOrder.RepresentationTheory.Modular.coeff_blockIdempotent_eq_zero_of_not_isPRegular` — the
+  form the block theory consumes
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -41,7 +44,7 @@ open IsLocalRing Matrix MonoidAlgebra OddOrder.GroupTheory
 
 variable {p : ℕ} {𝒪 K : Type*} [CommRing 𝒪] [IsDomain 𝒪] [ValuationRing 𝒪]
   [HenselianLocalRing 𝒪] [IsPModularSystem p 𝒪]
-  [Field K] [Algebra 𝒪 K] [IsFractionRing 𝒪 K] [FaithfulSMul 𝒪 K]
+  [Field K] [CharZero K] [Algebra 𝒪 K] [IsFractionRing 𝒪 K] [FaithfulSMul 𝒪 K]
 variable {G ι : Type*} [Group G] [Fintype G] [DecidableEq (ConjClasses G)]
   [Fintype (ConjClasses G)] {nn : ι → Type*}
   [∀ i, Fintype (nn i)] [∀ i, DecidableEq (nn i)] [Fintype ι] [∀ i, Nonempty (nn i)]
@@ -58,6 +61,7 @@ variable (hp : p.Prime) {ω : 𝒪} (hω : IsPrimitiveRoot ω (pRegularExponent 
     MatrixModule.blockCharacterPi π hπ hlin z = 0 → IsNilpotent z)
   (e : MonoidAlgebra K G ≃ₐ[K] ∀ j, Matrix (m j) (m j) K)
 
+omit [CharZero K] in
 open scoped Classical in
 include hp hω hω' hkerJ hnil in
 /-- **The `D`-column of a block, weighted by `χ(g)`, vanishes at a `p`-singular `g`.**
@@ -99,6 +103,7 @@ theorem sum_decompositionMatrix_mul_ordinaryCharacter_eq_zero (B : MatrixModule.
 
 -- `ι` indexes `IBr(G)`; it is summed over in the proof only, when `χ(1)` is expanded.
 set_option linter.unusedFintypeInType false in
+omit [CharZero K] in
 open scoped Classical in
 include hp hω hω' hkerJ hnil in
 /-- **Osima's theorem, vanishing half** — Navarro (3.8): for `g` `p`-singular,
@@ -144,5 +149,57 @@ theorem sum_ordinaryCharacter_one_mul_eq_zero_of_not_isPRegular
         refine Finset.sum_eq_zero fun φ _ => ?_
         rw [sum_decompositionMatrix_mul_ordinaryCharacter_eq_zero hp hω hω' hπ hlin hkerJ hnil e
           B φ hg, mul_zero]
+
+set_option maxHeartbeats 800000 in
+-- The block idempotent is compared across `𝒪`, `K` and `k` at once; the class-sum
+-- decidability is consumed by the block machinery in the proof.
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+open scoped Classical in
+include hp hω hω' hkerJ hnil e in
+/-- **Osima's theorem: a block idempotent vanishes at every `p`-singular element.**
+
+Over `K` the lift of `e_B` is `∑_{χ ∈ Irr(B)} e_χ` (`mapRingHom_blockIdempotent_eq_sum`), whose
+coefficient at `g` is `|G|⁻¹ ∑_{χ ∈ Irr(B)} χ(1) χ(g⁻¹)` — zero by the previous theorem, since
+`g⁻¹` is `p`-singular exactly when `g` is.  The coefficient of the lift is therefore zero in `𝒪`
+by injectivity, hence zero in `k` after reduction.
+
+This is what supplies `hcoeff` at the `p`-singular elements, where Külshammer's formula is
+unavailable. -/
+theorem coeff_blockIdempotent_eq_zero_of_not_isPRegular
+    {B : MatrixModule.Block π hπ hlin} {f : Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)}
+    (hidem : IsIdempotentElem f)
+    {f' : Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) G)}
+    (hf : MonoidAlgebra.mapRingHom G (residue 𝒪) (f : MonoidAlgebra 𝒪 G)
+      = (f' : MonoidAlgebra (ResidueField 𝒪) G))
+    (hB : MatrixModule.blockCharacterPi π hπ hlin f' = Pi.single B 1)
+    {g : G} (hg : ¬ IsPRegular p g) :
+    (f' : MonoidAlgebra (ResidueField 𝒪) G).coeff g = 0 := by
+  classical
+  have hginv : ¬ IsPRegular p g⁻¹ := by
+    unfold IsPRegular at hg ⊢
+    rwa [orderOf_inv]
+  -- the coefficient of the lift, read in `K`
+  have hK := mapRingHom_blockIdempotent_eq_sum e hπ hlin hnil hidem hf hB
+  have hcoeffK : algebraMap 𝒪 K ((f : MonoidAlgebra 𝒪 G).coeff g) = 0 := by
+    have hc := congrArg (fun x : MonoidAlgebra K G => x.coeff g) hK
+    rw [MonoidAlgebra.coeff_mapRingHom] at hc
+    rw [hc, MonoidAlgebra.coeff_finsetSum]
+    have hterm : ∀ i ∈ Finset.univ.filter
+          (fun i => blockOfIrr e hπ hlin hnil i = B),
+        (ordinaryIdempotent e i).coeff g
+          = ⅟(Nat.card G : K) * algebraMap 𝒪 K
+            (ordinaryCharacter (𝒪 := 𝒪) e i 1 * ordinaryCharacter (𝒪 := 𝒪) e i g⁻¹) := by
+      intro i _
+      rw [coeff_ordinaryIdempotent, map_mul, algebraMap_ordinaryCharacter,
+        algebraMap_ordinaryCharacter, mul_assoc]
+      rfl
+    rw [Finset.sum_congr rfl hterm, ← Finset.mul_sum, ← map_sum,
+      sum_ordinaryCharacter_one_mul_eq_zero_of_not_isPRegular hp hω hω' hπ hlin hkerJ hnil e B
+        hginv, map_zero, mul_zero]
+  -- descend to `𝒪`, then reduce
+  have hcoeff𝒪 : (f : MonoidAlgebra 𝒪 G).coeff g = 0 :=
+    FaithfulSMul.algebraMap_injective 𝒪 K (by rw [hcoeffK, map_zero])
+  rw [← hf, MonoidAlgebra.coeff_mapRingHom, hcoeff𝒪, map_zero]
 
 end OddOrder.RepresentationTheory.Modular

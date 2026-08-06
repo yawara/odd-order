@@ -19326,3 +19326,18 @@ Külshammer の公式が担ぐ `hweak` は**実質「`g` が `p`-正則」と同
   OddOrder.RepresentationTheory.Modular.sum_decompositionMatrix_mul_ordinaryCharacter_eq_zero
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_ordinaryCharacter_one_mul_eq_zero_of_not_isPRegular
+
+/-! 🎯 **issue 9506 段 318**: `hcoeff` の `p`-特異側 (`OsimaBlockSupport`)。
+
+`coeff_blockIdempotent_eq_zero_of_not_isPRegular` — **ブロック冪等元は `p`-特異元で係数 0**。
+
+段 317 と既存の `BlockIdempotentOrdinary.mapRingHom_blockIdempotent_eq_sum`
+(「ブロック冪等元の `K[G]` での像 = `∑_{χ ∈ Irr(B)} e_χ`」) の合成:
+`e_χ` の `g` 係数は `|G|⁻¹·χ(1)·χ(g⁻¹)` なので、段 317 を `g⁻¹` に適用して
+(`g` が `p`-特異 ⟺ `g⁻¹` が `p`-特異) `K` で 0 ⟹ 単射性で `𝒪` で 0 ⟹ 還元して `k` で 0。
+
+⟹ Külshammer の公式が使えない `p`-特異元での `hcoeff` が埋まった。
+残りは `p`-正則側 (Külshammer 経由、`hweak` は (5.11) から) との場合分け合成 → `hconv`。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.coeff_blockIdempotent_eq_zero_of_not_isPRegular
