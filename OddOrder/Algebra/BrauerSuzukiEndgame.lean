@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.Data.Int.ModEq
 import OddOrder.Algebra.BasicSetColumnShape
 import OddOrder.Algebra.HalfSumColumns
 import OddOrder.Algebra.SignRelationSolution
@@ -37,6 +38,8 @@ relation (10) is an identity between integers again.
 ## Main results
 
 * `OddOrder.Algebra.sign_relation_ten` — `(w, u_1) = 0` becomes Navarro's (10)
+* `OddOrder.Algebra.two_dvd_add_of_modEq`, `OddOrder.Algebra.odd_of_modEq_four` — the two
+  arithmetic bridges from the textbook congruences
 * `OddOrder.Algebra.exists_halfSum_columns` — the half-sums exist over `ℤ`
 * `OddOrder.Algebra.exists_eq_of_columns` — the whole endgame
 * `OddOrder.Algebra.exists_eq_of_columns_of_odd_degrees` — the same, from textbook inputs only
@@ -109,6 +112,32 @@ theorem sum_mul_halfSum_eq_zero {R : Type*} [CommRing R] [IsDomain R] {w a b c d
   ring
 
 /-! ### The half-sums are integer columns -/
+
+/-! #### Two arithmetic bridges to the textbook inputs -/
+
+/-- **`χ(t) ≡ χ(y) mod 2` is the congruence the half-sums need.**  Navarro's input (Gorenstein
+Lemma 7.5: two `p`-elements have congruent character values) is an `Int.ModEq`; the endgame asks
+for `2 ∣ χ(y) + χ(t)`, and the two differ by `2 χ(y)`. -/
+theorem two_dvd_add_of_modEq {x y : ℤ} (h : x ≡ y [ZMOD 2]) : (2 : ℤ) ∣ (x + y) := by
+  obtain ⟨c, hc⟩ := Int.ModEq.dvd h
+  exact ⟨c + x, by linarith⟩
+
+/-- **A degree congruent to `±1` mod `4` is odd.**  Navarro (7.2) gives `χ(t) = ±1` and
+`card_modEq_character_involution` gives `χ(1) ≡ χ(t) mod 4`, so the degrees in the basic set are
+odd. -/
+theorem odd_of_modEq_four {n e : ℤ} (h : n ≡ e [ZMOD 4]) (he : e = 1 ∨ e = -1) : Odd n := by
+  obtain ⟨c, hc⟩ := Int.ModEq.dvd h
+  rcases he with rfl | rfl
+  · exact ⟨-2 * c, by linarith⟩
+  · exact ⟨-2 * c - 1, by linarith⟩
+
+/-- The sign does not change the parity: `ε ψ(1)` is odd for `ε = ±1`. -/
+theorem odd_mul_of_eq_one_or_neg_one {e n : ℤ} (he : e = 1 ∨ e = -1) (hn : Odd n) :
+    Odd (e * n) := by
+  obtain ⟨c, hc⟩ := hn
+  rcases he with rfl | rfl
+  · exact ⟨c, by linarith⟩
+  · exact ⟨-c - 1, by linarith⟩
 
 omit [Fintype S] in
 /-- **The four columns are congruent mod `2`.**  Navarro's inputs are `χ(t) ≡ χ(y) mod 2` and that

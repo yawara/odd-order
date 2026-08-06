@@ -19948,3 +19948,20 @@ Navarro (7.2)/(7.4) の `hconjall`
   OddOrder.RepresentationTheory.Modular.card_eq_one_of_character_eq_one
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_intCast_character_of_involution
+
+/-! **issue 9506 段 342**: 段 340 の `hcong` / `hs₁` / `hs₂` を教科書の合同から出す橋
+(`Algebra/BrauerSuzukiEndgame`)。
+
+* `two_dvd_add_of_modEq` — `χ(t) ≡ χ(y) [ZMOD 2]` (段 289
+  `intModEq_of_isPElement_of_isPElement`) ⟹ **`2 ∣ χ(y) + χ(t)`** (= `hcong`)。
+* `odd_of_modEq_four` — `χ(1) ≡ χ(t) [ZMOD 4]` (`card_modEq_character_involution`) と
+  `χ(t) = ±1` ((7.2)) ⟹ **次数は奇数**。
+* `odd_mul_of_eq_one_or_neg_one` — 符号 `ε = ±1` を掛けても奇数のまま
+  (basic set の元は `ψ_j = ε_j χ_j⁰` なので `ψ_j(1) = ε_j χ_j(1)`) ⟹ `hs₁`/`hs₂`。
+
+⟹ 段 340 の 9 種のうち **7 つが供給済**。残りは `e`/`i₀` (既存 supplier) と
+「4 列 + 内積表 + 自明指標での値 + `hT` + `h10`」= modular datum の配線のみ。 -/
+
+#assert_only_allowed_axioms OddOrder.Algebra.two_dvd_add_of_modEq
+#assert_only_allowed_axioms OddOrder.Algebra.odd_of_modEq_four
+#assert_only_allowed_axioms OddOrder.Algebra.odd_mul_of_eq_one_or_neg_one
