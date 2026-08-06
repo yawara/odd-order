@@ -145,6 +145,19 @@ theorem exists_isPrimitiveRoot_residueField_padicComplexInt {n : ℕ} (hn : ¬ p
   haveI := hasEnoughRootsOfUnity_residueField_padicComplexInt p hn hn0
   exact HasEnoughRootsOfUnity.exists_primitiveRoot _ n
 
+/-- **`ℂ_[p]` has a primitive `n`-th root of unity for every `n ≠ 0`.**
+
+Unlike `exists_isPrimitiveRoot_padicComplexInt` this has *no* condition `p ∤ n`: the root is asked
+for in `ℂ_[p]`, which is algebraically closed of characteristic zero, not in the valuation
+subring's residue field.
+
+This is what `exists_intBlockCoeff` (Navarro (3.16) collected over `IBr`) needs: the Brauer
+characterisation of virtual characters runs over `ℚ(ζ_{|G|})`, and `|G|` is divisible by `p`. -/
+theorem exists_isPrimitiveRoot_padicComplex {n : ℕ} (hn0 : n ≠ 0) :
+    ∃ ζ : ℂ_[p], IsPrimitiveRoot ζ n := by
+  haveI : NeZero ((n : ℕ) : ℂ_[p]) := ⟨Nat.cast_ne_zero.mpr hn0⟩
+  exact HasEnoughRootsOfUnity.exists_primitiveRoot ℂ_[p] n
+
 /-- **A primitive `p`-th root of unity in `𝓞_ℂ_[p]`, congruent to `1` modulo `𝔪`.**
 
 `ℂ_[p]` is algebraically closed of characteristic zero, so it has a primitive `p`-th root of unity
