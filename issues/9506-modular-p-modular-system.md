@@ -5521,3 +5521,40 @@ supply できない形**になっていた ([[check-hypothesis-satisfiability-be
 ⚠ **実装知見**: `∃ M, M.Normal ∧ … ∧ IsPGroup p (H ⧸ M)` は elaborate しない
 (`Group (H ⧸ M)` の instance が同じ `∃` の前の連言から取れない)。
 **`∃ n, M.index = p^n` の形で述べて**、消費側で `IsPGroup.of_card` に渡す。
+
+### ✅ 段 376-378 完了 + 段 379 の組み立てレシピ (2026-08-07)
+
+| 段 | 定理 | 埋めた穴 |
+|---|---|---|
+| 376 | `card_sylow_centralizer_of_card_sylow_four` | `hcart = 4` の経路 |
+| 377 | `isNilpotent_of_blockCharacterPi_eq_zero` | **`hnilQ`** (商群の分裂の nil-kernel) |
+| 378 | `exists_isPrimitiveRoot_padicComplex` | `ha0`/`hasum` の `ζ_{\|G\|} ∈ K` |
+
+段 377 は実測で見つけた**本物の穴**: 段 344 は各群の `π` について nil-kernel 条件を返すが、
+鎖が使う商群の分裂は `quotientPi π hπ hlin hN` (`IBr(Q) = IBr(C)` を共有する必要がある)
+なので、その `hnilQ` を作るものが無かった。`ker (quotientPi π) = J(k[Q])`
+(`ker_quotientPi`, 既存) + 「有限次元代数の Jacobson 根基は冪零」で出る。
+
+#### 段 379 = 組み立てレシピ (全 supplier 実在確認済)
+
+5 群 `G` / `C = C_G(t)` / `Q = C/⟨t⟩` / `C_Q(ȳ)` / `C_G(y)` について:
+
+1. `exists_datum_padicComplex` (段 344) — `e`/`π`/`hπ`/`hlin`/`hkerJ`/`hnil`/`ω`/`ω'`
+   を無条件で obtain (⚠ `Q` の分裂だけは **`quotientPi π hπ hlin hN`** を使う。
+   `hnilQ` は段 377、`hkerJ` は `ker_quotientPi`)。
+2. `[Invertible (Nat.card · : ℂ_[p])]` は `invertibleOfNonzero` で `haveI` (標数 0)。
+3. `ζ` = `exists_pow_eq_one_residue_eq_one_padicComplexInt` (既存、`p = 2` なら `-1`)。
+4. `hconvG`/`hconvC` = `eq_principalBlock_of_inducedBlockOfCentralizer_eq_of_roots`
+   (自己完結。`hroot`/`hroot'` は `exists_isPrimitiveRoot_padicComplexInt`)。
+5. `hMp`/`hquot`/`Syl` = 段 372-375 (`card_sylow_quotient_centralizer` → 段 373 → 段 375)。
+6. `hcart` = `cartanMatrix_principalBlock_eq_card_sylow_of_hasNormalPComplement` + 段 376。
+7. `φ₀` = `Quotient.exists_rep (principalBlock …)`。
+8. `A`/`ha0`/`hasum` = `exists_intBlockCoeff` (`N := Nat.card Q`, `ωBT` は段 378)。
+9. `hconjall` = 段 339 + `isConj_of_sq_eq_one_quotient_centralizer`。
+10. `i₀` = `exists_blockOfIrr_eq_principalBlock_character_eq_one`;
+    `j₀`/`l₀`/`ψ₁`/`ψ₂` = (7.2) の `\|Irr(B₀)\| = 4` + 段 346 `exists_pair_of_card_filter_eq_four`。
+11. `T`/`gdeg` = 段 341、`b`/`c`/`d` = 段 370、`s₁`/`s₂` = 段 371、`a` 列 = 段 348。
+12. `hab`/`hac`/`had` = 段 349、`h10` = 段 330/335/336、`hcong` = 段 342 + 段 289。
+13. `exists_proper_normal_of_columns` (段 340) を呼ぶ。
+
+⟹ **未形式化の数学は残っていない**。段 379 以降は配線のみ。
