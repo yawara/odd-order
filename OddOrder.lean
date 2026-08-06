@@ -185,6 +185,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderSemisimple
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderCartan
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeOrderBrauerOrdinary
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerDecomposition
+import OddOrder.GroupTheory.RepresentationTheory.Modular.DicksonDivisibility
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionNumber
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfLattice
