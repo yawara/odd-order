@@ -294,6 +294,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIrrCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OsimaBlockSupport
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OsimaLinkedIntegral
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ProjectiveCharacterVanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularClassIndex
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
