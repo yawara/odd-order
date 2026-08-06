@@ -2960,6 +2960,28 @@ mathlib では `IsAdicComplete.henselianRing` **のみ** (実測: mathlib 内で
 (「Henselian 対は有限代数で安定」) を丸ごと形式化する話で、汎用性は高いが単発では重い。
 **着手時は (a) から**。
 
+#### (a) の具体的な第一歩 (2026-08-06 に部品を実測)
+
+`A = 𝕎(𝔽̄_p)` (完備 DVR、`IsAdicComplete (maximalIdeal A) A` は既存 instance)、
+`B = A[ζ_{p^a}]` (全分岐、`A`-自由有限) とすると:
+
+1. `IsAdicComplete (maximalIdeal A) B` — **repo の `AdicCompletePi.isAdicComplete_of_basis`
+   がそのまま使える** (完備環上の有限自由加群は完備)。
+2. `IsAdicComplete ((maximalIdeal A).map (algebraMap A B)) B` —
+   `CenterGroupAlgebraHenselian` が `IsAdicComplete.map_algebraMap_iff` で同じ移送をしている。
+3. ⚠ **残る 1 補題**: `𝔪_A · B` から `𝔪_B` への移送。全分岐なら `𝔪_B^e = 𝔪_A·B` なので
+   2 つの filtration は共終で、完備性は移る。要る形は
+   **`IsAdicComplete I R → J^n ≤ I → I ≤ J → IsAdicComplete J R`**
+   (共終な ideal filtration は同じ完備性を与える) — 定義から直接書ける小補題。
+   mathlib に見当たらないので自前 (`IsHausdorff`/`IsPrecomplete` を個別に移す)。
+
+⟹ 拡大 `B` 自体の構成 (Eisenstein 多項式 / `ζ_{p^a}` の最小多項式) と
+剰余体・分裂の確認が残るが、**完備性の骨は上の 3 段で通る**。
+
+⚠ mathlib の関連 instance も実測済: `AdicCompletion.isAdicComplete_of_fg`
+(局所環 + `maximalIdeal` が f.g. なら adic completion は完備)、
+`IsAdicComplete.congr_ringEquiv` (環同型で移送)。
+
 ### `hconv` は gap ではなく assembly (2026-08-06 実測)
 
 `hconv` (= Brauer 第 3 主定理の逆向き) の**本体は既に在る**:
