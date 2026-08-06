@@ -3508,7 +3508,39 @@ Navarro の (3.8) の証明は 2 つの主張を同時に出すが、**我々が
 instance が段 317 側 (`classical`) と食い違って `rw` が刺さらない。
 **binder を落として proof 内の `classical` に両方の呼び出しを揃えさせる**のが正解。
 
-#### ⟹ 次 = 段 319 (`hcoeff` の場合分け合成)
+### ✅ 段 319a 完了 (2026-08-06) — `hweak` の discharge
+
+`BlockPartVanishing.sum_character_blockOfIrr_eq_zero_of_isPRegular` —
+(5.11) を `h := g` (`p`-正則), `g := x` (Sylow の元) で使い、非共役条件を
+`pPart p x = x` + `pPart p g = 1` で **`x ≠ 1`** に落とした。
+⟹ Külshammer の `hweak` の形がそのまま出る。
+
+#### ⟹ 残り = 段 319b (per-`x` の modular datum supplier)
+
+`hweak` を Sylow の**各元 `x`** に適用するには `centralizerOf (pPart p x)` の
+modular datum 一式が要る: `π`/`hπ`/`hlin`/**`hkerJ`**/`hnil` + `eH` + `ω`/`hω` + `ω'`/`hω'`。
+
+**実測 (2026-08-06)**:
+
+* `π`/`hπ`/`hlin`/`hnil` — `Algebra/GroupAlgebraBlocks.lean:54-67` に
+  **`exists_algHom_pi_matrix_of_isAlgClosed` から組む手順がそのまま在る** (`k` 代数閉のみ要求)。
+  `ResidueField 𝓞_ℂ_[p] = 𝔽̄_p` は代数閉なので任意の有限群に効く。
+* ⚠ **`hkerJ` (核が jacobson と*ちょうど*一致) だけが未供給**。
+  `exists_algHom_pi_matrix_of_isAlgClosed` は「核が nil」しか返さない。
+  ただし**その証明の中では `π` を `A ⧸ Ring.jacobson A` 経由で作っており、
+  核が `Ring.jacobson A` そのものであることを既に示している**
+  (`AlgClosedSplitting.lean:52-62` の `hxJ`)。
+  ⟹ **戻り値に `RingHom.ker π = Ring.jacobson A` を足すだけ**で済む見込み。
+* `eH` — `K = ℂ_[p]` が代数閉なので
+  `IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed` から (段 292 と同じ)。
+* `ω`/`ω'` — `exists_isPrimitiveRoot_padicComplexInt` /
+  `_residueField_padicComplexInt` (段 292、`p ∤ pRegularExponent` から)。
+
+⟹ **段 319b = `exists_algHom_pi_matrix_of_isAlgClosed` の戻り値強化 + datum の束ね**。
+その後 段 319c = `hcoeff` の場合分け合成 (`p`-正則 = Külshammer / `p`-特異 = 段 318 を両側に)
+→ 段 320 = `hconv`。
+
+#### 旧メモ: 段 319 の見通し
 
 `hcoeff` (`coeff_principalBlock_eq_centralizer_intermediate` が出す形) を
 `∀ g` で得るには `g` の `p`-正則性で場合分けする:
