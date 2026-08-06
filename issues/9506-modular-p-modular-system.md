@@ -3498,7 +3498,32 @@ Navarro の (3.8) の証明は 2 つの主張を同時に出すが、**我々が
 `Finset.filter` の decidability は `open scoped Classical in` が要る;
 `hnil` は statement に現れるが `include` に明示しないと proof 内で見えなくなる。
 
-#### ⟹ 次 = 段 318 (`hcoeff` の `p`-特異側)
+### ✅ 段 318 完了 (2026-08-06) — `hcoeff` の `p`-特異側
+
+`OsimaBlockSupport.coeff_blockIdempotent_eq_zero_of_not_isPRegular` —
+**ブロック冪等元は `p`-特異元で係数 0**。段 317 + 既存
+`mapRingHom_blockIdempotent_eq_sum` の合成で、`K` で 0 → 単射性で `𝒪` で 0 → 還元して `k` で 0。
+
+⚠ **実装知見**: `[DecidableEq (Block ...)]` を明示 binder に置くと `Finset.filter` の
+instance が段 317 側 (`classical`) と食い違って `rw` が刺さらない。
+**binder を落として proof 内の `classical` に両方の呼び出しを揃えさせる**のが正解。
+
+#### ⟹ 次 = 段 319 (`hcoeff` の場合分け合成)
+
+`hcoeff` (`coeff_principalBlock_eq_centralizer_intermediate` が出す形) を
+`∀ g` で得るには `g` の `p`-正則性で場合分けする:
+
+* **`p`-正則**: Külshammer 経由 (`coeff_principalBlock_eq_centralizer_intermediate`)。
+  8 仮説の supplier は上表のとおり全部在る。`hweak` は (5.11) を `h := g`, `g := x` で
+  使い、`pPart p g = 1` から非共役条件が `x ≠ 1` に落ちる。
+  ⚠ (5.11) は `C(x)` の modular datum を要求するが `𝓞_ℂ_[p]` では
+  `exists_algHom_pi_matrix_of_isAlgClosed` から無償。
+* **`p`-特異**: 段 318 を `G` 側と `C_G(Q)` 側の両方に適用して両辺 0。
+
+その後 `hconv` = `eq_principalBlock_of_blockOfCentralCharacter_eq` +
+`C_G(⟨x⟩)` と `centralizerOf x` の項の同一視。
+
+#### 旧メモ: 段 318 の見通し (完了済)
 
 `mapRingHom_blockIdempotent_eq_sum` (`BlockIdempotentOrdinary.lean`、既存) が
 「ブロック冪等元の `K[G]` での像 = `∑_{χ ∈ Irr(B)} e_χ`」を与える。
