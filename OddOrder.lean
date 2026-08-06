@@ -20,6 +20,7 @@ import OddOrder.Algebra.BlockCornerLift
 import OddOrder.Algebra.SubgroupTruncation
 import OddOrder.Algebra.TraceIsCompl
 import OddOrder.Algebra.AdicCompletePi
+import OddOrder.Algebra.CyclotomicAdjoin
 import OddOrder.Algebra.IdempotentLift
 import OddOrder.Algebra.CenterGroupAlgebraHenselian
 import OddOrder.Algebra.CenterIdempotentLift

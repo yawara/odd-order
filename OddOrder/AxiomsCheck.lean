@@ -252,6 +252,7 @@ import OddOrder.Algebra.BlockCornerInverse
 import OddOrder.Algebra.BlockCornerLift
 import OddOrder.Algebra.TraceIsCompl
 import OddOrder.Algebra.AdicCompletePi
+import OddOrder.Algebra.CyclotomicAdjoin
 import OddOrder.Algebra.IdempotentLift
 import OddOrder.Algebra.CenterGroupAlgebraHenselian
 import OddOrder.Algebra.CenterIdempotentLift
@@ -19063,3 +19064,22 @@ BS の鎖は元々この instance を仮定しているので整合。
 `𝔪_B`-進完備性に移る。⟹ **係数環の完備性の骨が通った**。 -/
 
 #assert_only_allowed_axioms OddOrder.isAdicComplete_of_le_of_pow_le
+
+/-! 🎯 **issue 9506 段 301**: 分岐拡大 `A[ζ_n] = A[X]/Φ_n` の module 側
+(`Algebra/CyclotomicAdjoin`)。
+
+段 300 の裁定 (係数環を `𝕎(𝔽̄_p)[ζ_{p^a}]` へ移す) の実装第一歩。
+- `cyclotomicPowerBasis` = `Φ_n` は monic なので `A[X]/Φ_n` は階数 `deg Φ_n` の自由 `A`-加群
+  (`AdjoinRoot.powerBasis'`)。`Module.Free` / `Module.Finite` の instance も付けた。
+- `isAdicComplete_cyclotomicAdjoin` = 完備環上の有限自由加群は完備
+  (段 300 の `isAdicComplete_of_basis` をそのまま適用)。
+- `cyclotomic_prime_pow_charP` = 標数 `q` では `Φ_{q^k} = (X-1)^{q^k - q^{k-1}}`
+  (mathlib `cyclotomic_mul_prime_pow_eq` の `m = 1` 特殊化)。
+  ⟹ `B ⧸ 𝔪_A·B ≅ k[X]/((X-1)^{φ})` が局所アルティンで、`B` の局所性と
+  全分岐評価 `𝔪_B^{φ} ⊆ 𝔪_A·B` (段 300 が消費する形) の根拠。 -/
+
+#assert_only_allowed_axioms OddOrder.Algebra.cyclotomicPowerBasis
+
+#assert_only_allowed_axioms OddOrder.Algebra.isAdicComplete_cyclotomicAdjoin
+
+#assert_only_allowed_axioms OddOrder.Algebra.cyclotomic_prime_pow_charP
