@@ -5160,3 +5160,32 @@ theorem exists_sum_character_subgroup (ρ : Representation F G V) (H : Subgroup 
 `= |P| · ∑_i d_{iφ} n_i` ⟹ `|G|_p = |P| ∣ Φ_φ(1)`。
 ⚠ repo の `ordinaryCharacter` は `𝒪` 値なので、`K` での trace 計算と
 `algebraMap_ordinaryCharacter` で橋渡しし、最後に `algebraMap 𝒪 K` の単射性で `𝒪`/`ℕ` へ降ろす。
+
+### ✅✅ 段 353-359 完了 (2026-08-06) — **Navarro (3.8) Osima が完成**
+
+| 段 | 内容 | file |
+|---|---|---|
+| 353 | `∑_{h∈H} χ(h) = |H|·n` (平均化冪等元の trace = range の階数) | `RepresentationTheory/SubgroupAverageTrace.lean` (74 行、新) |
+| 354 | **Dickson `|P| ∣ Φ_φ(1)`** | `Modular/DicksonDivisibility.lean` (105 行、新) |
+| 355 | Osima の消滅を **linking-closed 述語**へ一般化 (2 本) | `Modular/OsimaBlockSupport` |
+| 356 | 「列は丸ごと `Φ_φ(g)` か 0 か」の二分法 (2 本) | 同上 (330 行) |
+| 357 | (3.8) の **`p`-正則半分** `|P| ∣ ∑_{i∈A}χ_i(1)χ_i(x)` | `Modular/OsimaLinkedIntegral.lean` (新) |
+| 358 | **(3.8) 統合** `|G| ∣ ∑_{i∈A}χ_i(1)χ_i(x)` (任意の `x`) | 同上 |
+| 359 | **`f_A = ∑_{χ∈A}e_χ` の係数が `𝒪` に入る** | 同上 (182 行) |
+
+数セッション前の「Problem (3.4) は 200 行超・multi-session」という見積りは、**原文 Ch.3 を
+実読して (3.6)→(3.8)→(3.9) の連鎖と Dickson の安い証明を確定させた後は 7 段で通った**。
+
+#### ⏭ 段 360 の着手点 — `f_A` の実体化と (3.9)
+
+1. **`f_A` を `MonoidAlgebra 𝒪 G` の元として構成**:
+   `choose z hz using fun g => exists_coeff_sum_ordinaryIdempotent … g` の後、
+   `MonoidAlgebra.ofCoeff (Finsupp.equivFunOnFinite.symm z)` で作り、
+   `MonoidAlgebra.coeff_injective` + `MonoidAlgebra.coeff_mapRingHom` で
+   `mapRingHom (algebraMap 𝒪 K) f_A = ∑_{i∈A} ordinaryIdempotent e i` を示す。
+   ⚠ `MonoidAlgebra.ofCoeff` は `G →₀ R` を取る (素の関数ではない)。
+2. **中心性**: 像が中心 (`ordinaryIdempotent_mem_center` の有限和) + `mapRingHom` の単射性。
+3. **(3.9)**: `ω_χ(f_A) = 1 ⟺ χ ∈ A` (`LatticeBlockIdempotent` の (3.13.a) 2 本) と
+   「還元後の中心指標 `λ_χ` はブロックにしか依らない」から
+   **`A` はブロックの合併** ⟹ `Irr(B)` は単一連結成分。
+4. ⟹ (7.6) のブロック全単射 → `hd` → `hT`/`hb0`-`hd0` → 組み立て。
