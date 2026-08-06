@@ -19083,3 +19083,15 @@ BS の鎖は元々この instance を仮定しているので整合。
 #assert_only_allowed_axioms OddOrder.Algebra.isAdicComplete_cyclotomicAdjoin
 
 #assert_only_allowed_axioms OddOrder.Algebra.cyclotomic_prime_pow_charP
+
+/-! 🎯 **issue 9506 段 302**: 全分岐評価 `(ζ - 1)^{φ(q^k)} ∈ 𝔪_A·B`
+(`sub_one_pow_mem_map_maximalIdeal`, `Algebra/CyclotomicAdjoin`)。
+
+段 301 の `cyclotomic_prime_pow_charP` (標数 `q` で `Φ_{q^k} = (X-1)^{φ}`) より
+`(X-1)^φ − Φ_{q^k}` の係数はすべて `𝔪_A` に入る。根で評価して `Φ(ζ) = 0` を使うと
+`(ζ-1)^φ ∈ 𝔪_A·B`。
+
+⚠ **商環の同型 `B ⧸ 𝔪_A·B ≅ k[X]/((X-1)^φ)` を作らずに済んだ** — 局所性の段取り
+(issue 9506 の「`B` の局所性」節) で一番重い部分を回避する鍵。 -/
+
+#assert_only_allowed_axioms OddOrder.Algebra.sub_one_pow_mem_map_maximalIdeal

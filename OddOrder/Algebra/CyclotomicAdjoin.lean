@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.RingTheory.AdjoinRoot
+import Mathlib.RingTheory.LocalRing.ResidueField.Defs
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Basic
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Expand
 import OddOrder.Algebra.AdicCompletePi
@@ -31,6 +32,8 @@ the hypothesis that the block idempotents are lifted along.
 * `OddOrder.Algebra.isAdicComplete_cyclotomicAdjoin` — `A[ζ_n]` inherits `I`-adic completeness
 * `OddOrder.Algebra.cyclotomic_prime_pow_charP` — `Φ_{p^k} = (X-1)^{p^k - p^{k-1}}` in
   characteristic `p` (the exponent is `φ(p^k)`)
+* `OddOrder.Algebra.sub_one_pow_mem_map_maximalIdeal` — the totally ramified estimate
+  `(ζ - 1)^{φ(p^k)} ∈ 𝔪_A·B`
 -/
 
 namespace OddOrder.Algebra
@@ -67,5 +70,38 @@ theorem cyclotomic_prime_pow_charP (R : Type*) [CommRing R] {q k : ℕ} [Fact (N
   have h := cyclotomic_mul_prime_pow_eq R (p := q) (m := 1)
     (by simpa [Nat.dvd_one] using (Fact.out : Nat.Prime q).ne_one) hk
   rwa [mul_one, cyclotomic_one] at h
+
+/-! ### The totally ramified estimate `(ζ - 1)^{φ} ∈ 𝔪_A·B` -/
+
+open IsLocalRing in
+/-- **`(ζ - 1)^{q^k - q^{k-1}} ∈ 𝔪_A·B`.**  In characteristic `q` the cyclotomic polynomial is
+`(X - 1)^{φ(q^k)}` (`cyclotomic_prime_pow_charP`), so the difference
+`(X - 1)^{φ(q^k)} - Φ_{q^k}` has all its coefficients in `𝔪_A`; evaluating at the root and using
+`Φ_{q^k}(ζ) = 0` leaves `(ζ - 1)^{φ(q^k)}` inside `𝔪_A·B`.
+
+This is the totally ramified estimate: no isomorphism `B ⧸ 𝔪_A·B ≅ k[X]/((X-1)^φ)` is needed. -/
+theorem sub_one_pow_mem_map_maximalIdeal {A : Type*} [CommRing A] [IsLocalRing A]
+    {q k : ℕ} [Fact (Nat.Prime q)] [CharP (ResidueField A) q] (hk : 0 < k) :
+    (AdjoinRoot.root (cyclotomic (q ^ k) A) - 1) ^ (q ^ k - q ^ (k - 1))
+      ∈ Ideal.map (algebraMap A (AdjoinRoot (cyclotomic (q ^ k) A))) (maximalIdeal A) := by
+  classical
+  set P : A[X] := (X - 1) ^ (q ^ k - q ^ (k - 1)) - cyclotomic (q ^ k) A with hP
+  have hcoeff : ∀ i, P.coeff i ∈ maximalIdeal A := by
+    intro i
+    have hmap : P.map (residue A) = 0 := by
+      rw [hP, Polynomial.map_sub, Polynomial.map_pow, Polynomial.map_sub, Polynomial.map_X,
+        Polynomial.map_one, map_cyclotomic, cyclotomic_prime_pow_charP (ResidueField A) hk,
+        sub_self]
+    have hc := congrArg (fun w : (ResidueField A)[X] => w.coeff i) hmap
+    simp only [Polynomial.coeff_map, Polynomial.coeff_zero] at hc
+    rwa [← RingHom.mem_ker, ker_residue] at hc
+  have hroot : (AdjoinRoot.root (cyclotomic (q ^ k) A) - 1) ^ (q ^ k - q ^ (k - 1))
+      = Polynomial.aeval (AdjoinRoot.root (cyclotomic (q ^ k) A)) P := by
+    rw [hP, map_sub, map_pow, map_sub, Polynomial.aeval_X, map_one, AdjoinRoot.aeval_eq,
+      AdjoinRoot.mk_self, sub_zero]
+  rw [hroot, Polynomial.aeval_eq_sum_range]
+  refine Ideal.sum_mem _ fun i _ => ?_
+  rw [Algebra.smul_def]
+  exact Ideal.mul_mem_right _ _ (Ideal.mem_map_of_mem _ (hcoeff i))
 
 end OddOrder.Algebra
