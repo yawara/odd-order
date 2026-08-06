@@ -5558,3 +5558,52 @@ supply できない形**になっていた ([[check-hypothesis-satisfiability-be
 13. `exists_proper_normal_of_columns` (段 340) を呼ぶ。
 
 ⟹ **未形式化の数学は残っていない**。段 379 以降は配線のみ。
+
+### 📌 セッション区切り (2026-08-07) — 段 366-394 の総括と**残り 1 本 (`h10`)**
+
+#### 構造変更: `BrauerSuzukiQ8.lean` のディレクトリ化 (段 379)
+
+`q8_exists_proper_normal` の証明は `Modular/` の鎖を import する必要があるが、
+`Modular/` 側は同ファイルの群論 (`isConj_of_sq_eq_one_quotient_centralizer` 等) を使うので
+**同一ファイルのままだと循環する**。pure re-export hub + 3 leaf に分割し
+`Reduction → Modular → CharacterCore → Induction` の一方向にした。
+module 名は不変ゆえ下流 (`RankOneAffineModel`) は無変更。
+
+#### 組み立ての現状 (`BrauerSuzukiQ8/CharacterCore.lean`, build green)
+
+段 340 `exists_proper_normal_of_columns` の仮説 9 種のうち **8 種が構成済**:
+
+| 仮説 | 供給元 | 状態 |
+|---|---|---|
+| `e`/`i₀`/`hi₀` | `exists_datum_padicComplex` / `exists_blockOfIrr_…_character_eq_one` | ✅ |
+| `hgdeg`/`hTval`/`hg0`/`hgpos` | 段 341 | ✅ |
+| `haa`/`hga`/`ha0` (y 側) | 段 348 (段 390-391 で instantiate) | ✅ |
+| `hbb`…`hcd`/`hgb`/`hgc`/`hgd`/`hb0`-`hd0`/`hT` (t 側) | 段 370 (段 389 で instantiate) | ✅ |
+| `hab`/`hac`/`had` | 段 349 (段 392) | ✅ |
+| `hs₁`/`hs₂` | 段 371 (段 388) | ✅ |
+| `hcong` | 段 289 + 段 342 (段 394) | ✅ |
+| `hzero` | 段 368 + 段 393 | ✅ |
+| **`h10`** | 段 330/332/335/336 | ⏭ **残り 1 本** |
+
+5 群 (`G`/`C_G(t)`/`Q = C_G(t)/⟨t⟩`/`C_Q(ȳ)`/`C_G(y)`) の datum、3 対の逆第三主定理、
+`hMp`/`hquot`/`hcart`/`A`/`hconjall`/4 添字 — すべて `CharacterCore.lean` 内で構成済。
+
+#### ⏭ 段 395 = `h10` (Burnside の関係式 (10)) の配線
+
+`h10 : ∀ v, (∀ k, 2 v k = a k + b k − c k − d k) → ∀ i j, … →
+  g i · g j + T i² · g j − T j² · g i = 0`
+
+必要な部品 (すべて実在、AxiomsCheck 済):
+1. `Modular/InvolutionClassBurnside`
+   * `classSquareCoeff_mul_character_one` (段 335) = `sign_relation_ten` の `hwg`
+   * `classSquareCoeff_of_character_eq_one` (段 335) = `hwi₀`
+   * `sum_classSquareCoeff_mul_basicDecompositionNumber_eq_zero` (段 336) = 各列との直交
+2. `Algebra/BrauerSuzukiEndgame.sum_mul_halfSum_eq_zero` (段 336) —
+   4 列と直交すれば半和とも直交 (`2(w,u₁) = (w,a)+(w,b)−(w,c)−(w,d)`)
+3. `Algebra/BrauerSuzukiEndgame.sign_relation_ten` (段 332) — (9) ⟹ (10)
+
+⚠ 群論的入力は 段 328/330/338 (「2 つの対合の積は奇位数」/ `Q₈` の対合一意性) で、
+`Reduction.lean` と `UniqueInvolutionSylow.lean` に既存。
+
+その後 `exists_proper_normal_of_columns` を呼べば `q8_exists_proper_normal` が閉じ、
+**issue 0147 (Q₈ Brauer–Suzuki) の最後の `sorry` が消える**。
