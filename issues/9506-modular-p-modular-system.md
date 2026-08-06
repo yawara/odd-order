@@ -3571,7 +3571,38 @@ instance が段 317 側 (`classical`) と食い違って `rw` が刺さらない
 **`private` はファイルを跨げない**ので、`zpowers`/`centralizerOf` の兄弟補題が並ぶ
 `InducedBlockCentralizer` に public 版を置いた。
 
-⟹ **`hconv` に要る部品は全部揃った**。残りは `eq_principalBlock_of_inducedBlockOfNormalizer_eq`
+#### ⚠⚠ 段 320b の実測 (2026-08-06) — 残りは**型レベルの datum 移送**
+
+`eq_principalBlock_of_inducedBlockOfNormalizer_eq_intermediate` (`.lean:910`) が
+**`inducedBlockOfCentralizer` と同じ形**だと判明した — 4 つの包含
+(`hQ`/`hQH`/`hCH`/`hHN`) が `InducedBlockCentralizer.lean:97` が渡すものと一致するので、
+`hind` は定義上そのまま `inducedBlockOfCentralizer … b = principalBlock …` になる。
+⟹ **`hind` 側に移送は要らない**。
+
+**しかし `hcoeff` 側に要る**。その形は
+
+  `∀ h : ↥H, (h : G) ∈ C_G(Q) → (F' B₀).coeff (h:G) = (F'H B₀).coeff h`
+
+で、`H = centralizerOf x`、`Q = zpowers x`。一方 段 320a が与えるのは
+`∀ g : ↥(C_G(Q)), (F' B₀).coeff (g:G) = (FC' B₀).coeff g` で、`FC'` は
+**`↥(C_G(zpowers x))` 上**の族。`F'H` は **`↥(centralizerOf x)` 上**の族。
+
+⟹ `Subgroup.centralizer (↑(zpowers x)) = centralizerOf x`
+(段 320b 準備の `centralizer_zpowers_eq_centralizerOf`) は**部分群としての等式**だが、
+必要なのは `↥` を取った**型**の間の移送 — `π`/`Block`/`principalBlock`/族 `F'` を
+まるごと運ぶ必要がある。⚠ **ここが issue 冒頭からの「項の同一視」の正体**で、
+単なる `rw` では済まない。
+
+**候補 2 つ**:
+1. **`Subgroup.equivOfEq` で datum を移送する汎用補題**を作る
+   (`MonoidAlgebra` の関手性 + `Block`/`principalBlock` の移送)。汎用的だが重い。
+2. **BS の鎖の側を `C_G(zpowers x)` に合わせる** — `PrincipalBlockInvolution` の `hconv` は
+   `centralizerOf t` 上の `π` を担ぐので、鎖の binder を変える話になる。影響範囲を要実測。
+
+⚠ どちらを採るかは着手時に実測で決めること (1 の汎用補題が他所でも要るなら 1、
+`hconv` 1 箇所のためだけなら 2 の方が安いかもしれない)。
+
+#### 旧メモ: 残りは `eq_principalBlock_of_inducedBlockOfNormalizer_eq`
 (Navarro の読み `b^G = B_0` 版) を `Q := zpowers x`, `H := centralizerOf x` で使い、
 `inducedBlockOfCentralizer` の定義 (`InducedBlockCentralizer.lean:97` — まさに
 `inducedBlockOfNormalizer` を `zpowers x` / `centralizerOf x` で特殊化したもの) と
