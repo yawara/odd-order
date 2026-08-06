@@ -4389,3 +4389,30 @@ modular datum を作り、上の 6 種の入力を実際に供給して `exists_
 | ~~A~~–~~E~~ | pp.141-145 の数学 | ✅ 段 327-333 |
 | F | `𝓞_ℂ_[2]` の instantiation + "analysis at t" の配線 | 残る唯一の塊。**ℤ 値性の欠落は 段 333 で解消** |
 | G | `q8_exists_proper_normal` への組み立て | F の後 |
+
+### ✅ 段 333c (2026-08-06) — 列を ℤ へ降ろす glue
+
+`BasicSetDecomposition` の Generic 節に 2 本:
+
+* `intCast_basicDecompositionNumber` — 整数 `IBr` 列 × 整数 `U` ⟹ **basic set 列も整数**。
+  入力は 段 333b (`d^t_{χμ} ∈ ℤ`) と `intCast_intBasicSetMatrix` (`U ∈ ℤ`、既存)。
+* `sum_mul_eq_of_intCast` — `K` で計算した 2 本の整数列の内積は**その整数**
+  (`ℤ → K` の単射性)。
+
+⟹ (7.5) の `(D^t_i,D^t_j) = 2(1+δ)` / `(D^y_0,D^t_j) = 0` / `(χ(1),D^t_j) = 0` が
+段 332 の ℤ endgame にそのまま届く。**F に残るのは datum の instantiation だけ**になった。
+
+#### F の残りの棚卸し (2026-08-06)
+
+| 入力 (段 332 が要求) | supplier | 状態 |
+|---|---|---|
+| `a = D^y_0` が ℤ 値 | `card_character_ne_zero_eq_four_of_isConj_inv` (`χ(y) ∈ {0,±1}`) | ✅ 既存 |
+| `b,c,d = D^t_j` が ℤ 値 | 段 333b + 段 333c + `intBasicSetMatrix` | ✅ |
+| `g = χ(1)` が ℤ 値 | `finrank` | ✅ |
+| `T = χ(t)` が ℤ 値 | (7.2) `χ(t) = ±1` | ✅ 既存 |
+| 内積表 | (7.5)(c)(d) × 段 322 + 段 185/195 + 段 333c | ✅ 部品は全部 |
+| 半和の整数性 `2 ∣ a+b+c+d` | 段 289 + `ψ_i(1)` 奇数 (`card_modEq_character_involution`) | ✅ 供給可 (段 326 で確認済) |
+| 自明指標での値 | 段 331 | ✅ |
+| (10) | 段 330 + `sign_relation_ten` | ✅ |
+| **modular datum 一式** (`G` / `C_G(t)` / `C_G(y)` / `C_G(t)/⟨t⟩`) | `exists_modularDatum` + `PadicComplexSystem` | ⏭ **残り** |
+| (7.2)/(7.4)/(7.6) の群論的仮説 (Klein four Sylow of `C_G(t)/⟨t⟩` 等) | Q₈ の構造から | ⏭ **残り** |

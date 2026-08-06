@@ -171,6 +171,31 @@ theorem sum_basicDecompositionNumber [Fintype ι₂] {d : ι → K} {u : ι → 
     _ = ∑ μ : ι, d μ * μval μ :=
         Finset.sum_congr rfl fun μ _ => by rw [hu μ]
 
+/-! ### Descent to `ℤ`
+
+The endgame of Brauer–Suzuki (`OddOrder.Algebra.exists_eq_of_columns`) runs over `ℤ`, so the
+basic-set columns have to be recognised as integer columns: `d^t_{χμ} ∈ ℤ` at an involution
+(`exists_intCast_generalizedDecompositionNumber`) and `U` integral (`intBasicSetMatrix`) make each
+`D^x_{χφ}` an integer, and then every pairing identity descends by injectivity of `ℤ → K`. -/
+
+/-- **An integral `IBr`-column against an integral `U` gives an integral basic-set column.** -/
+theorem intCast_basicDecompositionNumber {d : ι → K} {u : ι → ι₂ → K} {n : ι → ℤ} {U : ι → ι₂ → ℤ}
+    (hd : ∀ μ, d μ = (n μ : K)) (hu : ∀ μ φ, u μ φ = (U μ φ : K)) (φ : ι₂) :
+    basicDecompositionNumber d u φ = ((∑ μ : ι, n μ * U μ φ : ℤ) : K) := by
+  rw [basicDecompositionNumber, Int.cast_sum]
+  exact Finset.sum_congr rfl fun μ _ => by rw [hd μ, hu μ φ, Int.cast_mul]
+
+/-- **A pairing of two integer columns, computed in `K`, is that integer.**  This is how the
+identities `(D^t_i, D^t_j) = 2(1 + δ_ij)` and `(χ(1), D^t_j) = 0` of Navarro (7.5) reach the
+integer endgame. -/
+theorem sum_mul_eq_of_intCast [CharZero K] {S : Type*} [Fintype S] {D D' : S → K} {Dz Dz' : S → ℤ}
+    {c : ℤ} (h : ∀ k, D k = (Dz k : K)) (h' : ∀ k, D' k = (Dz' k : K))
+    (hc : (∑ k, D k * D' k) = (c : K)) :
+    (∑ k, Dz k * Dz' k) = c := by
+  refine Int.cast_injective (α := K) ?_
+  rw [Int.cast_sum, ← hc]
+  exact Finset.sum_congr rfl fun k _ => by rw [h k, h' k, Int.cast_mul]
+
 end Generic
 
 /-! ### Navarro (7.5)(c) -/

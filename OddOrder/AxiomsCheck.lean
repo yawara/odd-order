@@ -19806,3 +19806,16 @@ modular 鎖と同じ分裂体 `K` の中で完結する (**係数体の橋渡し
   OddOrder.RepresentationTheory.Modular.exists_nat_character_eq_sum_irreducibleBrauerCharacter
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_intCast_generalizedDecompositionNumber
+
+/-! **issue 9506 段 333c**: 列を ℤ へ降ろす glue (`BasicSetDecomposition`)。
+
+* `intCast_basicDecompositionNumber` — 整数 `IBr` 列 × 整数 `U` ⟹ **basic set 列も整数**
+  (`d^t_{χμ} ∈ ℤ` = 段 333b、`U ∈ ℤ` = `intBasicSetMatrix`)。
+* `sum_mul_eq_of_intCast` — `K` で計算した 2 本の整数列の内積は**その整数**
+  (`ℤ → K` の単射性)。⟹ (7.5) の `(D^t_i,D^t_j) = 2(1+δ)` / `(χ(1),D^t_j) = 0` が
+  段 332 の ℤ endgame にそのまま届く。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.intCast_basicDecompositionNumber
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_mul_eq_of_intCast
