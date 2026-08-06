@@ -277,6 +277,43 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
       (s₁ := s₁) (s₂ := s₂) (hj₀ := hj₀B) (hl₀B := hl₀B) (hl₀ := hl₀) (hl₀ne := hl₀ne)
       (hψ₁B := hψ₁B) (hψ₁ne := hψ₁ne) (hψ₂B := hψ₂B) (hψ₂ne := hψ₂ne) (henum := henum)
       (h01 := h01) (h02 := h02) (h12 := h12) (hs₁val := hs₁val) (hs₂val := hs₂val)
+  -- an element `y ∈ T` of order `4`, and the datum of `C_G(y)`
+  have hq : (QuaternionGroup.a 1 : QuaternionGroup 2) ^ 2 ≠ 1 := by decide
+  set w : ↥(T : Subgroup G) := e.symm (QuaternionGroup.a 1) with hwdef
+  have hw2 : (w : G) ^ 2 ≠ 1 := by
+    intro hcon
+    refine hq ?_
+    have hwsq : w ^ 2 = 1 := Subtype.ext (by rw [Subgroup.coe_pow, hcon, Subgroup.coe_one])
+    calc (QuaternionGroup.a 1 : QuaternionGroup 2) ^ 2
+        = (e (e.symm (QuaternionGroup.a 1))) ^ 2 := by rw [e.apply_symm_apply]
+      _ = e (w ^ 2) := by rw [map_pow, hwdef]
+      _ = 1 := by rw [hwsq, map_one]
+  have hyord : orderOf (w : G) = 4 := by
+    rw [Subgroup.orderOf_coe]
+    exact orderOf_eq_four_of_quaternionTwo e (fun hcon => hw2 (by
+      rw [← Subgroup.coe_pow, hcon, Subgroup.coe_one]))
+  have hyC : (w : G) ∈ Subgroup.centralizer ({(w : G)} : Set G) :=
+    Subgroup.mem_centralizer_iff.mpr fun m hm => by
+      rw [Set.mem_singleton_iff] at hm; subst hm; rfl
+  haveI : Finite ↥(Subgroup.centralizer ({(w : G)} : Set G)) := Subtype.finite
+  obtain ⟨ι'W, _, mW, _, _, _, eW, ιW, _, nnW, _, _, _, πW, hπW, hlinW, ωW, ω'W,
+    hkerJW, hnilW, hωW, hω'W⟩ :=
+    exists_datum_padicComplex 2 ↥(Subgroup.centralizer ({(w : G)} : Set G))
+  have hcomplW := hasNormalPComplement_centralizer_orderFour T e w.2 hw2
+  obtain ⟨MW, hMWnorm, hMWp, nMW, hMWindex⟩ := exists_normal_of_hasNormalPComplement hcomplW
+  haveI := hMWnorm
+  have hquotMW : IsPGroup 2 (↥(Subgroup.centralizer ({(w : G)} : Set G)) ⧸ MW) :=
+    IsPGroup.of_card (n := nMW) (by rw [← Subgroup.index_eq_card, hMWindex])
+  obtain ⟨SylW⟩ : Nonempty (Sylow 2 ↥(Subgroup.centralizer ({(w : G)} : Set G))) := Sylow.nonempty
+  have hSylW4 : Nat.card ↥(SylW : Subgroup ↥(Subgroup.centralizer ({(w : G)} : Set G))) = 4 := by
+    rw [sylow_centralizer_eq_zpowers T e w.2 hw2 hyC SylW, Nat.card_zpowers,
+      ← Subgroup.orderOf_coe]
+    exact hyord
+  obtain ⟨φ₀W, hφ₀W⟩ := Quotient.exists_rep (principalBlock πW hπW hlinW hnilW)
+  have hcartW : cartanMatrix (𝒪 := 𝓞_ℂ_[2]) (nn := nnW) Nat.prime_two hωW hω'W hπW hlinW hkerJW
+      eW φ₀W φ₀W = 4 := by
+    rw [cartanMatrix_principalBlock_eq_card_sylow_of_hasNormalPComplement Nat.prime_two hωW hω'W
+      hπW hlinW hkerJW hnilW eW hcomplW SylW hφ₀W, hSylW4]
   sorry
 
 end OddOrder.GroupTheory
