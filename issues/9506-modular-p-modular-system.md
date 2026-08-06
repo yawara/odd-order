@@ -2917,9 +2917,30 @@ BS の鎖が長らく**仮説として持ち回っていた**もののうち、s
 issue 9507 が「分岐拡大を作らずに済ませる」ために `𝓞_ℂ_[p]` を採った判断は、
 `IsAdicComplete` を見落としていたぶん**再検討が要る**。
 
-⚠ 代替案: 冪等元持ち上げを `IsAdicComplete` から **Henselian** へ弱める
-(`𝓞_ℂ_[p]` は Henselian)。`CenterIdempotentLift` の証明が逐次近似 (precomplete) を
-使っているので、Henselian 版に書き換えられるかは未調査。
+**代替案 (b) の調査結果 (2026-08-06)**: 冪等元持ち上げを `IsAdicComplete` から
+Henselian へ弱める線は **mathlib の支援が無い**。repo の鎖は
+`IsAdicComplete I 𝒪` → (`centerBasis` で自由) `IsAdicComplete I Z(𝒪G)` →
+`IsAdicComplete (centerIdeal I) Z(𝒪G)` → `IsAdicComplete.henselianRing`
+→ `HenselianRing Z(𝒪G) (centerIdeal I)` で、最後の `HenselianRing` を得る道は
+mathlib では `IsAdicComplete.henselianRing` **のみ** (実測: mathlib 内で
+`HenselianRing` は `Henselian.lean` の外で一度も使われていない)。
+`Z(𝒪G)` は局所環ではない (ブロック分解する) ので
+`HenselianLocalRing → HenselianRing (maximalIdeal)` の instance も使えない。
+⟹ (b) は「Henselian 局所環上の有限代数は Henselian 対」という**未形式化の可換環論定理**を
+要する。
+
+**⟹ 裁定 (2026-08-06、hub): 案 (a) = 分岐拡大 `𝒪 = 𝕎(𝔽̄_p)[ζ_m]` を採る。**
+理由: (i) 剰余体は `𝔽̄_p` のまま (分岐部分は完全分岐) なので modular 側の
+`[IsAlgClosed k]` 要求はそのまま満たす、(ii) 商体は `ℚ_p^{ur}(ζ_m) ⊇ ℚ(ζ_m)` で
+**Brauer の分裂体定理** (repo に `BrauerInductionTheorem` 在り) より `G` の分裂体、
+(iii) 完備 DVR の有限拡大は完備 DVR なので `IsAdicComplete` が回復する。
+(b) と違い、必要な数学はすべて repo か mathlib に土台がある。
+
+**⟹ 実装タスク (未着手、次の大きな塊)**:
+1. `𝕎(𝔽̄_p)[ζ_m]` の構成 (Eisenstein 拡大 / mathlib の DVR 拡大機構を調査)
+2. `IsAdicComplete (maximalIdeal ·) ·` の instance
+3. 剰余体が `𝔽̄_p` (⟹ `IsAlgClosed`) の instance
+4. 商体が `K[G]` を分裂 (Brauer の分裂体定理を経由)
 
 ### `hconv` は gap ではなく assembly (2026-08-06 実測)
 
