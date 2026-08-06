@@ -186,6 +186,90 @@ theorem sum_mul_basicDecompositionNumber_quotientPi {A : ι → κ → ℤ} (ht 
     ha0 hasum hconjall hyb1 hcart hj₀ hjB hjne hkB hkne
   exact h1.trans h2
 
+/-! ### Navarro p. 141, equations (4) and (5): the orthogonality of the columns -/
+
+omit [IsIntegrallyClosed 𝒪] [IsAlgClosed (FractionRing 𝒪)] [FaithfulSMul 𝒪 K]
+  [Fact p.Prime] [CharP (ResidueField 𝒪) p] [Fintype ↥(centralizerOf x)]
+  [Invertible (Nat.card ↥(centralizerOf x) : K)] [DecidableEq ι] in
+set_option linter.unusedFintypeInType false in
+include hp hω' hkerJ eG in
+/-- **Navarro p. 141, equation (5): `(χ(1), D^t_j) = 0`.**
+
+The degree column is orthogonal to every `IBr`-column at `x`
+(`sum_character_mul_generalizedDecompositionNumber_eq_zero` at `v = 1`, legitimate because
+`1` lies outside the `p`-section of `x` as soon as `x ≠ 1`), hence to every basic-set column. -/
+theorem sum_character_one_mul_basicDecompositionNumber_eq_zero {ι₂ : Type*} (u : ι → ι₂ → K)
+    (hx : IsPElement p x) (hx1 : x ≠ 1) (η : ι₂) :
+    (∑ i : J, (wedderburnRepresentation eG i).character 1 *
+        basicDecompositionNumber (generalizedDecompositionNumber x hp hω' hπ hlin hkerJ
+          ((wedderburnRepresentation eG i).character)
+          (fun _ _ h => character_eq_of_isConj _ h)) u η) = 0 := by
+  refine sum_mul_basicDecompositionNumber_left_eq_zero η fun τ => ?_
+  have hv : (1 : G)⁻¹ ∉ pSection p x := by
+    intro hmem
+    rw [mem_pSection_iff_isConj_pPart,
+      pPart_eq_one_of_isPRegular hp (isPRegular_one hp).inv] at hmem
+    obtain ⟨c, hc⟩ := isConj_iff.mp hmem
+    exact hx1 (by simpa using hc.symm)
+  exact sum_character_mul_generalizedDecompositionNumber_eq_zero hp eG hω' hπ hlin hkerJ hx τ hv
+
 end AnalysisAtInvolution
+
+/-! ### Navarro p. 141, equation (4): the column at `y` against the columns at `t` -/
+
+section TwoElements
+
+variable {p : ℕ} {𝒪 K : Type*} [CommRing 𝒪] [IsDomain 𝒪] [ValuationRing 𝒪]
+  [HenselianLocalRing 𝒪] [IsPModularSystem p 𝒪]
+  [Field K] [Algebra 𝒪 K] [IsFractionRing 𝒪 K]
+variable {G : Type*} [Group G] [Finite G] {x y : G} [Invertible (Nat.card G : K)]
+variable {ι : Type*} {nn : ι → Type*} [∀ i, Fintype (nn i)] [∀ i, DecidableEq (nn i)]
+  [Fintype ι] [∀ i, Nonempty (nn i)]
+variable {κY : Type*} {nnY : κY → Type*} [∀ i, Fintype (nnY i)] [∀ i, DecidableEq (nnY i)]
+  [Fintype κY] [∀ i, Nonempty (nnY i)]
+variable {J : Type*} [Fintype J] {mG : J → Type*} [∀ j, Fintype (mG j)]
+  [∀ j, DecidableEq (mG j)] [∀ j, Nonempty (mG j)]
+variable (hp : p.Prime)
+  {ω' : ResidueField 𝒪} (hω' : IsPrimitiveRoot ω' (pRegularExponent p ↥(centralizerOf x)))
+  {π : MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf x) →+*
+    ∀ j, Matrix (nn j) (nn j) (ResidueField 𝒪)}
+  (hπ : Function.Surjective π)
+  (hlin : ∀ (c : ResidueField 𝒪) (a : MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf x)),
+    π (c • a) = c • π a)
+  (hkerJ : RingHom.ker π = Ring.jacobson (MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf x)))
+  (eG : MonoidAlgebra K G ≃ₐ[K] ∀ j, Matrix (mG j) (mG j) K)
+  {ωY' : ResidueField 𝒪} (hωY' : IsPrimitiveRoot ωY' (pRegularExponent p ↥(centralizerOf y)))
+  {πY : MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf y) →+*
+    ∀ j, Matrix (nnY j) (nnY j) (ResidueField 𝒪)}
+  (hπY : Function.Surjective πY)
+  (hlinY : ∀ (c : ResidueField 𝒪) (a : MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf y)),
+    πY (c • a) = c • πY a)
+  (hkerJY : RingHom.ker πY
+    = Ring.jacobson (MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf y)))
+
+include hp hω' hπ hlin hkerJ eG hωY' hπY hlinY hkerJY in
+/-- **Navarro p. 141, equation (4): `(D^y_0, D^t_j) = 0`.**
+
+Navarro (5.13)(a) already makes the two `IBr`-columns orthogonal, because `y` and `t` are not
+conjugate, and orthogonality to every `IBr`-column at `t` is orthogonality to every basic-set
+column.  The family "at `t⁻¹`" that (5.13)(a) asks for is the family at `t` itself, `t` being an
+involution (`inv_mul_eq_mul_inv_of_mul_self_eq_one`). -/
+theorem sum_generalizedDecompositionNumber_mul_basicDecompositionNumber_eq_zero {ι₂ : Type*}
+    (u : ι → ι₂ → K) (ht : x * x = 1) (hx : IsPElement p x) (hy : IsPElement p y)
+    (hxy : ¬ IsConj x y) (φ : κY) (η : ι₂) :
+    (∑ i : J, generalizedDecompositionNumber y hp hωY' hπY hlinY hkerJY
+          ((wedderburnRepresentation eG i).character)
+          (fun _ _ h => character_eq_of_isConj _ h) φ *
+        basicDecompositionNumber (generalizedDecompositionNumber x hp hω' hπ hlin hkerJ
+          ((wedderburnRepresentation eG i).character)
+          (fun _ _ h => character_eq_of_isConj _ h)) u η) = 0 := by
+  refine sum_mul_basicDecompositionNumber_left_eq_zero η fun τ => ?_
+  refine Eq.trans (Finset.sum_congr rfl fun i _ => mul_comm _ _) ?_
+  exact sum_mul_generalizedDecompositionNumber_eq_zero hp hω' hπ hlin hkerJ eG hωY' hπY hlinY
+    hkerJY hx hy hxy τ φ _ fun i w hw => by
+      rw [sum_generalizedDecompositionNumber x hp hω' hπ hlin hkerJ _ _ (y := w⁻¹) hw.inv,
+        inv_mul_eq_mul_inv_of_mul_self_eq_one ht w]
+
+end TwoElements
 
 end OddOrder.RepresentationTheory.Modular
