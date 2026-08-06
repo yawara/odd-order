@@ -166,7 +166,7 @@ the separation hypothesis of `blockCharacter_blockOfIrr_pRegularSum_eq_zero` is 
 the Brauer constituents of the trivial representation all lie in `B_0`
 (`mk_eq_principalBlock_of_decompositionNumber_trivial`). -/
 theorem blockCharacter_pRegularSum_eq_zero_of_ne_principalBlock
-    [IsAdicComplete (maximalIdeal 𝒪) 𝒪]
+    [IsIntegrallyClosed 𝒪] [IsAlgClosed (FractionRing 𝒪)]
     (B : MatrixModule.Block π hπ hlin) (hB : B ≠ principalBlock π hπ hlin hnil) :
     MatrixModule.blockCharacter π hπ hlin B
       ⟨pRegularSum p (ResidueField 𝒪), pRegularSum_mem_center⟩ = 0 := by

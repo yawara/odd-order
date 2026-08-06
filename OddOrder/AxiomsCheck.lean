@@ -19276,3 +19276,18 @@ ordinary 側を分裂させる係数環 `𝓞_ℂ_[p]` は値群が可除ゆえ 
 #assert_only_allowed_axioms
   OddOrder.existsUnique_isIdempotentElem_centerGroupAlgebra_of_isAlgClosed
 #assert_only_allowed_axioms OddOrder.existsUnique_isIdempotentElem_mapRingHom_eq_of_isAlgClosed
+
+/-! ✅ **issue 9506 段 314**: 鎖の binder を張り替えた。
+
+`[IsAdicComplete (maximalIdeal 𝒪) 𝒪]` → `[IsIntegrallyClosed 𝒪] [IsAlgClosed (FractionRing 𝒪)]`
+を 13 file に適用 (`BlockIdempotentLift` の呼び出しも `_of_isAlgClosed` 版に差し替え)。
+⟹ **`OddOrder/GroupTheory/**` から `IsAdicComplete` の binder は消えた**
+(残るのは `WittVectorSystem` の instance と `PModularSystem` の
+「完備 ⟹ Henselian」導出だけ)。
+
+⚠ 係数体は抽象的な `K` でなく **`FractionRing 𝒪`** で書く。抽象 `K` は仮説にしか現れず
+instance 解決で metavariable になるため、全 consumer に explicit 引数として通す羽目になる。
+
+📌 副産物: `BlockCornerLift.exists_corner_inverse_blockCharacter` と
+`InducedBlockWitness.exists_inducedBlock_witness` の完備性仮説は
+**元から使われていなかった** (削除して build green)。 -/

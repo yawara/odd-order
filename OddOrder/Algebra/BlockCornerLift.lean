@@ -46,7 +46,6 @@ set_option linter.unusedDecidableInType false in
 /-- **Navarro (5.5).**  If `f` is the idempotent of the block `c` and `x ∈ Z(𝒪G)` has
 `λ_c(x*) = 1`, then `f x` is invertible in the corner `f Z(𝒪G)`. -/
 theorem exists_corner_inverse_blockCharacter
-    [IsAdicComplete (IsLocalRing.maximalIdeal 𝒪) 𝒪]
     (hφ : Function.Surjective φ) (hker : RingHom.ker φ = IsLocalRing.maximalIdeal 𝒪)
     (hnil : ∀ z : Subalgebra.center F (MonoidAlgebra F G),
       blockCharacterPi π hπ hlin z = 0 → IsNilpotent z)

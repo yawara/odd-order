@@ -12,9 +12,13 @@ import OddOrder.Algebra.IdempotentLift
 /-!
 # Idempotents lift over a coefficient ring whose fraction field is algebraically closed
 
-Let `A` be a local integrally closed domain whose fraction field `K` is algebraically closed, and
-let `B` be a commutative `A`-algebra that is free of finite rank.  Then idempotents lift along
+Let `A` be a local integrally closed domain whose fraction field is algebraically closed, and let
+`B` be a commutative `A`-algebra that is free of finite rank.  Then idempotents lift along
 `B ↠ B/𝔪B`.
+
+The fraction field is written `FractionRing A` rather than an abstract `K`, so that the hypothesis
+is a genuine instance argument: an abstract `K` occurs only in the hypotheses and would have to be
+threaded explicitly through every consumer.
 
 The usual hypothesis for lifting idempotents is that `A` be `𝔪`-adically complete, so that Newton's
 iteration `e ↦ 3e² - 2e³` converges.  That is unavailable for the coefficient rings that make the
@@ -204,12 +208,11 @@ and `B` is free of finite rank over `A`.
 over `A` (`exists_multiset_prod_X_sub_C`); prefixing the factor `X` puts `0` — an element of `𝔪` —
 among the roots, which is what
 `exists_isIdempotentElem_sub_mem_of_multiset_prod_eq_zero` asks for. -/
-theorem exists_isIdempotentElem_sub_mem_of_isAlgClosed (K : Type*) [Field K] [Algebra A K]
-    [IsFractionRing A K] [IsAlgClosed K] [Module.Free A B] [Module.Finite A B]
+theorem exists_isIdempotentElem_sub_mem_of_isAlgClosed [IsDomain A]
+    [IsAlgClosed (FractionRing A)] [Module.Free A B] [Module.Finite A B]
     {b : B} (hb : b * b - b ∈ (maximalIdeal A).map (algebraMap A B)) :
     ∃ e : B, IsIdempotentElem e ∧ e - b ∈ (maximalIdeal A).map (algebraMap A B) := by
   classical
-  haveI : Nontrivial A := (algebraMap A K).domain_nontrivial
   -- Cayley–Hamilton for multiplication by `b`
   set f : A[X] := (Algebra.lmul A B b).charpoly with hf
   have hfm : f.Monic := LinearMap.charpoly_monic _
@@ -217,7 +220,7 @@ theorem exists_isIdempotentElem_sub_mem_of_isAlgClosed (K : Type*) [Field K] [Al
     have hlm : (aeval (Algebra.lmul A B b)) f = 0 := LinearMap.aeval_self_charpoly _
     rw [Polynomial.aeval_algHom_apply] at hlm
     exact Algebra.lmul_injective (by rw [hlm, map_zero])
-  obtain ⟨s, hs⟩ := exists_multiset_prod_X_sub_C (A := A) K hfm
+  obtain ⟨s, hs⟩ := exists_multiset_prod_X_sub_C (A := A) (FractionRing A) hfm
   refine exists_isIdempotentElem_sub_mem_of_multiset_prod_eq_zero hb (s := (0 : A) ::ₘ s) ?_
     ⟨0, Multiset.mem_cons_self _ _, Submodule.zero_mem _⟩
   have hval : ∀ t : Multiset A, (aeval b) (t.map fun a => X - C a).prod
@@ -230,11 +233,11 @@ theorem exists_isIdempotentElem_sub_mem_of_isAlgClosed (K : Type*) [Field K] [Al
 
 /-- **Idempotents lift uniquely along `B ↠ B/𝔪B`.**  Uniqueness needs only that `𝔪B` sits inside
 the Jacobson radical, which is Nakayama and holds for any module-finite `B`. -/
-theorem existsUnique_isIdempotentElem_sub_mem_of_isAlgClosed (K : Type*) [Field K] [Algebra A K]
-    [IsFractionRing A K] [IsAlgClosed K] [Module.Free A B] [Module.Finite A B]
+theorem existsUnique_isIdempotentElem_sub_mem_of_isAlgClosed [IsDomain A]
+    [IsAlgClosed (FractionRing A)] [Module.Free A B] [Module.Finite A B]
     {b : B} (hb : b * b - b ∈ (maximalIdeal A).map (algebraMap A B)) :
     ∃! e : B, IsIdempotentElem e ∧ e - b ∈ (maximalIdeal A).map (algebraMap A B) := by
-  obtain ⟨e, he, heb⟩ := exists_isIdempotentElem_sub_mem_of_isAlgClosed K hb
+  obtain ⟨e, he, heb⟩ := exists_isIdempotentElem_sub_mem_of_isAlgClosed (A := A) hb
   refine ⟨e, ⟨he, heb⟩, fun f hf => ?_⟩
   refine eq_of_isIdempotentElem_of_sub_mem _
     (map_maximalIdeal_le_jacobson_bot (A := A) (B := B)) hf.1 he ?_

@@ -165,7 +165,8 @@ end SignRelation
 section KleinFour
 
 variable {p : ℕ} {𝒪 K : Type*} [CommRing 𝒪] [IsDomain 𝒪] [ValuationRing 𝒪]
-  [HenselianLocalRing 𝒪] [IsPModularSystem p 𝒪] [IsAdicComplete (maximalIdeal 𝒪) 𝒪]
+  [HenselianLocalRing 𝒪] [IsPModularSystem p 𝒪] [IsIntegrallyClosed 𝒪]
+  [IsAlgClosed (FractionRing 𝒪)]
   [Field K] [Algebra 𝒪 K] [IsFractionRing 𝒪 K] [FaithfulSMul 𝒪 K]
   [Fact p.Prime] [CharP (ResidueField 𝒪) p]
 variable {G : Type*} [Group G] [Fintype G] [DecidableEq (ConjClasses G)]
@@ -318,7 +319,8 @@ set_option maxHeartbeats 800000 in
 -- inverse inside `ordinaryCombinationCoeff` elaborate.
 set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
-omit [DecidableEq κ] [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [Fact p.Prime] [CharP (ResidueField 𝒪) p]
+omit [DecidableEq κ] [IsIntegrallyClosed 𝒪] [Fact p.Prime] [CharP (ResidueField 𝒪) p]
+  [IsAlgClosed (FractionRing 𝒪)]
   [Fintype ↥(centralizerOf t)] [Invertible (Nat.card G : K)] [Fintype κ] [DecidableEq ιG] in
 /-- **`u_{μj} = 0` for `μ ∉ IBr(B_0)` and `j ∈ Irr(B_0)`.**  Both coefficients of `u_{μj}` sit at
 indices in `Irr(B_0)`, and the family vanishes off the block of `μ`. -/
@@ -334,7 +336,8 @@ theorem basicSetMatrixOf_eq_zero_of_ne_principalBlock {a : ιG → κ → K}
 
 set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
-omit [DecidableEq κ] [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [Fact p.Prime] [CharP (ResidueField 𝒪) p]
+omit [DecidableEq κ] [IsIntegrallyClosed 𝒪] [Fact p.Prime] [CharP (ResidueField 𝒪) p]
+  [IsAlgClosed (FractionRing 𝒪)]
   [Fintype ↥(centralizerOf t)] in
 /-- The same for the `K`-valued family of `BrauerFromOrdinary`. -/
 theorem principalBasicSetMatrix_eq_zero_of_ne_principalBlock
@@ -447,7 +450,8 @@ set_option maxHeartbeats 800000 in
 -- Both factors carry the `G`-side modular datum.
 set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
-omit [DecidableEq κ] [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [Fact p.Prime] [CharP (ResidueField 𝒪) p]
+omit [DecidableEq κ] [IsIntegrallyClosed 𝒪] [Fact p.Prime] [CharP (ResidueField 𝒪) p]
+  [IsAlgClosed (FractionRing 𝒪)]
   [Fintype ↥(centralizerOf t)] in
 -- `Invertible (Nat.card G : K)` / `Fintype κ` / `DecidableEq ιG` are not used here, but omitting
 -- them makes the `K`-valued instance below unable to apply this statement.
@@ -471,7 +475,8 @@ theorem sum_decompositionMatrix_mul_basicSetMatrixOf_eq_zero {a : ιG → κ →
 
 set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
-omit [DecidableEq κ] [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [Fact p.Prime] [CharP (ResidueField 𝒪) p]
+omit [DecidableEq κ] [IsIntegrallyClosed 𝒪] [Fact p.Prime] [CharP (ResidueField 𝒪) p]
+  [IsAlgClosed (FractionRing 𝒪)]
   [Fintype ↥(centralizerOf t)] in
 /-- The same for the `K`-valued family of `BrauerFromOrdinary`. -/
 theorem sum_decompositionMatrix_mul_principalBasicSetMatrix_eq_zero

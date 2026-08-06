@@ -44,7 +44,8 @@ open OddOrder.GroupAlgebra (inclusionHom)
 open scoped TensorProduct
 
 variable {p : ℕ} {𝒪 K : Type*} [CommRing 𝒪] [IsDomain 𝒪] [ValuationRing 𝒪]
-  [HenselianLocalRing 𝒪] [IsPModularSystem p 𝒪] [IsAdicComplete (maximalIdeal 𝒪) 𝒪]
+  [HenselianLocalRing 𝒪] [IsPModularSystem p 𝒪] [IsIntegrallyClosed 𝒪]
+  [IsAlgClosed (FractionRing 𝒪)]
   [Field K] [Algebra 𝒪 K] [IsFractionRing 𝒪 K]
 variable {G : Type*} [Group G] [Fintype G] [DecidableEq (ConjClasses G)]
   [Fintype (ConjClasses G)]
@@ -61,6 +62,7 @@ set_option maxHeartbeats 1000000 in
 -- Two splittings, two block index sets and the three incarnations of `f_b`; unifying those
 -- instance chains is what costs the heartbeats.
 omit [Finite ιG] [Module 𝒪 V] [IsScalarTower 𝒪 K V] in
+omit [IsIntegrallyClosed 𝒪] [IsAlgClosed (FractionRing 𝒪)] in
 /-- **Brauer's second main theorem in block language, Navarro (5.2).**  Let `x` be a `p`-element,
 `H = C_G(x)`, `B` a block of `G` and `b` a block of `H` with `b^G = B`.  If the block idempotent
 `f_B` annihilates the module affording `χ` — this is `χ ∉ Irr(B)` — then `d^x_{χφ} = 0` for every
@@ -124,6 +126,7 @@ theorem generalizedDecompositionNumber_eq_zero_of_inducedBlock (hp : p.Prime) {x
 
 set_option maxHeartbeats 1000000 in
 -- As above, plus the block of `χ` and its lattice.
+omit [IsIntegrallyClosed 𝒪] [IsAlgClosed (FractionRing 𝒪)] in
 /-- **Navarro (5.8).**  Let `x` be a `p`-element and `H = C_G(x)`.  If the block of `χ` is not the
 block induced by `b ∈ Bl(H)`, then `d^x_{χφ} = 0` for every `φ ∈ IBr(b)`.  Equivalently: the
 generalized decomposition numbers of `χ ∈ Irr(B)` are supported on `⋃_{b^G = B} IBr(b)`.

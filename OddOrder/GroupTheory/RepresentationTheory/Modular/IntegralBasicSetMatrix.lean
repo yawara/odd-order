@@ -172,7 +172,8 @@ end IntMatrix
 section IntKleinFour
 
 variable {p : ℕ} {𝒪 K : Type*} [CommRing 𝒪] [IsDomain 𝒪] [ValuationRing 𝒪]
-  [HenselianLocalRing 𝒪] [IsPModularSystem p 𝒪] [IsAdicComplete (maximalIdeal 𝒪) 𝒪]
+  [HenselianLocalRing 𝒪] [IsPModularSystem p 𝒪] [IsIntegrallyClosed 𝒪]
+  [IsAlgClosed (FractionRing 𝒪)]
   [Field K] [Algebra 𝒪 K] [IsFractionRing 𝒪 K] [FaithfulSMul 𝒪 K]
   [Fact p.Prime] [CharP (ResidueField 𝒪) p]
 variable {G : Type*} [Group G] [Fintype G] [DecidableEq (ConjClasses G)]

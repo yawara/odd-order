@@ -38,8 +38,8 @@ open OddOrder.GroupTheory.CenterSimplesOrbit (aug aug_apply)
 
 open scoped OddOrder.Conjugation
 
-variable {p : ℕ} {𝒪 : Type*} [CommRing 𝒪] [HenselianLocalRing 𝒪] [IsPModularSystem p 𝒪]
-  [IsAdicComplete (maximalIdeal 𝒪) 𝒪]
+variable {p : ℕ} {𝒪 : Type*} [CommRing 𝒪] [IsDomain 𝒪] [HenselianLocalRing 𝒪]
+  [IsPModularSystem p 𝒪] [IsIntegrallyClosed 𝒪] [IsAlgClosed (FractionRing 𝒪)]
 variable {G : Type*} [Group G] [Finite G]
 variable {ι : Type*} [Finite ι] {nn : ι → Type*} [∀ i, Fintype (nn i)] [∀ i, DecidableEq (nn i)]
   [∀ i, Nonempty (nn i)]
@@ -49,7 +49,7 @@ variable (π : MonoidAlgebra (ResidueField 𝒪) G →+* ∀ j, Matrix (nn j) (n
   (hnil : ∀ z : Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) G),
     blockCharacterPi π hπ hlin z = 0 → IsNilpotent z)
 
-omit [IsAdicComplete (maximalIdeal 𝒪) 𝒪] in
+omit [IsDomain 𝒪] [IsIntegrallyClosed 𝒪] [IsAlgClosed (FractionRing 𝒪)] in
 /-- **`d(B_0) = ν(|G|)`.**  A lift `f` of the principal block idempotent has full defect: its
 augmentation reduces to `λ_{B_0}(e_{B_0}) = 1`, so `BlockHeight`'s criterion applies. -/
 theorem defect_eq_factorization_of_blockCharacterPi_principal

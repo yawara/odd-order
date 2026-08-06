@@ -32,17 +32,17 @@ namespace OddOrder
 
 open IsLocalRing OddOrder.GroupTheory.CenterClassSum
 
-variable {𝒪 G : Type*} [CommRing 𝒪] [IsLocalRing 𝒪] [IsIntegrallyClosed 𝒪] [Group G]
+variable {𝒪 G : Type*} [CommRing 𝒪] [IsDomain 𝒪] [IsLocalRing 𝒪] [IsIntegrallyClosed 𝒪]
+  [IsAlgClosed (FractionRing 𝒪)] [Group G]
 
 /-- **Idempotents lift uniquely to `Z(𝒪G)`** when the fraction field of `𝒪` is algebraically
 closed.  Same conclusion as `existsUnique_isIdempotentElem_centerGroupAlgebra`, with completeness
-of `𝒪` traded for `IsAlgClosed (Frac 𝒪)`.
+of `𝒪` traded for `IsAlgClosed (FractionRing 𝒪)`.
 
 Finiteness of `G` is an explicit hypothesis rather than an instance: it is needed only to produce
 the class-sum basis, so as an instance it would be reported as unused. -/
 theorem existsUnique_isIdempotentElem_centerGroupAlgebra_of_isAlgClosed
-    (K : Type*) [Field K] [Algebra 𝒪 K] [IsFractionRing 𝒪 K] [IsAlgClosed K] (hG : Finite G)
-    {c : ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G))}
+    (hG : Finite G) {c : ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G))}
     (hc : c * c - c ∈ centerIdeal (G := G) (maximalIdeal 𝒪)) :
     ∃! e : ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)),
       IsIdempotentElem e ∧ e - c ∈ centerIdeal (G := G) (maximalIdeal 𝒪) := by
@@ -55,7 +55,7 @@ theorem existsUnique_isIdempotentElem_centerGroupAlgebra_of_isAlgClosed
     Module.Free.of_basis centerBasis
   haveI : Module.Finite 𝒪 ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)) :=
     Module.Finite.of_basis centerBasis
-  exact existsUnique_isIdempotentElem_sub_mem_of_isAlgClosed K hc
+  exact existsUnique_isIdempotentElem_sub_mem_of_isAlgClosed hc
 
 -- Same as in `CenterIdempotentLift`: the finiteness instances are consumed through the kernel
 -- description of `centerIdeal`.
@@ -63,10 +63,10 @@ set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
 /-- **Idempotents of `Z(FG)` lift uniquely to `Z(𝒪G)`** when the fraction field of `𝒪` is
 algebraically closed.  Same conclusion as `existsUnique_isIdempotentElem_mapRingHom_eq`, with
-completeness of `𝒪` traded for `IsAlgClosed (Frac 𝒪)`; this is the form the block theory consumes,
+completeness of `𝒪` traded for `IsAlgClosed (FractionRing 𝒪)`; this is the form the block theory
+consumes,
 producing Navarro's `f_B ∈ Z(𝒪G)` from the block idempotents `e_B ∈ Z(kG)`. -/
 theorem existsUnique_isIdempotentElem_mapRingHom_eq_of_isAlgClosed
-    (K : Type*) [Field K] [Algebra 𝒪 K] [IsFractionRing 𝒪 K] [IsAlgClosed K]
     {F : Type*} [CommRing F] [Fintype G] [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)]
     (φ : 𝒪 →+* F) (hφ : Function.Surjective φ) (hker : RingHom.ker φ = maximalIdeal 𝒪)
     (hG : Finite G) {z : MonoidAlgebra F G}
@@ -80,7 +80,7 @@ theorem existsUnique_isIdempotentElem_mapRingHom_eq_of_isAlgClosed
   have happrox : cc * cc - cc ∈ centerIdeal (G := G) (maximalIdeal 𝒪) := by
     rw [mem_centerIdeal_iff_mapRingHom_eq_zero _ φ hker, map_sub, map_mul, hccred, hz, sub_self]
   obtain ⟨e, ⟨he, hec⟩, huniq⟩ :=
-    existsUnique_isIdempotentElem_centerGroupAlgebra_of_isAlgClosed (G := G) K hG happrox
+    existsUnique_isIdempotentElem_centerGroupAlgebra_of_isAlgClosed (G := G) hG happrox
   refine ⟨e, ⟨he, ?_⟩, fun e' he' => ?_⟩
   · have hzero : centerReduceHom φ (e - cc) = 0 :=
       (mem_centerIdeal_iff_mapRingHom_eq_zero _ φ hker _).mp hec

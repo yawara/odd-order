@@ -73,7 +73,6 @@ set_option linter.unusedFintypeInType false in
 /-- **Navarro (5.6).**  If `b` is a block of `H ≤ G` with `b^G = B`, then there is a `w ∈ 𝒪G`
 supported off `H`, centralised by `H`, with `w f_b = w` and `(1 - f_B) f_b = (1 - f_B) w`. -/
 theorem exists_inducedBlock_witness
-    [IsAdicComplete (IsLocalRing.maximalIdeal 𝒪) 𝒪]
     (hφ : Function.Surjective φ) (hker : RingHom.ker φ = IsLocalRing.maximalIdeal 𝒪)
     (hnilH : ∀ z : Subalgebra.center F (MonoidAlgebra F ↥H),
       blockCharacterPi πH hπH hlinH z = 0 → IsNilpotent z)
