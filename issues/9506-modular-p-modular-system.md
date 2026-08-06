@@ -5222,3 +5222,33 @@ theorem exists_sum_character_subgroup (ρ : Representation F G V) (H : Subgroup 
 ⚠ `BlockIdempotentOrdinary.lean:130-133` に
 `centralScalar … i fK • ordinaryIdempotent e i = if blockOfIrr … i = B then … else 0`
 という**同じ形の既存論法**がある。段 362 はこれを雛形にできる。
+
+##### 段 362 の橋 2 本 (2026-08-06、`BlockIdempotentOrdinary` の証明内から抽出)
+
+`mapRingHom_blockIdempotent_eq_sum` の証明 (`BlockIdempotentOrdinary.lean:78-118`) が
+使っている 2 本が、そのまま段 362 でも要る:
+
+* **`algebraMap_centralScalar_eq e i f`** —
+  `algebraMap 𝒪 K (centralScalar K (wedderburnLatticeRepresentation e i).asAlgebraHom
+  (exists_smul_id_of_commute_wedderburnLattice e i) f)
+  = MatrixModule.centralScalar e.toAlgHom.toRingHom i (mapRingHom (algebraMap 𝒪 K) f)`
+  (`𝒪` 側の中心スカラーと `K` 側の中心スカラーの橋)
+* **`blockCharacter_blockOfLattice_mapRingHom K _ (exists_smul_id_of_commute_wedderburnLattice e i)
+  residue_surjective πG hπG hlinG hnilG f hf`** —
+  `blockCharacter (blockOfLattice …) f' = residue 𝒪 (centralScalar K … f)`
+  (`blockOfIrr` の定義的性質; `hf : mapRingHom (residue 𝒪) f = f'`)
+
+段 362 の proof skeleton:
+1. 段 361 で `f : Z(𝒪G)`、`mapRingHom (algebraMap 𝒪 K) f = ∑_{k∈Q} e_k`。
+2. `centralScalar e.toAlgHom.toRingHom i (∑_{k∈Q} e_k) = if Q i then 1 else 0`
+   (`centralScalar_ordinaryIdempotent` + 加法性)。
+3. 1+2 と `algebraMap_centralScalar_eq` + `FaithfulSMul.algebraMap_injective` で
+   `centralScalar K … f = if Q i then 1 else 0` (`𝒪` の中で)。
+4. `blockCharacter_blockOfLattice_mapRingHom` で
+   `blockCharacter (blockOfIrr i) f' = residue (if Q i then 1 else 0)`。
+5. `blockOfIrr i = blockOfIrr j` なら左辺一致 ⟹ `Q i` かつ `¬ Q j` は
+   `residue 1 = residue 0` = `(1 : k) = 0` を導き矛盾。
+   ⟹ **(3.9) `Irr(B)` は単一連結成分**。
+
+⚠ `f'` (還元の中心性) は `OddOrder.mapRingHom_mem_center (residue 𝒪) f.2` で作れる
+(同 file の `hfKcentral` が `algebraMap` 版でこれを使っている)。
