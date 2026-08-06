@@ -3693,6 +3693,46 @@ BS では `x = t` (`G` の対合)、`N = ⟨t⟩ ≤ C_G(t)`、`t̄` = 位数 4 
   `(u_i, u_i) = 3` から「非零成分はちょうど 3 個で `{1,1,−1}`」を出す。
 * ⟹ pp.143-146 の endgame (未読 — 着手時に `references/navarro/pages/*.png` で実読)。
 
+### ✅ 段 323 完了 (2026-08-06) — basic set 列の直交 (p.141 の (4)(5))
+
+`BasicSetDecomposition` に 2 本追加 (どちらも `IBr` 列 → basic set 列の双線型移送):
+
+* `sum_mul_basicDecompositionNumber_eq_zero` = (7.5)(d) = **(4) `(D^y_0, D^t_j) = 0`**。
+  ⚠ 既存の `sum_mul_basicDecompositionNumber` に `c = 0` を食わせる形には**ならない** —
+  `y` と `t` は中心化群が違うので basic set の行列が**別の添字集合上の別の行列** `u`, `u'`。
+  入力 = `sum_mul_generalizedDecompositionNumber_eq_zero` (Navarro (5.13)(a) 後半、既存)。
+* `sum_mul_basicDecompositionNumber_left_eq_zero` = **(5) `(χ(1), D^t_j) = 0`**。
+  入力 = `sum_character_mul_generalizedDecompositionNumber_eq_zero` を `v = 1` で
+  (`1⁻¹ ∉ S(t)` は `t ≠ 1` から)。
+
+⚠ **(3) `(D^t_i, D^t_j) = |N|(1+δ)` は独立の補題にしない (設計判断)**: 既存の (7.5)(c)
+`sum_mul_basicDecompositionNumber_eq_cartanMatrix` の右辺が **段 322 の左辺そのもの**なので、
+消費側で `rw` + `exact` の 2 行で済む。約 60 仮説を書き写すだけのラッパーは
+CLAUDE.md「薄いラッパーを書かない」に反する。
+
+⚠ `#assert_only_allowed_axioms` は **1 コマンド 1 名前** (2 個並べると構文エラー)。
+
+### ⏭ 段 324 の着手点 — **p.142 の整数列 (原文未読、実読が要る)**
+
+p.141 の (3)(4)(5) が揃ったので、次は原文 p.142 の中核:
+
+> `2u_1 = D^y_0 + D^t_0 − D^t_1 − D^t_2` 等で整数列 `u_i` を作り、`(u_i, u_i) = 3` から
+> 「非零成分はちょうど 3 個で `{1,1,−1}`」を出す
+
+⚠ **着手前に `references/navarro/pages/navarro-p142.png` を Read して式を確定すること**
+(この issue の p.142 記述は 2026-08-05 の要約で、係数・符号は未検証)。
+その先 pp.143-146 は**未読**。
+
+材料の所在 (2026-08-06 実測):
+| 原文 | repo |
+|---|---|
+| (3) `(D^t_i,D^t_j) = 2(1+δ)` | (7.5)(c) `sum_mul_basicDecompositionNumber_eq_cartanMatrix` × 段 322 |
+| (4) `(D^y_0,D^t_j) = 0` | 段 323 `sum_mul_basicDecompositionNumber_eq_zero` |
+| (5) `(χ(1),D^t_j) = 0` | 段 323 `sum_mul_basicDecompositionNumber_left_eq_zero` |
+| `χ_i(tu) = ∑_j d^t_{χ_iψ_j} ψ_j(u)` | (7.5)(a) `sum_basicDecompositionNumber_eq_character` |
+| "analysis at y" の 4 部品 | 段 185/187/188/195/197-200/283-285 |
+| `τ(t) ≡ τ(y) mod 2` | 段 289 |
+
 #### 最終組み立ての形 (2026-08-06 実測)
 
 `hconv` の discharge は**既存の**
