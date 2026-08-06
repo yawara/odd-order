@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.GroupTheory.BrauerSuzukiQ8.Reduction
 import OddOrder.GroupTheory.CentralInvolutionNormalComplement
 import OddOrder.GroupTheory.RepresentationTheory.Modular.AnalysisAtInvolution
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDegreeOdd
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionColumnExpansion
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexDatum
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainConverseSupply
@@ -215,6 +216,46 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
     ne_of_character_involution_eq_neg_one eQ hl₀ hj₀neg
   obtain ⟨ψ₁, ψ₂, hψ₁B, hψ₂B, hψ₁ne, hψ₂ne, h01, h02, h12, henum⟩ :=
     exists_pair_of_card_filter_eq_four hcard4 hj₀B hl₀B hl₀ne
+  -- the degree column and the column of values at `z`, as integer columns (段 341)
+  obtain ⟨Tval, hTval⟩ := exists_intCast_character_of_involution (K := ℂ_[2]) eG
+    (show z * z = 1 by rw [← pow_two]; exact hz2)
+  have hgdeg : ∀ k, ((Fintype.card (mG k) : ℤ) : ℂ_[2])
+      = (wedderburnRepresentation eG k).character 1 := fun k =>
+    (character_one_eq_card eG k).symm
+  -- the two odd basic-set degrees `ψ₁(1)`, `ψ₂(1)` (段 371)
+  haveI : Fintype ↥((SQ : Subgroup (↥C ⧸ Nz))) := Fintype.ofFinite _
+  have hSQsing : ∀ h : ↥((SQ : Subgroup (↥C ⧸ Nz))), (h : ↥C ⧸ Nz) ≠ 1 →
+      ¬ IsPRegular 2 (h : ↥C ⧸ Nz) := by
+    intro h h1 hreg
+    obtain ⟨n, hn⟩ := SQ.isPGroup' h
+    have hcoe : (h : ↥C ⧸ Nz) ^ 2 ^ n = 1 := by
+      rw [← Subgroup.coe_pow, hn, Subgroup.coe_one]
+    have hdvd := orderOf_dvd_of_pow_eq_one hcoe
+    have hne1 : orderOf (h : ↥C ⧸ Nz) ≠ 1 := fun hc => h1 (orderOf_eq_one_iff.mp hc)
+    obtain ⟨k, -, hkeq⟩ := (Nat.dvd_prime_pow Nat.prime_two).mp hdvd
+    rcases Nat.eq_zero_or_pos k with rfl | hpos
+    · exact hne1 (by rw [hkeq, pow_zero])
+    · exact hreg (hkeq ▸ dvd_pow_self 2 hpos.ne')
+  obtain ⟨s₁, hs₁val, hs₁⟩ := exists_odd_intCast_principalBasicSet (𝒪 := 𝓞_ℂ_[2]) (nn := nnY)
+    (hp := Nat.prime_two) (hx := hybP) (hω := hωY) (e := eY) (eG := eQ)
+    (hπG := quotientPi_surjective πC hπC hlinC hNzP)
+    (hlinG := quotientPi_smul πC hπC hlinC hNzP) (hπ := hπY) (hlin := hlinY) (hkerJ := hkerJY)
+    (hnil := hnilY) (hnilG := hnilQ) (hω' := hω'Y) (hζ := hζ) (hζk := hζk) (hζK := hζK)
+    (hconv := hconvC) (hNp := hMp) (hquot := hquotM) (S := SylC) (hφ₀ := hφ₀)
+    (ht := by rw [← pow_two] at hyb2 ⊢; exact hyb2) (hconjall := hconjall) (ht1 := hyb1)
+    (hcart := hcart) (P := (SQ : Subgroup (↥C ⧸ Nz)))
+    (hPcard := by rw [← Nat.card_eq_fintype_card]; exact hSQ4)
+    (hPsing := hSQsing) (hjB := hψ₁B) (hjne := hψ₁ne)
+  obtain ⟨s₂, hs₂val, hs₂⟩ := exists_odd_intCast_principalBasicSet (𝒪 := 𝓞_ℂ_[2]) (nn := nnY)
+    (hp := Nat.prime_two) (hx := hybP) (hω := hωY) (e := eY) (eG := eQ)
+    (hπG := quotientPi_surjective πC hπC hlinC hNzP)
+    (hlinG := quotientPi_smul πC hπC hlinC hNzP) (hπ := hπY) (hlin := hlinY) (hkerJ := hkerJY)
+    (hnil := hnilY) (hnilG := hnilQ) (hω' := hω'Y) (hζ := hζ) (hζk := hζk) (hζK := hζK)
+    (hconv := hconvC) (hNp := hMp) (hquot := hquotM) (S := SylC) (hφ₀ := hφ₀)
+    (ht := by rw [← pow_two] at hyb2 ⊢; exact hyb2) (hconjall := hconjall) (ht1 := hyb1)
+    (hcart := hcart) (P := (SQ : Subgroup (↥C ⧸ Nz)))
+    (hPcard := by rw [← Nat.card_eq_fintype_card]; exact hSQ4)
+    (hPsing := hSQsing) (hjB := hψ₂B) (hjne := hψ₂ne)
   sorry
 
 end OddOrder.GroupTheory
