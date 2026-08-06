@@ -4540,3 +4540,34 @@ Navarro (7.2)/(7.4) の **`hconjall`** (「非自明な 2-元は全部 `t̄` に
 
 ⚠ 実装知見: `group` タクティクが `(c v c⁻¹)² = c v² c⁻¹` を閉じない
 (zpow 正規形で止まる) — `map_pow (MulAut.conj c) v 2` を使うと `simp` 一発。
+
+### ✅✅✅ 段 340 完了 (2026-08-06) — **原文 pp.139-145 の指標論パート全体が 1 本の定理に**
+
+`Modular/AnalysisAtInvolution.exists_proper_normal_of_columns`:
+
+> 「analysis at `y` / at `t` の 4 本の**整数列** + 原文 p.141 の内積表 + 自明指標での値
+> + `χ(t) = D^t_0+ψ_1(1)D^t_1+ψ_2(1)D^t_2` (`ψ_i(1)` 奇数) + `χ(t) ≡ χ(y) mod 2`
+> + Burnside (10)」
+> ⟹ **`∃ N, N.Normal ∧ N ≠ ⊤ ∧ t ∈ N`**
+
+段 332 (endgame) と 段 337 (核) の合成。**`sorry` 無し・仮説パラメータ化**。
+
+⚠ 列の添字は `Irr(B_0)` でなく **`Irr(G)` 全体**に取った — ブロック外では列が 0 なので
+内積の和は変わらず、部分型とその包含を持ち回らずに済む。
+
+⟹ **`q8_exists_proper_normal` の結論に到達する経路が完全に繋がった**。
+残るのは「この定理の仮説を `𝓞_ℂ_[2]` の 2-modular system から供給する」= **タスク F だけ**。
+
+#### F が供給すべきものの最終リスト (段 340 の仮説そのもの)
+
+1. `e : MonoidAlgebra ℂ_[2] G ≃ₐ ∏ Matrix` (Wedderburn 分裂) — `exists_algEquiv_pi_matrix_padicComplex`
+2. `i₀` と `hi₀` (自明指標) — `exists_blockOfIrr_eq_principalBlock_character_eq_one`
+3. `gdeg`/`Tval` の整数性 — `finrank` と (7.2) `χ(t) = ±1`
+4. `a,b,c,d` の整数列化 — 段 333b + 段 333c
+5. 内積表 — (7.5)(c)(d) × 段 322/323 + 段 185/195 + 段 333c
+6. 自明指標での値 — 段 331
+7. `hT`/`hs₁`/`hs₂` — (7.5)(a) と `card_modEq_character_involution`
+8. `hcong` — 段 289
+9. `h10` — 段 335 + 段 336 + `sign_relation_ten`
+
+**全部 supplier 確定済**。残るのは modular datum を作って配線する作業のみ。

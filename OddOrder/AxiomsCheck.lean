@@ -274,6 +274,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionClassBurnside
 import OddOrder.GroupTheory.RepresentationTheory.Modular.WedderburnKernel
+import OddOrder.GroupTheory.RepresentationTheory.Modular.AnalysisAtInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionDecompositionIntegral
 import OddOrder.GroupTheory.RepresentationTheory.Modular.TrivialCharacterBasicSet
 import OddOrder.Algebra.SubgroupSumBlockAction
@@ -19911,3 +19912,20 @@ Navarro (7.2)/(7.4) の `hconjall`
 
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.sq_eq_one_of_isPGroup_zpowers_quotient_centralizer
+
+/-! 🎯🎯🎯 **issue 9506 段 340**: 原文 pp.139-145 の**指標論パート全体が 1 本の定理**になった
+(`Modular/AnalysisAtInvolution`)。
+
+`exists_proper_normal_of_columns` — 「analysis at `y` / at `t` の 4 本の整数列 + 原文 p.141 の
+内積表 + 自明指標での値 + `χ(t) = D^t_0+ψ_1(1)D^t_1+ψ_2(1)D^t_2` (`ψ_i(1)` 奇数) +
+`χ(t) ≡ χ(y) mod 2` + Burnside (10)」から
+**`∃ N, N.Normal ∧ N ≠ ⊤ ∧ t ∈ N`** を出す。
+
+段 332 (endgame) と 段 337 (核) の合成。列の添字は `Irr(B_0)` でなく **`Irr(G)` 全体**に取る
+(ブロック外では列が 0 なので和は変わらない) — 部分型とその包含を持ち回らずに済む。
+
+⚠ **仮説パラメータ化・`sorry` 無し**。残りは「これらの仮説を `𝓞_ℂ_[2]` の 2-modular system
+から供給する」= 段 F だけ。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_proper_normal_of_columns
