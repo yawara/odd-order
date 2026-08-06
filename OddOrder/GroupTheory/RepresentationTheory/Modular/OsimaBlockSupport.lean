@@ -202,4 +202,96 @@ theorem coeff_blockIdempotent_eq_zero_of_not_isPRegular
     FaithfulSMul.algebraMap_injective 𝒪 K (by rw [hcoeffK, map_zero])
   rw [← hf, MonoidAlgebra.coeff_mapRingHom, hcoeff𝒪, map_zero]
 
+/-! ### The same vanishing for a linking-closed set of ordinary characters
+
+Navarro (3.8) needs these for `A` a **union of connected components of the Brauer graph**, which a
+priori is smaller than `Irr(B)`; that extra generality is exactly what makes (3.9) — `Irr(B)` is a
+*single* component — provable.  The proofs are the ones above with the block filter replaced by an
+abstract predicate closed under linking. -/
+
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+omit [CharZero K] [FaithfulSMul 𝒪 K] [DecidableEq (ConjClasses G)]
+  [Fintype (ConjClasses G)] in
+open scoped Classical in
+include hp hω hω' hkerJ e in
+/-- **`∑_{i ∈ A} d_{iφ} χ_i(g) = 0` at `p`-singular `g`**, for `A` closed under linking.
+
+Either some `i ∈ A` has `d_{iφ} ≠ 0` — and then linking-closure puts *every* `j` with
+`d_{jφ} ≠ 0` in `A`, so the sum is all of `Φ_φ(g)`, which vanishes off the `p`-regular elements —
+or no `i ∈ A` has `d_{iφ} ≠ 0` and every term is zero. -/
+theorem sum_decompositionMatrix_mul_ordinaryCharacter_eq_zero_of_linkedClosed {Q : ι' → Prop}
+    (hQ : ∀ (i j : ι') (ψ : ι), Q i →
+      decompositionMatrix hp hω hω' hπ hlin hkerJ e i ψ ≠ 0 →
+      decompositionMatrix hp hω hω' hπ hlin hkerJ e j ψ ≠ 0 → Q j)
+    (φ : ι) {g : G} (hg : ¬ IsPRegular p g) :
+    (∑ i ∈ Finset.univ.filter Q,
+      (decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ : 𝒪)
+        * ordinaryCharacter (𝒪 := 𝒪) e i g) = 0 := by
+  classical
+  by_cases hex : ∃ i, Q i ∧ decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ ≠ 0
+  · obtain ⟨i₀, hQi₀, hd₀⟩ := hex
+    have hfull : (∑ i ∈ Finset.univ.filter Q,
+          (decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ : 𝒪)
+            * ordinaryCharacter (𝒪 := 𝒪) e i g)
+        = ∑ i : ι', (decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ : 𝒪)
+            * ordinaryCharacter (𝒪 := 𝒪) e i g := by
+      refine Finset.sum_subset (Finset.filter_subset _ _) fun j _ hj => ?_
+      have hdj : decompositionMatrix hp hω hω' hπ hlin hkerJ e j φ = 0 := by
+        by_contra hc
+        exact hj (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hQ i₀ j φ hQi₀ hd₀ hc⟩)
+      rw [hdj, Nat.cast_zero, zero_mul]
+    rw [hfull]
+    exact projectiveIndecomposableCharacter_eq_zero hp hω hω' hπ hlin hkerJ e φ hg
+  · refine Finset.sum_eq_zero fun i hi => ?_
+    have hzero : decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ = 0 := by
+      by_contra hc
+      exact hex ⟨i, (Finset.mem_filter.mp hi).2, hc⟩
+    rw [hzero, Nat.cast_zero, zero_mul]
+
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+omit [CharZero K] [FaithfulSMul 𝒪 K] [DecidableEq (ConjClasses G)]
+  [Fintype (ConjClasses G)] in
+open scoped Classical in
+include hp hω hω' hkerJ e in
+/-- **Weak block orthogonality for a linking-closed `A`**: `∑_{i ∈ A} χ_i(1) χ_i(g) = 0` at
+`p`-singular `g`.  Expand `χ_i(1)` by its row of `D` (the identity is `p`-regular), exchange the
+sums, and apply the previous theorem to each `φ`. -/
+theorem sum_ordinaryCharacter_one_mul_eq_zero_of_linkedClosed {Q : ι' → Prop}
+    (hQ : ∀ (i j : ι') (ψ : ι), Q i →
+      decompositionMatrix hp hω hω' hπ hlin hkerJ e i ψ ≠ 0 →
+      decompositionMatrix hp hω hω' hπ hlin hkerJ e j ψ ≠ 0 → Q j)
+    {g : G} (hg : ¬ IsPRegular p g) :
+    (∑ i ∈ Finset.univ.filter Q,
+      ordinaryCharacter (𝒪 := 𝒪) e i 1 * ordinaryCharacter (𝒪 := 𝒪) e i g) = 0 := by
+  classical
+  have hone : ∀ i : ι', ordinaryCharacter (𝒪 := 𝒪) e i 1
+      = ∑ φ, (decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ : 𝒪)
+        * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π φ 1 :=
+    fun i => trace_eq_sum_decompositionMatrix hp hω hω' hπ hlin hkerJ e i 1 (isPRegular_one hp)
+  calc (∑ i ∈ Finset.univ.filter Q,
+        ordinaryCharacter (𝒪 := 𝒪) e i 1 * ordinaryCharacter (𝒪 := 𝒪) e i g)
+      = ∑ i ∈ Finset.univ.filter Q, ∑ φ,
+        ((decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ : 𝒪)
+            * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π φ 1)
+          * ordinaryCharacter (𝒪 := 𝒪) e i g := by
+        refine Finset.sum_congr rfl fun i _ => ?_
+        rw [hone i, Finset.sum_mul]
+    _ = ∑ φ, ∑ i ∈ Finset.univ.filter Q,
+        ((decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ : 𝒪)
+            * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π φ 1)
+          * ordinaryCharacter (𝒪 := 𝒪) e i g := Finset.sum_comm
+    _ = ∑ φ, irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π φ 1 *
+          ∑ i ∈ Finset.univ.filter Q,
+            (decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ : 𝒪)
+              * ordinaryCharacter (𝒪 := 𝒪) e i g := by
+        refine Finset.sum_congr rfl fun φ _ => ?_
+        rw [Finset.mul_sum]
+        exact Finset.sum_congr rfl fun i _ => by ring
+    _ = 0 := by
+        refine Finset.sum_eq_zero fun φ _ => ?_
+        rw [sum_decompositionMatrix_mul_ordinaryCharacter_eq_zero_of_linkedClosed hp hω hω' hπ
+          hlin hkerJ e hQ φ hg, mul_zero]
+
 end OddOrder.RepresentationTheory.Modular
