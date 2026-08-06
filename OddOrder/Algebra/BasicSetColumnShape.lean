@@ -158,7 +158,10 @@ the entries of `D^y_0` are `0, ±1` this leaves `(a_i, a_j) = (δ_1, 0)` or `(0,
 disposes of the second case by "interchanging the second and the third rows"; here that is the
 exchange of `(i, δ_1)` with `(j, δ_2)`, under which every hypothesis is symmetric.
 
-The output is exactly the pair `(6)`, `(7)` that `eq_of_sign_relations` consumes. -/
+The output is exactly the pair `(6)`, `(7)` that `eq_of_sign_relations` consumes, together with
+the record of *which* of the two namings was taken — every other fact about the pair (Navarro's
+(10), or that the indices avoid the trivial character) is symmetric in the exchange and transfers
+along that disjunction. -/
 theorem exists_sign_relations (hδ : δ₁ * δ₂ = -1)
     (hu₁i : u₁ i = δ₁) (hu₁j : u₁ j = δ₂)
     (hu₂i : u₂ i = 0) (hu₂j : u₂ j = 0) (hu₃i : u₃ i = 0) (hu₃j : u₃ j = 0)
@@ -168,8 +171,9 @@ theorem exists_sign_relations (hδ : δ₁ * δ₂ = -1)
     (hai' : a i = 0 ∨ a i = 1 ∨ a i = -1) (haj' : a j = 0 ∨ a j = 1 ∨ a j = -1)
     (hau : 1 + δ₁ * a i + δ₂ * a j = 2)
     (hg : 1 + δ₁ * g i + δ₂ * g j = 0) :
-    ∃ (i' j' : S) (e₁ e₂ : ℤ), e₁ * e₂ = -1 ∧
-      1 + e₁ * T i' - e₂ * T j' = 0 ∧ 1 + e₁ * g i' + e₂ * g j' = 0 := by
+    ∃ (i' j' : S) (e₁ e₂ : ℤ),
+      ((i' = i ∧ j' = j ∧ e₁ = δ₁ ∧ e₂ = δ₂) ∨ (i' = j ∧ j' = i ∧ e₁ = δ₂ ∧ e₂ = δ₁)) ∧
+      e₁ * e₂ = -1 ∧ 1 + e₁ * T i' - e₂ * T j' = 0 ∧ 1 + e₁ * g i' + e₂ * g j' = 0 := by
   obtain ⟨hδ₁, hδ₂⟩ := mul_self_eq_one_of_mul_eq_neg_one hδ
   obtain ⟨h₁, h₂⟩ := eq_one_or_neg_one_of_mul_eq_neg_one hδ
   -- `δ_2 = -δ_1`, so `(D^y_0, u_1) = 2` says `a_i - a_j = δ_1`
@@ -181,9 +185,9 @@ theorem exists_sign_relations (hδ : δ₁ * δ₂ = -1)
     rcases h₁ with rfl | rfl <;> rcases hai' with h | h | h <;> rcases haj' with h' | h' | h' <;>
       omega
   rcases hcase with hz | hz
-  · exact ⟨i, j, δ₁, δ₂, hδ,
+  · exact ⟨i, j, δ₁, δ₂, Or.inl ⟨rfl, rfl, rfl, rfl⟩, hδ,
       sign_relation_six hδ hu₁i hu₁j hu₂i hu₂j hu₃i hu₃j hc hd hb hT hz hau, hg⟩
-  · refine ⟨j, i, δ₂, δ₁, by linarith [hδ, mul_comm δ₁ δ₂],
+  · refine ⟨j, i, δ₂, δ₁, Or.inr ⟨rfl, rfl, rfl, rfl⟩, by linarith [hδ, mul_comm δ₁ δ₂],
       sign_relation_six (by rw [mul_comm]; exact hδ) hu₁j hu₁i hu₂j hu₂i hu₃j hu₃i hc hd hb hT hz
         (by linarith), by linarith⟩
 

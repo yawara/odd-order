@@ -4296,3 +4296,37 @@ eq_ite_of_sum_principalBasicSet_eq_one …                       -- ⟹ D_φ = �
 | G | `q8_exists_proper_normal` への組み立て | F の後 |
 
 ⟹ **原文 pp.139-145 の数学は全部 Lean に在る**。残りは F の instantiation/配線と G の組み立て。
+
+### ✅✅ 段 332 完了 (2026-08-06) — 原文 pp.142-145 の endgame を **1 本に組み上げた**
+
+`Algebra/BrauerSuzukiEndgame.lean` (183 行):
+
+| 名前 | 内容 |
+|---|---|
+| `sum_mul_eq_of_support` | 3 点台の列との内積は 3 項に潰れる (inline 3 箇所を共通化) |
+| `sign_relation_ten` | **(9) ⟹ (10)**。任意の整域で成立 |
+| `exists_eq_of_columns` | 🎯🎯 **endgame 全体** → `∃ χ ≠ 1_G, χ(t) = χ(1)` |
+
+`exists_eq_of_columns` の入力 (= F が供給すべきもの) は**これで確定した**:
+
+* 内積表 `(a,a)=(b,b)=(c,c)=(d,d)=4`, `(b,c)=(b,d)=(c,d)=2`, `(a,b)=(a,c)=(a,d)=0`
+  (`a = D^y_0`, `b,c,d = D^t_0,D^t_1,D^t_2`) — 段 322/323 + "analysis at y"
+* `(g,a)=(g,b)=(g,c)=(g,d)=0` (`g` = 次数列) — 段 323 + 段 195
+* 半和 `2u_1 = a+b−c−d` / `2u_2 = a+b−c+d` / `2u_3 = a+b+c−d` が**整数列**
+* `g i₀ = 1`, `∀k, 1 ≤ g k`, `a i₀ = b i₀ = 1`, `c i₀ = d i₀ = 0` — **段 331**
+* `T k = b k + s₁ c k + s₂ d k` (`T` = `χ(t)` 列、`s_i = ψ_i(1)`) — (7.5)(a)
+* (10) — **段 330 (Burnside) + `sign_relation_ten`**
+
+#### 除算を最後まで導入していない
+
+原文の `Θ_χ = χ(t)²/χ(1)` は `sign_relation_ten` の中で
+`w_χ = ω_χ(K̂)²χ(1)` (`w_χ · χ(1) = m · χ(t)²`, `m = |cl(t)|²`) として担がれ、
+`m` を約すところで初めて (10) が出る。⟹ 付値・整除の管理が一切要らない。
+
+⚠ `exists_sign_relations` を強化: 「記号の選択」を**どちらに取ったかの選言**
+(`(i',j',e₁,e₂)` が `(i,j,δ₁,δ₂)` か `(j,i,δ₂,δ₁)` か) も返す。交換で不変な事実
+((10) と `i' ≠ i₀`) はこれで移送できる。特定の事実を追加の仮説/結論として持たせるより汎用。
+
+⟹ **残るは F の配線のみ**: `𝓞_ℂ_[2]` で `G` / `C_G(t)` / `C_G(y)` / `C_G(t)/⟨t⟩` の
+modular datum を作り、上の 6 種の入力を実際に供給して `exists_eq_of_columns` を呼び、
+`ker χ` を取る (= G)。

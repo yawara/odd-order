@@ -328,6 +328,7 @@ import OddOrder.Algebra.ThreeNormColumn
 import OddOrder.Algebra.HalfSumColumns
 import OddOrder.Algebra.SignRelationSolution
 import OddOrder.Algebra.BasicSetColumnShape
+import OddOrder.Algebra.BrauerSuzukiEndgame
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockBasicSet
 import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
@@ -19746,3 +19747,24 @@ modular 鎖と同じ分裂体 `K` の中で完結する (**係数体の橋渡し
   OddOrder.RepresentationTheory.Modular.eq_of_sum_principalBasicSet_eq
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.eq_ite_of_sum_principalBasicSet_eq_one
+
+/-! 🎯🎯 **issue 9506 段 332**: 原文 pp.142-145 の endgame を 1 本に組み上げた。
+
+`Algebra/BrauerSuzukiEndgame`:
+
+* `sum_mul_eq_of_support` — 3 点台の列との内積は 3 項に潰れる (3 箇所の inline を共通化)。
+* `sign_relation_ten` — **(9) ⟹ (10)**。原文の `Θ_χ = χ(t)²/χ(1)` を除算なしの
+  `w_χ = ω_χ(K̂)²χ(1)` (`w_χ·χ(1) = m·χ(t)²`, `m = |cl(t)|²`) で担ぐので任意の整域で成立。
+* `exists_eq_of_columns` — 🎯🎯 **endgame 全体**: 4 本の列の内積表 + 自明指標での値
+  (`d^y_{00}=d^t_{00}=1`, `d^t_{01}=d^t_{02}=0`) + `χ(t) = D^t_0+ψ_1(1)D^t_1+ψ_2(1)D^t_2`
+  + (10) から **`∃ χ ≠ 1_G, χ(t) = χ(1)`** (原文 p.139 の "our objective")。
+
+段 324 (ノルム 3) → 段 325 (半和の内積表) → 段 327 (6)(7) → 段 326 (代入) を順に噛ませる。
+
+⚠ `exists_sign_relations` は「記号の選択」を**どちらに取ったかの選言**も返すように強化した
+(`(i',j',e₁,e₂)` が `(i,j,δ₁,δ₂)` か `(j,i,δ₂,δ₁)` か)。交換で不変な事実 ((10)、
+`i' ≠ i₀`) はこれで移送できる。 -/
+
+#assert_only_allowed_axioms OddOrder.Algebra.sum_mul_eq_of_support
+#assert_only_allowed_axioms OddOrder.Algebra.sign_relation_ten
+#assert_only_allowed_axioms OddOrder.Algebra.exists_eq_of_columns
