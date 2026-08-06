@@ -3515,7 +3515,28 @@ instance が段 317 側 (`classical`) と食い違って `rw` が刺さらない
 `pPart p x = x` + `pPart p g = 1` で **`x ≠ 1`** に落とした。
 ⟹ Külshammer の `hweak` の形がそのまま出る。
 
-#### ⟹ 残り = 段 319b (per-`x` の modular datum supplier)
+### ✅ 段 319b 完了 (2026-08-06) — 任意の有限群の modular datum
+
+`GroupAlgebra.exists_modularDatum` — 代数閉体 `k` と**任意の**有限群 `G` について
+5 仮説 (`π`/`hπ`/`hlin`/`hkerJ`/`hnil`) が一括で出る。
+併せて `exists_algHom_pi_matrix_of_isAlgClosed` の戻り値に
+`RingHom.ker π = Ring.jacobson A` を足した (証明が既に片側の包含を示していたので逆向きだけ)。
+
+⟹ (5.11) が要求する **per-`x` の `C_G(x)` datum** はこれで供給できる。
+
+#### ⟹ 残り = 段 319c (`hcoeff` の場合分け合成) → 段 320 (`hconv`)
+
+**`p`-正則側**: `coeff_principalBlock_eq_centralizer_intermediate` の 8 仮説を埋める。
+* `hidem`/`hf`/`hB` — `exists_blockIdempotentFamily` (両側)
+* `hvanish` — `blockCharacter_pRegularSum_eq_zero_of_ne_principalBlock` (両側)
+* `hweak` — 段 319a + 段 319b (Sylow の元は `p`-元: `IsPGroup` から)
+
+**`p`-特異側**: 段 318 を `G` 側と `C_G(Q)` 側の両方に適用して両辺 0。
+
+**その後** `hconv` = `eq_principalBlock_of_blockOfCentralCharacter_eq`
+(`KulshammerThirdMain.lean:503`) + `C_G(⟨x⟩)` と `centralizerOf x` の項の同一視。
+
+#### 旧メモ: 段 319b の見通し (完了済)
 
 `hweak` を Sylow の**各元 `x`** に適用するには `centralizerOf (pPart p x)` の
 modular datum 一式が要る: `π`/`hπ`/`hlin`/**`hkerJ`**/`hnil` + `eH` + `ω`/`hω` + `ω'`/`hω'`。
