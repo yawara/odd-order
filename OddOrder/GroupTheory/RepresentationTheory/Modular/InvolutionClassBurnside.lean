@@ -37,6 +37,10 @@ the basic-set columns of the "analysis at `t`" consume.
 
 * `OddOrder.RepresentationTheory.Modular.classSquareFn_eq_card_mul_coeff` — Burnside, packaged as
   a class function with an `Irr(G)`-expansion
+* `OddOrder.RepresentationTheory.Modular.classSquareCoeff_mul_character_one` —
+  `c_i χ_i(1) = |C|² χ_i(x_C)²`, the hypothesis `sign_relation_ten` consumes
+* `OddOrder.RepresentationTheory.Modular.classSquareCoeff_of_character_eq_one` — `c = |C|²` at the
+  trivial character
 * `OddOrder.RepresentationTheory.Modular.coeff_classSum_mul_self_eq_zero_of_not_isPRegular` — the
   group-theoretic input: an involution class squared misses the `2`-singular elements
 * `OddOrder.RepresentationTheory.Modular.classSquareFn_eq_zero_of_not_isPRegular`
@@ -108,6 +112,30 @@ noncomputable def classSquareCoeff (C : ConjClasses G) (i : ι') : K :=
 /-- The class function `∑_i c_i χ_i` attached to a class `C` by `classSquareCoeff`. -/
 noncomputable def classSquareFn (C : ConjClasses G) : G → K :=
   fun g => ∑ i : ι', classSquareCoeff e C i * (wedderburnRepresentation e i).character g
+
+omit [Fintype ι'] [Invertible (Nat.card G : K)] in
+/-- **`c_i χ_i(1) = |C|² χ_i(x_C)²`** — the division-free reading of `c_i = |C|² χ_i(x_C)²/χ_i(1)`.
+
+This is `sign_relation_ten`'s hypothesis `w_χ χ(1) = m χ(t)²` with the constant `m = |C|²`. -/
+theorem classSquareCoeff_mul_character_one (C : ConjClasses G) (i : ι') :
+    classSquareCoeff e C i * (wedderburnRepresentation e i).character 1
+      = (OddOrder.RepresentationTheory.conjugacyClassSize C : K) ^ 2
+        * (wedderburnRepresentation e i).character C.out ^ 2 := by
+  have h := centralScalar_classSum_mul_character_one_out e i C
+  calc classSquareCoeff e C i * (wedderburnRepresentation e i).character 1
+      = (MatrixModule.centralScalar e.toAlgHom.toRingHom i (classSum C)
+          * (wedderburnRepresentation e i).character 1) ^ 2 := by
+        rw [classSquareCoeff]; ring
+    _ = _ := by rw [h, mul_pow]
+
+omit [Fintype ι'] [Invertible (Nat.card G : K)] in
+/-- **At the trivial character `c_i = |C|²`**, since `1_G(x_C) = 1_G(1) = 1`. -/
+theorem classSquareCoeff_of_character_eq_one (C : ConjClasses G) {i : ι'}
+    (hi : ∀ g : G, (wedderburnRepresentation e i).character g = 1) :
+    classSquareCoeff e C i = (OddOrder.RepresentationTheory.conjugacyClassSize C : K) ^ 2 := by
+  have h := classSquareCoeff_mul_character_one e C i
+  rw [hi 1, mul_one, hi C.out, one_pow, mul_one] at h
+  exact h
 
 set_option maxHeartbeats 400000 in
 -- Burnside is applied at `g⁻¹`, under the same instance chain that carries `e`.

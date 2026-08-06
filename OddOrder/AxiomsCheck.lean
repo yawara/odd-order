@@ -19835,3 +19835,18 @@ modular 鎖と同じ分裂体 `K` の中で完結する (**係数体の橋渡し
 #assert_only_allowed_axioms OddOrder.Algebra.two_dvd_sum_of_odd_degrees
 #assert_only_allowed_axioms OddOrder.Algebra.exists_halfSum_columns
 #assert_only_allowed_axioms OddOrder.Algebra.exists_eq_of_columns_of_odd_degrees
+
+/-! **issue 9506 段 335**: `sign_relation_ten` の 2 仮説を Burnside 側から供給
+(`Modular/InvolutionClassBurnside`)。
+
+* `classSquareCoeff_mul_character_one` — **`c_i·χ_i(1) = |C|²·χ_i(x_C)²`**
+  (= 段 332 `sign_relation_ten` の `hwg : w_χ·g_χ = m·T_χ²`、`m = |C|²`)。
+  `ω_i(Ĉ)·χ_i(1) = |C|·χ_i(x_C)` を 2 乗するだけ。
+* `classSquareCoeff_of_character_eq_one` — **自明指標では `c = |C|²`** (= `hwi₀ : w_{i₀} = m`)。
+
+⟹ (10) の供給に残るのは `∑_k w_k·u₁_k = 0` (段 330 × 段 323 を 4 列ぶん) だけ。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.classSquareCoeff_mul_character_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.classSquareCoeff_of_character_eq_one

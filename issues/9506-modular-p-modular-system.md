@@ -4433,3 +4433,23 @@ modular datum を作り、上の 6 種の入力を実際に供給して `exists_
 
 ⟹ **F に残るのは modular datum の instantiation と (7.2)/(7.4)/(7.6) の群論的仮説だけ**。
 ℤ 側の endgame は「教科書の主張を渡すだけ」の 1 本になった。
+
+### ✅ 段 335 完了 (2026-08-06) — `sign_relation_ten` の 2 仮説を Burnside 側から供給
+
+`Modular/InvolutionClassBurnside` に 2 本:
+
+* `classSquareCoeff_mul_character_one` — **`c_i·χ_i(1) = |C|²·χ_i(x_C)²`**
+  (= 段 332 `sign_relation_ten` の `hwg : w_χ·g_χ = m·T_χ²`、`m = |C|²`)。
+  `centralScalar_classSum_mul_character_one_out` (`ω_i(Ĉ)·χ_i(1) = |C|·χ_i(x_C)`) を 2 乗するだけ。
+* `classSquareCoeff_of_character_eq_one` — **自明指標では `c = |C|²`** (= `hwi₀ : w_{i₀} = m`)。
+
+⟹ **(10) の供給に残るのは `∑_k w_k·u₁_k = 0` だけ** で、これは
+`2·(w,u₁) = (w,a)+(w,b)−(w,c)−(w,d)` の 4 項が全部 0 (段 330 × 段 323 を 4 列ぶん) から出る。
+
+#### F の残り (2026-08-06 時点)
+
+1. `∑_k w_k·u₁_k = 0` (4 列ぶんの 段 330 × 段 323 の合成) — 機械的
+2. modular datum の instantiation (`G` / `C_G(t)` / `C_G(y)` / `C_G(t)/⟨t⟩`)
+3. (7.2)/(7.4)/(7.6) の群論的仮説を Q₈ の構造から供給
+   (`isConj_of_sq_eq_one_quotient_centralizer` は `BrauerSuzukiQ8.lean` に既存)
+4. `exists_eq_of_columns_of_odd_degrees` を呼んで `ker χ` を取る (= G)
