@@ -7,6 +7,7 @@ import OddOrder.GroupTheory.BrauerSuzukiQ8.Reduction
 import OddOrder.GroupTheory.CentralInvolutionNormalComplement
 import OddOrder.GroupTheory.RepresentationTheory.Modular.AnalysisAtInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDegreeOdd
+import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionClassBurnside
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionColumnExpansion
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexDatum
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainConverseSupply
@@ -398,6 +399,24 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
         (mem_virtualCharacters_wedderburnRepresentation eG k))
       (hu := hwP) (hv := hzP) (ha := (havaB k hk).symm) (hb := (hTval k).symm)
       (hc := (character_one_eq_card eG k))
+  -- Burnside's relation (10) (段 330/332/335/336)
+  have hzuniq := unique_involution_of_quaternionSylow T e hzT hz2 hz1
+  have hwa : (∑ k, classSquareCoeff eG (ConjClasses.mk z) k * ((a k : ℤ) : ℂ_[2])) = 0 := by
+    rw [Finset.sum_congr rfl fun k _ => by rw [hava k]]
+    exact sum_classSquareCoeff_mul_generalizedDecompositionNumber_eq_zero (𝒪 := 𝓞_ℂ_[2])
+      (nn := nnW) eG hπW hlinW hkerJW hω'W T hzuniq hz hwP hw1 φ₀W
+  have hwcol : ∀ (η : ι'Q) (col : ι'G → ℤ),
+      (∀ k, basicDecompositionNumber
+        (generalizedDecompositionNumber z Nat.prime_two hω'C hπC hlinC hkerJC
+          ((wedderburnRepresentation eG k).character)
+          (fun _ _ h => character_eq_of_isConj _ h))
+        (fun μ l => ((intBasicSetMatrix eQ A yb j₀ μ l : ℤ) : ℂ_[2])) η = ((col k : ℤ) : ℂ_[2])) →
+      (∑ k, classSquareCoeff eG (ConjClasses.mk z) k * ((col k : ℤ) : ℂ_[2])) = 0 := by
+    intro η col hcolval
+    rw [Finset.sum_congr rfl fun k _ => by rw [← hcolval k]]
+    exact sum_classSquareCoeff_mul_basicDecompositionNumber_eq_zero (𝒪 := 𝓞_ℂ_[2]) (nn := nnC)
+      eG hπC hlinC hkerJC hω'C T hzuniq hz hzP hz1
+      (fun μ l => ((intBasicSetMatrix eQ A yb j₀ μ l : ℤ) : ℂ_[2])) η
   sorry
 
 end OddOrder.GroupTheory
