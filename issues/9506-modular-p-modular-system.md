@@ -3571,7 +3571,25 @@ instance が段 317 側 (`classical`) と食い違って `rw` が刺さらない
 **`private` はファイルを跨げない**ので、`zpowers`/`centralizerOf` の兄弟補題が並ぶ
 `InducedBlockCentralizer` に public 版を置いた。
 
-#### ⚠⚠ 段 320b の実測 (2026-08-06) — 残りは**型レベルの datum 移送**
+### ✅ 段 320b 完了 (2026-08-06) — **型移送は不要だった**
+
+`coeff_principalBlock_eq_of_mem_centralizer` (`KulshammerThirdMain`) —
+中間版の逆定理が要求する `hcoeff` (`G` vs `H`) を、段 320a (`G` vs `C_G(Q)`) と
+段 319c-2 (`H` vs `C_G(Q)`) の**合成**で得る。**どちらも `C_G(Q)` に対して比較している**ので
+その側が相殺され、証明は 3 行。
+
+⚠⚠ **直前の見立ての訂正**: 下の節で「`↥H` と `↥(C_G(⟨x⟩))` の間の datum 移送
+(`π`/`Block`/`principalBlock`/族をまるごと運ぶ) が要る」「単なる `rw` では済まない」と
+記録したが**誤り**だった。2 つの比較が同じ `C_G(Q)` を経由するので、
+`H` と `C_G(Q)` が偶々等しい部分群であってもその事実を使う必要が無い。
+⟹ 候補 1 (`Subgroup.equivOfEq` 汎用移送) も候補 2 (鎖の binder 変更) も**不要**。
+
+⟹ **残り = `hconv` の最終組み立て**: `eq_principalBlock_of_inducedBlockOfNormalizer_eq_intermediate`
+(`.lean:910`) に `Q := zpowers t`, `H := centralizerOf t` と本段の `hcoeff` を食わせ、
+`PrincipalBlockInvolution.lean:84` の `hconv` の形にする。
+`hind` は `inducedBlockOfCentralizer` の定義とそのまま一致する (前段で確認済)。
+
+#### 旧メモ (訂正済): 段 320b の実測 — 型レベルの datum 移送に見えた
 
 `eq_principalBlock_of_inducedBlockOfNormalizer_eq_intermediate` (`.lean:910`) が
 **`inducedBlockOfCentralizer` と同じ形**だと判明した — 4 つの包含

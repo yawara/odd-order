@@ -19449,3 +19449,19 @@ BS の鎖が担ぐのは `centralizerOf x = C_G(x)`。両者は部分群とし�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.centralizer_zpowers_eq_centralizerOf
+
+/-! 🎯🎯 **issue 9506 段 320b**: `hcoeff` の `G` vs `H` 形 — **型移送は不要だった**。
+
+`coeff_principalBlock_eq_of_mem_centralizer` (`KulshammerThirdMain`)。
+中間版の逆定理が要求する `hcoeff` は `G` と `H` の比較だが、
+段 320a は `G` vs `C_G(Q)`、段 319c-2 は `H` vs `C_G(Q)` を与える。
+**どちらも `C_G(Q)` に対して比較している**ので、合成すればその側が相殺されて
+`G` vs `H` が残る — 証明は 3 行。
+
+⚠ **前段の見立ての訂正**: 「`↥H` と `↥(C_G(⟨x⟩))` の間の datum 移送
+(`π`/`Block`/`principalBlock`/族をまるごと運ぶ) が要る」と記録したが、**誤り**だった。
+2 つの比較が同じ `C_G(Q)` を経由するので、`H` と `C_G(Q)` が偶々等しい部分群であっても
+その事実を使う必要が無い。⟹ `Subgroup.equivOfEq` 汎用移送も鎖の binder 変更も不要。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.coeff_principalBlock_eq_of_mem_centralizer

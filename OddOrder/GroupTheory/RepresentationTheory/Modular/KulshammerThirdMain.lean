@@ -679,6 +679,50 @@ theorem coeff_principalBlock_eq_centralizer_intermediate_forall [Fact p.Prime]
       eC hπC hlinC hnilC hp hCH hωH hω'H hkerJH hωC hω'C hkerJC g hg (hidemH _) (hfH _)
       (hBH _) (hidemC _) (hfC _) (hBC _)
 
+omit [DecidableEq (ConjClasses G)] [Invertible (Nat.card G : K)] [Fintype (ConjClasses G)]
+  [Fintype G] [IsDomain 𝒪] [ValuationRing 𝒪] [Fintype ↥H] [DecidableEq (ConjClasses ↥H)]
+  [Fintype (ConjClasses ↥H)] [Fintype ↥(Subgroup.centralizer (Q : Set G))]
+  [DecidableEq (ConjClasses ↥(Subgroup.centralizer (Q : Set G)))]
+  [Fintype (ConjClasses ↥(Subgroup.centralizer (Q : Set G)))] in
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+open scoped Classical in
+/-- **`e_{B_0}^G(h) = e_{b_0}^H(h)` for `h ∈ C_G(Q)`** — the `hcoeff` of the intermediate converse
+of the third main theorem, obtained by chaining the two comparisons through `C_G(Q)`.
+
+No transport between `↥H` and `↥C_G(Q)` is involved even when the two happen to be equal
+subgroups: both `coeff_principalBlock_eq_centralizer_forall` and
+`coeff_principalBlock_eq_centralizer_intermediate_forall` compare *against `C_G(Q)`*, so composing
+them cancels that side and leaves `G` against `H`. -/
+theorem coeff_principalBlock_eq_of_mem_centralizer
+    (hCH : Subgroup.centralizer (Q : Set G) ≤ H)
+    {F' : MatrixModule.Block πG hπG hlinG →
+      Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) G)}
+    {F'H : MatrixModule.Block πH hπH hlinH →
+      Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) ↥H)}
+    {FC' : MatrixModule.Block πC hπC hlinC →
+      Subalgebra.center (ResidueField 𝒪)
+        (MonoidAlgebra (ResidueField 𝒪) ↥(Subgroup.centralizer (Q : Set G)))}
+    (hGC : ∀ g : ↥(Subgroup.centralizer (Q : Set G)),
+      ((F' (principalBlock πG hπG hlinG hnilG) :
+          MonoidAlgebra (ResidueField 𝒪) G)).coeff (g : G)
+        = ((FC' (principalBlock πC hπC hlinC hnilC) :
+            MonoidAlgebra (ResidueField 𝒪) ↥(Subgroup.centralizer (Q : Set G)))).coeff g)
+    (hHC : ∀ g : ↥(Subgroup.centralizer (Q : Set G)),
+      ((F'H (principalBlock πH hπH hlinH hnilH) :
+          MonoidAlgebra (ResidueField 𝒪) ↥H)).coeff (⟨(g : G), hCH g.2⟩ : ↥H)
+        = ((FC' (principalBlock πC hπC hlinC hnilC) :
+            MonoidAlgebra (ResidueField 𝒪) ↥(Subgroup.centralizer (Q : Set G)))).coeff g) :
+    ∀ h : ↥H, (h : G) ∈ Subgroup.centralizer (Q : Set G) →
+      ((F' (principalBlock πG hπG hlinG hnilG) :
+          MonoidAlgebra (ResidueField 𝒪) G)).coeff (h : G)
+        = ((F'H (principalBlock πH hπH hlinH hnilH) :
+            MonoidAlgebra (ResidueField 𝒪) ↥H)).coeff h := by
+  intro h hmem
+  have hh : (⟨((⟨(h : G), hmem⟩ : ↥(Subgroup.centralizer (Q : Set G))) : G),
+      hCH hmem⟩ : ↥H) = h := Subtype.ext rfl
+  rw [hGC ⟨(h : G), hmem⟩, ← hHC ⟨(h : G), hmem⟩, hh]
+
 end IntermediateCoeff
 
 /-! ### The converse of the third main theorem for `H = C_G(Q)` -/
