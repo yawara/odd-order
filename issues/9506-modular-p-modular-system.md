@@ -3123,6 +3123,23 @@ mathlib の直接支援はゼロ。
 ⟹ **次の着手 = `eq_zero_of_vecMul_brauerCharacterMatrix` を
 `Frac 𝒪` 版 + 拡大体への移送に分ける**。それが済んでから 53 file の binder 掃除。
 
+##### 移送の具体案 (2026-08-06)
+
+`F := FractionRing 𝒪`、`K` を `F`-代数な体 (`[Algebra F K] [IsScalarTower 𝒪 F K]`) とする。
+
+1. **`F` 版**: 現行の証明がそのまま (`IsLocalization.exist_integer_multiples_of_finite` は
+   `F = Frac 𝒪` なので使える)。
+2. **移送**: 行列の成分は `𝒪` の像なので `F` の中にある。`d : ι → K` が左核に入るとき、
+   `K` を `F`-ベクトル空間として基底 `(b_j)` を取り (`Basis.ofVectorSpace F K`)、
+   `d i = ∑_j c_{i,j} • b_j` と展開すると
+   `0 = d ᵥ* M = ∑_j (c_{·,j} ᵥ* M) • b_j` で、各係数は `F` の元だから基底の一次独立性で
+   `c_{·,j} ᵥ* M = 0` ⟹ 1 の `F` 版で `c_{·,j} = 0` ⟹ `d = 0`。
+
+⚠ mathlib 実測: `LinearIndependent.map_of_injective_injective` /
+`..._of_surjective_injective` は**係数環を小さくする向き**なので使えない。
+体の拡大で一次独立性が保たれる補題 (階数の不変性) は見当たらなかった
+⟹ 上の**基底展開を自前で書く**のが確実。
+
 ### `hconv` は gap ではなく assembly (2026-08-06 実測)
 
 `hconv` (= Brauer 第 3 主定理の逆向き) の**本体は既に在る**:
