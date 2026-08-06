@@ -5349,3 +5349,44 @@ theorem mk_eq_principalBlock_quotientPi_of_mem [Fact p.Prime] {μ : ι}
 
 ⟹ これで `QuotientPrincipalBlock` の**難しい向き**が埋まり、`hd` が取れる。
 その後 `hT`/`hb0`-`hd0` → 5 群 datum の組み立て → `q8_exists_proper_normal`。
+
+### 📌 セッション区切り (2026-08-06) — 段 346-365 の総括と次の着手点
+
+#### このセッションで landing した段
+
+| 段 | 内容 | file |
+|---|---|---|
+| 346 | (7.4) の basic set は 3 元 / p.141 の展開が 3 項 | `BasicSetTriple.lean` (新) |
+| 347 | 🎯 **原文 (3) `(D^t_i,D^t_j) = 2(1+δ)`** | `ColumnsAtInvolution.lean` (新) |
+| 348 | "analysis at `y`" の列 (整数性+`haa`+`hga`+`ha0`) | `PrincipalBlockInvolution` |
+| 349 | 原文 (4)(5) の直交性 | `ColumnsAtInvolution` |
+| 350 | p.141 の展開は `Irr(B₀)` の χ でしか成り立たない (台限定版) | `BasicSetDecomposition` |
+| 351 | 商群の basic set を `C_G(x)` へ引き戻す橋 | `ColumnsAtInvolution` |
+| 352a | `quotientPi` 下の中心指標対応 (易しい向き) | `QuotientPrincipalBlock.lean` (新) |
+| 353 | 部分群上の指標の平均 = `|H|` の自然数倍 | `SubgroupAverageTrace.lean` (新) |
+| 354 | 🎯 **Dickson `|P| ∣ Φ_φ(1)`** | `DicksonDivisibility.lean` (新) |
+| 355/356 | Osima の消滅を linking-closed へ一般化 / 「列は丸ごとか 0 か」 | `OsimaBlockSupport` |
+| 357/358 | (3.8) の `p`-正則半分 / 統合 `|G| ∣ ∑χ(1)χ(x)` | `OsimaLinkedIntegral.lean` (新) |
+| 359/360/361 | 🎯🎯 **Osima (3.8) 完全形 `f_A ∈ Z(𝒪G)`** | 同上 |
+| 362 | 🎯🎯🎯 **Navarro (3.9)** ブロック = Brauer グラフの連結成分 | `BlockConnected.lean` (新) |
+| 363a/363 | `D` の列は非零 / 🎯🎯🎯 **(3.10) = Problem (3.4)** | `CartanInverse` / `BlockConnected` |
+| 364 | 🎯🎯🎯 **(7.6) のブロック全単射** | `QuotientBlockBijection.lean` (新) |
+| 365 | 🎯 **`hd` の供給** (`d^x_{χμ}` は `IBr(B₀(C_G(x)/N))` の外で 0) | `SupportOfGeneralizedDecomposition.lean` (新) |
+
+**要点**: 数セッション前に「(7.6) に必要な唯一の欠落・200 行超・multi-session」と診断した
+**Problem (3.4)** への道が、**原文 Ch.3 (pp.52-55) を実読して (3.6)→(3.8)→(3.9)→(3.10) の
+連鎖と Dickson の安い証明 (Sylow 上の平均化冪等元の trace) を確定させた後**、
+段 353→365 の 13 段で通った。思考だけで 2 回誤診 (`|G|_p ∣ Φ_φ(x)` の真偽) した後の教訓。
+
+#### ⏭ 次の着手点 (段 366 以降)
+
+1. **`hT`** — 段 346 (3 項展開) + 段 351 (商群 basic set の引き戻し) + 段 365 (`hd`) を
+   `sum_basicDecompositionNumber_eq_character_of_support` (段 350) に食わせる。
+   `η_j(1) = ε_j χ_j(1)` の奇数性は段 342。
+2. **`hb0`/`hc0`/`hd0`** — 段 331 `eq_ite_of_sum_principalBasicSet_eq_one` の配線
+   (`hone` は自明指標について 1 の橋から)。
+3. **組み立て** — 5 群 (`G`/`C_G(t)`/`C_G(t)/⟨t⟩`/`C_{C_G(t)/⟨t⟩}(ȳ)`/`C_G(y)`) の datum を
+   `exists_datum_padicComplex` (段 344) で obtain し、群論的仮説 (段 338/339/290-291/321b) を
+   供給して 段 340 `exists_proper_normal_of_columns` を呼ぶ ⟹ `q8_exists_proper_normal`。
+
+段 340 の 9 種の仮説はすべて supplier 確定済で、残るのは配線のみ。
