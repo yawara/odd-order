@@ -4941,3 +4941,48 @@ repo には**片側だけ**在る:
 
 ⟹ **易しい向き `block_Q(μ) = B₀(Q) ⟹ block_C(μ) = B₀(C)`** はこれで出る (30-60 行見込み)。
 難しい向きだけが Problem (3.4) 待ち。
+
+### ✅ 段 352a 完了 (2026-08-06) — `quotientPi` 下の中心指標対応 (易しい向き)
+
+`Modular/QuotientPrincipalBlock.lean` (新 leaf、161 行):
+`quotientMap_mem_center` / `centralScalar_quotientMap` (🎯 `ω^G_μ(z) = ω^{Ḡ}_μ(f z)`) /
+`centralCharacterAlg_quotientMap` / `augmentation_quotientMap` / `aug_quotientMap` /
+`blockSetoid_quotientPi_le` (**`Ḡ` の分割は `G` の分割を細分**) /
+`mk_eq_principalBlock_of_quotientPi` (**`IBr(B₀(Ḡ)) ⊆ IBr(B₀(G))`**)。
+
+`centralScalar` は行列の 1 成分そのもの (`Algebra/CentralCharacter.lean:93`) で、
+`quotientPi_mapDomain` が行列の等式を与えるので、中心指標の一致は成分を取るだけ。
+実装は見積り (30-60 行) どおり。
+
+### ⏭ 段 352b = **Problem (3.4)**: ブロックは連結成分と一致する
+
+#### 現状の整理 (2026-08-06、これが正確な frontier)
+
+* **易しい向き (repo に在る)**: 連結 ⟹ 同じ中心指標
+  (`centralCharacterAlg_eq_of_decompositionMatrix_ne_zero`, `CartanBlockDiagonal`)。
+  ⟹ **ブロックは連結成分の合併**。
+* **要る向き**: ブロックは**単一の**連結成分 (= 分裂しない)。これが Problem (3.4)。
+
+#### 形式化する最小の主張 (推奨)
+
+> **(3.4′)** `S ⊆ ι` が linking で閉じている (`μ ∈ S`, `d_{iμ} ≠ 0`, `d_{iτ} ≠ 0` ⟹ `τ ∈ S`)
+> ならば、中心冪等元 `f ∈ Z(𝒪[G])` で、還元が `ω_μ(f̄) = 1 (μ ∈ S)`, `= 0 (μ ∉ S)` を
+> 満たすものが存在する。
+
+(3.4′) ⟹ Problem (3.4): `ω_μ = ω_τ` で `μ ∈ S`, `τ ∉ S` なら `1 = ω_μ(f̄) = ω_τ(f̄) = 0` で矛盾。
+
+#### 使えそうな既存資産
+
+* `BlockIdempotentLift.exists_isIdempotentElem_blockCharacterPi_eq_single` —
+  **各ブロックに対し `𝒪` 上の中心冪等元**を作る (冪等元持ち上げ)。`Pi.single c 1` の形。
+* `LatticeBlockIdempotent` の (3.13.a) 2 本 — 冪等元は `χ ∈ B` の格子に恒等、`χ ∉ B` に 0 で作用。
+* `OrdinaryIdempotent` — `e_{χ_i} = (χ_i(1)/|G|)∑_g χ_i(g⁻¹)g`。
+* ⟹ 実作業の核は **`f = ∑_{i ∈ Irr_S} e_i` が `𝒪` 係数**であること
+  (`Irr_S = {i | ∃μ ∈ S, d_{iμ} ≠ 0}`)。ここが唯一の非自明部分。
+
+#### この段が要る理由 (見失わないこと)
+
+段 350 の台限定版が `hd : ¬P μ → d^x_{χμ} = 0` を要求し、`hd` は `block_C` の形でしか取れず、
+段 351 の橋は `block_Q` の形を要求する。両者を繋ぐのが **`block_C(μ) = B₀(C) ⟹
+block_Q(μ) = B₀(Q)`** で、これは段 352a の逆向き = (7.6) の分割一致 = Problem (3.4)。
+⟹ `hT` と `hb0`/`hc0`/`hd0` が全部これ待ち。**Navarro Ch.3 の Problem なので in-scope**。
