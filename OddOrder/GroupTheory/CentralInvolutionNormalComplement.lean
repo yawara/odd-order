@@ -320,4 +320,22 @@ theorem hasNormalPComplement_centralizer_of_card_sylow_four {Q : Type*} [Group Q
     refine Subtype.ext ?_
     exact (Subgroup.mem_centralizer_iff.mp h.2 y (Set.mem_singleton y)).symm
 
+/-- **Unpacking a normal `p`-complement** into the shape the block-theoretic chain asks for: a
+normal `p'`-subgroup `M` of index a power of `p`.
+
+`M.index = |P|` for a Sylow `p`-subgroup `P` (they are complements), and `|M| = P.index` is prime
+to `p`.  The index form avoids having to carry the `Normal` instance inside the statement; the
+consumer turns it into `IsPGroup p (H ⧸ M)` with `IsPGroup.of_card`. -/
+theorem exists_normal_of_hasNormalPComplement {p : ℕ} [Fact p.Prime]
+    (h : HasNormalPComplement p H) :
+    ∃ M : Subgroup H, M.Normal ∧ ¬ p ∣ Nat.card ↥M ∧ ∃ n : ℕ, M.index = p ^ n := by
+  classical
+  obtain ⟨M, hMnorm, hcompl⟩ := h
+  obtain ⟨P⟩ : Nonempty (Sylow p H) := Sylow.nonempty
+  refine ⟨M, hMnorm, ?_, ?_⟩
+  · rw [← (hcompl P).index_eq_card]
+    exact P.not_dvd_index
+  · obtain ⟨n, hn⟩ := P.isPGroup'.exists_card_eq
+    exact ⟨n, by rw [← hn]; exact (hcompl P).symm.index_eq_card⟩
+
 end OddOrder.GroupTheory
