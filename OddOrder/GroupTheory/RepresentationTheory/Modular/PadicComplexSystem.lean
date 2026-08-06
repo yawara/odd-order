@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.NumberTheory.Padics.Complex
 import Mathlib.RepresentationTheory.Maschke
+import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
 import Mathlib.RingTheory.SimpleModule.IsAlgClosed
 import Mathlib.RingTheory.Valuation.LocalSubring
 import OddOrder.Algebra.AlgClosedFractionField
@@ -43,6 +44,8 @@ residue class.
 * `OddOrder.RepresentationTheory.Modular.instIsAlgClosedResidueFieldPadicComplexInt`
 * `OddOrder.RepresentationTheory.Modular.exists_isPrimitiveRoot_padicComplexInt` — every `p'`-th
   root of unity is present, upstairs and downstairs
+* `OddOrder.RepresentationTheory.Modular.exists_pow_eq_one_residue_eq_one_padicComplexInt` — a
+  primitive `p`-th root of unity congruent to `1` mod `𝔪` (the `hζ`/`hζk`/`hζK` triple)
 * `OddOrder.RepresentationTheory.Modular.exists_algEquiv_pi_matrix_padicComplex` — `ℂ_[p]` splits
   `ℂ_[p][G]`, the property `𝕎(𝔽̄_p)` lacks
 -/
@@ -128,6 +131,41 @@ theorem exists_isPrimitiveRoot_residueField_padicComplexInt {n : ℕ} (hn : ¬ p
   haveI : NeZero n := ⟨hn0⟩
   haveI := hasEnoughRootsOfUnity_residueField_padicComplexInt p hn hn0
   exact HasEnoughRootsOfUnity.exists_primitiveRoot _ n
+
+/-- **A primitive `p`-th root of unity in `𝓞_ℂ_[p]`, congruent to `1` modulo `𝔪`.**
+
+`ℂ_[p]` is algebraically closed of characteristic zero, so it has a primitive `p`-th root of unity
+`z`; a root of unity lies in the valuation subring (if `z⁻¹` were the one inside, then so would be
+`(z⁻¹)^{p-1} = z`).  Its residue satisfies `x^p = 1` in characteristic `p`, i.e. `(x - 1)^p = 0`,
+so `x = 1`; and `z ≠ 1` because the root is primitive and `p > 1`.
+
+This is exactly the triple `hζ`, `hζk`, `hζK` carried by the generalized decomposition numbers —
+the `p`-th root of unity used to separate the `p`-part of an element. -/
+theorem exists_pow_eq_one_residue_eq_one_padicComplexInt :
+    ∃ ζ : 𝓞_ℂ_[p], ζ ^ p = 1 ∧ residue 𝓞_ℂ_[p] ζ = 1 ∧
+      algebraMap 𝓞_ℂ_[p] ℂ_[p] ζ ≠ 1 := by
+  haveI : NeZero ((p : ℕ) : ℂ_[p]) := ⟨Nat.cast_ne_zero.mpr hp.out.ne_zero⟩
+  obtain ⟨z, hz⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot ℂ_[p] p
+  have hzp : z ^ p = 1 := hz.pow_eq_one
+  have hz1 : z ≠ 1 := hz.ne_one hp.out.one_lt
+  -- a root of unity lies in the valuation subring
+  have hmem : z ∈ 𝓞_ℂ_[p] := by
+    rcases ValuationSubring.mem_or_inv_mem 𝓞_ℂ_[p] z with h | h
+    · exact h
+    · have hmul : z⁻¹ * (z⁻¹) ^ (p - 1) = 1 := by
+        rw [← pow_succ', Nat.sub_add_cancel hp.out.one_lt.le, inv_pow, hzp, inv_one]
+      rw [show z = (z⁻¹) ^ (p - 1) by rw [← inv_eq_of_mul_eq_one_right hmul, inv_inv]]
+      exact pow_mem h _
+  have hζp : (⟨z, hmem⟩ : 𝓞_ℂ_[p]) ^ p = 1 := Subtype.ext (by push_cast; exact hzp)
+  refine ⟨⟨z, hmem⟩, hζp, ?_, ?_⟩
+  · -- in characteristic `p` the only `p`-th root of unity is `1`
+    have hres : (residue 𝓞_ℂ_[p] (⟨z, hmem⟩ : 𝓞_ℂ_[p])) ^ p = 1 := by
+      rw [← map_pow, hζp, map_one]
+    have hsub : (residue 𝓞_ℂ_[p] (⟨z, hmem⟩ : 𝓞_ℂ_[p]) - 1) ^ p = 0 := by
+      rw [sub_pow_char, hres, one_pow, sub_self]
+    have := pow_eq_zero_iff (n := p) hp.out.ne_zero |>.mp hsub
+    linear_combination this
+  · exact fun h => hz1 h
 
 /-! ### `ℂ_[p]` is a splitting field -/
 

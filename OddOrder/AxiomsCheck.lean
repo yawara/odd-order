@@ -18935,3 +18935,20 @@ Cartan は `(4)` = `|C|₂`。
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.cartanMatrix_principalBlock_eq_card_sylow_of_hasNormalPComplement
+
+/-! 🎯 **issue 9506 段 292**: 一般化分解数が持ち回っていた `hζ`/`hζk`/`hζK` を
+`𝓞_ℂ_[p]` で供給。
+
+`ζ^p = 1` かつ `residue ζ = 1` かつ `algebraMap ζ ≠ 1` なる `ζ` は、これまで
+どの定理でも仮説のままだった (`hcart` と同じ状況)。`ℂ_[p]` は標数 0 の代数閉体なので
+原始 `p` 乗根 `z` があり、
+- `z ∈ 𝓞_ℂ_[p]`: 付値環は `x` か `x⁻¹` を含み、`z⁻¹` 側なら `(z⁻¹)^{p-1} = z` も含む
+- `residue z = 1`: 剰余体は標数 `p` ゆえ `(x-1)^p = x^p - 1 = 0`
+- `z ≠ 1`: 原始根で `p > 1`
+⟹ `exists_pow_eq_one_residue_eq_one_padicComplexInt`。
+
+⚠ `exists_isPrimitiveRoot_padicComplexInt` は `p ∤ n` を要求する (Henselian lift 経由) ので
+`n = p` には使えない。こちらは `ℂ_[p]` 側で取ってから付値環に落とす別ルート。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_pow_eq_one_residue_eq_one_padicComplexInt
