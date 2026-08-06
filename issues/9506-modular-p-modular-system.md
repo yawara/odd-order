@@ -3085,6 +3085,32 @@ Gorenstein 7.1-7.10) は在るが、**Schur 指数の機構がまったく無い
 ⟹ **着手時にどちらを採るか決めること**。(ii-b) は「完備離散付値 + 剰余体代数閉 ⟹
 有限次元斜体なし」という 1 本の定理に集約でき、Schur 指数の一般論より的が絞れる可能性が高い。
 
+⚠ mathlib 実測 (2026-08-06): `Algebra/BrauerGroup/` は**定義だけ** (`CSA` と同値関係)。
+C₁ 体・Tsen・Lang の定理は無い。斜体への付値延長も無い。⟹ (ii-a)(ii-b) とも
+mathlib の直接支援はゼロ。
+
+##### 🎯🎯 (iii) 第三の道 — **`IsFractionRing` を落とせば分裂は無償**かもしれない
+
+**実測 (2026-08-06)**: 鎖は `[IsFractionRing 𝒪 K]` を 53 file で binder に持つが、
+その API の**実使用は `IsFractionRing.injective` の 28 箇所だけ**で、しかも用途は
+すべて `CharZero K` を出すか `algebraMap 𝒪 K` の単射性を得るため。
+そして **`[FaithfulSMul 𝒪 K]` が常に併記されている** (`FaithfulSMul.algebraMap_injective`
+で同じ単射性が出る)。
+
+⟹ **`IsFractionRing 𝒪 K` を落とせる可能性が高い**。落とせれば `K` は
+`Frac 𝒪` である必要が無くなり、
+
+* `𝒪 = 𝕎(𝔽̄_p)[ζ_{p^a}]` (段 301-308 で完備局所・剰余体 `𝔽̄_p` を確立済)
+* `K = AlgebraicClosure (FractionRing 𝒪)` (**代数閉なので分裂は mathlib の
+  `IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed` で無償**)
+
+が両立し、**Brauer の分裂体定理も Schur 指数も不要**になる。
+
+⚠ 検証すべき点: mathlib 側の補題が `IsFractionRing` を **instance として暗黙に**
+使っていないか (格子 `Submodule.IsLattice`、基底変換、`wedderburnLattice` 周り)。
+⟹ **次の着手 = 1 file で binder を外して build する実験**。通れば全体に展開する。
+これが通れば係数環タスク 4 が消えるので、**他の道より先に必ず試すこと**。
+
 ### `hconv` は gap ではなく assembly (2026-08-06 実測)
 
 `hconv` (= Brauer 第 3 主定理の逆向き) の**本体は既に在る**:
