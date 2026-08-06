@@ -3223,6 +3223,46 @@ mathlib の直接支援はゼロ。
    (⚠ `𝕎(𝔽̄_p)` / `ℤ_[p]` はこの仮説を満たさなくなるが、**そもそも分裂しないので
    最終定理の carrier には使えない** — 実害なし)
 
+#### ✅ 段 309-313 の実施結果 (2026-08-06) — **供給側は完了、残りは配線**
+
+| 段 | 内容 | 状態 |
+|---|---|---|
+| 309 | `eq_zero_of_vecMul_map` (左核の消滅は体の拡大で保たれる) | ✅ |
+| 310 | `eq_zero_of_vecMul_brauerCharacterMatrix` を `Frac 𝒪` 版 + 移送に分割 | ✅ |
+| — | (iii) 第三の道 = **死亡** (上記 ❌❌ 節) | 恒久 close |
+| 311 | `exists_multiset_prod_X_sub_C` + 冪等元持ち上げ (存在) | ✅ |
+| 312 | 一意性 (`map_maximalIdeal_le_jacobson_bot`、中山) | ✅ |
+| 313 | `Z(𝒪G)` 側の drop-in 代替 2 本 | ✅ |
+
+新 leaf: `Algebra/AlgClosedIdempotentLift.lean` / `Algebra/CenterGroupAlgebraAlgClosed.lean`。
+`IdempotentLift.eq_of_isIdempotentElem_of_sub_mem` の `[HenselianRing R I]` は
+`I ≤ jacobson ⊥` に弱めた (一意性に Henselian 性は不要)。
+
+⟹ **`[IsAdicComplete I 𝒪]` を要求していた 2 本**
+(`existsUnique_isIdempotentElem_centerGroupAlgebra` /
+`existsUnique_isIdempotentElem_mapRingHom_eq`) **に、結論が同型の
+`_of_isAlgClosed` 版が揃った**。仮説は `[IsIntegrallyClosed 𝒪]` + `[IsAlgClosed K]` で、
+`𝓞_ℂ_[p]` / `ℂ_[p]` はどちらも既に満たす (段 291-292)。
+
+#### 残りの配線 (段 314 以降)
+
+1. `BlockIdempotentLift.lean` の `[IsAdicComplete (maximalIdeal 𝒪) 𝒪]` を
+   `[IsIntegrallyClosed 𝒪]` + `K`/`[IsAlgClosed K]` に張り替え、呼び出しを
+   `existsUnique_isIdempotentElem_mapRingHom_eq_of_isAlgClosed` に差し替える。
+   ⚠ `BlockIdempotentLift` は現在 `K` を binder に持たない (剰余体側だけで閉じている) ので、
+   **`K` を新たに通す**必要がある。ここが唯一の非機械的な点。
+2. 同じ張り替えを `[IsAdicComplete (maximalIdeal 𝒪) 𝒪]` を持つ鎖の file 群へ
+   (実測 2026-08-06: `BlockPartVanishing` / `IntegralBasicSetMatrix` /
+   `PrincipalBlockBasicSet` / `PrincipalBlockInvolution` / `SecondMainPrincipalBlock` /
+   `SecondMainBlockForm` / `SecondMainBlockOfIrr` / `BlockCharacterCount` /
+   `BlockKernel` / `PrincipalBlockDefect` / `PRegularSumVanishing` / `InducedBlockWitness`)。
+3. `𝓞_ℂ_[p]` で `[IsIntegrallyClosed 𝓞_ℂ_[p]]` を確認 (`AlgClosedFractionField` の適用実績から
+   既に在るはず) し、最終定理の carrier として instance 化。
+4. ⚠ `𝕎(𝔽̄_p)` / `ℤ_[p]` は新仮説を満たさなくなるが、**そもそも ordinary 側を分裂させないので
+   最終 carrier には使えない** — 実害なし。段 301-308 で作った
+   `𝕎(𝔽̄_p)[ζ_{p^a}]` (`Algebra/CyclotomicAdjoin.lean`) は (a) 側の資産として保持するが、
+   **(b) が通れば不要になる**。
+
 ### `hconv` は gap ではなく assembly (2026-08-06 実測)
 
 `hconv` (= Brauer 第 3 主定理の逆向き) の**本体は既に在る**:
