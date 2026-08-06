@@ -2931,8 +2931,25 @@ repo に補題が見当たらない) と (b) `hne` の discharge。**ここだ�
 `BlockIdempotentLift.exists_blockIdempotentFamily` を新設 (1 ブロック版から `choose`;
 `hf` は `centerReduce` の定義から `rfl`)。
 
-⟹ **次の着手点 = `blockOfIrr` の全射性**。これが出れば `hvanishH` が任意の `B` で言え、
-`hconv` の配管が最後まで通る。
+✅ **段 295 完了**: `blockOfIrr` の全射性 `CentralScalarBridge.exists_blockOfIrr_eq`
+(+ 支持補題 `mapRingHom_injective`)。
+
+#### `hvanishH` を任意の `B` に降ろす残り (2026-08-06 に段取り確定)
+
+`blockCharacter_blockOfIrr_pRegularSum_eq_zero` を `B ≠ B₀` で使うには、段 295 で `i` を取った後
+その追加仮説 `hne` を潰す必要がある。`hne` の中身は実は「`B ≠ B₀`」そのもの:
+
+- `decompositionMatrix e i φ ≠ 0` ⟹ `blockOfIrr e … i = Quotient.mk (blockSetoid) φ`
+  (`DecompositionBlockDiagonal.blockOfIrr_eq_of_decompositionMatrix_ne_zero`, 証明済)
+- `decompositionNumber σ μ ≠ 0` ⟹ `centralCharacterAlg π μ` は `σ` のブロック
+  (`DecompositionNumber.centralCharacterAlg_eq_of_decompositionNumber_ne_zero`, 証明済)
+- `centralCharacterAlg π φ ≠ centralCharacterAlg π μ` ⟺ `Quotient.mk φ ≠ Quotient.mk μ`
+  (`blockSetoid` の定義)
+
+⟹ **残る 1 点 = 「自明な `𝒪`-格子表現 `σ` (trace ≡ 1) のブロックは主ブロック」**。
+これは段 285 (`blockOfIrr_eq_principalBlock_of_trivial`) の **`𝒪`-格子側の対応物**で、
+証明も同じ (中心指標を類和基底上で比較)。これが出れば `hvanishH` → `hcoeff` → `hconv` が
+最後まで通る。
 
 - "Analysis at t" (p.141-142): `C_G(t)/⟨t⟩` が Klein four Sylow-2 ⟹ (7.4) の basic set、
   (7.6) で `C_G(t)` へ持ち上げ、(7.5) で `d^t` の列。**整数性は issue 9508 で完済**
