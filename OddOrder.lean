@@ -225,6 +225,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.TwistedLayerSum
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerCharacterIndependence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerIndependence
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerLinearIndependence
+import OddOrder.GroupTheory.RepresentationTheory.Modular.ColumnsAtInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorQuotient
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorSubspace
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InvariantLattice
