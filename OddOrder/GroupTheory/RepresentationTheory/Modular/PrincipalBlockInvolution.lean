@@ -851,4 +851,107 @@ theorem eq_zero_of_vanishing_on_pRegular_of_apply_eq_zero
   exact eq_zero_of_vanishing_on_pRegular hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil hnilG hω'
     hζ hζk hζK hconv hNp hquot S hφ₀ hconjall hsupp hvan hc0
 
+/-! ### The column of the "analysis at `y`" as a single integer column
+
+Navarro p. 140 writes the analysis at an element `y` of order `4` in terms of the column
+`D^y_0 = χ(y)`.  Read as the column of *generalized decomposition numbers* `d^y_{χ φ_0}` it needs
+no truncation to `Irr(B_0)`: it vanishes off the principal block by the second main theorem
+(`generalizedDecompositionNumber_principalBlock_eq_zero_of_blockOfIrr_ne`) and equals `χ(y)` on it,
+so the sums over `Irr(G)` and over `Irr(B_0)` agree.  That is what lets the pairing suppliers,
+which all range over the whole of `Irr(G)`, be used verbatim. -/
+
+set_option maxHeartbeats 1000000 in
+-- Four statements of the chain are composed, each carrying the full modular datum.
+set_option linter.unusedFintypeInType false in
+omit ht in
+open scoped Classical in
+include hp hx hω hω' e hπG hlinG hkerJ hnil hnilG hζ hζk hζK hconv hNp hquot S hφ₀ in
+/-- **Navarro p. 140, the column `D^y_0` in one statement.**  For `y` of order dividing `4`,
+conjugate to its inverse, whose centraliser has Cartan invariant `c_{φ_0φ_0} = 4`:
+
+* the column `d^y_{χ φ_0}`, `χ ∈ Irr(G)`, is a column of *integers*;
+* `(D^y_0, D^y_0) = 4` — Navarro's (1);
+* `(χ(1), D^y_0) = 0` — Navarro's (2);
+* its entry at the trivial character of `Irr(B_0)` is `1`.
+
+All four sums range over the whole of `Irr(G)`: the column vanishes outside `Irr(B_0)`, so nothing
+is lost against Navarro's `∑_{i=0}^r`. -/
+theorem exists_intColumn_generalizedDecompositionNumber_principalBlock
+    (hy4 : t ^ 4 = 1) (hinv : ∃ c : G, c * t * c⁻¹ = t⁻¹) (ht1 : t ≠ 1)
+    (hcart : cartanMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e φ₀ φ₀ = 4) :
+    ∃ a : κ → ℤ,
+      (∀ j : κ, ((a j : ℤ) : K)
+        = generalizedDecompositionNumber (𝒪 := 𝒪) (nn := nn) t hp hω' hπ hlin hkerJ
+            ((wedderburnRepresentation eG j).character)
+            (fun _ _ hgh => character_eq_of_isConj _ hgh) φ₀) ∧
+      (∑ j : κ, a j * a j) = 4 ∧
+      (∑ j : κ, (wedderburnRepresentation eG j).character 1 * ((a j : ℤ) : K)) = 0 ∧
+      ∀ j : κ, blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG →
+        (∀ g : G, (wedderburnRepresentation eG j).character g = 1) → a j = 1 := by
+  classical
+  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  set P : κ → Prop :=
+    fun j => blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG with hP
+  -- off `Irr(B_0)` the column vanishes
+  have hoff : ∀ j : κ, ¬ P j →
+      generalizedDecompositionNumber (𝒪 := 𝒪) (nn := nn) t hp hω' hπ hlin hkerJ
+        ((wedderburnRepresentation eG j).character)
+        (fun _ _ hgh => character_eq_of_isConj _ hgh) φ₀ = 0 := fun j hj =>
+    generalizedDecompositionNumber_principalBlock_eq_zero_of_blockOfIrr_ne hp hx hω e eG hπG
+      hlinG hπ hlin hkerJ hnil hnilG hω' hζ hζk hζK hφ₀ hj
+  -- on `Irr(B_0)` it is `χ(y)`
+  have hon : ∀ j : κ, P j →
+      generalizedDecompositionNumber (𝒪 := 𝒪) (nn := nn) t hp hω' hπ hlin hkerJ
+        ((wedderburnRepresentation eG j).character)
+        (fun _ _ hgh => character_eq_of_isConj _ hgh) φ₀
+      = (wedderburnRepresentation eG j).character t := fun j hj =>
+    (character_involution_eq_generalizedDecompositionNumber hp hx hω e eG hπG hlinG hπ hlin
+      hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hj).symm
+  -- the entries are `0`, `1` or `-1`
+  have hvals := (card_character_ne_zero_eq_four_of_isConj_inv hp hx hω e eG hπG hlinG hπ hlin
+    hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hy4 hinv hcart).2
+  have hexists : ∀ j : κ, ∃ n : ℤ, ((n : ℤ) : K)
+      = generalizedDecompositionNumber (𝒪 := 𝒪) (nn := nn) t hp hω' hπ hlin hkerJ
+          ((wedderburnRepresentation eG j).character)
+          (fun _ _ hgh => character_eq_of_isConj _ hgh) φ₀ := by
+    intro j
+    by_cases hj : P j
+    · rcases hvals j hj with h | h | h
+      · exact ⟨0, by rw [Int.cast_zero, hon j hj, h]⟩
+      · exact ⟨1, by rw [Int.cast_one, hon j hj, h]⟩
+      · exact ⟨-1, by rw [hon j hj, h]; push_cast; ring⟩
+    · exact ⟨0, by rw [Int.cast_zero, hoff j hj]⟩
+  choose a ha using hexists
+  have hmem : ∀ j : κ, j ∈ Finset.univ.filter P ↔ P j := fun j =>
+    ⟨fun h => (Finset.mem_filter.mp h).2, fun h => Finset.mem_filter.mpr ⟨Finset.mem_univ _, h⟩⟩
+  refine ⟨a, ha, ?_, ?_, ?_⟩
+  · -- `(D^y_0, D^y_0) = c_{φ_0 φ_0} = 4`
+    refine Int.cast_injective (α := K) ?_
+    push_cast
+    calc (∑ j : κ, ((a j : ℤ) : K) * ((a j : ℤ) : K))
+        = ∑ j ∈ Finset.univ.filter P,
+            ((wedderburnRepresentation eG j).character t) ^ 2 := by
+          rw [← Finset.sum_subset (Finset.filter_subset P Finset.univ) fun j _ hj => by
+            rw [ha j, hoff j (fun hc => hj ((hmem j).mpr hc)), mul_zero]]
+          exact Finset.sum_congr rfl fun j hj => by
+            rw [ha j, hon j ((hmem j).mp hj), sq]
+      _ = (4 : K) := by
+          rw [sum_sq_character_eq_cartanMatrix_of_isConj_inv hp hx hω e eG hπG hlinG hπ hlin
+            hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hinv, hcart]
+          norm_num
+  · -- `(χ(1), D^y_0) = 0`
+    calc (∑ j : κ, (wedderburnRepresentation eG j).character 1 * ((a j : ℤ) : K))
+        = ∑ j ∈ Finset.univ.filter P, (wedderburnRepresentation eG j).character 1 *
+            (wedderburnRepresentation eG j).character t := by
+          rw [← Finset.sum_subset (Finset.filter_subset P Finset.univ) fun j _ hj => by
+            rw [ha j, hoff j (fun hc => hj ((hmem j).mpr hc)), mul_zero]]
+          exact Finset.sum_congr rfl fun j hj => by
+            rw [ha j, hon j ((hmem j).mp hj)]
+      _ = 0 := sum_character_mul_character_involution_eq_zero hp hx hω e eG hπG hlinG hπ hlin
+            hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ ht1 (isPRegular_one hp)
+  · -- the trivial character contributes `1`
+    intro j hjB hj
+    refine Int.cast_injective (α := K) ?_
+    rw [ha j, hon j hjB, hj t, Int.cast_one]
+
 end OddOrder.RepresentationTheory.Modular
