@@ -164,6 +164,14 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
     exists_intBlockCoeff (𝒪 := 𝓞_ℂ_[2]) (m := mQ) Nat.prime_two hϖ hϖ'
       (quotientPi_surjective πC hπC hlinC hNzP) (quotientPi_smul πC hπC hlinC hNzP) hkerJQ eQ
       hnilQ Nat.card_pos.ne' (fun g => pow_card_eq_one') hωBT
+  -- Navarro (7.2)'s hypothesis for `Q`: every nontrivial `2`-element is conjugate to `ȳ`
+  have hconjall : ∀ v : ↥C ⧸ Nz, IsPElement 2 v → v ≠ 1 → IsConj yb v := by
+    intro v hv hv1
+    have hvsq : v ^ 2 = 1 :=
+      sq_eq_one_of_isPGroup_zpowers_quotient_centralizer T e hzT hz2 hz1 hzC
+        (isPGroup_zpowers_of_isPElement hv)
+    exact isConj_of_sq_eq_one_quotient_centralizer hO T e hTG hzT hz2 hz1 hzC hyb1
+      (by rw [pow_two]; exact hyb2) hv1 hvsq
   sorry
 
 end OddOrder.GroupTheory
