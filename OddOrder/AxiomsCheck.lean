@@ -19929,3 +19929,22 @@ Navarro (7.2)/(7.4) の `hconjall`
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_proper_normal_of_columns
+
+/-! **issue 9506 段 341**: 段 340 の仮説のうち「列の整数性」を供給
+(`Modular/AnalysisAtInvolution`)。
+
+* `character_one_eq_card` — **次数列 `χ_k(1) = card (m k)`** (`char_one` +
+  `finrank_fintype_fun_eq_card`) ⟹ `gdeg := fun k => (card (m k) : ℤ)` で `hgdeg` が閉じる。
+* `one_le_card` — `hgpos` (次数 ≥ 1)。
+* `card_eq_one_of_character_eq_one` — **`hg0` (`gdeg i₀ = 1`) は `hi₀` から出る**。
+* `exists_intCast_character_of_involution` — **対合での値の列が整数**
+  (`exists_intCast_character_of_mul_self_eq_one` を全ブロックで `choose`)。
+
+⟹ 段 340 の 9 種の仮説のうち **`hgdeg` / `hTval` / `hg0` / `hgpos` の 4 つが供給済**。 -/
+
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.Modular.character_one_eq_card
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.Modular.one_le_card
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_eq_one_of_character_eq_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_intCast_character_of_involution

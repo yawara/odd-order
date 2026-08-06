@@ -26,6 +26,9 @@ Everything below is hypothesis-parameterised and `sorry`-free; what remains for 
 
 ## Main results
 
+* `OddOrder.RepresentationTheory.Modular.character_one_eq_card` — the degree column is integral
+* `OddOrder.RepresentationTheory.Modular.exists_intCast_character_of_involution` — so is the
+  column of values at the involution
 * `OddOrder.RepresentationTheory.Modular.exists_proper_normal_of_columns`
 -/
 
@@ -36,6 +39,50 @@ open Matrix MonoidAlgebra
 variable {K G : Type*} [Field K] [CharZero K] [Group G] [Fintype G] [Fintype (ConjClasses G)]
 variable {ι' : Type*} {m : ι' → Type*} [∀ i, Fintype (m i)] [∀ i, DecidableEq (m i)]
   [∀ i, Nonempty (m i)] [Fintype ι'] [Invertible (Nat.card G : K)]
+
+/-! ### Two of the six columns are integral for free -/
+
+omit [CharZero K] [Fintype G] [Fintype (ConjClasses G)] [∀ i, Nonempty (m i)] [Fintype ι']
+  [Invertible (Nat.card G : K)] in
+set_option linter.unusedFintypeInType false in
+/-- **The degree column is `dim` of the matrix block.**  So `gdeg k = card (m k)` is the integer
+column the endgame wants, and it is `≥ 1` because every block is nonempty. -/
+theorem character_one_eq_card (e : MonoidAlgebra K G ≃ₐ[K] ∀ i, Matrix (m i) (m i) K) (k : ι') :
+    (wedderburnRepresentation e k).character 1 = ((Fintype.card (m k) : ℤ) : K) := by
+  rw [Representation.char_one, Module.finrank_fintype_fun_eq_card]
+  push_cast
+  rfl
+
+omit [Fintype G] [Fintype (ConjClasses G)] [∀ i, Nonempty (m i)] [Fintype ι']
+  [Invertible (Nat.card G : K)] in
+set_option linter.unusedFintypeInType false in
+/-- **The column of values at an involution is integral** —
+`exists_intCast_character_of_mul_self_eq_one` for every block at once. -/
+theorem exists_intCast_character_of_involution
+    (e : MonoidAlgebra K G ≃ₐ[K] ∀ i, Matrix (m i) (m i) K) {t : G} (ht : t * t = 1) :
+    ∃ Tval : ι' → ℤ, ∀ k, ((Tval k : ℤ) : K) = (wedderburnRepresentation e k).character t := by
+  choose Tval hTval using fun k : ι' =>
+    OddOrder.RepresentationTheory.exists_intCast_character_of_mul_self_eq_one
+      (wedderburnRepresentation e k) two_ne_zero ht
+  exact ⟨Tval, fun k => (hTval k).symm⟩
+
+omit [Fintype G] [Fintype (ConjClasses G)] [∀ i, Nonempty (m i)] [Fintype ι']
+  [Invertible (Nat.card G : K)] in
+set_option linter.unusedFintypeInType false in
+/-- **The trivial block is `1 × 1`**, read off its character: `χ_{i₀}(1) = 1`. -/
+theorem card_eq_one_of_character_eq_one (e : MonoidAlgebra K G ≃ₐ[K] ∀ i, Matrix (m i) (m i) K)
+    {i₀ : ι'} (hi₀ : ∀ g : G, (wedderburnRepresentation e i₀).character g = 1) :
+    ((Fintype.card (m i₀) : ℤ)) = 1 := by
+  have h : ((Fintype.card (m i₀) : ℤ) : K) = ((1 : ℤ) : K) := by
+    rw [← character_one_eq_card e i₀, hi₀ 1, Int.cast_one]
+  exact Int.cast_injective h
+
+omit [Field K] [CharZero K] [Group G] [Fintype G] [Fintype (ConjClasses G)]
+  [∀ i, DecidableEq (m i)] [Fintype ι'] [Invertible (Nat.card G : K)] in
+set_option linter.unusedFintypeInType false in
+/-- The degrees are at least `1`. -/
+theorem one_le_card (k : ι') : (1 : ℤ) ≤ (Fintype.card (m k) : ℤ) := by
+  exact_mod_cast Fintype.card_pos (α := m k)
 
 set_option linter.unusedFintypeInType false in
 /-- **The character-theoretic core of the `Q₈` case of Brauer–Suzuki.**

@@ -4571,3 +4571,19 @@ Navarro (7.2)/(7.4) の **`hconjall`** (「非自明な 2-元は全部 `t̄` に
 9. `h10` — 段 335 + 段 336 + `sign_relation_ten`
 
 **全部 supplier 確定済**。残るのは modular datum を作って配線する作業のみ。
+
+### ✅ 段 341 完了 (2026-08-06) — 段 340 の仮説のうち「列の整数性」4 つを供給
+
+`Modular/AnalysisAtInvolution` に 4 本:
+
+| 名前 | 供給する仮説 |
+|---|---|
+| `character_one_eq_card` (`χ_k(1) = card (m k)`) | `hgdeg` (`gdeg := fun k => (card (m k) : ℤ)`) |
+| `one_le_card` | `hgpos` |
+| `card_eq_one_of_character_eq_one` | `hg0` (**`hi₀` から出る**) |
+| `exists_intCast_character_of_involution` | `hTval` (全ブロックで `choose`) |
+
+⟹ 段 340 の 9 種のうち **4 つ (`hgdeg`/`hTval`/`hg0`/`hgpos`) が供給済**。
+残り 5 つ = `e`/`i₀`+`hi₀` (既存 supplier)・4 列の整数化と内積表・自明指標での列の値・
+`hT`/`hs₁`/`hs₂`/`hcong`・`h10`。いずれも supplier は確定済で、必要なのは
+modular datum を作って配線する作業。
