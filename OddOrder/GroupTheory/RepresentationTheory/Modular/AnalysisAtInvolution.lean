@@ -92,7 +92,12 @@ set_option linter.unusedFintypeInType false in
 of values at the involution `t`.  Given Navarro's pairing table (p. 141), the values at the trivial
 character (p. 141), the expansion `χ(t) = D^t_0 + ψ_1(1) D^t_1 + ψ_2(1) D^t_2` with odd
 `ψ_i(1)`, the congruence `χ(t) ≡ χ(y) mod 2` and Burnside's relation (10), the involution `t` lies
-in a proper normal subgroup — the kernel of the character the computation produces. -/
+in a proper normal subgroup — the kernel of the character the computation produces.
+
+The expansion and the congruence are only asked for on a predicate `Q` — in the application,
+`χ ∈ Irr(B_0(G))`, which is where Navarro's display on p. 141 holds — together with `hzero`, the
+vanishing of the four columns off `Q`.  The pairing table, in contrast, is stated over all of
+`Irr(G)`: `hzero` makes the sums the same either way, so no subtype of `Irr(G)` is needed. -/
 theorem exists_proper_normal_of_columns (e : MonoidAlgebra K G ≃ₐ[K] ∀ i, Matrix (m i) (m i) K)
     {t : G} (ht : t * t = 1) {i₀ : ι'}
     (hi₀ : ∀ g : G, (wedderburnRepresentation e i₀).character g = 1)
@@ -107,15 +112,17 @@ theorem exists_proper_normal_of_columns (e : MonoidAlgebra K G ≃ₐ[K] ∀ i, 
     (hgd : ∑ k, gdeg k * d k = 0)
     (hg0 : gdeg i₀ = 1) (hgpos : ∀ k, 1 ≤ gdeg k)
     (ha0 : a i₀ = 1) (hb0 : b i₀ = 1) (hc0 : c i₀ = 0) (hd0 : d i₀ = 0)
-    (hT : ∀ k, Tval k = b k + s₁ * c k + s₂ * d k) (hs₁ : Odd s₁) (hs₂ : Odd s₂)
-    (hcong : ∀ k, (2 : ℤ) ∣ (a k + Tval k))
+    {Q : ι' → Prop} (hT : ∀ k, Q k → Tval k = b k + s₁ * c k + s₂ * d k)
+    (hs₁ : Odd s₁) (hs₂ : Odd s₂)
+    (hcong : ∀ k, Q k → (2 : ℤ) ∣ (a k + Tval k))
+    (hzero : ∀ k, ¬ Q k → a k = 0 ∧ b k = 0 ∧ c k = 0 ∧ d k = 0)
     (h10 : ∀ v : ι' → ℤ, (∀ k, 2 * v k = a k + b k - c k - d k) →
       ∀ i j : ι', i ≠ i₀ → j ≠ i₀ → i ≠ j → v i = 1 → v j = -1 →
         (∀ k, k ≠ i₀ → k ≠ i → k ≠ j → v k = 0) →
         gdeg i * gdeg j + Tval i ^ 2 * gdeg j - Tval j ^ 2 * gdeg i = 0) :
     ∃ N : Subgroup G, N.Normal ∧ N ≠ ⊤ ∧ t ∈ N := by
   obtain ⟨k, hk, hkeq⟩ := OddOrder.Algebra.exists_eq_of_columns_of_odd_degrees haa hbb hcc hdd
-    hab hac had hbc hbd hcd hga hgb hgc hgd hg0 hgpos ha0 hb0 hc0 hd0 hT hs₁ hs₂ hcong h10
+    hab hac had hbc hbd hcd hga hgb hgc hgd hg0 hgpos ha0 hb0 hc0 hd0 hT hs₁ hs₂ hcong hzero h10
   refine exists_proper_normal_of_character_eq e hk hi₀ ht ?_
   rw [← hgdeg k, ← hTval k, hkeq]
 

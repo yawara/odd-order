@@ -134,7 +134,7 @@ theorem sign_relation_six (hδ : δ₁ * δ₂ = -1)
     (hu₂i : u₂ i = 0) (hu₂j : u₂ j = 0) (hu₃i : u₃ i = 0) (hu₃j : u₃ j = 0)
     (hc : ∀ k, c k = u₃ k - u₁ k) (hd : ∀ k, d k = u₂ k - u₁ k)
     (hb : ∀ k, 2 * u₁ k = a k + b k - c k - d k)
-    (hT : ∀ k, T k = b k + s₁ * c k + s₂ * d k)
+    (hTi : T i = b i + s₁ * c i + s₂ * d i) (hTj : T j = b j + s₁ * c j + s₂ * d j)
     (haj : a j = 0) (hau : 1 + δ₁ * a i + δ₂ * a j = 2) :
     1 + δ₁ * T i - δ₂ * T j = 0 := by
   obtain ⟨hδ₁, hδ₂⟩ := mul_self_eq_one_of_mul_eq_neg_one hδ
@@ -144,10 +144,10 @@ theorem sign_relation_six (hδ : δ₁ * δ₂ = -1)
   have hdj : d j = -δ₂ := by rw [hd j, hu₂j, hu₁j]; ring
   have hbi : b i = -a i := by have := hb i; rw [hu₁i, hci, hdi] at this; linarith
   have hbj : b j = 0 := by have := hb j; rw [hu₁j, hcj, hdj, haj] at this; linarith
-  have hTi : T i = -a i - δ₁ * (s₁ + s₂) := by rw [hT i, hbi, hci, hdi]; ring
-  have hTj : T j = -δ₂ * (s₁ + s₂) := by rw [hT j, hbj, hcj, hdj]; ring
+  have hTi' : T i = -a i - δ₁ * (s₁ + s₂) := by rw [hTi, hbi, hci, hdi]; ring
+  have hTj' : T j = -δ₂ * (s₁ + s₂) := by rw [hTj, hbj, hcj, hdj]; ring
   rw [haj, mul_zero, add_zero] at hau
-  rw [hTi, hTj]
+  rw [hTi', hTj']
   linear_combination (-1 : ℤ) * hau - (s₁ + s₂) * hδ₁ + (s₁ + s₂) * hδ₂
 
 omit [Fintype S] in
@@ -167,7 +167,7 @@ theorem exists_sign_relations (hδ : δ₁ * δ₂ = -1)
     (hu₂i : u₂ i = 0) (hu₂j : u₂ j = 0) (hu₃i : u₃ i = 0) (hu₃j : u₃ j = 0)
     (hc : ∀ k, c k = u₃ k - u₁ k) (hd : ∀ k, d k = u₂ k - u₁ k)
     (hb : ∀ k, 2 * u₁ k = a k + b k - c k - d k)
-    (hT : ∀ k, T k = b k + s₁ * c k + s₂ * d k)
+    (hTi : T i = b i + s₁ * c i + s₂ * d i) (hTj : T j = b j + s₁ * c j + s₂ * d j)
     (hai' : a i = 0 ∨ a i = 1 ∨ a i = -1) (haj' : a j = 0 ∨ a j = 1 ∨ a j = -1)
     (hau : 1 + δ₁ * a i + δ₂ * a j = 2)
     (hg : 1 + δ₁ * g i + δ₂ * g j = 0) :
@@ -186,9 +186,9 @@ theorem exists_sign_relations (hδ : δ₁ * δ₂ = -1)
       omega
   rcases hcase with hz | hz
   · exact ⟨i, j, δ₁, δ₂, Or.inl ⟨rfl, rfl, rfl, rfl⟩, hδ,
-      sign_relation_six hδ hu₁i hu₁j hu₂i hu₂j hu₃i hu₃j hc hd hb hT hz hau, hg⟩
+      sign_relation_six hδ hu₁i hu₁j hu₂i hu₂j hu₃i hu₃j hc hd hb hTi hTj hz hau, hg⟩
   · refine ⟨j, i, δ₂, δ₁, Or.inr ⟨rfl, rfl, rfl, rfl⟩, by linarith [hδ, mul_comm δ₁ δ₂],
-      sign_relation_six (by rw [mul_comm]; exact hδ) hu₁j hu₁i hu₂j hu₂i hu₃j hu₃i hc hd hb hT hz
-        (by linarith), by linarith⟩
+      sign_relation_six (by rw [mul_comm]; exact hδ) hu₁j hu₁i hu₂j hu₂i hu₃j hu₃i hc hd hb hTj hTi
+        hz (by linarith), by linarith⟩
 
 end OddOrder.Algebra

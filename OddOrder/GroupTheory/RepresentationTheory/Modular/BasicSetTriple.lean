@@ -130,19 +130,26 @@ include hpC hω' hπ hlin hkerJ in
 /-- **Navarro p. 141, the display in three terms**:
 `χ(x w) = D_{l₀}(χ) η_{l₀}(w) + D_{ψ_1}(χ) η_{ψ_1}(w) + D_{ψ_2}(χ) η_{ψ_2}(w)`.
 
-The basic set `η` vanishes off `𝓑 = {l : P l ∧ l ≠ j₀}` (that is how `principalBasicSet` is
+The basic set `η` vanishes off `𝓑 = {l : B l ∧ l ≠ j₀}` (that is how `principalBasicSet` is
 defined), and `𝓑 = {l₀, ψ_1, ψ_2}` by `exists_pair_of_card_filter_eq_four`; so the sum over the
-whole index type in `sum_basicDecompositionNumber_eq_character` has three terms. -/
+whole index type in `sum_basicDecompositionNumber_eq_character_of_support` has three terms.
+
+The hypothesis `hu` is only imposed on the support `P` of the column `d^x_{χ ·}`, since the basic
+set of the principal block expresses `φ_μ` only for `μ ∈ IBr(B_0(C_G(x)/N))`; `hd` is what the
+second main theorem supplies there
+(`generalizedDecompositionNumber_eq_zero_of_quotient_ne`). -/
 theorem basicDecompositionNumber_add_add_eq_character {ι₂ : Type*} [Fintype ι₂]
     (u : ι → ι₂ → K) (η : ι₂ → ↥(centralizerOf x) → K)
-    (hu : ∀ (μ : ι) (w : ↥(centralizerOf x)), IsPRegular p w →
+    (χ : G → K) (hχ : ∀ g h : G, IsConj g h → χ g = χ h) {P : ι → Prop}
+    (hd : ∀ μ : ι, ¬ P μ →
+      generalizedDecompositionNumber x hpC hω' hπ hlin hkerJ χ hχ μ = 0)
+    (hu : ∀ μ : ι, P μ → ∀ w : ↥(centralizerOf x), IsPRegular p w →
       algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π μ w)
         = ∑ φ : ι₂, u μ φ * η φ w)
-    (χ : G → K) (hχ : ∀ g h : G, IsConj g h → χ g = χ h)
     {w : ↥(centralizerOf x)} (hw : IsPRegular p w)
-    {P : ι₂ → Prop} {j₀ l₀ ψ₁ ψ₂ : ι₂}
-    (hη : ∀ φ : ι₂, ¬ (P φ ∧ φ ≠ j₀) → η φ w = 0)
-    (henum : ∀ φ : ι₂, P φ → φ ≠ j₀ → φ = l₀ ∨ φ = ψ₁ ∨ φ = ψ₂)
+    {B : ι₂ → Prop} {j₀ l₀ ψ₁ ψ₂ : ι₂}
+    (hη : ∀ φ : ι₂, ¬ (B φ ∧ φ ≠ j₀) → η φ w = 0)
+    (henum : ∀ φ : ι₂, B φ → φ ≠ j₀ → φ = l₀ ∨ φ = ψ₁ ∨ φ = ψ₂)
     (h01 : l₀ ≠ ψ₁) (h02 : l₀ ≠ ψ₂) (h12 : ψ₁ ≠ ψ₂) :
     basicDecompositionNumber
         (generalizedDecompositionNumber x hpC hω' hπ hlin hkerJ χ hχ) u l₀ * η l₀ w
@@ -152,13 +159,13 @@ theorem basicDecompositionNumber_add_add_eq_character {ι₂ : Type*} [Fintype �
           (generalizedDecompositionNumber x hpC hω' hπ hlin hkerJ χ hχ) u ψ₂ * η ψ₂ w
       = χ (x * (w : G)) := by
   classical
-  rw [← sum_eq_add_add_of_enumeration (P := P) (j₀ := j₀)
+  rw [← sum_eq_add_add_of_enumeration (P := B) (j₀ := j₀)
     (f := fun φ => basicDecompositionNumber
       (generalizedDecompositionNumber x hpC hω' hπ hlin hkerJ χ hχ) u φ * η φ w)
     (fun φ hφ => by
       by_contra hc
       exact hφ (by rw [hη φ hc, mul_zero])) henum h01 h02 h12]
-  exact sum_basicDecompositionNumber_eq_character hpC hω' hπ hlin hkerJ u η hu χ hχ hw
+  exact sum_basicDecompositionNumber_eq_character_of_support hpC hω' hπ hlin hkerJ u η χ hχ hd hu hw
 
 end Cartan
 

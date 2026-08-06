@@ -142,17 +142,28 @@ theorem odd_mul_of_eq_one_or_neg_one {e n : ℤ} (he : e = 1 ∨ e = -1) (hn : O
 omit [Fintype S] in
 /-- **The four columns are congruent mod `2`.**  Navarro's inputs are `χ(t) ≡ χ(y) mod 2` and that
 the basic-set degrees `ψ_1(1), ψ_2(1)` are odd; since `χ(t) = D^t_0 + ψ_1(1) D^t_1 + ψ_2(1) D^t_2`,
-the second turns `χ(t)` into `D^t_0 + D^t_1 + D^t_2` mod `2`. -/
-theorem two_dvd_sum_of_odd_degrees {a b c d T : S → ℤ} {s₁ s₂ : ℤ} (hs₁ : Odd s₁) (hs₂ : Odd s₂)
-    (hT : ∀ k, T k = b k + s₁ * c k + s₂ * d k) (hcong : ∀ k, (2 : ℤ) ∣ (a k + T k)) (k : S) :
+the second turns `χ(t)` into `D^t_0 + D^t_1 + D^t_2` mod `2`.
+
+Both inputs are only available on `Irr(B_0)` — the expansion of `χ(t)` in the basic set is
+Navarro's display on p. 141, which needs the second main theorem to close the sum, and `χ(y)` is
+read off the analysis at `y` in the same way.  Off `Irr(B_0)` all four columns vanish, so the
+conclusion is free there. -/
+theorem two_dvd_sum_of_odd_degrees {a b c d T : S → ℤ} {s₁ s₂ : ℤ} {Q : S → Prop}
+    (hs₁ : Odd s₁) (hs₂ : Odd s₂)
+    (hT : ∀ k, Q k → T k = b k + s₁ * c k + s₂ * d k)
+    (hcong : ∀ k, Q k → (2 : ℤ) ∣ (a k + T k))
+    (hzero : ∀ k, ¬ Q k → a k = 0 ∧ b k = 0 ∧ c k = 0 ∧ d k = 0) (k : S) :
     (2 : ℤ) ∣ (a k + b k + c k + d k) := by
-  obtain ⟨r, hr⟩ := hs₁
-  obtain ⟨q, hq⟩ := hs₂
-  obtain ⟨m, hm⟩ := hcong k
-  refine ⟨m - r * c k - q * d k, ?_⟩
-  have hTk := hT k
-  rw [hr, hq] at hTk
-  linarith [hm, hTk]
+  by_cases hk : Q k
+  · obtain ⟨r, hr⟩ := hs₁
+    obtain ⟨q, hq⟩ := hs₂
+    obtain ⟨m, hm⟩ := hcong k hk
+    refine ⟨m - r * c k - q * d k, ?_⟩
+    have hTk := hT k hk
+    rw [hr, hq] at hTk
+    linarith [hm, hTk]
+  · obtain ⟨ha, hb, hc, hd⟩ := hzero k hk
+    exact ⟨0, by rw [ha, hb, hc, hd]; ring⟩
 
 omit [Fintype S] in
 /-- **The three half-sums of Navarro p. 142 exist as integer columns.**  Each of
@@ -188,7 +199,9 @@ and the "analysis at `t`", their values at the trivial character, the expansion
 objective on p. 139.
 
 `h10` is asked for at whichever pair of indices carries the two extra `±1` entries of `u_1`; the
-supplier is `sign_relation_ten`. -/
+supplier is `sign_relation_ten`.  The expansion `hT` is only asked for on `Q` — Navarro's display
+holds on `Irr(B_0)` — which suffices because the two indices it is used at carry a nonzero entry
+of `u_1`, hence of one of the four columns, hence lie in `Q` by `hzero`. -/
 theorem exists_eq_of_columns
     (haa : ∑ k, a k * a k = 4) (hbb : ∑ k, b k * b k = 4) (hcc : ∑ k, c k * c k = 4)
     (hdd : ∑ k, d k * d k = 4) (hab : ∑ k, a k * b k = 0) (hac : ∑ k, a k * c k = 0)
@@ -201,7 +214,8 @@ theorem exists_eq_of_columns
     (hv₃ : ∀ k, 2 * u₃ k = a k + b k + c k - d k)
     (hg0 : g i₀ = 1) (hgpos : ∀ k, 1 ≤ g k)
     (ha0 : a i₀ = 1) (hb0 : b i₀ = 1) (hc0 : c i₀ = 0) (hd0 : d i₀ = 0)
-    (hT : ∀ k, T k = b k + s₁ * c k + s₂ * d k)
+    {Q : S → Prop} (hT : ∀ k, Q k → T k = b k + s₁ * c k + s₂ * d k)
+    (hzero : ∀ k, ¬ Q k → a k = 0 ∧ b k = 0 ∧ c k = 0 ∧ d k = 0)
     (h10 : ∀ i j : S, i ≠ i₀ → j ≠ i₀ → i ≠ j → u₁ i = 1 → u₁ j = -1 →
       (∀ k, k ≠ i₀ → k ≠ i → k ≠ j → u₁ k = 0) →
       g i * g j + T i ^ 2 * g j - T j ^ 2 * g i = 0) :
@@ -263,9 +277,19 @@ theorem exists_eq_of_columns
     have h₁ := hv₁ k; have h₃ := hv₃ k; omega
   have hdu : ∀ k, d k = u₂ k - u₁ k := fun k => by
     have h₁ := hv₁ k; have h₂ := hv₂ k; omega
+  -- a nonzero entry of `u_1` forces one of the four columns to be nonzero there, hence `Q`
+  have hQ : ∀ k : S, u₁ k ≠ 0 → Q k := by
+    intro k hk
+    by_contra hQk
+    obtain ⟨ha, hb, hc, hd⟩ := hzero k hQk
+    have hvk := hv₁ k
+    rw [ha, hb, hc, hd] at hvk
+    omega
   -- the sign relations (6), (7), with the naming chosen
   obtain ⟨i', j', e₁, e₂, hnaming, he, h6, h7⟩ :=
-    exists_sign_relations hδ hu₁i hu₁j hu₂i hu₂j hu₃i hu₃j hcu hdu hv₁ hT hai' haj' hau hgu
+    exists_sign_relations hδ hu₁i hu₁j hu₂i hu₂j hu₃i hu₃j hcu hdu hv₁
+      (hT i (hQ i (by rw [hu₁i]; norm_num))) (hT j (hQ j (by rw [hu₁j]; norm_num)))
+      hai' haj' hau hgu
   obtain ⟨he₁, he₂⟩ := mul_self_eq_one_of_mul_eq_neg_one he
   have hten := h10 i j hii₀ hji₀ hij hu₁i hu₁j hu₁off
   -- (10) at the chosen naming, and the substitution
@@ -292,16 +316,18 @@ theorem exists_eq_of_columns_of_odd_degrees
     (hgd : ∑ k, g k * d k = 0)
     (hg0 : g i₀ = 1) (hgpos : ∀ k, 1 ≤ g k)
     (ha0 : a i₀ = 1) (hb0 : b i₀ = 1) (hc0 : c i₀ = 0) (hd0 : d i₀ = 0)
-    (hT : ∀ k, T k = b k + s₁ * c k + s₂ * d k) (hs₁ : Odd s₁) (hs₂ : Odd s₂)
-    (hcong : ∀ k, (2 : ℤ) ∣ (a k + T k))
+    {Q : S → Prop} (hT : ∀ k, Q k → T k = b k + s₁ * c k + s₂ * d k)
+    (hs₁ : Odd s₁) (hs₂ : Odd s₂)
+    (hcong : ∀ k, Q k → (2 : ℤ) ∣ (a k + T k))
+    (hzero : ∀ k, ¬ Q k → a k = 0 ∧ b k = 0 ∧ c k = 0 ∧ d k = 0)
     (h10 : ∀ v : S → ℤ, (∀ k, 2 * v k = a k + b k - c k - d k) →
       ∀ i j : S, i ≠ i₀ → j ≠ i₀ → i ≠ j → v i = 1 → v j = -1 →
         (∀ k, k ≠ i₀ → k ≠ i → k ≠ j → v k = 0) →
         g i * g j + T i ^ 2 * g j - T j ^ 2 * g i = 0) :
     ∃ k : S, k ≠ i₀ ∧ g k = T k := by
   obtain ⟨v₁, v₂, v₃, hh₁, hh₂, hh₃⟩ :=
-    exists_halfSum_columns (two_dvd_sum_of_odd_degrees hs₁ hs₂ hT hcong)
+    exists_halfSum_columns (two_dvd_sum_of_odd_degrees hs₁ hs₂ hT hcong hzero)
   exact exists_eq_of_columns haa hbb hcc hdd hab hac had hbc hbd hcd hga hgb hgc hgd hh₁ hh₂ hh₃
-    hg0 hgpos ha0 hb0 hc0 hd0 hT (h10 v₁ hh₁)
+    hg0 hgpos ha0 hb0 hc0 hd0 hT hzero (h10 v₁ hh₁)
 
 end OddOrder.Algebra
