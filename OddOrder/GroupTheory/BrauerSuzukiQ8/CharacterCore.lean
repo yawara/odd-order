@@ -417,6 +417,47 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
     exact sum_classSquareCoeff_mul_basicDecompositionNumber_eq_zero (𝒪 := 𝓞_ℂ_[2]) (nn := nnC)
       eG hπC hlinC hkerJC hω'C T hzuniq hz hzP hz1
       (fun μ l => ((intBasicSetMatrix eQ A yb j₀ μ l : ℤ) : ℂ_[2])) η
+  have hm0 : ((OddOrder.RepresentationTheory.conjugacyClassSize (ConjClasses.mk z) : ℕ)
+      : ℂ_[2]) ^ 2 ≠ 0 := by
+    refine pow_ne_zero _ (Nat.cast_ne_zero.mpr ?_)
+    exact (OddOrder.RepresentationTheory.conjugacyClassSize_pos (ConjClasses.mk z)).ne'
+  have hwg : ∀ k, classSquareCoeff eG (ConjClasses.mk z) k
+      * ((Fintype.card (mG k) : ℤ) : ℂ_[2])
+      = ((OddOrder.RepresentationTheory.conjugacyClassSize (ConjClasses.mk z) : ℕ) : ℂ_[2]) ^ 2
+        * ((Tval k : ℤ) : ℂ_[2]) ^ 2 := by
+    intro k
+    rw [hgdeg k, hTval k, classSquareCoeff_mul_character_one eG (ConjClasses.mk z) k,
+      character_eq_of_isConj (wedderburnRepresentation eG k)
+        (ConjClasses.mk_eq_mk_iff_isConj.mp
+          (OddOrder.RepresentationTheory.conjClass_mk_out (ConjClasses.mk z)))]
+  have hwi₀ : classSquareCoeff eG (ConjClasses.mk z) i₀
+      = ((OddOrder.RepresentationTheory.conjugacyClassSize (ConjClasses.mk z) : ℕ) : ℂ_[2]) ^ 2 :=
+    classSquareCoeff_of_character_eq_one eG (ConjClasses.mk z) hi₀
+  have h10 : ∀ v : ι'G → ℤ, (∀ k, 2 * v k = a k + b k - c k - d k) →
+      ∀ i j : ι'G, i ≠ i₀ → j ≠ i₀ → i ≠ j → v i = 1 → v j = -1 →
+        (∀ k, k ≠ i₀ → k ≠ i → k ≠ j → v k = 0) →
+        (Fintype.card (mG i) : ℤ) * (Fintype.card (mG j) : ℤ)
+          + Tval i ^ 2 * (Fintype.card (mG j) : ℤ)
+          - Tval j ^ 2 * (Fintype.card (mG i) : ℤ) = 0 := by
+    intro v hv i j hii₀ hji₀ hij hvi hvj hvoff
+    have hv0 : v i₀ = 1 := by
+      have h := hv i₀
+      rw [ha0 i₀ hi₀B hi₀, hb0, hc0, hd0] at h
+      omega
+    have hzero : (∑ k, classSquareCoeff eG (ConjClasses.mk z) k * ((v k : ℤ) : ℂ_[2])) = 0 :=
+      OddOrder.Algebra.sum_mul_halfSum_eq_zero two_ne_zero
+        (fun k => by
+          have h := hv k
+          have : ((2 * v k : ℤ) : ℂ_[2]) = ((a k + b k - c k - d k : ℤ) : ℂ_[2]) := by rw [h]
+          push_cast at this
+          linear_combination this)
+        hwa (hwcol l₀ b hbval) (hwcol ψ₁ c hcval) (hwcol ψ₂ d hdval)
+    have hten := OddOrder.Algebra.sign_relation_ten (δ₁ := 1) (δ₂ := -1) hm0 hii₀ hji₀ hij hwg
+      hwi₀ (by rw [hv0]; norm_num) (by rw [hvi]; norm_num) (by rw [hvj]; norm_num)
+      (fun k h1 h2 h3 => by rw [hvoff k h1 h2 h3]; norm_num) hzero
+    refine Int.cast_injective (α := ℂ_[2]) ?_
+    push_cast at hten ⊢
+    linear_combination hten
   sorry
 
 end OddOrder.GroupTheory
