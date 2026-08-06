@@ -368,6 +368,7 @@ import OddOrder.GroupTheory.RepresentationTheory.PrimeTIResidue
 import OddOrder.GroupTheory.RepresentationTheory.ProjectiveFreeTwoDim
 import OddOrder.GroupTheory.RepresentationTheory.RepresentationDeterminant
 import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.SubgroupAverageTrace
 import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
 import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.SylowSumClassCoeff
