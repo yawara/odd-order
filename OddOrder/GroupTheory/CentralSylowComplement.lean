@@ -39,6 +39,25 @@ theorem hasNormalPComplement_of_sylow_le_center (P : Sylow p G)
   exact Subgroup.mem_centralizer_iff.mpr fun h hh =>
     ((Subgroup.mem_center_iff.mp (hP hh)) g).symm
 
+/-! ### Unpacking a normal `p`-complement
+
+`HasNormalPComplement p G` says `G = N ⋊ P` for every Sylow `p`-subgroup `P`.  The block theory
+consumes that in the form "`p ∤ |N|` and `G/N` is a `p`-group"; both are read off the complement
+relation, since `[G : P] = |N|` and `[G : N] = |P|`. -/
+
+/-- **A complement to a Sylow `p`-subgroup has order prime to `p`** — it is `[G : P]`. -/
+theorem not_dvd_card_of_isComplement' {N : Subgroup G} (P : Sylow p G)
+    (hcomp : Subgroup.IsComplement' N (P : Subgroup G)) : ¬ p ∣ Nat.card ↥N := by
+  rw [← hcomp.index_eq_card]
+  exact P.not_dvd_index
+
+/-- **The quotient by a normal complement is a `p`-group** — it has the order of `P`. -/
+theorem isPGroup_quotient_of_isComplement' {N : Subgroup G} [N.Normal] (P : Sylow p G)
+    (hcomp : Subgroup.IsComplement' N (P : Subgroup G)) : IsPGroup p (G ⧸ N) := by
+  obtain ⟨n, hn⟩ := P.isPGroup'.exists_card_eq
+  refine IsPGroup.of_card (n := n) ?_
+  rw [← Subgroup.index_eq_card, hcomp.symm.index_eq_card, hn]
+
 omit [Finite G] [Fact p.Prime] in
 /-- **`⟨x⟩` is central in `C_G(x)`.** -/
 theorem zpowers_self_le_center_centralizer (x : G)

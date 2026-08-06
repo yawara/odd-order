@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.CentralSylowComplement
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartan
 
@@ -36,6 +37,8 @@ So `c_{φ_0 φ_0} = ∑_χ d_{χ φ_0}² = ∑_{χ ∈ Irr(B_0)} χ(1)²`.
   `|N| · c_{φ_0 φ_0} = |G|`
 * `OddOrder.RepresentationTheory.Modular.cartanMatrix_principalBlock_eq_card_sylow` —
   **`c_{φ_0 φ_0} = |G|_p`**, the form the Brauer–Suzuki argument cites (`hcart`)
+* `…_eq_card_sylow_of_hasNormalPComplement` — the same with the complement packaged as
+  `OddOrder.Isaacs.Ch05.HasNormalPComplement`
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -168,5 +171,24 @@ theorem cartanMatrix_principalBlock_eq_card_sylow :
       = Nat.card G := by exact_mod_cast hK
   refine Nat.eq_of_mul_eq_mul_left (Nat.card_pos (α := ↥N)) ?_
   rw [hN, ← index_eq_card_sylow_of_isPGroup_quotient hNp hquot S, Subgroup.card_mul_index N]
+
+set_option maxHeartbeats 800000 in
+-- Same modular-datum chain as the theorem it repackages.
+set_option linter.unusedFintypeInType false in
+omit [DecidableEq (ConjClasses G)] in
+include hp hω hω' hkerJ hnil in
+/-- **Navarro (6.13), the form the Brauer–Suzuki proof cites on p. 132**: for a group with a
+normal `p`-complement the Cartan invariant of the principal block is the order of a Sylow
+`p`-subgroup.  The complement is unpacked from `HasNormalPComplement`
+(`not_dvd_card_of_isComplement'`, `isPGroup_quotient_of_isComplement'`). -/
+theorem cartanMatrix_principalBlock_eq_card_sylow_of_hasNormalPComplement
+    (hcomp : OddOrder.Isaacs.Ch05.HasNormalPComplement p G) (S : Sylow p G) {φ₀ : ι}
+    (hφ₀ : Quotient.mk (blockSetoid π hπ hlin) φ₀ = principalBlock π hπ hlin hnil) :
+    cartanMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e φ₀ φ₀
+      = Nat.card ↥(S : Subgroup G) := by
+  obtain ⟨N, hN, hc⟩ := hcomp
+  haveI := hN
+  exact cartanMatrix_principalBlock_eq_card_sylow hp hω hω' hπ hlin hkerJ hnil e
+    (not_dvd_card_of_isComplement' S (hc S)) (isPGroup_quotient_of_isComplement' S (hc S)) S hφ₀
 
 end OddOrder.RepresentationTheory.Modular

@@ -18910,3 +18910,28 @@ Cartan は `(4)` = `|C|₂`。
 
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.hasNormalPComplement_of_klein_sylow_of_mem_center
+
+/-! 🎯🎯 **issue 9506 段 291**: `hcart` の供給チェーンが閉じた。
+
+段 290 (Klein four Sylow + 中心的対合 ⟹ 正規 2-補群) の出力は
+`HasNormalPComplement` だが、段 282 の `cartanMatrix_principalBlock_eq_card_sylow` は
+`N`/`hNp`/`hquot` をバラで要求していた。その橋を架けた:
+
+- `not_dvd_card_of_isComplement'` / `isPGroup_quotient_of_isComplement'`
+  (`GroupTheory/CentralSylowComplement`) = 補群関係 `G = N ⋊ P` から
+  「`p ∤ |N|`」(= `[G:P]`) と「`G/N` は `p`-群」(= `|P|`) を読み出す。
+  ⚠ `∃ N, N.Normal ∧ … ∧ IsPGroup p (G ⧸ N)` という形にはできない
+  (statement の elaboration 時に `Group (G ⧸ N)` instance が要るため) ので、
+  `N` と補群関係を仮説に取る 2 本に分けた。
+- `cartanMatrix_principalBlock_eq_card_sylow_of_hasNormalPComplement` =
+  `HasNormalPComplement p G` から直接 `c_{φ₀φ₀} = |Sylow p G|`。
+
+⟹ Navarro p.132 の「`C` has a normal 2-complement ⟹ Cartan は (4)」が
+そのまま Lean で辿れるようになった。 -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.not_dvd_card_of_isComplement'
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.isPGroup_quotient_of_isComplement'
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.cartanMatrix_principalBlock_eq_card_sylow_of_hasNormalPComplement
