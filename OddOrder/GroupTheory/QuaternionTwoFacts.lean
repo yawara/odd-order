@@ -385,4 +385,44 @@ theorem eq_or_eq_inv_of_mem_zpowers_of_quaternionTwo {P : Type*} [Group P] [Fini
   · exact Or.inl (e.injective h)
   · exact Or.inr (e.injective (by rw [h, map_inv]))
 
+/-! ### The quotient by the centre is a Klein four group
+
+Navarro p. 141 opens the "analysis at `t`" with "`P` is a Sylow `2`-subgroup of `C_G(t)`, and thus
+`C_G(t)/⟨t⟩` has Sylow `2`-subgroups isomorphic to `ℤ₂ × ℤ₂`".  What is proved here is the
+statement about `Q₈` itself: `Q₈/⟨t⟩` has order `4` and exponent `2`. -/
+
+/-- **In a group isomorphic to `Q₈` every square is `1` or the involution.**  `(w²)² = w⁴ = 1`, and
+the involution is unique. -/
+theorem sq_eq_one_or_eq_of_quaternionTwo {P : Type*} [Group P] (e : P ≃* QuaternionGroup 2)
+    {t : P} (ht2 : t ^ 2 = 1) (ht1 : t ≠ 1) (w : P) : w ^ 2 = 1 ∨ w ^ 2 = t := by
+  by_cases h : w ^ 2 = 1
+  · exact Or.inl h
+  refine Or.inr (eq_of_sq_eq_one_of_quaternionTwo e ?_ h ht2 ht1)
+  have hw4 : w ^ 4 = 1 := e.injective (by rw [map_pow, quaternionTwo_pow_four (e w), map_one])
+  rw [← pow_mul, show (2 * 2 : ℕ) = 4 from rfl]
+  exact hw4
+
+/-- **`Q₈/⟨t⟩` has order `4`.** -/
+theorem card_quotient_zpowers_of_quaternionTwo {P : Type*} [Group P] [Finite P]
+    (e : P ≃* QuaternionGroup 2) {t : P} (ht2 : t ^ 2 = 1) (ht1 : t ≠ 1)
+    [(Subgroup.zpowers t).Normal] : Nat.card (P ⧸ Subgroup.zpowers t) = 4 := by
+  have hord : orderOf t = 2 :=
+    (Nat.Prime.eq_one_or_self_of_dvd Nat.prime_two _ (orderOf_dvd_of_pow_eq_one ht2)).resolve_left
+      fun h => ht1 (orderOf_eq_one_iff.mp h)
+  have hz : Nat.card ↥(Subgroup.zpowers t) = 2 := by rw [Nat.card_zpowers, hord]
+  have hsplit := Subgroup.card_eq_card_quotient_mul_card_subgroup (Subgroup.zpowers t)
+  rw [card_eq_eight_of_quaternionTwo e, hz] at hsplit
+  omega
+
+/-- **`Q₈/⟨t⟩` has exponent `2`**: every square of `Q₈` already lies in `⟨t⟩`. -/
+theorem sq_eq_one_quotient_zpowers_of_quaternionTwo {P : Type*} [Group P]
+    (e : P ≃* QuaternionGroup 2) {t : P} (ht2 : t ^ 2 = 1) (ht1 : t ≠ 1)
+    [(Subgroup.zpowers t).Normal] (x : P ⧸ Subgroup.zpowers t) : x ^ 2 = 1 := by
+  obtain ⟨w, rfl⟩ := QuotientGroup.mk_surjective x
+  rw [show (QuotientGroup.mk w : P ⧸ Subgroup.zpowers t) ^ 2 = QuotientGroup.mk (w ^ 2) from rfl,
+    QuotientGroup.eq_one_iff]
+  rcases sq_eq_one_or_eq_of_quaternionTwo e ht2 ht1 w with h | h
+  · rw [h]; exact Subgroup.one_mem _
+  · rw [h]; exact Subgroup.mem_zpowers t
+
 end OddOrder.GroupTheory

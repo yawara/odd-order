@@ -796,6 +796,22 @@ theorem hasNormalPComplement_centralizer_orderFour (T : Sylow 2 G)
   exact hasNormalPComplement_centralizer_of_sylow_zpowers y hy S
     (sylow_centralizer_eq_zpowers T e hyT hy2 hy S)
 
+/-! ### Navarro p. 141: the "analysis at `t`"
+
+`T` normalises itself and `N_G(T) ≤ C_G(t)`, so `T ≤ C_G(t)`; being a Sylow `2`-subgroup of `G` it
+is one of `C_G(t)` (`Sylow.subtype`).  Hence the Sylow `2`-subgroups of `C_G(t)/⟨t⟩` are
+`Q₈/Z(Q₈)`, a Klein four group — `card_quotient_zpowers_of_quaternionTwo` and
+`sq_eq_one_quotient_zpowers_of_quaternionTwo`. -/
+
+omit [Finite G] in
+/-- **`T ≤ C_G(t)`** for the involution `t` of `T ≅ Q₈` — Navarro p. 141's "`P` is a Sylow
+`2`-subgroup of `C_G(t)`", the form that `Sylow.subtype` consumes. -/
+theorem sylowQ8_le_centralizer_involution (T : Sylow 2 G)
+    (e : ↥(T : Subgroup G) ≃* QuaternionGroup 2) {t : G} (htT : t ∈ (T : Subgroup G))
+    (ht2 : t ^ 2 = 1) (ht1 : t ≠ 1) :
+    (T : Subgroup G) ≤ Subgroup.centralizer ({t} : Set G) :=
+  le_trans Subgroup.le_normalizer (normalizer_le_centralizer_involution T e htT ht2 ht1)
+
 /-- **Navarro pp. 139–146, the character-theoretic core** (issue 9506, `sorry`): when the
 quaternion Sylow `2`-subgroup is proper, its involution lies in a proper normal subgroup.
 

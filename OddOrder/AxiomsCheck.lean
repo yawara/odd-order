@@ -18808,3 +18808,24 @@ Navarro p.140 が「これらは先頭成分が 1 の整数列である」と言
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_blockOfIrr_eq_principalBlock_character_eq_one
+
+/-! 🎯 **issue 9506 段 286**: Navarro p.141 "Analysis at t" の群論的入力 (第 1 段)。
+
+原文冒頭「`P` is a Sylow 2-subgroup of `C_G(t)`, and thus `C_G(t)/⟨t⟩` has Sylow
+2-subgroups isomorphic to `ℤ₂ × ℤ₂`」。
+
+- `sylowQ8_le_centralizer_involution` = `T ≤ C_G(t)`。既存
+  `normalizer_le_centralizer_involution` (`N_G(T) ≤ C_G(t)`) と `T ≤ N_G(T)` の合成で出る。
+  これを mathlib `Sylow.subtype` に食わせると「`T` は `C_G(t)` の Sylow-2」になる。
+- `Q₈/⟨t⟩` が Klein four であることは `Q₈` 側だけの事実なので `QuaternionTwoFacts` に:
+  `sq_eq_one_or_eq_of_quaternionTwo` (全ての平方は `1` か対合 — `(w²)² = w⁴ = 1` と対合の一意性)
+  → `card_quotient_zpowers_of_quaternionTwo` (位数 4) と
+  `sq_eq_one_quotient_zpowers_of_quaternionTwo` (指数 2)。 -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.sq_eq_one_or_eq_of_quaternionTwo
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.card_quotient_zpowers_of_quaternionTwo
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.sq_eq_one_quotient_zpowers_of_quaternionTwo
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.sylowQ8_le_centralizer_involution
