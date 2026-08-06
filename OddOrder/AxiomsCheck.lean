@@ -273,6 +273,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionClassBurnside
+import OddOrder.GroupTheory.RepresentationTheory.Modular.TrivialCharacterBasicSet
 import OddOrder.Algebra.SubgroupSumBlockAction
 import OddOrder.Algebra.TraceMulLeft
 import OddOrder.GroupTheory.SylowContaining
@@ -19717,3 +19718,31 @@ modular 鎖と同じ分裂体 `K` の中で完結する (**係数体の橋渡し
   OddOrder.RepresentationTheory.Modular.not_isPRegular_of_mem_pSection
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_classSquareCoeff_mul_generalizedDecompositionNumber_eq_zero
+
+/-! 🎯 **issue 9506 段 331**: 原文 p.141 の「列の先頭が 1」(残タスク E の前半)。
+
+`Modular/TrivialCharacterBasicSet` — (7.4) の basic set `𝓑 = {ε_j χ_j⁰ : j ∈ Irr(B₀), j ≠ j₀}`
+について:
+
+* `principalBasicSet_eq_one_of_trivial` — **`𝓑` は定数関数 `1` を含む** (自明指標の位置
+  `i₀`; `ε_{i₀} = 1_G(t) = 1`)。
+* `ne_of_character_involution_eq_neg_one` — `ε_{j₀} = −1` なので `i₀ ≠ j₀` (捨てられない)。
+* `eq_zero_of_sum_principalBasicSet_eq_zero` — **`𝓑` は `G⁰` 上一次独立**
+  (既存 `eq_zero_of_vanishing_on_pRegular_of_apply_eq_zero` を「`𝓑` の展開」の形に読み替え)。
+* `eq_of_sum_principalBasicSet_eq` — `𝓑` の展開は一意。
+* `eq_ite_of_sum_principalBasicSet_eq_one` — 🎯 **`d^x_{00} = 1`, `d^x_{0j} = 0` (`j ≠ 0`)**:
+  `𝓑` での展開が定数 `1` になる族は `Pi.single i₀ 1`。
+
+⚠ 自明指標の所在 (`exists_blockOfIrr_eq_principalBlock_character_eq_one`) は
+`PrincipalBlockTrivial` に**既にあった** — 新規に作る前に概念名で grep して発見。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.principalBasicSet_eq_one_of_trivial
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.ne_of_character_involution_eq_neg_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_zero_of_sum_principalBasicSet_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_of_sum_principalBasicSet_eq
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_ite_of_sum_principalBasicSet_eq_one

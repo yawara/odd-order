@@ -4243,3 +4243,56 @@ build green + AxiomsCheck 登録 + sorry 非退行。
 
 ⟹ **原文 pp.139-145 の数学は E を残して全部 Lean に在る**。残りは E (整数の同定) と
 F (instantiation = 配線) と G (組み立て)。
+
+### ✅ 段 331 完了 (2026-08-06) — 残タスク E の**機構**が揃った (p.141「列の先頭が 1」)
+
+`Modular/TrivialCharacterBasicSet.lean` (222 行):
+
+| 名前 | 内容 |
+|---|---|
+| `principalBasicSet_eq_one_of_trivial` | **`𝓑` は定数関数 `1` を含む** (自明指標の位置 `i₀`; `ε_{i₀} = 1_G(t) = 1`) |
+| `ne_of_character_involution_eq_neg_one` | `ε_{j₀} = −1` ゆえ `i₀ ≠ j₀` (自明指標は捨てられない) |
+| `eq_zero_of_sum_principalBasicSet_eq_zero` | **`𝓑` は `G⁰` 上一次独立** |
+| `eq_of_sum_principalBasicSet_eq` | `𝓑` の展開は一意 |
+| `eq_ite_of_sum_principalBasicSet_eq_one` | 🎯 **`d^x_{00} = 1`, `d^x_{0j} = 0` (`j ≠ 0`)** |
+
+#### 実測で判明したこと (着手前の grep で 2 件が既存だった)
+
+* **自明指標の所在は既にあった**: `PrincipalBlockTrivial` の
+  `exists_blockOfIrr_eq_principalBlock_character_eq_one`
+  (`∃ i, blockOfIrr i = B₀ ∧ ∀ g, χ_i(g) = 1`) と `character_eq_one_of_trivial` /
+  `blockOfIrr_eq_principalBlock_of_trivial` / `exists_trivial_wedderburn_index`。
+  ⟹ 「Wedderburn 分解の中で自明表現を見つける」段は**新規に書く必要が無かった**。
+* **一次独立性も既にあった**: `PrincipalBlockInvolution` の
+  `eq_zero_of_vanishing_on_pRegular_of_apply_eq_zero` (関係束は `(χ(t))_χ` が張る直線で、
+  その座標に零が無い)。本段はこれを「`𝓑` での展開」の形に**読み替えただけ**。
+* **`∑_φ D_φ η_φ(w) = χ(x w)` も既存**: `BasicSetDecomposition.sum_basicDecompositionNumber_eq_character`。
+
+⟹ **残タスク E の合成は 2 行**になった (F で配線するときの形):
+
+```
+sum_basicDecompositionNumber_eq_character … (χ := χ_{i₀}) …   -- ∑_φ D_φ η_φ(w) = χ_{i₀}(t w) = 1
+eq_ite_of_sum_principalBasicSet_eq_one …                       -- ⟹ D_φ = δ_{φ i₀}
+```
+
+#### 実装知見
+
+* `set x := … with h` は `h : x = fun l => …` を作るので `rw [h]` が **β 簡約されない項**を残す。
+  族を導入するときは `let` + `have h : ∀ l, a l = … := fun _ => rfl` の方が `rw [h l]` が効く。
+* 大きな `variable` ブロックを別 file からコピーするときは**行単位で照合する**
+  (`PrincipalBlockInvolution` は `[Finite ιG]`、`PrincipalBlockBasicSet` は
+  `[Fintype ιG] [DecidableEq κ] [DecidableEq ιG]`。取り違えると
+  「failed to synthesize instance」が 10 件以上出て原因が見えない)。
+* `linter.unusedSectionVars` / `unusedDecidableInType` は `--strict` gate に効く ⟹
+  小さい補題を巨大 variable ブロックの下に置くときは `omit` を必ず付ける。
+
+### ⏭ 残タスク (更新、2026-08-06)
+
+| # | 内容 | 状態 |
+|---|---|---|
+| ~~A~~–~~D~~ | p.143-144 | ✅ 段 327-330 |
+| E | `d^t_{00}=1` 等 | ✅ **機構完了 (段 331)**。数値の確定は F の配線で 2 行 |
+| F | `𝓞_ℂ_[2]` での modular datum 一式の instantiation + "analysis at t" の配線 | **残る最大の塊**。次の着手点 |
+| G | `q8_exists_proper_normal` への組み立て | F の後 |
+
+⟹ **原文 pp.139-145 の数学は全部 Lean に在る**。残りは F の instantiation/配線と G の組み立て。
