@@ -19016,3 +19016,17 @@ Külshammer の公式と第 3 主定理が `𝒪` 側で持ち回る 3 仮説
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.mk_eq_principalBlock_of_centralCharacterAlg_eq
+
+/-! 🎯 **issue 9506 段 298**: 自明表現の既約 Brauer 構成因子は全て主ブロック
+(`mk_eq_principalBlock_of_decompositionNumber_trivial`, `Modular/PRegularSumVanishing`)。
+
+段 296 (自明表現の上では群環は増大射で作用) + 段 297 (中心指標が増大射なら主ブロック)
++ 既存 `centralCharacterAlg_eq_of_decompositionNumber_ne_zero` の合成。
+自明 `𝒪`-格子表現 `Representation.trivial 𝒪 G 𝒪` の還元はまた自明表現なので
+(`LinearMap.baseChange_id`)、その分解数が非零な `μ` はすべて `centralCharacterAlg π μ = aug`
+を満たす。
+
+⟹ `hvanishH` の `hne` が「`B ≠ B₀`」だけで潰せるようになった。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.mk_eq_principalBlock_of_decompositionNumber_trivial

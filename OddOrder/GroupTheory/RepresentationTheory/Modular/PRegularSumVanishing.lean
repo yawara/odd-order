@@ -120,4 +120,35 @@ theorem blockCharacter_blockOfIrr_pRegularSum_eq_zero (i : ι') (σ : Representa
     (z' := ⟨pRegularSum p (ResidueField 𝒪), pRegularSum_mem_center⟩)
     (mapRingHom_pRegularSum (residue 𝒪)), hlat, map_zero]
 
+/-! ### `λ_B(Ĝ⁰) = 0` for an arbitrary block `B ≠ B_0`
+
+`blockCharacter_blockOfIrr_pRegularSum_eq_zero` is stated for a block of the form `blockOfIrr e i`
+and carries a separation hypothesis `hne`.  Both are now removable: `blockOfIrr` is surjective
+(`exists_blockOfIrr_eq`), and `hne` *is* `B ≠ B_0`, because the group algebra acts on the trivial
+representation through the augmentation (`asAlgebraHom_trivial`), so every Brauer constituent of
+its reduction has central character `aug` and hence lies in `B_0`. -/
+
+set_option maxHeartbeats 800000 in
+-- The trivial lattice and its reduction are compared under the full modular-datum chain.
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+omit [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)] [DecidableEq ι] in
+include hp hω hω' hkerJ in
+/-- **Every irreducible Brauer constituent of the trivial representation lies in `B_0`.** -/
+theorem mk_eq_principalBlock_of_decompositionNumber_trivial {μ : ι}
+    (hμ : decompositionNumber (nn := nn) hp hω hω' hπ hlin hkerJ
+      (Representation.trivial 𝒪 G 𝒪) μ ≠ 0) :
+    Quotient.mk (MatrixModule.blockSetoid π hπ hlin) μ = principalBlock π hπ hlin hnil := by
+  refine mk_eq_principalBlock_of_centralCharacterAlg_eq π hπ hlin hnil μ (AlgHom.ext fun z => ?_)
+  refine (centralCharacterAlg_eq_of_decompositionNumber_ne_zero hp hω hω' hπ hlin hkerJ
+    (ρ := Representation.trivial 𝒪 G 𝒪) hμ
+    (c := OddOrder.GroupTheory.CenterSimplesOrbit.aug z) ?_).symm
+  have hred : reduction (Representation.trivial 𝒪 G 𝒪)
+      = Representation.trivial (ResidueField 𝒪) G (TensorProduct 𝒪 (ResidueField 𝒪) 𝒪) := by
+    refine MonoidHom.ext fun g => ?_
+    rw [reduction_apply]
+    exact LinearMap.baseChange_id
+  rw [hred, asAlgebraHom_trivial]
+  rfl
+
 end OddOrder.RepresentationTheory.Modular
