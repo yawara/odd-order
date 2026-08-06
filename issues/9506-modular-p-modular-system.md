@@ -4833,3 +4833,39 @@ Wedderburn 分裂が要らないので variable block が小さくて済む。
 3. **`hb0`/`hc0`/`hd0`** = `eq_ite_of_sum_principalBasicSet_eq_one` (段 331) の配線
    (`hone` は自明指標について上記 `hu` 橋から)。
 4. **組み立て** (段 352?): 5 群の datum を `exists_datum_padicComplex` で obtain。
+
+### ✅ 段 351 完了 (2026-08-06) — 商群の basic set を `C_G(x)` へ引き戻す橋
+
+`ColumnsAtInvolution.algebraMap_irreducibleBrauerCharacter_eq_sum_intBasicSetMatrix`
+(341 行)。原文が「(7.6) の後の注意により `{ψ₀,ψ₁,ψ₂}` は `b₀ = B₀(C_G(t))` の basic set
+でもある」と一言で済ませる箇所:
+
+`φ_μ(w) = φ̄_μ(w̄)` (`irreducibleBrauerCharacter_quotientPi`) +
+`φ̄_μ = ∑_j u_{μj} η_j` (商群での (7.3)) ⟹ 同じ `U` が `IBr(C_G(x))` を引き戻した
+basic set で表す。`μ ∈ IBr(B₀(Q))` に限る (段 350 の台限定版と対)。
+
+⚠ `IsPRegular.map` は `GroupTheory/PRegularQuotient.lean` に**既存**だった (重複宣言で発覚)。
+⚠ `intCast_intBasicSetMatrix` は `ε_j² = 1` を要求するので、`Irr(B₀(Q))` の外の `j` は
+`principalBasicSet` の `if` が落ちて両辺 0、という場合分けが要る。
+
+### ⏭ 段 352 = **`quotientPi` 下の主ブロック対応が結局必要** (段 348 note の訂正)
+
+段 348 で「`a` 列を truncate しなければ主ブロック対応は要らない」と書いたが、**`hT` の側で
+再登場する**ことが判明した。整理:
+
+* 段 350 の台限定版は `hd : ∀ μ, ¬P μ → d^x_{χμ} = 0` を要求する。
+* `hd` が取れるのは **`P μ = (block_{C_G(x)}(μ) = B₀(C_G(x)))`** の形
+  (第二主定理 `generalizedDecompositionNumber_eq_zero_of_blockOfIrr_ne` +
+  外側の対 `(G, C_G(x))` についての `hconv`)。
+* 一方 段 351 の橋は **`P μ = (block_Q(μ) = B₀(Q))`** を要求する。
+* ⟹ **`block_{C_G(x)}(μ) = B₀(C_G(x)) ⟹ block_Q(μ) = B₀(Q)`** の 1 方向が要る。
+
+**証明方針 (数学的には短い)**: `principalBlock = blockOfCentralCharacter … aug` で、
+`f : k[C] ↠ k[Q]` (mapDomain) について `π = quotientPi π ∘ f` (`quotientPi_mapDomain`)。
+全射だから `f (Z(k[C])) = Z(k[Q])`。中心指標は `ω^C_μ(z) = ω^Q_μ(f z)`、
+増大写像も `aug_C = aug_Q ∘ f`。⟹ `ω^Q_μ = aug_Q ⟺ ω^C_μ = aug_C` (両方向)。
+repo 側の `centralCharacterAlg` / `blockSetoid` / `blockOfCentralCharacter` の定義に沿って
+書き下すのが実作業 (~100-200 行と見込む)。
+
+その後: 段 353 = `hT` (段 346 の 3 項 + 段 350/351/352)、段 354 = `hb0`/`hc0`/`hd0`
+(`eq_ite_of_sum_principalBasicSet_eq_one`)、段 355 = 5 群の datum を obtain して組み立て。
