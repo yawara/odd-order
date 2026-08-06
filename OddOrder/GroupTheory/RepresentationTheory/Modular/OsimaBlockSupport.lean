@@ -212,6 +212,52 @@ abstract predicate closed under linking. -/
 set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
 omit [CharZero K] [FaithfulSMul 𝒪 K] [DecidableEq (ConjClasses G)]
+  [Fintype (ConjClasses G)] [∀ i, Nonempty (m i)] [Invertible (Nat.card G : K)] in
+open scoped Classical in
+include hp hω hω' hkerJ e in
+/-- **The `A`-restricted column of `D` is the whole column**, once `A` meets its support.
+
+`A` is closed under linking, so a single `i ∈ A` with `d_{iφ} ≠ 0` drags every `j` with
+`d_{jφ} ≠ 0` into `A`; the terms outside `A` are then zero and the restricted sum is `Φ_φ(g)`. -/
+theorem sum_decompositionMatrix_mul_ordinaryCharacter_of_linkedClosed {Q : ι' → Prop}
+    (hQ : ∀ (i j : ι') (ψ : ι), Q i →
+      decompositionMatrix hp hω hω' hπ hlin hkerJ e i ψ ≠ 0 →
+      decompositionMatrix hp hω hω' hπ hlin hkerJ e j ψ ≠ 0 → Q j)
+    {φ : ι} (hex : ∃ i, Q i ∧ decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ ≠ 0) (g : G) :
+    (∑ i ∈ Finset.univ.filter Q,
+      (decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ : 𝒪)
+        * ordinaryCharacter (𝒪 := 𝒪) e i g)
+      = projectiveIndecomposableCharacter hp hω hω' hπ hlin hkerJ e φ g := by
+  classical
+  obtain ⟨i₀, hQi₀, hd₀⟩ := hex
+  refine Finset.sum_subset (Finset.filter_subset _ _) fun j _ hj => ?_
+  have hdj : decompositionMatrix hp hω hω' hπ hlin hkerJ e j φ = 0 := by
+    by_contra hc
+    exact hj (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hQ i₀ j φ hQi₀ hd₀ hc⟩)
+  rw [hdj, Nat.cast_zero, zero_mul]
+
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+omit [CharZero K] [FaithfulSMul 𝒪 K] [DecidableEq (ConjClasses G)]
+  [Fintype (ConjClasses G)] [∀ i, Nonempty (m i)] [Invertible (Nat.card G : K)] in
+open scoped Classical in
+include hp hω hω' hkerJ e in
+/-- **The `A`-restricted column of `D` vanishes** when `A` misses its support. -/
+theorem sum_decompositionMatrix_mul_ordinaryCharacter_eq_zero_of_not_exists {Q : ι' → Prop}
+    {φ : ι} (hex : ¬ ∃ i, Q i ∧ decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ ≠ 0) (g : G) :
+    (∑ i ∈ Finset.univ.filter Q,
+      (decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ : 𝒪)
+        * ordinaryCharacter (𝒪 := 𝒪) e i g) = 0 := by
+  classical
+  refine Finset.sum_eq_zero fun i hi => ?_
+  have hzero : decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ = 0 := by
+    by_contra hc
+    exact hex ⟨i, (Finset.mem_filter.mp hi).2, hc⟩
+  rw [hzero, Nat.cast_zero, zero_mul]
+
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+omit [CharZero K] [FaithfulSMul 𝒪 K] [DecidableEq (ConjClasses G)]
   [Fintype (ConjClasses G)] in
 open scoped Classical in
 include hp hω hω' hkerJ e in
@@ -230,24 +276,11 @@ theorem sum_decompositionMatrix_mul_ordinaryCharacter_eq_zero_of_linkedClosed {Q
         * ordinaryCharacter (𝒪 := 𝒪) e i g) = 0 := by
   classical
   by_cases hex : ∃ i, Q i ∧ decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ ≠ 0
-  · obtain ⟨i₀, hQi₀, hd₀⟩ := hex
-    have hfull : (∑ i ∈ Finset.univ.filter Q,
-          (decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ : 𝒪)
-            * ordinaryCharacter (𝒪 := 𝒪) e i g)
-        = ∑ i : ι', (decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ : 𝒪)
-            * ordinaryCharacter (𝒪 := 𝒪) e i g := by
-      refine Finset.sum_subset (Finset.filter_subset _ _) fun j _ hj => ?_
-      have hdj : decompositionMatrix hp hω hω' hπ hlin hkerJ e j φ = 0 := by
-        by_contra hc
-        exact hj (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hQ i₀ j φ hQi₀ hd₀ hc⟩)
-      rw [hdj, Nat.cast_zero, zero_mul]
-    rw [hfull]
+  · rw [sum_decompositionMatrix_mul_ordinaryCharacter_of_linkedClosed hp hω hω' hπ hlin hkerJ e
+      hQ hex g]
     exact projectiveIndecomposableCharacter_eq_zero hp hω hω' hπ hlin hkerJ e φ hg
-  · refine Finset.sum_eq_zero fun i hi => ?_
-    have hzero : decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ = 0 := by
-      by_contra hc
-      exact hex ⟨i, (Finset.mem_filter.mp hi).2, hc⟩
-    rw [hzero, Nat.cast_zero, zero_mul]
+  · exact sum_decompositionMatrix_mul_ordinaryCharacter_eq_zero_of_not_exists hp hω hω' hπ hlin
+      hkerJ e hex g
 
 set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
