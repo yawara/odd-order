@@ -38,6 +38,9 @@ the hypothesis that the block idempotents are lifted along.
 * `OddOrder.Algebra.cyclotomicToResidueField` — the reduction `B → k` at `ζ ↦ 1`, and its
   surjectivity
 * `OddOrder.Algebra.Ideal.sup_pow_le` — `(I ⊔ J)^n ≤ I ⊔ J^n`
+* `OddOrder.Algebra.ker_cyclotomicToResidueField_le` /
+  `OddOrder.Algebra.ker_cyclotomicToResidueField_isMaximal` — the kernel is maximal and sits
+  inside `𝔪_A·B ⊔ ⟨ζ - 1⟩`
 -/
 
 namespace OddOrder.Algebra
@@ -164,5 +167,41 @@ theorem cyclotomicToResidueField_surjective {A : Type*} [CommRing A] [IsLocalRin
   intro y
   obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective y
   exact ⟨AdjoinRoot.of _ a, cyclotomicToResidueField_of hk a⟩
+
+open IsLocalRing in
+/-- **`ker (B → k) ≤ 𝔪_A·B ⊔ ⟨ζ - 1⟩`.**  Write a representative as `P = C (P(1)) + (X - 1)·Q`
+(`Polynomial.dvd_iff_isRoot`); the constant `P(1)` lies in `𝔪_A` exactly because the image
+vanishes. -/
+theorem ker_cyclotomicToResidueField_le {A : Type*} [CommRing A] [IsLocalRing A]
+    {q k : ℕ} [Fact (Nat.Prime q)] [CharP (ResidueField A) q] (hk : 0 < k) :
+    RingHom.ker (cyclotomicToResidueField (A := A) (q := q) (k := k) hk)
+      ≤ Ideal.map (algebraMap A (AdjoinRoot (cyclotomic (q ^ k) A))) (maximalIdeal A)
+        ⊔ Ideal.span {AdjoinRoot.root (cyclotomic (q ^ k) A) - 1} := by
+  intro x hx
+  obtain ⟨P, rfl⟩ := AdjoinRoot.mk_surjective x
+  rw [RingHom.mem_ker, cyclotomicToResidueField, AdjoinRoot.lift_mk] at hx
+  have hconst : P.eval 1 ∈ maximalIdeal A := by
+    rw [← ker_residue, RingHom.mem_ker]
+    have h1 : (1 : ResidueField A) = residue A 1 := (map_one _).symm
+    rw [h1, Polynomial.eval₂_at_apply] at hx
+    -- `hx : residue A (P.eval 1) = 0`
+    simpa using hx
+  obtain ⟨Q, hQ⟩ : (Polynomial.X - Polynomial.C (1 : A)) ∣ P - Polynomial.C (P.eval 1) := by
+    rw [Polynomial.dvd_iff_isRoot]
+    simp [Polynomial.IsRoot]
+  have hsplit : P = Polynomial.C (P.eval 1) + (Polynomial.X - Polynomial.C (1 : A)) * Q := by
+    rw [← hQ]; ring
+  rw [hsplit, map_add, map_mul]
+  refine Ideal.add_mem _ (Ideal.mem_sup_left ?_) (Ideal.mem_sup_right ?_)
+  · exact Ideal.mem_map_of_mem _ hconst
+  · refine Ideal.mul_mem_right _ _ (Ideal.subset_span ?_)
+    simp [Set.mem_singleton_iff, map_sub, AdjoinRoot.mk_X]
+
+open IsLocalRing in
+/-- **`ker (B → k)` is a maximal ideal** — the quotient is the field `k`. -/
+theorem ker_cyclotomicToResidueField_isMaximal {A : Type*} [CommRing A] [IsLocalRing A]
+    {q k : ℕ} [Fact (Nat.Prime q)] [CharP (ResidueField A) q] (hk : 0 < k) :
+    (RingHom.ker (cyclotomicToResidueField (A := A) (q := q) (k := k) hk)).IsMaximal :=
+  RingHom.ker_isMaximal_of_surjective _ (cyclotomicToResidueField_surjective hk)
 
 end OddOrder.Algebra

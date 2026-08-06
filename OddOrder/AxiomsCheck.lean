@@ -19119,3 +19119,20 @@ well-defined 条件は `Φ_{q^k}(1) = q`
 = 段 300 の `isAdicComplete_of_le_of_pow_le` が要求する共終性。 -/
 
 #assert_only_allowed_axioms OddOrder.Algebra.Ideal.sup_pow_le
+
+/-! 🎯 **issue 9506 段 305**: `B → k` の核は極大で `𝔪_A·B ⊔ ⟨ζ−1⟩` に含まれる
+(`Algebra/CyclotomicAdjoin`)。
+
+- `ker_cyclotomicToResidueField_isMaximal`: 商が体 `k` なので
+  mathlib `RingHom.ker_isMaximal_of_surjective` (段 303 の全射性) で即。
+- `ker_cyclotomicToResidueField_le`: 代表元 `P` を
+  `P = C(P(1)) + (X−1)·Q` と分解 (`Polynomial.dvd_iff_isRoot`)。定数項 `P(1)` は
+  像が消えることから `𝔪_A` に入る。⟹ `ker ≤ 𝔪_A·B ⊔ ⟨ζ−1⟩`。
+
+⟹ 段 302 (`(ζ−1)^φ ∈ 𝔪_A·B`) + 段 304 (`(I ⊔ J)^n ≤ I ⊔ J^n`) と合わせて
+`ker^φ ≤ 𝔪_A·B` が出る。あとは段 300 の `isAdicComplete_of_le_of_pow_le` と
+mathlib `isLocalRing_of_isAdicComplete_maximal` で `IsLocalRing B`。 -/
+
+#assert_only_allowed_axioms OddOrder.Algebra.ker_cyclotomicToResidueField_le
+
+#assert_only_allowed_axioms OddOrder.Algebra.ker_cyclotomicToResidueField_isMaximal
