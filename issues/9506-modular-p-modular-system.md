@@ -2942,6 +2942,24 @@ mathlib では `IsAdicComplete.henselianRing` **のみ** (実測: mathlib 内で
 3. 剰余体が `𝔽̄_p` (⟹ `IsAlgClosed`) の instance
 4. 商体が `K[G]` を分裂 (Brauer の分裂体定理を経由)
 
+⚠ **mathlib 支援の実測 (2026-08-06)**: `NumberTheory/LocalField/Basic.lean` の
+`IsNonarchimedeanLocalField` は **`Finite 𝓀[K]` (剰余体が有限)** を要求するので、
+剰余体 `𝔽̄_p` の我々の設定には使えない。`RingTheory/DiscreteValuationRing/` にも
+「完備 DVR の有限拡大は完備 DVR」に相当する補題は無い (`CompleteSpace`/`IsAdicComplete`
+の言及ゼロ)。⟹ **タスク 1-2 は自前で組む必要がある**。
+
+⚠ **(b) 側の精査**: `IsPrecomplete 𝔪 𝓞_ℂ_[p]` は (𝔪ⁿ = 𝔪 ゆえ) **自明に真**だが、
+失敗するのは `IsHausdorff` の側。冪等元の Newton 反復
+`e_{n+1} = 3eₙ² − 2eₙ³` は 𝔪-進に収束させるので `𝔪² = 𝔪` では意味を持たない。
+数学的には「Henselian 局所環上の有限代数で冪等元は持ち上がる」で正しいが、
+その形式化は mathlib に無い。
+
+⟹ **(a) も (b) も自前のインフラ構築**。規模はどちらも大きいが、(a) は
+「完備 DVR の全分岐拡大」という定型的な対象で mathlib の `Polynomial.IsEisensteinAt` /
+`IsAdicComplete` 補題群を積み上げれば届く見込み。(b) は可換環論の一般定理 1 本
+(「Henselian 対は有限代数で安定」) を丸ごと形式化する話で、汎用性は高いが単発では重い。
+**着手時は (a) から**。
+
 ### `hconv` は gap ではなく assembly (2026-08-06 実測)
 
 `hconv` (= Brauer 第 3 主定理の逆向き) の**本体は既に在る**:
