@@ -4869,3 +4869,56 @@ repo 側の `centralCharacterAlg` / `blockSetoid` / `blockOfCentralCharacter` �
 
 その後: 段 353 = `hT` (段 346 の 3 項 + 段 350/351/352)、段 354 = `hb0`/`hc0`/`hd0`
 (`eq_ite_of_sum_principalBasicSet_eq_one`)、段 355 = 5 群の datum を obtain して組み立て。
+
+### 🔍 段 352 の調査 (2026-08-06) — 欠けているのは **Navarro Problem (3.4) = ブロックの連結性**
+
+段 351 の後、`hT` に必要な `hd` を詰めた結果、**欠けている定理が 1 本に特定できた**。
+
+#### 何が要るか
+
+段 350 の台限定版は `hd : ∀ μ, ¬P μ → d^x_{χμ} = 0` を要求する。
+
+* `hd` が取れるのは `P μ = (block_C(μ) = B₀(C))` の形だけ
+  (第二主定理 + 外側の対 `(G, C_G(x))` の `hconv`)。
+* 段 351 の橋は `P μ = (block_Q(μ) = B₀(Q))` を要求する。
+* 両者を繋ぐのに要るのは **`block_C(μ) = B₀(C) ⟹ block_Q(μ) = B₀(Q)`**。
+  逆向き (`Q ⟹ C`) は易しい (下記) が、**必要なのは難しい方**。
+
+#### repo の枠組みでの定式化
+
+`blockSetoid π` は「中心指標 `centralCharacterAlg π μ` が等しい」で定義され
+(`Algebra/BlockIdempotent.lean`)、`principalBlock = blockOfCentralCharacter … aug`。
+`f : k[C] ↠ k[Q]` (mapDomain, `quotientPi_mapDomain` で `π = quotientPi π ∘ f`) について
+
+* `f (Z(k[C])) ⊆ Z(k[Q])` (全射だから)、`ω^C_μ = ω^Q_μ ∘ f`、`aug_C = aug_Q ∘ f`
+* ⟹ **易しい向き**: `ω^Q_μ = aug_Q ⟹ ω^C_μ = aug_C` (`blockSetoid_Q` は `blockSetoid_C` を細分)
+* **難しい向き**は `f` が中心の上で全射でないと出ない。
+
+#### 潰した近道 3 つ (再挑戦しないこと)
+
+1. **中心の全射性**: `f(K̂_g) = m · Ĉ_ḡ`、`m = [C_Q(ḡ) : im C_C(g)]` は `|N| = 2` の約数。
+   `g` が `p`-正則なら `u g u⁻¹ = g·x` は位数が合わず不可能ゆえ **`m = 1`**。
+   しかし `p`-特異な `g` (例: 位数 4 で `g² = x`) では `g x = g⁻¹` となり **`m = 2`** が実際に起きる。
+   ⟹ `f(Z(k[C])) ⊊ Z(k[Q])`。
+2. **「中心指標は `p`-正則類で決まる」**: 偽。`λ_{B₀}(K̂) = |K| mod p` は `p`-元の類 (= `p`-特異)
+   でも 0 でない。Osima (`OsimaBlockSupport`) は**ブロック冪等元が `p`-特異元で消える**という
+   別の主張で、これには使えない。
+3. **Cartan の零パターン**: `cartanMatrix_quotientPi` は `C_C = |N| · C_Q` を**全ての `μ,τ`** で
+   与えるので零パターンは一致するが、「同じ中心指標 ⟹ Cartan で連結」が無いと分割の一致は出ない
+   (`cartanMatrix_eq_zero_of_centralCharacterAlg_ne` は**逆向き**しか無い)。
+
+#### ⟹ 段 352 = **「同じ中心指標 ⟹ 通常指標を介して連結」** (Navarro Problem (3.4))
+
+原文 p.138 の (7.6) 証明が明示的に引いているのがこれ:
+「`s > 1` なら `c_{φθ} = |P| c_{φ̄θ̄}` より `C_B` が `(* 0; 0 *)` の形になり、Problem (3.4) に反する」。
+
+repo には**片側だけ**在る:
+`centralCharacterAlg_eq_of_decompositionMatrix_ne_zero` (連結 ⟹ 同じ中心指標,
+`CartanBlockDiagonal.lean`)。**逆** (= ブロックが連結成分と一致) が無い。
+
+証明方針: `IBr(B) = S ⊔ T` が Cartan で分離しているとする。`Irr(B)` も
+`S`/`T` に分かれる (どの `χ` も両側に成分を持たない)。そこから中心冪等元 `e_S` を作れば
+`ω_μ(e_S) = 1 (μ∈S)`, `= 0 (μ∈T)` だが `S`, `T` の中心指標は等しいので `1 = 0` で矛盾。
+実作業は「`e_S = ∑_{χ∈S} e_χ` が `𝒪` 係数」= ブロックが `𝒪`-定義であること。
+`Modular/OrdinaryIdempotent` / `Modular/BlockIdempotentLift` / `Algebra/BlockIdempotent` の
+既存 API で組めるか要調査。**規模は 200 行超と見込む** (multi-session)。
