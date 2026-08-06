@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Algebra.SumSquaresFour
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockTrivial
 import OddOrder.GroupTheory.RepresentationTheory.CharacterInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInverse
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
@@ -414,13 +415,13 @@ nonzero, and each of those is `±1`.
 
 `∑_{χ ∈ Irr(B_0)} χ(y)² = c_{φ_0 φ_0} = 4` (`sum_sq_character_eq_cartanMatrix_of_isConj_inv`,
 `y` being conjugate to `y⁻¹` in a quaternion group), the values are rational integers
-(`exists_intCast_character_of_pow_four_eq_one`, `y⁴ = 1` and `y` real), and one of them is `1`;
+(`exists_intCast_character_of_pow_four_eq_one`, `y⁴ = 1` and `y` real),
+and one of them is `1` — the trivial character, which lies in `Irr(B_0)`
+(`exists_blockOfIrr_eq_principalBlock_character_eq_one`);
 `OddOrder.Algebra.card_filter_ne_zero_eq_four_of_sum_sq_eq_four` closes it. -/
 theorem card_character_ne_zero_eq_four_of_isConj_inv
     (hy4 : t ^ 4 = 1) (hinv : ∃ c : G, c * t * c⁻¹ = t⁻¹)
-    (hcart : cartanMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e φ₀ φ₀ = 4)
-    {j₁ : κ} (hj₁ : blockOfIrr eG hπG hlinG hnilG j₁ = principalBlock πG hπG hlinG hnilG)
-    (hj₁val : (wedderburnRepresentation eG j₁).character t = 1) :
+    (hcart : cartanMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e φ₀ φ₀ = 4) :
     (Finset.univ.filter (fun j : κ =>
         blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG
           ∧ (wedderburnRepresentation eG j).character t ≠ 0)).card = 4
@@ -431,6 +432,10 @@ theorem card_character_ne_zero_eq_four_of_isConj_inv
   classical
   haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   have h2 : (2 : K) ≠ 0 := two_ne_zero
+  -- the trivial character: it lies in `Irr(B_0)` and is `1` everywhere
+  obtain ⟨j₁, hj₁, hj₁all⟩ :=
+    exists_blockOfIrr_eq_principalBlock_character_eq_one eG hπG hlinG hnilG
+  have hj₁val : (wedderburnRepresentation eG j₁).character t = 1 := hj₁all t
   set P : κ → Prop :=
     fun j => blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG with hP
   have hmem : ∀ j : κ, j ∈ Finset.univ.filter P ↔ P j := fun j =>

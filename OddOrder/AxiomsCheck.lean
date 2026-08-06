@@ -18782,3 +18782,29 @@ Navarro p.140 が「これらは先頭成分が 1 の整数列である」と言
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_trivial_wedderburn_index
+
+/-! 🎯 **issue 9506 段 285**: 自明指標は主ブロックに属する
+(`Modular/PrincipalBlockTrivial`)。
+
+`principalBlock` は「中心指標が増大射である唯一のブロック」として定義されている
+(Wedderburn 分解の中で自明指標を特定せずに済ませるため)。Navarro が p.140 で
+「これらは 1 を先頭成分とする整数列である」と言うときに要るのはその逆読み
+= 段 284 が作った自明成分のブロックが `B_0` である、という主張。
+
+両ブロックとも中心指標で一意に決まり、類和が中心の基底 (`centerBasis`) なので
+`K̂` 上で比べれば足りる: 自明ブロックでは `ω(K̂)·χ(1) = ∑_{g∈K} χ(g) = |K|`
+(`χ(1) = χ(g) = 1`)、格子側の中心指標は `𝒪 → K` の下でこれと一致し
+(`algebraMap_centralScalar_eq`) `𝒪 → K` は単射なので格子側の値は `|K| ∈ 𝒪`、
+その剰余は `|K|*` で `aug(K̂)` (`aug_classSumCenter`) に等しい。
+
+⟹ 段 283 の `card_character_ne_zero_eq_four_of_isConj_inv` から仮説
+`{j₁} (hj₁) (hj₁val)` を落として signature を hy4 / hinv / hcart だけにした。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.centralScalar_classSum_of_trivial
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockOfIrr_eq_principalBlock_of_trivial
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_blockOfIrr_eq_principalBlock_character_eq_one
