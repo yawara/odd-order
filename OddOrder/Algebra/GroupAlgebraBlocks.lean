@@ -114,4 +114,32 @@ theorem exists_modularDatum (k : Type*) [Field k] [IsAlgClosed k] (G : Type*) [G
   obtain ⟨m, hm⟩ := hker _ (RingHom.mem_ker.mpr ((blockCharacterPi_eq_zero_iff π' hπ hlin).mp hz))
   exact ⟨m, Subtype.ext (by simpa using hm)⟩
 
+/-- **The nil-kernel hypothesis is implied by `ker π = J(A)`.**
+
+`A` is Artinian (finite-dimensional over a field), so its Jacobson radical is nilpotent
+(`IsSemiprimaryRing.isNilpotent`); a central element killed by every block character lies in
+`ker π = J(A)` (`blockCharacterPi_eq_zero_iff`), hence is nilpotent.
+
+This is what makes the hypothesis available for *derived* splittings — notably
+`quotientPi`, whose kernel is the Jacobson radical of the quotient group algebra
+(`ker_quotientPi`) but which is not produced by `exists_modularDatum`. -/
+theorem isNilpotent_of_blockCharacterPi_eq_zero {k : Type*} [Field k]
+    {ι : Type*} [Finite ι] {nn : ι → Type*} [∀ i, Fintype (nn i)] [∀ i, DecidableEq (nn i)]
+    [∀ i, Nonempty (nn i)]
+    {A : Type*} [Ring A] [Algebra k A] [Module.Finite k A]
+    (π : A →+* ∀ j, Matrix (nn j) (nn j) k) (hπ : Function.Surjective π)
+    (hlin : ∀ (c : k) (a : A), π (c • a) = c • π a)
+    (hkerJ : RingHom.ker π = Ring.jacobson A)
+    (z : Subalgebra.center k A) (hz : MatrixModule.blockCharacterPi π hπ hlin z = 0) :
+    IsNilpotent z := by
+  haveI : IsArtinianRing A := IsArtinianRing.of_finite k A
+  obtain ⟨m, hm⟩ : IsNilpotent (Ring.jacobson A) := IsSemiprimaryRing.isNilpotent
+  have hmem : (z : A) ∈ Ring.jacobson A := by
+    rw [← hkerJ]
+    exact RingHom.mem_ker.mpr ((MatrixModule.blockCharacterPi_eq_zero_iff π hπ hlin).mp hz)
+  refine ⟨m, Subtype.ext ?_⟩
+  have hpow := Ideal.pow_mem_pow hmem m
+  rw [hm] at hpow
+  simpa using hpow
+
 end OddOrder.GroupAlgebra
