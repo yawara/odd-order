@@ -371,4 +371,29 @@ theorem sum_cartanMatrix_mul_pairingZero [Fintype G] (φ θ : ι) :
   rw [← Finset.sum_mul,
     ← projectiveIndecomposableCharacter_eq_sum_cartanMatrix hp hω hω' hπ hlin hkerJ e θ x hxreg]
 
+set_option linter.unusedDecidableInType false in
+set_option linter.unusedFintypeInType false in
+include hp hω hω' hkerJ e in
+/-- **The decomposition matrix has no zero column**: every irreducible Brauer character occurs in
+some ordinary one.
+
+If the column of `φ` vanished, `Φ_φ = ∑_i d_{iφ} χ_i` would be identically zero, contradicting
+`∑_j |C_G(x_j)|⁻¹ φ(x_j⁻¹) Φ_φ(x_j) = 1` (`sum_brauer_mul_projectiveIndecomposableCharacter` at
+`φ = θ`). -/
+theorem exists_decompositionMatrix_ne_zero (φ : ι) :
+    ∃ i : ι', decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ ≠ 0 := by
+  classical
+  by_contra hex
+  have hall : ∀ i : ι', decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ = 0 :=
+    fun i => not_not.mp fun hc => hex ⟨i, hc⟩
+  have hΦ : ∀ g : G, projectiveIndecomposableCharacter hp hω hω' hπ hlin hkerJ e φ g = 0 := by
+    intro g
+    refine Finset.sum_eq_zero fun i _ => ?_
+    rw [hall i, Nat.cast_zero, zero_mul]
+  have h1 := sum_brauer_mul_projectiveIndecomposableCharacter hp hω hω' hπ hlin hkerJ e φ φ
+  rw [if_pos rfl] at h1
+  rw [Finset.sum_congr rfl fun j _ => by rw [hΦ, mul_zero, map_zero, mul_zero],
+    Finset.sum_const_zero] at h1
+  exact zero_ne_one h1
+
 end OddOrder.RepresentationTheory.Modular
