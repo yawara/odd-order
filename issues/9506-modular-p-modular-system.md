@@ -4664,3 +4664,64 @@ CLAUDE.md「carrier は posit でなく construct」の doneness 判定にもな
 
 ⟹ 段 322 (`UᵗC_{C_G(t)}U = 2(1+δ)`) と合成すれば原文 (3) `(D^t_i, D^t_j) = 2(1+δ_ij)` が出る
 = 段 340 の `hbb`/`hcc`/`hdd`/`hbc`/`hbd`/`hcd` の supplier。
+
+### ✅ 段 346 完了 (2026-08-06) — (7.4) の basic set は 3 元。p.141 の展開が 3 項になる
+
+`Modular/BasicSetTriple.lean` (新 leaf、177 行):
+
+| 名前 | 内容 |
+|---|---|
+| `exists_pair_of_card_filter_eq_four` | `|Irr(B₀)| = 4` + 「捨てる `j₀`」「自明指標 `l₀`」から残り 2 元 `ψ₁`,`ψ₂` を名指し + 枚挙 |
+| `sum_eq_add_add_of_enumeration` | 台が `𝓑 = {l₀,ψ₁,ψ₂}` に載る和は 3 項に潰れる |
+| `basicDecompositionNumber_add_add_eq_character` | 🎯 原文 p.141 の `χ(tu) = ∑_φ d^t_{χφ} φ(u)` を **3 項**に |
+
+⟹ 段 340 の `hT : T k = b k + s₁ c k + s₂ d k` の骨格。**`|Irr(B₀)| = 4` (Navarro (7.2),
+`card_blockOfIrr_principal_eq_four_and_character_involution`) が実際に使われるのはここだけ** —
+basic set を 3 元にするため。𝓑 の外で `η` が消える (`principalBasicSet` の定義が `if`) ことが
+「和が 3 項」の根拠で、`u` (= `intBasicSetMatrix`) の方は 𝓑 の外でも 0 でないので使えない。
+
+### ✅✅ 段 347 完了 (2026-08-06) — 🎯 原文 p.141 の **(3) `(D^t_i, D^t_j) = 2(1+δ)`**
+
+`Modular/ColumnsAtInvolution.lean` (新 leaf、196 行) —
+`sum_mul_basicDecompositionNumber_quotientPi`:
+
+* 左辺 = 対合 `x` での basic set 列の内積 (段 345 = (7.5)(c) の対合版)
+* 右辺 = `|N|(1 + δ_jk)` (段 322 = (7.4)+(7.6))
+
+合流できるのは **(7.5)(c) の右辺に出る Cartan 行列が (7.4)+(7.6) の左辺のそれと同一項**
+だから (どちらも `C_G(x)` の通常分裂 `e` についての `cartanMatrix`; `IBr` の添字型は
+`quotientPi` で共有)。`N = ⟨x⟩` ⟹ 係数 2 ⟹ 段 340 の
+`hbb`/`hcc`/`hdd`/`hbc`/`hbd`/`hcd` の supplier。
+
+#### ⚠ 実装知見 (合流補題の書き方。1 時間溶かした)
+
+* 段 322 の**第 5 位置引数 `eG` は「その file の `G`」の通常分裂** = 本 file では
+  `C_G(x)` のもの (`e`)。外側の群の `eG` を渡すと型が合わない。
+* しかも `refine (段345 …).trans ?_` と書くと**期待型が伝播して誤った unification を
+  延々追い**、`(deterministic) timeout at isDefEq` という原因の見えないエラーになる
+  (maxHeartbeats を上げても無駄)。
+* `have h1 := …; have h2 := …; exact h1.trans h2` と**期待型無しで**組むと
+  「Application type mismatch: eG has type … but is expected …」が即座に出る。
+  **合流補題は常にこの形で書くこと**。
+* 正しく組んだ後は `maxHeartbeats` の引き上げも不要だった (既定で通る)。
+
+#### F の残り (2026-08-06 更新)
+
+| 段 340 の仮説 | supplier | 状態 |
+|---|---|---|
+| `e` / `i₀`+`hi₀` | `exists_datum_padicComplex` + `exists_blockOfIrr_eq_principalBlock_character_eq_one` | ✅ 既存 |
+| `hgdeg`/`hTval`/`hg0`/`hgpos` | 段 341 | ✅ |
+| `hcong`/`hs₁`/`hs₂` | 段 342 | ✅ |
+| `hbb`..`hcd` (t 側内積) | **段 347** | ✅ |
+| `haa` (y 側) | `sum_sq_character_eq_cartanMatrix_of_isConj_inv` (a は `B₀` へ truncate 必須) | ✅ 既存 |
+| `hab`/`hac`/`had` | `sum_character_mul_generalizedDecompositionNumber_eq_zero` (`y⁻¹ ∉ pSection 2 t`) + `sum_mul_basicDecompositionNumber_left_eq_zero` | ✅ 部品在り |
+| `hgb`/`hgc`/`hgd` | 同上を `v = 1` で | ✅ 部品在り |
+| `hga` | `sum_character_mul_character_involution_eq_zero` を `s = 1` で | ✅ 既存 |
+| `ha0`/`hb0`/`hc0`/`hd0` | 段 331 | ✅ |
+| `hT` | **段 346** + `sum_basicSetMatrixOf_mul_principalBasicSet` + `irreducibleBrauerCharacter_quotientPi` | ✅ 骨格 |
+| `h10` | 段 330 + 段 335/336 + `sign_relation_ten` | ✅ |
+
+⟹ **残るのは (i) 「basic set 列は `B₀(G)` の外で 0」((7.5)(a) の具体形; `a` を truncate した
+分と untruncate な supplier の差を埋める) と (ii) 5 群 (`G`/`C_G(t)`/`C_G(t)/⟨t⟩`/
+`C_{C_G(t)/⟨t⟩}(ȳ)`/`C_G(y)`) の datum を `exists_datum_padicComplex` で obtain して
+全部を配線する組み立てだけ**。数学的な未知は無い。
