@@ -18977,3 +18977,23 @@ Külshammer の公式と第 3 主定理が `𝒪` 側で持ち回る 3 仮説
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_blockIdempotentFamily
+
+/-! 🎯 **issue 9506 段 295**: `blockOfIrr` の全射性
+(`exists_blockOfIrr_eq`, `Modular/CentralScalarBridge`)。
+
+「どのブロックもある通常既約指標のブロックである」。段 294 で判明したとおり
+`hvanishH` (= `λ_B(Ĝ⁰) = 0` for `B ≠ B₀`) の既存補題は `blockOfIrr e … i` の形の
+ブロックについてしか言えていなかったので、任意の `B` に降ろすのにこれが要る。
+
+証明: もしどの `χ_i` のブロックも `B` でなければ、Navarro (3.13.a)
+(`apply_eq_zero_of_blockOfLattice_ne`) によりブロック冪等元 `f_B ∈ Z(𝒪G)` は
+すべての Wedderburn 格子上で `0` として作用する ⟹ 格子は全空間を張るので
+`K[G]` での像はすべての Wedderburn 成分で `0` ⟹ `0` そのもの ⟹
+`𝒪 → K` は単射なので `f_B = 0`。しかし `f_B` の還元のブロック指標は
+`Pi.single B 1 ≠ 0`。
+
+支持補題 `mapRingHom_injective` (係数写像が単射なら群環の係数変換も単射) も新設。 -/
+
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.Modular.mapRingHom_injective
+
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.Modular.exists_blockOfIrr_eq
