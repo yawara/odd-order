@@ -7,6 +7,7 @@ import Mathlib.RingTheory.Artinian.Ring
 import Mathlib.RingTheory.Ideal.Quotient.Operations
 import Mathlib.RingTheory.Jacobson.Semiprimary
 import Mathlib.RingTheory.SimpleModule.IsAlgClosed
+import OddOrder.Algebra.BlockIdempotent
 import OddOrder.Algebra.SplitSemisimpleCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularCount
 
@@ -37,6 +38,8 @@ algebras over `k`.
   from an abstract splitting datum
 * `OddOrder.RepresentationTheory.Modular.exists_wedderburn_pi_matrix_card_eq` — the datum,
   and hence the count, for an algebraically closed `k`
+* `OddOrder.RepresentationTheory.Modular.exists_splitting_datum` — the full datum `hπ`/`hlin`/
+  `hkerJ`/`hnil` that the block theory carries
 * `OddOrder.RepresentationTheory.Modular.exists_surjective_blocks_card_eq` — the same, packaged
   as a surjection of `kG` with kernel `J(kG)`, which is the form the module classification of
   `Algebra/PiMatrixSimpleModules` consumes
@@ -109,6 +112,55 @@ theorem exists_wedderburn_pi_matrix_card_eq [IsAlgClosed k] (hp : p.Prime) (hk :
     (Ideal.Quotient.mkₐ k _) (Ideal.Quotient.mkₐ_surjective k _) hker e'
   simpa using hcount
 
+/-- **The full modular splitting datum** of `kG` over an algebraically closed field of
+characteristic `p`: a surjective, `k`-linear ring map onto a product of `n` matrix algebras whose
+kernel is exactly `J(kG)` and whose block character detects nilpotence, with `n` the number of
+`p`-regular classes.
+
+These are precisely the four hypotheses `hπ`, `hlin`, `hkerJ`, `hnil` that the block theory
+carries everywhere.  Linearity comes from taking the quotient map as an *algebra* map
+(`Ideal.Quotient.mkₐ`), and `hnil` from the nilpotence of `J(kG)` (`kG` is semiprimary): a central
+element with vanishing block character lies in `ker π = J(kG)`, hence is nilpotent. -/
+theorem exists_splitting_datum [IsAlgClosed k] (hp : p.Prime) (hk : (p : k) = 0) :
+    ∃ (n : ℕ) (d : Fin n → ℕ) (_ : ∀ i, NeZero (d i))
+      (π : MonoidAlgebra k G →+* ∀ i, Matrix (Fin (d i)) (Fin (d i)) k)
+      (hπ : Function.Surjective π)
+      (hlin : ∀ (c : k) (a : MonoidAlgebra k G), π (c • a) = c • π a),
+      RingHom.ker π = Ring.jacobson (MonoidAlgebra k G) ∧
+      n = Nat.card {C : ConjClasses G // IsPRegularClass p C} ∧
+      ∀ z : Subalgebra.center k (MonoidAlgebra k G),
+        OddOrder.MatrixModule.blockCharacterPi π hπ hlin z = 0 → IsNilpotent z := by
+  classical
+  haveI : IsArtinianRing (MonoidAlgebra k G) := isArtinian_of_tower k inferInstance
+  obtain ⟨n, d, hd, ⟨e⟩, hn⟩ := exists_wedderburn_pi_matrix_card_eq (k := k) (G := G) hp hk
+  haveI : ∀ i, NeZero (d i) := hd
+  haveI : ∀ i, Nonempty (Fin (d i)) := fun i => ⟨⟨0, Nat.pos_of_ne_zero (hd i).out⟩⟩
+  set π : MonoidAlgebra k G →+* ∀ i, Matrix (Fin (d i)) (Fin (d i)) k :=
+    e.toRingEquiv.toRingHom.comp (Ideal.Quotient.mk (Ring.jacobson (MonoidAlgebra k G)))
+    with hπdef
+  have hπ : Function.Surjective π := e.surjective.comp Ideal.Quotient.mk_surjective
+  have hlin : ∀ (c : k) (a : MonoidAlgebra k G), π (c • a) = c • π a := by
+    intro c a
+    change e (Ideal.Quotient.mk _ (c • a)) = c • e (Ideal.Quotient.mk _ a)
+    rw [show Ideal.Quotient.mk (Ring.jacobson (MonoidAlgebra k G)) (c • a)
+        = c • Ideal.Quotient.mk (Ring.jacobson (MonoidAlgebra k G)) a from
+      map_smul (Ideal.Quotient.mkₐ k (Ring.jacobson (MonoidAlgebra k G))) c a,
+      map_smul]
+  have hker : RingHom.ker π = Ring.jacobson (MonoidAlgebra k G) := by
+    ext a
+    simp only [hπdef, RingHom.mem_ker, RingHom.coe_comp, Function.comp_apply]
+    rw [← Ideal.Quotient.eq_zero_iff_mem]
+    exact ⟨fun ha => e.injective (by simpa using ha), fun ha => by rw [ha]; simp⟩
+  refine ⟨n, d, hd, π, hπ, hlin, hker, hn, ?_⟩
+  intro z hz
+  obtain ⟨N, hN⟩ := IsSemiprimaryRing.isNilpotent (R := MonoidAlgebra k G)
+  have hz0 : (z : MonoidAlgebra k G) ∈ RingHom.ker π :=
+    RingHom.mem_ker.mpr ((OddOrder.MatrixModule.blockCharacterPi_eq_zero_iff π hπ hlin).mp hz)
+  rw [hker] at hz0
+  have hpow := Ideal.pow_mem_pow hz0 N
+  rw [hN] at hpow
+  exact ⟨N, Subtype.ext (by simpa using hpow)⟩
+
 /-- **Brauer's theorem, module form.**  Over an algebraically closed field of characteristic `p`
 there is a surjection of `kG` onto a product of `n` matrix algebras whose kernel is exactly
 `J(kG)`, with `n` the number of `p`-regular classes of `G`.
@@ -123,13 +175,7 @@ theorem exists_surjective_blocks_card_eq [IsAlgClosed k] (hp : p.Prime) (hk : (p
       (π : MonoidAlgebra k G →+* ∀ i, Matrix (Fin (d i)) (Fin (d i)) k),
       Function.Surjective π ∧ RingHom.ker π = Ring.jacobson (MonoidAlgebra k G) ∧
       n = Nat.card {C : ConjClasses G // IsPRegularClass p C} := by
-  obtain ⟨n, d, hd, ⟨e⟩, hn⟩ := exists_wedderburn_pi_matrix_card_eq (k := k) (G := G) hp hk
-  refine ⟨n, d, hd, e.toRingEquiv.toRingHom.comp
-    (Ideal.Quotient.mk (Ring.jacobson (MonoidAlgebra k G))), ?_, ?_, hn⟩
-  · exact e.surjective.comp Ideal.Quotient.mk_surjective
-  · ext a
-    simp only [RingHom.mem_ker, RingHom.coe_comp, Function.comp_apply]
-    rw [← Ideal.Quotient.eq_zero_iff_mem]
-    exact ⟨fun ha => e.injective (by simpa using ha), fun ha => by rw [ha]; simp⟩
+  obtain ⟨n, d, hd, π, hπ, -, hker, hn, -⟩ := exists_splitting_datum (k := k) (G := G) hp hk
+  exact ⟨n, d, hd, π, hπ, hker, hn⟩
 
 end OddOrder.RepresentationTheory.Modular

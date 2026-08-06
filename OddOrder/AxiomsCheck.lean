@@ -18952,3 +18952,17 @@ Cartan は `(4)` = `|C|₂`。
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_pow_eq_one_residue_eq_one_padicComplexInt
+
+/-! 🎯 **issue 9506 段 293**: modular splitting datum の完全な束
+(`exists_splitting_datum`, `Modular/BrauerCount`)。
+
+ブロック理論が全域で持ち回る 4 仮説 `hπ` (全射) / `hlin` (`k`-線型) / `hkerJ`
+(`ker π = J(kG)`) / `hnil` (ブロック指標が消えれば冪零) のうち、既存の
+`exists_surjective_blocks_card_eq` は **`hlin` と `hnil` を落としていた**
+(`k[G] ⧸ J(k[G])` 経由で構成し、商写像を素の ring hom として取っていたため)。
+
+`Ideal.Quotient.mkₐ` (代数写像) で取れば `hlin` はそのまま出るし、`hnil` は
+`J(kG)` の冪零性 (`kG` は semiprimary) から出る。⟹ 4 つ揃った束にして、
+旧 `exists_surjective_blocks_card_eq` はその射影に置換 (証明の重複を作らない)。 -/
+
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.Modular.exists_splitting_datum
