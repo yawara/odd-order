@@ -275,6 +275,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionClassBurnside
 import OddOrder.GroupTheory.RepresentationTheory.Modular.WedderburnKernel
 import OddOrder.GroupTheory.RepresentationTheory.Modular.AnalysisAtInvolution
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexDatum
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionDecompositionIntegral
 import OddOrder.GroupTheory.RepresentationTheory.Modular.TrivialCharacterBasicSet
 import OddOrder.Algebra.SubgroupSumBlockAction
@@ -622,7 +623,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 20000
+set_option linter.style.longFile 20100
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -19980,3 +19981,19 @@ Navarro (7.2)/(7.4) の `hconjall`
   OddOrder.RepresentationTheory.Modular.exists_isPrimitiveRoot_pRegularExponent
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_isPrimitiveRoot_residueField_pRegularExponent
+
+/-! 🎯🎯 **issue 9506 段 344**: **任意の有限群の完全 datum が `𝓞_ℂ_[p]` 上で構成できる**
+(`Modular/PadicComplexDatum`)。
+
+`exists_datum_padicComplex` — 有限群 `H` について 4 点セットを一度に出す:
+* 通常分裂 `e : ℂ_[p][H] ≃ₐ ∏ M_{m_i}(ℂ_[p])` (`exists_algEquiv_pi_matrix_padicComplex`)
+* modular 分裂 `π : k[H] ↠ ∏ M_{n_j}(k)` + `ker π = J(k[H])` + 冪零条件
+  (`GroupAlgebra.exists_modularDatum`; 剰余体 `𝔽̄_p` が代数閉)
+* `ω : 𝓞_ℂ_[p]` と `ω' : ResidueField 𝓞_ℂ_[p]` (段 343)
+
+⚠ **仮説がひとつも要らない** — `H` が有限群であること以外に条件が無い。
+BS の鎖は 4 群 (`G` / `C_G(t)` / `C_G(y)` / `C_G(t)/⟨t⟩`) の datum を同時に要求し、
+どれも事前に固定できないので、この「無条件性」が本質的。
+CLAUDE.md「carrier は posit でなく construct」の doneness 判定でもある。 -/
+
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.Modular.exists_datum_padicComplex

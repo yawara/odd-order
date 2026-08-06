@@ -414,6 +414,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.IntegralBasicSetMatrix
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionClassBurnside
 import OddOrder.GroupTheory.RepresentationTheory.Modular.WedderburnKernel
 import OddOrder.GroupTheory.RepresentationTheory.Modular.AnalysisAtInvolution
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PadicComplexDatum
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionDecompositionIntegral
 import OddOrder.GroupTheory.RepresentationTheory.Modular.TrivialCharacterBasicSet
 import OddOrder.GroupTheory.RepresentationTheory.InducedIndicator

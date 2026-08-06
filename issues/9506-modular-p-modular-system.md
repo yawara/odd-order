@@ -4622,3 +4622,25 @@ modular datum を作って配線する作業。
 (あちらは Witt ベクトル系 `StandardSystem p`、こちらは `𝓞_ℂ_[p]`)。BS の鎖が使うのは後者。
 `PadicComplexSystem` に `OddOrder.GroupTheory.PRegularElement` の import を足した
 (mathlib 2 本しか import しない葉なので循環の危険は無い)。
+
+### ✅✅ 段 344 完了 (2026-08-06) — **任意の有限群の完全 datum が `𝓞_ℂ_[p]` 上で構成できる**
+
+`Modular/PadicComplexDatum.exists_datum_padicComplex` — 有限群 `H` について 4 点セットを
+一度に出す:
+
+* 通常分裂 `e : ℂ_[p][H] ≃ₐ ∏ M_{m_i}(ℂ_[p])` (`exists_algEquiv_pi_matrix_padicComplex`)
+* modular 分裂 `π : k[H] ↠ ∏ M_{n_j}(k)` + `ker π = J(k[H])` + 冪零条件
+  (`GroupAlgebra.exists_modularDatum`; 剰余体 `𝔽̄_p` が代数閉)
+* `ω : 𝓞_ℂ_[p]` と `ω' : ResidueField 𝓞_ℂ_[p]` (段 343)
+
+⚠ **仮説がひとつも要らない** — `H` が有限群であること以外に条件が無い。
+BS の鎖は 4 群 (`G` / `C_G(t)` / `C_G(y)` / `C_G(t)/⟨t⟩`) の datum を同時に要求し、
+どれも事前に固定できないので、この「無条件性」が本質的。
+CLAUDE.md「carrier は posit でなく construct」の doneness 判定にもなっている。
+
+⚠ `blockCharacterPi` の namespace は `OddOrder.MatrixModule` (`OddOrder.GroupAlgebra` ではない)。
+⚠ AxiomsCheck の longFile stamp を 20000 → 20100 に更新。
+
+⟹ **F の残りは純粋に「配線」だけ**になった: 4 群の datum を `obtain` し、
+(7.4)/(7.6)/(7.5) を適用して 4 列とその内積表を作り、段 340 に渡す。
+数学的な未知はもう無い。
