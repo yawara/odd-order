@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentOrdinary
+import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
+import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OsimaLinkedIntegral
 
 /-!
@@ -109,5 +111,57 @@ theorem mem_of_blockOfIrr_eq_of_linkedClosed [Fact p.Prime] {Q : ι' → Prop}
     rw [← hres i, ← hres j, hij]
   rw [if_pos hi, if_neg hj, map_one, map_zero] at hcontra
   exact one_ne_zero hcontra
+
+set_option maxHeartbeats 800000 in
+-- (3.9) plus the two decomposition-matrix facts are elaborated together.
+set_option linter.unusedFintypeInType false in
+open scoped Classical in
+include hp hω hω' hkerJ hnil in
+/-- **Navarro (3.10) = Problem (3.4)**: the Cartan matrix of a block is not `(* 0; 0 *)`.
+
+If `IBr(B) = S ⊔ T` with `c_{φθ} = 0` for `φ ∈ S`, `θ ∈ T`, then — the entries of `D` being
+natural numbers — no ordinary character has constituents in both `S` and `T`.  Hence
+`A = {χ : χ has a constituent in S}` is closed under linking, so by (3.9) it is a union of blocks;
+but it meets `Irr(B)` and misses the `χ` with a constituent in `T`, which also lies in `Irr(B)`. -/
+theorem not_cartanMatrix_separated [Fact p.Prime] {S T : ι → Prop}
+    {B : MatrixModule.Block π hπ hlin}
+    (hsep : ∀ φ θ : ι, S φ → T θ → cartanMatrix hp hω hω' hπ hlin hkerJ e φ θ = 0)
+    (hSB : ∀ ψ : ι, S ψ → Quotient.mk (MatrixModule.blockSetoid π hπ hlin) ψ = B)
+    (hTB : ∀ ψ : ι, T ψ → Quotient.mk (MatrixModule.blockSetoid π hπ hlin) ψ = B)
+    (hcover : ∀ ψ : ι, Quotient.mk (MatrixModule.blockSetoid π hπ hlin) ψ = B → S ψ ∨ T ψ)
+    {φ θ : ι} (hSφ : S φ) (hTθ : T θ) : False := by
+  classical
+  -- `c_{φ'θ'} = ∑_i d_{iφ'} d_{iθ'} = 0` with natural entries kills each product
+  have hzero : ∀ (φ' θ' : ι) (i : ι'), S φ' → T θ' →
+      decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ'
+        * decompositionMatrix hp hω hω' hπ hlin hkerJ e i θ' = 0 := by
+    intro φ' θ' i hS hT
+    have hc := hsep φ' θ' hS hT
+    rw [cartanMatrix, Finset.sum_eq_zero_iff] at hc
+    exact hc i (Finset.mem_univ i)
+  -- the set of ordinary characters with a constituent in `S` is closed under linking
+  have hA : ∀ (a b : ι') (ψ : ι),
+      (∃ ψ', S ψ' ∧ decompositionMatrix hp hω hω' hπ hlin hkerJ e a ψ' ≠ 0) →
+      decompositionMatrix hp hω hω' hπ hlin hkerJ e a ψ ≠ 0 →
+      decompositionMatrix hp hω hω' hπ hlin hkerJ e b ψ ≠ 0 →
+      ∃ ψ', S ψ' ∧ decompositionMatrix hp hω hω' hπ hlin hkerJ e b ψ' ≠ 0 := by
+    rintro a b ψ ⟨ψ', hSψ', haψ'⟩ haψ hbψ
+    have hblockψ : Quotient.mk (MatrixModule.blockSetoid π hπ hlin) ψ = B := by
+      rw [← hSB ψ' hSψ']
+      exact Quotient.sound (centralCharacterAlg_eq_of_decompositionMatrix_ne_zero hp hω hω' hπ hlin
+        hkerJ e a haψ haψ')
+    rcases hcover ψ hblockψ with hS | hT
+    · exact ⟨ψ, hS, hbψ⟩
+    · exact absurd (hzero ψ' ψ a hSψ' hT) (mul_ne_zero haψ' haψ)
+  -- witnesses on both sides, in the same block
+  obtain ⟨i, hi⟩ := exists_decompositionMatrix_ne_zero hp hω hω' hπ hlin hkerJ e φ
+  obtain ⟨j, hj⟩ := exists_decompositionMatrix_ne_zero hp hω hω' hπ hlin hkerJ e θ
+  have hbi := blockOfIrr_eq_of_decompositionMatrix_ne_zero hp hω hω' hπ hlin hkerJ hnil e i hi
+  have hbj := blockOfIrr_eq_of_decompositionMatrix_ne_zero hp hω hω' hπ hlin hkerJ hnil e j hj
+  have hij : blockOfIrr e hπ hlin hnil i = blockOfIrr e hπ hlin hnil j := by
+    rw [← hbi, ← hbj, hSB φ hSφ, hTB θ hTθ]
+  obtain ⟨ψ', hSψ', hjψ'⟩ :=
+    mem_of_blockOfIrr_eq_of_linkedClosed hp hω hω' hπ hlin hkerJ hnil e hA ⟨φ, hSφ, hi⟩ hij
+  exact absurd (hzero ψ' θ j hSψ' hTθ) (mul_ne_zero hjψ' hj)
 
 end OddOrder.RepresentationTheory.Modular
