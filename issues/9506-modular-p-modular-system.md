@@ -5252,3 +5252,47 @@ theorem exists_sum_character_subgroup (ρ : Representation F G V) (H : Subgroup 
 
 ⚠ `f'` (還元の中心性) は `OddOrder.mapRingHom_mem_center (residue 𝒪) f.2` で作れる
 (同 file の `hfKcentral` が `algebraMap` 版でこれを使っている)。
+
+### ✅✅✅ 段 362 完了 (2026-08-06) — **Navarro (3.9)**: ブロック = Brauer グラフの連結成分
+
+`Modular/BlockConnected.mem_of_blockOfIrr_eq_of_linkedClosed` (113 行、新 leaf):
+`Q` が linking で閉じていれば `Q i` かつ `blockOfIrr i = blockOfIrr j` ⟹ `Q j`。
+(`blockOfIrr i` = 「`ω_{χ_i}` の還元を中心指標に持つ唯一のブロック」= 原文の `λ_χ`。)
+
+証明は原文どおり 5 段: 段 361 の `f_A ∈ Z(𝒪G)` → `K` 側の中心指標が `[Q k]`
+(`centralScalar_finsetSum` + `centralScalar_ordinaryIdempotent`) → `𝒪` 側も同じ
+(`algebraMap_centralScalar_eq` + 単射) → 還元して `λ_{χ_k}(f_A) = residue [Q k]`
+(`blockCharacter_blockOfLattice_mapRingHom`) → `λ` はブロックにしか依らないので矛盾。
+
+⚠ `Finset.sum_ite_eq'` (`if a = b`) と `Finset.sum_ite_eq` (`if b = a`) の向きに注意。
+
+### ⏭ 段 363/364 の設計 (2026-08-06、原文 p.138 の (7.6) 証明を Lean 用に展開)
+
+#### 段 363 = (3.10) 「Cartan が `(* 0; 0 *)` なら矛盾」
+
+**鍵の観察**: Cartan がブロック対角なら**分解行列もそう**。
+`c_{φθ} = ∑_χ d_{χφ} d_{χθ}` で **`d` は `ℕ` 値**だから、`c_{φθ} = 0` (`φ∈S`, `θ∈T`) は
+「どの `χ` も `S` と `T` の両方に成分を持たない」を意味する (各項が 0)。
+
+そこで `A := {i : ι' | ∃ φ, S φ ∧ d_{iφ} ≠ 0}` と置くと **`A` は linking-closed**:
+`i ∈ A` (φ ∈ S 経由)、`d_{iψ} ≠ 0`、`d_{jψ} ≠ 0` とする。
+`d_{iφ} ≠ 0` と `d_{iψ} ≠ 0` から `ψ` は `φ` と同じ C-ブロック
+(`centralCharacterAlg_eq_of_decompositionMatrix_ne_zero`)、つまり `ψ ∈ S ⊔ T`。
+`c_{φθ} = 0` より `d_{iθ} = 0` (θ∈T) なので `ψ ∉ T` ⟹ `ψ ∈ S` ⟹ `j ∈ A` ∎
+
+⟹ 段 362 で `A` は `blockOfIrr` のファイバーの合併。`T` の元 `θ` に成分を持つ
+`j` (存在する: `D` の列は非零) は同じブロックなので `A` に入り、`d_{jφ'} ≠ 0` (φ'∈S) と
+`d_{jθ} ≠ 0` が `c_{φ'θ} = 0` に矛盾。
+
+**要る補題 (着手前に grep)**: 「`d_{iφ} ≠ 0` なら `blockOfIrr i = Quotient.mk (blockSetoid) φ`」
+(ブロックの定義とつながる橋)。`D` の各列が非零 (どの `φ` にもある `χ` が成分を持つ) も要る。
+
+#### 段 364 = (7.6) のブロック全単射
+
+`cartanMatrix_quotientPi : C_C = |N| · C_Q` (**全 `μ,τ` で成立、既存**) と
+`cartanMatrix_eq_zero_of_centralCharacterAlg_ne` (Q 側に適用) から、
+`S := IBr(B₀(Q))`, `T := IBr(B₀(C)) \ S` が Cartan で分離される。
+段 363 が `T = ∅` を強制 ⟹ **`block_C(μ) = B₀(C) ⟹ block_Q(μ) = B₀(Q)`**
+= `QuotientPrincipalBlock` の難しい向き。
+
+⟹ その後 `hd` → `hT`/`hb0`-`hd0` → 5 群 datum の組み立て。
