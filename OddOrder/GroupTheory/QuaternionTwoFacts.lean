@@ -42,6 +42,30 @@ what `GroupTheory/BrauerSuzukiQ8.lean` uses, `P` being a Sylow `2`-subgroup.
 namespace OddOrder.GroupTheory
 
 
+/-! ### Order and cardinality -/
+
+/-- **Every element of `Q₈` has order dividing `4`.** -/
+theorem quaternionTwo_pow_four : ∀ w : QuaternionGroup 2, w ^ 4 = 1 := by decide
+
+/-- **A group isomorphic to `Q₈` has order `8`.** -/
+theorem card_eq_eight_of_quaternionTwo {P : Type*} [Group P] (e : P ≃* QuaternionGroup 2) :
+    Nat.card P = 8 := by
+  rw [Nat.card_congr e.toEquiv, Nat.card_eq_fintype_card, QuaternionGroup.card]
+
+/-- **In a group isomorphic to `Q₈` an element that is not an involution has order `4`.**  Every
+element satisfies `w⁴ = 1`, so the order divides `4`, and it is neither `1` nor `2`. -/
+theorem orderOf_eq_four_of_quaternionTwo {P : Type*} [Group P] (e : P ≃* QuaternionGroup 2)
+    {y : P} (hy : y ^ 2 ≠ 1) : orderOf y = 4 := by
+  have hy4 : y ^ 4 = 1 := e.injective (by rw [map_pow, quaternionTwo_pow_four (e y), map_one])
+  have hy1 : y ≠ 1 := fun h => hy (by rw [h, one_pow])
+  have hdvd : orderOf y ∣ 4 := orderOf_dvd_of_pow_eq_one hy4
+  have hle : orderOf y ≤ 4 := Nat.le_of_dvd (by norm_num) hdvd
+  have h0 : orderOf y ≠ 0 := fun h => by rw [h] at hdvd; norm_num at hdvd
+  have h1 : orderOf y ≠ 1 := fun h => hy1 (orderOf_eq_one_iff.mp h)
+  have h2 : orderOf y ≠ 2 := fun h => hy (by rw [← h]; exact pow_orderOf_eq_one y)
+  have h3 : orderOf y ≠ 3 := fun h => by rw [h] at hdvd; norm_num at hdvd
+  omega
+
 /-! ### The unique involution, and the proper subgroups
 
 Navarro's reduction (p. 139) opens with "`P ∩ N` is cyclic or `P ⊆ N`", which is exactly
@@ -133,8 +157,7 @@ it inherits the unique involution of `Q₈`. -/
 theorem isCyclic_of_ne_top_of_quaternionTwo {P : Type*} [Group P] [Finite P]
     (e : P ≃* QuaternionGroup 2) {H : Subgroup P} (hH : H ≠ ⊤) : IsCyclic ↥H := by
   classical
-  have hP8 : Nat.card P = 8 := by
-    rw [Nat.card_congr e.toEquiv, Nat.card_eq_fintype_card, QuaternionGroup.card]
+  have hP8 : Nat.card P = 8 := card_eq_eight_of_quaternionTwo e
   have hdvd : Nat.card ↥H ∣ 2 ^ 3 := by
     have := Subgroup.card_subgroup_dvd_card H
     rwa [hP8, show (8 : ℕ) = 2 ^ 3 from rfl] at this
@@ -334,25 +357,13 @@ reduces to this because `y ^ 4 = 1`. -/
 theorem quaternionTwo_eq_or_eq_inv_of_mem_powers : ∀ x y : QuaternionGroup 2, x ^ 2 ≠ 1 →
     y ^ 2 ≠ 1 → (x = 1 ∨ x = y ∨ x = y ^ 2 ∨ x = y ^ 3) → x = y ∨ x = y⁻¹ := by decide
 
-/-- **Every element of `Q₈` has order dividing `4`.** -/
-theorem quaternionTwo_pow_four : ∀ w : QuaternionGroup 2, w ^ 4 = 1 := by decide
-
 /-- **In a group isomorphic to `Q₈`, an element of order `4` inside `⟨y⟩` is `y` or `y⁻¹`.**
 The bridge from `Subgroup.zpowers` to the decidable list of powers goes through
 `mem_powers_iff_mem_zpowers` (so the exponent is a natural number) and `pow_mod_orderOf`. -/
 theorem eq_or_eq_inv_of_mem_zpowers_of_quaternionTwo {P : Type*} [Group P] [Finite P]
     (e : P ≃* QuaternionGroup 2) {x y : P} (hx : x ^ 2 ≠ 1) (hy : y ^ 2 ≠ 1)
     (hmem : x ∈ Subgroup.zpowers y) : x = y ∨ x = y⁻¹ := by
-  have hy4 : y ^ 4 = 1 := e.injective (by rw [map_pow, quaternionTwo_pow_four (e y), map_one])
-  have hy1 : y ≠ 1 := fun h => hy (by rw [h, one_pow])
-  have horder : orderOf y = 4 := by
-    have hdvd : orderOf y ∣ 4 := orderOf_dvd_of_pow_eq_one hy4
-    have hle : orderOf y ≤ 4 := Nat.le_of_dvd (by norm_num) hdvd
-    have h0 : orderOf y ≠ 0 := fun h => by rw [h] at hdvd; norm_num at hdvd
-    have h1 : orderOf y ≠ 1 := fun h => hy1 (orderOf_eq_one_iff.mp h)
-    have h2 : orderOf y ≠ 2 := fun h => hy (by rw [← h]; exact pow_orderOf_eq_one y)
-    have h3 : orderOf y ≠ 3 := fun h => by rw [h] at hdvd; norm_num at hdvd
-    omega
+  have horder : orderOf y = 4 := orderOf_eq_four_of_quaternionTwo e hy
   obtain ⟨n, hn⟩ := Submonoid.mem_powers_iff x y |>.mp (mem_powers_iff_mem_zpowers.mpr hmem)
   have hmod : x = y ^ (n % 4) := by rw [← hn, ← horder, pow_mod_orderOf]
   have hlist : x = 1 ∨ x = y ∨ x = y ^ 2 ∨ x = y ^ 3 := by

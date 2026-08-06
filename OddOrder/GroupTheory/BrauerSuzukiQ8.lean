@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.BrauerSuzukiEndgame
 import OddOrder.GroupTheory.CardSupInf
+import OddOrder.GroupTheory.CentralSylowComplement
 import OddOrder.GroupTheory.QuaternionTwoFacts
 import OddOrder.GroupTheory.SubgroupInAmbient
 import OddOrder.Isaacs.Ch05_Transfer.Main
@@ -53,6 +54,10 @@ contains `t` in its kernel".
 * `OddOrder.GroupTheory.q8_mk_mem_center` / `OddOrder.GroupTheory.brauerSuzuki_q8`
 * `OddOrder.GroupTheory.isConj_of_orderFour` — Navarro's first claim on p. 139: `G` has a single
   class of elements of order `4`
+* `OddOrder.GroupTheory.sylow_centralizer_eq_zpowers` /
+  `OddOrder.GroupTheory.hasNormalPComplement_centralizer_orderFour` — the group-theoretic input of
+  the "analysis at `y`" (p. 139): `⟨y⟩` is a Sylow `2`-subgroup of `C_G(y)`, so the latter has a
+  normal `2`-complement
 -/
 
 open OddOrder.Isaacs.Ch03
@@ -673,6 +678,123 @@ theorem normalizer_le_centralizer_involution (T : Sylow 2 G)
   subst hm
   calc m * u = u * m * u⁻¹ * u := by rw [hut]
     _ = u * m := by group
+
+/-! ### Navarro pp. 139–140: the "analysis at `y`"
+
+For an element `y` of order `4` of `T ≅ Q₈`, the cyclic group `⟨y⟩` is a Sylow `2`-subgroup of
+`C_G(y)`.  Indeed `y` is central in `C_G(y)`, so `⟨y⟩` is a normal `2`-subgroup and is contained in
+some Sylow `2`-subgroup `S` of `C_G(y)`; and `|S| ≠ 8`, for otherwise `S` would be a Sylow
+`2`-subgroup of `G` as well, hence isomorphic to `Q₈`, with `y` a *central* element of order `4` —
+which `Q₈` does not have (`sq_eq_one_of_mem_center_of_quaternionTwo`).  So `|S| = 4 = |⟨y⟩|`.
+
+Burnside then gives `C_G(y)` a normal `2`-complement
+(`hasNormalPComplement_centralizer_of_sylow_zpowers`), which is what makes `IBr(b₀) = {1}` and the
+Cartan matrix of the principal block of `C_G(y)` equal to `(4)`. -/
+
+/-- **`⟨y⟩` is a Sylow `2`-subgroup of `C_G(y)`** for `y` of order `4` in a quaternion Sylow
+`2`-subgroup `T` of `G` (Navarro p. 139, "analysis at `y`").
+
+The hypothesis `hy : y ∈ C_G(y)` is of course automatic; it is taken as an argument so that the
+element `⟨y, hy⟩` matches the one in `hasNormalPComplement_centralizer_of_sylow_zpowers`. -/
+theorem sylow_centralizer_eq_zpowers (T : Sylow 2 G)
+    (e : ↥(T : Subgroup G) ≃* QuaternionGroup 2) {y : G} (hyT : y ∈ (T : Subgroup G))
+    (hy2 : y ^ 2 ≠ 1) (hy : y ∈ Subgroup.centralizer ({y} : Set G))
+    (S : Sylow 2 ↥(Subgroup.centralizer ({y} : Set G))) :
+    (S : Subgroup ↥(Subgroup.centralizer ({y} : Set G)))
+      = Subgroup.zpowers (⟨y, hy⟩ : ↥(Subgroup.centralizer ({y} : Set G))) := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  -- `⟨y⟩` is central in `C_G(y)`, hence normal there
+  have hcentral : Subgroup.zpowers (⟨y, hy⟩ : ↥(Subgroup.centralizer ({y} : Set G)))
+      ≤ Subgroup.center ↥(Subgroup.centralizer ({y} : Set G)) := by
+    rw [Subgroup.zpowers_le]
+    refine Subgroup.mem_center_iff.mpr fun h => Subtype.ext ?_
+    push_cast
+    exact ((Subgroup.mem_centralizer_iff.mp h.2) y rfl).symm
+  haveI : (Subgroup.zpowers (⟨y, hy⟩ : ↥(Subgroup.centralizer ({y} : Set G)))).Normal :=
+    ⟨fun n hn g => by
+      have hc : g * n = n * g := Subgroup.mem_center_iff.mp (hcentral hn) g
+      have hrw : g * n * g⁻¹ = n := by rw [hc, mul_assoc, mul_inv_cancel, mul_one]
+      rw [hrw]; exact hn⟩
+  -- it has order `4`
+  have hy2' : (⟨y, hyT⟩ : ↥(T : Subgroup G)) ^ 2 ≠ 1 := fun h => hy2 (by
+    have hval := congrArg (Subtype.val : ↥(T : Subgroup G) → G) h
+    push_cast at hval
+    exact hval)
+  have horder : orderOf (⟨y, hy⟩ : ↥(Subgroup.centralizer ({y} : Set G))) = 4 := by
+    rw [Subgroup.orderOf_mk y hy, ← Subgroup.orderOf_mk y hyT]
+    exact orderOf_eq_four_of_quaternionTwo e hy2'
+  have hcard4 : Nat.card ↥(Subgroup.zpowers
+      (⟨y, hy⟩ : ↥(Subgroup.centralizer ({y} : Set G)))) = 4 := by
+    rw [Nat.card_zpowers, horder]
+  -- so it sits inside `S`
+  have hle : Subgroup.zpowers (⟨y, hy⟩ : ↥(Subgroup.centralizer ({y} : Set G)))
+      ≤ (S : Subgroup ↥(Subgroup.centralizer ({y} : Set G))) :=
+    (IsPGroup.of_card (p := 2) (n := 2) (by rw [hcard4]; norm_num)).le_sylow_of_normal S
+  have hdvd4 : 4 ∣ Nat.card ↥(S : Subgroup ↥(Subgroup.centralizer ({y} : Set G))) := by
+    rw [← hcard4]; exact card_dvd_card_of_le hle
+  -- and `|S|` divides `|G|₂ = 8`
+  obtain ⟨Q, hQ⟩ :=
+    (S.2.map (Subgroup.subtype (Subgroup.centralizer ({y} : Set G)))).exists_le_sylow
+  have hQ8 : Nat.card ↥(Q : Subgroup G) = 8 :=
+    card_eq_eight_of_quaternionTwo (nonempty_mulEquiv_quaternionTwo_of_sylow T Q e).some
+  have hcardmap : Nat.card ↥((S : Subgroup ↥(Subgroup.centralizer ({y} : Set G))).map
+      (Subgroup.subtype (Subgroup.centralizer ({y} : Set G))))
+      = Nat.card ↥(S : Subgroup ↥(Subgroup.centralizer ({y} : Set G))) :=
+    Subgroup.card_subtype _ _
+  have hdvd8 : Nat.card ↥(S : Subgroup ↥(Subgroup.centralizer ({y} : Set G))) ∣ 8 := by
+    rw [← hQ8, ← hcardmap]; exact card_dvd_card_of_le hQ
+  by_cases h8 : Nat.card ↥(S : Subgroup ↥(Subgroup.centralizer ({y} : Set G))) = 8
+  · -- `|S| = 8` would make `S` a Sylow `2`-subgroup of `G` with a central element of order `4`
+    exfalso
+    have hmapQ : (S : Subgroup ↥(Subgroup.centralizer ({y} : Set G))).map
+        (Subgroup.subtype (Subgroup.centralizer ({y} : Set G))) = (Q : Subgroup G) :=
+      Subgroup.eq_of_le_of_card_ge hQ (le_of_eq (by rw [hQ8, hcardmap, h8]))
+    have hyQ : y ∈ (Q : Subgroup G) := by
+      rw [← hmapQ]
+      exact ⟨⟨y, hy⟩, hle (Subgroup.mem_zpowers _), rfl⟩
+    have hcenter : (⟨y, hyQ⟩ : ↥(Q : Subgroup G)) ∈ Subgroup.center ↥(Q : Subgroup G) := by
+      refine Subgroup.mem_center_iff.mpr fun g => Subtype.ext ?_
+      push_cast
+      have hgC : (g : G) ∈ Subgroup.centralizer ({y} : Set G) := by
+        have hgmem : (g : G) ∈ (S : Subgroup ↥(Subgroup.centralizer ({y} : Set G))).map
+            (Subgroup.subtype (Subgroup.centralizer ({y} : Set G))) := by
+          rw [hmapQ]; exact g.2
+        obtain ⟨c, -, hc⟩ := hgmem
+        rw [← hc]; exact c.2
+      exact ((Subgroup.mem_centralizer_iff.mp hgC) y rfl).symm
+    refine hy2 ?_
+    have hsq := sq_eq_one_of_mem_center_of_quaternionTwo
+      (nonempty_mulEquiv_quaternionTwo_of_sylow T Q e).some hcenter
+    have hval := congrArg (Subtype.val : ↥(Q : Subgroup G) → G) hsq
+    push_cast at hval
+    exact hval
+  · -- so `|S| = 4 = |⟨y⟩|`
+    have h4 : Nat.card ↥(S : Subgroup ↥(Subgroup.centralizer ({y} : Set G))) = 4 := by
+      have hpos : 0 < Nat.card ↥(S : Subgroup ↥(Subgroup.centralizer ({y} : Set G))) :=
+        Nat.card_pos
+      have hle8 : Nat.card ↥(S : Subgroup ↥(Subgroup.centralizer ({y} : Set G))) ≤ 8 :=
+        Nat.le_of_dvd (by norm_num) hdvd8
+      obtain ⟨k, hk⟩ := hdvd4
+      omega
+    exact (Subgroup.eq_of_le_of_card_ge hle (le_of_eq (by rw [h4, hcard4]))).symm
+
+/-- **`C_G(y)` has a normal `2`-complement** for `y` of order `4` in a quaternion Sylow
+`2`-subgroup `T` of `G` (Navarro p. 139, "analysis at `y`": "`C_G(y)` has a normal `2`-complement,
+and therefore `IBr(b₀) = {1_{C_G(y)}}`").
+
+Its Sylow `2`-subgroup is `⟨y⟩` (`sylow_centralizer_eq_zpowers`), which is central there, so
+Burnside's transfer theorem applies. -/
+theorem hasNormalPComplement_centralizer_orderFour (T : Sylow 2 G)
+    (e : ↥(T : Subgroup G) ≃* QuaternionGroup 2) {y : G} (hyT : y ∈ (T : Subgroup G))
+    (hy2 : y ^ 2 ≠ 1) :
+    OddOrder.Isaacs.Ch05.HasNormalPComplement 2 ↥(Subgroup.centralizer ({y} : Set G)) := by
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hy : y ∈ Subgroup.centralizer ({y} : Set G) :=
+    Subgroup.mem_centralizer_iff.mpr fun m hm => by
+      rw [Set.mem_singleton_iff] at hm; subst hm; rfl
+  obtain ⟨S⟩ : Nonempty (Sylow 2 ↥(Subgroup.centralizer ({y} : Set G))) := inferInstance
+  exact hasNormalPComplement_centralizer_of_sylow_zpowers y hy S
+    (sylow_centralizer_eq_zpowers T e hyT hy2 hy S)
 
 /-- **Navarro pp. 139–146, the character-theoretic core** (issue 9506, `sorry`): when the
 quaternion Sylow `2`-subgroup is proper, its involution lies in a proper normal subgroup.
