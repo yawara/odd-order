@@ -93,6 +93,21 @@ theorem sign_relation_ten {R : Type*} [CommRing R] [IsDomain R] {w g T u : S →
     _ = (m + (w i * δ₁ + w j * δ₂)) * (g i * g j) := by ring
     _ = 0 := by rw [hzero, zero_mul]
 
+/-- **The Burnside coefficients are orthogonal to the half-sum.**  `2 (w, u_1)` is
+`(w,a) + (w,b) − (w,c) − (w,d)`, and Navarro's (9) kills each of the four columns separately. -/
+theorem sum_mul_halfSum_eq_zero {R : Type*} [CommRing R] [IsDomain R] {w a b c d u : S → R}
+    (h2 : (2 : R) ≠ 0) (hu : ∀ k, 2 * u k = a k + b k - c k - d k)
+    (ha : (∑ k, w k * a k) = 0) (hb : (∑ k, w k * b k) = 0) (hc : (∑ k, w k * c k) = 0)
+    (hd : (∑ k, w k * d k) = 0) :
+    (∑ k, w k * u k) = 0 := by
+  refine mul_left_cancel₀ h2 ?_
+  rw [mul_zero, Finset.mul_sum,
+    Finset.sum_congr rfl fun k _ =>
+      show (2 : R) * (w k * u k) = w k * a k + w k * b k - w k * c k - w k * d k by
+        rw [show (2 : R) * (w k * u k) = w k * (2 * u k) by ring, hu k]; ring,
+    Finset.sum_sub_distrib, Finset.sum_sub_distrib, Finset.sum_add_distrib, ha, hb, hc, hd]
+  ring
+
 /-! ### The half-sums are integer columns -/
 
 omit [Fintype S] in

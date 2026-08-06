@@ -4453,3 +4453,25 @@ modular datum を作り、上の 6 種の入力を実際に供給して `exists_
 3. (7.2)/(7.4)/(7.6) の群論的仮説を Q₈ の構造から供給
    (`isConj_of_sq_eq_one_quotient_centralizer` は `BrauerSuzukiQ8.lean` に既存)
 4. `exists_eq_of_columns_of_odd_degrees` を呼んで `ker χ` を取る (= G)
+
+### ✅ 段 336 完了 (2026-08-06) — `(w, u_1) = 0` の 2 段。**`sign_relation_ten` の 3 仮説が全部揃った**
+
+* `Algebra/BrauerSuzukiEndgame.sum_mul_halfSum_eq_zero` —
+  **`2(w,u_1) = (w,a)+(w,b)−(w,c)−(w,d)`** ゆえ 4 列が全部直交すれば半和とも直交
+  (標数 ≠ 2 の整域で `2` を約す)。
+* `Modular/InvolutionClassBurnside.sum_classSquareCoeff_mul_basicDecompositionNumber_eq_zero` —
+  **`(w, D^x_φ) = 0`**。段 330 の (9) が**全ての `μ ∈ IBr` について**成り立つので、
+  段 323 `sum_mul_basicDecompositionNumber_left_eq_zero` でそのまま basic set 列へ移る
+  (証明は 2 行)。
+
+⟹ `sign_relation_ten` の 3 仮説が全部供給された:
+
+| 仮説 | supplier |
+|---|---|
+| `hwg : w_χ·g_χ = m·T_χ²` | 段 335 `classSquareCoeff_mul_character_one` |
+| `hwi₀ : w_{i₀} = m` | 段 335 `classSquareCoeff_of_character_eq_one` |
+| `hzero : ∑_k w_k·u_k = 0` | 段 336 (4 列 × `sum_mul_halfSum_eq_zero`) |
+| `hm : m ≠ 0` | `|cl(t)| ≥ 1` + 標数 0 |
+
+⟹ **F に残るのは datum の instantiation と (7.2)/(7.4)/(7.6) の群論的仮説だけ**。
+pp.139-145 の数学は列の供給まで含めて全部 Lean に在る。

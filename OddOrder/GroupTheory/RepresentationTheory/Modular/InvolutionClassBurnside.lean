@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralCharacterTrace
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBasis
@@ -46,6 +47,8 @@ the basic-set columns of the "analysis at `t`" consume.
 * `OddOrder.RepresentationTheory.Modular.classSquareFn_eq_zero_of_not_isPRegular`
 * `OddOrder.RepresentationTheory.Modular`
   `.sum_classSquareCoeff_mul_generalizedDecompositionNumber_eq_zero` — Navarro (8)/(9) on p. 144
+* `OddOrder.RepresentationTheory.Modular`
+  `.sum_classSquareCoeff_mul_basicDecompositionNumber_eq_zero` — (9) against a basic-set column
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -248,6 +251,36 @@ theorem sum_classSquareCoeff_mul_generalizedDecompositionNumber_eq_zero
     hω' (classSquareFn e (ConjClasses.mk t)) (classSquareFn_isConj e _)
     (fun _ hu => classSquareFn_eq_zero_of_not_isPRegular e T hz ht
       (not_isPRegular_of_mem_pSection Nat.prime_two hx1 hu)) hx j
+
+set_option linter.unusedFintypeInType false in
+open scoped Classical in
+/-- **Navarro (9) against a basic-set column.**  The `IBr`-version
+(`sum_classSquareCoeff_mul_generalizedDecompositionNumber_eq_zero`) holds for *every* `μ`, so it
+transports to any basic set through `sum_mul_basicDecompositionNumber_left_eq_zero`:
+
+`(w, D^x_φ) = 0`  for every basic-set column `φ`.
+
+The four columns of the endgame — `D^y_0` and `D^t_0, D^t_1, D^t_2` — are instances, and
+`OddOrder.Algebra.sum_mul_halfSum_eq_zero` then gives `(w, u_1) = 0`, which is the input of
+`OddOrder.Algebra.sign_relation_ten`. -/
+theorem sum_classSquareCoeff_mul_basicDecompositionNumber_eq_zero {ι₂ : Type*}
+    (e : MonoidAlgebra K G ≃ₐ[K] ∀ i, Matrix (m i) (m i) K) {x : G} [Fintype ↥(centralizerOf x)]
+    {π : MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf x) →+*
+      ∀ j, Matrix (nn j) (nn j) (ResidueField 𝒪)}
+    (hπ : Function.Surjective π)
+    (hlin : ∀ (c : ResidueField 𝒪) (a : MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf x)),
+      π (c • a) = c • π a)
+    (hkerJ : RingHom.ker π = Ring.jacobson (MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf x)))
+    {ω' : ResidueField 𝒪} (hω' : IsPrimitiveRoot ω' (pRegularExponent 2 ↥(centralizerOf x)))
+    (T : Sylow 2 G) {z : G} (hz : ∀ s ∈ (T : Subgroup G), s ^ 2 = 1 → s = 1 ∨ s = z) {t : G}
+    (ht : orderOf t = 2) (hx : IsPElement 2 x) (hx1 : x ≠ 1) (u : ι → ι₂ → K) (φ : ι₂) :
+    ∑ i, classSquareCoeff e (ConjClasses.mk t) i *
+        basicDecompositionNumber (generalizedDecompositionNumber (𝒪 := 𝒪) (nn := nn) x
+          Nat.prime_two hω' hπ hlin hkerJ (wedderburnRepresentation e i).character
+          (fun _ _ hgh => character_eq_of_isConj (wedderburnRepresentation e i) hgh)) u φ = 0 :=
+  sum_mul_basicDecompositionNumber_left_eq_zero φ fun τ =>
+    sum_classSquareCoeff_mul_generalizedDecompositionNumber_eq_zero e hπ hlin hkerJ hω' T hz ht
+      hx hx1 τ
 
 end Orthogonality
 

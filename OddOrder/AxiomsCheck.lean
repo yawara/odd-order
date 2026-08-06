@@ -19850,3 +19850,18 @@ modular 鎖と同じ分裂体 `K` の中で完結する (**係数体の橋渡し
   OddOrder.RepresentationTheory.Modular.classSquareCoeff_mul_character_one
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.classSquareCoeff_of_character_eq_one
+
+/-! **issue 9506 段 336**: `(w, u_1) = 0` の 2 段。
+
+* `Algebra/BrauerSuzukiEndgame.sum_mul_halfSum_eq_zero` — **`2(w,u_1) = (w,a)+(w,b)−(w,c)−(w,d)`**
+  ゆえ 4 列が全部直交すれば半和とも直交 (標数 ≠ 2 の整域で)。
+* `Modular/InvolutionClassBurnside.sum_classSquareCoeff_mul_basicDecompositionNumber_eq_zero` —
+  **`(w, D^x_φ) = 0`**。(9) が全ての `μ ∈ IBr` について成り立つので
+  `sum_mul_basicDecompositionNumber_left_eq_zero` でそのまま basic set 列へ移る。
+
+⟹ `sign_relation_ten` の 3 仮説 (`hwg` / `hwi₀` / `hzero`) が**全部供給された**
+(段 335 + 本段)。F に残るのは datum の instantiation と群論的仮説のみ。 -/
+
+#assert_only_allowed_axioms OddOrder.Algebra.sum_mul_halfSum_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_classSquareCoeff_mul_basicDecompositionNumber_eq_zero
