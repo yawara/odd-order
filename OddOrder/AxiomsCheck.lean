@@ -567,6 +567,7 @@ import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
 import OddOrder.GroupTheory.GlaubermanReplacement
 import OddOrder.GroupTheory.GlaubermanZJ
 import OddOrder.GroupTheory.SolvableTwoTransitive
+import OddOrder.Algebra.AlgClosedIdempotentLift
 import OddOrder.Peterfalvi.Appendices.FeitSibleyMain
 
 /-!
@@ -19216,8 +19217,40 @@ modular 側が要求する `IsAlgClosed (ResidueField ·)` と `CharP (ResidueFi
 
 ⟹ **`BrauerBasis` の binder が `[IsFractionRing 𝒪 K]` → `[FaithfulSMul 𝒪 K]` に弱まった**
 (`IsFractionRing` から `FaithfulSMul` は priority-100 instance なので下流は無変更で通る —
-フルビルド 5413 jobs green で確認)。repo 中 `IsLocalization` の実使用はこれが唯一だったので、
-**鎖全体から `IsFractionRing` を外す障害はもう無い**。残りは 53 file の binder 掃除。 -/
+フルビルド 5413 jobs green で確認)。
+
+⚠ **ただし鎖全体から `IsFractionRing` を外すことはできない (2026-08-06 に実施して判明)**。
+`LatticeRepresentation` が使う `Module.Basis.extendOfIsLattice` の `[IsFractionRing R K]` は
+外すと**定理が偽**になる (反例 `R = ℤ`, `K = ℝ`, `L = ℤ + ℤ√2`)。より根本的には
+「`V` の `𝒪`-形が在る ⟺ `V` が `Frac 𝒪` 上実現可能」なので、`K` を `Frac 𝒪` から
+切り離しても分裂体の要求は `Frac 𝒪` 側に残る。詳細は issue 9506。 -/
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.eq_zero_of_vecMul_brauerCharacterMatrix_fractionRing
+
+/-! 🎯🎯🎯 **issue 9506 段 311**: 商体が代数閉な係数環の上で**冪等元が持ち上がる**
+(`AlgClosedIdempotentLift`)。
+
+BS の鎖は冪等元の持ち上げに `[IsAdicComplete (maximalIdeal 𝒪) 𝒪]` を要求してきたが、
+ordinary 側を分裂させる係数環 `𝓞_ℂ_[p]` は値群が可除ゆえ `𝔪² = 𝔪` で**これを満たさない**
+(段 299 の発見)。⟹ 冪等元の持ち上げを完備性から切り離す必要がある。
+
+一般の Henselian 局所環では Hensel の**分解形**が要り mathlib に無い
+(実測: `HenselianLocalRing`/`HenselianRing` は `RingTheory/Henselian.lean` の外で
+一度も使われていない)。しかし `𝓞_ℂ_[p]` にはより強い性質が在る —
+`exists_isRoot_of_monic` (段 291) が「monic は `𝒪` 自身に根を持つ」を与えるので、
+**monic は `𝒪[X]` で 1 次式に完全分解する** (`exists_multiset_prod_X_sub_C`, 本段で追加)。
+
+⟹ 分解形もレゾルヴァントも不要になる: `b² ≡ b (mod 𝔪B)` に対し
+`f = X · charpoly(μ_b)` を `∏(X − λ_i)` に分解し、根を `λ_i ∈ 𝔪` かどうかで 2 群に分けると、
+反対側の 1 次式どうしの差 `λ − μ` は単元なので **`IsCoprime` が自明**。
+`αβ = f(b) = 0` から Bézout 結合 `u·α` が冪等になり、`mod 𝔪B` で Bézout 等式に `b` を
+掛けると `u·α ≡ b` が出る (先頭の因子 `X` は根 `0 ∈ 𝔪` を保証するために付けている)。
+
+⟹ これで `𝓞_ℂ_[p]` が **`IsAdicComplete` 以外の全要求 (分裂・剰余体代数閉・Henselian・
+`IsFractionRing`) を既に満たす**ことと合わせ、Brauer の分裂体定理も Schur 指数も
+分岐拡大も要らなくなる見込み。 -/
+
+#assert_only_allowed_axioms OddOrder.exists_multiset_prod_X_sub_C
+#assert_only_allowed_axioms OddOrder.exists_isIdempotentElem_sub_mem_of_multiset_prod_eq_zero
+#assert_only_allowed_axioms OddOrder.exists_isIdempotentElem_sub_mem_of_isAlgClosed

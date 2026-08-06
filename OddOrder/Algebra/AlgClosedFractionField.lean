@@ -63,6 +63,33 @@ theorem exists_isRoot_of_monic (K : Type*) [Field K] [Algebra A K] [IsFractionRi
   rw [map_zero]
   exact hev.symm.trans hr
 
+/-- **A monic polynomial over `A` splits into linear factors over `A`.**  Peel off one root at a
+time with `exists_isRoot_of_monic`; the cofactor is again monic of smaller degree. -/
+theorem exists_multiset_prod_X_sub_C (K : Type*) [Field K] [Algebra A K] [IsFractionRing A K]
+    [IsAlgClosed K] {f : A[X]} (hf : f.Monic) :
+    ∃ s : Multiset A, f = (s.map fun a => X - C a).prod := by
+  haveI : Nontrivial A := (algebraMap A K).domain_nontrivial
+  suffices H : ∀ n : ℕ, ∀ g : A[X], g.Monic → g.natDegree ≤ n →
+      ∃ s : Multiset A, g = (s.map fun a => X - C a).prod from H f.natDegree f hf le_rfl
+  intro n
+  induction n with
+  | zero =>
+    intro g hg hdeg
+    exact ⟨0, by simp [(Polynomial.Monic.natDegree_eq_zero hg).mp (Nat.le_zero.mp hdeg)]⟩
+  | succ n ih =>
+    intro g hg hdeg
+    rcases Nat.eq_zero_or_pos g.natDegree with h0 | h0
+    · exact ⟨0, by simp [(Polynomial.Monic.natDegree_eq_zero hg).mp h0]⟩
+    obtain ⟨a, ha⟩ := exists_isRoot_of_monic K hg h0.ne'
+    obtain ⟨q, hq⟩ := dvd_iff_isRoot.mpr ha
+    have hqm : q.Monic := Polynomial.Monic.of_mul_monic_left (monic_X_sub_C a) (hq ▸ hg)
+    have hqdeg : q.natDegree ≤ n := by
+      have hmul := Polynomial.Monic.natDegree_mul (monic_X_sub_C a) hqm
+      rw [← hq, natDegree_X_sub_C] at hmul
+      omega
+    obtain ⟨s, hs⟩ := ih q hqm hqdeg
+    exact ⟨a ::ₘ s, by rw [hq, hs, Multiset.map_cons, Multiset.prod_cons]⟩
+
 variable [IsLocalRing A]
 
 /-- **A root can be chosen in a prescribed residue class.**  If `f` is monic and `f(a₀)` lies in
