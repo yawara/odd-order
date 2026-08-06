@@ -9,6 +9,16 @@
 > `[propext, Classical.choice, Quot.sound]` の標準3公理のみに依存する。これは FT 経路の
 > honest carrier / proof spine が完成したことを意味する。3冊の経路外章節・補章まで含む
 > 全文形式化は引き続き長期スコープであり、この milestone と区別する。
+>
+> **sorry-free milestone (2026-08-07)**: `OddOrder/**` の実 `sorry` が **0** になった
+> (`bin/count-sorry` = 0)。最後の 1 本は Peterfalvi App.C Prop 1 の根にあった **Q₈
+> Brauer–Suzuki** で、Navarro 1998 Ch.1–7 のモジュラー指標論を
+> `OddOrder/GroupTheory/RepresentationTheory/Modular/` (150 leaf / 28.7k 行) に一から
+> 構築して閉じた (issues 0147 / 9506)。下流の Peterfalvi 補章チェーン
+> (`rankOne_affine_nearField` → `theoremB` → **Suzuki の `theoremA`**) も同日に
+> `AxiomsCheck` へ登録済。
+> ⚠ **sorry 0 ≠ 3 冊完了** — 未形式化の番号付き結果は `sorry` を生まない。カバレッジは
+> 別追跡 (下記 Phase 表と `issues/`)。
 
 ## スコープ: 3 冊を全部形式化する
 
@@ -33,8 +43,8 @@
 |---|---|---|
 | 0 | Lean プロジェクト初期化 (Lean 4.29.1 + mathlib v4.29.1) | ✅ 2026-05-21 |
 | 1 | **Isaacs** Ch.1–10 + Appendix の Lean 化 | 🔄 Ch.1–7 sorry-free 完成 (Thm 7.6/7.8 含む 168 flagship axiom-clean)。**Ch.8–10 も 2026-07-17 に実装済・実 sorry 0** (Ch08_PermutationGroups 14 leaf / Ch09_MoreSubnormality 18 leaf / Ch10_MoreTransfer 6 leaf)。旧「FT 経路外で保留」は 2026-07-16 のフェーズ移行で失効 |
-| 2a | **BG** Ch.I–IV + 補助 Appendices の Lean 化 | 🔄 **FT が必要とする部分は sorry-free・axiom-clean** (§1–§16 spine + App.A/B/C、spine 消費 = Prop 16.1 のみ)。forward axiom **0 本**。⚠ 旧「FROZEN-COMPLETE (2026-07-02) / BG に active frontier は無い」は**失効** — 2026-07-03 以降 BG に 169 commit が入り、2026-07-19 現在も lane c の active frontier (Thm 6.4 系、issue 0126/9132/9133)。**残 sorry は 11 で内訳も旧記載と異なる**: S14/S15/S16 は 0、AppD_CNGroups 2 / AppE_FurtherResults 9 (2026-07-19 comment-strip census) |
-| 2b | **Peterfalvi** 主章 + 補章 の Lean 化 | 🔄 **FT 経路 §§3–§16 完成 (2026-07-15)** — §13 character-degree Core、§14 structure、§15–§16 endgame を実供給へ接続し、FT consumer まで axiom-clean。経路外の補章・historical mis-encoding は長期の全文形式化フェーズに残る。 |
+| 2a | **BG** Ch.I–IV + 補助 Appendices の Lean 化 | 🔄 **FT が必要とする部分は sorry-free・axiom-clean** (§1–§16 spine + App.A/B/C、spine 消費 = Prop 16.1 のみ)。forward axiom **0 本**。⚠ 旧「FROZEN-COMPLETE (2026-07-02) / BG に active frontier は無い」は**失効** — 2026-07-03 以降 BG に 169 commit が入り、2026-07-19 時点では lane c の active frontier だった (Thm 6.4 系、issue 0126/9132/9133)。**残 sorry は 2026-08-07 に 0** (旧記載の AppD_CNGroups 2 / AppE_FurtherResults 9 は解消済) |
+| 2b | **Peterfalvi** 主章 + 補章 の Lean 化 | 🔄 **FT 経路 §§3–§16 完成 (2026-07-15)** — §13 character-degree Core、§14 structure、§15–§16 endgame を実供給へ接続し、FT consumer まで axiom-clean。**補章も 2026-08-07 に sorry 0** — App.C Prop 1 (`rankOne_affine_nearField`) と Part II の Suzuki `theoremA` まで `AxiomsCheck` 登録済 (Q₈ Brauer–Suzuki の完了による)。未形式化の番号付き結果は長期の全文形式化フェーズに残る。 |
 | 3 | 最終矛盾の結合 (BG App.C ≅ Peterfalvi の対応物) | ✅ **App.C 完全形式化** — `theoremC` / `final_contradiction` は sorry-free かつ標準3公理のみ。Pf §16 の `nonexistence_of_G` から実配線済み。 |
 | 4 | `FeitThompson` メイン定理ステートメント & 完全結合 | ✅ **2026-07-15 完成** — `nonexistence_of_G` → `BG.AppC.final_contradiction` → `noMinimalSimpleOdd` → `feitThompson_of_noMinimalSimpleOdd` → `feitThompson` の全段を authoritative trace + permanent `AxiomsCheck` で検証。依存は標準3公理のみ。 |
 

@@ -23,12 +23,12 @@ theorem feitThompson {G : Type*} [Group G] [Finite G] (hodd : Odd (Nat.card G)) 
 プロジェクトは現在第 2 フェーズにある: 奇数位数定理が必要とする経路だけでなく、
 **3 冊の原典教科書を丸ごと形式化する**。
 
-> 🚧 **Lean ソース (`OddOrder/`) に残る `sorry` は 1 つ**: Brauer–Suzuki の定理の `Q₈` の場合 —
-> 原典はどれもこれを文献参照するだけで、証明していない。これに依存する結果
-> (Peterfalvi の Appendix C, Proposition 1 とその下流) だけが条件付きであり、それ以外はすべて —
-> 上の公理検査が示す通り `feitThompson` を含めて — `sorry` 無しである。解消の計画:
-> Navarro の *Characters and Blocks of Finite Groups* に沿って、Z\*-定理までの
-> モジュラー指標理論を形式化する。
+> ✅ **2026-08-07 をもって Lean ソース (`OddOrder/`) は `sorry` 無しになった**。最後に残っていたのは
+> Brauer–Suzuki の定理の `Q₈` の場合 — 原典はどれもこれを文献参照するだけで、証明していない。
+> これを閉じるにはモジュラー指標理論 (p-モジュラー系、Brauer 指標、ブロック、defect 群、
+> Brauer の三大主定理) を一から構築する必要があり、Navarro の *Characters and Blocks of Finite
+> Groups* Ch. 1–7 に沿って形式化した。⚠ `sorry` 無しは「3 冊が完了した」ことを意味しない:
+> まだ述べていない結果は `sorry` を生まないからである。カバレッジは下記で別に追跡している。
 
 ## Feit–Thompson の定理のその先へ: 有限群論ライブラリ
 
@@ -48,24 +48,27 @@ Feit–Thompson の証明には、mathlib がまだ持っていない大量の�
   こうした参照が Isaacs や mathlib で既にカバーされていない場合、Gorenstein の証明を
   ここに書き起こしてある (Theorems 3.4, 3.7/3.8/3.10, 4.15, 5.3.9–5.3.13, 7.6.5、
   `|S| ≥ 16` の場合の Brauer–Suzuki など。`OddOrder/BG/` と `OddOrder/GroupTheory/` 配下)。
-  唯一残っている `Q₈` の場合の Brauer–Suzuki は Gorenstein 自体に無い: 同書 Ch. 12 は
-  `|S| ≥ 16` だけを証明し、位数 8 の場合は証明抜きで述べるにとどまる
-  (「知られている証明はすべてモジュラー指標の理論を要する」— 同書が展開しない理論である)。
-  これを閉じるには、Navarro の *Characters and Blocks of Finite Groups* に沿って
-  Z\*-定理までのモジュラー指標理論を構築する必要がある。これがライブラリに唯一残る `sorry` であり、
-  進行中の長期プロジェクトである。Gorenstein を書物として形式化することは*しない*。
+  Gorenstein を書物として形式化することは*しない*。
 
-さらに 2 つの証明はこれらの書物の外から来ている: 書物は結果を述べるだけで証明は原論文から
+さらに 3 つの証明はこれらの書物の外から来ている: 書物は結果を述べるだけで証明は原典から
 取っているため、その原典自体をここで形式化した。
 
 - **Higman**, "Suzuki 2-groups" (*Illinois Journal of Mathematics* 7, 1963)。Peterfalvi の
   Appendix III は Higman による Suzuki 2-群の分類を再掲するが、その証明は明示的に論文に委ねている。
   この証明は [`OddOrder/Higman/`](OddOrder/Higman/) 配下で完全に形式化されている —
   約 65,000 行の `sorry` 無しのコードで、ライブラリ中最大の単一項目である。
+- **Navarro**, *Characters and Blocks of Finite Groups* (LMS LNS 250, 1998), Ch. 1–7。
+  `Q₈` の場合の Brauer–Suzuki は上記 4 冊のどれにも無い: Gorenstein Ch. 12 は `|S| ≥ 16` だけを
+  証明し、位数 8 の場合は証明抜きで述べるにとどまる (「知られている証明はすべてモジュラー指標の
+  理論を要する」— 同書が展開しない理論である)。mathlib にもモジュラー表現論は一切無い。
+  そこで [`OddOrder/GroupTheory/RepresentationTheory/Modular/`](OddOrder/GroupTheory/RepresentationTheory/Modular/)
+  配下に一から構築した — p-モジュラー系、Brauer 指標、分解行列と Cartan 行列、ブロックと defect 群、
+  Brauer 準同型と三大主定理。約 29,000 行が Navarro pp. 139–146 の指標論の議論を支えている。
 - **Huppert**, *Endliche Gruppen I* (1967), Kapitel II, Satz 3.2: 可解な 2-推移置換群は
   初等アーベルな正則正規部分群を持つ。Peterfalvi の Appendix C が必要とする。
 
-3 冊のカバレッジは結果単位で追跡している。2026-07-16 の監査で全 **815 個の番号付き結果**を数え上げた:
+3 冊のカバレッジは結果単位で追跡している — `sorry` の数とは別物で、測っているものが違う。
+2026-07-16 の監査で全 **815 個の番号付き結果**を数え上げた:
 470 が書籍の主張の強さのまま形式化済み、78 は mathlib 自体が完全にカバー、54 は特殊化された形で
 存在し一般化待ち、213 が残作業。この調査
 ([`notes/meta/three_books_full_survey_2026_07_16.md`](notes/meta/three_books_full_survey_2026_07_16.md))
@@ -85,13 +88,13 @@ lake build OddOrder
 ```
 
 Lean toolchain は [`lean-toolchain`](lean-toolchain) に、mathlib のリビジョンは
-[`lakefile.toml`](lakefile.toml) に固定されている。フルビルドはおよそ 4,450 jobs。
+[`lakefile.toml`](lakefile.toml) に固定されている。フルビルドはおよそ 5,450 jobs。
 
 ## リポジトリ構成
 
 | パス | 内容 |
 |---|---|
-| [`OddOrder/`](OddOrder/) | Lean ソース本体 (~1,050 ファイル)。`Isaacs/`, `BG/`, `Peterfalvi/` が 3 冊をミラーし、`Higman/` が Suzuki 2-群の論文、`GroupTheory/`, `Algebra/`, `Mathlib/` が汎用部分 |
+| [`OddOrder/`](OddOrder/) | Lean ソース本体 (~1,680 ファイル / 約 83 万行)。`Isaacs/`, `BG/`, `Peterfalvi/` が 3 冊をミラーし、`Higman/` が Suzuki 2-群の論文、`GroupTheory/`, `Algebra/`, `Mathlib/` が汎用部分 (ブロック論は `GroupTheory/RepresentationTheory/Modular/`) |
 | [`OddOrder/FeitThompson.lean`](OddOrder/FeitThompson.lean) | 主定理と最小反例への還元 |
 | [`OddOrder/AxiomsCheck.lean`](OddOrder/AxiomsCheck.lean) | 主要な結果すべてのビルド時公理監査 |
 | [`ROADMAP.md`](ROADMAP.md) | 長期計画、フェーズ、依存グラフ、章別チェックリスト |

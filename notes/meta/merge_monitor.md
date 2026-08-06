@@ -6,6 +6,26 @@
 > [`three_books_full_survey_2026_07_16.md`](three_books_full_survey_2026_07_16.md)。レーン再作成 + cron 再作成は
 > 新 note §3。以下の合流ゲート・手順 (build green / AxiomsCheck / --no-ff / 所有検査) は新フェーズでも不変。
 >
+> **▶▶ 2026-08-07 hub tick — 🎯 Q₈ 完了の後始末: open issue が 0 になった**
+> ① **`AxiomsCheck` に Q₈ 下流 6 本を登録** (すべて `all in allowlist`):
+> `brauerSuzuki_quaternionSylow_q8` / `RankOneHypothesis.brauerSuzuki` /
+> `rankOne_affine_nearField` / `FirstCaseHypothesis.theoremB` /
+> `nonempty_theoremAConclusion_of_V_ne_bot` / **`theoremA`** (= Peterfalvi Part II の
+> Suzuki Theorem A。`ZassenhausClassification` は axiom でなく明示引数)。
+> ② **issue 9506 と pending 2053 を close** ⟹ **open issue = 0 / pending = 4**。
+> 2053 の唯一の残タスクが「Q₈ の sorry 経由で AxiomsCheck 登録不可」だったので ① で解消。
+> ③ **stale docstring 34 箇所を一括修正** (`Peterfalvi/Appendices/` 配下)。
+> 「Inherits the step (2)(b) `sorry` (issue 9318)」型の注記が **AxiomsCheck の新 assert と
+> 正面から矛盾**していた (「not axiom-clean」と書いてあるものを axiom-clean と assert)。
+> ⟹ 依存関係の記述 (`Depends on step (2)(b)`) に置換。⚠ repo 全体では `sorry` 一括言及が
+> なお 172 行あり、別キャンペーンで棚卸しが要る。
+> ④ **README.md / README.ja.md / ROADMAP.md を現況へ**: 「残 `sorry` 1 本」→「sorry-free
+> (2026-08-07)」、Navarro を Higman/Huppert と並ぶ**書外原典 3 本目**として追加、
+> jobs 4,450→5,450 / files ~1,050→~1,680。⚠ **「sorry 0 ≠ 3 冊完了」を明記** (未形式化の
+> 結果は `sorry` を生まない)。
+> gate: フルビルド EXIT=0 / **5,446 jobs** / error 0、`bin/count-sorry` = **0**、
+> `--strict` EXIT=0。
+>
 > **▶▶ 2026-07-27 昼〜午後 hub 自走 tick 続き (`/loop` self-pacing) — 🎯🎯🎯
 > **Peterfalvi (6.5) を一般 kernel で完成 + (6.6) を step 4 直前まで前進**。push →3111f38a5**。
 > (直前 tick の記録は下記。以下はその継続分。)

@@ -23,12 +23,12 @@ No `sorryAx`, no project-specific axioms — only Lean's three standard ones.
 The project is now in its second phase: **formalizing the three source textbooks in full**, not merely
 the path through them that the Odd Order Theorem needs.
 
-> 🚧 **One `sorry` remains in the Lean sources** (`OddOrder/`): the `Q₈` case of the Brauer–Suzuki
-> theorem — cited by the sources, proved in none of them. Only the results that depend on it
-> (Peterfalvi's Appendix C, Proposition 1 and its dependents) are conditional; everything else —
-> `feitThompson` included, as the axiom check above shows — is `sorry`-free. The plan to close it:
-> formalize modular character theory up through the Z\*-theorem, following Navarro's *Characters and
-> Blocks of Finite Groups*.
+> ✅ **The Lean sources (`OddOrder/`) are `sorry`-free as of 2026-08-07.** The last one to go was the
+> `Q₈` case of the Brauer–Suzuki theorem — cited by the sources, proved in none of them. Closing it
+> meant building modular character theory from scratch (`p`-modular systems, Brauer characters,
+> blocks, defect groups, Brauer's three main theorems), following Navarro's *Characters and Blocks of
+> Finite Groups*, Ch. 1–7. Note that `sorry`-free is *not* the same as "the three books are done":
+> a result that has not been stated yet produces no `sorry`. Coverage is tracked separately, below.
 
 ## Beyond the Feit–Thompson theorem: a finite group theory library
 
@@ -47,25 +47,31 @@ That theory makes up the bulk of this repository, and completing it is now a goa
   and Peterfalvi's Appendix C likewise cites Gorenstein for the Brauer–Suzuki theorem (Ch. 12). Where
   such a citation is not already covered by Isaacs or by mathlib, the Gorenstein proof is written out
   here (Theorems 3.4, 3.7/3.8/3.10, 4.15, 5.3.9–5.3.13, 7.6.5, Brauer–Suzuki for `|S| ≥ 16`, among
-  others, under `OddOrder/BG/` and `OddOrder/GroupTheory/`). The one open piece, the `Q₈` case of
-  Brauer–Suzuki, is not in Gorenstein at all: his Ch. 12 proves only `|S| ≥ 16` and states the
-  order-8 case without proof ("all known proofs require the theory of modular characters" — a theory
-  the book never develops). Closing it means building modular character theory up through the
-  Z\*-theorem, following Navarro's *Characters and Blocks of Finite Groups*; it is the library's single
-  remaining `sorry` and an active long-term project. Gorenstein is *not* being formalized as a book.
+  others, under `OddOrder/BG/` and `OddOrder/GroupTheory/`). Gorenstein is *not* being formalized as
+  a book.
 
-Two proofs come from outside these books altogether: the books state the results but take the proofs
-from the original literature, so the sources themselves are formalized here.
+Three bodies of proof come from outside these books altogether: the books state the results but take
+the proofs from the original literature, so the sources themselves are formalized here.
 
 - **Higman**, "Suzuki 2-groups" (*Illinois Journal of Mathematics* 7, 1963). Peterfalvi's Appendix III
   restates Higman's classification of Suzuki 2-groups but explicitly takes its proof from the paper;
   that proof is formalized in full under [`OddOrder/Higman/`](OddOrder/Higman/) — about 65,000
   `sorry`-free lines, the largest single item in the library.
+- **Navarro**, *Characters and Blocks of Finite Groups* (LMS LNS 250, 1998), Ch. 1–7. The `Q₈` case of
+  Brauer–Suzuki is in none of the four books above: Gorenstein's Ch. 12 proves only `|S| ≥ 16` and
+  states the order-8 case without proof ("all known proofs require the theory of modular characters" —
+  a theory the book never develops), and mathlib has no modular representation theory at all. So it is
+  built here from the ground up under
+  [`OddOrder/GroupTheory/RepresentationTheory/Modular/`](OddOrder/GroupTheory/RepresentationTheory/Modular/)
+  — `p`-modular systems, Brauer characters, decomposition and Cartan matrices, blocks and defect
+  groups, the Brauer homomorphism and Brauer's three main theorems — about 29,000 lines feeding the
+  character-theoretic argument of Navarro pp. 139–146.
 - **Huppert**, *Endliche Gruppen I* (1967), Kapitel II, Satz 3.2: a solvable 2-transitive permutation
   group has an elementary abelian regular normal subgroup. Needed by Peterfalvi's Appendix C.
 
-Coverage of the three books is tracked result by result. An audit on 2026-07-16 enumerated all
-**815 numbered results**: 470 formalized at full book strength, 78 covered completely by mathlib itself,
+Coverage of the three books is tracked result by result — separately from the `sorry` count, which
+measures something else entirely. An audit on 2026-07-16 enumerated all **815 numbered results**:
+470 formalized at full book strength, 78 covered completely by mathlib itself,
 54 present in a specialized form awaiting generalization, and 213 remaining work items. That survey
 ([`notes/meta/three_books_full_survey_2026_07_16.md`](notes/meta/three_books_full_survey_2026_07_16.md))
 is a snapshot of the phase-two starting point, not a live scope document — later spot checks found some
@@ -85,13 +91,13 @@ lake build OddOrder
 ```
 
 The Lean toolchain is pinned in [`lean-toolchain`](lean-toolchain) and the mathlib revision in
-[`lakefile.toml`](lakefile.toml). A full build is roughly 4,450 jobs.
+[`lakefile.toml`](lakefile.toml). A full build is roughly 5,450 jobs.
 
 ## Repository layout
 
 | Path | Contents |
 |---|---|
-| [`OddOrder/`](OddOrder/) | The Lean sources (~1,050 files). `Isaacs/`, `BG/`, `Peterfalvi/` mirror the three books; `Higman/` holds the Suzuki 2-groups paper; `GroupTheory/`, `Algebra/`, `Mathlib/` hold general-purpose material |
+| [`OddOrder/`](OddOrder/) | The Lean sources (~1,680 files, ~830,000 lines). `Isaacs/`, `BG/`, `Peterfalvi/` mirror the three books; `Higman/` holds the Suzuki 2-groups paper; `GroupTheory/`, `Algebra/`, `Mathlib/` hold general-purpose material, including `GroupTheory/RepresentationTheory/Modular/` for the block theory |
 | [`OddOrder/FeitThompson.lean`](OddOrder/FeitThompson.lean) | The main theorem and the minimal-counterexample reduction |
 | [`OddOrder/AxiomsCheck.lean`](OddOrder/AxiomsCheck.lean) | Build-time axiom audit of every load-bearing result |
 | [`ROADMAP.md`](ROADMAP.md) | Long-range plan, phases, dependency graph, per-chapter checklists |
