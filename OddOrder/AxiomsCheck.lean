@@ -19402,3 +19402,24 @@ universe をまたげないため。実際の使用箇所 (`𝓞_ℂ_[p]` / `ℂ
 鎖の binder には `IsAlgClosed K` が無い — この補題がその橋渡し。 -/
 
 #assert_only_allowed_axioms OddOrder.isAlgClosed_of_isAlgClosed_fractionRing
+
+/-! 🎯🎯 **issue 9506 段 319c-2**: `hcoeff` が `∀ g` で揃った (`KulshammerThirdMain`)。
+
+`coeff_principalBlock_eq_centralizer_intermediate_forall` —
+`e_{b_0}^H(g) = e_{b_0}^{C_G(Q)}(g)` が**全ての `g ∈ C_G(Q)`** で成り立つ。
+
+2 つのルートは相補的で、どちらも単独では全体を覆えない:
+* **`p`-正則** — Külshammer の公式 (`..._intermediate`)。担ぐ `hweak` は
+  `g` の `p`-部分が Sylow に共役だと破れるので、正則な `g` 以外には届かない。
+* **`p`-特異** — Osima の定理 (`..._of_not_isPRegular`、段 318-319c-1)。両辺 0。
+
+⚠ `hweak` は `..._intermediate` では**与えられた `g` についての仮説**なので、
+束ねた版では `p`-正則な `g` 全体で量化した形になる — 段 319a
+(`sum_character_blockOfIrr_eq_zero_of_isPRegular`) がまさにその形を供給する。
+
+⟹ これが `hconv` (第三主定理の逆) の要求する `hcoeff` そのもの。
+残りは `eq_principalBlock_of_blockOfCentralCharacter_eq` に食わせて
+`C_G(⟨x⟩)` と `centralizerOf x` を同一視するだけ。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.coeff_principalBlock_eq_centralizer_intermediate_forall

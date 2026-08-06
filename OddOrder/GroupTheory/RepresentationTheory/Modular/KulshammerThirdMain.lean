@@ -507,6 +507,92 @@ theorem coeff_principalBlock_eq_centralizer_intermediate_of_not_isPRegular [Fact
     coeff_blockIdempotent_eq_zero_of_not_isPRegular hp hωC hω'C hπC hlinC hkerJC hnilC eC
       hidemC hfC hBC hgC]
 
+set_option maxHeartbeats 1600000 in
+-- Both routes are instantiated here, so every piece of splitting data for `H` and `C_G(Q)` is
+-- in play at once.
+omit [DecidableEq (ConjClasses G)] [Invertible (Nat.card G : K)] [Fintype (ConjClasses G)] in
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+open scoped Classical in
+include hnilH eH hnilC eC in
+/-- **`e_{b_0}^H(g) = e_{b_0}^{C_G(Q)}(g)` for every `g ∈ C_G(Q)`** — the hypothesis `hcoeff` of
+the converse of the third main theorem.
+
+The two routes cover complementary halves of the group and neither covers it alone.  Külshammer's
+formula reaches the `p`-regular `g` and no others, because the block-wise column sum it carries
+(`hweak`) fails exactly when the `p`-part of `g` is conjugate into the Sylow subgroup; Osima's
+theorem reaches the `p`-singular `g`, where both coefficients are simply `0`.
+
+⚠ `hweak` is a hypothesis *about a given `g`* in `coeff_principalBlock_eq_centralizer_intermediate`,
+so it appears here quantified over the `p`-regular elements — the form
+`sum_character_blockOfIrr_eq_zero_of_isPRegular` supplies. -/
+theorem coeff_principalBlock_eq_centralizer_intermediate_forall [Fact p.Prime]
+    (hp : p.Prime) (hQ : IsPGroup p ↥Q) (hQH : Q ≤ H)
+    (hCH : Subgroup.centralizer (Q : Set G) ≤ H)
+    [Fintype (MatrixModule.Block πH hπH hlinH)] [Fintype (MatrixModule.Block πC hπC hlinC)]
+    (SH : Sylow p ↥H) (SC : Sylow p ↥(Subgroup.centralizer (Q : Set G)))
+    {ωH : 𝒪} (hωH : IsPrimitiveRoot ωH (pRegularExponent p ↥H))
+    {ω'H : ResidueField 𝒪} (hω'H : IsPrimitiveRoot ω'H (pRegularExponent p ↥H))
+    (hkerJH : RingHom.ker πH = Ring.jacobson (MonoidAlgebra (ResidueField 𝒪) ↥H))
+    {ωC : 𝒪}
+    (hωC : IsPrimitiveRoot ωC (pRegularExponent p ↥(Subgroup.centralizer (Q : Set G))))
+    {ω'C : ResidueField 𝒪}
+    (hω'C : IsPrimitiveRoot ω'C (pRegularExponent p ↥(Subgroup.centralizer (Q : Set G))))
+    (hkerJC : RingHom.ker πC
+      = Ring.jacobson (MonoidAlgebra (ResidueField 𝒪) ↥(Subgroup.centralizer (Q : Set G))))
+    {FH : MatrixModule.Block πH hπH hlinH → Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 ↥H)}
+    {F'H : MatrixModule.Block πH hπH hlinH →
+      Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) ↥H)}
+    (hidemH : ∀ B, IsIdempotentElem (FH B))
+    (hfH : ∀ B, MonoidAlgebra.mapRingHom ↥H (residue 𝒪) ((FH B : MonoidAlgebra 𝒪 ↥H))
+      = ((F'H B : MonoidAlgebra (ResidueField 𝒪) ↥H)))
+    (hBH : ∀ B, MatrixModule.blockCharacterPi πH hπH hlinH (F'H B) = Pi.single B 1)
+    (hweakH : ∀ g : ↥(Subgroup.centralizer (Q : Set G)), IsPRegular p (g : G) →
+      ∀ B : MatrixModule.Block πH hπH hlinH, ∀ x : ↥(SH : Subgroup ↥H), (x : ↥H) ≠ 1 →
+      ∑ i ∈ Finset.univ.filter (fun i => blockOfIrr eH hπH hlinH hnilH i = B),
+        (wedderburnRepresentation eH i).character (⟨(g : G), hCH g.2⟩ : ↥H)⁻¹
+          * (wedderburnRepresentation eH i).character (x : ↥H) = 0)
+    (hvanishH : ∀ B : MatrixModule.Block πH hπH hlinH,
+      B ≠ principalBlock πH hπH hlinH hnilH →
+      MatrixModule.blockCharacter πH hπH hlinH B
+        ⟨pRegularSum p (ResidueField 𝒪), pRegularSum_mem_center⟩ = 0)
+    {FC : MatrixModule.Block πC hπC hlinC →
+      Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 ↥(Subgroup.centralizer (Q : Set G)))}
+    {FC' : MatrixModule.Block πC hπC hlinC →
+      Subalgebra.center (ResidueField 𝒪)
+        (MonoidAlgebra (ResidueField 𝒪) ↥(Subgroup.centralizer (Q : Set G)))}
+    (hidemC : ∀ B, IsIdempotentElem (FC B))
+    (hfC : ∀ B, MonoidAlgebra.mapRingHom ↥(Subgroup.centralizer (Q : Set G)) (residue 𝒪)
+        ((FC B : MonoidAlgebra 𝒪 ↥(Subgroup.centralizer (Q : Set G))))
+      = ((FC' B : MonoidAlgebra (ResidueField 𝒪) ↥(Subgroup.centralizer (Q : Set G)))))
+    (hBC : ∀ B, MatrixModule.blockCharacterPi πC hπC hlinC (FC' B) = Pi.single B 1)
+    (hweakC : ∀ g : ↥(Subgroup.centralizer (Q : Set G)), IsPRegular p (g : G) →
+      ∀ B : MatrixModule.Block πC hπC hlinC,
+      ∀ x : ↥(SC : Subgroup ↥(Subgroup.centralizer (Q : Set G))),
+        (x : ↥(Subgroup.centralizer (Q : Set G))) ≠ 1 →
+      ∑ i ∈ Finset.univ.filter (fun i => blockOfIrr eC hπC hlinC hnilC i = B),
+        (wedderburnRepresentation eC i).character g⁻¹
+          * (wedderburnRepresentation eC i).character
+              (x : ↥(Subgroup.centralizer (Q : Set G))) = 0)
+    (hvanishC : ∀ B : MatrixModule.Block πC hπC hlinC,
+      B ≠ principalBlock πC hπC hlinC hnilC →
+      MatrixModule.blockCharacter πC hπC hlinC B
+        ⟨pRegularSum p (ResidueField 𝒪), pRegularSum_mem_center⟩ = 0) :
+    ∀ g : ↥(Subgroup.centralizer (Q : Set G)),
+      ((F'H (principalBlock πH hπH hlinH hnilH) :
+          MonoidAlgebra (ResidueField 𝒪) ↥H)).coeff (⟨(g : G), hCH g.2⟩ : ↥H)
+        = ((FC' (principalBlock πC hπC hlinC hnilC) :
+            MonoidAlgebra (ResidueField 𝒪) ↥(Subgroup.centralizer (Q : Set G)))).coeff g := by
+  classical
+  intro g
+  by_cases hg : IsPRegular p (g : G)
+  · exact coeff_principalBlock_eq_centralizer_intermediate eH hπH hlinH hnilH eC hπC hlinC hnilC
+      hp hQ hQH hCH SH SC g hidemH hfH hBH (hweakH g hg) hvanishH hidemC hfC hBC
+      (hweakC g hg) hvanishC
+  · exact coeff_principalBlock_eq_centralizer_intermediate_of_not_isPRegular eH hπH hlinH hnilH
+      eC hπC hlinC hnilC hp hCH hωH hω'H hkerJH hωC hω'C hkerJC g hg (hidemH _) (hfH _)
+      (hBH _) (hidemC _) (hfC _) (hBC _)
+
 end IntermediateCoeff
 
 /-! ### The converse of the third main theorem for `H = C_G(Q)` -/
