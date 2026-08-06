@@ -269,21 +269,19 @@ theorem hasNormalPComplement_of_card_four_of_central_involution
   exact hasNormalPComplement_of_sylow_normalizer_le_centralizer V
     (normalizer_le_centralizer_of_card_four_of_central_involution V hcard hvV hv1 hv2 hvZ)
 
-/-- **Navarro (7.2) applied to a centraliser**: if the Sylow `2`-subgroups of `Q` have order `4`,
-then the centraliser of any involution of `Q` has a normal `2`-complement.
-
-This is the form the Brauer–Suzuki chain consumes: `Q = C_G(t)/⟨t⟩` has Klein four Sylow
-`2`-subgroups (the image of a quaternion `Q₈`), and `ȳ` is one of its involutions.
+/-- **The Sylow `2`-subgroups of `C_Q(y)` still have order `4`** when those of `Q` do and `y` is
+an involution.
 
 An involution lies in *some* Sylow `2`-subgroup `S'`, which is abelian (order `p²`), so
-`S' ≤ C_Q(ȳ)` and is Sylow there; and `ȳ` is central in `C_Q(ȳ)` by definition. -/
-theorem hasNormalPComplement_centralizer_of_card_sylow_four {Q : Type*} [Group Q] [Finite Q]
+`S' ≤ C_Q(y)`; being Sylow in `Q` it is Sylow in `C_Q(y)`, and all Sylow `2`-subgroups of
+`C_Q(y)` are conjugate to it. -/
+theorem card_sylow_centralizer_of_card_sylow_four {Q : Type*} [Group Q] [Finite Q]
     (S : Sylow 2 Q) (hcard : Nat.card ↥(S : Subgroup Q) = 4)
-    {y : Q} (hy1 : y ≠ 1) (hy2 : y * y = 1) :
-    HasNormalPComplement 2 ↥(Subgroup.centralizer ({y} : Set Q)) := by
+    {y : Q} (hy1 : y ≠ 1) (hy2 : y * y = 1)
+    (V : Sylow 2 ↥(Subgroup.centralizer ({y} : Set Q))) :
+    Nat.card ↥(V : Subgroup ↥(Subgroup.centralizer ({y} : Set Q))) = 4 := by
   classical
   haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  -- `y` lies in some Sylow `2`-subgroup, necessarily of order `4`
   have hord : orderOf y = 2 := orderOf_eq_prime (by rw [pow_two]; exact hy2) hy1
   have hyp : IsPGroup 2 ↥(Subgroup.zpowers y) :=
     IsPGroup.of_card (by rw [Nat.card_zpowers, hord, pow_one])
@@ -295,30 +293,48 @@ theorem hasNormalPComplement_centralizer_of_card_sylow_four {Q : Type*} [Group Q
     isMulCommutative_iff.mp
       (IsPGroup.isMulCommutative_of_card_eq_prime_sq (p := 2) (by rw [hcard']; norm_num))
   have hyS' : y ∈ (S' : Subgroup Q) := hS' (Subgroup.mem_zpowers y)
-  -- `S' ≤ C_Q(y)`, and it is Sylow there
   have hle : (S' : Subgroup Q) ≤ Subgroup.centralizer ({y} : Set Q) := by
     intro u hu
     refine Subgroup.mem_centralizer_iff.mpr ?_
-    rintro w hw
+    intro w hw
     rw [Set.mem_singleton_iff] at hw
     subst hw
     exact congrArg Subtype.val (hcomm (⟨w, hyS'⟩ : ↥(S' : Subgroup Q)) ⟨u, hu⟩)
-  have hyC : y ∈ Subgroup.centralizer ({y} : Set Q) :=
-    Subgroup.mem_centralizer_iff.mpr fun w hw => by
-      rw [Set.mem_singleton_iff] at hw; subst hw; rfl
   have hVcard : Nat.card ↥((S'.subtype hle : Sylow 2 ↥(Subgroup.centralizer ({y} : Set Q)))
       : Subgroup ↥(Subgroup.centralizer ({y} : Set Q))) = 4 := by
     rw [Sylow.coe_subtype, ← hcard']
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv
-  refine hasNormalPComplement_of_card_four_of_central_involution (S'.subtype hle) hVcard
-    (v := ⟨y, hyC⟩) ?_ ?_ ?_ ?_
-  · rw [Sylow.coe_subtype]
-    exact Subgroup.mem_subgroupOf.mpr hyS'
-  · exact fun h => hy1 (congrArg Subtype.val h)
-  · exact Subtype.ext hy2
-  · intro h
-    refine Subtype.ext ?_
-    exact (Subgroup.mem_centralizer_iff.mp h.2 y (Set.mem_singleton y)).symm
+  rw [← hVcard]
+  exact Nat.card_congr (Sylow.equiv V (S'.subtype hle)).toEquiv
+
+/-- **Navarro (7.2) applied to a centraliser**: if the Sylow `2`-subgroups of `Q` have order `4`,
+then the centraliser of any involution of `Q` has a normal `2`-complement.
+
+This is the form the Brauer–Suzuki chain consumes: `Q = C_G(t)/⟨t⟩` has Klein four Sylow
+`2`-subgroups (the image of a quaternion `Q₈`), and `ȳ` is one of its involutions. -/
+theorem hasNormalPComplement_centralizer_of_card_sylow_four {Q : Type*} [Group Q] [Finite Q]
+    (S : Sylow 2 Q) (hcard : Nat.card ↥(S : Subgroup Q) = 4)
+    {y : Q} (hy1 : y ≠ 1) (hy2 : y * y = 1) :
+    HasNormalPComplement 2 ↥(Subgroup.centralizer ({y} : Set Q)) := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hyC : y ∈ Subgroup.centralizer ({y} : Set Q) :=
+    Subgroup.mem_centralizer_iff.mpr fun w hw => by
+      rw [Set.mem_singleton_iff] at hw; subst hw; rfl
+  -- `y` lies in some Sylow `2`-subgroup of its centraliser, and that has order `4`
+  have hord : orderOf (⟨y, hyC⟩ : ↥(Subgroup.centralizer ({y} : Set Q))) = 2 :=
+    orderOf_eq_prime (by rw [pow_two]; exact Subtype.ext hy2)
+      (fun h => hy1 (congrArg Subtype.val h))
+  have hyp : IsPGroup 2 ↥(Subgroup.zpowers (⟨y, hyC⟩ :
+      ↥(Subgroup.centralizer ({y} : Set Q)))) :=
+    IsPGroup.of_card (by rw [Nat.card_zpowers, hord, pow_one])
+  obtain ⟨V, hV⟩ := hyp.exists_le_sylow
+  refine hasNormalPComplement_of_card_four_of_central_involution V
+    (card_sylow_centralizer_of_card_sylow_four S hcard hy1 hy2 V) (v := ⟨y, hyC⟩)
+    (hV (Subgroup.mem_zpowers _)) (fun h => hy1 (congrArg Subtype.val h)) (Subtype.ext hy2) ?_
+  intro h
+  refine Subtype.ext ?_
+  exact (Subgroup.mem_centralizer_iff.mp h.2 y (Set.mem_singleton y)).symm
 
 /-- **Unpacking a normal `p`-complement** into the shape the block-theoretic chain asks for: a
 normal `p'`-subgroup `M` of index a power of `p`.
