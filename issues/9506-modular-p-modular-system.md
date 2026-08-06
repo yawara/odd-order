@@ -2849,11 +2849,29 @@ p.139 の残り = 「位数 4 の元は全て `G`-共役 (実は `C_G(t)`-共役
   2. ⟹ `C_G(t)/⟨t⟩` の Sylow-2 は `Q₈/Z(Q₈) ≅ Z₂ × Z₂` (Klein four)
   3. `C_G(t)/⟨t⟩` の対合は全て共役 (`T` の位数 4 の元が `C_G(t)`-共役だから;
      対合は Sylow へ共役で送れる + `T̄` の 3 つの対合は位数 4 の元の像)
-  ⟹ これで Cor (7.4) (段 207-209) の仮説が揃い、basic set `{1=ψ₀,ψ₁,ψ₂}` と
-  Cartan `c_ij = 1 + δ_ij` が出る。(7.6) (段 214-215) で `C_G(t)` へ持ち上げると
-  Cartan は 2 倍。以降 (7.5.a) で `χ_i(tu) = ∑_j d^t_{χ_i ψ_j} ψ_j(u)`、
-  (7.5.b,c,d) で (3) `(D^t_i, D^t_j) = 2(1+δ_ij)` / (4) `(D^y_0, D^t_j) = 0` /
-  (5) `(χ(1), D^t_j) = 0`。最後に `Q₈` の指標表から `τ(t) ≡ τ(y) mod 2`。
+  ✅ **1-3 は段 286-288 で完了** (`sylowQ8_le_centralizer_involution` /
+  `card_quotient_zpowers_of_quaternionTwo` + `sq_eq_one_quotient_zpowers_of_quaternionTwo` /
+  `isConj_of_sq_eq_one_quotient_centralizer`)。3 の途中で
+  **`isConj_of_orderFour` の結論を `∃ g ∈ N_G(T)` に強化**し (証明中の融合元は元々
+  `N_G(T)` の中で作られていた)、`isConj_centralizer_of_orderFour` を得た (段 287)。
+  汎用配管 `exists_conj_mem_sylow` (p-元は指定 Sylow に共役で入る) も新設 —
+  ⚠ 着手後に対合専用の特殊化 `exists_conj_mem_sylow_of_mul_self_eq_one` が
+  `KleinFourSylowFusion` に既存と判明したので、その場で一般化して特殊版を置換した。
+
+  ✅ **`τ(t) ≡ τ(y) mod 2` = 段 289 で完了、しかも `Q₈` の指標表は不要だった**。
+  原文は「from the character table of `P`」と読むが、`t` も `y` も `2`-元なので
+  どちらの値も次数と `mod 2` で合同 (Gorenstein Lemma 7.5 = 既存
+  `intModEq_of_mem_adjoinSpan`) ⟹ 互いに合同。
+  新設 = `pRegularPart_eq_one_of_isPElement` / `intModEq_one_of_isPElement` /
+  `intModEq_of_isPElement_of_isPElement`。
+
+  ⟹ **残り** = Cor (7.4) (段 207-209) を `C_G(t)/⟨t⟩` に適用して basic set
+  `{1=ψ₀,ψ₁,ψ₂}` と Cartan `c_ij = 1 + δ_ij` を得る → (7.6) (段 214-215) で
+  `C_G(t)` へ持ち上げ (Cartan は 2 倍) → (7.5.a) で
+  `χ_i(tu) = ∑_j d^t_{χ_i ψ_j} ψ_j(u)` → (7.5.b,c,d) で
+  (3) `(D^t_i, D^t_j) = 2(1+δ_ij)` / (4) `(D^y_0, D^t_j) = 0` / (5) `(χ(1), D^t_j) = 0`。
+  ⚠ ここから先は「`C_G(t)/⟨t⟩` の modular datum を組む」段になるので、
+  着手前に (7.4)/(7.6) の実際の signature を実測すること。
 - "Analysis at t" (p.141-142): `C_G(t)/⟨t⟩` が Klein four Sylow-2 ⟹ (7.4) の basic set、
   (7.6) で `C_G(t)` へ持ち上げ、(7.5) で `d^t` の列。**整数性は issue 9508 で完済**
   (`intBasicSetMatrix` / `sum_intBasicSetMatrix_mul_cartanMatrix`)。
