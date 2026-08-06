@@ -65,4 +65,52 @@ theorem card_eq_four_of_sum_sq_eq_four [Nontrivial S] (hsum : ∑ i, a i ^ 2 = 4
     simp
   omega
 
+/-! ### Zeros allowed
+
+Navarro's "analysis at `y`" (p. 140) reaches the same total `4` for a column that is *not* known
+to be nowhere zero — the elements of order `4` are not all `G`-conjugate to every `p`-element, so
+the argument that no entry vanishes is unavailable.  What replaces it is one entry known to be
+`±1` (the trivial character, whose value is `1`), and that already forbids a `±2`: it would need
+`4 + 1 > 4`.  So the column consists of zeros and exactly four `±1`. -/
+
+/-- **Every term is `0` or `±1`**, once one term is known to be `±1`. -/
+theorem eq_zero_or_one_or_neg_one_of_sum_sq_eq_four (hsum : ∑ i, a i ^ 2 = 4) {i₀ : S}
+    (hi₀ : a i₀ ^ 2 = 1) (j : S) : a j = 0 ∨ a j = 1 ∨ a j = -1 := by
+  classical
+  have hle : a j ^ 2 ≤ 3 := by
+    by_contra hgt
+    push Not at hgt
+    have hne : i₀ ≠ j := by rintro rfl; omega
+    have hpair := Finset.sum_le_sum_of_subset_of_nonneg
+      (Finset.subset_univ ({i₀, j} : Finset S)) (fun i _ _ => sq_nonneg (a i))
+    rw [hsum, Finset.sum_pair hne] at hpair
+    omega
+  have hup : a j ≤ 1 := by nlinarith
+  have hlo : -1 ≤ a j := by nlinarith
+  omega
+
+/-- **Exactly four terms are nonzero**, once one term is known to be `±1`: each nonzero term
+contributes `1` to the total `4`. -/
+theorem card_filter_ne_zero_eq_four_of_sum_sq_eq_four (hsum : ∑ i, a i ^ 2 = 4) {i₀ : S}
+    (hi₀ : a i₀ ^ 2 = 1) : (Finset.univ.filter fun i => a i ≠ 0).card = 4 := by
+  classical
+  have hcount : ∑ i : S, a i ^ 2
+      = ((Finset.univ.filter fun i => a i ≠ 0).card : ℤ) := by
+    rw [← Finset.sum_filter_add_sum_filter_not Finset.univ (fun i => a i ≠ 0)]
+    have h1 : ∑ i ∈ Finset.univ.filter (fun i => a i ≠ 0), a i ^ 2
+        = ∑ _i ∈ Finset.univ.filter (fun i => a i ≠ 0), (1 : ℤ) := by
+      refine Finset.sum_congr rfl fun i hi => ?_
+      have hi' := (Finset.mem_filter.mp hi).2
+      rcases eq_zero_or_one_or_neg_one_of_sum_sq_eq_four hsum hi₀ i with h | h | h
+      · exact absurd h hi'
+      · rw [h]; norm_num
+      · rw [h]; norm_num
+    have h2 : ∑ i ∈ Finset.univ.filter (fun i => ¬ a i ≠ 0), a i ^ 2 = 0 := by
+      refine Finset.sum_eq_zero fun i hi => ?_
+      have hi' := (Finset.mem_filter.mp hi).2
+      push Not at hi'
+      rw [hi']; norm_num
+    rw [h1, h2, Finset.sum_const, add_zero, nsmul_eq_mul, mul_one]
+  omega
+
 end OddOrder.Algebra

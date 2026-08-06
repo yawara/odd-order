@@ -34,6 +34,9 @@ then forces four characters, each with `χ(t) = ±1`.
 * `OddOrder.RepresentationTheory.Modular.sum_sq_character_involution_eq_cartanMatrix`
 * `OddOrder.RepresentationTheory.Modular.nontrivial_blockOfIrr_principal`
 * `OddOrder.RepresentationTheory.Modular.card_blockOfIrr_principal_eq_four_and_character_involution`
+* `OddOrder.RepresentationTheory.Modular.card_character_ne_zero_eq_four_of_isConj_inv` — the same
+  total `4` at an element of order `4` (Navarro p. 140, "analysis at `y`"), where the entries may
+  vanish: exactly four are nonzero and each of those is `±1`
 * `OddOrder.RepresentationTheory.Modular.card_modEq_character_involution` — `χ(1) ≡ ε mod 4`
 -/
 
@@ -390,6 +393,102 @@ theorem card_blockOfIrr_principal_eq_four_and_character_involution
   · rcases OddOrder.Algebra.eq_one_or_neg_one_of_sum_sq_eq_four hsumZ hane ⟨j, hj⟩ with h | h
     · left; rw [hav j, h, Int.cast_one]
     · right; rw [hav j, h]; norm_num
+
+/-! ### The column at an element of order `4` (Navarro p. 140, "analysis at `y`")
+
+The same sum of squares `4`, but now without the hypothesis that no entry vanishes: for an element
+`y` of order `4` in a quaternion Sylow `2`-subgroup the elements of order `4` form only *one* of
+the two classes of `p`-elements, so `hconjall` is unavailable.  What Navarro uses instead is that
+the column has `1` as its first entry (the trivial character), which already forbids an entry
+`±2`.  The conclusion is correspondingly weaker: the column consists of zeros and **exactly four**
+entries `±1`. -/
+
+set_option maxHeartbeats 1000000 in
+-- Same modular-datum chain as (7.2); only the arithmetic ending differs.
+set_option linter.unusedFintypeInType false in
+omit ht in
+open scoped Classical in
+include hp hx hω hω' e hπG hlinG hkerJ hnil hζ hζk hζK hconv hNp hquot S hφ₀ in
+/-- **Navarro p. 140, the column `χ(y)`**: exactly four of the values `χ(y)`, `χ ∈ Irr(B_0)`, are
+nonzero, and each of those is `±1`.
+
+`∑_{χ ∈ Irr(B_0)} χ(y)² = c_{φ_0 φ_0} = 4` (`sum_sq_character_eq_cartanMatrix_of_isConj_inv`,
+`y` being conjugate to `y⁻¹` in a quaternion group), the values are rational integers
+(`exists_intCast_character_of_pow_four_eq_one`, `y⁴ = 1` and `y` real), and one of them is `1`;
+`OddOrder.Algebra.card_filter_ne_zero_eq_four_of_sum_sq_eq_four` closes it. -/
+theorem card_character_ne_zero_eq_four_of_isConj_inv
+    (hy4 : t ^ 4 = 1) (hinv : ∃ c : G, c * t * c⁻¹ = t⁻¹)
+    (hcart : cartanMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e φ₀ φ₀ = 4)
+    {j₁ : κ} (hj₁ : blockOfIrr eG hπG hlinG hnilG j₁ = principalBlock πG hπG hlinG hnilG)
+    (hj₁val : (wedderburnRepresentation eG j₁).character t = 1) :
+    (Finset.univ.filter (fun j : κ =>
+        blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG
+          ∧ (wedderburnRepresentation eG j).character t ≠ 0)).card = 4
+      ∧ ∀ j : κ, blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG →
+          (wedderburnRepresentation eG j).character t = 0
+            ∨ (wedderburnRepresentation eG j).character t = 1
+            ∨ (wedderburnRepresentation eG j).character t = -1 := by
+  classical
+  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have h2 : (2 : K) ≠ 0 := two_ne_zero
+  set P : κ → Prop :=
+    fun j => blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG with hP
+  have hmem : ∀ j : κ, j ∈ Finset.univ.filter P ↔ P j := fun j =>
+    ⟨fun h => (Finset.mem_filter.mp h).2, fun h => Finset.mem_filter.mpr ⟨Finset.mem_univ _, h⟩⟩
+  -- the integer value of `χ(y)`
+  obtain ⟨a, hav⟩ : ∃ a : κ → ℤ,
+      ∀ j : κ, (wedderburnRepresentation eG j).character t = ((a j : ℤ) : K) := by
+    have hreal : ∀ j : κ, (wedderburnRepresentation eG j).character t⁻¹
+        = (wedderburnRepresentation eG j).character t := by
+      obtain ⟨c, hc⟩ := hinv
+      exact fun j => by rw [← hc, Representation.char_conj]
+    choose a ha using fun j : κ =>
+      exists_intCast_character_of_pow_four_eq_one (wedderburnRepresentation eG j) h2 hy4 (hreal j)
+    exact ⟨a, ha⟩
+  have hzero : ∀ j : κ, (wedderburnRepresentation eG j).character t = 0 ↔ a j = 0 := fun j => by
+    rw [hav j]; exact_mod_cast Int.cast_eq_zero (α := K)
+  -- the sum of squares is `4`, over `ℤ`
+  have hsumZ : (∑ j : Subtype P, a (j : κ) ^ 2) = 4 := by
+    have hK : (∑ j ∈ Finset.univ.filter P, ((a j : ℤ) : K) ^ 2) = ((4 : ℤ) : K) := by
+      rw [Finset.sum_congr rfl fun j _ => by rw [← hav j],
+        sum_sq_character_eq_cartanMatrix_of_isConj_inv hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil
+          hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hinv, hcart]
+      norm_num
+    rw [← Finset.sum_subtype (Finset.univ.filter P) hmem (fun j => a j ^ 2)]
+    have : (((∑ j ∈ Finset.univ.filter P, a j ^ 2 : ℤ)) : K) = ((4 : ℤ) : K) := by
+      push_cast
+      push_cast at hK
+      exact hK
+    exact_mod_cast this
+  -- the entry at `j₁` is `1`
+  have hi₀ : a j₁ ^ 2 = 1 := by
+    have : ((a j₁ : ℤ) : K) = ((1 : ℤ) : K) := by rw [← hav j₁, hj₁val]; norm_num
+    have ha1 : a j₁ = 1 := by exact_mod_cast this
+    rw [ha1]; norm_num
+  refine ⟨?_, fun j hj => ?_⟩
+  · have hcard := OddOrder.Algebra.card_filter_ne_zero_eq_four_of_sum_sq_eq_four
+      (a := fun i : Subtype P => a (i : κ)) hsumZ (i₀ := ⟨j₁, hj₁⟩) hi₀
+    have hequiv : {j : κ // P j ∧ (wedderburnRepresentation eG j).character t ≠ 0}
+        ≃ {i : Subtype P // a (i : κ) ≠ 0} :=
+      (Equiv.subtypeSubtypeEquivSubtypeInter P
+          (fun j => (wedderburnRepresentation eG j).character t ≠ 0)).symm.trans
+        (Equiv.subtypeEquivRight fun i => not_congr (hzero (i : κ)))
+    have key : (Finset.univ.filter (fun j : κ =>
+        P j ∧ (wedderburnRepresentation eG j).character t ≠ 0)).card = 4 :=
+      calc (Finset.univ.filter (fun j : κ =>
+              P j ∧ (wedderburnRepresentation eG j).character t ≠ 0)).card
+          = Fintype.card {j : κ // P j ∧ (wedderburnRepresentation eG j).character t ≠ 0} :=
+            (Fintype.card_subtype _).symm
+        _ = Fintype.card {i : Subtype P // a (i : κ) ≠ 0} := Fintype.card_congr hequiv
+        _ = (Finset.univ.filter (fun i : Subtype P => a (i : κ) ≠ 0)).card :=
+            Fintype.card_subtype _
+        _ = 4 := hcard
+    exact key
+  · rcases OddOrder.Algebra.eq_zero_or_one_or_neg_one_of_sum_sq_eq_four
+      (a := fun i : Subtype P => a (i : κ)) hsumZ (i₀ := ⟨j₁, hj₁⟩) hi₀ ⟨j, hj⟩ with h | h | h
+    · left; rw [hav j, h, Int.cast_zero]
+    · right; left; rw [hav j, h, Int.cast_one]
+    · right; right; rw [hav j, h]; norm_num
 
 /-! ### `χ(1) ≡ ε mod 4` -/
 

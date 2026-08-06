@@ -18746,3 +18746,25 @@ Sylow-2 `Q` は位数 8 なので `|S| ∣ 8` で、`|S| = 8` なら濃度一致
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.cartanMatrix_principalBlock_eq_card_sylow
+
+/-! 🎯 **issue 9506 段 283**: Navarro p.140 の「`y` での列」。
+
+原文の "analysis at `y`" は (7.2) と**同じ平方和 4** に達するが、`hconjall`
+(全ての `p`-元が `t` に共役) が使えない — 位数 4 の元は 2 つある `2`-元の類の片方でしか
+ないので、「どの `χ(y)` も 0 でない」が言えない。原文が代わりに使うのは
+「列の先頭成分が 1 (自明指標)」で、これだけで `±2` の成分が排除できる (4 + 1 > 4)。
+⟹ 結論は弱まり「列は 0 と**ちょうど 4 個**の `±1` から成る」。
+
+`Algebra/SumSquaresFour` に 0 を許す版を追加
+(`eq_zero_or_one_or_neg_one_of_sum_sq_eq_four` /
+`card_filter_ne_zero_eq_four_of_sum_sq_eq_four`)、
+`card_character_ne_zero_eq_four_of_isConj_inv` がそれを
+`sum_sq_character_eq_cartanMatrix_of_isConj_inv` (段 197-198) +
+`exists_intCast_character_of_pow_four_eq_one` (段 199) + `hcart` (段 282) に噛ませる。 -/
+
+#assert_only_allowed_axioms OddOrder.Algebra.eq_zero_or_one_or_neg_one_of_sum_sq_eq_four
+
+#assert_only_allowed_axioms OddOrder.Algebra.card_filter_ne_zero_eq_four_of_sum_sq_eq_four
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.card_character_ne_zero_eq_four_of_isConj_inv
