@@ -34,6 +34,8 @@ namespace OddOrder.GroupTheory
 
 variable {G : Type*} [Group G] [Finite G]
 
+set_option maxHeartbeats 3200000 in
+-- Five modular data and the whole (7.2)/(7.4)/(7.6) chain are instantiated in one term.
 /-- **Navarro pp. 139–146, the character-theoretic core** (issue 9506, `sorry`): when the
 quaternion Sylow `2`-subgroup is proper, its involution lies in a proper normal subgroup.
 
@@ -172,6 +174,29 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
         (isPGroup_zpowers_of_isPElement hv)
     exact isConj_of_sq_eq_one_quotient_centralizer hO T e hTG hzT hz2 hz1 hzC hyb1
       (by rw [pow_two]; exact hyb2) hv1 hvsq
+  -- Navarro (7.2): `|Irr(B_0(Q))| = 4` and `χ(ȳ) = ±1` there
+  haveI := hMnorm
+  have hquotM : IsPGroup 2 (↥(Subgroup.centralizer ({yb} : Set (↥C ⧸ Nz))) ⧸ M) :=
+    IsPGroup.of_card (n := nM) (by rw [← Subgroup.index_eq_card, hMindex])
+  have hweak := sum_character_mul_character_involution_eq_zero (𝒪 := 𝓞_ℂ_[2]) (nn := nnY)
+    (hp := Nat.prime_two) (hx := hybP) (hω := hωY) (e := eY) (eG := eQ)
+    (hπG := quotientPi_surjective πC hπC hlinC hNzP)
+    (hlinG := quotientPi_smul πC hπC hlinC hNzP) (hπ := hπY) (hlin := hlinY) (hkerJ := hkerJY)
+    (hnil := hnilY) (hnilG := hnilQ) (hω' := hω'Y) (hζ := hζ) (hζk := hζk) (hζK := hζK)
+    (hconv := hconvC) (hNp := hMp) (hquot := hquotM) (S := SylC) (hφ₀ := hφ₀) (ht1 := hyb1)
+    (hs := isPRegular_one Nat.prime_two)
+  obtain ⟨hcard4, hpm⟩ := card_blockOfIrr_principal_eq_four_and_character_involution
+    (𝒪 := 𝓞_ℂ_[2]) (nn := nnY)
+    (hp := Nat.prime_two) (hx := hybP) (hω := hωY) (e := eY) (eG := eQ)
+    (hπG := quotientPi_surjective πC hπC hlinC hNzP)
+    (hlinG := quotientPi_smul πC hπC hlinC hNzP) (hπ := hπY) (hlin := hlinY) (hkerJ := hkerJY)
+    (hnil := hnilY) (hnilG := hnilQ) (hω' := hω'Y) (hζ := hζ) (hζk := hζk) (hζK := hζK)
+    (hconv := hconvC) (hNp := hMp) (hquot := hquotM) (S := SylC) (hφ₀ := hφ₀)
+    (hy4 := by
+      have h2 : yb ^ 2 = 1 := by rw [pow_two]; exact hyb2
+      rw [show (4 : ℕ) = 2 * 2 from rfl, pow_mul, h2, one_pow])
+    (hinv := ⟨1, by simpa using (inv_eq_of_mul_eq_one_right hyb2).symm⟩)
+    (hconjall := hconjall) (ht1 := hyb1) (hweak := hweak) (hcart := hcart)
   sorry
 
 end OddOrder.GroupTheory
