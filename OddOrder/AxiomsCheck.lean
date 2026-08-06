@@ -19109,3 +19109,13 @@ well-defined 条件は `Φ_{q^k}(1) = q`
 #assert_only_allowed_axioms OddOrder.Algebra.cyclotomicToResidueField
 
 #assert_only_allowed_axioms OddOrder.Algebra.cyclotomicToResidueField_surjective
+
+/-! 🎯 **issue 9506 段 304**: `(I ⊔ J)^n ≤ I ⊔ J^n`
+(`Algebra.Ideal.sup_pow_le`, `Algebra/CyclotomicAdjoin`)。
+
+`n` 乗の展開で `J^n` 以外の項はすべて `I` の因子を持つ、という素朴な事実の帰納法。
+`J = ⟨ζ − 1⟩` かつ `J^φ ≤ I = 𝔪_A·B` (段 302) と合わせると
+`B` の極大イデアル `N ≤ I ⊔ J` について `N^φ ≤ I` が出る
+= 段 300 の `isAdicComplete_of_le_of_pow_le` が要求する共終性。 -/
+
+#assert_only_allowed_axioms OddOrder.Algebra.Ideal.sup_pow_le

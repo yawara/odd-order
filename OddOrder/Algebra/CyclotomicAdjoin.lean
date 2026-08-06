@@ -37,6 +37,7 @@ the hypothesis that the block idempotents are lifted along.
   `(ζ - 1)^{φ(p^k)} ∈ 𝔪_A·B`
 * `OddOrder.Algebra.cyclotomicToResidueField` — the reduction `B → k` at `ζ ↦ 1`, and its
   surjectivity
+* `OddOrder.Algebra.Ideal.sup_pow_le` — `(I ⊔ J)^n ≤ I ⊔ J^n`
 -/
 
 namespace OddOrder.Algebra
@@ -106,6 +107,24 @@ theorem sub_one_pow_mem_map_maximalIdeal {A : Type*} [CommRing A] [IsLocalRing A
   refine Ideal.sum_mem _ fun i _ => ?_
   rw [Algebra.smul_def]
   exact Ideal.mul_mem_right _ _ (Ideal.mem_map_of_mem _ (hcoeff i))
+
+/-! ### An ideal-theoretic step -/
+
+/-- **`(I ⊔ J)^n ≤ I ⊔ J^n`.**  In the expansion of the `n`-th power every term except `J^n`
+carries a factor from `I`.  Used with `J = ⟨ζ - 1⟩` and `J^{φ} ≤ I = 𝔪_A·B` to see that the
+maximal ideal of `B` is `𝔪_A·B`-adically cofinal. -/
+theorem Ideal.sup_pow_le {R : Type*} [CommRing R] (I J : Ideal R) :
+    ∀ n : ℕ, (I ⊔ J) ^ n ≤ I ⊔ J ^ n
+  | 0 => by simp
+  | (n + 1) => by
+    refine le_trans (le_of_eq (pow_succ _ _)) ?_
+    refine le_trans (Ideal.mul_mono_left (Ideal.sup_pow_le I J n)) ?_
+    rw [Ideal.sup_mul, Ideal.mul_sup, Ideal.mul_sup]
+    refine sup_le (sup_le ?_ ?_) (sup_le ?_ ?_)
+    · exact le_sup_of_le_left Ideal.mul_le_right
+    · exact le_sup_of_le_left Ideal.mul_le_right
+    · exact le_sup_of_le_left Ideal.mul_le_left
+    · exact le_sup_of_le_right (le_of_eq (pow_succ J n).symm)
 
 /-! ### The reduction `B → k` at `ζ ↦ 1` -/
 
