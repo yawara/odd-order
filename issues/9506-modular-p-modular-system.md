@@ -5105,3 +5105,27 @@ repo に `Z(𝒪[G])` の order 構造・`𝔪`-進完備性まわりの資産�
    **ブロックについてしか `f_A` を与えない**。(3.9) にはこの逆 (係数から作る) が要る。
 
 ⟹ 次の着手 = **(2) Dickson** (独立・新規・小さい)、次に **(1) の一般化**、最後に (3)。
+
+#### Dickson (`|G|_p ∣ Φ_φ(1)`) の Lean 実装計画 (2026-08-06、mathlib 補題まで確認済)
+
+**数学**: `P` を Sylow `p`-部分群とする。
+1. `u ∈ P`, `u ≠ 1` ⟹ `p ∣ o(u)` ⟹ `¬IsPRegular` ⟹ `Φ_φ(u) = 0`
+   (`projectiveIndecomposableCharacter_eq_zero`、**既存**)。
+   ⟹ `∑_{u ∈ P} Φ_φ(u) = Φ_φ(1)`。
+2. 各通常指標について `∑_{u∈P} χ_i(u) = |P| · n_i` (`n_i : ℕ`)。
+3. `Φ_φ = ∑_i d_{iφ} χ_i` (`d ∈ ℕ`) ⟹ `Φ_φ(1) = |P| · ∑_i d_{iφ} n_i` ⟹ `|P| = |G|_p ∣ Φ_φ(1)`。
+
+**2 の実装ルート (mathlib 補題を実測済)**:
+`e_P := (1/|P|)∑_{u∈P} u ∈ K[P]` は char 0 で冪等。表現 `ρ_i` を通した
+`ρ_i(e_P) : V_i →ₗ V_i` は冪等な射影で、
+`LinearMap.IsProj.trace : trace R M f = (finrank R p : R)`
+(`Mathlib/LinearAlgebra/Trace.lean:335`) と
+`IsIdempotentElem.isProj_range` から **`trace (ρ_i e_P) = (finrank (range) : K)`**
+= 自然数のキャスト。一方 `trace (ρ_i e_P) = (1/|P|)∑_{u∈P} χ_i(u)`。
+⟹ `∑_{u∈P}χ_i(u) = |P| · finrank(...)`。
+
+**見積り**: 新 leaf 1 本 (~150-250 行)。必要な部品 = 平均化冪等元の構成と
+`wedderburnRepresentation` を通した作用・trace の同一視。repo の
+`OddOrder/GroupTheory/RepresentationTheory/` に平均化冪等元 (Maschke 用) が既にある可能性が
+高いので、**着手前に `(1/|G|)∑ g` 型の構成を grep すること**
+(`averageIdempotent` / `Maschke` / `invariants` で検索)。
