@@ -3486,6 +3486,25 @@ Navarro の (3.8) の証明は 2 つの主張を同時に出すが、**我々が
 ⟹ **次の着手 = Navarro (3.6) → (3.8) の消滅半分**。新しい大物ではなく、
 既存の `Φ_φ` 機構の上に載る。
 
+### ✅ 段 317 完了 (2026-08-06) — Osima の消滅半分
+
+`Modular/OsimaBlockSupport.lean` (新 leaf、`OddOrder.lean` に配線済):
+
+* `sum_decompositionMatrix_mul_ordinaryCharacter_eq_zero` — `φ` ごとの内側の和が 0
+* `sum_ordinaryCharacter_one_mul_eq_zero_of_not_isPRegular` — **`∑_{χ ∈ Irr(B)} χ(1)·χ(g) = 0`**
+
+仕様どおり 4 部品だけで通った (フルビルド 5416 jobs green、AxiomsCheck 2 件 OK、
+実 sorry 1 件で非退行)。⚠ 実装上の注意 2 点:
+`Finset.filter` の decidability は `open scoped Classical in` が要る;
+`hnil` は statement に現れるが `include` に明示しないと proof 内で見えなくなる。
+
+#### ⟹ 次 = 段 318 (`hcoeff` の `p`-特異側)
+
+`mapRingHom_blockIdempotent_eq_sum` (`BlockIdempotentOrdinary.lean`、既存) が
+「ブロック冪等元の `K[G]` での像 = `∑_{χ ∈ Irr(B)} e_χ`」を与える。
+`e_χ` の `g` 係数は `(χ(1)/|G|)·χ(g⁻¹)` なので、段 317 を `g⁻¹` に適用すれば
+(⚠ `g` が `p`-特異 ⟺ `g⁻¹` が `p`-特異) `K` で係数 0 ⟹ `𝒪` で 0 (単射) ⟹ 還元でも 0。
+
 ### 段 317 の実装仕様 (2026-08-06 実測、4 部品すべて署名確認済)
 
 **Osima の消滅半分は Navarro より短く書ける** — char 0 の `𝒪` 上で**厳密に 0** になるので、
