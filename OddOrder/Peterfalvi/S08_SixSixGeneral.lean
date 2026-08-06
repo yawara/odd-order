@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S08_SixFiveGeneral
 import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
 import OddOrder.Peterfalvi.S08_CoherenceCorePart1.CoherentAdjoin
+import OddOrder.Peterfalvi.S08_CoherenceCorePart2
 
 /-!
 # Peterfalvi (6.6) for a general kernel: the `X`-set and its degree data

@@ -143,3 +143,61 @@ Q₈ Brauer–Suzuki が閉じて repo 全体が sorry 0 になり、残スコ�
 
 完了条件は本文のまま (`Xset_isCoherent_of_irreducible_X` の証明本体が一般版の呼び出し 1 本に
 なること + build green + AxiomsCheck OK + sorry 非退行)。
+
+---
+
+## ✅ CLOSED (2026-08-07) — step 4 完了
+
+### ⚠ 2026-07-27 の診断「§8 DAG の再層化が要る」は**過大評価だった**
+
+当時の記述は「一般 (6.2) leaf が Sibley の case-B 機構に依存している」「10 段の長い経路が残る」
+だったが、実測すると **`S08_SixTwoGeneral` が case-B から取っていた宣言は 2 本だけ**だった。
+判定方法 = **import 行を消して leaf build を打ち、`Unknown identifier` を読む**
+(BFS で経路を眺めるのでなく、コンパイラに列挙させる)。
+
+1. `exists_finEnum_general` (`S08_CaseBEnumeration:216`) — docstring 自身が
+   「**Pure formalization (no character theory)**」と書いている `Fintype.equivFin` の包装。
+   ⟹ `S08_CoherenceCorePart1` へ移設 (`six_five_c_arith` の前例と同型)。
+2. `S07.zSpan_subset_zSupportedSpan` / `coherentDegreeSqNormBound_of_not_coherentW_k_general` —
+   それぞれ `S08_GeneralAdjoinWeighted` / `S08_CoherenceCorePart2` に在り、どちらも
+   **case-B を閉包に持たない**上流 leaf。⟹ 直接 import すれば済む。
+
+⟹ ファイル手術は **import 3 行 + 25 行の移設**で完了。閉包実測:
+
+| leaf | 閉包 (before → after) | CaseB 系 |
+|---|---|---|
+| `S08_SixTwoGeneral` | — → **147** | **なし** |
+| `S08_SixSixGeneral` | 189 → **158** | **なし** |
+
+`S08_CoherenceBasic` から `S08_SixSixGeneral` を import しても循環しないことを **build で確認**
+(BFS だけでは不十分 = [[relayer-verify-with-build-not-bfs]])。
+
+### step 4 本体
+
+`S08_CoherenceBasic` に橋を 3 本追加:
+
+- **`SibleyDadeHypothesis.toInducedFamilyTauData`** — `hyp.tau`
+  (= `S07.dadeIntegralCharacterMap hyp.dade hyp.dade.fullDadeIsometryData`) から (5.2.b) の
+  τ 部 4 フィールドを構成。中身は §7 の Dade 補題 3 本
+  (`dadeIntegralCharacterMap_inner_eq_on_supported_span` /
+  `_mem_ZIrr_of_supported` / `_apply_one_eq_zero`) をそのまま填めるだけ
+  (`S13_SixTwoImageData.inducedFamilyImageData` と同じ形)。
+- **`mem_supportInSubgroup_sharpImage`** / **`one_notMem_supportInSubgroup_sharpImage`** —
+  `A₀ = H^#` に対する `hKsupp` / `h1A`。`sharpImage H = (H.map L.subtype) \ {1}` なので両方 1 行。
+
+これで `Xset_isCoherent_of_irreducible_X` の**証明本体が一般版の呼び出し 1 本**になった:
+
+```lean
+  letI : H.Normal := hyp.H_normal
+  rw [hyp.Xset_eq_inducedKernelFamily_sdiff Z] at hX hXne ⊢
+  exact xSet_isCoherent_of_irreducible_X (K := H) hyp.toInducedFamilyTauData hyp.card_L_odd …
+```
+
+**183 行 → 68 行** (うち docstring 44 行)。`XAdjoinStepInput` の構成は (6.6) 経路から消え、
+`S08_CoherenceBasic` に残る言及は docstring 2 箇所のみ (実測)。
+
+### 完了条件の充足
+
+- [x] `Xset_isCoherent_of_irreducible_X` の証明本体 = 一般版の呼び出し 1 本
+- [x] `S08_CoherenceCorePart2/SibleyBounds` の X-chain 次数簿記が (6.6) 経路から不要
+- [x] build green / `--strict` 警告ゼロ / AxiomsCheck OK / sorry 非退行 (0 のまま)

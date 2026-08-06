@@ -6,7 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition
 import OddOrder.Peterfalvi.S08_CoherenceCorePart1
 import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
-import OddOrder.Peterfalvi.S08_CaseBEnumeration
+import OddOrder.Peterfalvi.S08_GeneralAdjoinWeighted
 import OddOrder.Peterfalvi.S08_InducedKernelFamily
 
 /-!

@@ -9,7 +9,9 @@ import OddOrder.Peterfalvi.S08_CoherenceCorePart1.CoherentAdjoin
 /-!
 # Peterfalvi §8: degree arithmetic and the Sibley–Dade carrier
 
-Degree arithmetic, p-group recognition, and the Sibley–Dade carrier for the §8 coherence proof.
+Degree arithmetic, p-group recognition, and the Sibley–Dade carrier for the §8 coherence proof,
+plus the generic `Fin`-enumeration primitive for finite sets of class functions
+(`exists_finEnum_general`) that both the case-(B) machinery and the general (6.2) leaf consume.
 -/
 namespace OddOrder.Peterfalvi.S08
 open OddOrder.RepresentationTheory
@@ -779,6 +781,31 @@ theorem sq_dvd_natDegreeSquareSum_of_commonIndex
   ring
 
 
+
+/-- **General finite enumeration of a set of class functions** (the case-(B) analogue of
+`exists_finEnum_irreducible`, dropping the irreducibility requirement).
+
+For a finite set `S : Set (ClassFunction Γ ℂ)` produces an injective `Fin k`-indexed family whose
+range is `S` — **without** requiring its members to be irreducible.  This is the enumeration
+primitive for the case-(B) norm-weighted member family, whose coherent set `X ∪ Y` contains the
+*reducible* certain-type columns `μ_j = columnSum h46 χ₂` (so the `IrreducibleCharacter`-typed
+`exists_finEnum_irreducible` does not apply).  Pure formalization (no character theory): the `Fin`
+enumeration of a `Fintype` via `Fintype.equivFin`. -/
+theorem exists_finEnum_general {Γ : Type*} [Group Γ] {S : Set (ClassFunction Γ ℂ)}
+    (hSfin : S.Finite) :
+    ∃ (k : ℕ) (f : Fin k → ClassFunction Γ ℂ),
+      Function.Injective f ∧ Set.range f = S := by
+  classical
+  haveI : Fintype S := hSfin.fintype
+  refine ⟨Fintype.card S, fun j => ((Fintype.equivFin S).symm j : ClassFunction Γ ℂ), ?_, ?_⟩
+  · intro i j hij
+    exact (Fintype.equivFin S).symm.injective (Subtype.ext hij)
+  · ext φ
+    constructor
+    · rintro ⟨j, rfl⟩
+      exact ((Fintype.equivFin S).symm j).2
+    · intro hφ
+      exact ⟨Fintype.equivFin S ⟨φ, hφ⟩, by simp⟩
 
 end OddOrder.Peterfalvi.S08
 
