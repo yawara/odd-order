@@ -5309,3 +5309,43 @@ theorem exists_sum_character_subgroup (ρ : Representation F G V) (H : Subgroup 
 
 ⟹ 段 363 は (i)(ii) + 段 362 で書ける。実装順は **(ii) の補題を先に**
 (`Modular/DecompositionColumnNonzero.lean` 相当、または `DecompositionBlockDiagonal` に追記)。
+
+### ✅✅✅ 段 363 完了 (2026-08-06) — **Problem (3.4) = Navarro (3.10)**
+
+`BlockConnected.not_cartanMatrix_separated` (167 行):
+`IBr(B) = S ⊔ T` で `c_{φθ} = 0` (`φ∈S`,`θ∈T`) なら矛盾。
+鍵は **`D` が `ℕ` 値**ゆえ `c_{φθ} = ∑_i d_{iφ}d_{iθ} = 0` が各項 0 を意味すること。
+前提 = 段 362 ((3.9)) + `blockOfIrr_eq_of_decompositionMatrix_ne_zero` (既存) +
+段 363a `exists_decompositionMatrix_ne_zero` (`CartanInverse` に追加)。
+
+⚠ `blockOfIrr_eq_of_decompositionMatrix_ne_zero` の向きは
+**`Quotient.mk … φ = blockOfIrr … i`** (左辺が `⟦φ⟧`) — `rw` は `←` で使う。
+
+### ⏭ 段 364 の完全な設計 (2026-08-06) — (7.6) のブロック全単射
+
+新 leaf (`Modular/QuotientBlockBijection.lean` 等) に、`BlockConnected` +
+`QuotientPrincipalBlock` + `QuotientCartan` を import して置く。
+variable block は **`QuotientBasicSetCartan` と同型** (G 側の完全 datum + 商群 `Q = G⧸N` の
+通常分裂 `eQ` + `ϖ`/`ϖ'`)。
+
+**statement**:
+```
+theorem mk_eq_principalBlock_quotientPi_of_mem [Fact p.Prime] {μ : ι}
+    (hμ : Quotient.mk (blockSetoid π hπ hlin) μ = principalBlock π hπ hlin hnil) :
+    Quotient.mk (blockSetoid (quotientPi π hπ hlin hN).toRingHom …) μ
+      = principalBlock (quotientPi π hπ hlin hN).toRingHom … hnilQ
+```
+
+**proof**:
+1. `by_contra`。`S ν := ⟦ν⟧_Q = B₀(Q)`、`T ν := ⟦ν⟧_C = B₀(C) ∧ ¬ S ν` と置くと `T μ`。
+2. `φ ∈ S` の存在: `principalBlock(Q)` はブロック = `ι` の商類なので `Quotient.exists_rep`。
+3. **Cartan 分離**: `φ∈S`, `θ∈T` なら `⟦φ⟧_Q ≠ ⟦θ⟧_Q` ⟹
+   `cartanMatrix_eq_zero_of_centralCharacterAlg_ne` (Q 側 datum で) が `c_Q(φ,θ) = 0`、
+   `cartanMatrix_quotientPi` (`c_C = |N|·c_Q`、`QuotientCartan:167`、**全ペアで成立**) で
+   `c_C(φ,θ) = 0`。
+4. `hSB` = 段 352a `mk_eq_principalBlock_of_quotientPi` (易しい向き)、
+   `hTB` = `T` の定義、`hcover` = `S ν` で場合分け。
+5. 段 363 `not_cartanMatrix_separated` に食わせて `False`。
+
+⟹ これで `QuotientPrincipalBlock` の**難しい向き**が埋まり、`hd` が取れる。
+その後 `hT`/`hb0`-`hd0` → 5 群 datum の組み立て → `q8_exists_proper_normal`。
