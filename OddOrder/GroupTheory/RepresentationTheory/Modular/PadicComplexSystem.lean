@@ -41,6 +41,7 @@ residue class.
 ## Main results
 
 * `OddOrder.RepresentationTheory.Modular.instIsPModularSystemPadicComplexInt`
+* `OddOrder.RepresentationTheory.Modular.instIsAlgClosedFractionRingPadicComplexInt`
 * `OddOrder.RepresentationTheory.Modular.instIsAlgClosedResidueFieldPadicComplexInt`
 * `OddOrder.RepresentationTheory.Modular.exists_isPrimitiveRoot_padicComplexInt` — every `p'`-th
   root of unity is present, upstairs and downstairs
@@ -92,6 +93,15 @@ instance : CharP (ResidueField 𝓞_ℂ_[p]) p := by
 instance : HenselianLocalRing 𝓞_ℂ_[p] := henselianLocalRing_of_isAlgClosed ℂ_[p]
 
 instance instIsPModularSystemPadicComplexInt : IsPModularSystem p 𝓞_ℂ_[p] where
+
+/-- **`Frac 𝓞_ℂ_[p]` is algebraically closed** — it *is* `ℂ_[p]`, up to the canonical isomorphism.
+
+The block theory asks for the hypothesis in exactly this shape (`AlgClosedIdempotentLift`): an
+abstract splitting field `K` occurs only in hypotheses and would be a metavariable for instance
+resolution, so `FractionRing 𝒪` is written instead. -/
+instance instIsAlgClosedFractionRingPadicComplexInt : IsAlgClosed (FractionRing 𝓞_ℂ_[p]) :=
+  IsAlgClosed.of_ringEquiv ℂ_[p] _
+    (FractionRing.algEquiv (A := 𝓞_ℂ_[p]) ℂ_[p]).symm.toRingEquiv
 
 /-- **The residue field of `𝓞_ℂ_[p]` is algebraically closed** (it is `𝔽̄_p`).  This is what makes
 the modular side — Brauer characters, the block decomposition, defect groups — unconditional. -/
@@ -181,5 +191,32 @@ theorem exists_algEquiv_pi_matrix_padicComplex (G : Type*) [Group G] [Finite G] 
   haveI : NeZero (Nat.card G : ℂ_[p]) :=
     ⟨Nat.cast_ne_zero.mpr Nat.card_pos.ne'⟩
   exact IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed ℂ_[p] (MonoidAlgebra ℂ_[p] G)
+
+/-! ### The whole coefficient-ring hypothesis set is met
+
+`CLAUDE.md`'s doneness criterion is that the carrier be *constructed*, not posited.  These are the
+hypotheses the block chain carries on `𝒪` and `K`, checked all at once against `𝓞_ℂ_[p]` and
+`ℂ_[p]`, so that the build breaks if any of them stops being derivable.
+
+Note what is **not** here: `IsAdicComplete`.  It is false for `𝓞_ℂ_[p]` (`𝔪² = 𝔪`, the value group
+being divisible) and the chain no longer asks for it — idempotents are lifted through
+`AlgClosedIdempotentLift` instead (issue 9506, 段 311–314). -/
+
+section CarrierCheck
+
+example : IsDomain 𝓞_ℂ_[p] := inferInstance
+example : ValuationRing 𝓞_ℂ_[p] := inferInstance
+example : HenselianLocalRing 𝓞_ℂ_[p] := inferInstance
+example : IsPModularSystem p 𝓞_ℂ_[p] := inferInstance
+example : IsIntegrallyClosed 𝓞_ℂ_[p] := inferInstance
+example : IsAlgClosed (FractionRing 𝓞_ℂ_[p]) := inferInstance
+noncomputable example : Algebra 𝓞_ℂ_[p] ℂ_[p] := inferInstance
+example : IsFractionRing 𝓞_ℂ_[p] ℂ_[p] := inferInstance
+example : FaithfulSMul 𝓞_ℂ_[p] ℂ_[p] := inferInstance
+example : IsAlgClosed (ResidueField 𝓞_ℂ_[p]) := inferInstance
+example : CharP (ResidueField 𝓞_ℂ_[p]) p := inferInstance
+example : CharZero ℂ_[p] := inferInstance
+
+end CarrierCheck
 
 end OddOrder.RepresentationTheory.Modular

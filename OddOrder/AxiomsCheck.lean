@@ -19290,4 +19290,16 @@ instance 解決で metavariable になるため、全 consumer に explicit 引�
 
 📌 副産物: `BlockCornerLift.exists_corner_inverse_blockCharacter` と
 `InducedBlockWitness.exists_inducedBlock_witness` の完備性仮説は
-**元から使われていなかった** (削除して build green)。 -/
+**元から使われていなかった** (削除して build green)。
+
+✅✅ **段 315 = issue 9506 の係数環問題の決着**。`𝓞_ℂ_[p]` に
+`IsAlgClosed (FractionRing 𝓞_ℂ_[p])` の instance を付け
+(`ℂ_[p]` との標準同型で移送)、鎖が要求する**全 12 仮説を `𝓞_ℂ_[p]` / `ℂ_[p]` が
+満たすことを検証した** (`PadicComplexSystem` の `CarrierCheck` 節に恒久化 —
+どれか 1 つでも導出不能になれば build が壊れる)。
+
+⟹ **`K[G]` の分裂は `ℂ_[p]` が代数閉なので無償** (段 292)、
+**`k[G]` の分裂も剰余体が代数閉なので無償** (段 292)、
+**冪等元の持ち上げは完備性なしで通る** (段 311-314)。
+⟹ **Brauer の分裂体定理・Schur 指数・分岐拡大はいずれも不要になった。**
+段 301-308 の `𝕎(𝔽̄_p)[ζ_{p^a}]` は案 (a) の資産として残るが、もう critical path 上に無い。 -/
