@@ -4922,3 +4922,22 @@ repo には**片側だけ**在る:
 実作業は「`e_S = ∑_{χ∈S} e_χ` が `𝒪` 係数」= ブロックが `𝒪`-定義であること。
 `Modular/OrdinaryIdempotent` / `Modular/BlockIdempotentLift` / `Algebra/BlockIdempotent` の
 既存 API で組めるか要調査。**規模は 200 行超と見込む** (multi-session)。
+
+#### 段 352 の第 1 ブリック (次に書くもの、API 確認済 2026-08-06)
+
+連結性 (Problem (3.4)) 本体の前に、**代数レベルの橋 3 本**が要る。これは連結性が入った後の
+最終論証でも使うので、独立に landing してよい。API を実測したところ**短い**:
+
+* `centralCharacterAlg π i hπ hlin z = centralScalar π i (z : A)`
+  (`Algebra/CentralCharacter.lean:170`) で、`centralScalar` は
+  `π a i = Matrix.scalar (nn i) (centralScalar π i a)` (`scalar_centralScalar`) で特徴づけられる。
+* `quotientPi_mapDomain : quotientPi π hπ hlin hN (quotientMap x) = π x`
+  (`QuotientSplitting.lean:113`) — `quotientMap` = `MonoidAlgebra.mapDomain (QuotientGroup.mk)`。
+* ⟹ **`centralScalar π μ z = centralScalar (quotientPi π …) μ (quotientMap z)`** は
+  `scalar_centralScalar` を両側に当てて `Matrix.scalar` の単射性 (`Nonempty (nn i)`) で終わる。
+  `quotientMap z ∈ Z(k[Q])` は「全射準同型は中心を中心へ送る」(`quotientPi_surjective` でなく
+  `quotientMap` の全射性が要る)。
+* `aug_C = aug_Q ∘ quotientMap` は `augmentation` の `mapDomain` 不変性。
+
+⟹ **易しい向き `block_Q(μ) = B₀(Q) ⟹ block_C(μ) = B₀(C)`** はこれで出る (30-60 行見込み)。
+難しい向きだけが Problem (3.4) 待ち。
