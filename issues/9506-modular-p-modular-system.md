@@ -4725,3 +4725,33 @@ basic set を 3 元にするため。𝓑 の外で `η` が消える (`principa
 分と untruncate な supplier の差を埋める) と (ii) 5 群 (`G`/`C_G(t)`/`C_G(t)/⟨t⟩`/
 `C_{C_G(t)/⟨t⟩}(ȳ)`/`C_G(y)`) の datum を `exists_datum_padicComplex` で obtain して
 全部を配線する組み立てだけ**。数学的な未知は無い。
+
+### ⏭ 段 348 の着手点 (2026-08-06 確定) — **`a` 列は truncate せず `D^y_0` そのものに取る**
+
+段 347 の後に F の配線を詰めていて、**truncation の落とし穴と、その回避**が確定した。記録:
+
+* **落とし穴**: `a` を「`χ(y)` を `Irr(B_0)` へ truncate した列」と読むと、
+  `haa : ∑_k a_k² = 4` は `∑_{χ∈B_0} χ(y)² = c_{φ_0φ_0} = 4` から出るが
+  (`Irr(G)` 全体だと第二直交関係で `|C_G(y)|` になり **4 でない**)、
+  `hab : ∑_k a_k b_k = 0` の supplier
+  (`sum_character_mul_generalizedDecompositionNumber_eq_zero`) は
+  **`Irr(G)` 全体の和**を返す。差を埋めるには「basic set 列 `b` は `B_0(G)` の外で 0」
+  = (7.5)(a) の具体形が要り、それには
+  **`block_Q(μ) = B_0(Q) ⟹ block_C(μ) = B_0(C)`**(`quotientPi` の下での主ブロック対応)
+  が要る — repo に無く、`principalBlock = blockOfCentralCharacter … aug` から作る新規仕事になる。
+* **回避 (採用)**: `a_k := d^y_{χ_k φ_0}` (**一般化分解数の列そのもの**) に取る。
+  * `B_0` の中では `d^y_{χφ_0} = χ(y)`
+    (`character_involution_eq_generalizedDecompositionNumber`)、
+  * `B_0` の外では **0**
+    (`generalizedDecompositionNumber_principalBlock_eq_zero_of_blockOfIrr_ne`、**既存**)。
+  * ⟹ `∑_{Irr(G)} a_k² = ∑_{B_0} χ(y)² = 4` が **truncate 無しで**出る。
+  * `hga`/`hab`/`hac`/`had` も `Irr(G)` 全体の supplier がそのまま効く。
+  * 整数性も 2 場合分けで出る (`B_0` 内は `χ(y) ∈ {0,±1}` =
+    `card_character_ne_zero_eq_four_of_isConj_inv`、外は 0)。
+
+⟹ **主ブロック対応 (`quotientPi`) の新規形式化は不要になった**。`b`,`c`,`d` も truncate せず
+`Irr(G)` 全体で取る (段 347・段 333b/c がそう出している)。
+
+**段 348 = `Modular/ColumnAtOrderFour.lean`**: 上の 5 点 (`a` の整数性 / `haa` /
+`hga` / `ha0` / `B_0` 外での消滅) を "analysis at `y`" の 1 leaf にまとめる。
+その後 段 349 で `hab`/`hac`/`had` (= (7.5)(d) 経由)、段 350 で全体の組み立て。
