@@ -111,4 +111,40 @@ theorem exists_card_sylow_mul_sum_ordinaryCharacter_one_mul [Fact p.Prime] (P : 
         rw [Finset.mul_sum]
         exact Finset.sum_congr rfl fun φ _ => by rw [hinner φ]; ring
 
+set_option linter.unusedFintypeInType false in
+open scoped Classical in
+include hp hω hω' hkerJ e in
+/-- **Osima (3.8), both halves**: for `A` closed under linking, `|G|` divides
+`∑_{i ∈ A} χ_i(1) χ_i(x)` in `𝒪`, for *every* `x`.
+
+At `p`-singular `x` the sum is zero; at `p`-regular `x` it is `|P|` times an element of `𝒪`, and
+`|G| = |P| · |G : P|` with `|G : P|` prime to `p`, hence a unit of the local ring `𝒪`.
+
+This is exactly the integrality of the coefficient `|G|⁻¹ ∑_{i ∈ A} χ_i(1) χ_i(x⁻¹)` of
+`f_A = ∑_{χ ∈ A} e_χ`, i.e. Navarro's `f_A ∈ Z(𝒪G)`. -/
+theorem exists_card_mul_sum_ordinaryCharacter_one_mul [Fact p.Prime] {Q : ι' → Prop}
+    (hQ : ∀ (i j : ι') (ψ : ι), Q i →
+      decompositionMatrix hp hω hω' hπ hlin hkerJ e i ψ ≠ 0 →
+      decompositionMatrix hp hω hω' hπ hlin hkerJ e j ψ ≠ 0 → Q j)
+    (x : G) :
+    ∃ z : 𝒪, (∑ i ∈ Finset.univ.filter Q,
+        ordinaryCharacter (𝒪 := 𝒪) e i 1 * ordinaryCharacter (𝒪 := 𝒪) e i x)
+      = (Nat.card G : 𝒪) * z := by
+  classical
+  by_cases hx : IsPRegular p x
+  · obtain ⟨P⟩ : Nonempty (Sylow p G) := inferInstance
+    obtain ⟨z, hz⟩ := exists_card_sylow_mul_sum_ordinaryCharacter_one_mul hp hω hω' hπ hlin hkerJ
+      e P hQ hx
+    obtain ⟨u, hu⟩ := isUnit_natCast_of_not_dvd (p := p) (𝒪 := 𝒪) P.not_dvd_index
+    refine ⟨(↑u⁻¹ : 𝒪) * z, ?_⟩
+    have hlag : (Nat.card G : 𝒪)
+        = (Nat.card ↥(P : Subgroup G) : 𝒪) * (((P : Subgroup G).index : ℕ) : 𝒪) := by
+      rw [← Nat.cast_mul, Subgroup.card_mul_index]
+    rw [hz, hlag, ← hu, mul_assoc,
+      show ((u : 𝒪) * ((↑u⁻¹ : 𝒪) * z)) = ((u : 𝒪) * (↑u⁻¹ : 𝒪)) * z from by ring,
+      Units.mul_inv, one_mul]
+  · refine ⟨0, ?_⟩
+    rw [mul_zero]
+    exact sum_ordinaryCharacter_one_mul_eq_zero_of_linkedClosed hp hω hω' hπ hlin hkerJ e hQ hx
+
 end OddOrder.RepresentationTheory.Modular
