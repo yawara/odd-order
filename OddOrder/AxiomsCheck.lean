@@ -569,6 +569,7 @@ import OddOrder.GroupTheory.GlaubermanZJ
 import OddOrder.GroupTheory.SolvableTwoTransitive
 import OddOrder.Algebra.AlgClosedIdempotentLift
 import OddOrder.Algebra.CenterGroupAlgebraAlgClosed
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OsimaBlockSupport
 import OddOrder.Peterfalvi.Appendices.FeitSibleyMain
 
 /-!
@@ -19303,3 +19304,25 @@ instance 解決で metavariable になるため、全 consumer に explicit 引�
 **冪等元の持ち上げは完備性なしで通る** (段 311-314)。
 ⟹ **Brauer の分裂体定理・Schur 指数・分岐拡大はいずれも不要になった。**
 段 301-308 の `𝕎(𝔽̄_p)[ζ_{p^a}]` は案 (a) の資産として残るが、もう critical path 上に無い。 -/
+
+/-! 🎯 **issue 9506 段 317**: Osima の定理の消滅半分 (`OsimaBlockSupport`)。
+
+`g` が `p`-特異なら `∑_{χ ∈ Irr(B)} χ(1)·χ(g) = 0` — Navarro (3.8) Corollary (Osima)。
+
+**なぜ要るか**: Külshammer 経由の第三主定理の逆 (`hconv`) は `hcoeff` を
+**全ての `g`** について要求するが (`brauerTrunc_eq_of_coeff_eq` が全係数の一致を見る)、
+Külshammer の公式が担ぐ `hweak` は**実質「`g` が `p`-正則」と同値**
+((5.11) の非共役条件が `¬ IsConj x (pPart p g)` なので、`p`-特異だと Sylow の元で破れる)。
+⟹ `p`-特異側は別ルートが要り、それがこれ。
+
+**Navarro より短い**: 原典は整数性と消滅を同時に出すので `𝔪` を経由し Dickson の定理を使うが、
+**我々が要るのは消滅だけ**で、標数 0 の `𝒪` 上では**厳密に 0** になる。
+⟹ (3.6) と (3.8) が 1 つの計算に畳める:
+`χ(1)` を `D` の行で展開 → 和を入れ替え → 内側 `∑_{i ∈ B} d_{iφ}·χ_i(g)` が `φ` ごとに 0
+(block が一致すれば `B` の外の項が消えて `Φ_φ(g) = 0` そのもの、しなければ各項が 0)。
+`D` の block 対角性 (`blockOfIrr_eq_of_decompositionMatrix_ne_zero`) が両方の場合を担う。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_decompositionMatrix_mul_ordinaryCharacter_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_ordinaryCharacter_one_mul_eq_zero_of_not_isPRegular
