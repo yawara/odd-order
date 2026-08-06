@@ -321,6 +321,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerFromOrdinary
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
 import OddOrder.Algebra.SumSquaresFour
+import OddOrder.Algebra.ThreeNormColumn
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockBasicSet
 import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
@@ -18763,15 +18764,15 @@ Sylow-2 `Q` は位数 8 なので `|S| ∣ 8` で、`|S| = 8` なら濃度一致
 ⟹ 結論は弱まり「列は 0 と**ちょうど 4 個**の `±1` から成る」。
 
 `Algebra/SumSquaresFour` に 0 を許す版を追加
-(`eq_zero_or_one_or_neg_one_of_sum_sq_eq_four` /
-`card_filter_ne_zero_eq_four_of_sum_sq_eq_four`)、
+(`eq_zero_or_one_or_neg_one_of_sum_sq_le_four` /
+`card_filter_ne_zero_of_sum_sq_le_four`; 総和 `≤ 4` に一般化済 — 段 324 が `3` で使う)、
 `card_character_ne_zero_eq_four_of_isConj_inv` がそれを
 `sum_sq_character_eq_cartanMatrix_of_isConj_inv` (段 197-198) +
 `exists_intCast_character_of_pow_four_eq_one` (段 199) + `hcart` (段 282) に噛ませる。 -/
 
-#assert_only_allowed_axioms OddOrder.Algebra.eq_zero_or_one_or_neg_one_of_sum_sq_eq_four
+#assert_only_allowed_axioms OddOrder.Algebra.eq_zero_or_one_or_neg_one_of_sum_sq_le_four
 
-#assert_only_allowed_axioms OddOrder.Algebra.card_filter_ne_zero_eq_four_of_sum_sq_eq_four
+#assert_only_allowed_axioms OddOrder.Algebra.card_filter_ne_zero_of_sum_sq_le_four
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.card_character_ne_zero_eq_four_of_isConj_inv
@@ -19547,3 +19548,19 @@ BS の鎖が担ぐのは `centralizerOf x = C_G(x)`。両者は部分群とし�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_mul_basicDecompositionNumber_left_eq_zero
+
+/-! 🎯 **issue 9506 段 324**: 原文 p.142 の整数列 — 非零成分は `{1,1,−1}`。
+
+`Algebra.exists_pair_of_sum_sq_eq_three` (`ThreeNormColumn`)。ノルム 3 の整数列で
+`i₀` 成分が `1`、次数の列 (すべて `≥ 1`、`i₀` で `= 1`) と直交するものは、
+**非零成分がちょうど 3 個で `1, 1, −1`**、しかも `deg j = 1 + deg i`。
+
+原文の論法をそのまま: ノルム 3 + 既知の `±1` 成分 ⟹ 全成分が `0, ±1` で非零はちょうど 3 個
+(`SumSquaresFour`、**総和 `≤ 4` に一般化**して再利用)。符号は直交から決まる —
+両方 `+1` なら `1 + deg i + deg j = 0` で正数の和が 0、
+両方 `−1` なら `deg i + deg j = 1` で `≥ 1` が 2 つ、どちらも不能。
+
+⚠ **表現論を一切含まない純粋な整数の補題として切り出した** — p.142 の中核はこれだけで、
+残りは列 `u_j` の定義 (`2u_1 = D^y_0 + D^t_0 − D^t_1 − D^t_2` 等) と内積の計算。 -/
+
+#assert_only_allowed_axioms OddOrder.Algebra.exists_pair_of_sum_sq_eq_three

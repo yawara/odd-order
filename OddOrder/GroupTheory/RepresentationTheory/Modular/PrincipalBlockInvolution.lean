@@ -419,7 +419,7 @@ nonzero, and each of those is `±1`.
 (`exists_intCast_character_of_pow_four_eq_one`, `y⁴ = 1` and `y` real),
 and one of them is `1` — the trivial character, which lies in `Irr(B_0)`
 (`exists_blockOfIrr_eq_principalBlock_character_eq_one`);
-`OddOrder.Algebra.card_filter_ne_zero_eq_four_of_sum_sq_eq_four` closes it. -/
+`OddOrder.Algebra.card_filter_ne_zero_of_sum_sq_le_four` closes it. -/
 theorem card_character_ne_zero_eq_four_of_isConj_inv
     (hy4 : t ^ 4 = 1) (hinv : ∃ c : G, c * t * c⁻¹ = t⁻¹)
     (hcart : cartanMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e φ₀ φ₀ = 4) :
@@ -472,8 +472,8 @@ theorem card_character_ne_zero_eq_four_of_isConj_inv
     have ha1 : a j₁ = 1 := by exact_mod_cast this
     rw [ha1]; norm_num
   refine ⟨?_, fun j hj => ?_⟩
-  · have hcard := OddOrder.Algebra.card_filter_ne_zero_eq_four_of_sum_sq_eq_four
-      (a := fun i : Subtype P => a (i : κ)) hsumZ (i₀ := ⟨j₁, hj₁⟩) hi₀
+  · have hcard := OddOrder.Algebra.card_filter_ne_zero_of_sum_sq_le_four (n := 4) (by norm_num)
+      (a := fun i : Subtype P => a (i : κ)) (by exact_mod_cast hsumZ) (i₀ := ⟨j₁, hj₁⟩) hi₀
     have hequiv : {j : κ // P j ∧ (wedderburnRepresentation eG j).character t ≠ 0}
         ≃ {i : Subtype P // a (i : κ) ≠ 0} :=
       (Equiv.subtypeSubtypeEquivSubtypeInter P
@@ -490,7 +490,7 @@ theorem card_character_ne_zero_eq_four_of_isConj_inv
             Fintype.card_subtype _
         _ = 4 := hcard
     exact key
-  · rcases OddOrder.Algebra.eq_zero_or_one_or_neg_one_of_sum_sq_eq_four
+  · rcases OddOrder.Algebra.eq_zero_or_one_or_neg_one_of_sum_sq_le_four (n := 4) le_rfl
       (a := fun i : Subtype P => a (i : κ)) hsumZ (i₀ := ⟨j₁, hj₁⟩) hi₀ ⟨j, hj⟩ with h | h | h
     · left; rw [hav j, h, Int.cast_zero]
     · right; left; rw [hav j, h, Int.cast_one]
