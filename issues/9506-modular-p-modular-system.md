@@ -3354,10 +3354,22 @@ repo に補題が見当たらない) と (b) `hne` の discharge。**ここだ�
 - `centralCharacterAlg π φ ≠ centralCharacterAlg π μ` ⟺ `Quotient.mk φ ≠ Quotient.mk μ`
   (`blockSetoid` の定義)
 
-⟹ **残る 1 点 = 「自明な `𝒪`-格子表現 `σ` (trace ≡ 1) のブロックは主ブロック」**。
-これは段 285 (`blockOfIrr_eq_principalBlock_of_trivial`) の **`𝒪`-格子側の対応物**で、
-証明も同じ (中心指標を類和基底上で比較)。これが出れば `hvanishH` → `hcoeff` → `hconv` が
-最後まで通る。
+~~⟹ **残る 1 点 = 「自明な `𝒪`-格子表現 `σ` (trace ≡ 1) のブロックは主ブロック」**~~
+
+✅ **完了済 (2026-08-06 実測で確認)**。`𝒪`-格子側の対応物は
+`PRegularSumVanishing.mk_eq_principalBlock_of_decompositionNumber_trivial` として在り、
+**`hvanishH` そのものも
+`PRegularSumVanishing.blockCharacter_pRegularSum_eq_zero_of_ne_principalBlock`
+(= Navarro (3.32) を任意の `B ≠ B₀` で) として証明済**。
+⟹ 上の「残り 1 点」の記述は**陳腐化していた**。
+
+**⟹ 真の frontier = `hcoeff` → `hconv`**。`hconv` は
+`PrincipalBlockInvolution.lean:84` の未充足仮説
+(`∀ b : Block π hπ hlin, … → b = principalBlock`) で、供給元は
+`KulshammerThirdMain.coeff_principalBlock_eq_centralizer_intermediate`
+(`.lean:394`、仮説が多い = 上表の 4 本 + 両側 Sylow + `𝒪` 側への持ち上げ)。
+⚠ 着手時に各仮説の supplier を**実測で**確認すること (上表も 2026-08-06 の
+carrier 危機より前の記述)。
 
 - "Analysis at t" (p.141-142): `C_G(t)/⟨t⟩` が Klein four Sylow-2 ⟹ (7.4) の basic set、
   (7.6) で `C_G(t)` へ持ち上げ、(7.5) で `d^t` の列。**整数性は issue 9508 で完済**
