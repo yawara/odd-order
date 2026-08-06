@@ -3018,6 +3018,31 @@ mathlib では `IsAdicComplete.henselianRing` **のみ** (実測: mathlib 内で
 
 ⟹ **新しい数学はほぼ無く、mathlib の `AdjoinRoot` + `cyclotomic` API の積み上げ**。
 
+✅ **段 301 完了**: `Algebra/CyclotomicAdjoin.lean` (`cyclotomicPowerBasis` /
+`isAdicComplete_cyclotomicAdjoin` / `cyclotomic_prime_pow_charP`)。
+
+#### `B` の局所性 — 証明の段取り (2026-08-06 に完全に詰めた)
+
+商環の同型 `B ⧸ 𝔪_A·B ≅ k[X]/((X-1)^φ)` を作らずに済む道が在る。
+`ζ := AdjoinRoot.root Φ`、`φ := q^k - q^{k-1}` として:
+
+1. **`k` への環準同型 `f : B →+* k`** を `AdjoinRoot.lift (residue ∘ algebraMap A k) 1 ?_` で作る。
+   well-defined 条件は `Φ.eval₂ _ 1 = 0`、すなわち `residue (Φ.eval 1) = 0`。
+   🎯 mathlib `Polynomial.eval_one_cyclotomic_prime_pow : eval 1 (cyclotomic (p^k) R) = p`
+   と `CharP k q` で出る。`f` は `A → B → k` が全射なので全射。
+2. **`(ζ - 1)^φ ∈ 𝔪_A·B`**: 段 301 の `cyclotomic_prime_pow_charP` より
+   `Φ - (X-1)^φ` の係数は全て `𝔪_A` に入る。`Φ(ζ) = 0` なので
+   `(ζ-1)^φ = (ζ-1)^φ - Φ(ζ) ∈ 𝔪_A·B`。**商の同型は不要**。
+3. **`N := 𝔪_A·B + span{ζ-1}` は極大**: `A → B → B/N` は全射
+   (`B` は `ζ` で生成され `ζ ≡ 1 mod N`)、その核は `𝔪_A` を含む真のイデアル
+   (`1 ∉ N` は `N ⊆ ker f` と `f 1 = 1 ≠ 0` から) ⟹ 核 `= 𝔪_A` ⟹ `B/N ≅ k`。
+4. **`N^φ ⊆ 𝔪_A·B`**: 二項展開で `i < φ` の項は `𝔪_A·B` の因子を持ち、`i = φ` の項は 2 で処理。
+5. ⟹ 段 300 `isAdicComplete_of_le_of_pow_le` で **`IsAdicComplete N B`**、
+   さらに mathlib `AdicCompletion.isLocalRing_of_isAdicComplete_maximal`
+   (`m` 極大 + `m`-進完備 ⟹ 局所環) で **`IsLocalRing B` かつ `maximalIdeal B = N`**。
+
+⟹ 残りは `ResidueField B ≅ k` (3 の `B/N ≅ k` そのもの) と `Frac(B)` の分裂。
+
 ### `hconv` は gap ではなく assembly (2026-08-06 実測)
 
 `hconv` (= Brauer 第 3 主定理の逆向き) の**本体は既に在る**:
