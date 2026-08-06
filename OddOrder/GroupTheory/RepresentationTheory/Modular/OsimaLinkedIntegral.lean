@@ -179,4 +179,28 @@ theorem exists_coeff_sum_ordinaryIdempotent [Fact p.Prime] {Q : ι' → Prop}
   rw [Finset.sum_congr rfl fun i _ => hterm i, ← Finset.mul_sum, ← map_sum, hz, map_mul,
     map_natCast, invOf_mul_cancel_left]
 
+set_option linter.unusedFintypeInType false in
+open scoped Classical in
+include hp hω hω' hkerJ in
+/-- **Navarro (3.8): `f_A ∈ 𝒪G`.**  For `A` closed under linking, the idempotent
+`f_A = ∑_{χ ∈ A} e_χ` of `KG` is the image of an element of `𝒪G`.
+
+Its coefficients are integral by `exists_coeff_sum_ordinaryIdempotent`; assembling them into an
+element of `𝒪G` and comparing coefficients gives the statement. -/
+theorem exists_mapRingHom_eq_sum_ordinaryIdempotent [Fact p.Prime] {Q : ι' → Prop}
+    (hQ : ∀ (i j : ι') (ψ : ι), Q i →
+      decompositionMatrix hp hω hω' hπ hlin hkerJ e i ψ ≠ 0 →
+      decompositionMatrix hp hω hω' hπ hlin hkerJ e j ψ ≠ 0 → Q j) :
+    ∃ f : MonoidAlgebra 𝒪 G,
+      MonoidAlgebra.mapRingHom G (algebraMap 𝒪 K) f
+        = ∑ i ∈ Finset.univ.filter Q, ordinaryIdempotent e i := by
+  classical
+  choose z hz using fun g : G =>
+    exists_coeff_sum_ordinaryIdempotent hp hω hω' hπ hlin hkerJ e hQ g
+  refine ⟨MonoidAlgebra.ofCoeff (Finsupp.equivFunOnFinite.symm z), ?_⟩
+  refine MonoidAlgebra.coeff_injective ?_
+  ext g
+  rw [MonoidAlgebra.coeff_mapRingHom]
+  simpa using (hz g).symm
+
 end OddOrder.RepresentationTheory.Modular
