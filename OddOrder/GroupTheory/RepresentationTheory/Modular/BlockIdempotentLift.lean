@@ -55,4 +55,23 @@ theorem exists_isIdempotentElem_blockCharacterPi_eq_single
   rw [show OddOrder.centerReduce (residue 𝒪) f = e from Subtype.ext hfr]
   exact hec
 
+/-- **The whole family `(f_B)_B` of block idempotents in `Z(𝒪G)`.**  Choosing one for each block
+packages the three hypotheses that Külshammer's formula and the third main theorem carry on the
+`𝒪` side: the family is idempotent (`hidem`), its reduction is the named family of `Z(kG)`
+(`hf`, which is `rfl` for `centerReduce`), and the block character picks out the block (`hB`). -/
+theorem exists_blockIdempotentFamily
+    (hnil : ∀ z : Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) G),
+      blockCharacterPi π hπ hlin z = 0 → IsNilpotent z)
+    [DecidableEq (Block π hπ hlin)] :
+    ∃ (F : Block π hπ hlin → ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)))
+      (F' : Block π hπ hlin →
+        ↥(Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) G))),
+      (∀ B, IsIdempotentElem (F B)) ∧
+      (∀ B, MonoidAlgebra.mapRingHom G (residue 𝒪) ((F B : MonoidAlgebra 𝒪 G))
+        = ((F' B : MonoidAlgebra (ResidueField 𝒪) G))) ∧
+      (∀ B, blockCharacterPi π hπ hlin (F' B) = Pi.single B 1) := by
+  classical
+  choose F hFi hFc using exists_isIdempotentElem_blockCharacterPi_eq_single π hπ hlin hnil
+  exact ⟨F, fun B => OddOrder.centerReduce (residue 𝒪) (F B), hFi, fun _ => rfl, hFc⟩
+
 end OddOrder.RepresentationTheory.Modular

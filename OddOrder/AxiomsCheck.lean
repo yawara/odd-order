@@ -18966,3 +18966,14 @@ Cartan は `(4)` = `|C|₂`。
 旧 `exists_surjective_blocks_card_eq` はその射影に置換 (証明の重複を作らない)。 -/
 
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.Modular.exists_splitting_datum
+
+/-! 🎯 **issue 9506 段 294**: ブロック冪等元の族の束
+(`exists_blockIdempotentFamily`, `Modular/BlockIdempotentLift`)。
+
+Külshammer の公式と第 3 主定理が `𝒪` 側で持ち回る 3 仮説
+`hidem` (冪等) / `hf` (還元が `Z(kG)` の族) / `hB` (ブロック指標が `Pi.single`) を、
+既存の 1 ブロック版 `exists_isIdempotentElem_blockCharacterPi_eq_single` から
+`choose` で族にまとめたもの。`hf` は `centerReduce` の定義から `rfl`。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_blockIdempotentFamily

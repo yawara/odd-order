@@ -2913,16 +2913,26 @@ BS の鎖が長らく**仮説として持ち回っていた**もののうち、s
 | `hidemH` / `hfH` | `BlockIdempotentLift.exists_isIdempotentElem_blockCharacterPi_eq_single` | 証明済 |
 | `hBH` | `MatrixModule.exists_completeOrthogonalIdempotents_block` | 証明済 |
 | `hweakH` | **Navarro (5.11)** `BlockPartVanishing.sum_character_blockOfIrr_eq_zero` | 証明済 |
-| `hvanishH` | `PRegularSumVanishing.blockCharacter_blockOfIrr_pRegularSum_eq_zero` | 証明済 |
+| `hvanishH` | `PRegularSumVanishing.blockCharacter_blockOfIrr_pRegularSum_eq_zero` | ⚠ **形が違う** |
 
 ⚠ **循環は無い**: (5.11) の仮説は「`G` と `C_G(g_p)` の modular datum + 原始根 + `ζ` 三点」だけで、
 `hconv` を要求しない。`ζ` 三点は段 292、datum は段 293 で supplier が揃ったので、
 (5.11) は無条件に使える。
 
-⟹ **`hconv` に至る道は全部舗装済み**。残っているのは
-「index/instance を合わせて `obtain` して渡す」だけの配管で、新しい数学は 1 つも無い。
-`coeff_principalBlock_eq_centralizer_intermediate` の仮説が多いのは、それらを
-呼び出し側で `obtain` する設計になっているため。
+⚠⚠ **上の表の `hvanishH` は訂正 (2026-08-06、実読)**。
+`blockCharacter_blockOfIrr_pRegularSum_eq_zero` は
+(a) ブロックが `blockOfIrr e … i` の形であること、(b) 追加の分離仮説 `hne`
+(`i` の分解行列の台と `σ` の分解数の台で中心指標が異なる) を要求する。
+`hvanishH` が要るのは**任意の `B ≠ B₀`** についてなので、そのままでは使えない。
+⟹ 埋めるべきもの: (a) **`blockOfIrr` の全射性** (「どのブロックもある `χ` のブロック」;
+repo に補題が見当たらない) と (b) `hne` の discharge。**ここだけは新しい補題が要る**。
+
+✅ **段 294 完了**: `hidemH`/`hf`/`hBH` の束
+`BlockIdempotentLift.exists_blockIdempotentFamily` を新設 (1 ブロック版から `choose`;
+`hf` は `centerReduce` の定義から `rfl`)。
+
+⟹ **次の着手点 = `blockOfIrr` の全射性**。これが出れば `hvanishH` が任意の `B` で言え、
+`hconv` の配管が最後まで通る。
 
 - "Analysis at t" (p.141-142): `C_G(t)/⟨t⟩` が Klein four Sylow-2 ⟹ (7.4) の basic set、
   (7.6) で `C_G(t)` へ持ち上げ、(7.5) で `d^t` の列。**整数性は issue 9508 で完済**
