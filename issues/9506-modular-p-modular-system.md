@@ -4755,3 +4755,43 @@ basic set を 3 元にするため。𝓑 の外で `η` が消える (`principa
 **段 348 = `Modular/ColumnAtOrderFour.lean`**: 上の 5 点 (`a` の整数性 / `haa` /
 `hga` / `ha0` / `B_0` 外での消滅) を "analysis at `y`" の 1 leaf にまとめる。
 その後 段 349 で `hab`/`hac`/`had` (= (7.5)(d) 経由)、段 350 で全体の組み立て。
+
+### ✅ 段 348 完了 (2026-08-06) — "analysis at `y`" の列が 1 本の定理に (原文 p.140)
+
+`PrincipalBlockInvolution.exists_intColumn_generalizedDecompositionNumber_principalBlock`
+(既存 file に +90 行、957 行)。位数 4 の `y` について 4 点を同時に:
+
+| 出力 | 段 340 の仮説 |
+|---|---|
+| 列 `d^y_{χφ₀}` (`Irr(G)` 全体) が整数列 | `a` の存在 |
+| `(D^y_0, D^y_0) = 4` (原文 (1)) | `haa` |
+| `(χ(1), D^y_0) = 0` (原文 (2)) | `hga` |
+| 自明指標での値が `1` | `ha0` |
+
+段 348 の設計 (truncate しない) が効いて、`Irr(G)` 全体の和と `Irr(B₀)` の和が
+自動的に一致する (`generalizedDecompositionNumber_principalBlock_eq_zero_of_blockOfIrr_ne`)。
+
+⚠ **`blockOfIrr_eq_principalBlock_of_trivial` は「指標が 1」でなく「表現が自明」
+(`ρ g w = w`) を要求する**。自明指標の index は
+`exists_blockOfIrr_eq_principalBlock_character_eq_one` が `blockOfIrr = B₀` 込みで返すので、
+最後の主張はその両方を仮説に取る形にした。
+
+⚠ **引数順は `include` の並びでなく `variable` の宣言順**。`PrincipalBlockInvolution` では
+`hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀`
+(`hω'` は `hnilG` の**後**)。間違えると「Prop が AlgEquiv を期待されている」+ 後続の
+`whnf` heartbeat 超過という読めない 2 連エラーになる。
+
+### ⏭ 段 349 以降 (2026-08-06 時点の残り)
+
+1. **`hab`/`hac`/`had`** = (4) `(D^y_0, D^t_j) = 0`:
+   `sum_mul_basicDecompositionNumber_left_eq_zero` (`c j := d^y_{χ_jφ₀}`) +
+   `sum_mul_generalizedDecompositionNumber_eq_zero` (`y` と `t` は非共役)。
+   ⚠ 後者は `dinv` 族 (`x` 側) を仮説に取るので、対合では
+   `generalizedDecompositionNumberInv_eq_of_mul_self_eq_one` (段 345) で供給する。
+2. **`hgb`/`hgc`/`hgd`** = (5): 同じ左辺補題 + `sum_character_mul_generalizedDecompositionNumber_eq_zero` を `v = 1` で。
+3. **`hb0`/`hc0`/`hd0`** = 段 331 の `eq_ite_of_sum_principalBasicSet_eq_one` の配線。
+4. **`hT`** = 段 346 + `sum_basicSetMatrixOf_mul_principalBasicSet` (商群側) +
+   `irreducibleBrauerCharacter_quotientPi` (`hu` の橋)。
+5. **組み立て**: 5 群 (`G`/`C_G(t)`/`C_G(t)/⟨t⟩`/`C_{C_G(t)/⟨t⟩}(ȳ)`/`C_G(y)`) の datum を
+   `exists_datum_padicComplex` で obtain し、群論的仮説 (段 338/339/290-291/321b) を供給して
+   `exists_proper_normal_of_columns` を呼ぶ。
