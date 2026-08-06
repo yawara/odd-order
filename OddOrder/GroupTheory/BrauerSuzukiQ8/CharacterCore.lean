@@ -363,6 +363,27 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
   have hab : (∑ k, a k * b k) = 0 := hcross l₀ b hbval
   have hac : (∑ k, a k * c k) = 0 := hcross ψ₁ c hcval
   have had : (∑ k, a k * d k) = 0 := hcross ψ₂ d hdval
+  -- off `Irr(B_0(G))` the column at `y` vanishes too, so `hzero` covers all four columns
+  have hzeroA : ∀ k, ¬ (blockOfIrr eG hπG hlinG hnilG k = principalBlock πG hπG hlinG hnilG) →
+      a k = 0 := by
+    intro k hk
+    refine Int.cast_injective (α := ℂ_[2]) ?_
+    rw [hava k, Int.cast_zero]
+    exact generalizedDecompositionNumber_principalBlock_eq_zero_of_blockOfIrr_ne
+      (hp := Nat.prime_two) (hx := hwP) (hω := hωW) (e := eW) (eG := eG) (hπG := hπG)
+      (hlinG := hlinG) (hπ := hπW) (hlin := hlinW) (hkerJ := hkerJW) (hnil := hnilW)
+      (hnilG := hnilG) (hω' := hω'W) (hζ := hζ) (hζk := hζk) (hζK := hζK) (hφ₀ := hφ₀W)
+      (hi := hk)
+  -- on `Irr(B_0(G))` the column at `y` *is* the character value `χ(y)`
+  have havaB : ∀ k, blockOfIrr eG hπG hlinG hnilG k = principalBlock πG hπG hlinG hnilG →
+      ((a k : ℤ) : ℂ_[2]) = (wedderburnRepresentation eG k).character (w : G) := by
+    intro k hk
+    rw [hava k]
+    exact (character_involution_eq_generalizedDecompositionNumber (𝒪 := 𝓞_ℂ_[2]) (nn := nnW)
+      (hp := Nat.prime_two) (hx := hwP) (hω := hωW) (hω' := hω'W) (e := eW) (eG := eG)
+      (hπG := hπG) (hlinG := hlinG) (hπ := hπW) (hlin := hlinW) (hkerJ := hkerJW)
+      (hnil := hnilW) (hnilG := hnilG) (hζ := hζ) (hζk := hζk) (hζK := hζK) (hconv := hconvW)
+      (hNp := hMWp) (hquot := hquotMW) (S := SylW) (hφ₀ := hφ₀W) (hj := hk)).symm
   sorry
 
 end OddOrder.GroupTheory
