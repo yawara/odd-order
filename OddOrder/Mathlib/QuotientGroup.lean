@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.GroupTheory.Coset.Card
 import Mathlib.GroupTheory.QuotientGroup.Basic
 
 /-!
@@ -112,6 +113,28 @@ theorem map_subgroupOf_subtype_injective (S N : Subgroup G) [N.Normal] :
     QuotientGroup.ker_mk']
   -- `N.comap S.subtype` *is* `N.subgroupOf S`.
   exact le_rfl
+
+/-- **The image of `K` in `G ⧸ N` has order `|K| / |N|`** when `N ≤ K`.
+
+Noether's first isomorphism theorem for the restriction of `G ↠ G ⧸ N` to `K`: its kernel is
+`N` and its range is `K.map (mk' N)`. -/
+theorem card_map_mk'_mul_card {G : Type*} [Group G] [Finite G] {N K : Subgroup G} [N.Normal]
+    (hNK : N ≤ K) :
+    Nat.card ↥(K.map (QuotientGroup.mk' N)) * Nat.card ↥N = Nat.card ↥K := by
+  classical
+  set f : ↥K →* G ⧸ N := (QuotientGroup.mk' N).comp K.subtype with hf
+  have hker : f.ker = N.subgroupOf K := by
+    rw [hf, ← MonoidHom.comap_ker, QuotientGroup.ker_mk']
+    rfl
+  have hrange : f.range = K.map (QuotientGroup.mk' N) := by
+    rw [hf, MonoidHom.range_comp, Subgroup.range_subtype]
+  have h1 : Nat.card ↥(K.map (QuotientGroup.mk' N)) = Nat.card (↥K ⧸ f.ker) := by
+    rw [← hrange]
+    exact (Nat.card_congr (QuotientGroup.quotientKerEquivRange f).toEquiv).symm
+  have h2 : Nat.card ↥(N.subgroupOf K) = Nat.card ↥N :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNK).toEquiv
+  rw [h1, hker, ← h2]
+  exact (Subgroup.card_eq_card_quotient_mul_card_subgroup _).symm
 
 end QuotientGroup
 
