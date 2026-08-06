@@ -171,6 +171,29 @@ theorem sum_basicDecompositionNumber [Fintype ι₂] {d : ι → K} {u : ι → 
     _ = ∑ μ : ι, d μ * μval μ :=
         Finset.sum_congr rfl fun μ _ => by rw [hu μ]
 
+/-- **The expansion only needs `U` where the column is nonzero.**  Navarro's display on p. 141 is
+stated for `χ ∈ Irr(B_0)`, and for those the second main theorem kills `d^x_{χμ}` outside
+`IBr(B_0(C_G(x)))` — which is exactly where the basic set of the principal block *fails* to
+express `φ_μ`.  So the hypothesis is only imposed on the support. -/
+theorem sum_basicDecompositionNumber_of_support [Fintype ι₂] {d : ι → K} {u : ι → ι₂ → K}
+    {μval : ι → K} {ηval : ι₂ → K} {P : ι → Prop} (hd : ∀ μ : ι, ¬ P μ → d μ = 0)
+    (hu : ∀ μ : ι, P μ → μval μ = ∑ φ : ι₂, u μ φ * ηval φ) :
+    (∑ φ : ι₂, basicDecompositionNumber d u φ * ηval φ) = ∑ μ : ι, d μ * μval μ := by
+  classical
+  calc (∑ φ : ι₂, basicDecompositionNumber d u φ * ηval φ)
+      = ∑ φ : ι₂, ∑ μ : ι, d μ * (u μ φ * ηval φ) := by
+        refine Finset.sum_congr rfl fun φ _ => ?_
+        rw [basicDecompositionNumber, Finset.sum_mul]
+        exact Finset.sum_congr rfl fun μ _ => by ring
+    _ = ∑ μ : ι, d μ * ∑ φ : ι₂, u μ φ * ηval φ := by
+        rw [Finset.sum_comm]
+        exact Finset.sum_congr rfl fun μ _ => (Finset.mul_sum _ _ _).symm
+    _ = ∑ μ : ι, d μ * μval μ :=
+        Finset.sum_congr rfl fun μ _ => by
+          by_cases hμ : P μ
+          · rw [hu μ hμ]
+          · rw [hd μ hμ, zero_mul, zero_mul]
+
 /-! ### Descent to `ℤ`
 
 The endgame of Brauer–Suzuki (`OddOrder.Algebra.exists_eq_of_columns`) runs over `ℤ`, so the
@@ -260,6 +283,28 @@ theorem sum_basicDecompositionNumber_eq_character {ι₂ : Type*} [Fintype ι₂
         (generalizedDecompositionNumber x hpC hω' hπ hlin hkerJ χ hχ) u φ * η φ w)
       = χ (x * (w : G)) := by
   rw [sum_basicDecompositionNumber (fun μ => hu μ w hw)]
+  exact sum_generalizedDecompositionNumber x hpC hω' hπ hlin hkerJ χ hχ hw
+
+omit [Invertible (Nat.card G : K)] in
+include hpC hω' hπ hlin hkerJ in
+/-- **`χ(x w) = ∑_φ d^x_{χφ} η_φ(w)` for `χ` whose column is supported on `P`.**
+
+The basic set of the principal block expresses `φ_μ` only for `μ ∈ IBr(B_0(C_G(x)))`; on the other
+hand the second main theorem makes `d^x_{χμ}` vanish there for `χ ∈ Irr(B_0(G))`.  This is the form
+of Navarro's display on p. 141 that survives that mismatch. -/
+theorem sum_basicDecompositionNumber_eq_character_of_support {ι₂ : Type*} [Fintype ι₂]
+    (u : ι → ι₂ → K) (η : ι₂ → ↥(centralizerOf x) → K) {P : ι → Prop}
+    (χ : G → K) (hχ : ∀ g h : G, IsConj g h → χ g = χ h)
+    (hd : ∀ μ : ι, ¬ P μ →
+      generalizedDecompositionNumber x hpC hω' hπ hlin hkerJ χ hχ μ = 0)
+    (hu : ∀ (μ : ι), P μ → ∀ w : ↥(centralizerOf x), IsPRegular p w →
+      algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π μ w)
+        = ∑ φ : ι₂, u μ φ * η φ w)
+    {w : ↥(centralizerOf x)} (hw : IsPRegular p w) :
+    (∑ φ : ι₂, basicDecompositionNumber
+        (generalizedDecompositionNumber x hpC hω' hπ hlin hkerJ χ hχ) u φ * η φ w)
+      = χ (x * (w : G)) := by
+  rw [sum_basicDecompositionNumber_of_support hd (fun μ hμ => hu μ hμ w hw)]
   exact sum_generalizedDecompositionNumber x hpC hω' hπ hlin hkerJ χ hχ hw
 
 end Cartan
