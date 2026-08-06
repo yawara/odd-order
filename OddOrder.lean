@@ -194,6 +194,8 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeBaseChange
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBasis
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishingSupply
+import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainConverseSupply
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockKernel
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockSumOverPSubgroup
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryBlockSplitting

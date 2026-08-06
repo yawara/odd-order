@@ -296,6 +296,8 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerFormula
 import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishingSupply
+import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainConverseSupply
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterOffCentralizer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SectionProjectiveCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionOrthogonality
@@ -19465,3 +19467,38 @@ BS の鎖が担ぐのは `centralizerOf x = C_G(x)`。両者は部分群とし�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.coeff_principalBlock_eq_of_mem_centralizer
+
+/-! 🎯🎯 **issue 9506 段 321a**: Külshammer の `hweak` を無条件で供給する。
+
+`sum_character_blockOfIrr_eq_zero_of_isPRegular_of_roots` (`BlockPartVanishingSupply`)。
+(5.11) の `hweak` 版は `C_G(x_p)` の modular datum 一式を要求するが、`x` は Sylow
+部分群を走るので**群ごとに違う中心化群**になり、あらかじめ 1 つ固定することができない。
+
+剰余体が代数閉なら全部無償: `GroupAlgebra.exists_modularDatum` が任意の有限群の
+`π`/`hπ`/`hlin`/`hkerJ`/`hnil` を出し、通常側の分裂は `IsAlgClosed K` の Maschke、
+1 の冪根は `hroot`/`hroot'` (`PadicComplexSystem` が `𝓞_ℂ_[p]` について与える形) から。
+
+⚠ **実装知見**: `exists_modularDatum` が返す `Fintype`/`DecidableEq` は**データ**なので
+`haveI` では不可 (`have` が証明項を潰し、消費側が推論した instance と defeq でなくなる)。
+`letI` で入れる。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_character_blockOfIrr_eq_zero_of_isPRegular_of_roots
+
+/-! 🎯🎯🎯 **issue 9506 段 321b**: `hconv` — 第三主定理の逆が、側条件ゼロで立つ。
+
+`eq_principalBlock_of_inducedBlockOfCentralizer_eq_of_roots` (`ThirdMainConverseSupply`)。
+`PrincipalBlockInvolution` が仮説として担いでいた `hconv`
+(`b^G = B_0(G) ⟹ b = b_0(C_G(t))`) がこれで**実証明に置き換わる**。
+
+3 群ぶんの modular datum (`G` / `H = C_G(x)` / `C = C_G(⟨x⟩)`) を 1 本の項で組む:
+`C` の datum は 段 319b、Sylow・通常側分裂・ブロック冪等元族はいずれも無償、
+1 の冪根は `hroot`/`hroot'`。`H` と `C` は部分群として等しいが**その事実は使わない**
+(段 320b — 2 つの比較が同じ `C` を経由して相殺する)。
+
+⚠ 供給した側条件: `hweak` (段 321a) / `hvanish`
+(`blockCharacter_pRegularSum_eq_zero_of_ne_principalBlock`) / `hidem`/`hf`/`hB`
+(`exists_blockIdempotentFamily`、3 群ぶん)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.eq_principalBlock_of_inducedBlockOfCentralizer_eq_of_roots
