@@ -2889,6 +2889,38 @@ BS の鎖が長らく**仮説として持ち回っていた**もののうち、s
 `hp`/`hx`/`hω`/`hω'`/`e`/`eG`/`Invertible` は既に supplier がある
 (`exists_isPrimitiveRoot_padicComplexInt` / `exists_algEquiv_pi_matrix_padicComplex` / 標数 0)。
 
+### ⚠⚠⚠ 発見 (2026-08-06): `𝓞_ℂ_[p]` は `IsAdicComplete` を**満たさない** — 係数環の再選択が要る
+
+段 299 で `hvanishH` を組んだところ、ブロック冪等元の Henselian 持ち上げ
+(`CenterIdempotentLift.existsUnique_isIdempotentElem_mapRingHom_eq`) が
+**`[IsAdicComplete I 𝒪]`** を要求することが判明した。BS の鎖 (`PrincipalBlockInvolution` 等)
+も元からこの instance を仮定している。
+
+**実測 (grep)**: repo と mathlib で `IsAdicComplete (maximalIdeal _) _` の instance は
+`WittVector p k` (= `StandardSystem`) と `ℤ_[p]` だけ。**`𝓞_ℂ_[p]` には無い**。
+
+**数学的理由 (未機械検証、2026-08-06 の推論)**: `ℂ_[p]` の値群は `ℚ` で**可除**。
+`v(x) = q > 0` なら `v(y) = q/2` なる `y` が在り `x = y·(x/y) ∈ 𝔪²` ⟹ **`𝔪² = 𝔪`**。
+よって `𝔪ⁿ = 𝔪` で `IsHausdorff 𝔪` は「`𝔪 = 0`」を要求 — 偽。
+⟹ **`IsAdicComplete (maximalIdeal 𝓞_ℂ_[p]) 𝓞_ℂ_[p]` は成り立たない。**
+
+**⟹ 係数環の緊張関係** (issue 9507 の結論を要更新):
+
+| 要求 | 満たす環 |
+|---|---|
+| `K` が `K[G]` を分裂 | `𝓞_ℂ_[p]` (商体が代数閉) — `𝕎(𝔽̄_p)` は**不可** |
+| `IsAdicComplete` (冪等元の持ち上げ) | `𝕎(𝔽̄_p)` / 完備 DVR — `𝓞_ℂ_[p]` は**不可** |
+
+**採るべき解**: `𝒪 = 𝕎(𝔽̄_p)[ζ_m]` (`m = exp G`) — 完備 DVR の**有限分岐拡大**なので
+再び完備 DVR (⟹ `IsAdicComplete`)、かつ商体は `ℚ_p^{ur}(ζ_m) ⊇ ℚ(ζ_m)` で
+**Brauer の分裂体定理**より `G` の分裂体 (repo に `BrauerInductionTheorem` 在り)。
+issue 9507 が「分岐拡大を作らずに済ませる」ために `𝓞_ℂ_[p]` を採った判断は、
+`IsAdicComplete` を見落としていたぶん**再検討が要る**。
+
+⚠ 代替案: 冪等元持ち上げを `IsAdicComplete` から **Henselian** へ弱める
+(`𝓞_ℂ_[p]` は Henselian)。`CenterIdempotentLift` の証明が逐次近似 (precomplete) を
+使っているので、Henselian 版に書き換えられるかは未調査。
+
 ### `hconv` は gap ではなく assembly (2026-08-06 実測)
 
 `hconv` (= Brauer 第 3 主定理の逆向き) の**本体は既に在る**:
