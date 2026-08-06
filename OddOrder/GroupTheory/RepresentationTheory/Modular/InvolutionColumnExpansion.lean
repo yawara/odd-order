@@ -314,6 +314,91 @@ theorem basicDecompositionNumber_eq_zero_of_blockOfIrr_ne {A : ι → κ → ℤ
     (hζ := hζ) (hζk := hζk) (hζK := hζK)
     (hφ₀ := mk_eq_principalBlock_of_quotientPi hπ hlin hN hnilH hnilQ hmk) (hi := hi)
 
+set_option maxHeartbeats 1600000 in
+-- The display, the pull-back of the basic set and the independence of `𝓑` meet here.
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+omit [Invertible (Nat.card G : K)] [DecidableEq ι] [Fintype J] in
+open scoped Classical in
+include hp hx hω hω' hkerJ hnilH e eG hπG hlinG hnilG eQ hN hcent hϖ hϖ' hyb hωC hω'C eC hkerJC
+  hnilC hnilQ hζ hζk hζK hconvC hconvG hMp hquot Syl hφ₀ hyb2 in
+/-- **Navarro p. 141: `d^t_{00} = 1` and `d^t_{0j} = 0` for `j ≠ 0`** — the hypotheses `hb0`,
+`hc0`, `hd0` of `exists_proper_normal_of_columns` at once.
+
+The basic-set column of the *trivial* character of `G` expands the constant function `1`: the
+display on p. 141 reads `1 = 1_G(t u) = ∑_j d^t_{1_G j} ψ_j(u)` on the `p`-regular classes.  Since
+`𝓑` contains the constant function `1` and is independent there
+(`eq_ite_of_sum_principalBasicSet_eq_one`), that column is `Pi.single l₀ 1`.
+
+Every `p`-regular class of `C_G(t)/⟨t⟩` is hit by a `p`-regular element of `C_G(t)`
+(`exists_isPRegular_mk_eq`), so the display covers all of them. -/
+theorem basicDecompositionNumber_trivial_eq_ite {A : ι → κ → ℤ}
+    (hasum : ∀ (ν : ι) {z : ↥(centralizerOf x) ⧸ N}, IsPRegular p z →
+      (∑ l ∈ Finset.univ.filter (fun l => blockOfIrr eQ (quotientPi_surjective π hπ hlin hN)
+          (quotientPi_smul π hπ hlin hN) hnilQ l
+          = Quotient.mk (blockSetoid (quotientPi π hπ hlin hN).toRingHom
+              (quotientPi_surjective π hπ hlin hN) (quotientPi_smul π hπ hlin hN)) ν),
+        (A ν l : K) * algebraMap 𝒪 K (ordinaryCharacter (𝒪 := 𝒪) eQ l z))
+        = algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪)
+            (quotientPi π hπ hlin hN).toRingHom ν z))
+    (hconjall : ∀ v : ↥(centralizerOf x) ⧸ N, IsPElement p v → v ≠ 1 → IsConj yb v)
+    (hyb1 : yb ≠ 1)
+    (hcart : cartanMatrix (𝒪 := 𝒪) (nn := nnC) hp hωC hω'C hπC hlinC hkerJC eC φ₀ φ₀ = 4)
+    {i₀ : J} (hi₀B : blockOfIrr eG hπG hlinG hnilG i₀ = principalBlock πG hπG hlinG hnilG)
+    (hi₀ : ∀ g : G, (wedderburnRepresentation eG i₀).character g = 1)
+    {j₀ l₀ : κ}
+    (hj₀ : blockOfIrr eQ (quotientPi_surjective π hπ hlin hN)
+      (quotientPi_smul π hπ hlin hN) hnilQ j₀
+      = principalBlock (quotientPi π hπ hlin hN).toRingHom (quotientPi_surjective π hπ hlin hN)
+          (quotientPi_smul π hπ hlin hN) hnilQ)
+    (hl₀B : blockOfIrr eQ (quotientPi_surjective π hπ hlin hN)
+      (quotientPi_smul π hπ hlin hN) hnilQ l₀
+      = principalBlock (quotientPi π hπ hlin hN).toRingHom (quotientPi_surjective π hπ hlin hN)
+          (quotientPi_smul π hπ hlin hN) hnilQ)
+    (hl₀ : ∀ g : ↥(centralizerOf x) ⧸ N, (wedderburnRepresentation eQ l₀).character g = 1)
+    (hl₀ne : l₀ ≠ j₀)
+    {j : κ} (hjB : blockOfIrr eQ (quotientPi_surjective π hπ hlin hN)
+      (quotientPi_smul π hπ hlin hN) hnilQ j
+      = principalBlock (quotientPi π hπ hlin hN).toRingHom (quotientPi_surjective π hπ hlin hN)
+          (quotientPi_smul π hπ hlin hN) hnilQ)
+    (hjne : j ≠ j₀) :
+    basicDecompositionNumber
+        (generalizedDecompositionNumber x hp hω' hπ hlin hkerJ
+          ((wedderburnRepresentation eG i₀).character)
+          (fun _ _ h => character_eq_of_isConj _ h))
+        (fun μ l => ((intBasicSetMatrix eQ A yb j₀ μ l : ℤ) : K)) j
+      = if j = l₀ then 1 else 0 := by
+  classical
+  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  refine eq_ite_of_sum_principalBasicSet_eq_one (hp := hp) (hx := hyb) (hω := hωC) (e := eC)
+    (eG := eQ) (hπG := quotientPi_surjective π hπ hlin hN)
+    (hlinG := quotientPi_smul π hπ hlin hN) (hπ := hπC) (hlin := hlinC) (hkerJ := hkerJC)
+    (hnil := hnilC) (hnilG := hnilQ) (hω' := hω'C) (hζ := hζ) (hζk := hζk) (hζK := hζK)
+    (hconv := hconvC) (hNp := hMp) (hquot := hquot) (S := Syl) (hφ₀ := hφ₀)
+    (hconjall := hconjall) (ht1 := hyb1) (hcart := hcart) (ht := hyb2) (hj₀ := hj₀)
+    (hone := ?_) (hi₀B := hl₀B) (hi₀ := hl₀) (hi₀ne := hl₀ne) (hjB := hjB) (hjne := hjne)
+  intro g hg
+  obtain ⟨w, hw, rfl⟩ := exists_isPRegular_mk_eq (N := N) hp hg
+  rw [← hi₀ (x * (w : G))]
+  exact sum_basicDecompositionNumber_eq_character_of_support (𝒪 := 𝒪) (nn := nn) hp hω' hπ hlin
+    hkerJ
+    (fun μ l => ((intBasicSetMatrix eQ A yb j₀ μ l : ℤ) : K))
+    (fun φ v => principalBasicSet eQ (quotientPi_surjective π hπ hlin hN)
+      (quotientPi_smul π hπ hlin hN) hnilQ yb j₀ φ (QuotientGroup.mk v))
+    ((wedderburnRepresentation eG i₀).character) (fun _ _ h => character_eq_of_isConj _ h)
+    (fun μ hμ => generalizedDecompositionNumber_eq_zero_of_quotient_ne hp hx e eG hπG hlinG hπ hlin
+      hkerJ hnilH hnilG hω hω' hζ hζk hζK hconvG
+      (fun ν hν => mk_eq_principalBlock_quotientPi_of_mem (hω := hω) (hω' := hω') (hϖ := hϖ)
+        (hϖ' := hϖ') (hπ := hπ) (hlin := hlin) (hkerJ := hkerJ) (hN := hN) (hnil := hnilH)
+        (hnilQ := hnilQ) (e := e) (e' := eQ) (hcent := hcent) (hμ := hν)) hi₀B hμ)
+    (fun μ hμ v hv => algebraMap_irreducibleBrauerCharacter_eq_sum_intBasicSetMatrix
+      (hp := hp) (hπ := hπ) (hlin := hlin) (eQ := eQ) (hN := hN) (hyb := hyb) (hωC := hωC)
+      (hω'C := hω'C) (eC := eC) (hπC := hπC) (hlinC := hlinC) (hkerJC := hkerJC) (hnilC := hnilC)
+      (hnilQ := hnilQ) (hζ := hζ) (hζk := hζk) (hζK := hζK) (hconv := hconvC) (hMp := hMp)
+      (hquot := hquot) (S := Syl) (hφ₀ := hφ₀) (hyb2 := hyb2) (hasum := hasum)
+      (hconjall := hconjall) (hyb1 := hyb1) (hcart := hcart) (hj₀ := hj₀) (hμ := hμ) (hw := hv))
+    hw
+
 end ThreeTermExpansion
 
 end OddOrder.RepresentationTheory.Modular
