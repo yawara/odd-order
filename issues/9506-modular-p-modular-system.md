@@ -3387,6 +3387,58 @@ carrier 危機より前の記述)。
 ⚠ 数式は OCR 崩れが重いので、各段の statement は `references/navarro/pages/*.png` で確定する
 (BS 証明の pp.139–146 は取得済)。
 
+### 段 316 の下ごしらえ (2026-08-06 実測) — `hcoeff` の 8 仮説を全部 supplier に当てた
+
+`KulshammerThirdMain.coeff_principalBlock_eq_centralizer_intermediate` (`.lean:394`) は
+`H` 側と `C = C_G(Q)` 側でそれぞれ 4 本、計 8 本の仮説を取る。**実測で全部の supplier が付いた**:
+
+| 仮説 (両側) | supplier | 状態 |
+|---|---|---|
+| `hidem` / `hf` / `hB` | `BlockIdempotentLift.exists_blockIdempotentFamily` (`.lean:64`) | ✅ 1 本で 3 つ出る |
+| `hvanish` | `PRegularSumVanishing.blockCharacter_pRegularSum_eq_zero_of_ne_principalBlock` (`.lean:168`) | ✅ 証明済 |
+| `hweak` | **Navarro (5.11)** `BlockPartVanishing.sum_character_blockOfIrr_eq_zero` (`.lean:177`) | ⚠ 下記の同定が要る |
+
+#### `hweak` ← (5.11) の同定 (2026-08-06 に確定)
+
+(5.11) の結論は `¬ IsConj (pPart p g) (pPart p h)` の下で
+`∑_{i ∈ B} χ_i(h⁻¹) · χ_i(g) = 0`。`hweak` が要るのは、固定した `g` と
+Sylow の元 `x ≠ 1` について `∑_{i ∈ B} χ_i(g⁻¹) · χ_i(x) = 0`。
+
+⟹ **(5.11) を `h := g`、`g := x` で使う**。非共役条件は
+`¬ IsConj (pPart p x) (pPart p g)` になり、
+
+* `pPart p x = x` (`pPart_eq_self_of_isPElement`, `PRegularElement.lean:318`) — `x` は Sylow の元
+* `pPart p g = 1` (`pPart_eq_one_of_isPRegular`, `.lean:302`) — **`g` が `p`-正則のとき**
+
+⟹ 条件は `¬ IsConj x 1` ⟺ `x ≠ 1` となり、**`hweak` の仮説そのもの**に一致する。
+**⟹ `hweak` は `g` が `p`-正則なら (5.11) から出る。**
+
+⚠ **`p`-正則性は本質的な副条件**。`g` が `p`-特異だと (5.11) の非共役条件が成り立たない。
+着手時に「消費側が `p`-正則な `g` だけで足りるか」(= ブロック冪等元が `p`-正則類に台を持つか)
+を確認すること。
+
+#### ⚠⚠ (5.11) は `C(x)` の modular datum を要求する — だが `𝓞_ℂ_[p]` では無償
+
+(5.11) は `centralizerOf (pPart p g)` の modular datum (`π`/`hπ`/`hlin`/`hkerJ`/`hnil`) を取る。
+上の同定では (5.11) の `g` = `x` なので、**Sylow の各元 `x` ごとに `C(x)` の datum**が要る。
+
+⟹ 一見すると「元ごとに datum」で重いが、**係数環を `𝓞_ℂ_[p]` にした今は無償**:
+`OddOrder.exists_algHom_pi_matrix_of_isAlgClosed` (`Algebra/AlgClosedSplitting.lean:43`) が
+「代数閉体上の有限次元代数は行列代数の積へ全射 + 核が nil」を与え、
+`ResidueField 𝓞_ℂ_[p] = 𝔽̄_p` は代数閉 (段 292) なので**任意の有限群について datum が作れる**。
+
+⟹ **これが段 315 の carrier 決着が効く 2 つ目の場所**である
+(1 つ目は ordinary 側の分裂)。
+
+#### 段 316 以降の手順
+
+1. `sum_character_blockOfIrr_eq_zero_of_isPRegular` を新設 — (5.11) を上の同定で包む。
+2. `C(x)` の datum を `exists_algHom_pi_matrix_of_isAlgClosed` から作る補題
+   (`hkerJ` = 核がちょうど jacobson、は nil 核 + 半単純商から詰める)。
+3. `hcoeff` の assembly (8 仮説を 1,2 と上表で埋める)。
+4. `hconv` = `SecondMainPrincipalBlock.eq_principalBlock_of_inducedBlockOfCentralizer_eq` +
+   `hcoeff` + `C_G(⟨x⟩)` と `centralizerOf x` の項の同一視。
+
 ## 完了条件
 
 上記チェックボックスが全て埋まり、**具体構成による instance が存在**し、
