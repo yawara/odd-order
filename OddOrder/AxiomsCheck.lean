@@ -19521,3 +19521,29 @@ BS の鎖が担ぐのは `centralizerOf x = C_G(x)`。両者は部分群とし�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_intBasicSetMatrix_mul_cartanMatrix_quotientPi
+
+/-! 🎯 **issue 9506 段 323**: basic set 列の直交 — 原文 p.141 の (4) と (5)。
+
+`sum_mul_basicDecompositionNumber_eq_zero` / `sum_mul_basicDecompositionNumber_left_eq_zero`
+(`BasicSetDecomposition`)。`IBr` 列が直交していれば basic set 列も直交する、という
+純粋な双線型の移送。
+
+* (4) `(D^y_0, D^t_j) = 0` — 非共役な `p`-元 `y`, `t` の列。⚠ **`c = 0` を
+  `sum_mul_basicDecompositionNumber` に食わせる形にはならない**: 2 つの元は中心化群が違うので
+  basic set を表す行列 `u`, `u'` が**別の添字集合上の別の行列**になる。⟹ 2 行列版を新設した。
+  入力は `GeneralizedDecompositionOrthogonality.sum_mul_generalizedDecompositionNumber_eq_zero`
+  (= Navarro (5.13)(a) 後半)。
+* (5) `(χ(1), D^t_j) = 0` — スカラー族 × 列。入力は
+  `sum_character_mul_generalizedDecompositionNumber_eq_zero` を `v = 1` で
+  (`1⁻¹ ∉ S(t)` は `t ≠ 1` から)。
+
+⚠ **(3) `(D^t_i, D^t_j) = |N|(1+δ)` は独立の補題にしない** — 既存の
+`sum_mul_basicDecompositionNumber_eq_cartanMatrix` (7.5)(c) の右辺が 段 322 の左辺**そのもの**
+なので、消費側で `rw` + `exact` の 2 行で済む。約 60 個の仮説を書き写すだけのラッパーは
+本リポジトリの「薄いラッパーを書かない」規約に反する。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_mul_basicDecompositionNumber_eq_zero
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_mul_basicDecompositionNumber_left_eq_zero

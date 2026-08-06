@@ -44,6 +44,9 @@ is the separate content of Navarro (3.16).
 * `OddOrder.RepresentationTheory.Modular.sum_mul_basicDecompositionNumber` — the `U`-congruence
 * `OddOrder.RepresentationTheory.Modular.sum_mul_basicDecompositionNumber_eq_cartanMatrix` —
   (7.5)(c)
+* `OddOrder.RepresentationTheory.Modular.sum_mul_basicDecompositionNumber_eq_zero` — (7.5)(d)
+* `OddOrder.RepresentationTheory.Modular.sum_mul_basicDecompositionNumber_left_eq_zero` —
+  the weak orthogonality `(χ(1), D^t_j) = 0`
 * `OddOrder.RepresentationTheory.Modular.sum_basicDecompositionNumber_eq_character` —
   `χ(x w) = ∑_φ d^x_{χφ} η_φ(w)` (the display on p. 141)
 -/
@@ -102,6 +105,50 @@ theorem sum_mul_basicDecompositionNumber {dinv d : J → ι → K} {u : ι → �
         exact Finset.sum_congr rfl fun j _ => by ring
     _ = ∑ μ : ι, ∑ τ : ι, u μ φ * c μ τ * u τ η :=
         Finset.sum_congr rfl fun μ _ => Finset.sum_congr rfl fun τ _ => by rw [hc μ τ]
+
+/-- **Navarro (7.5)(d)**: two basic-set columns belonging to non-conjugate `p`-elements are
+orthogonal, because their `IBr`-columns already are.
+
+The two elements have different centralisers, so the two basic sets are expressed by *different*
+matrices `u`, `u'` over different index sets — which is why this is not a special case of
+`sum_mul_basicDecompositionNumber` (`c = 0`). -/
+theorem sum_mul_basicDecompositionNumber_eq_zero {ι' ι₂' : Type*} [Fintype ι']
+    {dinv : J → ι → K} {d : J → ι' → K} {u : ι → ι₂ → K} {u' : ι' → ι₂' → K} (φ : ι₂) (η : ι₂')
+    (h : ∀ (μ : ι) (τ : ι'), (∑ j : J, dinv j μ * d j τ) = 0) :
+    (∑ j : J, basicDecompositionNumber (dinv j) u φ * basicDecompositionNumber (d j) u' η)
+      = 0 := by
+  classical
+  calc (∑ j : J, basicDecompositionNumber (dinv j) u φ * basicDecompositionNumber (d j) u' η)
+      = ∑ j : J, ∑ μ : ι, ∑ τ : ι', (dinv j μ * u μ φ) * (d j τ * u' τ η) := by
+        refine Finset.sum_congr rfl fun j _ => ?_
+        rw [basicDecompositionNumber, basicDecompositionNumber, Finset.sum_mul]
+        exact Finset.sum_congr rfl fun μ _ => Finset.mul_sum _ _ _
+    _ = ∑ μ : ι, ∑ τ : ι', u μ φ * (∑ j : J, dinv j μ * d j τ) * u' τ η := by
+        rw [Finset.sum_comm]
+        refine Finset.sum_congr rfl fun μ _ => ?_
+        rw [Finset.sum_comm]
+        refine Finset.sum_congr rfl fun τ _ => ?_
+        rw [Finset.mul_sum, Finset.sum_mul]
+        exact Finset.sum_congr rfl fun j _ => by ring
+    _ = 0 := by
+        refine Finset.sum_eq_zero fun μ _ => Finset.sum_eq_zero fun τ _ => ?_
+        rw [h μ τ, mul_zero, zero_mul]
+
+/-- **The weak orthogonality that Navarro reads as `(χ(1), D^t_j) = 0`**: a family of scalars
+orthogonal to every `IBr`-column is orthogonal to every basic-set column. -/
+theorem sum_mul_basicDecompositionNumber_left_eq_zero {c : J → K} {d : J → ι → K}
+    {u : ι → ι₂ → K} (η : ι₂) (h : ∀ τ : ι, (∑ j : J, c j * d j τ) = 0) :
+    (∑ j : J, c j * basicDecompositionNumber (d j) u η) = 0 := by
+  classical
+  calc (∑ j : J, c j * basicDecompositionNumber (d j) u η)
+      = ∑ j : J, ∑ τ : ι, c j * d j τ * u τ η := by
+        refine Finset.sum_congr rfl fun j _ => ?_
+        rw [basicDecompositionNumber, Finset.mul_sum]
+        exact Finset.sum_congr rfl fun τ _ => by ring
+    _ = ∑ τ : ι, (∑ j : J, c j * d j τ) * u τ η := by
+        rw [Finset.sum_comm]
+        exact Finset.sum_congr rfl fun τ _ => (Finset.sum_mul _ _ _).symm
+    _ = 0 := Finset.sum_eq_zero fun τ _ => by rw [h τ, zero_mul]
 
 /-- **The defining expansion in the basic set.**  If `U` expresses each irreducible Brauer
 character in the basic set — `μ = ∑_φ u_{μφ} η_φ` — then the basic-set numbers reproduce the
