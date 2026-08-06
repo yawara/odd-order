@@ -2982,6 +2982,26 @@ mathlib では `IsAdicComplete.henselianRing` **のみ** (実測: mathlib 内で
 (局所環 + `maximalIdeal` が f.g. なら adic completion は完備)、
 `IsAdicComplete.congr_ringEquiv` (環同型で移送)。
 
+✅ **段 300 で 3 が完成**: `Algebra/AdicCompletePi.isAdicComplete_of_le_of_pow_le`
+(`J^n ≤ I ≤ J` ⟹ `I`-進完備性は `J`-進完備性を導く)。⟹ **完備性の骨は通った**。
+
+#### なぜ分岐拡大が要るのか — 障害は Schur 指数でなく**中心** (2026-08-06 の整理)
+
+紛らわしいので明記する。`K = Frac(𝕎(𝔽̄_p))` は `ℚ_p` の最大不分岐拡大の完備化で、
+**Brauer 群は自明** (`Br(ℚ_p^{ur}) = 0`) — つまり **Schur 指数は障害にならない**
+(例: `Q₈` の 2 次元表現の `ℚ_2` 上の四元数環は不分岐 2 次拡大で既に分裂する)。
+
+障害は各単純成分の**中心** `K(χ)` = 指標値が生成する拡大。
+`K[G] ≅ ∏ Matrix_{n_i}(K)` には `Z_i = K` が要り、それは `K ∋ ζ_{exp G}` を要求する。
+`𝕎(𝔽̄_p)` は `p'`-乗根を全部持つが `ζ_{p^k}` を持たない (`p = 2` なら `i = ζ_4` が無い)
+ので、`ζ_{p^a}` を添加する**全分岐**拡大が要る。
+
+#### 残タスク (段 300 以降)
+- `B = A[ζ_{p^a}]` の構成 (`AdjoinRoot (cyclotomic (p^a) A)` か、`K(ζ)` の整閉包)
+  と `A`-有限自由性 / 全分岐性 (`𝔪_B^e = 𝔪_A·B`)
+- 剰余体が `𝔽̄_p` のまま (⟹ `IsAlgClosed`)
+- `Frac(B)` が `Frac(B)[G]` を分裂 (Brauer の分裂体定理経由)
+
 ### `hconv` は gap ではなく assembly (2026-08-06 実測)
 
 `hconv` (= Brauer 第 3 主定理の逆向き) の**本体は既に在る**:
