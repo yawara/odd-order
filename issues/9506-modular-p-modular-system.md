@@ -3601,6 +3601,63 @@ instance が段 317 側 (`classical`) と食い違って `rw` が刺さらない
 で、これは **段 320b `coeff_principalBlock_eq_of_mem_centralizer` の結論そのもの**。
 ⟹ 既存ラッパーに欠けていたのは `hcoeff` の供給だけで、それを 段 317-320b で埋めた。
 
+### ✅✅✅ 段 321 完了 (2026-08-06) — **`hconv` が実証明になった**
+
+`PrincipalBlockInvolution.lean:84` が仮説として担いでいた `hconv` を、側条件ゼロの定理に置換。
+
+* **段 321a** `BlockPartVanishingSupply.sum_character_blockOfIrr_eq_zero_of_isPRegular_of_roots`
+  — Külshammer の `hweak`。(5.11) は `C_G(x_p)` の modular datum 一式を要求するが、`x` は
+  Sylow 部分群を走るので**中心化群が `x` ごとに変わり 1 つ固定できない**。剰余体が代数閉なら
+  `GroupAlgebra.exists_modularDatum` (段 319b) が任意の有限群の datum を出すので全部無償。
+  通常側の分裂は `IsAlgClosed K` の Maschke、1 の冪根は仮説 `hroot`/`hroot'`
+  (= `exists_isPrimitiveRoot_padicComplexInt` / `_residueField_` の形)。
+
+* **段 321b** `ThirdMainConverseSupply.eq_principalBlock_of_inducedBlockOfCentralizer_eq_of_roots`
+  — `hconv` 本体。3 群 (`G` / `H = C_G(x)` / `C = C_G(⟨x⟩)`) の datum を 1 本の項で組み、
+  `hweak` (段 321a) / `hvanish`
+  (`blockCharacter_pRegularSum_eq_zero_of_ne_principalBlock`) / `hidem`/`hf`/`hB`
+  (`exists_blockIdempotentFamily`, 3 群ぶん) を供給して
+  `eq_principalBlock_of_inducedBlockOfCentralizer_eq` に渡す。
+
+⚠ **追加した仮説** (鎖の binder に無かったもの): `[IsAlgClosed (ResidueField 𝒪)]` /
+`[IsAlgClosed K]` / `[CharZero K]` / `hkerJG` / `hroot`/`hroot'`。
+**`𝓞_ℂ_[p]` / `ℂ_[p]` は全部満たす** (段 292 + `PadicComplexSystem` の `CarrierCheck` 節)。
+
+⚠ **実装知見**: `exists_modularDatum` が返す `Fintype`/`DecidableEq` は**データ**なので
+`haveI` では不可 — `have` が証明項を潰し、消費側が推論した instance と defeq でなくなる
+("synthesized type class instance is not definitionally equal")。**`letI` で入れる**。
+
+⟹ **`hconv` の消費側** (`PrincipalBlockInvolution` / `PrincipalBlockBasicSet` /
+`IntegralBasicSetMatrix` の全定理) は**書き換えない** — 呼び出し側で 段 321b を渡す。
+
+### ⏭ 段 322 の着手点 (2026-08-06 確定) — "Analysis at t" の Cartan 倍化
+
+原文 p.141: `C_G(t)/⟨t⟩` は Klein four Sylow-2 で対合の類が 1 個 ⟹ (7.4) が使える。
+そこで得た basic set `{1, ψ₁, ψ₂}` と Cartan `c_ij = 1 + δ_ij` を (7.6) で `C_G(t)` へ
+持ち上げると **Cartan は `|⟨t⟩| = 2` 倍**になる。**部品は 2 つとも在る**:
+
+| 役割 | 名前 | 場所 |
+|---|---|---|
+| (7.4) `UᵗCU = 1 + δ` over ℤ | `sum_intBasicSetMatrix_mul_cartanMatrix` | `IntegralBasicSetMatrix.lean:264` |
+| (7.6) `UᵗC_H U = \|N\| · UᵗC_{H/N} U` | `sum_sum_mul_cartanMatrix_quotientPi` | `QuotientCartan.lean:150` |
+
+⟹ **段 322 = この 2 本の合成** = `UᵗC_{C_G(t)}U = 2(1 + δ)`。
+
+⚠ 噛み合わせの条件 (着手時に実測すること):
+1. (7.6) は `ι` (= IBr の添字) を `H` と `H̄` で**共有**する設計 (`quotientPi` が同じ `ι`・
+   同じ行列サイズを使う) なので、`u : ι → ι₂ → K` は両側で同一に取れる。
+   ⟹ `u μ j := (intBasicSetMatrix e_{H̄} A t̄ j₀ μ j : K)` と置けばよい。
+2. 段 215 の `e'` (商側の通常分裂) は、(7.4) を `H̄` に当てるときの `eG` と**同じもの**を渡す。
+3. (7.4) 側の `hcart : cartanMatrix … = 4` は `H̄` の `C_{H̄}(t̄)` について。
+   供給は 段 290-291 (Klein four Sylow + 中心的対合 ⟹ 正規 2-補群 ⟹ `c = |Sylow|`)。
+4. `hconv` は 段 321b で供給する (これが 段 321 の最初の消費点)。
+
+その先 (p.141 の残り) = (7.5.a) で `χ_i(tu) = ∑_j d^t_{χ_i ψ_j} ψ_j(u)`
+(`BasicSetDecomposition.sum_basicDecompositionNumber_eq_character`) →
+(7.5.b,c,d) で (3) `(D^t_i, D^t_j) = 2(1+δ_ij)` / (4) `(D^y_0, D^t_j) = 0` /
+(5) `(χ(1), D^t_j) = 0` → **p.142-146 の endgame** (整数列 `2u_1 = D^y_0 + D^t_0 − D^t_1 − D^t_2`
+から `(u_i,u_i) = 3` ⟹ 非零成分ちょうど 3 個で `{1,1,−1}`)。
+
 #### 最終組み立ての形 (2026-08-06 実測)
 
 `hconv` の discharge は**既存の**
