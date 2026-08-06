@@ -19435,3 +19435,17 @@ universe をまたげないため。実際の使用箇所 (`𝓞_ℂ_[p]` / `ℂ
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.coeff_principalBlock_eq_centralizer_forall
+
+/-! 🎯 **issue 9506 段 320b の下ごしらえ**: `C_G(⟨x⟩) = C_G(x)`
+(`InducedBlockCentralizer.centralizer_zpowers_eq_centralizerOf`)。
+
+第三主定理の逆を BS の鎖に接続するときの**項の同一視** (issue 冒頭からの既知の残件)。
+Külshammer 経由の Converse は `C_G(Q)` で述べられ、`Q = ⟨x⟩` を取るが、
+BS の鎖が担ぐのは `centralizerOf x = C_G(x)`。両者は部分群として等しいが構文的に別。
+
+⚠ 同じ主張の `private` 版が `BG/Ch3_MaximalSubgroups/S11_ExceptionalMaximal.lean:864` に
+在ったが、**`private` はファイルを跨げない** (CLAUDE.md「開発規約」) ので、
+`zpowers`/`centralizerOf` の兄弟補題が並ぶこの場所に public 版を置いた。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.centralizer_zpowers_eq_centralizerOf

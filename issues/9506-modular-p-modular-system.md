@@ -3565,7 +3565,17 @@ instance が段 317 側 (`classical`) と食い違って `rw` が刺さらない
 (`KulshammerThirdMain.lean:503`) に `coeff_principalBlock_eq_centralizer_forall` を食わせ、
 `PrincipalBlockInvolution.lean:84` の `hconv` の形
 (`inducedBlockOfCentralizer t … b = principalBlock … → b = principalBlock …`) に合わせる。
-⚠ **`C_G(⟨x⟩)` と `centralizerOf x` の項の同一視**がここで要る (issue 冒頭からの既知の残件)。
+✅ **項の同一視は供給済 (2026-08-06)**:
+`InducedBlockCentralizer.centralizer_zpowers_eq_centralizerOf` (`C_G(⟨x⟩) = C_G(x)`)。
+⚠ 同じ主張の `private` 版が `S11_ExceptionalMaximal.lean:864` に在ったが
+**`private` はファイルを跨げない**ので、`zpowers`/`centralizerOf` の兄弟補題が並ぶ
+`InducedBlockCentralizer` に public 版を置いた。
+
+⟹ **`hconv` に要る部品は全部揃った**。残りは `eq_principalBlock_of_inducedBlockOfNormalizer_eq`
+(Navarro の読み `b^G = B_0` 版) を `Q := zpowers x`, `H := centralizerOf x` で使い、
+`inducedBlockOfCentralizer` の定義 (`InducedBlockCentralizer.lean:97` — まさに
+`inducedBlockOfNormalizer` を `zpowers x` / `centralizerOf x` で特殊化したもの) と
+突き合わせる配管のみ。
 
 * **段 320 (旧メモ)**: `hconv` = `eq_principalBlock_of_blockOfCentralCharacter_eq`
   (`KulshammerThirdMain.lean:503`) に段 319c-2 を食わせ、

@@ -24,6 +24,7 @@ once.
 
 ## Main definitions
 
+* `OddOrder.RepresentationTheory.Modular.centralizer_zpowers_eq_centralizerOf`
 * `OddOrder.RepresentationTheory.Modular.inducedBlockOfCentralizer` — `b^G` for
   `b ∈ Bl(C_G(x))`
 
@@ -57,6 +58,20 @@ theorem zpowers_le_centralizerOf : Subgroup.zpowers x ≤ centralizerOf x :=
 theorem centralizer_zpowers_le_centralizerOf :
     Subgroup.centralizer ((Subgroup.zpowers x : Subgroup G) : Set G) ≤ centralizerOf x :=
   Subgroup.centralizer_le (Set.singleton_subset_iff.mpr (Subgroup.mem_zpowers x))
+
+/-- **`C_G(⟨x⟩) = C_G(x)`**: commuting with `x` is the same as commuting with all its powers.
+
+The inclusion `≤` is `centralizer_zpowers_le_centralizerOf`; the reverse spreads a single
+commutation over the powers.  The *equality* is what reconciles the two readings of the third main
+theorem — Külshammer's route states it for `C_G(Q)` with `Q = ⟨x⟩`, while the Brauer–Suzuki chain
+carries `C_G(x)` (`centralizerOf`). -/
+theorem centralizer_zpowers_eq_centralizerOf :
+    Subgroup.centralizer ((Subgroup.zpowers x : Subgroup G) : Set G) = centralizerOf x := by
+  refine le_antisymm (centralizer_zpowers_le_centralizerOf x) fun c hc => ?_
+  refine Subgroup.mem_centralizer_iff.mpr fun h hh => ?_
+  obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp hh
+  have hcomm : Commute x c := (Subgroup.mem_centralizer_iff.mp hc) x rfl
+  exact hcomm.zpow_left n
 
 /-- `C_G(x) ≤ N_G(⟨x⟩)`: an element commuting with `x` commutes with all its powers, hence
 normalises `⟨x⟩`. -/
