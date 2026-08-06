@@ -5607,3 +5607,35 @@ module 名は不変ゆえ下流 (`RankOneAffineModel`) は無変更。
 
 その後 `exists_proper_normal_of_columns` を呼べば `q8_exists_proper_normal` が閉じ、
 **issue 0147 (Q₈ Brauer–Suzuki) の最後の `sorry` が消える**。
+
+## 🎯🎯🎯 完了 (2026-08-07) — `q8_exists_proper_normal` が閉じた
+
+Navarro pp.139-146 の指標論パート全体が `𝓞_ℂ_[2]` 上に**構成した** 5 群
+(`G` / `C_G(t)` / `C_G(t)/⟨t⟩` / `C_{C_G(t)/⟨t⟩}(ȳ)` / `C_G(y)`) の datum から配線され、
+`BrauerSuzukiQ8/CharacterCore.lean` の `sorry` が消えた。
+
+**検証**: フルビルド EXIT=0 / 5446 jobs / error 0 / **sorry 0 (リポジトリ全体)** /
+非 sorry warning 0、`axioms check OK: q8_exists_proper_normal depends on 3 axiom(s),
+all in allowlist`。
+
+### このセッション (段 366-396) で見つけた**本物の穴** 3 件
+
+1. **段 366** — 段 340 の `hT`/`hcong` が `Irr(G)` 全体で要求されており **supply 不能**
+   だった (B₀ の外で 4 列は消えるが `χ(t)` は消えない)。述語 `Q` + `hzero` へ一般化。
+2. **段 377** — 商群の分裂 `quotientPi π` の nil-kernel 条件に supplier が無かった。
+   `ker (quotientPi π) = J(k[Q])` + 「有限次元代数の Jacobson 根基は冪零」で解決。
+   段 380 の時点で実際に必要になった。
+3. **段 378** — 既存の原始根補題は `p ∤ n` を要求するが、`exists_intBlockCoeff` は
+   `ζ_{|G|}` (`2 ∣ |G|`) を要求する。`ℂ_[2]` は標数 0 の代数閉体なので条件不要。
+
+### 教科書の一文を形式化した箇所 (段 372-376)
+
+原文 p.132 の「`C` has a normal 2-complement」(Navarro が 1 文で済ませる) は、
+Burnside の移送定理 + 「`[N_H(V):C_H(V)]` は指数 2 かつ奇数ゆえ 1」の議論。
+⚠ **Klein 四元群である必要は無く** `|V| = 4` と中心対合だけで通る (巡回 `C₄` でも同じ)。
+
+### 構造変更 (段 379)
+
+`BrauerSuzukiQ8.lean` を pure re-export hub + 3 leaf
+(`Reduction` / `CharacterCore` / `Induction`) に分割。理由は行数でなく **import 方向**
+(`CharacterCore` は `Modular/` を、`Modular/` は `Reduction` を必要とする)。

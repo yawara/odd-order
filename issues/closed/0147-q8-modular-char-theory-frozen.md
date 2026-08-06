@@ -7,7 +7,16 @@ created: 2026-07-23
 
 # 【解凍】Q₈ Brauer–Suzuki のための modular character theory 長期プロジェクト
 
-## 状態: THAWED — 書籍確定 + **PDF 確保済（2026-08-04）**、着手可能
+## 状態: ✅ **CLOSED (2026-08-07)** — `q8_exists_proper_normal` が閉じた
+
+Navarro pp.139-146 の指標論パートが完全に形式化され、`BrauerSuzukiQ8/CharacterCore.lean` の
+`sorry` が消えた。フルビルド green / **リポジトリ全体で sorry 0** /
+`axioms check OK: q8_exists_proper_normal depends on 3 axiom(s), all in allowlist`。
+経緯と supplier 一覧は issue 9506 末尾の完了記録を参照。
+
+### (以下は着手前の記録)
+
+## 旧状態: THAWED — 書籍確定 + **PDF 確保済（2026-08-04）**、着手可能
 
 **2026-07-25 にユーザーが解凍・書籍選定を確定**: spine = **Navarro 1998** *Characters and Blocks of
 Finite Groups*（Cambridge LMS LNS 250）。Dade 1971/Feit 1982 は行間補完の併読に降格。
