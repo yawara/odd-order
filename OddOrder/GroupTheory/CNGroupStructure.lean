@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
+import OddOrder.GroupTheory.CardSupInf
 import OddOrder.GroupTheory.ThreeStepGroup
 import OddOrder.GroupTheory.SubgroupInAmbient
 import OddOrder.GroupTheory.FittingSelfCentralizing
@@ -405,27 +406,10 @@ theorem isCyclic_of_cn_of_conj_frobenius_of_odd [Finite G]
   haveI := isNilpotent_of_centerIn_ne_bot hCN hcin
   infer_instance
 
-/-! ### Small counting helpers for the endgame -/
+/-! ### Small counting helpers for the endgame
 
-/-- `|H ⊔ N| * |H ⊓ N| = |H| * |N|` for `N` normal (second isomorphism theorem). -/
-theorem card_sup_mul_card_inf_eq [Finite G] (H N : Subgroup G) [N.Normal] :
-    Nat.card ↥(H ⊔ N) * Nat.card ↥(H ⊓ N) = Nat.card ↥H * Nat.card ↥N := by
-  have h1 : Nat.card ↥H =
-      Nat.card (↥H ⧸ (N.subgroupOf H)) * Nat.card ↥(N.subgroupOf H) :=
-    Subgroup.card_eq_card_quotient_mul_card_subgroup _
-  have h2 : Nat.card ↥(H ⊔ N) =
-      Nat.card (↥(H ⊔ N) ⧸ (N.subgroupOf (H ⊔ N))) * Nat.card ↥(N.subgroupOf (H ⊔ N)) :=
-    Subgroup.card_eq_card_quotient_mul_card_subgroup _
-  have h3 : Nat.card ↥(N.subgroupOf (H ⊔ N)) = Nat.card ↥N :=
-    Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
-  have h4 : Nat.card ↥(N.subgroupOf H) = Nat.card ↥(H ⊓ N) :=
-    Nat.card_congr ⟨fun x => ⟨x.1.1, x.1.2, x.2⟩, fun x => ⟨⟨x.1, x.2.1⟩, x.2.2⟩,
-      fun _ => rfl, fun _ => rfl⟩
-  have h5 : Nat.card (↥H ⧸ (N.subgroupOf H)) =
-      Nat.card (↥(H ⊔ N) ⧸ (N.subgroupOf (H ⊔ N))) :=
-    Nat.card_congr (QuotientGroup.quotientInfEquivProdNormalQuotient H N).toEquiv
-  rw [h2, h3, ← h4, ← h5, h1]
-  ring
+`card_sup_mul_card_inf_eq` (`|H ⊔ N| · |H ⊓ N| = |H| · |N|`) used to be duplicated here; it now
+lives upstream in `GroupTheory/CardSupInf.lean` (issue 9209), which this file imports. -/
 
 /-- A positive natural number all of whose prime factors are `p` is a power of `p`. -/
 theorem eq_pow_factorization_of_primeFactors_subset {n p : ℕ} (hn : n ≠ 0)

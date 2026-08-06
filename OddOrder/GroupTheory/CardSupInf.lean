@@ -15,11 +15,13 @@ import Mathlib.Tactic.Ring
 * `card_sup_mul_card_inf_eq` — `N` 正規なら `|H ⊔ N| · |H ⊓ N| = |H| · |N|`
 * `card_sup_eq_mul_of_disjoint_normal` — さらに `H ⊓ N = ⊥` なら `|H ⊔ N| = |H| · |N|`
 
-⚠ 同内容が repo 内に 3 か所ある (2026-07-26 時点):
-`OddOrder/GroupTheory/CNGroupStructure.lean` の同名 public 定理 (Isaacs Ch06 を import する
-ので **Ch05 からは使えない**) と、`OddOrder/Isaacs/Ch06_FrobeniusActions/OddComplement.lean`
-の `private` 版 2 つ。本 leaf は mathlib しか import しないので全ての下流から使える。
-既存 3 か所の redirect は hub 判断 (issue 9209)。
+本 leaf は mathlib しか import しないので全ての下流から使える。
+
+⚠ 重複の状況 (issue 9209): `OddOrder/GroupTheory/CNGroupStructure.lean` にあった同名 public
+定理は **2026-08-06 に削除**し、同ファイルは本 leaf を import するようにした (`ThreeStepGroup`
+が本 leaf を import した時点で名前衝突してビルドが落ちたため)。残るは
+`OddOrder/Isaacs/Ch06_FrobeniusActions/OddComplement.lean` の `private` 版 2 つ
+(`private` なので衝突しない) と `Ch03_SplitExtensions/Problems3B.lean` のインライン 2 か所。
 -/
 
 namespace OddOrder.GroupTheory
