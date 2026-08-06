@@ -93,6 +93,12 @@ open Classical in
 noncomputable def centralScalar (z : A) : k :=
   π z i (Classical.arbitrary (nn i)) (Classical.arbitrary (nn i))
 
+/-- **`centralScalar` is additive on finite sums.**  It is a matrix entry of `π z`, and `π` is a
+ring homomorphism, so the sum passes through. -/
+theorem centralScalar_finsetSum {S : Type*} (s : Finset S) (g : S → A) :
+    centralScalar π i (∑ x ∈ s, g x) = ∑ x ∈ s, centralScalar π i (g x) := by
+  simp only [centralScalar, map_sum, Finset.sum_apply, Matrix.sum_apply]
+
 theorem scalar_centralScalar (hπ : Function.Surjective π) {z : A} (hz : z ∈ Set.center A) :
     π z i = Matrix.scalar (nn i) (centralScalar π i z) := by
   obtain ⟨c, hc⟩ := exists_scalar_of_mem_center hπ hz i
