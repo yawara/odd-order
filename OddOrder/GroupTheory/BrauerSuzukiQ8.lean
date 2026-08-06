@@ -10,6 +10,7 @@ import OddOrder.GroupTheory.QuaternionTwoFacts
 import OddOrder.GroupTheory.SylowContaining
 import OddOrder.GroupTheory.SubgroupInAmbient
 import OddOrder.Isaacs.Ch05_Transfer.Main
+import OddOrder.Mathlib.QuotientGroup
 import Mathlib.Algebra.Group.Action.Pointwise.Finset
 
 /-!
@@ -991,6 +992,59 @@ theorem sq_eq_one_of_isPGroup_zpowers_quotient_centralizer (T : Sylow 2 G)
   rw [hconj] at hcsq
   have h1 : c * v ^ 2 = c := by simpa using congrArg (· * c) hcsq
   exact mul_left_cancel (h1.trans (mul_one c).symm)
+
+/-- **The Sylow `2`-subgroups of `C_G(t)/⟨t⟩` have order `4`** (Navarro p. 141: "`P/⟨t⟩` is a
+Klein four Sylow `2`-subgroup of `C_G(t)/⟨t⟩`").
+
+`T ≅ Q₈` has order `8` and `⟨t⟩` has order `2`, so the image `T̄` has order `4`
+(`QuotientGroup.card_map_mk'_mul_card`); every Sylow `2`-subgroup of the quotient is conjugate
+to `T̄`.
+
+This is what makes `hasNormalPComplement_centralizer_of_card_sylow_four` applicable, hence what
+supplies the normal `2`-complement of `C_{C_G(t)/⟨t⟩}(ȳ)` that Navarro (7.2)/(7.4) needs. -/
+theorem card_sylow_quotient_centralizer (T : Sylow 2 G)
+    (e : ↥(T : Subgroup G) ≃* QuaternionGroup 2)
+    {t : G} (htT : t ∈ (T : Subgroup G)) (ht2 : t ^ 2 = 1) (ht1 : t ≠ 1)
+    (htC : t ∈ Subgroup.centralizer ({t} : Set G))
+    [(Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G)))).Normal]
+    (S : Sylow 2 (↥(Subgroup.centralizer ({t} : Set G)) ⧸
+      Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G))))) :
+    Nat.card ↥(S : Subgroup (↥(Subgroup.centralizer ({t} : Set G)) ⧸
+      Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G))))) = 4 := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hTC : (T : Subgroup G) ≤ Subgroup.centralizer ({t} : Set G) :=
+    sylowQ8_le_centralizer_involution T e htT ht2 ht1
+  set T' : Sylow 2 ↥(Subgroup.centralizer ({t} : Set G)) := T.subtype hTC with hT'
+  set Tbar : Sylow 2 (↥(Subgroup.centralizer ({t} : Set G)) ⧸
+      Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G)))) :=
+    T'.mapSurjective (QuotientGroup.mk'_surjective _) with hTbar
+  -- `|T| = 8`
+  have hT8 : Nat.card ↥(T' : Subgroup ↥(Subgroup.centralizer ({t} : Set G))) = 8 := by
+    rw [hT', Sylow.coe_subtype,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hTC).toEquiv,
+      Nat.card_congr e.toEquiv, Nat.card_eq_fintype_card, QuaternionGroup.card]
+  -- `|⟨t⟩| = 2`
+  have hord : orderOf t = 2 := orderOf_eq_prime ht2 ht1
+  have hNz2 : Nat.card ↥(Subgroup.zpowers
+      (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G)))) = 2 := by
+    rw [Nat.card_zpowers,
+      ← orderOf_injective (Subgroup.centralizer ({t} : Set G)).subtype
+        (Subgroup.subtype_injective _) ⟨t, htC⟩]
+    exact hord
+  -- `⟨t⟩ ≤ T`
+  have hle : Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G)))
+      ≤ (T' : Subgroup ↥(Subgroup.centralizer ({t} : Set G))) := by
+    rw [hT', Sylow.coe_subtype]
+    exact Subgroup.zpowers_le.mpr (Subgroup.mem_subgroupOf.mpr htT)
+  have hkey := QuotientGroup.card_map_mk'_mul_card hle
+  rw [hNz2, hT8] at hkey
+  have hTbarcard : Nat.card ↥(Tbar : Subgroup (↥(Subgroup.centralizer ({t} : Set G)) ⧸
+      Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G))))) = 4 := by
+    rw [hTbar, Sylow.coe_mapSurjective]
+    omega
+  rw [← hTbarcard]
+  exact Nat.card_congr (Sylow.equiv S Tbar).toEquiv
 
 /-- **Navarro pp. 139–146, the character-theoretic core** (issue 9506, `sorry`): when the
 quaternion Sylow `2`-subgroup is proper, its involution lies in a proper normal subgroup.
