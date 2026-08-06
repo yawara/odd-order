@@ -19997,3 +19997,23 @@ BS の鎖は 4 群 (`G` / `C_G(t)` / `C_G(y)` / `C_G(t)/⟨t⟩`) の datum を�
 CLAUDE.md「carrier は posit でなく construct」の doneness 判定でもある。 -/
 
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.Modular.exists_datum_padicComplex
+
+/-! 🎯 **issue 9506 段 345**: (7.5)(c) を対合で使える形に
+(`Modular/GeneralizedDecompositionInvolution`)。
+
+* `generalizedDecompositionNumberInv_eq_of_mul_self_eq_one` — **`x⁻¹ = x` なので
+  `d^{x⁻¹}_{χ·}` と `d^x_{χ·}` は同じ族** ((5.1) の一意性で同定; 定義式が同一の方程式になる)。
+* `sum_mul_basicDecompositionNumber_eq_cartanMatrix_of_involution` — 🎯 **(7.5)(c) の
+  basic set 版を対合で**: `(D^t_i, D^t_j) = UᵗCU`。
+
+⚠ 既存の basic set 版 (7.5)(c) は `d^{x⁻¹}` の列と `d^x` の列を対にする形なので、
+対合でも**そのままでは使えなかった** (`sum_sq_generalizedDecompositionNumber_of_involution` は
+`IBr` 列の対角成分だけを扱い、族の同定は inline だった)。本段でそれを外に出した。
+
+⟹ 段 322 (`UᵗC_{C_G(t)}U = 2(1+δ)`) と合成すれば原文 (3)
+`(D^t_i, D^t_j) = 2(1+δ_ij)` が出る。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumberInv_eq_of_mul_self_eq_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_mul_basicDecompositionNumber_eq_cartanMatrix_of_involution

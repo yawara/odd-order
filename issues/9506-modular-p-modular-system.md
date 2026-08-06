@@ -4644,3 +4644,23 @@ CLAUDE.md「carrier は posit でなく construct」の doneness 判定にもな
 ⟹ **F の残りは純粋に「配線」だけ**になった: 4 群の datum を `obtain` し、
 (7.4)/(7.6)/(7.5) を適用して 4 列とその内積表を作り、段 340 に渡す。
 数学的な未知はもう無い。
+
+### ✅ 段 345 完了 (2026-08-06) — (7.5)(c) を対合で使える形に
+
+`Modular/GeneralizedDecompositionInvolution` に 2 本:
+
+* `generalizedDecompositionNumberInv_eq_of_mul_self_eq_one` — **`x⁻¹ = x` なので
+  `d^{x⁻¹}_{χ·}` と `d^x_{χ·}` は同じ族**((5.1) の一意性で同定; 定義式が同一の方程式になる)
+* `sum_mul_basicDecompositionNumber_eq_cartanMatrix_of_involution` — 🎯 **(7.5)(c) の
+  basic set 版を対合で**: `(D^t_i, D^t_j) = UᵗCU`
+
+⚠ **見落としやすい点**: 既存の basic set 版 (7.5)(c)
+(`sum_mul_basicDecompositionNumber_eq_cartanMatrix`) は `generalizedDecompositionNumberInv` の列と
+`generalizedDecompositionNumber` の列を**対にする形**なので、対合でもそのままでは使えなかった。
+`sum_sq_generalizedDecompositionNumber_of_involution` は `IBr` 列の対角成分だけを扱い、
+族の同定を証明の中に埋めていた。本段でそれを外に出した。
+
+⚠ `GeneralizedDecompositionInvolution` に `BasicSetDecomposition` の import を足した (循環なし)。
+
+⟹ 段 322 (`UᵗC_{C_G(t)}U = 2(1+δ)`) と合成すれば原文 (3) `(D^t_i, D^t_j) = 2(1+δ_ij)` が出る
+= 段 340 の `hbb`/`hcc`/`hdd`/`hbc`/`hbd`/`hcd` の supplier。
