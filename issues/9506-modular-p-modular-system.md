@@ -2996,11 +2996,27 @@ mathlib では `IsAdicComplete.henselianRing` **のみ** (実測: mathlib 内で
 `𝕎(𝔽̄_p)` は `p'`-乗根を全部持つが `ζ_{p^k}` を持たない (`p = 2` なら `i = ζ_4` が無い)
 ので、`ζ_{p^a}` を添加する**全分岐**拡大が要る。
 
-#### 残タスク (段 300 以降)
-- `B = A[ζ_{p^a}]` の構成 (`AdjoinRoot (cyclotomic (p^a) A)` か、`K(ζ)` の整閉包)
-  と `A`-有限自由性 / 全分岐性 (`𝔪_B^e = 𝔪_A·B`)
-- 剰余体が `𝔽̄_p` のまま (⟹ `IsAlgClosed`)
-- `Frac(B)` が `Frac(B)[G]` を分裂 (Brauer の分裂体定理経由)
+#### 残タスク (段 300 以降) — **構成の設計は 2026-08-06 に確定**
+
+`A = 𝕎(𝔽̄_p)`、`k = 𝔽̄_p`、**`B := AdjoinRoot (Polynomial.cyclotomic (p^a) A)`** で行く。
+
+1. **`A`-有限自由**: `cyclotomic` は monic なので `AdjoinRoot.powerBasis'` が
+   階数 `φ(p^a)` の基底を与える ⟹ `Module.Free` / `Module.Finite`。
+   ⟹ 段 300 の 1-2 段 (`isAdicComplete_of_basis` + `map_algebraMap_iff`) がそのまま乗る。
+2. **`B` は局所環 / 全分岐**: 🎯 **鍵の mathlib 補題 =
+   `Polynomial.cyclotomic_mul_prime_pow_eq (R) [CharP R p] (¬p ∣ m) (0 < k)`**
+   — 標数 `p` では `cyclotomic (p^k · m) R = (cyclotomic m R)^{p^{k-1}(p-1)}`。
+   `m = 1` (`cyclotomic 1 = X - 1`) で
+   **`cyclotomic (p^a) k = (X - 1)^{φ(p^a)}`**。
+   ⟹ `B ⧸ 𝔪_A·B ≅ k[X]/((X-1)^{φ(p^a)})` は**局所アルティン**なので `B` は局所環
+   (`𝔪_A·B ⊆ Jacobson`)、`𝔪_B = 𝔪_A·B + (X-1)`、`𝔪_B^{φ(p^a)} ⊆ 𝔪_A·B`。
+   ⟹ 段 300 の `isAdicComplete_of_le_of_pow_le` で **`IsAdicComplete 𝔪_B B`**。
+3. **剰余体は `k` のまま**: `k[X]/((X-1)^φ)` を極大イデアル `(X-1)` で割ると `k`。
+   ⟹ `IsAlgClosed (ResidueField B)` ✅ (modular 側の要求はそのまま)。
+4. **`Frac(B)` が分裂**: `ζ_{p^a} ∈ Frac(B)` と `p'`-乗根 (既に `A` に在る) で
+   `ζ_{exp G}` が揃う ⟹ Brauer の分裂体定理 (repo の `BrauerInductionTheorem`)。
+
+⟹ **新しい数学はほぼ無く、mathlib の `AdjoinRoot` + `cyclotomic` API の積み上げ**。
 
 ### `hconv` は gap ではなく assembly (2026-08-06 実測)
 
