@@ -245,6 +245,75 @@ theorem character_eq_add_add_basicDecompositionNumber {A : ι → κ → ℤ}
   rw [← key]
   ring
 
+set_option maxHeartbeats 1000000 in
+-- The second main theorem it specialises carries the whole block chain.
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+omit [Invertible (Nat.card G : K)] [DecidableEq ι] [Fintype J]
+  [Invertible (Nat.card ↥(centralizerOf x) : K)]
+  [Invertible (Nat.card (↥(centralizerOf x) ⧸ N) : K)] [Fintype ↥(centralizerOf yb)]
+  [Fintype κ] [DecidableEq κ] in
+open scoped Classical in
+include hp hx hω hω' hkerJ hnilH e eG hπG hlinG hnilG eQ hN hζ hζk hζK in
+/-- **Off `Irr(B_0(G))` the basic-set columns at `x` vanish** — the hypothesis `hzero` of
+`exists_proper_normal_of_columns`.
+
+`U` is supported on `IBr(B_0(C_G(x)/N))`: its entries are differences `A_{μl} ε_l - A_{μj₀}
+ε_{j₀}` with `l`, `j₀` in the principal block of the quotient, and `A` is block-diagonal.  So a
+nonzero entry puts `μ` in `IBr(B_0(C_G(x)/N))`, hence in `IBr(B_0(C_G(x)))` by the easy half of
+Navarro (7.6) (`mk_eq_principalBlock_of_quotientPi`); and there the second main theorem kills
+`d^x_{χμ}` for `χ` outside `B_0(G)`. -/
+theorem basicDecompositionNumber_eq_zero_of_blockOfIrr_ne {A : ι → κ → ℤ}
+    (ha0 : ∀ (ν : ι) (l : κ), blockOfIrr eQ (quotientPi_surjective π hπ hlin hN)
+        (quotientPi_smul π hπ hlin hN) hnilQ l
+      ≠ Quotient.mk (blockSetoid (quotientPi π hπ hlin hN).toRingHom
+          (quotientPi_surjective π hπ hlin hN) (quotientPi_smul π hπ hlin hN)) ν → A ν l = 0)
+    {j₀ φ : κ}
+    (hj₀ : blockOfIrr eQ (quotientPi_surjective π hπ hlin hN)
+      (quotientPi_smul π hπ hlin hN) hnilQ j₀
+      = principalBlock (quotientPi π hπ hlin hN).toRingHom (quotientPi_surjective π hπ hlin hN)
+          (quotientPi_smul π hπ hlin hN) hnilQ)
+    (hφ : blockOfIrr eQ (quotientPi_surjective π hπ hlin hN)
+      (quotientPi_smul π hπ hlin hN) hnilQ φ
+      = principalBlock (quotientPi π hπ hlin hN).toRingHom (quotientPi_surjective π hπ hlin hN)
+          (quotientPi_smul π hπ hlin hN) hnilQ)
+    {i : J} (hi : blockOfIrr eG hπG hlinG hnilG i ≠ principalBlock πG hπG hlinG hnilG) :
+    basicDecompositionNumber
+        (generalizedDecompositionNumber x hp hω' hπ hlin hkerJ
+          ((wedderburnRepresentation eG i).character)
+          (fun _ _ h => character_eq_of_isConj _ h))
+        (fun μ l => ((intBasicSetMatrix eQ A yb j₀ μ l : ℤ) : K)) φ = 0 := by
+  classical
+  refine basicDecompositionNumber_eq_zero fun μ hU => ?_
+  -- a nonzero entry of `U` needs a nonzero entry of `A` in the principal block of the quotient
+  have hmk : Quotient.mk (blockSetoid (quotientPi π hπ hlin hN).toRingHom
+      (quotientPi_surjective π hπ hlin hN) (quotientPi_smul π hπ hlin hN)) μ
+      = principalBlock (quotientPi π hπ hlin hN).toRingHom (quotientPi_surjective π hπ hlin hN)
+          (quotientPi_smul π hπ hlin hN) hnilQ := by
+    by_cases hAφ : A μ φ = 0
+    · by_cases hAj : A μ j₀ = 0
+      · exact absurd (by rw [intBasicSetMatrix, hAφ, hAj, zero_mul, zero_mul, sub_zero,
+          Int.cast_zero]) hU
+      · have hbj : blockOfIrr eQ (quotientPi_surjective π hπ hlin hN)
+            (quotientPi_smul π hπ hlin hN) hnilQ j₀
+            = Quotient.mk (blockSetoid (quotientPi π hπ hlin hN).toRingHom
+              (quotientPi_surjective π hπ hlin hN) (quotientPi_smul π hπ hlin hN)) μ := by
+          by_contra hne
+          exact hAj (ha0 μ j₀ hne)
+        exact hbj.symm.trans hj₀
+    · have hbφ : blockOfIrr eQ (quotientPi_surjective π hπ hlin hN)
+          (quotientPi_smul π hπ hlin hN) hnilQ φ
+          = Quotient.mk (blockSetoid (quotientPi π hπ hlin hN).toRingHom
+            (quotientPi_surjective π hπ hlin hN) (quotientPi_smul π hπ hlin hN)) μ := by
+        by_contra hne
+        exact hAφ (ha0 μ φ hne)
+      exact hbφ.symm.trans hφ
+  exact generalizedDecompositionNumber_principalBlock_eq_zero_of_blockOfIrr_ne
+    (hp := hp) (hx := hx) (hω := hω) (e := e) (eG := eG) (hπG := hπG) (hlinG := hlinG)
+    (hπ := hπ) (hlin := hlin) (hkerJ := hkerJ) (hnil := hnilH) (hnilG := hnilG) (hω' := hω')
+    (hζ := hζ) (hζk := hζk) (hζK := hζK)
+    (hφ₀ := mk_eq_principalBlock_of_quotientPi hπ hlin hN hnilH hnilQ hmk) (hi := hi)
+
 end ThreeTermExpansion
 
 end OddOrder.RepresentationTheory.Modular
