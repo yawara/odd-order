@@ -149,6 +149,21 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
   -- the centrality of `⟨z⟩` in `C_G(z)`, as the `p`-regular commutation the chain asks for
   have hcent : ∀ w : ↥C, IsPRegular 2 w → ∀ v ∈ Nz, Commute w v := fun w _ v hv =>
     Subgroup.mem_center_iff.mp (zpowers_self_le_center_centralizer z hzC hv) w
+  -- the same converse, for the pair `(Q, C_Q(ȳ))`
+  haveI : Fintype (↥C ⧸ Nz) := Fintype.ofFinite _
+  haveI : DecidableEq (ConjClasses (↥C ⧸ Nz)) := Classical.decEq _
+  haveI : Fintype (ConjClasses (↥C ⧸ Nz)) := Fintype.ofFinite _
+  have hconvC := fun b hind =>
+    eq_principalBlock_of_inducedBlockOfCentralizer_eq_of_roots (K := ℂ_[2]) Nat.prime_two hybP
+      hroot hroot' hζ hζk hζK eQ eY (quotientPi_surjective πC hπC hlinC hNzP)
+      (quotientPi_smul πC hπC hlinC hNzP) hnilQ hkerJQ hπY hlinY hnilY hkerJY b hind
+  -- the integral coefficient family `A` of Navarro (3.16), collected over `IBr(Q)`
+  obtain ⟨ωBT, hωBT⟩ : ∃ w : ℂ_[2], IsPrimitiveRoot w (Nat.card (↥C ⧸ Nz)) :=
+    exists_isPrimitiveRoot_padicComplex 2 Nat.card_pos.ne'
+  obtain ⟨A, ha0, hasum⟩ :=
+    exists_intBlockCoeff (𝒪 := 𝓞_ℂ_[2]) (m := mQ) Nat.prime_two hϖ hϖ'
+      (quotientPi_surjective πC hπC hlinC hNzP) (quotientPi_smul πC hπC hlinC hNzP) hkerJQ eQ
+      hnilQ Nat.card_pos.ne' (fun g => pow_card_eq_one') hωBT
   sorry
 
 end OddOrder.GroupTheory
