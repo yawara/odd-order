@@ -18850,3 +18850,24 @@ Navarro p.140 が「これらは先頭成分が 1 の整数列である」と言
 #assert_only_allowed_axioms OddOrder.GroupTheory.exists_conj_mem_sylow
 
 #assert_only_allowed_axioms OddOrder.GroupTheory.isConj_centralizer_of_orderFour
+
+/-! 🎯🎯 **issue 9506 段 288**: Navarro p.141「all the involutions of `C_G(t)/⟨t⟩` are
+conjugate since the elements of order 4 of `P` are `C_G(t)`-conjugate」を証明。
+
+これで p.141 冒頭「So the hypotheses of Corollary (7.4) are satisfied」の**群論的仮説が
+3 点とも揃った** (段 286 の「`T` は `C_G(t)` の Sylow-2」「`Q₈/⟨t⟩` は Klein four」と本段)。
+
+- `zpowers_self_normal_centralizer` = `⟨t⟩ ⊴ C_G(t)` (中心的だから; 商群を作るのに要る)
+- `isConj_quotient_of_mem_sylowQ8` = `T` の 2 元の像が共に非自明なら共役。
+  像が非自明 ⟹ その元は `⟨t⟩` の外 ⟹ `Q₈` の対合は一意なので位数 4 ⟹ 段 287 の
+  `isConj_centralizer_of_orderFour` が `C_G(t)` 内の融合元を与え、商へ落とす。
+- `isConj_of_sq_eq_one_quotient_centralizer` = 商の対合は全て共役。
+  対合は 2-元なので段 287 の `exists_conj_mem_sylow` で Sylow-2 `T̄`
+  (= `T` の像、`Sylow.subtype` + `Sylow.mapSurjective`) に共役で入り、
+  `T̄` の非自明元同士は上で共役。 -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.zpowers_self_normal_centralizer
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.isConj_quotient_of_mem_sylowQ8
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.isConj_of_sq_eq_one_quotient_centralizer

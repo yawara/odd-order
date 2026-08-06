@@ -7,6 +7,7 @@ import OddOrder.GroupTheory.BrauerSuzukiEndgame
 import OddOrder.GroupTheory.CardSupInf
 import OddOrder.GroupTheory.CentralSylowComplement
 import OddOrder.GroupTheory.QuaternionTwoFacts
+import OddOrder.GroupTheory.SylowContaining
 import OddOrder.GroupTheory.SubgroupInAmbient
 import OddOrder.Isaacs.Ch05_Transfer.Main
 import Mathlib.Algebra.Group.Action.Pointwise.Finset
@@ -825,6 +826,116 @@ theorem sylowQ8_le_centralizer_involution (T : Sylow 2 G)
     (ht2 : t ^ 2 = 1) (ht1 : t ≠ 1) :
     (T : Subgroup G) ≤ Subgroup.centralizer ({t} : Set G) :=
   le_trans Subgroup.le_normalizer (normalizer_le_centralizer_involution T e htT ht2 ht1)
+
+omit [Finite G] in
+/-- **`⟨t⟩` is normal in `C_G(t)`** — it is central there. -/
+theorem zpowers_self_normal_centralizer (t : G) (htC : t ∈ Subgroup.centralizer ({t} : Set G)) :
+    (Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G)))).Normal :=
+  ⟨fun n hn g => by
+    have hc : g * n = n * g :=
+      Subgroup.mem_center_iff.mp (zpowers_self_le_center_centralizer t htC hn) g
+    rw [show g * n * g⁻¹ = n by rw [hc, mul_assoc, mul_inv_cancel, mul_one]]
+    exact hn⟩
+
+/-- **Navarro p. 141: two elements of `T` whose images in `C_G(t)/⟨t⟩` are non-trivial have
+conjugate images.**  Such an element lies outside `⟨t⟩`, hence has order `4` because the involution
+of `Q₈` is unique; and the elements of order `4` of `T` are `C_G(t)`-conjugate
+(`isConj_centralizer_of_orderFour`). -/
+theorem isConj_quotient_of_mem_sylowQ8 (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 2 G)
+    (e : ↥(T : Subgroup G) ≃* QuaternionGroup 2) (hTG : (T : Subgroup G) ≠ ⊤)
+    {t : G} (htT : t ∈ (T : Subgroup G)) (ht2 : t ^ 2 = 1) (ht1 : t ≠ 1)
+    (htC : t ∈ Subgroup.centralizer ({t} : Set G))
+    [(Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G)))).Normal]
+    {wa wb : ↥(Subgroup.centralizer ({t} : Set G))}
+    (hwa : (wa : G) ∈ (T : Subgroup G)) (hwb : (wb : G) ∈ (T : Subgroup G))
+    (ha1 : (QuotientGroup.mk wa :
+      ↥(Subgroup.centralizer ({t} : Set G)) ⧸ Subgroup.zpowers ⟨t, htC⟩) ≠ 1)
+    (hb1 : (QuotientGroup.mk wb :
+      ↥(Subgroup.centralizer ({t} : Set G)) ⧸ Subgroup.zpowers ⟨t, htC⟩) ≠ 1) :
+    IsConj (QuotientGroup.mk wa :
+        ↥(Subgroup.centralizer ({t} : Set G)) ⧸ Subgroup.zpowers ⟨t, htC⟩)
+      (QuotientGroup.mk wb) := by
+  classical
+  -- an element of `T` whose image is non-trivial has order `4`
+  have horder : ∀ w : ↥(Subgroup.centralizer ({t} : Set G)), (w : G) ∈ (T : Subgroup G) →
+      (QuotientGroup.mk w :
+        ↥(Subgroup.centralizer ({t} : Set G)) ⧸ Subgroup.zpowers ⟨t, htC⟩) ≠ 1 →
+      (w : G) ^ 2 ≠ 1 := by
+    intro w hw hw1 hsq
+    refine hw1 ?_
+    rw [QuotientGroup.eq_one_iff]
+    by_cases hone : (w : G) = 1
+    · rw [show w = 1 from Subtype.ext hone]; exact Subgroup.one_mem _
+    · have hwt : (w : G) = t := congrArg Subtype.val
+        (eq_of_sq_eq_one_of_quaternionTwo e (a := (⟨(w : G), hw⟩ : ↥(T : Subgroup G)))
+          (b := (⟨t, htT⟩ : ↥(T : Subgroup G))) (Subtype.ext (by push_cast; exact hsq))
+          (fun h => hone (congrArg Subtype.val h)) (Subtype.ext (by push_cast; exact ht2))
+          (fun h => ht1 (congrArg Subtype.val h)))
+      rw [show w = (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G))) from Subtype.ext hwt]
+      exact Subgroup.mem_zpowers _
+  obtain ⟨g, hgC, hg⟩ := isConj_centralizer_of_orderFour hO T e hTG htT ht2 ht1 hwa hwb
+    (horder wa hwa ha1) (horder wb hwb hb1)
+  refine isConj_iff.mpr ⟨QuotientGroup.mk (⟨g, hgC⟩ : ↥(Subgroup.centralizer ({t} : Set G))), ?_⟩
+  have hC : (⟨g, hgC⟩ : ↥(Subgroup.centralizer ({t} : Set G))) * wa
+      * (⟨g, hgC⟩ : ↥(Subgroup.centralizer ({t} : Set G)))⁻¹ = wb :=
+    Subtype.ext (by push_cast; exact hg)
+  calc QuotientGroup.mk (⟨g, hgC⟩ : ↥(Subgroup.centralizer ({t} : Set G))) * QuotientGroup.mk wa
+        * (QuotientGroup.mk (⟨g, hgC⟩ : ↥(Subgroup.centralizer ({t} : Set G))))⁻¹
+      = QuotientGroup.mk ((⟨g, hgC⟩ : ↥(Subgroup.centralizer ({t} : Set G))) * wa
+          * (⟨g, hgC⟩ : ↥(Subgroup.centralizer ({t} : Set G)))⁻¹) := rfl
+    _ = QuotientGroup.mk wb := by rw [hC]
+
+/-- **Navarro p. 141: all involutions of `C_G(t)/⟨t⟩` are conjugate.**  Each is conjugate into the
+Sylow `2`-subgroup `T̄` — the image of `T` — (`exists_conj_mem_sylow`), and any two non-identity
+elements of `T̄` are conjugate (`isConj_quotient_of_mem_sylowQ8`). -/
+theorem isConj_of_sq_eq_one_quotient_centralizer (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 2 G)
+    (e : ↥(T : Subgroup G) ≃* QuaternionGroup 2) (hTG : (T : Subgroup G) ≠ ⊤)
+    {t : G} (htT : t ∈ (T : Subgroup G)) (ht2 : t ^ 2 = 1) (ht1 : t ≠ 1)
+    (htC : t ∈ Subgroup.centralizer ({t} : Set G))
+    [(Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G)))).Normal]
+    {x y : ↥(Subgroup.centralizer ({t} : Set G)) ⧸
+      Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G)))}
+    (hx1 : x ≠ 1) (hx2 : x ^ 2 = 1) (hy1 : y ≠ 1) (hy2 : y ^ 2 = 1) : IsConj x y := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  set Tbar : Sylow 2 (↥(Subgroup.centralizer ({t} : Set G)) ⧸
+      Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G)))) :=
+    (T.subtype (sylowQ8_le_centralizer_involution T e htT ht2 ht1)).mapSurjective
+      (QuotientGroup.mk'_surjective _) with hTbar
+  -- an involution of the quotient is a `2`-element, hence conjugate into `T̄`
+  have hpg : ∀ z : ↥(Subgroup.centralizer ({t} : Set G)) ⧸
+        Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G))),
+      z ≠ 1 → z ^ 2 = 1 → IsPGroup 2 (Subgroup.zpowers z) := by
+    intro z hz1 hz2
+    refine IsPGroup.of_card (n := 1) ?_
+    rw [Nat.card_zpowers, pow_one]
+    exact ((Nat.dvd_prime Nat.prime_two).mp (orderOf_dvd_of_pow_eq_one hz2)).resolve_left
+      fun h => hz1 (orderOf_eq_one_iff.mp h)
+  obtain ⟨c, hc⟩ := exists_conj_mem_sylow (hpg x hx1 hx2) Tbar
+  obtain ⟨d, hd⟩ := exists_conj_mem_sylow (hpg y hy1 hy2) Tbar
+  -- the conjugates are still non-trivial, and lie in the image of `T`
+  have hne : ∀ (u z : ↥(Subgroup.centralizer ({t} : Set G)) ⧸
+        Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G)))),
+      z ≠ 1 → u * z * u⁻¹ ≠ 1 := fun u z hz h => hz (by
+    calc z = u⁻¹ * (u * z * u⁻¹) * u := by group
+      _ = u⁻¹ * 1 * u := by rw [h]
+      _ = 1 := by group)
+  have hunpack : ∀ z : ↥(Subgroup.centralizer ({t} : Set G)) ⧸
+        Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G))),
+      z ∈ (Tbar : Subgroup _) →
+      ∃ w : ↥(Subgroup.centralizer ({t} : Set G)), (w : G) ∈ (T : Subgroup G) ∧
+        QuotientGroup.mk w = z := by
+    intro z hz
+    rw [hTbar, Sylow.coe_mapSurjective, Subgroup.mem_map] at hz
+    obtain ⟨w, hw, hwz⟩ := hz
+    rw [Sylow.coe_subtype, Subgroup.mem_subgroupOf] at hw
+    exact ⟨w, hw, hwz⟩
+  obtain ⟨wa, hwaT, hwa⟩ := hunpack _ hc
+  obtain ⟨wb, hwbT, hwb⟩ := hunpack _ hd
+  have hkey := isConj_quotient_of_mem_sylowQ8 hO T e hTG htT ht2 ht1 htC hwaT hwbT
+    (by rw [hwa]; exact hne c x hx1) (by rw [hwb]; exact hne d y hy1)
+  rw [hwa, hwb] at hkey
+  exact ((isConj_iff.mpr ⟨c, rfl⟩).trans hkey).trans (isConj_iff.mpr ⟨d, rfl⟩).symm
 
 /-- **Navarro pp. 139–146, the character-theoretic core** (issue 9506, `sorry`): when the
 quaternion Sylow `2`-subgroup is proper, its involution lies in a proper normal subgroup.
