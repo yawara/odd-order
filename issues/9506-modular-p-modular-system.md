@@ -3263,6 +3263,40 @@ mathlib の直接支援はゼロ。
    `𝕎(𝔽̄_p)[ζ_{p^a}]` (`Algebra/CyclotomicAdjoin.lean`) は (a) 側の資産として保持するが、
    **(b) が通れば不要になる**。
 
+#### ✅✅✅ 段 314-315 (2026-08-06): **係数環問題は決着した**
+
+段 314 で鎖 13 file の binder を
+`[IsAdicComplete (maximalIdeal 𝒪) 𝒪]` → `[IsIntegrallyClosed 𝒪] [IsAlgClosed (FractionRing 𝒪)]`
+に張り替え、段 315 で `𝓞_ℂ_[p]` に `IsAlgClosed (FractionRing 𝓞_ℂ_[p])` を付けた。
+
+⚠ **設計上の決め手**: 係数体は抽象 `K` でなく **`FractionRing 𝒪`** で書く。
+抽象 `K` は仮説にしか現れないので instance 解決で metavariable になり、
+全 consumer に explicit 引数として通す羽目になる (これを最初に試して詰まった)。
+
+**carrier の検証 (`PadicComplexSystem` の `CarrierCheck` 節、恒久化)** — 鎖の要求する
+12 仮説をすべて `𝓞_ℂ_[p]` / `ℂ_[p]` が満たす:
+`IsDomain` / `ValuationRing` / `HenselianLocalRing` / `IsPModularSystem p` /
+`IsIntegrallyClosed` / `IsAlgClosed (FractionRing ·)` / `Algebra 𝒪 K` /
+`IsFractionRing 𝒪 K` / `FaithfulSMul 𝒪 K` / `IsAlgClosed (ResidueField ·)` /
+`CharP (ResidueField ·) p` / `CharZero K`。
+
+⟹ **`Frac(B)` の分裂 = Brauer の分裂体定理も Schur 指数も分岐拡大も不要になった。**
+`K[G]` の分裂は `ℂ_[p]` が代数閉なので無償 (段 292 `exists_algEquiv_pi_matrix_padicComplex`)、
+`k[G]` の分裂も剰余体が代数閉なので無償 (段 292)。
+
+📌 副産物: `BlockCornerLift.exists_corner_inverse_blockCharacter` と
+`InducedBlockWitness.exists_inducedBlock_witness` の完備性仮説は元から使われておらず削除した。
+
+📌 案 (a) の資産 (`Algebra/CyclotomicAdjoin.lean` = `𝕎(𝔽̄_p)[ζ_{p^a}]`、段 300-308) は
+保持するが **critical path 上には無い**。
+
+#### ⟹ 次の frontier は `hconv` の assembly に戻る
+
+carrier が片付いたので、下記「`hconv` は gap ではなく assembly」節の残り
+(= 「自明な `𝒪`-格子表現のブロックは主ブロック」 → `hvanishH` → `hcoeff` → `hconv`)
+が次の着手点。⚠ その節の記述は 2026-08-06 の carrier 危機より前のものなので、
+着手前に実測で再確認すること。
+
 ### `hconv` は gap ではなく assembly (2026-08-06 実測)
 
 `hconv` (= Brauer 第 3 主定理の逆向き) の**本体は既に在る**:
