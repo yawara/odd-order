@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.RingTheory.LocalRing.Module
 import Mathlib.LinearAlgebra.TensorProduct.Tower
 import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+import OddOrder.Algebra.AugmentationIdeal
 import OddOrder.GroupTheory.RepresentationTheory.Modular.LatticeEigenspaces
 
 /-!
@@ -282,5 +283,25 @@ theorem trace_eq_brauerCharacter_reduction {g : G} (hg : (ρ g) ^ n = 1) :
   exact Finset.sum_congr rfl fun ζ _ => by rw [reduction_apply]
 
 end Representation
+
+/-! ### The trivial representation
+
+The group algebra acts on a trivial representation through the augmentation.  This is what makes
+the block of the trivial character the *principal* block: `principalBlock` is by definition the
+block whose central character is the augmentation. -/
+
+/-- **On a trivial representation the group algebra acts by the augmentation.**  Both sides are
+`R`-linear in `a` and agree on group elements. -/
+theorem asAlgebraHom_trivial {R M H : Type*} [CommRing R] [Group H] [AddCommGroup M]
+    [Module R M] (a : MonoidAlgebra R H) :
+    (Representation.trivial R H M).asAlgebraHom a
+      = OddOrder.Algebra.augmentation R H a • LinearMap.id := by
+  induction a using MonoidAlgebra.induction_on with
+  | hM g =>
+    rw [OddOrder.Algebra.augmentation_of, one_smul, MonoidAlgebra.of_apply,
+      Representation.asAlgebraHom_single, one_smul]
+    rfl
+  | hadd x y hx hy => rw [map_add, hx, hy, map_add, add_smul]
+  | hsmul r x hx => rw [map_smul, hx, map_smul, smul_smul, smul_eq_mul]
 
 end OddOrder.RepresentationTheory.Modular

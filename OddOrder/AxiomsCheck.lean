@@ -18997,3 +18997,12 @@ Külshammer の公式と第 3 主定理が `𝒪` 側で持ち回る 3 仮説
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.Modular.mapRingHom_injective
 
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.Modular.exists_blockOfIrr_eq
+
+/-! 🎯 **issue 9506 段 296**: 自明表現の上では群環は増大射で作用する
+(`asAlgebraHom_trivial`, `Modular/Reduction`)。
+
+`principalBlock` は「中心指標が増大射であるブロック」として定義されているので、
+これが「自明表現のブロック = 主ブロック」の核。段 295 の `blockOfIrr` 全射性と組んで
+`hvanishH` を任意の `B ≠ B₀` に降ろすのに使う (`hne` の discharge)。 -/
+
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.Modular.asAlgebraHom_trivial
