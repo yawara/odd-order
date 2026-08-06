@@ -5459,3 +5459,30 @@ supply できない形**になっていた ([[check-hypothesis-satisfiability-be
 3. **群論的仮説**: 段 338 (Q₈ の対合一意) / 段 339 (`C_G(t)/⟨t⟩` の 2-元は対合) /
    段 290-291 / 段 321b。
 4. `exists_proper_normal_of_columns` を呼ぶ ⟹ `q8_exists_proper_normal`。
+
+### ✅ 段 371 完了 + 段 372 の実測 supplier 一覧 (2026-08-07)
+
+段 371 = `BasicSetDegreeOdd.exists_odd_intCast_principalBasicSet` (`hs₁`/`hs₂`)。
+
+**残りは全部「配線」だと実測で確認した** — 段 340 の入力を作るのに必要な補題は
+すべて repo に在る:
+
+| 入力 | supplier | 実在 |
+|---|---|---|
+| `A` (`ha0`/`hasum`) | `exists_intBlockCoeff` (`IntegralBasicSetMatrix`) | ✅ |
+| `hcart = 4` | `cartanMatrix_principalBlock_eq_card_sylow` (`PrincipalBlockCartanEntry`) + Klein 四元 Sylow | ✅ |
+| `hconjall` (Q 側) | 段 339 + `isConj_of_sq_eq_one_quotient_centralizer` | ✅ |
+| `hconv` (converse 第三主定理) | `ThirdMainConverseSupply.eq_principalBlock_of_inducedBlockOfCentralizer_eq_of_roots` | ✅ |
+| `a` 列 + `haa`/`hga`/`ha0` | 段 348 `exists_intColumn_generalizedDecompositionNumber_principalBlock` | ✅ |
+| `hab`/`hac`/`had` | 段 349 `sum_generalizedDecompositionNumber_mul_basicDecompositionNumber_eq_zero` | ✅ |
+| `hcong` | 段 342 `two_dvd_add_of_modEq` + 段 289 `intModEq_of_isPElement_of_isPElement` | ✅ |
+| `h10` | 段 330/335/336 | ✅ |
+| `hgdeg`/`hTval`/`hg0`/`hgpos` | 段 341 | ✅ |
+| b/c/d 列 + t 側の全主張 | 段 370 `exists_intColumns_basicDecompositionNumber` | ✅ |
+| `hs₁`/`hs₂` | 段 371 | ✅ |
+| 5 群の datum | 段 344 `exists_datum_padicComplex` | ✅ |
+
+⟹ **段 372 以降は「`q8_exists_proper_normal` の群論的 configuration を作って
+上の 12 行を順に食わせる」だけ**。群論側で要るのは
+`Q = C_G(t)/⟨t⟩` の Sylow 2 が Klein 四元群であること (`T ≅ Q₈` ⟹ `T/⟨t⟩ ≅ V₄`)、
+位数 4 の元 `y` の存在と `¬ IsConj t y`、`Q` の対合 `ȳ` の指定。
