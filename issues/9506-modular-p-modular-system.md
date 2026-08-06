@@ -5189,3 +5189,36 @@ theorem exists_sum_character_subgroup (ρ : Representation F G V) (H : Subgroup 
    「還元後の中心指標 `λ_χ` はブロックにしか依らない」から
    **`A` はブロックの合併** ⟹ `Irr(B)` は単一連結成分。
 4. ⟹ (7.6) のブロック全単射 → `hd` → `hT`/`hb0`-`hd0` → 組み立て。
+
+### ✅✅✅ 段 360/361 完了 (2026-08-06) — **Navarro (3.8) Osima が完全形で形式化**
+
+* 段 360 `exists_mapRingHom_eq_sum_ordinaryIdempotent` — `∃ f : 𝒪G, mapRingHom f = ∑_{i∈A} e_i`
+  (段 359 の係数を `choose` → `MonoidAlgebra.ofCoeff (Finsupp.equivFunOnFinite.symm z)`)
+* 段 361 `exists_center_mapRingHom_eq_sum_ordinaryIdempotent` — **`f_A ∈ Z(𝒪G)`**
+  (中心性 = 像が中心 + `𝒪G → KG` の単射性)
+
+⟹ 原文 (3.8) COROLLARY (Osima) がそのまま Lean にある。
+
+#### ⏭ 段 362 = **(3.9) 本体**。repo 用語への翻訳が済んだ (これが handoff の要点)
+
+`blockOfIrr i` は **「`ω_{χ_i}` の還元を中心指標に持つ唯一のブロック」** (定義、
+`BlockOfIrreducible.lean:115`) — つまり原文の `λ_χ` そのもの。したがって (3.9) は
+
+> **`A` が linking で閉じていれば、`Q i` かつ `blockOfIrr i = blockOfIrr j` ⟹ `Q j`**
+> (= `A` は `blockOfIrr` のファイバーの合併 = `Irr(B)` は単一連結成分)
+
+証明の 3 行:
+1. 段 361 の `f_A ∈ Z(𝒪G)`、その `K` 像は `∑_{k∈A} e_k`。
+2. `centralScalar` は加法的で `centralScalar_ordinaryIdempotent : ω_j(e_i) = δ_{ij}`
+   (`OrdinaryIdempotent.lean:93`) ⟹ `ω_i(∑_{k∈A}e_k) = if Q i then 1 else 0`。
+3. `blockCharacter (blockOfIrr i) (f_A の還元) = residue (ω_i(f_A))`
+   (`blockOfLattice` の定義的性質 — `blockCharacter_blockOfLattice` 等を grep で確認すること)。
+   `blockOfIrr i = blockOfIrr j` なら左辺が一致 ⟹ `residue 1 = residue 0` ⟹ `1 = 0` で矛盾。
+
+⟹ 段 363 = (3.10)/(Problem (3.4)) の系、段 364 = (7.6) のブロック全単射
+(`QuotientPrincipalBlock` の**難しい向き** `block_C(μ) = B₀ ⟹ block_Q(μ) = B₀`)、
+その後 `hd` → `hT`/`hb0`-`hd0` → 5 群 datum の組み立て。
+
+⚠ `BlockIdempotentOrdinary.lean:130-133` に
+`centralScalar … i fK • ordinaryIdempotent e i = if blockOfIrr … i = B then … else 0`
+という**同じ形の既存論法**がある。段 362 はこれを雛形にできる。
