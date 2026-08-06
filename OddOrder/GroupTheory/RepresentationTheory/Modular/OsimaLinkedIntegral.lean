@@ -203,4 +203,36 @@ theorem exists_mapRingHom_eq_sum_ordinaryIdempotent [Fact p.Prime] {Q : ι' → 
   rw [MonoidAlgebra.coeff_mapRingHom]
   simpa using (hz g).symm
 
+set_option linter.unusedFintypeInType false in
+open scoped Classical in
+include hp hω hω' hkerJ in
+/-- **Navarro (3.8), full form: `f_A ∈ Z(𝒪G)`.**
+
+The lift of `∑_{χ ∈ A} e_χ` is central because its image is (a sum of central idempotents) and
+`𝒪G → KG` is injective. -/
+theorem exists_center_mapRingHom_eq_sum_ordinaryIdempotent [Fact p.Prime] {Q : ι' → Prop}
+    (hQ : ∀ (i j : ι') (ψ : ι), Q i →
+      decompositionMatrix hp hω hω' hπ hlin hkerJ e i ψ ≠ 0 →
+      decompositionMatrix hp hω hω' hπ hlin hkerJ e j ψ ≠ 0 → Q j) :
+    ∃ f : Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G),
+      MonoidAlgebra.mapRingHom G (algebraMap 𝒪 K) (f : MonoidAlgebra 𝒪 G)
+        = ∑ i ∈ Finset.univ.filter Q, ordinaryIdempotent e i := by
+  classical
+  obtain ⟨f, hf⟩ :=
+    exists_mapRingHom_eq_sum_ordinaryIdempotent hp hω hω' hπ hlin hkerJ e hQ
+  have hinj : Function.Injective (MonoidAlgebra.mapRingHom G (algebraMap 𝒪 K)) := by
+    intro a b hab
+    refine MonoidAlgebra.coeff_injective ?_
+    ext x
+    have hx := congrArg (fun y : MonoidAlgebra K G => y.coeff x) hab
+    simp only [MonoidAlgebra.coeff_mapRingHom] at hx
+    exact IsFractionRing.injective 𝒪 K hx
+  have hsum : (∑ i ∈ Finset.univ.filter Q, ordinaryIdempotent e i)
+      ∈ Subalgebra.center K (MonoidAlgebra K G) :=
+    Subalgebra.sum_mem _ fun i _ => ordinaryIdempotent_mem_center e i
+  refine ⟨⟨f, Subalgebra.mem_center_iff.mpr fun b => ?_⟩, hf⟩
+  refine hinj ?_
+  rw [map_mul, map_mul, hf]
+  exact Subalgebra.mem_center_iff.mp hsum _
+
 end OddOrder.RepresentationTheory.Modular
