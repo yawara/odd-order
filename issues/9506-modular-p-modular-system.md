@@ -2796,25 +2796,36 @@ p.139 の残り = 「位数 4 の元は全て `G`-共役 (実は `C_G(t)`-共役
   `GroupTheory/CentralSylowComplement.hasNormalPComplement_of_sylow_le_center` (段 200;
   `y` は自分の中心化群で中心的なので仮説が自動)、Cartan 値は
   `Modular/PrincipalBlockCartan.card_mul_sum_sq_principalBlock` (`:157`)。
-  ⟹ **次の実装単位** = この 2 つで `hcart : cartanMatrix … = 4` を `C_G(y)` について供給し、
-  一般化済 (7.2) (段 277) に食わせる。
   「四元数群は位数 4 の中心元を持たない」は **段 278 で完了**
   (`sq_eq_one_of_mem_center_of_quaternionTwo`)。
 
-  **「`⟨y⟩` が `C_G(y)` の Sylow-2」の導出 (2026-08-06 に段取り確定)**:
-  `S : Sylow 2 ↥C_G(y)` を取る。`y` は `C_G(y)` の中心にいるので `⟨y⟩` は正規 2-部分群 ⟹
-  mathlib `IsPGroup.le_sylow_of_normal` で `⟨y⟩ ≤ S`、よって `4 ∣ |S|`。
-  `|S| = 8` なら `|G|_2 = 8` ゆえ `S` は `G` の Sylow-2 でもあり `T` と共役 ⟹ `S ≅ Q₈`;
-  一方 `y ∈ Z(S)` (中心性) かつ `y² ≠ 1` で段 278 に矛盾。⟹ `|S| = 4 = |⟨y⟩|` ⟹ `⟨y⟩ = S`。
-  ⚠ 要る配管: 「位数 8 の 2-部分群は `G` の Sylow-2」(`|G|_2 = 8` から)。
-  Sylow 共役による `≅ Q₈` の移送は **段 279 で完了**
-  (`nonempty_mulEquiv_quaternionTwo_of_sylow`)。
+  ✅ **「`⟨y⟩` が `C_G(y)` の Sylow-2」= 段 281 で完了**
+  (`sylow_centralizer_eq_zpowers`、`BrauerSuzukiQ8.lean`)。証明は予定どおり:
+  `y` は `C_G(y)` の中心 ⟹ `⟨y⟩` は正規 2-部分群 ⟹ `IsPGroup.le_sylow_of_normal` で
+  `⟨y⟩ ≤ S` ゆえ `4 ∣ |S|`; `S` の `G` への像は 2-部分群ゆえ `|S| ∣ |Q| = 8`;
+  `|S| = 8` なら濃度一致で像 `= Q` で `Q ≅ Q₈` (段 279) だが `Q ⊆ C_G(y)` の元は
+  `y` と可換ゆえ `y ∈ Z(Q)` で段 278 に矛盾 ⟹ `|S| = 4 = |⟨y⟩|`。
+  ⚠ 「位数 8 の 2-部分群は Sylow」という補題は**要らなかった** —
+  `IsPGroup.exists_le_sylow` で包む Sylow `Q` を取り、濃度一致で `= Q` を出す方が短い。
+  正規 2-補群への接続も同段で完了 (`hasNormalPComplement_centralizer_orderFour`)。
 
-⚠ **`GroupTheory/BrauerSuzukiQ8.lean` は 2026-08-06 時点で 1141 行** (上限 1500)。
-"Analysis at y" の本体を足す前に、`Q₈` 固有の decidable 事実群
-(`quaternionTwo_*` と同型移送版、~250 行) を `GroupTheory/QuaternionTwoFacts.lean` 等へ
-prefix-split するのが素直 (CLAUDE.md「ファイル粒度」= 新 leaf は同じ commit で
-`OddOrder.lean` に配線)。
+  ✅ **`hcart` の供給ルート = 段 282 で完了**
+  (`cartanMatrix_principalBlock_eq_card_sylow`、`Modular/PrincipalBlockCartanEntry.lean`)。
+  ⚠ **上の「所在」記述は不正確だった**: `card_mul_sum_sq_principalBlock` は degree 版で、
+  Cartan 版 `card_mul_cartanMatrix_principalBlock` (`|N| · c_{φ₀φ₀} = |G|`、`K` の中の等式)
+  が既に `PrincipalBlockCartanEntry.lean` に在った (ただし **consumer ゼロ**)。
+  足りなかったのは「`K` は標数 0 ゆえ ℕ で読み直し、`|N| · [G:N] = |G|` と約して
+  `c = [G:N] = |S|`」の一段だけ。支持補題
+  `index_eq_card_sylow_of_isPGroup_quotient` (`GroupTheory/ThreeStepGroup.lean`) も新設
+  (`S ⊔ N = ⊤` + `S ⊓ N = ⊥` ⟹ `|G| = |S|·|N|`)。
+
+  ⟹ **次の実装単位** = `C_G(y)` について (7.2) の仮説一式を組む:
+  `hcart` は段 281+282 の合成 (`|Sylow of C_G(y)| = |⟨y⟩| = 4`)、
+  `hconjall` は `isConj_of_orderFour` (段 276)、`hinv`/`hy4` は `Q₈` の Hamiltonian 性。
+
+✅ **`BrauerSuzukiQ8.lean` の prefix-split = 段 280 で完了**:
+`Q₈` 固有の事実 24 宣言を `GroupTheory/QuaternionTwoFacts.lean` (388 行) へ分離、
+本体は 811 行に (段 281 追加後 933 行)。`OddOrder.lean` 配線済。
 - "Analysis at t" (p.141-142): `C_G(t)/⟨t⟩` が Klein four Sylow-2 ⟹ (7.4) の basic set、
   (7.6) で `C_G(t)` へ持ち上げ、(7.5) で `d^t` の列。**整数性は issue 9508 で完済**
   (`intBasicSetMatrix` / `sum_intBasicSetMatrix_mul_cartanMatrix`)。
