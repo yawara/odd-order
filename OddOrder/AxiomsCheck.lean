@@ -19373,3 +19373,15 @@ Navarro (5.11) から出す。(5.11) を `h := g` (`p`-正則), `g := x` (Sylow 
 
 #assert_only_allowed_axioms OddOrder.exists_algHom_pi_matrix_of_isAlgClosed
 #assert_only_allowed_axioms OddOrder.GroupAlgebra.exists_modularDatum
+
+/-! 🎯 **issue 9506 段 319c-1**: `hcoeff` の `p`-特異側 (`KulshammerThirdMain`)。
+
+`coeff_principalBlock_eq_centralizer_intermediate_of_not_isPRegular` —
+`g` が `p`-特異なら `e_{b_0}^H(g) = e_{b_0}^{C_G(Q)}(g)` は**両辺 0** で成り立つ。
+Osima (段 318) を `H` 側と `C_G(Q)` 側に 1 回ずつ適用するだけ。
+
+⟹ `coeff_principalBlock_eq_centralizer_intermediate` (Külshammer 経由、`p`-正則でのみ有効)
+と合わせて**全ての `g`** が覆われた。これが `brauerTrunc_eq_of_coeff_eq` の要求。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.coeff_principalBlock_eq_centralizer_intermediate_of_not_isPRegular

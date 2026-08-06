@@ -8,6 +8,7 @@ import OddOrder.GroupTheory.PRegularElementCount
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterOffCentralizer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockDefined
 import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerFormula
+import OddOrder.GroupTheory.RepresentationTheory.Modular.OsimaBlockSupport
 
 /-!
 # Külshammer's route to the third main theorem: `e_{B_0}` is read off inside `C_G(Q)`
@@ -444,6 +445,67 @@ theorem coeff_principalBlock_eq_centralizer_intermediate [Fact p.Prime]
       hidemH hfH hBH hweakH hvanishH)
     (card_pRegular_mul_coeff_principalBlock eC hπC hlinC hnilC SC g
       hidemC hfC hBC hweakC hvanishC)
+
+set_option maxHeartbeats 800000 in
+-- Both sides are read through Osima's theorem, so both block-idempotent bundles are in play;
+-- the class-sum decidability is consumed there, not by this statement.
+omit [DecidableEq (ConjClasses G)] [Invertible (Nat.card G : K)] [Fintype (ConjClasses G)]
+  [Fintype G] in
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+open scoped Classical in
+include hnilH eH hnilC eC in
+/-- **`e_{b_0}^H(g) = e_{b_0}^{C_G(Q)}(g)` at a `p`-singular `g`** — both sides are `0`.
+
+Külshammer's formula is unavailable here: the hypothesis `hweak` it carries fails at a
+`p`-singular `g`, whose `p`-part is conjugate into any Sylow `p`-subgroup.  Osima's theorem
+supplies the two coefficients directly instead
+(`OsimaBlockSupport.coeff_blockIdempotent_eq_zero_of_not_isPRegular`), applied once in `H` and
+once in `C_G(Q)`.
+
+Together with `coeff_principalBlock_eq_centralizer_intermediate` this covers every `g`, which is
+what `brauerTrunc_eq_of_coeff_eq` — and hence the converse of the third main theorem — needs. -/
+theorem coeff_principalBlock_eq_centralizer_intermediate_of_not_isPRegular [Fact p.Prime]
+    (hp : p.Prime) (hCH : Subgroup.centralizer (Q : Set G) ≤ H)
+    {ωH : 𝒪} (hωH : IsPrimitiveRoot ωH (pRegularExponent p ↥H))
+    {ω'H : ResidueField 𝒪} (hω'H : IsPrimitiveRoot ω'H (pRegularExponent p ↥H))
+    (hkerJH : RingHom.ker πH = Ring.jacobson (MonoidAlgebra (ResidueField 𝒪) ↥H))
+    {ωC : 𝒪}
+    (hωC : IsPrimitiveRoot ωC (pRegularExponent p ↥(Subgroup.centralizer (Q : Set G))))
+    {ω'C : ResidueField 𝒪}
+    (hω'C : IsPrimitiveRoot ω'C (pRegularExponent p ↥(Subgroup.centralizer (Q : Set G))))
+    (hkerJC : RingHom.ker πC
+      = Ring.jacobson (MonoidAlgebra (ResidueField 𝒪) ↥(Subgroup.centralizer (Q : Set G))))
+    (g : ↥(Subgroup.centralizer (Q : Set G))) (hg : ¬ IsPRegular p (g : G))
+    {FH : Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 ↥H)}
+    {F'H : Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) ↥H)}
+    (hidemH : IsIdempotentElem FH)
+    (hfH : MonoidAlgebra.mapRingHom ↥H (residue 𝒪) (FH : MonoidAlgebra 𝒪 ↥H)
+      = (F'H : MonoidAlgebra (ResidueField 𝒪) ↥H))
+    {BH : MatrixModule.Block πH hπH hlinH}
+    (hBH : MatrixModule.blockCharacterPi πH hπH hlinH F'H = Pi.single BH 1)
+    {FC : Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 ↥(Subgroup.centralizer (Q : Set G)))}
+    {FC' : Subalgebra.center (ResidueField 𝒪)
+      (MonoidAlgebra (ResidueField 𝒪) ↥(Subgroup.centralizer (Q : Set G)))}
+    (hidemC : IsIdempotentElem FC)
+    (hfC : MonoidAlgebra.mapRingHom ↥(Subgroup.centralizer (Q : Set G)) (residue 𝒪)
+        (FC : MonoidAlgebra 𝒪 ↥(Subgroup.centralizer (Q : Set G)))
+      = (FC' : MonoidAlgebra (ResidueField 𝒪) ↥(Subgroup.centralizer (Q : Set G))))
+    {BC : MatrixModule.Block πC hπC hlinC}
+    (hBC : MatrixModule.blockCharacterPi πC hπC hlinC FC' = Pi.single BC 1) :
+    ((F'H : MonoidAlgebra (ResidueField 𝒪) ↥H)).coeff (⟨(g : G), hCH g.2⟩ : ↥H)
+      = ((FC' : MonoidAlgebra (ResidueField 𝒪) ↥(Subgroup.centralizer (Q : Set G)))).coeff g := by
+  classical
+  haveI : Fintype ιH := Fintype.ofFinite ιH
+  haveI : Fintype ιC := Fintype.ofFinite ιC
+  have hgH : ¬ IsPRegular p (⟨(g : G), hCH g.2⟩ : ↥H) := fun h =>
+    hg (isPRegular_coe_iff (H := H) (y := (⟨(g : G), hCH g.2⟩ : ↥H)) |>.mpr h)
+  have hgC : ¬ IsPRegular p g := fun h =>
+    hg (isPRegular_coe_iff (H := Subgroup.centralizer (Q : Set G)) (y := g) |>.mpr h)
+  rw [coeff_blockIdempotent_eq_zero_of_not_isPRegular hp hωH hω'H hπH hlinH hkerJH hnilH eH
+      hidemH hfH hBH hgH,
+    coeff_blockIdempotent_eq_zero_of_not_isPRegular hp hωC hω'C hπC hlinC hkerJC hnilC eC
+      hidemC hfC hBC hgC]
 
 end IntermediateCoeff
 
