@@ -3658,6 +3658,41 @@ instance が段 317 側 (`classical`) と食い違って `rw` が刺さらない
 (5) `(χ(1), D^t_j) = 0` → **p.142-146 の endgame** (整数列 `2u_1 = D^y_0 + D^t_0 − D^t_1 − D^t_2`
 から `(u_i,u_i) = 3` ⟹ 非零成分ちょうど 3 個で `{1,1,−1}`)。
 
+### ✅ 段 322 完了 (2026-08-06) — basic set の Cartan は `G ↠ G/N` で `|N|` 倍
+
+`QuotientBasicSetCartan.sum_intBasicSetMatrix_mul_cartanMatrix_quotientPi` —
+**`UᵗC_{B₀(G)}U = |N|(1 + δ)`** (原文 p.141 "analysis at `t`" が読む形)。
+(7.4) と (7.6) の合成で、証明は 2 本を並べて ℤ→K の `push_cast` するだけ。
+`hconv` は 段 321b が供給する (**段 321 の最初の消費点**)。
+
+⚠ **実装知見 (2026-08-06、1 時間溶かした)**: `quotientPi` は **`→ₐ[k]` (AlgHom)**。
+`π` を**明示引数**に取る消費側 (`blockCharacterPi` / `Block` / `principalBlock` /
+`blockSetoid` / `inducedBlockOfCentralizer` / `irreducibleBrauerCharacter`) には
+**`.toRingHom` を付ける**。`cartanMatrix` のように `π` が implicit なものは
+`quotientPi_surjective` から推論されるので不要 (`QuotientCartan` がそう書いている)。
+付け忘れると `variable` ブロックが**まるごと** elaborate に失敗し、
+エラーは「型不一致 1 件 + 後続変数の Unknown identifier が大量」という
+**原因の見えない形**で出る (最初のエラー行だけを見ること)。
+
+### ⏭ 段 323 の着手点 — (7.5)(c) と 段 322 の合成
+
+`BasicSetDecomposition.sum_mul_basicDecompositionNumber_eq_cartanMatrix` (`.lean:161`) が
+`(D^x_φ, D^x_η) = ∑_μ ∑_τ u_{μφ} C_{C_G(x)}(μ,τ) u_{τη}` を与える。
+その右辺が **段 322 の左辺そのもの** (群を `↥(centralizerOf x)`、正規部分群を `N` と読む)。
+
+⟹ **段 323 = `(D^t_i, D^t_j) = |N|(1 + δ_ij)`** = 原文 p.141 の (3)。
+BS では `x = t` (`G` の対合)、`N = ⟨t⟩ ≤ C_G(t)`、`t̄` = 位数 4 の元の像 (= `C_G(t)/⟨t⟩` の対合)
+なので **`2(1 + δ_ij)`**。
+
+その後 (原文 p.141-142):
+* (4) `(D^y_0, D^t_j) = 0` — (7.5)(d) = 非共役な `p`-元の列は直交。
+  ⚠ **repo に (7.5)(d) の形が在るか未実測** (`BasicSetDecomposition` に在るのは
+  (a)(c) と展開形だけ)。無ければ 段 197-198 の (5.13)(b) 一般化と同じ要領で作る。
+* (5) `(χ(1), D^t_j) = 0` — 弱ブロック直交の basic set 版。
+* ⟹ p.142 の中核: `2u_1 = D^y_0 + D^t_0 − D^t_1 − D^t_2` 等で整数列を作り、
+  `(u_i, u_i) = 3` から「非零成分はちょうど 3 個で `{1,1,−1}`」を出す。
+* ⟹ pp.143-146 の endgame (未読 — 着手時に `references/navarro/pages/*.png` で実読)。
+
 #### 最終組み立ての形 (2026-08-06 実測)
 
 `hconv` の discharge は**既存の**
