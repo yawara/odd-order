@@ -621,7 +621,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 19900
+set_option linter.style.longFile 20000
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -19885,3 +19885,16 @@ modular 鎖と同じ分裂体 `K` の中で完結する (**係数体の橋渡し
   OddOrder.RepresentationTheory.Modular.representationKernel_ne_top
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.exists_proper_normal_of_character_eq
+
+/-! **issue 9506 段 338**: `Q₈` Sylow が Burnside 段の仮説を満たす
+(`GroupTheory/UniqueInvolutionSylow`)。
+
+`unique_involution_of_quaternionSylow` — **`Q₈` に同型な Sylow 2-部分群は対合が一意**、
+しかも段 328/330 が要求する `∀ s ∈ T, s² = 1 → s = 1 ∨ s = z` の形で。
+既存 `eq_of_sq_eq_one_of_quaternionTwo` (`QuaternionTwoFacts`) を `↥T` から `G` へ移すだけ。
+
+⟹ 段 330 の Burnside 段 (`coeff_classSum_mul_self_eq_zero_of_not_isPRegular`) と
+段 328 の「2 つの対合の積は奇位数」が **`|S| = 8` の側で使える**ようになった
+(`BrauerSuzukiInvolutions` の `|S| ≥ 16` 版は使えない)。 -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.unique_involution_of_quaternionSylow

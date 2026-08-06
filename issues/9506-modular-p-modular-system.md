@@ -4499,3 +4499,27 @@ pp.139-145 の数学は列の供給まで含めて全部 Lean に在る。
 残るのは段 332 の `exists_eq_of_columns_of_odd_degrees` の出力
 (`∃ k ≠ i₀, g k = T k` = `χ_k(1) = χ_k(t)`) を段 337 に渡す配線と、
 その上流の modular datum instantiation だけ。
+
+### ✅ 段 338 完了 (2026-08-06) — `Q₈` Sylow が Burnside 段の仮説を満たす
+
+`GroupTheory/UniqueInvolutionSylow.unique_involution_of_quaternionSylow` —
+**`Q₈` に同型な Sylow 2-部分群は対合が一意**、しかも段 328/330 が要求する
+`∀ s ∈ T, s² = 1 → s = 1 ∨ s = z` の形で。既存 `eq_of_sq_eq_one_of_quaternionTwo`
+(`QuaternionTwoFacts`) を `↥T` から `G` へ移すだけ。
+
+⟹ 段 330 の Burnside 段と段 328 の「2 つの対合の積は奇位数」が **`|S| = 8` の側で使える**
+(`BrauerSuzukiInvolutions` の `|S| ≥ 16` 版は `hn : 3 ≤ n` ゆえ使えない)。
+
+⚠ AxiomsCheck の longFile stamp を 19900 → 20000 に更新
+(機械列挙ゆえの恒久例外; CLAUDE.md「lint 警告ゼロ方針」)。
+
+#### 群論的仮説の棚卸し (2026-08-06)
+
+| 仮説 | supplier | 状態 |
+|---|---|---|
+| `∀ s ∈ T, s²=1 → s=1 ∨ s=z` (対合一意) | 段 338 | ✅ |
+| `C_G(t)/⟨t⟩` の Sylow が Klein four | `card_quotient_zpowers_of_quaternionTwo` (位数 4) + `sq_eq_one_quotient_zpowers_of_quaternionTwo` (指数 2) | ✅ 部品在り |
+| `C_G(t)/⟨t⟩` の対合が 1 類 | `BrauerSuzukiQ8.isConj_of_sq_eq_one_quotient_centralizer` | ✅ 既存 |
+| `hcart = 4` | 段 290-291 (Klein four Sylow + 中心的対合 ⟹ 正規 2-補群) | ✅ 既存 |
+| `hconv` | 段 321b | ✅ 既存 |
+| modular datum 一式 | `exists_modularDatum` + `PadicComplexSystem` | ⏭ **残り** |

@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Sylow
+import OddOrder.GroupTheory.QuaternionTwoFacts
 
 /-!
 # A Sylow `2`-subgroup with a unique involution
@@ -23,6 +24,8 @@ uniqueness as a bare hypothesis, so both cases are instances.
   are equal
 * `OddOrder.GroupTheory.odd_orderOf_mul_of_involution_of_unique_involution` — the product of two
   involutions has odd order
+* `OddOrder.GroupTheory.unique_involution_of_quaternionSylow` — a `Q₈` Sylow `2`-subgroup meets
+  the hypothesis
 -/
 
 open scoped Pointwise
@@ -163,5 +166,29 @@ theorem odd_orderOf_mul_of_involution_of_unique_involution {u v : G} (hu : order
   have hg1 : g = 1 := by rw [hgdef, hu_eq, hv_eq, ← sq, hz'2]
   rw [hg1, orderOf_one] at hs
   omega
+
+/-! ### The `Q₈` case supplies the hypothesis -/
+
+omit [Finite G] in
+/-- **A quaternion Sylow `2`-subgroup has a unique involution.**  This is
+`eq_of_sq_eq_one_of_quaternionTwo` transported from `↥T` to `G`, in the shape the two results
+above take as `hz`.
+
+It is what makes Navarro's Burnside step (`coeff_classSum_mul_self_eq_zero_of_not_isPRegular`)
+available in the `Q₈` case of Brauer–Suzuki, where `|T| = 8` and the `|T| ≥ 16` machinery of
+`BrauerSuzukiInvolutions` does not apply. -/
+theorem unique_involution_of_quaternionSylow (T : Sylow 2 G)
+    (eq8 : ↥(T : Subgroup G) ≃* QuaternionGroup 2) {z : G} (hzT : z ∈ (T : Subgroup G))
+    (hz2 : z ^ 2 = 1) (hz1 : z ≠ 1) :
+    ∀ s ∈ (T : Subgroup G), s ^ 2 = 1 → s = 1 ∨ s = z := by
+  intro s hs hs2
+  by_cases h1 : s = 1
+  · exact Or.inl h1
+  refine Or.inr ?_
+  have hsq : (⟨s, hs⟩ : ↥(T : Subgroup G)) ^ 2 = 1 := Subtype.ext (by push_cast; exact hs2)
+  have hzsq : (⟨z, hzT⟩ : ↥(T : Subgroup G)) ^ 2 = 1 := Subtype.ext (by push_cast; exact hz2)
+  have hsne : (⟨s, hs⟩ : ↥(T : Subgroup G)) ≠ 1 := fun h => h1 (congrArg Subtype.val h)
+  have hzne : (⟨z, hzT⟩ : ↥(T : Subgroup G)) ≠ 1 := fun h => hz1 (congrArg Subtype.val h)
+  exact congrArg Subtype.val (eq_of_sq_eq_one_of_quaternionTwo eq8 hsq hsne hzsq hzne)
 
 end OddOrder.GroupTheory
