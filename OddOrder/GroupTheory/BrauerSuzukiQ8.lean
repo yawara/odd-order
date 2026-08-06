@@ -937,6 +937,61 @@ theorem isConj_of_sq_eq_one_quotient_centralizer (hO : oPiCore {p | p ≠ 2} G =
   rw [hwa, hwb] at hkey
   exact ((isConj_iff.mpr ⟨c, rfl⟩).trans hkey).trans (isConj_iff.mpr ⟨d, rfl⟩).symm
 
+/-- **Every `2`-element of `C_G(t)/⟨t⟩` is an involution.**  A `2`-element conjugates into the
+Sylow `2`-subgroup `T̄` (the image of `T`), and every square of `T ≅ Q₈` already lies in `⟨t⟩`
+(`sq_eq_one_or_eq_of_quaternionTwo`), so `T̄` has exponent `2`.
+
+Together with `isConj_of_sq_eq_one_quotient_centralizer` this is the hypothesis `hconjall` of
+Navarro (7.2)/(7.4) for the group `C_G(t)/⟨t⟩`: every nontrivial `2`-element is conjugate to a
+fixed involution. -/
+theorem sq_eq_one_of_isPGroup_zpowers_quotient_centralizer (T : Sylow 2 G)
+    (e : ↥(T : Subgroup G) ≃* QuaternionGroup 2)
+    {t : G} (htT : t ∈ (T : Subgroup G)) (ht2 : t ^ 2 = 1) (ht1 : t ≠ 1)
+    (htC : t ∈ Subgroup.centralizer ({t} : Set G))
+    [(Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G)))).Normal]
+    {v : ↥(Subgroup.centralizer ({t} : Set G)) ⧸
+      Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G)))}
+    (hv : IsPGroup 2 (Subgroup.zpowers v)) : v ^ 2 = 1 := by
+  classical
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  set Tbar : Sylow 2 (↥(Subgroup.centralizer ({t} : Set G)) ⧸
+      Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G)))) :=
+    (T.subtype (sylowQ8_le_centralizer_involution T e htT ht2 ht1)).mapSurjective
+      (QuotientGroup.mk'_surjective _) with hTbar
+  -- every element of `T̄` squares to `1`, because every square of `T` lies in `⟨t⟩`
+  have hTbar2 : ∀ z ∈ (Tbar : Subgroup (↥(Subgroup.centralizer ({t} : Set G)) ⧸
+      Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G))))), z ^ 2 = 1 := by
+    intro z hz
+    rw [hTbar, Sylow.coe_mapSurjective, Subgroup.mem_map] at hz
+    obtain ⟨w, hw, rfl⟩ := hz
+    rw [Sylow.coe_subtype, Subgroup.mem_subgroupOf] at hw
+    have hwsq : (⟨(w : G), hw⟩ : ↥(T : Subgroup G)) ^ 2 = 1 ∨
+        (⟨(w : G), hw⟩ : ↥(T : Subgroup G)) ^ 2 = ⟨t, htT⟩ :=
+      sq_eq_one_or_eq_of_quaternionTwo e (Subtype.ext (by push_cast; exact ht2))
+        (fun h => ht1 (by simpa using congrArg Subtype.val h)) _
+    have hw2G : (w : G) ^ 2 = 1 ∨ (w : G) ^ 2 = t := by
+      rcases hwsq with h | h
+      · exact Or.inl (by simpa using congrArg Subtype.val h)
+      · exact Or.inr (by simpa using congrArg Subtype.val h)
+    have hmem : w ^ 2 ∈ Subgroup.zpowers (⟨t, htC⟩ :
+        ↥(Subgroup.centralizer ({t} : Set G))) := by
+      rcases hw2G with h | h
+      · rw [show w ^ 2 = 1 from Subtype.ext (by push_cast; exact h)]
+        exact Subgroup.one_mem _
+      · rw [show w ^ 2 = (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G))) from
+          Subtype.ext (by push_cast; exact h)]
+        exact Subgroup.mem_zpowers _
+    rw [← map_pow, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+    exact hmem
+  -- a `2`-element conjugates into `T̄`
+  obtain ⟨c, hc⟩ := exists_conj_mem_sylow hv Tbar
+  have hcsq := hTbar2 _ hc
+  have hconj : (c * v * c⁻¹) ^ 2 = c * v ^ 2 * c⁻¹ := by
+    simp
+  rw [hconj] at hcsq
+  have h1 : c * v ^ 2 = c := by simpa using congrArg (· * c) hcsq
+  exact mul_left_cancel (h1.trans (mul_one c).symm)
+
 /-- **Navarro pp. 139–146, the character-theoretic core** (issue 9506, `sorry`): when the
 quaternion Sylow `2`-subgroup is proper, its involution lies in a proper normal subgroup.
 

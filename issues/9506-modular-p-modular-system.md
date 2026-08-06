@@ -4523,3 +4523,20 @@ pp.139-145 の数学は列の供給まで含めて全部 Lean に在る。
 | `hcart = 4` | 段 290-291 (Klein four Sylow + 中心的対合 ⟹ 正規 2-補群) | ✅ 既存 |
 | `hconv` | 段 321b | ✅ 既存 |
 | modular datum 一式 | `exists_modularDatum` + `PadicComplexSystem` | ⏭ **残り** |
+
+### ✅ 段 339 完了 (2026-08-06) — `C_G(t)/⟨t⟩` の 2-元は全部対合
+
+`GroupTheory/BrauerSuzukiQ8.sq_eq_one_of_isPGroup_zpowers_quotient_centralizer` —
+2-元は Sylow `T̄` (= `T` の像) へ共役で入り、`T ≅ Q₈` の平方は全部 `⟨t⟩` に入る
+(`sq_eq_one_or_eq_of_quaternionTwo`) ので **`T̄` は指数 2** ⟹ `v² = 1`。
+
+⟹ 既存 `isConj_of_sq_eq_one_quotient_centralizer` (対合は 1 類) と合わせて、
+Navarro (7.2)/(7.4) の **`hconjall`** (「非自明な 2-元は全部 `t̄` に共役」) が
+`C_G(t)/⟨t⟩` について供給できるようになった。
+
+⚠ 仮説は `IsPGroup 2 (Subgroup.zpowers v)` の形にした (`IsPElement` は
+`BrauerSuzukiQ8.lean` の import 面に無いため; 消費側で
+`isPGroup_zpowers_of_isPElement` を挟む)。
+
+⚠ 実装知見: `group` タクティクが `(c v c⁻¹)² = c v² c⁻¹` を閉じない
+(zpow 正規形で止まる) — `map_pow (MulAut.conj c) v 2` を使うと `simp` 一発。

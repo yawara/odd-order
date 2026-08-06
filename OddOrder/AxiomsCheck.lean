@@ -19898,3 +19898,16 @@ modular 鎖と同じ分裂体 `K` の中で完結する (**係数体の橋渡し
 (`BrauerSuzukiInvolutions` の `|S| ≥ 16` 版は使えない)。 -/
 
 #assert_only_allowed_axioms OddOrder.GroupTheory.unique_involution_of_quaternionSylow
+
+/-! **issue 9506 段 339**: `C_G(t)/⟨t⟩` の 2-元は全部対合 (`GroupTheory/BrauerSuzukiQ8`)。
+
+`sq_eq_one_of_isPGroup_zpowers_quotient_centralizer` — 2-元は Sylow `T̄` (= `T` の像) へ
+共役で入り、`T ≅ Q₈` の平方は全部 `⟨t⟩` に入る (`sq_eq_one_or_eq_of_quaternionTwo`) ので
+**`T̄` は指数 2** ⟹ `v² = 1`。
+
+⟹ 既存 `isConj_of_sq_eq_one_quotient_centralizer` (対合は 1 類) と合わせて、
+Navarro (7.2)/(7.4) の `hconjall`
+(「非自明な 2-元は全部 `t̄` に共役」) が `C_G(t)/⟨t⟩` について供給できる。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.sq_eq_one_of_isPGroup_zpowers_quotient_centralizer
