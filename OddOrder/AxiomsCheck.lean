@@ -298,6 +298,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerFormula
 import OddOrder.GroupTheory.RepresentationTheory.Modular.KulshammerThirdMain
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishingSupply
 import OddOrder.GroupTheory.RepresentationTheory.Modular.ThirdMainConverseSupply
+import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientBasicSetCartan
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockCharacterOffCentralizer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SectionProjectiveCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionOrthogonality
@@ -19502,3 +19503,21 @@ BS の鎖が担ぐのは `centralizerOf x = C_G(x)`。両者は部分群とし�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.eq_principalBlock_of_inducedBlockOfCentralizer_eq_of_roots
+
+/-! 🎯🎯 **issue 9506 段 322**: basic set の Cartan は `G ↠ G ⧸ N` で `|N|` 倍になる。
+
+`sum_intBasicSetMatrix_mul_cartanMatrix_quotientPi` (`QuotientBasicSetCartan`)。
+原文 p.141 "analysis at `t`" が使う形: `C_G(t)/⟨t⟩` は Klein four Sylow-2 なので (7.4) が
+`UᵗC_{G/N}U = 1 + δ` を出し、(7.6) が `UᵗC_G U = |N|·UᵗC_{G/N}U` を出す。
+2 本が噛み合うのは `quotientPi` が `IBr(G)` と `IBr(G/N)` に**同じ添字集合 `ι` と
+同じ行列サイズ**を使う設計だから (= 原文の「`IBr(B̄) = IBr(B)`」の形式化) で、
+**変換行列 `U` を両側で共有できる**。
+
+⚠ **実装知見**: `quotientPi` は `→ₐ[k]` (AlgHom) なので、`π` を**明示引数**に取る
+消費側 (`blockCharacterPi` / `Block` / `principalBlock` / `blockSetoid` /
+`inducedBlockOfCentralizer` / `irreducibleBrauerCharacter`) には
+**`.toRingHom` を付ける**。`cartanMatrix` のように `π` が implicit なものは
+`quotientPi_surjective` から推論されるので不要。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_intBasicSetMatrix_mul_cartanMatrix_quotientPi
