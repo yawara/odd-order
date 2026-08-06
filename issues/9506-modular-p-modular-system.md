@@ -5486,3 +5486,38 @@ supply できない形**になっていた ([[check-hypothesis-satisfiability-be
 上の 12 行を順に食わせる」だけ**。群論側で要るのは
 `Q = C_G(t)/⟨t⟩` の Sylow 2 が Klein 四元群であること (`T ≅ Q₈` ⟹ `T/⟨t⟩ ≅ V₄`)、
 位数 4 の元 `y` の存在と `¬ IsConj t y`、`Q` の対合 `ȳ` の指定。
+
+### ✅ 段 372-375 完了 (2026-08-07) — `hMp`/`hquot` の供給経路が完結
+
+段 372 の実測で、鎖が仮説として担いでいた `hMp`/`hquot`
+(= `C_{C_G(t)/⟨t⟩}(ȳ)` が正規 2-補群をもつ) に supplier が無いことが判明した。
+**原文 p.132 の (7.2) の証明を読むと、そこが正に Navarro の一文**:
+
+> "First, notice that `C` cannot have a unique class of involutions (because `t` is central
+>  in `C`). By the first part applied to `C`, we conclude that `C` has three classes of
+>  involutions and, therefore, that **`C` has a normal 2-complement**."
+
+「first part」= Klein 四元 Sylow なら (3 類 ⟺ 正規 2-補群) で、Burnside の移送定理を
+`N_H(V) = C_H(V)` の確認の後に使う。その確認を形式化した:
+
+| 段 | 定理 | file |
+|---|---|---|
+| 372 | `normalizer_le_centralizer_of_card_four_of_central_involution` | `GroupTheory/CentralInvolutionNormalComplement.lean` (新) |
+| 372 | `hasNormalPComplement_of_card_four_of_central_involution` | 同上 |
+| 373 | `hasNormalPComplement_centralizer_of_card_sylow_four` | 同上 |
+| 374 | `card_sylow_quotient_centralizer` (`\|Sylow₂(C_G(t)/⟨t⟩)\| = 4`) | `GroupTheory/BrauerSuzukiQ8.lean` |
+| 375 | `exists_normal_of_hasNormalPComplement` | `CentralInvolutionNormalComplement` |
+| — | `QuotientGroup.card_map_mk'_mul_card` | `OddOrder/Mathlib/QuotientGroup.lean` |
+
+**段 372 の論証**: `V = {1, v, a, va}` (段 372 の `eq_or_eq_or_eq_or_eq_of_card_four`)。
+`n ∈ N_H(V)` による共役は中心対合 `v` を固定するので `a ↦ a` か `a ↦ va`。
+前者なら `n ∈ C_H(V)`、後者でも `v² = 1` より `n² ∈ C_H(V)`。
+⟹ `[N_H(V):C_H(V)]` は指数 2。一方 `V ≤ C_H(V)` かつ `V` が Sylow ゆえ**この指数は奇数**
+(`[N:C] ∣ [N:V]`) ⟹ 1。Burnside (Isaacs Thm 5.13)。
+
+⚠ **`V` が Klein 四元群である必要は無い** — `|V| = 4` と「`V` の対合が `H` の中心にある」
+だけで通る (巡回 `C₄` でも同じ)。原文が Klein 四元を仮定するのは他の箇所のため。
+
+⚠ **実装知見**: `∃ M, M.Normal ∧ … ∧ IsPGroup p (H ⧸ M)` は elaborate しない
+(`Group (H ⧸ M)` の instance が同じ `∃` の前の連言から取れない)。
+**`∃ n, M.index = p^n` の形で述べて**、消費側で `IsPGroup.of_card` に渡す。
