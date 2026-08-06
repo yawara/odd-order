@@ -3916,6 +3916,49 @@ import が要る (無いと `![-1,-1,1]` が `Bool` の `!` として parse さ�
 
 ⟹ **数学的な未知は C の橋渡しと D の一次独立性だけ**で、残りは既知の部品の配線と instantiation。
 
+### ✅ 段 327 完了 (2026-08-06) — 原文 p.143 (残タスク A)
+
+`Algebra/BasicSetColumnShape.lean`:
+* `eq_zero_of_dotProduct_eq_one` = **p.142 の主張** `(u_2)_3 = (u_3)_3 = (1,0,0)`
+* `sign_relation_six` = **(6)**
+* `exists_sign_relations` = (6)(7) を**記号の選択込み**で
+
+原文の「記号を選ぶ」2 箇所を明示化した: 1 つ目は `u_1` の 2 つの台添字に**名前を付ける**だけ
+(⟹ `δ_1,δ_2` はその成分そのもの)、2 つ目は `D^y_0` のどちらが非零かの**本当の場合分け**で
+`(i,δ_1)` と `(j,δ_2)` の交換で解消する。出力は 段 326 がそのまま食う形。
+
+⚠ 実装知見: `omit [Fintype S] in` は **docstring の前**に置く。
+⚠ `Mathlib.Data.Int.Units` は現行 mathlib に無い — `δ₁δ₂ = −1 ⟹ δ_i = ±1` は
+`natAbs` + `Nat.dvd_one` + `Int.natAbs_eq_iff` で出る。
+
+### ✅ 段 328 完了 (2026-08-06) — 残タスク B は**既存の一般化で済んだ**
+
+`GroupTheory/UniqueInvolutionSylow.lean` —
+`commute_involution_eq_of_unique_involution` /
+`odd_orderOf_mul_of_involution_of_unique_involution`。
+
+⚠ **着手前の実測で判明**: 「2 つの対合の積は奇位数」は
+`BrauerSuzukiInvolutions` に **`QuaternionSylowSetup` 版が既に在った** (Gorenstein Ch.12 Lem 1.7、
+`|S| ≥ 16` の側で使うもの)。しかし その structure は **`hn : 3 ≤ n` (= `|S| ≥ 16`)** を持つので
+`Q₈` (`|S| = 8`) には**そのまま使えない**。証明が実際に使うのは
+「Sylow 2-部分群の対合が一意」だけなので、それを裸の仮説にして切り出した。
+⟹ `QuaternionSylowSetup` 版は一般版の**特殊化に置換**し、証明は 1 本になった
+(CLAUDE.md「その場で一般化・複製しない」)。
+
+### ⏭ 残タスク (更新、2026-08-06)
+
+| # | 内容 | 状態 |
+|---|---|---|
+| ~~A~~ | p.143 の (6)(7) | ✅ 段 327 |
+| ~~B~~ | 2 つの対合の積は奇位数 | ✅ 段 328 (既存の一般化) |
+| C | Burnside → (8)(9)(10) | ⚠ **係数体の橋渡しが未知**。公式は `ClassSumCoefficientFormula:121` |
+| D | p.144 の 3×3 可逆行列 (basic set の一次独立性) | ⚠ repo に一次独立性の形が在るか要実測 |
+| E | 段 324/325/327 の仮説供給 (`d^t_{00}=1` 等) | 一般化分解数の一意性から。要実測 |
+| F | `𝓞_ℂ_[2]` での modular datum 一式の instantiation | **最大の塊** |
+| G | `q8_exists_proper_normal` への組み立て | F の後 |
+
+⟹ **ℤ 上の組合せ論パート (段 324-327) は完了**。残りは C の設計判断と、D/E/F/G の配線。
+
 #### 最終組み立ての形 (2026-08-06 実測)
 
 `hconv` の discharge は**既存の**

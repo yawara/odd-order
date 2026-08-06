@@ -55,6 +55,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.TheoremAZassenhausCase
 import OddOrder.GroupTheory.BrauerSuzukiNormalizer
 import OddOrder.GroupTheory.BrauerSuzukiTISubset
 import OddOrder.GroupTheory.BrauerSuzukiCharacter
+import OddOrder.GroupTheory.UniqueInvolutionSylow
 import OddOrder.GroupTheory.BrauerSuzukiInvolutions
 import OddOrder.GroupTheory.BrauerSuzukiCounting
 import OddOrder.GroupTheory.BrauerSuzukiEndgame
@@ -19648,3 +19649,21 @@ modular 鎖は `K = ℂ_[p]` と `wedderburnRepresentation` を使う — **係�
 #assert_only_allowed_axioms OddOrder.Algebra.sign_relation_six
 
 #assert_only_allowed_axioms OddOrder.Algebra.exists_sign_relations
+
+/-! 🎯 **issue 9506 段 328**: 「2 つの対合の積は奇位数」を `Q₈` でも使えるように一般化。
+
+`GroupTheory/UniqueInvolutionSylow.lean` — `commute_involution_eq_of_unique_involution` /
+`odd_orderOf_mul_of_involution_of_unique_involution`。
+
+原文 p.143-144 の Burnside の段が要求する入力。`BrauerSuzukiInvolutions` に
+`QuaternionSylowSetup` 版が在ったが、その structure は `hn : 3 ≤ n` (= `|S| ≥ 16`) を持つので
+**`Q₈` (`|S| = 8`) には使えなかった**。証明が使うのは
+「Sylow 2-部分群の対合が一意」だけなので、それを裸の仮説にして切り出した。
+
+⟹ `QuaternionSylowSetup` 版は**この一般版の特殊化に置換済** (証明は 1 本になった)。
+`Q₈` 側は `quaternionTwo` の対合一意性から同じ仮説を供給する。 -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.commute_involution_eq_of_unique_involution
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.odd_orderOf_mul_of_involution_of_unique_involution

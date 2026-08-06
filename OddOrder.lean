@@ -92,6 +92,7 @@ import OddOrder.GroupTheory.BrauerSuzukiSetup
 import OddOrder.GroupTheory.BrauerSuzukiNormalizer
 import OddOrder.GroupTheory.BrauerSuzukiTISubset
 import OddOrder.GroupTheory.BrauerSuzukiCharacter
+import OddOrder.GroupTheory.UniqueInvolutionSylow
 import OddOrder.GroupTheory.BrauerSuzukiInvolutions
 import OddOrder.GroupTheory.BrauerSuzukiCounting
 import OddOrder.GroupTheory.BrauerSuzukiEndgame
