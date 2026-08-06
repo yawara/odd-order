@@ -256,6 +256,27 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
     (hcart := hcart) (P := (SQ : Subgroup (↥C ⧸ Nz)))
     (hPcard := by rw [← Nat.card_eq_fintype_card]; exact hSQ4)
     (hPsing := hSQsing) (hjB := hψ₂B) (hjne := hψ₂ne)
+  -- the trivial character of `G`
+  obtain ⟨i₀, hi₀B, hi₀⟩ :=
+    exists_blockOfIrr_eq_principalBlock_character_eq_one (𝒪 := 𝓞_ℂ_[2]) (e := eG)
+      (hπG := hπG) (hlinG := hlinG) (hnilG := hnilG)
+  -- the three columns `D^t_0, D^t_1, D^t_2` of the analysis at `t`, over `ℤ` (段 370)
+  obtain ⟨b, c, d, hbb, hcc, hdd, hbc, hbd, hcd, hgb, hgc, hgd, hb0, hc0, hd0, hT, hzero⟩ :=
+    exists_intColumns_basicDecompositionNumber (𝒪 := 𝓞_ℂ_[2])
+      (hp := Nat.prime_two) (hx := hzP) (hω := hωC) (hω' := hω'C) (hπ := hπC) (hlin := hlinC)
+      (hkerJ := hkerJC) (hnilH := hnilC) (e := eC) (eG := eG) (hπG := hπG) (hlinG := hlinG)
+      (hnilG := hnilG) (eQ := eQ) (hN := hNzP) (hcent := hcent) (hϖ := hϖ) (hϖ' := hϖ')
+      (hyb := hybP) (hωC := hωY) (hω'C := hω'Y) (eC := eY) (hπC := hπY) (hlinC := hlinY)
+      (hkerJC := hkerJY) (hnilC := hnilY) (hnilQ := hnilQ) (hζ := hζ) (hζk := hζk) (hζK := hζK)
+      (hconvC := hconvC) (hconvG := hconvG) (hMp := hMp) (hquot := hquotM) (Syl := SylC)
+      (hφ₀ := hφ₀) (hyb2 := hyb2) (A := A)
+      (ht := by rw [← pow_two]; exact hz2) (hx1 := hz1) (hcardN := hNzcard) (ha0 := ha0)
+      (hasum := hasum) (hconjall := hconjall) (hyb1 := hyb1) (hcart := hcart)
+      (T := Tval) (gdeg := fun k => (Fintype.card (mG k) : ℤ)) (hTval := hTval) (hgdeg := hgdeg)
+      (i₀ := i₀) (hi₀B := hi₀B) (hi₀ := hi₀) (j₀ := j₀) (l₀ := l₀) (ψ₁ := ψ₁) (ψ₂ := ψ₂)
+      (s₁ := s₁) (s₂ := s₂) (hj₀ := hj₀B) (hl₀B := hl₀B) (hl₀ := hl₀) (hl₀ne := hl₀ne)
+      (hψ₁B := hψ₁B) (hψ₁ne := hψ₁ne) (hψ₂B := hψ₂B) (hψ₂ne := hψ₂ne) (henum := henum)
+      (h01 := h01) (h02 := h02) (h12 := h12) (hs₁val := hs₁val) (hs₂val := hs₂val)
   sorry
 
 end OddOrder.GroupTheory
