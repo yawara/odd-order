@@ -18718,3 +18718,31 @@ Navarro (7.3)/(7.4) の 3 定理は加えて「族が `φ_ν` を `Irr(B)` 上�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_intBasicSetMatrix_mul_cartanMatrix
+
+/-! 🎯 **issue 9506 段 281-282**: Navarro p.139-140 "analysis at `y`" の**群論的入力と
+Cartan 値**。
+
+`sylow_centralizer_eq_zpowers` = 「`⟨y⟩` は `C_G(y)` の Sylow-2」。`y` は `C_G(y)` で中心的
+ゆえ `⟨y⟩` は正規 2-部分群で Sylow-2 `S` に入り `4 ∣ |S|`; 一方 `S` の `G` への像を包む
+Sylow-2 `Q` は位数 8 なので `|S| ∣ 8` で、`|S| = 8` なら濃度一致で像 `= Q ≅ Q₈` となり
+`Q ⊆ C_G(y)` の元は `y` と可換ゆえ `y ∈ Z(Q)` — `sq_eq_one_of_mem_center_of_quaternionTwo`
+に矛盾。⟹ `|S| = 4 = |⟨y⟩|`。
+`hasNormalPComplement_centralizer_orderFour` はこれを Burnside
+(`hasNormalPComplement_centralizer_of_sylow_zpowers`) に食わせた形で、原文
+「`C_G(y)` has a normal `2`-complement」。
+
+`cartanMatrix_principalBlock_eq_card_sylow` = Navarro (6.13) の **Cartan 形**
+`c_{φ₀φ₀} = |G|_p`。従来 repo は `card_mul_cartanMatrix_principalBlock` (`|N|·c = |G|`、
+`K` の中) までで consumer が無く、(7.2) 以降は `hcart` を仮説として持ち回っていた。
+`K` の標数 0 で ℕ へ降ろし `|N|·[G:N] = |G|` と約すだけで閉じる
+(支持補題 `index_eq_card_sylow_of_isPGroup_quotient` = `[G:N] = |S|`)。
+⟹ "analysis at `y`" の `hcart = 4` は 段 281 (`|Sylow of C_G(y)| = 4`) との合成で出る。 -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.sylow_centralizer_eq_zpowers
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.hasNormalPComplement_centralizer_orderFour
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.index_eq_card_sylow_of_isPGroup_quotient
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.cartanMatrix_principalBlock_eq_card_sylow
