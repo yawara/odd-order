@@ -3106,10 +3106,22 @@ mathlib の直接支援はゼロ。
 
 が両立し、**Brauer の分裂体定理も Schur 指数も不要**になる。
 
-⚠ 検証すべき点: mathlib 側の補題が `IsFractionRing` を **instance として暗黙に**
-使っていないか (格子 `Submodule.IsLattice`、基底変換、`wedderburnLattice` 周り)。
-⟹ **次の着手 = 1 file で binder を外して build する実験**。通れば全体に展開する。
-これが通れば係数環タスク 4 が消えるので、**他の道より先に必ず試すこと**。
+**実験の結果 (2026-08-06、`BrauerBasis.lean` で binder を外して build)**:
+
+⚠ **暗黙の instance 使用が 1 箇所だけ在った** — `BrauerBasis.lean:81` の
+`IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors 𝒪) d`
+(= 有限個の `K`-元に共通分母を掛けて `𝒪` に落とす)。これは
+`eq_zero_of_vecMul_brauerCharacterMatrix` (Brauer 指標の一次独立性) の証明で、
+**`K = Frac 𝒪` を本当に使っている**。`grep IsLocalization` でも repo 中この 1 箇所のみ。
+(併せて `[FaithfulSMul 𝒪 K]` は 72 binder 中 34 にしか無いので、外すなら足す必要も在る。)
+
+⟹ **(iii) は死んでいない**。この 1 補題を
+「`Frac 𝒪` 上で示し、体の拡大で一次独立性は保たれるので任意の拡大体 `K` へ移す」
+と書き換えれば良い (行列の階数は係数体の拡大で不変)。
+**Brauer の分裂体定理より遥かに小さい**。
+
+⟹ **次の着手 = `eq_zero_of_vecMul_brauerCharacterMatrix` を
+`Frac 𝒪` 版 + 拡大体への移送に分ける**。それが済んでから 53 file の binder 掃除。
 
 ### `hconv` は gap ではなく assembly (2026-08-06 実測)
 
