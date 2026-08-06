@@ -3555,7 +3555,19 @@ instance が段 317 側 (`classical`) と食い違って `rw` が刺さらない
   ⟹ `AlgClosedFractionField.isAlgClosed_of_isAlgClosed_fractionRing` で移送する
   (⚠ `A` と `K` は同一 universe — mathlib の `IsAlgClosed.of_ringEquiv` の制約。
   `𝓞_ℂ_[p]` / `ℂ_[p]` は両方 `Type` なので実害なし)。
-* **段 320**: `hconv` = `eq_principalBlock_of_blockOfCentralCharacter_eq`
+✅ **段 319c-2 / 320a 完了 (2026-08-06)** — `hcoeff` が `∀ g` で揃った (中間部分群版と `G` 版の両方):
+`coeff_principalBlock_eq_centralizer_intermediate_forall` /
+`coeff_principalBlock_eq_centralizer_forall`。
+`by_cases IsPRegular` で Külshammer (正則) と Osima (特異) を束ねただけ。
+どちらも **1 回目のビルドで通った** — 段 319a/b と 段 318 の形が消費側にそのまま合っていた。
+
+⟹ **残るは 段 320b = `hconv` 本体**: `eq_principalBlock_of_blockOfCentralCharacter_eq`
+(`KulshammerThirdMain.lean:503`) に `coeff_principalBlock_eq_centralizer_forall` を食わせ、
+`PrincipalBlockInvolution.lean:84` の `hconv` の形
+(`inducedBlockOfCentralizer t … b = principalBlock … → b = principalBlock …`) に合わせる。
+⚠ **`C_G(⟨x⟩)` と `centralizerOf x` の項の同一視**がここで要る (issue 冒頭からの既知の残件)。
+
+* **段 320 (旧メモ)**: `hconv` = `eq_principalBlock_of_blockOfCentralCharacter_eq`
   (`KulshammerThirdMain.lean:503`) に段 319c-2 を食わせ、
   `C_G(⟨x⟩)` と `centralizerOf x` の項を同一視する。
 

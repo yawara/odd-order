@@ -19423,3 +19423,15 @@ universe をまたげないため。実際の使用箇所 (`𝓞_ℂ_[p]` / `ℂ
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.coeff_principalBlock_eq_centralizer_intermediate_forall
+
+/-! 🎯🎯 **issue 9506 段 320a**: `G` 版の `hcoeff` も `∀ g` で揃った。
+
+`coeff_principalBlock_eq_centralizer_forall` — 段 319c-2 と同じ場合分けを、
+中間部分群 `H` でなく **`G` そのもの**について行ったもの。
+第三主定理の逆 (`eq_principalBlock_of_blockOfCentralCharacter_eq`) が消費するのは
+こちらの形 (`Converse` 節は `πG` を `G` 上に持つ)。
+
+⟹ `hconv` に必要な `hcoeff` が揃った。残るは項の同一視のみ。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.coeff_principalBlock_eq_centralizer_forall
