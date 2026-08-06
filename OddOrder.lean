@@ -81,6 +81,7 @@ import OddOrder.GroupTheory.PRegularCosetSubgroup
 import OddOrder.GroupTheory.PRegularProjection
 import OddOrder.GroupTheory.PRegularElementCount
 import OddOrder.GroupTheory.QuaternionRecognition
+import OddOrder.GroupTheory.QuaternionTwoFacts
 import OddOrder.GroupTheory.SolvablePrimeIndex
 import OddOrder.GroupTheory.AInvariantPiSubgroups
 import OddOrder.GroupTheory.BrauerSuzuki
