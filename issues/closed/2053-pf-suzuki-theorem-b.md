@@ -1552,3 +1552,22 @@ Nonempty (TheoremAConclusion G Ω)
 
 ⟹ 本 issue の完了条件「Theorem B (`(B1) → Theorem A conclusion`) が sorry-free で landing」
 は **(0147 の既知例外を除いて) 達成**。残タスクは AxiomsCheck 登録。
+
+---
+
+## ✅ CLOSED (2026-08-07)
+
+保留理由だった「`theoremB` が Q₈ Brauer–Suzuki の `sorry` を経由するので AxiomsCheck に
+登録できない」が、issue 0147 / 9506 の完了で解消。`AxiomsCheck.lean` に
+
+```
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.theoremB
+```
+
+を追加して `axioms check OK: … depends on 3 axiom(s), all in allowlist` を確認した
+(同時に `rankOne_affine_nearField` / `RankOneHypothesis.brauerSuzuki` /
+`brauerSuzuki_quaternionSylow_q8` / `nonempty_theoremAConclusion_of_V_ne_bot` /
+**`theoremA`** も登録 — Suzuki の Theorem A まで axiom-clean で通った。
+`ZassenhausClassification` は axiom ではなく明示引数)。
+
+⟹ 完了条件を全て満たしたので close。

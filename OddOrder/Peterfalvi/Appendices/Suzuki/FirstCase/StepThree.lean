@@ -521,8 +521,7 @@ Appendix B Lemma (`isCyclic_of_faithful_fpf_pgroup_on_elementaryAbelian`) the
 group has order `r`.  (This subsumes the book's citation of [H] V Satz 8.15 —
 subgroups of order `r²` of a Frobenius complement are cyclic.)
 
-Inherits the step (2)(b) `sorry` (Appendix C Prop 1 behind Brauer–Suzuki,
-issue 9318); everything else is proved. -/
+Depends on step (2)(b) (Appendix C Prop 1 behind Brauer–Suzuki). -/
 theorem card_inf_centralizer_eq_prime {r : ℕ} (hr : r.Prime)
     {M : Subgroup G} (hMQ1 : M ≤ fc.toHypothesis.Q1) (hMne : M ≠ ⊥)
     (helab : IsElementaryAbelian r ↥M)
@@ -683,7 +682,7 @@ counting, a minimal nontrivial `K`-invariant subgroup `V` has `|M| = |V|^t`,
 so `|V| = r^d` with `d · t = p`; `d = 1` gives the first branch and `d = p`
 forces `V = M`, giving the second.
 
-Inherits the step (2)(b) `sorry` through `|C_M(P)| = r` (issue 9318). -/
+Depends on step (2)(b) through `|C_M(P)| = r`. -/
 theorem exists_prime_order_invariant_or_irreducible {r : ℕ} (hr : r.Prime)
     {M : Subgroup G} (hMQ1 : M ≤ fc.toHypothesis.Q1) (hMne : M ≠ ⊥)
     (helab : IsElementaryAbelian r ↥M)
@@ -1013,7 +1012,7 @@ contradicting `|K| = 2^p − 1 > 1`.  Otherwise choose `m` with
 `x ↦ x^(r^(jm)) = x^r` (the Frobenius), and injectivity of `μ` transports
 `k ↦ k^r` back to `K`.
 
-Inherits the step (2)(b) `sorry` through `|C_M(P)| = r` (issue 9318). -/
+Depends on step (2)(b) through `|C_M(P)| = r`. -/
 theorem exists_K_conj_pow_of_irreducible {r : ℕ} (hr : r.Prime)
     {M : Subgroup G} (hMQ1 : M ≤ fc.toHypothesis.Q1) (hMne : M ≠ ⊥)
     (helab : IsElementaryAbelian r ↥M)
@@ -1321,7 +1320,7 @@ Half B (`exists_K_conj_pow_of_irreducible`) supplies `a ∈ P` with
 `k ↦ k^r` on `K`, and the combine (`exists_pow_two_modEq_of_K_conj`)
 compares it with Half A's `k ↦ k^(2^i)`.
 
-Inherits the step (2)(b) `sorry` through `|C_M(P)| = r` (issue 9318). -/
+Depends on step (2)(b) through `|C_M(P)| = r`. -/
 theorem exists_pow_two_modEq_of_prime_dvd_card_Q1 {r : ℕ} (hr : r.Prime)
     (hdvd : r ∣ Nat.card ↥fc.toHypothesis.Q1) :
     ∃ i : ℕ, r ≡ 2 ^ i [MOD 2 ^ fc.p - 1] := by

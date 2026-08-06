@@ -37,11 +37,12 @@ predicate `ZassenhausClassification` rather than as an axiom or a `sorry`.
   is Chapters II–IV (`nonempty_theoremAConclusion_of_V_ne_bot`), the case `V = 1` is the
   cited classification.
 
-## ⚠ Axiom status
+## Axiom status
 
-`theoremA` is not axiom-clean: besides the explicit `ZassenhausClassification` argument it
-inherits `sorryAx` through Chapter II (`brauerSuzuki_quaternionSylow_q8`, issue 0147).
-See `TheoremANonTrivialV`.
+`theoremA` is axiom-clean and registered in `AxiomsCheck` (2026-08-07); the cited
+classification enters as the explicit `ZassenhausClassification` argument, not as an axiom.
+The last `sorry` on this chain, `brauerSuzuki_quaternionSylow_q8` in Chapter II, was closed
+with the modular character theory of issues 0147 / 9506.  See `TheoremANonTrivialV`.
 -/
 
 set_option autoImplicit false
@@ -209,8 +210,8 @@ The proof is the book's induction on `|G|` (Ch. I §3):
 * `V = 1` — `G` is a Zassenhaus group of odd degree, and the cited classification
   ([HB], Ch. XI, Thm 11.16 = `ZassenhausClassification`) finishes.
 
-⚠ Depends on `sorryAx` through Chapter II (`brauerSuzuki_quaternionSylow_q8`, issue 0147);
-see the module docstring. -/
+Axiom-clean apart from the explicit `ZassenhausClassification` argument; see the module
+docstring. -/
 theorem theoremA (hcl : ZassenhausClassification.{u, v}) {G : Type u} {Ω : Type v}
     [Group G] [MulAction G Ω] [Finite G] (hyp : Hypothesis G Ω) :
     Nonempty (Hypothesis.TheoremAConclusion G Ω) :=

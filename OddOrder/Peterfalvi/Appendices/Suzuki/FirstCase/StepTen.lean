@@ -316,7 +316,7 @@ i.e. `v_p(|G|) = (m+2) + v_p(|W|)` where `|F| = p^m`.
 
 `|G| = |Q| · |D| · (|Q|+1)`; `|Q|_p = 1` (`not_p_dvd_card_Q`), `|D|_p = p · |W|_p`
 (`factorization_card_D_eq`), and `(|Q|+1)_p = p^{m+1}`
-(`padicValNat_card_Q_add_one`).  Inherits the step (2)(b) `sorry` (issue 9318)
+(`padicValNat_card_Q_add_one`).  Depends on step (2)(b)
 through the model. -/
 theorem factorization_card_G_eq {F : Type uG} [NearFields.NearField F]
     (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
@@ -342,7 +342,7 @@ prime and `F` a field of order `3^{|Σ|}`, `5^{|Σ|}` or `9^{|Σ|}`; with `p = |
 forces `p ∈ {3, 5}` (as `p ∣ |F|`) and `|C_Q(P)| = |F| − 1 ∈ {26, 3124, 728}`.  An odd
 prime `r ∈ {13, 11, 13}` divides `|C_Q(P)|` hence `|Q₁|`, so step (3) gives
 `r ≡ 2^i (mod 2^p − 1)` — impossible since `13 ≢ 2^i (mod 7)` and `11 ≢ 2^i (mod 31)`.
-Inherits the step (2)(b) `sorry` (issue 9318) through the model. -/
+Depends on step (2)(b) through the model. -/
 theorem Q1_eq_bot_of_p_dvd_card_centralizer_W
     (ind : Hypothesis.TheoremAInductionBelow G Ω)
     {F : Type uG} [NearFields.NearField F]
@@ -477,7 +477,7 @@ theorem not_p_dvd_card_W_of_not_p_dvd_card_centralizer_W
 
 `p ∤ |Σ| ⟹ p ∤ |W|` (`not_p_dvd_card_W_of_not_p_dvd_card_centralizer_W`), so `|W|_p = 0`
 and `|G|_p = p^{m+2} · |W|_p = p^{m+2}` (`factorization_card_G_eq`).  Inherits the step
-(2)(b) `sorry` (issue 9318) through the model. -/
+(2)(b) through the model. -/
 theorem factorization_card_G_eq_of_not_p_dvd_card_centralizer_W
     {F : Type uG} [NearFields.NearField F]
     (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
@@ -497,7 +497,7 @@ then `p = 3`, `|Σ| = 3`, `F ≅ F_{9,2}` (`|F| = 9`, non-commutative) and `|C_Q
 By (6) (`Q₁ = 1` from `Q1_eq_bot_of_p_dvd_card_centralizer_W`) a commutative `F` forces
 `|Σ| = 1`, contradicting `p ∣ |Σ|`; so `F` is non-commutative and `|Σ| ∈ {1, 3}`, whence
 `|Σ| = 3` and `p = 3`.  By (5), non-commutative `F` has `|F| = 9`, `|C_Q(P)| = 8`.
-Inherits the step (2)(b) `sorry` (issue 9318) + Higman through the model. -/
+Depends on step (2)(b) + Higman through the model. -/
 theorem card_field_eq_nine_of_p_dvd_card_centralizer_W
     (ind : Hypothesis.TheoremAInductionBelow G Ω)
     {F : Type uG} [NearFields.NearField F]
@@ -549,7 +549,7 @@ Building on the numeric core (`card_field_eq_nine_of_p_dvd_card_centralizer_W`:
 (`lemmaFive_of_orderThree`) then gives `W` cyclic with `|W| ∣ 2^p + 1 = 9`.  Since
 `W ⊇ C_W(P)` has order `|Σ| = 3 ≠ 1`, `W ≠ ⊥`, so `|W| ∈ {3, 9}`.  The `3`-part is
 `|G|_3 = 3^{m+2}·|W|_3 = 3^4·|W|` (`factorization_card_G_eq`, `m = 2`, `|W|` a
-`3`-power).  Inherits the step (2)(b) `sorry` (issue 9318) + Higman through the
+`3`-power).  Depends on step (2)(b) + Higman through the
 model. -/
 theorem w_cyclic_of_p_dvd_card_centralizer_W
     (ind : Hypothesis.TheoremAInductionBelow G Ω)
@@ -630,8 +630,8 @@ one of the following holds.
 
 The dichotomy is on whether `p ∣ |Σ| = |C_W(P)|`: the negative branch is
 `factorization_card_G_eq_of_not_p_dvd_card_centralizer_W`, the positive branch is
-`w_cyclic_of_p_dvd_card_centralizer_W`.  Inherits the step (2)(b) `sorry`
-(issue 9318) + Higman through the model. -/
+`w_cyclic_of_p_dvd_card_centralizer_W`.  Depends on step (2)(b) + Higman
+through the model. -/
 theorem step_ten_dichotomy
     (ind : Hypothesis.TheoremAInductionBelow G Ω)
     {F : Type uG} [NearFields.NearField F]

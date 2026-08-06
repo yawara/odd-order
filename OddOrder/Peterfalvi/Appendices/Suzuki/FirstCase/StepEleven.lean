@@ -931,8 +931,8 @@ theorem invImageF_mul_comm_of_card_D_eq_p
 include model in
 /-- **Step (11), first assertion: `R` is abelian** (p. 111–112): both branches of the
 step (10) dichotomy kill a nonabelian `R` via the shared Sylow engine — case (10.1)
-through `R` itself, case (10.2) through `R·C_W(P)`.  Inherits the step (2)(b) `sorry`
-(issue 9318) + Higman through `step_ten_dichotomy`. -/
+through `R` itself, case (10.2) through `R·C_W(P)`.  Depends on step (2)(b)
+ + Higman through `step_ten_dichotomy`. -/
 theorem invImageF_mul_comm
     (ind : Hypothesis.TheoremAInductionBelow G Ω)
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}

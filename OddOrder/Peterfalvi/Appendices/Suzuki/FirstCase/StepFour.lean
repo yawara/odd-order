@@ -29,7 +29,7 @@ on `Q` by conjugation:
   (`p` and `2^{i mod p}` are both `< 2^p − 1`, so they would be equal).
   The book notes this `r ≠ p` consequence after step (3).
 
-Steps (3)–(4) inherit the step (2)(b) `sorry` (issue 9318) through
+Steps (3)–(4) inherit the step (2)(b) through
 `|C_M(P)| = r`.
 -/
 
@@ -105,7 +105,7 @@ variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
 the congruence `r ≡ 2^i (mod 2^p − 1)`): `p` odd cannot be congruent to a
 power of two modulo `2^p − 1`.
 
-Inherits the step (2)(b) `sorry` (issue 9318) through step (3). -/
+Depends on step (2)(b) through step (3). -/
 theorem not_p_dvd_card_Q1 : ¬ fc.p ∣ Nat.card ↥fc.toHypothesis.Q1 := by
   intro hdvd
   obtain ⟨i, hi⟩ :=
@@ -115,7 +115,7 @@ theorem not_p_dvd_card_Q1 : ¬ fc.p ∣ Nat.card ↥fc.toHypothesis.Q1 := by
 /-- `p ∤ |Q|`: the Sylow `2`-part is out for parity, and `p ∤ |Q₁|` by
 `not_p_dvd_card_Q1`.
 
-Inherits the step (2)(b) `sorry` (issue 9318) through step (3). -/
+Depends on step (2)(b) through step (3). -/
 theorem not_p_dvd_card_Q : ¬ fc.p ∣ Nat.card ↥fc.toHypothesis.Q := by
   intro hdvd
   classical
@@ -144,7 +144,7 @@ Frobenius group `L = KP` (kernel `K`, complement `P` of prime order `p`,
 (§2 Proposition 1(a)) and `(|Q|, |KP|) = 1` (`coprime_card_Q_K` +
 `not_p_dvd_card_Q`).
 
-Inherits the step (2)(b) `sorry` (issue 9318) through `not_p_dvd_card_Q`. -/
+Depends on step (2)(b) through `not_p_dvd_card_Q`. -/
 theorem card_Q_eq_card_inf_centralizer_pow :
     Nat.card ↥fc.toHypothesis.Q =
       Nat.card ↥(fc.toHypothesis.Q ⊓

@@ -105,7 +105,7 @@ so `|Q| + 1 = (|F| − 1)^p + 1 ≡ |F| (mod p)` (Fermat: `a^p ≡ a`).  Hence
 (`char_spec`), so Cauchy produces an element of additive order `p`, forcing
 `p ∣ f` and thus `p = f`.
 
-Inherits the step (2)(b) `sorry` (issue 9318) through a model-supplying caller
+Depends on step (2)(b) through a model-supplying caller
 (via `centralizer_inf_mulEquiv_units`). -/
 theorem char_eq_p_of_p_dvd_card_Q_add_one
     {F : Type uG} [NearFields.NearField F]
@@ -320,7 +320,7 @@ theorem p_dvd_card_Q_add_one
 Combines the transfer half (`p_dvd_card_Q_add_one`) with the arithmetic finish
 (`char_eq_p_of_p_dvd_card_Q_add_one`).  The only remaining hypothesis is the book's
 standing (B2) (no normal subgroup of index `p`, as `p ∤ |G^{ab}|`).  Inherits the
-step (2)(b) `sorry` (issue 9318) through the supplied model. -/
+step (2)(b) through the supplied model. -/
 theorem char_eq_p {F : Type uG} [NearFields.NearField F]
     (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
       NearFields.AffineNearFieldModel fc.rankOneQuotient F)

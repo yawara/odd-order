@@ -5639,3 +5639,16 @@ Burnside の移送定理 + 「`[N_H(V):C_H(V)]` は指数 2 かつ奇数ゆえ 1
 `BrauerSuzukiQ8.lean` を pure re-export hub + 3 leaf
 (`Reduction` / `CharacterCore` / `Induction`) に分割。理由は行数でなく **import 方向**
 (`CharacterCore` は `Modular/` を、`Modular/` は `Reduction` を必要とする)。
+
+---
+
+## ✅ CLOSED (2026-08-07)
+
+`q8_exists_proper_normal` が axiom-clean で landing し (`AxiomsCheck` 登録済)、その下流の
+Q₈ Brauer–Suzuki チェーン (`brauerSuzuki_quaternionSylow_q8` → `RankOneHypothesis.brauerSuzuki`
+→ `rankOne_affine_nearField` → `theoremB` → `nonempty_theoremAConclusion_of_V_ne_bot`
+→ `theoremA`) も 6 本すべて axiom-clean として `AxiomsCheck` に登録した。
+**リポジトリ全体の実 `sorry` = 0**。親 issue 0147 も同日 close 済。
+
+成果物: `OddOrder/GroupTheory/RepresentationTheory/Modular/` (150 leaf / 28,714 行) =
+Navarro 1998 Ch. 1–7 の p-modular system・Brauer 指標・block・defect group・三大主定理。

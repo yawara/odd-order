@@ -175,7 +175,7 @@ The images `s̄ = π(s)`, `t̄ = π(t)` in `L/N = C_G(P)/N` are distinct involut
 bridge (`orderOf_mul_eq_prime_of_pow_mem_odd_kernel`, `s` inverts `st` and
 centralizes the odd `N`) gives `|s·t| = char`.
 
-Inherits the step (2)(b) `sorry` (issue 9318) only through a caller who supplies
+Depends on step (2)(b) only through a caller who supplies
 the model via `exists_affineNearFieldModel`. -/
 theorem orderOf_st_eq_char :
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
@@ -413,7 +413,7 @@ field of order `char`, the Fermat-prime case), or `|C_Q(P)| = 8` and
 case; and `|F| = 9 = 3²` forces `char = 3` (a nonzero element of `F` has
 additive order `char ∣ 9`).
 
-Inherits the step (2)(b) `sorry` (issue 9318) only through a model-supplying
+Depends on step (2)(b) only through a model-supplying
 caller. -/
 theorem cQ_card_cases_of_Q1_eq_bot :
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
@@ -548,7 +548,7 @@ Suppose `X = N ∩ W ≠ 1`.  As `X ≤ W` centralizes `Q₀`, the four-subgroup
 and `Q₀ ⊆ R`, strictly when `|C_Q(P)| > 2` (`|C_{Q₀}(P)| = 2`).  The resulting
 `|Q₀| ⊆ |R| ⊊ |Q|` cardinalities are contradictory in every case.
 
-Inherits the step (2)(b) `sorry` (issue 9318) through the model. -/
+Depends on step (2)(b) through the model. -/
 theorem kernelN_inf_W_eq_bot (ind : Hypothesis.TheoremAInductionBelow G Ω) :
     fc.kernelN ⊓ fc.toHypothesis.W = ⊥ := by
   by_contra hne
@@ -690,7 +690,7 @@ theorem kernelN_inf_W_eq_bot (ind : Hypothesis.TheoremAInductionBelow G Ω) :
 the `P`-centralizer action equals `P`.  By the decomposition
 `N = (N ∩ W) × P` and the trichotomy contradiction `N ∩ W = 1`.
 
-Inherits the step (2)(b) `sorry` (issue 9318) through the model. -/
+Depends on step (2)(b) through the model. -/
 theorem kernelN_eq_P (ind : Hypothesis.TheoremAInductionBelow G Ω) : fc.kernelN = fc.P :=
   fc.kernelN_eq_P_of_kernelInf_W_eq_bot (fc.kernelN_inf_W_eq_bot ind)
 
@@ -703,7 +703,7 @@ isomorphism `C_W(P) → Σ`: it is injective because `C_W(P) ∩ N ⊆ W ∩ N =
 (`kernelN_inf_W_eq_bot`); and surjective because `C_D(P) = C_W(P) · P` (step (1))
 with `P ⊆ N` (`P_le_kernelN`), so every `[d] ∈ Σ` is `[c]` with `c ∈ C_W(P)`.
 
-Inherits the step (2)(b) `sorry` (issue 9318) through `kernelN_inf_W_eq_bot`. -/
+Depends on step (2)(b) through `kernelN_inf_W_eq_bot`. -/
 theorem sigma_mulEquiv_centralizer_W
     (ind : Hypothesis.TheoremAInductionBelow G Ω) :
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V

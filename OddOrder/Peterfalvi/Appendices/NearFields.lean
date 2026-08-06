@@ -66,8 +66,9 @@ Per-result status:
 | `NearField.mul_add_of_mul_comm` (commutative ⇒ distributive) | **proved, sorry-free** (new) |
 | `exists_field_structure_of_cyclic_index_two` (Prop 2, first half) | **proved, sorry-free** (new) |
 | App. C Prop 1 prereq (i) (`sylow_two_isCyclic_or_quaternion`) | proved, axiom-clean |
-| BS (ii) quaternion `|S|≥16` + cyclic (`brauerSuzuki_of_quaternionSylow`) | proved, `Q₈` open |
-| App. C Prop 1 (`rankOne_affine_nearField`) | model assembled; sole `sorry` = `Q₈` BS case |
+| BS (ii) quaternion `|S|≥16` + cyclic (`brauerSuzuki_of_quaternionSylow`) | proved, axiom-clean |
+| BS (ii) quaternion `|S| = 8` (`brauerSuzuki_quaternionSylow_q8`) | proved, axiom-clean |
+| App. C Prop 1 (`rankOne_affine_nearField`) | proved, axiom-clean |
 | Prop 1 involution clauses (`model_involution_data`) | proved, axiom-clean |
 | App. C Prop 2 (`cyclic_index_two_nearField_classification`) | proved, axiom-clean |
 
@@ -79,9 +80,11 @@ downstream files importing `NearFields` are unaffected.
 normal subgroup and proves all 15 `AffineNearFieldModel` fields: the embedding `(F,+) ↪ G`,
 normality, the complement `G = F ⋊ H`, the identification `Q ≃* Fˣ` with its conjugation
 compatibility, the faithful action of `D` by near-field automorphisms, the characteristic, and the
-involution clauses (`model_involution_data`, axiom-clean).  The **sole** remaining `sorry` is the
-`Q₈` (`|S| = 8`) case of Brauer–Suzuki, which needs modular character theory (a known research gap,
-off the Feit–Thompson critical path).
+involution clauses (`model_involution_data`, axiom-clean).  For a long time its **sole** remaining
+`sorry` was the `Q₈` (`|S| = 8`) case of Brauer–Suzuki, which needs modular character theory; that
+theory was built from the ground up following Navarro 1998 Ch. 1–7
+(`OddOrder/GroupTheory/RepresentationTheory/Modular/`, issues 0147 / 9506) and the statement closed
+on 2026-08-07.
 -/
 
 namespace OddOrder.Peterfalvi.Appendices.NearFields

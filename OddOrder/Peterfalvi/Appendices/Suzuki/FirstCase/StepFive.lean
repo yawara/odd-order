@@ -25,8 +25,8 @@ identifications on which its proof (and the later steps) rest:
   (the odd factor of the nilpotent group `Q` is trivial) — the final
   inference of step (5) from `|Q| = |C_Q(P)|^p = 8^p` (step (4)).
 
-Everything consuming the near-field model inherits the step (2)(b)
-`sorry` (issue 9318) through `exists_affineNearFieldModel`.
+Everything consuming the near-field model depends on step (2)(b)
+through `exists_affineNearFieldModel`.
 -/
 
 set_option autoImplicit false
@@ -771,7 +771,7 @@ Suzuki `2`-group of exponent `4` (`sylowTwo_isMulCommutative_or_isSuzuki2Group`
 step (4) then makes `|Q| = 8^p = 2^{3p}` a `2`-power, so `Q₁ = 1`
 (`Q1_eq_bot_of_card_two_pow`).
 
-Inherits the step (2)(b) `sorry` (issue 9318) through the near-field model.
+Depends on step (2)(b) through the near-field model.
 The Higman exponent-four input is fully proved. -/
 theorem card_nearField_eq_nine_and_Q1_eq_bot :
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
@@ -905,7 +905,7 @@ Sylow `2`-subgroup `S` of `Q` is `⊤` and `↥S ≅ ↥Q`.  Two non-commuting u
 non-abelian, and `sylowTwo_isMulCommutative_or_isSuzuki2Group` gives that `S`,
 and so `Q`, is a Suzuki `2`-group (`IsSuzuki2Group.of_equiv`).
 
-Inherits the step (2)(b) `sorry` (issue 9318) + Higman through the model. -/
+Depends on step (2)(b) + Higman through the model. -/
 theorem isSuzuki2Group_Q_of_noncomm
     {F : Type uG} [NearFields.NearField F]
     (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V

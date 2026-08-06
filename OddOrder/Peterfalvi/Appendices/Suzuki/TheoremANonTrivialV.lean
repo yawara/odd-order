@@ -37,16 +37,15 @@ and Theorem B already gives the conclusion.  This file performs that case split,
 What is left of Theorem A is the case `V = 1`, which the book settles by citing the
 classification of Zassenhaus groups ([HB], Ch. XI, Thm 11.16) rather than proving it.
 
-## ⚠ Axiom status
+## Axiom status
 
-`nonempty_theoremAConclusion_of_V_ne_bot` is **not** axiom-clean: it inherits `sorryAx`
-from Chapter II, whose `FirstCaseHypothesis.theoremB` goes through
-`NearFields.rankOne_affine_nearField` → `RankOneHypothesis.brauerSuzuki` →
-`brauerSuzuki_quaternionSylow_q8`, the `Q₈` case of Brauer–Suzuki (issue 0147, a tracked
-long-term project needing modular character theory).  The Chapter III–IV half
-(`SecondCaseHypothesis.nonempty_theoremAConclusion`) *is* axiom-clean, and so is the
-bridge below; the only `sorry` reachable from here is that one.  It is therefore absent
-from `AxiomsCheck`, deliberately.
+`nonempty_theoremAConclusion_of_V_ne_bot` is axiom-clean and registered in `AxiomsCheck`
+(2026-08-07).  It had long been excluded deliberately: Chapter II's
+`FirstCaseHypothesis.theoremB` goes through `NearFields.rankOne_affine_nearField` →
+`RankOneHypothesis.brauerSuzuki` → `brauerSuzuki_quaternionSylow_q8`, the `Q₈` case of
+Brauer–Suzuki, which was the library's last `sorry` until the modular character theory it
+needs was built (issues 0147 / 9506, Navarro 1998 Ch. 1–7).  The Chapter III–IV half
+(`SecondCaseHypothesis.nonempty_theoremAConclusion`) was axiom-clean throughout.
 -/
 
 set_option autoImplicit false
@@ -115,7 +114,7 @@ This is the case split of (C1) at the head of Ch. III §1 (p. 115):
 The book's remaining case, `V = 1`, is settled there by citing the classification of
 Zassenhaus groups ([HB], Ch. XI, Thm 11.16).
 
-⚠ Depends on `sorryAx` through Chapter II only — see the module docstring. -/
+Axiom-clean; see the module docstring. -/
 theorem nonempty_theoremAConclusion_of_V_ne_bot (hV : hyp.V ≠ ⊥)
     (ih : TheoremAInductionBelow G Ω) :
     Nonempty (TheoremAConclusion G Ω) := by

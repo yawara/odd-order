@@ -186,10 +186,9 @@ noncomputable def rankOneQuotient :
 rank-one quotient `C_G(P)/N` is the affine group of a finite near-field
 extended by automorphisms.
 
-This cites Appendix C, Proposition 1 (`rankOne_affine_nearField`), which is
-honestly stated but currently sorried behind the Brauer–Suzuki theorem
-(issue 9318); downstream consumers of this theorem inherit that `sorry`
-until 9318 closes. -/
+This cites Appendix C, Proposition 1 (`rankOne_affine_nearField`), which rests
+on the Brauer–Suzuki theorem (issue 9318, `Q₈` case 0147 / 9506); the whole
+chain is axiom-clean since 2026-08-07. -/
 theorem exists_affineNearFieldModel :
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     ∃ (F : Type uG) (_ : NearFields.NearField F),

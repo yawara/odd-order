@@ -286,17 +286,20 @@ private theorem quaternionGroup_closure_pair (n : ℕ) [NeZero n] :
     exact Subgroup.mul_mem _
       (Subgroup.subset_closure (Set.mem_insert_of_mem _ rfl)) (ha_mem i)
 
-/-- **Brauer–Suzuki, the `Q₈` case** — the sole remaining `sorry` of Appendix C, Proposition 1,
-tracked as a deliberate long-term project (issue 0147, thawed 2026-07-25; spine = Navarro 1998
-Ch. 1–7 via the Z*-theorem — spec `notes/meta/q8_modular_char_theory_frozen_project.md`,
-background `notes/peterfalvi/appendixC_prop1_q8_brauer_suzuki.md`).
+/-- **Brauer–Suzuki, the `Q₈` case** — for a long time the sole remaining `sorry` of Appendix C,
+Proposition 1; **closed 2026-08-07** (issues 0147 / 9506, spec
+`notes/meta/q8_modular_char_theory_frozen_project.md`, background
+`notes/peterfalvi/appendixC_prop1_q8_brauer_suzuki.md`).
 
 Gorenstein: "all known proofs require the theory of modular characters" — the `|S| ≥ 16` case is
 proved by ordinary exceptional characters (`brauerSuzuki_of_quaternionSylow`), but for `S ≅ Q₈`
 the modular theory (`p`-modular systems, Brauer characters, blocks, quaternion defect groups) is
-genuinely required and absent from mathlib.  The statement is exactly the missing mathematics: a
-finite group with quaternion Sylow `2`-subgroup of order `8` satisfies `O_{2'}(G) ⊔ C_G(z) = ⊤`
-for every involution `z` of that Sylow subgroup. -/
+genuinely required and was absent from mathlib; it is now built from the ground up under
+`OddOrder/GroupTheory/RepresentationTheory/Modular/`, following Navarro 1998 Ch. 1–7.  The proof
+proper is `OddOrder.GroupTheory.brauerSuzuki_q8`, whose character-theoretic core is
+`q8_exists_proper_normal` (Navarro pp. 139–146).  The statement: a finite group with quaternion
+Sylow `2`-subgroup of order `8` satisfies `O_{2'}(G) ⊔ C_G(z) = ⊤` for every involution `z` of
+that Sylow subgroup. -/
 theorem brauerSuzuki_quaternionSylow_q8 {G : Type*} [Group G] [Finite G]
     (T : Sylow 2 G) (hq : Nonempty (↥(T : Subgroup G) ≃* QuaternionGroup 2))
     {z : G} (hz : z ∈ (T : Subgroup G)) (hz2 : z ^ 2 = 1) (hzne : z ≠ 1) :
@@ -314,8 +317,8 @@ closed by assembling the Gorenstein Ch. 12 setup (`QuaternionSylowSetup`) from t
 `↥T ≃* QuaternionGroup n` — generators `x = e⁻¹(a 1)`, `y = e⁻¹(xa 0)` with the quaternion
 relations transported — and applying `brauerSuzuki_of_quaternionSylow`; `t` equals the setup's
 central involution `z` by uniqueness of involutions in `T`
-(`eq_one_or_eq_z_of_sq_eq_one`).  The sole residual `sorry` is the isolated `|T| = 8` statement
-`brauerSuzuki_quaternionSylow_q8` (modular character theory; long-term project, issue 0147). -/
+(`eq_one_or_eq_z_of_sq_eq_one`).  The isolated `|T| = 8` case is `brauerSuzuki_quaternionSylow_q8`
+(modular character theory; closed 2026-08-07, issues 0147 / 9506). -/
 theorem RankOneHypothesis.brauerSuzuki {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
     (hyp : RankOneHypothesis G Ω) :
     OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G ⊔ Subgroup.centralizer {hyp.t} = ⊤ := by

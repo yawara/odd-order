@@ -20031,3 +20031,31 @@ CLAUDE.md「carrier は posit でなく construct」の doneness 判定でもあ
 段 372-376 (Navarro (7.2) 内の Burnside 段)。 -/
 
 #assert_only_allowed_axioms OddOrder.GroupTheory.q8_exists_proper_normal
+
+/-! ## Q₈ Brauer–Suzuki の下流 — 2026-08-07 に一斉解凍
+
+`q8_exists_proper_normal` が閉じたことで、`brauerSuzuki_quaternionSylow_q8` を経由していた
+Peterfalvi 補章の鎖が全て axiom-clean になった。従来この 4 本は「Q₈ の `sorry` を継承する」
+ことを理由に**意図的に未登録**だった (`TheoremANonTrivialV` の module docstring 参照)。
+
+```
+q8_exists_proper_normal            (issue 9506, Navarro pp.139-146)
+  → brauerSuzuki_quaternionSylow_q8   (App. C Prop 1 の前提 (ii)、|S| = 8)
+  → RankOneHypothesis.brauerSuzuki    (|S| ≥ 16 の ordinary route と合流)
+  → rankOne_affine_nearField          (App. C Prop 1 = 階数 1 の affine near-field model)
+  → FirstCaseHypothesis.theoremB      (Pf II Ch.II、issue 2053)
+  → nonempty_theoremAConclusion_of_V_ne_bot (Pf II Ch.II-IV = `V ≠ 1` の半分)
+  → theoremA                          (Pf II Ch.I §3 の `|G|` 帰納法; `ZassenhausClassification`
+                                       は axiom でなく明示引数)
+```
+-/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.brauerSuzuki_quaternionSylow_q8
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.RankOneHypothesis.brauerSuzuki
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.NearFields.rankOne_affine_nearField
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.theoremB
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.nonempty_theoremAConclusion_of_V_ne_bot
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.theoremA

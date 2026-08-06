@@ -352,8 +352,8 @@ Step (5) (`card_nearField_eq_nine_and_Q1_eq_bot`) gives the dichotomy `F`
 commutative, or `F ≅ F_{9,2}` with `Q₁ = 1`; the second alternative asserts
 `Q₁ = 1`, so `Q₁ ≠ 1` leaves `F` commutative.
 
-Inherits the step (2)(b) `sorry` (issue 9318) only through a model-supplying
-caller, and the Higman `sorry` (step (5)). -/
+Depends on step (2)(b) only through a model-supplying caller, and on Higman
+(step (5)). -/
 theorem comm_of_Q1_ne_bot :
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     ∀ {F : Type uG} [NearFields.NearField F]
@@ -375,8 +375,8 @@ Proposition 1(c) to `X = ⟨w⟩` yields that the global product order
 `Q₀` lies in `C_G(w)`); the trichotomy reading
 (`cQ_card_and_pGroup_of_trichotomy`) supplies both conclusions.
 
-Inherits the step (2)(b) `sorry` (issue 9318) — none directly, this is a clean
-application of the axiom-clean trichotomy reading. -/
+Independent of step (2)(b) — this is a clean application of the axiom-clean
+trichotomy reading. -/
 theorem st_mem_and_cQ_isPGroup_of_mem_centralizer_W
     (ind : Hypothesis.TheoremAInductionBelow G Ω)
     {w : G} (hwW : w ∈ fc.toHypothesis.W)
@@ -609,8 +609,8 @@ projection `C_Q(P) ≅ Q̄`) to the `w`-fixed part of `C_Q(P) ⊆ C_Q(w)`, a
 `2`-group; so `|C_{F^*}(w)| = 2^b` and `|C_F(w)| = 2^b + 1`.  The arithmetic
 heart `card_fixedSet_mem_of_units_two_pow` then gives `|C_F(w)| ∈ {f, 9}`.
 
-Inherits the step (2)(b) `sorry` (issue 9318) through a model-supplying caller,
-and the Higman `sorry` (step (5)) through `comm_of_Q1_ne_bot`. -/
+Depends on step (2)(b) through a model-supplying caller, and on Higman
+(step (5)) through `comm_of_Q1_ne_bot`. -/
 theorem cardFixedField_char_or_nine
     (ind : Hypothesis.TheoremAInductionBelow G Ω)
     {F : Type uG} [NearFields.NearField F]
@@ -700,8 +700,8 @@ constant, `RingAut F` is cyclic (finite field), so `C_W(P)` is cyclic with all
 nonidentity elements of the same order — forcing `ℓ` prime — and
 `|F| = |C_F(w)|^ℓ` with `|C_F(w)| ∈ {3, 5, 9}`.
 
-Inherits the step (2)(b) `sorry` (issue 9318) through a model-supplying caller
-and the Higman `sorry` (step (5)) through step (C). -/
+Depends on step (2)(b) through a model-supplying caller, and on Higman
+(step (5)) through step (C). -/
 theorem card_prime_and_card_field_of_Q1_ne_bot
     (ind : Hypothesis.TheoremAInductionBelow G Ω)
     {F : Type uG} [NearFields.NearField F]
