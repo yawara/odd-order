@@ -44,6 +44,8 @@ the hypothesis that the block idempotents are lifted along.
   inside `𝔪_A·B ⊔ ⟨ζ - 1⟩`
 * `OddOrder.Algebra.isAdicComplete_ker_cyclotomicToResidueField` /
   `OddOrder.Algebra.isLocalRing_cyclotomicAdjoin` — **`B` is a complete local ring**
+* `OddOrder.Algebra.residueFieldEquivCyclotomicAdjoin` /
+  `OddOrder.Algebra.maximalIdeal_cyclotomicAdjoin` — its residue field is that of `A`
 -/
 
 namespace OddOrder.Algebra
@@ -257,5 +259,31 @@ theorem isLocalRing_cyclotomicAdjoin {A : Type*} [CommRing A] [IsLocalRing A]
   haveI := isAdicComplete_ker_cyclotomicToResidueField (A := A) (q := q) (k := k) hk
   exact isLocalRing_of_isAdicComplete_maximal
     (RingHom.ker (cyclotomicToResidueField (A := A) (q := q) (k := k) hk))
+
+/-! ### The residue field of `B` is `k` -/
+
+open IsLocalRing in
+/-- **`B ⧸ ker(B → k) ≅ k`.**  The map is onto (`cyclotomicToResidueField_surjective`), so the
+first isomorphism theorem applies.  Together with `maximalIdeal_cyclotomicAdjoin` this identifies
+the residue field of `B` with that of `A` — in particular the extension does not enlarge it, so
+algebraic closedness is inherited. -/
+noncomputable def residueFieldEquivCyclotomicAdjoin {A : Type*} [CommRing A] [IsLocalRing A]
+    {q k : ℕ} [Fact (Nat.Prime q)] [CharP (ResidueField A) q] (hk : 0 < k) :
+    (AdjoinRoot (cyclotomic (q ^ k) A) ⧸
+        RingHom.ker (cyclotomicToResidueField (A := A) (q := q) (k := k) hk))
+      ≃+* ResidueField A :=
+  RingHom.quotientKerEquivOfSurjective (cyclotomicToResidueField_surjective hk)
+
+open IsLocalRing in
+/-- **The maximal ideal of `B` is `ker(B → k)`** — a local ring has only one maximal ideal. -/
+theorem maximalIdeal_cyclotomicAdjoin {A : Type*} [CommRing A] [IsLocalRing A]
+    {q k : ℕ} [Fact (Nat.Prime q)] [CharP (ResidueField A) q]
+    [IsAdicComplete (maximalIdeal A) A] (hk : 0 < k) :
+    letI := isLocalRing_cyclotomicAdjoin (A := A) (q := q) (k := k) hk
+    maximalIdeal (AdjoinRoot (cyclotomic (q ^ k) A))
+      = RingHom.ker (cyclotomicToResidueField (A := A) (q := q) (k := k) hk) := by
+  letI := isLocalRing_cyclotomicAdjoin (A := A) (q := q) (k := k) hk
+  exact (IsLocalRing.eq_maximalIdeal
+    (ker_cyclotomicToResidueField_isMaximal (A := A) (q := q) (k := k) hk)).symm
 
 end OddOrder.Algebra

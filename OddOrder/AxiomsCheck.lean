@@ -19156,3 +19156,18 @@ mathlib `isLocalRing_of_isAdicComplete_maximal` で `IsLocalRing B`。 -/
   OddOrder.Algebra.isAdicComplete_ker_cyclotomicToResidueField
 
 #assert_only_allowed_axioms OddOrder.Algebra.isLocalRing_cyclotomicAdjoin
+
+/-! 🎯 **issue 9506 段 307**: `B` の剰余体は `A` のそれ (`Algebra/CyclotomicAdjoin`)。
+
+- `residueFieldEquivCyclotomicAdjoin`: `B ⧸ ker(B → k) ≃+* k`
+  (段 303 の全射性 + 第一同型定理)。
+- `maximalIdeal_cyclotomicAdjoin`: 局所環の極大イデアルは一意なので
+  `maximalIdeal B = ker(B → k)` (段 305 の極大性 + 段 306 の局所性)。
+
+⟹ **`ResidueField B ≅ ResidueField A`** — 全分岐なので剰余体は伸びない。
+modular 側が要求する `IsAlgClosed (ResidueField ·)` と `CharP (ResidueField ·) q` は
+そのまま継承される。残るは `Frac(B)` の分裂のみ。 -/
+
+#assert_only_allowed_axioms OddOrder.Algebra.residueFieldEquivCyclotomicAdjoin
+
+#assert_only_allowed_axioms OddOrder.Algebra.maximalIdeal_cyclotomicAdjoin
