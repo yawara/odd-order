@@ -568,6 +568,7 @@ import OddOrder.GroupTheory.GlaubermanReplacement
 import OddOrder.GroupTheory.GlaubermanZJ
 import OddOrder.GroupTheory.SolvableTwoTransitive
 import OddOrder.Algebra.AlgClosedIdempotentLift
+import OddOrder.Algebra.CenterGroupAlgebraAlgClosed
 import OddOrder.Peterfalvi.Appendices.FeitSibleyMain
 
 /-!
@@ -19260,3 +19261,18 @@ ordinary 側を分裂させる係数環 `𝓞_ℂ_[p]` は値群が可除ゆえ 
 #assert_only_allowed_axioms OddOrder.map_maximalIdeal_le_jacobson_bot
 #assert_only_allowed_axioms OddOrder.exists_isIdempotentElem_sub_mem_of_isAlgClosed
 #assert_only_allowed_axioms OddOrder.existsUnique_isIdempotentElem_sub_mem_of_isAlgClosed
+
+/-! 🎯 **issue 9506 段 313**: `Z(𝒪G)` 側の張り替え (`CenterGroupAlgebraAlgClosed`)。
+
+段 311-312 を `Z(𝒪G)` に適用する。`Z(𝒪G)` は類和で自由有限 (`centerBasis`) なので
+仮説はそれだけで足り、`existsUnique_isIdempotentElem_centerGroupAlgebra` /
+`existsUnique_isIdempotentElem_mapRingHom_eq` (どちらも `[IsAdicComplete I 𝒪]` 版) の
+**drop-in 代替**が `[IsIntegrallyClosed 𝒪]` + `[IsAlgClosed K]` で得られた。
+
+⟹ 供給側は完了。残りは鎖の binder
+`[IsAdicComplete (maximalIdeal 𝒪) 𝒪]` → `[IsIntegrallyClosed 𝒪] [IsAlgClosed K]`
+の張り替えと `𝓞_ℂ_[p]` での instance 化。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.existsUnique_isIdempotentElem_centerGroupAlgebra_of_isAlgClosed
+#assert_only_allowed_axioms OddOrder.existsUnique_isIdempotentElem_mapRingHom_eq_of_isAlgClosed

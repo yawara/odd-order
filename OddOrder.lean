@@ -50,6 +50,7 @@ import OddOrder.Algebra.DefectGroupConjugacy
 import OddOrder.Algebra.GroupAlgebraDefectGroup
 import OddOrder.Algebra.AlgClosedFractionField
 import OddOrder.Algebra.AlgClosedIdempotentLift
+import OddOrder.Algebra.CenterGroupAlgebraAlgClosed
 import OddOrder.Algebra.AlgClosedSplitting
 import OddOrder.Algebra.GroupAlgebraBlocks
 import OddOrder.Algebra.BlockIdempotent
