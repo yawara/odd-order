@@ -3178,6 +3178,51 @@ mathlib の直接支援はゼロ。
 形になった (build green / AxiomsCheck OK)。ただし**上記のとおり鎖全体の解放には使えない**。
 53 file の binder 掃除は revert 済 (`IsFractionRing` は鎖に残る)。
 
+##### 🎯🎯🎯 裁定 (2026-08-06、hub): **(b) 冪等元持ち上げを Henselian へ弱める**を採る
+
+(iii) が死んだので (a) / (b) の二択に戻るが、**(b) が決定的に小さい**ことが分かった。
+
+**(b) を採る理由 — `𝓞_ℂ_[p]` は `IsAdicComplete` 以外の全要求を既に満たす**:
+
+| 要求 | `𝓞_ℂ_[p]` | `𝕎(𝔽̄_p)[ζ]` (= 案 (a)) |
+|---|---|---|
+| `IsFractionRing 𝒪 K` | ✅ (付値環) | ✅ |
+| `K` が `K[G]` を分裂 | ✅ **無償** (`ℂ_[p]` 代数閉、段 292 で証明済) | ❌ **Brauer の分裂体定理が要る** |
+| `IsAlgClosed (ResidueField 𝒪)` | ✅ (段 292) | ✅ |
+| Henselian | ✅ (段 292) | ✅ |
+| 冪等元の持ち上げ | ❌ `IsAdicComplete` が偽 (`𝔪² = 𝔪`) | ✅ |
+
+⟹ **(b) を通せば残り 0**。(a) は `Frac(B)` の分裂 = Schur 指数か `Br = 0` の一般論が残り、
+どちらも mathlib 支援ゼロの大物 (実測: mathlib で `HenselianLocalRing`/`HenselianRing` は
+`RingTheory/Henselian.lean` の**外で一度も使われていない**; Brauer 群は定義のみ)。
+
+**⚠ 以前「(b) は多変数 Hensel が要るので重い」と評価したのは誤り** — 一般の Henselian
+局所環では確かに Hensel の**分解形**が要る (mathlib に無い) が、**`𝓞_ℂ_[p]` には
+もっと強い性質が在る**: `AlgClosedFractionField.exists_isRoot_of_monic` (段 291 で証明済) が
+「monic 多項式は `𝒪` 自身に根を持つ」を与える。⟹ **monic は `𝒪[X]` で 1 次式に完全分解する**。
+
+**⟹ 初等的な構成 (新しい一般論は不要)**。`A` を `𝒪` 上有限自由な可換代数、
+`a ∈ A` が `a² − a ∈ 𝔪A` を満たすとする:
+
+1. `f := charpoly(μ_a) ∈ 𝒪[X]` は monic で `f(a) = 0` (Cayley–Hamilton)。
+2. `f = ∏ (X − λ_i)` に完全分解 (上記; `exists_isRoot_of_monic` + 次数の帰納法)。
+3. `f̄ = charpoly(μ_ā)` で `μ_ā` は冪等 ⟹ 固有値は `0`/`1` のみ ⟹ 各 `λ̄_i ∈ {0,1}`。
+4. `g := ∏_{λ̄_i = 0}(X − λ_i)`、`h := ∏_{λ̄_i = 1}(X − λ_i)`。
+   **`IsCoprime g h` は自明**: `λ̄ = 0`, `μ̄ = 1` なら `λ − μ` は単元で
+   `(X−λ) − (X−μ) = μ−λ` ⟹ 1 次式どうしが coprime、積は `IsCoprime.prod_left/right`。
+   ⟹ **resultant も Hensel の分解形も要らない**。
+5. `u g + v h = 1` を `a` で評価。`α := g(a)`, `β := h(a)` は `αβ = f(a) = 0` かつ
+   `uα + vβ = 1` ⟹ `e := vβ` は冪等 (`e² = vβ(1 − uα) = vβ`)。
+6. `mod 𝔪`: `ḡ(ā) = ā^r`, `h̄(ā) = (ā−1)^s` と `ā² = ā` から `ē = 1 − ā` ⟹ `1 − e` が求める持ち上げ。
+
+⟹ **実装タスク (段 311 以降)**:
+1. `𝒪[X]` の monic の 1 次分解 (`AlgClosedFractionField` の設定、次数の帰納法)
+2. 冪等な自己準同型の特性多項式の根は `0`/`1` のみ
+3. 上の 1-6 を束ねた **`A` 上の冪等元持ち上げ**
+4. 鎖の `[IsAdicComplete (maximalIdeal 𝒪) 𝒪]` を新仮説へ張り替え、`𝓞_ℂ_[p]` で instance 化
+   (⚠ `𝕎(𝔽̄_p)` / `ℤ_[p]` はこの仮説を満たさなくなるが、**そもそも分裂しないので
+   最終定理の carrier には使えない** — 実害なし)
+
 ### `hconv` は gap ではなく assembly (2026-08-06 実測)
 
 `hconv` (= Brauer 第 3 主定理の逆向き) の**本体は既に在る**:
