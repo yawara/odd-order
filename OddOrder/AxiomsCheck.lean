@@ -19341,3 +19341,18 @@ Külshammer の公式が担ぐ `hweak` は**実質「`g` が `p`-正則」と同
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.coeff_blockIdempotent_eq_zero_of_not_isPRegular
+
+/-! 🎯 **issue 9506 段 319a**: `hweak` の discharge (`BlockPartVanishing`)。
+
+`sum_character_blockOfIrr_eq_zero_of_isPRegular` — Külshammer の公式が担ぐ `hweak` の形を
+Navarro (5.11) から出す。(5.11) を `h := g` (`p`-正則), `g := x` (Sylow の元) で使うと
+非共役条件 `¬ IsConj (pPart p x) (pPart p g)` は
+`pPart p x = x` (`x` は `p`-元) と `pPart p g = 1` (`g` は `p`-正則) で
+**`¬ IsConj x 1` ⟺ `x ≠ 1`** に落ちる — これは `hweak` が既に持っている仮説そのもの。
+
+⚠ `g` の `p`-正則性は便宜ではなく**本質**: `p`-特異だと `pPart p g` は
+任意の Sylow `p`-部分群に共役なので、その `x` で和は本当に消えない。
+`p`-特異側は Osima の定理 (段 317-318) が担う。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_character_blockOfIrr_eq_zero_of_isPRegular

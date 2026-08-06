@@ -227,4 +227,52 @@ theorem sum_character_blockOfIrr_eq_zero (hp : p.Prime) {g h : G}
   rw [hcoeff] at hzero
   exact hzero
 
+-- The centraliser data of `x` is consumed by (5.11) in the proof, not by this statement.
+set_option linter.unusedFintypeInType false in
+open scoped Classical in
+/-- **(5.11) against a nontrivial `p`-element, for a `p`-regular `g`** — the shape Külshammer's
+formula carries as `hweak`.
+
+The non-conjugacy hypothesis of `sum_character_blockOfIrr_eq_zero` becomes `x ≠ 1` here: `x` is a
+`p`-element so `pPart p x = x`, and `g` is `p`-regular so `pPart p g = 1`, leaving
+`¬ IsConj x 1`.
+
+⚠ `p`-regularity of `g` is not a convenience — it is what makes the hypothesis discharge at all.
+For a `p`-singular `g` the `p`-part is conjugate into any Sylow `p`-subgroup, so the sum genuinely
+fails to vanish at that `x`; the `p`-singular case of Külshammer's route goes through Osima's
+theorem instead (`OsimaBlockSupport`). -/
+theorem sum_character_blockOfIrr_eq_zero_of_isPRegular (hp : p.Prime) {g x : G}
+    (hg : IsPRegular p g) (hx : IsPElement p x) (hx1 : x ≠ 1)
+    [Fintype ↥(centralizerOf (pPart p x))]
+    (e : MonoidAlgebra K G ≃ₐ[K] ∀ i, Matrix (m i) (m i) K)
+    (eH : MonoidAlgebra K ↥(centralizerOf (pPart p x)) ≃ₐ[K] ∀ i, Matrix (mH i) (mH i) K)
+    {πG : MonoidAlgebra (ResidueField 𝒪) G →+* ∀ j, Matrix (nnG j) (nnG j) (ResidueField 𝒪)}
+    (hπG : Function.Surjective πG)
+    (hlinG : ∀ (c : ResidueField 𝒪) (a : MonoidAlgebra (ResidueField 𝒪) G), πG (c • a) = c • πG a)
+    (hnilG : ∀ z : Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) G),
+      blockCharacterPi πG hπG hlinG z = 0 → IsNilpotent z)
+    {π : MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf (pPart p x)) →+*
+      ∀ j, Matrix (nn j) (nn j) (ResidueField 𝒪)}
+    (hπ : Function.Surjective π)
+    (hlin : ∀ (c : ResidueField 𝒪)
+      (a : MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf (pPart p x))), π (c • a) = c • π a)
+    (hkerJ : RingHom.ker π
+      = Ring.jacobson (MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf (pPart p x))))
+    (hnilH : ∀ z : Subalgebra.center (ResidueField 𝒪)
+      (MonoidAlgebra (ResidueField 𝒪) ↥(centralizerOf (pPart p x))),
+      blockCharacterPi π hπ hlin z = 0 → IsNilpotent z)
+    {ω : 𝒪} (hω : IsPrimitiveRoot ω (pRegularExponent p ↥(centralizerOf (pPart p x))))
+    {ω' : ResidueField 𝒪}
+    (hω' : IsPrimitiveRoot ω' (pRegularExponent p ↥(centralizerOf (pPart p x))))
+    {ζ : 𝒪} (hζ : ζ ^ p = 1) (hζk : residue 𝒪 ζ = 1) (hζK : algebraMap 𝒪 K ζ ≠ 1)
+    (B : Block πG hπG hlinG) :
+    ∑ i ∈ Finset.univ.filter (fun i => blockOfIrr e hπG hlinG hnilG i = B),
+        (wedderburnRepresentation e i).character g⁻¹
+          * (wedderburnRepresentation e i).character x = 0 :=
+  sum_character_blockOfIrr_eq_zero hp
+    (by
+      rw [pPart_eq_self_of_isPElement hp hx, pPart_eq_one_of_isPRegular hp hg]
+      exact fun hc => hx1 (isConj_one_left.mp hc))
+    e eH hπG hlinG hnilG hπ hlin hkerJ hnilH hω hω' hζ hζk hζK B
+
 end OddOrder.RepresentationTheory.Modular
