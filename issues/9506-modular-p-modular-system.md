@@ -2872,6 +2872,23 @@ p.139 の残り = 「位数 4 の元は全て `G`-共役 (実は `C_G(t)`-共役
   (3) `(D^t_i, D^t_j) = 2(1+δ_ij)` / (4) `(D^y_0, D^t_j) = 0` / (5) `(χ(1), D^t_j) = 0`。
   ⚠ ここから先は「`C_G(t)/⟨t⟩` の modular datum を組む」段になるので、
   着手前に (7.4)/(7.6) の実際の signature を実測すること。
+
+### 🎯 未供給仮説の棚卸し (段 290-293、2026-08-06)
+
+BS の鎖が長らく**仮説として持ち回っていた**もののうち、supplier がゼロだった 3 件を閉じた。
+(7.6) は `quotientPi` で商側の datum を**元の datum から導出**する設計なので、
+`C_G(t)/⟨t⟩` 用に別の datum を組む必要は無い — 要るのは `C_G(t)` の datum だけ。
+
+| 仮説 | 供給源 | 段 |
+|---|---|---|
+| `hcart : cartanMatrix … = 4` | Klein four Sylow + 中心的対合 ⟹ 正規 2-補群 ⟹ `c = \|Sylow\|` | 290-291 |
+| `hζ`/`hζk`/`hζK` | `exists_pow_eq_one_residue_eq_one_padicComplexInt` (ℂ_[p] の原始 p 乗根) | 292 |
+| `hlin`/`hnil` | `exists_splitting_datum` (旧 `exists_surjective_blocks_card_eq` は両方落としていた) | 293 |
+
+⟹ **残る未供給仮説は `hconv`** (`inducedBlockOfCentralizer … = principalBlock → b = principalBlock`
+= Brauer 第 3 主定理の収束条件) **と、datum 一式を実際に `obtain` して組む assembly**。
+`hp`/`hx`/`hω`/`hω'`/`e`/`eG`/`Invertible` は既に supplier がある
+(`exists_isPrimitiveRoot_padicComplexInt` / `exists_algEquiv_pi_matrix_padicComplex` / 標数 0)。
 - "Analysis at t" (p.141-142): `C_G(t)/⟨t⟩` が Klein four Sylow-2 ⟹ (7.4) の basic set、
   (7.6) で `C_G(t)` へ持ち上げ、(7.5) で `d^t` の列。**整数性は issue 9508 で完済**
   (`intBasicSetMatrix` / `sum_intBasicSetMatrix_mul_cartanMatrix`)。
