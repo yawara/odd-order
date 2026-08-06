@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.GroupTheory.Sylow
 import OddOrder.GroupTheory.KleinFourAutomorphism
 import OddOrder.GroupTheory.PRegularElement
+import OddOrder.GroupTheory.SylowContaining
 
 /-!
 # A single class of involutions for a Klein four Sylow `2`-subgroup
@@ -39,29 +40,17 @@ open scoped Pointwise
 
 variable {G : Type*} [Group G] [Finite G]
 
-/-- **An involution is conjugate into any Sylow `2`-subgroup.** -/
+/-- **An involution is conjugate into any Sylow `2`-subgroup** — the `p = 2`, order-`2` case of
+`exists_conj_mem_sylow`. -/
 theorem exists_conj_mem_sylow_of_mul_self_eq_one (P : Sylow 2 G) {u : G} (hu : u ≠ 1)
     (hu2 : u * u = 1) : ∃ c : G, c * u * c⁻¹ ∈ (P : Subgroup G) := by
   haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  have hord : orderOf u = 2 := by
-    have hdvd : orderOf u ∣ 2 := orderOf_dvd_of_pow_eq_one (by rw [pow_two]; exact hu2)
-    rcases (Nat.dvd_prime Nat.prime_two).mp hdvd with h | h
-    · exact absurd (orderOf_eq_one_iff.mp h) hu
-    · exact h
-  have hzp : IsPGroup 2 (Subgroup.zpowers u) := by
-    refine IsPGroup.of_card (n := 1) ?_
-    rw [Nat.card_zpowers, hord, pow_one]
-  obtain ⟨Q, hzQ⟩ := hzp.exists_le_sylow
-  obtain ⟨c, hc⟩ := MulAction.exists_smul_eq G Q P
-  have hQP : (P : Subgroup G) = MulAut.conj c • (Q : Subgroup G) := by
-    rw [← hc, Sylow.coe_subgroup_smul]
-  refine ⟨c, ?_⟩
-  rw [hQP, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
-  have hsimp : (MulAut.conj c)⁻¹ • (c * u * c⁻¹) = u := by
-    simp only [MulAut.smul_def, ← map_inv, MulAut.conj_apply, inv_inv]
-    group
-  rw [hsimp]
-  exact hzQ (Subgroup.mem_zpowers u)
+  have hord : orderOf u = 2 :=
+    ((Nat.dvd_prime Nat.prime_two).mp
+        (orderOf_dvd_of_pow_eq_one (by rw [pow_two]; exact hu2))).resolve_left
+      fun h => hu (orderOf_eq_one_iff.mp h)
+  exact exists_conj_mem_sylow
+    (IsPGroup.of_card (n := 1) (by rw [Nat.card_zpowers, hord, pow_one])) P
 
 /-- **All involutions of `G` are conjugate** when the Sylow `2`-subgroup `P` is a Klein four group
 and some odd-order `g ∈ N_G(P)` does not centralise `P`. -/

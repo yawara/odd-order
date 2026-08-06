@@ -18829,3 +18829,24 @@ Navarro p.140 が「これらは先頭成分が 1 の整数列である」と言
 #assert_only_allowed_axioms OddOrder.GroupTheory.sq_eq_one_quotient_zpowers_of_quaternionTwo
 
 #assert_only_allowed_axioms OddOrder.GroupTheory.sylowQ8_le_centralizer_involution
+
+/-! 🎯 **issue 9506 段 287**: p.141 の「位数 4 の元は `C_G(t)`-共役」と、その配管。
+
+原文 p.141 は「the elements of order 4 of `P` are `C_G(t)`-conjugate」を使って
+`C_G(t)/⟨t⟩` の対合が全て共役であることを言う。段 276 の `isConj_of_orderFour` は
+`G`-共役しか主張していなかったが、証明中の融合元は実際に `N_G(T)` の中で作られている
+(`b * a⁻¹ : ↥N_G(T)` と `d : ↥T ≤ N_G(T)` の積) ので、**結論を
+`∃ g ∈ N_G(T), g v g⁻¹ = w` に強化**した。`N_G(T) ≤ C_G(t)`
+(`normalizer_le_centralizer_involution`) と合わせて
+`isConj_centralizer_of_orderFour` が出る。
+
+`exists_conj_mem_sylow` (`GroupTheory/SylowContaining`) は汎用配管:
+「`p`-元は指定した Sylow `p` に共役で入る」(`IsPGroup.exists_le_sylow` + Sylow 共役)。
+商群 `C_G(t)/⟨t⟩` の対合を Klein four な Sylow-2 に持ち込むのに使う。
+⚠ 着手後に `KleinFourSylowFusion.exists_conj_mem_sylow_of_mul_self_eq_one` (対合専用の
+特殊化) が既存だと判明したので、**その場で一般化**して特殊版を一般版への 3 行に置換した
+(CLAUDE.md「既存の特殊化を見つけたらその場で一般化」)。 -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.exists_conj_mem_sylow
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.isConj_centralizer_of_orderFour

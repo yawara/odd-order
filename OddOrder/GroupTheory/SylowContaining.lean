@@ -28,7 +28,24 @@ namespace OddOrder.GroupTheory
 
 open MulAction
 
+open scoped Pointwise
+
 variable {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+
+/-- **Every `p`-element is conjugate into any prescribed Sylow `p`-subgroup.**  It lies in *some*
+Sylow `p`-subgroup (`IsPGroup.exists_le_sylow`), and the Sylow `p`-subgroups are conjugate. -/
+theorem exists_conj_mem_sylow {x : G} (hx : IsPGroup p (Subgroup.zpowers x)) (P : Sylow p G) :
+    ∃ g : G, g * x * g⁻¹ ∈ (P : Subgroup G) := by
+  obtain ⟨Q, hQ⟩ := hx.exists_le_sylow
+  obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G Q P
+  have hcoe : (P : Subgroup G) = MulAut.conj g • (Q : Subgroup G) := by rw [← hg]; rfl
+  refine ⟨g, ?_⟩
+  rw [hcoe, Subgroup.mem_pointwise_smul_iff_inv_smul_mem,
+    show (MulAut.conj g)⁻¹ • (g * x * g⁻¹) = x by
+      rw [← map_inv MulAut.conj g]
+      change g⁻¹ * (g * x * g⁻¹) * g⁻¹⁻¹ = x
+      group]
+  exact hQ (Subgroup.mem_zpowers x)
 
 /-- **Navarro (4.22).**  The number of Sylow `p`-subgroups containing a given `p`-subgroup is
 `≡ 1 (mod p)`. -/

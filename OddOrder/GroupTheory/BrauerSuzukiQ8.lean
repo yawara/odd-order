@@ -612,7 +612,8 @@ fuses `w` with `w⁻¹`, so any two elements of order `4` of `T` are `G`-conjuga
 theorem isConj_of_orderFour (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 2 G)
     (e : ↥(T : Subgroup G) ≃* QuaternionGroup 2) (hTG : (T : Subgroup G) ≠ ⊤)
     {v w : G} (hv : v ∈ (T : Subgroup G)) (hw : w ∈ (T : Subgroup G))
-    (hv2 : v ^ 2 ≠ 1) (hw2 : w ^ 2 ≠ 1) : ∃ g : G, g * v * g⁻¹ = w := by
+    (hv2 : v ^ 2 ≠ 1) (hw2 : w ^ 2 ≠ 1) :
+    ∃ g ∈ Subgroup.normalizer ((T : Subgroup G) : Set G), g * v * g⁻¹ = w := by
   classical
   letI : Fintype ↥(T : Subgroup G) := Fintype.ofFinite _
   set V : ↥(T : Subgroup G) := ⟨v, hv⟩ with hVdef
@@ -637,10 +638,11 @@ theorem isConj_of_orderFour (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 2 G)
       * ((b * a⁻¹ : ↥(Subgroup.normalizer ((T : Subgroup G) : Set G))) : G)⁻¹
       = ((b * a⁻¹) • V : ↥(T : Subgroup G)) := rfl
   rcases hmem with h | h
-  · exact ⟨_, hcv.trans (congrArg Subtype.val h)⟩
+  · exact ⟨_, (b * a⁻¹).2, hcv.trans (congrArg Subtype.val h)⟩
   · obtain ⟨d, hd⟩ := exists_conj_eq_inv_of_quaternionTwo e hW2
     have hdG : (d : G) * w * (d : G)⁻¹ = w⁻¹ := congrArg Subtype.val hd
-    refine ⟨(d : G)⁻¹ * ((b * a⁻¹ : ↥(Subgroup.normalizer ((T : Subgroup G) : Set G))) : G), ?_⟩
+    refine ⟨(d : G)⁻¹ * ((b * a⁻¹ : ↥(Subgroup.normalizer ((T : Subgroup G) : Set G))) : G),
+      Subgroup.mul_mem _ (Subgroup.inv_mem _ (Subgroup.le_normalizer d.2)) (b * a⁻¹).2, ?_⟩
     have hstep : ((b * a⁻¹ : ↥(Subgroup.normalizer ((T : Subgroup G) : Set G))) : G) * v
         * ((b * a⁻¹ : ↥(Subgroup.normalizer ((T : Subgroup G) : Set G))) : G)⁻¹ = w⁻¹ :=
       hcv.trans (congrArg Subtype.val h)
@@ -802,6 +804,18 @@ theorem hasNormalPComplement_centralizer_orderFour (T : Sylow 2 G)
 is one of `C_G(t)` (`Sylow.subtype`).  Hence the Sylow `2`-subgroups of `C_G(t)/⟨t⟩` are
 `Q₈/Z(Q₈)`, a Klein four group — `card_quotient_zpowers_of_quaternionTwo` and
 `sq_eq_one_quotient_zpowers_of_quaternionTwo`. -/
+
+/-- **Navarro p. 139, sharpened: the elements of order `4` of `T` are `C_G(t)`-conjugate.**
+This is the form p. 141 uses ("the elements of order `4` of `P` are `C_G(t)`-conjugate"): the
+fusing element of `isConj_of_orderFour` lies in `N_G(T)`, and `N_G(T) ≤ C_G(t)`. -/
+theorem isConj_centralizer_of_orderFour (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 2 G)
+    (e : ↥(T : Subgroup G) ≃* QuaternionGroup 2) (hTG : (T : Subgroup G) ≠ ⊤)
+    {t : G} (htT : t ∈ (T : Subgroup G)) (ht2 : t ^ 2 = 1) (ht1 : t ≠ 1)
+    {v w : G} (hv : v ∈ (T : Subgroup G)) (hw : w ∈ (T : Subgroup G))
+    (hv2 : v ^ 2 ≠ 1) (hw2 : w ^ 2 ≠ 1) :
+    ∃ g ∈ Subgroup.centralizer ({t} : Set G), g * v * g⁻¹ = w := by
+  obtain ⟨g, hgN, hg⟩ := isConj_of_orderFour hO T e hTG hv hw hv2 hw2
+  exact ⟨g, normalizer_le_centralizer_involution T e htT ht2 ht1 hgN, hg⟩
 
 omit [Finite G] in
 /-- **`T ≤ C_G(t)`** for the involution `t` of `T ≅ Q₈` — Navarro p. 141's "`P` is a Sylow
