@@ -278,6 +278,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolutio
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockBasicSet
 import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
 import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientPairing
+import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientPrincipalBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientCartan
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEntry
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
