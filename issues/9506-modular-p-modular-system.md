@@ -4187,3 +4187,59 @@ build green + AxiomsCheck 登録 + sorry 非退行。
 - 親: [0147](0147-q8-modular-char-theory-frozen.md)
 - spec: `notes/meta/q8_modular_char_theory_frozen_project.md`
 - 前提調査: `notes/peterfalvi/appendixC_prop1_q8_brauer_suzuki.md`
+
+### ✅✅ 段 330 完了 (2026-08-06) — 残タスク C (原文 p.144 の Burnside)。**係数体の橋渡しは不要だった**
+
+`Modular/InvolutionClassBurnside.lean` (226 行):
+
+| 名前 | 内容 |
+|---|---|
+| `coeff_classSum_mul_self_eq_zero_of_not_isPRegular` | **群論の入力**: `(K̂·K̂)(g) = 0` (`K = cl(t)`, `t` 対合, `g` が 2-特異) |
+| `classSquareCoeff` / `classSquareFn` | `c_i = ω_i(K̂)²·χ_i(1)` と類関数 `∑_i c_i χ_i` |
+| `classSquareFn_eq_card_mul_coeff` | **Burnside を類関数として読む**: `∑_i c_i χ_i(g) = |G|·(K̂·K̂)(g⁻¹)` |
+| `classSquareFn_isConj` / `ordinaryCoeff_classSquareFn` | 類関数性と `ordinaryCoeff = classSquareCoeff` |
+| `classSquareFn_eq_zero_of_not_isPRegular` | **(8)**: 2-特異点で消える |
+| `not_isPRegular_of_mem_pSection` | `x ≠ 1` なら `S(x)` の元は `p`-特異 |
+| `sum_classSquareCoeff_mul_generalizedDecompositionNumber_eq_zero` | 🎯 **(9)**: `∑_χ c_χ d^x_{χμ} = 0` (∀`μ ∈ IBr(C_G(x))`) |
+
+#### 🎯 前段で flag した「係数体の橋渡し」は**問題ですらなかった**
+
+前段のメモは「Burnside は `ClassSumCoefficientFormula.lean` に**ℂ 上でしか無い**ので
+(i) 一般分裂体で証明し直す / (ii) ℂ ↔ ℂ_[p] の指標対応 / (iii) 消費側を ℂ 版で書く、の
+どれかが要る」としていた。**実測すると 3 つとも不要**:
+
+* **一般分裂体版は既に在った** — 段 (4.19) 系で作った
+  `CentralCharacterTrace.sum_centralScalar_mul_character_eq_card_mul_coeff`
+  (`∑_i ω_i(Ĉ)ω_i(D̂)χ_i(1)χ_i(z⁻¹) = |G|·(Ĉ·D̂)(z)`) が**まさに Burnside の類積公式**で、
+  任意の標数 0 分裂体 `K` 上で成立する (共役を一切使わないので ℂ 固有の議論が無い)。
+  ⟹ ℂ 版 (`ClassSumCoefficientFormula`, BG App.C 用) は**この鎖では使わない**。
+* **除算も要らない** — 原文の `Θ_χ = χ(t)²/χ(1)` の代わりに
+  `c_i = ω_i(K̂)²·χ_i(1)` を担ぐ (`ω_i(K̂)χ_i(1) = |K|χ_i(t)` より `= |K|²·χ_i(t)²/χ_i(1)`)。
+  定数 `|K|²` 倍は下流の等式 (9)(10) の両辺で共通なので**そのまま通る**。
+
+⚠ **教訓**: 「repo には ℂ 版しか無い」という判断は**名前 (`ClassSumCoefficientFormula`) で
+探した結果**だった。同じ数学が別レイヤ (`Modular/CentralCharacterTrace`) に別名で在り、
+そちらは最初から一般係数だった。[[grep-concept-names-not-book-notation]] の実例をもう 1 つ増やす。
+
+#### 実装知見
+
+* `omit` は**実際に参照される instance を落とせない** (`cannot omit referenced section variable`)。
+  `classSquareFn` の型が `classSum` 経由で `Fintype G`/`DecidableEq (ConjClasses G)` を担ぐ。
+* `ordinaryCoeff` の `hf` 引数はラムダで渡すと `linter.unusedVariables` が誤検出する
+  ⟹ 補題を最初から **`∀ g h, IsConj g h → …` の形**で述べて名前で渡す。
+* `isConj_one_right : IsConj 1 b ↔ b = 1` (`isConj_one_left` は逆向き)。
+
+### ⏭ 残タスク (更新、2026-08-06)
+
+| # | 内容 | 状態 |
+|---|---|---|
+| ~~A~~ | p.143 の (6)(7) | ✅ 段 327 |
+| ~~B~~ | 2 つの対合の積は奇位数 | ✅ 段 328 |
+| ~~C~~ | Burnside → (8)(9) | ✅ 段 330 (**橋渡し不要**) |
+| ~~D~~ | p.144 の 3×3 可逆行列 | ✅ 消滅 (段 329、IBr 独立性で迂回) |
+| E | 段 324/325/327 の仮説供給 (`d^t_{00}=1` 等) | 一般化分解数の一意性から。**次の着手点**。要実測 |
+| F | `𝓞_ℂ_[2]` での modular datum 一式の instantiation | **最大の塊** |
+| G | `q8_exists_proper_normal` への組み立て | F の後 |
+
+⟹ **原文 pp.139-145 の数学は E を残して全部 Lean に在る**。残りは E (整数の同定) と
+F (instantiation = 配線) と G (組み立て)。

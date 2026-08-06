@@ -272,6 +272,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
+import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionClassBurnside
 import OddOrder.Algebra.SubgroupSumBlockAction
 import OddOrder.Algebra.TraceMulLeft
 import OddOrder.GroupTheory.SylowContaining
@@ -19689,3 +19690,30 @@ modular 鎖は `K = ℂ_[p]` と `wedderburnRepresentation` を使う — **係�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_ordinaryCoeff_mul_generalizedDecompositionNumber_eq_zero
+
+/-! 🎯🎯 **issue 9506 段 330**: 原文 p.144 の Burnside 段 (残タスク C)。
+
+`Modular/InvolutionClassBurnside` — 対合の類 `K = cl(t)` について
+
+* `coeff_classSum_mul_self_eq_zero_of_not_isPRegular` — **群論の入力**:
+  「2 つの対合の積は奇位数」(段 328) から `(K̂ · K̂)(g) = 0` (`g` が 2-特異)。
+* `classSquareFn_eq_card_mul_coeff` — **Burnside を類関数として読む**:
+  `∑_i ω_i(K̂)² χ_i(1) χ_i(g) = |G| · (K̂ · K̂)(g⁻¹)`。
+* `sum_classSquareCoeff_mul_generalizedDecompositionNumber_eq_zero` — **(8)(9) 本体**:
+  `∑_χ c_χ d^x_{χμ} = 0` (全ての `μ ∈ IBr(C_G(x))`、`x ≠ 1` は 2-元)。
+
+⚠ **除算を一切導入していない**: 原文の `χ(t)²/χ(1)` の代わりに
+`c_i = ω_i(K̂)² χ_i(1)` (`= |K|² χ_i(t)²/χ_i(1)`) を担ぐ。
+⟹ ℂ 上の類和公式 (`ClassSumCoefficientFormula`) を一般係数へ持ち上げる必要も無く、
+modular 鎖と同じ分裂体 `K` の中で完結する (**係数体の橋渡しは不要だった**)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.coeff_classSum_mul_self_eq_zero_of_not_isPRegular
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.classSquareFn_eq_card_mul_coeff
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.classSquareFn_eq_zero_of_not_isPRegular
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.not_isPRegular_of_mem_pSection
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.sum_classSquareCoeff_mul_generalizedDecompositionNumber_eq_zero

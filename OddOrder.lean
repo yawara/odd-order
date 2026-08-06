@@ -410,6 +410,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularPartCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIntegralCombination
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PPrimeSubgroupRestriction
 import OddOrder.GroupTheory.RepresentationTheory.Modular.IntegralBasicSetMatrix
+import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionClassBurnside
 import OddOrder.GroupTheory.RepresentationTheory.InducedIndicator
 import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCount
 import OddOrder.GroupTheory.RepresentationTheory.PRegularCosetCharacter
