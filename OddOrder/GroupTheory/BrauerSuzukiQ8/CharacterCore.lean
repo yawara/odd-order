@@ -314,6 +314,29 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
       eW φ₀W φ₀W = 4 := by
     rw [cartanMatrix_principalBlock_eq_card_sylow_of_hasNormalPComplement Nat.prime_two hωW hω'W
       hπW hlinW hkerJW hnilW eW hcomplW SylW hφ₀W, hSylW4]
+  -- the converse third main theorem for `(G, C_G(y))`, and the column `D^y_0` (段 348)
+  have hwP : IsPElement 2 (w : G) := ⟨2, by rw [hyord]; norm_num⟩
+  have hconvW := fun bl hind =>
+    eq_principalBlock_of_inducedBlockOfCentralizer_eq_of_roots (K := ℂ_[2]) Nat.prime_two hwP
+      hroot hroot' hζ hζk hζK eG eW hπG hlinG hnilG hkerJG hπW hlinW hnilW hkerJW bl hind
+  have hw1 : (w : G) ≠ 1 := fun hcon => hw2 (by rw [hcon, one_pow])
+  obtain ⟨a, hava, haa, hga, ha0⟩ :=
+    exists_intColumn_generalizedDecompositionNumber_principalBlock (𝒪 := 𝓞_ℂ_[2]) (nn := nnW)
+      (hp := Nat.prime_two) (hx := hwP) (hω := hωW) (e := eW) (eG := eG) (hπG := hπG)
+      (hlinG := hlinG) (hπ := hπW) (hlin := hlinW) (hkerJ := hkerJW) (hnil := hnilW)
+      (hnilG := hnilG) (hω' := hω'W) (hζ := hζ) (hζk := hζk) (hζK := hζK) (hconv := hconvW)
+      (hNp := hMWp) (hquot := hquotMW) (S := SylW) (hφ₀ := hφ₀W)
+      (hy4 := by
+        have h := pow_orderOf_eq_one (w : G)
+        rwa [hyord] at h)
+      (hinv := by
+        obtain ⟨g, hg⟩ := exists_conj_eq_inv_of_quaternionTwo e
+          (fun hcon => hw2 (by rw [← Subgroup.coe_pow, hcon, Subgroup.coe_one]))
+        exact ⟨(g : G), by
+          have := congrArg (Subtype.val (p := fun x => x ∈ (T : Subgroup G))) hg
+          push_cast at this
+          exact this⟩)
+      (ht1 := hw1) (hcart := hcartW)
   sorry
 
 end OddOrder.GroupTheory
