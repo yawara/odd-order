@@ -18768,3 +18768,17 @@ Sylow-2 `Q` は位数 8 なので `|S| ∣ 8` で、`|S| = 8` なら濃度一致
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.card_character_ne_zero_eq_four_of_isConj_inv
+
+/-! 🎯 **issue 9506 段 284**: 自明表現は任意の Wedderburn 分解に現れる
+(`exists_trivial_wedderburn_index`)。
+
+Navarro p.140 が「これらは先頭成分が 1 の整数列である」と言うときの「先頭成分」=
+自明指標 `χ_0 = 1_G` の存在を、抽象的な分解 `e : K[G] ≃ₐ[K] ∏ Matrix (m i) (m i) K` の
+中で特定する。`Ĝ = ∑_{g ∈ G} g` は係数 1 を持つので非零、`g · Ĝ = Ĝ` ゆえ
+`e Ĝ` が非零な成分 `i` では `e Ĝ i` の各列が不変ベクトル ⟹ 既存の
+`forall_apply_eq_of_invariants_ne_bot` で `i` 成分は自明表現。さらに `e` が
+その成分へ全射ゆえ像の行列は全てスカラー (`mulVec_eq_augmentation_smul`) で、
+対角外の行列単位はスカラーでないから `m i` は subsingleton (= 1 次元)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_trivial_wedderburn_index

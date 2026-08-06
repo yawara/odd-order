@@ -35,6 +35,8 @@ zero — and Cauchy supplies a `p`-singular element.
 
 * `OddOrder.RepresentationTheory.Modular.forall_apply_eq_of_invariants_ne_bot` — a Wedderburn
   block with a nonzero invariant vector is the trivial representation
+* `OddOrder.RepresentationTheory.Modular.exists_trivial_wedderburn_index` — the trivial
+  representation occurs in every Wedderburn splitting, as a `1 × 1` block
 * `OddOrder.RepresentationTheory.Modular.not_dvd_card_of_character_eq_zero_of_pSingular`
 * `OddOrder.RepresentationTheory.Modular.exists_not_isPRegular_character_ne_zero`
 -/
@@ -99,6 +101,64 @@ theorem forall_apply_eq_of_invariants_ne_bot
     rwa [smul_smul, inv_mul_cancel₀ hj, one_smul] at this
   obtain ⟨c, hc⟩ := Submodule.mem_span_singleton.mp (hspan w)
   rw [← hc, map_smul, hv g]
+
+/-- **The trivial representation occurs in every Wedderburn splitting of `K[G]`.**
+
+`Ĝ = ∑_{g ∈ G} g` is nonzero and satisfies `g · Ĝ = Ĝ`, so in any component where `e Ĝ` does not
+vanish the columns of `e Ĝ` are invariant vectors; a block with a nonzero invariant vector is the
+trivial representation (`forall_apply_eq_of_invariants_ne_bot`).  Such a block is `1 × 1`: `e` is
+onto it, but every matrix in its image acts on every vector by the scalar `ε(a)`
+(`mulVec_eq_augmentation_smul`), and a matrix unit off the diagonal is not scalar. -/
+theorem exists_trivial_wedderburn_index [Finite G] :
+    ∃ i : ι', Subsingleton (m i) ∧
+      ∀ (g : G) (w : m i → K), wedderburnRepresentation e i g w = w := by
+  classical
+  -- `Ĝ` is nonzero, so it is nonzero in some Wedderburn component
+  have hAne : OddOrder.GroupAlgebra.subgroupSum K (⊤ : Subgroup G) ≠ 0 := by
+    intro h
+    have h1 := OddOrder.GroupAlgebra.coeff_subgroupSum_one (R := K) (⊤ : Subgroup G)
+    rw [h] at h1
+    simp at h1
+  obtain ⟨i, hi⟩ : ∃ i : ι', e (OddOrder.GroupAlgebra.subgroupSum K (⊤ : Subgroup G)) i ≠ 0 :=
+    Function.ne_iff.mp fun h => hAne (e.injective (h.trans (map_zero e).symm))
+  -- the columns of `e Ĝ i` are invariant
+  set N : Matrix (m i) (m i) K := e (OddOrder.GroupAlgebra.subgroupSum K (⊤ : Subgroup G)) i
+    with hN
+  have hfix : ∀ g : G, (e (MonoidAlgebra.single g (1 : K)) i) * N = N := by
+    intro g
+    have := congrArg (fun x => e x i)
+      (OddOrder.GroupAlgebra.single_mul_subgroupSum (R := K) (N := (⊤ : Subgroup G))
+        (Subgroup.mem_top g))
+    simpa [hN] using this
+  obtain ⟨r₀, c₀, hrc⟩ : ∃ r c, N r c ≠ 0 := by
+    by_contra hcon
+    push Not at hcon
+    exact hi (Matrix.ext fun r c => by simpa using hcon r c)
+  have htriv : ∀ (g : G) (w : m i → K), wedderburnRepresentation e i g w = w := by
+    refine forall_apply_eq_of_invariants_ne_bot e i (fun hbot => ?_)
+    refine hrc ?_
+    have hmem : (fun r => N r c₀) ∈ Representation.invariants (wedderburnRepresentation e i) := by
+      refine (Representation.mem_invariants _ _).mpr fun g => ?_
+      rw [wedderburnRepresentation_apply]
+      funext r
+      have := congrFun (congrFun (hfix g) r) c₀
+      simpa [Matrix.mulVec, dotProduct, Matrix.mul_apply] using this
+    rw [hbot, Submodule.mem_bot] at hmem
+    exact congrFun hmem r₀
+  refine ⟨i, ⟨fun j j' => ?_⟩, htriv⟩
+  -- a trivial block is `1 × 1`
+  by_contra hne
+  obtain ⟨a, ha⟩ : ∃ a : MonoidAlgebra K G, e a i = Matrix.single j j' (1 : K) :=
+    ⟨e.symm (Pi.single i (Matrix.single j j' (1 : K))),
+      by rw [AlgEquiv.apply_symm_apply, Pi.single_eq_same]⟩
+  have hcol := mulVec_eq_augmentation_smul e i (v := Pi.single j' (1 : K))
+    (fun g => htriv g _) a
+  have hj := congrFun hcol j
+  rw [ha] at hj
+  simp only [Matrix.mulVec, dotProduct, Pi.single_apply, Pi.smul_apply, smul_eq_mul,
+    mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true] at hj
+  rw [Matrix.single_apply_same, if_neg hne] at hj
+  exact one_ne_zero hj
 
 end Invariants
 
