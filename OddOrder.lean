@@ -287,6 +287,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockCartanEnt
 import OddOrder.GroupTheory.RepresentationTheory.Modular.DefectZeroDegree
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockNonvanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockTrivial
+import OddOrder.GroupTheory.RepresentationTheory.Modular.SupportOfGeneralizedDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SylowSumReduction
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OrdinaryIdempotent
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
