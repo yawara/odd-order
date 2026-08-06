@@ -5129,3 +5129,34 @@ repo に `Z(𝒪[G])` の order 構造・`𝔪`-進完備性まわりの資産�
 `OddOrder/GroupTheory/RepresentationTheory/` に平均化冪等元 (Maschke 用) が既にある可能性が
 高いので、**着手前に `(1/|G|)∑ g` 型の構成を grep すること**
 (`averageIdempotent` / `Maschke` / `invariants` で検索)。
+
+##### Dickson の下請け補題: Lean スケルトン (2026-08-06、API 名まで確定)
+
+新 leaf `GroupTheory/RepresentationTheory/SubgroupAverageTrace.lean` に置く汎用補題:
+
+```lean
+-- Representation.character ρ g = LinearMap.trace k V (ρ g)  (mathlib
+-- Mathlib/RepresentationTheory/Character.lean:56)
+theorem exists_sum_character_subgroup (ρ : Representation F G V) (H : Subgroup G) [Fintype H] :
+    ∃ n : ℕ, (∑ h : H, ρ.character (h : G)) = (Fintype.card H : F) * (n : F)
+```
+(`[Field F] [CharZero F] [Group G] [AddCommGroup V] [Module F V] [FiniteDimensional F V]`)
+
+証明:
+1. `s := ∑ h : H, ρ (h : G)` (= 既存 `OddOrder.BG.Ch1.S03b.groupSumMap` と同じ形。
+   汎用補題としては再定義せず `groupSumMap` を使ってよい)。
+2. `ρ h * s = s` (左からの `h` 倍は `H` を置換する。`Equiv.sum_comp (Equiv.mulLeft h)`。
+   既存 `fixed_apply_groupSumMap` が同じ論法を要素ごとにやっている)。
+   ⟹ `s * s = (card H : F) • s`。
+3. `e := (card H : F)⁻¹ • s` は冪等 (`CharZero` ゆえ `(card H : F) ≠ 0`)。
+4. `he.isProj_range.trace : trace F V e = (finrank F (range e) : F)`
+   (`IsIdempotentElem.isProj_range` + `LinearMap.IsProj.trace`,
+   `Mathlib/LinearAlgebra/Trace.lean:335`)。
+5. `s = (card H : F) • e` ⟹ `trace s = (card H : F) * (finrank … : F)`。
+6. `trace s = ∑ h, ρ.character h` (trace は加法的)。
+
+その上で Dickson 本体:
+`Φ_φ(1) = ∑_{u ∈ P} Φ_φ(u)` (`p`-特異で消える) `= ∑_i d_{iφ} ∑_{u∈P} χ_i(u)`
+`= |P| · ∑_i d_{iφ} n_i` ⟹ `|G|_p = |P| ∣ Φ_φ(1)`。
+⚠ repo の `ordinaryCharacter` は `𝒪` 値なので、`K` での trace 計算と
+`algebraMap_ordinaryCharacter` で橋渡しし、最後に `algebraMap 𝒪 K` の単射性で `𝒪`/`ℕ` へ降ろす。
