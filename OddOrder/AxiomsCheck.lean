@@ -605,7 +605,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 19200
+set_option linter.style.longFile 19400
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -19184,3 +19184,24 @@ modular 側が要求する `IsAlgClosed (ResidueField ·)` と `CharP (ResidueFi
 残るは `Frac(B)` の分裂 = Brauer の分裂体定理 (Schur 指数インフラの新設が要る)。 -/
 
 #assert_only_allowed_axioms OddOrder.Algebra.residueFieldEquiv
+
+/-! 🎯 **issue 9506 段 309**: 左核の消滅は体の拡大で保たれる
+(`eq_zero_of_vecMul_map`, `Modular/BrauerBasis`)。
+
+係数体の再設計 (issue 9506 の「第三の道」) の要。`[IsFractionRing 𝒪 K]` を
+鎖から落とせない唯一の理由が `BrauerBasis.eq_zero_of_vecMul_brauerCharacterMatrix` の
+「共通分母を掛けて `𝒪` に落とす」段だったので、それを
+
+  (a) `F = Frac 𝒪` 上で示す (現行の証明のまま)
+  (b) 任意の体拡大 `K/F` へ移す
+
+に分ける。本段は (b): 成分が `F` にある行列の左核が `F` 上で消えれば、
+`K` 上でも消える。証明は `K` の `F`-基底で展開して係数を読むだけ
+(⚠ mathlib には体拡大で一次独立性が保たれる補題が無く、
+`LinearIndependent.map_of_injective_injective` 系は係数環を小さくする向きなので使えない)。
+
+⟹ これで `K` を `AlgebraicClosure (FractionRing 𝒪)` に取れる道が開き、
+`K[G]` の分裂が mathlib から無償で得られる見込み
+(= Brauer の分裂体定理も Schur 指数も不要)。 -/
+
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.Modular.eq_zero_of_vecMul_map

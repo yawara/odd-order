@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.LinearAlgebra.Basis.VectorSpace
 import Mathlib.LinearAlgebra.Matrix.ToLinearEquiv
 import Mathlib.RingTheory.Localization.Integer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CartanInverse
@@ -33,11 +34,49 @@ in `IBr(H)` — the coefficients being the generalized decomposition numbers `d^
 * `OddOrder.RepresentationTheory.Modular.exists_isConj_pRegularRep`
 * `OddOrder.RepresentationTheory.Modular.isUnit_det_brauerCharacterMatrix`
 * `OddOrder.RepresentationTheory.Modular.existsUnique_coeff_irreducibleBrauerCharacter`
+* `OddOrder.RepresentationTheory.Modular.eq_zero_of_vecMul_map` — a vanishing left kernel is
+  inherited by a field extension
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
 
 open IsLocalRing Matrix MonoidAlgebra OddOrder.GroupTheory
+
+/-! ### Left kernels survive a field extension
+
+A matrix with entries in `F` whose rows are independent over `F` has rows independent over any
+field extension `K`: expand a `K`-relation in an `F`-basis of `K` and read off the coefficients.
+
+This is what will let the coefficient field of the modular theory be an *arbitrary* extension of
+`Frac 𝒪` — in particular an algebraic closure, for which the Wedderburn splitting of `K[G]` is
+free — rather than `Frac 𝒪` itself (issue 9506). -/
+
+/-- **A vanishing left kernel is inherited by a field extension.** -/
+theorem eq_zero_of_vecMul_map {F L ι' κ : Type*} [Field F] [Field L] [Algebra F L]
+    [Fintype ι'] {M : Matrix ι' κ F}
+    (hF : ∀ c : ι' → F, c ᵥ* M = 0 → c = 0)
+    {d : ι' → L} (hd : d ᵥ* M.map (algebraMap F L) = 0) : d = 0 := by
+  classical
+  set b := Module.Basis.ofVectorSpace F L with hb
+  have hzero : ∀ j : Module.Basis.ofVectorSpaceIndex F L, (fun i => b.repr (d i) j) ᵥ* M = 0 := by
+    intro j
+    funext x
+    have hx := congrFun hd x
+    have hrepr : b.repr ((d ᵥ* M.map (algebraMap F L)) x) j
+        = ((fun i => b.repr (d i) j) ᵥ* M) x := by
+      simp only [Matrix.vecMul, dotProduct, map_sum, Finsupp.coe_finsetSum,
+        Finset.sum_apply]
+      refine Finset.sum_congr rfl fun i _ => ?_
+      rw [Matrix.map_apply, show d i * algebraMap F L (M i x) = M i x • d i by
+        rw [Algebra.smul_def]; ring, map_smul]
+      simp [mul_comm]
+    rw [← hrepr, hx]
+    simp
+  funext i
+  have := fun j => congrFun (hF _ (hzero j)) i
+  refine b.repr.injective ?_
+  ext j
+  simpa using this j
 
 variable {p : ℕ} {𝒪 K : Type*} [CommRing 𝒪] [IsDomain 𝒪] [ValuationRing 𝒪]
   [HenselianLocalRing 𝒪] [IsPModularSystem p 𝒪]
