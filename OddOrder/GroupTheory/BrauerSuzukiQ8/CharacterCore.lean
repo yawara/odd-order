@@ -84,6 +84,34 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
       (OddOrder.RepresentationTheory.Modular.quotientPi πC hπC hlinC hNzP).toRingHom
       (OddOrder.RepresentationTheory.Modular.quotientPi_surjective πC hπC hlinC hNzP)
       (OddOrder.RepresentationTheory.Modular.quotientPi_smul πC hπC hlinC hNzP) hkerJQ w hw
+  -- an involution `ȳ` of `Q`: its Sylow `2`-subgroups have order `4`
+  have hz2 : z ^ 2 = 1 := by rw [← hz]; exact pow_orderOf_eq_one z
+  have hz1 : z ≠ 1 := fun h => by simp [h] at hz
+  obtain ⟨SQ⟩ : Nonempty (Sylow 2 (↥C ⧸ Nz)) := Sylow.nonempty
+  have hSQ4 : Nat.card ↥(SQ : Subgroup (↥C ⧸ Nz)) = 4 :=
+    card_sylow_quotient_centralizer T e hzT hz2 hz1 hzC SQ
+  haveI : Fintype ↥(SQ : Subgroup (↥C ⧸ Nz)) := Fintype.ofFinite _
+  obtain ⟨u, hu⟩ : ∃ u : ↥(SQ : Subgroup (↥C ⧸ Nz)), orderOf u = 2 := by
+    refine exists_prime_orderOf_dvd_card 2 ?_
+    rw [← Nat.card_eq_fintype_card, hSQ4]
+    norm_num
+  set yb : ↥C ⧸ Nz := (u : ↥C ⧸ Nz) with hyb
+  have hyb1 : yb ≠ 1 := fun h => by
+    have : orderOf u = 1 := by
+      rw [← orderOf_injective (SQ : Subgroup (↥C ⧸ Nz)).subtype (Subgroup.subtype_injective _) u]
+      simp [← hyb, h]
+    rw [hu] at this; omega
+  have hyb2 : yb * yb = 1 := by
+    have h := pow_orderOf_eq_one u
+    rw [hu, pow_two] at h
+    rw [hyb, ← Subgroup.coe_mul, h, Subgroup.coe_one]
+  -- `C_Q(ȳ)` has a normal `2`-complement (Navarro (7.2)) and its Sylow `2`-subgroup has order `4`
+  have hcompl := hasNormalPComplement_centralizer_of_card_sylow_four SQ hSQ4 hyb1 hyb2
+  obtain ⟨M, hMnorm, hMp, nM, hMindex⟩ := exists_normal_of_hasNormalPComplement hcompl
+  obtain ⟨SylC⟩ : Nonempty (Sylow 2 ↥(Subgroup.centralizer ({yb} : Set (↥C ⧸ Nz)))) :=
+    Sylow.nonempty
+  have hSylC4 : Nat.card ↥(SylC : Subgroup ↥(Subgroup.centralizer ({yb} : Set (↥C ⧸ Nz)))) = 4 :=
+    card_sylow_centralizer_of_card_sylow_four SQ hSQ4 hyb1 hyb2 SylC
   sorry
 
 end OddOrder.GroupTheory
