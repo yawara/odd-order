@@ -5296,3 +5296,16 @@ theorem exists_sum_character_subgroup (ρ : Representation F G V) (H : Subgroup 
 = `QuotientPrincipalBlock` の難しい向き。
 
 ⟹ その後 `hd` → `hT`/`hb0`-`hd0` → 5 群 datum の組み立て。
+
+#### 段 363 の前提 2 本の実測 (2026-08-06)
+
+* **(i) 既存**: `DecompositionBlockDiagonal.blockOfIrr_eq_of_decompositionMatrix_ne_zero`
+  (`d_{iφ} ≠ 0 ⟹ blockOfIrr i = Quotient.mk (blockSetoid π hπ hlin) φ`、`.lean:114`)。
+  逆向き `decompositionMatrix_eq_zero_of_blockOfIrr_ne` も在る (`.lean:140`)。
+* **(ii) 無いが 10 行で出る**: 「`D` の列は非零」= `∀ φ, ∃ i, d_{iφ} ≠ 0`。
+  `CartanInverse.sum_brauer_mul_projectiveIndecomposableCharacter`
+  (`∑_j |C_G(x_j)|⁻¹ φ(x_j⁻¹) Φ_θ(x_j) = δ_{φθ}`) を `φ = θ` で使うと **`Φ_φ ≠ 0`**、
+  `Φ_φ = ∑_i d_{iφ} χ_i` (定義) だから、全部の `d_{iφ}` が 0 なら `Φ_φ = 0` で矛盾。
+
+⟹ 段 363 は (i)(ii) + 段 362 で書ける。実装順は **(ii) の補題を先に**
+(`Modular/DecompositionColumnNonzero.lean` 相当、または `DecompositionBlockDiagonal` に追記)。
