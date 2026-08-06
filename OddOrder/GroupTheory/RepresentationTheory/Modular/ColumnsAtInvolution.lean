@@ -186,6 +186,72 @@ theorem sum_mul_basicDecompositionNumber_quotientPi {A : ι → κ → ℤ} (ht 
     ha0 hasum hconjall hyb1 hcart hj₀ hjB hjne hkB hkne
   exact h1.trans h2
 
+set_option maxHeartbeats 1600000 in
+-- The (7.2) chain of the quotient plus the change of group are elaborated at once.
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+omit [Invertible (Nat.card G : K)] [Fintype ↥(centralizerOf x)]
+  [Invertible (Nat.card ↥(centralizerOf x) : K)] [DecidableEq ι] in
+open scoped Classical in
+include hp hπ hlin hN hyb hωC hω'C eC hkerJC hnilC hζ hζk hζK hconv hMp hquot S hφ₀ hyb2 eQ in
+/-- **The basic set of `C_G(x)/⟨x⟩`, pulled back, expresses `IBr(C_G(x))`** — the bridge Navarro
+takes for granted when he says "`{ψ_0, ψ_1, ψ_2}` is again a basic set for `b_0`, the principal
+block of `C_G(t)`, by the remark after the proof of Theorem (7.6)" (p. 141).
+
+`φ_μ(w) = φ̄_μ(w̄)` (`irreducibleBrauerCharacter_quotientPi`) and `φ̄_μ = ∑_j u_{μj} η_j` on the
+`p`-regular classes of the quotient (`sum_basicSetMatrixOf_mul_principalBasicSet`), so the same
+`U` expresses `IBr(C_G(x))` in the pulled-back basic set.
+
+Only `μ ∈ IBr(B_0)` is covered — off the principal block `U` has no columns at all, so the
+identity is false there; that is what
+`sum_basicDecompositionNumber_eq_character_of_support` is for. -/
+theorem algebraMap_irreducibleBrauerCharacter_eq_sum_intBasicSetMatrix {A : ι → κ → ℤ}
+    (hasum : ∀ (ν : ι) {z : ↥(centralizerOf x) ⧸ N}, IsPRegular p z →
+      (∑ l ∈ Finset.univ.filter (fun l => blockOfIrr eQ (quotientPi_surjective π hπ hlin hN)
+          (quotientPi_smul π hπ hlin hN) hnilQ l
+          = Quotient.mk (blockSetoid (quotientPi π hπ hlin hN).toRingHom
+              (quotientPi_surjective π hπ hlin hN) (quotientPi_smul π hπ hlin hN)) ν),
+        (A ν l : K) * algebraMap 𝒪 K (ordinaryCharacter (𝒪 := 𝒪) eQ l z))
+        = algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪)
+            (quotientPi π hπ hlin hN).toRingHom ν z))
+    (hconjall : ∀ v : ↥(centralizerOf x) ⧸ N, IsPElement p v → v ≠ 1 → IsConj yb v)
+    (hyb1 : yb ≠ 1)
+    (hcart : cartanMatrix (𝒪 := 𝒪) (nn := nnC) hp hωC hω'C hπC hlinC hkerJC eC φ₀ φ₀ = 4)
+    {j₀ : κ} (hj₀ : blockOfIrr eQ (quotientPi_surjective π hπ hlin hN)
+      (quotientPi_smul π hπ hlin hN) hnilQ j₀
+      = principalBlock (quotientPi π hπ hlin hN).toRingHom (quotientPi_surjective π hπ hlin hN)
+          (quotientPi_smul π hπ hlin hN) hnilQ)
+    {μ : ι} (hμ : Quotient.mk (blockSetoid (quotientPi π hπ hlin hN).toRingHom
+        (quotientPi_surjective π hπ hlin hN) (quotientPi_smul π hπ hlin hN)) μ
+      = principalBlock (quotientPi π hπ hlin hN).toRingHom (quotientPi_surjective π hπ hlin hN)
+          (quotientPi_smul π hπ hlin hN) hnilQ)
+    {w : ↥(centralizerOf x)} (hw : IsPRegular p w) :
+    algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π μ w)
+      = ∑ j : κ, ((intBasicSetMatrix eQ A yb j₀ μ j : ℤ) : K)
+          * principalBasicSet eQ (quotientPi_surjective π hπ hlin hN)
+              (quotientPi_smul π hπ hlin hN) hnilQ yb j₀ j (QuotientGroup.mk w) := by
+  classical
+  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have hwq : IsPRegular p (QuotientGroup.mk w : ↥(centralizerOf x) ⧸ N) := by
+    simpa using hw.map (QuotientGroup.mk' N)
+  rw [← irreducibleBrauerCharacter_quotientPi π hπ hlin hN μ w,
+    ← sum_basicSetMatrixOf_mul_principalBasicSet hp hyb hωC eC eQ
+      (quotientPi_surjective π hπ hlin hN) (quotientPi_smul π hπ hlin hN) hπC hlinC hkerJC hnilC
+      hnilQ hω'C hζ hζk hζK hconv hMp hquot S hφ₀ hyb2 hasum hconjall hyb1 hcart hj₀ hμ hwq]
+  refine Finset.sum_congr rfl fun j _ => ?_
+  by_cases hj : blockOfIrr eQ (quotientPi_surjective π hπ hlin hN)
+      (quotientPi_smul π hπ hlin hN) hnilQ j
+    = principalBlock (quotientPi π hπ hlin hN).toRingHom (quotientPi_surjective π hπ hlin hN)
+        (quotientPi_smul π hπ hlin hN) hnilQ ∧ j ≠ j₀
+  · rw [intCast_intBasicSetMatrix eQ A μ
+      (character_involution_mul_self hp hyb hωC eC eQ (quotientPi_surjective π hπ hlin hN)
+        (quotientPi_smul π hπ hlin hN) hπC hlinC hkerJC hnilC hnilQ hω'C hζ hζk hζK hconv hMp
+        hquot S hφ₀ hyb2 hconjall hyb1 hcart hj.1)
+      (character_involution_mul_self hp hyb hωC eC eQ (quotientPi_surjective π hπ hlin hN)
+        (quotientPi_smul π hπ hlin hN) hπC hlinC hkerJC hnilC hnilQ hω'C hζ hζk hζK hconv hMp
+        hquot S hφ₀ hyb2 hconjall hyb1 hcart hj₀)]
+  · rw [principalBasicSet, if_neg hj, mul_zero, mul_zero]
+
 /-! ### Navarro p. 141, equations (4) and (5): the orthogonality of the columns -/
 
 omit [IsIntegrallyClosed 𝒪] [IsAlgClosed (FractionRing 𝒪)] [FaithfulSMul 𝒪 K]
