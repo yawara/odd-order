@@ -197,6 +197,24 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
       rw [show (4 : ℕ) = 2 * 2 from rfl, pow_mul, h2, one_pow])
     (hinv := ⟨1, by simpa using (inv_eq_of_mul_eq_one_right hyb2).symm⟩)
     (hconjall := hconjall) (ht1 := hyb1) (hweak := hweak) (hcart := hcart)
+  -- the four members of `Irr(B_0(Q))`: the discarded `j₀` (sign `-1`), the trivial `l₀`, and two
+  -- more `ψ₁`, `ψ₂` (Navarro (7.4))
+  obtain ⟨j₀, hj₀B, hj₀neg⟩ := exists_character_involution_eq_neg_one (𝒪 := 𝓞_ℂ_[2]) (nn := nnY)
+    (hp := Nat.prime_two) (hx := hybP) (hω := hωY) (e := eY) (eG := eQ)
+    (hπG := quotientPi_surjective πC hπC hlinC hNzP)
+    (hlinG := quotientPi_smul πC hπC hlinC hNzP) (hπ := hπY) (hlin := hlinY) (hkerJ := hkerJY)
+    (hnil := hnilY) (hnilG := hnilQ) (hω' := hω'Y) (hζ := hζ) (hζk := hζk) (hζK := hζK)
+    (hconv := hconvC) (hNp := hMp) (hquot := hquotM) (S := SylC) (hφ₀ := hφ₀)
+    (ht := by rw [← pow_two] at hyb2 ⊢; exact hyb2) (hconjall := hconjall) (ht1 := hyb1)
+    (hweak := hweak) (hcart := hcart)
+  obtain ⟨l₀, hl₀B, hl₀⟩ :=
+    exists_blockOfIrr_eq_principalBlock_character_eq_one (𝒪 := 𝓞_ℂ_[2]) (e := eQ)
+      (hπG := quotientPi_surjective πC hπC hlinC hNzP)
+      (hlinG := quotientPi_smul πC hπC hlinC hNzP) (hnilG := hnilQ)
+  have hl₀ne : l₀ ≠ j₀ :=
+    ne_of_character_involution_eq_neg_one eQ hl₀ hj₀neg
+  obtain ⟨ψ₁, ψ₂, hψ₁B, hψ₂B, hψ₁ne, hψ₂ne, h01, h02, h12, henum⟩ :=
+    exists_pair_of_card_filter_eq_four hcard4 hj₀B hl₀B hl₀ne
   sorry
 
 end OddOrder.GroupTheory
