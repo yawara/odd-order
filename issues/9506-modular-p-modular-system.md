@@ -3043,6 +3043,30 @@ mathlib では `IsAdicComplete.henselianRing` **のみ** (実測: mathlib 内で
 
 ⟹ 残りは `ResidueField B ≅ k` (3 の `B/N ≅ k` そのもの) と `Frac(B)` の分裂。
 
+✅ **段 301-307 で 1-3 が完成** (`Algebra/CyclotomicAdjoin.lean`):
+`cyclotomicPowerBasis` / `isAdicComplete_cyclotomicAdjoin` /
+`cyclotomic_prime_pow_charP` / `sub_one_pow_mem_map_maximalIdeal` / `Ideal.sup_pow_le` /
+`cyclotomicToResidueField` (+ `_surjective`) / `ker_..._le` / `ker_..._isMaximal` /
+`isAdicComplete_ker_cyclotomicToResidueField` / `isLocalRing_cyclotomicAdjoin` /
+`residueFieldEquivCyclotomicAdjoin` / `maximalIdeal_cyclotomicAdjoin`。
+⟹ **`B = A[ζ_{q^k}]` は完備局所環で、剰余体は `A` のもの**。
+
+#### ⚠ 残る 4 = `Frac(B)` の分裂 — **Brauer の分裂体定理が未形式化**
+
+要る主張: **標数 0 の体 `K` が `ζ_{exp G}` を含めば `K` は `G` の分裂体**
+(⟹ `K[G] ≃ₐ[K] ∏ Matrix (m i) (m i) K` が得られ、BS の鎖の `eG` が供給できる)。
+
+実測 (2026-08-06): repo には **Brauer の帰納定理**
+(`BrauerInductionTheorem.mem_inducedVirtualCharacters_of_restrict` = 指標の特徴付け、
+Gorenstein 7.1-7.10) は在るが、**Schur 指数の機構がまったく無い**
+(`grep -rn "Schur index\|schurIndex" → 0 件)。分裂体定理は帰納定理から
+「線型指標は `K` 上実現可能 ⟹ 全ての指標は `K`-表現の指標の ℤ-結合 ⟹ Schur 指数 1」
+と進むので、**Schur 指数まわりのインフラを新設する必要がある**。
+
+⟹ これは単独で複数 session 規模の塊。着手時は
+(i) `K`-表現の指標が張る格子、(ii) Schur 指数の定義と「重複度を割る」性質、
+(iii) 帰納定理との接続、の順で積むこと。
+
 ### `hconv` は gap ではなく assembly (2026-08-06 実測)
 
 `hconv` (= Brauer 第 3 主定理の逆向き) の**本体は既に在る**:
