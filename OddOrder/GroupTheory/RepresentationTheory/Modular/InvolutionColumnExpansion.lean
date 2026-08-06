@@ -475,6 +475,21 @@ theorem exists_intColumns_basicDecompositionNumber {A : ι → κ → ℤ}
     (hs₂val : ((s₂ : ℤ) : K) = principalBasicSet eQ (quotientPi_surjective π hπ hlin hN)
       (quotientPi_smul π hπ hlin hN) hnilQ yb j₀ ψ₂ 1) :
     ∃ b c d : J → ℤ,
+      (∀ k, basicDecompositionNumber
+        (generalizedDecompositionNumber x hp hω' hπ hlin hkerJ
+          ((wedderburnRepresentation eG k).character)
+          (fun _ _ h => character_eq_of_isConj _ h))
+        (fun μ l => ((intBasicSetMatrix eQ A yb j₀ μ l : ℤ) : K)) l₀ = ((b k : ℤ) : K)) ∧
+      (∀ k, basicDecompositionNumber
+        (generalizedDecompositionNumber x hp hω' hπ hlin hkerJ
+          ((wedderburnRepresentation eG k).character)
+          (fun _ _ h => character_eq_of_isConj _ h))
+        (fun μ l => ((intBasicSetMatrix eQ A yb j₀ μ l : ℤ) : K)) ψ₁ = ((c k : ℤ) : K)) ∧
+      (∀ k, basicDecompositionNumber
+        (generalizedDecompositionNumber x hp hω' hπ hlin hkerJ
+          ((wedderburnRepresentation eG k).character)
+          (fun _ _ h => character_eq_of_isConj _ h))
+        (fun μ l => ((intBasicSetMatrix eQ A yb j₀ μ l : ℤ) : K)) ψ₂ = ((d k : ℤ) : K)) ∧
       (∑ k, b k * b k) = 4 ∧ (∑ k, c k * c k) = 4 ∧ (∑ k, d k * d k) = 4 ∧
       (∑ k, b k * c k) = 2 ∧ (∑ k, b k * d k) = 2 ∧ (∑ k, c k * d k) = 2 ∧
       (∑ k, gdeg k * b k) = 0 ∧ (∑ k, gdeg k * c k) = 0 ∧ (∑ k, gdeg k * d k) = 0 ∧
@@ -565,7 +580,7 @@ theorem exists_intColumns_basicDecompositionNumber {A : ι → κ → ℤ}
       (hω' := hω') (hkerJ := hkerJ) (hnilH := hnilH) (e := e) (eG := eG) (hπG := hπG)
       (hlinG := hlinG) (hnilG := hnilG) (eQ := eQ) (hN := hN) (hζ := hζ) (hζk := hζk)
       (hζK := hζK) (hnilQ := hnilQ) (A := A) (ha0 := ha0) (hj₀ := hj₀) (hφ := huB) (hi := hk)
-  refine ⟨col l₀, col ψ₁, col ψ₂,
+  refine ⟨col l₀, col ψ₁, col ψ₂, hcol l₀, hcol ψ₁, hcol ψ₂,
     by simpa using hpair l₀ l₀ hl₀B hl₀ne hl₀B hl₀ne,
     by simpa using hpair ψ₁ ψ₁ hψ₁B hψ₁ne hψ₁B hψ₁ne,
     by simpa using hpair ψ₂ ψ₂ hψ₂B hψ₂ne hψ₂B hψ₂ne,

@@ -261,7 +261,8 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
     exists_blockOfIrr_eq_principalBlock_character_eq_one (𝒪 := 𝓞_ℂ_[2]) (e := eG)
       (hπG := hπG) (hlinG := hlinG) (hnilG := hnilG)
   -- the three columns `D^t_0, D^t_1, D^t_2` of the analysis at `t`, over `ℤ` (段 370)
-  obtain ⟨b, c, d, hbb, hcc, hdd, hbc, hbd, hcd, hgb, hgc, hgd, hb0, hc0, hd0, hT, hzero⟩ :=
+  obtain ⟨b, c, d, hbval, hcval, hdval, hbb, hcc, hdd, hbc, hbd, hcd, hgb, hgc, hgd,
+      hb0, hc0, hd0, hT, hzero⟩ :=
     exists_intColumns_basicDecompositionNumber (𝒪 := 𝓞_ℂ_[2])
       (hp := Nat.prime_two) (hx := hzP) (hω := hωC) (hω' := hω'C) (hπ := hπC) (hlin := hlinC)
       (hkerJ := hkerJC) (hnilH := hnilC) (e := eC) (eG := eG) (hπG := hπG) (hlinG := hlinG)
@@ -337,6 +338,31 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
           push_cast at this
           exact this⟩)
       (ht1 := hw1) (hcart := hcartW)
+  -- Navarro p. 141, equation (4): the column at `y` is orthogonal to the columns at `t`
+  have hxy : ¬ IsConj z (w : G) := fun hcon => by
+    obtain ⟨u, hu⟩ := hcon
+    have hord := SemiconjBy.orderOf_eq (u : G) hu
+    rw [hyord, hz] at hord
+    omega
+  have hcross : ∀ (η : ι'Q) (col : ι'G → ℤ),
+      (∀ k, basicDecompositionNumber
+        (generalizedDecompositionNumber z Nat.prime_two hω'C hπC hlinC hkerJC
+          ((wedderburnRepresentation eG k).character)
+          (fun _ _ h => character_eq_of_isConj _ h))
+        (fun μ l => ((intBasicSetMatrix eQ A yb j₀ μ l : ℤ) : ℂ_[2])) η = ((col k : ℤ) : ℂ_[2])) →
+      (∑ k, a k * col k) = 0 := by
+    intro η col hcolval
+    refine sum_mul_eq_of_intCast (fun k => (hava k).symm) (fun k => hcolval k) ?_
+    rw [Int.cast_zero]
+    exact sum_generalizedDecompositionNumber_mul_basicDecompositionNumber_eq_zero
+      (hp := Nat.prime_two) (hω' := hω'C) (hπ := hπC) (hlin := hlinC) (hkerJ := hkerJC)
+      (eG := eG) (hωY' := hω'W) (hπY := hπW) (hlinY := hlinW) (hkerJY := hkerJW)
+      (u := fun μ l => ((intBasicSetMatrix eQ A yb j₀ μ l : ℤ) : ℂ_[2]))
+      (ht := by rw [← pow_two]; exact hz2) (hx := hzP) (hy := hwP) (hxy := hxy)
+      (φ := φ₀W) (η := η)
+  have hab : (∑ k, a k * b k) = 0 := hcross l₀ b hbval
+  have hac : (∑ k, a k * c k) = 0 := hcross ψ₁ c hcval
+  have had : (∑ k, a k * d k) = 0 := hcross ψ₂ d hdval
   sorry
 
 end OddOrder.GroupTheory
