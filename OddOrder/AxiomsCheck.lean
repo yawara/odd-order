@@ -19030,3 +19030,20 @@ Külshammer の公式と第 3 主定理が `𝒪` 側で持ち回る 3 仮説
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.mk_eq_principalBlock_of_decompositionNumber_trivial
+
+/-! 🎯🎯 **issue 9506 段 299**: `hvanishH` が任意のブロックで言えた
+(`blockCharacter_pRegularSum_eq_zero_of_ne_principalBlock`,
+`Modular/PRegularSumVanishing`)。
+
+Navarro (3.32) `λ_B(Ĝ⁰) = 0 (B ≠ B₀)` を、既存の `blockOfIrr` 形限定・追加仮説つきの版から
+**任意の `B ≠ B₀`** に一般化。
+- ブロックが `blockOfIrr e … i` の形であることは 段 295 の全射性 (段 294 のブロック冪等元を食わせる)
+- 追加仮説 `hne` は 段 296-298 で「`B ≠ B₀`」だけになった
+
+⚠ `[IsAdicComplete (maximalIdeal 𝒪) 𝒪]` が要る (ブロック冪等元の Henselian 持ち上げ経由)。
+BS の鎖は元々この instance を仮定しているので整合。
+⚠⚠ ただし `𝓞_ℂ_[p]` (段 292/9507 の splitting system) が adic complete かは**別途要確認** —
+値群が可除で Noether でないため自明ではない。最終 assembly の前に必ず検証すること。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.blockCharacter_pRegularSum_eq_zero_of_ne_principalBlock

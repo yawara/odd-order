@@ -3,7 +3,9 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockIdempotentLift
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CentralScalarBridge
+import OddOrder.GroupTheory.RepresentationTheory.Modular.DecompositionBlockDiagonal
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PRegularSumBlock
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PairingZeroBlock
 
@@ -150,5 +152,39 @@ theorem mk_eq_principalBlock_of_decompositionNumber_trivial {μ : ι}
     exact LinearMap.baseChange_id
   rw [hred, asAlgebraHom_trivial]
   rfl
+
+set_option maxHeartbeats 1600000 in
+-- The block idempotent, the surjectivity of `blockOfIrr` and the vanishing lemma are all
+-- elaborated under the full modular-datum chain.
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+include hp hω hω' hkerJ e in
+/-- **Navarro (3.32) for an arbitrary block**: `λ_B(Ĝ⁰) = 0` for every `B ≠ B_0`.
+
+`blockOfIrr` is surjective (`exists_blockOfIrr_eq`, applied to the block idempotent of `B`), and
+the separation hypothesis of `blockCharacter_blockOfIrr_pRegularSum_eq_zero` is exactly `B ≠ B_0`:
+the Brauer constituents of the trivial representation all lie in `B_0`
+(`mk_eq_principalBlock_of_decompositionNumber_trivial`). -/
+theorem blockCharacter_pRegularSum_eq_zero_of_ne_principalBlock
+    [IsAdicComplete (maximalIdeal 𝒪) 𝒪]
+    (B : MatrixModule.Block π hπ hlin) (hB : B ≠ principalBlock π hπ hlin hnil) :
+    MatrixModule.blockCharacter π hπ hlin B
+      ⟨pRegularSum p (ResidueField 𝒪), pRegularSum_mem_center⟩ = 0 := by
+  classical
+  obtain ⟨F, F', hidem, hf, hFB⟩ := exists_blockIdempotentFamily π hπ hlin hnil
+  obtain ⟨i, hi⟩ := exists_blockOfIrr_eq e hπ hlin hnil B (hidem B) (hf B) (hFB B)
+  rw [← hi]
+  refine blockCharacter_blockOfIrr_pRegularSum_eq_zero hp hω hω' hπ hlin hkerJ hnil e i
+    (Representation.trivial 𝒪 G 𝒪) (fun g => by rw [show Representation.trivial 𝒪 G 𝒪 g
+        = LinearMap.id from rfl, LinearMap.trace_id, Module.finrank_self, Nat.cast_one])
+    ?_
+  intro φ μ hφ hμ heq
+  refine hB ?_
+  calc B = blockOfIrr e hπ hlin hnil i := hi.symm
+    _ = Quotient.mk (MatrixModule.blockSetoid π hπ hlin) φ :=
+        (blockOfIrr_eq_of_decompositionMatrix_ne_zero hp hω hω' hπ hlin hkerJ hnil e i hφ).symm
+    _ = Quotient.mk (MatrixModule.blockSetoid π hπ hlin) μ := Quotient.sound heq
+    _ = principalBlock π hπ hlin hnil :=
+        mk_eq_principalBlock_of_decompositionNumber_trivial hp hω hω' hπ hlin hkerJ hnil hμ
 
 end OddOrder.RepresentationTheory.Modular
