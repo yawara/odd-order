@@ -28,6 +28,8 @@ residue field of the `p`-modular system `𝕎(𝔽̄_p)`.
 ## Main results
 
 * `OddOrder.GroupAlgebra.exists_blockIdempotents_defectGroups_conj`
+* `OddOrder.GroupAlgebra.exists_modularDatum` — the splitting datum the modular theory carries,
+  for *any* finite group, over an algebraically closed field
 -/
 
 namespace OddOrder.GroupAlgebra
@@ -51,7 +53,7 @@ theorem exists_blockIdempotents_defectGroups_conj (k : Type*) [Field k] [IsAlgCl
       ∀ c (D D' : Subgroup G), IsDefectGroup (e c) D → IsDefectGroup (e c) D' →
         ∃ g : G, D = MulAut.conj g • D' := by
   classical
-  obtain ⟨n, d, hd, π, hπ, hker⟩ := exists_algHom_pi_matrix_of_isAlgClosed k (MonoidAlgebra k G)
+  obtain ⟨n, d, hd, π, hπ, -, hker⟩ := exists_algHom_pi_matrix_of_isAlgClosed k (MonoidAlgebra k G)
   haveI : ∀ i, NeZero (d i) := hd
   haveI : ∀ i, Nonempty (Fin (d i)) := fun i => ⟨0⟩
   set π' : MonoidAlgebra k G →+* ∀ i, Matrix (Fin (d i)) (Fin (d i)) k := π.toRingHom with hπ'def
@@ -80,5 +82,36 @@ theorem exists_blockIdempotents_defectGroups_conj (k : Type*) [Field k] [IsAlgCl
     (Subtype.ext hbu) with h | h
   · exact Or.inl (congrArg Subtype.val h)
   · exact Or.inr (congrArg Subtype.val h)
+
+/-- **The modular datum of `k[G]`, for any finite `G` over an algebraically closed `k`.**
+
+The chain of `Modular/` carries the splitting of `k[G]` as five separate hypotheses — the map `π`
+onto a product of matrix algebras, its surjectivity, its `k`-linearity, the identification of its
+kernel with `J(k[G])`, and nilpotence of the elements the block character kills.  All five come
+from `exists_algHom_pi_matrix_of_isAlgClosed` as soon as `k` is algebraically closed, with no
+condition on `G`.
+
+This is what makes the per-element data of Navarro (5.11) affordable: that result needs the datum
+of `C_G(x)` for each `x`, and over `𝔽̄_p` — the residue field of `𝓞_ℂ_[p]` — every centraliser
+supplies one. -/
+theorem exists_modularDatum (k : Type*) [Field k] [IsAlgClosed k] (G : Type*) [Group G] [Finite G] :
+    ∃ (ι : Type) (_ : Fintype ι) (nn : ι → Type) (_ : ∀ i, Fintype (nn i))
+      (_ : ∀ i, DecidableEq (nn i)) (_ : ∀ i, Nonempty (nn i))
+      (π : MonoidAlgebra k G →+* ∀ j, Matrix (nn j) (nn j) k) (hπ : Function.Surjective π)
+      (hlin : ∀ (c : k) (a : MonoidAlgebra k G), π (c • a) = c • π a),
+      RingHom.ker π = Ring.jacobson (MonoidAlgebra k G) ∧
+        ∀ z : Subalgebra.center k (MonoidAlgebra k G),
+          blockCharacterPi π hπ hlin z = 0 → IsNilpotent z := by
+  classical
+  obtain ⟨n, d, hd, π, hπ, hkerJ, hker⟩ :=
+    exists_algHom_pi_matrix_of_isAlgClosed k (MonoidAlgebra k G)
+  haveI : ∀ i, NeZero (d i) := hd
+  haveI : ∀ i, Nonempty (Fin (d i)) := fun i => ⟨0⟩
+  set π' : MonoidAlgebra k G →+* ∀ i, Matrix (Fin (d i)) (Fin (d i)) k := π.toRingHom with hπ'def
+  have hlin : ∀ (c : k) (a : MonoidAlgebra k G), π' (c • a) = c • π' a := fun c a => map_smul π c a
+  refine ⟨Fin n, inferInstance, fun i => Fin (d i), inferInstance, inferInstance, inferInstance,
+    π', hπ, hlin, hkerJ, fun z hz => ?_⟩
+  obtain ⟨m, hm⟩ := hker _ (RingHom.mem_ker.mpr ((blockCharacterPi_eq_zero_iff π' hπ hlin).mp hz))
+  exact ⟨m, Subtype.ext (by simpa using hm)⟩
 
 end OddOrder.GroupAlgebra

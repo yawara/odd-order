@@ -19356,3 +19356,20 @@ Navarro (5.11) から出す。(5.11) を `h := g` (`p`-正則), `g := x` (Sylow 
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_character_blockOfIrr_eq_zero_of_isPRegular
+
+/-! 🎯 **issue 9506 段 319b**: 任意の有限群の modular datum (`GroupAlgebraBlocks`)。
+
+`exists_modularDatum` — 代数閉体 `k` と**任意の**有限群 `G` について、
+`Modular/` の鎖が担ぐ 5 つの仮説 (`π` / `hπ` / `hlin` / **`hkerJ`** / `hnil`) が一括で出る。
+
+これが要るのは Navarro (5.11) が **Sylow の各元 `x` ごとに `C_G(x)` の datum** を
+要求するから (段 319a の `hweak` discharge がそう使う)。剰余体が代数閉
+(`ResidueField 𝓞_ℂ_[p] = 𝔽̄_p`、段 292) なので、どの中心化群でも無償で作れる。
+
+⚠ 併せて `AlgClosedSplitting.exists_algHom_pi_matrix_of_isAlgClosed` の戻り値を強化した:
+従来は「核が nil」だけだったが、**`RingHom.ker π = Ring.jacobson A`** も返す。
+証明は `π` を `A ⧸ Ring.jacobson A` 経由で作っており、包含の片側は既に示していたので
+逆向き (`x ∈ jacobson ⟹ π x = 0`) を足しただけ。nil 性はそこから従う。 -/
+
+#assert_only_allowed_axioms OddOrder.exists_algHom_pi_matrix_of_isAlgClosed
+#assert_only_allowed_axioms OddOrder.GroupAlgebra.exists_modularDatum
