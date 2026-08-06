@@ -19047,3 +19047,19 @@ BS の鎖は元々この instance を仮定しているので整合。
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.blockCharacter_pRegularSum_eq_zero_of_ne_principalBlock
+
+/-! 🎯 **issue 9506 段 300**: 共終な ideal filtration は同じ完備性を与える
+(`isAdicComplete_of_le_of_pow_le`, `Algebra/AdicCompletePi`)。
+
+段 299 で判明した係数環の緊張 (`𝓞_ℂ_[p]` は `IsAdicComplete` を満たさない、
+分岐拡大 `𝕎(𝔽̄_p)[ζ_m]` へ移る) の**第 3 段**。
+`J^n ≤ I ≤ J` なら `I`-進完備性は `J`-進完備性を導く:
+- Hausdorff は `J^{nm} ≤ I^m` で添字を伸ばすだけ
+- Precomplete は `J`-Cauchy 列 `f` を `m ↦ f (n·m)` に間引くと `I`-Cauchy になり、
+  その極限が `I ≤ J` を通して `f` の `J`-極限にもなる
+
+全分岐拡大 `B/A` では `𝔪_B^e = 𝔪_A·B ≤ 𝔪_B` なので、`B` が `A`-有限自由から得る
+`𝔪_A·B`-進完備性 (`isAdicComplete_of_basis` + `IsAdicComplete.map_algebraMap_iff`) が
+`𝔪_B`-進完備性に移る。⟹ **係数環の完備性の骨が通った**。 -/
+
+#assert_only_allowed_axioms OddOrder.isAdicComplete_of_le_of_pow_le

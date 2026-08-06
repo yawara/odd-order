@@ -153,4 +153,35 @@ theorem isAdicComplete_of_basis {ι : Type*} (hι : Finite ι) (b : Module.Basis
   haveI : IsAdicComplete I (ι → R) := isAdicComplete_pi I hι
   exact isAdicComplete_of_linearEquiv I b.equivFun.symm
 
+
+/-! ### Cofinal filtrations -/
+
+/-- **Cofinal ideal filtrations give the same completeness.**  If `Jⁿ ≤ I ≤ J` then the `I`-adic
+and `J`-adic filtrations are cofinal in each other, so `I`-adic completeness transfers to `J`.
+
+The case the Brauer–Suzuki coefficient ring needs is a totally ramified extension `B/A`: there
+`𝔪_B^e = 𝔪_A·B ≤ 𝔪_B`, so completeness for `𝔪_A·B` — which comes for free from `B` being a finite
+free `A`-module (`isAdicComplete_of_basis`) — gives completeness for `𝔪_B`. -/
+theorem isAdicComplete_of_le_of_pow_le {R : Type*} [CommRing R] {I J : Ideal R}
+    [IsAdicComplete I R] {n : ℕ} (hn : n ≠ 0) (hJn : J ^ n ≤ I) (hIJ : I ≤ J) :
+    IsAdicComplete J R := by
+  have hpow : ∀ m : ℕ, (J ^ (n * m) • ⊤ : Submodule R R) ≤ (I ^ m • ⊤ : Submodule R R) := by
+    intro m
+    refine Submodule.smul_mono_left ?_
+    rw [pow_mul]
+    exact pow_le_pow_left' hJn m
+  have hle : ∀ m : ℕ, (I ^ m • ⊤ : Submodule R R) ≤ (J ^ m • ⊤ : Submodule R R) := fun m =>
+    Submodule.smul_mono_left (pow_le_pow_left' hIJ m)
+  haveI : IsHausdorff J R :=
+    ⟨fun x hx => IsHausdorff.haus' (I := I) x fun m => SModEq.mono (hpow m) (hx (n * m))⟩
+  haveI : IsPrecomplete J R := by
+    refine ⟨fun f hf => ?_⟩
+    obtain ⟨L, hL⟩ := IsPrecomplete.prec' (I := I) (fun m => f (n * m))
+      (fun {a b} hab => SModEq.mono (hpow a) (hf (Nat.mul_le_mul_left n hab)))
+    refine ⟨L, fun k => ?_⟩
+    refine SModEq.trans ?_ (SModEq.mono (hle k) (hL k))
+    exact hf (Nat.le_mul_of_pos_left k (Nat.pos_of_ne_zero hn))
+  exact ⟨⟩
+
+
 end OddOrder
