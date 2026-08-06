@@ -20017,3 +20017,17 @@ CLAUDE.md「carrier は posit でなく construct」の doneness 判定でもあ
   OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumberInv_eq_of_mul_self_eq_one
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.sum_mul_basicDecompositionNumber_eq_cartanMatrix_of_involution
+
+/-! 🎯🎯🎯 **issue 9506 段 395**: **`q8_exists_proper_normal` が閉じた** — Navarro pp.139-146 の
+指標論パート全体が、`𝓞_ℂ_[2]` 上に構成した 5 群 (`G` / `C_G(t)` / `C_G(t)/⟨t⟩` /
+`C_{C_G(t)/⟨t⟩}(ȳ)` / `C_G(y)`) の datum から配線された。
+
+段 340 `exists_proper_normal_of_columns` の 9 種の仮説の供給元:
+`hgdeg`/`hTval`/`hg0`/`hgpos` = 段 341、`haa`/`hga`/`ha0` = 段 348、
+`hbb`…`hcd`/`hgb`-`hgd`/`hb0`-`hd0`/`hT` = 段 370、`hab`/`hac`/`had` = 段 349、
+`hs₁`/`hs₂` = 段 371、`hcong` = 段 289+342、`hzero` = 段 368+393、`h10` = 段 330/332/335/336。
+
+群論側の入力は `BrauerSuzukiQ8/Reduction.lean` (原文 p.139 の還元) と
+段 372-376 (Navarro (7.2) 内の Burnside 段)。 -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.q8_exists_proper_normal

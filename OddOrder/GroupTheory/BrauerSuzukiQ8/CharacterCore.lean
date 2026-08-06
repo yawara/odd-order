@@ -38,8 +38,8 @@ variable {G : Type*} [Group G] [Finite G]
 
 set_option maxHeartbeats 3200000 in
 -- Five modular data and the whole (7.2)/(7.4)/(7.6) chain are instantiated in one term.
-/-- **Navarro pp. 139–146, the character-theoretic core** (issue 9506, `sorry`): when the
-quaternion Sylow `2`-subgroup is proper, its involution lies in a proper normal subgroup.
+/-- **Navarro pp. 139–146, the character-theoretic core**: when the quaternion Sylow
+`2`-subgroup is proper, its involution lies in a proper normal subgroup.
 
 This is Navarro's "our objective is to find a nontrivial character in the principal block of `G`
 which contains `t` in its kernel" — the kernel of such a character is the proper normal subgroup.
@@ -458,6 +458,14 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
     refine Int.cast_injective (α := ℂ_[2]) ?_
     push_cast at hten ⊢
     linear_combination hten
-  sorry
+  -- Navarro pp. 142–145: the endgame produces the proper normal subgroup
+  exact exists_proper_normal_of_columns (K := ℂ_[2]) eG
+    (show z * z = 1 by rw [← pow_two]; exact hz2) hi₀ hgdeg hTval haa hbb hcc hdd hab hac had
+    hbc hbd hcd
+    (sum_mul_eq_of_intCast (fun k => (hgdeg k).symm) (fun _ => rfl)
+      (by rw [Int.cast_zero]; exact hga))
+    hgb hgc hgd (card_eq_one_of_character_eq_one eG hi₀) (fun k => one_le_card k)
+    (ha0 i₀ hi₀B hi₀) hb0 hc0 hd0 hT hs₁ hs₂ hcong
+    (fun k hk => ⟨hzeroA k hk, (hzero k hk).1, (hzero k hk).2.1, (hzero k hk).2.2⟩) h10
 
 end OddOrder.GroupTheory
