@@ -267,6 +267,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositio
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
 import OddOrder.Algebra.SumSquaresFour
 import OddOrder.Algebra.ThreeNormColumn
+import OddOrder.Algebra.HalfSumColumns
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockBasicSet
 import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting

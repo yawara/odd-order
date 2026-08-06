@@ -322,6 +322,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositio
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
 import OddOrder.Algebra.SumSquaresFour
 import OddOrder.Algebra.ThreeNormColumn
+import OddOrder.Algebra.HalfSumColumns
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockBasicSet
 import OddOrder.GroupTheory.RepresentationTheory.Modular.QuotientSplitting
@@ -19564,3 +19565,30 @@ BS の鎖が担ぐのは `centralizerOf x = C_G(x)`。両者は部分群とし�
 残りは列 `u_j` の定義 (`2u_1 = D^y_0 + D^t_0 − D^t_1 − D^t_2` 等) と内積の計算。 -/
 
 #assert_only_allowed_axioms OddOrder.Algebra.exists_pair_of_sum_sq_eq_three
+
+/-! 🎯 **issue 9506 段 325**: 原文 p.142 の半和列 `u_1, u_2, u_3` の内積表。
+
+`Algebra.dotProduct_of_halfSum` / `dotProduct_degree_of_halfSum` (`HalfSumColumns`)。
+`a = D^y_0`、`b, c, d = D^t_0, D^t_1, D^t_2` が
+`(a,a)=(b,b)=(c,c)=(d,d)=4`、`(b,c)=(b,d)=(c,d)=2`、`(a,b)=(a,c)=(a,d)=0`
+を満たし、次数列 `g = χ(1)` が 4 本すべてと直交するとき、
+`2u_1 = a+b−c−d`、`2u_2 = a+b−c+d`、`2u_3 = a+b+c−d` について
+
+  `(u_i,u_j) = 1 + 2δ_ij`、`(g,u_i) = 0`、`(a,u_i) = 2`。
+
+⚠ **表現論を含まない純粋な双線型代数**。段 324 (`ThreeNormColumn`) と合わせて
+**p.142 の内容はこの 2 file で尽きる**。
+
+⚠ 4 つ目の符号 `(+,+)` (`2u = a+b+c+d`) は**除外される** — それだけノルムが 7 になる
+(`16 + 4(εc+εd+εcεd)` が `(1,1)` でのみ `28`)。
+
+⚠ 実装: 3 本を `Fin 3` 添字の族 `u` にまとめ、符号を `![-1,-1,1]` / `![-1,1,-1]` の
+ベクトル記法で担がせると、9 通りの `(i,j)` が展開補題 1 本の instance で片付く
+(`fin_cases i <;> fin_cases j <;> norm_num`)。
+`![…]` には `Mathlib.Data.Fin.VecNotation`、`fin_cases` には `Mathlib.Tactic.FinCases` の
+import が要る (無いと `![-1,-1,1]` が `Bool` の `!` として parse され、
+"Application type mismatch: List ?m has type … but is expected to have type Bool" になる)。 -/
+
+#assert_only_allowed_axioms OddOrder.Algebra.dotProduct_of_halfSum
+
+#assert_only_allowed_axioms OddOrder.Algebra.dotProduct_degree_of_halfSum
