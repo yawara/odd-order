@@ -147,4 +147,36 @@ theorem exists_card_mul_sum_ordinaryCharacter_one_mul [Fact p.Prime] {Q : ι' �
     rw [mul_zero]
     exact sum_ordinaryCharacter_one_mul_eq_zero_of_linkedClosed hp hω hω' hπ hlin hkerJ e hQ hx
 
+set_option linter.unusedFintypeInType false in
+open scoped Classical in
+include hp hω hω' hkerJ in
+/-- **Navarro (3.8), in the form the block theory consumes**: for `A` closed under linking, every
+coefficient of `f_A = ∑_{χ ∈ A} e_χ` lies in `𝒪`.
+
+The coefficient at `g` is `|G|⁻¹ ∑_{i ∈ A} χ_i(1) χ_i(g⁻¹)`
+(`coeff_ordinaryIdempotent`), and `|G|` divides that sum in `𝒪`
+(`exists_card_mul_sum_ordinaryCharacter_one_mul`). -/
+theorem exists_coeff_sum_ordinaryIdempotent [Fact p.Prime] {Q : ι' → Prop}
+    (hQ : ∀ (i j : ι') (ψ : ι), Q i →
+      decompositionMatrix hp hω hω' hπ hlin hkerJ e i ψ ≠ 0 →
+      decompositionMatrix hp hω hω' hπ hlin hkerJ e j ψ ≠ 0 → Q j)
+    (g : G) :
+    ∃ z : 𝒪, (∑ i ∈ Finset.univ.filter Q, ordinaryIdempotent e i).coeff g
+      = algebraMap 𝒪 K z := by
+  classical
+  obtain ⟨z, hz⟩ :=
+    exists_card_mul_sum_ordinaryCharacter_one_mul hp hω hω' hπ hlin hkerJ e hQ g⁻¹
+  refine ⟨z, ?_⟩
+  rw [MonoidAlgebra.coeff_finsetSum,
+    Finset.sum_congr rfl fun i _ => coeff_ordinaryIdempotent e i g]
+  have hterm : ∀ i : ι', ⅟(Nat.card G : K) * (wedderburnRepresentation e i).character 1
+        * (wedderburnRepresentation e i).character g⁻¹
+      = ⅟(Nat.card G : K) * algebraMap 𝒪 K
+          (ordinaryCharacter (𝒪 := 𝒪) e i 1 * ordinaryCharacter (𝒪 := 𝒪) e i g⁻¹) := by
+    intro i
+    rw [map_mul, algebraMap_ordinaryCharacter, algebraMap_ordinaryCharacter, mul_assoc]
+    simp only [Representation.character]
+  rw [Finset.sum_congr rfl fun i _ => hterm i, ← Finset.mul_sum, ← map_sum, hz, map_mul,
+    map_natCast, invOf_mul_cancel_left]
+
 end OddOrder.RepresentationTheory.Modular
