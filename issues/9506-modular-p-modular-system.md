@@ -4795,3 +4795,41 @@ basic set を 3 元にするため。𝓑 の外で `η` が消える (`principa
 5. **組み立て**: 5 群 (`G`/`C_G(t)`/`C_G(t)/⟨t⟩`/`C_{C_G(t)/⟨t⟩}(ȳ)`/`C_G(y)`) の datum を
    `exists_datum_padicComplex` で obtain し、群論的仮説 (段 338/339/290-291/321b) を供給して
    `exists_proper_normal_of_columns` を呼ぶ。
+
+### ✅ 段 349 完了 (2026-08-06) — 原文 p.141 の (4)(5)
+
+`Modular/ColumnsAtInvolution` に 2 本 (計 275 行):
+
+* `sum_character_one_mul_basicDecompositionNumber_eq_zero` = **(5) `(χ(1), D^t_j) = 0`**
+  (`sum_character_mul_generalizedDecompositionNumber_eq_zero` を `v = 1` で) ⟹ `hgb`/`hgc`/`hgd`
+* `sum_generalizedDecompositionNumber_mul_basicDecompositionNumber_eq_zero`
+  = **(4) `(D^y_0, D^t_j) = 0`** ((5.13)(a) + 対合ゆえ `t⁻¹` の族 = `t` の族) ⟹ `hab`/`hac`/`had`
+
+(4) は独立の `section TwoElements` に置いた — 2 つの中心化群の **modular datum だけ**で足り、
+Wedderburn 分裂が要らないので variable block が小さくて済む。
+
+### ✅ 段 350 完了 (2026-08-06) — p.141 の展開は `Irr(B₀)` の χ でしか成り立たない
+
+`BasicSetDecomposition` に `sum_basicDecompositionNumber_of_support` と
+`sum_basicDecompositionNumber_eq_character_of_support`。
+
+⚠ **設計上の落とし穴 (発見)**: 主ブロックの basic set は `μ ∈ IBr(B₀(C_G(x)))` でしか
+`φ_μ` を表さない (外では `U` の列が全部 0 = `A μ j = A μ j₀ = 0` なのに `φ_μ ≠ 0`)。
+⟹ 既存 `sum_basicDecompositionNumber_eq_character` の仮説 `hu` は**全 `μ` では偽**。
+原文が展開を「for all `i = 0,…,r`」= `Irr(B₀)` の `χ` に限って述べているのはこのためで、
+その `χ` では第二主定理が `d^x_{χμ}` を `IBr(B₀)` の外で殺すので和が台に閉じる。
+段 346 の 3 項展開もこの台限定版の上に乗せること。
+
+### ⏭ 段 351 以降
+
+1. **`hu` の橋** (商群の basic set を `C_G(x)` へ引き戻す):
+   `irreducibleBrauerCharacter_quotientPi` (`φ(w) = φ̄(w̄)`) +
+   `sum_basicSetMatrixOf_mul_principalBasicSet` を商群 `Q` に適用 +
+   `IsPRegular p w → IsPRegular p w̄`。台は `block_Q(μ) = B₀(Q)`。
+   `d^x_{χμ}` 側の消滅は `generalizedDecompositionNumber_eq_zero_of_blockOfIrr_ne` 系。
+   ⚠ ここで初めて「`block_Q(μ) = B₀(Q)` と `block_{C_G(x)}(μ)` の関係」が要るかを実測すること
+   (段 348 の note では回避できたが、`hd` の側で再登場する可能性がある)。
+2. **`hT`** = 段 346 (3 項) + 上記 `hu` 橋 + `η_j(1) = ε_j χ_j(1)` の奇数性 (段 342)。
+3. **`hb0`/`hc0`/`hd0`** = `eq_ite_of_sum_principalBasicSet_eq_one` (段 331) の配線
+   (`hone` は自明指標について上記 `hu` 橋から)。
+4. **組み立て** (段 352?): 5 群の datum を `exists_datum_padicComplex` で obtain。
