@@ -3601,7 +3601,39 @@ instance が段 317 側 (`classical`) と食い違って `rw` が刺さらない
 で、これは **段 320b `coeff_principalBlock_eq_of_mem_centralizer` の結論そのもの**。
 ⟹ 既存ラッパーに欠けていたのは `hcoeff` の供給だけで、それを 段 317-320b で埋めた。
 
-⟹ **残り = `PrincipalBlockInvolution.lean:84` の `hconv` を実際に discharge する**:
+#### 最終組み立ての形 (2026-08-06 実測)
+
+`hconv` の discharge は**既存の**
+`SecondMainPrincipalBlock.eq_principalBlock_of_inducedBlockOfCentralizer_eq` に
+`hB`/`hBH`/`hcoeff` を渡すだけだが、`hcoeff` (= 段 320b) は
+`hGC` (段 320a: `G` vs `C_G(Q)`) と `hHC` (段 319c-2: `H` vs `C_G(Q)`) の合成なので、
+**3 つの群の modular datum が要る**:
+
+| 群 | 役割 |
+|---|---|
+| `G` | 主ブロック `B_0(G)` 側 |
+| `H = centralizerOf t` | `hconv` の主役 (`π` はここに載っている) |
+| `C = C_G(⟨t⟩)` | 2 つの比較が経由する中継点 |
+
+⚠ **`H` と `C` は等しい部分群だが型としては別**
+(`↥(centralizerOf t)` vs `↥(Subgroup.centralizer ↑(zpowers t))`)。
+段 320b の合成はこの等式を**使わない**ので問題ないが、**datum は 3 つぶん要る**。
+`C` の datum は 段 319b `GroupAlgebra.exists_modularDatum` から作る
+(`ResidueField 𝓞_ℂ_[p] = 𝔽̄_p` が代数閉なので任意の有限群で無償)。
+
+⚠ **族の扱い**: `hB`/`hBH`/`hcoeff` は同じ族 `F'`/`F'H` について述べる必要があるので、
+discharge 補題は族を `exists_blockIdempotentFamily` から `obtain` したうえで、
+`hcoeff` を**族について量化した形**で受け取るのが素直:
+
+```
+(hcoeff : ∀ F' F'H, (∀ B, blockCharacterPi πG … (F' B) = Pi.single B 1) →
+    (∀ B, blockCharacterPi π … (F'H B) = Pi.single B 1) →
+    ∀ h : ↥(centralizerOf t), (h:G) ∈ C_G(⟨t⟩) → … = …)
+```
+
+⟹ 規模は 3 群ぶんの binder で大きいが、**新しい数学は無い** — 全部供給済の部品の配線。
+
+#### 旧メモ: 残り = `hconv` を discharge する:
 `SecondMainPrincipalBlock.eq_principalBlock_of_inducedBlockOfCentralizer_eq` に
 段 320b の `hcoeff` (= 段 320a + 段 319c-2 の合成) を食わせ、
 `hB`/`hBH` は `exists_blockIdempotentFamily` から供給する。
