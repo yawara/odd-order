@@ -3486,6 +3486,50 @@ Navarro の (3.8) の証明は 2 つの主張を同時に出すが、**我々が
 ⟹ **次の着手 = Navarro (3.6) → (3.8) の消滅半分**。新しい大物ではなく、
 既存の `Φ_φ` 機構の上に載る。
 
+### 段 317 の実装仕様 (2026-08-06 実測、4 部品すべて署名確認済)
+
+**Osima の消滅半分は Navarro より短く書ける** — char 0 の `𝒪` 上で**厳密に 0** になるので、
+Navarro のように `𝔪` を経由する必要が無い。
+
+#### 目標
+
+```
+theorem sum_ordinaryCharacter_one_mul_eq_zero_of_not_isPRegular
+    (B : Block π hπ hlin) {g : G} (hg : ¬ IsPRegular p g) :
+    ∑ i ∈ Finset.univ.filter (fun i => blockOfIrr e hπ hlin hnil i = B),
+      ordinaryCharacter (𝒪 := 𝒪) e i 1 * ordinaryCharacter (𝒪 := 𝒪) e i g = 0
+```
+
+#### 証明 (Navarro (3.6)+(3.8) の消滅側を 1 本に畳んだもの)
+
+1. `χ_i(1) = ∑_φ d_{iφ} φ(1)` で `χ_i(1)` を展開 (`1` は `p`-正則)。
+2. 和を入れ替えて `∑_φ φ(1) · (∑_{i ∈ B} d_{iφ} χ_i(g))`。
+3. **内側の和は `φ` ごとに常に 0**:
+   * `Quotient.mk (blockSetoid) φ = B` のとき — `d_{iφ} ≠ 0 ⟹ blockOfIrr i = B` なので
+     `B` の外の項は 0、⟹ `∑_{i ∈ B} = ∑_{全 i} = Φ_φ(g) = 0` (`g` が `p`-特異)。
+   * それ以外 — `i ∈ B` なら `d_{iφ} ≠ 0` は `Quotient.mk φ = B` を導くので矛盾、
+     ⟹ 各項が 0。
+
+#### 部品 (すべて実在、署名確認済 2026-08-06)
+
+| 役割 | 名前 | 場所 |
+|---|---|---|
+| `Φ_φ = ∑_i d_{iφ} χ_i` (定義) | `projectiveIndecomposableCharacter` | `CartanMatrix.lean:101` |
+| `Φ_φ(x) = 0` (`x` が `p`-特異) | `projectiveIndecomposableCharacter_eq_zero` | `ProjectiveCharacterVanishing.lean:109` |
+| `χ_i(g) = ∑_φ d_{iφ} φ(g)` (`g` `p`-正則) | `trace_eq_sum_decompositionMatrix` | `OrdinaryIrreducibles.lean:123` |
+| `d_{iφ} ≠ 0 ⟹ Quotient.mk φ = blockOfIrr i` | `blockOfIrr_eq_of_decompositionMatrix_ne_zero` | `DecompositionBlockDiagonal.lean:114` |
+
+⚠ **置き場所**: `ProjectiveCharacterVanishing` と `DecompositionBlockDiagonal` は互いに
+import していない。新 leaf (両方を import) が素直。`OddOrder.lean` への配線を忘れないこと。
+
+#### その先 (段 318)
+
+`mapRingHom_blockIdempotent_eq_sum` (`BlockIdempotentOrdinary.lean`、**既存**) が
+「ブロック冪等元の `K[G]` での像 = `∑_{χ ∈ Irr(B)} e_χ`」を与える。
+`e_χ` の `g` での係数は `(χ(1)/|G|)·χ(g⁻¹)` なので、上の定理を `g⁻¹` に適用すれば
+**ブロック冪等元の `g` 係数が `K` で 0** ⟹ `𝒪` で 0 (単射) ⟹ 還元 `F' B` でも 0。
+⟹ これが `hcoeff` の `p`-特異側。
+
 ## 完了条件
 
 上記チェックボックスが全て埋まり、**具体構成による instance が存在**し、
