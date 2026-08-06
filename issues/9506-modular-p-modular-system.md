@@ -2906,7 +2906,23 @@ BS の鎖が長らく**仮説として持ち回っていた**もののうち、s
    両側の Sylow + 𝒪 側への持ち上げ)。⟹ **ここが本当の assembly コスト**。
 3. `C_G(⟨x⟩)` と `centralizerOf x` の項の同一視 (同じ部分群だが syntactic に別)。
 
-⟹ 次に着手するときは **2 の `hweakH`/`hvanishH`/`hfH` の supplier から**当たること。
+#### 供給源の実測 (2026-08-06) — **4 つとも既に在る。残りは純粋な配管**
+
+| 仮説 | supplier | 状態 |
+|---|---|---|
+| `hidemH` / `hfH` | `BlockIdempotentLift.exists_isIdempotentElem_blockCharacterPi_eq_single` | 証明済 |
+| `hBH` | `MatrixModule.exists_completeOrthogonalIdempotents_block` | 証明済 |
+| `hweakH` | **Navarro (5.11)** `BlockPartVanishing.sum_character_blockOfIrr_eq_zero` | 証明済 |
+| `hvanishH` | `PRegularSumVanishing.blockCharacter_blockOfIrr_pRegularSum_eq_zero` | 証明済 |
+
+⚠ **循環は無い**: (5.11) の仮説は「`G` と `C_G(g_p)` の modular datum + 原始根 + `ζ` 三点」だけで、
+`hconv` を要求しない。`ζ` 三点は段 292、datum は段 293 で supplier が揃ったので、
+(5.11) は無条件に使える。
+
+⟹ **`hconv` に至る道は全部舗装済み**。残っているのは
+「index/instance を合わせて `obtain` して渡す」だけの配管で、新しい数学は 1 つも無い。
+`coeff_principalBlock_eq_centralizer_intermediate` の仮説が多いのは、それらを
+呼び出し側で `obtain` する設計になっているため。
 
 - "Analysis at t" (p.141-142): `C_G(t)/⟨t⟩` が Klein four Sylow-2 ⟹ (7.4) の basic set、
   (7.6) で `C_G(t)` へ持ち上げ、(7.5) で `d^t` の列。**整数性は issue 9508 で完済**
