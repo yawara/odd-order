@@ -18871,3 +18871,22 @@ conjugate since the elements of order 4 of `P` are `C_G(t)`-conjugate」を証�
 #assert_only_allowed_axioms OddOrder.GroupTheory.isConj_quotient_of_mem_sylowQ8
 
 #assert_only_allowed_axioms OddOrder.GroupTheory.isConj_of_sq_eq_one_quotient_centralizer
+
+/-! 🎯 **issue 9506 段 289**: Navarro p.141 末「`τ(t) ≡ τ(y) mod 2`」を**指標表なしで**証明。
+
+原文は「if `τ` is an irreducible character of `P`, notice that **from the character table of
+`P`**」と `Q₈` の指標表を読む。ここは一般論で済む: `t` も `y` も `2`-元なので、
+どちらの値も次数 `τ(1)` と `mod 2` で合同 (Gorenstein Lemma 7.5 =
+既存 `intModEq_of_mem_adjoinSpan`)。⟹ `Q₈` の指標表を形式化する必要は無い。
+
+- `pRegularPart_eq_one_of_isPElement` (`GroupTheory/PRegularElement`) =
+  `p`-元の `p'`-部分は自明 (`ordProj[p](p^k) = p^k = orderOf g` ゆえ `g^(orderOf g · m) = 1`)
+- `intModEq_one_of_isPElement` = `p`-元での値は次数と合同
+- `intModEq_of_isPElement_of_isPElement` = 2 つの `p`-元での値は互いに合同 -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.pRegularPart_eq_one_of_isPElement
+
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.intModEq_one_of_isPElement
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.intModEq_of_isPElement_of_isPElement

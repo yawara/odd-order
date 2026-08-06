@@ -303,6 +303,13 @@ theorem pPart_eq_one_of_isPRegular (hp : p.Prime) {g : G} (hg : IsPRegular p g) 
     pPart p g = 1 :=
   ((eq_pPart_of_commute hp (Commute.one_left g) (isPElement_one p) hg (mul_one g)).1).symm
 
+theorem pRegularPart_eq_one_of_isPElement (hp : p.Prime) {g : G} (hg : IsPElement p g) :
+    pRegularPart p g = 1 := by
+  obtain ⟨k, hk⟩ := hg
+  have hproj : ordProj[p] (orderOf g) = orderOf g := by
+    rw [hk, Nat.Prime.factorization_pow hp, Finsupp.single_eq_same]
+  rw [pRegularPart, hproj, zpow_mul, zpow_natCast, pow_orderOf_eq_one, one_zpow]
+
 theorem pRegularPart_eq_self_of_isPRegular (hp : p.Prime) {g : G} (hg : IsPRegular p g) :
     pRegularPart p g = g :=
   ((eq_pPart_of_commute hp (Commute.one_left g) (isPElement_one p) hg (mul_one g)).2).symm

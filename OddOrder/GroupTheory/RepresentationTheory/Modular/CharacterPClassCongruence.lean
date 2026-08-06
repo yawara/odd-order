@@ -212,4 +212,27 @@ theorem intModEq_of_mem_adjoinSpan [Finite G] (hω : IsIntegral ℤ ω) (hp : p.
     rwa [ZMod.pow_card_pow, ZMod.pow_card_pow] at this
   exact (ZMod.intCast_eq_intCast_iff' _ _ _).mp hZ
 
+include hm hωm hgm in
+/-- **At a `p`-element the value is congruent to the degree**: the `p'`-part of a `p`-element is
+trivial, so Lemma 7.5 compares `χ(y)` with `χ(1)`. -/
+theorem intModEq_one_of_isPElement [Finite G] (hω : IsIntegral ℤ ω) (hp : p.Prime)
+    {χ : G → K} (hχ : χ ∈ adjoinSpan ω (virtualCharacters K G)) {y : G} (hy : IsPElement p y)
+    {a b : ℤ} (ha : χ y = (a : K)) (hb : χ 1 = (b : K)) : a ≡ b [ZMOD (p : ℤ)] :=
+  intModEq_of_mem_adjoinSpan hm hωm hgm hω hp hχ y ha
+    (by rw [pRegularPart_eq_one_of_isPElement hp hy]; exact hb)
+
+include hm hωm hgm in
+/-- **An integer-valued element of `ch_R(G)` is constant modulo `p` on the `p`-elements.**
+
+This is what Navarro p. 141 reads off the character table of `Q₈` — "`τ(t) ≡ τ(y) mod 2`" for the
+involution `t` and an element `y` of order `4` — but it needs no character table: both values are
+congruent to the degree by Gorenstein Lemma 7.5. -/
+theorem intModEq_of_isPElement_of_isPElement [Finite G] (hω : IsIntegral ℤ ω) (hp : p.Prime)
+    {χ : G → K} (hχ : χ ∈ adjoinSpan ω (virtualCharacters K G))
+    {u v : G} (hu : IsPElement p u) (hv : IsPElement p v)
+    {a b c : ℤ} (ha : χ u = (a : K)) (hb : χ v = (b : K)) (hc : χ 1 = (c : K)) :
+    a ≡ b [ZMOD (p : ℤ)] :=
+  (intModEq_one_of_isPElement hm hωm hgm hω hp hχ hu ha hc).trans
+    (intModEq_one_of_isPElement hm hωm hgm hω hp hχ hv hb hc).symm
+
 end OddOrder.RepresentationTheory
