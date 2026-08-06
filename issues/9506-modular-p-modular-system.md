@@ -3584,7 +3584,29 @@ instance が段 317 側 (`classical`) と食い違って `rw` が刺さらない
 `H` と `C_G(Q)` が偶々等しい部分群であってもその事実を使う必要が無い。
 ⟹ 候補 1 (`Subgroup.equivOfEq` 汎用移送) も候補 2 (鎖の binder 変更) も**不要**。
 
-⟹ **残り = `hconv` の最終組み立て**: `eq_principalBlock_of_inducedBlockOfNormalizer_eq_intermediate`
+#### ⚠⚠ 訂正 (2026-08-06): **最終ラッパーは既に在った** — 重複を書いて revert した
+
+`eq_principalBlock_of_inducedBlockOfCentralizer_eq` を新設しようとしたら
+**`SecondMainPrincipalBlock.lean:126` に同名・同文で既に在った** (ビルドの
+"has already been declared" で発覚、revert 済)。issue 冒頭の
+「`hconv` の本体は既に在る」という記述が正しく、それを読んだ上で多段あとに作り直した。
+
+⚠ **教訓**: 新しいラッパーを書く前に、issue が「既に在る」と言っている名前を
+**そのまま grep する** (`verify-port-state-by-number-not-coq-name` の適用漏れ)。
+
+✅ **ただし 段 320b は無駄ではない**: 既存ラッパーの `hcoeff` の形は
+
+  `∀ h : ↥(centralizerOf x), (h:G) ∈ C_G(⟨x⟩) → (F' B₀).coeff (h:G) = (F'H B₀).coeff h`
+
+で、これは **段 320b `coeff_principalBlock_eq_of_mem_centralizer` の結論そのもの**。
+⟹ 既存ラッパーに欠けていたのは `hcoeff` の供給だけで、それを 段 317-320b で埋めた。
+
+⟹ **残り = `PrincipalBlockInvolution.lean:84` の `hconv` を実際に discharge する**:
+`SecondMainPrincipalBlock.eq_principalBlock_of_inducedBlockOfCentralizer_eq` に
+段 320b の `hcoeff` (= 段 320a + 段 319c-2 の合成) を食わせ、
+`hB`/`hBH` は `exists_blockIdempotentFamily` から供給する。
+
+#### 旧メモ: 残り = `hconv` の最終組み立て: `eq_principalBlock_of_inducedBlockOfNormalizer_eq_intermediate`
 (`.lean:910`) に `Q := zpowers t`, `H := centralizerOf t` と本段の `hcoeff` を食わせ、
 `PrincipalBlockInvolution.lean:84` の `hconv` の形にする。
 `hind` は `inducedBlockOfCentralizer` の定義とそのまま一致する (前段で確認済)。
