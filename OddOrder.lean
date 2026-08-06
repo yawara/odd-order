@@ -80,6 +80,7 @@ import OddOrder.GroupTheory.AInvariantComplement
 import OddOrder.GroupTheory.PRegularElement
 import OddOrder.GroupTheory.PRegularQuotient
 import OddOrder.GroupTheory.CosetInvariantCard
+import OddOrder.GroupTheory.CentralInvolutionNormalComplement
 import OddOrder.GroupTheory.PRegularCosetSubgroup
 import OddOrder.GroupTheory.PRegularProjection
 import OddOrder.GroupTheory.PRegularElementCount
