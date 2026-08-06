@@ -9,6 +9,7 @@ import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
 import Mathlib.RingTheory.SimpleModule.IsAlgClosed
 import Mathlib.RingTheory.Valuation.LocalSubring
 import OddOrder.Algebra.AlgClosedFractionField
+import OddOrder.GroupTheory.PRegularElement
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SplittingSystem
 
 /-!
@@ -49,6 +50,8 @@ residue class.
   primitive `p`-th root of unity congruent to `1` mod `𝔪` (the `hζ`/`hζk`/`hζK` triple)
 * `OddOrder.RepresentationTheory.Modular.exists_algEquiv_pi_matrix_padicComplex` — `ℂ_[p]` splits
   `ℂ_[p][G]`, the property `𝕎(𝔽̄_p)` lacks
+* `OddOrder.RepresentationTheory.Modular.exists_isPrimitiveRoot_pRegularExponent` and its residue
+  companion — the `ω`/`ω'` of *any* finite group, with no side condition to discharge
 -/
 
 namespace OddOrder.RepresentationTheory.Modular
@@ -201,6 +204,27 @@ hypotheses the block chain carries on `𝒪` and `K`, checked all at once agains
 Note what is **not** here: `IsAdicComplete`.  It is false for `𝓞_ℂ_[p]` (`𝔪² = 𝔪`, the value group
 being divisible) and the chain no longer asks for it — idempotents are lifted through
 `AlgClosedIdempotentLift` instead (issue 9506, 段 311–314). -/
+
+/-! ### The roots of unity every group needs
+
+The decomposition-number machinery asks each group `H` for a primitive `pRegularExponent p H`-th
+root of unity in `𝒪` and one in the residue field.  Over `𝓞_ℂ_[p]` both are free: the exponent is
+the `p'`-part of `|H|`, so `p` does not divide it.  In the Brauer–Suzuki chain this is what makes
+the datum of `G`, `C_G(t)`, `C_G(y)` and `C_G(t)/⟨t⟩` available all at once. -/
+
+/-- **`ω` for any finite group**, over `𝓞_ℂ_[p]`. -/
+theorem exists_isPrimitiveRoot_pRegularExponent (H : Type*) [Group H] [Finite H] :
+    ∃ ζ : 𝓞_ℂ_[p], IsPrimitiveRoot ζ (OddOrder.GroupTheory.pRegularExponent p H) :=
+  exists_isPrimitiveRoot_padicComplexInt p
+    (OddOrder.GroupTheory.not_dvd_pRegularExponent hp.out)
+    (OddOrder.GroupTheory.pRegularExponent_pos (p := p) (G := H)).ne'
+
+/-- **`ω'` for any finite group**, in the residue field of `𝓞_ℂ_[p]`. -/
+theorem exists_isPrimitiveRoot_residueField_pRegularExponent (H : Type*) [Group H] [Finite H] :
+    ∃ ζ : ResidueField 𝓞_ℂ_[p], IsPrimitiveRoot ζ (OddOrder.GroupTheory.pRegularExponent p H) :=
+  exists_isPrimitiveRoot_residueField_padicComplexInt p
+    (OddOrder.GroupTheory.not_dvd_pRegularExponent hp.out)
+    (OddOrder.GroupTheory.pRegularExponent_pos (p := p) (G := H)).ne'
 
 section CarrierCheck
 

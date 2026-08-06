@@ -19965,3 +19965,18 @@ Navarro (7.2)/(7.4) の `hconjall`
 #assert_only_allowed_axioms OddOrder.Algebra.two_dvd_add_of_modEq
 #assert_only_allowed_axioms OddOrder.Algebra.odd_of_modEq_four
 #assert_only_allowed_axioms OddOrder.Algebra.odd_mul_of_eq_one_or_neg_one
+
+/-! **issue 9506 段 343**: 任意の有限群の `ω`/`ω'` を `𝓞_ℂ_[p]` から無条件で
+(`Modular/PadicComplexSystem`)。
+
+* `exists_isPrimitiveRoot_pRegularExponent` — **任意の有限群 `H` について
+  `∃ ω : 𝓞_ℂ_[p], IsPrimitiveRoot ω (pRegularExponent p H)`**。
+* `exists_isPrimitiveRoot_residueField_pRegularExponent` — 剰余体版。
+
+`pRegularExponent p H = |H|_{p'}` なので `p ∤ n` と `n ≠ 0` が自動 — 側条件が消える。
+⟹ F の 4 群 (`G` / `C_G(t)` / `C_G(y)` / `C_G(t)/⟨t⟩`) の `hω`/`hω'` がこれ 1 本で揃う。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_isPrimitiveRoot_pRegularExponent
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_isPrimitiveRoot_residueField_pRegularExponent

@@ -4606,3 +4606,19 @@ modular datum を作って配線する作業。
 (`hgdeg`/`hTval`/`hg0`/`hgpos`/`hcong`/`hs₁`/`hs₂`)。
 残りは `e`/`i₀`+`hi₀` (既存 supplier) と「4 列 + 内積表 + 自明指標での列の値 + `hT` + `h10`」
 = modular datum の配線のみ。
+
+### ✅ 段 343 完了 (2026-08-06) — 任意の有限群の `ω`/`ω'` を `𝓞_ℂ_[p]` から無条件で
+
+`Modular/PadicComplexSystem` に 2 本:
+
+* `exists_isPrimitiveRoot_pRegularExponent` — **任意の有限群 `H` について
+  `∃ ω : 𝓞_ℂ_[p], IsPrimitiveRoot ω (pRegularExponent p H)`**
+* `exists_isPrimitiveRoot_residueField_pRegularExponent` — 剰余体版
+
+`pRegularExponent p H = |H|_{p'}` なので `p ∤ n` と `n ≠ 0` が自動 — 側条件が消える。
+⟹ F の 4 群 (`G` / `C_G(t)` / `C_G(y)` / `C_G(t)/⟨t⟩`) の `hω`/`hω'` がこれ 1 本で揃う。
+
+⚠ **既存の `exists_isPrimitiveRoot_pRegularExponent_standardSystem` とは別物**
+(あちらは Witt ベクトル系 `StandardSystem p`、こちらは `𝓞_ℂ_[p]`)。BS の鎖が使うのは後者。
+`PadicComplexSystem` に `OddOrder.GroupTheory.PRegularElement` の import を足した
+(mathlib 2 本しか import しない葉なので循環の危険は無い)。
