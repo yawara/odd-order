@@ -7,6 +7,7 @@ import Mathlib.GroupTheory.Sylow
 import OddOrder.GroupTheory.KleinFourAutomorphism
 import OddOrder.GroupTheory.PRegularElement
 import OddOrder.GroupTheory.SylowContaining
+import OddOrder.Isaacs.Ch05_Transfer.Basic
 
 /-!
 # A single class of involutions for a Klein four Sylow `2`-subgroup
@@ -32,6 +33,8 @@ appeal to "`|N_G(P) : C_G(P)|` is odd".
   `p`-subgroup lies in it
 * `OddOrder.GroupTheory.exists_odd_not_centralizes` — the witness may be taken of odd order
 * `OddOrder.GroupTheory.isConj_of_klein_sylow_of_not_centralizes` — Navarro (7.2), first part
+* `OddOrder.GroupTheory.hasNormalPComplement_of_klein_sylow_of_mem_center` — the converse reading
+  used on p. 132: a *central* involution forces `N_G(P) = C_G(P)`, hence a normal `2`-complement
 -/
 
 namespace OddOrder.GroupTheory
@@ -183,5 +186,60 @@ theorem isConj_of_klein_sylow_of_not_centralizes (P : Sylow 2 G)
     IsConj u v := by
   obtain ⟨h, hhN, hhodd, hhnc⟩ := exists_odd_not_centralizes P hexp hgN hgnc
   exact isConj_of_klein_sylow P hcard hexp hhN hhodd hhnc hu hu2 hv hv2
+
+/-! ### A central involution forces a normal `2`-complement
+
+Navarro's proof of (7.2), p. 132: for `C = C_G(t)` with `t` central in `C` and Klein four Sylow
+`P ≤ C`, the group `C` *cannot* have a unique class of involutions — the class of `t` is `{t}`,
+while `P` has three involutions.  So `N_C(P) = C_C(P)` by the first part of (7.2), and Burnside's
+transfer theorem gives `C` a normal `2`-complement.  This is what makes the Cartan matrix of the
+principal block of `C` equal to `(4)`. -/
+
+/-- **A Klein four Sylow `2`-subgroup with a central involution forces a normal `2`-complement.**
+If some element of `N_G(P)` moved `P`, all involutions would be conjugate
+(`isConj_of_klein_sylow_of_not_centralizes`) — impossible when one of the three involutions of `P`
+is central.  So `N_G(P) ≤ C_G(P)` and Burnside applies. -/
+theorem hasNormalPComplement_of_klein_sylow_of_mem_center (P : Sylow 2 G)
+    (hcard : Nat.card ↥(P : Subgroup G) = 4) (hexp : ∀ x : ↥(P : Subgroup G), x * x = 1)
+    {t : G} (htP : t ∈ (P : Subgroup G)) (ht1 : t ≠ 1) (htZ : t ∈ Subgroup.center G) :
+    OddOrder.Isaacs.Ch05.HasNormalPComplement 2 G := by
+  classical
+  letI : Fintype ↥(P : Subgroup G) := Fintype.ofFinite _
+  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  -- `P` has an involution other than the central `t`
+  obtain ⟨u, huP, hu1, hut⟩ : ∃ u ∈ (P : Subgroup G), u ≠ 1 ∧ u ≠ t := by
+    have hex : ∃ y : ↥(P : Subgroup G), y ∉ ({1, ⟨t, htP⟩} : Finset ↥(P : Subgroup G)) := by
+      by_contra hcon
+      push Not at hcon
+      have hsub : (Finset.univ : Finset ↥(P : Subgroup G)) ⊆ {1, ⟨t, htP⟩} := fun y _ => hcon y
+      have hcnt := Finset.card_le_card hsub
+      rw [Finset.card_univ, ← Nat.card_eq_fintype_card, hcard] at hcnt
+      have hle : ({1, ⟨t, htP⟩} : Finset ↥(P : Subgroup G)).card ≤ 2 :=
+        le_trans (Finset.card_insert_le _ _) (by simp)
+      omega
+    obtain ⟨y, hy⟩ := hex
+    rw [Finset.mem_insert, Finset.mem_singleton] at hy
+    push Not at hy
+    exact ⟨(y : G), y.2, fun h => hy.1 (Subtype.ext h), fun h => hy.2 (Subtype.ext h)⟩
+  have ht2 : t * t = 1 := congrArg Subtype.val (hexp ⟨t, htP⟩)
+  have hu2 : u * u = 1 := congrArg Subtype.val (hexp ⟨u, huP⟩)
+  refine OddOrder.Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer P ?_
+  intro g hgN
+  refine Subgroup.mem_centralizer_iff.mpr fun x hx => ?_
+  by_contra hne
+  -- otherwise all involutions of `G` are conjugate, and `u` would equal the central `t`
+  have hmove : ∃ x ∈ (P : Subgroup G), g * x * g⁻¹ ≠ x :=
+    ⟨x, hx, fun h => hne (by
+      calc x * g = (g * x * g⁻¹) * g := by rw [h]
+        _ = g * x := by group)⟩
+  obtain ⟨c, hc⟩ := isConj_iff.mp
+    (isConj_of_klein_sylow_of_not_centralizes P hcard hexp hgN hmove hu1 hu2 ht1 ht2)
+  have hcomm : c * t = t * c := Subgroup.mem_center_iff.mp htZ c
+  refine hut ?_
+  calc u = c⁻¹ * (c * u * c⁻¹) * c := by group
+    _ = c⁻¹ * t * c := by rw [hc]
+    _ = c⁻¹ * (t * c) := by group
+    _ = c⁻¹ * (c * t) := by rw [← hcomm]
+    _ = t := by group
 
 end OddOrder.GroupTheory

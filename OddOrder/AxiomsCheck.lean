@@ -18890,3 +18890,23 @@ conjugate since the elements of order 4 of `P` are `C_G(t)`-conjugate」を証�
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.intModEq_of_isPElement_of_isPElement
+
+/-! 🎯 **issue 9506 段 290**: Navarro (7.2) の証明 (p.132) が使う
+「`C = C_G(t)` は正規 2-補群を持つ」を証明 — これが `hcart = 4` の**供給源**。
+
+原文 p.132: `G` が Klein four Sylow `P` と対合 1 類を持つとき `C = C_G(t)` を取ると、
+`t` は `C` の中心にいるので **`C` は対合 1 類ではありえない**。(7.2) 前半を `C` に適用すると
+`C` は対合 3 類 ⟹ **`C` は正規 2-補群を持つ** ⟹ Cor (6.13) で `IBr(b₀) = {1}`、
+Cartan は `(4)` = `|C|₂`。
+
+`hasNormalPComplement_of_klein_sylow_of_mem_center` (`GroupTheory/KleinFourSylowFusion`):
+`N_G(P)` の元が `P` を動かせば既存 `isConj_of_klein_sylow_of_not_centralizes` で
+全対合が共役になるが、`P` の 3 つの対合のうち 1 つが中心的なら矛盾
+(中心元の共役類は自分自身)。⟹ `N_G(P) ≤ C_G(P)` で Burnside
+(`hasNormalPComplement_of_sylow_normalizer_le_centralizer`)。
+
+⟹ 段 282 の `cartanMatrix_principalBlock_eq_card_sylow` と合成すれば
+(7.2)/(7.4) が仮説として持ち回っていた `hcart` が閉じる。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.hasNormalPComplement_of_klein_sylow_of_mem_center
