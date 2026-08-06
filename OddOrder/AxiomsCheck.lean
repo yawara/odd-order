@@ -273,6 +273,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.InducedBlockCentralizer
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockOfIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BlockPartVanishing
 import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionClassBurnside
+import OddOrder.GroupTheory.RepresentationTheory.Modular.InvolutionDecompositionIntegral
 import OddOrder.GroupTheory.RepresentationTheory.Modular.TrivialCharacterBasicSet
 import OddOrder.Algebra.SubgroupSumBlockAction
 import OddOrder.Algebra.TraceMulLeft
@@ -619,7 +620,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 19800
+set_option linter.style.longFile 19900
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -19784,3 +19785,24 @@ modular 鎖と同じ分裂体 `K` の中で完結する (**係数体の橋渡し
 #assert_only_allowed_axioms OddOrder.Algebra.sum_mul_eq_of_support
 #assert_only_allowed_axioms OddOrder.Algebra.sign_relation_ten
 #assert_only_allowed_axioms OddOrder.Algebra.exists_eq_of_columns
+
+/-! 🎯🎯 **issue 9506 段 333b**: **対合での一般化分解数は有理整数** (段 332 が要求する ℤ 値性)。
+
+`Modular/InvolutionDecompositionIntegral`:
+
+* `exists_nat_character_eq_sum_irreducibleBrauerCharacter` — **任意の通常指標は `p`-正則類上で
+  `IBr` の `ℕ`-結合** (`decompositionNumber` が任意の格子表現に対して定義されているのが効く)。
+* `involutionPlusRepresentation` — `V₊ = im (1+σt)/2` を `C_G(t)` の表現として。
+* `exists_intCast_generalizedDecompositionNumber` — 🎯🎯 **`d^t_{χφ} ∈ ℤ`**。
+
+`χ(t y) = 2·χ_{V₊}(y) − χ(y)` (段 333a) の右辺は `C_G(t)` の通常指標 2 本ゆえ、
+`p`-正則類上でそれぞれ `IBr` の `ℕ`-結合 ⟹ (5.1) の一意性で `d^t_{χφ} = 2n⁺_φ − n_φ`。
+
+⚠ **原文より弱い仮定で済む**: Navarro は `d^x_{χφ} ∈ ℤ[ζ_{o(x)}]` (Schur スカラー + 制限の
+重複度) を経由するが、本証明は**1 の冪根も Schur スカラーも使わず**、`2` が `K` で可逆で
+あることだけを使う。`p = 2` も `t` が `p`-元であることも不要。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_nat_character_eq_sum_irreducibleBrauerCharacter
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.exists_intCast_generalizedDecompositionNumber

@@ -4355,3 +4355,37 @@ modular datum を作り、上の 6 種の入力を実際に供給して `exists_
 `eq_generalizedDecompositionNumber` で `d^t_{χμ} = 2n⁺_μ − m_μ` を確定する。
 部品は全部在る (`exists_isLattice_invariant` / `latticeRepresentation` /
 `algebraMap_trace_latticeRepresentation` / `trace_eq_sum_decompositionNumber`)。
+
+### ✅✅ 段 333b 完了 (2026-08-06) — **対合での一般化分解数は有理整数**
+
+`Modular/InvolutionDecompositionIntegral.lean` (196 行):
+
+| 名前 | 内容 |
+|---|---|
+| `exists_nat_character_eq_sum_irreducibleBrauerCharacter` | **任意の通常指標は `p`-正則類上で `IBr` の `ℕ`-結合** |
+| `involutionPlusRepresentation` | `V₊ = im (1+σt)/2` を `C_G(t)` の表現として |
+| `exists_intCast_generalizedDecompositionNumber` | 🎯🎯 **`d^t_{χφ} ∈ ℤ`** |
+
+証明は 段 333a の `χ(t y) = 2·χ_{V₊}(y) − χ(y)` を (5.1) の一意性に食わせるだけ:
+右辺は `C_G(t)` の通常指標 2 本 ⟹ `p`-正則類上でそれぞれ `IBr` の `ℕ`-結合 ⟹
+`d^t_{χφ} = 2n⁺_φ − n_φ`。
+
+⚠ **原文より弱い仮定で済んだ**: Navarro は `d^x_{χφ} ∈ ℤ[ζ_{o(x)}]` (Schur スカラー +
+制限の重複度 + 通常分解数) を経由するが、本証明は**1 の冪根も Schur スカラーも制限の重複度も
+使わず**、`2` が `K` で可逆であることだけを使う。**`p = 2` も `t` が `p`-元であることも不要**。
+
+⚠ **効いた設計**: `decompositionNumber` が**任意の格子表現**に対して定義されている
+(`DecompositionNumber.lean`; 既約に限定されていない) ので、`V₊` と `V|_{C_G(t)}` の
+両方にそのまま当たる。既約分解も重複度も要らない。
+
+⚠ **instance 検査を `example` で固定した**: 消費側 (`wedderburnRepresentation eG i`) で
+`Module 𝒪 (m i → K)` / `IsScalarTower 𝒪 K (m i → K)` が解決することを file 末尾の
+`example` で常時検証する (壊れたら build が赤)。
+
+### ⏭ 残タスク (更新、2026-08-06)
+
+| # | 内容 | 状態 |
+|---|---|---|
+| ~~A~~–~~E~~ | pp.141-145 の数学 | ✅ 段 327-333 |
+| F | `𝓞_ℂ_[2]` の instantiation + "analysis at t" の配線 | 残る唯一の塊。**ℤ 値性の欠落は 段 333 で解消** |
+| G | `q8_exists_proper_normal` への組み立て | F の後 |
