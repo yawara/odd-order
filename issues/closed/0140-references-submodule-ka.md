@@ -50,3 +50,43 @@ submodule 経由で再現すること。
 - ただし全レーン稼働中の references 構成変更は各 worktree の symlink 運用に触るため、
   実施タイミングは **FeitSibley (1054) / Theorem B (2053) いずれかの close 後の quiet
   window** を推奨。repo 構成の不可逆変更ゆえ最終 go はユーザー承認事項 → pending。
+
+---
+
+## 🔓 2026-08-07 REOPENED — 推奨のトリガー条件が満たされた
+
+hub 推奨の実施タイミング条件「**FeitSibley (1054) / Theorem B (2053) いずれかの close 後の
+quiet window**」が成立した: **2053 は 2026-08-07 に close**、レーン a/b/c はいずれも main へ
+完全合流済で worktree 稼働なし = まさに quiet window。
+
+⚠ 残る条件は「repo 構成の不可逆変更ゆえ最終 go はユーザー承認」の 1 点のみ。着手前に確認する。
+
+---
+
+## ✅ CLOSED (2026-08-07) — submodule 化を実施 (ユーザー承認)
+
+「repo 構成の不可逆変更ゆえ最終 go はユーザー承認」の条件が満たされ、実施した。
+
+**やったこと**:
+1. `references` リポの未 push commit 1 本を push (submodule pointer が解決するように)。
+2. 本リポの `.gitignore` から `references/` 行を削除。
+3. **`.git/info/exclude` の `references` 行を削除** — ⚠ ここが罠。worktree 運用のために
+   足してあった行 (worktree_setup.md 旧 §3) が残っていると `git submodule add` が
+   「ignored by one of your .gitignore files」で失敗し、`.gitignore` だけ見ても原因が分からない。
+   `git check-ignore -v references` で発見できる。
+4. `git submodule add git@github.com:yawara/odd-order-references.git references`
+   ⟹ `.gitmodules` に登録、gitlink `59e7b885` を記録。
+
+**CI**: 変更不要。`lean_action_ci.yml` は `actions/checkout@v5` を submodule オプション無しで
+使っており、既定で submodule を fetch しない (ユーザー指示「CI はサブモジュールは必要ない」に
+一致)。意図が後から壊されないよう**理由コメントを追加**した (private repo 認証で落ちる旨)。
+
+**worktree 運用**: `references` は submodule 化後も **main の実体を symlink で共有**する
+(PDF + ページ画像で重いため)。旧 §3 の `.git/info/exclude` 手順は廃止し、`typechange` が
+気になる場合の `update-index --skip-worktree` を代替として記載 (`worktree_setup.md` §3)。
+
+⚠ **公開される情報**: 本リポは public なので、`.gitmodules` によって private リポの URL
+(`yawara/odd-order-references`) が公開される。中身は clone できないので実害は無いが、存在は見える。
+
+**波及**: `erdos90` は `references` の中の submodule なので、本リポから見ると **nested**。
+取得は `git submodule update --init --recursive references`。

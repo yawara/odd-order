@@ -10,7 +10,7 @@
 
 - `.lake/packages/mathlib` = **6.5 GB** (mathlib ソース + `lake exe cache get` で取得した olean)
 - `lake exe cache get` 再実行 = **~5 min + ~3 GB DL**
-- `references/` (gitignored 別 private リポ) も再取得
+- `references/` (submodule = 別 private リポ) も再 checkout
 
 mathlib は `lakefile.toml` で **exact SHA** (`rev = "360da6fa…"`) に pin されており worktree 間で drift しないので, **mathlib パッケージと references を main worktree から symlink で共有**するのが最適.
 (toolchain は `lean-toolchain` = `leanprover/lean4:v4.32.0-rc1`、2026-07-09 bump。pin は toolchain tag でなく mathlib の SHA で効く。)
@@ -40,15 +40,27 @@ ln -s /home/ywr/odd-order/references /home/ywr/odd-order-<slug>/references
 cp -a /home/ywr/odd-order/.lake/build /home/ywr/odd-order-<slug>/.lake/build
 ```
 
-### 3. references symlink の untracked 抑制 (1 回だけ)
+### 3. references は main から symlink (submodule 化後の扱い)
 
-`.gitignore` の `references/` は trailing slash でディレクトリのみマッチ. symlink ファイルは素通りするので `git status` に出る. 修正:
+**2026-08-07 に `references/` は本リポの submodule になった** (issue 0140). worktree でも
+`git submodule update --init references` で正規に checkout できるが, **PDF + ページ画像で重い**
+ので **main の実体を symlink で共有する運用は不変**:
 
 ```bash
-echo "references" >> /home/ywr/odd-order/.git/info/exclude
+ln -s /home/ywr/odd-order/references /home/ywr/odd-order-<slug>/references
 ```
 
-`.git/info/exclude` は worktree 共有だが main では `references/` が実ディレクトリで既にマッチ済なので無害. 既に追加済なら再実行不要.
+⚠ submodule パスに symlink を置くと worktree 側の `git status` が
+`typechange: references` を報告する. 実害は無いが紛らわしいので, 気になるなら worktree 側だけ
+
+```bash
+git -C /home/ywr/odd-order-<slug> update-index --skip-worktree references
+```
+
+で抑止する (main 側では実行しない — main が submodule pointer の正本).
+
+⚠ **旧手順 (`.git/info/exclude` に `references` を足す) は廃止**. submodule 化に伴い削除済で,
+残っていると `git submodule add` / `git status` が壊れる.
 
 ### 4. 初回ビルド
 
@@ -77,8 +89,7 @@ export ODD_ISSUE_BASE=1000
 |---|---|---|
 | `.lake/packages/` | symlink (共有) | mathlib pin 固定で drift しない. 6.5 GB 節約 |
 | `.lake/build/` | 独立 (worktree ごと) — ただし作成時に main から **コピー**して warm-start | 本プロジェクト olean. 並行 `lake build` 衝突回避のため symlink 不可. コピーは HEAD 一致時に初回ビルドをほぼ no-op 化 (mtime 保持に `cp -a`) |
-| `references/` | symlink (共有) | gitignored, 別 private リポで重い |
-| `.git/info/exclude` | 共有 (主 `.git` 直下) | `references` 行は worktree 共通で害なし |
+| `references/` | symlink (共有) | submodule (別 private リポ) だが PDF/ページ画像で重いので main の実体を共有 |
 
 ## 安全性 / 注意
 
@@ -94,7 +105,7 @@ git worktree remove /home/ywr/odd-order-<slug>
 git branch -d <slug>          # 未マージなら -D
 ```
 
-symlink は worktree 削除で一緒に消える. `.git/info/exclude` の `references` 行はそのままで OK (再利用される).
+symlink は worktree 削除で一緒に消える.
 
 ## 関連
 

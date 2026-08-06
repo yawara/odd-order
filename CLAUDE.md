@@ -12,7 +12,7 @@
 
 **⚠ scope の正本 = `git log` + `issues/` + 実測 grep (2026-07-19 hub 裁定 9154 で降格)**。ギャップ調査 note [`notes/meta/three_books_full_survey_2026_07_16.md`](notes/meta/three_books_full_survey_2026_07_16.md) (3 冊の全 815 番号付き結果を列挙) は **2026-07-16 時点の出発点**として保持するが、**scope の一次情報にしない** — Isaacs だけで Ch.1/2/5/8/9/10 の 6 章が実体と食い違い、"Confirmed missing (slim pass)" のような検証済みを示す文言も無効だった (Ch.8 は「ディレクトリすら無い」と断言していたが実際は 14 leaf / 5,707 行が存在)。**未/部分ラベルは着手前に必ず実測で再確認する** ([[verify-port-state-by-number-not-coq-name]])。レーン配分の正本 = [`notes/meta/lane_reallocation_2026_07_16.md`](notes/meta/lane_reallocation_2026_07_16.md)。
 
-PDF と `pdftotext -layout` 抽出 text は `references/` 配下 (別 private リポ、本リポでは gitignore)。教科書本文を読む必要があるときは、まず該当の `*.pdftotext.txt` (Peterfalvi は `references/peterfalvi/pdftotext/*.txt`) を grep / Read し、記号・式・仮定は PDF ページ画像で確定する。**Nougat は新規抽出に使わない (ユーザー方針 2026-07-18)**。既存 `.mmd` は履歴として保持するが、原文照合の正本にしない。
+PDF と `pdftotext -layout` 抽出 text は `references/` 配下 (**submodule** [`odd-order-references`](https://github.com/yawara/odd-order-references) = 別 private リポ; 2026-08-07 に gitignore 方式から移行。取得 = `git submodule update --init references`。⚠ **CI は submodule を fetch しない** — `lake build` に不要なので `actions/checkout` の既定 (submodules 無し) のまま)。教科書本文を読む必要があるときは、まず該当の `*.pdftotext.txt` (Peterfalvi は `references/peterfalvi/pdftotext/*.txt`) を grep / Read し、記号・式・仮定は PDF ページ画像で確定する。**Nougat は新規抽出に使わない (ユーザー方針 2026-07-18)**。既存 `.mmd` は履歴として保持するが、原文照合の正本にしない。
 
 **⚠ Peterfalvi の text は 2026-07-26 まで全 35 章が壊れていた (修正済)**。テキストレイヤが 1 グリフ = 1 word として書き出される PDF なので、素の `pdftotext` はどのモードでも `H y p o t h e s i s` のように全文字を分解し、しかも**語順まで崩す** (91〜97% が 1 文字トークン)。`references/bin/pdf-glyph-join.py` (`pdftotext -bbox-layout` の XML からグリフ bbox で行を組み直す) を通して再生成済 — **現在の `references/peterfalvi/pdftotext/*.txt` は散文が読めて grep も効く**。他の原典 (isaacs/bg/gorenstein/higman) はこの問題を持たない。再生成手順は `references/EXTRACTION_LOG.md` 2026-07-26 節。⚠ **表示数式は元の OCR レイヤ自体が壊れており復元不能** — 式・記号・添字の確定には必ず PDF ページ画像を読むこと。
 
@@ -22,7 +22,7 @@ PDF と `pdftotext -layout` 抽出 text は `references/` 配下 (別 private �
 
 **Coq 形式化の併読 (`coq/` submodule)**: [math-comp/odd-order](https://github.com/math-comp/odd-order) (Gonthier et al. の Coq/mathcomp FT 完全形式化, CeCILL-B, 公開) を `coq/` に submodule として取り込んでいる。各 `.v` の**コメントが教科書 (BG / Peterfalvi) の行間を埋めている**。**BG §N / Peterfalvi §N の原文 (`pdftotext`/PDF) を読むタイミングで、対応する `coq/theories/{BG,PF}sectionN.v` のコメントを併読する** (ファイル名が教科書構成と 1:1 対応; 対応表・grep レシピ・コメント規約は [`notes/meta/coq_odd_order_reference.md`](notes/meta/coq_odd_order_reference.md))。形式化対象は 3 冊のまま; Coq は**行間補完の参照専用**で Lean に直訳するソースではない (証明戦略のヒント・前提の所在確認に使う)。Coq ツールチェインは不要 (`.v` を Read/grep するだけ)。fresh clone では `git submodule update --init coq` で取得。
 
-**外部形式化の参照 (`coq/` 以外; ユーザー裁定 2026-07-19)**: 同じ定理を扱う外部の形式化 (他の証明支援系のライブラリ、個人リポジトリ等) は **`coq/` と同じ posture で参照してよい** — 証明戦略のヒント・前提の所在確認・規模感の把握に**読む**。禁じられるのは**コピペ (逐語の複製)** だけで、それを避ければよい。判断軸は**ライセンス上の複製可否**のみであり、**「AI 生成だから」は使用可否の基準にならない** (Lean の証明はコンパイラが検証するので出自による信頼度差が最も小さく、そもそも本プロジェクト自体が AI エージェント駆動)。実在するリスクは「証明が間違っている」でなく「**定理の文が思ったものと違う**」(隠れた仮定・自明化する定義) で、これは人間が書いた形式化でも同じ — statement を読む / `#print axioms` / carrier の構成可能性、という既存の検証手順で扱う ([[scaffold-sorry-free-not-done]])。⚠ 外部リポジトリについて issue/notes に事実を書くときは、**自分で確認したか subagent の未検証報告か**を明示する (行数・sorry 有無・ライセンス表記を実測事実と同じ調子で書かない)。現在取り込み済のもの: **`references/erdos90/`** (submodule [plby/Erdos90](https://github.com/plby/Erdos90); 名目は Erdős unit distance 予想だが支持ライブラリに **Hall–Petresco (= BG Thm E.1) の完全形式化**を含む。**LICENSE 無し ⟹ コピペ不可**、ビルドもしない = `.lean` を Read/grep するだけ。⚠ **本リポの submodule ではない** (`references/` は gitignore で、実体は別 private リポ `odd-order-references`。erdos90 はそちら側の submodule) — 取得は `cd references && git submodule update --init erdos90`)。
+**外部形式化の参照 (`coq/` 以外; ユーザー裁定 2026-07-19)**: 同じ定理を扱う外部の形式化 (他の証明支援系のライブラリ、個人リポジトリ等) は **`coq/` と同じ posture で参照してよい** — 証明戦略のヒント・前提の所在確認・規模感の把握に**読む**。禁じられるのは**コピペ (逐語の複製)** だけで、それを避ければよい。判断軸は**ライセンス上の複製可否**のみであり、**「AI 生成だから」は使用可否の基準にならない** (Lean の証明はコンパイラが検証するので出自による信頼度差が最も小さく、そもそも本プロジェクト自体が AI エージェント駆動)。実在するリスクは「証明が間違っている」でなく「**定理の文が思ったものと違う**」(隠れた仮定・自明化する定義) で、これは人間が書いた形式化でも同じ — statement を読む / `#print axioms` / carrier の構成可能性、という既存の検証手順で扱う ([[scaffold-sorry-free-not-done]])。⚠ 外部リポジトリについて issue/notes に事実を書くときは、**自分で確認したか subagent の未検証報告か**を明示する (行数・sorry 有無・ライセンス表記を実測事実と同じ調子で書かない)。現在取り込み済のもの: **`references/erdos90/`** (submodule [plby/Erdos90](https://github.com/plby/Erdos90); 名目は Erdős unit distance 予想だが支持ライブラリに **Hall–Petresco (= BG Thm E.1) の完全形式化**を含む。**LICENSE 無し ⟹ コピペ不可**、ビルドもしない = `.lean` を Read/grep するだけ。⚠ **本リポから見ると nested submodule** (`references/` 自体が本リポの submodule で、erdos90 はそのさらに中) — 取得は `git submodule update --init --recursive references`、または `git -C references submodule update --init erdos90`)。
 
 ## 進捗の測り方 — 実質的証明の積み上げ (sorry 数ではない)
 
@@ -207,7 +207,7 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
   他レーン由来なら notes/issue で hub へ。これは LAUNCH.md の「🔄 起動時 main 同期」ブロックの上位正本
   (LAUNCH.md は git-excluded ゆえ、常時ロードされる本規約が確実な拠り所)。
 - worktree path = `/home/ywr/odd-order-<slug>` (sibling), branch 名も `<slug>` (現行 = 単文字レーン `a`/`b`/`c`; 正本 = [`notes/meta/lane_reallocation_2026_07_16.md`](notes/meta/lane_reallocation_2026_07_16.md)。**2026-07-19 現在 a/b/c の 3 レーンとも稼働中** — 2026-07-15 の全退役後に再作成済み。改めて退役 → 再開するときは同 note §3 の手順)
-- `.lake/packages` と `references` は main から **symlink で共有** (mathlib 6.5GB + 初回ビルド数分を節約)
+- `.lake/packages` は main から **symlink で共有** (mathlib 6.5GB + 初回ビルド数分を節約)。`references` は submodule 化 (2026-08-07) 後も **symlink 共有のまま** — worktree ごとに 2 度目の checkout をすると PDF/ページ画像が重複するため (手順は `worktree_setup.md` §3)
 - `.lake/build/` は worktree ごとに独立 (並行 `lake build` 安全)
 - **`lake update` は worktree で走らせない** (共有 mathlib rev を壊す)
 - forward axiom 経由で章をまたぐ並行作業は合流時の名前衝突に注意 ([`notes/meta/forward_dep_policy.md`](notes/meta/forward_dep_policy.md))
@@ -225,13 +225,13 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
 | `notes/` | ミニロードマップ・調査メモ |
 | `issues/` | ファイルベース issue (open は直下, `pending/` `closed/` で状態管理) |
 | `bin/` | 雑用スクリプト (`new-issue` 等) |
-| `references/` (gitignored) | PDF + `pdftotext -layout` 抽出 text — 別 private リポ `odd-order-references` |
+| `references/` (submodule) | PDF + `pdftotext -layout` 抽出 text — private リポ [`odd-order-references`](https://github.com/yawara/odd-order-references)。取得 = `git submodule update --init references` (CI は fetch しない) |
 | `references/{isaacs,bg,gorenstein}/*.pdf`, `*.pdftotext.txt` | 原典/補助原典と検索用 text (フラット) |
 | `references/navarro/characters-and-blocks.{pdf,pdftotext.txt}` | Navarro 1998 *Characters and Blocks of Finite Groups* (LMS LNS 250)。**Q₈ Brauer–Suzuki の modular character theory 専用の補助原典** (issue 0147; Gorenstein と同じ「行間参照のみ・独立の形式化対象ではない」posture)。⚠ **PDF ページ = 書籍ページ + 10**、数式は OCR 崩れ大 |
 | `references/peterfalvi/pdf/*.pdf`, `references/peterfalvi/pdftotext/*.txt` | Peterfalvi だけ章別 PDF/text を各ディレクトリに集約 (text は `bin/pdf-glyph-join.py` で再構成) |
 | `references/<book>/pages/*.png` | 切り出したページ画像 (捨てずに残す規約, 2026-07-26) |
 | `references/bin/pdf-glyph-join.py` | グリフ bbox から本文を組み直すツール (Peterfalvi 専用) |
-| `references/erdos90/` (references リポ側の submodule) | [plby/Erdos90](https://github.com/plby/Erdos90) — 外部 Lean 4 形式化。**Hall–Petresco (BG Thm E.1) を含む**。⚠ LICENSE 無し ⟹ **参照可・コピペ不可**、ビルドしない。取得 = `cd references && git submodule update --init erdos90` |
+| `references/erdos90/` (nested submodule) | [plby/Erdos90](https://github.com/plby/Erdos90) — 外部 Lean 4 形式化。**Hall–Petresco (BG Thm E.1) を含む**。⚠ LICENSE 無し ⟹ **参照可・コピペ不可**、ビルドしない。取得 = `git submodule update --init --recursive references` |
 | `references/README.md` | 参照資料の配置・取得 provenance・`pdftotext` 手順 |
 
 ## ツールチェイン

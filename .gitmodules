@@ -1,3 +1,6 @@
 [submodule "coq"]
 	path = coq
 	url = https://github.com/math-comp/odd-order.git
+[submodule "references"]
+	path = references
+	url = git@github.com:yawara/odd-order-references.git

@@ -17,8 +17,22 @@
 > ③ **stale docstring 34 箇所を一括修正** (`Peterfalvi/Appendices/` 配下)。
 > 「Inherits the step (2)(b) `sorry` (issue 9318)」型の注記が **AxiomsCheck の新 assert と
 > 正面から矛盾**していた (「not axiom-clean」と書いてあるものを axiom-clean と assert)。
-> ⟹ 依存関係の記述 (`Depends on step (2)(b)`) に置換。⚠ repo 全体では `sorry` 一括言及が
-> なお 172 行あり、別キャンペーンで棚卸しが要る。
+> ⟹ 依存関係の記述 (`Depends on step (2)(b)`) に置換。
+> ③′ **repo 全体の stale sorry docstring 掃討 (第 2 波、41 file)**。sorry 言及行 399 のうち
+> **live sorry を主張していた 45 箇所**を修正。⚠ 見落としやすい 4 型:
+> (i) 「still-`sorry` §14 / (still `sorry`) BG §14--§15」= 上流が既に landing 済、
+> (ii) 「only remaining `sorry`s are …」= 列挙先が全部 closed (issue 2022/1021 等)、
+> (iii) **「not axiom-clean」「inherits `sorryAx`」**= repo に `axiom` 宣言 0 + sorry 0 ⟹
+> 全部 axiom-clean なので**定義上ありえない**主張、
+> (iv) 「once §14 lands / 埋めた時点で unconditional 化する」= 未来形が既に過去。
+> ⟹ 現在形の主張は事実に、設計判断の記録は**過去形に書き換えて残す** (「なぜこの分解に
+> なっているか」は今も有用なので削除しない)。`sorry`-free / 「no `sorry` of its own」型は
+> 現在も真なので touch しない。
+> ⑤ **pending issue 4 件を全部 open へ** (0050 lean-eval / 0140 references submodule /
+> 0143 blueprint 逆生成 / 0156 (5.2.d) 一般化)。0050・0143 はユーザー凍結の解除、
+> **0140 は hub 推奨のトリガー条件「2053 close 後の quiet window」が成立**、
+> 0156 は繰延理由 (「書籍被覆を優先」) が sorry 0 到達で消滅。
+> ⟹ **open = 4 / pending = 0 / closed = 563**。
 > ④ **README.md / README.ja.md / ROADMAP.md を現況へ**: 「残 `sorry` 1 本」→「sorry-free
 > (2026-08-07)」、Navarro を Higman/Huppert と並ぶ**書外原典 3 本目**として追加、
 > jobs 4,450→5,450 / files ~1,050→~1,680。⚠ **「sorry 0 ≠ 3 冊完了」を明記** (未形式化の

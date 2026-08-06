@@ -42,6 +42,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # ⚠ submodule は意図的に fetch しない (既定のまま)。`coq/` は行間参照用、
+      # `references/` は教科書 PDF (private リポ, 数 GB) で、どちらも `lake build` に不要。
+      # `submodules: recursive` を足すと CI が private repo 認証で落ちる。
       - uses: actions/checkout@v5
 
       # プロジェクト自身の build 成果 (.lake/build) のみを per-commit で cache する。

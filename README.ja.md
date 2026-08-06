@@ -102,7 +102,7 @@ Lean toolchain は [`lean-toolchain`](lean-toolchain) に、mathlib のリビジ
 | `notes/` | 章別ロードマップ、設計判断、原文調査 |
 | `issues/` | ファイルベースの issue tracker (`issues/` = open, `pending/`, `closed/`) |
 | `coq/` | Submodule: [math-comp/odd-order](https://github.com/math-comp/odd-order)、Coq/mathcomp による形式化 — **読み取り専用の参照**で、教科書が省く行間をコメントが埋めているために併読する。ここから翻訳はしていない |
-| `references/` | 教科書 PDF と抽出テキスト — gitignore 対象で、別の private リポジトリに保管 |
+| `references/` | 教科書 PDF・ページ画像・抽出テキスト — 別の private リポジトリを指す submodule (使用した版が記録される)。ビルドには不要で、CI は submodule を fetch しない |
 
 ## AI の利用について
 

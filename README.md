@@ -105,7 +105,7 @@ The Lean toolchain is pinned in [`lean-toolchain`](lean-toolchain) and the mathl
 | `notes/` | Per-chapter roadmaps, design decisions, and source-text investigations |
 | `issues/` | File-based issue tracker (`issues/` open, `pending/`, `closed/`) |
 | `coq/` | Submodule: [math-comp/odd-order](https://github.com/math-comp/odd-order), the Coq/mathcomp formalization — a **read-only reference**, consulted because its comments fill in steps the textbooks elide. Nothing is translated from it |
-| `references/` | Textbook PDFs and extracted Markdown — gitignored, kept in a separate private repository |
+| `references/` | Textbook PDFs, page images, and extracted text — a submodule pointing at a separate private repository, so the exact revision used is recorded. Not needed to build: CI does not fetch submodules |
 
 ## Use of AI
 
