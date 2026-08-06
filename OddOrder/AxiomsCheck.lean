@@ -19171,3 +19171,16 @@ modular 側が要求する `IsAlgClosed (ResidueField ·)` と `CharP (ResidueFi
 #assert_only_allowed_axioms OddOrder.Algebra.residueFieldEquivCyclotomicAdjoin
 
 #assert_only_allowed_axioms OddOrder.Algebra.maximalIdeal_cyclotomicAdjoin
+
+/-! 🎯 **issue 9506 段 308**: `ResidueField B ≃+* ResidueField A`
+(`residueFieldEquiv`, `Algebra/CyclotomicAdjoin`)。
+
+段 307 の 2 本 (`B ⧸ ker ≃+* k` と `maximalIdeal B = ker`) を繋いだ形。
+⟹ 全分岐拡大は剰余体を伸ばさないので、modular 側が要求する
+`IsAlgClosed (ResidueField ·)` / `CharP (ResidueField ·) q` は
+この同型で `B` へ移せる。
+
+⟹ **係数環タスク 4 点のうち 1-3 が完了** (構成・完備局所性・剰余体)。
+残るは `Frac(B)` の分裂 = Brauer の分裂体定理 (Schur 指数インフラの新設が要る)。 -/
+
+#assert_only_allowed_axioms OddOrder.Algebra.residueFieldEquiv

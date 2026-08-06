@@ -45,7 +45,8 @@ the hypothesis that the block idempotents are lifted along.
 * `OddOrder.Algebra.isAdicComplete_ker_cyclotomicToResidueField` /
   `OddOrder.Algebra.isLocalRing_cyclotomicAdjoin` — **`B` is a complete local ring**
 * `OddOrder.Algebra.residueFieldEquivCyclotomicAdjoin` /
-  `OddOrder.Algebra.maximalIdeal_cyclotomicAdjoin` — its residue field is that of `A`
+  `OddOrder.Algebra.maximalIdeal_cyclotomicAdjoin` /
+  `OddOrder.Algebra.residueFieldEquiv` — its residue field is that of `A`
 -/
 
 namespace OddOrder.Algebra
@@ -285,5 +286,17 @@ theorem maximalIdeal_cyclotomicAdjoin {A : Type*} [CommRing A] [IsLocalRing A]
   letI := isLocalRing_cyclotomicAdjoin (A := A) (q := q) (k := k) hk
   exact (IsLocalRing.eq_maximalIdeal
     (ker_cyclotomicToResidueField_isMaximal (A := A) (q := q) (k := k) hk)).symm
+
+open IsLocalRing in
+/-- **`ResidueField B ≃+* ResidueField A`** — the totally ramified extension does not enlarge the
+residue field, so `IsAlgClosed` and `CharP … q` transfer to `B`. -/
+noncomputable def residueFieldEquiv {A : Type*} [CommRing A] [IsLocalRing A]
+    {q k : ℕ} [Fact (Nat.Prime q)] [CharP (ResidueField A) q]
+    [IsAdicComplete (maximalIdeal A) A] (hk : 0 < k) :
+    letI := isLocalRing_cyclotomicAdjoin (A := A) (q := q) (k := k) hk
+    ResidueField (AdjoinRoot (cyclotomic (q ^ k) A)) ≃+* ResidueField A :=
+  letI := isLocalRing_cyclotomicAdjoin (A := A) (q := q) (k := k) hk
+  (Ideal.quotEquivOfEq (maximalIdeal_cyclotomicAdjoin (A := A) (q := q) (k := k) hk)).trans
+    (residueFieldEquivCyclotomicAdjoin hk)
 
 end OddOrder.Algebra
