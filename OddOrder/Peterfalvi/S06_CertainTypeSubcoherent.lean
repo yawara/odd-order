@@ -15,8 +15,15 @@ import OddOrder.Peterfalvi.S08_InducedKernelFamily
 §5, p. 26, Theorem (5.3)(b).
 
 > **(5.3)(b)** Assume Hypothesis (4.6), (5.2.a) and that
-> `𝒮 ⊆ {Ind_H^L θ | θ ∈ Irr H, H ⊄ Ker θ}`.  Then **Hypothesis (5.2) holds**, with the isometry
+> `𝒮 ⊆ {Ind_K^L θ | θ ∈ Irr K, H ⊄ Ker θ}`.  Then **Hypothesis (5.2) holds**, with the isometry
 > `τ` of (5.2) being the restriction to `ℤ[𝒮, L^#]` of the isometry `τ` of Hypothesis (4.6).
+> If `φ ∈ 𝒮 ∩ Irr L`, then `R(φ)` is orthogonal to `ω^σ` for all `ω ∈ Irr(W)`.
+
+⚠ The induction and the source range are over **`K`**, not `H`; only the *kernel test* uses `H`
+(recall `W₂ ⊆ H ⊆ K` from (4.6.c), so the two are different subgroups in general).  An earlier
+version of this quote read `{Ind_H^L θ | θ ∈ Irr H, …}` — corrected 2026-08-07 against book p. 25.
+The Lean family `S10.inducedNonKernelFamily` was already right (`θ : Irr ↥K`, filter
+`¬ (H.subgroupOf K ⊆ characterKernel θ)`, image `Ind_K^L θ`).
 
 The book's proof splits the (5.2.d) clause `(χ − χ̄)^τ = ∑_{α ∈ R(χ)} α` by reducibility of the
 member `χ = Ind_K^L θ`:
