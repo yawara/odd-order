@@ -218,15 +218,31 @@ created: 2026-08-07
         (`κ(N) ⊆ τ₁(N) ∪ τ₃(N)` で `σ(M)` はそれらと交わりうる)。⟹ この経路は使えない (確定)。
       - **BG (15.2) (`K₁R` 非冪零) は repo に無い**。`K₁ ∩ M_σ = 1` も無い。
 
-- [ ] **次の作業 (BG §15 レーン、優先度は低くない)**: 上の最小鎖を下から積む。
-      1. BG (15.2) (`K₁R` が非冪零) を §15 の文脈で形式化
-      2. `|K₁|` 素数 (`prime_of_mem_kappa` + Prop 14.2(g)) と合わせて **`K₁ ∩ M_σ = 1`**
-      3. 「`M_σ ⊴ M`、`x ∈ M_σ`、`M_σ ∩ K₁^g = 1` ⟹ `k ∤ |x|`」の定型 → `x ∈ N'`
-      4. D(4) 第 4 成分を型依存の `A(N)` へ強める
-      5. Peterfalvi (8.13)(c3) Type II を Type I 版 (`escaping_mem_typeA_notMem_A1_of_typeI`) と
-         同じ形で出す
+- [x] **さらに実測 (2026-08-08): 定型部分は全部 repo に在った**。
+      `S14_TypePCounting/Basics.lean` が
 
-      ⚠ **経路は完全に確定済み・未解決数学は無い**。1-2 が BG §15 の実作業、3-5 は定型。
+      | repo | 内容 |
+      |---|---|
+      | `mem_of_coprime_index` (:890) | `x ∈ M`, `N ⊴ M`, `gcd([M:N], \|x\|) = 1` ⟹ `x ∈ N` |
+      | `index_U_sup_Msigma_primeFactors_subset_kappa` (:907) | `[M : U ⊔ M_σ]` は `κ(M)`-数 |
+      | **`mem_U_sup_Msigma_iff_isPiElement_kappa_compl` (:952)** | **`x ∈ U ⊔ M_σ ⟺ x` は `κ(M)′`-元** (iff!) |
+
+      Type II では `N' = U_N ⊔ N_σ` (BG Lemma 15.1(b)) なので、3 本目の iff がそのまま
+
+      > **`x ∈ N' ⟺ κ(N) ∩ π(⟨x⟩) = ∅`**
+
+      を与える。⟹ **手順 3-5 の定型部分は既存補題の組み合わせで済む**。
+
+- [ ] **⟹ 真に必要なのは 1 命題だけ**:
+
+      > escaping な `x ∈ M_σ^#` と `N = N(x)` について **`κ(N) ∩ π(⟨x⟩) = ∅`**
+      > (= `x` は `κ(N)′`-元)
+
+      BG の経路は `K₁ ∩ M_σ = 1` (`\|K₁\|` 素数 + (15.2) の `K₁R` 非冪零) から
+      「`x ∈ M_σ` の `k`-部分は `M_σ ∩ K₁^g = 1`」で出す。**これが唯一の新規数学**で、
+      BG (15.2) の形式化がその前提。
+
+      ⚠ **経路は完全に確定済み・未解決数学は無い**。
 - [ ] 組み立て: `escapingCentralizers_control` と同じ入口
       (`mem_sigmaSharp_of_mem_aSet_of_escape` / `A1_eq_sigmaSharp` で `x ∈ sigmaSharp M`)
       → D(4) → 第 3/4/5 成分 → 結論。`L` の同定は
