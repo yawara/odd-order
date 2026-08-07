@@ -1130,4 +1130,36 @@ theorem TypeIICrossIsometryData.elim [Finite G]
   rcases hδpm with hδ | hδ <;> rcases pkg.delta'_pm with hδ' | hδ' <;>
     rw [hδ, hδ'] at h0 <;> norm_num at h0
 
+/-! ### Peterfalvi (8.13) at `X = A₀(S)` for a Type-II maximal
+
+The book's (8.13) is stated for `X = A(M)` or `X = A₀(M)` and **any** maximal `M`, while
+`S10.escapingCentralizers_control` covers `X = A₁(M)` (all types) and the type-`P₁` `A₀(M)`
+(the repo's `typePA0` over-claims for type `P₂` = II, issue 9008).  The type-II case of the book's
+range is not a gap but a *degeneracy*: by (8.16) both `A(S)` and `A₀(S)` are TI-subsets with
+normalizer bound `S`, so **no point of them escapes** — the escaping set `D` is empty and (8.13)'s
+conclusions hold vacuously.  The `A(S)` level is
+`S12_TypeIIDadeBase.typeII_centralizer_le_of_mem_centralizerSupport`; this is the `A₀(S)` level
+(issue 0172 §8 audit). -/
+
+open OddOrder.BG.Ch3.S10 in
+/-- **Peterfalvi (8.13) at `X = A₀(S)` for a Type-II maximal**: the escaping set is empty, i.e.
+`C_G(x) ≤ S` for every `x ∈ A₀(S) = A(S) ∪ V^S`.
+
+Same argument as the `A(S)`-level
+`typeII_centralizer_le_of_mem_centralizerSupport`, run against the `A₀`-level (8.16) TI property
+`typeII_A0_isTISubset`: a centralizing `c` conjugates `x` to itself, so the TI condition places
+`c ∈ S`. -/
+theorem typeII_centralizer_le_of_mem_A0 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hSmax : S ∈ maximalSubgroups G) (hSII : IsTypeII S) (data : TypePData S)
+    {x : G} (hx : x ∈ centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S)
+      ∪ conjClassSetIn S (typePV S data)) :
+    Subgroup.centralizer ({x} : Set G) ≤ S := by
+  intro c hc
+  refine typeII_A0_isTISubset hG hSmax hSII data c ⟨x, hx, ?_⟩
+  have hcx : c * x * c⁻¹ = x := by
+    rw [mul_inv_eq_iff_eq_mul]
+    exact Subgroup.mem_centralizer_singleton_iff.mp hc
+  rw [hcx]; exact hx
+
 end OddOrder.Peterfalvi.S12

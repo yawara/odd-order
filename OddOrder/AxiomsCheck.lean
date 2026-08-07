@@ -10633,6 +10633,13 @@ the Singer model to `φ(s) = 1` (`…_basePoint`); `U*` generates `F` additively
 -- BG §14/§16 counting and the (10.8) TI-counting).  Axiom-clean.
 #assert_only_allowed_axioms OddOrder.GroupTheory.mem_conjClassSet_conj_iff
 
+-- **Peterfalvi (8.13) at `X = A₀(S)` for a Type-II maximal** (issue 0172 §8 audit) —
+-- `typeII_centralizer_le_of_mem_A0`: the escaping set is **empty**, so (8.13)'s conclusions hold
+-- vacuously there.  The book states (8.13) for `X = A(M)`/`A₀(M)` and any maximal `M`, while
+-- `escapingCentralizers_control` covers `A₁(M)` (all types) and the type-`P₁` `A₀(M)`; the type-II
+-- case is a degeneracy of (8.16) (both `A(S)` and `A₀(S)` are TI with normalizer bound `S`, so a
+-- centralizing element cannot escape).  `A(S)` level = `typeII_centralizer_le_of_mem_centralizerSupport`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.typeII_centralizer_le_of_mem_A0
 -- **Peterfalvi (8.16) for the type-`P` support `A(M)`** (lane-b W3, §7-input prerequisite) —
 -- `Hypothesis.normalizer_typePA_eq`: `N_G(A(M)) = M` for the genuine (10.1) `Hypothesis` under
 -- `hG : IsMinimalSimpleOdd G`.  `M ≤ N_G(A(M))` is the `M`-invariance `le_normalizer_typePA`
