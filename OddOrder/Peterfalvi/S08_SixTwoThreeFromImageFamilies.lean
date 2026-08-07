@@ -406,8 +406,20 @@ Hypothesis (6.1) is realized by: `RD` (the whole Hypothesis (5.2) bundle — the
 `τ` with its `ℤ[Irr G]` codomain, and the (5.2.d)/(5.2.e) image families), `hodd` (so `𝒮` has no
 real members, (5.2.a)),
 `hKsupp`/`h1A` (the family's differences are `A₀`-supported), `K` solvable normal, and
-`𝒮(X) = inducedKernelFamily K X`.  `B < K` is part of (6.2.a) (`B ⊆ D ⊆ C ⊆ K` with `A ⊊ K`
-forcing a proper section; it is what makes `S(B)` nonempty). -/
+`𝒮(X) = inducedKernelFamily K X`.
+
+⚠ **`hBK : B < K` repairs the book's statement** — it is *not* implied by (6.2.a)-(6.2.b).  At
+`B = K` the hypotheses (a) and (b) both hold vacuously: `D = C = K`, `D/B = 1 ⊆ Z(C/B)`, and
+`𝒮(K) = ∅` is *not* coherent because Definition (5.1) demands `ℤ[𝒮, A] ≠ 0` (p. 25).  The
+conclusion would then read `|K:A| − 1 ≤ 2|L:K|`, which is false as soon as `K` is large relative
+to `|L:K|` (e.g. `A = 1` with `𝒮` coherent — exactly what (6.3) produces).  The book's proof needs
+`𝒮(B) ≠ ∅` for its breaking pair `𝒮₂ = {ψ, ψ̄} ⊆ 𝒮(B)`, i.e. `K/B ≠ 1`.  (mathcomp's
+`coherent_seqIndD_bound` gets away without it because its `coherent` predicate drops the
+`ℤ[𝒮, A] ≠ 0` clause, making the empty family coherent and its `\unless` disjunction true.)
+
+Weaker than the book where nothing depends on it: only `A` and `B` are asked to be normal in `L`
+(`C`, `D` are not), and `D` enters only through `D ⊓ C` (`D.subgroupOf C`), so `D ⊆ C` may be
+dropped. -/
 theorem six_two_of_imageData
     [IsSolvable ↥K] (RD : InducedFamilyImageData A₀ K)
     (hodd : Odd (Nat.card ↥L))
@@ -432,8 +444,10 @@ theorem six_two_of_imageData
 *`M ⊆ H₁ ⊆ H ⊆ K`.  Assume further that (a) `H/M` is nilpotent, (b) `S(H₁)` is coherent,*
 *(c) `|H:H₁| > 4|L:K|² + 1`.  Then `S(M)` is coherent.*  (p. 30.)
 
-⚠ **Specialization**: the repo takes `H` nilpotent where the book takes `H/M` nilpotent (the §11
-consumer has `M = 1`, so the two agree there); this is inherited from `six_three_descent`.
+The nilpotency binder is the book's (6.3)(a) verbatim — `[Group.IsNilpotent (↥H ⧸ M.subgroupOf H)]`
+= `H/M` nilpotent (issue 0173; an earlier wrapper asked for `H` itself nilpotent, which the engine
+`six_three_descent` never needed).  `hH₁H : H₁ < H` is strict where the book writes `H₁ ⊆ H`, but
+(c) `4|L:K|² + 1 < |H:H₁|` forces `|H:H₁| ≥ 5`, so nothing is lost.
 
 Everything is discharged: the minimal-`A` descent and maximal-`B` step (`six_three_descent`), the
 `√`-arithmetic (`six_three_index_bound_general`), and the (6.2) break bound

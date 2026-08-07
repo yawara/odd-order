@@ -75,11 +75,24 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
 
 - **ステップ 2**: Part II + 補章の census (章内リセット番号なので手作業寄り)。
 - **ステップ 3 (進行中)**: Part I の逐条監査を (1.1) から文書順に。1 章ぶん終えるごとに census note を更新。
-  - **2026-08-07 時点: §1-§5 完了 (全 55 件)、§6 は (6.4)(6.5)(6.6) 済**。
+  - **2026-08-07 時点: §1-§6 完了 (全 63 件)**。
     正本 = [census note](../notes/peterfalvi/full_formalization_census_2026_08_07.md) §3.5 の各表。
-  - **次の入口**: §6 の残り ((6.1)/(6.2)/(6.3)/(6.7)/(6.8) の条項突合、書籍 pp.30/32-37。
-    (6.1)-(6.3) の条項は書籍 p.30 を読了済で census note に記録) → §7 = repo `S09`
-    ((7.1)-(7.11)、書籍 pp.38-43。ページ画像 p038-p043 の有無を要確認)。
+  - **§6 の補充 3 件 (2026-08-07)**:
+    - **(6.7) の第 1 結論 `ψ(z) ∈ ℤ`** — 書籍 p.32 の結論は 2 つだが repo は合同側のみで、整数性は
+      「consumer が別途知っている」と file docstring が自認していた。
+      `RepresentationTheory.exists_int_character_of_constant_on_nonidentity` を追加
+      (`Z^#` 上定数 ⟹ `ψ(z)` は有理数 ⟹ 代数的整数ゆえ整数; TI/Sylow/奇数位数を使わない)。
+      併せて `peterfalvi_67_int_dvd_of_odd` (両結論 + ℤ 整除形) と `int_dvd_of_cong_intCast`。
+    - **(6.8)(b) の `τ = Ind_L^G`** — 書籍は「`τ` は `Ind_L^G` の `ℤ[𝒮,L^#]` への制限」だが repo の
+      `tau` は §4 Dade 写像だった。`SibleyDadeHypothesis.tau_apply_eq_induce` で同定
+      (TI ⟹ 局所部分群自明 ⟹ 同じ点ごとの規則; §15 (13.2.e) の §8 版)。
+    - **(6.8)(b) の格子** — `CoherenceTarget` の `A` が `H^#` で書籍は `L^#`。
+      `zSupportedSpan_ne_one_eq_sharp` (`Ind_H^L θ` は正規 `H` の外で消える) +
+      `CoherenceTarget.toBookForm` で capstone を書籍形へ移送。
+  - **stale 注記の訂正 2 件**: `six_three_of_imageData` の「repo は `H` 冪零を取る」(issue 0173 で
+    解消済) と `six_two_of_imageData` の `B < K` の誤った正当化 (実際は**書籍 statement の修理**;
+    `B = K` では書籍 (6.2) は偽)。
+  - **次の入口**: §7 = repo `S09` ((7.1)-(7.11)、書籍 pp.38-43。ページ画像 p038-p043 は切り出し済)。
   - **監査手順の正本** = memory `textbook-coverage-audit-failure-modes`。
     **(1) AxiomsCheck の番号コメント → (2) 書籍ページ画像 → (3) 結論の突合** の順。
     🚨「実体が見つからない」を結論にしない (本セッションで 3 回誤判定しかけた)。

@@ -273,11 +273,10 @@ docstring が「in particular 直交する」と**散文で主張**していた�
 ⚠ **既知の罠**: (5.3)(b) の族の条件は `θ ≠ 1_K` **ではなく** `H ⊄ Ker θ`
 (memory [[read-book-hypothesis-before-adding-side-condition]] — 過去に取り違えて 1 session 誤診した)。
 
-### §6 = repo `S08` (書籍 pp.30-37、`pages/peterfalvi-p030..p037.png` 切り出し済) — **未監査 (着手準備のみ)**
+### §6 = repo `S08` (書籍 pp.30-37、`pages/peterfalvi-p030..p037.png` 切り出し済) — **監査完了 (2026-08-07)**
 
-⚠ **結論の突合は未実施**。以下は着手のための下調べ。
-
-**AxiomsCheck の headline block を読んだ結果 (2026-08-07、⚠ 書籍ページとの条項突合は未実施)**:
+全 8 件 ((6.1)-(6.8)) を書籍ページ (p.30/31/32/33) と逐条突合した。**未形式化ゼロ**。
+補充 3 件 = (6.7) の第 1 結論 `ψ(z) ∈ ℤ` / (6.8)(b) の `τ = Ind_L^G` / (6.8)(b) の格子 `ℤ[𝒮,L^#] = ℤ[𝒮,H^#]`。
 
 | 書籍 | AxiomsCheck が記録する到達点 |
 |---|---|
@@ -286,23 +285,34 @@ docstring が「in particular 直交する」と**散文で主張**していた�
 | (6.4) | **Hypothesis** (定理でない)。書籍 p.31 と条項一致: (a) (6.1) + `\|L\|` 奇 / (b) `M ⊴ L`, `M ⊆ K`, **`K/M` 冪零** / (c) `H₁/M = [K/M,K/M]` かつ `L/H₁` が核 `K/H₁` の Frobenius 群 |
 | (6.5) | ⚠ **特殊化債務を確認** (2026-08-07、書籍 p.31 と突合)。書籍は「(6.4) を仮定し `𝒮(M)` が **coherent でない**」下で (a) `K/H₁` が `L` の chief factor かつ `\|K:H₁\| ≤ 4\|L:K\|²+1` / (b) ある素数 `p` で **`K/M` が非可換 `p`-群** / (c) `\|L:K\| ∤ p−1`。repo は (a) `relIndex_le_of_not_isCoherent` + `isChiefFactor_of_not_isCoherent` / (b) `exists_prime_isPGroup_of_not_isCoherent` / (c) `not_dvd_sub_one_of_not_isCoherent`。**⚠ repo は `K` 自体の冪零性を要求するが書籍 (6.4)(b) は `K/M` の冪零性**。✅ **2026-08-07 に書籍形へ一般化済** ([issue 0173](../../issues/closed/0173-peterfalvi-65-generalize-nilpotent.md) closed)。診断: 過剰仮説は **wrapper の宣言だけ**で、engine `six_three_of_six_two_oracle` は元から書籍形 `[Group.IsNilpotent (↥H ⧸ M.subgroupOf H)]` を取っていた (=「threading されている ≠ 依存している」)。(6.3) wrapper と (6.5)(a) の 2 定理を書籍形へ。(6.5)(b),(c) の section は変数に `M` が無く書籍の `M = 1` の場合なので**債務ではない**と判定 (`K/M = K` ゆえ `[Group.IsNilpotent ↥K]` が書籍 (6.4)(b) そのもの) |
 | (6.6) | ✅ **2 結論とも在る**。書籍 p.31: 「(6.4) が `M = 1` で成立、`Z ⊴ L`, `1 ≠ Z ⊆ Z(K)`, `𝒳 = 𝒮 − 𝒮(Z) ⊆ Irr L` ⟹ **`𝒳 = {χ ∈ Irr L \| Z ⊄ Ker χ}`** かつ **`𝒳` は coherent**」。repo は一貫性半分 `xSet_isCoherent_of_irreducible_X` (一般核 + **任意の `τ`**、Dade datum 不要、issue 0155) と `X`-特徴づけ (`:4335`) の両方。書籍 p.32 の証明どおり ((5.7) で最小次数ブロック → 次数順に (5.6) で 1 対ずつ追加)。⚠ **書籍自身が `M = 1` を置く**ので (6.5) の特殊化債務の影響を受けない |
-| (6.7) | 独自 setup + (6.7.1) 固定点自由仮説 (`:2347`)、class-sum 機構、代数的整数の合同 (「proof of (6.7), pp.31-32」`:2683`) |
-| (6.8) | sub-part (6.8.1)(6.8.2)(6.8.3) あり。直交 coherent union の 2 格子恒等式 → `IsCoherent (X∪Y) A` witness の組み立て (`:3566`-`:3578`) |
+| (6.1) 突合 | ✅ **忠実 + 一般化**。書籍 p.30 の 3 条項 = 「Hypothesis (5.2) が成立」「`K` は `L` の可解正規部分群」「`𝒮 = {Ind_K^L θ \| θ ∈ Irr K, θ ≠ 1_K}`」+ `𝒮(A)` の定義。repo の `InducedFamilyImageData` は (5.2.b) の `τ` (+ 終域 `ℤ[Irr G]` + `τφ(1) = 0`) と (5.2.d)/(5.2.e) を**データ**として持ち、(5.2.a)(5.2.c) は族の形から**証明**される (`S08_SixTwoGeneral`)。⚠ 書籍の等長は `ℤ[𝒮, L^#]` 上、repo は任意の `A₀` (`K^# ⊆ A₀`, `1 ∉ A₀`) 上 ⟹ **より弱い仮説 = より強い定理**。`inducedKernelFamily K X` は `{Ind_K^L θ \| θ ≠ 1_K, X ∩ K ⊆ Ker θ}` で書籍どおり |
+| (6.2) 突合 | ✅ **忠実 + 書籍の statement を修理**。結論 `\|K:A\| − 1 ≤ 2\|L:C\|√\|C:D\|` / 仮説 (a)(b) は一致。**⚠ repo の `hBK : B < K` は (6.2.a)(b) から従わない**: `B = K` では `D = C = K`・`D/B = 1 ⊆ Z(C/B)` で (a) が成立し、`𝒮(K) = ∅` は書籍 (5.1) の `ℤ[𝒮,A] ≠ 0` 条項ゆえ **coherent でない** ので (b) も成立する — が結論 `\|K:A\| ≤ 2\|L:K\|+1` は偽 (例: `A = 1` で `𝒮` coherent)。書籍の証明は breaking pair `𝒮₂ = {ψ,ψ̄} ⊆ 𝒮(B)` を取るので `𝒮(B) ≠ ∅` (= `B < K`) が必要。**書籍 statement の implicit 仮定**であり repo 側の特殊化債務ではない (docstring に明記した)。mathcomp `coherent_seqIndD_bound` が `B \proper K` 無しで通るのは、そちらの `coherent` が `ℤ[𝒮,A] ≠ 0` 条項を落として空族を coherent にしているため。repo は `C`/`D` の `L`-正規性を要求せず `D` は `D ⊓ C` 経由でしか入らない (= 書籍より弱い仮説) |
+| (6.3) 突合 | ✅ **忠実** (issue 0173 の一般化後)。書籍 p.30: `M ⊆ H₁ ⊆ H ⊆ K` 正規 + (a) `H/M` 冪零 (b) `𝒮(H₁)` coherent (c) `\|H:H₁\| > 4\|L:K\|²+1` ⟹ `𝒮(M)` coherent。repo binder = `[Group.IsNilpotent (↥H ⧸ M.subgroupOf H)]` で (a) そのもの。`hH₁H : H₁ < H` は狭いが (c) が `\|H:H₁\| ≥ 5` を強制するので損失なし。⚠ **`six_three_of_imageData` の docstring に残っていた「repo は `H` 冪零を取る」という特殊化注記は stale だった** → 2026-08-07 訂正 (engine は元から書籍形) |
+| (6.7) | ⚠ **第 1 結論が欠けていた → 2026-08-07 補充**。書籍 p.32 の結論は **2 つ**: `z ∈ Z^#` に対し **(i) `ψ(z) ∈ ℤ`** と **(ii) `ψ(z) ≡ ψ(1) (mod \|P\|)`**。repo は (ii) のみ (`peterfalvi_67_of_odd`、`[ALGMOD \|P\|]`) で、(i) は「consumers upgrade to a ℤ-congruence where they separately know `ψ(z) ∈ ℤ`」と**下流に委ねられていた** (file docstring が自認)。⟹ `exists_int_character_of_constant_on_nonidentity` を追加 (`SylowTICongruence.lean`): `Z^#` 上定数な指標は `ψ(1) + (\|Z\|−1)ψ(z) = ∑_{w∈Z} ψ(w) = \|Z\|·dim V^Z` (`sum_character_eq_card_mul_finrank_invariants`) で有理数と判り、代数的整数ゆえ整数 — **TI/Sylow/奇数位数を一切使わない**書籍の証明冒頭そのまま。併せて `peterfalvi_67_int_dvd_of_odd` (両結論 + `\|P\| ∣ ψ(z)−ψ(1)` の ℤ 整除形) と AlgInt の逆向き橋 `int_dvd_of_cong_intCast` (`Cong.of_int` の converse) を追加。**番号 grep では検出できない「部分被覆」型の実例 2 件目** |
+| (6.7.1)(6.7.2)(6.7.3) | ✅ 在る。(6.7.1) = `fixedPointFree_classPair_of_isTISubset` + `card_dvd_classSumCoeff_of_fixedPointFree` (`\|P\| ∣ a_{ijs}\|C_s\|`、書籍 p.32 の `Ω = {(u,v) ∈ C_i×C_j \| uv ∈ C_s}` への固定点自由作用)。(6.7.2)/(6.7.3) = `centralCharacterOfRep_classSum_mul_cong_collapse_of_isTISubset` + `peterfalvi_673_combine`/`peterfalvi_673_cancel` (`\|C₁\|` が `p` と互いに素ゆえ消去)。`a₁₁₀ = 0` は `RealClassTISubset` が無仮説で供給 (書籍「Since `\|L\|` is odd, `z⁻¹` is not conjugate to `z`」) |
+| (6.8) | ✅ **capstone は無条件・carrier は書籍忠実 (2 点を 2026-08-07 補充)**。書籍 p.33 の (a)(b)(c1)(c2) ⟹ `𝒮` coherent。repo = `sibleySetup_is_coherent : hyp.CoherenceTarget` (`hyp : SibleyDadeHypothesis G L H` のみを取る = 追加仮説ゼロ)。carrier の条項対応: (a) = `H_ne_bot`/`H_normal`/`H_nilpotent`/`split (L = H ⋊ W₁)`/`card_L_odd`/`H_sharp_ti` (⚠ `IsTISubset A L` + `A ≠ ∅` + `L`-不変性 ⟹ `N_G(A) = L` が `set_normalizer_eq_of_nonempty_of_normalizes` で出るので書籍の「with normalizer `L`」と同値) / (b) = `S`/`S_eq` + `dade`/`dade_H_eq_bot` / (c) = `cases` (Frobenius ∨ `Hypothesis46` + `w₂` 素数 + `W₂ ⊆ [H,H]`)。**補充 (b) 2 件**: 書籍は「`τ` は `Ind_L^G` の `ℤ[𝒮,L^#]` への制限」と言うのに repo の `tau` は §4 Dade 写像で、`CoherenceTarget` の `A` も `H^#` だった ⟹ `tau_apply_eq_induce` (TI ⟹ 局所部分群自明 ⟹ 両者は同じ点ごとの規則; §15 の (13.2.e) `H_sharp_tau_eq_induce` の §8 版) と `zSupportedSpan_ne_one_eq_sharp` (`Ind_H^L θ` は正規な `H` の外で消える) を追加し、`CoherenceTarget.toBookForm` で capstone を書籍形 `IsCoherent hyp.tau hyp.S L^#` へ移送。**冗長だが導出可能な 2 フィールド** (債務ではない): `W1_nontrivial` は (c1) `IsFrobeniusGroup.ne_bot_complement` / (c2) `h46.W1_nontrivial` から、`cases` の c2 側 `Nat.Coprime (Nat.card ↥H) (Nat.card W1)` は (4.2.a) Hall 条項 `h46.card_coprime` から出る。carrier の**構成可能性**は `S09_FrobeniusSibley` / `S12_TypeVSibley.typeVSibleyDadeHypothesis` が担保 (posited でない) |
 
-⟹ **所在と到達点は把握できたが、書籍 pp.30-37 の条項との突合は未実施**。次の作業単位。
-⚠ (6.5)(a) の「`K` nilpotent vs 書籍の `K/M` nilpotent」は **repo が自認する特殊化債務**なので、
-書籍と突合するときに優先確認すること。
+**§6 監査完了 (2026-08-07)**: 全 8 件で**未形式化ゼロ**。補充 3 件・stale 注記訂正 2 件。
 
-**着手手順** (§5 で確立した順序を守る):
-1. **`AxiomsCheck.lean` の該当番号コメントを最初に読む** — 番号付きで到達点が書かれている
-2. 書籍ページ画像を読んで条項を確定
-3. 各宣言の**結論**を条項ごとに突合 (repo 全体 grep + 結論の形での grep)
+得られた一般的教訓 (memory [[textbook-coverage-audit-failure-modes]] に追記すべき型):
 
-**既知の手がかり**: (6.2)/(6.3) は `S08_SixTwoThreeFromImageFamilies` に oracle 無し版
-(`six_two_of_imageData` / `six_three_of_imageData`、issues 0153/0154)。(6.5)(a) の冒頭一文
-「Since `K/H₁` is abelian and non-trivial, (6.3.b) holds by (5.7)」(書籍 p.31) は
-`S08_SixFiveGeneral` が一般核で供給。(6.6) は `CoherenceUnion:568` に「repeated use of (5.6)」
-反復エンジン + `NormInequalities:986` に degree-ratio 界。
+1. **「結論が 2 つある定理」は 1 つだけ形式化されがち** — (6.7) は `ψ(z) ∈ ℤ` と合同の 2 結論で、
+   番号 cite も AxiomsCheck の headline も合同側だけ見て「(6.7) 済」に見えていた。しかも file
+   docstring が「(i) は consumer 側で別途知っている」と**自認**していた ⟹ **docstring の
+   "consumers supply X" / "separately known" は部分被覆のシグナル**として読むこと。
+2. **`τ` と `A` の同定は statement の一部** — coherence は `(𝒮, A, τ)` の 3 つ組の性質なので、
+   「`τ` が書籍の写像か」「`A` が書籍の台集合か」を確認しないと定理の意味が変わる。§5 の
+   (5.2.b) `L^#` vs `A` と同型の論点が §6 の (6.8)(b) で再発した (格子側は同じ補題
+   `zSupportedSpan_ne_one_eq` で閉じた)。**書籍 p.34 ((6.8) の証明冒頭) が両方を明言している**:
+   > By the definition of `𝒮`, `ℤ[𝒮, L^#] = ℤ[𝒮, H^#]`.  Since `H^#` is a TI-subset with
+   > normalizer `L`, (5.2.b) holds by [Is], Lemma 7.7.  Moreover, (2.3), Definition (2.5) and
+   > [Is], Lemma 7.7, show that `τ` coincides with the Dade isometry relative to `(A, L, G)`.
+
+   ⟹ repo が暗黙にしていた 2 点は、書籍が**明示的な 2 文**として書いていたもの。
+   **「書籍の証明の冒頭数文」は statement の一部として読むこと** (仮説の言い換え・同定はそこに置かれる)。
+3. **書籍 statement 自体の implicit 仮定** — (6.2) は `B = K` で偽。repo が `B < K` を持つのは
+   修理であって債務ではない。**mathcomp が同じ仮説を持たない**ときは、定義 (ここでは
+   `coherent` に `ℤ[𝒮,A] ≠ 0` を含めるか) の差を疑う。
 
 ## 4. 未着手の census
 
