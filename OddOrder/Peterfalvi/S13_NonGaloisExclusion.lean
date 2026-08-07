@@ -1071,4 +1071,107 @@ theorem fittingIsTI_of_isTypeNonI {G : Type*} [Group G] [Finite G]
   · exact OddOrder.BG.Ch4.S15.fitting_isTI_of_mf_ne_msigma hG hM
       (hcIII_IV.mp (Or.inl hIII)).2
 
+/-! ### The §11 results in their unconditional book form
+
+Peterfalvi states (11.5)–(11.9) under Hypothesis (11.2) alone.  The repo proves them
+*parametrized* on the (11.3) non-coherence `hnc` (and on the type disjunction `htype`, which is
+the carrier field `type_alt`), because the unconditional (11.3)
+`S_H0C_not_coherent_unconditional` lives downstream of the files where (11.5)–(11.7) are proved
+(`S13_CoreStructure`, `S13_Lemmas113To115`) — it routes through the unconditional Theorem (10.8).
+This section, which imports both sides, discharges those hypotheses once and for all, so the
+book's statements are directly citable.  No circularity: (11.3)'s proof is Theorem (6.3) applied
+to `S(H₀C)` plus (10.8), and uses none of (11.5)–(11.9). -/
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.4), unconditional**: under Hypothesis (11.2), if `H₁` is a normal subgroup
+of `M` strictly contained in `M'` for which `S(H₁)` is coherent, then `|M'/H₁| − 1 ≤ 2q|U/C|`
+(stated subtraction-free as `|M' : H₁| ≤ 2q|U : C| + 1`).
+`coherent_quotient_bound_of_noncoherent` with the (11.3) non-coherence discharged by
+`S_H0C_not_coherent_unconditional`. -/
+theorem coherent_quotient_bound {G : Type*} [Group G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M H1 : Subgroup G} (hyp : Hypothesis M)
+    (hH1_norm : M ≤ Subgroup.normalizer (H1 : Set G)) (hH1_lt : H1 < derivedInG M)
+    (hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf H1) hyp.base.A0)) :
+    H1.relIndex (derivedInG M) ≤ 2 * hyp.q * hyp.C.relIndex hyp.U + 1 :=
+  coherent_quotient_bound_of_noncoherent hG hyp hH1_norm hH1_lt hcoh
+    (S_H0C_not_coherent_unconditional hG hyp)
+
+/-- **Peterfalvi (11.5), unconditional**: `M'' = HC` under Hypothesis (11.2).
+`secondDerived_eq_HC_of_noncoherent` with the (11.3) non-coherence discharged by
+`S_H0C_not_coherent_unconditional` and `htype` read off the carrier field `type_alt`. -/
+theorem secondDerived_eq_HC {G : Type*} [Group G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
+    secondDerivedInAmbient M = hyp.HC :=
+  secondDerived_eq_HC_of_noncoherent hG hyp (S_H0C_not_coherent_unconditional hG hyp)
+    hyp.type_alt
+
+/-- **Peterfalvi (11.6), unconditional**: under Hypothesis (11.2), `H` is a `p`-group, `U`
+centralizes `H₀`, `H₀ = H'` and `C = U'`.  `core_structure` with the (11.3) non-coherence
+discharged. -/
+theorem core_structure_unconditional {G : Type*} [Group G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
+    IsPGroup hyp.p ↥hyp.H ∧
+      hyp.U ≤ Subgroup.centralizer (hyp.chief.H0 : Set G) ∧
+      hyp.chief.H0 = hyp.Hprime ∧ hyp.C = hyp.Uprime :=
+  core_structure hG hyp (S_H0C_not_coherent_unconditional hG hyp) hyp.type_alt
+
+/-- **Peterfalvi (11.7), unconditional**: under Hypothesis (11.2), `H` is an elementary abelian
+`p`-group of order `p^q`, and `H₀ = 1`.  `H_elementaryAbelian` with the (11.3) non-coherence
+discharged. -/
+theorem H_elementaryAbelian_unconditional {G : Type*} [Group G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
+    IsElementaryAbelian hyp.p ↥hyp.H ∧ Nat.card ↥hyp.H = hyp.p ^ hyp.q ∧
+      hyp.chief.H0 = ⊥ :=
+  H_elementaryAbelian hG hyp (S_H0C_not_coherent_unconditional hG hyp) hyp.type_alt
+
+open OddOrder.RepresentationTheory in
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.8), unconditional** (the book's `∀ ζ ∈ S(HC)` form): under Hypothesis (11.2),
+for every `ζ ∈ S(HC)` — i.e. every irreducible member of `S = inducedFamily M` of degree
+`q = w₁` — the residual `(μ₀ − ζ)^τ − ∑_{0≤i<q} ω_{i0}^σ` is **not** orthogonal to `(Irr W)^σ`.
+
+`zeta_residual_not_orthogonal_H0C_of_refuter` with its three dischargeable inputs supplied: the
+(11.5) `M'' = HC` (`secondDerived_eq_fitting_of_base`), the (11.7) order `|H| = p^q`
+(`card_H_eq_of_base`), and the (11.3) non-coherence refuter. -/
+theorem zeta_residual_not_orthogonal_unconditional {G : Type*} [Group G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ OddOrder.Peterfalvi.S12.inducedFamily M)
+    (hζirr : IsIrreducibleCharacter ζ) (hζdeg : ζ 1 = (hyp.w1 : ℂ)) :
+    ¬ ∀ (i : Fin hyp.w1) (j : Fin hyp.w2),
+      ClassFunction.inner
+        ((hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hG.odd i' 0) - ζ))
+          - ∑ i' : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i' 0)
+        (hyp.alignedOmegaSigmaGrid hG hG.odd i j) = 0 :=
+  zeta_residual_not_orthogonal_H0C_of_refuter hG hyp htype
+    (secondDerived_eq_fitting_of_base hG hyp htype
+      (fun s13 => S_H0C_not_coherent_unconditional hG s13))
+    (card_H_eq_of_base hG hyp htype (fun s13 => S_H0C_not_coherent_unconditional hG s13))
+    (fun s13 => S_H0C_not_coherent_unconditional hG s13) hζS hζirr hζdeg
+
+open OddOrder.RepresentationTheory in
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (11.9)(a), unconditional**: under Hypothesis (11.2), for every `ζ ∈ S(HC)` the
+`σ`-grid coefficients of `ψ = (μ₀ − ζ)^τ` are the **row-`0` indicator**
+`⟨ψ, ω_{ij}^σ⟩ = δ_{i0}`; equivalently `ψ − ∑_{0≤j<p} ω_{0j}^σ` is orthogonal to `(Irr W)^σ`.
+
+`S12.Hypothesis.inner_tau_muColumnZero_sub_zeta_rowZero_of_residual_not_orthogonal` with its two
+dischargeable inputs supplied: the (5.7) coherence of `S₁ = S(HC)` (`SHC_isCoherent`) and the
+(11.8) non-orthogonality (`zeta_residual_not_orthogonal_unconditional`).  Note the contrast with
+(11.8): the *column*-`0` residual is non-orthogonal, the *row*-`0` residual is orthogonal. -/
+theorem inner_tau_muColumnZero_sub_zeta_rowZero_unconditional {G : Type*} [Group G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ OddOrder.Peterfalvi.S12.inducedFamily M)
+    (hζirr : IsIrreducibleCharacter ζ) (hζdeg : ζ 1 = (hyp.w1 : ℂ)) :
+    ∀ (i : Fin hyp.w1) (j : Fin hyp.w2),
+      ClassFunction.inner (hyp.tau ((∑ r : Fin hyp.w1, hyp.muGrid hG hG.odd r 0) - ζ))
+        (hyp.alignedOmegaSigmaGrid hG hG.odd i j) = (if i = 0 then (1 : ℂ) else 0) :=
+  hyp.inner_tau_muColumnZero_sub_zeta_rowZero_of_residual_not_orthogonal hG htype
+    (hyp.SHC_isCoherent hG) hζS hζirr hζdeg
+    (zeta_residual_not_orthogonal_unconditional hG hyp htype hζS hζirr hζdeg)
+
 end OddOrder.Peterfalvi.S13

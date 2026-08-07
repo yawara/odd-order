@@ -454,6 +454,35 @@ sub-part **(10.10.1)-(10.10.4)** の計 15 件。repo は `S12_*` 系に分散�
 `S12_TypeVCaseC.lean` (549 行、(10.10.2) の `p³` 構造パッケージ) に prefix-split し、
 `OddOrder.lean` に配線した。
 
+### §11 = repo `S13` (書籍 pp.64-68、`pages/peterfalvi-p064..p068.png` 切り出し済) — **監査完了 (2026-08-07、未形式化ゼロ)**
+
+書籍 §11 =「Maximal Subgroups of Types III and IV」= **(11.1)-(11.9)** + (11.8) の sub-part
+**(11.8.1)-(11.8.6)** の計 15 件。**全 15 件に実体あり**。本監査の補充は「書籍は Hypothesis (11.2)
+だけの下で述べるのに repo は (11.3) の非coherence をパラメータで受けていた」6 件の無条件化。
+
+| 書籍 | 判定 | repo の実体 / 備考 |
+|---|---|---|
+| (11.1) | ✅ | `prime_pow_gt_four_mul_sq_add_one`: `p ≠ q` 奇素数 ⟹ `4q² + 1 < p^q` (純算術、`3^x > 4x²+1` の帰納) |
+| (11.2) Hypothesis | ✅ carrier が条項一致 | `S13.Hypothesis` (`S13_MaximalIII_IVBasic.lean`): `base` = (10.1) / `type_alt` = III ∨ IV / `chief` = (9.4) を満たす `H₀` (`chief.H0`) / `C` + `C_eq_centralizer` = `C_U(H)` / `Hprime`,`Uprime` = `H'`,`U'` / `SOf` = `𝒮(X)` (`S08.inducedKernelFamily` に pin、`SOf ⊥ = base.Sset`) / `p = \|W₂\|`,`q = \|W₁\|` は projection。**2026-08-07 の清掃**: 未消費の opaque `Prop` フィールド 3 本 (`notOrthogonalFormula` / `finalOrthogonalityFormula` / `caseB_of_97`、producer が `True` を入れるだけ) を削除し、構造 docstring を書籍の条項列挙に差し替え |
+| (11.3) | ✅ **無条件** | `S_H0C_not_coherent_unconditional`: `𝒮(H₀C)` は coherent でない。書籍どおり (6.3) → (10.8) 経由 |
+| (11.4) | ⭐ **2026-08-07 に無条件化** | `coherent_quotient_bound` (`S13_NonGaloisExclusion`): `H₁ ⊴ M`, `H₁ < M'`, `𝒮(H₁)` coherent ⟹ `\|M' : H₁\| ≤ 2q\|U : C\| + 1` (書籍の `2q\|U/C\| ≥ \|M'/H₁\| − 1` を減算なしで)。旧 `coherent_quotient_bound_of_noncoherent` は `hnc` 受け |
+| (11.5) | ⭐ **2026-08-07 に無条件化** | `secondDerived_eq_HC`: `M'' = HC` |
+| (11.6) | ⭐ **2026-08-07 に無条件化、4 条項とも** | `core_structure_unconditional`: `H` が `p`-群 ∧ `U` が `H₀` を中心化 ∧ `H₀ = H'` ∧ `C = U'`。第 2 条項は元から無条件 ((9.6)/(9.1) 経由の `U_centralizes_H0`) |
+| (11.7) | ⭐ **2026-08-07 に無条件化、3 条項とも** | `H_elementaryAbelian_unconditional`: `H` は基本可換 `p`-群 ∧ `\|H\| = p^q` ∧ `H₀ = 1` |
+| (11.8) | ⭐ **2026-08-07 に無条件化** | `zeta_residual_not_orthogonal_unconditional`: 書籍の `∀ ζ ∈ 𝒮(HC)` 形。`𝒮(HC)` = 次数 `q = w₁` の既約メンバー (= repo の `SHCSet`) で、**列**-`0` 残差 `(μ₀ − ζ)^τ − ∑_{0≤i<q} ω_{i0}^σ` が `(Irr W)^σ` に直交**しない**。旧 `zeta_residual_not_orthogonal_H0C_of_refuter` は (11.5)/(11.7)/(11.3) を 3 つとも仮説で受けていた |
+| (11.8.1) | ✅ 3 条項とも | `charParam_d_eq_u` (`d = u`) / `charParam_delta_eq_one` (`δ = 1`) / `card_SHCSet_filter_eq_charParam_n` (`\|𝒮₁\| = n = (u−1)/q`; 一般形の軌道数え `card_abelianization_derived_eq_w1_mul_card_SHCSet_add_one` は §10 (10.10.2) と共有) |
+| (11.8.2) | ✅ | `muGridAlpha_tau_residual_norm` + `muGridAlpha_tau_proj_a_mem` (`a ∈ {0,1,2}`) + `charParam_a_mem_of_norm_ineq` (`\|𝒮₁\|a² − 2an ≤ 2` の算術) |
+| (11.8.3) | ✅ 2 条項とも | `beta_row_eq` / `beta_column_eq_zeroRow` (`i`,`j` 非依存) + `beta_isReal` (実性) |
+| (11.8.4) | ✅ 二分律つき | `tau_muColumnZero_sub_zeta_dichotomy_of_orthogonal` (書籍の「we may assume」= 分岐 2 で `τ₁` を共役スワップ `SHC_swap` に置換) + `exists_coherent_extension_h114_of_orthogonal` (両分岐を `∃ ν` に畳んだ消費側インタフェース) |
+| (11.8.5) | ✅ | `charParam_a_eq_zero_of_residualEq` (`a = 0`)。書籍の「`β` 実 ⟹ `a` 偶」は `even_inner_of_conjPerm_symmetric` |
+| (11.8.6) | ✅ | (11.8) 本体の結び (`zeta_residual_not_orthogonal_H0C_of_refuter` の narrow `𝒮(H₀C)` capstone) |
+| (11.9) | ✅ (a)(b)(c) とも | (a) ⭐ **2026-08-07 に無条件化** = `inner_tau_muColumnZero_sub_zeta_rowZero_unconditional` (**行**-`0` 残差は直交 — σ 係数が行-`0` 指示関数 `δ_{i0}`; (11.8) の列-`0` と対照的) / (b) = `w2_lt_w1_of_hypothesis_H0C_unconditional` (`q > p`、既に無条件) / (c) = `not_cliffordCaseA_of_hypothesis` ((9.7) の case (b) が成立) + `isTypeIII_of_hypothesis` (`M` は type III) + 全称形 `no_typeIV_maximal` |
+
+⚠ **層順に注意**: 無条件の (11.3) は Theorem (10.8) 経由なので、(11.5)-(11.7) を証明する
+`S13_CoreStructure` / `S13_Lemmas113To115` より**下流**に居る。無条件形は両側を import する
+`S13_NonGaloisExclusion` の末尾にまとめた。循環はない — (11.3) の証明は `𝒮(H₀C)` への
+Theorem (6.3) + (10.8) で、(11.5)-(11.9) を一切使わない。
+
 ## 4. 未着手の census
 
 - **Part II (Suzuki の定理 A、書籍 pp.97-134)** — `Proposition N` / `Lemma N` の**章内リセット

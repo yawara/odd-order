@@ -11351,6 +11351,32 @@ optParam→explicit+wrapper rework を (9.11)/(11.9) chain に適用時。 -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.muColumnChar_zero
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.exists_muColumnChar_inv
 
+/-! **Peterfalvi §11 (11.4)–(11.9.a) の無条件形, axiom-clean** (issue 0172 §11 監査、2026-08-07).
+
+書籍は (11.4)–(11.9) を Hypothesis (11.2) だけの下で述べる。repo はこれらを **(11.3) の
+非coherence `hnc` をパラメータで受けた形**で証明していた — 無条件の (11.3)
+(`S_H0C_not_coherent_unconditional`) は Theorem (10.8) 経由なので、(11.5)–(11.7) を証明する
+ファイル (`S13_CoreStructure` / `S13_Lemmas113To115`) より**下流**に居るという層順の都合。
+両側を import する `S13_NonGaloisExclusion` で一度だけ discharge し、書籍の statement を
+そのまま cite できるようにした (循環なし: (11.3) の証明は `S(H₀C)` への Theorem (6.3) +
+(10.8) で、(11.5)–(11.9) を一切使わない)。
+
+* (11.4) `coherent_quotient_bound` — `|M' : H₁| ≤ 2q|U : C| + 1`
+* (11.5) `secondDerived_eq_HC` — `M'' = HC`
+* (11.6) `core_structure_unconditional` — `H` が `p`-群 / `U` が `H₀` を中心化 / `H₀ = H'` / `C = U'`
+* (11.7) `H_elementaryAbelian_unconditional` — `H` は位数 `p^q` の基本可換 `p`-群、`H₀ = 1`
+* (11.8) `zeta_residual_not_orthogonal_unconditional` — 書籍の `∀ ζ ∈ 𝒮(HC)` 形。
+  **列**-`0` 残差 `(μ₀ − ζ)^τ − ∑_{0≤i<q} ω_{i0}^σ` は `(Irr W)^σ` に直交**しない**
+* (11.9.a) `inner_tau_muColumnZero_sub_zeta_rowZero_unconditional` — 対照的に**行**-`0` 残差
+  `(μ₀ − ζ)^τ − ∑_{0≤j<p} ω_{0j}^σ` は直交する (σ 係数が行-`0` 指示関数) -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.coherent_quotient_bound
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.secondDerived_eq_HC
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.core_structure_unconditional
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.H_elementaryAbelian_unconditional
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.zeta_residual_not_orthogonal_unconditional
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S13.inner_tau_muColumnZero_sub_zeta_rowZero_unconditional
+
 /-! **nilpotent + cyclic abelianization ⟹ cyclic, axiom-clean** (lane a, 2026-07-12, issue 9086).
 Pf (11.9.c) caseB 帰結の一般群論 engine (mathcomp `cyclic_nilpotent_quo_der1_cyclic` 対応):
 下降中心列の安定化 (γ₂ ≤ ⁅γ₂,⊤⁆) + center-quotient cyclic → abelian。 -/

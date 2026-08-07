@@ -175,9 +175,14 @@ theorem prime_pow_gt_four_mul_sq_add_one {p q : ℕ}
 
 /-- **Peterfalvi (11.2)**: the Type III/IV specialization of §12.
 
-`SOf X` is Peterfalvi's `S(X) = {chi in S | X <= Ker chi}`.  The fields ending
-in `Formula` are the named algebraic or character-theoretic calculations proved
-throughout §13. -/
+Book (p. 64): Hypothesis (10.1) with `M` of Type III or IV; `H`, `U` as in Definition (8.4),
+`H' = [H,H]`, `U' = [U,U]`, `C = C_U(H)`; `H₀` a normal subgroup of `M` contained in `H`
+satisfying (9.4); `p = |W₂|`, `q = |W₁|`; and `S(X) = {χ ∈ S | X ⊆ Ker χ}` for `X ⊆ M`.
+Each of those is a field or a projection here: `base` is (10.1), `chief` supplies the (9.4)
+datum `H₀` (`chief.H0`), `C`/`Hprime`/`Uprime` carry `C_U(H)`/`H'`/`U'` with their defining
+equations, and `SOf` is `S(X)` pinned to the general kernel-filter family
+(`S08.inducedKernelFamily`), so `SOf ⊥ = base.Sset`.  The book's remark "the set denoted `S`
+in Hypothesis (9.5) is denoted `S − S(H)` here" is the `SOf`/`S11.sSet` relation. -/
 structure Hypothesis (M : Subgroup G) where
   [finiteG : Finite G]
   base : OddOrder.Peterfalvi.S12.Hypothesis M
@@ -223,9 +228,6 @@ structure Hypothesis (M : Subgroup G) where
   (`S12.inducedFamily_eq_inducedKernelFamily_bot`). -/
   SOf_eq : ∀ X : Subgroup G, SOf X = OddOrder.Peterfalvi.S08.inducedKernelFamily
     ((derivedInG M).subgroupOf M) (X.subgroupOf M)
-  notOrthogonalFormula : ClassFunction ↥M ℂ → Prop
-  finalOrthogonalityFormula : ClassFunction ↥M ℂ → Prop
-  caseB_of_97 : Prop
 
 /-- **The §13 hypothesis holds for a type-III/IV maximal subgroup** — the producer connecting the
 whole §13 (11.1)–(11.7) theory (and hence (11.5) `secondDerived_eq_HC`, (11.7) `core_structure`) to
@@ -234,8 +236,7 @@ parameters (`exists_charParameters_full`; proof-irrelevance of the `Prop`s `IsMi
 `Odd` discharges the `∀ hG hodd` fields), the §11 chief-factor setup
 (`toTypesIIIIIIVSetup`/`exists_chiefFactorData`), and `C = C_U(H) = U ⊓ C_G(H)` with its
 `M`-normality
-(`S12.typePData_C_normalized_by_M`) and centralizer form.  The formula `Prop`s are unconstrained
-placeholder fields. -/
+(`S12.typePData_C_normalized_by_M`) and centralizer form. -/
 theorem exists_hypothesis_of_isTypeIIIorIV [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
@@ -270,10 +271,7 @@ theorem exists_hypothesis_of_isTypeIIIorIV [Finite G]
     Uprime_eq := rfl
     SOf := fun X => OddOrder.Peterfalvi.S08.inducedKernelFamily
       ((derivedInG M).subgroupOf M) (X.subgroupOf M)
-    SOf_eq := fun _ => rfl
-    notOrthogonalFormula := fun _ => True
-    finalOrthogonalityFormula := fun _ => True
-    caseB_of_97 := True }, rfl⟩
+    SOf_eq := fun _ => rfl }, rfl⟩
 
 namespace Hypothesis
 

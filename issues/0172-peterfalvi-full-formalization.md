@@ -125,7 +125,19 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
     `tau_muColumnZero_sub_zeta_eq` の「(10.6)(b)」誤ラベルを (10.6)(a) 第 2 文へ訂正。
     設計差 2 件 (いずれも被覆済): (10.1) の「(5.2) も成立」は独立 carrier でなく Dade datum 経由 /
     (10.7) は `TypesIIIIIIVSetup` を受けるが `maximal + IsTypeII` から構成可能。
-  - **次の入口**: §11 = 書籍 pp.64-68 ((11.1)-(11.9) 系、repo `S13`)。
+  - **§11 監査完了 (2026-08-07)**: 15 件 ((11.1)-(11.9) + (11.8.1)-(11.8.6)) すべてに実体あり。
+    **補充 = 無条件化 6 件**: 書籍は (11.4)-(11.9) を Hypothesis (11.2) だけの下で述べるが、repo は
+    **(11.3) の非coherence `hnc` をパラメータで受けた形**しか持たなかった (無条件の (11.3)
+    `S_H0C_not_coherent_unconditional` は Theorem (10.8) 経由ゆえ (11.5)-(11.7) を証明する
+    ファイルより下流、という層順の都合)。両側を import する `S13_NonGaloisExclusion` で
+    一度だけ discharge:
+    (11.4) `coherent_quotient_bound` / (11.5) `secondDerived_eq_HC` /
+    (11.6) `core_structure_unconditional` / (11.7) `H_elementaryAbelian_unconditional` /
+    (11.8) `zeta_residual_not_orthogonal_unconditional` (書籍の `∀ ζ ∈ 𝒮(HC)` 形) /
+    (11.9.a) `inner_tau_muColumnZero_sub_zeta_rowZero_unconditional`。循環なし。
+    清掃 1 件: §13 `Hypothesis` の未消費 opaque `Prop` フィールド 3 本を削除 +
+    構造 docstring を書籍 (11.2) の条項列挙に差し替え。
+  - **次の入口**: §12 = 書籍 pp.69-74「Maximal Subgroups of Type I」(repo `S14`)。
   - **監査手順の正本** = memory `textbook-coverage-audit-failure-modes`。
     **(1) AxiomsCheck の番号コメント → (2) 書籍ページ画像 → (3) 結論の突合** の順。
     🚨「実体が見つからない」を結論にしない (本セッションで 3 回誤判定しかけた)。
