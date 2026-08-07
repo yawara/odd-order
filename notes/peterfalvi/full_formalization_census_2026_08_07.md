@@ -277,12 +277,21 @@ docstring が「in particular 直交する」と**散文で主張**していた�
 
 ⚠ **結論の突合は未実施**。以下は着手のための下調べ。
 
-**AxiomsCheck の番号出現数** (「何がどこまで証明されたか」の目安。⚠ 数は証拠でない):
-`(6.1)` 9 / `(6.2)` 35 / `(6.3)` 18 / **`(6.4)` 1** / `(6.5)` 16 / `(6.6)` 55 / `(6.7)` 10 / `(6.8)` 19。
+**AxiomsCheck の headline block を読んだ結果 (2026-08-07、⚠ 書籍ページとの条項突合は未実施)**:
 
-**(6.4) が 1 件と少ないのは「定理でなく Hypothesis」だから** — `S08_SixFiveGeneral:39,366,375` が
-「Assume Hypothesis (6.4)」の形で使い、clause (c) を `H₁/M = [K/M, K/M]` (⟹ `K/H₁` 可換) と同定し、
-(6.4.c) が `L/H₁` を Frobenius 群にすることも記録している。⟹ **異常ではない**。
+| 書籍 | AxiomsCheck が記録する到達点 |
+|---|---|
+| (6.1) | Hypothesis。「assume that Hypothesis (5.2) holds」と読む (`:4076`)。一般核の族 `S(X) = {Ind_K^L θ \| θ ∈ Irr K, θ ≠ 1, X ⊆ Ker θ}` (issue 2022)。standalone 版は `K` 可解 / `H ≤ K` 冪零 / `K ≠ H` (`:3976`) |
+| (6.2) (6.3) | **oracle 無し**で一般核 (`six_two_of_imageData` / `six_three_of_imageData`、issues 0153/0154)。(6.3.b) は「`K/X` 可換なら `𝒮(X)` coherent」を任意の可解正規 `K` で (`:4113`) |
+| (6.4) | **Hypothesis** (定理でない)。clause (c) = `H₁/M = [K/M, K/M]` ⟹ `K/H₁` 可換、`L/H₁` は Frobenius |
+| (6.5) | (a) 指数界 `\|K:H₁\| ≤ 4\|L:K\|²+1` + chief factor 節 (`:4137`) / (b) `K` が `p`-群 / (c) `\|L:K\| ∤ p−1` (`:4145`)。すべて一般核。⚠ **repo 自身が特殊化を明記**: 「`K` nilpotent where the book has `K/M` nilpotent」(`M = 1` で一致、(6.6) が使うのはその場合) |
+| (6.6) | 一貫性半分を一般核 + **任意の `τ`** (Dade datum 不要) で (`xSet_isCoherent_of_irreducible_X`、issue 0155)。書籍 p.32 の証明どおり ((5.7) で最小次数ブロック → 次数順に (5.6) で 1 対ずつ追加)。`X`-特徴づけも一般核版あり (`:4335`) |
+| (6.7) | 独自 setup + (6.7.1) 固定点自由仮説 (`:2347`)、class-sum 機構、代数的整数の合同 (「proof of (6.7), pp.31-32」`:2683`) |
+| (6.8) | sub-part (6.8.1)(6.8.2)(6.8.3) あり。直交 coherent union の 2 格子恒等式 → `IsCoherent (X∪Y) A` witness の組み立て (`:3566`-`:3578`) |
+
+⟹ **所在と到達点は把握できたが、書籍 pp.30-37 の条項との突合は未実施**。次の作業単位。
+⚠ (6.5)(a) の「`K` nilpotent vs 書籍の `K/M` nilpotent」は **repo が自認する特殊化債務**なので、
+書籍と突合するときに優先確認すること。
 
 **着手手順** (§5 で確立した順序を守る):
 1. **`AxiomsCheck.lean` の該当番号コメントを最初に読む** — 番号付きで到達点が書かれている
