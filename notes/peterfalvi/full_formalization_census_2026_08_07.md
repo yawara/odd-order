@@ -259,7 +259,11 @@ docstring が「in particular 直交する」と**散文で主張**していた�
 | (5.6) | ✅ **oracle 懸念は解消済** / ⬜ 書籍との突合は未了 | sub-part は `S07_Coherence/NormInequalities` に在る ((5.6.1) 構成 / (5.6.2) 開始評価 `‖Y‖² ≤ ‖ψ‖²` `:371` / (5.6.3) 分解対 `:145`)。⚠ 「(5.6) break-member **oracle** `h56`」を仮説に取る §8 の standalone 定理 (`S08_Theorem62_63_Standalone:350,388`) を producer まで追ったところ、**この oracle は既に除去されていた** (issues 0153/0154)。`AxiomsCheck:4072` が明記: 「Peterfalvi の Hypothesis (6.1) は "assume that Hypothesis (5.2) holds" と読むので、正直な仮説は (5.2.d) と (5.2.e) であって **conclusion-shaped な break oracle ではない**」。`InducedFamilyImageData` が (5.2.b)(5.2.d)(5.2.e) を束ね、`six_two_of_imageData` / `six_three_of_imageData` が **oracle 無しの** (6.2)/(6.3)。break も member も**可約でよい**。⟹ **doneness 懸念なし** (oracle 付き版は旧 API として残るだけ) |
 | (5.7) | ✅ **書籍強度で実証明** | `coherent_of_constant_degree_general` (issue 0157)。**メンバーの既約性を仮定しない**書籍どおりの形で `GeneralHypothesis` 上に述べられている。旧 `coherent_of_constant_degree` (2 元 carrier) は `m = 1` の特殊化。base case `\|𝒮\| = 2` は `R(χ)` を `m = ‖χ‖²` で二分する構成 (`isCoherent_pair_of_orthonormalImage`) |
 | (5.8) | ⬜ 要突合 (statement は在る) | μ-列の二分律を Hypothesis (4.6) 一般で (issue 0161、`AxiomsCheck:13782`) + **一意性 rider** (p.29、`S06_CertainTypeColumnUniqueness:54`)。書籍 pp.28-29 と未突合 |
-| (5.9)(a) | ⬜ 要突合 (statement は在る) | `S07_CoherenceGalois:94` (Dade 状況で `𝒮 ⊆ Irr L`, `\|𝒮\| ≥ 2`, 共役閉)。(5.9)(b) の有無も要確認。書籍 p.29 と未突合 |
+| (5.9) | ⬜ 要突合 / **(a)(b) とも statement は在る** | (a) `S07_CoherenceGalois:94` (Dade 状況で `𝒮 ⊆ Irr L`, `\|𝒮\| ≥ 2`, 共役閉)。**(b)** `DifferenceImage:1256` = 「`τ` が複素共役と可換なときの差分像の共役対応」(`CharacterDifferenceImage.nu_eq_mu_conj`)、§14 の (12.3) bar-trick が消費。書籍 p.29 と未突合 |
+
+**§5 の暫定まとめ (2026-08-07 時点)**: (5.1)/(5.2)/(5.3)(b)/(5.6) の oracle 懸念/(5.7) は監査済で
+**欠落ゼロ**。(5.3)(a)/(5.4)/(5.5)/(5.6) 本体/(5.8)/(5.9) は **statement の所在のみ確認、
+書籍 pp.25-29 との条項突合が未了**。
 
 ⚠ **既知の罠**: (5.3)(b) の族の条件は `θ ≠ 1_K` **ではなく** `H ⊄ Ker θ`
 (memory [[read-book-hypothesis-before-adding-side-condition]] — 過去に取り違えて 1 session 誤診した)。
