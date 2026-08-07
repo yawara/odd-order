@@ -233,7 +233,14 @@ docstring が「in particular 直交する」と**散文で主張**していた�
 | (4.6) Hypothesis | ✅ 構造体 (a)-(e) | `S06_CertainHypothesis46`。(a) `L` が (4.2) を満たす / (b) `G, W` が (3.1) / (c) `H ⊴ L`, `W₂ ⊆ H ⊆ K` / (d) 被覆条件 `⋃_{h∈H^#} C_K(h)^# ⊆ A ⊆ K^#` と `A₀ = A ∪ V^L` / (e) 記号と `τ` |
 | (4.7) | ✅ 実証明 (**5 主張とも**) | `S06_CertainTypeSupport`: (i) `Supp χ ⊆ A∪{1}` `:91`/`:110` / (ii) `Supp Ind_K^L χ ⊆ A∪{1}` `:130` / (iii) `j≥1 ⟹ H ⊄ Ker χ_j` `:185`/`:358` / (iv) `Supp χ_j ⊆ A∪{1}` `:394` / (v) `Supp μ_j ⊆ A∪{1}` `S06_CertainTypeCoherence:285`。構造形 `:43` は Dade 等長性に依らない一般版 |
 | (4.8) | ✅ 実証明 (**3 結論とも**) | 結論(1) `Supp(μ_ij − μ_ik) ⊆ A₀` (`FeitThompsonCharacterData:299` = `muS_diff_support`、engine は `S06_CertainTypeStructure:37`) / 結論(2) `δ_j = δ_k` (`certainType_columnSign_eq`, `S06_CertainTypeCoherence:332`) / 結論(3) 等長性同一式 (`S05_SigmaTrichotomy:267` + AxiomsCheck 2456)。⚠ **`FeitThompsonSection16Core` の構造体フィールド `mu_diff_support` は posited ではない** — `FeitThompson.lean:110` が `Section16CharacterData.muS_diff_support` から**実供給**しているのを確認した |
-| (4.9) (4.10) | ⬜ **未監査 (statement は存在)** | 書籍 p.24 は読了。**結論の突合が未了**。所在: (4.9)(a) `S06_CertainTypeConjugation:200,223,249,298` (`μ̄_j ∈ T`, `μ̄_j ≠ μ_j`) — ただし **`0 ≠ ℤ[T,L^#] = ℤ[T,A]` の節**が別途要確認 (`S10_SubcoherentTypeP:72,297` が (4.7) 由来として言及)。(4.9)(b) `S13_Lemmas113To115:288` は「**§10 interface form**」という語が付くので要注意。(4.10) `S06_CertainTypeFourCorner` (a)(b)(packaged)。次の作業単位 |
+| (4.9)(a) | ✅ 実証明 (主要主張) / ⚠ 1 節が未確認 | `S06_CertainTypeConjugation`: 共役 bridge `:200` / `μ̄_{ij} = μ_{i'j'}` `:223` / `μ̄_j = μ_{j'}` (列和形) `:249` / `μ̄_k ≠ μ_k` `:298`。`0 ≠` の部分は `certainType_nonzero` (`S06_CertainTypeCoherence:524`)。⚠ **`ℤ[T, L^#] = ℤ[T, A]` の等式そのものは statement として見つからない** — (4.7)(v) (`Supp μ_j ⊆ A ∪ {1}`) から従うはずで、repo は `IsCoherent` を最初から `ℤ[T,A]` 相対で述べるので不要になっている。`S10_SubcoherentTypeP:72,297` が下流でこの等式に言及し「(4.7) から得る」と書いている。**低優先の要確認** |
+| (4.9)(b) | ✅ 実証明 (全条項) | `certainType_isCoherent` (`S06_CertainTypeCoherence:554`) が書籍の (b) を丸ごと束ねる: 拡張 `ν : μ_{ij} ↦ δ_j ω_{ij}^σ` が `ℤ[𝒯]` 上で等長 (`:249`)、`ℤ[𝒯,A]` 上で `τ` と一致 (`:486`)、`ℤ[Irr G]` に着地 (`:206`)、かつ `ℤ[𝒯,A] ≠ 0`。生成系の補題 (`ℤ[𝒯,A]` は差 `μ_j − μ_k` で生成、`:416`) も書籍の証明どおり |
+| (4.10) | ✅ 実証明 (書籍の式そのもの) | `fourCorner_dade_eq` (`S06_CertainTypeFourCorner:432`): `(δ_j μ_{ij} − δ_j μ_{0j} − μ_{i0} + μ_{00})^τ = ω_{ij}^σ − ω_{0j}^σ − ω_{i0}^σ + ω_{00}^σ`。piece (a) `:38` (L 側 = 誘導)、piece (b) `:98` (W 側は `V` 上に台)、crux (c) `:389`、crux (d) `:303` から組み上げ |
+
+**§4 監査完了 (2026-08-07)**: 全 10 件のうち**未形式化ゼロ**。補充ゼロ (§4 は元から完全被覆)。
+⚠ 要確認 1 件 = (4.9)(a) の `ℤ[T,L^#] = ℤ[T,A]` 節 (上記、低優先)。
+⚠ 途中で (4.1) を「要確認」と誤判定した — grep を `S06_*.lean` に絞ったため。教訓は memory
+[[textbook-coverage-audit-failure-modes]] に記録済。
 
 ## 4. 未着手の census
 
