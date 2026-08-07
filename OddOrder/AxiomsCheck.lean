@@ -2744,6 +2744,12 @@ one-element lemma).  All axiom-clean. -/
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.IsTISubset.set_normalizer_eq_of_nonempty_of_normalizes
 
+-- **Peterfalvi §4 (2.7), "in particular" 節** — 「`χ` が各 `aH(a)` 上で定数なら
+-- `(α^τ, χ)_G = (α, Res_L^G χ)_L`」。一般形 `adjoint_formula` は平均 `ψ` を明示引数で取るが、
+-- 書籍が直後に (2.6.a) の証明で使うのはこの Res 形。repo には `χ = τβ` の特殊化
+-- (`adjointAverageFun_dadeMap_eq`、定数性が (2.5) から出る場合) しか無かった。2026-08-07 に補充。
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.adjoint_formula_restrict
+
 -- Peterfalvi §4 (2.8): the semidirect structure `M(B) = H(B) ⋊ N_L(B)` for a nonempty
 -- `B ⊆ A`, recorded as the order identity `|M(B)| = |H(B)| · |N_L(B)|` (internal-product
 -- bijection: `N_L(B)` normalizes `H(B)` by (2.4.a), and `H(B) ∩ N_L(B) = 1`).

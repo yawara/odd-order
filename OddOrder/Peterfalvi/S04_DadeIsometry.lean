@@ -722,6 +722,33 @@ theorem adjoint_formula
         rw [mul_comm (⅟(Nat.card G : ℂ)) (⅟(Nat.card L : ℂ)), mul_assoc,
           ← mul_assoc (⅟(Nat.card G : ℂ)), invOf_mul_self, one_mul]
 
+/-- **Peterfalvi (2.7), the "in particular" clause** (book p. 11): *if `χ` is constant on `aH(a)`
+for all `a ∈ A`, then `(α^τ, χ)_G = (α, Res_L^G χ)_L`.*
+
+The general (2.7) (`adjoint_formula`) takes the averaged `ψ` as an explicit input; the book then
+notes that when `χ` is already constant along each coset `a·H(a)`, that average *is* `Res_L^G χ`,
+so the adjoint of `τ` is plain restriction.  This is the form the book uses immediately, in the
+proof of (2.6.a).
+
+`adjointAverageFun_dadeMap_eq` below is the special case `χ = τ β` (where constancy comes from the
+(2.5) defining equation); this states the book's clause for an arbitrary such `χ`. -/
+theorem adjoint_formula_restrict
+    (τ : DadeMap (G := G) (k := ℂ) A L) (hτ : IsDadeMap hyp τ)
+    (α : SupportedClassFunctions (G := G) ℂ A L) (χ : ClassFunction G ℂ)
+    (hconst : ∀ (a : {a : G // a ∈ A}) (x : ↥(hyp.H a)), χ (a.1 * (x : G)) = χ a.1) :
+    ClassFunction.inner (τ α) χ =
+      ClassFunction.inner (α : ClassFunction L ℂ) (ClassFunction.restrict L χ) := by
+  classical
+  refine adjoint_formula hyp τ hτ α χ (ClassFunction.restrict L χ) fun a => ?_
+  -- The average of a constant is that constant.
+  simp only [adjointAverageFun, ClassFunction.restrict_apply]
+  rw [dif_pos a.2]
+  have hHne : (Nat.card (hyp.H ⟨a.1, a.2⟩) : ℂ) ≠ 0 := by
+    have : 0 < Nat.card (hyp.H ⟨a.1, a.2⟩) := Nat.card_pos
+    exact_mod_cast this.ne'
+  rw [Finset.sum_congr rfl (fun x _ => hconst ⟨a.1, a.2⟩ x), Finset.sum_const, Finset.card_univ,
+    ← Nat.card_eq_fintype_card, nsmul_eq_mul, ← mul_assoc, inv_mul_cancel₀ hHne, one_mul]
+
 omit [Fintype L] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card L : ℂ)] in
 /-- For a Dade map `τ` and `β : CF(L, A)`, the (2.7) averaging map applied to the
 class function `τ β` recovers `β` on `A`.
