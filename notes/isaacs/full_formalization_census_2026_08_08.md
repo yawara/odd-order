@@ -219,6 +219,23 @@ statement で在り、docstring も「**後半**」と明記していた。
 ⟹ **Ch.1 の進捗表・Ch.2 の実在しない補題名と合わせて、stale な自己注記はこの repo で
 最も頻出する誤判定源**。監査では**注記を読んだら必ず実体を grep する**。
 
-⬜ **残り: 3.13-3.22, 3.25-3.36 の条項突合**。
+**残り 3.13-3.22 / 3.25-3.36 も全件被覆を確認 (2026-08-08)**:
 
-### Ch.4-Ch.7, Ch.9-Ch.10 — 未着手
+| Isaacs | 実体 |
+|---|---|
+| 3.13 **Hall-E** / 3.14 **Hall-C** | `Ch03` `Basic.lean:630` / `:1007` (⚠ アンカー正規表現が 3.14 を無関係な docstring に誤マッチしていた) |
+| 3.15 (Hall E の逆) | ⚠ **`Ch07_ThompsonSubgroup/ForwardFromCh03.lean:34`** (owner chapter 規則で他章) |
+| 3.16 / 3.17 (Wielandt) | `Theorem315.lean:33` / `:194` |
+| 3.18-3.22 (π-separable / Hall–Higman 1.2.3) | `Ch03/Main.lean:28,273,521,620` |
+| 3.25-3.33 (coprime action) | `Ch04_Commutators/ForwardFromCh03.lean` ほか |
+| 3.34 | `exists_orbit_card_mul_of_coprime_orbit_card` (`HartleyTurull.lean:1126`) — **一般形**。abelian case (:1034) と Step 2 (:847) はその内部段 |
+| 3.35 / 3.36 | `CyclicExtensions.lean:39` / `:185` |
+
+⟹ **Ch.3 全 36 件被覆・補充ゼロ**。訂正は stale な自己注記 3 件のみ。
+
+⚠ **3.34 で危うく誤判定しかけた** — 先に目に入ったのが「Step 2 の τ-論法」「abelian case」
+だったため。ファイル冒頭の対応表 (`| Thm 3.34 | exists_orbit_card_mul_of_coprime_orbit_card | ✅ |`)
+と末尾の `theorem` 一覧を見て一般形の存在を確認した。**内部段の名前が先に当たっても、
+その file の endpoint を必ず確認する**。
+
+### Ch.4-Ch.7, Ch.9-Ch.10 — 未着手 (次の入口 = Ch.4 Commutators、38 件)

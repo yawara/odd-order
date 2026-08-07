@@ -118,6 +118,9 @@ repo の `Ch08_PermutationGroups` も既に `IsPreprimitive` を使っている�
       - **Ch.2 監査完了 (2026-08-08)**: 全 20 件。補充 1 件 (**2.4** `S ∩ T ⊴⊴ G`)。
         ⚠ file-header が実在しない `Subgroup.IsSubnormal.inf` を挙げていたのが検出経路。
         ⚠ 2.20 (Lucchini) の本体は owner chapter 規則で **Ch04** に在る。
+      - **Ch.3 監査完了 (2026-08-08)**: 全 36 件被覆・**補充ゼロ**。訂正は stale な
+        自己注記 3 件のみ (進捗表「3.11 まで」/ 3.11 の「TODO・新規実装候補」/
+        3.23-3.24 の「placeholder ~8-12 週」— いずれも実装済だった)。
       - 1 章ぶん終えるごとに census note を更新して commit。
 
 ## 完了条件
