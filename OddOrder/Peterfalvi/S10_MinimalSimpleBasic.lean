@@ -684,6 +684,58 @@ theorem escapingCentralizers_control [Finite G]
   · exact OddOrder.BG.Ch4.S16.existsUnique_maximal_centralizer_le_typeI_or_typeII hG hM
       (key x hx) hx.2
 
+/-- **Peterfalvi (8.13)(c3) for a Type-I supporting maximal** (p. 47).
+
+> (c) Let `x ∈ D` and let `L` be the maximal subgroup with `C_G(x) ⊆ L`.  Then …
+>     (c3) `x ∈ A(L) − A₁(L)`.
+
+BG Theorem D(4) already carries this clause: its rich `∃! N` predicate has
+`x ∈ ASet N ⊤ ∖ M_σ(N)` as its fourth component (`TheoremsAE`).  With `U = ⊤` the BG support
+`ASet N ⊤` is all of `hatMsigma N`, and on Type I that is `A(N)` up to the identity
+(`typeA_eq_hatMsigma_sdiff_one_of_typeI`); the removed `M_σ(N)` is `A₁(N)`'s ambient group
+(`A1_eq_sigmaSharp`), so `x ∉ M_σ(N)` gives `x ∉ A₁(N)` outright.  The supporting `L` is pinned
+to the `N` of Theorem D(4) because `ℳ(C_G(x))` is a singleton
+(`maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`).
+
+⚠ Type II is **not** covered: there `A(L)`'s host is `L'` by (8.10), and Theorem D(4)'s
+`hatMsigma`-membership only gives `x ∈ L`. -/
+theorem escaping_mem_typeA_notMem_A1_of_typeI [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {x : G} (hxM : x ∈ OddOrder.BG.Ch4.S14.sigmaSharp M)
+    (hesc : ¬ Subgroup.centralizer ({x} : Set G) ≤ M)
+    {L : Subgroup G} (hL : L ∈ maximalSubgroups G)
+    (hCL : Subgroup.centralizer ({x} : Set G) ≤ L)
+    (htauL : HasPeterfalviType PeterfalviType.I L) :
+    x ∈ OddOrder.GroupTheory.typeA L PeterfalviType.I ∧
+      x ∉ OddOrder.GroupTheory.A1 L PeterfalviType.I := by
+  classical
+  -- Theorem D(4) at `x`, and its fourth predicate component.
+  obtain ⟨_, _, _, hD4⟩ :=
+    OddOrder.BG.Ch4.S16.theoremD_msigma_conjugacy_and_centralizers hG hM
+  obtain ⟨_R, _hR, N₀, hQN₀, _hQuniq⟩ := hD4 x hxM hesc
+  obtain ⟨hN₀mem, _, _, hxA, _, _⟩ := hQN₀
+  -- `ℳ(C_G(x))` is a singleton, so the given `L` *is* `N₀`.
+  obtain ⟨N, hMC⟩ :=
+    OddOrder.BG.Ch4.S16.maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape
+      hG hM hxM hesc
+  have hLN₀ : L = N₀ := by
+    have h1 : L ∈ OddOrder.GroupTheory.maximalSubgroupsContaining
+        (Subgroup.centralizer ({x} : Set G)) :=
+      OddOrder.GroupTheory.mem_maximalSubgroupsContaining.mpr ⟨hL, hCL⟩
+    rw [hMC, Set.mem_singleton_iff] at h1
+    rw [hMC, Set.mem_singleton_iff] at hN₀mem
+    rw [h1, hN₀mem]
+  subst hLN₀
+  obtain ⟨hxASet, hxnMσ⟩ := hxA
+  -- `ASet L ⊤ = hatMsigma L` (the `U = ⊤` support is the whole `σ`-saturation).
+  have hxhat : x ∈ OddOrder.BG.Ch4.S16.hatMsigma L := hxASet.1
+  have hxnMσ' : x ∉ OddOrder.BG.Ch3.S10.Msigma L := fun h => hxnMσ (SetLike.mem_coe.mpr h)
+  have hx1 : x ≠ 1 := fun h => hxnMσ' (h ▸ (OddOrder.BG.Ch3.S10.Msigma L).one_mem)
+  refine ⟨S10.mem_typeA_of_mem_hatMsigma_of_typeI hG hL htauL hxhat hx1, ?_⟩
+  -- `A₁(L) = M_σ(L)^# ⊆ M_σ(L)`, and `x ∉ M_σ(L)`.
+  rw [OddOrder.BG.Ch4.S16.A1_eq_sigmaSharp hG hL htauL]
+  exact fun h => hxnMσ' h.1
+
 /-- **Mixed-case vacuity for the type-`P₁` `A_0`-support**: an `M_σ^#`-point (`= A(M)` for `P₁`) and
 a `V^M`-point are never `G`-conjugate.  An `M_σ^#`-point is a `σ(M)`-element, conjugation preserves
 this, and a `σ(M)`-element `v ∈ M` lies in the normal `σ`-Hall `M_σ = M'` (type `P₁`), contradicting

@@ -628,6 +628,68 @@ theorem A1_eq_sigmaSharp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rw [OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG hM htau]
   rfl
 
+/-- **The Type-I converse of `typePACore_subset_hatMsigma`: `hatMsigma M ∖ {1} ⊆ A(M)`.**
+
+By (8.10) (p. 47), on Type I the support is `A(M) = ⋃_{x ∈ H^#} C_M(x)^#` — the host is `M`
+itself, and `H = M_F = M_σ` (`mainSubgroup_eq_Msigma`).  BG's `hatMsigma M = {a ∈ M |
+M_σ ⊓ C_G(a) ≠ 1}` says exactly that `a ∈ M` centralizes some `x ∈ M_σ^#`, and for `a ∈ M`
+the conditions `a ∈ C_M(x)` and `a ∈ C_G(x)` agree.  So on Type I the two sets differ only by
+the identity, which `hatMsigma` does not exclude.
+
+Together with `typePACore_subset_hatMsigma` this identifies `A(M) = hatMsigma M ∖ {1}` on
+Type I; it is what turns BG Theorem D(4)'s `x ∈ ASet N ⊤ ∖ M_σ(N)` into Peterfalvi
+(8.13)(c3)'s `x ∈ A(N) − A₁(N)`. -/
+theorem mem_typeA_of_mem_hatMsigma_of_typeI [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (htau : HasPeterfalviType PeterfalviType.I M)
+    {y : G} (hy : y ∈ OddOrder.BG.Ch4.S16.hatMsigma M) (hy1 : y ≠ 1) :
+    y ∈ OddOrder.GroupTheory.typeA M PeterfalviType.I := by
+  obtain ⟨hyM, hne⟩ := hy
+  refine ⟨hyM, hy1, ?_⟩
+  -- `M_σ ⊓ C_G(y) ≠ 1` supplies a nonidentity `x ∈ M_σ` centralizing `y`.
+  obtain ⟨x, hxmem, hx1⟩ : ∃ x ∈ OddOrder.BG.Ch3.S10.Msigma M ⊓
+      Subgroup.centralizer ({y} : Set G), x ≠ 1 := by
+    by_contra hall
+    push Not at hall
+    exact hne (by
+      rw [eq_bot_iff]
+      intro z hz
+      exact Subgroup.mem_bot.mpr (hall z hz))
+  obtain ⟨hxMσ, hxCy⟩ := Subgroup.mem_inf.mp hxmem
+  refine ⟨x, ?_, ?_⟩
+  · -- `x ∈ (mainSubgroup M .I)^# = M_σ^#`
+    rw [OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG hM htau]
+    exact ⟨hxMσ, hx1⟩
+  · -- `y ∈ C_G(x)`, the symmetric form of `x ∈ C_G(y)`
+    rw [Subgroup.mem_centralizer_singleton_iff] at hxCy ⊢
+    exact hxCy.symm
+
+/-- **`A(M) = hatMsigma M ∖ {1}` on Type I** (both inclusions).  See
+`mem_typeA_of_mem_hatMsigma_of_typeI` for the substance. -/
+theorem typeA_eq_hatMsigma_sdiff_one_of_typeI [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (htau : HasPeterfalviType PeterfalviType.I M) :
+    OddOrder.GroupTheory.typeA M PeterfalviType.I =
+      OddOrder.BG.Ch4.S16.hatMsigma M \ {(1 : G)} := by
+  ext y
+  constructor
+  · rintro ⟨hyM, hy1, x, hxσ, hyC⟩
+    obtain ⟨hxMσ, hx1'⟩ := (Set.mem_sdiff _).mp hxσ
+    rw [OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG hM htau] at hxMσ
+    have hx1 : x ≠ 1 := fun h => hx1' (Set.mem_singleton_iff.mpr h)
+    refine ⟨⟨hyM, ?_⟩, hy1⟩
+    intro hbot
+    have hxCy : x ∈ Subgroup.centralizer ({y} : Set G) := by
+      rw [Subgroup.mem_centralizer_singleton_iff] at hyC ⊢
+      exact hyC.symm
+    have hmem : x ∈ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({y} : Set G) :=
+      Subgroup.mem_inf.mpr ⟨SetLike.mem_coe.mp hxMσ, hxCy⟩
+    rw [hbot] at hmem
+    exact hx1 (Subgroup.mem_bot.mp hmem)
+  · rintro ⟨hy, hy1⟩
+    exact mem_typeA_of_mem_hatMsigma_of_typeI hG hM htau hy
+      (fun h => hy1 (Set.mem_singleton_iff.mpr h))
+
 /-- A type-`P₁` maximal is not of Peterfalvi Type I: Type I is BG type `F` (`κ(M) = ∅`,
 `isTypeI_iff_isTypeF`) while type `P₁` has `κ(M)` nonempty. -/
 theorem ne_typeI_of_isTypeP1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)

@@ -78,9 +78,21 @@ created: 2026-08-07
       `[N,N] = H ⋊ U` (書籍 (8.12)) から `H ≤ N'` は出るが、「`H^#` の元を中心化する `x ∈ N`」が
       `N'` に入る理由は自明でない。
 
-- [ ] **次の作業**: (i) Type I 版を先に landing させる (完全に閉じているので即書ける)。
-      (ii) Type II 版の `x ∈ N'` をどこから取るか特定する — 候補は BG Theorem B(5)
-      (`A(M) − M_σ` の TI 性) か、書籍 (8.13)(c1) の `C_G(x) = C_{L_F}(x) ⋊ C_M(x)` 分解。
+- [x] **Type I 版を landing (2026-08-08)**。新規 3 定理、すべて axiom-clean:
+
+      ```
+      S10_StructureSetup.mem_typeA_of_mem_hatMsigma_of_typeI    hatMsigma M ∖ {1} ⊆ A(M)
+      S10_StructureSetup.typeA_eq_hatMsigma_sdiff_one_of_typeI  A(M) = hatMsigma M ∖ {1}
+      S10_MinimalSimpleBasic.escaping_mem_typeA_notMem_A1_of_typeI   ← (8.13)(c3) 本体
+      ```
+
+      新しい数学は不要で、**BG Theorem D(4) の第 4 成分を Peterfalvi の語彙へ翻訳する**仕事だった。
+      `L` の同定は `maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`
+      (`ℳ(C_G(x))` の単元性)、`x ∉ A₁(L)` は `A1_eq_sigmaSharp` 経由。
+
+- [ ] **残: Type II 版**。host が `L'` なので `x ∈ L'` が別途要り、D(4) は `x ∈ L` までしか
+      与えない。候補は BG Theorem B(5) (`A(M) − M_σ` の TI 性) か、書籍 (8.13)(c1) の
+      `C_G(x) = C_{L_F}(x) ⋊ C_M(x)` 分解 (`C_M(x) ≤ L'` が出せれば済む)。
 - [ ] 組み立て: `escapingCentralizers_control` と同じ入口
       (`mem_sigmaSharp_of_mem_aSet_of_escape` / `A1_eq_sigmaSharp` で `x ∈ sigmaSharp M`)
       → D(4) → 第 3/4/5 成分 → 結論。`L` の同定は
@@ -89,7 +101,7 @@ created: 2026-08-07
 
 ## 完了条件
 
-型一律の形 (任意の Peterfalvi 型の `M`、`X = A(M)` または `A₀(M)`) で
+**Type I は 2026-08-08 に達成済**。残るは Type II。型一律の形 (任意の Peterfalvi 型の `M`、`X = A(M)` または `A₀(M)`) で
 
 ```
 x ∈ D → C_G(x) ≤ L → L ∈ maximalSubgroups G →

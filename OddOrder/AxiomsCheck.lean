@@ -12550,6 +12550,31 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.A1_subset_typeA
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.ne_typeI_of_isTypeP1
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typeA_eq_A1_of_isTypeP1
+/-! ### Peterfalvi (8.13)(c3) — Type I の支持極大 (issue 0174、2026-08-08)
+
+書籍 (8.13)(c) は `x ∈ D` と `C_G(x) ⊆ L` なる極大 `L` について 4 条項を主張し、そのうち
+**(c3) `x ∈ A(L) − A₁(L)`** だけが未形式化だった。**BG Theorem D(4) が既に運んでいた**:
+その rich `∃! N` 述語の第 4 成分が `x ∈ ASet N ⊤ ∖ M_σ(N)`。
+
+  mem_typeA_of_mem_hatMsigma_of_typeI     `hatMsigma M ∖ {1} ⊆ A(M)` (Type I)
+  typeA_eq_hatMsigma_sdiff_one_of_typeI   両包含 = `A(M) = hatMsigma M ∖ {1}`
+  escaping_mem_typeA_notMem_A1_of_typeI   **(8.13)(c3) 本体** (Type I)
+
+書籍 (8.10) (p.47) の定義: Type I は `A(M) = ⋃_{x∈H^#} C_M(x)^#` で **host が `M`**、
+type 𝒫 は host が `M'`。`U = ⊤` の BG 支持 `ASet N ⊤` は `hatMsigma N` (host `N`) なので
+Type I とちょうど噛み合う。`x ∉ M_σ(N)` は `A₁(N) = M_σ(N)^#` (`A1_eq_sigmaSharp`) から
+`x ∉ A₁(N)` を直に与える。`L` の同定は `ℳ(C_G(x))` の単元性。
+
+⚠ **Type II は未カバー**: host が `L'` なので `x ∈ L'` が別途要り、D(4) は `x ∈ L` までしか
+与えない (issue 0174 に残作業として記録)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S10.mem_typeA_of_mem_hatMsigma_of_typeI
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S10.typeA_eq_hatMsigma_sdiff_one_of_typeI
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S10.escaping_mem_typeA_notMem_A1_of_typeI
+
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.not_isTypeP1_of_mem_typeA_not_mem_A1
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.isTypeI_or_isTypeII_of_mem_typeA_not_mem_A1
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typeP_centralizer_unique_of_mem_typePACore
