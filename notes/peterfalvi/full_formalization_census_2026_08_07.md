@@ -348,6 +348,30 @@ docstring が「in particular 直交する」と**散文で主張**していた�
 - **§6 で見つけた「結論が 2 つある定理の片方だけ」型は §7 では発生していない** —
   (7.2)(b)/(7.3) の等号条件、(7.8)(c) の (i)(ii) がいずれも揃っている。
 
+### §8 = repo `S10` (書籍 pp.44-49、`pages/peterfalvi-p044..p049.png` 切り出し済) — **監査途中 ((8.1)-(8.9) 済)**
+
+書籍 §8 は番号付き結果 **18 件 ((8.1)-(8.18))**。うち多くは「型」の定義で、監査の問いは
+「repo の定義が書籍の条項を全部持っているか」。
+
+| 書籍 | 判定 | repo の実体 / 備考 |
+|---|---|---|
+| (8.1) 型 `𝓕` の定義 | ✅ 条項一致 | `GroupTheory.TypeFData` (`MaximalSubgroupType.lean:82`)。(a) `H = M_F ≠ 1`・`U ≠ 1`・`M = H ⋊ U` = `H_eq`/`H_nontrivial`/`U_nontrivial`/`complement` / (b) `U₁ ⊴ U` 可換・`C_U(x) ⊆ U₁` (`x ∈ H^#`) = `U1_normal`/`U1_commutative`/`centralizer_le_U1` / (c) `U₀ ≤ U`, `exp U₀ = exp U`, `HU₀` が核 `H` の Frobenius = `U0_le`/`exponent_eq`/`frobenius_HU0` |
+| (8.2)(a) | ✅ 実証明 | `S10.typeF_card_U0_eq_exponent` (`\|U₀\| = exp(U)`; [BG] Prop 3.9 経由の Z-群 ⟹ `exp = card`) |
+| (8.2)(b) | ⚠ **片側だけだった → 2026-08-07 に同値を補充** | 書籍は「`M` が核 `H` の Frobenius **⟺** `U` の Sylow 部分群が巡回」。repo は `⟸` 側のみ (`typeF_frobenius_of_card_eq_exponent` = `\|U\| = exp(U)` 版、および S14 にあった `IsZGroup` 版)。⟹ `S10.typeF_frobenius_iff_isZGroup` を追加 (`⟹` 側 = 奇数位数 Frobenius 補元は Z-群 [BG] Prop 3.9)。併せて `⟸` 側の一般形を `S10.typeF_frobenius_of_isZGroup` として §8 に置き、**S14 にあった同証明の重複を削除** |
+| (8.2)(c) | ✅ 実証明 | `S14.typeF_inertia_inf_le_U1` (`I(θ) ⊓ U ≤ U₁` for `θ ∈ Irr H ∖ {1}`) |
+| (8.3) Type I の定義 | ✅ 条項一致 | `TypeIData` = `typeF` + 3 択 (`H^#` TI / `H` 可換 rank 2 / 全ての `p \| \|H\|` で `exp U \| p−1` かつ ある `p` で `O_{p'}(M)` 巡回) |
+| (8.4) 型 `𝒫` の定義 | ✅ 条項一致 (2 点の設計差は導出可能) | `TypePData`。(a) `M = M' ⋊ W₁`, `W₁ ≠ 1` 巡回 = `M_complement`/`W1_nontrivial`/`W1_cyclic` — ⚠ **書籍の「Hall」条項は field でない**。代わりに `W_cyclic` (= `W = W₁W₂` 巡回) を持つ (Hall の帰結)。Hall 性は極小単純奇の設定で `S12.typePData_W1_isHallSubgroup_kappa` が**定理として証明**している / (b) `U ≤ M'` 冪零・`W₁` が正規化・`M' = H ⋊ U` = `U_le`/`U_nilpotent`/`W1_normalizes_U`/`derived_complement` / (c) `H` 非巡回・`M'' ⊆ HC_M(H) = F(M) ⊆ M'` = `H_noncyclic`/`secondDerived_le_fitting`/`fitting_eq` (⚠ `fitting_eq` は **(8.5)(a) の形** `F(M) = H·C_U(H)` で持つ — 書籍の (8.4.c) と (8.4.b) から同値。⟹ (8.5)(a) は projection で、producer が discharge) / (d) `W₂ ≠ 1` 巡回 `≤ H ⊓ M''`・`C_{M'}(x) = W₂` (`x ∈ W₁^#`) = `W2_*`/`centralizer_W1` / (e) `W = W₁W₂`, `V = W ∖ (W₁∪W₂)`, 任意の空でない `X ⊆ V` で `N_G(X) = W` = `W_eq`/`normalizer_V` |
+| (8.5) | ✅ (a) は carrier field 化 / (b)(c) は要確認 | (a) `F(M) = HC_U(H)` = `TypePData.fitting_eq` (上記)。(b) `[U,U]` は `H` を中心化・`U ≠ 1` なら `U` は `H` を中心化しない / (c) `V` は正規化群 `W` の TI-subset = `normalizer_V` + TI。⬜ (b) の 2 条項と (c) の TI 部分の突合は次回 |
+| (8.6) Type II/III/IV の定義 | ✅ 条項被覆 (TI 条項の所在が違う) | `TypeIIData`/`TypeIIIData`/`TypeIVData` = `typeP` + `TypePNontrivialCore` + 型別条項。(b II) `U` 可換・`N_G(U) ⊄ M`・`M'` が型 `𝓕` で `(M')_F = H` = `U_commutative`/`normalizer_not_le`/`derived_typeF`/`derived_fitting_eq` ✓ / (b III)(b IV) ✓。⚠ **(8.6)(a) の TI 条項の読み替え**: 書籍は「`F(M)^#` が `G` の TI-subset」だが `TypePNontrivialCore` は「`M_F^#` が TI」を持つ (Dade base が使う形)。**書籍の形は別に定理として在る** — `S13.fittingIsTI_of_isTypeNonI` が `FittingIsTI M = IsTISubset (F(M)^#) (N_G(F(M)))` を**全ての非 Type-I 極大部分群**について証明 (BG Thm 15.7(a) / type-`P₂` 経路)。⟹ 被覆済 (carrier の `M_F^#` 版は書籍にない**追加**条項で、producer が discharge) |
+| (8.7) Type V の定義 | ✅ 条項一致 | `TypeVData` = `typeP` + `U = ⊥` + 3 択 ((a) `H^#` TI / (b) `\|W₁\| \| p−1` かつ `O_{p'}(H)` 巡回 / (c) `\|O_p(H)\| = p³`, `\|W₁\| \| p+1`, `O_{p'}(H)` 巡回) |
+| (8.8) | ✅ 実証明 (BG Thm I 経由) | `S10.maximalSubgroup_type_dichotomy` (型言語) + `S14.theorem88_dichotomy` (W/S/T データ込み)。(b1)-(b4) の条項は BG Theorem I から |
+| (8.9) | ✅ **2026-08-07 に形式化** (本キャンペーンのステップ 1) | `S10_Theorem88CaseB.Theorem88CaseBData.typePData_W2_eq` + 内在形 `derivedInG_inf_centralizer_W1_eq`。副産物として (8.8.b) の carrier に 6 条項を補充 |
+
+⬜ **残り ((8.10)-(8.18))**: (8.10) `M_s`/`A₁`/`A`/`A₀` の記法、(8.11) `N_G(P) ⊆ M` と Hall 性、
+(8.12) type I/II の 3 条項、(8.13) escaping-centralizer 定理 (a)(b)(c1-c3)、(8.14) `R(x)`/`Ã` の記法、
+(8.15) `M = N_G(A)` + (2.2)/(4.6) の成立、(8.16) type II の TI、(8.17) BG Theorem E の被覆、
+(8.18) 支持関係の 3 条項。
+
 ## 4. 未着手の census
 
 - **Part II (Suzuki の定理 A、書籍 pp.97-134)** — `Proposition N` / `Lemma N` の**章内リセット
