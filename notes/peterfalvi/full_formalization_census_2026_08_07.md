@@ -221,13 +221,16 @@ docstring が「in particular 直交する」と**散文で主張**していた�
 
 | 書籍 | 判定 | repo の実体 / 備考 |
 |---|---|---|
-| (4.1) | ⚠ **要確認** | 「`α,β,γ,δ ∈ ±Irr(X)`、`(α,β)=(γ,δ)=(α−β,uγ−vδ)=0` かつ次数条件 ⟹ 4 つは pairwise 直交」。`S06_CertainTypeIsometry:444` 等が「(4.1) により」と**消費側から言及**するが、`**Peterfalvi (4.1)**` の bolded statement が見つからない。⚠ (1.8) と同じ「消費点でしか言及されない」型の可能性 — **結論の形** (pairwise orthogonal + signed irreducibles + 実係数 `u,v`) で検索し直すこと。`InducedIrreducible.lean` の `SignedIrreducible` 節に在る可能性が高い (そこの docstring が「Peterfalvi (4.1) は…§4.3, §6.8.1, §9.5, §10.3, §14.1 で使う」と書いている) |
+| (4.1) | ✅ 実証明・書籍と逐条一致 | `InducedIrreducible.pairwise_inner_eq_zero_of_orthogonal_signedDifference` (+ 核 `inner_eq_zero_of_orthogonal_signedDifference`)。仮説 4 本 (`α,β,γ,δ` が norm-1 の `ZIrr` 元 / `(α,β)=(γ,δ)=0` / `(α−β, uγ−vδ)=0` / 両差が `1` で消える、`u,v` は非零実数) と結論 (4 つの交差内積すべて 0) が書籍どおり。⚠ **前回「要確認」としたのは誤り** — grep を `S06_*.lean` に絞ったせいで見落とした。§4 の結果が `GroupTheory/RepresentationTheory/` に在る例で、(1.8) と同型の教訓 |
 | (4.2) Hypothesis | ✅ 構造体 | certain-type hypothesis ((a) `L = K ⋊ W₁`、(b) `C_K(x) = W₂`、(c) `W` 奇位数) |
 | (4.3)(a) | ✅ 実証明 (両半分) | TI part `S06_DadeIsometryCertain:237` + Hypothesis (3.1) 成立 `:408`、centralizer form `:190` |
 | (4.3)(b) | ✅ 実証明 | `columnFamily` (`S06_MuColumnBridge`)。`μ_{ij}` の pairwise distinct と `Ind_W^L(ω_{ij} − ω_{0j}) = δ_j(μ_{ij} − μ_{0j})` |
 | (4.3)(c) | ✅ **両文とも実証明** | 第 1 文 (値の同定) `S06_CertainTypeCharacters:1006`、**第 2 文 (completeness、`μ_{ij}` でない既約は `W − W₂` 上で消える)** `:1048`。⚠ (3.2)(d) と同じ形なので確認したが、こちらは在った |
 | (4.3)(d) | ✅ 実証明 | 次数合同 `μ_{ij}(1) ≡ δ_j (mod w₁)` `S06_CertainTypeCharacters:1065` |
-| (4.4)-(4.10) | ⬜ **未監査** | 書籍 pp.22-24 未読。(4.5.b)/(4.6)(a)-(e)/(4.7)/(4.9)(a) は bolded statement を確認済だが**書籍と未突合**。次の作業単位 |
+| (4.4) | ✅ 実証明 (全条項) | `S06_CertainTypeCharacters`: 完全特徴づけ `:1309` (「`μ_{i0}` = 核が `K` を含む `L` の既約指標」) + 両方向 (`:1191` `:1277`) + アンカー `δ₀ = 1`, `μ₀₀ = 1_L` `:1149` |
+| (4.5)(a) | ✅ 実証明 (3 主張とも) | `S06_CertainTypeClifford`: `i` に依らない `:614` / `χ_j ∈ Irr(K)` `:747` / `Ind_K^L χ_j = μ_j` `:758` |
+| (4.5)(b) | ✅ 実証明 (**"Moreover" 節込み** 3 主張とも) | 第 1 文 `:970` / `Ind_K^L χ ≠ μ_{ij}` `:983` / 網羅性 (`L` の既約は `μ_{ij}` か `Ind_K^L χ`) `:1005`。⚠ "Moreover" 型なので重点確認したが揃っていた |
+| (4.6)-(4.10) | ⬜ **未監査 (statement は存在)** | **書籍 pp.23-24 を未読**。bolded statement の所在のみ確認: (4.6) `S06_CertainHypothesis46` (a)-(e) / (4.7) `S06_CertainTypeSupport` 複数形 / (4.8) `FeitThompsonNuGrid:477`・`FeitThompsonCharacterData:299` / (4.9)(a) `S06_CertainTypeConjugation:200,223,249,298` / (4.10) `S06_CertainTypeFourCorner` (a)(b)。⚠ **結論を書籍と未突合**。⚠ (4.8)/(4.9)(a) は `FeitThompsonSection16Core` に**構造体フィールド**としても現れる (`:255` `:268` `:408` `:420`) ので、そちらが posited なのか上記 top-level 定理から供給されるのかを確認すること |
 
 ## 4. 未着手の census
 
