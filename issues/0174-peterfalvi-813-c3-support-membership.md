@@ -145,10 +145,26 @@ created: 2026-08-07
 
 - [ ] **次の作業 (BG レーン)**: `LocalTaxonomy.lean:930` の D(4) 第 4 成分を
       `ASet N ⊤` から **型依存の `A(N)`** (Type II なら `ASet N U₀`、`U₀` = matched
-      `(κ∪σ)'`-Hall) へ強める。材料の一部は既に在る:
-      `S15.typeP_hall_derived_eq_and_derived` (`derivedInG N = U₀ ⊔ M_σ N`) /
-      `S10_TypePSupport.typePACore_subset_ASet`。⟹ 強化後、Peterfalvi (8.13)(c3) の Type II は
-      Type I 版と同じ 10 行程度で出る。
+      `(κ∪σ)'`-Hall) へ強める。
+
+      **BG 側の証明鎖を特定済 (2026-08-08)**。BG は Theorem D に schematic proof しか付けない
+      (mmd L4455):
+
+      > Theorem D — Corollary 15.3(b) → (1) / Lemma 12.17 → (2) /
+      > **Theorem 14.4(b), Theorem A(8), Corollary 15.9 → (3)(4)**
+
+      **Corollary 15.9** (mmd L4313、Feit-Thompson 1991 + Sibley の未公刊部分) の証明が
+      `x ∈ N'` に必要な構造を出す:
+
+      - `{N} = ℳ(C_G(x))`、`N ∈ ℳ_{𝒫₂}`、`r ∈ τ₂(N) ∩ σ(M)`、`M ∩ N` は `N_σ` の補元 (15.3)
+      - `K₁` = `M ∩ N` の `κ(N)`-Hall で **`\|K₁\|` は素数**、`M ∩ N = K₁ ⋉ U₁` で `U₁` は
+        可換正規補元、`C_{U₁}(K₁) = 1` (Prop 14.2(g),(a))
+      - `R` (`M∩N` の Sylow `r`) について **`R ⊆ U₁`** かつ `N_G(R) ⊆ M` (Cor 12.10(d))
+      - `K₁ ∩ M_σ = 1` (`K₁R` が非冪零ゆえ)
+
+      ⟹ `x ∈ M_σ ∩ (M∩N)` が `U₁` に入ること (= `x ∈ N'`) を、この鎖から出すのが本体。
+      repo 側の対応物 (`Proposition 14.2` / `Corollary 12.10(d)` / `Theorem 15.7(d)` /
+      `Theorem 15.8`) の実在確認から始める。**BG §14/§15 の実作業で、10 行では済まない。**
 - [ ] 組み立て: `escapingCentralizers_control` と同じ入口
       (`mem_sigmaSharp_of_mem_aSet_of_escape` / `A1_eq_sigmaSharp` で `x ∈ sigmaSharp M`)
       → D(4) → 第 3/4/5 成分 → 結論。`L` の同定は
