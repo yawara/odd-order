@@ -67,4 +67,32 @@ pat = re.compile(r'^\s*(' + kinds + r')\s+(\d(?:\s*\d)?)\s*\.\s*(\d(?:\s*\d)?)(?
 
 ## 4. 逐条監査
 
-⬜ **未着手** (次の入口 = §1、22 件)。
+### §1 Preliminary Results (22 件、書籍 pp.1-30) — **監査完了 (2026-08-08)**、補充ゼロ
+
+**22/22 参照あり**。`S01_FrattiniBurnside.lean` の file header が §1A-§1G の全番号を
+Isaacs / mathlib / 本 repo の 3 列で対応づける**マスター対応表**を持っており、それを
+実体で裏取りした。
+
+⚠ **stale 注記を 2 件訂正** — 対応表に「**Phase 1 待ち**」のまま残っていた:
+
+| 番号 | 表の記載 | 実体 |
+|---|---|---|
+| **Thm 1.8** (Burnside, operator on `p`-group) | 「mathlib: (Ch.1 §1B TODO) / 本ファイル: **Phase 1 待ち**」 | ✅ `S01_BurnsideOperator.burnside_operator` (元形も :153) |
+| **Thm 1.11** | 「mathlib: Phase 1 Ch.4 §4D / 本ファイル: **Phase 1 待ち**」 | ✅ `Isaacs/Ch04_Commutators/Main/BaerTrick.lean:254` (docstring が「= BG Thm 1.11」と明記) |
+
+🚨 **1.8 は同一ファイル内で矛盾していた** — :63 の表が「Phase 1 待ち」なのに、
+**同じファイルの :152** が `Thm 1.8` `burnside_operator` ⭐ sorry-free` と記録していた。
+⟹ **1 つの file 内でも注記どうしが食い違う**。Isaacs 監査で「注記は判定の証拠ではない」を
+確立したが、BG ではさらに強く「**同じ file の別の注記とすら一致しない**」ことがある。
+
+⚠ **1.11 は Isaacs 側のディレクトリに在る** — owner chapter 規則。BG のディレクトリだけ
+見ると「未形式化」と誤判定する (Isaacs 2.20 / 3.15 / 3.23 と同じ型で通算 4 回目)。
+
+その他の §1 は mathlib 被覆と repo 実装が対応表どおり:
+`Lem 1.7` は 4 条項 (a)/(b)(c⇒)(d⊇)/(c⇐)/(d⇐) に分けて全て sorry-free、
+`Thm 1.13` = `GroupTheory.CriticalSubgroup` の `thompson_critical_omega`、
+§1F (`Thm 1.17`/`1.18`/`Cor 1.19`/`Thm 1.20`) は **mathlib 直接**。
+
+⟹ **§1 全 22 件被覆・補充ゼロ**。
+
+### §2-§16 + Theorems A-E + 補章 — 未着手 (次の入口 = §2、7 件)

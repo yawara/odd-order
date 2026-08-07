@@ -91,7 +91,14 @@ pat = re.compile(r'^(Theorem|Proposition|Lemma|Corollary)\s+(\d{1,2})\.(\d{1,2})
       - **補章**: `Kind X.N` が 14 件。⬜ 各補章の `.1` が未発見で要確認。
 - [x] **census note を新設 (2026-08-08)**:
       [`notes/bg/full_formalization_census_2026_08_08.md`](../notes/bg/full_formalization_census_2026_08_08.md)
-- [ ] **ステップ 2**: §1 から文書順に逐条監査。1 節ぶん終えるごとに census note を更新して commit。
+- [ ] **ステップ 2 (進行中)**: §1 から文書順に逐条監査。
+      - **§1 監査完了 (2026-08-08)**: 全 22 件被覆・**補充ゼロ**。
+        ⚠ **stale 注記 2 件を訂正** — `S01_FrattiniBurnside.lean` の対応表が Thm 1.8 と
+        Thm 1.11 を「**Phase 1 待ち**」のまま残していた (どちらも実装済)。
+        🚨 とくに **1.8 は同一ファイル内で矛盾**していた (:63 が「Phase 1 待ち」、
+        :152 が「⭐ sorry-free」)。
+        ⚠ **1.11 は Isaacs 側のディレクトリに在る** (owner chapter 規則、通算 4 回目)。
+      - 1 節ぶん終えるごとに census note を更新して commit。
 
 ## 完了条件
 

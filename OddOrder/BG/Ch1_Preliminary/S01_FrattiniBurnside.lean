@@ -60,10 +60,12 @@ CLAUDE.md no-mathlib-wrapper policy 準拠: mathlib 直接対応がある §1F �
   - Isaacs FGT: Ch.1 Fitting maximality + solvable commutator descent
   - mathlib: —
   - 本ファイル: ✅ **sorry-free**
-- Thm 1.8
-  - Isaacs FGT: Thm 1.8
-  - mathlib: (Ch.1 §1B TODO)
-  - 本ファイル: Phase 1 待ち
+- **Thm 1.8**
+  - Isaacs FGT: Isaacs Cor 3.29 (`aFixed_quotient_frattini`) 経由
+  - mathlib: —
+  - 実体: ✅ **`S01_BurnsideOperator.burnside_operator`** (元形も同ファイル :153)
+  - ⚠ 以前は「Phase 1 待ち」のままだった (本ファイル :152 が同じ定理を
+    「⭐ sorry-free」と記録しており**同一ファイル内で矛盾**していた)。issue 0177 で訂正。
 - **Lem 1.7(a)**
   - Isaacs FGT: —
   - mathlib: `frattini_nongenerating` ✅
@@ -80,10 +82,12 @@ CLAUDE.md no-mathlib-wrapper policy 準拠: mathlib 直接対応がある §1F �
   - Isaacs FGT: Isaacs Lem 4.5
   - mathlib: `R/K` elementary abelian
   - 本ファイル: ✅ **sorry-free**
-- Thm 1.11
-  - Isaacs FGT: Thm 4.36
-  - mathlib: Phase 1 Ch.4 §4D
-  - 本ファイル: Phase 1 待ち
+- **Thm 1.11**
+  - Isaacs FGT: Isaacs Thm 4.36 (Baer trick)
+  - mathlib: —
+  - 実体: ✅ **`Isaacs/Ch04_Commutators/Main/BaerTrick.lean:254`**
+    (docstring が「= BG Thm 1.11」と明記。owner chapter 規則で Isaacs 側に置かれている)
+  - ⚠ 以前は「Phase 1 待ち」のままだった。issue 0177 で訂正。
 - **Thm 1.13**
   - Isaacs FGT: (Thompson critical)
   - mathlib: `GroupTheory.CriticalSubgroup` ✅
