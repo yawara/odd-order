@@ -30,6 +30,7 @@ import OddOrder.GroupTheory.NonzeroVectorAction
 import OddOrder.GroupTheory.ElementaryAbelianLinear
 import OddOrder.GroupTheory.LinearGroupSimple
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.AbelianAutSimple
+import OddOrder.Isaacs.Ch08_PermutationGroups.SymmetricNormalSubgroups
 import OddOrder.Peterfalvi.Appendices.Suzuki.RankOneSetup
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3Preliminary
 import OddOrder.Peterfalvi.Appendices.Suzuki.PSU3CenterCoordinate
@@ -15985,6 +15986,29 @@ pointwise is `1` or the `q`-Frobenius, and the latter has order `2`
   OddOrder.Isaacs.Ch08.card_linearEquiv_eq_six
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch08.isSimpleGroup_mulAut_iff
+
+/-! ### Isaacs Cor 8.28 — `Sym Ω` の正規部分群 (issue 0176 ステップ 1、2026-08-08)
+
+Isaacs Ch.8 の cite ゼロ 13 件のうち **唯一 mathlib にも repo にも実体が無かった**もの。
+書籍 (8.28) (p.240): `n ≥ 5` で `Sₙ` の正規部分群はちょうど 3 つ — `1`, `Aₙ`, `Sₙ`。
+
+  center_perm_eq_bot                          `Z(Sym Ω) = 1` (`|Ω| ≥ 3`)
+  normal_perm_eq_bot_or_alternating_or_top    (8.28) 本体
+
+⚠ `Z(Sym Ω) = 1` も mathlib に無い (mathlib の
+`Equiv.Perm.alternatingGroup.center_eq_bot` は**交代群**の中心)。中心元 `t` が `a ↦ b ≠ a` と
+動かすなら第 3 の点 `c` を取って互換 `(b c)` との可換性から `b = c` が出る、という 5 行の議論。
+
+(8.28) 本体は `N.subgroupOf Aₙ` に `Aₙ` の単純性 (mathlib
+`alternatingGroup.isSimpleGroup` = 書籍 (8.27)) を当てて二分し、
+⊤ 側は `[Sₙ : Aₙ] = 2` が素数ゆえ `N = Aₙ` か `N = ⊤`、
+⊥ 側は `sign` が `N` 上単射になるので `g t g⁻¹` と `t` の符号が一致 ⟹ `t` は中心元 ⟹ `N = ⊥`。
+
+残り 12 件の mathlib 対応は `notes/isaacs/ch08_permutation.md` の対応表が正本。 -/
+
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch08.center_perm_eq_bot
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch08.normal_perm_eq_bot_or_alternating_or_top
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch09.KegelHypothesis.map_mk
 #assert_only_allowed_axioms

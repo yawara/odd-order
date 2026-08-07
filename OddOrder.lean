@@ -636,6 +636,7 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8C.AbelianAutSimple
 import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8D
 import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
+import OddOrder.Isaacs.Ch08_PermutationGroups.SymmetricNormalSubgroups
 import OddOrder.Isaacs.Ch08_PermutationGroups.CommonDivisorGraph
 import OddOrder.Isaacs.Ch10_MoreTransfer.HuppertMetacyclic
 import OddOrder.Isaacs.Ch10_MoreTransfer.Main

@@ -464,10 +464,10 @@ A_n general (8.27) が新規実装の中心.
 | **8.21** | Jordan 集合 `X, Y` で `X ∪ Y ≠ Ω` なら `X ∩ Y` も Jordan (strongly も同様) | `IsPretransitive.isPretransitive_ofFixingSubgroup_inter` / `IsPreprimitive.isPreprimitive_ofFixingSubgroup_inter` (`SubMulAction/OfFixingSubgroup.lean:470,499`) | ⚠ **mathlib は特殊化**: 2 つ目を `g • s` (translate) に限る。書籍は任意の 2 つ。消費点 (8.22) は translate 版で足りる |
 | **8.22** | 原始的 + Jordan 集合 `X` (`0 < \|X\| < \|Ω\|−1`) ⟹ `G_α` は `Ω−{α}` 上推移的 (= `G` 2-推移的); strongly Jordan なら 2-原始的 | `MulAction.IsPreprimitive.is_two_pretransitive` / `is_two_preprimitive` (`Jordan.lean:224,232`、Wielandt 13.1) | mathlib の `s` = 書籍の `Ω − X`、`ofFixingSubgroup M s` が書籍の `X` |
 | **8.27** | `n ≥ 5` で `Aₙ` は単純 | `alternatingGroup.isSimpleGroup` (`SpecificGroups/Alternating/Simple.lean:202`) | mathlib は **Iwasawa 構造**経由 (書籍と同じ道具立て = 8.30) |
-| **8.28** | `n ≥ 5` で `Sₙ` の正規部分群はちょうど 3 つ (`1`, `Aₙ`, `Sₙ`) | ⬜ **無し** | **cite ゼロ 13 件で唯一の真の未形式化**。`Aₙ` 単純性 + 指数 2 + `Z(Sₙ) = 1` から出る |
+| **8.28** | `n ≥ 5` で `Sₙ` の正規部分群はちょうど 3 つ (`1`, `Aₙ`, `Sₙ`) | ✅ **2026-08-08 に本 repo で形式化** `Ch08.normal_perm_eq_bot_or_alternating_or_top` (`SymmetricNormalSubgroups.lean`) | **cite ゼロ 13 件で唯一の真の未形式化**だった。⚠ 支持補題 `Z(Sym Ω) = 1` も mathlib に無く (`alternatingGroup.center_eq_bot` は**交代群**の中心)、`Ch08.center_perm_eq_bot` として併せて証明 |
 | **8.30** | **Iwasawa**: 原始的置換群 `G` が `G' = G`、`H = G_α`、可解 `A ⊴ H` で `G = ⟨A^G⟩` ⟹ `G` 単純 | `MulAction.IwasawaStructure` + `MulAction.IwasawaStructure.isSimpleGroup` | mathlib は構造体として束ねる。`PSL(2,F)` の単純性でも使われている |
 
-**結論**: 13 件中 **12 件が mathlib 被覆**、**1 件 (8.28) が真の未形式化**、
+**結論**: 13 件中 **12 件が mathlib 被覆**、**1 件 (8.28) が真の未形式化 → 2026-08-08 に形式化済**、
 **1 件 (8.21) に mathlib 側の特殊化債務** (translate 限定)。
 
 ⚠ 8.21 の特殊化は **mathlib 側**の債務であり、CLAUDE.md の「mathlib 本体への PR は当面しない」

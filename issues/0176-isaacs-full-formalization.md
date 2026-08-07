@@ -76,9 +76,28 @@ repo の `Ch08_PermutationGroups` も既に `IsPreprimitive` を使っている�
 
 ## 作業手順
 
-- [ ] **ステップ 1**: cite ゼロ 13 件 (Ch.8 の block/primitivity/Jordan + `Aₙ` 単純性) の
-      実状態を確定する。mathlib 被覆 / repo 被覆 (別名) / 真の未形式化 の 3 分類。
-      mathlib 被覆なら対応表を `notes/isaacs/ch08_permutation.md` に記録。
+- [x] **ステップ 1 ✅ 完了 (2026-08-08)**: cite ゼロ 13 件を分類した。対応表の正本 =
+      [`notes/isaacs/ch08_permutation.md`](../notes/isaacs/ch08_permutation.md)。
+
+      | 分類 | 件数 | 内訳 |
+      |---|---|---|
+      | **mathlib 被覆** | **12** | 8.11-8.15, 8.17, 8.19-8.22, 8.27, 8.30 |
+      | **真の未形式化** | **1** | 8.28 → **2026-08-08 に形式化済** (下記) |
+
+      ⭐ **8.20 は mathlib のほうが一般** — 書籍は「部分群 `H` の軌道 `X` で `H` が原始的、
+      `|X| > |Ω|/2`」だが mathlib の `IsPreprimitive.of_card_lt` は**任意の同変写像**
+      `f : X →ₑ[φ] Y` で `|Y| < 2·|range f|`。
+      ⚠ **8.21 は mathlib のほうが狭い** — 書籍は任意の 2 つの Jordan 集合 `X, Y` だが
+      mathlib の `is...ofFixingSubgroup_inter` は 2 つ目を `g • s` (translate) に限定。
+      消費点 (8.22) は translate 版で足りるので実害は無いが、**mathlib 側の特殊化債務**。
+
+- [x] **8.28 を形式化 (2026-08-08)**。`OddOrder/Isaacs/Ch08_PermutationGroups/SymmetricNormalSubgroups.lean`:
+      ```
+      center_perm_eq_bot                        Z(Sym Ω) = 1  (|Ω| ≥ 3)
+      normal_perm_eq_bot_or_alternating_or_top  (8.28) 本体
+      ```
+      ⚠ `Z(Sym Ω) = 1` も mathlib に無かった (mathlib の
+      `Equiv.Perm.alternatingGroup.center_eq_bot` は**交代群**の中心)。両方 axiom-clean。
 - [ ] **ステップ 2**: Ch.1 から文書順に逐条監査 (書籍ページ画像で条項確定 → repo 突合)。
       1 章ぶん終えるごとに census note を更新して commit。
 - [ ] census note を新設 (`notes/isaacs/full_formalization_census_2026_08_08.md`)
