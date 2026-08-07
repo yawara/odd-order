@@ -826,10 +826,34 @@ commits, issue 2053」= 実際は landing 済 / `StepEleven` の散文列挙に�
 清掃 1 件: `AxiomsCheck` の「`char_eq_p` は model の `sorry` (9318) を継承するので未登録」注記が
 stale だった (Q₈ は 2026-08-07 に閉了) → 訂正し `char_eq_p` を登録 (axiom-clean 確認)。
 
+#### Part II Ch.III The Structure of H (書籍 pp.115-121) — **監査完了 (2026-08-08、補充ゼロ)**
+
+16 件 (Theorem C + §1/§2/§3 の各 Proposition + 各節のステップ)。全件に書籍強度の実体あり。
+仮説 (C1) (p.115: `V ≠ 1` かつ素数位数の `P ≤ V` すべてに `C_Q(P)` の 2-rank ≥ 2) は
+`SecondCaseHypothesis`、(C2) (p.119: 「`S` は type B の Suzuki 2-群、`st` の位数 3、`W ≠ 1`」
+= §1 Proposition の case (c) を §3 以降の標準仮定に昇格したもの) は
+`theoremAConclusion_or_caseC2` の右分岐 + 各条項をパラメータで受ける形。
+
+| 書籍 | repo |
+|---|---|
+| **Theorem C** (`Q` は 2-群) | `SecondCaseHypothesis.isPGroup_two_Q` (**書籍そのままの形**; 内訳の step 1-3 は `StructureOfH/{Basic,FeitSibleyInput,CoherenceContradiction}`) |
+| **§1 Proposition** (3 分岐 (a)(b)(c)) | `WNeBot.trichotomy` (**3 分岐を束ねた形**; 書籍より強く case (b)(c) に `\|Q\| = \|Q₀\|²`/`\|Q₀\|³` も付く) |
+| **§2 Proposition** (case (b) ⟹ `(SK) ∪ (SKtS)` は部分群) | `CaseBStructure.typeASubgroup` (`Subgroup G` として構成 = 「部分群である」の内容そのもの) + `coe_typeASubgroup` で carrier 一致 |
+| §2 ステップ (1)-(7) | `OrderFivePairing` / `OrderFiveOrbits` / `OrderFiveSubgroup` (`h(x) ∈ K`、`K`-軌道代表系、構造方程式の帰結) |
+| **§3 Proposition** (`S ⋊ KW ≅ S₁ ⋊ K₁W₁` + 明示モデル) | `ModelAction.exists_standardModel` (**書籍の全条項**: `φ` の双加法性・scaling 則 `φ(ax,by) = ab^θφ(x,y)`・anisotropy `x≠0 ⟹ φ(x,x)≠0`・`K₁W₁ ≤ E^×` の作用 `(x,y)^a = (ax, a^{1+σ}y)`) |
+| §3 ステップ (1)-(5) | `ModelIsomorphism` の step (3)/(5)、`CenterFieldExponent` の step (2)、`QuotientKWField` 等 |
+
+設計差の記録: §3 の全 endpoint は `V = W` を要求するが、これは Ch.IV §4 が `U = O^{2'}(C_G(P))`
+に対して §2/§3 を適用する場面では商側で自動的に得られない。repo は標準 `PSU(3,ℓ)` モデル側
+(`StandardModelHypothesis`) で `V = W` を**定理として**証明し、結論を
+`CentralizerPSUData.residualQuotientEquiv` で戻す構成にしている (書籍の "relative to `U`,
+`U ∩ H` and `t`" の Lean 化)。
+
 #### 次の入口
 
-**Ch.III The Structure of H (書籍 pp.115-121)** — Theorem C、§1/§2/§3 の各 Proposition、
-各節のステップ。
+**Ch.IV Characterization of PSU(3,q) (書籍 pp.122-134)** — §1 の恒等式 (H1)-(H6) + Lemma、
+§2 のステップ (1)-(20) + Proposition、§3 の Proposition + ステップ (1)-(5) + Corollary 1/2、
+§4 のステップ (1)-(5)。
 
 ### 4.5 ページ画像
 

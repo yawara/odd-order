@@ -117,8 +117,14 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
     stale docstring 2 件 (`StepElevenComplement` の「in subsequent commits」等) も訂正。
     ⚠ ページ画像が必須だった — pdftotext は (4)(6)(8)(10) の式を壊す
     (`|Q| = |C_Q(P)|^p = |F*|^p` が `|0| = |Cg(P)|'= |Fr-`)。
-  - **次の入口 = Ch.III The Structure of H (書籍 pp.115-121)**: Theorem C、§1/§2/§3 の
-    各 Proposition、各節のステップ。
+  - **Ch.III 監査完了 (2026-08-08、補充ゼロ)**: 16 件。Theorem C は書籍そのままの形
+    (`isPGroup_two_Q`)、§1 Proposition は 3 分岐を束ねた `WNeBot.trichotomy` (書籍より強く
+    case (b)(c) に位数情報も付く)、§2 Proposition は `typeASubgroup` を `Subgroup G` として
+    構成 (=「部分群である」の内容そのもの)、§3 Proposition は `exists_standardModel` が
+    書籍の全条項 (φ の双加法性・scaling 則・anisotropy・`K₁W₁` の作用) を持つ。
+  - **次の入口 = Ch.IV Characterization of PSU(3,q) (書籍 pp.122-134)**: §1 の (H1)-(H6) +
+    Lemma、§2 のステップ (1)-(20) + Proposition、§3 の Proposition + ステップ (1)-(5) +
+    Corollary 1/2、§4 のステップ (1)-(5)。
 - **ステップ 3 ✅ 完了 (2026-08-08)**: Part I (§1-§14) の逐条監査を (1.1) から文書順に完了。1 章ぶん終えるごとに census note を更新した。
   - **2026-08-07 時点: §1-§6 完了 (全 63 件)**。
     正本 = [census note](../notes/peterfalvi/full_formalization_census_2026_08_07.md) §3.5 の各表。
