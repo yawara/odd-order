@@ -314,6 +314,27 @@ docstring が「in particular 直交する」と**散文で主張**していた�
    修理であって債務ではない。**mathcomp が同じ仮説を持たない**ときは、定義 (ここでは
    `coherent` に `ℤ[𝒮,A] ≠ 0` を含めるか) の差を疑う。
 
+### §7 = repo `S09` (書籍 pp.38-43、`pages/peterfalvi-p038..p043.png` 切り出し済) — **監査途中 ((7.1)-(7.7) 済)**
+
+| 書籍 | 判定 | repo の実体 / 備考 |
+|---|---|---|
+| (7.1) Hypothesis | ✅ 忠実 | `S09.Hypothesis71` = (2.2) 仮説 + Dade 写像 `τ` + `IsDadeMap` ((2.5) の方程式)。`χ^ρ` = `chiRho` (`(1/\|H(a)\|)∑_{x∈H(a)} χ(ax)`、`A` 外は 0)、`A^τ` = `hyp.dadeSupport`。TI からの構成 `of_isTISubset` あり。⚠ 書籍は「τ は **Dade isometry**」と言い、repo は等長性を個別定理の仮説 `hiso : IsDadeIsometry` で受ける — 書籍 (2.6) が等長性を与えるので導出可能な仮説 (要確認: (2.6) の形式化を repo が持つか) |
+| (7.2)(a) | ✅ 実証明 | `α^{τρ} = α` (pointwise は `chiRho_apply_eq_of_forall_coset` 系、`chiRhoCF_dadeImage_eq`) |
+| (7.2)(b) | ✅ **不等式 + 等号条件の両方** | `chiRho_norm_sq_le` (`‖χ^ρ‖² ≤ ‖χ‖²`) と `chiRho_norm_sq_eq_iff_mem_range` (等号 ⟺ `χ ∈ im τ`)。書籍の rider が落ちていない |
+| (7.3) | ✅ **不等式 + 等号条件の両方** | `chiRho_integral_inequality` (`(1/\|G\|)∑_{g∈A^τ}\|χ(g)\|² ≥ ‖χ^ρ‖²`) と `chiRho_integral_eq_iff_constant_on_hCoset` (等号 ⟺ 各 `aH(a)` 上で `χ` が定数) |
+| (7.4) Hypothesis | ✅ 忠実 | `FamilyHypothesis71`: `L_i`/`A_i` + 各 `i` の (7.1) + `pairwise_disjoint` (`A_i^{τ_i}` が互いに素) + `G0 = G − ⋃_i A_i^{τ_i}` |
+| (7.5) | ✅ **実証明 + 一般化** | `family_inequality` = 書籍の displayed 不等式そのまま。⚠ 書籍は `χ ∈ Irr G` だが repo は `‖χ‖² = 1` だけを仮定 (証明が使うのはそれだけ) = **一般化** |
+| (7.6) Hypothesis | ✅ 忠実 + **構成可能** | `Hypothesis76`: (7.1) + 等長 + `H ⊴ L` + `A = H^#` + 族 `ζ : Fin (n+1) → CF(L)` + 次数比 `d` + `zeta_induced` (各 `ζ_i` は `Ind_H^L θ`) + `zeta_injective` (相異なる) + `zeta_family_cover` (**全ての** `θ ∈ Irr H` が現れる = 書籍の `T = {Ind θ \| θ ∈ Irr H}` の網羅性)。網羅性を持つのが重要 — (7.7.a) の証明が `CF(L,A)` の基底性を使うため |
+| (7.7)(a) | ✅ **実証明** (carrier field だが producer が discharge) | `Hypothesis76.chiRho_decomp` は field だが、`hypothesis76OfFamily` / `hypothesis76OfDade` が **(7.1) データ + `H ⊴ L` + `A = H^#` だけから** 構成し `chiRho_decomp_induced` で証明している (docstring: *"with **no certificate assumed**"*)。名前付き定理 `chiRho_explicit_formula` もある。⟹ posited data ではない |
+| (7.7)(b) | ✅ 実証明 | `Hypothesis76.chiRho_norm_sq_double_sum` = 書籍の二重和恒等式そのまま (`(ζ_i,ζ_j) − ζ_i(1)ζ_j(1)/(eh)`; repo は `/(Nat.card L)` = `eh` と同じ)。直交性で潰した形 `chiRho_norm_sq_collapse` も別途 |
+| (7.8)(a)(b)(c) | ⬜ **監査途中** | `Hypothesis78` (`QuadraticTerm.lean:62`) に `ind1H`/`zetaDistinct`/`nu`/`nu_isometry` と **(7.8.c.i) 証明書 field** `chiRho_eq_inner_beta`。⚠ **次の確認事項**: (7.7.a) と同様に producer が discharge しているか (`S09.Hypothesis78.indChainDecomposition_of_isCoherent` / `nu_mem_ZIrr_of_isCoherent` が coherence witness からの橋)。書籍 (7.8) の 3 条項 ((a) `β = 1_G − ζ^ν + a∑φ(1)/(e‖φ‖²)·φ^ν + Γ` と `a ∈ ℤ`, `Γ ⊥ 𝒮^ν ∪ {1_G}` / (b) `e ≤ (h−1)/2 ⟹ ‖ζ^{νρ}‖² ≥ 1 − e/h` かつ `‖Γ‖² ≤ e−1` / (c) `χ ⊥ 𝒮^ν ⟹ χ^ρ(x) = (β,χ)` かつ `‖χ^ρ‖² = (\|A\|/\|L\|)(β,χ)²`) との突合が未実施 |
+| (7.9) | ⬜ 未突合 | `hypothesis79_conclusion` (AxiomsCheck `:11378`): 二分律 `⟨β_i, ζ_j^ν⟩ ≠ 0 ∨ …`。書籍 p.42 の `(β₁,ζ₂^{ν₂}) ≠ 0 or (β₂,ζ₁^{ν₁}) ≠ 0` と突合すること |
+| (7.10) | ✅ **書籍の displayed 不等式そのまま** | `card_G0_lower_bound` (`S09_FrobeniusCardG0LowerBound:129`): `(\|G₀\|−1)/\|G\| ≥ (e−1)((h−2e−1)/(eh) + 2/(h(h+2)))`。仮説 = `FrobeniusFamily G k` ((a) 各 `L_i` が核 `H_i` の Frobenius 群 / (b) `H_i^#` TI with normalizer `L_i` / (c) `i ≠ j` で `h_i`, `h_j` 互いに素 / (d) `G₀`)。⚠ 書籍は Thompson で `H_i` 冪零を得るが repo も**仮定でなく導出** |
+| (7.11) | ✅ 実証明 | `not_trivial_G0` (`:148`): `G₀ = {1}` は矛盾 |
+
+⬜ **残り**: (7.8) の 3 条項突合 + `Hypothesis78` 証明書 field の discharge 確認、(7.9) の突合、
+(7.1) の `IsDadeIsometry` が書籍 (2.6) から導出可能か (repo に (2.6) があるか)。
+
 ## 4. 未着手の census
 
 - **Part II (Suzuki の定理 A、書籍 pp.97-134)** — `Proposition N` / `Lemma N` の**章内リセット
