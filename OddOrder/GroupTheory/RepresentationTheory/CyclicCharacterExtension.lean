@@ -30,7 +30,11 @@ the normalized conjugation unit and the extension representation — lives in
 Given that upgrade, steps 2-4 are the generic ones re-exported from `CyclicExtension.lean`.
 
 This file is the **(G1) extension** brick of the constructive Clifford correspondence
-(issue 9002): Peterfalvi (1.7)(b) needs each `θ ∈ Irr(H)` with abelian inertia quotient
+(issue 9002).  ⚠ The target here is the **general** Peterfalvi (1.7)(b) -- the one that drops
+coprimality and carries a multiplicity `e` -- which is **not** formalized in this repository; the
+coprime case (1.7)(c) is (`CliffordDecomposition`), and it gets its extension from Isaacs 8.16
+directly, with no composition-series iteration.  (1.7)(b) needs each `θ ∈ Irr(H)` with abelian
+inertia quotient
 `I(θ)/H` to extend to its inertia group, which follows by iterating the cyclic case along a
 composition series of `I(θ)/H` (the coprime/canonical-extension refinement, Isaacs 6.28/8.16,
 handles the invariance propagation; see `RepresentationDeterminant`).
@@ -138,8 +142,9 @@ since `H ≤ I_K(θ)` always).  Then `θ` **extends** to `K`: there is an irredu
 `χ` of `K` with `Res_H χ = θ`.
 
 This is the (G1) cyclic building block of the constructive Clifford correspondence
-(Peterfalvi (1.7)(b), issue 9002); the abelian inertia quotient case follows by iterating
-along a composition series.
+(Peterfalvi (1.7)(b) -- the **general**, not-yet-formalized one; the coprime (1.7)(c) does not
+need this route); the abelian inertia quotient case follows by iterating along a composition
+series.
 
 The representation-level, characteristic-free analogue over any algebraically closed field is
 `exists_extension_of_nonempty_equiv_conjRep` (BG Prop 2.2(b)). -/

@@ -509,10 +509,15 @@ theorem theta_degree_le_index_mul_constituent {K : Type*} [Group K] [Fintype K]
   rwa [Complex.mul_re, Complex.natCast_re, Complex.natCast_im, zero_mul, sub_zero] at hbound
 
 set_option linter.unusedFintypeInType false in
-/-- **Peterfalvi (6.2) `θ`-bound** (full degree bound).  For an irreducible character `θ` of a
-finite group `K`, a subgroup `C ≤ K`, and a section `N ◁ C` with `N ≤ D ≤ C`, `θ` trivial on `N`
-(after restriction to `C`) and `D ⧸ N` central in `C ⧸ N`, the degree of `θ` is bounded:
-`θ(1) ≤ |K : C|·√|C : D|`.
+/-- **Peterfalvi (1.8)** (book p. 8), used here as the (6.2) `θ`-bound.  For an irreducible
+character `θ` of a finite group `K`, a subgroup `C ≤ K`, and a section `N ◁ C` with `N ≤ D ≤ C`,
+`θ` trivial on `N` (after restriction to `C`) and `D ⧸ N` central in `C ⧸ N`, the degree of `θ` is
+bounded: `θ(1) ≤ |K : C|·√|C : D|`.
+
+This is the book's (1.8) verbatim, in index form: with the book's `ψ, G, B, C, D` matching
+`θ, K, N, C, D` here, `|K:C|·√|C:D| = |K|/√(|C|·|D|)` (as `|D| = |C|/|C:D|`), which is the book's
+right-hand side.  The book states it in §1 as a general degree bound; the repository reached it
+from its §8 consumer, hence the (6.2) naming in the surrounding section.
 
 Assembled from the two halves: the a-half `theta_degree_le_index_mul_constituent`
 (`θ(1) ≤ |K:C|·φ(1)` for an `Ind`-constituent `φ ∈ Irr C` of `θ`) and the section b-half

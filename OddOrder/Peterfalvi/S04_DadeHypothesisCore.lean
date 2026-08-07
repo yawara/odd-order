@@ -326,6 +326,30 @@ theorem H_eq_bot_of_isTISubset (hyp : Hypothesis G A L)
     hyp.H a = ⊥ :=
   hyp.H_eq_bot_of_centralizer_le a (hTI.centralizer_le a.2)
 
+/-- **Peterfalvi (2.3)** (book p. 10), the biconditional: *`A` is a TI-subset of `G` with
+normalizer `L` if and only if Hypothesis (2.2) holds with `H(a) = 1` for all `a ∈ A`.*
+
+Both halves were already available separately -- `isTISubset_of_forall_H_eq_bot` and
+`H_eq_bot_of_isTISubset` -- but the book's equivalence itself was not stated.  Here the
+`Hypothesis` argument supplies the (2.2) side; the direction that *produces* (2.2) from a
+TI-subset is `of_isTISubset`, and the `N_G(A) = L` half of "with normalizer `L`" is
+`normalizer_eq_of_isTISubset` below. -/
+theorem isTISubset_iff_forall_H_eq_bot (hyp : Hypothesis G A L) :
+    OddOrder.GroupTheory.IsTISubset A L ↔ ∀ a : {a : G // a ∈ A}, hyp.H a = ⊥ :=
+  ⟨fun hTI => hyp.H_eq_bot_of_isTISubset hTI, hyp.isTISubset_of_forall_H_eq_bot⟩
+
+/-- **Peterfalvi (2.3)**, the "with normalizer `L`" clause: for a nonempty `A` satisfying
+Hypothesis (2.2), being a TI-subset relative to `L` forces `N_G(A) = L` exactly.
+
+The relative-normalizer API carries `L` as an explicit bound (`A ⊆ L ⊆ N_G(A)`), so this is the
+statement that the bound is attained.  `L ≤ N_G(A)` is the `L_normalizes_A` field of (2.2); the
+reverse is the TI condition at any element of `A`. -/
+theorem normalizer_eq_of_isTISubset (hyp : Hypothesis G A L) (hne : A.Nonempty)
+    (hTI : OddOrder.GroupTheory.IsTISubset A L) :
+    Subgroup.normalizer A = L :=
+  hTI.set_normalizer_eq_of_nonempty_of_normalizes hne
+    (fun l hl _ ha => hyp.L_normalizes_A ⟨l, hl⟩ ha)
+
 
 end Hypothesis
 

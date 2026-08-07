@@ -39,7 +39,7 @@ This file assembles the determinantal bookkeeping on top of
 ## References
 
 * I. M. Isaacs, *Character Theory of Finite Groups*, Academic Press 1976, 6.25/6.28/8.16.
-* Peterfalvi §3 (1.7)(b); issue 9002 (v-c).
+* Peterfalvi §3 (1.7)(c); issue 9002 (v-c).
 -/
 
 namespace OddOrder.RepresentationTheory
@@ -583,8 +583,9 @@ Since `o(χ₁)·χ₁(1) = o(θ)·d` and `[K:N₁] = [K:H]/p`, the coprimality 
 recursion closes.
 
 This is the (G1) extension input to Gallagher's theorem for the constructive Clifford
-decomposition (Peterfalvi (1.7)(b)): in the type-I application `H = L_F` is a normal Hall
-subgroup and `I(θ)/H` is abelian, so `o(θ)·θ(1) ∣ |H|` is coprime to `[I(θ):H]`. -/
+decomposition (Peterfalvi (1.7)(c)): in the type-I application `H = L_F` is a normal Hall
+subgroup and `I(θ)/H` is abelian, so `o(θ)·θ(1) ∣ |H|` is coprime to `[I(θ):H]`.  (The coprimality
+is what makes this the book's (1.7)(c); the multiplicity-`e` (1.7)(b) drops it.) -/
 theorem IsIrreducibleCharacter.exists_extension_of_forall_conjBy_eq [Finite K]
     {θ : ClassFunction ↥H ℂ} (hθ : IsIrreducibleCharacter θ)
     (hinv : ∀ y : K, ClassFunction.conjBy y θ = θ)

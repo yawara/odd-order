@@ -33,7 +33,7 @@ constituent `χ` of `Ind_T^G ψ` with multiplicity `m = ⟨Ind ψ, χ⟩ ≥ 1`,
   a multiplicity-one constituent of full degree exhausts the induced character.
 
 This is the (G3)/6.11 step of the constructive Clifford decomposition for Peterfalvi
-(1.7)(b) (issue 9002): combined with the extension theorem (Isaacs 8.16,
+(1.7)(c) (issue 9002): combined with the extension theorem (Isaacs 8.16,
 `CanonicalCharacterExtension`) and the Gallagher decomposition (`GallagherDecomposition`),
 it yields the multiplicity-one equal-degree decomposition of `Ind_H^L θ` for a type-I
 maximal subgroup.
@@ -381,6 +381,7 @@ this forces `m = 1` with equal degrees, and `Ind ψ = χ` by degree exhaustion
 Combined with the extension theorem (Isaacs 8.16, `CanonicalCharacterExtension`) and the
 Gallagher decomposition (`GallagherDecomposition`) this completes the constructive Clifford
 decomposition of `Ind_H^G θ` for an abelian coprime inertia quotient (Peterfalvi
+(1.7)(c) -- the coprimality is exactly what distinguishes it from the multiplicity-`e`
 (1.7)(b)). -/
 theorem isIrreducibleCharacter_induce_of_liesOver_of_inertia_eq
     {H T : Subgroup G} [H.Normal] [(H.subgroupOf T).Normal] (hHT : H ≤ T)

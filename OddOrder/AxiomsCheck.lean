@@ -2734,6 +2734,16 @@ one-element lemma).  All axiom-clean. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S03.exists_natDegree_characterDegree_eq_prime_pow_of_isPGroup
 
+-- **Peterfalvi §4 (2.3)** — 「`A` が正規化群 `L` の TI-subset ⟺ 仮説 (2.2) が `H(a) = 1`
+-- (∀a∈A) で成り立つ」。両半分 (`isTISubset_of_forall_H_eq_bot` / `H_eq_bot_of_isTISubset` +
+-- `of_isTISubset`) は以前から在ったが、**書籍の同値そのものが述べられておらず**、さらに
+-- 「TI-subset **with normalizer L**」の `N_G(A) = L` 節が欠けていた (相対正規化群 API が
+-- `L` を明示的な bound として保持するため。docstring も自認していた)。2026-08-07 に補充。
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.isTISubset_iff_forall_H_eq_bot
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S04.Hypothesis.normalizer_eq_of_isTISubset
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.IsTISubset.set_normalizer_eq_of_nonempty_of_normalizes
+
 -- Peterfalvi §4 (2.8): the semidirect structure `M(B) = H(B) ⋊ N_L(B)` for a nonempty
 -- `B ⊆ A`, recorded as the order identity `|M(B)| = |H(B)| · |N_L(B)|` (internal-product
 -- bijection: `N_L(B)` normalizes `H(B)` by (2.4.a), and `H(B) ∩ N_L(B) = 1`).

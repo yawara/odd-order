@@ -142,6 +142,28 @@ theorem centralizer_le (hA : IsTISubset A L) {x : G} (hx : x ∈ A) :
     rwa [hxx]
   exact hA c ⟨x, hx, hfix⟩
 
+/-- **A TI-subset that its host normalizes has that host as its full normalizer**:
+if `A` is a nonempty TI-subset with normalizer-bound `L` and `L` normalizes `A`, then
+`N_G(A) = L`.
+
+`N_G(A) ≤ L` is the TI condition applied to any element of `A` (this is where nonemptiness is
+used); `L ≤ N_G(A)` is the normalization hypothesis, whose converse half comes from applying it
+at `l⁻¹`.
+
+This is the `N_G(A) = L` clause of **Peterfalvi (2.3)** ("`A` is a TI-subset of `G` *with
+normalizer* `L`"), which the relative-normalizer API of `S04.Hypothesis` otherwise leaves
+implicit by carrying `L` as an explicit bound. -/
+theorem set_normalizer_eq_of_nonempty_of_normalizes (hA : IsTISubset A L)
+    (hne : A.Nonempty) (hnorm : ∀ l ∈ L, ∀ a ∈ A, l * a * l⁻¹ ∈ A) :
+    Subgroup.normalizer A = L := by
+  refine le_antisymm (fun g hg => ?_) (fun l hl => ?_)
+  · obtain ⟨a, ha⟩ := hne
+    exact hA g ⟨a, ha, (Subgroup.mem_set_normalizer_iff.mp hg a).mp ha⟩
+  · rw [Subgroup.mem_set_normalizer_iff]
+    refine fun h => ⟨fun hh => hnorm l hl h hh, fun hh => ?_⟩
+    have := hnorm l⁻¹ (inv_mem hl) _ hh
+    simpa [mul_assoc] using this
+
 /-- **A TI-subset inside an abelian host pins the normalizer of each of its nonempty pieces**:
 if `A` is a TI-subset with normalizer-bound `L`, `A` sits inside `L`, and `L` is commutative,
 then `N_G(X) = L` for *every* nonempty `X ⊆ A`.
