@@ -767,7 +767,7 @@ Prop 3 は非常に忠実: `semilinearGroup F A = (F₊ ⋊ Fˣ) ⋊ A` が書�
 Lemma 1 は書籍が外部引用 ([HB] Ch.XI Ex 1.3a/Thm 3.3、[H] Kap.II Satz 10.12 等) で済ませる
 「`|Ω|−1` が 2 冪」「`L` 単純」を、repo は 3 つの標準モデルから**導出**している。
 
-#### Part II Ch.II The First Case (書籍 pp.108-114) — **監査途中 (2026-08-08)**
+#### Part II Ch.II The First Case (書籍 pp.108-114) — **監査完了 (2026-08-08、未形式化 1 件)**
 
 18 件 (仮説 (B1)(B2) + Theorem B + ステップ (1)-(17))。**全ステップにファイルが存在**
 (`FirstCase/Step{One..Seventeen}*.lean`、補助分割込みで 29 file)。突合済は以下:
@@ -781,11 +781,45 @@ Lemma 1 は書籍が外部引用 ([HB] Ch.XI Ex 1.3a/Thm 3.3、[H] Kap.II Satz 1
 | (2)(a) `C_G(P)` は `Ω_P` 上 (A1)、核は `N = C_D(C_Q(P)) ∩ C_G(P)` | `rankOneQuotient` (faithful 商上の `RankOneHypothesis`) + 核の同定は §3 Prop 1(a) `normalCore_cH_eq_centralizer_cQ` | ✅ 書籍も核を §3 から引く |
 | (2)(b) `C_G(P)/N ≅ (F ⋊ C_Q(P)) ⋊ Σ`、`C_Q(P) ≅ F*`、`Σ = C_W(P)` が `F` の自己同型群 | `exists_affineNearFieldModel` → `AffineNearFieldModel` が `emb`/`isComplement` (半直積)、`qEquiv : Q ≃* Fˣ`、`dAut : D → Aut F` (単射・乗法的・共役実現) を**全部フィールドとして持つ** | ✅ 3 つの同定条項とも |
 
-**残り = ステップ (3)-(17)** (次 iteration)。
+ステップ (3)-(17) も全件に実体あり (突合 2026-08-08):
+
+| 書籍 | repo |
+|---|---|
+| (3) `\|Q₁\|` の各素因数 `r` に `r ≡ 2^i (mod 2^p−1)` (`0 ≤ i ≤ p−1`) | `StepThree` 末尾の packaged 定理 (Clifford 二分岐経由) |
+| (4) `\|Q\| = \|C_Q(P)\|^p = \|F*\|^p` | `StepFour` (Wielandt 不動点定理; 第 2 等号は step (2)(b) の `qEquiv` から) |
+| (5) `F` が体でない ⟹ `F ≅ F_{9,2}` かつ `Q₁ = 1` | `StepFive` (2 条項とも) |
+| (6) `Q₁ = 1` のとき `F ≅ F_{9,2} ⟹ \|Σ\| ∈ {1,3}`、さもなくば `\|F\| ∈ {f,9}` かつ `Σ = 1` | `card_field_and_D_of_Q1_eq_bot` (2 分岐とも) |
+| (7) `N = P` かつ `Σ ≅ C_W(P)` | `N_eq_P_and_sigma_mulEquiv_centralizer_W` (2 条項を束ねた形) |
+| (8) `Q₁ ≠ 1`、`ℓ = \|Σ\| ≠ 1` ⟹ `ℓ` 素数かつ `F` は位数 `3^ℓ/5^ℓ/9^ℓ` の体 | `StepEight` 末尾 |
+| (9) `p = f` | `char_eq_p` (`p ∣ \|Q\|+1` の transfer 半分 + 算術仕上げ) |
+| (10) `\|F\| = p^m` のとき (10.1) `p ∤ \|Σ\|` かつ `\|G\|_p = p^{m+2}` / (10.2) `p = \|Σ\| = 3`, `F ≅ F_{9,2}`, `W` 巡回 (位数 3 か 9), `\|G\|_3 = 3⁴\|W\|` | `factorization_card_G_eq` + `StepTen` の (10.1)/(10.2) |
+| (11) `R = T × P`、`T` は `C_Q(P)C_W(P)` で正規化、**`T ⋊ C_Q(P) ≅ F ⋊ F*`**、`C_Q(P)` は `𝒜 − {P}` に正則 | `StepEleven` + `StepElevenComplement` (⚠ **1 条項が言及のみ**、下記) |
+| (12) case (10.2) が成立 | `StepTwelve*` |
+| (13) `C_G(Z₁)` は Z-群 | `StepThirteen` |
+| (14) `Z(RΣ) = Z₁P`、3-部分群 `R₁` の存在 | `StepFourteen*` |
+| (15) 位数 9 の巡回部分群 `L ≤ P₁` の存在 | `StepFifteen*` |
+| (16) `Z₁PΣ ⊆ Z₂(P₁)` 等 | `StepSixteen` |
+| (17) Conclusion (最終矛盾) | `StepSeventeen*` の `false_of_transfer_control` |
+
+**⚠ 未形式化 1 件 — step (11) の `T ⋊ C_Q(P) ≅ F ⋊ F*`** (§2 の失敗様式 3 =「言及のみ」)。
+`StepEleven.lean` の file docstring が 3 条項を散文で列挙するが、この半直積同型だけ**定理が無い**
+(`sInvertedT` に関する `MulEquiv` は repo 全体にゼロ)。他の 3 条項 —
+`R = T × P` (`coe_invImageF_eq_sInvertedT_mul_P` + `sInvertedT_spec` の `⊔`/`⊓`)、
+`T` の正規化 (`conj_mem_sInvertedT_of_mem_*`)、正則性 (`ncard_prime_order_not_le_sInvertedT` +
+`index_normalizer_P_subgroupOf_normalizer_invImageF`) — は在る。下流 (`StepTwelve`〜`StepFifteen`)
+はこの同型を消費していない (使うのは `T` の可換性・位数・`sInvertedT_spec` だけ) ので
+**証明の健全性には影響しない**が、書籍の条項なので補充対象。
+
+補充の道筋 (材料は揃っている): `θ : T ≃* Multiplicative F` を「`R → R/P ≅ emb(F) ≅ F` の
+`T` への制限」で作る (単射は `T ⊓ P = ⊥` + step (7) の `N = P`、全射は `card_sInvertedT`)。
+同変性は model の `qEquiv_conj` (`q·emb(x)·q⁻¹ = emb(x · qEquiv q⁻¹)`) から。
+
+清掃 1 件: `AxiomsCheck` の「`char_eq_p` は model の `sorry` (9318) を継承するので未登録」注記が
+stale だった (Q₈ は 2026-08-07 に閉了) → 訂正し `char_eq_p` を登録 (axiom-clean 確認)。
 
 #### 次の入口
 
-**Ch.II ステップ (3)-(17)** (書籍 pp.109-114)。
+**step (11) の `T ⋊ C_Q(P) ≅ F ⋊ F*` を補充**、その後 Ch.III (書籍 pp.115-121)。
 
 ### 4.5 ページ画像
 

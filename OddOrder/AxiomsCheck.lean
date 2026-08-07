@@ -13359,7 +13359,8 @@ transversal `1, {t y : y ∈ Q}` and the relation `t y x = x t y^x`.
 * `p_dvd_card_Q_add_one` — **step (9)**: `p ∣ |Q|+1`, taking `ϕ = Abelianization.of : H → H^{ab}`,
   from `hB2 : p ∤ |G^{ab}|` (⟹ `x ∈ ⁅G,G⁆` ⟹ `T(x)=1`) and `P_inf_commutator_H_eq_bot` (⟹ `ϕ x`
   has order `p`).  Only remaining hypothesis is the book's standing (B2) `hB2`.  The `char = f = p`
-  assembly (`char_eq_p`) inherits only `hB2` + the model `sorry` (9318), so is unregistered. -/
+  assembly (`char_eq_p`) inherits only the book's standing `hB2`; the model `sorry` (9318)
+  closed on 2026-08-07, so it is registered below. -/
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.transfer_eq_pow_of_conj_invariant_transversal
 #assert_only_allowed_axioms OddOrder.GroupTheory.isComplement_inv_of_isComplement
@@ -13378,6 +13379,8 @@ transversal `1, {t y : y ∈ Q}` and the relation `t y x = x t y^x`.
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.P_inf_commutator_H_eq_bot
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.p_dvd_card_Q_add_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.char_eq_p
 
 /-! **Peterfalvi Appendix II, Proposition 2 — COMPLETE** (`Peterfalvi.Appendices.NearFields`,
 2026-07-21; 登録は 2026-07-22 に補完 — landing commit `42892fcb5` が AxiomsCheck 追記を
