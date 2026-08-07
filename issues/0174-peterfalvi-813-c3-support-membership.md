@@ -37,13 +37,33 @@ created: 2026-08-07
 
 ## やること
 
-- [ ] 書籍 p.47 の (8.13) の Reference ([BG] §16 Theorem II, Theorem B(5), Theorem D(4)) のうち
-      **Theorem D(4)** の rich predicate `Q` (repo: `theoremD_msigma_conjugacy_and_centralizers`
-      の第 4 成分、`TaxonomyOutput.lean:452` で 6 成分に分解している) を読み、
-      `x ∈ A(N₀) − A₁(N₀)` に相当する成分が既に在るか確認する
-- [ ] 在れば Peterfalvi 側の statement (`x ∈ typeA L tauL ∧ x ∉ A1 L tauL`) として取り出す
-- [ ] 無ければ BG 側で何を足す必要があるか特定する (signalizer `R(x) = C_{L_F}(x) ≠ 1` から
-      `x ∈ C_{L'}(y)^#` for some `y ∈ L_s^#` を得る経路が自然)
+- [x] **Theorem D(4) の rich predicate を確認 (2026-08-08) — 該当成分は既に在る**。
+      `TheoremsAE.theoremD_msigma_conjugacy_and_centralizers` の第 4 連言 (`hD4`) が返す
+      `∃! N` の述語は 6 成分で、その **第 4 成分がまさに**
+
+      ```
+      x ∈ ASet N ⊤ \ (OddOrder.BG.Ch3.S10.Msigma N : Set G)
+      ```
+
+      = 書籍の `x ∈ A(N) − M_σ(N)`。`A₁` 側の橋も既存:
+      **`BG.Ch4.S16.A1_eq_sigmaSharp hG hM htau : A1 M tau = sigmaSharp M`**
+      (`sigmaSharp M = (Msigma M)^#`)。したがって
+      `x ∉ Msigma N` ⟹ `x ∉ sigmaSharp N` ⟹ `x ∉ A1 N tauN` が直に出る。
+
+      さらに D(4) の第 3 成分 `S15.MF N = Msigma N` と第 5 成分
+      `S14.IsTypeF N ∨ S14.IsTypeP2 N` (→ Prop 16.1 で Type I/II) が
+      `mainSubgroup N tauN = maxNilpotentNormalHall N = Msigma N` を保証するので、
+      `A1_eq_sigmaSharp` の適用条件も揃う。
+
+- [ ] **残る作業は `x ∈ ASet N ⊤` → `x ∈ typeA N tauN` の橋だけ**。`typeA` は型ごとの
+      `centralizerSupport` 定義 (`MaximalSubgroupType.lean`) で、`ASet N ⊤` は BG 側の定義。
+      両者を結ぶ補題が repo に無いようなので、そこを特定して足す (あるいは既存の
+      `S10_MinimalSimpleBasic` の型一律ブリッジを再利用する)。
+- [ ] 組み立て: `escapingCentralizers_control` と同じ入口
+      (`mem_sigmaSharp_of_mem_aSet_of_escape` / `A1_eq_sigmaSharp` で `x ∈ sigmaSharp M`)
+      → D(4) → 第 3/4/5 成分 → 結論。`L` の同定は
+      `existsUnique_maximal_centralizer_le_typeI_or_typeII` の一意性で行う。
+- [ ] AxiomsCheck に登録 + census note §8 表を更新
 
 ## 完了条件
 
