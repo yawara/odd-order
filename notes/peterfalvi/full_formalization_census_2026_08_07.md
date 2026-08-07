@@ -194,6 +194,21 @@ Lemma typeP_pairW S T W W1 W2 (defW : W1 \x W2 = W) :
 無関係ファイル (`BG/Ch1_Preliminary/S02_*`, `GroupTheory/RepresentationTheory/*` 等) が大量に混ざる。
 Peterfalvi §2 の監査では **`OddOrder/Peterfalvi/S04_*.lean` に絞って** grep すること。
 
+### §3 = repo `S05` (書籍 pp.15-20、`pages/peterfalvi-p015..p020.png`) — **監査途中**
+
+| 書籍 | 判定 | repo の実体 / 備考 |
+|---|---|---|
+| (3.1) Hypothesis | ✅ 構造体 | `TICyclicHypothesis` (cite 10 箇所) |
+| (3.2) | ✅ (a)-(d) 全条項 + 等長性 + 仮想指標保存 | capstone `TICyclicHypothesis.exists_sigma` (`S05_SigmaIsometry:399`) が 6 連言すべてを持つ。個別も (a) `:164`/`:218` (b) `:152` (c) `S05_IntegralSigma:72` (d) `:353` |
+| (3.3) (3.4) (3.5) | ✅ 実証明 | ω-grid `S05_OmegaGrid:62`、`α_{ij}` 基底 `S05_NormThree:134`、(3.5.1)-(3.5.5) の sub-part も密 (計 71 cite) |
+| (3.6)-(3.9) | ⬜ **未監査** | cite は密 ((3.6) 11 / (3.7) 11 / (3.8) 20 / (3.9) 20、sub-part (3.8.b)(3.8.c)(3.9.a)(3.9.b) も有) だが**書籍 pp.16-20 を未読**。次の作業単位 |
+
+⚠ **(3.2)(d) の形が書籍と違う** (未処理、要判断): 書籍は「**σ の像に入らない `G` の既約指標**は `V` 上で消える」。
+repo (`exists_sigma` 第 6 連言 / `:353`) は「`σ(Irr W)` の**全てと直交する**類関数は `V` 上で消える」。
+後者の方が仮説として一般だが、**書籍の literal な形は導けていない** — 橋渡しに
+「σ は等長 + `ℤIrr → ℤIrr` ゆえ `σ(ω)` は ±既約」→「像に入らない既約は像と直交」が要る。
+小さいが本物の欠落。次イテレーションで判断すること。
+
 ## 4. 未着手の census
 
 - **Part II (Suzuki の定理 A、書籍 pp.97-134)** — `Proposition N` / `Lemma N` の**章内リセット
