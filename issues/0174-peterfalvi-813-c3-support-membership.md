@@ -102,10 +102,30 @@ created: 2026-08-07
         よって `x ∈ L'` ⟺ `x` の `L/L_F ≅ M ∩ L` での像が `L'/L_F ≅ U_L` に入る。
       - D(4) が与える `x ∈ hatMsigma L` は `x ∈ L` までで、この `U_L` 条件は含まない。
 
-      ⟹ 必要なのは「`M ∩ L` の元で `L_F^#` の元を中心化するものは `U_L` 成分だけ」という
-      主張。候補: BG §16 Theorem B の `A(M) − M_σ` の TI 性 (Peterfalvi (8.12)(c) が
-      これを `A(M) − A₁(M) is a TI-subset of G` として引く) を `L` 側に適用する経路。
-      **次 iteration は BG Theorem B の repo 側 statement を読むところから。**
+      ⟹ 必要なのは「`M ∩ L` の元で `L_F^#` の元を中心化するものは `U_L` 成分だけ」という主張。
+
+- [x] **経路を特定 (2026-08-08): これは BG 側の作業**。repo の Theorem D(4) は第 4 成分を
+      **`x ∈ ASet N ⊤ ∖ M_σ(N)`** と記録しているが、`ASet N U = hatMsigma N ∩ (U ⊔ M_σ N)`
+      なので `U = ⊤` 版は単に `hatMsigma N` であり、**BG の `A(N)` より弱い**。
+
+      実際 `S10_TypePSupport.typePACore_subset_ASet` が示すとおり、型 `𝒫` の正しい `U₀`
+      (matched `(κ∪σ)'`-Hall) では BG Lemma 15.1(b) が `derivedInG N = U₀ ⊔ M_σ N` を与え、
+      **`ASet N U₀ = hatMsigma N ∩ N'` = Peterfalvi の `A(N)`** (host `N'`) になる。
+      つまり Type II 版に必要なのは
+
+      > Theorem D(4) の第 4 成分を `ASet N ⊤` から **`ASet N U₀`** へ強める
+
+      こと。repo の証明 (`LocalTaxonomy.lean:930`) は `x ∈ N` と `M_σ N ⊓ C_G(x) ≠ ⊥` から
+      `⊤` 版を出しており、`x ∈ N'` を出す材料を持っていない。⟹ **BG §16 側の強化が前提**で、
+      Peterfalvi 側だけでは閉じない。
+
+      ⚠ repo の D(4) は**主張しているものは証明している** (honest) が、書籍 BG の D(4) より
+      弱い可能性がある。BG 原文の D(4) が `A(N)` をどう定義しているかの確認が先。
+
+- [ ] **次の作業 (BG レーン向け)**: BG §16 原文 (mmd L4317 付近) の Theorem D(4) を読み、
+      `A(N)` が `ASet N U₀` (正しい Hall) か `hatMsigma N` かを確定する。前者なら repo の
+      D(4) は弱すぎるので強化。後者なら Peterfalvi (8.13)(c3) の Type II は BG D(4) 単独では
+      出ず、Theorem B(5) / (8.12)(c) の TI 性からの別経路が要る。
 - [ ] 組み立て: `escapingCentralizers_control` と同じ入口
       (`mem_sigmaSharp_of_mem_aSet_of_escape` / `A1_eq_sigmaSharp` で `x ∈ sigmaSharp M`)
       → D(4) → 第 3/4/5 成分 → 結論。`L` の同定は
