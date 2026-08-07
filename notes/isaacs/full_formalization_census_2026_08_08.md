@@ -327,4 +327,25 @@ repo は **(1) ⇔ (3)** だけを theorem として持ち、条件 (2) は Lemm
 
 ⟹ **Ch.7 全 8 件被覆・補充ゼロ**。
 
-### Ch.9-Ch.10 — 未着手 (次の入口 = Ch.9 More on Subnormality、31 件)
+### Ch.9 More on Subnormality (31 件、書籍 pp.267-293) — **監査完了 (2026-08-08)**、補充ゼロ
+
+**31/31 参照あり**。単独参照の 5 件と多段構成の 9.23/9.24 を実体で確認:
+
+| Isaacs | 書籍 | 実体 |
+|---|---|---|
+| 9.3 | `N` 極小正規、`H` が `N` に含まれない component ⟹ `[N,H] = 1` | `commutator_eq_bot_of_isMinimalNormal_of_isComponent` (`Components.lean`) |
+| 9.19 | `N ⊴ G`、`N ≤ Φ(G)`、`G/N` 冪零 ⟹ `G` 冪零 | `isNilpotent_of_frattini_le_of_quotient_nilpotent` (`Schenkman.lean`) |
+| 9.20 | `N ⊴ G`、`G/N` 冪零 ⟹ ∃ 冪零 `H ≤ G` で `NH = G` | `exists_nilpotent_sup_eq_top` |
+| 9.21 | **Schenkman** | `centralizer_nilpotentResidual_le_of_centralizer_eq_bot` |
+| 9.22 | `Z(G) = 1` ⟹ `C_G(G^∞) ⊆ G^∞` | `centralizer_nilpotentResidual_le_of_center_eq_bot` |
+| **9.23** | **Thompson**: corefree 極大 `H`、`g ∉ H`、`m = [H : H ∩ H^g]` ⟹ ある素数 `p` で `[H : O_p(H)] ≤ ((m!)²)!` | `Ch09.thompsonCorefreeBound` (`ThompsonWielandt.lean:752`) |
+| **9.24** | **Thompson–Wielandt** | `Ch09.thompsonWielandt` (`:685`) |
+
+⚠ `ThompsonWielandt.lean` は「**Thm 9.23 準備**」「**index 連鎖**」といった中間段の
+section 名が先に目に入るが、**endpoint は file 末尾の `thompsonCorefreeBound` / `thompsonWielandt`**。
+Ch.3 の 3.34 と同じ「内部段の名前が先に当たる」パターンで、`grep -n '^theorem' <file> | tail`
+で endpoint を確認するのが定石。
+
+⟹ **Ch.9 全 31 件被覆・補充ゼロ**。
+
+### Ch.10 — 未着手 (最後の 1 章、More Transfer、28 件)

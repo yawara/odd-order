@@ -134,6 +134,8 @@ repo の `Ch08_PermutationGroups` も既に `IsPreprimitive` を使っている�
       - **Ch.7 監査完了 (2026-08-08)**: 全 8 件被覆・**補充ゼロ**。7.8 (Burnside `p^a q^b`)
         は指標を使わない Goldschmidt–Bender–Matsuyama の 9 段証明で `burnside_p_pow_q_pow`。
         ⚠ 7.4 は repo が `Isaacs Lem 7.4` と略記しており grep パターンが取りこぼした。
+      - **Ch.9 監査完了 (2026-08-08)**: 全 31 件被覆・**補充ゼロ**。9.21 (Schenkman)、
+        9.23 (Thompson の corefree bound)、9.24 (Thompson–Wielandt) とも endpoint あり。
       - 1 章ぶん終えるごとに census note を更新して commit。
 
 ## 完了条件
