@@ -253,17 +253,22 @@ docstring が「in particular 直交する」と**散文で主張**していた�
 | **(5.2) 全体の重要注記** | ⚠ 2 つの carrier があり **旧 `Hypothesis` は特殊化債務**だった | `S07.Hypothesis` は `difference_image` を **2 元版** (`CharacterDifferenceImage`) で持つため、ノルムを取ると `‖τ(χ−χ̄)‖² = 2` と (5.2.b) 等長性から `‖χ−χ̄‖² = 2‖χ‖²` が出て **`S` の全メンバーの既約性を暗黙に強制**する。書籍はそれを課さない (可約メンバーは `‖χ‖² > 1`, `\|R(χ)\| = 2‖χ‖²`)。これが **(5.7) を書籍強度で証明できなくしていた** (issue 0157)。→ 書籍忠実な `GeneralHypothesis` (R(χ) が**任意サイズ**) が導入され、`Hypothesis.toGeneralHypothesis` で旧版が特殊化として繋がっている。**私の監査分類でいう「特殊化」型が、過去に発見・解消された実例** |
 | **(5.2)(b) の `L^#` vs `A`** | ✅ **2026-08-07 に橋渡しを補充** | 書籍は `τ : ℤ[S, L^#] → ℤ[Irr G, G^#]` の等長。repo は **`ℤ[S,A]` 相対**。docstring が理由を明記: FT の Dade 写像には**大域的な等長は存在しない** (`dim CF(L) > dim CF(G)`)、かつ pre-0099 の全メンバー差分形は混合次数の族で**偽**。書籍の `L^#` 版と一致するのは **`ℤ[S,L^#] = ℤ[S,A]`** (= (4.7) 由来) による。⟹ この等式 `zSupportedSpan_ne_one_eq` を `S07_Coherence/DifferenceImage.lean` に追加した (仮説「各メンバーの台が `A ∪ {1}`」は (4.7) が供給)。従来は必要な個別の台評価 (`inducedNonKernelFamily_conjDiff_support` 等) だけが在り**格子の等式そのものは無かった**。ambient 版の台伝播補題 `support_subset_of_mem_zSpan` も併せて追加 (既存版は subgroup 相対専用)。⟹ **(4.9)(a) の繰延項目もこれで解消** |
 | (5.3)(b) | ✅ 族は書籍忠実 / ⚠ docstring の引用を訂正 | 族 `S10.inducedNonKernelFamily` が書籍どおり (`θ : Irr ↥K`、フィルタ `¬(H.subgroupOf K ⊆ characterKernel θ)`、像 `Ind_K^L θ`)。producer は `inducedNonKernelFamily_subcoherent` (= (5.3.b) verbatim)。証明は可約性で 2 分岐 (既約 → (5.3)(a) の 2 元 `R(χ)` / 可約 → (4.4)+(4.5) で源が certain-type 列と判り (4.9) が `2w₁` 元の `R(μ_j)` を供給)。⚠ **`S06_CertainTypeSubcoherent:17` の書籍引用が `{Ind_H^L θ \| θ ∈ Irr H, …}` と誤転記されていた** (書籍 p.25 は `Ind_K^L`, `θ ∈ Irr K`。`W₂ ⊆ H ⊆ K` なので別物) → 2026-08-07 訂正。Lean 側は元から正しかった。書籍の末尾節「`φ ∈ 𝒮 ∩ Irr L` なら `R(φ) ⊥ ω^σ`」も引用に補った |
-| (5.3)(a) | ⬜ **未監査** | `(5.2.a)(5.2.b)` + `𝒮 ⊆ Irr L` ⟹ (5.2) 成立。2 元 `R(χ)` (`CharacterDifferenceImage`) が対応するはずで、`characterDifferenceImageOfIsometry` が producer 候補 |
+| (5.3)(a) | ✅ 実証明・書籍の証明どおり | `nonempty_characterDifferenceImage_of_irreducible` = 「任意の `τ` に対する (5.3.a)」: 既約・非実な `χ` で `‖τ(χ−χ̄)‖² = 2` ⟹ 相異なる既約の符号付き対 (`dirr_small_norm`)、`1` で評価すると ((5.2.b) の終域 `ℤ[Irr G, G^#]`) **符号が逆**に強制され 2 元 `R(χ)` になる。`InducedFamilyTauData.hypothesis` が (5.2) 全体を供給し、**(5.2.e) は (4.1) から *導出*** (転送ではない) — **書籍の (5.3.a) の証明どおり** |
 | (5.4) | ✅ 実証明 (a)(b) とも・書籍と一致 | 仮説束ね `NormInequalities:28` (`CharacterPsiDecomposition`)、(a) `inner_self_chi_re_le_inner_self_X` `:309`、(b) `:387` (`‖X‖² = ‖χ‖²`, `‖Y‖² = ‖ψ‖²`, `X = ∑_{α∈E} α`)。書籍 p.26 と条項一致 |
 | (5.5) | ✅ 実証明・書籍の証明どおり | `NormInequalities:442`。書籍と同じく **(5.4) を `ψ = 0` で適用** し、`‖Y‖² ≥ ‖ψ‖² = 0` が自動成立するので `Y = 0`、`χ^{τ₁} = X = ∑_{α∈E} α`。⚠ 前回 `S12_TypeIIColumnPin` を実体と記録したのは誤り — あれは §12 の**応用**で、一般形は S07 に在る (「節のディレクトリに絞らない」の再確認) |
 | (5.6) | ✅ **全体組み立てが在る (UNCONDITIONAL)** | ⚠ **前ターンの「全体定理が見当たらない」は誤り**。実体は `S07.retarget_isCoherent` (`S07_RetargetScaled:367`) = 「**MAIN coherence-union assembly (general (5.6), UNCONDITIONAL)**: `IsCoherent (S₁ ∪ {χ,χ̄}) A`」。拡張 `τ₂ := retarget τ₁ χ χ̄ X X̄` を**構成**し、`ℤ[S₁∪{χ,χ̄}]` 上の格子等長を証明、`extends_on_supported` を 3 本の差分生成元で discharge。**special-position 制限なし**。さらに仮説側も posited でなく構成される: `{X,X̄}` は `retargetTargetPair` が (5.5) 分解から**構成** (既約 `χ` では target pair は強制される)、`himg` は `image_eq_of_decomposition` が構成。(6.6)/(6.8) の `coherentPairChain` が呼ぶ単一エントリ (`IsCoherent τ S₁ A → IsCoherent τ (S₁∪{χ,χ̄}) A`) も在る。私が先に見つけた `isCoherent_union_pair_of_bridge` は §9 レベルの**別ルート** (bridge 経由) だった。⬜ 残る narrow な問い: 書籍の仮説 (b) `χ₁(1) \| χ(1)` と (c) 次数不等式が、repo では「分解 `D₀`/`Da` の存在」に置き換わっている。(b)(c) ⟹ 分解存在 の橋渡しが statement として在るかは未確認 |
 | (5.7) | ✅ **書籍強度で実証明** | `coherent_of_constant_degree_general` (issue 0157)。**メンバーの既約性を仮定しない**書籍どおりの形で `GeneralHypothesis` 上に述べられている。旧 `coherent_of_constant_degree` (2 元 carrier) は `m = 1` の特殊化。base case `\|𝒮\| = 2` は `R(χ)` を `m = ‖χ‖²` で二分する構成 (`isCoherent_pair_of_orthonormalImage`) |
-| (5.8) | ⬜ 要突合 (statement は在る) | μ-列の二分律を Hypothesis (4.6) 一般で (issue 0161、`AxiomsCheck:13782`) + **一意性 rider** (p.29、`S06_CertainTypeColumnUniqueness:54`)。書籍 pp.28-29 と未突合 |
-| (5.9) | ⬜ 要突合 / **(a)(b) とも statement は在る** | (a) `S07_CoherenceGalois:94` (Dade 状況で `𝒮 ⊆ Irr L`, `\|𝒮\| ≥ 2`, 共役閉)。**(b)** `DifferenceImage:1256` = 「`τ` が複素共役と可換なときの差分像の共役対応」(`CharacterDifferenceImage.nu_eq_mu_conj`)、§14 の (12.3) bar-trick が消費。書籍 p.29 と未突合 |
+| (5.8) | ✅ 実証明 (二分律 + 一意性 rider) | 二分律 `S12.certainTypeR_subsum_dichotomy` — Hypothesis (4.6) 一般に抽象化済 (issue 0161、型-II 特殊化 `typeII_nu_tau2_dichotomy` の ~430 行が抽象版へ移動)。「`ψ` が (4.9) 列像族 `R(μ_j)` の濃度 `w₁` 部分和で `V` 上消えるなら符号付きの完全 σ-grid 列」。**一意性 rider** (書籍 p.29) `S06.subsum_eq_column_of_third_column` も別途 |
+| (5.9) | ✅ (a)(b) とも実証明 | (a) `S07_CoherenceGalois:94` (Dade 状況で `𝒮 ⊆ Irr L`, `\|𝒮\| ≥ 2`, 共役閉)。**(b)** `DifferenceImage:1256` = 「`τ` が複素共役と可換なときの差分像の共役対応」(`CharacterDifferenceImage.nu_eq_mu_conj`)、§14 の (12.3) bar-trick が消費。書籍 p.29 と未突合 |
 
-**§5 の暫定まとめ (2026-08-07 時点)**: (5.1)/(5.2)/(5.3)(b)/(5.6) の oracle 懸念/(5.7) は監査済で
-**欠落ゼロ**。(5.3)(a)/(5.4)/(5.5)/(5.6) 本体/(5.8)/(5.9) は **statement の所在のみ確認、
-書籍 pp.25-29 との条項突合が未了**。
+**§5 監査完了 (2026-08-07)**: 全 9 件で**未形式化ゼロ・補充ゼロ**。§4 に続いて元から完全被覆だった。
+⬜ narrow な残問 1 件: (5.6) の書籍仮説 (b) `χ₁(1) \| χ(1)` / (c) 次数不等式が repo では
+「分解 `D₀`/`Da` の存在」に置き換わっている。(b)(c) ⟹ 分解存在 の橋渡しの有無は未確認 (低優先)。
+
+⚠ **§5 の監査で私は 3 回「実体が無い」と誤判定しかけた** ((4.1)/(5.5)/(5.6))。いずれも検索範囲を
+節の repo ディレクトリに絞ったのが原因。**`AxiomsCheck.lean` の番号コメント検索を最初に打つ**のが
+最も確実 (「何がどこまで証明されたか」が番号付きで記録されている)。正本 = memory
+[[textbook-coverage-audit-failure-modes]]。
 
 ⚠ **既知の罠**: (5.3)(b) の族の条件は `θ ≠ 1_K` **ではなく** `H ⊄ Ker θ`
 (memory [[read-book-hypothesis-before-adding-side-condition]] — 過去に取り違えて 1 session 誤診した)。
