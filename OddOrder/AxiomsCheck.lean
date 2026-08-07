@@ -625,7 +625,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 20500
+set_option linter.style.longFile 20600
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -12592,6 +12592,46 @@ signalizer 経路のほうが直接的)。 -/
   OddOrder.BG.Ch4.S14.notMem_kappa_of_mem_tau2
 #assert_only_allowed_axioms
   OddOrder.BG.Ch4.S14.notMem_kappa_of_mem_piSet_of_forall_mem_tau2
+
+/-! ### Peterfalvi (8.13)(c3) — Type II の支持極大 (issue 0174、2026-08-08)
+
+(8.13)(c3) の Type II 版。Type I との差は**支持台 (host)** だけ: (8.10) により
+`A(L)` の host は Type I なら `L`、Type II (類 `𝒫`) なら `L'`。repo の Theorem D(4)
+(`exists_RData_escape_structure`) は第 4 成分を `x ∈ ASet L ⊤ = hatMsigma L` (host `L`) と
+記録しており、**BG 原文の型依存 `A(L)` より弱い**。
+
+BG 側の強化 4 本 (`LocalTaxonomy` / `TaxonomyOutput`):
+
+  notMem_Msigma_of_forall_mem_tau2       π(⟨x⟩) ⊆ τ₂(N) ⟹ x ∉ N_σ (D(4) 証明から抽出)
+  isPiElement_kappa_compl_of_forall_mem_tau2
+                                         π(⟨x⟩) ⊆ τ₂(N) ⟹ x は κ(N)′-元
+  escaping_mem_derived_of_typeP          同上 ⟹ x ∈ N' (Lemma 15.1(b) + 正規 κ′-Hall)
+  mem_ASet_sdiff_Msigma_of_typeP         D(4) 第 4 成分を ASet N U へ強める
+  escaping_mem_ASet_sdiff_Msigma_of_typeP
+                                         escaping x に対する BG 原文どおりの x ∈ A(N) − N_σ
+
+Peterfalvi 側:
+
+  mem_typeA_of_mem_hatMsigma             hatMsigma M ∖ {1} ∩ host ⊆ A(M) (型一律に一般化;
+                                         Type I 版 mem_typeA_of_mem_hatMsigma_of_typeI は
+                                         host = M の系に縮約)
+  escaping_mem_typeA_notMem_A1_of_typeII (8.13)(c3) Type II 本体
+
+⚠ BG 自身の証明経路 (Cor 15.9 → `|K₁|` 素数 → `K₁R` 非冪零 (15.2) → `K₁ ∩ M_σ = 1`) は
+**不要だった**。signalizer 構造が既に `π(⟨x⟩) ⊆ τ₂(N)` を持ち、`κ(N) ∩ τ₂(N) = ∅`
+(`S14.notMem_kappa_of_mem_tau2`、pRank 1 vs 2) だけで `x` が `κ(N)′`-元になる。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.notMem_Msigma_of_forall_mem_tau2
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.isPiElement_kappa_compl_of_forall_mem_tau2
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.escaping_mem_derived_of_typeP
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.mem_ASet_sdiff_Msigma_of_typeP
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.escaping_mem_ASet_sdiff_Msigma_of_typeP
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.mem_typeA_of_mem_hatMsigma
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S10.escaping_mem_typeA_notMem_A1_of_typeII
 
 /-! ### Peterfalvi (8.13)(c3) — Type I の支持極大 (issue 0174、2026-08-08)
 

@@ -525,6 +525,51 @@ theorem maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape
     (fun y hy => by rw [Set.mem_singleton_iff.mp hy]))
   exact ⟨N, maximalContaining_centralizer_eq_singleton_of_tau2_element hG hNmax hxN hx1 hxtau2 hRne⟩
 
+/-- **BG Theorem D(4) with BG's own type-`𝒫` host: `x ∈ A(N) − N_σ`.**
+
+BG's Theorem D(4) reads "… `x ∈ A(N) − N_σ` …" with the *type-dependent* `A(N)` of BG p. 227
+(= Peterfalvi (8.10)): host `N` on type I, host `N′` on type II.  The rich `∃! N` predicate of
+`exists_RData_escape_structure` records only `x ∈ ASet N ⊤ = hatMsigma N`, i.e. the host-`N`
+half — enough on type I, strictly weaker on type II.  This theorem supplies BG's clause for the
+types of class `𝒫`, where `ASet N U = hatMsigma N ∩ N′` by Lemma 15.1(b).
+
+The extra content over `exists_RData_escape_structure` is `x ∈ N′`, which
+`escaping_mem_derived_of_typeP` reads straight off the signalizer datum
+`π(⟨x⟩) ⊆ τ₂(N)` — no part of BG's own Corollary 15.9 route (`|K₁|` prime, `K₁R` non-nilpotent,
+`K₁ ∩ M_σ = 1`) is needed.  `N` is pinned to the signalizer neighbour by the singleton
+`ℳ(C_G(x)) = {N}`. -/
+theorem escaping_mem_ASet_sdiff_Msigma_of_typeP [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {x : G} (hx : x ∈ S14.sigmaSharp M)
+    (hesc : ¬ Subgroup.centralizer ({x} : Set G) ≤ M)
+    {N K U : Subgroup G}
+    (hNmem : N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)))
+    (hP : S14.IsTypeP N) (hKN : K ≤ N) (hUN : U ≤ N)
+    (hK : Ch03.IsHallSubgroup (S14.kappa N) (K.subgroupOf N))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa N ∪ OddOrder.BG.Ch3.S10.sigma N)ᶜ) (U.subgroupOf N)) :
+    x ∈ ASet N U \ (OddOrder.BG.Ch3.S10.Msigma N : Set G) := by
+  have hx1 : x ≠ 1 := hx.2
+  have hgt : 1 < (S14.maximalSigmaSubgroupsOfElement x).ncard := by
+    by_contra h
+    push Not at h
+    exact hesc (centralizer_le_of_maximalSigma_le_one hG hM hx.1 hx1 h)
+  obtain ⟨N₀, hN₀struct, -⟩ := signalizer_structure_of_mem_sigmaSharp hG hM hx hgt
+  obtain ⟨hN₀max, hCN₀, hRne, _hRhall, hxtau2, _hN₀type, _hforall⟩ := hN₀struct
+  have hxN₀ : x ∈ N₀ := hCN₀ (Subgroup.mem_centralizer_iff.mpr
+    (fun y hy => by rw [Set.mem_singleton_iff.mp hy]))
+  -- `ℳ(C_G(x)) = {N₀}` pins the given `N` to the signalizer neighbour.
+  obtain ⟨N', hMC⟩ := maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape
+    hG hM hx hesc
+  have hNN₀ : N = N₀ := by
+    have h1 := hNmem
+    have h2 : N₀ ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) :=
+      mem_maximalSubgroupsContaining.mpr ⟨hN₀max, hCN₀⟩
+    rw [hMC, Set.mem_singleton_iff] at h1 h2
+    rw [h1, h2]
+  subst hNN₀
+  exact mem_ASet_sdiff_Msigma_of_typeP hG hN₀max hP hKN hUN hK hU ⟨hxN₀, hRne⟩
+    (notMem_Msigma_of_forall_mem_tau2 hx1 hxtau2) hxtau2
+
 /-- **The signalizer maximal is the unique type-`I`/`II` overgroup of `C_G(x)`** (full per-element
 half of Peterfalvi (8.13)): for an escaping `σ`-sharp element `x` (`x ∈ M_σ#`, `C_G(x) ⊄ M`) there
 is

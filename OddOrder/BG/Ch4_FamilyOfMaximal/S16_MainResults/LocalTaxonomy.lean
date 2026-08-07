@@ -861,6 +861,100 @@ theorem centralizer_escape_final_local [Finite G]
   obtain ⟨hIsCompl, hFrob⟩ := typeF_frobenius_of_esetup hG hM hFM htau2M hsetupM hEMne
   exact ⟨EM, hsetupM.E_le, hIsCompl, hEMcyc, hFrob⟩
 
+/-- **A `τ₂(N)`-element lies outside `N_σ`.**  Every prime of `π(⟨x⟩)` is a `τ₂(N)`-prime, hence a
+`σ(N)′`-prime (`mem_tau2_iff`), while `N_σ` is a `σ(N)`-group.  Extracted from the Theorem D(4)
+proof, which needs it for the `∖ N_σ` half of its fourth component. -/
+theorem notMem_Msigma_of_forall_mem_tau2 [Finite G] {N : Subgroup G} {x : G} (hx1 : x ≠ 1)
+    (hxtau2 : ∀ p ∈ S14.piSet (Subgroup.closure ({x} : Set G)), p ∈ tau2 N) :
+    x ∉ (OddOrder.BG.Ch3.S10.Msigma N : Set G) := by
+  intro hxMσN
+  obtain ⟨p, hpp, hpdvd⟩ := (orderOf x).exists_prime_and_dvd
+    (fun h => hx1 (orderOf_eq_one_iff.mp h))
+  have hpπx : p ∈ S14.piSet (Subgroup.closure ({x} : Set G)) := by
+    rw [S14.piSet, ← Subgroup.zpowers_eq_closure, Nat.card_zpowers]
+    exact Nat.mem_primeFactors.mpr ⟨hpp, hpdvd, (orderOf_pos x).ne'⟩
+  have hpτ2 : p ∈ tau2 N := hxtau2 p hpπx
+  have hpσN : p ∈ OddOrder.BG.Ch3.S10.sigma N :=
+    OddOrder.BG.Ch3.S10.Msigma_isPiGroup N p (Nat.mem_primeFactors.mpr ⟨hpp,
+      hpdvd.trans ((OddOrder.BG.Ch3.S10.Msigma N).orderOf_dvd_natCard
+        (SetLike.mem_coe.mp hxMσN)), Nat.card_pos.ne'⟩)
+  exact ((mem_tau2_iff N p).mp hpτ2).1 hpσN
+
+/-- **A `τ₂(N)`-element of `G` is a `κ(N)′`-element.**
+
+Pure translation of `S14.notMem_kappa_of_mem_tau2` (`κ(N) ∩ τ₂(N) = ∅`, immediate from `pRank`)
+into the `IsPiElement` vocabulary, using `π(⟨x⟩) = π(|x|)` (`zpowers_eq_closure` +
+`Nat.card_zpowers`).  The hypothesis is exactly the fifth component of
+`signalizer_structure_of_mem_sigmaSharp`, so every escaping `x ∈ M_σ^#` satisfies it for its
+signalizer neighbour `N`. -/
+theorem isPiElement_kappa_compl_of_forall_mem_tau2 {N : Subgroup G} {x : G}
+    (hxtau2 : ∀ p ∈ S14.piSet (Subgroup.closure ({x} : Set G)), p ∈ tau2 N) :
+    IsPiElement (S14.kappa N)ᶜ x := by
+  intro p hp
+  refine S14.notMem_kappa_of_mem_tau2 (hxtau2 p ?_)
+  rw [S14.piSet, ← Subgroup.zpowers_eq_closure, Nat.card_zpowers]
+  exact hp
+
+/-- **BG Theorem D(4), type-`𝒫` refinement: the escaping element lies in `N′`.**
+
+BG states D(4) as `x ∈ A(N) − N_σ`, and `A(N)` is *type-dependent*: for type I the host is `N`,
+but for type II (`𝒫₂`) it is `N′` (BG p. 227 = Peterfalvi (8.10)).  The repo's
+`theoremD_msigma_conjugacy_and_centralizers` records only the host-`N` half
+(`x ∈ ASet N ⊤ = hatMsigma N`), because its proof of that clause uses just `x ∈ N` and
+`N_σ ⊓ C_G(x) ≠ 1`.  This theorem supplies the missing type-II half.
+
+BG's own route goes through Corollary 15.9 — `|K₁|` prime (Prop 14.2(g)), `K₁R` non-nilpotent
+(15.2), hence `K₁ ∩ M_σ = 1`.  None of that is needed: the signalizer datum already carries
+`π(⟨x⟩) ⊆ τ₂(N)`, and `κ(N) ∩ τ₂(N) = ∅` makes `x` a `κ(N)′`-element outright.  Then
+
+* `mem_U_sup_Msigma_iff_isPiElement_kappa_compl` — `U ⊔ N_σ` is *the* normal `κ(N)′`-Hall of `N`,
+  so `κ(N)′`-elements of `N` are exactly its elements;
+* `typeP_hall_derived_eq_and_abelian` (BG Lemma 15.1(b)) — `N′ = U ⊔ N_σ` for type `𝒫`.
+
+Together with `hatMsigma N` from D(4) this is `x ∈ ASet N U`, i.e. Peterfalvi's `A(N)` with the
+type-II host `N′`. -/
+theorem escaping_mem_derived_of_typeP [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {N K U : Subgroup G} (hNmax : N ∈ maximalSubgroups G) (hP : S14.IsTypeP N)
+    (hKN : K ≤ N) (hUN : U ≤ N)
+    (hK : Ch03.IsHallSubgroup (S14.kappa N) (K.subgroupOf N))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa N ∪ OddOrder.BG.Ch3.S10.sigma N)ᶜ) (U.subgroupOf N))
+    {x : G} (hxN : x ∈ N)
+    (hxtau2 : ∀ p ∈ S14.piSet (Subgroup.closure ({x} : Set G)), p ∈ tau2 N) :
+    x ∈ derivedInG N := by
+  have hKne : K ≠ ⊥ := fun h =>
+    S14.card_kappaHall_ne_one hP hKN hK (by rw [h, Subgroup.card_bot])
+  have hM'eq : derivedInG N = U ⊔ OddOrder.BG.Ch3.S10.Msigma N :=
+    (S15.typeP_hall_derived_eq_and_abelian hG hNmax hKN hUN hKne hK hU).1
+  haveI hnorm : ((U ⊔ OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).Normal := by
+    rw [← hM'eq]
+    exact Subgroup.normal_subgroupOf_of_le_normalizer
+      (OddOrder.BG.Ch3.S10.le_normalizer_derivedInG N)
+  rw [hM'eq]
+  exact (S14.mem_U_sup_Msigma_iff_isPiElement_kappa_compl hG hNmax hUN hU hnorm hxN).mpr
+    (isPiElement_kappa_compl_of_forall_mem_tau2 hxtau2)
+
+/-- **BG Theorem D(4) with the type-`𝒫` host**: for an escaping `x ∈ M_σ^#` whose signalizer
+neighbour `N` is of type `𝒫`, the D(4) conclusion upgrades from `x ∈ ASet N ⊤` to
+`x ∈ ASet N U ∖ N_σ` — BG's own `x ∈ A(N) − N_σ` with the type-II host `N′ = U ⊔ N_σ`.
+
+`hxhat`/`hxnot` are the two halves of D(4)'s fourth component, `hxtau2` its signalizer datum
+(fifth component of `signalizer_structure_of_mem_sigmaSharp`). -/
+theorem mem_ASet_sdiff_Msigma_of_typeP [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {N K U : Subgroup G} (hNmax : N ∈ maximalSubgroups G) (hP : S14.IsTypeP N)
+    (hKN : K ≤ N) (hUN : U ≤ N)
+    (hK : Ch03.IsHallSubgroup (S14.kappa N) (K.subgroupOf N))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa N ∪ OddOrder.BG.Ch3.S10.sigma N)ᶜ) (U.subgroupOf N))
+    {x : G} (hxhat : x ∈ hatMsigma N)
+    (hxnot : x ∉ (OddOrder.BG.Ch3.S10.Msigma N : Set G))
+    (hxtau2 : ∀ p ∈ S14.piSet (Subgroup.closure ({x} : Set G)), p ∈ tau2 N) :
+    x ∈ ASet N U \ (OddOrder.BG.Ch3.S10.Msigma N : Set G) := by
+  refine ⟨⟨hxhat, ?_⟩, hxnot⟩
+  have hxN : x ∈ N := hxhat.1
+  have hx := escaping_mem_derived_of_typeP hG hNmax hP hKN hUN hK hU hxN hxtau2
+  rwa [(S15.typeP_hall_derived_eq_and_abelian hG hNmax hKN hUN
+    (fun h => S14.card_kappaHall_ne_one hP hKN hK (by rw [h, Subgroup.card_bot]))
+    hK hU).1] at hx
+
 /-- **BG Theorem D(4), the escape structure** (the `hD4` conjunct of
 `theoremD_msigma_conjugacy_and_centralizers`): for `x ∈ M_σ^#` whose centralizer escapes `M`, the
 normal-complement data `R(x)` exists and is attached to a *unique* maximal `N ⊇ C_G(x)` of type `F`
@@ -908,19 +1002,8 @@ theorem exists_RData_escape_structure [Finite G]
   have hxM_mem : x ∈ M := OddOrder.BG.Ch3.S10.Msigma_le M hxMσ
   obtain ⟨-, -, hMcompl, hMsharp⟩ := hforall M ⟨hM, hxMσ⟩
   -- `x ∉ M_σ(N)` since `x` is a `τ₂(N)`-element (`σ(N)′`).
-  have hxnotMσN : x ∉ (OddOrder.BG.Ch3.S10.Msigma N : Set G) := by
-    intro hxMσN
-    obtain ⟨p, hpp, hpdvd⟩ := (orderOf x).exists_prime_and_dvd
-      (fun h => hx1 (orderOf_eq_one_iff.mp h))
-    have hpπx : p ∈ S14.piSet (Subgroup.closure ({x} : Set G)) := by
-      rw [S14.piSet, ← Subgroup.zpowers_eq_closure, Nat.card_zpowers]
-      exact Nat.mem_primeFactors.mpr ⟨hpp, hpdvd, (orderOf_pos x).ne'⟩
-    have hpτ2 : p ∈ tau2 N := hxtau2 p hpπx
-    have hpσN : p ∈ OddOrder.BG.Ch3.S10.sigma N :=
-      OddOrder.BG.Ch3.S10.Msigma_isPiGroup N p (Nat.mem_primeFactors.mpr ⟨hpp,
-        hpdvd.trans ((OddOrder.BG.Ch3.S10.Msigma N).orderOf_dvd_natCard
-          (SetLike.mem_coe.mp hxMσN)), Nat.card_pos.ne'⟩)
-    exact ((mem_tau2_iff N p).mp hpτ2).1 hpσN
+  have hxnotMσN : x ∉ (OddOrder.BG.Ch3.S10.Msigma N : Set G) :=
+    notMem_Msigma_of_forall_mem_tau2 hx1 hxtau2
   refine ⟨OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G),
     RData_of_inputs hG hM hxMσ hx1 hCN hMsharp hRhall
       (signalizer_centralizer_isComplement hMcompl hCN hxM_mem),

@@ -233,32 +233,74 @@ created: 2026-08-07
 
       を与える。⟹ **手順 3-5 の定型部分は既存補題の組み合わせで済む**。
 
-- [ ] **⟹ 真に必要なのは 1 命題だけ**:
+- [x] **⟹ 真に必要なのは 1 命題だけ、しかも BG の経路は不要だった (2026-08-08)**:
 
       > escaping な `x ∈ M_σ^#` と `N = N(x)` について **`κ(N) ∩ π(⟨x⟩) = ∅`**
       > (= `x` は `κ(N)′`-元)
 
       BG の経路は `K₁ ∩ M_σ = 1` (`\|K₁\|` 素数 + (15.2) の `K₁R` 非冪零) から
-      「`x ∈ M_σ` の `k`-部分は `M_σ ∩ K₁^g = 1`」で出す。**これが唯一の新規数学**で、
-      BG (15.2) の形式化がその前提。
+      「`x ∈ M_σ` の `k`-部分は `M_σ ∩ K₁^g = 1`」で出すが、**それは遠回りだった**。
 
-      ⚠ **経路は完全に確定済み・未解決数学は無い**。
-- [ ] 組み立て: `escapingCentralizers_control` と同じ入口
-      (`mem_sigmaSharp_of_mem_aSet_of_escape` / `A1_eq_sigmaSharp` で `x ∈ sigmaSharp M`)
-      → D(4) → 第 3/4/5 成分 → 結論。`L` の同定は
-      `existsUnique_maximal_centralizer_le_typeI_or_typeII` の一意性で行う。
-- [ ] AxiomsCheck に登録 + census note §8 表を更新
+      repo の D(4) 証明 (`LocalTaxonomy.lean:902`) は signalizer 構造から
+      **`hxtau2 : ∀ p ∈ π(⟨x⟩), p ∈ τ₂(N)` を既に文脈に持っている**。あとは
+
+      ```
+      κ(N) ⊆ τ₁(N) ∪ τ₃(N)   kappa_subset_tau1_union_tau3
+      τ₁/τ₃ ⟹ pRank N p = 1   mem_tau1_iff / mem_tau3_iff
+      τ₂    ⟹ pRank N p = 2   mem_tau2_iff
+      ⟹ κ(N) ∩ τ₂(N) = ∅      (自然数が 1 と 2 の両方にはなれない)
+      ```
+
+      だけで `x` は `κ(N)′`-元。**BG (15.2) も `K₁ ∩ M_σ = 1` も形式化不要**。
+
+- [x] **landing 完了 (2026-08-08)**。全 8 定理 axiom-clean:
+
+      **BG 側** (`S14_TypePCounting/TypeClassification.lean`):
+      ```
+      notMem_kappa_of_mem_tau2                        p ∈ τ₂(M) ⟹ p ∉ κ(M)
+      notMem_kappa_of_mem_piSet_of_forall_mem_tau2    π(⟨x⟩) ⊆ τ₂(M) ⟹ x は κ(M)′-元
+      ```
+      **BG 側** (`S16_MainResults/LocalTaxonomy.lean`):
+      ```
+      notMem_Msigma_of_forall_mem_tau2            π(⟨x⟩) ⊆ τ₂(N) ⟹ x ∉ N_σ (D(4) から抽出)
+      isPiElement_kappa_compl_of_forall_mem_tau2  IsPiElement 語彙への翻訳
+      escaping_mem_derived_of_typeP               ⟹ x ∈ N' (Lemma 15.1(b) + 正規 κ′-Hall)
+      mem_ASet_sdiff_Msigma_of_typeP              D(4) 第 4 成分を ASet N U へ強化
+      ```
+      **BG 側** (`S16_MainResults/TaxonomyOutput.lean`):
+      ```
+      escaping_mem_ASet_sdiff_Msigma_of_typeP     escaping x に対する BG 原文どおりの
+                                                  x ∈ A(N) − N_σ (型依存 host)
+      ```
+      **Peterfalvi 側**:
+      ```
+      S10_StructureSetup.mem_typeA_of_mem_hatMsigma          型一律に一般化
+                          (Type I 版は host = M の 1 行系に縮約)
+      S10_MinimalSimpleBasic.escaping_mem_typeA_notMem_A1_of_typeII   ← (8.13)(c3) Type II 本体
+      ```
+
+      ⟹ **repo の Theorem D(4) は BG 原文の型依存 `A(N)` を運ぶようになった**
+      (弱化の解消)。D(4) 本体の signature は不変で、型依存版は別定理として提供
+      (下流の再配線ゼロ)。
 
 ## 完了条件
 
-**Type I は 2026-08-08 に達成済**。残るは Type II。型一律の形 (任意の Peterfalvi 型の `M`、`X = A(M)` または `A₀(M)`) で
+**達成 (2026-08-08)**。Type I (`escaping_mem_typeA_notMem_A1_of_typeI`) と
+Type II (`escaping_mem_typeA_notMem_A1_of_typeII`) の両方で
 
 ```
 x ∈ D → C_G(x) ≤ L → L ∈ maximalSubgroups G →
   x ∈ typeA L tauL ∧ x ∉ A1 L tauL
 ```
 
-が証明され、AxiomsCheck に登録される。census note の §8 表を更新して §8 監査を完了にする。
+が証明され、AxiomsCheck に登録された。(8.13) の supporting maximal `L` は D(4) により
+Type I か II に限られる (`existsUnique_maximal_centralizer_le_typeI_or_typeII`) ので、
+**この 2 本で (c3) は完全被覆**。
+
+⚠ Type II 版は Hall パラメータ `K`/`U` を明示引数で取る (BG §15--§16 の
+`a0_minus_a_subset_conj_zTilde` 等と同じローカル慣用)。`L` が Type II なら両者は存在する
+(可解群の Hall 部分群) が、その存在を内部で取ると `∃` の下で結論を述べることになり
+使い勝手が落ちるため、呼び出し側に渡させる形にした。
 
 ## 参照
 

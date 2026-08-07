@@ -697,8 +697,9 @@ BG Theorem D(4) already carries this clause: its rich `∃! N` predicate has
 to the `N` of Theorem D(4) because `ℳ(C_G(x))` is a singleton
 (`maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`).
 
-⚠ Type II is **not** covered: there `A(L)`'s host is `L'` by (8.10), and Theorem D(4)'s
-`hatMsigma`-membership only gives `x ∈ L`. -/
+Type II is the companion `escaping_mem_typeA_notMem_A1_of_typeII`: there `A(L)`'s host is `L'`
+by (8.10), so it needs the type-`𝒫` strengthening of D(4)
+(`BG.Ch4.S16.escaping_mem_ASet_sdiff_Msigma_of_typeP`) on top of what this proof uses. -/
 theorem escaping_mem_typeA_notMem_A1_of_typeI [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     {x : G} (hxM : x ∈ OddOrder.BG.Ch4.S14.sigmaSharp M)
@@ -733,6 +734,55 @@ theorem escaping_mem_typeA_notMem_A1_of_typeI [Finite G]
   have hx1 : x ≠ 1 := fun h => hxnMσ' (h ▸ (OddOrder.BG.Ch3.S10.Msigma L).one_mem)
   refine ⟨S10.mem_typeA_of_mem_hatMsigma_of_typeI hG hL htauL hxhat hx1, ?_⟩
   -- `A₁(L) = M_σ(L)^# ⊆ M_σ(L)`, and `x ∉ M_σ(L)`.
+  rw [OddOrder.BG.Ch4.S16.A1_eq_sigmaSharp hG hL htauL]
+  exact fun h => hxnMσ' h.1
+
+/-- **Peterfalvi (8.13)(c3) for a Type-II supporting maximal** (p. 47).
+
+> (c) Let `x ∈ D` and let `L` be the maximal subgroup with `C_G(x) ⊆ L`.  Then …
+>     (c3) `x ∈ A(L) − A₁(L)`.
+
+The Type-II companion of `escaping_mem_typeA_notMem_A1_of_typeI`.  On Type II the support host
+is `L′` rather than `L` ((8.10) p. 47), which is precisely what the repo's Theorem D(4) predicate
+(`x ∈ ASet L ⊤ = hatMsigma L`) failed to carry.  BG's own D(4) *does* assert the type-dependent
+`A(L)`, and `BG.Ch4.S16.escaping_mem_ASet_sdiff_Msigma_of_typeP` now supplies it: the signalizer
+datum `π(⟨x⟩) ⊆ τ₂(L)` plus `κ(L) ∩ τ₂(L) = ∅` makes `x` a `κ(L)′`-element, hence a member of the
+normal `κ(L)′`-Hall `U ⊔ L_σ`, which is `L′` by Lemma 15.1(b).
+
+`x ∉ A₁(L)` is unchanged from Type I: `A₁(L) = L_σ^#` (`A1_eq_sigmaSharp`) and `x ∉ L_σ`. -/
+theorem escaping_mem_typeA_notMem_A1_of_typeII [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {x : G} (hxM : x ∈ OddOrder.BG.Ch4.S14.sigmaSharp M)
+    (hesc : ¬ Subgroup.centralizer ({x} : Set G) ≤ M)
+    {L K U : Subgroup G} (hL : L ∈ maximalSubgroups G)
+    (hCL : Subgroup.centralizer ({x} : Set G) ≤ L)
+    (htauL : HasPeterfalviType PeterfalviType.II L)
+    (hKL : K ≤ L) (hUL : U ≤ L)
+    (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa L) (K.subgroupOf L))
+    (hU : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa L ∪ OddOrder.BG.Ch3.S10.sigma L)ᶜ) (U.subgroupOf L)) :
+    x ∈ OddOrder.GroupTheory.typeA L PeterfalviType.II ∧
+      x ∉ OddOrder.GroupTheory.A1 L PeterfalviType.II := by
+  classical
+  have hLmem : L ∈ OddOrder.GroupTheory.maximalSubgroupsContaining
+      (Subgroup.centralizer ({x} : Set G)) :=
+    OddOrder.GroupTheory.mem_maximalSubgroupsContaining.mpr ⟨hL, hCL⟩
+  have hP : OddOrder.BG.Ch4.S14.IsTypeP L :=
+    ((OddOrder.Peterfalvi.S10Interface.isTypeII_iff_isTypeP2 hG hL).mp htauL).1
+  obtain ⟨hxASet, hxnMσ⟩ :=
+    OddOrder.BG.Ch4.S16.escaping_mem_ASet_sdiff_Msigma_of_typeP hG hM hxM hesc hLmem hP
+      hKL hUL hK hU
+  have hxnMσ' : x ∉ OddOrder.BG.Ch3.S10.Msigma L := fun h => hxnMσ (SetLike.mem_coe.mpr h)
+  have hx1 : x ≠ 1 := fun h => hxnMσ' (h ▸ (OddOrder.BG.Ch3.S10.Msigma L).one_mem)
+  -- `ASet L U = hatMsigma L ∩ (U ⊔ L_σ)`, and `U ⊔ L_σ = L'` (Lemma 15.1(b)) is the Type-II host.
+  have hxhost : x ∈ OddOrder.GroupTheory.supportHost L PeterfalviType.II := by
+    change x ∈ derivedInG L
+    rw [(OddOrder.BG.Ch4.S15.typeP_hall_derived_eq_and_abelian hG hL hKL hUL
+      (fun h => OddOrder.BG.Ch4.S14.card_kappaHall_ne_one hP hKL hK
+        (by rw [h, Subgroup.card_bot])) hK hU).1]
+    exact hxASet.2
+  refine ⟨S10.mem_typeA_of_mem_hatMsigma hG hL htauL hxASet.1 hx1 hxhost, ?_⟩
+  -- `A₁(L) = L_σ^# ⊆ L_σ`, and `x ∉ L_σ`.
   rw [OddOrder.BG.Ch4.S16.A1_eq_sigmaSharp hG hL htauL]
   exact fun h => hxnMσ' h.1
 

@@ -628,6 +628,47 @@ theorem A1_eq_sigmaSharp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rw [OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG hM htau]
   rfl
 
+/-- **The converse of `typePACore_subset_hatMsigma`, type-uniform: `hatMsigma M ∖ {1}`, restricted
+to the support host, lies in `A(M)`.**
+
+By (8.10) (p. 47) the support is `A(M) = ⋃_{x ∈ M_s^#} C_K(x)^#` with `K = supportHost M tau`
+(`= M` on Type I, `= M'` on the types of class `𝒫`), and `M_s = M_σ` (`mainSubgroup_eq_Msigma`).
+BG's `hatMsigma M = {a ∈ M | M_σ ⊓ C_G(a) ≠ 1}` says exactly that `a` centralizes some
+`x ∈ M_σ^#`, and for `a ∈ M` the conditions `a ∈ C_K(x)` and `a ∈ C_G(x)` agree.  What
+`hatMsigma` does *not* record is **host** membership — hence the extra hypothesis `hyK`, which is
+vacuous on Type I (`supportHost M .I = M`, so `hy.1` supplies it) and is the genuine content on
+Type II (`supportHost M .II = M'`; BG Theorem D(4) yields it via
+`BG.Ch4.S16.escaping_mem_derived_of_typeP`).
+
+Together with `typePACore_subset_hatMsigma` this identifies `A(M) = hatMsigma M ∖ {1}` on
+Type I; it is what turns BG Theorem D(4)'s `x ∈ A(N) ∖ M_σ(N)` into Peterfalvi (8.13)(c3)'s
+`x ∈ A(N) − A₁(N)`. -/
+theorem mem_typeA_of_mem_hatMsigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {tau : PeterfalviType} (htau : HasPeterfalviType tau M)
+    {y : G} (hy : y ∈ OddOrder.BG.Ch4.S16.hatMsigma M) (hy1 : y ≠ 1)
+    (hyK : y ∈ OddOrder.GroupTheory.supportHost M tau) :
+    y ∈ OddOrder.GroupTheory.typeA M tau := by
+  obtain ⟨-, hne⟩ := hy
+  refine ⟨hyK, hy1, ?_⟩
+  -- `M_σ ⊓ C_G(y) ≠ 1` supplies a nonidentity `x ∈ M_σ` centralizing `y`.
+  obtain ⟨x, hxmem, hx1⟩ : ∃ x ∈ OddOrder.BG.Ch3.S10.Msigma M ⊓
+      Subgroup.centralizer ({y} : Set G), x ≠ 1 := by
+    by_contra hall
+    push Not at hall
+    exact hne (by
+      rw [eq_bot_iff]
+      intro z hz
+      exact Subgroup.mem_bot.mpr (hall z hz))
+  obtain ⟨hxMσ, hxCy⟩ := Subgroup.mem_inf.mp hxmem
+  refine ⟨x, ?_, ?_⟩
+  · -- `x ∈ (mainSubgroup M tau)^# = M_σ^#`
+    rw [OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG hM htau]
+    exact ⟨hxMσ, hx1⟩
+  · -- `y ∈ C_G(x)`, the symmetric form of `x ∈ C_G(y)`
+    rw [Subgroup.mem_centralizer_singleton_iff] at hxCy ⊢
+    exact hxCy.symm
+
 /-- **The Type-I converse of `typePACore_subset_hatMsigma`: `hatMsigma M ∖ {1} ⊆ A(M)`.**
 
 By (8.10) (p. 47), on Type I the support is `A(M) = ⋃_{x ∈ H^#} C_M(x)^#` — the host is `M`
@@ -643,26 +684,8 @@ theorem mem_typeA_of_mem_hatMsigma_of_typeI [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (htau : HasPeterfalviType PeterfalviType.I M)
     {y : G} (hy : y ∈ OddOrder.BG.Ch4.S16.hatMsigma M) (hy1 : y ≠ 1) :
-    y ∈ OddOrder.GroupTheory.typeA M PeterfalviType.I := by
-  obtain ⟨hyM, hne⟩ := hy
-  refine ⟨hyM, hy1, ?_⟩
-  -- `M_σ ⊓ C_G(y) ≠ 1` supplies a nonidentity `x ∈ M_σ` centralizing `y`.
-  obtain ⟨x, hxmem, hx1⟩ : ∃ x ∈ OddOrder.BG.Ch3.S10.Msigma M ⊓
-      Subgroup.centralizer ({y} : Set G), x ≠ 1 := by
-    by_contra hall
-    push Not at hall
-    exact hne (by
-      rw [eq_bot_iff]
-      intro z hz
-      exact Subgroup.mem_bot.mpr (hall z hz))
-  obtain ⟨hxMσ, hxCy⟩ := Subgroup.mem_inf.mp hxmem
-  refine ⟨x, ?_, ?_⟩
-  · -- `x ∈ (mainSubgroup M .I)^# = M_σ^#`
-    rw [OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG hM htau]
-    exact ⟨hxMσ, hx1⟩
-  · -- `y ∈ C_G(x)`, the symmetric form of `x ∈ C_G(y)`
-    rw [Subgroup.mem_centralizer_singleton_iff] at hxCy ⊢
-    exact hxCy.symm
+    y ∈ OddOrder.GroupTheory.typeA M PeterfalviType.I :=
+  mem_typeA_of_mem_hatMsigma hG hM htau hy hy1 hy.1
 
 /-- **`A(M) = hatMsigma M ∖ {1}` on Type I** (both inclusions).  See
 `mem_typeA_of_mem_hatMsigma_of_typeI` for the substance. -/
