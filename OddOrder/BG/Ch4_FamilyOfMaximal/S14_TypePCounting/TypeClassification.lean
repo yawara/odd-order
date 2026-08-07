@@ -145,6 +145,31 @@ may be chosen to contain it. -/
 theorem kappa_subset_tau1_union_tau3 {M : Subgroup G} : kappa M ⊆ tau1 M ∪ tau3 M :=
   fun _ hp => hp.2.1
 
+/-- **`κ(M) ∩ τ₂(M) = ∅`**: a `τ₂(M)`-prime is never a `κ(M)`-prime.
+
+`κ(M) ⊆ τ₁(M) ∪ τ₃(M)` (`kappa_subset_tau1_union_tau3`), and both `τ₁` and `τ₃` require
+`pRank M p = 1` while `τ₂` requires `pRank M p = 2` — a single natural number cannot be both.
+
+This is the disjointness that turns "every prime of `π(⟨x⟩)` lies in `τ₂(N)`" (the escaping
+signalizer datum of BG Theorem D(4)) into "`x` is a `κ(N)′`-element", hence — via
+`mem_U_sup_Msigma_iff_isPiElement_kappa_compl` — into `x ∈ U_N ⊔ N_σ = N'`, which is the
+type-II half of BG's `x ∈ A(N) − N_σ`. -/
+theorem notMem_kappa_of_mem_tau2 {M : Subgroup G} {p : ℕ} (hp : p ∈ tau2 M) :
+    p ∉ kappa M := by
+  intro hpκ
+  have hrank2 : pRank ↥M p = 2 := ((mem_tau2_iff M p).mp hp).2
+  rcases kappa_subset_tau1_union_tau3 hpκ with h1 | h3
+  · rw [((mem_tau1_iff M p).mp h1).2.2] at hrank2; omega
+  · rw [((mem_tau3_iff M p).mp h3).2.2] at hrank2; omega
+
+/-- **A `τ₂(M)`-element is a `κ(M)′`-element.**  Every prime of `π(⟨x⟩)` lying in `τ₂(M)`
+(the hypothesis carried by BG's escaping signalizer datum) means no prime of `κ(M)` divides
+`|x|`, by `notMem_kappa_of_mem_tau2`. -/
+theorem notMem_kappa_of_mem_piSet_of_forall_mem_tau2 {M : Subgroup G} {x : G}
+    (hxtau2 : ∀ p ∈ piSet (Subgroup.closure ({x} : Set G)), p ∈ tau2 M)
+    {p : ℕ} (hp : p ∈ piSet (Subgroup.closure ({x} : Set G))) : p ∉ kappa M :=
+  notMem_kappa_of_mem_tau2 (hxtau2 p hp)
+
 /-- Every prime in `κ(M)` is prime (recorded explicitly in the definition). -/
 theorem prime_of_mem_kappa {M : Subgroup G} {p : ℕ} (hp : p ∈ kappa M) : p.Prime := hp.1
 

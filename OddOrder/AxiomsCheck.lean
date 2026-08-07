@@ -12567,6 +12567,32 @@ Hub ruling 9163 (Option B′) / issues 1042, 1045, 9008. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.A1_subset_typeA
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.ne_typeI_of_isTypeP1
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typeA_eq_A1_of_isTypeP1
+/-! ### BG: `κ(M) ∩ τ₂(M) = ∅` — (8.13)(c3) Type II への鍵 (issue 0174、2026-08-08)
+
+Peterfalvi (8.13)(c3) の Type II 版は「escaping な `x` が `L'` に入る」を要する。BG 原文の
+Theorem D(4) は型依存の `A(N)` (Type II では host `N'`) を主張するのに対し、repo の D(4) は
+`ASet N ⊤ = hatMsigma N` (host `N`) しか記録していない (= BG より弱い)。
+
+その差を埋める鍵が本補題:
+
+  notMem_kappa_of_mem_tau2   `p ∈ τ₂(M) ⟹ p ∉ κ(M)`
+                             (`κ ⊆ τ₁ ∪ τ₃` は `pRank = 1`、`τ₂` は `pRank = 2`)
+  notMem_kappa_of_mem_piSet_of_forall_mem_tau2
+                             `π(⟨x⟩) ⊆ τ₂(M) ⟹ x は κ(M)′-元`
+
+repo の D(4) 証明 (`LocalTaxonomy.lean:902`) は **`hxtau2 : ∀ p ∈ π(⟨x⟩), p ∈ τ₂(N)` を既に
+文脈に持っている**ので、本補題 + 既存の
+`mem_U_sup_Msigma_iff_isPiElement_kappa_compl` (`x ∈ U ⊔ M_σ ⟺ x` は `κ(M)′`-元) +
+BG Lemma 15.1(b) (`N' = U_N ⊔ N_σ`) で **`x ∈ N'`** が出る。
+
+⟹ BG (15.2) や `K₁ ∩ M_σ = 1` の形式化は**不要**だった (BG 原文の証明経路より repo の
+signalizer 経路のほうが直接的)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S14.notMem_kappa_of_mem_tau2
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S14.notMem_kappa_of_mem_piSet_of_forall_mem_tau2
+
 /-! ### Peterfalvi (8.13)(c3) — Type I の支持極大 (issue 0174、2026-08-08)
 
 書籍 (8.13)(c) は `x ∈ D` と `C_G(x) ⊆ L` なる極大 `L` について 4 条項を主張し、そのうち
