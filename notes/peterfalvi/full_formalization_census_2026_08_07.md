@@ -217,6 +217,18 @@ docstring が「in particular 直交する」と**散文で主張**していた�
 ⟹ **教訓: docstring の「in particular ～」「so this is the stated form of ～」は赤信号**
 (証明でなく主張)。
 
+### §4 = repo `S06` (書籍 pp.21-24、`pages/peterfalvi-p021..p024.png`) — **監査途中**
+
+| 書籍 | 判定 | repo の実体 / 備考 |
+|---|---|---|
+| (4.1) | ⚠ **要確認** | 「`α,β,γ,δ ∈ ±Irr(X)`、`(α,β)=(γ,δ)=(α−β,uγ−vδ)=0` かつ次数条件 ⟹ 4 つは pairwise 直交」。`S06_CertainTypeIsometry:444` 等が「(4.1) により」と**消費側から言及**するが、`**Peterfalvi (4.1)**` の bolded statement が見つからない。⚠ (1.8) と同じ「消費点でしか言及されない」型の可能性 — **結論の形** (pairwise orthogonal + signed irreducibles + 実係数 `u,v`) で検索し直すこと。`InducedIrreducible.lean` の `SignedIrreducible` 節に在る可能性が高い (そこの docstring が「Peterfalvi (4.1) は…§4.3, §6.8.1, §9.5, §10.3, §14.1 で使う」と書いている) |
+| (4.2) Hypothesis | ✅ 構造体 | certain-type hypothesis ((a) `L = K ⋊ W₁`、(b) `C_K(x) = W₂`、(c) `W` 奇位数) |
+| (4.3)(a) | ✅ 実証明 (両半分) | TI part `S06_DadeIsometryCertain:237` + Hypothesis (3.1) 成立 `:408`、centralizer form `:190` |
+| (4.3)(b) | ✅ 実証明 | `columnFamily` (`S06_MuColumnBridge`)。`μ_{ij}` の pairwise distinct と `Ind_W^L(ω_{ij} − ω_{0j}) = δ_j(μ_{ij} − μ_{0j})` |
+| (4.3)(c) | ✅ **両文とも実証明** | 第 1 文 (値の同定) `S06_CertainTypeCharacters:1006`、**第 2 文 (completeness、`μ_{ij}` でない既約は `W − W₂` 上で消える)** `:1048`。⚠ (3.2)(d) と同じ形なので確認したが、こちらは在った |
+| (4.3)(d) | ✅ 実証明 | 次数合同 `μ_{ij}(1) ≡ δ_j (mod w₁)` `S06_CertainTypeCharacters:1065` |
+| (4.4)-(4.10) | ⬜ **未監査** | 書籍 pp.22-24 未読。(4.5.b)/(4.6)(a)-(e)/(4.7)/(4.9)(a) は bolded statement を確認済だが**書籍と未突合**。次の作業単位 |
+
 ## 4. 未着手の census
 
 - **Part II (Suzuki の定理 A、書籍 pp.97-134)** — `Proposition N` / `Lemma N` の**章内リセット
