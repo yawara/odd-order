@@ -86,8 +86,26 @@ Lemma 1.23 = `exists_normal_index_eq_prime` を `M = ⊤` に適用)。
 書籍強度。⟹ **「隣接する 2 つの系のうち片方だけが正規性を主張する」** ような差は、
 番号 grep でも cite 数でも絶対に検出できない。ページ画像での逐条確認だけが効く。
 
-⬜ **残り 37 件の条項ごとの突合は未実施**。とくに 1.12-1.15 / 1.18-1.22 / 1.30-1.31 は
-**1 つの file-header docstring が複数番号を列挙**しているだけで、番号ごとの statement が
-在るかは個別確認が要る (Peterfalvi の「file docstring の散文が定理の代わり」型)。
+### Ch.1 §1B-§1D の突合 (2026-08-08、書籍 pp.15-24 のページ画像)
+
+| Isaacs | 書籍 | repo / mathlib | 判定 |
+|---|---|---|---|
+| 1.12 | Sylow C (共役) | mathlib `Sylow` は共役類 1 個 (`Sylow p G` の推移的作用) | ✅ |
+| 1.13 | **Frattini argument** `N ⊴ G`, `P ∈ Syl_p(N)` ⟹ `G = N_G(P)N` | mathlib `Sylow.normalizer_sup_eq_top` (`Sylow.lean:498,514`) | ✅ |
+| 1.14 | **Sylow D** — `p`-部分群は或る Sylow に含まれる | mathlib `IsPGroup.exists_le_sylow` | ✅ |
+| 1.15 | `n_p(G) = [G : N_G(S)]` | mathlib `Sylow.card_eq_index_normalizer` (`Sylow.lean:424`) | ✅ |
+| 1.18 | `P ∈ Syl_p(G)`、`Q ≤ N_G(P)` が `p`-部分群 ⟹ `Q ≤ P` | mathlib `IsPGroup.inf_normalizer_sylow` (`Sylow.lean:301`) | ✅ |
+| 1.19 | `P` 有限 `p`-群、`1 ≠ N ⊴ P` ⟹ `N ∩ Z(P) ≠ 1` | `Ch01.IsPGroup.normal_inf_center_nontrivial` | ✅ 実証明 |
+| 1.20 / 1.21 | 冪零 ⟺ NormalizerCondition / `Z_c(G) = G` | mathlib (`isNilpotent_of_finite_tfae` / `upperCentralSeries_nilpotencyClass`) | ✅ |
+| 1.22 | **冪零 (有限とは限らない)** `G`、`H < G` ⟹ `H < N_G(H)` | `Ch01.lt_normalizer_of_isNilpotent_of_lt_top` | ✅ statement は `[Finite G]` を取らず書籍強度。⚠ **docstring が「有限冪零群」と書いていた** = statement より狭い記述 → 2026-08-08 訂正 |
+| 1.23 | `N < M` が `P` の正規部分群 ⟹ `N ⊆ L ⊆ M`、`L ⊴ P`、`\|L:N\| = p` | `Ch01.IsPGroup.exists_normal_index_eq_prime` | ✅ 実証明 |
+
+⚠ **file-header の進捗表が stale だった** — 1A が「着手中」、1B/1C/1D/1E/1G が「TODO」の
+ままで、章が広範に形式化された後も放置されていた。2026-08-08 に更新
+(`OddOrder/Isaacs/Ch01_Sylow/Basic.lean` 冒頭)。**この種の自己注記を監査の一次証拠にしない**。
+
+⬜ **残り: 1.2-1.4, 1.8, 1.9, 1.16, 1.26-1.46 の条項ごとの突合**。1.30-1.31 (§1E の
+位数条件つき Sylow 正規性) と 1.41-1.46 (Chermak-Delgado) は repo に実体があるので
+条項の一致を確認する。
 
 ### Ch.2-Ch.7, Ch.9-Ch.10 — 未着手

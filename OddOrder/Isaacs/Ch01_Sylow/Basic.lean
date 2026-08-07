@@ -30,13 +30,18 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 1
 
 | § | 内容 | Isaacs 番号 | 状態 |
 |---|---|---|---|
-| 1A | 群作用と Fundamental Counting Principle | 1.1 – 1.6 | 着手中 |
-| 1B | Sylow の存在定理 (Sylow E), Cauchy | 1.7 – 1.10 | TODO |
-| 1C | Sylow の共役 (Sylow C / D), Frattini argument | 1.11 – 1.18 | TODO |
-| 1D | 冪零群, Fitting 部分群 `F(G)` | 1.19 – 1.29 | TODO |
-| 1E | 位数 \|G\|=2n (n 奇) の指数 2 正規部分群 など | 1.30 – 1.36 | TODO |
-| 1F | Brodkey の定理 (Sylow が abelian の場合) | 1.37 – 1.40 | 完了 |
-| 1G | Chermak–Delgado | 1.41 – 1.46 | TODO |
+| 1A | 群作用と Fundamental Counting Principle | 1.1 – 1.6 | ✅ 被覆 (1.1/1.5/1.6 は mathlib) |
+| 1B | Sylow の存在定理 (Sylow E), Cauchy | 1.7 – 1.10 | ✅ 被覆 (1.7/1.10 は mathlib) |
+| 1C | Sylow の共役 (Sylow C / D), Frattini | 1.11 – 1.18 | ✅ 被覆 (多くは mathlib) |
+| 1D | 冪零群, Fitting 部分群 `F(G)` | 1.19 – 1.29 | ✅ 被覆 (1.24 は 2026-08-08 に正規条項を補充) |
+| 1E | 位数 \|G\|=2n (n 奇) の指数 2 正規部分群 など | 1.30 – 1.36 | ✅ 被覆 |
+| 1F | Brodkey の定理 (Sylow が abelian の場合) | 1.37 – 1.40 | ✅ 被覆 |
+| 1G | Chermak–Delgado | 1.41 – 1.46 | ✅ 被覆 (`GroupTheory/ChermakDelgado.lean`) |
+
+⚠ この表は 2026-08-08 の逐条監査 (issue 0176) で更新した。それ以前は 1A が「着手中」、
+1B/1C/1D/1E/1G が「TODO」のままで、章が広範に形式化された後も**放置されていた** —
+`notes/isaacs/full_formalization_census_2026_08_08.md` の「stale な自己注記」型そのもの。
+mathlib 被覆分を含む番号ごとの対応は同 census note が正本。
 
 ## 方針
 
@@ -453,8 +458,12 @@ theorem IsPGroup.normal_inf_center_nontrivial {P : Type*} [Group P] [Finite P]
 **Thm 1.21** (`upperCentralSeries G (nilpotencyClass G) = ⊤`) は
 `upperCentralSeries_nilpotencyClass` を直接呼ぶ. -/
 
-/-- **Isaacs Thm 1.22** (Normalizer Condition).  有限冪零群 `G` で真部分群 `H < G` ならば
+/-- **Isaacs Thm 1.22** (Normalizer Condition、p.22).  冪零群 `G` で真部分群 `H < G` ならば
 `H < N_G(H)`.
+
+⚠ 書籍は **"(not necessarily finite) nilpotent group"** と明記する。本 statement も
+`[Finite G]` を取らないので書籍強度 — 以前の docstring が「有限冪零群」と書いていたのは
+**statement より狭い記述**で、2026-08-08 の逐条監査 (issue 0176) で訂正した。
 
 mathlib `Group.normalizerCondition_of_isNilpotent` の再述. -/
 theorem lt_normalizer_of_isNilpotent_of_lt_top [Group.IsNilpotent G]
