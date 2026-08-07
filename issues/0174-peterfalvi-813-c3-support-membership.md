@@ -90,9 +90,22 @@ created: 2026-08-07
       `L` の同定は `maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`
       (`ℳ(C_G(x))` の単元性)、`x ∉ A₁(L)` は `A1_eq_sigmaSharp` 経由。
 
-- [ ] **残: Type II 版**。host が `L'` なので `x ∈ L'` が別途要り、D(4) は `x ∈ L` までしか
-      与えない。候補は BG Theorem B(5) (`A(M) − M_σ` の TI 性) か、書籍 (8.13)(c1) の
-      `C_G(x) = C_{L_F}(x) ⋊ C_M(x)` 分解 (`C_M(x) ≤ L'` が出せれば済む)。
+- [ ] **残: Type II 版**。書籍 (8.13)(c1) をページ画像で確定した (2026-08-08):
+
+      > (c1) `L = L_F ⋊ (M ∩ L)` and `C_G(x) = C_{L_F}(x) ⋊ C_M(x)`.
+
+      これで障害が正確に見える:
+
+      - `x ∈ D ⊆ A₁(M) = M_σ^# ⊆ M` かつ `x ∈ C_G(x) ≤ L` なので **`x ∈ M ∩ L`** —
+        つまり `x` は (c1) の**補因子側**に居て `L_F` 側ではない。
+      - Type II では `[L,L] = L_F ⋊ U_L` (書籍 (8.12))、一方 `L = L_F ⋊ (M ∩ L)`。
+        よって `x ∈ L'` ⟺ `x` の `L/L_F ≅ M ∩ L` での像が `L'/L_F ≅ U_L` に入る。
+      - D(4) が与える `x ∈ hatMsigma L` は `x ∈ L` までで、この `U_L` 条件は含まない。
+
+      ⟹ 必要なのは「`M ∩ L` の元で `L_F^#` の元を中心化するものは `U_L` 成分だけ」という
+      主張。候補: BG §16 Theorem B の `A(M) − M_σ` の TI 性 (Peterfalvi (8.12)(c) が
+      これを `A(M) − A₁(M) is a TI-subset of G` として引く) を `L` 側に適用する経路。
+      **次 iteration は BG Theorem B の repo 側 statement を読むところから。**
 - [ ] 組み立て: `escapingCentralizers_control` と同じ入口
       (`mem_sigmaSharp_of_mem_aSet_of_escape` / `A1_eq_sigmaSharp` で `x ∈ sigmaSharp M`)
       → D(4) → 第 3/4/5 成分 → 結論。`L` の同定は
