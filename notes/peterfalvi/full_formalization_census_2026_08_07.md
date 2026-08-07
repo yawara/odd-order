@@ -26,7 +26,7 @@
 repo は **`(1.5.d)` のような sub-part 形でしか cite していない結果**が多い。必ず
 `\(N\.M(\.[a-z0-9]+)?\)` で取ること。
 
-### 結果 — 書籍 169 件中 168 件が cite あり
+### 結果 — 書籍 169 件中 168 件が cite あり (残り 1 = (8.9) は 2026-08-07 に形式化済)
 
 | 書籍番号 | 件数 | repo | 章 (書籍ページ) | 状態 |
 |---|---|---|---|---|
@@ -37,14 +37,14 @@ repo は **`(1.5.d)` のような sub-part 形でしか cite していない結�
 | (5.1)–(5.9) | 9 | `S07` | §7 Coherence (pp.25-29) | cite 全数あり |
 | (6.1)–(6.8) | 8 | `S08` | §8 Some Coherence Theorems (pp.30-37) | cite 全数あり |
 | (7.1)–(7.11) | 11 | `S09` | §9 Non-existence of a Certain Type of Group (pp.38-43) | cite 全数あり |
-| (8.1)–(8.18) | 18 | `S10` | §10 Structure of a Minimal Simple Group of Odd Order (pp.44-49) | **(8.9) が cite ゼロ** |
+| (8.1)–(8.18) | 18 | `S10` | §10 Structure of a Minimal Simple Group of Odd Order (pp.44-49) | ✅ (8.9) 形式化済 (2026-08-07) |
 | (9.1)–(9.11) | 11 | `S11` | §11 Maximal Subgroups of Types II, III, IV (pp.50-57) | cite 全数あり |
 | (10.1)–(10.11) | 11 | `S12` | §12 Maximal Subgroups of Types III, IV, V (pp.58-63) | cite 全数あり |
 | (11.1)–(11.9) | 9 | `S13` | §13 Maximal Subgroups of Types III and IV (pp.64-68) | cite 全数あり |
 | (12.1)–(12.17) | 17 | `S14` | §14 Maximal Subgroups of Type I (pp.69-74) | cite 全数あり |
 | (13.1)–(13.19) | 19 | `S15` | §15 The Subgroups S and T (pp.75-86) | cite 全数あり |
 | (14.1)–(14.16) | 16 | `S16` | §16 Non-existence of G (pp.87-92) | cite 全数あり |
-| **合計** | **169** | | | **cite 168 / cite ゼロ 1** |
+| **合計** | **169** | | | **cite 169 / cite ゼロ 0** (2026-08-07 時点) |
 
 ⚠ **repo モジュール番号 = 書籍 result 章番号 + 2** (`S10` ↔ (8.x))。この off-by-2 は
 frontier 誤診の常習犯なので、番号で話すときは必ずどちらの体系か明示する。
@@ -64,7 +64,32 @@ frontier 誤診の常習犯なので、番号で話すときは必ずどちら�
 ⟹ **キャンペーンの本体は「番号を埋める」ことではなく、1 件ずつ statement を書籍と逐条照合する
 監査**。上流優先 + 文書順で (1.1) から当たる。
 
-## 3. 唯一の cite ゼロ — Peterfalvi (8.9)
+## 3. 唯一の cite ゼロ — Peterfalvi (8.9) ✅ **2026-08-07 解消**
+
+**形式化済** (commit `39bfc2831`、`OddOrder/Peterfalvi/S10_Theorem88CaseB.lean`):
+
+| Lean 名 | 書籍 | 状態 |
+|---|---|---|
+| `Theorem88CaseBData.derivedInG_inf_centralizer_W1_eq` | (8.9) 内在形 `C_{S'}(W₁) = W₂` | axiom-clean |
+| `Theorem88CaseBData.typePData_W2_eq` | (8.9) 書籍そのままの形 | axiom-clean |
+
+**採用した形**: 下記「どちらの形を採るか」の問いに対する答えは **書籍の `W₂` 同定** (Coq の
+witness 抽出形ではない)。理由は消費点が `TypePData S` を既に持っており、必要なのは
+「その `.W2` が (8.8) の `W₂` と一致する」という同定だけだったため。
+
+**副産物**: `Theorem88CaseBData` を `S12_MaximalIII_IV_V` から新 leaf `S10_Theorem88CaseB` へ
+移設したうえで、書籍 p.46 と逐条照合して**欠けていた 6 条項を補充**した (旧版は (b1) の半分と
+(b2)(b3) しか持たず、(8.9) が要求する (8.4.e)・`S ∩ T = W`・直積性・非自明性・(b4) を欠いていた)。
+生産側 2 箇所 (`S14.theorem88_dichotomy` / `FeitThompsonSection16Core`) を実データで充足済 —
+**仮説への hoist ではない**。
+
+**(8.4.e) の供給経路**: BG Thm 14.7 の `IsTISubset (zTilde K K*) (K ⊔ K*)` 連言から直接出る。
+これは書籍 (8.5.c)「V is a TI-subset of G with normalizer W」そのもので、抽象化した
+`IsTISubset.set_normalizer_eq_of_subset_of_commute` (可換 host 内の TI-subset は任意の空でない
+部分集合の正規化群を host に固定) を `GroupTheory/TISubset.lean` に置いた。
+⚠ この経路は双対極大部分群の同定も型 `P₂` 性も要らない (TypePData 経由の重い版より真に弱い仮説)。
+
+以下は着手時の調査記録 (保持)。
 
 書籍 p.46 (`04.10_pp_44_49_...txt`):
 
@@ -78,7 +103,7 @@ frontier 誤診の常習犯なので、番号で話すときは必ずどちら�
 > By (8.4.d) with `M = S`, `W₁C_{S'}(W₁)` is abelian, and so `C_{S'}(W₁) ⊆ C(W)`. As `W`
 > satisfies (8.4.e), `C_{S'}(W₁) ⊆ W`, whence `C_{S'}(W₁) = W₂`.
 
-**検証**: `grep -rE "\(8\.9(\.[a-z0-9]+)?\)" --include=*.lean OddOrder/` = 0 hit。
+**検証** (着手時): `grep -rE "\(8\.9(\.[a-z0-9]+)?\)" --include=*.lean OddOrder/` = 0 hit。
 内容 grep (`W2.*coincide` / `centralizer.*W1.*eq.*W2` 等) でも該当なし。
 
 **Coq 対応**: `typeP_pairW` (`coq/theories/PFsection8.v:466`)。Coq は Peterfalvi Definition (8.4)
@@ -93,8 +118,7 @@ Lemma typeP_pairW S T W W1 W2 (defW : W1 \x W2 = W) :
 その証明内部 `defW2xy : W2x :^ y = 'C_S'(W1)` として現れる)。(8.8)+(8.9) の合成が同ファイル
 :712 の `FTtypeP_pair_witness`。
 
-⟹ **repo 側でどちらの形 (書籍の `W₂` 同定 / Coq の witness 抽出) を採るかは、消費点
-(`S10`/`S15` の `Sdata_W2_eq` 系) を見てから決める**。
+⟹ **決着 (2026-08-07)**: 書籍の `W₂` 同定を採った (上記)。
 
 ## 4. 未着手の census
 

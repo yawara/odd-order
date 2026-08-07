@@ -26,8 +26,8 @@ repo の docstring cite と突合:
 
 | 層 | 件数 | 内容 |
 |---|---|---|
-| cite あり | **168 / 169** | 番号または sub-part `(N.M.x)` 形で repo に出現 |
-| **cite ゼロ** | **1** | **(8.9)** — 下記 |
+| cite あり | **169 / 169** | 番号または sub-part `(N.M.x)` 形で repo に出現 |
+| **cite ゼロ** | **0** | (8.9) は 2026-08-07 に形式化済 (下記ステップ 1) |
 
 ### Part II (Suzuki の定理 A) / 補章
 
@@ -50,7 +50,19 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
 
 ## 作業手順
 
-- **ステップ 1 (着手済)**: **(8.9)** — 唯一の cite ゼロ。書籍 p.46:
+- **ステップ 1 ✅ 完了 (2026-08-07、commit `39bfc2831`)**: **(8.9)** — 唯一の cite ゼロ。
+  `OddOrder/Peterfalvi/S10_Theorem88CaseB.lean` に形式化 (axiom-clean):
+  `Theorem88CaseBData.derivedInG_inf_centralizer_W1_eq` (内在形 `C_{S'}(W₁) = W₂`) と
+  `Theorem88CaseBData.typePData_W2_eq` (書籍そのままの形)。証明は書籍 pp.46-47 を逐条で追う。
+
+  **副産物 — (8.8.b) の条項欠落を発見・補充**: `Theorem88CaseBData` (旧 `S12_MaximalIII_IV_V`)
+  は (b1) の半分と (b2)(b3) しか持たず、(8.9) が要求する (8.4.e)・`S ∩ T = W`・直積性・
+  非自明性・(b4) を**欠いていた**。書籍 p.46 と逐条照合して 6 フィールドを追加し、生産側
+  2 箇所 (`S14.theorem88_dichotomy` / `FeitThompsonSection16Core`) を実データで充足した
+  (仮説への hoist ではない)。これは §2「部分被覆 — bundled statement が条項を運搬していない」
+  の実例で、**番号 grep では検出できなかった**。以降の逐条監査で同型を探すこと。
+
+  書籍 p.46:
   > Suppose that case (b) of Theorem (8.8) holds. Then the group denoted by `W₂` in Theorem (8.8)
   > coincides with the group denoted by `W₂` in (8.4.d) with `M = S`.
 
