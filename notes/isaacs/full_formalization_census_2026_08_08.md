@@ -286,4 +286,23 @@ repo は **(1) ⇔ (3)** だけを theorem として持ち、条件 (2) は Lemm
 「Lem 5.27, Lem 5.28 **完成後**の theorem 化を参照」と、まだ未完であるかのように
 書かれたままだった (実体は同ファイル下部)。
 
-### Ch.6-Ch.7, Ch.9-Ch.10 — 未着手 (次の入口 = Ch.6 Frobenius Actions、24 件)
+### Ch.6 Frobenius Actions (24 件、書籍 pp.177-199) — **監査完了 (2026-08-08)**、補充ゼロ
+
+**24/24 参照あり**。FT の主戦場なので repo 側の被覆が最も厚い章。単独参照の 6.18 と
+多条項の 6.22/6.24 を実体で確認:
+
+| Isaacs | 書籍 | 実体 |
+|---|---|---|
+| **6.18** | 奇位数 Frobenius 補元 `A` は `A'` と `A/A'` が**巡回**でかつ**互いに素**な位数 (**3 条項**) | `Ch06.isCyclic_commutator_abelianization_coprime_of_isFrobeniusAction_of_odd` (`OddComplement.lean:166`) — 3 条項を束ねた形。docstring 自身が「各使用点が `IsZGroup` から個別に導いていたのを、書籍に合わせて 1 つの結果として名付けた」と記録 |
+| 6.19 | 奇位数 Frobenius 補元は各素数 `p` で位数 `p` の部分群が一意 | `OddComplement.lean` / `CNGroupStructure.lean` |
+| **6.22** | **可解**な Frobenius 核は冪零 | `Ch06.isNilpotent_of_isFrobeniusAction_of_isSolvable` (`KernelNilpotent.lean:58`) |
+| **6.24** | **Thompson**: Frobenius 核は冪零 | `Ch06.isNilpotent_of_isFrobeniusAction` (:365) + `IsFrobeniusGroup.isNilpotent_kernel` (:382) |
+
+⭐ **6.18 は「書籍の形に束ねる」対処が既に取られていた実例** — 3 条項が
+`IsZGroup` から個別に導けるので使用点ごとにばらばらに再導出されていたところを、
+書籍に合わせた合成定理として名付け直してある。**Ch.5 の 5.26 TFAE で私が行った補充と
+同じ処置が、既にこの章では自発的に行われていた**。
+
+⟹ **Ch.6 全 24 件被覆・補充ゼロ**。
+
+### Ch.7, Ch.9-Ch.10 — 未着手 (次の入口 = Ch.7 Thompson Subgroup、8 件)

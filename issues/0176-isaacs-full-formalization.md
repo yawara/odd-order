@@ -128,6 +128,9 @@ repo の `Ch08_PermutationGroups` も既に `IsPreprimitive` を使っている�
         書籍どおり 3 条件 TFAE (`frobenius_normal_p_complement_tfae`)。repo は (1)⇔(3) だけを
         theorem として持ち、条件 (2) は Lemma 5.27 の前後段に分かれていた
         (Peterfalvi (3.8) と同型の packaging 差)。
+      - **Ch.6 監査完了 (2026-08-08)**: 全 24 件被覆・**補充ゼロ**。6.18 (3 条項) は
+        既に書籍の形に束ねた合成定理として名付けられており、6.22/6.24 (Frobenius 核の
+        冪零性、Thompson) も実体あり。
       - 1 章ぶん終えるごとに census note を更新して commit。
 
 ## 完了条件
