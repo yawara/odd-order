@@ -173,9 +173,32 @@ created: 2026-08-07
       | Theorem 15.8 | `S15_MF/OpicoreCentralizer.lean` ✅ |
       | **Corollary 15.9** | `S15_MF/TIFailure.lean:1131` — ⚠ **一部のみ** (`not_fittingIsTI_of_mem_fittingSharp_of_centralizer_not_le` = 「`F(M)` は TI でない」ステップだけ)。**(15.3) の `M ∩ N` 補元性 / (15.4) の `M∩N = K₁ ⋉ U₁`, `C_{U₁}(K₁)=1` / `R ⊆ U₁` は無い** |
 
-      ⟹ **本体は Cor 15.9 の構造部分 ((15.3)+(15.4)+`R ⊆ U₁`) を新規に形式化すること**。
-      前提の Prop 14.2 / Cor 12.10 / Thm 15.7-15.8 は揃っているので純粋な組み立てだが、
-      **BG §14/§15 の実作業で複数 session 規模**。10 行では済まない (前 iteration の見積もりを訂正)。
+      ⟹ 素朴には「Cor 15.9 の構造部分 ((15.3)+(15.4)+`R ⊆ U₁`) を新規に形式化」だが、
+
+- [x] **より軽い経路を発見 (2026-08-08)** — 商の位数による整除性だけで済む:
+
+      D(4) の第 6 成分が既に **`M ∩ N` は `N_σ` の `N` における補元**を与える
+      (`Subgroup.IsComplement' ((M ⊓ N).subgroupOf N) ((Msigma N).subgroupOf N)`)。
+      Type II (= `𝒫₂`) では BG Lemma 15.1(b) (`typeP_hall_derived_eq_and_abelian`) が
+      `N' = U_N ⊔ N_σ` を与え、`U_N` は `M ∩ N` の `κ(N)'`-部分。したがって
+
+      ```
+      N / N' ≅ K₁ = (M ∩ N) の κ(N)-Hall     (Prop 14.2(g) より **素数位数** k)
+      ```
+
+      一方 `x ∈ M_σ^#` は **`σ(M)`-元**なので `|x|` は `σ(M)`-数。⟹
+
+      > **`k ∉ σ(M)` なら `gcd(|x|, |N/N'|) = 1` となり、`x` の `N/N'` での像は自明 = `x ∈ N'`**
+
+      つまり必要なのは **`κ(N) ∩ σ(M) = ∅` 型の 1 本**だけで、(15.4) の
+      `M∩N = K₁ ⋉ U₁` / `C_{U₁}(K₁) = 1` / `R ⊆ U₁` を全部作る必要はない。
+      Peterfalvi (8.13)(c2) が同型の coprimality (`coprime_FT_signalizer_centralizerIn_typeA`)
+      を既に持つので、そこから引ける可能性が高い。
+
+- [ ] **次の作業**: (i) `κ(N) ∩ σ(M) = ∅` (または `k ∉ σ(M)`) を repo で探す/証明する。
+      (ii) `Prop 14.2(g)` の repo 版から `|K₁|` 素数を取る。
+      (iii) 「商の位数と元の位数が互いに素 ⟹ 元は部分群に入る」で `x ∈ N'` を締める。
+      (iv) D(4) 第 4 成分を型依存の `A(N)` へ強め、(8.13)(c3) Type II を Type I と同じ形で出す。
 - [ ] 組み立て: `escapingCentralizers_control` と同じ入口
       (`mem_sigmaSharp_of_mem_aSet_of_escape` / `A1_eq_sigmaSharp` で `x ∈ sigmaSharp M`)
       → D(4) → 第 3/4/5 成分 → 結論。`L` の同定は
