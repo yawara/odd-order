@@ -204,7 +204,10 @@ Peterfalvi §2 の監査では **`OddOrder/Peterfalvi/S04_*.lean` に絞って**
 | (3.6) Hypothesis | ✅ 定義として忠実 | `sigmaCoeff` (係数 `a_{ij} = ⟨ψ, ω_{ij}^σ⟩`) + `sigmaNC` (`NC(ψ)`) |
 | (3.7) | ✅ **2026-08-07 に補充** | 格子恒等式 `a_{ij} + a_{i'j'} = a_{ij'} + a_{i'j}` は `sigmaCoeff_add_eq` として在ったが、書籍の **"In particular" 節** `a_{ij} = a_{i0} + a_{0j} − a_{00}` が無かった → `sigmaCoeff_eq_add_sub` を追加。(1.3)(b) / (2.7) に続く 3 例目の「In particular 欠落」 |
 | (3.8) | ✅ 内容は在る (packaging 差あり) | `S05_SigmaTrichotomy.sigmaCoeff_trichotomy` が三分岐を係数形で持つ。⚠ 書籍は結論に **`NC(ψ) = w₁` / `= w₂`** を含め、`ψ = a·Σω^σ + β` の形で述べる。repo は係数形 (「列 `j₀` が定数 `c ≠ 0`、他は 0」) で、NC 値は導けるが**述べられていない**。数学的内容は同値だが packaging が違う — 低優先の繰延項目 |
-| (3.9) | ⬜ **未監査** | cite 20 + sub-part (3.9.a)(3.9.b)。書籍 p.20 未読。次の作業単位 |
+| (3.9) | ✅ 実証明 (a)(b)(c) 全条項 + (a) の "In particular" 節 | `S05_SigmaIsometry`: (a) `:830` / (a) の "in particular" (σ が係数体自己同型と可換) `:902` / (b) `:949` / (c) `:1270`。(3.9.b) の Galois 推移性補題 (`:1023` `:1101`) も有 |
+
+**§3 監査完了 (2026-08-07)**: 全 9 件のうち**未形式化ゼロ**。補充したのは (3.2)(d) の書籍 literal 形と
+(3.7) の "In particular" 節の 2 件。繰延 1 件 = (3.8) の packaging 差 (上記)。
 
 ✅ **(3.2)(d) の書籍 literal 形を 2026-08-07 に補充**。従来は直交形 (「`σ(Irr W)` の全てと直交する
 類関数は `V` 上で消える」) だけで、書籍の「**σ の像に入らない**既約指標は消える」は
