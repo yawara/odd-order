@@ -422,20 +422,37 @@ docstring が「in particular 直交する」と**散文で主張**していた�
 ⚠ **書籍の (9.8)(b) を pdftotext で読むと `μ_j ∉ 𝒮(H₀C)` に見える** (実際は `μ_j ∈ 𝒮(H₀C)`)。
 ページ画像 p053 で確認した — 否定の有無が反転する OCR 崩れは危険なので、条項の突合は必ず画像で。
 
-### §10 = repo `S12` (書籍 pp.58-63) — **未着手 (下調べのみ、2026-08-07)**
+### §10 = repo `S12` (書籍 pp.58-63、`pages/peterfalvi-p058..p063.png` 切り出し済) — **監査完了 (2026-08-07、未形式化ゼロ)**
 
-書籍 §10 = **(10.1)-(10.11)** + (10.10) の sub-part **(10.10.1)-(10.10.4)**。
-「Maximal Subgroups of Types III, IV and V」で、repo は `S12_MaximalIII_IV_V*` 系。
+書籍 §10 =「Maximal Subgroups of Types III, IV and V」= **(10.1)-(10.11)** + (10.10) の
+sub-part **(10.10.1)-(10.10.4)** の計 15 件。repo は `S12_*` 系に分散。
+**全 15 件に書籍強度の実体あり**。うち 2 件は本監査で書籍の形へ補充した (下表 ⭐)。
 
-repo の cite 密度 (実測 2026-08-07、`grep -c` を AxiomsCheck 除外で):
-(10.1) 50 / (10.2) 61 / (10.3) 78 / (10.4) 18 / (10.5) 118 / (10.6) 80 / (10.7) 85 /
-(10.8) 62 / (10.9) 27 / (10.10) 120 / (10.11) 11。**全件に実体あり**の見込み。
+| 書籍 | 判定 | repo の実体 / 備考 |
+|---|---|---|
+| (10.1) Hypothesis | ✅ carrier が条項一致 | `S12.Hypothesis` (`S12_MaximalIII_IV_V_Core/Hypothesis.lean:349`): `maximal` + `typeP : TypePData M` ((8.4) の `M'`,`M''`,`W₁`,`W₂`,`V`) + `type_alt : III ∨ IV ∨ V` + `dadeData` ((8.15) の `A₀(M)` Dade 支持データ)。`τ`/`𝒮`/`A₀`/`w₁`/`w₂` は**すべて honest projection** (free field でない): `tau = dadeIntegralCharacterMap dadeData.dade`、`Sset = inducedFamily M = {Ind_{M'}^M θ ∣ θ ∈ Irr M', θ ≠ 1}`。「(8.15) により (4.6) が `L=M`, `H=K=M'` で成立」= `Hypothesis.toHypothesis46`。⚠ **設計差**: 同じ文の「(5.2) も成立」は独立 carrier を持たず Dade datum 経由 (`S07.coherentEqualDegree_fromDade` / `S06.CertainTypeSubcoherent` (5.3.b)) で実現 — (5.2) が供給する対象 (`ℤ[𝒮,A₀]` 上の等長 `τ`・メンバーの直交性) はすべて `hyp.tau` + `inducedFamily` 直交性から出る |
+| (10.2) | ✅ 3 条項とも | `exists_zeta_in_inducedFamily_degree_w1`: `∃ ζ`, `ζ ∈ inducedFamily M` ∧ `IsIrreducibleCharacter ζ` ∧ `ζ(1) = \|W₁\|`。`Hypothesis` 版は `exists_zeta_degree_w1` |
+| (10.3) | ✅ 5 条項とも | `w2_prime_and_parameter_independence`: `w₂` 素数 / `1 < d` / `∀ i j ≠ 0, μ_{ij}(1) = d` (**`i` と `j` の両方**に独立) / `∀ j j' ≠ 0, δ_j = δ_{j'}` / `n·w₁ = d − δ` (`n : ℕ` なので `n = (d−δ)/w₁ ∈ ℕ`)。`w₂` 素数の単体は `Hypothesis.w2_prime` — 書籍どおり (8.8)→(8.6.a) 経由で、**(10.10) を経由しない非循環ルート** |
+| (10.4) Hypothesis | ✅ (a)(b) とも | (a) = `CharacterParameters` (`ζ,d,δ,n` + (10.3) の恒等式群)、(b) = `CoherentHypothesis` = `S07.IsCoherent hyp.tau hyp.Sset hyp.A0` で `τ₁ = coherent.extension` (`ℤ[𝒮]` 上の等長 + `ℤ[𝒮,A₀]` 上で `τ` と一致)。**2026-08-07 の清掃**: 未消費の opaque `Prop` データフィールド 2 本 (`typeV_parameter_formula` / `typeV_coherence_formula`、3 producer が `True` を入れるだけ) を削除 |
+| (10.5) | ✅ 2 条項とも | 支持半分 = `alpha_support` (`CharacterParameters.alpha_support` フィールドでもあり、producer が `muGrid_alpha_support` で discharge)、Dade 像半分 = `alpha_tau_image` (`α_{ij}^τ = δ(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}`)。7 つの pin (`hmu`/`hos`/`hzS`/`hz1`/`hzconj`/`hδpm`/`hδj`) は `exists_charParameters_full` が全部 discharge |
+| (10.6) | ✅ (a) の 2 恒等式 + (b) | (a) 第 1 = `muColumn_tau1_pin` (= `tau1_values_and_norm_bound` 第 1 連言、`μ_j^{τ₁} = δ∑_i ω_{ij}^σ`)、(a) 第 2 (書籍 "Also") = **`tau_muColumnZero_sub_zeta_eq`** (`(μ_0 − ζ)^τ = ∑_i ω_{i0}^σ − ζ^{τ₁}`、書籍と同じ `∑_i α_{ij} = (μ_j − dζ) − δ(μ_0 − ζ)` 経由)、(b) = `zeta_tau1_norm_ge_one` (**書籍より強い**: `g ∉ Ã(M)` かつ `ord g` が `w₁` と互いに素なら `ζ^{τ₁}(g)` は**奇整数**、ゆえに `\|·\| ≥ 1`)。⚠ (a) 第 2 の docstring が「(10.6)(b) reduction identity」と誤ラベルだったので訂正 (書籍では (10.6)(a) の第 2 文; (10.6)(b) 証明の STEP 1 でもある) |
+| (10.7) | ✅ | `typeII_HU_frobenius_of_coherent'`: Hypothesis (10.4) の下で type-II 極大 `S` の `[S,S]` は核 `S_F` の Frobenius 群 (`IsFrobeniusGroup ↥(derivedInG S) (H.subgroupOf _) (U.subgroupOf _)`、`H = S_F`)。⚠ **packaging 差**: `S` 側を `data : TypesIIIIIIVSetup S` で受けるが、これは `typesIIIIIIVSetup_of_isTypeII hM hSII` により `maximal + IsTypeII` から構成可能 (実際 `S12_Noncoherence:125` は inline で構成している) |
+| (10.8) Theorem | ✅ | `S_not_coherent_unconditional`: Hypothesis (10.1) の下で `¬ Nonempty (S07.IsCoherent hyp.tau hyp.Sset hyp.A0)` |
+| (10.9) | ⭐ **2026-08-07 に書籍の形へ補充** | 従来 repo にあったのは**直交条項だけ** (`residual_alignedOmegaSigma_inner_eq_zero_of_w1_lt_w2`、(11.9.b) 消費側の形) と、**coherence を仮定した**特殊化 (`orthogonality_of_w1_lt_w2`、`χ = ζ^{τ₁}` まで同定)。書籍 (10.9) は Hypothesis (10.1) だけの下で `(μ_0 − ζ)^τ = ∑_i ω_{i0}^σ − χ`, `χ ∈ ℤ[Irr G]`, `χ ⊥ (Irr W)^σ`, `‖χ‖² = 1` の **3 条項** ⟹ **`exists_residual_of_w1_lt_w2`** を新設 (coherence-free、axiom-clean)。`‖χ‖² = 1` は `‖(μ_0−ζ)^τ‖² = ‖μ_0−ζ‖² = w₁+1` (Dade 等長) と σ-grid 正規直交性から `w₁ − w₁ − w₁ + (w₁+1)`。coherence-free であることが (10.8) で `𝒮` が非 coherent な (11.9.b) で使える理由 |
+| (10.10) Theorem | ✅ | `no_typeV_maximal_unconditional` |
+| (10.10.1) | ✅ 2 条項とも | `typeV_param_arithmetic`: `p = 2w₁ − 1 ∧ w₁ < p` (純算術。入力は `w₁ ∣ p+1` と (6.5.a) の `p² ≤ 4w₁²+1`)。`w₁ < w₂` は `p = w₂` から |
+| (10.10.2) | ⭐ **2026-08-07 に個数を書籍の形へ補充** | `d = p` (`muGrid_degree_eq_prime_of_card_eq_prime_cube`) / `δ = −1` (`delta_eq_neg_one`) / `n = 2` (`n_eq_two`) / `𝒮 = 𝒮₁ ∪ {μ_j}` (`mem_SHCSet_or_eq_muGrid_columnSum_of_card_eq_prime_cube`) / `μ_j(1) = d·w₁` (`muColumn_apply_one`) / `W₂ = H′ = M″` (`W2_eq_secondDerivedInAmbient_of_card_eq_prime_cube`)。**`\|𝒮₁\|` は従来 statement に `8 ≤ \|𝒮₁\|` しか出ておらず**、書籍の `\|𝒮₁\| = (p²−1)/w₁` は証明内部の `hcardeq` に埋もれていた ⟹ `w1_mul_SHCcount_add_one_eq_of_card_eq_prime_cube` (`w₁·\|𝒮₁\| + 1 = p²` = 書籍の除算を払った形) と `SHCcount_eq_of_card_eq_prime_cube` (`\|𝒮₁\| = 4(w₁−1)`) を新設し、`eight_le_…` をその数値系に降格 |
+| (10.10.3) | ✅ 3 条項とも | `τ₁` の存在 = `SHC_isCoherent` ((5.7) equal-degree 経由)、支持 = `muGrid_alpha_support`、Dade 像 = `SHC_tau_muGridAlpha_eq_of_eight_le_SHCcount` (`α_{ij}^τ = δ(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}`、`ζ ∈ 𝒮₁`) |
+| (10.10.4) | ✅ | `typeV_caseC_coherence_engine : S07.IsCoherent hyp.tau hyp.Sset hyp.A0` |
+| (10.11) | ✅ 第 1・第 2 主張とも | 第 1 = `theorem88_caseB_prime_orders` (case (b) で `\|W₁\|`,`\|W₂\|` 素数)、第 2 = `S11.typeII_sSet_coherent` ((a) `p = \|W₂\|` ∧ `\|H\| = p^q` ∧ `H` 基本可換、(b) Hypothesis (9.5) の `𝒮` が coherent) |
 
-⚠ **監査の入口** (§6-§9 で確立した順序):
-1. `AxiomsCheck.lean` の (10.x) コメントを読む
-2. **ページ画像 p058-p063 で条項を確定** — §9 で 2 件の OCR 崩れを踏んだ (指数落ち・否定反転)
-3. 各宣言の**結論**を条項ごとに突合。carrier field を見たら **producer を探す** (§7 で 4 件、
-   §8 で複数がこれで「posited でない」と判明した)
+⚠ **OCR 注意**: §10 は pdftotext の崩れが激しい ((10.5) の `α_{ij} = μ_{ij} − δμ_{i0} − nζ` は
+`OL{J= fi>ij—Sfi>io — n(.` になる)。全条項をページ画像 p058-p063 で確定した。
+
+📎 **副産物 (ファイル粒度)**: 補充で `S12_TypeVCaseC.lean` が 1515 行になったので
+`S12_TypeVColumnCoherence.lean` (985 行、(10.10.3)/(10.10.4) の列指標 + coherence engine) と
+`S12_TypeVCaseC.lean` (549 行、(10.10.2) の `p³` 構造パッケージ) に prefix-split し、
+`OddOrder.lean` に配線した。
 
 ## 4. 未着手の census
 

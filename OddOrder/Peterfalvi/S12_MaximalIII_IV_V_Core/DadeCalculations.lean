@@ -491,8 +491,11 @@ theorem Hypothesis.muColumn_tau1_pin [Finite G]
   rw [Finset.smul_sum]
 
 open scoped FiniteInduce in
-/-- **Peterfalvi (10.6)(b) reduction identity** (the `Ã(M)`-independent half of (10.6)(b)):
-`τ(μ_0 − ζ) = ∑_i ω_{i0}^σ − ζ^{τ₁}` as a class function on `G`.
+/-- **Peterfalvi (10.6)(a), second identity** — the book's "Also,
+`(μ_0 − ζ)^τ = ∑_{0≤i<w₁} ω_{i0}^σ − ζ^{τ₁}`" (p. 59), which is also the `Ã(M)`-independent
+half of the (10.6)(b) argument.  Holds under Hypothesis (10.4) alone (no `w₁ < w₂`, no §11
+input); the coherence-free (10.9) restatement, where the residual is *not* identified with
+`ζ^{τ₁}`, is `exists_residual_of_w1_lt_w2`.
 
 Picks a fixed nontrivial column `k`; the `M`-level identity
 `δ(μ_0 − ζ) = (μ_k − dζ) − ∑_i α_{ik}` (from `α_{ik} = μ_{ik} − δμ_{i0} − nζ` and `d = w₁n + δ`)
@@ -686,7 +689,7 @@ Both `μ_0` and `ζ` are induced from the normal `M' = [M,M]`, hence vanish off 
 
 This is the companion of `muColumn_sub_conj_support`/`zeta_sub_conj_support`: it makes `μ_0 − ζ`
 `A_0`-supported, so the Dade isometry `τ` vanishes on it off `Ã(M)`
-(`tau_apply_eq_zero_of_not_mem_dadeSupport`).  Together with the (10.6)(b) reduction identity
+(`tau_apply_eq_zero_of_not_mem_dadeSupport`).  Together with the (10.6)(a) identity
 `τ(μ_0 − ζ) = ∑_i ω_{i0}^σ − ζ^{τ₁}` (`tau_muColumnZero_sub_zeta_eq`) it yields the pointwise
 identity `ζ^{τ₁}(g) = ∑_i ω_{i0}^σ(g)` off `Ã(M)`. -/
 theorem Hypothesis.muColumnZero_sub_zeta_support [Finite G]
@@ -740,7 +743,7 @@ open scoped FiniteInduce in
 `Ã(M) = dadeSupport`, the coherent image `ζ^{τ₁}` agrees with the column-`0` σ-sum,
 `ζ^{τ₁}(g) = ∑_i ω_{i0}^σ(g)` for `g ∉ hyp.dadeData.dade.dadeSupport`.
 
-Combines the (10.6)(b) reduction identity `τ(μ_0 − ζ) = ∑_i ω_{i0}^σ − ζ^{τ₁}`
+Combines the (10.6)(a) identity `τ(μ_0 − ζ) = ∑_i ω_{i0}^σ − ζ^{τ₁}`
 (`tau_muColumnZero_sub_zeta_eq`, STEP 1) with the vanishing of `τ(μ_0 − ζ)` off `Ã(M)`
 (`tau_apply_eq_zero_of_not_mem_dadeSupport`, since `μ_0 − ζ` is `A_0`-supported by
 `muColumnZero_sub_zeta_support`).  This is STEP 2 of (10.6)(b) (issue 1009); the remaining STEP 3

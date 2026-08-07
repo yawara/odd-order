@@ -112,7 +112,20 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
     誤読した版**についてのもの — 書籍の (8.16) は type II の honest な `A(S)` で成立し証明済。
   - **§9 監査完了 (2026-08-07)**: 11 件 + sub-part 8 件。(9.1) の指数 `|E|`・(9.8)(b) の
     `μ_j ∈ 𝒮(H₀C)` はいずれも pdftotext が壊す箇所で、ページ画像で確定した。
-  - **次の入口**: §10 = repo `S12` ((10.1)-(10.11) + (10.10.1)-(10.10.4)、書籍 pp.58-63)。
+  - **§10 監査完了 (2026-08-07)**: 15 件 ((10.1)-(10.11) + (10.10.1)-(10.10.4)) すべてに
+    書籍強度の実体あり。**補充 2 件**:
+    - **(10.9) を書籍の形へ** — repo は直交条項だけ (`residual_alignedOmegaSigma_inner_eq_zero_of_w1_lt_w2`、
+      (11.9.b) 消費側の形) と **coherence を仮定した**特殊化 (`orthogonality_of_w1_lt_w2`) しか持たず、
+      書籍の `χ ∈ ℤ[Irr G]` と `‖χ‖² = 1` が statement に無かった。
+      `S12.exists_residual_of_w1_lt_w2` を新設 (Hypothesis (10.1) のみ、axiom-clean)。
+    - **(10.10.2) の `|𝒮₁|`** — statement は `8 ≤ |𝒮₁|` だけで、書籍の `|𝒮₁| = (p²−1)/w₁` は
+      証明内部に埋もれていた。`w1_mul_SHCcount_add_one_eq_of_card_eq_prime_cube` (`w₁·|𝒮₁|+1 = p²`) と
+      `SHCcount_eq_of_card_eq_prime_cube` (`|𝒮₁| = 4(w₁−1)`) を新設、`eight_le_…` はその系に。
+    清掃 2 件: `CharacterParameters` の未消費 opaque `Prop` フィールド 2 本を削除 /
+    `tau_muColumnZero_sub_zeta_eq` の「(10.6)(b)」誤ラベルを (10.6)(a) 第 2 文へ訂正。
+    設計差 2 件 (いずれも被覆済): (10.1) の「(5.2) も成立」は独立 carrier でなく Dade datum 経由 /
+    (10.7) は `TypesIIIIIIVSetup` を受けるが `maximal + IsTypeII` から構成可能。
+  - **次の入口**: §11 = 書籍 pp.64-68 ((11.1)-(11.9) 系、repo `S13`)。
   - **監査手順の正本** = memory `textbook-coverage-audit-failure-modes`。
     **(1) AxiomsCheck の番号コメント → (2) 書籍ページ画像 → (3) 結論の突合** の順。
     🚨「実体が見つからない」を結論にしない (本セッションで 3 回誤判定しかけた)。

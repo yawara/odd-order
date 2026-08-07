@@ -761,8 +761,6 @@ structure CharacterParameters {M : Subgroup G} (hyp : Hypothesis M) where
   /-- (10.5), support half: for `0 < j < w₂`, `α_{ij}` is supported on `A_0(M)`.  De-opaqued (and
   dade0-free) — materialized in the producer from `Hypothesis.muGrid_alpha_support`. -/
   alpha_support : ∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 → (alpha i j).support ⊆ hyp.A0
-  typeV_parameter_formula : Prop
-  typeV_coherence_formula : Prop
 
 /-- **Peterfalvi (10.4)**: the coherent-extension hypothesis for the family of
 characters in (10.1).
@@ -1011,9 +1009,7 @@ theorem Hypothesis.exists_charParameters [Finite G] (hG : OddOrder.BG.IsMinimalS
            two_le_n := hn2
            alpha_support := fun i j hj =>
              hyp.muGrid_alpha_support hG hodd hj hζS (hdi i j hj)
-               (hyp.muGrid_zero_column_apply_one hG hodd i) hζdeg hnf (hδindep j hj)
-           typeV_parameter_formula := True
-           typeV_coherence_formula := True },
+               (hyp.muGrid_zero_column_apply_one hG hodd i) hζdeg hnf (hδindep j hj) },
     ⟨hζS, hζirr, hζdeg⟩, hd1, hdi,
     (fun _ _ hj hj' => hyp.muColumnSign_eq_of_ne hG hG.odd (hyp.w2_prime hG) hj hj'), hnf⟩
 
@@ -1111,9 +1107,7 @@ theorem Hypothesis.exists_charParameters_full [Finite G]
             two_le_n := hn2
             alpha_support := fun i j hj =>
               hyp.muGrid_alpha_support hG hG.odd hj hζS (hdi i j hj)
-                (hyp.muGrid_zero_column_apply_one hG hG.odd i) hζdeg hnf (hδindep j hj)
-            typeV_parameter_formula := True
-            typeV_coherence_formula := True },
+                (hyp.muGrid_zero_column_apply_one hG hG.odd i) hζdeg hnf (hδindep j hj) },
     rfl, rfl, hζS, hζdeg, ?_, ?_, hδindep⟩
   · exact hyp.zeta_conj_ne hG hζdeg
   · have hw2 : 2 ≤ hyp.w2 := (hyp.w2_prime hG).two_le
@@ -1166,9 +1160,7 @@ theorem Hypothesis.exists_charParameters_full_of_zeta [Finite G]
             two_le_n := hn2
             alpha_support := fun i j hj =>
               hyp.muGrid_alpha_support hG hG.odd hj hζS (hdi i j hj)
-                (hyp.muGrid_zero_column_apply_one hG hG.odd i) hζdeg hnf (hδindep j hj)
-            typeV_parameter_formula := True
-            typeV_coherence_formula := True },
+                (hyp.muGrid_zero_column_apply_one hG hG.odd i) hζdeg hnf (hδindep j hj) },
     rfl, rfl, rfl, hζS, hζdeg, ?_, ?_, hδindep⟩
   · exact hyp.zeta_conj_ne hG hζdeg
   · have hw2 : 2 ≤ hyp.w2 := (hyp.w2_prime hG).two_le

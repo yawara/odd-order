@@ -594,6 +594,103 @@ theorem residual_alignedOmegaSigma_inner_eq_zero_of_w1_lt_w2 [Finite G]
   · intro h; exact absurd (Finset.mem_univ _) h
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (10.9), the book statement** (coherence-free).  Under Hypothesis (10.1), with `ζ`
+as in (10.2) and `w₁ < w₂`:
+
+> `(μ_0 − ζ)^τ = ∑_{0≤i<w₁} ω_{i0}^σ − χ`, where `χ ∈ ℤ[Irr G]` is orthogonal to `(Irr W)^σ`
+> and `‖χ‖² = 1`.
+
+The witness is `χ = ∑_i ω_{i0}^σ − (μ_0 − ζ)^τ`, so the displayed decomposition is trivial; the
+three substantive clauses are:
+
+* **`χ ∈ ℤ[Irr G]`** — `(μ_0 − ζ) ∈ ℤ[Irr M]` is `A_0`-supported
+  (`muColumnZero_sub_zeta_support`), so its Dade image is integral
+  (`dadeIntegralCharacterMap_mem_ZIrr_of_supported`), and the `σ`-grid entries are integral
+  (`alignedOmegaSigmaGrid_mem_ZIrr`);
+* **orthogonality to `(Irr W)^σ`** — the coherence-free (10.9)
+  `residual_alignedOmegaSigma_inner_eq_zero_of_w1_lt_w2` (itself the (3.8) trichotomy on
+  `ψ = (μ_0 − ζ)^τ`, whose `σ`-coefficient grid is the single constant column `j = 0`);
+* **`‖χ‖² = 1`** — the book's `‖χ‖² = ‖(μ_0 − ζ)^τ‖² − ‖∑_i ω_{i0}^σ‖²`, computed as
+  `w₁ − w₁ − w₁ + (w₁ + 1)` from `⟨ψ, ω_{i0}^σ⟩ = 1` (the `j = 0` case of the `σ`-coefficient
+  form), the `σ`-grid orthonormality `‖∑_i ω_{i0}^σ‖² = w₁`, and the Dade isometry
+  `‖ψ‖² = ‖μ_0 − ζ‖² = w₁ + 1` (`inner_muColumnZero_sub_zeta_self`).
+
+Note that (10.9) is stated under Hypothesis (10.1) alone — **not** under the coherence Hypothesis
+(10.4) — which is what makes it usable in (11.9.b), where `S` is not coherent by (10.8).  The
+coherent specialisation (which additionally identifies `χ = ζ^{τ₁}`) is
+`orthogonality_of_w1_lt_w2`. -/
+theorem exists_residual_of_w1_lt_w2 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    {ζ : ClassFunction ↥M ℂ} (hzS : ζ ∈ inducedFamily M) (hzirr : IsIrreducibleCharacter ζ)
+    (hz1 : ζ 1 = (hyp.w1 : ℂ)) (hw : hyp.w1 < hyp.w2) :
+    ∃ χ : ClassFunction G ℂ,
+      χ ∈ ZIrr G ∧
+      hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i 0) - ζ)
+          = (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i 0) - χ ∧
+      (∀ (i : Fin hyp.w1) (j : Fin hyp.w2),
+          ClassFunction.inner χ (hyp.alignedOmegaSigmaGrid hG hG.odd i j) = 0) ∧
+      ClassFunction.inner χ χ = 1 := by
+  haveI := hyp.finiteG
+  classical
+  have hodd : Odd (Nat.card G) := hG.odd
+  set Ω : ClassFunction G ℂ := ∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i 0 with hΩ
+  set ψ : ClassFunction G ℂ :=
+    hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ) with hψ
+  -- the `A_0`-support of `μ_0 − ζ`, and integrality of both `ψ` and `Ω`.
+  have hsupp : ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ).support ⊆ hyp.A0 :=
+    hyp.muColumnZero_sub_zeta_support hG hodd hzS hz1
+  have hdiffZ : ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ) ∈ ZIrr ↥M :=
+    Submodule.sub_mem _
+      (Submodule.sum_mem _ fun i _ => (hyp.muGrid_isIrreducible hG hodd i 0).mem_ZIrr)
+      hzirr.mem_ZIrr
+  have hψZ : ψ ∈ ZIrr G :=
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+      hyp.dadeData.dade hsupp hdiffZ
+  have hΩZ : Ω ∈ ZIrr G :=
+    Submodule.sum_mem _ fun i _ => hyp.alignedOmegaSigmaGrid_mem_ZIrr hG hodd i 0
+  -- `⟨Ω, ω_{r0}^σ⟩ = 1` (σ-grid orthonormality) and hence `‖Ω‖² = w₁`.
+  have hΩr : ∀ r : Fin hyp.w1,
+      ClassFunction.inner Ω (hyp.alignedOmegaSigmaGrid hG hodd r 0) = 1 := by
+    intro r
+    rw [hΩ, inner_sum_left, Finset.sum_eq_single r]
+    · rw [hyp.alignedOmegaSigmaGrid_inner hG hodd r r 0 0, if_pos ⟨rfl, rfl⟩]
+    · intro r' _ hne
+      rw [hyp.alignedOmegaSigmaGrid_inner hG hodd r' r 0 0, if_neg fun h => hne h.1]
+    · intro h; exact absurd (Finset.mem_univ _) h
+  have hsum1 : ∑ _r : Fin hyp.w1, (1 : ℂ) = (hyp.w1 : ℂ) := by
+    rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one]
+  have hΩnorm : ClassFunction.inner Ω Ω = (hyp.w1 : ℂ) := by
+    rw [hΩ, OddOrder.RepresentationTheory.inner_sum_right]
+    rw [Finset.sum_congr rfl fun r _ => hΩr r, hsum1]
+  -- `⟨ψ, ω_{r0}^σ⟩ = 1` (the `j = 0` case of the coherence-free σ-coefficient form).
+  have hψr : ∀ r : Fin hyp.w1,
+      ClassFunction.inner ψ (hyp.alignedOmegaSigmaGrid hG hodd r 0) = 1 := fun r => by
+    have h := inner_tau_muColumnZero_sub_zeta_alignedOmegaSigma_of_w1_lt_w2 hG hyp hzS hzirr hz1
+      hw r 0
+    rwa [if_pos rfl] at h
+  have hψΩ : ClassFunction.inner ψ Ω = (hyp.w1 : ℂ) := by
+    rw [hΩ, OddOrder.RepresentationTheory.inner_sum_right]
+    rw [Finset.sum_congr rfl fun r _ => hψr r, hsum1]
+  have hΩψ : ClassFunction.inner Ω ψ = (hyp.w1 : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hψΩ, star_natCast]
+  -- `‖ψ‖² = ‖μ_0 − ζ‖² = w₁ + 1` (Dade isometry on the `A_0`-supported difference).
+  have hψnorm : ClassFunction.inner ψ ψ = ((hyp.w1 + 1 : ℕ) : ℂ) := by
+    rw [hψ, hyp.tau_inner_eq_of_supported hsupp hsupp]
+    exact inner_muColumnZero_sub_zeta_self hG hyp hzirr hz1
+  refine ⟨Ω - ψ, Submodule.sub_mem _ hΩZ hψZ, (sub_sub_cancel Ω ψ).symm, ?_, ?_⟩
+  · -- orthogonality: the residual `ψ − Ω` is `σ`-orthogonal, hence so is its negative.
+    intro i j
+    have h := residual_alignedOmegaSigma_inner_eq_zero_of_w1_lt_w2 hG hyp hzS hzirr hz1 hw i j
+    rw [← hΩ, ← hψ, ClassFunction.inner_sub_left] at h
+    rw [ClassFunction.inner_sub_left]
+    linear_combination -h
+  · -- `‖Ω − ψ‖² = w₁ − w₁ − w₁ + (w₁ + 1) = 1`.
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, hΩnorm, hΩψ, hψΩ, hψnorm]
+    push_cast
+    ring
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (11.9.b), the `q > p` reduction** (modulo (11.8)).  For an irreducible
 `ζ ∈ S = inducedFamily M` of degree `w₁`, given the genuine (11.8) non-orthogonality `h118`
 (`(μ_0 − ζ)^τ − ∑ ω_{i0}^σ` is **not** orthogonal to `(Irr W)^σ`), it follows that `w₂ < w₁`

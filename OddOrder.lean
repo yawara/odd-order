@@ -829,6 +829,7 @@ import OddOrder.Peterfalvi.S11_NineElevenPairAdjoin
 import OddOrder.Peterfalvi.S11_NineElevenCaseAResidual
 import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
 import OddOrder.Peterfalvi.S12_Noncoherence
+import OddOrder.Peterfalvi.S12_TypeVColumnCoherence
 import OddOrder.Peterfalvi.S12_TypeVCaseC
 import OddOrder.Peterfalvi.S12_TypeIIColumnPin
 import OddOrder.Peterfalvi.S12_TypeIIGridTranspose

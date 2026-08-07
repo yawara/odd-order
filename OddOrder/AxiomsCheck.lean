@@ -10600,10 +10600,31 @@ the Singer model to `φ(s) = 1` (`…_basePoint`); `U*` generates `F` additively
 -- Peterfalvi §10 (10.9) coherence-free support: the general Bessel `NC` bound
 -- `sigmaNC ψ ≤ ‖ψ‖²` (`ψ ∈ ZIrr G`, `⟨ψ, ψ⟩ = N ⟹ NC ≤ N`), generalising the norm-1/2 `σ`-image
 -- support bounds.  Fully axiom-clean (the σ-grid orthonormality + integer Parseval).  Used by the
--- coherence-free (10.9) `inner_tau_muColumnZero_sub_zeta_alignedOmegaSigma_of_w1_lt_w2` (lane-b W3,
--- which is itself char-gated, so not registered here).
+-- coherence-free (10.9) `inner_tau_muColumnZero_sub_zeta_alignedOmegaSigma_of_w1_lt_w2`.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S05.TICyclicHypothesis.ncard_sigmaCoeff_ne_zero_le_of_inner_self_natCast
+
+-- **Peterfalvi (10.9), the book statement** (issue 0172 §10 audit) —
+-- `exists_residual_of_w1_lt_w2`: under Hypothesis (10.1), for `ζ` as in (10.2) with `w₁ < w₂`,
+-- `(μ_0 − ζ)^τ = ∑_{0≤i<w₁} ω_{i0}^σ − χ` with `χ ∈ ℤ[Irr G]` orthogonal to `(Irr W)^σ` and
+-- `‖χ‖² = 1`.  The repo previously carried only the orthogonality clause
+-- (`residual_alignedOmegaSigma_inner_eq_zero_of_w1_lt_w2`, the (11.9.b) consumer's form); the
+-- integrality and `‖χ‖² = 1` clauses are the book's remaining content, assembled here from the
+-- Dade isometry `‖(μ_0 − ζ)^τ‖² = w₁ + 1` and the σ-grid orthonormality.  **Coherence-free** —
+-- (10.9) is stated under (10.1), not (10.4), which is what makes it usable in (11.9.b) where
+-- `S` is not coherent by (10.8).  Axiom-clean.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.exists_residual_of_w1_lt_w2
+
+-- **Peterfalvi (10.10.2), the exact `S₁`-count** (issue 0172 §10 audit) —
+-- `Hypothesis.w1_mul_SHCcount_add_one_eq_of_card_eq_prime_cube`: `w₁·|S₁| + 1 = p²`, i.e. the
+-- book's "`S₁` consists of `(p² − 1)/w₁` irreducible characters of degree `w₁`" in cleared form.
+-- The repo previously exposed only the numeric consequence `|S₁| ≥ 8` needed by the (10.10.3)
+-- engine, although the exact count was already derived inside that proof.  The case-(c) value
+-- `|S₁| = 4(w₁ − 1)` (using the (10.10.1) pin `p = 2w₁ − 1`) is
+-- `Hypothesis.SHCcount_eq_of_card_eq_prime_cube`.  Axiom-clean.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S12.Hypothesis.w1_mul_SHCcount_add_one_eq_of_card_eq_prime_cube
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.SHCcount_eq_of_card_eq_prime_cube
 
 -- **`|K*| = w₂` carrier bridge** (lane-b W3, BG §14 group theory) —
 -- `card_Msigma_inf_centralizer_eq_card_W2`: for a type-`P` maximal `S`, κ-Hall `K` cyclic, and any
