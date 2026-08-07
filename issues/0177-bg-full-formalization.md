@@ -81,10 +81,17 @@ pat = re.compile(r'^(Theorem|Proposition|Lemma|Corollary)\s+(\d{1,2})\.(\d{1,2})
 
 ## 作業手順
 
-- [ ] **ステップ 1**: 欠番 3 件 (4.1 / 7.1 / 14.11) の statement をページ画像で確定し、
-      Theorems A-E と補章の件数を確定する。
+- [x] **ステップ 1 (大半完了、2026-08-08)**: 欠番 3 件のうち **2 件を解決**。
+      - **7.1** — OCR が `L e m m a 7.1.` と**文字分解**。空白許容パターンで解決。
+      - **4.1** — OCR が `Lemma-4.1.` と**ハイフン**を入れており空白許容でも漏れる。
+        ⟹ §4 は 20 件。
+      - ⬜ **14.11 は未発見**。ページ画像で要確認。
+      - **Theorems A–E**: 5 件すべて所在確認 (`Theorem A` L6615 / `B` L6602 / `C` L6653 /
+        `D` L6669 / `E` L6692)。⚠ `Theorem B.4` (補章 B) と混同しないこと。
+      - **補章**: `Kind X.N` が 14 件。⬜ 各補章の `.1` が未発見で要確認。
+- [x] **census note を新設 (2026-08-08)**:
+      [`notes/bg/full_formalization_census_2026_08_08.md`](../notes/bg/full_formalization_census_2026_08_08.md)
 - [ ] **ステップ 2**: §1 から文書順に逐条監査。1 節ぶん終えるごとに census note を更新して commit。
-- [ ] census note を新設 (`notes/bg/full_formalization_census_2026_08_08.md`)
 
 ## 完了条件
 
