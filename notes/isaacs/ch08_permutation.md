@@ -440,3 +440,35 @@ A_n general (8.27) が新規実装の中心.
 - [`../meta/mathlib_coverage.md`](../meta/mathlib_coverage.md) — 全体カバレッジ.
   `GroupTheory/GroupAction/` 配下 (Transitive, Blocks, Primitive, Jordan, Iwasawa, ...)
   の Ch.8 直撃ファイル群が要となる.
+
+## Isaacs Ch.8 ↔ mathlib 対応表 (issue 0176 ステップ 1、2026-08-08)
+
+[issue 0176](../../issues/0176-isaacs-full-formalization.md) の census で **cite ゼロ 13 件**
+(8.11-8.15, 8.17, 8.19-8.22, 8.27, 8.28, 8.30) を検出した。実状態を分類した結果、
+**12 件は mathlib 被覆**で、repo に実体が無いのは正しい (CLAUDE.md のラッパー方針: 薄い
+ラッパーを書かず対応を記録する)。⚠ **cite ゼロ ≠ 未形式化**の実例がまた 12 件増えた。
+
+書籍の記法: `Ω` = 作用先、`G_α` = 点安定化群、Jordan 集合 `X` = 「補集合の各点固定部分群
+`G_{Ω−X}` が `X` 上推移的」、strongly Jordan = さらに原始的。
+
+| Isaacs | 書籍の主張 | mathlib | 備考 |
+|---|---|---|---|
+| **8.11** | ブロック `Δ` について `\|Δ\| ∣ \|Ω\|`、translate はちょうど `\|Ω\|/\|Δ\|` 個で互いに素・和が `Ω`・`G` が推移的に置換 | `MulAction.IsBlock.ncard_block_mul_ncard_orbit_eq` / `.ncard_dvd_card` / `.ncard_block_eq_relIndex` (`GroupAction/Blocks.lean:648,659`) | translate の族が `orbit G B` として直接扱われる |
+| **8.12** | 素数濃度の推移的作用は原始的 | `MulAction.IsPreprimitive.of_prime_card` (`Primitive.lean:313`) | 一致 |
+| **8.13** | `H = G_α ≤ K` に対し `α*K` はブロック、`\|α*K\| = [K:H]`、`K ↦ α*K` は `[H,G]` 区間からブロック全体への全単射 | `MulAction.block_stabilizerOrderIso` + `IsBlock.ncard_block_eq_relIndex` | mathlib は**順序同型**として述べる (書籍は全単射) = より強い |
+| **8.14** | 推移的・`\|Ω\| > 1` で「`G` 原始的 ⟺ `G_α` が極大部分群」 | `MulAction.isCoatom_stabilizer_iff_preprimitive` (`Primitive.lean:263`) | 一致 (`IsCoatom` = 極大) |
+| **8.15** | `N ⊴ G` の各軌道は `G`-ブロック。特に `G` 原始的なら `N` は自明か推移的 | `MulAction.IsBlock.orbit_of_normal` (`Blocks.lean:447`) | 「特に」節は `IsPreprimitive` + `IsTrivialBlock` から即 |
+| **8.17** | **Jordan**: 原始的置換群が互換を含めば全対称群 | `subgroup_eq_top_of_isPreprimitive_of_isSwap_mem` (`GroupAction/Jordan.lean:385`) | 一致 |
+| **8.19** | 原始的置換群が 3-サイクルを含めば対称群か交代群 | `alternatingGroup_le_of_isPreprimitive_of_isThreeCycle_mem` (`Jordan.lean:423`) | mathlib は `Aₙ ≤ G` の形 (書籍の二者択一はここから) |
+| **8.20** | `H ≤ G`、`X` が `H`-軌道、`H` が `X` 上原始的、`\|X\| > \|Ω\|/2` ⟹ `G` は `Ω` 上原始的 | `MulAction.IsPreprimitive.of_card_lt` (`Primitive.lean:325`) | ⭐ **mathlib のほうが一般** — 部分群の軌道でなく**任意の同変写像** `f : X →ₑ[φ] Y` で `\|Y\| < 2·\|range f\|` |
+| **8.21** | Jordan 集合 `X, Y` で `X ∪ Y ≠ Ω` なら `X ∩ Y` も Jordan (strongly も同様) | `IsPretransitive.isPretransitive_ofFixingSubgroup_inter` / `IsPreprimitive.isPreprimitive_ofFixingSubgroup_inter` (`SubMulAction/OfFixingSubgroup.lean:470,499`) | ⚠ **mathlib は特殊化**: 2 つ目を `g • s` (translate) に限る。書籍は任意の 2 つ。消費点 (8.22) は translate 版で足りる |
+| **8.22** | 原始的 + Jordan 集合 `X` (`0 < \|X\| < \|Ω\|−1`) ⟹ `G_α` は `Ω−{α}` 上推移的 (= `G` 2-推移的); strongly Jordan なら 2-原始的 | `MulAction.IsPreprimitive.is_two_pretransitive` / `is_two_preprimitive` (`Jordan.lean:224,232`、Wielandt 13.1) | mathlib の `s` = 書籍の `Ω − X`、`ofFixingSubgroup M s` が書籍の `X` |
+| **8.27** | `n ≥ 5` で `Aₙ` は単純 | `alternatingGroup.isSimpleGroup` (`SpecificGroups/Alternating/Simple.lean:202`) | mathlib は **Iwasawa 構造**経由 (書籍と同じ道具立て = 8.30) |
+| **8.28** | `n ≥ 5` で `Sₙ` の正規部分群はちょうど 3 つ (`1`, `Aₙ`, `Sₙ`) | ⬜ **無し** | **cite ゼロ 13 件で唯一の真の未形式化**。`Aₙ` 単純性 + 指数 2 + `Z(Sₙ) = 1` から出る |
+| **8.30** | **Iwasawa**: 原始的置換群 `G` が `G' = G`、`H = G_α`、可解 `A ⊴ H` で `G = ⟨A^G⟩` ⟹ `G` 単純 | `MulAction.IwasawaStructure` + `MulAction.IwasawaStructure.isSimpleGroup` | mathlib は構造体として束ねる。`PSL(2,F)` の単純性でも使われている |
+
+**結論**: 13 件中 **12 件が mathlib 被覆**、**1 件 (8.28) が真の未形式化**、
+**1 件 (8.21) に mathlib 側の特殊化債務** (translate 限定)。
+
+⚠ 8.21 の特殊化は **mathlib 側**の債務であり、CLAUDE.md の「mathlib 本体への PR は当面しない」
+方針の対象。書籍強度の一般形が本 repo で必要になったら `OddOrder` namespace で書く。
