@@ -127,8 +127,23 @@ Isaacs / mathlib / 本 repo の 3 列で対応づける**マスター対応表**
 | **Prop 2.4** | 「形式化方針」+ **「(stub 未配置: 10 部を個別 lemma 化, shared module 作成後.)」** | ⚠ **注記が stale** — `GroupTheory/RepresentationTheory/EigenspaceUnderCyclicAction.lean` は**既に存在する** |
 | **Thm 2.5** | 「形式化方針」+ **「(stub 未配置: 依存定理多数, foundation 整備後に着手.)」** | ⬜ 未確定。挙げられた `RepresentationTheory/AutElementaryAbelian.lean` は**存在しない**。別名で在るか要調査 |
 
-⬜ **Lem 2.7** — BG 配下に番号参照が無い。`AppE_CentralizerDecomposition.lean:106` に
-「`q ∣ p − 1`」という**同じ結論の散文**があるので、そこか別モジュールに実体がある可能性。要調査。
+⬜ **Thm 2.5** — 実装計画は「`AutElementaryAbelian.lean` + Prop 2.4」だが**そのファイルは
+存在しない**。消費点は「§3 Thm 3.4, §15 Thm 15.7」と記録されているので、
+**§3 Thm 3.4 の証明が 2.5 をどう使っているか**を追えば実体の有無が決まる (次回)。
+
+🚨 **Lem 2.7 は repo の §2 計画表に載っていない** — `S02_RepresentationsBasic.lean` の
+「§2A-§2F」区分も「主要 cite」表も **2.1-2.6 の 6 件しか追っていない**。書籍 §2 は 7 件なので
+**1 件まるごと計画から抜け落ちている**。
+⚠ `AppE_CentralizerDecomposition.lean:106` の「`q ∣ p − 1`」は **BG Thm E.3(a)** であって
+Lem 2.7 ではない (結論の字面が同じなので取り違えやすい)。
+
+### 🚨 §2 の所見 2 — 「番号の抜け」は計画表の区分からも起きる
+
+repo の §2 計画は **§2A(2.1) / §2B(2.2) / §2C(2.3) / §2D(2.4) / §2E(2.5) / §2F(2.6)** と
+**書籍の 6 件に節記号を割り当てる形**で作られており、7 件目の **Lem 2.7 に対応する節記号が無い**。
+⟹ **節記号ベースの計画表は「書籍の番号を全部数えたか」を保証しない**。
+本キャンペーンのように**書籍側から機械抽出した番号リストと突合**しないと発見できない型。
+(Peterfalvi/Isaacs では計画表が番号ベースだったのでこの型は出なかった。)
 
 ### 🚨 §2 の所見 — 「stub 未配置」注記が信用できない
 
