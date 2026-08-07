@@ -261,4 +261,29 @@ file header の対応表と `theorem` 一覧で確認する。
 
 ⟹ **Ch.4 全 38 件被覆・補充ゼロ**。
 
-### Ch.5-Ch.7, Ch.9-Ch.10 — 未着手 (次の入口 = Ch.5 Transfer、30 件)
+### Ch.5 Transfer (30 件、書籍 pp.156-185) — **監査完了 (2026-08-08)**、補充 1 件
+
+**30/30 参照あり**。単独参照の 4 件と多条項の 5.26 を実体で確認:
+
+| Isaacs | 実体 |
+|---|---|
+| 5.11 (Hall index transfer) | `Ch05.ker_transfer_sup_eq_top_of_hall` (`Basic.lean:388`) |
+| 5.15 (Z-群は可解) | mathlib `IsZGroup → IsSolvable` instance |
+| 5.25 | `hasNormalPComplement_iff_controlsOwnFusion` (iff) |
+| **5.26 Frobenius** | ⚠ **packaging 差 → 2026-08-08 に解消** (下記) |
+| 5.27 / 5.28 / 5.29 | `Main.lean:406` / `:657` / Cor は 5.26 経由 |
+
+⚠ **5.26 の packaging 差** — 書籍 p.175 は **3 条件の TFAE**:
+(1) `G` が normal `p`-complement を持つ / (2) 全ての非自明 `p`-部分群 `X` で `N_G(X)` が
+normal `p`-complement を持つ / (3) 全ての `p`-部分群 `X` で `N_G(X)/C_G(X)` が `p`-群。
+
+repo は **(1) ⇔ (3)** だけを theorem として持ち、条件 (2) は Lemma 5.27 の前後段に
+分かれていた。3 つの含意はすべて在ったので `Ch05.frobenius_normal_p_complement_tfae` で
+書籍の形に束ねた。⟹ **Peterfalvi (3.8) と同型の packaging 差**で、
+「条項はすべて在るが書籍の statement の形になっていない」型。
+
+⚠ 併せて **stale な forward reference** を訂正 — `Main.lean:388` が
+「Lem 5.27, Lem 5.28 **完成後**の theorem 化を参照」と、まだ未完であるかのように
+書かれたままだった (実体は同ファイル下部)。
+
+### Ch.6-Ch.7, Ch.9-Ch.10 — 未着手 (次の入口 = Ch.6 Frobenius Actions、24 件)

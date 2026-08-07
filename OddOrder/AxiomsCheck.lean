@@ -16052,6 +16052,24 @@ Ch.2 逐条監査で検出した唯一の真の未形式化。書籍 p.46 の証
 実在確認する**。 -/
 
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch02.inf_isSubnormal
+
+/-! ### Isaacs Thm 5.26 (Frobenius) — 書籍どおりの 3 条件 TFAE (issue 0176、2026-08-08)
+
+書籍 p.175 は 3 条件の同値を述べる:
+  (1) `G` が normal `p`-complement を持つ
+  (2) 全ての非自明 `p`-部分群 `X` について `N_G(X)` が normal `p`-complement を持つ
+  (3) 全ての `p`-部分群 `X` について `N_G(X)/C_G(X)` が `p`-群
+
+repo は長らく **(1) ⇔ (3)** だけを theorem として持ち、条件 (2) は Lemma 5.27 の前後段
+(`hasNormalPComplement_of_subgroup` / `isPGroup_normalizerQuotientCentralizer_…`) に
+分かれていた。3 つの含意はすべて在ったので `frobenius_normal_p_complement_tfae` で
+書籍の形に束ねた (packaging 差の解消)。
+
+⚠ 併せて stale な forward reference を訂正 — 「Lem 5.27, Lem 5.28 **完成後**の
+theorem 化を参照」と、まだ未完であるかのように書かれたままだった。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch05.frobenius_normal_p_complement_tfae
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch01.isCyclic_of_card_eq_mul_prime_lt_of_not_dvd
 

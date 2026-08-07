@@ -384,8 +384,13 @@ theorem hasNormalPComplement_iff_controlsOwnFusion [Finite G] {p : ℕ} [Fact p.
     HasNormalPComplement p G ↔ P.ControlsOwnFusion :=
   ⟨controlsOwnFusion_of_hasNormalPComplement P, hasNormalPComplement_of_controlsOwnFusion P⟩
 
-/-! **Isaacs Thm 5.26 Frobenius normal p-complement** (forward declaration; theorem 化は下記)
-は (1) ⇔ (3) で記述. 詳細は Lem 5.27, Lem 5.28 完成後の theorem 化を参照. -/
+/-! **Isaacs Thm 5.26 Frobenius normal p-complement** の theorem 化は本ファイル下部:
+(1) ⇔ (3) が `hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer`、
+書籍どおりの **3 条件 TFAE** が `frobenius_normal_p_complement_tfae`.
+
+⚠ この注記は 2026-08-08 の逐条監査 (issue 0176) で更新した。それ以前は
+「Lem 5.27, Lem 5.28 **完成後**の theorem 化を参照」と、まだ未完であるかのように
+書かれたままだった (stale な forward reference)。 -/
 
 /-- **Isaacs Lem 5.27 part 1 (1 ⇒ 2, strong form)**: G が normal p-complement を持つなら,
 任意の subgroup `H ≤ G` も normal p-complement を持つ.
@@ -1056,6 +1061,39 @@ theorem hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer
       _ = ((t_N : G) * (u_N : G)) * x * ((t_N : G) * (u_N : G))⁻¹ := by group
       _ = (c * g) * x * (c * g)⁻¹ := by rw [← hcg_val_eq]
       _ = y := h_y_eq_cgx.symm
+
+
+/-- **Isaacs Thm 5.26 (Frobenius), 書籍どおりの 3 条件 TFAE** (p. 175).
+
+> Let `G` be a finite group and `p` a prime.  Then the following are equivalent.
+> (1) `G` has a normal `p`-complement.
+> (2) `N_G(X)` has a normal `p`-complement for every nonidentity `p`-subgroup `X ⊆ G`.
+> (3) `N_G(X)/C_G(X)` is a `p`-group for every `p`-subgroup `X ⊆ G`.
+
+repo は長らく **(1) ⇔ (3)** だけを theorem として持ち、条件 (2) は Lemma 5.27 の
+前後段 (`hasNormalPComplement_of_subgroup` / `isPGroup_normalizerQuotientCentralizer_…`)
+に分かれていた。3 つの含意はすべて在ったので、本定理で書籍の形に束ねる
+(issue 0176 の逐条監査で検出した packaging 差)。
+
+* (1) → (2): `hasNormalPComplement_of_subgroup` を `N_G(X)` に適用。
+* (2) → (3): `isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement`。
+* (3) → (1): 既存の iff の `mpr`。 -/
+theorem frobenius_normal_p_complement_tfae [Finite G] {p : ℕ} [Fact p.Prime] :
+    List.TFAE
+      [HasNormalPComplement p G,
+        ∀ X : Subgroup G, X ≠ ⊥ → IsPGroup p X →
+          HasNormalPComplement p ↥(Subgroup.normalizer (X : Set G)),
+        ∀ X : Subgroup G, IsPGroup p X →
+          IsPGroup p (↥(Subgroup.normalizer (X : Set G)) ⧸
+            (Subgroup.centralizer (X : Set G)).subgroupOf
+              (Subgroup.normalizer (X : Set G)))] := by
+  tfae_have 1 → 2 := fun hG X _ _ =>
+    hasNormalPComplement_of_subgroup hG (Subgroup.normalizer (X : Set G))
+  tfae_have 2 → 3 := fun h =>
+    isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement h
+  tfae_have 3 → 1 := fun h =>
+    (hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer).mpr h
+  tfae_finish
 
 /-- Isaacs' p-local action criterion, packaged with Frobenius' normal p-complement theorem.
 

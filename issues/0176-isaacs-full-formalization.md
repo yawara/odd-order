@@ -124,6 +124,10 @@ repo の `Ch08_PermutationGroups` も既に `IsPreprimitive` を使っている�
       - **Ch.4 監査完了 (2026-08-08)**: 全 38 件被覆・**補充ゼロ**。4.9 は mathlib
         `commutator_commutator_eq_bot_of_rotate`、4.14-4.19 (Mann) は `Mann.lean` の
         file header が全件対応づけ済、4.33 は `oPiCore_compl_le_oPiCore_compl_of_isPLocal`。
+      - **Ch.5 監査完了 (2026-08-08)**: 全 30 件被覆。補充 1 件 = **5.26 (Frobenius)** の
+        書籍どおり 3 条件 TFAE (`frobenius_normal_p_complement_tfae`)。repo は (1)⇔(3) だけを
+        theorem として持ち、条件 (2) は Lemma 5.27 の前後段に分かれていた
+        (Peterfalvi (3.8) と同型の packaging 差)。
       - 1 章ぶん終えるごとに census note を更新して commit。
 
 ## 完了条件
