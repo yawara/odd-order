@@ -728,6 +728,7 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults.FittingNonTITrichotomy
 import OddOrder.Peterfalvi.S01_Introduction
 import OddOrder.Peterfalvi.S02_Notation
 import OddOrder.Peterfalvi.S03_PreliminaryCharacter
+import OddOrder.Peterfalvi.S03_InductionRestriction
 import OddOrder.Peterfalvi.S03b_Vanishing
 import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.Peterfalvi.S05_TICyclic

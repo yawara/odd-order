@@ -586,6 +586,7 @@ import OddOrder.Algebra.AlgClosedIdempotentLift
 import OddOrder.Algebra.CenterGroupAlgebraAlgClosed
 import OddOrder.GroupTheory.RepresentationTheory.Modular.OsimaBlockSupport
 import OddOrder.Peterfalvi.Appendices.FeitSibleyMain
+import OddOrder.Peterfalvi.S03_InductionRestriction
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -6443,6 +6444,17 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.induceLinear
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.induceLinear_apply
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_eq_tau
+-- **Peterfalvi (1.3) 本体** (`S03_InductionRestriction`) — 教科書 p.5 の statement そのもの。
+-- 従来は「(1.3)(a) engine」(直交補空間 `CF(H,A)^⊥ = CF(H,H−A)`) と (1.3)(b) の値同定半分だけが
+-- 在り、教科書の `Res μ − ∑ dᵢχᵢ` bookkeeping は "left to the consumers" と明記されていた
+-- (= census §2 の「部分被覆」)。ここで (a) の同値と (b) の直交性側の結論を補った。
+-- (a) は `(χᵢ)` の既約性も `(ψⱼ)` が基底であることも使わないので、張るだけの族で述べてある。
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S03.restrict_eq_on_iff_forall_inner_eq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S03.restrict_eq_on_of_induce_eq_sum
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S03.restrict_eq_zero_on_of_induce_eq_sum_of_inner_eq_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S03.restrict_eq_on_and_eq_zero_of_induce_eq_sum
+
 -- §5 Peterfalvi (1.3)(a) engine + (3.2)(c)(d): vanishing on `V` from orthogonality to `CF(W, V)`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.eq_zero_of_mem_of_inner_supported_eq_zero
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.innerLeftFunctional
