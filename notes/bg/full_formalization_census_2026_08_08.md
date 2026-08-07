@@ -95,4 +95,42 @@ Isaacs / mathlib / 本 repo の 3 列で対応づける**マスター対応表**
 
 ⟹ **§1 全 22 件被覆・補充ゼロ**。
 
-### §2-§16 + Theorems A-E + 補章 — 未着手 (次の入口 = §2、7 件)
+### §2 Representation Theory (7 件) — **監査中 (2026-08-08)**
+
+書籍の 7 件:
+
+| BG | 書籍の主張 |
+|---|---|
+| Prop 2.1 | `M` 既約 `FG`-加群 ⟹ (a) 絶対既約 ⟺ `Hom_{FG}(M,M) = F` ほか |
+| Prop 2.2 | `H ⊴ G`、`G/H` 巡回、`F` 代数閉、`M` 既約 `FH`-加群で `M ≇ M^x` ⟹ … |
+| Lem 2.3 | `G` 可解、`M` 絶対既約 ⟹ `dim M ∣ \|G\|` (Fong–Swan) |
+| Prop 2.4 | `dim V = q > 2`、`g` が位数 `n > 2` の可逆線形変換 ⟹ … |
+| Thm 2.5 | extraspecial `p`-群 `P` (位数 `p^{2n+1}`) と巡回群 `H` の半直積 ⟹ … |
+| Thm 2.6 | 奇位数 `G` が 2 次元 `FG`-加群に忠実に作用 ⟹ (a)(b) |
+| Lem 2.7 | `P`, `Q` が位数 `p²`, `q²` の基本可換群、`Q ⊆ Aut(P)` ⟹ (a) `q ∣ p−1` ほか |
+
+**確認済**:
+
+* **Prop 2.1** = `BG.Ch1.S02.absolutely_irreducible_iff_hom_eq_F`
+  (`S02_RepresentationPropositions.lean:84`)
+* **Thm 2.6** = (a) `odd_two_dim_abelian` / (b) `isPGroup_commutator_of_faithful_two_dim_charP`
+  (`S04_PGroupsSmallRank.lean` から 2 条項とも引用されている)
+
+⬜ **要調査**:
+
+* **Prop 2.2 / Lem 2.3 / Prop 2.4 / Thm 2.5** — `S02_RepresentationPropositions.lean` は
+  §2B-§2E の `/-! ## -/` 見出しを持つが、**top-level `theorem` は §2A の 1 本だけ**。
+  実体が別ファイルにあるのか、見出しだけで実装が無いのかを確認する。
+* **Lem 2.7** — **BG 配下に参照が無い**。repo 全体を結論の形で検索する必要がある。
+
+### ⚠ 書籍間の番号衝突 (2026-08-08 に踏んだ)
+
+`2.6` を repo 全体で grep すると **Isaacs の Thm 2.6** (`Ch02.isMinimalNormal_le_normalizer_of_isSubnormal`)
+が先に当たる。BG / Isaacs / Peterfalvi は `1.x`-`16.x` の範囲で番号が全面的に衝突するので、
+**BG の監査では検索を BG 文脈 (パス `/BG/` か行内の "BG" マーカー) に絞る必要がある**。
+⚠ ただし owner chapter 規則で **BG の結果が Isaacs 側に置かれている**ことがある
+(BG Thm 1.11 = `Isaacs/Ch04_Commutators/Main/BaerTrick.lean`)。
+⟹ **絞って引いた後、ゼロ件のものだけ repo 全体を「BG」マーカー込みで再検索する**という
+2 段構えが要る。
+
+### §3-§16 + Theorems A-E + 補章 — 未着手
