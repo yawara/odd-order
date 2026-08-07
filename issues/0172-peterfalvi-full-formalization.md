@@ -73,7 +73,32 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
   Coq 対応 = **`typeP_pairW`** (`coq/theories/PFsection8.v:466`、`of_typeP` 述語で述べる形)。
   (8.8)+(8.9) の合成 `FTtypeP_pair_witness` が同ファイル :712 にある。
 
-- **ステップ 2**: Part II + 補章の census (章内リセット番号なので手作業寄り)。
+- **ステップ 2 ✅ 完了 (2026-08-08)**: Part II + 補章の census。書籍テキストを節境界つきで
+  走査し **全 111 件**を列挙 (Part II Introduction 1 / Ch.I 19 / Ch.II 18 / Ch.III 16 /
+  Ch.IV 41 / App.I-IV 16)。**cite ゼロは無し** (Part I の 169/169 と同じ状況)。
+  - Part II は Part I と番号体系がまったく違う: (1) 章をまたぐ固有名 Theorem A/B/C、
+    (2) **節ごとにリセット**する `Proposition N`/`Lemma N` + 無番号の `Proposition.`/`Lemma.`/
+    `Corollary.`、(3) 証明内の連番ステップ `(N)` (書籍が本文から参照するので実質的に結果)。
+    ⟹ Part I の機械 census (番号 grep) は原理的に効かない。
+  - ⚠ 初回の機械 census は **11 件を偽の「cite ゼロ」と誤判定**した (すべて repo の引用表記の差)。
+    対応表を census note §4.2 に残した。
+  - **補章ラベルの不統一を是正**: repo が BG の補章 letter (`Appendix B`/`C`/`E`) を Peterfalvi
+    側に流用しており grep が混線していた → 書籍どおり `Appendix I`/`II`/`IV` へ統一。
+  - **ページ画像を全ページ揃えた** (pp.97-114 / 135-143 を追加 → pp.5-92 / 97-150 が完備)。
+- **ステップ 4 (Part II 逐条監査)** — 上流優先 + 文書順で進行中。
+  - **Ch.I §1 監査完了 (2026-08-08)**: 7 件 (Prop 1-6 + 無番号 Lemma) 全件に書籍強度の実体。
+    **補充 2 件**:
+    - **Prop 4(c) の特殊化債務** — 書籍の §1 は **(A1) だけ**を仮定する (p.100) のに repo の
+      `Hypothesis` は (A1)+(A2)+(A3) を束ねていたため、`N = ⋂_x H^x = C_D(Q) ⊆ C_D(t)` 等が
+      **(A2) の下で `N = 1` により恒真**に潰れていた。書籍は §3 Prop 1(a)/1(c) の証明で
+      **(A1) のみの一般形**を 2 度使う (`L = C_G(X)` の `Ω_X` 上の作用は一般に非忠実) ため、
+      repo は §3 で同じ内容を独立に再証明していた。`Hypothesis extends HypothesisA1` に変更し
+      §1 全体を `HypothesisA1` へ移送、5 条項を一般形で証明 (すべて axiom-clean)。
+      ⚠ (A2)/(A3) の実使用は §1 全体で 2 箇所だけだったので**証明本体は無変更**で済んだ。
+    - **Lemma (a) の第 2 全単射** — 書籍は `(y,z) ↦ yz` と `(y,z) ↦ zy` の**両方**が全単射と
+      主張するが repo は前者だけ。§3 Prop 1(b) が回り道をしていた → `invertedProdEquiv'` を追加。
+  - **次の入口 = Ch.I §2 (書籍 pp.103-104)**: Prop 1(a)-(c) / Prop 2 / 無番号 Lemma /
+    無番号 Corollary / Prop 3。
 - **ステップ 3 ✅ 完了 (2026-08-08)**: Part I (§1-§14) の逐条監査を (1.1) から文書順に完了。1 章ぶん終えるごとに census note を更新した。
   - **2026-08-07 時点: §1-§6 完了 (全 63 件)**。
     正本 = [census note](../notes/peterfalvi/full_formalization_census_2026_08_07.md) §3.5 の各表。
