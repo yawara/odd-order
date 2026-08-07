@@ -168,10 +168,16 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
      `κ ⊆ τ₁ ∪ τ₃` の pRank 1 vs `τ₂` の pRank 2)。repo の D(4) 証明は signalizer 構造から
      `π(⟨x⟩) ⊆ τ₂(N)` を既に文脈に持っており、BG 自身の Cor 15.9 経路
      (`|K₁|` 素数 → `K₁R` 非冪零 (15.2) → `K₁ ∩ M_σ = 1`) は**形式化不要**。全 8 定理 axiom-clean。
-  3. [issue 0175](0175-pf-911-section9-casea-descent.md) — (9.11) の type-free 化。
-     **2026-08-08 に依存を実測して scope を再評価**: `hnoV` の使用は 1 箇所だが、型固有の
-     実体は §15 補題 9 本で、§9 counterpart が在るのは 1 本のみ。「4 箇所を差し替える」ではなく
-     **~520 行の証明の移植 (複数 session 規模)**。
+  3. ~~[issue 0175](0175-pf-911-section9-casea-descent.md) — (9.11) の type-free 化~~ —
+     **2026-08-08 に「残 1 件」判定を撤回、close**。実体は **2026-07-20 の commit `9b3b2bc95`**
+     で完了済だった: endpoint は `S11.nineEleven_coherent`
+     (`S11_NineElevenCaseAResidual.lean:886`) で、`sOf_nineEleven_coherent` が露出する
+     case (a) の 2 仮説を `caseA_irrCut_two_le_ncard` / `caseA_equalityRefutation` で
+     内部 discharge している。type II 版 `typeII_nineEleven_coherent` も在り。
+     ⚠ **誤判定 2 段**: (i) 二分律の branch-level assembly `sOf_nineEleven_coherent` を
+     endpoint と取り違えた、(ii) 「参照訂正」で挙げた `S15...nineElevenSevenEightRefutationS`
+     は §13/§15 の S-instance 用で §9 の `CaseASevenEightRefutation` とは別物 —
+     ~520 行の移植見積もりは**存在しない作業**の見積もりだった。
   4. ~~低優先繰延 2 件~~ — **両方 2026-08-08 に解消**:
      - **(3.8)**: 個数条項 `NC(ψ) = w₁` / `= w₂` を `sigmaNC_eq_card_W1_of_column` /
        `sigmaNC_eq_card_W2_of_row` として補充 (残る差は再構成条項 `ψ = a·∑ω^σ + β` のみ)。
@@ -185,11 +191,23 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
 |---|---|
 | Part I (169 件) | **逐条監査完了・未形式化ゼロ** ((1.7)(b) の誤判定は 2026-08-08 に撤回) |
 | Part II (115 件) | **逐条監査完了・未形式化ゼロ**、補充 4 件すべて landing |
-| 条件付き 1 件 | (9.11) type-free = **複数 session の移植** ((8.13)(c3) Type II は 2026-08-08 に解消) |
+| 条件付き | **ゼロ** ((8.13)(c3) Type II・(9.11) type-free とも 2026-08-08 に解消) |
 | 低優先繰延 | **2026-08-08 に両方解消** ((3.8) は個数条項を補充 / (5.6) は元から書籍強度) |
 
-⟹ **Peterfalvi 全 284 件の番号付き結果に書籍強度の実体があり、未形式化はゼロ**。
-残るのは「条件付き 1 件の仮説解消」((9.11) の type-free 化 = issue 0175) のみ。
+⟹ **Peterfalvi 全 284 件の番号付き結果に書籍強度の実体があり、未形式化も条件付きもゼロ**。
+残差は (3.8) の再構成条項 `ψ = a·∑ω^σ + β` の packaging 差 1 点のみ。
+
+### ⚠ 本キャンペーンで最も多かった誤判定様式 (計 9 件)
+
+「未形式化と記録されていたが実際は既に在った」が **9 件**。原因は 3 型:
+
+1. **番号表記の揺れ** — docstring が `(1.7.b)` と書いているのに `(1.7)(b)` で grep した。
+2. **assembly を endpoint と誤認** — `sOf_nineEleven_coherent` は Clifford 二分律の
+   branch-level assembly で、残差を分岐データごとに量化して露出するのが役目。endpoint は
+   下流の `nineEleven_coherent`。(memory `textbook-coverage-audit-failure-modes` の
+   「engine 止まり」の逆向き。)
+3. **stale な自己注記の連鎖** — AxiomsCheck / docstring の「still needs …」がそのまま監査の
+   一次証拠になった。⟹ **注記は必ず実体 (定理の signature) で裏を取る**。
 - **ステップ 3 ✅ 完了 (2026-08-08)**: Part I (§1-§14) の逐条監査を (1.1) から文書順に完了。1 章ぶん終えるごとに census note を更新した。
   - **2026-08-07 時点: §1-§6 完了 (全 63 件)**。
     正本 = [census note](../notes/peterfalvi/full_formalization_census_2026_08_07.md) §3.5 の各表。
@@ -211,8 +229,8 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
   - **§1-§9 監査完了 (2026-08-07)**。未形式化/条件付きは **3 件のみ**:
     1. ~~**(1.7)(b)**~~ — **2026-08-08 撤回: 形式化済** (`InducedInvariantConstituent.lean`)
     2. ~~**(8.13)(c3)**~~ — **2026-08-08 に Type I/II とも landing、issue 0174 close**
-    3. **(9.11) の type-free 化** — types III/IV は閉、type II 込みの版は case (a) の 2 仮説が残る
-       → [issue 0175](0175-pf-911-section9-casea-descent.md) (descent 作業、未解決数学ではない)
+    3. ~~**(9.11) の type-free 化**~~ — **2026-08-08 撤回: 2026-07-20 に完了済**
+       (`S11.nineEleven_coherent` / `typeII_nineEleven_coherent`)
   - **§6 の補充 3 件・§8 の補充 1 件は landed** (下記)。**次の入口 = §10 (書籍 pp.58-63、repo `S12`)**
     — census note に下調べ (cite 密度・監査手順) を記録済。
   - **§7 監査完了 (2026-08-07)**: 全 11 件 ((7.1)-(7.11)) で未形式化ゼロ・補充ゼロ。

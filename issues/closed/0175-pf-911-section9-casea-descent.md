@@ -71,21 +71,57 @@ created: 2026-08-07
       ⟹ **scope の再評価**: 「4 箇所を差し替える」ではなく「~520 行の証明を、§15 固有の
       6 本程度を §9 レベルの事実へ載せ替えながら移植する」作業。**複数 session 規模**。
       (CLAUDE.md: 規模は着手可否の基準でないが、見積もりは正確にしておく。)
-- [ ] 各点を上記 type-free counterpart に置換して `CaseASevenEightRefutation` の §9 producer を作る
-- [ ] その producer で `sOf_nineEleven_coherent` の `h2`/`hrefuteEq` を discharge し、
-      **Hypothesis (9.5) だけから (9.11) が出る**形にする
-- [ ] AxiomsCheck の (9.11) block のコメント (「case (a) still needs …, the remaining item of
-      issue 1045」) を更新する (issue 1045 は closed なので現状 stale)
-- [ ] census note の §9 表を更新
+- [x] **⚠ 2026-08-08: 本 issue の前提が誤りだったと判明 — descent は 2026-07-20 に完了済**。
+
+      実測すると `S11_NineElevenCaseAResidual.lean` に §9 レベルの producer が**全部揃っている**:
+
+      | repo (すべて AxiomsCheck 登録済 = axiom-clean) | 内容 |
+      |---|---|
+      | `S11.caseA_sevenEightRefutation` (:445) | `CaseASevenEightRefutation` の §9 producer。docstring 明記「**No type hypothesis remains.**」 |
+      | `S11.caseA_normBound` (:838) | (9.11.4)-(9.11.8) の norm bound、`h78` 供給済 |
+      | `S11.caseA_equalityRefutation` (:853) | `CaseAEqualityRefutation` = `hrefuteEq` |
+      | **`S11.nineEleven_coherent` (:886)** | **endpoint** — `sOf_nineEleven_coherent` に `h2` = `caseA_irrCut_two_le_ncard`、`hrefuteEq` = `caseA_equalityRefutation` を渡して**両仮説を消している** |
+      | `S11.typeII_nineEleven_coherent` (:922) | type II 版 (Hypothesis (9.2) を `TypeIIData` から直接構成) |
+      | `S11.nineEleven_coherent_A0` | `A₀` レベル版 |
+
+      landing は **2026-07-20 の commit `9b3b2bc95`**
+      (「⭐ (9.11) の §9 版が case (9.7.a) 込みで完全証明に — 最後の producer を降ろした」)。
+      ⟹ **本 issue は 2026-08-07 の起票時点で既に stale**。
+
+      **誤判定の原因** (2 段重ね):
+      1. `sOf_nineEleven_coherent` を endpoint と取り違えた。これは Clifford 二分律の
+         **branch-level assembly** で、case (a)/(b) の残差を分岐データごとに量化して露出する
+         のが役目。endpoint はその下流の `nineEleven_coherent`。
+      2. 2026-08-08 の「参照訂正」で `S15.Hypothesis.nineElevenSevenEightRefutationS` を
+         descent 対象と特定したのも誤り。あれは **§13/§15 の S-instance** (FT spine 側) 用で、
+         §9 レベルの `CaseASevenEightRefutation` とは別物。~520 行の移植見積もりは
+         **存在しない作業**の見積もりだった。
+
+      ⟹ memory [[textbook-coverage-audit-failure-modes]] に既出の様式そのもの
+      (「engine 止まり」の逆 = **assembly を endpoint と誤認**)。本セッションだけで
+      「未形式化と記録されていたが既に在った」が 8 件目。
+
+- [x] **AxiomsCheck の (9.11) block の stale コメントを修正 (2026-08-08)**。
+      `sOf_nineEleven_coherent` の注記から「the remaining item of issue 1045」を外し、
+      **下流の `nineEleven_coherent` が両残差を discharge している**ことへの forward pointer に
+      置き換えた (この文言自体が誤判定を招いた)。
+- [x] census note の §9 表を更新 (2026-08-08)
 
 ## 完了条件
 
-`S11.sOf_nineEleven_coherent` (または後継) が **Hypothesis (9.5) 相当のデータのみ**を取り
-`𝒮(H₀C′)` の coherence を返す (case-(a) の 2 仮説が消える)。full build green + AxiomsCheck OK。
+**達成済 (実体は 2026-07-20、判定は 2026-08-08)**。完了条件は
+
+> `S11.sOf_nineEleven_coherent` (**または後継**) が Hypothesis (9.5) 相当のデータのみを取り
+> `𝒮(H₀C′)` の coherence を返す (case-(a) の 2 仮説が消える)。full build green + AxiomsCheck OK。
+
+で、**後継 = `S11.nineEleven_coherent`** がこれを満たしている。残る parametric 入力は
+(4.6)/(8.15) の Dade データ (`h46` / `dd` とその pin) のみで、これは (9.5) が前提とする
+Dade 等長そのもの — open mathematics ではない。
 
 ## 参照
 
 - 監査記録: [`notes/peterfalvi/full_formalization_census_2026_08_07.md`](../notes/peterfalvi/full_formalization_census_2026_08_07.md) §3.5 の §9 節
-- 前段の調査: [closed issue 1045](closed/1045-pf-9-11-section9-level.md) (「次の自然な frontier」節)
+- 前段の調査: [closed issue 1045](closed/1045-pf-9-11-section9-level.md)
+- landing commit: `9b3b2bc95` (2026-07-20)
 - 書籍: `references/peterfalvi/pages/peterfalvi-p054..p057.png` ((9.11) と (9.11.1)-(9.11.8))
 - Coq 併読: `coq/theories/PFsection9.v`

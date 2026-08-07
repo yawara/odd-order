@@ -12811,11 +12811,12 @@ Type I とちょうど噛み合う。`x ∉ M_σ(N)` は `A₁(N) = M_σ(N)^#` (
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseB_coherent_sOf_cprime
 -- **Peterfalvi (9.11) at §9 level**: `𝒮(H₀C′)` coherent under Hypothesis (9.5) alone, by the (9.7)
 -- Clifford dichotomy over the two branches.  Residual inputs are quantified over the branch datum
--- they belong to: case (a) still needs the degree-`qa` base coherence and the maximality refuter
--- (the `S11_NineElevenCaseA`/`_AlphaBound`/`_PairAdjoin` descent from `S13.Hypothesis`, the
--- remaining item of issue 1045); case (b) needs only the (9.9.b) pivot.  **No type hypothesis
--- anywhere on this route** — `S13.coherent_sOf_H0Cprime` carries `IsTypeIII ∨ IsTypeIV` only
--- because its carrier does.
+-- they belong to: case (a) takes the degree-`qa` base coherence and the maximality refuter, case
+-- (b) only the (9.9.b) pivot.  ⚠ **Both case-(a) residuals are discharged downstream** by
+-- `nineEleven_coherent` (below), via `caseA_irrCut_two_le_ncard` and `caseA_equalityRefutation` —
+-- this theorem keeps them exposed because it is the branch-level assembly, not the endpoint.
+-- **No type hypothesis anywhere on this route** — `S13.coherent_sOf_H0Cprime` carries
+-- `IsTypeIII ∨ IsTypeIV` only because its carrier does.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.sOf_nineEleven_coherent
 -- **(9.9.b) for `𝒮(H₀C)`** — the second carrier of the book's "both `𝒮(H₀)` and `𝒮(H₀C)` contain
 -- exactly `p − 1` reducible characters" (p. 54).  All five inputs of the shared count
