@@ -28,9 +28,18 @@ created: 2026-08-07
 
 ## なぜ「未解決数学ではない」のか (issue 1045 の調査結果)
 
-§13 側の対応物 **`S13.nineElevenSevenEightRefutation`** (`S11_NineElevenPairAdjoin.lean:893`) が
-**sorry-free で証明済** (~420 行、projection-budget 論法)。その証明が type 情報を使うのは
+§13 側の対応物が **sorry-free で証明済** (projection-budget 論法)。その証明が type 情報を使うのは
 `hncH0C` / `htype` の 4 箇所だけで、**4 つとも type-free な §9 counterpart が既に在る**:
+
+> ⚠ **2026-08-08 の参照訂正**: 上の「`S13.nineElevenSevenEightRefutation`
+> (`S11_NineElevenPairAdjoin.lean:893`)」は **stale** (当該ファイルは 224 行しかない)。
+> 実体は **`OddOrder/Peterfalvi/S15_NineElevenSevenEight.lean`** (563 行) の
+> `S15.Hypothesis.nineElevenSevenEightRefutationS` (:45) と
+> `...RefutationT` (AxiomsCheck :11659 に登録済)。
+> ⚠ さらにこの S15 版は `hyp : S15.Hypothesis` と `hnoV` (Type-V 排除) を仮説に取り、
+> **§13 の S-and-T 設定に強く依存**する。descent は「4 箇所を差し替える」より重い可能性があり、
+> 着手時に依存の実測 (どのフィールドが実使用か) を先にやること
+> — memory `generalize-by-measuring-which-carrier-fields-are-used` の手順。
 
 - `caseA_nineElevenTwo_tiWitness`
 - `caseA_two_summand_inertia_inputs`
@@ -41,7 +50,8 @@ created: 2026-08-07
 
 ## やること
 
-- [ ] `S13.nineElevenSevenEightRefutation` の証明を読み、`hncH0C`/`htype` の 4 使用点を特定
+- [ ] `S15.Hypothesis.nineElevenSevenEightRefutationS` (`S15_NineElevenSevenEight.lean:45`) の
+      証明を読み、`hyp`/`hnoV` の**実使用箇所を数える** (docstring の「4 箇所」は未検証)
 - [ ] 各点を上記 type-free counterpart に置換して `CaseASevenEightRefutation` の §9 producer を作る
 - [ ] その producer で `sOf_nineEleven_coherent` の `h2`/`hrefuteEq` を discharge し、
       **Hypothesis (9.5) だけから (9.11) が出る**形にする
