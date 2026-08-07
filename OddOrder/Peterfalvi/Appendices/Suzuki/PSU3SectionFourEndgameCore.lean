@@ -212,7 +212,7 @@ include hyp in
 and `h(ω) ∈ W`").
 
 The book states this without argument; it is the *definition* of `W`.  `W = C_V(K)`
-(`Hypothesis.W`, p. 98), so for `η ∈ V` it suffices that `η` centralize `K`.  And `μ` on a
+(`HypothesisA1.W`, p. 98), so for `η ∈ V` it suffices that `η` centralize `K`.  And `μ` on a
 `K`-scalar is conjugation of the corresponding element of `K` by `η`
 (`coordFieldAut_muK`); `μ = 1` therefore says `μ(κ^η) = μ(κ)` for every `κ ∈ K`, and both
 `μ` on `K` (`mu_K_injective`) and the conjugation action of `K` on `Q`

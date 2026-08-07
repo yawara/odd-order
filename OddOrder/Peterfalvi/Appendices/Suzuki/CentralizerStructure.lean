@@ -28,10 +28,10 @@ conjugation, `sᴰ = H∩I`).
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
-namespace Hypothesis
+namespace HypothesisA1
 
 variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
-  (hyp : Hypothesis G Ω)
+  (hyp : HypothesisA1 G Ω)
 
 open scoped Pointwise
 
@@ -298,6 +298,6 @@ theorem W_eq_centralizer_involutions_H :
         _ = k * w := by rw [hk'k]
     exact hwk.symm
 
-end Hypothesis
+end HypothesisA1
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

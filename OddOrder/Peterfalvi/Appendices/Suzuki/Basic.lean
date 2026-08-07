@@ -129,22 +129,36 @@ theorem map_conj_one {G : Type*} [Group G] (K : Subgroup G) :
   rw [Subgroup.mem_map_equiv, MulAut.conj_symm_apply]
   simp
 
-/-! ## Hypotheses (A1)–(A3) -/
+/-! ## Hypotheses (A1)–(A3)
 
-/-- **Peterfalvi Part II, hypotheses (A1)–(A3)** (p. 97).  The internal
-semidirect decomposition `H = Q ⋊ D` is recorded as in the book's
-notation section (p. 99): `Q` is normal in `H`, `Q ∩ D = 1` and
-`Q D = H`. -/
-structure Hypothesis (G Ω : Type*) [Group G] [MulAction G Ω]
+The book keeps the three hypotheses apart: **Chapter I §1 assumes only (A1)**
+("We assume in this section that `G` satisfies hypothesis (A1)", p. 100), and
+(A2)+(A3) enter only from §2 on ("We assume from this point onwards that `G`
+satisfies (A1), (A2) and (A3)", p. 103).  The separation is not cosmetic —
+§3 Proposition 1(a) applies the whole of §1 to `L = C_G(X)` acting on `Ω_X`,
+whose action is in general **not** faithful (Proposition 4(c) computes its
+kernel `𝒩(L)`).  So the (A1)-only carrier is the one §1 is stated over, and
+`Hypothesis` extends it with (A2)+(A3). -/
+
+/-- **Peterfalvi Theorem A, hypothesis (A1)** (p. 97), the carrier Chapter I
+§1 is stated over.  The internal semidirect decomposition `H = Q ⋊ D` is
+recorded as in the book's notation section (p. 99): `Q` is normal in `H`,
+`Q ∩ D = 1` and `Q D = H`.
+
+Faithfulness (A2) and the 2-rank condition (A3) are deliberately **excluded**:
+§3 Proposition 1(a) needs §1 for the possibly-unfaithful action of `C_G(X)`
+on `Ω_X`. -/
+structure HypothesisA1 (G Ω : Type*) [Group G] [MulAction G Ω]
     [Finite G] where
   /-- the base point of `Ω`; `H` is its stabilizer -/
   basept : Ω
   /-- (A1): the action is doubly transitive -/
   doubly_transitive : IsMultiplyPretransitive G Ω 2
-  /-- (A2): the action is faithful -/
-  faithful : FaithfulSMul G Ω
+  /-- the stabilizer of `basept` -/
   H : Subgroup G
+  /-- the regular normal subgroup of the point stabilizer -/
   Q : Subgroup G
+  /-- the two-point stabilizer, a complement to `Q` in `H` -/
   D : Subgroup G
   H_def : H = stabilizer G basept
   /-- the distinguished involution `t ∈ G - H` -/
@@ -159,13 +173,20 @@ structure Hypothesis (G Ω : Type*) [Group G] [MulAction G Ω]
   Q_mul_D_eq_H : (Q : Set G) * (D : Set G) = (H : Set G)
   Q_even : Even (Nat.card Q)
   D_odd : Odd (Nat.card D)
+
+/-- **Peterfalvi Part II, hypotheses (A1)–(A3)** (p. 97) — the standing
+hypothesis from §2 on. -/
+structure Hypothesis (G Ω : Type*) [Group G] [MulAction G Ω]
+    [Finite G] extends HypothesisA1 G Ω where
+  /-- (A2): the action is faithful -/
+  faithful : FaithfulSMul G Ω
   /-- (A3): `G` has 2-rank at least two -/
   two_rank_ge_two : ∃ E : Subgroup G, Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1
 
-namespace Hypothesis
+namespace HypothesisA1
 
 variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
-  (hyp : Hypothesis G Ω)
+  (hyp : HypothesisA1 G Ω)
 
 /-! ## Standing notation: `K`, `V`, `W` (p. 98) -/
 
@@ -399,10 +420,9 @@ lemma D_map_conj_t_eq :
 /-- The **conjugate hypothesis**: swap the roles of `basept` and
 `t • basept`.  Same group, same involution `t`; the point stabilizer
 becomes `H^t`, the regular normal complement `Q^t`, and `D` is unchanged. -/
-def symm : Hypothesis G Ω where
+def symm : HypothesisA1 G Ω where
   basept := hyp.t • hyp.basept
   doubly_transitive := hyp.doubly_transitive
-  faithful := hyp.faithful
   H := hyp.H.map (MulAut.conj hyp.t).toMonoidHom
   Q := hyp.Q.map (MulAut.conj hyp.t).toMonoidHom
   D := hyp.D
@@ -453,7 +473,6 @@ def symm : Hypothesis G Ω where
     rw [hcard]
     exact hyp.Q_even
   D_odd := hyp.D_odd
-  two_rank_ge_two := hyp.two_rank_ge_two
 
 @[simp] lemma symm_basept : hyp.symm.basept = hyp.t • hyp.basept := rfl
 
@@ -640,6 +659,19 @@ lemma normalizer_H_eq_H : Subgroup.normalizer (hyp.H : Set G) = hyp.H := by
     rw [hyp.card_H_eq]
     exact hyp.Q_even.mul_right _
   exact Nat.not_even_iff_odd.mpr hodd heven
+
+end HypothesisA1
+
+/-! ## Chapter I §1, Proposition 1(e) (p. 100)
+
+The book states (e) under the extra assumption "`G` has 2-rank `≥ 2`", which
+from §2 on is exactly (A3).  So this clause — alone among §1 — is stated over
+the full `Hypothesis`. -/
+
+namespace Hypothesis
+
+variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
+  (hyp : Hypothesis G Ω)
 
 section Prop1e
 

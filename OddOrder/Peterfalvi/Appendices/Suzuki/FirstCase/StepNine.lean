@@ -158,7 +158,7 @@ theorem rightTransversalTQ_conj_invariant {x : G} (hxP : x ∈ fc.P) :
   have hxH : x ∈ hyp.H := hyp.D_le_H (hyp.V_le_D (fc.P_le_V hxP))
   have hxt : Commute x hyp.t := hyp.commute_t_of_mem_V (fc.P_le_V hxP)
   intro r hr
-  rw [Hypothesis.mem_rightTransversalTQ] at hr ⊢
+  rw [HypothesisA1.mem_rightTransversalTQ] at hr ⊢
   rcases hr with rfl | ⟨y, hyQ, rfl⟩
   · left; group
   · right

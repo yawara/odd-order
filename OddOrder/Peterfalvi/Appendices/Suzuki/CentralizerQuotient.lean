@@ -120,6 +120,34 @@ theorem quotientTwoRankGeTwo_of_odd_kernel [Finite A]
     obtain ⟨e, he, rfl⟩ := hx
     rw [← map_pow, hEsq e he, map_one]
 
+/-- **Peterfalvi Part II, Ch. I Prop 4 (c)** (p. 101), fourth clause — `Q̄ ≅ Q`.
+
+The projection restricted to `Q` is injective because its kernel `N` lies in
+`D` and `Q ∩ D = 1`; it is surjective onto `Q̄ = Q·N/N` by construction.  The
+book states this as part of Proposition 4(c) and §3 Proposition 1(c) uses it
+("`C_Q(X) ≅ \overline{C_Q(X)}` is the Sylow `2`-subgroup of `\overline{C_H(X)}`"). -/
+noncomputable def quotientQEquiv (Q D N : Subgroup A) [N.Normal] (hND : N ≤ D)
+    (hQD : Q ⊓ D = ⊥) :
+    Q ≃* Q.map (QuotientGroup.mk' N) := by
+  classical
+  let π : A →* A ⧸ N := QuotientGroup.mk' N
+  refine MulEquiv.ofBijective
+    (MonoidHom.codRestrict ((π.comp Q.subtype)) (Q.map π)
+      (fun q => ⟨q, q.2, rfl⟩)) ⟨?_, ?_⟩
+  · intro q r hqr
+    have hqr' : π (q : A) = π (r : A) := congrArg Subtype.val hqr
+    have hquot : π ((q : A) * (r : A)⁻¹) = 1 := by
+      rw [map_mul, map_inv, hqr', mul_inv_cancel]
+    have hmemN : (q : A) * (r : A)⁻¹ ∈ N :=
+      (QuotientGroup.eq_one_iff _).mp hquot
+    have hbot : (q : A) * (r : A)⁻¹ ∈ Q ⊓ D :=
+      ⟨Q.mul_mem q.2 (Q.inv_mem r.2), hND hmemN⟩
+    rw [hQD, Subgroup.mem_bot] at hbot
+    exact Subtype.ext (mul_inv_eq_one.mp hbot)
+  · intro y
+    obtain ⟨q, hq, hqy⟩ := y.2
+    exact ⟨⟨q, hq⟩, Subtype.ext hqy⟩
+
 /-- Hypothesis (A1) descends along quotienting by the exact action kernel
 provided the kernel lies in `D`. -/
 noncomputable def HypothesisA1.quotientOfKernel [Finite A]
@@ -249,28 +277,10 @@ noncomputable def HypothesisA1.quotientOfKernel [Finite A]
       obtain ⟨q, hq, d, hd, rfl⟩ := haProd
       exact ⟨π q, ⟨q, hq, rfl⟩, π d, ⟨d, hd, rfl⟩, by
         simp only [π, map_mul]⟩
-  · let f : h.Q → Qbar := fun q =>
-      ⟨π q, ⟨q, q.2, rfl⟩⟩
-    have hf_inj : Function.Injective f := by
-      intro q r hqr
-      have hqr' : π (q : A) = π (r : A) := congrArg Subtype.val hqr
-      have hquot : π ((q : A) * (r : A)⁻¹) = 1 := by
-        rw [map_mul, map_inv, hqr', mul_inv_cancel]
-      have hmemN : (q : A) * (r : A)⁻¹ ∈ N :=
-        (QuotientGroup.eq_one_iff _).mp hquot
-      have hmemD : (q : A) * (r : A)⁻¹ ∈ h.D := hND hmemN
-      have hmemQ : (q : A) * (r : A)⁻¹ ∈ h.Q :=
-        h.Q.mul_mem q.2 (h.Q.inv_mem r.2)
-      have hbot : (q : A) * (r : A)⁻¹ ∈ h.Q ⊓ h.D :=
-        ⟨hmemQ, hmemD⟩
-      rw [h.Q_inf_D_eq_bot, Subgroup.mem_bot] at hbot
-      exact Subtype.ext (mul_inv_eq_one.mp hbot)
-    have hf_surj : Function.Surjective f := by
-      intro y
-      obtain ⟨q, hq, hqy⟩ := y.2
-      exact ⟨⟨q, hq⟩, Subtype.ext hqy⟩
+  · -- `Q̄ ≅ Q` (Prop 4(c), fourth clause)
     have hcard : Nat.card Qbar = Nat.card h.Q :=
-      (Nat.card_congr (Equiv.ofBijective f ⟨hf_inj, hf_surj⟩)).symm
+      (Nat.card_congr
+        (quotientQEquiv h.Q h.D N hND h.Q_inf_D_eq_bot).toEquiv).symm
     rw [hcard]
     exact h.Q_even
   · exact h.D_odd.of_dvd_nat (Subgroup.card_map_dvd h.D π)
@@ -280,26 +290,8 @@ def HypothesisA1.toHypothesis [Finite A] (h : HypothesisA1 A Λ)
     (hfaithful : FaithfulSMul A Λ)
     (hA3 : ∃ E : Subgroup A,
       Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1) :
-    Hypothesis A Λ where
-  basept := h.basept
-  doubly_transitive := h.doubly_transitive
-  faithful := hfaithful
-  H := h.H
-  Q := h.Q
-  D := h.D
-  H_def := h.H_def
-  t := h.t
-  t_sq := h.t_sq
-  t_ne_one := h.t_ne_one
-  t_not_mem_H := h.t_not_mem_H
-  D_def := h.D_def
-  Q_le_H := h.Q_le_H
-  Q_normal_in_H := h.Q_normal_in_H
-  Q_inf_D_eq_bot := h.Q_inf_D_eq_bot
-  Q_mul_D_eq_H := h.Q_mul_D_eq_H
-  Q_even := h.Q_even
-  D_odd := h.D_odd
-  two_rank_ge_two := hA3
+    Hypothesis A Λ :=
+  { h with faithful := hfaithful, two_rank_ge_two := hA3 }
 
 end
 

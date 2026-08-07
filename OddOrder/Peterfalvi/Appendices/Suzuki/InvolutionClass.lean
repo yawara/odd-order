@@ -23,10 +23,10 @@ Proposition 1 from `Suzuki.Basic`:
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
-namespace Hypothesis
+namespace HypothesisA1
 
 variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
-  (hyp : Hypothesis G Ω)
+  (hyp : HypothesisA1 G Ω)
 
 /-! ## Chapter I §1, Proposition 2 (pp. 100–101) -/
 
@@ -547,6 +547,6 @@ lemma image_conj_KSet_eq_involutions_H {s : G} (hsH : s ∈ hyp.H)
     ← hyp.ncard_KSet_eq]
 
 
-end Hypothesis
+end HypothesisA1
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

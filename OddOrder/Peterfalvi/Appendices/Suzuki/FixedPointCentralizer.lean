@@ -27,23 +27,42 @@ here `MulAction.fixedPoints X Ω`):
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
-namespace Hypothesis
-
-variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
-  (hyp : Hypothesis G Ω)
-
 open MulAction
 
 open scoped Pointwise
 
-/-! ## The fixed-point set `Ω_X` -/
+/-! ## The fixed-point set `Ω_X`
 
-omit [Finite G] in
+Two facts about `Ω_X` that mention no hypothesis carrier at all. -/
+
+section GenericFixedPoints
+
+variable {G Ω : Type*} [Group G] [MulAction G Ω] {X : Subgroup G}
+
 /-- Membership in `Ω_X = fixedPoints X Ω`, phrased over elements of `G`. -/
-lemma mem_fixedPoints_iff_forall {X : Subgroup G} {ω : Ω} :
+lemma mem_fixedPoints_iff_forall {ω : Ω} :
     ω ∈ fixedPoints X Ω ↔ ∀ x ∈ X, x • ω = ω := by
   rw [mem_fixedPoints]
   exact ⟨fun h x hx => h ⟨x, hx⟩, fun h m => h m m.2⟩
+
+/-- `C_G(X)` preserves `Ω_X`. -/
+lemma smul_mem_fixedPoints_of_mem_centralizer {c : G}
+    (hc : c ∈ Subgroup.centralizer (X : Set G)) {ω : Ω}
+    (hω : ω ∈ fixedPoints X Ω) : c • ω ∈ fixedPoints X Ω := by
+  rw [mem_fixedPoints_iff_forall] at hω ⊢
+  intro x hx
+  have hcx : x * c = c * x := Subgroup.mem_centralizer_iff.mp hc x hx
+  calc x • c • ω = (x * c) • ω := (mul_smul x c ω).symm
+    _ = (c * x) • ω := by rw [hcx]
+    _ = c • x • ω := mul_smul c x ω
+    _ = c • ω := by rw [hω x hx]
+
+end GenericFixedPoints
+
+namespace HypothesisA1
+
+variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
+  (hyp : HypothesisA1 G Ω)
 
 variable {X : Subgroup G}
 
@@ -58,19 +77,6 @@ lemma t_smul_basept_mem_fixedPoints (hXD : X ≤ hyp.D) :
     hyp.t • hyp.basept ∈ fixedPoints X Ω :=
   mem_fixedPoints_iff_forall.mpr fun _ hx =>
     hyp.smul_t_basept_eq_of_mem_D (hXD hx)
-
-omit [Finite G] in
-/-- `C_G(X)` preserves `Ω_X`. -/
-lemma smul_mem_fixedPoints_of_mem_centralizer {c : G}
-    (hc : c ∈ Subgroup.centralizer (X : Set G)) {ω : Ω}
-    (hω : ω ∈ fixedPoints X Ω) : c • ω ∈ fixedPoints X Ω := by
-  rw [mem_fixedPoints_iff_forall] at hω ⊢
-  intro x hx
-  have hcx : x * c = c * x := Subgroup.mem_centralizer_iff.mp hc x hx
-  calc x • c • ω = (x * c) • ω := (mul_smul x c ω).symm
-    _ = (c * x) • ω := by rw [hcx]
-    _ = c • x • ω := mul_smul c x ω
-    _ = c • ω := by rw [hω x hx]
 
 /-! ## Prop 6 (a), engine: `C_Q(X)` is regular on `Ω_X - {basept}` (p. 102) -/
 
@@ -577,6 +583,6 @@ theorem exists_conj_mem_D_map_le_V (hXD : X ≤ hyp.D)
     _ = k * (u * x) * k⁻¹ := by rw [hxu]
     _ = (k * u * k⁻¹) * (k * x * k⁻¹) := by group
 
-end Hypothesis
+end HypothesisA1
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

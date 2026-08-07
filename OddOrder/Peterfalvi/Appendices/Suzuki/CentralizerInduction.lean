@@ -69,45 +69,6 @@ instance (X : Subgroup G) :
     (MulAction ↥(Subgroup.centralizer (X : Set G))
       ↥(fixedPointsCentralizerSubMulAction X))
 
-/-- **Peterfalvi Theorem A, hypothesis (A1)**, in the form used by Part II,
-Ch. I §3 Prop 1(a).  This carrier deliberately excludes faithfulness (A2)
-and the 2-rank assumption (A3). -/
-structure HypothesisA1 (L Λ : Type*) [Group L] [MulAction L Λ] [Finite L] where
-  /-- The distinguished point whose stabilizer is `H`. -/
-  basept : Λ
-  /-- The action is doubly transitive. -/
-  doubly_transitive : IsMultiplyPretransitive L Λ 2
-  /-- The stabilizer of `basept`. -/
-  H : Subgroup L
-  /-- The regular normal subgroup in the point stabilizer. -/
-  Q : Subgroup L
-  /-- The two-point stabilizer and complement to `Q` in `H`. -/
-  D : Subgroup L
-  /-- `H` is the stabilizer of `basept`. -/
-  H_def : H = stabilizer L basept
-  /-- The distinguished involution outside `H`. -/
-  t : L
-  /-- `t` is an involution. -/
-  t_sq : t ^ 2 = 1
-  /-- `t` is nontrivial. -/
-  t_ne_one : t ≠ 1
-  /-- `t` lies outside the point stabilizer. -/
-  t_not_mem_H : t ∉ H
-  /-- `D = H ∩ H^t`. -/
-  D_def : D = H ⊓ H.map (MulAut.conj t).toMonoidHom
-  /-- `Q ≤ H`. -/
-  Q_le_H : Q ≤ H
-  /-- `Q` is normal in `H`, in ambient conjugation form. -/
-  Q_normal_in_H : ∀ h ∈ H, ∀ x ∈ Q, h * x * h⁻¹ ∈ Q
-  /-- The internal factors have trivial intersection. -/
-  Q_inf_D_eq_bot : Q ⊓ D = ⊥
-  /-- `H = QD`. -/
-  Q_mul_D_eq_H : (Q : Set L) * (D : Set L) = (H : Set L)
-  /-- `Q` has even order. -/
-  Q_even : Even (Nat.card Q)
-  /-- `D` has odd order. -/
-  D_odd : Odd (Nat.card D)
-
 /-- Kernel/core lemma used in **Peterfalvi Part II, Ch. I §3 Prop 1(a)**:
 for a transitive action, the normal core of a point stabilizer is exactly
 the kernel of the permutation action. -/

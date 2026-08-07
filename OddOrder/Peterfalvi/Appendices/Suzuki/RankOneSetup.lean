@@ -23,7 +23,7 @@ that `f` determines `L` — applies to it.  This file supplies the bridge.
 
 The only piece not already an axiom of `Hypothesis` is the unique factorization of
 `G − H` as `H t Q`, which is Ch. I §1, Proposition 4 (a)
-(`Hypothesis.existsUnique_canonicalForm`).  The two non-membership conditions come for
+(`HypothesisA1.existsUnique_canonicalForm`).  The two non-membership conditions come for
 free: `t ∉ H` is an axiom, and `t x t ∉ H` for `x ∈ Q^#` is `Q ∩ D = 1`, since
 `t x t ∈ H` together with `x ∈ H` says exactly `x ∈ D`.
 

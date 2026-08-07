@@ -211,7 +211,7 @@ theorem stepTwenty_fst_eq (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     have h := mul_left_cancel hstep7.2.1
     exact mul_right_cancel h
   have hainv : a⁻¹ = a'⁻¹ :=
-    eq_of_sq_eq_of_odd_orderOf (hyp.odd_orderOf_of_mem_D (hyp.D.inv_mem haK.1))
+    HypothesisA1.eq_of_sq_eq_of_odd_orderOf (hyp.odd_orderOf_of_mem_D (hyp.D.inv_mem haK.1))
       (hyp.odd_orderOf_of_mem_D (hyp.D.inv_mem ha'K.1)) rfl hκeq.symm
   have haa : a = a' := inv_injective hainv
   rw [← ha, ← ha', haa]

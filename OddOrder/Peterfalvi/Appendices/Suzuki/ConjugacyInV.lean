@@ -99,12 +99,12 @@ theorem exists_mem_D_conj_image_eq
       Subgroup.closure Y
     rw [MonoidHom.map_closure, hXY]
   have hgb : g • hyp.basept ∈ fixedPoints Yc Ω := by
-    rw [Hypothesis.mem_fixedPoints_iff_forall]
+    rw [mem_fixedPoints_iff_forall]
     intro y hy
     rw [← hmap] at hy
     obtain ⟨x, hx, rfl⟩ := hy
     have hxb : x • hyp.basept = hyp.basept :=
-      Hypothesis.mem_fixedPoints_iff_forall.mp
+      mem_fixedPoints_iff_forall.mp
         (hyp.basept_mem_fixedPoints hXcD) x hx
     change (g * x * g⁻¹) • (g • hyp.basept) = g • hyp.basept
     calc
@@ -114,12 +114,12 @@ theorem exists_mem_D_conj_image_eq
         group
       _ = g • hyp.basept := by rw [hxb]
   have hgt : g • (hyp.t • hyp.basept) ∈ fixedPoints Yc Ω := by
-    rw [Hypothesis.mem_fixedPoints_iff_forall]
+    rw [mem_fixedPoints_iff_forall]
     intro y hy
     rw [← hmap] at hy
     obtain ⟨x, hx, rfl⟩ := hy
     have hxt : x • (hyp.t • hyp.basept) = hyp.t • hyp.basept :=
-      Hypothesis.mem_fixedPoints_iff_forall.mp
+      mem_fixedPoints_iff_forall.mp
         (hyp.t_smul_basept_mem_fixedPoints hXcD) x hx
     change (g * x * g⁻¹) • (g • (hyp.t • hyp.basept)) =
       g • (hyp.t • hyp.basept)

@@ -13366,7 +13366,7 @@ transversal `1, {t y : y ∈ Q}` and the relation `t y x = x t y^x`.
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.transfer_eq_pow_of_conj_invariant_rightTransversal
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.isComplement_H_rightTransversalTQ
+  OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisA1.isComplement_H_rightTransversalTQ
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.rightTransversalTQ_conj_invariant
 #assert_only_allowed_axioms
@@ -15561,7 +15561,7 @@ element).
 
 (10) is then the substitution of the trace relation into the `μ`-invariance (`sectionFour_ten`).
 And the book's closing "Thus `η ∈ W`" — stated without argument — is the *definition* of `W`:
-`W = C_V(K)` (`Hypothesis.W`, p. 98), and `μ = 1` says `μ(κ^η) = μ(κ)` for every `κ ∈ K`
+`W = C_V(K)` (`HypothesisA1.W`, p. 98), and `μ = 1` says `μ(κ^η) = μ(κ)` for every `κ ∈ K`
 (`coordFieldAut_muK`), whence `κ^η = κ` because `μ` on `K` and the conjugation action of `K` on `Q`
 are both faithful (`mem_W_of_coordFieldAut_eq_id`).  No Galois correspondence on `Q₀` is needed.
 
@@ -20271,6 +20271,39 @@ CLAUDE.md「carrier は posit でなく construct」の doneness 判定でもあ
 段 372-376 (Navarro (7.2) 内の Burnside 段)。 -/
 
 #assert_only_allowed_axioms OddOrder.GroupTheory.q8_exists_proper_normal
+
+/-! ## Peterfalvi Part II, Ch. I §1 Proposition 4(c) — 一般形 (2026-08-08, issue 0172)
+
+Part II の逐条監査で見つかった**特殊化債務**の解消。書籍の §1 は **(A1) だけ**を仮定する
+("We assume in this section that `G` satisfies hypothesis (A1)", p. 100) のに対し、repo の
+`Hypothesis` は (A1)+(A2)+(A3) を束ねていたため、Prop 4(c) (`N = ⋂_x H^x = C_D(Q) ⊆ C_D(t)`、
+`Ḡ = G/N` が (A1) を満たす、`Q̄ ≅ Q`、`|s̄t̄| = |st|`) が **(A2) の下で恒真に潰れていた**
+(`N = 1`)。これは飾りでなく、書籍は §3 Prop 1(a) の証明で
+"The statement concerning `𝒩(L)` has been seen in §1, Proposition 4(c)"、
+§3 Prop 1(c) の証明で "By §1, Proposition 4(c), the order of `st` is equal to the order of
+`s̄t̄` in `L̄`" と、**(A1) のみの一般形**を 2 度使う (`L = C_G(X)` の `Ω_X` 上の作用は
+一般に忠実でない)。
+
+`Hypothesis` を `HypothesisA1` (= (A1) だけ) の拡張に変更し、§1 の全内容を `HypothesisA1`
+へ移したうえで、4 条項を一般形で証明した。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisA1.mem_normalCore_H_iff
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisA1.normalCore_H_le_D
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisA1.normalCore_H_eq_centralizer_Q
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisA1.normalCore_H_le_V
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisA1.conj_t_pow_distinguished_mul_t
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisA1.pow_eq_one_of_mem_normalCore
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisA1.orderOf_mk_distinguished_mul_t
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.quotientQEquiv
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisA1.quotientOfKernel
 
 /-! ## Q₈ Brauer–Suzuki の下流 — 2026-08-07 に一斉解凍
 

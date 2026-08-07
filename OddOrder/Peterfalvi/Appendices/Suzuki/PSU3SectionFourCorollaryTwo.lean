@@ -505,7 +505,7 @@ theorem corollaryTwo_residualQuotient (hXV : X ≤ hyp.V) (hX : X ≠ ⊥)
       _ ≤ 2 ^ data.n := Nat.pow_le_pow_right (by norm_num) data.one_lt_n
   refine ⟨f₁, g₁, h₁, H₁, ?_⟩
   exact (hyp.residualQuotientHypothesis details).corollaryTwo_of_isStandardModel_of_closing
-    H₁ (Hypothesis.braid_of_orderOf_mul_eq_three _ hst) sfive M sfive.centerEqQ0 hmu hVW
+    H₁ (HypothesisA1.braid_of_orderOf_mul_eq_three _ hst) sfive M sfive.centerEqQ0 hmu hVW
     hm hQ0card hcardQ hcard
     ((hyp.residualQuotientHypothesis details).card_actualKActor_eq sfive M hm hQ0card)
     hWdvd hW1 hWcyc hfQ x₀

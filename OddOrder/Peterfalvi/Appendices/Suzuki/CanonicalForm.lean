@@ -29,10 +29,10 @@ open MulAction
 
 open scoped Pointwise
 
-namespace Hypothesis
+namespace HypothesisA1
 
 variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
-  (hyp : Hypothesis G Ω)
+  (hyp : HypothesisA1 G Ω)
 
 /-! ## Proposition 4 (a): the canonical form -/
 
@@ -178,6 +178,6 @@ lemma isComplement_H_rightTransversalTQ :
           hyp.canonicalForm_unique hmem' hyQ hx hy' (hgeq.trans hxy)
         exact congrArg (hyp.t * ·) hyeq
 
-end Hypothesis
+end HypothesisA1
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

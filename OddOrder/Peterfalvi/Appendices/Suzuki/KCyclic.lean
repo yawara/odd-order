@@ -817,7 +817,7 @@ lemma K_le_D : hyp.K ≤ hyp.D :=
 /-- **Peterfalvi Part II, Ch. I §2, Proposition 2** (p. 103):
 K is normal in D, by §1 Lemma (b). -/
 instance K_normal : (hyp.K.subgroupOf hyp.D).Normal := by
-  simpa only [K, KSet, invertedBy] using
+  simpa only [K, HypothesisA1.KSet, invertedBy] using
     (closure_invertedBy_subgroupOf_normal hyp.t_mul_t hyp.D_odd
       (fun x hx => hyp.t_conj_mem_D' hx))
 

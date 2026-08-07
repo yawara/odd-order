@@ -24,10 +24,10 @@ form of `tut`, and uses that `k ↦ k²` is a bijection of `K` (elements of
 
 namespace OddOrder.Peterfalvi.Appendices.Suzuki
 
-namespace Hypothesis
+namespace HypothesisA1
 
 variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
-  (hyp : Hypothesis G Ω)
+  (hyp : HypothesisA1 G Ω)
 
 /-! ## Closure properties of `K` (p. 98) -/
 
@@ -320,66 +320,171 @@ theorem existsUnique_distinguishedInvolution :
 
 /-! ## Chapter I §1, Proposition 4 (c) (p. 101)
 
-`N = ⋂_{x ∈ G} H^x` is the *normal core* `𝒩(G)` of `H`.  Because `G` acts
-faithfully on `Ω` (hypothesis (A2)), `N = 1`, so the book's `N = C_D(Q) ⊆
-C_D(t)` holds with all three subgroups equal to `1`, and the quotient
-`Ḡ = G/N` coincides with `G` (hence trivially satisfies (A1), `Q̄ ≅ Q`, and
-`|s̄t̄| = |st|`).  The mathematically substantial part in this setting is the
-identity `C_D(Q) = 1`.  (The general quotient construction of Prop 4(c), used
-in the Chapters II–IV induction where the ambient action need not be
-faithful, is recovered there by instantiating the hypotheses on `G/N`.) -/
+The book puts `N = ⋂_{x ∈ G} H^x` (the *normal core* `𝒩(G)` of `H`) and proves
 
-/-- **Peterfalvi Part II, Ch. I Prop 4 (c)** (p. 101), the kernel — `𝒩(G) =
-⋂_x H^x = 1` (the action is faithful, (A2)). -/
-theorem normalCore_H_eq_bot : hyp.H.normalCore = ⊥ := by
-  haveI := hyp.faithful
+> `N = C_D(Q) ⊂ C_D(t)`.  The group `Ḡ = G/N` acting on `Ω` satisfies (A1),
+> `Q̄ ≅ Q` and, if `s` is as in (b), then the order of the image `s̄t̄` of `st`
+> in `Ḡ` is equal to the order of `st`.
+
+Under (A1) alone `N` need not be trivial, and that is exactly how §3 uses the
+statement: Proposition 1(a) there says "the statement concerning `𝒩(L)` has
+been seen in §1, Proposition 4(c)", and Proposition 1(c) says "by §1,
+Proposition 4(c), the order of `st` is equal to the order of `s̄t̄` in `L̄`".
+So the two subgroup clauses are proved here on `HypothesisA1`; the quotient
+clauses live with the quotient construction (`CentralizerQuotient`). -/
+
+/-- `𝒩(G) = ⋂_x H^x` is exactly the set of elements acting trivially on `Ω`
+(the kernel of the permutation representation).  Only double transitivity is
+used, through the transitivity it implies. -/
+theorem mem_normalCore_H_iff {n : G} :
+    n ∈ hyp.H.normalCore ↔ ∀ ω : Ω, n • ω = ω := by
   haveI := hyp.doubly_transitive
   haveI : MulAction.IsPretransitive G Ω :=
     MulAction.isPretransitive_of_is_two_pretransitive
+  constructor
+  · intro hn ω
+    obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G hyp.basept ω
+    have hmem : g⁻¹ * n * g ∈ hyp.H := by
+      have := hn g⁻¹
+      rwa [inv_inv] at this
+    have hfix : (g⁻¹ * n * g) • hyp.basept = hyp.basept :=
+      hyp.smul_basept_eq_of_mem_H hmem
+    rw [← hg, ← mul_smul, show n * g = g * (g⁻¹ * n * g) from by group,
+      mul_smul, hfix]
+  · intro hfix g
+    show g * n * g⁻¹ ∈ hyp.H
+    rw [hyp.H_def, MulAction.mem_stabilizer_iff, mul_smul, mul_smul,
+      hfix (g⁻¹ • hyp.basept), smul_inv_smul]
+
+/-- `𝒩(G) ≤ D`: an element acting trivially on `Ω` fixes both `basept` and
+`t • basept`. -/
+theorem normalCore_H_le_D : hyp.H.normalCore ≤ hyp.D := by
+  intro n hn
+  have hfix := hyp.mem_normalCore_H_iff.mp hn
+  rw [hyp.D_def]
+  refine Subgroup.mem_inf.mpr ⟨hyp.H.normalCore_le hn, ?_⟩
+  rw [Subgroup.mem_map_equiv, MulAut.conj_symm_apply, hyp.H_def,
+    MulAction.mem_stabilizer_iff]
+  simp [mul_smul, hfix]
+
+/-- **Peterfalvi Part II, Ch. I Prop 4 (c)** (p. 101), first clause —
+`𝒩(G) = C_D(Q)`.
+
+`⊆`: `n ∈ 𝒩(G)` fixes every point, so it lies in `D` and, for `q ∈ Q`, the
+conjugate `n q n⁻¹ ∈ Q` moves `t • basept` exactly as `q` does; regularity of
+`Q` on `Ω - {basept}` forces `n q n⁻¹ = q`.
+`⊇`: `d ∈ C_D(Q)` fixes `basept` and `t • basept`, hence fixes
+`q • (t • basept)` for every `q ∈ Q`, i.e. all of `Ω`. -/
+theorem normalCore_H_eq_centralizer_Q :
+    hyp.H.normalCore = hyp.D ⊓ Subgroup.centralizer (hyp.Q : Set G) := by
+  refine le_antisymm (fun n hn => ?_) (fun d hd => ?_)
+  · have hfix := hyp.mem_normalCore_H_iff.mp hn
+    refine Subgroup.mem_inf.mpr ⟨hyp.normalCore_H_le_D hn, ?_⟩
+    rw [Subgroup.mem_centralizer_iff]
+    intro q hq
+    have hnH : n ∈ hyp.H := hyp.H.normalCore_le hn
+    have hconjQ : n * q * n⁻¹ ∈ hyp.Q := hyp.Q_normal_in_H n hnH q hq
+    have hfixinv : ∀ ω : Ω, n⁻¹ • ω = ω := fun ω => by
+      have h := hfix (n⁻¹ • ω)
+      rw [smul_inv_smul] at h
+      exact h.symm
+    -- both `n q n⁻¹` and `q` send `t • basept` to the same point
+    have hsame : (n * q * n⁻¹) • (hyp.t • hyp.basept) =
+        q • (hyp.t • hyp.basept) := by
+      rw [mul_smul, mul_smul, hfixinv (hyp.t • hyp.basept),
+        hfix (q • hyp.t • hyp.basept)]
+    have hne : q • (hyp.t • hyp.basept) ≠ hyp.basept :=
+      hyp.Q_smul_t_basept_ne hq
+    have := hyp.qRegularEquiv.injective (a₁ := ⟨n * q * n⁻¹, hconjQ⟩)
+      (a₂ := ⟨q, hq⟩) (Subtype.ext hsame)
+    have hq' : n * q * n⁻¹ = q := congrArg Subtype.val this
+    calc q * n = (n * q * n⁻¹) * n := by rw [hq']
+      _ = n * q := by group
+  · obtain ⟨hdD, hdC⟩ := Subgroup.mem_inf.mp hd
+    refine hyp.mem_normalCore_H_iff.mpr fun ω => ?_
+    by_cases hω : ω = hyp.basept
+    · rw [hω]; exact hyp.smul_basept_eq_of_mem_H (hyp.D_le_H hdD)
+    · obtain ⟨q, hq⟩ := hyp.qRegularEquiv.surjective ⟨ω, hω⟩
+      have hq' : (↑q : G) • (hyp.t • hyp.basept) = ω := congrArg Subtype.val hq
+      have hcomm : Commute d (↑q : G) :=
+        (Subgroup.mem_centralizer_iff.mp hdC (↑q) q.2).symm
+      rw [← hq', ← mul_smul, hcomm.eq, mul_smul,
+        hyp.smul_t_basept_eq_of_mem_D hdD]
+
+/-- **Peterfalvi Part II, Ch. I Prop 4 (c)** (p. 101), second clause —
+`𝒩(G) ⊆ C_D(t) = V`.
+
+The book's argument: "as `t` is conjugate to an element of `Q`, `t`
+centralizes `N`".  `Q` has even order, so it contains an involution `u`; by
+Prop 2(b) the involutions form one class, so `t = g⁻¹ u g` for some `g`.
+`N` centralizes `Q` by the first clause and is normal, so `g⁻¹ N g = N` is
+centralized by `g⁻¹ u g = t`. -/
+theorem normalCore_H_le_V : hyp.H.normalCore ≤ hyp.V := by
+  obtain ⟨u, huQ, hu2, hu1⟩ := hyp.exists_involution_mem_Q
+  obtain ⟨g, hg⟩ := isConj_iff.mp (hyp.isConj_of_involutions hu2 hu1 hyp.t_sq
+    hyp.t_ne_one)
+  intro n hn
+  have hnD : n ∈ hyp.D := hyp.normalCore_H_le_D hn
+  refine Subgroup.mem_inf.mpr ⟨hnD, ?_⟩
+  -- `g⁻¹ n g ∈ 𝒩(G)` centralizes `Q ∋ u`
+  have hconj : g⁻¹ * n * g ∈ hyp.H.normalCore := by
+    have := (Subgroup.normalCore_normal hyp.H).conj_mem n hn g⁻¹
+    simpa using this
+  have hcQ : g⁻¹ * n * g ∈ Subgroup.centralizer (hyp.Q : Set G) :=
+    (Subgroup.mem_inf.mp
+      (hyp.normalCore_H_eq_centralizer_Q ▸ hconj)).2
+  have hcu : u * (g⁻¹ * n * g) = (g⁻¹ * n * g) * u :=
+    Subgroup.mem_centralizer_iff.mp hcQ u huQ
+  rw [Subgroup.mem_centralizer_iff]
+  rintro x hx
+  rw [Set.mem_singleton_iff] at hx
+  subst hx
+  rw [← hg]
+  calc g * u * g⁻¹ * n = g * (u * (g⁻¹ * n * g)) * g⁻¹ := by group
+    _ = g * ((g⁻¹ * n * g) * u) * g⁻¹ := by rw [hcu]
+    _ = n * (g * u * g⁻¹) := by group
+
+end HypothesisA1
+
+namespace Hypothesis
+
+variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
+  (hyp : Hypothesis G Ω)
+
+/-! ### Proposition 4(c) under (A2)
+
+Adding faithfulness collapses `𝒩(G)` to `1`, so under the standing hypothesis
+of §2 onwards all three subgroups of the first clause are trivial. -/
+
+/-- `𝒩(G) = ⋂_x H^x = 1` under (A2). -/
+theorem normalCore_H_eq_bot : hyp.H.normalCore = ⊥ := by
+  haveI := hyp.faithful
   rw [eq_bot_iff]
   intro n hn
   rw [Subgroup.mem_bot]
-  apply FaithfulSMul.eq_of_smul_eq_smul (α := Ω)
-  intro ω
-  rw [one_smul]
-  obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G hyp.basept ω
-  have hmem : g⁻¹ * n * g ∈ hyp.H := by
-    have := hn g⁻¹
-    rwa [inv_inv] at this
-  have hfix : (g⁻¹ * n * g) • hyp.basept = hyp.basept :=
-    hyp.smul_basept_eq_of_mem_H hmem
-  rw [← hg, ← mul_smul, show n * g = g * (g⁻¹ * n * g) from by group, mul_smul, hfix]
+  exact FaithfulSMul.eq_of_smul_eq_smul (α := Ω)
+    fun ω => by rw [one_smul]; exact hyp.toHypothesisA1.mem_normalCore_H_iff.mp hn ω
 
-/-- **Peterfalvi Part II, Ch. I Prop 4 (c)** (p. 101), the substantial clause
-— `C_D(Q) = 1` (elements of `D` centralizing `Q` fix every point of `Ω`, hence
-are trivial by faithfulness). -/
+/-- `C_D(Q) = 1` under (A2) — Prop 4(c)'s first clause with `𝒩(G) = 1`. -/
 theorem centralizer_Q_inf_D_eq_bot :
     hyp.D ⊓ Subgroup.centralizer (hyp.Q : Set G) = ⊥ := by
-  haveI := hyp.faithful
-  rw [eq_bot_iff]
-  intro d hd
-  obtain ⟨hdD, hdC⟩ := Subgroup.mem_inf.mp hd
-  rw [Subgroup.mem_bot]
-  apply FaithfulSMul.eq_of_smul_eq_smul (α := Ω)
-  intro ω
-  rw [one_smul]
-  by_cases hω : ω = hyp.basept
-  · rw [hω]; exact hyp.smul_basept_eq_of_mem_H (hyp.D_le_H hdD)
-  · obtain ⟨q, hq⟩ := hyp.qRegularEquiv.surjective ⟨ω, hω⟩
-    have hq' : (↑q : G) • (hyp.t • hyp.basept) = ω := congrArg Subtype.val hq
-    have hcomm : Commute d (↑q : G) :=
-      (Subgroup.mem_centralizer_iff.mp hdC (↑q) q.2).symm
-    rw [← hq', ← mul_smul, hcomm.eq, mul_smul, hyp.smul_t_basept_eq_of_mem_D hdD]
+  rw [← hyp.toHypothesisA1.normalCore_H_eq_centralizer_Q, hyp.normalCore_H_eq_bot]
 
-/-- **Peterfalvi Part II, Ch. I Prop 4 (c)** (p. 101), packaged — the book's
-`𝒩(G) = C_D(Q)` (both `= 1` under (A2)). -/
+/-- **Peterfalvi Part II, Ch. I Prop 4 (c)**, first clause under (A2). -/
 theorem normalCore_eq_centralizer_Q :
-    hyp.H.normalCore = hyp.D ⊓ Subgroup.centralizer (hyp.Q : Set G) := by
-  rw [hyp.normalCore_H_eq_bot, hyp.centralizer_Q_inf_D_eq_bot]
+    hyp.H.normalCore = hyp.D ⊓ Subgroup.centralizer (hyp.Q : Set G) :=
+  hyp.toHypothesisA1.normalCore_H_eq_centralizer_Q
 
-/-- **Peterfalvi Part II, Ch. I Prop 4 (c)** (p. 101) — `𝒩(G) ⊆ C_D(t) = V`. -/
-theorem normalCore_le_V : hyp.H.normalCore ≤ hyp.V := by
-  rw [hyp.normalCore_H_eq_bot]; exact bot_le
+/-- **Peterfalvi Part II, Ch. I Prop 4 (c)**, second clause under (A2). -/
+theorem normalCore_le_V : hyp.H.normalCore ≤ hyp.V :=
+  hyp.toHypothesisA1.normalCore_H_le_V
+
+end Hypothesis
+
+namespace HypothesisA1
+
+variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
+  (hyp : HypothesisA1 G Ω)
 
 /-! ## The distinguished involution `s` and structure conjugator `r` (p. 101)
 
@@ -443,6 +548,74 @@ lemma braid_of_orderOf_mul_eq_three
   have h2 : s * t * s = (t * s * t)⁻¹ := mul_eq_one_iff_eq_inv.mp h
   rw [h2, mul_inv_rev, mul_inv_rev, hsinv, htinv, mul_assoc]
 
+/-! ### Proposition 4(c), third clause: `|s̄t̄| = |st|`
+
+The book's argument (p. 102): "The elements of `⟨st⟩ ∩ N` are inverted by `t`,
+centralized by `t` and of odd order; it follows that `⟨st⟩ ∩ N = 1` and the
+order of `s̄t̄` is the same as that of `st`."  This is used verbatim in §3
+Proposition 1(c) to transport the value of `|st|` through the induction. -/
+
+/-- `t` inverts every power of `st` (both `s` and `t` are involutions, so
+`t (st) t⁻¹ = (st)⁻¹`, and conjugation is an automorphism). -/
+lemma conj_t_pow_distinguished_mul_t (n : ℕ) :
+    hyp.t * (hyp.distinguishedInvolution * hyp.t) ^ n * hyp.t =
+      ((hyp.distinguishedInvolution * hyp.t) ^ n)⁻¹ := by
+  set s : G := hyp.distinguishedInvolution with hsdef
+  set t : G := hyp.t with htdef
+  have hsinv : s⁻¹ = s :=
+    inv_eq_of_mul_eq_one_right (by rw [← sq]; exact hyp.distinguishedInvolution_sq)
+  have htinv : t⁻¹ = t :=
+    inv_eq_of_mul_eq_one_right (by rw [← sq]; exact hyp.t_sq)
+  have htt : t * t = 1 := by rw [← sq]; exact hyp.t_sq
+  have hbase : (MulAut.conj t) (s * t) = (s * t)⁻¹ := by
+    rw [MulAut.conj_apply, mul_inv_rev, hsinv, htinv]
+    calc t * (s * t) * t = t * s * (t * t) := by group
+      _ = t * s := by rw [htt, mul_one]
+  calc t * (s * t) ^ n * t
+      = (MulAut.conj t) ((s * t) ^ n) := by
+        rw [MulAut.conj_apply, htinv]
+    _ = ((MulAut.conj t) (s * t)) ^ n := map_pow _ _ _
+    _ = ((s * t)⁻¹) ^ n := by rw [hbase]
+    _ = ((s * t) ^ n)⁻¹ := inv_pow _ _
+
+/-- **Peterfalvi Part II, Ch. I Prop 4 (c)** (p. 101), third clause, key step —
+`⟨st⟩ ∩ 𝒩(G) = 1`. -/
+theorem pow_eq_one_of_mem_normalCore {n : ℕ}
+    (hn : (hyp.distinguishedInvolution * hyp.t) ^ n ∈ hyp.H.normalCore) :
+    (hyp.distinguishedInvolution * hyp.t) ^ n = 1 := by
+  set x : G := (hyp.distinguishedInvolution * hyp.t) ^ n with hxdef
+  -- inverted by `t`
+  have hinv : hyp.t * x * hyp.t = x⁻¹ := hyp.conj_t_pow_distinguished_mul_t n
+  -- centralized by `t`, since `𝒩(G) ≤ V = C_D(t)`
+  have hV : x ∈ hyp.V := hyp.normalCore_H_le_V hn
+  have hcent : hyp.t * x = x * hyp.t :=
+    Subgroup.mem_centralizer_iff.mp (Subgroup.mem_inf.mp hV).2 hyp.t rfl
+  have hfix : hyp.t * x * hyp.t = x := by
+    rw [hcent, mul_assoc, show hyp.t * hyp.t = 1 by rw [← sq]; exact hyp.t_sq,
+      mul_one]
+  have hxx : x = x⁻¹ := by rw [← hinv, hfix]
+  have hsq : x ^ 2 = 1 := by
+    rw [sq]
+    nth_rewrite 1 [hxx]
+    exact inv_mul_cancel x
+  exact OddOrder.GroupTheory.eq_one_of_sq_eq_one_of_odd_card hyp.D_odd
+    (hyp.normalCore_H_le_D hn) hsq
+
+/-- **Peterfalvi Part II, Ch. I Prop 4 (c)** (p. 101), third clause — the order
+of the image `s̄t̄` in `Ḡ = G/𝒩(G)` equals the order of `st`. -/
+theorem orderOf_mk_distinguished_mul_t :
+    orderOf (QuotientGroup.mk' hyp.H.normalCore
+        (hyp.distinguishedInvolution * hyp.t)) =
+      orderOf (hyp.distinguishedInvolution * hyp.t) := by
+  refine Nat.dvd_antisymm ?_ (orderOf_dvd_of_pow_eq_one ?_)
+  · refine orderOf_dvd_of_pow_eq_one ?_
+    rw [← map_pow, pow_orderOf_eq_one, map_one]
+  · refine hyp.pow_eq_one_of_mem_normalCore ?_
+    have := pow_orderOf_eq_one (QuotientGroup.mk' hyp.H.normalCore
+      (hyp.distinguishedInvolution * hyp.t))
+    rw [← map_pow] at this
+    exact (QuotientGroup.eq_one_iff _).mp this
+
 /-- Uniqueness of the distinguished pair: any `(s', r')` satisfying the
 defining conditions equals `(s, r)`. -/
 lemma eq_distinguishedPair_of_structure {s' r' : G} (hsH : s' ∈ hyp.H)
@@ -454,6 +627,6 @@ lemma eq_distinguishedPair_of_structure {s' r' : G} (hsH : s' ∈ hyp.H)
       ⟨⟨hsH, hs2, hs1⟩, hrQ, heq⟩ hyp.distinguishedPair_spec
   exact ⟨congrArg Prod.fst h, congrArg Prod.snd h⟩
 
-end Hypothesis
+end HypothesisA1
 
 end OddOrder.Peterfalvi.Appendices.Suzuki

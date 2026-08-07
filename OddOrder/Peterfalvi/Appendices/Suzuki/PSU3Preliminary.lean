@@ -189,7 +189,7 @@ theorem f_conj_distinguishedInvolution_mul (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f 
 /-! ## `f` and `g` preserve `Q₀`
 
 `Q₀ = (H ∩ I) ∪ {1}` is the set of involutions of `H` together with `1`, and by
-`Hypothesis.image_conj_KSet_eq_involutions_H` its nonidentity elements are exactly the
+`HypothesisA1.image_conj_KSet_eq_involutions_H` its nonidentity elements are exactly the
 `K`-conjugates `s^k` of the distinguished involution.  Step (1) says `f` and `g` send
 `s^k` to `s^{k⁻¹}`, again an involution — so both preserve `Q₀^#`, and being
 involutive maps they reflect it as well.
@@ -198,7 +198,7 @@ This is the engine of step (4).
 -/
 
 /-- Every nonidentity element of `Q₀` is a `K`-conjugate `s^k` of the distinguished
-involution (Ch. I; `Hypothesis.image_conj_KSet_eq_involutions_H`). -/
+involution (Ch. I; `HypothesisA1.image_conj_KSet_eq_involutions_H`). -/
 theorem exists_mem_KSet_conj_eq_of_mem_Q0 {z : G} (hzQ0 : z ∈ hyp.Q0) (hz1 : z ≠ 1) :
     ∃ k ∈ hyp.KSet, k⁻¹ * hyp.distinguishedInvolution * k = z := by
   have hmem : z ∈ {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H} := ⟨hzQ0.1, hz1, hzQ0.2⟩

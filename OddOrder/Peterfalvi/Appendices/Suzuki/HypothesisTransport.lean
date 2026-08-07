@@ -188,7 +188,7 @@ variable (h : Hypothesis A Λ) (e : A ≃* B) (f : Λ ≃ Λ')
 
 /-- `V = C_D(t)` transports. -/
 theorem ofMulEquiv_V : (h.ofMulEquiv e f hf).V = h.V.map e.toMonoidHom := by
-  rw [Hypothesis.V, Hypothesis.V, map_inf_equiv, map_centralizer_equiv,
+  rw [HypothesisA1.V, HypothesisA1.V, map_inf_equiv, map_centralizer_equiv,
     Set.image_singleton]
   rfl
 
@@ -211,7 +211,7 @@ theorem ofMulEquiv_KSet : (h.ofMulEquiv e f hf).KSet = e '' h.KSet := by
 
 /-- `W = C_V(K)` transports. -/
 theorem ofMulEquiv_W : (h.ofMulEquiv e f hf).W = h.W.map e.toMonoidHom := by
-  rw [Hypothesis.W, Hypothesis.W, map_inf_equiv, ofMulEquiv_V, map_centralizer_equiv,
+  rw [HypothesisA1.W, HypothesisA1.W, map_inf_equiv, ofMulEquiv_V, map_centralizer_equiv,
     ofMulEquiv_KSet]
 
 /-- `Q₀`, the involutions of `H` together with `1`, transports. -/

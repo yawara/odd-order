@@ -129,7 +129,7 @@ theorem map_W_of_mulEquiv (h₁ : Hypothesis L Λ) (h₂ : Hypothesis L' Λ') (�
 theorem map_V_of_mulEquiv (h₁ : Hypothesis L Λ) (h₂ : Hypothesis L' Λ') (φ : L ≃* L')
     (hD : h₁.D.map φ.toMonoidHom = h₂.D) (ht : φ h₁.t = h₂.t) :
     h₁.V.map φ.toMonoidHom = h₂.V := by
-  rw [Hypothesis.V, Hypothesis.V, Subgroup.map_inf _ _ φ.toMonoidHom φ.injective, hD,
+  rw [HypothesisA1.V, HypothesisA1.V, Subgroup.map_inf _ _ φ.toMonoidHom φ.injective, hD,
     map_centralizer_equiv φ {h₁.t}, Set.image_singleton, ht]
 
 /-- `K` is determined by `D` and `t`. -/
