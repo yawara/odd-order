@@ -624,7 +624,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 20100
+set_option linter.style.longFile 20200
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -2091,6 +2091,24 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_irreducibleCharacter_le
 -- RepresentationTheory: there are finitely many irreducible characters of a finite group.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finite_irreducibleCharacter
+
+/-! ### Peterfalvi (1.6) — 誘導と inflation / 誘導と核
+
+**(1.6)(a)** `subsetCharacterKernel_induce_iff`: `A ⊆ Ker θ ↔ A ⊆ Ker Ind_H^G θ`。両半分は以前から
+在ったが (順方向 = 任意の類関数、逆方向 = 既約 θ に対する [Is] Lemma 2.21)、**教科書の同値そのもの
+は述べられていなかった**ので束ねた。
+
+**(1.6)(b)** `induce_eq_compHom_induce_of_inflation`: `θ` が `H/N` 上の `θ₁` の inflation なら
+`Ind_H^G θ = (Ind_{H/N}^{G/N} θ₁) ∘ mk'`。従来は **自明指標 `θ = 1` の場合だけ**が在り
+(`induce_one_eq_compHom_induce_one_of_le`、docstring も "(1.6.b)" と引用符付きで自認)、
+書籍の一般の `θ` は欠けていた。一般版を証明し、自明指標版はその特殊化に置換した
+(重複していた ~63 行の証明を削除)。 -/
+
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S03.subsetCharacterKernel_induce_iff
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.induce_eq_compHom_induce_of_inflation
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.induce_one_eq_compHom_induce_one_of_le
 
 /-! ### Peterfalvi (1.7)(a) — Clifford correspondence, distinctness half
 

@@ -856,6 +856,27 @@ theorem mem_characterKernel_of_mem_characterKernel_induce
     (⟨x, hxH⟩ : ↥H) S (fun _ => 1) fam (fun _ => n) hfamdeg hval θ hθS one_ne_zero
   rwa [hfamcoe θ hθS] at hkey
 
+/-- **Peterfalvi (1.6)(a)** (book p. 7): *`A ⊆ Ker θ` if and only if `A ⊆ Ker Ind_H^G θ`.*
+
+The two halves are proved separately above -- the forward direction
+`subsetCharacterKernel_induce_of_subgroupOf` for an arbitrary class function `θ` (a constant `θ`
+on `A` makes every term of the induction sum that constant), and the converse
+`mem_characterKernel_of_mem_characterKernel_induce` for an irreducible `θ` ([Is] Lemma 2.21, via
+the Mackey orbit identity and the triangle-equality keystone).  This is the book's biconditional
+itself, which is the form the statement is cited in. -/
+theorem subsetCharacterKernel_induce_iff {L : Type*} [Group L] [Fintype L]
+    {A H : Subgroup L} [A.Normal] [H.Normal] [Finite ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    (hAH : A ≤ H) {θ : ClassFunction ↥H ℂ}
+    (hθ : OddOrder.RepresentationTheory.IsIrreducibleCharacter θ) :
+    ((A.subgroupOf H : Set ↥H) ⊆ characterKernel θ) ↔
+      SubsetCharacterKernel (A : Set L) (ClassFunction.induce H θ) := by
+  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  refine ⟨subsetCharacterKernel_induce_of_subgroupOf hAH θ, fun hind y hy => ?_⟩
+  -- `y : ↥H` lies in `A.subgroupOf H`, so `(y : L) ∈ A` and the induced kernel applies.
+  have hyA : (y : L) ∈ A := Subgroup.mem_subgroupOf.mp hy
+  have hker := mem_characterKernel_of_mem_characterKernel_induce hθ y.2 (hind hyA)
+  simpa using hker
+
 end InducedKernelDescent
 
 end OddOrder.Peterfalvi.S03

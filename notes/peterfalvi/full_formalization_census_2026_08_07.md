@@ -134,7 +134,11 @@ Lemma typeP_pairW S T W W1 W2 (defW : W1 \x W2 = W) :
 | (1.3) | ✅ **2026-08-07 に補充** | 旧状態は **engine 止まり**の部分被覆 → `S03_InductionRestriction.lean` で (a) の同値と (b) 両結論を追加。詳細下記 |
 | (1.4) | ✅ 実証明 | `isometry_difference_pair_structure` (`IsometryDifferencePair.lean`)。符号一様性・pairwise distinct まで込み |
 | (1.5) | ✅ 実証明 (a)-(e) 全条項 | (a)(b) `restrict_induce_eq_norm_smul_sum` 系 / (c) `induce_eq_induce_iff_conj` (書籍より強い **iff**) + `inner_induce_eq_zero_of_not_conj` / (d) `InducedIrreducible.lean:327` / (e) `CliffordDecomposition.lean:433` |
-| (1.6)-(1.10) | ⬜ 未監査 | 次の作業単位 |
+| (1.6) | ✅ **2026-08-07 に補充** | (a) 両半分は在ったが**同値そのものが無かった** → `subsetCharacterKernel_induce_iff` で束ねた。(b) は **自明指標 `θ = 1` の場合だけ**だった (`induce_one_eq_compHom_induce_one_of_le`、docstring も "(1.6.b)" と引用符付きで自認) → 一般 `θ` 版 `induce_eq_compHom_induce_of_inflation` を証明し、自明版をその特殊化に置換 (重複 ~63 行削除) |
+| (1.7)(a) | ✅ 実証明・verbatim | `induce_eq_sum_smul_induce_of_inertia_eq`。既約性・pairwise distinct・分解式の 3 結論すべて。coprime 性も `T/H` 可換性も不要な一般形 |
+| (1.7)(b) | ❌ **未形式化** | 「`T/H` 可換 ⟹ `Ind_H^G θ = e ∑ χᵢ`, `n = \|T:H\|/e²`, `χᵢ(1) = \|G:T\|eθ(1)`」。repo が持つのは **coprime 版** (`induce_eq_sum_mul_linearClassFunction`, Gallagher) だけで、`GallagherDecomposition.lean:229` が「**general** Peterfalvi (1.7.b)」を未達目標と明記。必要な前提 = 可換 inertia 商への拡張定理 (`CyclicCharacterExtension` の巡回版は済、「合成列に沿って反復」が未実施 = 旧 issue 9002 の残り) |
+| (1.7)(c) | ❌ **未形式化 (ただし導出可能)** | `T/H` 可換 **かつ** `\|H\|` と `\|T:H\|` が互いに素 ⟹ `Ind_H^G θ = ∑_{i=1}^n χᵢ`, `n = \|T:H\|`, `χᵢ(1) = \|G:T\|θ(1)`。番号 cite ゼロ、結論を述べた宣言なし。**部品は揃っている**: `induce_eq_sum_mul_linearClassFunction` (Gallagher coprime 版) が `Ind_H^T θ = ∑_β χ·Inf(β)` を与え (`\|H\|` と `[T:H]` が互いに素 ⟹ `d = θ(1) \| \|H\|` も互いに素、拡張 `χ` は Isaacs 8.16 で存在)、(1.7)(a) `induce_eq_sum_smul_induce_of_inertia_eq` で `T` から `G` へ上げれば書籍の形になる。⟹ 次イテレーションの第一候補 |
+| (1.8)-(1.10) | ⬜ 未監査 | 次の作業単位 (書籍 pp.8-9) |
 
 **(1.3) で見つかった型 (再発を探すべきパターン)**: engine (証明の中核となる補題) は在るが、
 **教科書の statement そのものが無い**。しかも engine の docstring が
@@ -142,6 +146,16 @@ Lemma typeP_pairW S T W W1 W2 (defW : W1 \x W2 = W) :
 と自認していた。番号 grep では 100% 検出できない。
 ⟹ **監査時は「その番号の docstring を持つ宣言の *結論* が書籍の結論と一致するか」を見る**。
 "engine" / "core" / "-style" / "left to the consumers" / "abstracted" は赤信号。
+
+**(1.6) で見つかった第 2 の型 — 特殊化**: 番号を cite する宣言は在るが、**書籍より狭い場合しか
+述べていない** ((1.6.b) は `θ = 1` のみ)。docstring が番号を**引用符付き** `"(1.6.b)"` で書くのは
+書き手が自認している合図なので、grep で `"(N.M` (引用符つき番号) を探すと拾える。
+処理は「一般版を証明 → 旧版をその特殊化に置換」(コンパイラが同値性を検証してくれる)。
+
+**監査で使った検出クエリ** (次章でも同じ手順を踏むこと):
+1. `grep -rn "(N\.M\(\.[a-z]\)\?)" --include=*.lean OddOrder/ | grep -v AxiomsCheck` で cite 箇所を列挙
+2. 各 hit の**宣言の結論**を書籍のページ画像と条項ごとに突合 (docstring の主張を信用しない)
+3. 赤信号語 + 引用符付き番号 + 「TODO」「まだ」「left as」を本文検索
 
 ## 4. 未着手の census
 

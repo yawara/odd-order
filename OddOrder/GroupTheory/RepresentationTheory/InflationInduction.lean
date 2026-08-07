@@ -104,7 +104,89 @@ private theorem induceTriv_apply {H : Subgroup G} [Fintype G] [Invertible (Nat.c
     Finset.sum_const, nsmul_eq_mul, mul_one]
 
 open scoped Classical in
-/-- **P2 — trivial-character induction–inflation commute** (Peterfalvi "(1.6.b)").  For a normal
+/-- **Peterfalvi (1.6)(b)** (book p. 7): *induction commutes with inflation along a normal subgroup
+contained in the kernel.*
+
+Let `N ⊴ G` with `N ≤ H`, let `θ₁` be a class function on `H/N = H.map (mk' N)`, and let `θ` be the
+class function on `H` it inflates to -- i.e. `θ(x) = θ₁(xN)` for all `x ∈ H` (`hinfl`).  Then
+
+`Ind_H^G θ = (Ind_{H/N}^{G/N} θ₁) ∘ mk'`.
+
+This is the book's statement: there `θ ∈ Irr(H)` is given with `N ⊆ Ker θ`, `θ₁` is *defined* by
+`θ₁(xN) = θ(x)`, and `χ` -- the character of `G/N` with `χ(xN) = (Ind_H^G θ)(x)`, which exists by
+(1.6)(a) -- is shown to equal `Ind_{H/N}^{G/N} θ₁`.  Saying "`χ` inflates to `Ind_H^G θ`" is the
+same as the displayed equation, and stating it that way avoids having to construct `χ` (the
+equation determines it, `mk'` being surjective).  Neither irreducibility of `θ` nor `N ⊆ Ker θ` is
+needed beyond what `hinfl` already says: `hinfl` *is* the assertion that `θ` factors through `H/N`,
+which for a character is exactly `N ⊆ Ker θ`.
+
+*Proof* (the book's).  Both sides vanish off `H` resp. `H/N`, and the conjugator condition
+`x⁻¹gx ∈ H` transports along `mk` (`N ≤ H`), so the two induction sums have matching terms:
+`induceTerm H θ x g = induceTerm (H/N) θ₁ (mk x) (mk g)`.  Summing over `G` rather than `G/N`
+overcounts by the constant fiber size `|N|` (`card_filter_mk_eq`), which the normalization
+`⅟|H| = ⅟(|N|·|H/N|)` absorbs. -/
+theorem induce_eq_compHom_induce_of_inflation {N H : Subgroup G} [N.Normal] (hNH : N ≤ H)
+    [Fintype G] [Fintype (G ⧸ N)] [Invertible (Nat.card ↥H : ℂ)]
+    [Invertible (Nat.card ↥(H.map (QuotientGroup.mk' N)) : ℂ)]
+    (θ : ClassFunction ↥H ℂ) (θ₁ : ClassFunction ↥(H.map (QuotientGroup.mk' N)) ℂ)
+    (hinfl : ∀ (x : G) (hx : x ∈ H),
+      θ ⟨x, hx⟩ = θ₁ ⟨QuotientGroup.mk x, Subgroup.mem_map_of_mem _ hx⟩) :
+    ClassFunction.induce H θ
+      = ClassFunction.compHom (QuotientGroup.mk' N)
+          (ClassFunction.induce (H.map (QuotientGroup.mk' N)) θ₁) := by
+  classical
+  -- Membership bridge: `mk y ∈ H/N ↔ y ∈ H` (uses `N ≤ H`).
+  have hmem : ∀ y : G, (QuotientGroup.mk y : G ⧸ N) ∈ H.map (QuotientGroup.mk' N) ↔ y ∈ H := by
+    intro y
+    rw [← QuotientGroup.mk'_apply, ← Subgroup.mem_comap, Subgroup.comap_map_eq,
+      QuotientGroup.ker_mk', sup_eq_left.mpr hNH]
+  -- `|H| = |N| · |H/N|`: `H` is the `mk`-preimage of `H/N`, whose fibers all have size `|N|`.
+  have hcardH : (Nat.card ↥H : ℂ)
+      = (Nat.card ↥N : ℂ) * (Nat.card ↥(H.map (QuotientGroup.mk' N)) : ℂ) := by
+    have hset : ((QuotientGroup.mk : G → G ⧸ N) ⁻¹'
+        (H.map (QuotientGroup.mk' N) : Set (G ⧸ N))) = (H : Set G) := by
+      ext y
+      rw [Set.mem_preimage, SetLike.mem_coe, SetLike.mem_coe, hmem y]
+    have h := QuotientGroup.card_preimage_mk N (H.map (QuotientGroup.mk' N) : Set (G ⧸ N))
+    rw [hset, SetLike.coe_sort_coe, SetLike.coe_sort_coe] at h
+    exact_mod_cast h
+  have hneN : (Nat.card ↥N : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  ext g
+  -- Termwise match, the heart of the proof.
+  have hterm : ∀ x : G, ClassFunction.induceTerm H θ x g
+      = ClassFunction.induceTerm (H.map (QuotientGroup.mk' N)) θ₁
+          (QuotientGroup.mk x) (QuotientGroup.mk g) := by
+    intro x
+    have hconj : ((QuotientGroup.mk x : G ⧸ N)⁻¹ * QuotientGroup.mk g * QuotientGroup.mk x)
+        = (QuotientGroup.mk (x⁻¹ * g * x) : G ⧸ N) := by
+      simp only [← QuotientGroup.mk_mul, ← QuotientGroup.mk_inv]
+    by_cases hx : x⁻¹ * g * x ∈ H
+    · rw [ClassFunction.induceTerm_of_mem θ hx,
+        ClassFunction.induceTerm_of_mem θ₁ (by rw [hconj]; exact (hmem _).mpr hx)]
+      rw [hinfl (x⁻¹ * g * x) hx]
+      congr 1
+    · rw [ClassFunction.induceTerm_of_not_mem θ hx,
+        ClassFunction.induceTerm_of_not_mem θ₁ (by rw [hconj]; exact fun h => hx ((hmem _).mp h))]
+  -- Sum over `G` = `|N|` × sum over `G ⧸ N` (constant fiber size).
+  have hsum : (∑ x : G, ClassFunction.induceTerm (H.map (QuotientGroup.mk' N)) θ₁
+        (QuotientGroup.mk x) (QuotientGroup.mk g))
+      = (Nat.card ↥N : ℂ) * ∑ q : G ⧸ N,
+          ClassFunction.induceTerm (H.map (QuotientGroup.mk' N)) θ₁ q (QuotientGroup.mk g) := by
+    rw [← Finset.sum_fiberwise' (Finset.univ) (fun x : G => (QuotientGroup.mk x : G ⧸ N))
+      (fun q => ClassFunction.induceTerm (H.map (QuotientGroup.mk' N)) θ₁ q
+        (QuotientGroup.mk g)), Finset.mul_sum]
+    refine Finset.sum_congr rfl fun q _ => ?_
+    rw [Finset.sum_const, nsmul_eq_mul, card_filter_mk_eq q]
+  rw [ClassFunction.compHom_apply, QuotientGroup.mk'_apply, ClassFunction.induce_apply,
+    ClassFunction.induce_apply, Finset.sum_congr rfl (fun x _ => hterm x), hsum, ← mul_assoc]
+  -- `⅟|H| · |N| = ⅟|H/N|`.
+  congr 1
+  rw [invOf_eq_inv, invOf_eq_inv, hcardH, mul_inv, mul_comm ((Nat.card ↥N : ℂ))⁻¹,
+    mul_assoc, inv_mul_cancel₀ hneN, mul_one]
+
+open scoped Classical in
+/-- **P2 — trivial-character induction–inflation commute**: the `θ = 1` case of Peterfalvi (1.6)(b)
+(`induce_eq_compHom_induce_of_inflation`).  For a normal
 subgroup `N ⊴ G` contained in `A ≤ G`, the induced trivial character of `A` is the inflation of the
 induced trivial character of the quotient subgroup `A/N = A.map (mk' N) ≤ G ⧸ N`:
 `Ind_A^G 1_A = (Ind_{A/N}^{G/N} 1) ∘ mk'`.
@@ -119,70 +201,9 @@ theorem induce_one_eq_compHom_induce_one_of_le {N A : Subgroup G} [N.Normal] (hN
     ClassFunction.induce A (trivialClassFunction ↥A)
       = ClassFunction.compHom (QuotientGroup.mk' N)
           (ClassFunction.induce (A.map (QuotientGroup.mk' N))
-            (trivialClassFunction ↥(A.map (QuotientGroup.mk' N)))) := by
-  -- Membership bridge: `mk' y ∈ A/N ↔ y ∈ A` (`N ≤ A`).
-  have hmem : ∀ y : G, (QuotientGroup.mk' N y ∈ A.map (QuotientGroup.mk' N)) ↔ y ∈ A := by
-    intro y
-    rw [← Subgroup.mem_comap, Subgroup.comap_map_eq, QuotientGroup.ker_mk', sup_eq_left.mpr hNA]
-  -- `|A| = |N| · |A/N|`: `A` is the `mk`-preimage of `A/N`, whose fibers all have size `|N|`.
-  have hcardA : (Nat.card ↥A : ℂ)
-      = (Nat.card ↥N : ℂ) * (Nat.card ↥(A.map (QuotientGroup.mk' N)) : ℂ) := by
-    have hset : ((QuotientGroup.mk : G → G ⧸ N) ⁻¹'
-        (A.map (QuotientGroup.mk' N) : Set (G ⧸ N))) = (A : Set G) := by
-      ext y
-      rw [Set.mem_preimage, SetLike.mem_coe, SetLike.mem_coe, ← QuotientGroup.mk'_apply, hmem y]
-    have h := QuotientGroup.card_preimage_mk N (A.map (QuotientGroup.mk' N) : Set (G ⧸ N))
-    rw [hset, SetLike.coe_sort_coe, SetLike.coe_sort_coe] at h
-    exact_mod_cast h
-  have hneN : (Nat.card ↥N : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
-  ext g
-  -- Conjugator condition transports along `mk`.
-  have hPQ : ∀ x : G, (x⁻¹ * g * x ∈ A) ↔
-      ((QuotientGroup.mk x : G ⧸ N)⁻¹ * (QuotientGroup.mk g) * (QuotientGroup.mk x)
-        ∈ A.map (QuotientGroup.mk' N)) := by
-    intro x
-    rw [← hmem (x⁻¹ * g * x)]
-    simp only [QuotientGroup.mk'_apply, map_mul, map_inv]
-  rw [ClassFunction.compHom_apply, induceTriv_apply (H := A),
-    induceTriv_apply (H := A.map (QuotientGroup.mk' N)), QuotientGroup.mk'_apply]
-  -- Fiberwise count: `#{x : x⁻¹gx∈A} = |N| · #{xq : xq⁻¹ḡxq∈A/N}`.
-  have hmapsto : ∀ x ∈ Finset.univ.filter (fun x : G => x⁻¹ * g * x ∈ A),
-      (QuotientGroup.mk x : G ⧸ N) ∈ Finset.univ.filter
-        (fun xq : G ⧸ N => xq⁻¹ * (QuotientGroup.mk g) * xq ∈ A.map (QuotientGroup.mk' N)) :=
-    fun x hx => Finset.mem_filter.mpr ⟨Finset.mem_univ _, (hPQ x).mp (Finset.mem_filter.mp hx).2⟩
-  have hper : ∀ xq ∈ Finset.univ.filter
-        (fun xq : G ⧸ N => xq⁻¹ * (QuotientGroup.mk g) * xq ∈ A.map (QuotientGroup.mk' N)),
-      ((Finset.univ.filter (fun x : G => x⁻¹ * g * x ∈ A)).filter
-          (fun a => (QuotientGroup.mk a : G ⧸ N) = xq)).card = Nat.card ↥N := by
-    intro xq hxq
-    have hQ : xq⁻¹ * (QuotientGroup.mk g) * xq ∈ A.map (QuotientGroup.mk' N) :=
-      (Finset.mem_filter.mp hxq).2
-    have hfeq : (Finset.univ.filter (fun x : G => x⁻¹ * g * x ∈ A)).filter
-          (fun a => (QuotientGroup.mk a : G ⧸ N) = xq)
-        = Finset.univ.filter (fun a : G => (QuotientGroup.mk a : G ⧸ N) = xq) := by
-      rw [Finset.filter_filter]
-      apply Finset.filter_congr
-      intro a _
-      constructor
-      · exact fun h => h.2
-      · intro h
-        refine ⟨(hPQ a).mpr ?_, h⟩
-        rw [h]; exact hQ
-    rw [hfeq]
-    exact card_filter_mk_eq xq
-  have hcount : (Finset.univ.filter (fun x : G => x⁻¹ * g * x ∈ A)).card
-      = Nat.card ↥N * (Finset.univ.filter
-          (fun xq : G ⧸ N => xq⁻¹ * (QuotientGroup.mk g) * xq
-            ∈ A.map (QuotientGroup.mk' N))).card := by
-    rw [Finset.card_eq_sum_card_fiberwise hmapsto, Finset.sum_congr rfl hper, Finset.sum_const,
-      smul_eq_mul, mul_comm]
-  rw [hcount]
-  push_cast
-  -- `⅟|A| · (|N| · c) = ⅟|A/N| · c`.
-  rw [← mul_assoc]
-  congr 1
-  rw [invOf_eq_inv, invOf_eq_inv, hcardA, mul_inv, mul_comm ((Nat.card ↥N : ℂ))⁻¹,
-    mul_assoc, inv_mul_cancel₀ hneN, mul_one]
+            (trivialClassFunction ↥(A.map (QuotientGroup.mk' N)))) :=
+  induce_eq_compHom_induce_of_inflation hNA (trivialClassFunction ↥A)
+    (trivialClassFunction ↥(A.map (QuotientGroup.mk' N))) (fun _ _ => rfl)
 
 open scoped Classical in
 /-- **P3 — inflated class functions are orthogonal to irreducibles not killing `N`.**  For `N ⊴ G`,
