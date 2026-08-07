@@ -238,4 +238,27 @@ statement で在り、docstring も「**後半**」と明記していた。
 と末尾の `theorem` 一覧を見て一般形の存在を確認した。**内部段の名前が先に当たっても、
 その file の endpoint を必ず確認する**。
 
-### Ch.4-Ch.7, Ch.9-Ch.10 — 未着手 (次の入口 = Ch.4 Commutators、38 件)
+### Ch.4 Commutators (38 件、書籍 pp.117-155) — **監査完了 (2026-08-08)**、補充ゼロ
+
+**38/38 被覆**。アンカーが取れなかった 1 件と、私の走査が誤った 8 件を実体で確認した:
+
+| Isaacs | 実体 |
+|---|---|
+| **4.9** Three-subgroups (`[X,Y,Z]=1 ∧ [Y,Z,X]=1 ⟹ [Z,X,Y]=1`) | mathlib `Subgroup.commutator_commutator_eq_bot_of_rotate` (`ThreeSubgroups.lean:26` の対応表に記録) |
+| **4.14** Mann (冪零 ⟹ `M(G)` の冪零類 ≤ 3) | `lowerCentralSeries_mannSubgroup_eq_bot_of_isNilpotent` |
+| **4.15** 自己中心化正規部分群 ⟹ `M(G)` 冪零類 ≤ 3 | `commutator_mannSubgroup_four_eq_bot_of_centralizer_eq_self` / `nilpotencyClass_mannSubgroup_le_of_centralizer_eq_self` |
+| **4.16** 極大可換正規 `A` ⟹ `A = C_G(A)` | `Mann.lean:623` (冪零一般化) / `:724` (存在形) |
+| **4.17** `\|C_G(x)\| < \|C_G([k,x])\|` | `card_centralizer_lt_card_centralizer_commutator` (:326、core case :210) |
+| **4.18** `[K, M(G)] ⊆ Z(G)` | `commutator_mannSubgroup_le_center` |
+| **4.19** `F(M(G))` の冪零類 ≤ 4 | `lowerCentralSeries_map_fitting_mannSubgroup_eq_bot` |
+| **4.33** `G` `p`-可解 ⟹ 全 `p`-local `H` で `O_{p'}(H) ≤ O_{p'}(G)` | `Ch04.oPiCore_compl_le_oPiCore_compl_of_isPLocal` |
+
+⚠ **4.14-4.19 の「アンカー cite なし」は私の走査の artifact だった** — `Mann.lean` の
+file header が `* **Theorem 4.14** (Mann, p. 126): <名前>` 形式で全件を対応づけているのに、
+私のスクリプトは「アンカー行の次に現れる `theorem` 行」を取る実装だったため無関係な `def` を
+拾っていた。**アンカー地図は当たりを付ける道具であって被覆の証拠ではない** — 実体は必ず
+file header の対応表と `theorem` 一覧で確認する。
+
+⟹ **Ch.4 全 38 件被覆・補充ゼロ**。
+
+### Ch.5-Ch.7, Ch.9-Ch.10 — 未着手 (次の入口 = Ch.5 Transfer、30 件)
