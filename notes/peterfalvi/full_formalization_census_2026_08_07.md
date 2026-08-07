@@ -395,7 +395,7 @@ docstring が「in particular 直交する」と**散文で主張**していた�
 
 ⬜ **§8 の残り = (8.13)(c3) の 1 件のみ** ([issue 0174](../../issues/0174-peterfalvi-813-c3-support-membership.md))。
 
-### §9 = repo `S11` (書籍 pp.50-57、`pages/peterfalvi-p050..p057.png` 切り出し済) — **監査途中 ((9.1)-(9.8) 済)**
+### §9 = repo `S11` (書籍 pp.50-57、`pages/peterfalvi-p050..p057.png` 切り出し済) — **監査完了 (2026-08-07、残 1 件 = (9.11) の type-free 化)**
 
 書籍 §9 = **(9.1)-(9.11)** + (9.11) の sub-part (9.11.1)-(9.11.8)。型 II/III/IV の極大部分群の
 構造解析で、repo は `S11_MaximalII_III_IV/**` + `S13_CoreStructure` + 共有 infra
@@ -411,7 +411,13 @@ docstring が「in particular 直交する」と**散文で主張**していた�
 | (9.6) | ✅ 4 条項とも | `U ≠ C` / `H̄` が chief factor / `\|W̄₂\| = p` / `\|H̄\| = p^q`。算術段は `GroupTheory.coprimeFrobeniusAction_card_eq_prime_pow` ((9.1) 系から `\|H̄\| = \|C_H̄(W₁)\|^q` と `\|W̄₂\| ∣ p` で確定) |
 | (9.7) | ✅ **二分律 + 両ケースのデータ** | `S11.clifford_dichotomy` + carrier `CliffordCaseAData`/`CliffordCaseBData`。case (a) = `q` 個の位数 `p` 因子 (`exists_supIndep_aInvariant_family_of_iSup`) + `a ∣ p−1` (`aInvariantRestrictAut_range_card_dvd`)。case (b) = `U` 既約 + Galois 体モデル (`S11_GaloisFieldModel`: `F ≅ GF(p^q)`、`U* ≤ F*`、`η : W₁ ↪ Aut F` と twist 恒等式) + **書籍の "Furthermore" 3 条項** (`Ubar_cyclic` / `u_coprime_p_sub_one` / `u_dvd_norm_quotient` = `u ∣ (p^q−1)/(p−1)`) |
 | (9.8) | ✅ (a)(b)(c)(d) とも | (a) `a ∣ χ(1)` on `𝒳(H₀)` (`S11_SingleFactorCentralizer:319`、member 版 `:1129`) / (b) 可約メンバーの分類と次数 `qu` (`S12_HcBound:237,419,548`) / (c) `𝒮(H₀C)` の次数 `qu` 既約メンバー (`S15_CharacterDegreeSupply:129`、`HC` の線型指標から誘導) / (d) 次数 `qa` 既約が `(p−1)/a · \|U\|/(a\|U'\|)` 個以上 (`S11_SingleFactorCentralizer:478,554` の `a²\|U'\| ∣ (p−1)\|U\|` と exact count) |
-| (9.9)-(9.11) | ⬜ **未突合** | (9.9) case (b) の条項、(9.10) Frobenius 実現、(9.11) `𝒮(H₀C')` coherent + sub-part (9.11.1)-(9.11.8)。cite 密度は最大 ((9.11): 719) |
+| (9.9) | ✅ (a)(b)(c) とも | (a) `u ∣ χ(1)` on `𝒳(H₀)` と `𝒳(H₀C′)` 上の一様次数 `χ(1) = u` (`S13_CoreStructure:716` の `caseB_degree_qu`、Clifford 対応の次数は `CliffordSingleOrbit:594`) / (b) `𝒮(H₀)`・`𝒮(H₀C)` がちょうど `p−1` 個の可約メンバーを持ち次数 `qu` (`S11.reducible_count_sOf_H0supC` + `S12_HcBound:237`) / (c) 「`𝒮(H₀C′)` に既約が無い ⟹ `C = 1`」= `caseB_no_irreducible_forces_C_bot` (`CaseBXi:817`)、`u = (p^q−1)/(p−1)` は (9.10) の結論に含まれる |
+| (9.10) | ✅ **4 結論とも + case (b) の導出込み** | `S11.exceptional_case_frobenius_realization_of_trigger` (`ThetaCountAssembly:1151`): 「`𝒮(H₀C′)` に次数 `qu` の既約が無い」だけを仮定して (i) `H̄Ū` の固定点自由性 (= `H̄U` が核 `H̄` の Frobenius) (ii) `u = (p^q−1)/(p−1)` (iii) `IsCyclic U` (iv) **type II なら `HU` が核 `H` の Frobenius** を返す。書籍の「Then case (9.7.b) holds」は定理内部で**導出** ((9.8.c) の次数 `qu` 既約が case (a) を否定) |
+| (9.11) | ⚠ **types III/IV は閉、type-free 版は case (a) の 2 仮説が残る** → [issue 0175](../../issues/0175-pf-911-section9-casea-descent.md) | 書籍は Hypothesis (9.5) (= type II/III/IV) の下で `𝒮(H₀C′)` coherent。repo: **types III/IV は `S13.coherent_sOf_H0Cprime` で閉じている** (FT の live path)。type-free の §9 版 `S11.sOf_nineEleven_coherent` は二分律の両枝を通すが case (a) 側で `h2` (degree-`qa` base coherence) と `hrefuteEq` (maximality refuter) を仮説で受ける。[closed issue 1045](../../issues/closed/1045-pf-9-11-section9-level.md) の消化記録が「開いた carrier はちょうど 1 本 = `CaseASevenEightRefutation`」と結論し、§13 側の対応物が sorry-free で証明済・type 依存点は 4 箇所で**すべて type-free counterpart が在る**ので **descent 作業であって未解決数学ではない**。case (b) 側は無条件 (`sOf_caseB_coherent` / `caseB_coherent_sOf_cprime`) |
+| (9.11.1)-(9.11.8) | ✅ 8 件すべて repo に実体 | cite 数 40-130/件。(9.11) case (a) の内部段 (TI witness・inertia 入力・count 入力・norm bound ほか) で、上記 descent の材料 |
+
+⚠ **AxiomsCheck の (9.11) block のコメントが stale**: 「the remaining item of issue 1045」と
+書いてあるが issue 1045 は closed。issue 0175 で更新する。
 
 ⚠ **書籍の (9.8)(b) を pdftotext で読むと `μ_j ∉ 𝒮(H₀C)` に見える** (実際は `μ_j ∈ 𝒮(H₀C)`)。
 ページ画像 p053 で確認した — 否定の有無が反転する OCR 崩れは危険なので、条項の突合は必ず画像で。
