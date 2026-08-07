@@ -16025,6 +16025,14 @@ mathlib `Sylow.exists_subgroup_card_pow_prime` がそのまま書籍強度 (ペ�
 
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch01.IsPGroup.exists_normal_card_eq_pow
+-- **Isaacs Thm 1.30 の 2 条項** (issue 0176 の逐条監査で AxiomsCheck 未登録と判明、
+-- 2026-08-08 に登録)。書籍 p.31: `|G| = pq` (`q < p` 素数) ⟹ (i) Sylow `p` は正規、
+-- (ii) `q ∤ p−1` なら `G` は巡回。両方とも repo に実体が在った。
+-- ⚠ 監査中に一度 (ii) を「欠けている」と誤判定した — (i) の docstring の「前半」を
+-- 「後半が無い」と読んだため。実際は次の宣言が (ii) 本体だった。自認語は指標にならない。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch01.sylow_normal_of_card_eq_mul_prime_lt
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch01.isCyclic_of_card_eq_mul_prime_lt_of_not_dvd
 
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch08.center_perm_eq_bot
 #assert_only_allowed_axioms

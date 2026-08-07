@@ -112,7 +112,7 @@ Lemma 1.23 = `exists_normal_index_eq_prime` を `M = ⊤` に適用)。
 | 1.27 | 位数が対ごとに互いに素な有限正規部分群の族の積は直積 | `Ch01.iSupIndep_of_coprime_card_of_normal` | ✅ |
 | 1.28 | `F(G)` は **(i) 正規 (ii) 冪零 (iii) 正規冪零部分群をすべて含む** | `Ch01.fitting.normal` (:833) / `fitting.isNilpotent` (:1149) / `nilpotent_normal_le_fitting` (:1004) | ✅ **3 条項とも** |
 | 1.29 | 正規冪零 `K, L` ⟹ `KL` 冪零 | `Ch01.sup_isNilpotent_of_normal_nilpotent` | ✅ |
-| **1.30** | `\|G\| = pq` (`q < p` 素数) ⟹ **(i) Sylow `p` は正規** かつ **(ii) `q ∤ p−1` なら `G` は巡回** | (i) = `Ch01.sylow_p_subsingleton_of_card_eq_mul_prime_lt` | ⚠ **(ii) が欠けていた** — docstring 自身が「**前半**, uniqueness form」と自認 |
+| 1.30 | `\|G\| = pq` (`q < p` 素数) ⟹ **(i) Sylow `p` は正規** かつ **(ii) `q ∤ p−1` なら `G` は巡回** | (i) `Ch01.sylow_normal_of_card_eq_mul_prime_lt` / (ii) `Ch01.isCyclic_of_card_eq_mul_prime_lt_of_not_dvd` (:1358) | ✅ **2 条項とも** (AxiomsCheck 未登録だったので 2026-08-08 に登録) |
 | 1.31 | `\|G\| = p²q` ⟹ Sylow `p` か Sylow `q` が正規 | `Ch01.sylow_normal_of_card_eq_sq_mul_prime_lt` | ✅ |
 | 1.32 | `\|G\| = p³q` ⟹ 同上 (`\|G\| = 24` を除く) | `Ch01.sylow_normal_of_card_eq_cube_mul_prime` | ✅ |
 | 1.33 | `\|G\| = 24`、`n₂ > 1`、`n₃ > 1` ⟹ `G ≅ S₄` | `Ch01.mulEquiv_perm_fin_four_of_card_twenty_four` | ✅ |
@@ -120,9 +120,22 @@ Lemma 1.23 = `exists_normal_index_eq_prime` を `M = ⊤` に適用)。
 | 1.35 | `\|G\| = 2n` (`n` 奇) ⟹ 指数 2 の正規部分群 | `Ch01.normalSubgroup_index_two_of_card_two_mul_odd` | ✅ |
 | 1.36 | `\|G\| = p^a q` ⟹ 非単純 | `Ch01.exists_normal_ne_bot_ne_top_of_card_eq_pow_mul_prime` | ✅ |
 
-⚠ **1.30 (ii) が 2 つめの部分被覆**。1.24 と同じく **docstring が自ら「前半」と自認**しており、
-番号 grep でも cite 数でも出ない。**「前半」「弱形」「uniqueness form」のような自認語を
-grep する**のが有効な検出手段だと分かった。
+### 🚨 誤判定の実例 — 「前半」を「後半が無い」と読んだ (2026-08-08)
+
+**一度 1.30 (ii) を「部分被覆」と誤判定した**。`sylow_p_subsingleton_of_card_eq_mul_prime_lt` の
+docstring が「**前半**, uniqueness form」と書いているのを見て、そこで打ち切ったため。実際には
+**すぐ次の宣言**として `isCyclic_of_card_eq_mul_prime_lt_of_not_dvd` (:1358) が書籍そのままの
+statement で在り、docstring も「**後半**」と明記していた。
+
+⟹ **「前半」「弱形」「uniqueness form」等の自認語は部分被覆の指標にならない**。repo では
+**対で書く慣習**があり (`Problem 3F.3 前半/後半`、`Problem 3C.5 前半/後半`、`Thm 3.11 の前半` …)、
+「前半」は「この宣言が前半だ」の意であって「後半が無い」ではない。
+
+**正しい手順**: 自認語を見つけたら**その前後 ±5 宣言を必ず読む**。1 宣言だけ見て結論しない
+(Peterfalvi 監査の「assembly を endpoint と誤認」型と同根 — 本キャンペーン通算 10 件目)。
+
+⚠ ただし **1.24 は本物の部分被覆**だった (mathlib 側に正規条項が無い)。自認語が当たる場合も
+外れる場合もあるので、**判定は常に statement を読むこと**。
 
 ⬜ **残り: 1.2-1.4, 1.8, 1.9, 1.16, 1.37-1.46 の条項突合**。
 
