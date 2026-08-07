@@ -98,9 +98,18 @@ repo の `Ch08_PermutationGroups` も既に `IsPreprimitive` を使っている�
       ```
       ⚠ `Z(Sym Ω) = 1` も mathlib に無かった (mathlib の
       `Equiv.Perm.alternatingGroup.center_eq_bot` は**交代群**の中心)。両方 axiom-clean。
-- [ ] **ステップ 2**: Ch.1 から文書順に逐条監査 (書籍ページ画像で条項確定 → repo 突合)。
-      1 章ぶん終えるごとに census note を更新して commit。
-- [ ] census note を新設 (`notes/isaacs/full_formalization_census_2026_08_08.md`)
+- [x] **census note を新設 (2026-08-08)**:
+      [`notes/isaacs/full_formalization_census_2026_08_08.md`](../notes/isaacs/full_formalization_census_2026_08_08.md)
+- [ ] **ステップ 2 (進行中)**: Ch.1 から文書順に逐条監査。
+      - **Ch.1 の第 1 パス完了 (2026-08-08)**: 46/46 に cite あり。docstring の**アンカー位置**
+        (`**Isaacs Thm 1.N**`) に cite が無い 9 件 (1.1, 1.5, 1.6, 1.7, 1.10, 1.11, 1.17,
+        1.24, 1.25) を調査し、**9 件すべて mathlib 被覆**と確定 (対応表は census note §3)。
+      - ⚠ **1.24 の「正規」条項は要確認** — 書籍は `L ⊴ P` を主張。mathlib の
+        `exists_subgroup_card_pow_prime` が正規性まで返すかは未確認。
+      - ⬜ **残り 37 件の条項ごとの突合は未実施**。とくに 1.12-1.15 / 1.18-1.22 / 1.30-1.31 は
+        **1 つの file-header docstring が複数番号を列挙**しているだけなので、番号ごとの
+        statement の有無を個別確認する (Peterfalvi の「file docstring の散文が定理の代わり」型)。
+      - 1 章ぶん終えるごとに census note を更新して commit。
 
 ## 完了条件
 
