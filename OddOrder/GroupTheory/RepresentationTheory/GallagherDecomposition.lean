@@ -76,6 +76,69 @@ instance {G M : Type*} [Group G] [Finite G] [CommRing M] [IsDomain M] :
 
 variable {K : Type*} [Group K] {H : Subgroup K} [hH : H.Normal]
 
+/-- **Distinct linear twists of an extension stay distinct** (coprime degree).  For `χ ∈ Irr(K)`
+of degree `d` coprime to `[K:H]`, the twisting map `β ↦ χ · Inf(β)` on `Hom(K/H, ℂˣ)` is
+injective.
+
+The determinantal characters separate the twists: `det(χ·Inf β) = β^d · det χ`
+(`determinant_mul_linearClassFunction`), so `χ·Inf β₁ = χ·Inf β₂` forces `(β₁/β₂)^d = 1`; and
+`β₁/β₂` is trivial on `H`, hence killed by `[K:H]` as well.  Coprimality of `d` and `[K:H]` then
+makes `β₁/β₂` trivial.
+
+Extracted from `induce_eq_sum_mul_linearClassFunction`, which cites it for the distinctness of
+its constituents.  It is stated separately because the multiplicity-one *packaging* of that
+decomposition (a `Finset (IrreducibleCharacter K)` of cardinality `[K:H]`) needs exactly this
+injectivity, and re-deriving it inside every such repackaging would duplicate the determinantal
+argument. -/
+theorem injective_mul_linearClassFunction_of_coprime [Finite K]
+    {χ : ClassFunction K ℂ} (hχ : IsIrreducibleCharacter χ)
+    {d : ℕ} (hd_χ : χ 1 = (d : ℂ)) (hcop : Nat.Coprime H.index d) :
+    Function.Injective fun β : (K ⧸ H) →* ℂˣ =>
+      χ * linearClassFunction (β.comp (QuotientGroup.mk' H)) := by
+  letI : Fintype K := Fintype.ofFinite K
+  intro β₁ β₂ hcoe
+  simp only at hcoe
+  set f₁ := β₁.comp (QuotientGroup.mk' H) with hf₁
+  set f₂ := β₂.comp (QuotientGroup.mk' H) with hf₂
+  have hIrr₁ : IsIrreducibleCharacter (χ * linearClassFunction f₁) :=
+    isIrreducibleCharacter_mul_linearClassFunction hχ f₁
+  have hIrr₂ : IsIrreducibleCharacter (χ * linearClassFunction f₂) :=
+    isIrreducibleCharacter_mul_linearClassFunction hχ f₂
+  -- equal characters have equal determinantal characters
+  have hdeq : hIrr₁.determinant = hIrr₂.determinant := by
+    revert hIrr₁ hIrr₂
+    rw [hcoe]
+    intro h₁ h₂
+    rfl
+  have hdet₁ : hIrr₁.determinant = f₁ ^ d * hχ.determinant :=
+    hχ.determinant_mul_linearClassFunction f₁ hIrr₁ hd_χ
+  have hdet₂ : hIrr₂.determinant = f₂ ^ d * hχ.determinant :=
+    hχ.determinant_mul_linearClassFunction f₂ hIrr₂ hd_χ
+  have hpow : f₁ ^ d = f₂ ^ d :=
+    mul_right_cancel ((hdet₁.symm.trans hdeq).trans hdet₂)
+  -- `f₁/f₂` is trivial on `H`, hence index-torsion; and `d`-torsion by `hpow`
+  have htriv : ∀ h : ↥H, (f₁ * f₂⁻¹) ((h : K)) = 1 := fun h => by
+    have e1 : QuotientGroup.mk' H ((h : K)) = 1 :=
+      (QuotientGroup.eq_one_iff _).mpr h.2
+    rw [MonoidHom.mul_apply, MonoidHom.inv_apply, hf₁, hf₂, MonoidHom.comp_apply,
+      MonoidHom.comp_apply, e1, map_one, map_one, inv_one, mul_one]
+  have hq : (f₁ * f₂⁻¹) ^ H.index = 1 :=
+    pow_index_eq_one_of_forall_coe_eq_one htriv
+  have hd' : (f₁ * f₂⁻¹) ^ d = 1 := by
+    calc
+      (f₁ * f₂⁻¹) ^ d = f₁ ^ d * (f₂⁻¹) ^ d := mul_pow f₁ f₂⁻¹ d
+      _ = f₁ ^ d * (f₂ ^ d)⁻¹ := congrArg (f₁ ^ d * ·) (inv_pow f₂ d)
+      _ = f₂ ^ d * (f₂ ^ d)⁻¹ := congrArg (· * (f₂ ^ d)⁻¹) hpow
+      _ = 1 := mul_inv_cancel (f₂ ^ d)
+  have hf : f₁ * f₂⁻¹ = 1 := by
+    exact orderOf_eq_one_iff.mp (Nat.dvd_one.mp (hcop ▸
+      Nat.dvd_gcd
+        (orderOf_dvd_of_pow_eq_one (x := f₁ * f₂⁻¹) (n := H.index) hq)
+        (orderOf_dvd_of_pow_eq_one (x := f₁ * f₂⁻¹) (n := d) hd')))
+  have hf12 : f₁ = f₂ := mul_inv_eq_one.mp hf
+  rw [hf₁, hf₂] at hf12
+  exact (MonoidHom.cancel_right (QuotientGroup.mk'_surjective H)).mp hf12
+
 open scoped commutatorElement in
 /-- **Gallagher's decomposition, coprime abelian case** (Isaacs, *Character Theory*,
 Corollary 6.17 specialized; issue 9002 (G2)).  Let `H ⊴ K` finite with `K/H` abelian, let
@@ -132,51 +195,11 @@ theorem induce_eq_sum_mul_linearClassFunction [Finite K] [Fintype K]
   have hcoeΦ : ∀ β : (K ⧸ H) →* ℂˣ, ((Φ β : IrreducibleCharacter K) : ClassFunction K ℂ)
       = χ * linearClassFunction (β.comp (QuotientGroup.mk' H)) := fun β => rfl
   -- distinctness: the determinantal characters separate the twists (coprime degree)
-  have hΦinj : Function.Injective Φ := by
-    intro β₁ β₂ hβeq
-    have hcoe : χ * linearClassFunction (β₁.comp (QuotientGroup.mk' H))
-        = χ * linearClassFunction (β₂.comp (QuotientGroup.mk' H)) := by
-      rw [← hcoeΦ β₁, ← hcoeΦ β₂, hβeq]
-    set f₁ := β₁.comp (QuotientGroup.mk' H) with hf₁
-    set f₂ := β₂.comp (QuotientGroup.mk' H) with hf₂
-    have hIrr₁ : IsIrreducibleCharacter (χ * linearClassFunction f₁) :=
-      isIrreducibleCharacter_mul_linearClassFunction hχ f₁
-    have hIrr₂ : IsIrreducibleCharacter (χ * linearClassFunction f₂) :=
-      isIrreducibleCharacter_mul_linearClassFunction hχ f₂
-    -- equal characters have equal determinantal characters
-    have hdeq : hIrr₁.determinant = hIrr₂.determinant := by
-      revert hIrr₁ hIrr₂
-      rw [hcoe]
-      intro h₁ h₂
-      rfl
-    have hdet₁ : hIrr₁.determinant = f₁ ^ d * hχ.determinant :=
-      hχ.determinant_mul_linearClassFunction f₁ hIrr₁ hd_χ
-    have hdet₂ : hIrr₂.determinant = f₂ ^ d * hχ.determinant :=
-      hχ.determinant_mul_linearClassFunction f₂ hIrr₂ hd_χ
-    have hpow : f₁ ^ d = f₂ ^ d :=
-      mul_right_cancel ((hdet₁.symm.trans hdeq).trans hdet₂)
-    -- `f₁/f₂` is trivial on `H`, hence index-torsion; and `d`-torsion by `hpow`
-    have htriv : ∀ h : ↥H, (f₁ * f₂⁻¹) ((h : K)) = 1 := fun h => by
-      have e1 : QuotientGroup.mk' H ((h : K)) = 1 :=
-        (QuotientGroup.eq_one_iff _).mpr h.2
-      rw [MonoidHom.mul_apply, MonoidHom.inv_apply, hf₁, hf₂, MonoidHom.comp_apply,
-        MonoidHom.comp_apply, e1, map_one, map_one, inv_one, mul_one]
-    have hq : (f₁ * f₂⁻¹) ^ H.index = 1 :=
-      pow_index_eq_one_of_forall_coe_eq_one htriv
-    have hd' : (f₁ * f₂⁻¹) ^ d = 1 := by
-      calc
-        (f₁ * f₂⁻¹) ^ d = f₁ ^ d * (f₂⁻¹) ^ d := mul_pow f₁ f₂⁻¹ d
-        _ = f₁ ^ d * (f₂ ^ d)⁻¹ := congrArg (f₁ ^ d * ·) (inv_pow f₂ d)
-        _ = f₂ ^ d * (f₂ ^ d)⁻¹ := congrArg (· * (f₂ ^ d)⁻¹) hpow
-        _ = 1 := mul_inv_cancel (f₂ ^ d)
-    have hf : f₁ * f₂⁻¹ = 1 := by
-      exact orderOf_eq_one_iff.mp (Nat.dvd_one.mp (hcop ▸
-        Nat.dvd_gcd
-          (orderOf_dvd_of_pow_eq_one (x := f₁ * f₂⁻¹) (n := H.index) hq)
-          (orderOf_dvd_of_pow_eq_one (x := f₁ * f₂⁻¹) (n := d) hd')))
-    have hf12 : f₁ = f₂ := mul_inv_eq_one.mp hf
-    rw [hf₁, hf₂] at hf12
-    exact (MonoidHom.cancel_right (QuotientGroup.mk'_surjective H)).mp hf12
+  have hΦinj : Function.Injective Φ := fun β₁ β₂ hβeq =>
+    injective_mul_linearClassFunction_of_coprime hχ hd_χ hcop
+      (show χ * linearClassFunction (β₁.comp (QuotientGroup.mk' H))
+          = χ * linearClassFunction (β₂.comp (QuotientGroup.mk' H)) by
+        rw [← hcoeΦ β₁, ← hcoeΦ β₂, hβeq])
   -- the twists as a finset, of cardinality `[K:H]`
   set S : Finset (IrreducibleCharacter K) := Finset.univ.image Φ with hS
   have hcard_S : S.card = H.index := by
