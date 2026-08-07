@@ -158,9 +158,27 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
      `induce_invariant_constituent_apply_one_eq`)。docstring が `(1.7.b)` と書いており
      `(1.7)(b)` の番号 grep が 0 hit だったのが誤判定の原因。6 定理を AxiomsCheck に登録
      (全て axiom-clean)。⟹ **Part I の未形式化もゼロ**。
-  2. [issue 0174](0174-peterfalvi-813-c3-support-membership.md) — (8.13)(c3)
-  3. [issue 0175](0175-pf-911-section9-casea-descent.md) — (9.11) の type-free 化
+  2. [issue 0174](0174-peterfalvi-813-c3-support-membership.md) — (8.13)(c3)。
+     **Type I は 2026-08-08 に landing** (`escaping_mem_typeA_notMem_A1_of_typeI`、axiom-clean)。
+     **Type II は BG 側の作業**と判明: Theorem D(4) の第 4 成分 `x ∈ ASet N ⊤` を
+     `ASet N U₀` (正しい `(κ∪σ)'`-Hall) へ強める必要がある。Peterfalvi 側だけでは閉じない。
+  3. [issue 0175](0175-pf-911-section9-casea-descent.md) — (9.11) の type-free 化。
+     **2026-08-08 に依存を実測して scope を再評価**: `hnoV` の使用は 1 箇所だが、型固有の
+     実体は §15 補題 9 本で、§9 counterpart が在るのは 1 本のみ。「4 箇所を差し替える」ではなく
+     **~520 行の証明の移植 (複数 session 規模)**。
   4. 低優先繰延 2 件: (3.8) の packaging 差 / (5.6) の書籍仮説 (b)(c) ⟹ 分解存在 の橋渡し
+
+## 現況サマリ (2026-08-08)
+
+| 層 | 状態 |
+|---|---|
+| Part I (169 件) | **逐条監査完了・未形式化ゼロ** ((1.7)(b) の誤判定は 2026-08-08 に撤回) |
+| Part II (115 件) | **逐条監査完了・未形式化ゼロ**、補充 4 件すべて landing |
+| 条件付き 2 件 | (8.13)(c3) Type II = **BG 側前提** / (9.11) type-free = **複数 session の移植** |
+| 低優先繰延 | (3.8) packaging / (5.6) 橋渡し |
+
+⟹ **Peterfalvi 全 284 件の番号付き結果に書籍強度の実体があり、未形式化はゼロ**。
+残るのは「条件付き 2 件の仮説解消」と「低優先繰延 2 件」のみ。
 - **ステップ 3 ✅ 完了 (2026-08-08)**: Part I (§1-§14) の逐条監査を (1.1) から文書順に完了。1 章ぶん終えるごとに census note を更新した。
   - **2026-08-07 時点: §1-§6 完了 (全 63 件)**。
     正本 = [census note](../notes/peterfalvi/full_formalization_census_2026_08_07.md) §3.5 の各表。
