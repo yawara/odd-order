@@ -120,6 +120,29 @@ Lemma typeP_pairW S T W W1 W2 (defW : W1 \x W2 = W) :
 
 ⟹ **決着 (2026-08-07)**: 書籍の `W₂` 同定を採った (上記)。
 
+## 3.5. 逐条監査ログ (ステップ 3) — 文書順に進める
+
+⚠ **「cite あり」は監査済を意味しない**。ここに行が在るものだけが実際に書籍と逐条照合済。
+判定は **書籍のページ画像**を読んで条項ごとに突合すること (text は数式が OCR 崩れ)。
+
+### §1 = repo `S03` (書籍 pp.5-9、`pages/peterfalvi-p005..p009.png`)
+
+| 書籍 | 判定 | repo の実体 / 備考 |
+|---|---|---|
+| (1.1) | ✅ 実証明 | `not_isReal_of_ne_trivial_of_odd_card'`、`BrauerPermutationUnconditional` に pointwise 版 |
+| (1.2) | ✅ 実証明・仮説忠実 | `irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot` が `H` normal + `H ⊄ Ker χ` を正しく要求 |
+| (1.3) | ✅ **2026-08-07 に補充** | 旧状態は **engine 止まり**の部分被覆 → `S03_InductionRestriction.lean` で (a) の同値と (b) 両結論を追加。詳細下記 |
+| (1.4) | ✅ 実証明 | `isometry_difference_pair_structure` (`IsometryDifferencePair.lean`)。符号一様性・pairwise distinct まで込み |
+| (1.5) | ✅ 実証明 (a)-(e) 全条項 | (a)(b) `restrict_induce_eq_norm_smul_sum` 系 / (c) `induce_eq_induce_iff_conj` (書籍より強い **iff**) + `inner_induce_eq_zero_of_not_conj` / (d) `InducedIrreducible.lean:327` / (e) `CliffordDecomposition.lean:433` |
+| (1.6)-(1.10) | ⬜ 未監査 | 次の作業単位 |
+
+**(1.3) で見つかった型 (再発を探すべきパターン)**: engine (証明の中核となる補題) は在るが、
+**教科書の statement そのものが無い**。しかも engine の docstring が
+"the `Res μ − Σ dᵢχᵢ` bookkeeping of the textbook statement is **left to the consumers**"
+と自認していた。番号 grep では 100% 検出できない。
+⟹ **監査時は「その番号の docstring を持つ宣言の *結論* が書籍の結論と一致するか」を見る**。
+"engine" / "core" / "-style" / "left to the consumers" / "abstracted" は赤信号。
+
 ## 4. 未着手の census
 
 - **Part II (Suzuki の定理 A、書籍 pp.97-134)** — `Proposition N` / `Lemma N` の**章内リセット
