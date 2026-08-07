@@ -20285,7 +20285,12 @@ Part II の逐条監査で見つかった**特殊化債務**の解消。書籍�
 一般に忠実でない)。
 
 `Hypothesis` を `HypothesisA1` (= (A1) だけ) の拡張に変更し、§1 の全内容を `HypothesisA1`
-へ移したうえで、4 条項を一般形で証明した。 -/
+へ移したうえで、4 条項を一般形で証明した。
+
+併せて **§1 の Lemma (a) の第 2 全単射 `(y,z) ↦ zy`** を補充 (`invertedProdEquiv'`)。書籍は
+"The mappings `(y,z) ↦ yz` **and** `(y,z) ↦ zy` are bijections from `Y × Z` to `X`" と両方を
+主張するが repo は `yz` 側しか持たず、§3 Prop 1(b) (`N_D(X) = N_K(X) N_V(X)` — 反転因子 `K` が
+先) は `d⁻¹` に `yz` 版を当てて反転する回り道をしていた。 -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisA1.mem_normalCore_H_iff
@@ -20302,6 +20307,8 @@ Part II の逐条監査で見つかった**特殊化債務**の解消。書籍�
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisA1.orderOf_mk_distinguished_mul_t
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.quotientQEquiv
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.invertedProdEquiv'
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.inv_mem_invertedBy
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.HypothesisA1.quotientOfKernel
 

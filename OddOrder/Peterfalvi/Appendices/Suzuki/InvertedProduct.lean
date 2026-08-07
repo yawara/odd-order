@@ -241,6 +241,49 @@ noncomputable def invertedProdEquiv {M : Type*} [Group M] [Finite M] {t : M}
     change (x * (sqrtRoot X t x)⁻¹) * sqrtRoot X t x = x
     group
 
+/-- `Z = {x ∈ X | tˣt = x⁻¹}` is closed under inversion. -/
+lemma inv_mem_invertedBy {M : Type*} [Group M] {t : M} {X : Subgroup M}
+    (ht : t * t = 1) {z : M} (hz : z ∈ invertedBy X t) :
+    z⁻¹ ∈ invertedBy X t := by
+  refine ⟨X.inv_mem hz.1, ?_⟩
+  have h : t * z * t = z⁻¹ := hz.2
+  have htinv : t⁻¹ = t := inv_eq_of_mul_eq_one_right ht
+  calc t * z⁻¹ * t = (t * z * t)⁻¹ := by
+        rw [mul_inv_rev, mul_inv_rev, htinv, mul_assoc]
+      _ = z := by rw [h, inv_inv]
+      _ = z⁻¹⁻¹ := (inv_inv z).symm
+
+open invertedBy in
+/-- **Peterfalvi Part II, Ch. I §1, the Lemma (a)** (p. 101), second bijection —
+the book states that *both* `(y, z) ↦ yz` and `(y, z) ↦ zy` are bijections from
+`Y × Z` onto `X`.  This is the `zy` one, obtained from the `yz` one by inverting
+on both sides (`(y⁻¹ z⁻¹)⁻¹ = z y`, and `Y`, `Z` are inversion-closed).
+
+§3 Proposition 1(b) uses exactly this order: "By §1, Lemma,
+`N_D(X) = N_K(X) N_V(X)`" puts the inverted factor `K` first. -/
+noncomputable def invertedProdEquiv' {M : Type*} [Group M] [Finite M] {t : M}
+    {X : Subgroup M} (ht : t * t = 1) (hodd : Odd (Nat.card X))
+    (hnorm : ∀ x ∈ X, t * x * t ∈ X) :
+    ↥(X ⊓ Subgroup.centralizer ({t} : Set M)) × ↥(invertedBy X t) ≃ ↥X :=
+  ((Equiv.prodCongr
+      ⟨fun y => ⟨(y : M)⁻¹, Subgroup.inv_mem _ y.2⟩,
+       fun y => ⟨(y : M)⁻¹, Subgroup.inv_mem _ y.2⟩,
+       fun _ => Subtype.ext (inv_inv _), fun _ => Subtype.ext (inv_inv _)⟩
+      ⟨fun z => ⟨(z : M)⁻¹, inv_mem_invertedBy ht z.2⟩,
+       fun z => ⟨(z : M)⁻¹, inv_mem_invertedBy ht z.2⟩,
+       fun _ => Subtype.ext (inv_inv _), fun _ => Subtype.ext (inv_inv _)⟩).trans
+    (invertedProdEquiv ht hodd hnorm)).trans
+    ⟨fun x => ⟨(x : M)⁻¹, X.inv_mem x.2⟩, fun x => ⟨(x : M)⁻¹, X.inv_mem x.2⟩,
+     fun _ => Subtype.ext (inv_inv _), fun _ => Subtype.ext (inv_inv _)⟩
+
+@[simp] lemma invertedProdEquiv'_apply {M : Type*} [Group M] [Finite M] {t : M}
+    {X : Subgroup M} (ht : t * t = 1) (hodd : Odd (Nat.card X))
+    (hnorm : ∀ x ∈ X, t * x * t ∈ X)
+    (p : ↥(X ⊓ Subgroup.centralizer ({t} : Set M)) × ↥(invertedBy X t)) :
+    ((invertedProdEquiv' ht hodd hnorm p : ↥X) : M) = (p.2 : M) * (p.1 : M) := by
+  change ((p.1 : M)⁻¹ * (p.2 : M)⁻¹)⁻¹ = (p.2 : M) * (p.1 : M)
+  rw [mul_inv_rev, inv_inv, inv_inv]
+
 /-- **Peterfalvi Part II, Ch. I §1, the Lemma (a)** (p. 101), cardinality —
 `|X| = |Y||Z|` with `Y = C_X(t)`, `Z = {x ∈ X | tˣt = x⁻¹}`. -/
 theorem card_eq_card_centralizer_mul_ncard_invertedBy {M : Type*} [Group M]

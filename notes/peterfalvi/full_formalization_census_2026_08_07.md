@@ -674,11 +674,64 @@ Part I が「章番号.通し番号」の 1 系列 ((1.1)…(14.16)) なのに�
 Peterfalvi 側がこれを流用すると grep が混線する (現に上表の偽陰性 2 件を生んだ)。
 2026-08-08 に Peterfalvi 側の見出しを書籍どおりのローマ数字へ統一した。
 
-### 4.4 逐条監査 (ステップ 3 の Part II 版) の入口
+### 4.4 逐条監査 (ステップ 3 の Part II 版)
 
-上流優先 + 文書順 ⟹ **Ch.I §1 から**。各単位のページ画像は `references/peterfalvi/pages/` に
-pp.115-134 / pp.144-150 が既出、**pp.97-114 / pp.135-143 は未切り出し** (必要時に
-`pdftoppm -png -r 200` で作って**残す**)。
+上流優先 + 文書順 ⟹ **Ch.I §1 から**。ページ画像は `references/peterfalvi/pages/` に
+**pp.5-92 / 97-150 が全て揃った** (2026-08-08 に pp.97-114, 135-143 を追加)。
+
+#### Part II Ch.I §1 (書籍 pp.100-103) — **監査完了 (2026-08-08)**
+
+7 件 (Prop 1-6 + 無番号 Lemma) すべてに書籍強度の実体あり。**補充 2 件**:
+
+| 書籍 | repo | 判定 |
+|---|---|---|
+| Prop 1 (a) | `HypothesisA1.exists_mem_H_conj_inf_eq_D` + `odd_card_conj_inf` | 2 条項とも ✅ |
+| Prop 1 (b) | `normalizer_le_H_of_le_Q` (部分**群** X) + `centralizer_le_H_of_mem_Q` | ✅ 書籍は部分**集合** `X ⊂ Q` だが `N_G(X) ≤ N_G(⟨X⟩)` で同値 |
+| Prop 1 (c)(d) | `exists_sylow_two_le_Q` / `normalizer_Q_eq_H` + `normalizer_H_eq_H` | ✅ |
+| Prop 1 (e) | `Hypothesis.oPiCore_two_compl_eq_normalCore` | ✅ (書籍も 2-rank を明示仮説にする唯一の §1 条項ゆえ `Hypothesis` 側に残す) |
+| Prop 2 (a)-(d) | `odd_orderOf_mul_involution` / `isConj_of_involutions` / `bijOn_conj_of_involution_mem_Q` / `ncard_involutions_map_conj_eq_card_involutions_H` | ✅ 4 条項とも |
+| Prop 3 | `ncard_KSet_eq` + `image_conj_KSet_eq_involutions_H` | ✅ 2 条項とも |
+| Prop 4 (a)(b) | `CanonicalForm.*` / `existsUnique_distinguishedInvolution` | ✅ |
+| **Prop 4 (c)** | 旧: `normalCore_H_eq_bot` 等 (**(A2) で恒真**) | ⚠ **特殊化債務 → 一般形へ補充** |
+| Prop 5 | `V_eq_centralizer_distinguishedInvolution` + `W_eq_centralizer_involutions_H` | ✅ 2 条項とも |
+| Prop 6 (a)(b)(c) | `exists_mem_centralizer_smul_pair` + `cQ_mul_cD_eq_cH` / `even_card_cQ` / `exists_conj_mem_D_map_le_V` | ✅ |
+| **Lemma (a)** | 旧: `invertedProdEquiv` (**`yz` だけ**) | ⚠ **第 2 全単射 `zy` を補充** |
+| Lemma (b) | `closure_invertedBy_subgroupOf_normal` | ✅ |
+
+**補充 1 — Prop 4(c) の特殊化債務 (失敗様式 2 = 部分被覆)**。書籍の §1 は **(A1) だけ**を仮定する
+(p. 100「We assume in this section that `G` satisfies hypothesis (A1)」)。(A2)(A3) が入るのは
+§2 から (p. 103)。repo の `Hypothesis` が 3 つを束ねていたので、Prop 4(c)
+
+> `N = ⋂_x H^x = C_D(Q) ⊂ C_D(t)`。`Ḡ = G/N` は `Ω` 上 (A1) を満たし、`Q̄ ≅ Q`、`|s̄t̄| = |st|`。
+
+が **`N = 1` で恒真**に潰れていた (旧 docstring 自身が「all three subgroups equal to `1`」と自認)。
+これは飾りでなく、書籍は一般形を §3 で 2 度使う — Prop 1(a) の証明「The statement concerning
+`𝒩(L)` has been seen in §1, Proposition 4(c)」、Prop 1(c) の証明「By §1, Proposition 4(c), the
+order of `st` is equal to the order of `s̄t̄` in `L̄`」。`L = C_G(X)` の `Ω_X` 上の作用は一般に
+忠実でない (Prop 1(a) はその核を計算するのが仕事)。実際 repo も §3 で
+`normalCore_cH_eq_centralizer_cQ` を**独立に再証明**していた。
+
+修正 = `Hypothesis extends HypothesisA1` に変更 + §1 全体を `HypothesisA1` へ移送 + 5 条項を
+一般形で証明 (`mem_normalCore_H_iff` / `normalCore_H_le_D` / `normalCore_H_eq_centralizer_Q` /
+`normalCore_H_le_V` / `quotientOfKernel` / `quotientQEquiv` / `orderOf_mk_distinguished_mul_t`)。
+⚠ **(A2)/(A3) を実際に使っていたのは §1 全体で 2 箇所だけ**だった (Prop 1(e) とこの Prop 4(c))
+ので、証明本体は一切変えずに済んだ — memory `generalize-by-measuring-which-carrier-fields-are-used`
+の実例。
+
+**補充 2 — §1 Lemma (a) の第 2 全単射**。書籍は「The mappings `(y,z) ↦ yz` **and**
+`(y,z) ↦ zy` are bijections from `Y × Z` to `X`」と両方を主張するが repo は `yz` 側だけを持ち、
+§3 Prop 1(b) (`N_D(X) = N_K(X) N_V(X)` — **反転因子 `K` が先**) は `d⁻¹` に `yz` 版を当てて
+反転する回り道をしていた。`invertedProdEquiv'` を追加。
+
+#### 次の入口
+
+**Ch.I §2 (書籍 pp.103-104)** — Prop 1(a)-(c) / Prop 2 / 無番号 Lemma / 無番号 Corollary / Prop 3。
+
+### 4.5 ページ画像
+
+`references/peterfalvi/pages/` に **pp.5-92 / pp.97-150 が全て揃った** (2026-08-08 に
+pp.97-114 と pp.135-143 を `pdftoppm -png -r 200` で追加)。以後の Part II 監査で
+再レンダリングは不要。
 
 ## 5. 参照
 
