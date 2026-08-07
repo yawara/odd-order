@@ -512,7 +512,7 @@ Theorem (6.3) + (10.8) で、(11.5)-(11.9) を一切使わない。
 `no_typeV_maximal_unconditional` で常に discharge されている (書籍 §12 の証明も (10.10) を cite
 するので、内部段としては忠実)。headline (12.7) のみ無条件形に直した。
 
-### §13 = repo `S15_*` (書籍 pp.75-86、`pages/peterfalvi-p075..p086.png` 切り出し済) — **監査途中 (2026-08-07、(13.19) 済)**
+### §13 = repo `S15_*` (書籍 pp.75-86、`pages/peterfalvi-p075..p086.png` 切り出し済) — **監査完了 (2026-08-08、未形式化ゼロ)**
 
 書籍 §13 =「The Subgroups S and T」= **(13.1)-(13.19)** + (13.10) の sub-part
 **(13.10.1)-(13.10.3)** の計 **22 件**。repo は `S15_*` 系 (最大のクラスタ)。
@@ -536,11 +536,16 @@ Theorem (6.3) + (10.8) で、(11.5)-(11.9) を一切使わない。
 | (13.11) | ⭐ **2026-08-07 に書籍の仮説へ揃えた、3 条項とも** | `Hypothesis.numeric_bounds_of_lambdaCluster`: (a) `q ≥ 7 → m > 8/10` / (b) `q ≥ 5 → m > 7/10` / (c) `q = 3 → m > 49/100 ∧ u/c > (p²−1)/6`。Core 形は `numeric_bounds_of_caseB_facts` |
 | (13.12) | ✅ | `Hypothesis.c_eq_one_of_lambda_dichotomy`: `c = 1` (無条件、`pins` のみ)。λ の有無で二分し、λ 無しの Galois 枝は `C = ⊥` を直接与える |
 | (13.13) | ✅ 2 条項とも | `Hypothesis.caseA_parameters_of_clifford_caseA`: case (9.7.a) が `M = S` で成立 ⟹ `q = 3 ∧ u = (p−1)²/4` |
+| (13.14) | ✅ 4 条項とも | `cyclotomic_divisor_facts`: `(p^q−1)/(p−1)` が奇 ∧ (`p ≡ 1 mod q` → `q ∣ …`) ∧ (`p ≢ 1 mod q` → `(p^q−1)/(p−1)` と `p−1` が互いに素 ∧ 約数 `x` は `x ≡ 1 mod q`) |
+| (13.15) | ✅ | `T_caseB_v_eq_full_of_swapped_lambda_dichotomy` ほか (swap 経由で Singer パラメータの完全位数)。書籍の 2 分岐 (`p ≢ 1` / `p ≡ 1 mod q`) は (13.14) の場合分けとして扱われる |
+| (13.16) | ✅ **2 条項とも** | `normalizer_W1_of_D_eq_bot`: `N_G(W₁) = C_G(W₁) ∧ C_G(W₁) = Q ⊔ W₂`。S-side ミラー `normalizer_W2_of_c_eq_one` (`C_G(W₂) = P ⊔ W₁`)。⚠ 設計差: `hTTypeII`/`hDbot` を仮説で受ける (それぞれ (14.9)/(13.4) から discharge 可能) |
+| (13.17) | ✅ carrier が条項一致 | `TypeIOverNormalizerData`: `L` 極大 / `H = L_F` / `N_G(U) ≤ L` / `TypeIFrobeniusData L` / `U ≤ H` / `\|complement\| = pq` / `∃ y ∈ Q, W₂^y ≤ complement` — (13.17)(a)(b)(c) の全条項が genuine field |
+| (13.18) | ✅ | `S15_BridgeCharacterBasic` の `β_j`/`Γ_j` carrier (`β_j = Ind_{PW₁}^S 1 − 1_S − μ_{0j}`)。docstring が「de-opacified (W3 §15)、issue 3003 の訂正後は Peterfalvi (13.18) に忠実」と明記 |
 | (13.19) | ✅ **書籍の全条項が `TypeIOrthogonalityGridData` に在る** | `S15_SAndTGrid.lean:134` の `TypeIOrthogonalityGridData`: `e_eq_index` (本物の等式) / `betaL_eq` (**`β_L` を Dade 像 `(Ind_H^L 1_H − φ)^{τ₁}` に pin**) / `Ltau_orthogonal_eta` / `betaL_eta0_row_constant`+`col_constant` ((c) 第 1 条項 = `(β_L^τ, η_{0j})` の `j` 非依存) / `caseC`, `caseC_dual` (**(c1) = `(β_S^τ, φ^{τ₁}) ≡ 1 (mod 2)` ∧ `(\|H\|−1)/e ≤ (u−1)/q`、(c2) = `η_{0j}` odd-parity ∧ `p ≤ e`** の**両条項とも**)。producer `typeIOrthogonalityGridData_of_coherent78_of_c_eq_one_and_d_eq_one` は axiom-clean |
 | — | ⚠ **設計差 (§16 向け lossy adapter)** | 同ファイル `:36` の**旧** carrier `TypeIOrthogonalityData` は opaque `Prop` を **case ラベル**として持ち (`e_eq_index`/`disjoint_support`/`Ltau_orthogonal_eta`/`betaL_eta_independent`/`caseC1`/`caseC2`/duals)、implication field は (c1) の**次数評価だけ** (`caseC1_bound`)・(c2) の**parity だけ** (`caseC2_eta0j_odd`) を投影する。`betaL` も自由フィールドで pin が無い。producer `typeI_orthogonality_dichotomy_of_c_eq_one_and_d_eq_one` は grid 版から**本物の命題を入れて**いるので**証明としては忠実**だが、`∃ data, data.disjoint_support ∧ …` という statement 単体では (c1) の parity 条項・(c2) の `p ≤ e`・`β_L` の同定が読めない (issue 0172 §2 の失敗様式 2「`∃ X` decoupling」に近い形)。**書籍強度の (13.19) は grid 版**なので被覆漏れではない — §16 側 (`S16_NonExistenceG/BetaVanishing`) がこの adapter 経由で消費している |
 
-⬜ **残り: (13.14)-(13.18) の逐条突合** (次セッション)。
-✅ 済: (13.1)-(13.13) + (13.10.1)-(13.10.3) + (13.19)。
+✅ **§13 監査完了 (2026-08-08)** — 全 22 件に書籍強度の実体あり。補充 3 件 ((13.2)(e) /
+(13.10) / (13.11))、清掃・訂正 1 件 (closed issue 3001 への stale 参照)。
 番号 → 主な repo ファイルの対応 (grep 実測):
 (13.1)(13.2) `S15_SAndT_Setup/{PairStructure,SubcoherenceInputs,TSideDegrees}` /
 (13.3)(13.5) `S15_CaseBEndgameSupply/HSharpChosenBase`, `S15_CharacterDegreeEnginesSSide` /

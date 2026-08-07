@@ -167,8 +167,19 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
     **headline `basic_structure` の結論の最終連言が空**だった。`basic_structure` の結論も本物の
     `IsTISubset` へ差し替え。Type-V 排除は (10.10) で discharge (書籍にその仮説は無い)。
     stale docstring 訂正 1 件 (closed issue 3001 への「未解決」参照)。
-  - **次の入口**: §13 の残り = (13.3)-(13.18) + (13.10.1)-(13.10.3) の逐条突合
-    (番号→ファイル対応は census note に記録済)。
+  - **§13 監査完了 (2026-08-08)**: 22 件 ((13.1)-(13.19) + (13.10.1)-(13.10.3)) すべてに
+    書籍強度の実体あり。**補充 3 件**:
+    - **(13.2)(e)** `S15.Hypothesis.A0S_normedTI` — carrier が `Prop` 値フィールドで `True` を
+      入れており headline `basic_structure` の結論の最終連言が空だった (5 例目の opaque-Prop、
+      最も実害大)。`basic_structure` の結論も本物の `IsTISubset` へ差し替え。
+    - **(13.10)** `Hypothesis.analytic_inequality_of_lambdaCluster` — Core endpoint は書籍が
+      λ から導く 3 入力 (`hD`/`hv` = (13.4)、`hQcomm` = (13.2.b)-at-`T`) を仮説で受けていた。
+    - **(13.11)** `Hypothesis.numeric_bounds_of_lambdaCluster` — 同上の 3 条項版。
+    設計差の記録: (13.4) の「case (9.7.b) holds for `M = T`」は数値署名で表現 (定性形は
+    `clifford_dichotomy` に在る) / (13.16) は `hTTypeII`/`hDbot` を仮説で受ける (discharge 可) /
+    (13.19) の旧 carrier `TypeIOrthogonalityData` は lossy adapter (書籍強度は grid 版)。
+    stale docstring 訂正 1 件 (closed issue 3001)。
+  - **次の入口**: §14 = 書籍 pp.87-92「Non-existence of G」(repo `S16`)。
   - **監査手順の正本** = memory `textbook-coverage-audit-failure-modes`。
     **(1) AxiomsCheck の番号コメント → (2) 書籍ページ画像 → (3) 結論の突合** の順。
     🚨「実体が見つからない」を結論にしない (本セッションで 3 回誤判定しかけた)。
