@@ -137,6 +137,26 @@ statement で在り、docstring も「**後半**」と明記していた。
 ⚠ ただし **1.24 は本物の部分被覆**だった (mathlib 側に正規条項が無い)。自認語が当たる場合も
 外れる場合もあるので、**判定は常に statement を読むこと**。
 
-⬜ **残り: 1.2-1.4, 1.8, 1.9, 1.16, 1.37-1.46 の条項突合**。
+### Ch.1 §1A-§1B・§1F-§1G の突合 (2026-08-08) — **Ch.1 監査完了**
 
-### Ch.2-Ch.7, Ch.9-Ch.10 — 未着手
+| Isaacs | 書籍 | repo / mathlib | 判定 |
+|---|---|---|---|
+| 1.2 | `[G:H] = n` ⟹ `N ⊴ G`, `N ≤ H`, `[G:N] ∣ n!` の **3 条項** | `Ch01.normalCore_index_dvd_factorial` | ✅ 3 条項とも |
+| 1.3 | 単純群が指数 `n > 1` の部分群を持つ ⟹ `\|G\| ∣ n!` | `Ch01.card_dvd_factorial_of_simple_subgroup_index` | ✅ |
+| 1.4 | **Fundamental Counting Principle** — 剰余類 `↔` 軌道の全単射 `Hg ↦ a*g`、特に `\|O\| = [G:G_a]` | mathlib `MulAction.orbitEquivQuotientStabilizer` | ✅ 全単射そのもの |
+| 1.8 | `C(p^a·m, p^a) ≡ m (mod p)` | mathlib `Nat.choose_pow_mul_pow_mul_modEq_choose_nat` (`Choose/Lucas.lean:130`) | ✅ |
+| 1.9 | Cauchy | `Ch01.cauchy` (mathlib `exists_prime_orderOf_dvd_card'` の再述) | ✅ |
+| 1.16 | `n_p > 1`、`\|S ∩ T\|` 最大 ⟹ `n_p ≡ 1 (mod [S : S∩T])` | `Ch01.card_sylow_modEq_one_of_max_inter` | ✅ |
+| 1.37 | **Brodkey** — Sylow `p` が可換 ⟹ `∃ S,T`, `S ∩ T = O_p(G)` | `Ch01.exists_pair_inf_eq_opCore_of_abelian` | ✅ |
+| 1.38 | `S ∩ T` が極小 ⟹ `O_p(G) = S ∩ T` | `Ch01.opCore_eq_inf_of_minimal_sylow_inter` | ✅ |
+| 1.39 | `P` 可換 ⟹ `[G : O_p(G)] ≤ [G:P]²` | `Ch01.index_opCore_le_index_sylow_sq` | ✅ |
+| **1.40** | `P` 可換, `\|P\| > \|G\|^{1/2}` ⟹ **(i) `O_p(G) > 1`** かつ **(ii) `\|G\| ≠ p` なら `G` 非単純** | (i) `Ch01.opCore_ne_bot_of_card_sylow_sq_gt` | ⚠ **(ii) が欠けていた → 2026-08-08 に補充** `Ch01.not_isSimpleGroup_of_card_sylow_sq_gt` |
+| 1.41-1.46 | Chermak-Delgado | `OddOrder/GroupTheory/ChermakDelgado.lean` (条項ごとの対応は `Ch01_Sylow/Main.lean` 末尾の docstring が正本) | ✅ 1.44(a)(b)(c) / 1.45 の 4 条項も個別に名前がある |
+
+⚠ **1.40(ii) は本物の部分被覆**だった。1.30 で「次の宣言に在った」誤判定を出した直後なので、
+今回は **repo 全体を grep して実体が無いことを確認**してから補充した。
+
+⟹ **Ch.1 全 46 件の逐条監査完了**。補充 2 件 (**1.24 の正規条項** / **1.40(ii)**)、
+誤判定 1 件 (1.30(ii)、撤回済)。
+
+### Ch.2-Ch.7, Ch.9-Ch.10 — 未着手 (次の入口 = Ch.2 Subnormality、20 件)

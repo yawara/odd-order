@@ -626,7 +626,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 20600
+set_option linter.style.longFile 20700
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -16031,6 +16031,15 @@ mathlib `Sylow.exists_subgroup_card_pow_prime` がそのまま書籍強度 (ペ�
 -- ⚠ 監査中に一度 (ii) を「欠けている」と誤判定した — (i) の docstring の「前半」を
 -- 「後半が無い」と読んだため。実際は次の宣言が (ii) 本体だった。自認語は指標にならない。
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch01.sylow_normal_of_card_eq_mul_prime_lt
+-- **Isaacs Cor 1.40 の後半** (issue 0176、2026-08-08 に補充)。書籍 p.34 は
+-- 「`O_p(G) > 1`, and thus `G` is not simple unless `|G| = p`」と 2 条項で述べるが、
+-- repo は前半 (`opCore_ne_bot_of_card_sylow_sq_gt`) しか持っていなかった。
+-- ⚠ **repo 全体を grep しても後半の実体が無い**ことを確認してから補充した
+-- (1.30 で「次の宣言に在った」誤判定を出した直後なので、今回は範囲を絞らず確認)。
+-- 証明: 単純性 + `O_p(G) ≠ ⊥` ⟹ `O_p(G) = ⊤` ⟹ `G` は `p`-群。非自明 `p`-群の中心は
+-- 非自明で単純性から `Z(G) = ⊤` ⟹ `G` 可換 ⟹ `IsSimpleGroup.prime_card` で `|G|` は素数、
+-- `p` 冪と合わせて `|G| = p`。
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch01.not_isSimpleGroup_of_card_sylow_sq_gt
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch01.isCyclic_of_card_eq_mul_prime_lt_of_not_dvd
 

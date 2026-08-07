@@ -1050,6 +1050,58 @@ theorem opCore_ne_bot_of_card_sylow_sq_gt
   rw [h, Subgroup.index_bot] at hidx_le
   exact (hidx_le.trans_lt hPidx_sq).false
 
+
+/-- **Isaacs Cor 1.40** (後半、書籍 p. 34).  同じ仮定 (各 Sylow `p`-部分群が abelian かつ
+`|G| < |P|²`) の下で, `|G| ≠ p` ならば `G` は単純でない.
+
+書籍は (1.40) を「`O_p(G) > 1`, and thus `G` is not simple unless `|G| = p`」と 2 条項で
+述べる。前半は `opCore_ne_bot_of_card_sylow_sq_gt`, 本定理が後半 (issue 0176 の逐条監査で
+未形式化と判明し補充)。
+
+証明: `G` が単純と仮定する。前半より `O_p(G) ≠ ⊥` で `O_p(G) ⊴ G` なので単純性から
+`O_p(G) = ⊤`, つまり `G` 自身が `p`-群。単純群は巡回で位数が素数
+(`IsSimpleGroup.prime_card`) だから `|G|` は素数、かつ `p`-群ゆえ `p` 冪 ⟹ `|G| = p`。
+これは仮定 `|G| ≠ p` に反する。 -/
+theorem not_isSimpleGroup_of_card_sylow_sq_gt
+    [Finite G]
+    (hAbel : ∀ (S : Sylow p G) (x y : G), x ∈ (S : Subgroup G) → y ∈ (S : Subgroup G) →
+      Commute x y) (P : Sylow p G)
+    (hcard : Nat.card G < Nat.card (P : Subgroup G) ^ 2)
+    (hne : Nat.card G ≠ p) :
+    ¬ IsSimpleGroup G := by
+  intro hsimple
+  haveI := hsimple
+  have hOp : opCore p G ≠ ⊥ := opCore_ne_bot_of_card_sylow_sq_gt hAbel P hcard
+  -- 単純性から `O_p(G) = ⊤`
+  have hOptop : opCore p G = ⊤ :=
+    (hsimple.eq_bot_or_eq_top_of_normal (opCore p G) inferInstance).resolve_left hOp
+  -- したがって `G` 自身が `p`-群
+  have hPG : IsPGroup p G := by
+    have h := opCore_isPGroup p G
+    rw [hOptop] at h
+    exact h.of_equiv (Subgroup.topEquiv (G := G))
+  -- 非自明な `p`-群は中心が非自明。単純性から `Z(G) = ⊤`, つまり `G` は可換。
+  haveI : Nontrivial G := hsimple.toNontrivial
+  have hZ : Subgroup.center G ≠ ⊥ := by
+    have := hPG.center_nontrivial (G := G)
+    exact (Subgroup.nontrivial_iff_ne_bot _).mp this
+  have hZtop : Subgroup.center G = ⊤ :=
+    (hsimple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance).resolve_left hZ
+  letI : CommGroup G := Group.commGroupOfCenterEqTop hZtop
+  -- 可換単純群の位数は素数。`p`-群なので `p` 冪 ⟹ 指数は `1` ⟹ `|G| = p`。
+  have hprime : (Nat.card G).Prime := IsSimpleGroup.prime_card
+  obtain ⟨n, hn0, hn⟩ := hPG.nontrivial_iff_card.mp inferInstance
+  rw [hn] at hprime
+  have hn1 : n = 1 := by
+    by_contra hne1
+    have hdvd : p ∣ p ^ n := dvd_pow_self p (by omega)
+    rcases hprime.eq_one_or_self_of_dvd p hdvd with h | h
+    · exact (Fact.out (p := p.Prime)).one_lt.ne' h
+    · have hplt : p < p ^ n := by
+        calc p = p ^ 1 := (pow_one p).symm
+          _ < p ^ n := Nat.pow_lt_pow_right (Fact.out (p := p.Prime)).one_lt (by omega)
+      omega
+  exact hne (by rw [hn, hn1, pow_one])
 end -- 1F
 
 section /- 1G: Chermak–Delgado (pp. 41-44) -/
