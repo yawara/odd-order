@@ -483,6 +483,33 @@ sub-part **(10.10.1)-(10.10.4)** の計 15 件。repo は `S12_*` 系に分散�
 `S13_NonGaloisExclusion` の末尾にまとめた。循環はない — (11.3) の証明は `𝒮(H₀C)` への
 Theorem (6.3) + (10.8) で、(11.5)-(11.9) を一切使わない。
 
+### §12 = repo `S14` (書籍 pp.69-74、`pages/peterfalvi-p069..p074.png` 切り出し済) — **未着手 (下調べのみ、2026-08-07)**
+
+書籍 §12 =「Maximal Subgroups of Type I」= **(12.1)-(12.17)** の 17 件 (sub-part なし)。
+テキストから抽出した見出し (⚠ pdftotext 崩れあり、条項はページ画像で確定すること):
+
+| 番号 | 見出し (text 抽出、要画像確認) |
+|---|---|
+| (12.1) | Hypothesis. `L` maximal of Type I, `H = L_F` |
+| (12.2) | (Hypothesis (12.1) の下の帰結群) |
+| (12.3) | `L₁`, `L₂` 非共役な Type I 極大 |
+| (12.4) | `ψ ∈ CF(G)` が … に直交するとき |
+| (12.5) | `ρ` = Hypothesis (7.1) の写像 |
+| (12.6) | `L` が核 `H` の Frobenius 群なら … |
+| (12.7) | **Theorem**. Type I の極大 `M` はすべて核 `M_F` の Frobenius 群 |
+| (12.8) | Hypothesis. `π` = … を満たす素数 `p` の集合 |
+| (12.9) | `P₀` は階数 2 の可換群。極大 `L` が存在して … |
+| (12.10) | `H = L_F` とすると `L` は核 `H` の Frobenius 群 |
+| (12.11) | `M ∩ L` は `M` における `K` の補群で `M ∩ L ⊆ H` |
+| (12.12) | `E` = `L` における `H` の補群、`e = \|E\|` ⟹ `E` は巡回 … |
+| (12.13) | Notation. `𝒮 = {Ind_H^L θ ∣ θ ∈ Irr H, θ ≠ 1_H}`、`τ` = … |
+| (12.14) | `x` を (12.9) のものとする。`g ∈ K` なら `ψ(xg) = ψ_p(x) = χ(x)` |
+| (12.15) | `ρ_M` = Hypothesis (7.1) の写像 (`M`, `A₁(M)`) |
+| (12.16) | Theorem (12.7) の証明 |
+| (12.17) | Theorem (8.8) の case (b) が成立 |
+
+repo 側は `S14_MaximalI*` 系 (`OddOrder/Peterfalvi/S14_MaximalI/` ディレクトリ + `S14*.lean`)。
+
 ## 4. 未着手の census
 
 - **Part II (Suzuki の定理 A、書籍 pp.97-134)** — `Proposition N` / `Lemma N` の**章内リセット
