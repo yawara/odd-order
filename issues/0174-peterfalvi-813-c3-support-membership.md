@@ -195,9 +195,26 @@ created: 2026-08-07
       Peterfalvi (8.13)(c2) が同型の coprimality (`coprime_FT_signalizer_centralizerIn_typeA`)
       を既に持つので、そこから引ける可能性が高い。
 
-- [ ] **次の作業**: (i) `κ(N) ∩ σ(M) = ∅` (または `k ∉ σ(M)`) を repo で探す/証明する。
-      (ii) `Prop 14.2(g)` の repo 版から `|K₁|` 素数を取る。
-      (iii) 「商の位数と元の位数が互いに素 ⟹ 元は部分群に入る」で `x ∈ N'` を締める。
+- [x] **鎖を最小形まで詰めた (2026-08-08)**。`κ(N) ∩ σ(M) = ∅` は**不要**だった
+      (実際 BG Cor 15.9 は `r ∈ τ₂(N) ∩ σ(M)` を使うので両者は交わりうる)。正しい鎖は:
+
+      ```
+      |K₁| 素数 (= k)                        BG Prop 14.2(g)
+      K₁ ⊄ M_σ                              BG Cor 15.9 の (15.2) 経由 (K₁R が非冪零)
+        ⟹ K₁ ∩ M_σ = 1                      (|K₁| 素数ゆえ)
+        ⟹ M_σ ⊴ M なので M_σ ∩ K₁^g = 1 (∀g)
+      x ∈ M_σ の k-部分 ∈ M_σ ∩ (M∩N の Sylow k) ⊆ M_σ ∩ K₁^g = 1
+        ⟹ k ∤ |x|
+        ⟹ x の N/N' ≅ K₁ (位数 k) での像は自明
+        ⟹ x ∈ N'
+      ```
+
+      ⟹ **新規に要るのは `K₁ ∩ M_σ = 1` の 1 本だけ**。`|K₁|` 素数は Prop 14.2(g) から、
+      `K₁ ⊄ M_σ` は (15.2) から。あとは群論の定型 (正規部分群の元の素数部分・商の位数との互素性)。
+
+- [ ] **次の作業**: (i) repo の `S14_Prop142Support` から `|K₁|` 素数を取り出す。
+      (ii) (15.2) (`K₁R` 非冪零) の repo 版を探す/証明して `K₁ ∩ M_σ = 1` を出す。
+      (iii) 上の定型で `x ∈ N'` を締める。
       (iv) D(4) 第 4 成分を型依存の `A(N)` へ強め、(8.13)(c3) Type II を Type I と同じ形で出す。
 - [ ] 組み立て: `escapingCentralizers_control` と同じ入口
       (`mem_sigmaSharp_of_mem_aSet_of_escape` / `A1_eq_sigmaSharp` で `x ∈ sigmaSharp M`)
