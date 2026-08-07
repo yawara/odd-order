@@ -11550,6 +11550,16 @@ assembled Section 16 inputs depend only on Lean/mathlib's standard three axioms.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.dadeSupportHypotheses_typeI
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.hypothesis_of_typeIData
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.typeI_frobenius
+-- **Peterfalvi (12.7), the book statement** (issue 0172 §12 監査、2026-08-07) —
+-- `typeI_isFrobenius_kernel_maxNilpotentNormalHall`: 「Type I の極大部分群 `M` はすべて核 `M_F`
+-- の Frobenius 群」を**無条件**かつ**核を名指しで**述べる形。既存の `typeI_frobenius` は
+-- (i) Type-V 排除 `hnoV` を仮説で受け (書籍 (12.7) には無い; Theorem (10.10)
+-- `S12.no_typeV_maximal_unconditional` で discharge 可能 — `S14 → S12_Noncoherence` は
+-- 小さい葉 `S14_MaximalI.CentralizerContainment` だけが逆向きなので循環しない)、
+-- (ii) 結論の第 2 連言が carrier フィールド `data.kernel_eq_MF` で、その producer は `True` を
+-- 入れている (実質は `data.frobenius` + `TypeFData.H_eq` から出るが statement からは読めない)。
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S14.typeI_isFrobenius_kernel_maxNilpotentNormalHall
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.not_all_maximal_typeI
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.theorem88_caseB_holds
 #assert_only_allowed_axioms OddOrder.exists_section16MaximalPair_data

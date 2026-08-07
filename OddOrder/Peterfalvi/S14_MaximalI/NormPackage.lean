@@ -683,6 +683,29 @@ theorem typeI_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
            kernel_eq_MF_holds := trivial
            frobenius := typeI_frobenius_of_pi_empty hG (pi_empty hG hnoV) hM data }, trivial⟩
 
+/-- **Peterfalvi (12.7), the book statement** — *"Every maximal subgroup `M` of `G` of Type I is
+a Frobenius group with kernel `M_F`"* (p. 70), unconditional and with the kernel named.
+
+Two differences from `typeI_frobenius`, both of which hid the book's content behind carriers:
+
+* the Type-V exclusion `hnoV` is **discharged** here by the axiom-clean Theorem (10.10)
+  `S12.no_typeV_maximal_unconditional` (a `S14 → S12_Noncoherence` citation is available: only
+  the small leaf `S14_MaximalI.CentralizerContainment` sits upstream of `S12_Noncoherence`, so
+  no cycle forms).  The book's (12.7) has no such hypothesis;
+* the conclusion names the kernel as `M_F = maxNilpotentNormalHall M` rather than the carrier's
+  `typeF.H` — they agree by the `TypeFData` field `H_eq`, but only the present form lets a
+  reader see "with kernel `M_F`" without unfolding `TypeIFrobeniusData`.  (The carrier's
+  `kernel_eq_MF : Prop` field is *not* that identification: the `typeI_frobenius` producer
+  instantiates it with `True`.) -/
+theorem typeI_isFrobenius_kernel_maxNilpotentNormalHall [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hType : IsTypeI M) :
+    ∃ E : Subgroup ↥M, OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M
+      ((maxNilpotentNormalHall M).subgroupOf M) E := by
+  obtain ⟨data, -⟩ :=
+    typeI_frobenius hG (OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional hG) hM hType
+  exact ⟨data.complement, data.typeI.typeF.H_eq ▸ data.frobenius⟩
+
 /-- **The type-I Dade support is `H#`** (Peterfalvi (8.3)/(12.1) for the witness subgroup `L`).
 `typeIA L = centralizerSupport (H#) L` collapses to `H# = (H : Set G) \ {1}` (`H = L_F`): the
 Frobenius structure of `L` (from (12.7) `typeI_frobenius`) makes the centralizer condition vacuous
