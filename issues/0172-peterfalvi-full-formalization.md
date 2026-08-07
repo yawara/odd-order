@@ -107,8 +107,18 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
     (Lemma 1 = `TheoremAConclusion.Q_and_residual` / Lemma 3 =
     `stronglyReal_normalForm_and_centralizer_odd` / Lemma 5 = `lemmaFive_of_orderThree`)。
     §1 Prop 4(c) の一般形は Prop 1(a) の `normalCore_cH_*` が消費する形で実在。
-  - **次の入口 = Ch.II The First Case (書籍 pp.108-114)**: 仮説 (B1)(B2)、Theorem B、
-    ステップ (1)-(17)。
+  - **Ch.II 監査完了 (2026-08-08、補充 1 件)**: 18 件 ((B1)(B2) + Theorem B + step (1)-(17))。
+    **補充 = step (11) の第 3 条項 `T ⋊ C_Q(P) ≅ F ⋊ F*`** — 書籍 p.111 は 4 条項を主張するが
+    repo は半直積同型だけ `StepEleven.lean` の file docstring に散文で書かれているだけで
+    定理が無かった (census note §2 の失敗様式 3 =「言及のみ」の実例)。新 leaf
+    `FirstCase/StepElevenSemidirect.lean` で `fieldCoord`/`sInvertedTEquivField`/
+    `fieldCoord_conj` を証明 (全て axiom-clean)。
+    清掃: `char_eq_p` の「model の sorry を継承するので未登録」注記が stale → 訂正 + 登録。
+    stale docstring 2 件 (`StepElevenComplement` の「in subsequent commits」等) も訂正。
+    ⚠ ページ画像が必須だった — pdftotext は (4)(6)(8)(10) の式を壊す
+    (`|Q| = |C_Q(P)|^p = |F*|^p` が `|0| = |Cg(P)|'= |Fr-`)。
+  - **次の入口 = Ch.III The Structure of H (書籍 pp.115-121)**: Theorem C、§1/§2/§3 の
+    各 Proposition、各節のステップ。
 - **ステップ 3 ✅ 完了 (2026-08-08)**: Part I (§1-§14) の逐条監査を (1.1) から文書順に完了。1 章ぶん終えるごとに census note を更新した。
   - **2026-08-07 時点: §1-§6 完了 (全 63 件)**。
     正本 = [census note](../notes/peterfalvi/full_formalization_census_2026_08_07.md) §3.5 の各表。
