@@ -34,7 +34,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 3
 | § | 内容 | Isaacs 番号 | 状態 |
 |---|---|---|---|
 | 3A | 半直積構成 + Aut(G) 位数評価 | 3.1 – 3.4 | ✅ 3.1-3.4 |
-| 3B | Schur-Zassenhaus + 可解群基本 | 3.5 – 3.12 | ✅ 3.11 まで |
+| 3B | Schur-Zassenhaus + 可解群基本 | 3.5 – 3.12 | ✅ 3.12 まで全件 |
 | 3C | Hall 部分群 + 可解性判定 | 3.13 – 3.17 | ✅ Hall-E/C + 3.16 |
 | 3D | π-separable + Hall-Higman 1.2.3 | 3.18 – 3.22 | ✅ 3.18-3.22 |
 | 3E | Coprime action | 3.23 – 3.34 | ✅ Tier 1; Tier 2 は Ch.4 待ち |
@@ -82,13 +82,17 @@ CLAUDE.md mathlib ラッパー方針に従い, 純粋なリネームは書かな
 - Thm 3.10 (solvable 基本)
   - mathlib: `IsSolvable` instance による subgroup/quotient/extension 各種
 - Thm 3.11 (solvable min normal は elem abelian p-group)
-  - mathlib: **新規**? — mathlib にあるか要確認 (TODO)
+  - **本ファイル `solvable_minimal_normal_isElementaryAbelian` (:194)** で実装済.
+    可換性だけの前半は `solvable_minimal_normal_isAbelian` (:172, 有限性不要).
 - Thm 3.12 (complement conjugacy in solvable)
-  - mathlib: `IsConj` 系 + `SchurZassenhaus`
+  - **`OddOrder/Mathlib/SchurZassenhausConj.lean:1292`
+    `Subgroup.IsComplement'.exists_conj_of_coprime`** — 書籍どおり
+    「`N` または `G/N` が可解」の仮説つきで、共役元が `N` に取れるところまで。
 
-新規実装候補:
-- **Thm 3.11**: solvable group の minimal normal subgroup は elementary abelian p-group.
-  Isaacs 自身の証明は短い. mathlib に直接の対応があるか調査が必要.
+⚠ この表は 2026-08-08 の逐条監査 (issue 0176) で更新した。それ以前は 3.11 が
+「mathlib にあるか要確認 (TODO)」「新規実装候補」のままで、**実装済になった後も
+放置されていた**。3.12 も対応が「`IsConj` 系 + `SchurZassenhaus`」と曖昧なままだった。
+`notes/isaacs/full_formalization_census_2026_08_08.md` の「stale な自己注記」型。
 -/
 
 /-- A normal subgroup meeting a prime-order complement trivially lies in the normal Hall kernel.

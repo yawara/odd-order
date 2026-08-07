@@ -1062,11 +1062,18 @@ theorem IsAInvariant.fixedPointsOfMulAut {A : Type*} [Group A] (φ : A →* MulA
   rw [show (φ a) x = x from hx a]
   exact hx b
 
-/-! **Isaacs Thm 3.23, 3.24 (Coprime action)** ⭐ **FT クリティカル**.
-A coprime action ⇒ A-不変 Sylow 存在 (3.23a), 共役 (3.23b), Glauberman fixed point (3.24).
+/-! **Isaacs Thm 3.23, 3.24 (Coprime action)** ⭐ **FT クリティカル** — **実装済**.
 
-**Forward dep**: Ch.4 §4C-§4D (coprime action machinery) を要する. ~8-12 週の大規模.
-所在: `OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean` (placeholder). -/
+所在は owner chapter 規則で `OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean`:
+
+* **3.23(a)** `A`-不変 Sylow `p`-部分群の存在 — `exists_aInvariant_sylow` (:445)
+* **3.23(b)** 2 つの `A`-不変 Sylow は `C_G(A)` で共役 — `aInvariant_sylow_conj` (:498)
+* **3.24(a)** Glauberman fixed-point lemma — `glauberman_fixed_point_exists` (:187)
+* **3.24(b)** `A`-不変な 2 元は `C_G(A)` で共役 — `glauberman_fixed_points_conj` (:337)
+
+⚠ この注記は 2026-08-08 の逐条監査 (issue 0176) で更新した。それ以前は
+「**placeholder**」「**~8-12 週の大規模**」のままで、実装完了後も放置されていた
+(`notes/isaacs/full_formalization_census_2026_08_08.md` の「stale な自己注記」型)。 -/
 
 end -- 3E
 

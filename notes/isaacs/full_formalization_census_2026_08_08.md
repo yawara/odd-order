@@ -192,4 +192,33 @@ statement で在り、docstring も「**後半**」と明記していた。
 注記しかなく、本体は owner chapter 規則で **Ch04** に置かれている。章ディレクトリだけ見ると
 部分被覆と誤判定する。
 
-### Ch.3-Ch.7, Ch.9-Ch.10 — 未着手 (次の入口 = Ch.3 Split Extensions、36 件)
+### Ch.3 Split Extensions (36 件、書籍 pp.65-100) — **監査中**
+
+**アンカー cite は 36/36 に存在** (2026-08-08)。うち 5 件 (3.5, 3.8, 3.9, 3.10, 3.12) は
+アンカーが無かったが、`Ch03_SplitExtensions/Basic.lean` の **§3B 対応表**に記録されており
+実体を確認できた:
+
+| Isaacs | 書籍 | 実体 | 判定 |
+|---|---|---|---|
+| 3.5 | 可換 `N` の Schur-Zassenhaus (存在 + 共役) | mathlib `Subgroup.exists_right_complement'_of_coprime` + 共役は 3.12 | ✅ |
+| 3.8 | **Schur-Zassenhaus** 一般 (存在) | mathlib `Subgroup.exists_right_complement'_of_coprime` | ✅ |
+| 3.9 | `G` 可解 **⟺** `G^{(m)} = 1` | mathlib `isSolvable_def` | ✅ iff |
+| 3.10 | 可解群の基本 (部分群/商/拡大) | mathlib の `IsSolvable` instance 群 | ✅ |
+| 3.11 | 可解な極小正規部分群は可換、有限なら基本可換 `p`-群 | `Ch03.solvable_minimal_normal_isAbelian` (:172、有限性不要) + `..._isElementaryAbelian` (:194) | ✅ 2 条項とも |
+| 3.12 | 補元の共役性 (`N` か `G/N` が可解) | `Subgroup.IsComplement'.exists_conj_of_coprime` (**`OddOrder/Mathlib/SchurZassenhausConj.lean:1292`**) | ✅ 共役元が `N` に取れるところまで |
+| 3.23 | **coprime action**: (a) `A`-不変 Sylow の存在 (b) `C_G(A)` で共役 | `exists_aInvariant_sylow` (:445) / `aInvariant_sylow_conj` (:498) — **`Ch04_Commutators/ForwardFromCh03.lean`** | ✅ 2 条項とも |
+| 3.24 | Glauberman fixed-point lemma (a)(b) | `glauberman_fixed_point_exists` (:187) / `glauberman_fixed_points_conj` (:337) — 同ファイル | ✅ |
+
+⚠ **stale な自己注記を 3 件訂正 (2026-08-08)** — Ch.3 だけで:
+
+1. `Basic.lean:37` の進捗表「✅ **3.11 まで**」 → 実際は 3.12 まで全件。
+2. `Basic.lean` §3B 対応表の 3.11「mathlib に**あるか要確認 (TODO)**」「**新規実装候補**」
+   → 実装済 (同ファイル :194)。3.12 も「`IsConj` 系 + `SchurZassenhaus`」と曖昧なままだった。
+3. `Main.lean` の 3.23/3.24「**placeholder**」「**~8-12 週の大規模**」 → **全 4 条項実装済**。
+
+⟹ **Ch.1 の進捗表・Ch.2 の実在しない補題名と合わせて、stale な自己注記はこの repo で
+最も頻出する誤判定源**。監査では**注記を読んだら必ず実体を grep する**。
+
+⬜ **残り: 3.13-3.22, 3.25-3.36 の条項突合**。
+
+### Ch.4-Ch.7, Ch.9-Ch.10 — 未着手
