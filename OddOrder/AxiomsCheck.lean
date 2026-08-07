@@ -10381,6 +10381,13 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.induceHU_apply_one_eq_q_mul
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.card_range_dvd_card_sub_one_of_prime_card
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_commutator_U_centralizes_H
+-- **Peterfalvi (8.5)(c)** (issue 0172、2026-08-08): 書籍は「`V` は正規化群 `W` を持つ `G` の
+-- TI-subset」と述べる。2 つの半分がそれぞれ:
+--   TI 半分        `S10.typePData_V_ti : IsTISubset (typePV M data) data.W`
+--   正規化群半分   `TypePData.normalizer_V` を `X = V` に適用 (`V` の非空性は
+--                  `S12.typePData_typePV_nonempty`)。これは書籍 (8.4)(e) の projection で、
+--                  (8.5)(a) が `fitting_eq` の projection なのと同じ構図。
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typePData_V_ti
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_caseB_image_cyclic
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S11.singerAdapter_coprime_fpf

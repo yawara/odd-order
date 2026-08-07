@@ -332,10 +332,37 @@ packaging 差のすべてがゼロ**。
   - ~~**低優先の繰延 2 件**~~: 両方 2026-08-08 に解消 ((3.8) の packaging 差は個数条項 +
     再構成条項 + 逐語版で完済 / (5.6) は元から書籍強度)。
 
-## 完了条件
+## 完了条件 — **達成 (2026-08-08)**
 
-Peterfalvi の全番号付き結果 (Part I 169 + Part II + 補章) が**書籍強度**の Lean statement を
-持ち、特殊化債務ゼロ。各章の監査結果を census note に記録する。
+> Peterfalvi の全番号付き結果 (Part I 169 + Part II + 補章) が**書籍強度**の Lean statement を
+> 持ち、特殊化債務ゼロ。各章の監査結果を census note に記録する。
+
+**全 284 件 (Part I 169 + Part II/補章 115) を逐条監査し、書籍ページ画像で条項を確定した。**
+
+| 判定 | 件数 |
+|---|---|
+| 書籍強度の statement あり | **284 / 284** |
+| 未形式化 | **0** |
+| 条件付き (仮説として受けている) | **0** |
+| 特殊化債務 | **0** |
+| packaging 差 | **0** |
+
+census note の全表から `⬜` マーカーが消えた (最後の 3 件 = (1.7)(b) / (5.6) / (8.5)(b)(c) は
+2026-08-08 に解消 — うち (8.5) だけが真に未検証で、書籍 p.45 の画像で 3 条項とも突合し、
+TI 半分 `S10.typePData_V_ti` を AxiomsCheck に登録した)。
+
+### ⚠ 本キャンペーンで補充した実体 (抜粋)
+
+(8.9) / (1.6)(a)(b) / (2.7) / (3.7) / (3.8) 個数条項 + 再構成条項 + 逐語版 / (6.5) 一般化
+(issue 0173) / (6.7) 整数性 / (6.8)(b) の `τ = Ind` 同定と格子 / (8.13)(c3) Type I + Type II
+(issue 0174、BG Theorem D(4) の弱化解消込み) / (10.9) coherence-free 形 / Part II Ch.I §1
+Prop 4(c) の (A1)-only 一般形 + Lemma (a) 第 2 全単射 / Ch.II 段 (11) の `T ⋊ C_Q(P) ≅ F ⋊ F*` /
+App.I Prop 1 の `[IsSolvable D]` 除去 (Feit–Thompson 経由)。
+
+### 残る作業 (本 issue の外)
+
+- **Q₈ Brauer–Suzuki (`|S| = 8`)** — [issue 0147](0147-q8-brauer-suzuki-navarro.md) (Navarro 1998 経路)。
+  Peterfalvi の番号付き結果ではなく、lane c の補助定理。
 
 ## 参照
 
