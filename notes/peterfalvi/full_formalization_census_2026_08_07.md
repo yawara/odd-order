@@ -181,7 +181,11 @@ Lemma typeP_pairW S T W W1 W2 (defW : W1 \x W2 = W) :
 | (2.1) | ✅ 実証明 | `GroupTheory/CoprimeConjugacy.coset_eq_cosetConjImage`。BG §13 Lemma 13.7 も消費 |
 | (2.2) | ✅ 構造体として忠実 | `S04.Hypothesis` が (a)(b)(c) 全条項をフィールドで持つ ((b) の半直積は `centralizer_eq_sup` + `centralizer_disjoint` + `H_normalized` の 3 本に分解) |
 | (2.3) | ✅ **2026-08-07 に補充** | 両半分 (`isTISubset_of_forall_H_eq_bot` / `H_eq_bot_of_isTISubset` + `of_isTISubset`) は在ったが **書籍の同値そのものが無く**、さらに「TI-subset **with normalizer L**」の `N_G(A) = L` 節が欠けていた (docstring が「`L` を明示的な normalizer-bound として保持する」と自認)。`isTISubset_iff_forall_H_eq_bot` と `normalizer_eq_of_isTISubset` を追加 (後者の汎用核 `IsTISubset.set_normalizer_eq_of_nonempty_of_normalizes` は `TISubset.lean`) |
-| (2.4)-(2.11) | ⬜ 未監査 | 次の作業単位 (書籍 pp.11-14) |
+| (2.4)-(2.11) | ⬜ **未監査** | 次の作業単位 (書籍 pp.11-14 = `pages/peterfalvi-p011..p014.png`、切り出し済)。着手ヒント: `S04_*.lean` 内の cite は密で sub-part まで出る ((2.4.a) 13 / (2.4.b) 7 / (2.4.c) 1 / (2.5) 27 / (2.6.a) 11 / (2.6.b) 16 / (2.7) 6 / (2.8) 6 / (2.9) 9 / (2.10) 36 / (2.11) 7)。**ただし cite 密度は証拠にならない** — §1 で (1.3) が engine 止まり・(1.6.b) が特殊化だった。必ず各宣言の**結論**を書籍と突合すること |
+
+⚠ **番号衝突に注意**: `(2.5)` `(2.6)` `(2.7)` は BG・Isaacs にも同じ番号があり、repo 全体 grep では
+無関係ファイル (`BG/Ch1_Preliminary/S02_*`, `GroupTheory/RepresentationTheory/*` 等) が大量に混ざる。
+Peterfalvi §2 の監査では **`OddOrder/Peterfalvi/S04_*.lean` に絞って** grep すること。
 
 ## 4. 未着手の census
 
