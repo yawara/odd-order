@@ -12,9 +12,10 @@ T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272,
 2000), Part II, Ch. II, (11), pp. 111–112 — second half.
 
 Split from `StepEleven.lean` (file-length limit): the subgroup `T` of elements of `R`
-inverted by the distinguished involution, the decomposition `R = T × P`, and (in
-subsequent commits, issue 2053) the `C_Q(P)·C_W(P)`-normalization of `T` and the regular
-action of `C_Q(P)` on `𝒜 − {P}`.
+inverted by the distinguished involution, the decomposition `R = T × P`, the
+`C_Q(P)·C_W(P)`-normalization of `T` and the regular action of `C_Q(P)` on `𝒜 − {P}`.
+The remaining clause of step (11), `T ⋊ C_Q(P) ≅ F ⋊ F^*`, is in
+`StepElevenSemidirect.lean`.
 -/
 
 set_option autoImplicit false

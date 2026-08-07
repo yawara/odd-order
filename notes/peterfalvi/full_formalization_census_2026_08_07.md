@@ -767,7 +767,7 @@ Prop 3 は非常に忠実: `semilinearGroup F A = (F₊ ⋊ Fˣ) ⋊ A` が書�
 Lemma 1 は書籍が外部引用 ([HB] Ch.XI Ex 1.3a/Thm 3.3、[H] Kap.II Satz 10.12 等) で済ませる
 「`|Ω|−1` が 2 冪」「`L` 単純」を、repo は 3 つの標準モデルから**導出**している。
 
-#### Part II Ch.II The First Case (書籍 pp.108-114) — **監査完了 (2026-08-08、未形式化 1 件)**
+#### Part II Ch.II The First Case (書籍 pp.108-114) — **監査完了 (2026-08-08、補充 1 件)**
 
 18 件 (仮説 (B1)(B2) + Theorem B + ステップ (1)-(17))。**全ステップにファイルが存在**
 (`FirstCase/Step{One..Seventeen}*.lean`、補助分割込みで 29 file)。突合済は以下:
@@ -801,7 +801,8 @@ Lemma 1 は書籍が外部引用 ([HB] Ch.XI Ex 1.3a/Thm 3.3、[H] Kap.II Satz 1
 | (16) `Z₁PΣ ⊆ Z₂(P₁)` 等 | `StepSixteen` |
 | (17) Conclusion (最終矛盾) | `StepSeventeen*` の `false_of_transfer_control` |
 
-**⚠ 未形式化 1 件 — step (11) の `T ⋊ C_Q(P) ≅ F ⋊ F*`** (§2 の失敗様式 3 =「言及のみ」)。
+**補充 1 件 (2026-08-08 に landing) — step (11) の `T ⋊ C_Q(P) ≅ F ⋊ F*`** (§2 の失敗様式 3
+=「言及のみ」の実例)。
 `StepEleven.lean` の file docstring が 3 条項を散文で列挙するが、この半直積同型だけ**定理が無い**
 (`sInvertedT` に関する `MulEquiv` は repo 全体にゼロ)。他の 3 条項 —
 `R = T × P` (`coe_invImageF_eq_sInvertedT_mul_P` + `sInvertedT_spec` の `⊔`/`⊓`)、
@@ -810,16 +811,25 @@ Lemma 1 は書籍が外部引用 ([HB] Ch.XI Ex 1.3a/Thm 3.3、[H] Kap.II Satz 1
 はこの同型を消費していない (使うのは `T` の可換性・位数・`sInvertedT_spec` だけ) ので
 **証明の健全性には影響しない**が、書籍の条項なので補充対象。
 
-補充の道筋 (材料は揃っている): `θ : T ≃* Multiplicative F` を「`R → R/P ≅ emb(F) ≅ F` の
-`T` への制限」で作る (単射は `T ⊓ P = ⊥` + step (7) の `N = P`、全射は `card_sInvertedT`)。
-同変性は model の `qEquiv_conj` (`q·emb(x)·q⁻¹ = emb(x · qEquiv q⁻¹)`) から。
+補充の中身 (新 leaf `FirstCase/StepElevenSemidirect.lean`、全て axiom-clean):
+
+  fieldCoord            座標写像 `T → (F,+)` = 「`C_G(P)/N` 上で `x` が誘導する平行移動」
+  emb_fieldCoord        定義性質 `emb (fieldCoord x) = [x]`
+  fieldCoord_injective  単射 (`[x] = 1 ⟹ x ∈ N = P` (step (7)) かつ `T ⊓ P = ⊥`)
+  sInvertedTEquivField  `T ≃* (F,+)` (全射は `|T| = |F|` = `card_sInvertedT` から)
+  fieldCoord_conj       `C_Q(P)` 同変性 — 共役が `qEquiv q⁻¹` 倍に対応 (model の `qEquiv_conj`)
+
+最後の 2 本が合わせて書籍の `T ⋊ C_Q(P) ≅ F ⋊ F*` そのもの (`T` が `(F,+)`、`C_Q(P)` が
+`F*` で、作用が一致)。stale docstring 2 件も訂正 (`StepElevenComplement` の「in subsequent
+commits, issue 2053」= 実際は landing 済 / `StepEleven` の散文列挙に定理名を追記)。
 
 清掃 1 件: `AxiomsCheck` の「`char_eq_p` は model の `sorry` (9318) を継承するので未登録」注記が
 stale だった (Q₈ は 2026-08-07 に閉了) → 訂正し `char_eq_p` を登録 (axiom-clean 確認)。
 
 #### 次の入口
 
-**step (11) の `T ⋊ C_Q(P) ≅ F ⋊ F*` を補充**、その後 Ch.III (書籍 pp.115-121)。
+**Ch.III The Structure of H (書籍 pp.115-121)** — Theorem C、§1/§2/§3 の各 Proposition、
+各節のステップ。
 
 ### 4.5 ページ画像
 

@@ -507,6 +507,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSix
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepSeven
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEight
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepNine
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepElevenSemidirect
 import OddOrder.Peterfalvi.Appendices.Suzuki.SylowDecomposition
 import OddOrder.Peterfalvi.Appendices.Suzuki.ActualKActor
 import OddOrder.Peterfalvi.Appendices.Suzuki.SemilinearModel
@@ -13381,6 +13382,27 @@ transversal `1, {t y : y ∈ Q}` and the relation `t y x = x t y^x`.
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.p_dvd_card_Q_add_one
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.char_eq_p
+
+/-! **Peterfalvi Part II, Ch. II, step (11) の第 3 条項 — `T ⋊ C_Q(P) ≅ F ⋊ F*`**
+(`FirstCase/StepElevenSemidirect.lean`, issue 0172, 2026-08-08).  Part II の逐条監査で
+検出した「言及のみ」1 件の補充。書籍 p.111 の step (11) は 4 条項だが、repo は半直積同型
+だけ `StepEleven.lean` の file docstring に散文で書かれているだけで定理が無かった。
+
+  fieldCoord            — 座標写像 `T → (F,+)` (`C_G(P)/N` 上で `x` が誘導する平行移動)
+  emb_fieldCoord        — 定義性質 `emb (fieldCoord x) = [x]`
+  fieldCoord_injective  — `T ∩ N = T ∩ P = 1` (step (7) + step (11)) から
+  sInvertedTEquivField  — `T ≃* (F,+)` (全射は `|T| = |F|`)
+  fieldCoord_conj       — `C_Q(P)` 同変性 (共役 ↔ `qEquiv q⁻¹` 倍)
+
+最後の 2 本が合わせて書籍の `T ⋊ C_Q(P) ≅ F ⋊ F*` そのもの。 -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.emb_fieldCoord
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.fieldCoord_injective
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.sInvertedTEquivField
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.fieldCoord_conj
 
 /-! **Peterfalvi Appendix II, Proposition 2 — COMPLETE** (`Peterfalvi.Appendices.NearFields`,
 2026-07-21; 登録は 2026-07-22 に補完 — landing commit `42892fcb5` が AxiomsCheck 追記を

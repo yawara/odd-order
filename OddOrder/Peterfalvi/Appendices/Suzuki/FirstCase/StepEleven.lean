@@ -17,7 +17,8 @@ translation subgroup `emb(F) ⊴ C_G(P)/N` under the quotient map
 `C_G(P) → C_G(P)/N`, pushed forward along `C_G(P) ↪ G` — and proves:
 
 * `R = T × P`, with `T` a subgroup normalized by `C_Q(P)·C_W(P)` and
-  `T ⋊ C_Q(P) ≅ F ⋊ F^*`;
+  `T ⋊ C_Q(P) ≅ F ⋊ F^*` (proved in `StepElevenSemidirect.lean`:
+  `sInvertedTEquivField` + `fieldCoord_conj`);
 * `C_Q(P)` acts regularly on `𝒜 − {P}`, where `𝒜` denotes the set of
   subgroups of `R` of order `p` which are not contained in `T`.
 

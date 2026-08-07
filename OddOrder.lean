@@ -935,6 +935,7 @@ import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepNine
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTen
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepEleven
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepElevenComplement
+import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepElevenSemidirect
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelve
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveEndgame
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwelveConclusion
