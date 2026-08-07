@@ -92,12 +92,27 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
   - **stale 注記の訂正 2 件**: `six_three_of_imageData` の「repo は `H` 冪零を取る」(issue 0173 で
     解消済) と `six_two_of_imageData` の `B < K` の誤った正当化 (実際は**書籍 statement の修理**;
     `B = K` では書籍 (6.2) は偽)。
+  - **§1-§9 監査完了 (2026-08-07)**。未形式化/条件付きは **3 件のみ**:
+    1. **(1.7)(b)** — 重複度 `e` 付き一般形 (可換 inertia 商への拡張定理が前提。巡回版は済)
+    2. **(8.13)(c3)** — `x ∈ A(L) − A₁(L)` → [issue 0174](0174-peterfalvi-813-c3-support-membership.md)
+    3. **(9.11) の type-free 化** — types III/IV は閉、type II 込みの版は case (a) の 2 仮説が残る
+       → [issue 0175](0175-pf-911-section9-casea-descent.md) (descent 作業、未解決数学ではない)
+  - **§6 の補充 3 件・§8 の補充 1 件は landed** (下記)。**次の入口 = §10 (書籍 pp.58-63、repo `S12`)**
+    — census note に下調べ (cite 密度・監査手順) を記録済。
   - **§7 監査完了 (2026-08-07)**: 全 11 件 ((7.1)-(7.11)) で未形式化ゼロ・補充ゼロ。
     carrier の「証明書 field」((7.7.a)/(7.8.c.i)/(7.8.a)/(7.8.b)) は 4 つとも producer が
     discharge 済 (`hypothesis76OfFamily` / `hypothesis78OfDade` / `betaDecompOfFacts` /
     `normEstimates_of_source_orthogonal`)。(7.1) の `IsDadeIsometry` も書籍 (2.6) =
     `S04.Hypothesis.fullDadeIsometryData` が (2.2) だけから構成するので導出可能。
-  - **次の入口**: §8 = repo `S10` ((8.1)-(8.x)、書籍 pp.44-52)。
+  - **§8 監査完了 (2026-08-07)**: 18 件中 17 件被覆。補充 = `S12.typeII_centralizer_le_of_mem_A0`
+    ((8.13) の `X` 範囲を type II で完成 — (8.16) より escaping set が空になる退化)。
+    型定義 ((8.1)(8.3)(8.4)(8.6)(8.7)) は条項一致で、3 つの設計差 (Hall 条項が field でない /
+    `fitting_eq` が (8.5)(a) 形 / (8.6.a) の TI が `M_F^#` 版) はいずれも別途定理で被覆済。
+    ⚠ `S10_StructureSetup:910` の「(8.16) RETIRED (false-as-stated)」注記は **`A(M) = (M')^#` と
+    誤読した版**についてのもの — 書籍の (8.16) は type II の honest な `A(S)` で成立し証明済。
+  - **§9 監査完了 (2026-08-07)**: 11 件 + sub-part 8 件。(9.1) の指数 `|E|`・(9.8)(b) の
+    `μ_j ∈ 𝒮(H₀C)` はいずれも pdftotext が壊す箇所で、ページ画像で確定した。
+  - **次の入口**: §10 = repo `S12` ((10.1)-(10.11) + (10.10.1)-(10.10.4)、書籍 pp.58-63)。
   - **監査手順の正本** = memory `textbook-coverage-audit-failure-modes`。
     **(1) AxiomsCheck の番号コメント → (2) 書籍ページ画像 → (3) 結論の突合** の順。
     🚨「実体が見つからない」を結論にしない (本セッションで 3 回誤判定しかけた)。
