@@ -273,6 +273,28 @@ docstring が「in particular 直交する」と**散文で主張**していた�
 ⚠ **既知の罠**: (5.3)(b) の族の条件は `θ ≠ 1_K` **ではなく** `H ⊄ Ker θ`
 (memory [[read-book-hypothesis-before-adding-side-condition]] — 過去に取り違えて 1 session 誤診した)。
 
+### §6 = repo `S08` (書籍 pp.30-37、`pages/peterfalvi-p030..p037.png` 切り出し済) — **未監査 (着手準備のみ)**
+
+⚠ **結論の突合は未実施**。以下は着手のための下調べ。
+
+**AxiomsCheck の番号出現数** (「何がどこまで証明されたか」の目安。⚠ 数は証拠でない):
+`(6.1)` 9 / `(6.2)` 35 / `(6.3)` 18 / **`(6.4)` 1** / `(6.5)` 16 / `(6.6)` 55 / `(6.7)` 10 / `(6.8)` 19。
+
+**(6.4) が 1 件と少ないのは「定理でなく Hypothesis」だから** — `S08_SixFiveGeneral:39,366,375` が
+「Assume Hypothesis (6.4)」の形で使い、clause (c) を `H₁/M = [K/M, K/M]` (⟹ `K/H₁` 可換) と同定し、
+(6.4.c) が `L/H₁` を Frobenius 群にすることも記録している。⟹ **異常ではない**。
+
+**着手手順** (§5 で確立した順序を守る):
+1. **`AxiomsCheck.lean` の該当番号コメントを最初に読む** — 番号付きで到達点が書かれている
+2. 書籍ページ画像を読んで条項を確定
+3. 各宣言の**結論**を条項ごとに突合 (repo 全体 grep + 結論の形での grep)
+
+**既知の手がかり**: (6.2)/(6.3) は `S08_SixTwoThreeFromImageFamilies` に oracle 無し版
+(`six_two_of_imageData` / `six_three_of_imageData`、issues 0153/0154)。(6.5)(a) の冒頭一文
+「Since `K/H₁` is abelian and non-trivial, (6.3.b) holds by (5.7)」(書籍 p.31) は
+`S08_SixFiveGeneral` が一般核で供給。(6.6) は `CoherenceUnion:568` に「repeated use of (5.6)」
+反復エンジン + `NormInequalities:986` に degree-ratio 界。
+
 ## 4. 未着手の census
 
 - **Part II (Suzuki の定理 A、書籍 pp.97-134)** — `Proposition N` / `Lemma N` の**章内リセット
