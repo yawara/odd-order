@@ -74,7 +74,7 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
   (8.8)+(8.9) の合成 `FTtypeP_pair_witness` が同ファイル :712 にある。
 
 - **ステップ 2**: Part II + 補章の census (章内リセット番号なので手作業寄り)。
-- **ステップ 3 (進行中)**: Part I の逐条監査を (1.1) から文書順に。1 章ぶん終えるごとに census note を更新。
+- **ステップ 3 ✅ 完了 (2026-08-08)**: Part I (§1-§14) の逐条監査を (1.1) から文書順に完了。1 章ぶん終えるごとに census note を更新した。
   - **2026-08-07 時点: §1-§6 完了 (全 63 件)**。
     正本 = [census note](../notes/peterfalvi/full_formalization_census_2026_08_07.md) §3.5 の各表。
   - **§6 の補充 3 件 (2026-08-07)**:
@@ -179,7 +179,14 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
     `clifford_dichotomy` に在る) / (13.16) は `hTTypeII`/`hDbot` を仮説で受ける (discharge 可) /
     (13.19) の旧 carrier `TypeIOrthogonalityData` は lossy adapter (書籍強度は grid 版)。
     stale docstring 訂正 1 件 (closed issue 3001)。
-  - **次の入口**: §14 = 書籍 pp.87-92「Non-existence of G」(repo `S16`)。
+  - **§14 監査完了 (2026-08-08) ⟹ ステップ 3 (Part I §1-§14 の逐条監査) 完了**:
+    20 件 ((14.1)-(14.16) + (14.11.1)-(14.11.4)) すべてに書籍強度の実体あり、**補充ゼロ**。
+    (14.2) = `S16.FieldNormalizerData` が (a)(b) の条項一致 ((a) `σ` 経由の体モデル同定 +
+    condition (A)、(b) `Q` の可換 `p'` 性 + `W₂` の正規化)。総組み立て
+    `S16.field_normalizer_structure` は書籍の結び「By (14.12), (14.16) and (14.7), the proof
+    of Theorem (14.2) is complete」を**そのまま**写した分岐構造で、`feitThompson` まで axiom-clean。
+  - **次の入口**: ステップ 2 = Part II (Suzuki の定理 A、書籍 pp.97-134) + 補章 (Huppert /
+    Near-Fields / Suzuki 2-Groups / Feit–Sibley) の census。章内リセット番号なので手作業寄り。
   - **監査手順の正本** = memory `textbook-coverage-audit-failure-modes`。
     **(1) AxiomsCheck の番号コメント → (2) 書籍ページ画像 → (3) 結論の突合** の順。
     🚨「実体が見つからない」を結論にしない (本セッションで 3 回誤判定しかけた)。

@@ -559,7 +559,7 @@ Theorem (6.3) + (10.8) で、(11.5)-(11.9) を一切使わない。
 `GroupTheory/WielandtFixedPoint` / (13.17) `S15_SAndTDefs` / (13.18) `S15_SAndTGrid`,
 `S10_TypePSupportA0`。
 
-### §14 = repo `S16_*` (書籍 pp.87-92、`pages/peterfalvi-p087..p092.png` 切り出し済) — **監査途中 (2026-08-08、(14.1)(14.2) 済)**
+### §14 = repo `S16_*` (書籍 pp.87-92、`pages/peterfalvi-p087..p092.png` 切り出し済) — **監査完了 (2026-08-08、未形式化ゼロ・補充ゼロ)**
 
 書籍 §14 =「Non-existence of G」= **(14.1)-(14.16)** + (14.11) の sub-part
 **(14.11.1)-(14.11.4)** の計 **20 件**。Part I の最終章で、(14.2) の証明完了が FT 定理の完成。
@@ -570,7 +570,28 @@ Theorem (6.3) + (10.8) で、(11.5)-(11.9) を一切使わない。
 | (14.1) Hypothesis | ✅ | `q < p` — `S16.Hypothesis` の field `q_lt_p` (`S16_CoreLemmas:46`) |
 | (14.2) Theorem | ✅ **(a)(b) とも carrier が条項一致** | `S16.FieldNormalizerData` (`S16_CoreLemmas:572`) が `BG.AppC.FieldNormalizerData p q G` を extend: **(a)** `σ` 単射準同型 + `sigma_P_eq_P` (`P` = 加法群 `F = 𝔽_{p^q}` の像) + `sigma_U_eq_U` (`U` = ノルム 1 補群 `U*`、位数 `(p^q−1)/(p−1)` の像) + `sigma_P0_eq_W2` (`W₂` = 素体直線 `𝔽_p` の像) + `cyclotomic_coprime` = condition (A) = 「`(p^q−1)/(p−1)` は `p−1` と互いに素」 / **(b)** `Q` の可換性・`p'` 性と `primeLine_normalizes_Q` (`W₂` が `Q` を正規化) ほか。書籍の「(a)(b) は BG App.C Theorem C により `p ≤ q` を導き (14.1) に矛盾」は `BG.AppC.theoremC` + `S16.nonexistence_of_G` + `BG.AppC.final_contradiction` の連鎖で、`feitThompson` まで axiom-clean |
 
-⬜ **残り: (14.3)-(14.16) + (14.11.1)-(14.11.4) の逐条突合** (次セッション)。
+| (14.3) Hypothesis | ✅ | `S16.LHypothesis` (`S16_NonExistenceG/SubgroupL:38`): `L` 極大 ⊇ `N_G(U)` / `H = L_F` / `ℒ` / `τ`,`τ₁` / 次数 `\|L:H\|` の `φ`。(b) の `β_S`,`β_T`,`β_L` は `S15_BridgeCharacterBasic` の carrier |
+| (14.4) | ✅ | `T_side_caseB_facts` ((13.13)+(13.15) 経由で `v = (q^p−1)/(q−1)`、case (9.7.b) at `T`) |
+| (14.5) | ✅ | `exists_y_L_structure`: `∃ y ∈ Q`, `L = H ⋊ (W₁W₂^y)` (repo では `W₂^y ≤` Frobenius 補群の形)。`S15_SAndT:927` に「(14.5) 小補群の排除」節 |
+| (14.6) | ✅ | `S15_SSideGaloisFieldModel:217` 「S-side case (9.7.b) with explicit sharp parameters」+ `S15_CaseAOmegaFixedPointFree` (`W₂^y` が `Ω₁(Z(R))` 上 fpf という書籍の矛盾論法) |
+| (14.7) | ✅ | `field_normalizer_of_U_characteristic`: `U` が `H` で characteristic ⟹ `Nonempty (FieldNormalizerData hyp)` (= Theorem (14.2) が成立)。**`sorry` なし** |
+| (14.8) | ✅ (a)(b) とも | (a) `q_pow_gt_p_pow`: `q^{p+1} > p^{q+1}` (`Hypothesis` 版もあり) / (b) `cyclotomic_ratio_gt_of_q_lt_p`: `((q^p−1)/(q−1) − 1)/p > ((p^q−1)/(p−1) − 1)/q` (書籍の `(v−1)/p > (u−1)/q` を (14.4) の `v` と (13.2.c) の `u` 上界で表した形) |
+| (14.9) | ✅ | `T` は type II — `S16_NonExistenceG/TSideTypeP` の type-III 排除群 + `S13.no_typeIV_maximal`/(10.10) |
+| (14.10) Hypothesis | ✅ | `S16.MHypothesis` (`S16_NonExistenceG/SubgroupMCore`): `M` 極大 ⊇ `N_G(V)`。`exists_MHypothesis` が producer |
+| (14.11) | ✅ | `K = V` と `\|M : K\| = pq` — `SubgroupMCore` の `K_eq_MF`/`e_eq_index` (`e = pq`) |
+| (14.11.1)-(14.11.4) | ✅ 4 件とも | (1) `k > 2pv` 系 (`S15_SAndTDefs:980`, `KeyInequality`) / (2) `e = pq` と `β` の η-grid 展開 (`CoherentEtaOrthogonality:330`) / (3) 一般元集合の被覆 (`S16_G0Coprime`, `S15_SAndTDefs:1013`) / (4) 結論 = norm cascade の矛盾 (`KeyInequality:179`) |
+| (14.12) | ✅ | `field_normalizer_of_L_conj_M`: `L` が `M` に共役 ⟹ Theorem (14.2) が成立 |
+| (14.13) Hypothesis | ✅ | `NonConjugateHypothesis` (`L` は `M` に非共役、`h = \|H\|`) |
+| (14.14) | ✅ 2 分岐とも | `(β_L^τ, ψ^{τ₁}) = 0` / `≠ 0` の二分律 (`S15_BridgeCharacterBasic:78` ほか、case (b) は `CaseBContradictionData`) |
+| (14.15) | ✅ | `q_eq_three_of_p_pow_q_sub_two_lt_q_sq` + `p_eq_seven_of_q_eq_three_modEq_one_and_lt_q_sq` (`S16_CoreLemmas`) |
+| (14.16) | ✅ | `H_eq_U` (`ComparingLM:533`): `H = U`。`U_characteristic_of_H_eq_U` で (14.7) の分岐仮定に矛盾 |
+
+🏁 **§14 の総組み立て** `S16.field_normalizer_structure` (`ComparingLM:1036`) が書籍の結び
+「By (14.12), (14.16) and (14.7), the proof of Theorem (14.2) is complete」を**そのまま**写す:
+(14.3) `exists_LHypothesis` → `U` characteristic か否かで分岐 → yes なら (14.7)、no なら
+(14.10) `exists_MHypothesis` → `L ~ M` か否かで分岐 → yes なら (14.12)、no なら
+(14.13)-(14.16) `H_eq_U` + `U_characteristic_of_H_eq_U` で分岐仮定に矛盾。
+`field_normalizer_structure` / `H_eq_U` / `feitThompson` はいずれも axiom-clean。
 番号 → 主な repo ファイル (grep 実測): (14.3)-(14.7) `S16_NonExistenceG/{SubgroupL,TSideTypeP,BetaVanishing}`,
 `S15_SAndT` / (14.8) `S16_NonExistenceG/KeyInequalityArithmetic` / (14.9) `S15_SAndTGrid`,
 `Isaacs/Ch06_FrobeniusActions/FrobeniusGroupQuotient` / (14.10)(14.11) `S16_NonExistenceG/SubgroupMCore`,
