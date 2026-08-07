@@ -55,10 +55,32 @@ created: 2026-08-07
       `mainSubgroup N tauN = maxNilpotentNormalHall N = Msigma N` を保証するので、
       `A1_eq_sigmaSharp` の適用条件も揃う。
 
-- [ ] **残る作業は `x ∈ ASet N ⊤` → `x ∈ typeA N tauN` の橋だけ**。`typeA` は型ごとの
-      `centralizerSupport` 定義 (`MaximalSubgroupType.lean`) で、`ASet N ⊤` は BG 側の定義。
-      両者を結ぶ補題が repo に無いようなので、そこを特定して足す (あるいは既存の
-      `S10_MinimalSimpleBasic` の型一律ブリッジを再利用する)。
+- [x] **`x ∈ ASet N ⊤` → `x ∈ typeA N tauN` の橋を解析 (2026-08-08)**。書籍 (8.10) (p.47) の
+      定義をページ画像で確定した:
+
+      ```
+      M_s = H (= M_F)  if Type I, II, V ;  M'  if Type III, IV
+      A₁(M) = M_s^#
+      Type I : A(M) = A₀(M) = ⋃_{x ∈ H^#} C_M (x)^#     ← host は M
+      type 𝒫 : A(M)          = ⋃_{x ∈ M_s^#} C_{M'}(x)^#  ← host は M'
+      ```
+
+      repo の `mainSubgroup` / `supportHost` はこれと**完全一致**している (定義の突合は OK)。
+
+      **Type I は完全に閉じる**: `Msigma N = MF N = H` かつ host が `N` なので
+      `hatMsigma N = {a ∈ N | ∃ y ∈ H^#, a ∈ C_G(y)}` と
+      `A(N) = {a ∈ N | a ≠ 1 ∧ ∃ y ∈ H^#, a ∈ C_N(y)}` は
+      **`A(N) = hatMsigma N ∖ {1}`** で一致する (`a ∈ N` なので `C_N(y) = C_G(y) ∩ N` の差は消える)。
+      `a ≠ 1` は D(4) 第 4 成分の `x ∉ Msigma N` から出る (`1 ∈ Msigma N`)。
+
+      ⚠ **Type II にはギャップがある**: host が `N'` なので `x ∈ N'` が別途要る。
+      D(4) が返すのは `x ∈ ASet N ⊤ = hatMsigma N` (host は `N`) までで、`x ∈ N'` は含まない。
+      `[N,N] = H ⋊ U` (書籍 (8.12)) から `H ≤ N'` は出るが、「`H^#` の元を中心化する `x ∈ N`」が
+      `N'` に入る理由は自明でない。
+
+- [ ] **次の作業**: (i) Type I 版を先に landing させる (完全に閉じているので即書ける)。
+      (ii) Type II 版の `x ∈ N'` をどこから取るか特定する — 候補は BG Theorem B(5)
+      (`A(M) − M_σ` の TI 性) か、書籍 (8.13)(c1) の `C_G(x) = C_{L_F}(x) ⋊ C_M(x)` 分解。
 - [ ] 組み立て: `escapingCentralizers_control` と同じ入口
       (`mem_sigmaSharp_of_mem_aSet_of_escape` / `A1_eq_sigmaSharp` で `x ∈ sigmaSharp M`)
       → D(4) → 第 3/4/5 成分 → 結論。`L` の同定は
