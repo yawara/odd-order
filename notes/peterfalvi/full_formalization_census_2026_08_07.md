@@ -395,6 +395,19 @@ docstring が「in particular 直交する」と**散文で主張**していた�
 
 ⬜ **§8 の残り = (8.13)(c3) の 1 件のみ** ([issue 0174](../../issues/0174-peterfalvi-813-c3-support-membership.md))。
 
+### §9 = repo `S11` (書籍 pp.50-57、`pages/peterfalvi-p050..p057.png` 切り出し済) — **監査途中 ((9.1)(9.3) 済)**
+
+書籍 §9 = **(9.1)-(9.11)** + (9.11) の sub-part (9.11.1)-(9.11.8)。型 II/III/IV の極大部分群の
+構造解析で、repo は `S11_MaximalII_III_IV/**` + `S13_CoreStructure` + 共有 infra
+(`GroupTheory/WielandtFixedPoint.lean` ほか) に分散。
+
+| 書籍 | 判定 | repo の実体 / 備考 |
+|---|---|---|
+| (9.1) | ✅ **本体 + "In particular" 2 条項とも** | `GroupTheory.wielandt_fixedPoint_frobenius`: `\|C_H(UE)\|^{\|E\|}·\|H\| = \|C_H(E)\|^{\|E\|}·\|C_H(U)\|` (**指数 `\|E\|` が正しく入っている** — pdftotext は上付きを落とすので実害が出やすい箇所、memory [[pdftotext-drops-superscripts]])。第 1 corollary `wielandt_fixedPoint_trivial_E_fixed` (`C_H(E) = 1 ⟹ C_H(U) = H`)、第 2 corollary `wielandt_fixedPoint_trivial_U_fixed` (`C_H(U) = 1 ⟹ \|H\| = \|C_H(E)\|^{\|E\|}`)。証明は chief series 帰納 + 各 chief factor 上の次元恒等式で**無条件** (Wielandt の不動点定理を FT なしで使う書籍の注意も守られている) |
+| (9.2) Hypothesis | ✅ carrier あり | 型 II/III/IV の極大 `M` と (8.4) の `H`,`U`,`W₁`,`W₂`,`q = \|W₁\|` — `S11_MaximalII_III_IV` の setup データ (`WielandtSetupBasic` の `data`) |
+| (9.3) | ✅ **2 分岐とも書籍そのまま** | `typeII_III_IV_order_relations` (`WielandtSetupBasic:649`): type II で `C_H(U) = 1` ∧ `\|H\| = \|W₂\|^q`、type III/IV で `∃ p` 素数 `\|W₂\| = p` ∧ `C_H(UW₁) = 1` ∧ `\|H\| = p^q·\|C_H(U)\|` |
+| (9.4)-(9.11) | ⬜ **未突合** | (9.4) `H₀`/`p` の存在と条項、(9.5) Hypothesis (`H̄`/`C`/`Ū`/`u`/`W̄₂`/`τ`/`𝒳`/`𝒮`)、(9.6) chief factor + `\|H̄\| = p^q`、(9.7) 二分律 (a) ブロック分解 (b) `H̄U` の構造、(9.8) case (a) の条項、(9.9) case (b) の条項、(9.10) Frobenius への帰着、(9.11) `𝒮(H₀C')` coherent + sub-part 8 件。repo 側の cite 密度は高い ((9.7): 296, (9.8): 358, (9.11): 719) |
+
 ## 4. 未着手の census
 
 - **Part II (Suzuki の定理 A、書籍 pp.97-134)** — `Proposition N` / `Lemma N` の**章内リセット
