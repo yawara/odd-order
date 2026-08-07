@@ -163,8 +163,19 @@ created: 2026-08-07
       - `K₁ ∩ M_σ = 1` (`K₁R` が非冪零ゆえ)
 
       ⟹ `x ∈ M_σ ∩ (M∩N)` が `U₁` に入ること (= `x ∈ N'`) を、この鎖から出すのが本体。
-      repo 側の対応物 (`Proposition 14.2` / `Corollary 12.10(d)` / `Theorem 15.7(d)` /
-      `Theorem 15.8`) の実在確認から始める。**BG §14/§15 の実作業で、10 行では済まない。**
+      **repo 側の在庫を実測 (2026-08-08)** — 前提はすべて在るが Cor 15.9 は一部だけ:
+
+      | BG | repo |
+      |---|---|
+      | Proposition 14.2 | `BG/Ch3_MaximalSubgroups/S14_Prop142Support.lean` ✅ |
+      | Corollary 12.10 | `BG/Ch3_MaximalSubgroups/S12_E.lean` ✅ |
+      | Theorem 15.7 | `S15_MF/OpicoreCentralizer.lean` / `S16_MainResults/FittingNonTITrichotomy.lean` ✅ |
+      | Theorem 15.8 | `S15_MF/OpicoreCentralizer.lean` ✅ |
+      | **Corollary 15.9** | `S15_MF/TIFailure.lean:1131` — ⚠ **一部のみ** (`not_fittingIsTI_of_mem_fittingSharp_of_centralizer_not_le` = 「`F(M)` は TI でない」ステップだけ)。**(15.3) の `M ∩ N` 補元性 / (15.4) の `M∩N = K₁ ⋉ U₁`, `C_{U₁}(K₁)=1` / `R ⊆ U₁` は無い** |
+
+      ⟹ **本体は Cor 15.9 の構造部分 ((15.3)+(15.4)+`R ⊆ U₁`) を新規に形式化すること**。
+      前提の Prop 14.2 / Cor 12.10 / Thm 15.7-15.8 は揃っているので純粋な組み立てだが、
+      **BG §14/§15 の実作業で複数 session 規模**。10 行では済まない (前 iteration の見積もりを訂正)。
 - [ ] 組み立て: `escapingCentralizers_control` と同じ入口
       (`mem_sigmaSharp_of_mem_aSet_of_escape` / `A1_eq_sigmaSharp` で `x ∈ sigmaSharp M`)
       → D(4) → 第 3/4/5 成分 → 結論。`L` の同定は
