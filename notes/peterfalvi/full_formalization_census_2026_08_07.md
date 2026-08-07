@@ -242,19 +242,18 @@ docstring が「in particular 直交する」と**散文で主張**していた�
 ⚠ 途中で (4.1) を「要確認」と誤判定した — grep を `S06_*.lean` に絞ったため。教訓は memory
 [[textbook-coverage-audit-failure-modes]] に記録済。
 
-### §5 = repo `S07` (書籍 pp.25-29、`pages/peterfalvi-p025..p029.png`) — **未監査 (着手ヒントのみ)**
+### §5 = repo `S07` (書籍 pp.25-29、`pages/peterfalvi-p025..p029.png`) — **監査途中 ((5.1)(5.2) 済)**
 
-⚠ **statement の所在を控えただけで、結論の突合はしていない**。次の作業単位。
+| 書籍 | 判定 | repo の実体 / 備考 |
+|---|---|---|
+| (5.1) Definition | ✅ 条項対応が忠実 | `S07.IsCoherent` (`S07_Coherence/NormInequalities:484`)。`nonzero` = `ℤ[S,A] ≠ 0` / `extension` + `extension_inner_eq` (on `zSpan S`) = 「`ℤ[S] → ℤ[Irr G]` の線形等長」/ `extends_on_supported` = 「`ℤ[S,A]` 上で `τ` と一致」/ `extension_mem_ZIrr` = 終域が `ℤ[Irr G]`。書籍が 1 文で言う「等長 `ℤ[S] → ℤ[Irr G]`」を内積保存 + 終域の 2 フィールドに割っただけで内容は同じ |
+| (5.2)(d) | ✅ 実証明 + **存在構成あり** | `OrthonormalCharacterImageFamily` (`DifferenceImage:835`) が書籍の `R(χ)` そのもの (`(χ − χ̄)^τ = Σ_{α∈R(χ)} α`、`R(χ)` は `ℤ[Irr G]` の正規直交部分集合)。2 元版 `CharacterDifferenceImage` は**かつて constructor 無しの posited 構造体**だったが、`characterDifferenceImageOfIsometry` (`:1132`) が §3 (1.4) keystone から**実構成**するようになっている (docstring に経緯あり) |
+| (5.2)(e) | ✅ 実証明 | disjoint-pair 直交 `DifferenceImage:898`、同一定義域版 `:730` ((4.1) 経由)。§9 レベルの形も `AxiomsCheck:12508` |
+| (5.2)(a)(b)(c) | ⬜ **未確認** | (a) `χ ∈ S ⟹ χ̄ ∈ S, χ̄ ≠ χ` / (b) `τ : ℤ[S,L^#] → ℤ[Irr G,G^#]` 等長 / (c) `S` の元は pairwise 直交。束ねた「Hypothesis (5.2)」構造体が在るのか、各所で個別仮説として取られているのかを確認すること |
+| (5.3)(a)(b) | ⬜ **未監査** | (b) は `S06_CertainTypeSubcoherent` に集中 (`:17` に書籍原文引用、`:53` `:77` `:132` `:238`)。`AxiomsCheck:13719`/`:13736` が「**(5.3)(b) at book strength**」(issue 0159 second pass) と記録。⚠ 「`R(φ)` は全ての `ω ∈ Irr(W)` に対し `ω^σ` と直交」の節も確認 |
+| (5.4)-(5.9) | ⬜ **未監査** | 書籍 pp.26-29 未読 |
 
-| 書籍 | 着手ヒント |
-|---|---|
-| (5.1) Definition | coherent = 「`ℤ[S,A] ≠ 0` かつ `ℤ[S] → ℤ[Irr G]` の線形等長で `ℤ[S,A]` 上 `τ` と一致するものが在る」。repo の `S07.IsCoherent` (フィールド `nonzero` / `extension` / `extension_inner_eq` / `extends_on_supported`) と条項対応を突合すること |
-| (5.2) Hypothesis (a)-(e) | (a) `χ ∈ S ⟹ χ̄ ∈ S, χ̄ ≠ χ` / (b) `τ : ℤ[S,L^#] → ℤ[Irr G,G^#]` 等長 / (c) `S` の元は pairwise 直交 / (d) `(χ − χ̄)^τ = Σ_{α∈R(χ)} α`, `R(χ)` は正規直交 / (e) `φ ⊥ {χ,χ̄} ⟹ R(φ) ⊥ R(χ)`。(5.2.e) は `AxiomsCheck:12508` に §9 レベルの形あり |
-| (5.3)(a) | `(5.2.a)(5.2.b)` + `S ⊆ Irr L` ⟹ (5.2) 成立 |
-| (5.3)(b) | `S06_CertainTypeSubcoherent` に集中 (`:17` に書籍原文引用、`:53` `:77` `:132` `:238`)。`AxiomsCheck:13719`/`:13736` が **「(5.3)(b) at book strength」(issue 0159 second pass)** と書いており、書籍強度の見直しが一度入っている。⚠ 併せて「`R(φ)` は全ての `ω ∈ Irr(W)` に対し `ω^σ` と直交」の節も確認すること |
-| (5.4)-(5.9) | 書籍 pp.26-29 未読 |
-
-⚠ **既知の関連知見**: (5.3)(b) の族の条件は `θ ≠ 1_K` **ではなく** `H ⊄ Ker θ`
+⚠ **既知の罠**: (5.3)(b) の族の条件は `θ ≠ 1_K` **ではなく** `H ⊄ Ker θ`
 (memory [[read-book-hypothesis-before-adding-side-condition]] — 過去に取り違えて 1 session 誤診した)。
 
 ## 4. 未着手の census
