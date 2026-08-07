@@ -9,11 +9,16 @@ import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
 import OddOrder.GroupTheory.RepresentationTheory.InertiaAbelianQuotient
 
 /-!
-# The constructive Clifford decomposition (Peterfalvi (1.7)(b))
+# The constructive Clifford decomposition (toward Peterfalvi (1.7)(c))
 
-**Peterfalvi, _Character Theory for the Odd Order Theorem_, Lemma 1.7(b), constructive
+**Peterfalvi, _Character Theory for the Odd Order Theorem_, Lemma 1.7(c), constructive
 form**: let `H ⊴ L` and let `θ ∈ Irr(H)` have inertia group `T = I_L(θ)` with `T/H`
 abelian and `gcd([T:H], o(θ)·θ(1)) = 1`.  Then
+
+⚠ **番号注意 (2026-08-07 訂正)**: 本ファイルの結果は書籍の **(1.7)(c)** であって (1.7)(b) では
+ない。(1.7)(b) は `T/H` 可換**のみ**を仮定して重複度 `e` 付きの `Ind_H^G θ = e·∑ᵢ χᵢ`
+(`n = [T:H]/e²`, `χᵢ(1) = [G:T]·e·θ(1)`) を主張するもので、**本リポジトリには無い**。
+ここで扱うのは coprimality を課して `e = 1` に落ちる場合、すなわち (1.7)(c) である。
 
   `Ind_H^L θ = ∑_{β ∈ Hom(T/H, ℂˣ)} Ind_T^L (χ·Inf(β))`,
 
@@ -40,10 +45,12 @@ bookkeeping on top.
 ## Main result
 
 * `exists_extension_induce_eq_sum_induce_mul` — the decomposition above.
+* `exists_induce_eq_sum_distinct_irreducible_of_coprime_card` — **Peterfalvi (1.7)(c)** under the
+  book's own coprimality hypothesis `gcd(|H|, [T:H]) = 1`.
 
 ## References
 
-* Peterfalvi §3 (1.7)(b); Isaacs 6.11/6.17/8.16.  Issue 9002.
+* Peterfalvi §3 (1.7)(c); Isaacs 6.11/6.17/8.16.  Issue 9002.
 -/
 
 namespace OddOrder.RepresentationTheory
@@ -51,7 +58,7 @@ namespace OddOrder.RepresentationTheory
 variable {L : Type*} [Group L] [Fintype L] [Invertible (Nat.card L : ℂ)]
 
 open scoped commutatorElement in
-/-- **The constructive Clifford decomposition (Peterfalvi (1.7)(b))**.  Let `H ⊴ L`, let
+/-- **The constructive Clifford decomposition (toward Peterfalvi (1.7)(c))**.  Let `H ⊴ L`, let
 `θ ∈ Irr(H)` have inertia group exactly `T` with `T/H` abelian (elementwise commutator
 hypothesis), degree `d`, and `gcd([T:H], o(θ)·d) = 1`.  Then there is an extension
 `χ ∈ Irr(T)` of (the transport of) `θ` such that
@@ -163,7 +170,9 @@ theorem exists_extension_induce_eq_sum_induce_mul
 
 open scoped commutatorElement in
 /-- **The constructive Clifford decomposition, distinct-constituent (multiplicity-free) form**
-(Peterfalvi (1.7)(b), the mult-one packaging).  Under the hypotheses of
+(the mult-one packaging; this is Peterfalvi **(1.7)(c)** up to the shape of the coprimality
+hypothesis -- see `exists_induce_eq_sum_distinct_irreducible_of_coprime_card` for the book's own
+hypothesis `gcd(|H|, [T:H]) = 1`).  Under the hypotheses of
 `exists_extension_induce_eq_sum_induce_mul`, the `[T:H]` induced summands `Ind_T^L(χ·Inf β)` of
 `Ind_H^L θ` are **pairwise distinct**: there is an extension `χ ∈ Irr(T)` of `θ` and a finite set
 `S` of `[T:H]` distinct irreducible characters of `L` with
@@ -278,7 +287,7 @@ theorem exists_extension_induce_eq_sum_distinct_irreducible
 
 open scoped commutatorElement in
 /-- **The distinct-constituent Clifford decomposition from a type-`F`-style inertia hypothesis**
-(Peterfalvi (1.7)(b), packaged for the type-I application).  This replaces the abstract
+(Peterfalvi (1.7)(c), packaged for the type-I application).  This replaces the abstract
 "`T/H` abelian" hypothesis `hab` of `exists_extension_induce_eq_sum_distinct_irreducible` with the
 concrete Peterfalvi (8.2.c) data: a complement `Γ = H U` (`H ⊔ U = ⊤`), the inertia bound
 `I(θ) ∩ U ≤ U₁`, and `U₁` abelian.  From these, `I(θ) ∩ U` is abelian
@@ -360,6 +369,67 @@ theorem coprime_index_orderOf_determinant_mul_of_coprime_index [Finite L]
   have hcop_Hi : Nat.Coprime H.index (Nat.card ↥H) := hHall.symm
   exact ((hcop_Hi.coprime_dvd_right ho_dvd).mul_right
     (hcop_Hi.coprime_dvd_right hd_dvd)).coprime_dvd_left hidx_dvd
+
+omit [Fintype L] [Invertible (Nat.card L : ℂ)] in
+/-- **Coprimality bridge under Peterfalvi's own hypothesis.**  The book's (1.7)(c) assumes only
+that `|H|` is prime to the *inertia* index `[T:H]`; that already gives
+`gcd([T:H], o(det θ)·d) = 1`, since both `d` (Ito) and `o(det θ)` divide `|H|`.
+
+Strictly weaker in the relevant place than
+`coprime_index_orderOf_determinant_mul_of_coprime_index`, which asks for the Hall condition
+`gcd(|H|, [L:H]) = 1` on the *full* index and then descends along the index tower. -/
+theorem coprime_relIndex_orderOf_determinant_mul_of_coprime_card [Finite L]
+    {H T : Subgroup L} [H.Normal]
+    (hcopH : Nat.Coprime (Nat.card ↥H) (H.subgroupOf T).index)
+    {θ : ClassFunction ↥H ℂ} (hθ : IsIrreducibleCharacter θ) {d : ℕ} (hd : θ 1 = (d : ℂ)) :
+    Nat.Coprime (H.subgroupOf T).index (orderOf hθ.determinant * d) := by
+  -- `d ∣ |H|` (Ito's theorem)
+  obtain ⟨n, -, hn_val, hn_dvd⟩ := hθ.exists_natDegree_charValue_one_dvd_card
+  have hdn : d = n := by
+    have hdc : (d : ℂ) = (n : ℂ) := by rw [← hd, hn_val]
+    exact_mod_cast hdc
+  have hd_dvd : d ∣ Nat.card ↥H := hdn ▸ hn_dvd
+  -- `o(det θ) ∣ |H|` (a linear character has `|H|`-torsion)
+  have ho_dvd : orderOf hθ.determinant ∣ Nat.card ↥H := by
+    apply orderOf_dvd_of_pow_eq_one
+    ext h
+    rw [MonoidHom.pow_apply, MonoidHom.one_apply, ← map_pow, pow_card_eq_one', map_one]
+  have hsym : Nat.Coprime (H.subgroupOf T).index (Nat.card ↥H) := hcopH.symm
+  exact (hsym.coprime_dvd_right ho_dvd).mul_right (hsym.coprime_dvd_right hd_dvd)
+
+open scoped commutatorElement in
+/-- **Peterfalvi (1.7)(c)** (book p. 7): *suppose that `T/H` is abelian and that `|H|` is prime to
+the index `[T:H]`.  Then `Ind_H^L θ = ∑_{i=1}^n χᵢ`, `n = [T:H]` and, for all `i`,
+`χᵢ(1) = [L:T]·θ(1)`.*
+
+This is `exists_extension_induce_eq_sum_distinct_irreducible` stated under the book's own
+coprimality hypothesis, via `coprime_relIndex_orderOf_determinant_mul_of_coprime_card`.  All three
+of the book's conclusions are conjuncts: the sum is over a finite set `S` of **distinct irreducible
+characters of `L`** taken with multiplicity one (`Ind_H^L θ = ∑_{φ ∈ S} φ`), `S.card = [T:H]`, and
+every member has degree `[L:T]·d`.
+
+Note the contrast with (1.7)(b), which drops the coprimality and only concludes
+`Ind_H^L θ = e·∑ᵢ χᵢ` with `n = [T:H]/e²` -- that general multiplicity-`e` form is *not* covered
+here (nor elsewhere in the repository; it needs the extension theorem for an abelian inertia
+quotient without coprimality). -/
+theorem exists_induce_eq_sum_distinct_irreducible_of_coprime_card
+    {H T : Subgroup L} [H.Normal] [(H.subgroupOf T).Normal] (hHT : H ≤ T)
+    [Invertible (Nat.card ↥H : ℂ)] [Invertible (Nat.card ↥T : ℂ)]
+    [Invertible (Nat.card ↥(H.subgroupOf T) : ℂ)]
+    [Finite ((↥T ⧸ H.subgroupOf T) →* ℂˣ)]
+    {θ : ClassFunction ↥H ℂ} (hθ : IsIrreducibleCharacter θ)
+    (hinertia : ClassFunction.inertia (G := L) θ = T)
+    (hab : ∀ x y : ↥T, ⁅x, y⁆ ∈ H.subgroupOf T)
+    {d : ℕ} (hd : θ 1 = (d : ℂ))
+    (hcopH : Nat.Coprime (Nat.card ↥H) (H.subgroupOf T).index) :
+    ∃ S : Finset (IrreducibleCharacter L), S.Nonempty ∧
+      S.card = (H.subgroupOf T).index ∧
+      ClassFunction.induce H θ = ∑ φ ∈ S, (φ : ClassFunction L ℂ) ∧
+      ∀ φ ∈ S, (φ : ClassFunction L ℂ) 1 = (T.index : ℂ) * (d : ℂ) := by
+  obtain ⟨_, _, S, hne, hcard, hsum, hdeg, _⟩ :=
+    exists_extension_induce_eq_sum_distinct_irreducible hHT hθ hinertia hab hd
+      (coprime_relIndex_orderOf_determinant_mul_of_coprime_card hcopH hθ hd)
+  exact ⟨S, hne, hcard, hsum, hdeg⟩
 
 omit [Invertible (Nat.card L : ℂ)] in
 /-- **Induction commutes with complex conjugation**: `(Ind_H^L θ)̄ = Ind_H^L (θ̄)`.  Pointwise

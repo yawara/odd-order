@@ -2110,6 +2110,26 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.induce_one_eq_compHom_induce_one_of_le
 
+/-! ### Peterfalvi (1.7)(c) — 書籍自身の仮説による多重度 1 分解
+
+`exists_induce_eq_sum_distinct_irreducible_of_coprime_card` が書籍 (1.7)(c) そのもの:
+`T/H` 可換 かつ `gcd(|H|, [T:H]) = 1` ⟹ `Ind_H^L θ = ∑_{φ ∈ S} φ` (相異なる既約指標の
+多重度 1 の和)、`|S| = [T:H]`、各 `φ(1) = [L:T]·θ(1)`。
+
+⚠ **2026-08-07 の番号訂正**: 実体 `exists_extension_induce_eq_sum_distinct_irreducible` は
+以前 **(1.7)(b) と誤ラベル**されていた。(1.7)(b) は coprimality を課さず重複度 `e` 付きの
+`Ind = e·∑ χᵢ` を主張する別物で、**本リポジトリには無い**。誤ラベルのせいで (1.7)(c) の
+番号 grep が 0 hit になり「未形式化」と誤診しかけた。
+
+橋 `coprime_relIndex_orderOf_determinant_mul_of_coprime_card` は書籍の仮説
+(`|H|` が inertia 指数 `[T:H]` と互いに素) から既存版が要求する
+`gcd([T:H], o(det θ)·d) = 1` を出す。既存の橋は `H` が `L` の Hall という強い仮定だった。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.coprime_relIndex_orderOf_determinant_mul_of_coprime_card
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_induce_eq_sum_distinct_irreducible_of_coprime_card
+
 /-! ### Peterfalvi (1.7)(a) — Clifford correspondence, distinctness half
 
 `induce_eq_sum_smul_induce_of_inertia_eq` is Peterfalvi (1.7)(a) verbatim: with `H ⊴ G`,
