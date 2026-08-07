@@ -122,10 +122,33 @@ created: 2026-08-07
       ⚠ repo の D(4) は**主張しているものは証明している** (honest) が、書籍 BG の D(4) より
       弱い可能性がある。BG 原文の D(4) が `A(N)` をどう定義しているかの確認が先。
 
-- [ ] **次の作業 (BG レーン向け)**: BG §16 原文 (mmd L4317 付近) の Theorem D(4) を読み、
-      `A(N)` が `ASet N U₀` (正しい Hall) か `hatMsigma N` かを確定する。前者なら repo の
-      D(4) は弱すぎるので強化。後者なら Peterfalvi (8.13)(c3) の Type II は BG D(4) 単独では
-      出ず、Theorem B(5) / (8.12)(c) の TI 性からの別経路が要る。
+- [x] **BG 原文で確定 (2026-08-08) — repo の D(4) は BG より弱い**。
+      `references/bg/local-analysis.pdftotext.txt`:
+
+      - **Theorem D(4)** (L6532 付近): 「… `R(x) = C_{N_σ}(x)`, `N_σ = N_F`,
+        **`x ∈ A(N) − N_σ`**, and `M ∩ N` is a complement of `N_σ` in `N`.」
+      - **`A(M)` の定義** (L6852 付近) は Peterfalvi (8.10) と**同一**:
+
+        ```
+        Type I        A(M) = A₀(M) = ⋃_{x∈H^#} C_M (x)     ← host M
+        Type II       A(M)          = ⋃_{x∈H^#} C_{M'}(x)   ← host M'
+        Type III/IV/V A(M)          = (M')^#
+        ```
+
+      ⟹ **BG D(4) は型依存の `A(N)` を主張しており、Type II では host が `N'`**。
+      repo の `theoremD_msigma_conjugacy_and_centralizers` が記録する
+      `x ∈ ASet N ⊤ ∖ M_σ(N)` = `hatMsigma N ∖ M_σ(N)` は host が `N` で、
+      **Type II においてのみ BG より弱い** (Type I では一致 — 前 commit で landing 済)。
+
+      ⟹ **これは Peterfalvi 側の債務ではなく BG 側の弱化**。repo の D(4) は主張しているものは
+      証明している (honest) が、BG 原文の条項を完全には運んでいない。
+
+- [ ] **次の作業 (BG レーン)**: `LocalTaxonomy.lean:930` の D(4) 第 4 成分を
+      `ASet N ⊤` から **型依存の `A(N)`** (Type II なら `ASet N U₀`、`U₀` = matched
+      `(κ∪σ)'`-Hall) へ強める。材料の一部は既に在る:
+      `S15.typeP_hall_derived_eq_and_derived` (`derivedInG N = U₀ ⊔ M_σ N`) /
+      `S10_TypePSupport.typePACore_subset_ASet`。⟹ 強化後、Peterfalvi (8.13)(c3) の Type II は
+      Type I 版と同じ 10 行程度で出る。
 - [ ] 組み立て: `escapingCentralizers_control` と同じ入口
       (`mem_sigmaSharp_of_mem_aSet_of_escape` / `A1_eq_sigmaSharp` で `x ∈ sigmaSharp M`)
       → D(4) → 第 3/4/5 成分 → 結論。`L` の同定は
