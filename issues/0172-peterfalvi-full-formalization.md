@@ -74,7 +74,7 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
   (8.8)+(8.9) の合成 `FTtypeP_pair_witness` が同ファイル :712 にある。
 
 - **ステップ 2 ✅ 完了 (2026-08-08)**: Part II + 補章の census。書籍テキストを節境界つきで
-  走査し **全 111 件**を列挙 (Part II Introduction 1 / Ch.I 19 / Ch.II 18 / Ch.III 16 /
+  走査し **全 110 件**を列挙 (Part II Introduction 1 / Ch.I 19 / Ch.II 18 / Ch.III 16 /
   Ch.IV 41 / App.I-IV 16)。**cite ゼロは無し** (Part I の 169/169 と同じ状況)。
   - Part II は Part I と番号体系がまったく違う: (1) 章をまたぐ固有名 Theorem A/B/C、
     (2) **節ごとにリセット**する `Proposition N`/`Lemma N` + 無番号の `Proposition.`/`Lemma.`/
@@ -97,8 +97,18 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
       ⚠ (A2)/(A3) の実使用は §1 全体で 2 箇所だけだったので**証明本体は無変更**で済んだ。
     - **Lemma (a) の第 2 全単射** — 書籍は `(y,z) ↦ yz` と `(y,z) ↦ zy` の**両方**が全単射と
       主張するが repo は前者だけ。§3 Prop 1(b) が回り道をしていた → `invertedProdEquiv'` を追加。
-  - **次の入口 = Ch.I §2 (書籍 pp.103-104)**: Prop 1(a)-(c) / Prop 2 / 無番号 Lemma /
-    無番号 Corollary / Prop 3。
+  - **Ch.I §2 監査完了 (2026-08-08、補充ゼロ)**: 4 件 (Prop 1(a)-(c) / Prop 2 / Corollary /
+    Prop 3) すべてに書籍強度の実体。Prop 3 は `semilinearGroup F A = (F₊ ⋊ Fˣ) ⋊ A` が書籍の
+    `𝓛(F,A)` そのもので、3 つの同定と "In particular `V/W` is cyclic" まで揃う。
+    ⚠ census の件数を **111 → 110** に訂正 (§2 の `Lemma` 3 箇所は**§1 の Lemma への参照**で
+    そこに新 statement は無い — ページ画像で確認)。
+  - **Ch.I §3 監査完了 (2026-08-08、補充ゼロ)**: 7 件 (Lemma 1 / Prop 1(a)(b)(c) / Prop 2 /
+    Lemma 2-5) すべてに書籍強度の実体。複数条項の結果はいずれも**束ねた形**で在る
+    (Lemma 1 = `TheoremAConclusion.Q_and_residual` / Lemma 3 =
+    `stronglyReal_normalForm_and_centralizer_odd` / Lemma 5 = `lemmaFive_of_orderThree`)。
+    §1 Prop 4(c) の一般形は Prop 1(a) の `normalCore_cH_*` が消費する形で実在。
+  - **次の入口 = Ch.II The First Case (書籍 pp.108-114)**: 仮説 (B1)(B2)、Theorem B、
+    ステップ (1)-(17)。
 - **ステップ 3 ✅ 完了 (2026-08-08)**: Part I (§1-§14) の逐条監査を (1.1) から文書順に完了。1 章ぶん終えるごとに census note を更新した。
   - **2026-08-07 時点: §1-§6 完了 (全 63 件)**。
     正本 = [census note](../notes/peterfalvi/full_formalization_census_2026_08_07.md) §3.5 の各表。

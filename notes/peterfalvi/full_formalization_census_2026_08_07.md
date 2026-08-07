@@ -624,7 +624,7 @@ Part I が「章番号.通し番号」の 1 系列 ((1.1)…(14.16)) なのに�
 |---|---|---|---|
 | Part II Introduction | 97-98 | 仮説 (A1)(A2)(A3)、帰納法仮説、**Theorem A** | 1 |
 | Ch.I §1 Consequences of (A1) | 100-103 | Prop 1(a)-(e) / Prop 2(a)-(d) / Prop 3 / Prop 4(a)-(c) / **Lemma** (無番号, p.102, (a)(b)) / Prop 5 / Prop 6(a)-(c) | 7 |
-| Ch.I §2 Structure of Q and K | 103-104 | Prop 1(a)-(c) / Prop 2 / **Lemma** (無番号) / **Corollary** (Prop 2 の系) / Prop 3 | 5 |
+| Ch.I §2 Structure of Q and K | 103-104 | Prop 1(a)-(c) / Prop 2 / **Corollary** (Prop 2 の系) / Prop 3 | 4 |
 | Ch.I §3 Induction Hypothesis | 104-107 | Lemma 1 / Prop 1(a)-(c) / Prop 2 / Lemma 2 / Lemma 3 / Lemma 4 / Lemma 5 | 7 |
 | Ch.II The First Case | 108-114 | 仮説 (B1)(B2)、**Theorem B**、ステップ (1)-(17) | 18 |
 | Ch.III §1 The Structure of Q | 115-118 | 仮説 (C1)、**Theorem C**、**Proposition** (3 分岐 (a)(b)(c)) | 2 |
@@ -638,11 +638,14 @@ Part I が「章番号.通し番号」の 1 系列 ((1.1)…(14.16)) なのに�
 | App.II On Near-Fields | 137-138 | Prop 1 / Prop 2 | 2 |
 | App.III On Suzuki 2-Groups | 139-143 | Lemma 1(a)(b) / Lemma 2 / Def 1 / Def 2 / Def 3 / **Theorem** / Prop 1 / Prop 2 | 8 |
 | App.IV The Feit–Sibley Theorem | 144-150 | Lemma 1(a)(b) / Lemma 2(a)(b)(c) / **Theorem** | 3 |
-| **合計** | | | **111** |
+| **合計** | | | **110** |
 
 ### 4.2 repo 側の cite 突合 — **111 / 111 に cite あり**
 
-全 111 件について repo 内に引用が存在する (**cite ゼロは無し**)。Part I の 169/169 と同じ状況で、
+全 110 件について repo 内に引用が存在する (**cite ゼロは無し**)。Part I の 169/169 と同じ状況で、
+⚠ 初版は §2 に「無番号 Lemma」を数えて 111 件としていたが、**§2 の `Lemma` は 3 箇所とも
+§1 の Lemma への参照**でありそこに新しい statement は無い (2026-08-08 にページ画像で確認)。
+
 ⟹ **本命はここでも「番号を埋める」ことでなく §2 の 3 種の残債を 1 件ずつ潰す逐条監査**。
 
 ⚠ **初回の機械 census は 11 件を偽の「cite ゼロ」と誤判定した** — すべて repo 側の引用表記が
@@ -723,9 +726,50 @@ order of `st` is equal to the order of `s̄t̄` in `L̄`」。`L = C_G(X)` の `
 §3 Prop 1(b) (`N_D(X) = N_K(X) N_V(X)` — **反転因子 `K` が先**) は `d⁻¹` に `yz` 版を当てて
 反転する回り道をしていた。`invertedProdEquiv'` を追加。
 
+#### Part II Ch.I §2 (書籍 pp.103-104) — **監査完了 (2026-08-08、補充ゼロ)**
+
+§2 冒頭に「We assume from this point onwards that `G` satisfies (A1), (A2) and (A3)」と明記
+(§1 の (A1)-only との対比が §1 の Prop 4(c) 債務の根拠)。4 件すべてに書籍強度の実体あり。
+
+| 書籍 | repo |
+|---|---|
+| Prop 1 (a) `x ∈ K−{1} ⟹ C_Q(x)=1` | `QStructure.centralizer_Q_eq_bot_of_mem_K` 系 (`QStructure.lean:102`) |
+| Prop 1 (b) `Q` 冪零 | `QStructure.isNilpotent_Q` (`:169`) |
+| Prop 1 (c) `H∩I ⊆ Z(Q)` + `(H∩I)∪{1}` は初等アーベル 2-群 | `involutions_H_subset_centralizer_Q` / `Q0` を**部分群として定義**(`:293`) + `sq_eq_one_of_mem_Q0` + `commute_of_mem_Q0` |
+| Prop 2 `K` は `D` の巡回正規部分群 | `KCyclic.K_isCyclic` + `K_normal` |
+| Corollary `S` はアーベルか Suzuki 2-群 | `SylowTwo.sylowTwo_isMulCommutative_or_isSuzuki2Group` |
+| Prop 3 `Q₀ ⋊ (D/W) ≅ 𝓛(F_q,A)` + `V/W` 巡回 | `SemilinearRealization.exists_semilinear_equiv` |
+
+Prop 3 は非常に忠実: `semilinearGroup F A = (F₊ ⋊ Fˣ) ⋊ A` が書籍の `𝓛(F,A) = (F ⋊ F*) ⋊ A`
+そのもので、同型 `Q₀ ⋊ D̄ ≃* semilinearGroup F A` に加えて 3 つの同定 (`Q₀ ↔ F₊` / `K̄ ↔ Fˣ` /
+`V̄ ↔ A`) と `IsCyclic V̄` (書籍の "In particular, `V/W` is cyclic") を全部持つ。
+書籍が `K` と書く因子は repo では `fitting D̄` で、`SemilinearIdentification.Kbar_eq_fitting`
+が両者を同定する (これは §2 Prop 2 の証明そのもの)。
+
+#### Part II Ch.I §3 (書籍 pp.104-107) — **監査完了 (2026-08-08、補充ゼロ)**
+
+7 件すべてに書籍強度の実体あり。
+
+| 書籍 | repo |
+|---|---|
+| Lemma 1 (Theorem A の結論 ⟹ `Q` は 2-群、`L = O^{2'}(G) = ⟨Qˣ⟩`) | `TheoremAConclusion.Q_and_residual` (**束ねた書籍形**; 3 分岐は `Q_and_residual_of_{psl2,suzuki,psu3}_target`)、核は `simple_normal_oddIndex_Q_core` |
+| Prop 1 (a) `C_G(X)` は `Ω_X` 上 (A1)、`𝒩(L) = C_{L∩D}(L∩Q) ⊂ L∩V` | `centralizerHypothesisA1` + `normalCore_cH_eq_centralizer_cQ` + `normalCore_cH_le_cV` (⟵ §1 Prop 4(c) の一般形の適用先) |
+| Prop 1 (b) `N_G(X) = C_G(X)N_V(X)` | `CentralizerNormalizer.normalizer_eq_centralizer_mul_normalizer_inf_V` |
+| Prop 1 (c) 三分岐 + `C_{Q₁}(X)=1` + `𝒩(L)∩F = Z(F)` | `centralizer_trichotomy_of_induction` → `CentralizerTrichotomyData` (`common` に前 2 条項、`branch` に (i)(ii)(iii)) |
+| Prop 2 (`G` 非単純 ⟹ Theorem A の結論) | `InductionNonSimple.theoremAConclusion_of_not_simple` |
+| Lemma 2 (`V` の部分集合が `G`-共役 ⟹ `V`-共役) | `ConjugacyInV.lean:176` |
+| Lemma 3 (強実で `x²≠1` ⟹ `ut` (`u ∈ Q₀^#`) に共役 **かつ** `|C_G(x)|` 奇) | `stronglyReal_normalForm_and_centralizer_odd` (**2 条項を束ねた形**) |
+| Lemma 4 (`\|st\|=3`, `V≠1` ⟹ `⟨Q₀,K,t⟩ = Q₀K ∪ Q₀KtQ₀ ≅ PSL(2,q)`) | `OrderThreePSL` / `OrderThreePSLInduction` |
+| Lemma 5 (`W` 巡回 **かつ** `\|W\| ∣ q+1` **かつ** `W≠1 ⟹ Q` は type B) | `WCyclicDivides.lemmaFive_of_orderThree` (**3 条項を束ねた形**) |
+
+設計差の記録: §3 は書籍が「帰納法仮説を標準仮定にする」節なので、repo は
+`TheoremAInductionBelow` を明示パラメータで受ける (axiom でも carrier field でもない)。
+Lemma 1 は書籍が外部引用 ([HB] Ch.XI Ex 1.3a/Thm 3.3、[H] Kap.II Satz 10.12 等) で済ませる
+「`|Ω|−1` が 2 冪」「`L` 単純」を、repo は 3 つの標準モデルから**導出**している。
+
 #### 次の入口
 
-**Ch.I §2 (書籍 pp.103-104)** — Prop 1(a)-(c) / Prop 2 / 無番号 Lemma / 無番号 Corollary / Prop 3。
+**Ch.II The First Case (書籍 pp.108-114)** — 仮説 (B1)(B2)、Theorem B、ステップ (1)-(17)。
 
 ### 4.5 ページ画像
 
