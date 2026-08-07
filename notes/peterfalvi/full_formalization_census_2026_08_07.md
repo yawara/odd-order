@@ -483,32 +483,34 @@ sub-part **(10.10.1)-(10.10.4)** の計 15 件。repo は `S12_*` 系に分散�
 `S13_NonGaloisExclusion` の末尾にまとめた。循環はない — (11.3) の証明は `𝒮(H₀C)` への
 Theorem (6.3) + (10.8) で、(11.5)-(11.9) を一切使わない。
 
-### §12 = repo `S14` (書籍 pp.69-74、`pages/peterfalvi-p069..p074.png` 切り出し済) — **未着手 (下調べのみ、2026-08-07)**
+### §12 = repo `S14_MaximalI/**` (書籍 pp.69-74、`pages/peterfalvi-p069..p074.png` 切り出し済) — **監査完了 (2026-08-07、未形式化ゼロ)**
 
 書籍 §12 =「Maximal Subgroups of Type I」= **(12.1)-(12.17)** の 17 件 (sub-part なし)。
-テキストから抽出した見出し (⚠ pdftotext 崩れあり、条項はページ画像で確定すること):
+**全 17 件に実体あり**。補充 1 件 (⭐) + 清掃 2 件。
 
-| 番号 | 見出し (text 抽出、要画像確認) |
-|---|---|
-| (12.1) | Hypothesis. `L` maximal of Type I, `H = L_F` |
-| (12.2) | (Hypothesis (12.1) の下の帰結群) |
-| (12.3) | `L₁`, `L₂` 非共役な Type I 極大 |
-| (12.4) | `ψ ∈ CF(G)` が … に直交するとき |
-| (12.5) | `ρ` = Hypothesis (7.1) の写像 |
-| (12.6) | `L` が核 `H` の Frobenius 群なら … |
-| (12.7) | **Theorem**. Type I の極大 `M` はすべて核 `M_F` の Frobenius 群 |
-| (12.8) | Hypothesis. `π` = … を満たす素数 `p` の集合 |
-| (12.9) | `P₀` は階数 2 の可換群。極大 `L` が存在して … |
-| (12.10) | `H = L_F` とすると `L` は核 `H` の Frobenius 群 |
-| (12.11) | `M ∩ L` は `M` における `K` の補群で `M ∩ L ⊆ H` |
-| (12.12) | `E` = `L` における `H` の補群、`e = \|E\|` ⟹ `E` は巡回 … |
-| (12.13) | Notation. `𝒮 = {Ind_H^L θ ∣ θ ∈ Irr H, θ ≠ 1_H}`、`τ` = … |
-| (12.14) | `x` を (12.9) のものとする。`g ∈ K` なら `ψ(xg) = ψ_p(x) = χ(x)` |
-| (12.15) | `ρ_M` = Hypothesis (7.1) の写像 (`M`, `A₁(M)`) |
-| (12.16) | Theorem (12.7) の証明 |
-| (12.17) | Theorem (8.8) の case (b) が成立 |
+| 書籍 | 判定 | repo の実体 / 備考 |
+|---|---|---|
+| (12.1) Hypothesis | ✅ | `S14.Hypothesis` (`S14_MaximalI/Hypothesis.lean`): `L` type-I 極大 / `H = L_F` / `𝒮 = {Ind_H^L θ ∣ θ ∈ Irr H, θ ≠ 1_H}` / `τ` = `(A(L), L, G)` の Dade 等長 |
+| (12.2) | ✅ (a)(b) とも | (a) = `character_decomposition_and_dade_domain` (`CharacterDecompositionData`: `χ = ∑_{φ∈S(χ)} φ`、`φ(1)` が `φ` に非依存、`τ` の定義域が `ℤ[⋃S(χ), L^#]`) / (b) = Hypothesis (5.2) + `R₁(φ)` (`ℤ[Irr G]` の濃度 2 正規直交部分集合) と `R(χ) = ⋃_{φ∈S(χ)} R₁(φ)` |
+| (12.3) | ✅ | `nonconjugate_typeI_R_orthogonal` (`RhoConstancyDecomposition:640`): 非共役 type-I 極大 `L₁`,`L₂` に対し `R(χ₁) ⊥ R(χ₂)` |
+| (12.4) | ✅ | `orthogonal_character_constant_on_coset` (`RhoConstancy:947`): `ψ ⊥ R(χ) ∀χ ∈ 𝒮` ⟹ `x ∈ L − H` 上 `ψ` は `xH` で定数 |
+| (12.5) | ✅ | `ψ^ρ` が `H − H'` 上定数 (`PairCoherence:727` の constancy composition; `ρ` = Hypothesis (7.1) の `A = A(L)` 版) |
+| (12.6) | ✅ 2 条項とも | `Sset_isIrreducibleCharacter` (`𝒮 ⊆ Irr L`) + `witness_L_coherent` (`𝒮` coherent) |
+| (12.7) Theorem | ⭐ **2026-08-07 に書籍の形へ補充** | `typeI_isFrobenius_kernel_maxNilpotentNormalHall` (`NormPackage`): `∃ E, IsFrobeniusGroup ↥M ((maxNilpotentNormalHall M).subgroupOf M) E` — **無条件**かつ**核を名指し**。旧 `typeI_frobenius` は (i) Type-V 排除 `hnoV` を仮説で受け (書籍に無い; (10.10) `no_typeV_maximal_unconditional` で discharge 可、`S12_Noncoherence` が import する S14 側は葉 `CentralizerContainment` のみゆえ循環なし)、(ii) 結論の第 2 連言が `Prop` 値データフィールド `data.kernel_eq_MF` で、その producer は `True` を入れていた (別 producer `WitnessFrobenius` は本物の `typeF.H = M_F` を入れており**強度が producer 依存**) |
+| (12.8) Hypothesis | ✅ | `InPi` + `CounterexampleHypothesis` (`WitnessSylowBasic`): `π`・最小元 `p`・`M`・`K = M_F`・`K' = [K,K]`・`P₀` |
+| (12.9) | ✅ 3 条項とも | `WitnessSylowCyclic:276` が `IsMulCommutative ↥ctr.P0 ∧ rank ↥ctr.P0 = 2 ∧ Nonempty (RankTwoWitnessData ctr)` を束ねる。`RankTwoWitnessData` は `L`・`P₀ ≤ L_s`・`x ∈ Ω₁(P₀)^#` と `C_K(x) ⊄ K'` / `N_G(⟨x⟩) ≤ M` / `C_G(x) ⊄ L` を**全部 field で**持つ |
+| (12.10) | ✅ | `witness_L_frobenius` (`L` は核 `H = L_F` の Frobenius 群) |
+| (12.11) | ✅ 2 条項とも | `card_M_le` (`\|M\| ≤ \|K\|·\|H\|` = 補群性の帰結) + `M ∩ L ⊆ H` (`MinimalCounterexample`) |
+| (12.12) | ✅ 2 条項とも | `complement_cyclic_order_dvd`: `IsCyclic E ∧ (e ∣ p−1 ∨ e ∣ p+1)` |
+| (12.13) Notation | ✅ | `DadeNotation` (`DadeContradiction:21`): `e` / `τ₁` / `χ ∈ 𝒮` with `χ(1) = e` / `ψ = χ^{τ₁}`。**2026-08-07 の清掃**: 未消費の `Prop` 値フィールド 3 本 (`e_eq_index` / `rhoFormula` / `rhoMFormula`; 後 2 者は `True`) を削除 — 本物の `e = [L:H]` は `witness_value_norm_package` の `he_eq` 引数で明示的に threading されている |
+| (12.14) | ✅ | `psi_constant_on_xK` (`ψ(xg) = ψ(x)` for `g ∈ K`) + `witness_dade_psi_apply_x_eq_chi` (`ψ^ρ(x) = χ(x)`) |
+| (12.15) | ✅ 3 条項とも | 第 1 = `counterexample_chiRho_eval_of_mem_K_sharp` / `counterexample_chiRhoA1_eval_of_mem_K_sharp` (`ψ^{ρ_M}(g) = ψ(g)` on `K^#`) / 第 2 = `counterexample_psi_constant_on_K_sub_Kprime` / 第 3 = `counterexample_psi_int_on_K_sub_Kprime` (`ψ(g) ∈ ℤ`) |
+| (12.16) | ✅ | `counterexample_contradiction` + `pi_empty` ((12.7) の証明本体)。**2026-08-07 の訂正**: `witness_value_norm_package` の docstring にあった「**Genuinely still-missing**: ρ-machinery norm estimates …」は **stale** — 7 連言すべてが名前つき補題で discharge 済で axiom-clean |
+| (12.17) | ✅ | `not_all_maximal_typeI` + `theorem88_caseB_holds` (Theorem (8.8) の case (b) が成立) |
 
-repo 側は `S14_MaximalI*` 系 (`OddOrder/Peterfalvi/S14_MaximalI/` ディレクトリ + `S14*.lean`)。
+⚠ **設計差 (被覆済)**: `S14` の多くの補題が Type-V 排除 `hnoV` を仮説で受けたままだが、これは
+`no_typeV_maximal_unconditional` で常に discharge されている (書籍 §12 の証明も (10.10) を cite
+するので、内部段としては忠実)。headline (12.7) のみ無条件形に直した。
 
 ## 4. 未着手の census
 

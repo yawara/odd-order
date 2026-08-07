@@ -463,15 +463,17 @@ Concretely, for the (12.9) witness `L` with its (12.13) Dade calculation `ψ = �
   relation `‖ψ^{ρM}‖² ≥ (|K−K'|/|M|)·ψ(g)²`, `hB` = (7.8.b) `‖ψ^ρ‖² ≥ 1 − e/|H|`, `hC` =
   (7.3)+(8.17) `‖ψ^{ρM}‖² + ‖ψ^ρ‖² < 1`.
 
-**Genuinely still-missing**: the `ρ`-machinery norm estimates (`S09.zetaNuRhoNormSqGeOfDade` for
-`hB`, `chiRho_integral_inequality`/(8.17) support-disjointness for `hC`, the (12.15) `ρM` relation
-for `hA`), the (12.3)/(12.5) constancy facts feeding `h_const`/(12.15), and the (8.1.c)/(12.12)
-numerics `hidx`/`h2e` for the witness are none of them assembled into these exact conclusions in
-reach of `S14`.  The statement is **sound**: each conjunct is the genuine
-(12.14)/(12.15)/(12.12)/(8.1.c)/(7.x)
-fact for the *specific* witness character `ψ = dade.psi` of the genuine witness `L` (tied to
-`ctr`/`witness`/`hyp`/`dade` via `data` and `hψZ`), with `e = dade.e` and `|K|,|K'|,|M|,|H|` the
-genuine cardinalities — not a free arithmetic implication. -/
+⚠ **The former "genuinely still-missing" note is stale (issue 0172 §12 監査, 2026-08-07)**: every
+conjunct is now discharged in the proof below by a named lemma —
+`counterexample_psi_int_on_K_sub_Kprime`
+((12.15) integrality), `psi_constant_on_xK` ((12.14)), `witness_two_mul_index_le_p_add_one`
+((12.12)), `four_mul_card_Kprime_le` ((8.1.c)), `counterexample_chiRhoA1_normSq_ge` ((12.15) `ρM`
+norm relation), `witness_dade_psi_rho_norm_ge` ((7.8.b)) and
+`witness_dade_psi_rhoM_rho_normSq_lt_one` ((7.3)+(8.17)).  The theorem is `#print axioms`-clean.
+Each conjunct is the genuine (12.14)/(12.15)/(12.12)/(8.1.c)/(7.x) fact for the *specific* witness
+character `ψ = dade.psi` of the genuine witness `L` (tied to `ctr`/`witness`/`hyp`/`dade` via
+`data` and `hψZ`), with `e = dade.e` and `|K|,|K'|,|M|,|H|` the genuine cardinalities — not a free
+arithmetic implication. -/
 theorem witness_value_norm_package [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} {L : Subgroup G}

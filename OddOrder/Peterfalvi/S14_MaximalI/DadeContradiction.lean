@@ -20,15 +20,12 @@ variable {G : Type*} [Group G]
 minimal counterexample. -/
 structure DadeNotation {L : Subgroup G} (hyp : Hypothesis L) where
   e : ℕ
-  e_eq_index : Prop
   tau1 : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G
   chi : ClassFunction ↥L ℂ
   chi_mem : chi ∈ hyp.Sset
   chi_degree_eq_e : chi 1 = (e : ℂ)
   psi : ClassFunction G ℂ
   psi_eq_tau1_chi : psi = tau1 chi
-  rhoFormula : Prop
-  rhoMFormula : Prop
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.13), the Dade calculation realized from coherence**: given the (12.6) coherent
@@ -41,21 +38,21 @@ This wires the coherent isometric extension into the `ψ`-construction backbone 
 former opaque `tau1`/`psi` are now the genuine `coh.extension` and its value on `χ`.  The remaining
 input is the *selection* of the distinguished `χ` — a minimal-degree `Ind_H^L θ` with `θ` a
 nontrivial linear character of `H = L_F`, so `χ(1) = [L:H] = e` — together with the (12.12) degree
-bounds on `e`.  (`e_eq_index`/`rhoFormula`/`rhoMFormula` remain the structure's carried `Prop`s.) -/
+bounds on `e`.  (The former carried `Prop` fields `e_eq_index`/`rhoFormula`/`rhoMFormula` were
+removed in the issue 0172 §12 audit: nothing consumed them, `rhoFormula`/`rhoMFormula` were filled
+with `True`, and the genuine `e = [L:H]` identification is threaded explicitly as the `he_eq`
+argument of `witness_value_norm_package`.) -/
 noncomputable def dadeNotation_of_coherence {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
     (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
     (χ : ClassFunction ↥L ℂ) (hχ : χ ∈ hyp.Sset) (e : ℕ) (hdeg : χ 1 = (e : ℂ)) :
     DadeNotation hyp where
   e := e
-  e_eq_index := e = (hyp.H.subgroupOf L).index
   tau1 := coh.extension
   chi := χ
   chi_mem := hχ
   chi_degree_eq_e := hdeg
   psi := coh.extension χ
   psi_eq_tau1_chi := rfl
-  rhoFormula := True
-  rhoMFormula := True
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.13), the distinguished character**: the family `S` of `L` contains a member of

@@ -137,7 +137,20 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
     (11.9.a) `inner_tau_muColumnZero_sub_zeta_rowZero_unconditional`。循環なし。
     清掃 1 件: §13 `Hypothesis` の未消費 opaque `Prop` フィールド 3 本を削除 +
     構造 docstring を書籍 (11.2) の条項列挙に差し替え。
-  - **次の入口**: §12 = 書籍 pp.69-74「Maximal Subgroups of Type I」(repo `S14`)。
+  - **§12 監査完了 (2026-08-07)**: 17 件 ((12.1)-(12.17)) すべてに実体あり。
+    **補充 1 件** = (12.7) を書籍そのままの形へ (`S14.typeI_isFrobenius_kernel_maxNilpotentNormalHall`):
+    旧 `typeI_frobenius` は (i) Type-V 排除 `hnoV` を仮説で受けていた (書籍に無い; (10.10) で
+    discharge 可能、循環しない)、(ii) 結論の第 2 連言が `Prop` 値データフィールド
+    `data.kernel_eq_MF` で producer が `True` を入れていた (**強度が producer 依存** — 別 producer
+    は本物の `typeF.H = M_F` を入れる)。新形は核を `maxNilpotentNormalHall M` と名指しし無条件。
+    清掃 2 件: `DadeNotation` の未消費 `Prop` フィールド 3 本を削除 /
+    `witness_value_norm_package` の「Genuinely still-missing」docstring が stale だったので訂正
+    (7 連言すべて名前つき補題で discharge 済・axiom-clean)。
+  - **opaque-`Prop` フィールドの棚卸し (§10-§12 で 4 例)**: `S12.CharacterParameters` (2 本) /
+    `S13.Hypothesis` (3 本) / `S14.TypeIFrobeniusData.kernel_eq_MF` (1 本、**消費者あり・強度可変**) /
+    `S14.DadeNotation` (3 本)。**残 1 件**: `S15_SAndTGrid.lean:39` の `e_eq_index : Prop`
+    (同ファイル :137 に本物版がある) → §13 監査で扱う。
+  - **次の入口**: §13 = 書籍 pp.75-86「The Subgroups S and T」(repo `S15`)。
   - **監査手順の正本** = memory `textbook-coverage-audit-failure-modes`。
     **(1) AxiomsCheck の番号コメント → (2) 書籍ページ画像 → (3) 結論の突合** の順。
     🚨「実体が見つからない」を結論にしない (本セッションで 3 回誤判定しかけた)。
