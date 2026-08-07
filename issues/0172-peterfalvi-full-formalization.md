@@ -132,8 +132,23 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
     いた。census を Ch.IV 41 → 46、総数 110 → **115** に訂正。
   - ⟹ **Part II 本体 (Ch.I-IV) の逐条監査完了**。補充は通算 3 件
     (Ch.I §1 の Prop 4(c) 一般形 / Ch.I §1 Lemma (a) の第 2 全単射 / Ch.II step (11) の半直積同型)。
-  - **次の入口 = 補章 4 本**: Appendix I (Huppert, pp.135-136) / II (Near-Fields, pp.137-138) /
-    III (Suzuki 2-Groups, pp.139-143) / IV (Feit–Sibley, pp.144-150) = 16 件。
+  - **補章 4 本 監査完了 (2026-08-08、補充 1 件)**: 16 件 (App.I = 3 / II = 2 / III = 8 / IV = 3)。
+    **補充 = App.I Prop 1 の `[IsSolvable D]` 削除** — 書籍は「odd order」しか仮定しないが
+    repo は可解性も要求していた。奇数位数 ⟹ 可解は **本リポジトリが証明済の Feit–Thompson**
+    なので `feitThompson` を内部で使い仮説を書籍どおりに戻した (import cycle なし)。
+    これは Part I の失敗様式リストに無かった型 (**失敗様式 7 = 書籍が暗黙にしている定理を
+    repo が仮説で受ける**) で census note に記録。
+    stale docstring 訂正 1 件 (App.III hub の「Theorem (e) forward direction」— 逆向きも実在)。
+
+- **⟹ ステップ 4 (Part II 逐条監査) 完了 (2026-08-08)**。Part II 全 115 件
+  (Theorem A + Ch.I 19 + Ch.II 18 + Ch.III 16 + Ch.IV 46 + 補章 16) に書籍強度の実体あり、
+  **未形式化ゼロ** (Part I の (1.7)(b) に相当する残件が無い)。**補充は通算 4 件**:
+  1. Ch.I §1 Prop 4(c) の (A1)-only 一般形 (`Hypothesis extends HypothesisA1` へ再編)
+  2. Ch.I §1 Lemma (a) の第 2 全単射 `(y,z) ↦ zy` (`invertedProdEquiv'`)
+  3. Ch.II step (11) の `T ⋊ C_Q(P) ≅ F ⋊ F*` (新 leaf `StepElevenSemidirect.lean`)
+  4. App.I Prop 1 の `[IsSolvable D]` 削除 (Feit–Thompson で discharge)
+  すべて axiom-clean。**新たに見つけた失敗様式 2 型** (7 = 書籍が暗黙にする定理を仮説で受ける /
+  8 = file docstring の散文が定理の代わりをしている) を census note §4.6 に記録。
 - **ステップ 3 ✅ 完了 (2026-08-08)**: Part I (§1-§14) の逐条監査を (1.1) から文書順に完了。1 章ぶん終えるごとに census note を更新した。
   - **2026-08-07 時点: §1-§6 完了 (全 63 件)**。
     正本 = [census note](../notes/peterfalvi/full_formalization_census_2026_08_07.md) §3.5 の各表。
