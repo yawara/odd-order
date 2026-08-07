@@ -767,9 +767,25 @@ Prop 3 は非常に忠実: `semilinearGroup F A = (F₊ ⋊ Fˣ) ⋊ A` が書�
 Lemma 1 は書籍が外部引用 ([HB] Ch.XI Ex 1.3a/Thm 3.3、[H] Kap.II Satz 10.12 等) で済ませる
 「`|Ω|−1` が 2 冪」「`L` 単純」を、repo は 3 つの標準モデルから**導出**している。
 
+#### Part II Ch.II The First Case (書籍 pp.108-114) — **監査途中 (2026-08-08)**
+
+18 件 (仮説 (B1)(B2) + Theorem B + ステップ (1)-(17))。**全ステップにファイルが存在**
+(`FirstCase/Step{One..Seventeen}*.lean`、補助分割込みで 29 file)。突合済は以下:
+
+| 書籍 | repo | 判定 |
+|---|---|---|
+| (B1) | `FirstCaseHypothesis extends Hypothesis` の `P`/`p`/`p_prime`/`P_le_V`/`card_P`/`twoRank_centralizer_le_one` | ✅ 条項一致 |
+| (B2) | 仮説として持たず、`theoremB` 内部の二分岐で処理 | ✅ 書籍も背理法の仮定として置くだけ (`p ∣ \|G^ab\|` なら Ch.I §3 Prop 2、さもなくば (B2) で step (1)-(17) が矛盾) |
+| **Theorem B** | `FirstCaseHypothesis.theoremB (ind : TheoremAInductionBelow G Ω) : Nonempty (TheoremAConclusion G Ω)` | ✅ 書籍そのまま |
+| (1) `V = W ⋊ P`、`\|Q₀\| = 2^p`、`N_G(P) = C_G(P)`、`C_D(P) = C_W(P) × P` | `exists_decomp_of_mem_V` + `P_inf_W_eq_bot` / `card_Q0_eq_two_pow` / `normalizer_P_eq_centralizer` / `D_inf_centralizer_eq_W_inf_centralizer_join_P` | ✅ 4 条項とも (半直積は分解 + 交わり自明の 2 本で表現) |
+| (2)(a) `C_G(P)` は `Ω_P` 上 (A1)、核は `N = C_D(C_Q(P)) ∩ C_G(P)` | `rankOneQuotient` (faithful 商上の `RankOneHypothesis`) + 核の同定は §3 Prop 1(a) `normalCore_cH_eq_centralizer_cQ` | ✅ 書籍も核を §3 から引く |
+| (2)(b) `C_G(P)/N ≅ (F ⋊ C_Q(P)) ⋊ Σ`、`C_Q(P) ≅ F*`、`Σ = C_W(P)` が `F` の自己同型群 | `exists_affineNearFieldModel` → `AffineNearFieldModel` が `emb`/`isComplement` (半直積)、`qEquiv : Q ≃* Fˣ`、`dAut : D → Aut F` (単射・乗法的・共役実現) を**全部フィールドとして持つ** | ✅ 3 つの同定条項とも |
+
+**残り = ステップ (3)-(17)** (次 iteration)。
+
 #### 次の入口
 
-**Ch.II The First Case (書籍 pp.108-114)** — 仮説 (B1)(B2)、Theorem B、ステップ (1)-(17)。
+**Ch.II ステップ (3)-(17)** (書籍 pp.109-114)。
 
 ### 4.5 ページ画像
 
