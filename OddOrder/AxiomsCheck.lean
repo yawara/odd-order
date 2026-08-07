@@ -2119,7 +2119,8 @@ set_option linter.style.longLine false in
 
 ⚠ **2026-08-07 の番号訂正**: 実体 `exists_extension_induce_eq_sum_distinct_irreducible` は
 以前 **(1.7)(b) と誤ラベル**されていた。(1.7)(b) は coprimality を課さず重複度 `e` 付きの
-`Ind = e·∑ χᵢ` を主張する別物で、**本リポジトリには無い**。誤ラベルのせいで (1.7)(c) の
+`Ind = e·∑ χᵢ` を主張する別物で、**`InducedInvariantConstituent.lean` に landing 済**
+(2026-08-08 に判明、上記ブロック)。誤ラベルのせいで (1.7)(c) の
 番号 grep が 0 hit になり「未形式化」と誤診しかけた。
 
 橋 `coprime_relIndex_orderOf_determinant_mul_of_coprime_card` は書籍の仮説
@@ -2130,6 +2131,39 @@ set_option linter.style.longLine false in
   OddOrder.RepresentationTheory.coprime_relIndex_orderOf_determinant_mul_of_coprime_card
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.exists_induce_eq_sum_distinct_irreducible_of_coprime_card
+
+/-! ### Peterfalvi (1.7)(b) — 重複度 `e` 付き一般形 (2026-08-08 に「未形式化」を撤回)
+
+`RepresentationTheory/InducedInvariantConstituent.lean` が書籍 (1.7)(b) の 3 条項を全部持つ:
+
+> `T/H` 可換 ⟹ `Ind_H^G θ = e·∑_{i=1}^n χᵢ`、`e = e₁`、`n = [T:H]/e²`、
+> `χᵢ(1) = [G:T]·e·θ(1)`。
+
+  induce_smul_eq_mul_sum_of_invariant            `e·Ind_H^K θ = ψ·∑_β Inf(β)` (T レベル分解)
+  induce_invariant_constituent_apply_one_eq      構成要素の次数が共通 (`φ(1) = ψ(1)`)
+  index_eq_card_induce_constituents_mul_sq_of_invariant  `[K:H] = n·e²`
+  card_induce_constituents_eq_index_div_sq_of_invariant  `n = [T:H]/e²` (**書籍の割り算形**)
+  induce_smul_eq_sum_induce_mul_of_invariant_inertia     `e·Ind_N^L θ = ∑_β Ind_T^L(ψ·Inf β)`
+                                                         (**Clifford 対応で全群へ持ち上げた形**)
+  induce_inertia_constituents_apply_one_eq       `L` レベルの次数共通性
+
+⚠ **2026-08-07 の census が (1.7)(b) を「Part I 唯一の未形式化」と誤判定していた**。docstring が
+`(1.7.b)` と書いており `(1.7)(b)` の番号 grep が 0 hit だったのが原因 (memory
+`verify-port-state-by-number-not-coq-name` の典型例)。実体は coprimality を使わない一般形として
+Peterfalvi (12.5) の `H'/H` レベル用に landing 済だった。⟹ **Part I の未形式化はゼロ**。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.induce_smul_eq_mul_sum_of_invariant
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.induce_invariant_constituent_apply_one_eq
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.index_eq_card_induce_constituents_mul_sq_of_invariant
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.card_induce_constituents_eq_index_div_sq_of_invariant
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.induce_smul_eq_sum_induce_mul_of_invariant_inertia
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.induce_inertia_constituents_apply_one_eq
 
 /-! ### Peterfalvi (1.7)(a) — Clifford correspondence, distinctness half
 

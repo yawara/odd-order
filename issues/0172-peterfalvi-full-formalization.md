@@ -142,7 +142,7 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
 
 - **⟹ ステップ 4 (Part II 逐条監査) 完了 (2026-08-08)**。Part II 全 115 件
   (Theorem A + Ch.I 19 + Ch.II 18 + Ch.III 16 + Ch.IV 46 + 補章 16) に書籍強度の実体あり、
-  **未形式化ゼロ** (Part I の (1.7)(b) に相当する残件が無い)。**補充は通算 4 件**:
+  **未形式化ゼロ**。**補充は通算 4 件**:
   1. Ch.I §1 Prop 4(c) の (A1)-only 一般形 (`Hypothesis extends HypothesisA1` へ再編)
   2. Ch.I §1 Lemma (a) の第 2 全単射 `(y,z) ↦ zy` (`invertedProdEquiv'`)
   3. Ch.II step (11) の `T ⋊ C_Q(P) ≅ F ⋊ F*` (新 leaf `StepElevenSemidirect.lean`)
@@ -151,8 +151,13 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
   8 = file docstring の散文が定理の代わりをしている) を census note §4.6 に記録。
 
 - **次の入口 = 残件の消化 (上流優先 + 文書順)**:
-  1. **(1.7)(b)** — Part I 唯一の未形式化 (重複度 `e` 付き一般形。可換 inertia 商への拡張定理が
-     前提で、巡回版は済・合成列に沿う反復が未実施)。書籍順で最も上流。
+  1. ~~**(1.7)(b)**~~ — **2026-08-08 に「未形式化」判定を撤回**。実体は
+     `RepresentationTheory/InducedInvariantConstituent.lean` に landing 済で書籍の 3 条項を
+     すべて持つ (`induce_smul_eq_sum_induce_mul_of_invariant_inertia` /
+     `card_induce_constituents_eq_index_div_sq_of_invariant` /
+     `induce_invariant_constituent_apply_one_eq`)。docstring が `(1.7.b)` と書いており
+     `(1.7)(b)` の番号 grep が 0 hit だったのが誤判定の原因。6 定理を AxiomsCheck に登録
+     (全て axiom-clean)。⟹ **Part I の未形式化もゼロ**。
   2. [issue 0174](0174-peterfalvi-813-c3-support-membership.md) — (8.13)(c3)
   3. [issue 0175](0175-pf-911-section9-casea-descent.md) — (9.11) の type-free 化
   4. 低優先繰延 2 件: (3.8) の packaging 差 / (5.6) の書籍仮説 (b)(c) ⟹ 分解存在 の橋渡し
@@ -175,7 +180,7 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
     解消済) と `six_two_of_imageData` の `B < K` の誤った正当化 (実際は**書籍 statement の修理**;
     `B = K` では書籍 (6.2) は偽)。
   - **§1-§9 監査完了 (2026-08-07)**。未形式化/条件付きは **3 件のみ**:
-    1. **(1.7)(b)** — 重複度 `e` 付き一般形 (可換 inertia 商への拡張定理が前提。巡回版は済)
+    1. ~~**(1.7)(b)**~~ — **2026-08-08 撤回: 形式化済** (`InducedInvariantConstituent.lean`)
     2. **(8.13)(c3)** — `x ∈ A(L) − A₁(L)` → [issue 0174](0174-peterfalvi-813-c3-support-membership.md)
     3. **(9.11) の type-free 化** — types III/IV は閉、type II 込みの版は case (a) の 2 仮説が残る
        → [issue 0175](0175-pf-911-section9-casea-descent.md) (descent 作業、未解決数学ではない)
@@ -272,8 +277,7 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
   - **監査手順の正本** = memory `textbook-coverage-audit-failure-modes`。
     **(1) AxiomsCheck の番号コメント → (2) 書籍ページ画像 → (3) 結論の突合** の順。
     🚨「実体が見つからない」を結論にしない (本セッションで 3 回誤判定しかけた)。
-  - **未形式化として残るもの**: **(1.7)(b)** (重複度 `e` 付き一般形。可換 inertia 商への
-    拡張定理が前提で、巡回版は済・合成列に沿う反復が未実施) の 1 件のみ。
+  - **未形式化として残るもの**: **なし** (2026-08-08 に (1.7)(b) の判定を撤回 — 上記)。
   - **低優先の繰延 2 件**: (3.8) の packaging 差 / (5.6) の書籍仮説 (b)(c) ⟹ 分解存在 の橋渡し。
 
 ## 完了条件

@@ -902,6 +902,27 @@ stale docstring 訂正 1 件: App.III hub が「Theorem **(e) forward direction*
 
 ⟹ **Part II 全体 (Ch.I-IV + 補章 4 本) の逐条監査完了**。
 
+## 4.55 ⚠ (1.7)(b) の「未形式化」判定を撤回 (2026-08-08)
+
+2026-08-07 の census は **(1.7)(b) を「Part I 唯一の未形式化」**と記録していたが、**誤り**。
+実体は `GroupTheory/RepresentationTheory/InducedInvariantConstituent.lean` に landing 済で、
+書籍の 3 条項をすべて持つ:
+
+| 書籍 (1.7)(b) | repo |
+|---|---|
+| `Ind_H^G θ = e·∑_{i=1}^n χᵢ` | `induce_smul_eq_sum_induce_mul_of_invariant_inertia` (Clifford 対応で全群へ持ち上げた形 `e·Ind_N^L θ = ∑_β Ind_T^L(ψ·Inf β)`)、T レベルは `induce_smul_eq_mul_sum_of_invariant` |
+| `n = [T:H]/e²` | `card_induce_constituents_eq_index_div_sq_of_invariant` (**書籍の割り算形そのもの**) + `index_eq_card_induce_constituents_mul_sq_of_invariant` (`[K:H] = n·e²`) |
+| `χᵢ(1) = [G:T]·e·θ(1)` | `induce_invariant_constituent_apply_one_eq` (`φ(1) = ψ(1)`) + `induce_inertia_constituents_apply_one_eq` (`L` レベル) + Clifford の `ψ(1) = e·θ(1)` |
+
+**誤判定の原因**: docstring が `(1.7.b)` と書いており、`(1.7)(b)` の番号 grep が 0 hit だった。
+memory `verify-port-state-by-number-not-coq-name` の典型例で、Part II 監査で見つけた
+**失敗様式 8 (docstring の書き方が grep を外す)** と同根。しかも `AxiomsCheck` の (1.7)(c) ブロックが
+「(1.7)(b) は…**本リポジトリには無い**」と明記しており、その注記自体が誤りを固定していた
+(2026-08-08 に訂正 + 6 定理を登録、全て axiom-clean)。
+
+⟹ **Part I の未形式化はゼロ**。Part I / Part II ともに未形式化ゼロで、残るのは
+issue 0174 / 0175 と低優先繰延 2 件のみ。
+
 ## 4.6 Part II 監査の総括 (2026-08-08)
 
 | 単位 | 件数 | 補充 |
