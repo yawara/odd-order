@@ -116,12 +116,29 @@ Isaacs / mathlib / 本 repo の 3 列で対応づける**マスター対応表**
 * **Thm 2.6** = (a) `odd_two_dim_abelian` / (b) `isPGroup_commutator_of_faithful_two_dim_charP`
   (`S04_PGroupsSmallRank.lean` から 2 条項とも引用されている)
 
-⬜ **要調査**:
+**`S02_RepresentationPropositions.lean` は 286 行あるが top-level `theorem` は §2A の 1 本だけ**。
+§2B-§2E は**方針を記した見出しだけ**で、実体は shared module に置かれている (または未実装)。
+各見出しの記載と実体を突合した結果:
 
-* **Prop 2.2 / Lem 2.3 / Prop 2.4 / Thm 2.5** — `S02_RepresentationPropositions.lean` は
-  §2B-§2E の `/-! ## -/` 見出しを持つが、**top-level `theorem` は §2A の 1 本だけ**。
-  実体が別ファイルにあるのか、見出しだけで実装が無いのかを確認する。
-* **Lem 2.7** — **BG 配下に参照が無い**。repo 全体を結論の形で検索する必要がある。
+| BG | 見出しの記載 | 実体 |
+|---|---|---|
+| **Prop 2.2** | 「**形式化状態 (2026-07-18 更新, 旧 docstring は stale だった)**: 両パートとも形式化済み・sorry-free」 | ✅ `RepresentationTheory/CliffordMultiplicityOne.lean` / `CyclicExtension.lean` / `CyclicCharacterExtension.lean` |
+| **Lem 2.3** (Fong–Swan) | 「形式化方針」+ **「(stub 未配置: forward dependent 不在のため §2 完成後または…)」** | ⚠ **注記が stale** — 実体は `RepresentationTheory.finrank_dvd_card_of_isAbsolutelyIrreducible` で **AxiomsCheck 登録済** (`AxiomsCheck.lean:6325`) |
+| **Prop 2.4** | 「形式化方針」+ **「(stub 未配置: 10 部を個別 lemma 化, shared module 作成後.)」** | ⚠ **注記が stale** — `GroupTheory/RepresentationTheory/EigenspaceUnderCyclicAction.lean` は**既に存在する** |
+| **Thm 2.5** | 「形式化方針」+ **「(stub 未配置: 依存定理多数, foundation 整備後に着手.)」** | ⬜ 未確定。挙げられた `RepresentationTheory/AutElementaryAbelian.lean` は**存在しない**。別名で在るか要調査 |
+
+⬜ **Lem 2.7** — BG 配下に番号参照が無い。`AppE_CentralizerDecomposition.lean:106` に
+「`q ∣ p − 1`」という**同じ結論の散文**があるので、そこか別モジュールに実体がある可能性。要調査。
+
+### 🚨 §2 の所見 — 「stub 未配置」注記が信用できない
+
+§2 の 4 つの「形式化方針」見出しのうち **2 つ (Lem 2.3 / Prop 2.4) の「stub 未配置」が stale**
+だった。しかも **Prop 2.2 の見出し自身が「旧 docstring は stale だった」と書いている** —
+つまりこのファイルは**過去に一度同じ問題を起こして直した履歴を持ちながら、隣の項目が
+また stale になっている**。
+
+⟹ BG の「stub 未配置」「foundation 整備後に着手」「Phase 1 待ち」といった**未着手を示す
+注記は、一律に実体で裏を取る**。§1 の Thm 1.8 / 1.11 と合わせて、BG だけで既に 4 件。
 
 ### ⚠ 書籍間の番号衝突 (2026-08-08 に踏んだ)
 
