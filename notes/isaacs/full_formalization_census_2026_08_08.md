@@ -104,8 +104,26 @@ Lemma 1.23 = `exists_normal_index_eq_prime` を `M = ⊤` に適用)。
 ままで、章が広範に形式化された後も放置されていた。2026-08-08 に更新
 (`OddOrder/Isaacs/Ch01_Sylow/Basic.lean` 冒頭)。**この種の自己注記を監査の一次証拠にしない**。
 
-⬜ **残り: 1.2-1.4, 1.8, 1.9, 1.16, 1.26-1.46 の条項ごとの突合**。1.30-1.31 (§1E の
-位数条件つき Sylow 正規性) と 1.41-1.46 (Chermak-Delgado) は repo に実体があるので
-条項の一致を確認する。
+### Ch.1 §1D-§1E の突合 (2026-08-08)
+
+| Isaacs | 書籍 | repo / mathlib | 判定 |
+|---|---|---|---|
+| 1.26 | 冪零の TFAE **5 条項** ((1) 冪零 (2) `N_G(H) > H` (3) 極大部分群は正規 (4) Sylow は正規 (5) Sylow の内部直積) | mathlib `Group.isNilpotent_of_finite_tfae` | ✅ **5 条項が同順で完全一致** |
+| 1.27 | 位数が対ごとに互いに素な有限正規部分群の族の積は直積 | `Ch01.iSupIndep_of_coprime_card_of_normal` | ✅ |
+| 1.28 | `F(G)` は **(i) 正規 (ii) 冪零 (iii) 正規冪零部分群をすべて含む** | `Ch01.fitting.normal` (:833) / `fitting.isNilpotent` (:1149) / `nilpotent_normal_le_fitting` (:1004) | ✅ **3 条項とも** |
+| 1.29 | 正規冪零 `K, L` ⟹ `KL` 冪零 | `Ch01.sup_isNilpotent_of_normal_nilpotent` | ✅ |
+| **1.30** | `\|G\| = pq` (`q < p` 素数) ⟹ **(i) Sylow `p` は正規** かつ **(ii) `q ∤ p−1` なら `G` は巡回** | (i) = `Ch01.sylow_p_subsingleton_of_card_eq_mul_prime_lt` | ⚠ **(ii) が欠けていた** — docstring 自身が「**前半**, uniqueness form」と自認 |
+| 1.31 | `\|G\| = p²q` ⟹ Sylow `p` か Sylow `q` が正規 | `Ch01.sylow_normal_of_card_eq_sq_mul_prime_lt` | ✅ |
+| 1.32 | `\|G\| = p³q` ⟹ 同上 (`\|G\| = 24` を除く) | `Ch01.sylow_normal_of_card_eq_cube_mul_prime` | ✅ |
+| 1.33 | `\|G\| = 24`、`n₂ > 1`、`n₃ > 1` ⟹ `G ≅ S₄` | `Ch01.mulEquiv_perm_fin_four_of_card_twenty_four` | ✅ |
+| 1.34 | 「奇に作用する」元があれば指数 2 の正規部分群 | `Ch01.normalSubgroup_index_two_of_actsOddly` | ✅ |
+| 1.35 | `\|G\| = 2n` (`n` 奇) ⟹ 指数 2 の正規部分群 | `Ch01.normalSubgroup_index_two_of_card_two_mul_odd` | ✅ |
+| 1.36 | `\|G\| = p^a q` ⟹ 非単純 | `Ch01.exists_normal_ne_bot_ne_top_of_card_eq_pow_mul_prime` | ✅ |
+
+⚠ **1.30 (ii) が 2 つめの部分被覆**。1.24 と同じく **docstring が自ら「前半」と自認**しており、
+番号 grep でも cite 数でも出ない。**「前半」「弱形」「uniqueness form」のような自認語を
+grep する**のが有効な検出手段だと分かった。
+
+⬜ **残り: 1.2-1.4, 1.8, 1.9, 1.16, 1.37-1.46 の条項突合**。
 
 ### Ch.2-Ch.7, Ch.9-Ch.10 — 未着手
