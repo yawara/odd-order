@@ -305,4 +305,26 @@ repo は **(1) ⇔ (3)** だけを theorem として持ち、条件 (2) は Lemm
 
 ⟹ **Ch.6 全 24 件被覆・補充ゼロ**。
 
-### Ch.7, Ch.9-Ch.10 — 未着手 (次の入口 = Ch.7 Thompson Subgroup、8 件)
+### Ch.7 Thompson Subgroup (8 件、書籍 pp.200-222) — **監査完了 (2026-08-08)**、補充ゼロ
+
+**8/8 被覆**。全件を実体で確認:
+
+| Isaacs | 書籍 | 実体 |
+|---|---|---|
+| 7.1 | **Thompson**: `p ≠ 2`、`C_G(Z(P))` と `N_G(J(P))` が normal `p`-complement を持つ ⟹ `G` も | `S7A1_JpGL2p.lean:67` |
+| 7.2 | `J(P) ≤ Q ≤ P` ⟹ `J(Q) = J(P)`、特に `J(P)` は `Q` の特性部分群 | `S7A1_JpGL2p.lean:53` |
+| 7.3 | `GL(2,p)` の `p`-部分群についての補題 | `S7A2_NormalPThm75.lean:71` (`gl2_pSubgroup_centralizer…`) |
+| 7.4 | `q` 奇 ⟹ `SL(2,q)` の involution は `−I` ただ 1 つ | `S7A1_JpGL2p.lean:100` |
+| 7.5 | `p`-可解 + 諸条件 ⟹ normal `p`-complement | `S7A2_NormalPThm75.lean:23` |
+| 7.6 | **normal-J**: `p`-可解 + 諸条件 ⟹ `J(P) ⊴ G` | `S7B2_NormalJ_PComplement.lean:428` |
+| 7.7 | `G/N` (`N` は正規 `p'`-群) での `N_G(P)` の挙動 (a)(b) | `S7B2_NormalJ_PComplement.lean:288` |
+| **7.8** | **Burnside `p^a q^b` 可解性** | `Ch07.burnside_p_pow_q_pow` (`Main.lean:917`) — 指標を使わない **Goldschmidt–Bender–Matsuyama の 9 段証明** |
+
+⚠ **7.4 で誤判定しかけた** — 私の grep パターンが `Isaacs Lemma 7.4` / `Isaacs Thm 7.4` しか
+見ておらず、repo の表記 **`Isaacs Lem 7.4`** (略記) を取りこぼした。
+⟹ **番号だけでなく「種別語の略記」でも表記揺れが起きる**。`Thm`/`Theorem`/`Lem`/`Lemma`/
+`Cor`/`Corollary` を全部含めるか、種別語を落として番号だけで引く。
+
+⟹ **Ch.7 全 8 件被覆・補充ゼロ**。
+
+### Ch.9-Ch.10 — 未着手 (次の入口 = Ch.9 More on Subnormality、31 件)

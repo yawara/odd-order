@@ -131,6 +131,9 @@ repo の `Ch08_PermutationGroups` も既に `IsPreprimitive` を使っている�
       - **Ch.6 監査完了 (2026-08-08)**: 全 24 件被覆・**補充ゼロ**。6.18 (3 条項) は
         既に書籍の形に束ねた合成定理として名付けられており、6.22/6.24 (Frobenius 核の
         冪零性、Thompson) も実体あり。
+      - **Ch.7 監査完了 (2026-08-08)**: 全 8 件被覆・**補充ゼロ**。7.8 (Burnside `p^a q^b`)
+        は指標を使わない Goldschmidt–Bender–Matsuyama の 9 段証明で `burnside_p_pow_q_pow`。
+        ⚠ 7.4 は repo が `Isaacs Lem 7.4` と略記しており grep パターンが取りこぼした。
       - 1 章ぶん終えるごとに census note を更新して commit。
 
 ## 完了条件
