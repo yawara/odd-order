@@ -150,7 +150,16 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
     `S13.Hypothesis` (3 本) / `S14.TypeIFrobeniusData.kernel_eq_MF` (1 本、**消費者あり・強度可変**) /
     `S14.DadeNotation` (3 本)。**残 1 件**: `S15_SAndTGrid.lean:39` の `e_eq_index : Prop`
     (同ファイル :137 に本物版がある) → §13 監査で扱う。
-  - **次の入口**: §13 = 書籍 pp.75-86「The Subgroups S and T」(repo `S15`)。
+  - **§13 監査に着手 (2026-08-07)**: 22 件 ((13.1)-(13.19) + (13.10.1)-(13.10.3))、番号 grep では
+    全件に実体。**(13.19) は突合済 = 書籍の全条項が `S15.TypeIOrthogonalityGridData` に在る**
+    (`betaL_eq` で `β_L` を Dade 像に pin / (c) 第 1 条項の `j` 非依存 / (c1)(c2) とも**両条項**)。
+    ⚠ 同ファイルの**旧** carrier `TypeIOrthogonalityData` は opaque `Prop` を case ラベルに使い、
+    implication field が (c1) の次数評価・(c2) の parity しか投影しない **lossy adapter**
+    (§16 `BetaVanishing` が消費)。producer は grid 版から本物を入れているので**証明は忠実**だが
+    statement 単体では条項が読めない (失敗様式 2 に近い形)。**被覆漏れではない**ので補充不要と判断。
+    §12 の宿題だった `S15_SAndTGrid.lean:39` の `e_eq_index : Prop` はこの旧 carrier のもの。
+  - **次の入口**: §13 の残り = (13.1)-(13.18) + (13.10.1)-(13.10.3) の逐条突合
+    (番号→ファイル対応は census note に記録済)。
   - **監査手順の正本** = memory `textbook-coverage-audit-failure-modes`。
     **(1) AxiomsCheck の番号コメント → (2) 書籍ページ画像 → (3) 結論の突合** の順。
     🚨「実体が見つからない」を結論にしない (本セッションで 3 回誤判定しかけた)。

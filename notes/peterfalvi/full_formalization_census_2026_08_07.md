@@ -512,6 +512,31 @@ Theorem (6.3) + (10.8) で、(11.5)-(11.9) を一切使わない。
 `no_typeV_maximal_unconditional` で常に discharge されている (書籍 §12 の証明も (10.10) を cite
 するので、内部段としては忠実)。headline (12.7) のみ無条件形に直した。
 
+### §13 = repo `S15_*` (書籍 pp.75-86、`pages/peterfalvi-p075..p086.png` 切り出し済) — **監査途中 (2026-08-07、(13.19) 済)**
+
+書籍 §13 =「The Subgroups S and T」= **(13.1)-(13.19)** + (13.10) の sub-part
+**(13.10.1)-(13.10.3)** の計 **22 件**。repo は `S15_*` 系 (最大のクラスタ)。
+番号 grep では全 22 件に実体あり。逐条突合は下記から。
+
+| 書籍 | 判定 | repo の実体 / 備考 |
+|---|---|---|
+| (13.19) | ✅ **書籍の全条項が `TypeIOrthogonalityGridData` に在る** | `S15_SAndTGrid.lean:134` の `TypeIOrthogonalityGridData`: `e_eq_index` (本物の等式) / `betaL_eq` (**`β_L` を Dade 像 `(Ind_H^L 1_H − φ)^{τ₁}` に pin**) / `Ltau_orthogonal_eta` / `betaL_eta0_row_constant`+`col_constant` ((c) 第 1 条項 = `(β_L^τ, η_{0j})` の `j` 非依存) / `caseC`, `caseC_dual` (**(c1) = `(β_S^τ, φ^{τ₁}) ≡ 1 (mod 2)` ∧ `(\|H\|−1)/e ≤ (u−1)/q`、(c2) = `η_{0j}` odd-parity ∧ `p ≤ e`** の**両条項とも**)。producer `typeIOrthogonalityGridData_of_coherent78_of_c_eq_one_and_d_eq_one` は axiom-clean |
+| — | ⚠ **設計差 (§16 向け lossy adapter)** | 同ファイル `:36` の**旧** carrier `TypeIOrthogonalityData` は opaque `Prop` を **case ラベル**として持ち (`e_eq_index`/`disjoint_support`/`Ltau_orthogonal_eta`/`betaL_eta_independent`/`caseC1`/`caseC2`/duals)、implication field は (c1) の**次数評価だけ** (`caseC1_bound`)・(c2) の**parity だけ** (`caseC2_eta0j_odd`) を投影する。`betaL` も自由フィールドで pin が無い。producer `typeI_orthogonality_dichotomy_of_c_eq_one_and_d_eq_one` は grid 版から**本物の命題を入れて**いるので**証明としては忠実**だが、`∃ data, data.disjoint_support ∧ …` という statement 単体では (c1) の parity 条項・(c2) の `p ≤ e`・`β_L` の同定が読めない (issue 0172 §2 の失敗様式 2「`∃ X` decoupling」に近い形)。**書籍強度の (13.19) は grid 版**なので被覆漏れではない — §16 側 (`S16_NonExistenceG/BetaVanishing`) がこの adapter 経由で消費している |
+
+⬜ **残り: (13.1)-(13.18) + (13.10.1)-(13.10.3) の逐条突合** (次セッション)。
+番号 → 主な repo ファイルの対応 (grep 実測):
+(13.1)(13.2) `S15_SAndT_Setup/{PairStructure,SubcoherenceInputs,TSideDegrees}` /
+(13.3)(13.5) `S15_CaseBEndgameSupply/HSharpChosenBase`, `S15_CharacterDegreeEnginesSSide` /
+(13.4) `S15_CharacterDegreeSupply` / (13.6)-(13.9) `S15_CaseBEndgameSupply/{AnalyticRelayer,Eta10HCorrection}`,
+`S15_CharacterDegreeEngines`, `S15_SAndT_Setup/CaseBOrder` /
+(13.10)(13.10.1-3) `S15_SAndT_Setup/DegreesFirstSplit`, `GroupTheory/TISubsetCounting`,
+`Algebra/GaloisRationalInteger` / (13.11)(13.12) `S15_CaseBEndgameSupply/OrderRelayerCore`,
+`S16_CoreLemmas`, `RepresentationTheory/SingerLineBound` / (13.13)(13.15) `S15_CaseAContradiction`,
+`RepresentationTheory/TypePGaloisUBound`, `S15_CharacterDegreeSupply` /
+(13.14) `S15_SAndT_Setup/CaseBOrder` / (13.16) `BG/Ch1_Preliminary/OperatorMaschke`,
+`GroupTheory/WielandtFixedPoint` / (13.17) `S15_SAndTDefs` / (13.18) `S15_SAndTGrid`,
+`S10_TypePSupportA0`。
+
 ## 4. 未着手の census
 
 - **Part II (Suzuki の定理 A、書籍 pp.97-134)** — `Proposition N` / `Lemma N` の**章内リセット
