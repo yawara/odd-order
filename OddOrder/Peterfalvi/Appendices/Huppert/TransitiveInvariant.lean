@@ -6,10 +6,10 @@ Authors: Yawara Ishida
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 
 /-!
-# Peterfalvi Appendix B: transitivity implies irreducibility
+# Peterfalvi Appendix I: transitivity implies irreducibility
 
 T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272,
-2000), Appendix B, Proposition 1, p. 135.
+2000), Appendix I, Proposition 1, p. 135.
 
 This lightweight leaf isolates the first implication of Proposition 1: an
 action transitive on the nonidentity elements has no proper nontrivial
@@ -27,7 +27,7 @@ universe uD uE
 
 variable {D : Type uD} {E : Type uE} [Group D] [Group E]
 
-/-- **Peterfalvi Appendix B, Proposition 1 — irreducibility from
+/-- **Peterfalvi Appendix I, Proposition 1 — irreducibility from
 transitivity**: a group acting transitively on `E#` acts irreducibly, i.e.
 every `D`-invariant subgroup of `E` is `bot` or `top`. -/
 theorem isAInvariant_eq_bot_or_top_of_transitive

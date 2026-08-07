@@ -17,7 +17,7 @@ import OddOrder.Peterfalvi.Appendices.NearFieldClass
 /-!
 # Near-field from a sharply transitive additive action
 
-Peterfalvi, *Character Theory for the Odd Order Theorem*, Appendix C, p. 137 (the "transport"
+Peterfalvi, *Character Theory for the Odd Order Theorem*, Appendix II, p. 137 (the "transport"
 recorded in the proof of Proposition 1): if a group `M` acts on an additive abelian group `A` by
 *additive* automorphisms, **regularly on the nonzero elements** `A ∖ {0}` (sharply transitive),
 then `A` carries a near-field structure whose multiplicative group `A∖{0}` is isomorphic to `M`.
@@ -35,7 +35,7 @@ Then `(A, +, *)` is a near-field (`NearField`):
 * the **right** distributive law `(x + y)*z = x*z + y*z` is exactly additivity of `z ↦ m_z • ·`.
 
 The construction is packaged through `SharplyTransitiveData`.  This is the elementary core of the
-affine near-field model (`AffineNearFieldModel`) of Appendix C, Proposition 1.
+affine near-field model (`AffineNearFieldModel`) of Appendix II, Proposition 1.
 -/
 
 open OddOrder.Peterfalvi.Appendices.NearFields (NearField)
@@ -242,7 +242,7 @@ multiplicative identity is `e`. -/
 The inverse `m ↦ m⁻¹` (rather than `m ↦ m • e`) is what makes this a *homomorphism*: right
 multiplication is `x * y = (coord y) • x`, so `(m₁⁻¹ • e) * (m₂⁻¹ • e) = (m₁ m₂)⁻¹ • e` — i.e.
 `m ↦ m • e` is an *anti*-homomorphism, and pre-composing with inversion fixes the direction.  This
-realizes the identification `Q ≃* F^*` of Peterfalvi Appendix C, Proposition 1. -/
+realizes the identification `Q ≃* F^*` of Peterfalvi Appendix II, Proposition 1. -/
 noncomputable def mulEquivUnits :
     letI := d.nearField
     M ≃* Aˣ :=
@@ -282,7 +282,7 @@ end OddOrder.GroupTheory
 
 /-! ### The affine group of a near-field (forward direction of the correspondence)
 
-Peterfalvi, Appendix C, p. 137 records the correspondence in *both* directions.  The structure
+Peterfalvi, Appendix II, p. 137 records the correspondence in *both* directions.  The structure
 `SharplyTransitiveData` above does the backward half (a sharply transitive action produces a
 near-field).  Here is the
 forward half: *from* a near-field `F` one builds the **affine group** `𝓛(F) = F ⋊ F^*`, realized as
@@ -405,7 +405,7 @@ def nearFieldAffineGroup (F : Type*) [NearField F] : Subgroup (Equiv.Perm F) whe
 @[simp] theorem mem_nearFieldAffineGroup {g : Equiv.Perm F} :
     g ∈ nearFieldAffineGroup F ↔ ∃ u t, nearFieldAffinePerm u t = g := Iff.rfl
 
-/-- **The affine group of a near-field acts sharply `2`-transitively** (Peterfalvi, Appendix C,
+/-- **The affine group of a near-field acts sharply `2`-transitively** (Peterfalvi, Appendix II,
 p. 137, forward direction of the Zassenhaus correspondence): for distinct `a ≠ b` and distinct
 `c ≠ d` there is a *unique* element of `𝓛(F) = F ⋊ F^*` sending `a ↦ c` and `b ↦ d`.  This packages
 the arithmetic core `nearField_affine_existsUnique` at the level of the permutation group. -/

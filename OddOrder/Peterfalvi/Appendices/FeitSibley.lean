@@ -8,7 +8,7 @@ import OddOrder.Peterfalvi.S08_GeneralAdjoin
 import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
 
 /-!
-# Peterfalvi Appendix E: The Feit-Sibley Theorem
+# Peterfalvi Appendix IV: The Feit-Sibley Theorem
 
 T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272,
 2000), Appendix IV ("The Feit--Sibley Theorem"), pp. 144--150.

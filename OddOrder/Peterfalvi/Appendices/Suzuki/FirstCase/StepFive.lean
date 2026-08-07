@@ -277,7 +277,7 @@ noncommutativity pushes into `T`, which is generalized quaternion
 ([Is] Thm 6.11, 2-rank one) of exponent `4`, hence `Q₈` of order `8`.
 Then `Z(F^*) = Z(T) × O` has order `2|O|`, and `T` contains a cyclic
 subgroup of order `4`, so `C₄ × O` is cyclic of index `2` in `F^*`;
-Appendix C, Proposition 2 (`cyclic_index_two_nearField_classification`)
+Appendix II, Proposition 2 (`cyclic_index_two_nearField_classification`)
 gives `|F| = r²` with `|Z(F^*)| = r − 1`, and the arithmetic
 `8|O| = r² − 1`, `2|O| = r − 1` forces `|O| = 1`, `r = 3`. -/
 theorem nearField_card_eq_nine_of_nilpotent_units {F : Type*}
@@ -553,7 +553,7 @@ theorem nearField_card_eq_nine_of_nilpotent_units {F : Type*}
     have h4 : 4 * Nat.card ↥O * C.index = 4 * Nat.card ↥O * 2 := by
       rw [hmul]; ring
     exact Nat.eq_of_mul_eq_mul_left (by positivity) h4
-  -- Appendix C, Proposition 2
+  -- Appendix II, Proposition 2
   rcases NearFields.cyclic_index_two_nearField_classification C hCcyc hCidx
     with hfield | ⟨r, K, instK, instKfin, d, ⟨p', n', hp', hp'odd, hn'pos, hreq⟩,
       hcardK, ⟨e, -⟩, hZr⟩

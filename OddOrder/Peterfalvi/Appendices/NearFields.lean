@@ -16,10 +16,10 @@ import OddOrder.GroupTheory.BrauerSuzuki
 import OddOrder.Peterfalvi.Appendices.RankOneAffineModel
 
 /-!
-# Peterfalvi Appendix C: On Near-Fields
+# Peterfalvi Appendix II: On Near-Fields
 
 T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272,
-2000), Appendix C, pp. 137--138.
+2000), Appendix II, pp. 137--138.
 
 The appendix uses finite near-fields to describe the 2-rank one case of the
 Suzuki theorem and records the special Zassenhaus classification needed there.
@@ -92,7 +92,7 @@ namespace OddOrder.Peterfalvi.Appendices.NearFields
 /-- **A finite group acting freely on a finite type divides its cardinality**: if every stabilizer
 is trivial, then `|G| ∣ |α|` (each orbit has size `|G|`, and the orbits partition `α`).  General
 group-action fact (could live in `Mathlib.GroupTheory.GroupAction`); used here for the orbit
-counting `|A| ∣ |U| - 1` in Appendix C, Proposition 2. -/
+counting `|A| ∣ |U| - 1` in Appendix II, Proposition 2. -/
 theorem card_group_dvd_card_of_free {G β : Type*} [Group G] [MulAction G β]
     [Finite G] [Finite β] (hfree : ∀ b : β, MulAction.stabilizer G b = ⊥) :
     Nat.card G ∣ Nat.card β := by
@@ -131,7 +131,7 @@ theorem addOrderOf_eq_of_ne_zero (x y : F) (hx : x ≠ 0) (hy : y ≠ 0) :
   exact (addOrderOf_injective (rightMul (x⁻¹ * y) hne).toAddMonoidHom
     (rightMul (x⁻¹ * y) hne).injective x).symm
 
-/-- **The characteristic of a finite near-field is a prime** (Peterfalvi, Appendix C, p. 137: "`F`
+/-- **The characteristic of a finite near-field is a prime** (Peterfalvi, Appendix II, p. 137: "`F`
 is an elementary abelian `f`-group for some prime `f`"): there is a prime `f` with `f • x = 0` for
 all `x ∈ F`.  Since all nonzero elements share one additive order (`addOrderOf_eq_of_ne_zero`),
 that order is forced to be prime by the divisor argument; this makes `(F, +)` elementary abelian. -/
@@ -240,7 +240,7 @@ theorem card_eq_of_index_two (A : Subgroup Fˣ) [Finite F] (hidx : A.index = 2) 
   have hpos : 0 < Nat.card F := Nat.card_pos
   omega
 
-/-- **Free-orbit counting bound** (the engine behind irreducibility in Appendix C, Proposition 2).
+/-- **Free-orbit counting bound** (the engine behind irreducibility in Appendix II, Proposition 2).
 If a commutative subgroup `A ⊆ Fˣ` acts on `(F, +)` by right multiplication and `U` is a nontrivial
 `A`-invariant subgroup, then `|A| + 1 ≤ |U|`.  Indeed `A` acts *freely* on `U ∖ {1}`
 (`rightMulAction_eq_self_iff`), so `|A| ∣ |U| - 1` (`card_group_dvd_card_of_free`); as `U ≠ ⊥` the
@@ -290,7 +290,7 @@ theorem add_one_le_card_of_aInvariant_ne_bot {F : Type*} [NearField F] [Finite F
   omega
 
 /-- **Maschke's theorem for an elementary abelian operator module** (the splitting step in
-Appendix C, Proposition 2).  Let `A` act on an elementary abelian `p`-group `E` via
+Appendix II, Proposition 2).  Let `A` act on an elementary abelian `p`-group `E` via
 `φ : A →* MulAut E`, with `(|A|, |E|)` coprime and `p ∣ |E|`.  Then every `A`-invariant subgroup
 `U ≤ E` has an `A`-invariant **complement** `W` (`IsCompl U W`, so `E` is the internal direct sum
 `U ⊕ W`).  `Additive E` is an `F_p`-vector space on which `A` acts coprimely, so the representation
@@ -379,7 +379,7 @@ theorem exists_aInvariant_complement_of_elementaryAbelian
     have h := congrArg Φ hsup
     rwa [Φ.map_sup, Φ.map_top, hΦpU, ← hW_def] at h
 
-/-- **Near-field field structure** (the first half of Peterfalvi Appendix C, Proposition 2, via
+/-- **Near-field field structure** (the first half of Peterfalvi Appendix II, Proposition 2, via
 Appendix I Proposition 2).  If a commutative subgroup `A ⊆ Fˣ` of a finite near-field acts
 *irreducibly* on `(F, +)` by right multiplication, then `(F, +)` is a `1`-dimensional vector space
 over a finite field `K` with `|K| = |F|` (i.e. `F` carries a field structure refining its additive
@@ -401,7 +401,7 @@ theorem nearField_field_structure.{u} {F : Type u} [NearField F] [Finite F]
       (rightMulAction A hcomm) hirr
   exact ⟨K, hK, hMod, hKfin, hrank, hcard⟩
 
-/-- **Index-two subgroups act irreducibly** (Peterfalvi Appendix C, Proposition 2, counting step).
+/-- **Index-two subgroups act irreducibly** (Peterfalvi Appendix II, Proposition 2, counting step).
 A commutative subgroup `A ⊆ Fˣ` of **index `2`** acts *irreducibly* on `(F, +)` by right
 multiplication: the only `A`-invariant subgroups of `(F, +)` are `⊥` and `⊤`.  If a proper
 nontrivial invariant `U` existed, the free action of `A` on `U ∖ {1}` and on its Maschke complement
@@ -451,7 +451,7 @@ theorem rightMulAction_irreducible_of_index_two {F : Type*} [NearField F] [Finit
     Nat.mul_le_mul hU_ge hW_ge
   nlinarith [hge, hprod, hFcard, hApos]
 
-/-- **Unconditional near-field field structure for an index-`2` subgroup** (Peterfalvi Appendix C,
+/-- **Unconditional near-field field structure for an index-`2` subgroup** (Peterfalvi Appendix II,
 Proposition 2, field-structure half).  If a commutative subgroup `A ⊆ Fˣ` of a finite near-field has
 index `2`, then `(F, +)` is a `1`-dimensional vector space over a finite field `K` with `|K| = |F|`.
 Combines the index-`2` irreducibility (`rightMulAction_irreducible_of_index_two`) with
@@ -469,7 +469,7 @@ end NearFieldBasics
 section TwistedNearField
 
 /-- **Twisting data turning a field into a near-field** (the construction behind `F_{r²,2}`,
-Peterfalvi Appendix C, pp. 137--138).  An order-`≤ 2` ring automorphism `σ` of a field `K` together
+Peterfalvi Appendix II, pp. 137--138).  An order-`≤ 2` ring automorphism `σ` of a field `K` together
 with a multiplicative *sign* character `χ : Kˣ → ℤ/2` that is invariant under `σ`.  The twisted
 multiplication `x ∘ y = σ^{χ(y)}(x) · y` then makes `K` a near-field (in general non-commutative
 multiplicatively, so not a field).  For `F_{r²,2}`: `K = 𝔽_{r²}`, `σ : x ↦ x^r` (the order-`2`
@@ -607,7 +607,7 @@ end TwistData
 /-- The near-field carried by twisting data `d`: the additive group of the field `K` equipped with
 the twisted multiplication `x ∘ y = σ^{χ(y)}(x) · y`.  A type synonym for `K` so the twisted
 multiplication does not clash with the field multiplication.  This is the abstract form of the
-exceptional near-field `F_{r²,2}` (Peterfalvi, Appendix C). -/
+exceptional near-field `F_{r²,2}` (Peterfalvi, Appendix II). -/
 def Twisted {K : Type*} [Field K] (_ : TwistData K) : Type _ := K
 
 namespace Twisted
@@ -642,7 +642,7 @@ end TwistedNearField
 section PropositionTwo
 
 /-- **An order-`2` field automorphism forces square cardinality** (the twisted branch of Peterfalvi
-Appendix C, Proposition 2).  If `σ : RingAut K` on a finite field `K` satisfies `σ² = 1` and
+Appendix II, Proposition 2).  If `σ : RingAut K` on a finite field `K` satisfies `σ² = 1` and
 `σ ≠ 1`, then `|K|` is a perfect square `r²`, where `r = |K^σ|` is a prime power `p^n` (`n ≥ 1`).
 
 By Artin's theorem (`FixedPoints.finrank_eq_card`) the fixed field `K^{⟨σ⟩}` satisfies
@@ -675,7 +675,7 @@ theorem card_eq_sq_of_orderTwo_ringAut {K : Type*} [Field K] [Finite K]
   exact ⟨Fintype.card (FixedPoints.subfield G K), p, (n : ℕ), hp, n.pos, hcardFix,
     by rw [Nat.card_eq_fintype_card, hcardK], by rw [Nat.card_eq_fintype_card]⟩
 
-/-- **Peterfalvi Appendix C, Proposition 2, first half** (proved, sorry-free), stated with the
+/-- **Peterfalvi Appendix II, Proposition 2, first half** (proved, sorry-free), stated with the
 book's hypothesis: if the multiplicative group `F^*` of a finite near-field has a **cyclic**
 subgroup `A` of index `2`, then `(F, +)` is a `1`-dimensional vector space over a finite field `K`
 with `|K| = |F|`.
@@ -693,9 +693,10 @@ theorem exists_field_structure_of_cyclic_index_two.{u} {F : Type u} [NearField F
     simpa using congrArg Subtype.val (mul_comm u v)
   exact nearField_field_structure_of_index_two A hcomm hidx
 
-/-- **Centre of a twisted near-field's multiplicative group** (Peterfalvi Appendix C, Proposition 2,
-last clause).  For the twisted near-field structure `d` on a finite field `K`, whose multiplication
-is `a ∘ c = a·c` for `c` in an index-`2` subgroup `B ≤ Kˣ` and `a ∘ c = σ(a)·c` otherwise, an
+/-- **Centre of a twisted near-field's multiplicative group** (Peterfalvi Appendix II,
+Proposition 2, last clause).  For the twisted near-field structure `d` on a finite field `K`,
+whose multiplication is `a ∘ c = a·c` for `c` in an index-`2` subgroup `B ≤ Kˣ` and
+`a ∘ c = σ(a)·c` otherwise, an
 element `a ≠ 0` is central for `∘` iff it is `σ`-fixed.  Extracted as a standalone lemma so the
 centrality case analysis (which needs `B = 𝔽_{|B|}`-roots via `rootsOfUnity` and the cardinality
 comparison `|B| > r-1`) runs in a small context.  The `σ`-fixed units number `r-1` (`hFuCount`). -/
@@ -786,7 +787,7 @@ theorem twMul_central_iff {K : Type*} [Field K] [Finite K]
       · rw [htwB a c hc hcB, htwB c a ha haB]; exact mul_comm a c
       · rw [htwNB a c hc hcB, htwB c a ha haB, hσa]; exact mul_comm a c
 
-/-- **Peterfalvi Appendix C, Proposition 2** (pp. 137--138).  Let `F` be a finite near-field whose
+/-- **Peterfalvi Appendix II, Proposition 2** (pp. 137--138).  Let `F` be a finite near-field whose
 multiplicative group `F^*` has a **cyclic** subgroup `A` of index `2`.  Then either `F` is a field
 (equivalently, by `NearField.mul_add_of_mul_comm`, its multiplication is commutative), or there is
 an `r` which is a power of an odd prime such that `F ≅ F_{r²,2}` — the twisted near-field carried by

@@ -12943,7 +12943,8 @@ Step 2's `(E.15)`; its group-theoretic half is the new leaf `AppE_SemidirectFrat
   (`aInvariant_coset_mem_centralizer_of_coprime_subgroup`) applied to `y·N_S(R₀)`, with
   `A`-regularity forcing the fixed point to be `1`.
 
-⚠ The `sorry`s left in Appendix E are exactly **E.4** and **E.5**. -/
+(E.4 and E.5 were the last `sorry`s of Appendix E; both closed before the
+2026-08-07 repo-wide sorry-free milestone.) -/
 #assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.eq_omega_of_maximal
 #assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.omega_pow_eq_one
 #assert_only_allowed_axioms OddOrder.BG.AppE.RegularOperatorSetup.R₀_not_le_derived_omega
@@ -13110,13 +13111,15 @@ abelian 2-subgroups of `C_G(P)` have order ≤ 2"; the adapted field model
 2026-07-21): the faithful centralizer quotient `C_G(P)/N` is a rank-one (A1)+(A2)
 group — `exists_four_subgroup_of_quotient` lifts a four-subgroup along an odd
 kernel, and `rankOneQuotient` assembles `RankOneHypothesis` from §3 Prop 1(a)/(c)
-plus (B1).  Step (2)(b) (`exists_affineNearFieldModel`) cites the honestly-stated
-Appendix C Prop 1, which is sorried behind Brauer–Suzuki (issue 9318), and is
-therefore deliberately NOT asserted here. -/
+plus (B1).  Step (2)(b) (`exists_affineNearFieldModel`) cites Appendix II Prop 1;
+that was sorried behind Brauer–Suzuki until the `Q₈` case closed on 2026-08-07
+(issue 9506), so it is now asserted too. -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.exists_four_subgroup_of_quotient
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.rankOneQuotient
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.exists_affineNearFieldModel
 
 /-! **Peterfalvi Part II, Ch. II, step (3), the dimension identity** (`FirstCase/StepThree.lean`,
 issue 2053, 2026-07-22): for a nontrivial `KP`-invariant elementary abelian `r`-subgroup
@@ -13142,10 +13145,14 @@ subgroup for `K ◁ L`, then `|M| = |V|^t`.  Sorry-free; no semisimple-module ma
 issue 2053, 2026-07-22): a `K`-invariant subgroup `V ≤ Q` of prime order `r` forces
 `2^p − 1 ∣ r − 1` — `K` acts faithfully on `V` (f.p.f. on `Q`), embedding into
 `Aut(V) ≅ (ℤ/r)^*`.  Sorry-free.  (The dichotomy `exists_prime_order_invariant_or_irreducible`
-and `card_inf_centralizer_eq_prime` inherit the step (2)(b) sorry — issue 9318 — and are
-deliberately NOT asserted here.) -/
+and `card_inf_centralizer_eq_prime` used to inherit the step (2)(b) sorry — issue 9318 — and
+are asserted here since the `Q₈` case closed on 2026-08-07.) -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.card_K_dvd_sub_one_of_prime_order_invariant
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.card_inf_centralizer_eq_prime
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.exists_prime_order_invariant_or_irreducible
 
 /-! **Peterfalvi Part II, Ch. II, step (5), the near-field analysis** (`FirstCase/StepFive.lean`,
 issue 2053, 2026-07-22): if `C_Q(P) ≅ F^*` is nonabelian then `|F| = 9`.  The unit group of a
@@ -13156,16 +13163,18 @@ given that `2`-elements have order dividing `4`, `T` is `Q₈`, forcing `|F| = 9
 (`nearField_card_eq_nine_of_nilpotent_units`).  All three are sorry-free.
 
 (The `2`-element exponent bound is supplied by the proved Higman theorem
-`pow_four_eq_one_of_isSuzuki2Group`.  The near-field model still comes from
-Appendix C Proposition 1 (issue 9318), so the step (5) conclusion
-`card_nearField_eq_nine_and_Q1_eq_bot` inherits that `sorry` and is deliberately
-NOT asserted here.) -/
+`pow_four_eq_one_of_isSuzuki2Group`.  The near-field model comes from Appendix II
+Proposition 1, which was sorried behind Brauer–Suzuki until 2026-08-07 (issue 9506);
+the step (5) conclusion `card_nearField_eq_nine_and_Q1_eq_bot` is therefore asserted
+here as well.) -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.exists_nilpotent_units_sylowTwo_decomp
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.exists_noncommuting_two_elements_of_nearField_units
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.nearField_card_eq_nine_of_nilpotent_units
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.card_nearField_eq_nine_and_Q1_eq_bot
 
 /-! **Peterfalvi Part II, Ch. II, step (6), the arithmetic lemma** (`FirstCase/StepSix.lean`,
 issue 2053, 2026-07-22): [HB] Kapitel IX, Lemma 2.7 — an odd prime power `f^a = 2^b + 1`
@@ -13183,7 +13192,7 @@ exponent `≤ 2` (`σ² = 1`).  Via `ringAut_card_prime_pow_eq_pow` (`σ x = x^{
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.ringAut_sq_eq_one_of_card_prime_or_prime_sq
 
-/-! **A commutative near-field is a field** (`FirstCase/StepSix.lean`, App. C Prop 2 first
+/-! **A commutative near-field is a field** (`FirstCase/StepSix.lean`, App. II Prop 2 first
 alternative, 2026-07-22): `NearFields.fieldOfComm` builds a `Field` structure on a commutative
 `NearField` by adding `mul_comm` and the left distributive law
 (`NearField.mul_add_of_mul_comm`) to the existing `AddCommGroup`/`GroupWithZero`.  Reusing the
@@ -13370,7 +13379,7 @@ transversal `1, {t y : y ∈ Q}` and the relation `t y x = x t y^x`.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.FirstCaseHypothesis.p_dvd_card_Q_add_one
 
-/-! **Peterfalvi Appendix C, Proposition 2 — COMPLETE** (`Peterfalvi.Appendices.NearFields`,
+/-! **Peterfalvi Appendix II, Proposition 2 — COMPLETE** (`Peterfalvi.Appendices.NearFields`,
 2026-07-21; 登録は 2026-07-22 に補完 — landing commit `42892fcb5` が AxiomsCheck 追記を
 欠いていた).  Zassenhaus/Dickson 分類の App.C 特殊形: 有限 near-field `F` の乗法群が
 **cyclic** な指数 `2` 部分群 `A` を持てば、`F` は可換 (体) か、さもなくば奇素数冪 `r` が
@@ -13388,7 +13397,7 @@ transversal `1, {t y : y ∈ Q}` and the relation `t y x = x t y^x`.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.NearFields.cyclic_index_two_nearField_classification
 
-/-! **Peterfalvi Appendix C, the exceptional near-field `F_{r²,2}` — concrete instantiation**
+/-! **Peterfalvi Appendix II, the exceptional near-field `F_{r²,2}` — concrete instantiation**
 (`Peterfalvi.Appendices.ExceptionalNearField`, 2026-07-22).  `TwistData` の抽象構成
 (`NearFields.lean`) を book の実データで実体化: `K` を位数 `p^{2n}` の有限体として
 
@@ -20271,9 +20280,9 @@ Peterfalvi 補章の鎖が全て axiom-clean になった。従来この 4 本�
 
 ```
 q8_exists_proper_normal            (issue 9506, Navarro pp.139-146)
-  → brauerSuzuki_quaternionSylow_q8   (App. C Prop 1 の前提 (ii)、|S| = 8)
+  → brauerSuzuki_quaternionSylow_q8   (App. II Prop 1 の前提 (ii)、|S| = 8)
   → RankOneHypothesis.brauerSuzuki    (|S| ≥ 16 の ordinary route と合流)
-  → rankOne_affine_nearField          (App. C Prop 1 = 階数 1 の affine near-field model)
+  → rankOne_affine_nearField          (App. II Prop 1 = 階数 1 の affine near-field model)
   → FirstCaseHypothesis.theoremB      (Pf II Ch.II、issue 2053)
   → nonempty_theoremAConclusion_of_V_ne_bot (Pf II Ch.II-IV = `V ≠ 1` の半分)
   → theoremA                          (Pf II Ch.I §3 の `|G|` 帰納法; `ZassenhausClassification`

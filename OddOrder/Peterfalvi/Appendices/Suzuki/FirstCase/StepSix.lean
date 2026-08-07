@@ -177,7 +177,7 @@ theorem ringAut_sq_eq_one_of_card_prime_or_prime_sq {F : Type*} [Field F]
     rw [hqq, ← h2, ← hcardfin]
     exact FiniteField.pow_card_pow i x
 
-/-- **A commutative near-field is a field** (Peterfalvi, Appendix C,
+/-- **A commutative near-field is a field** (Peterfalvi, Appendix II,
 Proposition 2, first alternative): a `NearField` with commutative
 multiplication is a `Field`.
 

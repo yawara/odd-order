@@ -15,7 +15,7 @@ import OddOrder.GroupTheory.BrauerSuzukiEndgame
 import OddOrder.GroupTheory.BrauerSuzukiQ8
 
 /-!
-# Peterfalvi Appendix C, Proposition 1 — the affine near-field model of a rank-one group
+# Peterfalvi Appendix II, Proposition 1 — the affine near-field model of a rank-one group
 
 Split out of `NearFields.lean` (which exceeded the 2000-line file limit).  Contains the
 `RankOneHypothesis` structure, the `AffineNearFieldModel`, the main theorem
@@ -32,7 +32,7 @@ section PropositionOne
 
 open scoped Pointwise
 
-/-- **Peterfalvi Appendix C, Proposition 1, hypotheses** (p. 137): the Part II hypotheses
+/-- **Peterfalvi Appendix II, Proposition 1, hypotheses** (p. 137): the Part II hypotheses
 **(A1)** and **(A2)** (p. 97) together with "`G` has 2-rank `1`".
 
 The fields are exactly those of `Suzuki.Hypothesis` *except* (A3), which is replaced by its
@@ -105,7 +105,7 @@ theorem RankOneHypothesis.sylow_two_isCyclic_or_quaternion
   · exact Or.inl hcyc
   · exact Or.inr hq
 
-/-- **Peterfalvi Appendix C, Proposition 1, conclusion**: the affine near-field model of `G`.
+/-- **Peterfalvi Appendix II, Proposition 1, conclusion**: the affine near-field model of `G`.
 
 The book asserts an isomorphism `G ≅ 𝓛(F) ⋊ Σ = (F ⋊ F^*) ⋊ Σ` identifying `Q` with `F^*` and `D`
 with `Σ`.  Internally this says: `F` sits in `G` as a normal subgroup complemented by `H`
@@ -286,7 +286,7 @@ private theorem quaternionGroup_closure_pair (n : ℕ) [NeZero n] :
     exact Subgroup.mul_mem _
       (Subgroup.subset_closure (Set.mem_insert_of_mem _ rfl)) (ha_mem i)
 
-/-- **Brauer–Suzuki, the `Q₈` case** — for a long time the sole remaining `sorry` of Appendix C,
+/-- **Brauer–Suzuki, the `Q₈` case** — for a long time the sole remaining `sorry` of Appendix II,
 Proposition 1; **closed 2026-08-07** (issues 0147 / 9506, spec
 `notes/meta/q8_modular_char_theory_frozen_project.md`, background
 `notes/peterfalvi/appendixC_prop1_q8_brauer_suzuki.md`).
@@ -808,7 +808,7 @@ theorem RankOneHypothesis.model_involution_data {G Ω : Type*} [Group G] [MulAct
     · exact absurd (orderOf_eq_one_iff.mp h1) huv1
     · exact hp'
 
-/-- **Peterfalvi Appendix C, Proposition 1** (p. 137).  If `G` satisfies (A1) and (A2) and has
+/-- **Peterfalvi Appendix II, Proposition 1** (p. 137).  If `G` satisfies (A1) and (A2) and has
 2-rank `1`, then `G` is the affine group of a finite near-field: there is a near-field `F` and a
 group `Σ` of automorphisms of `F` with `G ≅ 𝓛(F) ⋊ Σ = (F ⋊ F^*) ⋊ Σ`, identifying `Q` with `F^*`
 and `D` with `Σ`.  Moreover `H` has a unique involution and, for distinct involutions `u, v ∈ G`,

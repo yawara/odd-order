@@ -10,10 +10,10 @@ import OddOrder.GroupTheory.PrimeOrderSubgroups
 import OddOrder.Peterfalvi.Appendices.Huppert.TransitiveInvariant
 
 /-!
-# Peterfalvi Appendix B: A Special Case of a Theorem of Huppert
+# Peterfalvi Appendix I: A Special Case of a Theorem of Huppert
 
 T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272,
-2000), Appendix B (= Appendix I), pp. 135--136.
+2000), Appendix I, pp. 135--136.
 
 A group `D` of odd order acts faithfully on an elementary abelian `q`-group `E`
 and transitively on `E^#`.  Then `F(D)` is cyclic, acts without fixed points on
@@ -23,7 +23,7 @@ The crucial **fixed-point-free ⟹ cyclic** step is Huppert V.8.15, which is
 already formalized in this repository as **BG Proposition 3.9**
 (`OddOrder.BG.Ch3.S12.isCyclic_of_coprime_fpf_pgroup_action`, a coprime
 fixed-point-free `p`-action of odd `p` is cyclic).  This file records the genuine
-group-theoretic content of Appendix B on top of that endpoint:
+group-theoretic content of Appendix I on top of that endpoint:
 
 * `smul_eq_of_sq_smul_eq_of_odd_orderOf` — the odd-order "no transposition" step
   of part (1) of the Lemma ("the second case is impossible since `x` has odd
@@ -72,7 +72,7 @@ theorem mem_pointStabilizer {φ : P →* MulAut E} {a : E} {x : P} :
   simp only [pointStabilizer, Subgroup.mem_comap, MulAction.mem_stabilizer_iff]
   rfl
 
-/-- **Peterfalvi Appendix B, Lemma, part (1) odd-order step**: an element of odd
+/-- **Peterfalvi Appendix I, Lemma, part (1) odd-order step**: an element of odd
 order cannot interchange two points that it permutes.  Concretely, if `g ^ 2`
 fixes `a` and `g` has odd order, then `g` already fixes `a`.  (Peterfalvi: "the
 second case is impossible since `x` has odd order".) -/
@@ -85,7 +85,7 @@ theorem smul_eq_of_sq_smul_eq_of_odd_orderOf
   calc g • a = (g ^ 2) ^ m • a := by rw [hm]
     _ = a := MulAction.mem_stabilizer_iff.mp (pow_mem hstab m)
 
-/-- **Peterfalvi Appendix B, Lemma, part (1) key step**: if `φ x` permutes an
+/-- **Peterfalvi Appendix I, Lemma, part (1) key step**: if `φ x` permutes an
 independent family `S` of subgroups of the abelian group `E`, `a ∈ S i`, `b ∈ S j`
 (`i ≠ j`, both nontrivial), `x` has odd order and fixes `a * b`, then `x` fixes both
 `a` and `b`.
@@ -206,7 +206,7 @@ theorem mul_ne_one_of_components
   exact ha1 (Subgroup.disjoint_def.mp (hindep.pairwiseDisjoint hij) ha
     (mul_eq_one_iff_eq_inv.mp h ▸ inv_mem hb))
 
-/-- **Peterfalvi Appendix B, Lemma, part (1)**: a constant point-stabilizer order forces
+/-- **Peterfalvi Appendix I, Lemma, part (1)**: a constant point-stabilizer order forces
 equal point stabilizers `P_a = P_b` for components in distinct members of the permuted
 independent family (p. 135: `P_a = P_b`). -/
 theorem pointStabilizer_eq_of_components_of_constant [Finite P]
@@ -232,7 +232,7 @@ theorem pointStabilizer_eq_of_components_of_constant [Finite P]
     rw [← hinfba]; exact (hconst (b * a) b hba1 hb1).ge
   exact le_antisymm (hPa ▸ inf_le_right) (hPb ▸ inf_le_right)
 
-/-- **Peterfalvi Appendix B, Lemma, part (1)** (full): a `P`-permuted independent
+/-- **Peterfalvi Appendix I, Lemma, part (1)** (full): a `P`-permuted independent
 family decomposition `E = ⨆ S i` with `≥ 2` nontrivial members, a faithful odd-order
 action, and a constant point-stabilizer order, force the action to be
 fixed-point-free.
@@ -303,7 +303,7 @@ theorem fpf_of_constant_stabilizer_of_permuted_decomp [Finite P]
   rw [hPa_bot, Subgroup.mem_bot] at hxa
   exact hx1 hxa
 
-/-- **Peterfalvi Appendix B, Lemma, part (2), cyclic case**: an abelian group acting
+/-- **Peterfalvi Appendix I, Lemma, part (2), cyclic case**: an abelian group acting
 faithfully and irreducibly on `E` acts fixed-point-freely (p. 135: "Suppose that `P`
 is cyclic.  Then ... `C_E(x) = 0` and so `P` acts without fixed points").  For `x ≠ 1`
 the fixed subgroup `C_E(x) = actionFixedBy φ x` is `P`-invariant (commutativity) and
@@ -330,7 +330,7 @@ theorem fpf_of_abelian_of_irreducible
     have he : e ∈ actionFixedBy φ x := by rw [h]; exact Subgroup.mem_top e
     simpa using mem_actionFixedBy.mp he
 
-/-- **Peterfalvi Appendix B, Lemma, part (1) — reducible case**: part (1) applied to a
+/-- **Peterfalvi Appendix I, Lemma, part (1) — reducible case**: part (1) applied to a
 `P`-invariant complement `E = U ⊕ W` (both nontrivial), via the trivial permutation of
 the two summands.  A Maschke complement of a proper nonzero `P`-submodule feeds this. -/
 theorem fpf_of_constant_stabilizer_of_invariant_compl [Finite P]
@@ -354,7 +354,7 @@ theorem fpf_of_constant_stabilizer_of_invariant_compl [Finite P]
     · exact hUinv x
   · exact ⟨true, false, by decide, hU, hW⟩
 
-/-- **Peterfalvi Appendix B, Lemma — cyclic conclusion** for an elementary
+/-- **Peterfalvi Appendix I, Lemma — cyclic conclusion** for an elementary
 abelian module.  A `p`-group `P` (`p` odd) acting faithfully and fixed-point-freely
 on a nontrivial elementary abelian `q`-group `E` is cyclic.
 
@@ -674,7 +674,7 @@ theorem exists_aInvariant_complement_of_elementaryAbelian
   · have h := congrArg Φ hsup; rwa [Φ.map_sup, Φ.map_top, hΦpU, ← hW_def] at h
 
 omit [Finite E] in
-/-- **Peterfalvi Appendix B, Lemma — reducible case**: if the faithful coprime odd-order
+/-- **Peterfalvi Appendix I, Lemma — reducible case**: if the faithful coprime odd-order
 action of `P` on the elementary abelian `q`-group `E` admits a proper nonzero `P`-invariant
 subgroup `U`, then a constant point-stabilizer order forces the action to be
 fixed-point-free.  Maschke (`exists_aInvariant_complement_of_elementaryAbelian`) splits off a
@@ -701,7 +701,7 @@ theorem fpf_of_reducible
   exact fpf_of_constant_stabilizer_of_invariant_compl hE.comm φ hfaithful hcompl hUbot hWbot
     (conv hUinv) (conv hWinv) hPodd hconst
 
-/-- **Peterfalvi Appendix B, Lemma**: let `p ≠ 2` be prime, `q ≠ p`, and let the `p`-group
+/-- **Peterfalvi Appendix I, Lemma**: let `p ≠ 2` be prime, `q ≠ p`, and let the `p`-group
 `P` act faithfully on the elementary abelian `q`-group `E`.  If `|P_a|` is the same for every
 `a ∈ E^#`, then `P` is cyclic and acts without fixed points on `E`.
 
@@ -1019,7 +1019,7 @@ section Proposition1
 
 variable {D E : Type*} [Group D] [Group E]
 
-/-- **Peterfalvi Appendix B, Proposition 1 — no normal `q`-subgroup**: a faithful irreducible
+/-- **Peterfalvi Appendix I, Proposition 1 — no normal `q`-subgroup**: a faithful irreducible
 action of `D` on the elementary abelian `q`-group `E` admits no nontrivial normal `q`-subgroup.
 (So for `D` acting transitively on `E^#`, `q ∤ |F(D)|`, i.e. every Fitting prime is `≠ q`.)
 The fixed subgroup `C_E(N)` is `D`-invariant (normality) and nonzero (the `q`-group `N` acts on
@@ -1077,7 +1077,7 @@ theorem normal_isPGroup_eq_bot_of_faithful_irreducible
       simpa using he ⟨n, hn⟩
     exact hfaithful (hφn1.trans (map_one φ).symm)
 
-/-- **Peterfalvi Appendix B, Proposition 1 bridge**: if `D` acts transitively on
+/-- **Peterfalvi Appendix I, Proposition 1 bridge**: if `D` acts transitively on
 `E^#` and `N ⊴ D`, then the `N`-point-stabilizers `N_a`, `N_b` of any two
 nonidentity points have the same order — they are conjugate in `D` (`N_b = d N_a
 d⁻¹` for any `d` with `d·a = b`, using normality of `N`).
@@ -1110,7 +1110,7 @@ theorem card_pointStabilizer_comp_eq_of_normal_of_transitive
   · apply Subtype.ext; apply Subtype.ext; change d⁻¹ * (d * (s.1 : D) * d⁻¹) * d = (s.1 : D); group
   · apply Subtype.ext; apply Subtype.ext; change d * (d⁻¹ * (t.1 : D) * d) * d⁻¹ = (t.1 : D); group
 
-/-- **Peterfalvi Appendix B, Proposition 1 — the abelian-quotient step**: for a
+/-- **Peterfalvi Appendix I, Proposition 1 — the abelian-quotient step**: for a
 finite solvable group `D` whose Fitting subgroup `F(D)` is cyclic, `D/F(D)` is
 abelian, i.e. `commutator D ≤ F(D)`.
 
@@ -1140,7 +1140,7 @@ theorem commutator_le_fitting_of_isCyclic_fitting
   -- `hap : (x : D) = g * x * g⁻¹`
   exact (mul_inv_eq_iff_eq_mul.mp hap.symm).symm
 
-/-- **Peterfalvi Appendix B, Proposition 1 — per-prime `O_p` step**: under the hypotheses
+/-- **Peterfalvi Appendix I, Proposition 1 — per-prime `O_p` step**: under the hypotheses
 of Proposition 1, each `p`-core `O_p(D) = opCore p D` is cyclic and acts without fixed points
 on `E`.  For `O_p = ⊥` this is trivial; otherwise `p` is odd (`p ∣ |D|` odd) and `p ≠ q`
 (no nontrivial normal `q`-subgroup), the conjugate-stabilizer bridge gives the constant
@@ -1204,7 +1204,7 @@ theorem opCore_fitting_map_subtype_eq [Finite D] (p : ℕ) [Fact p.Prime] :
       _ ≤ (opCore p ↥(fitting D)).map (fitting D).subtype := Subgroup.map_mono hle
 
 open OddOrder.Isaacs.Ch01 OddOrder.BG.Ch3.S10 in
-/-- **Peterfalvi Appendix B, Proposition 1 — `F(D)` cyclic from cyclic `p`-cores**: if every
+/-- **Peterfalvi Appendix I, Proposition 1 — `F(D)` cyclic from cyclic `p`-cores**: if every
 `p`-core `O_p(D)` is cyclic, then the Fitting subgroup `F(D)` is cyclic.  Pure group theory:
 `F(D)` is nilpotent (`fitting.isNilpotent`), each Sylow of `F(D)` is its unique normal one and
 equals an `O_p(D)` (`= ⨅` of Sylows), so `F(D)` is a nilpotent `Z`-group, hence cyclic. -/
@@ -1244,7 +1244,7 @@ theorem isCyclic_fitting_of_forall_opCore_isCyclic [Finite D]
   infer_instance
 
 open OddOrder.Isaacs.Ch01 in
-/-- **Peterfalvi Appendix B, Proposition 1 — `F(D)` fixed-point-free**: under the hypotheses
+/-- **Peterfalvi Appendix I, Proposition 1 — `F(D)` fixed-point-free**: under the hypotheses
 of Proposition 1, every nontrivial element of the Fitting subgroup acts without fixed points on
 `E`.  For `f ∈ F(D)^#`, pick a prime `p ∣ |f|` and the order-`p` power `g = f ^ (|f| / p)`; then
 `g ∈ O_p(F(D))`, hence `g ∈ O_p(D)` (`opCore_fitting_map_subtype_eq`), the per-prime step gives
@@ -1293,7 +1293,7 @@ theorem fitting_fpf_of_transitive [Finite D] [Finite E] {q : ℕ}
   rw [eq_bot_iff, ← hgfpf, hgpow]
   exact hmono f (orderOf f' / p)
 
-/-- **Peterfalvi Appendix B, Proposition 1**: let `D` be a solvable group of odd order
+/-- **Peterfalvi Appendix I, Proposition 1**: let `D` be a solvable group of odd order
 acting faithfully on the elementary abelian `q`-group `E`, transitively on `E^#`.  Then
 the Fitting subgroup `F(D)` is cyclic, acts without fixed points on `E`, and
 `D / F(D)` is abelian (equivalently `D' ≤ F(D)`).

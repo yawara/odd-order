@@ -10,7 +10,7 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
 # Brauer–Suzuki theorem — statement layer and the cyclic case
 
 **Brauer–Suzuki theorem** (Gorenstein, *Finite Groups*, Ch. 12, Theorem 1.1; cited by
-Peterfalvi, *Character Theory for the Odd Order Theorem*, Appendix C, Proposition 1):
+Peterfalvi, *Character Theory for the Odd Order Theorem*, Appendix II, Proposition 1):
 if a Sylow `2`-subgroup `S` of a finite group `G` is cyclic or generalized quaternion
 and `u` is an involution of `G`, then `G = O_{2'}(G) · C_G(u)` — equivalently
 `O_{2'}(G) ⊔ C_G(u) = ⊤`, since `O_{2'}(G)` is normal.

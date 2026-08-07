@@ -17,7 +17,7 @@ By §3 Proposition 1(a), `L = C_G(P)` acts on the fixed points `Ω_P` with
 kernel `N = C_{D_L}(Q_L)`, and the faithful quotient `L/N` satisfies (A1)
 and (A2).  Under (B1) the quotient has 2-rank one — a four-subgroup of the
 quotient would lift along the odd kernel to a four-subgroup of `C_G(P)` —
-so Appendix C, Proposition 1 applies to `L/N`.
+so Appendix II, Proposition 1 applies to `L/N`.
 -/
 
 set_option autoImplicit false
@@ -123,7 +123,7 @@ variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
 
 /-- **Peterfalvi Part II, Ch. II, step (2)(a)** (p. 108): the faithful
 centralizer quotient `C_G(P)/N` is a doubly transitive rank-one group —
-the input of Appendix C, Proposition 1.  All of (A1) comes from §3
+the input of Appendix II, Proposition 1.  All of (A1) comes from §3
 Proposition 1(a)/(c); faithfulness is the quotient construction; and a
 four-subgroup of the quotient would lift along the odd kernel to a
 four-subgroup of `C_G(P)`, contradicting (B1). -/
@@ -186,7 +186,7 @@ noncomputable def rankOneQuotient :
 rank-one quotient `C_G(P)/N` is the affine group of a finite near-field
 extended by automorphisms.
 
-This cites Appendix C, Proposition 1 (`rankOne_affine_nearField`), which rests
+This cites Appendix II, Proposition 1 (`rankOne_affine_nearField`), which rests
 on the Brauer–Suzuki theorem (issue 9318, `Q₈` case 0147 / 9506); the whole
 chain is axiom-clean since 2026-08-07. -/
 theorem exists_affineNearFieldModel :

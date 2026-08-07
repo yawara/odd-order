@@ -516,12 +516,12 @@ nontrivial `KP`-invariant elementary abelian `r`-subgroup `M ≤ Q₁`, the
 
 Via the near-field model of step (2)(b), `C_M(P) ≤ C_Q(P)` embeds into `F^*`,
 which acts on `(F, +)` fixed-point-freely by right multiplication; by the
-Appendix B Lemma (`isCyclic_of_faithful_fpf_pgroup_on_elementaryAbelian`) the
+Appendix I Lemma (`isCyclic_of_faithful_fpf_pgroup_on_elementaryAbelian`) the
 `r`-group `C_M(P)` is then cyclic, and an elementary abelian nontrivial cyclic
 group has order `r`.  (This subsumes the book's citation of [H] V Satz 8.15 —
 subgroups of order `r²` of a Frobenius complement are cyclic.)
 
-Depends on step (2)(b) (Appendix C Prop 1 behind Brauer–Suzuki). -/
+Depends on step (2)(b) (Appendix II Prop 1 behind Brauer–Suzuki). -/
 theorem card_inf_centralizer_eq_prime {r : ℕ} (hr : r.Prime)
     {M : Subgroup G} (hMQ1 : M ≤ fc.toHypothesis.Q1) (hMne : M ≠ ⊥)
     (helab : IsElementaryAbelian r ↥M)
@@ -646,7 +646,7 @@ theorem card_inf_centralizer_eq_prime {r : ℕ} (hr : r.Prime)
       exact hcancel
     have : ι m = 1 := Units.ext hu1
     exact hm (hιinj (this.trans (map_one ι).symm))
-  -- Appendix B Lemma: the `r`-group `M₀` acting f.p.f. on `(F, +)` is cyclic.
+  -- Appendix I Lemma: the `r`-group `M₀` acting f.p.f. on `(F, +)` is cyclic.
   obtain ⟨f, hf, hEA⟩ :=
     NearFields.isElementaryAbelian_multiplicative (F := F)
   haveI : Fact r.Prime := ⟨hr⟩

@@ -10,7 +10,7 @@ import Mathlib.RingTheory.SimpleModule.Rank
 import Mathlib.RingTheory.LittleWedderburn
 
 /-!
-# Peterfalvi, Appendix I (= Appendix B), Proposition 2 — the field structure
+# Peterfalvi, Appendix I, Proposition 2 — the field structure
 
 (Peterfalvi, *Character Theory for the Odd Order Theorem*, Appendix I, pp. 135-136.)
 

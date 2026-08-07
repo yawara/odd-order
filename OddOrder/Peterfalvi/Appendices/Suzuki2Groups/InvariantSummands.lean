@@ -20,7 +20,7 @@ summands in its central quotient.
 
 * coprime fixed-point lifting makes the induced quotient action fixed-point-free;
 * an action of order `|U| - 1` which is fixed-point-free is transitive on `U#`;
-* Peterfalvi Appendix B, Proposition 1 then makes `U` simple as a `K`-group;
+* Peterfalvi Appendix I, Proposition 1 then makes `U` simple as a `K`-group;
 * two distinct invariant summands of the correct cardinalities are complementary.
 
 No elementary-abelian hypothesis is needed for these implications; that

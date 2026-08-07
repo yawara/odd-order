@@ -9,9 +9,9 @@ import Mathlib.Algebra.CharP.Frobenius
 import OddOrder.Peterfalvi.Appendices.NearFields
 
 /-!
-# Peterfalvi Appendix C: the exceptional near-field `F_{r²,2}` (p. 138)
+# Peterfalvi Appendix II: the exceptional near-field `F_{r²,2}` (p. 138)
 
-**Peterfalvi, Character Theory for the Odd Order Theorem, Appendix C "On Near-Fields"
+**Peterfalvi, Character Theory for the Odd Order Theorem, Appendix II "On Near-Fields"
 (p. 138)**: the concrete instantiation of the exceptional near-field `F_{r²,2}`.
 
 The abstract construction — `TwistData` (an order-`≤ 2` automorphism `σ` of a field `K`
@@ -29,7 +29,7 @@ plus a `σ`-invariant sign character `χ : Kˣ →* ℤ/2`, twisting the multipl
   (`exceptionalTwistData_twMul_of_isSquare` / `…_of_not_isSquare`).
 
 The near-field `F_{r²,2}` itself is `Twisted (exceptionalTwistData K p n hcard)`, a
-`NearField` by the generic instance.  The classification (Appendix C, Proposition 2:
+`NearField` by the generic instance.  The classification (Appendix II, Proposition 2:
 these and the fields are the only finite near-fields whose multiplicative group has a
 cyclic index-`2` subgroup) is `cyclic_index_two_nearField_classification` in
 `NearFields.lean`.
@@ -44,7 +44,7 @@ section SquareSignChar
 variable {K : Type*} [Field K] [Fintype K]
 
 open scoped Classical in
-/-- **The quadratic character as a `ℤ/2`-valued homomorphism** (Peterfalvi Appendix C,
+/-- **The quadratic character as a `ℤ/2`-valued homomorphism** (Peterfalvi Appendix II,
 p. 138): `y ↦ 0` if `y` is a square in `K`, `y ↦ 1` otherwise.  Multiplicativity is the
 multiplicativity of the quadratic character of a finite field.  (In characteristic `2`
 every element is a square and the character is trivial; no oddness hypothesis is
@@ -118,7 +118,7 @@ section HalfFrobenius
 variable (K : Type*) [Field K] [Fintype K] (p n : ℕ) [Fact p.Prime] [CharP K p]
 
 /-- **The half-Frobenius** `x ↦ x^{pⁿ}` of a finite field of characteristic `p` — for
-`|K| = p^{2n}` this is the book's `x ↦ xʳ` with `r = pⁿ` (Peterfalvi Appendix C,
+`|K| = p^{2n}` this is the book's `x ↦ xʳ` with `r = pⁿ` (Peterfalvi Appendix II,
 p. 138), the unique automorphism of order `2` when `n ≥ 1`. -/
 noncomputable def halfFrobenius : RingAut K :=
   haveI : ExpChar K p := ExpChar.prime Fact.out
@@ -147,7 +147,7 @@ section ExceptionalNearField
 
 variable (K : Type*) [Field K] [Fintype K] (p n : ℕ) [Fact p.Prime] [CharP K p]
 
-/-- **Peterfalvi Appendix C, the exceptional near-field `F_{r²,2}` — the twisting data**
+/-- **Peterfalvi Appendix II, the exceptional near-field `F_{r²,2}` — the twisting data**
 (p. 138).  On a finite field `K` of cardinality `r² = p^{2n}` (the book's `K = 𝔽_{r²}`,
 `r = pⁿ` a power of an odd prime — oddness is not needed for the construction itself),
 the half-Frobenius `σ : x ↦ xʳ` and the quadratic character `χ` twist the field
@@ -259,7 +259,7 @@ theorem exists_isSquare_halfFrobenius_ne (hp2 : p ≠ 2) (hn : n ≠ 0)
     exact h2K (by rw [← one_add_one_eq_two, eq_neg_iff_add_eq_zero.mp h1])
 
 /-- **The twisted multiplication of `F_{r²,2}` is not commutative** (Peterfalvi
-Appendix C, p. 138): for `r = pⁿ` a power of an odd prime (`n ≥ 1`), the twist is
+Appendix II, p. 138): for `r = pⁿ` a power of an odd prime (`n ≥ 1`), the twist is
 genuine — a square `z²` moved by the half-Frobenius and a non-square `y` do not
 commute, since `z² ∘ y = (z²)ʳ·y` while `y ∘ z² = y·z²`.  Hence the exceptional branch
 of Proposition 2 (`cyclic_index_two_nearField_classification`) is disjoint from the

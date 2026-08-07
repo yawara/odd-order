@@ -599,14 +599,86 @@ Theorem (6.3) + (10.8) で、(11.5)-(11.9) を一切使わない。
 `S16_G0Coprime` / (14.12)(14.13) `S16_NonExistenceG/ComparingLM`, `S16_PairingCoherence` /
 (14.14) `S15_BridgeCharacterBasic` / (14.15)(14.16) `S16_CoreLemmas`。
 
-## 4. 未着手の census
+## 4. Part II + 補章の番号 census (ステップ 2) — **2026-08-08 実施**
 
-- **Part II (Suzuki の定理 A、書籍 pp.97-134)** — `Proposition N` / `Lemma N` の**章内リセット
-  番号**なので Part I の機械 census が効かない。repo 側は `Appendices/Suzuki/` に
-  Ch.I–IV + FirstCase step 1-17 + PSU3 が実装済で、`theoremA` / `theoremB` は 2026-08-07 に
-  axiom-clean で `AxiomsCheck` 登録済。**逐条 census は未実施**。
-- **補章** — Huppert (pp.135-136) / On Near-Fields (pp.137-138) / On Suzuki 2-Groups
-  (pp.139-143) / The Feit–Sibley Theorem (pp.144-150)。repo に対応実装あり、逐条 census 未実施。
+### 4.0 番号体系 — Part I とまったく違う
+
+Part I が「章番号.通し番号」の 1 系列 ((1.1)…(14.16)) なのに対し、**Part II は 3 系統が混在**する:
+
+1. **章をまたぐ固有名**: `Theorem A` (Introduction, p.97) / `Theorem B` (Ch.II, p.108) /
+   `Theorem C` (Ch.III, p.115)。
+2. **節ごとにリセットする `Proposition N` / `Lemma N`** — Ch.I だけがこれを使う。
+   同じ「Proposition 1」が Ch.I §1・§2・§3 に**3 つ別々に存在する**ので、`§` を落とした引用は
+   一意でない。しかも §2 / §3 は**無番号の `Proposition.` / `Lemma.` / `Corollary.`** も混ぜる。
+3. **証明内の連番ステップ `(N)`** — Ch.II の (1)-(17)、Ch.III 各節の (1)-(7)、
+   Ch.IV §2 の (1)-(20) 等。書籍はこれを本文から `(11) により` と参照するので、**実質的に
+   番号付き結果**であり repo も 1 ステップ = 1 定理 (しばしば 1 ファイル) で形式化している。
+
+⟹ **Part I の機械 census (番号 grep) は原理的に効かない**。本節は書籍テキストを節境界つきで
+走査して結果を列挙し (`scratchpad/census.py` 相当)、repo 側は**概念名 + 節つき引用**の
+両方で突合した。
+
+### 4.1 書籍側の全結果 (機械抽出 + ページ画像確認)
+
+| 単位 | 書籍 pp. | 結果 | 件数 |
+|---|---|---|---|
+| Part II Introduction | 97-98 | 仮説 (A1)(A2)(A3)、帰納法仮説、**Theorem A** | 1 |
+| Ch.I §1 Consequences of (A1) | 100-103 | Prop 1(a)-(e) / Prop 2(a)-(d) / Prop 3 / Prop 4(a)-(c) / **Lemma** (無番号, p.102, (a)(b)) / Prop 5 / Prop 6(a)-(c) | 7 |
+| Ch.I §2 Structure of Q and K | 103-104 | Prop 1(a)-(c) / Prop 2 / **Lemma** (無番号) / **Corollary** (Prop 2 の系) / Prop 3 | 5 |
+| Ch.I §3 Induction Hypothesis | 104-107 | Lemma 1 / Prop 1(a)-(c) / Prop 2 / Lemma 2 / Lemma 3 / Lemma 4 / Lemma 5 | 7 |
+| Ch.II The First Case | 108-114 | 仮説 (B1)(B2)、**Theorem B**、ステップ (1)-(17) | 18 |
+| Ch.III §1 The Structure of Q | 115-118 | 仮説 (C1)、**Theorem C**、**Proposition** (3 分岐 (a)(b)(c)) | 2 |
+| Ch.III §2 `st` の位数 5 | 118-119 | **Proposition**、ステップ (1)-(7) | 8 |
+| Ch.III §3 `KW` の `S` への作用 | 119-121 | **Proposition**、ステップ (1)-(5) | 6 |
+| Ch.IV §1 The Mappings f, g, h | 122-123 | 恒等式 **(H1)-(H6)**、**Lemma** | 7 |
+| Ch.IV §2 Preliminary Calculation | 123-129 | ステップ (1)-(20)、**Proposition** (p.129) | 21 |
+| Ch.IV §3 Determination of f | 129-132 | **Proposition**、ステップ (1)-(5)、**Corollary 1**、**Corollary 2** | 8 |
+| Ch.IV §4 The Case V ≠ W | 132-134 | ステップ (1)-(5) | 5 |
+| App.I A Special Case of Huppert | 135-136 | Prop 1 / **Lemma** (無番号) / Prop 2(a)(b) | 3 |
+| App.II On Near-Fields | 137-138 | Prop 1 / Prop 2 | 2 |
+| App.III On Suzuki 2-Groups | 139-143 | Lemma 1(a)(b) / Lemma 2 / Def 1 / Def 2 / Def 3 / **Theorem** / Prop 1 / Prop 2 | 8 |
+| App.IV The Feit–Sibley Theorem | 144-150 | Lemma 1(a)(b) / Lemma 2(a)(b)(c) / **Theorem** | 3 |
+| **合計** | | | **111** |
+
+### 4.2 repo 側の cite 突合 — **111 / 111 に cite あり**
+
+全 111 件について repo 内に引用が存在する (**cite ゼロは無し**)。Part I の 169/169 と同じ状況で、
+⟹ **本命はここでも「番号を埋める」ことでなく §2 の 3 種の残債を 1 件ずつ潰す逐条監査**。
+
+⚠ **初回の機械 census は 11 件を偽の「cite ゼロ」と誤判定した** — すべて repo 側の引用表記が
+自分の正規表現と違っただけだった。記録しておく (同型の誤判定を繰り返さないため):
+
+| 偽陰性だった項目 | 実際の repo 表記 |
+|---|---|
+| Ch.III §1 ステップ (1)(2)(3) | `Ch. III §1, Proposition, case (3): st has order 3` (ステップでなく **case** と呼ぶ) |
+| Ch.III §2 Proposition | `Ch. III §2, p. 118.` (**ページ番号**で指す) |
+| Ch.IV §2 Proposition | `PSU3StepTwenty.lean:396` / `PSU3BarOrbit.lean:400` に**書籍文そのまま引用** |
+| Ch.IV §3 ステップ (1)-(5) | `Ch. IV §3 (3), p. 130` (`step` の語を挟まない) |
+| Ch.IV §4 ステップ (4)(5) | `Ch. IV §4: the linear equation (4)` 等 |
+| App.I Lemma | `Peterfalvi Appendix B, Lemma, part (1)` (**Appendix B** 表記, 下記 4.3) |
+| App.II Prop 2 | `Appendix II (Near-Fields), Proposition 2 — irreducibility` |
+
+### 4.3 ⚠ 補章のラベルが repo 内で不統一だった (2026-08-08 に統一)
+
+書籍の補章は **Appendix I / II / III / IV** (ローマ数字) だが、repo は一部で BG の補章letter
+(`Appendix A`-`E`) を流用していた:
+
+| 書籍 | 旧 repo 表記 | 実体 |
+|---|---|---|
+| Appendix I (Huppert, pp.135-136) | **Appendix B** | `Appendices/Huppert.lean` |
+| Appendix II (Near-Fields, pp.137-138) | **Appendix C** | `Appendices/NearFields.lean` |
+| Appendix III (Suzuki 2-Groups) | Appendix III ✅ | `Appendices/Suzuki2Groups.lean` |
+| Appendix IV (Feit–Sibley) | **Appendix E** (見出しのみ; 本文は IV) | `Appendices/FeitSibley.lean` |
+
+`Appendix B`/`C`/`D`/`E` は **BG の補章**を指す語として repo 全体で 200+ 箇所使われているので、
+Peterfalvi 側がこれを流用すると grep が混線する (現に上表の偽陰性 2 件を生んだ)。
+2026-08-08 に Peterfalvi 側の見出しを書籍どおりのローマ数字へ統一した。
+
+### 4.4 逐条監査 (ステップ 3 の Part II 版) の入口
+
+上流優先 + 文書順 ⟹ **Ch.I §1 から**。各単位のページ画像は `references/peterfalvi/pages/` に
+pp.115-134 / pp.144-150 が既出、**pp.97-114 / pp.135-143 は未切り出し** (必要時に
+`pdftoppm -png -r 200` で作って**残す**)。
 
 ## 5. 参照
 
