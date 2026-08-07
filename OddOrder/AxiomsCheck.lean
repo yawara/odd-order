@@ -2132,6 +2132,23 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.exists_induce_eq_sum_distinct_irreducible_of_coprime_card
 
+/-! ### Peterfalvi (3.8) — 三分岐の `NC(ψ)` 条項 (issue 0172、2026-08-08)
+
+書籍 (3.8) (p.19) は `w₁ < w₂` かつ `NC(ψ) < 2w₁` の下で 3 分岐を主張し、(b)(c) には
+**`NC(ψ) = w₁` / `NC(ψ) = w₂`** という**個数の条項**が付く。repo の
+`S05.sigmaCoeff_trichotomy` は係数形 (「列 `j₀` が定数 `c ≠ 0`、他は 0」) しか述べておらず、
+個数条項は §3 監査 (2026-08-07) で **packaging 差として繰延**されていた。その半分を解消:
+
+  sigmaNC_eq_card_W1_of_column   (b) の `NC(ψ) = w₁` (非零係数は列 `Ŵ₁ × {j₀}` ちょうど)
+  sigmaNC_eq_card_W2_of_row      (c) の `NC(ψ) = w₂`
+
+残る packaging 差は再構成条項 `ψ = a·∑ ω^σ + β` (`β` = `Im σ` と直交する成分の名指し)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaNC_eq_card_W1_of_column
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaNC_eq_card_W2_of_row
+
 /-! ### Peterfalvi (1.7)(b) — 重複度 `e` 付き一般形 (2026-08-08 に「未形式化」を撤回)
 
 `RepresentationTheory/InducedInvariantConstituent.lean` が書籍 (1.7)(b) の 3 条項を全部持つ:

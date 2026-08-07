@@ -62,6 +62,75 @@ theorem sigmaCoeff_trichotomy (hyp : TICyclicHypothesis G) [Fintype hyp.W]
   · rw [hyp.card_charGroup_subgroupOf hyp.W1_le_W]
     exact hNC
 
+/-- **Peterfalvi (3.8)(b), the count clause `NC(ψ) = w₁`.**  In the single-column branch of the
+trichotomy the nonzero `σ`-coefficients are exactly the column `Ŵ₁ × {j₀}`, so their number is
+`|Ŵ₁| = w₁` (`card_charGroup_subgroupOf`).
+
+The book states (b) as "`NC(ψ) = w₁` and there is `a ∈ C` and an index `j` with
+`ψ = a ∑_{0≤i<w₁} ω_{ij}^σ + β`"; `sigmaCoeff_trichotomy` supplies the coefficient half and this
+supplies the count half. -/
+theorem sigmaNC_eq_card_W1_of_column (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    {ψ : ClassFunction G ℂ}
+    {j₀ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ} {c : ℂ} (hc : c ≠ 0)
+    (hcol : ∀ p, hyp.sigmaCoeff hVeq app ψ (p, j₀) = c)
+    (hrest : ∀ p q, q ≠ j₀ → hyp.sigmaCoeff hVeq app ψ (p, q) = 0) :
+    hyp.sigmaNC hVeq app ψ = Nat.card hyp.W1 := by
+  have hset : {pq | hyp.sigmaCoeff hVeq app ψ pq ≠ 0} =
+      (fun p : (hyp.W1.subgroupOf hyp.W) →* ℂˣ => (p, j₀)) '' Set.univ := by
+    ext ⟨p, q⟩
+    constructor
+    · intro hpq
+      by_cases hq : q = j₀
+      · exact ⟨p, Set.mem_univ p, by rw [hq]⟩
+      · exact absurd (hrest p q hq) hpq
+    · rintro ⟨p', -, hp'⟩
+      rw [Prod.mk.injEq] at hp'
+      obtain ⟨rfl, rfl⟩ := hp'
+      change hyp.sigmaCoeff hVeq app ψ (p', j₀) ≠ 0
+      rw [hcol p']
+      exact hc
+  have hinj : Function.Injective
+      (fun p : (hyp.W1.subgroupOf hyp.W) →* ℂˣ => (p, j₀)) := by
+    intro a b hab
+    exact congrArg Prod.fst hab
+  change {pq | hyp.sigmaCoeff hVeq app ψ pq ≠ 0}.ncard = _
+  rw [hset, Set.ncard_image_of_injective _ hinj, Set.ncard_univ,
+    hyp.card_charGroup_subgroupOf hyp.W1_le_W]
+
+/-- **Peterfalvi (3.8)(c), the count clause `NC(ψ) = w₂`.**  Row form of
+`sigmaNC_eq_card_W1_of_column`. -/
+theorem sigmaNC_eq_card_W2_of_row (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    {ψ : ClassFunction G ℂ}
+    {i₀ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} {c : ℂ} (hc : c ≠ 0)
+    (hrow : ∀ q, hyp.sigmaCoeff hVeq app ψ (i₀, q) = c)
+    (hrest : ∀ p q, p ≠ i₀ → hyp.sigmaCoeff hVeq app ψ (p, q) = 0) :
+    hyp.sigmaNC hVeq app ψ = Nat.card hyp.W2 := by
+  have hset : {pq | hyp.sigmaCoeff hVeq app ψ pq ≠ 0} =
+      (fun q : (hyp.W2.subgroupOf hyp.W) →* ℂˣ => (i₀, q)) '' Set.univ := by
+    ext ⟨p, q⟩
+    constructor
+    · intro hpq
+      by_cases hp : p = i₀
+      · exact ⟨q, Set.mem_univ q, by rw [hp]⟩
+      · exact absurd (hrest p q hp) hpq
+    · rintro ⟨q', -, hq'⟩
+      rw [Prod.mk.injEq] at hq'
+      obtain ⟨rfl, rfl⟩ := hq'
+      change hyp.sigmaCoeff hVeq app ψ (i₀, q') ≠ 0
+      rw [hrow q']
+      exact hc
+  have hinj : Function.Injective
+      (fun q : (hyp.W2.subgroupOf hyp.W) →* ℂˣ => (i₀, q)) := by
+    intro a b hab
+    exact congrArg Prod.snd hab
+  change {pq | hyp.sigmaCoeff hVeq app ψ pq ≠ 0}.ncard = _
+  rw [hset, Set.ncard_image_of_injective _ hinj, Set.ncard_univ,
+    hyp.card_charGroup_subgroupOf hyp.W2_le_W]
+
 open scoped Classical in
 /-- **All σ-coefficients of a norm-`2` `V`-vanishing virtual character vanish** — the
 degenerate all-zero case of the (4.8)/(10.5) trichotomy.  `ŵ₁, ŵ₂ ≥ 3`, both odd and
