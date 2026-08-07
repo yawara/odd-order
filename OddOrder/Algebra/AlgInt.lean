@@ -321,5 +321,27 @@ theorem isIntegral_rat_imp_int {q : ℚ} (h : IsIntegral ℤ (q : ℂ)) :
   push_cast
   ring
 
+/-- **To an ordinary integer congruence** — the converse of `OddOrder.AlgInt.Cong.of_int`.  If two
+*integers* satisfy the algebraic-integer congruence `(j : ℂ) ≡ (k : ℂ) (mod n)` with `n ≠ 0`, then
+`n ∣ j - k` in `ℤ`: the quotient `(j - k)/n` is rational as well as an algebraic integer, hence an
+integer (`isIntegral_rat_imp_int`).
+
+This is the upgrade Peterfalvi's (6.7) performs implicitly — its conclusion
+`ψ(z) ≡ ψ(1) (mod |P|)` becomes a divisibility of integers once `ψ(z) ∈ ℤ` is known (which is
+(6.7)'s first conclusion, `exists_int_character_of_constant_on_nonidentity`). -/
+theorem int_dvd_of_cong_intCast {n j k : ℤ} (hn : n ≠ 0)
+    (h : OddOrder.AlgInt.Cong n (j : ℂ) (k : ℂ)) : n ∣ j - k := by
+  have hnℚ : (n : ℚ) ≠ 0 := Int.cast_ne_zero.mpr hn
+  -- The quotient is the cast of the rational `(j - k)/n`.
+  have hcast : ((((j - k : ℤ) : ℚ) / (n : ℚ) : ℚ) : ℂ) = ((j : ℂ) - (k : ℂ)) / (n : ℂ) := by
+    push_cast
+    ring
+  obtain ⟨m, hm⟩ :=
+    isIntegral_rat_imp_int (q := ((j - k : ℤ) : ℚ) / (n : ℚ)) (by rw [hcast]; exact h)
+  refine ⟨m, ?_⟩
+  -- `hm` lives in `ℂ`; descend to `ℚ` along the injection `ℚ ↪ ℂ`, then to `ℤ`.
+  have hmℚ : ((j - k : ℤ) : ℚ) / (n : ℚ) = (m : ℚ) := by exact_mod_cast hm
+  field_simp at hmℚ
+  exact_mod_cast hmℚ
 
 end OddOrder.RepresentationTheory

@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 import OddOrder.GroupTheory.RepresentationTheory.RealClassTISubset
 import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
+import OddOrder.GroupTheory.RepresentationTheory.SumCharacterInvariants
 
 /-!
 # Peterfalvi (6.7), odd-order assembly
@@ -45,6 +46,69 @@ local notation3 "ω" ρ:max C:max => centralCharacterOfRep ρ ⟨classSum C, cla
 variable {G : Type*} [Group G]
 variable {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
 variable [Fintype G] [DecidableEq G] [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)]
+
+/-! ### The first conclusion of (6.7): `ψ(z) ∈ ℤ` -/
+
+omit [Fintype G] [DecidableEq G] [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)] in
+/-- **Peterfalvi (6.7), first conclusion** (p. 32): a character that is **constant on `Z^#`** takes
+an *integer* value there.  No Sylow, TI or odd-order hypothesis enters — this is the opening line
+of the book's proof of (6.7):
+
+> Since `(Res_Z^G ψ, 1_Z) ∈ ℕ`, `ψ(z) ∈ ℚ`, and, since `ψ(z)` is an algebraic integer, `ψ(z) ∈ ℤ`.
+
+The multiplicity `(Res_Z ψ, 1_Z) = dim V^Z` comes from
+`sum_character_eq_card_mul_finrank_invariants` applied to the restriction `ρ ∘ Z.subtype`:
+constancy on `Z^#` collapses the sum to
+`ψ(1) + (|Z| − 1)·ψ(z) = ∑_{w ∈ Z} ψ(w) = |Z| · dim V^Z`, exhibiting `ψ(z)` as the *rational*
+`(|Z| · dim V^Z − dim V)/(|Z| − 1)` (the denominator is nonzero because `z ≠ 1` puts two elements
+in `Z`).  Being also an algebraic integer (`character_isIntegral`) it is an integer
+(`isIntegral_rat_imp_int`). -/
+theorem exists_int_character_of_constant_on_nonidentity [Finite G] (ρ : Representation ℂ G V)
+    {Z : Subgroup G} {z : G} (hzZ : z ∈ Z) (hz1 : z ≠ 1)
+    (hconst : ∀ ⦃w : G⦄, w ∈ Z → w ≠ 1 → ρ.character w = ρ.character z) :
+    ∃ n : ℤ, ρ.character z = (n : ℂ) := by
+  classical
+  haveI : Fintype ↥Z := Fintype.ofFinite _
+  let ρZ : Representation ℂ ↥Z V := ρ.comp Z.subtype
+  set N : ℕ := Fintype.card ↥Z with hNdef
+  -- `Z` contains the two distinct elements `1` and `z`, so `N ≥ 2`.
+  have hzne : (⟨z, hzZ⟩ : ↥Z) ≠ 1 := by simpa [Subtype.ext_iff] using hz1
+  haveI : Nontrivial ↥Z := ⟨⟨⟨z, hzZ⟩, 1, hzne⟩⟩
+  have hN2 : 2 ≤ N := Fintype.one_lt_card
+  have hNne : ((N : ℂ) - 1) ≠ 0 := by
+    refine sub_ne_zero.mpr ?_
+    have : N ≠ 1 := by omega
+    simpa using (Nat.cast_injective (R := ℂ)).ne this
+  haveI : Invertible ((Fintype.card ↥Z : ℂ)) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr (by omega : Fintype.card ↥Z ≠ 0))
+  -- `∑_{w ∈ Z} ψ(w) = |Z| · dim V^Z`.
+  have hsum := sum_character_eq_card_mul_finrank_invariants ρZ
+  -- Constancy on `Z^#` collapses the left-hand side.
+  have hsplit : ∑ w : ↥Z, ρZ.character w
+      = ρ.character 1 + ((N : ℂ) - 1) * ρ.character z := by
+    rw [← Finset.add_sum_erase _ _ (Finset.mem_univ (1 : ↥Z))]
+    have hcongr : ∀ w ∈ Finset.univ.erase (1 : ↥Z), ρZ.character w = ρ.character z := by
+      intro w hw
+      exact hconst w.2 fun h => (Finset.ne_of_mem_erase hw) (OneMemClass.coe_eq_one.mp h)
+    have h2 : ∑ w ∈ Finset.univ.erase (1 : ↥Z), ρZ.character w
+        = ((N : ℂ) - 1) * ρ.character z := by
+      rw [Finset.sum_congr rfl hcongr, Finset.sum_const,
+        Finset.card_erase_of_mem (Finset.mem_univ _), Finset.card_univ, nsmul_eq_mul]
+      congr 1
+      rw [← hNdef, Nat.cast_sub (by omega), Nat.cast_one]
+    rw [h2]
+    rfl
+  rw [hsplit, ρ.char_one] at hsum
+  -- `ψ(z)` is the rational `(N·m − d)/(N − 1)`.
+  set m : ℕ := Module.finrank ℂ ρZ.invariants with hm
+  set d : ℕ := Module.finrank ℂ V with hd
+  have hq : ((((N : ℚ) * m - d) / ((N : ℚ) - 1) : ℚ) : ℂ) = ρ.character z := by
+    push_cast
+    rw [div_eq_iff hNne]
+    linear_combination -hsum
+  obtain ⟨n, hn⟩ := isIntegral_rat_imp_int (q := ((N : ℚ) * m - d) / ((N : ℚ) - 1))
+    (by rw [hq]; exact character_isIntegral ρ z)
+  exact ⟨n, by rw [← hq, hn]⟩
 
 /-- **The trivial-character instance of (6.7.2)–(6.7.3)**: under the (6.7) Sylow/TI setup
 the collapsed nonidentity-`Z` structure-constant sums satisfy
@@ -162,5 +226,49 @@ theorem peterfalvi_67_of_odd [Finite G] (ρ : Representation ℂ G V) [ρ.IsIrre
   exact peterfalvi_67 ρ P hZP hZnormal hti hzZ hz1 hPz hreal hconst
     (nonidentityZClassCoeffSum_cong_of_isTISubset P hZP hZnormal hti hzZ hz1 hPz hreal
       (fun w hw h1 => (hconst hw h1).2))
+
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+/-- **Peterfalvi (6.7), both conclusions** (p. 32).  The book states two things about `ψ(z)` for
+`z ∈ Z^#`:
+
+> Then, for `z ∈ Z^#`, `ψ(z) ∈ ℤ` and `ψ(z) ≡ ψ(1) (mod |P|)`.
+
+`peterfalvi_67_of_odd` supplies the second (as the algebraic-integer congruence `[ALGMOD |P|]`,
+which is the book's own reading of the notation) and
+`exists_int_character_of_constant_on_nonidentity` the first.  Since both values are then integers
+(`ψ(1) = dim V`), the congruence sharpens to an ordinary divisibility in `ℤ`
+(`int_dvd_of_cong_intCast`) — the form consumers previously had to assemble by hand. -/
+theorem peterfalvi_67_int_dvd_of_odd [Finite G] (ρ : Representation ℂ G V) [ρ.IsIrreducible]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G) {Z : Subgroup G}
+    (hZP : Z ≤ (P : Subgroup G))
+    (hZnormal : (Z.subgroupOf (Subgroup.normalizer ((P : Subgroup G) : Set G))).Normal)
+    (hti : OddOrder.GroupTheory.IsTISubset ((P : Set G) \ {1})
+      (Subgroup.normalizer ((P : Subgroup G) : Set G)))
+    (hodd : Odd (Nat.card (Subgroup.normalizer ((P : Subgroup G) : Set G))))
+    {z : G} (hzZ : z ∈ Z) (hz1 : z ≠ 1)
+    (hPz : (P : Subgroup G) ≤ Subgroup.centralizer {z})
+    (hconst : ∀ ⦃w : G⦄, w ∈ Z → w ≠ 1 →
+      ρ.character w = ρ.character z ∧
+        Nat.card ↥(Subgroup.normalizer ((P : Subgroup G) : Set G) ⊓
+            Subgroup.centralizer ({w} : Set G)) =
+          Nat.card ↥(Subgroup.normalizer ((P : Subgroup G) : Set G) ⊓
+            Subgroup.centralizer ({z} : Set G))) :
+    ∃ n : ℤ, ρ.character z = (n : ℂ) ∧
+      (Nat.card (P : Subgroup G) : ℤ) ∣ n - (Module.finrank ℂ V : ℤ) := by
+  obtain ⟨n, hn⟩ := exists_int_character_of_constant_on_nonidentity ρ hzZ hz1
+    (fun w hw h1 => (hconst hw h1).1)
+  refine ⟨n, hn, ?_⟩
+  have hcong := peterfalvi_67_of_odd ρ P hZP hZnormal hti hodd hzZ hz1 hPz hconst
+  rw [hn, ρ.char_one] at hcong
+  have hPne : (Nat.card (P : Subgroup G) : ℤ) ≠ 0 := by
+    have hpos : 0 < Nat.card (P : Subgroup G) := Nat.card_pos
+    exact_mod_cast hpos.ne'
+  refine int_dvd_of_cong_intCast hPne ?_
+  have hcast : (((Module.finrank ℂ V : ℤ)) : ℂ) = ((Module.finrank ℂ V : ℕ) : ℂ) := by
+    push_cast
+    ring
+  rw [hcast]
+  exact hcong
 
 end OddOrder.RepresentationTheory

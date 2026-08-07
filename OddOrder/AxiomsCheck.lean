@@ -2689,6 +2689,10 @@ one-element lemma).  All axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.AlgInt.Cong.smul_left
 #assert_only_allowed_axioms OddOrder.AlgInt.cong_of_exists_isIntegral
 #assert_only_allowed_axioms OddOrder.AlgInt.Cong.of_int
+-- The converse of `Cong.of_int`: an `[ALGMOD n]` congruence between *integers* is an ordinary
+-- divisibility `n ∣ j − k` (the quotient is rational and integral).  Used to state Peterfalvi
+-- (6.7) with both of its book conclusions (issue 0172 §6 audit).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.int_dvd_of_cong_intCast
 -- The "divide by |C₁|" cancellation of (6.7.3): a congruence `c·a ≡ c·b (mod n)` with `c` coprime
 -- to `n` and `a`, `b` algebraic integers gives `a ≡ b (mod n)` (Bézout `u·c + v·n = 1`).
 #assert_only_allowed_axioms OddOrder.AlgInt.Cong.intMul_cancel_left
@@ -3923,6 +3927,15 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.nonidentityZClassCoeffSum_cong_of_isTISubset
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.peterfalvi_67_of_odd
+-- Peterfalvi (6.7), **first conclusion** `ψ(z) ∈ ℤ` (p. 32, opening line of the proof; issue 0172
+-- §6 audit).  A character constant on `Z^#` takes an integer value there — no Sylow/TI/odd-order
+-- hypothesis: `ψ(1) + (|Z|−1)·ψ(z) = ∑_{w∈Z} ψ(w) = |Z|·dim V^Z` exhibits `ψ(z)` as a rational,
+-- and a rational algebraic integer is an integer.  With it the (6.7) congruence sharpens to an
+-- ordinary `ℤ`-divisibility `|P| ∣ ψ(z) − ψ(1)` (`peterfalvi_67_int_dvd_of_odd`), which is what
+-- the book's "ψ(z) ∈ ℤ and ψ(z) ≡ ψ(1) (mod |P|)" amounts to.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_int_character_of_constant_on_nonidentity
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.peterfalvi_67_int_dvd_of_odd
 -- Peterfalvi (1.1)+(1.4) equal-degree coherence: `range χ` is coherent for an orthonormal,
 -- equal-degree family, with extension the Fourier-image map `ν φ = ∑ⱼ ⟨φ, χⱼ⟩ • Xⱼ`
 -- (`coherentImageMap`).  The seed for both the (6.6) equal-minimal-degree base prefix and the
@@ -4917,6 +4930,20 @@ set_option linter.style.longLine false in
 -- Sibley-carrier reciprocity wrapper (uses the new `dade_H_eq_bot` TI field).
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.inner_tau_eq_inner_restrict
+-- (6.8)(b) faithfulness (issue 0172 §6 audit): the book says "`τ` is the restriction to
+-- `ℤ[𝒮, L^#]` of `Ind_L^G`" (p. 33) while the carrier's `tau` is the §4 Dade isometry, and
+-- `CoherenceTarget` uses `A = H^#` instead of `L^#`.  Both gaps are closed: `tau_apply_eq_induce`
+-- identifies the maps on the supported lattice (TI ⟹ all local subgroups trivial ⟹ both are the
+-- same pointwise recipe, the §8 analogue of `S15.H_sharp_tau_eq_induce` for (13.2.e)), and
+-- `zSupportedSpan_ne_one_eq_sharp` identifies the lattices (`Ind_H^L θ` vanishes off the normal
+-- `H`).  `CoherenceTarget.toBookForm` transports the capstone `sibleySetup_is_coherent` to the
+-- book's `(𝒮, L^#, τ)` statement.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.tau_apply_eq_induce
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.zSupportedSpan_ne_one_eq_sharp
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.CoherenceTarget.toBookForm
 -- Peterfalvi (7.10) consumer algebra: sum and normalize the weighted Ind equations.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.IndChainDecomposition.image_weightedDifferenceInput

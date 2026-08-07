@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S08_CoherenceCorePart1
+import OddOrder.GroupTheory.TISubsetCounting
 
 /-!
 # Peterfalvi §8: induced degree-one families
@@ -57,6 +58,110 @@ theorem inner_tau_eq_inner_restrict (hyp : SibleyDadeHypothesis G L H)
     (ψ : ClassFunction G ℂ) :
     ClassFunction.inner (hyp.tau α) ψ = ClassFunction.inner α (ClassFunction.restrict L ψ) :=
   inner_dadeIntegralCharacterMap_eq_inner_restrict hyp.dade hyp.dade_H_eq_bot hαsupp ψ
+
+/-! ### (6.8)(b) faithfulness: the book's `τ = Ind_L^G` on `ℤ[𝒮, L^#]` -/
+
+open scoped Pointwise in
+/-- **(6.8)(b), the map**: `τ` *is* the restriction of `Ind_L^G` to the `H^#`-supported lattice.
+
+Peterfalvi (6.8)(b) reads "`τ` is the restriction to `ℤ[𝒮, L^#]` of `Ind_L^G`" (p. 33), whereas
+this carrier defines `tau` as the genuine §4 Dade isometry.  The two agree: `H^#` is a TI-subset
+with normalizer `L` (`H_sharp_ti`), so all local subgroups are trivial (`dade_H_eq_bot`) and both
+maps are the *same* pointwise recipe — the base value `φ(a)` on the conjugacy saturation `(H^#)^G`
+and `0` off it (`S04.map_eq_of_isConj_of_forall_H_eq_bot` /
+`IsTISubset.induce_apply_of_mem_conj`, and the two vanishing halves).  This is the §8 instance of
+the identification made in §15 for (13.2.e) (`S15.H_sharp_tau_eq_induce`). -/
+theorem tau_apply_eq_induce (hyp : SibleyDadeHypothesis G L H)
+    {φ : ClassFunction ↥L ℂ}
+    (hφ : φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :
+    hyp.tau φ = ClassFunction.induce L φ := by
+  classical
+  have hAL : sharpImage H ⊆ (L : Set G) := by
+    intro x hx
+    obtain ⟨y, _, rfl⟩ := Subgroup.mem_map.mp hx.1
+    exact y.2
+  have hsupp : ∀ w : ↥L, (w : G) ∉ sharpImage H → φ w = 0 := by
+    intro w hw
+    by_contra hne
+    exact hw (hφ (ClassFunction.mem_support.mpr hne))
+  -- `H ⊴ L` makes `H^#` stable under `L`-conjugation.
+  have hstab : ∀ l ∈ L, MulAut.conj l • sharpImage H = sharpImage H := by
+    have hmem : ∀ (l : ↥L) (x : G), x ∈ sharpImage H → (l : G) * x * (l : G)⁻¹ ∈ sharpImage H := by
+      intro l x hx
+      obtain ⟨y, hy, hyx⟩ := Subgroup.mem_map.mp hx.1
+      have hx1 : x ≠ 1 := by simpa using hx.2
+      refine ⟨Subgroup.mem_map.mpr ⟨l * y * l⁻¹, hyp.H_normal.conj_mem y hy l, ?_⟩, ?_⟩
+      · simp only [L.subtype_apply, Subgroup.coe_mul, Subgroup.coe_inv] at *
+        rw [hyx]
+      · simp only [Set.mem_singleton_iff]
+        intro hcon
+        exact hx1 (by
+          have := congrArg (fun g : G => (l : G)⁻¹ * g * (l : G)) hcon
+          simpa [mul_assoc] using this)
+    intro l hl
+    refine Set.eq_of_subset_of_subset ?_ ?_
+    · rintro x ⟨a, ha, rfl⟩
+      simpa [MulAut.smul_def] using hmem ⟨l, hl⟩ a ha
+    · intro x hx
+      refine ⟨(l : G)⁻¹ * x * l, ?_, ?_⟩
+      · have := hmem (⟨l, hl⟩ : ↥L)⁻¹ x hx
+        simpa using this
+      · simp only [MulAut.smul_def, MulAut.conj_apply]
+        group
+  rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp.dade _ hφ]
+  ext g
+  by_cases hg : g ∈ OddOrder.GroupTheory.conjClassSet (sharpImage H)
+  · obtain ⟨a, ha, y, hy⟩ := OddOrder.GroupTheory.mem_conjClassSet.mp hg
+    rw [OddOrder.Peterfalvi.S04.map_eq_of_isConj_of_forall_H_eq_bot
+        hyp.dade.isDadeMap_dadeMap hyp.dade_H_eq_bot _ ha (isConj_iff.mpr ⟨y, hy⟩),
+      OddOrder.GroupTheory.IsTISubset.induce_apply_of_mem_conj hyp.H_sharp_ti hAL hstab φ
+        hsupp ha hy.symm]
+  · have hg' : g ∉ Group.conjugatesOfSet (sharpImage H) := by
+      intro hmem
+      obtain ⟨a, ha, hconj⟩ := Group.mem_conjugatesOfSet_iff.mp hmem
+      obtain ⟨c, hc⟩ := isConj_iff.mp hconj
+      exact hg (OddOrder.GroupTheory.mem_conjClassSet.mpr ⟨a, ha, c, hc⟩)
+    rw [OddOrder.Peterfalvi.S04.map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot
+        hyp.dade.isDadeMap_dadeMap hyp.dade_H_eq_bot _ hg',
+      OddOrder.GroupTheory.IsTISubset.induce_apply_of_not_mem_conjClassSet φ hsupp hg]
+
+/-- **(6.8)(b), the lattice**: `ℤ[𝒮, L^#] = ℤ[𝒮, H^#]`.
+
+The book's `τ` is an isometry on `ℤ[𝒮, L^#]`, while `CoherenceTarget` asks the coherent extension
+to agree with `τ` on `ℤ[𝒮, H^#]`.  The two lattices coincide: `H ⊴ L`, so every member
+`Ind_H^L θ` of `𝒮` vanishes off `H` (`support_induce_subset_of_normal`), hence a `ℤ`-combination
+of members supported off `1` is supported on `H^#`.  (Same bridge as
+`S07.zSupportedSpan_ne_one_eq`, which the §4/§5 families use for (4.9)(a)/(5.2.b).) -/
+theorem zSupportedSpan_ne_one_eq_sharp (hyp : SibleyDadeHypothesis G L H) :
+    OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) hyp.S {x : ↥L | x ≠ 1}
+      = OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) hyp.S
+          (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  haveI := hyp.H_normal
+  refine OddOrder.Peterfalvi.S07.zSupportedSpan_ne_one_eq (fun h1 => ?_) (fun s hs x hx => ?_)
+  · exact (OddOrder.Peterfalvi.S04.mem_supportInSubgroup.mp h1).2 rfl
+  · -- Members are induced from the normal `H`, so they vanish off `H`; split off `x = 1`.
+    obtain ⟨θ, _, rfl⟩ := hyp.S_eq ▸ hs
+    have hxH : x ∈ H := ClassFunction.support_induce_subset_of_normal H _ hx
+    by_cases hx1 : x = 1
+    · exact Set.mem_insert_iff.mpr (Or.inl hx1)
+    · refine Set.mem_insert_iff.mpr (Or.inr ?_)
+      refine ⟨Subgroup.mem_map.mpr ⟨x, hxH, rfl⟩, ?_⟩
+      simpa using fun hcon => hx1 (by exact_mod_cast hcon)
+
+/-- **Peterfalvi (6.8), the book's coherence statement.**  `CoherenceTarget` states coherence of
+`(𝒮, H^#, τ)`; the book states coherence of `(𝒮, L^#, τ)` with `τ` the restriction of `Ind_L^G`
+(p. 33).  The two are the same by `zSupportedSpan_ne_one_eq_sharp` (the lattice) and
+`tau_apply_eq_induce` (the map), so the capstone `sibleySetup_is_coherent` delivers exactly the
+book's conclusion. -/
+noncomputable def CoherenceTarget.toBookForm {hyp : SibleyDadeHypothesis G L H}
+    (c : hyp.CoherenceTarget) :
+    OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau hyp.S {x : ↥L | x ≠ 1} where
+  nonzero := by rw [hyp.zSupportedSpan_ne_one_eq_sharp]; exact c.nonzero
+  extension := c.extension
+  extension_inner_eq := c.extension_inner_eq
+  extends_on_supported := fun φ hφ =>
+    c.extends_on_supported φ (by rwa [hyp.zSupportedSpan_ne_one_eq_sharp] at hφ)
+  extension_mem_ZIrr := c.extension_mem_ZIrr
 
 /-- (6.8)(a) consequence: `[L : H] = |W₁|`.  From the complement `L = H ⋊ W₁` (`hyp.split`).
 This is the common degree of the members of `Y = S(H')`: by [Is] Thm 6.34
