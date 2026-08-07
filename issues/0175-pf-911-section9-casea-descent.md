@@ -50,8 +50,27 @@ created: 2026-08-07
 
 ## やること
 
-- [ ] `S15.Hypothesis.nineElevenSevenEightRefutationS` (`S15_NineElevenSevenEight.lean:45`) の
-      証明を読み、`hyp`/`hnoV` の**実使用箇所を数える** (docstring の「4 箇所」は未検証)
+- [x] **依存を実測 (2026-08-08)**。`S15.Hypothesis.nineElevenSevenEightRefutationS`
+      (`S15_NineElevenSevenEight.lean:45`、本体 ~520 行) の実使用:
+
+      - **`hnoV` は 1 箇所だけ** (:266、`sSet_coherent_extension_cross_orthogonal` へ渡す)。
+      - `hyp` の大半は**記法**: `toTypesIIIIIIVSetupS` 65 回 / `dadeHypS` 59 回 / `S` 33 回。
+        これらは setup・Dade 仮説・群のアクセサで、型固有の事実ではない。
+      - 型固有の実体は **9 本の名前つき §15 補題**:
+        `sSet_scaledDiff_support` (2) / `sSet_member_conjDiff_supported` /
+        `sSet_eq_sOf_H0Cprime` / `sSet_coherent_extension_cross_orthogonal` /
+        `sOf_H0Uprime_subset_sSet` / `oddCardS` / `nineElevenSTwoExtractionS` /
+        `nineElevenFourNormInputsS` / `finiteG`。
+
+      **§9 counterpart の実在**: 本 issue が挙げる 4 本
+      (`caseA_nineElevenTwo_tiWitness` / `caseA_two_summand_inertia_inputs` /
+      `caseA_nineElevenThree_count_inputs` / `C_eq_cSub_of_noncoherent`) は**全部実在**し
+      AxiomsCheck 登録済 (`S11_NineElevenCaseA.lean` / `S11_NineElevenSubcoherentBridge.lean`)。
+      しかし上の 9 本のうち §11 に同名/対応が見つかるのは `nineElevenSTwoExtraction` **1 本だけ**。
+
+      ⟹ **scope の再評価**: 「4 箇所を差し替える」ではなく「~520 行の証明を、§15 固有の
+      6 本程度を §9 レベルの事実へ載せ替えながら移植する」作業。**複数 session 規模**。
+      (CLAUDE.md: 規模は着手可否の基準でないが、見積もりは正確にしておく。)
 - [ ] 各点を上記 type-free counterpart に置換して `CaseASevenEightRefutation` の §9 producer を作る
 - [ ] その producer で `sOf_nineEleven_coherent` の `h2`/`hrefuteEq` を discharge し、
       **Hypothesis (9.5) だけから (9.11) が出る**形にする
