@@ -165,6 +165,52 @@ theorem typeF_frobenius_of_card_eq_exponent [Finite G] {M : Subgroup G}
   rw [hU0eq, hHU] at hfrob
   exact hfrob
 
+/-- **Peterfalvi (8.2.b), the `⟸` half in its general form**: if the Sylow subgroups of the
+complement `U` are cyclic (`IsZGroup ↥U`), then `M` is a Frobenius group with kernel `H = M_F`.
+
+No oddness is needed here: a Z-group has `exp = |·|` (`IsZGroup.exponent_eq_card`), which is
+exactly the hypothesis of `typeF_frobenius_of_card_eq_exponent` (the book: *"if the Sylow subgroups
+of `U` are cyclic, `exp(U) = |U|`.  Thus, by (a), `|U₀| = |U|`, whence `U₀ = U`"*).  The `⟹` half
+does need oddness — see `typeF_frobenius_iff_isZGroup`. -/
+theorem typeF_frobenius_of_isZGroup [Finite G] {M : Subgroup G}
+    (data : TypeFData M) (hZ : _root_.IsZGroup ↥data.U) :
+    OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M (data.H.subgroupOf M) (data.U.subgroupOf M) := by
+  haveI := hZ
+  exact typeF_frobenius_of_card_eq_exponent data
+    (_root_.IsZGroup.exponent_eq_card (G := ↥data.U)).symm
+
+/-- **Peterfalvi (8.2.b)**, the book's equivalence (p. 44): for a group `M` of type `F` of odd
+order,
+
+*`M` is a Frobenius group with kernel `H = M_F` **if and only if** the Sylow subgroups of `U` are
+cyclic.*
+
+"The Sylow subgroups of `U` are cyclic" is `IsZGroup ↥U`.
+
+* **(⟸)** `typeF_frobenius_of_isZGroup` (no oddness needed).
+* **(⟹)** the complement of an odd-order Frobenius group is a Z-group ([BG] Proposition 3.9,
+  `isZGroup_of_isFrobeniusGroup_of_odd`), transported from `U.subgroupOf M` to `U`.
+
+Only the `⟸` half was previously available; the `⟹` half is what makes this the book's
+biconditional. -/
+theorem typeF_frobenius_iff_isZGroup [Finite G] (hodd : Odd (Nat.card G)) {M : Subgroup G}
+    (data : TypeFData M) :
+    OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M (data.H.subgroupOf M) (data.U.subgroupOf M) ↔
+      _root_.IsZGroup ↥data.U := by
+  classical
+  let e : ↥(data.U.subgroupOf M) ≃* ↥data.U := Subgroup.subgroupOfEquivOfLe data.U_le
+  refine ⟨fun hfrob => ?_, fun hZ => ?_⟩
+  · -- `U` is a Frobenius complement of odd order, hence a Z-group ([BG] Prop 3.9).
+    have hcard : Nat.card ↥(data.U.subgroupOf M) = Nat.card ↥data.U := Nat.card_congr e.toEquiv
+    have hodd' : Odd (Nat.card ↥(data.U.subgroupOf M)) := by
+      rw [hcard]
+      exact Odd.of_dvd_nat hodd (Subgroup.card_subgroup_dvd_card data.U)
+    haveI : _root_.IsZGroup ↥(data.U.subgroupOf M) :=
+      isZGroup_of_isFrobeniusGroup_of_odd hfrob hodd'
+    have hinj : Function.Injective ⇑(e.symm.toMonoidHom) := by simpa using e.symm.injective
+    exact _root_.IsZGroup.of_injective hinj
+  · exact typeF_frobenius_of_isZGroup data hZ
+
 /-! ## (8.8): BG maximal-subgroup dichotomy -/
 
 /-- **Peterfalvi (8.8)**: BG Theorem I / Proposition 16.1 / Theorems B and C(3),

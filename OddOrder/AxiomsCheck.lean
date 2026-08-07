@@ -624,7 +624,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 20200
+set_option linter.style.longFile 20400
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -2295,7 +2295,14 @@ one-element lemma).  All axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.typeI_tau_eq_induce_of_supported_trivial_H
 -- (12.16) `π = ∅` case): a type-F/I maximal whose complement `U` is a Z-group (all Sylow cyclic)
 -- is Frobenius with kernel `M_F`, via `IsZGroup.exponent_eq_card` + `typeF_frobenius_of_card_eq_exponent`.
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.typeF_frobenius_of_isZGroup_complement
+-- **Peterfalvi (8.2.b)** (issue 0172 §8 audit): the book states this as a *biconditional* — `M` is
+-- Frobenius with kernel `M_F` **iff** the Sylow subgroups of `U` are cyclic (p. 44).  Only the `⟸`
+-- half existed; `typeF_frobenius_iff_isZGroup` adds the `⟹` half (an odd-order Frobenius complement
+-- is a Z-group, [BG] Prop 3.9) and packages the equivalence.  `typeF_frobenius_of_isZGroup` is the
+-- `⟸` half in general form (no oddness), now living in §8 with the other (8.2) lemmas — the former
+-- S14 duplicate of it was removed.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typeF_frobenius_of_isZGroup
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.typeF_frobenius_iff_isZGroup
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.typeI_frobenius_of_isZGroup_complement
 -- Pf (12.8) minimal-counterexample existence: a nonempty prime set `π` yields a
 -- `CounterexampleHypothesis` at its least element `p = Nat.find` (the `InPi` witness + `Nat.find_min'`
