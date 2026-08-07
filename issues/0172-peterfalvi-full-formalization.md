@@ -92,7 +92,12 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
   - **stale 注記の訂正 2 件**: `six_three_of_imageData` の「repo は `H` 冪零を取る」(issue 0173 で
     解消済) と `six_two_of_imageData` の `B < K` の誤った正当化 (実際は**書籍 statement の修理**;
     `B = K` では書籍 (6.2) は偽)。
-  - **次の入口**: §7 = repo `S09` ((7.1)-(7.11)、書籍 pp.38-43。ページ画像 p038-p043 は切り出し済)。
+  - **§7 監査完了 (2026-08-07)**: 全 11 件 ((7.1)-(7.11)) で未形式化ゼロ・補充ゼロ。
+    carrier の「証明書 field」((7.7.a)/(7.8.c.i)/(7.8.a)/(7.8.b)) は 4 つとも producer が
+    discharge 済 (`hypothesis76OfFamily` / `hypothesis78OfDade` / `betaDecompOfFacts` /
+    `normEstimates_of_source_orthogonal`)。(7.1) の `IsDadeIsometry` も書籍 (2.6) =
+    `S04.Hypothesis.fullDadeIsometryData` が (2.2) だけから構成するので導出可能。
+  - **次の入口**: §8 = repo `S10` ((8.1)-(8.x)、書籍 pp.44-52)。
   - **監査手順の正本** = memory `textbook-coverage-audit-failure-modes`。
     **(1) AxiomsCheck の番号コメント → (2) 書籍ページ画像 → (3) 結論の突合** の順。
     🚨「実体が見つからない」を結論にしない (本セッションで 3 回誤判定しかけた)。
