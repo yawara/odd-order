@@ -16006,6 +16006,26 @@ Isaacs Ch.8 の cite ゼロ 13 件のうち **唯一 mathlib にも repo にも�
 
 残り 12 件の mathlib 対応は `notes/isaacs/ch08_permutation.md` の対応表が正本。 -/
 
+/-! ### Isaacs Cor 1.24 — 正規条項つき (issue 0176 ステップ 2、2026-08-08)
+
+書籍 (1.24) (p.24、ページ画像で確定) は位数 `p^a` の `p`-群 `P` について、各 `0 ≤ b ≤ a` で
+**`L ⊴ P`** かつ `|L| = p^b` なる部分群の存在を主張する。
+
+⚠ mathlib の `Sylow.exists_subgroup_card_pow_prime_of_le_card` は**存在だけ**を返し
+**正規性を返さない** ⟹ **部分被覆**だった。repo の該当箇所の注記も自ら「弱形」と書いていた
+(= Peterfalvi 監査でいう「stale/自認つき自己注記」型)。
+
+  IsPGroup.exists_normal_card_eq_pow   書籍どおりの正規条項つき
+
+証明は書籍と同じ `b` の帰納法で、Lemma 1.23 (`exists_normal_index_eq_prime`) を `M = ⊤` に
+適用して正規性を保ったまま位数を `p` 倍ずつ上げる。
+
+⚠ 対して **Cor 1.25** (`p^b ∣ |G| ⇒ 位数 `p^b` の部分群) は書籍自身が正規性を主張しないので
+mathlib `Sylow.exists_subgroup_card_pow_prime` がそのまま書籍強度 (ページ画像で確認)。 -/
+
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch01.IsPGroup.exists_normal_card_eq_pow
+
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch08.center_perm_eq_bot
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch08.normal_perm_eq_bot_or_alternating_or_top

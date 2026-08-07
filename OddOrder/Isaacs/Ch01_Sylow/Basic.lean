@@ -564,10 +564,42 @@ theorem IsPGroup.exists_normal_index_eq_prime {P : Type*} [Group P] [Finite P]
     have hL_index_ne_zero : L.index ≠ 0 := Nat.card_pos.ne'
     exact Nat.eq_of_mul_eq_mul_right (Nat.pos_of_ne_zero hL_index_ne_zero) h_eq
 
-/-! **Isaacs Cor 1.24** (弱形, `p`-群が各 `m ≤ n` で位数 `p^m` 部分群を持つ) は
-mathlib `Sylow.exists_subgroup_card_pow_prime_of_le_card` を, **Cor 1.25** (Sylow E
-の一般化 `p^m ∣ |G| ⇒ 位数 `p^m` 部分群存在) は `Sylow.exists_subgroup_card_pow_prime`
-を直接呼ぶ. -/
+/-- **Isaacs Cor 1.24** (p. 24): `P` を位数 `p^a` の `p`-群とすると, 各 `0 ≤ b ≤ a` に対して
+**`P` で正規**な部分群 `L ⊴ P` で `|L| = p^b` なるものが存在する.
+
+⚠ mathlib の `Sylow.exists_subgroup_card_pow_prime_of_le_card` は**存在だけ**を返し
+**正規性を返さない** ので, 書籍 (1.24) の弱形にとどまる (issue 0176 の逐条監査で検出).
+書籍の証明どおり `b` に関する帰納法で Lemma 1.23 (`exists_normal_index_eq_prime`) を
+`M = ⊤` に適用して正規性を保ったまま位数を `p` 倍ずつ上げる.
+
+なお **Cor 1.25** (`p^b ∣ |G| ⇒ 位数 `p^b` の部分群が存在) は正規性を主張しないので
+mathlib `Sylow.exists_subgroup_card_pow_prime` がそのまま書籍強度. -/
+theorem IsPGroup.exists_normal_card_eq_pow {P : Type*} [Group P] [Finite P]
+    {p a : ℕ} [Fact p.Prime] (hP : IsPGroup p P) (hcard : Nat.card P = p ^ a) :
+    ∀ {b : ℕ}, b ≤ a → ∃ L : Subgroup P, L.Normal ∧ Nat.card L = p ^ b := by
+  intro b
+  induction b with
+  | zero => exact fun _ => ⟨⊥, inferInstance, by simp⟩
+  | succ b ih =>
+    intro hb
+    obtain ⟨N, hNnorm, hNcard⟩ := ih (Nat.le_of_succ_le hb)
+    haveI := hNnorm
+    -- `|N| = p^b < p^a = |P|`, so `N` is proper.
+    have hplt : 1 < p := (Fact.out : p.Prime).one_lt
+    have hNlt : N < ⊤ := by
+      refine lt_top_iff_ne_top.mpr fun htop => ?_
+      rw [htop, Subgroup.card_top, hcard] at hNcard
+      exact absurd (Nat.pow_right_injective hplt hNcard) (by omega)
+    -- Lemma 1.23 at `M = ⊤` raises the order by exactly `p`, keeping normality.
+    obtain ⟨L, hLnorm, hNL, -, hrel⟩ :=
+      OddOrder.Isaacs.Ch01.IsPGroup.exists_normal_index_eq_prime hP (N := N) (M := ⊤) hNlt
+    refine ⟨L, hLnorm, ?_⟩
+    have hcards : Nat.card ↥(N.subgroupOf L) = Nat.card ↥N :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNL.le).toEquiv
+    have hcm := (N.subgroupOf L).card_mul_index
+    have hrelidx : (N.subgroupOf L).index = p := hrel
+    rw [hcards, hNcard, hrelidx] at hcm
+    rw [← hcm, pow_succ]
 
 /-! ### O_p(G) と Fitting 部分群 F(G)
 

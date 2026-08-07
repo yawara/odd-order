@@ -69,11 +69,22 @@ cite があるのは 37 件で、残り 9 件 (**1.1, 1.5, 1.6, 1.7, 1.10, 1.11,
 | **1.10** | `K char N ⊴ G ⟹ K ⊴ G` | `ConjAct.normal_of_characteristic_of_normal` (`ConjAct.lean:270`) — repo も既に使用中 |
 | **1.11** | 任意の `p`-部分群 `P` は或る Sylow の共役に含まれる | `IsPGroup.exists_le_sylow` (`Sylow.lean:167`) |
 | **1.17** | `n_p(G) ≡ 1 (mod p)` | `card_sylow_modEq_one` (`Sylow.lean:344`) |
-| **1.24** | 位数 `p^a` の `p`-群は各 `0 ≤ b ≤ a` で位数 `p^b` の**正規**部分群を持つ | `Sylow.exists_subgroup_card_pow_prime` の `p`-群版 |
+| **1.24** | 位数 `p^a` の `p`-群は各 `0 ≤ b ≤ a` で位数 `p^b` の**正規**部分群 `L ⊴ P` を持つ | ⚠ **部分被覆だった** → **2026-08-08 に補充** `Ch01.IsPGroup.exists_normal_card_eq_pow` |
 | **1.25** | `p^b ∣ \|G\|` ⟹ 位数 `p^b` の部分群が在る | `Sylow.exists_subgroup_card_pow_prime` (`Sylow.lean:671`) |
 
-⚠ **1.24 の「正規」条項は要確認** — 書籍は `L ⊴ P` を主張する。mathlib の
-`exists_subgroup_card_pow_prime` が正規性まで返すかは未確認 (返さないなら部分被覆)。
+✅ **1.24 の「正規」条項を確定 (2026-08-08、書籍 p.24 のページ画像)** — 書籍は `L ⊴ P` を
+主張するが mathlib の `Sylow.exists_subgroup_card_pow_prime_of_le_card` は**存在だけ**を返し
+**正規性を返さない** ⟹ **部分被覆**だった。repo の該当注記も自ら「弱形」と自認していた。
+⟹ 書籍強度の `Ch01.IsPGroup.exists_normal_card_eq_pow` を補充 (証明は書籍と同じ `b` の帰納法で
+Lemma 1.23 = `exists_normal_index_eq_prime` を `M = ⊤` に適用)。
+
+⚠ **この判別は pdftotext では不可能** — `⊲` が `<` に落ちるので `L ⊴ P` と `L < P` が
+区別できない ([[mmd-collapses-subnormal-symbol]] と同型の罠)。**ページ画像が必須**。
+使用したページ画像は `references/isaacs/pages/isaacs-p015..p024.png` に保存済。
+
+対照的に **1.25** は書籍自身が正規性を主張しない (同ページで確認) ので mathlib がそのまま
+書籍強度。⟹ **「隣接する 2 つの系のうち片方だけが正規性を主張する」** ような差は、
+番号 grep でも cite 数でも絶対に検出できない。ページ画像での逐条確認だけが効く。
 
 ⬜ **残り 37 件の条項ごとの突合は未実施**。とくに 1.12-1.15 / 1.18-1.22 / 1.30-1.31 は
 **1 つの file-header docstring が複数番号を列挙**しているだけで、番号ごとの statement が
