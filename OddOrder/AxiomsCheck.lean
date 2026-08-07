@@ -2142,12 +2142,35 @@ set_option linter.style.longLine false in
   sigmaNC_eq_card_W1_of_column   (b) の `NC(ψ) = w₁` (非零係数は列 `Ŵ₁ × {j₀}` ちょうど)
   sigmaNC_eq_card_W2_of_row      (c) の `NC(ψ) = w₂`
 
-残る packaging 差は再構成条項 `ψ = a·∑ ω^σ + β` (`β` = `Im σ` と直交する成分の名指し)。 -/
+**残っていた再構成条項 `ψ = a·∑ ω^σ + β` も同日に解消**:
+
+  exists_sigmaBeta           **Hypothesis (3.6) の分解そのもの** — 書籍が *posit* する
+                             `ψ = ∑ a_{ij} ω_{ij}^σ + β` (`β ⊥ Im σ`) を定理として証明。
+                             `{ω_{ij}^σ} = {χ_{ij}}` が正規直交 (`chiFam_spec`) なので
+                             `β := ψ − ∑ a_{ij} χ_{ij}` は自動的に全 `χ_{rs}` と直交する
+                             (Fourier 剰余)。⚠ `ψ` への仮定は不要 — `V` 上消えることと
+                             `NC(ψ)` は (3.7)/(3.8) でしか効かない。
+  exists_sigmaBeta_column    (b) の `ψ = a·∑_{0≤i<w₁} ω_{i j₀}^σ + β`
+  exists_sigmaBeta_row       (c) の `ψ = a·∑_{0≤j<w₂} ω_{i₀ j}^σ + β`
+  sigmaCoeff_trichotomy_book **書籍 (3.8) の statement 逐語版** — 3 分岐それぞれに個数条項と
+                             再構成条項を付けた形。case (a) の `ψ = β` は「全 Fourier 係数が
+                             消える」= `∀ pq, ⟨ψ, ω_{pq}^σ⟩ = 0` として表現。
+
+⟹ **(3.8) の packaging 差は解消**。係数形 `sigmaCoeff_trichotomy` は consumer 向けの
+working version として残し、書籍形は上の逐語版が担う。 -/
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaNC_eq_card_W1_of_column
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaNC_eq_card_W2_of_row
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_sigmaBeta
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_sigmaBeta_column
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_sigmaBeta_row
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff_trichotomy_book
 
 /-! ### Peterfalvi (1.7)(b) — 重複度 `e` 付き一般形 (2026-08-08 に「未形式化」を撤回)
 

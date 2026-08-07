@@ -179,8 +179,12 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
      は §13/§15 の S-instance 用で §9 の `CaseASevenEightRefutation` とは別物 —
      ~520 行の移植見積もりは**存在しない作業**の見積もりだった。
   4. ~~低優先繰延 2 件~~ — **両方 2026-08-08 に解消**:
-     - **(3.8)**: 個数条項 `NC(ψ) = w₁` / `= w₂` を `sigmaNC_eq_card_W1_of_column` /
-       `sigmaNC_eq_card_W2_of_row` として補充 (残る差は再構成条項 `ψ = a·∑ω^σ + β` のみ)。
+     - **(3.8)**: packaging 差を**完全解消**。個数条項 `NC(ψ) = w₁` / `= w₂` を
+       `sigmaNC_eq_card_W1_of_column` / `sigmaNC_eq_card_W2_of_row`、再構成条項
+       `ψ = a·∑ω^σ + β` を `exists_sigmaBeta` (= **Hypothesis (3.6) の分解そのものを定理化**;
+       `{ω_{ij}^σ}` が正規直交なので `β := ψ − ∑ a_{ij} χ_{ij}` は自動で `Im σ` と直交する
+       Fourier 剰余) + `exists_sigmaBeta_column` / `exists_sigmaBeta_row` として補充し、
+       書籍 statement の逐語版 `sigmaCoeff_trichotomy_book` を追加。
      - **(5.6)**: 実測の結果**元から書籍強度**だった。`DadeChainStep` が (b) を
        `famDegree_chi`、(c) を `hdeg_c` として持ち、唯一 posited に見えた `Dmem` も
        `decompositionPairFromDadeOfIrreducible` (coherence 仮説を取らない) で構成可能。
@@ -194,8 +198,8 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
 | 条件付き | **ゼロ** ((8.13)(c3) Type II・(9.11) type-free とも 2026-08-08 に解消) |
 | 低優先繰延 | **2026-08-08 に両方解消** ((3.8) は個数条項を補充 / (5.6) は元から書籍強度) |
 
-⟹ **Peterfalvi 全 284 件の番号付き結果に書籍強度の実体があり、未形式化も条件付きもゼロ**。
-残差は (3.8) の再構成条項 `ψ = a·∑ω^σ + β` の packaging 差 1 点のみ。
+⟹ **Peterfalvi 全 284 件の番号付き結果に書籍強度の実体があり、未形式化・条件付き・
+packaging 差のすべてがゼロ**。
 
 ### ⚠ 本キャンペーンで最も多かった誤判定様式 (計 9 件)
 
@@ -325,7 +329,8 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
     **(1) AxiomsCheck の番号コメント → (2) 書籍ページ画像 → (3) 結論の突合** の順。
     🚨「実体が見つからない」を結論にしない (本セッションで 3 回誤判定しかけた)。
   - **未形式化として残るもの**: **なし** (2026-08-08 に (1.7)(b) の判定を撤回 — 上記)。
-  - **低優先の繰延 2 件**: (3.8) の packaging 差 / (5.6) の書籍仮説 (b)(c) ⟹ 分解存在 の橋渡し。
+  - ~~**低優先の繰延 2 件**~~: 両方 2026-08-08 に解消 ((3.8) の packaging 差は個数条項 +
+    再構成条項 + 逐語版で完済 / (5.6) は元から書籍強度)。
 
 ## 完了条件
 

@@ -131,6 +131,137 @@ theorem sigmaNC_eq_card_W2_of_row (hyp : TICyclicHypothesis G) [Fintype hyp.W]
   rw [hset, Set.ncard_image_of_injective _ hinj, Set.ncard_univ,
     hyp.card_charGroup_subgroupOf hyp.W2_le_W]
 
+/-! ### Peterfalvi (3.6)/(3.8): the reconstruction `ψ = a·∑ ω^σ + β` -/
+
+/-- **Peterfalvi Hypothesis (3.6), the decomposition itself**: every `ψ ∈ CF(G)` splits as
+
+`ψ = ∑_{0≤i<w₁, 0≤j<w₂} a_{ij} ω_{ij}^σ + β`   with   `a_{ij} = ⟨ψ, ω_{ij}^σ⟩` and `β ⊥ Im σ`.
+
+The book *posits* this shape in (3.6); here it is a theorem, because `{ω_{ij}^σ} = {χ_{ij}}`
+(`chiFam`) is orthonormal (`chiFam_spec`), so `β := ψ − ∑ a_{ij} χ_{ij}` is automatically
+orthogonal to every `χ_{rs}` — the Fourier remainder.  ⚠ No hypothesis on `ψ` is needed; (3.6)'s
+`ψ` vanishing on `V` and the `NC(ψ)` bookkeeping enter only in (3.7)/(3.8).
+
+This is what turns the repo's coefficient-level (3.8) (`sigmaCoeff_trichotomy`) into the book's
+statement, whose cases (b)/(c) are phrased as reconstructions of `ψ` rather than as conditions on
+the `a_{ij}`. -/
+theorem exists_sigmaBeta (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    [Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ)] [Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (ψ : ClassFunction G ℂ) :
+    ∃ β : ClassFunction G ℂ,
+      (∀ pq, ClassFunction.inner β (hyp.chiFam hVeq app pq) = 0) ∧
+      ψ = (∑ pq, hyp.sigmaCoeff hVeq app ψ pq • hyp.chiFam hVeq app pq) + β := by
+  classical
+  refine ⟨ψ - ∑ pq, hyp.sigmaCoeff hVeq app ψ pq • hyp.chiFam hVeq app pq, ?_, by abel⟩
+  intro rs
+  rw [ClassFunction.inner_sub_left, inner_sum_left]
+  have hstep : ∀ pq, ClassFunction.inner
+      (hyp.sigmaCoeff hVeq app ψ pq • hyp.chiFam hVeq app pq) (hyp.chiFam hVeq app rs)
+      = if pq = rs then hyp.sigmaCoeff hVeq app ψ pq else 0 := by
+    intro pq
+    rw [ClassFunction.inner_smul_left, (hyp.chiFam_spec hVeq app).2.2.1]
+    split_ifs <;> ring
+  simp only [hstep, Finset.sum_ite_eq' Finset.univ rs, Finset.mem_univ, if_true]
+  exact sub_self _
+
+/-- **Peterfalvi (3.8)(b), the reconstruction clause**: in the single-column branch,
+`ψ = a·∑_{0≤i<w₁} ω_{i j₀}^σ + β` with `β` the Hypothesis-(3.6) remainder (`⊥ Im σ`).
+
+Substitute the branch's coefficient data into the (3.6) decomposition `exists_sigmaBeta`: the
+double sum `∑_{i,j} a_{ij} χ_{ij}` collapses to the column `j = j₀`, where every coefficient is
+the common value `a`.  Together with `sigmaNC_eq_card_W1_of_column` this is the book's (b) in
+full. -/
+theorem exists_sigmaBeta_column (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    [Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    {ψ : ClassFunction G ℂ}
+    {j₀ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ} {c : ℂ}
+    (hcol : ∀ p, hyp.sigmaCoeff hVeq app ψ (p, j₀) = c)
+    (hrest : ∀ p q, q ≠ j₀ → hyp.sigmaCoeff hVeq app ψ (p, q) = 0) :
+    ∃ β : ClassFunction G ℂ,
+      (∀ pq, ClassFunction.inner β (hyp.chiFam hVeq app pq) = 0) ∧
+      ψ = c • (∑ p, hyp.chiFam hVeq app (p, j₀)) + β := by
+  classical
+  haveI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  obtain ⟨β, hβ, hψ⟩ := hyp.exists_sigmaBeta hVeq app ψ
+  refine ⟨β, hβ, ?_⟩
+  rw [hψ]
+  congr 1
+  rw [Fintype.sum_prod_type, Finset.smul_sum]
+  refine Finset.sum_congr rfl fun p _ => ?_
+  rw [Finset.sum_eq_single j₀ (fun q _ hq => by rw [hrest p q hq, zero_smul])
+    (fun h => absurd (Finset.mem_univ j₀) h), hcol p]
+
+/-- **Peterfalvi (3.8)(c), the reconstruction clause**: row form of `exists_sigmaBeta_column`,
+`ψ = a·∑_{0≤j<w₂} ω_{i₀ j}^σ + β`. -/
+theorem exists_sigmaBeta_row (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    [Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    {ψ : ClassFunction G ℂ}
+    {i₀ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} {c : ℂ}
+    (hrow : ∀ q, hyp.sigmaCoeff hVeq app ψ (i₀, q) = c)
+    (hrest : ∀ p q, p ≠ i₀ → hyp.sigmaCoeff hVeq app ψ (p, q) = 0) :
+    ∃ β : ClassFunction G ℂ,
+      (∀ pq, ClassFunction.inner β (hyp.chiFam hVeq app pq) = 0) ∧
+      ψ = c • (∑ q, hyp.chiFam hVeq app (i₀, q)) + β := by
+  classical
+  haveI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  obtain ⟨β, hβ, hψ⟩ := hyp.exists_sigmaBeta hVeq app ψ
+  refine ⟨β, hβ, ?_⟩
+  rw [hψ]
+  congr 1
+  rw [Fintype.sum_prod_type, Finset.sum_eq_single i₀
+    (fun p _ hp => Finset.sum_eq_zero fun q _ => by rw [hrest p q hp, zero_smul])
+    (fun h => absurd (Finset.mem_univ i₀) h), Finset.smul_sum]
+  exact Finset.sum_congr rfl fun q _ => by rw [hrow q]
+
+/-- **Peterfalvi Theorem (3.8), the book's statement verbatim** (p. 19).
+
+> Assume Hypothesis (3.6), that `w₁ < w₂` and that `NC(ψ) < 2w₁`.  Then one of the following
+> three cases holds.
+> (a) `ψ = β`.
+> (b) `NC(ψ) = w₁` and there is an element `a ∈ ℂ` and an index `j` such that
+>     `ψ = a ∑_{0≤i<w₁} ω_{ij}^σ + β`.
+> (c) `NC(ψ) = w₂` and there is an element `a ∈ ℂ` and an index `i` such that
+>     `ψ = a ∑_{0≤j<w₂} ω_{ij}^σ + β`.
+
+Case (a) is rendered as "`ψ` is orthogonal to every `ω_{ij}^σ`", which is exactly `ψ = β` for the
+(3.6) remainder (all Fourier coefficients vanish, so `β = ψ − 0 = ψ`).
+
+Assembled from `sigmaCoeff_trichotomy` (the coefficient trichotomy), the count clauses
+`sigmaNC_eq_card_W1_of_column` / `sigmaNC_eq_card_W2_of_row`, and the reconstruction clauses
+`exists_sigmaBeta_column` / `exists_sigmaBeta_row`.  The coefficient form remains the working
+version for consumers; this is the shape the book states. -/
+theorem sigmaCoeff_trichotomy_book (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    [Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ)] [Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    {ψ : ClassFunction G ℂ} (hψ : ∀ v ∈ hyp.V, ψ v = 0)
+    (hgap : Nat.card hyp.W1 + 2 ≤ Nat.card hyp.W2)
+    (hNC : hyp.sigmaNC hVeq app ψ < 2 * Nat.card hyp.W1) :
+    (∀ pq, ClassFunction.inner ψ (hyp.chiFam hVeq app pq) = 0) ∨
+      (hyp.sigmaNC hVeq app ψ = Nat.card hyp.W1 ∧
+        ∃ (a : ℂ) (j₀ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) (β : ClassFunction G ℂ),
+          a ≠ 0 ∧ (∀ pq, ClassFunction.inner β (hyp.chiFam hVeq app pq) = 0) ∧
+            ψ = a • (∑ p, hyp.chiFam hVeq app (p, j₀)) + β) ∨
+      (hyp.sigmaNC hVeq app ψ = Nat.card hyp.W2 ∧
+        ∃ (a : ℂ) (i₀ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (β : ClassFunction G ℂ),
+          a ≠ 0 ∧ (∀ pq, ClassFunction.inner β (hyp.chiFam hVeq app pq) = 0) ∧
+            ψ = a • (∑ q, hyp.chiFam hVeq app (i₀, q)) + β) := by
+  rcases hyp.sigmaCoeff_trichotomy hVeq app hψ hgap hNC with h | ⟨j₀, c, hc, hcol, hrest⟩ |
+    ⟨i₀, c, hc, hrow, hrest⟩
+  · exact Or.inl h
+  · obtain ⟨β, hβ, hψeq⟩ := hyp.exists_sigmaBeta_column hVeq app hcol hrest
+    exact Or.inr (Or.inl ⟨hyp.sigmaNC_eq_card_W1_of_column hVeq app hc hcol hrest,
+      c, j₀, β, hc, hβ, hψeq⟩)
+  · obtain ⟨β, hβ, hψeq⟩ := hyp.exists_sigmaBeta_row hVeq app hrow hrest
+    exact Or.inr (Or.inr ⟨hyp.sigmaNC_eq_card_W2_of_row hVeq app hc hrow hrest,
+      c, i₀, β, hc, hβ, hψeq⟩)
+
 open scoped Classical in
 /-- **All σ-coefficients of a norm-`2` `V`-vanishing virtual character vanish** — the
 degenerate all-zero case of the (4.8)/(10.5) trichotomy.  `ŵ₁, ŵ₂ ≥ 3`, both odd and
