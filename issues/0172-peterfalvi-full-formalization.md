@@ -74,7 +74,7 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
   (8.8)+(8.9) の合成 `FTtypeP_pair_witness` が同ファイル :712 にある。
 
 - **ステップ 2 ✅ 完了 (2026-08-08)**: Part II + 補章の census。書籍テキストを節境界つきで
-  走査し **全 110 件**を列挙 (Part II Introduction 1 / Ch.I 19 / Ch.II 18 / Ch.III 16 /
+  走査し **全 115 件**を列挙 (Part II Introduction 1 / Ch.I 19 / Ch.II 18 / Ch.III 16 /
   Ch.IV 41 / App.I-IV 16)。**cite ゼロは無し** (Part I の 169/169 と同じ状況)。
   - Part II は Part I と番号体系がまったく違う: (1) 章をまたぐ固有名 Theorem A/B/C、
     (2) **節ごとにリセット**する `Proposition N`/`Lemma N` + 無番号の `Proposition.`/`Lemma.`/
@@ -122,9 +122,18 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
     case (b)(c) に位数情報も付く)、§2 Proposition は `typeASubgroup` を `Subgroup G` として
     構成 (=「部分群である」の内容そのもの)、§3 Proposition は `exists_standardModel` が
     書籍の全条項 (φ の双加法性・scaling 則・anisotropy・`K₁W₁` の作用) を持つ。
-  - **次の入口 = Ch.IV Characterization of PSU(3,q) (書籍 pp.122-134)**: §1 の (H1)-(H6) +
-    Lemma、§2 のステップ (1)-(20) + Proposition、§3 の Proposition + ステップ (1)-(5) +
-    Corollary 1/2、§4 のステップ (1)-(5)。
+  - **Ch.IV 監査完了 (2026-08-08、補充ゼロ)**: **46 件** (§1 = 7 / §2 = 21 / §3 = 8 / §4 = 10)。
+    §1 の (H1)-(H6) は `GroupTheory/RankOneBNPair.lean`、§1 Lemma は `RankOneBNPairRigidity`、
+    §3 Corollary 1 (`O^{2'}(G) ≅ PSU(3,q)`) は `exists_mulEquiv_standardPermGroup` +
+    `TheoremAConclusion` インスタンス。
+    ⚠ **(H3)/(H4)/(H6) の指数は `a^t`/`a^{-t}`/`h(y)^t`** で `a^{-1}` 等ではない —
+    pdftotext は完全に潰すのでページ画像を拡大クロップして確定した (repo 側は元から正しい)。
+    ⚠ **§4 のステップは (1)-(10)** — 素の `^\(N\)` grep が表示式内の (6)-(9) を取りこぼして
+    いた。census を Ch.IV 41 → 46、総数 110 → **115** に訂正。
+  - ⟹ **Part II 本体 (Ch.I-IV) の逐条監査完了**。補充は通算 3 件
+    (Ch.I §1 の Prop 4(c) 一般形 / Ch.I §1 Lemma (a) の第 2 全単射 / Ch.II step (11) の半直積同型)。
+  - **次の入口 = 補章 4 本**: Appendix I (Huppert, pp.135-136) / II (Near-Fields, pp.137-138) /
+    III (Suzuki 2-Groups, pp.139-143) / IV (Feit–Sibley, pp.144-150) = 16 件。
 - **ステップ 3 ✅ 完了 (2026-08-08)**: Part I (§1-§14) の逐条監査を (1.1) から文書順に完了。1 章ぶん終えるごとに census note を更新した。
   - **2026-08-07 時点: §1-§6 完了 (全 63 件)**。
     正本 = [census note](../notes/peterfalvi/full_formalization_census_2026_08_07.md) §3.5 の各表。

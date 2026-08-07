@@ -633,18 +633,20 @@ Part I が「章番号.通し番号」の 1 系列 ((1.1)…(14.16)) なのに�
 | Ch.IV §1 The Mappings f, g, h | 122-123 | 恒等式 **(H1)-(H6)**、**Lemma** | 7 |
 | Ch.IV §2 Preliminary Calculation | 123-129 | ステップ (1)-(20)、**Proposition** (p.129) | 21 |
 | Ch.IV §3 Determination of f | 129-132 | **Proposition**、ステップ (1)-(5)、**Corollary 1**、**Corollary 2** | 8 |
-| Ch.IV §4 The Case V ≠ W | 132-134 | ステップ (1)-(5) | 5 |
+| Ch.IV §4 The Case V ≠ W | 132-134 | ステップ (1)-(10) | 10 |
 | App.I A Special Case of Huppert | 135-136 | Prop 1 / **Lemma** (無番号) / Prop 2(a)(b) | 3 |
 | App.II On Near-Fields | 137-138 | Prop 1 / Prop 2 | 2 |
 | App.III On Suzuki 2-Groups | 139-143 | Lemma 1(a)(b) / Lemma 2 / Def 1 / Def 2 / Def 3 / **Theorem** / Prop 1 / Prop 2 | 8 |
 | App.IV The Feit–Sibley Theorem | 144-150 | Lemma 1(a)(b) / Lemma 2(a)(b)(c) / **Theorem** | 3 |
-| **合計** | | | **110** |
+| **合計** | | | **115** |
 
 ### 4.2 repo 側の cite 突合 — **111 / 111 に cite あり**
 
-全 110 件について repo 内に引用が存在する (**cite ゼロは無し**)。Part I の 169/169 と同じ状況で、
-⚠ 初版は §2 に「無番号 Lemma」を数えて 111 件としていたが、**§2 の `Lemma` は 3 箇所とも
-§1 の Lemma への参照**でありそこに新しい statement は無い (2026-08-08 にページ画像で確認)。
+全 115 件について repo 内に引用が存在する (**cite ゼロは無し**)。Part I の 169/169 と同じ状況で、
+⚠ 初版の件数 111 は 2 箇所が誤りだった (どちらも 2026-08-08 にページ画像で判明):
+**(a)** Ch.I §2 に数えた「無番号 Lemma」は存在しない (§2 の `Lemma` 3 箇所はすべて §1 の
+Lemma への参照)。**(b)** Ch.IV §4 のステップは (1)-(5) でなく **(1)-(10)** — 素の
+`^\(N\)` grep が表示式内の (6)-(9) を取りこぼしていた。差引 111 − 1 + 5 = **115**。
 
 ⟹ **本命はここでも「番号を埋める」ことでなく §2 の 3 種の残債を 1 件ずつ潰す逐条監査**。
 
@@ -849,11 +851,34 @@ stale だった (Q₈ は 2026-08-07 に閉了) → 訂正し `char_eq_p` を登
 `CentralizerPSUData.residualQuotientEquiv` で戻す構成にしている (書籍の "relative to `U`,
 `U ∩ H` and `t`" の Lean 化)。
 
+#### Part II Ch.IV Characterization of PSU(3,q) (書籍 pp.122-134) — **監査完了 (2026-08-08、補充ゼロ)**
+
+**46 件** (§1 = 7 / §2 = 21 / §3 = 8 / §4 = 10)。全件に書籍強度の実体あり。
+
+| 書籍 | repo |
+|---|---|
+| §1 恒等式 **(H1)-(H6)** | `GroupTheory/RankOneBNPair.lean` の `hOne`/`hTwo`/`hThree`/`hFive`/`hSix` (各定理が書籍の条項 + `g`-companion を束ねた形) |
+| §1 **Lemma** (`L` 忠実 ⟹ `⟨Qˣ⟩` と `L` は `Q`,`f` (resp. `M`,`f`) で同型を除き決まる) | `GroupTheory/RankOneBNPairRigidity.lean` |
+| §2 ステップ (1)-(20) | `PSU3Preliminary` / `PSU3OrbitCount` / `PSU3Sequence` / `PSU3FieldArithmetic` / `PSU3StepFifteen` / `PSU3StepSeventeen` / `PSU3StepEighteen` / `PSU3PairComparison` / `PSU3StepTwenty` |
+| §2 末尾 **Proposition** (`D` が `(Q/Q₀)^#` に不動点なく作用 ⟹ ∃`i`, `f(ω) = (ω⁻¹)^ζ`, `h(ω) ∈ W`) | `PSU3StepTwenty.lean:396` / `PSU3BarOrbit.lean:400` (**書籍文そのまま引用**) |
+| §3 **Proposition** (`θ = 1` かつ `f(ρ) = (ρ̄/y, 1/y)`) | `PSU3Proposition.proposition_inverseFormula_of_ne_one` (+ `Q^#` 全体版) |
+| §3 ステップ (1)-(5) | `PSU3SectionThree` |
+| §3 **Corollary 1** (`O^{2'}(G) ≅ PSU(3,q)`) | `PSU3CorollaryOne.exists_mulEquiv_standardPermGroup` + `TheoremAConclusion` インスタンス |
+| §3 **Corollary 2** | `PSU3CorollaryTwo` |
+| §4 ステップ **(1)-(10)** | `PSU3SectionFourSetup` / `PSU3SectionFourCorollaryTwo` / `PSU3SectionFourCoordinate` (= (4)) / `PSU3SectionFourEquations` / `PSU3SectionFourArithmetic` ((6)-(9)) / `PSU3SectionFourEndgameCore` ((10) + `λ = 1` + `μ = 1 ⟹ η ∈ W`) |
+
+⚠ **(H3)/(H4)/(H6) の指数は `a^t` / `a^{-t}` / `h(y)^t` であって `a^{-1}` 等ではない**。
+pdftotext はこれを完全に潰す (`(H3) /(*") =/(*)"' foraeD.`) ので、本セッションでは 200dpi
+ページ画像を**さらに拡大クロップして**確定した (repo 側は元から正しい)。
+memory `pdftotext-drops-superscripts` の典型例。
+
+⚠ **§4 のステップ数は (1)-(10)** — 素の `^\(N\)` grep は表示式の中に置かれた (6)-(9) を
+取りこぼす。census の Ch.IV は 41 → **46** に訂正。
+
 #### 次の入口
 
-**Ch.IV Characterization of PSU(3,q) (書籍 pp.122-134)** — §1 の恒等式 (H1)-(H6) + Lemma、
-§2 のステップ (1)-(20) + Proposition、§3 の Proposition + ステップ (1)-(5) + Corollary 1/2、
-§4 のステップ (1)-(5)。
+**補章 4 本** (Appendix I Huppert pp.135-136 / II Near-Fields pp.137-138 /
+III Suzuki 2-Groups pp.139-143 / IV Feit–Sibley pp.144-150) = 16 件。
 
 ### 4.5 ページ画像
 
