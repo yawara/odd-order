@@ -348,4 +348,54 @@ Ch.3 の 3.34 と同じ「内部段の名前が先に当たる」パターンで
 
 ⟹ **Ch.9 全 31 件被覆・補充ゼロ**。
 
-### Ch.10 — 未着手 (最後の 1 章、More Transfer、28 件)
+### Ch.10 More Transfer (28 件、書籍 pp.294-319) — **監査完了 (2026-08-08)**、補充ゼロ
+
+**28/28 参照あり**。`Ch10_MoreTransfer/Main.lean:19` が
+「**章完成 (2026-07-17): 全 28 結果 (10.1 – 10.28) が sorry-free で形式化済み**」と
+節別の表つきで記録しており、単独参照の 3 件と endpoint を実体で確認して裏を取った:
+
+| Isaacs | 実体 |
+|---|---|
+| 10.17 (`K`-不変部分群の補元、`p ∤ \|K\|`) | `BG/Ch1_Preliminary/OperatorMaschke.lean` (⚠ **他章のディレクトリ**) |
+| 10.21 (`ℤ[G]` の transversal 補題) | `OddOrder/Algebra/AugmentationIdeal.lean:521` |
+| 10.22 (`Δ(K)² = Δ(K)Δ(G) ∩ Δ(K)`) | 同 `AugmentationIdeal.lean` |
+| **10.28** (**Alperin–Kuo**) | `pow_index_commutator_inf_center_eq_one` (`PrincipalIdeal.lean:52` 一般形 / `:88` 書籍形) |
+
+⚠ この章は **stale でない自己注記の実例**。日付つき (2026-07-17) で節別の ✅ 表を持ち、
+実体と一致していた。⟹ 「注記は信用しない」は「注記を無視する」ではなく
+**「注記を当たりに使い、実体で裏を取る」**。
+
+⟹ **Ch.10 全 28 件被覆・補充ゼロ**。
+
+---
+
+## 4. 監査結果まとめ (2026-08-08、Ch.1-Ch.10 完了)
+
+| 章 | 件数 | 補充 | stale 注記の訂正 |
+|---|---|---|---|
+| Ch.1 Sylow | 46 | **2** (1.24 正規条項 / 1.40(ii) 非単純性) | 2 |
+| Ch.2 Subnormality | 20 | **1** (2.4 `S ∩ T ⊴⊴ G`) | 1 |
+| Ch.3 Split Extensions | 36 | 0 | 3 |
+| Ch.4 Commutators | 38 | 0 | 0 |
+| Ch.5 Transfer | 30 | **1** (5.26 Frobenius 3 条件 TFAE) | 1 |
+| Ch.6 Frobenius Actions | 24 | 0 | 0 |
+| Ch.7 Thompson Subgroup | 8 | 0 | 0 |
+| Ch.8 Permutation Groups | 44 | **1** (8.28 `Sₙ` の正規部分群) | 0 |
+| Ch.9 More on Subnormality | 31 | 0 | 0 |
+| Ch.10 More Transfer | 28 | 0 | 0 |
+| **合計** | **305** | **5** | **7** |
+
+**305 件すべてに書籍強度の実体があるか mathlib 被覆が記録された。**
+
+### ⚠ Isaacs 監査で最も多かった問題
+
+**数学そのものより「自己注記の腐り」** — 補充 5 件に対し stale 注記の訂正が 7 件。
+一次証拠にすると実装済の章を丸ごと「未着手」と誤診する:
+
+* Ch.1 の進捗表が全節「TODO」(章は広範に実装済)
+* Ch.2 が**実在しない補題名** `Subgroup.IsSubnormal.inf` を挙げていた
+* Ch.3 の 3.23/3.24 が「placeholder」「~8-12 週の大規模」(全 4 条項実装済)
+* Ch.5 が「Lem 5.27, 5.28 **完成後**の theorem 化を参照」(同ファイル下部に実体)
+
+⟹ **注記は当たりを付ける道具**。判定は必ず statement を読む。
+Ch.10 のように**日付つきで実体と一致している注記**もあるので、無視するのも誤り。

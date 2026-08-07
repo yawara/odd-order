@@ -136,12 +136,58 @@ repo の `Ch08_PermutationGroups` も既に `IsPreprimitive` を使っている�
         ⚠ 7.4 は repo が `Isaacs Lem 7.4` と略記しており grep パターンが取りこぼした。
       - **Ch.9 監査完了 (2026-08-08)**: 全 31 件被覆・**補充ゼロ**。9.21 (Schenkman)、
         9.23 (Thompson の corefree bound)、9.24 (Thompson–Wielandt) とも endpoint あり。
-      - 1 章ぶん終えるごとに census note を更新して commit。
+      - **Ch.10 監査完了 (2026-08-08)**: 全 28 件被覆・**補充ゼロ**。10.28 (Alperin–Kuo)
+        まで実体あり。⚠ この章の注記は日付つき (2026-07-17) で実体と一致していた
+        (**stale でない自己注記の実例**)。
+      - **⟹ ステップ 2 完了。Ch.1-Ch.10 の全 305 件を逐条監査した。**
 
-## 完了条件
+## 完了条件 — **達成 (2026-08-08)**
 
-Isaacs の全 305 件が **書籍強度**の Lean statement を持つか、**mathlib 被覆として対応が
-記録されている**。特殊化債務ゼロ・部分被覆ゼロ。各章の監査結果を census note に記録する。
+> Isaacs の全 305 件が **書籍強度**の Lean statement を持つか、**mathlib 被覆として対応が
+> 記録されている**。特殊化債務ゼロ・部分被覆ゼロ。各章の監査結果を census note に記録する。
+
+**Ch.1-Ch.10 の全 305 件を逐条監査した。**
+
+| 章 | 件数 | 補充 | stale 注記の訂正 |
+|---|---|---|---|
+| Ch.1 Sylow | 46 | **2** (1.24 正規条項 / 1.40(ii) 非単純性) | 2 |
+| Ch.2 Subnormality | 20 | **1** (2.4 `S ∩ T ⊴⊴ G`) | 1 |
+| Ch.3 Split Extensions | 36 | 0 | 3 |
+| Ch.4 Commutators | 38 | 0 | 0 |
+| Ch.5 Transfer | 30 | **1** (5.26 Frobenius 3 条件 TFAE) | 1 |
+| Ch.6 Frobenius Actions | 24 | 0 | 0 |
+| Ch.7 Thompson Subgroup | 8 | 0 | 0 |
+| Ch.8 Permutation Groups | 44 | **1** (8.28 `Sₙ` の正規部分群) | 0 |
+| Ch.9 More on Subnormality | 31 | 0 | 0 |
+| Ch.10 More Transfer | 28 | 0 | 0 |
+| **合計** | **305** | **5** | **7** |
+
+補充した 5 件はすべて axiom-clean で AxiomsCheck 登録済。
+節別の詳細は [census note](../notes/isaacs/full_formalization_census_2026_08_08.md) §3 が正本。
+
+### ⚠ Isaacs 監査で最も多かった問題 — 自己注記の腐り
+
+**補充 5 件に対し stale 注記の訂正が 7 件**。Peterfalvi 監査 (issue 0172) では
+「未形式化と記録されていたが既に在った」が 9 件だったが、Isaacs では**書き手自身の
+進捗記録が実体から乖離している**のが主因だった:
+
+* Ch.1 の進捗表が全節「TODO」(章は広範に実装済)
+* Ch.2 が**実在しない補題名** `Subgroup.IsSubnormal.inf` を挙げていた
+* Ch.3 の 3.23/3.24 が「placeholder」「~8-12 週の大規模」(全 4 条項実装済)
+* Ch.5 が「Lem 5.27, 5.28 **完成後**の theorem 化を参照」(同ファイル下部に実体)
+
+⟹ **注記は当たりを付ける道具であって判定の証拠ではない**。ただし Ch.10 のように
+日付つきで実体と一致している注記もあるので、無視するのも誤り。
+
+### Isaacs 特有だった残債型 — mathlib 被覆の未記録
+
+標準的な有限群論の章 (Ch.1 / Ch.8) では**書籍の結果が mathlib にそのまま在る**ことが多く、
+repo に実体が無くても被覆済。Ch.8 の cite ゼロ 13 件のうち **12 件がこれ**だった。
+対処は CLAUDE.md のラッパー方針どおり「薄いラッパーを書かず対応表を記録」。
+
+### 残る作業
+
+なし。次フロンティアは **BG** (Bender–Glauberman) の逐条監査 (3 冊スコープの最後)。
 
 ## 参照
 
