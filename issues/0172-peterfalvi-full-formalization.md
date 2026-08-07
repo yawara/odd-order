@@ -149,6 +149,13 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
   4. App.I Prop 1 の `[IsSolvable D]` 削除 (Feit–Thompson で discharge)
   すべて axiom-clean。**新たに見つけた失敗様式 2 型** (7 = 書籍が暗黙にする定理を仮説で受ける /
   8 = file docstring の散文が定理の代わりをしている) を census note §4.6 に記録。
+
+- **次の入口 = 残件の消化 (上流優先 + 文書順)**:
+  1. **(1.7)(b)** — Part I 唯一の未形式化 (重複度 `e` 付き一般形。可換 inertia 商への拡張定理が
+     前提で、巡回版は済・合成列に沿う反復が未実施)。書籍順で最も上流。
+  2. [issue 0174](0174-peterfalvi-813-c3-support-membership.md) — (8.13)(c3)
+  3. [issue 0175](0175-pf-911-section9-casea-descent.md) — (9.11) の type-free 化
+  4. 低優先繰延 2 件: (3.8) の packaging 差 / (5.6) の書籍仮説 (b)(c) ⟹ 分解存在 の橋渡し
 - **ステップ 3 ✅ 完了 (2026-08-08)**: Part I (§1-§14) の逐条監査を (1.1) から文書順に完了。1 章ぶん終えるごとに census note を更新した。
   - **2026-08-07 時点: §1-§6 完了 (全 63 件)**。
     正本 = [census note](../notes/peterfalvi/full_formalization_census_2026_08_07.md) §3.5 の各表。
