@@ -52,6 +52,48 @@ theorem mem_zSupportedSpan_iff {S : Set (ClassFunction L ℂ)} {A : Set L}
       φ ∈ zSpan (L := L) S ∧ φ.support ⊆ A :=
   Iff.rfl
 
+/-- **A support bound on the generators propagates to the whole lattice `ℤ[S]`.**  If every member
+of `S` is supported on `B`, so is every `ℤ`-combination of members.
+
+Ambient-set form of `support_subset_of_mem_zSpan_of_supported` (`FamilyBundleDade`), which is
+stated for the subgroup-relative `supportInSubgroup A L`; the proof is the same span-closure
+argument (`supportedSubmodule B` is a `ℂ`-submodule, so its `ℤ`-restriction contains `span ℤ S`). -/
+theorem support_subset_of_mem_zSpan {S : Set (ClassFunction L ℂ)} {B : Set L}
+    (hS : ∀ s ∈ S, s.support ⊆ B) {φ : ClassFunction L ℂ}
+    (hφ : φ ∈ zSpan (L := L) S) : φ.support ⊆ B := by
+  have hle : zSpan (L := L) S
+      ≤ (ClassFunction.supportedSubmodule (G := L) (k := ℂ) B).restrictScalars ℤ :=
+    Submodule.span_le.mpr fun s hs =>
+      ClassFunction.mem_supportedSubmodule.mpr (fun x hx => hS s hs hx)
+  exact fun x hx => ClassFunction.mem_supportedSubmodule.mp (hle hφ) hx
+
+/-- **Peterfalvi (4.9)(a) / (5.3)(b), the lattice identification `ℤ[𝒮, L^#] = ℤ[𝒮, A]`**
+(book pp. 24, 25).
+
+If every member of `𝒮` is supported on `A ∪ {1}` -- which for the §4 families is exactly what
+(4.7) delivers (`Supp χ ⊆ A ∪ {1}`, `Supp μ_j ⊆ A ∪ {1}`) -- and `1 ∉ A`, then a `ℤ`-combination
+of members vanishing at `1` is automatically supported on `A`.  So the two lattices the book plays
+off against each other coincide.
+
+This is the bridge the book uses twice: in (4.9)(a) (*"Also, `0 ≠ ℤ[T, L^#] = ℤ[T, A]`"*) and,
+decisively, in the proof of (5.3)(b), where Hypothesis (5.2) is stated with `τ` an isometry on
+`ℤ[𝒮, L^#]` while the repository's `GeneralHypothesis.tau_isometry_diff` gives it on `ℤ[𝒮, A]`.
+The two agree exactly by this lemma -- and the `A`-relative form is the one that can be supplied,
+since a *global* isometry does not exist for the Feit--Thompson Dade map
+(`dim CF(L) > dim CF(G)`; see the `Hypothesis.tau_isometry_diff` docstring). -/
+theorem zSupportedSpan_ne_one_eq {S : Set (ClassFunction L ℂ)} {A : Set L}
+    (hA1 : (1 : L) ∉ A) (hS : ∀ s ∈ S, s.support ⊆ insert (1 : L) A) :
+    zSupportedSpan (L := L) S {x : L | x ≠ 1} = zSupportedSpan (L := L) S A := by
+  ext φ
+  refine ⟨fun ⟨hspan, hsupp⟩ => ⟨hspan, fun x hx => ?_⟩,
+    fun ⟨hspan, hsupp⟩ => ⟨hspan, fun x hx => ?_⟩⟩
+  · -- `x ∈ A ∪ {1}` from the generators, and `x ≠ 1` from `L^#`-support.
+    rcases support_subset_of_mem_zSpan hS hspan hx with h1 | hA
+    · exact absurd h1 (hsupp hx)
+    · exact hA
+  · -- `A ⊆ L^#` because `1 ∉ A`.
+    exact fun h1 => hA1 (h1 ▸ hsupp hx)
+
 theorem mem_zSpan_of_mem_zSupportedSpan {S : Set (ClassFunction L ℂ)} {A : Set L}
     {φ : ClassFunction L ℂ} (hφ : φ ∈ zSupportedSpan (L := L) S A) :
     φ ∈ zSpan (L := L) S :=

@@ -3703,6 +3703,17 @@ set_option linter.style.longLine false in
 -- `decompositionPairFromDade` then PRODUCES the per-step `(D₀, Da)` pair directly from the Dade
 -- isometry — `htau1_inner_eq` discharged internally — closing Round-24 (ii).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.support_subset_of_mem_zSpan_of_supported
+-- **Peterfalvi (4.9)(a) / (5.3)(b) の格子同一視 `ℤ[𝒮, L^#] = ℤ[𝒮, A]`** (2026-08-07 補充)。
+-- 書籍が 2 度使う橋渡し: (4.9)(a) の "Also, `0 ≠ ℤ[T,L^#] = ℤ[T,A]`" と、(5.3)(b) の証明。
+-- 後者が本質的 — Hypothesis (5.2)(b) は書籍では `ℤ[𝒮, L^#]` 上の等長だが、repo の
+-- `GeneralHypothesis.tau_isometry_diff` は `ℤ[𝒮, A]` 上で与える (FT の Dade 写像に**大域的な
+-- 等長は存在しない**: `dim CF(L) > dim CF(G)`)。両者が一致する根拠がこの等式で、仮説
+-- 「各メンバーの台が `A ∪ {1}`」は (4.7) が供給する。従来は必要な個別の台評価
+-- (`inducedNonKernelFamily_conjDiff_support` 等) だけが在り、**格子の等式そのものは無かった**。
+-- 併せて generator の台評価を格子全体へ伝播させる ambient 版 `support_subset_of_mem_zSpan` も追加
+-- (既存版は subgroup 相対 `supportInSubgroup A L` 専用だった)。
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.support_subset_of_mem_zSpan
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.zSupportedSpan_ne_one_eq
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.decompositionPairFromDade
