@@ -16040,6 +16040,18 @@ mathlib `Sylow.exists_subgroup_card_pow_prime` がそのまま書籍強度 (ペ�
 -- 非自明で単純性から `Z(G) = ⊤` ⟹ `G` 可換 ⟹ `IsSimpleGroup.prime_card` で `|G|` は素数、
 -- `p` 冪と合わせて `|G| = p`。
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch01.not_isSimpleGroup_of_card_sylow_sq_gt
+/-! ### Isaacs Cor 2.4 — `S, T ⊴⊴ G ⟹ S ∩ T ⊴⊴ G` (issue 0176、2026-08-08)
+
+Ch.2 逐条監査で検出した唯一の真の未形式化。書籍 p.46 の証明どおり Lemma 2.3
+(`inf_isSubnormal_subgroupOf`、repo に既存) + subnormality の推移性
+(mathlib `Subgroup.IsSubnormal.trans`) の 1 行。
+
+⚠ **`Ch02_Subnormality/Basic.lean` の冒頭一覧が長らくこれを `Subgroup.IsSubnormal.inf` と
+記していたが、その名前は mathlib にも repo にも存在しなかった**。実在しない補題名を挙げた
+自己注記の実例で、番号 grep では「cite あり」になってしまう。⟹ **注記の挙げる名前は
+実在確認する**。 -/
+
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch02.inf_isSubnormal
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch01.isCyclic_of_card_eq_mul_prime_lt_of_not_dvd
 

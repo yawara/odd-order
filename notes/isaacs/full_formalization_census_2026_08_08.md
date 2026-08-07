@@ -159,4 +159,37 @@ statement で在り、docstring も「**後半**」と明記していた。
 ⟹ **Ch.1 全 46 件の逐条監査完了**。補充 2 件 (**1.24 の正規条項** / **1.40(ii)**)、
 誤判定 1 件 (1.30(ii)、撤回済)。
 
-### Ch.2-Ch.7, Ch.9-Ch.10 — 未着手 (次の入口 = Ch.2 Subnormality、20 件)
+### Ch.2 Subnormality (20 件、書籍 pp.45-64) — **監査完了 (2026-08-08)**、補充 1 件
+
+| Isaacs | 書籍 | repo | 判定 |
+|---|---|---|---|
+| 2.1 | 有限 `G` 冪零 **⟺** 全部分群が subnormal | `Ch02.isNilpotent_iff_all_isSubnormal` (:131) | ✅ iff |
+| 2.2 | `H ≤ F(G)` **⟺** `H` 冪零かつ subnormal | `Ch02.le_fitting_iff_isNilpotent_and_isSubnormal` | ✅ iff |
+| 2.3 | `S ⊴⊴ G`, `K ≤ G` ⟹ `S ∩ K ⊴⊴ K` | `Ch02.inf_isSubnormal_subgroupOf` | ✅ |
+| **2.4** | `S, T ⊴⊴ G` ⟹ `S ∩ T ⊴⊴ G` | ⚠ **未形式化だった → 2026-08-08 補充** `Ch02.inf_isSubnormal` | ⚠ |
+| 2.5 | **Wielandt** `S, T ⊴⊴ G` ⟹ `⟨S,T⟩ ⊴⊴ G` | `Ch02.isSubnormal_sup_of_isSubnormal` | ✅ |
+| 2.6 | `S ⊴⊴ G`、`M` 極小正規 ⟹ `M ≤ N_G(S)` | `Ch02.isMinimalNormal_le_normalizer_of_isSubnormal` | ✅ |
+| 2.7 | `M, N ⊴ G`、`M ∩ N = 1` ⟹ 元同士が可換 | `Ch02.commute_of_disjoint_normal` | ✅ |
+| 2.8 | `S·S^x = S^x·S` (∀`x`) ⟹ `S ⊴⊴ G` | `Ch02.isSubnormal_of_permutable_with_conjugates` | ✅ |
+| 2.9 | **Zipper Lemma** | `Ch02.zipper_lemma` | ✅ |
+| 2.10 | `H·H^x = G` ⟹ `H = G` | `Ch02.eq_top_of_set_mul_conj_eq_top` | ✅ |
+| 2.11 | **Wielandt** `A` 可換、`∀ H ⊇ A`: `[H:A]² ≤ [H:Z(H)]` ⟹ `A ≤ F(G)` | `Ch02.subset_fitting_of_index_sq_le_index_center` (`Theorem211Wielandt.lean:422`) | ✅ |
+| 2.12 | **Baer** `H ≤ F(G)` **⟺** `⟨H, H^x⟩` が全 `x` で冪零 | `Ch02.le_fitting_iff_baer_sup_conj_isNilpotent` (:580) | ✅ iff (両方向 :440 / :569) |
+| 2.13 | **Matsuyama** `t` 対合、`t ∉ O₂(G)` ⟹ ∃ 奇素数位数 `x`, `x^t = x⁻¹` | `Ch02.matsuyama` (`Theorem211Wielandt.lean:768`) | ✅ 書籍そのまま |
+| 2.14 | 二面体型の補題 (a)(b) | `DihedralBasics.lean` の 12 宣言 | ✅ |
+| 2.15 | 奇素数 `p` の `p`-local が全て正規 Sylow 2 ⟹ `G` も | `Ch02.normal_sylow_two_of_odd_pLocal_normal_sylow_two` | ✅ |
+| 2.16 | 商群の `p`-local | `Ch02.isPLocal_of_quotient` | ✅ |
+| 2.17 | `p ∤ \|N\|` での `p`-部分群の持ち上げ | `Ch02.map_ne_bot_of_coprime_kernel` | ✅ |
+| 2.18 | **Zenkov** | `Ch02.zenkov_minimal_le_fitting` (unconditional) | ✅ |
+| 2.19 | `A` 可換、`\|A\| ≥ [G:A]` ⟹ `A ∩ F(G) > 1` | `Ch02.inf_fitting_ne_bot_of_abelian_card_ge_index` | ✅ |
+| 2.20 | **Lucchini** `[A:K] < [G:A]`、特に `\|A\| > [G:A]` なら `K > 1` | `lucchini_index_normalCore_lt_index` (⚠ **`Ch04_Commutators/ForwardFromCh02.lean:1084`**) | ✅ |
+
+⚠ **2.4 の検出経路** — file-header 一覧が `Subgroup.IsSubnormal.inf` という**実在しない補題名**を
+挙げていた。番号 grep では「cite あり」になるので検出できない型。
+⟹ 監査手順に「**注記の挙げる補題名は実在確認する**」を追加。
+
+⚠ **2.20 は Ch.2 のディレクトリに無い** — Main.lean には「structural reduction のみ」という
+注記しかなく、本体は owner chapter 規則で **Ch04** に置かれている。章ディレクトリだけ見ると
+部分被覆と誤判定する。
+
+### Ch.3-Ch.7, Ch.9-Ch.10 — 未着手 (次の入口 = Ch.3 Split Extensions、36 件)

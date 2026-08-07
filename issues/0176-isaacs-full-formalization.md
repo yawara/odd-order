@@ -113,6 +113,11 @@ repo の `Ch08_PermutationGroups` も既に `IsPreprimitive` を使っている�
       - ⬜ **残り 37 件の条項ごとの突合は未実施**。とくに 1.12-1.15 / 1.18-1.22 / 1.30-1.31 は
         **1 つの file-header docstring が複数番号を列挙**しているだけなので、番号ごとの
         statement の有無を個別確認する (Peterfalvi の「file docstring の散文が定理の代わり」型)。
+      - **Ch.1 監査完了 (2026-08-08)**: 全 46 件。補充 2 件 (**1.24** の正規条項 /
+        **1.40(ii)** 非単純性)、誤判定 1 件 (1.30(ii)、撤回済)。
+      - **Ch.2 監査完了 (2026-08-08)**: 全 20 件。補充 1 件 (**2.4** `S ∩ T ⊴⊴ G`)。
+        ⚠ file-header が実在しない `Subgroup.IsSubnormal.inf` を挙げていたのが検出経路。
+        ⚠ 2.20 (Lucchini) の本体は owner chapter 規則で **Ch04** に在る。
       - 1 章ぶん終えるごとに census note を更新して commit。
 
 ## 完了条件

@@ -54,7 +54,7 @@ CLAUDE.md `## 開発規約 ### mathlib ラッパー方針` に従い, 以下の 
 mathlib に直接対応があり, 純粋なリネームラッパーは書かない. 呼び出し側で
 直接 mathlib 名を使う:
 
-* **Isaacs Cor 2.4** (`S ∩ T subnormal`): `Subgroup.IsSubnormal.inf`
+* **Isaacs Cor 2.4** (`S ∩ T subnormal`): `inf_isSubnormal` (本ファイル、2026-08-08 追加)
 * (`H ⊴ G ⇒ H ⊴⊴ G`): `Subgroup.Normal.isSubnormal`
 * (subnormal の推移律): `Subgroup.IsSubnormal.trans`
 * (subnormal の準同型像/逆像/quotient/smul): `.map`, `.comap`, `.quotient`, `.smul`
@@ -141,6 +141,18 @@ theorem inf_isSubnormal_subgroupOf {S : Subgroup G} (hS : S.IsSubnormal) (K : Su
     ((S ⊓ K).subgroupOf K).IsSubnormal := by
   rw [Subgroup.inf_subgroupOf_right]
   exact hS.subgroupOf
+
+/-- **Isaacs Cor 2.4** (書籍 p.46): `S, T ⊴⊴ G` ならば `S ∩ T ⊴⊴ G`.
+
+書籍の証明そのまま: Lemma 2.3 で `S ∩ T ⊴⊴ T`、`T ⊴⊴ G` と subnormality の推移性
+(`Subgroup.IsSubnormal.trans`) を合わせる。
+
+⚠ 本ファイル冒頭の一覧は長らくこれを `Subgroup.IsSubnormal.inf` と記していたが、
+**その名前は mathlib にも repo にも存在しなかった** (issue 0176 の逐条監査で判明)。
+実在しない補題名を挙げた自己注記の実例。 -/
+theorem inf_isSubnormal {S T : Subgroup G} (hS : S.IsSubnormal) (hT : T.IsSubnormal) :
+    (S ⊓ T).IsSubnormal :=
+  Subgroup.IsSubnormal.trans inf_le_right (inf_isSubnormal_subgroupOf hS T) hT
 
 /-- **Isaacs Lemma 2.7**: `M, N ◁ G` で `M ∩ N = 1` ならば `M` の元と `N` の元は可換.
 
