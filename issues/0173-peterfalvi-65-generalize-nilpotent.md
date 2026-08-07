@@ -78,18 +78,31 @@ Then `𝒮(M)` is coherent.
 
 - [x] 債務の出所を特定 → **(6.3) 本体** (`six_three_of_imageData` の `[Group.IsNilpotent ↥H]`)。
       冪零性の実使用は「`H/B` の非自明正規部分群が中心と交わる」1 ステップのみ (上記)。
-- [ ] repo 側の証明で冪零性インスタンスが実際にどこで消費されているか確認する
-      (`six_three_of_six_two_oracle` の中。⚠「threading されている」≠「依存している」—
-      memory `generalize-by-measuring-which-carrier-fields-are-used`)。
-- [ ] `H/M` 冪零版を証明する (`Group.IsNilpotent (↥H ⧸ M.subgroupOf H)` を仮説に)。
-- [ ] **旧 `K` 冪零版をその特殊化に置換**し、コンパイラに同値性を検証させる
-      (§1 の (1.6)(b) と同じ標準処方。linter の unused 仮説は「最初から不要だった」の合図)。
-- [ ] `AxiomsCheck.lean:4141` の ⚠ 注記を更新。
+- [x] repo 側の消費点を確認 → **engine `six_three_of_six_two_oracle` は元から書籍形**
+      `[Group.IsNilpotent (↥H ⧸ M.subgroupOf H)]` を取っていた
+      (`S08_Theorem62_63_Standalone:404`)。**過剰仮説は wrapper だけ**だった
+      (`six_three_of_imageData` が `[Group.IsNilpotent ↥H]` を宣言し、instance 探索で
+      商の冪零性を導いていた)。⟹ 「threading されている ≠ 依存している」の典型例。
+- [x] **(6.3) wrapper を書籍形に** — `six_three_of_imageData` の binder を
+      `[Group.IsNilpotent (↥H ⧸ M.subgroupOf H)]` へ (binder 順は `[M.Normal]` の**後**に置く。
+      前に置くと `Group (↥H ⧸ M.subgroupOf H)` の synthesize に失敗する)。
+- [x] **(6.5)(a) `relIndex_le_of_not_isCoherent` を書籍形に** —
+      `[Group.IsNilpotent ↥K]` を削り `[Group.IsNilpotent (↥K ⧸ M.subgroupOf K)]` を
+      `[M.Normal] [H₁.Normal]` の後に追加。leaf build green。
+- [x] **(6.5)(a) chief-factor 節 `isChiefFactor_of_not_isCoherent` を書籍形に** (同じ処方)。
+- [x] **(6.5)(b),(c) の section は債務ではないと確認** — その section の変数は `{H₁}` のみで
+      **`M` を持たない** = 書籍の `M = 1` の場合 ((6.6) が使う場合)。`M = 1` では `K/M = K` なので
+      `[Group.IsNilpotent ↥K]` は**書籍 (6.4)(b) そのもの**。section docstring に明記した。
+- [x] `AxiomsCheck.lean` の ⚠ 注記を ✅ へ更新 (原因が engine でなく wrapper だったことも記録)。
+
+**⟹ 旧版を特殊化として残す必要はなかった**: 証明は元から書籍の弱い仮説で通っており、
+宣言だけが強すぎた。`K` 冪零を持つ呼び出し側は instance 探索で商の冪零性を得るので、
+weaken は呼び出し側から見て透過的 (下流は無変更で通る)。
 
 ## 完了条件
 
-(6.3)(a) が書籍どおり `H/M` 冪零で述べられ、(6.5) がそれを継いで `K/M` 冪零になり、旧 `K` 冪零版がその特殊化として
-繋がっている。フルビルド green + `bin/check-warnings --strict` + sorry 非退行 + axiom-clean。
+(6.3)(a) が書籍どおり `H/M` 冪零で述べられ、(6.5)(a) がそれを継いで `K/M` 冪零になっている。
+フルビルド green + `bin/check-warnings --strict` + sorry 非退行 + axiom-clean。
 
 ## 参照
 

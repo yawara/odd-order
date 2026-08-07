@@ -4138,8 +4138,13 @@ set_option linter.style.longLine false in
 -- `|K:H₁| ≤ 4|L:K|² + 1` is the contrapositive of `six_three_of_imageData` at `H = K`, fed by the
 -- (6.3.b) coherence above; the chief-factor clause then follows from the already-general
 -- `isChiefFactor_of_relIndex_le_of_odd_dvd` (odd order + the (6.4.c) Frobenius divisibility).
--- ⚠ `K` nilpotent where the book has `K/M` nilpotent (inherited from `six_three_of_imageData`;
--- the two agree at `M = 1`, the case (6.6) uses).
+-- ✅ **書籍どおり `K/M` 冪零のみを仮定する** (issue 0173、2026-08-07)。以前は `K` 自体の冪零性を
+-- 要求していたが、原因は engine でなく **wrapper** だった: `six_three_of_six_two_oracle` は元から
+-- 書籍形 `[Group.IsNilpotent (↥H ⧸ M.subgroupOf H)]` を取っており、`six_three_of_imageData` が
+-- `[Group.IsNilpotent ↥H]` を宣言して instance 探索で商の冪零性を導いていただけ
+-- (= 「threading されている ≠ 依存している」)。wrapper と (6.5)(a) の 2 定理を書籍形へ直した。
+-- なお (6.5)(b),(c) の section は書籍の `M = 1` の場合を扱うので、そこの `[Group.IsNilpotent ↥K]`
+-- は `K/M = K` ゆえ書籍 (6.4)(b) そのもの (特殊化ではない)。
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.relIndex_le_of_not_isCoherent
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.isChiefFactor_of_not_isCoherent
 -- **(6.5)(b),(c) for a general kernel** (at `M = 1`, the case (6.6) uses).  (b) `K` is a

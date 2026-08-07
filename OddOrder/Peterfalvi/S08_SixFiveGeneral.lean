@@ -375,13 +375,16 @@ and whose `S(H₁) ≠ ∅` witness comes from the solvability of `K`
 The abelianness of `K/H₁` is Hypothesis (6.4)(c) (`H₁/M = [K/M, K/M]`), carried here as the
 instance `[IsMulCommutative (↥K ⧸ H₁.subgroupOf K)]`.
 
-⚠ `K` is taken nilpotent where the book takes `K/M` nilpotent — inherited from
-`six_three_of_imageData` (the two agree at `M = 1`, which is the case (6.6) uses). -/
+**書籍どおり `K/M` の冪零性のみを仮定する** (issue 0173、2026-08-07)。以前は `K` 自体の
+冪零性を要求していた — `six_three_of_imageData` の wrapper が書籍の (6.3)(a) より強い
+`[Group.IsNilpotent ↥H]` を宣言していたのを、engine (`six_three_of_six_two_oracle`) が元から
+持っていた書籍形 `[Group.IsNilpotent (↥H ⧸ M.subgroupOf H)]` に合わせた。 -/
 theorem relIndex_le_of_not_isCoherent
-    [IsSolvable ↥K] [Group.IsNilpotent ↥K] (RD : InducedFamilyImageData A₀ K)
+    [IsSolvable ↥K] (RD : InducedFamilyImageData A₀ K)
     (hodd : Odd (Nat.card ↥L))
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀) (h1A : (1 : ↥L) ∉ A₀)
     {M H₁ : Subgroup ↥L} [M.Normal] [H₁.Normal]
+    [Group.IsNilpotent (↥K ⧸ M.subgroupOf K)]
     [IsMulCommutative (↥K ⧸ H₁.subgroupOf K)]
     (hMH₁ : M ≤ H₁) (hH₁K : H₁ < K)
     (hirr : ∀ φ ∈ inducedKernelFamily K H₁, IsIrreducibleCharacter φ)
@@ -403,10 +406,11 @@ The group-theoretic half (`isChiefFactor_of_relIndex_le_of_odd_dvd`) needs only 
 Frobenius divisibility `hdvd` and the index bound of `relIndex_le_of_not_isCoherent`; the whole
 character-theoretic content of (6.5)(a) is in that bound. -/
 theorem isChiefFactor_of_not_isCoherent
-    [IsSolvable ↥K] [Group.IsNilpotent ↥K] (RD : InducedFamilyImageData A₀ K)
+    [IsSolvable ↥K] (RD : InducedFamilyImageData A₀ K)
     (hodd : Odd (Nat.card ↥L))
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀) (h1A : (1 : ↥L) ∉ A₀)
     {M H₁ : Subgroup ↥L} [M.Normal] [H₁.Normal]
+    [Group.IsNilpotent (↥K ⧸ M.subgroupOf K)]
     [IsMulCommutative (↥K ⧸ H₁.subgroupOf K)]
     (hMH₁ : M ≤ H₁) (hH₁K : H₁ < K)
     (hdvd : ∀ W : Subgroup ↥L, W.Normal → H₁ ≤ W → W ≤ K →
@@ -418,7 +422,11 @@ theorem isChiefFactor_of_not_isCoherent
   isChiefFactor_of_relIndex_le_of_odd_dvd hodd hH₁K hdvd
     (relIndex_le_of_not_isCoherent RD hodd hKsupp h1A hMH₁ hH₁K hirr hncoh)
 
-/-! ### Peterfalvi (6.5)(b),(c) for a general kernel -/
+/-! ### Peterfalvi (6.5)(b),(c) for a general kernel
+
+⚠ この section は書籍の `M = 1` の場合 ((6.6) が使う場合) を扱う。`M = 1` では `K/M = K` なので
+下の `[Group.IsNilpotent ↥K]` は**書籍 (6.4)(b) そのもの**であり、特殊化ではない
+(issue 0173 で (6.3)/(6.5)(a) の過剰仮説を書籍形へ直したときに確認)。 -/
 
 section SixFiveBC
 

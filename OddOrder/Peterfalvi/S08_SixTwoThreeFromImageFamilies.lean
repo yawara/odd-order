@@ -444,7 +444,7 @@ theorem six_three_of_imageData
     (hodd : Odd (Nat.card ↥L))
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀)
     (h1A : (1 : ↥L) ∉ A₀)
-    {H M H₁ : Subgroup ↥L} [Group.IsNilpotent ↥H] [M.Normal] [H₁.Normal]
+    {H M H₁ : Subgroup ↥L} [M.Normal] [H₁.Normal] [Group.IsNilpotent (↥H ⧸ M.subgroupOf H)]
     (hHnorm : H.Normal) (hMH₁ : M ≤ H₁) (hH₁H : H₁ < H) (hHK : H ≤ K)
     (hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent RD.tau
       (inducedKernelFamily K H₁) A₀))
