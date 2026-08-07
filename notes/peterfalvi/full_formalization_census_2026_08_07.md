@@ -875,10 +875,57 @@ memory `pdftotext-drops-superscripts` の典型例。
 ⚠ **§4 のステップ数は (1)-(10)** — 素の `^\(N\)` grep は表示式の中に置かれた (6)-(9) を
 取りこぼす。census の Ch.IV は 41 → **46** に訂正。
 
-#### 次の入口
+#### Part II 補章 4 本 (書籍 pp.135-150) — **監査完了 (2026-08-08、補充 1 件)**
 
-**補章 4 本** (Appendix I Huppert pp.135-136 / II Near-Fields pp.137-138 /
-III Suzuki 2-Groups pp.139-143 / IV Feit–Sibley pp.144-150) = 16 件。
+16 件 (App.I = 3 / II = 2 / III = 8 / IV = 3)。全件に書籍強度の実体あり。
+
+| 書籍 | repo |
+|---|---|
+| **App.I Prop 1** (`F(D)` 巡回・不動点自由、`D/F(D)` 可換) | `Huppert.fitting_cyclic_fixedPointFree` (3 条項とも) ⚠ **補充 = `[IsSolvable D]` 削除**、下記 |
+| **App.I Lemma** (`\|P_a\|` 一定 ⟹ `P` 巡回・不動点自由) | `Huppert.pGroup_cyclic_fixedPointFree` |
+| **App.I Prop 2 (a)(b)** (`F = 𝔽_p[T]` は体、`E` は 1 次元、`U` は半線形) | `SemilinearField.exists_field_semilinear` 系 |
+| **App.II Prop 1** (2-rank 1 の階数 1 群 ⟹ near-field affine model) | `NearFields.rankOne_affine_nearField` (Q₈ 込みで axiom-clean) |
+| **App.II Prop 2** (`F*` が指数 2 の巡回部分群を持つ near-field の分類) | `cyclic_index_two_nearField_classification` (⚠ 旧版は `∃ classification : Prop` の opaque だったが 2026-07 に実分類へ差し替え済) |
+| **App.III Def 1-3 / Lemma 1(a)-(d) / Lemma 2(a)-(c) / Theorem (a)-(e) / Prop 1 / Prop 2** | hub `Suzuki2Groups.lean` の被覆表のとおり全件。書籍は Theorem を [Hi] 引用で済ませるが **repo は Higman の分類を証明済** (`OddOrder.Higman.Suzuki2Groups`) |
+| **App.IV Lemma 1(a)(b) / Lemma 2(a)(b)(c) / Theorem** | hub `FeitSibley.lean` の per-result 表のとおり全件 proved (2026-07-18 の de-opacification で opaque `Prop` フィールドを全廃済) |
+
+**補充 — App.I Prop 1 の `[IsSolvable D]` を削除**。書籍は「`D` be a group of **odd order**」
+としか仮定しないが repo は `[IsSolvable D]` も要求していた。奇数位数 ⟹ 可解は **Feit–Thompson**
+で、それは本リポジトリが証明済 (`feitThompson`、2026-07-15 に axiom-clean)。
+`OddOrder.FeitThompson` を import して内部で `haveI : IsSolvable D := feitThompson hD_odd`
+とし、仮説を書籍どおりに戻した (import cycle なし — `FeitThompson.lean` は `Appendices/` を
+一切 import しない)。下流 (`KCyclic.fitting_Dbar_cyclic_fpf_abelian`) は呼び出し側無変更。
+
+stale docstring 訂正 1 件: App.III hub が「Theorem **(e) forward direction**」とだけ書いていたが、
+逆向き (`isTypeB_of_isomorphicOrderQModuleSplit_of_card_eq_cube`、Ch.I §3 Lemma 5 が消費する側) も
+`Higman/Suzuki2Groups/HigmanLemmaTwelve/TypeBRecognition.lean` に在る。
+
+⟹ **Part II 全体 (Ch.I-IV + 補章 4 本) の逐条監査完了**。
+
+## 4.6 Part II 監査の総括 (2026-08-08)
+
+| 単位 | 件数 | 補充 |
+|---|---|---|
+| Ch.I §1 | 7 | **2** (Prop 4(c) の (A1) 一般形 / Lemma (a) の第 2 全単射) |
+| Ch.I §2 / §3 | 4 / 7 | 0 |
+| Ch.II | 18 | **1** (step (11) の `T ⋊ C_Q(P) ≅ F ⋊ F*`) |
+| Ch.III | 16 | 0 |
+| Ch.IV | 46 | 0 |
+| 補章 I-IV | 16 | **1** (App.I Prop 1 の `[IsSolvable D]` 削除) |
+| **合計** | **114** | **4** |
+
+(Introduction の Theorem A を足して 115。)
+
+**未形式化ゼロ** — Part II には Part I の (1.7)(b) に相当する残件が無い。
+補充 4 件はすべて axiom-clean で landing 済。
+
+**監査の教訓 (Part I の失敗様式リストに追加すべきもの)**:
+- **失敗様式 7 = 書籍が暗黙にしている定理を repo が仮説で受ける**。App.I Prop 1 の
+  `[IsSolvable D]` がこれ。「書籍が書いていない仮説がある」は特殊化債務のサインだが、
+  それが**本リポジトリの既証明定理**で消せる場合がある (ここでは FT 本体)。
+- **失敗様式 8 = file docstring の散文が定理の代わりをしている**。Ch.II step (11) の
+  半直積同型、App.III Theorem (e) の逆向き (こちらは実在したが docstring が言及漏れ)。
+  **hub/file docstring の被覆リストは grep 対象にならないので、必ず定理名まで確認する**。
 
 ### 4.5 ページ画像
 

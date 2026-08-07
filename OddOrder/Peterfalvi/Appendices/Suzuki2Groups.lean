@@ -53,7 +53,12 @@ bundled 2(b) basis and the 2(c) spanning theorem;
 `Algebra/QuadraticMapCoordinates.lean` supplies the dimension count),
 **Proposition 1** (`FieldModel.lean`), **Proposition 2**
 (`AutomorphismInducedMaps.lean` + `AutomorphismClassification.lean`), and
-the Theorem (e) forward direction (`TypeBIsomorphicSplit.lean`, issue
-2052).  With these, every numbered statement of Appendix III is
-formalized.
+**both directions of the Theorem's part (e)** — the forward implication
+"type B ⟹ `P/Z` splits into two isomorphic `𝔽₂[K]`-modules" in
+`TypeBIsomorphicSplit.lean` (`IsTypeB.exists_isomorphicOrderQModuleSplit`,
+issue 2052), and the converse in
+`OddOrder.Higman.Suzuki2Groups.HigmanLemmaTwelve.TypeBRecognition`
+(`isTypeB_of_isomorphicOrderQModuleSplit_of_card_eq_cube`), which is what
+Part II Ch. I §3 Lemma 5 consumes.  With these, every numbered statement of
+Appendix III is formalized.
 -/

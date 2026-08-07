@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.FeitThompson
 import OddOrder.GroupTheory.SubgroupInAmbient
 import OddOrder.Peterfalvi.S16_NonExistenceG
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
@@ -1293,7 +1294,7 @@ theorem fitting_fpf_of_transitive [Finite D] [Finite E] {q : ℕ}
   rw [eq_bot_iff, ← hgfpf, hgpow]
   exact hmono f (orderOf f' / p)
 
-/-- **Peterfalvi Appendix I, Proposition 1**: let `D` be a solvable group of odd order
+/-- **Peterfalvi Appendix I, Proposition 1**: let `D` be a group of odd order
 acting faithfully on the elementary abelian `q`-group `E`, transitively on `E^#`.  Then
 the Fitting subgroup `F(D)` is cyclic, acts without fixed points on `E`, and
 `D / F(D)` is abelian (equivalently `D' ≤ F(D)`).
@@ -1301,10 +1302,11 @@ the Fitting subgroup `F(D)` is cyclic, acts without fixed points on `E`, and
 Proof (p. 136): for each odd prime `p`, `P = O_p(F(D)) ⊴ D`, so transitivity gives
 constant point-stabilizer order (`card_pointStabilizer_comp_eq_of_normal_of_transitive`)
 and the Lemma makes `O_p(F)` cyclic and fixed-point-free; `F = ∏_p O_p(F)` is then
-cyclic and fixed-point-free; finally `C_D(F) = F` (Feit–Thompson + Fitting, `D`
-solvable of odd order) gives `D/F ↪ Aut(F)`, abelian since `F` is cyclic. -/
+cyclic and fixed-point-free; finally `C_D(F) = F` (Feit–Thompson + Fitting; the
+solvability the book leaves implicit under "odd order" is supplied by `feitThompson`)
+gives `D/F ↪ Aut(F)`, abelian since `F` is cyclic. -/
 theorem fitting_cyclic_fixedPointFree
-    [Finite D] [Finite E] [IsSolvable D] {q : ℕ} (hq : q.Prime) [Nontrivial E]
+    [Finite D] [Finite E] {q : ℕ} (hq : q.Prime) [Nontrivial E]
     (hD_odd : Odd (Nat.card D)) (hE : IsElementaryAbelian q E)
     (φ : D →* MulAut E) (hfaithful : Function.Injective φ)
     (htrans : ∀ a b : E, a ≠ 1 → b ≠ 1 → ∃ g : D, (φ g) a = b) :
@@ -1312,6 +1314,9 @@ theorem fitting_cyclic_fixedPointFree
       (∀ x ∈ OddOrder.Isaacs.Ch01.fitting D, x ≠ 1 → actionFixedBy φ x = ⊥) ∧
       commutator D ≤ OddOrder.Isaacs.Ch01.fitting D := by
   haveI : Fact q.Prime := ⟨hq⟩
+  -- the book says only "of odd order"; solvability is Feit–Thompson, proved in this
+  -- repository, so it need not be assumed
+  haveI : IsSolvable D := feitThompson hD_odd
   have hqE : q ∣ Nat.card E := by
     obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := q)).mp hE.isPGroup
     have hn0 : n ≠ 0 := by
