@@ -11377,6 +11377,19 @@ optParam→explicit+wrapper rework を (9.11)/(11.9) chain に適用時。 -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S13.inner_tau_muColumnZero_sub_zeta_rowZero_unconditional
 
+/-! **Peterfalvi (13.2)(e) の書籍形, axiom-clean** (issue 0172 §13 監査、2026-08-07).
+
+書籍 p.75:「`A₀(S)` は正規化群 `S` を持つ `G` の TI-部分集合であり、`A₀(S)` に関する Dade 等長 `τ`
+は `Ind_S^G` と一致する」。両半分 (`isTISubset_typePACore` / `sInstance_dade_eq_induce`) は既存
+だったが、carrier `BasicStructureGated`/`BasicStructureData` は (13.2.e) を **`Prop` 値データ
+フィールド** `A0S_TI` / `tauS_eq_induction` としてしか露出しておらず、producer
+`basic_structure_gated` はそこに **`True`** を入れていた — headline `basic_structure` の結論の
+最終連言が `data.A0S_TI` = `True` で**空**だった。`A0S_normedTI` で 2 条項を束ね、Type-V 排除を
+Theorem (10.10) `no_typeV_maximal_unconditional` で discharge (書籍にその仮説は無い)。
+`basic_structure` の結論も本物の `IsTISubset` へ差し替え済。 -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.A0S_normedTI
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.basic_structure
+
 /-! **nilpotent + cyclic abelianization ⟹ cyclic, axiom-clean** (lane a, 2026-07-12, issue 9086).
 Pf (11.9.c) caseB 帰結の一般群論 engine (mathcomp `cyclic_nilpotent_quo_der1_cyclic` 対応):
 下降中心列の安定化 (γ₂ ≤ ⁅γ₂,⊤⁆) + center-quotient cyclic → abelian。 -/

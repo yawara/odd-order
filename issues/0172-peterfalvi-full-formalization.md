@@ -158,7 +158,16 @@ Part II は `Proposition N` / `Lemma N` の**章内リセット番号**で、Par
     (§16 `BetaVanishing` が消費)。producer は grid 版から本物を入れているので**証明は忠実**だが
     statement 単体では条項が読めない (失敗様式 2 に近い形)。**被覆漏れではない**ので補充不要と判断。
     §12 の宿題だった `S15_SAndTGrid.lean:39` の `e_eq_index : Prop` はこの旧 carrier のもの。
-  - **次の入口**: §13 の残り = (13.1)-(13.18) + (13.10.1)-(13.10.3) の逐条突合
+  - **§13 の (13.1)(13.2) 突合済 (2026-08-07)**。(13.1) carrier は条項一致。
+    **(13.2)(e) を書籍の形へ補充** (`S15.Hypothesis.A0S_normedTI`): 書籍「`A₀(S)` は正規化群 `S` を
+    持つ TI-部分集合、かつ `τ = Ind_S^G`」の 2 条項。両半分の honest 定理
+    (`isTISubset_typePACore` / `sInstance_dade_eq_induce`) は既存だったが、carrier
+    `BasicStructureGated`/`BasicStructureData` は (13.2.e) を **`Prop` 値データフィールド**
+    `A0S_TI`/`tauS_eq_induction` としてしか露出せず、producer が **`True`** を入れていたため
+    **headline `basic_structure` の結論の最終連言が空**だった。`basic_structure` の結論も本物の
+    `IsTISubset` へ差し替え。Type-V 排除は (10.10) で discharge (書籍にその仮説は無い)。
+    stale docstring 訂正 1 件 (closed issue 3001 への「未解決」参照)。
+  - **次の入口**: §13 の残り = (13.3)-(13.18) + (13.10.1)-(13.10.3) の逐条突合
     (番号→ファイル対応は census note に記録済)。
   - **監査手順の正本** = memory `textbook-coverage-audit-failure-modes`。
     **(1) AxiomsCheck の番号コメント → (2) 書籍ページ画像 → (3) 結論の突合** の順。

@@ -863,6 +863,35 @@ theorem Hypothesis.sInstance_dade_eq_induce [Fintype G] [Finite G]
     (fun l _ ha => S10.typePACore_conj_mem l.2 ha)
     (fun a => hyp.forall_dadeHypS_H_eq_bot hG hnoV ⟨a.1, a.2⟩) hf
 
+open scoped FiniteInduce in
+/-- **Peterfalvi (13.2)(e), the book statement, unconditional** — *"`A₀(S)` is a TI-subset of `G`
+with normalizer `S` and the Dade isometry `τ` relative to `A₀(S)` coincides with `Ind_S^G`"*
+(p. 75; Coq `FTtypeP_facts` (e), the `normedTI 'A0(S) G S` + `{in 'CF(S, 'A0(S)), tau =1 'Ind}`
+pair).
+
+Both halves already exist (`isTISubset_typePACore`, `sInstance_dade_eq_induce`); this bundles
+them and **discharges the Type-V exclusion** with the axiom-clean Theorem (10.10)
+`S12.no_typeV_maximal_unconditional`, so the (13.2)(e) statement is available with no hypothesis
+beyond `hG` and the (13.1) carrier.
+
+Recorded because the `BasicStructureGated`/`BasicStructureData` carriers expose (13.2)(e) only as
+the `Prop`-valued data fields `A0S_TI` / `tauS_eq_induction`, which `basic_structure_gated`
+instantiates with `True` — a reader of `basic_structure`'s conclusion cannot see the clause
+(issue 0172 §13 audit). -/
+theorem Hypothesis.A0S_normedTI [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    OddOrder.GroupTheory.IsTISubset (S10.typePACore hyp.S) hyp.S ∧
+      ∀ [Fintype G], ∀ {f : ClassFunction ↥hyp.S ℂ},
+        f.support ⊆
+            OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S →
+          OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypS hG)
+              ((hyp.dadeHypS hG).fullDadeIsometryData) f
+            = ClassFunction.induce hyp.S f :=
+  ⟨hyp.isTISubset_typePACore hG (OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional hG),
+    fun {_} {_} hf =>
+      hyp.sInstance_dade_eq_induce hG
+        (OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional hG) hf⟩
+
 /-- **The honest `(H₀ ⊔ C')^#`-support for the `S`-instance, `= (C')^#`** (issue 2035 step 2).
 For the `S`-instance the chief kernel is trivial (`toTypesIIIIIIVSetupS_chief_N_eq_bot`, giving
 `H₀ = ⊥`), so the §9 `H₀C'`-support degenerates to `(C')^#` — the non-identity elements of

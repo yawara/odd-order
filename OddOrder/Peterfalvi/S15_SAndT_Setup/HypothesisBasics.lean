@@ -594,8 +594,10 @@ between the *intrinsic* type-`P` `W₂` of `S` (`Sdata.W2 = C_{S'}(W₁#)`) and 
 (complement of `W₁` in the cyclic `W = S ∩ T`) — the `W₂`-analogue of the carried
 `Sdata_U_eq` / `Sdata_W1_eq`.  It is honest §16-carrier content (`Section16TypePStructure`, which
 builds `Sdata`); taken here as an explicit hypothesis so the order computation is unconditional on
-its proof.  See issue 3001 for threading it through the carrier (then `basic_structure_gated`'s
-`P_order` field discharges). -/
+its proof.  ⚠ The former "see issue 3001 for threading it through the carrier" note is **stale**
+(issue 3001 closed): `Sdata_W2_eq` is now a field of the (13.1) `Hypothesis`, so
+`basic_structure_gated`'s `P_order` discharges unconditionally as `hyp.card_P_eq hG
+hyp.Sdata_W2_eq`. -/
 theorem Hypothesis.card_P_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hSdataW2 : hyp.Sdata.W2 = hyp.W2) :
     Nat.card ↥hyp.P = hyp.p ^ hyp.q := by
@@ -1304,14 +1306,23 @@ abelian of order `p^q`, `u` is bounded, and `A_0(S)` is a TI-subset.
 The **type determination** (13.2.a) is discharged without the stronger `S_typeP2` carrier:
 `isTypeII_or_isTypeIII_of_isTypeNonI` gives the unconditional alternative, while
 `Hypothesis.isTypeII_of_q_lt_p` applies the genuine κ-ordering theorem when `q < p`.  The
-remaining `M_F`-structure data (13.2.b,c,e) is read off the faithful §16-gated producer
-`basic_structure_gated`. -/
+remaining `M_F`-structure data (13.2.b,c) is read off the faithful §16-gated producer
+`basic_structure_gated`.
+
+**(13.2.e)** is stated *genuinely* here — `A₀(S)` is a TI-subset with normalizer `S`
+(`Hypothesis.A0S_normedTI`, whose Type-V exclusion is discharged by the unconditional Theorem
+(10.10)).  The carrier fields `BasicStructureData.A0S_TI` / `tauS_eq_induction` remain `Prop`-valued
+placeholders that `basic_structure_gated` fills with `True`; the conclusion no longer routes
+through them (issue 0172 §13 audit).  The isometry half `τ = Ind_S^G` is the second conjunct of
+`A0S_normedTI`. -/
 theorem basic_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
-    ∃ data : BasicStructureData hyp,
+    ∃ _data : BasicStructureData hyp,
       (IsTypeII hyp.S ∨ IsTypeIII hyp.S) ∧ IsElementaryAbelian hyp.p ↥hyp.P ∧
         Nat.card ↥hyp.P = hyp.p ^ hyp.q ∧
-        hyp.u ≤ (hyp.p ^ hyp.q - 1) / (hyp.p - 1) ∧ data.A0S_TI := by
+        hyp.u ≤ (hyp.p ^ hyp.q - 1) / (hyp.p - 1) ∧
+        OddOrder.GroupTheory.IsTISubset
+          (OddOrder.Peterfalvi.S10.typePACore hyp.S) hyp.S := by
   -- (13.2.a): the honest II/III alternative; its witness-independent core gives `Sdata.U ≠ ⊥`.
   have hStype : IsTypeII hyp.S ∨ IsTypeIII hyp.S :=
     OddOrder.Peterfalvi.S13.isTypeII_or_isTypeIII_of_isTypeNonI
@@ -1339,6 +1350,7 @@ theorem basic_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
             A0S_TI_holds := core.A0S_TI_holds
             tauS_eq_induction := core.tauS_eq_induction
             tauS_eq_induction_holds := core.tauS_eq_induction_holds }, ?_⟩
-  exact ⟨hStype, core.P_elementaryAbelian, core.P_order, core.u_bound, core.A0S_TI_holds⟩
+  exact ⟨hStype, core.P_elementaryAbelian, core.P_order, core.u_bound,
+    (hyp.A0S_normedTI _hG).1⟩
 
 end OddOrder.Peterfalvi.S15
