@@ -6519,6 +6519,17 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.eq_zero_of_mem_V_of_inner_chiFam_eq_zero
 -- §5 Peterfalvi Theorem (3.2) capstone: the linear isometry `σ` with properties (a)-(d).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_sigma
+-- **(3.2)(d) 書籍 literal 形** (2026-08-07 補充): 「**σ の像に入らない**既約指標は `V` 上で消える」。
+-- 従来は直交形 (「`σ(Irr W)` の全てと直交する類関数は消える」) だけで、docstring が
+-- 「像に入らない既約は in particular 直交する」と**散文で主張**していたが証明は無かった。
+-- 橋渡しは `dirr` 抽出 (`ω^σ = δ·μ`, `δ = ±1`, `μ ∈ Irr G`): `χ = μ` なら `χ = σ(δ·ω)` で
+-- 像に入ってしまう ⟹ `χ ≠ μ` ⟹ `Irr G` の正規直交性で `⟨χ, ω^σ⟩ = 0`。
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S05.TICyclicHypothesis.apply_eq_zero_of_mem_V_of_not_mem_range_sigma
+-- **(3.7) の "in particular" 節** (2026-08-07 補充): `a_{ij} = a_{i0} + a_{0j} − a_{00}`。
+-- 格子恒等式 `sigmaCoeff_add_eq` の `(i',j') = (0,0)` 特殊化。書籍が併記する明示形で、
+-- 抽象格子補題が使う因数分解形 `a(i,j) = f i + g j` とは別。
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff_eq_add_sub
 -- §5 Peterfalvi (3.6)-(3.7): the σ-image coefficient grid `a_{ij}` and its additive identity.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaCombo_mem_supportedSubmodule
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaCombo

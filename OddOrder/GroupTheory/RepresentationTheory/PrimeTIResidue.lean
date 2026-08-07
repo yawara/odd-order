@@ -787,6 +787,44 @@ theorem mu2Grid_eq_sign_smul_sigma_omega (hyp : TICyclicHypothesis G) [Fintype h
   rcases hyp.mu2GridSign_eq hVeq app ω with h | h <;> rw [h] <;> simp
 
 open scoped Classical in
+/-- **Peterfalvi (3.2)(d)**, the book's literal form (book p. 15): *every irreducible character of
+`G` which is not in the image of `σ` vanishes on `V`.*
+
+`eq_zero_of_mem_V_of_inner_chiFam_eq_zero` proves the *orthogonality* form -- any class function
+orthogonal to all of `σ(Irr W)` vanishes on `V` -- and its docstring notes that an irreducible
+outside the image "is in particular orthogonal to all `χ_{ij}`".  That bridging step is what this
+theorem actually supplies, and it needs the `dirr` extraction above: `ω^σ = δ·μ` with `δ = ±1` and
+`μ ∈ Irr(G)` (`sigma_omega_eq_mu2GridSign_smul_mu2Grid`), so if `χ` were equal to that `μ` then
+`χ = δ·ω^σ = σ(δ·ω)` (`mu2Grid_eq_sign_smul_sigma_omega` plus linearity) would put `χ` in the image
+after all.  Hence `χ ≠ μ`, and orthonormality of `Irr(G)` gives `⟨χ, ω^σ⟩ = 0`.
+
+Note that being outside the image is used only through this one consequence, so the orthogonality
+form remains the more general statement; this is the shape the book quotes. -/
+theorem apply_eq_zero_of_mem_V_of_not_mem_range_sigma (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (χ : IrreducibleCharacter G)
+    (hnot : ∀ α : ClassFunction hyp.W ℂ, (χ : ClassFunction G ℂ) ≠ hyp.sigma hVeq app α)
+    {v : G} (hv : v ∈ hyp.V) :
+    (χ : ClassFunction G ℂ) v = 0 := by
+  refine hyp.eq_zero_of_mem_V_of_inner_chiFam_eq_zero hVeq app (fun a b => ?_) hv
+  -- index bridge: `χ_{ab} = (ω_{ab})^σ`
+  have hbridge : hyp.chiFam hVeq app (a, b)
+      = hyp.sigma hVeq app (hyp.omegaIrrEquiv (a, b) : ClassFunction hyp.W ℂ) := by
+    rw [hyp.sigma_irreducibleCharacter hVeq app (hyp.omegaIrrEquiv (a, b)),
+      Equiv.symm_apply_apply]
+  set ω := hyp.omegaIrrEquiv (a, b) with hω
+  -- `χ ≠ μ`: otherwise `χ = δ·ω^σ = σ(δ·ω)` lies in the image of `σ`.
+  have hne : χ ≠ hyp.mu2Grid hVeq app ω := by
+    intro hχμ
+    refine hnot (hyp.mu2GridSign hVeq app ω • (ω : ClassFunction hyp.W ℂ)) ?_
+    rw [map_zsmul, ← hyp.mu2Grid_eq_sign_smul_sigma_omega hVeq app ω, hχμ]
+  rw [hbridge, hyp.sigma_omega_eq_mu2GridSign_smul_mu2Grid hVeq app ω,
+    ← Int.cast_smul_eq_zsmul ℂ (hyp.mu2GridSign hVeq app ω)
+      (hyp.mu2Grid hVeq app ω : ClassFunction G ℂ),
+    ClassFunction.inner_smul_right, irreducibleCharacter_inner_eq_ite, if_neg hne, mul_zero]
+
+open scoped Classical in
 /-- **Peterfalvi (4.3.b) / Coq `cfdot_prTIirr`** (extraction form): the prime-TI irreducibles
 `mu2Grid ω` form an orthonormal system indexed by `Irr(W)`,
 `⟨mu2Grid ω, mu2Grid ω'⟩ = [ω = ω']`.  The diagonal is irreducibility; off the diagonal, if

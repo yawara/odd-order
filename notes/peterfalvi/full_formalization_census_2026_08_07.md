@@ -201,13 +201,18 @@ Peterfalvi §2 の監査では **`OddOrder/Peterfalvi/S04_*.lean` に絞って**
 | (3.1) Hypothesis | ✅ 構造体 | `TICyclicHypothesis` (cite 10 箇所) |
 | (3.2) | ✅ (a)-(d) 全条項 + 等長性 + 仮想指標保存 | capstone `TICyclicHypothesis.exists_sigma` (`S05_SigmaIsometry:399`) が 6 連言すべてを持つ。個別も (a) `:164`/`:218` (b) `:152` (c) `S05_IntegralSigma:72` (d) `:353` |
 | (3.3) (3.4) (3.5) | ✅ 実証明 | ω-grid `S05_OmegaGrid:62`、`α_{ij}` 基底 `S05_NormThree:134`、(3.5.1)-(3.5.5) の sub-part も密 (計 71 cite) |
-| (3.6)-(3.9) | ⬜ **未監査** | cite は密 ((3.6) 11 / (3.7) 11 / (3.8) 20 / (3.9) 20、sub-part (3.8.b)(3.8.c)(3.9.a)(3.9.b) も有) だが**書籍 pp.16-20 を未読**。次の作業単位 |
+| (3.6) Hypothesis | ✅ 定義として忠実 | `sigmaCoeff` (係数 `a_{ij} = ⟨ψ, ω_{ij}^σ⟩`) + `sigmaNC` (`NC(ψ)`) |
+| (3.7) | ✅ **2026-08-07 に補充** | 格子恒等式 `a_{ij} + a_{i'j'} = a_{ij'} + a_{i'j}` は `sigmaCoeff_add_eq` として在ったが、書籍の **"In particular" 節** `a_{ij} = a_{i0} + a_{0j} − a_{00}` が無かった → `sigmaCoeff_eq_add_sub` を追加。(1.3)(b) / (2.7) に続く 3 例目の「In particular 欠落」 |
+| (3.8) | ✅ 内容は在る (packaging 差あり) | `S05_SigmaTrichotomy.sigmaCoeff_trichotomy` が三分岐を係数形で持つ。⚠ 書籍は結論に **`NC(ψ) = w₁` / `= w₂`** を含め、`ψ = a·Σω^σ + β` の形で述べる。repo は係数形 (「列 `j₀` が定数 `c ≠ 0`、他は 0」) で、NC 値は導けるが**述べられていない**。数学的内容は同値だが packaging が違う — 低優先の繰延項目 |
+| (3.9) | ⬜ **未監査** | cite 20 + sub-part (3.9.a)(3.9.b)。書籍 p.20 未読。次の作業単位 |
 
-⚠ **(3.2)(d) の形が書籍と違う** (未処理、要判断): 書籍は「**σ の像に入らない `G` の既約指標**は `V` 上で消える」。
-repo (`exists_sigma` 第 6 連言 / `:353`) は「`σ(Irr W)` の**全てと直交する**類関数は `V` 上で消える」。
-後者の方が仮説として一般だが、**書籍の literal な形は導けていない** — 橋渡しに
-「σ は等長 + `ℤIrr → ℤIrr` ゆえ `σ(ω)` は ±既約」→「像に入らない既約は像と直交」が要る。
-小さいが本物の欠落。次イテレーションで判断すること。
+✅ **(3.2)(d) の書籍 literal 形を 2026-08-07 に補充**。従来は直交形 (「`σ(Irr W)` の全てと直交する
+類関数は `V` 上で消える」) だけで、書籍の「**σ の像に入らない**既約指標は消える」は
+docstring が「in particular 直交する」と**散文で主張**していただけだった。
+`apply_eq_zero_of_mem_V_of_not_mem_range_sigma` (`PrimeTIResidue.lean`) として証明。
+橋渡しは既存の `dirr` 抽出 (`ω^σ = δ·μ`, `δ = ±1`, `μ ∈ Irr G`)。
+⟹ **教訓: docstring の「in particular ～」「so this is the stated form of ～」は赤信号**
+(証明でなく主張)。
 
 ## 4. 未着手の census
 

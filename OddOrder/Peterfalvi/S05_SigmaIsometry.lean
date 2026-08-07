@@ -535,6 +535,25 @@ theorem sigmaCoeff_add_eq (hyp : TICyclicHypothesis G) [Fintype hyp.W]
   simp only [sigmaCoeff]
   linear_combination h0
 
+/-- **Peterfalvi (3.7), the "in particular" clause** (book p. 18):
+`a_{ij} = a_{i0} + a_{0j} − a_{00}`.
+
+The `(i', j') = (0, 0)` instance of the grid identity `sigmaCoeff_add_eq`, with the book's index `0`
+being the trivial character of each factor (the unit of the character group).  It expresses every
+coefficient through the first row, the first column and the corner -- the explicit form of the
+additive separability that the abstract grid lemmas (`S05_GridTrichotomy`) use in the factored
+shape `a(i,j) = f i + g j`. -/
+theorem sigmaCoeff_eq_add_sub (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    {ψ : ClassFunction G ℂ} (hψ : ∀ v ∈ hyp.V, ψ v = 0)
+    (p : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    hyp.sigmaCoeff hVeq app ψ (p, q)
+      = hyp.sigmaCoeff hVeq app ψ (p, 1) + hyp.sigmaCoeff hVeq app ψ (1, q)
+        - hyp.sigmaCoeff hVeq app ψ (1, 1) := by
+  have h := hyp.sigmaCoeff_add_eq hVeq app hψ p 1 q 1
+  linear_combination h
+
 /-- **Peterfalvi (3.8) corollary** (`NC` too small for a row or column): if `ψ` vanishes on `V` and
 `NC(ψ) < min(w₁, w₂)`, then *all* `σ`-image coefficients of `ψ` vanish — i.e. `ψ = β` is orthogonal
 to `Im σ`.  By (3.7) the coefficient grid `a_{ij}` is additively separable; the abstract grid lemma
