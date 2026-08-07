@@ -19,6 +19,47 @@ variable {G : Type*} [Group G]
 
 section /- (13.11)–(13.15): consequences of the Core analytic inequality -/
 
+/-- **Peterfalvi (13.10), the book statement** — *"Suppose that `𝒮` contains an irreducible
+character `λ` of degree `uq` induced from a linear character of `PC`. Let
+`m = 1 − 1/(q−1) − (q−1)/q^p + 1/((q−1)q^p)`.  Then `u/c > m·p^{q−1}/q`"* (p. 79).
+
+The Core endpoint `analytic_inequality_of_caseB_facts` carries three inputs the book does not
+state as hypotheses, because in the book they are *consequences* of the λ-cluster:
+* `hD`/`hv` — the case-B facts `D = 1`, `v = (q^p−1)/(q−1)`, which are exactly (13.4)
+  (`lambda_forces_T_caseB_core`), the very first step of the (13.10) proof;
+* `hQcomm` — commutativity of `Q = T_F`, from (13.2.b) applied to `T`
+  (`Hypothesis.Q_elementaryAbelian`).
+
+Discharging all three here gives the book's own hypothesis/conclusion pair (issue 0172 §13
+audit).  `core` is `characterDegreeCore_nonempty`; `pins` is the ν-side grid supply that the
+book's "in this section `S` and `T` play the same role" remark provides. -/
+theorem Hypothesis.analytic_inequality_of_lambdaCluster [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (lam : LambdaClusterData hyp) (pins : NuGridSupplyData hyp) :
+    (hyp.u : ℚ) / (hyp.c : ℚ) >
+      hyp.m * ((hyp.p ^ (hyp.q - 1) : ℕ) : ℚ) / (hyp.q : ℚ) := by
+  obtain ⟨core⟩ := hyp.characterDegreeCore_nonempty hG
+  obtain ⟨hD, hv, -⟩ := lambda_forces_T_caseB_core hG core lam pins
+  have hQcomm : IsMulCommutative ↥hyp.Q :=
+    IsMulCommutative.of_comm (hyp.Q_elementaryAbelian hG).comm
+  exact core.analytic_inequality_of_caseB_facts hG lam hD hv hQcomm pins
+
+/-- **Peterfalvi (13.11), the book statement** — *"Under the hypothesis of (13.10) we have:
+(a) if `q ≥ 7` then `m > 8/10`; (b) if `q ≥ 5` then `m > 7/10`; (c) if `q = 3` then
+`m > 49/100` and `u/c > (p²−1)/6`"* (p. 81), with the book's own hypothesis (the λ-cluster of
+(13.10)) rather than the Core endpoint's case-B inputs.  Purely numerical consequence of
+`analytic_inequality_of_lambdaCluster` via `numeric_bounds_of_analytic_inequality`. -/
+theorem Hypothesis.numeric_bounds_of_lambdaCluster [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (lam : LambdaClusterData hyp) (pins : NuGridSupplyData hyp) :
+    (7 ≤ hyp.q → hyp.m > (8 / 10 : ℚ)) ∧
+      (5 ≤ hyp.q → hyp.m > (7 / 10 : ℚ)) ∧
+      (hyp.q = 3 →
+        hyp.m > (49 / 100 : ℚ) ∧
+          (hyp.u : ℚ) / (hyp.c : ℚ) > (((hyp.p ^ 2 - 1 : ℕ) : ℚ) / 6)) :=
+  numeric_bounds_of_analytic_inequality hyp
+    (hyp.analytic_inequality_of_lambdaCluster hG lam pins)
+
 /-- **Peterfalvi (13.12), honest dichotomy form**: `c = 1`.
 
 This is the unconditional replacement for the legacy monolithic character-degree carrier.

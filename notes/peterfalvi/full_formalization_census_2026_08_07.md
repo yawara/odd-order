@@ -529,11 +529,18 @@ Theorem (6.3) + (10.8) で、(11.5)-(11.9) を一切使わない。
 | (13.7) | ✅ | `CharacterDegreeCore.eta10_Hsharp_norm_lower_core`: `\|H\| − 1 ≤ ∑_{x∈H^#} ‖η₁₀(x)‖²` (= `\|H^#\|`) |
 | (13.8) | ✅ **書籍そのままの S-side** | `Hypothesis.eta01_Hsharp_norm_lower_core` (`Eta01Correction:790`, issue 1041): `\|S'\| − u² ≤ ∑_{x∈H^#} ‖η₀₁(x)‖²`。T-side ミラー `eta10_Qsharp_norm_lower_core` もあり (docstring が「(13.8) applied to `T`」と明記) 。⚠ pdftotext だと `η₀₁` が `\Voi` に崩れて `ν₀₁` に見える — ページ画像 p079 で確定 |
 | (13.9) | ✅ (a)(b) とも | (a) `CharacterDegreeCore.G0_nonvanishing_dichotomy_core`: `∀ x ∈ G₀, λ^{τ₁}(x) ≠ 0 ∨ η₁₀(x) ≠ 0` (`G₀ = G^# − ((H^#)^G ∪ (Q^#)^G)`) / (b) `analyticEstimate_galois_core` (`\|G₀\|/\|G\| ≤` 二つの正規化 norm 和。[Is] Lemma 3.14 の core は `NormEstimates:84`) |
+| (13.10) | ⭐ **2026-08-07 に書籍の仮説へ揃えた** | `Hypothesis.analytic_inequality_of_lambdaCluster`: λ-cluster だけを仮説にして `u/c > m·p^{q−1}/q` (`m` は `m_eq` で書籍の式)。従来の Core endpoint `analytic_inequality_of_caseB_facts` は、書籍では**λ から導かれる** 3 入力 (`hD`/`hv` = (13.4)、`hQcomm` = (13.2.b)-at-`T`) を仮説で受けていた |
+| (13.10.1) | ✅ | `CharacterDegreeCore.analyticEstimate_lambda_core` (書籍の証明中の display 番号式) |
+| (13.10.2) | ✅ | `CharacterDegreeCore.analyticEstimate_eta_core` |
+| (13.10.3) | ✅ | `Hypothesis.analyticCounting_disjointCover_of_caseB_facts` (`G = {1} ⊔ G₀ ⊔ (H^#)^G ⊔ (Q^#)^G` の 4 分割カウント) |
+| (13.11) | ⭐ **2026-08-07 に書籍の仮説へ揃えた、3 条項とも** | `Hypothesis.numeric_bounds_of_lambdaCluster`: (a) `q ≥ 7 → m > 8/10` / (b) `q ≥ 5 → m > 7/10` / (c) `q = 3 → m > 49/100 ∧ u/c > (p²−1)/6`。Core 形は `numeric_bounds_of_caseB_facts` |
+| (13.12) | ✅ | `Hypothesis.c_eq_one_of_lambda_dichotomy`: `c = 1` (無条件、`pins` のみ)。λ の有無で二分し、λ 無しの Galois 枝は `C = ⊥` を直接与える |
+| (13.13) | ✅ 2 条項とも | `Hypothesis.caseA_parameters_of_clifford_caseA`: case (9.7.a) が `M = S` で成立 ⟹ `q = 3 ∧ u = (p−1)²/4` |
 | (13.19) | ✅ **書籍の全条項が `TypeIOrthogonalityGridData` に在る** | `S15_SAndTGrid.lean:134` の `TypeIOrthogonalityGridData`: `e_eq_index` (本物の等式) / `betaL_eq` (**`β_L` を Dade 像 `(Ind_H^L 1_H − φ)^{τ₁}` に pin**) / `Ltau_orthogonal_eta` / `betaL_eta0_row_constant`+`col_constant` ((c) 第 1 条項 = `(β_L^τ, η_{0j})` の `j` 非依存) / `caseC`, `caseC_dual` (**(c1) = `(β_S^τ, φ^{τ₁}) ≡ 1 (mod 2)` ∧ `(\|H\|−1)/e ≤ (u−1)/q`、(c2) = `η_{0j}` odd-parity ∧ `p ≤ e`** の**両条項とも**)。producer `typeIOrthogonalityGridData_of_coherent78_of_c_eq_one_and_d_eq_one` は axiom-clean |
 | — | ⚠ **設計差 (§16 向け lossy adapter)** | 同ファイル `:36` の**旧** carrier `TypeIOrthogonalityData` は opaque `Prop` を **case ラベル**として持ち (`e_eq_index`/`disjoint_support`/`Ltau_orthogonal_eta`/`betaL_eta_independent`/`caseC1`/`caseC2`/duals)、implication field は (c1) の**次数評価だけ** (`caseC1_bound`)・(c2) の**parity だけ** (`caseC2_eta0j_odd`) を投影する。`betaL` も自由フィールドで pin が無い。producer `typeI_orthogonality_dichotomy_of_c_eq_one_and_d_eq_one` は grid 版から**本物の命題を入れて**いるので**証明としては忠実**だが、`∃ data, data.disjoint_support ∧ …` という statement 単体では (c1) の parity 条項・(c2) の `p ≤ e`・`β_L` の同定が読めない (issue 0172 §2 の失敗様式 2「`∃ X` decoupling」に近い形)。**書籍強度の (13.19) は grid 版**なので被覆漏れではない — §16 側 (`S16_NonExistenceG/BetaVanishing`) がこの adapter 経由で消費している |
 
-⬜ **残り: (13.10)-(13.18) + (13.10.1)-(13.10.3) の逐条突合** (次セッション)。
-✅ 済: (13.1)-(13.9)(13.19)。
+⬜ **残り: (13.14)-(13.18) の逐条突合** (次セッション)。
+✅ 済: (13.1)-(13.13) + (13.10.1)-(13.10.3) + (13.19)。
 番号 → 主な repo ファイルの対応 (grep 実測):
 (13.1)(13.2) `S15_SAndT_Setup/{PairStructure,SubcoherenceInputs,TSideDegrees}` /
 (13.3)(13.5) `S15_CaseBEndgameSupply/HSharpChosenBase`, `S15_CharacterDegreeEnginesSSide` /

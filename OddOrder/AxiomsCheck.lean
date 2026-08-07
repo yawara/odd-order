@@ -11377,6 +11377,18 @@ optParam→explicit+wrapper rework を (9.11)/(11.9) chain に適用時。 -/
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S13.inner_tau_muColumnZero_sub_zeta_rowZero_unconditional
 
+/-! **Peterfalvi (13.10)/(13.11) の書籍形, axiom-clean** (issue 0172 §13 監査、2026-08-07).
+
+書籍 (13.10) の仮説は「`𝒮` が `PC` の線型指標から誘導される次数 `uq` の既約指標 `λ` を含む」
+だけ。repo の Core endpoint `analytic_inequality_of_caseB_facts` は、書籍では**その λ から
+導かれる** 3 つの入力 (`hD`/`hv` = (13.4) の case-B 事実、`hQcomm` = (13.2.b)-at-`T`) を
+仮説で受けていた。`analytic_inequality_of_lambdaCluster` は 3 つとも discharge して書籍の
+仮説/結論の対 (`u/c > m·p^{q−1}/q`) にする。(13.11) の 3 条項も同様に
+`numeric_bounds_of_lambdaCluster` で書籍の仮説へ揃えた。 -/
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S15.Hypothesis.analytic_inequality_of_lambdaCluster
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.numeric_bounds_of_lambdaCluster
+
 /-! **Peterfalvi (13.2)(e) の書籍形, axiom-clean** (issue 0172 §13 監査、2026-08-07).
 
 書籍 p.75:「`A₀(S)` は正規化群 `S` を持つ `G` の TI-部分集合であり、`A₀(S)` に関する Dade 等長 `τ`
