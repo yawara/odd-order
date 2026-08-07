@@ -149,6 +149,32 @@ repo 全体で `Lem 2.7` / `Lemma 2.7` を引くと **Isaacs の Lemma 2.7** (`M
 `Q` は可換だが巡回でないので `P` 上既約でない (**G**, Thm 3.2.3)。
 よって `P = P₁ ⊕ P₂` (1 次元 `Q`-部分加群の直和)。
 
+### BG Lem 2.7 の形式化計画 (2026-08-08 策定)
+
+**既存インフラ** (実測):
+
+* `Isaacs/Ch07_ThompsonSubgroup/S7A2_NormalPThm75.lean:95`
+  `mulAutGLTwoEquivOfIsElementaryAbelianCard` — **`V` が位数 `p²` の基本可換群のとき
+  `Aut(V) ≅ GL(2, F_p)`**。これが橋渡しの本体。
+* `BG/Ch1_Preliminary/S02_RepresentationsBasic.lean` に 2 次元表現の道具一式
+  (`rank_one_subquotients_of_finrank_two`,
+  `rank_one_invariant_submodule_eq_left_or_right_of_distinct_scalars`,
+  `subgroup_commutative_of_faithful_representation_fixed_on_submodule_and_quotient` ほか)。
+
+**証明の筋** (書籍の「既約でない ⟹ 直和分解」を対角化として実行する):
+
+1. `Q ↪ Aut(P) ≅ GL(2, F_p)` は忠実。`q ≠ p` なので `Q` は半単純に作用し、可換なので
+   **同時対角化可能** ⟹ 2 つの指標 `λ₁, λ₂ : Q → F_p^×` で `Q ↪ F_p^× × F_p^×` (忠実)。
+2. **(a)**: `Q` は位数 `q²` の基本可換群なので `λᵢ(Q)` の位数は `1` か `q`。忠実性から
+   少なくとも一方は位数 `q` ⟹ `q ∣ \|F_p^×\| = p − 1`。
+3. **(b)**: **スカラーとして作用する元**の集合は `ker(λ₁ λ₂⁻¹)`。像は `F_p^×` の `q`-捻れに
+   入るので位数は `1` か `q` ⟹ `\|ker\| ≥ q²/q = q > 1`。よって非自明な `a ∈ ker` が取れる。
+   `r := λ₁(a)` とおけば `x^a = x^r` (∀`x ∈ P`)、`a^q = 1` から `r^q ≡ 1 (mod p)`、
+   忠実性から `r ≢ 1 (mod p)` (`r = 1` なら `a` が自明に作用する)。
+
+⚠ 書籍は (b) の存在を「`P = P₁ ⊕ P₂`」から導くが、**`ker(λ₁λ₂⁻¹)` の位数評価のほうが直接的**
+(書籍の場合分けが要らない)。⟹ 書籍の証明を写経せず、この筋で書く。
+
 ⚠ **OCR の罠 3 種がこの 1 文に同居している**:
 * `(/ divides` = `q divides` (`q` が `(/` に化ける)
 * `a £ Q^` = `a ∈ Q^#` (`∈` が `£` に化ける)
