@@ -899,10 +899,43 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
   haveI : IsCyclic ↥mp.Kstar :=
     isCyclic_of_injective (Subgroup.inclusion (le_sup_right : mp.Kstar ≤ mp.K ⊔ mp.Kstar))
       (Subgroup.inclusion_injective _)
+  -- **BG Theorem 14.7(e)**: `Ẑ = (K ⊔ K*) − (K ∪ K*)` is a TI-set with normalizer-bound `K ⊔ K*`.
+  -- This conjunct of the duality does not mention the partner, so the `∃!` witness need not be
+  -- identified with `mp.T`.  It supplies Peterfalvi (8.4.e) for `W = K ⊔ K*` below.
+  have hZti : IsTISubset (BG.Ch4.S14.zTilde mp.K mp.Kstar) (mp.K ⊔ mp.Kstar) := by
+    obtain ⟨_, hMstP⟩ := (BG.Ch4.S14.typeP_duality hG mp.S_maximal mp.S_typeP mp.K_le_S mp.K_hall
+      mp.Kstar_eq).2.2.exists
+    exact hMstP.2.2.2.2.2.1
+  -- **S-side `TypePData` carrier** (relane #4, issue 4010): the chosen complement
+  -- `U = hScompl.choose` to `M_F` in `S'` is the `(κ∪σ)'`-Hall
+  -- (`S10Interface.isHall_kappaSigmaCompl_of_isTypeP2_complement`, using `mp.S_typeP2`), so
+  -- `typePData_of_kappaHall_hallComplement` produces a `TypePData mp.S` with `.W₁ = mp.K = W1` and
+  -- `.U = U`, reconciling the carrier to the structure's factors.
+  have hScompl := BG.Ch4.S14.exists_kappaHall_invariant_complement_to_MF hG
+    mp.S_maximal mp.S_typeP mp.K_le_S mp.K_hall
+  have hTcompl := BG.Ch4.S14.exists_kappaHall_invariant_complement_to_MF hG
+    mp.T_maximal mp.T_typeP mp.Kstar_le_T mp.Kstar_hall
+  have hUM : hScompl.choose ≤ mp.S :=
+    (le_sup_right.trans_eq hScompl.choose_spec.1.symm).trans (Subgroup.map_subtype_le _)
+  have hUhall :=
+    Peterfalvi.S10Interface.isHall_kappaSigmaCompl_of_isTypeP2_complement hG mp.S_maximal
+      mp.S_typeP2 hUM
+    hScompl.choose_spec.1 hScompl.choose_spec.2.2
+  have hKne : mp.K ≠ ⊥ := fun h =>
+    BG.Ch4.S14.card_kappaHall_ne_one mp.S_typeP mp.K_le_S mp.K_hall (Subgroup.card_eq_one.mpr h)
+  have hKstarne : mp.Kstar ≠ ⊥ := fun h =>
+    BG.Ch4.S14.card_kappaHall_ne_one mp.T_typeP mp.Kstar_le_T mp.Kstar_hall
+      (Subgroup.card_eq_one.mpr h)
   have hprimes := Peterfalvi.S12.theorem88_caseB_prime_orders hG hnoV
     { S := mp.S, T := mp.T, W1 := mp.K, W2 := mp.Kstar, W := mp.K ⊔ mp.Kstar,
       S_maximal := mp.S_maximal, T_maximal := mp.T_maximal, S_ne_T := mp.S_ne_T,
       W_eq := rfl, W_cyclic := mp.Z_cyclic,
+      -- `W = K × K*` and both factors nontrivial (8.8.b): the disjointness is the BG 14.7
+      -- pairing (`typeP_pair_W_structure`), the nontriviality the κ-Hall order bound.
+      W1_inf_W2_eq_bot := hbot,
+      W1_nontrivial := hKne, W2_nontrivial := hKstarne,
+      -- (8.4.e) for `W = K ⊔ K*`: the BG 14.7 TI-set `Ẑ` inside the cyclic (hence abelian) host.
+      normalizer_V := Peterfalvi.S10.normalizer_V_of_isTISubset mp.Z_cyclic hZti,
       S_nonI := mp.S_nonI, T_nonI := mp.T_nonI, one_typeII := mp.one_typeII,
       W1_le_S := mp.K_le_S, W2_le_T := mp.Kstar_le_T,
       -- (8.8.b1): the κ-Hall factors complement the derived subgroups —
@@ -911,7 +944,9 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
       S_compl := BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall hG mp.S_maximal mp.S_typeP
         mp.K_le_S mp.K_hall,
       T_compl := BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall hG mp.T_maximal mp.T_typeP
-        mp.Kstar_le_T mp.Kstar_hall }
+        mp.Kstar_le_T mp.Kstar_hall,
+      -- (8.8.b1) last clause `S ∩ T = W` and (8.8.b4) the covering.
+      S_inf_T_eq_W := hWjoin, cover := mp.theorem88_caseB }
   -- **U-side residual**: the (13.1.b) semidirect complements `U, V` (with `M' = M_F ⊔ U` and
   -- `K ≤ N_G(U)`) and the ordering `q < p`.  A *true*, constructible §13/§14 statement for the
   -- canonical pair (`mp.K`, `mp.Kstar`).
@@ -922,24 +957,6 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
   -- is now fully discharged.
   -- `Section16TypePStructure mp` is `Type`-valued, so we cannot `obtain` the `∃`-witness into the
   -- goal (`Exists.casesOn` only eliminates into `Prop`).  Extract the data with `Exists.choose`.
-  have hScompl := BG.Ch4.S14.exists_kappaHall_invariant_complement_to_MF hG
-    mp.S_maximal mp.S_typeP mp.K_le_S mp.K_hall
-  have hTcompl := BG.Ch4.S14.exists_kappaHall_invariant_complement_to_MF hG
-    mp.T_maximal mp.T_typeP mp.Kstar_le_T mp.Kstar_hall
-  -- **S-side `TypePData` carrier** (relane #4, issue 4010): the chosen complement
-  -- `U = hScompl.choose`
-  -- to `M_F` in `S'` is the `(κ∪σ)'`-Hall
-  -- (`S10Interface.isHall_kappaSigmaCompl_of_isTypeP2_complement`, using
-  -- `mp.S_typeP2`), so `typePData_of_kappaHall_hallComplement` produces a `TypePData mp.S` with
-  -- `.W₁ = mp.K = W1` and `.U = U`, reconciling the carrier to the structure's factors.
-  have hUM : hScompl.choose ≤ mp.S :=
-    (le_sup_right.trans_eq hScompl.choose_spec.1.symm).trans (Subgroup.map_subtype_le _)
-  have hUhall :=
-    Peterfalvi.S10Interface.isHall_kappaSigmaCompl_of_isTypeP2_complement hG mp.S_maximal
-      mp.S_typeP2 hUM
-    hScompl.choose_spec.1 hScompl.choose_spec.2.2
-  have hKne : mp.K ≠ ⊥ := fun h =>
-    BG.Ch4.S14.card_kappaHall_ne_one mp.S_typeP mp.K_le_S mp.K_hall (Subgroup.card_eq_one.mpr h)
   exact section16TypePStructure_of_components mp.K mp.Kstar hScompl.choose hTcompl.choose
     hScompl.choose_spec.1 hTcompl.choose_spec.1 hTcompl.choose_spec.2.2
     (BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall hG mp.T_maximal mp.T_typeP mp.Kstar_le_T

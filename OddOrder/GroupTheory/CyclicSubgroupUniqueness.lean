@@ -93,6 +93,39 @@ theorem le_of_card_dvd_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCyclic C]
   rw [← cyclic_subgroup_eq_of_card_eq hAcard]
   exact hAle
 
+/-- In a finite cyclic group, two subgroups meeting trivially have **coprime orders**.
+
+The gcd `d` of the two orders divides `|C|`, so `C` has a subgroup `A` of order `d`
+(`exists_subgroup_card_eq_of_isCyclic`); since `d` divides both orders, `A` sits inside both
+(`le_of_card_dvd_of_isCyclic`), hence inside their trivial intersection, forcing `d = 1`.
+
+This is the converse direction of the familiar "cyclic ⟹ order determines the subgroup"
+package, and is what turns a *direct* decomposition `W = W₁ × W₂` of a cyclic group into the
+arithmetic statement `gcd(|W₁|, |W₂|) = 1`. -/
+theorem coprime_card_of_inf_eq_bot_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCyclic C]
+    {H K : Subgroup C} (h : H ⊓ K = ⊥) : Nat.Coprime (Nat.card ↥H) (Nat.card ↥K) := by
+  obtain ⟨A, hA⟩ := exists_subgroup_card_eq_of_isCyclic (C := C)
+    ((Nat.gcd_dvd_left (Nat.card ↥H) (Nat.card ↥K)).trans H.card_subgroup_dvd_card)
+  have hAH : A ≤ H := le_of_card_dvd_of_isCyclic (by rw [hA]; exact Nat.gcd_dvd_left _ _)
+  have hAK : A ≤ K := le_of_card_dvd_of_isCyclic (by rw [hA]; exact Nat.gcd_dvd_right _ _)
+  have hAbot : A = ⊥ := le_bot_iff.mp (h ▸ le_inf hAH hAK)
+  rw [Nat.Coprime, ← hA, hAbot, Subgroup.card_bot]
+
+/-- Ambient form of `coprime_card_of_inf_eq_bot_of_isCyclic`: two subgroups `H, K` of a group `G`
+that both sit inside a common **cyclic** subgroup `W` and meet trivially have coprime orders.
+
+Used for the direct factorisation `W = W₁ × W₂` of Peterfalvi (8.4.e)/(8.8.b), where `W₁` and `W₂`
+are named as subgroups of the ambient group rather than of `W`. -/
+theorem coprime_card_of_inf_eq_bot_of_le_cyclic {G : Type*} [Group G] {W H K : Subgroup G}
+    [Finite ↥W] [IsCyclic ↥W] (hH : H ≤ W) (hK : K ≤ W) (h : H ⊓ K = ⊥) :
+    Nat.Coprime (Nat.card ↥H) (Nat.card ↥K) := by
+  have hbot : H.subgroupOf W ⊓ K.subgroupOf W = ⊥ := by
+    rw [Subgroup.subgroupOf, Subgroup.subgroupOf, ← Subgroup.comap_inf, h,
+      ← Subgroup.subgroupOf, Subgroup.bot_subgroupOf]
+  have := coprime_card_of_inf_eq_bot_of_isCyclic (C := ↥W) hbot
+  rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hH).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hK).toEquiv] at this
+
 /-- Every subgroup of a finite cyclic group is characteristic (it is the unique subgroup of
 its order, by `cyclic_subgroup_eq_of_card_eq`). -/
 theorem characteristic_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCyclic C]

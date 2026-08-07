@@ -10617,7 +10617,22 @@ not an additional sorry in this theorem. -/
 -- and `typeP_duality` (BG Theorem 14.7) are axiom-clean, so the (8.8) dichotomy is honestly proven.
 -- The full `theorem88_caseB_holds` chain is now axiom-clean: the type-I Dade and covering
 -- residuals are discharged, and its guard is registered in the Section 16 producer block below.
+-- 2026-08-07: the datum now carries every clause of the book's (8.8.b) — the direct-product shape
+-- `W = W₁ × W₂` with both factors nontrivial, the (8.4.e) normalizer law, the intersection
+-- `S ∩ T = W` and the covering (8.8.b4) — all discharged here from `typeP_pair_W_structure`
+-- (BG §16) and the two extra conjuncts of `typeP_duality` (the `Ẑ` TI-set and the type-`P`
+-- covering).  These are exactly the hypotheses Peterfalvi (8.9) consumes.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.theorem88_dichotomy
+
+-- **Peterfalvi (8.9)** (`S10_Theorem88CaseB`) — *the group denoted `W₂` in Theorem (8.8) coincides
+-- with the group denoted `W₂` in (8.4.d) with `M = S`*, i.e. `C_{S'}(W₁) = W₂`.  The proof follows
+-- the book (pp. 46--47): `W` cyclic makes `|W₁|`, `|W₂|` coprime, so `W₂ ⊆ S'` and hence
+-- `W₂ ⊆ C_{S'}(W₁)`; conversely (8.4.d) identifies `C_{S'}(W₁)` with the type-`P` `W₂(S)`, which
+-- centralizes all of `W`, and (8.4.e) forces `C_G(W) ⊆ N_G(V) = W`, leaving `C_{S'}(W₁) ⊆ W ∩ S'
+-- = W₂`.  Both the intrinsic form and the book's identification are axiom-clean.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S10.Theorem88CaseBData.derivedInG_inf_centralizer_W1_eq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.Theorem88CaseBData.typePData_W2_eq
 
 -- **W2 §12 (12.9) rank-two witness machinery (lane-h/lane-c)** — the minimal-counterexample structure
 -- theory of Peterfalvi (12.9), now axiom-clean since its sole `§16` gate (Proposition 16.1's type-`I`

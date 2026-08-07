@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S12_Props109To1011
 import OddOrder.Peterfalvi.S12_MaximalTypesSetup
+import OddOrder.Peterfalvi.S10_Theorem88CaseB
 
 /-!
 # TAIL
@@ -1044,27 +1045,6 @@ theorem typeV_param_arithmetic {p w₁ : ℕ} (hpodd : Odd p) (hw1odd : Odd w₁
   · omega
   · omega
 
-/-- The case-(b) data in Peterfalvi (8.8), used in the remark (10.11). -/
-structure Theorem88CaseBData (G : Type*) [Group G] where
-  S : Subgroup G
-  T : Subgroup G
-  W1 : Subgroup G
-  W2 : Subgroup G
-  W : Subgroup G
-  S_maximal : S ∈ maximalSubgroups G
-  T_maximal : T ∈ maximalSubgroups G
-  S_ne_T : S ≠ T
-  W_eq : W = W1 ⊔ W2
-  W_cyclic : IsCyclic ↥W
-  S_nonI : IsTypeNonI S
-  T_nonI : IsTypeNonI T
-  one_typeII : IsTypeII S ∨ IsTypeII T
-  /-- (8.8.b1): `W₁ ≤ S` and `S = [S,S] ⋊ W₁` (so `W₁` complements `S' = [S,S]` in `S`). -/
-  W1_le_S : W1 ≤ S
-  W2_le_T : W2 ≤ T
-  S_compl : Subgroup.IsComplement' ((derivedInG S).subgroupOf S) (W1.subgroupOf S)
-  T_compl : Subgroup.IsComplement' ((derivedInG T).subgroupOf T) (W2.subgroupOf T)
-
 /-- A non-type-I maximal subgroup that is not of type V (so of type II/III/IV) carries type-`P`
 data whose `W₁` has prime order — Peterfalvi (8.6.a), via `TypePNontrivialCore`.  Type V is
 excluded by the (10.10) hypothesis `hnoV` (supplied downstream by the axiom-clean
@@ -1090,7 +1070,7 @@ orders `|S : S'|`, `|T : T'|` with the respective type-`P` `W₁` (`card_W1_eq_d
 — hence prime. -/
 theorem theorem88_caseB_prime_orders [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeV M)
-    (caseB : Theorem88CaseBData G) :
+    (caseB : S10.Theorem88CaseBData G) :
     (Nat.card ↥caseB.W1).Prime ∧ (Nat.card ↥caseB.W2).Prime := by
   have hW1 : Nat.card ↥caseB.W1 = ((derivedInG caseB.S).subgroupOf caseB.S).index := by
     rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe caseB.W1_le_S).toEquiv,

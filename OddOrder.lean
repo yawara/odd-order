@@ -815,6 +815,7 @@ import OddOrder.Peterfalvi.S10_TypePSupport
 import OddOrder.Peterfalvi.S10_SubcoherentTypeP
 import OddOrder.Peterfalvi.S10_Hypothesis46TypeP
 import OddOrder.Peterfalvi.S10_BGInterface
+import OddOrder.Peterfalvi.S10_Theorem88CaseB
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV
 import OddOrder.Peterfalvi.S11_GaloisFieldModel
 import OddOrder.Peterfalvi.S11_ImprimitiveUBound

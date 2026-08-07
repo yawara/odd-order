@@ -500,23 +500,34 @@ the duality again at `M*` gives the second complement `T = T' ⋊ K*`.  The `κ`
 plays the role of the case-(b) factor `W₁` (both `K` and the type-`P` `W₁` complement `S'`,
 Peterfalvi
 (8.8.b1)).  Cites the merged BG §16 `typeP_duality` and `proposition_type_classification`; the
-remaining hard content lives in their (issue-8015) residuals. -/
+remaining hard content lives in their (issue-8015) residuals.
+
+The remaining clauses of (8.8.b) come from the same two BG results.  The direct-product shape
+`W = K × K*` and the intersection `S ∩ M* = K ⊔ K*` (8.8.b1, last clause) are
+`typeP_pair_W_structure` (BG §16); the (8.4.e) normalizer law is the BG 14.7 TI-set
+`Ẑ = (K ⊔ K*) − (K ∪ K*)` read through `normalizer_V_of_isTISubset`; the covering (8.8.b4) is
+the last conjunct of `typeP_duality` (every type-`P` maximal is conjugate to one of the pair)
+combined with `TypeI ⟺ ¬TypeP`. -/
 theorem theorem88_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     (∀ M : Subgroup G, M ∈ maximalSubgroups G → IsTypeI M) ∨
-      Nonempty (OddOrder.Peterfalvi.S12.Theorem88CaseBData G) := by
+      Nonempty (OddOrder.Peterfalvi.S10.Theorem88CaseBData G) := by
   classical
+  -- Not type I ⟹ type `P` (Prop 16.1(a): `TypeI ⟺ TypeF`, `TypeF ⟺ κ = ∅`).  Used both to start
+  -- the argument at `S` and, in the covering clause (8.8.b4), at an arbitrary maximal subgroup.
+  have notTypeI_imp_typeP : ∀ N : Subgroup G, N ∈ maximalSubgroups G →
+      ¬ IsTypeI N → OddOrder.BG.Ch4.S14.IsTypeP N := by
+    intro N hN hnotI
+    have hiff := (OddOrder.BG.Ch4.S16.proposition_type_classification hG hN).1
+    have hnotF : ¬ OddOrder.BG.Ch4.S14.IsTypeF N := fun hF => hnotI (hiff.mpr hF)
+    rw [OddOrder.BG.Ch4.S14.IsTypeP, Set.nonempty_iff_ne_empty]
+    exact fun he => hnotF he
   by_cases hall : ∀ M : Subgroup G, M ∈ maximalSubgroups G → IsTypeI M
   · exact Or.inl hall
   · refine Or.inr ?_
     push Not at hall
     obtain ⟨S, hS, hSnotI⟩ := hall
     haveI : IsSolvable ↥S := hG.solvable_of_mem_maximalSubgroups hS
-    -- `S` not type I ⟹ `S` type `P` (Prop 16.1(a): `TypeI ⟺ TypeF`, `TypeF ⟺ κ(S) = ∅`).
-    have hSP : OddOrder.BG.Ch4.S14.IsTypeP S := by
-      have hiff := (OddOrder.BG.Ch4.S16.proposition_type_classification hG hS).1
-      have hnotF : ¬ OddOrder.BG.Ch4.S14.IsTypeF S := fun hF => hSnotI (hiff.mpr hF)
-      rw [OddOrder.BG.Ch4.S14.IsTypeP, Set.nonempty_iff_ne_empty]
-      exact fun he => hnotF he
+    have hSP : OddOrder.BG.Ch4.S14.IsTypeP S := notTypeI_imp_typeP S hS hSnotI
     -- A `κ(S)`-Hall subgroup `K` of `S` (Hall's theorem in the solvable `S`).
     obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥S) (OddOrder.BG.Ch4.S14.kappa S)
     set K : Subgroup G := K'.map S.subtype with hKdef
@@ -526,13 +537,26 @@ theorem theorem88_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
       rw [hKeq]; exact hK'
     set Kstar : Subgroup G :=
       OddOrder.BG.Ch3.S10.Msigma S ⊓ Subgroup.centralizer (K : Set G) with hKstardef
-    -- BG Theorem 14.7 duality at `S`: `S = S' ⋊ K` (`hScompl`), the dual `M*`, its data.
+    -- BG Theorem 14.7 duality at `S`: `S = S' ⋊ K` (`hScompl`), the dual `M*`, its data,
+    -- the TI-set `Ẑ` (`hTI`) and the type-`P` covering (`hcover`).
     obtain ⟨hScompl, _, Mstar, ⟨hMstarMem, hMstarP, hSnconjMstar,
-        ⟨hKstarMstar, hKstar_hall, hK_eq⟩, hcyc, _, hP2disj, _⟩, _⟩ :=
+        ⟨hKstarMstar, hKstar_hall, hK_eq⟩, hcyc, hTI, hP2disj, hcover⟩, _⟩ :=
       OddOrder.BG.Ch4.S14.typeP_duality hG hS hSP (Subgroup.map_subtype_le K') hK hKstardef
     -- Apply duality again at `M*` with its `κ`-Hall `K*`: `M* = (M*)' ⋊ K*` (`hTcompl`).
     obtain ⟨hTcompl, _⟩ :=
       OddOrder.BG.Ch4.S14.typeP_duality hG hMstarMem hMstarP hKstarMstar hKstar_hall hK_eq
+    -- A `(κ(S) ∪ σ(S))′`-Hall subgroup `U` of the solvable `S`, the last input of
+    -- `typeP_pair_W_structure` (which supplies `S ∩ M* = K ⊔ K*` and `K ⊓ K* = ⊥`).
+    obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥S)
+      ((OddOrder.BG.Ch4.S14.kappa S ∪ OddOrder.BG.Ch3.S10.sigma S)ᶜ)
+    have hUeq : (U'.map S.subtype).subgroupOf S = U' :=
+      Subgroup.comap_map_eq_self_of_injective S.subtype_injective U'
+    have hU : Ch03.IsHallSubgroup ((OddOrder.BG.Ch4.S14.kappa S ∪ OddOrder.BG.Ch3.S10.sigma S)ᶜ)
+        ((U'.map S.subtype).subgroupOf S) := by
+      rw [hUeq]; exact hU'
+    obtain ⟨hWjoin, _, hbot, _⟩ :=
+      OddOrder.BG.Ch4.S16.typeP_pair_W_structure hG hS hSP (Subgroup.map_subtype_le K') hK
+        hKstardef hU hMstarMem hMstarP hSnconjMstar hKstarMstar hKstar_hall hcyc hK_eq
     exact ⟨{
       S := S, T := Mstar, W1 := K, W2 := Kstar, W := K ⊔ Kstar
       S_maximal := hS, T_maximal := hMstarMem
@@ -541,6 +565,16 @@ theorem theorem88_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
         rw [hST] at hSnconjMstar
         exact hSnconjMstar (OddOrder.BG.Ch4.S14.IsConjugateSubgroup.refl Mstar)
       W_eq := rfl, W_cyclic := hcyc
+      -- `W = K × K*`: the factors meet trivially (coprime orders, BG 14.7).
+      W1_inf_W2_eq_bot := hbot
+      -- Both factors are nontrivial: a `κ`-Hall of a type-`P` maximal is `≠ 1`, at `S` and at `M*`.
+      W1_nontrivial := fun h => OddOrder.BG.Ch4.S14.card_kappaHall_ne_one hSP
+        (Subgroup.map_subtype_le K') hK (Subgroup.card_eq_one.mpr h)
+      W2_nontrivial := fun h => OddOrder.BG.Ch4.S14.card_kappaHall_ne_one hMstarP hKstarMstar
+        hKstar_hall (Subgroup.card_eq_one.mpr h)
+      -- (8.4.e): the BG 14.7 TI-set `Ẑ = (K ⊔ K*) − (K ∪ K*)` inside the cyclic (hence abelian)
+      -- host `K ⊔ K*` pins the normalizer of each of its nonempty pieces.
+      normalizer_V := OddOrder.Peterfalvi.S10.normalizer_V_of_isTISubset hcyc hTI
       S_nonI := isTypeNonI_of_isTypeP hG hS hSP
       T_nonI := isTypeNonI_of_isTypeP hG hMstarMem hMstarP
       one_typeII := hP2disj.imp
@@ -549,14 +583,21 @@ theorem theorem88_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
       W1_le_S := Subgroup.map_subtype_le K'
       W2_le_T := hKstarMstar
       S_compl := hScompl
-      T_compl := hTcompl }⟩
+      T_compl := hTcompl
+      -- (8.8.b1), last clause: `S ∩ M* = K ⊔ K*` (BG §16 `typeP_pair_W_structure`).
+      S_inf_T_eq_W := hWjoin
+      -- (8.8.b4): a maximal subgroup is type I, or type `P` and hence conjugate to `S` or `M*`.
+      cover := fun M hM => by
+        by_cases hMI : IsTypeI M
+        · exact Or.inl hMI
+        · exact Or.inr (hcover M hM (notTypeI_imp_typeP M hM hMI)) }⟩
 
 /-- **Peterfalvi (12.17)**: the all-type-I case of Theorem (8.8) is impossible, so the case-(b)
 data of (8.8) exists.  Immediate from the (8.8) dichotomy (`theorem88_dichotomy`) and the
 non-existence half `not_all_maximal_typeI`. -/
 theorem theorem88_caseB_holds [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M) :
-    Nonempty (OddOrder.Peterfalvi.S12.Theorem88CaseBData G) :=
+    Nonempty (OddOrder.Peterfalvi.S10.Theorem88CaseBData G) :=
   (theorem88_dichotomy hG).resolve_left (not_all_maximal_typeI hG hnoV)
 
 end OddOrder.Peterfalvi.S14

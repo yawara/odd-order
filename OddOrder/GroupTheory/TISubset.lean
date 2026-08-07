@@ -142,6 +142,41 @@ theorem centralizer_le (hA : IsTISubset A L) {x : G} (hx : x ∈ A) :
     rwa [hxx]
   exact hA c ⟨x, hx, hfix⟩
 
+/-- **A TI-subset inside an abelian host pins the normalizer of each of its nonempty pieces**:
+if `A` is a TI-subset with normalizer-bound `L`, `A` sits inside `L`, and `L` is commutative,
+then `N_G(X) = L` for *every* nonempty `X ⊆ A`.
+
+Both inclusions are short.  For `N_G(X) ≤ L`, pick any `a ∈ X`; then `g·a·g⁻¹ ∈ X ⊆ A`, so the
+TI condition places `g ∈ L`.  For `L ≤ N_G(X)`, conjugation by `w ∈ L` fixes every element of
+`L` — and both `h ∈ X ⊆ L` and (in the converse direction) `h = w⁻¹·(w·h·w⁻¹)·w ∈ L` — so the
+membership iff is an identity.
+
+This is the abstract content of Peterfalvi (8.4.e) (`N_G(X) = W` for every nonempty
+`X ⊆ W − (W₁ ∪ W₂)`): BG Theorem 14.7 delivers exactly `IsTISubset (zTilde K K*) (K ⊔ K*)`
+together with the cyclicity of `K ⊔ K*`, and (8.4.e) is this lemma applied to them. -/
+theorem set_normalizer_eq_of_subset_of_commute (hA : IsTISubset A L) (hAL : A ⊆ (L : Set G))
+    (hcomm : ∀ x ∈ L, ∀ y ∈ L, Commute x y)
+    {X : Set G} (hX : X.Nonempty) (hXA : X ⊆ A) :
+    Subgroup.normalizer X = L := by
+  -- Conjugation by an element of `L` fixes `L` pointwise.
+  have hfix : ∀ w ∈ L, ∀ h ∈ L, w * h * w⁻¹ = h := by
+    intro w hw h hh
+    rw [(hcomm w hw h hh).eq, mul_inv_cancel_right]
+  refine le_antisymm (fun g hg => ?_) (fun w hw => ?_)
+  · obtain ⟨a, ha⟩ := hX
+    exact hA g ⟨a, hXA ha, hXA ((Subgroup.mem_set_normalizer_iff.mp hg a).mp ha)⟩
+  · rw [Subgroup.mem_set_normalizer_iff]
+    intro h
+    constructor
+    · intro hh; rwa [hfix w hw h (hAL (hXA hh))]
+    · intro hh
+      -- `h` is a priori arbitrary, but `w·h·w⁻¹ ∈ X ⊆ L` forces `h ∈ L`.
+      have hhL : h ∈ L := by
+        have : w⁻¹ * (w * h * w⁻¹) * w ∈ L :=
+          mul_mem (mul_mem (inv_mem hw) (hAL (hXA hh))) hw
+        simpa [mul_assoc] using this
+      rwa [hfix w hw h hhL] at hh
+
 /-- **TI transport along an `M`-conjugacy saturation.**  If `T` is a TI-subset with
 normalizer-bound `Z ≤ M`, and every element of `A` is `M`-conjugate to an element of `T`
 (i.e. `A` lies inside the `M`-conjugacy saturation `⋃_{m ∈ M} m·T·m⁻¹`), then `A` is itself a
