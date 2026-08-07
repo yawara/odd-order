@@ -1,0 +1,111 @@
+---
+id: 177
+slug: bg-full-formalization
+title: "BG 完全形式化キャンペーン (逐条監査)"
+created: 2026-08-08
+---
+
+# BG 完全形式化キャンペーン (逐条監査)
+
+## 位置づけ
+
+3 冊スコープ (Isaacs / BG / Peterfalvi) の逐条監査の**最後**。
+
+| 書籍 | 件数 | 状態 | issue |
+|---|---|---|---|
+| Peterfalvi | 284 | ✅ 完了 (補充 ~20、誤判定 9) | [closed/0172](closed/0172-peterfalvi-full-formalization.md) |
+| Isaacs | 305 | ✅ 完了 (補充 5、stale 注記訂正 7) | [closed/0176](closed/0176-isaacs-full-formalization.md) |
+| **BG** | 下記 | ⬜ **本 issue** | 0177 |
+
+方法論は 0172 / 0176 と同一:
+
+> 番号の参照地図で当たりを付ける → file header の対応表と `theorem` 一覧で実体確認
+> → 書籍ページ画像で条項確定 → 部分被覆/特殊化/packaging 差を補充
+
+## ⚠ BG は番号体系が前 2 冊と違う
+
+Isaacs / Peterfalvi は `N.M.` を行頭に置く形式だったが、**BG は 2 系統ある**:
+
+1. **`(N.M)` を単独行に置くラベル** — これは**証明内の主張ラベル**であって定理番号ではない。
+   例: §3 の証明中に `(3.6)` `(3.7)` `(3.8)` が並び、後段が「by (3.6)」と参照する。
+   ⚠ **これを定理番号と取り違えると件数が数倍に膨らむ**。
+2. **`Kind N.M.` / `Kind N.M (帰属).`** — こちらが**番号付き結果**。
+   `Theorem` / `Proposition` / `Lemma` / `Corollary` の 4 種。
+
+さらに BG は **Theorems A–E** (章番号を持たない主定理) と **Appendix A–E** を持つ。
+
+## 実測ベースライン (2026-08-08)
+
+`references/bg/local-analysis.pdftotext.txt` から機械抽出。
+抽出パターン (⚠ `N.M.K` 形は Gorenstein の引用なので除外する):
+
+```python
+pat = re.compile(r'^(Theorem|Proposition|Lemma|Corollary)\s+(\d{1,2})\.(\d{1,2})(?!\.\d)\s*(\(|\.)', re.M)
+```
+
+| 節 | 件数 | 欠番 |
+|---|---|---|
+| §1 | 22 | なし |
+| §2 | 7 | なし |
+| §3 | 10 | なし |
+| §4 | 19 | ⚠ 4.1 (OCR で header 行が崩れている。本文中には `Lemma 4.1` の引用あり) |
+| §5 | 7 | なし |
+| §6 | 7 | なし |
+| §7 | 5 | ⚠ 7.1 (同上) |
+| §8 | 1 | — |
+| §9 | 6 | なし |
+| §10 | 14 | なし |
+| §11 | 7 | なし |
+| §12 | 19 | なし |
+| §13 | 13 | なし |
+| §14 | 12 | ⚠ 14.11 |
+| §15 | 9 | なし |
+| §16 | 1 | — |
+| **小計** | **159** | 欠番 3 (いずれも OCR 由来、実在は本文引用で確認済) |
+
+種別内訳: Theorem 71 / Lemma 69 / Proposition 35 / Corollary 34
+(重複カウント込み — 章頭の再掲があるため)。
+
+**補章**: `Kind X.N` (X ∈ A-E) が **15 件**。
+
+⬜ **要確定**: (a) 欠番 3 件の実際の statement (ページ画像で確認)、
+(b) Theorems A-E の扱い、(c) 補章の正確な件数。
+
+## ⚠ この census が測っていないもの (0172 / 0176 と同じ)
+
+1. **特殊化債務** — 書籍より狭い仮説
+2. **部分被覆** — 多条項の一部だけ / TFAE の条項数不足
+3. **packaging 差** — 条項はすべて在るが書籍の statement の形になっていない
+4. **mathlib 被覆の未記録** — Isaacs で主役だった型。BG は FT 固有の内容が多いので
+   前 2 冊より少ないと予想されるが、§1 (Preliminary Results) は標準的な有限群論なので要確認。
+
+## 作業手順
+
+- [ ] **ステップ 1**: 欠番 3 件 (4.1 / 7.1 / 14.11) の statement をページ画像で確定し、
+      Theorems A-E と補章の件数を確定する。
+- [ ] **ステップ 2**: §1 から文書順に逐条監査。1 節ぶん終えるごとに census note を更新して commit。
+- [ ] census note を新設 (`notes/bg/full_formalization_census_2026_08_08.md`)
+
+## 完了条件
+
+BG の全番号付き結果が**書籍強度**の Lean statement を持つか、**mathlib 被覆として対応が
+記録されている**。特殊化債務ゼロ・部分被覆ゼロ・packaging 差ゼロ。
+各節の監査結果を census note に記録する。
+
+## ⚠ 誤判定様式 (前 2 冊で計 16 件の実例)
+
+正本 = memory `textbook-coverage-audit-failure-modes` (11 型)。とくに:
+
+* **注記は当たりを付ける道具であって判定の証拠ではない** — Isaacs では stale 注記の訂正
+  (7 件) が実際の補充 (5 件) を上回った。
+* **grep は種別語の略記も含める / 番号だけで引く** — Isaacs 7.4 を `Lem` 略記で取りこぼした。
+* **内部段の名前が先に当たっても file の endpoint を確認する** — Pf (9.11) / Isaacs 3.34 / 9.23。
+* **検索範囲を章のディレクトリに絞らない** — owner chapter 規則で他章に在る (Isaacs 2.20 / 3.15 / 3.23)。
+* **`⊴` と `<` は pdftotext で区別不可** — ページ画像が必須 (Isaacs 1.24)。
+* **TFAE/iff は書籍の条項数と一致するか確認** — Isaacs 5.26 は 3 条件中 (1)⇔(3) だけだった。
+
+## 参照
+
+- 前身: [issue 0172](closed/0172-peterfalvi-full-formalization.md) / [issue 0176](closed/0176-isaacs-full-formalization.md)
+- 書籍: `references/bg/local-analysis.pdf`
+- Coq 併読: `coq/theories/BGsectionN.v` (ファイル名が BG の節構成と 1:1 対応)
