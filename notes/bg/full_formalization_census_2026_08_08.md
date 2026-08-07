@@ -125,11 +125,18 @@ Isaacs / mathlib / 本 repo の 3 列で対応づける**マスター対応表**
 | **Prop 2.2** | 「**形式化状態 (2026-07-18 更新, 旧 docstring は stale だった)**: 両パートとも形式化済み・sorry-free」 | ✅ `RepresentationTheory/CliffordMultiplicityOne.lean` / `CyclicExtension.lean` / `CyclicCharacterExtension.lean` |
 | **Lem 2.3** (Fong–Swan) | 「形式化方針」+ **「(stub 未配置: forward dependent 不在のため §2 完成後または…)」** | ⚠ **注記が stale** — 実体は `RepresentationTheory.finrank_dvd_card_of_isAbsolutelyIrreducible` で **AxiomsCheck 登録済** (`AxiomsCheck.lean:6325`) |
 | **Prop 2.4** | 「形式化方針」+ **「(stub 未配置: 10 部を個別 lemma 化, shared module 作成後.)」** | ⚠ **注記が stale** — `GroupTheory/RepresentationTheory/EigenspaceUnderCyclicAction.lean` は**既に存在する** |
-| **Thm 2.5** | 「形式化方針」+ **「(stub 未配置: 依存定理多数, foundation 整備後に着手.)」** | ⬜ 未確定。挙げられた `RepresentationTheory/AutElementaryAbelian.lean` は**存在しない**。別名で在るか要調査 |
+| **Thm 2.5** | 「形式化方針」+ **「(stub 未配置: 依存定理多数, foundation 整備後に着手.)」** | ⚠ **注記が stale** — 実体は `RepresentationTheory/ExtraspecialThm25Final.lean` の `finrank_modEq_of_extraspecial` (:63) / `finrank_eq_sub_one_of_extraspecial` (:89)。**ファイル名に `Thm25` が入っている**のに計画表が追随していなかった。消費点 `S03d_Thm34.lean:31` も「keystone consumer of BG Theorem 2.5」と明記 |
 
-⬜ **Thm 2.5** — 実装計画は「`AutElementaryAbelian.lean` + Prop 2.4」だが**そのファイルは
-存在しない**。消費点は「§3 Thm 3.4, §15 Thm 15.7」と記録されているので、
-**§3 Thm 3.4 の証明が 2.5 をどう使っているか**を追えば実体の有無が決まる (次回)。
+✅ **Thm 2.5 は実体あり (2026-08-08 確定)** — 計画表が挙げる `AutElementaryAbelian.lean` は
+存在しないが、実体は **`ExtraspecialThm25Final.lean`** に別名で在った。
+消費点 `S03d_Thm34.lean` (BG §3 Thm 3.4) が「keystone consumer of BG Theorem 2.5」と
+明記しており、そこから辿れた。⟹ **消費点から辿るのが確実**。
+
+🔴 **Lem 2.7 = BG §1-§2 で唯一の真の未形式化 (2026-08-08 判定)**
+
+repo 全体で `Lem 2.7` / `Lemma 2.7` を引くと **Isaacs の Lemma 2.7** (`M, N ⊴ G`,
+`M ∩ N = 1` ⟹ 元同士が可換) しか当たらない。BG の Lem 2.7 (位数 `p²`, `q²` の基本可換群
+`P`, `Q` で `Q ⊆ Aut(P)` ⟹ (a) `q ∣ p−1` ほか) の実体は無い。
 
 🚨 **Lem 2.7 は repo の §2 計画表に載っていない** — `S02_RepresentationsBasic.lean` の
 「§2A-§2F」区分も「主要 cite」表も **2.1-2.6 の 6 件しか追っていない**。書籍 §2 は 7 件なので
