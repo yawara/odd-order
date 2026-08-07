@@ -1,0 +1,97 @@
+---
+id: 176
+slug: isaacs-full-formalization
+title: "Isaacs 完全形式化キャンペーン (逐条監査)"
+created: 2026-08-08
+---
+
+# Isaacs 完全形式化キャンペーン (逐条監査)
+
+## 位置づけ
+
+[issue 0172](closed/0172-peterfalvi-full-formalization.md) (Peterfalvi 全 284 件) が
+2026-08-08 に完了したので、**同じ逐条監査を Isaacs に適用する**。3 冊スコープの文書順
+(Isaacs → BG → Peterfalvi) に従い、次は最上流の Isaacs。
+
+方法論は 0172 と同一:
+
+> 書籍ページ画像で条項を確定 → repo の statement と突合 → 部分被覆/特殊化/言及のみを補充
+
+## 実測ベースライン (2026-08-08)
+
+### 書籍側の番号 census
+
+`references/isaacs/finite-group-theory.pdftotext.txt` から機械抽出
+(⚠ OCR が `T h e o r e m` / `2 . 1 4 .` のように文字・数字を分解するので、**空白許容の
+正規表現が必須**。素朴な `^\d+\.\d+\.\s*(Theorem|...)` だと 29 件取りこぼす)。
+
+| 章 | 件数 | 欠番 |
+|---|---|---|
+| Ch.1 Sylow | 46 | なし |
+| Ch.2 Subnormality | 20 | なし |
+| Ch.3 Split Extensions | 36 | なし |
+| Ch.4 Commutators | 38 | なし |
+| Ch.5 Transfer | 30 | なし |
+| Ch.6 Frobenius Actions | 24 | なし |
+| Ch.7 Thompson Subgroup | 8 | なし |
+| Ch.8 Permutation Groups | 44 | なし |
+| Ch.9 More on Subnormality | 31 | なし |
+| Ch.10 More Transfer | 28 | なし |
+| **合計** | **305** | **各章 1..max が連続、欠番ゼロ** |
+
+種別は全件 **Theorem / Lemma / Corollary** (Theorem 135 / Lemma 105 / Corollary 65)。
+Definition / Example / Notation は別番号系ではなく同じ連番に混ざらない。
+
+### repo 側の cite 突合
+
+`OddOrder/**/*.lean` の docstring を grep (`OddOrder/Isaacs/**` は素の `N.M`、それ以外は
+同一行に "Isaacs" を要求):
+
+| 層 | 件数 |
+|---|---|
+| cite あり | **292 / 305** |
+| **cite ゼロ** | **13** — すべて Ch.8 |
+
+cite ゼロ 13 件 = **8.11, 8.12, 8.13, 8.14, 8.15, 8.17, 8.19, 8.20, 8.21, 8.22, 8.27, 8.28, 8.30**
+= block / primitivity / Jordan set のクラスタ + `Aₙ` 単純性。
+
+⚠ **cite ゼロ ≠ 未形式化** (0172 の最大の教訓)。実際、**mathlib に
+`MulAction.IsBlock` / `IsPreprimitive` / `Mathlib/GroupTheory/GroupAction/Jordan.lean` が在り**、
+repo の `Ch08_PermutationGroups` も既に `IsPreprimitive` を使っている。⟹ 多くは
+**mathlib 被覆**の可能性が高く、その場合の正しい対処は CLAUDE.md のラッパー方針どおり
+「薄いラッパーを書かず、**対応表を section docstring か `notes/` に記録**」。
+
+## ⚠ この census が測っていないもの (0172 と同じ)
+
+「cite あり」= 番号が docstring に現れるだけ。番号 grep で検出できない残債:
+
+1. **特殊化債務** — 書籍より狭い仮説で述べている
+2. **部分被覆** — (a)(b)(c) の一部だけ / bundled statement が条項を運搬しない
+3. **言及のみ** — 散文 cite で statement が無い
+4. **mathlib 被覆の未記録** — Isaacs 固有 (Peterfalvi には無かった型)。書籍の結果が
+   mathlib にそのまま在る場合、repo に実体が無くても**被覆済**だが、対応が記録されていないと
+   監査で「未形式化」に誤分類される
+
+⟹ 本体は番号埋めでなく逐条照合。
+
+## 作業手順
+
+- [ ] **ステップ 1**: cite ゼロ 13 件 (Ch.8 の block/primitivity/Jordan + `Aₙ` 単純性) の
+      実状態を確定する。mathlib 被覆 / repo 被覆 (別名) / 真の未形式化 の 3 分類。
+      mathlib 被覆なら対応表を `notes/isaacs/ch08_permutation.md` に記録。
+- [ ] **ステップ 2**: Ch.1 から文書順に逐条監査 (書籍ページ画像で条項確定 → repo 突合)。
+      1 章ぶん終えるごとに census note を更新して commit。
+- [ ] census note を新設 (`notes/isaacs/full_formalization_census_2026_08_08.md`)
+
+## 完了条件
+
+Isaacs の全 305 件が **書籍強度**の Lean statement を持つか、**mathlib 被覆として対応が
+記録されている**。特殊化債務ゼロ・部分被覆ゼロ。各章の監査結果を census note に記録する。
+
+## 参照
+
+- 前身: [issue 0172](closed/0172-peterfalvi-full-formalization.md) (Peterfalvi、完了)
+- 書籍: `references/isaacs/finite-group-theory.pdf` (⚠ **PDF ページ = 書籍ページ + 13**)、
+  ページ画像は `references/isaacs/pages/`
+- ⚠ 誤判定様式は 0172 で 9 件検出済 — 番号表記の揺れ / assembly を endpoint と誤認 /
+  stale な自己注記の連鎖。**自分の過去の「未形式化」ラベルを一次証拠にしない**。
