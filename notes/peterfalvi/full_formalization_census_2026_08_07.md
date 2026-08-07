@@ -559,6 +559,25 @@ Theorem (6.3) + (10.8) で、(11.5)-(11.9) を一切使わない。
 `GroupTheory/WielandtFixedPoint` / (13.17) `S15_SAndTDefs` / (13.18) `S15_SAndTGrid`,
 `S10_TypePSupportA0`。
 
+### §14 = repo `S16_*` (書籍 pp.87-92、`pages/peterfalvi-p087..p092.png` 切り出し済) — **監査途中 (2026-08-08、(14.1)(14.2) 済)**
+
+書籍 §14 =「Non-existence of G」= **(14.1)-(14.16)** + (14.11) の sub-part
+**(14.11.1)-(14.11.4)** の計 **20 件**。Part I の最終章で、(14.2) の証明完了が FT 定理の完成。
+番号 grep では全 20 件に実体あり。
+
+| 書籍 | 判定 | repo の実体 / 備考 |
+|---|---|---|
+| (14.1) Hypothesis | ✅ | `q < p` — `S16.Hypothesis` の field `q_lt_p` (`S16_CoreLemmas:46`) |
+| (14.2) Theorem | ✅ **(a)(b) とも carrier が条項一致** | `S16.FieldNormalizerData` (`S16_CoreLemmas:572`) が `BG.AppC.FieldNormalizerData p q G` を extend: **(a)** `σ` 単射準同型 + `sigma_P_eq_P` (`P` = 加法群 `F = 𝔽_{p^q}` の像) + `sigma_U_eq_U` (`U` = ノルム 1 補群 `U*`、位数 `(p^q−1)/(p−1)` の像) + `sigma_P0_eq_W2` (`W₂` = 素体直線 `𝔽_p` の像) + `cyclotomic_coprime` = condition (A) = 「`(p^q−1)/(p−1)` は `p−1` と互いに素」 / **(b)** `Q` の可換性・`p'` 性と `primeLine_normalizes_Q` (`W₂` が `Q` を正規化) ほか。書籍の「(a)(b) は BG App.C Theorem C により `p ≤ q` を導き (14.1) に矛盾」は `BG.AppC.theoremC` + `S16.nonexistence_of_G` + `BG.AppC.final_contradiction` の連鎖で、`feitThompson` まで axiom-clean |
+
+⬜ **残り: (14.3)-(14.16) + (14.11.1)-(14.11.4) の逐条突合** (次セッション)。
+番号 → 主な repo ファイル (grep 実測): (14.3)-(14.7) `S16_NonExistenceG/{SubgroupL,TSideTypeP,BetaVanishing}`,
+`S15_SAndT` / (14.8) `S16_NonExistenceG/KeyInequalityArithmetic` / (14.9) `S15_SAndTGrid`,
+`Isaacs/Ch06_FrobeniusActions/FrobeniusGroupQuotient` / (14.10)(14.11) `S16_NonExistenceG/SubgroupMCore`,
+`S15_ComplementStructure` / (14.11.1)-(14.11.4) `S16_NonExistenceG/{BetaVanishing,CoherentEtaOrthogonality,KeyInequality}`,
+`S16_G0Coprime` / (14.12)(14.13) `S16_NonExistenceG/ComparingLM`, `S16_PairingCoherence` /
+(14.14) `S15_BridgeCharacterBasic` / (14.15)(14.16) `S16_CoreLemmas`。
+
 ## 4. 未着手の census
 
 - **Part II (Suzuki の定理 A、書籍 pp.97-134)** — `Proposition N` / `Lemma N` の**章内リセット
