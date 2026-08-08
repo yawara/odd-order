@@ -24,7 +24,8 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.Subdegrees
   **8B.6 前半**: 長さ 2 の軌道なら `|G_α| = 2`。
 - `odd_card_of_card_stabilizer_eq_two`, `exists_regular_normal_of_card_stabilizer_eq_two`,
   `prime_card_of_card_stabilizer_eq_two` — **8B.6 の次数部分**: `|Ω|` は奇素数。
-  ⚠ `G ≅ D₂ₚ` の同型そのものは未形式化。
+  `G ≅ D₂ₚ` の同型そのものは `Problems8B/DihedralStructure.lean` の
+  `nonempty_mulEquiv_dihedralGroup_of_card_stabilizer_eq_two` が与える。
 - `oddCore`, `isPGroup_two_of_oddCore_eq_bot`, `smul_eq_self_of_odd_of_ncard_le_two`,
   `stabilizer_le_normalizer_oddCore`,
   `card_stabilizer_eq_three_mul_two_pow_of_suborbit_ncard_eq_three` —

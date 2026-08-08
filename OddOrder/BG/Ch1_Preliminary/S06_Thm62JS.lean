@@ -77,7 +77,14 @@ variable {G : Type u} [Group G]
 `Z(J(S̄)) = mk(Z(J(S)))` (`map_centralizer_inf`). `hZJ` で `Z(J(S̄)) ⊴ Ḡ`, その `mk⁻¹` が
 `Z(J(S))·O_{p'} = mk⁻¹(Z(J(S̄)))` (`comap` が正規性を保つ).
 
-`hZJ` は Glauberman の `Z(J)`-定理そのもの (Isaacs FGT が省く未形式化前提; ファイル冒頭 docstring 参照). -/
+`hZJ` は Glauberman の `Z(J)`-定理そのもの (Isaacs FGT が省く前提).
+⚠ **ここでの `J` は初等可換版 `thompsonJ _ p`** (Isaacs Ch.7) であって, **書籍 6.2 の `J(S)` ではない**
+— BG は証明を **G** Thm 8.2.11 に投げており, Gorenstein の `J(P) = ⟨A(P)⟩` は「位数最大の**可換**
+部分群」で生成される (**G** p. 271; 初等可換版は同 p. 272 が "another slightly different definition"
+として別物と明記). よって書籍 6.2 に対応するのは `thompsonJAbelian` 版で,
+そちらは `zCenterThompsonJAbelian_sup_oPiCore_normal` (本ファイル, 2026-07-21) が
+`GroupTheory/GlaubermanZJ.lean` の `inf_zCenter_thompsonJAbelian_normal` を使って**無条件で**
+証明済. 本定理は初等可換版の条件付きミラーであり, 書籍 6.2 の未形式化を意味しない. -/
 theorem zCenterThompsonJ_sup_oPiCore_normal_of_reduced [Finite G] {p : ℕ} [Fact p.Prime]
     (_hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd : Odd (Nat.card G)) (S : Sylow p G)
     (hZJ : ∀ (H : Type u) [Group H] [Finite H], IsSolvable H → Odd (Nat.card H) →

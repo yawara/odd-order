@@ -12,8 +12,10 @@ import Mathlib.Tactic.NormNum.Prime
 **Problem 8C.6**: 可換群 `A` について `Aut(A)` が単純 ⟺ `|A| = 3` または `A` が位数 8
 以上の初等可換 2-群。
 
-本 leaf は「⟸」の片方 (`|A| = 3`) を扱う。もう片方 (初等可換 2-群 ⟹
-`Aut(A) ≅ GL(n, 2)` が単純) と「⟹」は未形式化。
+本 leaf は「⟸」の片方 (`|A| = 3`) を扱う。残り (初等可換 2-群の側と「⟹」) は
+`Problems8C/AbelianAutSimple.lean` の `isSimpleGroup_mulAut_iff` が双方向で運んでいる
+(そこで書籍の分類が訂正され, 正しくは「位数 `3`, `4`, `6` の巡回群, または位数 `8` 以上の
+初等可換 `2`-群」— 書籍は `ℤ/4` と `ℤ/6` を落としている)。
 
 ## Main results
 
