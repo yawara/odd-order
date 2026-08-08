@@ -323,4 +323,56 @@ theorem aeval_ne_zero_of_degree_lt [Fact p.Prime] (hq : q.Prime) {b : GaloisFiel
     natDegree_minpoly_eq p q hq hb] at hle
   exact absurd (hle.trans_lt hdeg) (lt_irrefl _)
 
+/-- The `𝔽_p`-linear map `f ↦ b · f(b)` on polynomials of degree `< r`.  Its range is the
+direction of the affine space `A_r = 1 + b𝔽_p + ⋯ + b^r 𝔽_p` of the paper's Step 2. -/
+noncomputable def towerMap [Fact p.Prime] (b : GaloisField p q) (r : ℕ) :
+    degreeLT (ZMod p) r →ₗ[ZMod p] GaloisField p q where
+  toFun f := b * (aeval b) (f : (ZMod p)[X])
+  map_add' f g := by
+    simp only [Submodule.coe_add, map_add]
+    ring
+  map_smul' c f := by
+    simp only [SetLike.val_smul, map_smul, RingHom.id_apply]
+    exact (mul_smul_comm c b ((aeval b) (f : (ZMod p)[X]))).symm ▸ rfl
+
+@[simp] theorem towerMap_apply [Fact p.Prime] (b : GaloisField p q) (r : ℕ)
+    (f : degreeLT (ZMod p) r) :
+    towerMap p q b r f = b * (aeval b) (f : (ZMod p)[X]) := rfl
+
+/-- The direction of `A_r`: the `𝔽_p`-span of `b, b², …, b^r`, presented as the range of
+`towerMap`. -/
+noncomputable def towerSubmodule [Fact p.Prime] (b : GaloisField p q) (r : ℕ) :
+    Submodule (ZMod p) (GaloisField p q) :=
+  LinearMap.range (towerMap p q b r)
+
+/-- For `r ≤ q` the map `f ↦ b · f(b)` is injective on polynomials of degree `< r`: a nonzero
+such polynomial cannot vanish at `b`, which has degree `q`. -/
+theorem towerMap_injective [Fact p.Prime] (hq : q.Prime) {b : GaloisField p q}
+    (hb : b ∉ Set.range (algebraMap (ZMod p) (GaloisField p q))) {r : ℕ} (hr : r ≤ q) :
+    Function.Injective (towerMap p q b r) := by
+  have hb0 : b ≠ 0 := by
+    intro h
+    exact hb ⟨0, by rw [map_zero, h]⟩
+  rw [← LinearMap.ker_eq_bot, Submodule.eq_bot_iff]
+  intro f hf
+  rw [LinearMap.mem_ker, towerMap_apply] at hf
+  have haev : (aeval b) (f : (ZMod p)[X]) = 0 := by
+    rcases mul_eq_zero.mp hf with h | h
+    · exact absurd h hb0
+    · exact h
+  have hdeg : ((f : (ZMod p)[X])).degree < (q : ℕ) :=
+    lt_of_lt_of_le (mem_degreeLT.mp f.2) (by exact_mod_cast Nat.cast_le.mpr hr)
+  exact Subtype.ext (aeval_ne_zero_of_degree_lt p q hq hb hdeg haev)
+
+/-- **Glauberman–Norton, Proposition 7, Step 2** (p. 1092): `|A_r| = p^r` for `r ≤ q`.
+
+The affine space `A_r` is a coset of `towerSubmodule`, whose cardinality is computed here. -/
+theorem card_towerSubmodule [Fact p.Prime] (hq : q.Prime) {b : GaloisField p q}
+    (hb : b ∉ Set.range (algebraMap (ZMod p) (GaloisField p q))) {r : ℕ} (hr : r ≤ q) :
+    Nat.card ↥(towerSubmodule p q b r) = p ^ r := by
+  have hequiv : ↥(towerSubmodule p q b r) ≃ degreeLT (ZMod p) r :=
+    (LinearEquiv.ofInjective (towerMap p q b r) (towerMap_injective p q hq hb hr)).symm.toEquiv
+  rw [Nat.card_congr hequiv, Nat.card_congr (degreeLTEquiv (ZMod p) r).toEquiv,
+    Nat.card_fun, Nat.card_zmod, Nat.card_eq_fintype_card, Fintype.card_fin]
+
 end OddOrder.BG.AppC.NormSet
