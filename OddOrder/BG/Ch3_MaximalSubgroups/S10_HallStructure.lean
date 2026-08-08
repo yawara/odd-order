@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructureCore
+import OddOrder.Isaacs.Ch03_SplitExtensions.HallNilpotent
+import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.PiParts
 
 /-!
 # BG §10: Theorem 10.2 後半 — `M_σ`/`M_α` の Hall 同定と `M_σ ≠ ⊥`
@@ -952,9 +954,15 @@ theorem Msigma_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
   · exact Msigma_ne_bot_of_Malpha_eq_bot_of_isHall hG hM (Malpha_isHall hG hM) hα
   · exact Msigma_ne_bot_of_Malpha_ne_bot hG hM hα
 
-/-- **BG Theorem 10.2** (mmd L2713): `M ∈ ℳ` のとき `M_σ`, `M_α` は `M` および `G` の Hall 部分群で、
-`M_α ⊆ M_σ ⊆ M'`、`M_σ ≠ 1`。(原典はさらに `r(M/M_α) ≤ 2` と `M'/M_α` nilpotent を含む —
-quotient 型の `Normal` instance 整備後に追加予定。) -/
+/-- **BG Theorem 10.2 の (a)(b)(c)(e)** (mmd L2713): `M ∈ ℳ` のとき `M_σ`, `M_α` は Hall 部分群で、
+`M_α ⊆ M_σ ⊆ M'`、`M_σ ≠ 1`。
+
+⚠ 原典の **(d)** (`r(M/M_α) ≤ 2` と `M'/M_α` nilpotent) は**この束にだけ入っていない**。
+(d) 自体は形式化済で、`rank_quotient_Malpha_le_two_of_isHall` と
+`derived_quotient_Malpha_le_fitting` (+ `rank_fitting_quotient_Malpha_le_two`) が与える。
+書籍の 5 条項すべてを 1 statement にした形は `bgThm102` (本ファイル末尾)。
+(以前ここには「quotient 型の `Normal` instance 整備後に追加予定」と書かれていたが stale
+だった — issue 0177 §10 監査, 2026-08-08。) -/
 theorem isHall_Msigma_Malpha [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
     Ch03.IsHallSubgroup (sigma M) (Msigma M) ∧
@@ -964,6 +972,44 @@ theorem isHall_Msigma_Malpha [Finite G] (hG : IsMinimalSimpleOdd G)
   exact ⟨Msigma_isHall hG hM, Malpha_isHall hG hM, Malpha_le_Msigma hG hM,
     Msigma_le_derived hG hM, Msigma_ne_bot hG hM⟩
 
+/-! ### The book statement -/
+
+/-- **BG Theorem 10.2** (Bender–Glauberman, LMS LNS 188, p. 72), the book's packaging.
+Let `M ∈ ℳ`.  Then
+
+* **(a)** `M_α` is a Hall `α(M)`-subgroup of `M` and of `G`;
+* **(b)** `M_σ` is a Hall `σ(M)`-subgroup of `M` and of `G`;
+* **(c)** `M_α ⊆ M_σ ⊆ M'`;
+* **(d)** `r(M/M_α) ≤ 2` and `M'/M_α` is nilpotent;
+* **(e)** `M_σ ≠ 1`.
+
+`isHall_Msigma_Malpha` above carries (a)(b)(c)(e) but **not (d)**; the (d) pieces
+(`rank_quotient_Malpha_le_two_of_isHall`, `derived_quotient_Malpha_le_fitting`) live separately.
+This bundles all five in the book's order.
+
+The "of `M`" halves of (a)/(b) come from the "of `G`" halves by
+`Ch03.isHallSubgroup_subgroupOf_of_le` (the relative index divides the ambient one).
+`M'/M_α` is rendered as `commutator (M ⧸ M_α)` — equal to `M'M_α/M_α = M'/M_α` because
+`M_α ⊆ M'` by (c) — and its nilpotency is read off from `(M/M_α)' ≤ F(M/M_α)`. -/
+theorem bgThm102 [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    (Ch03.IsHallSubgroup (alpha M) (Malpha M) ∧
+      Ch03.IsHallSubgroup (alpha M) ((Malpha M).subgroupOf M)) ∧
+    (Ch03.IsHallSubgroup (sigma M) (Msigma M) ∧
+      Ch03.IsHallSubgroup (sigma M) ((Msigma M).subgroupOf M)) ∧
+    (Malpha M ≤ Msigma M ∧ Msigma M ≤ derivedInG M) ∧
+    (rank (↥M ⧸ (Malpha M).subgroupOf M) ≤ 2 ∧
+      Group.IsNilpotent ↥(commutator (↥M ⧸ (Malpha M).subgroupOf M))) ∧
+    Msigma M ≠ ⊥ := by
+  have hHallα : Ch03.IsHallSubgroup (alpha M) (Malpha M) := Malpha_isHall hG hM
+  have hHallσ : Ch03.IsHallSubgroup (sigma M) (Msigma M) := Msigma_isHall hG hM
+  refine ⟨⟨hHallα, Ch03.isHallSubgroup_subgroupOf_of_le hHallα (Malpha_le M)⟩,
+    ⟨hHallσ, Ch03.isHallSubgroup_subgroupOf_of_le hHallσ (Msigma_le M)⟩,
+    ⟨Malpha_le_Msigma hG hM, Msigma_le_derived hG hM⟩,
+    ⟨rank_quotient_Malpha_le_two_of_isHall hHallα, ?_⟩,
+    Msigma_ne_bot hG hM⟩
+  -- (d), nilpotency half: `(M/M_α)' ≤ F(M/M_α)` and the Fitting subgroup is nilpotent.
+  exact Ch03.isNilpotent_of_le inferInstance (derived_quotient_Malpha_le_fitting hG hM)
 
 end OddOrder.BG.Ch3.S10
 

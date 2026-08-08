@@ -628,7 +628,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 20700
+set_option linter.style.longFile 20800
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -7158,6 +7158,12 @@ Cor 12.16 依存は完全に unconditional 化** (もはや sorry に bottom-out
 -- impossible. GAP 3 (coprime quotient cover → `R` of order `r` → Theorem 13.4 conjugated to the
 -- Hall complement `E` → nilpotent `M*'/M*_α` collapse) is fully unconditional and axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S13.forbidden_config_impossible
+
+-- BG Theorem 10.2, BOOK packaging (issue 0177 §10 監査): `M ∈ ℳ` に対し
+-- (a) `M_α` は `M` と `G` の Hall `α(M)`-部分群, (b) `M_σ` は `M` と `G` の Hall `σ(M)`-部分群,
+-- (c) `M_α ⊆ M_σ ⊆ M'`, (d) `r(M/M_α) ≤ 2` かつ `M'/M_α` nilpotent, (e) `M_σ ≠ 1`。
+-- 既存の `isHall_Msigma_Malpha` は **(d) を欠いていた** ((d) 自体は形式化済で別宣言に在った)。
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S10.bgThm102
 
 -- BG §10 (β-radical spine): Theorem 10.6 (every proper subgroup has `p`-length one).
 -- Originally wired against two forward axioms of `S10_ForwardFromKeystone`
