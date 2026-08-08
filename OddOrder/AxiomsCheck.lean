@@ -6345,6 +6345,13 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.omega1UpperCentralTwo_not_isCyclic_and_card_prime_sq_le_of_not_isCyclic
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.exists_normal_isElementaryAbelian_card_prime_sq_le_of_normal_not_isCyclic
 
+-- BG Theorem 4.12 (Huppert), the BOOK packaging (issue 0177 §4 audit): for a coprime operator
+-- action of `A` on a metacyclic `p`-group `R` (`p` odd), with `T = ⁅R,A⁆` and `C = C_R(A)` —
+-- (a) `T` abelian (the general form, not just the `T = R` case), (b) `R = T·C` and `T ⊓ C = 1`,
+-- (c) `R` nonabelian + `A` nontrivial ⟹ `T`, `C` nonidentity cyclic and `R' ⊆ T`.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S04b.isMulCommutative_actionCommutator
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S04b.bgThm412
+
 -- BG Proposition 4.4(b) (Gorenstein 7.6.5): for `A ∈ SCN(R)` with `R` a Sylow `p`-subgroup of a
 -- finite `G`, the centralizer `C_G(A)` is the internal direct product `A × H` of `A` with a
 -- `p'`-subgroup `H`.

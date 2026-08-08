@@ -527,4 +527,90 @@ theorem actionCommutator_isCyclic_and_fixedPoints_isCyclic_and_commutator_le
     obtain ⟨b, rfl⟩ := hsurj y
     rw [← map_mul, ← map_mul, mul_comm a b]
 
+/-! ### The book statement -/
+
+/-- **BG Theorem 4.12(a)** (Huppert), the book's *general* form: for a coprime operator action of
+`A` on a metacyclic `p`-group `R` (`p` odd), the commutator `[R, A]` is **abelian**.
+
+BG states (a) with no side condition;
+`isMulCommutative_of_metacyclic_actionCommutator_eq_top` above is only the special case
+`[R, A] = R`.  The general form follows by applying that special case to the subgroup
+`T = [R, A]`, whose restricted action satisfies `[T, A] = T` (Proposition 1.6(b),
+`actionCommutator_restrict_self_eq_top`) — exactly the reduction BG's own proof performs, and the
+one already carried out inside `actionCommutator_inf_fixedPoints_eq_bot`. -/
+theorem isMulCommutative_actionCommutator
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime] (hp_odd : Odd p)
+    (hR : IsPGroup p R) (hmeta : OddOrder.GroupTheory.IsMetacyclic R)
+    {A : Type*} [Group A] [Finite A] {φ : A →* MulAut R}
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card R)) :
+    IsMulCommutative ↥(OddOrder.Isaacs.Ch04.actionCommutator φ) := by
+  haveI : Group.IsNilpotent R := hR.isNilpotent
+  set T : Subgroup R := OddOrder.Isaacs.Ch04.actionCommutator φ with hT_def
+  set ψT : A →* MulAut ↥T := (IsAInvariant.actionCommutator φ).toMulAutHom with hψT_def
+  have hψT_top : OddOrder.Isaacs.Ch04.actionCommutator ψT = ⊤ :=
+    actionCommutator_restrict_self_eq_top hcop (Or.inr inferInstance)
+  have hT_meta : IsMetacyclic ↥T := hmeta.subgroup
+  have hT_pg : IsPGroup p ↥T := hR.to_subgroup T
+  have hcopT : Nat.Coprime (Nat.card A) (Nat.card ↥T) :=
+    Nat.Coprime.coprime_dvd_right (Subgroup.card_subgroup_dvd_card T) hcop
+  exact isMulCommutative_of_metacyclic_actionCommutator_eq_top hp_odd hT_pg hT_meta hcopT hψT_top
+
+/-- **BG Theorem 4.12** (Huppert; Bender–Glauberman, LMS LNS 188, p. 39), the book's packaging.
+
+Let `p` be an odd prime, `R` a metacyclic `p`-group, and `A` a `p'`-group of operators on `R`
+(a coprime action `φ : A →* MulAut R`).  Writing `T = [R, A]` and `C = C_R(A)`:
+
+* **(a)** `T` is abelian;
+* **(b)** `R = T · C` and `T ∩ C = 1`;
+* **(c)** if `R` is not abelian and `A` does not act trivially on `R`, then `T` and `C` are
+  nonidentity cyclic groups and `R' ⊆ T`.
+
+The (b) product decomposition is Proposition 1.6(a)
+(`fixedPoints_sup_actionCommutator_eq_top`); the intersection is
+`actionCommutator_inf_fixedPoints_eq_bot`.  For (c), BG's standing assumption `1 ⊊ T ⊊ R` is
+recovered from "`R` not abelian": were `T = R`, part (a) would make `R` abelian.  The
+`T ≠ ⊥ / T ≠ ⊤`-parametrised form `actionCommutator_isCyclic_and_fixedPoints_isCyclic_and_…`
+above is *more general* than this clause (it does not need `R` nonabelian), and `C ≠ ⊥` is
+recovered here from `R = T ⊔ C` with `T ≠ ⊤`. -/
+theorem bgThm412
+    {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime] (hp_odd : Odd p)
+    (hR : IsPGroup p R) (hmeta : OddOrder.GroupTheory.IsMetacyclic R)
+    {A : Type*} [Group A] [Finite A] {φ : A →* MulAut R}
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card R)) :
+    IsMulCommutative ↥(OddOrder.Isaacs.Ch04.actionCommutator φ) ∧
+    (OddOrder.Isaacs.Ch04.actionCommutator φ ⊔ Subgroup.fixedPointsOfMulAut φ = ⊤ ∧
+      OddOrder.Isaacs.Ch04.actionCommutator φ ⊓ Subgroup.fixedPointsOfMulAut φ = ⊥) ∧
+    (¬ IsMulCommutative R → OddOrder.Isaacs.Ch04.actionCommutator φ ≠ ⊥ →
+      Subgroup.fixedPointsOfMulAut φ ≠ ⊥ ∧
+      IsCyclic ↥(OddOrder.Isaacs.Ch04.actionCommutator φ) ∧
+      IsCyclic ↥(Subgroup.fixedPointsOfMulAut φ) ∧
+      commutator R ≤ OddOrder.Isaacs.Ch04.actionCommutator φ) := by
+  haveI : Group.IsNilpotent R := hR.isNilpotent
+  set T : Subgroup R := OddOrder.Isaacs.Ch04.actionCommutator φ with hT_def
+  set C : Subgroup R := Subgroup.fixedPointsOfMulAut φ with hC_def
+  -- (a).
+  have ha : IsMulCommutative ↥T := isMulCommutative_actionCommutator hp_odd hR hmeta hcop
+  -- (b): `C ⊔ T = ⊤` (Prop 1.6(a)) and `T ⊓ C = ⊥`.
+  have hsup : C ⊔ T = ⊤ :=
+    OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top hcop (Or.inr inferInstance)
+  have hinf : T ⊓ C = ⊥ := actionCommutator_inf_fixedPoints_eq_bot hp_odd hR hmeta hcop
+  refine ⟨ha, ⟨by rw [sup_comm]; exact hsup, hinf⟩, ?_⟩
+  -- (c).
+  intro hRnab hT_ne_bot
+  -- `T ≠ ⊤`: otherwise (a) makes `R` abelian.
+  have hT_ne_top : T ≠ ⊤ := by
+    intro hTtop
+    refine hRnab ⟨⟨fun a b => ?_⟩⟩
+    rw [hTtop] at ha
+    exact congrArg Subtype.val
+      (ha.is_comm.comm ⟨a, Subgroup.mem_top a⟩ ⟨b, Subgroup.mem_top b⟩)
+  -- `C ≠ ⊥`: otherwise `C ⊔ T = T = ⊤`.
+  have hC_ne_bot : C ≠ ⊥ := by
+    intro hCbot
+    exact hT_ne_top (by rw [← hsup, hCbot, bot_sup_eq])
+  obtain ⟨hTcyc, hCcyc, hcomm⟩ :=
+    actionCommutator_isCyclic_and_fixedPoints_isCyclic_and_commutator_le
+      hp_odd hR hmeta hcop hT_ne_bot hT_ne_top
+  exact ⟨hC_ne_bot, hTcyc, hCcyc, hcomm⟩
+
 end OddOrder.BG.Ch1.S04b

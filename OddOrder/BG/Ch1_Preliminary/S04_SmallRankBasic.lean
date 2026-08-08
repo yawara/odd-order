@@ -138,13 +138,18 @@ theorem exists_distinct_subgroups_card_prime_of_not_isCyclic (hR : IsPGroup p R)
   simp only [not_exists, not_and, ne_eq, not_not] at h
   exact hnc (huniq fun K L hK hL => h K L hK hL)
 
-/-- **BG Lemma 4.5(a)** (existence half, normality deferred). An odd noncyclic
+/-- **BG Lemma 4.5(a)**, existence half only (no normality). An odd noncyclic
 `p`-group `R` contains an elementary abelian subgroup of order `p²`.
 
 Proof: by `exists_distinct_subgroups_card_prime_of_not_isCyclic` there are two
 distinct order-`p` subgroups; `ElementaryAbelian.lean`'s
 `exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_ne` builds an
-`E_{p²}` from them. -/
+`E_{p²}` from them.
+
+⚠ This is *not* the frontier: the **full** Lemma 4.5(a) — with the book's `normal`
+conclusion and no side hypothesis — is
+`exists_normal_isElementaryAbelian_card_prime_sq_of_not_isCyclic` **later in this file**.
+This weaker form is kept because several callers only need a (non-normal) `E_{p²}`. -/
 theorem exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic (hR : IsPGroup p R)
     (hp_odd : Odd p) (hnc : ¬ IsCyclic R) :
     ∃ E : Subgroup R, E.IsElementaryAbelian p ∧ Nat.card E = p ^ 2 := by
@@ -179,8 +184,10 @@ Proof: `Ω₁(Z(R))` is central, hence its `p²`-order subgroup `B` (obtained fr
 `p`-group of order `≥ p²`) is central in `R`, therefore normal; and `B`, being a
 subgroup of the elementary abelian group `Ω₁(Z(R))`, is itself elementary abelian.
 
-This is the case of Lemma 4.5(a) that the repo proves cleanly. The general (cyclic
-center, e.g. extraspecial) case is Gorenstein 5.4.10 and is deferred. -/
+This is the abelian-center special case, kept because its proof is a two-line central
+argument.  ⚠ The **general** case (cyclic center, e.g. extraspecial; Gorenstein 5.4.10)
+is *not* deferred — it is `exists_normal_isElementaryAbelian_card_prime_sq_of_not_isCyclic`
+later in this file, proved unconditionally. -/
 theorem exists_normal_isElementaryAbelian_card_prime_sq_of_prime_sq_dvd_card_omega1Center
     (hsq : p ^ 2 ∣ Nat.card (omega1Center R p)) :
     ∃ E : Subgroup R, E.Normal ∧ E.IsElementaryAbelian p ∧ Nat.card E = p ^ 2 := by
