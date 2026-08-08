@@ -1109,4 +1109,84 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       exact kappa_subset_tau1_union_tau3 (hK.1 q (by
         rwa [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv] at hq))
 
+/-- **BG Proposition 14.2(g), the `M_σ`-nilpotency clause** (mmd L3850; issue 0178).
+For a **type-`P₂`** maximal subgroup `M` (i.e. `κ(M) ⊊ π(M) ∖ σ(M)`, equivalently `U ≠ 1`),
+the `σ`-radical `M_σ` is **nilpotent**.
+
+This is the one conjunct of BG Proposition 14.2(g) that `typeP_structure` does not carry
+(it has `σ(M) = β(M)`, `|K|` prime, and the `TI` property).  BG's proof: with `U ≠ 1`, `E` is a
+Frobenius group with kernel `U`, and **Lemma 14.1** gives both `C_{M_σ}(U) = 1` and `M_σ`
+nilpotent (mmd L3852-3853).
+
+Proof here, following BG's own case split:
+
+* **`κ(M) ∩ τ₃(M) ≠ ∅`** — then `E₃ ≠ 1` acts non-regularly on `M_σ`, so Corollary 13.11 makes
+  `E` prime on `M_σ` and every prime of `|E|` lies in `κ(M)`; hence
+  `κ(M) = π(M) ∖ σ(M)` (`kappa_eq_sigmaComplementPrimes_of_isPiGroup_card_E`), i.e. `M` is
+  type `P₁` — contradicting `IsTypeP2 M`.  So this case cannot occur.
+* **`κ(M) ⊆ τ₁(M)`** — conjugate the §12 `E`-setup by `w` so that its `E₁` is `K`
+  (both are Hall `κ(M)`-subgroups of the solvable `M`).  Then `IsTypeP2 M` forces
+  `U = E₂E₃ ≠ 1` (`E23_ne_bot_of_isTypeP2_caseTau1`), and
+  `Msigma_centralizer_E23_eq_bot_of_caseTau1` — which is exactly Lemma 14.1 applied to a prime
+  of `|U|` — returns `C_{M_σ}(U) = 1` **and** `M_σ` nilpotent.
+
+Closes the `(g)` half of issue 0178; the `(a)`-half (regular action on `U`) remains open. -/
+theorem typeP2_Msigma_isNilpotent [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP2 : IsTypeP2 M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M)) :
+    Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) := by
+  classical
+  have hP : IsTypeP M := hP2.1
+  -- `K` is a `σ(M)'`-subgroup (a Hall `κ(M)`-subgroup, and `κ(M) ⊆ σ(M)'`).
+  have hK_pi : Subgroup.IsPiSubgroup ((OddOrder.BG.Ch3.S10.sigma M)ᶜ) K := by
+    intro p hp
+    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv] at hp
+    exact kappa_subset_sigmaCompl (hK.1 p hp)
+  obtain ⟨E, E₁, E₂, E₃, hsetup, hKE, hE_pi⟩ :=
+    OddOrder.BG.Ch3.S12.exists_subgroupESetup_with_le hG hM hKM hK_pi
+  by_cases hτ3 : (kappa M ∩ tau3 M).Nonempty
+  · -- `κ(M) ∩ τ₃(M) ≠ ∅` forces `M` to be type `P₁`, contradicting `IsTypeP2 M`.
+    exfalso
+    obtain ⟨p, hpmem⟩ := hτ3
+    rw [Set.mem_inter_iff] at hpmem
+    obtain ⟨hpκ, hpτ3⟩ := hpmem
+    have hp : p.Prime := Nat.prime_of_mem_primeFactors ((mem_tau3_iff M p).mp hpτ3).2.1
+    obtain ⟨hE3ne, hreg⟩ := E3_not_regular_of_mem_kappa_tau3 hG hsetup hp hpκ hpτ3
+    obtain ⟨hE1ne, hEeq, hEprime, hEnorm⟩ := E3_not_regular_consequences hG hsetup hE3ne hreg
+    obtain ⟨x, hxE3, hxne, hxC⟩ : ∃ x ∈ E₃, x ≠ 1 ∧
+        OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
+      by_contra hcon
+      push Not at hcon
+      exact hreg fun y hy hy1 => hcon y hy hy1
+    exact hP2.2 (kappa_eq_sigmaComplementPrimes_of_isPiGroup_card_E hG hsetup
+      (fun q hq => mem_kappa_of_mem_primeFactors_card_E hG hsetup hEprime hxE3 hxne hxC hq))
+  · -- `κ(M) ⊆ τ₁(M)`: conjugate the setup so its `E₁` is `K`, then apply Lemma 14.1 to `U`.
+    haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hsetup.mem_maximal
+    have hκτ1 : ∀ p ∈ kappa M, p ∈ tau1 M := fun p hpκ =>
+      (kappa_subset_tau1_union_tau3 hpκ).resolve_right
+        (fun hpτ3 => hτ3 ⟨p, Set.mem_inter hpκ hpτ3⟩)
+    obtain ⟨p₀, hp₀κ⟩ := hP
+    obtain ⟨hE1ne, hE1nonreg⟩ := E1_not_regular_of_mem_kappa_tau1 hG hsetup
+      (prime_of_mem_kappa hp₀κ) hp₀κ (hκτ1 p₀ hp₀κ)
+    have hE1prime : ActsPrimeOn (OddOrder.BG.Ch3.S10.Msigma M) E₁ := E1_actsPrime hG hsetup hE1ne
+    have hCE1 : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (E₁ : Set G) ≠ ⊥ :=
+      Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular hE1prime (le_refl E₁) hE1nonreg
+    have hE1HallκE : Ch03.IsHallSubgroup (kappa M) (E₁.subgroupOf E) :=
+      ⟨fun p hp => mem_kappa_of_mem_primeFactors_card_E1 hG hsetup hE1prime hCE1
+          (by rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E₁_le).toEquiv] at hp),
+        fun p hp hpκ => hsetup.E₁_hall.2 p hp (hκτ1 p hpκ)⟩
+    have hE1Hallκ : Ch03.IsHallSubgroup (kappa M) (E₁.subgroupOf M) :=
+      hallPiece_isHall_in_M hG hsetup hsetup.E₁_le hE1HallκE kappa_subset_sigmaCompl
+    obtain ⟨w, hwM, hw⟩ := OddOrder.BG.Ch1.S06.exists_conj_eq_of_isHall_subgroupOf hMsolv
+      (hsetup.E₁_le.trans hsetup.E_le) hKM hE1Hallκ hK
+    have h' := SubgroupESetup.conj' hsetup hwM
+    rw [hw] at h'
+    obtain ⟨hKne, hKnonreg⟩ := E1_not_regular_of_mem_kappa_tau1 hG h'
+      (prime_of_mem_kappa hp₀κ) hp₀κ (hκτ1 p₀ hp₀κ)
+    have hKprime : ActsPrimeOn (OddOrder.BG.Ch3.S10.Msigma M) K := E1_actsPrime hG h' hKne
+    have hKstar_ne : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) ≠ ⊥ :=
+      Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular hKprime (le_refl K) hKnonreg
+    have hUne := E23_ne_bot_of_isTypeP2_caseTau1 hG h' hKprime hKstar_ne hτ3 hP2
+    exact (Msigma_centralizer_E23_eq_bot_of_caseTau1 hG h' hτ3 hUne).2
+
 end OddOrder.BG.Ch4.S14

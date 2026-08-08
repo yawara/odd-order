@@ -36,11 +36,31 @@ created: 2026-08-08
 > nilpotent TI-subgroup of `G`**.
 
 * `σ(M) = β(M)` ✅ / `|K|` prime ✅ / `M_σ` が TI ✅ — いずれも `typeP_structure` に在る
-* **`M_σ` が nilpotent** だけが無い
-* ⚠ **下流 `AppE_CorollaryE5.lean` / `AppE_E5Counting.lean` は
-  `Group.IsNilpotent ↥(Msigma M)` を仮説 `hMσnil` として取っている** —
-  CLAUDE.md が警告する「hard content を未充足の仮説に hoist する」形になっている
-  ([[scaffold-sorry-free-not-done]])。⟹ **これを閉じると下流の仮説が実証明に置換できる**。
+* **`M_σ` が nilpotent** だけが無かった
+
+### ✅ (g) は 2026-08-08 に解決 — `S14.typeP2_Msigma_isNilpotent`
+
+書籍の証明どおり: `U ≠ 1` ⟹ `E` は kernel `U` の Frobenius 群 ⟹ **Lemma 14.1** が
+`C_{M_σ}(U) = 1` と `M_σ` 冪零の両方を与える。repo には部品がすべて在った:
+
+* `E23_ne_bot_of_isTypeP2_caseTau1` — type-`P₂` ⟹ `U = E₂E₃ ≠ ⊥`
+* `Msigma_centralizer_E23_eq_bot_of_caseTau1` — `U ≠ ⊥` ⟹ `C_{M_σ}(U) = 1` **かつ `M_σ` 冪零**
+  (Lemma 14.1 を `|U|` の素数に適用したもの)
+* `κ ∩ τ₃ ≠ ∅` のケースは `kappa_eq_sigmaComplementPrimes_of_isPiGroup_card_E` で
+  type `P₁` を強制し `IsTypeP2` と矛盾 ⟹ 起こりえない
+
+⟹ 欠けていたのは**この 3 つを繋ぐ endpoint だけ**だった。AxiomsCheck 登録済・axiom-clean。
+
+### 🚨 起票時の見込み違いを訂正 (2026-08-08)
+
+起票時に「下流 `AppE_CorollaryE5` / `AppE_E5Counting` の仮説 `hMσnil` を実証明に置換できる」
+と書いたが、**これは誤り**。AppE の `hMσnil` は **Corollary 15.9 の状況** ——
+15.9(a) が `M ∈ 𝓜_F`、15.9(b) が「`M` は Frobenius 群」を与えるので `M_σ` は
+**Frobenius kernel として冪零** —— から来ており、type-`P₂` 経路とは別物。
+(15.9 では `N` の側が `𝓜_{𝒫₂}`。) ⟹ **AppE は unblock されない**。
+
+⚠ 教訓: 「仮説 `h` が下流に在る」ことを grep で見つけても、**その `h` がどの定理から来る
+はずかを書籍で確認する**まで「閉じれば置換できる」と書かない。
 
 ## 確認の手順 (再現可能)
 
@@ -62,10 +82,8 @@ repo は既に `exists_subgroupESetup_with_le` を持っている (`typeP_struct
 
 ## 作業単位
 
-1. **(g) の `M_σ` nilpotent を先に** — 下流 (AppE) の仮説を実証明に置換できるので価値が明確。
-   Thm 12.5(a) (`Msigma_nilpotent_of_tau2`) が `τ₂(M) ≠ ∅` の場合の `M_σ` 冪零を既に与えている
-   ので、type-`P₂` の場合にそれが使えるか (あるいは `σ = β` 経由の別ルートか) を先に確認する。
-2. **(a) 後半** — `U` の abelian 性 + `K` の regular 作用 + `U M_σ` が normal complement。
+1. ~~**(g) の `M_σ` nilpotent**~~ ✅ **2026-08-08 完了** (`S14.typeP2_Msigma_isNilpotent`)。
+2. ⬜ **(a) 後半** — `U` の abelian 性 + `K` の regular 作用 + `U M_σ` が normal complement。
 
 ## 参照
 

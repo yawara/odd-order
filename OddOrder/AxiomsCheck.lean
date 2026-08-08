@@ -8082,6 +8082,15 @@ Corollary 13.11) and `κ ⊆ τ₁` (`K = E₁`, the Frobenius core via Theorem 
 + Lemma 12.19) are discharged.  Sorry-free and axiom-clean — the §14 funnel keystone. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_structure
+-- BG Proposition 14.2(g), the `M_σ`-nilpotency clause (issue 0178, 2026-08-08): for a type-`P₂`
+-- maximal subgroup `M` (`U ≠ 1`), `M_σ` is nilpotent.  `typeP_structure` carries the other three
+-- conjuncts of (g) (`σ = β`, `|K|` prime, TI) but not this one.  BG's route: `U ≠ 1` ⟹ `E` is
+-- Frobenius with kernel `U` ⟹ Lemma 14.1 gives `C_{M_σ}(U) = 1` and `M_σ` nilpotent.  The
+-- `κ ∩ τ₃ ≠ ∅` case cannot occur (it forces type `P₁`).  Consumed by BG Theorem C(9).
+-- ⚠ This does **not** discharge the `hMσnil` hypotheses of `AppE_*`: those sit in the
+-- Corollary 15.9 situation where `M` is type `F` and Frobenius (so `M_σ` is a Frobenius kernel),
+-- a different route from the type-`P₂` clause proved here.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP2_Msigma_isNilpotent
 
 /-! **BG Proposition 14.2(b2)** (`S14_TypePCounting`, `typeP_elemAbelian_le_neighbor_Msigma`): the
 clause of Prop 14.2(b) that `typeP_structure` omits — for `X ∈ ℰ_p¹(K)` (`K` Hall `κ(M)`) with
