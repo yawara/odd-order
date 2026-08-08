@@ -33,8 +33,9 @@ counterexamples exist.
 
 - `CondCLine` / `CondC` — condition (C), on a line `ZMod p` and on a general `𝔽_p`-module.
 - `eq_univ_of_condCLine` — Proposition 6, Case 1 (the line case, `r = 1`).
-- `ncard_le_of_condCLine` — the contrapositive form used by Case 2: a proper (C)-subset of a
-  line has at most `(p-1)/2` points.
+- `two_mul_ncard_le_of_condCLine_ne_univ` — the contrapositive form used by Case 2: a proper
+  (C)-subset of a line satisfies `2 |S| ≤ p - 1`.
+- `eq_univ_of_condC` — **Proposition 6** itself, for a finite `𝔽_p`-module.
 
 ## Implementation notes
 
@@ -254,5 +255,139 @@ theorem two_mul_ncard_le_of_condCLine_ne_univ (hp : 5 ≤ p) {S : Set (ZMod p)}
   have hodd : Odd p := (Fact.out : p.Prime).odd_of_ne_two (by omega)
   rcases hodd with ⟨m, hm⟩
   omega
+
+/-! ## Case 2 of Proposition 6: arbitrary dimension -/
+
+section General
+
+variable {V : Type*} [AddCommGroup V] [Module (ZMod p) V]
+
+/-- A nonzero scalar times a nonzero vector is nonzero (`𝔽_p` is a field). -/
+theorem smul_ne_zero_of_ne_zero {k : ZMod p} {x : V} (hk : k ≠ 0) (hx : x ≠ 0) : k • x ≠ 0 := by
+  intro h
+  refine hx ?_
+  have h' := congrArg (fun y : V => k⁻¹ • y) h
+  simpa [smul_smul, inv_mul_cancel₀ hk] using h'
+
+/-- Restricting a (C)-set to the line `{k • x}` through the origin gives a (C)-subset of the
+scalars. -/
+theorem condCLine_of_condC {S : Set V} (hC : CondC (p := p) S) (x : V) :
+    CondCLine {k : ZMod p | k • x ∈ S} := by
+  intro b y hsub hb hadd k
+  simp only [Set.mem_setOf_eq] at hsub hb hadd ⊢
+  rw [sub_smul] at hsub
+  rw [add_smul] at hadd
+  rw [add_smul, mul_smul]
+  exact hC (b • x) (y • x) hsub hb hadd k
+
+/-- **Glauberman–Norton, Proposition 6** (p. 1090), with the affine space taken to be a finite
+`𝔽_p`-module `V` (a general affine space is a coset of one, and (C) transports along the
+translation).
+
+If `p ≥ 5`, a subset satisfying condition (C) and containing at least half of `V` is all of `V`.
+
+The proof is the paper's Case 2 (p. 1091).  After translating a point outside `S` to the origin,
+every punctured line through the origin meets `S` in at most `(p-1)/2` points by Case 1; the
+paper's partition of `V ∖ {0}` into punctured lines is replaced here by the equivalent double
+count of `{(x, k) | x ≠ 0, k ≠ 0, k • x ∈ S}`, which avoids constructing the quotient. -/
+theorem eq_univ_of_condC [Finite V] (hp : 5 ≤ p) {S : Set V} (hC : CondC (p := p) S)
+    (hcard : Nat.card V ≤ 2 * S.ncard) : S = Set.univ := by
+  classical
+  have _ : Fintype V := Fintype.ofFinite V
+  by_contra hne
+  obtain ⟨lam, hlam⟩ := not_forall.mp (fun h => hne (Set.eq_univ_iff_forall.mpr h))
+  -- Translate `lam` to the origin.
+  set S' : Set V := (fun v => lam + v) ⁻¹' S with hS'
+  have hmem' : ∀ v : V, v ∈ S' ↔ lam + v ∈ S := fun _ => Iff.rfl
+  have h0' : (0 : V) ∉ S' := by rw [hmem', add_zero]; exact hlam
+  have htsurj : Function.Surjective (fun v : V => lam + v) := fun y => ⟨y - lam, by simp⟩
+  have htinj : Function.Injective (fun v : V => lam + v) := fun a b h => by simpa using h
+  have hcard' : S'.ncard = S.ncard := by
+    have himg : (fun v => lam + v) '' S' = S := Set.image_preimage_eq S htsurj
+    rw [← himg, Set.ncard_image_of_injective _ htinj]
+  have hC' : CondC (p := p) S' := by
+    intro b x hsub hb hadd k
+    rw [hmem'] at hsub hb hadd ⊢
+    rw [← add_assoc]
+    rw [← add_sub_assoc] at hsub
+    rw [← add_assoc] at hadd
+    exact hC (lam + b) x hsub hb hadd k
+  -- Every line through the origin meets `S'` in at most `(p-1)/2` points.
+  have hline : ∀ x : V, x ≠ 0 → 2 * ({k : ZMod p | k • x ∈ S'}).ncard ≤ p - 1 := by
+    intro x _
+    refine two_mul_ncard_le_of_condCLine_ne_univ hp (condCLine_of_condC hC' x) ?_
+    intro huniv
+    have h0 : (0 : ZMod p) ∈ {k : ZMod p | k • x ∈ S'} := by rw [huniv]; trivial
+    simp only [Set.mem_setOf_eq, zero_smul] at h0
+    exact h0' h0
+  -- Double count `{(x, k) | x ≠ 0, k ≠ 0, k • x ∈ S'}`.
+  set Vs : Finset V := {x ∈ Finset.univ | x ≠ 0} with hVsdef
+  set Ks : Finset (ZMod p) := {k ∈ Finset.univ | k ≠ 0} with hKsdef
+  set Ss : Finset V := {s ∈ Finset.univ | s ∈ S'} with hSsdef
+  have hVscard : Vs.card = Nat.card V - 1 := by
+    rw [hVsdef, Finset.filter_ne' Finset.univ (0 : V), Finset.card_erase_of_mem (by simp),
+      Finset.card_univ, Nat.card_eq_fintype_card]
+  have hKscard : Ks.card = p - 1 := by
+    have : Fintype.card (ZMod p) = p := ZMod.card p
+    rw [hKsdef, Finset.filter_ne' Finset.univ (0 : ZMod p), Finset.card_erase_of_mem (by simp),
+      Finset.card_univ, this]
+  have hSscoe : (↑Ss : Set V) = S' := by ext s; simp [hSsdef]
+  have hSscard : Ss.card = S'.ncard := by rw [← hSscoe, Set.ncard_coe_finset]
+  -- Swap the order of summation.
+  have hswap : ∑ x ∈ Vs, ({k ∈ Ks | k • x ∈ S'}).card = ∑ k ∈ Ks, ({x ∈ Vs | k • x ∈ S'}).card := by
+    simp only [Finset.card_filter]
+    exact Finset.sum_comm
+  -- Each fiber over `k ≠ 0` is a copy of `S'`.
+  have hfiber : ∀ k ∈ Ks, ({x ∈ Vs | k • x ∈ S'}).card = Ss.card := by
+    intro k hk
+    have hk0 : k ≠ 0 := by simpa [hKsdef] using hk
+    refine Finset.card_nbij' (fun x => k • x) (fun s => k⁻¹ • s) ?_ ?_ ?_ ?_
+    · intro x hx
+      simp only [Finset.coe_filter, Set.mem_setOf_eq, hVsdef, Finset.mem_filter] at hx
+      simp [hSsdef, hx.2]
+    · intro s hs
+      simp only [Finset.mem_coe, hSsdef, Finset.mem_filter] at hs
+      have hs0 : s ≠ 0 := fun h => h0' (h ▸ hs.2)
+      simp only [Finset.coe_filter, Set.mem_setOf_eq, hVsdef, Finset.mem_filter]
+      refine ⟨⟨Finset.mem_univ _, smul_ne_zero_of_ne_zero (inv_ne_zero hk0) hs0⟩, ?_⟩
+      rw [smul_smul, mul_inv_cancel₀ hk0, one_smul]
+      exact hs.2
+    · intro x _; simp [smul_smul, inv_mul_cancel₀ hk0]
+    · intro s _; simp [smul_smul, mul_inv_cancel₀ hk0]
+  -- Each fiber over `x ≠ 0` is at most half a line.
+  have hslice : ∀ x ∈ Vs, 2 * ({k ∈ Ks | k • x ∈ S'}).card ≤ p - 1 := by
+    intro x hx
+    have hx0 : x ≠ 0 := by simpa [hVsdef] using hx
+    refine le_trans (Nat.mul_le_mul_left 2 ?_) (hline x hx0)
+    have hsub : (↑({k ∈ Ks | k • x ∈ S'}) : Set (ZMod p)) ⊆ {k : ZMod p | k • x ∈ S'} := by
+      intro k hk
+      simp only [Finset.coe_filter, Set.mem_setOf_eq] at hk
+      exact hk.2
+    calc ({k ∈ Ks | k • x ∈ S'}).card = (↑({k ∈ Ks | k • x ∈ S'}) : Set (ZMod p)).ncard :=
+          (Set.ncard_coe_finset _).symm
+      _ ≤ ({k : ZMod p | k • x ∈ S'}).ncard := Set.ncard_le_ncard hsub (Set.toFinite _)
+  -- Put the two counts together.
+  have hupper : 2 * ∑ x ∈ Vs, ({k ∈ Ks | k • x ∈ S'}).card ≤ Vs.card * (p - 1) := by
+    rw [Finset.mul_sum]
+    calc ∑ x ∈ Vs, 2 * ({k ∈ Ks | k • x ∈ S'}).card ≤ ∑ _x ∈ Vs, (p - 1) :=
+          Finset.sum_le_sum hslice
+      _ = Vs.card * (p - 1) := by rw [Finset.sum_const, smul_eq_mul]
+  have hexact : ∑ x ∈ Vs, ({k ∈ Ks | k • x ∈ S'}).card = (p - 1) * S'.ncard := by
+    rw [hswap, Finset.sum_congr rfl hfiber, Finset.sum_const, smul_eq_mul, hKscard, hSscard]
+  rw [hexact, hVscard] at hupper
+  -- `2 (p-1) |S'| ≤ (|V| - 1)(p - 1)`, so `2 |S'| ≤ |V| - 1`, contradicting the hypothesis.
+  have hp1 : 0 < p - 1 := by omega
+  have hfinal : 2 * S'.ncard ≤ Nat.card V - 1 := by
+    have h := hupper
+    rw [← mul_assoc] at h
+    have h' : (2 * S'.ncard) * (p - 1) ≤ (Nat.card V - 1) * (p - 1) := by
+      calc (2 * S'.ncard) * (p - 1) = 2 * (p - 1) * S'.ncard := by ring
+        _ ≤ (Nat.card V - 1) * (p - 1) := by rw [mul_comm (Nat.card V - 1)] at h ⊢; omega
+    exact Nat.le_of_mul_le_mul_right h' hp1
+  have hVpos : 0 < Nat.card V := Nat.card_pos
+  rw [hcard'] at hfinal
+  omega
+
+end General
 
 end OddOrder.BG.AppC.Affine
