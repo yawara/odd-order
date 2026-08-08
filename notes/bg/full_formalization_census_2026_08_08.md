@@ -632,4 +632,48 @@ nonabelian simple group.」⟹ repo の `IsMinimalSimpleOdd G` を §7 以降の
 `∀ n ∈ N_G(P), ∃ c ∈ O_{π'}(C_G(P)), ∃ m ∈ N_G(P) ⊓ N_G(Q), n = c*m` (⊆ 方向のみ) と
 書いているが、`C_G(P) ≤ N_G(P)` ゆえ ⊇ は自明で**同値**。
 
-### §8-§16 + Theorems A-E + 補章 — 未着手
+## §8 (The Fitting Subgroup of a Maximal Subgroup、1 件 = 8.1) — 監査完了 (2026-08-08)
+
+書籍 §8 の番号付き結果は **Thm 8.1 の 1 件のみ** (2 条項)。両方とも AxiomsCheck 登録済:
+
+* (a) `S08.cFitting_isUniquelyMaximal_of_not_pGroup` — `F(M)` が `p`-群でなければ
+  `C_{F(M)}(A₀) ∈ 𝒰`
+* (b) `S08.sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup` — `F(M)` が `p`-群なら
+  `M` の Sylow `p` は `G` の Sylow、かつ `SCN₃(P)` の各元は `F(M)` に含まれ `𝒰` に属す
+
+⟹ **補充ゼロ**。(§8 の分量が大きいのは、1 定理の証明が長いため。)
+
+## §9 (The Uniqueness Theorem、6 件 = 9.1-9.6) — 監査完了 (2026-08-08)
+
+全 6 件被覆・**未形式化ゼロ・packaging 差ゼロ・stale 注記ゼロ**。
+
+| BG | repo の endpoint | 照合 |
+|---|---|---|
+| **Thm 9.1** | `S09.noncyclic_isUniquelyMaximal_of_centralizer_le` | ✅ **書籍の (a)/(b) を選言で保持** |
+| **Cor 9.2** | `S09.isUniquelyMaximal_of_le_centralizer_of_two_le_rank` | ✅ |
+| **Cor 9.3** | `S09.isUniquelyMaximal_of_abelian_rank_three` | ✅ |
+| **Lem 9.4** | `S09.abelian_rank_three_isUniquelyMaximal_of_fitting` | ✅ |
+| **Lem 9.5** | `S09.scn3_isUniquelyMaximal` | ✅ |
+| **Thm 9.6** (Uniqueness) | `S09.uniquenessTheorem` + **"In particular" 条項** `S09.isUniquelyMaximal_of_mem_e2_not_maximal` | ✅ |
+
+### 🔴 実収穫: §9 が AxiomsCheck に 1 件も登録されていなかった
+
+数学は全部在ったが、**書籍番号 ↔ 実体の索引 (AxiomsCheck) に §9 の entry がゼロ**だった。
+CLAUDE.md は AxiomsCheck を「**書籍番号 ↔ Lean 実体の最良の索引**」と位置づけ、本監査の
+走査手順もその第 1 手に置いている (§2 の Lem 2.7 誤判定の再発防止策)。**Uniqueness Theorem
+という BG 第 II 章の主結果が索引に無い**のは、後続の監査・再開セッションを誤判定させる。
+
+⟹ 7 件 (9.1-9.6 + 9.6 の "In particular") を登録。axiom-clean も同時に検証される。
+
+⚠ **「AxiomsCheck に無い ⟹ 未形式化」ではない** (§9 がその反例)。逆に
+**「実体が在る ⟹ 索引にも在る」も成り立たない**。索引の欠落は**索引の欠陥**として直す。
+
+### ✅ Thm 9.6 の "In particular" は取りこぼされていなかった
+
+前 2 冊の監査で「**"In particular" 欠落**」は誤判定様式の 1 つだった (memory
+[[textbook-coverage-audit-failure-modes]])。9.6 の「In particular, if `A ∈ ℰ²(G) − ℰ*(G)`,
+then `A ∈ 𝒰`」は `isUniquelyMaximal_of_mem_e2_not_maximal` として独立の public theorem に
+なっており、private helper `three_le_rank_centralizer_of_mem_e2_not_maximal` が
+「`ℰ²` かつ非極大 ⟹ `r(C_G(A)) ≥ 3`」を供給している。
+
+### §10-§16 + Theorems A-E + 補章 — 未着手

@@ -157,8 +157,19 @@ pat = re.compile(r'^(Theorem|Proposition|Lemma|Corollary)\s+(\d{1,2})\.(\d{1,2})
         ページ画像 `references/bg/pages/bg-p056.png` で `⟨ℋ_X(A;π')⟩ = O_{π'}(X)` と確定 —
         repo の `Hypothesis71.generated_eq` と完全一致。
         ⟹ **番号付き結果だけでなく Hypothesis の定義文も OCR 落ちの危険がある**。
+      - **§8 監査完了 (2026-08-08)**: 番号付き結果は **Thm 8.1 の 1 件のみ** (2 条項)、
+        両方 AxiomsCheck 登録済。**補充ゼロ**。
+      - **§9 監査完了 (2026-08-08)**: 全 6 件被覆・未形式化 / packaging 差 / stale 注記ゼロ。
+        Thm 9.1 は書籍の (a)/(b) を選言で保持、Thm 9.6 の **"In particular" 条項**も独立の
+        public theorem になっていた (前 2 冊で誤判定様式だった型を回避できている)。
+        🔴 **実収穫 = §9 が AxiomsCheck に 1 件も登録されていなかった**。数学は全部在ったが、
+        本監査が第 1 手に置く索引 (CLAUDE.md が「書籍番号 ↔ Lean 実体の最良の索引」と
+        位置づける) に **Uniqueness Theorem という第 II 章の主結果が無い**状態だった。
+        ⟹ 7 件 (9.1-9.6 + "In particular") を登録し、**全て axiom-clean を確認**。
+        ⚠ 「AxiomsCheck に無い ⟹ 未形式化」ではない (§9 が反例)。索引の欠落は
+        **索引の欠陥**として直す。
       - 1 節ぶん終えるごとに census note を更新して commit。
-      - ⬜ **次 = §8 (1 件)**。
+      - ⬜ **次 = §10 (14 件)**。
 
 ## 📌 BG の大域規約 (2026-08-08 §3 で確定 — 全節の判定に効く)
 
