@@ -25,9 +25,9 @@ p. 149:
 > The work mentioned in (IV) shows that whenever `p` and `q` are primes that satisfy (A)
 > and `E = E⁻¹`, then `p ≤ 3`.
 
-This file carries the elementary front of that paper: its **Lemma 4** (`p ≤ 3` forces
-`E = E⁻¹`) and its **Lemma 5** (`|E| ≥ 2` except in one degenerate case).  The combinatorial
-core (Proposition 6) and the main equivalence (Proposition 7) build on these.
+This file carries the paper's **Lemma 4**, **Lemma 5** and **Proposition 7**; its combinatorial
+core, **Proposition 6**, is in `AppC_AffineLineCondition`, and the polynomial count behind
+Step 3 is `OddOrder/Algebra/FiniteFieldIrreducibleCount.lean`.
 
 ## 🚨 The paper's Proposition 7 is false as literally stated
 
@@ -51,6 +51,13 @@ needs — `q ≠ 2 ∨ p = 2` — and derives BG's condition-(A) form as a corol
 - `normSetE_eq_inv_of_le_three` — Lemma 4: `p ≤ 3` gives `E = E⁻¹`
   (the `p = 3` half is `normSetE_eq_inv_of_p_eq_three`, already available as BG's Lemma C.3 note).
 - `two_le_normSetE_ncard` — Lemma 5(b): `|E| ≥ 2` when `q ≠ 2 ∨ p = 2`.
+- `condC_normOneSet` — Proposition 7, Step 1: `A ∩ U` satisfies condition (C).
+- `card_towerSubmodule` — Step 2: `|A_r| = p^r` for `r ≤ q`.
+- `towerSet_subset_normOneSet` — Step 3: `A_r ⊆ U` for every `r ≤ q`.
+- `normSetE_ne_inv_of_five_le` — Step 4: for `p ≥ 5` and `q ≠ 2`, `E ≠ E⁻¹`.
+- `normSetE_eq_inv_iff` — **Proposition 7**, corrected: `E = E⁻¹ ↔ p ≤ 3` under `q ≠ 2 ∨ p = 2`.
+- `le_three_of_conditionA_of_normSetE_eq_inv` — **BG Appendix C, Remark (IV)** in the form BG
+  states on p. 149: condition (A) and `E = E⁻¹` give `p ≤ 3`.
 -/
 
 namespace OddOrder.BG.AppC.NormSet
@@ -603,5 +610,151 @@ theorem towerSet_succ_subset_normOneSet [Fact p.Prime] (hp5 : 5 ≤ p) (hq : q.P
   obtain ⟨w, hwW, rfl⟩ := hx
   have : (⟨w, hwW⟩ : ↥W) ∈ S := by rw [huniv]; trivial
   exact this
+
+/-- The base of Step 3's induction: `A_1 = {1 + k(1 - c)} ⊆ U` is exactly Lemma 1(a). -/
+theorem towerSet_one_subset_normOneSet [Fact p.Prime] (hq : 0 < q)
+    (hEinv : normSetE p q = (normSetE p q)⁻¹) {c : GaloisField p q} (hc : c ∈ normSetE p q) :
+    towerSet p q (1 - c) 1 ⊆ normOneSet p q := by
+  rintro x ⟨w, ⟨f, rfl⟩, rfl⟩
+  have hfC : (f : (ZMod p)[X]) = C ((f : (ZMod p)[X]).coeff 0) := by
+    rcases eq_or_ne (f : (ZMod p)[X]) 0 with h0 | h0
+    · rw [h0]; simp
+    · refine eq_C_of_natDegree_eq_zero ?_
+      have := (natDegree_lt_iff_degree_lt h0).mpr (mem_degreeLT.mp f.2)
+      omega
+  have hval : towerMap p q (1 - c) 1 f
+      = ((f : (ZMod p)[X]).coeff 0) • ((1 : GaloisField p q) - c) := by
+    rw [towerMap_apply, Algebra.smul_def]
+    conv_lhs => rw [hfC]
+    rw [aeval_C]
+    ring
+  rw [hval]
+  exact normN_one_add_smul_one_sub p q hq hEinv hc _
+
+/-- **Glauberman–Norton, Proposition 7, Step 3** (p. 1092–1093): `A_r ⊆ U` for every `r ≤ q`. -/
+theorem towerSet_subset_normOneSet [Fact p.Prime] (hp5 : 5 ≤ p) (hq : q.Prime)
+    (hEinv : normSetE p q = (normSetE p q)⁻¹) {c : GaloisField p q} (hc : c ∈ normSetE p q)
+    (hb : (1 - c) ∉ Set.range (algebraMap (ZMod p) (GaloisField p q))) :
+    ∀ r, r ≤ q → towerSet p q (1 - c) r ⊆ normOneSet p q := by
+  intro r
+  induction r with
+  | zero =>
+    intro hr
+    exact (towerSet_mono p q (Nat.zero_le 1)).trans
+      (towerSet_one_subset_normOneSet p q hq.pos hEinv hc)
+  | succ r ih =>
+    intro hr
+    rcases Nat.eq_zero_or_pos r with rfl | hr1
+    · exact towerSet_one_subset_normOneSet p q hq.pos hEinv hc
+    · exact towerSet_succ_subset_normOneSet p q hp5 hq hEinv hb hr1 hr (ih (by omega))
+
+/-! ## Proposition 7, Step 4, and the main theorem -/
+
+/-- The size of the affine space `A_r`. -/
+theorem ncard_towerSet [Fact p.Prime] (hq : q.Prime) {b : GaloisField p q}
+    (hb : b ∉ Set.range (algebraMap (ZMod p) (GaloisField p q))) {r : ℕ} (hr : r ≤ q) :
+    (towerSet p q b r).ncard = p ^ r := by
+  have himg : towerSet p q b r = (fun w => 1 + w) '' (↑(towerSubmodule p q b r)) := by
+    ext x
+    constructor
+    · rintro ⟨w, hw, rfl⟩; exact ⟨w, hw, rfl⟩
+    · rintro ⟨w, hw, rfl⟩; exact ⟨w, hw, rfl⟩
+  rw [himg, Set.ncard_image_of_injective _ (fun a b h => by simpa using h),
+    ← Nat.card_coe_set_eq]
+  exact card_towerSubmodule p q hq hb hr
+
+/-- **Glauberman–Norton, Proposition 7** (p. 1092), forward direction, in the sharp form: if
+`p ≥ 5` then the norm set is *not* closed under inversion — provided `q ≠ 2` (see the module
+docstring: with `q = 2` and `p` odd one has `E = {1}`, and the paper's statement fails).
+
+Step 4 of the paper: `A_q ⊆ U` has `p^q` elements while `U` misses `0`, so `U` has at most
+`p^q - 1` elements. -/
+theorem normSetE_ne_inv_of_five_le [Fact p.Prime] (hp5 : 5 ≤ p) (hq : q.Prime) (hq2 : q ≠ 2) :
+    normSetE p q ≠ (normSetE p q)⁻¹ := by
+  intro hEinv
+  -- Pick `c ∈ E ∖ {1}` and put `b = 1 - c ≠ 0`.
+  obtain ⟨c, hc, hcne⟩ :=
+    exists_mem_normSetE_ne_one p q (two_le_normSetE_ncard p q hq (Or.inl hq2))
+  have hbne : (1 : GaloisField p q) - c ≠ 0 := sub_ne_zero.mpr (Ne.symm hcne)
+  -- `b` is outside the prime field: otherwise `0 ∈ A_1 ⊆ U`.
+  have hb : (1 - c) ∉ Set.range (algebraMap (ZMod p) (GaloisField p q)) := by
+    rintro ⟨k, hk⟩
+    have hk0 : k ≠ 0 := by
+      intro h; rw [h, map_zero] at hk; exact hbne hk.symm
+    have hmem : (0 : GaloisField p q) ∈ towerSet p q (1 - c) 1 := by
+      rw [mem_towerSet_iff]
+      refine ⟨C 1 + C (-k⁻¹) * X, ?_, ?_, ?_⟩
+      · refine (natDegree_add_le _ _).trans ?_
+        simp only [natDegree_C, max_le_iff]
+        exact ⟨Nat.zero_le _, (natDegree_C_mul_le _ _).trans (by simp)⟩
+      · simp
+      · have hprod : algebraMap (ZMod p) (GaloisField p q) (-k⁻¹) * (1 - c) = -1 := by
+          rw [← hk, ← map_mul, neg_mul, inv_mul_cancel₀ hk0, map_neg, map_one]
+        rw [map_add, map_mul, aeval_C, aeval_C, aeval_X, map_one, hprod]
+        ring
+    have := towerSet_one_subset_normOneSet p q hq.pos hEinv hc hmem
+    exact ne_zero_of_mem_normOneSet p q hq.pos this rfl
+  -- Step 4: `|A_q| = p^q` but `U` misses `0`.
+  have hAq : towerSet p q (1 - c) q ⊆ normOneSet p q :=
+    towerSet_subset_normOneSet p q hp5 hq hEinv hc hb q le_rfl
+  have hcardA : (towerSet p q (1 - c) q).ncard = p ^ q := ncard_towerSet p q hq hb le_rfl
+  have hUsub : normOneSet p q ⊆ {x : GaloisField p q | x ≠ 0} := fun x hx =>
+    ne_zero_of_mem_normOneSet p q hq.pos hx
+  have hUcard : (normOneSet p q).ncard ≤ p ^ q - 1 := by
+    have hnz : ({x : GaloisField p q | x ≠ 0}).ncard = p ^ q - 1 := by
+      have huniv : ({x : GaloisField p q | x ≠ 0})
+          = (Set.univ : Set (GaloisField p q)) \ {0} := by ext x; simp
+      rw [huniv, Set.ncard_sdiff (by simp) (Set.toFinite _), Set.ncard_univ,
+        Set.ncard_singleton, GaloisField.card p q hq.pos.ne']
+    exact hnz ▸ Set.ncard_le_ncard hUsub (Set.toFinite _)
+  have hle := Set.ncard_le_ncard hAq (Set.toFinite _)
+  rw [hcardA] at hle
+  have hpos : 0 < p ^ q := pow_pos (by omega) q
+  omega
+
+/-- **Glauberman–Norton, Proposition 7**, in the corrected form: for primes `p, q` with
+`q ≠ 2 ∨ p = 2`,
+
+`E = E⁻¹ ↔ p ≤ 3`.
+
+⚠ The hypothesis `q ≠ 2 ∨ p = 2` cannot be dropped, although the paper states the equivalence
+without it: for `p` odd and `q = 2` one has `E = {1}`, so the left side holds while `p` may be
+arbitrarily large (see the module docstring). -/
+theorem normSetE_eq_inv_iff [Fact p.Prime] (hq : q.Prime) (h : q ≠ 2 ∨ p = 2) :
+    normSetE p q = (normSetE p q)⁻¹ ↔ p ≤ 3 := by
+  constructor
+  · intro hEinv
+    by_contra hp
+    have hp5 : 5 ≤ p := by
+      have hprime := (Fact.out : p.Prime)
+      rcases Nat.lt_or_ge p 5 with hlt | hge
+      · have hp4 : p = 4 := by have := hprime.two_le; omega
+        rw [hp4] at hprime
+        norm_num at hprime
+      · exact hge
+    have hq2 : q ≠ 2 := h.resolve_right (by omega)
+    exact normSetE_ne_inv_of_five_le p q hp5 hq hq2 hEinv
+  · exact normSetE_eq_inv_of_le_three p q hq.pos
+
+/-- **BG Appendix C, Remark (IV)** (p. 148), in the combinatorial form BG states on p. 149:
+
+> whenever `p` and `q` are primes that satisfy (A) and `E = E⁻¹`, then `p ≤ 3`.
+
+Condition (A) is what rescues the paper's statement: under `q ∤ p - 1` the degenerate case
+`q = 2`, `p` odd is impossible, because every odd prime `p` has `2 ∣ p - 1`. -/
+theorem le_three_of_conditionA_of_normSetE_eq_inv [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    (hEinv : normSetE p q = (normSetE p q)⁻¹) : p ≤ 3 := by
+  have hnd : ¬ q ∣ (p - 1) :=
+    (conditionA_iff_not_dvd p q (Fact.out : p.Prime).two_le hq).mp hA
+  refine (normSetE_eq_inv_iff p q hq ?_).mp hEinv
+  rcases eq_or_ne q 2 with rfl | hq2
+  · right
+    by_contra hp2
+    exact hnd (by
+      have hodd : Odd p := (Fact.out : p.Prime).odd_of_ne_two hp2
+      obtain ⟨k, hk⟩ := hodd
+      exact ⟨k, by omega⟩)
+  · exact Or.inl hq2
 
 end OddOrder.BG.AppC.NormSet

@@ -501,6 +501,7 @@ import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_SL2Example
 import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
+import OddOrder.BG.AppC_GlaubermanNorton
 import OddOrder.BG.AppD_CNGroups
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
@@ -20731,3 +20732,34 @@ q8_exists_proper_normal            (issue 9506, Navarro pp.139-146)
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.Suzuki.Hypothesis.nonempty_theoremAConclusion_of_V_ne_bot
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Suzuki.theoremA
+
+/-! ### BG Appendix C, Remark (IV) — the Glauberman–Norton sharpening `p ≤ 3` (issue 0179)
+
+BG p. 148 states Remark (IV) with no proof, citing Glauberman–Norton, Proc. Amer. Math. Soc.
+**119** (1993), 1089–1094 (`references/glauberman-norton/`).  The chain formalized here:
+
+```
+Affine.eq_univ_of_condCLine        (Prop 6, Case 1: the line)
+  → Affine.eq_univ_of_condC        (Prop 6, general dimension; double count over lines)
+  → towerSet_succ_subset_normOneSet (Step 3 induction; uses FiniteFieldCount.mul_card_le)
+  → towerSet_subset_normOneSet     (Step 3: A_r ⊆ U for r ≤ q)
+  → normSetE_ne_inv_of_five_le     (Step 4: |A_q| = p^q but 0 ∉ U)
+  → normSetE_eq_inv_iff            (Prop 7, corrected: needs `q ≠ 2 ∨ p = 2`)
+  → le_three_of_conditionA_of_normSetE_eq_inv  (BG p. 149, the (A) form)
+```
+
+⚠ The paper's Proposition 7 is stated without hypotheses and is false as literally written
+(`p` odd, `q = 2` gives `E = {1} = E⁻¹` with `p` arbitrary); BG's own restatement carries
+condition (A), which excludes exactly that case.  See the module docstring of
+`OddOrder/BG/AppC_GlaubermanNorton.lean`. -/
+
+#assert_only_allowed_axioms OddOrder.BG.AppC.Affine.eq_univ_of_condCLine
+#assert_only_allowed_axioms OddOrder.BG.AppC.Affine.eq_univ_of_condC
+#assert_only_allowed_axioms OddOrder.FiniteFieldCount.mul_card_le
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.condC_normOneSet
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.card_towerSubmodule
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.towerSet_subset_normOneSet
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normSetE_ne_inv_of_five_le
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normSetE_eq_inv_iff
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.le_three_of_conditionA_of_normSetE_eq_inv
