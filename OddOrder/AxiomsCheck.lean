@@ -3383,6 +3383,31 @@ All nine declarations axiom-clean. -/
 -- かつ SCN₃(P) の各元は F(M) に含まれ一意最大部分群に属する。
 #assert_only_allowed_axioms
   OddOrder.BG.Ch2.S08.sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup
+
+/-! ### BG §9 (The Uniqueness Theorem) — 全 6 結果 (issue 0177 §9 監査で登録)
+
+§9 は書籍の 9.1→9.2→9.3→9.4→9.5→9.6 が線形チェーンをなし、終点が **Uniqueness Theorem**
+(Thm 9.6)。実体は全て在ったが AxiomsCheck に未登録だったので、書籍番号 ↔ 実体の索引を
+完成させる (CLAUDE.md が AxiomsCheck を「書籍番号 ↔ Lean 実体の最良の索引」と位置づけている)。 -/
+
+-- BG Thm 9.1 (mmd L2492): p prime, M∈ℳ, B∈ℰ_p(M) noncyclic で
+-- (a) ∀b∈B^#, C_G(b)⊆M または (b) ⟨ℋ_G(B;p')⟩⊆M ⇒ B∈𝒰。**両分岐を選言で持つ**。
+#assert_only_allowed_axioms OddOrder.BG.Ch2.S09.noncyclic_isUniquelyMaximal_of_centralizer_le
+-- BG Cor 9.2 (mmd L2540): L∈𝒰, K ≤ C_G(L), r(K)≥2 ⇒ K∈𝒰。
+#assert_only_allowed_axioms OddOrder.BG.Ch2.S09.isUniquelyMaximal_of_le_centralizer_of_two_le_rank
+-- BG Cor 9.3 (mmd L2545): A abelian p-群 ∈𝒰 with m(A)≥3, B noncyclic p-群 with
+-- r_p(C_G(B))≥3 ⇒ B∈𝒰。
+#assert_only_allowed_axioms OddOrder.BG.Ch2.S09.isUniquelyMaximal_of_abelian_rank_three
+-- BG Lem 9.4 (mmd L2555): M∈ℳ, r_p(F(M))≥3 ⇒ 𝒰 は rank ≥3 の全 abelian p-群を含む。
+#assert_only_allowed_axioms OddOrder.BG.Ch2.S09.abelian_rank_three_isUniquelyMaximal_of_fitting
+-- BG Lem 9.5 (mmd L2561): A∈SCN₃(p) ⇒ A∈𝒰。§9 チェーンの要 (chief-series stabilizer 論法)。
+#assert_only_allowed_axioms OddOrder.BG.Ch2.S09.scn3_isUniquelyMaximal
+-- BG Thm 9.6 ⭐ **The Uniqueness Theorem** (mmd L2627): K<G, r(K)≥2, かつ
+-- (r(K)≥3 または r(C_G(K))≥3) ⇒ K∈𝒰。
+#assert_only_allowed_axioms OddOrder.BG.Ch2.S09.uniquenessTheorem
+-- BG Thm 9.6 の "In particular" 条項: A ∈ ℰ²(G) − ℰ*(G) ⇒ A∈𝒰。
+#assert_only_allowed_axioms OddOrder.BG.Ch2.S09.isUniquelyMaximal_of_mem_e2_not_maximal
+
 -- Gorenstein Thm 3.7 (precursor 2, issue 0051): ψ が全 proper A-不変正規部分群上自明 + P 上非自明
 -- ⇒ P′⊆Z(P), P/P′ elem ab + A irreducible + ψ nontrivial, P special. Thm 3.8/3.10 → BG Lem 4.13.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.isSpecial_of_pprimeAction_trivialOnProper
