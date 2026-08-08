@@ -445,6 +445,27 @@ theorem centralizer_inf_le_derivedInG_of_isComplement' [Finite G] [IsSolvable G]
   have hxker : x ∈ (q : G →* G ⧸ N).ker := by rw [MonoidHom.mem_ker]; exact hqx
   rwa [hkerq] at hxker
 
+open OddOrder.GroupTheory in
+/-- **BG Lemma 6.3(a)** (mmd L1981), the book's packaging.  Let `G` be a finite solvable group,
+`H` a **normal Hall** subgroup of `G` and `K` a complement of `H` in `G`, with `H ⊆ G'`.  Then
+
+* `H = ⁅H, K⁆`, and
+* `C_H(K) ⊆ H'`.
+
+The book's "Hall" hypothesis is rendered as the coprimality `(|H|, |K|) = 1` (equivalent for a
+normal subgroup with a complement).  Mirrors `lemma63b` (`S06_Lem63b.lean`), which packages the
+two conclusions of part (b) the same way.
+
+⚠ The first conclusion `commutator_eq_self_of_isComplement'_le_commutator` is **stronger than
+this clause**: it needs neither finiteness nor coprimality.  Cite it directly when the Hall
+hypothesis is unavailable. -/
+theorem lemma63a [Finite G] [IsSolvable G]
+    {H K : Subgroup G} [H.Normal] (hHK : H.IsComplement' K) (hH : H ≤ commutator G)
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card ↥K)) :
+    ⁅H, K⁆ = H ∧ Subgroup.centralizer (K : Set G) ⊓ H ≤ derivedInG H :=
+  ⟨commutator_eq_self_of_isComplement'_le_commutator hHK hH,
+    centralizer_inf_le_derivedInG_of_isComplement' hHK hH hcop⟩
+
 end /- 6.3 -/
 
 /-! ## 6.5: 可解群の N/C 分解 (pp. 64-65, mmd L2048-2088)

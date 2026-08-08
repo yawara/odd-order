@@ -6330,6 +6330,9 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_dvd_card_of_isAlgClosed_of_irreducible
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_dvd_card_of_isAbsolutelyIrreducible
 
+-- BG Lemma 6.3(a), BOOK packaging (issue 0177 §6 監査): `H` normal Hall with complement `K` and
+-- `H ⊆ G'` ⟹ `H = ⁅H,K⁆` かつ `C_H(K) ⊆ H'`。(b) の `lemma63b` と対称に 2 条項を束ねる。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S06.lemma63a
 -- BG Lemma 6.3(b): for a finite solvable `G` with `G'` nilpotent and `|G/G'|` prime, `G'` is a Hall
 -- subgroup of `G` and `G' = [G, K]` for every complement `K` of `G'`.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S06.lemma63b
