@@ -143,8 +143,45 @@ namespace = `OddOrder.BG.AppC.NormSet` (既存 App.C に合わせる)。
 - [x] **Prop 7 Step 2** — `natDegree_minpoly_eq` (`b` の次数 = `q`) /
       `aeval_ne_zero_of_degree_lt` / `towerMap` / `towerSubmodule` / `towerMap_injective` /
       `card_towerSubmodule` (`|A_r| = p^r`)。
-- [ ] **Prop 7 Step 3** (帰納法本体) — 下記の設計で進める
-- [ ] Prop 7 Step 4 + 主定理 + BG (A) 版の系 + AxiomsCheck 登録
+- [x] **Prop 7 Step 3** (帰納法本体) — `aeval_mem_normOneSet_of_not_irreducible` (易しい 2 分岐) /
+      `towerSet_succ_subset_normOneSet` (既約分岐 = 個数上界 + Prop 6) /
+      `towerSet_one_subset_normOneSet` (base = Lemma 1(a)) / `towerSet_subset_normOneSet`。
+- [x] **Prop 7 Step 4 + 主定理 + BG (A) 版の系 + AxiomsCheck 登録** —
+      `ncard_towerSet` / `normSetE_ne_inv_of_five_le` / `normSetE_eq_inv_iff` /
+      `le_three_of_conditionA_of_normSetE_eq_inv`。AxiomsCheck に 9 件登録、全て axiom-clean。
+
+## ✅ 完了 (2026-08-08)
+
+BG p.149 の再述が Lean の定理として存在し axiom-clean:
+
+```lean
+theorem le_three_of_conditionA_of_normSetE_eq_inv [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    (hEinv : normSetE p q = (normSetE p q)⁻¹) : p ≤ 3
+```
+
+より一般の形 (必要十分な弱仮説) と `⟸` 方向も揃っている:
+
+```lean
+theorem normSetE_eq_inv_iff [Fact p.Prime] (hq : q.Prime) (h : q ≠ 2 ∨ p = 2) :
+    normSetE p q = (normSetE p q)⁻¹ ↔ p ≤ 3
+```
+
+論文 Prop 7 の literal 版が偽であることは module docstring / AxiomsCheck の節 /
+`references/glauberman-norton/SOURCE.md` の 3 箇所に明記した。
+
+### 成果物
+
+| ファイル | 内容 |
+|---|---|
+| `OddOrder/BG/AppC_AffineLineCondition.lean` | 条件 (C) と **Prop 6** (直線 + 一般次元) |
+| `OddOrder/Algebra/FiniteFieldIrreducibleCount.lean` | `r · #{r 次単項既約} ≤ p^r − p` |
+| `OddOrder/BG/AppC_GlaubermanNorton.lean` | Lemma 4 / Lemma 5 / **Prop 7** (Step 1–4) + BG (A) 版 |
+
+### 副産物 (未使用仮説の除去による一般化 2 件)
+
+* `NormSet.lemmaC2` から条件 (A) を削除 (書籍の Note 自身が「p, q が奇であればよい」と明記)
+* `AppC.theoremC_abstract` から条件 (A) を削除 (3 つの step lemma がいずれも (A) を使わない)
 
 ### Step 3 の設計 (次セッションの入口)
 
