@@ -253,4 +253,74 @@ repo の §2 計画は **§2A(2.1) / §2B(2.2) / §2C(2.3) / §2D(2.4) / §2E(2.
 ⟹ **絞って引いた後、ゼロ件のものだけ repo 全体を「BG」マーカー込みで再検索する**という
 2 段構えが要る。
 
-### §3-§16 + Theorems A-E + 補章 — 未着手
+## §3 (Actions of Frobenius Groups and Related Results) — 進行中
+
+書籍 10 件: Lem 3.1 / Lem 3.2 / Lem 3.3 / Thm 3.4 / Thm 3.5 / Thm 3.6 / Thm 3.7 / Thm 3.8 /
+Prop 3.9 / Thm 3.10。**未形式化ゼロ** (全 10 件に実体あり)。
+
+### 走査は新しい順序で実施 (AxiomsCheck → issues/closed → 結論の形 → 節ディレクトリ)
+
+§2 の失敗を受けて順序を変えた結果、**番号 grep では出ない 2 件が第 1 手/第 3 手で出た**:
+
+| BG | 実体 | どう見つけたか |
+|---|---|---|
+| **Lem 3.1** | `isFrobeniusGroup_iff_complement_centralizer_inf_kernel_eq_bot` (`S03_FrobeniusActions.lean:81`) | **結論の形** (`IsFrobeniusGroup … ↔`) で grep。宣言名にも docstring 以外にも「3.1」は無い |
+| **Thm 3.7** | `IsFrobeniusGroup.isNilpotent_kernel` (`Isaacs/Ch06_FrobeniusActions/KernelNilpotent.lean`) | owner chapter 規則で **Isaacs 側**に在った (通算 5 回目) |
+| Lem 3.2 | `isFrobeniusGroup_quotient_of_normal_not_le_kernel` ほか 2 本 | AxiomsCheck:6746-6748 |
+| Lem 3.3 | `S03b_Lemma33.lean` (Wielandt) | 節ディレクトリ |
+| Thm 3.4/3.5/3.6 | `S03d_Thm34` / `S03e_Thm35` / `S03f_Thm36` | AxiomsCheck:6490/6575/6687 |
+| Thm 3.8 / Prop 3.9 / Thm 3.10 | `S03h_Thm38.thm38` / `isCyclic_of_isPGroup_of_isFrobeniusAction` / `S03g_Thm310*` | AxiomsCheck:6749/6691/6352+ |
+
+### ✅ Lem 3.1 は書籍強度で一致 (ページ画像で確定)
+
+⚠ **pdftotext は (b) の行を丸ごと落としていた** (`(b)` の後が空行)。
+`references/bg/pages/bg-p017.png` (PDF p.30 = 書籍 p.17、offset **+13**) を読んで確定:
+
+> **(b)** `C_K(x) = 1` for all `x ∈ R^#`
+
+repo の `iff` は仮説 (`K ⊴ G` / `IsComplement' K R` = `KR = G ∧ K ∩ R = 1` / `K ≠ ⊥` / `R ≠ ⊥`)
+も両条項も一致。⟹ **書籍強度 OK**。
+⟹ **条項が OCR で消えることがある** — 「(a)(b) の (b) が見当たらない」ときは欠番でなく
+**OCR 落ち**を疑い、ページ画像で確認する。
+
+### 🔴 実収穫: 特殊化債務 2 件 — 書籍自身が「不要」と書いている仮説
+
+**書籍の Note を読まずに statement だけ写すと入る**型。BG は Lem 3.2 と Thm 3.5 の直後に
+**同じ Note** を置いている:
+
+> **Note.** Since Thompson's Thesis … implies that the kernel of a Frobenius group is nilpotent,
+> the assumption that `K` is solvable is unnecessary.
+
+しかし repo の 5 宣言はすべて `IsSolvable ↥K` を仮説に持っていた (= Note **以前**の形):
+
+  S03.inf_complement_eq_bot_of_normal_not_le_kernel   (hSolvK : IsSolvable ↥K)
+  S03.normal_le_kernel_of_not_le                      (hSolvK : IsSolvable ↥K)
+  S03.isFrobeniusGroup_quotient_of_normal_not_le_kernel (hSolvK : IsSolvable ↥K)
+  S03e.thm35_algClosed                                (hKsolv : IsSolvable ↥K)
+  S03e.thm35                                          (hKsolv : IsSolvable ↥K)
+
+しかも **Thompson は repo に在る** (`IsFrobeniusGroup.isNilpotent_kernel`) ので、
+仮説は機械的に discharge できる。⟹ 新 leaf
+`OddOrder/BG/Ch1_Preliminary/S03_WithoutSolvableKernel.lean`:
+
+* `isSolvable_kernel_of_isFrobeniusGroup` — Note そのもの (Thompson + nilpotent ⟹ solvable)
+* `bgLemma32` (a)+(b) / `normal_le_kernel_of_not_le'` / `inf_complement_eq_bot_..._'`
+* `bgThm35` / `bgThm35_algClosed`
+
+### ⚠ なぜ「その場で一般化」でなく別 leaf か (import cycle)
+
+`KernelNilpotent` (Thompson) は `BG.Ch1_Preliminary.S03c_Thm37` を import し、
+それが `S03_FrobeniusActions` を import する。よって `S03_FrobeniusActions` で
+Thompson を使うと **cycle**。⟹ 一般形は両者の下流に置く。
+`IsSolvable` 付きの旧版は §3 の内部エンジンとして残す (そこでは solvability が既に手元にある)。
+⚠ CLAUDE.md の「一般版を証明 → 旧版をその特殊化に置換」は、
+**依存階層がそれを許すときだけ**在place でできる。
+
+### ⬜ §3 の残り (次イテレーション)
+
+Lem 3.3 / Thm 3.4 / Thm 3.6 / Thm 3.8 / Prop 3.9 / Thm 3.10 の **条項ごとの照合が未了**
+(実体の所在は確定済、statement の逐語照合はこれから)。
+Thm 3.10 は AxiomsCheck に (a)(b)(c) が分散登録されており、**書籍の 3 条項が
+1 つの statement に揃っているか**を確認する必要がある。
+
+### §4-§16 + Theorems A-E + 補章 — 未着手

@@ -374,6 +374,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorQuotient
 import OddOrder.BG.Ch1_Preliminary.PLengthPComplement
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S02_Lemma27Group
+import OddOrder.BG.Ch1_Preliminary.S03_WithoutSolvableKernel
 import OddOrder.BG.Ch1_Preliminary.S04_Lem45c_Prop46
 import OddOrder.BG.Ch1_Preliminary.S04_Prop44b
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
@@ -6746,6 +6747,18 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.inf_complement_eq_bot_of_normal_not_le_kernel
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.normal_le_kernel_of_not_le
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.isFrobeniusGroup_quotient_of_normal_not_le_kernel
+-- BG Lemma 3.2 **plus its Note** (§3 逐条監査 2026-08-08, issue 0177): the書籍 states Lemma 3.2
+-- with a solvable kernel and then notes that solvability is unnecessary (Thompson's Thesis).  The
+-- three declarations above formalize the lemma *before* the Note; these discharge `IsSolvable ↥K`
+-- via `IsFrobeniusGroup.isNilpotent_kernel` (Isaacs Thm 6.24 = BG Thm 3.7), so the repository
+-- states the book's actual reach.  Separate file because Thompson sits downstream of §3.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.isSolvable_kernel_of_isFrobeniusGroup
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.bgLemma32
+-- BG Theorem 3.5 **plus its Note** (same 逐条監査): Thm 3.5 carries the identical Note ("Just as
+-- for Lemma 3.2 … the assumption that `K` is solvable is not necessary"), and `S03e.thm35` /
+-- `thm35_algClosed` assume `IsSolvable ↥K`.  These discharge it the same way.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.bgThm35_algClosed
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.bgThm35
 -- BG Theorem 3.8 (§3D): `G = KR` solvable of odd order, `K ⊴ G`, `(|R|,|K|)=1`, `C_K(x)=C_K(R)` for
 -- `x ∈ R^#`, and `C_{F(K)}(R)=1`, gives `⁅K,R⁆ ⊆ F(K)`.  Unblocks BG §15 Theorem 15.2 (issue 8011).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03h.thm38

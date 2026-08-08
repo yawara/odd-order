@@ -650,6 +650,7 @@ import OddOrder.BG.Ch1_Preliminary.S01c_Omega1Rigidity
 import OddOrder.BG.Ch1_Preliminary.S02_Lemma27Group
 import OddOrder.BG.Ch1_Preliminary.S02_Representations
 import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
+import OddOrder.BG.Ch1_Preliminary.S03_WithoutSolvableKernel
 import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
 import OddOrder.BG.Ch1_Preliminary.S03f_Thm36
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310

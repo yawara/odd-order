@@ -106,6 +106,14 @@ pat = re.compile(r'^(Theorem|Proposition|Lemma|Corollary)\s+(\d{1,2})\.(\d{1,2})
         「**BG Lemma 2.7(a)/(b)**」と明示コメント付きで登録されていた。
         ⚠ **stale 注記 4 件を訂正** (`S02_RepresentationsBasic.lean` の
         Lem 2.3 / Prop 2.4 / Thm 2.5 の「stub 未配置」+ 「全 6 結果」という件数)。
+      - **§3 進行中 (2026-08-08)**: 全 10 件に実体あり・**未形式化ゼロ**。
+        実収穫 = **特殊化債務 2 件** (Lem 3.2 / Thm 3.5 — どちらも**書籍自身の Note** が
+        「`K` が可解という仮説は不要」と書いているのに repo が `IsSolvable ↥K` を
+        持っていた。Thompson は repo に在るので discharge 可能)。
+        ⟹ `S03_WithoutSolvableKernel.lean` (`bgLemma32` / `bgThm35`)。
+        ⚠ **Lem 3.1 の条項 (b) は pdftotext が丸ごと落としていた** — ページ画像
+        `references/bg/pages/bg-p017.png` (PDF = 書籍 + 13) で `C_K(x) = 1 (x ∈ R^#)` と確定。
+        ⬜ 残り = Lem 3.3 / Thm 3.4 / Thm 3.6 / Thm 3.8 / Prop 3.9 / Thm 3.10 の条項照合。
       - 1 節ぶん終えるごとに census note を更新して commit。
 
 ## 完了条件
@@ -135,6 +143,10 @@ BG の全番号付き結果が**書籍強度**の Lean statement を持つか、
   (`GroupTheory/RepresentationTheory/`) に在った。区分表の穴は**当たりを付ける道具**であって
   不在の証拠ではない。
 
+* 🚨 **書籍の Note / Remark を statement と一緒に読む** — BG は Lem 3.2 と Thm 3.5 の直後に
+  「`K` が可解という仮説は不要」という Note を置いており、それを読まずに statement だけ
+  写した結果 5 宣言に**書籍が明示的に不要と言った仮説**が入っていた (2026-08-08)。
+  **番号付き結果の直後の Note/Remark は statement の一部として扱う**。
 * **注記は当たりを付ける道具であって判定の証拠ではない** — Isaacs では stale 注記の訂正
   (7 件) が実際の補充 (5 件) を上回った。
 * **grep は種別語の略記も含める / 番号だけで引く** — Isaacs 7.4 を `Lem` 略記で取りこぼした。
