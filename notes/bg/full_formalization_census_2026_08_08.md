@@ -588,4 +588,48 @@ BG 6.7 の直後の Remark は「`p`-length one の仮定は Thompson の定理 
 ⟹ repo が `hasPLengthOne` を保持しているのは**書籍の証明どおり**で正しい
 ([[feedback-generalize-specialized-fully]] の「文献引用のみは低優先繰延」に該当)。
 
-### §7-§16 + Theorems A-E + 補章 — 未着手
+## §7 (The Transitivity Theorem、6 件 = 7.1-7.6) — 監査完了 (2026-08-08)
+
+全 6 件被覆・**未形式化ゼロ・packaging 差ゼロ・stale 注記ゼロ** (BG で初の「補充ゼロ」節)。
+
+| BG | repo の endpoint | 照合 |
+|---|---|---|
+| **Lem 7.1** (Inductive Lemma) | `S07.inductiveLemma` 系 (AxiomsCheck:3347) | ✅ |
+| **Thm 7.2** (`m(Z(A)) ≥ 3`) | AxiomsCheck:3360 | ✅ |
+| **Thm 7.3** (`m(Z(A)) ≥ 2` + `q ∈ π(C_G(A))`) | AxiomsCheck:3354 | ✅ |
+| **Thm 7.4** (Propagation) | `S07.transitivity_propagates` — **(a)(b)(c)(d) が 1 statement** | ✅ |
+| **Prop 7.5** | `S07.hypothesis71_of_scn2_or_pLengthOne` — **両分岐 (1)(2) が 1 statement** | ✅ |
+| **Thm 7.6** (Thompson Transitivity) | `S07.thompsonTransitivity` | ✅ |
+
+### ⚠ Hypothesis 7.1(2) の式は pdftotext が丸ごと落としていた
+
+`Hypothesis 7.1` の (2) は pdftotext で
+
+> (2) Whenever `X` is a proper subgroup of `G` that contains `A`, we have
+
+と**結論の式のところで切れている** (Lem 3.1(b) と同じ型)。ページ画像
+`references/bg/pages/bg-p056.png` (PDF = 書籍 + 13 = p.69) で確定:
+
+> **(2)** Whenever `X` is a proper subgroup of `G` that contains `A`, we have
+> `⟨ℋ_X(A;π')⟩ = O_{π'}(X)`.
+
+⟹ repo の `Hypothesis71.generated_eq`
+(`sSup (hInvariant X A (primesOf A)ᶜ) = opiCoreInG (primesOf A)ᶜ X`) と**完全一致**。
+同ページで Lem 7.1 の statement も確認 (`A ⊆ H`, `H ∩ Q₁ ≠ 1`, `H ∩ Q₂ ≠ 1` ⟹ `Q₂ = Q₁^k`)。
+⟹ **BG では「条項/式が OCR で消える」が 2 例目**。番号付き結果だけでなく
+**Hypothesis の定義文**も同じ危険がある。
+
+### 📌 Ch.II の standing hypothesis は `IsMinimalSimpleOdd`
+
+書籍 p.55 (L3267-3269): 「We now assume that the main theorem is false. Henceforth in these
+notes we let `G` denote a fixed **counterexample of minimal order**. Of course `G` is a
+nonabelian simple group.」⟹ repo の `IsMinimalSimpleOdd G` を §7 以降の全 statement が
+仮説に持つのは書籍どおり (§1-§6 が `G` 一般なのと対照的)。
+
+### 📌 7.4(d) の積表示
+
+書籍の (d) 後半は `N_G(P) = O_{π'}(C_G(P))·(N_G(P) ∩ N_G(Q))` (集合積)。repo は
+`∀ n ∈ N_G(P), ∃ c ∈ O_{π'}(C_G(P)), ∃ m ∈ N_G(P) ⊓ N_G(Q), n = c*m` (⊆ 方向のみ) と
+書いているが、`C_G(P) ≤ N_G(P)` ゆえ ⊇ は自明で**同値**。
+
+### §8-§16 + Theorems A-E + 補章 — 未着手

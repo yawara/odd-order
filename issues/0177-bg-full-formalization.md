@@ -150,8 +150,15 @@ pat = re.compile(r'^(Theorem|Proposition|Lemma|Corollary)\s+(\d{1,2})\.(\d{1,2})
         📌 **6.7 の Remark は特殊化債務でない** — 「`p`-length one は Thompson の定理により不要」
         と書くが、その Thompson は**外部文献 [18]** で 3 冊スコープ外 (BG 自身も証明を書いていない)。
         §3 の Lem 3.2 / Thm 3.5 とは逆のケース (あちらの Thompson は repo に在った)。
+      - **§7 監査完了 (2026-08-08)**: 全 6 件被覆・**補充ゼロ** (未形式化 / packaging 差 /
+        stale 注記がすべてゼロ — BG で初)。Thm 7.4 は (a)(b)(c)(d)、Prop 7.5 は両分岐 (1)(2) が
+        既に 1 statement に揃っていた。
+        ⚠ **Hypothesis 7.1(2) の式を pdftotext が丸ごと落としていた** (Lem 3.1(b) と同じ型)。
+        ページ画像 `references/bg/pages/bg-p056.png` で `⟨ℋ_X(A;π')⟩ = O_{π'}(X)` と確定 —
+        repo の `Hypothesis71.generated_eq` と完全一致。
+        ⟹ **番号付き結果だけでなく Hypothesis の定義文も OCR 落ちの危険がある**。
       - 1 節ぶん終えるごとに census note を更新して commit。
-      - ⬜ **次 = §7 (6 件)**。
+      - ⬜ **次 = §8 (1 件)**。
 
 ## 📌 BG の大域規約 (2026-08-08 §3 で確定 — 全節の判定に効く)
 
