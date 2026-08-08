@@ -136,10 +136,48 @@ namespace = `OddOrder.BG.AppC.NormSet` (既存 App.C に合わせる)。
       `{4, −4}` の分岐に畳むと一様になる (`p = 5` では `−4 = 1`)。
 - [x] **Prop 6 一般の場合** — `eq_univ_of_condC`。⚠ 分割 (商) を作らず
       `{(x,k) | x ≠ 0, k ≠ 0, k·x ∈ S}` の二重数え上げ (`Finset.sum_comm` + `card_nbij'`)。
-- [ ] Prop 7 Step 1 (既存 `normN_dSeq_eq_one` を使う)
-- [ ] Prop 7 Step 2 (`A_r` の濃度; `b` の次数 `q`)
-- [ ] Prop 7 Step 3 (既約多項式の個数上界 `(p^r − p)/r`)
+- [x] **Prop 7 Step 1** — `condC_normOneSet` (任意のアフィン部分空間 `a₀ + W` について
+      `A ∩ U` が (C) を満たす)。Lemma 1(a) の素体版 `normN_one_add_smul_one_sub` 込み。
+- [x] **既約多項式の個数上界** — 新 leaf `OddOrder/Algebra/FiniteFieldIrreducibleCount.lean`:
+      `mul_card_le : r * #ι ≤ p^r − p` (単項既約 `r` 次多項式の単射族)。
+- [x] **Prop 7 Step 2** — `natDegree_minpoly_eq` (`b` の次数 = `q`) /
+      `aeval_ne_zero_of_degree_lt` / `towerMap` / `towerSubmodule` / `towerMap_injective` /
+      `card_towerSubmodule` (`|A_r| = p^r`)。
+- [ ] **Prop 7 Step 3** (帰納法本体) — 下記の設計で進める
 - [ ] Prop 7 Step 4 + 主定理 + BG (A) 版の系 + AxiomsCheck 登録
+
+### Step 3 の設計 (次セッションの入口)
+
+**目標**: 仮説 `p ≥ 5`, `q` 素数, `E = E⁻¹`, `c₀ ∈ E ∖ {1}`, `b = 1 − c₀`,
+`b ∉ 𝔽_p` の下で、`1 ≤ r ≤ q` について `A_r ⊆ U`。ここで
+`A_r = {1 + w | w ∈ towerSubmodule p q b r}`。
+
+**多項式による言い換え** (最初に証明する橋渡し補題):
+`x ∈ A_r ↔ ∃ g : (ZMod p)[X], g.natDegree ≤ r ∧ g.coeff 0 = 1 ∧ x = aeval b g`。
+(⟸ は `X * g.divX + C (g.coeff 0) = g` = `Polynomial.X_mul_divX_add` と
+`degree_divX_lt` で `f = g.divX ∈ degreeLT r` を作る。)
+
+**帰納段** (`2 ≤ r ≤ q`、`A_{r−1} ⊆ U` を仮定):
+1. `x ∈ A_r` を `g` (次数 ≤ r, `g.coeff 0 = 1`) で表す。
+2. `g.natDegree < r` なら `x ∈ A_{r−1} ⊆ U`。
+3. `g.natDegree = r` かつ `g` 可約なら `g = g₁g₂` (両者 1 ≤ 次数 < r)。
+   `g.coeff 0 = g₁.coeff 0 · g₂.coeff 0 = 1` なので定数項は両方非零 ⟹
+   `g₁ ← g₁ * C (g₁.coeff 0)⁻¹`, `g₂ ← g₂ * C (g₁.coeff 0)` に正規化すると
+   両方の定数項が 1。⟹ `aeval b gᵢ ∈ A_{r−1} ⊆ U` で `U` は積で閉じる。
+4. 残りは `g` 既約 (次数ちょうど `r`)。**単項化** `h = g * C (g.leadingCoeff)⁻¹` は
+   単項既約 `r` 次。`g ↦ h` は単射 (`g.coeff 0 = 1` から `g = h * C (h.coeff 0)⁻¹` で戻せる)。
+   ⟹ `FiniteFieldCount.mul_card_le` で `r · |A_r ∖ U| ≤ p^r − p`。
+5. `|A_r ∖ U| ≤ (p^r − p)/r ≤ (p^r − p)/2` ⟹
+   `|A_r ∩ U| ≥ p^r − (p^r − p)/2 = (p^r + p)/2 > p^r/2 = |A_r|/2`。
+6. Step 1 (`condC_normOneSet`) + **Prop 6** (`Affine.eq_univ_of_condC`, `p ≥ 5`) ⟹
+   `A_r ∩ U = A_r`。
+
+**Prop 6 への渡し方**: `V := ↥(towerSubmodule p q b r)`,
+`S := {w : ↥V | 1 + (w : 𝔽_{p^q}) ∈ normOneSet p q}`。`Nat.card V = p^r`
+(`card_towerSubmodule`) と `|S| = |A_r ∩ U|` を使う。
+
+**Step 4**: `p^q = |A_q| ≤ |U| = (p^q − 1)/(p − 1) < p^q` で矛盾
+(`normOneUnits_card` が `|U|` を与える)。⟹ `p ≥ 5` かつ `E = E⁻¹` は不可能。
 
 ### Step 3 で使う mathlib 資産 (2026-08-08 実測)
 
