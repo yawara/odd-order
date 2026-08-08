@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.AppC_LemmaC2
+import OddOrder.BG.AppC_AffineLineCondition
 
 /-!
 # BG Appendix C, Remark (IV): the Glauberman–Norton sharpening `p ≤ 3`
@@ -172,5 +173,100 @@ theorem two_le_normSetE_ncard [Fact p.Prime] (hq : q.Prime) (h : q ≠ 2 ∨ p =
     have hpodd : Odd p := (Fact.out : p.Prime).odd_of_ne_two hp2
     have hq2 : q ≠ 2 := h.resolve_right hp2
     exact lemmaC2 p q hpodd hq (hq.odd_of_ne_two hq2)
+
+/-! ## The norm-one set `U`, and Lemma 1(a) over the whole prime field -/
+
+/-- **BG Appendix C, Remark (VII)** / Glauberman–Norton (1): the norm-one set
+`U = {b ∈ 𝔽_{p^q} | N(b) = 1}`, as a subset of the field.
+
+This is the underlying set of `normOneUnits`; the set form is what Proposition 6 consumes. -/
+def normOneSet [Fact p.Prime] : Set (GaloisField p q) := {b | normN p q b = 1}
+
+@[simp] theorem mem_normOneSet_iff [Fact p.Prime] {b : GaloisField p q} :
+    b ∈ normOneSet p q ↔ normN p q b = 1 := Iff.rfl
+
+theorem ne_zero_of_mem_normOneSet [Fact p.Prime] (hq : 0 < q) {b : GaloisField p q}
+    (hb : b ∈ normOneSet p q) : b ≠ 0 := by
+  intro h
+  rw [mem_normOneSet_iff, h, normN_zero p q hq] at hb
+  exact zero_ne_one hb
+
+/-- The norm of an inverse of a norm-one element is `1`. -/
+theorem normN_inv_of_mem_normOneSet [Fact p.Prime] (hq : 0 < q) {b : GaloisField p q}
+    (hb : b ∈ normOneSet p q) : normN p q b⁻¹ = 1 := by
+  have hb0 : b ≠ 0 := ne_zero_of_mem_normOneSet p q hq hb
+  have := normN_mul p q b b⁻¹
+  rw [mul_inv_cancel₀ hb0, normN_one, hb, one_mul] at this
+  exact this.symm
+
+/-- **Glauberman–Norton, Lemma 1(a)** (p. 1089) over the whole prime field: if `E = E⁻¹` and
+`a ∈ E`, then `1 + k(1 - a) ∈ U` for every `k ∈ 𝔽_p`.
+
+The repository already has this for natural-number `k` (`normN_dSeq_eq_one`, the telescoping
+step inside BG's Lemma C.1, where `dSeq p q a k = k + 1 - k * a`); every element of the prime
+field is such a cast, so the two statements agree. -/
+theorem normN_one_add_smul_one_sub [Fact p.Prime] (hq : 0 < q)
+    (hEinv : normSetE p q = (normSetE p q)⁻¹) {a : GaloisField p q} (ha : a ∈ normSetE p q)
+    (k : ZMod p) :
+    (1 + k • (1 - a) : GaloisField p q) ∈ normOneSet p q := by
+  haveI : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
+  have hcast : (k • (1 - a) : GaloisField p q) = ((k.val : ℕ) : GaloisField p q) * (1 - a) := by
+    rw [Algebra.smul_def, ← map_natCast (algebraMap (ZMod p) (GaloisField p q)) k.val,
+      ZMod.natCast_val, ZMod.cast_id]
+  have hd : (1 + k • (1 - a) : GaloisField p q) = dSeq p q a k.val := by
+    rw [hcast, dSeq]; ring
+  rw [mem_normOneSet_iff, hd]
+  exact normN_dSeq_eq_one p q hq hEinv ha k.val
+
+/-! ## Proposition 7, Step 1: `A ∩ U` satisfies condition (C) -/
+
+/-- **Glauberman–Norton, Proposition 7, Step 1** (p. 1092): for every affine subspace
+`A = a₀ + W` of `𝔽_{p^q}` over `𝔽_p`, the set `A ∩ U` satisfies condition (C).
+
+Given `b ∈ A` and `x` in the direction `W` with `b - x, b, b + x ∈ U`, put `d = b⁻¹x` and
+`c = 1 - d`.  Since `U` is closed under multiplication and inverses, `c = b⁻¹(b - x) ∈ U` and
+`2 - c = 1 + d = b⁻¹(b + x) ∈ U`, so `c ∈ E`; Lemma 1(a) then gives `1 + kd ∈ U`, whence
+`b + kx = b(1 + kd) ∈ U`.
+
+The affine subspace is presented as a coset `a₀ + W` and condition (C) is stated on the
+direction `W`, which is the shape `Affine.eq_univ_of_condC` consumes. -/
+theorem condC_normOneSet [Fact p.Prime] (hq : 0 < q)
+    (hEinv : normSetE p q = (normSetE p q)⁻¹)
+    (W : Submodule (ZMod p) (GaloisField p q)) (a₀ : GaloisField p q) :
+    Affine.CondC (p := p) {w : ↥W | a₀ + (w : GaloisField p q) ∈ normOneSet p q} := by
+  intro b x hsub hb hadd k
+  simp only [Set.mem_setOf_eq, Submodule.coe_add, Submodule.coe_sub] at hsub hb hadd ⊢
+  set B : GaloisField p q := a₀ + (b : GaloisField p q) with hB
+  set X : GaloisField p q := (x : GaloisField p q) with hX
+  have hB1 : normN p q B = 1 := hb
+  have hB0 : B ≠ 0 := ne_zero_of_mem_normOneSet p q hq hb
+  have hBinv : normN p q B⁻¹ = 1 := normN_inv_of_mem_normOneSet p q hq hb
+  -- `c = B⁻¹ (B - X) = 1 - B⁻¹X` lies in `E`.
+  have hsub' : normN p q (B - X) = 1 := by
+    have : a₀ + ((b : GaloisField p q) - X) = B - X := by rw [hB]; ring
+    rw [← this]; exact hsub
+  have hadd' : normN p q (B + X) = 1 := by
+    have : a₀ + ((b : GaloisField p q) + X) = B + X := by rw [hB]; ring
+    rw [← this]; exact hadd
+  set d : GaloisField p q := B⁻¹ * X with hd
+  have hc1 : normN p q (1 - d) = 1 := by
+    have he : (1 : GaloisField p q) - d = B⁻¹ * (B - X) := by
+      rw [hd]; field_simp
+    rw [he, normN_mul, hBinv, hsub', one_mul]
+  have hc2 : normN p q (2 - (1 - d)) = 1 := by
+    have he : (2 : GaloisField p q) - (1 - d) = B⁻¹ * (B + X) := by
+      rw [hd]; field_simp; ring
+    rw [he, normN_mul, hBinv, hadd', one_mul]
+  have hcE : (1 - d) ∈ normSetE p q := ⟨hc1, hc2⟩
+  -- Lemma 1(a) applied to `c = 1 - d` gives `1 + k d ∈ U`.
+  have hstep := normN_one_add_smul_one_sub p q hq hEinv hcE k
+  have hone_sub : (1 : GaloisField p q) - (1 - d) = d := by ring
+  rw [mem_normOneSet_iff, hone_sub] at hstep
+  -- Multiply back by `B`.
+  have hfinal : a₀ + ((b : GaloisField p q) + k • X) = B * (1 + k • d) := by
+    rw [hB, hd, Algebra.smul_def, Algebra.smul_def]
+    field_simp
+    ring
+  rw [mem_normOneSet_iff, Submodule.coe_smul, ← hX, hfinal, normN_mul, hB1, hstep, one_mul]
 
 end OddOrder.BG.AppC.NormSet
