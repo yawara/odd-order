@@ -872,4 +872,39 @@ theorem absolutely_irreducible_iff_hom_eq_F      ← 列 0 から始まる
 (= `Hom_F(M,M) = E(G)`) / (c) `isAbsolutelyIrreducible_overEnd`。
 ⟹ **未形式化ではない**が、census の所在記録が誤っていた。
 
-### §14-§16 + Theorems A-E + 補章 — 未着手
+## §14 (Maximal Subgroups of Type 𝒫 and Counting、13 件 = 14.1-14.13) — 監査完了 (2026-08-08)
+
+13 件すべてに endpoint あり。**しかし BG 監査で初めて「真の未形式化」を確認**した節。
+
+| BG | repo | 照合 |
+|---|---|---|
+| **Prop 14.2** ((a)-(g)) | `typeP_structure` + 個別条項 5 本 | 🔴 **(a) 後半と (g) の一部が未形式化** → [issue 0178](../../issues/0178-bg-prop142-regular-u-and-nilpotent-msigma.md) |
+| **Thm 14.7** ((a)-(h)) | `typeP_duality` が (b)-(h) を `∃!` で束ね、(a) は `typeP_partner_centralizer_singleton` | ✅ 全条項あり (軽微な分離) |
+| **Lem 14.5** ((a)(b)(c)) | `xRsub_disjoint` / `Mtilde_disjoint` / `sigmaSaturation_Rsub_count` | ✅ |
+| **Cor 14.9** ((a)(b)) | `exists_mem_conjClassSet_Mtilde_or_zTilde_of_ne_one` ほか | ✅ |
+| 14.1 / 14.3 / 14.4 / 14.6 / 14.8 / 14.10 / **14.11** / 14.12 / 14.13 | すべて endpoint あり | ✅ |
+
+### 🔴🔴 BG 監査で唯一の「真の未形式化」— Prop 14.2 の 2 件
+
+§1-§13 (127 件) で見つかった問題は**すべて packaging 差か stale 注記**で、実体は必ず在った。
+Prop 14.2 は違う: **書籍の主張が repo のどこにも無い**。
+
+1. **(a) 後半** — 「`K` は `M` のある abelian Hall `(κ(M) ∪ σ(M))'`-部分群 `U` に
+   **regular に作用**し、`U M_σ` は `M` における `K` の normal complement」。
+   ⚠ `typeP_structure` は `U` の Hall 性を**仮説 `_hU` で受け取り、使っていない**
+   (アンダースコア付き)。
+2. **(g) 第 3 主張** — 「`M ∈ 𝓜_{𝒫₂}` なら … `M_σ` は **nilpotent** な TI-部分群」。
+   `σ = β` / `|K|` prime / TI は在るが**冪零性だけ無い**。
+   ⚠ **下流 `AppE_CorollaryE5` / `AppE_E5Counting` はこれを仮説 `hMσnil` として取っている** —
+   CLAUDE.md が警告する「hard content を未充足の仮説に hoist」そのもの。
+   ⟹ **閉じれば下流の仮説を実証明に置換できる**。
+
+⟹ [issue 0178](../../issues/0178-bg-prop142-regular-u-and-nilpotent-msigma.md) を起票。
+
+### ⚠ この gap は「deferred 注記」に書かれていたが、注記の 8 割は stale だった
+
+`typeP_structure` の docstring は 7 項目を "deferred" と列挙していたが、**そのうち 4 件
+((b2)/(d) の第 2 条項/(e)/(f)) は既に別宣言で証明済**だった。⟹ **注記を根拠に「未形式化」と
+書かない。概念形の grep で不在を確認してから初めて gap と呼ぶ**。docstring は実態に合わせて訂正。
+
+### §15-§16 + Theorems A-E + 補章 — 未着手

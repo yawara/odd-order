@@ -211,8 +211,19 @@ pat = re.compile(r'^(Theorem|Proposition|Lemma|Corollary)\s+(\d{1,2})\.(\d{1,2})
            ⟹ `S10.bgLem108`。
         2. **`S02_RepresentationPropositions.lean` の「stub 未配置」4 件** (§2 の見落とし。
            §2 監査は同じ節の**別ファイル**しか直していなかった)。
+      - **§14 監査完了 (2026-08-08)**: 13 件すべてに endpoint あり。
+        🔴🔴 **BG 監査で唯一の「真の未形式化」を確認** — Prop 14.2 の
+        **(a) 後半** (`K` が abelian Hall `(κ∪σ)'`-部分群 `U` に regular 作用 / `U M_σ` が
+        normal complement) と **(g) 第 3 主張** (`M_σ` が nilpotent)。
+        ⟹ [issue 0178](0178-bg-prop142-regular-u-and-nilpotent-msigma.md) を起票。
+        ⚠ 下流 `AppE_*` は `M_σ` 冪零を**仮説 `hMσnil`** として取っており、閉じれば実証明に
+        置換できる (hard content の仮説 hoist)。
+        ⚠ **`typeP_structure` の docstring は 7 項目を "deferred" と列挙していたが、そのうち
+        4 件は既に別宣言で証明済だった** ⟹ **注記を根拠に「未形式化」と書かない。
+        概念形 grep で不在を確認してから初めて gap と呼ぶ**。
+        ✅ Thm 14.7 は (b)-(h) を `∃!` で束ね (a) を別宣言に持つ — 全条項あり。
       - 1 節ぶん終えるごとに census note を更新して commit。
-      - ⬜ **次 = §14 (12 件)**。
+      - ⬜ **次 = §15 (9 件) / §16 (1 件) / Theorems A-E (5 件) / 補章 (14 件)**。
 
 ## 📌 BG の大域規約 (2026-08-08 §3 で確定 — 全節の判定に効く)
 

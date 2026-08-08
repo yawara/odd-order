@@ -645,13 +645,29 @@ theorem kstar_ne_msigma_aux [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 ("nearly everything proved in §13" about `M ∈ 𝓜_𝓟`).
 
 `K` = Hall `κ(M)`-subgroup of `M`, `K* = C_{M_σ}(K)`, `U` = Hall `(κ(M) ∪ σ(M))'`-subgroup.
-BG states seven parts (a)–(g); this Lean surface is a **faithful partial** capturing the
-prime action `(a)`, `K* ≠ 1` `(c)`, the normalizer identity `N_M(X) = K × K*` `(b1)`, the
-`(d)` disjointness `K* ∩ M^g = 1` for `g ∉ M`, and the type-`P₂` consequences `(g)`
-(`σ = β`, `|K|` prime, `M_σ` a `TI`-subgroup). Deferred to proof time (gated on §13): the
-`(a)` regular action on `U` / normal complement `U M_σ`, part `(b2)`, the second half of
-`(c)`, the `(d)` clause `K ∩ K^g = 1`, parts `(e)`, `(f)`, and `M_σ` nilpotent in `(g)`.
-See `notes/bg/s14_typeP_counting.md` for the full part-map.
+BG states seven parts (a)–(g).  This bundle captures the prime action `(a)`, `K* ≠ 1` and the
+second half of `(c)`, the normalizer identity `N_M(X) = K × K*` `(b1)`, the `(d)` clause
+`K* ∩ M^g = 1` for `g ∉ M`, and the type-`P₂` consequences `(g)` (`σ = β`, `|K|` prime,
+`M_σ` a `TI`-subgroup).
+
+**Status of the rest (issue 0177 §14 audit, 2026-08-08 — the old "deferred" list was mostly
+stale).**  These are proved, just not in this bundle:
+
+* `(b2)` = `LocalStructure.typeP_elemAbelian_le_neighbor_Msigma`
+* `(d)`, clause `K ∩ K^g = 1` = `SigmaCovers.typeP_kappaHall_inf_conj_eq_bot`
+* `(e)` = `LocalStructure.typeP_sylow_not_le_kstar_of_isHall`
+* `(f)` = `TypePDuality.typeP_sigma_subgroup_le_Msigma`
+
+⚠ **Two pieces are genuinely NOT formalized anywhere** (verified by concept-form grep, not by
+reading notes):
+
+1. `(a)`, second half — `K` acts **regularly** on some abelian Hall `(κ(M) ∪ σ(M))'`-subgroup
+   `U` of `M`, and `U M_σ` is a normal complement of `K` in `M`.  (`U`'s Hall property is an
+   *assumed* input `_hU` here, and is unused.)
+2. `(g)`, third clause — `M_σ` is **nilpotent** for `M ∈ 𝓜_{𝒫₂}`.  Downstream `AppE_*` files
+   currently take this as a hypothesis (`hMσnil`) rather than deriving it.
+
+See `notes/bg/s14_typeP_counting.md` and issue 0177.
 
 **Faithfulness note (2026-06-14):** a spurious `M_σ ≤ N_G(K*)` conjunct was removed — it is
 not one of BG's seven parts and is false in general (`K = C_q` acting on a Heisenberg
