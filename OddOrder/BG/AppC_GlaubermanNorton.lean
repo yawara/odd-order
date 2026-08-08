@@ -375,4 +375,44 @@ theorem card_towerSubmodule [Fact p.Prime] (hq : q.Prime) {b : GaloisField p q}
   rw [Nat.card_congr hequiv, Nat.card_congr (degreeLTEquiv (ZMod p) r).toEquiv,
     Nat.card_fun, Nat.card_zmod, Nat.card_eq_fintype_card, Fintype.card_fin]
 
+/-- The affine space `A_r = {1 + k₁b + k₂b² + ⋯ + k_r b^r}` of the paper's Step 2, as a coset of
+`towerSubmodule`. -/
+def towerSet [Fact p.Prime] (b : GaloisField p q) (r : ℕ) : Set (GaloisField p q) :=
+  {x | ∃ w ∈ towerSubmodule p q b r, x = 1 + w}
+
+/-- `A_r` is exactly the set of values at `b` of polynomials of degree `≤ r` with constant
+term `1` — the shape in which the paper's Step 3 does its case analysis
+(degree drop / reducible / irreducible). -/
+theorem mem_towerSet_iff [Fact p.Prime] {b : GaloisField p q} {r : ℕ} {x : GaloisField p q} :
+    x ∈ towerSet p q b r ↔
+      ∃ g : (ZMod p)[X], g.natDegree ≤ r ∧ g.coeff 0 = 1 ∧ x = (aeval b) g := by
+  constructor
+  · rintro ⟨w, ⟨f, rfl⟩, rfl⟩
+    refine ⟨C 1 + X * (f : (ZMod p)[X]), ?_, ?_, ?_⟩
+    · refine (natDegree_add_le _ _).trans ?_
+      simp only [natDegree_C, max_le_iff]
+      refine ⟨Nat.zero_le _, ?_⟩
+      rcases eq_or_ne (f : (ZMod p)[X]) 0 with hf0 | hf0
+      · simp [hf0]
+      · have hlt : ((f : (ZMod p)[X])).natDegree < r :=
+          (natDegree_lt_iff_degree_lt hf0).mpr (mem_degreeLT.mp f.2)
+        refine (natDegree_mul_le).trans ?_
+        rw [natDegree_X]
+        omega
+    · simp
+    · simp [towerMap_apply]
+  · rintro ⟨g, hdeg, h0, rfl⟩
+    have hg0 : g ≠ 0 := fun h => by rw [h] at h0; simp at h0
+    have hfmem : g.divX ∈ degreeLT (ZMod p) r := by
+      rw [mem_degreeLT]
+      refine lt_of_lt_of_le (degree_divX_lt hg0) ?_
+      rw [degree_eq_natDegree hg0]
+      exact_mod_cast hdeg
+    refine ⟨towerMap p q b r ⟨g.divX, hfmem⟩, ⟨_, rfl⟩, ?_⟩
+    have hrec : X * g.divX + C (g.coeff 0) = g := X_mul_divX_add g
+    rw [towerMap_apply]
+    calc (aeval b) g = (aeval b) (X * g.divX + C (g.coeff 0)) := by rw [hrec]
+      _ = 1 + b * (aeval b) g.divX := by
+          rw [map_add, map_mul, aeval_X, aeval_C, h0, map_one]; ring
+
 end OddOrder.BG.AppC.NormSet
