@@ -247,7 +247,38 @@ pat = re.compile(r'^(Theorem|Proposition|Lemma|Corollary)\s+(\d{1,2})\.(\d{1,2})
         🔴 **Theorem A の逐条対応を実施した結果、issue 0178 の gap が
         Theorem A(3)(4) そのものだと判明** — 周辺的な条項ではなく BG 主定理の条項。
         ⟹ **0178 の優先度を上げる根拠**。
-      - ⬜ **残り = Theorems B-E の逐条対応表** (下敷きの §10-§15 は監査済なので対応付け作業)。
+      - **Theorems A-E 監査完了 (2026-08-08)**: **書籍自身が依存図で対応表を与えていた**
+        (L6571-6573「their "proof" can be given **schematically**」+ L6575-6675 の図)。
+        A(1)←Thm 10.2(b) / A(2)←Lem 15.1(a) / A(3)(4)(5)←Prop 14.2(a)(b)(c) /
+        A(6)(7)(8)←Thm 15.2(a)+Cor 15.5+Thm 15.7(a)(b) / B(1)←Lem 12.1(d) /
+        B(2)-(5)←Thm 12.5(b)+Lem 15.1(c)(d)(e) / C(1)-(3)←Cor 14.12+Cor 15.6+Lem 15.1(b) /
+        C(4)(5)←Thm 10.1(b)+Thm 14.7(a)(b)(c)+Prop 14.2(c) /
+        C(6)(7)(8)(11)←Thm 14.7(d)(e)(f)(g)+Prop 14.2(d) /
+        C(9)←Thm A(3)(5)+Prop 14.2(g)+Thm 15.7(a) / D(1)←Cor 15.3(b) / D(2)←Lem 12.17 /
+        D(3)(4)←Thm 14.4(b)+Thm A(8)+Cor 15.9 / E(1)←Lem 14.5(c) / E(2)←Thm 13.9 /
+        E(3)←Cor 14.9。
+        ⟹ **Theorems A-E の被覆は §10-§15 に完全に帰着し、唯一の穴は issue 0178** —
+        それが **Theorem A(3)(4)** と **Theorem C(9)** として現れる。
+        📌 **教訓**: 「要約定理」の逐条監査は、**書籍が依存図/schematic proof を持っていないか
+        先に探す**。BG は持っており、対応表を自分で作る必要はなかった。
+
+## 🏁 完了 (2026-08-08)
+
+| 区分 | 件数 | 状態 |
+|---|---|---|
+| §1-§16 の番号付き結果 | **162** | ✅ 全件被覆 |
+| Theorems A-E | 5 (計 33 条項) | ✅ §10-§15 に還元、対応表確定 |
+| 補章 A-E | **19** | ✅ 全件被覆 |
+| **合計** | **186** | |
+
+**実形式化 8 件** (すべて axiom-clean): `bgThm310` / `isMulCommutative_actionCommutator` +
+`bgThm412` / `bgThm53` / `lemma63a` / `bgThm102` / `bgLem108` / `bgProp1011` / `bgCor116`。
+**特殊化債務解消 2 件** (§3 の可解性仮説)。**索引補完 7 件** (§9 が AxiomsCheck に不在だった)。
+**stale 注記訂正 20 件超**。
+
+**真の未形式化は 1 件のみ** → [issue 0178](0178-bg-prop142-regular-u-and-nilpotent-msigma.md)。
+
+⟹ **3 冊の逐条監査 (Peterfalvi 284 / Isaacs 305 / BG 186) がすべて完了**。
 
 ## 📌 BG の大域規約 (2026-08-08 §3 で確定 — 全節の判定に効く)
 

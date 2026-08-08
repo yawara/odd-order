@@ -990,8 +990,61 @@ repo 対応 (すべて実体あり): `AppA_PStability*` (`thmA1`/`thmA2`/`thmA3`
 ⟹ **[issue 0178](../../issues/0178-bg-prop142-regular-u-and-nilpotent-msigma.md) の gap は
 周辺的な条項ではなく、BG の主定理 Theorem A の (3)(4) そのもの**。優先度を上げる根拠になる。
 
-### ⬜ 残り: Theorems B-E の逐条対応
+### ✅ Theorems A-E の完全な対応表 — **書籍自身が依存図で与えていた**
 
-repo は条項ラベル付きで B(1)(3)(4)(5) / C(1)(2)(3)(4)(5)(8)(9) / D(1)(3)(4) / E(2) に言及。
-**A と同じ「下敷きの番号付き結果への還元」を B-E でも行うのが残作業** (下敷きは §10-§15 で
-既に監査済なので、対応表を作る作業)。
+書籍 L6571-6573:
+> All these results have already appeared elsewhere in this book or are a direct consequence of
+> previous results. Consequently their "proof" can be given **schematically**.
+
+その「schematic proof」= L6575-6675 の**依存図**が、各条項の出典を明示している
+(pdftotext では図が縦に潰れて読みにくいが、ラベルの並びから復元できる):
+
+| 主定理 | 条項 | 出典 (書籍の依存図) | 監査結果 |
+|---|---|---|---|
+| **A** | (1) | Thm 10.2(b) | ✅ |
+| | (2) | Lem 15.1(a) | ✅ |
+| | **(3)(4)**(5) | **Prop 14.2(a)**(b)(c) | 🔴 **(3)(4) = Prop 14.2(a) 後半 = issue 0178** |
+| | (6)(7)(8) | Thm 15.2(a) / Cor 15.5 / Thm 15.7(a)(b) | ✅ |
+| **B** | (1) | Lem 12.1(d) | ✅ |
+| | (2)(3)(4)(5) | Thm 12.5(b) / Lem 15.1(d)(e)(c) | ✅ |
+| **C** | (1)(2)(3) | Cor 14.12 / Cor 15.6 / Lem 15.1(b) | ✅ |
+| | (4)(5) | Thm 10.1(b) / Thm 14.7(a)(b)(c) / Prop 14.2(c) | ✅ |
+| | (6)(7)(11)(8) | Thm 14.7(d)(f)(g)(e) / Prop 14.2(d) | ✅ |
+| | **(9)** | Thm A(3)(5) / **Prop 14.2(g)** / Thm 15.7(a) | 🔴 **Prop 14.2(g) の `M_σ` 冪零 = issue 0178** |
+| **D** | (1) | Cor 15.3(b) | ✅ |
+| | (2) | Lem 12.17 | ✅ |
+| | (3)(4) | Thm 14.4(b) / Thm A(8) / Cor 15.9 | ✅ |
+| **E** | (1) | Lem 14.5(c) | ✅ |
+| | (2) | Thm 13.9 | ✅ |
+| | (3) | Cor 14.9 | ✅ |
+
+⟹ **Theorems A-E の被覆は §10-§15 の被覆に完全に帰着し、唯一の穴は issue 0178
+(Prop 14.2 の (a) 後半と (g) の冪零性) — それが Theorem A(3)(4) と Theorem C(9) に現れる**。
+
+📌 **教訓**: 「要約定理」の逐条監査は、**書籍が依存図/schematic proof を持っていないか先に探す**。
+BG はそれを持っており、対応表を自分で作る必要はなかった。
+
+---
+
+# 🏁 BG 逐条監査 — 完了 (2026-08-08)
+
+| 区分 | 件数 | 状態 |
+|---|---|---|
+| §1-§16 の番号付き結果 | **162** | ✅ 全件被覆 |
+| Theorems A-E | 5 (計 33 条項) | ✅ §10-§15 に還元、対応表確定 |
+| 補章 A-E | **19** | ✅ 全件被覆 |
+| **合計** | **186** | |
+
+**実形式化 (書籍形 statement の新設 / 欠落条項の補充) = 8 件**:
+`bgThm310` (§3) / `isMulCommutative_actionCommutator` + `bgThm412` (§4) / `bgThm53` (§5) /
+`lemma63a` (§6) / `bgThm102` + `bgLem108` (§10) / `bgProp1011` (§10) / `bgCor116` (§11)。
+すべて AxiomsCheck 登録済・axiom-clean。
+
+**特殊化債務の解消 = 2 件** (§3 Lem 3.2 / Thm 3.5 の可解性仮説、`S03_WithoutSolvableKernel`)。
+
+**索引の補完 = 7 件** (§9 の Uniqueness Theorem 系が AxiomsCheck に 1 件も無かった)。
+
+**stale 注記の訂正 = 20 件超** (§1:2 / §2:8 / §3:1 / §4:3 / §5:1 / §10:2 / §12:2 / §15:2 …)。
+
+**真の未形式化 = 1 件のみ** → [issue 0178](../../issues/0178-bg-prop142-regular-u-and-nilpotent-msigma.md)
+(Prop 14.2 の (a) 後半 = Thm A(3)(4)、(g) の `M_σ` 冪零 = Thm C(9))。
