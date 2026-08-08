@@ -106,15 +106,33 @@ pat = re.compile(r'^(Theorem|Proposition|Lemma|Corollary)\s+(\d{1,2})\.(\d{1,2})
         「**BG Lemma 2.7(a)/(b)**」と明示コメント付きで登録されていた。
         ⚠ **stale 注記 4 件を訂正** (`S02_RepresentationsBasic.lean` の
         Lem 2.3 / Prop 2.4 / Thm 2.5 の「stub 未配置」+ 「全 6 結果」という件数)。
-      - **§3 進行中 (2026-08-08)**: 全 10 件に実体あり・**未形式化ゼロ**。
-        実収穫 = **特殊化債務 2 件** (Lem 3.2 / Thm 3.5 — どちらも**書籍自身の Note** が
-        「`K` が可解という仮説は不要」と書いているのに repo が `IsSolvable ↥K` を
-        持っていた。Thompson は repo に在るので discharge 可能)。
-        ⟹ `S03_WithoutSolvableKernel.lean` (`bgLemma32` / `bgThm35`)。
+      - **§3 監査完了 (2026-08-08)**: 全 10 件被覆・**未形式化ゼロ**。実収穫 3 件:
+        1. **特殊化債務 2 件** (Lem 3.2 / Thm 3.5 — どちらも**書籍自身の Note** が
+           「`K` が可解という仮説は不要」と書いているのに repo が `IsSolvable ↥K` を
+           持っていた。Thompson は repo に在るので discharge 可能)。
+           ⟹ `S03_WithoutSolvableKernel.lean` (`bgLemma32` / `bgThm35`)。
+        2. **部分被覆 1 件 = Thm 3.10 の (a)** — capstone `bgThm310_nilpotent` は (b)+(c) しか
+           返しておらず、(a) は module leaf 止まりだった。docstring は「(a) は elsewhere」と
+           書いていたがその実体は**可換 kernel 専用**で書籍の (a) を満たさない。
+           ⟹ (a) を dévissage に通し、書籍パッケージ `S03g.bgThm310` を新設。
+        3. **BG の大域規約 2 本を確定** (下記 ⚠)。
         ⚠ **Lem 3.1 の条項 (b) は pdftotext が丸ごと落としていた** — ページ画像
         `references/bg/pages/bg-p017.png` (PDF = 書籍 + 13) で `C_K(x) = 1 (x ∈ R^#)` と確定。
-        ⬜ 残り = Lem 3.3 / Thm 3.4 / Thm 3.6 / Thm 3.8 / Prop 3.9 / Thm 3.10 の条項照合。
+        ✅ **Prop 3.9 は書籍より強い** (書籍の「`H` は `p'`-群」を落としている)。
       - 1 節ぶん終えるごとに census note を更新して commit。
+      - ⬜ **次 = §4 (20 件)**。
+
+## 📌 BG の大域規約 (2026-08-08 §3 で確定 — 全節の判定に効く)
+
+**これを知らないと偽の特殊化債務を起票する**:
+
+| 規約 | 出典 | 意味 |
+|---|---|---|
+| 「All groups considered in this work will be **finite** except when explicitly stated otherwise」 | 書籍 p.4 (pdftotext L612) | `[Finite G]` は書籍強度 |
+| 「we consider representations … by **finite-dimensional** linear transformations. … By module we will always mean **finite-dimensional** right module」 | 書籍 p.9, §2 冒頭 (L961-967) | **`[FiniteDimensional F V]` は書籍強度** — module 系 statement (Thm 3.4 / 3.5 等) に付いていても債務でない |
+
+⚠ 個々の statement 本体には書かれていないので、**節冒頭の規約を読まないと
+「repo が書籍より狭い」と誤判定する**。
 
 ## 完了条件
 
@@ -149,6 +167,13 @@ BG の全番号付き結果が**書籍強度**の Lean statement を持つか、
   **番号付き結果の直後の Note/Remark は statement の一部として扱う**。
 * **注記は当たりを付ける道具であって判定の証拠ではない** — Isaacs では stale 注記の訂正
   (7 件) が実際の補充 (5 件) を上回った。
+* 🚨 **AxiomsCheck の「(a)+(b)」表記も条項被覆の証拠にならない** (§3 Thm 3.10, 2026-08-08)。
+  注記が「BG Theorem 3.10 **(a)+(b)**, elementary-abelian GROUP case」と書いていても、
+  それは「その周辺で (a) も証明済」の意で、**endpoint の結論の型に (a) が入っている
+  保証ではない**。実際 group form は (a) を捨てて (b)+(c) だけ返していた。
+  ⟹ **条項照合は注記でなく `theorem` の結論の型を読む**。
+* 🚨 **「(x) は M-independent ゆえ elsewhere で提供」型の docstring は行き先を確認する**
+  — Thm 3.10 の "elsewhere" は**可換 kernel 専用**の特殊形で、書籍の条項を満たさなかった。
 * **grep は種別語の略記も含める / 番号だけで引く** — Isaacs 7.4 を `Lem` 略記で取りこぼした。
 * **内部段の名前が先に当たっても file の endpoint を確認する** — Pf (9.11) / Isaacs 3.34 / 9.23。
 * **検索範囲を章のディレクトリに絞らない** — owner chapter 規則で他章に在る (Isaacs 2.20 / 3.15 / 3.23)。

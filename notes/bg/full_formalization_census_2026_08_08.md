@@ -318,11 +318,73 @@ Thompson を使うと **cycle**。⟹ 一般形は両者の下流に置く。
 ⚠ CLAUDE.md の「一般版を証明 → 旧版をその特殊化に置換」は、
 **依存階層がそれを許すときだけ**在place でできる。
 
-### ⬜ §3 の残り (次イテレーション)
+### ✅ 残り 6 件の条項照合 (2026-08-08 完了)
 
-Lem 3.3 / Thm 3.4 / Thm 3.6 / Thm 3.8 / Prop 3.9 / Thm 3.10 の **条項ごとの照合が未了**
-(実体の所在は確定済、statement の逐語照合はこれから)。
-Thm 3.10 は AxiomsCheck に (a)(b)(c) が分散登録されており、**書籍の 3 条項が
-1 つの statement に揃っているか**を確認する必要がある。
+| BG | repo の endpoint | 照合結果 |
+|---|---|---|
+| **Lem 3.3** | `S03b.centralizer_ne_bot_of_nontrivial_kernel` | ✅ 一致 (`char F ∤ \|K\|` = `(Nat.card K : F) ≠ 0`、結論 `∃ v ≠ 0, ∀ r ∈ R, ρ r v = v`) |
+| **Thm 3.4** | `S03.thm34` (一般体) / `thm34_algClosed` | ✅ 一致。`FiniteDimensional` は**書籍の大域規約**であり債務でない (下記) |
+| **Thm 3.6** | `S03f.thm36` | ✅ 一致 (`R₀ ≤ R` 素数位数・`C_H(R₀)` が Z-群 ⟹ `⁅H,R⁆` は全素数 `p` で `p`-length one) |
+| **Thm 3.8** | `S03h.thm38` | ✅ 一致 (3 条件そのまま、結論 `⁅K,R⁆ ≤ F(K)`) |
+| **Prop 3.9** | `S03.isCyclic_of_isPGroup_of_isFrobeniusAction` | ✅ **書籍より強い** — 書籍の「`H` は `p'`-群」を落としている (docstring に明記済) |
+| **Thm 3.10** | `S03g.bgThm310` (新設) | 🔴 **部分被覆だった** — 下記で解消 |
+
+### 🔴 実収穫 2: Thm 3.10 の (a) が group level に無かった (部分被覆)
+
+**症状**: `bgThm310_nilpotent` (一般 nilpotent `M` の capstone) の結論は **(b)+(c) のみ**で、
+docstring も「Part (a) (`R` of prime order) is `M`-independent and is **provided elsewhere**」と
+書いていた。しかし "elsewhere" = `prime_card_complement_of_frobenius_conj` は
+**Frobenius kernel が可換**という仮説付き (§14.2(g) 専用の共役形) で、書籍の (a) を満たさない。
+
+⚠ **AxiomsCheck の注記は (a) を「在る」と読ませる形だった** — `6712` が
+「BG Theorem 3.10 **(a)+(b)**, general (non-abelian) kernel」、`6734` が
+「(a)+(b), elementary-abelian **GROUP** case, general kernel」と書いており、番号 grep でも
+注記読みでも「(a) は在る」と見える。実際そこに在るのは **module leaf**
+(`prime_card_and_finrank_of_elemAbelian_general`) までで、**group form の
+`bgThm310_elemAbelian_group` は (b)+(c) しか返していなかった** (= (a) を捨てていた)。
+⟹ **注記の "(a)+(b)" は「その周辺で (a) も証明済」の意であって、
+endpoint の結論に (a) が入っている保証ではない**。結論の型を読むこと。
+
+**解消 (2026-08-08)**:
+
+1. `S03g_Thm310GroupForm.bgThm310_elemAbelian_group` — 結論に (a) を追加
+   (`∃ p', p'.Prime ∧ Nat.card ↥R = p'`)。証明は既存の module leaf
+   `prime_card_and_finrank_of_elemAbelian_general` を、既に組んである仮説翻訳
+   (`hCK'` / `hcond3'` / `hIsFrob.conj_frobenius`) にそのまま食わせるだけ。
+2. `S03g_Thm310Nilpotent.bgThm310_nilpotent_aux` / `bgThm310_nilpotent` — (a) を dévissage に通す。
+   **base case** は 1 で得た (a) をそのまま、**step case** は `resN.1`
+   (`N ◁ M` への帰納法仮説) をそのまま返す — (a) は `M` に依らないので step は無証明。
+3. `S03g_Thm310Nilpotent.bgThm310` — **書籍どおりのパッケージを新設**:
+
+   ```
+   ∃ p, p.Prime ∧ Nat.card ↥R = p ∧ IsCyclic ↥R ∧
+     Nat.card M = Nat.card ↥C_M(R) ^ p ∧
+     (IsCyclic ↥C_M(R) → ∀ g ∈ ⁅K,K⁆, ∀ m, g • m = m)
+   ```
+
+   * (a) が書籍の「`R` is **cyclic** of prime order」まで含む (`isCyclic_of_prime_card`)
+   * (b) の指数が書籍どおり `p` (`|R|` でなく)
+   * `hRne` / `hKne` を**仮説から除去** — `IsFrobeniusGroup` の `ne_bot_kernel` /
+     `ne_bot_complement` フィールドから取れる (書籍も Frobenius 群の定義に含めている)
+
+⟹ AxiomsCheck に `bgThm310` を登録 (axiom-clean 確認済)。
+
+### 📌 BG の大域規約 2 本 (監査の判定に効く — 全節で有効)
+
+書籍を読み直して確定 (これを知らないと**偽の特殊化債務**を起票してしまう):
+
+| 規約 | 出典 | 監査上の意味 |
+|---|---|---|
+| 「All groups considered in this work will be **finite** except when explicitly stated otherwise」 | 書籍 p.4 (L612) | `[Finite G]` は書籍強度 |
+| 「In this section, we consider representations … by **finite-dimensional** linear transformations. … By module we will always mean **finite-dimensional** right module」 | 書籍 p.9, §2 冒頭 (L961-967) | **`[FiniteDimensional F V]` は書籍強度** — Thm 3.4 / Thm 3.5 等の module 系 statement に付いていても債務でない |
+
+⚠ Thm 3.4 は書籍の statement 本体に「finite-dimensional」と書いていないので、
+**§2 冒頭の規約を読まないと「repo が書籍より狭い」と誤判定する**。
+[[repo-stronger-hypothesis-is-specialization-not-gap]] の逆向きの罠。
+
+### ✅ §3 = 全 10 件・書籍強度で被覆 (2026-08-08 完了)
+
+未形式化ゼロ / 部分被覆ゼロ / 特殊化債務ゼロ (Lem 3.2・Thm 3.5 の可解性は
+`S03_WithoutSolvableKernel.lean` で解消、Thm 3.10 (a) は上記で解消)。
 
 ### §4-§16 + Theorems A-E + 補章 — 未着手
