@@ -245,15 +245,23 @@ it directly (no wrapper, per project policy):
   form `Monoid.exponent (Omega R p 1) = p` (under `Nontrivial (Omega R p 1)`).
 
 These are exactly BG Proposition 4.3(a) in the `cl ≤ 2` case; the BG-facing uses
-(e.g. Lemma 4.5(c), applying 4.3(a) to `Z₂(R)`) call them directly. The
-`cl ≤ 3, p > 3` branch of 4.3 (regular-`p`-group collection, mmd L1410-1472, which
-needs the `(uv)^n` triple-commutator expansion (4.4)) is developed below: its
-**mathematical core**, the iterated commutator power law (4.4)-precursor under
-`cl ≤ 3`, is supplied here sorry-free (`commutatorElement_pow_left_of_triple_central`).
-The full `(u*v)^n` collection bookkeeping and the `|R|`-induction packaging the
-exponent-`≤ p` conclusion as `Omega.pow_eq_one_of_class_le_three` remain to be
-assembled on top of this core (they additionally need `γ₄(R) = 1` collection and a
-maximal-subgroup induction; see the section below). -/
+(e.g. Lemma 4.5(c), applying 4.3(a) to `Z₂(R)`) call them directly.
+
+The `cl ≤ 3, p > 3` branch (regular-`p`-group collection, mmd L1410-1472) is developed
+in the sections below and is **complete**: the iterated commutator power law
+(`commutatorElement_pow_left_of_triple_central`), the two-generator collection formula
+`(4.4)` (`mul_pow_eq_collect_of_triple_central`), and the `|R|`-induction that packages
+them.  **Both parts of Proposition 4.3 land in this file, combining the two branches**:
+
+* **(a)** `omega1_pow_eq_one` — `g ∈ Ω₁(R) ⟹ g ^ p = 1` under `cl(R) ≤ 2` *or*
+  (`p > 3` and `cl(R) ≤ 3`);
+* **(b)** `pow_mul_eq_mul_pow_of_commutator_le_omega1` — with `R' ⊆ Ω₁(R)` in addition,
+  `(x * y) ^ p = x ^ p * y ^ p` (the `p`-th power map is a homomorphism; stated as the
+  bare equation since `x ↦ x ^ p` is not a `MonoidHom` on a nonabelian group).
+
+⚠ This paragraph previously said the `cl ≤ 3` packaging "remains to be assembled" and
+named a nonexistent `Omega.pow_eq_one_of_class_le_three`; that was stale (corrected in
+the issue 0177 §4 audit, 2026-08-08). -/
 
 /-! ## §4A: iterated commutator power law under `cl ≤ 3` (Proposition 4.3(a), `(4.4)`)
 

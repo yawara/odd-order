@@ -387,4 +387,48 @@ endpoint の結論に (a) が入っている保証ではない**。結論の型�
 未形式化ゼロ / 部分被覆ゼロ / 特殊化債務ゼロ (Lem 3.2・Thm 3.5 の可解性は
 `S03_WithoutSolvableKernel.lean` で解消、Thm 3.10 (a) は上記で解消)。
 
-### §4-§16 + Theorems A-E + 補章 — 未着手
+## §4 (p-Groups of Small Rank、20 件 = 4.1-4.20) — 進行中
+
+### 第 1 走査: 20/20 に候補あり (2026-08-08)
+
+`OddOrder/BG/Ch1_Preliminary/S04*.lean` (17 file) の docstring から番号を機械抽出すると
+**4.2-4.20 の 19 件**が当たる。**4.1 だけがディレクトリに無い**が、これは
+「`G/Z(G)` 巡回 ⟹ `G` 可換」で **mathlib 被覆** (`commutative_of_cyclic_center_quotient`,
+`Mathlib/GroupTheory/SpecificGroups/Cyclic.lean`)。BG 自身も証明を書かず
+**G** Thm 1.3.4 に投げている。
+
+| 番号 | 実体 |
+|---|---|
+| 4.1 | mathlib `commutative_of_cyclic_center_quotient` |
+| 4.2 / 4.3 / 4.16 | `S04_CommutatorCollection.lean` / `S04f_Blackburn*.lean` / `S04f_Omega1.lean` |
+| 4.4 | (a) `GroupTheory/SCN.lean` / (b) `S04_Prop44b.lean` |
+| 4.5 / 4.6 | `S04_Lem45c_Prop46.lean` / `S04_SmallRankBasic.lean` |
+| 4.7 | `S04d_GorThm415.lean` / `S04f_AutOrderConstraints.lean` |
+| 4.8 / 4.9 / 4.17 | `S04_PGroupsSmallRank.lean` |
+| 4.10 / 4.12 | `S04_SmallRankBasic.lean` / `S04b_Thm412.lean` |
+| 4.11 | `S04c_Prop411.lean` |
+| 4.13 / 4.14 | `S04e_GorThm37.lean` / `S04f_AutOrderConstraints.lean` |
+| 4.15 | `S04_ExtraspecialCommutator.lean` |
+| 4.18 / 4.19 / 4.20 | `S04g_Thm418*.lean` / `S04g_Cor419.lean` |
+
+### 条項照合 (文書順)
+
+* **4.1** ✅ mathlib 被覆。書籍も **G** Thm 1.3.4 引用のみ。
+* **4.2** ✅ 一致。(a) は左右両スロット
+  (`commutatorElement_pow_left_of_central` / `_right_of_central`)、
+  (b) は `mul_pow_eq_mul_commutator_pow_of_central`
+  (`(x*y)^n = x^n y^n ⁅y,x⁆^(n.choose 2)` — 書籍の二項係数の形そのまま)。
+* **4.3** ✅ **(a)(b) とも完全形式化済** (`S04_CommutatorCollection.lean`):
+  `omega1_pow_eq_one` (a) / `pow_mul_eq_mul_pow_of_commutator_le_omega1` (b)。
+  どちらも仮説が書籍どおりの選言 `cl(R) ≤ 2 ∨ (p > 3 ∧ cl(R) ≤ 3)`。
+  🚨 **stale 注記 1 件を訂正** — 同ファイルの §4A 節 docstring が
+  「`cl ≤ 3` の collection bookkeeping と `|R|`-induction は **remain to be assembled**」
+  と書き、存在しない名前 `Omega.pow_eq_one_of_class_le_three` を挙げていた。
+  実体は同じファイルの下方に両方揃っている。**BG での stale 注記は通算 8 件目**
+  (§1 が 2、§2 が 4、§3 が 1、§4 が 1)。
+* **4.4** ✅ (a) `GroupTheory/SCN.lean` の `isSCN_iff_isMaximalAbelianNormal`
+  (両方向: `IsSCN.isMaximalAbelianNormal` / `IsMaximalAbelianNormal.isSCN`)、
+  (b) `S04_Prop44b.lean`。
+* ⬜ **4.5-4.20 の条項照合が未了**。
+
+### §5-§16 + Theorems A-E + 補章 — 未着手
