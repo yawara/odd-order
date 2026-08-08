@@ -36,13 +36,19 @@ Prefix-split from `OddOrder.BG.Ch1_Preliminary.S02_Representations` (2000-line l
 # BG §2: General Results on Representations
 
 **スコープ**: Bender–Glauberman, _Local Analysis for the Odd Order Theorem_
-(LMS LNS 188, 1994), Chapter I §2 (pp. 9-16), mmd L586-794, **6 結果**
+(LMS LNS 188, 1994), Chapter I §2 (pp. 9-17), mmd L586-794, **7 結果**
 (Proposition 2.1, Proposition 2.2, Lemma 2.3, Proposition 2.4, Theorem 2.5,
-Theorem 2.6).
+Theorem 2.6, Lemma 2.7).
 
-## 構造 (BG §2 全 6 結果)
+⚠ **本ファイルの区分 §2A-§2F は書籍の 6 件までしか覆っていない** (2026-08-08, issue 0177 §2
+逐条監査で判明)。7 件目の **Lemma 2.7** は本ファイルの外
+(`OddOrder/GroupTheory/RepresentationTheory/ElemAbelianAutAction.lean` および
+`SingerReducibility.lean`) で **2026-07-18 に完成済**。節記号ベースの計画表は
+「書籍の番号を全部数えたか」を保証しないので、番号リストとの突合が要る。
 
-§2 を結果単位で 6 つの sub-section に整理:
+## 構造 (BG §2 全 7 結果)
+
+§2 を結果単位で sub-section に整理 (2.1-2.6 が本ファイル、2.7 は上記の別ファイル):
 
 - **§2A** Schur + absolute irreducibility (**Prop 2.1**, 3 parts a/b/c)
 - **§2B** Clifford for cyclic quotient (**Prop 2.2**, 2 parts a/b)
@@ -55,6 +61,11 @@ Theorem 2.6).
   — IsExtraspecial + AutElementaryAbelian
 - **§2F** Odd-order two-dimensional representation (**Thm 2.6**, 2 parts a/b)
   — App.A Thm A.1 gate
+- **(§2G)** `(ℤ/q)² ⊆ Aut((ℤ/p)²)` (**Lem 2.7**, 2 parts a/b) — **本ファイル外**:
+  加群形 = `GroupTheory/RepresentationTheory/ElemAbelianAutAction.lean`
+  (`elemAbelian_aut_action`) と `SingerReducibility.lean`
+  (`prime_dvd_sub_one_of_faithful_rank_two`, `exists_powerMap_of_faithful_rank_two`);
+  **書籍どおりの群形** (`Q ⊆ Aut(P)`) = `S02_Lemma27Group.lean` (`bgLemma27`)
 
 ## Phase 2a 優先度 (2026-05-23 audit 訂正後)
 
@@ -126,10 +137,13 @@ mathlib `Module.Finite.toModuleEnd_moduleEnd_surjective`
   - 依存: Wedderburn (`LittleWedderburn`)
   - 状態 (2026-07-18 更新): ✅ mathlib 既存
 
-## 実装 status (2026-05-24)
+## 実装 status
+
+⚠ **以下の「未確定 / 未作成」記述は 2026-05-24 時点のもので、現在はすべて解消済**
+(2026-08-08 の逐条監査で確認)。着手順の記録として残す。
 
 - **Skeleton + 6 sub-section docstring + mapping table** (本ファイル).
-- 全 6 結果 **statement stub 未確定** (依存 shared module 未作成 +
+- (2026-05-24) 全 6 結果 **statement stub 未確定** (依存 shared module 未作成 +
   Isaacs Ch.6 §6F Clifford 未完成).
 - 着手順 (audit 推奨):
   1. `RepresentationTheory/PGroupFixedVector.lean` 新規 (~30 行)

@@ -132,12 +132,84 @@ Isaacs / mathlib / 本 repo の 3 列で対応づける**マスター対応表**
 消費点 `S03d_Thm34.lean` (BG §3 Thm 3.4) が「keystone consumer of BG Theorem 2.5」と
 明記しており、そこから辿れた。⟹ **消費点から辿るのが確実**。
 
-🔴 **Lem 2.7 = BG §1-§2 で唯一の真の未形式化 (2026-08-08 判定)**
+🟢 **Lem 2.7 は既に形式化済だった (2026-08-08 に自己訂正)**
 
-repo 全体で `Lem 2.7` / `Lemma 2.7` を引くと **Isaacs の Lemma 2.7** (`M, N ⊴ G`,
-`M ∩ N = 1` ⟹ 元同士が可換) しか当たらない。BG の Lem 2.7 の実体は無い。
+⚠ **この節は最初「Lem 2.7 = BG §1-§2 で唯一の真の未形式化」と誤判定していた。**
+実体は **2 系統・独立に 2 回**形式化されていた:
 
-**書籍の statement (L1329、2 条項)**:
+| 実体 | 場所 | 由来 |
+|---|---|---|
+| `elemAbelian_aut_action` (a)(b) 一括 | `GroupTheory/RepresentationTheory/ElemAbelianAutAction.lean` | issue **3009** (2026-07-18, 「book strength」と明記して close) |
+| `prime_dvd_sub_one_of_faithful_rank_two` (a) / `exists_powerMap_of_faithful_rank_two` (b) | `GroupTheory/RepresentationTheory/SingerReducibility.lean` | issue **0150** |
+| crux = **G** Thm 3.2.3 | 同 `isCyclic_of_faithful_isIrreducible` | 3009 |
+
+いずれも sorry-free・AxiomsCheck 登録済 (`AxiomsCheck.lean:4737` / `:4744` / `:6362`)。
+
+### 🚨 なぜ「無い」と誤判定したか — 誤判定様式の実例 4 つ
+
+1. **書籍ラベルで grep した** — `Lem 2.7` / `Lemma 2.7` を引くと Isaacs の Lemma 2.7 が当たり、
+   BG の実体は当たらない。実体のファイル名は `ElemAbelianAutAction` / `SingerReducibility` で、
+   **結論の形 (概念名)** でしか引けない。[[grep-concept-names-not-book-notation]]
+2. **`AxiomsCheck.lean` を走査しなかった** — そこには「**BG Lemma 2.7(a)**」「**BG Lemma 2.7(b)**」
+   と*明示的に*書かれていた。**AxiomsCheck は書籍番号 ↔ 実体の最良の索引**であり、
+   逐条監査では最初に引くべき。
+3. **`issues/closed/` を走査しなかった** — `0150-bg-lemma-2-7-rank-two-action.md` と
+   `3009-lem27-elem-abelian-aut.md` が両方 close 済で残っていた。
+4. **§2 の計画表 (`S02_RepresentationsBasic.lean`) が §2A-§2F の 6 件しか追っていない**という
+   観察は**正しかった**が、そこから「repo に実体が無い」と結論したのが誤り。
+   **計画表の欠落 ≠ 実体の欠落** (実体は BG ディレクトリの外に置かれていた)。
+
+⟹ **逐条監査の走査対象を確定**: (i) `AxiomsCheck.lean` の番号コメント、
+(ii) `issues/closed/`、(iii) 結論の形での repo 全体 grep、(iv) 節ディレクトリ。
+(iv) だけでは足りない。
+
+### ✅ 本監査の実収穫 — packaging 差 1 件を解消
+
+書籍の statement は **群** `P`, `Q` (基本可換, 位数 `p²`, `q²`) と `Q ⊆ Aut(P)` だが、
+既存の 2 実装はいずれも **加群形** (`[Module (ZMod p) P]` + `finrank = 2` +
+faithful `Representation`)。`ElemAbelianAutAction.lean` の docstring は
+「これは `Q ⊆ Aut(P)` の忠実な表現である」と**散文で主張**していたが、
+その rendering 自体は形式化されていなかった (= 監査基準の「packaging 差」)。
+
+⟹ 追加 (2026-08-08) = **新規 leaf 1 本のみ**
+`OddOrder/BG/Ch1_Preliminary/S02_Lemma27Group.lean` (~130 行):
+
+* `elemAbelian_aut_action_ofModule` — 群形 (加群構造は**インスタンス引数**のまま)
+* `bgLemma27` — **書籍どおりの形**:
+  `hPea : IsElementaryAbelian p P`, `Nat.card P = p^2`, `φ : Q →* MulAut P` 単射 ⟹
+  `q ∣ p - 1` ∧ `∃ a ≠ 1, ∃ r : ℕ, (∀ x, φ a x = x ^ r) ∧ r^q ≡ 1 [MOD p] ∧ ¬(r ≡ 1 [MOD p])`
+
+数学は既存の `elemAbelian_aut_action` に委譲 (再証明していない)。
+橋渡しも**既存のものだけ**を使う:
+`IsElementaryAbelian.zmodModule` (PRank) / `OddOrder.BG.Ch1_Preliminary.mulAutToEnd`
+(OperatorMaschke) / `OddOrder.GroupTheory.zmod_smul_ofMul` (CommGroupAut)。
+
+### 🚨 補助 def も「無い」と思ったら 3 個あった
+
+最初 `mulAutToEnd` (`MulAut E →* Module.End (ZMod p) (Additive E)`) と
+「スカラー倍 = 冪」補題を**新規に PRank へ足した**が、どちらも既存だった:
+
+| 実体 | 場所 |
+|---|---|
+| `mulAutToEnd` (public, 10+ 箇所で使用) | `BG/Ch1_Preliminary/OperatorMaschke.lean:140` |
+| 同 (private の重複) | `BG/AppA_PStability.lean:143` |
+| `zmod_smul_ofMul` | `GroupTheory/CommGroupAut.lean:111` |
+
+しかも新設した `mulAutToEnd` は `ExtraspecialSinger.lean` で**名前解決の曖昧化を起こして
+ビルドを壊した** (引数順が違う `(p) {E}` vs `(E) (p)` なので型エラーとして出た)。
+⟹ **汎用の小さい def を足す前に、名前と「型の形」の両方で grep する**
+([[grep-abbreviations-not-just-full-names]] [[grep-before-writing-transport-defs]])。
+⚠ `AppA_PStability.lean` の private 複製は残置 (OperatorMaschke 版へ寄せるのは follow-up)。
+
+### ⚠ 加群構造は `letI` でなくインスタンス引数で渡す
+
+`IsElementaryAbelian.zmodModule` を `letI` で束縛すると `Additive P` の
+`Module.Finite` / `FunLike` 合成が詰まる (PRank の `addAutEquivGL` docstring に既出の罠)。
+実際に `ρ b (Additive.ofMul x)` が **"Function expected"** で落ちた。
+⟹ 加群を使う補題は `[Module (ZMod p) (Additive P)]` を**インスタンス引数**に取り、
+`letI` は最外殻 (`elemAbelian_aut_action_group`) だけに置く。
+
+### 書籍の statement (L1329、2 条項)
 
 > `p`, `q` を相異なる素数、`P`, `Q` をそれぞれ位数 `p²`, `q²` の基本可換群、
 > `Q ⊆ Aut(P)` とする。このとき
@@ -145,66 +217,14 @@ repo 全体で `Lem 2.7` / `Lemma 2.7` を引くと **Isaacs の Lemma 2.7** (`M
 > **(b)** ある `a ∈ Q^#` と整数 `r` が存在して、**すべての** `x ∈ P` で `x^a = x^r`、
 > かつ `r^q ≡ 1 (mod p)`、`r ≢ 1 (mod p)`。
 
-書籍の証明: `P` を `F_p` 上 2 次元ベクトル空間、`Q` をその線形変換群と見る。
-`Q` は可換だが巡回でないので `P` 上既約でない (**G**, Thm 3.2.3)。
-よって `P = P₁ ⊕ P₂` (1 次元 `Q`-部分加群の直和)。
-
-### BG Lem 2.7 の形式化計画 (2026-08-08 策定)
-
-**既存インフラ** (実測):
-
-* `Isaacs/Ch07_ThompsonSubgroup/S7A2_NormalPThm75.lean:95`
-  `mulAutGLTwoEquivOfIsElementaryAbelianCard` — **`V` が位数 `p²` の基本可換群のとき
-  `Aut(V) ≅ GL(2, F_p)`**。これが橋渡しの本体。
-* `BG/Ch1_Preliminary/S02_RepresentationsBasic.lean` に 2 次元表現の道具一式
-  (`rank_one_subquotients_of_finrank_two`,
-  `rank_one_invariant_submodule_eq_left_or_right_of_distinct_scalars`,
-  `subgroup_commutative_of_faithful_representation_fixed_on_submodule_and_quotient` ほか)。
-
-**証明の筋** (書籍の「既約でない ⟹ 直和分解」を対角化として実行する):
-
-1. `Q ↪ Aut(P) ≅ GL(2, F_p)` は忠実。`q ≠ p` なので `Q` は半単純に作用し、可換なので
-   **同時対角化可能** ⟹ 2 つの指標 `λ₁, λ₂ : Q → F_p^×` で `Q ↪ F_p^× × F_p^×` (忠実)。
-2. **(a)**: `Q` は位数 `q²` の基本可換群なので `λᵢ(Q)` の位数は `1` か `q`。忠実性から
-   少なくとも一方は位数 `q` ⟹ `q ∣ \|F_p^×\| = p − 1`。
-3. **(b)**: **スカラーとして作用する元**の集合は `ker(λ₁ λ₂⁻¹)`。像は `F_p^×` の `q`-捻れに
-   入るので位数は `1` か `q` ⟹ `\|ker\| ≥ q²/q = q > 1`。よって非自明な `a ∈ ker` が取れる。
-   `r := λ₁(a)` とおけば `x^a = x^r` (∀`x ∈ P`)、`a^q = 1` から `r^q ≡ 1 (mod p)`、
-   忠実性から `r ≢ 1 (mod p)` (`r = 1` なら `a` が自明に作用する)。
-
-⚠ 書籍は (b) の存在を「`P = P₁ ⊕ P₂`」から導くが、**`ker(λ₁λ₂⁻¹)` の位数評価のほうが直接的**
-(書籍の場合分けが要らない)。⟹ 書籍の証明を写経せず、この筋で書く。
-
-**⬜ 唯一足りないサブ補題 (2026-08-08 実測)**:
-
-> **可換かつ非巡回な部分群が 2 次元 `F_p`-空間に忠実に作用するなら既約でない**
-> (= 書籍が **G**, Thm 3.2.3 で済ませている部分)
-
-repo の既存インフラは**可約と分かってから先**は揃っている
-(`rank_one_subquotients_of_finrank_two` (:385) が 1 次元部分加群と 1 次元商を出す、
-`invariants_ne_bot_of_not_irreducible_sup` (`S03e_Thm35Prelim.lean:1012`) など)。
-しかし **「可換非巡回 ⟹ 可約」自体は無い**。
-
-数学的な筋: 既約かつ可換なら Schur から `End_{F_pQ}(P)` は可換多元体 = `F_p` の有限拡大体
-`F_{p^k}`、`Q ↪ F_{p^k}^×` は**巡回群**なので `Q` は巡回。対偶で非巡回 ⟹ 可約。
-⟹ **`Q` が巡回でないこと** (位数 `q²` の基本可換群だから) が効く。
-
-⚠ mathlib に「可換既約 ⟹ `End` は体」があるかを先に確認する
-(`S02_RepresentationPropositions.absolutely_irreducible_iff_hom_eq_F` = **BG Prop 2.1** が
-近いが、そちらは*絶対*既約との同値で `F` が代数閉でないここでは直接は使えない)。
-
-⚠ **OCR の罠 3 種がこの 1 文に同居している**:
+⚠ **OCR の罠 3 種がこの 1 文に同居している** (statement 確定時に踏んだ):
 * `(/ divides` = `q divides` (`q` が `(/` に化ける)
 * `a £ Q^` = `a ∈ Q^#` (`∈` が `£` に化ける)
 * **`rq = 1 (mod p)` は `r^q ≡ 1 (mod p)`** — [[pdftotext-drops-superscripts]] そのもの。
   **添字に「文字+文字」を見たら指数を疑う**。ここを `r·q ≡ 1` と読むと別の (偽の) 主張になる。
 
-🚨 **Lem 2.7 は repo の §2 計画表に載っていない** — `S02_RepresentationsBasic.lean` の
-「§2A-§2F」区分も「主要 cite」表も **2.1-2.6 の 6 件しか追っていない**。書籍 §2 は 7 件なので
-**1 件まるごと計画から抜け落ちている**。
 ⚠ `AppE_CentralizerDecomposition.lean:106` の「`q ∣ p − 1`」は **BG Thm E.3(a)** であって
 Lem 2.7 ではない (結論の字面が同じなので取り違えやすい)。
-
 ### 🚨 §2 の所見 2 — 「番号の抜け」は計画表の区分からも起きる
 
 repo の §2 計画は **§2A(2.1) / §2B(2.2) / §2C(2.3) / §2D(2.4) / §2E(2.5) / §2F(2.6)** と

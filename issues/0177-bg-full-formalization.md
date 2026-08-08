@@ -98,6 +98,14 @@ pat = re.compile(r'^(Theorem|Proposition|Lemma|Corollary)\s+(\d{1,2})\.(\d{1,2})
         🚨 とくに **1.8 は同一ファイル内で矛盾**していた (:63 が「Phase 1 待ち」、
         :152 が「⭐ sorry-free」)。
         ⚠ **1.11 は Isaacs 側のディレクトリに在る** (owner chapter 規則、通算 4 回目)。
+      - **§2 監査完了 (2026-08-08)**: 全 7 件被覆・**未形式化ゼロ**。
+        補充 = **packaging 差 1 件** (Lem 2.7 の群形 `elemAbelian_aut_action_group`)。
+        ⚠ **自己訂正**: 本 issue は一度「Lem 2.7 = §1-§2 で唯一の真の未形式化」と
+        **誤判定した**。実体は 2 系統・独立に 2 回 (issue **0150** と **3009**、
+        いずれも close 済) 形式化されており、`AxiomsCheck.lean` には
+        「**BG Lemma 2.7(a)/(b)**」と明示コメント付きで登録されていた。
+        ⚠ **stale 注記 4 件を訂正** (`S02_RepresentationsBasic.lean` の
+        Lem 2.3 / Prop 2.4 / Thm 2.5 の「stub 未配置」+ 「全 6 結果」という件数)。
       - 1 節ぶん終えるごとに census note を更新して commit。
 
 ## 完了条件
@@ -106,9 +114,26 @@ BG の全番号付き結果が**書籍強度**の Lean statement を持つか、
 記録されている**。特殊化債務ゼロ・部分被覆ゼロ・packaging 差ゼロ。
 各節の監査結果を census note に記録する。
 
+## 🔎 逐条監査の走査手順 (2026-08-08 §2 で確定 — 順に全部やる)
+
+§2 で「実体が在るのに無いと判定した」ので、走査対象を固定する。**(4) だけでは足りない**。
+
+1. **`OddOrder/AxiomsCheck.lean` を書籍番号で grep** — ここが **書籍番号 ↔ Lean 実体の最良の
+   索引**。`grep -n "Lemma 2.7\|Lem 2.7" OddOrder/AxiomsCheck.lean` で一発で当たった。
+2. **`issues/closed/` を番号で grep** — 過去に閉じた形式化 issue が残っている
+   (`0150-bg-lemma-2-7-*`, `3009-lem27-*`)。
+3. **結論の形 (概念名) で repo 全体 grep** — 書籍ラベルでの grep は他書と衝突するうえ、
+   実体のファイル名は概念名 (`ElemAbelianAutAction` / `SingerReducibility`) なので当たらない。
+4. 節ディレクトリの file header 対応表 + `theorem` 一覧。
+
 ## ⚠ 誤判定様式 (前 2 冊で計 16 件の実例)
 
 正本 = memory `textbook-coverage-audit-failure-modes` (11 型)。とくに:
+
+* **「計画表の欠落 ≠ 実体の欠落」** (§2 Lem 2.7, 2026-08-08)。`S02_RepresentationsBasic.lean`
+  の §2A-§2F 区分に Lem 2.7 が無いのは事実だが、実体は BG ディレクトリの**外**
+  (`GroupTheory/RepresentationTheory/`) に在った。区分表の穴は**当たりを付ける道具**であって
+  不在の証拠ではない。
 
 * **注記は当たりを付ける道具であって判定の証拠ではない** — Isaacs では stale 注記の訂正
   (7 件) が実際の補充 (5 件) を上回った。
