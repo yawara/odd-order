@@ -647,6 +647,7 @@ import OddOrder.Isaacs.Appendix.DirectDiamond
 import OddOrder.Isaacs.Appendix.SubgroupBasics
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S01c_Omega1Rigidity
+import OddOrder.BG.Ch1_Preliminary.S02_Lemma27Group
 import OddOrder.BG.Ch1_Preliminary.S02_Representations
 import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
 import OddOrder.BG.Ch1_Preliminary.S03f_Prelim

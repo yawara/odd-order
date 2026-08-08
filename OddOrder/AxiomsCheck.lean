@@ -373,6 +373,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.InvariantLattice
 import OddOrder.GroupTheory.RepresentationTheory.Modular.CommutatorQuotient
 import OddOrder.BG.Ch1_Preliminary.PLengthPComplement
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.S02_Lemma27Group
 import OddOrder.BG.Ch1_Preliminary.S04_Lem45c_Prop46
 import OddOrder.BG.Ch1_Preliminary.S04_Prop44b
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
@@ -6366,6 +6367,13 @@ set_option linter.style.longLine false in
 -- irreducible ⟹ cyclic).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.isCyclic_of_faithful_isIrreducible
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.elemAbelian_aut_action
+-- BG Lemma 2.7 in BG's own shape (§2 逐条監査 2026-08-08, issue 0177): `P`, `Q` are elementary
+-- abelian *groups* of orders `p²`, `q²` and `Q ⊆ Aut(P)` is an injective `Q →* MulAut P`; the
+-- scalar is an integer `r` with `xᵃ = xʳ`, `r^q ≡ 1 (mod p)`, `r ≢ 1 (mod p)`.  The mathematics
+-- is `elemAbelian_aut_action`; this closes the *packaging* gap by proving (not asserting in
+-- prose) that the `𝔽_p`-linear rendering of `Q ⊆ Aut(P)` is faithful to the book hypothesis.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S02.elemAbelian_aut_action_ofModule
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S02.bgLemma27
 
 -- Peterfalvi Part II, Ch. I, Lemma 5: a fixed-point-free action on a
 -- two-dimensional projective line is irreducible; in characteristic two an odd faithful
