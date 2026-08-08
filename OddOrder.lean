@@ -886,6 +886,8 @@ import OddOrder.BG.AppC_SL2Example
 import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
+import OddOrder.BG.AppC_AffineLineCondition
+import OddOrder.BG.AppC_GlaubermanNorton
 import OddOrder.BG.AppD_CNGroups
 import OddOrder.BG.AppE_CollectionFormula
 import OddOrder.BG.AppE_FurtherResults

@@ -21,9 +21,15 @@ namespace OddOrder.BG.AppC.NormSet
 variable (p q : ℕ)
 
 /-- **BG Appendix C, Lemma C.2** (mmd L4923): the norm set has at least two
-elements when `p`, `q` are odd primes satisfying condition (A). -/
-theorem lemmaC2 [Fact p.Prime] (hpodd : Odd p) (hq : q.Prime) (hqodd : Odd q)
-    (_hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1)) :
+elements when `p` and `q` are odd primes.
+
+The book states this under condition (A), but its own `Note` after the statement says the
+proof "requires only that `p` and `q` be odd primes that satisfy (A)", and in fact neither
+branch of the proof below uses (A) at all — so the hypothesis is dropped (it used to sit here
+as an unused argument).  This matters for
+`OddOrder.BG.AppC.GlaubermanNorton`: Glauberman–Norton's Lemma 5 needs `|E| ≥ 2` under the
+weaker hypothesis `q ≠ 2 ∨ p = 2`, where (A) is not available. -/
+theorem lemmaC2 [Fact p.Prime] (hpodd : Odd p) (hq : q.Prime) (hqodd : Odd q) :
     2 ≤ (normSetE p q).ncard := by
   rcases eq_or_ne q 3 with rfl | hq3
   · exact normSetE_ncard_ge_two_of_eq_three p hpodd

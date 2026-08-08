@@ -94,9 +94,14 @@ theorem le_of_conditionA_of_not_odd {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
     rw [hA] at hgcd
     omega
 
-/-- **BG Theorem C, `p`/`q`-abstract form.**  For odd primes `p, q` satisfying condition (A) and
-the norm-set relation that Hypothesis (B) produces — `N(2a - 1) = 1` for every `a` in the norm set
-`E` — one has `p ≤ q`.
+/-- **BG Theorem C, `p`/`q`-abstract form.**  For odd primes `p, q` and the norm-set relation that
+Hypothesis (B) produces — `N(2a - 1) = 1` for every `a` in the norm set `E` — one has `p ≤ q`.
+
+⚠ **Condition (A) is not needed here** (2026-08-08, issue 0179).  The book states Theorem C under
+(A), and this abstract form used to carry `hA : conditionA p q` as an argument, but none of the
+three step lemmas uses it: `lemmaC1` only needs `E = E⁻¹` and `|E| ≥ 2`, and `lemmaC2` only needs
+`p`, `q` odd (its own `(A)` argument was likewise unused and has been dropped).  (A) does real work
+downstream, in producing `hrel` from Hypothesis (B); it does no work in this composition.
 
 This is the book's Theorem C with the Peterfalvi Section 16 configuration removed from the
 *statement*: no `S16.Hypothesis`, no `FieldNormalizerData`, no ambient `q < p`.  The three step
@@ -110,13 +115,12 @@ configuration supplying `hrel` — e.g. the `SL(2, 2^q)` example of the book's R
 this form directly.  The FT spine continues to use `theoremC` below, which discharges `hrel` from
 the constructed `FieldNormalizerData`. -/
 theorem theoremC_abstract {p q : ℕ} [Fact p.Prime] (hp_odd : Odd p) (hq : q.Prime) (hq_odd : Odd q)
-    (hA : conditionA p q)
     (hrel : ∀ a : GaloisField p q, a ∈ NormSet.normSetE p q →
       NormSet.normN p q ((2 : GaloisField p q) * a - 1) = 1) :
     p ≤ q :=
   NormSet.lemmaC1 (p := p) (q := q) hq
     (NormSet.normSetE_eq_inv_of_forall_normN_two_mul_sub_one (p := p) (q := q) hq.pos hrel)
-    (NormSet.lemmaC2 (p := p) (q := q) hp_odd hq hq_odd hA)
+    (NormSet.lemmaC2 (p := p) (q := q) hp_odd hq hq_odd)
 
 /-! ## Theorem C -/
 
@@ -128,7 +132,7 @@ disposes of the case where `q` is even. -/
 theorem theoremC_of_hypothesisB {p q : ℕ} [Fact p.Prime] {G : Type*} [Group G]
     (data : FieldNormalizerData p q G) : p ≤ q := by
   by_cases hqodd : Odd q
-  · exact theoremC_abstract data.p_odd data.q_prime hqodd data.cyclotomic_coprime
+  · exact theoremC_abstract data.p_odd data.q_prime hqodd
       data.normSetGeneratorRelation_of_hypothesisB
   · exact le_of_conditionA_of_not_odd Fact.out data.q_prime data.cyclotomic_coprime
       fun h => hqodd h.2
