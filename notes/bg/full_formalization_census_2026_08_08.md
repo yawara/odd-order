@@ -500,4 +500,48 @@ Prop 1.6(a) (`fixedPoints_sup_actionCommutator_eq_top`) で引いている。
 「無条件形は本ファイル後方」と明記して訂正。**BG での stale 注記は通算 10 件目**
 (§1: 2 / §2: 4 / §3: 1 / §4: 3)。
 
-### §5-§16 + Theorems A-E + 補章 — 未着手
+## §5 (Narrow p-Groups、7 件 = 5.1-5.7) — 監査完了 (2026-08-08)
+
+全 7 件被覆・**未形式化ゼロ**。実体は `S05_NarrowSCN` / `S05_NarrowCharacterization` /
+`S05_NarrowAutomorphisms` / `S05_NarrowPGroups` の 4 file。
+
+| BG | repo の endpoint | 照合 |
+|---|---|---|
+| **5.1** | (a) `scn3_nonempty_of_three_le_pRank` / (b) `mem_scn3_of_normal_isElementaryAbelian_card_prime_sq` | ✅ |
+| **5.2** | `lemma52` — **(a)(b)(c) が 1 statement** | ✅ |
+| **5.3** | 同値 = `narrow_iff_exists_maximalElementaryAbelian_card_prime_sq` / (d) = `narrow_centralizer_decomp` / (a)(b)(c) = `lemma52` 経由 | 🔴 **packaging 差** → `bgThm53` 新設 |
+| **5.4** | `narrow_iff_exists_card_prime_centralizer_pRank_le_two` | ✅ |
+| **5.5** | `solvableAut_of_narrow` — **(a)(b)(c) が 1 statement** | ✅ |
+| **5.6** | `narrow_sylow_solvable_structure` — **(a)-(e) が 1 statement** | ✅ |
+| **5.7** | `derived_le_fitting_of_centralizer_rank_le_two` | ✅ |
+
+### 🔴 実収穫: Thm 5.3 の packaging 差
+
+書籍の 5.3 は「**同値 + narrow のときの (a)(b)(c)(d)**」という 1 つの結果だが、repo では
+
+* 同値と (d) は endpoint に在る、
+* しかし **(a)(b)(c) は `lemma52` (= Lem 5.2) 経由でしか取れず、`lemma52` は
+  `E ∈ ℰ²(R) ∩ ℰ*(R)` を明示引数に要求する** — 「`R` が narrow」からその `E` を作る一手
+  (`narrow_iff_…` の `.1`) が endpoint に無かった。
+
+⚠ 書籍自身が「By Lemma 5.2, we obtain (a), (b), and (c)」と書いており、repo もその通りに
+実装されている。**欠けていたのは数学でなく「narrow ⟹ E 存在」を挟んだ書籍の形**。
+
+⟹ `bgThm53` (`S05_NarrowCharacterization.lean`) を新設。あわせて
+
+* **(a) を全称形にした** — 書籍は「**no element** of `ℰ²(R) ∩ ℰ*(R)` is contained in `T`」。
+  `lemma52` は渡した `E` についてしか言わないが、その `E` は `ℰ²∩ℰ*` を走るので
+  全称形が無償で出る (narrow すら不要)。
+* **(c) の characteristic 半分を明示** — `lemma52` は index しか返しておらず、
+  characteristic は `GroupTheory/NarrowPGroup.lean` の instance
+  `centralizer_omega1UpperCentralTwo_characteristic` に在った (別 file)。
+  書籍の (c) は「characteristic subgroup of index `p`」なので両方要る。
+
+### 🚨 stale 注記 1 件 (§4 の余波)
+
+`S05_NarrowSCN.lean` の `omega1UpperCentralTwo_not_isCyclic_of_three_le_pRank` docstring が
+「**still-deferred** general Lemma 4.5(a) を避けるため」と書いていた。4.5(a) は無条件形が
+`S04_SmallRankBasic.lean:921` に在る (§4 監査で確定)。⟹ 「4.5(a) は在るが、この経路は
+位数 `p³` を直接くれるので残す」と訂正。**BG での stale 注記は通算 11 件目**。
+
+### §6-§16 + Theorems A-E + 補章 — 未着手

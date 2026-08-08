@@ -131,8 +131,18 @@ pat = re.compile(r'^(Theorem|Proposition|Lemma|Corollary)\s+(\d{1,2})\.(\d{1,2})
         ✅ **書籍より強い形が 3 件** — 4.15 (`p` 奇を落として `p`-一般) /
         4.17 (`A` 可解を落とす) / 4.20(a) (「`G'` 冪零」でなく `G' ≤ F(G)`)。
         ⚠ **4.20 の 3 条項は S04 でなく S05 に在る** (owner chapter、BG で通算 6 回目)。
+      - **§5 監査完了 (2026-08-08)**: 全 7 件被覆・**未形式化ゼロ**。実収穫 2 件:
+        1. **packaging 差 1 件 = Thm 5.3**。書籍は「同値 + narrow のときの (a)(b)(c)(d)」で
+           1 つの結果だが、repo は (a)(b)(c) を `lemma52` (= Lem 5.2) 経由でしか取れず、
+           `lemma52` は `E ∈ ℰ²∩ℰ*` を明示引数に要求していた (「narrow ⟹ `E` 存在」を
+           挟む一手が endpoint に無い)。⟹ `S05.bgThm53` を新設。あわせて (a) を書籍どおり
+           **全称形** (「no element of ℰ²∩ℰ*」) にし、(c) の characteristic 半分
+           (別 file の instance) を明示した。
+        2. **stale 注記 1 件** (`S05_NarrowSCN.lean` の「still-deferred general Lemma 4.5(a)」
+           — §4 監査で無条件形の実在を確定済)。
+        ✅ 5.2 / 5.5 / 5.6 は多条項が既に 1 statement に揃っていた ((a)(b)(c) / (a)(b)(c) / (a)-(e))。
       - 1 節ぶん終えるごとに census note を更新して commit。
-      - ⬜ **次 = §5 (7 件)**。
+      - ⬜ **次 = §6 (7 件)**。
 
 ## 📌 BG の大域規約 (2026-08-08 §3 で確定 — 全節の判定に効く)
 
