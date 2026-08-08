@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import Mathlib.FieldTheory.Finite.Extension
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.BG.AppC_AffineLineCondition
 
@@ -268,5 +269,58 @@ theorem condC_normOneSet [Fact p.Prime] (hq : 0 < q)
     field_simp
     ring
   rw [mem_normOneSet_iff, Submodule.coe_smul, ← hX, hfinal, normN_mul, hB1, hstep, one_mul]
+
+/-! ## Proposition 7, Step 2: the degree of `b` and the tower `A_r` -/
+
+open Polynomial
+
+/-- An element of `𝔽_{p^q}` outside the prime field has degree exactly `q` over `𝔽_p`, when `q`
+is prime.
+
+Its minimal polynomial is irreducible and divides `X^{p^q} - X`, so its degree divides `q`
+(`Irreducible.natDegree_dvd_of_dvd_X_pow_card_pow_sub_X`); degree `1` would put the element in
+the prime field. -/
+theorem natDegree_minpoly_eq [Fact p.Prime] (hq : q.Prime) {b : GaloisField p q}
+    (hb : b ∉ Set.range (algebraMap (ZMod p) (GaloisField p q))) :
+    (minpoly (ZMod p) b).natDegree = q := by
+  haveI : Fintype (GaloisField p q) := Fintype.ofFinite _
+  have hirr : Irreducible (minpoly (ZMod p) b) :=
+    minpoly.irreducible (IsIntegral.of_finite (ZMod p) b)
+  -- `b` is a root of `X^{p^q} - X`, so its minimal polynomial divides that.
+  have hcardF : Fintype.card (GaloisField p q) = p ^ q := by
+    rw [← Nat.card_eq_fintype_card]; exact GaloisField.card p q hq.pos.ne'
+  have hroot : (aeval b) (X ^ (Nat.card (ZMod p)) ^ q - X : (ZMod p)[X]) = 0 := by
+    have hcardZ : Nat.card (ZMod p) = p := Nat.card_zmod p
+    rw [hcardZ, map_sub, map_pow, aeval_X, ← hcardF, FiniteField.pow_card, sub_self]
+  have hdvd : minpoly (ZMod p) b ∣ (X ^ (Nat.card (ZMod p)) ^ q - X : (ZMod p)[X]) :=
+    minpoly.dvd _ _ hroot
+  have hdd : (minpoly (ZMod p) b).natDegree ∣ q :=
+    hirr.natDegree_dvd_of_dvd_X_pow_card_pow_sub_X hdvd
+  -- Degree `1` would mean `b` lies in the prime field.
+  rcases (Nat.Prime.eq_one_or_self_of_dvd hq _ hdd) with h1 | hq'
+  · exfalso
+    refine hb ⟨-(minpoly (ZMod p) b).coeff 0, ?_⟩
+    have hmonic : (minpoly (ZMod p) b).Monic := minpoly.monic (IsIntegral.of_finite (ZMod p) b)
+    have heq : minpoly (ZMod p) b = X + C ((minpoly (ZMod p) b).coeff 0) := by
+      have := hmonic.eq_X_add_C h1
+      simpa using this
+    have h0 : (aeval b) (minpoly (ZMod p) b) = 0 := minpoly.aeval _ _
+    rw [heq, map_add, aeval_X, aeval_C] at h0
+    have : algebraMap (ZMod p) (GaloisField p q) (-(minpoly (ZMod p) b).coeff 0) = b := by
+      rw [map_neg]
+      linear_combination -h0
+    exact this
+  · exact hq'
+
+/-- A nonzero polynomial of degree `< q` cannot vanish at an element of degree `q`. -/
+theorem aeval_ne_zero_of_degree_lt [Fact p.Prime] (hq : q.Prime) {b : GaloisField p q}
+    (hb : b ∉ Set.range (algebraMap (ZMod p) (GaloisField p q)))
+    {f : (ZMod p)[X]} (hdeg : f.degree < (q : ℕ)) (hf : (aeval b) f = 0) : f = 0 := by
+  by_contra hne
+  have hdvd : minpoly (ZMod p) b ∣ f := minpoly.dvd _ _ hf
+  have hle : (minpoly (ZMod p) b).degree ≤ f.degree := Polynomial.degree_le_of_dvd hdvd hne
+  rw [Polynomial.degree_eq_natDegree (minpoly.ne_zero (IsIntegral.of_finite (ZMod p) b)),
+    natDegree_minpoly_eq p q hq hb] at hle
+  exact absurd (hle.trans_lt hdeg) (lt_irrefl _)
 
 end OddOrder.BG.AppC.NormSet
