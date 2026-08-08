@@ -105,3 +105,56 @@ issue 0177 の Theorems A-E 監査で、Theorem A の 8 条項を §10-§15 の�
 本 issue を閉じる必要がある**。周辺的な条項の欠落ではない。
 
 `M_σ` の冪零性 (条項 (g)) も同様に、下流 `AppE_*` が仮説として取っている。
+
+---
+
+# 🚨 2026-08-08 の重要な訂正 — (a) も「真の未形式化」ではなく **packaging 差**だった
+
+(g) を閉じた直後に (a) の実装に入って判明。**起票時の「(a) 後半は repo のどこにも無い」は誤り**。
+数学は全部在り、欠けているのは書籍形の endpoint だけ:
+
+| 書籍 (a) 後半の構成要素 | repo の実体 | 状態 |
+|---|---|---|
+| `K` が `U` に **regular 作用** | `S14.actsRegularlyOn_E23_E1_of_caseTau1` (docstring に「**BG Prop 14.2(a)**, case `κ ⊆ τ₁`: `E₁` acts regularly on `U = E₂E₃`」と明記) | ✅ **在る** |
+| `U` が **abelian** な **Hall `(κ∪σ)'`**-部分群、`U ≠ 1`、`K ≤ N(U)` | `S16.typeP2_matched_kappa_hall_pair_of_esetup` (7 連言) | ✅ **在る** |
+| `U M_σ` が `M` 内の `K` の **normal complement** | `SubgroupESetup` の `E_compl_inf` / `E_compl_sup` / `E23_normal` / `eq_sup` からの短い帰結 | ⬜ 未 statement |
+
+## ⚠ なぜ §14 監査で誤ったか
+
+`grep -rn "ActsRegularlyOn" OddOrder/BG/Ch4_FamilyOfMaximal/` は
+`Basics.lean:291: ActsRegularlyOn (E₂ ⊔ E₃) E₁` を**実際に返していた**のに、
+「`E₁`/`E₃` 相手の regular しか無く、`K` が `U` に regular という結論は存在しない」と
+判定した。**`E₁` が `K`、`E₂ ⊔ E₃` が `U` だと気づかなかった** (書籍の変数名と repo の
+setup 変数名の対応を確認しなかった)。
+
+⟹ **誤判定様式 (新)**: **grep の hit を「別物」と即断しない。書籍の変数と repo の setup 変数の
+対応表 (ここでは `K = E₁`, `U = E₂E₃`) を先に作る。** 監査で「概念形 grep で不在を確認した」と
+書いたが、実際には**hit を見て意味を取り違えた**のであって不在確認になっていなかった。
+
+## ⟹ BG 監査の結論も訂正
+
+issue 0177 は「真の未形式化 1 件」と結論したが、**正しくは 0 件** — BG の全 186 件は
+packaging 差・stale 注記・索引欠落のみで、**書籍の数学はすべて repo に在る**。
+
+## 残作業 (設計は確定)
+
+`S14.typeP2_exists_regular_abelian_hall` を新設:
+
+```
+∃ K₀ U, K₀ ≤ M ∧ U ≤ M ∧ Hall κ(M) K₀ ∧ Hall (κ∪σ)ᶜ U ∧ U ≠ ⊥ ∧ IsMulCommutative U ∧
+  ActsRegularlyOn U K₀ ∧
+  M ≤ N(U ⊔ M_σ) ∧ K₀ ⊓ (U ⊔ M_σ) = ⊥ ∧ K₀ ⊔ (U ⊔ M_σ) = M
+```
+
+`K₀ = E₁`, `U = E₂ ⊔ E₃`。3 つの normal-complement 条項の証明:
+
+1. `M ≤ N(U ⊔ M_σ)`: `M = M_σ ⊔ E` (`E_compl_sup`)。`M_σ ≤ U ⊔ M_σ ≤ N(U ⊔ M_σ)`
+   (`Subgroup.le_normalizer`)。`E` は `U` を正規化 (`E23_normal`) し `M_σ` も正規化
+   (`M_σ ⊴ M`, `E ≤ M`) ので join も正規化 (pointwise `smul_sup` 経由)。
+2. `K₀ ⊓ (U ⊔ M_σ) = ⊥`: `x = u·s` (`u ∈ U ≤ E`, `s ∈ M_σ`) と書くと
+   `s = u⁻¹x ∈ E ⊓ M_σ = ⊥` (`E_compl_inf`) ゆえ `x = u ∈ E₁ ⊓ (E₂⊔E₃)`、
+   これは Hall の π-互いに素性 (`inf_eq_bot_of_isPiSubgroup_of_isPiSubgroup_compl`) で `⊥`。
+3. `K₀ ⊔ (U ⊔ M_σ) = M`: `eq_sup` (`E = E₁⊔E₂⊔E₃`) + `E_compl_sup` (`M_σ ⊔ E = M`) の
+   結合則。
+
+⚠ 実装時は **sorry を一切残さない** (このファイルは sorry-free)。
