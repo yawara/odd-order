@@ -73,3 +73,17 @@ repo は既に `exists_subgroupESetup_with_le` を持っている (`typeP_struct
 - 実体: `OddOrder/BG/Ch4_FamilyOfMaximal/S14_TypePCounting/ElemAbelianNeighbor.lean`
   (`typeP_structure`; docstring に本 issue の内容を明記済)
 - 書籍: `references/bg/local-analysis.pdf` p. 106
+
+## 🔴 優先度の根拠 (2026-08-08 追記): この gap は BG 主定理 **Theorem A(3)(4)** そのもの
+
+issue 0177 の Theorems A-E 監査で、Theorem A の 8 条項を §10-§15 の結果に還元したところ:
+
+| Thm A | 内容 | 下敷き | 状態 |
+|---|---|---|---|
+| **(3)** | `K M_σ` は `M` 内に **`K`-不変な補群 `U`** を持ち `U M_σ ⊴ M = K U M_σ` | **Prop 14.2(a) 後半** | 🔴 本 issue |
+| **(4)** | 各 `k ∈ K^#` で **`C_U(k) = 1`** | **Prop 14.2(a) 後半** | 🔴 本 issue |
+
+他の 6 条項 ((1)(2)(5)(6)(7)(8)) はすべて被覆済。⟹ **Theorem A を書籍の形で述べるには
+本 issue を閉じる必要がある**。周辺的な条項の欠落ではない。
+
+`M_σ` の冪零性 (条項 (g)) も同様に、下流 `AppE_*` が仮説として取っている。

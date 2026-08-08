@@ -942,4 +942,56 @@ Cor 15.5(c) は「`M_F ⊆ M'` **かつ** `M'/M_F` が nilpotent」の 2 主張�
 📌 **「quotient 型 API 整備後に追加予定」という言い訳は BG で 3 回出て 3 回とも stale だった**
 (Thm 10.2(d) / Lem 10.8(c) / Cor 15.5(c))。⟹ **この文言を見たら即座に実体を探す**。
 
-### Theorems A-E + 補章 — 未着手
+## 補章 A-E — census を訂正 (2026-08-08): **14 件 → 19 件**
+
+当初 census は「`Kind X.N` が 14 件、各補章の `.1` が未発見」としていた。原因は **OCR**:
+
+| 罠 | 実例 | 対処 |
+|---|---|---|
+| **数字 `1` が大文字 `I` に化ける** | `Theorem A.I.` / `Lemma B.I.` / `Lemma C.I.` / `Lemma D.I.` / `Theorem E.I.` | `[0-9IlL]` を許して正規化 |
+| **帰属の括弧が番号の直後に入る** | `Theorem B.4 (L. Puig, 1976).` / `Theorem E.3 (Feit and Thompson, 1991).` | `\.\s` だけでなく `(` も許す (本文節のパターンは既にそうなっていた) |
+
+⟹ 確定: **A:5 / B:4 / C:3 / D:2 / E:5 = 19 件**。
+
+repo 対応 (すべて実体あり): `AppA_PStability*` (`thmA1`/`thmA2`/`thmA3`/`thmA4a,b,c`/`thmA5_*`) /
+`AppB_Puig*` + `AppB_Thm62` (B.1-B.4) / `AppC_*` (C.1-C.3) / `AppD_CNGroups/*` (D.1/D.2) /
+`AppE_*` (E.1-E.5)。
+
+### ✅ 補章 D は de-opacification の模範例 (2026-07-18、監査より前)
+
+`MinimalSimpleCNHypothesis` が minimal simplicity を **free `Prop` フィールド**として持っていた
+ため、`True` で instantiate でき **D.1/D.2 が全 odd CN-群について主張される形**になっていた
+(その読みでは両方とも**偽** — D.2 は `C₃`、D.1 は `F_{3⁶} ⋊ (C₇ ⋊ C₃)` が反例)。
+既に honest な仮説 (`IsCNGroup` + `IsMinimalSimpleOdd`) に置換され、反例まで docstring に
+記録されている。⚠ 「Appendix D を `feitThompson` から空虚に導かない」という注意書きも在る
+(CN-定理は FT の**入力**なので依存順序が逆転する)。
+
+## Theorems A-E (章番号なしの主定理 5 件) — 位置と性格を確定
+
+⚠ **issue 0177 の baseline が記録した行番号 (A=L6615 等) は依存関係の図のラベル**だった。
+本文は **§16 内** の L6479 (A) / L6509 (B) / L6516 (C) / L6532 (D) / L6554 (E)。
+
+**性格**: Theorems A-E は §10-§15 の結果の**要約 (summary)** で、各条項が既出の番号付き結果の
+言い換え。⟹ 被覆は「下敷きの番号付き結果の被覆」に帰着する。
+
+### 🔴 Theorem A の逐条対応 — issue 0178 の gap が主定理条項として再浮上
+
+| Thm A | 書籍の内容 | 下敷き | 状態 |
+|---|---|---|---|
+| (1) | `M_σ` が `M` の唯一の normal Hall `σ(M)`-部分群、かつ `G` の `σ(M)`-Hall | Thm 10.2(b) | ✅ (`bgThm102`) |
+| (2) | `M` は cyclic Hall `κ(M)`-部分群 `K` を持つ | Lem 15.1(b) | ✅ |
+| **(3)** | `K M_σ` は `M` 内に **`K`-不変な補群 `U`** を持ち `U M_σ ⊴ M = K U M_σ` | **Prop 14.2(a) 後半** | 🔴 **未形式化** |
+| **(4)** | 各 `k ∈ K^#` で **`C_U(k) = 1`** | **Prop 14.2(a) 後半** | 🔴 **未形式化** |
+| (5) | `K* = C_{M_σ}(K) ≠ 1`、`K ≠ 1` なら `N_M(⟨k⟩) = K × K*` | Prop 14.2(b)(c) | ✅ |
+| (6) | `1 ⊂ M_F ⊂ M_σ ⊂ M' ⊂ M` かつ `M'/M_F` nilpotent | Thm 15.2 + Cor 15.5(c) | ✅ |
+| (7) | `M'' ⊆ F(M) = C_M(M_F)M_F`、`K ≠ 1` なら `F(M) ⊆ M'` | Cor 15.5(b)(d) | ✅ |
+| (8) | `M_F ≠ M_σ` なら `U = 1`、`F(M)` が TI、`|K|` 素数 | Thm 15.8 | ✅ |
+
+⟹ **[issue 0178](../../issues/0178-bg-prop142-regular-u-and-nilpotent-msigma.md) の gap は
+周辺的な条項ではなく、BG の主定理 Theorem A の (3)(4) そのもの**。優先度を上げる根拠になる。
+
+### ⬜ 残り: Theorems B-E の逐条対応
+
+repo は条項ラベル付きで B(1)(3)(4)(5) / C(1)(2)(3)(4)(5)(8)(9) / D(1)(3)(4) / E(2) に言及。
+**A と同じ「下敷きの番号付き結果への還元」を B-E でも行うのが残作業** (下敷きは §10-§15 で
+既に監査済なので、対応表を作る作業)。
