@@ -128,13 +128,34 @@ namespace = `OddOrder.BG.AppC.NormSet` (既存 App.C に合わせる)。
 
 ## やること
 
-- [ ] Lemma 4(a)(b) + Lemma 5 (`q ≠ 2 ∨ p = 2` 版)
-- [ ] Prop 6 直線の場合 (`ZMod p`)
-- [ ] Prop 6 一般の場合 (二重数え上げ)
+- [x] **Lemma 4(a)(b) + Lemma 5** (`q ≠ 2 ∨ p = 2` 版) — `AppC_GlaubermanNorton.lean`
+      (`normSetE_eq_setOf_ne_zero_of_two` / `normSetE_eq_inv_of_le_three` /
+      `two_le_normSetE_ncard`)。4(b) は既存の `normSetE_eq_inv_of_p_eq_three` を再利用。
+- [x] **Prop 6 直線の場合** — `eq_univ_of_condCLine_of_zero_one` + `eq_univ_of_condCLine`
+      + `two_mul_ncard_le_of_condCLine_ne_univ`。⚠ 論文の `p = 5 / 7 / ≥11` の場合分けは不要で、
+      `{4, −4}` の分岐に畳むと一様になる (`p = 5` では `−4 = 1`)。
+- [x] **Prop 6 一般の場合** — `eq_univ_of_condC`。⚠ 分割 (商) を作らず
+      `{(x,k) | x ≠ 0, k ≠ 0, k·x ∈ S}` の二重数え上げ (`Finset.sum_comm` + `card_nbij'`)。
 - [ ] Prop 7 Step 1 (既存 `normN_dSeq_eq_one` を使う)
 - [ ] Prop 7 Step 2 (`A_r` の濃度; `b` の次数 `q`)
 - [ ] Prop 7 Step 3 (既約多項式の個数上界 `(p^r − p)/r`)
 - [ ] Prop 7 Step 4 + 主定理 + BG (A) 版の系 + AxiomsCheck 登録
+
+### Step 3 で使う mathlib 資産 (2026-08-08 実測)
+
+個数上界 `r · |I_r| ≤ p^r − p` は「各既約 `h` が `GF(p^r)` にちょうど `r` 個の根を持ち、
+相異なる `h` の根集合は交わらない。根は `𝔽_p` の外」で出る。必要な部品は全部ある:
+
+* **根の存在**: `FiniteField.nonempty_algHom_iff_finrank_dvd` — `AdjoinRoot h` (finrank `r`)
+  から `GaloisField p r` (finrank `r`) への `AlgHom` があり、`AdjoinRoot.root h` の像が根。
+* **分裂**: `GaloisField.lean:197` の `instance (priority := 100) … : IsGalois K K'`
+  (有限体の任意の拡大は Galois) ⟹ `Normal` ⟹ `minpoly` が分裂。
+* **重根なし**: `PerfectField.ofFinite` (有限体は完全) ⟹ `Irreducible.separable`。
+* **根の個数**: `Polynomial.card_rootSet_eq_natDegree` (separable + splits ⟹ 根の個数 = 次数)。
+
+⚠ 「単項既約 `r` 次多項式の集合」を Finset として扱うと Fintype 付けが面倒なので、
+**`A_r ∖ U` の元 `c` から直接**その既約多項式・根集合を取り、`Finset.card_biUnion` で
+`r · |A_r ∖ U| ≤ p^r − p` を出す方針 (`c ↦ h_c` の単射性は `b` の次数が `q ≥ r` から従う)。
 
 ## 完了条件
 
