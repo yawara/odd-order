@@ -22,10 +22,19 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
   Hypothesis 11.1, then Theorems 11.3, 11.5, 11.7, Corollary 11.6, and
   Lemma 12.3 give the six conclusions (mmd L3129-L3148).
 - Theorem 12.12 packages the Frobenius-complement endpoint from Theorem 12.7,
-  Lemma 12.8, Corollary 12.6, and Lemma 12.11 (mmd L3306-L3344). The internal
-  cyclic `Z_p` construction remains deferred.
+  Lemma 12.8, Corollary 12.6, and Lemma 12.11 (mmd L3306-L3344).  ✅ **Complete**:
+  `S12_Theorem1212c.frobenius_factorization_of_regular` handles all three cases,
+  including the abelian-Sylow one whose internal cyclic `Z_p` construction is
+  `exists_regular_cyclic_of_mem_tau2` / `exists_tau2_product`.
+  (This paragraph used to say the `Z_p` construction "remains deferred" — stale,
+  corrected in the issue 0177 §12 audit, 2026-08-08.)
 - Proposition 12.15, Corollary 12.16 are the direct §13--§14 gates
-  (mmd L3385-L3453); Corollary 12.16(b) remains a deferred proof obligation.
+  (mmd L3385-L3453).  ✅ **Complete**: Corollary 12.16 has both clauses in the
+  general `σ(M)`-subgroup form (`sigma_subgroup_pRank_normalizer_le_one` (a) /
+  `sigma_subgroup_not_mem_primeFactors_derived_of_tau1` (b)), each reducing to a
+  `q`-group specialization via a characteristic `O_q(Y)`.
+  (This paragraph used to say 12.16(b) "remains a deferred proof obligation" —
+  stale, corrected in the same audit.)
 - Lemma 12.18 uses Theorem 1.13, Theorem 3.7, Corollary 10.9(a), and the
   Uniqueness Theorem (mmd L3454-L3482). Do not replace it by downstream
   prime-action assumptions in §13.

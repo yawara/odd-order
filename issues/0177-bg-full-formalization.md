@@ -188,8 +188,16 @@ pat = re.compile(r'^(Theorem|Proposition|Lemma|Corollary)\s+(\d{1,2})\.(\d{1,2})
         束ねるべき) ⟹ `S11.bgCor116`。
         📌 §11 は書籍の standing hypothesis (Hypothesis 11.1) を `Hypothesis111` という
         **structure** にしてあり、7 結果すべてがそれを取る — §7 の `Hypothesis71` と同じ設計。
+      - **§12 監査完了 (2026-08-08)**: 全 19 件被覆・未形式化 / packaging 差 / 特殊化債務ゼロ。
+        **BG 最大の節だが最も整っていた** — Lem 12.1 は **(a)-(g) の 7 条項**、Thm 12.5 は
+        **(a)-(f) の 6 条項**が既に 1 statement。全 21 file が実 sorry ゼロ。
+        実収穫 = **stale 注記 2 件** (`S12_E.lean` の「Lane proof-gate notes」= 後続セッションが
+        真っ先に読むヘッダに、Thm 12.12 の `Z_p` 構成と Cor 12.16(b) を「deferred」と記載。
+        どちらも完全証明済)。
+        ✅ 「`q`-group **specialization**」と自称する docstring があったが、一般 `σ(M)`-部分群形が
+        同じファイルに在り債務でなかった — **「specialization」の語を見たら一般形の有無を確認**。
       - 1 節ぶん終えるごとに census note を更新して commit。
-      - ⬜ **次 = §12 (19 件、BG 最大の節)**。
+      - ⬜ **次 = §13 (13 件)**。
 
 ## 📌 BG の大域規約 (2026-08-08 §3 で確定 — 全節の判定に効く)
 

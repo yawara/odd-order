@@ -758,4 +758,38 @@ then `A ∈ 𝒰`」は `isUniquelyMaximal_of_mem_e2_not_maximal` として独�
 (a)(b) の docstring は「(原典 (c): … — **後続**。)」と書いており、(c) が同じファイルに
 実装された後も更新されていなかった (軽度の stale) ので訂正した。
 
-### §12-§16 + Theorems A-E + 補章 — 未着手
+## §12 (The Subgroup E、19 件 = 12.1-12.19、BG 最大の節) — 監査完了 (2026-08-08)
+
+全 19 件被覆・**未形式化ゼロ・packaging 差ゼロ・特殊化債務ゼロ**。
+実収穫 = **stale 注記 2 件** (どちらも `S12_E.lean` のファイルヘッダ)。
+
+**多条項がすべて既に 1 statement に揃っていた** — §12 は BG 最大の節だが最も整っている:
+
+| BG | 条項数 | repo の endpoint |
+|---|---|---|
+| **Lem 12.1** | **(a)-(g) の 7 条項** | `S12_ECore.subgroupE_basic` |
+| **Thm 12.5** | **(a)-(f) の 6 条項** | `S12_Theorem125.Msigma_nilpotent_of_tau2` |
+| **Cor 12.10** | (a)-(d) | `S12_Corollary1210.nilpotent_sigmaComplement_abelian` |
+| **Thm 12.12** | (a)(b) | `S12_Theorem1212c.frobenius_factorization_of_regular` (`FrobFactConclusion`) |
+| **Cor 12.16** | (a)(b) | `sigma_subgroup_pRank_normalizer_le_one` / `sigma_subgroup_not_mem_primeFactors_derived_of_tau1` |
+
+`grep sorry` (コメント除去後) で §12 の全 21 file が **実 sorry ゼロ**。
+
+### 🚨 実収穫: `S12_E.lean` ヘッダの「deferred」注記 2 件が stale
+
+| 注記 | 実体 |
+|---|---|
+| 「Theorem 12.12 … 内部の cyclic `Z_p` 構成は **remains deferred**」 | ✅ `frobenius_factorization_of_regular` が 3 ケースすべてを処理済。abelian-Sylow ケースの `Z_p` 構成は `exists_regular_cyclic_of_mem_tau2` / `exists_tau2_product` |
+| 「**Corollary 12.16(b) remains a deferred proof obligation**」 | ✅ `not_mem_primeFactors_derived_of_tau1` (docstring に「**実証明版**」)、さらに一般 `σ(M)`-部分群形 `sigma_subgroup_not_mem_primeFactors_derived_of_tau1` も在る |
+
+⟹ **BG での stale 注記は通算 13 件目 / 14 件目**。⚠ この 2 件は**ファイルヘッダの
+「Lane proof-gate notes」**という、後続セッションが真っ先に読む場所に在った。
+
+### ✅ 「`q`-群特殊化」は債務でなかった
+
+`pRank_normalizer_le_one` の docstring は自身を「**`q`-group specialization**」と明示するが、
+**一般形が同じファイルに在る** (`sigma_subgroup_pRank_normalizer_le_one`; 特性部分群
+`O_q(Y)` 経由で還元、`N_G(Y) ≤ N_G(O_q(Y))`)。⟹ 内部エンジンの特殊化であって
+書籍に対する特殊化債務ではない。**「specialization」という語を見たら一般形の有無を確認する**。
+
+### §13-§16 + Theorems A-E + 補章 — 未着手
