@@ -192,14 +192,16 @@ faithful `Representation`)。`ElemAbelianAutAction.lean` の docstring は
 | 実体 | 場所 |
 |---|---|
 | `mulAutToEnd` (public, 10+ 箇所で使用) | `BG/Ch1_Preliminary/OperatorMaschke.lean:140` |
-| 同 (private の重複) | `BG/AppA_PStability.lean:143` |
+| 同 (private の重複) | `BG/AppA_PStability.lean:143` — **2026-08-08 に削除し共有版へ寄せた** |
 | `zmod_smul_ofMul` | `GroupTheory/CommGroupAut.lean:111` |
 
 しかも新設した `mulAutToEnd` は `ExtraspecialSinger.lean` で**名前解決の曖昧化を起こして
 ビルドを壊した** (引数順が違う `(p) {E}` vs `(E) (p)` なので型エラーとして出た)。
 ⟹ **汎用の小さい def を足す前に、名前と「型の形」の両方で grep する**
 ([[grep-abbreviations-not-just-full-names]] [[grep-before-writing-transport-defs]])。
-⚠ `AppA_PStability.lean` の private 複製は残置 (OperatorMaschke 版へ寄せるのは follow-up)。
+✅ `AppA_PStability.lean` の private 複製は**同日中に除去**し `OperatorMaschke` の共有版へ寄せた
+(`def mulAutToEnd` は repo 全体で 1 本)。`OperatorMaschke` 側の docstring に
+「共有版・4 つ目を新設しないこと」と今回の破壊事例を明記した。
 
 ### ⚠ 加群構造は `letI` でなくインスタンス引数で渡す
 

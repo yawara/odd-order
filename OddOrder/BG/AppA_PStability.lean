@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.AppA_PStabilityBasic
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 import OddOrder.GroupTheory.GlaubermanZJ
 
 /-!
@@ -137,18 +138,6 @@ private theorem centralizer_subgroupOf_normalizer_eq {G : Type*} [Group G] (P : 
       rw [SetLike.mem_coe, Subgroup.mem_subgroupOf]; exact hx
     exact congrArg Subtype.val (h ⟨x, hxN⟩ hmem)
 
-open scoped IsMulCommutative in
-/-- 自己同型 `φ : MulAut W` を `Additive W` 上の `ZMod p`-線形自己準同型と見るための
-`MulAut W →* Module.End (ZMod p) (Additive W)`. `stability_perFactor` の共役表現コア. -/
-private noncomputable def mulAutToEnd
-    (W : Type*) [Group W] [IsMulCommutative W] (p : ℕ)
-    [Module (ZMod p) (Additive W)] :
-    MulAut W →* Module.End (ZMod p) (Additive W) where
-  toFun φ := ((MulEquiv.toAdditive φ).toLinearEquiv
-      (fun c x => ZMod.map_smul (MulEquiv.toAdditive φ).toAddMonoidHom c x)).toLinearMap
-  map_one' := by ext x; rfl
-  map_mul' φ ψ := by ext x; rfl
-
 open OddOrder.GroupTheory OddOrder.BG.Ch1.S02 OddOrder.RepresentationTheory in
 open scoped commutatorElement IsMulCommutative in
 /-- **PSTAB — per-chief-factor p-stability** (= Gorenstein 6.5.3 steps 1-3, A.4(c)):
@@ -175,7 +164,8 @@ factor (`isChiefFactor_chiefSeriesInside`) の場合:
    `ρ' ā = 1` ⇒ faithful で `ā = 1` ⇒ `Ā = 1` ⇒ `A ⊆ H_i` ⇒ `⁅U, A⁆ ≤ V`. ∎
 
 主要 API: `isChiefFactor_chiefSeriesInside`, `IsChiefFactor.isMinimalNormal_map_quotient`,
-`solvable_minimal_normal_isElementaryAbelian`, `AddCommGroup.zmodModule`, `mulAutToEnd`,
+`solvable_minimal_normal_isElementaryAbelian`, `AddCommGroup.zmodModule`,
+`OddOrder.BG.Ch1_Preliminary.mulAutToEnd` (共有版, `OperatorMaschke`),
 `IsPGroup.invariants_ne_bot` (step 3 の O_p=1), `thmA4a`, `baseChangeRepresentation`
 (+ `_faithful`). -/
 private theorem stability_perFactor
@@ -238,7 +228,8 @@ private theorem stability_perFactor
   haveI : Finite ↥W := inferInstance
   -- the conjugation representation ρ : M → End (Additive ↥W)
   set ρ : Representation (ZMod p) M (Additive ↥W) :=
-    (mulAutToEnd ↥W p).comp ((MulAut.conjNormal (H := W)).comp (QuotientGroup.mk' V)) with hρdef
+    (OddOrder.BG.Ch1_Preliminary.mulAutToEnd ↥W p).comp
+      ((MulAut.conjNormal (H := W)).comp (QuotientGroup.mk' V)) with hρdef
   have hρ_apply : ∀ (g : M) (x : Additive ↥W),
       ρ g x = Additive.ofMul (MulAut.conjNormal (H := W) (QuotientGroup.mk' V g)
         (Additive.toMul x)) := by

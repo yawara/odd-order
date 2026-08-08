@@ -62,6 +62,8 @@ handoff §6 の sub-issue ロードマップに従う (各々別 issue 化推奨
 - ⚠ 設計書 (`s04_n4_maschke_bridge_design.md`) は `mapSubmodule`/`asModule` 経由を想定したが, **`asModule` の AddCommMonoid 二重 instance (derived vs AddCommGroup.toAddCommMonoid) の defeq trap** で詰まり, **`Subrepresentation` 経由に変更** (V=Additive ↥E 上で instance 一貫, asModule 合成不要)。実装者向け教訓として記録。
 - sorry-free / axiom-clean (`[propext, Classical.choice, Quot.sound]`), `lake build OddOrder` green (3354 jobs)。`OddOrder.lean` に import 追加済。
 - 補助: `isElementaryAbelian_omega_one_of_comm` / `neZero_natCast_zmod_of_coprime` / `isAInvariant_{map_mk',comap_mk',subgroupOf_restrict,map_subtype_of_restrict}` / `mulAutToEnd` (AppA private helper の自前複製; 将来 AppA と共有 module 化候補)。
+  → **2026-08-08 完了** (issue 0177 の §3 監査ついで): AppA 側の private 複製を削除し、
+  本 `OperatorMaschke.mulAutToEnd` を repo 唯一の定義にした。
 
 → **Thm 4.12(a) (Huppert, metacyclic+[R,A]=R⇒abelian) の最深 gate が開いた**。次候補 = Thm 4.12(a) 本体 (N-4 + Lem 4.10✅/4.5(b)✅ で書ける) / Prop 4.11 (Huppert) / Prop 4.3(a) full。⚠ Ch04 `quotientMulAutHom` の `_root_` 欠落 (二重 nest 実名) は未修正 — 本ファイルは explicit 実名で回避 (S7A2 と同様)。
 

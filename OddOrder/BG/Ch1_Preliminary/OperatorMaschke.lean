@@ -136,7 +136,13 @@ theorem isAInvariant_map_subtype_of_restrict {K : Subgroup R} (hK : IsAInvariant
 
 /-- A `MulAut`-action on a commutative `p`-group `W`, packaged as a monoid hom into the
 `F_p`-linear endomorphisms of `Additive W`. Composing with `φ : A →* MulAut W` yields a
-`Representation (ZMod p) A (Additive W)`. (Mirrors the private helper in `AppA_PStability`.) -/
+`Representation (ZMod p) A (Additive W)`.
+
+**共有版** — BG §3/§4, App.A, Peterfalvi §16 と補章がここを使う。⚠ 新設しないこと:
+2026-08-08 に `AppA_PStability` の private 複製を本定義に寄せ、さらに `PRank` に 3 つ目を
+足しかけて `ExtraspecialSinger` の名前解決を壊した (引数順が `(W) (p)` と `(p) {W}` で
+違うため型エラーとして露見)。スカラー倍を冪に読み替えるのは
+`OddOrder.GroupTheory.zmod_smul_ofMul` (`CommGroupAut`)。 -/
 noncomputable def mulAutToEnd (W : Type*) [Group W] [IsMulCommutative W] (p : ℕ)
     [Module (ZMod p) (Additive W)] :
     MulAut W →* Module.End (ZMod p) (Additive W) where
