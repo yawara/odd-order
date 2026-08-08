@@ -544,4 +544,48 @@ Prop 1.6(a) (`fixedPoints_sup_actionCommutator_eq_top`) で引いている。
 `S04_SmallRankBasic.lean:921` に在る (§4 監査で確定)。⟹ 「4.5(a) は在るが、この経路は
 位数 `p³` を直接くれるので残す」と訂正。**BG での stale 注記は通算 11 件目**。
 
-### §6-§16 + Theorems A-E + 補章 — 未着手
+## §6 (Additional Results、7 件 = 6.1-6.7) — 監査完了 (2026-08-08)
+
+全 7 件被覆・**未形式化ゼロ**・**stale 注記ゼロ** (BG で初)。
+
+| BG | repo の endpoint | 照合 |
+|---|---|---|
+| **6.1** (Hall–Higman) | `AppA.thmA4b` + §6 側 (issue 3025、`p ≠ 2` の空虚な仮説を落とした版) | ✅ BG 自身が 6.1 = Thm A.4(b) と同定 |
+| **6.2** | `AppB.zCenter_lOdd_sup_oPiCore_normal` (Puig `L(S)` 版 = 書籍 Thm B.4) **かつ** `S06.zCenterThompsonJAbelian_sup_oPiCore_normal` (**literal `J(S)`**) | ✅ 両方 |
+| **6.3** | (a) 2 条項 / (b) `lemma63b` | 🔴 (a) が非対称 → `lemma63a` 新設 |
+| **6.4** | `exists_centralizing_conj_sup_isPiGroup_of_normalHall` | ✅ |
+| **6.5** | (a) `inf_commutator_eq_of_coprime` / (b) `normalizer_eq_centralizerK_mul_normalizerU` / (c) `exists_mem_centralizerK_mul_of_conj_le` | ✅ 3 条項 |
+| **6.6** | (a) `oPiPrimePiCore_eq_oPiPrimeCore_sup_sylow` + `top_eq_oPiPrimeCore_sup_normalizer_sylow` / (b) `sylow_le_commutator_normalizer_of_le_commutator` / (c) `exists_mem_centralizer_mul_normalizer_of_conj_subset_sylow` / (d) `exists_mem_centralizer_inf_conj_le_sylow` | ✅ 4 条項 |
+| **6.7** | `le_oPiPrimeCore_of_normalized_by_maximalElementaryAbelian` | ✅ |
+
+### ✅ Thm 6.2 は書籍の両版を持っている (誤判定しかけた)
+
+書籍 6.2 は **Thompson の `J(S)`** で `Z(J(S))·O_{p'}(G) ⊴ G` と述べ、証明は **G** に投げる。
+直後の Remark が「**代替** (Thm B.4) を Appendix B で Puig の `L(S)` を使って証明する」と書く。
+
+⚠ AxiomsCheck の登録コメントは `L(S)` 版を「**BG Thm 6.2 一般形**」と呼んでおり、
+それだけ見ると「literal `J(S)` 版は無い = 書籍の 6.2 は未被覆」と読める。実際には
+`S06_Thm62JS.lean` が **2026-07-21 に literal `J(S)` 版を無条件で完成**させている
+(Gorenstein 版 abelian Thompson subgroup + `GroupTheory/GlaubermanZJ.lean` の Glauberman
+`Z(J)`-定理本体 + 商の p-stability + p-constraint)。⟹ **両版とも在る**。
+
+### 🔴 実収穫: Lem 6.3(a) の 2 条項が非対称だった
+
+書籍 6.3(a) は「`H = [H,K]` **かつ** `C_H(K) ⊆ H'`」で 1 つの主張。repo は 2 定理に分かれており、
+**同じ節の (b) は `lemma63b` として束ねられている**という非対称があった。
+⟹ `lemma63a` を新設 (`S06_ConjugationBridges.lean`)。
+
+⚠ 第 1 条項 `commutator_eq_self_of_isComplement'_le_commutator` は**書籍より強い** —
+有限性も coprimality (= Hall) も要らない。`lemma63a` の docstring にその旨を明記し、
+Hall が無い場面では直接 cite するよう案内した (束ねたことで一般形が隠れないようにする)。
+
+### 📌 6.7 の Remark は「低優先繰延」であって特殊化債務でない
+
+BG 6.7 の直後の Remark は「`p`-length one の仮定は Thompson の定理 [18, Thm X.1.12] により不要」
+と書く。⚠ **§3 の Lem 3.2 / Thm 3.5 と同じ形だが結論は逆** — §3 の Note が挙げた Thompson
+(Frobenius kernel nilpotency) は repo に在ったので仮説を落とせたが、**6.7 の Thompson は
+[18] = Huppert–Blackwell 系の外部文献**で 3 冊スコープ外。BG 自身も証明を書いていない。
+⟹ repo が `hasPLengthOne` を保持しているのは**書籍の証明どおり**で正しい
+([[feedback-generalize-specialized-fully]] の「文献引用のみは低優先繰延」に該当)。
+
+### §7-§16 + Theorems A-E + 補章 — 未着手

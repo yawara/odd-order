@@ -141,8 +141,17 @@ pat = re.compile(r'^(Theorem|Proposition|Lemma|Corollary)\s+(\d{1,2})\.(\d{1,2})
         2. **stale 注記 1 件** (`S05_NarrowSCN.lean` の「still-deferred general Lemma 4.5(a)」
            — §4 監査で無条件形の実在を確定済)。
         ✅ 5.2 / 5.5 / 5.6 は多条項が既に 1 statement に揃っていた ((a)(b)(c) / (a)(b)(c) / (a)-(e))。
+      - **§6 監査完了 (2026-08-08)**: 全 7 件被覆・**未形式化ゼロ**・**stale 注記ゼロ** (BG で初)。
+        実収穫 = **packaging 差 1 件** (Lem 6.3(a) の 2 条項が分かれており、同じ節の (b) が
+        `lemma63b` として束ねられているのと非対称) ⟹ `S06.lemma63a`。
+        ✅ **Thm 6.2 は書籍の両版を持っていた** — AxiomsCheck の登録コメントは Puig `L(S)` 版を
+        「BG Thm 6.2 一般形」と呼ぶので literal `J(S)` 版が無いように読めるが、
+        `S06_Thm62JS.lean` が 2026-07-21 に無条件で完成させている。
+        📌 **6.7 の Remark は特殊化債務でない** — 「`p`-length one は Thompson の定理により不要」
+        と書くが、その Thompson は**外部文献 [18]** で 3 冊スコープ外 (BG 自身も証明を書いていない)。
+        §3 の Lem 3.2 / Thm 3.5 とは逆のケース (あちらの Thompson は repo に在った)。
       - 1 節ぶん終えるごとに census note を更新して commit。
-      - ⬜ **次 = §6 (7 件)**。
+      - ⬜ **次 = §7 (6 件)**。
 
 ## 📌 BG の大域規約 (2026-08-08 §3 で確定 — 全節の判定に効く)
 
