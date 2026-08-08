@@ -222,8 +222,17 @@ pat = re.compile(r'^(Theorem|Proposition|Lemma|Corollary)\s+(\d{1,2})\.(\d{1,2})
         4 件は既に別宣言で証明済だった** ⟹ **注記を根拠に「未形式化」と書かない。
         概念形 grep で不在を確認してから初めて gap と呼ぶ**。
         ✅ Thm 14.7 は (b)-(h) を `∃!` で束ね (a) を別宣言に持つ — 全条項あり。
+      - **§15 / §16 監査完了 (2026-08-08)**: 全 10 件被覆・未形式化 / packaging 差ゼロ。
+        条項ラベル付き endpoint が非常に密 (Lem 15.1 は (a)-(e)、Thm 15.7 も (a)-(e))。
+        実収穫 = **stale 注記 2 件** — Cor 15.5(c) の後半 (`M'/M_F` nilpotent) を 2 箇所が
+        「deferred — quotient API」と書いていたが、実体は §16 の
+        `derivedInG_quotient_maxNilpotentNormalHall_isNilpotent` に在った。
+        ⚠ ただし証明が **§16 (下流)** なので §15 の束には入れられない (import cycle)。
+        注記を「証明済だが層の都合で別位置」に訂正 (bundle はしない)。
+        📌 **「quotient 型 API 整備後に追加予定」は BG で 3 回出て 3 回とも stale**
+        (Thm 10.2(d) / Lem 10.8(c) / Cor 15.5(c)) ⟹ **この文言を見たら即座に実体を探す**。
       - 1 節ぶん終えるごとに census note を更新して commit。
-      - ⬜ **次 = §15 (9 件) / §16 (1 件) / Theorems A-E (5 件) / 補章 (14 件)**。
+      - ⬜ **次 = Theorems A-E (5 件) / 補章 A-E (14 件)** — これで BG 完了。
 
 ## 📌 BG の大域規約 (2026-08-08 §3 で確定 — 全節の判定に効く)
 

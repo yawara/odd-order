@@ -201,7 +201,10 @@ theorem maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent [Finite G]
 
 /-- **`M_F ≤ M'`** (the `H ⊆ M'` part of BG Corollary 15.5(c), `H = M_F`): the containment chain
 `M_F ≤ M_σ ≤ M' ≤ M` via `maxNilpotentNormalHall_le_Msigma` and `Msigma_le_derived`.
-`§14`-independent.  (The `M'/M_F` nilpotency of 15.5(c) remains deferred — quotient API.) -/
+`§14`-independent.  ⚠ The other half of 15.5(c), "`M'/M_F` is nilpotent", is **proved** as
+`S16.derivedInG_quotient_maxNilpotentNormalHall_isNilpotent` (downstream, so it cannot appear in
+a §15 statement without an import cycle).  The old "remains deferred — quotient API" note was
+stale; corrected in the issue 0177 §15 audit (2026-08-08). -/
 theorem maxNilpotentNormalHall_le_derived [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
     maxNilpotentNormalHall M ≤ derivedInG M :=

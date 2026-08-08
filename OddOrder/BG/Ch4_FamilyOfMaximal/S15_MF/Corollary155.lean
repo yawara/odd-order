@@ -927,7 +927,11 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       fittingInAmbient M = fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) ⊔ Y ∧
       fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) ⊓ Y = ⊥ ∧
       ⁅fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M), Y⁆ = ⊥ ∧
-      -- (c) `M_F ⊆ M'` (the `M'/M_F` nilpotent part is deferred — quotient API).
+      -- (c) `M_F ⊆ M'`.  ⚠ The book's second half of (c), "`M'/M_F` is nilpotent", is **proved**
+      -- as `S16.derivedInG_quotient_maxNilpotentNormalHall_isNilpotent`; it cannot be bundled
+      -- here because that proof lives downstream (`S16_MainResults/TypeBridges.lean` imports
+      -- §15), so putting it in this statement would be an import cycle.  (The old comment said
+      -- it was "deferred — quotient API"; stale, corrected in the issue 0177 §15 audit.)
       MF M ≤ derivedInG M ∧
       -- (d) if `K ≠ 1` (i.e. `M` is not of type `F`), then `F(M) ⊆ M'`.
       (¬ S14.IsTypeF M → fittingInAmbient M ≤ derivedInG M) ∧

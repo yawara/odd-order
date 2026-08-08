@@ -907,4 +907,39 @@ Prop 14.2 は違う: **書籍の主張が repo のどこにも無い**。
 ((b2)/(d) の第 2 条項/(e)/(f)) は既に別宣言で証明済**だった。⟹ **注記を根拠に「未形式化」と
 書かない。概念形の grep で不在を確認してから初めて gap と呼ぶ**。docstring は実態に合わせて訂正。
 
-### §15-§16 + Theorems A-E + 補章 — 未着手
+## §15 (9 件 = 15.1-15.9) / §16 (1 件 = 16.1) — 監査完了 (2026-08-08)
+
+全 10 件被覆・**未形式化ゼロ・packaging 差ゼロ**。条項ラベル付きの endpoint が非常に密:
+
+| BG | 条項 | repo |
+|---|---|---|
+| **Lem 15.1** | (a)(b)(c)(d)(e) | `isNilpotent_complement_of_isTypeF` / `typeP_hall_derived_eq_and_abelian` / `uniqueMaximal_of_kappaSigmaCompl_element` / `typeP_centralizerGeneratedBySigma_isMulCommutative` / `typeP_hall_frobenius_factorization` |
+| **Thm 15.2** | (b)(g) ほか | `Theorem152Assembly` 一式 |
+| **Cor 15.3** | (a)(b) | `mf_centralizer_hall_decomp` / `hall_subgroupOf_normal_of_msigma_nilpotent` |
+| **Cor 15.4** | — | `eq_top_of_forall_sylow_le` ほか |
+| **Cor 15.5** | (a)(b)(c)(d) | `Corollary155` の束 + (c) 後半は §16 (下記) |
+| **Cor 15.6** | — | `typeP_kstar_in_mf` |
+| **Thm 15.7** | (a)(b)(c)(d)(e) | `S15_MF` の 5 系統 |
+| **Thm 15.8** | — | `fittingInAmbient_eq_Msigma_of_isTypeP2_of_tau2_empty` |
+| **Cor 15.9** | (b) ほか | `not_fittingIsTI_of_mem_fittingSharp_of_centralizer_not_le` |
+| **Prop 16.1** | (a)(b) | `S16.proposition_type_classification` |
+
+### 🚨 実収穫: 「quotient API deferred」の 3 例目も stale
+
+Cor 15.5(c) は「`M_F ⊆ M'` **かつ** `M'/M_F` が nilpotent」の 2 主張。repo は前半だけを束に持ち、
+2 箇所 (`Corollary155.lean` のインラインコメント / `AutAbelianCore.lean` の docstring) が
+「`M'/M_F` nilpotency は **deferred — quotient API**」と書いていた。
+
+**実体は在る**: `S16_MainResults/TypeBridges.lean` の
+`derivedInG_quotient_maxNilpotentNormalHall_isNilpotent` が
+`Group.IsNilpotent (↥(derivedInG M) ⧸ (MF M).subgroupOf (derivedInG M))` を証明しており、
+同ファイル内の大きな §16 束にも組み込まれている。
+
+⚠ **ただしこれは §15 の束には入れられない** — 証明が **§16 (下流) に在る**ため、
+§15 の statement に書くと import cycle になる。§3 の `S03_WithoutSolvableKernel` と同じ構図。
+⟹ 注記を「証明済だが層の都合で別位置」に訂正 (bundle はしない)。
+
+📌 **「quotient 型 API 整備後に追加予定」という言い訳は BG で 3 回出て 3 回とも stale だった**
+(Thm 10.2(d) / Lem 10.8(c) / Cor 15.5(c))。⟹ **この文言を見たら即座に実体を探す**。
+
+### Theorems A-E + 補章 — 未着手
