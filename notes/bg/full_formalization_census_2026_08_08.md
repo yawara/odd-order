@@ -1046,5 +1046,20 @@ BG はそれを持っており、対応表を自分で作る必要はなかっ�
 
 **stale 注記の訂正 = 20 件超** (§1:2 / §2:8 / §3:1 / §4:3 / §5:1 / §10:2 / §12:2 / §15:2 …)。
 
-**真の未形式化 = 1 件のみ** → [issue 0178](../../issues/0178-bg-prop142-regular-u-and-nilpotent-msigma.md)
-(Prop 14.2 の (a) 後半 = Thm A(3)(4)、(g) の `M_σ` 冪零 = Thm C(9))。
+**真の未形式化 = 0 件** (2026-08-08 に確定)。監査中は Prop 14.2 の (a) 後半 / (g) を
+「唯一の真の未形式化」と判定し [issue 0178](../../issues/closed/0178-bg-prop142-regular-u-and-nilpotent-msigma.md)
+を起票したが、**実装に入って両方とも packaging 差だと判明**した:
+
+* **(g)** `M_σ` 冪零 (= Thm C(9)) — 部品 (`E23_ne_bot_of_isTypeP2_caseTau1` /
+  `Msigma_centralizer_E23_eq_bot_of_caseTau1`) は在り、繋ぐ endpoint だけが無かった
+  ⟹ `S14.typeP2_Msigma_isNilpotent`
+* **(a) 後半** regular 作用 + normal complement (= Thm A(3)(4)) — regular 作用は
+  `actsRegularlyOn_E23_E1_of_caseTau1` (docstring に「BG Prop 14.2(a)」と明記)、
+  abelian Hall 性は `typeP2_matched_kappa_hall_pair_of_esetup` に在った
+  ⟹ `S16.typeP2_exists_regular_abelian_hall`
+
+🚨 **(a) の誤判定の原因**: `grep "ActsRegularlyOn"` は
+`Basics.lean:291: ActsRegularlyOn (E₂ ⊔ E₃) E₁` を**実際に返していた**のに、
+「`K` が `U` に regular という結論は存在しない」と判定した — **`E₁` が `K`、
+`E₂ ⊔ E₃` が `U`** だと気づかなかった。⟹ **誤判定様式 (新)**: grep の hit を「別物」と
+即断せず、**書籍の変数と repo の setup 変数の対応表を先に作る**。

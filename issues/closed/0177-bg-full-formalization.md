@@ -276,7 +276,15 @@ pat = re.compile(r'^(Theorem|Proposition|Lemma|Corollary)\s+(\d{1,2})\.(\d{1,2})
 **特殊化債務解消 2 件** (§3 の可解性仮説)。**索引補完 7 件** (§9 が AxiomsCheck に不在だった)。
 **stale 注記訂正 20 件超**。
 
-**真の未形式化は 1 件のみ** → [issue 0178](0178-bg-prop142-regular-u-and-nilpotent-msigma.md)。
+**真の未形式化は 0 件** (2026-08-08 確定)。監査中は Prop 14.2 の (a)(g) を「唯一の真の
+未形式化」と判定し issue 0178 を起票したが、**実装に入って両方とも packaging 差だと判明**
+(部品は repo に在り、繋ぐ endpoint だけが無かった)。
+⟹ `S14.typeP2_Msigma_isNilpotent` / `S16.typeP2_exists_regular_abelian_hall` で解消、
+[0178 closed](closed/0178-bg-prop142-regular-u-and-nilpotent-msigma.md)。
+
+🚨 (a) の誤判定の原因 = **grep の hit を「別物」と即断した**
+(`ActsRegularlyOn (E₂ ⊔ E₃) E₁` は返っていたが `E₁ = K`, `E₂⊔E₃ = U` に気づかなかった)。
+⟹ **書籍の変数と repo の setup 変数の対応表を先に作る**。
 
 ⟹ **3 冊の逐条監査 (Peterfalvi 284 / Isaacs 305 / BG 186) がすべて完了**。
 

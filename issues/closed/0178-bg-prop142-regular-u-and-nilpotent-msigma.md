@@ -158,3 +158,32 @@ packaging 差・stale 注記・索引欠落のみで、**書籍の数学はす�
    結合則。
 
 ⚠ 実装時は **sorry を一切残さない** (このファイルは sorry-free)。
+
+---
+
+# ✅ 完了 (2026-08-08)
+
+| 条項 | 実体 | 状態 |
+|---|---|---|
+| **(g)** `M_σ` 冪零 (= Thm C(9)) | `S14.typeP2_Msigma_isNilpotent` | ✅ axiom-clean |
+| **(a) 後半** regular 作用 + normal complement (= Thm A(3)(4)) | `S16.typeP2_exists_regular_abelian_hall` | ✅ axiom-clean |
+
+どちらも**書籍の証明どおりの経路**で、repo には部品がすべて在り、欠けていたのは
+**それらを繋ぐ書籍形の endpoint だけ**だった。
+
+## (a) の実装で踏んだ 3 つの罠 (再利用可能)
+
+1. **配置** — `typeP2_matched_kappa_hall_pair_of_esetup` が §16 (下流) にあるため、定理は
+   §14 でなく **§16 に置く**必要があった (§14 に書くと import cycle)。
+2. **`rw [← E_compl_sup]` の爆発** — 目標の `M` を全箇所 (`Msigma M`, `kappa M` の中まで)
+   書き換えて `isDefEq` heartbeat 超過。⟹ **局所 `have key : ... := ...` を作って
+   `rwa [hsetup.E_compl_sup] at key`** に変更 (書き換え対象を 1 箇所に限定)。
+3. **部分群束は modular でない** — Dedekind (`sup_inf_assoc_of_le`) は
+   `[IsModularLattice]` を要求し `Subgroup G` は満たさない。⟹ `U ≤ M ≤ N(M_σ)` と
+   `U ⊓ M_σ = ⊥` から `card_sup_eq_mul_of_le_normalizer_of_disjoint` で
+   `|U M_σ| = |U|·|M_σ|` を出し、**位数が `κ'`-数**であることで disjointness を得る経路へ。
+
+## ⟹ BG 逐条監査の最終結論
+
+**BG 186 件に「真の未形式化」は 0 件**。監査が見つけたのはすべて
+**packaging 差・stale 注記・索引欠落**で、書籍の数学は最初から repo に在った。
