@@ -1113,7 +1113,8 @@ theorem sylow_p_isCommutative [Finite G] (hG : IsMinimalSimpleOdd G)
     (Subgroup.equivMapOfInjective _ _ (MulAut.conj m).injective) hTab
 
 /-- **BG Corollary 11.6 (a)(b)** (mmd L2977): (a) `A = Ω₁(P)`、(b) `C_{M_σ}(A) = 1`。
-(原典 (c): `g₁,g₂∈N_G(P)−N_M(P)` で `C_{M_σ}(A₀^{gᵢ})=1` ∧ `A=A₁×A₂` — 後続。)
+原典 (c) は同ファイルの `exists_distinct_conj_lines`、3 条項を書籍の形に束ねたものが
+`bgCor116` (本ファイル末尾)。
 
 証明: Theorem 11.5 で `P` は abelian。(a) `Ω₁(P)` の生成元 (exp-`p` 元) は `A` を中心化する
 ので極大性により `A` に落ち、逆向きは自明。(b) `g ∈ N_G(P) − M` を取ると `Ω₁(P)` は
@@ -1350,5 +1351,30 @@ theorem exists_distinct_conj_lines [Finite G] (hG : IsMinimalSimpleOdd G)
 /- **BG Theorem 11.7** (`MsigmaA_normal`, `M_σ A ⊴ M`) is the single-theorem leaf
 `S11_MsigmaANormal.lean` (it consumes Theorem 11.5 / Corollary 11.6 from this file
 together with §10 and the Theorem 4.20(c) Hall radicals). -/
+
+/-! ### The book statement (Corollary 11.6) -/
+
+/-- **BG Corollary 11.6** (Bender–Glauberman, LMS LNS 188, p. 82), the book's packaging.
+Under Hypothesis 11.1:
+
+* **(a)** `A = Ω₁(P)`;
+* **(b)** `C_{M_σ}(A) = 1`;
+* **(c)** there exist `A₁ ≠ A₂` in `ℰ_p¹(A)` with `A = A₁ × A₂` and
+  `C_{M_σ}(A₁) = C_{M_σ}(A₂) = 1`.
+
+The three clauses share exactly the hypotheses of the corollary (Hypothesis 11.1 and nothing
+more), so they belong in one statement; `omega1_eq_and_centralizer_trivial` carries (a)(b) and
+`exists_distinct_conj_lines` carries (c).  The internal direct product `A = A₁ × A₂` is
+rendered as `A₁ ⊔ A₂ = A` together with `A₁ ⊓ A₂ = ⊥`. -/
+theorem bgCor116 [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} {p : ℕ} {A₀ A P : Subgroup G} (h : Hypothesis111 M p A₀ A P) :
+    A = (Omega ↥P p 1).map P.subtype ∧
+    Subgroup.centralizer (A : Set G) ⊓ S10.Msigma M = ⊥ ∧
+    (∃ A₁ A₂ : Subgroup G, A₁ ≤ A ∧ A₂ ≤ A ∧ A₁ ≠ A₂ ∧
+      Nat.card ↥A₁ = p ∧ Nat.card ↥A₂ = p ∧ A₁ ⊔ A₂ = A ∧ A₁ ⊓ A₂ = ⊥ ∧
+      Subgroup.centralizer (A₁ : Set G) ⊓ S10.Msigma M = ⊥ ∧
+      Subgroup.centralizer (A₂ : Set G) ⊓ S10.Msigma M = ⊥) :=
+  ⟨(omega1_eq_and_centralizer_trivial hG h).1, (omega1_eq_and_centralizer_trivial hG h).2,
+    exists_distinct_conj_lines hG h⟩
 
 end OddOrder.BG.Ch3.S11

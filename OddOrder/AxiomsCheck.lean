@@ -7170,6 +7170,11 @@ Cor 12.16 依存は完全に unconditional 化** (もはや sorry に bottom-out
 -- (d) 追加仮説の下で `⁅K,P⁆` が `M_σ` を中心化し cyclic normal。既存は (a)(b)(c) 束と (d) が別々。
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S10.bgProp1011
 
+-- BG Corollary 11.6, BOOK packaging (issue 0177 §11 監査): Hypothesis 11.1 のもと
+-- (a) `A = Ω₁(P)`, (b) `C_{M_σ}(A) = 1`, (c) `A = A₁ × A₂` (`A₁ ≠ A₂ ∈ ℰ_p¹(A)`) で
+-- `C_{M_σ}(A₁) = C_{M_σ}(A₂) = 1`。既存は (a)(b) 束と (c) が別々 (仮説は完全に共有)。
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S11.bgCor116
+
 -- BG §10 (β-radical spine): Theorem 10.6 (every proper subgroup has `p`-length one).
 -- Originally wired against two forward axioms of `S10_ForwardFromKeystone`
 -- (BG Thm 3.6 + BG Lem 10.4(b)), both de-axiomatized; see that file.
