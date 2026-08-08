@@ -415,4 +415,84 @@ theorem mem_towerSet_iff [Fact p.Prime] {b : GaloisField p q} {r : ℕ} {x : Gal
       _ = 1 + b * (aeval b) g.divX := by
           rw [map_add, map_mul, aeval_X, aeval_C, h0, map_one]; ring
 
+/-! ### Closure properties of `U` and of the tower -/
+
+theorem one_mem_normOneSet [Fact p.Prime] : (1 : GaloisField p q) ∈ normOneSet p q := by
+  rw [mem_normOneSet_iff, normN_one]
+
+theorem mul_mem_normOneSet [Fact p.Prime] {x y : GaloisField p q} (hx : x ∈ normOneSet p q)
+    (hy : y ∈ normOneSet p q) : x * y ∈ normOneSet p q := by
+  rw [mem_normOneSet_iff, normN_mul, hx, hy, one_mul]
+
+theorem towerSet_mono [Fact p.Prime] {b : GaloisField p q} {r s : ℕ} (hrs : r ≤ s) :
+    towerSet p q b r ⊆ towerSet p q b s := by
+  intro x hx
+  rw [mem_towerSet_iff] at hx ⊢
+  obtain ⟨g, hdeg, h0, hval⟩ := hx
+  exact ⟨g, hdeg.trans hrs, h0, hval⟩
+
+/-- The easy branches of Step 3's induction: a value `aeval b g` with `g` of constant term `1`
+lies in `U` as soon as `g` has degree `≤ r` (induction hypothesis) or `g` factors into two
+polynomials of degree `≤ r`.
+
+Normalizing the constant terms of the factors to `1` is possible because their product is
+`g.coeff 0 = 1`, hence both are nonzero. -/
+theorem aeval_mem_normOneSet_of_not_irreducible [Fact p.Prime] {b : GaloisField p q} {r : ℕ}
+    (hIH : towerSet p q b r ⊆ normOneSet p q) {g : (ZMod p)[X]}
+    (hdeg : g.natDegree ≤ r + 1) (h0 : g.coeff 0 = 1) (hnirr : ¬ Irreducible g) :
+    (aeval b) g ∈ normOneSet p q := by
+  have hg0 : g ≠ 0 := fun h => by rw [h] at h0; simp at h0
+  rcases le_or_gt g.natDegree r with hle | hgt
+  · exact hIH (mem_towerSet_iff p q |>.mpr ⟨g, hle, h0, rfl⟩)
+  -- `g` has degree exactly `r + 1 ≥ 1`, so it is not a unit; being reducible it factors.
+  have hdegeq : g.natDegree = r + 1 := by omega
+  have hnunit : ¬ IsUnit g := by
+    intro hu
+    have := natDegree_eq_zero_of_isUnit hu
+    omega
+  obtain ⟨g₁, g₂, hmul, hu₁, hu₂⟩ : ∃ g₁ g₂, g = g₁ * g₂ ∧ ¬ IsUnit g₁ ∧ ¬ IsUnit g₂ := by
+    by_contra hcon
+    refine hnirr ⟨hnunit, ?_⟩
+    intro a b hab
+    by_contra hnn
+    exact hcon ⟨a, b, hab, fun h => hnn (Or.inl h), fun h => hnn (Or.inr h)⟩
+  -- Both factors have degree between `1` and `r`.
+  have hg₁0 : g₁ ≠ 0 := fun h => hg0 (by rw [hmul, h, zero_mul])
+  have hg₂0 : g₂ ≠ 0 := fun h => hg0 (by rw [hmul, h, mul_zero])
+  have hsum : g₁.natDegree + g₂.natDegree = r + 1 := by
+    rw [← hdegeq, hmul, natDegree_mul hg₁0 hg₂0]
+  have hd₁ : 1 ≤ g₁.natDegree := by
+    rcases Nat.eq_zero_or_pos g₁.natDegree with h | h
+    · refine absurd ?_ hu₁
+      rw [Polynomial.isUnit_iff_degree_eq_zero, degree_eq_natDegree hg₁0, h]
+      simp
+    · exact h
+  have hd₂ : 1 ≤ g₂.natDegree := by
+    rcases Nat.eq_zero_or_pos g₂.natDegree with h | h
+    · refine absurd ?_ hu₂
+      rw [Polynomial.isUnit_iff_degree_eq_zero, degree_eq_natDegree hg₂0, h]
+      simp
+    · exact h
+  -- Normalize the constant terms to `1`.
+  have hc : g₁.coeff 0 * g₂.coeff 0 = 1 := by rw [← mul_coeff_zero, ← hmul, h0]
+  have hc₁ : g₁.coeff 0 ≠ 0 := fun h => by rw [h, zero_mul] at hc; exact zero_ne_one hc
+  set c : ZMod p := g₁.coeff 0 with hcdef
+  have hnorm₁ : (C c⁻¹ * g₁).coeff 0 = 1 := by
+    rw [mul_coeff_zero, coeff_C_zero]
+    exact inv_mul_cancel₀ hc₁
+  have hnorm₂ : (C c * g₂).coeff 0 = 1 := by
+    rw [mul_coeff_zero, coeff_C_zero]; exact hc
+  have hdeg₁ : (C c⁻¹ * g₁).natDegree ≤ r := by
+    rw [natDegree_C_mul (inv_ne_zero hc₁)]; omega
+  have hdeg₂ : (C c * g₂).natDegree ≤ r := by
+    rw [natDegree_C_mul hc₁]; omega
+  have hprod : (C c⁻¹ * g₁) * (C c * g₂) = g := by
+    rw [hmul]
+    rw [show (C c⁻¹ * g₁) * (C c * g₂) = (C c⁻¹ * C c) * (g₁ * g₂) by ring, ← C_mul,
+      inv_mul_cancel₀ hc₁, C_1, one_mul]
+  rw [← hprod, map_mul]
+  exact mul_mem_normOneSet p q
+    (hIH (mem_towerSet_iff p q |>.mpr ⟨_, hdeg₁, hnorm₁, rfl⟩))
+    (hIH (mem_towerSet_iff p q |>.mpr ⟨_, hdeg₂, hnorm₂, rfl⟩))
+
 end OddOrder.BG.AppC.NormSet
