@@ -429,6 +429,75 @@ endpoint の結論に (a) が入っている保証ではない**。結論の型�
 * **4.4** ✅ (a) `GroupTheory/SCN.lean` の `isSCN_iff_isMaximalAbelianNormal`
   (両方向: `IsSCN.isMaximalAbelianNormal` / `IsMaximalAbelianNormal.isSCN`)、
   (b) `S04_Prop44b.lean`。
-* ⬜ **4.5-4.20 の条項照合が未了**。
+* **4.5** ✅ (a)(b)(c) 全条項。
+  (a) 無条件形 = `S04_SmallRankBasic.exists_normal_isElementaryAbelian_card_prime_sq_of_not_isCyclic`、
+  (b) `isElementaryAbelian_omega1_of_isCyclic_index_prime` (書籍どおり抽象巡回部分群 `H` を取る形)、
+  (c) `omega1UpperCentralTwo_not_isCyclic_and_card_prime_sq_le_of_not_isCyclic` (書籍より強く order 下界付き)。
+  🚨 **stale 注記 2 件を訂正** (下記)。
+* **4.6** ✅ `exists_normal_isElementaryAbelian_card_prime_sq_le_of_normal_not_isCyclic`。
+* **4.7** ✅ 両方向 (`scn3_empty_of_pRank_le_two` / `pRank_le_two_of_scn3_empty`)。
+* **4.8** ✅ (a) `card_le_prime_cube_of_pRank_le_two_of_exponent_prime` /
+  (b) `omega1_pow_eq_one_of_pRank_le_two_of_three_lt`。
+* **4.9** ✅ `card_omega1_quotient_le_prime_sq`。
+* **4.10** ✅ `isElementaryAbelian_omega1_of_isMetacyclic`。
+* **4.11** ✅ `isMetacyclic_of_omega1_card_le_prime_sq`。
+* **4.12** 🔴 **部分被覆 2 件だった** → 解消 (下記)。
+* **4.13** ✅ `dvd_prime_sq_sub_one_and_lt_of_prime_dvd_aut_of_scn3_empty` (`q ∣ p²−1 ∧ q < p`)。
+* **4.14** ✅ `dvd_half_prime_add_or_sub_of_prime_dvd_aut_of_scn3_empty`。
+* **4.15** ✅ `mul_centralizer_eq_top_of_isExtraspecial`。**書籍より強い** — `p` 奇の仮説を落とし
+  `p`-一般 (docstring に明記)。
+* **4.16** (Blackburn) ✅ `blackburnRankTwoClassification` — `3 < p ∧ (R 可換 ∨ 中心積の場合)`。
+* **4.17** ✅ `isPGroup_commutator_of_mulAut_odd_of_pRank_le_two`。**書籍より強い** — 書籍の
+  「`A` は可解」を落としている (§2 エンジンが odd だけで回るため)。
+* **4.18** ✅ `solvable_structure_of_pRank_le_two` — **(a)-(e) の 5 条項が 1 statement**。
+* **4.19** ✅ `commutator_le_chiefFactorCentralizer_of_rank_le_two_of_le_normal`。
+* **4.20** ✅ (a)(b)(c) 全条項。
+  (a) `S05.derived_le_fitting_of_rank_fitting_le_two` — 書籍は「`G'` は冪零」だが
+  repo は **より強い `G' ≤ F(G)`**、
+  (b) `S05.characteristic_le_derived_normal_of_rank_fitting_le_two`、
+  (c) `S05.exists_characteristicSylowSeriesPackage_of_rank_fitting_le_two`
+  (`CharacteristicSylowSeriesPackage` = 書籍の characteristic Sylow series)。
+  ⚠ **3 条項とも S04 でなく S05 に在る** — 節ディレクトリに絞ると全滅する
+  (owner chapter 規則、BG での通算 6 回目)。書籍の仮説「`r(G) ≤ 2` **または** `r(F(G)) ≤ 2`」は
+  `r(F(G)) ≤ 2` 側が一般 (`F(G) ≤ G` ゆえ) なので repo の単一仮説で両方を被覆。
+
+### 🔴 実収穫 1: Thm 4.12 の (a) 一般形と (b) の積分解が無かった (部分被覆 2 件)
+
+| 書籍の条項 | repo にあったもの | 判定 |
+|---|---|---|
+| **(a)** `[R,A]` は可換 | `isMulCommutative_of_metacyclic_actionCommutator_eq_top` = **`[R,A] = R` の場合のみ** (結論も `R` 可換) | 🔴 特殊形のみ |
+| **(b)** `R = [R,A]·C_R(A)` **かつ** `[R,A] ∩ C_R(A) = 1` | `actionCommutator_inf_fixedPoints_eq_bot` = **交わりのみ** | 🔴 積分解が欠落 |
+| **(c)** | `actionCommutator_isCyclic_and_fixedPoints_isCyclic_and_commutator_le` | ✅ (しかも書籍より一般) |
+
+⚠ **どちらも証明の内部には既に在った** — (a) の一般形は `actionCommutator_inf_fixedPoints_eq_bot`
+の証明が冒頭 8 行で作っており (「Part (a) applied to `T` ⇒ `T` abelian」)、積分解は (c) の証明が
+Prop 1.6(a) (`fixedPoints_sup_actionCommutator_eq_top`) で引いている。
+**endpoint に出ていないだけ**だった。⟹ **「証明の中にある」は被覆でない**。
+
+解消 (2026-08-08、`S04b_Thm412.lean`):
+
+* `isMulCommutative_actionCommutator` — 書籍どおりの (a) (`[R,A]` が可換、側条件なし)。
+  既存の特殊形を `T = [R,A]` に適用するだけ (`[T,A] = T` は Prop 1.6(b))。
+* `bgThm412` — **書籍パッケージ (a)+(b)+(c)**。(c) は書籍の「`R` が非可換」から
+  `T ≠ ⊤` を (a) 経由で導き (`T = ⊤` なら (a) が `R` を可換にする)、
+  `C ≠ ⊥` を `R = T ⊔ C` と `T ≠ ⊤` から導いて、書籍の
+  「`[R,A]` と `C_R(A)` は**非単位**巡回群」を完全に返す。
+
+⚠ 既存の (c) endpoint は `T ≠ ⊥ ∧ T ≠ ⊤` でパラメータ化されており **書籍より一般**
+(`R` 可換でも使える)。`bgThm412` はそれを書籍の仮説に特殊化したもので、置換ではない。
+
+### 🚨 実収穫 2: Lem 4.5(a) の stale 注記 2 件 (同一ファイル内矛盾)
+
+`S04_SmallRankBasic.lean` は **同じファイルの中で** 4.5(a) について 3 通りのことを言っていた:
+
+| 行 | 記載 | 実体 |
+|---|---|---|
+| :142 | 「**BG Lemma 4.5(a)** (existence half, **normality deferred**)」 | 正規性なし版 (これ自体は正しい) |
+| :~181 | 「これが repo が clean に証明できる 4.5(a) の場合。一般 (巡回中心, 例えば extraspecial) の場合は Gorenstein 5.4.10 で **deferred**」 | ❌ 誤り |
+| **:921** | 「**BG Lemma 4.5(a)** (= Gorenstein 5.4.10, odd-`p` case). …**unconditional form**」 | ✅ **無条件形が同じファイルに在る** |
+
+⟹ §1 の Thm 1.8 と**同型** (同一ファイル内で注記どうしが矛盾)。両方の注記に
+「無条件形は本ファイル後方」と明記して訂正。**BG での stale 注記は通算 10 件目**
+(§1: 2 / §2: 4 / §3: 1 / §4: 3)。
 
 ### §5-§16 + Theorems A-E + 補章 — 未着手

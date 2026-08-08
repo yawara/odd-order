@@ -119,8 +119,20 @@ pat = re.compile(r'^(Theorem|Proposition|Lemma|Corollary)\s+(\d{1,2})\.(\d{1,2})
         ⚠ **Lem 3.1 の条項 (b) は pdftotext が丸ごと落としていた** — ページ画像
         `references/bg/pages/bg-p017.png` (PDF = 書籍 + 13) で `C_K(x) = 1 (x ∈ R^#)` と確定。
         ✅ **Prop 3.9 は書籍より強い** (書籍の「`H` は `p'`-群」を落としている)。
+      - **§4 監査完了 (2026-08-08)**: 全 20 件被覆・**未形式化ゼロ**。
+        (4.1 のみ mathlib 被覆 `commutative_of_cyclic_center_quotient`。)実収穫 2 件:
+        1. **部分被覆 2 件 = Thm 4.12 の (a) 一般形と (b) 積分解**。repo の (a) は
+           `[R,A] = R` の特殊形のみ、(b) は交わり `[R,A] ∩ C_R(A) = 1` のみで書籍の
+           `R = [R,A]·C_R(A)` を欠いていた。⚠ **どちらも証明の内部には既に在った**
+           ((a) の一般形は (b) の証明が冒頭 8 行で、積分解は (c) の証明が Prop 1.6(a) で)。
+           ⟹ `S04b.isMulCommutative_actionCommutator` + 書籍パッケージ `S04b.bgThm412`。
+        2. **stale 注記 3 件** (Prop 4.3 の「remain to be assembled」+ 存在しない名前、
+           Lem 4.5(a) の「normality deferred」「一般の場合は deferred」)。
+        ✅ **書籍より強い形が 3 件** — 4.15 (`p` 奇を落として `p`-一般) /
+        4.17 (`A` 可解を落とす) / 4.20(a) (「`G'` 冪零」でなく `G' ≤ F(G)`)。
+        ⚠ **4.20 の 3 条項は S04 でなく S05 に在る** (owner chapter、BG で通算 6 回目)。
       - 1 節ぶん終えるごとに census note を更新して commit。
-      - ⬜ **次 = §4 (20 件)**。
+      - ⬜ **次 = §5 (7 件)**。
 
 ## 📌 BG の大域規約 (2026-08-08 §3 で確定 — 全節の判定に効く)
 
@@ -174,6 +186,9 @@ BG の全番号付き結果が**書籍強度**の Lean statement を持つか、
   ⟹ **条項照合は注記でなく `theorem` の結論の型を読む**。
 * 🚨 **「(x) は M-independent ゆえ elsewhere で提供」型の docstring は行き先を確認する**
   — Thm 3.10 の "elsewhere" は**可換 kernel 専用**の特殊形で、書籍の条項を満たさなかった。
+* 🚨 **「証明の中にある」は被覆でない** (§4 Thm 4.12, 2026-08-08)。(a) の一般形も (b) の
+  積分解も、**別の条項の証明の内部では現に構成されていた**が endpoint に出ていなかった。
+  ⟹ 条項照合では `theorem` の**結論の型**だけを数える。proof body は数えない。
 * **grep は種別語の略記も含める / 番号だけで引く** — Isaacs 7.4 を `Lem` 略記で取りこぼした。
 * **内部段の名前が先に当たっても file の endpoint を確認する** — Pf (9.11) / Isaacs 3.34 / 9.23。
 * **検索範囲を章のディレクトリに絞らない** — owner chapter 規則で他章に在る (Isaacs 2.20 / 3.15 / 3.23)。
