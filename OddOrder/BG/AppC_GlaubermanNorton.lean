@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.FieldTheory.Finite.Extension
+import OddOrder.Algebra.FiniteFieldIrreducibleCount
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.BG.AppC_AffineLineCondition
 
@@ -494,5 +495,113 @@ theorem aeval_mem_normOneSet_of_not_irreducible [Fact p.Prime] {b : GaloisField 
   exact mul_mem_normOneSet p q
     (hIH (mem_towerSet_iff p q |>.mpr ⟨_, hdeg₁, hnorm₁, rfl⟩))
     (hIH (mem_towerSet_iff p q |>.mpr ⟨_, hdeg₂, hnorm₂, rfl⟩))
+
+/-! ### Step 3: the induction `A_r ⊆ U` -/
+
+/-- The monic normalization of a nonzero polynomial. -/
+private noncomputable def monicOf (g : (ZMod p)[X]) : (ZMod p)[X] := g * C g.leadingCoeff⁻¹
+
+/-- A polynomial with constant term `1` is recovered from its monic normalization. -/
+private theorem eq_of_monicOf_eq [Fact p.Prime] {g₁ g₂ : (ZMod p)[X]} (h₁ : g₁ ≠ 0) (h₂ : g₂ ≠ 0)
+    (hc₁ : g₁.coeff 0 = 1) (hc₂ : g₂.coeff 0 = 1) (h : monicOf p g₁ = monicOf p g₂) :
+    g₁ = g₂ := by
+  have key : ∀ g : (ZMod p)[X], g ≠ 0 → g.coeff 0 = 1 →
+      g = monicOf p g * C ((monicOf p g).coeff 0)⁻¹ := by
+    intro g hg hc
+    have hlc : g.leadingCoeff ≠ 0 := leadingCoeff_ne_zero.mpr hg
+    have hcoeff : (monicOf p g).coeff 0 = g.leadingCoeff⁻¹ := by
+      rw [monicOf, mul_comm, coeff_C_mul, hc, mul_one]
+    have hscalar : g.leadingCoeff⁻¹ * (g.leadingCoeff⁻¹)⁻¹ = 1 :=
+      mul_inv_cancel₀ (inv_ne_zero hlc)
+    calc g = g * C (g.leadingCoeff⁻¹ * (g.leadingCoeff⁻¹)⁻¹) := by rw [hscalar, C_1, mul_one]
+      _ = g * C g.leadingCoeff⁻¹ * C (g.leadingCoeff⁻¹)⁻¹ := by rw [C_mul, mul_assoc]
+      _ = monicOf p g * C ((monicOf p g).coeff 0)⁻¹ := by rw [hcoeff]; rfl
+  rw [key g₁ h₁ hc₁, key g₂ h₂ hc₂, h]
+
+/-- **Glauberman–Norton, Proposition 7, Step 3** (p. 1092–1093): the induction step
+`A_r ⊆ U ⟹ A_{r+1} ⊆ U`, for `2 ≤ r + 1 ≤ q`.
+
+Every `x ∈ A_{r+1} ∖ U` comes from a polynomial `g` of degree exactly `r + 1` with constant
+term `1` which is irreducible — otherwise `aeval_mem_normOneSet_of_not_irreducible` would put
+`x` in `U`.  Monic normalization is injective on such `g`, so the counting bound
+`FiniteFieldCount.mul_card_le` gives `(r+1)·|A_{r+1} ∖ U| ≤ p^{r+1} - p`; since `r + 1 ≥ 2` this
+makes `A_{r+1} ∩ U` more than half of `A_{r+1}`, and Step 1 plus Proposition 6 finish. -/
+theorem towerSet_succ_subset_normOneSet [Fact p.Prime] (hp5 : 5 ≤ p) (hq : q.Prime)
+    (hEinv : normSetE p q = (normSetE p q)⁻¹)
+    {b : GaloisField p q} (hb : b ∉ Set.range (algebraMap (ZMod p) (GaloisField p q)))
+    {r : ℕ} (hr1 : 1 ≤ r) (hr : r + 1 ≤ q) (hIH : towerSet p q b r ⊆ normOneSet p q) :
+    towerSet p q b (r + 1) ⊆ normOneSet p q := by
+  classical
+  set W := towerSubmodule p q b (r + 1) with hW
+  haveI : Finite ↥W := Subtype.finite
+  set S : Set ↥W := {w : ↥W | (1 : GaloisField p q) + (w : GaloisField p q) ∈ normOneSet p q}
+    with hS
+  -- Step 1 gives condition (C) for `S`.
+  have hC : Affine.CondC (p := p) S := condC_normOneSet p q hq.pos hEinv W 1
+  -- Every `w ∉ S` produces a monic irreducible polynomial of degree `r + 1`.
+  have hpoly : ∀ w : ↥W, w ∉ S → ∃ g : (ZMod p)[X], g.natDegree = r + 1 ∧ g.coeff 0 = 1 ∧
+      Irreducible g ∧ (1 : GaloisField p q) + (w : GaloisField p q) = (aeval b) g := by
+    intro w hw
+    obtain ⟨g, hdeg, h0, hval⟩ :=
+      (mem_towerSet_iff p q (b := b) (r := r + 1)
+        (x := (1 : GaloisField p q) + (w : GaloisField p q))).mp ⟨w, w.2, rfl⟩
+    have hdegeq : g.natDegree = r + 1 := by
+      rcases eq_or_lt_of_le hdeg with h | h
+      · exact h
+      · exfalso
+        refine hw ?_
+        change (1 : GaloisField p q) + (w : GaloisField p q) ∈ normOneSet p q
+        rw [hval]
+        exact hIH ((mem_towerSet_iff p q).mpr ⟨g, by omega, h0, rfl⟩)
+    have hirr : Irreducible g := by
+      by_contra hn
+      refine hw ?_
+      change (1 : GaloisField p q) + (w : GaloisField p q) ∈ normOneSet p q
+      rw [hval]
+      exact aeval_mem_normOneSet_of_not_irreducible p q hIH hdeg h0 hn
+    exact ⟨g, hdegeq, h0, hirr, hval⟩
+  -- Count the complement of `S`.
+  have hcompl : (r + 1) * Nat.card ↥(Sᶜ) ≤ p ^ (r + 1) - p := by
+    haveI : Fintype ↥(Sᶜ) := Fintype.ofFinite _
+    have hchoice : ∀ w : ↥(Sᶜ), ∃ g : (ZMod p)[X], g.natDegree = r + 1 ∧ g.coeff 0 = 1 ∧
+        Irreducible g ∧ (1 : GaloisField p q) + ((w : ↥W) : GaloisField p q) = (aeval b) g :=
+      fun w => hpoly (w : ↥W) w.2
+    choose G hGdeg hG0 hGirr hGval using hchoice
+    have hGne : ∀ w, G w ≠ 0 := fun w hz => by
+      have := hG0 w; rw [hz] at this; simp at this
+    rw [Nat.card_eq_fintype_card]
+    refine FiniteFieldCount.mul_card_le p (by omega) (fun w => monicOf p (G w)) ?_ ?_ ?_ ?_
+    · exact fun w => monic_mul_leadingCoeff_inv (hGne w)
+    · intro w
+      refine (associated_mul_unit_right (G w) (C (G w).leadingCoeff⁻¹) ?_).irreducible (hGirr w)
+      exact isUnit_C.mpr (IsUnit.mk0 _ (inv_ne_zero (leadingCoeff_ne_zero.mpr (hGne w))))
+    · intro w
+      rw [monicOf, natDegree_mul_leadingCoeff_inv _ (hGne w)]
+      exact hGdeg w
+    · intro w w' hww
+      have hGeq : G w = G w' := eq_of_monicOf_eq p (hGne w) (hGne w') (hG0 w) (hG0 w') hww
+      have : ((w : ↥W) : GaloisField p q) = ((w' : ↥W) : GaloisField p q) := by
+        have h := (hGval w).trans (hGeq ▸ (hGval w').symm)
+        exact add_left_cancel h
+      exact Subtype.ext (Subtype.ext this)
+  -- Hence `S` is more than half of `W`, and Proposition 6 applies.
+  have hWcard : Nat.card ↥W = p ^ (r + 1) := card_towerSubmodule p q hq hb hr
+  have hsplit : S.ncard + (Sᶜ : Set ↥W).ncard = Nat.card ↥W := by
+    rw [← Set.ncard_univ, ← Set.ncard_union_eq disjoint_compl_right (Set.toFinite _)
+      (Set.toFinite _), Set.union_compl_self]
+  have hcomplcard : (Sᶜ : Set ↥W).ncard = Nat.card ↥(Sᶜ) := (Nat.card_coe_set_eq _).symm
+  have hle : Nat.card ↥W ≤ 2 * S.ncard := by
+    rw [hcomplcard] at hsplit
+    have h2 : 2 * Nat.card ↥(Sᶜ) ≤ (r + 1) * Nat.card ↥(Sᶜ) :=
+      Nat.mul_le_mul_right _ (by omega)
+    have hp0 : 0 < p := by omega
+    rw [hWcard] at hsplit ⊢
+    omega
+  have huniv : S = Set.univ := Affine.eq_univ_of_condC hp5 hC hle
+  -- Read off `A_{r+1} ⊆ U`.
+  intro x hx
+  obtain ⟨w, hwW, rfl⟩ := hx
+  have : (⟨w, hwW⟩ : ↥W) ∈ S := by rw [huniv]; trivial
+  exact this
 
 end OddOrder.BG.AppC.NormSet
