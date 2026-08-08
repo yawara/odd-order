@@ -3271,6 +3271,10 @@ All nine declarations axiom-clean. -/
   OddOrder.BG.Ch1.S05.narrow_iff_exists_maximalElementaryAbelian_card_prime_sq
 -- BG §5 Thm 5.3(d): narrow, |S|=p, r(C_R(S))≤2 ⇒ C_T(S) cyclic ∧ S∩R'=S∩T=1 ∧ C_R(S)=S×C_T(S)。
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S05.narrow_centralizer_decomp
+-- BG §5 Thm 5.3, BOOK packaging (issue 0177 §5 監査): 同値 + narrow のとき (a) ℰ²∩ℰ* のどの元も
+-- T = C_R(Ω₁(Z₂(R))) に含まれない (全称形) / (b) |Ω₁(Z(R))|=p ∧ Ω₁(Z₂(R)) ∈ ℰ² /
+-- (c) T は指数 p の characteristic / (d) centralizer 分解、を 1 statement に束ねる。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S05.bgThm53
 -- BG §5 Cor 5.4: r(R)≥3 ⇒ (narrow ⟺ ∃S, |S|=p ∧ r(C_R(S))≤2)。
 #assert_only_allowed_axioms
   OddOrder.BG.Ch1.S05.narrow_iff_exists_card_prime_centralizer_pRank_le_two

@@ -765,5 +765,58 @@ theorem narrow_iff_exists_card_prime_centralizer_pRank_le_two
       (exists_maximalElementaryAbelian_card_prime_sq_of_card_prime_centralizer_pRank_le_two
         hp hpg h3 h)
 
+/-! ### The book statement -/
+
+/-- **BG Theorem 5.3** (Bender–Glauberman, LMS LNS 188, p. 46), the book's packaging.
+
+Let `p` be an odd prime and `R` a finite `p`-group with `r(R) ≥ 3`.  Then `R` is **narrow** iff
+`ℰ²(R) ∩ ℰ*(R) ≠ ∅`.  Suppose `R` is narrow, and put `T = C_R(Ω₁(Z₂(R)))`.  Then
+
+* **(a)** no element of `ℰ²(R) ∩ ℰ*(R)` is contained in `T`;
+* **(b)** `|Ω₁(Z(R))| = p` and `Ω₁(Z₂(R)) ∈ ℰ²(R)`;
+* **(c)** `T` is a characteristic subgroup of index `p` in `R`;
+* **(d)** if `S ≤ R` has order `p` and `r(C_R(S)) ≤ 2`, then `C_T(S)` is cyclic,
+  `S ∩ R' = S ∩ T = 1`, and `C_R(S) = S × C_T(S)`.
+
+Clauses (a)-(c) are `lemma52` (BG's own route: "By Lemma 5.2, we obtain (a), (b), and (c)"),
+which takes an explicit `E ∈ ℰ²(R) ∩ ℰ*(R)`; here narrowness supplies that `E` via the `iff`.
+⚠ (a) is the **universally quantified** form — `lemma52` gives it for the `E` handed to it, and
+that `E` ranges over all of `ℰ²(R) ∩ ℰ*(R)`, so no narrowness is needed for (a) at all.
+Clause (d) is `narrow_centralizer_decomp`; the characteristic half of (c) is the instance
+`centralizer_omega1UpperCentralTwo_characteristic` (`GroupTheory/NarrowPGroup.lean`).
+
+The internal direct product `C_R(S) = S × C_T(S)` is rendered as `S ⊓ C_T(S) = ⊥` together with
+`C_R(S) = S ⊔ C_T(S)`, matching `narrow_centralizer_decomp`. -/
+theorem bgThm53 [Finite R] {p : ℕ} [Fact p.Prime]
+    (hp : Odd p) (hpg : IsPGroup p R) (h3 : 3 ≤ pRank R p) :
+    (IsNarrow p R ↔
+        ∃ E : Subgroup R, Nat.card ↥E = p ^ 2 ∧ IsMaximalElementaryAbelian p E) ∧
+    (IsNarrow p R →
+      (∀ E : Subgroup R, Nat.card ↥E = p ^ 2 → IsMaximalElementaryAbelian p E →
+          ¬ E ≤ Subgroup.centralizer (omega1UpperCentralTwo R p : Set R)) ∧
+      (Nat.card ↥(omega1Center R p) = p ∧
+        (omega1UpperCentralTwo R p).IsElementaryAbelian p ∧
+        Nat.card ↥(omega1UpperCentralTwo R p) = p ^ 2) ∧
+      ((Subgroup.centralizer (omega1UpperCentralTwo R p : Set R)).Characteristic ∧
+        (Subgroup.centralizer (omega1UpperCentralTwo R p : Set R)).index = p) ∧
+      (∀ S : Subgroup R, Nat.card ↥S = p →
+        pRank ↥(Subgroup.centralizer (S : Set R)) p ≤ 2 →
+        IsCyclic ↥(Subgroup.centralizer (S : Set R) ⊓
+            Subgroup.centralizer (omega1UpperCentralTwo R p : Set R)) ∧
+          S ⊓ commutator R = ⊥ ∧
+          S ⊓ Subgroup.centralizer (omega1UpperCentralTwo R p : Set R) = ⊥ ∧
+          Subgroup.centralizer (S : Set R) =
+            S ⊔ (Subgroup.centralizer (S : Set R) ⊓
+              Subgroup.centralizer (omega1UpperCentralTwo R p : Set R)))) := by
+  refine ⟨narrow_iff_exists_maximalElementaryAbelian_card_prime_sq hp hpg h3, ?_⟩
+  intro hnarrow
+  -- Narrowness supplies an `E ∈ ℰ²(R) ∩ ℰ*(R)`, which drives (b) and (c) through `lemma52`.
+  obtain ⟨E, hEcard, hEstar⟩ :=
+    (narrow_iff_exists_maximalElementaryAbelian_card_prime_sq hp hpg h3).1 hnarrow
+  obtain ⟨-, hb, hc⟩ := lemma52 hp hpg h3 E hEcard hEstar
+  refine ⟨?_, hb, ⟨inferInstance, hc⟩, ?_⟩
+  · -- (a): `lemma52` applies to *every* such `E`.
+    exact fun E' hE'card hE'star => (lemma52 hp hpg h3 E' hE'card hE'star).1
+  · exact fun S hScard hSrank => narrow_centralizer_decomp hp hpg h3 hnarrow S hScard hSrank
 
 end OddOrder.BG.Ch1.S05

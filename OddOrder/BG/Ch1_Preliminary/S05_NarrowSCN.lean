@@ -424,8 +424,11 @@ theorem mem_scn3_of_normal_isElementaryAbelian_card_prime_sq [Finite R] {p : ℕ
 /-- **BG Lemma 5.2 support / Lemma 4.5(c) in the `r(R) ≥ 3` context**:
 `W = Ω₁(Z₂(R))` is noncyclic.
 
-We avoid the still-deferred general Lemma 4.5(a) by using the stronger local hypothesis
-`r(R) ≥ 3`: Lemma 5.1's SCN₃ construction gives a normal elementary abelian subgroup
+We route around Lemma 4.5(a) by using the stronger local hypothesis
+`r(R) ≥ 3` (4.5(a) itself is available unconditionally as
+`S04.exists_normal_isElementaryAbelian_card_prime_sq_of_not_isCyclic`; this route is kept
+because it delivers order `p³` directly): Lemma 5.1's SCN₃ construction gives a normal
+elementary abelian subgroup
 of order `p³`; BG Lemma 1.22 extracts a normal elementary abelian subgroup `S` of
 order `p²`. Since `R` is nilpotent, `[S,R]` is a proper subgroup of `S`; hence it has
 order `1` or `p`, and in the latter case it is central. Thus `S ≤ Z₂(R)`, and since
