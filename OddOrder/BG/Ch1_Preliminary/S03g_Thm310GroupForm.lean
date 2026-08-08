@@ -11,6 +11,7 @@ import OddOrder.BG.Ch1_Preliminary.S03g_Thm310
 # BG Theorem 3.10 for elementary abelian `M`, GROUP form (issue 3011, piece 2)
 
 The elementary-abelian base results
+`OddOrder.BG.Ch1.S03.prime_card_and_finrank_of_elemAbelian_general` (part (a)),
 `OddOrder.BG.Ch1.S03.card_eq_pow_card_invariants_of_elemAbelian_general` (part (b)) and
 `OddOrder.BG.Ch1.S03.commutator_acts_trivially_of_elemAbelian_general` (part (c)) are stated in
 **module** terms: the `R`-fixed points of `M` appear as the module `invariants` submodule
@@ -21,7 +22,7 @@ The downstream general-nilpotent-`M` induction (issue 3011, piece 3) works unifo
 terms, denoting the fixed points as `fixedSubgroup (MulDistribMulAction.toMulAut H M) R` — the same
 `fixedSubgroup` convention as the fixed-point split
 `card_fixedSubgroup_eq_mul_of_mulDistribMulAction` (piece 1).  This file bridges the two:
-`bgThm310_elemAbelian_group` restates (b)+(c) with the centralizer `C_M(R)` written as
+`bgThm310_elemAbelian_group` restates (a)+(b)+(c) with the centralizer `C_M(R)` written as
 `fixedSubgroup (MulDistribMulAction.toMulAut H M) R`, so piece 3 never touches the module framework.
 
 ## The bridge
@@ -103,13 +104,14 @@ private theorem mem_fixedSubgroup_zpowers_iff [MulDistribMulAction H M] (x : H) 
 
 open OddOrder.Isaacs.Ch06 (IsFrobeniusGroup)
 
-/-- **BG Theorem 3.10 (b)+(c) for an elementary abelian `M`, GROUP form** (issue 3011, piece 2).
+/-- **BG Theorem 3.10 (a)+(b)+(c) for an elementary abelian `M`, GROUP form** (issue 3011, piece 2).
 
 Let a finite solvable group `H` act (`MulDistribMulAction`) on a finite nontrivial elementary
 abelian `p`-group `M`, forming a Frobenius group `H = KR` with kernel `K ⊴ H` and complement `R`,
 with `p ∤ |H|`, `(|R|, |K|) = 1`, `C_M(K) = 1` and the "prime manner" condition `C_M(⟨x⟩) = C_M(R)`
 for every nonidentity `x ∈ R`.  Then:
 
+* **(a)** `|R|` is prime;
 * **(b)** `|M| = |C_M(R)| ^ |R|`;
 * **(c)** if `C_M(R)` is cyclic then the kernel's derived subgroup acts trivially: every
   `g ∈ ⁅K, K⁆` fixes every `m ∈ M`.
@@ -129,7 +131,9 @@ theorem bgThm310_elemAbelian_group [Fact p.Prime]
     (hcond3 : ∀ x ∈ R, x ≠ 1 →
       fixedSubgroup (MulDistribMulAction.toMulAut H M) (Subgroup.zpowers x)
         = fixedSubgroup (MulDistribMulAction.toMulAut H M) R) :
-    Nat.card M = (Nat.card ↥(fixedSubgroup (MulDistribMulAction.toMulAut H M) R)) ^ (Nat.card ↥R) ∧
+    (∃ p' : ℕ, p'.Prime ∧ Nat.card ↥R = p') ∧
+      Nat.card M
+        = (Nat.card ↥(fixedSubgroup (MulDistribMulAction.toMulAut H M) R)) ^ (Nat.card ↥R) ∧
       (IsCyclic ↥(fixedSubgroup (MulDistribMulAction.toMulAut H M) R) →
         ∀ g ∈ ⁅K, K⁆, ∀ m : M, (g : H) • m = m) := by
   classical
@@ -154,7 +158,12 @@ theorem bgThm310_elemAbelian_group [Fact p.Prime]
     · intro h l hl
       rw [toMulAut_apply_smul]
       exact h ⟨l, hl⟩
-  refine ⟨?_, ?_⟩
+  refine ⟨?_, ?_, ?_⟩
+  · -- (a): `|R|` is prime — the general-kernel elementary-abelian module leaf.
+    obtain ⟨p', hp', hcard, -⟩ :=
+      OddOrder.BG.Ch1.S03.prime_card_and_finrank_of_elemAbelian_general (p := p)
+        hRne hKne hpH hcop hCK' hIsFrob.conj_frobenius hcond3'
+    exact ⟨p', hp', hcard⟩
   · -- (b): rewrite the module leaf's `invariants` count to the `fixedSubgroup` count.
     rw [← card_invariants_eq_card_fixedSubgroup (p := p) R]
     exact OddOrder.BG.Ch1.S03.card_eq_pow_card_invariants_of_elemAbelian_general

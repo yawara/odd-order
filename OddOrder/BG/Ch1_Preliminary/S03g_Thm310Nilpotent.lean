@@ -127,7 +127,7 @@ private theorem fixedSubgroup_quotientMulAutHom_eq_map [Finite H] [Finite M] {φ
 
 /-! ### The Case-1 strong induction -/
 
-/-- **BG Theorem 3.10 (b)+(c), `MulAut`-framework auxiliary** (issue 3011 piece 3).  Strong
+/-- **BG Theorem 3.10 (a)+(b)+(c), `MulAut`-framework auxiliary** (issue 3011 piece 3).  Strong
 induction on `|M|` for a finite *solvable* `M` with an automorphic `H`-action `φ`; `H = KR` is a
 fixed finite solvable Frobenius group.  See the module docstring for the dévissage. -/
 private theorem bgThm310_nilpotent_aux
@@ -139,7 +139,8 @@ private theorem bgThm310_nilpotent_aux
       fixedSubgroup φ K = ⊥ →
       (∀ x ∈ R, x ≠ 1 → fixedSubgroup φ (Subgroup.zpowers x) = fixedSubgroup φ R) →
       Nat.card M = n →
-      Nat.card M = Nat.card ↥(fixedSubgroup φ R) ^ Nat.card ↥R ∧
+      (∃ p' : ℕ, p'.Prime ∧ Nat.card ↥R = p') ∧
+        Nat.card M = Nat.card ↥(fixedSubgroup φ R) ^ Nat.card ↥R ∧
         (IsCyclic ↥(fixedSubgroup φ R) → ∀ g ∈ ⁅K, K⁆, ∀ m : M, φ g m = m) := by
   intro n
   induction n using Nat.strong_induction_on with
@@ -184,10 +185,10 @@ private theorem bgThm310_nilpotent_aux
       have hpiece2 := bgThm310_elemAbelian_group (p := p) (M := M) (K := K) (R := R)
         hIsFrob hRne hKne hpH hcopRK (by rw [hbridge]; exact hCK)
         (by intro x hx hx1; rw [hbridge]; exact hcond3 x hx hx1)
-      refine ⟨?_, ?_⟩
-      · have hb := hpiece2.1; rw [hbridge] at hb; exact hb
+      refine ⟨hpiece2.1, ?_, ?_⟩
+      · have hb := hpiece2.2.1; rw [hbridge] at hb; exact hb
       · intro hcyc g hg m
-        have hc := hpiece2.2; rw [hbridge] at hc
+        have hc := hpiece2.2.2; rw [hbridge] at hc
         exact hc hcyc g hg m
     · -- **Step case**: peel off the proper elementary-abelian `N` and recurse.
       haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNne
@@ -230,8 +231,9 @@ private theorem bgThm310_nilpotent_aux
       have hpiece1 := card_fixedSubgroup_eq_mul_of_invariantNormal hcop (Or.inr ‹IsSolvable M›)
         hNinv R
       have hb : Nat.card M = Nat.card ↥(fixedSubgroup φ R) ^ Nat.card ↥R := by
-        rw [hcardM_split, resQ.1, resN.1, ← mul_pow, hpiece1]; ring
-      refine ⟨hb, ?_⟩
+        rw [hcardM_split, resQ.2.1, resN.2.1, ← mul_pow, hpiece1]; ring
+      -- (a) is `M`-independent: it already holds for the proper invariant normal `N ◁ M`.
+      refine ⟨resN.1, hb, ?_⟩
       -- (c): assemble the two chain-stabiliser conclusions.
       intro hcyc g hg m
       haveI : IsCyclic ↥(fixedSubgroup φ R) := hcyc
@@ -262,10 +264,10 @@ private theorem bgThm310_nilpotent_aux
         (hcop.coprime_dvd_left (Subgroup.card_subgroup_dvd_card ⁅K, K⁆))
         (Or.inr ‹IsSolvable M›) (fun a => hNinv (a : H))
         (fun a n hn => by
-          have h2 := congrArg Subtype.val (resN.2 hcycN (a : H) a.2 ⟨n, hn⟩)
+          have h2 := congrArg Subtype.val (resN.2.2 hcycN (a : H) a.2 ⟨n, hn⟩)
           rwa [IsAInvariant.restrict_apply_val] at h2)
         (fun a g' => by
-          have h := resQ.2 hcycQ (a : H) a.2 (QuotientGroup.mk' N g')
+          have h := resQ.2.2 hcycQ (a : H) a.2 (QuotientGroup.mk' N g')
           rw [OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk',
             QuotientGroup.mk'_apply, QuotientGroup.mk'_apply, QuotientGroup.eq] at h
           exact ⟨g'⁻¹ * (φ (a : H)) g', by simpa using N.inv_mem h,
@@ -274,19 +276,24 @@ private theorem bgThm310_nilpotent_aux
 
 /-! ### The book statement -/
 
-/-- **BG Theorem 3.10 (b)+(c) for a general nilpotent `M`** (mmd L1287-1317; issue 3011 piece 3).
+/-- **BG Theorem 3.10 (a)+(b)+(c) for a general nilpotent `M`** (mmd L1287-1317; issue 3011, piece
+3).
 
 Let a finite solvable group `H` act (`MulDistribMulAction`) on a finite nontrivial **nilpotent**
 group `M`, forming a Frobenius group `H = KR` with kernel `K ⊴ H` and complement `R`, coprimely
 (`(|H|, |M|) = 1`), with `C_M(K) = 1` and the "prime manner" condition `C_M(⟨x⟩) = C_M(R)` for every
 `x ∈ R^#`.  Then:
 
+* **(a)** `|R|` is prime;
 * **(b)** `|M| = |C_M(R)| ^ |R|`;
 * **(c)** if `C_M(R)` is cyclic then every `g ∈ ⁅K, K⁆` fixes every `m ∈ M`.
 
 Here `C_M(R) = fixedSubgroup (MulDistribMulAction.toMulAut H M) R`.  The proof (the Case-1 dévissage
 `bgThm310_nilpotent_aux`) only uses that `M` is solvable; the nilpotent hypothesis is weakened to
-`IsSolvable M` internally. -/
+`IsSolvable M` internally.
+
+For the book's own packaging — `R` cyclic of prime order `p` with `(b)` read as `|M| = |C_M(R)|^p`,
+and `R ≠ ⊥` / `K ≠ ⊥` taken from the Frobenius structure rather than assumed — see `bgThm310`. -/
 theorem bgThm310_nilpotent
     {H : Type*} [Group H] [Finite H] [IsSolvable H]
     {M : Type*} [Group M] [Finite M] [Nontrivial M] (hMnil : Group.IsNilpotent M)
@@ -297,12 +304,56 @@ theorem bgThm310_nilpotent
     (hcond3 : ∀ x ∈ R, x ≠ 1 →
       fixedSubgroup (MulDistribMulAction.toMulAut H M) (Subgroup.zpowers x)
         = fixedSubgroup (MulDistribMulAction.toMulAut H M) R) :
-    Nat.card M = Nat.card ↥(fixedSubgroup (MulDistribMulAction.toMulAut H M) R) ^ Nat.card ↥R ∧
+    (∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p) ∧
+      Nat.card M = Nat.card ↥(fixedSubgroup (MulDistribMulAction.toMulAut H M) R) ^ Nat.card ↥R ∧
       (IsCyclic ↥(fixedSubgroup (MulDistribMulAction.toMulAut H M) R) →
         ∀ g ∈ ⁅K, K⁆, ∀ m : M, (g : H) • m = m) := by
   haveI := hMnil
-  obtain ⟨hb, hc⟩ := bgThm310_nilpotent_aux hIsFrob hRne hKne (Nat.card M)
+  obtain ⟨ha, hb, hc⟩ := bgThm310_nilpotent_aux hIsFrob hRne hKne (Nat.card M)
     (MulDistribMulAction.toMulAut H M) hcop hCK hcond3 rfl
-  exact ⟨hb, fun hcyc g hg m => hc hcyc g hg m⟩
+  exact ⟨ha, hb, fun hcyc g hg m => hc hcyc g hg m⟩
+
+/-- **BG Theorem 3.10** (Bender–Glauberman, LMS LNS 188, pp. 30-32), the book's own packaging.
+
+Let `G = KR` be a solvable Frobenius group with Frobenius kernel `K` and Frobenius complement `R`,
+acting on a nonidentity **nilpotent** group `M` such that
+
+1. `(|G|, |M|) = 1`;
+2. `C_M(K) = 1`; and
+3. `C_M(x) = C_M(R)` for all `x ∈ R^#`.
+
+Then
+
+* **(a)** `R` is cyclic of prime order, say `p`;
+* **(b)** `|M| = |C_M(R)|^p`; and
+* **(c)** if `C_M(R)` is cyclic, then `K' ⊆ C_K(M)`.
+
+The three conclusions are bundled under the single existential witnessing the prime `p` of (a), so
+that (b) reads with the book's exponent.  `K ≠ ⊥` and `R ≠ ⊥` are *not* hypotheses here: they are
+fields of `IsFrobeniusGroup` (`ne_bot_kernel` / `ne_bot_complement`).  Conclusion (c) is the
+statement `K' ⊆ C_K(M)` in acting form (`every g ∈ ⁅K, K⁆ fixes every m ∈ M`), which is exactly
+`⁅K, K⁆ ≤ ` the kernel of the action restricted to `K`.
+
+All the mathematics lives in `bgThm310_nilpotent`; this is the repackaging into the book's shape. -/
+theorem bgThm310
+    {H : Type*} [Group H] [Finite H] [IsSolvable H]
+    {M : Type*} [Group M] [Finite M] [Nontrivial M] (hMnil : Group.IsNilpotent M)
+    [MulDistribMulAction H M] {K R : Subgroup H} [K.Normal]
+    (hIsFrob : IsFrobeniusGroup H K R)
+    (hcop : Nat.Coprime (Nat.card H) (Nat.card M))
+    (hCK : fixedSubgroup (MulDistribMulAction.toMulAut H M) K = ⊥)
+    (hcond3 : ∀ x ∈ R, x ≠ 1 →
+      fixedSubgroup (MulDistribMulAction.toMulAut H M) (Subgroup.zpowers x)
+        = fixedSubgroup (MulDistribMulAction.toMulAut H M) R) :
+    ∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p ∧ IsCyclic ↥R ∧
+      Nat.card M = Nat.card ↥(fixedSubgroup (MulDistribMulAction.toMulAut H M) R) ^ p ∧
+      (IsCyclic ↥(fixedSubgroup (MulDistribMulAction.toMulAut H M) R) →
+        ∀ g ∈ ⁅K, K⁆, ∀ m : M, (g : H) • m = m) := by
+  obtain ⟨⟨p, hp, hRcard⟩, hb, hc⟩ :=
+    bgThm310_nilpotent hMnil hIsFrob hIsFrob.ne_bot_complement hIsFrob.ne_bot_kernel hcop hCK hcond3
+  haveI : Fact p.Prime := ⟨hp⟩
+  refine ⟨p, hp, hRcard, ?_, ?_, hc⟩
+  · exact isCyclic_of_prime_card (p := p) hRcard
+  · rw [← hRcard]; exact hb
 
 end OddOrder.BG.Ch1.S03g
