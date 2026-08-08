@@ -7165,6 +7165,11 @@ Cor 12.16 依存は完全に unconditional 化** (もはや sorry に bottom-out
 -- 既存の `isHall_Msigma_Malpha` は **(d) を欠いていた** ((d) 自体は形式化済で別宣言に在った)。
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S10.bgThm102
 
+-- BG Proposition 10.11, BOOK packaging (issue 0177 §10 監査): `M ∈ ℳ`, `K` を `M` の
+-- `σ(M)'`-部分群として (a) `K ∉ 𝒰`, (b) `r(C_K(M_σ)) ≤ 1`, (c) `C_K(M_σ) ⊓ M'` は cyclic normal,
+-- (d) 追加仮説の下で `⁅K,P⁆` が `M_σ` を中心化し cyclic normal。既存は (a)(b)(c) 束と (d) が別々。
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S10.bgProp1011
+
 -- BG §10 (β-radical spine): Theorem 10.6 (every proper subgroup has `p`-length one).
 -- Originally wired against two forward axioms of `S10_ForwardFromKeystone`
 -- (BG Thm 3.6 + BG Lem 10.4(b)), both de-axiomatized; see that file.

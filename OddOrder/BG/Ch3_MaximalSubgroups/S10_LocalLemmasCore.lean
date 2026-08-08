@@ -1152,4 +1152,42 @@ theorem disjoint_of_not_conj [Finite G] (hG : IsMinimalSimpleOdd G)
     rw [hσ_disj] at hmem
     exact absurd hmem (Set.notMem_empty q)
 
+/-! ### The book statement (Proposition 10.11) -/
+
+/-- **BG Proposition 10.11** (Bender–Glauberman, LMS LNS 188, p. 78), the book's packaging.
+Let `M ∈ ℳ` and let `K` be a `σ(M)'`-subgroup of `M`.  Then
+
+* **(a)** `K ∉ 𝒰`;
+* **(b)** `r(C_K(M_σ)) ≤ 1`;
+* **(c)** `C_K(M_σ) ∩ M'` is a cyclic normal subgroup of `M`;
+* **(d)** if `p ∈ σ(M)'`, `P ∈ ℰ_p¹(N_M(K))`, `C_{M_σ}(P) = 1` and `K` is an abelian `p'`-group,
+  then `⁅K, P⁆` centralizes `M_σ` and is a cyclic normal subgroup of `M`.
+
+`sigma_complement_rank_le_one` carries (a)(b)(c); `sigma_complement_commutator_cyclic_normal`
+carries (d) under its extra side conditions.  Here they are bundled in the book's order, with
+(d) as an implication (its hypotheses are *additional* to the shared ones, exactly as in the
+book's own phrasing "if …, then …").
+
+Normality of the cyclic subgroups in (c)/(d) is rendered as `M ≤ N_G(-)`. -/
+theorem bgProp1011 [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {K : Subgroup G} (hKM : K ≤ M)
+    (hKpi : Subgroup.IsPiSubgroup (sigma M)ᶜ K) :
+    ¬ IsUniquelyMaximal K ∧
+    rank ↥(Subgroup.centralizer (Msigma M : Set G) ⊓ K) ≤ 1 ∧
+    (IsCyclic ↥(Subgroup.centralizer (Msigma M : Set G) ⊓ K ⊓ derivedInG M) ∧
+      M ≤ Subgroup.normalizer
+        ((Subgroup.centralizer (Msigma M : Set G) ⊓ K ⊓ derivedInG M : Subgroup G) : Set G)) ∧
+    (∀ p : ℕ, ∀ _ : Fact p.Prime, p ∉ sigma M →
+      ∀ P : Subgroup G, P ∈ elemAbelianOfRank G p 1 →
+        P ≤ Subgroup.normalizer (K : Set G) ⊓ M →
+        Msigma M ⊓ Subgroup.centralizer (P : Set G) = ⊥ →
+        IsMulCommutative ↥K → Subgroup.IsPiSubgroup (({p} : Set ℕ)ᶜ) K →
+        ⁅K, P⁆ ≤ Subgroup.centralizer ((Msigma M : Subgroup G) : Set G) ∧
+          IsCyclic ↥(⁅K, P⁆ : Subgroup G) ∧
+          M ≤ Subgroup.normalizer ((⁅K, P⁆ : Subgroup G) : Set G)) := by
+  obtain ⟨ha, hb, hc⟩ := sigma_complement_rank_le_one hG hM hKM hKpi
+  refine ⟨ha, hb, hc, ?_⟩
+  intro p _ hp P hP hPN hCP hKab hKp'
+  exact sigma_complement_commutator_cyclic_normal hG hM hKM hKpi hp hP hPN hCP hKab hKp'
+
 end OddOrder.BG.Ch3.S10
