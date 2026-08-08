@@ -729,4 +729,33 @@ then `A ∈ 𝒰`」は `isUniquelyMaximal_of_mem_e2_not_maximal` として独�
 **条項が statement の仮説を共有する (追加の側条件は可) なら束ねる。書籍が番号だけを共有する
 別々の主張を並べているなら束ねない。**
 
-### §11-§16 + Theorems A-E + 補章 — 未着手
+## §11 (Exceptional Maximal Subgroups、7 件 = 11.1-11.7) — 監査完了 (2026-08-08)
+
+全 7 件被覆・**未形式化ゼロ・stale 注記ゼロ**。実収穫 = **packaging 差 1 件** (Cor 11.6)。
+
+| BG | repo の endpoint | 照合 |
+|---|---|---|
+| **Lem 11.1** | `invariant_sylow_disjoint` | ✅ (a)(b) |
+| **Cor 11.2** | `Msigma_meet_conjugate` | ✅ (a)(b) |
+| **Thm 11.3** | `Msigma_isNilpotent` | ✅ |
+| **Cor 11.4** | `eq_of_Msigma_meet_Hsigma` | ✅ |
+| **Thm 11.5** | `sylow_p_isCommutative` | ✅ |
+| **Cor 11.6** | (a)(b) `omega1_eq_and_centralizer_trivial` + (c) `exists_distinct_conj_lines` | 🔴 → `bgCor116` |
+| **Thm 11.7** | `MsigmaA_normal` | ✅ |
+
+### 📌 §11 は standing hypothesis を structure 化してある
+
+書籍 §11 は冒頭に **Hypothesis 11.1** (`M ∈ ℳ`, `p ∈ σ(M)'`, `A₀ ∈ ℰ_p¹(M)`, `N_G(A₀) ⊆ M`、
+そこから導かれる `r_p(M)=2` / `A₀ ⊆ A ∈ ℰ_p²(M)` / `A ⊆ P ∈ Syl_p(M)` / `N_G(P) ⊄ M` /
+`C_G(A) ⊆ M`) を置き、7 結果すべてがそれを仮定する。repo は `Hypothesis111 M p A₀ A P` という
+**structure** にしてあり、全 endpoint が `(h : Hypothesis111 …)` を取る。⟹ §7 の
+`Hypothesis71` と同じ設計で、書籍の節構造がそのまま Lean に写っている。
+
+### 🔴 実収穫: Cor 11.6 の (c) が別置きだった
+
+(a)(b) と (c) は **Hypothesis 11.1 以外に仮説を持たない** (完全に共有) ので、
+§10 で確立した基準では束ねるべき。⟹ `bgCor116` (3 条項)。
+(a)(b) の docstring は「(原典 (c): … — **後続**。)」と書いており、(c) が同じファイルに
+実装された後も更新されていなかった (軽度の stale) ので訂正した。
+
+### §12-§16 + Theorems A-E + 補章 — 未着手

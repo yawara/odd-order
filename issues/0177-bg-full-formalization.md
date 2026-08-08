@@ -182,8 +182,14 @@ pat = re.compile(r'^(Theorem|Proposition|Lemma|Corollary)\s+(\d{1,2})\.(\d{1,2})
         (a)(b)(c) とも **σ(M)** (`references/bg/pages/bg-p074.png`; 同ページに Lem 10.3 = α(M)'、
         Lem 10.5 = σ(M)' も並ぶ)。
         ✅ 10.1 と 10.7 は **5 条項が既に 1 statement** に揃っていた。
+      - **§11 監査完了 (2026-08-08)**: 全 7 件被覆・未形式化ゼロ。
+        実収穫 = **packaging 差 1 件** (Cor 11.6 の (c) が (a)(b) 束から別置き。
+        Hypothesis 11.1 以外に仮説を持たない = 完全共有なので §10 で確立した基準では
+        束ねるべき) ⟹ `S11.bgCor116`。
+        📌 §11 は書籍の standing hypothesis (Hypothesis 11.1) を `Hypothesis111` という
+        **structure** にしてあり、7 結果すべてがそれを取る — §7 の `Hypothesis71` と同じ設計。
       - 1 節ぶん終えるごとに census note を更新して commit。
-      - ⬜ **次 = §11 (7 件)**。
+      - ⬜ **次 = §12 (19 件、BG 最大の節)**。
 
 ## 📌 BG の大域規約 (2026-08-08 §3 で確定 — 全節の判定に効く)
 
