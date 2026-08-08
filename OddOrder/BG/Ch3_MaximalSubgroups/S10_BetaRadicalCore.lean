@@ -1084,7 +1084,12 @@ theorem Mbeta_isHall [Finite G] (hG : IsMinimalSimpleOdd G)
 (a) `M_β` は `M` および `G` の Hall 部分群;
 (b) `M'` と `M_σ` は nilpotent な Hall `β(M)'`-部分群を持つ;
 (c) `p ∈ π(M)−β(M)` ⇒ `M'` と `M_σ` は normal `p`-complement を持つ (`M_β` を含む)。
-(原典 (c) はさらに「`p` は `|M/O_{p'}(M)|` の最大素因子」を含む — quotient 型整備後に追加予定。) -/
+
+⚠ **原典 (c) はさらに「`p` は `|M/O_{p'}(M)|` の最大素因子」を含むが、この束には入っていない**。
+その条項自体は直下の `largestPrime_quotient_oPiCore_compl_of_not_mem_beta` で証明済。
+書籍の (a)(b)(c) を完全な形で 1 statement にしたものは `bgLem108` (本ファイル、下方)。
+(以前ここには「quotient 型整備後に追加予定」と書かれていたが stale だった —
+issue 0177 §13 の一括走査で発見, 2026-08-08。) -/
 theorem isHall_Mbeta [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
     Ch03.IsHallSubgroup (beta M) (Mbeta M) ∧
@@ -1180,5 +1185,35 @@ theorem sylow_le_oPiCore_compl_of_lt_of_not_mem_beta [Finite G]
   rw [hk]
   exact Nat.Coprime.pow_left k ((Fact.out : q.Prime).coprime_iff_not_dvd.mpr hq_ndvd)
 
+/-! ### The book statement (Lemma 10.8) -/
+
+/-- **BG Lemma 10.8** (Bender–Glauberman, LMS LNS 188, p. 76), the book's packaging.
+Let `M ∈ ℳ`.  Then
+
+* **(a)** `M_β` is a Hall `β(M)`-subgroup of `M` and of `G`;
+* **(b)** `M'` and `M_σ` have nilpotent Hall `β(M)'`-subgroups;
+* **(c)** for each prime `p ∈ π(M) − β(M)`, both `M'` and `M_σ` have normal `p`-complements
+  **and `p` is the largest prime divisor of `|M / O_{p'}(M)|`**.
+
+`isHall_Mbeta` above carries (a)(b) and the normal-`p`-complement half of (c) but **not the
+largest-prime half**; that half is `largestPrime_quotient_oPiCore_compl_of_not_mem_beta`.
+This bundles the full (c).  Same shape as the Theorem 10.2 (d) gap found in the same audit. -/
+theorem bgLem108 [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    Ch03.IsHallSubgroup (beta M) (Mbeta M) ∧
+    (∃ W : Subgroup G, W ≤ derivedInG M ∧
+      Ch03.IsHallSubgroup (beta M)ᶜ (W.subgroupOf (derivedInG M)) ∧
+      Group.IsNilpotent ↥W) ∧
+    (∃ W : Subgroup G, W ≤ Msigma M ∧
+      Ch03.IsHallSubgroup (beta M)ᶜ (W.subgroupOf (Msigma M)) ∧ Group.IsNilpotent ↥W) ∧
+    (∀ p : ℕ, ∀ _ : Fact p.Prime, p ∈ (Nat.card ↥M).primeFactors → p ∉ beta M →
+      Ch05.HasNormalPComplement p ↥(derivedInG M) ∧
+      Ch05.HasNormalPComplement p ↥(Msigma M) ∧
+      ∀ q ∈ (Nat.card (↥M ⧸ Ch03.oPiCore {r : ℕ | r ≠ p} ↥M)).primeFactors, q ≤ p) := by
+  obtain ⟨ha, hb1, hb2, hc⟩ := isHall_Mbeta hG hM
+  refine ⟨ha, hb1, hb2, ?_⟩
+  intro p _ hpπ hpβ
+  exact ⟨(hc p Fact.out hpπ hpβ).1, (hc p Fact.out hpπ hpβ).2,
+    largestPrime_quotient_oPiCore_compl_of_not_mem_beta hG hM hpπ hpβ⟩
 
 end OddOrder.BG.Ch3.S10

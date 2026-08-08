@@ -90,8 +90,17 @@ theorem absolutely_irreducible_iff_hom_eq_F
         ∃ c : F, φ = c • LinearMap.id
 ```
 
-(stub 未配置: `IsAbsolutelyIrreducible` shared module 完成後に
-statement 確定.)
+⚠ **上の "Lean signature 案" は実装されていない** — コードフェンス内の草案であって宣言ではない。
+実体は shared module `OddOrder/GroupTheory/RepresentationTheory/AbsolutelyIrreducible.lean`:
+
+* **Prop 2.1(a)** = `isAbsolutelyIrreducible_iff_bijective_algebraMap` (:672)
+* **Prop 2.1(b)** (`Hom_F(M,M) = E(G)`) =
+  `span_range_representation_eq_top_of_algebraMap_intertwiningMap_surjective` (:177)
+  / `asAlgebraHom_surjective_of_algebraMap_intertwiningMap_surjective` (:137)
+* **Prop 2.1(c)** = `isAbsolutelyIrreducible_overEnd` (:701)
+
+(以前ここには「stub 未配置: shared module 完成後に statement 確定」とあったが stale。
+issue 0177 の一括走査で訂正, 2026-08-08。)
 -/
 
 /-! ## §2B: Clifford for Cyclic Quotient (Prop 2.2, mmd L614-652)
@@ -166,8 +175,8 @@ statement 確定.)
 **Phase 2a 優先度**: **defer** (Wave 2 以降 or skip 可).
 audit 推奨「forward use 0 ⇒ defer」.
 
-(stub 未配置: forward dependent 不在のため §2 完成後または
-Phase 2a 完成後に判断.)
+⚠ **stale**: 実体は `OddOrder.RepresentationTheory.finrank_dvd_card_of_isAbsolutelyIrreducible`
+(AxiomsCheck 登録済)。issue 0177 の一括走査で訂正 (2026-08-08)。
 -/
 
 /-! ## §2D: Eigenspace Decomposition (Prop 2.4, mmd L670-712)
@@ -220,7 +229,9 @@ Phase 2a 完成後に判断.)
 
 **下流引用**: §2E Thm 2.5 内部 ((j),(k) が鍵).
 
-(stub 未配置: 10 部を個別 lemma 化, shared module 作成後.)
+⚠ **stale**: 実体は
+`OddOrder/GroupTheory/RepresentationTheory/EigenspaceUnderCyclicAction.lean`。
+issue 0177 の一括走査で訂正 (2026-08-08)。
 -/
 
 /-! ## §2E: Extraspecial p-Group with Cyclic Action (Thm 2.5, mmd L716-772)
@@ -279,7 +290,10 @@ of order `h`, `gcd(h, p) = 1`, `∀ x ∈ H^#, C_P(x) = Z(P)`
 
 **Phase 1 gate**: Isaacs Thm 5.5.4-5 対応 (Ch.6 §6E?) + Prop 2.4 完成.
 
-(stub 未配置: 依存定理多数, foundation 整備後に着手.)
+⚠ **stale**: 実体は `OddOrder/GroupTheory/RepresentationTheory/ExtraspecialThm25Final.lean`
+(`finrank_modEq_of_extraspecial` / `finrank_eq_sub_one_of_extraspecial`)。消費点は
+`S03d_Thm34.lean` (「keystone consumer of BG Theorem 2.5」)。
+issue 0177 の一括走査で訂正 (2026-08-08)。
 -/
 
 

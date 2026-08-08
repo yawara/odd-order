@@ -7175,6 +7175,12 @@ Cor 12.16 依存は完全に unconditional 化** (もはや sorry に bottom-out
 -- `C_{M_σ}(A₁) = C_{M_σ}(A₂) = 1`。既存は (a)(b) 束と (c) が別々 (仮説は完全に共有)。
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S11.bgCor116
 
+-- BG Lemma 10.8, BOOK packaging (issue 0177 §13 の一括走査で発見): (a) `M_β` は Hall,
+-- (b) `M'`/`M_σ` は nilpotent Hall `β(M)'`-部分群を持つ, (c) `p ∈ π(M)−β(M)` で `M'`/`M_σ` が
+-- normal `p`-complement を持ち **かつ `p` は `|M/O_{p'}(M)|` の最大素因子**。
+-- 既存の `isHall_Mbeta` は (c) の最大素因子半分を欠いていた (Thm 10.2 (d) と同型)。
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S10.bgLem108
+
 -- BG §10 (β-radical spine): Theorem 10.6 (every proper subgroup has `p`-length one).
 -- Originally wired against two forward axioms of `S10_ForwardFromKeystone`
 -- (BG Thm 3.6 + BG Lem 10.4(b)), both de-axiomatized; see that file.
