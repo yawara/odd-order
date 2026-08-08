@@ -676,4 +676,57 @@ then `A ∈ 𝒰`」は `isUniquelyMaximal_of_mem_e2_not_maximal` として独�
 なっており、private helper `three_le_rank_centralizer_of_mem_e2_not_maximal` が
 「`ℰ²` かつ非極大 ⟹ `r(C_G(A)) ≥ 3`」を供給している。
 
-### §10-§16 + Theorems A-E + 補章 — 未着手
+## §10 (The Subgroups M_α and M_σ、14 件 = 10.1-10.14) — 監査完了 (2026-08-08)
+
+全 14 件被覆・**未形式化ゼロ**。実収穫 = **packaging 差 2 件** (Thm 10.2 / Prop 10.11)。
+
+| BG | 条項数 | repo | 照合 |
+|---|---|---|---|
+| **10.1** | (a)-(e) | `fusion_control_of_mem_sigma` | ✅ **5 条項が 1 statement** |
+| **10.2** | (a)-(e) | `isHall_Msigma_Malpha` | 🔴 **(d) 欠落** → `bgThm102` |
+| **10.3** | 1 | `centralizer_isUniquelyMaximal_of_two_le_rank` | ✅ `α(M)'` 正しい |
+| **10.4** | (a)(b)(c) | `alpha_criterion` (a)(c) + `exists_mem_omega1_center_zgroupCentralizer` (b) | ✅ |
+| **10.5** | 1 (3 結論) | `pRank_eq_two_of_normalizer_le` | ✅ |
+| **10.6** | 1 | `proper_hasPLengthOne` | ✅ |
+| **10.7** | (a)-(e) | `sylow_structure` | ✅ **5 条項が 1 statement** |
+| **10.8** | (a)(b)(c) | `isHall_Mbeta` | ✅ 3 条項 |
+| **10.9** | (a)(1)(2)(3) + (b) | `beta_complement_centralizes` / `beta_complement_normalizer_derived_contains_sylow` / `beta_factorization_of_sylow_normalizer_in_intersection` | ✅ **分離が正しい** (下記) |
+| **10.10** | (a)(b)(c) | `normalizer_factorization` | ✅ 3 条項 |
+| **10.11** | (a)(b)(c)(d) | (a)(b)(c) 束 + (d) 別 | 🔴 → `bgProp1011` |
+| **10.12** | (a)(b) | `disjoint_of_not_conj` | ✅ 2 条項 |
+| **10.13** | (a)(b)(c) | `nonabelian_pSubgroup_rankTwo_elemAbelian_structure` | ✅ 3 条項 |
+| **10.14** | (a)(b)(c)(d) | (a)(b)(c) 束 + (d) 別 | ✅ **分離が正しい** (下記) |
+
+### 🔴 実収穫 1: Thm 10.2 の (d) が束から落ちていた
+
+`isHall_Msigma_Malpha` は (a)(b)(c)(e) を持つが **(d)** (`r(M/M_α) ≤ 2` かつ `M'/M_α` nilpotent)
+を欠いていた。docstring は「quotient 型の `Normal` instance 整備後に**追加予定**」と書いていたが
+**stale** — (d) 自体は `rank_quotient_Malpha_le_two_of_isHall` /
+`derived_quotient_Malpha_le_fitting` として既に形式化されていた。
+
+⟹ `bgThm102` (5 条項を書籍の順で)。(a)(b) の「`M` の Hall でもある」半分も
+`Ch03.isHallSubgroup_subgroupOf_of_le` から補った。`M'/M_α` の冪零性は
+`(M/M_α)' ≤ F(M/M_α)` から (`Ch03.isNilpotent_of_le`)。そのため
+`HallNilpotent` / `NilpotentInjector.PiParts` の import を追加 (フルビルドで cascade 無し確認)。
+⚠ 行数増で `AxiomsCheck.lean` の longFile stamp を 20700 → 20800 に更新。
+
+### 🔴 実収穫 2: Prop 10.11 の (d) が束から分離していた
+
+(a)(b)(c) は `sigma_complement_rank_le_one` に束ねられ、(d) は
+`sigma_complement_commutator_cyclic_normal` に別置き。**(d) の仮説は (a)(b)(c) の仮説への
+追加**なので、書籍どおり含意として束ねられる ⟹ `bgProp1011`。
+
+### 📌 束ねない判断 — 10.9 と 10.14
+
+**条項ごとに仮説が別物のときは束ねない**という線を引いた:
+
+* **10.9**: (a) は「`p,q ∈ β(M)'` distinct, `X` が `M` の `q`-部分群, `X ⊆ M'` または `p<q`」、
+  (b) は「`H ∈ ℳ − {M}` と `N_G(S) ⊆ H ⊓ M`」。**共有仮説は `M ∈ ℳ` だけ**。
+* **10.14**: (a)(b)(c) は「`p ∈ β(G)`, `P ∈ Syl_p(G)`」だが、**(d) は `M ∈ ℳ` を使う** —
+  書籍の (d) は Prop 10.14 の仮説に登場しない `M` を参照しており、書籍側が緩い書き方をしている。
+
+⟹ 束ねると人工的な statement になるので分離のまま。**判断基準**:
+**条項が statement の仮説を共有する (追加の側条件は可) なら束ねる。書籍が番号だけを共有する
+別々の主張を並べているなら束ねない。**
+
+### §11-§16 + Theorems A-E + 補章 — 未着手
