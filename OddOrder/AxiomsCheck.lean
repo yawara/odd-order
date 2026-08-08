@@ -12754,6 +12754,13 @@ Peterfalvi 側:
   OddOrder.BG.Ch4.S16.isPiElement_kappa_compl_of_forall_mem_tau2
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.escaping_mem_derived_of_typeP
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.mem_ASet_sdiff_Msigma_of_typeP
+-- BG Proposition 14.2(a), the `U`-half (issue 0178, 2026-08-08): for a type-`P₂` maximal `M`
+-- there are `K₀` (Hall `κ(M)`) and `U` (nontrivial abelian Hall `(κ(M)∪σ(M))'`) in `M` with
+-- `K₀` acting **regularly** on `U`, and `U M_σ` a **normal complement of `K₀` in `M`**
+-- (`M ≤ N(U M_σ)`, `K₀ ⊓ (U M_σ) = ⊥`, `K₀ ⊔ (U M_σ) = M`).  `typeP_structure` takes the Hall
+-- property of `U` as an unused input and asserts nothing about it; this is the book's clause.
+-- Together with `S14.typeP2_Msigma_isNilpotent` this closes issue 0178, hence BG Theorem A(3)(4).
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeP2_exists_regular_abelian_hall
 #assert_only_allowed_axioms
   OddOrder.BG.Ch4.S16.escaping_mem_ASet_sdiff_Msigma_of_typeP
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.mem_typeA_of_mem_hatMsigma

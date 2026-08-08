@@ -1291,4 +1291,113 @@ theorem aSets_support_slice [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact hyκ' p hpf (hyκ p hpf)
   exact mem_conjClassSet.mpr ⟨y, Or.inr hyA0, 1, by group⟩
 
+/-- **BG Proposition 14.2(a), the `U`-half** (mmd L3840; issue 0178): for a **type-`P₂`** maximal
+subgroup `M` there are subgroups `K₀, U ≤ M` such that
+
+* `K₀` is a Hall `κ(M)`-subgroup and `U` a **nontrivial abelian Hall `(κ(M) ∪ σ(M))'`-subgroup**;
+* `K₀` **acts regularly** on `U`; and
+* `U M_σ` is a **normal complement of `K₀` in `M`**: `M ≤ N_G(U M_σ)`,
+  `K₀ ⊓ (U M_σ) = 1` and `K₀ ⊔ (U M_σ) = M`.
+
+This is the second sentence of BG Prop 14.2(a) ("… and acts regularly on some abelian Hall
+`(κ(M) ∪ σ(M))'`-subgroup `U` of `M`.  (Thus `U M_σ` is a normal complement of `K` in `M`.)"),
+which `typeP_structure` does not carry: it takes the Hall property of `U` as an *unused* input.
+
+`U` is produced, not assumed — it is `E₂E₃` for a §12 `E`-setup, with `K₀ = E₁`.  The two hard
+ingredients already existed (issue 0178's 2026-08-08 correction):
+`typeP2_matched_kappa_hall_pair_of_esetup` (abelian, both Hall properties, `U ≠ ⊥`) and
+`actsRegularlyOn_E23_E1_of_caseTau1` (the regular action, whose docstring already names it
+"BG Prop 14.2(a)").  What is added here is the book's packaging plus the normal-complement
+derivation from `SubgroupESetup`: `M_σ ⋉ E = M` with `E = E₁ ⊔ E₂ ⊔ E₃` and `E ≤ N(E₂E₃)`.
+
+⚠ In BG's other case (`κ(M) ∩ τ₃(M) ≠ ∅`) one takes `U = 1`; that case is exactly type `P₁`,
+excluded here by `IsTypeP2 M`. -/
+theorem typeP2_exists_regular_abelian_hall [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP2 : IsTypeP2 M) :
+    ∃ K₀ U : Subgroup G, K₀ ≤ M ∧ U ≤ M ∧
+      Ch03.IsHallSubgroup (kappa M) (K₀.subgroupOf M) ∧
+      Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M) ∧
+      U ≠ ⊥ ∧ IsMulCommutative ↥U ∧
+      OddOrder.BG.Ch3.S13.ActsRegularlyOn U K₀ ∧
+      M ≤ Subgroup.normalizer ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) ∧
+      K₀ ⊓ (U ⊔ OddOrder.BG.Ch3.S10.Msigma M) = ⊥ ∧
+      K₀ ⊔ (U ⊔ OddOrder.BG.Ch3.S10.Msigma M) = M := by
+  classical
+  obtain ⟨E, E₁, E₂, E₃, hsetup⟩ := exists_subgroupESetup hG hM
+  obtain ⟨hE1M, hE23E, hE23ne, hE1hall, hUhall, hUab, -⟩ :=
+    typeP2_matched_kappa_hall_pair_of_esetup hG hM hP2 hsetup
+  -- The `κ ∩ τ₃ = ∅` side condition (type `P₂` excludes the `τ₃` case).
+  have hτ3 : ¬ (kappa M ∩ tau3 M).Nonempty := by
+    rintro ⟨p, hpκ, hpτ3⟩
+    have hp : p.Prime := prime_of_mem_kappa hpκ
+    obtain ⟨hE3ne, hreg⟩ := E3_not_regular_of_mem_kappa_tau3 hG hsetup hp hpκ hpτ3
+    obtain ⟨-, -, hEprime, -⟩ :=
+      OddOrder.BG.Ch3.S13.E3_not_regular_consequences hG hsetup hE3ne hreg
+    obtain ⟨x, hxE3, hxne, hxC⟩ : ∃ x ∈ E₃, x ≠ 1 ∧
+        OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
+      by_contra hcon; push Not at hcon; exact hreg fun y hy hy1 => hcon y hy hy1
+    exact hP2.2 (kappa_eq_sigmaComplementPrimes_of_isPiGroup_card_E hG hsetup
+      (fun q hq => mem_kappa_of_mem_primeFactors_card_E hG hsetup hEprime hxE3 hxne hxC hq))
+  have hκτ1 : ∀ p ∈ kappa M, p ∈ tau1 M := fun p hpκ =>
+    (kappa_subset_tau1_union_tau3 hpκ).resolve_right (fun hpτ3 => hτ3 ⟨p, hpκ, hpτ3⟩)
+  obtain ⟨p₀, hp₀κ⟩ := hP2.1
+  obtain ⟨hE1ne, hE1nonreg⟩ := E1_not_regular_of_mem_kappa_tau1 hG hsetup
+    (prime_of_mem_kappa hp₀κ) hp₀κ (hκτ1 p₀ hp₀κ)
+  have hE1prime : OddOrder.BG.Ch3.S13.ActsPrimeOn (OddOrder.BG.Ch3.S10.Msigma M) E₁ :=
+    OddOrder.BG.Ch3.S13.E1_actsPrime hG hsetup hE1ne
+  have hCE1 : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (E₁ : Set G) ≠ ⊥ :=
+    Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular hE1prime (le_refl E₁) hE1nonreg
+  have hreg : OddOrder.BG.Ch3.S13.ActsRegularlyOn (E₂ ⊔ E₃) E₁ :=
+    actsRegularlyOn_E23_E1_of_caseTau1 hG hsetup hE1ne hCE1 hτ3
+  -- `M ≤ N_G(M_σ)` (`M_σ = O_{σ(M)}(M)` is characteristic in `M`).
+  have hMnormMσ :
+      M ≤ Subgroup.normalizer ((OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) := by
+    rw [OddOrder.BG.Ch3.S10.Msigma]; exact le_normalizer_opiCoreInG _ _
+  -- `U ⊓ M_σ = ⊥` (`U ≤ E` and `M_σ ⊓ E = ⊥`) and `U ≤ N(M_σ)`, so `|U M_σ| = |U|·|M_σ|`.
+  have hUleM : (E₂ ⊔ E₃ : Subgroup G) ≤ M := hE23E.trans hsetup.E_le
+  have hUdisj : (E₂ ⊔ E₃ : Subgroup G) ⊓ OddOrder.BG.Ch3.S10.Msigma M = ⊥ := by
+    rw [eq_bot_iff]
+    intro x hx
+    obtain ⟨hxU, hxM⟩ := Subgroup.mem_inf.mp hx
+    have : x ∈ OddOrder.BG.Ch3.S10.Msigma M ⊓ E := Subgroup.mem_inf.mpr ⟨hxM, hE23E hxU⟩
+    rwa [hsetup.E_compl_inf] at this
+  have hUnormMσ : (E₂ ⊔ E₃ : Subgroup G) ≤
+      Subgroup.normalizer ((OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) :=
+    hUleM.trans hMnormMσ
+  have hcard : Nat.card ↥((E₂ ⊔ E₃) ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G)
+      = Nat.card ↥(E₂ ⊔ E₃ : Subgroup G) *
+        Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) :=
+    OddOrder.BG.Ch3.S12.card_sup_eq_mul_of_le_normalizer_of_disjoint hUnormMσ hUdisj
+  refine ⟨E₁, E₂ ⊔ E₃, hE1M, hUleM, hE1hall, hUhall, hE23ne, hUab, hreg, ?_, ?_, ?_⟩
+  · -- `M ≤ N(U M_σ)`: split `M = M_σ ⊔ E`; `M_σ` lies inside `U M_σ`, and `E` normalises both
+    -- factors (`E23_normal`, and `M_σ` since `E ≤ M`).
+    have key : (OddOrder.BG.Ch3.S10.Msigma M ⊔ E : Subgroup G) ≤
+        Subgroup.normalizer
+          (((E₂ ⊔ E₃) ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) :=
+      sup_le (le_trans le_sup_right Subgroup.le_normalizer) (fun e he =>
+        Subgroup.normalizer_inf_normalizer_le_normalizer_sup _ _
+          ⟨(hsetup.E23_normal hG) he, hMnormMσ (hsetup.E_le he)⟩)
+    rwa [hsetup.E_compl_sup] at key
+  · -- `K₀ ⊓ (U M_σ) = ⊥`: `E₁` is a `κ(M)`-group while `|U M_σ| = |U|·|M_σ|` is a `κ(M)'`-number
+    -- (`U` is `(κ∪σ)'`-Hall and `M_σ` is a `σ`-group, and `κ ∩ σ = ∅`).
+    refine OddOrder.GroupTheory.inf_eq_bot_of_isPiSubgroup_of_isPiSubgroup_compl
+      (π := kappa M) (fun p hp => ?_) (fun p hp => ?_)
+    · exact hE1hall.1 p (by rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hE1M).toEquiv])
+    · rw [hcard] at hp
+      have hpp : p.Prime := Nat.prime_of_mem_primeFactors hp
+      rcases (Nat.Prime.dvd_mul hpp).mp (Nat.dvd_of_mem_primeFactors hp) with h | h
+      · have h' : p ∈ (Nat.card ↥((E₂ ⊔ E₃ : Subgroup G).subgroupOf M)).primeFactors := by
+          rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUleM).toEquiv]
+          exact Nat.mem_primeFactors.mpr ⟨hpp, h, Nat.card_pos.ne'⟩
+        exact fun hpκ => (hUhall.1 p h') (Set.mem_union_left _ hpκ)
+      · exact fun hpκ => kappa_subset_sigmaCompl hpκ
+          (OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p
+            (Nat.mem_primeFactors.mpr ⟨hpp, h, Nat.card_pos.ne'⟩))
+  · -- `K₀ ⊔ (U M_σ) = M`: `E₁ ⊔ E₂ ⊔ E₃ = E` and `M_σ ⊔ E = M`.
+    have h1 : (E₁ ⊔ ((E₂ ⊔ E₃) ⊔ OddOrder.BG.Ch3.S10.Msigma M) : Subgroup G)
+        = (E₁ ⊔ E₂ ⊔ E₃) ⊔ OddOrder.BG.Ch3.S10.Msigma M := by
+      simp only [sup_assoc]
+    rw [h1, ← hsetup.eq_sup hG, sup_comm]
+    exact hsetup.E_compl_sup
+
 end OddOrder.BG.Ch4.S16
