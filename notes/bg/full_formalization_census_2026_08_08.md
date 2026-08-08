@@ -45,10 +45,33 @@ pat = re.compile(r'^\s*(' + kinds + r')\s+(\d(?:\s*\d)?)\s*\.\s*(\d(?:\s*\d)?)(?
 | §11 | 7 | |
 | §12 | 19 | |
 | §13 | 13 | |
-| §14 | 12 (+1?) | ⬜ **14.11 が未発見** — ページ画像で要確認 |
+| §14 | **13** | ✅ **14.11 解決 (2026-08-08)** — 下記 |
 | §15 | 9 | |
 | §16 | 1 | |
-| **小計** | **161** | (14.11 を入れると 162) |
+| **小計** | **162** | (§1-§16 の番号付き結果、確定) |
+
+### ✅ 14.11 が「未発見」だった理由 — header が前段落の行末に貼り付いていた
+
+ページ画像は不要だった。pdftotext L6051 は
+
+```
+related to those of type ^ 2 Lemma 14.11. Suppose that M G ^ j r , E is a complement of MG in M,
+```
+
+で、**`Lemma 14.11.` が前の段落の最終行の末尾に続いている**。抽出パターンは
+`^\s*(Kind)` と**行頭アンカー**なので原理的に取れない。
+
+⟹ 非アンカー版で **BG 全文を再走査**したところ、**この 1 件だけ**が行頭アンカーで漏れていた
+(他の 15 節に glued header は無い)。よって §1-§16 の総数は **162 件**で確定。
+
+**Lem 14.11 の statement**: `M ∈ 𝓜_𝒫`, `E` を `M_σ` の `M` 内補群、`q ∈ π(E)`,
+`Q ∈ ℰ_q¹(E)`, `Q ⊄ F(E)` ⟹ ある `M* ∈ 𝓜` が存在して
+(1) `q ∈ τ₂(M*)` かつ `𝓜(C_G(Q)) = {M*}`、または (2) `q ∈ κ(M*)` かつ `M* ∈ 𝓜_𝒫`。
+実体 = `S14_TypePCounting/KappaHallCommutator.lean` (`BG Lemma 14.11` 記載あり)。
+
+⚠ **誤判定様式**: 行頭アンカーの機械抽出は「番号付き結果の見出しが常に行頭にある」ことを
+仮定している。OCR (や組版) はこれを破る。**「欠番」を見つけたら非アンカー再走査を先にやる**
+(ページ画像より安い)。
 
 **Theorems A–E**: 5 件 (`Theorem A` L6615 / `B` L6602 / `C` L6653 / `D` L6669 / `E` L6692)。
 
@@ -792,4 +815,61 @@ then `A ∈ 𝒰`」は `isUniquelyMaximal_of_mem_e2_not_maximal` として独�
 `O_q(Y)` 経由で還元、`N_G(Y) ≤ N_G(O_q(Y))`)。⟹ 内部エンジンの特殊化であって
 書籍に対する特殊化債務ではない。**「specialization」という語を見たら一般形の有無を確認する**。
 
-### §13-§16 + Theorems A-E + 補章 — 未着手
+## §13 (Prime Action、13 件 = 13.1-13.13) — 監査完了 (2026-08-08)
+
+全 13 件被覆・**未形式化ゼロ・packaging 差ゼロ・stale 注記ゼロ**。全 8 file が実 sorry ゼロ。
+
+多条項がすべて 1 statement に揃っている: **13.1** (a)(b)(c) / **13.2** (a)(b)(c) /
+**13.3** (a)(b) / **13.10** (a)(b)(c) / **13.11** (a)(b)(c)(d)。
+
+📌 **13.10 と 13.11 の docstring は「結論は PDF p.102/p.103 から画像読みで復元」と明記**
+— OCR が結論を落とす箇所で既にページ画像を使う運用がされていた (本監査が §3/§7/§10 で
+独立に到達した手順と同じ)。
+
+## 🚨 §13 で実施した「deferral 注記の一括走査」— 2 件の見落としを回収
+
+`grep -rn "追加予定|stub 未配置|remains deferred|deferred proof obligation|TODO|Phase 1 待ち" OddOrder/BG/`
+を全 BG に対して実行し、**節ごとの監査で取りこぼした stale 注記を 2 件回収**した。
+
+### 🔴 回収 1: Lem 10.8(c) の「最大素因子」条項 (§10 の見落とし)
+
+`isHall_Mbeta` の docstring:
+> (原典 (c) はさらに「`p` は `|M/O_{p'}(M)|` の最大素因子」を含む — **quotient 型整備後に追加予定**。)
+
+**Thm 10.2(d) と完全に同型**の見落とし (同じ「quotient 型整備後」という言い訳まで同じ)。
+条項自体は**直下の** `largestPrime_quotient_oPiCore_compl_of_not_mem_beta` で証明済。
+⟹ `bgLem108` (a)(b)(c) 完全形を新設。
+⚠ **§10 の監査で `isHall_Mbeta` の結論の型 (4 連言) だけを見て ✅ と判定したのが誤り** —
+書籍の (c) が 2 つの主張からなることを見落としていた。**条項の内訳まで書籍と突き合わせる**。
+
+### 🔴 回収 2: `S02_RepresentationPropositions.lean` の「stub 未配置」4 件 (§2 の見落とし)
+
+§2 監査は `S02_RepresentationsBasic.lean` の注記を訂正したが、**同じ節の別ファイル**
+`S02_RepresentationPropositions.lean` に同種の注記が 4 件残っていた (Prop 2.1 / Lem 2.3 /
+Prop 2.4 / Thm 2.5)。実体はすべて在る。
+
+### 🚨🚨 最重要: 「`^theorem ` grep が docstring 内のコードフェンスに当たる」
+
+§2 census は **Prop 2.1 の実体を `S02_RepresentationPropositions.lean:84` の
+`absolutely_irreducible_iff_hom_eq_F`** と記録していたが、その行は
+
+```
+**Lean signature 案** (未確定):
+```                                    ← markdown コードフェンス
+theorem absolutely_irreducible_iff_hom_eq_F      ← 列 0 から始まる
+```
+
+という **docstring 内の未実装の草案**だった。`grep -n "^theorem "` は列 0 の行に当たるので
+**docstring の中身を宣言と誤認する**。
+
+⟹ **新しい誤判定様式**: 「宣言を `^theorem ` で拾う」走査は docstring 内のコードブロックに
+汚染される。**実体確認は `grep -rn "<name>" --include=*.lean` で全 hit を見て、
+その行が本当に宣言かを確認する** (hit が 1 件でその 1 件が docstring 内なら未実装)。
+
+✅ 実際の Prop 2.1 は 3 条項とも `GroupTheory/RepresentationTheory/AbsolutelyIrreducible.lean` に:
+(a) `isAbsolutelyIrreducible_iff_bijective_algebraMap` /
+(b) `span_range_representation_eq_top_of_algebraMap_intertwiningMap_surjective`
+(= `Hom_F(M,M) = E(G)`) / (c) `isAbsolutelyIrreducible_overEnd`。
+⟹ **未形式化ではない**が、census の所在記録が誤っていた。
+
+### §14-§16 + Theorems A-E + 補章 — 未着手
