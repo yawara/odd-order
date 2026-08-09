@@ -119,3 +119,56 @@ ToolSearch (記述キーワード) → `tabs_context_mcp{createIfEmpty:false}` �
 プロンプトを backtick-free で用意 (`notes/.../*_chatgpt_prompt.md` 保存) → §2 の合成 paste JS (tabId 付き、
 template literal 直接) → JS で `editorLen≈targetLen`+head/tail 検証 → §3 で paste 後 screenshot → 送信ボタン
 click → JS で送信検証 → `ScheduleWakeup`(~900s) ポーリング → §4 `get_page_text` で text 回収 → 厳密検証 → Lean 化。
+
+---
+
+## 2026-08-09 更新 (UI 変更 + 長考の実測)
+
+### モデル選択の UI が変わった — 「Pro 拡張」はもう無い
+
+旧記載の「モデルドロップダウン → 知能メニュー (最速/標準/高/最高/**Pro 拡張**/GPT-5.5)」は**現存しない**。
+現在 (2026-08-09 実測) の手順:
+
+1. composer 右の **`Pro ⌄`** バッジをクリック → 小さいポップオーバー (スライダー + `詳細設定 ›`)
+2. **`詳細設定`** をクリック → 2 行が出る
+   - **モデル**: `GPT-5.6 Sol` / `GPT-5.5` / `o3` (既定は `GPT-5.6 Sol` = 最強)
+   - **推論レベル**: `Pro` (最上位)
+3. 送信前に composer のバッジが `Pro` であることを目視確認する。
+
+⟹ **既定のままで最強** (`GPT-5.6 Sol` + 推論レベル `Pro`)。旧 UI を探して迷わないこと。
+
+### 長文投入は `execCommand('insertText')` でも通る (合成 paste より簡単)
+
+§2 の ClipboardEvent 合成 paste は今も有効だが、**次の 4 行でも同じ結果**が得られた (2026-08-09、4738 字):
+
+```js
+const TEXT = `…本文 (backtick / ${…} / \ を含めない)…`;
+const ed = document.querySelector('#prompt-textarea') || document.querySelector('div[contenteditable="true"]');
+ed.focus();
+document.execCommand('insertText', false, TEXT);
+ed.textContent.length;   // 検証用
+```
+
+⚠ `type` アクションで改行入り文字列を渡すと**改行の時点で送信される**ことを実測で再確認した
+(「TEST line one / TEST line two」で 1 行目だけが送信された)。落とし穴 3 は健在。
+
+⚠ 送信ボタンの座標は paste 後に取り直すこと (落とし穴 5) — 加えて **composer 右上の「展開」アイコンを
+誤クリックしやすい**。展開すると composer が縦に伸びて送信ボタンがさらに下へ動くので、screenshot を
+取り直してから押し直す。
+
+### Pro の思考時間は「12〜19 分」では収まらない
+
+落とし穴 6 の「12〜19分」は**過小**。2026-08-09 の実測 (BG App.C Problem 1 = 未解決問題を投入):
+
+- **1 回目**: 約 2.5 時間走ったのち **`A network error occurred.`** で落ちた。
+  落ちる直前は「PDF をダウンロード → サイト検索 → 交互語の最短自明関係を探索」まで到達していた。
+- **`再試行` ボタン**を押すと**最初からやり直し**になる (途中経過は保持されない)。
+- **2 回目**: さらに 4 時間以上走ってなお未完了 (進捗表示は 2.5 時間動かず)。
+
+⟹ **未解決問題級を投げるときの運用**:
+- ポーリング間隔は `ScheduleWakeup(1800)` (30 分) で十分。60〜900s は無駄。
+- **ネットワークエラーで落ちる前提**で監視する (落ちていたら `再試行` を押す)。
+- 進捗表示 (`Pro が思考中です` の上の要約行) は**内部推論の断片が出る**ので、完走しなくても
+  中間結果 (簡約・排除された場合分け) は回収できる。screenshot で読める。
+- 何時間で見切るかは**ユーザーに決めさせる** (`AskUserQuestion`)。こちらで勝手に「今すぐ回答」を
+  押さない — 深い探索が打ち切られる。
