@@ -1,0 +1,25 @@
+D=[12,3] pair=1 uexp=1  |Gamma|=13  |H_image|=13  Hembeds=false
+D=[12,3] pair=1 uexp=3  |Gamma|=1  |H_image|=1  Hembeds=false
+D=[12,3] pair=1 uexp=9  |Gamma|=1  |H_image|=1  Hembeds=false
+D=[21,1] pair=1 uexp=1  TIMEOUT-or-ERROR (enumeration too hard; Gamma may be infinite)
+D=[21,1] pair=1 uexp=3  TIMEOUT-or-ERROR (enumeration too hard; Gamma may be infinite)
+D=[21,1] pair=1 uexp=9  TIMEOUT-or-ERROR (enumeration too hard; Gamma may be infinite)
+D=[21,1] pair=2 uexp=1  |Gamma|=13  |H_image|=13  Hembeds=false
+D=[21,1] pair=2 uexp=3  |Gamma|=1  |H_image|=1  Hembeds=false
+D=[21,1] pair=2 uexp=9  |Gamma|=1  |H_image|=1  Hembeds=false
+D=[39,1] pair=1 uexp=1  TIMEOUT-or-ERROR (enumeration too hard; Gamma may be infinite)
+D=[39,1] pair=1 uexp=3  TIMEOUT-or-ERROR (enumeration too hard; Gamma may be infinite)
+D=[39,1] pair=1 uexp=9  TIMEOUT-or-ERROR (enumeration too hard; Gamma may be infinite)
+D=[39,1] pair=2 uexp=1  TIMEOUT-or-ERROR (enumeration too hard; Gamma may be infinite)
+D=[39,1] pair=2 uexp=3  TIMEOUT-or-ERROR (enumeration too hard; Gamma may be infinite)
+D=[39,1] pair=2 uexp=9  TIMEOUT-or-ERROR (enumeration too hard; Gamma may be infinite)
+D=[48,3] pair=1 uexp=1  |Gamma|=13  |H_image|=13  Hembeds=false
+D=[48,3] pair=1 uexp=3  |Gamma|=1  |H_image|=1  Hembeds=false
+D=[48,3] pair=1 uexp=9  |Gamma|=1  |H_image|=1  Hembeds=false
+D=[57,1] pair=1 uexp=1  TIMEOUT-or-ERROR (enumeration too hard; Gamma may be infinite)
+D=[57,1] pair=1 uexp=3  TIMEOUT-or-ERROR (enumeration too hard; Gamma may be infinite)
+D=[57,1] pair=1 uexp=9  TIMEOUT-or-ERROR (enumeration too hard; Gamma may be infinite)
+D=[57,1] pair=2 uexp=1  TIMEOUT-or-ERROR (enumeration too hard; Gamma may be infinite)
+D=[57,1] pair=2 uexp=3  TIMEOUT-or-ERROR (enumeration too hard; Gamma may be infinite)
+D=[57,1] pair=2 uexp=9  TIMEOUT-or-ERROR (enumeration too hard; Gamma may be infinite)
+ALLDONE
