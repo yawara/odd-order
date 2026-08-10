@@ -48,8 +48,10 @@ recorded in `notes/bg/appC_problem1_partial_resolution.md` (issue 0180):
 * `eq_one_of_closure_eq_top`, `eq_top_of_generators_mem` — the two abstract steps of Theorem 2,
   assembled in `commutator_eq_top_of_relations`: for an exponent that is not a Frobenius power
   the three layers die in `N^{ab}`, so `N` is perfect.
-* `commute_conj_of_le_closure` — Theorem 1's engine: the relation family plus a spanning set
-  makes the cross-commutator vanish.
+* `commute_conj_of_le_closure_twisted` — Theorem 1's engine (Frobenius-twisted form), with
+  `commute_conj_of_le_closure` its untwisted specialisation: the relation family plus a spanning
+  set makes the cross-commutator vanish.
+* `injective_pow_mul_pow` — the `3q` exponents of Lemma D are pairwise distinct.
 * `injective_pow_mul` — the coset separation behind Lemma D.
 -/
 
@@ -318,25 +320,32 @@ end TheoremTwo
 
 section TheoremOne
 
-/-- **Theorem 1's engine.**  Let `P` be an abelian subgroup, `g` an element with `g³ = 1`, and
-`S ⊆ P` a set of elements satisfying the norm relation `(g · s)³ = 1`.  Fix `t ∈ S`.  If the
-elements `s ∈ S` for which `s · t` also lies in `S` generate `P`, then `t` commutes with the whole
-of `P^g`:
+/-- **Theorem 1's engine** (twisted form).  Let `P` be an abelian subgroup, `g` an element with
+`σ` an endomorphism preserving `P`, and `S ⊆ P` a set of elements satisfying the *layered*
+relation
+
+`(σ²s)^{g²} · (σs)^g · s = 1`.
+
+Fix `t ∈ S`.  If `σ` maps the elements `s ∈ S` with `s · t ∈ S` onto a generating set of `P`, then
 
 `t · v^g = v^g · t` for every `v ∈ P`.
 
-This is the step that turns the family of relations produced by conjugating `(g x)³ = 1` with
-`σ(U)` into the vanishing cross-commutator.  For each admissible `s` the three relations at `s`,
-`t` and `s · t` feed `cross_commute_of_three_relations`; the elements that commute with `t^g` form
-a subgroup, so a generating set suffices.
+For each admissible `s` the three relations at `s`, `t` and `s · t` feed
+`cross_commute_of_three_relations` — the middle layers multiply correctly because `σ` is a
+homomorphism — and the elements commuting with `t` after conjugation form a subgroup, so a
+generating set suffices.
 
-In the application `P` is the additive group of `𝔽_{3^q}`, `S` is the set of squares, `t = 1`, and
-the admissible `s` are those with `s` and `s + 1` both squares — a Paley-type set whose spanning
-is the one analytic ingredient (Lemma B). -/
-theorem commute_conj_of_le_closure {P : Subgroup G} (hP : ∀ a ∈ P, ∀ b ∈ P, a * b = b * a)
-    {g : G} (hg3 : g ^ 3 = 1) {S : Set G} (hSP : S ⊆ (P : Set G))
-    (hrel : ∀ s ∈ S, (g * s) ^ 3 = 1) {t : G} (ht : t ∈ S)
-    (hspan : P ≤ Subgroup.closure {s | s ∈ S ∧ s * t ∈ S}) :
+In the application `P` is the additive group of `𝔽_{3^q}`, `S` the set of squares, `t = 1`, and
+`σ` a power of the Frobenius: that is exactly the case `e ∈ ⟨3⟩` of the partial resolution, where
+`s ↦ s^e` is additive.  `commute_conj_of_le_closure` is the untwisted specialisation `σ = id`
+(the centralising case `e = 1`, available for every `q`). -/
+theorem commute_conj_of_le_closure_twisted {P : Subgroup G}
+    (hP : ∀ a ∈ P, ∀ b ∈ P, a * b = b * a) {g : G} (σ : G →* G)
+    (hσP : ∀ v ∈ P, σ v ∈ P) {S : Set G} (hSP : S ⊆ (P : Set G))
+    (hrel : ∀ s ∈ S,
+      (g⁻¹ * (g⁻¹ * σ (σ s) * g) * g) * (g⁻¹ * σ s * g) * s = 1)
+    {t : G} (ht : t ∈ S)
+    (hspan : P ≤ Subgroup.closure (σ '' {s | s ∈ S ∧ s * t ∈ S})) :
     ∀ v ∈ P, t * (g⁻¹ * v * g) = (g⁻¹ * v * g) * t := by
   -- The elements commuting with `t` after conjugation form a subgroup.
   set C : Subgroup G :=
@@ -351,35 +360,39 @@ theorem commute_conj_of_le_closure {P : Subgroup G} (hP : ∀ a ∈ P, ∀ b ∈
       refine Subgroup.mem_centralizer_iff.mpr ?_
       rintro m rfl
       simpa [MulAut.conj_apply, mul_assoc] using hv
-  -- Every admissible generator lies in `C`, by Lemma C.
-  have hgen : {s | s ∈ S ∧ s * t ∈ S} ⊆ (C : Set G) := by
-    rintro s ⟨hs, hst⟩
-    have hlayer : ∀ w ∈ S, (g⁻¹ * (g⁻¹ * w * g) * g) * (g⁻¹ * w * g) * w = 1 := by
-      intro w hw
-      have h := hrel w hw
-      rw [pow_three_eq_conj_mul hg3 w] at h
-      rw [← mul_assoc] at h
-      exact h
-    have ha := hlayer s hs
-    have hb := hlayer t ht
-    have hab := hlayer (s * t) hst
-    have hab' : (g⁻¹ * (g⁻¹ * s * g) * g) * (g⁻¹ * (g⁻¹ * t * g) * g) *
-        ((g⁻¹ * s * g) * (g⁻¹ * t * g)) * (s * t) = 1 := by
-      have hconj : ∀ w : G, g⁻¹ * (s * t) * g = (g⁻¹ * s * g) * (g⁻¹ * t * g) := fun _ => by
-        group
+  have hgen : σ '' {s | s ∈ S ∧ s * t ∈ S} ⊆ (C : Set G) := by
+    rintro _ ⟨s, ⟨hs, hst⟩, rfl⟩
+    have ha := hrel s hs
+    have hb := hrel t ht
+    have hab := hrel (s * t) hst
+    have hab' : (g⁻¹ * (g⁻¹ * σ (σ s) * g) * g) * (g⁻¹ * (g⁻¹ * σ (σ t) * g) * g) *
+        ((g⁻¹ * σ s * g) * (g⁻¹ * σ t * g)) * (s * t) = 1 := by
       rw [← hab]
-      rw [hconj s]
+      simp only [map_mul]
       group
-    have h₁ : (g⁻¹ * s * g) * (g⁻¹ * t * g) = (g⁻¹ * t * g) * (g⁻¹ * s * g) := by
-      have := hP s (hSP hs) t (hSP ht)
-      have hcs : g⁻¹ * s * g * (g⁻¹ * t * g) = g⁻¹ * (s * t) * g := by group
-      have hct : g⁻¹ * t * g * (g⁻¹ * s * g) = g⁻¹ * (t * s) * g := by group
-      rw [hcs, hct, this]
+    have h₁ : (g⁻¹ * σ s * g) * (g⁻¹ * σ t * g) = (g⁻¹ * σ t * g) * (g⁻¹ * σ s * g) := by
+      have hcomm := hP (σ s) (hσP s (hSP hs)) (σ t) (hσP t (hSP ht))
+      have hcs : g⁻¹ * σ s * g * (g⁻¹ * σ t * g) = g⁻¹ * (σ s * σ t) * g := by group
+      have hct : g⁻¹ * σ t * g * (g⁻¹ * σ s * g) = g⁻¹ * (σ t * σ s) * g := by group
+      rw [hcs, hct, hcomm]
     have h₀ : s * t = t * s := hP s (hSP hs) t (hSP ht)
-    have := cross_commute_of_three_relations ha hb hab' h₁ h₀
-    exact (hmemC s).mpr this.symm
+    exact (hmemC (σ s)).mpr (cross_commute_of_three_relations ha hb hab' h₁ h₀).symm
   intro v hv
   exact (hmemC v).mp ((Subgroup.closure_le C).mpr hgen (hspan hv))
+
+/-- **Theorem 1's engine**, untwisted (`σ = id`): the centralising case `e = 1`, available for
+every `q`.  Here the relation is simply `(g · s)³ = 1` for `s ∈ S`. -/
+theorem commute_conj_of_le_closure {P : Subgroup G} (hP : ∀ a ∈ P, ∀ b ∈ P, a * b = b * a)
+    {g : G} (hg3 : g ^ 3 = 1) {S : Set G} (hSP : S ⊆ (P : Set G))
+    (hrel : ∀ s ∈ S, (g * s) ^ 3 = 1) {t : G} (ht : t ∈ S)
+    (hspan : P ≤ Subgroup.closure {s | s ∈ S ∧ s * t ∈ S}) :
+    ∀ v ∈ P, t * (g⁻¹ * v * g) = (g⁻¹ * v * g) * t := by
+  refine commute_conj_of_le_closure_twisted hP (MonoidHom.id G) (fun v hv => hv) hSP ?_ ht ?_
+  · intro s hs
+    have h := hrel s hs
+    rw [pow_three_eq_conj_mul hg3 s] at h
+    simpa [← mul_assoc] using h
+  · simpa using hspan
 
 end TheoremOne
 
