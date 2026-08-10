@@ -203,9 +203,11 @@ f(a) = Tr(λa) + Tr(μ a^{ẽ}) + Tr(ν a^{ẽ²}) = Σ_j λ^{3^j} a^{3^j} + Σ_
 
 要点:
 
-* **定理 1** は解析的入力 (補題 B = Paley 集合の張り生成、Weil 評価) を仮説に置いた形で
-  `commute_conj_of_le_closure` として完全に証明済み。「関係式の族 + 張り生成 ⟹ 交差交換子が消える」
-  という中身は全部群論なので、そこは Lean 上で閉じている。
+* **定理 1 (中心化の場合) は単一の定理 `false_of_centralizing_of_spanning` として閉じた**。
+  仮説は「`g` が `σ(U)` を中心化」と「Paley 型の張り生成 (= 補題 B)」の 2 つだけで、後者以外は
+  すべて証明済み。内訳: 関係式の族 `pow_three_mul_conj_eq_one` → エンジン
+  `commute_conj_of_le_closure` (Frobenius 捻り版 `..._twisted` の特殊化) → 最後の一マイル
+  `inv_mul_pow_three_eq_one_of_commute_conj` → 矛盾 `not_commute_conj`。
 * **定理 2** は `commutator_eq_top_of_relations` で結論 (`commutator N = ⊤`) まで到達。
   仮説は「関係格子 `T` が `V³` を生成する」だけで、これは補題 D で `e ∉ ⟨3⟩` と同値。
 * **補題 D** は両半分 (解析的 = trace 展開 + Dedekind 独立性、組合せ的 = 剰余類分離) が
