@@ -20823,6 +20823,9 @@ injective_pow_mul                      (Lemma D, combinatorial half: `e ∉ A` a
                                         power maps on `Fˣ`, which is the hypothesis of the trace
                                         lemma — so Lemma D is complete)
 
+mem_orbitS_iff                         (the orbit `S` in field terms: it is the σ-image of the
+                                        norm-one set, so the spanning hypothesis below is
+                                        literally Lemma B)
 false_of_centralizing_of_spanning      (**Theorem 1, assembled**: no witness with `g`
                                         centralising `σ(U)`, given only the Paley spanning)
 ```
@@ -20866,4 +20869,5 @@ finite group of odd order — satisfies hypothesis (B) for `p = 3`.* -/
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.injective_pow_mul_pow
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.injective_powHom_pow_mul_pow
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.P_mul_comm
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.mem_orbitS_iff
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_centralizing_of_spanning

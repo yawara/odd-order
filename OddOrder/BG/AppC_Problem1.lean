@@ -823,6 +823,39 @@ with `𝔽_{3^q}` this is the set of squares — the set `S` of the partial reso
 def orbitS (data : FieldNormalizerData p q G) : Set G :=
   {s | ∃ v ∈ data.U, s = v⁻¹ * data.s * v}
 
+/-- **The orbit `S` in field terms.**  The `σ(U)`-orbit of `x = σ(1)` is precisely the `σ`-image
+of the *norm-one set* of `𝔽_{p^q}`, embedded additively:
+
+`orbitS data = { σ(inl u) : u a norm-one unit }`.
+
+This is the translation promised by `AppC.inr_inv_mul_primeLineGenerator_mul_inr`: conjugation by
+`σ(inr u)` multiplies the base point by `u⁻¹`, and inversion permutes the norm-one units.  For
+`p = 3` the norm-one set is the set of squares, so the spanning hypothesis of
+`false_of_centralizing_of_spanning` becomes exactly Lemma B of
+`notes/bg/appC_problem1_partial_resolution.md`. -/
+theorem mem_orbitS_iff (data : FieldNormalizerData p q G) {s : G} :
+    s ∈ orbitS data ↔ ∃ u : NormSet.normOneUnits p q,
+      s = data.sigma (SemidirectProduct.inl (Multiplicative.ofAdd
+        (((u : (GaloisField p q)ˣ) : GaloisField p q)))) := by
+  constructor
+  · rintro ⟨v, hv, rfl⟩
+    rw [← data.sigma_U_eq_U] at hv
+    obtain ⟨w, hw, rfl⟩ := hv
+    obtain ⟨u, rfl⟩ := hw
+    refine ⟨u⁻¹, ?_⟩
+    rw [FieldNormalizerData.s, ← map_inv, ← map_mul, ← map_mul]
+    congr 1
+    rw [inr_inv_mul_primeLineGenerator_mul_inr]
+    simp
+  · rintro ⟨u, rfl⟩
+    refine ⟨data.sigma (SemidirectProduct.inr u⁻¹), ?_, ?_⟩
+    · rw [← data.sigma_U_eq_U]
+      exact ⟨SemidirectProduct.inr u⁻¹, ⟨u⁻¹, rfl⟩, rfl⟩
+    · rw [FieldNormalizerData.s, ← map_inv, ← map_mul, ← map_mul]
+      congr 1
+      rw [inr_inv_mul_primeLineGenerator_mul_inr]
+      simp
+
 /-- **Theorem 1 (centralising case), assembled.**  There is no witness of BG Appendix C,
 hypothesis (B), for `p = 3` in which `g = x^y` centralises `σ(U)` — *provided* the Paley-type
 spanning holds: the elements `s` of the `σ(U)`-orbit of `x` for which `s · x` is again in the
