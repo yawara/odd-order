@@ -823,6 +823,47 @@ with `𝔽_{3^q}` this is the set of squares — the set `S` of the partial reso
 def orbitS (data : FieldNormalizerData p q G) : Set G :=
   {s | ∃ v ∈ data.U, s = v⁻¹ * data.s * v}
 
+/-- The additive group of `𝔽_{p^q}`, written multiplicatively, mapped into `G` by
+`a ↦ σ(inl a)`.  Its range is `σ(P)`. -/
+noncomputable def fieldHom (data : FieldNormalizerData p q G) :
+    Multiplicative (GaloisField p q) →* G :=
+  data.sigma.comp SemidirectProduct.inl
+
+theorem fieldHom_injective (data : FieldNormalizerData p q G) :
+    Function.Injective (fieldHom data) :=
+  data.sigma_injective.comp SemidirectProduct.inl_injective
+
+theorem fieldHom_range (data : FieldNormalizerData p q G) :
+    (fieldHom data).range = data.P := by
+  rw [← data.sigma_P_eq_P, NormSet.normOneFrobeniusKernel, fieldHom, MonoidHom.range_comp]
+
+theorem fieldHom_mem (data : FieldNormalizerData p q G) (a : GaloisField p q) :
+    fieldHom data (Multiplicative.ofAdd a) ∈ data.P := by
+  rw [← fieldHom_range data]
+  exact ⟨Multiplicative.ofAdd a, rfl⟩
+
+/-- **`σ(P)` is the additive group of `𝔽_{p^q}` written multiplicatively.**  This is the
+identification that turns the spanning hypotheses of `false_of_centralizing_of_spanning` and
+`commutator_layerClosure_eq_top` into statements about `ZMod p`-spans in the field — the form in
+which Lemma B and Lemma D of `notes/bg/appC_problem1_partial_resolution.md` are stated.
+
+Combined with `Submodule.span_eq_top_iff_closure_eq_top` it is the last piece of plumbing between
+the group-theoretic and the arithmetic sides of the partial resolution. -/
+noncomputable def fieldMulEquiv (data : FieldNormalizerData p q G) :
+    Multiplicative (GaloisField p q) ≃* data.P :=
+  MulEquiv.ofBijective ((fieldHom data).codRestrict data.P (fun a => by
+      rw [← fieldHom_range data]; exact ⟨a, rfl⟩))
+    ⟨fun a b hab => fieldHom_injective data (congrArg Subtype.val hab), by
+      rintro ⟨x, hx⟩
+      rw [← fieldHom_range data] at hx
+      obtain ⟨a, rfl⟩ := hx
+      exact ⟨a, rfl⟩⟩
+
+@[simp]
+theorem coe_fieldMulEquiv (data : FieldNormalizerData p q G)
+    (a : Multiplicative (GaloisField p q)) :
+    ((fieldMulEquiv data a : data.P) : G) = fieldHom data a := rfl
+
 /-- **The orbit `S` in field terms.**  The `σ(U)`-orbit of `x = σ(1)` is precisely the `σ`-image
 of the *norm-one set* of `𝔽_{p^q}`, embedded additively:
 
