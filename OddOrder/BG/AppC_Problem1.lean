@@ -507,14 +507,21 @@ can be a witness. -/
 theorem commutator_eq_top_of_relations {V N : Type*} [Group V] [Group N]
     (ι₀ ι₁ ι₂ : V →* N)
     (hgen : Subgroup.closure (Set.range ι₀ ∪ Set.range ι₁ ∪ Set.range ι₂) = ⊤)
-    {T : Set (V × V × V)} (hT : ∀ t ∈ T, ι₀ t.1 * ι₁ t.2.1 * ι₂ t.2.2 = 1)
+    {T : Set (V × V × V)} (hT : ∀ t ∈ T, ι₂ t.2.2 * ι₁ t.2.1 * ι₀ t.1 = 1)
     (hspan : Subgroup.closure T = ⊤) :
     commutator N = ⊤ := by
   have hab := eq_one_of_closure_eq_top ((Abelianization.of).comp ι₀)
     ((Abelianization.of).comp ι₁) ((Abelianization.of).comp ι₂)
     (fun t ht => by
-      simp only [MonoidHom.comp_apply, ← map_mul]
-      rw [hT t ht, map_one]) hspan
+      have h := congrArg Abelianization.of (hT t ht)
+      simp only [map_mul, map_one] at h
+      simp only [MonoidHom.comp_apply]
+      calc Abelianization.of (ι₀ t.1) * Abelianization.of (ι₁ t.2.1) *
+            Abelianization.of (ι₂ t.2.2)
+          = Abelianization.of (ι₂ t.2.2) * Abelianization.of (ι₁ t.2.1) *
+            Abelianization.of (ι₀ t.1) := by
+            simp only [mul_comm, mul_left_comm]
+        _ = 1 := h) hspan
   refine eq_top_of_generators_mem hgen ?_
   intro x hx
   rw [← Abelianization.ker_of, MonoidHom.mem_ker]
