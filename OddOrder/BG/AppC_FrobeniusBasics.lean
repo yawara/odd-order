@@ -86,6 +86,34 @@ theorem primeLineGenerator_ne_one (p q : ℕ) [Fact p.Prime] :
     ofAdd_eq_one.mp (SemidirectProduct.inl_inj.mp h)
   exact one_ne_zero hfield
 
+/-- **Conjugation by a norm-one unit is multiplication in the field.**  For `u ∈ U` and
+`a ∈ P = 𝔽_{p^q}`,
+
+`(inr u)⁻¹ · inl a · inr u = inl (u⁻¹ · a)`.
+
+This is the identification of the `U`-action on `P` with field multiplication, read inside the
+semidirect product `H = P ⋊ U`.  In particular the `U`-orbit of the prime-line generator
+`x = inl 1` is the set of *norm-one elements* of `𝔽_{p^q}` — which, for `p = 3`, is the set of
+squares.  That is the set `S` of BG Appendix C, Problem 1 (issue 0180). -/
+theorem inr_inv_mul_inl_mul_inr (p q : ℕ) [Fact p.Prime] (u : NormSet.normOneUnits p q)
+    (a : GaloisField p q) :
+    (SemidirectProduct.inr u : NormSet.normOneFrobeniusGroup p q)⁻¹ *
+        SemidirectProduct.inl (Multiplicative.ofAdd a) * SemidirectProduct.inr u
+      = SemidirectProduct.inl (Multiplicative.ofAdd
+          (((u⁻¹ : (GaloisField p q)ˣ) : GaloisField p q) * a)) := by
+  rw [← map_inv, ← SemidirectProduct.inl_aut_inv]
+  simp [NormSet.normOneMulAction, Units.smul_def]
+
+/-- The `U`-orbit of the prime-line generator `x = σ(1)`: conjugating by `u ∈ U` gives the
+element `u⁻¹` of the field, so the orbit is exactly the norm-one set. -/
+theorem inr_inv_mul_primeLineGenerator_mul_inr (p q : ℕ) [Fact p.Prime]
+    (u : NormSet.normOneUnits p q) :
+    (SemidirectProduct.inr u : NormSet.normOneFrobeniusGroup p q)⁻¹ *
+        primeLineGenerator p q * SemidirectProduct.inr u
+      = SemidirectProduct.inl (Multiplicative.ofAdd
+          (((u⁻¹ : (GaloisField p q)ˣ) : GaloisField p q))) := by
+  rw [primeLineGenerator, inr_inv_mul_inl_mul_inr, mul_one]
+
 /-- The distinguished generator of `P₀` has order dividing `p`. -/
 theorem primeLineGenerator_pow_p (p q : ℕ) [Fact p.Prime] :
     (primeLineGenerator p q) ^ p = 1 := by

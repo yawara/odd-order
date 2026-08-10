@@ -255,8 +255,10 @@ Gersten–Stallings の非球面条件 `Σ 1/m_v ≤ 1` による自動的な発
 ⚠ **残り 2 件に共通して要るのは「`σ(P)` と `𝔽_{3^q}` の同一視の API」**。具体的には
 「ノルム 1 元 `v ∈ U` による `x = σ(1)` の共役が、`F` の中では `v` 倍に対応する」という補題で、
 これが `orbitS` = 平方元全体、`layerSet` の関係格子 = `L_e` という読み替えを可能にする。
-2026-08-10 現在 `AppC_FrobeniusBasics` / `AppC_LemmaC3_Setup` にこの形の補題は無く、
-`normOneFrobeniusGroup` の `SemidirectProduct` 構造から作る必要がある (次のセッションの入口)。
+**✅ 2026-08-10 に追加した**: `AppC.inr_inv_mul_inl_mul_inr` (ノルム 1 元 `u` による共役は
+体の中で `u⁻¹` 倍) と `AppC.inr_inv_mul_primeLineGenerator_mul_inr` (`x = σ(1)` の `U`-軌道は
+ノルム 1 集合そのもの)。`SemidirectProduct.inl_aut_inv` から 2 行で出た。
+⟹ 残り 2 件は「この補題を使って `orbitS` / 関係格子を体の言葉に翻訳する」作業に落ちた。
 
 ## 次にやるとしたら (2026-08-10 更新)
 
