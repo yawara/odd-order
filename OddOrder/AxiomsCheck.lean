@@ -20854,6 +20854,13 @@ mem_normOneUnits_iff_isSquare          (for `p = 3` the norm is the `(3^q-1)/2`-
   → span_triples_normOne_eq_top        (**Lemma D for `𝔽_{3^q}`**: replacing `e` by an odd
                                         representative mod `n = |U|` makes it a unit mod `3^q-1`
                                         with cube one, not a power of `3`; Lemma D then spans)
+    → closure_relationTriples_eq_top   (the same, transported to `σ(P)³` through
+                                        `fieldTripleHom`)
+      → commutator_layerClosure_eq_top_of_exp
+                                       (**Theorem 2, unconditional**: `⟨P, P^g, P^{g²}⟩` is
+                                        perfect for a non-Frobenius exponent)
+        → not_isSolvable_of_exp        (so the ambient group is not solvable — with the odd order
+                                        theorem, no finite group of odd order is such a witness)
   → le_closure_orbitS                  (**Lemma B transported**: the spanning hypothesis of
                                         Theorem 1 *holds*)
 false_of_centralizing_of_spanning      (**Theorem 1, assembled**: no witness with `g`
@@ -20923,3 +20930,7 @@ hypothesis (B) for `p = 3` with `g` centralising `σ(U)`; and for a non-Frobeniu
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.le_closure_orbitS
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_centralizing
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.span_triples_normOne_eq_top
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.fieldTripleHom_surjective
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.closure_relationTriples_eq_top
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.commutator_layerClosure_eq_top_of_exp
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.not_isSolvable_of_exp
