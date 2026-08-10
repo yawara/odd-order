@@ -47,6 +47,8 @@ recorded in `notes/bg/appC_problem1_partial_resolution.md` (issue 0180):
 * `cross_commute_of_three_relations` — Lemma C.
 * `eq_zero_of_closure_eq_top`, `eq_top_of_generators_mem` — the two abstract steps of Theorem 2
   (for an exponent that is not a Frobenius power the layers die in `N^{ab}`, so `N` is perfect).
+* `commute_conj_of_le_closure` — Theorem 1's engine: the relation family plus a spanning set
+  makes the cross-commutator vanish.
 * `injective_pow_mul` — the coset separation behind Lemma D.
 -/
 
@@ -76,6 +78,17 @@ private theorem cancel_three (hx : x ^ 3 = 1) (r : G) : x * (x * (x * r)) = r :=
     rwa [← mul_assoc] at h
   rw [← mul_assoc, ← mul_assoc, h, one_mul]
 
+/-- Expansion of `(x · c)³` into the three `x`-conjugates of `c`, valid whenever `x³ = 1`:
+
+`(x c)³ = c^{x²} · (c^x · c)`.
+
+Equivalently `(x c)³ = 1` says that the "norm" of `c` along `⟨x⟩` is trivial. -/
+theorem pow_three_eq_conj_mul (hx : x ^ 3 = 1) (c : G) :
+    (x * c) ^ 3 = x⁻¹ * (x⁻¹ * c * x) * x * ((x⁻¹ * c * x) * c) := by
+  have hxi : x⁻¹ = x * x := inv_eq_mul_self hx
+  have hcan : ∀ r : G, x * (x * (x * r)) = r := cancel_three hx
+  simp only [hxi, pow_succ, pow_zero, one_mul, mul_assoc, hcan]
+
 /-- **Lemma A′.**  Let `x` have order dividing three and let `c` commute with its conjugate
 `x⁻¹cx`.  Then
 
@@ -91,11 +104,9 @@ theorem pow_three_mul_eq_pow_three_of_commute (hx : x ^ 3 = 1)
     (h : Commute c (x⁻¹ * c * x)) : (x * c * x) ^ 3 = (x * c) ^ 3 := by
   have hxi : x⁻¹ = x * x := inv_eq_mul_self hx
   have hcan : ∀ r : G, x * (x * (x * r)) = r := cancel_three hx
-  have e₁ : (x * c) ^ 3 = x⁻¹ * (x⁻¹ * c * x) * x * ((x⁻¹ * c * x) * c) := by
-    simp only [hxi, pow_succ, pow_zero, one_mul, mul_assoc, hcan]
   have e₂ : (x * c * x) ^ 3 = x⁻¹ * (x⁻¹ * c * x) * x * (c * (x⁻¹ * c * x)) := by
     simp only [hxi, pow_succ, pow_zero, one_mul, mul_assoc, hcan]
-  rw [e₁, e₂, h.eq]
+  rw [pow_three_eq_conj_mul hx c, e₂, h.eq]
 
 /-- The shape used downstream.  If `g = x * c` has order dividing three — automatic when `g` is a
 conjugate of the order-three element `x` — and `c` commutes with `x⁻¹cx`, then the product
@@ -270,6 +281,73 @@ theorem eq_top_of_generators_mem {N : Type*} [Group N] {X : Set N}
   top_le_iff.mp (hgen ▸ (Subgroup.closure_le _).mpr hX)
 
 end TheoremTwo
+
+section TheoremOne
+
+/-- **Theorem 1's engine.**  Let `P` be an abelian subgroup, `g` an element with `g³ = 1`, and
+`S ⊆ P` a set of elements satisfying the norm relation `(g · s)³ = 1`.  Fix `t ∈ S`.  If the
+elements `s ∈ S` for which `s · t` also lies in `S` generate `P`, then `t` commutes with the whole
+of `P^g`:
+
+`t · v^g = v^g · t` for every `v ∈ P`.
+
+This is the step that turns the family of relations produced by conjugating `(g x)³ = 1` with
+`σ(U)` into the vanishing cross-commutator.  For each admissible `s` the three relations at `s`,
+`t` and `s · t` feed `cross_commute_of_three_relations`; the elements that commute with `t^g` form
+a subgroup, so a generating set suffices.
+
+In the application `P` is the additive group of `𝔽_{3^q}`, `S` is the set of squares, `t = 1`, and
+the admissible `s` are those with `s` and `s + 1` both squares — a Paley-type set whose spanning
+is the one analytic ingredient (Lemma B). -/
+theorem commute_conj_of_le_closure {P : Subgroup G} (hP : ∀ a ∈ P, ∀ b ∈ P, a * b = b * a)
+    {g : G} (hg3 : g ^ 3 = 1) {S : Set G} (hSP : S ⊆ (P : Set G))
+    (hrel : ∀ s ∈ S, (g * s) ^ 3 = 1) {t : G} (ht : t ∈ S)
+    (hspan : P ≤ Subgroup.closure {s | s ∈ S ∧ s * t ∈ S}) :
+    ∀ v ∈ P, t * (g⁻¹ * v * g) = (g⁻¹ * v * g) * t := by
+  -- The elements commuting with `t` after conjugation form a subgroup.
+  set C : Subgroup G :=
+    (Subgroup.centralizer ({t} : Set G)).comap (MulAut.conj g⁻¹).toMonoidHom with hC
+  have hmemC : ∀ v : G, v ∈ C ↔ t * (g⁻¹ * v * g) = (g⁻¹ * v * g) * t := by
+    intro v
+    constructor
+    · intro hv
+      have := (Subgroup.mem_centralizer_iff.mp hv) t rfl
+      simpa [MulAut.conj_apply, mul_assoc] using this
+    · intro hv
+      refine Subgroup.mem_centralizer_iff.mpr ?_
+      rintro m rfl
+      simpa [MulAut.conj_apply, mul_assoc] using hv
+  -- Every admissible generator lies in `C`, by Lemma C.
+  have hgen : {s | s ∈ S ∧ s * t ∈ S} ⊆ (C : Set G) := by
+    rintro s ⟨hs, hst⟩
+    have hlayer : ∀ w ∈ S, (g⁻¹ * (g⁻¹ * w * g) * g) * (g⁻¹ * w * g) * w = 1 := by
+      intro w hw
+      have h := hrel w hw
+      rw [pow_three_eq_conj_mul hg3 w] at h
+      rw [← mul_assoc] at h
+      exact h
+    have ha := hlayer s hs
+    have hb := hlayer t ht
+    have hab := hlayer (s * t) hst
+    have hab' : (g⁻¹ * (g⁻¹ * s * g) * g) * (g⁻¹ * (g⁻¹ * t * g) * g) *
+        ((g⁻¹ * s * g) * (g⁻¹ * t * g)) * (s * t) = 1 := by
+      have hconj : ∀ w : G, g⁻¹ * (s * t) * g = (g⁻¹ * s * g) * (g⁻¹ * t * g) := fun _ => by
+        group
+      rw [← hab]
+      rw [hconj s]
+      group
+    have h₁ : (g⁻¹ * s * g) * (g⁻¹ * t * g) = (g⁻¹ * t * g) * (g⁻¹ * s * g) := by
+      have := hP s (hSP hs) t (hSP ht)
+      have hcs : g⁻¹ * s * g * (g⁻¹ * t * g) = g⁻¹ * (s * t) * g := by group
+      have hct : g⁻¹ * t * g * (g⁻¹ * s * g) = g⁻¹ * (t * s) * g := by group
+      rw [hcs, hct, this]
+    have h₀ : s * t = t * s := hP s (hSP hs) t (hSP ht)
+    have := cross_commute_of_three_relations ha hb hab' h₁ h₀
+    exact (hmemC s).mpr this.symm
+  intro v hv
+  exact (hmemC v).mp ((Subgroup.closure_le C).mpr hgen (hspan hv))
+
+end TheoremOne
 
 section CosetSeparation
 

@@ -20776,7 +20776,10 @@ resolution whose two elementary group-theoretic steps are formalized here:
 ```
 pow_three_mul_eq_pow_three_of_commute  (Lemma A′: (xcx)³ = (xc)³ when c commutes with c^x)
   → pow_three_mul_pow_three_eq_one     (hypothesis (B) forces (g·x)³ = 1 for g = x^y)
+pow_three_eq_conj_mul                  ((x c)³ = c^{x²}·(c^x·c) when x³ = 1)
 cross_commute_of_three_relations       (Lemma C: the three-layer cancellation)
+  → commute_conj_of_le_closure         (Theorem 1's engine: the relation family plus a
+                                        spanning set kills the cross-commutator)
 
 conj_mul_pow_three_eq_one              (the bridge: (B) with p = 3 gives (g·x)³ = 1)
 
@@ -20811,4 +20814,6 @@ finite group of odd order — satisfies hypothesis (B) for `p = 3`.* -/
 #assert_only_allowed_axioms OddOrder.PowerMonomial.eq_zero_of_sum_powHom_eq_zero
 #assert_only_allowed_axioms OddOrder.PowerMonomial.injective_powHom_of_apply_injective
 #assert_only_allowed_axioms OddOrder.PowerMonomial.eq_zero_of_forall_trace_sum_eq_zero
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.pow_three_eq_conj_mul
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.commute_conj_of_le_closure
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.injective_pow_mul
