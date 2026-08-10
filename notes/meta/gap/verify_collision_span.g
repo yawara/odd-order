@@ -15,6 +15,7 @@
 #
 # This script searches for collisions by random sampling and reports the F_3-rank of the S's.
 
+SizeScreen([512, 24]);;
 CubeRoots := function(n)
   local fac, mods, rootsList, pp, p, a, m, g, roots, res, newres, i, x, r, M;
   fac := Collected(Factors(n));
@@ -80,13 +81,9 @@ RunQ := function(q, nsamples)
       if Length(rows) >= 3*q and RankMat(rows) = q then break; fi;
     od;
     if Length(rows) = 0 then rank := 0; else rank := RankMat(rows); fi;
-    Print("  e = ", e, "  E = ", E, ":  usable collisions ", coll,
-          ",  F_3-rank of the S's = ", rank, " / ", q,
-          Concatenation(" ", String(rank = q)), "\n");
+    Print("RESULT q=", q, " e=", e, " rank=", rank, " of ", q, " full=", rank = q, "\n");
   od;
 end;;
 
-RunQ(7, 200000);
-RunQ(13, 400000);
-RunQ(19, 3000000);
+RunQ(19, 4000000);
 QUIT;
