@@ -513,6 +513,86 @@ theorem commutator_layerClosure_eq_top_of_exp (data : FieldNormalizerData p q G)
   rw [h1, h2, h3, hshape]
   exact hrel
 
+/-! ### The relation family in field coordinates
+
+The collision-span computation runs entirely in `𝔽_{3^q}`, so the relation family has to be read
+through the identification of `σ(P)` with the field.  `layerFieldHom data i` is the `i`-th layer
+`t ↦ (gⁱ)⁻¹ σ(inl t) gⁱ`, and `layered_relation_field` is the relation `d(t^{E²}) b(t^E) a(t) = 1`
+of `notes/bg/appC_problem1_partial_resolution.md`. -/
+
+/-- The element of `σ(U)` attached to a norm-one unit. -/
+noncomputable def unitElt (data : FieldNormalizerData p q G) (u : NormSet.normOneUnits p q) : G :=
+  data.sigma (SemidirectProduct.inr u)
+
+theorem unitElt_mem_U (data : FieldNormalizerData p q G) (u : NormSet.normOneUnits p q) :
+    unitElt data u ∈ data.U := by
+  rw [← data.sigma_U_eq_U]
+  exact ⟨SemidirectProduct.inr u, ⟨u, rfl⟩, rfl⟩
+
+theorem unitElt_pow (data : FieldNormalizerData p q G) (u : NormSet.normOneUnits p q) (k : ℕ) :
+    unitElt data u ^ k = unitElt data (u ^ k) := by
+  rw [unitElt, unitElt, ← map_pow, ← map_pow]
+
+/-- **Conjugating `x = σ(1)` by a norm-one unit is multiplication in the field.** -/
+theorem conj_s_unitElt (data : FieldNormalizerData p q G) (u : NormSet.normOneUnits p q) :
+    (unitElt data u)⁻¹ * data.s * unitElt data u =
+      fieldHom data (Multiplicative.ofAdd
+        (((u⁻¹ : NormSet.normOneUnits p q) : (GaloisField p q)ˣ) : GaloisField p q)) := by
+  have hval := inr_inv_mul_primeLineGenerator_mul_inr p q u
+  rw [unitElt, FieldNormalizerData.s, ← map_inv data.sigma, ← map_mul data.sigma,
+    ← map_mul data.sigma, hval]
+  rfl
+
+/-- The `i`-th layer of `σ(P)`, in field coordinates. -/
+noncomputable def layerFieldHom (data : FieldNormalizerData p q G) (i : ℕ) :
+    Multiplicative (GaloisField p q) →* G :=
+  (MulAut.conj (((conjGen data) ^ i)⁻¹) : G →* G).comp (fieldHom data)
+
+@[simp]
+theorem layerFieldHom_apply (data : FieldNormalizerData p q G) (i : ℕ)
+    (t : Multiplicative (GaloisField p q)) :
+    layerFieldHom data i t =
+      ((conjGen data) ^ i)⁻¹ * fieldHom data t * (conjGen data) ^ i := by
+  change ((conjGen data) ^ i)⁻¹ * fieldHom data t * (((conjGen data) ^ i)⁻¹)⁻¹ = _
+  rw [inv_inv]
+
+/-- **The relation family, in field coordinates.**  For every norm-one `u`,
+
+`d(u^{e²}) · b(u^e) · a(u) = 1`,
+
+where `a`, `b`, `d` are the three layers.  This is the shape in which the collision-span
+computation of `notes/bg/appC_problem1_partial_resolution.md` uses hypothesis (B). -/
+theorem layered_relation_field (data : FieldNormalizerData p q G) (hp : p = 3) {e : ℕ}
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    (u : NormSet.normOneUnits p q) :
+    layerFieldHom data 2 (Multiplicative.ofAdd
+        (((u ^ (e * e) : NormSet.normOneUnits p q) : (GaloisField p q)ˣ) : GaloisField p q)) *
+      layerFieldHom data 1 (Multiplicative.ofAdd
+        (((u ^ e : NormSet.normOneUnits p q) : (GaloisField p q)ˣ) : GaloisField p q)) *
+      layerFieldHom data 0 (Multiplicative.ofAdd
+        (((u : NormSet.normOneUnits p q) : (GaloisField p q)ˣ) : GaloisField p q)) = 1 := by
+  have hrel := layered_relation_of_exp data hp hexp (unitElt_mem_U data u⁻¹)
+  have h0 := conj_s_unitElt data u⁻¹
+  have h1 := conj_s_unitElt data (u⁻¹ ^ e)
+  have h2 := conj_s_unitElt data (u⁻¹ ^ (e * e))
+  rw [← unitElt_pow] at h1 h2
+  rw [h0, h1, h2] at hrel
+  simp only [inv_pow, inv_inv] at hrel
+  have hshape : ∀ A B C : G,
+      (((conjGen data) ^ 2)⁻¹ * A * (conjGen data) ^ 2) *
+          (((conjGen data) ^ 1)⁻¹ * B * (conjGen data) ^ 1) *
+          (((conjGen data) ^ 0)⁻¹ * C * (conjGen data) ^ 0)
+        = (conjGen data)⁻¹ * ((conjGen data)⁻¹ * A * conjGen data) * conjGen data *
+            (((conjGen data)⁻¹ * B * conjGen data) * C) := by
+    intro A B C
+    rw [show (conjGen data) ^ 2 = conjGen data * conjGen data by rw [pow_succ, pow_one],
+      pow_one, pow_zero]
+    group
+  simp only [layerFieldHom_apply]
+  rw [hshape]
+  exact hrel
+
+
 /-! ### The collision-span endgame
 
 If `σ(P)` normalizes the second layer `σ(P)^g`, the perfect group `N` of Theorem 2 collapses:

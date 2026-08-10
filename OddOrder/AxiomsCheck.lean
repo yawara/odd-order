@@ -20870,6 +20870,9 @@ layerClosure_eq_closure_two            (**two layers suffice**: `P^{g²}` alread
                                         forces `N = 1` — no witness)
       ← U_le_normalizer_layerOne       (`σ(U)` normalizes the second layer, since conjugation by
                                         `v` becomes conjugation by `v^e` inside it)
+conj_s_unitElt / layerFieldHom_apply   (the three layers in *field* coordinates)
+  → layered_relation_field             (the relation family as `d(u^{e²})·b(u^e)·a(u) = 1` — the
+                                        form the collision-span computation consumes)
       → false_of_s_normalizes_layerOne (**the criterion, group side**: it is enough that the
                                         single element `x = σ(1)` normalizes the second layer —
                                         the `σ(U)`-orbit of `x` then spreads it over `σ(P)`.
@@ -20955,4 +20958,7 @@ hypothesis (B) for `p = 3` with `g` centralising `σ(U)`; and for a non-Frobeniu
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.layerClosure_eq_sup
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_normalizes_layerOne
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.U_le_normalizer_layerOne
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conj_s_unitElt
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.layerFieldHom_apply
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.layered_relation_field
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_s_normalizes_layerOne
