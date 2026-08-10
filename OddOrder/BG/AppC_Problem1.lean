@@ -225,6 +225,36 @@ theorem cross_commute_of_three_relations (ha : a₂ * a₁ * a₀ = 1) (hb : b�
     exact step
   exact mul_right_cancel step₂
 
+section Semilinear
+
+/-- **Semilinearity of the layer map.**  Suppose `g` normalizes a subgroup with exponent `e`, in
+the sense `g · v = vᵉ · g`.  Then conjugating the `g`-layer by `v` shifts the base point by `vᵉ`:
+
+`(z^g)^v = (z^{vᵉ})^g`.
+
+This is the rule that produces the relation family for a *non-centralising* action: conjugating
+`x^{g²} · x^g · x = 1` by `v ∈ σ(U)` gives
+
+`(x^{v^{e²}})^{g²} · (x^{v^e})^g · x^v = 1`,
+
+the twisted relation `R(s)` of the partial resolution.  For `e = 1` it degenerates to the plain
+statement that conjugation by `v` commutes with the layer map, which is what
+`pow_three_mul_conj_eq_one` uses. -/
+theorem conj_layer_of_exp {g v : G} {e : ℕ} (hexp : g * v = v ^ e * g) (z : G) :
+    v⁻¹ * (g⁻¹ * z * g) * v = g⁻¹ * ((v ^ e)⁻¹ * z * v ^ e) * g := by
+  calc v⁻¹ * (g⁻¹ * z * g) * v = (g * v)⁻¹ * z * (g * v) := by group
+    _ = (v ^ e * g)⁻¹ * z * (v ^ e * g) := by rw [hexp]
+    _ = g⁻¹ * ((v ^ e)⁻¹ * z * v ^ e) * g := by group
+
+/-- Iterating `conj_layer_of_exp`: the second layer moves by `v^{e²}`. -/
+theorem conj_layer_two_of_exp {g v : G} {e : ℕ} (hexp : ∀ w : G, g * w = w ^ e * g) (z : G) :
+    v⁻¹ * (g⁻¹ * (g⁻¹ * z * g) * g) * v
+      = g⁻¹ * (g⁻¹ * ((v ^ (e * e))⁻¹ * z * v ^ (e * e)) * g) * g := by
+  rw [conj_layer_of_exp (hexp v) (g⁻¹ * z * g), conj_layer_of_exp (hexp (v ^ e)) z,
+    ← pow_mul]
+
+end Semilinear
+
 end LemmaC
 
 section Witness

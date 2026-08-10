@@ -20779,6 +20779,9 @@ pow_three_mul_eq_pow_three_of_commute  (Lemma A′: (xcx)³ = (xc)³ when c comm
 pow_three_eq_conj_mul                  ((x c)³ = c^{x²}·(c^x·c) when x³ = 1)
 inv_mul_pow_three_eq_one_of_commute_conj  (Theorem 1's last mile: `[x, x^g] = 1` forces
                                         `(x⁻¹g)³ = 1`, hence `x⁻¹g = 1` in the 3′-group `Q`)
+conj_layer_of_exp, conj_layer_two_of_exp  (semilinearity: with `g·v = vᵉ·g` the layer map
+                                        shifts the base point by `vᵉ`, which produces the
+                                        twisted relation family for `e ≠ 1`)
 cross_commute_of_three_relations       (Lemma C: the three-layer cancellation)
   → commute_conj_of_le_closure_twisted (Theorem 1's engine, Frobenius-twisted: the layered
                                         relation family plus a spanning set kills the
@@ -20827,6 +20830,8 @@ finite group of odd order — satisfies hypothesis (B) for `p = 3`.* -/
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.pow_three_mul_pow_three_eq_one
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.inv_mul_pow_three_eq_one_of_commute_conj
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.cross_commute_of_three_relations
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conj_layer_of_exp
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conj_layer_two_of_exp
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conj_mul_pow_three_eq_one
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.inv_mul_conj_mem_Q
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conj_s_mem_P
