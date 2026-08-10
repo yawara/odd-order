@@ -20791,6 +20791,8 @@ cross_commute_of_three_relations       (Lemma C: the three-layer cancellation)
 conj_mul_pow_three_eq_one              (the bridge: (B) with p = 3 gives (g·x)³ = 1)
   → pow_three_mul_conj_eq_one          (the relation family: conjugating by σ(U) in the
                                         centralising case gives (g·s)³ = 1 for the whole orbit)
+  → layered_relation_of_exp            (the **twisted** relation family, exponent e ≠ 1:
+                                        (x^{v^{e²}})^{g²}·(x^{v^e})^g·x^v = 1)
   → not_commute_conj                   (Theorem 1 assembled: in a witness `x` cannot commute
                                         with `x^g`; only the relation family and the Paley
                                         spanning lemma are still missing)
@@ -20836,6 +20838,7 @@ finite group of odd order — satisfies hypothesis (B) for `p = 3`.* -/
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.inv_mul_conj_mem_Q
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conj_s_mem_P
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.pow_three_mul_conj_eq_one
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.layered_relation_of_exp
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.not_commute_conj
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.eq_zero_of_closure_eq_top
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.eq_top_of_generators_mem

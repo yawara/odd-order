@@ -247,11 +247,11 @@ theorem conj_layer_of_exp {g v : G} {e : ℕ} (hexp : g * v = v ^ e * g) (z : G)
     _ = g⁻¹ * ((v ^ e)⁻¹ * z * v ^ e) * g := by group
 
 /-- Iterating `conj_layer_of_exp`: the second layer moves by `v^{e²}`. -/
-theorem conj_layer_two_of_exp {g v : G} {e : ℕ} (hexp : ∀ w : G, g * w = w ^ e * g) (z : G) :
+theorem conj_layer_two_of_exp {g v : G} {e : ℕ} (h₁ : g * v = v ^ e * g)
+    (h₂ : g * v ^ e = (v ^ e) ^ e * g) (z : G) :
     v⁻¹ * (g⁻¹ * (g⁻¹ * z * g) * g) * v
       = g⁻¹ * (g⁻¹ * ((v ^ (e * e))⁻¹ * z * v ^ (e * e)) * g) * g := by
-  rw [conj_layer_of_exp (hexp v) (g⁻¹ * z * g), conj_layer_of_exp (hexp (v ^ e)) z,
-    ← pow_mul]
+  rw [conj_layer_of_exp h₁ (g⁻¹ * z * g), conj_layer_of_exp h₂ z, ← pow_mul]
 
 end Semilinear
 
@@ -321,6 +321,51 @@ theorem conj_s_mem_P (data : FieldNormalizerData p q G) {v : G} (hv : v ∈ data
     data.normalizer_P_sup_U_le_normalizer_P
       (Subgroup.le_normalizer (le_sup_right (a := data.P) hv))
   exact (Subgroup.mem_normalizer_iff''.mp hvN data.s).mp data.s_mem_P
+
+/-- The conjugate `g = x^y` of the generator `x = σ(1)` of `σ(P₀)`: a generator of the subgroup
+`σ(P₀)^y` that hypothesis (B) requires to normalize `σ(U)`. -/
+noncomputable def conjGen (data : FieldNormalizerData p q G) : G := MulAut.conj data.y data.s
+
+@[simp]
+theorem conjGen_def (data : FieldNormalizerData p q G) :
+    conjGen data = MulAut.conj data.y data.s := rfl
+
+/-- **The twisted relation family.**  Suppose `g = x^y` normalizes `σ(U)` with exponent `e`, i.e.
+`g w = wᵉ g` for `w ∈ σ(U)` (the general case `e ≠ 1`).  Conjugating `(g x)³ = 1` by `v ∈ σ(U)`
+and pushing the conjugation through the layers with `conj_layer_of_exp` gives
+
+`(x^{v^{e²}})^{g²} · (x^{v^e})^g · x^v = 1`.
+
+This is the relation `R(s)` of `notes/bg/appC_problem1_partial_resolution.md` in its layered form:
+the three layers are based at `v^{e²}`, `v^e` and `v`, which under the identification of `σ(P)`
+with `𝔽_{3^q}` are the field elements `s^{e²}`, `s^e` and `s`.  Feeding this family to
+`commutator_eq_top_of_relations` is what makes `N` perfect when the relation lattice spans. -/
+theorem layered_relation_of_exp (data : FieldNormalizerData p q G) (hp : p = 3) {e : ℕ}
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data) {v : G} (hv : v ∈ data.U) :
+    (conjGen data)⁻¹ * ((conjGen data)⁻¹ * ((v ^ (e * e))⁻¹ * data.s * v ^ (e * e)) *
+        conjGen data) * conjGen data *
+      (((conjGen data)⁻¹ * ((v ^ e)⁻¹ * data.s * v ^ e) * conjGen data) *
+        (v⁻¹ * data.s * v)) = 1 := by
+  have hx3 : data.s ^ 3 = 1 := by
+    subst hp
+    rw [FieldNormalizerData.s, ← map_pow, primeLineGenerator_pow_p, map_one]
+  have hg3 : (conjGen data) ^ 3 = 1 := by
+    rw [conjGen_def, ← map_pow, hx3, map_one]
+  -- The layered form of `(g x)³ = 1`.
+  have hlayer : (conjGen data)⁻¹ * ((conjGen data)⁻¹ * data.s * conjGen data) * conjGen data *
+      (((conjGen data)⁻¹ * data.s * conjGen data) * data.s) = 1 :=
+    (pow_three_eq_conj_mul hg3 data.s).symm.trans (conj_mul_pow_three_eq_one data hp)
+  -- Conjugate by `v` and push the conjugation through the three layers.
+  have hconj := congrArg (fun z => v⁻¹ * z * v) hlayer
+  simp only [mul_one, inv_mul_cancel] at hconj
+  have hdist : v⁻¹ * ((conjGen data)⁻¹ * ((conjGen data)⁻¹ * data.s * conjGen data) *
+        conjGen data * (((conjGen data)⁻¹ * data.s * conjGen data) * data.s)) * v
+      = (v⁻¹ * ((conjGen data)⁻¹ * ((conjGen data)⁻¹ * data.s * conjGen data) * conjGen data) * v)
+        * ((v⁻¹ * ((conjGen data)⁻¹ * data.s * conjGen data) * v) * (v⁻¹ * data.s * v)) := by
+    group
+  rw [hdist, conj_layer_two_of_exp (hexp v hv) (hexp (v ^ e) (data.U.pow_mem hv e)) data.s,
+    conj_layer_of_exp (hexp v hv) data.s] at hconj
+  exact hconj
 
 /-- **The relation family.**  If `g = x^y` centralizes `σ(U)` — the case `e = 1`, which the book's
 remark makes automatic whenever `3 ∤ |Aut U|` — then conjugating `(g x)³ = 1` by `σ(U)` produces
