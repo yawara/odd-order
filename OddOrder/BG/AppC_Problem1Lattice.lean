@@ -513,6 +513,95 @@ theorem commutator_layerClosure_eq_top_of_exp (data : FieldNormalizerData p q G)
   rw [h1, h2, h3, hshape]
   exact hrel
 
+/-! ### The collision-span endgame
+
+If `σ(P)` normalizes the second layer `σ(P)^g`, the perfect group `N` of Theorem 2 collapses:
+`N = σ(P) ⊔ σ(P)^g` is then metabelian (an abelian normal subgroup with abelian quotient), so its
+commutator subgroup is proper — contradicting `commutator N = ⊤`.
+
+This is the endgame of the *collision-span obstruction* of
+`notes/bg/appC_problem1_partial_resolution.md`: the relation family produces, for every
+"collision" of the map `p ↦ p^E - (p-1)^E`, an element `S` with `b(S)^{a(-1)} ∈ B`; once those `S`
+span the field, `a(-1)` — and hence, conjugating by `σ(U)`, all of `σ(P)` — normalizes `B`. -/
+
+/-- The second layer `σ(P)^g`, as a subgroup. -/
+noncomputable def layerOne (data : FieldNormalizerData p q G) : Subgroup G :=
+  data.P.map (MulAut.conj (conjGen data)⁻¹).toMonoidHom
+
+theorem coe_layerOne (data : FieldNormalizerData p q G) :
+    (layerOne data : Set G) = layerSet data.P (conjGen data) 1 := by
+  ext z
+  simp only [layerOne, layerSet, Subgroup.coe_map, MulEquiv.coe_toMonoidHom, MulAut.conj_apply,
+    inv_inv, Set.mem_image, pow_one]
+
+theorem layerOne_mul_comm (data : FieldNormalizerData p q G) {a b : G} (ha : a ∈ layerOne data)
+    (hb : b ∈ layerOne data) : a * b = b * a := by
+  obtain ⟨a', ha', rfl⟩ := ha
+  obtain ⟨b', hb', rfl⟩ := hb
+  rw [← map_mul, ← map_mul, P_mul_comm data ha' hb']
+
+/-- `N = ⟨σ(P), σ(P)^g⟩` is the join of the first two layers (`layerClosure_eq_closure_two`, read
+as a supremum of subgroups). -/
+theorem layerClosure_eq_sup (data : FieldNormalizerData p q G) (hp : p = 3) {e : ℕ}
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data) :
+    layerClosure data.P (conjGen data) = data.P ⊔ layerOne data := by
+  have h0 : layerSet data.P (conjGen data) 0 = (data.P : Set G) := by
+    ext z
+    simp only [layerSet, pow_zero, inv_one, one_mul, mul_one, Set.image_id']
+  have h1 : layerSet data.P (conjGen data) 1 = (layerOne data : Set G) := (coe_layerOne data).symm
+  rw [layerClosure_eq_closure_two data hp hexp, h0, h1, Subgroup.closure_union,
+    Subgroup.closure_eq, Subgroup.closure_eq]
+
+/-- **The collision-span endgame.**  If `σ(P)` normalizes the second layer, no witness exists.
+
+`N = σ(P) ⊔ σ(P)^g` has the abelian normal subgroup `σ(P)^g` with abelian quotient, so
+`commutator N ≤ σ(P)^g` — but Theorem 2 says `commutator N = ⊤`, which forces `N` itself to be
+abelian and hence trivial, contradicting `σ(1) ≠ 1`. -/
+theorem false_of_normalizes_layerOne (data : FieldNormalizerData p q G) (hp : p = 3) {e : ℕ}
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    (hnotfrob : ∀ j : ℕ, ∃ u : NormSet.normOneUnits p q, u ^ e ≠ u ^ (3 ^ j))
+    (hnorm : data.P ≤ Subgroup.normalizer ((layerOne data : Subgroup G) : Set G)) : False := by
+  set N : Subgroup G := layerClosure data.P (conjGen data) with hN
+  have hNsup : N = data.P ⊔ layerOne data := layerClosure_eq_sup data hp hexp
+  have hPN : data.P ≤ N := by rw [hNsup]; exact le_sup_left
+  have hBN : layerOne data ≤ N := by rw [hNsup]; exact le_sup_right
+  -- every element of `N` normalizes the second layer
+  have hNnorm : N ≤ Subgroup.normalizer ((layerOne data : Subgroup G) : Set G) := by
+    rw [hNsup]
+    exact sup_le hnorm Subgroup.le_normalizer
+  haveI hBnormal : ((layerOne data).subgroupOf N).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hBN).mpr hNnorm
+  haveI hPcomm : IsMulCommutative (data.P.subgroupOf N) :=
+    ⟨⟨fun a b => Subtype.ext (Subtype.ext (P_mul_comm data a.2 b.2))⟩⟩
+  have hsup : (layerOne data).subgroupOf N ⊔ data.P.subgroupOf N = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hBN hPN, sup_comm, ← hNsup, Subgroup.subgroupOf_self]
+  have hle := Subgroup.Normal.commutator_le_of_self_sup_commutative_eq_top hsup hPcomm
+  rw [commutator_layerClosure_eq_top_of_exp data hp hexp hnotfrob, top_le_iff,
+    Subgroup.subgroupOf_eq_top] at hle
+  -- so `N` lies in the abelian second layer, hence is abelian, hence trivial
+  have habel : ∀ a ∈ N, ∀ b ∈ N, a * b = b * a := fun a ha b hb =>
+    layerOne_mul_comm data (hle ha) (hle hb)
+  have hbot : commutator N = ⊥ := by
+    rw [commutator_def, Subgroup.commutator_eq_bot_iff_le_centralizer]
+    intro z _
+    rw [Subgroup.mem_centralizer_iff]
+    intro w _
+    exact Subtype.ext (habel w.1 w.2 z.1 z.2)
+  have htop := commutator_layerClosure_eq_top_of_exp data hp hexp hnotfrob
+  rw [hbot] at htop
+  -- `x = σ(1)` is a non-trivial element of `N`
+  have hsN : data.s ∈ N := by
+    have h := mem_layerClosure data.P (conjGen data) (i := 0) (Or.inl rfl) data.s_mem_P
+    rw [pow_zero, inv_one, one_mul, mul_one] at h
+    exact h
+  have hsne : data.s ≠ 1 := by
+    rw [FieldNormalizerData.s]
+    intro h
+    exact primeLineGenerator_ne_one p q (data.sigma_injective (by rw [h, map_one]))
+  have hmem : (⟨data.s, hsN⟩ : N) ∈ (⊥ : Subgroup N) := htop ▸ Subgroup.mem_top _
+  rw [Subgroup.mem_bot] at hmem
+  exact hsne (congrArg Subtype.val hmem)
+
 /-- **Theorem 2, the punchline.**  A witness of BG Appendix C, hypothesis (B), for `p = 3` whose
 exponent is not a power of the Frobenius has a *non-solvable* ambient group.
 
