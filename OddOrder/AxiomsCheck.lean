@@ -502,6 +502,7 @@ import OddOrder.BG.AppC_SL2Example
 import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.BG.AppC_GlaubermanNorton
+import OddOrder.Algebra.PowerMonomialIndependence
 import OddOrder.BG.AppC_Problem1
 import OddOrder.BG.AppD_CNGroups
 import OddOrder.Peterfalvi.Appendices.SemilinearField
@@ -20781,6 +20782,9 @@ conj_mul_pow_three_eq_one              (the bridge: (B) with p = 3 gives (g·x)�
 
 eq_zero_of_closure_eq_top              (Theorem 2, linear step: the layer maps die)
   → eq_top_of_generators_mem           (Theorem 2, group step: N is perfect)
+
+PowerMonomial.eq_zero_of_sum_powHom_eq_zero  (Lemma D core: Dedekind independence of the
+                                              power monomials `a ↦ a^d` on `Fˣ`)
 ```
 
 Lemma A′ is what hypothesis (B) yields — `c = ⁅x, y⁆` lies in the abelian `p'`-subgroup `Q`, so
@@ -20797,3 +20801,5 @@ finite group of odd order — satisfies hypothesis (B) for `p = 3`.* -/
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conj_mul_pow_three_eq_one
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.eq_zero_of_closure_eq_top
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.eq_top_of_generators_mem
+#assert_only_allowed_axioms OddOrder.PowerMonomial.eq_zero_of_sum_powHom_eq_zero
+#assert_only_allowed_axioms OddOrder.PowerMonomial.injective_powHom_of_apply_injective

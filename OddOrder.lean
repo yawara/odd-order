@@ -889,6 +889,7 @@ import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.BG.AppC_AffineLineCondition
 import OddOrder.BG.AppC_GlaubermanNorton
+import OddOrder.Algebra.PowerMonomialIndependence
 import OddOrder.BG.AppC_Problem1
 import OddOrder.BG.AppD_CNGroups
 import OddOrder.BG.AppE_CollectionFormula
