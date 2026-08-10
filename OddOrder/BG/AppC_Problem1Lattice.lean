@@ -602,6 +602,56 @@ theorem false_of_normalizes_layerOne (data : FieldNormalizerData p q G) (hp : p 
   rw [Subgroup.mem_bot] at hmem
   exact hsne (congrArg Subtype.val hmem)
 
+/-- `σ(U)` normalizes the second layer: conjugation by `v ∈ σ(U)` turns into conjugation by
+`v^e` inside the layer, and `σ(U)` normalizes `σ(P)`. -/
+theorem U_le_normalizer_layerOne (data : FieldNormalizerData p q G) {e : ℕ}
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data) :
+    data.U ≤ Subgroup.normalizer ((layerOne data : Subgroup G) : Set G) := by
+  intro v hv
+  have hvP : v ^ e ∈ Subgroup.normalizer (data.P : Set G) :=
+    data.normalizer_P_sup_U_le_normalizer_P
+      (Subgroup.le_normalizer (le_sup_right (a := data.P) (data.U.pow_mem hv e)))
+  have hPmap := Subgroup.mem_normalizer_iff_map_conj_eq.mp hvP
+  have hcomm : v * (conjGen data)⁻¹ = (conjGen data)⁻¹ * v ^ e := by
+    have h := hexp v hv
+    calc v * (conjGen data)⁻¹
+        = (conjGen data)⁻¹ * (conjGen data * v) * (conjGen data)⁻¹ := by group
+      _ = (conjGen data)⁻¹ * (v ^ e * conjGen data) * (conjGen data)⁻¹ := by rw [h]
+      _ = (conjGen data)⁻¹ * v ^ e := by group
+  have hcomm' : conjGen data * v⁻¹ = (v ^ e)⁻¹ * conjGen data := by
+    have := congrArg (fun z : G => z⁻¹) hcomm
+    simpa using this
+  rw [Subgroup.mem_normalizer_iff_map_conj_eq, layerOne, Subgroup.map_map]
+  have hfun : (MulAut.conj v : G →* G).comp (MulAut.conj (conjGen data)⁻¹).toMonoidHom
+      = (MulAut.conj (conjGen data)⁻¹).toMonoidHom.comp (MulAut.conj (v ^ e) : G →* G) := by
+    ext w
+    simp only [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, MulAut.conj_apply, inv_inv]
+    calc v * ((conjGen data)⁻¹ * w * conjGen data) * v⁻¹
+        = (v * (conjGen data)⁻¹) * w * (conjGen data * v⁻¹) := by group
+      _ = ((conjGen data)⁻¹ * v ^ e) * w * ((v ^ e)⁻¹ * conjGen data) := by rw [hcomm, hcomm']
+      _ = (conjGen data)⁻¹ * (v ^ e * w * (v ^ e)⁻¹) * conjGen data := by group
+  rw [hfun, ← Subgroup.map_map, hPmap]
+
+/-- **The collision-span criterion, group side.**  If the generator `x = σ(1)` of `σ(P₀)`
+normalizes the second layer `σ(P)^g`, then *no witness exists*.
+
+Conjugating by `σ(U)` spreads the normalizing property over the whole orbit of `x`, which
+generates `σ(P)` (Lemma B); then `false_of_normalizes_layerOne` applies.
+
+This is the endpoint of the collision-span obstruction: the field-side computation produces
+elements `S` with `b(S)^{x⁻¹} ∈ B` whose span is everything, which is exactly the hypothesis
+`hx` below. -/
+theorem false_of_s_normalizes_layerOne (data : FieldNormalizerData p q G) (hp : p = 3) {e : ℕ}
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    (hnotfrob : ∀ j : ℕ, ∃ u : NormSet.normOneUnits p q, u ^ e ≠ u ^ (3 ^ j))
+    (hx : data.s ∈ Subgroup.normalizer ((layerOne data : Subgroup G) : Set G)) : False := by
+  refine false_of_normalizes_layerOne data hp hexp hnotfrob ?_
+  have hU := U_le_normalizer_layerOne data hexp
+  refine le_trans (le_closure_orbitS data hp) ((Subgroup.closure_le _).mpr ?_)
+  rintro z ⟨⟨v, hv, rfl⟩, -⟩
+  exact Subgroup.mul_mem _ (Subgroup.mul_mem _ (Subgroup.inv_mem _ (hU hv)) hx) (hU hv)
+
+
 /-- **Theorem 2, the punchline.**  A witness of BG Appendix C, hypothesis (B), for `p = 3` whose
 exponent is not a power of the Frobenius has a *non-solvable* ambient group.
 

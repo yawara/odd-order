@@ -20867,9 +20867,14 @@ layerClosure_eq_closure_two            (**two layers suffice**: `P^{g²}` alread
   → layerClosure_eq_sup                (the same, read as `N = σ(P) ⊔ σ(P)^g`)
     → false_of_normalizes_layerOne     (**the collision-span endgame**: if `σ(P)` normalizes the
                                         second layer then `N` is metabelian, so `commutator N = ⊤`
-                                        forces `N = 1` — no witness.  This is what the field-side
-                                        "collision span" produces; see
-                                        notes/bg/appC_problem1_partial_resolution.md)
+                                        forces `N = 1` — no witness)
+      ← U_le_normalizer_layerOne       (`σ(U)` normalizes the second layer, since conjugation by
+                                        `v` becomes conjugation by `v^e` inside it)
+      → false_of_s_normalizes_layerOne (**the criterion, group side**: it is enough that the
+                                        single element `x = σ(1)` normalizes the second layer —
+                                        the `σ(U)`-orbit of `x` then spreads it over `σ(P)`.
+                                        The field-side "collision span" is what produces that;
+                                        see notes/bg/appC_problem1_partial_resolution.md)
   → le_closure_orbitS                  (**Lemma B transported**: the spanning hypothesis of
                                         Theorem 1 *holds*)
 false_of_centralizing_of_spanning      (**Theorem 1, assembled**: no witness with `g`
@@ -20949,3 +20954,5 @@ hypothesis (B) for `p = 3` with `g` centralising `σ(U)`; and for a non-Frobeniu
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.layerOne_mul_comm
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.layerClosure_eq_sup
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_normalizes_layerOne
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.U_le_normalizer_layerOne
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_s_normalizes_layerOne
