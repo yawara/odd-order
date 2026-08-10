@@ -20802,6 +20802,8 @@ eq_zero_of_closure_eq_top              (Theorem 2, linear step: the layer maps d
   → commutator_eq_top_of_relations     (Theorem 2, assembled: the relation lattice spanning
                                         forces `commutator N = ⊤`)
     ← layerHom / coe_layerHom          (the `ι_i` it consumes: `v ↦ v^{gⁱ}` as `P →* N`)
+  → commutator_layerClosure_eq_top     (**Theorem 2 in the ambient group**: the layered
+                                        relations plus spanning make `⟨P, P^g, P^{g²}⟩` perfect)
 
 PowerMonomial.eq_zero_of_sum_powHom_eq_zero  (Lemma D core: Dedekind independence of the
                                               power monomials `a ↦ a^d` on `Fˣ`)
@@ -20846,6 +20848,8 @@ finite group of odd order — satisfies hypothesis (B) for `p = 3`.* -/
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.eq_one_of_closure_eq_top
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.commutator_eq_top_of_relations
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.coe_layerHom
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.mem_layerClosure
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.commutator_layerClosure_eq_top
 #assert_only_allowed_axioms OddOrder.PowerMonomial.eq_zero_of_sum_powHom_eq_zero
 #assert_only_allowed_axioms OddOrder.PowerMonomial.injective_powHom_of_apply_injective
 #assert_only_allowed_axioms OddOrder.PowerMonomial.eq_zero_of_forall_trace_sum_eq_zero
