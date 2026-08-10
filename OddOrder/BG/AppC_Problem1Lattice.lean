@@ -593,6 +593,49 @@ theorem layered_relation_field (data : FieldNormalizerData p q G) (hp : p = 3) {
   exact hrel
 
 
+/-- **The exponent cubes to the identity on the norm-one units.**  Read off the `G`-level
+statement `pow_three_exp_eq_self` through the injectivity of `σ`. -/
+theorem normOneUnits_pow_cube (data : FieldNormalizerData p q G) (hp : p = 3) {e : ℕ}
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    (u : NormSet.normOneUnits p q) : u ^ (e * e * e) = u := by
+  refine SemidirectProduct.inr_injective (data.sigma_injective ?_)
+  rw [map_pow, map_pow]
+  exact pow_three_exp_eq_self data hp hexp (unitElt_mem_U data u)
+
+/-- **Relation (1) of the collision-span obstruction.**  Substituting `t = r^e` into the relation
+family and using `e³ = 1` on the norm-one units,
+
+`d(r) = a(-r^e) · b(-r^{e²})`,
+
+i.e. the third layer at `r` is a product of one element of the first layer and one of the second.
+(`notes/bg/appC_problem1_partial_resolution.md`, step 1 of the criterion.) -/
+theorem layerFieldHom_two_eq (data : FieldNormalizerData p q G) (hp : p = 3) {e : ℕ}
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    (r : NormSet.normOneUnits p q) :
+    layerFieldHom data 2 (Multiplicative.ofAdd
+        (((r : NormSet.normOneUnits p q) : (GaloisField p q)ˣ) : GaloisField p q))
+      = (layerFieldHom data 0 (Multiplicative.ofAdd
+            (((r ^ e : NormSet.normOneUnits p q) : (GaloisField p q)ˣ) : GaloisField p q)))⁻¹ *
+        (layerFieldHom data 1 (Multiplicative.ofAdd
+            (((r ^ (e * e) : NormSet.normOneUnits p q) : (GaloisField p q)ˣ) :
+              GaloisField p q)))⁻¹ := by
+  have hrel := layered_relation_field data hp hexp (r ^ e)
+  have h1 : (r ^ e) ^ (e * e) = r := by
+    rw [← pow_mul, ← mul_assoc]
+    exact normOneUnits_pow_cube data hp hexp r
+  have h2 : (r ^ e) ^ e = r ^ (e * e) := by rw [← pow_mul]
+  rw [h1, h2] at hrel
+  have hone : layerFieldHom data 2 (Multiplicative.ofAdd
+        (((r : NormSet.normOneUnits p q) : (GaloisField p q)ˣ) : GaloisField p q)) *
+      (layerFieldHom data 1 (Multiplicative.ofAdd
+          (((r ^ (e * e) : NormSet.normOneUnits p q) : (GaloisField p q)ˣ) : GaloisField p q)) *
+        layerFieldHom data 0 (Multiplicative.ofAdd
+          (((r ^ e : NormSet.normOneUnits p q) : (GaloisField p q)ˣ) : GaloisField p q))) = 1 := by
+    rw [← mul_assoc]
+    exact hrel
+  rw [eq_inv_iff_mul_eq_one.mpr hone, mul_inv_rev]
+
+
 /-! ### The collision-span endgame
 
 If `σ(P)` normalizes the second layer `σ(P)^g`, the perfect group `N` of Theorem 2 collapses:

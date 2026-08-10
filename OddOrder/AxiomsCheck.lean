@@ -20873,6 +20873,9 @@ layerClosure_eq_closure_two            (**two layers suffice**: `P^{g²}` alread
 conj_s_unitElt / layerFieldHom_apply   (the three layers in *field* coordinates)
   → layered_relation_field             (the relation family as `d(u^{e²})·b(u^e)·a(u) = 1` — the
                                         form the collision-span computation consumes)
+    → layerFieldHom_two_eq             (**relation (1)**: `d(r) = a(-r^e)·b(-r^{e²})`, i.e. the
+                                        third layer at a norm-one point is one element of each of
+                                        the other two)
       → false_of_s_normalizes_layerOne (**the criterion, group side**: it is enough that the
                                         single element `x = σ(1)` normalizes the second layer —
                                         the `σ(U)`-orbit of `x` then spreads it over `σ(P)`.
@@ -20961,4 +20964,6 @@ hypothesis (B) for `p = 3` with `g` centralising `σ(U)`; and for a non-Frobeniu
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conj_s_unitElt
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.layerFieldHom_apply
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.layered_relation_field
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.normOneUnits_pow_cube
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.layerFieldHom_two_eq
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_s_normalizes_layerOne
