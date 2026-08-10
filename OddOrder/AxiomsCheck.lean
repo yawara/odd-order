@@ -20797,6 +20797,7 @@ PowerMonomial.eq_zero_of_sum_powHom_eq_zero  (Lemma D core: Dedekind independenc
 
 injective_pow_mul                      (Lemma D, combinatorial half: `e ∉ A` and `e³ = 1` make
                                         the cosets `A`, `eA`, `e²A` pairwise disjoint)
+  → injective_pow_mul_pow              (the `3q` exponents `e^k·φ^j` are pairwise distinct)
 ```
 
 Lemma A′ is what hypothesis (B) yields — `c = ⁅x, y⁆` lies in the abelian `p'`-subgroup `Q`, so
@@ -20821,3 +20822,4 @@ finite group of odd order — satisfies hypothesis (B) for `p = 3`.* -/
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.pow_three_eq_conj_mul
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.commute_conj_of_le_closure
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.injective_pow_mul
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.injective_pow_mul_pow

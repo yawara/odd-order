@@ -427,6 +427,35 @@ theorem injective_pow_mul {H : Type*} [CommGroup H] {A : Subgroup H} {e : H}
   subst hij
   exact Prod.ext rfl (Subtype.ext (mul_left_cancel hxy))
 
+/-- **The exponent family of Lemma D is injective.**  Let `φ` have order `r` in a commutative
+group and let `ε ∉ ⟨φ⟩` satisfy `ε³ = 1`.  Then
+
+`(k, j) ↦ ε^k · φ^j`  (`k < 3`, `j < r`)
+
+is injective.  Combining `injective_pow_mul` (the three cosets of `⟨φ⟩` are disjoint) with the
+injectivity of `j ↦ φ^j` below the order of `φ`.
+
+For Lemma D one takes the group of units mod `|F| - 1`, `φ = 3` (of order `q`) and `ε = e`: the
+`3q` exponents `e^k · 3^j` are then pairwise incongruent, which is exactly the hypothesis of
+`OddOrder.PowerMonomial.eq_zero_of_forall_trace_sum_eq_zero`. -/
+theorem injective_pow_mul_pow {H : Type*} [CommGroup H] {ε φ : H} {r : ℕ}
+    (he3 : ε ^ 3 = 1) (heφ : ε ∉ Subgroup.zpowers φ) (hr : orderOf φ = r) :
+    Function.Injective fun x : Fin 3 × Fin r => ε ^ (x.1 : ℕ) * φ ^ (x.2 : ℕ) := by
+  have hbase := injective_pow_mul (A := Subgroup.zpowers φ) he3 heφ
+  rintro ⟨k, j⟩ ⟨k', j'⟩ hEq
+  have h : (fun x : Fin 3 × Subgroup.zpowers φ => ε ^ (x.1 : ℕ) * (x.2 : H))
+      (k, ⟨φ ^ (j : ℕ), Subgroup.mem_zpowers_iff.mpr ⟨(j : ℕ), by simp⟩⟩) =
+      (fun x : Fin 3 × Subgroup.zpowers φ => ε ^ (x.1 : ℕ) * (x.2 : H))
+      (k', ⟨φ ^ (j' : ℕ), Subgroup.mem_zpowers_iff.mpr ⟨(j' : ℕ), by simp⟩⟩) := hEq
+  have hpair := hbase h
+  have hk : k = k' := congrArg Prod.fst hpair
+  have hφ : φ ^ (j : ℕ) = φ ^ (j' : ℕ) := congrArg (fun z => (z.2 : H)) hpair
+  have hj : j = j' := by
+    have hjlt : (j : ℕ) < orderOf φ := by rw [hr]; exact j.isLt
+    have hj'lt : (j' : ℕ) < orderOf φ := by rw [hr]; exact j'.isLt
+    exact Fin.ext (pow_injOn_Iio_orderOf hjlt hj'lt hφ)
+  exact Prod.ext hk hj
+
 end CosetSeparation
 
 end OddOrder.BG.AppC.Problem1
