@@ -277,6 +277,44 @@ theorem conj_mul_pow_three_eq_one (data : FieldNormalizerData p q G) (hp : p = 3
   have key := pow_three_mul_pow_three_eq_one hx3 hcomm hg3
   rwa [hxc] at key
 
+/-- The `σ(U)`-orbit of `x` stays inside `σ(P)`: `σ(U)` normalizes `σ(P)` because anything
+normalizing `σ(P)σ(U)` normalizes `σ(P)` (BG Appendix C, Step 3, `P char PU`). -/
+theorem conj_s_mem_P (data : FieldNormalizerData p q G) {v : G} (hv : v ∈ data.U) :
+    v⁻¹ * data.s * v ∈ data.P := by
+  have hvN : v ∈ Subgroup.normalizer (data.P : Set G) :=
+    data.normalizer_P_sup_U_le_normalizer_P
+      (Subgroup.le_normalizer (le_sup_right (a := data.P) hv))
+  exact (Subgroup.mem_normalizer_iff''.mp hvN data.s).mp data.s_mem_P
+
+/-- **The relation family.**  If `g = x^y` centralizes `σ(U)` — the case `e = 1`, which the book's
+remark makes automatic whenever `3 ∤ |Aut U|` — then conjugating `(g x)³ = 1` by `σ(U)` produces
+the whole family
+
+`(g · s)³ = 1` for every `s` in the `σ(U)`-orbit of `x`,
+
+which is exactly the input `hrel` of `commute_conj_of_le_closure`.  Under the identification of
+`σ(P)` with `𝔽_{3^q}` that orbit is the set of squares. -/
+theorem pow_three_mul_conj_eq_one (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hcent : ∀ v ∈ data.U, Commute (MulAut.conj data.y data.s) v) {v : G} (hv : v ∈ data.U) :
+    (MulAut.conj data.y data.s * (v⁻¹ * data.s * v)) ^ 3 = 1 := by
+  have h := conj_mul_pow_three_eq_one data hp
+  have hg : v⁻¹ * MulAut.conj data.y data.s * v = MulAut.conj data.y data.s := by
+    have := (hcent v hv).eq
+    calc v⁻¹ * MulAut.conj data.y data.s * v = v⁻¹ * (MulAut.conj data.y data.s * v) := by
+          rw [mul_assoc]
+      _ = v⁻¹ * (v * MulAut.conj data.y data.s) := by rw [this]
+      _ = MulAut.conj data.y data.s := by group
+  have hconj : (v⁻¹ * (MulAut.conj data.y data.s * data.s) * v) ^ 3
+      = v⁻¹ * (MulAut.conj data.y data.s * data.s) ^ 3 * v := by
+    simp only [pow_succ, pow_zero, one_mul]
+    group
+  have hsplit : v⁻¹ * (MulAut.conj data.y data.s * data.s) * v
+      = MulAut.conj data.y data.s * (v⁻¹ * data.s * v) := by
+    calc v⁻¹ * (MulAut.conj data.y data.s * data.s) * v
+        = (v⁻¹ * MulAut.conj data.y data.s * v) * (v⁻¹ * data.s * v) := by group
+      _ = MulAut.conj data.y data.s * (v⁻¹ * data.s * v) := by rw [hg]
+  rw [← hsplit, hconj, h, mul_one, inv_mul_cancel]
+
 /-- **Theorem 1, assembled.**  In a witness of hypothesis (B) with `p = 3`, the generator
 `x = σ(1)` of `σ(P₀)` cannot commute with its conjugate `x^g`, where `g = x^y` generates
 `σ(P₀)^y`.
