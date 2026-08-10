@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.LinearAlgebra.LinearIndependent.Basic
 import Mathlib.Algebra.Group.Units.Hom
 import Mathlib.LinearAlgebra.LinearIndependent.Lemmas
+import Mathlib.FieldTheory.Finite.Trace
 
 /-!
 # Independence of power monomials on the unit group of a field
@@ -73,5 +74,52 @@ theorem eq_zero_of_sum_powHom_eq_zero {ι : Type*} [Fintype ι] (D : ι → ℕ)
   refine Fintype.linearIndependent_iff.mp hli c ?_
   funext a
   simpa [Finset.sum_apply] using h a
+
+/-! ## Trace forms -/
+
+section Trace
+
+open Finset
+
+variable {K F : Type*} [Field K] [Field F] [Finite F] [Algebra K F]
+
+/-- **Lemma D, analytic core.**  Let `F / K` be an extension of finite fields, let `d : ι → ℕ` be
+exponents and `c : ι → F` coefficients, and suppose the `K`-trace form
+
+`a ↦ ∑ i, Tr_{F/K} (c i · a ^ d i)`
+
+vanishes on every unit of `F`.  If the *expanded* exponent family `d i · |K| ^ j`
+(`j < [F : K]`) consists of pairwise distinct power maps, then every coefficient `c i` is zero.
+
+Expanding the trace as `Tr(x) = ∑_{j < [F:K]} x ^ (|K| ^ j)`
+(`FiniteField.algebraMap_trace_eq_sum_pow`) turns the hypothesis into a vanishing `F`-linear
+combination of the power monomials
+`a ↦ a ^ (d i · |K| ^ j)`, and `eq_zero_of_sum_powHom_eq_zero` kills all of its coefficients
+`c i ^ (|K| ^ j)`; the case `j = 0` is the conclusion.
+
+For BG Appendix C, Problem 1 (issue 0180) this is applied with `K = 𝔽₃`, `ι = Fin 3`,
+`d = ![1, e, e²]`: the expanded exponents are then the three cosets `⟨3⟩`, `e⟨3⟩`, `e²⟨3⟩` in
+`(ZMod (|F| - 1))ˣ`, which are pairwise disjoint exactly when `e ∉ ⟨3⟩`. -/
+theorem eq_zero_of_forall_trace_sum_eq_zero {ι : Type*} [Fintype ι] (d : ι → ℕ) (c : ι → F)
+    (hD : Function.Injective fun x : ι × Fin (Module.finrank K F) =>
+      powHom F (d x.1 * Nat.card K ^ (x.2 : ℕ)))
+    (h : ∀ a : Fˣ, ∑ i, Algebra.trace K F (c i * (a : F) ^ d i) = 0) :
+    ∀ i, c i = 0 := by
+  have hfin : Module.Finite K F := Module.Finite.of_finite
+  have hrpos : 0 < Module.finrank K F := Module.finrank_pos
+  have key : ∀ a : Fˣ, ∑ x : ι × Fin (Module.finrank K F),
+      c x.1 ^ (Nat.card K ^ (x.2 : ℕ)) * (a : F) ^ (d x.1 * Nat.card K ^ (x.2 : ℕ)) = 0 := by
+    intro a
+    have h0 := congrArg (algebraMap K F) (h a)
+    rw [map_sum, map_zero] at h0
+    rw [Fintype.sum_prod_type]
+    refine h0 ▸ Finset.sum_congr rfl fun i _ => ?_
+    rw [FiniteField.algebraMap_trace_eq_sum_pow, ← Fin.sum_univ_eq_sum_range]
+    exact Finset.sum_congr rfl fun j _ => by rw [mul_pow, ← pow_mul]
+  intro i
+  have h0 := eq_zero_of_sum_powHom_eq_zero _ hD _ key (i, ⟨0, hrpos⟩)
+  simpa using h0
+
+end Trace
 
 end OddOrder.PowerMonomial
