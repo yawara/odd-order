@@ -459,7 +459,7 @@ In the application `V` is the additive group of `𝔽_{3^q}`, `A` is the abelian
 `s` in the set of squares: the hypothesis `hspan` is then exactly `L_e = V³`, which holds iff `e`
 is not a power of the Frobenius. -/
 @[to_additive]
-theorem eq_one_of_closure_eq_top {V A : Type*} [CommGroup V] [CommGroup A]
+theorem eq_one_of_closure_eq_top {V A : Type*} [Group V] [CommGroup A]
     (π₀ π₁ π₂ : V →* A) {T : Set (V × V × V)}
     (hT : ∀ t ∈ T, π₀ t.1 * π₁ t.2.1 * π₂ t.2.2 = 1)
     (hspan : Subgroup.closure T = ⊤) :
@@ -504,7 +504,7 @@ images are the three layers `P`, `P^g`, `P^{g²}` generating `N`), and `T` is th
 Frobenius.  A witness of hypothesis (B) with such an `e` therefore contains a non-trivial perfect
 subgroup, so no solvable group — hence, by the odd order theorem, no finite group of odd order —
 can be a witness. -/
-theorem commutator_eq_top_of_relations {V N : Type*} [CommGroup V] [Group N]
+theorem commutator_eq_top_of_relations {V N : Type*} [Group V] [Group N]
     (ι₀ ι₁ ι₂ : V →* N)
     (hgen : Subgroup.closure (Set.range ι₀ ∪ Set.range ι₁ ∪ Set.range ι₂) = ⊤)
     {T : Set (V × V × V)} (hT : ∀ t ∈ T, ι₀ t.1 * ι₁ t.2.1 * ι₂ t.2.2 = 1)
@@ -522,6 +522,28 @@ theorem commutator_eq_top_of_relations {V N : Type*} [CommGroup V] [Group N]
   · obtain ⟨v, rfl⟩ := hx; simpa using hab.1 v
   · obtain ⟨v, rfl⟩ := hx; simpa using hab.2.1 v
   · obtain ⟨v, rfl⟩ := hx; simpa using hab.2.2 v
+
+/-- The `i`-th **layer map** `v ↦ v^{gⁱ}` from a subgroup `P` into a subgroup `N` containing all
+the layers, packaged as a group homomorphism `P →* N`.
+
+These are the `ι_i` of `commutator_eq_top_of_relations`: with `P = σ(P)`, `g = x^y` and
+`N = ⟨P, P^g, P^{g²}⟩`, the twisted relation family `layered_relation_of_exp` says exactly that
+the triples `(x^{v}, x^{v^e}, x^{v^{e²}})` are killed by `ι₀ · ι₁ · ι₂`, so once those triples
+generate `P × P × P` — which is Lemma D's `L_e = V³` — the group `N` is perfect. -/
+noncomputable def layerHom (P N : Subgroup G) (g : G) (i : ℕ)
+    (h : ∀ v ∈ P, (g ^ i)⁻¹ * v * g ^ i ∈ N) : P →* N :=
+  MonoidHom.codRestrict (((MulAut.conj (g ^ i)⁻¹).toMonoidHom).comp P.subtype) N
+    (fun v => by
+      simp only [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, MulAut.conj_apply, inv_inv]
+      exact h v v.2)
+
+@[simp]
+theorem coe_layerHom (P N : Subgroup G) (g : G) (i : ℕ)
+    (h : ∀ v ∈ P, (g ^ i)⁻¹ * v * g ^ i ∈ N) (v : P) :
+    ((layerHom P N g i h v : N) : G) = (g ^ i)⁻¹ * (v : G) * g ^ i := by
+  simp only [layerHom, MonoidHom.codRestrict_apply, MonoidHom.comp_apply,
+    MulEquiv.coe_toMonoidHom, MulAut.conj_apply, inv_inv]
+  rfl
 
 end TheoremTwo
 
