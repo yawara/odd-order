@@ -112,12 +112,13 @@ omit [Algebra.IsSeparable K F] in
 /-- **Lemma D, the annihilator computation.**  If the `3 · [F : K]` expanded exponents
 `d i · |K|ʲ` give pairwise distinct power maps, then a triple `(l, m, n)` whose trace form
 `Tr(l a^{d 0} + m a^{d 1} + n a^{d 2})` vanishes on every unit is zero. -/
-theorem eq_zero_of_forall_trace_triple_eq_zero (d : Fin 3 → ℕ) {l m n : F}
-    (hD : Function.Injective fun x : Fin 3 × Fin (Module.finrank K F) =>
-      powHom F (d x.1 * Nat.card K ^ (x.2 : ℕ)))
+theorem eq_zero_of_forall_trace_triple_eq_zero (d : Fin 3 → ℕ) {l m n : F} {r c : ℕ}
+    (hr : Module.finrank K F = r) (hc : Nat.card K = c)
+    (hD : Function.Injective fun x : Fin 3 × Fin r => powHom F (d x.1 * c ^ (x.2 : ℕ)))
     (h : ∀ a : Fˣ, Algebra.trace K F
       (l * (a : F) ^ d 0 + m * (a : F) ^ d 1 + n * (a : F) ^ d 2) = 0) :
     l = 0 ∧ m = 0 ∧ n = 0 := by
+  subst hr; subst hc
   have hzero := eq_zero_of_forall_trace_sum_eq_zero (K := K) d ![l, m, n] hD (fun a => by
     rw [Fin.sum_univ_three]
     simpa [← map_add] using h a)
@@ -125,13 +126,13 @@ theorem eq_zero_of_forall_trace_triple_eq_zero (d : Fin 3 → ℕ) {l m n : F}
 
 /-- **Lemma D.**  If the `3 · [F : K]` expanded exponents `d i · |K|ʲ` give pairwise distinct power
 maps, the triples `(a^{d 0}, a^{d 1}, a^{d 2})` span `F³` over the base field. -/
-theorem span_triples_eq_top (d : Fin 3 → ℕ)
-    (hD : Function.Injective fun x : Fin 3 × Fin (Module.finrank K F) =>
-      powHom F (d x.1 * Nat.card K ^ (x.2 : ℕ))) :
+theorem span_triples_eq_top (d : Fin 3 → ℕ) {r c : ℕ}
+    (hr : Module.finrank K F = r) (hc : Nat.card K = c)
+    (hD : Function.Injective fun x : Fin 3 × Fin r => powHom F (d x.1 * c ^ (x.2 : ℕ))) :
     Submodule.span K {t : F × F × F |
       ∃ a : Fˣ, t = ((a : F) ^ d 0, (a : F) ^ d 1, (a : F) ^ d 2)} = ⊤ := by
   refine span_eq_top_of_trace_annihilator _ fun l m n hann => ?_
-  refine eq_zero_of_forall_trace_triple_eq_zero d hD fun a => ?_
+  refine eq_zero_of_forall_trace_triple_eq_zero d hr hc hD fun a => ?_
   exact hann _ ⟨a, rfl⟩
 
 /-- **Lemma D on a subgroup covering `Fˣ` up to sign.**  In the application the triples are only
@@ -142,13 +143,13 @@ forces the vanishing on `Fˣ` and Lemma D applies unchanged.
 For `F = 𝔽_{3^q}` the norm-one subgroup is the group of squares, of index two, and `-1` is a
 non-square, so `hcov` holds. -/
 theorem span_triples_subgroup_eq_top (d : Fin 3 → ℕ) (hodd : ∀ i, Odd (d i)) {S : Subgroup Fˣ}
-    (hcov : ∀ a : Fˣ, a ∈ S ∨ -a ∈ S)
-    (hD : Function.Injective fun x : Fin 3 × Fin (Module.finrank K F) =>
-      powHom F (d x.1 * Nat.card K ^ (x.2 : ℕ))) :
+    (hcov : ∀ a : Fˣ, a ∈ S ∨ -a ∈ S) {r c : ℕ}
+    (hr : Module.finrank K F = r) (hc : Nat.card K = c)
+    (hD : Function.Injective fun x : Fin 3 × Fin r => powHom F (d x.1 * c ^ (x.2 : ℕ))) :
     Submodule.span K {t : F × F × F |
       ∃ a ∈ S, t = ((a : F) ^ d 0, (a : F) ^ d 1, (a : F) ^ d 2)} = ⊤ := by
   refine span_eq_top_of_trace_annihilator _ fun l m n hann => ?_
-  refine eq_zero_of_forall_trace_triple_eq_zero d hD fun a => ?_
+  refine eq_zero_of_forall_trace_triple_eq_zero d hr hc hD fun a => ?_
   rcases hcov a with ha | ha
   · exact hann _ ⟨a, ha, rfl⟩
   · have h0 := hann _ ⟨-a, ha, rfl⟩

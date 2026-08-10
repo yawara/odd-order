@@ -38,6 +38,7 @@ one), no Galois module theory, and no separate treatment of `q = 3`.
 
 * `paleySet` — the set `T`.
 * `card_paleySet_lower` — `|F| - 3 ≤ 4 |T|`, via the parametrisation `u ↦ (u - u⁻¹)²`.
+* `isSquare_or_isSquare_neg` — every non-zero element is `±` a square.
 * `addClosure_paleySet_eq_top` — **Lemma B**: `T` generates `(F, +)`.
 -/
 
@@ -70,6 +71,17 @@ theorem not_isSquare_neg_one [Fintype F] (h2 : ringChar F ≠ 2) (h4 : Fintype.c
   rcases (Nat.dvd_prime Nat.prime_two).mp hdvd with h1 | h1
   · exact CharP.ringChar_ne_one h1
   · exact h2 h1
+
+/-- When `|F| ≡ 3 (mod 4)` the non-squares are exactly the negatives of the squares: every non-zero
+element is `±` a square.  (Euler's criterion again: `(-1)^{(|F|-1)/2} = -1`.) -/
+theorem isSquare_or_isSquare_neg [Fintype F] (h2 : ringChar F ≠ 2)
+    (h4 : Fintype.card F % 4 = 3) {a : F} (ha : a ≠ 0) : IsSquare a ∨ IsSquare (-a) := by
+  rcases FiniteField.pow_dichotomy h2 ha with h | h
+  · exact Or.inl ((FiniteField.isSquare_iff h2 ha).mpr h)
+  · refine Or.inr ((FiniteField.isSquare_iff h2 (neg_ne_zero.mpr ha)).mpr ?_)
+    have hodd : Odd (Fintype.card F / 2) := Nat.odd_iff.mpr (by omega)
+    rw [neg_pow, hodd.neg_one_pow, h]
+    ring
 
 /-- **A parametrisation of the Paley set.**  In characteristic three, `(u - u⁻¹)²` and its
 successor `(u + u⁻¹)²` are both squares, and both are nonzero as soon as `u² ≠ 1` and `-1` is not
