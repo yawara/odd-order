@@ -20799,8 +20799,7 @@ conj_mul_pow_three_eq_one              (the bridge: (B) with p = 3 gives (g·x)�
   → layered_relation_of_exp            (the **twisted** relation family, exponent e ≠ 1:
                                         (x^{v^{e²}})^{g²}·(x^{v^e})^g·x^v = 1)
   → not_commute_conj                   (Theorem 1 assembled: in a witness `x` cannot commute
-                                        with `x^g`; only the relation family and the Paley
-                                        spanning lemma are still missing)
+                                        with `x^g`)
 
 eq_zero_of_closure_eq_top              (Theorem 2, linear step: the layer maps die)
   → eq_top_of_generators_mem           (Theorem 2, group step: N is perfect)
@@ -20830,23 +20829,42 @@ fieldMulEquiv / coe_fieldMulEquiv      (`σ(P)` *is* the additive group of `𝔽
 mem_orbitS_iff                         (the orbit `S` in field terms: it is the σ-image of the
                                         norm-one set, so the spanning hypothesis below is
                                         literally Lemma B)
+
+Paley.sub_inv_sq_mem_paleySet          (Lemma B, the parametrisation: `u ↦ (u - u⁻¹)²` lands in
+                                        the Paley set `T` in characteristic three)
+  → Paley.eq_or_of_sub_inv_sq_eq       (its fibres are `{u, -u, u⁻¹, -u⁻¹}`)
+    → Paley.card_paleySet_lower        (hence `|F| - 3 ≤ 4|T|`)
+      → Paley.addClosure_paleySet_eq_top  (**Lemma B**: `T` is disjoint from `-T`, so it
+                                        generates more than a proper subgroup can hold)
+mem_normOneUnits_iff_isSquare          (for `p = 3` the norm is the `(3^q-1)/2`-th power map, so
+                                        the norm-one units are the squares)
+  → le_closure_orbitS                  (**Lemma B transported**: the spanning hypothesis of
+                                        Theorem 1 *holds*)
 false_of_centralizing_of_spanning      (**Theorem 1, assembled**: no witness with `g`
-                                        centralising `σ(U)`, given only the Paley spanning)
+                                        centralising `σ(U)`, given the Paley spanning)
+  → false_of_centralizing              (**Theorem 1, unconditional**: same statement with no
+                                        hypotheses beyond (A) and (B))
 ```
 
 Lemma A′ is what hypothesis (B) yields — `c = ⁅x, y⁆` lies in the abelian `p'`-subgroup `Q`, so
 its conjugates commute for free.  Lemma C is the engine that turns the `σ(U)`-conjugates of
 `(g·x)³ = 1`, taken at `s`, `t` and `s + t` in the set of squares of `𝔽_{3^q}`, into a vanishing
-cross-commutator.  Together with the Paley-type spanning lemma (not formalized: its general-`q`
-form needs a Weil bound) they give: *no solvable group — hence, by the odd order theorem, no
-finite group of odd order — satisfies hypothesis (B) for `p = 3`.* -/
+cross-commutator.  Lemma B — the Paley-type spanning that feeds it — needs no Weil bound: `T` is
+disjoint from `-T`, and that alone makes it too big for a proper subgroup.  Together they give:
+*no solvable group — hence, by the odd order theorem, no finite group of odd order — satisfies
+hypothesis (B) for `p = 3` with `g` centralising `σ(U)`; and for a non-Frobenius exponent (Theorem
+2) the group `⟨P, P^g, P^{g²}⟩` is perfect, so again no solvable witness exists.* -/
 
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.Problem1.pow_three_mul_eq_pow_three_of_commute
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.pow_three_mul_pow_three_eq_one
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.inv_mul_pow_three_eq_one_of_commute_conj
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.cross_commute_of_three_relations
-#assert_only_allowed_axioms OddOrder.Paley.sum_add_inv_add_one
+#assert_only_allowed_axioms OddOrder.Paley.not_isSquare_neg_one
+#assert_only_allowed_axioms OddOrder.Paley.sub_inv_sq_mem_paleySet
+#assert_only_allowed_axioms OddOrder.Paley.eq_or_of_sub_inv_sq_eq
+#assert_only_allowed_axioms OddOrder.Paley.card_paleySet_lower
+#assert_only_allowed_axioms OddOrder.Paley.addClosure_paleySet_eq_top
 #assert_only_allowed_axioms AddSubgroup.toZModSubmodule_closure
 #assert_only_allowed_axioms Submodule.span_eq_top_iff_closure_eq_top
 #assert_only_allowed_axioms OddOrder.BG.AppC.inr_inv_mul_inl_mul_inr
@@ -20880,3 +20898,6 @@ finite group of odd order — satisfies hypothesis (B) for `p = 3`.* -/
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.coe_fieldMulEquiv
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.mem_orbitS_iff
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_centralizing_of_spanning
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.mem_normOneUnits_iff_isSquare
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.le_closure_orbitS
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_centralizing

@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.Algebra.Group.Commute.Defs
 import Mathlib.Algebra.Group.Basic
 import OddOrder.Algebra.PowerMonomialIndependence
+import OddOrder.Algebra.PaleySpanning
 import OddOrder.BG.AppC_LemmaC3_ConjugateLine
 
 /-!
@@ -932,6 +933,131 @@ theorem false_of_centralizing_of_spanning (data : FieldNormalizerData p q G) (hp
   exact not_commute_conj data hp (Commute.symm (by
     have := hcomm
     exact this.symm))
+
+/-! ### Lemma B: discharging the spanning hypothesis -/
+
+/-- **For `p = 3` the norm-one units are exactly the nonzero squares.**  The BG norm
+`N(x) = ∏_{i<q} x^{3^i}` is the `(3^q - 1)/2`-th power map, so this is Euler's criterion.
+
+This is what turns the `σ(U)`-orbit of `x` (`mem_orbitS_iff`) into the set of squares of
+`𝔽_{3^q}`, i.e. the set `S` of `notes/bg/appC_problem1_partial_resolution.md`. -/
+theorem mem_normOneUnits_iff_isSquare (hp : p = 3) (hq : q ≠ 0) (u : (GaloisField p q)ˣ) :
+    u ∈ NormSet.normOneUnits p q ↔ IsSquare ((u : GaloisField p q)) := by
+  subst hp
+  letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
+  haveI : CharP (GaloisField 3 q) 3 := by
+    rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
+    exact ZMod.charP 3
+  have hcard : Fintype.card (GaloisField 3 q) = 3 ^ q := by
+    rw [← Nat.card_eq_fintype_card]
+    exact GaloisField.card 3 q hq
+  have hchar2 : ringChar (GaloisField 3 q) ≠ 2 := by
+    rw [ringChar.eq (GaloisField 3 q) 3]
+    norm_num
+  have hnorm : NormSet.normN 3 q (u : GaloisField 3 q) =
+      (u : GaloisField 3 q) ^ (Fintype.card (GaloisField 3 q) / 2) := by
+    rw [NormSet.normN, Finset.prod_pow_eq_pow_sum, hcard]
+    congr 1
+    have hgeom : ∑ i ∈ Finset.range q, 3 ^ i = (3 ^ q - 1) / (3 - 1) :=
+      Nat.geomSum_eq (by norm_num) q
+    have hodd : 3 ^ q % 2 = 1 := Nat.odd_iff.mp (Odd.pow (by decide))
+    omega
+  rw [NormSet.mem_normOneUnits_iff_normN 3 q hq u, hnorm,
+    ← FiniteField.isSquare_iff hchar2 u.ne_zero]
+
+/-- **Lemma B, transported into `G`.**  For `p = 3` the spanning hypothesis of
+`false_of_centralizing_of_spanning` *holds*: the elements `s` of the `σ(U)`-orbit of `x` with
+`s · x` again in the orbit generate `σ(P)`.
+
+Through `mem_orbitS_iff` and `mem_normOneUnits_iff_isSquare` the generating set is the image of
+the Paley set `T = {a : a and a + 1 are nonzero squares}` of `𝔽_{3^q}`, which generates the
+additive group by `OddOrder.Paley.addClosure_paleySet_eq_top`.  Condition (A) supplies the two
+numerical inputs of that lemma: `q ∤ p - 1 = 2` makes `q` odd, hence `|F| = 3^q ≡ 3 (mod 4)` and
+`|F| ≥ 27`. -/
+theorem le_closure_orbitS (data : FieldNormalizerData p q G) (hp : p = 3) :
+    data.P ≤ Subgroup.closure {s | s ∈ orbitS data ∧ s * data.s ∈ orbitS data} := by
+  classical
+  letI : Fintype (GaloisField p q) := Fintype.ofFinite _
+  have hq0 : q ≠ 0 := data.q_prime.pos.ne'
+  have hcard : Fintype.card (GaloisField p q) = p ^ q := by
+    rw [← Nat.card_eq_fintype_card]
+    exact GaloisField.card p q hq0
+  -- condition (A) forces `q` to be odd
+  have hqodd : Odd q := by
+    have hnd : ¬ q ∣ (p - 1) :=
+      (NormSet.conditionA_iff_not_dvd p q (Fact.out : p.Prime).two_le data.q_prime).mp
+        data.cyclotomic_coprime
+    refine data.q_prime.odd_of_ne_two fun h2 => hnd ?_
+    rw [h2, hp]
+  have hq3 : 3 ≤ q := by
+    have h2 : 2 ≤ q := data.q_prime.two_le
+    rcases hqodd with ⟨k, hk⟩
+    omega
+  haveI : CharP (GaloisField p q) p := by
+    rw [← Algebra.charP_iff (ZMod p) (GaloisField p q) p]
+    exact ZMod.charP p
+  have h3 : ringChar (GaloisField p q) = 3 := by
+    rw [ringChar.eq (GaloisField p q) p, hp]
+  have h4 : Fintype.card (GaloisField p q) % 4 = 3 := by
+    rw [hcard, hp]
+    obtain ⟨k, hk⟩ := hqodd
+    subst hk
+    rw [pow_succ, pow_mul, Nat.mul_mod, Nat.pow_mod]
+    norm_num
+  have h9 : 9 < Fintype.card (GaloisField p q) := by
+    rw [hcard, hp]
+    calc (9 : ℕ) < 3 ^ 3 := by norm_num
+      _ ≤ 3 ^ q := Nat.pow_le_pow_right (by norm_num) hq3
+  set K : Subgroup G := Subgroup.closure {s | s ∈ orbitS data ∧ s * data.s ∈ orbitS data} with hK
+  -- every element of the Paley set maps into the generating set
+  have hmemK : ∀ a : GaloisField p q, a ∈ Paley.paleySet (GaloisField p q) →
+      fieldHom data (Multiplicative.ofAdd a) ∈ K := by
+    rintro a ⟨ha0, hasq, ha10, ha1sq⟩
+    refine Subgroup.subset_closure ⟨?_, ?_⟩
+    · rw [mem_orbitS_iff]
+      refine ⟨⟨Units.mk0 a ha0, (mem_normOneUnits_iff_isSquare hp hq0 _).mpr (by simpa using
+        hasq)⟩, ?_⟩
+      simp [fieldHom]
+    · have hmul : fieldHom data (Multiplicative.ofAdd a) * data.s =
+          fieldHom data (Multiplicative.ofAdd (a + 1)) := by
+        rw [FieldNormalizerData.s, primeLineGenerator, fieldHom]
+        simp only [MonoidHom.coe_comp, Function.comp_apply]
+        rw [← map_mul data.sigma, ← map_mul SemidirectProduct.inl, ← ofAdd_add]
+      rw [hmul, mem_orbitS_iff]
+      refine ⟨⟨Units.mk0 (a + 1) ha10, (mem_normOneUnits_iff_isSquare hp hq0 _).mpr (by simpa using
+        ha1sq)⟩, ?_⟩
+      simp [fieldHom]
+  -- the preimage of `K` is an additive subgroup of the field containing the Paley set
+  let A : AddSubgroup (GaloisField p q) :=
+    { carrier := {a | fieldHom data (Multiplicative.ofAdd a) ∈ K}
+      zero_mem' := by simp
+      add_mem' := fun {a b} ha hb => by
+        simp only [Set.mem_setOf_eq, ofAdd_add, map_mul] at *
+        exact K.mul_mem ha hb
+      neg_mem' := fun {a} ha => by
+        simp only [Set.mem_setOf_eq, ofAdd_neg, map_inv] at *
+        exact K.inv_mem ha }
+  have hAtop : A = ⊤ := by
+    rw [eq_top_iff, ← Paley.addClosure_paleySet_eq_top (F := GaloisField p q) h3 h4 h9,
+      AddSubgroup.closure_le]
+    exact hmemK
+  intro x hx
+  rw [← fieldHom_range data] at hx
+  obtain ⟨a, rfl⟩ := hx
+  have hmem : Multiplicative.toAdd a ∈ A := hAtop ▸ AddSubgroup.mem_top _
+  exact hmem
+
+/-- **Theorem 1 (centralising case), unconditional.**  There is no witness of BG Appendix C,
+hypothesis (B), for `p = 3` in which `g = x^y` centralises `σ(U)`.
+
+This is the `e = 1` half of Theorem 1 of `notes/bg/appC_problem1_partial_resolution.md`, now with
+*no* hypotheses beyond (A) and (B): the Paley-type spanning it used to assume is
+`le_closure_orbitS`.  By the book's remark (Glauberman--Norton p. 1094) the centralising case is
+automatic whenever `3 ∤ |Aut U| = φ((3^q - 1)/2)`, so this settles hypothesis (B) outright for
+`q = 5, 11, 17, 23, 37, 43, …`. -/
+theorem false_of_centralizing (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hcent : ∀ v ∈ data.U, Commute (MulAut.conj data.y data.s) v) : False :=
+  false_of_centralizing_of_spanning data hp hcent (le_closure_orbitS data hp)
 
 end Assembled
 
