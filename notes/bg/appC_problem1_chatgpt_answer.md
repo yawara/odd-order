@@ -47,7 +47,7 @@ witness `(G, σ, Q, y)` があるとして `g = x^y`, `c = x^{-1}g` とおく。
 ## 先方の追加主張 (こちらで未検証 ⚠ / 一部は不要になった)
 
 * **`q = 5`: 不可能。** ACE で `[Γ:H] = 729`, `|Γ| = 21434787`, `z` の位数 3。
-  ⚠ 未検証。**ただし下記の人手証明で `q = 5` は計算なしに従う** ([`appC_problem1_centralizing_case.md`](appC_problem1_centralizing_case.md))
+  ⚠ 未検証。**ただし下記の人手証明で `q = 5` は計算なしに従う** ([`appC_problem1_partial_resolution.md`](appC_problem1_partial_resolution.md))
   ので、独立に確認済とみなしてよい。
 * **`q = 7`: 不可能。** `e = 1` は同じ飽和論法。`e = 151, 941` は「ACE が index 3 を出し、
   埋め込みがあれば `H ◁ Γ` になるが、`H` の自己同型が誘導できる指数は `⟨3⟩ ≤ (Z/1093)^×`
@@ -76,4 +76,4 @@ witness `(G, σ, Q, y)` があるとして `g = x^y`, `c = x^{-1}g` とおく。
   こちらの `verify_gn.g` で果たした (Todd–Coxeter が完走し `|Γ_e|` が確定するので、
   `z` の位数は有限群の中で直接計算される)。
 * この回答から出発して、こちらで**一般の奇素数 `q` に対する人手証明** (中心化作用の場合) を
-  得た → [`appC_problem1_centralizing_case.md`](appC_problem1_centralizing_case.md)。
+  得た → [`appC_problem1_partial_resolution.md`](appC_problem1_partial_resolution.md)。

@@ -16,3 +16,44 @@
 (B) q = 13  |F| = 1594323  |T| = 398580 (expected 398580: true)  rank_F3(T) = 13 / 13  spans = true
 (C) q = 3  |Gamma_1| = 28431  order(z) = 3  [x, x^g] = 1 ? true  (g*x)^3 = 1 ? true
     (S4) pairs with s,t,s+t in S violating [t, s^g] = 1 : 0
+
+## verify_noncentral.g — e ∉ <3> の関係格子と指数
+           ^^^^^^^^^^^^^^^^^^^
+--- (I) relation lattice ---
+q=3  n=13   #{e : ord(e)=3} = 2
+      e=3   e in <3> ? true   dim L_e = 3 / 9   FULL ? false
+      e=9   e in <3> ? true   dim L_e = 3 / 9   FULL ? false
+      ==> all order-3 exponents give FULL lattice ? false
+q=5  n=121   3 does not divide phi(n)  ==> only e=1 (settled by hand)
+q=7  n=1093   #{e : ord(e)=3} = 2
+      e=151   e in <3> ? false   dim L_e = 21 / 21   FULL ? true
+      e=941   e in <3> ? false   dim L_e = 21 / 21   FULL ? true
+      ==> all order-3 exponents give FULL lattice ? true
+q=13  n=797161   #{e : ord(e)=3} = 2
+      e=356562   e in <3> ? false   dim L_e = 39 / 39   FULL ? true
+      e=440598   e in <3> ? false   dim L_e = 39 / 39   FULL ? true
+      ==> all order-3 exponents give FULL lattice ? true
+q=19  n=581130733   #{e : ord(e)=3} = 8
+      e=302055   e in <3> ? false   dim L_e = 57 / 57   FULL ? true
+      e=71020188   e in <3> ? false   dim L_e = 57 / 57   FULL ? true
+      e=143008378   e in <3> ? false   dim L_e = 57 / 57   FULL ? true
+      e=214028565   e in <3> ? false   dim L_e = 57 / 57   FULL ? true
+      e=367102167   e in <3> ? false   dim L_e = 57 / 57   FULL ? true
+      e=438424411   e in <3> ? false   dim L_e = 57 / 57   FULL ? true
+      e=509808490   e in <3> ? false   dim L_e = 57 / 57   FULL ? true
+      e=580828677   e in <3> ? false   dim L_e = 57 / 57   FULL ? true
+      ==> all order-3 exponents give FULL lattice ? true
+q=29  n=34315188682441   #{e : ord(e)=3} = 2
+      e=10851184871233   e in <3> ? false   dim L_e = 87 / 87   FULL ? true
+      e=27517565890213   e in <3> ? false   dim L_e = 87 / 87   FULL ? true
+      ==> all order-3 exponents give FULL lattice ? true
+q=31  n=308836698141973   #{e : ord(e)=3} = 2
+      e=57792014272514   e in <3> ? false   dim L_e = 93 / 93   FULL ? true
+      e=249519646070254   e in <3> ? false   dim L_e = 93 / 93   FULL ? true
+      ==> all order-3 exponents give FULL lattice ? true
+q=41  n=18236498188585393201   #{e : ord(e)=3} = 2
+      e=536353372228279264   e in <3> ? false   dim L_e = 123 / 123   FULL ? true
+      e=10057858016290394805   e in <3> ? false   dim L_e = 123 / 123   FULL ? true
+      ==> all order-3 exponents give FULL lattice ? true
+--- (II) index of H in the universal completion ---
+q=7  e=151   [Gamma_e : H] = 3
