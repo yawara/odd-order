@@ -193,6 +193,24 @@ f(a) = Tr(λa) + Tr(μ a^{ẽ}) + Tr(ν a^{ẽ²}) = Σ_j λ^{3^j} a^{3^j} + Σ_
    `U` を素冪成分に分解した表示にすれば軽くなるはず)。
 3. `c ∈ Q` が 3′-元であることは定理 2 では未使用。これを組み合わせる余地がある。
 
+## Lean 形式化 (2026-08-10)
+
+部分解決のうち**確定した数学**は形式化済み。leaf =
+[`OddOrder/BG/AppC_Problem1.lean`](../../OddOrder/BG/AppC_Problem1.lean) +
+[`OddOrder/Algebra/PowerMonomialIndependence.lean`](../../OddOrder/Algebra/PowerMonomialIndependence.lean)。
+全て AxiomsCheck 登録済 (allowlist のみ)、フルビルド green。対応表は
+[issue 0180](../../issues/0180-bg-appc-problem1-p-eq-three.md) の「Lean 形式化の状況」節。
+
+要点:
+
+* **定理 1** は解析的入力 (補題 B = Paley 集合の張り生成、Weil 評価) を仮説に置いた形で
+  `commute_conj_of_le_closure` として完全に証明済み。「関係式の族 + 張り生成 ⟹ 交差交換子が消える」
+  という中身は全部群論なので、そこは Lean 上で閉じている。
+* **定理 2** は `commutator_eq_top_of_relations` で結論 (`commutator N = ⊤`) まで到達。
+  仮説は「関係格子 `T` が `V³` を生成する」だけで、これは補題 D で `e ∉ ⟨3⟩` と同値。
+* **補題 D** は両半分 (解析的 = trace 展開 + Dedekind 独立性、組合せ的 = 剰余類分離) が
+  それぞれ証明済み。残るのは両者を `(ZMod (Q−1))ˣ` の巡回性で繋ぐ配線だけ。
+
 ## 検証スクリプト
 
 * [`../meta/gap/verify_gn.g`](../meta/gap/verify_gn.g) — `q = 3` の `Γ_e` の位数と `z` の位数

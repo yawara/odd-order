@@ -226,14 +226,18 @@ Gersten–Stallings の非球面条件 `Σ 1/m_v ≤ 1` による自動的な発
 | 数学 | Lean | 状態 |
 |---|---|---|
 | 補題 A′ `(xcx)³ = (xc)³` | `Problem1.pow_three_mul_eq_pow_three_of_commute` | ✅ |
+| `(xc)³` の層分解 | `Problem1.pow_three_eq_conj_mul` | ✅ |
 | 仮説 (B) ⟹ `(g·x)³ = 1` | `Problem1.conj_mul_pow_three_eq_one` | ✅ |
 | 補題 C (3 層消去) | `Problem1.cross_commute_of_three_relations` | ✅ |
-| 定理 2 線形段 | `Problem1.eq_zero_of_closure_eq_top` | ✅ |
-| 定理 2 群段 (完全群) | `Problem1.eq_top_of_generators_mem` | ✅ |
-| 補題 D 核 (Dedekind 独立性) | `PowerMonomial.eq_zero_of_sum_powHom_eq_zero` | ✅ |
-| `R(s)` の族 (`P ≅ F` と `U`-共役) | — | ⬜ 未 |
+| **定理 1 のエンジン** (関係式族+張り生成 ⟹ 交差交換子消滅) | `Problem1.commute_conj_of_le_closure` | ✅ |
+| 定理 2 線形段 (乗法版、`to_additive`) | `Problem1.eq_one_of_closure_eq_top` | ✅ |
+| 定理 2 群段 | `Problem1.eq_top_of_generators_mem` | ✅ |
+| **定理 2 の結論** (`commutator N = ⊤`) | `Problem1.commutator_eq_top_of_relations` | ✅ |
+| 補題 D 解析的半分 (trace 展開 + Dedekind) | `PowerMonomial.eq_zero_of_forall_trace_sum_eq_zero` | ✅ |
+| 補題 D 組合せ的半分 (剰余類分離) | `Problem1.injective_pow_mul` | ✅ |
 | 補題 B (Paley 型の張り生成) | — | ⬜ 未 (一般 `q` は Weil 評価が要る) |
-| 補題 D 本体 (trace 展開 + 剰余類) | — | ⬜ 未 |
+| `R(s)` の族 (`P ≅ F` と `U`-共役の具体化) | — | ⬜ 未 (抽象形は上のエンジンに入っている) |
+| 補題 D の 2 半分を繋ぐ配線 | — | ⬜ 未 (`(ZMod (Q−1))ˣ` の巡回性) |
 
 ## 次にやるとしたら (2026-08-10 更新)
 
