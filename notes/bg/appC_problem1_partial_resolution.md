@@ -208,8 +208,10 @@ f(a) = Tr(λa) + Tr(μ a^{ẽ}) + Tr(ν a^{ẽ²}) = Σ_j λ^{3^j} a^{3^j} + Σ_
   すべて証明済み。内訳: 関係式の族 `pow_three_mul_conj_eq_one` → エンジン
   `commute_conj_of_le_closure` (Frobenius 捻り版 `..._twisted` の特殊化) → 最後の一マイル
   `inv_mul_pow_three_eq_one_of_commute_conj` → 矛盾 `not_commute_conj`。
-* **定理 2** は `commutator_eq_top_of_relations` で結論 (`commutator N = ⊤`) まで到達。
-  仮説は「関係格子 `T` が `V³` を生成する」だけで、これは補題 D で `e ∉ ⟨3⟩` と同値。
+* **定理 2** も ambient 群の形 `commutator_layerClosure_eq_top` まで閉じた。層写像の半線形性
+  (`conj_layer_of_exp`) から捻れた関係式族 `layered_relation_of_exp` を作り、それを層写像
+  `layerHom` 経由で `commutator_eq_top_of_relations` に食わせる。残る仮説は「関係格子 `T` が
+  `P × P × P` を生成する」だけで、これは補題 D により `e ∉ ⟨3⟩` と同値。
 * **補題 D** は両半分 (解析的 = trace 展開 + Dedekind 独立性、組合せ的 = 剰余類分離) が
   それぞれ証明済み。残るのは両者を `(ZMod (Q−1))ˣ` の巡回性で繋ぐ配線だけ。
 

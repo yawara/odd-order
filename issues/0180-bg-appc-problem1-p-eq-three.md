@@ -244,9 +244,13 @@ Gersten–Stallings の非球面条件 `Σ 1/m_v ≤ 1` による自動的な発
 | 補題 D 解析的半分 (trace 展開 + Dedekind) | `PowerMonomial.eq_zero_of_forall_trace_sum_eq_zero` | ✅ |
 | 補題 D 組合せ的半分 (剰余類分離) | `Problem1.injective_pow_mul` | ✅ |
 | 補題 D 指数族の単射性 | `Problem1.injective_pow_mul_pow` | ✅ |
+| 層写像の半線形性 (`e ≠ 1` の要) | `Problem1.conj_layer_of_exp` / `..._two_of_exp` | ✅ |
+| **捻れた関係式族 `R(s)`** (`e ≠ 1`) | `Problem1.layered_relation_of_exp` | ✅ |
+| 層写像 `ι_i : ↥P →* ↥N` | `Problem1.layerHom` / `coe_layerHom` | ✅ |
+| **🎯 定理 2 (ambient 形)** (`N` が完全群) | `Problem1.commutator_layerClosure_eq_top` | ✅ |
+| 補題 D の配線 (単位 → 冪写像の相異性) | `Problem1.injective_powHom_pow_mul_pow` | ✅ |
 | **補題 B (Paley 型の張り生成)** | — | ⬜ **未** (一般 `q` は Weil 評価が要る。定理 1 の唯一の残り) |
-| 定理 2 側の `R(s)` 族 (`e ≠ 1` の捻り) の具体化 | — | ⬜ 未 |
-| 補題 D の 2 半分を繋ぐ配線 | — | ⬜ 未 (`(ZMod (Q−1))ˣ` の巡回性) |
+| 関係格子の張り生成を具体的な `σ(P)` に接続 | — | ⬜ 未 (定理 2 の唯一の残り) |
 
 ## 次にやるとしたら (2026-08-10 更新)
 
