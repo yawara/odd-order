@@ -20776,6 +20776,8 @@ resolution whose two elementary group-theoretic steps are formalized here:
 pow_three_mul_eq_pow_three_of_commute  (Lemma A′: (xcx)³ = (xc)³ when c commutes with c^x)
   → pow_three_mul_pow_three_eq_one     (hypothesis (B) forces (g·x)³ = 1 for g = x^y)
 cross_commute_of_three_relations       (Lemma C: the three-layer cancellation)
+
+conj_mul_pow_three_eq_one              (the bridge: (B) with p = 3 gives (g·x)³ = 1)
 ```
 
 Lemma A′ is what hypothesis (B) yields — `c = ⁅x, y⁆` lies in the abelian `p'`-subgroup `Q`, so
@@ -20789,3 +20791,4 @@ finite group of odd order — satisfies hypothesis (B) for `p = 3`.* -/
   OddOrder.BG.AppC.Problem1.pow_three_mul_eq_pow_three_of_commute
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.pow_three_mul_pow_three_eq_one
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.cross_commute_of_three_relations
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conj_mul_pow_three_eq_one

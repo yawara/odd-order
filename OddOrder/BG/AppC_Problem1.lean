@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Group.Commute.Defs
 import Mathlib.Algebra.Group.Basic
+import OddOrder.BG.AppC_LemmaC3_ConjugateLine
 
 /-!
 # BG Appendix C, Problem 1: the group-theoretic core
@@ -152,5 +153,59 @@ theorem cross_commute_of_three_relations (ha : a₂ * a₁ * a₀ = 1) (hb : b�
   exact mul_right_cancel step₂
 
 end LemmaC
+
+section Witness
+
+variable {p q : ℕ} [Fact p.Prime] {G : Type*} [Group G]
+
+/-- **The single relation hypothesis (B) yields**, for `p = 3`.
+
+Let `data` be a witness of BG Appendix C, hypothesis (B), let `x = σ(1)` be the distinguished
+generator of `σ(P₀)` (`FieldNormalizerData.s`) and let `g = x^y` be its conjugate by the element
+`y ∈ Q`, so that `⟨g⟩ = σ(P₀)^y` is the subgroup (B) requires to normalize `σ(U)`.  Then
+
+`(g * x)³ = 1`.
+
+Both `g` and `x` have order three, so the assertion is that their *product* again has order
+dividing three.  Nothing else about (B) is used downstream: conjugating this one relation by
+`σ(U)` produces the whole family that drives the partial resolution of Problem 1 recorded in
+`notes/bg/appC_problem1_partial_resolution.md`.
+
+The proof is `pow_three_mul_pow_three_eq_one` applied to `c = x⁻¹g = ⁅x, y⁆`: since `x`
+normalizes `Q` and `y ∈ Q` the element `c` lies in `Q`, and `Q` is abelian, so `c` commutes with
+its conjugate `x⁻¹cx ∈ Q`. -/
+theorem conj_mul_pow_three_eq_one (data : FieldNormalizerData p q G) (hp : p = 3) :
+    (MulAut.conj data.y data.s * data.s) ^ 3 = 1 := by
+  subst hp
+  have hx3 : data.s ^ 3 = 1 := by
+    rw [FieldNormalizerData.s, ← map_pow, primeLineGenerator_pow_p, map_one]
+  -- `x` normalizes `Q`, so conjugation by it preserves `Q`.
+  have hxn : data.s ∈ Subgroup.normalizer (data.Q : Set G) :=
+    data.W2_normalizes_Q data.s_mem_W2
+  have hconj : ∀ z ∈ data.Q, data.s⁻¹ * z * data.s ∈ data.Q := fun z hz =>
+    (Subgroup.mem_normalizer_iff''.mp hxn z).mp hz
+  -- `c = x⁻¹ g = ⁅x, y⁆` lies in `Q`.
+  have hcQ : data.s⁻¹ * MulAut.conj data.y data.s ∈ data.Q := by
+    have h1 : data.s⁻¹ * data.y * data.s ∈ data.Q := hconj data.y data.y_mem_Q
+    have h2 : data.s⁻¹ * MulAut.conj data.y data.s
+        = (data.s⁻¹ * data.y * data.s) * data.y⁻¹ := by
+      simp only [MulAut.conj_apply]
+      group
+    rw [h2]
+    exact data.Q.mul_mem h1 (data.Q.inv_mem data.y_mem_Q)
+  have hcxQ : data.s⁻¹ * (data.s⁻¹ * MulAut.conj data.y data.s) * data.s ∈ data.Q :=
+    hconj _ hcQ
+  have hcomm : Commute (data.s⁻¹ * MulAut.conj data.y data.s)
+      (data.s⁻¹ * (data.s⁻¹ * MulAut.conj data.y data.s) * data.s) :=
+    data.Q_mul_comm hcQ hcxQ
+  -- `x * c = g` has order dividing three, being a conjugate of `x`.
+  have hxc : data.s * (data.s⁻¹ * MulAut.conj data.y data.s) = MulAut.conj data.y data.s := by
+    group
+  have hg3 : (data.s * (data.s⁻¹ * MulAut.conj data.y data.s)) ^ 3 = 1 := by
+    rw [hxc, ← map_pow, hx3, map_one]
+  have key := pow_three_mul_pow_three_eq_one hx3 hcomm hg3
+  rwa [hxc] at key
+
+end Witness
 
 end OddOrder.BG.AppC.Problem1
