@@ -630,7 +630,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 20800
+set_option linter.style.longFile 21000
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -20778,6 +20778,9 @@ pow_three_mul_eq_pow_three_of_commute  (Lemma A′: (xcx)³ = (xc)³ when c comm
 cross_commute_of_three_relations       (Lemma C: the three-layer cancellation)
 
 conj_mul_pow_three_eq_one              (the bridge: (B) with p = 3 gives (g·x)³ = 1)
+
+eq_zero_of_closure_eq_top              (Theorem 2, linear step: the layer maps die)
+  → eq_top_of_generators_mem           (Theorem 2, group step: N is perfect)
 ```
 
 Lemma A′ is what hypothesis (B) yields — `c = ⁅x, y⁆` lies in the abelian `p'`-subgroup `Q`, so
@@ -20792,3 +20795,5 @@ finite group of odd order — satisfies hypothesis (B) for `p = 3`.* -/
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.pow_three_mul_pow_three_eq_one
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.cross_commute_of_three_relations
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conj_mul_pow_three_eq_one
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.eq_zero_of_closure_eq_top
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.eq_top_of_generators_mem
