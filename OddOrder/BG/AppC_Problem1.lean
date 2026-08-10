@@ -225,6 +225,24 @@ section Witness
 
 variable {p q : ℕ} [Fact p.Prime] {G : Type*} [Group G]
 
+/-- Conjugation by the generator `x = σ(1)` of `σ(P₀)` preserves `Q`, since `σ(P₀)` normalizes
+`Q` by hypothesis (B). -/
+theorem conj_mem_Q (data : FieldNormalizerData p q G) (z : G) (hz : z ∈ data.Q) :
+    data.s⁻¹ * z * data.s ∈ data.Q :=
+  (Subgroup.mem_normalizer_iff''.mp (data.W2_normalizes_Q data.s_mem_W2) z).mp hz
+
+/-- The commutator `c = x⁻¹ · x^y = ⁅x, y⁆` lies in `Q`: it is the product of `x⁻¹ y x ∈ Q` and
+`y⁻¹ ∈ Q`. -/
+theorem inv_mul_conj_mem_Q (data : FieldNormalizerData p q G) :
+    data.s⁻¹ * MulAut.conj data.y data.s ∈ data.Q := by
+  have h1 : data.s⁻¹ * data.y * data.s ∈ data.Q := conj_mem_Q data data.y data.y_mem_Q
+  have h2 : data.s⁻¹ * MulAut.conj data.y data.s
+      = (data.s⁻¹ * data.y * data.s) * data.y⁻¹ := by
+    simp only [MulAut.conj_apply]
+    group
+  rw [h2]
+  exact data.Q.mul_mem h1 (data.Q.inv_mem data.y_mem_Q)
+
 /-- **The single relation hypothesis (B) yields**, for `p = 3`.
 
 Let `data` be a witness of BG Appendix C, hypothesis (B), let `x = σ(1)` be the distinguished
@@ -246,32 +264,53 @@ theorem conj_mul_pow_three_eq_one (data : FieldNormalizerData p q G) (hp : p = 3
   subst hp
   have hx3 : data.s ^ 3 = 1 := by
     rw [FieldNormalizerData.s, ← map_pow, primeLineGenerator_pow_p, map_one]
-  -- `x` normalizes `Q`, so conjugation by it preserves `Q`.
-  have hxn : data.s ∈ Subgroup.normalizer (data.Q : Set G) :=
-    data.W2_normalizes_Q data.s_mem_W2
-  have hconj : ∀ z ∈ data.Q, data.s⁻¹ * z * data.s ∈ data.Q := fun z hz =>
-    (Subgroup.mem_normalizer_iff''.mp hxn z).mp hz
-  -- `c = x⁻¹ g = ⁅x, y⁆` lies in `Q`.
-  have hcQ : data.s⁻¹ * MulAut.conj data.y data.s ∈ data.Q := by
-    have h1 : data.s⁻¹ * data.y * data.s ∈ data.Q := hconj data.y data.y_mem_Q
-    have h2 : data.s⁻¹ * MulAut.conj data.y data.s
-        = (data.s⁻¹ * data.y * data.s) * data.y⁻¹ := by
-      simp only [MulAut.conj_apply]
-      group
-    rw [h2]
-    exact data.Q.mul_mem h1 (data.Q.inv_mem data.y_mem_Q)
+  have hcQ := inv_mul_conj_mem_Q data
   have hcxQ : data.s⁻¹ * (data.s⁻¹ * MulAut.conj data.y data.s) * data.s ∈ data.Q :=
-    hconj _ hcQ
+    conj_mem_Q data _ hcQ
   have hcomm : Commute (data.s⁻¹ * MulAut.conj data.y data.s)
       (data.s⁻¹ * (data.s⁻¹ * MulAut.conj data.y data.s) * data.s) :=
     data.Q_mul_comm hcQ hcxQ
-  -- `x * c = g` has order dividing three, being a conjugate of `x`.
   have hxc : data.s * (data.s⁻¹ * MulAut.conj data.y data.s) = MulAut.conj data.y data.s := by
     group
   have hg3 : (data.s * (data.s⁻¹ * MulAut.conj data.y data.s)) ^ 3 = 1 := by
     rw [hxc, ← map_pow, hx3, map_one]
   have key := pow_three_mul_pow_three_eq_one hx3 hcomm hg3
   rwa [hxc] at key
+
+/-- **Theorem 1, assembled.**  In a witness of hypothesis (B) with `p = 3`, the generator
+`x = σ(1)` of `σ(P₀)` cannot commute with its conjugate `x^g`, where `g = x^y` generates
+`σ(P₀)^y`.
+
+This is everything of Theorem 1 except the production of the relation family (conjugating
+`(g x)³ = 1` by `σ(U)`) and the Paley-type spanning lemma: given those,
+`commute_conj_of_le_closure_twisted` supplies the commutation and this theorem closes the
+argument.  The chain here is `(g x)³ = 1` (from (B)) → `(x⁻¹g)³ = 1` (the last mile) →
+`x⁻¹g = 1` (because `Q` is a `3′`-group) → `g = x`, which is absurd since `⟨g⟩` normalizes `σ(U)`
+while `x` does not (`FieldNormalizerData.s_not_normalizes_U`). -/
+theorem not_commute_conj (data : FieldNormalizerData p q G) (hp : p = 3) :
+    ¬ Commute data.s ((MulAut.conj data.y data.s)⁻¹ * data.s * MulAut.conj data.y data.s) := by
+  intro hcomm
+  subst hp
+  have hx3 : data.s ^ 3 = 1 := by
+    rw [FieldNormalizerData.s, ← map_pow, primeLineGenerator_pow_p, map_one]
+  have hg3 : (MulAut.conj data.y data.s) ^ 3 = 1 := by
+    rw [← map_pow, hx3, map_one]
+  have hgx : (MulAut.conj data.y data.s * data.s) ^ 3 = 1 :=
+    conj_mul_pow_three_eq_one data rfl
+  -- `c = x⁻¹g` has order dividing three and lies in the `3′`-group `Q`, so it is trivial.
+  have hc3 : (data.s⁻¹ * MulAut.conj data.y data.s) ^ 3 = 1 :=
+    inv_mul_pow_three_eq_one_of_commute_conj hg3 hgx hcomm.eq
+  have hc1 : data.s⁻¹ * MulAut.conj data.y data.s = 1 :=
+    data.eq_one_of_mem_Q_of_pow_p_eq_one (inv_mul_conj_mem_Q data) hc3
+  -- Hence `g = x`, but `⟨g⟩` normalizes `σ(U)` and `x` does not.
+  have hgx' : MulAut.conj data.y data.s = data.s := by
+    have := congrArg (fun z => data.s * z) hc1
+    simpa using this
+  refine data.s_not_normalizes_U ?_
+  have hmem : MulAut.conj data.y data.s ∈ Subgroup.normalizer (data.U : Set G) := by
+    refine data.W2_conj_y_normalizes_U ?_
+    exact ⟨data.s, data.s_mem_W2, rfl⟩
+  rwa [hgx'] at hmem
 
 end Witness
 
