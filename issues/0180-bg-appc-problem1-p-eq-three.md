@@ -217,6 +217,24 @@ Gersten–Stallings の非球面条件 `Σ 1/m_v ≤ 1` による自動的な発
 頂点 `N = U⋊⟨g⟩` のリンクには長さ 4 の閉路がある (`u₁g^{a}u₂g^{-a} = 1` が非自明解をもつ)
 ので `m_N = 2` で、条件が破れる。
 
+## Lean 形式化の状況 (2026-08-10)
+
+部分解決のうち**確定した数学**を形式化中。leaf = [`OddOrder/BG/AppC_Problem1.lean`](../OddOrder/BG/AppC_Problem1.lean)
++ [`OddOrder/Algebra/PowerMonomialIndependence.lean`](../OddOrder/Algebra/PowerMonomialIndependence.lean)。
+すべて AxiomsCheck 登録済 (allowlist のみ)、フルビルド green。
+
+| 数学 | Lean | 状態 |
+|---|---|---|
+| 補題 A′ `(xcx)³ = (xc)³` | `Problem1.pow_three_mul_eq_pow_three_of_commute` | ✅ |
+| 仮説 (B) ⟹ `(g·x)³ = 1` | `Problem1.conj_mul_pow_three_eq_one` | ✅ |
+| 補題 C (3 層消去) | `Problem1.cross_commute_of_three_relations` | ✅ |
+| 定理 2 線形段 | `Problem1.eq_zero_of_closure_eq_top` | ✅ |
+| 定理 2 群段 (完全群) | `Problem1.eq_top_of_generators_mem` | ✅ |
+| 補題 D 核 (Dedekind 独立性) | `PowerMonomial.eq_zero_of_sum_powHom_eq_zero` | ✅ |
+| `R(s)` の族 (`P ≅ F` と `U`-共役) | — | ⬜ 未 |
+| 補題 B (Paley 型の張り生成) | — | ⬜ 未 (一般 `q` は Weil 評価が要る) |
+| 補題 D 本体 (trace 展開 + 剰余類) | — | ⬜ 未 |
+
 ## 次にやるとしたら (2026-08-10 更新)
 
 1. **定理 2 の完全群 `N` をさらに潰す**。`N` は 3 個の共役可換 3-部分群で生成され、`U`
