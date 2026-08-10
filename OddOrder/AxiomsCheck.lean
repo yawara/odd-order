@@ -503,6 +503,7 @@ import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.BG.AppC_GlaubermanNorton
 import OddOrder.Algebra.PaleySpanning
+import OddOrder.Algebra.RelationLattice
 import OddOrder.Algebra.PowerMonomialIndependence
 import OddOrder.BG.AppC_Problem1
 import OddOrder.BG.AppD_CNGroups
@@ -20809,6 +20810,17 @@ eq_zero_of_closure_eq_top              (Theorem 2, linear step: the layer maps d
   → commutator_layerClosure_eq_top     (**Theorem 2 in the ambient group**: the layered
                                         relations plus spanning make `⟨P, P^g, P^{g²}⟩` perfect)
 
+RelationLattice.exists_trace_repr      (every `K`-linear functional on a finite field is
+                                        `a ↦ Tr(l·a)` — the trace form is a perfect pairing)
+  → RelationLattice.span_eq_top_of_trace_annihilator
+                                       (trace duality: a set of triples spans `F³` unless some
+                                        non-zero `(l,m,n)` annihilates it)
+    → RelationLattice.span_triples_eq_top       (**Lemma D**: the relation lattice is `F³`)
+    → RelationLattice.span_triples_subgroup_eq_top
+                                       (the form actually needed: the triples are indexed by the
+                                        norm-one subgroup `S`, and odd exponents propagate the
+                                        vanishing from `S` to `Fˣ = S ∪ (-S)`)
+
 PowerMonomial.eq_zero_of_sum_powHom_eq_zero  (Lemma D core: Dedekind independence of the
                                               power monomials `a ↦ a^d` on `Fˣ`)
   → PowerMonomial.eq_zero_of_forall_trace_sum_eq_zero
@@ -20865,6 +20877,11 @@ hypothesis (B) for `p = 3` with `g` centralising `σ(U)`; and for a non-Frobeniu
 #assert_only_allowed_axioms OddOrder.Paley.eq_or_of_sub_inv_sq_eq
 #assert_only_allowed_axioms OddOrder.Paley.card_paleySet_lower
 #assert_only_allowed_axioms OddOrder.Paley.addClosure_paleySet_eq_top
+#assert_only_allowed_axioms OddOrder.RelationLattice.exists_trace_repr
+#assert_only_allowed_axioms OddOrder.RelationLattice.span_eq_top_of_trace_annihilator
+#assert_only_allowed_axioms OddOrder.RelationLattice.eq_zero_of_forall_trace_triple_eq_zero
+#assert_only_allowed_axioms OddOrder.RelationLattice.span_triples_eq_top
+#assert_only_allowed_axioms OddOrder.RelationLattice.span_triples_subgroup_eq_top
 #assert_only_allowed_axioms AddSubgroup.toZModSubmodule_closure
 #assert_only_allowed_axioms Submodule.span_eq_top_iff_closure_eq_top
 #assert_only_allowed_axioms OddOrder.BG.AppC.inr_inv_mul_inl_mul_inr
