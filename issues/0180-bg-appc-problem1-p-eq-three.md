@@ -259,6 +259,16 @@ Gersten–Stallings の非球面条件 `Σ 1/m_v ≤ 1` による自動的な発
 体の中で `u⁻¹` 倍) と `AppC.inr_inv_mul_primeLineGenerator_mul_inr` (`x = σ(1)` の `U`-軌道は
 ノルム 1 集合そのもの)。`SemidirectProduct.inl_aut_inv` から 2 行で出た。
 ⟹ 残り 2 件は「この補題を使って `orbitS` / 関係格子を体の言葉に翻訳する」作業に落ちた。
+**`orbitS` の側は完了** (`Problem1.mem_orbitS_iff`: 軌道 = ノルム 1 集合の σ-像)。
+残る関係格子の側の具体的手順:
+
+1. `↥σ(P) ≅ (𝔽_{3^q}, +)` (群同型、`σ ∘ inl ∘ ofAdd` の像) で `↥P × ↥P × ↥P ≅ F³` を作る。
+2. `Subgroup.closure` (乗法) → `AddSubgroup.closure` (加法) → `Submodule.span (ZMod 3)` と移す。
+   最後の対応には `AddSubgroup.toZModSubmodule p : AddSubgroup M ≃o Submodule (ZMod p) M`
+   (mathlib、本リポでも `AppC_NormSetBasic` 等で使用中) を使い、
+   `toZModSubmodule p (AddSubgroup.closure S) = Submodule.span (ZMod p) S` を両側の
+   `le_antisymm` で示す (この補題はまだ無いので新規に要る)。
+3. すると `commutator_layerClosure_eq_top` の `hspan` が補題 D の `L_e = V³` と一致する。
 
 ## 次にやるとしたら (2026-08-10 更新)
 
