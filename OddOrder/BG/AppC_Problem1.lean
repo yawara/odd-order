@@ -44,6 +44,8 @@ recorded in `notes/bg/appC_problem1_partial_resolution.md` (issue 0180):
 * `pow_three_mul_eq_pow_three_of_commute` — Lemma A′.
 * `pow_three_mul_pow_three_eq_one` — the form used downstream: `(g * x)³ = 1`.
 * `conj_mul_pow_three_eq_one` — the same relation read off a witness of hypothesis (B).
+* `inv_mul_pow_three_eq_one_of_commute_conj` — Theorem 1's last mile: once `x` commutes with
+  `x^g`, the element `c = x⁻¹g` satisfies `c³ = 1`, so `c = 1` in the `3′`-group `Q`.
 * `cross_commute_of_three_relations` — Lemma C.
 * `eq_one_of_closure_eq_top`, `eq_top_of_generators_mem` — the two abstract steps of Theorem 2,
   assembled in `commutator_eq_top_of_relations`: for an exponent that is not a Frobenius power
@@ -61,7 +63,7 @@ variable {G : Type*} [Group G]
 
 section LemmaA
 
-variable {x c : G}
+variable {x c g : G}
 
 /-- `x³ = 1`, unfolded. -/
 private theorem mul_mul_eq_one_of_pow_three (hx : x ^ 3 = 1) : x * (x * x) = 1 := by
@@ -117,6 +119,53 @@ conjugate of the order-three element `x` — and `c` commutes with `x⁻¹cx`, t
 theorem pow_three_mul_pow_three_eq_one (hx : x ^ 3 = 1) (h : Commute c (x⁻¹ * c * x))
     (hg : (x * c) ^ 3 = 1) : (x * c * x) ^ 3 = 1 := by
   rw [pow_three_mul_eq_pow_three_of_commute hx h, hg]
+
+/-- **The last mile of Theorem 1.**  Let `x` and `g` have order dividing three, let `g · x` also
+have order dividing three, and suppose `x` commutes with its `g`-conjugate.  Then
+
+`(x⁻¹ g)³ = 1`.
+
+Since `x⁻¹g = ⁅x, y⁆` lies in the `3′`-group `Q` for a witness of hypothesis (B), this forces
+`x⁻¹g = 1`, i.e. `g = x` — and `⟨g⟩` normalizes `σ(U)` whereas `⟨x⟩` does not.  That is the final
+contradiction of Theorem 1.
+
+The computation: `(g x)³ = 1` says `x^{g²} · x^g · x = 1`, so also `x · x^{g²} · x^g = 1` after a
+cyclic shift; commuting the last two factors (the hypothesis, conjugated by `g`) gives
+`x · x^g · x^{g²} = 1`, which is exactly `(g x⁻¹)³ = 1`, and `x⁻¹g` is conjugate to `g x⁻¹`. -/
+theorem inv_mul_pow_three_eq_one_of_commute_conj (hg : g ^ 3 = 1) (hgx : (g * x) ^ 3 = 1)
+    (hcomm : x * (g⁻¹ * x * g) = (g⁻¹ * x * g) * x) : (x⁻¹ * g) ^ 3 = 1 := by
+  -- `x^{g²} · (x^g · x) = 1`.
+  have h1 : g⁻¹ * (g⁻¹ * x * g) * g * ((g⁻¹ * x * g) * x) = 1 := by
+    rw [← pow_three_eq_conj_mul hg x]; exact hgx
+  -- Cyclic shift: `x · x^{g²} · x^g = 1`.
+  have h2 : x * (g⁻¹ * (g⁻¹ * x * g) * g) * (g⁻¹ * x * g) = 1 := by
+    have := h1
+    rw [mul_assoc] at this
+    have hx1 : g⁻¹ * (g⁻¹ * x * g) * g * (g⁻¹ * x * g) = x⁻¹ := by
+      rw [← mul_one (g⁻¹ * (g⁻¹ * x * g) * g * (g⁻¹ * x * g)), ← mul_inv_cancel x,
+        ← mul_assoc, ← mul_assoc, ← mul_assoc]
+      simp only [← mul_assoc] at this ⊢
+      rw [this, one_mul]
+    calc x * (g⁻¹ * (g⁻¹ * x * g) * g) * (g⁻¹ * x * g)
+        = x * (g⁻¹ * (g⁻¹ * x * g) * g * (g⁻¹ * x * g)) := by rw [mul_assoc]
+      _ = x * x⁻¹ := by rw [hx1]
+      _ = 1 := mul_inv_cancel x
+  -- The `g`-conjugate of the commutation hypothesis swaps the last two factors.
+  have hcomm' : (g⁻¹ * x * g) * (g⁻¹ * (g⁻¹ * x * g) * g) =
+      (g⁻¹ * (g⁻¹ * x * g) * g) * (g⁻¹ * x * g) := by
+    have := congrArg (fun z => g⁻¹ * z * g) hcomm
+    simpa [mul_assoc] using this
+  have h3 : x * (g⁻¹ * x * g) * (g⁻¹ * (g⁻¹ * x * g) * g) = 1 := by
+    rw [mul_assoc, hcomm', ← mul_assoc]; exact h2
+  -- Read this as `(g x⁻¹)³ = 1`, then conjugate by `x`.
+  have h4 : (g * x⁻¹) ^ 3 = 1 := by
+    rw [pow_three_eq_conj_mul hg x⁻¹]
+    have hid : g⁻¹ * (g⁻¹ * x⁻¹ * g) * g * ((g⁻¹ * x⁻¹ * g) * x⁻¹)
+        = (x * (g⁻¹ * x * g) * (g⁻¹ * (g⁻¹ * x * g) * g))⁻¹ := by group
+    rw [hid, h3, inv_one]
+  calc (x⁻¹ * g) ^ 3 = x⁻¹ * (g * x⁻¹) ^ 3 * x := by
+        simp only [pow_succ, pow_zero, one_mul]; group
+    _ = 1 := by rw [h4]; group
 
 end LemmaA
 
