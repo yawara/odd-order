@@ -82,6 +82,18 @@ Proposition 9 の仮説 (記法は
   ⟹ 可解群と `P ◁ G` 型のアフィン構成は排除される — ⚠ 未検証
 * `q = 3` (`F = GF(27)`, `|U| = 13`) で `³D₄(3)` による候補を検証 — ⚠ 結論不明
 
+## ChatGPT Work (GPT-5.6 Sol / 思考レベル ウルトラ) への再投入 (2026-08-10)
+
+ユーザー指示で、従来の `Chat` でなく **`Work` サーフェス**に投入 (モデル `GPT-5.6 Sol`、
+**思考レベル `ウルトラ`**)。UI 手順は [`notes/meta/chatgpt_consult_via_chrome.md`](../notes/meta/chatgpt_consult_via_chrome.md)
+2026-08-10 節。
+
+* プロンプト全文 = [`notes/bg/appC_problem1_chatgpt_prompt.md`](../notes/bg/appC_problem1_chatgpt_prompt.md) (10,728 字)
+* スレッド = `https://chatgpt.com/c/6a7935bc-0d48-83ee-9d4c-202c494dcb38`
+* 1 回目 (2026-08-09) の反省を反映: **問題を絞り**、上記の還元 R1–R4 と GAP 結果を検証済み入力として
+  与え、**最優先タスクを「未決 15 ケースの判定」に固定**。さらに「完走しなくても部分報告を必ず出せ」
+  「(a) 証明済 / (b) 実行した計算 / (c) 発見的推測 を区別せよ」を明示。
+
 ## 計算機探索 (2026-08-09、自前 GAP)
 
 ChatGPT 打ち切り後、ユーザー指示でこちらで探索した。スクリプト = [`notes/meta/gap/`](../notes/meta/gap/)
