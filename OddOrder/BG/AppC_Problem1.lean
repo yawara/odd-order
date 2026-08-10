@@ -43,7 +43,11 @@ recorded in `notes/bg/appC_problem1_partial_resolution.md` (issue 0180):
 
 * `pow_three_mul_eq_pow_three_of_commute` — Lemma A′.
 * `pow_three_mul_pow_three_eq_one` — the form used downstream: `(g * x)³ = 1`.
+* `conj_mul_pow_three_eq_one` — the same relation read off a witness of hypothesis (B).
 * `cross_commute_of_three_relations` — Lemma C.
+* `eq_zero_of_closure_eq_top`, `eq_top_of_generators_mem` — the two abstract steps of Theorem 2
+  (for an exponent that is not a Frobenius power the layers die in `N^{ab}`, so `N` is perfect).
+* `injective_pow_mul` — the coset separation behind Lemma D.
 -/
 
 namespace OddOrder.BG.AppC.Problem1
@@ -266,5 +270,51 @@ theorem eq_top_of_generators_mem {N : Type*} [Group N] {X : Set N}
   top_le_iff.mp (hgen ▸ (Subgroup.closure_le _).mpr hX)
 
 end TheoremTwo
+
+section CosetSeparation
+
+/-! ### The combinatorial half of Lemma D
+
+Whether the relation lattice `L_e` is all of `V³` is decided by a coset computation.  Expanding
+the trace turns the annihilator condition into a vanishing combination of power monomials
+`a ↦ a^{d·3ʲ}` with `d ∈ {1, e, e²}`, and the exponents involved run through the three cosets
+`⟨3⟩`, `e⟨3⟩`, `e²⟨3⟩` of the Frobenius subgroup.  Cosets are equal or disjoint, and since
+`e² = e⁻¹` the three are pairwise disjoint precisely when `e ∉ ⟨3⟩`.  That is the content of
+`injective_pow_mul` and `injective_pow_mul_pow` below; combined with
+`OddOrder.PowerMonomial.eq_zero_of_forall_trace_sum_eq_zero` it gives Lemma D. -/
+
+/-- **Coset separation.**  In a commutative group, an element `e ∉ A` with `e³ = 1` makes the
+three cosets `A`, `eA`, `e²A` pairwise disjoint: the map `(i, x) ↦ eⁱ · x` from `Fin 3 × A` is
+injective.
+
+The only arithmetic used is `e = (e²)²`, which turns "`e² ∈ A`" into "`e ∈ A`". -/
+theorem injective_pow_mul {H : Type*} [CommGroup H] {A : Subgroup H} {e : H}
+    (he3 : e ^ 3 = 1) (heA : e ∉ A) :
+    Function.Injective fun x : Fin 3 × A => e ^ (x.1 : ℕ) * (x.2 : H) := by
+  -- `e² ∈ A` would give `e = (e²)² ∈ A`.
+  have he2 : e ^ 2 ∉ A := fun h => heA (by
+    have h4 : e ^ 4 = e := by rw [show (4 : ℕ) = 3 + 1 from rfl, pow_succ, he3, one_mul]
+    have hmul : e ^ 2 * e ^ 2 ∈ A := A.mul_mem h h
+    rwa [← pow_add, show 2 + 2 = 4 from rfl, h4] at hmul)
+  have hinv : e⁻¹ = e ^ 2 := inv_eq_of_mul_eq_one_right (by
+    rw [← pow_succ']; exact he3)
+  have hinv2 : (e ^ 2)⁻¹ = e := by
+    rw [← hinv, inv_inv]
+  have hd12 : e / e ^ 2 = e ^ 2 := by rw [div_eq_mul_inv, hinv2, ← pow_two]
+  have hd21 : e ^ 2 / e = e := by rw [pow_two, mul_div_assoc, div_self', mul_one]
+  rintro ⟨i, x⟩ ⟨j, y⟩ hxy
+  simp only at hxy
+  have hdiv : e ^ (i : ℕ) / e ^ (j : ℕ) ∈ A := by
+    have hEq : e ^ (i : ℕ) / e ^ (j : ℕ) = (y : H) / (x : H) := by
+      rw [div_eq_div_iff_mul_eq_mul, hxy, mul_comm]
+    rw [hEq]
+    exact A.div_mem y.2 x.2
+  have hij : i = j := by
+    fin_cases i <;> fin_cases j <;>
+      simp_all [pow_zero, pow_one, one_div, div_self']
+  subst hij
+  exact Prod.ext rfl (Subtype.ext (mul_left_cancel hxy))
+
+end CosetSeparation
 
 end OddOrder.BG.AppC.Problem1

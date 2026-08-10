@@ -20789,6 +20789,9 @@ PowerMonomial.eq_zero_of_sum_powHom_eq_zero  (Lemma D core: Dedekind independenc
                                              (Lemma D, analytic half: a vanishing trace form
                                               has zero coefficients once the expanded exponents
                                               `d i · |K|ʲ` are pairwise distinct)
+
+injective_pow_mul                      (Lemma D, combinatorial half: `e ∉ A` and `e³ = 1` make
+                                        the cosets `A`, `eA`, `e²A` pairwise disjoint)
 ```
 
 Lemma A′ is what hypothesis (B) yields — `c = ⁅x, y⁆` lies in the abelian `p'`-subgroup `Q`, so
@@ -20808,3 +20811,4 @@ finite group of odd order — satisfies hypothesis (B) for `p = 3`.* -/
 #assert_only_allowed_axioms OddOrder.PowerMonomial.eq_zero_of_sum_powHom_eq_zero
 #assert_only_allowed_axioms OddOrder.PowerMonomial.injective_powHom_of_apply_injective
 #assert_only_allowed_axioms OddOrder.PowerMonomial.eq_zero_of_forall_trace_sum_eq_zero
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.injective_pow_mul
