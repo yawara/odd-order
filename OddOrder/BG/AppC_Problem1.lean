@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Group.Commute.Defs
 import Mathlib.Algebra.Group.Basic
+import OddOrder.Algebra.PowerMonomialIndependence
 import OddOrder.BG.AppC_LemmaC3_ConjugateLine
 
 /-!
@@ -54,7 +55,9 @@ recorded in `notes/bg/appC_problem1_partial_resolution.md` (issue 0180):
   `commute_conj_of_le_closure` its untwisted specialisation: the relation family plus a spanning
   set makes the cross-commutator vanish.
 * `injective_pow_mul_pow` — the `3q` exponents of Lemma D are pairwise distinct.
-* `injective_pow_mul` — the coset separation behind Lemma D.
+* `injective_pow_mul`, `injective_pow_mul_pow`, `injective_powHom_pow_mul_pow` — Lemma D: the
+  coset separation, the resulting distinctness of the `3q` exponents, and the wiring that turns
+  it into the hypothesis of `OddOrder.PowerMonomial.eq_zero_of_forall_trace_sum_eq_zero`.
 * `false_of_centralizing_of_spanning` — **Theorem 1 (centralising case), assembled**: no witness
   exists, given only the Paley-type spanning hypothesis (Lemma B, not formalized: its general-`q`
   proof needs a Weil bound).
@@ -597,6 +600,40 @@ theorem injective_pow_mul_pow {H : Type*} [CommGroup H] {ε φ : H} {r : ℕ}
     have hj'lt : (j' : ℕ) < orderOf φ := by rw [hr]; exact j'.isLt
     exact Fin.ext (pow_injOn_Iio_orderOf hjlt hj'lt hφ)
   exact Prod.ext hk hj
+
+/-- **Lemma D, wiring.**  Let `a` generate the unit group of a finite field `F`, of order `N`, and
+let `e`, `f` be natural numbers whose classes mod `N` are units `ε`, `φ` with `ε³ = 1`,
+`ε ∉ ⟨φ⟩` and `φ` of order `r`.  Then the `3r` power maps
+
+`z ↦ z ^ (eᵏ · fʲ)`  (`k < 3`, `j < r`)
+
+on `Fˣ` are pairwise distinct.
+
+Together with `OddOrder.PowerMonomial.eq_zero_of_forall_trace_sum_eq_zero` this is Lemma D: for
+`F = 𝔽_{3^q}`, `f = 3` (of order `q` mod `N = 3^q - 1`) and `e` of order three, a vanishing trace
+form `Tr(λ z + μ z^e + ν z^{e²})` has `λ = μ = ν = 0` exactly when `e ∉ ⟨3⟩`. -/
+theorem injective_powHom_pow_mul_pow {F : Type*} [Field F] [Finite F] {N : ℕ} (a : Fˣ)
+    (ha : orderOf a = N) {ε φ : (ZMod N)ˣ} {r e f : ℕ}
+    (he3 : ε ^ 3 = 1) (heφ : ε ∉ Subgroup.zpowers φ) (hr : orderOf φ = r)
+    (hE : ((e : ℕ) : ZMod N) = (ε : ZMod N)) (hF : ((f : ℕ) : ZMod N) = (φ : ZMod N)) :
+    Function.Injective fun x : Fin 3 × Fin r =>
+      OddOrder.PowerMonomial.powHom F (e ^ (x.1 : ℕ) * f ^ (x.2 : ℕ)) := by
+  refine OddOrder.PowerMonomial.injective_powHom_of_apply_injective _ a ?_
+  intro x x' hxx
+  -- Pass from `F` to `Fˣ`, then to congruences mod `N = orderOf a`.
+  have hunits : a ^ (e ^ (x.1 : ℕ) * f ^ (x.2 : ℕ)) = a ^ (e ^ (x'.1 : ℕ) * f ^ (x'.2 : ℕ)) := by
+    apply Units.ext
+    simpa using hxx
+  have hmod : (e ^ (x.1 : ℕ) * f ^ (x.2 : ℕ)) ≡ (e ^ (x'.1 : ℕ) * f ^ (x'.2 : ℕ)) [MOD N] := by
+    rw [← ha]; exact (pow_eq_pow_iff_modEq).mp hunits
+  have hcast : ((e ^ (x.1 : ℕ) * f ^ (x.2 : ℕ) : ℕ) : ZMod N)
+      = ((e ^ (x'.1 : ℕ) * f ^ (x'.2 : ℕ) : ℕ) : ZMod N) :=
+    (ZMod.natCast_eq_natCast_iff _ _ _).mpr hmod
+  -- Read the two sides as units and apply the coset separation.
+  have hval : ((ε ^ (x.1 : ℕ) * φ ^ (x.2 : ℕ) : (ZMod N)ˣ) : ZMod N)
+      = ((ε ^ (x'.1 : ℕ) * φ ^ (x'.2 : ℕ) : (ZMod N)ˣ) : ZMod N) := by
+    simpa [hE, hF] using hcast
+  exact injective_pow_mul_pow he3 heφ hr (Units.ext hval)
 
 end CosetSeparation
 
