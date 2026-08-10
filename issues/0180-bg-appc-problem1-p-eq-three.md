@@ -217,58 +217,56 @@ Gersten–Stallings の非球面条件 `Σ 1/m_v ≤ 1` による自動的な発
 頂点 `N = U⋊⟨g⟩` のリンクには長さ 4 の閉路がある (`u₁g^{a}u₂g^{-a} = 1` が非自明解をもつ)
 ので `m_N = 2` で、条件が破れる。
 
-## Lean 形式化の状況 (2026-08-10)
+## Lean 形式化の状況 (2026-08-10 更新: **確定した数学はすべて形式化済**)
 
-部分解決のうち**確定した数学**を形式化中。leaf = [`OddOrder/BG/AppC_Problem1.lean`](../OddOrder/BG/AppC_Problem1.lean)
-+ [`OddOrder/Algebra/PowerMonomialIndependence.lean`](../OddOrder/Algebra/PowerMonomialIndependence.lean)。
-すべて AxiomsCheck 登録済 (allowlist のみ)、フルビルド green。
+leaf = [`OddOrder/BG/AppC_Problem1.lean`](../OddOrder/BG/AppC_Problem1.lean) +
+[`OddOrder/BG/AppC_Problem1Lattice.lean`](../OddOrder/BG/AppC_Problem1Lattice.lean) +
+[`OddOrder/Algebra/PaleySpanning.lean`](../OddOrder/Algebra/PaleySpanning.lean) +
+[`OddOrder/Algebra/RelationLattice.lean`](../OddOrder/Algebra/RelationLattice.lean) +
+[`OddOrder/Algebra/PowerMonomialIndependence.lean`](../OddOrder/Algebra/PowerMonomialIndependence.lean)。
+すべて AxiomsCheck 登録済 (allowlist のみ)、フルビルド green、--strict lint clean。
+
+**2 つの主定理はどちらも無条件** (仮説は (A) + (B) と場合分けの条件だけ):
+
+| | Lean | 仮説 |
+|---|---|---|
+| **定理 1 (中心化の場合)** | `Problem1.false_of_centralizing` | (A)+(B)、`g` が `σ(U)` を中心化 |
+| **定理 2** | `Problem1.commutator_layerClosure_eq_top_of_exp` | (A)+(B)、`g` の指数 `e` が `U` 上 Frobenius 冪でない |
+| ⟹ **witness は非可解** | `Problem1.not_isSolvable_of_exp` | 同上 |
+
+### 定理 1 の内訳
 
 | 数学 | Lean | 状態 |
 |---|---|---|
 | 補題 A′ `(xcx)³ = (xc)³` | `Problem1.pow_three_mul_eq_pow_three_of_commute` | ✅ |
-| `(xc)³` の層分解 | `Problem1.pow_three_eq_conj_mul` | ✅ |
 | 仮説 (B) ⟹ `(g·x)³ = 1` | `Problem1.conj_mul_pow_three_eq_one` | ✅ |
-| `c = ⁅x,y⁆ ∈ Q` | `Problem1.inv_mul_conj_mem_Q` | ✅ |
-| **関係式の族 `R(s)`** (中心化の場合) | `Problem1.pow_three_mul_conj_eq_one` | ✅ |
-| 軌道が `σ(P)` に留まる | `Problem1.conj_s_mem_P` | ✅ |
+| 関係式の族 `R(s)` | `Problem1.pow_three_mul_conj_eq_one` | ✅ |
 | 補題 C (3 層消去) | `Problem1.cross_commute_of_three_relations` | ✅ |
-| 定理 1 のエンジン (Frobenius 捻り付き) | `Problem1.commute_conj_of_le_closure_twisted` | ✅ |
-| 定理 1 のエンジン (捻りなし) | `Problem1.commute_conj_of_le_closure` | ✅ |
-| 定理 1 の最後の一マイル (`[x,x^g]=1 ⟹ c³=1`) | `Problem1.inv_mul_pow_three_eq_one_of_commute_conj` | ✅ |
-| 定理 1 の矛盾 (`x` は `x^g` と可換になりえない) | `Problem1.not_commute_conj` | ✅ |
-| **🎯 定理 1 capstone** (張り生成だけが仮説) | `Problem1.false_of_centralizing_of_spanning` | ✅ |
-| `σ(P)` が可換 | `Problem1.P_mul_comm` | ✅ |
-| 定理 2 線形段 (乗法版、`to_additive`) | `Problem1.eq_one_of_closure_eq_top` | ✅ |
-| 定理 2 群段 | `Problem1.eq_top_of_generators_mem` | ✅ |
-| **定理 2 の結論** (`commutator N = ⊤`) | `Problem1.commutator_eq_top_of_relations` | ✅ |
+| エンジン (Frobenius 捻り付き/なし) | `Problem1.commute_conj_of_le_closure(_twisted)` | ✅ |
+| 最後の一マイル + 矛盾 | `..._of_commute_conj` / `Problem1.not_commute_conj` | ✅ |
+| **補題 B (Paley 型の張り生成)** | `Paley.addClosure_paleySet_eq_top` | ✅ **Weil 不要の初等証明** |
+| 補題 B の移送 (ノルム 1 ⟺ 平方元) | `Problem1.mem_normOneUnits_iff_isSquare` / `le_closure_orbitS` | ✅ |
+| **🎯 定理 1 capstone (無条件)** | `Problem1.false_of_centralizing` | ✅ |
+
+### 定理 2 の内訳
+
+| 数学 | Lean | 状態 |
+|---|---|---|
+| 層写像の半線形性・捻れた関係式族 | `Problem1.conj_layer_of_exp` / `layered_relation_of_exp` | ✅ |
+| 線形段・群段・完全群 | `Problem1.eq_one_of_closure_eq_top` / `eq_top_of_generators_mem` / `commutator_eq_top_of_relations` | ✅ |
+| ambient 形 (仮説付き) | `Problem1.commutator_layerClosure_eq_top` | ✅ |
 | 補題 D 解析的半分 (trace 展開 + Dedekind) | `PowerMonomial.eq_zero_of_forall_trace_sum_eq_zero` | ✅ |
-| 補題 D 組合せ的半分 (剰余類分離) | `Problem1.injective_pow_mul` | ✅ |
-| 補題 D 指数族の単射性 | `Problem1.injective_pow_mul_pow` | ✅ |
-| 層写像の半線形性 (`e ≠ 1` の要) | `Problem1.conj_layer_of_exp` / `..._two_of_exp` | ✅ |
-| **捻れた関係式族 `R(s)`** (`e ≠ 1`) | `Problem1.layered_relation_of_exp` | ✅ |
-| 層写像 `ι_i : ↥P →* ↥N` | `Problem1.layerHom` / `coe_layerHom` | ✅ |
-| **🎯 定理 2 (ambient 形)** (`N` が完全群) | `Problem1.commutator_layerClosure_eq_top` | ✅ |
-| 補題 D の配線 (単位 → 冪写像の相異性) | `Problem1.injective_powHom_pow_mul_pow` | ✅ |
-| **補題 B (Paley 型の張り生成)** | — | ⬜ **未** (一般 `q` は Weil 評価が要る。定理 1 の唯一の残り) |
-| 関係格子の張り生成を具体的な `σ(P)` に接続 | — | ⬜ 未 (定理 2 の唯一の残り) |
+| 補題 D 組合せ的半分 (剰余類分離) | `Problem1.injective_pow_mul(_pow)` | ✅ |
+| **トレース双対性** (汎関数 = trace form) | `RelationLattice.exists_trace_repr` / `span_eq_top_of_trace_annihilator` | ✅ |
+| **補題 D 本体** `L_e = F³` | `RelationLattice.span_triples_eq_top` | ✅ |
+| 部分群版 (奇数指数で `S` → `Fˣ` に伝播) | `RelationLattice.span_triples_subgroup_eq_top` | ✅ |
+| **補題 D の 𝔽_{3^q} 版** (奇代表の算術) | `Problem1.span_triples_normOne_eq_top` | ✅ |
+| 関係格子を `σ(P)³` へ移送 | `Problem1.fieldTripleHom` / `closure_relationTriples_eq_top` | ✅ |
+| **🎯 定理 2 capstone (無条件)** | `Problem1.commutator_layerClosure_eq_top_of_exp` | ✅ |
+| **🎯 witness は非可解** | `Problem1.not_isSolvable_of_exp` | ✅ |
 
-⚠ **残り 2 件に共通して要るのは「`σ(P)` と `𝔽_{3^q}` の同一視の API」**。具体的には
-「ノルム 1 元 `v ∈ U` による `x = σ(1)` の共役が、`F` の中では `v` 倍に対応する」という補題で、
-これが `orbitS` = 平方元全体、`layerSet` の関係格子 = `L_e` という読み替えを可能にする。
-**✅ 2026-08-10 に追加した**: `AppC.inr_inv_mul_inl_mul_inr` (ノルム 1 元 `u` による共役は
-体の中で `u⁻¹` 倍) と `AppC.inr_inv_mul_primeLineGenerator_mul_inr` (`x = σ(1)` の `U`-軌道は
-ノルム 1 集合そのもの)。`SemidirectProduct.inl_aut_inv` から 2 行で出た。
-⟹ 残り 2 件は「この補題を使って `orbitS` / 関係格子を体の言葉に翻訳する」作業に落ちた。
-**`orbitS` の側は完了** (`Problem1.mem_orbitS_iff`: 軌道 = ノルム 1 集合の σ-像)。
-残る関係格子の側の具体的手順:
-
-1. `↥σ(P) ≅ (𝔽_{3^q}, +)` (群同型、`σ ∘ inl ∘ ofAdd` の像) で `↥P × ↥P × ↥P ≅ F³` を作る。
-2. `Subgroup.closure` (乗法) → `AddSubgroup.closure` (加法) → `Submodule.span (ZMod 3)` と移す。
-   最後の対応には `AddSubgroup.toZModSubmodule p : AddSubgroup M ≃o Submodule (ZMod p) M`
-   (mathlib、本リポでも `AppC_NormSetBasic` 等で使用中) を使い、
-   `toZModSubmodule p (AddSubgroup.closure S) = Submodule.span (ZMod p) S` を両側の
-   `le_antisymm` で示す (この補題はまだ無いので新規に要る)。
-3. すると `commutator_layerClosure_eq_top` の `hspan` が補題 D の `L_e = V³` と一致する。
+⚠ **形式化されているのは「部分解決」の部分であって、Problem 1 そのものではない**。
+残る数学的ギャップは下記「次にやるとしたら」の 1・2 (`q ≥ 13`、`e ∉ ⟨3⟩`、`G` 非可解・無限可)。
 
 ## 次にやるとしたら (2026-08-10 更新)
 
@@ -277,11 +275,9 @@ Gersten–Stallings の非球面条件 `Σ 1/m_v ≤ 1` による自動的な発
 2. `q = 13` 以降で `[Γ_e : H̄] = 3` を実測する (定理 2 と合わせれば完全決着)。
    ⚠ 関係子 `u^n` が長い (`q = 13` で `n ≈ 8·10⁵`)。生成元を素冪分解した表示にすると軽くなるはず。
 3. `c ∈ Q` が 3′-元であることは定理 2 では未使用。組み合わせる余地がある。
-4. **Lean 化**: 定理 1 は `G` の中だけで完結する有限群論なので**形式化可能**。必要なのは
-   (i) 語の恒等式 `[x^{-1}g,(x^{-1}g)^x] = (gx)³`、(ii) 補題 C の消去、(iii) 補題 B (Paley 型の
-   張り生成)。**(iii) の一般 `q` は Weil 評価**を要するので、mathlib に無ければ `q` を固定した
-   有限検証に落とす。定理 2 は `N^{ab}` 上の線形代数なので (i)+(線形写像) だけで通り、
-   `L_e = V³` を `decide` 可能な形にすれば `q` ごとに機械検証できる。
+4. ~~**Lean 化**~~ **完了 (2026-08-10)**。定理 1・定理 2 とも無条件に形式化済 (上表)。
+   補題 B は Weil 評価が不要な初等証明が見つかり、補題 D はトレース双対性 +
+   Dedekind 独立性で閉じた。
 5. 旧項目「`D` の枚挙」は**破棄**。万能完備化に置き換わった。
 
 ## 参照

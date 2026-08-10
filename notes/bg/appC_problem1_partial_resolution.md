@@ -267,12 +267,16 @@ f(a) = Tr(λa) + Tr(μ a^{ẽ}) + Tr(ν a^{ẽ²}) = Σ_j λ^{3^j} a^{3^j} + Σ_
   `le_closure_orbitS` で `G` へ移送して消えた。移送の要は `mem_orbitS_iff` (軌道 = ノルム 1 集合)
   と `mem_normOneUnits_iff_isSquare` (`p = 3` ではノルム 1 ⟺ 平方元 = Euler の規準)、および
   条件 (A) から出る `q` 奇 (⟹ `|F| ≡ 3 mod 4`, `|F| ≥ 27`)。
-* **定理 2** も ambient 群の形 `commutator_layerClosure_eq_top` まで閉じた。層写像の半線形性
-  (`conj_layer_of_exp`) から捻れた関係式族 `layered_relation_of_exp` を作り、それを層写像
-  `layerHom` 経由で `commutator_eq_top_of_relations` に食わせる。残る仮説は「関係格子 `T` が
-  `P × P × P` を生成する」だけで、これは補題 D により `e ∉ ⟨3⟩` と同値。
-* **補題 D** は両半分 (解析的 = trace 展開 + Dedekind 独立性、組合せ的 = 剰余類分離) が
-  それぞれ証明済み。残るのは両者を `(ZMod (Q−1))ˣ` の巡回性で繋ぐ配線だけ。
+* **定理 2 も無条件に閉じた** (`commutator_layerClosure_eq_top_of_exp`、2026-08-10)。層写像の
+  半線形性 (`conj_layer_of_exp`) から捻れた関係式族 `layered_relation_of_exp` を作り、層写像
+  `layerHom` 経由で `commutator_eq_top_of_relations` に食わせる。関係格子の張り生成は補題 D
+  (`span_triples_normOne_eq_top`) を `fieldTripleHom` で `σ(P)³` に移送して消えた。
+  さらに `not_isSolvable_of_exp` で **witness の ambient 群が非可解**まで到達
+  (`N` は完全群で `x = σ(1) ≠ 1` を含むので導来列が止まらない)。
+* **補題 D** は解析的半分 (trace 展開 + Dedekind 独立性) と組合せ的半分 (剰余類分離) を
+  **トレース双対性** (`RelationLattice.exists_trace_repr`: 有限体上の汎関数はすべて
+  `a ↦ Tr(l·a)`) で接続して完成。`Fˣ` 全体での消滅が要るところは、指数 `e` を法 `n` で
+  **奇数代表 ẽ** に取り替えて `Fˣ = U ∪ (−U)` に伝播させる (`n` が奇数なのが効く)。
 
 ## 検証スクリプト
 
