@@ -502,6 +502,7 @@ import OddOrder.BG.AppC_SL2Example
 import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.BG.AppC_GlaubermanNorton
+import OddOrder.BG.AppC_Problem1
 import OddOrder.BG.AppD_CNGroups
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
@@ -20763,3 +20764,28 @@ condition (A), which excludes exactly that case.  See the module docstring of
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normSetE_eq_inv_iff
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.NormSet.le_three_of_conditionA_of_normSetE_eq_inv
+
+/-! ### BG Appendix C, Problem 1 (open) — the settled group-theoretic core
+
+Problem 1 (BG p. 152 = Glauberman–Norton p. 1094, "Problem (Péterfalvi)"): *can the hypothesis of
+Proposition 9 be satisfied for `p = 3`?*  This is **open**, and it is not a formalization debt.
+What is settled — see `notes/bg/appC_problem1_partial_resolution.md`, issue 0180 — is a partial
+resolution whose two elementary group-theoretic steps are formalized here:
+
+```
+pow_three_mul_eq_pow_three_of_commute  (Lemma A′: (xcx)³ = (xc)³ when c commutes with c^x)
+  → pow_three_mul_pow_three_eq_one     (hypothesis (B) forces (g·x)³ = 1 for g = x^y)
+cross_commute_of_three_relations       (Lemma C: the three-layer cancellation)
+```
+
+Lemma A′ is what hypothesis (B) yields — `c = ⁅x, y⁆` lies in the abelian `p'`-subgroup `Q`, so
+its conjugates commute for free.  Lemma C is the engine that turns the `σ(U)`-conjugates of
+`(g·x)³ = 1`, taken at `s`, `t` and `s + t` in the set of squares of `𝔽_{3^q}`, into a vanishing
+cross-commutator.  Together with the Paley-type spanning lemma (not formalized: its general-`q`
+form needs a Weil bound) they give: *no solvable group — hence, by the odd order theorem, no
+finite group of odd order — satisfies hypothesis (B) for `p = 3`.* -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.Problem1.pow_three_mul_eq_pow_three_of_commute
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.pow_three_mul_pow_three_eq_one
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.cross_commute_of_three_relations
