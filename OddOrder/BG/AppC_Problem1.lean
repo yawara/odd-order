@@ -55,6 +55,9 @@ recorded in `notes/bg/appC_problem1_partial_resolution.md` (issue 0180):
   set makes the cross-commutator vanish.
 * `injective_pow_mul_pow` — the `3q` exponents of Lemma D are pairwise distinct.
 * `injective_pow_mul` — the coset separation behind Lemma D.
+* `false_of_centralizing_of_spanning` — **Theorem 1 (centralising case), assembled**: no witness
+  exists, given only the Paley-type spanning hypothesis (Lemma B, not formalized: its general-`q`
+  proof needs a Weil bound).
 -/
 
 namespace OddOrder.BG.AppC.Problem1
@@ -596,5 +599,65 @@ theorem injective_pow_mul_pow {H : Type*} [CommGroup H] {ε φ : H} {r : ℕ}
   exact Prod.ext hk hj
 
 end CosetSeparation
+
+section Assembled
+
+variable {p q : ℕ} [Fact p.Prime] {G : Type*} [Group G]
+
+/-- The image `σ(P)` of the additive kernel is abelian. -/
+theorem P_mul_comm (data : FieldNormalizerData p q G) {a b : G} (ha : a ∈ data.P)
+    (hb : b ∈ data.P) : a * b = b * a := by
+  haveI : IsMulCommutative (NormSet.normOneFrobeniusKernel p q) := by
+    unfold NormSet.normOneFrobeniusKernel
+    infer_instance
+  rw [← data.sigma_P_eq_P] at ha hb
+  obtain ⟨a', ha', rfl⟩ := ha
+  obtain ⟨b', hb', rfl⟩ := hb
+  rw [← map_mul, ← map_mul]
+  congr 1
+  exact setLike_mul_comm (s := NormSet.normOneFrobeniusKernel p q) ha' hb'
+
+/-- The `σ(U)`-orbit of the generator `x = σ(1)` of `σ(P₀)`.  Under the identification of `σ(P)`
+with `𝔽_{3^q}` this is the set of squares — the set `S` of the partial resolution. -/
+def orbitS (data : FieldNormalizerData p q G) : Set G :=
+  {s | ∃ v ∈ data.U, s = v⁻¹ * data.s * v}
+
+/-- **Theorem 1 (centralising case), assembled.**  There is no witness of BG Appendix C,
+hypothesis (B), for `p = 3` in which `g = x^y` centralises `σ(U)` — *provided* the Paley-type
+spanning holds: the elements `s` of the `σ(U)`-orbit of `x` for which `s · x` is again in the
+orbit must generate `σ(P)`.
+
+Under the identification of `σ(P)` with `𝔽_{3^q}` the orbit is the set of squares and the
+admissible `s` are those with `s` and `s + 1` both squares, so the hypothesis is exactly Lemma B
+of `notes/bg/appC_problem1_partial_resolution.md`; that lemma is the one analytic ingredient of
+Theorem 1 (its general-`q` proof uses a Weil bound) and is not formalized here.
+
+Everything else *is*: the relation family `pow_three_mul_conj_eq_one`, the engine
+`commute_conj_of_le_closure`, and the closing contradiction `not_commute_conj`.
+
+Since the book's remark makes the centralising case automatic whenever `3 ∤ |Aut U|`, this covers
+in particular every `q` with `3 ∤ φ((3^q - 1)/2)` — e.g. `q = 5, 11, 17, 23, 37, 43`. -/
+theorem false_of_centralizing_of_spanning (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hcent : ∀ v ∈ data.U, Commute (MulAut.conj data.y data.s) v)
+    (hspan : data.P ≤ Subgroup.closure
+      {s | s ∈ orbitS data ∧ s * data.s ∈ orbitS data}) : False := by
+  have hx3 : data.s ^ 3 = 1 := by
+    subst hp
+    rw [FieldNormalizerData.s, ← map_pow, primeLineGenerator_pow_p, map_one]
+  have hg3 : (MulAut.conj data.y data.s) ^ 3 = 1 := by rw [← map_pow, hx3, map_one]
+  have hSP : orbitS data ⊆ (data.P : Set G) := by
+    rintro s ⟨v, hv, rfl⟩
+    exact conj_s_mem_P data hv
+  have hrel : ∀ s ∈ orbitS data, (MulAut.conj data.y data.s * s) ^ 3 = 1 := by
+    rintro s ⟨v, hv, rfl⟩
+    exact pow_three_mul_conj_eq_one data hp hcent hv
+  have ht : data.s ∈ orbitS data := ⟨1, data.U.one_mem, by group⟩
+  have hcomm := commute_conj_of_le_closure (P := data.P)
+    (fun a ha b hb => P_mul_comm data ha hb) hg3 hSP hrel ht hspan data.s data.s_mem_P
+  exact not_commute_conj data hp (Commute.symm (by
+    have := hcomm
+    exact this.symm))
+
+end Assembled
 
 end OddOrder.BG.AppC.Problem1
