@@ -889,3 +889,26 @@ theorem AddSubgroup.toZModSubmodule_closure {M : Type*} [AddCommGroup M] (n : �
   · rw [Submodule.span_le]
     intro x hx
     exact AddSubgroup.subset_closure hx
+
+/-- **Spanning transport.**  In a `ZMod n`-module, a set spans the whole module (as a submodule)
+iff it generates the whole group when the module is written multiplicatively.
+
+This is the bridge between an arithmetic rank computation (a `Submodule.span` over `ZMod n`) and a
+group-theoretic generation hypothesis (a `Subgroup.closure` in the multiplicative copy) — the form
+in which BG Appendix C, Problem 1 (issue 0180) needs its relation-lattice input. -/
+theorem Submodule.span_eq_top_iff_closure_eq_top {A : Type*} [AddCommGroup A] {n : ℕ}
+    [Module (ZMod n) A] (S : Set A) :
+    Submodule.span (ZMod n) S = ⊤ ↔
+      Subgroup.closure (Multiplicative.toAdd ⁻¹' S) = ⊤ := by
+  rw [← AddSubgroup.toZModSubmodule_closure n S, ← AddSubgroup.toSubgroup_closure S]
+  constructor
+  · intro h
+    have hclosure : AddSubgroup.closure S = ⊤ :=
+      (AddSubgroup.toZModSubmodule n).injective (by simpa using h)
+    rw [hclosure]
+    exact AddSubgroup.toSubgroup.map_top
+  · intro h
+    have hclosure : AddSubgroup.closure S = ⊤ :=
+      AddSubgroup.toSubgroup.injective (by simpa using h)
+    rw [hclosure]
+    exact (AddSubgroup.toZModSubmodule n).map_top
