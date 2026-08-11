@@ -737,8 +737,9 @@ variable {G : Type*} [Group G]
 - Thm 3.29-3.31: 軌道構造 (Hartley-Turull, orbit-size 主張).
 - Thm 3.32-3.34: テクニカル系 (`[G,A,A] = [G,A]` Three-Subgroup Lemma 経由 等).
 
-**形式化状態**: 全 stub.  完全実装は ~8-12 週の大規模作業 (mathlib coprime action machinery
-の活用 + Isaacs 流の細部). 別 phase で進める. -/
+**形式化状態**: 実装済. owner chapter 規則により実体は
+`OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean` にあり (3.23/3.24 の対応は
+本ファイル末尾 §3E の注記を参照)。以下は本ファイルが持つ `IsAInvariant` 等の共通 def。 -/
 
 /-- **A-不変部分群**: `φ : A →* MulAut G` の作用下で `H ≤ G` が `A`-不変.
 i.e., `∀ a ∈ A, φ(a) • H = H`. -/

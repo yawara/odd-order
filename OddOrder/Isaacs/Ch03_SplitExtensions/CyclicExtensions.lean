@@ -27,8 +27,9 @@ variable {G : Type*} [Group G]
 
 FT 経路では優先度低 (Peterfalvi で散発使用).
 
-**形式化状態**: stub. 全 lifted 結果は SemidirectProduct (mathlib) との接続で得られる
-可能性が高い. -/
+**形式化状態**: 実装済 — 本ファイルに 3.35 (`cyclic_quotient_lift` /
+`cyclic_quotient_extension_unique`) と 3.36 (`cyclic_extension_exists`、標準模型
+`(↥N ⋊_σ ℤ) ⧸ ⟨(a⁻¹, m)⟩` 経由) が入っている. -/
 
 /-- **Isaacs Thm 3.35 (cyclic lift; generator)**: `H ⊴ G`, `G/H` cyclic ⇒ ある `g ∈ G` が
 `G/H` の生成元の lift で, `⟨g⟩ ⊔ H = G`. (Thm 3.35 強版の uniqueness の前提.)
@@ -68,7 +69,8 @@ Isaacs §3F の主結果 (extension uniqueness). 任意 `u ∈ G` は `u = (u·(
 形に一意分解 (`u·(g^i)⁻¹ ∈ N`, `i` は `gN` の zpowers での representation).
 両 θ, θ' が同じ extension を与えるなら値が一致.
 
-**注**: existence (Thm 3.36 cyclic extension) は別途 (Sym(Ω) realization), Phase 4 予定. -/
+**注**: existence (Thm 3.36 cyclic extension) は本ファイル後半の
+`cyclic_extension_exists`. -/
 theorem cyclic_quotient_extension_unique
     {G G₀ : Type*} [Group G] [Group G₀]
     {N : Subgroup G} [N.Normal]
