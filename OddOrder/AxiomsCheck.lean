@@ -20882,6 +20882,15 @@ conj_s_unitElt / layerFieldHom_apply   (the three layers in *field* coordinates)
         → layerFieldHom_one_conj       (**relation (3)**: a collision `D(p) = D(r)` conjugates one
                                         second-layer element into another *by a first-layer
                                         element*: `b(K(r) z^{e²}) = b(K(p) z^{e²})^{a(-δ z^e)}`)
+          → conj_layerFieldHom_one_mem (**relation (4)**: when `δ` is a square, normalising `z`
+                                        makes the conjugating element the fixed `x = σ(1)`)
+            → false_of_collisionSet_spanning
+                                       (**the criterion, assembled**: if the `S`-values of
+                                        collisions with square `δ` generate `(𝔽_{3^q}, +)` then
+                                        hypothesis (B) has *no witness*.  `collisionSet` is a
+                                        purely field-theoretic set — exactly what
+                                        notes/meta/gap/verify_collision_span.g checks, and what it
+                                        confirms for q = 7, 13, 19)
       → false_of_s_normalizes_layerOne (**the criterion, group side**: it is enough that the
                                         single element `x = σ(1)` normalizes the second layer —
                                         the `σ(U)`-orbit of `x` then spreads it over `σ(P)`.
@@ -20975,4 +20984,7 @@ hypothesis (B) for `p = 3` with `g` centralising `σ(U)`; and for a non-Frobeniu
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.normOneVal_pow
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.layerFieldHom_two_factor
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.layerFieldHom_one_conj
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conj_layerFieldHom_one_mem
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.coe_layerOne_eq_range
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionSet_spanning
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_s_normalizes_layerOne

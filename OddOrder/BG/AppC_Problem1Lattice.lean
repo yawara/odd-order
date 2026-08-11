@@ -530,6 +530,11 @@ theorem normOneVal_mul (u v : NormSet.normOneUnits p q) :
     normOneVal (u * v) = normOneVal u * normOneVal v := rfl
 
 @[simp]
+theorem normOneVal_inv (u : NormSet.normOneUnits p q) :
+    normOneVal u⁻¹ = (normOneVal u)⁻¹ := by
+  simp [normOneVal]
+
+@[simp]
 theorem normOneVal_pow (u : NormSet.normOneUnits p q) (k : ℕ) :
     normOneVal (u ^ k) = normOneVal u ^ k := by
   simp only [normOneVal, SubgroupClass.coe_pow, Units.val_pow_eq_pow_val]
@@ -881,6 +886,133 @@ theorem false_of_s_normalizes_layerOne (data : FieldNormalizerData p q G) (hp : 
   refine le_trans (le_closure_orbitS data hp) ((Subgroup.closure_le _).mpr ?_)
   rintro z ⟨⟨v, hv, rfl⟩, -⟩
   exact Subgroup.mul_mem _ (Subgroup.mul_mem _ (Subgroup.inv_mem _ (hU hv)) hx) (hU hv)
+
+
+/-! ### The criterion, assembled -/
+
+/-- The `S`-values produced by a collision whose difference `δ = r^e - p^e` is a *square* (the
+value of a norm-one unit).  Normalising by `z = (δ⁻¹)^{e²}` makes `δ z^e = 1`, so relation (3)
+becomes conjugation by the fixed element `x = σ(1)`. -/
+def collisionSet (p q e : ℕ) [Fact p.Prime] : Set (GaloisField p q) :=
+  {S | ∃ p₀ p₁ r₀ r₁ d₀ : NormSet.normOneUnits p q,
+      normOneVal p₀ = normOneVal p₁ + 1 ∧ normOneVal r₀ = normOneVal r₁ + 1 ∧
+      normOneVal p₀ ^ e - normOneVal p₁ ^ e = normOneVal r₀ ^ e - normOneVal r₁ ^ e ∧
+      normOneVal d₀ = normOneVal r₀ ^ e - normOneVal p₀ ^ e ∧
+      S = (normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e)) *
+          normOneVal (d₀⁻¹ ^ (e * e)) ^ (e * e)}
+
+/-- **Relation (4).**  For a collision with square difference, conjugation by `x = σ(1)` carries
+the second-layer element `b(S)` back into the second layer. -/
+theorem conj_layerFieldHom_one_mem (data : FieldNormalizerData p q G) (hp : p = 3) {e : ℕ}
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {S : GaloisField p q} (hS : S ∈ collisionSet p q e) :
+    data.s * layerFieldHom data 1 (Multiplicative.ofAdd S) * (data.s)⁻¹ ∈ layerOne data := by
+  obtain ⟨p₀, p₁, r₀, r₁, d₀, hpp, hrr, hcoll, hd, rfl⟩ := hS
+  set z : NormSet.normOneUnits p q := d₀⁻¹ ^ (e * e) with hz
+  have hcube := normOneUnits_pow_cube data hp hexp d₀⁻¹
+  have hze : normOneVal z ^ e = (normOneVal d₀)⁻¹ := by
+    have hstep : normOneVal (z ^ e) = normOneVal (d₀⁻¹) := by
+      rw [hz, ← pow_mul, hcube]
+    rw [normOneVal_pow] at hstep
+    rw [hstep, normOneVal_inv]
+  have hone : (normOneVal r₀ ^ e - normOneVal p₀ ^ e) * normOneVal z ^ e = 1 := by
+    rw [hze, ← hd]
+    exact mul_inv_cancel₀ (Units.ne_zero _)
+  have h3 := layerFieldHom_one_conj data hp hexp p₀ p₁ r₀ r₁ z hpp hrr hcoll
+  rw [hone] at h3
+  have ha1 : layerFieldHom data 0 (Multiplicative.ofAdd (1 : GaloisField p q)) = data.s := by
+    simp only [layerFieldHom_apply, pow_zero, inv_one, one_mul, mul_one]
+    rfl
+  have ha2 : layerFieldHom data 0 (Multiplicative.ofAdd (-1 : GaloisField p q)) = (data.s)⁻¹ := by
+    rw [← ha1, ← map_inv]
+    rfl
+  rw [ha1, ha2] at h3
+  rw [← h3]
+  exact ⟨fieldHom data (Multiplicative.ofAdd
+      ((normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e)) * normOneVal z ^ (e * e))),
+    by rw [← fieldHom_range data]; exact ⟨_, rfl⟩,
+    by simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply, inv_inv, layerFieldHom_apply,
+      pow_one]⟩
+
+theorem coe_layerOne_eq_range (data : FieldNormalizerData p q G) :
+    (layerOne data : Set G) = Set.range (layerFieldHom data 1) := by
+  ext z
+  constructor
+  · rintro ⟨w, hw, rfl⟩
+    rw [← fieldHom_range data] at hw
+    obtain ⟨t, rfl⟩ := hw
+    exact ⟨t, by simp only [layerFieldHom_apply, pow_one, MulEquiv.coe_toMonoidHom,
+      MulAut.conj_apply, inv_inv]⟩
+  · rintro ⟨t, rfl⟩
+    exact ⟨fieldHom data t, by rw [← fieldHom_range data]; exact ⟨t, rfl⟩,
+      by simp only [layerFieldHom_apply, pow_one, MulEquiv.coe_toMonoidHom, MulAut.conj_apply,
+        inv_inv]⟩
+
+/-- **The collision-span criterion, fully assembled.**  If the `S`-values coming from collisions
+with square difference generate `(𝔽_{3^q}, +)`, hypothesis (B) has no witness.
+
+Conjugation by `x = σ(1)` maps a generating set of the second layer back into it, and the second
+layer is finite, so `x` normalizes it; `false_of_s_normalizes_layerOne` finishes.  This is exactly
+the criterion verified computationally for `q = 7, 13, 19` in
+`notes/meta/gap/verify_collision_span.g`. -/
+theorem false_of_collisionSet_spanning (data : FieldNormalizerData p q G) (hp : p = 3) {e : ℕ}
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    (hnotfrob : ∀ j : ℕ, ∃ u : NormSet.normOneUnits p q, u ^ e ≠ u ^ (3 ^ j))
+    (hspan : AddSubgroup.closure (collisionSet p q e) = ⊤) : False := by
+  classical
+  haveI : Finite (layerOne data) := by
+    have hfin : ((layerOne data : Subgroup G) : Set G).Finite := by
+      rw [coe_layerOne_eq_range data]
+      exact Set.finite_range _
+    exact hfin.to_subtype
+  -- conjugation by `x` maps the second layer into itself
+  have hmapsto : ∀ z ∈ layerOne data, data.s * z * (data.s)⁻¹ ∈ layerOne data := by
+    have hJ : ∀ t : GaloisField p q,
+        data.s * layerFieldHom data 1 (Multiplicative.ofAdd t) * (data.s)⁻¹ ∈ layerOne data := by
+      have hsub : collisionSet p q e ⊆ {t : GaloisField p q |
+          data.s * layerFieldHom data 1 (Multiplicative.ofAdd t) * (data.s)⁻¹ ∈ layerOne data} :=
+        fun t ht => conj_layerFieldHom_one_mem data hp hexp ht
+      have hgrp : AddSubgroup.closure (collisionSet p q e) ≤
+          { carrier := {t : GaloisField p q |
+              data.s * layerFieldHom data 1 (Multiplicative.ofAdd t) * (data.s)⁻¹ ∈ layerOne data}
+            zero_mem' := by
+              simp only [Set.mem_setOf_eq, ofAdd_zero, map_one, mul_one, mul_inv_cancel]
+              exact (layerOne data).one_mem
+            add_mem' := fun {a b} ha hb => by
+              simp only [Set.mem_setOf_eq, ofAdd_add, map_mul] at *
+              have : data.s * (layerFieldHom data 1 (Multiplicative.ofAdd a) *
+                  layerFieldHom data 1 (Multiplicative.ofAdd b)) * (data.s)⁻¹ =
+                  (data.s * layerFieldHom data 1 (Multiplicative.ofAdd a) * (data.s)⁻¹) *
+                  (data.s * layerFieldHom data 1 (Multiplicative.ofAdd b) * (data.s)⁻¹) := by
+                group
+              rw [this]
+              exact (layerOne data).mul_mem ha hb
+            neg_mem' := fun {a} ha => by
+              simp only [Set.mem_setOf_eq, ofAdd_neg, map_inv] at *
+              have : data.s * (layerFieldHom data 1 (Multiplicative.ofAdd a))⁻¹ * (data.s)⁻¹ =
+                  (data.s * layerFieldHom data 1 (Multiplicative.ofAdd a) * (data.s)⁻¹)⁻¹ := by
+                group
+              rw [this]
+              exact (layerOne data).inv_mem ha } :=
+        (AddSubgroup.closure_le _).mpr hsub
+      intro t
+      have := hgrp (by rw [hspan]; trivial : t ∈ AddSubgroup.closure (collisionSet p q e))
+      exact this
+    intro z hz
+    rw [← SetLike.mem_coe, coe_layerOne_eq_range data] at hz
+    obtain ⟨t, rfl⟩ := hz
+    exact hJ (Multiplicative.toAdd t)
+  -- finiteness upgrades this to normalizing
+  have hmap_le : (layerOne data).map (MulAut.conj data.s : G →* G) ≤ layerOne data := by
+    rintro _ ⟨z, hz, rfl⟩
+    exact hmapsto z hz
+  have hcard : Nat.card ((layerOne data).map (MulAut.conj data.s : G →* G))
+      = Nat.card (layerOne data) :=
+    Subgroup.card_map_of_injective (f := (MulAut.conj data.s : G →* G))
+      (MulAut.conj data.s).injective
+  exact false_of_s_normalizes_layerOne data hp hexp hnotfrob
+    (Subgroup.mem_normalizer_iff_map_conj_eq.mpr
+      (Subgroup.eq_of_le_of_card_ge hmap_le (le_of_eq hcard.symm)))
 
 
 /-- **Theorem 2, the punchline.**  A witness of BG Appendix C, hypothesis (B), for `p = 3` whose
