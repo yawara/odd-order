@@ -386,6 +386,8 @@ per_page 付き 2 ページで (1 回の要約 fetch は後半を捏造する事
 5. Tier A proposal PR: Jordan / Chermak–Delgado / Furtwängler / Thompson-FPF + 🆕 B.H.Neumann 位数 3
    + 一般 Hall–Petresco (#16 差替)。proposal merge 後、solver は他者開放 (feit_thompson 前例)。
 6. 🎯 issue 0147 Q₈ 完成 (2026-07-25 解凍済、Navarro spine) → `brauer_suzuki` proof submit (唯一の既存未解決落とし)。
-7. stale docstring 掃除 — `burnside_p_pow_q_pow` の「local axiom」は 2026-07-24 修正済; 残り =
-   `Ch07.normal_J` の「Remaining local axioms」、`AppC_NormSet` の「to be formalized」、
-   `brauer_permutation_lemma'` の「Isaacs Thm 6.32」誤引用ほか — 公開物に写すと誤解を招く。
+7. ✅ **(2026-08-11 完了) stale docstring 掃除** — 「未形式化」「TODO」「gated」の陳腐化記述
+   12 件と誤引用 1 件を修正 (commit `613559800`、詳細は issue 0050 の該当項目)。特に
+   `brauer_permutation_lemma` の「[Isaacs] Thm 6.32」は本リポの `[Isaacs]` = *Finite Group
+   Theory* に**存在しない番号** (同書 Ch.6 は 6.24 まで) で、正しくは *Character Theory of
+   Finite Groups* (1976)。proposal PR に写す前に潰せた。

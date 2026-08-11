@@ -47,9 +47,17 @@ self-contained / 証明が難しく mathlib 未収録。詳細と全候補は正
       `lake exe lean-eval validate-manifest` + `check-problem-build` で検証してから PR
 - [ ] **(proposal) Chermak–Delgado / Furtwängler / Thompson FPF-nilpotency** を続けて proposal PR。
       merge 後、solver は他者開放 (`feit_thompson` 前例)
-- [ ] **(整備) stale docstring 掃除** — `burnside_p_pow_q_pow`「local axiom 封じ込め」/
-      `Ch07.normal_J`「Remaining local axioms」/ `AppC_NormSet`「to be formalized」/
-      `brauer_permutation_lemma'`「Isaacs Thm 6.32」誤引用ほか (正本 note §8)
+- [x] **(整備 2026-08-11 完了) stale docstring 掃除** — 「未形式化」「TODO」「gated」の
+      陳腐化記述 12 件 + 誤引用 1 件を実測で洗い出して修正 (commit `613559800`)。
+      内訳: `AppC_Problem1` の補題 B「未形式化・Weil 要」/ `S14 Basics` の `R(x)`・`M̃`
+      「未形式化」/ `S16 TypeBridges` の型 III/IV 最後の一里「未形式化」(実際は直下で証明済) /
+      `S09 NormalCase` の (7.7.a) / `PSU3StepTwenty` の (H5) 連鎖 / `CharacterCompleteness` /
+      `S06_Additional` 対応表 (Thm 6.2 一般形・Lem 6.3(a) 第 2 結論・6.3(b)/6.4/6.7) /
+      `TheoremsAE` の G# 被覆 / `Theorem315` の placeholder / `SemidirectAut` の実装 TODO /
+      `Ch07 S7B2`・`S7D1` の local axiom / `AppC_NormSet` lemmaC1 / `Modular/
+      GeneralizedDecomposition` ほか。**誤引用** = `brauer_permutation_lemma` の
+      「[Isaacs] Thm 6.32」は *Finite Group Theory* に存在しない (同書 Ch.6 は 6.24 で終わる)
+      — 正しくは *Character Theory of Finite Groups* (1976) で、4 箇所に書名を明示
 
 ## 完了条件
 
