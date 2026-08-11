@@ -15,7 +15,8 @@ This module discharges the explicit hypotheses of
 `OddOrder.RepresentationTheory.brauer_permutation_lemma` (`BrauerPermutation.lean`) for an
 arbitrary finite group `G`, producing the hypothesis-free statement
 
-> `# { χ ∈ Irr G | χ̄ = χ } = # { C ∈ ConjClasses G | C⁻¹ = C }`   ([Isaacs] Thm 6.32).
+> `# { χ ∈ Irr G | χ̄ = χ } = # { C ∈ ConjClasses G | C⁻¹ = C }`   (Isaacs,
+*Character Theory of Finite Groups*, Thm 6.32 — **not** *Finite Group Theory*).
 
 Two ingredients are supplied here:
 
@@ -189,7 +190,8 @@ theorem conjPerm_compat [Finite G] (χ : IrreducibleCharacter G) (C : ConjClasse
 
 variable [Finite G]
 
-/-- **Brauer's permutation lemma** ([Isaacs] Thm 6.32), unconditional form.
+/-- **Brauer's permutation lemma** (Isaacs, *Character Theory of Finite Groups*, Thm 6.32),
+unconditional form.
 
 For a finite group `G`, the number of real irreducible complex characters equals the number of
 self-inverse (real) conjugacy classes. -/

@@ -63,8 +63,9 @@ recorded in `notes/bg/appC_problem1_partial_resolution.md` (issue 0180):
   family plus the spanning of the relation lattice makes `⟨P, P^g, P^{g²}⟩` perfect, so a witness
   with a non-Frobenius exponent forces the ambient group to be non-solvable.
 * `false_of_centralizing_of_spanning` — **Theorem 1 (centralising case), assembled**: no witness
-  exists, given only the Paley-type spanning hypothesis (Lemma B, not formalized: its general-`q`
-  proof needs a Weil bound).
+  exists, given only the Paley-type spanning hypothesis (Lemma B).
+* `le_closure_orbitS` — Lemma B, transported into `G`, which discharges that hypothesis; hence
+  `false_of_centralizing` — **Theorem 1, unconditional**.
 -/
 
 namespace OddOrder.BG.AppC.Problem1
@@ -905,10 +906,13 @@ orbit must generate `σ(P)`.
 
 Under the identification of `σ(P)` with `𝔽_{3^q}` the orbit is the set of squares and the
 admissible `s` are those with `s` and `s + 1` both squares, so the hypothesis is exactly Lemma B
-of `notes/bg/appC_problem1_partial_resolution.md`; that lemma is the one analytic ingredient of
-Theorem 1 (its general-`q` proof uses a Weil bound) and is not formalized here.
+of `notes/bg/appC_problem1_partial_resolution.md`.  That lemma *is* formalized, elementarily and
+for every `q` (`OddOrder.Paley.addClosure_paleySet_eq_top`: the Paley set is disjoint from its
+negative because `-1` is a non-square, so its span has more than `|F|/3` elements — no Weil bound
+needed), and `le_closure_orbitS` transports it into `G`, giving the unconditional
+`false_of_centralizing` below.
 
-Everything else *is*: the relation family `pow_three_mul_conj_eq_one`, the engine
+The rest of the argument is the relation family `pow_three_mul_conj_eq_one`, the engine
 `commute_conj_of_le_closure`, and the closing contradiction `not_commute_conj`.
 
 Since the book's remark makes the centralising case automatic whenever `3 ∤ |Aut U|`, this covers

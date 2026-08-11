@@ -22,8 +22,10 @@ class function of `H` because `x` is centralised by `H`, so it expands uniquely 
 
 Navarro's own argument decomposes `χ|_H` into `Irr(H)` and uses that `x` acts as a scalar in each
 irreducible representation of `H` (`x ∈ Z(H)`); that route also shows `d^x_{χφ} ∈ ℤ[ζ]` for `ζ` a
-primitive `o(x)`-th root of unity, which the basis argument does not see and which is not proved
-here.  ⚠ Nothing below needs `x` to be a `p`-element.
+primitive `o(x)`-th root of unity, which the basis argument here does not see.  The case actually
+needed downstream — `x` an **involution**, where `ℤ[ζ] = ℤ` — is proved by a different route (no
+roots of unity, only `2` invertible) in `InvolutionDecompositionIntegral`:
+`exists_intCast_generalizedDecompositionNumber`.  ⚠ Nothing below needs `x` to be a `p`-element.
 
 ## Main definitions
 

@@ -91,13 +91,12 @@ Isaacs p.71 の証明: `A = ⟨σ⟩ ≤ Aut(G)` cyclic, `Γ = G ⋊ A` semidire
 適用 ⇒ K と inl(G) 可換. K ⊆ C_Γ(inl(G)) ⊓ inr A = ⊥ (非自明自己同型は非自明作用). 故に
 K = ⊥, `|inr A : K| = |inr A| = o(σ)`. 結論 `o(σ) < |G|`.
 
-実装 TODO: Lucchini axiom + 半直積セットアップが揃った後に別 commit で本証明を fill in.
-鍵となる補題:
+実装に使う補題:
 - `SemidirectProduct.card`, `SemidirectProduct.equivProd` (Finite + 濃度)
 - `inl_range_isComplement_inr_range` (本ファイル §3A): inl(G), inr(A) 補集合
 - `inr_conj_inl_eq` (本ファイル §3A): 半直積内の共役 = 作用
 - `Subgroup.commute_of_normal_of_disjoint` (mathlib, Lemma 2.7): K ⊴, inl(G) ⊴, K∩inl(G)=⊥ ⇒ 可換
-- `OddOrder.Isaacs.Ch04.lucchini_index_normalCore_lt_index` (Ch.4 dir owner; K = ⊥ axiom 残)
+- `OddOrder.Isaacs.Ch04.lucchini_index_normalCore_lt_index` (Ch.4 dir owner)
 - `MonoidHom.map_zpowers`, `Nat.card_zpowers`, `Subgroup.index_mul_card`. -/
 theorem horosevskii_aut_order_lt {G : Type*} [Group G] [Finite G] [Nontrivial G]
     (σ : MulAut G) :

@@ -489,12 +489,12 @@ theorem matsuyama_of_simple_nonsolvable_q_two
 
 /-! ### §7D Steps 2-9 — per-step decomposition of the 9-step argument
 
-The original monolithic axiom `noNonsolvableSimplePaQb` (the entire
-Goldschmidt-Bender-Matsuyama argument) is here decomposed into the individual
-textbook steps.  Steps that are provable from the landed infrastructure appear
-as theorems; the heavier steps (4, 8, 9) remain as fine-grained local axioms,
-each tracked in issue 0032.  The steps are wired together into
-`noNonsolvableSimplePaQb` (now a *theorem*) at the end. -/
+The entire Goldschmidt-Bender-Matsuyama argument is decomposed into the
+individual textbook steps, each landed as a theorem, and the steps are wired
+together into `noNonsolvableSimplePaQb` at the end.  (Historically the argument
+sat behind a monolithic local axiom, then behind fine-grained per-step ones for
+Steps 4, 8, 9 tracked in issue 0032; all of those are discharged — the file has
+no axioms.) -/
 
 /-- **§7D arithmetic helper** — a positive natural dividing `p^a * q^b`
 (`p ≠ q` prime) is itself of the form `p^a' * q^b'`.

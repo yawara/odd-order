@@ -821,19 +821,23 @@ theorem typeP1_complement_mem_sigma_and_factorization [Finite G]
   rw [← hlag, Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
     Finsupp.add_apply, Nat.factorization_eq_zero_of_not_dvd hp_not_UM, add_zero]
 
-/-- **Prop 16.1 forward bridge `hP1neIIIIV`, reduced to the Peterfalvi (8.7) normalizer residual** —
-a type-`P₁` maximal subgroup with `M_F ≠ M_σ` is of type III or IV.
+/-- **Prop 16.1 forward bridge `hP1neIIIIV`** — a type-`P₁` maximal subgroup with `M_F ≠ M_σ` is
+of type III or IV.
 
-The type-`P` datum is now fully constructed (`typePData_of_isTypeP1_mf_ne_msigma`, the type III/IV
+The type-`P` datum is fully constructed (`typePData_of_isTypeP1_mf_ne_msigma`, the type III/IV
 carrier-constructibility milestone, BG Corollary 15.5): the nilpotent `M_F`-complement `U ≠ ⊥` with
 `F(M) = M_F ⊔ (U ⊓ C_M(M_F))`.  The complement is built transparently here (rather than via the
 opaque constructor) so that `U ≠ ⊥` (`hcommon`) and the normalizer condition are statable for the
 *specific* `U`.  `isTypeIII_or_IV_of_typePData` then splits on `IsMulCommutative ↥U` (III vs IV).
 
-The sole remaining residual is the genuinely-deep **type III/IV last mile `N_G(U) ⊆ M`** (Peterfalvi
-(8.7) / Coq `BGsection15` `Fcore_structure`): this self-normalizing property of the `M_F`-complement
-is exactly what distinguishes type III/IV (`normalizer_le`) from type II (`normalizer_not_le`), and
-needs the BG uniqueness analysis of the complement not yet formalized. -/
+The **type III/IV last mile `N_G(U) ⊆ M`** (Peterfalvi (8.7) / Coq `BGsection15` `Fcore_structure`)
+— the property that distinguishes type III/IV (`normalizer_le`) from type II
+(`normalizer_not_le`) — is discharged in the proof below, without the BG uniqueness analysis of
+the complement: pick a prime `p ∣ |U|` and the Sylow `p`-subgroup `P̄` of the *nilpotent* `U`, so
+`N_G(U) ≤ N_G(P̄)` (uniqueness of Sylows in a nilpotent group,
+`normalizer_le_normalizer_map_sylow_of_isNilpotent`); `p ∈ σ(M)` and `P̄` is a full Sylow
+`p`-subgroup of `M` (`typeP1_complement_mem_sigma_and_factorization`), so
+`N_G(P̄) ≤ M` (`Ch3.S10.normalizer_sylow_map_le_of_mem_sigma`). -/
 theorem isTypeIII_or_IV_of_isTypeP1_mf_ne_msigma [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hP1 : S14.IsTypeP1 M) (hne : S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M) :

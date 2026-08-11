@@ -22,8 +22,9 @@ variable {G : Type*} [Group G]
 /-! **Isaacs Thm 3.15**: 全ての素数 `p` について `p`-complement (i.e., `{p}'`-Hall) が
 存在 ⇒ `G` 可解.
 
-**Forward dep**: Burnside `p^a q^b` 経由. Ch.7 完成後に back-fill.
-所在: `OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean` (placeholder).
+Burnside `p^a q^b` を 2-素数基底に使うので Ch.7 に置いてある:
+`OddOrder.Isaacs.Ch07.isSolvable_of_pcomplement_exists`
+(`OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean`).
 詳細は [`notes/isaacs/ch07_burnside.md`](../../notes/isaacs/ch07_burnside.md). -/
 
 /-- **Isaacs Lemma 3.16**: `|G:H|`, `|G:K|` が coprime ⇒ `G = HK` (i.e., `H ⊔ K = ⊤`).

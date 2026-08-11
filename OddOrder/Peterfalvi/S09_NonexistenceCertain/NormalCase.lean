@@ -37,12 +37,11 @@ subgroup `H ⊴ L`, with the family `T = {ζ_0, ..., ζ_n}` of induced character
   `‖χ^ρ‖² = Σ_{i,j≥1} c̄_i c_j / ‖ζ_i‖² ‖ζ_j‖² · ((ζ_i, ζ_j) - ζ_i(1)·conj(ζ_j(1))/|L|)`,
   obtained by inner-product expansion of (7.7.a) using `ζ_i` supported on `H`.
 
-The (7.7.a) statement is carried as a structural certificate (`chiRho_decomp`)
-rather than proved here: it encodes Peterfalvi's basis argument
-("ψ_i span CF(L,A)") which depends on the induced/restricted character
-decomposition theory not yet formalized in this file.  Once that decomposition
-is available the field can be discharged by a constructor.  (7.7.b) is then
-proved here as a direct corollary by inner-product expansion. -/
+The (7.7.a) statement is carried here as a structural certificate (`chiRho_decomp`) rather
+than proved in place: it encodes Peterfalvi's basis argument ("ψ_i span CF(L,A)"), which needs
+the induced/restricted character decomposition theory of the downstream files.  That certificate
+is **discharged** by `S09_Building78C.chiRho_decomp_proof`.  (7.7.b) is proved here as a direct
+corollary by inner-product expansion. -/
 
 /-- **Peterfalvi (7.6) Hypothesis.**
 

@@ -37,18 +37,20 @@ CLAUDE.md no-wrapper policy 準拠: 完成済 Isaacs Ch.7 を直接呼ぶ。教�
 - **Thm 6.2**
   - 内容: (normal-J) G solvable odd, S∈Syl_p ⇒ `Z(J(S))·O_{p'}(G) ⊴ G`
   - Isaacs FGT / repo: **Thm 7.6** `OddOrder.Isaacs.Ch07.normal_J` (odd-order 等価)
-  - 状態: core 完成 (本ファイル, reduced case)。⚠ literal `J(S)` 一般形は **Glauberman ZJ に
-    blocked** (issue 3017 → 3024)。book 推奨代替の `L(S)` 一般形は済 =
+  - 状態: ✅ **完了**。core (reduced case) は本ファイル、literal `J(S)` 一般形は
+    `S06_Thm62JS` が `GroupTheory/GlaubermanZJ.inf_zCenter_thompsonJAbelian_normal` を使って
+    **無条件で**供給 (issue 3017 → 3024、いずれも closed)。book 推奨代替の `L(S)` 一般形も済 =
     `AppB_Thm62.zCenter_lOdd_sup_oPiCore_normal`
 - **Lem 6.3(a)**
   - 内容: G solvable, H ⊴ G normal Hall 補群 K, H⊆G' ⇒ `⁅H,K⁆ = H` (∧ C_H(K)⊆H')
   - Isaacs FGT / repo: `commutator_eq_self_of_isComplement'_le_commutator` (§6.3, 本ファイル)
-  - 状態: 第 1 結論 ✅ (Thm 10.6/Cor 10.7(a)/§15 が引用); C_H(K)⊆H' は §10 critical path 外で
-    TODO
-- 6.3(b)-6.4, 6.7
+  - 状態: ✅ **両結論とも完了**。第 1 結論 (Thm 10.6/Cor 10.7(a)/§15 が引用) と
+    第 2 結論 `C_H(K) ⊆ H'` = `S06_ConjugationBridges.centralizer_inf_le_derivedInG_of_isComplement'`
+- 6.3(b), 6.4, 6.7
   - 内容: solvable + p-length 1 + Frobenius factorization
   - Isaacs FGT / repo: Isaacs Ch.5/Ch.7
-  - 状態: TODO
+  - 状態: ✅ **完了** — 6.3(b) = `S06_Lem63b`、6.4 = `S06_Thm64` (+ `S06_Thm64Case2`)、
+    6.7 = 本ファイル末尾の `6.7` セクション
 
 ## このコミット (core results)
 

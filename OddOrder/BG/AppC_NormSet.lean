@@ -531,7 +531,7 @@ lemma natCast_pow_pPow [Fact p.Prime] (k i : ℕ) :
 /-- **BG Appendix C, Lemma C.1** (mmd L4911): if the norm set is closed under
 inversion and has at least two elements, then `p ≤ q`.
 
-Proof (to be formalized, issue 3000): for `a ∈ E^#`, the map `τ(a) = 1/(2-a)`
+Proof: for `a ∈ E^#`, the map `τ(a) = 1/(2-a)`
 sends `E` to `E` (using `E = E⁻¹`), and `∏_{j≤k} τ^j(a) = 1/((k+1)-ka)`
 telescopes, giving `N((1-a)k+1) = 1` for all `k ∈ 𝔽_p`. The degree-`q` polynomial
 `∏_{i<q} ((1-a)^{p^i} X + 1) - 1` (leading coefficient `N(1-a) ≠ 0`) then has all

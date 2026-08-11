@@ -1262,7 +1262,9 @@ the new BG Corollary 15.5 lemmas: `U` is nilpotent
 Fitting decomposition `F(M) = M_F ⊔ (U ⊓ C_M(M_F))` (`fittingInAmbient_eq_mf_sup_inf_of_…`, whence
 `M'' ≤ F(M)` gives `hSDfit`).  Fed to the gated-endpoint `typePData_of_isTypeP_of_inputs`.  Mirrors
 `typePData_of_isTypeP2`; together they construct the type-`P` datum for every non-type-V type-`P`
-maximal, leaving the `hP1neIIIIV` bridge gated only on the type III/IV last mile `N_G(U) ⊆ M`. -/
+maximal; the `hP1neIIIIV` bridge then only needs the type III/IV last mile `N_G(U) ⊆ M`, which
+`TypeBridges.isTypeIII_or_IV_of_isTypeP1_mf_ne_msigma` discharges by a Sylow argument in the
+nilpotent `U`. -/
 noncomputable def typePData_of_isTypeP1_mf_ne_msigma [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (hP1 : S14.IsTypeP1 M)

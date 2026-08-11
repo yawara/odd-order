@@ -1132,7 +1132,7 @@ private theorem conjNormal_ker_eq_centralizer
     -- `g * v * g⁻¹ = v * g * g⁻¹ = v`.
     rw [← hcomm]; group
 
-/-- **Isaacs Thm 7.6 Step 8a** (local axiom — mmd L3893-3895): apply Thm 7.5.
+/-- **Isaacs Thm 7.6 Step 8a** (mmd L3893-3895): apply Thm 7.5.
 
 Given Step 4-5-6-7 outputs:
 * `P = UA` (Step 4)

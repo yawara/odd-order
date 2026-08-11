@@ -400,7 +400,8 @@ theorem stepTwenty_of_mem_KW (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
 Its hypothesis is `eq_one_of_conj_eq_mul_Q0_of_mem_D`, and `h(ω) ∈ W` is `h_mem_W`.  What
 is left is `ω_i² = (0,α)`, which the book gets from a chain of three orbit identities fed
 to (H5).  The last two steps of that argument are here; the chain itself — which needs the
-family `ω_1, …, ω_n` of orbit representatives — is not yet formalized.
+family `ω_1, …, ω_n` of orbit representatives (`exists_normalizedOrbitRep`) — is assembled in
+`PSU3BarOrbit.exists_f_eq_conj_inv`, the closing Proposition itself.
 -/
 
 /-- **The (H5) chain of §2's closing Proposition** (Peterfalvi Part II, p. 129).

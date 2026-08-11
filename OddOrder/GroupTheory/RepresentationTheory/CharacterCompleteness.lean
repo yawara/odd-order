@@ -25,7 +25,9 @@ By Schur's lemma, on an irreducible `ρ` the intertwiner `T_ρ f` is a scalar, c
 the inner product `(f, χ_ρ)`; if `f ⊥ Irr G` then this scalar is `0`, so `T_ρ f = 0` on every
 irreducible and (by Maschke) on the regular representation, forcing `f = 0`. Hence the
 irreducible characters span, giving `|Irr G| ≥ |ConjClasses G|` and (with the reverse
-inequality already proved) equality. The downstream steps are not yet formalized here.
+inequality already proved) equality — `card_irreducibleCharacter_eq`, which this file then
+packages as `CharacterTableIndexing.ofFinite'` / `instCharacterTableIndexingOfFinite`, the
+square-table datum every downstream orthogonality result consumes.
 -/
 
 namespace OddOrder.RepresentationTheory

@@ -17,18 +17,21 @@ import OddOrder.BG.Ch1_Preliminary.S06_Additional
 
 Then `⁅K, R⁆ ⊆ F(K)`.
 
-This is the unique §3 prerequisite of BG Theorem 15.2 (`mf_ne_msigma_typeP1_structure`) that was
-not yet formalized (the `S03` group covers 3.4/3.5/3.6/3.7/3.10 only).  See `issues/8011-thm38.md`
-for the full proof plan (mmd L1221-1259, induction on `|RK|` + a chief-factor module argument).
+This is the §3 prerequisite of BG Theorem 15.2 (`mf_ne_msigma_typeP1_structure`) that the
+`S03` group (3.4/3.5/3.6/3.7/3.10) does not cover.  The proof runs by strong induction on `|RK|`
+plus a chief-factor module argument (mmd L1221-1259); `issues/closed/8011-thm38.md` records the
+step-by-step plan.
 
-## This file (in progress, issue 8011)
+## This file
 
-The proof's step 4 (chief-factor dichotomy) is structurally identical to BG Theorem 3.7's
-(`S03c_Thm37`), so most of the chief-factor machinery is reused.  The `q = p` case is a direct
-citation of `S03c.samePrime_kernel_le_chiefFactorCentralizer`; the `q ≠ p` case (leaf B, the
-linchpin) replaces Theorem 3.7's Frobenius argument with **Theorem 3.4** (`S03d.thm34`).  This
-file currently lands the abstract `q ≠ p` core
-(`commutator_acts_trivially_via_thm34`), the `thm34`-analog of
+`thm38_aux` carries the induction (step 1 = Prop 1.4, step 2 = `K̄` a `p`-group, step 3 = `R` of
+prime order, step 4 = the reduced chief-factor dichotomy) and `thm38` is the statement above.
+
+Step 4 is structurally identical to BG Theorem 3.7's (`S03c_Thm37`), so most of the chief-factor
+machinery is reused.  The `q = p` case is a direct citation of
+`S03c.samePrime_kernel_le_chiefFactorCentralizer`; the `q ≠ p` case (the linchpin) replaces
+Theorem 3.7's Frobenius argument with **Theorem 3.4** (`S03d.thm34`), through the abstract core
+`commutator_acts_trivially_via_thm34` — the `thm34`-analog of
 `S03c.kernel_acts_trivially_of_coprime_fixedPointFree`.
 -/
 

@@ -25,8 +25,9 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
 ambient を移しても不変なので subnormal 版 (Lemma 3.18 本体) の帰納にそのまま
 使える).
 
-TODO (この leaf の続き): ladder 存在 (π-sep ⇒ normal π/π' ladder), 原子拡大
-(π-群 `A ⊴ G` + `G/A` π-sep ⇒ π-sep), 拡大閉包, Lemma 3.18 (subnormal 版).
+この leaf の続き (ladder 存在, 原子拡大, 拡大閉包, subnormal 版) は別所で実装済:
+`Theorem315` が π-Fitting series 版 (`Def 3.18` + subgroup/quotient 転送) を、
+`Main` の subgroup / quotient 閉包 instance が Lemma 3.18 の役割を担う.
 -/
 
 namespace OddOrder.Isaacs.Ch03

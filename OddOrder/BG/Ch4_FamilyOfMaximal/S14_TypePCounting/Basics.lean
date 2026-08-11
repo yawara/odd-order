@@ -620,13 +620,14 @@ def maximalSigmaSubgroupsOfElement (x : G) : Set (Subgroup G) :=
 
 /-- The nonidentity part `M_σ^#` of `M_σ` (`= sharpSubgroup M_σ`).
 
-**Naming caveat (2026-06-14):** BG's `M̃` — used in Lemma 14.5(c), Theorem 14.7(e), and the
-Corollary 14.9 covering — is the *larger* set `{ x x' | x ∈ M_σ^#, x' ∈ R(x) }`, where `R(x)`
-is the normal Hall subgroup of `C_G(x)` from Theorem 14.4 (it adjoins the `ℓ_σ = 2` "twisted"
-elements). `R(x)` and hence `M̃` are **not yet formalized** (gated on Theorem 14.4 ⟸ §13), so
-this `sigmaSharp` is only the `ℓ_σ = 1` core `M_σ^#`, a strict under-approximation of `M̃`.
-Any downstream use (§15/§16, Corollary 14.9) that intends BG's `M̃` must switch to the
-eventual `M̃` once `R(x)` is available. See `notes/bg/s14_typeP_counting.md`. -/
+**Naming caveat:** BG's `M̃` — used in Lemma 14.5(c), Theorem 14.7(e), and the Corollary 14.9
+covering — is the *larger* set `{ x x' | x ∈ M_σ^#, x' ∈ R(x) }`, where `R(x)` is the normal
+Hall subgroup of `C_G(x)` from Theorem 14.4 (it adjoins the `ℓ_σ = 2` "twisted" elements).  So
+this `sigmaSharp` is only the `ℓ_σ = 1` core `M_σ^#`, a strict under-approximation of `M̃`;
+downstream uses that intend BG's `M̃` must take `Conjugacy145C.Mtilde` instead
+(`sigmaSharp_subset_Mtilde` is the easy inclusion).  `R(x)` is `Conjugacy145C.Rsub`, and
+`S16_MainResults.Notation` carries its Theorem D(3) properties (`FT_signalizer_isHall`,
+`FT_signalizer_normal_in_centralizer`).  See `notes/bg/s14_typeP_counting.md`. -/
 def sigmaSharp (M : Subgroup G) : Set G :=
   sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma M)
 

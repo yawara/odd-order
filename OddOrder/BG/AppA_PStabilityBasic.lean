@@ -762,7 +762,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
   -- 8. A.2 (`thmA2`) を H̄ ↷ V_i/V_{i+1} に適用 (closure_eq via x̄, ȳ 生成元)
   --    ⇒ ¬ Odd |H̄| ⇒ 2 ∣ |H̄|. 2 ∣ |H̄| ∣ |H| ∣ |G| (Lagrange) で 2 ∣ |G|. ∎
   --
-  -- TODO 主要新規補題 (issue #0043 + notes/bg/appA_pstability.md):
+  -- 使う主要補題 (issue #0043 + notes/bg/appA_pstability.md):
   --   * H-invariant `CompositionSeries` of `V` as `F[H]`-module
   --   * `coprime_action_trivial_of_trivial_on_quotients` (= Gorenstein Thm 3.4)
   --   * `IsPGroup.faithful_irreducible_in_charP_trivial` (= Gorenstein Thm 1.2)

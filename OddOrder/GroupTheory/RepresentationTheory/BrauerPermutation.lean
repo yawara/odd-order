@@ -18,7 +18,8 @@ import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
 /-!
 # Brauer's permutation lemma
 
-For a finite group `G`, [Is] Thm 6.32 states:
+For a finite group `G`, Isaacs, *Character Theory of Finite Groups* (1976), Thm 6.32
+(**not** *Finite Group Theory*, whose Chapter 6 stops at 6.24) states:
 
 > The number of real irreducible characters of `G` equals the number of self-inverse
 > conjugacy classes of `G`.
@@ -313,7 +314,7 @@ theorem ncard_fixedPoints_eq_of_permMatrix_conj {n : Type*} [Fintype n] [Decidab
     rw [← hσ_tr, ← hτ_tr]; exact htrace
   exact_mod_cast hncard_cast
 
-/-- **Brauer's permutation lemma** ([Is] Thm 6.32).
+/-- **Brauer's permutation lemma** (Isaacs, *Character Theory of Finite Groups*, Thm 6.32).
 
 For a finite group `G`, the number of real irreducible complex characters equals the
 number of self-inverse conjugacy classes:

@@ -1093,8 +1093,10 @@ theorem exists_maximal_conjugacy_reps [Finite G] :
 `p ∣ |G|` iff `p ∈ σ(Mᵢ)` for a unique class, and distinct representatives have disjoint `σ`-sets.
 Combines `exists_maximal_conjugacy_reps` (the transversal) with `sigma_reps_prime_cover` (cover,
 clause (a1)) and `sigma_reps_pairwise_disjoint` (disjointness, clause (a2)).  This is the full
-**partition core** of BG Theorem E, with no `reps` hypothesis; the remaining BG Theorem E content
-(the thickened-support cardinality / `G#` covering) stays gated on §13–14 (issue 8019). -/
+**partition core** of BG Theorem E, with no `reps` hypothesis.  The other half of BG Theorem E —
+the `G#` covering by `𝒞_G(M̃)` and the exceptional `Ẑ` — is
+`sharpSubgroup_top_cover_reps_dichotomy` below, and the two are combined in
+`theoremE_sigma_partition_and_counting` (issue 8019, closed). -/
 theorem exists_reps_sigma_partition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     ∃ reps : Set (Subgroup G),
       (∀ Mi ∈ reps, Mi ∈ maximalSubgroups G) ∧
