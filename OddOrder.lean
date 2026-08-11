@@ -894,6 +894,7 @@ import OddOrder.Algebra.RelationLattice
 import OddOrder.Algebra.PowerMonomialIndependence
 import OddOrder.BG.AppC_Problem1
 import OddOrder.BG.AppC_Problem1Lattice
+import OddOrder.BG.AppC_Problem1Trace
 import OddOrder.BG.AppD_CNGroups
 import OddOrder.BG.AppE_CollectionFormula
 import OddOrder.BG.AppE_FurtherResults

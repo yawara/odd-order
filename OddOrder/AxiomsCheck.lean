@@ -507,6 +507,7 @@ import OddOrder.Algebra.RelationLattice
 import OddOrder.Algebra.PowerMonomialIndependence
 import OddOrder.BG.AppC_Problem1
 import OddOrder.BG.AppC_Problem1Lattice
+import OddOrder.BG.AppC_Problem1Trace
 import OddOrder.BG.AppD_CNGroups
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
@@ -634,7 +635,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 21000
+set_option linter.style.longFile 21100
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -20891,6 +20892,23 @@ conj_s_unitElt / layerFieldHom_apply   (the three layers in *field* coordinates)
                                         purely field-theoretic set — exactly what
                                         notes/meta/gap/verify_collision_span.g checks, and what it
                                         confirms for q = 7, 13, 19)
+          → conj_layerFieldHom_one_eq  (relation (4) again, kept as an *equation* between the two
+                                        endpoints `S`, `S'` of a `CollisionPair`)
+            ← CollisionPair.frobenius  (**the collision data is Frobenius-equivariant**: in
+                                        characteristic three `p³ - 1 = (p-1)³`, so cubing a
+                                        collision is a collision and cubes both `S`-values)
+              → conj_layerFieldHom_one_trace
+                                       (multiplying the `q` Frobenius conjugates of relation (4)
+                                        inside the abelian second layer: `x·b(Tr S)·x⁻¹ = b(Tr S')`)
+                → false_of_collisionPair_trace_ne_zero
+                                       (**the trace obstruction**: both traces lie in `𝔽₃`
+                                        (fieldTrace_pow_char), so both sides lie in `⟨x^g⟩ ≅ C₃`;
+                                        `Aut(C₃) ≅ C₂` has no element of order three
+                                        (eq_one_of_conj_eq_inv), so `x` centralises `x^g` and
+                                        `not_commute_conj` applies.  Hence a *single* collision
+                                        with `Tr S ≠ 0` refutes hypothesis (B) — no spanning
+                                        family and no non-Frobenius hypothesis needed.  This is
+                                        what notes/meta/gap/verify_trace_obstruction.g checks)
       → false_of_s_normalizes_layerOne (**the criterion, group side**: it is enough that the
                                         single element `x = σ(1)` normalizes the second layer —
                                         the `σ(U)`-orbit of `x` then spreads it over `σ(P)`.
@@ -20988,3 +21006,13 @@ hypothesis (B) for `p = 3` with `g` centralising `σ(U)`; and for a non-Frobeniu
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.coe_layerOne_eq_range
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionSet_spanning
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_s_normalizes_layerOne
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.pow_card_pow
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.fieldTrace_pow_char
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.eq_zero_or_one_or_neg_one_of_pow_char
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.eq_one_of_conj_eq_inv
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.mem_collisionSet_iff_exists_pair
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.CollisionPair.frobenius
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.CollisionPair.frobenius_iterate
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conj_layerFieldHom_one_eq
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conj_layerFieldHom_one_trace
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_trace_ne_zero
