@@ -31,7 +31,7 @@ mathlib upstream 候補として `OddOrder/GroupTheory/` 配下に shared module
 * `chermakDelgadoMeasure_mul_le` (Lemma 1.43): `m_G(H) · m_G(K) ≤ m_G(D) · m_G(J)`
   for `D = H ⊓ K`, `J = H ⊔ K`.
 
-Thm 1.44 / Cor 1.45 / Thm 1.41 / Cor 1.46 は同ファイル後半 (本コミットで追加予定).
+Thm 1.44 / Cor 1.45 / Thm 1.41 / Cor 1.46 は同ファイル後半.
 
 ## References
 

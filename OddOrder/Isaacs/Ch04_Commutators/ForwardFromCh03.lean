@@ -324,7 +324,7 @@ theorem glauberman_fixed_point_exists
   -- (inl g)⁻¹ • α₀ = g⁻¹ • α₀.
   rw [← map_inv, IsCompatibleMulAction.toMulAction_inl_smul h g⁻¹ α₀]
 
-/-! ### Glauberman 3.24(b) (C_G(A) conjugacy) — 予定 -/
+/-! ### Glauberman 3.24(b) (C_G(A) conjugacy) -/
 
 /-- **Isaacs Lemma 3.24(b)**: 同じ前提下で, 2 つの A-invariant 元 α, β ∈ Ω に対し,
 `∃ c ∈ C_G(A), c • α = β`.

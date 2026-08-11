@@ -49,12 +49,12 @@ Feit-Thompson 局所解析の中核を担う:
 2. ✅ Lem 7.4 SL(2,q) — 独立小テーマ (先行章不要)
 3. ✅ Lem 7.7 — Lem 2.17 拡張 (Ch.2 完成済から短い延長)
 4. ✅ Lem 7.3 GL(2,p) 補題 — `|L|`-induction + Lem 7.4 + Ch.4 coprime action
-5. Thm 7.5 normal-P → Thm 7.6 normal-J
-6. (Ch.5 §5E 5.26 完成後) Thm 7.1
-7. (上記完成後) Thm 7.8 Burnside
+5. ✅ Thm 7.5 normal-P (`S7A2_NormalPThm75`) → Thm 7.6 normal-J (`S7B2_NormalJClose`)
+6. ✅ Thm 7.1 (Ch.5 §5E 5.26 経由)
+7. ✅ Thm 7.8 Burnside (`S7D1_BurnsideSetup` ほか)
 
-未着手 statement の def 系前提 (`HasNormalPComplement`, `GeneralLinearGroup` 引数法,
-`Aut(E) ≅ GL(n,p)`) は実装時に決める.
+def 系前提 (`HasNormalPComplement`, `GeneralLinearGroup` 引数法, `Aut(E) ≅ GL(n,p)`)
+は上記の実装で確定済.
 
 ## File layout (split per issue 0038)
 

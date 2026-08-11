@@ -40,8 +40,8 @@ Peterfalvi: Irr(G) := { χ : G → ℂ | χ is irreducible character }
 
 - **mathlib v4.29.1**: `FDRep k G` (有限次元表現), `character` (`FDRep k G → G → k`)
   はあるが、**`Irr G` を 1 つの Finset/型として明示する API は限定的**.
-- **Wave 1a**: `OddOrder/GroupTheory/RepresentationTheory/ClassFunction.lean`
-  + `ZIrr.lean` で整備予定.
+- **本リポジトリ**: `OddOrder/GroupTheory/RepresentationTheory/ClassFunction.lean`
+  + `ZIrr.lean` で整備済 (`IrreducibleCharacter G`, `ZIrr G`).
 
 ### 類関数空間 `CF(G)` / `CF(G, A)`
 
@@ -54,8 +54,8 @@ Peterfalvi:
 - **mathlib v4.29.1**: ⚠️ audit 訂正 (旧記載「`ClassFunction G` 既存」は誤り):
   conj-invariant submodule としての `ClassFunction G` 型は **完全に不在**.
   `FDRep.character : G → k` という個別関数のみ.
-- **Wave 1a**: `OddOrder/GroupTheory/RepresentationTheory/ClassFunction.lean` (~150 LOC)
-  で新規定義予定 (§3-§8 全節で使用).
+- **本リポジトリ**: `OddOrder/GroupTheory/RepresentationTheory/ClassFunction.lean` で
+  新規定義済 (`ClassFunction G ℂ` / `supportInSubgroup`; §3-§8 全節で使用).
 
 ### 内積 `(α, β)_G`, ノルム `‖α‖²`
 
@@ -154,14 +154,14 @@ mathlib v4.29.1 完全未収載. Phase 2b 第 2 波の山場.
 
 ## 本ファイルでの notation 提供方針
 
-**現状**: mathlib v4.29.1 で対応 API が薄いため、本ファイルでは alias 定義を
-最小限に留め、Wave 1a shared modules + §3 以降の実体定義に委ねる. notation 統一は
-Wave 1a 完成後に再着手予定.
+**方針 (確定)**: mathlib 側の対応 API が薄いので、本ファイルは alias を置かず、
+`GroupTheory/RepresentationTheory/` の shared modules + §3 以降の実体定義に委ねる。
+記号を notation で導入する案は**採らなかった** — 全節が記述的な Lean 名を直接使う方が
+grep しやすく、mathlib 互換の命名 (リポジトリのラッパー方針) とも整合するため。
 
-将来予定の notation:
+検討したが採用しなかった notation:
 
 ```lean
--- 後日 Wave 1a 完成後に追加予定:
 -- notation "CF(" G ")" => ClassFunction G ℂ
 -- notation "CF(" G "," A ")" => ClassFunction.support_subset G A
 -- notation "ℤ[Irr " G "]" => ZIrr G
@@ -179,8 +179,7 @@ Wave 1a 完成後に再着手予定.
 
 namespace OddOrder.Peterfalvi.S02
 
--- §2 は記号定義のみ. 形式化対象は notation alias と若干の helper.
--- 現状 mathlib API が薄いため、本ファイルでは alias 定義なし.
--- Wave 1a 完成後に再着手予定.
+-- §2 は記号定義のみ. 実体は GroupTheory/RepresentationTheory/ 配下にあり、
+-- 本ファイルは対応表 (上の docstring) だけを持つ — notation alias は置かない方針.
 
 end OddOrder.Peterfalvi.S02

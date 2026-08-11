@@ -18,7 +18,7 @@ open scoped IsMulCommutative -- rc2: IsMulCommutative→CommMonoid (for Additive
 
 variable {G : Type*} [Group G]
 
-/-! ### Thm 7.5 — normal-P theorem (statement 保留)
+/-! ### Thm 7.5 — normal-P theorem (本節末の `sylow_normal_of_elementary_normal_P_theorem`)
 
 **Isaacs Thm 7.5** (mmd L3783):
 

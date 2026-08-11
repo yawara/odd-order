@@ -548,10 +548,10 @@ private theorem stabilityLiftAux
 `N_G(P)` の `p`-部分群で `[P,A,A]=1` なら, `A` の `N_G(P)/C_G(P)` での像は
 `O_p(N_G(P)/C_G(P))` に含まれる (= **stability lift**, A.5/B.4 → Thm 6.2 の本線)。
 
-**証明ルート (未完, issue #0047)**: condition (B) は「`G` が non-p-stable な section を
-involve しない」とき成立 (Gorenstein 6.5.3 proof 末尾)。奇数位数可解 `G` では全 section が
-`O_p=1` で p-stable (= `thmA4a` = `thmA3` 対偶) ⇒ condition (B)。詳細・step 分解は
-issue [#0047](../../issues/0047-bg-appa-a4.md) 「A.4(c) 作業計画」。 -/
+**証明ルート**: condition (B) は「`G` が non-p-stable な section を involve しない」とき
+成立 (Gorenstein 6.5.3 proof 末尾)。奇数位数可解 `G` では全 section が `O_p=1` で p-stable
+(= `thmA4a` = `thmA3` 対偶) ⇒ condition (B)。step 分解の記録は
+issue [#0047](../../issues/closed/0047-bg-appa-a4.md) (closed)。 -/
 theorem thmA4c [Finite G] (hp_odd : p ≠ 2) (hsolv : IsSolvable G)
     (hodd : Odd (Nat.card G))
     {P : Subgroup G} (hP : IsPGroup p P)

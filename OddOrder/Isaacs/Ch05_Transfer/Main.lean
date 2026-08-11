@@ -676,8 +676,8 @@ private lemma lt_normalizer_of_pgroup_of_lt_top
 * `(x y z) • Q = x • y • z • Q = x • (y • R^y) = x • R = P`. `x, y, z` all centralize `D`,
   hence `xyz ∈ C_G(D)`. 完了.
 
-**実装状態 (2026-05-24)**: 助補題 (sylow_sup_normal + normalizers grow) は実装済.
-本体は ~250 LOC で骨格のみ. 完全形式化は別 session.
+**実装状態**: ⭐ sorry-free. 助補題 (`sylow_sup_normal_eq_top_of_quot_isPGroup` +
+`IsPGroup.lt_normalizer_subgroupOf`) と本体 (`(P ⊓ Q).index` に関する強帰納) とも完成済.
 
 **FT クリティカル**: Frobenius 5.26 (3⇒1) 経由. -/
 theorem isaacs_lem_5_28 [Finite G] {p : ℕ} [Fact p.Prime]

@@ -50,9 +50,9 @@ Prefix-split from `OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank` (2000-line 
 - **§4G** solvable operator の導来部分群 (Lemma 4.17)
 - **§4H** solvable odd group の構造定理 (Thm 4.18, Cor 4.19, Thm 4.20)
 
-## Current status
+## この leaf の位置づけ
 
-本ファイルは §4 の **§4G (Lemma 4.17) の証明で必要な再利用補題**から着手する。
+本ファイルは §4 の **§4G (Lemma 4.17) の証明で必要な再利用補題**を持つ。
 Lemma 4.17 (`A` solvable `p'`-operator, `r(R) ≤ 2`, `|A|` odd ⇒ `A'` は `p`-群)
 の BG 原証明 (mmd L1706-1732) は次の 4 部品を組む:
 
@@ -60,16 +60,16 @@ Lemma 4.17 (`A` solvable `p'`-operator, `r(R) ≤ 2`, `|A|` odd ⇒ `A'` は `p`
    利用可能: `thompson_critical_omega` (`S01_Solvable`) が
    `IsPGroup p (autCentralizer H)` を供給する。
 2. (4.17) `|H| ≤ p³` (Prop 4.8 — `r(R) ≤ 2` + exponent `p`).
-   **未実装** (rank 理論 `pRank`/`m` が `OddOrder.GroupTheory.PRank` で def のみ)。
+   rank 理論は `OddOrder.GroupTheory.PRank` に API 込みで整備済 (`le_pRank`,
+   `pRank_le_iff` ほか)。
 3. (4.18) `C := C_A(H/Φ(H))` が `p`-群 (Burnside Thm 1.8 で `C/C_A(H)` が `p`-群).
    Burnside は `burnside_operator` (`S01_Solvable`) で利用可能。
 4. `m(V) = 2` のとき `Aut V ≅ GL(2,p)` で `(A/C)'` が `p`-群 (BG Thm 2.6).
    **本ファイルで供給** (`isPGroup_commutator_of_faithful_two_dim_charP`).
 
-現状のゲートは (2) の Prop 4.8 + `m(V) ≤ 2` を与える rank 機構 (設計書 Wave 0)。
-本ファイルでは部品 (4) = Blackburn 4.16 / Lemma 4.17 の `m(V) = 2` 分岐エンジン
-であり Cor 4.19 でも直接引かれる「2 次元 faithful 表現 ⇒ 導来部分群が `p`-群」
-を切り出して実装する。Lemma 4.17 本体は rank 機構の整備後に本ファイルへ追加する。
+本ファイルが持つのは部品 (4) = Blackburn 4.16 / Lemma 4.17 の `m(V) = 2` 分岐エンジン
+であり Cor 4.19 でも直接引かれる「2 次元 faithful 表現 ⇒ 導来部分群が `p`-群」。
+Lemma 4.17 の本体は `S04_PGroupsSmallRank`、Cor 4.19 は `S04g_Cor419` にある。
 
 ## References
 

@@ -19,8 +19,8 @@ Theory", §10B: Huppert の定理に向けた main lemma。
 * **Theorem 10.15** (`dvd_index_commutator_of_normal_metacyclic_sylow`):
   `P ⊴ N` が nonabelian metacyclic な正規 Sylow `p`-部分群で `p > 2` なら
   `p ∣ |N : N'|`。`|P|` に関する帰納。
-* **Theorem 10.12** (Huppert) は 10.15 + Yoshida 10.1 + Lemma 10.14 から。
-  (本 leaf 後半に追加予定。)
+* **Theorem 10.12** (Huppert) は 10.15 + Yoshida 10.1 + Lemma 10.14 から
+  (本 leaf 後半の `10B: Theorem 10.12` 節)。
 
 ## 教科書対応 (証明の要点, mmd L5613-5645)
 

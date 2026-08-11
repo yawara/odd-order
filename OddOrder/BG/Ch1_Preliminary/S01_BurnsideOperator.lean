@@ -138,8 +138,9 @@ Prop 1.5(d) + Lem 1.7(a) 合成形) を `G ↦ R` で適用するだけ.
 ここで `R` p-群 ⇒ `IsNilpotent R` ⇒ `IsSolvable R` を経由して `Or.inr` を渡していた。
 Cor 3.29 が**書籍どおり可解性なしに一般化された**ため、その経由は不要になった。
 
-**Isaacs 対応**: Isaacs FGT Thm 1.8 (完全一致). Phase 1 Ch.1 §1B 側の Thm 1.8 は未実装
-だが, 本実装は Ch.4 forward §3E coprime action machinery 経由で独立に成立.
+**Isaacs 対応**: Isaacs FGT Thm 1.8 (完全一致). 本実装は Ch.4 forward §3E coprime action
+machinery 経由で独立に成立している (Ch.1 §1B = 1.7–1.10 は別ルートで被覆済 —
+`Ch01_Sylow/Basic.lean` の対応表).
 
 **no-wrapper policy 例外**: 仮定特殊化 (`p`-群という文脈固有の仮定で述べ直す). -/
 theorem burnside_operator {p : ℕ} [Fact p.Prime] {R : Type*} [Group R] [Finite R]

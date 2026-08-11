@@ -39,7 +39,8 @@ mathlib カバレッジ薄 (~21%; `DihedralGroup`/`QuaternionGroup` の具体群
 ## 先行章依存
 
 本ファイル §6A の実装済み範囲は, 6.2 が Ch.4 forward の Cor 3.28 を使う以外,
-大きな先行章依存なし. 6.7 (Schur-Zassenhaus / Ch.5 normal p-complement 周辺) は保留.
+大きな先行章依存なし. 6.7 は Schur-Zassenhaus / Ch.5 normal p-complement 周辺を使い
+`KernelComplement` で完成済 (上表).
 
 ノート: [`notes/isaacs/ch06_frobenius_actions.md`](../../notes/isaacs/ch06_frobenius_actions.md)
 

@@ -47,7 +47,8 @@ mathlib `SemidirectProduct` (Chris Hughes), `SchurZassenhaus`, `Complement`,
 construction を Isaacs 流に再述するラッパー.
 
 Thm 3.3 Horosevskii は Ch.2 Thm 2.20 Lucchini に依存 (PDF p.71 で証明確認済).
-Thm 3.4 は Ch.1 Thm 1.37 Brodkey に依存 (Ch.1 §1F 未着手).
+Thm 3.4 は Ch.1 Thm 1.37 Brodkey に依存 (Ch.1 §1F = `Ch01_Sylow/Main.lean` の
+`1F` 節 + `ProblemsBrodkey`、被覆済).
 
 ノート: [notes/isaacs/ch03_split.md](../../notes/isaacs/ch03_split.md)
 -/
