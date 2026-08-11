@@ -44,8 +44,10 @@ Proposition 9 の仮説 (記法は
 |---|---|
 | 3, 5, 11, 17, 23, 37, 43, … (`3 ∤ φ(n)`) | ✅ 定理 1 |
 | 7 | ✅ 合同枚挙 + collision-span (rank 7/7) |
-| **13** | ✅ **collision-span (rank 13/13、独立再現済)** |
-| 19 以降 | 🟡 可解/有限奇位数は不可 (定理 2)。exotic 指数ごとに collision-span を測れば個別決着 |
+| **13, 19, 29** | ✅ **collision-span (rank 満杯、独立再現済)** |
+| 31 以降 | 🟡 可解/有限奇位数は不可 (定理 2)。exotic 指数ごとに collision-span を測れば個別決着 (`q=31` は射程内、`q=41` 以降は要高速化) |
+
+⟹ **`q ≤ 29` の全奇素数で hypothesis (B) は不可能**。
 
 **残る一般化 (priority A)**: 「すべての exotic `E` で `S_E(p,r)` が `F` を張る」を証明する。
 

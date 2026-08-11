@@ -75,6 +75,6 @@ RunOrbit := function(q, nsamples)
   od;
 end;;
 
-RunOrbit(13, 200000);
-RunOrbit(29, 20000000);
+RunOrbit(31, 12000000);
+
 QUIT;
