@@ -520,6 +520,20 @@ through the identification of `σ(P)` with the field.  `layerFieldHom data i` is
 `t ↦ (gⁱ)⁻¹ σ(inl t) gⁱ`, and `layered_relation_field` is the relation `d(t^{E²}) b(t^E) a(t) = 1`
 of `notes/bg/appC_problem1_partial_resolution.md`. -/
 
+/-- The field element underlying a norm-one unit.  (Notation for the doubly-coerced
+`((u : (GaloisField p q)ˣ) : GaloisField p q)`, which the relation family is full of.) -/
+def normOneVal (u : NormSet.normOneUnits p q) : GaloisField p q :=
+  ((u : (GaloisField p q)ˣ) : GaloisField p q)
+
+@[simp]
+theorem normOneVal_mul (u v : NormSet.normOneUnits p q) :
+    normOneVal (u * v) = normOneVal u * normOneVal v := rfl
+
+@[simp]
+theorem normOneVal_pow (u : NormSet.normOneUnits p q) (k : ℕ) :
+    normOneVal (u ^ k) = normOneVal u ^ k := by
+  simp only [normOneVal, SubgroupClass.coe_pow, Units.val_pow_eq_pow_val]
+
 /-- The element of `σ(U)` attached to a norm-one unit. -/
 noncomputable def unitElt (data : FieldNormalizerData p q G) (u : NormSet.normOneUnits p q) : G :=
   data.sigma (SemidirectProduct.inr u)
@@ -612,28 +626,63 @@ i.e. the third layer at `r` is a product of one element of the first layer and o
 theorem layerFieldHom_two_eq (data : FieldNormalizerData p q G) (hp : p = 3) {e : ℕ}
     (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
     (r : NormSet.normOneUnits p q) :
-    layerFieldHom data 2 (Multiplicative.ofAdd
-        (((r : NormSet.normOneUnits p q) : (GaloisField p q)ˣ) : GaloisField p q))
-      = (layerFieldHom data 0 (Multiplicative.ofAdd
-            (((r ^ e : NormSet.normOneUnits p q) : (GaloisField p q)ˣ) : GaloisField p q)))⁻¹ *
-        (layerFieldHom data 1 (Multiplicative.ofAdd
-            (((r ^ (e * e) : NormSet.normOneUnits p q) : (GaloisField p q)ˣ) :
-              GaloisField p q)))⁻¹ := by
+    layerFieldHom data 2 (Multiplicative.ofAdd (normOneVal r))
+      = (layerFieldHom data 0 (Multiplicative.ofAdd (normOneVal (r ^ e))))⁻¹ *
+        (layerFieldHom data 1 (Multiplicative.ofAdd (normOneVal (r ^ (e * e)))))⁻¹ := by
   have hrel := layered_relation_field data hp hexp (r ^ e)
   have h1 : (r ^ e) ^ (e * e) = r := by
     rw [← pow_mul, ← mul_assoc]
     exact normOneUnits_pow_cube data hp hexp r
   have h2 : (r ^ e) ^ e = r ^ (e * e) := by rw [← pow_mul]
   rw [h1, h2] at hrel
-  have hone : layerFieldHom data 2 (Multiplicative.ofAdd
-        (((r : NormSet.normOneUnits p q) : (GaloisField p q)ˣ) : GaloisField p q)) *
-      (layerFieldHom data 1 (Multiplicative.ofAdd
-          (((r ^ (e * e) : NormSet.normOneUnits p q) : (GaloisField p q)ˣ) : GaloisField p q)) *
-        layerFieldHom data 0 (Multiplicative.ofAdd
-          (((r ^ e : NormSet.normOneUnits p q) : (GaloisField p q)ˣ) : GaloisField p q))) = 1 := by
+  have hone : layerFieldHom data 2 (Multiplicative.ofAdd (normOneVal r)) *
+      (layerFieldHom data 1 (Multiplicative.ofAdd (normOneVal (r ^ (e * e)))) *
+        layerFieldHom data 0 (Multiplicative.ofAdd (normOneVal (r ^ e)))) = 1 := by
     rw [← mul_assoc]
     exact hrel
   rw [eq_inv_iff_mul_eq_one.mpr hone, mul_inv_rev]
+
+
+/-- **Relation (2) of the collision-span obstruction.**  For `p` in the Paley set
+`T = {p ∈ U : p - 1 ∈ U}` (given here as a pair `p₀ = p`, `p₁ = p - 1` of norm-one units) and any
+norm-one `z`, splitting `z = p z - (p-1) z` and applying relation (1) twice gives the exact
+non-commutative factorisation
+
+`d(z) = a(-p^e z^e) · b(K(p) z^{e²}) · a((p-1)^e z^e)`,  `K(p) = (p-1)^{e²} - p^{e²}`.
+
+The two second-layer factors merge because the layer is the image of a homomorphism from an
+abelian group.  This is the identity whose *collisions* drive the whole obstruction. -/
+theorem layerFieldHom_two_factor (data : FieldNormalizerData p q G) (hp : p = 3) {e : ℕ}
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    (p₀ p₁ z : NormSet.normOneUnits p q) (hpp : normOneVal p₀ = normOneVal p₁ + 1) :
+    layerFieldHom data 2 (Multiplicative.ofAdd (normOneVal z))
+      = (layerFieldHom data 0 (Multiplicative.ofAdd (normOneVal (p₀ ^ e * z ^ e))))⁻¹ *
+        layerFieldHom data 1 (Multiplicative.ofAdd
+          ((normOneVal (p₁ ^ (e * e)) - normOneVal (p₀ ^ (e * e))) * normOneVal (z ^ (e * e)))) *
+        layerFieldHom data 0 (Multiplicative.ofAdd (normOneVal (p₁ ^ e * z ^ e))) := by
+  -- split `z = p₀ z - p₁ z` in the third layer
+  have hsplit : normOneVal z = normOneVal (p₀ * z) + -normOneVal (p₁ * z) := by
+    simp only [normOneVal_mul, hpp]
+    ring
+  have hd : layerFieldHom data 2 (Multiplicative.ofAdd (normOneVal z))
+      = layerFieldHom data 2 (Multiplicative.ofAdd (normOneVal (p₀ * z))) *
+        (layerFieldHom data 2 (Multiplicative.ofAdd (normOneVal (p₁ * z))))⁻¹ := by
+    rw [← map_inv, ← map_mul, ← ofAdd_neg, ← ofAdd_add, hsplit]
+  rw [hd, layerFieldHom_two_eq data hp hexp (p₀ * z), layerFieldHom_two_eq data hp hexp (p₁ * z)]
+  -- merge the two second-layer factors
+  simp only [mul_inv_rev, inv_inv, mul_pow, normOneVal_mul, normOneVal_pow]
+  have hb : (layerFieldHom data 1 (Multiplicative.ofAdd
+        (normOneVal p₀ ^ (e * e) * normOneVal z ^ (e * e))))⁻¹ *
+      layerFieldHom data 1 (Multiplicative.ofAdd
+        (normOneVal p₁ ^ (e * e) * normOneVal z ^ (e * e)))
+      = layerFieldHom data 1 (Multiplicative.ofAdd
+        ((normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e)) * normOneVal z ^ (e * e))) := by
+    rw [← map_inv, ← map_mul, ← ofAdd_neg, ← ofAdd_add]
+    congr 2
+    ring
+  simp only [mul_assoc]
+  congr 1
+  rw [← mul_assoc, hb]
 
 
 /-! ### The collision-span endgame
