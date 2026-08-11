@@ -49,16 +49,21 @@ Proposition 9 の仮説 (記法は
 
 **残る一般化 (priority A)**: 「すべての exotic `E` で `S_E(p,r)` が `F` を張る」を証明する。
 
-### Lean 形式化の計画 (2026-08-11)
+### Lean 形式化 (2026-08-11 完了)
 
-collision-span 判定法は**一般定理なので形式化対象**。2 段階:
+collision-span 判定法は**群論側・体側とも丸ごと形式化済** (axiom-clean、full build green)。
+capstone = `Problem1.false_of_collisionSet_spanning`:
 
-1. **エンドゲーム**: `A ≤ N_G(B)` ⟹ `N = A ⊔ B` で `B ⊴ N`・`N/B` は `A` の像 = 可換 ⟹
-   `N` は可解 (`solvable_of_ker_le_range`) ⟹ 完全かつ非自明に矛盾。
-   (`layerOne`, `layerClosure_eq_sup`, `not_isSolvable_layerClosure`, `false_of_normalizes_layerOne`)
-2. **代数的核**: 関係式 (1)–(4) を Lean 化して `a(−1) ∈ N_G(B)` を張り生成仮説から導く。
-   ⚠ 各 `q` の証明書 (rank の計算) は `GaloisField` が計算可能でないため Lean では回せない。
-   形式化するのは**判定法**であって `q = 13` の計算ではない。
+> `collisionSet p q e` (= 衝突かつ `δ` 平方元から作る `S` たちの集合、**`data` に依存しない
+> 純粋な体の集合**) が `(𝔽_{3^q}, +)` を生成すれば hypothesis (B) に witness は存在しない。
+
+内訳 = `layered_relation_field` → `layerFieldHom_two_eq` (1) → `layerFieldHom_two_factor` (2)
+→ `layerFieldHom_one_conj` (3) → `conj_layerFieldHom_one_mem` (4) → capstone、
+群論側は `U_le_normalizer_layerOne` / `false_of_s_normalizes_layerOne` /
+`false_of_normalizes_layerOne`。
+
+⚠ 各 `q` の証明書 (rank の計算) は `GaloisField` が計算可能でないため Lean 内では回せない。
+**判定法が機械検証済みの定理、`q` ごとの証明書は外部計算 (GAP)** という切り分け。
 
 ## 状態 (2026-08-10 更新) — 大幅に前進、ただし全面解決ではない
 

@@ -343,6 +343,27 @@ D(p³) = D(p)³,   K(p³) = K(p)³,   δ(p³,r³) = δ(p,r)³   ⟹   S(p³, r³
 `T` の元は**平方判定なしに生成できる** — 大きい `q` の探索コストが半減する
 ([`verify_collision_span_big.g`](../meta/gap/verify_collision_span_big.g))。
 
+### Lean 化 (2026-08-11 完了)
+
+**判定法は群論側・体側とも丸ごと形式化済** (axiom-clean)。leaf =
+[`OddOrder/BG/AppC_Problem1Lattice.lean`](../../OddOrder/BG/AppC_Problem1Lattice.lean)。
+
+| 段 | Lean |
+|---|---|
+| 関係式族の体座標版 `d(u^{e²})b(u^e)a(u) = 1` | `layered_relation_field` |
+| (1) `d(r) = a(−r^e)b(−r^{e²})` | `layerFieldHom_two_eq` |
+| (2) `d(z) = a(−p^e z^e)·b(K(p)z^{e²})·a((p−1)^e z^e)` | `layerFieldHom_two_factor` |
+| (3) 衝突 ⟹ `b(K(r)z^{e²}) = b(K(p)z^{e²})^{a(−δz^e)}` | `layerFieldHom_one_conj` |
+| (4) `δ ∈ U` の正規化 ⟹ `x·b(S)·x⁻¹ ∈ B` | `conj_layerFieldHom_one_mem` |
+| **判定法 (体側の張り生成 ⟹ 矛盾)** | **`false_of_collisionSet_spanning`** |
+| `x ∈ N_G(B)` ⟹ 矛盾 (群論側) | `false_of_s_normalizes_layerOne` |
+| `σ(U)` が第 2 層を正規化 | `U_le_normalizer_layerOne` |
+| `A ≤ N_G(B)` ⟹ `N` メタアーベル ⟹ 矛盾 | `false_of_normalizes_layerOne` |
+
+`collisionSet p q e` は **`data` に依存しない純粋な体の集合**として定義してあり、
+GAP スクリプトが測っているものと同一。⟹ 「判定法は機械検証済みの定理、各 `q` の証明書は
+外部計算」という切り分け (`GaloisField` が計算可能でないため Lean 内で rank は回せない)。
+
 ### 残る一般化 (priority A)
 
 > **すべての exotic `E` について、`D_E` の衝突 (かつ `δ ∈ U`) から来る `S_E(p,r)` が `F` を張る。**
