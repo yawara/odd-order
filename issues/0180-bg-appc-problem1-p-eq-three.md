@@ -29,16 +29,18 @@ Proposition 9 の仮説 (記法は
 
 ## ▶ 再開手順 (2026-08-11 時点)
 
-1. **次の Lean 作業 = トレース障害の形式化**。既存の `conj_layerFieldHom_one_mem` (関係式 (4)) に
-   **`S` の Frobenius 閉性** (`S(p³,r³) = S(p,r)³`) を足して `q` 本を掛け合わせ、
-   `b(Tr S)^{a(−1)} = b(Tr S')` から `Tr S = 0` を導く
-   (詳細 = notes の「トレース障害」節)。これで判定法の仮説が
-   `AddSubgroup.closure (collisionSet …) = ⊤` から**「衝突 1 個で `Tr S ≠ 0`」**に弱まる。
-2. **走らせている計算**: `notes/meta/gap/verify_trace_obstruction.g` (q=7,13,19,29 の独立検証) と
-   `q = 31` のトレース判定 (scratchpad の派生スクリプト、6000 万サンプル)。
-   ⚠ 旧 `verify_collision_span_orbit.g` の q=31 ジョブはセッション終了時に落ちた。
-3. **一般 `q` は依然 open**。壁 = `A_E = {(u,u^E)}` が Sidon でないことの証明
-   (= `z ↦ z^E` の擬ランダム性)。ChatGPT も未証明。
+1. ~~次の Lean 作業 = トレース障害の形式化~~ → **2026-08-11 完了**。leaf =
+   [`OddOrder/BG/AppC_Problem1Trace.lean`](../OddOrder/BG/AppC_Problem1Trace.lean)
+   (330 行、axiom-clean)。判定法の仮説が `AddSubgroup.closure (collisionSet …) = ⊤` から
+   **「衝突 1 個で `Tr S ≠ 0`」** (`false_of_collisionPair_trace_ne_zero`) に弱まり、さらに
+   指数の非 Frobenius 性 `hnotfrob` も**不要**になった (矛盾が `N` の完全性を経由せず
+   定理 1 の終局 `not_commute_conj` に直接落ちるため)。
+2. **走らせている計算**: `notes/meta/gap/verify_trace_obstruction.g` (q=7,13,19,29 の独立検証。
+   q=7,13,19 は決着済 — 衝突 1〜5 個で `Tr S ≠ 0`) と `q = 31` のトレース判定
+   (scratchpad の派生スクリプト、6000 万サンプル)。
+3. **一般 `q` は依然 open**。示すべきことは 2 段階に弱まった:
+   **(B1)** 衝突が 1 つ存在する (= `A_E = {(u,u^E)}` が Sidon でない ⟸ `z ↦ z^E` の擬ランダム性。
+   これが本丸、ChatGPT も未証明) / **(B2)** その `S` が `Tr S ≠ 0` (実測では数個以内で当たる)。
 
 ## 状態 (2026-08-11 更新) — **q ≤ 29 決着**、判定法は Lean 化済
 
@@ -79,6 +81,19 @@ capstone = `Problem1.false_of_collisionSet_spanning`:
 
 ⚠ 各 `q` の証明書 (rank の計算) は `GaloisField` が計算可能でないため Lean 内では回せない。
 **判定法が機械検証済みの定理、`q` ごとの証明書は外部計算 (GAP)** という切り分け。
+
+**強化: トレース障害** ([`AppC_Problem1Trace.lean`](../OddOrder/BG/AppC_Problem1Trace.lean)、
+2026-08-11)。capstone = `Problem1.false_of_collisionPair_trace_ne_zero`:
+
+> 衝突が**ひとつ**あって、その `S` が `Tr S = ∑_{j<q} S^{3^j} ≠ 0` を満たせば witness は存在しない。
+
+機構 = `S` の Frobenius 閉性 `S(p³,r³) = S(p,r)³` (`CollisionPair.frobenius`; 標数 3 で
+`p³−1 = (p−1)³`) で関係式 (4) を `q` 本作り、可換な第 2 層で掛け合わせて
+`x·b(Tr S)·x⁻¹ = b(Tr S')` (`conj_layerFieldHom_one_trace`)。両トレースは素体に落ちる
+(`fieldTrace_pow_char`) ので双方 `⟨x^g⟩ ≅ C₃` に属し、`Aut(C₃) ≅ C₂` に位数 3 の元は無い
+(`eq_one_of_conj_eq_inv`) ⟹ `x` が `x^g` を中心化 ⟹ `not_commute_conj`。
+旧判定より仮説が真に弱く、**`hnotfrob` (指数の非 Frobenius 性) も不要**。
+証明書コストも桁で下がる (`q = 19` で衝突 1〜3 個 / サンプル 5k〜43k、旧 span は数百万)。
 
 ## 状態 (2026-08-10 更新) — 大幅に前進、ただし全面解決ではない
 

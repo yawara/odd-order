@@ -21,7 +21,7 @@
 ⟹ **`q ≤ 29` の全ての奇素数で hypothesis (B) は不可能**。さらに全ての `q` について、
 witness の `G` は非可解でなければならない (定理 2)。
 
-**3 つの道具** (すべて Lean で機械検証済、axiom-clean):
+**4 つの道具** (すべて Lean で機械検証済、axiom-clean):
 
 1. **定理 1** — `e` が Frobenius 冪なら矛盾。鍵は Paley 集合 `T = {s : s, s+1 ∈ U}` が `F` を張ること
    (`T ∩ (−T) = ∅` から出る初等証明、Weil 不要)。
@@ -29,6 +29,10 @@ witness の `G` は非可解でなければならない (定理 2)。
    (補題 D: 関係格子 `L_e = F³`)。⟹ `G` は非可解。
 3. **collision-span 判定法** — `D(p) = p^e−(p−1)^e` の**衝突**から作る `S` たちが `F` を張れば
    witness は存在しない。`q` ごとに `S` の階数を測れば決着する (証明書は GAP)。
+4. **トレース障害** (3 の強化, 2026-08-11 Lean 化) — **衝突 1 個**で `Tr S ≠ 0` なら witness は
+   存在しない。張り生成も階数計算も不要で、指数の非 Frobenius 性 (`hnotfrob`) すら要らない。
+   鍵は `S` の Frobenius 閉性 `S(p³,r³) = S(p,r)³` と `Aut(C₃) ≅ C₂`。証明書の計算コストが
+   桁で下がる (`q = 19` で衝突 1〜3 個、サンプル 5k〜43k)。
 
 **残る一般化**: 「すべての exotic `e` で `S` たちが `F` を張る」。壁は
 **`z ↦ z^E` (乗法群の位数 3 の自己同型) の擬ランダム性**に一本化されている (下記「なぜ難しいのか」)。
@@ -359,6 +363,27 @@ GAP の Conway 多項式による `GF(3^q)` (ChatGPT の `X^13+2X+1` とは別�
 (旧: `S` たちが `F` を張ることを確認 = 階数計算。新判定は真に弱い — `3` が `q` の原始根のとき
 `S` が加群を生成する ⟺ `Tr S ≠ 0` かつ `S ∉ F₃` なので、トレース条件だけの方が緩い。)
 
+#### Lean 化 (2026-08-11 完了)
+
+leaf = [`OddOrder/BG/AppC_Problem1Trace.lean`](../../OddOrder/BG/AppC_Problem1Trace.lean)
+(330 行, axiom-clean)。
+
+| 段 | Lean |
+|---|---|
+| 衝突データ (両端 `S`, `S'` を保持) | `CollisionPair` |
+| `S(p³,r³) = S(p,r)³` (Frobenius 同変性) | `CollisionPair.frobenius` / `_iterate` |
+| 関係式 (4) を**等式**として | `conj_layerFieldHom_one_eq` |
+| `q` 本の積 ⟹ `x·b(Tr S)·x⁻¹ = b(Tr S')` | `conj_layerFieldHom_one_trace` |
+| `Tr S ∈ F₃` (`Tr(S)^3 = Tr S`) | `fieldTrace_pow_char` |
+| `Aut(C₃)` に位数 3 の元は無い | `eq_one_of_conj_eq_inv` |
+| **トレース障害** | **`false_of_collisionPair_trace_ne_zero`** |
+| 旧 `collisionSet` との橋渡し | `mem_collisionSet_iff_exists_pair` |
+
+上の段 4 (「witness では `Tr S = 0` が強制される」) は Lean では回り道せず、
+`x` が `x^g = b(1)` を中心化することを直接示して**定理 1 の終局** `not_commute_conj` に落とす
+(`c³ = 1 ⟹ c = 1` の議論はそちらに既に入っている)。⟹ `false_of_collisionSet_spanning` と違い
+`hnotfrob` が**不要**。
+
 ### 🔎 (B1) の正確な言い換え: Sidon 集合
 
 `A_E := {(u, u^E) : u ∈ U} ⊂ (F², +)` と置くと
@@ -417,10 +442,17 @@ GAP スクリプトが測っているものと同一。⟹ 「判定法は機械
 
 ### 残る一般化 (priority A)
 
-> **すべての exotic `E` について、`D_E` の衝突 (かつ `δ ∈ U`) から来る `S_E(p,r)` が `F` を張る。**
+トレース障害 (上記) の Lean 化で、示すべきことは次まで弱まった:
 
-これが示せれば `q ≥ 13` 全体が落ちる。ChatGPT も未証明。`S(p,r) = K(p)·δ^{−E}` と明示的なので、
-指標和ではなく「衝突集合の像が超平面に入らない」型の議論になる。
+> **すべての exotic `E` について、`D_E` の衝突 (かつ `δ ∈ U`) が少なくとも 1 つ存在し、
+> その `S_E(p,r) = K(p)·δ^{−E}` が `Tr S ≠ 0` を満たす。**
+
+(旧: 「衝突から来る `S` 全体が `F` を張る」= 階数条件。)  ChatGPT も未証明。
+壁は 2 段階に分かれる:
+
+* **(B1) 衝突の存在** — `A_E = {(u, u^E)}` が Sidon でないこと (下記)。これが本丸。
+* **(B2) `Tr S ≠ 0`** — 衝突が取れれば `Tr S` が `0` になる確率は `1/3` 程度で、
+  複数の衝突を取れば実質自動 (実測でも常に数個以内で当たる)。
 
 ## 旧: Itô の定理経由の攻め筋 (2026-08-11 午前)
 
