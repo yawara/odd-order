@@ -685,6 +685,65 @@ theorem layerFieldHom_two_factor (data : FieldNormalizerData p q G) (hp : p = 3)
   rw [← mul_assoc, hb]
 
 
+/-- **Relation (3) of the collision-span obstruction: a collision conjugates one second-layer
+element into another.**  If `p` and `r` both lie in the Paley set and *collide*, i.e.
+
+`p^e - (p-1)^e = r^e - (r-1)^e`,
+
+then, with `δ = r^e - p^e`, equating the two factorisations of `d(z)` gives
+
+`b(K(r) z^{e²}) = a(δ z^e) · b(K(p) z^{e²}) · a(-δ z^e)`.
+
+Conjugation by a *first*-layer element therefore maps a second-layer element back into the second
+layer — the whole point of the obstruction. -/
+theorem layerFieldHom_one_conj (data : FieldNormalizerData p q G) (hp : p = 3) {e : ℕ}
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    (p₀ p₁ r₀ r₁ z : NormSet.normOneUnits p q)
+    (hpp : normOneVal p₀ = normOneVal p₁ + 1) (hrr : normOneVal r₀ = normOneVal r₁ + 1)
+    (hcoll : normOneVal p₀ ^ e - normOneVal p₁ ^ e = normOneVal r₀ ^ e - normOneVal r₁ ^ e) :
+    layerFieldHom data 1 (Multiplicative.ofAdd
+        ((normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e)) * normOneVal z ^ (e * e)))
+      = layerFieldHom data 0 (Multiplicative.ofAdd
+            ((normOneVal r₀ ^ e - normOneVal p₀ ^ e) * normOneVal z ^ e)) *
+        layerFieldHom data 1 (Multiplicative.ofAdd
+            ((normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e)) * normOneVal z ^ (e * e))) *
+        layerFieldHom data 0 (Multiplicative.ofAdd
+            (-((normOneVal r₀ ^ e - normOneVal p₀ ^ e) * normOneVal z ^ e))) := by
+  have hP := layerFieldHom_two_factor data hp hexp p₀ p₁ z hpp
+  have hR := layerFieldHom_two_factor data hp hexp r₀ r₁ z hrr
+  rw [hP] at hR
+  simp only [normOneVal_mul, normOneVal_pow] at hR
+  -- solve for the second-layer factor of `r`
+  have hsolve : layerFieldHom data 1 (Multiplicative.ofAdd
+        ((normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e)) * normOneVal z ^ (e * e)))
+      = layerFieldHom data 0 (Multiplicative.ofAdd (normOneVal r₀ ^ e * normOneVal z ^ e)) *
+        ((layerFieldHom data 0 (Multiplicative.ofAdd
+              (normOneVal p₀ ^ e * normOneVal z ^ e)))⁻¹ *
+          layerFieldHom data 1 (Multiplicative.ofAdd
+              ((normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e)) * normOneVal z ^ (e * e))) *
+          layerFieldHom data 0 (Multiplicative.ofAdd (normOneVal p₁ ^ e * normOneVal z ^ e))) *
+        (layerFieldHom data 0 (Multiplicative.ofAdd (normOneVal r₁ ^ e * normOneVal z ^ e)))⁻¹ := by
+    rw [hR]
+    simp only [mul_assoc, mul_inv_cancel_left, mul_inv_cancel, mul_one]
+  -- the two first-layer differences are `δ z^e` and `-δ z^e`
+  have hleft : layerFieldHom data 0 (Multiplicative.ofAdd (normOneVal r₀ ^ e * normOneVal z ^ e)) *
+      (layerFieldHom data 0 (Multiplicative.ofAdd (normOneVal p₀ ^ e * normOneVal z ^ e)))⁻¹
+      = layerFieldHom data 0 (Multiplicative.ofAdd
+          ((normOneVal r₀ ^ e - normOneVal p₀ ^ e) * normOneVal z ^ e)) := by
+    rw [← map_inv, ← map_mul, ← ofAdd_neg, ← ofAdd_add]
+    congr 2
+    ring
+  have hright : layerFieldHom data 0 (Multiplicative.ofAdd (normOneVal p₁ ^ e * normOneVal z ^ e)) *
+      (layerFieldHom data 0 (Multiplicative.ofAdd (normOneVal r₁ ^ e * normOneVal z ^ e)))⁻¹
+      = layerFieldHom data 0 (Multiplicative.ofAdd
+          (-((normOneVal r₀ ^ e - normOneVal p₀ ^ e) * normOneVal z ^ e))) := by
+    rw [← map_inv, ← map_mul, ← ofAdd_neg, ← ofAdd_add]
+    congr 2
+    linear_combination (-(normOneVal z ^ e)) * hcoll
+  rw [hsolve, ← hleft, ← hright]
+  simp only [mul_assoc]
+
+
 /-! ### The collision-span endgame
 
 If `σ(P)` normalizes the second layer `σ(P)^g`, the perfect group `N` of Theorem 2 collapses:

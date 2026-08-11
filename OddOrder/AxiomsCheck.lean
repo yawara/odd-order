@@ -20879,6 +20879,9 @@ conj_s_unitElt / layerFieldHom_apply   (the three layers in *field* coordinates)
       → layerFieldHom_two_factor       (**relation (2)**: for `p` in the Paley set and `z` norm-one,
                                         `d(z) = a(-p^e z^e)·b(K(p) z^{e²})·a((p-1)^e z^e)` — the
                                         identity whose *collisions* drive the obstruction)
+        → layerFieldHom_one_conj       (**relation (3)**: a collision `D(p) = D(r)` conjugates one
+                                        second-layer element into another *by a first-layer
+                                        element*: `b(K(r) z^{e²}) = b(K(p) z^{e²})^{a(-δ z^e)}`)
       → false_of_s_normalizes_layerOne (**the criterion, group side**: it is enough that the
                                         single element `x = σ(1)` normalizes the second layer —
                                         the `σ(U)`-orbit of `x` then spreads it over `σ(P)`.
@@ -20971,4 +20974,5 @@ hypothesis (B) for `p = 3` with `g` centralising `σ(U)`; and for a non-Frobeniu
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.layerFieldHom_two_eq
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.normOneVal_pow
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.layerFieldHom_two_factor
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.layerFieldHom_one_conj
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_s_normalizes_layerOne
