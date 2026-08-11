@@ -70,11 +70,16 @@ RunOrbit := function(q, nsamples)
       fi;
       if done then break; fi;
     od;
-    Print("RESULT q=", q, " e=", e, " collisions=", coll, " samples=", i,
-          " rank=", RankMat(rows), " of ", q, " full=", RankMat(rows) = q, "\n");
+    if Length(rows) = 0 then
+      Print("RESULT q=", q, " e=", e, " collisions=0 samples=", i, " rank=0 of ", q,
+            " full=false\n");
+    else
+      Print("RESULT q=", q, " e=", e, " collisions=", coll, " samples=", i,
+            " rank=", RankMat(rows), " of ", q, " full=", RankMat(rows) = q, "\n");
+    fi;
   od;
 end;;
 
-RunOrbit(31, 12000000);
+RunOrbit(31, 60000000);
 
 QUIT;
