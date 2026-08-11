@@ -125,7 +125,7 @@ problem 追加は 2026-06-23 が最新 (解析系 3 件) で、群論系の新�
 | problem | 他者 solved | repo 実体 | 残作業 |
 |---|---|---|---|
 | `finite_group_isSolvable_of_card_eq_prime_pow_mul_prime_pow` (Burnside p^aq^b) | 済 | `Isaacs.Ch07.burnside_p_pow_q_pow` (Ch07_ThompsonSubgroup/Main.lean:917、AxiomsCheck:1687 登録済)。eval より一般 (`p ≠ q` 不要、`Nat.card` + ∃ 形) | statement 橋渡しは数行 (`Fintype.card`→`Nat.card`、`Fact` instance 化)。主作業 = self-contained 化 (§1.2): Ch.7 9-step + normal-J の閉包 vendoring で規模大 (feit_thompson 前例の縮小版) |
-| `brauer_character_in_cyclotomic` | 済 (10 名) | 数学は既済: trace = 固有値和 (`character_isIntegral` 内部、ClassSumCongruence.lean:1053)、有限位数 endo の固有値は 1 の冪根 (`pow_eq_one_of_isRoot_charpoly_of_pow_eq_one`、同 :1030) | `CyclotomicField (Monoid.exponent G) ℚ →+* ℂ` embedding の構成と `φ.range` 所属への packaging (中規模 glue、10 名 solved の易問側) |
+| `brauer_character_in_cyclotomic` | 済 (10 名) | **数学は完全に既済** — `RepresentationTheory.character_mem_adjoin` (`CharacterEigenvalues.lean:103`, AxiomsCheck 登録済): `ω` が原始 `m` 乗根で `g^m = 1` なら `χ_ρ(g) ∈ ℤ[ω]`。任意体上・**`ℤ` 係数**なので `ℚ(ζ)` 版より強い。付随して `character_pow_eq_sum_finrank_smul` (固有値の重複度つき和) もある | `CyclotomicField (Monoid.exponent G) ℚ →+* ℂ` embedding の構成と `φ.range` 所属への packaging **のみ** (中規模 glue、10 名 solved の易問側)。⚠ 2026-08-11 に「数学が無い」と誤読して同内容の leaf を書きかけた — repo 側に新規実装は不要 |
 
 ### Q₈ 完成待ち (1) — issue 0147 は 2026-07-25 解凍済
 
