@@ -49,6 +49,7 @@ Proposition 9 の仮説 (記法は
 | 11 | **🎯 証明書形** — 同じ剰余類の Paley 点 2 個で witness 無し | `false_of_sameCoset_pair` |
 | 12 | **Theorem A の中核** — 反転ペアリング + 鳩の巣 | `isSquare_one_sub_inv_iff` / `exists_sameCoset_pair_of_card_lt` |
 | 13 | **🎯 Theorem A (算術形)** — `\|L\|(\|L\|−1) > 2\|U\|` で探索不要に決着 | `exists_sameCoset_pair_of_card_arith` |
+| 14 | **parity 精密化** — 判定が回答の `a ≥ 2c+1` と同じ鋭さに | `exists_sameCoset_pair_of_two_mul_card_le` |
 
 **⟹ 定理 2 + 奇数位数定理により、有限奇位数群は witness になれない。
 BG App.C が置かれている文脈そのものでは否定的に決着している。**

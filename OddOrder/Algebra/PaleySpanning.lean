@@ -66,6 +66,8 @@ the problem: that graph is symmetric, hence never Sidon.
 * `exists_sameCoset_pair_of_card_lt` / `exists_sameCoset_pair_of_card` /
   `exists_sameCoset_pair_of_card_arith` — **Theorem A**: `|L| (|L| - 1) > 2 |U|` gives two Paley
   points in one coset.
+* `two_dvd_card_trivial_fibre` / `exists_sameCoset_pair_of_two_mul_card_le` — the parity
+  refinement, which sharpens the criterion by one unit to `2 |V| ≤ |L|`.
 -/
 
 namespace OddOrder.Paley
@@ -762,6 +764,29 @@ theorem two_mul_card_usable_add_one [Fintype F] (h2 : ringChar F ≠ 2)
   rw [hsplit, Finset.card_insert_of_notMem hnotmem, Finset.card_union_of_disjoint hdisj, ← hcard]
   ring
 
+/-- Two distinct usable parameters with the same value give two Paley points sharing a scaling
+factor. -/
+theorem exists_sameCoset_pair_of_eq {t t' : F} (ht0 : t ≠ 0) (ht1 : t ≠ 1) (hft : t ^ E = t)
+    (hst : IsSquare t) (hs1 : IsSquare (1 - t)) (ht0' : t' ≠ 0) (ht1' : t' ≠ 1)
+    (hft' : t' ^ E = t') (hst' : IsSquare t') (hs1' : IsSquare (1 - t')) (hne : t ≠ t')
+    (hval : (1 - t) / (1 - t) ^ E = (1 - t') / (1 - t') ^ E) :
+    ∃ a b lam : F, a ∈ paleySet F ∧ b ∈ paleySet F ∧ a ≠ b ∧
+      a ^ E = lam * a ∧ (a + 1) ^ E = lam * (a + 1) ∧
+      b ^ E = lam * b ∧ (b + 1) ^ E = lam * (b + 1) := by
+  have hd : (1 : F) - t ≠ 0 := sub_ne_zero.mpr (Ne.symm ht1)
+  have hd' : (1 : F) - t' ≠ 0 := sub_ne_zero.mpr (Ne.symm ht1')
+  obtain ⟨hmem, -⟩ := mem_paleySet_powDiff_of_pow_eq ht0 ht1 hft hst hs1
+  obtain ⟨hmem', -⟩ := mem_paleySet_powDiff_of_pow_eq ht0' ht1' hft' hst' hs1'
+  obtain ⟨hsc, hsc1⟩ := pow_eq_mul_of_pow_eq ht1 hft
+  obtain ⟨hsc', hsc1'⟩ := pow_eq_mul_of_pow_eq ht1' hft'
+  rw [← hval] at hsc' hsc1'
+  refine ⟨t / (1 - t), t' / (1 - t'), (1 - t) / (1 - t) ^ E, hmem, hmem', ?_,
+    hsc, hsc1, hsc', hsc1'⟩
+  intro hcontra
+  refine hne ?_
+  field_simp at hcontra
+  linear_combination hcontra
+
 /-- **Theorem A, pigeonhole form.**  If the usable fixed-point parameters outnumber the collision
 values they produce, then two of them give *distinct* Paley points sharing one scaling factor —
 that is, two Paley points in a single coset of the fixed subgroup.
@@ -777,19 +802,7 @@ theorem exists_sameCoset_pair_of_card_lt (P V : Finset F)
     Finset.exists_ne_map_eq_of_card_lt_of_maps_to hcard hV
   obtain ⟨ht0, ht1, hft, hst, hs1⟩ := hP t htP
   obtain ⟨ht0', ht1', hft', hst', hs1'⟩ := hP t' ht'P
-  have hd : (1 : F) - t ≠ 0 := sub_ne_zero.mpr (Ne.symm ht1)
-  have hd' : (1 : F) - t' ≠ 0 := sub_ne_zero.mpr (Ne.symm ht1')
-  obtain ⟨hmem, -⟩ := mem_paleySet_powDiff_of_pow_eq ht0 ht1 hft hst hs1
-  obtain ⟨hmem', -⟩ := mem_paleySet_powDiff_of_pow_eq ht0' ht1' hft' hst' hs1'
-  obtain ⟨hsc, hsc1⟩ := pow_eq_mul_of_pow_eq ht1 hft
-  obtain ⟨hsc', hsc1'⟩ := pow_eq_mul_of_pow_eq ht1' hft'
-  rw [← hval] at hsc' hsc1'
-  refine ⟨t / (1 - t), t' / (1 - t'), (1 - t) / (1 - t) ^ E, hmem, hmem', ?_,
-    hsc, hsc1, hsc', hsc1'⟩
-  intro hcontra
-  refine hne ?_
-  field_simp at hcontra
-  linear_combination hcontra
+  exact exists_sameCoset_pair_of_eq ht0 ht1 hft hst hs1 ht0' ht1' hft' hst' hs1' hne hval
 
 /-- **Fibre counting.**  If a finite set `S` is stable under multiplication by a finite set `L` of
 nonzero scalars and `f` is constant on those translates, then each fibre of `f` on `S` has at least
@@ -901,6 +914,105 @@ theorem exists_sameCoset_pair_of_card_arith [Fintype F] (h2 : ringChar F ≠ 2)
     have hexp : (2 * V.card + 1) * L.card = 2 * (V.card * L.card) + L.card := by ring
     omega
   exact Nat.lt_of_mul_lt_mul_right hprod
+
+/-- **The trivial coset carries an even number of parameters.**  On the fibre over the value `1`
+— the parameters `t` for which `1 - t` is *also* fixed — the involution `t ↦ 1 - t` acts without
+fixed points: a fixed point would satisfy `2t = 1`, i.e. `t = -1` in characteristic three, and `-1`
+is not a square. -/
+theorem two_dvd_card_trivial_fibre [Fintype F] (h3 : (3 : F) = 0) (h2 : ringChar F ≠ 2)
+    (h4 : Fintype.card F % 4 = 3) (T0 : Finset F)
+    (hT0 : ∀ t, t ∈ T0 ↔ (t ≠ 0 ∧ t ≠ 1 ∧ IsSquare t ∧ IsSquare (1 - t) ∧ t ^ E = t
+      ∧ (1 - t) ^ E = 1 - t)) :
+    2 ∣ T0.card := by
+  classical
+  have hnegsq : ¬ IsSquare (-1 : F) := not_isSquare_neg_one h2 h4
+  have hmem : ∀ t ∈ T0, (1 : F) - t ∈ T0 := by
+    intro t ht
+    obtain ⟨ht0, ht1, hst, hs1, hft, hf1⟩ := (hT0 t).mp ht
+    have hrw : (1 : F) - (1 - t) = t := by ring
+    exact (hT0 _).mpr ⟨sub_ne_zero.mpr (Ne.symm ht1), by
+      intro hcon
+      exact ht0 (by linear_combination -hcon), hs1, by rw [hrw]; exact hst, hf1, by
+      rw [hrw]; exact hft⟩
+  have hnofix : ∀ t ∈ T0, (1 : F) - t ≠ t := by
+    intro t ht hcon
+    obtain ⟨-, -, hst, -, -, -⟩ := (hT0 t).mp ht
+    refine hnegsq ?_
+    have htval : t = -1 := by linear_combination hcon + t * h3
+    rwa [htval] at hst
+  have hsum : ∑ _t ∈ T0, (1 : ZMod 2) = 0 :=
+    Finset.sum_involution (f := fun _ : F => (1 : ZMod 2)) (fun t _ => 1 - t)
+      (fun _ _ => by decide) (fun t ht _ => hnofix t ht) hmem (fun t _ => by ring)
+  have hcast : ((T0.card : ℕ) : ZMod 2) = 0 := by simpa using hsum
+  exact (ZMod.natCast_eq_zero_iff _ _).mp hcast
+
+/-- **Theorem A, sharp criterion.**  The parity of the trivial fibre buys one unit: `2 |V| ≤ |L|`
+already forces two Paley points into one coset, whereas `exists_sameCoset_pair_of_card` needed the
+strict inequality.
+
+If every value were attained at most once, the trivial fibre — of even size — would be empty, so
+the values actually attained would avoid `1` and there would be at most `|V| - 1` of them; but
+`2|V| ≤ |L| = 2|Pos| + 1` gives `|V| ≤ |Pos|`. -/
+theorem exists_sameCoset_pair_of_two_mul_card_le [Fintype F] (h3 : (3 : F) = 0)
+    (h2 : ringChar F ≠ 2) (h4 : Fintype.card F % 4 = 3) (L Pos Neg V : Finset F)
+    (hL : ∀ t, t ∈ L ↔ (t ≠ 0 ∧ IsSquare t ∧ t ^ E = t))
+    (hPos : ∀ t, t ∈ Pos ↔ (t ∈ L ∧ t ≠ 1 ∧ IsSquare (1 - t)))
+    (hNeg : ∀ t, t ∈ Neg ↔ (t ∈ L ∧ t ≠ 1 ∧ ¬ IsSquare (1 - t)))
+    (hV : ∀ t ∈ Pos, (1 - t) / (1 - t) ^ E ∈ V) (hVone : (1 : F) ∈ V)
+    (hcards : 2 * V.card ≤ L.card) :
+    ∃ a b lam : F, a ∈ paleySet F ∧ b ∈ paleySet F ∧ a ≠ b ∧
+      a ^ E = lam * a ∧ (a + 1) ^ E = lam * (a + 1) ∧
+      b ^ E = lam * b ∧ (b + 1) ^ E = lam * (b + 1) := by
+  classical
+  have hcount := two_mul_card_usable_add_one h2 h4 L Pos Neg hL hPos hNeg
+  by_cases hinj : ∀ t ∈ Pos, ∀ t' ∈ Pos, (1 - t) / (1 - t) ^ E = (1 - t') / (1 - t') ^ E → t = t'
+  · exfalso
+    -- the value `1` is attained exactly on the parameters whose partner is fixed too
+    have hval1 : ∀ t ∈ Pos, ((1 - t) / (1 - t) ^ E = 1 ↔ (1 - t) ^ E = 1 - t) := by
+      intro t ht
+      obtain ⟨-, ht1, -⟩ := (hPos t).mp ht
+      have hd : (1 : F) - t ≠ 0 := sub_ne_zero.mpr (Ne.symm ht1)
+      rw [div_eq_one_iff_eq (pow_ne_zero _ hd)]
+      exact eq_comm
+    set T0 := Pos.filter fun t => (1 - t) ^ E = 1 - t with hT0def
+    have hT0 : ∀ t, t ∈ T0 ↔ (t ≠ 0 ∧ t ≠ 1 ∧ IsSquare t ∧ IsSquare (1 - t) ∧ t ^ E = t
+        ∧ (1 - t) ^ E = 1 - t) := by
+      intro t
+      simp only [hT0def, Finset.mem_filter, hPos, hL]
+      constructor
+      · rintro ⟨⟨⟨h0, hs, hf⟩, h1, hsq⟩, hfix⟩
+        exact ⟨h0, h1, hs, hsq, hf, hfix⟩
+      · rintro ⟨h0, h1, hs, hsq, hf, hfix⟩
+        exact ⟨⟨⟨h0, hs, hf⟩, h1, hsq⟩, hfix⟩
+    have hpar := two_dvd_card_trivial_fibre h3 h2 h4 T0 hT0
+    have hT0le : T0.card ≤ 1 := by
+      refine Finset.card_le_one.mpr ?_
+      intro x hx y hy
+      obtain ⟨hxP, hxf⟩ := Finset.mem_filter.mp hx
+      obtain ⟨hyP, hyf⟩ := Finset.mem_filter.mp hy
+      exact hinj x hxP y hyP (by rw [(hval1 x hxP).mpr hxf, (hval1 y hyP).mpr hyf])
+    have hT0empty : T0 = ∅ := Finset.card_eq_zero.mp (by omega)
+    have himg : Pos.image (fun t => (1 - t) / (1 - t) ^ E) ⊆ V.erase 1 := by
+      intro v hv
+      obtain ⟨t, ht, rfl⟩ := Finset.mem_image.mp hv
+      refine Finset.mem_erase.mpr ⟨?_, hV t ht⟩
+      intro hone
+      have : t ∈ T0 := Finset.mem_filter.mpr ⟨ht, (hval1 t ht).mp hone⟩
+      rw [hT0empty] at this
+      exact absurd this (Finset.notMem_empty t)
+    have hcardimg : (Pos.image fun t => (1 - t) / (1 - t) ^ E).card = Pos.card :=
+      Finset.card_image_of_injOn fun x hx y hy h => hinj x hx y hy h
+    have hle := Finset.card_le_card himg
+    rw [hcardimg, Finset.card_erase_of_mem hVone] at hle
+    have hV1 : 1 ≤ V.card := Finset.card_pos.mpr ⟨1, hVone⟩
+    omega
+  · push Not at hinj
+    obtain ⟨t, ht, t', ht', hvv, hne⟩ := hinj
+    obtain ⟨htL, ht1, hs1⟩ := (hPos t).mp ht
+    obtain ⟨ht0, hst, hft⟩ := (hL t).mp htL
+    obtain ⟨htL', ht1', hs1'⟩ := (hPos t').mp ht'
+    obtain ⟨ht0', hst', hft'⟩ := (hL t').mp htL'
+    exact exists_sameCoset_pair_of_eq ht0 ht1 hft hst hs1 ht0' ht1' hft' hst' hs1' hne hvv
 
 end FixedSubgroup
 
