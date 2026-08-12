@@ -61,8 +61,9 @@ the problem: that graph is symmetric, hence never Sidon.
 * `exists_paley_collision_of_pow_eq` — the search-free certificate: two nonzero squares `t`, `t'`
   fixed by `z ↦ z ^ E` whose values `(1 - t) / (1 - t)^E` agree produce a collision outright.
 * `isSquare_one_sub_inv_iff` — the inversion pairing: of `t` and `t⁻¹` exactly one is usable.
-* `exists_sameCoset_pair_of_card_lt` — **Theorem A, pigeonhole form**: more parameters than values
-  gives two Paley points in one coset.
+* `two_mul_card_usable_add_one` — exactly half of the fixed nonzero squares are usable.
+* `exists_sameCoset_pair_of_card_lt` / `exists_sameCoset_pair_of_card` — **Theorem A**: more
+  parameters than values gives two Paley points in one coset.
 -/
 
 namespace OddOrder.Paley
@@ -684,6 +685,81 @@ theorem isSquare_one_sub_inv_iff [Fintype F] (h2 : ringChar F ≠ 2)
     rw [hrw, ← neg_mul, hs, hu]
     ring
 
+/-- **Exactly half of the parameters are usable.**  Inversion pairs off `L ∖ {1}` — its only
+fixed points would be `±1`, and `-1` is not a square, so it is not in `L` — and by
+`isSquare_one_sub_inv_iff` exactly one member of each pair has `1 - ·` a square.
+
+Here `L` is the fixed subgroup inside the squares, `Pos` its usable half and `Neg` the other. -/
+theorem two_mul_card_usable_add_one [Fintype F] (h2 : ringChar F ≠ 2)
+    (h4 : Fintype.card F % 4 = 3) (L Pos Neg : Finset F)
+    (hL : ∀ t, t ∈ L ↔ (t ≠ 0 ∧ IsSquare t ∧ t ^ E = t))
+    (hPos : ∀ t, t ∈ Pos ↔ (t ∈ L ∧ t ≠ 1 ∧ IsSquare (1 - t)))
+    (hNeg : ∀ t, t ∈ Neg ↔ (t ∈ L ∧ t ≠ 1 ∧ ¬ IsSquare (1 - t))) :
+    2 * Pos.card + 1 = L.card := by
+  classical
+  -- `L` is closed under inversion
+  have hLinv : ∀ t ∈ L, t⁻¹ ∈ L := by
+    intro t ht
+    obtain ⟨ht0, htsq, htf⟩ := (hL t).mp ht
+    refine (hL _).mpr ⟨inv_ne_zero ht0, ?_, ?_⟩
+    · obtain ⟨s, hs⟩ := htsq
+      exact ⟨s⁻¹, by rw [hs, mul_inv]⟩
+    · rw [inv_pow, htf]
+  -- inversion is a bijection between the two halves
+  have hcard : Pos.card = Neg.card := by
+    refine Finset.card_bij' (fun t _ => t⁻¹) (fun t _ => t⁻¹) ?_ ?_ ?_ ?_
+    · intro t ht
+      obtain ⟨htL, ht1, htsq⟩ := (hPos t).mp ht
+      obtain ⟨ht0, htsq', -⟩ := (hL t).mp htL
+      refine (hNeg _).mpr ⟨hLinv t htL, ?_, ?_⟩
+      · intro hcon
+        exact ht1 (by simpa using congrArg (·⁻¹) hcon)
+      · rw [isSquare_one_sub_inv_iff h2 h4 ht0 ht1 htsq']
+        exact not_not.mpr htsq
+    · intro t ht
+      obtain ⟨htL, ht1, htsq⟩ := (hNeg t).mp ht
+      obtain ⟨ht0, htsq', -⟩ := (hL t).mp htL
+      refine (hPos _).mpr ⟨hLinv t htL, ?_, ?_⟩
+      · intro hcon
+        exact ht1 (by simpa using congrArg (·⁻¹) hcon)
+      · by_contra hcon
+        rw [← isSquare_one_sub_inv_iff h2 h4 (inv_ne_zero ht0) ?_ ?_] at hcon
+        · rw [inv_inv] at hcon
+          exact htsq hcon
+        · intro hc
+          exact ht1 (by simpa using congrArg (·⁻¹) hc)
+        · obtain ⟨s, hs⟩ := htsq'
+          exact ⟨s⁻¹, by rw [hs, mul_inv]⟩
+    · intro t _
+      exact inv_inv t
+    · intro t _
+      exact inv_inv t
+  -- `L` is the disjoint union of `{1}`, `Pos` and `Neg`
+  have hone : (1 : F) ∈ L := (hL 1).mpr ⟨one_ne_zero, ⟨1, (one_mul 1).symm⟩, one_pow E⟩
+  have hdisj : Disjoint Pos Neg := by
+    refine Finset.disjoint_left.mpr ?_
+    intro t htp htn
+    exact ((hNeg t).mp htn).2.2 ((hPos t).mp htp).2.2
+  have hsplit : L = insert 1 (Pos ∪ Neg) := by
+    ext t
+    simp only [Finset.mem_insert, Finset.mem_union, hPos, hNeg]
+    constructor
+    · intro ht
+      by_cases h1 : t = 1
+      · exact Or.inl h1
+      · by_cases hs : IsSquare (1 - t)
+        · exact Or.inr (Or.inl ⟨ht, h1, hs⟩)
+        · exact Or.inr (Or.inr ⟨ht, h1, hs⟩)
+    · rintro (rfl | ⟨ht, -, -⟩ | ⟨ht, -, -⟩)
+      · exact hone
+      · exact ht
+      · exact ht
+  have hnotmem : (1 : F) ∉ Pos ∪ Neg := by
+    simp only [Finset.mem_union, hPos, hNeg]
+    rintro (⟨-, h, -⟩ | ⟨-, h, -⟩) <;> exact h rfl
+  rw [hsplit, Finset.card_insert_of_notMem hnotmem, Finset.card_union_of_disjoint hdisj, ← hcard]
+  ring
+
 /-- **Theorem A, pigeonhole form.**  If the usable fixed-point parameters outnumber the collision
 values they produce, then two of them give *distinct* Paley points sharing one scaling factor —
 that is, two Paley points in a single coset of the fixed subgroup.
@@ -712,6 +788,31 @@ theorem exists_sameCoset_pair_of_card_lt (P V : Finset F)
   refine hne ?_
   field_simp at hcontra
   linear_combination hcontra
+
+/-- **Theorem A, criterion form.**  Once the fixed subgroup `L` is more than twice as large as the
+set of collision values it can produce, two Paley points must share a coset — and then
+`OddOrder.BG.AppC.Problem1.false_of_sameCoset_pair` refutes hypothesis (B).
+
+With `|V| ≤ [U : L]` this is the gcd criterion `|L| ≥ 2[U : L] + 2`.  (The sharper `|L| ≥
+2[U : L] + 1` needs one further parity refinement, namely that the coset of `L` itself carries an
+even number of Paley points.) -/
+theorem exists_sameCoset_pair_of_card [Fintype F] (h2 : ringChar F ≠ 2)
+    (h4 : Fintype.card F % 4 = 3) (L Pos Neg V : Finset F)
+    (hL : ∀ t, t ∈ L ↔ (t ≠ 0 ∧ IsSquare t ∧ t ^ E = t))
+    (hPos : ∀ t, t ∈ Pos ↔ (t ∈ L ∧ t ≠ 1 ∧ IsSquare (1 - t)))
+    (hNeg : ∀ t, t ∈ Neg ↔ (t ∈ L ∧ t ≠ 1 ∧ ¬ IsSquare (1 - t)))
+    (hV : ∀ t ∈ Pos, (1 - t) / (1 - t) ^ E ∈ V)
+    (hcards : 2 * V.card + 1 < L.card) :
+    ∃ a b lam : F, a ∈ paleySet F ∧ b ∈ paleySet F ∧ a ≠ b ∧
+      a ^ E = lam * a ∧ (a + 1) ^ E = lam * (a + 1) ∧
+      b ^ E = lam * b ∧ (b + 1) ^ E = lam * (b + 1) := by
+  have hcount := two_mul_card_usable_add_one h2 h4 L Pos Neg hL hPos hNeg
+  refine exists_sameCoset_pair_of_card_lt Pos V ?_ hV ?_
+  · intro t ht
+    obtain ⟨htL, ht1, hsq⟩ := (hPos t).mp ht
+    obtain ⟨ht0, htsq, htf⟩ := (hL t).mp htL
+    exact ⟨ht0, ht1, htf, htsq, hsq⟩
+  · omega
 
 end FixedSubgroup
 

@@ -20993,6 +20993,8 @@ share a scaling factor (`exists_sameCoset_pair_of_card_lt`) — which is precise
 #assert_only_allowed_axioms OddOrder.Paley.isSquare_neg_one_of_isSquare_neg
 #assert_only_allowed_axioms OddOrder.Paley.isSquare_one_sub_inv_iff
 #assert_only_allowed_axioms OddOrder.Paley.exists_sameCoset_pair_of_card_lt
+#assert_only_allowed_axioms OddOrder.Paley.two_mul_card_usable_add_one
+#assert_only_allowed_axioms OddOrder.Paley.exists_sameCoset_pair_of_card
 
 /-! **Inversion-closed additive subgroups of a field** (`Algebra/InverseClosedSubgroup`).  Hua's
 identity `x - (x⁻¹ + (y - x)⁻¹)⁻¹ = x² / y` writes `x²/y` with additions and inversions only, so
