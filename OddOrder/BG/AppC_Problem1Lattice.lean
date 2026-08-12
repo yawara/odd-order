@@ -575,6 +575,14 @@ theorem layerFieldHom_apply (data : FieldNormalizerData p q G) (i : ℕ)
   change ((conjGen data) ^ i)⁻¹ * fieldHom data t * (((conjGen data) ^ i)⁻¹)⁻¹ = _
   rw [inv_inv]
 
+/-- Each layer is a faithful copy of `(𝔽_{3^q}, +)`: `fieldHom` is injective because `σ` is, and
+conjugation is a bijection. -/
+theorem layerFieldHom_injective (data : FieldNormalizerData p q G) (i : ℕ) :
+    Function.Injective (layerFieldHom data i) := by
+  intro s t hst
+  simp only [layerFieldHom_apply] at hst
+  exact fieldHom_injective data (mul_left_cancel (mul_right_cancel hst))
+
 /-- **The relation family, in field coordinates.**  For every norm-one `u`,
 
 `d(u^{e²}) · b(u^e) · a(u) = 1`,

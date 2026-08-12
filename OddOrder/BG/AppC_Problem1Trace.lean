@@ -40,10 +40,14 @@ non-Frobenius (`hnotfrob`), because the contradiction no longer runs through the
 ## Main results
 
 * `CollisionPair` — the collision data of relation (4), keeping *both* `S` and `S'`.
+* `exists_collisionPair_of_sub_ne_zero` — the square-difference requirement is free: of the two
+  orderings of a collision exactly one has square `δ`, since `-1` is a non-square.
 * `CollisionPair.frobenius` — cubing a collision cubes its `S`-values.
 * `conj_layerFieldHom_one_eq` — relation (4) as an equation.
 * `fieldTrace_pow_char` — `Tr S` lies in the prime field.
 * `false_of_collisionPair_trace_ne_zero` — **the trace obstruction**.
+* `false_of_collisionPair_trace` — its final form: one collision suffices unless *both* traces
+  vanish.
 -/
 
 namespace OddOrder.BG.AppC.Problem1
@@ -408,6 +412,42 @@ theorem false_of_collisionPair_trace_ne_zero (data : FieldNormalizerData p q G) 
     rfl
   rw [← hwval]
   exact hcomm
+
+/-- **The trace obstruction at the second endpoint.**  A collision whose *other* normalised value
+has non-zero trace also refutes hypothesis (B).
+
+The mechanism is different, and cheaper: if `Tr S = 0` the traced relation
+`x · b(Tr S) · x⁻¹ = b(Tr S')` degenerates to `1 = b(Tr S')`, and `b` is injective
+(`layerFieldHom_injective`), so `Tr S' = 0` too.  Contrapositive: `Tr S' ≠ 0` forces `Tr S ≠ 0`,
+which is the case already refuted. -/
+theorem false_of_collisionPair_trace_ne_zero_right (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hq : q ≠ 0) {e : ℕ}
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {S S' : GaloisField p q} (hpair : CollisionPair p q e S S')
+    (htr : fieldTrace p q S' ≠ 0) : False := by
+  by_cases h : fieldTrace p q S = 0
+  · have hTr := conj_layerFieldHom_one_trace data hp hexp hpair
+    have hb : layerFieldHom data 1 (Multiplicative.ofAdd (fieldTrace p q S'))
+        = layerFieldHom data 1 (Multiplicative.ofAdd (0 : GaloisField p q)) := by
+      rw [← hTr, h, ofAdd_zero, map_one, mul_one, mul_inv_cancel]
+    exact htr (Multiplicative.ofAdd.injective (layerFieldHom_injective data 1 hb))
+  · exact false_of_collisionPair_trace_ne_zero data hp hq hexp hpair h
+
+/-- **The trace obstruction, final form.**  A single collision refutes hypothesis (B) unless
+*both* of its normalised values have zero trace.
+
+Together with `exists_collisionPair_of_sub_ne_zero` (the square-difference condition is free) this
+is the sharpest form of the criterion: hypothesis (B1) of
+`notes/bg/appC_problem1_partial_resolution.md` is now just "`D_E` is not injective on the Paley
+set", and (B2) only has to avoid the single value `(0, 0)` instead of the single value `0` — so a
+certificate search fails on a collision with probability about `1/9` rather than `1/3`. -/
+theorem false_of_collisionPair_trace (data : FieldNormalizerData p q G) (hp : p = 3) (hq : q ≠ 0)
+    {e : ℕ} (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {S S' : GaloisField p q} (hpair : CollisionPair p q e S S')
+    (htr : fieldTrace p q S ≠ 0 ∨ fieldTrace p q S' ≠ 0) : False := by
+  rcases htr with h | h
+  · exact false_of_collisionPair_trace_ne_zero data hp hq hexp hpair h
+  · exact false_of_collisionPair_trace_ne_zero_right data hp hq hexp hpair h
 
 end GroupSide
 

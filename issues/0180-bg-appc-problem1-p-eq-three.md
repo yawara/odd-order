@@ -43,6 +43,7 @@ Proposition 9 の仮説 (記法は
 | 5 | 自由な衝突は必ず Paley 集合を外れる (一般 `q` が難しい理由) | `powDiff_neg_sub_one` / `neg_sub_one_notMem_paleySet` |
 | 6 | **`E` と `E²` の衝突問題は共役** ⟹ (B1) は対の片方でよい | `exists_paley_collision_pow_mul` |
 | 7 | **`δ ∈ U` 条件は無条件に満たせる** ⟹ (B1) = 「衝突が存在する」 | `exists_collisionPair_of_sub_ne_zero` |
+| 8 | **判定法の最終形** — 空振りは両端のトレースが両方 0 のときだけ | `false_of_collisionPair_trace` |
 
 **⟹ 定理 2 + 奇数位数定理により、有限奇位数群は witness になれない。
 BG App.C が置かれている文脈そのものでは否定的に決着している。**
@@ -76,6 +77,17 @@ w が平方   ⟹  b := a^E·w⁻¹ ,        w が非平方 ⟹  b := −(a+1)^E
 「使えるのは約半分」は**固定した順序規約の artifact** であって本物のフィルタではない。
 ⟹ **証明書探索の効率が 2 倍** (`q = 47` は 1 指数 ~12h → ~6h)。
 Lean = `exists_collisionPair_of_sub_ne_zero` (axiom-clean)。
+
+### 追記 (2026-08-12): (B2) も弱まった — 空振りは `(Tr S, Tr S′) = (0,0)` のときだけ
+
+`Tr S′ ≠ 0` **でも**同じ結論が出る (`Tr S = 0` なら traced 関係式が `1 = b(Tr S′)` に退化し、
+層が `(F,+)` の忠実なコピーゆえ `Tr S′ = 0` が従う)。⟹ 1 衝突あたりの失敗確率が
+`1/3` → `1/9`。Lean = `false_of_collisionPair_trace` (axiom-clean)。
+
+**判定法の現状 (3 つの弱化の合成)**:
+
+> `D_E` が Paley 集合 `T` 上で単射でなければ (= 衝突が 1 個あれば)、その衝突の両端のトレースが
+> **両方** 0 でない限り witness は存在しない。しかも `{E, E²}` の**片方**で確認すれば十分。
 
 ### 残る 1 行 = (B1)
 

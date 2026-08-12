@@ -21054,6 +21054,14 @@ difference `δ`, and swapping the two Paley points always yields a `CollisionPai
 (`exists_collisionPair_of_sub_ne_zero`).  So hypothesis (B1) is just "a collision exists", and the
 observed "only half the collisions are usable" was an artefact of a fixed ordering convention. -/
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.exists_collisionPair_of_sub_ne_zero
+/-! **The criterion only fails when *both* traces vanish.**  If `Tr S = 0` the traced relation
+degenerates to `1 = b(Tr S')`, and each layer is a faithful copy of the additive group
+(`layerFieldHom_injective`), so `Tr S' = 0` as well.  Hence `Tr S ≠ 0 ∨ Tr S' ≠ 0` already refutes
+(B) (`false_of_collisionPair_trace`), and a certificate loses a collision with probability about
+`1/9` instead of `1/3`. -/
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.layerFieldHom_injective
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_trace_ne_zero_right
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_trace
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.CollisionPair.frobenius
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.CollisionPair.frobenius_iterate
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conj_layerFieldHom_one_eq
