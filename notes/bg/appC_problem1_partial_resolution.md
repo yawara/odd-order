@@ -558,9 +558,13 @@ GAP スクリプトが測っているものと同一。⟹ 「判定法は機械
 **⚠ Frobenius 軌道の中では `Tr` は不変** (`Tr(S³) = Tr S`) — 同じ軌道の `q` 個の衝突は
 同じトレース値を与えるので、独立な試行数は衝突数の `1/q` になる。
 
-**構造的な言い換え**: `span{S}` は Frobenius 安定な `𝔽₃`-部分空間 = `𝔽₃[x]/(x^q−1)`-部分加群。
-`x^q − 1` の 1 次因子は `x − 1` だけ (`2^q = 2 ≠ 1` ゆえ) なので、**`ker Tr` は唯一の
-Frobenius 安定な超平面**。よって
+**構造的な言い換え (2026-08-12 に Lean 化)**: `span{S}` は Frobenius 安定な `𝔽₃`-部分空間
+(`CollisionPair.frobenius`)。そして **`ker Tr` は唯一の Frobenius 安定な超平面**
+— これは [`OddOrder/Algebra/FrobeniusStableHyperplane.lean`](../../OddOrder/Algebra/FrobeniusStableHyperplane.lean)
+の `ker_eq_ker_trace_of_frobenius_stable` として形式化済 (axiom-clean)。証明はトレース双対性で
+`ℓ = Tr(c·−)` と書き、Frobenius 安定性を `c = μc³` (`μ ∈ 𝔽₃`) に翻訳し、`μ = −1` の場合が
+`c² = −1` すなわち「`−1` が平方」を要求して潰れる、というもの — **補題 B を駆動しているのと
+同じ入力** (`Paley.not_isSquare_neg_one`) で片付く。よって
 
 ```
 (B2) が破れる  ⟺  span{S} ⊆ ker Tr  ⟺  span{S} が唯一の不変超平面に丸ごと入る

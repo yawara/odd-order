@@ -502,6 +502,7 @@ import OddOrder.BG.AppC_SL2Example
 import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.BG.AppC_GlaubermanNorton
+import OddOrder.Algebra.FrobeniusStableHyperplane
 import OddOrder.Algebra.PaleySpanning
 import OddOrder.Algebra.RelationLattice
 import OddOrder.Algebra.PowerMonomialIndependence
@@ -20943,6 +20944,17 @@ hypothesis (B) for `p = 3` with `g` centralising `σ(U)`; and for a non-Frobeniu
 #assert_only_allowed_axioms OddOrder.Paley.addClosure_paleySet_eq_top
 #assert_only_allowed_axioms OddOrder.RelationLattice.exists_trace_repr
 #assert_only_allowed_axioms OddOrder.RelationLattice.span_eq_top_of_trace_annihilator
+
+/-! **`ker Tr` is the unique Frobenius-stable hyperplane** (`Algebra/FrobeniusStableHyperplane`).
+The `S`-values of the collisions span a Frobenius-stable subspace, so the span criterion
+(`false_of_collisionSet_spanning`) asks for everything while the trace criterion
+(`false_of_collisionPair_trace_ne_zero`) only asks the span to avoid `ker Tr`.  This theorem is
+why the latter is *strictly* weaker: in characteristic three with `|F| ≡ 3 (mod 4)` there is only
+one Frobenius-stable hyperplane, and the input that rules the others out is the same
+`-1` is-not-a-square fact that drives Lemma B. -/
+#assert_only_allowed_axioms OddOrder.FrobeniusStable.trace_pow_char
+#assert_only_allowed_axioms OddOrder.FrobeniusStable.ker_eq_ker_trace_of_frobenius_stable
+#assert_only_allowed_axioms OddOrder.FrobeniusStable.frobeniusStableHyperplane_unique
 #assert_only_allowed_axioms OddOrder.RelationLattice.eq_zero_of_forall_trace_triple_eq_zero
 #assert_only_allowed_axioms OddOrder.RelationLattice.span_triples_eq_top
 #assert_only_allowed_axioms OddOrder.RelationLattice.span_triples_subgroup_eq_top
