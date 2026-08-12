@@ -409,6 +409,80 @@ static void *worker(void *v) {
   return NULL;
 }
 
+/* ------------------------------------------- structured-exponent certificate */
+
+/* For exponents `E` that act trivially on a large factor of `n`, the fixed subgroup
+ *      Fix = { x : x^{E-1} = 1 },      S = Fix ∩ (squares)
+ * is large, and every `f ∈ S` with `f + 2 ∈ S` gives a Paley point with D(p) = 1:
+ * take p = f, p - 1 = f + 2 (char 3), then p^E - (p-1)^E = f - (f+2) = 1 since both
+ * are fixed by `E`.  Such `f` are produced *constructively*: for g ∈ S with 1 - g ∈ S,
+ *      f := (1 - g)^{-1} ∈ S      and      f + 2 = g f ∈ S,
+ * so one only has to sample `g` uniformly from `S` (a single exponentiation) and test
+ * `1 - g ∈ S` — expected |F| / |S| trials instead of the birthday bound sqrt(|F|/q).
+ *
+ * ⚠ The method needs such an `f` to EXIST at all: the expected number is |S|^2 / |F|, so it
+ * applies exactly when **|S| > sqrt(|F|)**.  For `q = 19` that holds for 2 of the 8 exotic
+ * exponents (|S| = 363889 > 34092) and fails for the next 2 (|S| = 1597); for `q = 47` it holds
+ * for 4 of the 8.  The remaining exponents still need the birthday search.
+ *
+ * All these `f` share the same D-value, so any two of them collide; for such a pair
+ *      delta = f1 - f2,     S-value = -(delta^E)^{-1},
+ * and the certificate needs `delta` a square with non-zero trace of the S-value. */
+
+static int fixmode(int nthreads_unused, long trials) {
+  (void)nthreads_unused;
+  u128 q = 1; for (int i = 0; i < N; i++) q *= 3;
+  u128 qm1 = q - 1;
+  /* |Fix| = gcd(E - 1, |F| - 1); S = Fix ∩ squares has half that order (E is odd). */
+  u128 a = EXP_E - 1, b = qm1;
+  while (b) { u128 t = a % b; a = b; b = t; }
+  u128 fixord = a;
+  if (fixord % 2 != 0) { printf("unexpected: |Fix| is odd\n"); return 1; }
+  u128 m = fixord / 2;                 /* |S| */
+  u128 cof = qm1 / m;                  /* x^cof is uniform in S */
+  printf("|F|-1 = %llu*2^64+%llu   |S| = %llu*2^64+%llu   expected trials ~ %llu\n",
+         (unsigned long long)(qm1 >> 64), (unsigned long long)(uint64_t)qm1,
+         (unsigned long long)(m >> 64), (unsigned long long)(uint64_t)m,
+         (unsigned long long)(qm1 / m));
+  fflush(stdout);
+  fe *found = malloc(sizeof(fe) * 64);
+  int nf = 0;
+  rng_state = 0x9E3779B97F4A7C15ull ^ (uint64_t)EXP_E;
+  for (long t = 0; t < trials && nf < 64; t++) {
+    fe x = fe_random();
+    if (fe_is_zero(x)) continue;
+    fe g = fe_pow_u128(x, cof);                 /* uniform in S */
+    fe y = fe_sub((fe){1, 0}, g);               /* 1 - g */
+    if (fe_is_zero(y)) continue;
+    fe ym = fe_pow_u128(y, m);
+    if (!(ym.m == 1 && ym.s == 0)) continue;    /* 1 - g ∈ S ? */
+    fe f = fe_inv(y);
+    /* sanity: f and f+2 are in S and give D(f) = 1 */
+    fe f2 = fe_add(f, (fe){1, 1});              /* f + 2 */
+    fe d = fe_sub(fe_pow_u128(f, EXP_E), fe_pow_u128(f2, EXP_E));
+    if (!(d.m == 1 && d.s == 0)) { printf("internal check failed\n"); return 1; }
+    int dup = 0;
+    for (int i = 0; i < nf; i++) if (fe_eq(found[i], f)) dup = 1;
+    if (!dup) found[nf++] = f;
+  }
+  printf("found %d Paley points with D = 1\n", nf);
+  for (int i = 0; i < nf; i++)
+    for (int j = i + 1; j < nf; j++) {
+      fe delta = fe_sub(found[i], found[j]);
+      if (fe_is_zero(delta) || !fe_is_square(delta)) continue;
+      fe Sv = fe_neg(fe_inv(fe_pow_u128(delta, EXP_E)));
+      fe tr = fe_trace(Sv);
+      if (!fe_is_zero(tr)) {
+        printf("DECISIVE  pair (%d,%d)  Tr(S) = %s\n", i, j, tr.s & 1 ? "-1" : "+1");
+        free(found);
+        return 0;
+      }
+    }
+  printf("no decisive pair among the %d points found\n", nf);
+  free(found);
+  return 1;
+}
+
 int main(int argc, char **argv) {
   if (argc >= 2 && strcmp(argv[1], "selftest") == 0) {
     printf("field self-test\n");
@@ -421,9 +495,18 @@ int main(int argc, char **argv) {
     census(7, 2, 941);
     return f ? 1 : 0;
   }
+  if (argc >= 7 && strcmp(argv[1], "fix") == 0) {
+    int n = atoi(argv[2]), k = atoi(argv[3]);
+    set_field(n, k);
+    EXP_E = ((u128)strtoull(argv[4], NULL, 10) << 64) | (u128)strtoull(argv[5], NULL, 10);
+    u128 qm1 = 1; for (int i = 0; i < N; i++) qm1 *= 3; qm1 -= 1;
+    EXP_E2 = (EXP_E % qm1) * (EXP_E % qm1) % qm1;
+    return fixmode(0, atol(argv[6]));
+  }
   if (argc < 9) {
     fprintf(stderr,
-            "usage: %s search <N> <K> <E-hi> <E-lo> <threads> <seconds> <dpbits>\n", argv[0]);
+            "usage: %s search <N> <K> <E-hi> <E-lo> <threads> <seconds> <dpbits>\n"
+            "       %s fix <N> <K> <E-hi> <E-lo> <trials>\n", argv[0], argv[0]);
     return 2;
   }
   int n = atoi(argv[2]), k = atoi(argv[3]);
