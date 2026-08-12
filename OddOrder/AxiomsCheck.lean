@@ -503,6 +503,7 @@ import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.BG.AppC_GlaubermanNorton
 import OddOrder.Algebra.FrobeniusStableHyperplane
+import OddOrder.Algebra.InverseClosedSubgroup
 import OddOrder.Algebra.PaleySpanning
 import OddOrder.Algebra.RelationLattice
 import OddOrder.Algebra.PowerMonomialIndependence
@@ -20981,6 +20982,24 @@ any search — is the special case `1 - t ∈ Fix`
 #assert_only_allowed_axioms OddOrder.Paley.mem_paleySet_powDiff_of_pow_eq
 #assert_only_allowed_axioms OddOrder.Paley.exists_paley_collision_of_pow_eq
 #assert_only_allowed_axioms OddOrder.Paley.exists_paley_collision_of_pow_eq_of_sub
+
+/-! **Inversion-closed additive subgroups of a field** (`Algebra/InverseClosedSubgroup`).  Hua's
+identity `x - (x⁻¹ + (y - x)⁻¹)⁻¹ = x² / y` writes `x²/y` with additions and inversions only, so
+such a subgroup `W` is closed under `(x, y) ↦ x²/y`; rescaling by a nonzero `s ∈ W` then gives
+closure under squaring, and in characteristic three `u v = u² + v² - (u+v)²` upgrades that to
+multiplication.  Hence `{v : s * v ∈ W}` is a subfield and `W = s • K`.
+
+This is the algebraic core of the *same-coset obstruction* of issue 0180: the set of `s` for
+which `x` commutes with the second-layer line `b(s t^E)` is such a subgroup, so for `q` prime it
+is either the prime field (pinning the collision value to `-1`, whose trace is non-zero) or all of
+`𝔽_{3^q}` (making the layers centralise each other, contradicting perfectness).  Either branch
+refutes hypothesis (B) with **no** assumption on the trace. -/
+#assert_only_allowed_axioms OddOrder.InverseClosed.hua_identity
+#assert_only_allowed_axioms OddOrder.InverseClosed.sq_div_mem
+#assert_only_allowed_axioms OddOrder.InverseClosed.mul_sq_mem
+#assert_only_allowed_axioms OddOrder.InverseClosed.mul_mul_mem
+#assert_only_allowed_axioms OddOrder.InverseClosed.mem_scaledSubfield
+#assert_only_allowed_axioms OddOrder.InverseClosed.eq_smul_scaledSubfield
 #assert_only_allowed_axioms OddOrder.RelationLattice.exists_trace_repr
 #assert_only_allowed_axioms OddOrder.RelationLattice.span_eq_top_of_trace_annihilator
 

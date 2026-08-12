@@ -201,3 +201,35 @@ Theorem D の不等式も成立、`E₁E₂ ≡ 1 (mod n)` を確認した。
 ⚠ **他の `q` はブロック列挙の完全性が未検証** (分解されていない余因子に `≡ 1 (mod 3)` の素数が
 潜んでいれば `c` が増える)。`n` の全分解は `q = 101` 以外は手元で回していない。
 ⟹ **「`q = 53, 79, 109, …` も決着」は現時点で未確認**として扱う。
+
+
+---
+
+## V. Lean 化 (2026-08-12〜)
+
+### ✅ 第 1 段: 反転で閉じた加法部分群 (Theorem B の代数的中核)
+
+leaf = [`OddOrder/Algebra/InverseClosedSubgroup.lean`](../../OddOrder/Algebra/InverseClosedSubgroup.lean)
+(axiom-clean・AxiomsCheck 登録済・`OddOrder.lean` に配線済)。
+
+| 数学 | Lean |
+|---|---|
+| Hua の恒等式 `x − (x⁻¹+(y−x)⁻¹)⁻¹ = x²/y` | `hua_identity` |
+| `W` は `(x,y) ↦ x²/y` で閉じる | `sq_div_mem` |
+| `s` で正規化すると平方で閉じる | `mul_sq_mem` |
+| 標数 3 で `uv = u²+v²−(u+v)²` ⟹ 積で閉じる | `mul_mul_mem` |
+| `K = {v : s·v ∈ W}` は部分環 | `scaledSubring` |
+| **`K` は部分体** (`s·v⁻¹ = s²/(s·v)` で反転も出る、有限性不要) | **`scaledSubfield`** |
+| `W = s·K` | `eq_smul_scaledSubfield` |
+
+⚠ 回答は「有限部分環は体」と言っていたが、**有限性は不要** — `s·v⁻¹ = s²/(s·v)` が
+`sq_div_mem` から直接出る。こちらの方が強い。
+
+**数値検証**: `GF(9)` と `GF(27)` で**すべての** `𝔽₃`-部分空間を枚挙し、反転で閉じるもの
+すべてについて `s⁻¹W` が部分体になることを確認 (計 40 ケース、失敗 0)。
+
+### 残り (次段)
+
+* `𝔽_{3^q}` (`q` 素数) の部分体は `𝔽₃` と全体だけ、の形式化
+* 群側: `W = {s : ∀t [a(t), b(s t^E)] = 1}` が加法部分群かつ反転で閉じること
+* Theorem A (gcd 判定 = 鳩の巣)

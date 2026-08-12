@@ -890,6 +890,7 @@ import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.BG.AppC_AffineLineCondition
 import OddOrder.BG.AppC_GlaubermanNorton
+import OddOrder.Algebra.InverseClosedSubgroup
 import OddOrder.Algebra.PaleySpanning
 import OddOrder.Algebra.RelationLattice
 import OddOrder.Algebra.PowerMonomialIndependence
