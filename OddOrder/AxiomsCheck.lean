@@ -510,6 +510,7 @@ import OddOrder.Algebra.PowerMonomialIndependence
 import OddOrder.BG.AppC_Problem1
 import OddOrder.BG.AppC_Problem1Lattice
 import OddOrder.BG.AppC_Problem1Trace
+import OddOrder.BG.AppC_Problem1SameCoset
 import OddOrder.BG.AppD_CNGroups
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
@@ -21095,6 +21096,22 @@ degenerates to `1 = b(Tr S')`, and each layer is a faithful copy of the additive
 (B) (`false_of_collisionPair_trace`), and a certificate loses a collision with probability about
 `1/9` instead of `1/3`. -/
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.layerFieldHom_injective
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_trace
+
+/-! **The same-coset obstruction, group side** (`BG/AppC_Problem1SameCoset`).  When the two Paley
+points of a collision lie in one coset of the fixed subgroup of `z ↦ z ^ e` one has `K(p) = K(r)`,
+so relation (4) becomes a *commutation* `[a(t), b(S t^e)] = 1`.  The admissible twists form an
+additive subgroup (`commSubgroup`) which conjugation by `g²` plus the factorisation
+`d(u) = a(-u^e) b(-u^{e²})` shows to be closed under `s ↦ (s ^ e)⁻¹`, hence under inversion
+(`inv_mem_commSubgroup`) — exactly the hypothesis of `InverseClosed`. -/
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conjGen_pow_three
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conj_layerFieldHom_zero
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conj_layerFieldHom_one
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.mem_commSubgroup
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.commute_two_zero_of_mem
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.commute_inv_pow_of_normOne
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.mem_commSubgroup_inv_pow
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.inv_mem_commSubgroup
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_trace_ne_zero_right
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_trace
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.CollisionPair.frobenius

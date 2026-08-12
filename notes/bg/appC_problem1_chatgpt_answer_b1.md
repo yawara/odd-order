@@ -245,8 +245,26 @@ leaf = [`OddOrder/Algebra/InverseClosedSubgroup.lean`](../../OddOrder/Algebra/In
 ⟹ 応用側では `s := S` として `S⁴ = 1` かつ `S` 非平方 ⟹ `S² = ±1` で `S² = −1` は
 `−1` 非平方ゆえ排除 ⟹ `S = −1` (`S = 1` は平方)。
 
+### ✅ 第 3 段: 群側の `W` (新 leaf `AppC_Problem1SameCoset.lean`)
+
+| 数学 | Lean |
+|---|---|
+| `g³ = 1` | `conjGen_pow_three` |
+| `g²` による共役が層を 0→2, 1→0 と回す | `conj_layerFieldHom_zero` / `conj_layerFieldHom_one` |
+| **`W = {s : ∀t [a(t), b(s t^e)] = 1}` は加法部分群** | `commSubgroup` |
+| `g²` 共役で `[d(t), a(s t^e)] = 1` | `commute_two_zero_of_mem` |
+| `d(u) = a(−u^e)b(−u^{e²})` の第 1 層因子を可換性で消す | `commute_inv_pow_of_normOne` |
+| **`W` は `s ↦ (s^e)⁻¹` で閉じる** | `mem_commSubgroup_inv_pow` |
+| **`W` は反転で閉じる** (3 回反復、`e³` が恒等) | **`inv_mem_commSubgroup`** |
+
+`mem_commSubgroup_inv_pow` の証明: `t ≠ 0` は `t/s` が平方かどうかで 2 分し、平方側は
+`v = t/s` を `normOneUnits` に持ち上げて `u := u₀^{e²}` と取れば `normOneVal u ^ e = v` かつ
+`normOneVal u ^ (e·e) = v^e`、非平方側は `−1` 倍して `e` が奇数ゆえ両辺が反転するだけ。
+`t = 0` は `a(0) = 1`。
+
+⟹ **`InverseClosed.pow_four_eq_one_or_forall_mem` の仮説がすべて揃った**。
+
 ### 残り (次段)
 
-* 群側: `W = {s : ∀t [a(t), b(s t^E)] = 1}` が加法部分群かつ `s ↦ s^{−E}` で閉じること
-* Theorem B 本体の組み立て
+* Theorem B 本体の組み立て (同一剰余類の衝突 ⟹ `S = S′` ⟹ 交換関係 ⟹ 二分法 ⟹ 矛盾)
 * Theorem A (gcd 判定 = 鳩の巣)
