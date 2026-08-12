@@ -68,6 +68,11 @@ the problem: that graph is symmetric, hence never Sidon.
   points in one coset.
 * `two_dvd_card_trivial_fibre` / `exists_sameCoset_pair_of_two_mul_card_le` — the parity
   refinement, which sharpens the criterion by one unit to `2 |V| ≤ |L|`.
+* `notMem_prime_field_of_mem_paleySet` — the Paley set avoids `𝔽₃`.
+* `exists_paley_collision_of_pow_char` — **one Paley point** whose collision value lies in `𝔽₃`
+  already collides, namely with its own cube.
+* `exists_paley_collision_of_pow_add` — **one Paley point** at which `z ↦ z ^ E` is additive on
+  `(a, 1)` collides with its own inverse.
 -/
 
 namespace OddOrder.Paley
@@ -1013,6 +1018,124 @@ theorem exists_sameCoset_pair_of_two_mul_card_le [Fintype F] (h3 : (3 : F) = 0)
     obtain ⟨htL', ht1', hs1'⟩ := (hPos t').mp ht'
     obtain ⟨ht0', hst', hft'⟩ := (hL t').mp htL'
     exact exists_sameCoset_pair_of_eq ht0 ht1 hft hst hs1 ht0' ht1' hft' hst' hs1' hne hvv
+
+/-! ### Collisions forced by the Frobenius, and by additivity at one point
+
+Two mechanisms that need only a **single** Paley point.  Both rest on the same elementary fact:
+
+**the Paley set avoids the prime field** (`notMem_prime_field_of_mem_paleySet`) — `0` and `-1` are
+excluded outright and `1` is excluded because `1 + 1 = -1` is a non-square —
+
+while `powDiff` is equivariant for the two maps that *preserve* the Paley set:
+
+* the Frobenius `a ↦ a³`, with `powDiff E (a³) = (powDiff E a)³`;
+* the inversion `a ↦ a⁻¹`, whose fixed points `±1` are outside the Paley set.
+
+So a Paley point whose collision value lies in `𝔽₃` collides with its own cube, and a Paley point
+at which `z ↦ z ^ E` is *additive on the pair `(a, 1)`* collides with its own inverse.  The latter
+strictly generalises the fixed-subgroup certificate above: `a, a + 1 ∈ Fix` gives
+`(a+1)^E = a + 1 = a^E + 1`, but the converse fails. -/
+
+section FrobeniusCollision
+
+/-- **The Paley set avoids the prime field.**  `a` and `a + 1` are non-zero by definition, and
+`a = 1` would make `a + 1 = -1` a square. -/
+theorem notMem_prime_field_of_mem_paleySet (h3 : (3 : F) = 0) (hnegsq : ¬ IsSquare (-1 : F))
+    {a : F} (ha : a ∈ paleySet F) : a ^ 3 ≠ a := by
+  obtain ⟨ha0, -, ha10, ha1sq⟩ := ha
+  intro hcube
+  have hfac : a * ((a + 1) * (a - 1)) = 0 := by linear_combination hcube
+  rcases mul_eq_zero.mp hfac with h | h
+  · exact ha0 h
+  rcases mul_eq_zero.mp h with h' | h'
+  · exact ha10 h'
+  · refine hnegsq ?_
+    have ha1 : a = 1 := by linear_combination h'
+    have hrw : a + 1 = -1 := by
+      rw [ha1]
+      linear_combination h3
+    rwa [hrw] at ha1sq
+
+/-- In characteristic three cubing is additive, so it is a difference-preserving map. -/
+private theorem sub_pow_three (h3 : (3 : F) = 0) (x y : F) : (x - y) ^ 3 = x ^ 3 - y ^ 3 := by
+  linear_combination (x * y ^ 2 - x ^ 2 * y) * h3
+
+/-- **The Frobenius collision.**  If the collision value of a Paley point lies in the prime field,
+the point collides with its own cube — which is again a Paley point, and is *different* because the
+Paley set avoids `𝔽₃`. -/
+theorem exists_paley_collision_of_pow_char (h3 : (3 : F) = 0) (hnegsq : ¬ IsSquare (-1 : F))
+    {a : F} (ha : a ∈ paleySet F) (hval : powDiff E a ^ 3 = powDiff E a) :
+    ∃ b c : F, b ∈ paleySet F ∧ c ∈ paleySet F ∧ b ≠ c ∧ powDiff E b = powDiff E c := by
+  obtain ⟨ha0, hasq, ha10, ha1sq⟩ := ha
+  have hcube1 : a ^ 3 + 1 = (a + 1) ^ 3 := by linear_combination (-(a ^ 2) - a) * h3
+  have hmem : a ^ 3 ∈ paleySet F := by
+    refine ⟨pow_ne_zero _ ha0, ?_, ?_, ?_⟩
+    · obtain ⟨s, hs⟩ := hasq
+      exact ⟨s ^ 3, by rw [hs]; ring⟩
+    · rw [hcube1]
+      exact pow_ne_zero _ ha10
+    · rw [hcube1]
+      obtain ⟨s, hs⟩ := ha1sq
+      exact ⟨s ^ 3, by rw [hs]; ring⟩
+  have e1 : ((a + 1) ^ 3) ^ E = ((a + 1) ^ E) ^ 3 := by
+    rw [← pow_mul, ← pow_mul, Nat.mul_comm]
+  have e2 : (a ^ 3) ^ E = (a ^ E) ^ 3 := by
+    rw [← pow_mul, ← pow_mul, Nat.mul_comm]
+  have hval3 : powDiff E (a ^ 3) = powDiff E a ^ 3 := by
+    rw [powDiff, powDiff, hcube1, e1, e2, sub_pow_three h3]
+  exact ⟨a, a ^ 3, ⟨ha0, hasq, ha10, ha1sq⟩, hmem,
+    fun hcon => notMem_prime_field_of_mem_paleySet h3 hnegsq ⟨ha0, hasq, ha10, ha1sq⟩ hcon.symm,
+    by rw [hval3, hval]⟩
+
+/-- **The additivity collision.**  If `z ↦ z ^ E` is additive at the pair `(a, 1)`, i.e.
+`(a + 1) ^ E = a ^ E + 1`, then `a` collides with `a⁻¹`, and the common value is `1`.
+
+This strictly generalises the fixed-subgroup certificate: `a, a + 1 ∈ Fix` gives the hypothesis,
+but the hypothesis is *one* equation where membership in `Fix` is two. -/
+theorem exists_paley_collision_of_pow_add (h3 : (3 : F) = 0) (hnegsq : ¬ IsSquare (-1 : F))
+    {a : F} (ha : a ∈ paleySet F) (hadd : (a + 1) ^ E = a ^ E + 1) :
+    ∃ b c : F, b ∈ paleySet F ∧ c ∈ paleySet F ∧ b ≠ c ∧ powDiff E b = powDiff E c := by
+  obtain ⟨ha0, hasq, ha10, ha1sq⟩ := ha
+  have hae : a ^ E ≠ 0 := pow_ne_zero _ ha0
+  have hne1 : a ≠ 1 := by
+    rintro rfl
+    refine hnegsq ?_
+    have hrw : (1 : F) + 1 = -1 := by linear_combination h3
+    rwa [hrw] at ha1sq
+  have hnem1 : a ≠ -1 := by
+    rintro rfl
+    exact hnegsq hasq
+  have hsucc : a⁻¹ + 1 = (a + 1) * a⁻¹ := by
+    field_simp
+    ring
+  have hinvsq : IsSquare a⁻¹ := by
+    obtain ⟨s, hs⟩ := hasq
+    exact ⟨s⁻¹, by rw [hs, mul_inv]⟩
+  have hmem : a⁻¹ ∈ paleySet F := by
+    refine ⟨inv_ne_zero ha0, hinvsq, ?_, ?_⟩
+    · rw [hsucc]
+      exact mul_ne_zero ha10 (inv_ne_zero ha0)
+    · rw [hsucc]
+      obtain ⟨s, hs⟩ := ha1sq
+      obtain ⟨u, hu⟩ := hinvsq
+      exact ⟨s * u, by rw [hs, hu]; ring⟩
+  have hva : powDiff E a = 1 := by
+    rw [powDiff, hadd]
+    ring
+  have hvb : powDiff E a⁻¹ = 1 := by
+    rw [powDiff, hsucc, mul_pow, hadd, inv_pow]
+    field_simp
+    ring
+  refine ⟨a, a⁻¹, ⟨ha0, hasq, ha10, ha1sq⟩, hmem, ?_, by rw [hva, hvb]⟩
+  intro hcon
+  have hsq : a * a = 1 := by
+    calc a * a = a * a⁻¹ := by rw [← hcon]
+      _ = 1 := mul_inv_cancel₀ ha0
+  rcases mul_eq_zero.mp (show (a - 1) * (a + 1) = 0 by linear_combination hsq) with h | h
+  · exact hne1 (by linear_combination h)
+  · exact hnem1 (by linear_combination h)
+
+end FrobeniusCollision
 
 end FixedSubgroup
 

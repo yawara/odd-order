@@ -21001,6 +21001,19 @@ share a scaling factor (`exists_sameCoset_pair_of_card_lt`) — which is precise
 #assert_only_allowed_axioms OddOrder.Paley.exists_sameCoset_pair_of_eq
 #assert_only_allowed_axioms OddOrder.Paley.two_dvd_card_trivial_fibre
 #assert_only_allowed_axioms OddOrder.Paley.exists_sameCoset_pair_of_two_mul_card_le
+/-! **Collisions from a single Paley point.**  In characteristic three the Paley set avoids the
+prime field (`notMem_prime_field_of_mem_paleySet`: `0` and `-1` are excluded outright, and `a = 1`
+would make `a + 1 = -1` a square), while `powDiff` is equivariant for the two maps that *preserve*
+the Paley set — the Frobenius `a ↦ a³` and the inversion `a ↦ a⁻¹`, whose fixed points `±1` lie
+outside it.  Hence **one** Paley point suffices: if its collision value lies in `𝔽₃` it collides
+with its cube (`exists_paley_collision_of_pow_char`), and if `z ↦ z ^ E` is additive at `(a, 1)` it
+collides with its inverse (`exists_paley_collision_of_pow_add`, which strictly generalises the
+fixed-subgroup certificate).  A corollary worth recording: the fibre of `powDiff` over `1` always
+contains all of `𝔽₃`, so `x ^ E` is **never** APN — unconditionally, with no appeal to the open
+classification of APN power maps. -/
+#assert_only_allowed_axioms OddOrder.Paley.notMem_prime_field_of_mem_paleySet
+#assert_only_allowed_axioms OddOrder.Paley.exists_paley_collision_of_pow_char
+#assert_only_allowed_axioms OddOrder.Paley.exists_paley_collision_of_pow_add
 
 /-! **Inversion-closed additive subgroups of a field** (`Algebra/InverseClosedSubgroup`).  Hua's
 identity `x - (x⁻¹ + (y - x)⁻¹)⁻¹ = x² / y` writes `x²/y` with additions and inversions only, so
