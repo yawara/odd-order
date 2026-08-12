@@ -20968,16 +20968,19 @@ distributions, and it halves hypothesis (B1): one exponent per pair `{E, E²}` s
 #assert_only_allowed_axioms OddOrder.Paley.powDiffConjNeg_mem_paleySet
 #assert_only_allowed_axioms OddOrder.Paley.exists_paley_collision_pow_mul
 
-/-! **Collisions supplied by the fixed subgroup, with no search.**  If both coordinates of a Paley
-point are fixed by `z ↦ z ^ E` then its collision value is forced to be `1`
-(`powDiff_eq_one_of_pow_eq`), and such points are parametrised by the fixed nonzero squares `h`
-with `1 - h` again one, via the Möbius map `h ↦ h / (1 - h)`
-(`mem_paleySet_powDiff_eq_one_of_pow_eq`).  Two of them already give a collision
-(`exists_paley_collision_of_pow_eq`), which is the certificate that settled 4 of the 8 exotic
-exponents for `q = 47` without any search. -/
-#assert_only_allowed_axioms OddOrder.Paley.powDiff_eq_one_of_pow_eq
-#assert_only_allowed_axioms OddOrder.Paley.mem_paleySet_powDiff_eq_one_of_pow_eq
+/-! **Collisions supplied by the fixed subgroup, with no search.**  If the two coordinates of a
+Paley point lie in the same coset of `Fix = {z : z ^ E = z}`, its collision value is that coset
+(`powDiff_eq_of_pow_eq_mul`); the Möbius map `t ↦ t / (1 - t)` parametrises such points by `Fix`
+itself, with computable value `(1 - t) / (1 - t) ^ E` (`mem_paleySet_powDiff_of_pow_eq`), so two
+fixed nonzero squares sharing a value already collide (`exists_paley_collision_of_pow_eq`).  The
+certificate recorded in the notes — which settled 4 of the 8 exotic exponents for `q = 47` without
+any search — is the special case `1 - t ∈ Fix`
+(`exists_paley_collision_of_pow_eq_of_sub`); the general form lowers the threshold on `|Fix|` from
+`√|F|` to `|F|^{1/3}`. -/
+#assert_only_allowed_axioms OddOrder.Paley.powDiff_eq_of_pow_eq_mul
+#assert_only_allowed_axioms OddOrder.Paley.mem_paleySet_powDiff_of_pow_eq
 #assert_only_allowed_axioms OddOrder.Paley.exists_paley_collision_of_pow_eq
+#assert_only_allowed_axioms OddOrder.Paley.exists_paley_collision_of_pow_eq_of_sub
 #assert_only_allowed_axioms OddOrder.RelationLattice.exists_trace_repr
 #assert_only_allowed_axioms OddOrder.RelationLattice.span_eq_top_of_trace_annihilator
 
