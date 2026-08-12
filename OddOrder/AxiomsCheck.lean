@@ -21190,5 +21190,6 @@ Frobenius combination `∑ kⱼ S^{3^j} = ∑ kⱼ S'^{3^j} ≠ 0` refutes (B)
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_neg
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.ConjPair.compose
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.ConjPair.composeFlip
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_conjPair_spanning
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_ratio_eq
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_frobCombo

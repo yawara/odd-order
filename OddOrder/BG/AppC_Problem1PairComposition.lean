@@ -663,6 +663,85 @@ theorem ConjPair.composeFlip (data : FieldNormalizerData p q G) (hp : p = 3) (hq
     rw [← h]
     group
 
+/-! ### The K3 endpoint: a spanning family of pairs -/
+
+/-- **A spanning family of conjugation pairs refutes hypothesis (B).**  If the first components
+of a family of conjugation pairs generate `(𝔽_{3^q}, +)`, then conjugation by `x = a(1)` maps the
+(finite) second layer into itself — evaluate each pair at `v = 1` — so `x` normalizes the layer
+and `false_of_s_normalizes_layerOne` applies.
+
+This is the endpoint "K3" of the closure computation of
+`notes/bg/appC_problem1_pair_composition.md` §7: the pair space of an escape collision is forced
+into the trace-zero Frobenius module, and a single composition already breaks out of it, so its
+first components span and this theorem fires. -/
+theorem false_of_conjPair_spanning (data : FieldNormalizerData p q G) (hp : p = 3) {e : ℕ}
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    (hnotfrob : ∀ j : ℕ, ∃ u : NormSet.normOneUnits p q, u ^ e ≠ u ^ (3 ^ j))
+    {D : Set (GaloisField p q)} (hD : ∀ s ∈ D, ∃ s', ConjPair data e s s')
+    (hspan : AddSubgroup.closure D = ⊤) : False := by
+  classical
+  haveI : Finite (layerOne data) := by
+    have hfin : ((layerOne data : Subgroup G) : Set G).Finite := by
+      rw [coe_layerOne_eq_range data]
+      exact Set.finite_range _
+    exact hfin.to_subtype
+  have ha1 : layerFieldHom data 0 (Multiplicative.ofAdd (1 : GaloisField p q)) = data.s := by
+    simp only [layerFieldHom_apply, pow_zero, inv_one, one_mul, mul_one]
+    rfl
+  -- conjugation by `x` maps the second layer into itself
+  have hmapsto : ∀ z ∈ layerOne data, data.s * z * (data.s)⁻¹ ∈ layerOne data := by
+    have hJ : ∀ t : GaloisField p q,
+        data.s * layerFieldHom data 1 (Multiplicative.ofAdd t) * (data.s)⁻¹ ∈ layerOne data := by
+      have hsub : D ⊆ {t : GaloisField p q |
+          data.s * layerFieldHom data 1 (Multiplicative.ofAdd t) * (data.s)⁻¹ ∈ layerOne data} := by
+        intro t ht
+        obtain ⟨t', hpair⟩ := hD t ht
+        have h1 := hpair 1 ⟨1, (mul_one 1).symm⟩ one_ne_zero
+        rw [one_pow, mul_one, mul_one, ha1] at h1
+        rw [Set.mem_setOf_eq, h1, ← SetLike.mem_coe, coe_layerOne_eq_range data]
+        exact ⟨_, rfl⟩
+      have hgrp : AddSubgroup.closure D ≤
+          { carrier := {t : GaloisField p q |
+              data.s * layerFieldHom data 1 (Multiplicative.ofAdd t) * (data.s)⁻¹ ∈ layerOne data}
+            zero_mem' := by
+              simp only [Set.mem_setOf_eq, ofAdd_zero, map_one, mul_one, mul_inv_cancel]
+              exact (layerOne data).one_mem
+            add_mem' := fun {a b} ha hb => by
+              simp only [Set.mem_setOf_eq, ofAdd_add, map_mul] at *
+              have hsplit : data.s * (layerFieldHom data 1 (Multiplicative.ofAdd a) *
+                  layerFieldHom data 1 (Multiplicative.ofAdd b)) * (data.s)⁻¹ =
+                  (data.s * layerFieldHom data 1 (Multiplicative.ofAdd a) * (data.s)⁻¹) *
+                  (data.s * layerFieldHom data 1 (Multiplicative.ofAdd b) * (data.s)⁻¹) := by
+                group
+              rw [hsplit]
+              exact (layerOne data).mul_mem ha hb
+            neg_mem' := fun {a} ha => by
+              simp only [Set.mem_setOf_eq, ofAdd_neg, map_inv] at *
+              have hinv : data.s * (layerFieldHom data 1 (Multiplicative.ofAdd a))⁻¹ *
+                  (data.s)⁻¹ =
+                  (data.s * layerFieldHom data 1 (Multiplicative.ofAdd a) * (data.s)⁻¹)⁻¹ := by
+                group
+              rw [hinv]
+              exact (layerOne data).inv_mem ha } :=
+        (AddSubgroup.closure_le _).mpr hsub
+      intro t
+      exact hgrp (by rw [hspan]; trivial : t ∈ AddSubgroup.closure D)
+    intro z hz
+    rw [← SetLike.mem_coe, coe_layerOne_eq_range data] at hz
+    obtain ⟨t, rfl⟩ := hz
+    exact hJ (Multiplicative.toAdd t)
+  -- finiteness upgrades this to normalizing
+  have hmap_le : (layerOne data).map (MulAut.conj data.s : G →* G) ≤ layerOne data := by
+    rintro _ ⟨z, hz, rfl⟩
+    exact hmapsto z hz
+  have hcard : Nat.card ((layerOne data).map (MulAut.conj data.s : G →* G))
+      = Nat.card (layerOne data) :=
+    Subgroup.card_map_of_injective (f := (MulAut.conj data.s : G →* G))
+      (MulAut.conj data.s).injective
+  exact false_of_s_normalizes_layerOne data hp hexp hnotfrob
+    (Subgroup.mem_normalizer_iff_map_conj_eq.mpr
+      (Subgroup.eq_of_le_of_card_ge hmap_le (le_of_eq hcard.symm)))
+
 /-! ### Theorems N2 and N3 -/
 
 /-- **Theorem N2: two collisions with equal ratios refute hypothesis (B)** — with no trace
