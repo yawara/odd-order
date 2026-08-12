@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Field.Subfield.Basic
 import Mathlib.Algebra.Ring.Subring.Basic
+import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.FieldTheory.Finiteness
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.LinearCombination
 import Mathlib.Tactic.Ring
@@ -40,6 +42,9 @@ crucially *no* hypothesis on the trace is needed.
 * `sq_div_mem` — an inversion-closed additive subgroup is closed under `(x, y) ↦ x² / y`.
 * `scaledSubring` — `{v : s * v ∈ W}` as a `Subring`, in characteristic three.
 * `scaledSubfield` — the same, as a `Subfield`; `eq_smul_scaledSubfield` recovers `W = s • K`.
+* `subfield_eq_bot_or_top` — a finite field of prime degree has no intermediate subfield.
+* `pow_four_eq_one_or_forall_mem` — **the dichotomy**: in `𝔽_{3^q}` with `q` prime such a `W`
+  either is everything, or has `s ^ 4 = 1` for each of its nonzero elements.
 -/
 
 namespace OddOrder.InverseClosed
@@ -156,5 +161,86 @@ theorem eq_smul_scaledSubfield (hinv : ∀ w ∈ W, w⁻¹ ∈ W) (h3 : (3 : F) 
     · rw [← mul_assoc, mul_inv_cancel₀ hs0, one_mul]
   · rintro ⟨v, hv, rfl⟩
     exact hv
+
+/-! ### No intermediate subfield in prime degree
+
+`𝔽_{p^q}` with `q` prime has only the two obvious subfields, because a subfield has `p^d` elements
+with `d ∣ q`.  Combined with the previous subsection this pins an inversion-closed additive
+subgroup down completely. -/
+
+section PrimeDegree
+
+variable [Fintype F] {p q : ℕ} [Fact p.Prime] [CharP F p]
+
+/-- **A finite field of prime degree over its prime field has no intermediate subfield.** -/
+theorem subfield_eq_bot_or_top (hq : q.Prime) (hcard : Fintype.card F = p ^ q) (K : Subfield F) :
+    K = ⊥ ∨ K = ⊤ := by
+  classical
+  letI : Fintype K := Fintype.ofFinite K
+  have hpp : p.Prime := Fact.out
+  obtain ⟨d, -, hdcard⟩ := FiniteField.card K p
+  have hpow : Fintype.card F = Fintype.card K ^ Module.finrank K F := Module.card_eq_pow_finrank
+  rw [hcard, hdcard, ← pow_mul] at hpow
+  have hexp : q = (d : ℕ) * Module.finrank K F := Nat.pow_right_injective hpp.two_le hpow
+  rcases hq.eq_one_or_self_of_dvd (d : ℕ) ⟨_, hexp⟩ with h1 | hqd
+  · -- `|K| = p`, so every element of `K` satisfies `x ^ p = x`
+    left
+    refine le_antisymm (fun x hx => ?_) bot_le
+    have hcardK : Fintype.card K = p := by rw [hdcard, h1, pow_one]
+    have hfix : (⟨x, hx⟩ : K) ^ p = ⟨x, hx⟩ := by
+      have := FiniteField.pow_card (⟨x, hx⟩ : K)
+      rwa [hcardK] at this
+    refine (Subfield.mem_bot_iff_pow_eq_self F p).mpr ?_
+    exact congrArg Subtype.val hfix
+  · -- `|K| = |F|`, so the inclusion is onto
+    right
+    refine le_antisymm le_top (fun x _ => ?_)
+    have hcards : Fintype.card K = Fintype.card F := by rw [hdcard, hcard, hqd]
+    have hbij : Function.Bijective ((↑) : K → F) :=
+      (Fintype.bijective_iff_injective_and_card _).mpr ⟨Subtype.val_injective, hcards⟩
+    obtain ⟨k, hk⟩ := hbij.2 x
+    exact hk ▸ k.2
+
+/-- **The punchline.**  In a finite field of characteristic three whose degree over the prime
+field is prime, an inversion-closed additive subgroup `W` with a nonzero element `s` either
+exhausts the field, or satisfies `s ^ 4 = 1` — in which case `W = s · 𝔽₃` with `s = ±1`, i.e.
+`W` is the prime field.
+
+This is exactly the dichotomy the same-coset obstruction of issue 0180 needs. -/
+theorem pow_four_eq_one_or_forall_mem (hinv : ∀ w ∈ W, w⁻¹ ∈ W) (hp : p = 3) (hq : q.Prime)
+    (hcard : Fintype.card F = p ^ q) {s : F} (hs : s ∈ W) (hs0 : s ≠ 0) :
+    s ^ 4 = 1 ∨ ∀ x : F, x ∈ W := by
+  have h3 : (3 : F) = 0 := by
+    have := CharP.cast_eq_zero F p
+    rw [hp] at this
+    exact_mod_cast this
+  rcases subfield_eq_bot_or_top hq hcard (scaledSubfield W hinv h3 hs hs0) with hbot | htop
+  · left
+    have hsinv : s⁻¹ ∈ W := hinv _ hs
+    have hv : s⁻¹ * s⁻¹ ∈ scaledSubfield W hinv h3 hs hs0 := by
+      change s * (s⁻¹ * s⁻¹) ∈ W
+      have hrw : s * (s⁻¹ * s⁻¹) = s⁻¹ := by
+        field_simp
+      rw [hrw]
+      exact hsinv
+    rw [hbot] at hv
+    have hpow : (s⁻¹ * s⁻¹) ^ p = s⁻¹ * s⁻¹ := (Subfield.mem_bot_iff_pow_eq_self F p).mp hv
+    rw [hp] at hpow
+    have hfac : (s⁻¹) ^ 2 * ((s⁻¹) ^ 4 - 1) = 0 := by linear_combination hpow
+    rcases mul_eq_zero.mp hfac with h | h
+    · exact absurd h (pow_ne_zero _ (inv_ne_zero hs0))
+    · have h1 : (s ^ 4)⁻¹ = 1 := by
+        rw [← inv_pow]
+        linear_combination h
+      exact inv_eq_one.mp h1
+  · right
+    intro x
+    have hx : x * s⁻¹ ∈ scaledSubfield W hinv h3 hs hs0 := htop ▸ Subfield.mem_top _
+    have hmem : s * (x * s⁻¹) ∈ W := hx
+    have hrw : s * (x * s⁻¹) = x := by
+      field_simp
+    rwa [hrw] at hmem
+
+end PrimeDegree
 
 end OddOrder.InverseClosed

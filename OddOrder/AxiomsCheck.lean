@@ -21000,6 +21000,8 @@ refutes hypothesis (B) with **no** assumption on the trace. -/
 #assert_only_allowed_axioms OddOrder.InverseClosed.mul_mul_mem
 #assert_only_allowed_axioms OddOrder.InverseClosed.mem_scaledSubfield
 #assert_only_allowed_axioms OddOrder.InverseClosed.eq_smul_scaledSubfield
+#assert_only_allowed_axioms OddOrder.InverseClosed.subfield_eq_bot_or_top
+#assert_only_allowed_axioms OddOrder.InverseClosed.pow_four_eq_one_or_forall_mem
 #assert_only_allowed_axioms OddOrder.RelationLattice.exists_trace_repr
 #assert_only_allowed_axioms OddOrder.RelationLattice.span_eq_top_of_trace_annihilator
 

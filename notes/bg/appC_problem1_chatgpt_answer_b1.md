@@ -228,8 +228,25 @@ leaf = [`OddOrder/Algebra/InverseClosedSubgroup.lean`](../../OddOrder/Algebra/In
 **数値検証**: `GF(9)` と `GF(27)` で**すべての** `𝔽₃`-部分空間を枚挙し、反転で閉じるもの
 すべてについて `s⁻¹W` が部分体になることを確認 (計 40 ケース、失敗 0)。
 
+### ✅ 第 2 段: 部分体分類と二分法 (同 leaf)
+
+| 数学 | Lean |
+|---|---|
+| `𝔽_{p^q}` (`q` 素数) の部分体は `⊥` か `⊤` だけ | `subfield_eq_bot_or_top` |
+| **二分法**: `W` は全体か、非零元がすべて `s⁴ = 1` を満たす | **`pow_four_eq_one_or_forall_mem`** |
+
+分類の証明: `|K| = p^d` (`FiniteField.card`)、`|F| = |K|^{finrank}` (`Module.card_eq_pow_finrank`)
+⟹ `q = d · finrank`、`q` 素数ゆえ `d = 1` か `d = q`。`d = 1` なら `K` の元は `x^p = x` を
+満たすので `Subfield.mem_bot_iff_pow_eq_self` で `K = ⊥`、`d = q` なら濃度が等しく包含が全単射。
+
+二分法: `K = ⊥` の枝では `s⁻¹ ∈ W` から `s⁻² ∈ K = ⊥`、すなわち `(s⁻²)³ = s⁻²` ⟹ `s⁴ = 1`。
+`K = ⊤` の枝では任意の `x` に対し `x·s⁻¹ ∈ K` ⟹ `s·(x s⁻¹) = x ∈ W`。
+
+⟹ 応用側では `s := S` として `S⁴ = 1` かつ `S` 非平方 ⟹ `S² = ±1` で `S² = −1` は
+`−1` 非平方ゆえ排除 ⟹ `S = −1` (`S = 1` は平方)。
+
 ### 残り (次段)
 
-* `𝔽_{3^q}` (`q` 素数) の部分体は `𝔽₃` と全体だけ、の形式化
-* 群側: `W = {s : ∀t [a(t), b(s t^E)] = 1}` が加法部分群かつ反転で閉じること
+* 群側: `W = {s : ∀t [a(t), b(s t^E)] = 1}` が加法部分群かつ `s ↦ s^{−E}` で閉じること
+* Theorem B 本体の組み立て
 * Theorem A (gcd 判定 = 鳩の巣)
