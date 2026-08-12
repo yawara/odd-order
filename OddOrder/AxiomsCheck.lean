@@ -20942,6 +20942,15 @@ hypothesis (B) for `p = 3` with `g` centralising `σ(U)`; and for a non-Frobeniu
 #assert_only_allowed_axioms OddOrder.Paley.eq_or_of_sub_inv_sq_eq
 #assert_only_allowed_axioms OddOrder.Paley.card_paleySet_lower
 #assert_only_allowed_axioms OddOrder.Paley.addClosure_paleySet_eq_top
+
+/-! **The automatic collision of `a ↦ (a+1)^E - a^E` misses the Paley set.**  For odd `E` the
+involution `a ↦ -a-1` preserves `powDiff` (`powDiff_neg_sub_one`), so that map is never injective
+and the graph `{(u, u^E)}` is never a Sidon set; but the involution always leaves the Paley set
+(`neg_sub_one_notMem_paleySet`, again because `-1` is a non-square).  Hence a collision usable by
+`false_of_collisionPair_trace_ne_zero` — two *Paley* points with the same `powDiff` — is an extra
+coincidence, which is exactly why the general-`q` case is an equidistribution question. -/
+#assert_only_allowed_axioms OddOrder.Paley.powDiff_neg_sub_one
+#assert_only_allowed_axioms OddOrder.Paley.neg_sub_one_notMem_paleySet
 #assert_only_allowed_axioms OddOrder.RelationLattice.exists_trace_repr
 #assert_only_allowed_axioms OddOrder.RelationLattice.span_eq_top_of_trace_annihilator
 

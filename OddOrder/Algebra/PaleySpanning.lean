@@ -40,6 +40,22 @@ one), no Galois module theory, and no separate treatment of `q = 3`.
 * `card_paleySet_lower` — `|F| - 3 ≤ 4 |T|`, via the parametrisation `u ↦ (u - u⁻¹)²`.
 * `isSquare_or_isSquare_neg` — every non-zero element is `±` a square.
 * `addClosure_paleySet_eq_top` — **Lemma B**: `T` generates `(F, +)`.
+
+## The automatic collision of `a ↦ (a+1)^E - a^E`
+
+The second half of the file records why the Paley set is also the *obstruction* in BG Appendix C,
+Problem 1.  For odd `E` the "discrete derivative" `powDiff E a = (a+1)^E - a^E` has a free
+2-to-1 symmetry, the involution `a ↦ -a-1` (`powDiff_neg_sub_one`).  That involution maps `T`
+into its complement whenever `-1` is a non-square (`neg_sub_one_notMem_paleySet`), so the
+collisions that the trace criterion of
+`OddOrder.BG.AppC.Problem1.false_of_collisionPair_trace_ne_zero` consumes — two *Paley* points
+with the same `powDiff` — are never the automatic ones.  This is exactly the reason the general
+`q` case of that criterion is hard, and it corrects the "`{(u, u^E)}` is a Sidon set" reading of
+the problem: that graph is symmetric, hence never Sidon.
+
+* `powDiff` — `a ↦ (a+1)^E - a^E`.
+* `powDiff_neg_sub_one` — the free involution.
+* `neg_sub_one_notMem_paleySet` — it always leaves `T`.
 -/
 
 namespace OddOrder.Paley
@@ -279,5 +295,50 @@ theorem addClosure_paleySet_eq_top [Fintype F] (h3 : ringChar F = 3)
       _ = Fintype.card F := Nat.card_eq_fintype_card
   have hlower : Fintype.card F - 3 ≤ 4 * #T := card_paleySet_lower h30 hnegsq T hTmem
   omega
+
+/-! ## The automatic collision, and why it misses the Paley set -/
+
+section PowDiff
+
+variable {E : ℕ}
+
+/-- The **discrete derivative of the power map**, `D_E(a) = (a+1)^E - a^E`.
+
+In BG Appendix C, Problem 1 this is `D(p) = p^E - (p-1)^E` written at `a = p - 1`, so that
+`a ∈ paleySet F` says exactly that `p` and `p - 1` are both non-zero squares. -/
+def powDiff (E : ℕ) (a : F) : F := (a + 1) ^ E - a ^ E
+
+/-- **The free 2-to-1 symmetry.**  For *odd* `E` the involution `a ↦ -a-1` preserves `powDiff`:
+it exchanges the two terms up to the sign that `(-x)^E = -x^E` supplies.
+
+So `powDiff E` is never injective, and the graph `{(u, u^E)}` — being symmetric under negation —
+is never a Sidon set.  The content of BG Appendix C, Problem 1 is therefore *not* about that
+graph but about the Paley set, which the involution avoids (`neg_sub_one_notMem_paleySet`). -/
+theorem powDiff_neg_sub_one (hE : Odd E) (a : F) : powDiff E (-a - 1) = powDiff E a := by
+  have h1 : (-a - 1 + 1 : F) = -a := by ring
+  have h2 : (-a - 1 : F) = -(a + 1) := by ring
+  rw [powDiff, powDiff, h1, h2, hE.neg_pow, hE.neg_pow]
+  ring
+
+/-- **The involution always leaves the Paley set.**  If `-1` is not a square then `a ∈ T` forces
+`-a - 1 ∉ T`, because `(-a-1) + 1 = -a` is a non-square.
+
+Hence the automatic collision `powDiff E (-a-1) = powDiff E a` never gives *two* Paley points:
+any usable collision is an extra coincidence, which is what makes the general-`q` case of the
+criterion an equidistribution question rather than an identity. -/
+theorem neg_sub_one_notMem_paleySet (hneg : ¬ IsSquare (-1 : F)) {a : F}
+    (ha : a ∈ paleySet F) : -a - 1 ∉ paleySet F := by
+  obtain ⟨ha0, hasq, -, -⟩ := ha
+  rintro ⟨-, -, -, hsq⟩
+  have h1 : (-a - 1 + 1 : F) = -a := by ring
+  rw [h1] at hsq
+  obtain ⟨r, hr⟩ := hsq
+  obtain ⟨t, ht⟩ := hasq
+  refine hneg ⟨r * t⁻¹, ?_⟩
+  have hstep : (r * t⁻¹) * (r * t⁻¹) = (r * r) * (t * t)⁻¹ := by
+    rw [mul_inv]; ring
+  rw [hstep, ← hr, ← ht, neg_mul, mul_inv_cancel₀ ha0]
+
+end PowDiff
 
 end OddOrder.Paley

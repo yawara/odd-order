@@ -405,6 +405,11 @@ D(1 − p) = (1−p)^E − (−p)^E = (1−p)^E + p^E = p^E − (p−1)^E = D(p)
 すなわち **`D` は `F` 上つねに 2 対 1** (対合 `p ↦ 1−p` による)。したがって `A_E` の
 Sidon 性を論じても何も出ない。
 
+**(2026-08-12 に Lean 化)** この 2 つは
+[`OddOrder/Algebra/PaleySpanning.lean`](../../OddOrder/Algebra/PaleySpanning.lean) の
+`powDiff_neg_sub_one` (自由な対合) と `neg_sub_one_notMem_paleySet` (それが必ず `T` を出る)
+として形式化済 (axiom-clean)。
+
 **⟹ 難しさの正体は「`T` がこの自由な衝突をちょうど避けている」ことにある**:
 `p ∈ T` (= `p, p−1` とも平方元) なら `1 − p = −(p−1)` は `−1` が非平方ゆえ**非平方**、
 つまり `1 − p ∉ T`。実際 `p ↦ 1−p` は
