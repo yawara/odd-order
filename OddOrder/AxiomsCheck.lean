@@ -21120,6 +21120,13 @@ all of `𝔽_{3^q}` — so `x` centralises the second layer and `N` is abelian, 
 `false_of_s_normalizes_layerOne` — or a copy of the prime field, forcing `S = ±1` and
 `Tr S = ±q ≠ 0`, which `false_of_collisionPair_trace_ne_zero` refutes. -/
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_self
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.exists_collisionPair_self_of_K_eq
+/-! **The certificate form.**  Two distinct Paley points `a ≠ b` whose coordinates are scaled by
+one and the same factor `lam` under `z ↦ z ^ e` — that is, `a`, `a+1`, `b`, `b+1` in a single coset
+of the fixed subgroup — refute hypothesis (B) outright.  This is what an external search produces,
+and `Paley.exists_paley_collision_of_pow_eq` constructs such pairs from the fixed subgroup with no
+search at all. -/
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_sameCoset_pair
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_trace_ne_zero_right
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_trace
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.CollisionPair.frobenius

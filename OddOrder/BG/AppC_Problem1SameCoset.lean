@@ -37,6 +37,8 @@ under `s ↦ s⁻¹`, at which point `OddOrder.InverseClosed.pow_four_eq_one_or_
 * `mem_commSubgroup_of_collisionPair` — a collision with `S = S'` is an admissible twist.
 * `false_of_collisionPair_self` — **Theorem B**: such a collision refutes hypothesis (B), with no
   assumption on the trace.
+* `false_of_sameCoset_pair` — **the certificate form**: two distinct Paley points scaled by one and
+  the same factor under `z ↦ z ^ e` refute hypothesis (B).
 -/
 
 namespace OddOrder.BG.AppC.Problem1
@@ -420,6 +422,118 @@ theorem false_of_collisionPair_self (data : FieldNormalizerData p q G) (hp : p =
           _ = n := by group
       rw [← h2]
       exact hn
+
+/-! ### The certificate form
+
+What a computation actually produces is two Paley points lying in one coset of the fixed subgroup,
+i.e. two points `a ≠ b` with `a ^ e = lam · a`, `(a+1) ^ e = lam · (a+1)` and the same for `b`,
+with a *common* multiplier `lam`.  The two lemmas below turn that data into a `CollisionPair` with
+equal normalised values, and hence into a refutation of hypothesis (B). -/
+
+/-- **A collision with equal `K`-values yields a `CollisionPair` with `S = S'`.**  As in
+`exists_collisionPair_of_sub_ne_zero`, exactly one of the two orderings has square difference; both
+give the same normalised value because the two `K`-values agree. -/
+theorem exists_collisionPair_self_of_K_eq (hp : p = 3) (hq : q ≠ 0) (hqodd : Odd q) {e : ℕ}
+    (p₀ p₁ r₀ r₁ : NormSet.normOneUnits p q)
+    (hpp : normOneVal p₀ = normOneVal p₁ + 1) (hrr : normOneVal r₀ = normOneVal r₁ + 1)
+    (hcoll : normOneVal p₀ ^ e - normOneVal p₁ ^ e = normOneVal r₀ ^ e - normOneVal r₁ ^ e)
+    (hK : normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e)
+        = normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e))
+    (hd : normOneVal r₀ ^ e - normOneVal p₀ ^ e ≠ 0) :
+    ∃ S : GaloisField p q, CollisionPair p q e S S := by
+  subst hp
+  letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
+  haveI : CharP (GaloisField 3 q) 3 := by
+    rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
+    exact ZMod.charP 3
+  have hcard : Fintype.card (GaloisField 3 q) = 3 ^ q := by
+    rw [← Nat.card_eq_fintype_card]
+    exact GaloisField.card 3 q hq
+  have hchar2 : ringChar (GaloisField 3 q) ≠ 2 := by
+    rw [ringChar.eq (GaloisField 3 q) 3]
+    norm_num
+  have h4 : Fintype.card (GaloisField 3 q) % 4 = 3 := by
+    rw [hcard]
+    have hq2 : q % 2 = 1 := Nat.odd_iff.mp hqodd
+    have hk : q = 2 * (q / 2) + 1 := by omega
+    rw [hk, pow_succ, pow_mul, Nat.mul_mod, Nat.pow_mod]
+    norm_num
+  rcases Paley.isSquare_or_isSquare_neg hchar2 h4 hd with hsq | hnsq
+  · exact ⟨_, p₀, p₁, r₀, r₁,
+      ⟨Units.mk0 _ hd, (mem_normOneUnits_iff_isSquare rfl hq _).mpr hsq⟩,
+      hpp, hrr, hcoll, rfl, rfl, by rw [hK]⟩
+  · have hd' : normOneVal p₀ ^ e - normOneVal r₀ ^ e ≠ 0 := by
+      intro h
+      exact hd (by linear_combination -h)
+    have hsq' : IsSquare (normOneVal p₀ ^ e - normOneVal r₀ ^ e) := by
+      have hrw : normOneVal p₀ ^ e - normOneVal r₀ ^ e
+          = -(normOneVal r₀ ^ e - normOneVal p₀ ^ e) := by ring
+      rw [hrw]
+      exact hnsq
+    exact ⟨_, r₀, r₁, p₀, p₁,
+      ⟨Units.mk0 _ hd', (mem_normOneUnits_iff_isSquare rfl hq _).mpr hsq'⟩,
+      hrr, hpp, hcoll.symm, rfl, rfl, by rw [hK]⟩
+
+/-- **The certificate.**  Two distinct Paley points whose coordinates are scaled by *one and the
+same* factor `lam` under `z ↦ z ^ e` refute hypothesis (B).
+
+This is the computable form of the same-coset obstruction: `lam` is the coset of the fixed subgroup
+of `z ↦ z ^ e` shared by `a`, `a+1`, `b`, `b+1`, the common collision value is `lam` itself
+(`Paley.powDiff_eq_of_pow_eq_mul`), and the two `K`-values are both `-lam^{e+1}`, so the collision
+has `S = S'` and `false_of_collisionPair_self` applies — with no hypothesis on any trace. -/
+theorem false_of_sameCoset_pair (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hqprime : q.Prime) (hqodd : Odd q) (hqne : q ≠ 3) {e : ℕ} (he : Odd e)
+    (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    (hnotfrob : ∀ j : ℕ, ∃ u : NormSet.normOneUnits p q, u ^ e ≠ u ^ (3 ^ j))
+    {a b lam : GaloisField p q}
+    (ha : a ∈ Paley.paleySet (GaloisField p q)) (hb : b ∈ Paley.paleySet (GaloisField p q))
+    (hab : a ≠ b) (hae : a ^ e = lam * a) (hae1 : (a + 1) ^ e = lam * (a + 1))
+    (hbe : b ^ e = lam * b) (hbe1 : (b + 1) ^ e = lam * (b + 1)) : False := by
+  obtain ⟨ha0, hasq, ha10, ha1sq⟩ := ha
+  obtain ⟨hb0, hbsq, hb10, hb1sq⟩ := hb
+  have hq0 : q ≠ 0 := hqprime.ne_zero
+  have hlam0 : lam ≠ 0 := by
+    intro hzero
+    rw [hzero, zero_mul] at hae
+    exact (pow_ne_zero _ ha0) hae
+  -- the four Paley coordinates as norm-one units
+  have hmk : ∀ z : GaloisField p q, z ≠ 0 → IsSquare z → ∃ u : NormSet.normOneUnits p q,
+      normOneVal u = z := fun z hz0 hzsq =>
+    ⟨⟨Units.mk0 z hz0, (mem_normOneUnits_iff_isSquare hp hq0 _).mpr (by simpa using hzsq)⟩, rfl⟩
+  obtain ⟨p₁, hp₁⟩ := hmk a ha0 hasq
+  obtain ⟨p₀, hp₀⟩ := hmk (a + 1) ha10 ha1sq
+  obtain ⟨r₁, hr₁⟩ := hmk b hb0 hbsq
+  obtain ⟨r₀, hr₀⟩ := hmk (b + 1) hb10 hb1sq
+  -- the second-power multiplier is `lam ^ (e + 1)`
+  have hsq2 : ∀ z : GaloisField p q, z ^ e = lam * z → z ^ (e * e) = lam ^ (e + 1) * z := by
+    intro z hz
+    calc z ^ (e * e) = (z ^ e) ^ e := by rw [pow_mul]
+      _ = (lam * z) ^ e := by rw [hz]
+      _ = lam ^ e * z ^ e := by rw [mul_pow]
+      _ = lam ^ e * (lam * z) := by rw [hz]
+      _ = lam ^ (e + 1) * z := by rw [pow_succ]; ring
+  have hpp : normOneVal p₀ = normOneVal p₁ + 1 := by rw [hp₀, hp₁]
+  have hrr : normOneVal r₀ = normOneVal r₁ + 1 := by rw [hr₀, hr₁]
+  have hcoll : normOneVal p₀ ^ e - normOneVal p₁ ^ e
+      = normOneVal r₀ ^ e - normOneVal r₁ ^ e := by
+    rw [hp₀, hp₁, hr₀, hr₁, hae, hae1, hbe, hbe1]
+    ring
+  have hK : normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e)
+      = normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e) := by
+    rw [hp₀, hp₁, hr₀, hr₁, hsq2 a hae, hsq2 (a + 1) hae1, hsq2 b hbe, hsq2 (b + 1) hbe1]
+    ring
+  have hd : normOneVal r₀ ^ e - normOneVal p₀ ^ e ≠ 0 := by
+    rw [hr₀, hp₀, hae1, hbe1]
+    intro hzero
+    refine hab ?_
+    have hstep : lam * (b - a) = 0 := by linear_combination hzero
+    rcases mul_eq_zero.mp hstep with h | h
+    · exact absurd h hlam0
+    · linear_combination -h
+  obtain ⟨S, hpair⟩ :=
+    exists_collisionPair_self_of_K_eq hp hq0 hqodd p₀ p₁ r₀ r₁ hpp hrr hcoll hK hd
+  exact false_of_collisionPair_self data hp hqprime hqodd hqne he hcube hexp hnotfrob hpair
 
 end SameCoset
 

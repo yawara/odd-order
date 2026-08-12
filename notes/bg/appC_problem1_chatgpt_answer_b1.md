@@ -290,7 +290,30 @@ theorem false_of_collisionPair_self (data) (hp : p = 3) (hqprime : q.Prime) (hqo
 
 ⟹ **(B2) は同一剰余類の衝突には不要**という回答の主張が、Lean で完全に検証された。
 
-### 残り (次段)
+### 🎯 第 5 段: **証明書形** (同 leaf、axiom-clean)
+
+外部計算が実際に出すのは「同じ剰余類にある 2 つの Paley 点」なので、その形の入口を作った。
+
+| 数学 | Lean |
+|---|---|
+| `K` が等しい衝突は `S = S′` の `CollisionPair` を与える | `exists_collisionPair_self_of_K_eq` |
+| **🎯 証明書**: 同じ `lam` で伸縮する相異なる Paley 点 2 個 ⟹ witness 無し | **`false_of_sameCoset_pair`** |
+
+```
+theorem false_of_sameCoset_pair (data) (hp : p = 3) (hqprime : q.Prime) (hqodd : Odd q)
+    (hqne : q ≠ 3) (he : Odd e) (hcube) (hexp) (hnotfrob)
+    {a b lam} (ha : a ∈ paleySet _) (hb : b ∈ paleySet _) (hab : a ≠ b)
+    (hae : a ^ e = lam * a) (hae1 : (a+1) ^ e = lam * (a+1))
+    (hbe : b ^ e = lam * b) (hbe1 : (b+1) ^ e = lam * (b+1)) : False
+```
+
+鍵は `z^{e·e} = lam^{e+1}·z` (2 回冪で係数が `lam^{e+1}` になる) なので **2 点の `K` が一致**し、
+`S = S′` になること。⟹ `false_of_collisionPair_self` に落ちる。
+
+⟹ **パイプライン完成**: 探索が出す `(a, b, lam)` → Lean 定理 → hypothesis (B) の否定。
+`Paley.exists_paley_collision_of_pow_eq` (探索不要の構成) の出力もこの形。
+
+### 残り
 
 * Theorem A (gcd 判定 = 鳩の巣) の Lean 化 — `a ≥ 2c+1` ⟹ 同一剰余類の衝突が存在
 * `q = 47` の残り 4 指数を誕生日探索で決着 (Theorem B があるのでトレース不要)
