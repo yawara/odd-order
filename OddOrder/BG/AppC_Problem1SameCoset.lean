@@ -35,8 +35,11 @@ under `s ↦ s⁻¹`, at which point `OddOrder.InverseClosed.pow_four_eq_one_or_
 * `inv_mem_commSubgroup` — closure under inversion, the hypothesis of
   `OddOrder.InverseClosed.pow_four_eq_one_or_forall_mem`.
 * `mem_commSubgroup_of_collisionPair` — a collision with `S = S'` is an admissible twist.
+* `false_of_mem_commSubgroup_ne_zero` — **the fixed-point principle**: any non-zero admissible
+  twist refutes hypothesis (B) outright (both branches of the dichotomy collapse to
+  `1 ∈ commSubgroup`, i.e. to `Commute x x^g`, refuted by `not_commute_conj`).
 * `false_of_collisionPair_self` — **Theorem B**: such a collision refutes hypothesis (B), with no
-  assumption on the trace.
+  assumption on the trace, no `q ≠ 3`, and no non-Frobenius hypothesis.
 * `false_of_sameCoset_pair` — **the certificate form**: two distinct Paley points scaled by one and
   the same factor under `z ↦ z ^ e` refute hypothesis (B).
 -/
@@ -312,40 +315,22 @@ theorem inv_mem_commSubgroup (data : FieldNormalizerData p q G) (hp : p = 3) (hq
     rw [← pow_mul, hcube]
   rwa [hx3] at h3
 
-/-- **Theorem B: the same-coset obstruction.**  A collision whose two normalised values *coincide*
-refutes hypothesis (B), with **no** assumption on the trace.
+/-- **The fixed-point principle: any non-zero admissible twist is fatal.**  If some `s ≠ 0` lies
+in `commSubgroup`, then hypothesis (B) fails — with no assumption on any trace, no `q ≠ 3`, and no
+non-Frobenius hypothesis on the exponent.
 
-`S = S'` turns relation (4) into a commutation, so `S` is an admissible twist; the twists form an
-inversion-closed additive subgroup, hence — `q` being prime — either all of `𝔽_{3^q}` or a copy of
-the prime field.  In the first case `x` centralises the whole second layer, so the two layers
-commute and `N` is abelian, which `false_of_s_normalizes_layerOne` refutes.  In the second case
-`S ^ 4 = 1`, and `-1` is a non-square, so `S = ±1`; then `Tr S = ±q ≠ 0` and the trace obstruction
-applies. -/
-theorem false_of_collisionPair_self (data : FieldNormalizerData p q G) (hp : p = 3)
-    (hqprime : q.Prime) (hqodd : Odd q) (hqne : q ≠ 3) {e : ℕ} (he : Odd e)
+Both branches of the inversion-closure dichotomy collapse to `1 ∈ commSubgroup`: in the
+prime-field branch `s ^ 4 = 1` and `-1` is a non-square, so `s = ±1` and `1` is in the (additive)
+subgroup; in the full branch everything is.  But `1 ∈ commSubgroup` evaluated at `t = 1` says that
+`x = a(1)` commutes with `x^g = b(1)`, which is exactly the endgame `not_commute_conj` of
+Theorem 1. -/
+theorem false_of_mem_commSubgroup_ne_zero (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hqprime : q.Prime) (hqodd : Odd q) {e : ℕ} (he : Odd e)
     (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
     (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
-    (hnotfrob : ∀ j : ℕ, ∃ u : NormSet.normOneUnits p q, u ^ e ≠ u ^ (3 ^ j))
-    {S : GaloisField p q} (hpair : CollisionPair p q e S S) : False := by
+    {s : GaloisField p q} (hs : s ∈ commSubgroup data e) (hs0 : s ≠ 0) : False := by
   classical
   have hq0 : q ≠ 0 := hqprime.ne_zero
-  have hmem := mem_commSubgroup_of_collisionPair data hp hq0 hqodd he hexp hpair
-  -- `S ≠ 0`, because `z ↦ z ^ (e * e)` is injective and `p₀ ≠ p₁`
-  have hS0 : S ≠ 0 := by
-    obtain ⟨p₀, p₁, r₀, r₁, d₀, hpp, -, -, -, hS, -⟩ := hpair
-    rw [hS]
-    refine mul_ne_zero ?_ (pow_ne_zero _ (Units.ne_zero _))
-    intro hzero
-    have hEq : normOneVal p₁ ^ (e * e) = normOneVal p₀ ^ (e * e) := by
-      linear_combination hzero
-    have hinj : normOneVal p₁ = normOneVal p₀ := by
-      have h1 := hcube (normOneVal p₁)
-      have h2 := hcube (normOneVal p₀)
-      calc normOneVal p₁ = (normOneVal p₁ ^ (e * e)) ^ e := by rw [← pow_mul, h1]
-        _ = (normOneVal p₀ ^ (e * e)) ^ e := by rw [hEq]
-        _ = normOneVal p₀ := by rw [← pow_mul, h2]
-    rw [hpp] at hinj
-    exact one_ne_zero (by linear_combination -hinj)
   subst hp
   letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
   haveI : CharP (GaloisField 3 q) 3 := by
@@ -365,63 +350,69 @@ theorem false_of_collisionPair_self (data : FieldNormalizerData p q G) (hp : p =
     norm_num
   have hinvW : ∀ w ∈ commSubgroup data e, w⁻¹ ∈ commSubgroup data e := fun w hw =>
     inv_mem_commSubgroup data rfl hq0 hqodd he hcube hexp hw
-  rcases InverseClosed.pow_four_eq_one_or_forall_mem (commSubgroup data e) hinvW rfl hqprime
-      hcard hmem hS0 with hfour | hall
-  · -- `S = ±1`, so its trace is `±q ≠ 0`
-    have hnegsq : ¬ IsSquare (-1 : GaloisField 3 q) := Paley.not_isSquare_neg_one hchar2 h4card
-    have hsq : S ^ 2 = 1 := by
-      have hfac : (S ^ 2 - 1) * (S ^ 2 + 1) = 0 := by linear_combination hfour
+  -- reduce both branches of the dichotomy to `1 ∈ commSubgroup`
+  have hone : (1 : GaloisField 3 q) ∈ commSubgroup data e := by
+    rcases InverseClosed.pow_four_eq_one_or_forall_mem (commSubgroup data e) hinvW rfl hqprime
+        hcard hs hs0 with hfour | hall
+    · have hnegsq : ¬ IsSquare (-1 : GaloisField 3 q) := Paley.not_isSquare_neg_one hchar2 h4card
+      have hsq : s ^ 2 = 1 := by
+        have hfac : (s ^ 2 - 1) * (s ^ 2 + 1) = 0 := by linear_combination hfour
+        rcases mul_eq_zero.mp hfac with h | h
+        · linear_combination h
+        · exact absurd ⟨s, by linear_combination -h⟩ hnegsq
+      have hfac : (s - 1) * (s + 1) = 0 := by linear_combination hsq
       rcases mul_eq_zero.mp hfac with h | h
-      · linear_combination h
-      · exact absurd ⟨S, by linear_combination -h⟩ hnegsq
-    have hcast : ((q : ℕ) : GaloisField 3 q) ≠ 0 := by
-      rw [Ne, CharP.cast_eq_zero_iff (GaloisField 3 q) 3]
-      intro hdvd
-      exact hqne ((Nat.prime_dvd_prime_iff_eq Nat.prime_three hqprime).mp hdvd).symm
-    have htr : fieldTrace 3 q S ≠ 0 := by
-      have hfac : (S - 1) * (S + 1) = 0 := by linear_combination hsq
-      rcases mul_eq_zero.mp hfac with h | h
-      · have hS1 : S = 1 := by linear_combination h
-        rw [hS1, fieldTrace]
-        simp only [one_pow, Finset.sum_const, Finset.card_range, nsmul_eq_mul, mul_one]
-        exact hcast
-      · have hS1 : S = -1 := by linear_combination h
-        rw [hS1, fieldTrace]
-        have hodd : ∀ j : ℕ, ((-1 : GaloisField 3 q)) ^ (3 : ℕ) ^ j = -1 := fun j =>
-          (Odd.pow (by decide)).neg_one_pow
-        simp only [hodd, Finset.sum_const, Finset.card_range, nsmul_eq_mul, mul_neg_one]
-        exact neg_ne_zero.mpr hcast
-    exact false_of_collisionPair_trace_ne_zero data rfl hq0 hexp hpair htr
-  · -- the two layers centralise each other
-    refine false_of_s_normalizes_layerOne data rfl hexp hnotfrob ?_
-    have ha1 : layerFieldHom data 0 (Multiplicative.ofAdd (1 : GaloisField 3 q)) = data.s := by
-      simp only [layerFieldHom_apply, pow_zero, inv_one, one_mul, mul_one]
-      rfl
-    have hfixS : ∀ n ∈ ((layerOne data : Subgroup G) : Set G),
-        data.s * n * (data.s)⁻¹ = n := by
-      intro n hn
-      rw [coe_layerOne_eq_range] at hn
-      obtain ⟨w, rfl⟩ := hn
-      have hx := hall (Multiplicative.toAdd w) 1
-      rw [one_pow, mul_one, ha1] at hx
-      have hwo : Multiplicative.ofAdd (Multiplicative.toAdd w) = w := rfl
-      rw [hwo] at hx
-      exact mul_inv_eq_iff_eq_mul.mpr hx.eq
-    rw [Subgroup.mem_set_normalizer_iff]
-    intro n
-    constructor
-    · intro hn
-      rw [hfixS n hn]
-      exact hn
-    · intro hn
-      have h3 := hfixS _ hn
-      have h2 : data.s * n * (data.s)⁻¹ = n := by
-        calc data.s * n * (data.s)⁻¹
-            = (data.s)⁻¹ * (data.s * (data.s * n * (data.s)⁻¹) * (data.s)⁻¹) * data.s := by group
-          _ = (data.s)⁻¹ * (data.s * n * (data.s)⁻¹) * data.s := by rw [h3]
-          _ = n := by group
-      rw [← h2]
-      exact hn
+      · have hs1 : s = 1 := by linear_combination h
+        rwa [hs1] at hs
+      · have hs1 : s = -1 := by linear_combination h
+        have hneg := (commSubgroup data e).neg_mem hs
+        rwa [hs1, neg_neg] at hneg
+    · exact hall 1
+  -- `1 ∈ commSubgroup` at the argument `t = 1` is `Commute x x^g`, refuted by `not_commute_conj`
+  have hcomm := hone 1
+  rw [one_pow, mul_one] at hcomm
+  refine not_commute_conj data rfl ?_
+  have ha1 : layerFieldHom data 0 (Multiplicative.ofAdd (1 : GaloisField 3 q)) = data.s := by
+    simp only [layerFieldHom_apply, pow_zero, inv_one, one_mul, mul_one]
+    rfl
+  have hb1 : layerFieldHom data 1 (Multiplicative.ofAdd (1 : GaloisField 3 q))
+      = (MulAut.conj data.y data.s)⁻¹ * data.s * MulAut.conj data.y data.s := by
+    simp only [layerFieldHom_apply, pow_one, conjGen_def]
+    rfl
+  rwa [ha1, hb1] at hcomm
+
+/-- **Theorem B: the same-coset obstruction.**  A collision whose two normalised values *coincide*
+refutes hypothesis (B), with **no** assumption on the trace.
+
+`S = S'` turns relation (4) into a commutation, so `S` is a non-zero admissible twist, and
+`false_of_mem_commSubgroup_ne_zero` applies.  (Compared with the original form of this theorem,
+the hypotheses `q ≠ 3` and the non-Frobenius witness `hnotfrob` have been dropped: both branches
+of the dichotomy end at `not_commute_conj` rather than at the trace obstruction or at
+`false_of_s_normalizes_layerOne`.) -/
+theorem false_of_collisionPair_self (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hqprime : q.Prime) (hqodd : Odd q) {e : ℕ} (he : Odd e)
+    (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {S : GaloisField p q} (hpair : CollisionPair p q e S S) : False := by
+  have hq0 : q ≠ 0 := hqprime.ne_zero
+  have hmem := mem_commSubgroup_of_collisionPair data hp hq0 hqodd he hexp hpair
+  -- `S ≠ 0`, because `z ↦ z ^ (e * e)` is injective and `p₀ ≠ p₁`
+  have hS0 : S ≠ 0 := by
+    obtain ⟨p₀, p₁, r₀, r₁, d₀, hpp, -, -, -, hS, -⟩ := hpair
+    rw [hS]
+    refine mul_ne_zero ?_ (pow_ne_zero _ (Units.ne_zero _))
+    intro hzero
+    have hEq : normOneVal p₁ ^ (e * e) = normOneVal p₀ ^ (e * e) := by
+      linear_combination hzero
+    have hinj : normOneVal p₁ = normOneVal p₀ := by
+      have h1 := hcube (normOneVal p₁)
+      have h2 := hcube (normOneVal p₀)
+      calc normOneVal p₁ = (normOneVal p₁ ^ (e * e)) ^ e := by rw [← pow_mul, h1]
+        _ = (normOneVal p₀ ^ (e * e)) ^ e := by rw [hEq]
+        _ = normOneVal p₀ := by rw [← pow_mul, h2]
+    rw [hpp] at hinj
+    exact one_ne_zero (by linear_combination -hinj)
+  exact false_of_mem_commSubgroup_ne_zero data hp hqprime hqodd he hcube hexp hmem hS0
 
 /-! ### The certificate form
 
@@ -482,10 +473,9 @@ of `z ↦ z ^ e` shared by `a`, `a+1`, `b`, `b+1`, the common collision value is
 (`Paley.powDiff_eq_of_pow_eq_mul`), and the two `K`-values are both `-lam^{e+1}`, so the collision
 has `S = S'` and `false_of_collisionPair_self` applies — with no hypothesis on any trace. -/
 theorem false_of_sameCoset_pair (data : FieldNormalizerData p q G) (hp : p = 3)
-    (hqprime : q.Prime) (hqodd : Odd q) (hqne : q ≠ 3) {e : ℕ} (he : Odd e)
+    (hqprime : q.Prime) (hqodd : Odd q) {e : ℕ} (he : Odd e)
     (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
     (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
-    (hnotfrob : ∀ j : ℕ, ∃ u : NormSet.normOneUnits p q, u ^ e ≠ u ^ (3 ^ j))
     {a b lam : GaloisField p q}
     (ha : a ∈ Paley.paleySet (GaloisField p q)) (hb : b ∈ Paley.paleySet (GaloisField p q))
     (hab : a ≠ b) (hae : a ^ e = lam * a) (hae1 : (a + 1) ^ e = lam * (a + 1))
@@ -533,7 +523,7 @@ theorem false_of_sameCoset_pair (data : FieldNormalizerData p q G) (hp : p = 3)
     · linear_combination -h
   obtain ⟨S, hpair⟩ :=
     exists_collisionPair_self_of_K_eq hp hq0 hqodd p₀ p₁ r₀ r₁ hpp hrr hcoll hK hd
-  exact false_of_collisionPair_self data hp hqprime hqodd hqne he hcube hexp hnotfrob hpair
+  exact false_of_collisionPair_self data hp hqprime hqodd he hcube hexp hpair
 
 end SameCoset
 

@@ -61,6 +61,11 @@ Proposition 9 の仮説 (記法は
 | 12 | **Theorem A の中核** — 反転ペアリング + 鳩の巣 | `isSquare_one_sub_inv_iff` / `exists_sameCoset_pair_of_card_lt` |
 | 13 | **🎯 Theorem A (算術形)** — `\|L\|(\|L\|−1) > 2\|U\|` で探索不要に決着 | `exists_sameCoset_pair_of_card_arith` |
 | 14 | **parity 精密化** — 判定が回答の `a ≥ 2c+1` と同じ鋭さに | `exists_sameCoset_pair_of_two_mul_card_le` |
+| 15 | **🎯 不動点原理** — `commSubgroup` の非零元 1 個で witness 無し (trace/`hnotfrob`/`q≠3` 全部不要) | `false_of_mem_commSubgroup_ne_zero` |
+| 16 | **🎯 合成定理 C1/C2** — 衝突対の比が乗法的に合成される (C1 は退化なし) | `ConjPair.compose` / `ConjPair.composeFlip` |
+| 17 | **Theorem N1** — `S′ = −S` の衝突で witness 無し (trace 不要) | `false_of_collisionPair_neg` |
+| 18 | **🎯 Theorem N2** — 比が等しい 2 衝突 (`S₂′ ≠ ±S₁′`) で witness 無し | `false_of_collisionPair_ratio_eq` |
+| 19 | **Theorem N3** — Frobenius 束の非自明関係 `Σk_jS^{3^j} = Σk_jS′^{3^j} ≠ 0` で witness 無し | `false_of_collisionPair_frobCombo` |
 
 **⟹ 定理 2 + 奇数位数定理により、有限奇位数群は witness になれない。
 BG App.C が置かれている文脈そのものでは否定的に決着している。**
@@ -129,6 +134,30 @@ Lean = `exists_collisionPair_of_sub_ne_zero` (axiom-clean)。
   「(B1) の正体 = 差分一様性」の 3 節。**同じ道を再探索しないこと**。
 * **`q` を増やす方向は打ち切り** (証明に寄与しない)。ツールは
   `notes/meta/c/gf3_collision.c` に残してある。
+
+## 🎯 合成計算 (pair composition calculus) — ChatGPT が open とした閉包定理を解決 (2026-08-13)
+
+回答 §III.2 が open と明言した「`S ≠ S′` に必要な**射影比 `S′/S` に依存する閉包定理**」を
+こちらで発見・証明・Lean 化した。正本 =
+[`notes/bg/appC_problem1_pair_composition.md`](../notes/bg/appC_problem1_pair_composition.md)、
+leaf = [`OddOrder/BG/AppC_Problem1PairComposition.lean`](../OddOrder/BG/AppC_Problem1PairComposition.lean)
+(すべて axiom-clean・敵対的検証で反証ゼロ)。骨子:
+
+1. 衝突関係式は正規形 **(3′) `a(v)·b(Sv^e)·a(v)⁻¹ = b(S′v^e)`** (∀v ∈ U) になる (`ConjPair`)。
+   pair は単射加法写像のグラフをなす。
+2. **不動点原理**: 比 1 の pair (非零) は `1 ∈ commSubgroup` = `Commute(x, x^g)` に潰れて
+   即矛盾。⟹ **既存 Theorem B から `hnotfrob` と `q ≠ 3` が消えた** (リファクタ済)。
+3. **合成定理**: 2 つの pair から比が**積** (straight、**退化なし** — `1+η = 0` は `−1` が
+   平方になり不可能) または**商** (flip、退化は `t′ = ±s′` のみ) の新 pair が作れる。
+   比は乗法的に合成される — これが求められていた閉包構造。
+4. 新判定 (すべて trace 不要): **N1** `S′ = −S` / **N2** 等比 2 衝突 / **N3** Frobenius 束の
+   非自明関係。旧 trace 判定 (両側版) も合成計算から再導出できる (機構が 1 本化)。
+
+**数値測定** (q = 7/13 悉皆): N2 は q = 13 で trace の外側を 195/182 件殺す (実効強化を確認)。
+ただし **escape が残る** (q = 7 で 3 Frobenius 軌道 21 衝突) ⟹ 深さ 1 では (B2) は消えない。
+**次の一手 = 合成チェーン (深さ ≥ 2) の explicit base 追跡** (`m = s(1+η)^{−e}` は明示式なので
+全部計算可能; note §6)。(B2) 完全消去は「escape 系列の base-coincidence 恒等式系が充足不能」
+の証明に帰着した — 群論はもう不要で、純粋に体の中の方程式系。
 
 ## 🎯 ChatGPT 4 回目の回答 (2026-08-12、240 分) — **(B2) が同一剰余類の衝突には不要**と判明
 

@@ -511,6 +511,7 @@ import OddOrder.BG.AppC_Problem1
 import OddOrder.BG.AppC_Problem1Lattice
 import OddOrder.BG.AppC_Problem1Trace
 import OddOrder.BG.AppC_Problem1SameCoset
+import OddOrder.BG.AppC_Problem1PairComposition
 import OddOrder.BG.AppD_CNGroups
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
@@ -21145,11 +21146,12 @@ additive subgroup (`commSubgroup`) which conjugation by `g²` plus the factorisa
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.inv_mem_commSubgroup
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.mem_commSubgroup_of_square
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.mem_commSubgroup_of_collisionPair
-/-! **Theorem B.**  A collision whose two normalised values coincide refutes hypothesis (B) with no
-hypothesis on the trace: the admissible twists are inversion-closed, hence (as `q` is prime) either
-all of `𝔽_{3^q}` — so `x` centralises the second layer and `N` is abelian, refuted by
-`false_of_s_normalizes_layerOne` — or a copy of the prime field, forcing `S = ±1` and
-`Tr S = ±q ≠ 0`, which `false_of_collisionPair_trace_ne_zero` refutes. -/
+/-! **The fixed-point principle and Theorem B.**  Any non-zero admissible twist refutes
+hypothesis (B) outright: both branches of the inversion-closure dichotomy collapse to
+`1 ∈ commSubgroup`, i.e. to `Commute x x^g`, which is the endgame `not_commute_conj` of
+Theorem 1.  In particular a collision with `S = S'` refutes (B) with no hypothesis on the trace,
+no `q ≠ 3`, and no non-Frobenius witness. -/
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_mem_commSubgroup_ne_zero
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_self
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.exists_collisionPair_self_of_K_eq
 /-! **The certificate form.**  Two distinct Paley points `a ≠ b` whose coordinates are scaled by
@@ -21165,3 +21167,28 @@ search at all. -/
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conj_layerFieldHom_one_eq
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conj_layerFieldHom_one_trace
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_trace_ne_zero
+
+/-! **The pair-composition calculus** (`BG/AppC_Problem1PairComposition`).  Relation (3′) of a
+general collision, `a(v) · b(S v^e) · a(v)⁻¹ = b(S' v^e)`, packaged as `ConjPair`: the pairs form
+the graph of an injective additive map and *compose*, realising the product (`compose`, total) or
+the quotient (`composeFlip`, degenerate only at `t' = ±s'`) of the two ratios.  A pair of ratio
+`1` is a non-zero admissible twist, hence fatal.  Consequences, all free of any trace hypothesis:
+a collision with `S' = -S` refutes (B) (`false_of_collisionPair_neg`), two collisions with equal
+ratios and `S₂' ≠ ±S₁'` refute (B) (`false_of_collisionPair_ratio_eq`), and a non-trivial
+Frobenius combination `∑ kⱼ S^{3^j} = ∑ kⱼ S'^{3^j} ≠ 0` refutes (B)
+(`false_of_collisionPair_frobCombo`).  This is the closure theorem in the projective ratio
+`S'/S` that the general (B2) problem asked for; the record is
+`notes/bg/appC_problem1_pair_composition.md`. -/
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.ConjPair.add
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.ConjPair.sum
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.ConjPair.left_eq_zero
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.ConjPair.right_ne_zero
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.ConjPair.of_collisionPair
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_conjPair_self
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.CollisionPair.left_ne_zero
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.CollisionPair.frobenius_pow
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_neg
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.ConjPair.compose
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.ConjPair.composeFlip
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_ratio_eq
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_frobCombo
