@@ -20951,6 +20951,22 @@ and the graph `{(u, u^E)}` is never a Sidon set; but the involution always leave
 coincidence, which is exactly why the general-`q` case is an equidistribution question. -/
 #assert_only_allowed_axioms OddOrder.Paley.powDiff_neg_sub_one
 #assert_only_allowed_axioms OddOrder.Paley.neg_sub_one_notMem_paleySet
+
+/-! **The `E` and `E²` collision problems are conjugate.**  When `z ↦ z ^ E` has order three,
+rescaling the `E`-th power by the collision value `w = powDiff E a` carries the fibres of
+`powDiff E` on the Paley set bijectively onto those of `powDiff (E * E)`
+(`powDiff_powDiffConj` / `powDiff_powDiffConjNeg` give the value `(w⁻¹) ^ (E * E)`, and
+`powDiffConj_mem_paleySet` / `powDiffConjNeg_mem_paleySet` keep the image inside `T` — the first
+when `w` is a square, the second when it is not).  This proves the coincidence found by the
+exhaustive `q = 13` enumeration, where the two exotic exponents gave identical fibre-size
+distributions, and it halves hypothesis (B1): one exponent per pair `{E, E²}` suffices. -/
+#assert_only_allowed_axioms OddOrder.Paley.pow_injective_of_cube
+#assert_only_allowed_axioms OddOrder.Paley.powDiff_ne_zero
+#assert_only_allowed_axioms OddOrder.Paley.powDiff_powDiffConj
+#assert_only_allowed_axioms OddOrder.Paley.powDiff_powDiffConjNeg
+#assert_only_allowed_axioms OddOrder.Paley.powDiffConj_mem_paleySet
+#assert_only_allowed_axioms OddOrder.Paley.powDiffConjNeg_mem_paleySet
+#assert_only_allowed_axioms OddOrder.Paley.exists_paley_collision_pow_mul
 #assert_only_allowed_axioms OddOrder.RelationLattice.exists_trace_repr
 #assert_only_allowed_axioms OddOrder.RelationLattice.span_eq_top_of_trace_annihilator
 

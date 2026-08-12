@@ -339,6 +339,182 @@ theorem neg_sub_one_notMem_paleySet (hneg : ¬ IsSquare (-1 : F)) {a : F}
     rw [mul_inv]; ring
   rw [hstep, ← hr, ← ht, neg_mul, mul_inv_cancel₀ ha0]
 
+/-! ### Conjugating the `E` and the `E²` collision problem
+
+The exhaustive enumeration for `q = 13` recorded in
+`notes/bg/appC_problem1_partial_resolution.md` found that the two exotic exponents `E` and `E²`
+give *identical* fibre-size distributions of `powDiff` on the Paley set — all four numbers agree.
+That is no accident.  Once `z ↦ z ^ E` has order three, i.e. `z ^ (E * E * E) = z`, the two
+problems are conjugate by an explicit map: rescale the `E`-th power by the collision value.
+
+Write `w = powDiff E a` (never zero, `powDiff_ne_zero`).  Both
+
+`powDiffConj E a = a ^ E * w⁻¹`   and   `powDiffConjNeg E a = -(a + 1) ^ E * w⁻¹`
+
+satisfy `powDiff (E * E) · = (w⁻¹) ^ (E * E)`, a value depending on `a` only through `w`.  So each
+maps a *fibre* of `powDiff E` into a single fibre of `powDiff (E * E)`, injectively.  Exactly one
+of the two lands back inside the Paley set — the first when `w` is a square, the second when it is
+not — whence a Paley collision for `E` yields one for `E²`
+(`exists_paley_collision_pow_mul`).
+
+Consequence for BG Appendix C, Problem 1: hypothesis (B1) of the trace criterion
+`OddOrder.BG.AppC.Problem1.false_of_collisionPair_trace_ne_zero` need only be established for one
+exponent out of each conjugate pair `{E, E²}`. -/
+
+section Conjugation
+
+/-- The order-three hypothesis, in the form used below: `z ↦ z ^ E` is a bijection whose square
+is its inverse.  For `F = 𝔽_{3^q}` this says `E³ ≡ 1 (mod 3^q - 1)`. -/
+theorem pow_pow_mul_self (hcube : ∀ z : F, z ^ (E * E * E) = z) (z : F) :
+    (z ^ E) ^ (E * E) = z := by
+  rw [← pow_mul, ← mul_assoc]
+  exact hcube z
+
+/-- Under the order-three hypothesis `z ↦ z ^ E` is injective. -/
+theorem pow_injective_of_cube (hcube : ∀ z : F, z ^ (E * E * E) = z) {x y : F}
+    (h : x ^ E = y ^ E) : x = y := by
+  have := congrArg (· ^ (E * E)) h
+  simpa only [pow_pow_mul_self hcube] using this
+
+/-- **The discrete derivative never vanishes** when `z ↦ z ^ E` is injective: `powDiff E a = 0`
+would force `a + 1 = a`. -/
+theorem powDiff_ne_zero (hcube : ∀ z : F, z ^ (E * E * E) = z) (a : F) : powDiff E a ≠ 0 := by
+  intro h
+  have hpow : (a + 1) ^ E = a ^ E := by
+    have := sub_eq_zero.mp h
+    exact this
+  have := pow_injective_of_cube hcube hpow
+  exact one_ne_zero (by linear_combination this)
+
+/-- The conjugating map on the branch where the collision value is a square. -/
+def powDiffConj (E : ℕ) (a : F) : F := a ^ E * (powDiff E a)⁻¹
+
+/-- The conjugating map on the branch where the collision value is a non-square. -/
+def powDiffConjNeg (E : ℕ) (a : F) : F := -(a + 1) ^ E * (powDiff E a)⁻¹
+
+theorem powDiffConj_add_one (hcube : ∀ z : F, z ^ (E * E * E) = z) (a : F) :
+    powDiffConj E a + 1 = (a + 1) ^ E * (powDiff E a)⁻¹ := by
+  have hw : powDiff E a ≠ 0 := powDiff_ne_zero hcube a
+  rw [powDiffConj]
+  field_simp
+  rw [powDiff]
+  ring
+
+theorem powDiffConjNeg_add_one (hcube : ∀ z : F, z ^ (E * E * E) = z) (a : F) :
+    powDiffConjNeg E a + 1 = -a ^ E * (powDiff E a)⁻¹ := by
+  have hw : powDiff E a ≠ 0 := powDiff_ne_zero hcube a
+  rw [powDiffConjNeg]
+  field_simp
+  rw [powDiff]
+  ring
+
+/-- Raising an `E`-th power (times anything) to the `E²` undoes the `E`. -/
+private theorem pow_mul_pow_mul_self (hcube : ∀ z : F, z ^ (E * E * E) = z) (x w : F) :
+    (x ^ E * w) ^ (E * E) = x * w ^ (E * E) := by
+  rw [mul_pow, pow_pow_mul_self hcube]
+
+/-- **The conjugation identity, square branch.**  The image lies in the fibre of `powDiff (E * E)`
+over `(powDiff E a)⁻¹ ^ (E * E)`, which depends on `a` only through the collision value. -/
+theorem powDiff_powDiffConj (hcube : ∀ z : F, z ^ (E * E * E) = z) (a : F) :
+    powDiff (E * E) (powDiffConj E a) = (powDiff E a)⁻¹ ^ (E * E) := by
+  rw [powDiff, powDiffConj_add_one hcube, powDiffConj, pow_mul_pow_mul_self hcube,
+    pow_mul_pow_mul_self hcube]
+  ring
+
+/-- **The conjugation identity, non-square branch** — the same value as the square branch. -/
+theorem powDiff_powDiffConjNeg (hE : Odd E) (hcube : ∀ z : F, z ^ (E * E * E) = z) (a : F) :
+    powDiff (E * E) (powDiffConjNeg E a) = (powDiff E a)⁻¹ ^ (E * E) := by
+  have hodd : Odd (E * E) := hE.mul hE
+  have hneg : ∀ x : F, (-x ^ E * (powDiff E a)⁻¹) ^ (E * E)
+      = -(x * (powDiff E a)⁻¹ ^ (E * E)) := by
+    intro x
+    rw [neg_mul, hodd.neg_pow, pow_mul_pow_mul_self hcube]
+  rw [powDiff, powDiffConjNeg_add_one hcube, powDiffConjNeg, hneg a, hneg (a + 1)]
+  ring
+
+/-- Squares are closed under the operations used by the two branches. -/
+private theorem isSquare_pow_mul_inv {x y : F} (hx : IsSquare x) (hy : IsSquare y) (n : ℕ) :
+    IsSquare (x ^ n * y⁻¹) := by
+  obtain ⟨s, hs⟩ := hx
+  obtain ⟨t, ht⟩ := hy
+  refine ⟨s ^ n * t⁻¹, ?_⟩
+  rw [hs, ht, mul_pow, mul_inv]
+  ring
+
+/-- **Square branch: the image is again a Paley point.** -/
+theorem powDiffConj_mem_paleySet (hcube : ∀ z : F, z ^ (E * E * E) = z) {a : F}
+    (ha : a ∈ paleySet F) (hsq : IsSquare (powDiff E a)) : powDiffConj E a ∈ paleySet F := by
+  obtain ⟨ha0, hasq, ha1, ha1sq⟩ := ha
+  have hw : powDiff E a ≠ 0 := powDiff_ne_zero hcube a
+  refine ⟨?_, isSquare_pow_mul_inv hasq hsq E, ?_, ?_⟩
+  · exact mul_ne_zero (pow_ne_zero _ ha0) (inv_ne_zero hw)
+  · rw [powDiffConj_add_one hcube]
+    exact mul_ne_zero (pow_ne_zero _ ha1) (inv_ne_zero hw)
+  · rw [powDiffConj_add_one hcube]
+    exact isSquare_pow_mul_inv ha1sq hsq E
+
+/-- **Non-square branch: the image is again a Paley point.**  Here `-w` is the square, and the
+sign in `powDiffConjNeg` is exactly what turns `w⁻¹` into `(-w)⁻¹`. -/
+theorem powDiffConjNeg_mem_paleySet [Fintype F] (h2 : ringChar F ≠ 2)
+    (h4 : Fintype.card F % 4 = 3)
+    (hcube : ∀ z : F, z ^ (E * E * E) = z) {a : F} (ha : a ∈ paleySet F)
+    (hsq : ¬ IsSquare (powDiff E a)) : powDiffConjNeg E a ∈ paleySet F := by
+  obtain ⟨ha0, hasq, ha1, ha1sq⟩ := ha
+  have hw : powDiff E a ≠ 0 := powDiff_ne_zero hcube a
+  have hnegsq : IsSquare (-powDiff E a) :=
+    (isSquare_or_isSquare_neg h2 h4 hw).resolve_left hsq
+  have hinv : ∀ x : F, x * (powDiff E a)⁻¹ = -(x * (-powDiff E a)⁻¹) := by
+    intro x
+    rw [← neg_inv]
+    ring
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · rw [powDiffConjNeg]
+    exact mul_ne_zero (neg_ne_zero.mpr (pow_ne_zero _ ha1)) (inv_ne_zero hw)
+  · have : powDiffConjNeg E a = (a + 1) ^ E * (-powDiff E a)⁻¹ := by
+      rw [powDiffConjNeg, neg_mul, hinv ((a + 1) ^ E), neg_neg]
+    rw [this]
+    exact isSquare_pow_mul_inv ha1sq hnegsq E
+  · rw [powDiffConjNeg_add_one hcube]
+    exact mul_ne_zero (neg_ne_zero.mpr (pow_ne_zero _ ha0)) (inv_ne_zero hw)
+  · have : powDiffConjNeg E a + 1 = a ^ E * (-powDiff E a)⁻¹ := by
+      rw [powDiffConjNeg_add_one hcube, neg_mul, hinv (a ^ E), neg_neg]
+    rw [this]
+    exact isSquare_pow_mul_inv hasq hnegsq E
+
+/-- **Conjugation of the two collision problems.**  A collision of `powDiff E` inside the Paley
+set produces one of `powDiff (E * E)` inside the Paley set.
+
+Applying it to `E` and to `E²` in turn (both are odd and both satisfy the order-three hypothesis)
+shows the two problems are equivalent, which is why the measured fibre-size distributions agree
+exactly.  For BG Appendix C, Problem 1 this halves the work: hypothesis (B1) has to be proved for
+only one exponent of each pair `{E, E²}`. -/
+theorem exists_paley_collision_pow_mul [Fintype F] (h2 : ringChar F ≠ 2)
+    (h4 : Fintype.card F % 4 = 3)
+    (hE : Odd E) (hcube : ∀ z : F, z ^ (E * E * E) = z) {a b : F} (ha : a ∈ paleySet F)
+    (hb : b ∈ paleySet F) (hab : a ≠ b) (hval : powDiff E a = powDiff E b) :
+    ∃ c ∈ paleySet F, ∃ d ∈ paleySet F, c ≠ d ∧ powDiff (E * E) c = powDiff (E * E) d := by
+  have hw : powDiff E a ≠ 0 := powDiff_ne_zero hcube a
+  have hwinv : (powDiff E a)⁻¹ ≠ 0 := inv_ne_zero hw
+  by_cases hsq : IsSquare (powDiff E a)
+  · refine ⟨powDiffConj E a, powDiffConj_mem_paleySet hcube ha hsq, powDiffConj E b,
+      powDiffConj_mem_paleySet hcube hb (hval ▸ hsq), ?_, ?_⟩
+    · simp only [powDiffConj, ← hval]
+      intro h
+      exact hab (pow_injective_of_cube hcube (mul_right_cancel₀ hwinv h))
+    · rw [powDiff_powDiffConj hcube, powDiff_powDiffConj hcube, hval]
+  · refine ⟨powDiffConjNeg E a, powDiffConjNeg_mem_paleySet h2 h4 hcube ha hsq,
+      powDiffConjNeg E b, powDiffConjNeg_mem_paleySet h2 h4 hcube hb (hval ▸ hsq), ?_, ?_⟩
+    · simp only [powDiffConjNeg, ← hval]
+      intro h
+      have h' : (a + 1) ^ E = (b + 1) ^ E := by
+        have := mul_right_cancel₀ hwinv h
+        linear_combination -this
+      have := pow_injective_of_cube hcube h'
+      exact hab (by linear_combination this)
+    · rw [powDiff_powDiffConjNeg hE hcube, powDiff_powDiffConjNeg hE hcube, hval]
+
+end Conjugation
+
 end PowDiff
 
 end OddOrder.Paley
