@@ -136,6 +136,21 @@ witness は到達可能集合が 1 を避けるよう field data が完璧に整
 なすので、C1 の合成 (符号 +) と衝突 pair `(S₁₃, S₁₃′)` が「同じ比・異なる base」を大量生産する
 — N2 の適用先は実際には豊富。
 
+### 第 3 の kill 条件 (K3) と escape の生存条件
+
+pair 空間 `V` (生成 pair の 𝔽₃-span) の `Dom` (第 1 成分の射影) が **`F` 全体に達したら
+それ自体が致命的**: 全ての `s` に pair があるなら `a(v)` が `B` 全体を `B` に写す ⟹
+`A ≤ N_G(B)` ⟹ `false_of_normalizes_layerOne` (要 `hnotfrob` = exotic なら自動)。
+
+escape 衝突 (`Tr S = Tr S′ = 0`) では初期 `Dom₀ = ⟨S⟩_{Frob} ⊆ ker Tr`。`3` が `mod q` の
+原始根なら (`q = 7, 13` ✓) `ker Tr` の Frobenius 加群は既約なので `Dom₀ = ker Tr` (dim `q−1`)。
+⟹ **escape が生き残る必要十分に近い条件: 合成で出る base `m = s·τ^{−E}` が全部
+`Tr m = 0` に留まり続け (1 個でも破れたら span が `F` になり K3)、かつ不動点 (K1) が
+出ないこと**。合成 base は `E`-冪と `τ = 1 ± (c s′/t)^{E²}` を含み Frobenius 加群構造を
+一般には保たない ⟹ この confinement は極端に強い制約で、(B2) 完全消去の証明目標は
+「`Tr(s·τ^{−E}) = 0` が閉包全体で維持されることの不可能性」= `ker Tr` 上の構造化された
+指標和の非消滅、にまで具体化した。
+
 ## 5. 検証状況
 
 - 導出はすべて (1)–(3′) と層の可換性・加法性のみ使用。`d`-展開 ((1) の逆順版) は
@@ -170,13 +185,43 @@ witness は到達可能集合が 1 を避けるよう field data が完璧に整
    深さ 1 の合成だけで判定が真に強くなった初の実測。
 2. `S′ = ±S` は q = 7, 13 の実データでは**一度も起きない** (N1/Theorem B の実効カバレッジは
    この 2 つの q ではゼロ。定理としては残る)。
-3. **escape が残る** — q = 7 で 3 Frobenius 軌道 (14+7 衝突、全て両端 trace 0・等比相手なし)。
-   ⟹ 深さ 1 の判定集合では (B2) は消えない。**次の一手 = 合成チェーン (深さ ≥ 2)**:
-   compose で作った pair の base `m = s(1+η)^{−e}` は明示式なので、
-   「`m(s,t)` vs `m(t,s)` (同比・異 base) → flip で比 1」の探索は場合分けの符号
-   (`χ(1+η)`) 込みで**全部計算可能**。escape 21 衝突に対して深さ 2 チェーンが閉じるかを
-   測るのが次の実験。
+3. ~~escape が残る~~ → **閉包実験で全滅 (下記 §7)**。
 4. 整合性: trace-dead = escape + F-only (5928 = 5733+195, 5499 = 5317+182) ✓。
 
-スクリプト = scratchpad `collision_impact/` (session-local。恒久化するなら
-`notes/meta/` へ移す — 現状は結果のみ本 note に記録)。
+スクリプト = scratchpad `collision_impact/` `chain_closure/` (session-local。
+結果は本 note に記録)。
+
+## 7. 🎯 閉包実験 — escape は深さ 1 で全滅、(B2) は q = 7 で経験的に完全消滅 (2026-08-13)
+
+escape 21 衝突 (3 Frobenius 軌道) に対し、pair 空間
+`V := span_{𝔽₃}{(S^{3^j}, S′^{3^j})} ⊆ 𝔽₃^{14}` を C1/C2 合成で飽和させる実験
+(kill 条件: **K1** = `V ∩ Δ ≠ 0` 不動点 / **K2** = グラフ性違反 `(0, x≠0) ∈ V` /
+**K3** = `dim Dom(V) = q` ⟹ `A ≤ N_G(B)` ⟹ `false_of_normalizes_layerOne`):
+
+> **全 21 衝突が round 1 で死亡** — しかも**最初の自己合成 C1(v,v) 1 回**で。
+> 機構は一様: escape は `Tr S = Tr S′ = 0` ⟹ 初期 `V` はちょうど dim 6
+> (= `x⁷−1` の次数 6 因子成分 = `ker Tr` 加群)。自己合成 1 回が**必ず加群の外に出て**
+> dim 7 に達し、dim 7 は K2 ∨ K3 を強制 (14/21 は K1 も)。C1 だけでも C2 だけでも殺せる。
+> 検証 0 anomaly (exactly-one-c / τ ≠ 0 / 全 kill の brute-force 再検証込み)。
+
+⟹ **GF(3⁷) の全 140 衝突 (両指数) が有効な証明書** — {trace ∪ N2 ∪ 深さ 1 閉包} で
+escape ゼロ。**(B2) は q = 7 で経験的に完全消滅**した。
+
+### 一般証明への含意 (次の一手の具体形)
+
+escape の生存には「合成 base が全部 `ker Tr` (唯一の Frobenius 安定超平面) に閉じ込め
+られ続ける」ことが必要 (§4 の K3 観察)。実験はこの confinement が**最初の 1 歩で必ず破れる**
+ことを示した。⟹ (B2) 完全消去の証明目標は 1 本に絞られた:
+
+> **予想 (B2-elim)**: `q` 奇素数、`E` exotic、衝突 `(S, S′)` が `Tr S = Tr S′ = 0`、
+> `v = (S, S′)`-型の Frobenius 加群元の自己合成 `C1(v,v)` の base `m = s·(1+η)^{−E}`
+> (`η = (cs′/s-型)^{E²}`) について、**`Tr m ≠ 0` となる加群元 `v` が常に存在する**
+> (あるいは K1/K2 で死ぬ)。
+
+これは `ker Tr` 上の構造化された指標和の非消滅で、生の (B1) equidistribution より
+はるかに手がかりが多い (`τ` の明示式・加群の既約性・`E³ = 1`)。⚠ (B1) 自体
+(衝突の存在) は依然 open — (B2) が消えると残る仮定は純粋に「衝突が 1 個ある」だけになる。
+
+- K3 の Lean 入口 (`ConjPair` 族の第 1 成分が `F` を張る ⟹ False) は未形式化 —
+  `false_of_collisionSet_spanning` の類似で `false_of_normalizes_layerOne` に落とす。次の Lean 作業。
+- q = 13 の escape 11,050 件への同実験 = 実行中 (結果は追記)。
