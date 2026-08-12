@@ -62,8 +62,10 @@ the problem: that graph is symmetric, hence never Sidon.
   fixed by `z ↦ z ^ E` whose values `(1 - t) / (1 - t)^E` agree produce a collision outright.
 * `isSquare_one_sub_inv_iff` — the inversion pairing: of `t` and `t⁻¹` exactly one is usable.
 * `two_mul_card_usable_add_one` — exactly half of the fixed nonzero squares are usable.
-* `exists_sameCoset_pair_of_card_lt` / `exists_sameCoset_pair_of_card` — **Theorem A**: more
-  parameters than values gives two Paley points in one coset.
+* `card_image_mul_card_le` / `card_values_mul_card_le` — the index bound `|V| · |L| ≤ |U|`.
+* `exists_sameCoset_pair_of_card_lt` / `exists_sameCoset_pair_of_card` /
+  `exists_sameCoset_pair_of_card_arith` — **Theorem A**: `|L| (|L| - 1) > 2 |U|` gives two Paley
+  points in one coset.
 -/
 
 namespace OddOrder.Paley
@@ -789,6 +791,51 @@ theorem exists_sameCoset_pair_of_card_lt (P V : Finset F)
   field_simp at hcontra
   linear_combination hcontra
 
+/-- **Fibre counting.**  If a finite set `S` is stable under multiplication by a finite set `L` of
+nonzero scalars and `f` is constant on those translates, then each fibre of `f` on `S` has at least
+`|L|` elements, so `|f(S)| · |L| ≤ |S|`.
+
+Applied to `S` = the nonzero squares, `f u = u^E · u⁻¹` and `L` = the fixed squares, this is the
+index bound `|V| ≤ [U : L]` of the gcd criterion. -/
+theorem card_image_mul_card_le [DecidableEq F] (S L : Finset F) (f : F → F)
+    (hS0 : ∀ u ∈ S, u ≠ 0) (hmul : ∀ u ∈ S, ∀ l ∈ L, u * l ∈ S)
+    (hf : ∀ u ∈ S, ∀ l ∈ L, f (u * l) = f u) :
+    (S.image f).card * L.card ≤ S.card := by
+  classical
+  have hfib : ∀ v ∈ S.image f, L.card ≤ (S.filter fun u => f u = v).card := by
+    intro v hv
+    obtain ⟨u, hu, rfl⟩ := Finset.mem_image.mp hv
+    refine Finset.card_le_card_of_injOn (fun l => u * l) ?_ ?_
+    · intro l hl
+      exact Finset.mem_filter.mpr ⟨hmul u hu l hl, hf u hu l hl⟩
+    · intro l₁ _ l₂ _ heq
+      exact mul_left_cancel₀ (hS0 u hu) heq
+  calc (S.image f).card * L.card
+      = ∑ _v ∈ S.image f, L.card := by rw [Finset.sum_const, smul_eq_mul]
+    _ ≤ ∑ v ∈ S.image f, (S.filter fun u => f u = v).card := Finset.sum_le_sum hfib
+    _ = S.card :=
+        (Finset.card_eq_sum_card_fiberwise fun u hu => Finset.mem_image_of_mem f hu).symm
+
+/-- **The index bound.**  The collision values produced by the fixed subgroup all lie in the image
+of `u ↦ u ^ E · u⁻¹` on the nonzero squares, and that image has at most `|U| / |L|` elements. -/
+theorem card_values_mul_card_le [DecidableEq F] (Usq L : Finset F)
+    (hUsq : ∀ u, u ∈ Usq ↔ (u ≠ 0 ∧ IsSquare u))
+    (hL : ∀ t, t ∈ L ↔ (t ≠ 0 ∧ IsSquare t ∧ t ^ E = t)) :
+    (Usq.image fun u => u ^ E * u⁻¹).card * L.card ≤ Usq.card := by
+  refine card_image_mul_card_le Usq L _ (fun u hu => ((hUsq u).mp hu).1) ?_ ?_
+  · intro u hu l hl
+    obtain ⟨hu0, hus⟩ := (hUsq u).mp hu
+    obtain ⟨hl0, hls, -⟩ := (hL l).mp hl
+    refine (hUsq _).mpr ⟨mul_ne_zero hu0 hl0, ?_⟩
+    obtain ⟨s, hs⟩ := hus
+    obtain ⟨t, ht⟩ := hls
+    exact ⟨s * t, by rw [hs, ht]; ring⟩
+  · intro u hu l hl
+    obtain ⟨hu0, -⟩ := (hUsq u).mp hu
+    obtain ⟨hl0, -, hlf⟩ := (hL l).mp hl
+    rw [mul_pow, hlf, mul_inv]
+    field_simp
+
 /-- **Theorem A, criterion form.**  Once the fixed subgroup `L` is more than twice as large as the
 set of collision values it can produce, two Paley points must share a coset — and then
 `OddOrder.BG.AppC.Problem1.false_of_sameCoset_pair` refutes hypothesis (B).
@@ -813,6 +860,47 @@ theorem exists_sameCoset_pair_of_card [Fintype F] (h2 : ringChar F ≠ 2)
     obtain ⟨ht0, htsq, htf⟩ := (hL t).mp htL
     exact ⟨ht0, ht1, htf, htsq, hsq⟩
   · omega
+
+/-- **Theorem A, arithmetic form.**  Writing `a = |L|` for the size of the fixed subgroup inside
+the squares and `n = |U|` for the number of nonzero squares, the single inequality
+
+`a (a - 1) > 2 n`
+
+forces two Paley points into one coset, and hence (through
+`OddOrder.BG.AppC.Problem1.false_of_sameCoset_pair`) refutes hypothesis (B).
+
+For `F = 𝔽_{3^q}` one has `a = gcd(E - 1, n)` and `n = (3^q - 1)/2`, so this is the gcd criterion
+of `notes/bg/appC_problem1_chatgpt_answer_b1.md`, up to the one unit that the parity refinement
+there gains. -/
+theorem exists_sameCoset_pair_of_card_arith [Fintype F] (h2 : ringChar F ≠ 2)
+    (h4 : Fintype.card F % 4 = 3) (Usq L Pos Neg : Finset F)
+    (hUsq : ∀ u, u ∈ Usq ↔ (u ≠ 0 ∧ IsSquare u))
+    (hL : ∀ t, t ∈ L ↔ (t ≠ 0 ∧ IsSquare t ∧ t ^ E = t))
+    (hPos : ∀ t, t ∈ Pos ↔ (t ∈ L ∧ t ≠ 1 ∧ IsSquare (1 - t)))
+    (hNeg : ∀ t, t ∈ Neg ↔ (t ∈ L ∧ t ≠ 1 ∧ ¬ IsSquare (1 - t)))
+    (harith : 2 * Usq.card + L.card < L.card * L.card) :
+    ∃ a b lam : F, a ∈ paleySet F ∧ b ∈ paleySet F ∧ a ≠ b ∧
+      a ^ E = lam * a ∧ (a + 1) ^ E = lam * (a + 1) ∧
+      b ^ E = lam * b ∧ (b + 1) ^ E = lam * (b + 1) := by
+  classical
+  set V : Finset F := Usq.image fun u => u ^ E * u⁻¹ with hV
+  have hbound : V.card * L.card ≤ Usq.card := card_values_mul_card_le Usq L hUsq hL
+  have hmaps : ∀ t ∈ Pos, (1 - t) / (1 - t) ^ E ∈ V := by
+    intro t ht
+    obtain ⟨htL, ht1, hs1⟩ := (hPos t).mp ht
+    obtain ⟨ht0, hst, hft⟩ := (hL t).mp htL
+    obtain ⟨hmem, -⟩ := mem_paleySet_powDiff_of_pow_eq ht0 ht1 hft hst hs1
+    obtain ⟨ha0, hasq, -, -⟩ := hmem
+    obtain ⟨hsc, -⟩ := pow_eq_mul_of_pow_eq ht1 hft
+    refine Finset.mem_image.mpr ⟨t / (1 - t), (hUsq _).mpr ⟨ha0, hasq⟩, ?_⟩
+    rw [hsc, mul_assoc, mul_inv_cancel₀ ha0, mul_one]
+  refine exists_sameCoset_pair_of_card h2 h4 L Pos Neg V hL hPos hNeg hmaps ?_
+  have hone : (1 : F) ∈ L := (hL 1).mpr ⟨one_ne_zero, ⟨1, (one_mul 1).symm⟩, one_pow E⟩
+  have hL1 : 0 < L.card := Finset.card_pos.mpr ⟨1, hone⟩
+  have hprod : (2 * V.card + 1) * L.card < L.card * L.card := by
+    have hexp : (2 * V.card + 1) * L.card = 2 * (V.card * L.card) + L.card := by ring
+    omega
+  exact Nat.lt_of_mul_lt_mul_right hprod
 
 end FixedSubgroup
 
