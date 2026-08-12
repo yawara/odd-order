@@ -45,6 +45,7 @@ Proposition 9 の仮説 (記法は
 | 7 | **`δ ∈ U` 条件は無条件に満たせる** ⟹ (B1) = 「衝突が存在する」 | `exists_collisionPair_of_sub_ne_zero` |
 | 8 | **判定法の最終形** — 空振りは両端のトレースが両方 0 のときだけ | `false_of_collisionPair_trace` |
 | 9 | **探索不要の証明書** — Fix の同じ剰余類から衝突を構成 (閾値 `Q^{1/3}`) | `exists_paley_collision_of_pow_eq` |
+| 10 | **🎯 Theorem B** — `S = S′` なる衝突は**トレース仮説なしで** witness を排除 | `false_of_collisionPair_self` |
 
 **⟹ 定理 2 + 奇数位数定理により、有限奇位数群は witness になれない。
 BG App.C が置かれている文脈そのものでは否定的に決着している。**

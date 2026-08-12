@@ -21112,6 +21112,14 @@ additive subgroup (`commSubgroup`) which conjugation by `g²` plus the factorisa
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.commute_inv_pow_of_normOne
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.mem_commSubgroup_inv_pow
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.inv_mem_commSubgroup
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.mem_commSubgroup_of_square
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.mem_commSubgroup_of_collisionPair
+/-! **Theorem B.**  A collision whose two normalised values coincide refutes hypothesis (B) with no
+hypothesis on the trace: the admissible twists are inversion-closed, hence (as `q` is prime) either
+all of `𝔽_{3^q}` — so `x` centralises the second layer and `N` is abelian, refuted by
+`false_of_s_normalizes_layerOne` — or a copy of the prime field, forcing `S = ±1` and
+`Tr S = ±q ≠ 0`, which `false_of_collisionPair_trace_ne_zero` refutes. -/
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_self
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_trace_ne_zero_right
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_trace
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.CollisionPair.frobenius

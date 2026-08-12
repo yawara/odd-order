@@ -30,9 +30,13 @@ under `s ↦ s⁻¹`, at which point `OddOrder.InverseClosed.pow_four_eq_one_or_
 * `conjGen_pow_three` — `g³ = 1`.
 * `conj_layerFieldHom_zero` / `conj_layerFieldHom_one` — conjugating by `g²` shifts layers.
 * `commSubgroup` — the additive subgroup of admissible twists `s`.
+* `mem_commSubgroup_of_square` — one square class of arguments suffices.
 * `mem_commSubgroup_inv_pow` — closure under `s ↦ (s ^ e)⁻¹`.
 * `inv_mem_commSubgroup` — closure under inversion, the hypothesis of
   `OddOrder.InverseClosed.pow_four_eq_one_or_forall_mem`.
+* `mem_commSubgroup_of_collisionPair` — a collision with `S = S'` is an admissible twist.
+* `false_of_collisionPair_self` — **Theorem B**: such a collision refutes hypothesis (B), with no
+  assumption on the trace.
 -/
 
 namespace OddOrder.BG.AppC.Problem1
@@ -142,16 +146,15 @@ theorem commute_inv_pow_of_normOne (data : FieldNormalizerData p q G) (hp : p = 
     simpa using hcancel.inv_left
   exact hfinal.symm
 
-/-- **Closure of the admissible twists under `s ↦ (s ^ e)⁻¹`.**
-
-Every non-zero `t` is `± s · u^e` for a norm-one `u` (because `-1` is a non-square and `z ↦ z^e`
-permutes the norm-one units), and on those arguments the previous lemma supplies exactly the
-required commutation; the sign is absorbed because `e` is odd. -/
-theorem mem_commSubgroup_inv_pow (data : FieldNormalizerData p q G) (hp : p = 3) (hq : q ≠ 0)
-    (hqodd : Odd q) {e : ℕ} (he : Odd e)
-    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
-    {s : GaloisField p q} (hs : s ∈ commSubgroup data e) (hs0 : s ≠ 0) :
-    (s ^ e)⁻¹ ∈ commSubgroup data e := by
+/-- **One square class suffices.**  If the defining commutation of `commSubgroup` holds at every
+argument `c * v` with `v` a non-zero square, it holds everywhere: every non-zero `t` is `c * v` or
+`-(c * v)` for such a `v` (as `-1` is a non-square), and the sign is absorbed because `e` is odd. -/
+theorem mem_commSubgroup_of_square (data : FieldNormalizerData p q G) (hp : p = 3) (hq : q ≠ 0)
+    (hqodd : Odd q) {e : ℕ} (he : Odd e) {c s : GaloisField p q} (hc0 : c ≠ 0)
+    (hkey : ∀ v : GaloisField p q, IsSquare v → v ≠ 0 →
+      Commute (layerFieldHom data 0 (Multiplicative.ofAdd (c * v)))
+        (layerFieldHom data 1 (Multiplicative.ofAdd (s * (c * v) ^ e)))) :
+    s ∈ commSubgroup data e := by
   classical
   subst hp
   letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
@@ -170,52 +173,119 @@ theorem mem_commSubgroup_inv_pow (data : FieldNormalizerData p q G) (hp : p = 3)
     have hk : q = 2 * (q / 2) + 1 := by omega
     rw [hk, pow_succ, pow_mul, Nat.mul_mod, Nat.pow_mod]
     norm_num
-  -- the statement to be proved, at a single argument
-  have hkey : ∀ v : GaloisField 3 q, IsSquare v → v ≠ 0 →
-      Commute (layerFieldHom data 0 (Multiplicative.ofAdd (s * v)))
-        (layerFieldHom data 1
-          (Multiplicative.ofAdd ((s ^ e)⁻¹ * (s * v) ^ e))) := by
-    intro v hvsq hv0
-    -- `v` is norm-one, and `z ↦ z ^ e` is onto the norm-one units
-    obtain ⟨u0, hu0⟩ : ∃ u0 : NormSet.normOneUnits 3 q, normOneVal u0 = v :=
-      ⟨⟨Units.mk0 v hv0, (mem_normOneUnits_iff_isSquare rfl hq _).mpr (by simpa using hvsq)⟩, rfl⟩
-    have hcube : normOneVal u0 ^ (e * e * e) = normOneVal u0 := by
-      have hu := normOneUnits_pow_cube data rfl hexp u0
-      calc normOneVal u0 ^ (e * e * e) = normOneVal (u0 ^ (e * e * e)) := by rw [normOneVal_pow]
-        _ = normOneVal u0 := by rw [hu]
-    have hue : normOneVal (u0 ^ (e * e)) ^ e = v := by
-      rw [normOneVal_pow, ← pow_mul, hcube, hu0]
-    have hue2 : normOneVal (u0 ^ (e * e)) ^ (e * e) = v ^ e := by
-      have hexp4 : e * e * (e * e) = e * e * e * e := by ring
-      rw [normOneVal_pow, ← pow_mul, hexp4, pow_mul, hcube, hu0]
-    have hres := commute_inv_pow_of_normOne data rfl hexp hs (u0 ^ (e * e))
-    rw [hue, hue2] at hres
-    have harg : (s ^ e)⁻¹ * (s * v) ^ e = v ^ e := by
-      rw [mul_pow, ← mul_assoc, inv_mul_cancel₀ (pow_ne_zero _ hs0), one_mul]
-    rw [harg]
-    exact hres
-  -- now every argument, by the square-class dichotomy
   have he0 : e ≠ 0 := by
     have := Nat.odd_iff.mp he
     omega
   intro t
   rcases eq_or_ne t 0 with rfl | ht0
   · simp [zero_pow he0]
-  have hz0 : t * s⁻¹ ≠ 0 := mul_ne_zero ht0 (inv_ne_zero hs0)
+  have hz0 : t * c⁻¹ ≠ 0 := mul_ne_zero ht0 (inv_ne_zero hc0)
   rcases Paley.isSquare_or_isSquare_neg hchar2 h4 hz0 with hsq | hnsq
-  · have hv : s * (t * s⁻¹) = t := by
-      rw [mul_comm t, ← mul_assoc, mul_inv_cancel₀ hs0, one_mul]
-    have hcm := hkey (t * s⁻¹) hsq hz0
+  · have hv : c * (t * c⁻¹) = t := by
+      rw [mul_comm t, ← mul_assoc, mul_inv_cancel₀ hc0, one_mul]
+    have hcm := hkey (t * c⁻¹) hsq hz0
     rwa [hv] at hcm
-  · have hv : s * -(t * s⁻¹) = -t := by
-      rw [mul_neg, mul_comm t, ← mul_assoc, mul_inv_cancel₀ hs0, one_mul]
-    have hcm := hkey (-(t * s⁻¹)) hnsq (neg_ne_zero.mpr hz0)
+  · have hv : c * -(t * c⁻¹) = -t := by
+      rw [mul_neg, mul_comm t, ← mul_assoc, mul_inv_cancel₀ hc0, one_mul]
+    have hcm := hkey (-(t * c⁻¹)) hnsq (neg_ne_zero.mpr hz0)
     rw [hv] at hcm
-    have hb : (s ^ e)⁻¹ * (-t) ^ e = -((s ^ e)⁻¹ * t ^ e) := by
+    have hb : s * (-t) ^ e = -(s * t ^ e) := by
       rw [he.neg_pow]
       ring
     rw [hb, ofAdd_neg, map_inv, ofAdd_neg, map_inv] at hcm
     simpa using hcm.inv_inv
+
+/-- **Closure of the admissible twists under `s ↦ (s ^ e)⁻¹`.**
+
+On the arguments `t = s · u^e` with `u` norm-one this is `commute_inv_pow_of_normOne`; the previous
+lemma extends it to every `t`. -/
+theorem mem_commSubgroup_inv_pow (data : FieldNormalizerData p q G) (hp : p = 3) (hq : q ≠ 0)
+    (hqodd : Odd q) {e : ℕ} (he : Odd e)
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {s : GaloisField p q} (hs : s ∈ commSubgroup data e) (hs0 : s ≠ 0) :
+    (s ^ e)⁻¹ ∈ commSubgroup data e := by
+  refine mem_commSubgroup_of_square data hp hq hqodd he hs0 ?_
+  intro v hvsq hv0
+  subst hp
+  obtain ⟨u0, hu0⟩ : ∃ u0 : NormSet.normOneUnits 3 q, normOneVal u0 = v :=
+    ⟨⟨Units.mk0 v hv0, (mem_normOneUnits_iff_isSquare rfl hq _).mpr (by simpa using hvsq)⟩, rfl⟩
+  have hcube : normOneVal u0 ^ (e * e * e) = normOneVal u0 := by
+    have hu := normOneUnits_pow_cube data rfl hexp u0
+    calc normOneVal u0 ^ (e * e * e) = normOneVal (u0 ^ (e * e * e)) := by rw [normOneVal_pow]
+      _ = normOneVal u0 := by rw [hu]
+  have hue : normOneVal (u0 ^ (e * e)) ^ e = v := by
+    rw [normOneVal_pow, ← pow_mul, hcube, hu0]
+  have hue2 : normOneVal (u0 ^ (e * e)) ^ (e * e) = v ^ e := by
+    have hexp4 : e * e * (e * e) = e * e * e * e := by ring
+    rw [normOneVal_pow, ← pow_mul, hexp4, pow_mul, hcube, hu0]
+  have hres := commute_inv_pow_of_normOne data rfl hexp hs (u0 ^ (e * e))
+  rw [hue, hue2] at hres
+  have harg : (s ^ e)⁻¹ * (s * v) ^ e = v ^ e := by
+    rw [mul_pow, ← mul_assoc, inv_mul_cancel₀ (pow_ne_zero _ hs0), one_mul]
+  rw [harg]
+  exact hres
+
+/-- **A collision with equal normalised values is an admissible twist.**
+
+When `S = S'` — equivalently `K(p) = K(r)`, which is what "the two Paley points lie in one coset
+of the fixed subgroup" gives — relation (4) of `layerFieldHom_one_conj` says that `a(δ z^e)`
+*commutes with* `b(K z^{e²})` instead of merely conjugating one second-layer element to another.
+Since `S · δ^e = K`, that is exactly the defining condition of `commSubgroup` at the arguments
+`δ v` with `v` a non-zero square. -/
+theorem mem_commSubgroup_of_collisionPair (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hq : q ≠ 0) (hqodd : Odd q) {e : ℕ} (he : Odd e)
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {S : GaloisField p q} (hpair : CollisionPair p q e S S) : S ∈ commSubgroup data e := by
+  obtain ⟨p₀, p₁, r₀, r₁, d₀, hpp, hrr, hcoll, hd, hS, hS'⟩ := hpair
+  set Z : GaloisField p q := normOneVal (d₀⁻¹ ^ (e * e)) ^ (e * e) with hZ
+  have hZ0 : Z ≠ 0 := by
+    rw [hZ]
+    exact pow_ne_zero _ (Units.ne_zero _)
+  have hKeq : normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e)
+      = normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e) :=
+    mul_right_cancel₀ hZ0 (hS.symm.trans hS')
+  have hd0 : normOneVal d₀ ≠ 0 := Units.ne_zero _
+  refine mem_commSubgroup_of_square data hp hq hqodd he hd0 ?_
+  intro v hvsq hv0
+  subst hp
+  obtain ⟨u0, hu0⟩ : ∃ u0 : NormSet.normOneUnits 3 q, normOneVal u0 = v :=
+    ⟨⟨Units.mk0 v hv0, (mem_normOneUnits_iff_isSquare rfl hq _).mpr (by simpa using hvsq)⟩, rfl⟩
+  have hcubev : normOneVal u0 ^ (e * e * e) = normOneVal u0 := by
+    have hu := normOneUnits_pow_cube data rfl hexp u0
+    calc normOneVal u0 ^ (e * e * e) = normOneVal (u0 ^ (e * e * e)) := by rw [normOneVal_pow]
+      _ = normOneVal u0 := by rw [hu]
+  have hue : normOneVal (u0 ^ (e * e)) ^ e = v := by
+    rw [normOneVal_pow, ← pow_mul, hcubev, hu0]
+  have hue2 : normOneVal (u0 ^ (e * e)) ^ (e * e) = v ^ e := by
+    have hexp4 : e * e * (e * e) = e * e * e * e := by ring
+    rw [normOneVal_pow, ← pow_mul, hexp4, pow_mul, hcubev, hu0]
+  -- `S · δ^e = K`
+  have hdcube : normOneVal d₀ ^ (e * e * e) = normOneVal d₀ := by
+    have hu := normOneUnits_pow_cube data rfl hexp d₀
+    calc normOneVal d₀ ^ (e * e * e) = normOneVal (d₀ ^ (e * e * e)) := by rw [normOneVal_pow]
+      _ = normOneVal d₀ := by rw [hu]
+  have hZval : Z * normOneVal d₀ ^ e = 1 := by
+    have hexp4 : e * e * (e * e) = e * e * e * e := by ring
+    rw [hZ, normOneVal_pow, normOneVal_inv, ← pow_mul, inv_pow, hexp4, pow_mul, hdcube]
+    exact inv_mul_cancel₀ (pow_ne_zero _ hd0)
+  have hSd : S * normOneVal d₀ ^ e
+      = normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e) := by
+    rw [hS, mul_assoc, hZval, mul_one]
+  -- relation (4) at the norm-one argument `u0 ^ (e * e)`
+  have hrel := layerFieldHom_one_conj data rfl hexp p₀ p₁ r₀ r₁ (u0 ^ (e * e)) hpp hrr hcoll
+  rw [hue, hue2, ← hd, ← hKeq] at hrel
+  -- rewrite the goal into the same shape
+  have hgoal : S * (normOneVal d₀ * v) ^ e
+      = (normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e)) * v ^ e := by
+    rw [mul_pow, ← mul_assoc, hSd]
+  rw [hgoal]
+  -- and read the commutation off relation (4)
+  have hinv : layerFieldHom data 0
+      (Multiplicative.ofAdd (-(normOneVal d₀ * v)))
+      = (layerFieldHom data 0 (Multiplicative.ofAdd (normOneVal d₀ * v)))⁻¹ := by
+    rw [ofAdd_neg, map_inv]
+  rw [hinv] at hrel
+  exact mul_inv_eq_iff_eq_mul.mp hrel.symm
 
 /-- **The admissible twists are closed under inversion.**  Iterating `s ↦ (s ^ e)⁻¹` three times
 is `s ↦ (s ^ (e³))⁻¹ = s⁻¹`, since `e³` acts as the identity on the field.
@@ -239,6 +309,117 @@ theorem inv_mem_commSubgroup (data : FieldNormalizerData p q G) (hp : p = 3) (hq
   have hx3 : ((s ^ (e * e)) ^ e)⁻¹ = s⁻¹ := by
     rw [← pow_mul, hcube]
   rwa [hx3] at h3
+
+/-- **Theorem B: the same-coset obstruction.**  A collision whose two normalised values *coincide*
+refutes hypothesis (B), with **no** assumption on the trace.
+
+`S = S'` turns relation (4) into a commutation, so `S` is an admissible twist; the twists form an
+inversion-closed additive subgroup, hence — `q` being prime — either all of `𝔽_{3^q}` or a copy of
+the prime field.  In the first case `x` centralises the whole second layer, so the two layers
+commute and `N` is abelian, which `false_of_s_normalizes_layerOne` refutes.  In the second case
+`S ^ 4 = 1`, and `-1` is a non-square, so `S = ±1`; then `Tr S = ±q ≠ 0` and the trace obstruction
+applies. -/
+theorem false_of_collisionPair_self (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hqprime : q.Prime) (hqodd : Odd q) (hqne : q ≠ 3) {e : ℕ} (he : Odd e)
+    (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    (hnotfrob : ∀ j : ℕ, ∃ u : NormSet.normOneUnits p q, u ^ e ≠ u ^ (3 ^ j))
+    {S : GaloisField p q} (hpair : CollisionPair p q e S S) : False := by
+  classical
+  have hq0 : q ≠ 0 := hqprime.ne_zero
+  have hmem := mem_commSubgroup_of_collisionPair data hp hq0 hqodd he hexp hpair
+  -- `S ≠ 0`, because `z ↦ z ^ (e * e)` is injective and `p₀ ≠ p₁`
+  have hS0 : S ≠ 0 := by
+    obtain ⟨p₀, p₁, r₀, r₁, d₀, hpp, -, -, -, hS, -⟩ := hpair
+    rw [hS]
+    refine mul_ne_zero ?_ (pow_ne_zero _ (Units.ne_zero _))
+    intro hzero
+    have hEq : normOneVal p₁ ^ (e * e) = normOneVal p₀ ^ (e * e) := by
+      linear_combination hzero
+    have hinj : normOneVal p₁ = normOneVal p₀ := by
+      have h1 := hcube (normOneVal p₁)
+      have h2 := hcube (normOneVal p₀)
+      calc normOneVal p₁ = (normOneVal p₁ ^ (e * e)) ^ e := by rw [← pow_mul, h1]
+        _ = (normOneVal p₀ ^ (e * e)) ^ e := by rw [hEq]
+        _ = normOneVal p₀ := by rw [← pow_mul, h2]
+    rw [hpp] at hinj
+    exact one_ne_zero (by linear_combination -hinj)
+  subst hp
+  letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
+  haveI : CharP (GaloisField 3 q) 3 := by
+    rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
+    exact ZMod.charP 3
+  have hcard : Fintype.card (GaloisField 3 q) = 3 ^ q := by
+    rw [← Nat.card_eq_fintype_card]
+    exact GaloisField.card 3 q hq0
+  have hchar2 : ringChar (GaloisField 3 q) ≠ 2 := by
+    rw [ringChar.eq (GaloisField 3 q) 3]
+    norm_num
+  have h4card : Fintype.card (GaloisField 3 q) % 4 = 3 := by
+    rw [hcard]
+    have hq2 : q % 2 = 1 := Nat.odd_iff.mp hqodd
+    have hk : q = 2 * (q / 2) + 1 := by omega
+    rw [hk, pow_succ, pow_mul, Nat.mul_mod, Nat.pow_mod]
+    norm_num
+  have hinvW : ∀ w ∈ commSubgroup data e, w⁻¹ ∈ commSubgroup data e := fun w hw =>
+    inv_mem_commSubgroup data rfl hq0 hqodd he hcube hexp hw
+  rcases InverseClosed.pow_four_eq_one_or_forall_mem (commSubgroup data e) hinvW rfl hqprime
+      hcard hmem hS0 with hfour | hall
+  · -- `S = ±1`, so its trace is `±q ≠ 0`
+    have hnegsq : ¬ IsSquare (-1 : GaloisField 3 q) := Paley.not_isSquare_neg_one hchar2 h4card
+    have hsq : S ^ 2 = 1 := by
+      have hfac : (S ^ 2 - 1) * (S ^ 2 + 1) = 0 := by linear_combination hfour
+      rcases mul_eq_zero.mp hfac with h | h
+      · linear_combination h
+      · exact absurd ⟨S, by linear_combination -h⟩ hnegsq
+    have hcast : ((q : ℕ) : GaloisField 3 q) ≠ 0 := by
+      rw [Ne, CharP.cast_eq_zero_iff (GaloisField 3 q) 3]
+      intro hdvd
+      exact hqne ((Nat.prime_dvd_prime_iff_eq Nat.prime_three hqprime).mp hdvd).symm
+    have htr : fieldTrace 3 q S ≠ 0 := by
+      have hfac : (S - 1) * (S + 1) = 0 := by linear_combination hsq
+      rcases mul_eq_zero.mp hfac with h | h
+      · have hS1 : S = 1 := by linear_combination h
+        rw [hS1, fieldTrace]
+        simp only [one_pow, Finset.sum_const, Finset.card_range, nsmul_eq_mul, mul_one]
+        exact hcast
+      · have hS1 : S = -1 := by linear_combination h
+        rw [hS1, fieldTrace]
+        have hodd : ∀ j : ℕ, ((-1 : GaloisField 3 q)) ^ (3 : ℕ) ^ j = -1 := fun j =>
+          (Odd.pow (by decide)).neg_one_pow
+        simp only [hodd, Finset.sum_const, Finset.card_range, nsmul_eq_mul, mul_neg_one]
+        exact neg_ne_zero.mpr hcast
+    exact false_of_collisionPair_trace_ne_zero data rfl hq0 hexp hpair htr
+  · -- the two layers centralise each other
+    refine false_of_s_normalizes_layerOne data rfl hexp hnotfrob ?_
+    have ha1 : layerFieldHom data 0 (Multiplicative.ofAdd (1 : GaloisField 3 q)) = data.s := by
+      simp only [layerFieldHom_apply, pow_zero, inv_one, one_mul, mul_one]
+      rfl
+    have hfixS : ∀ n ∈ ((layerOne data : Subgroup G) : Set G),
+        data.s * n * (data.s)⁻¹ = n := by
+      intro n hn
+      rw [coe_layerOne_eq_range] at hn
+      obtain ⟨w, rfl⟩ := hn
+      have hx := hall (Multiplicative.toAdd w) 1
+      rw [one_pow, mul_one, ha1] at hx
+      have hwo : Multiplicative.ofAdd (Multiplicative.toAdd w) = w := rfl
+      rw [hwo] at hx
+      exact mul_inv_eq_iff_eq_mul.mpr hx.eq
+    rw [Subgroup.mem_set_normalizer_iff]
+    intro n
+    constructor
+    · intro hn
+      rw [hfixS n hn]
+      exact hn
+    · intro hn
+      have h3 := hfixS _ hn
+      have h2 : data.s * n * (data.s)⁻¹ = n := by
+        calc data.s * n * (data.s)⁻¹
+            = (data.s)⁻¹ * (data.s * (data.s * n * (data.s)⁻¹) * (data.s)⁻¹) * data.s := by group
+          _ = (data.s)⁻¹ * (data.s * n * (data.s)⁻¹) * data.s := by rw [h3]
+          _ = n := by group
+      rw [← h2]
+      exact hn
 
 end SameCoset
 

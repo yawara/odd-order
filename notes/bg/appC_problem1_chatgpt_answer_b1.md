@@ -264,7 +264,33 @@ leaf = [`OddOrder/Algebra/InverseClosedSubgroup.lean`](../../OddOrder/Algebra/In
 
 ⟹ **`InverseClosed.pow_four_eq_one_or_forall_mem` の仮説がすべて揃った**。
 
+### 🎯 第 4 段: **Theorem B 完成** (同 leaf、axiom-clean)
+
+| 数学 | Lean |
+|---|---|
+| 1 つの平方類で条件を確かめれば十分 | `mem_commSubgroup_of_square` |
+| **`S = S′` なる衝突は admissible twist** | `mem_commSubgroup_of_collisionPair` |
+| **🎯 Theorem B** — そんな衝突は witness を排除 (トレース仮説不要) | **`false_of_collisionPair_self`** |
+
+```
+theorem false_of_collisionPair_self (data) (hp : p = 3) (hqprime : q.Prime) (hqodd : Odd q)
+    (hqne : q ≠ 3) (he : Odd e) (hcube : ∀ z, z ^ (e*e*e) = z) (hexp) (hnotfrob)
+    {S} (hpair : CollisionPair p q e S S) : False
+```
+
+証明の骨格 (すべて機械検証済):
+
+1. `S = S′` ⟹ 関係式 (4) `layerFieldHom_one_conj` が**交換関係**になる ⟹ `S ∈ commSubgroup`。
+2. `S ≠ 0` (`z ↦ z^{e·e}` が単射で `p₀ = p₁ + 1`)。
+3. `commSubgroup` は反転で閉じる ⟹ `InverseClosed.pow_four_eq_one_or_forall_mem` を適用。
+4. **`W = F` 枝**: `t = 1` で `x = a(1)` が第 2 層を中心化 ⟹ `x ∈ N_G(B)` ⟹
+   `false_of_s_normalizes_layerOne` で矛盾 (ここだけ `hnotfrob` が要る)。
+5. **`W = 𝔽₃` 枝**: `S⁴ = 1` と `−1` 非平方から `S² = 1` ⟹ `S = ±1` ⟹
+   `Tr S = ±q ≠ 0` (`q ≠ 3`) ⟹ `false_of_collisionPair_trace_ne_zero` で矛盾。
+
+⟹ **(B2) は同一剰余類の衝突には不要**という回答の主張が、Lean で完全に検証された。
+
 ### 残り (次段)
 
-* Theorem B 本体の組み立て (同一剰余類の衝突 ⟹ `S = S′` ⟹ 交換関係 ⟹ 二分法 ⟹ 矛盾)
-* Theorem A (gcd 判定 = 鳩の巣)
+* Theorem A (gcd 判定 = 鳩の巣) の Lean 化 — `a ≥ 2c+1` ⟹ 同一剰余類の衝突が存在
+* `q = 47` の残り 4 指数を誕生日探索で決着 (Theorem B があるのでトレース不要)
