@@ -548,6 +548,22 @@ D(p) = p^E − (p−1)^E = f − g f = f(1 − g) = 1
 * **`q = 47`: 8 指数のうち 4 個が DECISIVE** (数分)。`|S| > √Q` を満たさない残り 4 個は
   誕生日探索が要る (32 スレッドで ~13 時間/指数)。
 
+**✅ Lean 化 (2026-08-12)** — この構成は notes と C コードにしか無かったが、定理になった
+([`OddOrder/Algebra/PaleySpanning.lean`](../../OddOrder/Algebra/PaleySpanning.lean) の
+`section FixedSubgroup`、axiom-clean・AxiomsCheck 登録済):
+
+| 数学 | Lean |
+|---|---|
+| 両座標が `E`-固定な Paley 点は `D = 1` | `powDiff_eq_one_of_pow_eq` |
+| 探索不要の径数付け `h ↦ h/(1−h)` | `mem_paleySet_powDiff_eq_one_of_pow_eq` |
+| **`h ≠ h′` 2 つで衝突が出る (= (B1))** | **`exists_paley_collision_of_pow_eq`** |
+
+`a = h/(1−h)` とすると `a + 1 = (1−h)⁻¹`、`a = h·(a+1)` なので、`h` と `1−h` がともに固定された
+非零平方なら `a` と `a+1` もそうで、`D(a) = (a+1) − a = 1`。Möbius 写像は単射なので相異なる
+`h` は相異なる Paley 点を与える。⚠ **標数 3 も有限性も使わない**。素体での数値検証:
+`p < 900` の exotic 指数 108 個で構成が常に正しい Paley 点と `D = 1` を与え (失敗 0)、
+うち **40 個はこの構成だけで (B1) が決着**した。
+
 ⚠ `q = 7, 13` は `n` が素数なので `|S| = 2` となり、この手法は**原理的に効かない**
 (誕生日探索が唯一の道)。逆に `n` が「`ω` が自明な大きい因子」を持つ `q` では探索が不要になる。
 

@@ -56,6 +56,10 @@ the problem: that graph is symmetric, hence never Sidon.
 * `powDiff` — `a ↦ (a+1)^E - a^E`.
 * `powDiff_neg_sub_one` — the free involution.
 * `neg_sub_one_notMem_paleySet` — it always leaves `T`.
+* `exists_paley_collision_pow_mul` — the `E` and `E²` collision problems are conjugate, so a
+  usable collision for one gives one for the other.
+* `exists_paley_collision_of_pow_eq` — the search-free certificate: two fixed nonzero squares
+  `h`, `h'` (with `1 - h`, `1 - h'` also fixed squares) produce a collision outright.
 -/
 
 namespace OddOrder.Paley
@@ -514,6 +518,81 @@ theorem exists_paley_collision_pow_mul [Fintype F] (h2 : ringChar F ≠ 2)
     · rw [powDiff_powDiffConjNeg hE hcube, powDiff_powDiffConjNeg hE hcube, hval]
 
 end Conjugation
+
+/-! ### Collisions supplied by the fixed subgroup of `z ↦ z ^ E`
+
+The map `omega : z ↦ z ^ E` has a fixed subgroup `Fix = {z : z ^ E = z}` (of order
+`gcd(E - 1, |F| - 1)` inside `Fˣ`).  Whenever *both* coordinates `a` and `a + 1` of a Paley point
+lie in `Fix`, its collision value is forced:
+
+`powDiff E a = (a + 1) - a = 1`.
+
+So all such points sit in one fibre, and any two of them collide.  They are parametrised without
+any search: for `h` and `1 - h` both fixed nonzero squares, `a = h / (1 - h)` is such a point,
+because `a + 1 = (1 - h)⁻¹` and `a = h ⬝ (a + 1)`.
+
+This is the "structured exponent" certificate of
+`notes/bg/appC_problem1_partial_resolution.md`: it settles hypothesis (B1) for an exponent with a
+large fixed subgroup by *constructing* a collision instead of searching for one, and it is what
+disposed of 4 of the 8 exotic exponents for `q = 47` in minutes.  Note that nothing here uses
+characteristic three; the expected number of usable `h` is `|Fix ∩ squares|² / |F|`, so the
+construction bites exactly when the fixed subgroup exceeds `√|F|`. -/
+
+section FixedSubgroup
+
+/-- **A Paley point whose two coordinates are both fixed by `z ↦ z ^ E` has collision value 1.** -/
+theorem powDiff_eq_one_of_pow_eq {a : F} (ha : a ^ E = a) (ha1 : (a + 1) ^ E = a + 1) :
+    powDiff E a = 1 := by
+  rw [powDiff, ha, ha1]
+  ring
+
+/-- **The search-free parametrisation.**  If `h` and `1 - h` are nonzero squares fixed by
+`z ↦ z ^ E`, then `a = h / (1 - h)` is a Paley point with `powDiff E a = 1`. -/
+theorem mem_paleySet_powDiff_eq_one_of_pow_eq {h : F} (hh0 : h ≠ 0) (hh1 : h ≠ 1)
+    (hfh : h ^ E = h) (hf1 : (1 - h) ^ E = 1 - h) (hsh : IsSquare h) (hs1 : IsSquare (1 - h)) :
+    h / (1 - h) ∈ paleySet F ∧ powDiff E (h / (1 - h)) = 1 := by
+  have hd : (1 : F) - h ≠ 0 := sub_ne_zero.mpr (Ne.symm hh1)
+  have hsucc : h / (1 - h) + 1 = (1 - h)⁻¹ := by
+    field_simp
+    ring
+  have hinvsq : IsSquare ((1 - h)⁻¹) := by
+    obtain ⟨t, ht⟩ := hs1
+    exact ⟨t⁻¹, by rw [ht, mul_inv]⟩
+  have hasq : IsSquare (h / (1 - h)) := by
+    obtain ⟨s, hs⟩ := hsh
+    obtain ⟨t, ht⟩ := hinvsq
+    refine ⟨s * t, ?_⟩
+    rw [div_eq_mul_inv, ht, hs]
+    ring
+  have ha1 : (h / (1 - h) + 1) ^ E = h / (1 - h) + 1 := by
+    rw [hsucc, inv_pow, hf1]
+  have ha : (h / (1 - h)) ^ E = h / (1 - h) := by
+    rw [div_pow, hfh, hf1]
+  refine ⟨⟨div_ne_zero hh0 hd, hasq, ?_, ?_⟩, powDiff_eq_one_of_pow_eq ha ha1⟩
+  · rw [hsucc]
+    exact inv_ne_zero hd
+  · rw [hsucc]
+    exact hinvsq
+
+/-- **Two fixed squares give a Paley collision**, hence hypothesis (B1) for this exponent.  The
+Möbius map `h ↦ h / (1 - h)` is injective, so distinct `h` give distinct Paley points, and both
+have collision value `1`. -/
+theorem exists_paley_collision_of_pow_eq {h h' : F} (hh0 : h ≠ 0) (hh1 : h ≠ 1)
+    (hfh : h ^ E = h) (hf1 : (1 - h) ^ E = 1 - h) (hsh : IsSquare h) (hs1 : IsSquare (1 - h))
+    (hh0' : h' ≠ 0) (hh1' : h' ≠ 1) (hfh' : h' ^ E = h') (hf1' : (1 - h') ^ E = 1 - h')
+    (hsh' : IsSquare h') (hs1' : IsSquare (1 - h')) (hne : h ≠ h') :
+    ∃ a ∈ paleySet F, ∃ b ∈ paleySet F, a ≠ b ∧ powDiff E a = powDiff E b := by
+  obtain ⟨hmem, hval⟩ := mem_paleySet_powDiff_eq_one_of_pow_eq hh0 hh1 hfh hf1 hsh hs1
+  obtain ⟨hmem', hval'⟩ := mem_paleySet_powDiff_eq_one_of_pow_eq hh0' hh1' hfh' hf1' hsh' hs1'
+  have hd : (1 : F) - h ≠ 0 := sub_ne_zero.mpr (Ne.symm hh1)
+  have hd' : (1 : F) - h' ≠ 0 := sub_ne_zero.mpr (Ne.symm hh1')
+  refine ⟨_, hmem, _, hmem', ?_, by rw [hval, hval']⟩
+  intro hcontra
+  refine hne ?_
+  field_simp at hcontra
+  linear_combination hcontra
+
+end FixedSubgroup
 
 end PowDiff
 
