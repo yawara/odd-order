@@ -195,9 +195,45 @@ ed.textContent.length;   // 検証用
 
 ⚠ `Chat` 側の既定は `非常に高い` で、`Work` 側の既定は `軽` と**別々に持たれている**。
 
-### 投入・送信は従来どおり
+### 投入・送信は従来どおり (以下は Work サーフェスの話; Chat 側は 2026-08-12 節を見よ)
 
 `#prompt-textarea` への `document.execCommand('insertText', …)` (§「長文投入」) がそのまま効く。
 2026-08-10 実測: 10,728 字を 1 発で投入 (`editorLen` 10,826 = ProseMirror の段落区切り分だけ増える)。
 送信ボタンは composer 右下の丸い上矢印で、**paste 後に screenshot を取り直して座標を読む**
 (落とし穴 5 は健在)。送信検証 JS (`msgCount`/`composerEmpty`/`isGenerating`) も同じものが使える。
+
+---
+
+## 2026-08-12 更新 (Chat サーフェスの現行 UI + 実測手順)
+
+ユーザー指示で **`Work` が使えず `Chat` サーフェス**に投入したときの実測 (BG App.C Problem 1 の
+(B1)+(B2) を投入、14,513 字)。
+
+### モデル / 推論レベルの確認 (Chat 側)
+
+1. `https://chatgpt.com/` を開くと上部に `Chat` | `Work` トグル。**既定で `Chat` が選択済**。
+2. **composer をクリックしないとバッジが出ない** (初期状態は入力欄と送信ボタンだけ)。
+   クリックすると composer 右に **`Pro ⌄`** バッジ + マイク + 送信ボタンが現れる。
+3. `Pro ⌄` をクリック → スライダー + `詳細設定 ›` のポップオーバー
+4. `詳細設定` → **`モデル: GPT-5.6 Sol`** / **`推論レベル: Pro`** の 2 行。
+   ⟹ **Chat 側の既定はこれ (= 最強)。触らなくてよい**が、投入前に目視確認する。
+   ⚠ 2026-08-10 に記録した `Work` 側の階梯 (軽 / … / ウルトラ) とは**別の軸**。
+   Chat 側は `Pro` が最上位で、ウルトラ等は出てこない。
+5. 確認したら `Escape` でポップオーバーを閉じてから composer をクリックし直す。
+
+### 送信ボタンの座標は 2 回取り直す
+
+落とし穴 5 の強化版。長文 paste 後に screenshot を取り直しても、**その後に window サイズが
+変わる**ことがある (実測: 1456x840 → 1502x818。おそらく拡張側の描画都合)。1 回目のクリックが
+空振り (`msgCount` 0 / `composerEmpty` false) だったら、**必ず screenshot を取り直して
+新しい座標でクリックする** — 実測では `[1139, 428]` が空振りし、取り直した `[1175, 603]` で
+送信できた。paste 済みテキストは空振りクリックでは壊れない (末尾まで無事だった)。
+
+### 手順まとめ (Chat 版・実証済)
+
+`tabs_context_mcp{createIfEmpty:true}` (既存 group が無ければ空 tab が 1 枚できる) →
+`navigate{url:"https://chatgpt.com/"}` → composer をクリック → `Pro ⌄` → `詳細設定` で
+`GPT-5.6 Sol` / `Pro` を確認 → `Escape` → composer をクリック →
+`document.execCommand('insertText', …)` で全文投入 (`targetLen`/`editorLen`/`head`/`tail` を検証;
+14,513 字 → editorLen 14,741 が正常) → screenshot → 送信ボタン click → 送信検証 JS →
+空振りなら screenshot 取り直して再 click → `Pro が思考中です` を確認。
