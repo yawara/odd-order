@@ -222,6 +222,21 @@ escape の生存には「合成 base が全部 `ker Tr` (唯一の Frobenius 安
 はるかに手がかりが多い (`τ` の明示式・加群の既約性・`E³ = 1`)。⚠ (B1) 自体
 (衝突の存在) は依然 open — (B2) が消えると残る仮定は純粋に「衝突が 1 個ある」だけになる。
 
-- K3 の Lean 入口 (`ConjPair` 族の第 1 成分が `F` を張る ⟹ False) は未形式化 —
-  `false_of_collisionSet_spanning` の類似で `false_of_normalizes_layerOne` に落とす。次の Lean 作業。
-- q = 13 の escape 11,050 件への同実験 = 実行中 (結果は追記)。
+- ~~K3 の Lean 入口は未形式化~~ → **完了** (`false_of_conjPair_spanning`、v = 1 評価で
+  `x` が第 2 層の生成系を層内に写す ⟹ 有限性 ⟹ `false_of_s_normalizes_layerOne`)。
+  K1 入口 = `false_of_conjPair_self`、K2 入口 = `ConjPair.right_eq_zero` — **3 条件とも Lean 済**。
+
+### q = 13: escape 11,050 件も全滅 (2026-08-13)
+
+同エンジンで **11,050 / 11,050 killed、生存者ゼロ・anomaly ゼロ** (8,528 合成、全 kill を
+明示 witness — K1/K2 は kernel 組合せベクトル、K3 は単位ベクトル所属 — で独立再検証)。
+kill round: r0 = 1625+1196 (`V₀` 単独で K1/K2 = **N3 型、既 Lean 化の `frobCombo` の射程**)、
+r1 = 4082+4069 (自己合成 1 回)、r2 = 26+52 (dim₀ = dom₀ = 9 の特殊軌道、決定的)。
+Frobenius 同変性の実証: 全 850 軌道で 13 メンバーの結果が完全一致。
+
+q = 7 との違い: q = 13 では `dim V₀ ∈ {9, 12}` (q = 7 は一様に 6) で、`V₀` 単独で死ぬ
+衝突が 2,821 件ある (`x¹³−1` の因子構造が豊富なため)。r2 の 78 件はすべて
+`dim₀ = dom₀ = 9` 軌道で、うち 1 軌道は dim 12 のまま**真の K1** (dim-13 機構でない) で死んだ。
+
+⟹ **両方の q で全 101,592 衝突が例外なく有効な証明書** — 合成閉包 + 線形代数は
+(この 2 つの q では) 完全な証明書生成器である。

@@ -165,6 +165,27 @@ theorem left_eq_zero {s : GaloisField p q} (h : ConjPair data e s 0) : s = 0 := 
 theorem right_ne_zero {s s' : GaloisField p q} (h : ConjPair data e s s') (hs : s ≠ 0) :
     s' ≠ 0 := fun h0 => hs (left_eq_zero (h0 ▸ h))
 
+/-- **The graph property, other direction.**  A pair with vanishing first component has vanishing
+second component: `a(v) · 1 · a(v)⁻¹ = 1`.  A violation — the kill condition "K2" of the closure
+computation — therefore refutes hypothesis (B) outright. -/
+theorem right_eq_zero {s' : GaloisField p q} (h : ConjPair data e 0 s') : s' = 0 := by
+  have h1 := h 1 ⟨1, (mul_one 1).symm⟩ one_ne_zero
+  have h0 : layerFieldHom data 1 (Multiplicative.ofAdd ((0 : GaloisField p q) * 1 ^ e)) = 1 := by
+    have harg : Multiplicative.ofAdd ((0 : GaloisField p q) * 1 ^ e) = 1 := by
+      rw [zero_mul]
+      exact ofAdd_zero
+    rw [harg]
+    exact map_one _
+  rw [h0, mul_one, mul_inv_cancel] at h1
+  have h0' : layerFieldHom data 1 (Multiplicative.ofAdd (0 : GaloisField p q)) = 1 := by
+    rw [ofAdd_zero]
+    exact map_one _
+  have harg := layerFieldHom_injective data 1 (h0'.trans h1)
+  have hval : (0 : GaloisField p q) = s' * 1 ^ e := by
+    have := congrArg Multiplicative.toAdd harg
+    simpa using this
+  simpa using hval.symm
+
 end ConjPair
 
 /-- **Relation (3′): a collision is a conjugation pair.**  The normalisation `v := δ z^e` of
