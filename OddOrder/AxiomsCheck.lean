@@ -21048,6 +21048,12 @@ one Frobenius-stable hyperplane, and the input that rules the others out is the 
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.eq_zero_or_one_or_neg_one_of_pow_char
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.eq_one_of_conj_eq_inv
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.mem_collisionSet_iff_exists_pair
+/-! **The square-difference requirement of `CollisionPair` is free.**  `q` is odd, so `-1` is a
+non-square in `𝔽_{3^q}`; hence of the two orderings of a collision exactly one has square
+difference `δ`, and swapping the two Paley points always yields a `CollisionPair`
+(`exists_collisionPair_of_sub_ne_zero`).  So hypothesis (B1) is just "a collision exists", and the
+observed "only half the collisions are usable" was an artefact of a fixed ordering convention. -/
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.exists_collisionPair_of_sub_ne_zero
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.CollisionPair.frobenius
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.CollisionPair.frobenius_iterate
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conj_layerFieldHom_one_eq

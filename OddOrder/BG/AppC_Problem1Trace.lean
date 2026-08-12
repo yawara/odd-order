@@ -180,6 +180,61 @@ theorem mem_collisionSet_iff_exists_pair {e : ℕ} (S : GaloisField p q) :
   · rintro ⟨S', p₀, p₁, r₀, r₁, d₀, hpp, hrr, hcoll, hd, hS, -⟩
     exact ⟨p₀, p₁, r₀, r₁, d₀, hpp, hrr, hcoll, hd, hS⟩
 
+/-- **The square-difference requirement in `CollisionPair` costs nothing.**
+
+`CollisionPair` asks for the difference `δ = r₀^e - p₀^e` of an *ordered* pair to be norm-one,
+i.e. (for `p = 3`) a square.  Since `q` is odd, `-1` is a non-square in `𝔽_{3^q}`, so `δ` and `-δ`
+are never both squares and never both non-squares: **exactly one of the two orderings of a
+collision has square difference**.  Swapping the two Paley points therefore always produces a
+`CollisionPair`, and the only genuine hypothesis left is that the collision be nondegenerate,
+`δ ≠ 0` — which for a collision of distinct Paley points is automatic.
+
+Consequences.  (i) Hypothesis (B1) of `notes/bg/appC_problem1_partial_resolution.md` — "some
+collision with square difference exists" — collapses to the plain statement "some collision
+exists".  (ii) The measured "only about half of the collisions are usable" (the enumeration for
+`q = 7, 13`) is an artefact of a fixed ordering convention, not a real filter: *every* collision
+is usable, so a certificate search may keep both orderings and doubles its hit rate. -/
+theorem exists_collisionPair_of_sub_ne_zero (hp : p = 3) (hq : q ≠ 0) (hqodd : Odd q) {e : ℕ}
+    (p₀ p₁ r₀ r₁ : NormSet.normOneUnits p q)
+    (hpp : normOneVal p₀ = normOneVal p₁ + 1) (hrr : normOneVal r₀ = normOneVal r₁ + 1)
+    (hcoll : normOneVal p₀ ^ e - normOneVal p₁ ^ e = normOneVal r₀ ^ e - normOneVal r₁ ^ e)
+    (hd : normOneVal r₀ ^ e - normOneVal p₀ ^ e ≠ 0) :
+    ∃ S S', CollisionPair p q e S S' := by
+  subst hp
+  letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
+  haveI : CharP (GaloisField 3 q) 3 := by
+    rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
+    exact ZMod.charP 3
+  have hcard : Fintype.card (GaloisField 3 q) = 3 ^ q := by
+    rw [← Nat.card_eq_fintype_card]
+    exact GaloisField.card 3 q hq
+  have hchar2 : ringChar (GaloisField 3 q) ≠ 2 := by
+    rw [ringChar.eq (GaloisField 3 q) 3]
+    norm_num
+  have h4 : Fintype.card (GaloisField 3 q) % 4 = 3 := by
+    rw [hcard]
+    have hq2 : q % 2 = 1 := Nat.odd_iff.mp hqodd
+    have hk : q = 2 * (q / 2) + 1 := by omega
+    rw [hk, pow_succ, pow_mul, Nat.mul_mod, Nat.pow_mod]
+    norm_num
+  rcases Paley.isSquare_or_isSquare_neg hchar2 h4 hd with hsq | hnsq
+  · -- the given ordering already has square difference
+    refine ⟨_, _, p₀, p₁, r₀, r₁,
+      ⟨Units.mk0 _ hd, (mem_normOneUnits_iff_isSquare rfl hq _).mpr hsq⟩,
+      hpp, hrr, hcoll, rfl, rfl, rfl⟩
+  · -- swap the two Paley points; the difference changes sign, hence square class
+    have hd' : normOneVal p₀ ^ e - normOneVal r₀ ^ e ≠ 0 := by
+      intro h
+      exact hd (by linear_combination -h)
+    have hsq' : IsSquare (normOneVal p₀ ^ e - normOneVal r₀ ^ e) := by
+      have hrw : normOneVal p₀ ^ e - normOneVal r₀ ^ e
+          = -(normOneVal r₀ ^ e - normOneVal p₀ ^ e) := by ring
+      rw [hrw]
+      exact hnsq
+    refine ⟨_, _, r₀, r₁, p₀, p₁,
+      ⟨Units.mk0 _ hd', (mem_normOneUnits_iff_isSquare rfl hq _).mpr hsq'⟩,
+      hrr, hpp, hcoll.symm, rfl, rfl, rfl⟩
+
 /-- **The collision data is Frobenius-equivariant.**  In characteristic `p` the map `a ↦ a^p` is a
 ring endomorphism fixing `1`, so it carries a Paley pair to a Paley pair, a collision to a
 collision and the difference `δ` to `δ^p`; the two normalised values are raised to the `p`-th
