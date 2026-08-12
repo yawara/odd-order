@@ -20983,6 +20983,16 @@ any search — is the special case `1 - t ∈ Fix`
 #assert_only_allowed_axioms OddOrder.Paley.mem_paleySet_powDiff_of_pow_eq
 #assert_only_allowed_axioms OddOrder.Paley.exists_paley_collision_of_pow_eq
 #assert_only_allowed_axioms OddOrder.Paley.exists_paley_collision_of_pow_eq_of_sub
+/-! **Counting the parameters (Theorem A).**  The parameters come in inversion pairs `{t, t⁻¹}` of
+which exactly one is usable, because `1 - t⁻¹ = -(1 - t) t⁻¹` differs from `1 - t` by the
+non-square `-1` (`isSquare_one_sub_inv_iff`).  Hence exactly `(|L| - 1)/2` of the fixed nonzero
+squares give a Paley point, and once those outnumber the collision values they produce, two of them
+share a scaling factor (`exists_sameCoset_pair_of_card_lt`) — which is precisely the input of
+`BG.AppC.Problem1.false_of_sameCoset_pair`. -/
+#assert_only_allowed_axioms OddOrder.Paley.pow_eq_mul_of_pow_eq
+#assert_only_allowed_axioms OddOrder.Paley.isSquare_neg_one_of_isSquare_neg
+#assert_only_allowed_axioms OddOrder.Paley.isSquare_one_sub_inv_iff
+#assert_only_allowed_axioms OddOrder.Paley.exists_sameCoset_pair_of_card_lt
 
 /-! **Inversion-closed additive subgroups of a field** (`Algebra/InverseClosedSubgroup`).  Hua's
 identity `x - (x⁻¹ + (y - x)⁻¹)⁻¹ = x² / y` writes `x²/y` with additions and inversions only, so

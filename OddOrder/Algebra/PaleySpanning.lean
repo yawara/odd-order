@@ -60,6 +60,9 @@ the problem: that graph is symmetric, hence never Sidon.
   usable collision for one gives one for the other.
 * `exists_paley_collision_of_pow_eq` — the search-free certificate: two nonzero squares `t`, `t'`
   fixed by `z ↦ z ^ E` whose values `(1 - t) / (1 - t)^E` agree produce a collision outright.
+* `isSquare_one_sub_inv_iff` — the inversion pairing: of `t` and `t⁻¹` exactly one is usable.
+* `exists_sameCoset_pair_of_card_lt` — **Theorem A, pigeonhole form**: more parameters than values
+  gives two Paley points in one coset.
 -/
 
 namespace OddOrder.Paley
@@ -565,11 +568,24 @@ theorem powDiff_eq_of_pow_eq_mul {a c : F} (ha : a ^ E = c * a) (ha1 : (a + 1) ^
 
 No hypothesis is placed on `1 - t` beyond being a square: `t ∈ Fix` alone already puts `a` and
 `a + 1` into a common coset of `Fix`. -/
+theorem pow_eq_mul_of_pow_eq {t : F} (ht1 : t ≠ 1) (hft : t ^ E = t) :
+    (t / (1 - t)) ^ E = ((1 - t) / (1 - t) ^ E) * (t / (1 - t)) ∧
+      (t / (1 - t) + 1) ^ E = ((1 - t) / (1 - t) ^ E) * (t / (1 - t) + 1) := by
+  have hd : (1 : F) - t ≠ 0 := sub_ne_zero.mpr (Ne.symm ht1)
+  have hdE : ((1 : F) - t) ^ E ≠ 0 := pow_ne_zero _ hd
+  have hsucc : t / (1 - t) + 1 = (1 - t)⁻¹ := by
+    field_simp
+    ring
+  refine ⟨?_, ?_⟩
+  · rw [div_pow, hft]
+    field_simp
+  · rw [hsucc, inv_pow]
+    field_simp
+
 theorem mem_paleySet_powDiff_of_pow_eq {t : F} (ht0 : t ≠ 0) (ht1 : t ≠ 1)
     (hft : t ^ E = t) (hst : IsSquare t) (hs1 : IsSquare (1 - t)) :
     t / (1 - t) ∈ paleySet F ∧ powDiff E (t / (1 - t)) = (1 - t) / (1 - t) ^ E := by
   have hd : (1 : F) - t ≠ 0 := sub_ne_zero.mpr (Ne.symm ht1)
-  have hdE : ((1 : F) - t) ^ E ≠ 0 := pow_ne_zero _ hd
   have hsucc : t / (1 - t) + 1 = (1 - t)⁻¹ := by
     field_simp
     ring
@@ -582,16 +598,9 @@ theorem mem_paleySet_powDiff_of_pow_eq {t : F} (ht0 : t ≠ 0) (ht1 : t ≠ 1)
     refine ⟨s * u, ?_⟩
     rw [div_eq_mul_inv, hu, hs]
     ring
-  refine ⟨⟨div_ne_zero ht0 hd, hasq, ?_, ?_⟩, ?_⟩
-  · rw [hsucc]
-    exact inv_ne_zero hd
-  · rw [hsucc]
-    exact hinvsq
-  · refine powDiff_eq_of_pow_eq_mul ?_ ?_
-    · rw [div_pow, hft]
-      field_simp
-    · rw [hsucc, inv_pow]
-      field_simp
+  obtain ⟨hsc, hsc1⟩ := pow_eq_mul_of_pow_eq ht1 hft
+  exact ⟨⟨div_ne_zero ht0 hd, hasq, by rw [hsucc]; exact inv_ne_zero hd,
+    by rw [hsucc]; exact hinvsq⟩, powDiff_eq_of_pow_eq_mul hsc hsc1⟩
 
 /-- **Two fixed squares with the same collision value give a Paley collision**, hence hypothesis
 (B1) for this exponent.  The Möbius map `t ↦ t / (1 - t)` is injective, so distinct `t` give
@@ -624,6 +633,85 @@ theorem exists_paley_collision_of_pow_eq_of_sub {t t' : F} (ht0 : t ≠ 0) (ht1 
   have hd' : (1 : F) - t' ≠ 0 := sub_ne_zero.mpr (Ne.symm ht1')
   refine exists_paley_collision_of_pow_eq ht0 ht1 hft hst hs1 ht0' ht1' hft' hst' hs1' ?_ hne
   rw [hf1, hf1', div_self hd, div_self hd']
+
+/-! ### Counting the fixed-point parameters
+
+The parameters `t` come in inversion pairs `{t, t⁻¹}`, and the two members are never both usable:
+`1 - t⁻¹ = -(1 - t) · t⁻¹` differs from `1 - t` by the non-square `-1`.  So exactly *half* of the
+fixed nonzero squares `t ≠ 1` give a Paley point, which is the counting input of the gcd criterion
+of `notes/bg/appC_problem1_chatgpt_answer_b1.md` (Theorem A there). -/
+
+/-- If `x` and `-x` are both squares then so is `-1`. -/
+theorem isSquare_neg_one_of_isSquare_neg {x : F} (hx : x ≠ 0) (h1 : IsSquare x)
+    (h2 : IsSquare (-x)) : IsSquare (-1 : F) := by
+  obtain ⟨s, hs⟩ := h1
+  obtain ⟨u, hu⟩ := h2
+  have hs0 : s ≠ 0 := by
+    rintro rfl
+    exact hx (by simpa using hs)
+  refine ⟨u * s⁻¹, ?_⟩
+  have hstep : (u * s⁻¹) * (u * s⁻¹) = (u * u) * (s * s)⁻¹ := by
+    rw [mul_inv]
+    ring
+  rw [hstep, ← hu, ← hs, neg_mul, mul_inv_cancel₀ hx]
+
+/-- **The inversion pairing.**  For a nonzero square `t ≠ 1`, exactly one of `t` and `t⁻¹` is a
+usable parameter: `1 - t⁻¹` is a square precisely when `1 - t` is not. -/
+theorem isSquare_one_sub_inv_iff [Fintype F] (h2 : ringChar F ≠ 2)
+    (h4 : Fintype.card F % 4 = 3) {t : F} (ht0 : t ≠ 0) (ht1 : t ≠ 1) (hst : IsSquare t) :
+    IsSquare (1 - t⁻¹) ↔ ¬ IsSquare (1 - t) := by
+  have hd : (1 : F) - t ≠ 0 := sub_ne_zero.mpr (Ne.symm ht1)
+  have hinvsq : IsSquare t⁻¹ := by
+    obtain ⟨s, hs⟩ := hst
+    exact ⟨s⁻¹, by rw [hs, mul_inv]⟩
+  have hrw : (1 : F) - t⁻¹ = -((1 - t) * t⁻¹) := by
+    field_simp
+    ring
+  constructor
+  · rintro hsq hcon
+    refine not_isSquare_neg_one h2 h4 ?_
+    refine isSquare_neg_one_of_isSquare_neg (x := (1 - t) * t⁻¹)
+      (mul_ne_zero hd (inv_ne_zero ht0)) ?_ ?_
+    · obtain ⟨s, hs⟩ := hcon
+      obtain ⟨u, hu⟩ := hinvsq
+      exact ⟨s * u, by rw [hs, hu]; ring⟩
+    · rwa [← hrw]
+  · intro hcon
+    have hnegsq : IsSquare (-(1 - t)) := (isSquare_or_isSquare_neg h2 h4 hd).resolve_left hcon
+    obtain ⟨s, hs⟩ := hnegsq
+    obtain ⟨u, hu⟩ := hinvsq
+    refine ⟨s * u, ?_⟩
+    rw [hrw, ← neg_mul, hs, hu]
+    ring
+
+/-- **Theorem A, pigeonhole form.**  If the usable fixed-point parameters outnumber the collision
+values they produce, then two of them give *distinct* Paley points sharing one scaling factor —
+that is, two Paley points in a single coset of the fixed subgroup.
+
+This is exactly the input of `OddOrder.BG.AppC.Problem1.false_of_sameCoset_pair`. -/
+theorem exists_sameCoset_pair_of_card_lt (P V : Finset F)
+    (hP : ∀ t ∈ P, t ≠ 0 ∧ t ≠ 1 ∧ t ^ E = t ∧ IsSquare t ∧ IsSquare (1 - t))
+    (hV : ∀ t ∈ P, (1 - t) / (1 - t) ^ E ∈ V) (hcard : V.card < P.card) :
+    ∃ a b lam : F, a ∈ paleySet F ∧ b ∈ paleySet F ∧ a ≠ b ∧
+      a ^ E = lam * a ∧ (a + 1) ^ E = lam * (a + 1) ∧
+      b ^ E = lam * b ∧ (b + 1) ^ E = lam * (b + 1) := by
+  obtain ⟨t, htP, t', ht'P, hne, hval⟩ :=
+    Finset.exists_ne_map_eq_of_card_lt_of_maps_to hcard hV
+  obtain ⟨ht0, ht1, hft, hst, hs1⟩ := hP t htP
+  obtain ⟨ht0', ht1', hft', hst', hs1'⟩ := hP t' ht'P
+  have hd : (1 : F) - t ≠ 0 := sub_ne_zero.mpr (Ne.symm ht1)
+  have hd' : (1 : F) - t' ≠ 0 := sub_ne_zero.mpr (Ne.symm ht1')
+  obtain ⟨hmem, -⟩ := mem_paleySet_powDiff_of_pow_eq ht0 ht1 hft hst hs1
+  obtain ⟨hmem', -⟩ := mem_paleySet_powDiff_of_pow_eq ht0' ht1' hft' hst' hs1'
+  obtain ⟨hsc, hsc1⟩ := pow_eq_mul_of_pow_eq ht1 hft
+  obtain ⟨hsc', hsc1'⟩ := pow_eq_mul_of_pow_eq ht1' hft'
+  rw [← hval] at hsc' hsc1'
+  refine ⟨t / (1 - t), t' / (1 - t'), (1 - t) / (1 - t) ^ E, hmem, hmem', ?_,
+    hsc, hsc1, hsc', hsc1'⟩
+  intro hcontra
+  refine hne ?_
+  field_simp at hcontra
+  linear_combination hcontra
 
 end FixedSubgroup
 

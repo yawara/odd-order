@@ -313,7 +313,30 @@ theorem false_of_sameCoset_pair (data) (hp : p = 3) (hqprime : q.Prime) (hqodd :
 ⟹ **パイプライン完成**: 探索が出す `(a, b, lam)` → Lean 定理 → hypothesis (B) の否定。
 `Paley.exists_paley_collision_of_pow_eq` (探索不要の構成) の出力もこの形。
 
+### ✅ 第 6 段: Theorem A の中核 (`PaleySpanning.lean`、axiom-clean)
+
+| 数学 | Lean |
+|---|---|
+| パラメータのスケーリング係数 | `pow_eq_mul_of_pow_eq` |
+| `x` と `−x` が両方平方なら `−1` も平方 | `isSquare_neg_one_of_isSquare_neg` |
+| **反転ペアリング**: `t` と `t⁻¹` のちょうど一方が使える | `isSquare_one_sub_inv_iff` |
+| **Theorem A (鳩の巣形)**: パラメータ数 > 値の個数 ⟹ 同一剰余類の 2 点 | `exists_sameCoset_pair_of_card_lt` |
+
+反転ペアリングの内容: `1 − t⁻¹ = −(1−t)·t⁻¹` で、`t` が平方だから `1−t` と `1−t⁻¹` は
+**非平方 `−1` の分だけ平方類が違う** ⟹ ちょうど一方が使える。⟹ 固定された非零平方
+`t ≠ 1` のうち**ちょうど半分** `(|L|−1)/2` が Paley 点を与える (回答の数え上げの核)。
+
+`exists_sameCoset_pair_of_card_lt` の出力は `false_of_sameCoset_pair` の仮説そのままの形
+(`a, b, lam` と 4 本のスケーリング等式) なので、**両者を繋げば hypothesis (B) の否定が出る**。
+
+**数値検証**: 素体 (`p < 900`) の exotic 指数 30 個について、反転ペアリングを 6,840 例で確認し
+(失敗 0)、`#{t ∈ L : t ≠ 1, 1−t 平方} = (|L|−1)/2` も全 30 指数で確認した。
+
 ### 残り
 
-* Theorem A (gcd 判定 = 鳩の巣) の Lean 化 — `a ≥ 2c+1` ⟹ 同一剰余類の衝突が存在
-* `q = 47` の残り 4 指数を誕生日探索で決着 (Theorem B があるのでトレース不要)
+* 濃度の 2 本 (どちらも群論的な数え上げ):
+  `|P| = (|L|−1)/2` (上の反転ペアリングから) と `|V| ≤ [U:L]` (`z ↦ z^{E−1}` の像の大きさ)。
+  これが入ると `a ≥ 2c+1` という gcd 判定そのものになる。
+* ⚠ ChatGPT の `q` 表 (53, 79, 109, …) は eligible ブロック列挙の完全性が未検証
+  (`q = 101` のみ検証済) — 「決着」と書く前にこれが要る。
+* ~~`q = 47` の個別探索~~ → **取り下げ** (証明に寄与しない; notes の打ち切り方針どおり)。
