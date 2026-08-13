@@ -1103,6 +1103,135 @@ theorem false_of_masterFormula_cubic (hp : p = 3) (hq0 : q ≠ 0) (hqodd : Odd q
   · exact key b₀ b₁ c₀ c₁ hbb hcc hab hac hbc (iff_of_false hB hC)
   · exact key b₀ b₁ c₀ c₁ hbb hcc hab hac hbc (iff_of_false hB hC)
 
+/-! ### The capstone: no witness for `q ≠ 3` -/
+
+/-- **The case tree, assembled: hypothesis (B) has no witness for `q ≠ 3`.**  Despite the
+historical name, no exoticity of the exponent is assumed — the tree kills *every* exponent
+(`e` odd with `e³ = 1` on the field, as every witness provides): a collision dies by Part I;
+otherwise the conspiracy collapses to the master formula, and its four parameter branches
+(`Δ = 0`, `Σ̄ = 0`, `μ ≠ 0`, `λ ∈ 𝔽₃`) all die.  The four distinct Paley points needed by the
+branches exist because `|T| ≥ (3^q - 3)/4 ≥ 60` for `q ≥ 5`. -/
+theorem false_of_exotic (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hqprime : q.Prime) (hq3 : q ≠ 3) (hqodd : Odd q) {e : ℕ} (he : Odd e)
+    (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data) : False := by
+  subst hp
+  classical
+  have hq0 : q ≠ 0 := hqprime.ne_zero
+  have hneg1 := not_isSquare_neg_one_galois rfl hq0 hqodd
+  -- four distinct Paley elements
+  letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
+  haveI : CharP (GaloisField 3 q) 3 := by
+    rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
+    exact ZMod.charP 3
+  have h30 : (3 : GaloisField 3 q) = 0 := by
+    exact_mod_cast CharP.cast_eq_zero (GaloisField 3 q) 3
+  set T : Finset (GaloisField 3 q) := {a ∈ Finset.univ | a ∈ Paley.paleySet (GaloisField 3 q)}
+    with hTdef
+  have hT : ∀ a, a ∈ T ↔ a ∈ Paley.paleySet (GaloisField 3 q) := by
+    intro a
+    simp [hTdef]
+  have hlow := Paley.card_paleySet_lower h30 hneg1 T hT
+  have hcard : Fintype.card (GaloisField 3 q) = 3 ^ q := by
+    rw [← Nat.card_eq_fintype_card]
+    exact GaloisField.card 3 q hq0
+  have hq5 : 5 ≤ q := by
+    have h2 := hqprime.two_le
+    have hodd := Nat.odd_iff.mp hqodd
+    omega
+  have hcard5 : 3 ^ 5 ≤ 3 ^ q := Nat.pow_le_pow_right (by norm_num) hq5
+  have hT4 : 4 ≤ T.card := by
+    rw [hcard] at hlow
+    omega
+  obtain ⟨t₁, ht₁⟩ := Finset.card_pos.mp (by omega : 0 < T.card)
+  obtain ⟨t₂, ht₂⟩ := Finset.card_pos.mp
+    (by rw [Finset.card_erase_of_mem ht₁]; omega : 0 < (T.erase t₁).card)
+  obtain ⟨t₃, ht₃⟩ := Finset.card_pos.mp
+    (by rw [Finset.card_erase_of_mem ht₂, Finset.card_erase_of_mem ht₁]; omega :
+      0 < ((T.erase t₁).erase t₂).card)
+  obtain ⟨t₄, ht₄⟩ := Finset.card_pos.mp
+    (by rw [Finset.card_erase_of_mem ht₃, Finset.card_erase_of_mem ht₂,
+        Finset.card_erase_of_mem ht₁]; omega :
+      0 < (((T.erase t₁).erase t₂).erase t₃).card)
+  have h12 : t₂ ≠ t₁ := Finset.ne_of_mem_erase ht₂
+  have h23 : t₃ ≠ t₂ := Finset.ne_of_mem_erase ht₃
+  have h13 : t₃ ≠ t₁ := Finset.ne_of_mem_erase (Finset.mem_of_mem_erase ht₃)
+  have h34 : t₄ ≠ t₃ := Finset.ne_of_mem_erase ht₄
+  have h24 : t₄ ≠ t₂ := Finset.ne_of_mem_erase (Finset.mem_of_mem_erase ht₄)
+  have h14 : t₄ ≠ t₁ :=
+    Finset.ne_of_mem_erase (Finset.mem_of_mem_erase (Finset.mem_of_mem_erase ht₄))
+  obtain ⟨hp₁0, hp₁sq, hp₁10, hp₁1sq⟩ := (hT t₁).mp ht₁
+  obtain ⟨hp₂0, hp₂sq, hp₂10, hp₂1sq⟩ := (hT t₂).mp (Finset.mem_of_mem_erase ht₂)
+  obtain ⟨hp₃0, hp₃sq, hp₃10, hp₃1sq⟩ :=
+    (hT t₃).mp (Finset.mem_of_mem_erase (Finset.mem_of_mem_erase ht₃))
+  obtain ⟨hp₄0, hp₄sq, hp₄10, hp₄1sq⟩ := (hT t₄).mp
+    (Finset.mem_of_mem_erase (Finset.mem_of_mem_erase (Finset.mem_of_mem_erase ht₄)))
+  -- lift to Paley pairs of norm-one units
+  let mk : ∀ (t : GaloisField 3 q), t ≠ 0 → IsSquare t → NormSet.normOneUnits 3 q :=
+    fun t ht0 htsq => ⟨Units.mk0 t ht0,
+      (mem_normOneUnits_iff_isSquare rfl hq0 _).mpr (by simpa using htsq)⟩
+  have hxx₁ : normOneVal (mk (t₁ + 1) hp₁10 hp₁1sq) = normOneVal (mk t₁ hp₁0 hp₁sq) + 1 := rfl
+  have hxx₂ : normOneVal (mk (t₂ + 1) hp₂10 hp₂1sq) = normOneVal (mk t₂ hp₂0 hp₂sq) + 1 := rfl
+  have hxx₃ : normOneVal (mk (t₃ + 1) hp₃10 hp₃1sq) = normOneVal (mk t₃ hp₃0 hp₃sq) + 1 := rfl
+  have hxx₄ : normOneVal (mk (t₄ + 1) hp₄10 hp₄1sq) = normOneVal (mk t₄ hp₄0 hp₄sq) + 1 := rfl
+  have hne₁₂ : normOneVal (mk (t₁ + 1) hp₁10 hp₁1sq)
+      ≠ normOneVal (mk (t₂ + 1) hp₂10 hp₂1sq) :=
+    fun h => h12.symm (by
+      have h' : (t₁ + 1 : GaloisField 3 q) = t₂ + 1 := h
+      linear_combination h')
+  have hne₁₃ : normOneVal (mk (t₁ + 1) hp₁10 hp₁1sq)
+      ≠ normOneVal (mk (t₃ + 1) hp₃10 hp₃1sq) :=
+    fun h => h13.symm (by
+      have h' : (t₁ + 1 : GaloisField 3 q) = t₃ + 1 := h
+      linear_combination h')
+  have hne₁₄ : normOneVal (mk (t₁ + 1) hp₁10 hp₁1sq)
+      ≠ normOneVal (mk (t₄ + 1) hp₄10 hp₄1sq) :=
+    fun h => h14.symm (by
+      have h' : (t₁ + 1 : GaloisField 3 q) = t₄ + 1 := h
+      linear_combination h')
+  have hne₂₃ : normOneVal (mk (t₂ + 1) hp₂10 hp₂1sq)
+      ≠ normOneVal (mk (t₃ + 1) hp₃10 hp₃1sq) :=
+    fun h => h23.symm (by
+      have h' : (t₂ + 1 : GaloisField 3 q) = t₃ + 1 := h
+      linear_combination h')
+  have hne₂₄ : normOneVal (mk (t₂ + 1) hp₂10 hp₂1sq)
+      ≠ normOneVal (mk (t₄ + 1) hp₄10 hp₄1sq) :=
+    fun h => h24.symm (by
+      have h' : (t₂ + 1 : GaloisField 3 q) = t₄ + 1 := h
+      linear_combination h')
+  have hne₃₄ : normOneVal (mk (t₃ + 1) hp₃10 hp₃1sq)
+      ≠ normOneVal (mk (t₄ + 1) hp₄10 hp₄1sq) :=
+    fun h => h34.symm (by
+      have h' : (t₃ + 1 : GaloisField 3 q) = t₄ + 1 := h
+      linear_combination h')
+  -- a collision dies by Part I
+  by_cases hcoll : ∃ p₀ p₁ r₀ r₁ : NormSet.normOneUnits 3 q,
+      normOneVal p₀ = normOneVal p₁ + 1 ∧ normOneVal r₀ = normOneVal r₁ + 1 ∧
+      normOneVal p₀ ≠ normOneVal r₀ ∧
+      normOneVal r₀ ^ e - normOneVal p₀ ^ e = normOneVal r₁ ^ e - normOneVal p₁ ^ e
+  · obtain ⟨p₀, p₁, r₀, r₁, hpp, hrr, hne, heq⟩ := hcoll
+    obtain ⟨S, S', hpair⟩ := exists_collisionPair_of_sub_ne_zero rfl hq0 hqodd p₀ p₁ r₀ r₁
+      hpp hrr (by linear_combination -heq) (skewPair_edge_left_ne_zero hcube hne)
+    exact false_of_collisionPair data rfl hqprime hq3 hqodd he hcube hexp hpair
+  push Not at hcoll
+  -- no collision: the conspiracy collapses to the master formula
+  obtain ⟨lamP, lamM, hmaster⟩ := exists_masterFormula_of_no_collision data rfl hqprime hq3
+    hqodd he hcube hexp hxx₁ hxx₂ hxx₃ hne₁₂ hne₁₃ hne₂₃ hcoll
+  by_cases hDel : lamP = lamM
+  · rw [hDel] at hmaster
+    exact false_of_masterFormula_delta_zero rfl he hcube hxx₁ hxx₂ hxx₃
+      hne₁₂ hne₁₃ hne₂₃ hmaster
+  by_cases hSig : lamP + lamM = 0
+  · have hlamM : lamM = -lamP := by linear_combination hSig
+    rw [hlamM] at hmaster
+    exact false_of_masterFormula_sigma_zero data rfl hqprime hq3 hqodd he hcube hexp
+      hxx₁ hxx₂ hne₁₂ hmaster
+  by_cases hmu : lamP - lamP ^ (3 : ℕ) = 0 ∧ lamM - lamM ^ (3 : ℕ) = 0
+  · exact false_of_masterFormula_cubic rfl hq0 hqodd he hcube hxx₁ hxx₂ hxx₃ hxx₄
+      hne₁₂ hne₁₃ hne₁₄ hne₂₃ hne₂₄ hne₃₄ hmaster hmu.1 hmu.2 hDel hSig
+  · exact false_of_masterFormula_mu_ne_zero rfl hq0 hqodd he hcube hxx₁ hxx₂ hxx₃
+      hne₁₂ hne₁₃ hne₂₃ hcoll hmaster hSig hmu
+
 end SkewEndgame
 
 end OddOrder.BG.AppC.Problem1
