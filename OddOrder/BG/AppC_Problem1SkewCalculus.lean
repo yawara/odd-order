@@ -535,6 +535,70 @@ theorem weight_sum_eq_zero_of_antipodal_edge (data : FieldNormalizerData p q G) 
   by_contra hK
   exact false_of_antipodal_edge data hp hqprime hq3 hqodd he hcube hexp hpp hrr hne hopp hK
 
+/-! ### Leg supply: climbing from an arbitrary height
+
+A loop leg of the class of an edge `(p, r)` can enter at *any* non-zero height `h`: rescale
+the edge by `h/δ₀` when that is a square, and rescale the swap edge `(r, p)` by `-h/δ₀`
+otherwise (`-1` is a non-square, so exactly one case applies).  Either way the leg runs
+`h → h·(δ₁/δ₀)` — multiplication by the ratio — and its weights are sign-resolved.  These two
+lemmas make every loop of the endgame assemble mechanically. -/
+
+/-- **The forward leg.**  When `h/δ₀` is a square, the edge rescales onto entry height `h`,
+with weights `(K(p)(h/δ₀)ᵉ, K(r)(h/δ₀)ᵉ)`. -/
+theorem FrobFam.leg_fwd (data : FieldNormalizerData p q G) (hp : p = 3) (hq : q ≠ 0) {e : ℕ}
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {p₀ p₁ r₀ r₁ : NormSet.normOneUnits p q}
+    (hpp : normOneVal p₀ = normOneVal p₁ + 1) (hrr : normOneVal r₀ = normOneVal r₁ + 1)
+    (hA0 : normOneVal r₀ ^ e - normOneVal p₀ ^ e ≠ 0) {h : GaloisField p q} (hh0 : h ≠ 0)
+    (hs : IsSquare (h * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹)) :
+    FrobFam data e h
+      (h * ((normOneVal r₁ ^ e - normOneVal p₁ ^ e)
+        * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹))
+      ((normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e))
+        * (h * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹) ^ e)
+      ((normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e))
+        * (h * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹) ^ e) := by
+  have hs0 : h * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹ ≠ 0 :=
+    mul_ne_zero hh0 (inv_ne_zero hA0)
+  have hfam := (FrobFam.edge data hp hq hexp hpp hrr).rescale hs hs0
+  rw [show (normOneVal r₀ ^ e - normOneVal p₀ ^ e)
+        * (h * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹) = h by
+      field_simp,
+    show (normOneVal r₁ ^ e - normOneVal p₁ ^ e)
+        * (h * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹)
+      = h * ((normOneVal r₁ ^ e - normOneVal p₁ ^ e)
+        * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹) by ring] at hfam
+  exact hfam
+
+/-- **The swap leg.**  When `h/δ₀` is a non-square, the swap edge `(r, p)` rescales onto entry
+height `h` instead (by `-h/δ₀`, a square since `-1` is a non-square), running along the same
+ratio with weights `(K(r)(-h/δ₀)ᵉ, K(p)(-h/δ₀)ᵉ)`. -/
+theorem FrobFam.leg_swap (data : FieldNormalizerData p q G) (hp : p = 3) (hq : q ≠ 0) {e : ℕ}
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {p₀ p₁ r₀ r₁ : NormSet.normOneUnits p q}
+    (hpp : normOneVal p₀ = normOneVal p₁ + 1) (hrr : normOneVal r₀ = normOneVal r₁ + 1)
+    (hA0 : normOneVal r₀ ^ e - normOneVal p₀ ^ e ≠ 0) {h : GaloisField p q} (hh0 : h ≠ 0)
+    (hs : IsSquare (-(h * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹))) :
+    FrobFam data e h
+      (h * ((normOneVal r₁ ^ e - normOneVal p₁ ^ e)
+        * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹))
+      ((normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e))
+        * (-(h * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹)) ^ e)
+      ((normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e))
+        * (-(h * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹)) ^ e) := by
+  have hs0 : -(h * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹) ≠ 0 :=
+    neg_ne_zero.mpr (mul_ne_zero hh0 (inv_ne_zero hA0))
+  have hfam := (FrobFam.edge data hp hq hexp hrr hpp).rescale hs hs0
+  rw [show (normOneVal p₀ ^ e - normOneVal r₀ ^ e)
+        * -(h * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹) = h by
+      field_simp; ring,
+    show (normOneVal p₁ ^ e - normOneVal r₁ ^ e)
+        * -(h * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹)
+      = h * ((normOneVal r₁ ^ e - normOneVal p₁ ^ e)
+        * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹) by
+      field_simp; ring] at hfam
+  exact hfam
+
 /-! ### The four-leg loop: forward–forward–backward–backward
 
 The commutator loop of the endgame (`notes/bg/appC_problem1_resolution.md` §4.2) is a four-leg

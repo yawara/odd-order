@@ -21248,5 +21248,7 @@ family of closed loops with non-vanishing weight is fatal through the chain-reve
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.FrobFam.comp
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.FrobFam.rescale
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.FrobFam.false_of_self
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.FrobFam.leg_fwd
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.FrobFam.leg_swap
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_four_loop
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.weights_eq_zero_of_four_loop
