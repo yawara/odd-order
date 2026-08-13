@@ -2,7 +2,7 @@
 
 [English](README.md) | 日本語
 
-**Feit–Thompson の奇数位数定理** — *奇数位数の有限群はすべて可解である* — の **Lean 4 + mathlib** による完全形式化と、それを支える有限群論のライブラリ。
+**Feit–Thompson の奇数位数定理** — *奇数位数の有限群はすべて可解である* — の **Lean 4 + mathlib** による完全形式化と、それを支える有限群論のライブラリ。この定理の Lean での形式化はこれが初である。
 
 ```lean
 theorem feitThompson {G : Type*} [Group G] [Finite G] (hodd : Odd (Nat.card G)) :
@@ -19,6 +19,18 @@ theorem feitThompson {G : Type*} [Group G] [Finite G] (hodd : Odd (Nat.card G)) 
 ```
 
 `sorryAx` もプロジェクト固有の公理も無く、依存するのは Lean 標準の 3 公理のみ。
+
+**この定理の Lean での形式化はこれが初である**。既存の形式化は Gonthier らによる Coq での
+記念碑的証明 (2012) のみ。証明はこのリポジトリの外でも検証されている: Lean コミュニティの
+フォーマル数学ベンチマーク [lean-eval](https://lean-lang.org/eval/) は `feit_thompson` を課題として
+出題していた — 定理文は本プロジェクトとは無関係に、ベンチマーク側が mathlib の語彙だけで書いた
+もので、出題文には「Lean port は存在しない」と明記されていた。本プロジェクトの提出
+([lean-eval-submissions#828](https://github.com/leanprover/lean-eval-submissions/issues/828)、
+2026-07-16) が、その**最初の受理解答**である。受理とは、ベンチマークの comparator が自前の定理文と
+同じ 3 公理 allowlist の下で証明を再検査したことを意味する。検証された self-contained な提出物は
+[yawara/odd-order-submission](https://github.com/yawara/odd-order-submission) で公開されている。
+数日のうちに他者による解答が続いたが、その最初のものは Coq 証明のポートである — 本形式化は
+教科書から構築したものであり、ポートではない。
 
 プロジェクトは現在第 2 フェーズにある: 奇数位数定理が必要とする経路だけでなく、
 **3 冊の原典教科書を丸ごと形式化する**。
@@ -160,7 +172,9 @@ Lean toolchain は [`lean-toolchain`](lean-toolchain) に、mathlib のリビジ
 証明の正しさはそのレビューに依存しない: Lean カーネルがすべての証明を機械検証し、公理監査
 ([`OddOrder/AxiomsCheck.lean`](OddOrder/AxiomsCheck.lean)) が各結果の依存先を正確に特定する。読者の懐疑がなお正当なのは*ステートメント*について、すなわち
 Lean の宣言がそれが参照する教科書の定理を忠実に写しているかどうかである。docstring に書籍の
-定理番号を載せているのは、まさにこの対応を検証できるようにするためである。
+定理番号を載せているのは、まさにこの対応を検証できるようにするためである。主定理については
+この検査は外部でも行われている: lean-eval の comparator が、本リポジトリとは無関係に書かれた
+ベンチマーク側の定理文に対してこの証明を受理した (上記「[現状](#現状)」参照)。
 
 ## ライセンス
 

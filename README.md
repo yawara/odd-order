@@ -2,7 +2,7 @@
 
 English | [日本語](README.ja.md)
 
-A complete formalization of the **Feit–Thompson Odd Order Theorem** in **Lean 4 + mathlib** — *every finite group of odd order is solvable* — together with the finite group theory it is built on.
+A complete formalization of the **Feit–Thompson Odd Order Theorem** in **Lean 4 + mathlib** — *every finite group of odd order is solvable* — together with the finite group theory it is built on. It is the first formalization of the theorem in Lean.
 
 ```lean
 theorem feitThompson {G : Type*} [Group G] [Finite G] (hodd : Odd (Nat.card G)) :
@@ -19,6 +19,19 @@ theorem feitThompson {G : Type*} [Group G] [Finite G] (hodd : Odd (Nat.card G)) 
 ```
 
 No `sorryAx`, no project-specific axioms — only Lean's three standard ones.
+
+**This is the first formalization of the theorem in Lean**; the only previous formalization is the
+landmark Coq proof of Gonthier et al. (2012). The proof has also been verified outside this
+repository: [lean-eval](https://lean-lang.org/eval/), the Lean community's formal-mathematics
+benchmark, had posed `feit_thompson` as a challenge — stated independently of this project, in
+plain mathlib vocabulary, with the note "there is no Lean port" — and this project's submission
+([lean-eval-submissions#828](https://github.com/leanprover/lean-eval-submissions/issues/828),
+2026-07-16) was its first accepted solution. Acceptance means the benchmark's comparator
+re-checked the proof against the benchmark's own statement of the theorem, under the same
+three-axiom allowlist; the self-contained submission as verified is public at
+[yawara/odd-order-submission](https://github.com/yawara/odd-order-submission). Within days,
+further solutions by others followed, the first of them a port of the Coq proof — the
+formalization here was developed from the textbooks, not ported.
 
 The project is now in its second phase: **formalizing the three source textbooks in full**, not merely
 the path through them that the Odd Order Theorem needs.
@@ -167,6 +180,9 @@ review: the Lean kernel machine-checks every proof, and the axiom audit
 depends on. Where reader skepticism remains
 warranted is the *statements*: whether a Lean declaration faithfully renders the textbook theorem it
 cites. Docstrings carry the book numbering precisely so that this correspondence can be checked.
+For the headline theorem, that check has also been performed externally: lean-eval's comparator
+accepted this proof against the benchmark's own, independently written statement of the theorem
+(see [Status](#status)).
 
 ## License
 
