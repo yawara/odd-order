@@ -40,6 +40,14 @@ Proposition 9 の仮説 (記法は
 位置 (下記「(B1) の正体」)。trace 条件・span 条件・剛性・閉包実験は certificate として
 すべて不要になった (定理としては残る)。
 
+**🎯 (2026-08-13 深夜第 3 弾): skew calculus の endgame が閉じ、紙上では
+Problem 1 の否定的全面解決に到達** (正本 = skew_calculus note §6.2、部品は敵対的検証
+計 5 レンズ CONFIRMED、最終 assembly 監査は実施中)。witness 排除のケース木: 衝突あり ⟹
+(B2)-elim / 非退化 loop ⟹ family capstone / 共謀 ⟹ (EX) ⟹ master formula ⟹
+Δ=0・Σ̄=0・λ∉𝔽₃・𝔽₃ 残 4 候補がすべて初等的に矛盾 (使用仮説は χ(−1)=−1・e 奇・
+e³-cube・K≠0・|T|≥4・鳩の巣のみ — equidistribution 不要)。残り = assembly 最終監査 +
+完全証明文書 + Lean 化 (数 session 規模)。
+
 **さらに (2026-08-13 深夜第 2 弾): (B1) 自体を迂回する skew-pair calculus を発見**
 (正本 = [`notes/bg/appC_problem1_skew_calculus.md`](../notes/bg/appC_problem1_skew_calculus.md)、
 敵対的検証 3 レンズ全 CONFIRMED)。衝突なしで T² の任意の順序対が skew 辺
