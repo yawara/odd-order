@@ -60,10 +60,21 @@ Part II (skew calculus)・Part III (endgame) は紙上のみ。本 issue はそ�
       8 セクターを 1 statement (Bool b₂b₃b₄ + cond 平方類仮定)。証明は分岐なし
       (leg_resolved ×3 + 高さ整合 field_simp ×2 + 4-loop lemma)。逆成分 c₁ = −χ(δ₀)
       の (EX) は swap 対 (r,p) への適用で得る設計。
-- [ ] **(EX) ⟹ master formula (anchor 論法)**: resolution.md §4.3 の人口場合分け
-      (χ=+1 anchor / 全 −1 で 2 クラス以上 / 単集合 {ρ₀≠±1} は全射性、{−1} は
-      step 4 済)。λ± を anchor 対の K から定義し、各対の master 等式を
-      exchange_relation + κ-constancy (weights_proportional) で pin する。
+- [x] **master formula の定義 + case P (χ=+1 anchor)** (2026-08-13, commit 6d49e6838):
+      `sqSelect`/`MasterFormula` def + `pin_of_exchange` (係数明示 linear_combination で
+      決定論的に分母払い) + `exists_masterFormula_of_plus_anchor`。**紙の 2 段 pinning は
+      不要だった**: (EX)(X, anchor) は b₃ = true で任意の X に合法、(b₂,b₄) の 4 sub-case
+      が sqSelect 評価と 1:1 対応。λ± = ±K_anchor·(Δ₀^e − Δ₁^e)⁻¹。κ-constancy 転送も
+      人口仮説も不要 (anchor 1 本で全対 pin)。
+- [ ] **master case M (全比非平方)**: anchor 比 ρ₀ ∉ {±1} (無ければ全比 −1 =
+      step 4 kill)。b₃ = false で (EX) 両成分が (K_p, K_r) の 2×2 系
+      (det = 1 − ρ₀^{2e} ≠ 0)。pin2_of_exchange (両成分版の分母払い) を作り、
+      λ_{χΔ₀} = (K_aΔ₀^e − K_bΔ₁^e)/(Δ₀^{2e} − Δ₁^{2e})、
+      λ_{−χΔ₀} = (K_aΔ₁^e − K_bΔ₀^e)/(同) で master を検証。
+      det ≠ 0 は Δ₀ ≠ ±Δ₁ (no-collision + ρ₀ ≠ −1) + e-冪単射 + e 奇。
+- [ ] **人口 glue** (`exists_masterFormula_of_conspiracy` 相当): classical 場合分け —
+      ∃ 平方比対 → case P / ¬∃ かつ ∃ 比 ≠ −1 対 → case M / さもなくば全対比 −1 →
+      false_of_three_antipodal (3 点は |T| ≥ 4 から) → False.elim。
 - [ ] **(EX) ⟹ master formula** (anchor 論法; 退化人口: singleton {−1} は
       fwd-fwd 2-loop `e∘swap(e)` の別補題、singleton {ρ≠±1} は master 全射性)。
 - [ ] **枝撃破**: Δ=0 (3 点矛盾) / Σ̄=0 (K 定数 ⟹ e²-衝突 glue、下記) /
