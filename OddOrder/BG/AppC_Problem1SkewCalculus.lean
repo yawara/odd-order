@@ -351,6 +351,75 @@ private theorem normOneVal_sub_pow_frobenius (j k : ℕ) (x y : NormSet.normOneU
   rw [normOneVal_pow, normOneVal_pow, pow_right_comm (normOneVal x) (p ^ j) k,
     pow_right_comm (normOneVal y) (p ^ j) k, ← sub_pow_char_pow]
 
+/-- **A Frobenius-closed family of skew pairs**: every Frobenius twist of the data is a skew
+pair.  Edges are Frobenius-closed because the Paley set is, and reversal, composition and
+square rescaling preserve closedness (freshman's dream), so each concrete loop of the calculus
+is assembled once at family level; a closed family with non-vanishing weight is then fatal by
+`false_of_skewPair_self_frobenius_family`. -/
+def FrobFam (data : FieldNormalizerData p q G) (e : ℕ) (A B X Y : GaloisField p q) : Prop :=
+  ∀ j : ℕ, SkewPair data e (A ^ p ^ j) (B ^ p ^ j) (X ^ p ^ j) (Y ^ p ^ j)
+
+namespace FrobFam
+
+variable {data : FieldNormalizerData p q G} {e : ℕ}
+
+/-- **The skew edge is Frobenius-closed**: twisting the two Paley pairs twists the edge
+data componentwise. -/
+theorem edge (data : FieldNormalizerData p q G) (hp : p = 3) (hq : q ≠ 0) {e : ℕ}
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {p₀ p₁ r₀ r₁ : NormSet.normOneUnits p q}
+    (hpp : normOneVal p₀ = normOneVal p₁ + 1) (hrr : normOneVal r₀ = normOneVal r₁ + 1) :
+    FrobFam data e (normOneVal r₀ ^ e - normOneVal p₀ ^ e)
+      (normOneVal r₁ ^ e - normOneVal p₁ ^ e)
+      (normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e))
+      (normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e)) := by
+  intro j
+  have he := skewPair_edge data hp hq hexp _ _ _ _ (paley_frobenius_iterate hpp j)
+    (paley_frobenius_iterate hrr j)
+  rw [normOneVal_sub_pow_frobenius j e r₀ p₀, normOneVal_sub_pow_frobenius j e r₁ p₁,
+    normOneVal_sub_pow_frobenius j (e * e) p₁ p₀,
+    normOneVal_sub_pow_frobenius j (e * e) r₁ r₀] at he
+  exact he
+
+/-- Reversal preserves Frobenius-closedness (`pʲ` is odd). -/
+theorem rev (hp : p = 3) {A B X Y : GaloisField p q} (h : FrobFam data e A B X Y) :
+    FrobFam data e B A (-X) (-Y) := by
+  subst hp
+  intro j
+  have hodd : Odd (3 ^ j : ℕ) := (by decide : Odd (3 : ℕ)).pow
+  have hrev := (h j).rev
+  rwa [← hodd.neg_pow X, ← hodd.neg_pow Y] at hrev
+
+/-- Composition preserves Frobenius-closedness (freshman's dream on the weights). -/
+theorem comp {A B C X₁ Y₁ X₂ Y₂ : GaloisField p q} (h₁ : FrobFam data e A B X₁ Y₁)
+    (h₂ : FrobFam data e B C X₂ Y₂) : FrobFam data e A C (X₁ + X₂) (Y₁ + Y₂) := by
+  intro j
+  have hcomp := (h₁ j).comp (h₂ j)
+  rwa [← add_pow_char_pow, ← add_pow_char_pow] at hcomp
+
+/-- Rescaling by a non-zero square preserves Frobenius-closedness. -/
+theorem rescale {A B X Y : GaloisField p q} (h : FrobFam data e A B X Y)
+    {s : GaloisField p q} (hs : IsSquare s) (hs0 : s ≠ 0) :
+    FrobFam data e (A * s) (B * s) (X * s ^ e) (Y * s ^ e) := by
+  intro j
+  rw [mul_pow, mul_pow, show (X * s ^ e) ^ p ^ j = X ^ p ^ j * (s ^ p ^ j) ^ e by
+      rw [mul_pow, pow_right_comm s e (p ^ j)],
+    show (Y * s ^ e) ^ p ^ j = Y ^ p ^ j * (s ^ p ^ j) ^ e by
+      rw [mul_pow, pow_right_comm s e (p ^ j)]]
+  exact (h j).rescale (hs.pow _) (pow_ne_zero _ hs0)
+
+/-- **The family kill**: a closed Frobenius-closed family with non-vanishing weight refutes
+hypothesis (B). -/
+theorem false_of_self (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hqprime : q.Prime) (hq3 : q ≠ 3) (hqodd : Odd q) {e : ℕ} (he : Odd e)
+    (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {A X Y : GaloisField p q} (hA0 : A ≠ 0) (hXY : ¬(X = 0 ∧ Y = 0))
+    (h : FrobFam data e A A X Y) : False :=
+  false_of_skewPair_self_frobenius_family data hp hqprime hq3 hqodd he hcube hexp hA0 hXY h
+
+end FrobFam
+
 /-- **The same-slot two-loop kill.**  Two edges with parameters proportional by a non-zero
 square `s` compose into a closed loop; if either component of its weight
 `(K(p) - K(p')sᵉ, K(r) - K(r')sᵉ)` does not vanish, hypothesis (B) is refuted.  The loop
@@ -374,51 +443,21 @@ theorem false_of_proportional_edges (data : FieldNormalizerData p q G) (hp : p =
           = (normOneVal r₁' ^ (e * e) - normOneVal r₀' ^ (e * e)) * s ^ e)) : False := by
   subst hp
   have hq0 : q ≠ 0 := hqprime.ne_zero
-  refine false_of_skewPair_self_frobenius_family data rfl hqprime hq3 hqodd he hcube hexp
-    (A := normOneVal r₀ ^ e - normOneVal p₀ ^ e)
-    (X := (normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e))
-      - (normOneVal p₁' ^ (e * e) - normOneVal p₀' ^ (e * e)) * s ^ e)
-    (Y := (normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e))
-      - (normOneVal r₁' ^ (e * e) - normOneVal r₀' ^ (e * e)) * s ^ e)
-    (skewPair_edge_left_ne_zero hcube hne) ?_ ?_
-  · rintro ⟨hX0, hY0⟩
-    exact hW ⟨sub_eq_zero.mp hX0, sub_eq_zero.mp hY0⟩
-  · intro j
-    have hppj := paley_frobenius_iterate hpp j
-    have hrrj := paley_frobenius_iterate hrr j
-    have hppj' := paley_frobenius_iterate hpp' j
-    have hrrj' := paley_frobenius_iterate hrr' j
-    have he₁ := skewPair_edge data rfl hq0 hexp _ _ _ _ hppj hrrj
-    have he₂ := skewPair_edge data rfl hq0 hexp _ _ _ _ hppj' hrrj'
-    rw [normOneVal_sub_pow_frobenius j e r₀ p₀, normOneVal_sub_pow_frobenius j e r₁ p₁,
-      normOneVal_sub_pow_frobenius j (e * e) p₁ p₀,
-      normOneVal_sub_pow_frobenius j (e * e) r₁ r₀] at he₁
-    rw [normOneVal_sub_pow_frobenius j e r₀' p₀', normOneVal_sub_pow_frobenius j e r₁' p₁',
-      normOneVal_sub_pow_frobenius j (e * e) p₁' p₀',
-      normOneVal_sub_pow_frobenius j (e * e) r₁' r₀'] at he₂
-    have he₂' := (he₂.rev).rescale (s := s ^ 3 ^ j) (hs.pow _) (pow_ne_zero _ hs0)
-    have hin_j : (normOneVal r₁' ^ e - normOneVal p₁' ^ e) ^ 3 ^ j * s ^ 3 ^ j
-        = (normOneVal r₁ ^ e - normOneVal p₁ ^ e) ^ 3 ^ j := by
-      rw [← mul_pow, ← hinner]
-    have hout_j : (normOneVal r₀' ^ e - normOneVal p₀' ^ e) ^ 3 ^ j * s ^ 3 ^ j
-        = (normOneVal r₀ ^ e - normOneVal p₀ ^ e) ^ 3 ^ j := by
-      rw [← mul_pow, ← houter]
-    rw [hin_j, hout_j] at he₂'
-    have hcomp := he₁.comp he₂'
-    have hXj : (normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e)) ^ 3 ^ j +
-        -((normOneVal p₁' ^ (e * e) - normOneVal p₀' ^ (e * e)) ^ 3 ^ j) * (s ^ 3 ^ j) ^ e
-        = ((normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e))
-            - (normOneVal p₁' ^ (e * e) - normOneVal p₀' ^ (e * e)) * s ^ e) ^ 3 ^ j := by
-      conv_rhs => rw [sub_pow_char_pow, mul_pow, pow_right_comm s e (3 ^ j)]
-      ring
-    have hYj : (normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e)) ^ 3 ^ j +
-        -((normOneVal r₁' ^ (e * e) - normOneVal r₀' ^ (e * e)) ^ 3 ^ j) * (s ^ 3 ^ j) ^ e
-        = ((normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e))
-            - (normOneVal r₁' ^ (e * e) - normOneVal r₀' ^ (e * e)) * s ^ e) ^ 3 ^ j := by
-      conv_rhs => rw [sub_pow_char_pow, mul_pow, pow_right_comm s e (3 ^ j)]
-      ring
-    rw [hXj, hYj] at hcomp
-    exact hcomp
+  have f₁ := FrobFam.edge data rfl hq0 hexp hpp hrr
+  have f₂ := ((FrobFam.edge data rfl hq0 hexp hpp' hrr').rev rfl).rescale hs hs0
+  rw [← hinner, ← houter] at f₂
+  have hcomp := f₁.comp f₂
+  rw [show (normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e)) +
+        -(normOneVal p₁' ^ (e * e) - normOneVal p₀' ^ (e * e)) * s ^ e
+      = (normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e))
+        - (normOneVal p₁' ^ (e * e) - normOneVal p₀' ^ (e * e)) * s ^ e by ring,
+    show (normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e)) +
+        -(normOneVal r₁' ^ (e * e) - normOneVal r₀' ^ (e * e)) * s ^ e
+      = (normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e))
+        - (normOneVal r₁' ^ (e * e) - normOneVal r₀' ^ (e * e)) * s ^ e by ring] at hcomp
+  exact FrobFam.false_of_self data rfl hqprime hq3 hqodd he hcube hexp
+    (skewPair_edge_left_ne_zero hcube hne)
+    (fun hZ => hW ⟨sub_eq_zero.mp hZ.1, sub_eq_zero.mp hZ.2⟩) hcomp
 
 /-- **Same-slot κ-constancy.**  Proportional edges have proportional weights: both components
 of the two-loop weight vanish, i.e. `K(p) = K(p')sᵉ` and `K(r) = K(r')sᵉ`.  In slot language
@@ -468,32 +507,15 @@ theorem false_of_antipodal_edge (data : FieldNormalizerData p q G) (hp : p = 3)
       + (normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e)) ≠ 0) : False := by
   subst hp
   have hq0 : q ≠ 0 := hqprime.ne_zero
-  refine false_of_skewPair_self_frobenius_family data rfl hqprime hq3 hqodd he hcube hexp
-    (A := normOneVal r₀ ^ e - normOneVal p₀ ^ e)
-    (X := (normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e))
-      + (normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e)))
-    (Y := (normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e))
-      + (normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e)))
-    (skewPair_edge_left_ne_zero hcube hne) (fun h => hK h.1) ?_
-  intro j
-  have hppj := paley_frobenius_iterate hpp j
-  have hrrj := paley_frobenius_iterate hrr j
-  have he₁ := skewPair_edge data rfl hq0 hexp _ _ _ _ hppj hrrj
-  have he₂ := skewPair_edge data rfl hq0 hexp _ _ _ _ hrrj hppj
-  rw [normOneVal_sub_pow_frobenius j e r₀ p₀, normOneVal_sub_pow_frobenius j e r₁ p₁,
-    normOneVal_sub_pow_frobenius j (e * e) p₁ p₀,
-    normOneVal_sub_pow_frobenius j (e * e) r₁ r₀] at he₁
-  rw [normOneVal_sub_pow_frobenius j e p₀ r₀, normOneVal_sub_pow_frobenius j e p₁ r₁,
-    normOneVal_sub_pow_frobenius j (e * e) r₁ r₀,
-    normOneVal_sub_pow_frobenius j (e * e) p₁ p₀] at he₂
+  have f₁ := FrobFam.edge data rfl hq0 hexp hpp hrr
+  have f₂ := FrobFam.edge data rfl hq0 hexp hrr hpp
   -- the swap edge's parameters coincide with `δ₁` and `δ₀` on the ratio class `-1`
   rw [show normOneVal p₀ ^ e - normOneVal r₀ ^ e
       = normOneVal r₁ ^ e - normOneVal p₁ ^ e by linear_combination -hopp,
     show normOneVal p₁ ^ e - normOneVal r₁ ^ e
-      = normOneVal r₀ ^ e - normOneVal p₀ ^ e by linear_combination -hopp] at he₂
-  have hcomp := he₁.comp he₂
-  rw [← add_pow_char_pow, ← add_pow_char_pow] at hcomp
-  exact hcomp
+      = normOneVal r₀ ^ e - normOneVal p₀ ^ e by linear_combination -hopp] at f₂
+  exact FrobFam.false_of_self data rfl hqprime hq3 hqodd he hcube hexp
+    (skewPair_edge_left_ne_zero hcube hne) (fun hZ => hK hZ.1) (f₁.comp f₂)
 
 /-- **The ratio class `-1` forces antisymmetric weights.**  On an edge with `δ₁ = -δ₀` the
 weight sum vanishes: `K(p) = -K(r)`.  Step 4 of the case tree: in the singleton-`{-1}`
@@ -512,6 +534,49 @@ theorem weight_sum_eq_zero_of_antipodal_edge (data : FieldNormalizerData p q G) 
       + (normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e)) = 0 := by
   by_contra hK
   exact false_of_antipodal_edge data hp hqprime hq3 hqodd he hcube hexp hpp hrr hne hopp hK
+
+/-! ### The four-leg loop: forward–forward–backward–backward
+
+The commutator loop of the endgame (`notes/bg/appC_problem1_resolution.md` §4.2) is a four-leg
+loop: two forward legs climbing `v → ρv → σρv` and two backward legs descending
+`σρv → σv → v`.  At family level the four legs are `FrobFam` values with shared endpoints —
+the caller supplies each leg already rescaled onto the common heights — and the loop is their
+composite `h₁ ∘ h₂ ∘ rev h₃ ∘ rev h₄`, with weight `(X₁+X₂-X₃-X₄, Y₁+Y₂-Y₃-Y₄)`.  Conspiracy
+(both components vanish) is the exchange relation (EX). -/
+
+/-- **The four-leg loop kill.**  Four Frobenius-closed families chaining as
+`A → B₁ → B₂ ← B₃ ← A` (legs 3 and 4 used backwards) compose into a closed loop; if either
+component of the weight `(X₁+X₂-X₃-X₄, Y₁+Y₂-Y₃-Y₄)` does not vanish, hypothesis (B) is
+refuted. -/
+theorem false_of_four_loop (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hqprime : q.Prime) (hq3 : q ≠ 3) (hqodd : Odd q) {e : ℕ} (he : Odd e)
+    (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {A B₁ B₂ B₃ X₁ Y₁ X₂ Y₂ X₃ Y₃ X₄ Y₄ : GaloisField p q}
+    (h₁ : FrobFam data e A B₁ X₁ Y₁) (h₂ : FrobFam data e B₁ B₂ X₂ Y₂)
+    (h₃ : FrobFam data e B₃ B₂ X₃ Y₃) (h₄ : FrobFam data e A B₃ X₄ Y₄)
+    (hA0 : A ≠ 0)
+    (hW : ¬(X₁ + X₂ - X₃ - X₄ = 0 ∧ Y₁ + Y₂ - Y₃ - Y₄ = 0)) : False := by
+  subst hp
+  have hcomp := ((h₁.comp h₂).comp (h₃.rev rfl)).comp (h₄.rev rfl)
+  rw [show X₁ + X₂ + -X₃ + -X₄ = X₁ + X₂ - X₃ - X₄ by ring,
+    show Y₁ + Y₂ + -Y₃ + -Y₄ = Y₁ + Y₂ - Y₃ - Y₄ by ring] at hcomp
+  exact FrobFam.false_of_self data rfl hqprime hq3 hqodd he hcube hexp hA0 hW hcomp
+
+/-- **The exchange relation, raw form.**  Conspiracy on a four-leg loop: both components of
+the weight vanish.  Instantiated with the commutator loop's legs this is relation (EX) of the
+endgame (step 5 of the case tree). -/
+theorem weights_eq_zero_of_four_loop (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hqprime : q.Prime) (hq3 : q ≠ 3) (hqodd : Odd q) {e : ℕ} (he : Odd e)
+    (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {A B₁ B₂ B₃ X₁ Y₁ X₂ Y₂ X₃ Y₃ X₄ Y₄ : GaloisField p q}
+    (h₁ : FrobFam data e A B₁ X₁ Y₁) (h₂ : FrobFam data e B₁ B₂ X₂ Y₂)
+    (h₃ : FrobFam data e B₃ B₂ X₃ Y₃) (h₄ : FrobFam data e A B₃ X₄ Y₄)
+    (hA0 : A ≠ 0) :
+    X₁ + X₂ - X₃ - X₄ = 0 ∧ Y₁ + Y₂ - Y₃ - Y₄ = 0 := by
+  by_contra hW
+  exact false_of_four_loop data hp hqprime hq3 hqodd he hcube hexp h₁ h₂ h₃ h₄ hA0 hW
 
 end SkewCalculus
 
