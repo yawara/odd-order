@@ -94,14 +94,21 @@ Part II (skew calculus)・Part III (endgame) は紙上のみ。本 issue はそ�
       MonoidHom.map_cyclic + 奇代表 + CRT) + `q_odd_of_conditionA` (q 奇は (A) から
       無料) + **`false_of_witness` (SkewEndgame): FieldNormalizerData 3 q G + q ≠ 3
       だけから False** — 指数仮説なしの完全 witness 排除。
-- [ ] **glue (b) q = 3 / e ∈ ⟨3⟩ の還元** (最後の未形式化): `false_of_centralizing` は
-      centralizing (e-作用自明) 形のみ。e = 3^j の witness を centralizing に落とす
-      還元が必要 — 案 1: σ' := σ ∘ (体 Frobenius)^{-j} で FieldNormalizerData を
-      再構成 (U-作用が e·3^{-j} = 1 に)。案 2: hexp (e = 3^j 形) から hcent
-      (Commute (MulAut.conj y s) v) を直接導出できるか検討 — hcent は g が σ(U) を
-      **点ごと固定**する主張なので、e = 3^j ≠ 1-作用では偽; 案 1 が本筋。
-      q = 3 では n = 13、e³ ≡ 1 mod 13 の解 = {1, 3, 9} = ⟨3⟩ mod 13 ✓ (全指数被覆の
-      確認は Nat.decide レベル)。済んだら `hypothesisB_false` (by_cases q = 3) が最終形。
+- [x] **glue (b) + 最終形** (2026-08-13 深夜, commit 9ae31686f): ⚠ 案 1 (σ twist) は
+      **誤り**だった — hexp の e は (g, U) に内在的で σ の取り替えでは変わらない。
+      正解 = 紙の定理 1 の本来の論法: σ_e = Frobenius 冪の**加法性**で twisted engine
+      (`commute_conj_of_le_closure_twisted`、σ : G →* G → 関数 + P 上乗法性に一般化)
+      を直接回す。`false_of_frobenius_exponent` (全 q の e ∈ ⟨3⟩ 側; fieldHom 移送の
+      Frobenius 冪 σf + closure_induction による spanning 移送 + not_commute_conj) →
+      **`hypothesisB_false : FieldNormalizerData p q G → p = 3 → False`** (q = 3 は
+      e³ ≡ 1 mod 13 の decide で {1,3,9} = ⟨3⟩)。フルビルド green・--strict 警告ゼロ・
+      axiom-clean。
+
+## 完了 (2026-08-13)
+
+完了条件 (`false_of_exotic` axiom-clean) を上回り、**最終形 `hypothesisB_false` まで**
+landing。Problem 1 は全 q・G 無限可・追加仮定ゼロで機械検証済。歴史的 per-q 証明書群は
+定理として保持 (supersede、削除せず)。
 - [x] **文書更新** (2026-08-13): resolution.md §7–§9 を機械検証済に更新 (Part II/III の
       Lean 定理名対応表 + 形式化で得た紙の証明の簡約 4 点を記録)。memory 更新済。
 - [ ] **(EX) ⟹ master formula** (anchor 論法; 退化人口: singleton {−1} は

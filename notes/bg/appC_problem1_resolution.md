@@ -5,13 +5,14 @@
 [`appC_problem1_skew_calculus.md`](appC_problem1_skew_calculus.md) §1–6.2 (skew calculus +
 endgame) を **1 本の定理 + 完全証明**として書き下した統合文書。敵対的検証 6 レンズ
 (部品 5 + 最終 assembly 監査、全 CONFIRMED・fatal 0、§8) を反映済。
-**✅ スコープ更新 (2026-08-13 夜)**: **Part II–III も同日中に Lean 形式化完了** —
-capstone `false_of_exotic` (`AppC_Problem1SkewEndgame.lean`) が「`q ≠ 3` の全 witness
-(e 奇・cube・hexp) は矛盾」を axiom-clean で機械検証 (§7 の表・issue 0181)。
-紙上のみの残りは **witness からの指数抽出** (`∃ e` 奇・cube・hexp — hexp は全定理で
-仮説として受けている) と **`q = 3`/`e ∈ ⟨3⟩` の Frobenius twist 還元** (定理 1 =
-`false_of_centralizing` は centralizing 形のみ) の 2 つの glue で、統合形
-`hypothesisB_false` (§9) が最後の作業。
+**✅✅ 完全機械検証 (2026-08-13 深夜)**: **主定理が Lean で完結** —
+**`hypothesisB_false : FieldNormalizerData p q G → p = 3 → False`**
+(`AppC_Problem1SkewEndgame.lean`、全 `q`・`G` の有限性不要・追加仮定ゼロ・axiom-clean)。
+内訳: `q ≠ 3` = skew calculus のケース木 (`false_of_witness` — 指数は
+`exists_odd_cube_exponent` で witness から抽出、`q` の奇性は (A) から)、`q = 3` =
+指数が全部 Frobenius 冪 (`e³ ≡ 1 mod 13` の解 {1,3,9} = ⟨3⟩、decide) で定理 1 の
+`e ∈ ⟨3⟩` 側 (`false_of_frobenius_exponent` — twisted engine + Frobenius 移送 spanning)。
+紙上のみの部分は消滅 — 本文書の主定理は §0 の形のまま全て機械検証済 (issue 0181 closed)。
 
 ## 0. 問題と結果
 
@@ -343,14 +344,20 @@ g-共役なしの純代入になる。(ii) 具体対 (EX)(X, anchor) は χ(anch
 の和で μ₊ + μ₋ = 0 が人口場合分けなしに出る。(iv) 3-冪単射は char 3 の Frobenius
 単射性から無料 (gcd(3e, Q−1) = 1 の供給不要)。
 
-**紙上のみ (真の残作業 = 統合 glue 2 つ)**:
+**統合 glue (2026-08-13 深夜に完了)**:
 
-- **指数抽出**: witness (`primeLine_conj_normalizes_U`) から `∃ e` 奇・cube・hexp を
-  取り出す補題 (cyclic 自己同型 = 冪写像 + §1 の表の CRT 正規化; 全定理は hexp を
-  仮説として受けている)。
-- **`q = 3` / `e ∈ ⟨3⟩`**: 定理 1 (`false_of_centralizing`) は centralizing 形のみ。
-  `e = 3^j` ⟹ centralizing の Frobenius twist 還元が未形式化。
-- 両者が済めば `hypothesisB_false : FieldNormalizerData 3 q G → False` (全 q) が最終形。
+| 部品 | Lean |
+|---|---|
+| 指数抽出 (§1 の導出表: 冪写像・奇代表・CRT) | `exists_odd_cube_exponent` (`AppC_Problem1Exponent.lean`) |
+| `q` 奇 ⟸ 条件 (A) | `q_odd_of_conditionA` |
+| witness 単独の排除 (`q ≠ 3`) | `false_of_witness` |
+| 定理 1 の `e ∈ ⟨3⟩` 側 (twisted engine + Frobenius 移送 spanning) | `false_of_frobenius_exponent` |
+| **最終形 (全 `q`)** | **`hypothesisB_false`** |
+
+⚠ 註: 定理 1 の Lean 化はもともと `false_of_centralizing` (`e = 1` 側) のみだった —
+`e = 3^j` 側は「σ の twist で e が変わる」わけではなく (hexp の `e` は `(g, U)` に
+内在的)、**σ_e = Frobenius 冪の加法性**で twisted engine
+(`commute_conj_of_le_closure_twisted`、関数 + P 上乗法性へ一般化) を直接回す。
 
 ## 8. 検証記録
 
@@ -389,12 +396,9 @@ Part I ((B2)-elim) は別途 3 レンズ (group / module / history) で敵対的
 
 ## 9. スコープの正直な申告と残作業
 
-- **2026-08-13 夜更新: Part I–III すべて Lean 検証済・axiom-clean** (§7 の 2 表)。
-  capstone `false_of_exotic` により「`q ≠ 3`・任意の指数 (e 奇 + cube + hexp) の witness
-  は矛盾」が機械検証された。**未形式化の残りは統合 glue 2 つのみ**: witness からの
-  指数抽出 (∃ e) と `q = 3`/`e ∈ ⟨3⟩` の Frobenius twist 還元 (§7 末尾)。これらが
-  済むまで、機械検証済の主張は「hexp 形の witness の排除」に限る (数学的には §1 の
-  導出表のとおり全 witness が hexp 形を持つ — その導出の Lean 化が残り)。
+- **2026-08-13 深夜: 完全機械検証**。`hypothesisB_false` により、本文書の主定理
+  (§0) は**そのままの一般性で** Lean 検証済となった: p = 3 の witness は全 `q` で
+  存在しない、`G` 無限可、追加仮定ゼロ、axiom-clean。紙上のみの残作業は無い。
 - witness 構造の基礎事実 (定理 1・定理 2・層・基本関係式・`|T|` 下界) と木の全 kill 入口
   (`false_of_collisionPair` / `false_of_conjPair_frobenius_family` / `false_of_conjPair_self` /
   ブリッジ部品) は Lean 済なので、残る形式化は**体の中の有限計算** (辺 calculus・可換子
