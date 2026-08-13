@@ -54,9 +54,16 @@ Part II (skew calculus)・Part III (endgame) は紙上のみ。本 issue はそ�
 - [x] **step 4 (singleton {−1})** (commit 7a72905eb, 新 leaf
       `AppC_Problem1SkewEndgame.lean`): `false_of_three_antipodal` — 3 点の全対 ρ = −1
       ⟹ K ≡ 0 ⟹ 矛盾。
-- [ ] **可換子 loop ⟹ (EX) の具体形**: 2 対 (p,r), (p',r') + 符号セクター仮定から
-      leg_fwd/leg_swap × 4 + weights_eq_zero_of_four_loop で K の交換関係式を導出
-      (v = δ₀ 正規化で s₁ = 1、閉条件は自動)。
+- [x] **可換子 loop ⟹ (EX)** (2026-08-13, commit 9227ed108): `legWeight` +
+      `FrobFam.leg_resolved` (E/Ē 分岐を 1 補題に封じた Bool セクター統一 leg) +
+      `exchange_relation` — v = δ₀ 正規化の可換子 loop で共謀 ⟹ 重み両成分消滅。
+      8 セクターを 1 statement (Bool b₂b₃b₄ + cond 平方類仮定)。証明は分岐なし
+      (leg_resolved ×3 + 高さ整合 field_simp ×2 + 4-loop lemma)。逆成分 c₁ = −χ(δ₀)
+      の (EX) は swap 対 (r,p) への適用で得る設計。
+- [ ] **(EX) ⟹ master formula (anchor 論法)**: resolution.md §4.3 の人口場合分け
+      (χ=+1 anchor / 全 −1 で 2 クラス以上 / 単集合 {ρ₀≠±1} は全射性、{−1} は
+      step 4 済)。λ± を anchor 対の K から定義し、各対の master 等式を
+      exchange_relation + κ-constancy (weights_proportional) で pin する。
 - [ ] **(EX) ⟹ master formula** (anchor 論法; 退化人口: singleton {−1} は
       fwd-fwd 2-loop `e∘swap(e)` の別補題、singleton {ρ≠±1} は master 全射性)。
 - [ ] **枝撃破**: Δ=0 (3 点矛盾) / Σ̄=0 (K 定数 ⟹ e²-衝突 glue、下記) /
