@@ -45,8 +45,8 @@ Problem 1 の否定的全面解決に到達** (正本 = skew_calculus note §6.2
 最終 assembly 監査 (effort max) の計 6 本すべて CONFIRMED・fatal 0)。witness 排除のケース木: 衝突あり ⟹
 (B2)-elim / 非退化 loop ⟹ family capstone / 共謀 ⟹ (EX) ⟹ master formula ⟹
 Δ=0・Σ̄=0・λ∉𝔽₃・𝔽₃ 残 4 候補がすべて初等的に矛盾 (使用仮説は χ(−1)=−1・e 奇・
-e³-cube・K≠0・|T|≥4・鳩の巣のみ — equidistribution 不要)。残り = assembly 最終監査 +
-完全証明文書 + Lean 化 (数 session 規模)。
+e³-cube・K≠0・|T|≥4 のみ — equidistribution・鳩の巣すら不要)。残り = 統合証明文書 +
+endgame の Lean 化 (数 session 規模)。
 
 **さらに (2026-08-13 深夜第 2 弾): (B1) 自体を迂回する skew-pair calculus を発見**
 (正本 = [`notes/bg/appC_problem1_skew_calculus.md`](../notes/bg/appC_problem1_skew_calculus.md)、
