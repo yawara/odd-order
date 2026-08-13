@@ -89,11 +89,23 @@ Part II (skew calculus)・Part III (endgame) は紙上のみ。本 issue はそ�
 - [x] **capstone** (commit cb6d52514): `false_of_exotic` — **Part II+III 機械検証完了**。
       4 点抽出 (card_paleySet_lower + q ≥ 5) + 衝突 by_cases + master + 4 枝網羅。
       フルビルド green・--strict 警告ゼロ・axiom-clean。
-- [ ] **最終統合形 `hypothesisB_false`**: false_of_centralizing (定理 1、e ∈ ⟨3⟩ と
-      q = 3 を被覆) と false_of_exotic (q ≠ 3 の全指数) の合成。witness からの
-      e 抽出・q 場合分けの形は false_of_centralizing の入口形に合わせて設計。
-- [ ] **文書更新**: resolution.md §7–§9 の「Part II–III は紙上のみ」を機械検証済に
-      更新 (定理名対応表付き)。memory の appc-problem1 状態も更新。
+- [ ] **最終統合形 `hypothesisB_false`** (調査済 2026-08-13、次セッション規模):
+      必要な glue は 2 つ。
+      **(a) 指数抽出補題** `exists_odd_cube_exponent : (data : FieldNormalizerData 3 q G) →
+      ∃ e, Odd e ∧ (∀ z : GaloisField 3 q, z^(e*e*e) = z) ∧
+      (∀ w ∈ data.U, conjGen data * w = w^e * conjGen data)`:
+      `primeLine_conj_normalizes_U` → conjGen が U を正規化 → U ≅ normOneUnits cyclic の
+      自己同型 = 冪写像 (mathlib `MonoidHom.map_cyclic`, ℤ-冪 → mod n で ℕ 化) →
+      奇代表 (e or e+n、n 奇) → g³ = 1 (`conjGen_pow_three`) から e³ ≡ 1 mod n →
+      CRT で mod 2n = mod Q−1 → 体レベル cube。CRT juggling の雛形 =
+      `span_triples_normOne_eq_top` (Lattice.lean 60–130 行付近) の hcubeN block。
+      **(b) q = 3 / e ∈ ⟨3⟩ の還元**: `false_of_centralizing` は centralizing 形のみ。
+      e = 3^j の witness を centralizing に落とす Frobenius twist (σ' := σ ∘ Frob^{-j}
+      で FieldNormalizerData を再構成、または hexp e=3^j から hcent を直接導出) が
+      未形式化。q = 3 は指数が全部 ⟨3⟩ に入る (n = 13; e³ ≡ 1 mod 13 の解 = {1,3,9})。
+      **(c) assembly**: q 奇 (p=3 + conditionA → q ∤ 2)・by_cases q = 3。
+- [x] **文書更新** (2026-08-13): resolution.md §7–§9 を機械検証済に更新 (Part II/III の
+      Lean 定理名対応表 + 形式化で得た紙の証明の簡約 4 点を記録)。memory 更新済。
 - [ ] **(EX) ⟹ master formula** (anchor 論法; 退化人口: singleton {−1} は
       fwd-fwd 2-loop `e∘swap(e)` の別補題、singleton {ρ≠±1} は master 全射性)。
 - [ ] **枝撃破**: Δ=0 (3 点矛盾) / Σ̄=0 (K 定数 ⟹ e²-衝突 glue、下記) /

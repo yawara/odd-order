@@ -5,9 +5,13 @@
 [`appC_problem1_skew_calculus.md`](appC_problem1_skew_calculus.md) §1–6.2 (skew calculus +
 endgame) を **1 本の定理 + 完全証明**として書き下した統合文書。敵対的検証 6 レンズ
 (部品 5 + 最終 assembly 監査、全 CONFIRMED・fatal 0、§8) を反映済。
-**⚠ スコープ**: これは**紙上 (paper-level) の解決**であり、Part II–III の Lean 形式化は
-残作業 (§9)。witness 構造の基礎事実 (定理 1・定理 2・層・基本関係式) と Part I 全体、
-および木の全 kill 入口は **Lean 検証済・axiom-clean** (§7)。
+**✅ スコープ更新 (2026-08-13 夜)**: **Part II–III も同日中に Lean 形式化完了** —
+capstone `false_of_exotic` (`AppC_Problem1SkewEndgame.lean`) が「`q ≠ 3` の全 witness
+(e 奇・cube・hexp) は矛盾」を axiom-clean で機械検証 (§7 の表・issue 0181)。
+紙上のみの残りは **witness からの指数抽出** (`∃ e` 奇・cube・hexp — hexp は全定理で
+仮説として受けている) と **`q = 3`/`e ∈ ⟨3⟩` の Frobenius twist 還元** (定理 1 =
+`false_of_centralizing` は centralizing 形のみ) の 2 つの glue で、統合形
+`hypothesisB_false` (§9) が最後の作業。
 
 ## 0. 問題と結果
 
@@ -318,15 +322,35 @@ equidistribution・Weil・Davenport・鳩の巣は不要。
 | 衝突 packaging (`δ ∈ U` 向き) | `exists_collisionPair_of_sub_ne_zero` | `OddOrder/BG/AppC_Problem1Trace.lean` |
 | `e`-冪単射性 | `pow_injective_of_cube` | `OddOrder/Algebra/PaleySpanning.lean` |
 
-**紙上のみ (Lean 化残作業)**:
+**Part II–III の Lean 化 (2026-08-13 夜に完了、issue 0181)** — 新 leaf
+`AppC_Problem1SkewCalculus.lean` + `AppC_Problem1SkewEndgame.lean`、全 axiom-clean:
 
-- **Part II 全体**: (P)・skew 辺 (E)・再スケール・合成・閉条件・loop ⟹ family の組み立て
-  (kill 入口の family capstone は Lean 済だが、loop から族を作る cube-loop 部は未)。
-- **Part III 全体**: κ-定数・可換子 loop・(EX)・anchor 論法・master・枝撃破 (§4)。
-- **e²-衝突ブリッジの 1 補題化**: 部品 (`exists_paley_collision_pow_mul_down` /
-  `exists_collisionPair_of_sub_ne_zero` / `false_of_collisionPair`) は全部 merge 済で、
-  合成も自明に構成可能 (q = 7 の実 e²-衝突で end-to-end 数値検証済) だが、
-  1 本の Lean 補題にはまだなっていない。
+| 部品 | Lean |
+|---|---|
+| skew 辺・groupoid ops・graph・loop ⟹ ConjPair | `SkewPair` / `skewPair_edge` / `SkewPair.rev`/`comp`/`rescale`/`conjPair_of_self(_neg)` |
+| loop ⟹ kill (Frobenius 族) | `FrobFam` calculus + `false_of_skewPair_self_frobenius_family` |
+| same-slot 2-loop ⟹ κ-定数 (step 3) | `false_of_proportional_edges` / `weights_proportional_of_proportional_edges` |
+| fwd-fwd 2-loop・step 4 | `false_of_antipodal_edge` / `false_of_three_antipodal` |
+| leg supply・可換子 loop・(EX) (step 5) | `FrobFam.leg_fwd`/`leg_swap`/`leg_resolved` / `exchange_relation` (8 セクター一括) |
+| anchor 論法 ⟹ master (§4.3) | `exists_masterFormula_of_plus_anchor` / `_minus_anchor` / `_of_no_collision` |
+| 枝 Δ=0 / Σ̄=0 (+e²-衝突 glue の 1 補題化) | `false_of_masterFormula_delta_zero` / `_sigma_zero` |
+| 枝 μ≠0 / λ∈𝔽₃ (§4.4) | `false_of_masterFormula_mu_ne_zero` / `_cubic` |
+| **capstone (`q ≠ 3` 全指数)** | **`false_of_exotic`** |
+
+形式化で見つかった簡約 (紙の証明の改良): (i) layer (0,1) 構築で loop ⟹ ConjPair が
+g-共役なしの純代入になる。(ii) 具体対 (EX)(X, anchor) は χ(anchor 比) = +1 だけで
+全 target に合法 — 紙の 2 段 pinning (＋クラス → −クラス) は不要。(iii) (Q) + swap-(Q)
+の和で μ₊ + μ₋ = 0 が人口場合分けなしに出る。(iv) 3-冪単射は char 3 の Frobenius
+単射性から無料 (gcd(3e, Q−1) = 1 の供給不要)。
+
+**紙上のみ (真の残作業 = 統合 glue 2 つ)**:
+
+- **指数抽出**: witness (`primeLine_conj_normalizes_U`) から `∃ e` 奇・cube・hexp を
+  取り出す補題 (cyclic 自己同型 = 冪写像 + §1 の表の CRT 正規化; 全定理は hexp を
+  仮説として受けている)。
+- **`q = 3` / `e ∈ ⟨3⟩`**: 定理 1 (`false_of_centralizing`) は centralizing 形のみ。
+  `e = 3^j` ⟹ centralizing の Frobenius twist 還元が未形式化。
+- 両者が済めば `hypothesisB_false : FieldNormalizerData 3 q G → False` (全 q) が最終形。
 
 ## 8. 検証記録
 
@@ -365,10 +389,12 @@ Part I ((B2)-elim) は別途 3 レンズ (group / module / history) で敵対的
 
 ## 9. スコープの正直な申告と残作業
 
-- **本文書は紙上 (paper-level) の解決である**。Part I (§2) は capstone まで Lean 済・
-  axiom-clean だが、**Part II (§3) と Part III (§4) は敵対的検証済の紙上証明**であり、
-  Lean 形式化は未着手 (中規模、数 session 規模の見積り)。機械検証済と主張してよいのは
-  §7 の表の範囲のみ。
+- **2026-08-13 夜更新: Part I–III すべて Lean 検証済・axiom-clean** (§7 の 2 表)。
+  capstone `false_of_exotic` により「`q ≠ 3`・任意の指数 (e 奇 + cube + hexp) の witness
+  は矛盾」が機械検証された。**未形式化の残りは統合 glue 2 つのみ**: witness からの
+  指数抽出 (∃ e) と `q = 3`/`e ∈ ⟨3⟩` の Frobenius twist 還元 (§7 末尾)。これらが
+  済むまで、機械検証済の主張は「hexp 形の witness の排除」に限る (数学的には §1 の
+  導出表のとおり全 witness が hexp 形を持つ — その導出の Lean 化が残り)。
 - witness 構造の基礎事実 (定理 1・定理 2・層・基本関係式・`|T|` 下界) と木の全 kill 入口
   (`false_of_collisionPair` / `false_of_conjPair_frobenius_family` / `false_of_conjPair_self` /
   ブリッジ部品) は Lean 済なので、残る形式化は**体の中の有限計算** (辺 calculus・可換子
