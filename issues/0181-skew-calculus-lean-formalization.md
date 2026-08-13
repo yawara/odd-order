@@ -83,10 +83,17 @@ Part II (skew calculus)・Part III (endgame) は紙上のみ。本 issue はそ�
       (Q) + swap-(Q) の**和** (sqSelect_add_swap) で μ₋ = −μ₊ が人口場合分けなしに
       出る。3-冪単射は char 3 Frobenius 単射性から無料 (gcd(3e,Q−1)=1 の supply 問題
       は消滅)。data/hexp 非依存 (衝突は hnocoll 直行、loop 不要)。
-- [ ] **枝 (iv) F₃ 残 4 候補** (±1,0),(0,±1): 同符号辺 1 本で K(p) = 0 即死 (候補依存、
-      swap が補完) / 全混合世界は 2 パターン各 1 本 pin で out-degree ≤ 2 vs |T|−1 ≥ 3。
-- [ ] **capstone** `Problem1.false_of_exotic`: 無衝突 by_contra 分岐 + card_paleySet_lower
-      から 4 点抽出 + master 存在 + 枝の網羅 (λ の Δ/Σ̄/μ 場合分け)。
+- [x] **枝 (iv) F₃ 残 4 候補** (2026-08-13, commit 0a8ed7519):
+      `false_of_masterFormula_cubic` — hcases (ちょうど片方 0)・同符号対の orientation
+      即死・partner pin の pigeonhole (8 分岐)。hnocoll/data 非依存。
+- [x] **capstone** (commit cb6d52514): `false_of_exotic` — **Part II+III 機械検証完了**。
+      4 点抽出 (card_paleySet_lower + q ≥ 5) + 衝突 by_cases + master + 4 枝網羅。
+      フルビルド green・--strict 警告ゼロ・axiom-clean。
+- [ ] **最終統合形 `hypothesisB_false`**: false_of_centralizing (定理 1、e ∈ ⟨3⟩ と
+      q = 3 を被覆) と false_of_exotic (q ≠ 3 の全指数) の合成。witness からの
+      e 抽出・q 場合分けの形は false_of_centralizing の入口形に合わせて設計。
+- [ ] **文書更新**: resolution.md §7–§9 の「Part II–III は紙上のみ」を機械検証済に
+      更新 (定理名対応表付き)。memory の appc-problem1 状態も更新。
 - [ ] **(EX) ⟹ master formula** (anchor 論法; 退化人口: singleton {−1} は
       fwd-fwd 2-loop `e∘swap(e)` の別補題、singleton {ρ≠±1} は master 全射性)。
 - [ ] **枝撃破**: Δ=0 (3 点矛盾) / Σ̄=0 (K 定数 ⟹ e²-衝突 glue、下記) /
