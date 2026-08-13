@@ -202,8 +202,8 @@ Lean 化済 (`exists_paley_collision_pow_mul_down`)。**
 2. Lean 化: skew 辺 (E(p,r))・合成/閉条件・可換子 loop・master 崩壊・枝撃破。
    入口 (`false_of_conjPair_frobenius_family`, `exists_paley_collision_pow_mul_down`) は
    merge 済。中規模プロジェクト (数 session 規模)。
-3. 検証スクリプト正本: `endgame_check.py` / `lensA_commutator_verify.py` /
-   `lensB_verify.py` (session scratchpad `rigidity/`)。
+3. 検証スクリプト正本: [`notes/meta/c/`](../meta/c/) (engine 込み 6 本、保全済)。
+   統合証明文書 = [`appC_problem1_resolution.md`](appC_problem1_resolution.md)。
 
 ## 7. 帰結
 
