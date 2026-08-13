@@ -501,6 +501,60 @@ theorem exists_masterFormula_of_minus_anchor (data : FieldNormalizerData p q G) 
       sqSelect_ite_opp hneg1 hdichA hDA0 hd1 hb₂]
     linear_combination master_div hD2 hpin
 
+/-- **Master or death: the population glue.**  Under conspiracy and no collision, the master
+formula holds: some pair has square ratio (case P), or some pair has ratio `≠ -1` — then
+non-square, so case M applies — or every ratio is `-1` and the three distinct Paley points
+die by step 4.  Steps 3–5 of the case tree, assembled. -/
+theorem exists_masterFormula_of_no_collision (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hqprime : q.Prime) (hq3 : q ≠ 3) (hqodd : Odd q) {e : ℕ} (he : Odd e)
+    (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {a₀ a₁ b₀ b₁ c₀ c₁ : NormSet.normOneUnits p q}
+    (haa : normOneVal a₀ = normOneVal a₁ + 1) (hbb : normOneVal b₀ = normOneVal b₁ + 1)
+    (hcc : normOneVal c₀ = normOneVal c₁ + 1)
+    (hab : normOneVal a₀ ≠ normOneVal b₀) (hac : normOneVal a₀ ≠ normOneVal c₀)
+    (hbc : normOneVal b₀ ≠ normOneVal c₀)
+    (hnocoll : ∀ p₀ p₁ r₀ r₁ : NormSet.normOneUnits p q,
+      normOneVal p₀ = normOneVal p₁ + 1 → normOneVal r₀ = normOneVal r₁ + 1 →
+      normOneVal p₀ ≠ normOneVal r₀ →
+      normOneVal r₀ ^ e - normOneVal p₀ ^ e ≠ normOneVal r₁ ^ e - normOneVal p₁ ^ e) :
+    ∃ lamP lamM : GaloisField p q, MasterFormula e lamP lamM := by
+  classical
+  have hq0 : q ≠ 0 := hqprime.ne_zero
+  by_cases hplus : ∃ p₀ p₁ r₀ r₁ : NormSet.normOneUnits p q,
+      normOneVal p₀ = normOneVal p₁ + 1 ∧ normOneVal r₀ = normOneVal r₁ + 1 ∧
+      normOneVal p₀ ≠ normOneVal r₀ ∧
+      IsSquare ((normOneVal r₁ ^ e - normOneVal p₁ ^ e)
+        * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹)
+  · obtain ⟨p₀, p₁, r₀, r₁, hpp, hrr, hne, hsq⟩ := hplus
+    exact exists_masterFormula_of_plus_anchor data hp hqprime hq3 hqodd he hcube hexp
+      hpp hrr hne (hnocoll p₀ p₁ r₀ r₁ hpp hrr hne) hsq
+  · push Not at hplus
+    by_cases hgen : ∃ p₀ p₁ r₀ r₁ : NormSet.normOneUnits p q,
+        normOneVal p₀ = normOneVal p₁ + 1 ∧ normOneVal r₀ = normOneVal r₁ + 1 ∧
+        normOneVal p₀ ≠ normOneVal r₀ ∧
+        normOneVal r₁ ^ e - normOneVal p₁ ^ e ≠ -(normOneVal r₀ ^ e - normOneVal p₀ ^ e)
+    · obtain ⟨p₀, p₁, r₀, r₁, hpp, hrr, hne, hanti⟩ := hgen
+      have hd0 : normOneVal r₀ ^ e - normOneVal p₀ ^ e ≠ 0 :=
+        skewPair_edge_left_ne_zero hcube hne
+      have hne₁ : normOneVal p₁ ≠ normOneVal r₁ :=
+        fun h => hne (by linear_combination hpp - hrr + h)
+      have hd1 : normOneVal r₁ ^ e - normOneVal p₁ ^ e ≠ 0 :=
+        skewPair_edge_left_ne_zero hcube hne₁
+      have hr0 : (normOneVal r₁ ^ e - normOneVal p₁ ^ e)
+          * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹ ≠ 0 :=
+        mul_ne_zero hd1 (inv_ne_zero hd0)
+      have hneg : IsSquare (-((normOneVal r₁ ^ e - normOneVal p₁ ^ e)
+          * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹)) :=
+        (isSquare_or_isSquare_neg_galois hp hq0 hqodd hr0).resolve_left
+          (hplus p₀ p₁ r₀ r₁ hpp hrr hne)
+      exact exists_masterFormula_of_minus_anchor data hp hqprime hq3 hqodd he hcube hexp
+        hpp hrr hne (hnocoll p₀ p₁ r₀ r₁ hpp hrr hne) hanti hneg
+    · push Not at hgen
+      exact (false_of_three_antipodal data hp hqprime hq3 hqodd he hcube hexp
+        haa hbb hcc hab hac hbc (hgen a₀ a₁ b₀ b₁ haa hbb hab)
+        (hgen a₀ a₁ c₀ c₁ haa hcc hac) (hgen b₀ b₁ c₀ c₁ hbb hcc hbc)).elim
+
 end SkewEndgame
 
 end OddOrder.BG.AppC.Problem1
