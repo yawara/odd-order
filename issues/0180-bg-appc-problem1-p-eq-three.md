@@ -27,12 +27,18 @@ Proposition 9 の仮説 (記法は
 ⚠ **`G` の有限性は要求されていない** (有限性が課されているのは `Q` だけ)。字義どおり読むと
 有限アマルガムの完備化による構成の余地がある。
 
-## 📌 総括 (2026-08-12 夜、第 4 回 ChatGPT 後に大幅更新)
+## 📌 総括 (2026-08-13 深夜、chain reversal で (B2) が定理として消滅)
 
 ⚠ **これは形式化の残債ではなく 1993 年以来の未解決問題**で、**全面解決はしていない**。
-決着しているのは (i) 全 `q` での可解群/有限奇位数群、(ii) 個別に決着した `q` の一覧 (下記)。
-残る一般 `q` は **(B1) 一行 = 「`D_E` が Paley 集合 `T` 上で単射でない」**に集約されており、
-その正体は冪写像の APN 性 = 未解決の APN 分類予想に寄りかかる位置 (下記「(B1) の正体」)。
+決着しているのは (i) 全 `q` での可解群/有限奇位数群、(ii) 個別に決着した `q` の一覧 (下記)、
+そして **(iii) (B2) の完全消去 (2026-08-13): 衝突が 1 個でも存在すれば witness は無条件に
+矛盾する** (`false_of_collisionPair`、chain reversal C3 + Frobenius 加群の巡回性;
+正本 = [`notes/bg/appC_problem1_pair_composition.md`](../notes/bg/appC_problem1_pair_composition.md) §9、
+敵対的検証 3 レンズ全 CONFIRMED、axiom-clean)。
+残る一般 `q` は **(B1) 一行 = 「衝突が 1 個存在する」 (= `D_E` が Paley 集合 `T` 上で単射で
+ない)** に完全に一本化された。その正体は冪写像の APN 性 = 未解決の APN 分類予想に寄りかかる
+位置 (下記「(B1) の正体」)。trace 条件・span 条件・剛性・閉包実験は certificate として
+すべて不要になった (定理としては残る)。
 
 **2026-08-12 の到達点**: ChatGPT (Chat / GPT-5.6 Sol / 推論レベル Pro、思考 240 分) の回答を
 全ステップ検証したうえで、**Theorem A (gcd 判定)・Theorem B (トレース不要の障害)・証明書形を
@@ -66,6 +72,9 @@ Proposition 9 の仮説 (記法は
 | 17 | **Theorem N1** — `S′ = −S` の衝突で witness 無し (trace 不要) | `false_of_collisionPair_neg` |
 | 18 | **🎯 Theorem N2** — 比が等しい 2 衝突 (`S₂′ ≠ ±S₁′`) で witness 無し | `false_of_collisionPair_ratio_eq` |
 | 19 | **Theorem N3** — Frobenius 束の非自明関係 `Σk_jS^{3^j} = Σk_jS′^{3^j} ≠ 0` で witness 無し | `false_of_collisionPair_frobCombo` |
+| 20 | **🎯🎯 補題 C3 (chain reversal)** — `conjPair(s,s′) ∧ conjPair(s′,s″) ⟹ conjPair(s″,s)` (char 3) | `ConjPair.chain` |
+| 21 | **Frobenius 加群の巡回性** — Ann 包含 ⟹ `S′ = a₀.S`; squarefree radical 降冪 | `Algebra/FrobeniusCyclicModule.lean` |
+| 22 | **🎯🎯🎯 (B2) 完全消去** — **衝突 1 個で witness 排除、一切の付帯条件なし** (`q ≠ 3`) | **`false_of_collisionPair`** |
 
 **⟹ 定理 2 + 奇数位数定理により、有限奇位数群は witness になれない。
 BG App.C が置かれている文脈そのものでは否定的に決着している。**

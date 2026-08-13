@@ -1,5 +1,10 @@
 # (B2) への攻撃: 衝突対の合成計算 (pair composition calculus) — 2026-08-13
 
+> **⚠ 2026-08-13 深夜に §9 で完結**: (B2) は**定理として完全消滅**した (chain reversal C3 +
+> Frobenius 加群の巡回性)。**衝突が 1 個あれば witness は無条件に死ぬ** — trace も span も
+> 剛性も不要。§6–§8 の実験・剛性還元は歴史的記録 + (B1) への手がかりとして残す
+> (証明としては superseded)。残る壁は (B1) = 衝突の存在、のみ。
+
 [issue 0180](../../issues/0180-bg-appc-problem1-p-eq-three.md)。ChatGPT 第 4 回回答が open と明言した
 「`S ≠ S′` の一般衝突に必要な**射影比 `S′/S` に依存する閉包定理**」
 ([`appC_problem1_chatgpt_answer_b1.md`](appC_problem1_chatgpt_answer_b1.md) §III.2) を正面から攻めた記録。
@@ -283,3 +288,80 @@ q = 7 との違い: q = 13 では `dim V₀ ∈ {9, 12}` (q = 7 は一様に 6) 
 組める)。**(B2)-elim の一般証明の残件 = `β ≠ 0` の 6 本の方程式族の解数が admissible 集合
 (≈ Q/2) を覆えないことの証明** (`β = 0` の 2 本は単射性で解 ≤ 1 個ずつ、証明済)。
 `3` が原始根でない `q` は `W` の分解に応じた同型の議論が要る (未着手)。
+**→ §9 で全て不要になった** (剛性ルートは per-z₀ 証明書としても superseded)。
+
+## 9. 🎯🎯 (B2) の完全消去 — chain reversal 定理 (2026-08-13 深夜、Lean 化・検証済)
+
+§8 が「退化」として除外していた **z₀ ∈ 𝔽₃^× の合成サイト**を調べる過程で、char 3 特有の
+3 行の恒等式が見つかり、(B2) が**丸ごと定理として落ちた**。
+
+### 補題 C3 (chain reversal)
+
+> **conjPair (s, s′) ∧ conjPair (s′, s″) ⟹ conjPair (s″, s)。**
+>
+> 証明: 同じ `v` で 2 つの関係式を連鎖すると `a(v)² b(sv^e) a(v)⁻² = b(s″v^e)`。
+> `a` は加法的で char 3 なので `a(v)² = a(2v) = a(−v) = a(v)⁻¹` ⟹
+> `a(v)⁻¹ b(sv^e) a(v) = b(s″v^e)` ⟹ 両辺を `a(v)` 共役して `conjPair (s″, s)`。∎
+
+C1/C2 と違い χ・τ・`E`-冪が一切出ない (N1 の機構 `a(v)² = a(−v)` の一般化)。
+同値な言い方: `a(v)³ = a(3v) = 1` — conjugation by `a(v)` は位数 3。
+
+### 定理 ((B2)-elim 完全版)
+
+> **`q ≠ 3` のとき、衝突対 `(S, S′)` が 1 つでも存在すれば witness は矛盾する。**
+> トレース条件・span 条件・`e` の exotic 性・`3 mod q` の位数、すべて不要。
+> (`q = 3` は exotic `e` が存在せず定理 1 が既にカバー — 何も失わない。)
+
+証明の骨子 (5 手):
+
+1. **(K-frob)**: `conjPair (c.S, c.S′)` ∀`c ∈ 𝔽₃[x]` (Frobenius twist + 加法性; 既存機構)。
+2. **Ann 包含**: `c.S = 0` なら graph 性 (K2) より `c.S′ = 0`。
+3. **巡回性**: Frobenius の最小多項式 = `x^q − 1` (Dedekind 独立性) ⟹ `F` は
+   `𝔽₃[x]/(x^q−1)` の正則表現 (multiplicity-free) ⟹ Ann 包含から **`S′ = a₀.S`**。
+4. **chain**: C3 を `(S, S′), (S′, a₀².S)` に適用 ⟹ `conjPair (a₀².S, S)`;
+   pair `(a₀².S, a₀³.S)` との差 + K2 ⟹ **`a₀³.S = S`**。
+5. **char 3 + squarefree**: `a₀³ − 1 = (a₀ − 1)³`、`x^q − 1` は `q ≠ 3` で squarefree
+   ⟹ Ann は radical (gcd/Bezout) ⟹ `(a₀ − 1).S = 0` ⟹ **`S′ = S`** ⟹
+   Theorem B (`false_of_collisionPair_self`、無仮説版) で矛盾。∎
+
+### Lean 化 (2026-08-13、axiom-clean・AxiomsCheck 登録済・--strict lint clean)
+
+| 内容 | Lean |
+|---|---|
+| 補題 C3 | `ConjPair.chain` (PairComposition) |
+| (K-frob) の標準 packaging | `conjPair_aeval_of_collisionPair` |
+| Frobenius 加群の巡回性 (正規基底不要の直接構成) | `OddOrder/Algebra/FrobeniusCyclicModule.lean`: `frobEnd` / `minpoly_frobEnd` / `exists_frobenius_cyclic_vector` / `exists_aeval_frobEnd_eq_of_forall_imp` |
+| radical 降冪 (squarefree + gcd/Bezout) | `aeval_frobEnd_eq_zero_of_pow` |
+| **🎯 capstone** | **`false_of_collisionPair`** (仮説 = data + `p = 3`, `q` 素数 ≠ 3, 奇 + `e` 奇・`e³`-cube・共役指数 + 衝突 1 個) |
+
+実装メモ: 巡回性は mathlib の `minpoly_frobeniusAlgHom` (Frobenius の最小多項式 = `X^q − 1`) +
+`Module.exists_ker_toSpanSingleton_eq_annihilator` (PID 上の f.g. 加群) + 次元勘定で、正規基底
+定理を経由せずに閉じた。radical 性は `Squarefree.dvd_pow_iff_dvd` + `EuclideanDomain.gcd_eq_gcd_ab`
+の 3 行。dedupe: `CollisionPair.frobenius_pow` (PairComposition の重複) を削除し
+`frobenius_iterate` (Trace) に一本化。
+
+### 検証 (2026-08-13)
+
+- **敵対的検証 (subagent 3 レンズ、全 CONFIRMED・fatal 0)**: (i) group レンズ = C3 を Lean 定義
+  から独立再導出 (−v トラップ無し・向き一致)、q = 3 では反例 `a₀ = x` が実在し squarefree の
+  必要箇所が正確であることを 𝔽₃[x]/(x⁷−1) の 20,000 ランダム試行で確認。(ii) module レンズ =
+  正規基底/multiplicity-free/gcd の全リンク + **GF(3⁵) で 243×243 全ペアの悉皆計算検証**
+  (Ann 包含 ⟹ 軌道所属、違反 0)。(iii) history レンズ = §6 の「escape」は「安い証明書が
+  当たらない」の意味で「witness が生き残る」ではない ⟹ 閉包実験の kill 100% (101,592/101,592)
+  と完全整合; §7/§8 が一般証明を取り逃した理由 = 閉包エンジンは C1/C2 のみで **C3 を持って
+  いなかった**。
+- **数値サニティ**: 検証済み compose_C1 エンジンはサイト `((w, μw), (μw, μ²w))` で正確に
+  `(μ².w, w)` を出力 (3 escape 軌道 × 200 w、全 600 一致、anomaly 0) — C3 は C1 の
+  `z_raw = 1, τ = −1` 退化点そのもの。
+- **coverage 悉皆スキャン** (本 session、§8 剛性の独立確認): 8 統一方程式の被覆数は
+  **全 728 twist ν で最大 21/1092** (平均 3.0、β = 0 は全 ν で 0 件、escape 3 軌道の
+  14/14/0 を再現)。剛性ルートも全 ν で成立していた — が、C3 定理により不要になった。
+
+### 帰結
+
+- **(B2) は消滅**。witness への障害は「**衝突が 1 個存在する**」だけ = **(B1) に一本化**。
+- **per-q 証明書が激安化**: 各 exotic 指数類 {E, E²} につき衝突 1 個の発見で決着
+  (trace 値・剰余類・span・閉包 LA すべて不要; E↔E² 共役で片方の類のみで十分)。
+  `q = 47, 73` の残り指数も birthday 探索 1 回/類で閉じる。
+- §7 の閉包実験・§8 の剛性定理・trace 判定・N1/N2/N3 は certificate としては superseded
+  (定理としては残る; (B1) の equidistribution への手がかりとしての価値は不変)。
