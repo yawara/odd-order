@@ -200,6 +200,43 @@ theorem sqSelect_of_isSquare {x lamP lamM : GaloisField p q} (h : IsSquare x) :
 theorem sqSelect_of_not_isSquare {x lamP lamM : GaloisField p q} (h : ¬IsSquare x) :
     sqSelect x lamP lamM = lamM := if_neg h
 
+open scoped Classical in
+/-- Evaluating `sqSelect` with values branched on the sign of a reference `A₀`, at an element
+whose ratio to `A₀` is a square: the sign of `x` agrees with the sign of `A₀`, so the selector
+returns `vS`. -/
+private theorem sqSelect_ite_same {A₀ x vS vO : GaloisField p q} (hA₀ : A₀ ≠ 0)
+    (hx0 : x ≠ 0) (hxs : IsSquare (x * A₀⁻¹)) :
+    sqSelect x (if IsSquare A₀ then vS else vO) (if IsSquare A₀ then vO else vS) = vS := by
+  by_cases hA : IsSquare A₀
+  · have hxsq : IsSquare x := by
+      rw [show x = x * A₀⁻¹ * A₀ by field_simp]
+      exact hxs.mul hA
+    rw [sqSelect_of_isSquare hxsq, if_pos hA]
+  · have hxsq : ¬IsSquare x := by
+      intro hxq
+      exact hA (by rw [show A₀ = x * (x * A₀⁻¹)⁻¹ by field_simp]; exact hxq.mul hxs.inv)
+    rw [sqSelect_of_not_isSquare hxsq, if_neg hA]
+
+open scoped Classical in
+/-- Evaluating `sqSelect` with values branched on the sign of a reference `A₀`, at an element
+whose ratio to `A₀` has square negative: the signs disagree, so the selector returns `vO`. -/
+private theorem sqSelect_ite_opp {A₀ x vS vO : GaloisField p q}
+    (hneg1 : ¬IsSquare (-1 : GaloisField p q))
+    (hdichA : IsSquare A₀ ∨ IsSquare (-A₀)) (hA₀ : A₀ ≠ 0) (hx0 : x ≠ 0)
+    (hxs : IsSquare (-(x * A₀⁻¹))) :
+    sqSelect x (if IsSquare A₀ then vS else vO) (if IsSquare A₀ then vO else vS) = vO := by
+  by_cases hA : IsSquare A₀
+  · have hxsq : ¬IsSquare x := by
+      refine not_isSquare_of_isSquare_neg hneg1 hx0 ?_
+      rw [show -x = -(x * A₀⁻¹) * A₀ by field_simp]
+      exact hxs.mul hA
+    rw [sqSelect_of_not_isSquare hxsq, if_pos hA]
+  · have hAneg : IsSquare (-A₀) := hdichA.resolve_left hA
+    have hxsq : IsSquare x := by
+      rw [show x = -(x * A₀⁻¹) * -A₀ by field_simp]
+      exact hxs.mul hAneg
+    rw [sqSelect_of_isSquare hxsq, if_neg hA]
+
 /-- **The master formula**: `K(p) = λ_{χ(δ₀)}·δ₀ᵉ - λ_{χ(δ₁)}·δ₁ᵉ` for every ordered pair
 of distinct Paley points.  (The pair `(r, p)` recovers the `K(r)`-equation, so one component
 suffices.) -/
@@ -247,6 +284,7 @@ theorem exists_masterFormula_of_plus_anchor (data : FieldNormalizerData p q G) (
   have hneg1 := not_isSquare_neg_one_galois rfl hq0 hqodd
   have hDA0 : normOneVal b₀ ^ e - normOneVal a₀ ^ e ≠ 0 :=
     skewPair_edge_left_ne_zero hcube hneA
+  have hdichA := isSquare_or_isSquare_neg_galois rfl hq0 hqodd hDA0
   have hD : (normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
       - (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e ≠ 0 := by
     intro h0
@@ -275,89 +313,6 @@ theorem exists_masterFormula_of_plus_anchor (data : FieldNormalizerData p q G) (
     fun h => hne (by linear_combination hpp - hrr + h)
   have hd1 : normOneVal r₁ ^ e - normOneVal p₁ ^ e ≠ 0 :=
     skewPair_edge_left_ne_zero hcube hne₁
-  -- `sqSelect` evaluation against the anchor sign
-  have hsel : ∀ x : GaloisField 3 q, x ≠ 0 →
-      IsSquare (x * (normOneVal b₀ ^ e - normOneVal a₀ ^ e)⁻¹) →
-      sqSelect x
-          (if IsSquare (normOneVal b₀ ^ e - normOneVal a₀ ^ e) then
-            (normOneVal a₁ ^ (e * e) - normOneVal a₀ ^ (e * e))
-              * ((normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
-                - (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e)⁻¹
-          else
-            -(normOneVal b₁ ^ (e * e) - normOneVal b₀ ^ (e * e))
-              * ((normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
-                - (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e)⁻¹)
-          (if IsSquare (normOneVal b₀ ^ e - normOneVal a₀ ^ e) then
-            -(normOneVal b₁ ^ (e * e) - normOneVal b₀ ^ (e * e))
-              * ((normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
-                - (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e)⁻¹
-          else
-            (normOneVal a₁ ^ (e * e) - normOneVal a₀ ^ (e * e))
-              * ((normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
-                - (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e)⁻¹)
-        = (normOneVal a₁ ^ (e * e) - normOneVal a₀ ^ (e * e))
-            * ((normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
-              - (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e)⁻¹ := by
-    intro x hx0 hxs
-    by_cases hA : IsSquare (normOneVal b₀ ^ e - normOneVal a₀ ^ e)
-    · have hxsq : IsSquare x := by
-        have hx : x = x * (normOneVal b₀ ^ e - normOneVal a₀ ^ e)⁻¹
-            * (normOneVal b₀ ^ e - normOneVal a₀ ^ e) := by
-          field_simp
-        rw [hx]
-        exact hxs.mul hA
-      rw [sqSelect_of_isSquare hxsq, if_pos hA]
-    · have hxsq : ¬IsSquare x := by
-        intro hx
-        refine hA ?_
-        have hA' : normOneVal b₀ ^ e - normOneVal a₀ ^ e
-            = x * (x * (normOneVal b₀ ^ e - normOneVal a₀ ^ e)⁻¹)⁻¹ := by
-          field_simp
-        rw [hA']
-        exact hx.mul hxs.inv
-      rw [sqSelect_of_not_isSquare hxsq, if_neg hA]
-  have hselneg : ∀ x : GaloisField 3 q, x ≠ 0 →
-      IsSquare (-(x * (normOneVal b₀ ^ e - normOneVal a₀ ^ e)⁻¹)) →
-      sqSelect x
-          (if IsSquare (normOneVal b₀ ^ e - normOneVal a₀ ^ e) then
-            (normOneVal a₁ ^ (e * e) - normOneVal a₀ ^ (e * e))
-              * ((normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
-                - (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e)⁻¹
-          else
-            -(normOneVal b₁ ^ (e * e) - normOneVal b₀ ^ (e * e))
-              * ((normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
-                - (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e)⁻¹)
-          (if IsSquare (normOneVal b₀ ^ e - normOneVal a₀ ^ e) then
-            -(normOneVal b₁ ^ (e * e) - normOneVal b₀ ^ (e * e))
-              * ((normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
-                - (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e)⁻¹
-          else
-            (normOneVal a₁ ^ (e * e) - normOneVal a₀ ^ (e * e))
-              * ((normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
-                - (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e)⁻¹)
-        = -(normOneVal b₁ ^ (e * e) - normOneVal b₀ ^ (e * e))
-            * ((normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
-              - (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e)⁻¹ := by
-    intro x hx0 hxs
-    by_cases hA : IsSquare (normOneVal b₀ ^ e - normOneVal a₀ ^ e)
-    · have hxsq : ¬IsSquare x := by
-        refine not_isSquare_of_isSquare_neg hneg1 hx0 ?_
-        have hx : -x = -(x * (normOneVal b₀ ^ e - normOneVal a₀ ^ e)⁻¹)
-            * (normOneVal b₀ ^ e - normOneVal a₀ ^ e) := by
-          field_simp
-        rw [hx]
-        exact hxs.mul hA
-      rw [sqSelect_of_not_isSquare hxsq, if_pos hA]
-    · have hAneg : IsSquare (-(normOneVal b₀ ^ e - normOneVal a₀ ^ e)) :=
-        (isSquare_or_isSquare_neg_galois rfl hq0 hqodd hDA0).resolve_left hA
-      have hxsq : IsSquare x := by
-        have hx : x = -(x * (normOneVal b₀ ^ e - normOneVal a₀ ^ e)⁻¹)
-            * -(normOneVal b₀ ^ e - normOneVal a₀ ^ e) := by
-          field_simp
-        rw [hx]
-        exact hxs.mul hAneg
-      rw [sqSelect_of_isSquare hxsq, if_neg hA]
-  -- the exchange relation against the anchor, in the four sign sub-cases
   have hr₂0 : (normOneVal r₁ ^ e - normOneVal p₁ ^ e)
       * (normOneVal b₀ ^ e - normOneVal a₀ ^ e)⁻¹ ≠ 0 :=
     mul_ne_zero hd1 (inv_ne_zero hDA0)
@@ -371,7 +326,7 @@ theorem exists_masterFormula_of_plus_anchor (data : FieldNormalizerData p q G) (
       hpp hrr haa hbb hne hneA true true true hb₂ hanchor hb₄).1
     simp only [legWeight_true] at hEX
     have hpin := pin_of_exchange hDA0 hEX
-    rw [hsel _ hd0 hb₄, hsel _ hd1 hb₂]
+    rw [sqSelect_ite_same hDA0 hd0 hb₄, sqSelect_ite_same hDA0 hd1 hb₂]
     field_simp
     linear_combination hpin
   · -- `(b₂, b₄) = (true, false)`
@@ -379,7 +334,7 @@ theorem exists_masterFormula_of_plus_anchor (data : FieldNormalizerData p q G) (
       hpp hrr haa hbb hne hneA true true false hb₂ hanchor hb₄).1
     simp only [legWeight_true, legWeight_false] at hEX
     have hpin := pin_of_exchange hDA0 hEX
-    rw [hselneg _ hd0 hb₄, hsel _ hd1 hb₂]
+    rw [sqSelect_ite_opp hneg1 hdichA hDA0 hd0 hb₄, sqSelect_ite_same hDA0 hd1 hb₂]
     field_simp
     linear_combination hpin
   · -- `(b₂, b₄) = (false, true)`
@@ -387,7 +342,7 @@ theorem exists_masterFormula_of_plus_anchor (data : FieldNormalizerData p q G) (
       hpp hrr haa hbb hne hneA false true true hb₂ hanchor hb₄).1
     simp only [legWeight_true, legWeight_false] at hEX
     have hpin := pin_of_exchange hDA0 hEX
-    rw [hsel _ hd0 hb₄, hselneg _ hd1 hb₂]
+    rw [sqSelect_ite_same hDA0 hd0 hb₄, sqSelect_ite_opp hneg1 hdichA hDA0 hd1 hb₂]
     field_simp
     linear_combination hpin
   · -- `(b₂, b₄) = (false, false)`
@@ -395,9 +350,156 @@ theorem exists_masterFormula_of_plus_anchor (data : FieldNormalizerData p q G) (
       hpp hrr haa hbb hne hneA false true false hb₂ hanchor hb₄).1
     simp only [legWeight_true, legWeight_false] at hEX
     have hpin := pin_of_exchange hDA0 hEX
-    rw [hselneg _ hd0 hb₄, hselneg _ hd1 hb₂]
+    rw [sqSelect_ite_opp hneg1 hdichA hDA0 hd0 hb₄, sqSelect_ite_opp hneg1 hdichA hDA0 hd1 hb₂]
     field_simp
     linear_combination hpin
+
+/-- Dividing a pinned weight by the (non-zero) anchor determinant, distributing over the two
+master terms. -/
+private theorem master_div {K D A B d₀e d₁e : GaloisField p q} (hD : D ≠ 0)
+    (h : K * D = A * d₀e - B * d₁e) : K = A * D⁻¹ * d₀e - B * D⁻¹ * d₁e := by
+  have hK : K = (A * d₀e - B * d₁e) * D⁻¹ := by
+    rw [← h, mul_assoc, mul_inv_cancel₀ hD, mul_one]
+  rw [hK]
+  ring
+
+/-- Clearing the anchor denominator in an exchange relation with `b₃ = false`: the two
+components couple the two target weights into a `2 × 2` system, solved against the determinant
+`D₀^{2e} - D₁^{2e}`. -/
+private theorem pin2_of_exchange {e : ℕ} {Kp Kr W₂ V₂ W₄ V₄ D₀ D₁ d₀ d₁ : GaloisField p q}
+    (hD₀ : D₀ ≠ 0)
+    (h1 : Kp + W₂ * (d₁ * D₀⁻¹) ^ e - -Kr * (D₁ * D₀⁻¹) ^ e - W₄ * (d₀ * D₀⁻¹) ^ e = 0)
+    (h2 : Kr + V₂ * (d₁ * D₀⁻¹) ^ e - -Kp * (D₁ * D₀⁻¹) ^ e - V₄ * (d₀ * D₀⁻¹) ^ e = 0) :
+    Kp * (D₀ ^ e * D₀ ^ e - D₁ ^ e * D₁ ^ e)
+      = (W₄ * D₀ ^ e - V₄ * D₁ ^ e) * d₀ ^ e - (W₂ * D₀ ^ e - V₂ * D₁ ^ e) * d₁ ^ e := by
+  have hcancel : (D₀⁻¹) ^ e * D₀ ^ e = 1 := by
+    rw [inv_pow]
+    exact inv_mul_cancel₀ (pow_ne_zero _ hD₀)
+  linear_combination (D₀ ^ e * D₀ ^ e) * h1 - (D₁ ^ e * D₀ ^ e) * h2
+    - (W₂ * d₁ ^ e * D₀ ^ e + Kr * D₁ ^ e * D₀ ^ e - W₄ * d₀ ^ e * D₀ ^ e
+      - V₂ * d₁ ^ e * D₁ ^ e - Kp * (D₁ ^ e * D₁ ^ e) + V₄ * d₀ ^ e * D₁ ^ e) * hcancel
+
+/-- **The anchor argument, case `χ(ρ₀) = -1`.**  When the anchor ratio is a non-square with
+`ρ₀ ≠ ±1`, the exchange relation of any target pair against the anchor has `b₃ = false` and
+couples the two target weights; its two components form a `2 × 2` system with determinant
+`Δ₀^{2e} - Δ₁^{2e} ≠ 0`, which pins every pair to the master formula with coefficients
+`λ = (K(a)Δ₀ᵉ - K(b)Δ₁ᵉ)/(Δ₀^{2e} - Δ₁^{2e})` (component of `χ(Δ₀)`) and
+`λ' = (K(a)Δ₁ᵉ - K(b)Δ₀ᵉ)/(Δ₀^{2e} - Δ₁^{2e})` (opposite component). -/
+theorem exists_masterFormula_of_minus_anchor (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hqprime : q.Prime) (hq3 : q ≠ 3) (hqodd : Odd q) {e : ℕ} (he : Odd e)
+    (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {a₀ a₁ b₀ b₁ : NormSet.normOneUnits p q}
+    (haa : normOneVal a₀ = normOneVal a₁ + 1) (hbb : normOneVal b₀ = normOneVal b₁ + 1)
+    (hneA : normOneVal a₀ ≠ normOneVal b₀)
+    (hcollA : normOneVal b₀ ^ e - normOneVal a₀ ^ e
+      ≠ normOneVal b₁ ^ e - normOneVal a₁ ^ e)
+    (hantiA : normOneVal b₁ ^ e - normOneVal a₁ ^ e
+      ≠ -(normOneVal b₀ ^ e - normOneVal a₀ ^ e))
+    (hanchor : IsSquare (-((normOneVal b₁ ^ e - normOneVal a₁ ^ e)
+      * (normOneVal b₀ ^ e - normOneVal a₀ ^ e)⁻¹))) :
+    ∃ lamP lamM : GaloisField p q, MasterFormula e lamP lamM := by
+  subst hp
+  classical
+  have hq0 : q ≠ 0 := hqprime.ne_zero
+  have hneg1 := not_isSquare_neg_one_galois rfl hq0 hqodd
+  have hDA0 : normOneVal b₀ ^ e - normOneVal a₀ ^ e ≠ 0 :=
+    skewPair_edge_left_ne_zero hcube hneA
+  have hdichA := isSquare_or_isSquare_neg_galois rfl hq0 hqodd hDA0
+  have hD2 : (normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
+        * (normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
+      - (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e
+        * (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e ≠ 0 := by
+    intro h0
+    rcases mul_eq_zero.mp (show
+        ((normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
+          - (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e)
+        * ((normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
+          + (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e) = 0 by linear_combination h0)
+      with h | h
+    · exact hcollA (Paley.pow_injective_of_cube hcube (sub_eq_zero.mp h))
+    · have h' : (normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
+          = (-(normOneVal b₁ ^ e - normOneVal a₁ ^ e)) ^ e := by
+        rw [he.neg_pow]
+        linear_combination h
+      have hba := Paley.pow_injective_of_cube hcube h'
+      exact hantiA (by linear_combination hba)
+  refine ⟨if IsSquare (normOneVal b₀ ^ e - normOneVal a₀ ^ e) then
+      ((normOneVal a₁ ^ (e * e) - normOneVal a₀ ^ (e * e))
+          * (normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
+        - (normOneVal b₁ ^ (e * e) - normOneVal b₀ ^ (e * e))
+          * (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e)
+        * ((normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
+            * (normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
+          - (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e
+            * (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e)⁻¹
+    else
+      ((normOneVal a₁ ^ (e * e) - normOneVal a₀ ^ (e * e))
+          * (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e
+        - (normOneVal b₁ ^ (e * e) - normOneVal b₀ ^ (e * e))
+          * (normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e)
+        * ((normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
+            * (normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
+          - (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e
+            * (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e)⁻¹,
+    if IsSquare (normOneVal b₀ ^ e - normOneVal a₀ ^ e) then
+      ((normOneVal a₁ ^ (e * e) - normOneVal a₀ ^ (e * e))
+          * (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e
+        - (normOneVal b₁ ^ (e * e) - normOneVal b₀ ^ (e * e))
+          * (normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e)
+        * ((normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
+            * (normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
+          - (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e
+            * (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e)⁻¹
+    else
+      ((normOneVal a₁ ^ (e * e) - normOneVal a₀ ^ (e * e))
+          * (normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
+        - (normOneVal b₁ ^ (e * e) - normOneVal b₀ ^ (e * e))
+          * (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e)
+        * ((normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
+            * (normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e
+          - (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e
+            * (normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e)⁻¹, ?_⟩
+  intro p₀ p₁ r₀ r₁ hpp hrr hne
+  have hd0 : normOneVal r₀ ^ e - normOneVal p₀ ^ e ≠ 0 :=
+    skewPair_edge_left_ne_zero hcube hne
+  have hne₁ : normOneVal p₁ ≠ normOneVal r₁ :=
+    fun h => hne (by linear_combination hpp - hrr + h)
+  have hd1 : normOneVal r₁ ^ e - normOneVal p₁ ^ e ≠ 0 :=
+    skewPair_edge_left_ne_zero hcube hne₁
+  have hr₂0 : (normOneVal r₁ ^ e - normOneVal p₁ ^ e)
+      * (normOneVal b₀ ^ e - normOneVal a₀ ^ e)⁻¹ ≠ 0 :=
+    mul_ne_zero hd1 (inv_ne_zero hDA0)
+  have hr₄0 : (normOneVal r₀ ^ e - normOneVal p₀ ^ e)
+      * (normOneVal b₀ ^ e - normOneVal a₀ ^ e)⁻¹ ≠ 0 :=
+    mul_ne_zero hd0 (inv_ne_zero hDA0)
+  rcases isSquare_or_isSquare_neg_galois rfl hq0 hqodd hr₂0 with hb₂ | hb₂ <;>
+    rcases isSquare_or_isSquare_neg_galois rfl hq0 hqodd hr₄0 with hb₄ | hb₄
+  · have hEX := exchange_relation data rfl hqprime hq3 hqodd he hcube hexp
+      hpp hrr haa hbb hne hneA true false true hb₂ hanchor hb₄
+    simp only [legWeight_true, legWeight_false] at hEX
+    have hpin := pin2_of_exchange hDA0 hEX.1 hEX.2
+    rw [sqSelect_ite_same hDA0 hd0 hb₄, sqSelect_ite_same hDA0 hd1 hb₂]
+    linear_combination master_div hD2 hpin
+  · have hEX := exchange_relation data rfl hqprime hq3 hqodd he hcube hexp
+      hpp hrr haa hbb hne hneA true false false hb₂ hanchor hb₄
+    simp only [legWeight_true, legWeight_false] at hEX
+    have hpin := pin2_of_exchange hDA0 hEX.1 hEX.2
+    rw [sqSelect_ite_opp hneg1 hdichA hDA0 hd0 hb₄, sqSelect_ite_same hDA0 hd1 hb₂]
+    linear_combination master_div hD2 hpin
+  · have hEX := exchange_relation data rfl hqprime hq3 hqodd he hcube hexp
+      hpp hrr haa hbb hne hneA false false true hb₂ hanchor hb₄
+    simp only [legWeight_true, legWeight_false] at hEX
+    have hpin := pin2_of_exchange hDA0 hEX.1 hEX.2
+    rw [sqSelect_ite_same hDA0 hd0 hb₄, sqSelect_ite_opp hneg1 hdichA hDA0 hd1 hb₂]
+    linear_combination master_div hD2 hpin
+  · have hEX := exchange_relation data rfl hqprime hq3 hqodd he hcube hexp
+      hpp hrr haa hbb hne hneA false false false hb₂ hanchor hb₄
+    simp only [legWeight_false] at hEX
+    have hpin := pin2_of_exchange hDA0 hEX.1 hEX.2
+    rw [sqSelect_ite_opp hneg1 hdichA hDA0 hd0 hb₄,
+      sqSelect_ite_opp hneg1 hdichA hDA0 hd1 hb₂]
+    linear_combination master_div hD2 hpin
 
 end SkewEndgame
 
