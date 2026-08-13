@@ -78,13 +78,11 @@ Part II (skew calculus)・Part III (endgame) は紙上のみ。本 issue はそ�
       `false_of_masterFormula_sigma_zero` (Σ̄=0: `sqSelect_neg_apply` で selector 反対称
       → K 定数 → powDiff(e²) 衝突 → pow_mul_down → CollisionPair → Part I)。
       「Σ̄=0 glue の 1 補題化」(assembly 監査 nit) も解消。
-- [ ] **枝 (iii) Frobenius 量子化** (μ_c = λ_c − λ_c³ ≠ 0 の反駁 → λ± ∈ F₃):
-      master(p,r) と master(p³,r³) の cube 差で μ_{χδ₀}δ₀^{3e} = μ_{χδ₁}δ₁^{3e}。
-      場合分け: 同符号辺あり → ρ^{3e} = 1 → gcd(3e,Q−1)=1 で ρ=1 = 衝突 → 死 /
-      μ 片方 0 → 混合辺即矛盾 → 全辺同符号 → 上で死 / 両方非零 → swap 対で
-      μ+ = −μ− かつ全混合辺 ρ = −1 → master 退化 K(p) = Σ̄δ₀^e → e-冪単射で
-      out-degree 1 → |T| ≥ 3 矛盾。⚠ gcd(3e, Q−1) = 1 (= 3 ∤ Q−1 + cube) の仮定を
-      capstone からどう供給するか要設計 (z^{3e}-単射性の形で受けるのが素直)。
+- [x] **枝 (iii) Frobenius 量子化** (2026-08-13, commit 69e3eda12):
+      `false_of_masterFormula_mu_ne_zero` + selector 補題 4 本。紙より簡潔な構成:
+      (Q) + swap-(Q) の**和** (sqSelect_add_swap) で μ₋ = −μ₊ が人口場合分けなしに
+      出る。3-冪単射は char 3 Frobenius 単射性から無料 (gcd(3e,Q−1)=1 の supply 問題
+      は消滅)。data/hexp 非依存 (衝突は hnocoll 直行、loop 不要)。
 - [ ] **枝 (iv) F₃ 残 4 候補** (±1,0),(0,±1): 同符号辺 1 本で K(p) = 0 即死 (候補依存、
       swap が補完) / 全混合世界は 2 パターン各 1 本 pin で out-degree ≤ 2 vs |T|−1 ≥ 3。
 - [ ] **capstone** `Problem1.false_of_exotic`: 無衝突 by_contra 分岐 + card_paleySet_lower
