@@ -719,6 +719,231 @@ theorem false_of_masterFormula_sigma_zero (data : FieldNormalizerData p q G) (hp
   obtain ⟨S, S', hpair⟩ := hcoll
   exact false_of_collisionPair data rfl hqprime hq3 hqodd he hcube hexp hpair
 
+/-- Negating the argument of the selector swaps its two values (`-1` is a non-square). -/
+private theorem sqSelect_neg_swap (hneg1 : ¬IsSquare (-1 : GaloisField p q))
+    {x : GaloisField p q} (hdich : IsSquare x ∨ IsSquare (-x)) (hx0 : x ≠ 0)
+    {lamP lamM : GaloisField p q} :
+    sqSelect (-x) lamP lamM = sqSelect x lamM lamP := by
+  by_cases hx : IsSquare x
+  · have hnx : ¬IsSquare (-x) :=
+      not_isSquare_of_isSquare_neg hneg1 (neg_ne_zero.mpr hx0) (by rwa [neg_neg])
+    rw [sqSelect_of_not_isSquare hnx, sqSelect_of_isSquare hx]
+  · rw [sqSelect_of_isSquare (hdich.resolve_left hx), sqSelect_of_not_isSquare hx]
+
+/-- The selector and its value-swapped twin sum to the sum of the values. -/
+private theorem sqSelect_add_swap {x a b : GaloisField p q} :
+    sqSelect x a b + sqSelect x b a = a + b := by
+  by_cases hx : IsSquare x
+  · rw [sqSelect_of_isSquare hx, sqSelect_of_isSquare hx]
+  · rw [sqSelect_of_not_isSquare hx, sqSelect_of_not_isSquare hx, add_comm]
+
+/-- The selector commutes with `λ ↦ λ - λ³`. -/
+private theorem sqSelect_sub_cube {x lamP lamM : GaloisField p q} :
+    sqSelect x lamP lamM - sqSelect x lamP lamM ^ (3 : ℕ)
+      = sqSelect x (lamP - lamP ^ (3 : ℕ)) (lamM - lamM ^ (3 : ℕ)) := by
+  by_cases hx : IsSquare x
+  · simp only [sqSelect_of_isSquare hx]
+  · simp only [sqSelect_of_not_isSquare hx]
+
+/-- The selector is invariant under cubing the argument (`x³ = x·x²` has the sign of `x`). -/
+private theorem sqSelect_cube {x lamP lamM : GaloisField p q} (hx0 : x ≠ 0) :
+    sqSelect (x ^ (3 : ℕ)) lamP lamM = sqSelect x lamP lamM := by
+  by_cases hx : IsSquare x
+  · rw [sqSelect_of_isSquare (hx.pow _), sqSelect_of_isSquare hx]
+  · have h3 : ¬IsSquare (x ^ (3 : ℕ)) := by
+      intro h
+      refine hx ?_
+      rw [show x = x ^ (3 : ℕ) * (x⁻¹) ^ (2 : ℕ) by field_simp]
+      exact h.mul ⟨x⁻¹, pow_two x⁻¹⟩
+    rw [sqSelect_of_not_isSquare h3, sqSelect_of_not_isSquare hx]
+
+/-- **Branch `μ ≠ 0`: Frobenius quantisation.**  Comparing the master formula on `(p³, r³)`
+with the cube of the master formula on `(p, r)` yields the quantisation identity
+`μ_{χ(δ₀)}·δ₀^{3e} = μ_{χ(δ₁)}·δ₁^{3e}` with `μ_c = λ_c - λ_c³`.  Adding it to its swap gives
+`(μ₊ + μ₋)(δ₀^{3e} - δ₁^{3e}) = 0`, so `μ₋ = -μ₊` (a collision otherwise); if `μ₊ ≠ 0`,
+same-sign pairs are collisions and mixed pairs are antipodal, so *every* pair is antipodal —
+the master formula degenerates to `K = Σ̄·δ₀ᵉ` and pins the partner of `a` uniquely,
+contradicting two distinct partners.  Hence `λ₊, λ₋ ∈ 𝔽₃`. -/
+theorem false_of_masterFormula_mu_ne_zero (hp : p = 3) (hq0 : q ≠ 0) (hqodd : Odd q)
+    {e : ℕ} (he : Odd e)
+    (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
+    {a₀ a₁ b₀ b₁ c₀ c₁ : NormSet.normOneUnits p q}
+    (haa : normOneVal a₀ = normOneVal a₁ + 1) (hbb : normOneVal b₀ = normOneVal b₁ + 1)
+    (hcc : normOneVal c₀ = normOneVal c₁ + 1)
+    (hab : normOneVal a₀ ≠ normOneVal b₀) (hac : normOneVal a₀ ≠ normOneVal c₀)
+    (hbc : normOneVal b₀ ≠ normOneVal c₀)
+    (hnocoll : ∀ p₀ p₁ r₀ r₁ : NormSet.normOneUnits p q,
+      normOneVal p₀ = normOneVal p₁ + 1 → normOneVal r₀ = normOneVal r₁ + 1 →
+      normOneVal p₀ ≠ normOneVal r₀ →
+      normOneVal r₀ ^ e - normOneVal p₀ ^ e ≠ normOneVal r₁ ^ e - normOneVal p₁ ^ e)
+    {lamP lamM : GaloisField p q} (hmaster : MasterFormula e lamP lamM)
+    (hSig : lamP + lamM ≠ 0)
+    (hμ : ¬(lamP - lamP ^ (3 : ℕ) = 0 ∧ lamM - lamM ^ (3 : ℕ) = 0)) : False := by
+  subst hp
+  have hneg1 := not_isSquare_neg_one_galois rfl hq0 hqodd
+  have hodd3 : Odd (3 : ℕ) := by decide
+  have h3inj : ∀ x y : GaloisField 3 q, x ^ (3 : ℕ) = y ^ (3 : ℕ) → x = y := by
+    intro x y h
+    have h0 : (x - y) ^ (3 : ℕ) = 0 := by rw [sub_pow_char, h, sub_self]
+    exact sub_eq_zero.mp ((pow_eq_zero_iff (by norm_num : (3 : ℕ) ≠ 0)).mp h0)
+  have hfrob : ∀ (x y : NormSet.normOneUnits 3 q) (k : ℕ),
+      normOneVal (x ^ (3 : ℕ)) ^ k - normOneVal (y ^ (3 : ℕ)) ^ k
+        = (normOneVal x ^ k - normOneVal y ^ k) ^ (3 : ℕ) := by
+    intro x y k
+    rw [normOneVal_pow, normOneVal_pow, pow_right_comm (normOneVal x) 3 k,
+      pow_right_comm (normOneVal y) 3 k, ← sub_pow_char]
+  -- the quantisation identity (Q), for every pair
+  have hQ : ∀ x₀ x₁ y₀ y₁ : NormSet.normOneUnits 3 q,
+      normOneVal x₀ = normOneVal x₁ + 1 → normOneVal y₀ = normOneVal y₁ + 1 →
+      normOneVal x₀ ≠ normOneVal y₀ →
+      sqSelect (normOneVal y₀ ^ e - normOneVal x₀ ^ e)
+          (lamP - lamP ^ (3 : ℕ)) (lamM - lamM ^ (3 : ℕ))
+          * ((normOneVal y₀ ^ e - normOneVal x₀ ^ e) ^ e) ^ (3 : ℕ)
+        = sqSelect (normOneVal y₁ ^ e - normOneVal x₁ ^ e)
+            (lamP - lamP ^ (3 : ℕ)) (lamM - lamM ^ (3 : ℕ))
+            * ((normOneVal y₁ ^ e - normOneVal x₁ ^ e) ^ e) ^ (3 : ℕ) := by
+    intro x₀ x₁ y₀ y₁ hxx hyy hxy
+    have hd0 : normOneVal y₀ ^ e - normOneVal x₀ ^ e ≠ 0 :=
+      skewPair_edge_left_ne_zero hcube hxy
+    have hne₁ : normOneVal x₁ ≠ normOneVal y₁ :=
+      fun h => hxy (by linear_combination hxx - hyy + h)
+    have hd1 : normOneVal y₁ ^ e - normOneVal x₁ ^ e ≠ 0 :=
+      skewPair_edge_left_ne_zero hcube hne₁
+    have h1 := hmaster x₀ x₁ y₀ y₁ hxx hyy hxy
+    have hxx3 : normOneVal (x₀ ^ (3 : ℕ)) = normOneVal (x₁ ^ (3 : ℕ)) + 1 := by
+      simp only [normOneVal_pow]
+      rw [hxx, add_pow_char, one_pow]
+    have hyy3 : normOneVal (y₀ ^ (3 : ℕ)) = normOneVal (y₁ ^ (3 : ℕ)) + 1 := by
+      simp only [normOneVal_pow]
+      rw [hyy, add_pow_char, one_pow]
+    have hxy3 : normOneVal (x₀ ^ (3 : ℕ)) ≠ normOneVal (y₀ ^ (3 : ℕ)) := by
+      intro h
+      refine hxy (h3inj _ _ ?_)
+      simpa [normOneVal_pow] using h
+    have h3 := hmaster (x₀ ^ (3 : ℕ)) (x₁ ^ (3 : ℕ)) (y₀ ^ (3 : ℕ)) (y₁ ^ (3 : ℕ))
+      hxx3 hyy3 hxy3
+    rw [hfrob y₀ x₀ e, hfrob y₁ x₁ e, hfrob x₁ x₀ (e * e),
+      sqSelect_cube hd0, sqSelect_cube hd1,
+      pow_right_comm (normOneVal y₀ ^ e - normOneVal x₀ ^ e) 3 e,
+      pow_right_comm (normOneVal y₁ ^ e - normOneVal x₁ ^ e) 3 e] at h3
+    have hc1 : (normOneVal x₁ ^ (e * e) - normOneVal x₀ ^ (e * e)) ^ (3 : ℕ)
+        = sqSelect (normOneVal y₀ ^ e - normOneVal x₀ ^ e) lamP lamM ^ (3 : ℕ)
+            * ((normOneVal y₀ ^ e - normOneVal x₀ ^ e) ^ e) ^ (3 : ℕ)
+          - sqSelect (normOneVal y₁ ^ e - normOneVal x₁ ^ e) lamP lamM ^ (3 : ℕ)
+            * ((normOneVal y₁ ^ e - normOneVal x₁ ^ e) ^ e) ^ (3 : ℕ) := by
+      rw [h1, sub_pow_char, mul_pow, mul_pow]
+    rw [← sqSelect_sub_cube, ← sqSelect_sub_cube]
+    linear_combination hc1 - h3
+  -- adding (Q) to its swap forces `μ₋ = -μ₊`
+  have hdich : ∀ x : GaloisField 3 q, x ≠ 0 → IsSquare x ∨ IsSquare (-x) :=
+    fun x hx => isSquare_or_isSquare_neg_galois rfl hq0 hqodd hx
+  have hd0ab : normOneVal b₀ ^ e - normOneVal a₀ ^ e ≠ 0 :=
+    skewPair_edge_left_ne_zero hcube hab
+  have hne₁ab : normOneVal a₁ ≠ normOneVal b₁ :=
+    fun h => hab (by linear_combination haa - hbb + h)
+  have hd1ab : normOneVal b₁ ^ e - normOneVal a₁ ^ e ≠ 0 :=
+    skewPair_edge_left_ne_zero hcube hne₁ab
+  have hμsum : lamM - lamM ^ (3 : ℕ) = -(lamP - lamP ^ (3 : ℕ)) := by
+    by_contra hSigMu
+    have hSigMu' : lamP - lamP ^ (3 : ℕ) + (lamM - lamM ^ (3 : ℕ)) ≠ 0 :=
+      fun h0 => hSigMu (by linear_combination h0)
+    have hq1 := hQ a₀ a₁ b₀ b₁ haa hbb hab
+    have hq2 := hQ b₀ b₁ a₀ a₁ hbb haa hab.symm
+    rw [show normOneVal a₀ ^ e - normOneVal b₀ ^ e
+        = -(normOneVal b₀ ^ e - normOneVal a₀ ^ e) by ring,
+      show normOneVal a₁ ^ e - normOneVal b₁ ^ e
+        = -(normOneVal b₁ ^ e - normOneVal a₁ ^ e) by ring,
+      sqSelect_neg_swap hneg1 (hdich _ hd0ab) hd0ab,
+      sqSelect_neg_swap hneg1 (hdich _ hd1ab) hd1ab,
+      he.neg_pow, he.neg_pow, hodd3.neg_pow, hodd3.neg_pow] at hq2
+    have e₀ := sqSelect_add_swap (x := normOneVal b₀ ^ e - normOneVal a₀ ^ e)
+      (a := lamP - lamP ^ (3 : ℕ)) (b := lamM - lamM ^ (3 : ℕ))
+    have e₁ := sqSelect_add_swap (x := normOneVal b₁ ^ e - normOneVal a₁ ^ e)
+      (a := lamP - lamP ^ (3 : ℕ)) (b := lamM - lamM ^ (3 : ℕ))
+    have hsum : (lamP - lamP ^ (3 : ℕ) + (lamM - lamM ^ (3 : ℕ)))
+        * ((normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e) ^ (3 : ℕ)
+        = (lamP - lamP ^ (3 : ℕ) + (lamM - lamM ^ (3 : ℕ)))
+        * ((normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e) ^ (3 : ℕ) := by
+      linear_combination hq1 - hq2
+        - ((normOneVal b₀ ^ e - normOneVal a₀ ^ e) ^ e) ^ (3 : ℕ) * e₀
+        + ((normOneVal b₁ ^ e - normOneVal a₁ ^ e) ^ e) ^ (3 : ℕ) * e₁
+    have hpow := h3inj _ _ (mul_left_cancel₀ hSigMu' hsum)
+    exact hnocoll a₀ a₁ b₀ b₁ haa hbb hab
+      (Paley.pow_injective_of_cube hcube hpow)
+  have hμP : lamP - lamP ^ (3 : ℕ) ≠ 0 := by
+    intro h0
+    exact hμ ⟨h0, by rw [hμsum, h0, neg_zero]⟩
+  -- every pair is antipodal
+  have hanti : ∀ x₀ x₁ y₀ y₁ : NormSet.normOneUnits 3 q,
+      normOneVal x₀ = normOneVal x₁ + 1 → normOneVal y₀ = normOneVal y₁ + 1 →
+      normOneVal x₀ ≠ normOneVal y₀ →
+      normOneVal y₁ ^ e - normOneVal x₁ ^ e
+        = -(normOneVal y₀ ^ e - normOneVal x₀ ^ e) := by
+    intro x₀ x₁ y₀ y₁ hxx hyy hxy
+    have hd0 : normOneVal y₀ ^ e - normOneVal x₀ ^ e ≠ 0 :=
+      skewPair_edge_left_ne_zero hcube hxy
+    have hne₁ : normOneVal x₁ ≠ normOneVal y₁ :=
+      fun h => hxy (by linear_combination hxx - hyy + h)
+    have hd1 : normOneVal y₁ ^ e - normOneVal x₁ ^ e ≠ 0 :=
+      skewPair_edge_left_ne_zero hcube hne₁
+    have hq1 := hQ x₀ x₁ y₀ y₁ hxx hyy hxy
+    rw [hμsum] at hq1
+    have hcollx := hnocoll x₀ x₁ y₀ y₁ hxx hyy hxy
+    by_cases h₀ : IsSquare (normOneVal y₀ ^ e - normOneVal x₀ ^ e) <;>
+      by_cases h₁ : IsSquare (normOneVal y₁ ^ e - normOneVal x₁ ^ e)
+    · rw [sqSelect_of_isSquare h₀, sqSelect_of_isSquare h₁] at hq1
+      exact absurd (Paley.pow_injective_of_cube hcube
+        (h3inj _ _ (mul_left_cancel₀ hμP hq1))) hcollx
+    · rw [sqSelect_of_isSquare h₀, sqSelect_of_not_isSquare h₁] at hq1
+      have hAB : ((normOneVal y₀ ^ e - normOneVal x₀ ^ e) ^ e) ^ (3 : ℕ)
+          = ((-(normOneVal y₁ ^ e - normOneVal x₁ ^ e)) ^ e) ^ (3 : ℕ) := by
+        rw [he.neg_pow, hodd3.neg_pow]
+        linear_combination mul_left_cancel₀ hμP (by linear_combination hq1 :
+          (lamP - lamP ^ (3 : ℕ))
+              * ((normOneVal y₀ ^ e - normOneVal x₀ ^ e) ^ e) ^ (3 : ℕ)
+            = (lamP - lamP ^ (3 : ℕ))
+              * -((normOneVal y₁ ^ e - normOneVal x₁ ^ e) ^ e) ^ (3 : ℕ))
+      have := Paley.pow_injective_of_cube hcube (h3inj _ _ hAB)
+      linear_combination this
+    · rw [sqSelect_of_not_isSquare h₀, sqSelect_of_isSquare h₁] at hq1
+      have hAB : ((normOneVal y₀ ^ e - normOneVal x₀ ^ e) ^ e) ^ (3 : ℕ)
+          = ((-(normOneVal y₁ ^ e - normOneVal x₁ ^ e)) ^ e) ^ (3 : ℕ) := by
+        rw [he.neg_pow, hodd3.neg_pow]
+        linear_combination mul_left_cancel₀ hμP (by linear_combination -hq1 :
+          (lamP - lamP ^ (3 : ℕ))
+              * ((normOneVal y₀ ^ e - normOneVal x₀ ^ e) ^ e) ^ (3 : ℕ)
+            = (lamP - lamP ^ (3 : ℕ))
+              * -((normOneVal y₁ ^ e - normOneVal x₁ ^ e) ^ e) ^ (3 : ℕ))
+      have := Paley.pow_injective_of_cube hcube (h3inj _ _ hAB)
+      linear_combination this
+    · rw [sqSelect_of_not_isSquare h₀, sqSelect_of_not_isSquare h₁] at hq1
+      have hq1' : (lamP - lamP ^ (3 : ℕ))
+            * ((normOneVal y₀ ^ e - normOneVal x₀ ^ e) ^ e) ^ (3 : ℕ)
+          = (lamP - lamP ^ (3 : ℕ))
+            * ((normOneVal y₁ ^ e - normOneVal x₁ ^ e) ^ e) ^ (3 : ℕ) := by
+        linear_combination -hq1
+      exact absurd (Paley.pow_injective_of_cube hcube
+        (h3inj _ _ (mul_left_cancel₀ hμP hq1'))) hcollx
+  -- the master formula degenerates to `K = Σ̄·δ₀ᵉ` and pins the partner of `a`
+  have hpin : ∀ y₀ y₁ : NormSet.normOneUnits 3 q,
+      normOneVal y₀ = normOneVal y₁ + 1 → normOneVal a₀ ≠ normOneVal y₀ →
+      normOneVal a₁ ^ (e * e) - normOneVal a₀ ^ (e * e)
+        = (lamP + lamM) * (normOneVal y₀ ^ e - normOneVal a₀ ^ e) ^ e := by
+    intro y₀ y₁ hyy hay
+    have hd0 : normOneVal y₀ ^ e - normOneVal a₀ ^ e ≠ 0 :=
+      skewPair_edge_left_ne_zero hcube hay
+    have h1 := hmaster a₀ a₁ y₀ y₁ haa hyy hay
+    rw [hanti a₀ a₁ y₀ y₁ haa hyy hay,
+      sqSelect_neg_swap hneg1 (hdich _ hd0) hd0, he.neg_pow] at h1
+    have hadd := sqSelect_add_swap (x := normOneVal y₀ ^ e - normOneVal a₀ ^ e)
+      (a := lamP) (b := lamM)
+    linear_combination h1 + (normOneVal y₀ ^ e - normOneVal a₀ ^ e) ^ e * hadd
+  have hb := hpin b₀ b₁ hbb hab
+  have hc := hpin c₀ c₁ hcc hac
+  have hpow := mul_left_cancel₀ hSig (hb.symm.trans hc)
+  have h0e := Paley.pow_injective_of_cube hcube hpow
+  exact hbc (Paley.pow_injective_of_cube hcube (by linear_combination h0e))
+
 end SkewEndgame
 
 end OddOrder.BG.AppC.Problem1

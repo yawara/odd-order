@@ -21271,3 +21271,4 @@ refutation: population branches of the master-formula collapse. -/
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.sqSelect_self
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_masterFormula_delta_zero
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_masterFormula_sigma_zero
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_masterFormula_mu_ne_zero
