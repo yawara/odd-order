@@ -25,19 +25,27 @@ Part II (skew calculus)・Part III (endgame) は紙上のみ。本 issue はそ�
 
 ## やること (上流から)
 
-- [ ] **SkewPair 定義と点関係式 (P)**: `SkewPair data e A B X Y : Prop :=
-      ∀z ∈ U 版の b(Az^e)d(Xz^{e²})b(−Bz^e) = d(Yz^{e²})`。(P) = `a(z) = b(−p^ez^e)
-      d(K(p)z^{e²}) b((p−1)^ez^e)` を `layered_relation_field` から (新 leaf
-      `AppC_Problem1SkewCalculus.lean`; 既存 ConjPair 系のイディオム流用)。
-- [ ] **skew 辺 (E(p,r))**: (P) 2 本の等置。`p, r ∈ T` の encode は
-      `paleySet`/`normOneUnits` の既存 glue に合わせる。
-- [ ] **反転・swap・再スケール・合成**: rev = 群逆元 / swap = (r,p)-辺 /
-      `z ↦ tz` (t ∈ U) / 内側 b 相殺の合成補題。
-- [ ] **閉条件**: t-逐次決定と `∏B = ∏A` ⟺ 閉じ (符号条件込み)。有限列上の帰納。
-- [ ] **loop ⟹ kill**: 片側零 ⟹ 層単射で矛盾 / 両側非零 ⟹ χ(A) 分岐 +
-      g-共役の層シフト (`g·layer_{i+1}(x)·g⁻¹ = layer_i(x)`、`conjGen_pow_three`) ⟹
-      `ConjPair` ⟹ cube-loop で Frobenius 族 ⟹ `false_of_conjPair_frobenius_family`。
-- [ ] **同 slot 2-loop ⟹ κ-定数** と **可換子 loop ⟹ (EX)** (全 4 符号セクター;
+- [x] **SkewPair 定義と点関係式 (P)** (2026-08-13, commit 5ae0afa81)。**設計変更**:
+      layer (1,2) でなく **(0,1) で構築** — `SkewPair data e A B X Y` =
+      `a(Aw)·b(Xw^e)·a(Bw)⁻¹ = b(Yw^e)` (∀w 非零平方)。点関係式は既存
+      `layerFieldHom_two_factor` (relation (2)) をそのまま使い、閉 loop が置換
+      `v := Aw` だけで標準 `ConjPair` になる (g-共役の層シフト不要)。
+- [x] **skew 辺 (E(p,r))**: `skewPair_edge` (two_factor 2 本の第 3 層消去) +
+      非退化 `skewPair_edge_left_ne_zero` / `skewPair_edge_weight_ne_zero`。
+- [x] **反転・再スケール・合成**: `SkewPair.rev`/`rescale`/`comp` +
+      `self_symm`/graph property (`self_left_eq_zero`/`self_right_eq_zero`)。
+      swap 辺は独立補題不要 (= `skewPair_edge` を (r,p) 順で適用するだけ)。
+- [x] **閉条件 (設計変更: 一般 k-連鎖理論は作らない)**: endgame が使う loop は
+      同 slot 2-loop・fwd-fwd 2-loop・可換子 4-loop のみなので、各 loop を
+      rescale+comp の直接合成で組む。一般の「t-逐次決定・∏B = ∏A 帰納」は不要
+      (共謀仮定は具体 loop ごとに contrapositive で使われる)。
+- [x] **loop ⟹ kill**: `false_of_skewPair_self_frobenius_family` — 閉 loop の
+      Frobenius 族 (重み非零) → χ(A) 分岐 (向きは cube 不変で族一様) →
+      `conjPair_of_self`/`conjPair_of_self_neg` → `false_of_conjPair_frobenius_family`。
+- [x] **同 slot 2-loop ⟹ κ-定数** (commit 204fd6c5c): `false_of_proportional_edges` +
+      `weights_proportional_of_proportional_edges` (K(p) = K(p')s^e ∧ K(r) = K(r')s^e、
+      除算なし multiplied-out 形; loop 族は `paley_frobenius_iterate` で供給)。
+- [ ] **可換子 loop ⟹ (EX)** (全 4 符号セクター;
       per-leg slot 表は resolution.md の表を写す)。
 - [ ] **(EX) ⟹ master formula** (anchor 論法; 退化人口: singleton {−1} は
       fwd-fwd 2-loop `e∘swap(e)` の別補題、singleton {ρ≠±1} は master 全射性)。

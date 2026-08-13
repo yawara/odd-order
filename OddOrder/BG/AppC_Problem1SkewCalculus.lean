@@ -444,6 +444,75 @@ theorem weights_proportional_of_proportional_edges (data : FieldNormalizerData p
   exact false_of_proportional_edges data hp hqprime hq3 hqodd he hcube hexp hpp hrr hpp' hrr'
     hne hs hs0 houter hinner hW
 
+/-! ### The antipodal two-loop: an edge of ratio `-1` forces `K(p) + K(r) = 0`
+
+An edge with `δ₁ = -δ₀` composes with its own swap `(r, p)`-edge into a closed loop with
+weights `(K(p) + K(r), K(r) + K(p))` — the forward-forward two-loop `e ∘ swap(e)`, legal
+exactly on the ratio class `-1`.  The kill lemma forces `K(p) = -K(r)`; over three distinct
+Paley points this kills the singleton-`{-1}` population (step 4 of the case tree). -/
+
+/-- **The antipodal two-loop kill.**  An edge with `δ₁ = -δ₀` whose weight sum
+`K(p) + K(r)` does not vanish refutes hypothesis (B): the edge composes with its own swap
+into a closed loop of weight `(K(p) + K(r), K(r) + K(p))`, uniformly in the Frobenius
+twist. -/
+theorem false_of_antipodal_edge (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hqprime : q.Prime) (hq3 : q ≠ 3) (hqodd : Odd q) {e : ℕ} (he : Odd e)
+    (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {p₀ p₁ r₀ r₁ : NormSet.normOneUnits p q}
+    (hpp : normOneVal p₀ = normOneVal p₁ + 1) (hrr : normOneVal r₀ = normOneVal r₁ + 1)
+    (hne : normOneVal p₀ ≠ normOneVal r₀)
+    (hopp : normOneVal r₁ ^ e - normOneVal p₁ ^ e
+      = -(normOneVal r₀ ^ e - normOneVal p₀ ^ e))
+    (hK : (normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e))
+      + (normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e)) ≠ 0) : False := by
+  subst hp
+  have hq0 : q ≠ 0 := hqprime.ne_zero
+  refine false_of_skewPair_self_frobenius_family data rfl hqprime hq3 hqodd he hcube hexp
+    (A := normOneVal r₀ ^ e - normOneVal p₀ ^ e)
+    (X := (normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e))
+      + (normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e)))
+    (Y := (normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e))
+      + (normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e)))
+    (skewPair_edge_left_ne_zero hcube hne) (fun h => hK h.1) ?_
+  intro j
+  have hppj := paley_frobenius_iterate hpp j
+  have hrrj := paley_frobenius_iterate hrr j
+  have he₁ := skewPair_edge data rfl hq0 hexp _ _ _ _ hppj hrrj
+  have he₂ := skewPair_edge data rfl hq0 hexp _ _ _ _ hrrj hppj
+  rw [normOneVal_sub_pow_frobenius j e r₀ p₀, normOneVal_sub_pow_frobenius j e r₁ p₁,
+    normOneVal_sub_pow_frobenius j (e * e) p₁ p₀,
+    normOneVal_sub_pow_frobenius j (e * e) r₁ r₀] at he₁
+  rw [normOneVal_sub_pow_frobenius j e p₀ r₀, normOneVal_sub_pow_frobenius j e p₁ r₁,
+    normOneVal_sub_pow_frobenius j (e * e) r₁ r₀,
+    normOneVal_sub_pow_frobenius j (e * e) p₁ p₀] at he₂
+  -- the swap edge's parameters coincide with `δ₁` and `δ₀` on the ratio class `-1`
+  rw [show normOneVal p₀ ^ e - normOneVal r₀ ^ e
+      = normOneVal r₁ ^ e - normOneVal p₁ ^ e by linear_combination -hopp,
+    show normOneVal p₁ ^ e - normOneVal r₁ ^ e
+      = normOneVal r₀ ^ e - normOneVal p₀ ^ e by linear_combination -hopp] at he₂
+  have hcomp := he₁.comp he₂
+  rw [← add_pow_char_pow, ← add_pow_char_pow] at hcomp
+  exact hcomp
+
+/-- **The ratio class `-1` forces antisymmetric weights.**  On an edge with `δ₁ = -δ₀` the
+weight sum vanishes: `K(p) = -K(r)`.  Step 4 of the case tree: in the singleton-`{-1}`
+population this holds for every ordered pair, and three distinct Paley points then force
+`K ≡ 0`, a contradiction. -/
+theorem weight_sum_eq_zero_of_antipodal_edge (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hqprime : q.Prime) (hq3 : q ≠ 3) (hqodd : Odd q) {e : ℕ} (he : Odd e)
+    (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {p₀ p₁ r₀ r₁ : NormSet.normOneUnits p q}
+    (hpp : normOneVal p₀ = normOneVal p₁ + 1) (hrr : normOneVal r₀ = normOneVal r₁ + 1)
+    (hne : normOneVal p₀ ≠ normOneVal r₀)
+    (hopp : normOneVal r₁ ^ e - normOneVal p₁ ^ e
+      = -(normOneVal r₀ ^ e - normOneVal p₀ ^ e)) :
+    (normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e))
+      + (normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e)) = 0 := by
+  by_contra hK
+  exact false_of_antipodal_edge data hp hqprime hq3 hqodd he hcube hexp hpp hrr hne hopp hK
+
 end SkewCalculus
 
 end OddOrder.BG.AppC.Problem1

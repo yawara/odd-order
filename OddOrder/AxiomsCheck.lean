@@ -21241,3 +21241,5 @@ family of closed loops with non-vanishing weight is fatal through the chain-reve
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.paley_frobenius_iterate
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_proportional_edges
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.weights_proportional_of_proportional_edges
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_antipodal_edge
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.weight_sum_eq_zero_of_antipodal_edge
