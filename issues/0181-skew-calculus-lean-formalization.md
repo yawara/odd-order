@@ -89,21 +89,19 @@ Part II (skew calculus)・Part III (endgame) は紙上のみ。本 issue はそ�
 - [x] **capstone** (commit cb6d52514): `false_of_exotic` — **Part II+III 機械検証完了**。
       4 点抽出 (card_paleySet_lower + q ≥ 5) + 衝突 by_cases + master + 4 枝網羅。
       フルビルド green・--strict 警告ゼロ・axiom-clean。
-- [ ] **最終統合形 `hypothesisB_false`** (調査済 2026-08-13、次セッション規模):
-      必要な glue は 2 つ。
-      **(a) 指数抽出補題** `exists_odd_cube_exponent : (data : FieldNormalizerData 3 q G) →
-      ∃ e, Odd e ∧ (∀ z : GaloisField 3 q, z^(e*e*e) = z) ∧
-      (∀ w ∈ data.U, conjGen data * w = w^e * conjGen data)`:
-      `primeLine_conj_normalizes_U` → conjGen が U を正規化 → U ≅ normOneUnits cyclic の
-      自己同型 = 冪写像 (mathlib `MonoidHom.map_cyclic`, ℤ-冪 → mod n で ℕ 化) →
-      奇代表 (e or e+n、n 奇) → g³ = 1 (`conjGen_pow_three`) から e³ ≡ 1 mod n →
-      CRT で mod 2n = mod Q−1 → 体レベル cube。CRT juggling の雛形 =
-      `span_triples_normOne_eq_top` (Lattice.lean 60–130 行付近) の hcubeN block。
-      **(b) q = 3 / e ∈ ⟨3⟩ の還元**: `false_of_centralizing` は centralizing 形のみ。
-      e = 3^j の witness を centralizing に落とす Frobenius twist (σ' := σ ∘ Frob^{-j}
-      で FieldNormalizerData を再構成、または hexp e=3^j から hcent を直接導出) が
-      未形式化。q = 3 は指数が全部 ⟨3⟩ に入る (n = 13; e³ ≡ 1 mod 13 の解 = {1,3,9})。
-      **(c) assembly**: q 奇 (p=3 + conditionA → q ∤ 2)・by_cases q = 3。
+- [x] **glue (a) 指数抽出 + (c) 前半** (2026-08-13, commit 407e73bc7): 新 leaf
+      `AppC_Problem1Exponent.lean` — `exists_odd_cube_exponent` (B から標準形指数;
+      MonoidHom.map_cyclic + 奇代表 + CRT) + `q_odd_of_conditionA` (q 奇は (A) から
+      無料) + **`false_of_witness` (SkewEndgame): FieldNormalizerData 3 q G + q ≠ 3
+      だけから False** — 指数仮説なしの完全 witness 排除。
+- [ ] **glue (b) q = 3 / e ∈ ⟨3⟩ の還元** (最後の未形式化): `false_of_centralizing` は
+      centralizing (e-作用自明) 形のみ。e = 3^j の witness を centralizing に落とす
+      還元が必要 — 案 1: σ' := σ ∘ (体 Frobenius)^{-j} で FieldNormalizerData を
+      再構成 (U-作用が e·3^{-j} = 1 に)。案 2: hexp (e = 3^j 形) から hcent
+      (Commute (MulAut.conj y s) v) を直接導出できるか検討 — hcent は g が σ(U) を
+      **点ごと固定**する主張なので、e = 3^j ≠ 1-作用では偽; 案 1 が本筋。
+      q = 3 では n = 13、e³ ≡ 1 mod 13 の解 = {1, 3, 9} = ⟨3⟩ mod 13 ✓ (全指数被覆の
+      確認は Nat.decide レベル)。済んだら `hypothesisB_false` (by_cases q = 3) が最終形。
 - [x] **文書更新** (2026-08-13): resolution.md §7–§9 を機械検証済に更新 (Part II/III の
       Lean 定理名対応表 + 形式化で得た紙の証明の簡約 4 点を記録)。memory 更新済。
 - [ ] **(EX) ⟹ master formula** (anchor 論法; 退化人口: singleton {−1} は
