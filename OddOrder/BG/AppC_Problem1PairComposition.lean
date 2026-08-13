@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.Algebra.FrobeniusCyclicModule
 import OddOrder.BG.AppC_Problem1SameCoset
 
 /-!
@@ -287,16 +288,6 @@ theorem CollisionPair.left_ne_zero {e : ℕ}
   rw [hpp] at hinj
   exact one_ne_zero (by linear_combination -hinj)
 
-/-- Iterated Frobenius twists of a collision. -/
-theorem CollisionPair.frobenius_pow {e : ℕ} {S S' : GaloisField p q}
-    (h : CollisionPair p q e S S') (j : ℕ) :
-    CollisionPair p q e (S ^ p ^ j) (S' ^ p ^ j) := by
-  induction j with
-  | zero => simpa using h
-  | succ n ih =>
-      have hnext := ih.frobenius
-      rwa [← pow_mul, ← pow_mul, ← pow_succ] at hnext
-
 /-! ### Theorem N1: a collision with `S' = -S` is fatal
 
 Conjugating the pair relation twice by the same `a(v)` and using `a(v)² = a(-v)` (characteristic
@@ -369,6 +360,54 @@ theorem false_of_collisionPair_neg (data : FieldNormalizerData p q G) (hp : p = 
     simp only [one_mul]
     exact (commute_iff_eq _ _).mpr hBX.symm
   exact false_of_mem_commSubgroup_ne_zero data rfl hqprime hqodd he hcube hexp hmem hS0
+
+/-! ### Chain reversal
+
+Two pairs sharing a middle value close into a *reversed* pair.  Unlike the composition calculus
+below, no sign analysis and no `e`-th powers appear: both relations are instantiated at the *same*
+argument `v`, and `a(v)² = a(2v) = a(-v) = a(v)⁻¹` (characteristic three) turns the double
+conjugation into a conjugation by `a(v)⁻¹`. -/
+
+/-- **Chain reversal.**  `ConjPair s s'` and `ConjPair s' s''` imply `ConjPair s'' s`: conjugating
+the first relation by `a(v)` and consuming it with the second gives
+`a(v)² · b(s v^e) · a(v)⁻² = b(s'' v^e)`, and `a(v)² = a(v)⁻¹` in characteristic three. -/
+theorem ConjPair.chain (data : FieldNormalizerData p q G) (hp : p = 3)
+    {e : ℕ} {s s' s'' : GaloisField p q}
+    (h₁ : ConjPair data e s s') (h₂ : ConjPair data e s' s'') :
+    ConjPair data e s'' s := by
+  subst hp
+  haveI : CharP (GaloisField 3 q) 3 := by
+    rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
+    exact ZMod.charP 3
+  intro v hv hv0
+  have h1 := h₁ v hv hv0
+  have h2 := h₂ v hv hv0
+  have hdouble : layerFieldHom data 0 (Multiplicative.ofAdd (v + v)) *
+      layerFieldHom data 1 (Multiplicative.ofAdd (s * v ^ e)) *
+      (layerFieldHom data 0 (Multiplicative.ofAdd (v + v)))⁻¹
+      = layerFieldHom data 1 (Multiplicative.ofAdd (s'' * v ^ e)) := by
+    rw [ConjPair.layer_split data 0 (rfl : v + v = v + v)]
+    calc (layerFieldHom data 0 (Multiplicative.ofAdd v) *
+          layerFieldHom data 0 (Multiplicative.ofAdd v)) *
+          layerFieldHom data 1 (Multiplicative.ofAdd (s * v ^ e)) *
+          (layerFieldHom data 0 (Multiplicative.ofAdd v) *
+            layerFieldHom data 0 (Multiplicative.ofAdd v))⁻¹
+        = layerFieldHom data 0 (Multiplicative.ofAdd v) *
+          (layerFieldHom data 0 (Multiplicative.ofAdd v) *
+            layerFieldHom data 1 (Multiplicative.ofAdd (s * v ^ e)) *
+            (layerFieldHom data 0 (Multiplicative.ofAdd v))⁻¹) *
+          (layerFieldHom data 0 (Multiplicative.ofAdd v))⁻¹ := by group
+      _ = layerFieldHom data 0 (Multiplicative.ofAdd v) *
+          layerFieldHom data 1 (Multiplicative.ofAdd (s' * v ^ e)) *
+          (layerFieldHom data 0 (Multiplicative.ofAdd v))⁻¹ := by rw [h1]
+      _ = _ := h2
+  have hvv : v + v = -v := by
+    have h3 : (3 : GaloisField 3 q) = 0 := by
+      exact_mod_cast CharP.cast_eq_zero (GaloisField 3 q) 3
+    linear_combination v * h3
+  rw [hvv, ConjPair.layer_neg data 0 (rfl : -v = -v), inv_inv] at hdouble
+  rw [← hdouble]
+  group
 
 /-! ### The composition calculus
 
@@ -807,9 +846,107 @@ theorem false_of_collisionPair_frobCombo (data : FieldNormalizerData p q G) (hp 
       (∑ j ∈ Finset.range n, k j • S' ^ p ^ j) := by
     refine ConjPair.sum _ _ _ ?_
     intro j hj
-    exact (ConjPair.of_collisionPair data hp hq0 hexp (hpair.frobenius_pow j)).nsmul (k j)
+    exact (ConjPair.of_collisionPair data hp hq0 hexp (hpair.frobenius_iterate j)).nsmul (k j)
   rw [heq] at hsum
   exact false_of_conjPair_self data hp hqprime hqodd he hcube hexp hsum (heq ▸ hne)
+
+/-! ### (B2) eliminated: any collision refutes hypothesis (B)
+
+`ConjPair.chain` closes the polynomial family `{(c • S, c • S') : c ∈ (ZMod 3)[X]}` of pairs
+into a 3-cycle, and the cyclicity of the Frobenius module
+(`OddOrder.Algebra.FrobeniusCyclicModule`) converts the closure into `S' = S`:
+
+* the graph property forces the annihilator inclusion `Ann(S) ⊆ Ann(S')`, so `S' = a₀ • S`
+  for some polynomial `a₀` (`exists_aeval_frobEnd_eq_of_forall_imp`);
+* chaining `(S, S') → (S', a₀² • S)` and subtracting the `a₀²`-pair forces `a₀³ • S = S`;
+* in characteristic three `a₀³ - 1 = (a₀ - 1)³`, and `X ^ q - 1` is squarefree for `q ≠ 3`,
+  so the annihilator is radical and `a₀ • S = S`, i.e. `S' = S` — fatal by
+  `false_of_collisionPair_self`.
+
+No trace hypothesis, no spanning hypothesis, no Frobenius-exoticity of the exponent: **one
+collision kills the witness**.  (For `q = 3` no exotic exponent exists — every solution of
+`e³ ≡ 1 mod n`, `n ∣ 26`, lies in `⟨3⟩` — so `false_of_centralizing` already covers that case
+and nothing is lost.) -/
+
+open Polynomial in
+/-- Polynomial multiples of a collision are conjugation pairs: the `(ZMod p)[X]`-module
+action through the Frobenius endomorphism preserves the pair family. -/
+theorem conjPair_aeval_of_collisionPair (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hq0 : q ≠ 0) {e : ℕ}
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {S S' : GaloisField p q} (hpair : CollisionPair p q e S S') (c : (ZMod p)[X]) :
+    ConjPair data e (aeval (frobEnd p q) c S) (aeval (frobEnd p q) c S') := by
+  rw [aeval_frobEnd_apply, aeval_frobEnd_apply]
+  exact ConjPair.sum _ _ _ fun j _ =>
+    (ConjPair.of_collisionPair data hp hq0 hexp (hpair.frobenius_iterate j)).nsmul _
+
+open Polynomial in
+/-- **(B2) is eliminated: a single collision refutes hypothesis (B)** — with no trace
+hypothesis, no spanning hypothesis, and no condition on the exponent beyond the standing
+ones.  Chain reversal (`ConjPair.chain`) plus the cyclicity of the Frobenius module force
+`S' = S`, which is fatal by `false_of_collisionPair_self`. -/
+theorem false_of_collisionPair (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hqprime : q.Prime) (hq3 : q ≠ 3) (hqodd : Odd q) {e : ℕ} (he : Odd e)
+    (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {S S' : GaloisField p q} (hpair : CollisionPair p q e S S') : False := by
+  subst hp
+  have hq0 : q ≠ 0 := hqprime.ne_zero
+  have hcp : ∀ c : (ZMod 3)[X],
+      ConjPair data e (aeval (frobEnd 3 q) c S) (aeval (frobEnd 3 q) c S') :=
+    conjPair_aeval_of_collisionPair data rfl hq0 hexp hpair
+  have haux : ∀ y : GaloisField 3 q, ∀ a b : (ZMod 3)[X],
+      aeval (frobEnd 3 q) (a * b) y
+        = aeval (frobEnd 3 q) a (aeval (frobEnd 3 q) b y) := by
+    intro y a b
+    rw [map_mul, Module.End.mul_apply]
+  -- the graph property forces the annihilator inclusion
+  have hann : ∀ c : (ZMod 3)[X],
+      aeval (frobEnd 3 q) c S = 0 → aeval (frobEnd 3 q) c S' = 0 := by
+    intro c h0
+    have h := hcp c
+    rw [h0] at h
+    exact ConjPair.right_eq_zero h
+  obtain ⟨a₀, ha₀⟩ := exists_aeval_frobEnd_eq_of_forall_imp 3 q hq0 hann
+  -- chain reversal at the pair `(S, S')` and its `a₀`-translate
+  have h1 : ConjPair data e S S' := by
+    have h := hcp 1
+    simpa using h
+  have h2 : ConjPair data e S' (aeval (frobEnd 3 q) a₀ S') := by
+    have h := hcp a₀
+    rwa [ha₀] at h
+  have h3 := ConjPair.chain data rfl h1 h2
+  have hsq2 : aeval (frobEnd 3 q) a₀ S' = aeval (frobEnd 3 q) (a₀ * a₀) S := by
+    rw [haux S a₀ a₀, ha₀]
+  rw [hsq2] at h3
+  -- subtract the `a₀²`-pair: the graph forces `a₀³ • S = S`
+  have h5 := (hcp (a₀ * a₀)).add h3.neg
+  rw [add_neg_cancel] at h5
+  have h6 : aeval (frobEnd 3 q) (a₀ * a₀) S' = S :=
+    add_neg_eq_zero.mp (ConjPair.right_eq_zero h5)
+  -- `(a₀³ - 1) • S = 0`, and `(a₀ - 1)³ = a₀³ - 1` in characteristic three
+  have h33 : aeval (frobEnd 3 q) (a₀ ^ 3) S = S := by
+    have hpow : a₀ ^ 3 = (a₀ * a₀) * a₀ := by ring
+    rw [hpow, haux S (a₀ * a₀) a₀, ha₀]
+    exact h6
+  have h7 : aeval (frobEnd 3 q) (a₀ ^ 3 - 1) S = 0 := by
+    rw [map_sub, LinearMap.sub_apply, h33, map_one, Module.End.one_apply, sub_self]
+  haveI : CharP ((ZMod 3)[X]) 3 :=
+    charP_of_injective_ringHom (C_injective (R := ZMod 3)) 3
+  haveI : ExpChar ((ZMod 3)[X]) 3 := .prime Nat.prime_three
+  have hchar : (a₀ - 1) ^ 3 = a₀ ^ 3 - 1 := by
+    rw [sub_pow_expChar, one_pow]
+  have h8 : aeval (frobEnd 3 q) ((a₀ - 1) ^ 3) S = 0 := by
+    rw [hchar]
+    exact h7
+  have hpq : ¬ (3 : ℕ) ∣ q := fun hdvd =>
+    hq3 (((Nat.prime_dvd_prime_iff_eq Nat.prime_three hqprime).mp hdvd).symm)
+  have h9 := aeval_frobEnd_eq_zero_of_pow 3 q hq0 hpq (by norm_num : (3 : ℕ) ≠ 0) h8
+  rw [map_sub, LinearMap.sub_apply, map_one, Module.End.one_apply] at h9
+  have hSS : S' = S := by
+    rw [← ha₀]
+    exact sub_eq_zero.mp h9
+  exact false_of_collisionPair_self data rfl hqprime hqodd he hcube hexp (hSS ▸ hpair)
 
 end PairComposition
 

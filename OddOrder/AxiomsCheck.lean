@@ -21187,10 +21187,30 @@ Frobenius combination `∑ kⱼ S^{3^j} = ∑ kⱼ S'^{3^j} ≠ 0` refutes (B)
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.ConjPair.of_collisionPair
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_conjPair_self
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.CollisionPair.left_ne_zero
-#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.CollisionPair.frobenius_pow
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_neg
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.ConjPair.compose
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.ConjPair.composeFlip
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_conjPair_spanning
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_ratio_eq
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair_frobCombo
+
+/-! **(B2) eliminated** (`Algebra/FrobeniusCyclicModule` + the chain-reversal capstone in
+`BG/AppC_Problem1PairComposition`).  The Frobenius polynomial action makes `GaloisField p q` a
+*cyclic* `(ZMod p)[X]`-module (minimal polynomial of Frobenius = `X ^ q - 1`, by Dedekind
+independence), so the annihilator inclusion forced by the graph property yields `S' = a₀ • S`;
+the chain reversal `ConjPair s s' → ConjPair s' s'' → ConjPair s'' s` (characteristic three:
+`a(v)² = a(-v)`) closes the polynomial pair family into a 3-cycle and forces `a₀³ • S = S`;
+squarefreeness of `X ^ q - 1` (`q ≠ 3`) makes the annihilator radical, so
+`a₀ • S = S`, i.e. `S' = S` — fatal by `false_of_collisionPair_self`.  **A single collision
+now refutes hypothesis (B)**: no trace condition, no spanning condition, no exoticity of the
+exponent.  The only remaining obstruction question for BG App.C Problem 1 is the existence of
+one collision per exotic-exponent class ((B1)). -/
+#assert_only_allowed_axioms OddOrder.frobEnd
+#assert_only_allowed_axioms OddOrder.minpoly_frobEnd
+#assert_only_allowed_axioms OddOrder.aeval_frobEnd_apply
+#assert_only_allowed_axioms OddOrder.exists_frobenius_cyclic_vector
+#assert_only_allowed_axioms OddOrder.exists_aeval_frobEnd_eq_of_forall_imp
+#assert_only_allowed_axioms OddOrder.aeval_frobEnd_eq_zero_of_pow
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.ConjPair.chain
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conjPair_aeval_of_collisionPair
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair
