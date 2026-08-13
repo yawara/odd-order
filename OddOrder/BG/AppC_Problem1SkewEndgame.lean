@@ -944,6 +944,165 @@ theorem false_of_masterFormula_mu_ne_zero (hp : p = 3) (hq0 : q ≠ 0) (hqodd : 
   have h0e := Paley.pow_injective_of_cube hcube hpow
   exact hbc (Paley.pow_injective_of_cube hcube (by linear_combination h0e))
 
+/-- **Branch `λ ∈ 𝔽₃`: the four remaining candidates.**  With `λ₊, λ₋ ∈ 𝔽₃`, `Δ ≠ 0` and
+`Σ̄ ≠ 0` force exactly one of `λ₊, λ₋` to vanish.  A same-sign pair then dies: one of its two
+orientations reads the vanished coefficient on both terms, so its weight is zero.  Hence all
+pairs are mixed, and the master formula pins the partner of `a` through the non-vanished
+coefficient — one candidate partner per sign pattern.  Three distinct partners `b, c, d` of
+`a` overload the two patterns, and the pinning identifies two of them.  Step 7 of the case
+tree. -/
+theorem false_of_masterFormula_cubic (hp : p = 3) (hq0 : q ≠ 0) (hqodd : Odd q)
+    {e : ℕ} (he : Odd e)
+    (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
+    {a₀ a₁ b₀ b₁ c₀ c₁ d₀ d₁ : NormSet.normOneUnits p q}
+    (haa : normOneVal a₀ = normOneVal a₁ + 1) (hbb : normOneVal b₀ = normOneVal b₁ + 1)
+    (hcc : normOneVal c₀ = normOneVal c₁ + 1) (hdd : normOneVal d₀ = normOneVal d₁ + 1)
+    (hab : normOneVal a₀ ≠ normOneVal b₀) (hac : normOneVal a₀ ≠ normOneVal c₀)
+    (had : normOneVal a₀ ≠ normOneVal d₀) (hbc : normOneVal b₀ ≠ normOneVal c₀)
+    (hbd : normOneVal b₀ ≠ normOneVal d₀) (hcd : normOneVal c₀ ≠ normOneVal d₀)
+    {lamP lamM : GaloisField p q} (hmaster : MasterFormula e lamP lamM)
+    (hP3 : lamP - lamP ^ (3 : ℕ) = 0) (hM3 : lamM - lamM ^ (3 : ℕ) = 0)
+    (hDel : lamP ≠ lamM) (hSig : lamP + lamM ≠ 0) : False := by
+  subst hp
+  have hneg1 := not_isSquare_neg_one_galois rfl hq0 hqodd
+  have hdich : ∀ x : GaloisField 3 q, x ≠ 0 → IsSquare x ∨ IsSquare (-x) :=
+    fun x hx => isSquare_or_isSquare_neg_galois rfl hq0 hqodd hx
+  -- exactly one of the two coefficients vanishes
+  have hval : ∀ x : GaloisField 3 q, x - x ^ (3 : ℕ) = 0 → x = 0 ∨ x = 1 ∨ x = -1 := by
+    intro x hx
+    have h1 : x * ((x - 1) * (x + 1)) = 0 := by linear_combination -hx
+    rcases mul_eq_zero.mp h1 with h | h
+    · exact Or.inl h
+    rcases mul_eq_zero.mp h with h | h
+    · exact Or.inr (Or.inl (by linear_combination h))
+    · exact Or.inr (Or.inr (by linear_combination h))
+  have hcases : (lamP = 0 ∧ lamM ≠ 0) ∨ (lamM = 0 ∧ lamP ≠ 0) := by
+    rcases hval lamP hP3 with hP | hP | hP <;> rcases hval lamM hM3 with hM | hM | hM
+    · exact absurd (hP.trans hM.symm) hDel
+    · exact Or.inl ⟨hP, by rw [hM]; exact one_ne_zero⟩
+    · exact Or.inl ⟨hP, by rw [hM]; exact neg_ne_zero.mpr one_ne_zero⟩
+    · exact Or.inr ⟨hM, by rw [hP]; exact one_ne_zero⟩
+    · exact absurd (hP.trans hM.symm) hDel
+    · exact absurd (by rw [hP, hM]; ring : lamP + lamM = 0) hSig
+    · exact Or.inr ⟨hM, by rw [hP]; exact neg_ne_zero.mpr one_ne_zero⟩
+    · exact absurd (by rw [hP, hM]; ring : lamP + lamM = 0) hSig
+    · exact absurd (hP.trans hM.symm) hDel
+  -- a same-sign pair dies: one orientation has weight zero
+  have hsame_dead : ∀ x₀ x₁ y₀ y₁ : NormSet.normOneUnits 3 q,
+      normOneVal x₀ = normOneVal x₁ + 1 → normOneVal y₀ = normOneVal y₁ + 1 →
+      normOneVal x₀ ≠ normOneVal y₀ →
+      (IsSquare (normOneVal y₀ ^ e - normOneVal x₀ ^ e)
+        ↔ IsSquare (normOneVal y₁ ^ e - normOneVal x₁ ^ e)) → False := by
+    intro x₀ x₁ y₀ y₁ hxx hyy hxy hiff
+    have hd0 : normOneVal y₀ ^ e - normOneVal x₀ ^ e ≠ 0 :=
+      skewPair_edge_left_ne_zero hcube hxy
+    have hne₁ : normOneVal x₁ ≠ normOneVal y₁ :=
+      fun h => hxy (by linear_combination hxx - hyy + h)
+    have hd1 : normOneVal y₁ ^ e - normOneVal x₁ ^ e ≠ 0 :=
+      skewPair_edge_left_ne_zero hcube hne₁
+    have h1 := hmaster x₀ x₁ y₀ y₁ hxx hyy hxy
+    have h2 := hmaster y₀ y₁ x₀ x₁ hyy hxx hxy.symm
+    rw [show normOneVal x₀ ^ e - normOneVal y₀ ^ e
+        = -(normOneVal y₀ ^ e - normOneVal x₀ ^ e) by ring,
+      show normOneVal x₁ ^ e - normOneVal y₁ ^ e
+        = -(normOneVal y₁ ^ e - normOneVal x₁ ^ e) by ring,
+      sqSelect_neg_swap hneg1 (hdich _ hd0) hd0,
+      sqSelect_neg_swap hneg1 (hdich _ hd1) hd1, he.neg_pow, he.neg_pow] at h2
+    by_cases hs : IsSquare (normOneVal y₀ ^ e - normOneVal x₀ ^ e)
+    · have hs₁ := hiff.mp hs
+      rw [sqSelect_of_isSquare hs, sqSelect_of_isSquare hs₁] at h1
+      rw [sqSelect_of_isSquare hs, sqSelect_of_isSquare hs₁] at h2
+      rcases hcases with ⟨hP0, hM0⟩ | ⟨hM0, hP0⟩
+      · exact skewPair_edge_weight_ne_zero hcube hxx
+          (by rw [hP0] at h1; linear_combination h1)
+      · exact skewPair_edge_weight_ne_zero hcube hyy
+          (by rw [hM0] at h2; linear_combination h2)
+    · have hs₁ : ¬IsSquare (normOneVal y₁ ^ e - normOneVal x₁ ^ e) :=
+        fun h₁ => hs (hiff.mpr h₁)
+      rw [sqSelect_of_not_isSquare hs, sqSelect_of_not_isSquare hs₁] at h1
+      rw [sqSelect_of_not_isSquare hs, sqSelect_of_not_isSquare hs₁] at h2
+      rcases hcases with ⟨hP0, hM0⟩ | ⟨hM0, hP0⟩
+      · exact skewPair_edge_weight_ne_zero hcube hyy
+          (by rw [hP0] at h2; linear_combination h2)
+      · exact skewPair_edge_weight_ne_zero hcube hxx
+          (by rw [hM0] at h1; linear_combination h1)
+  have hmixed : ∀ x₀ x₁ y₀ y₁ : NormSet.normOneUnits 3 q,
+      normOneVal x₀ = normOneVal x₁ + 1 → normOneVal y₀ = normOneVal y₁ + 1 →
+      normOneVal x₀ ≠ normOneVal y₀ →
+      ¬(IsSquare (normOneVal y₀ ^ e - normOneVal x₀ ^ e)
+        ↔ IsSquare (normOneVal y₁ ^ e - normOneVal x₁ ^ e)) :=
+    fun x₀ x₁ y₀ y₁ hxx hyy hxy hiff => hsame_dead x₀ x₁ y₀ y₁ hxx hyy hxy hiff
+  -- two partners of `a` with the same sign pattern coincide
+  have key : ∀ y₀ y₁ z₀ z₁ : NormSet.normOneUnits 3 q,
+      normOneVal y₀ = normOneVal y₁ + 1 → normOneVal z₀ = normOneVal z₁ + 1 →
+      normOneVal a₀ ≠ normOneVal y₀ → normOneVal a₀ ≠ normOneVal z₀ →
+      normOneVal y₀ ≠ normOneVal z₀ →
+      (IsSquare (normOneVal y₀ ^ e - normOneVal a₀ ^ e)
+        ↔ IsSquare (normOneVal z₀ ^ e - normOneVal a₀ ^ e)) → False := by
+    intro y₀ y₁ z₀ z₁ hyy hzz hay haz hyz hiff
+    have h1 := hmaster a₀ a₁ y₀ y₁ haa hyy hay
+    have h2 := hmaster a₀ a₁ z₀ z₁ haa hzz haz
+    by_cases hsy : IsSquare (normOneVal y₀ ^ e - normOneVal a₀ ^ e)
+    · have hsz := hiff.mp hsy
+      have hns₁y : ¬IsSquare (normOneVal y₁ ^ e - normOneVal a₁ ^ e) :=
+        fun h₁ => hmixed a₀ a₁ y₀ y₁ haa hyy hay (iff_of_true hsy h₁)
+      have hns₁z : ¬IsSquare (normOneVal z₁ ^ e - normOneVal a₁ ^ e) :=
+        fun h₁ => hmixed a₀ a₁ z₀ z₁ haa hzz haz (iff_of_true hsz h₁)
+      rw [sqSelect_of_isSquare hsy, sqSelect_of_not_isSquare hns₁y] at h1
+      rw [sqSelect_of_isSquare hsz, sqSelect_of_not_isSquare hns₁z] at h2
+      rcases hcases with ⟨hP0, hM0⟩ | ⟨hM0, hP0⟩
+      · have h12 : lamM * ((normOneVal y₁ ^ e - normOneVal a₁ ^ e) ^ e)
+            = lamM * ((normOneVal z₁ ^ e - normOneVal a₁ ^ e) ^ e) := by
+          rw [hP0] at h1 h2
+          linear_combination h1 - h2
+        have hz1 := Paley.pow_injective_of_cube hcube (mul_left_cancel₀ hM0 h12)
+        have hy1 : normOneVal y₁ = normOneVal z₁ :=
+          Paley.pow_injective_of_cube hcube (by linear_combination hz1)
+        exact hyz (by linear_combination hyy - hzz + hy1)
+      · have h12 : lamP * ((normOneVal y₀ ^ e - normOneVal a₀ ^ e) ^ e)
+            = lamP * ((normOneVal z₀ ^ e - normOneVal a₀ ^ e) ^ e) := by
+          rw [hM0] at h1 h2
+          linear_combination h2 - h1
+        have hz0 := Paley.pow_injective_of_cube hcube (mul_left_cancel₀ hP0 h12)
+        exact hyz (Paley.pow_injective_of_cube hcube (by linear_combination hz0))
+    · have hsz : ¬IsSquare (normOneVal z₀ ^ e - normOneVal a₀ ^ e) :=
+        fun h => hsy (hiff.mpr h)
+      have hs₁y : IsSquare (normOneVal y₁ ^ e - normOneVal a₁ ^ e) := by
+        by_contra h₁
+        exact hmixed a₀ a₁ y₀ y₁ haa hyy hay (iff_of_false hsy h₁)
+      have hs₁z : IsSquare (normOneVal z₁ ^ e - normOneVal a₁ ^ e) := by
+        by_contra h₁
+        exact hmixed a₀ a₁ z₀ z₁ haa hzz haz (iff_of_false hsz h₁)
+      rw [sqSelect_of_not_isSquare hsy, sqSelect_of_isSquare hs₁y] at h1
+      rw [sqSelect_of_not_isSquare hsz, sqSelect_of_isSquare hs₁z] at h2
+      rcases hcases with ⟨hP0, hM0⟩ | ⟨hM0, hP0⟩
+      · have h12 : lamM * ((normOneVal y₀ ^ e - normOneVal a₀ ^ e) ^ e)
+            = lamM * ((normOneVal z₀ ^ e - normOneVal a₀ ^ e) ^ e) := by
+          rw [hP0] at h1 h2
+          linear_combination h2 - h1
+        have hz0 := Paley.pow_injective_of_cube hcube (mul_left_cancel₀ hM0 h12)
+        exact hyz (Paley.pow_injective_of_cube hcube (by linear_combination hz0))
+      · have h12 : lamP * ((normOneVal y₁ ^ e - normOneVal a₁ ^ e) ^ e)
+            = lamP * ((normOneVal z₁ ^ e - normOneVal a₁ ^ e) ^ e) := by
+          rw [hM0] at h1 h2
+          linear_combination h1 - h2
+        have hz1 := Paley.pow_injective_of_cube hcube (mul_left_cancel₀ hP0 h12)
+        have hy1 : normOneVal y₁ = normOneVal z₁ :=
+          Paley.pow_injective_of_cube hcube (by linear_combination hz1)
+        exact hyz (by linear_combination hyy - hzz + hy1)
+  -- three partners overload the two sign patterns
+  by_cases hB : IsSquare (normOneVal b₀ ^ e - normOneVal a₀ ^ e) <;>
+    by_cases hC : IsSquare (normOneVal c₀ ^ e - normOneVal a₀ ^ e) <;>
+      by_cases hD : IsSquare (normOneVal d₀ ^ e - normOneVal a₀ ^ e)
+  · exact key b₀ b₁ c₀ c₁ hbb hcc hab hac hbc (iff_of_true hB hC)
+  · exact key b₀ b₁ c₀ c₁ hbb hcc hab hac hbc (iff_of_true hB hC)
+  · exact key b₀ b₁ d₀ d₁ hbb hdd hab had hbd (iff_of_true hB hD)
+  · exact key c₀ c₁ d₀ d₁ hcc hdd hac had hcd (iff_of_false hC hD)
+  · exact key c₀ c₁ d₀ d₁ hcc hdd hac had hcd (iff_of_true hC hD)
+  · exact key b₀ b₁ d₀ d₁ hbb hdd hab had hbd (iff_of_false hB hD)
+  · exact key b₀ b₁ c₀ c₁ hbb hcc hab hac hbc (iff_of_false hB hC)
+  · exact key b₀ b₁ c₀ c₁ hbb hcc hab hac hbc (iff_of_false hB hC)
+
 end SkewEndgame
 
 end OddOrder.BG.AppC.Problem1
