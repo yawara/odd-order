@@ -257,6 +257,55 @@ theorem skewPair_edge_weight_ne_zero {e : ℕ}
   rw [h1] at hpp
   simp at hpp
 
+/-- **`-1` is a non-square in `𝔽_{3^q}` for odd `q`** (`3^q ≡ 3 mod 4`). -/
+theorem not_isSquare_neg_one_galois (hp : p = 3) (hq0 : q ≠ 0) (hqodd : Odd q) :
+    ¬IsSquare (-1 : GaloisField p q) := by
+  subst hp
+  letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
+  haveI : CharP (GaloisField 3 q) 3 := by
+    rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
+    exact ZMod.charP 3
+  have hchar2 : ringChar (GaloisField 3 q) ≠ 2 := by
+    rw [ringChar.eq (GaloisField 3 q) 3]
+    norm_num
+  have h4 : Fintype.card (GaloisField 3 q) % 4 = 3 := by
+    rw [show Fintype.card (GaloisField 3 q) = 3 ^ q by
+      rw [← Nat.card_eq_fintype_card]; exact GaloisField.card 3 q hq0]
+    have hq2 : q % 2 = 1 := Nat.odd_iff.mp hqodd
+    have hk : q = 2 * (q / 2) + 1 := by omega
+    rw [hk, pow_succ, pow_mul, Nat.mul_mod, Nat.pow_mod]
+    norm_num
+  exact Paley.not_isSquare_neg_one hchar2 h4
+
+/-- **The square dichotomy in `𝔽_{3^q}`** (`q` odd): every non-zero element is `±` a square. -/
+theorem isSquare_or_isSquare_neg_galois (hp : p = 3) (hq0 : q ≠ 0) (hqodd : Odd q)
+    {a : GaloisField p q} (ha : a ≠ 0) : IsSquare a ∨ IsSquare (-a) := by
+  subst hp
+  letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
+  haveI : CharP (GaloisField 3 q) 3 := by
+    rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
+    exact ZMod.charP 3
+  have hchar2 : ringChar (GaloisField 3 q) ≠ 2 := by
+    rw [ringChar.eq (GaloisField 3 q) 3]
+    norm_num
+  have h4 : Fintype.card (GaloisField 3 q) % 4 = 3 := by
+    rw [show Fintype.card (GaloisField 3 q) = 3 ^ q by
+      rw [← Nat.card_eq_fintype_card]; exact GaloisField.card 3 q hq0]
+    have hq2 : q % 2 = 1 := Nat.odd_iff.mp hqodd
+    have hk : q = 2 * (q / 2) + 1 := by omega
+    rw [hk, pow_succ, pow_mul, Nat.mul_mod, Nat.pow_mod]
+    norm_num
+  exact Paley.isSquare_or_isSquare_neg hchar2 h4 ha
+
+/-- When `-1` is a non-square, `a` and `-a` are never both squares. -/
+theorem not_isSquare_of_isSquare_neg {F : Type*} [Field F]
+    (hneg1 : ¬IsSquare (-1 : F)) {a : F} (ha : a ≠ 0) (h : IsSquare (-a)) :
+    ¬IsSquare a := by
+  intro hsq
+  refine hneg1 ?_
+  rw [show (-1 : F) = -a * a⁻¹ by field_simp]
+  exact h.mul hsq.inv
+
 /-- **Loop ⟹ kill.**  A Frobenius-closed family of closed loops whose weight pair does not
 vanish refutes hypothesis (B).  If one weight vanishes the graph property kills the loop
 directly; otherwise the loop is a conjugation pair with non-zero seed — forwards when the loop
@@ -279,24 +328,7 @@ theorem false_of_skewPair_self_frobenius_family (data : FieldNormalizerData p q 
   have hY0 : Y ≠ 0 := by
     intro h0
     exact hXY ⟨SkewPair.self_left_eq_zero (by rwa [h0] at h00), h0⟩
-  -- `±A` is a square
-  letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
-  haveI : CharP (GaloisField 3 q) 3 := by
-    rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
-    exact ZMod.charP 3
-  have hcard : Fintype.card (GaloisField 3 q) = 3 ^ q := by
-    rw [← Nat.card_eq_fintype_card]
-    exact GaloisField.card 3 q hqprime.ne_zero
-  have hchar2 : ringChar (GaloisField 3 q) ≠ 2 := by
-    rw [ringChar.eq (GaloisField 3 q) 3]
-    norm_num
-  have h4 : Fintype.card (GaloisField 3 q) % 4 = 3 := by
-    rw [hcard]
-    have hq2 : q % 2 = 1 := Nat.odd_iff.mp hqodd
-    have hk : q = 2 * (q / 2) + 1 := by omega
-    rw [hk, pow_succ, pow_mul, Nat.mul_mod, Nat.pow_mod]
-    norm_num
-  rcases Paley.isSquare_or_isSquare_neg hchar2 h4 hA0 with hsq | hnsq
+  rcases isSquare_or_isSquare_neg_galois rfl hqprime.ne_zero hqodd hA0 with hsq | hnsq
   · -- forward orientation: seed `X A⁻ᵉ`
     have hfam' : ∀ j : ℕ,
         ConjPair data e ((X * (A ^ e)⁻¹) ^ 3 ^ j) ((Y * (A ^ e)⁻¹) ^ 3 ^ j) := by

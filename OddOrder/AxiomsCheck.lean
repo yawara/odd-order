@@ -21260,3 +21260,9 @@ family of closed loops with non-vanishing weight is fatal through the chain-reve
 refutation: population branches of the master-formula collapse. -/
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_three_antipodal
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.exchange_relation
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.not_isSquare_neg_one_galois
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.isSquare_or_isSquare_neg_galois
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.not_isSquare_of_isSquare_neg
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.sqSelect
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.MasterFormula
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.exists_masterFormula_of_plus_anchor
