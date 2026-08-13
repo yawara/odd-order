@@ -327,6 +327,123 @@ theorem false_of_skewPair_self_frobenius_family (data : FieldNormalizerData p q 
     exact false_of_conjPair_frobenius_family data rfl hqprime hq3 hqodd he hcube hexp
       (mul_ne_zero hY0 (inv_ne_zero (pow_ne_zero _ (neg_ne_zero.mpr hA0)))) hfam'
 
+/-! ### The same-slot two-loop: proportional edges have proportional weights
+
+Two edges whose parameters are proportional by a non-zero square `s` (`δ₀ = δ₀'·s`,
+`δ₁ = δ₁'·s` — in slot language: the same ratio class and the same sign component) compose
+into the closed loop `e ∘ rev(e'·s)` with weights `(K(p) - K(p')sᵉ, K(r) - K(r')sᵉ)`,
+uniformly in the Frobenius twist.  The kill lemma forces both weights to vanish, i.e.
+`κ := K δ₁⁻ᵉ` is constant on each slot (stated multiplied-out, with no division).  This is
+step 3 of the case tree of `notes/bg/appC_problem1_resolution.md` §5. -/
+
+/-- A Paley pair is Frobenius-stable: `p₀ = p₁ + 1` gives `p₀^{pʲ} = p₁^{pʲ} + 1`. -/
+theorem paley_frobenius_iterate {p₀ p₁ : NormSet.normOneUnits p q}
+    (hpp : normOneVal p₀ = normOneVal p₁ + 1) (j : ℕ) :
+    normOneVal (p₀ ^ p ^ j) = normOneVal (p₁ ^ p ^ j) + 1 := by
+  simp only [normOneVal_pow]
+  rw [hpp, add_pow_char_pow, one_pow]
+
+/-- Frobenius twists of the edge data: differences of `e`-th (or `e²`-th) powers of norm-one
+values twist by `x ↦ x^{pʲ}` componentwise. -/
+private theorem normOneVal_sub_pow_frobenius (j k : ℕ) (x y : NormSet.normOneUnits p q) :
+    normOneVal (x ^ p ^ j) ^ k - normOneVal (y ^ p ^ j) ^ k
+      = (normOneVal x ^ k - normOneVal y ^ k) ^ p ^ j := by
+  rw [normOneVal_pow, normOneVal_pow, pow_right_comm (normOneVal x) (p ^ j) k,
+    pow_right_comm (normOneVal y) (p ^ j) k, ← sub_pow_char_pow]
+
+/-- **The same-slot two-loop kill.**  Two edges with parameters proportional by a non-zero
+square `s` compose into a closed loop; if either component of its weight
+`(K(p) - K(p')sᵉ, K(r) - K(r')sᵉ)` does not vanish, hypothesis (B) is refuted.  The loop
+family is supplied by the Frobenius twists of the two Paley pairs, whose proportionality
+constants are the twists of `s`. -/
+theorem false_of_proportional_edges (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hqprime : q.Prime) (hq3 : q ≠ 3) (hqodd : Odd q) {e : ℕ} (he : Odd e)
+    (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {p₀ p₁ r₀ r₁ p₀' p₁' r₀' r₁' : NormSet.normOneUnits p q} {s : GaloisField p q}
+    (hpp : normOneVal p₀ = normOneVal p₁ + 1) (hrr : normOneVal r₀ = normOneVal r₁ + 1)
+    (hpp' : normOneVal p₀' = normOneVal p₁' + 1) (hrr' : normOneVal r₀' = normOneVal r₁' + 1)
+    (hne : normOneVal p₀ ≠ normOneVal r₀) (hs : IsSquare s) (hs0 : s ≠ 0)
+    (houter : normOneVal r₀ ^ e - normOneVal p₀ ^ e
+      = (normOneVal r₀' ^ e - normOneVal p₀' ^ e) * s)
+    (hinner : normOneVal r₁ ^ e - normOneVal p₁ ^ e
+      = (normOneVal r₁' ^ e - normOneVal p₁' ^ e) * s)
+    (hW : ¬(normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e)
+          = (normOneVal p₁' ^ (e * e) - normOneVal p₀' ^ (e * e)) * s ^ e ∧
+        normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e)
+          = (normOneVal r₁' ^ (e * e) - normOneVal r₀' ^ (e * e)) * s ^ e)) : False := by
+  subst hp
+  have hq0 : q ≠ 0 := hqprime.ne_zero
+  refine false_of_skewPair_self_frobenius_family data rfl hqprime hq3 hqodd he hcube hexp
+    (A := normOneVal r₀ ^ e - normOneVal p₀ ^ e)
+    (X := (normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e))
+      - (normOneVal p₁' ^ (e * e) - normOneVal p₀' ^ (e * e)) * s ^ e)
+    (Y := (normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e))
+      - (normOneVal r₁' ^ (e * e) - normOneVal r₀' ^ (e * e)) * s ^ e)
+    (skewPair_edge_left_ne_zero hcube hne) ?_ ?_
+  · rintro ⟨hX0, hY0⟩
+    exact hW ⟨sub_eq_zero.mp hX0, sub_eq_zero.mp hY0⟩
+  · intro j
+    have hppj := paley_frobenius_iterate hpp j
+    have hrrj := paley_frobenius_iterate hrr j
+    have hppj' := paley_frobenius_iterate hpp' j
+    have hrrj' := paley_frobenius_iterate hrr' j
+    have he₁ := skewPair_edge data rfl hq0 hexp _ _ _ _ hppj hrrj
+    have he₂ := skewPair_edge data rfl hq0 hexp _ _ _ _ hppj' hrrj'
+    rw [normOneVal_sub_pow_frobenius j e r₀ p₀, normOneVal_sub_pow_frobenius j e r₁ p₁,
+      normOneVal_sub_pow_frobenius j (e * e) p₁ p₀,
+      normOneVal_sub_pow_frobenius j (e * e) r₁ r₀] at he₁
+    rw [normOneVal_sub_pow_frobenius j e r₀' p₀', normOneVal_sub_pow_frobenius j e r₁' p₁',
+      normOneVal_sub_pow_frobenius j (e * e) p₁' p₀',
+      normOneVal_sub_pow_frobenius j (e * e) r₁' r₀'] at he₂
+    have he₂' := (he₂.rev).rescale (s := s ^ 3 ^ j) (hs.pow _) (pow_ne_zero _ hs0)
+    have hin_j : (normOneVal r₁' ^ e - normOneVal p₁' ^ e) ^ 3 ^ j * s ^ 3 ^ j
+        = (normOneVal r₁ ^ e - normOneVal p₁ ^ e) ^ 3 ^ j := by
+      rw [← mul_pow, ← hinner]
+    have hout_j : (normOneVal r₀' ^ e - normOneVal p₀' ^ e) ^ 3 ^ j * s ^ 3 ^ j
+        = (normOneVal r₀ ^ e - normOneVal p₀ ^ e) ^ 3 ^ j := by
+      rw [← mul_pow, ← houter]
+    rw [hin_j, hout_j] at he₂'
+    have hcomp := he₁.comp he₂'
+    have hXj : (normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e)) ^ 3 ^ j +
+        -((normOneVal p₁' ^ (e * e) - normOneVal p₀' ^ (e * e)) ^ 3 ^ j) * (s ^ 3 ^ j) ^ e
+        = ((normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e))
+            - (normOneVal p₁' ^ (e * e) - normOneVal p₀' ^ (e * e)) * s ^ e) ^ 3 ^ j := by
+      conv_rhs => rw [sub_pow_char_pow, mul_pow, pow_right_comm s e (3 ^ j)]
+      ring
+    have hYj : (normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e)) ^ 3 ^ j +
+        -((normOneVal r₁' ^ (e * e) - normOneVal r₀' ^ (e * e)) ^ 3 ^ j) * (s ^ 3 ^ j) ^ e
+        = ((normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e))
+            - (normOneVal r₁' ^ (e * e) - normOneVal r₀' ^ (e * e)) * s ^ e) ^ 3 ^ j := by
+      conv_rhs => rw [sub_pow_char_pow, mul_pow, pow_right_comm s e (3 ^ j)]
+      ring
+    rw [hXj, hYj] at hcomp
+    exact hcomp
+
+/-- **Same-slot κ-constancy.**  Proportional edges have proportional weights: both components
+of the two-loop weight vanish, i.e. `K(p) = K(p')sᵉ` and `K(r) = K(r')sᵉ`.  In slot language
+`κ = K δ₁⁻ᵉ` (equivalently `κ̂ = K δ₀⁻ᵉ`) is well defined on each slot.  Step 3 of the case
+tree. -/
+theorem weights_proportional_of_proportional_edges (data : FieldNormalizerData p q G)
+    (hp : p = 3) (hqprime : q.Prime) (hq3 : q ≠ 3) (hqodd : Odd q) {e : ℕ} (he : Odd e)
+    (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {p₀ p₁ r₀ r₁ p₀' p₁' r₀' r₁' : NormSet.normOneUnits p q} {s : GaloisField p q}
+    (hpp : normOneVal p₀ = normOneVal p₁ + 1) (hrr : normOneVal r₀ = normOneVal r₁ + 1)
+    (hpp' : normOneVal p₀' = normOneVal p₁' + 1) (hrr' : normOneVal r₀' = normOneVal r₁' + 1)
+    (hne : normOneVal p₀ ≠ normOneVal r₀) (hs : IsSquare s) (hs0 : s ≠ 0)
+    (houter : normOneVal r₀ ^ e - normOneVal p₀ ^ e
+      = (normOneVal r₀' ^ e - normOneVal p₀' ^ e) * s)
+    (hinner : normOneVal r₁ ^ e - normOneVal p₁ ^ e
+      = (normOneVal r₁' ^ e - normOneVal p₁' ^ e) * s) :
+    normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e)
+        = (normOneVal p₁' ^ (e * e) - normOneVal p₀' ^ (e * e)) * s ^ e ∧
+      normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e)
+        = (normOneVal r₁' ^ (e * e) - normOneVal r₀' ^ (e * e)) * s ^ e := by
+  by_contra hW
+  exact false_of_proportional_edges data hp hqprime hq3 hqodd he hcube hexp hpp hrr hpp' hrr'
+    hne hs hs0 houter hinner hW
+
 end SkewCalculus
 
 end OddOrder.BG.AppC.Problem1
