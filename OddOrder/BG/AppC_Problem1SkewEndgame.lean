@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.AppC_Problem1SkewCalculus
+import OddOrder.BG.AppC_Problem1Exponent
 
 /-!
 # BG Appendix C, Problem 1: the endgame — the κ-conspiracy refuted
@@ -1231,6 +1232,15 @@ theorem false_of_exotic (data : FieldNormalizerData p q G) (hp : p = 3)
       hne₁₂ hne₁₃ hne₁₄ hne₂₃ hne₂₄ hne₃₄ hmaster hmu.1 hmu.2 hDel hSig
   · exact false_of_masterFormula_mu_ne_zero rfl hq0 hqodd he hcube hxx₁ hxx₂ hxx₃
       hne₁₂ hne₁₃ hne₂₃ hcoll hmaster hSig hmu
+
+/-- **Hypothesis (B) has no witness for `p = 3`, `q ≠ 3`** — from the witness data alone:
+`q` is odd by condition (A), the exponent is extracted from the witness
+(`exists_odd_cube_exponent`), and the case tree kills it (`false_of_exotic`). -/
+theorem false_of_witness (data : FieldNormalizerData p q G) (hp : p = 3) (hq3 : q ≠ 3) :
+    False := by
+  have hqodd := q_odd_of_conditionA data hp
+  obtain ⟨e, he, hcube, hexp⟩ := exists_odd_cube_exponent data hp data.q_prime hqodd
+  exact false_of_exotic data hp data.q_prime hq3 hqodd he hcube hexp
 
 end SkewEndgame
 

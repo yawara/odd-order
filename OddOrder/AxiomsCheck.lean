@@ -513,6 +513,7 @@ import OddOrder.BG.AppC_Problem1Trace
 import OddOrder.BG.AppC_Problem1SameCoset
 import OddOrder.BG.AppC_Problem1PairComposition
 import OddOrder.BG.AppC_Problem1SkewCalculus
+import OddOrder.BG.AppC_Problem1Exponent
 import OddOrder.BG.AppC_Problem1SkewEndgame
 import OddOrder.BG.AppD_CNGroups
 import OddOrder.Peterfalvi.Appendices.SemilinearField
@@ -21274,3 +21275,6 @@ refutation: population branches of the master-formula collapse. -/
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_masterFormula_mu_ne_zero
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_masterFormula_cubic
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_exotic
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.exists_odd_cube_exponent
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.q_odd_of_conditionA
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_witness
