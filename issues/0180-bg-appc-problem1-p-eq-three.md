@@ -40,6 +40,17 @@ Proposition 9 の仮説 (記法は
 位置 (下記「(B1) の正体」)。trace 条件・span 条件・剛性・閉包実験は certificate として
 すべて不要になった (定理としては残る)。
 
+**さらに (2026-08-13 深夜第 2 弾): (B1) 自体を迂回する skew-pair calculus を発見**
+(正本 = [`notes/bg/appC_problem1_skew_calculus.md`](../notes/bg/appC_problem1_skew_calculus.md)、
+敵対的検証 3 レンズ全 CONFIRMED)。衝突なしで T² の任意の順序対が skew 辺
+`b(δ₀z^e)d(K(p)z^{e²})b(−δ₁z^e) = d(K(r)z^{e²})` を与え、`∏δ₁ = ∏δ₀` で閉じた loop が
+一般化 capstone `false_of_conjPair_frobenius_family` (Lean 化済・axiom-clean) 経由で
+witness を殺す。閉 loop の存在は鳩の巣で**無条件** (同 slot に 2 辺)、q = 7 では
+same-slot 対 **1,015 万件の悉皆検証で kill 率 100%**。残る一般 q の作業 = κ-共謀
+(全 loop の重み消滅) の反駁 1 本 (equidistribution 不要の有限線形代数; 成分内では
+共謀が自己整合であることまで証明済 ⟹ 成分横断 loop の解析が核心)。閉じれば
+**Problem 1 は (B1) を証明せずに全面解決**。
+
 **2026-08-12 の到達点**: ChatGPT (Chat / GPT-5.6 Sol / 推論レベル Pro、思考 240 分) の回答を
 全ステップ検証したうえで、**Theorem A (gcd 判定)・Theorem B (トレース不要の障害)・証明書形を
 すべて Lean 化した** (`notes/bg/appC_problem1_chatgpt_answer_b1.md`)。判定法は 1 日で
