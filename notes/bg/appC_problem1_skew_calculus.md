@@ -145,6 +145,56 @@ master formula は swap-整合的。)
 (G-定数型; パターン人口の場合分けと合わせて)、(iv) 退化人口 (実現クラス ≤ 2、
 単一セクター等)、(v) e²-衝突ブリッジ (`z^{e⁴} = z^e`) の Lean 化。
 これらが閉じれば **Problem 1 全面解決**。
+**→ §6.2: (i)–(iv) はすべて閉じた (2026-08-13 第 2 検証 wave)。(v) は Paley 級で
+Lean 化済 (`exists_paley_collision_pow_mul_down`)。**
+
+### 6.2 🎯 endgame CLOSED — 全ケース木 (2026-08-13、敵対的検証 2 レンズ CONFIRMED)
+
+第 2 検証 wave (lens A = 可換子 loop 合法性/(EX) 解空間、lens B = 枝撃破/量子化;
+`lensA_commutator_verify.py` 4000/4000 全 8 (セクター, c₁) 組合せ・
+`lensB_verify.py` synthetic master データで全恒等式検証) により、残件 (i)–(iv) が
+すべて閉じた。**witness 排除の完全なケース木**:
+
+1. **ρ = 1 クラスが実現** (= 衝突が存在): `false_of_collisionPair` で死 [Lean 済]。
+2. 以下衝突なしとする。**非退化重みの閉 loop が 1 つでもあれば**
+   `false_of_conjPair_frobenius_family` で死 [Lean 済]。よって共謀 (全 loop 消滅)。
+3. 共謀 ⟹ same-slot κ-定数 (2-loop、常に合法) ⟹ **可換子 loop は任意の実現クラス対・
+   両成分で合法** (swap が両成分を常に共存させる; 全 4 符号セクターで検証済) ⟹ (EX)。
+4. (EX) の解 = **master formula** `K(p) = λ_{χδ₀}δ₀^e − λ_{χδ₁}δ₁^e` (rank 計算で
+   一意性確認; `x ↦ x^e` 全単射なので `ρ ≠ 1 ⟹ 1−ρ^e ≠ 0`、`ρ^e = σ^e ⟹ ρ = σ`)。
+   **唯一の例外 = 実現クラスが単集合 {−1}**: このとき fwd-fwd 2-loop `e ∘ swap(e)`
+   (ρ = −1 でのみ符号合法!) が `K(p) = −K(r)` を全対に強制 ⟹ 3 点で K ≡ 0 ⟹ 死。
+5. master の枝: **Δ = 0** ⟹ swap で `K(p) = −K(r)` ∀対 ⟹ 3 点矛盾 (2 可逆, char 3)。
+   **Σ̄ = 0** ⟹ `K(p) − K(r) = Σ̄(δ₀^e − δ₁^e) = 0` ⟹ K 定数 ⟹ e²-衝突 ⟹
+   下向き共役ブリッジ [`exists_paley_collision_pow_mul_down`, Lean 済] で e-衝突 ⟹ 1 で死。
+6. **Frobenius 量子化**: μ_c := λ_c − λ_c³ が 1 つでも非零なら: 同符号パターン辺
+   (swap で (+,+)↔(−,−) ゆえ 1 本でもあれば) は `ρ^{3e} = 1 ⟹ ρ = 1` (gcd(3e,Q−1)=1)
+   = 衝突 ⟹ 死; 全辺混合パターンの世界は swap 対で μ₊ = −μ₋ ⟹ 全辺 ρ = −1 ⟹
+   master が `K(p) = Σ̄δ₀^e` に退化 ⟹ e-冪単射性で r が p ごとに一意 ⟹ |T| ≥ 3 と矛盾。
+   ⟹ **λ₊, λ₋ ∈ 𝔽₃**。
+7. 𝔽₃ 内で Δ, Σ̄ ≠ 0 の残候補 = **(±1, 0), (0, ±1) の 4 本**。各候補: (−,−)-パターン辺
+   ⟹ K(p) = 0 即死; (+,+)-辺の swap は (−,−)-辺 ⟹ 同左; 混合パターン
+   ((+,−): K(p) = ±δ₀^e / (−,+): K(p) = ∓δ₁^e) は e-冪単射性で p ごとに r を一意に
+   pin ⟹ **out-degree |T|−1 ≤ 2 ⟹ |T| ≤ 3、実際は |T| = (Q−3)/4 ≥ 546 で矛盾**
+   (|T| ≥ 4 のみ必要)。パターン人口仮説・G-定数型残渣は**不要**。
+
+**使用仮説の総目録**: χ(−1) = −1 (Q ≡ 3 mod 4)、e 奇・`z^{e³} = z`・gcd(e, Q−1) = 1、
+`K ≠ 0`、|T| ≥ 4、swap の成分反転、鳩の巣 (同 slot 2 辺 — 手順 3 の κ-定数の実効性)。
+equidistribution・Weil 評価・Davenport すら**最終版では不要** (可換子 loop は辺再利用で
+組めるため)。
+
+⟹ **witness は全ケースで矛盾 = hypothesis (B) は p = 3 で実現不能。
+定理 1 (e ∈ ⟨3⟩)・定理 2 と合わせ、BG App.C Problem 1 (Péterfalvi 1993) は
+否定的に全面解決** — (B1) の証明は不要になった。
+
+残作業 (数学は完結、記録と形式化):
+1. 統合された完全証明文書 (§1–§6.2 を 1 本の定理として書き下し) + 最終 assembly
+   検証 (部品は個別検証済; 組み立ての量化子構造の最終監査)。
+2. Lean 化: skew 辺 (E(p,r))・合成/閉条件・可換子 loop・master 崩壊・枝撃破。
+   入口 (`false_of_conjPair_frobenius_family`, `exists_paley_collision_pow_mul_down`) は
+   merge 済。中規模プロジェクト (数 session 規模)。
+3. 検証スクリプト正本: `endgame_check.py` / `lensA_commutator_verify.py` /
+   `lensB_verify.py` (session scratchpad `rigidity/`)。
 
 ## 7. 帰結
 
