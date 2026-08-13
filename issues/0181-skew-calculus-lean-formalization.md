@@ -45,8 +45,18 @@ Part II (skew calculus)・Part III (endgame) は紙上のみ。本 issue はそ�
 - [x] **同 slot 2-loop ⟹ κ-定数** (commit 204fd6c5c): `false_of_proportional_edges` +
       `weights_proportional_of_proportional_edges` (K(p) = K(p')s^e ∧ K(r) = K(r')s^e、
       除算なし multiplied-out 形; loop 族は `paley_frobenius_iterate` で供給)。
-- [ ] **可換子 loop ⟹ (EX)** (全 4 符号セクター;
-      per-leg slot 表は resolution.md の表を写す)。
+- [x] **FrobFam 層 + 4-loop raw 形 + leg supply** (2026-08-13, commits 79281f7db/fbbcd575a):
+      `FrobFam` (Frobenius 閉族) の edge/rev/comp/rescale/false_of_self で per-j
+      boilerplate を集約 (既存 2 lemma を書き換え、statement 不変)。
+      `false_of_four_loop`/`weights_eq_zero_of_four_loop` (endpoint 共有形の 4 脚 loop =
+      (EX) の raw 形)。`FrobFam.leg_fwd`/`leg_swap` (任意高さ h からの class leg、
+      per-leg slot 表の E/Ē 選択を符号仮定で解決)。
+- [x] **step 4 (singleton {−1})** (commit 7a72905eb, 新 leaf
+      `AppC_Problem1SkewEndgame.lean`): `false_of_three_antipodal` — 3 点の全対 ρ = −1
+      ⟹ K ≡ 0 ⟹ 矛盾。
+- [ ] **可換子 loop ⟹ (EX) の具体形**: 2 対 (p,r), (p',r') + 符号セクター仮定から
+      leg_fwd/leg_swap × 4 + weights_eq_zero_of_four_loop で K の交換関係式を導出
+      (v = δ₀ 正規化で s₁ = 1、閉条件は自動)。
 - [ ] **(EX) ⟹ master formula** (anchor 論法; 退化人口: singleton {−1} は
       fwd-fwd 2-loop `e∘swap(e)` の別補題、singleton {ρ≠±1} は master 全射性)。
 - [ ] **枝撃破**: Δ=0 (3 点矛盾) / Σ̄=0 (K 定数 ⟹ e²-衝突 glue、下記) /
