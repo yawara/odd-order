@@ -599,6 +599,54 @@ theorem FrobFam.leg_swap (data : FieldNormalizerData p q G) (hp : p = 3) (hq : q
       field_simp; ring] at hfam
   exact hfam
 
+/-- **Sign-resolved leg weight**: a forward leg contributes `K(p)`, a swapped leg `-K(r)`. -/
+noncomputable def legWeight (Kp Kr : GaloisField p q) : Bool → GaloisField p q
+  | true => Kp
+  | false => -Kr
+
+@[simp] theorem legWeight_true (Kp Kr : GaloisField p q) : legWeight Kp Kr true = Kp := rfl
+
+@[simp] theorem legWeight_false (Kp Kr : GaloisField p q) : legWeight Kp Kr false = -Kr := rfl
+
+/-- **The sign-resolved leg.**  The Boolean `b` selects the orientation forced by the square
+class of `h/δ₀`: the forward edge when it is a square, the swap edge otherwise.  Both run
+`h → h·(δ₁/δ₀)` with weights `(legWeight K(p) K(r) b · (h/δ₀)ᵉ, legWeight K(r) K(p) b ·
+(h/δ₀)ᵉ)` — a single uniform shape for the loop assembly of the endgame. -/
+theorem FrobFam.leg_resolved (data : FieldNormalizerData p q G) (hp : p = 3) (hq : q ≠ 0)
+    {e : ℕ} (he : Odd e)
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {p₀ p₁ r₀ r₁ : NormSet.normOneUnits p q}
+    (hpp : normOneVal p₀ = normOneVal p₁ + 1) (hrr : normOneVal r₀ = normOneVal r₁ + 1)
+    (hA0 : normOneVal r₀ ^ e - normOneVal p₀ ^ e ≠ 0) {h : GaloisField p q} (hh0 : h ≠ 0)
+    (b : Bool)
+    (hs : cond b (IsSquare (h * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹))
+      (IsSquare (-(h * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹)))) :
+    FrobFam data e h
+      (h * ((normOneVal r₁ ^ e - normOneVal p₁ ^ e)
+        * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹))
+      (legWeight (normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e))
+          (normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e)) b
+        * (h * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹) ^ e)
+      (legWeight (normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e))
+          (normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e)) b
+        * (h * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹) ^ e) := by
+  cases b
+  · have hfam := FrobFam.leg_swap data hp hq hexp hpp hrr hA0 hh0 hs
+    simp only [legWeight]
+    rw [show (normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e))
+          * (-(h * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹)) ^ e
+        = -(normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e))
+          * (h * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹) ^ e by
+        rw [he.neg_pow]; ring,
+      show (normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e))
+          * (-(h * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹)) ^ e
+        = -(normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e))
+          * (h * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹) ^ e by
+        rw [he.neg_pow]; ring] at hfam
+    exact hfam
+  · simpa only [legWeight] using
+      FrobFam.leg_fwd data hp hq hexp hpp hrr hA0 hh0 hs
+
 /-! ### The four-leg loop: forward–forward–backward–backward
 
 The commutator loop of the endgame (`notes/bg/appC_problem1_resolution.md` §4.2) is a four-leg

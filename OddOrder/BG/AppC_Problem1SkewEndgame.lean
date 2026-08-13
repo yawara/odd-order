@@ -64,6 +64,124 @@ theorem false_of_three_antipodal (data : FieldNormalizerData p q G) (hp : p = 3)
   exact skewPair_edge_weight_ne_zero hcube hcc
     ((mul_eq_zero.mp h2).resolve_left h2ne)
 
+/-! ### Step 5: the commutator loop and the exchange relation (EX)
+
+For two Paley pairs `(p, r)` and `(p', r')` with ratios `ρ = δ₁/δ₀`, `σ = δ₁'/δ₀'`, the
+commutator loop climbs `δ₀ → δ₁ → δ₁σ` by the edge itself and a `σ`-leg, and descends
+`δ₁σ → δ₀σ → δ₀` by a backwards `ρ`-leg and a backwards `σ`-leg.  The chaining and closure
+conditions hold identically (`ρσ = σρ`), each leg exists in exactly one orientation
+(`leg_resolved`), and conspiracy forces both weight components to vanish — the exchange
+relation (EX).  The Booleans `b₂ b₃ b₄` record the forced orientations; the loop for the
+opposite entry component `-δ₀` is this relation applied to the swapped pair `(r, p)`. -/
+
+/-- **The exchange relation (EX).**  Conspiracy on the commutator loop of two Paley pairs, in
+sign-resolved form: for any orientation sector `(b₂, b₃, b₄)` matching the square classes of
+`δ₁/δ₀'`, `δ₁'/δ₀'` and `δ₀/δ₀'`, both weight components of the loop vanish.  Step 5 of the
+case tree. -/
+theorem exchange_relation (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hqprime : q.Prime) (hq3 : q ≠ 3) (hqodd : Odd q) {e : ℕ} (he : Odd e)
+    (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {p₀ p₁ r₀ r₁ p₀' p₁' r₀' r₁' : NormSet.normOneUnits p q}
+    (hpp : normOneVal p₀ = normOneVal p₁ + 1) (hrr : normOneVal r₀ = normOneVal r₁ + 1)
+    (hpp' : normOneVal p₀' = normOneVal p₁' + 1) (hrr' : normOneVal r₀' = normOneVal r₁' + 1)
+    (hne : normOneVal p₀ ≠ normOneVal r₀) (hne' : normOneVal p₀' ≠ normOneVal r₀')
+    (b₂ b₃ b₄ : Bool)
+    (hs₂ : cond b₂
+      (IsSquare ((normOneVal r₁ ^ e - normOneVal p₁ ^ e)
+        * (normOneVal r₀' ^ e - normOneVal p₀' ^ e)⁻¹))
+      (IsSquare (-((normOneVal r₁ ^ e - normOneVal p₁ ^ e)
+        * (normOneVal r₀' ^ e - normOneVal p₀' ^ e)⁻¹))))
+    (hs₃ : cond b₃
+      (IsSquare ((normOneVal r₁' ^ e - normOneVal p₁' ^ e)
+        * (normOneVal r₀' ^ e - normOneVal p₀' ^ e)⁻¹))
+      (IsSquare (-((normOneVal r₁' ^ e - normOneVal p₁' ^ e)
+        * (normOneVal r₀' ^ e - normOneVal p₀' ^ e)⁻¹))))
+    (hs₄ : cond b₄
+      (IsSquare ((normOneVal r₀ ^ e - normOneVal p₀ ^ e)
+        * (normOneVal r₀' ^ e - normOneVal p₀' ^ e)⁻¹))
+      (IsSquare (-((normOneVal r₀ ^ e - normOneVal p₀ ^ e)
+        * (normOneVal r₀' ^ e - normOneVal p₀' ^ e)⁻¹)))) :
+    (normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e))
+        + legWeight (normOneVal p₁' ^ (e * e) - normOneVal p₀' ^ (e * e))
+            (normOneVal r₁' ^ (e * e) - normOneVal r₀' ^ (e * e)) b₂
+          * ((normOneVal r₁ ^ e - normOneVal p₁ ^ e)
+            * (normOneVal r₀' ^ e - normOneVal p₀' ^ e)⁻¹) ^ e
+        - legWeight (normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e))
+            (normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e)) b₃
+          * ((normOneVal r₁' ^ e - normOneVal p₁' ^ e)
+            * (normOneVal r₀' ^ e - normOneVal p₀' ^ e)⁻¹) ^ e
+        - legWeight (normOneVal p₁' ^ (e * e) - normOneVal p₀' ^ (e * e))
+            (normOneVal r₁' ^ (e * e) - normOneVal r₀' ^ (e * e)) b₄
+          * ((normOneVal r₀ ^ e - normOneVal p₀ ^ e)
+            * (normOneVal r₀' ^ e - normOneVal p₀' ^ e)⁻¹) ^ e = 0
+    ∧ (normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e))
+        + legWeight (normOneVal r₁' ^ (e * e) - normOneVal r₀' ^ (e * e))
+            (normOneVal p₁' ^ (e * e) - normOneVal p₀' ^ (e * e)) b₂
+          * ((normOneVal r₁ ^ e - normOneVal p₁ ^ e)
+            * (normOneVal r₀' ^ e - normOneVal p₀' ^ e)⁻¹) ^ e
+        - legWeight (normOneVal r₁ ^ (e * e) - normOneVal r₀ ^ (e * e))
+            (normOneVal p₁ ^ (e * e) - normOneVal p₀ ^ (e * e)) b₃
+          * ((normOneVal r₁' ^ e - normOneVal p₁' ^ e)
+            * (normOneVal r₀' ^ e - normOneVal p₀' ^ e)⁻¹) ^ e
+        - legWeight (normOneVal r₁' ^ (e * e) - normOneVal r₀' ^ (e * e))
+            (normOneVal p₁' ^ (e * e) - normOneVal p₀' ^ (e * e)) b₄
+          * ((normOneVal r₀ ^ e - normOneVal p₀ ^ e)
+            * (normOneVal r₀' ^ e - normOneVal p₀' ^ e)⁻¹) ^ e = 0 := by
+  subst hp
+  have hq0 : q ≠ 0 := hqprime.ne_zero
+  have hD0 : normOneVal r₀ ^ e - normOneVal p₀ ^ e ≠ 0 :=
+    skewPair_edge_left_ne_zero hcube hne
+  have hD0' : normOneVal r₀' ^ e - normOneVal p₀' ^ e ≠ 0 :=
+    skewPair_edge_left_ne_zero hcube hne'
+  have hne₁ : normOneVal p₁ ≠ normOneVal r₁ := fun h => hne (by linear_combination hpp - hrr + h)
+  have hD1 : normOneVal r₁ ^ e - normOneVal p₁ ^ e ≠ 0 :=
+    skewPair_edge_left_ne_zero hcube hne₁
+  have hne₁' : normOneVal p₁' ≠ normOneVal r₁' :=
+    fun h => hne' (by linear_combination hpp' - hrr' + h)
+  have hD1' : normOneVal r₁' ^ e - normOneVal p₁' ^ e ≠ 0 :=
+    skewPair_edge_left_ne_zero hcube hne₁'
+  -- the entry height of the backwards `ρ`-leg
+  have hent0 : (normOneVal r₀ ^ e - normOneVal p₀ ^ e)
+      * ((normOneVal r₁' ^ e - normOneVal p₁' ^ e)
+        * (normOneVal r₀' ^ e - normOneVal p₀' ^ e)⁻¹) ≠ 0 :=
+    mul_ne_zero hD0 (mul_ne_zero hD1' (inv_ne_zero hD0'))
+  have hent : (normOneVal r₀ ^ e - normOneVal p₀ ^ e)
+        * ((normOneVal r₁' ^ e - normOneVal p₁' ^ e)
+          * (normOneVal r₀' ^ e - normOneVal p₀' ^ e)⁻¹)
+        * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹
+      = (normOneVal r₁' ^ e - normOneVal p₁' ^ e)
+        * (normOneVal r₀' ^ e - normOneVal p₀' ^ e)⁻¹ := by
+    field_simp
+  -- the four legs
+  have h₁ := FrobFam.edge data rfl hq0 hexp hpp hrr
+  have h₂ := FrobFam.leg_resolved data rfl hq0 he hexp hpp' hrr' hD0' hD1 b₂ hs₂
+  have hs₃' : cond b₃
+      (IsSquare ((normOneVal r₀ ^ e - normOneVal p₀ ^ e)
+        * ((normOneVal r₁' ^ e - normOneVal p₁' ^ e)
+          * (normOneVal r₀' ^ e - normOneVal p₀' ^ e)⁻¹)
+        * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹))
+      (IsSquare (-((normOneVal r₀ ^ e - normOneVal p₀ ^ e)
+        * ((normOneVal r₁' ^ e - normOneVal p₁' ^ e)
+          * (normOneVal r₀' ^ e - normOneVal p₀' ^ e)⁻¹)
+        * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹))) := by
+    rw [hent]
+    exact hs₃
+  have h₃ := FrobFam.leg_resolved data rfl hq0 he hexp hpp hrr hD0 hent0 b₃ hs₃'
+  rw [hent] at h₃
+  rw [show (normOneVal r₀ ^ e - normOneVal p₀ ^ e)
+        * ((normOneVal r₁' ^ e - normOneVal p₁' ^ e)
+          * (normOneVal r₀' ^ e - normOneVal p₀' ^ e)⁻¹)
+        * ((normOneVal r₁ ^ e - normOneVal p₁ ^ e)
+          * (normOneVal r₀ ^ e - normOneVal p₀ ^ e)⁻¹)
+      = (normOneVal r₁ ^ e - normOneVal p₁ ^ e)
+        * ((normOneVal r₁' ^ e - normOneVal p₁' ^ e)
+          * (normOneVal r₀' ^ e - normOneVal p₀' ^ e)⁻¹) by
+      field_simp] at h₃
+  have h₄ := FrobFam.leg_resolved data rfl hq0 he hexp hpp' hrr' hD0' hD0 b₄ hs₄
+  exact weights_eq_zero_of_four_loop data rfl hqprime hq3 hqodd he hcube hexp
+    h₁ h₂ h₃ h₄ hD0
+
 end SkewEndgame
 
 end OddOrder.BG.AppC.Problem1
