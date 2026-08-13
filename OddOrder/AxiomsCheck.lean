@@ -21278,3 +21278,5 @@ refutation: population branches of the master-formula collapse. -/
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.exists_odd_cube_exponent
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.q_odd_of_conditionA
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_witness
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_frobenius_exponent
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.hypothesisB_false

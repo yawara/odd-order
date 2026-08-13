@@ -638,7 +638,8 @@ In the application `P` is the additive group of `𝔽_{3^q}`, `S` the set of squ
 `s ↦ s^e` is additive.  `commute_conj_of_le_closure` is the untwisted specialisation `σ = id`
 (the centralising case `e = 1`, available for every `q`). -/
 theorem commute_conj_of_le_closure_twisted {P : Subgroup G}
-    (hP : ∀ a ∈ P, ∀ b ∈ P, a * b = b * a) {g : G} (σ : G →* G)
+    (hP : ∀ a ∈ P, ∀ b ∈ P, a * b = b * a) {g : G} (σ : G → G)
+    (hσmul : ∀ a ∈ P, ∀ b ∈ P, σ (a * b) = σ a * σ b)
     (hσP : ∀ v ∈ P, σ v ∈ P) {S : Set G} (hSP : S ⊆ (P : Set G))
     (hrel : ∀ s ∈ S,
       (g⁻¹ * (g⁻¹ * σ (σ s) * g) * g) * (g⁻¹ * σ s * g) * s = 1)
@@ -665,8 +666,8 @@ theorem commute_conj_of_le_closure_twisted {P : Subgroup G}
     have hab := hrel (s * t) hst
     have hab' : (g⁻¹ * (g⁻¹ * σ (σ s) * g) * g) * (g⁻¹ * (g⁻¹ * σ (σ t) * g) * g) *
         ((g⁻¹ * σ s * g) * (g⁻¹ * σ t * g)) * (s * t) = 1 := by
-      rw [← hab]
-      simp only [map_mul]
+      rw [← hab, hσmul s (hSP hs) t (hSP ht),
+        hσmul (σ s) (hσP s (hSP hs)) (σ t) (hσP t (hSP ht))]
       group
     have h₁ : (g⁻¹ * σ s * g) * (g⁻¹ * σ t * g) = (g⁻¹ * σ t * g) * (g⁻¹ * σ s * g) := by
       have hcomm := hP (σ s) (hσP s (hSP hs)) (σ t) (hσP t (hSP ht))
@@ -685,7 +686,8 @@ theorem commute_conj_of_le_closure {P : Subgroup G} (hP : ∀ a ∈ P, ∀ b ∈
     (hrel : ∀ s ∈ S, (g * s) ^ 3 = 1) {t : G} (ht : t ∈ S)
     (hspan : P ≤ Subgroup.closure {s | s ∈ S ∧ s * t ∈ S}) :
     ∀ v ∈ P, t * (g⁻¹ * v * g) = (g⁻¹ * v * g) * t := by
-  refine commute_conj_of_le_closure_twisted hP (MonoidHom.id G) (fun v hv => hv) hSP ?_ ht ?_
+  refine commute_conj_of_le_closure_twisted hP id (fun a _ b _ => rfl)
+    (fun v hv => hv) hSP ?_ ht ?_
   · intro s hs
     have h := hrel s hs
     rw [pow_three_eq_conj_mul hg3 s] at h

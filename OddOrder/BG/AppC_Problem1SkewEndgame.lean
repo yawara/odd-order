@@ -1242,6 +1242,52 @@ theorem false_of_witness (data : FieldNormalizerData p q G) (hp : p = 3) (hq3 : 
   obtain ⟨e, he, hcube, hexp⟩ := exists_odd_cube_exponent data hp data.q_prime hqodd
   exact false_of_exotic data hp data.q_prime hq3 hqodd he hcube hexp
 
+/-- **BG Appendix C, Problem 1 (Péterfalvi 1993), resolved: hypothesis (B) has no witness
+for `p = 3`.**  The answer to "*Can the hypothesis of Proposition 9 be satisfied for
+`p = 3`?*" is **no**, for every `q` and with no finiteness assumption on `G`: for `q ≠ 3` the
+collision-free skew calculus kills every exponent (`false_of_witness`), and for `q = 3` every
+admissible exponent is a Frobenius power mod `13` and Theorem 1 applies
+(`false_of_frobenius_exponent`). -/
+theorem hypothesisB_false (data : FieldNormalizerData p q G) (hp : p = 3) : False := by
+  by_cases hq3 : q = 3
+  · subst hq3
+    obtain ⟨e, he, hcube, hexp⟩ :=
+      exists_odd_cube_exponent data hp Nat.prime_three (by decide)
+    subst hp
+    -- the norm-one units have order `13`, so the exponent is `1`, `3` or `9` mod `13`
+    have hncard : Nat.card (NormSet.normOneUnits 3 3) = 13 := by
+      rw [NormSet.normOneUnits_card 3 3 (by norm_num)]
+      norm_num
+    have hcubeu : ∀ u : NormSet.normOneUnits 3 3, u ^ (e * e * e) = u := by
+      intro u
+      have h := hcube (((u : (GaloisField 3 3)ˣ) : GaloisField 3 3))
+      refine Subtype.ext (Units.ext ?_)
+      simpa using h
+    obtain ⟨u₀, hu₀⟩ := IsCyclic.exists_generator (α := NormSet.normOneUnits 3 3)
+    have hord : orderOf u₀ = 13 := by
+      rw [orderOf_eq_card_of_forall_mem_zpowers hu₀, hncard]
+    have hmod : e * e * e ≡ 1 [MOD 13] := by
+      have h1 : u₀ ^ (e * e * e) = u₀ ^ 1 := by simpa using hcubeu u₀
+      have h2 := pow_eq_pow_iff_modEq.mp h1
+      rwa [hord] at h2
+    have hdec : ∀ r : ℕ, r < 13 → r * r * r % 13 = 1 → r = 1 ∨ r = 3 ∨ r = 9 := by decide
+    have hcases := hdec (e % 13) (Nat.mod_lt _ (by norm_num)) (by
+      have hself : e ≡ e % 13 [MOD 13] := (Nat.mod_modEq e 13).symm
+      have hmm := ((hself.symm.mul hself.symm).mul hself.symm).trans hmod
+      simpa [Nat.ModEq] using hmm)
+    have hfrobmk : ∀ jj : ℕ, e % 13 = 3 ^ jj % 13 →
+        ∀ u : NormSet.normOneUnits 3 3, u ^ e = u ^ 3 ^ jj := by
+      intro jj hjj u
+      have hdvd : orderOf u ∣ 13 := by
+        rw [← hncard]
+        exact orderOf_dvd_natCard u
+      exact pow_eq_pow_iff_modEq.mpr ((show e ≡ 3 ^ jj [MOD 13] from hjj).of_dvd hdvd)
+    rcases hcases with h | h | h
+    · exact false_of_frobenius_exponent data rfl hexp (hfrobmk 0 (by rw [h]; norm_num))
+    · exact false_of_frobenius_exponent data rfl hexp (hfrobmk 1 (by rw [h]; norm_num))
+    · exact false_of_frobenius_exponent data rfl hexp (hfrobmk 2 (by rw [h]; norm_num))
+  · exact false_of_witness data hp hq3
+
 end SkewEndgame
 
 end OddOrder.BG.AppC.Problem1

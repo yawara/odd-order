@@ -211,6 +211,162 @@ theorem q_odd_of_conditionA (data : FieldNormalizerData p q G) (hp : p = 3) : Od
   have h1 := Nat.odd_iff.mp hA
   omega
 
+/-- **Theorem 1, Frobenius-power case.**  If `g` acts on `σ(U)` by an exponent agreeing with a
+Frobenius power `u ↦ u^{3ʲ}` on the norm-one units, hypothesis (B) fails.  The transported
+Frobenius `s ↦ s^{3ʲ}` is additive on `σ(P)`, so the layered relation family feeds the twisted
+engine `commute_conj_of_le_closure_twisted`; the Paley spanning transports along the Frobenius
+bijection; and the resulting commutation `[x, x^g] = 1` is fatal (`not_commute_conj`).  This is
+the `e ∈ ⟨3⟩` half of Theorem 1 of `notes/bg/appC_problem1_partial_resolution.md` —
+`false_of_centralizing` is the specialisation `j = 0`. -/
+theorem false_of_frobenius_exponent (data : FieldNormalizerData p q G) (hp : p = 3)
+    {e j : ℕ} (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    (hfrob : ∀ u : NormSet.normOneUnits p q, u ^ e = u ^ 3 ^ j) : False := by
+  subst hp
+  classical
+  -- the transported Frobenius power on `σ(P)`
+  set σf : G → G := fun x =>
+    if h : ∃ a : Multiplicative (GaloisField 3 q), fieldHom data a = x then
+      fieldHom data (Multiplicative.ofAdd (Multiplicative.toAdd (Classical.choose h) ^ 3 ^ j))
+    else x with hσfdef
+  have hσf_apply : ∀ a : Multiplicative (GaloisField 3 q),
+      σf (fieldHom data a)
+        = fieldHom data (Multiplicative.ofAdd (Multiplicative.toAdd a ^ 3 ^ j)) := by
+    intro a
+    have hex : ∃ b, fieldHom data b = fieldHom data a := ⟨a, rfl⟩
+    simp only [hσfdef, dif_pos hex]
+    have hchoose : Classical.choose hex = a :=
+      fieldHom_injective data (Classical.choose_spec hex)
+    rw [hchoose]
+  have hσP : ∀ v ∈ data.P, σf v ∈ data.P := by
+    intro v hv
+    rw [← fieldHom_range data] at hv ⊢
+    obtain ⟨a, rfl⟩ := hv
+    rw [hσf_apply]
+    exact ⟨_, rfl⟩
+  have hσmul : ∀ a ∈ data.P, ∀ b ∈ data.P, σf (a * b) = σf a * σf b := by
+    intro x hx y hy
+    rw [← fieldHom_range data] at hx hy
+    obtain ⟨a, rfl⟩ := hx
+    obtain ⟨b, rfl⟩ := hy
+    have harg : Multiplicative.ofAdd (Multiplicative.toAdd (a * b) ^ 3 ^ j)
+        = Multiplicative.ofAdd (Multiplicative.toAdd a ^ 3 ^ j)
+          * Multiplicative.ofAdd (Multiplicative.toAdd b ^ 3 ^ j) := by
+      rw [← ofAdd_add]
+      congr 1
+      rw [toAdd_mul, add_pow_char_pow]
+    rw [← map_mul, hσf_apply, harg, map_mul, ← hσf_apply, ← hσf_apply]
+  -- orbit elements in field coordinates, and the twist as the `e`-power on the orbit
+  have hSP : orbitS data ⊆ (data.P : Set G) := by
+    rintro s ⟨v, hv, rfl⟩
+    exact conj_s_mem_P data hv
+  have horbit : ∀ v ∈ data.U, ∃ u : NormSet.normOneUnits 3 q, v = unitElt data u := by
+    intro v hv
+    rw [← data.sigma_U_eq_U] at hv
+    obtain ⟨w', ⟨u, rfl⟩, rfl⟩ := hv
+    exact ⟨u, rfl⟩
+  have hval_pow : ∀ u : NormSet.normOneUnits 3 q,
+      (((u⁻¹ : NormSet.normOneUnits 3 q) : (GaloisField 3 q)ˣ) : GaloisField 3 q) ^ 3 ^ j
+        = ((((u ^ e)⁻¹ : NormSet.normOneUnits 3 q) : (GaloisField 3 q)ˣ) : GaloisField 3 q) := by
+    intro u
+    have h := hfrob u⁻¹
+    have hval := congrArg (fun z : NormSet.normOneUnits 3 q =>
+      ((z : (GaloisField 3 q)ˣ) : GaloisField 3 q)) h
+    simp only [inv_pow] at hval ⊢
+    exact hval.symm
+  have hσf_orbit : ∀ u : NormSet.normOneUnits 3 q,
+      σf ((unitElt data u)⁻¹ * data.s * unitElt data u)
+        = (unitElt data u ^ e)⁻¹ * data.s * unitElt data u ^ e := by
+    intro u
+    rw [conj_s_unitElt data u, hσf_apply, unitElt_pow, conj_s_unitElt data (u ^ e)]
+    congr 2
+    simp only [toAdd_ofAdd]
+    exact hval_pow u
+  have hrel : ∀ s' ∈ orbitS data,
+      ((conjGen data)⁻¹ * ((conjGen data)⁻¹ * σf (σf s') * conjGen data) * conjGen data) *
+        ((conjGen data)⁻¹ * σf s' * conjGen data) * s' = 1 := by
+    rintro s' ⟨v, hv, rfl⟩
+    obtain ⟨u, rfl⟩ := horbit v hv
+    have h1 : σf ((unitElt data u)⁻¹ * data.s * unitElt data u)
+        = (unitElt data u ^ e)⁻¹ * data.s * unitElt data u ^ e := hσf_orbit u
+    have h2 : σf ((unitElt data u ^ e)⁻¹ * data.s * unitElt data u ^ e)
+        = (unitElt data u ^ (e * e))⁻¹ * data.s * unitElt data u ^ (e * e) := by
+      have h := hσf_orbit (u ^ e)
+      rw [← unitElt_pow, ← pow_mul] at h
+      exact h
+    rw [h1, h2]
+    have hlay := layered_relation_of_exp data rfl hexp hv
+    calc ((conjGen data)⁻¹ * ((conjGen data)⁻¹ *
+            ((unitElt data u ^ (e * e))⁻¹ * data.s * unitElt data u ^ (e * e)) *
+            conjGen data) * conjGen data) *
+          ((conjGen data)⁻¹ * ((unitElt data u ^ e)⁻¹ * data.s * unitElt data u ^ e) *
+            conjGen data) *
+          ((unitElt data u)⁻¹ * data.s * unitElt data u)
+        = ((conjGen data)⁻¹ * ((conjGen data)⁻¹ *
+            ((unitElt data u ^ (e * e))⁻¹ * data.s * unitElt data u ^ (e * e)) *
+            conjGen data) * conjGen data) *
+          (((conjGen data)⁻¹ * ((unitElt data u ^ e)⁻¹ * data.s * unitElt data u ^ e) *
+            conjGen data) *
+          ((unitElt data u)⁻¹ * data.s * unitElt data u)) := by group
+      _ = 1 := hlay
+  -- the spanning hypothesis transports along the Frobenius bijection
+  have hσinv : ∀ x ∈ data.P, σf x⁻¹ = (σf x)⁻¹ := by
+    intro x hx
+    have h1 : σf x⁻¹ * σf x = 1 := by
+      rw [← hσmul x⁻¹ (inv_mem hx) x hx, inv_mul_cancel]
+      rw [show (1 : G) = fieldHom data 1 from (map_one _).symm, hσf_apply]
+      simp
+    exact eq_inv_of_mul_eq_one_left h1
+  have hclP : Subgroup.closure {s' | s' ∈ orbitS data ∧ s' * data.s ∈ orbitS data}
+      ≤ data.P :=
+    (Subgroup.closure_le _).mpr fun s' hs' => hSP hs'.1
+  have hfrob_inj : Function.Injective (fun z : GaloisField 3 q => z ^ 3 ^ j) := by
+    intro x y hxy
+    simp only at hxy
+    have h0 : (x - y) ^ 3 ^ j = 0 := by
+      rw [sub_pow_char_pow, hxy, sub_self]
+    exact sub_eq_zero.mp
+      ((pow_eq_zero_iff (by positivity : 0 < 3 ^ j).ne').mp h0)
+  have hσf_surj : ∀ v ∈ data.P, ∃ w ∈ data.P, σf w = v := by
+    intro v hv
+    rw [← fieldHom_range data] at hv
+    obtain ⟨a, rfl⟩ := hv
+    obtain ⟨t, ht⟩ := Finite.injective_iff_surjective.mp hfrob_inj (Multiplicative.toAdd a)
+    refine ⟨fieldHom data (Multiplicative.ofAdd t), ?_, ?_⟩
+    · rw [← fieldHom_range data]
+      exact ⟨_, rfl⟩
+    · rw [hσf_apply]
+      have hta : Multiplicative.toAdd (Multiplicative.ofAdd t) ^ 3 ^ j
+          = Multiplicative.toAdd a := by
+        simpa using ht
+      rw [hta]
+      simp
+  have hspan : data.P ≤ Subgroup.closure
+      (σf '' {s' | s' ∈ orbitS data ∧ s' * data.s ∈ orbitS data}) := by
+    intro v hv
+    obtain ⟨w, hwP, rfl⟩ := hσf_surj v hv
+    have hw := le_closure_orbitS data rfl hwP
+    refine Subgroup.closure_induction
+      (p := fun x _ => σf x ∈ Subgroup.closure
+        (σf '' {s' | s' ∈ orbitS data ∧ s' * data.s ∈ orbitS data}))
+      (fun x hx => Subgroup.subset_closure ⟨x, hx, rfl⟩) ?_ ?_ ?_ hw
+    · have h0 : (0 : GaloisField 3 q) ^ 3 ^ j = 0 :=
+        zero_pow (by positivity : (0 : ℕ) < 3 ^ j).ne'
+      rw [show (1 : G) = fieldHom data 1 from (map_one _).symm, hσf_apply, toAdd_one, h0,
+        ofAdd_zero, map_one]
+      exact Subgroup.one_mem _
+    · intro x y hxc hyc hx hy
+      rw [hσmul x (hclP hxc) y (hclP hyc)]
+      exact Subgroup.mul_mem _ hx hy
+    · intro x hxc hx
+      rw [hσinv x (hclP hxc)]
+      exact Subgroup.inv_mem _ hx
+  -- feed the engine and close by the fixed-point contradiction
+  have ht : data.s ∈ orbitS data := ⟨1, data.U.one_mem, by group⟩
+  have hcomm := commute_conj_of_le_closure_twisted (P := data.P) (g := conjGen data)
+    (fun a ha b hb => P_mul_comm data ha hb) σf hσmul hσP hSP hrel ht hspan
+    data.s data.s_mem_P
+  exact not_commute_conj data rfl hcomm
+
 end ExponentExtraction
 
 end OddOrder.BG.AppC.Problem1
