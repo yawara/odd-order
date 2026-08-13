@@ -66,15 +66,19 @@ Part II (skew calculus)・Part III (endgame) は紙上のみ。本 issue はそ�
       不要だった**: (EX)(X, anchor) は b₃ = true で任意の X に合法、(b₂,b₄) の 4 sub-case
       が sqSelect 評価と 1:1 対応。λ± = ±K_anchor·(Δ₀^e − Δ₁^e)⁻¹。κ-constancy 転送も
       人口仮説も不要 (anchor 1 本で全対 pin)。
-- [ ] **master case M (全比非平方)**: anchor 比 ρ₀ ∉ {±1} (無ければ全比 −1 =
-      step 4 kill)。b₃ = false で (EX) 両成分が (K_p, K_r) の 2×2 系
-      (det = 1 − ρ₀^{2e} ≠ 0)。pin2_of_exchange (両成分版の分母払い) を作り、
-      λ_{χΔ₀} = (K_aΔ₀^e − K_bΔ₁^e)/(Δ₀^{2e} − Δ₁^{2e})、
-      λ_{−χΔ₀} = (K_aΔ₁^e − K_bΔ₀^e)/(同) で master を検証。
-      det ≠ 0 は Δ₀ ≠ ±Δ₁ (no-collision + ρ₀ ≠ −1) + e-冪単射 + e 奇。
-- [ ] **人口 glue** (`exists_masterFormula_of_conspiracy` 相当): classical 場合分け —
-      ∃ 平方比対 → case P / ¬∃ かつ ∃ 比 ≠ −1 対 → case M / さもなくば全対比 −1 →
-      false_of_three_antipodal (3 点は |T| ≥ 4 から) → False.elim。
+- [x] **master case M** (commit c638223dd): `pin2_of_exchange` (2×2 系の決定論的分母払い、
+      det = Δ₀^{2e} − Δ₁^{2e}) + `master_div` (field_simp 非依存の除算分配) +
+      `sqSelect_ite_same`/`_opp` (評価ヘルパー汎用化、case P も置換) +
+      `exists_masterFormula_of_minus_anchor`。
+- [x] **人口 glue** (commit 4776aeb99): `exists_masterFormula_of_no_collision` —
+      共謀+無衝突 ⟹ master 成立 (∃平方比 → P / ∃比≠−1 → M / 全比 −1 → step 4 kill)。
+      **ケース木 step 3–5 の Lean 化完結**。
+- [ ] **枝撃破 (step 6–7)**: MasterFormula lamP lamM を仮定して:
+      (i) Δ = lamP − lamM = 0 枝 — swap 対で K(p) = −K(r) ∀対 → 3 点矛盾
+      (weight_sum 不要、master 直接)。(ii) Σ̄ = lamP + lamM = 0 枝 — K 定数 →
+      e²-衝突 glue (exists_paley_collision_pow_mul_down → CollisionPair → Part I)。
+      (iii) Frobenius 量子化 (μ_c = λ_c − λ_c³ ≠ 0 の反駁) → λ ∈ F₃。
+      (iv) F₃ 残 4 候補 (±1,0),(0,±1) の out-degree 論法 (|T| ≥ 4)。
 - [ ] **(EX) ⟹ master formula** (anchor 論法; 退化人口: singleton {−1} は
       fwd-fwd 2-loop `e∘swap(e)` の別補題、singleton {ρ≠±1} は master 全射性)。
 - [ ] **枝撃破**: Δ=0 (3 点矛盾) / Σ̄=0 (K 定数 ⟹ e²-衝突 glue、下記) /
