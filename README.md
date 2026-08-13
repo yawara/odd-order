@@ -30,6 +30,15 @@ the path through them that the Odd Order Theorem needs.
 > Finite Groups*, Ch. 1–7. Note that `sorry`-free is *not* the same as "the three books are done":
 > a result that has not been stated yet produces no `sorry`. Coverage is tracked separately, below.
 
+> ✅ **Every numbered result in the three books is formalized as of 2026-08-08**, when an
+> item-by-item audit of all **775 numbered results** — checked clause by clause against the book
+> pages — was completed. The tally and its precise scope are in the coverage paragraph below.
+
+> ★ **A question left open in print since 1993 was settled along the way** (2026-08-13): Problem 1
+> of Bender–Glauberman's Appendix C has a negative answer, found here and machine-checked in Lean
+> the same day. See "[An open problem resolved](#an-open-problem-resolved-problem-1-of-appendix-c)"
+> below.
+
 ## Beyond the Feit–Thompson theorem: a finite group theory library
 
 Proving Feit–Thompson requires a large body of finite group theory that mathlib does not yet have.
@@ -70,18 +79,60 @@ the proofs from the original literature, so the sources themselves are formalize
   group has an elementary abelian regular normal subgroup. Needed by Peterfalvi's Appendix C.
 
 Coverage of the three books is tracked result by result — separately from the `sorry` count, which
-measures something else entirely. An audit on 2026-07-16 enumerated all **815 numbered results**:
-470 formalized at full book strength, 78 covered completely by mathlib itself,
-54 present in a specialized form awaiting generalization, and 213 remaining work items. That survey
+measures something else entirely. An item-by-item audit, completed 2026-08-08, went through every
+numbered result of the three books and checked it clause by clause against the book page images:
+**775 numbered results** — 284 in Peterfalvi
+([issue 0172](issues/closed/0172-peterfalvi-full-formalization.md)), 305 in Isaacs
+([0176](issues/closed/0176-isaacs-full-formalization.md)), 186 in Bender–Glauberman
+([0177](issues/closed/0177-bg-full-formalization.md)). Every one of them now has a Lean statement at
+full book strength — proved, since the tree is `sorry`-free — or, for a number of classical facts
+(mostly in Isaacs), is covered by mathlib itself, with the correspondence recorded in `notes/` rather
+than as wrapper lemmas. Specialization debt — results present only in a form narrower than the
+book's — is down to zero. What the audit does *not* cover is the unnumbered material: end-of-chapter
+problems, remarks, and asides remain a separate, ongoing track in `issues/`, so "all numbered results"
+is still not "the three books are done". (An earlier survey of 2026-07-16
 ([`notes/meta/three_books_full_survey_2026_07_16.md`](notes/meta/three_books_full_survey_2026_07_16.md))
-is a snapshot of the phase-two starting point, not a live scope document — later spot checks found some
-of its per-chapter labels unreliable. Current scope and progress are tracked in the git history and in
-`issues/`, with each item re-verified against the tree before work starts.
+enumerated the starting point of this phase; its counts and labels turned out partly unreliable and it
+is kept only as a historical snapshot.)
 
 Everything sits under the `OddOrder` namespace rather than being upstreamed piecemeal, but mathlib
 naming and style conventions are followed throughout so that the general-purpose parts stay
 upstreamable later. The tree builds with zero non-`sorry` warnings under mathlib's standard linter
 set, enforced as a strict gate in CI.
+
+## An open problem resolved: Problem 1 of Appendix C
+
+This is the one place where the project produced new mathematics rather than formalizing existing
+mathematics. Problem 1 of Bender–Glauberman's Appendix C (p. 152) was posed by Péterfalvi and first
+appeared in print in Glauberman–Norton, "On a combinatorial problem associated with the odd order
+theorem" (*Proc. Amer. Math. Soc.* **119** (1993), 1089–1094, p. 1094):
+
+> Can the hypothesis of Proposition 9 be satisfied for `p = 3`?
+
+The hypothesis in question — condition (B) — asks for a group `G`, an injective homomorphism `σ`
+into `G` from the Frobenius group `H = P ⋊ U` (the additive group of `𝔽_{p^q}` acted on by its
+norm-one units), a finite abelian `p′`-subgroup `Q ≤ G`, and an element `y ∈ Q` such that `σ(P₀)`
+normalizes `Q` and `σ(P₀)^y` normalizes `σ(U)` — `P₀` being the prime-field line of `P`. For
+`p = 2` the configuration is realized in `SL(2, 2^q)` and in the Suzuki groups `Sz(2^q)` (the
+paper's Examples 10 and 11); for `p ≥ 5` the paper's Proposition 7 rules it out (that proposition,
+too, is formalized here). The case `p = 3` had been open since 1993, with no published resolution.
+
+The answer is **no** — for every `q`, and with no finiteness assumption on `G`:
+
+```lean
+theorem hypothesisB_false (data : FieldNormalizerData p q G) (hp : p = 3) : False
+```
+
+where `FieldNormalizerData p q G` packages exactly the problem's two conditions (A) and (B) — only
+`Q` is assumed finite, not `G`. The proof was completed on paper on 2026-08-13 and machine-checked
+in Lean the same day; the theorem is axiom-clean (`propext`, `Classical.choice`, `Quot.sound` only),
+enforced at build time by [`AxiomsCheck.lean`](OddOrder/AxiomsCheck.lean). The final theorem is in
+[`OddOrder/BG/AppC_Problem1SkewEndgame.lean`](OddOrder/BG/AppC_Problem1SkewEndgame.lean), at the top
+of about 8,700 lines across 14 files written for the resolution. The mathematical write-up — the
+theorem, the complete proof, and the paper-to-Lean correspondence — is
+[`notes/bg/appC_problem1_resolution.md`](notes/bg/appC_problem1_resolution.md), with an overview of
+the history, methodology, and verification in
+[`notes/bg/appC_problem1_summary.md`](notes/bg/appC_problem1_summary.md).
 
 ## Building
 
@@ -91,13 +142,13 @@ lake build OddOrder
 ```
 
 The Lean toolchain is pinned in [`lean-toolchain`](lean-toolchain) and the mathlib revision in
-[`lakefile.toml`](lakefile.toml). A full build is roughly 5,450 jobs.
+[`lakefile.toml`](lakefile.toml). A full build is roughly 5,470 jobs.
 
 ## Repository layout
 
 | Path | Contents |
 |---|---|
-| [`OddOrder/`](OddOrder/) | The Lean sources (~1,680 files, ~830,000 lines). `Isaacs/`, `BG/`, `Peterfalvi/` mirror the three books; `Higman/` holds the Suzuki 2-groups paper; `GroupTheory/`, `Algebra/`, `Mathlib/` hold general-purpose material, including `GroupTheory/RepresentationTheory/Modular/` for the block theory |
+| [`OddOrder/`](OddOrder/) | The Lean sources (~1,705 files, ~841,000 lines). `Isaacs/`, `BG/`, `Peterfalvi/` mirror the three books; `Higman/` holds the Suzuki 2-groups paper; `GroupTheory/`, `Algebra/`, `Mathlib/` hold general-purpose material, including `GroupTheory/RepresentationTheory/Modular/` for the block theory |
 | [`OddOrder/FeitThompson.lean`](OddOrder/FeitThompson.lean) | The main theorem and the minimal-counterexample reduction |
 | [`OddOrder/AxiomsCheck.lean`](OddOrder/AxiomsCheck.lean) | Build-time axiom audit of every load-bearing result |
 | [`ROADMAP.md`](ROADMAP.md) | Long-range plan, phases, dependency graph, per-chapter checklists |

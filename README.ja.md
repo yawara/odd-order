@@ -30,6 +30,14 @@ theorem feitThompson {G : Type*} [Group G] [Finite G] (hodd : Odd (Nat.card G)) 
 > Groups* Ch. 1–7 に沿って形式化した。⚠ `sorry` 無しは「3 冊が完了した」ことを意味しない:
 > まだ述べていない結果は `sorry` を生まないからである。カバレッジは下記で別に追跡している。
 
+> ✅ **2026-08-08 をもって 3 冊の番号付き結果はすべて形式化済みになった**。全 **775 個の
+> 番号付き結果**を書籍のページと条項単位で突き合わせる逐条監査が完了した。集計とその正確な
+> 射程は下記のカバレッジ段落を参照。
+
+> ★ **1993 年から活字の上で未解決だった問題が、この過程で解決された** (2026-08-13):
+> Bender–Glauberman の Appendix C の Problem 1 の答えは否 — ここで発見され、同日中に Lean で
+> 機械検証された。下記「[未解決問題の解決](#未解決問題の解決-appendix-c-の-problem-1)」を参照。
+
 ## Feit–Thompson の定理のその先へ: 有限群論ライブラリ
 
 Feit–Thompson の証明には、mathlib がまだ持っていない大量の有限群論が必要になる。
@@ -68,17 +76,58 @@ Feit–Thompson の証明には、mathlib がまだ持っていない大量の�
   初等アーベルな正則正規部分群を持つ。Peterfalvi の Appendix C が必要とする。
 
 3 冊のカバレッジは結果単位で追跡している — `sorry` の数とは別物で、測っているものが違う。
-2026-07-16 の監査で全 **815 個の番号付き結果**を数え上げた:
-470 が書籍の主張の強さのまま形式化済み、78 は mathlib 自体が完全にカバー、54 は特殊化された形で
-存在し一般化待ち、213 が残作業。この調査
+2026-08-08 に完了した逐条監査で、3 冊のすべての番号付き結果を書籍のページ画像と条項単位で
+突き合わせた: 全 **775 個の番号付き結果** — Peterfalvi 284
+([issue 0172](issues/closed/0172-peterfalvi-full-formalization.md))、Isaacs 305
+([0176](issues/closed/0176-isaacs-full-formalization.md))、Bender–Glauberman 186
+([0177](issues/closed/0177-bg-full-formalization.md))。そのすべてが、書籍の主張の強さのままの
+Lean statement を持つ — ツリーは `sorry` 無しなので、証明済みである — か、一部の古典的事実
+(大半は Isaacs) については mathlib 自体がカバーしており、その対応は wrapper 補題ではなく
+`notes/` の対応表に記録してある。特殊化債務 — 書籍より狭い形でしか存在しない結果 — はゼロに
+なった。監査が**カバーしない**のは番号の付かない素材である: 章末の問題・Remark・本文中の
+補足は `issues/` で別トラックとして進行中で、「番号付き結果がすべて済んだ」ことは今も
+「3 冊が完了した」ことを意味しない。(2026-07-16 の初期調査
 ([`notes/meta/three_books_full_survey_2026_07_16.md`](notes/meta/three_books_full_survey_2026_07_16.md))
-は第 2 フェーズ開始時点のスナップショットであり、生きたスコープ文書ではない — 後の抜き取り検査で
-章ごとのラベルの一部に信頼できないものが見つかっている。現在のスコープと進捗は git 履歴と `issues/`
-で追跡しており、各項目は着手前にツリーの実状態と突き合わせて再確認する。
+はこのフェーズの出発点を数え上げたものだが、その件数とラベルは後に一部信頼できないと判明し、
+歴史的スナップショットとしてのみ保持している。)
 
 すべては細切れに mathlib へ upstream せず `OddOrder` namespace 配下に置いているが、命名・スタイルは
 一貫して mathlib の規約に従っており、汎用部分は後から upstream できる状態を保っている。ツリーは
 mathlib 標準の linter セットの下で非 `sorry` 警告ゼロでビルドされ、CI の strict gate で強制されている。
+
+## 未解決問題の解決: Appendix C の Problem 1
+
+ここは、本プロジェクトが既存数学の形式化ではなく**新しい数学**を生んだ唯一の場所である。
+Bender–Glauberman の Appendix C (p. 152) の Problem 1 は Péterfalvi が提起した問いで、
+Glauberman–Norton, "On a combinatorial problem associated with the odd order theorem"
+(*Proc. Amer. Math. Soc.* **119** (1993), 1089–1094) の p. 1094 に初めて活字として現れた:
+
+> Proposition 9 の仮定は `p = 3` で満たせるか?
+
+問われている仮定 — 条件 (B) — が求めるのは、群 `G`、Frobenius 群 `H = P ⋊ U` (`𝔽_{p^q}` の
+加法群にノルム 1 の元の群が作用したもの) から `G` への単射準同型 `σ`、有限可換 `p′`-部分群
+`Q ≤ G`、そして `σ(P₀)` が `Q` を正規化し `σ(P₀)^y` が `σ(U)` を正規化するような元 `y ∈ Q`
+である (`P₀` は `P` の素体直線)。`p = 2` ではこの配置は `SL(2, 2^q)` と Suzuki 群 `Sz(2^q)`
+の中に実現する (論文の Examples 10, 11)。`p ≥ 5` は論文の Proposition 7 が排除する
+(この命題もここで形式化してある)。残る `p = 3` は 1993 年以来未解決で、解決を主張する公刊物は
+無かった。
+
+答えは**否**である — すべての `q` について、しかも `G` の有限性を一切仮定せずに:
+
+```lean
+theorem hypothesisB_false (data : FieldNormalizerData p q G) (hp : p = 3) : False
+```
+
+ここで `FieldNormalizerData p q G` は問題の 2 条件 (A)・(B) をそのまま束ねたものである —
+有限性を仮定するのは `Q` だけで、`G` には仮定しない。証明は 2026-08-13 に紙上で完成し、同日中に
+Lean での機械検証まで終えた。定理は axiom-clean (`propext`, `Classical.choice`, `Quot.sound`
+のみ) で、[`AxiomsCheck.lean`](OddOrder/AxiomsCheck.lean) がビルド時に強制する。最終定理は
+[`OddOrder/BG/AppC_Problem1SkewEndgame.lean`](OddOrder/BG/AppC_Problem1SkewEndgame.lean) にあり、
+この解決のために書かれたコードは 14 ファイル・約 8,700 行にのぼる。数学的な正本 — 主定理・
+完全証明・紙と Lean の対応表 — は
+[`notes/bg/appC_problem1_resolution.md`](notes/bg/appC_problem1_resolution.md)、経緯・方法論・
+検証態勢の俯瞰は
+[`notes/bg/appC_problem1_summary.md`](notes/bg/appC_problem1_summary.md)。
 
 ## ビルド
 
@@ -88,13 +137,13 @@ lake build OddOrder
 ```
 
 Lean toolchain は [`lean-toolchain`](lean-toolchain) に、mathlib のリビジョンは
-[`lakefile.toml`](lakefile.toml) に固定されている。フルビルドはおよそ 5,450 jobs。
+[`lakefile.toml`](lakefile.toml) に固定されている。フルビルドはおよそ 5,470 jobs。
 
 ## リポジトリ構成
 
 | パス | 内容 |
 |---|---|
-| [`OddOrder/`](OddOrder/) | Lean ソース本体 (~1,680 ファイル / 約 83 万行)。`Isaacs/`, `BG/`, `Peterfalvi/` が 3 冊をミラーし、`Higman/` が Suzuki 2-群の論文、`GroupTheory/`, `Algebra/`, `Mathlib/` が汎用部分 (ブロック論は `GroupTheory/RepresentationTheory/Modular/`) |
+| [`OddOrder/`](OddOrder/) | Lean ソース本体 (~1,705 ファイル / 約 84.1 万行)。`Isaacs/`, `BG/`, `Peterfalvi/` が 3 冊をミラーし、`Higman/` が Suzuki 2-群の論文、`GroupTheory/`, `Algebra/`, `Mathlib/` が汎用部分 (ブロック論は `GroupTheory/RepresentationTheory/Modular/`) |
 | [`OddOrder/FeitThompson.lean`](OddOrder/FeitThompson.lean) | 主定理と最小反例への還元 |
 | [`OddOrder/AxiomsCheck.lean`](OddOrder/AxiomsCheck.lean) | 主要な結果すべてのビルド時公理監査 |
 | [`ROADMAP.md`](ROADMAP.md) | 長期計画、フェーズ、依存グラフ、章別チェックリスト |

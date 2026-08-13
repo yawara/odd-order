@@ -58,6 +58,26 @@ README.md と README.ja.md の両方が上記 4 点を反映し、記載の数�
 監査件数) がすべて更新時点の実測または一次情報 (closed issue の最終集計) と一致していること。
 docs-only なのでビルド gate は不要だが、リンク切れが無いことを確認して commit。
 
+## 消化記録 (2026-08-14, close)
+
+4 項目すべて実施 (英日同時):
+
+1. **Problem 1**: Status に ★ blockquote + 独立節「An open problem resolved: Problem 1 of
+   Appendix C」/「未解決問題の解決: Appendix C の Problem 1」を新設 (Building の直前)。
+   問題の出自 (Péterfalvi 提起、GN 1993 PAMS 119 p.1094 初出、BG p.152 再掲)、条件 (B) の内容、
+   `p = 2` 実現 / `p ≥ 5` 排除 / `p = 3` open の文脈、`hypothesisB_false` の statement、
+   全 `q`・`G` 無限可・axiom-clean、14 leaf ≈ 8,700 行、正本 2 note へのリンクを記載。
+   **Glauberman–Norton 1993 の書誌はこの節に置いた** (「Three bodies of proof」リストではなく —
+   役割が「外部証明の形式化元」でなく「問題の出自 + Prop 7」なので)。
+2. **Coverage 段落置換**: 逐条監査 3 本 (0172/0176/0177、775 件、2026-08-08) を一次情報化。
+   最終集計どおり「書籍強度 statement (sorry-free ゆえ証明済) or mathlib カバー、特殊化債務 0」。
+   「3 冊 done」とは書かず、番号無し素材 (章末問題・Remark) が別トラックである旨を明記。
+   2026-07-16 survey は歴史的スナップショットに格下げ。Status にも ✅ blockquote 追加。
+3. **数値再実測** (2026-08-14): 1,705 files / 840,973 行 (→ ~841,000) / フルビルド 5,470 jobs
+   (実測、AxiomsCheck OK 出力確認)。sorry = 0 を comment-strip census + `bin/count-sorry` の
+   両方で再確認 (2026-08-07 の日付は初達成日として保持)。
+4. **リンク検査**: 両 README の相対リンク全数 + in-page anchor を機械検査、全通過。
+
 ## 参照
 
 - [issue 0180](closed/0180-bg-appc-problem1-p-eq-three.md) (Problem 1 経緯 + 最終総括) /
