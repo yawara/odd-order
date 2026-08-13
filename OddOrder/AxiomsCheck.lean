@@ -21211,6 +21211,8 @@ one collision per exotic-exponent class ((B1)). -/
 #assert_only_allowed_axioms OddOrder.exists_frobenius_cyclic_vector
 #assert_only_allowed_axioms OddOrder.exists_aeval_frobEnd_eq_of_forall_imp
 #assert_only_allowed_axioms OddOrder.aeval_frobEnd_eq_zero_of_pow
+#assert_only_allowed_axioms OddOrder.Paley.powDiff_pow_mul_pow_mul
+#assert_only_allowed_axioms OddOrder.Paley.exists_paley_collision_pow_mul_down
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.ConjPair.chain
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conjPair_aeval_of_frobenius_family
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conjPair_aeval_of_collisionPair

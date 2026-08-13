@@ -58,6 +58,8 @@ the problem: that graph is symmetric, hence never Sidon.
 * `neg_sub_one_notMem_paleySet` — it always leaves `T`.
 * `exists_paley_collision_pow_mul` — the `E` and `E²` collision problems are conjugate, so a
   usable collision for one gives one for the other.
+* `exists_paley_collision_pow_mul_down` — the downward direction: a collision for `E²` yields
+  one for `E`, by conjugating at `E²` and contracting `E⁴` to `E` pointwise.
 * `exists_paley_collision_of_pow_eq` — the search-free certificate: two nonzero squares `t`, `t'`
   fixed by `z ↦ z ^ E` whose values `(1 - t) / (1 - t)^E` agree produce a collision outright.
 * `isSquare_one_sub_inv_iff` — the inversion pairing: of `t` and `t⁻¹` exactly one is usable.
@@ -529,6 +531,36 @@ theorem exists_paley_collision_pow_mul [Fintype F] (h2 : ringChar F ≠ 2)
       have := pow_injective_of_cube hcube h'
       exact hab (by linear_combination this)
     · rw [powDiff_powDiffConjNeg hE hcube, powDiff_powDiffConjNeg hE hcube, hval]
+
+/-- `powDiff` at the exponent `E⁴` is `powDiff` at `E`: `z ^ (E⁴) = z ^ E` pointwise, from
+`z ^ (E³) = z`. -/
+theorem powDiff_pow_mul_pow_mul (hcube : ∀ z : F, z ^ (E * E * E) = z) (a : F) :
+    powDiff ((E * E) * (E * E)) a = powDiff E a := by
+  have hpt : ∀ z : F, z ^ ((E * E) * (E * E)) = z ^ E := by
+    intro z
+    calc z ^ ((E * E) * (E * E)) = z ^ ((E * E * E) * E) := by ring_nf
+      _ = (z ^ (E * E * E)) ^ E := by rw [pow_mul]
+      _ = z ^ E := by rw [hcube]
+  simp only [powDiff, hpt]
+
+/-- **The conjugation, downward**: a Paley collision for `E²` yields one for `E`.  Apply the
+upward conjugation at the exponent `E²` and contract `E⁴` to `E` pointwise (`z ^ (E³) = z`).
+Together with `exists_paley_collision_pow_mul` this makes the collision problems for `E` and
+`E²` fully equivalent. -/
+theorem exists_paley_collision_pow_mul_down [Fintype F] (h2 : ringChar F ≠ 2)
+    (h4 : Fintype.card F % 4 = 3)
+    (hE : Odd E) (hcube : ∀ z : F, z ^ (E * E * E) = z) {a b : F} (ha : a ∈ paleySet F)
+    (hb : b ∈ paleySet F) (hab : a ≠ b) (hval : powDiff (E * E) a = powDiff (E * E) b) :
+    ∃ c ∈ paleySet F, ∃ d ∈ paleySet F, c ≠ d ∧ powDiff E c = powDiff E d := by
+  have hcube' : ∀ z : F, z ^ ((E * E) * (E * E) * (E * E)) = z := by
+    intro z
+    calc z ^ ((E * E) * (E * E) * (E * E)) = z ^ ((E * E * E) * (E * E * E)) := by ring_nf
+      _ = (z ^ (E * E * E)) ^ (E * E * E) := by rw [pow_mul]
+      _ = z := by rw [hcube, hcube]
+  obtain ⟨c, hc, d, hd, hcd, hcdval⟩ :=
+    exists_paley_collision_pow_mul h2 h4 (hE.mul hE) hcube' ha hb hab hval
+  exact ⟨c, hc, d, hd, hcd, by
+    rwa [powDiff_pow_mul_pow_mul hcube, powDiff_pow_mul_pow_mul hcube] at hcdval⟩
 
 end Conjugation
 
