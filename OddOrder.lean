@@ -900,6 +900,7 @@ import OddOrder.BG.AppC_Problem1Lattice
 import OddOrder.BG.AppC_Problem1Trace
 import OddOrder.BG.AppC_Problem1SameCoset
 import OddOrder.BG.AppC_Problem1PairComposition
+import OddOrder.BG.AppC_Problem1SkewCalculus
 import OddOrder.BG.AppD_CNGroups
 import OddOrder.BG.AppE_CollectionFormula
 import OddOrder.BG.AppE_FurtherResults

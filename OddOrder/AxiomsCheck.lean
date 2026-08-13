@@ -512,6 +512,7 @@ import OddOrder.BG.AppC_Problem1Lattice
 import OddOrder.BG.AppC_Problem1Trace
 import OddOrder.BG.AppC_Problem1SameCoset
 import OddOrder.BG.AppC_Problem1PairComposition
+import OddOrder.BG.AppC_Problem1SkewCalculus
 import OddOrder.BG.AppD_CNGroups
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
@@ -21218,3 +21219,22 @@ one collision per exotic-exponent class ((B1)). -/
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conjPair_aeval_of_collisionPair
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_conjPair_frobenius_family
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair
+
+/-! **The skew-pair calculus** (`BG/AppC_Problem1SkewCalculus`).  The collision-free attack on
+hypothesis (B): eliminating the third layer between the Paley factorisations of two points
+`p ≠ r` yields the skew edge `(δ₀, δ₁; K(p), K(r))` with no collision hypothesis; reversal,
+composition and rescaling make the edges a groupoid; a closed loop (`A = B`) with square (resp.
+non-square) parameter is a forward (resp. backward) conjugation pair, and a Frobenius-closed
+family of closed loops with non-vanishing weight is fatal through the chain-reversal engine. -/
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.SkewPair.rev
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.SkewPair.comp
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.SkewPair.rescale
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.SkewPair.self_symm
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.SkewPair.self_left_eq_zero
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.SkewPair.self_right_eq_zero
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.SkewPair.conjPair_of_self
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.SkewPair.conjPair_of_self_neg
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.skewPair_edge
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.skewPair_edge_left_ne_zero
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.skewPair_edge_weight_ne_zero
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_skewPair_self_frobenius_family
