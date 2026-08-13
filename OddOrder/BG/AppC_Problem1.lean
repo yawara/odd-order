@@ -17,9 +17,13 @@ Bender--Glauberman, *Local Analysis for the Odd Order Theorem*, Appendix C, p. 1
 
 > Can the hypothesis of Proposition 9 be satisfied for `p = 3`?
 
-This is **open** (since 1993); it is not a formalization debt.  What *is* settled — and what this
-file carries — are the two elementary group-theoretic steps behind the partial resolution
-recorded in `notes/bg/appC_problem1_partial_resolution.md` (issue 0180):
+This was open since 1993 and is now **resolved negatively** (2026-08-13): the final,
+machine-checked answer is `Problem1.hypothesisB_false` in `AppC_Problem1SkewEndgame.lean`
+(all `q`, no finiteness assumption on `G`; master document
+`notes/bg/appC_problem1_resolution.md`).  What this file carries are the two elementary
+group-theoretic steps that seeded the resolution — Theorem 1 (the Frobenius-power case,
+still the live endpoint for `e ∈ ⟨3⟩` and hence all of `q = 3`) and the engine behind it —
+first recorded in `notes/bg/appC_problem1_partial_resolution.md` (issue 0180):
 
 * **Lemma A′** (`pow_three_mul_eq_pow_three_of_commute`): if `x³ = 1` and `c` commutes with its
   conjugate `x⁻¹cx`, then `(x * c * x)³ = (x * c)³`.  Both sides expand to the three conjugates
