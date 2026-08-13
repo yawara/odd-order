@@ -73,12 +73,22 @@ Part II (skew calculus)・Part III (endgame) は紙上のみ。本 issue はそ�
 - [x] **人口 glue** (commit 4776aeb99): `exists_masterFormula_of_no_collision` —
       共謀+無衝突 ⟹ master 成立 (∃平方比 → P / ∃比≠−1 → M / 全比 −1 → step 4 kill)。
       **ケース木 step 3–5 の Lean 化完結**。
-- [ ] **枝撃破 (step 6–7)**: MasterFormula lamP lamM を仮定して:
-      (i) Δ = lamP − lamM = 0 枝 — swap 対で K(p) = −K(r) ∀対 → 3 点矛盾
-      (weight_sum 不要、master 直接)。(ii) Σ̄ = lamP + lamM = 0 枝 — K 定数 →
-      e²-衝突 glue (exists_paley_collision_pow_mul_down → CollisionPair → Part I)。
-      (iii) Frobenius 量子化 (μ_c = λ_c − λ_c³ ≠ 0 の反駁) → λ ∈ F₃。
-      (iv) F₃ 残 4 候補 (±1,0),(0,±1) の out-degree 論法 (|T| ≥ 4)。
+- [x] **枝 (i)(ii)** (2026-08-13, commit 0d2655033): `false_of_masterFormula_delta_zero`
+      (Δ=0: swap 対 master + e 奇で K 反対称 → `false_of_antisym_triple`; 群非依存) +
+      `false_of_masterFormula_sigma_zero` (Σ̄=0: `sqSelect_neg_apply` で selector 反対称
+      → K 定数 → powDiff(e²) 衝突 → pow_mul_down → CollisionPair → Part I)。
+      「Σ̄=0 glue の 1 補題化」(assembly 監査 nit) も解消。
+- [ ] **枝 (iii) Frobenius 量子化** (μ_c = λ_c − λ_c³ ≠ 0 の反駁 → λ± ∈ F₃):
+      master(p,r) と master(p³,r³) の cube 差で μ_{χδ₀}δ₀^{3e} = μ_{χδ₁}δ₁^{3e}。
+      場合分け: 同符号辺あり → ρ^{3e} = 1 → gcd(3e,Q−1)=1 で ρ=1 = 衝突 → 死 /
+      μ 片方 0 → 混合辺即矛盾 → 全辺同符号 → 上で死 / 両方非零 → swap 対で
+      μ+ = −μ− かつ全混合辺 ρ = −1 → master 退化 K(p) = Σ̄δ₀^e → e-冪単射で
+      out-degree 1 → |T| ≥ 3 矛盾。⚠ gcd(3e, Q−1) = 1 (= 3 ∤ Q−1 + cube) の仮定を
+      capstone からどう供給するか要設計 (z^{3e}-単射性の形で受けるのが素直)。
+- [ ] **枝 (iv) F₃ 残 4 候補** (±1,0),(0,±1): 同符号辺 1 本で K(p) = 0 即死 (候補依存、
+      swap が補完) / 全混合世界は 2 パターン各 1 本 pin で out-degree ≤ 2 vs |T|−1 ≥ 3。
+- [ ] **capstone** `Problem1.false_of_exotic`: 無衝突 by_contra 分岐 + card_paleySet_lower
+      から 4 点抽出 + master 存在 + 枝の網羅 (λ の Δ/Σ̄/μ 場合分け)。
 - [ ] **(EX) ⟹ master formula** (anchor 論法; 退化人口: singleton {−1} は
       fwd-fwd 2-loop `e∘swap(e)` の別補題、singleton {ρ≠±1} は master 全射性)。
 - [ ] **枝撃破**: Δ=0 (3 点矛盾) / Σ̄=0 (K 定数 ⟹ e²-衝突 glue、下記) /
