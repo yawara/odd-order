@@ -513,6 +513,7 @@ import OddOrder.BG.AppC_Problem1Trace
 import OddOrder.BG.AppC_Problem1SameCoset
 import OddOrder.BG.AppC_Problem1PairComposition
 import OddOrder.BG.AppC_Problem1SkewCalculus
+import OddOrder.BG.AppC_Problem1SkewEndgame
 import OddOrder.BG.AppD_CNGroups
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.Suzuki.FirstCase.StepTwo
@@ -21252,3 +21253,7 @@ family of closed loops with non-vanishing weight is fatal through the chain-reve
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.FrobFam.leg_swap
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_four_loop
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.weights_eq_zero_of_four_loop
+
+/-! **The endgame** (`BG/AppC_Problem1SkewEndgame`).  The case tree of the κ-conspiracy
+refutation: population branches of the master-formula collapse. -/
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_three_antipodal
