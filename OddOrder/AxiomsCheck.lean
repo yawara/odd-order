@@ -21212,5 +21212,7 @@ one collision per exotic-exponent class ((B1)). -/
 #assert_only_allowed_axioms OddOrder.exists_aeval_frobEnd_eq_of_forall_imp
 #assert_only_allowed_axioms OddOrder.aeval_frobEnd_eq_zero_of_pow
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.ConjPair.chain
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conjPair_aeval_of_frobenius_family
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.conjPair_aeval_of_collisionPair
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_conjPair_frobenius_family
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_collisionPair

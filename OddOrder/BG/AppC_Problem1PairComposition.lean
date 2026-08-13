@@ -869,32 +869,44 @@ collision kills the witness**.  (For `q = 3` no exotic exponent exists — every
 and nothing is lost.) -/
 
 open Polynomial in
+/-- Polynomial multiples of a Frobenius-closed pair family are conjugation pairs: the
+`(ZMod p)[X]`-module action through the Frobenius endomorphism preserves the family. -/
+theorem conjPair_aeval_of_frobenius_family (data : FieldNormalizerData p q G) {e : ℕ}
+    {S S' : GaloisField p q}
+    (hfam : ∀ j : ℕ, ConjPair data e (S ^ p ^ j) (S' ^ p ^ j)) (c : (ZMod p)[X]) :
+    ConjPair data e (aeval (frobEnd p q) c S) (aeval (frobEnd p q) c S') := by
+  rw [aeval_frobEnd_apply, aeval_frobEnd_apply]
+  exact ConjPair.sum _ _ _ fun j _ => (hfam j).nsmul _
+
+open Polynomial in
 /-- Polynomial multiples of a collision are conjugation pairs: the `(ZMod p)[X]`-module
 action through the Frobenius endomorphism preserves the pair family. -/
 theorem conjPair_aeval_of_collisionPair (data : FieldNormalizerData p q G) (hp : p = 3)
     (hq0 : q ≠ 0) {e : ℕ}
     (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
     {S S' : GaloisField p q} (hpair : CollisionPair p q e S S') (c : (ZMod p)[X]) :
-    ConjPair data e (aeval (frobEnd p q) c S) (aeval (frobEnd p q) c S') := by
-  rw [aeval_frobEnd_apply, aeval_frobEnd_apply]
-  exact ConjPair.sum _ _ _ fun j _ =>
-    (ConjPair.of_collisionPair data hp hq0 hexp (hpair.frobenius_iterate j)).nsmul _
+    ConjPair data e (aeval (frobEnd p q) c S) (aeval (frobEnd p q) c S') :=
+  conjPair_aeval_of_frobenius_family data
+    (fun j => ConjPair.of_collisionPair data hp hq0 hexp (hpair.frobenius_iterate j)) c
 
 open Polynomial in
-/-- **(B2) is eliminated: a single collision refutes hypothesis (B)** — with no trace
-hypothesis, no spanning hypothesis, and no condition on the exponent beyond the standing
-ones.  Chain reversal (`ConjPair.chain`) plus the cyclicity of the Frobenius module force
-`S' = S`, which is fatal by `false_of_collisionPair_self`. -/
-theorem false_of_collisionPair (data : FieldNormalizerData p q G) (hp : p = 3)
+/-- **The chain-reversal engine, for pair families of any provenance.**  A Frobenius-closed
+conjugation-pair family with non-zero seed refutes hypothesis (B) — no collision needed.
+Chain reversal (`ConjPair.chain`) plus the cyclicity of the Frobenius module force `S' = S`,
+which is fatal by the fixed-point principle `false_of_conjPair_self`.  (Closed loops of the
+collision-free skew-pair calculus provide such families; a collision provides one via
+`ConjPair.of_collisionPair` and `CollisionPair.frobenius_iterate`.) -/
+theorem false_of_conjPair_frobenius_family (data : FieldNormalizerData p q G) (hp : p = 3)
     (hqprime : q.Prime) (hq3 : q ≠ 3) (hqodd : Odd q) {e : ℕ} (he : Odd e)
     (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
     (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
-    {S S' : GaloisField p q} (hpair : CollisionPair p q e S S') : False := by
+    {S S' : GaloisField p q} (hS0 : S ≠ 0)
+    (hfam : ∀ j : ℕ, ConjPair data e (S ^ p ^ j) (S' ^ p ^ j)) : False := by
   subst hp
   have hq0 : q ≠ 0 := hqprime.ne_zero
   have hcp : ∀ c : (ZMod 3)[X],
       ConjPair data e (aeval (frobEnd 3 q) c S) (aeval (frobEnd 3 q) c S') :=
-    conjPair_aeval_of_collisionPair data rfl hq0 hexp hpair
+    conjPair_aeval_of_frobenius_family data hfam
   have haux : ∀ y : GaloisField 3 q, ∀ a b : (ZMod 3)[X],
       aeval (frobEnd 3 q) (a * b) y
         = aeval (frobEnd 3 q) a (aeval (frobEnd 3 q) b y) := by
@@ -946,7 +958,25 @@ theorem false_of_collisionPair (data : FieldNormalizerData p q G) (hp : p = 3)
   have hSS : S' = S := by
     rw [← ha₀]
     exact sub_eq_zero.mp h9
-  exact false_of_collisionPair_self data rfl hqprime hqodd he hcube hexp (hSS ▸ hpair)
+  have hself : ConjPair data e S S := by
+    have h := h1
+    rwa [hSS] at h
+  exact false_of_conjPair_self data rfl hqprime hqodd he hcube hexp hself hS0
+
+open Polynomial in
+/-- **(B2) is eliminated: a single collision refutes hypothesis (B)** — with no trace
+hypothesis, no spanning hypothesis, and no condition on the exponent beyond the standing
+ones.  Special case of `false_of_conjPair_frobenius_family` with the family supplied by the
+Frobenius twists of the collision. -/
+theorem false_of_collisionPair (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hqprime : q.Prime) (hq3 : q ≠ 3) (hqodd : Odd q) {e : ℕ} (he : Odd e)
+    (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {S S' : GaloisField p q} (hpair : CollisionPair p q e S S') : False :=
+  false_of_conjPair_frobenius_family data hp hqprime hq3 hqodd he hcube hexp
+    (CollisionPair.left_ne_zero hcube hpair)
+    (fun j => ConjPair.of_collisionPair data hp hqprime.ne_zero hexp
+      (hpair.frobenius_iterate j))
 
 end PairComposition
 
