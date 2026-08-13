@@ -555,6 +555,170 @@ theorem exists_masterFormula_of_no_collision (data : FieldNormalizerData p q G) 
         haa hbb hcc hab hac hbc (hgen a₀ a₁ b₀ b₁ haa hbb hab)
         (hgen a₀ a₁ c₀ c₁ haa hcc hac) (hgen b₀ b₁ c₀ c₁ hbb hcc hbc)).elim
 
+/-! ### Steps 6–7: the branches of the master formula
+
+With the master formula in hand the loops are no longer needed: each parameter branch is pure
+field arithmetic.  `Δ = λ₊ - λ₋ = 0` forces antisymmetric weights and dies on three points;
+`Σ̄ = λ₊ + λ₋ = 0` forces constant weights and dies through the `e²`-collision bridge back to
+Part I. -/
+
+theorem sqSelect_self {x lam : GaloisField p q} : sqSelect x lam lam = lam := ite_self lam
+
+/-- Negating the argument of an antisymmetric selector negates the value (`-1` is a
+non-square). -/
+private theorem sqSelect_neg_apply (hneg1 : ¬IsSquare (-1 : GaloisField p q))
+    {x : GaloisField p q} (hdich : IsSquare x ∨ IsSquare (-x)) (hx0 : x ≠ 0)
+    {lam : GaloisField p q} :
+    sqSelect (-x) lam (-lam) = -sqSelect x lam (-lam) := by
+  by_cases hx : IsSquare x
+  · have hnx : ¬IsSquare (-x) :=
+      not_isSquare_of_isSquare_neg hneg1 (neg_ne_zero.mpr hx0) (by rwa [neg_neg])
+    rw [sqSelect_of_not_isSquare hnx, sqSelect_of_isSquare hx]
+  · have hnegx : IsSquare (-x) := hdich.resolve_left hx
+    rw [sqSelect_of_isSquare hnegx, sqSelect_of_not_isSquare hx, neg_neg]
+
+/-- Three pairwise-antisymmetric weights with a non-zero member are impossible in
+characteristic three (`2 = -1` is invertible). -/
+private theorem false_of_antisym_triple (hp : p = 3) {Ka Kb Kc : GaloisField p q}
+    (hab : Ka + Kb = 0) (hac : Ka + Kc = 0) (hbc : Kb + Kc = 0) (hc : Kc ≠ 0) : False := by
+  subst hp
+  have h30 : (3 : GaloisField 3 q) = 0 := by
+    exact_mod_cast CharP.cast_eq_zero (GaloisField 3 q) 3
+  have h2 : (2 : GaloisField 3 q) * Kc = 0 := by linear_combination hac + hbc - hab
+  have h2ne : (2 : GaloisField 3 q) ≠ 0 := fun h20 =>
+    one_ne_zero (by linear_combination h30 - h20 : (1 : GaloisField 3 q) = 0)
+  exact hc ((mul_eq_zero.mp h2).resolve_left h2ne)
+
+/-- **Branch `Δ = 0`** (`λ₊ = λ₋`).  The master formula becomes sign-free, so the swapped pair
+gives `K(p) = -K(r)` for every ordered pair (`e` odd); three distinct Paley points then force
+`K = 0`, contradicting the non-vanishing of the weight.  No loops are needed. -/
+theorem false_of_masterFormula_delta_zero (hp : p = 3) {e : ℕ} (he : Odd e)
+    (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
+    {a₀ a₁ b₀ b₁ c₀ c₁ : NormSet.normOneUnits p q}
+    (haa : normOneVal a₀ = normOneVal a₁ + 1) (hbb : normOneVal b₀ = normOneVal b₁ + 1)
+    (hcc : normOneVal c₀ = normOneVal c₁ + 1)
+    (hab : normOneVal a₀ ≠ normOneVal b₀) (hac : normOneVal a₀ ≠ normOneVal c₀)
+    (hbc : normOneVal b₀ ≠ normOneVal c₀)
+    {lam : GaloisField p q} (hmaster : MasterFormula e lam lam) : False := by
+  have key : ∀ x₀ x₁ y₀ y₁ : NormSet.normOneUnits p q,
+      normOneVal x₀ = normOneVal x₁ + 1 → normOneVal y₀ = normOneVal y₁ + 1 →
+      normOneVal x₀ ≠ normOneVal y₀ →
+      (normOneVal x₁ ^ (e * e) - normOneVal x₀ ^ (e * e))
+        + (normOneVal y₁ ^ (e * e) - normOneVal y₀ ^ (e * e)) = 0 := by
+    intro x₀ x₁ y₀ y₁ hxx hyy hxy
+    have h1 := hmaster x₀ x₁ y₀ y₁ hxx hyy hxy
+    have h2 := hmaster y₀ y₁ x₀ x₁ hyy hxx hxy.symm
+    simp only [sqSelect_self] at h1 h2
+    have hnp₀ : (normOneVal x₀ ^ e - normOneVal y₀ ^ e) ^ e
+        = -(normOneVal y₀ ^ e - normOneVal x₀ ^ e) ^ e := by
+      rw [show normOneVal x₀ ^ e - normOneVal y₀ ^ e
+          = -(normOneVal y₀ ^ e - normOneVal x₀ ^ e) by ring, he.neg_pow]
+    have hnp₁ : (normOneVal x₁ ^ e - normOneVal y₁ ^ e) ^ e
+        = -(normOneVal y₁ ^ e - normOneVal x₁ ^ e) ^ e := by
+      rw [show normOneVal x₁ ^ e - normOneVal y₁ ^ e
+          = -(normOneVal y₁ ^ e - normOneVal x₁ ^ e) by ring, he.neg_pow]
+    linear_combination h1 + h2 + lam * hnp₀ - lam * hnp₁
+  exact false_of_antisym_triple hp (key a₀ a₁ b₀ b₁ haa hbb hab)
+    (key a₀ a₁ c₀ c₁ haa hcc hac) (key b₀ b₁ c₀ c₁ hbb hcc hbc)
+    (skewPair_edge_weight_ne_zero hcube hcc)
+
+/-- **Branch `Σ̄ = 0`** (`λ₋ = -λ₊`).  The selector becomes antisymmetric, so the swapped pair
+gives `K(p) = K(r)` for every ordered pair: `K` is constant on the Paley set.  Two distinct
+Paley points then produce an `e²`-collision of `powDiff`, the downward conjugation bridge
+turns it into an `e`-collision, and Part I kills the witness. -/
+theorem false_of_masterFormula_sigma_zero (data : FieldNormalizerData p q G) (hp : p = 3)
+    (hqprime : q.Prime) (hq3 : q ≠ 3) (hqodd : Odd q) {e : ℕ} (he : Odd e)
+    (hcube : ∀ z : GaloisField p q, z ^ (e * e * e) = z)
+    (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
+    {a₀ a₁ b₀ b₁ : NormSet.normOneUnits p q}
+    (haa : normOneVal a₀ = normOneVal a₁ + 1) (hbb : normOneVal b₀ = normOneVal b₁ + 1)
+    (hab : normOneVal a₀ ≠ normOneVal b₀)
+    {lam : GaloisField p q} (hmaster : MasterFormula e lam (-lam)) : False := by
+  subst hp
+  have hq0 : q ≠ 0 := hqprime.ne_zero
+  have hneg1 := not_isSquare_neg_one_galois rfl hq0 hqodd
+  -- `K` is constant: `K(x) = K(y)` for every ordered pair
+  have key : ∀ x₀ x₁ y₀ y₁ : NormSet.normOneUnits 3 q,
+      normOneVal x₀ = normOneVal x₁ + 1 → normOneVal y₀ = normOneVal y₁ + 1 →
+      normOneVal x₀ ≠ normOneVal y₀ →
+      normOneVal x₁ ^ (e * e) - normOneVal x₀ ^ (e * e)
+        = normOneVal y₁ ^ (e * e) - normOneVal y₀ ^ (e * e) := by
+    intro x₀ x₁ y₀ y₁ hxx hyy hxy
+    have hd0 : normOneVal y₀ ^ e - normOneVal x₀ ^ e ≠ 0 :=
+      skewPair_edge_left_ne_zero hcube hxy
+    have hne₁ : normOneVal x₁ ≠ normOneVal y₁ :=
+      fun h => hxy (by linear_combination hxx - hyy + h)
+    have hd1 : normOneVal y₁ ^ e - normOneVal x₁ ^ e ≠ 0 :=
+      skewPair_edge_left_ne_zero hcube hne₁
+    have h1 := hmaster x₀ x₁ y₀ y₁ hxx hyy hxy
+    have h2 := hmaster y₀ y₁ x₀ x₁ hyy hxx hxy.symm
+    rw [show normOneVal x₀ ^ e - normOneVal y₀ ^ e
+        = -(normOneVal y₀ ^ e - normOneVal x₀ ^ e) by ring,
+      show normOneVal x₁ ^ e - normOneVal y₁ ^ e
+        = -(normOneVal y₁ ^ e - normOneVal x₁ ^ e) by ring,
+      sqSelect_neg_apply hneg1 (isSquare_or_isSquare_neg_galois rfl hq0 hqodd hd0) hd0,
+      sqSelect_neg_apply hneg1 (isSquare_or_isSquare_neg_galois rfl hq0 hqodd hd1) hd1,
+      he.neg_pow, he.neg_pow] at h2
+    linear_combination h1 - h2
+  -- translate to a `powDiff (e²)`-collision on the Paley set
+  letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
+  haveI : CharP (GaloisField 3 q) 3 := by
+    rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
+    exact ZMod.charP 3
+  have hchar2 : ringChar (GaloisField 3 q) ≠ 2 := by
+    rw [ringChar.eq (GaloisField 3 q) 3]
+    norm_num
+  have h4 : Fintype.card (GaloisField 3 q) % 4 = 3 := by
+    rw [show Fintype.card (GaloisField 3 q) = 3 ^ q by
+      rw [← Nat.card_eq_fintype_card]; exact GaloisField.card 3 q hq0]
+    have hq2 : q % 2 = 1 := Nat.odd_iff.mp hqodd
+    have hk : q = 2 * (q / 2) + 1 := by omega
+    rw [hk, pow_succ, pow_mul, Nat.mul_mod, Nat.pow_mod]
+    norm_num
+  have hmem : ∀ x₀ x₁ : NormSet.normOneUnits 3 q,
+      normOneVal x₀ = normOneVal x₁ + 1 →
+      normOneVal x₁ ∈ Paley.paleySet (GaloisField 3 q) := by
+    intro x₀ x₁ hxx
+    refine ⟨Units.ne_zero _, ?_, ?_, ?_⟩
+    · have := (mem_normOneUnits_iff_isSquare rfl hq0 (x₁ : (GaloisField 3 q)ˣ)).mp x₁.2
+      simpa [normOneVal] using this
+    · rw [← hxx]
+      exact Units.ne_zero _
+    · rw [← hxx]
+      have := (mem_normOneUnits_iff_isSquare rfl hq0 (x₀ : (GaloisField 3 q)ˣ)).mp x₀.2
+      simpa [normOneVal] using this
+  have hne₁ : normOneVal a₁ ≠ normOneVal b₁ :=
+    fun h => hab (by linear_combination haa - hbb + h)
+  have hval : Paley.powDiff (e * e) (normOneVal a₁) = Paley.powDiff (e * e) (normOneVal b₁) := by
+    have hKab := key a₀ a₁ b₀ b₁ haa hbb hab
+    rw [Paley.powDiff, Paley.powDiff, ← haa, ← hbb]
+    linear_combination -hKab
+  obtain ⟨c, hcP, d, hdP, hcd, hpd⟩ := Paley.exists_paley_collision_pow_mul_down hchar2 h4
+    he hcube (hmem a₀ a₁ haa) (hmem b₀ b₁ hbb) hne₁ hval
+  -- package the `e`-collision as a `CollisionPair` and kill it by Part I
+  obtain ⟨hc0, hcsq, hc10, hc1sq⟩ := hcP
+  obtain ⟨hd0, hdsq, hd10, hd1sq⟩ := hdP
+  have hcoll : ∃ S S', CollisionPair 3 q e S S' := by
+    refine exists_collisionPair_of_sub_ne_zero rfl hq0 hqodd
+      ⟨Units.mk0 (c + 1) hc10, (mem_normOneUnits_iff_isSquare rfl hq0 _).mpr
+        (by simpa using hc1sq)⟩
+      ⟨Units.mk0 c hc0, (mem_normOneUnits_iff_isSquare rfl hq0 _).mpr (by simpa using hcsq)⟩
+      ⟨Units.mk0 (d + 1) hd10, (mem_normOneUnits_iff_isSquare rfl hq0 _).mpr
+        (by simpa using hd1sq)⟩
+      ⟨Units.mk0 d hd0, (mem_normOneUnits_iff_isSquare rfl hq0 _).mpr (by simpa using hdsq)⟩
+      rfl rfl ?_ ?_
+    · have := hpd
+      rw [Paley.powDiff, Paley.powDiff] at this
+      exact this
+    · intro h0
+      have hd1c1 : (d + 1 : GaloisField 3 q) ^ e = (c + 1) ^ e := by
+        have : normOneVal (⟨Units.mk0 (d + 1) hd10, _⟩ : NormSet.normOneUnits 3 q) ^ e
+            - normOneVal (⟨Units.mk0 (c + 1) hc10, _⟩ : NormSet.normOneUnits 3 q) ^ e = 0 := h0
+        simpa [normOneVal, sub_eq_zero] using this
+      exact hcd (by linear_combination (Paley.pow_injective_of_cube hcube hd1c1).symm)
+  obtain ⟨S, S', hpair⟩ := hcoll
+  exact false_of_collisionPair data rfl hqprime hq3 hqodd he hcube hexp hpair
+
 end SkewEndgame
 
 end OddOrder.BG.AppC.Problem1

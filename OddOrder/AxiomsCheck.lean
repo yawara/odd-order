@@ -21268,3 +21268,6 @@ refutation: population branches of the master-formula collapse. -/
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.exists_masterFormula_of_plus_anchor
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.exists_masterFormula_of_minus_anchor
 #assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.exists_masterFormula_of_no_collision
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.sqSelect_self
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_masterFormula_delta_zero
+#assert_only_allowed_axioms OddOrder.BG.AppC.Problem1.false_of_masterFormula_sigma_zero
