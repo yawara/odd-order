@@ -1,6 +1,6 @@
 # skew-pair calculus — 衝突仮定なしの witness 攻撃 ((B1) の迂回プログラム) — 2026-08-13
 
-[issue 0180](../../issues/0180-bg-appc-problem1-p-eq-three.md)。(B2) 完全消去
+[issue 0180](../../issues/closed/0180-bg-appc-problem1-p-eq-three.md)。(B2) 完全消去
 ([`appC_problem1_pair_composition.md`](appC_problem1_pair_composition.md) §9) の直後に発見。
 **衝突 (CollisionPair) の存在 = (B1) を仮定せずに** hypothesis (B) の witness を攻撃する
 calculus。敵対的検証 3 レンズ (群計算 / 組合せ / 整合性・行き止まり照合) **全 CONFIRMED・

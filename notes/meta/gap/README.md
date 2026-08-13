@@ -1,6 +1,6 @@
 # GAP scripts — BG Appendix C, Problem 1 (Péterfalvi), `p = 3`
 
-[issue 0180](../../../issues/0180-bg-appc-problem1-p-eq-three.md) の計算機探索の再現用。
+[issue 0180](../../../issues/closed/0180-bg-appc-problem1-p-eq-three.md) の計算機探索の再現用。
 GAP は `~/gap-4.16.0/gap` (apt 版ではなくホーム直下のビルド、4.16.0)。
 
 ## 何を計算しているか

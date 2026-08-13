@@ -1,6 +1,7 @@
 # BG App.C Problem 1 (p = 3) の否定的解決 — 統合証明文書 — 2026-08-13
 
-[issue 0180](../../issues/0180-bg-appc-problem1-p-eq-three.md)。
+[issue 0180](../../issues/closed/0180-bg-appc-problem1-p-eq-three.md)。
+俯瞰まとめ (経緯・方法論・文書地図) = [`appC_problem1_summary.md`](appC_problem1_summary.md)。
 [`appC_problem1_pair_composition.md`](appC_problem1_pair_composition.md) §9 ((B2)-elim) と
 [`appC_problem1_skew_calculus.md`](appC_problem1_skew_calculus.md) §1–6.2 (skew calculus +
 endgame) を **1 本の定理 + 完全証明**として書き下した統合文書。敵対的検証 6 レンズ
@@ -392,7 +393,9 @@ Part I ((B2)-elim) は別途 3 レンズ (group / module / history) で敵対的
 
 **スクリプト正本 = [`notes/meta/c/`](../meta/c/)**: `skew_cycles.py` (辺 census・閉包)、
 `endgame_check.py` (重み公式・master fit)、`lensA_commutator_verify.py`、`lensB_verify.py`、
-`chain_closure.py` / `collision_impact.py` (Part I 閉包実験)、`gf3_collision.c` (衝突探索)。
+`chain_closure.py` / `collision_impact.py` (Part I 閉包実験)、`gf3_collision.c` (衝突探索)、
+`assembly_spotcheck.py` (assembly 監査の独立スポットチェック; 2026-08-13 に scratchpad から
+救出・再実行 ALL OK)。
 
 ## 9. スコープの正直な申告と残作業
 
@@ -403,5 +406,5 @@ Part I ((B2)-elim) は別途 3 レンズ (group / module / history) で敵対的
   (`false_of_collisionPair` / `false_of_conjPair_frobenius_family` / `false_of_conjPair_self` /
   ブリッジ部品) は Lean 済なので、残る形式化は**体の中の有限計算** (辺 calculus・可換子
   loop・master 崩壊・枝撃破) に閉じており、群論側の新規作業はない。
-- Lean 化の設計・進捗は [issue 0181](../../issues/0181-skew-calculus-lean-formalization.md)
-  (親 = [issue 0180](../../issues/0180-bg-appc-problem1-p-eq-three.md)) で追跡。
+- Lean 化の設計・進捗は [issue 0181](../../issues/closed/0181-skew-calculus-lean-formalization.md)
+  (親 = [issue 0180](../../issues/closed/0180-bg-appc-problem1-p-eq-three.md)) で追跡。

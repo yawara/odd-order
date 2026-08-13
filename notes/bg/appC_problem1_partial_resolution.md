@@ -1,6 +1,6 @@
 # BG App.C Problem 1 (Péterfalvi 1993) — 部分解決
 
-[issue 0180](../../issues/0180-bg-appc-problem1-p-eq-three.md)。2026-08-10 開始。
+[issue 0180](../../issues/closed/0180-bg-appc-problem1-p-eq-three.md)。2026-08-10 開始。
 **総括は issue 冒頭 (2026-08-12 夜に大幅更新)**。
 ⚠ **全面解決ではない** — 決着したのは `q ≤ 43` + `q = 53, 79, 101` (gcd 判定) と、
 全 `q` での可解/有限奇位数の場合。
@@ -281,7 +281,7 @@ f(a) = Tr(λa) + Tr(μ a^{ẽ}) + Tr(ν a^{ẽ²}) = Σ_j λ^{3^j} a^{3^j} + Σ_
 [`OddOrder/BG/AppC_Problem1.lean`](../../OddOrder/BG/AppC_Problem1.lean) +
 [`OddOrder/Algebra/PowerMonomialIndependence.lean`](../../OddOrder/Algebra/PowerMonomialIndependence.lean)。
 全て AxiomsCheck 登録済 (allowlist のみ)、フルビルド green。対応表は
-[issue 0180](../../issues/0180-bg-appc-problem1-p-eq-three.md) の「Lean 形式化の状況」節。
+[issue 0180](../../issues/closed/0180-bg-appc-problem1-p-eq-three.md) の「Lean 形式化の状況」節。
 
 要点:
 

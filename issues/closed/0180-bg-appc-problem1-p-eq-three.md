@@ -5,10 +5,12 @@ title: "BG App.C Problem 1: Theorem C で p = 3 はありうるか (未解決問
 created: 2026-08-09
 ---
 
-# BG App.C Problem 1 — 未解決問題
+# BG App.C Problem 1 — 未解決問題 (→ 2026-08-13 に否定的に全面解決・close)
 
-3 冊逐条監査 (775 件、issue 0172/0176/0177) と [Remark (IV) の形式化](closed/0179-bg-appc-remark-iv-glauberman-norton.md)
-が完了した後に残る**最後の項目**。⚠ **これは形式化の残債ではなく、1993 年以来の未解決問題**。
+3 冊逐条監査 (775 件、issue 0172/0176/0177) と [Remark (IV) の形式化](0179-bg-appc-remark-iv-glauberman-norton.md)
+が完了した後に残る**最後の項目**。⚠ **これは形式化の残債ではなく、1993 年以来の未解決問題**
+— であったが、**2026-08-13 に否定的に全面解決し、同日中に Lean での完全機械検証まで完了した**
+(下記「最終総括」)。
 
 ## 問題
 
@@ -17,8 +19,8 @@ created: 2026-08-09
 > Can the hypothesis of Proposition 9 be satisfied for `p = 3`?
 
 Proposition 9 の仮説 (記法は
-[`references/glauberman-norton/SOURCE.md`](../references/glauberman-norton/SOURCE.md) と
-[`OddOrder/BG/AppC_GlaubermanNorton.lean`](../OddOrder/BG/AppC_GlaubermanNorton.lean) を参照):
+[`references/glauberman-norton/SOURCE.md`](../../references/glauberman-norton/SOURCE.md) と
+[`OddOrder/BG/AppC_GlaubermanNorton.lean`](../../OddOrder/BG/AppC_GlaubermanNorton.lean) を参照):
 
 * (A) `q ∤ p − 1`
 * (B) 単射準同型 `σ : H → G` (`H = P ⋊ U`)、**有限可換 `p′`-部分群** `Q ≤ G`、`y ∈ Q` が存在して
@@ -27,18 +29,55 @@ Proposition 9 の仮説 (記法は
 ⚠ **`G` の有限性は要求されていない** (有限性が課されているのは `Q` だけ)。字義どおり読むと
 有限アマルガムの完備化による構成の余地がある。
 
-## 📌 総括 (2026-08-13 深夜、chain reversal で (B2) が定理として消滅)
+## ✅ 最終総括 (2026-08-13) — 否定的に全面解決 + 完全機械検証、close
 
-⚠ **これは形式化の残債ではなく 1993 年以来の未解決問題**で、**全面解決はしていない**。
-決着しているのは (i) 全 `q` での可解群/有限奇位数群、(ii) 個別に決着した `q` の一覧 (下記)、
+**Problem 1 は解決した。答えは NO。** 1993 年の提出以来 33 年間、解決を主張する公刊物が
+無いまま残っていた未解決問題が、2026-08-09 の着手から 4 日 (08-13) で決着した。
+
+> **主定理.** `p = 3` のとき、**すべての奇素数 `q`** に対し hypothesis (B) を満たす
+> `(G, σ, Q, y)` は存在しない (**`G` は無限でもよい**)。
+
+しかも紙上の解決と**同日中に Lean での完全機械検証まで完了**した:
+
+> **`Problem1.hypothesisB_false : FieldNormalizerData p q G → p = 3 → False`**
+> ([`OddOrder/BG/AppC_Problem1SkewEndgame.lean`](../../OddOrder/BG/AppC_Problem1SkewEndgame.lean)、
+> 追加仮定ゼロ・axiom-clean。Lean 化の追跡 = [issue 0181](0181-skew-calculus-lean-formalization.md))
+
+- **数学的正本** = [`notes/bg/appC_problem1_resolution.md`](../../notes/bg/appC_problem1_resolution.md)
+  (統合証明文書: 主定理 + 完全証明 + Lean 対応表 + 検証記録)。
+  **俯瞰まとめ** (経緯・方法論込み) = [`notes/bg/appC_problem1_summary.md`](../../notes/bg/appC_problem1_summary.md)。
+- **証明の構造**: `q = 3` (位数 3 の指数がすべて Frobenius 冪 `⟨3⟩` に入る) は定理 1 側
+  (`false_of_frobenius_exponent`)。`q ≠ 3` はケース木 (`false_of_witness`):
+  **Part I** ((B2)-elim = 衝突 1 個で witness 死、`false_of_collisionPair`) →
+  **Part II** (skew calculus: 衝突が無くても `T²` の任意の対が辺になり、非退化な閉 loop は
+  `false_of_conjPair_frobenius_family` で死) → **Part III** (endgame: 全 loop 消滅 = 共謀
+  ⟹ 交換関係 (EX) ⟹ master formula ⟹ 4 枝 (Δ=0 / Σ̄=0 / λ∉𝔽₃ / 𝔽₃ 残 4 候補) すべて
+  初等矛盾)。
+- **(B1)「衝突が存在する」は証明不要になった** — 本 issue の記録の大半を占める (B1) 攻略
+  (APN 分類予想への依存を含む) は、skew calculus が (B1) そのものを迂回したことで最終証明から
+  消えた。equidistribution・Weil・Davenport・鳩の巣も不要。使用仮説は `χ(−1) = −1`・`e` 奇・
+  `z^{e³} = z`・`K ≠ 0`・`|T| ≥ 4` のみ (すべて witness から出る)。
+- **検証**: 敵対的検証 9 レンズ (Part I × 3 + Part II/III × 6、全 CONFIRMED・fatal 0) +
+  数値悉皆 (GF(3⁷) same-slot 対 1,015 万件 kill 率 100%、閉包実験の衝突 101,592 件
+  (q = 7, 13) 全 kill ほか)。
+- per-q 証明書 (`q ≤ 43` 全部 + gcd 判定の `53/79/101`)・trace 判定・N1–N3・閉包実験・剛性は
+  certificate として superseded (定理としては保持、削除しない)。
+
+**以下は解決に至る経緯の記録** (各時点のスナップショットを逆時系列で保存)。
+「全面解決はしていない」「(B1) は依然 open」「APN 分類予想に寄りかかる」等の記述は
+**当時の見立て**であり、最終状態は上記総括と resolution.md が正本。
+
+## 📌 旧総括 (2026-08-13 深夜時点のスナップショット、機械検証完了前)
+
+決着していたのは (i) 全 `q` での可解群/有限奇位数群、(ii) 個別に決着した `q` の一覧 (下記)、
 そして **(iii) (B2) の完全消去 (2026-08-13): 衝突が 1 個でも存在すれば witness は無条件に
 矛盾する** (`false_of_collisionPair`、chain reversal C3 + Frobenius 加群の巡回性;
-正本 = [`notes/bg/appC_problem1_pair_composition.md`](../notes/bg/appC_problem1_pair_composition.md) §9、
+正本 = [`notes/bg/appC_problem1_pair_composition.md`](../../notes/bg/appC_problem1_pair_composition.md) §9、
 敵対的検証 3 レンズ全 CONFIRMED、axiom-clean)。
 残る一般 `q` は **(B1) 一行 = 「衝突が 1 個存在する」 (= `D_E` が Paley 集合 `T` 上で単射で
 ない)** に完全に一本化された。その正体は冪写像の APN 性 = 未解決の APN 分類予想に寄りかかる
-位置 (下記「(B1) の正体」)。trace 条件・span 条件・剛性・閉包実験は certificate として
-すべて不要になった (定理としては残る)。
+位置 (下記「(B1) の正体」) — **と見立てていたが、最終的には (B1) は迂回されて不要になった**。
+trace 条件・span 条件・剛性・閉包実験は certificate としてすべて不要になった (定理としては残る)。
 
 **🎯 (2026-08-13 深夜第 3 弾): skew calculus の endgame が閉じ、紙上では
 Problem 1 の否定的全面解決に到達** (正本 = skew_calculus note §6.2、敵対的検証は部品 5 レンズ +
@@ -49,7 +88,7 @@ e³-cube・K≠0・|T|≥4 のみ — equidistribution・鳩の巣すら不要)�
 endgame の Lean 化 (数 session 規模)。
 
 **さらに (2026-08-13 深夜第 2 弾): (B1) 自体を迂回する skew-pair calculus を発見**
-(正本 = [`notes/bg/appC_problem1_skew_calculus.md`](../notes/bg/appC_problem1_skew_calculus.md)、
+(正本 = [`notes/bg/appC_problem1_skew_calculus.md`](../../notes/bg/appC_problem1_skew_calculus.md)、
 敵対的検証 3 レンズ全 CONFIRMED)。衝突なしで T² の任意の順序対が skew 辺
 `b(δ₀z^e)d(K(p)z^{e²})b(−δ₁z^e) = d(K(r)z^{e²})` を与え、`∏δ₁ = ∏δ₀` で閉じた loop が
 一般化 capstone `false_of_conjPair_frobenius_family` (Lean 化済・axiom-clean) 経由で
@@ -146,13 +185,13 @@ Lean = `exists_collisionPair_of_sub_ne_zero` (axiom-clean)。
 > `D_E` が Paley 集合 `T` 上で単射でなければ (= 衝突が 1 個あれば)、その衝突の両端のトレースが
 > **両方** 0 でない限り witness は存在しない。しかも `{E, E²}` の**片方**で確認すれば十分。
 
-### 残る 1 行 = (B1)
+### 残る 1 行 = (B1) (⚠ 最終版では不要 — skew calculus が (B1) を迂回して解決)
 
 「衝突が存在する」。**これは冪写像 `x^E` の APN 性の問題**で、既知 APN 指数の
 (完全と予想されている) リストと突き合わせると我々の `E` は一度も一致しない
 ⟹ **未解決の APN 分類予想に寄りかかる位置**にある (初等的な見落としではない)。
 
-### 再開するとしたら
+### 再開するとしたら (⚠ 失効 — 再開不要、Problem 1 は解決済)
 
 * **(B1) の一般証明** — 道具立ては Katz の総説
   [arXiv:1805.10452](https://arxiv.org/abs/1805.10452) (差分スペクトル = Weil 和のべき和モーメント)、
@@ -167,8 +206,8 @@ Lean = `exists_collisionPair_of_sub_ne_zero` (axiom-clean)。
 
 回答 §III.2 が open と明言した「`S ≠ S′` に必要な**射影比 `S′/S` に依存する閉包定理**」を
 こちらで発見・証明・Lean 化した。正本 =
-[`notes/bg/appC_problem1_pair_composition.md`](../notes/bg/appC_problem1_pair_composition.md)、
-leaf = [`OddOrder/BG/AppC_Problem1PairComposition.lean`](../OddOrder/BG/AppC_Problem1PairComposition.lean)
+[`notes/bg/appC_problem1_pair_composition.md`](../../notes/bg/appC_problem1_pair_composition.md)、
+leaf = [`OddOrder/BG/AppC_Problem1PairComposition.lean`](../../OddOrder/BG/AppC_Problem1PairComposition.lean)
 (すべて axiom-clean・敵対的検証で反証ゼロ)。骨子:
 
 1. 衝突関係式は正規形 **(3′) `a(v)·b(Sv^e)·a(v)⁻¹ = b(S′v^e)`** (∀v ∈ U) になる (`ConjPair`)。
@@ -189,11 +228,12 @@ escape 21 衝突 (両端 trace 0) には**閉包実験** (pair 空間 `V` を C1
 (B2) 完全消去の一般証明は 1 本の予想「escape 型衝突の自己合成 base `m = s(1+η)^{−E}` に
 `Tr m ≠ 0` なるものが常にある」(= `ker Tr` 上の構造化指標和の非消滅) に絞られた。
 残る Lean 作業: K3 入口 (`ConjPair` 族の第 1 成分が `F` を張る ⟹ False)。
-⚠ **(B1) (衝突の存在) は依然 open** — これが最後の壁のまま。
+⚠ **(B1) (衝突の存在) は依然 open** — これが最後の壁のまま
+(当時。同日深夜の skew calculus + endgame が (B1) ごと迂回して解決した)。
 
 ## 🎯 ChatGPT 4 回目の回答 (2026-08-12、240 分) — **(B2) が同一剰余類の衝突には不要**と判明
 
-全文と検証 = [`notes/bg/appC_problem1_chatgpt_answer_b1.md`](../notes/bg/appC_problem1_chatgpt_answer_b1.md)。
+全文と検証 = [`notes/bg/appC_problem1_chatgpt_answer_b1.md`](../../notes/bg/appC_problem1_chatgpt_answer_b1.md)。
 ⚠ **一般の (B1)/(B2) は未解決のまま** (`n` が素数の `q = 7, 13` には原理的に届かない)。
 得られたのは 3 つの厳密な前進で、**こちらで全ステップ検証済**。
 
@@ -240,7 +280,7 @@ escape 21 衝突 (両端 trace 0) には**閉包実験** (pair 空間 `V` を C1
 `Chat` サーフェス**に投入 (`Work` を使った 2・3 回目とはここが違う)。
 
 * モデル `GPT-5.6 Sol` / **推論レベル `Pro`** (composer の `Pro ⌄` → `詳細設定` で目視確認)
-* プロンプト全文 = [`notes/bg/appC_problem1_chatgpt_prompt_b1.md`](../notes/bg/appC_problem1_chatgpt_prompt_b1.md) (14,513 字)
+* プロンプト全文 = [`notes/bg/appC_problem1_chatgpt_prompt_b1.md`](../../notes/bg/appC_problem1_chatgpt_prompt_b1.md) (14,513 字)
 * スレッド = `https://chatgpt.com/c/6a7c2d39-55bc-83ee-9297-500e730c34bd`
 * 渡した検証済入力: (P1)–(P5) = 語の恒等式 / 指数 `e` と関係式族 `R(v)` / **定理 1** / **定理 2** /
   **トレース障害** (衝突 1 個 + `Tr S ≠ 0` ⟹ witness 無し、`q ≤ 43` 決着済)
@@ -259,7 +299,7 @@ escape 21 衝突 (両端 trace 0) には**閉包実験** (pair 空間 `V` を C1
 ## ▶ 経緯 (2026-08-11〜12)
 
 1. ~~次の Lean 作業 = トレース障害の形式化~~ → **2026-08-11 完了**。leaf =
-   [`OddOrder/BG/AppC_Problem1Trace.lean`](../OddOrder/BG/AppC_Problem1Trace.lean)
+   [`OddOrder/BG/AppC_Problem1Trace.lean`](../../OddOrder/BG/AppC_Problem1Trace.lean)
    (330 行、axiom-clean)。判定法の仮説が `AddSubgroup.closure (collisionSet …) = ⊤` から
    **「衝突 1 個で `Tr S ≠ 0`」** (`false_of_collisionPair_trace_ne_zero`) に弱まり、さらに
    指数の非 Frobenius 性 `hnotfrob` も**不要**になった (矛盾が `N` の完全性を経由せず
@@ -267,7 +307,7 @@ escape 21 衝突 (両端 trace 0) には**閉包実験** (pair 空間 `V` を C1
 2. ~~走らせている計算~~ → **完了**。`notes/meta/gap/verify_trace_obstruction.g` で
    **q = 7, 13, 19, 29, 31 の exotic 指数 16 個すべてが DECISIVE** (2026-08-11)。さらに
    **q = 41 も決着** (2026-08-12): GAP では届かないので C 実装
-   [`notes/meta/c/gf3_collision.c`](../notes/meta/c/gf3_collision.c) を書き、
+   [`notes/meta/c/gf3_collision.c`](../../notes/meta/c/gf3_collision.c) を書き、
    両 exotic 指数とも 2 個目の衝突で `Tr S ≠ 0` (5.39×10⁸ 歩 / 78 分、1.16×10⁹ 歩 / 2h17m)。
    ⟹ **`q ≤ 43` の全奇素数で hypothesis (B) は不可能** (37, 43 は exotic 指数 0 で定理 1)。
 3. ⚠ **`q` を 1 つずつ潰しても最終証明には到達しない** (奇素数は無限)。証明になるのは
@@ -292,7 +332,7 @@ escape 21 衝突 (両端 trace 0) には**閉包実験** (pair 空間 `V` を C1
 
 2026-08-11 に **collision-span 障害** (ChatGPT Work 5.6 Sol ウルトラ由来、こちらで全ステップ検証 +
 独立計算再現) が入り、**最小の未決ケース `q = 13` が落ちた**。詳細 =
-[`notes/bg/appC_problem1_partial_resolution.md`](../notes/bg/appC_problem1_partial_resolution.md)
+[`notes/bg/appC_problem1_partial_resolution.md`](../../notes/bg/appC_problem1_partial_resolution.md)
 「q = 13 決着」節。
 
 判定法 (一般・証明済): `T = {p ∈ U : p−1 ∈ U}`、`D(p) = p^E − (p−1)^E`、
@@ -333,7 +373,7 @@ capstone = `Problem1.false_of_collisionSet_spanning`:
 ⚠ 各 `q` の証明書 (rank の計算) は `GaloisField` が計算可能でないため Lean 内では回せない。
 **判定法が機械検証済みの定理、`q` ごとの証明書は外部計算 (GAP)** という切り分け。
 
-**強化: トレース障害** ([`AppC_Problem1Trace.lean`](../OddOrder/BG/AppC_Problem1Trace.lean)、
+**強化: トレース障害** ([`AppC_Problem1Trace.lean`](../../OddOrder/BG/AppC_Problem1Trace.lean)、
 2026-08-11)。capstone = `Problem1.false_of_collisionPair_trace_ne_zero`:
 
 > 衝突が**ひとつ**あって、その `S` が `Tr S = ∑_{j<q} S^{3^j} ≠ 0` を満たせば witness は存在しない。
@@ -349,7 +389,7 @@ capstone = `Problem1.false_of_collisionSet_spanning`:
 ## 状態 (2026-08-10 更新) — 大幅に前進、ただし全面解決ではない
 
 **部分解決。** 2026-08-10 に以下が確定した (詳細 =
-[`notes/bg/appC_problem1_partial_resolution.md`](../notes/bg/appC_problem1_partial_resolution.md))。
+[`notes/bg/appC_problem1_partial_resolution.md`](../../notes/bg/appC_problem1_partial_resolution.md))。
 
 `g` = `σ(P₀)^y` の生成元が `σ(U)` に誘導する指数を `e` (`e³ ≡ 1 mod n`, `n = (3^q−1)/2`) とする。
 `⟨3⟩ ≤ (Z/n)^×` は位数 `q` なので、**位数 3 の `e` が Frobenius 冪になるのは `q = 3` だけ**。
@@ -368,7 +408,7 @@ BG App.C が置かれている文脈そのものでは否定的に決着した�
 残るのは「`q ≥ 13` で `e ∉ ⟨3⟩`、`G` は非可解 (無限でもよい)」だけ。
 
 * `p = 2` は実現する (Example 10 = `SL(2,2^q)`、Example 11 = `Sz(2^q)`)。
-* `p ≤ 3` は Glauberman–Norton の Prop 7 から従う ([0179](closed/0179-bg-appc-remark-iv-glauberman-norton.md) で形式化済)。
+* `p ≤ 3` は Glauberman–Norton の Prop 7 から従う ([0179](0179-bg-appc-remark-iv-glauberman-norton.md) で形式化済)。
 * **`p = 3` は組合せ的には何の障害も無い** — 標数 3 では `E = E⁻¹` が自動
   (`NormSet.normSetE_eq_inv_of_p_eq_three`、Lean 検証済・AxiomsCheck 登録済)。
   ⟹ 問題は**純粋に (B) の実現可能性**。
@@ -414,6 +454,9 @@ R(s):   (s^{e²})^{g²} · (s^e)^g · s = 1        (s ∈ S = 平方元全体)
 | Semantic Scholar | **0** |
 
 ⟹ 1993 年以降この問題に触れた公刊物は無さそう (MathSciNet は未確認)。
+⚠ 後日訂正 (2026-08-10、ChatGPT 指摘をこちらで妥当と評価): **「被引用 0」は文字どおりには
+不正確** — BG (1994) 自身が Glauberman–Norton 1993 を引用しており、OpenAlex / Semantic
+Scholar が書籍からの引用を拾っていないだけ。「解決を主張する公刊物が無い」は成立。
 
 ## こちらで確立した還元 (2026-08-09)
 
@@ -440,7 +483,7 @@ R(s):   (s^{e²})^{g²} · (s^e)^g · s = 1        (s ∈ S = 平方元全体)
 ## ChatGPT (GPT-5.6 Sol / 推論レベル Pro) への相談 (2026-08-09)
 
 ユーザー指示で投入。**完走せず** (1 回目は約 2.5 時間で network error、再試行は 4 時間以上走って未完了)。
-運用上の教訓は [`notes/meta/chatgpt_consult_via_chrome.md`](../notes/meta/chatgpt_consult_via_chrome.md)
+運用上の教訓は [`notes/meta/chatgpt_consult_via_chrome.md`](../../notes/meta/chatgpt_consult_via_chrome.md)
 2026-08-09 節に記録済。
 
 進捗表示から回収できた**未検証**の中間主張 (再開するならここから):
@@ -460,7 +503,7 @@ R(s):   (s^{e²})^{g²} · (s^e)^g · s = 1        (s ∈ S = 平方元全体)
 定理 1・定理 2 の形式化完了後、**残った 1 ケースだけ**に絞って再投入した。
 
 * サーフェス = `Work`、モデル `GPT-5.6 Sol`、**思考レベル `ウルトラ`** (バッジで目視確認)
-* プロンプト全文 = [`notes/bg/appC_problem1_chatgpt_prompt_open_case.md`](../notes/bg/appC_problem1_chatgpt_prompt_open_case.md) (9,596 字)
+* プロンプト全文 = [`notes/bg/appC_problem1_chatgpt_prompt_open_case.md`](../../notes/bg/appC_problem1_chatgpt_prompt_open_case.md) (9,596 字)
 * スレッド = `https://chatgpt.com/c/WEB:b1cd2e72-e66d-463a-bc70-f57294162e0d`
 * 渡した検証済入力: (1)–(11) = `c ∈ Q` / 語の恒等式 / 指数 `e` / 関係式族 `R(v)` /
   **定理 1** / **定理 2** / **`N = ⟨P, P^g⟩` (2 層で足りる)** / `D = ⟨x,g⟩` は有限メタアーベル /
@@ -474,10 +517,10 @@ R(s):   (s^{e²})^{g²} · (s^e)^g · s = 1        (s ∈ S = 平方元全体)
 ## ChatGPT Work (GPT-5.6 Sol / 思考レベル ウルトラ) への再投入 (2026-08-10)
 
 ユーザー指示で、従来の `Chat` でなく **`Work` サーフェス**に投入 (モデル `GPT-5.6 Sol`、
-**思考レベル `ウルトラ`**)。UI 手順は [`notes/meta/chatgpt_consult_via_chrome.md`](../notes/meta/chatgpt_consult_via_chrome.md)
+**思考レベル `ウルトラ`**)。UI 手順は [`notes/meta/chatgpt_consult_via_chrome.md`](../../notes/meta/chatgpt_consult_via_chrome.md)
 2026-08-10 節。
 
-* プロンプト全文 = [`notes/bg/appC_problem1_chatgpt_prompt.md`](../notes/bg/appC_problem1_chatgpt_prompt.md) (10,728 字)
+* プロンプト全文 = [`notes/bg/appC_problem1_chatgpt_prompt.md`](../../notes/bg/appC_problem1_chatgpt_prompt.md) (10,728 字)
 * スレッド = `https://chatgpt.com/c/6a7935bc-0d48-83ee-9d4c-202c494dcb38`
 * 1 回目 (2026-08-09) の反省を反映: **問題を絞り**、上記の還元 R1–R4 と GAP 結果を検証済み入力として
   与え、**最優先タスクを「未決 15 ケースの判定」に固定**。さらに「完走しなくても部分報告を必ず出せ」
@@ -485,7 +528,7 @@ R(s):   (s^{e²})^{g²} · (s^e)^g · s = 1        (s ∈ S = 平方元全体)
 
 ## 計算機探索 (2026-08-09、自前 GAP)
 
-ChatGPT 打ち切り後、ユーザー指示でこちらで探索した。スクリプト = [`notes/meta/gap/`](../notes/meta/gap/)
+ChatGPT 打ち切り後、ユーザー指示でこちらで探索した。スクリプト = [`notes/meta/gap/`](../../notes/meta/gap/)
 (GAP 4.16.0 = `~/gap-4.16.0/gap`)。
 
 ### 探索を有限化する第 2 の還元
@@ -554,11 +597,11 @@ Gersten–Stallings の非球面条件 `Σ 1/m_v ≤ 1` による自動的な発
 
 ## Lean 形式化の状況 (2026-08-10 更新: **確定した数学はすべて形式化済**)
 
-leaf = [`OddOrder/BG/AppC_Problem1.lean`](../OddOrder/BG/AppC_Problem1.lean) +
-[`OddOrder/BG/AppC_Problem1Lattice.lean`](../OddOrder/BG/AppC_Problem1Lattice.lean) +
-[`OddOrder/Algebra/PaleySpanning.lean`](../OddOrder/Algebra/PaleySpanning.lean) +
-[`OddOrder/Algebra/RelationLattice.lean`](../OddOrder/Algebra/RelationLattice.lean) +
-[`OddOrder/Algebra/PowerMonomialIndependence.lean`](../OddOrder/Algebra/PowerMonomialIndependence.lean)。
+leaf = [`OddOrder/BG/AppC_Problem1.lean`](../../OddOrder/BG/AppC_Problem1.lean) +
+[`OddOrder/BG/AppC_Problem1Lattice.lean`](../../OddOrder/BG/AppC_Problem1Lattice.lean) +
+[`OddOrder/Algebra/PaleySpanning.lean`](../../OddOrder/Algebra/PaleySpanning.lean) +
+[`OddOrder/Algebra/RelationLattice.lean`](../../OddOrder/Algebra/RelationLattice.lean) +
+[`OddOrder/Algebra/PowerMonomialIndependence.lean`](../../OddOrder/Algebra/PowerMonomialIndependence.lean)。
 すべて AxiomsCheck 登録済 (allowlist のみ)、フルビルド green、--strict lint clean。
 
 **2 つの主定理はどちらも無条件** (仮説は (A) + (B) と場合分けの条件だけ):
@@ -617,6 +660,6 @@ leaf = [`OddOrder/BG/AppC_Problem1.lean`](../OddOrder/BG/AppC_Problem1.lean) +
 
 ## 参照
 
-- 原論文: [`references/glauberman-norton/`](../references/glauberman-norton/) (p.1094 が Prop 9 と Problem)
+- 原論文: [`references/glauberman-norton/`](../../references/glauberman-norton/) (p.1094 が Prop 9 と Problem)
 - BG: `references/bg/local-analysis.pdf` (Problem 1 = p.152、Remark (IV) = p.148)
-- 形式化済の周辺: [issue 0179](closed/0179-bg-appc-remark-iv-glauberman-norton.md)
+- 形式化済の周辺: [issue 0179](0179-bg-appc-remark-iv-glauberman-norton.md)

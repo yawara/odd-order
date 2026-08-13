@@ -5,7 +5,7 @@
 > 剛性も不要。§6–§8 の実験・剛性還元は歴史的記録 + (B1) への手がかりとして残す
 > (証明としては superseded)。残る壁は (B1) = 衝突の存在、のみ。
 
-[issue 0180](../../issues/0180-bg-appc-problem1-p-eq-three.md)。ChatGPT 第 4 回回答が open と明言した
+[issue 0180](../../issues/closed/0180-bg-appc-problem1-p-eq-three.md)。ChatGPT 第 4 回回答が open と明言した
 「`S ≠ S′` の一般衝突に必要な**射影比 `S′/S` に依存する閉包定理**」
 ([`appC_problem1_chatgpt_answer_b1.md`](appC_problem1_chatgpt_answer_b1.md) §III.2) を正面から攻めた記録。
 **結論: 閉包定理は「比の乗法的合成計算」として実在する。** ここから trace 不要の新判定が 3 つ出て、
