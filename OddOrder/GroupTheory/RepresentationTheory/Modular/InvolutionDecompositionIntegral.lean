@@ -73,7 +73,7 @@ theorem exists_nat_character_eq_sum_irreducibleBrauerCharacter (hp : p.Prime) {�
             (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π φ y) := by
   classical
   obtain ⟨L, hLat, hinv⟩ := exists_isLattice_invariant (𝒪 := 𝒪) σ
-  haveI := hLat
+  have := hLat
   refine ⟨decompositionNumber (nn := nn) hp hω hω' hπ hlin hkerJ (latticeRepresentation σ hinv),
     fun y hy => ?_⟩
   rw [Representation.character, ← algebraMap_trace_latticeRepresentation σ hinv y,
@@ -144,7 +144,7 @@ theorem exists_intCast_generalizedDecompositionNumber (hp : p.Prime) {ω : 𝒪}
       generalizedDecompositionNumber (𝒪 := 𝒪) (nn := nn) t hp hω' hπ hlin hkerJ σ.character hχ φ
         = (n φ : K) := by
   classical
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   have h2 : (2 : K) ≠ 0 := two_ne_zero
   obtain ⟨nplus, hnplus⟩ := exists_nat_character_eq_sum_irreducibleBrauerCharacter (ι := ι)
     (nn := nn) hp hω hω' hπ hlin hkerJ (involutionPlusRepresentation σ t)

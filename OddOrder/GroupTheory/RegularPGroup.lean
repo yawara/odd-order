@@ -70,7 +70,7 @@ theorem pow_eq_one_of_mul_closed {p : ℕ}
       one_mem' := one_pow p
       mul_mem' := fun {x y} hx hy => hclosed x y hx hy
       inv_mem' := fun {x} hx => by
-        simp only [Set.mem_setOf_eq] at hx ⊢
+        simp only [Set.mem_ofPred_eq] at hx ⊢
         rw [inv_pow, hx, inv_one] }
   have hsub : Omega G p 1 ≤ S := by
     refine Subgroup.closure_le S |>.mpr fun x hx => ?_
@@ -205,12 +205,12 @@ theorem pow_mul_eq_one_of_class_lt {p : ℕ} (hp : p.Prime) :
       · by_cases hycyc : Subgroup.zpowers y = ⊤
         · obtain ⟨k, hk⟩ : x * y ∈ Subgroup.zpowers y := hycyc ▸ Subgroup.mem_top _
           rw [← hk, ← zpow_natCast, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast, hy, one_zpow]
-        · haveI hnil : Group.IsNilpotent R :=
+        · have hnil : Group.IsNilpotent R :=
             Subgroup.nilpotent_iff_lowerCentralSeries.mpr ⟨p - 1, hgamma⟩
           obtain ⟨M, hMco, hyM⟩ :=
             (IsCoatomic.eq_top_or_exists_le_coatom (Subgroup.zpowers y)).resolve_left hycyc
           have htfae := (Group.isNilpotent_of_finite_tfae (G := R)).out 0 2
-          haveI : M.Normal := htfae.mp hnil M hMco
+          have : M.Normal := htfae.mp hnil M hMco
           have hcardM : Nat.card ↥M < Nat.card R := card_lt_card_of_lt_top hMco.1
           have hMclosed : ∀ a b : R, a ∈ M → b ∈ M → a ^ p = 1 → b ^ p = 1 →
               (a * b) ^ p = 1 := by

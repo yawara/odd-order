@@ -85,6 +85,7 @@ theorem index_commutator_dvd_of_surjective {G H : Type*} [Group G] [Group H]
   obtain ⟨g, rfl⟩ := hf h
   exact ⟨QuotientGroup.mk g, rfl⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Isaacs Theorem 10.15, base case** (Isaacs pp. 305-306, second and later
 paragraphs): under the 10.15 hypotheses, if moreover the quotient `P/Y` is
 abelian — equivalently `⁅P, P⁆ ≤ Y` — for **every** normal subgroup `Y ⊴ N` of
@@ -99,16 +100,16 @@ private theorem thm1015_base {N : Type*} [Group N] [Finite N] {P : Subgroup N}
     p ∣ (commutator N).index := by
   classical
   have hp_prime : p.Prime := hp.out
-  haveI := hPn
+  have := hPn
   -- ### Step 2 setup: `P' := ⁅P, P⁆ ⊴ N` is a nontrivial cyclic `p`-group
   set P' : Subgroup N := ⁅P, P⁆ with hP'_def
-  haveI hP'n : P'.Normal := by rw [hP'_def]; infer_instance
+  have hP'n : P'.Normal := by rw [hP'_def]; infer_instance
   have hP'le : P' ≤ P := Subgroup.commutator_le_left P P
   have hP'_map : (_root_.commutator ↥P).map P.subtype = P' := by
     rw [_root_.commutator_def, Subgroup.map_commutator, ← MonoidHom.range_eq_map,
       Subgroup.range_subtype]
   have hP'cyc : IsCyclic ↥P' := by
-    haveI := hmeta.isCyclic_commutator
+    have := hmeta.isCyclic_commutator
     have e := Subgroup.equivMapOfInjective (_root_.commutator ↥P) P.subtype
       P.subtype_injective
     rw [hP'_map] at e
@@ -147,7 +148,7 @@ private theorem thm1015_base {N : Type*} [Group N] [Finite N] {P : Subgroup N}
         ← Nat.card_congr (Subgroup.equivMapOfInjective Y₀ (MulAut.conj n).toMonoidHom
           (MulAut.conj n).injective).toEquiv]
       exact hY₀card
-    haveI := hP'cyc
+    have := hP'cyc
     have hsub : Y₁.subgroupOf P' = Y₀.subgroupOf P' := by
       refine subgroup_eq_of_card_eq_prime_of_isCyclic (p := p) ?_ ?_
       · rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hY₁le).toEquiv]
@@ -166,7 +167,7 @@ private theorem thm1015_base {N : Type*} [Group N] [Finite N] {P : Subgroup N}
       have : (⟨x, hxP'⟩ : ↥P') ∈ Y₀.subgroupOf P' := hx
       rw [← hsub] at this
       exact this
-  haveI hY₀n : Y₀.Normal := by
+  have hY₀n : Y₀.Normal := by
     constructor
     intro y hy n
     rw [← hY₀conj n]
@@ -179,7 +180,7 @@ private theorem thm1015_base {N : Type*} [Group N] [Finite N] {P : Subgroup N}
   -- any normal `p`-subgroup of `N` sits inside the normal Sylow subgroup `P`
   have hle_P : ∀ Y : Subgroup N, Y.Normal → IsPGroup p ↥Y → Y ≤ P := by
     intro Y hYn hYp
-    haveI := hYn
+    have := hYn
     by_contra hnot
     have hsupp : IsPGroup p ↥(Y ⊔ P) := hYp.to_sup_of_normal_right hPp
     have hlt : P < Y ⊔ P := lt_of_le_of_ne le_sup_right fun h => hnot (h ▸ le_sup_left)
@@ -216,7 +217,7 @@ private theorem thm1015_base {N : Type*} [Group N] [Finite N] {P : Subgroup N}
   -- ### Step 4: `V := Ω₁(P)` is elementary abelian of order `p²`
   have hnc : ¬ IsCyclic ↥P := by
     intro hcyc
-    letI : CommGroup ↥P := IsCyclic.commGroup
+    let : CommGroup ↥P := IsCyclic.commGroup
     exact hnonab fun x y => mul_comm x y
   obtain ⟨hVea, hVcard⟩ := OddOrder.BG.Ch1.S04.isElementaryAbelian_omega1_of_isMetacyclic
     hPp (hp_prime.odd_of_ne_two (by omega)) hmeta hnc
@@ -274,14 +275,14 @@ private theorem thm1015_base {N : Type*} [Group N] [Finite N] {P : Subgroup N}
     -- cardinality bookkeeping: `|U| = p` hence `|W| = p`
     have hUcard : Nat.card ↥((_root_.commutator ↥P).subgroupOf (Omega ↥P p 1)) = p := by
       rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hK'V).toEquiv, hcomm_card]
-    letI : CommGroup ↥(Omega ↥P p 1) :=
+    let : CommGroup ↥(Omega ↥P p 1) :=
       { (inferInstance : Group ↥(Omega ↥P p 1)) with mul_comm := hVea.comm }
     have hcompl : ((_root_.commutator ↥P).subgroupOf (Omega ↥P p 1)).IsComplement' W := by
       refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ
         (disjoint_iff.mpr hWinf) ?_
       rw [← Subgroup.mul_normal, hWsup, Subgroup.coe_top]
     have hWcard : Nat.card ↥W = p := by
-      have hmul := hcompl.card_mul
+      have hmul := hcompl.card_mul_card
       rw [hUcard, hVcard, pow_two] at hmul
       exact Nat.eq_of_mul_eq_mul_left hp_prime.pos hmul
     -- transport `W` to a normal order-`p` subgroup of `N`
@@ -525,22 +526,22 @@ private theorem thm1015_base {N : Type*} [Group N] [Finite N] {P : Subgroup N}
     intro n
     exact hXinv (QuotientGroup.mk n)
   set H2 : Subgroup N := H_P.map P.subtype with hH2_def
-  haveI hH2n : H2.Normal := by
+  have hH2n : H2.Normal := by
     constructor
     intro x hx n
     rw [hH2_def] at hx ⊢
     obtain ⟨w, hw, rfl⟩ := hx
     refine ⟨(φ₀ n) w, hH_Pinv.smul_mem n hw, ?_⟩
     simp [hφ₀_def]
-  haveI hH2cyc : IsCyclic ↥H2 := by
-    haveI := hHcyc
+  have hH2cyc : IsCyclic ↥H2 := by
+    have := hHcyc
     exact isCyclic_of_surjective
       (Subgroup.equivMapOfInjective H_P P.subtype P.subtype_injective).toMonoidHom
       (Subgroup.equivMapOfInjective H_P P.subtype P.subtype_injective).surjective
   set ψ2 : N →* MulAut ↥H2 := MulAut.conjNormal with hψ2_def
   -- `Aut(H)` is abelian since `H` is cyclic
   let e := IsCyclic.mulAutMulEquiv ↥H2
-  letI : CommGroup (MulAut ↥H2) := e.toMonoidHom.commGroupOfInjective e.injective
+  let : CommGroup (MulAut ↥H2) := e.toMonoidHom.commGroupOfInjective e.injective
   have hN'ker : commutator N ≤ ψ2.ker := by
     rw [commutator_def, Subgroup.commutator_le]
     intro g₁ _ g₂ _
@@ -614,11 +615,11 @@ private theorem thm1015_aux (n : ℕ) :
         ¬ ⁅P, P⁆ ≤ Y
     · -- some order-`p` normal `Y` has nonabelian `P/Y`: induct in `N ⧸ Y`
       obtain ⟨Y, hYn, hYP, hYcard, hYcomm⟩ := hquot
-      haveI := hYn
+      have := hYn
       have hfsurj : Function.Surjective (QuotientGroup.mk' Y) :=
         QuotientGroup.mk'_surjective Y
       set Pq : Subgroup (N ⧸ Y) := P.map (QuotientGroup.mk' Y) with hPq_def
-      haveI hPqn : Pq.Normal := Subgroup.Normal.map hPn _ hfsurj
+      have hPqn : Pq.Normal := Subgroup.Normal.map hPn _ hfsurj
       -- the image is again a `p`-group …
       have hPqp : IsPGroup p ↥Pq :=
         IsPGroup.of_surjective (hPp.of_equiv (MulEquiv.refl _)) ((QuotientGroup.mk' Y).subgroupMap

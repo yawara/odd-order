@@ -64,11 +64,11 @@ theorem exists_planeCoordinates_of_isomorphicSplit
   set Ybar := isplit.split.right with hYdef
   have hcomm := isplit.split.quotientEA.comm
   have hsq := isplit.split.quotientEA.pow_eq_one
-  letI : CommGroup (P ⧸ Z) :=
+  let : CommGroup (P ⧸ Z) :=
     { (inferInstance : Group (P ⧸ Z)) with mul_comm := hcomm }
-  letI : CommGroup K := IsCyclic.commGroup
+  let : CommGroup K := IsCyclic.commGroup
   -- the additive `F₂`-structure on the left summand
-  letI : Module (ZMod 2) (Additive ↥Xbar) := AddCommGroup.zmodModule (by
+  let : Module (ZMod 2) (Additive ↥Xbar) := AddCommGroup.zmodModule (by
     intro q
     apply Additive.toMul.injective
     change (Additive.toMul q : ↥Xbar) ^ 2 = 1
@@ -113,7 +113,7 @@ theorem exists_planeCoordinates_of_isomorphicSplit
       have hbt : (⊥ : Submodule (ZMod 2) (Additive ↥Xbar)) = ⊤ :=
         congrArg Subrepresentation.toSubmodule h
       exact bot_ne_top hbt
-    letI : Nontrivial (Subrepresentation rhoX) := ⟨⊥, ⊤, hbot_ne_top⟩
+    let : Nontrivial (Subrepresentation rhoX) := ⟨⊥, ⊤, hbot_ne_top⟩
     apply IsSimpleOrder.of_forall_eq_top
     intro W hWbot
     set V : Subgroup ↥Xbar := Φ W.toSubmodule with hV
@@ -177,7 +177,7 @@ theorem exists_planeCoordinates_of_isomorphicSplit
   -- dimension of the summand
   have hfinrank : Module.finrank (ZMod 2) (Additive ↥Xbar) = n := by
     have hpow : (2 : ℕ) ^ Module.finrank (ZMod 2) (Additive ↥Xbar) = 2 ^ n := by
-      haveI : Fintype (Additive ↥Xbar) := Fintype.ofFinite _
+      have : Fintype (Additive ↥Xbar) := Fintype.ofFinite _
       calc (2 : ℕ) ^ Module.finrank (ZMod 2) (Additive ↥Xbar)
           = Fintype.card (ZMod 2) ^
               Module.finrank (ZMod 2) (Additive ↥Xbar) := by
@@ -193,7 +193,7 @@ theorem exists_planeCoordinates_of_isomorphicSplit
   -- `mu` is surjective by cardinality
   have hmusurj : Function.Surjective mu := by
     have hcardF : Nat.card (GaloisField 2 n)ˣ = 2 ^ n - 1 := by
-      haveI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+      have : Fintype (GaloisField 2 n) := Fintype.ofFinite _
       rw [Nat.card_eq_fintype_card, Fintype.card_units,
         ← Nat.card_eq_fintype_card, GaloisField.card 2 n hn]
     have hbij : Function.Bijective mu :=
@@ -232,7 +232,7 @@ theorem exists_planeCoordinates_of_isomorphicSplit
       rwa [mul_inv_eq_one] at h2'
     exact Prod.ext (Subtype.ext h1.symm) (Subtype.ext h2.symm)
   have hcardprod : Nat.card (↥Xbar × ↥Ybar) = Nat.card (P ⧸ Z) := by
-    haveI hXnormal : Xbar.Normal := normal_of_mul_comm hcomm _
+    have hXnormal : Xbar.Normal := normal_of_mul_comm hcomm _
     rw [Nat.card_prod]
     calc Nat.card ↥Xbar * Nat.card ↥Ybar
         = Nat.card ((P ⧸ Z) ⧸ Xbar) * Nat.card ↥Xbar := by

@@ -103,7 +103,7 @@ theorem uActionHom_conjNormal [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSe
       = quotientMulAutHom (N := chief.N) chief.N_aInvariant l
         * uActionHom data chief x
         * (quotientMulAutHom (N := chief.N) chief.N_aInvariant l)⁻¹ := by
-  haveI : chief.N.Normal := chief.N_normal
+  have : chief.N.Normal := chief.N_normal
   have hval : ((MulAut.conjNormal l x :
         ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))) :
         ↥(data.typeP.U ⊔ data.typeP.W1))
@@ -131,9 +131,9 @@ theorem uActionHom_eq_one_of_commute_mulAut [Finite G] {M : Subgroup G}
     (g : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
     (hcentral : ∀ σ : MulAut (↥data.H ⧸ chief.N), Commute (uActionHom data chief g) σ) :
     uActionHom data chief g = 1 := by
-  haveI : chief.N.Normal := chief.N_normal
+  have : chief.N.Normal := chief.N_normal
   have frob := typeP_uW1_frobenius data.typeP data.nontrivial.1
-  haveI hUnorm : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal := frob.isNormal
+  have hUnorm : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal := frob.isNormal
   -- The kernel `C = C_U(H̄)` of the `U`-action is invariant under `L`-conjugation.
   have hNinv : IsAInvariant
       (MulAut.conjNormal :
@@ -149,14 +149,14 @@ theorem uActionHom_eq_one_of_commute_mulAut [Finite G] {M : Subgroup G}
       (Nat.card ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
       (Nat.card ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))) :=
     frob.coprime_card_kernel_complement.symm
-  haveI hXcyc : IsCyclic ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) := by
-    haveI := data.typeP.W1_cyclic
+  have hXcyc : IsCyclic ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) := by
+    have := data.typeP.W1_cyclic
     exact isCyclic_of_surjective _
       (Subgroup.subgroupOfEquivOfLe le_sup_right).symm.surjective
-  have hSolv : IsSolvable ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))
-      ∨ IsSolvable ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) := by
+  have hSolv : Group.IsSolvable ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))
+      ∨ Group.IsSolvable ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) := by
     left
-    letI := hXcyc.commGroup
+    let := hXcyc.commGroup
     infer_instance
   -- `C_U(W₁) = 1`: the Frobenius fixed-point-freeness.
   have hfixbot : fixedSubgroup
@@ -216,7 +216,7 @@ i.e. `uActionHom ⁅a, b⁆ = 1`; hence the images `uActionHom a`, `uActionHom b
 theorem uActionHom_range_comm [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
     (chief : ChiefFactorData data) (s t : ↥(MonoidHom.range (uActionHom data chief))) :
     s * t = t * s := by
-  haveI : chief.N.Normal := chief.N_normal
+  have : chief.N.Normal := chief.N_normal
   set act := typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant with hact
   -- `uActionHom = act.φ.comp act.U.subtype` definitionally; work through `φU` to match its domain.
   set φU := act.φ.comp act.U.subtype with hφU
@@ -269,8 +269,8 @@ theorem range_uActionHom_conj_mem [Finite G] {M : Subgroup G} (data : TypesIIIII
     quotientMulAutHom chief.N_aInvariant w * u *
         (quotientMulAutHom chief.N_aInvariant w)⁻¹
       ∈ MonoidHom.range (uActionHom data chief) := by
-  haveI : chief.N.Normal := chief.N_normal
-  haveI hUnorm : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal :=
+  have : chief.N.Normal := chief.N_normal
+  have hUnorm : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal :=
     (typeP_uW1_frobenius data.typeP data.nontrivial.1).isNormal
   obtain ⟨v, rfl⟩ := hu
   refine ⟨⟨w * (v : ↥(data.typeP.U ⊔ data.typeP.W1)) * w⁻¹, ?_⟩, ?_⟩
@@ -318,17 +318,17 @@ theorem caseA_blockScalarFacts [Finite G] {M : Subgroup G}
     (∃ ψ : ↥(MonoidHom.range (uActionHom data chief)) →*
         (Fin (data.q - 1) → (ZMod chief.p)ˣ),
       Function.Injective ψ) ∧ ∃ a : ℕ, a ∣ chief.p - 1 ∧ chars.u ∣ a ^ (data.q - 1) := by
-  haveI : Fact chief.p.Prime := ⟨chief.p_prime⟩
-  haveI : chief.N.Normal := chief.N_normal
+  have : Fact chief.p.Prime := ⟨chief.p_prime⟩
+  have : chief.N.Normal := chief.N_normal
   -- Build the vector-space structure over the canonical quotient-group instance, so the
   -- `MulAut H̄` used by `uActionHom` and by `elabRepresentation` agrees definitionally.
-  letI : CommGroup (↥data.H ⧸ chief.N) :=
+  let : CommGroup (↥data.H ⧸ chief.N) :=
     { (inferInstance : Group (↥data.H ⧸ chief.N)) with
       mul_comm := chief.quotient_elementaryAbelian.comm }
-  letI : Module (ZMod chief.p) (Additive (↥data.H ⧸ chief.N)) :=
+  let : Module (ZMod chief.p) (Additive (↥data.H ⧸ chief.N)) :=
     chief.quotient_elementaryAbelian.zmodModule
-  haveI : Finite ↥(MonoidHom.range (uActionHom data chief)) := inferInstance
-  letI : CommGroup ↥(MonoidHom.range (uActionHom data chief)) :=
+  have : Finite ↥(MonoidHom.range (uActionHom data chief)) := inferInstance
+  let : CommGroup ↥(MonoidHom.range (uActionHom data chief)) :=
     { (inferInstance : Group ↥(MonoidHom.range (uActionHom data chief))) with
       mul_comm := uActionHom_range_comm chief }
   have hq1 : (data.q - 1) + 1 = data.q := Nat.sub_add_cancel data.nontrivial.2.1.pos
@@ -459,7 +459,7 @@ theorem caseA_u_dvd_pred_pow [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSet
     {chief : ChiefFactorData data} (chars : Section11CharacterData data chief)
     (caseA : CliffordCaseAData chars) :
     chars.u ∣ (chief.p - 1) ^ (data.q - 1) := by
-  haveI : Fact chief.p.Prime := ⟨chief.p_prime⟩
+  have : Fact chief.p.Prime := ⟨chief.p_prime⟩
   obtain ⟨ψ, hψ⟩ := caseA_exists_blockScalarRatioEmbedding chars caseA
   have hunits : Nat.card (ZMod chief.p)ˣ = chief.p - 1 := by
     rw [Nat.card_eq_fintype_card, ZMod.card_units_eq_totient,
@@ -530,21 +530,21 @@ theorem fixedSubgroup_quotient_uActionKer_eq_bot [Finite G] {M : Subgroup G}
       (uActionHom data chief).ker) :
     fixedSubgroup (quotientMulAutHom hNinv)
       (data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) = ⊥ := by
-  haveI : chief.N.Normal := chief.N_normal
+  have : chief.N.Normal := chief.N_normal
   have frob := typeP_uW1_frobenius data.typeP data.nontrivial.1
   -- Coprimality `|W₁| ⟂ |U|` and solvability of the cyclic `W₁`.
   have hCop : Nat.Coprime
       (Nat.card ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
       (Nat.card ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))) :=
     frob.coprime_card_kernel_complement.symm
-  haveI hXcyc : IsCyclic ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) := by
-    haveI := data.typeP.W1_cyclic
+  have hXcyc : IsCyclic ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) := by
+    have := data.typeP.W1_cyclic
     exact isCyclic_of_surjective _
       (Subgroup.subgroupOfEquivOfLe le_sup_right).symm.surjective
-  have hSolv : IsSolvable ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))
-      ∨ IsSolvable ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) := by
+  have hSolv : Group.IsSolvable ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))
+      ∨ Group.IsSolvable ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) := by
     left
-    letI := hXcyc.commGroup
+    let := hXcyc.commGroup
     infer_instance
   -- `C_U(W₁) = 1`: the Frobenius fixed-point-freeness.
   have hfixbot : fixedSubgroup
@@ -587,9 +587,9 @@ theorem card_uActionHom_range_modEq_one [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
     Nat.card ↥(MonoidHom.range (uActionHom data chief)) ≡ 1 [MOD data.q] := by
   classical
-  haveI : chief.N.Normal := chief.N_normal
+  have : chief.N.Normal := chief.N_normal
   have frob := typeP_uW1_frobenius data.typeP data.nontrivial.1
-  haveI hUnorm : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal := frob.isNormal
+  have hUnorm : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal := frob.isNormal
   -- The kernel `C = C_U(H̄)` of the `U`-action is invariant under `L`-conjugation.
   have hNinv : IsAInvariant
       (MulAut.conjNormal :
@@ -604,7 +604,7 @@ theorem card_uActionHom_range_modEq_one [Finite G] {M : Subgroup G}
   set Q := (↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))
     ⧸ (uActionHom data chief).ker) with hQdef
   -- `W₁` acts on the quotient `Q = U/C` through the descended conjugation.
-  letI : MulAction ↥W₁sub Q :=
+  let : MulAction ↥W₁sub Q :=
     MulAction.compHom Q ((quotientMulAutHom hNinv).comp W₁sub.subtype)
   have hsmul : ∀ (w : ↥W₁sub) (x : Q), w • x = quotientMulAutHom hNinv (w : _) x := fun _ _ => rfl
   -- The fixed points are exactly `C_Ū(W̄₁) = 1`.
@@ -624,7 +624,7 @@ theorem card_uActionHom_range_modEq_one [Finite G] {M : Subgroup G}
       rw [hsmul]
       exact map_one (quotientMulAutHom hNinv (w : _))
   -- `W₁sub` is a `q`-group of order exactly `q` (prime).
-  haveI : Fact (data.q).Prime := ⟨data.nontrivial.2.1⟩
+  have : Fact (data.q).Prime := ⟨data.nontrivial.2.1⟩
   have hW1card : Nat.card ↥W₁sub = data.q :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
   have hPG : IsPGroup data.q ↥W₁sub := IsPGroup.of_card (by rw [hW1card, pow_one])
@@ -737,7 +737,7 @@ image on the orbit generator `S₀` — the Clifford integer `caseA.a`. -/
 theorem caseA_card_range_restrictAut_Hpart (caseA : CliffordCaseAData chars) (j : Fin data.q) :
     Nat.card (aInvariantRestrictAut (caseA.Hpart_aInvariant j)).range = caseA.a := by
   classical
-  haveI hUnorm : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal :=
+  have hUnorm : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal :=
     (typeP_uW1_frobenius data.typeP data.nontrivial.1).isNormal
   set Γ := ↥(data.typeP.U ⊔ data.typeP.W1)
   set q' : Γ →* MulAut (↥data.H ⧸ chief.N) := quotientMulAutHom chief.N_aInvariant with hq'
@@ -908,11 +908,11 @@ of `MulAut` of the order-`p` (hence cyclic) summand, and `MulAut(C_p) ≅ (ZMod 
 theorem caseA_isCyclic_range_restrictAut_Hpart (caseA : CliffordCaseAData chars)
     (i : Fin data.q) :
     IsCyclic ↥(aInvariantRestrictAut (caseA.Hpart_aInvariant i)).range := by
-  haveI : Fact chief.p.Prime := ⟨chief.p_prime⟩
-  haveI : chief.N.Normal := chief.N_normal
-  haveI hcyc : IsCyclic ↥(caseA.Hpart i) := isCyclic_of_prime_card (caseA.Hpart_order i)
-  haveI : Fact (Nat.card ↥(caseA.Hpart i)).Prime := ⟨(caseA.Hpart_order i).symm ▸ chief.p_prime⟩
-  haveI : IsCyclic (MulAut ↥(caseA.Hpart i)) := by
+  have : Fact chief.p.Prime := ⟨chief.p_prime⟩
+  have : chief.N.Normal := chief.N_normal
+  have hcyc : IsCyclic ↥(caseA.Hpart i) := isCyclic_of_prime_card (caseA.Hpart_order i)
+  have : Fact (Nat.card ↥(caseA.Hpart i)).Prime := ⟨(caseA.Hpart_order i).symm ▸ chief.p_prime⟩
+  have : IsCyclic (MulAut ↥(caseA.Hpart i)) := by
     have e := IsCyclic.mulAutMulEquiv (↥(caseA.Hpart i))
     exact isCyclic_of_injective e.toMonoidHom e.injective
   exact Subgroup.isCyclic _

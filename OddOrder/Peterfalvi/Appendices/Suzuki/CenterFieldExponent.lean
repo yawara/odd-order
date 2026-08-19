@@ -104,8 +104,8 @@ theorem actualKActor_free_on_center {m : ℕ} (s : hyp.LemmaFiveSetup m)
     (k : ↥hyp.actualKActor) (z : ↥(Subgroup.center hyp.Q)) (hz : z ≠ 1)
     (hfix : hyp.centerKHom k z = z) : k = 1 := by
   classical
-  haveI : Fintype ↥(Subgroup.center hyp.Q) := Fintype.ofFinite _
-  haveI : Fintype ↥hyp.actualKActor := Fintype.ofFinite _
+  have : Fintype ↥(Subgroup.center hyp.Q) := Fintype.ofFinite _
+  have : Fintype ↥hyp.actualKActor := Fintype.ofFinite _
   have hzQ : (z : ↥hyp.Q) ≠ 1 := fun h => hz (Subtype.ext h)
   -- the orbit map at `z`, valued in the nonidentity central elements
   have hzne : ∀ a : ↥hyp.actualKActor, hyp.centerKHom a z ≠ 1 := fun a hone =>
@@ -161,33 +161,33 @@ theorem exists_center_coordinate_exponent {m : ℕ} (hm : m ≠ 0)
         ι (Additive.ofMul (hyp.centerKHom k z))
           = ((M.mu (k, 1) ^ d : M.Eˣ) : M.E) * ι (Additive.ofMul z) := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hEA : IsElementaryAbelian 2 ↥(Subgroup.center hyp.Q) :=
     hyp.isElementaryAbelian_center_of_lemmaFiveSetup s
   have hZcard : Nat.card ↥(Subgroup.center hyp.Q) = 2 ^ m := by
     rw [s.centerEqQ0,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Q0_le_Q).toEquiv, hQ0card]
-  letI : CommGroup ↥(Subgroup.center hyp.Q) :=
+  let : CommGroup ↥(Subgroup.center hyp.Q) :=
     { (inferInstance : Group ↥(Subgroup.center hyp.Q)) with mul_comm := hEA.comm }
-  haveI : Nontrivial ↥(Subgroup.center hyp.Q) := by
+  have : Nontrivial ↥(Subgroup.center hyp.Q) := by
     refine Finite.one_lt_card_iff_nontrivial.mp ?_
     rw [hZcard]
     exact Nat.one_lt_pow hm (by norm_num)
-  haveI := hyp.actualKActor_isCyclic
-  letI : CommGroup ↥hyp.actualKActor := IsCyclic.commGroup
+  have := hyp.actualKActor_isCyclic
+  let : CommGroup ↥hyp.actualKActor := IsCyclic.commGroup
   -- Appendix I Proposition 2 on `Z(Q)`
   obtain ⟨F, instF, instFin, γ, α, hcardF, hγ⟩ :=
     Huppert.exists_field_coordinate_realization hEA hyp.centerKHom
       (fun k z hz hfix => hyp.actualKActor_free_on_center s k z hz hfix)
       s.cardActorCenter
-  letI : Field F := instF
-  haveI : Finite F := instFin
+  let : Field F := instF
+  have : Finite F := instFin
   -- `F` is the subfield `{x : x^q = x}` of `E`
   set F₁ : Subfield M.E := OddOrder.FiniteField.frobFixedSubfield M.E 2 m with hF₁
   have hF₁card : Nat.card ↥F₁ = 2 ^ m :=
     OddOrder.FiniteField.natCard_frobFixedSubfield M.card hm
-  haveI : Fintype F := Fintype.ofFinite F
-  haveI : Fintype ↥F₁ := Fintype.ofFinite _
+  have : Fintype F := Fintype.ofFinite F
+  have : Fintype ↥F₁ := Fintype.ofFinite _
   have hcards : Fintype.card F = Fintype.card ↥F₁ := by
     rw [← Nat.card_eq_fintype_card, ← Nat.card_eq_fintype_card, hcardF, hZcard, hF₁card]
   let e : F ≃+* ↥F₁ := FiniteField.ringEquivOfCardEq hcards
@@ -325,11 +325,11 @@ theorem exists_quadraticMap_of_lemmaFiveSetup {m : ℕ} (hm : m ≠ 0)
     hyp.isElementaryAbelian_center_of_lemmaFiveSetup s
   have hV : IsElementaryAbelian 2 (↥hyp.Q ⧸ Subgroup.center hyp.Q) :=
     s.isplit.split.quotientEA
-  letI : IsMulCommutative (↥hyp.Q ⧸ Subgroup.center hyp.Q) :=
+  let : IsMulCommutative (↥hyp.Q ⧸ Subgroup.center hyp.Q) :=
     IsMulCommutative.of_comm hV.comm
-  letI : IsMulCommutative ↥(Subgroup.center hyp.Q) := IsMulCommutative.of_comm hW.comm
-  letI : Module (ZMod 2) (Additive (↥hyp.Q ⧸ Subgroup.center hyp.Q)) := hV.zmodModule
-  letI : Module (ZMod 2) (Additive ↥(Subgroup.center hyp.Q)) := hW.zmodModule
+  let : IsMulCommutative ↥(Subgroup.center hyp.Q) := IsMulCommutative.of_comm hW.comm
+  let : Module (ZMod 2) (Additive (↥hyp.Q ⧸ Subgroup.center hyp.Q)) := hV.zmodModule
+  let : Module (ZMod 2) (Additive ↥(Subgroup.center hyp.Q)) := hW.zmodModule
   -- the descended square map (Appendix III Lemma 1(a))
   set χ₀ := Suzuki2Groups.centralSquareQuadraticMap
     (le_refl (Subgroup.center ↥hyp.Q)) hW hV with hχ₀
@@ -472,7 +472,7 @@ theorem exists_sigma_inverting_W1 {m : ℕ} (hm : m ≠ 0)
       ((M.mu (1, v) : M.Eˣ) : M.E) *
           OddOrder.FiniteField.qFrobenius M.E 2 j ((M.mu (1, v) : M.Eˣ) : M.E) = 1 := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨_d, σ, τ, _hK, hW⟩ :=
     hyp.exists_scalingPair_of_lemmaFiveSetup hm hQ0card s M
   -- `|E| = 2 ^ (2m)`
@@ -522,7 +522,7 @@ theorem exists_center_coordinate_equiv {m : ℕ} (hm : m ≠ 0)
             ((ι (Additive.ofMul z) :
               ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) : M.E) := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨ι₀, d, hinj, hF, hequiv⟩ :=
     hyp.exists_center_coordinate_exponent hm hQ0card s M
   -- corestrict `ι₀` to the subfield
@@ -542,11 +542,11 @@ theorem exists_center_coordinate_equiv {m : ℕ} (hm : m ≠ 0)
   have hcards : Nat.card (Additive ↥(Subgroup.center hyp.Q)) = Nat.card ↥F₁ := by
     rw [Nat.card_congr (Additive.toMul (α := ↥(Subgroup.center hyp.Q))), hZcard, hF₁]
     exact (OddOrder.FiniteField.natCard_frobFixedSubfield M.card hm).symm
-  haveI : Finite ↥F₁ := Subtype.finite
-  haveI : Finite (Additive ↥(Subgroup.center hyp.Q)) := by
+  have : Finite ↥F₁ := Subtype.finite
+  have : Finite (Additive ↥(Subgroup.center hyp.Q)) := by
     exact Finite.of_equiv _ (Additive.ofMul (α := ↥(Subgroup.center hyp.Q)))
-  haveI : Fintype (Additive ↥(Subgroup.center hyp.Q)) := Fintype.ofFinite _
-  haveI : Fintype ↥F₁ := Fintype.ofFinite _
+  have : Fintype (Additive ↥(Subgroup.center hyp.Q)) := Fintype.ofFinite _
+  have : Fintype ↥F₁ := Fintype.ofFinite _
   have hbij : Function.Bijective ι₁ := by
     refine (Fintype.bijective_iff_injective_and_card ι₁).mpr ⟨hι₁inj, ?_⟩
     rw [← Nat.card_eq_fintype_card, ← Nat.card_eq_fintype_card, hcards]

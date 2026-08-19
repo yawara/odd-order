@@ -31,7 +31,7 @@ Isaacs Problem 3C.8 (nilpotent injector の共役性) の準備。冪零部分�
 
 namespace OddOrder.Isaacs.Ch03
 
-open Subgroup Pointwise
+open _root_.OddOrder.Isaacs.Ch03.Subgroup Pointwise
 
 section /- 3C.8 準備: 冪零部分群の π-部分 -/
 
@@ -69,7 +69,7 @@ theorem isHallPart_of_card_of_relIndex {N A : Subgroup G} {π : Set ℕ} (hAN : 
   rwa [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAN).toEquiv]
 
 /-- **存在**: 有限可解群の部分群は任意の `π` について `π`-部分を持つ (`hall_E_exists`)。 -/
-theorem exists_isHallPart [Finite G] (N : Subgroup G) [IsSolvable ↥N] (π : Set ℕ) :
+theorem exists_isHallPart [Finite G] (N : Subgroup G) [Group.IsSolvable ↥N] (π : Set ℕ) :
     ∃ A : Subgroup G, IsHallPart N A π := by
   obtain ⟨L, hL⟩ := hall_E_exists (G := ↥N) π
   refine ⟨L.map N.subtype, Subgroup.map_subtype_le L, ?_⟩
@@ -80,16 +80,16 @@ theorem exists_isHallPart [Finite G] (N : Subgroup G) [IsSolvable ↥N] (π : Se
 theorem IsHallPart.le_normalizer [Finite G] {N A : Subgroup G} {π : Set ℕ}
     (hN : Group.IsNilpotent ↥N) (h : IsHallPart N A π) :
     N ≤ Subgroup.normalizer (A : Set G) := by
-  haveI := hN
-  haveI : (A.subgroupOf N).Normal := h.2.normal_of_isNilpotent
+  have := hN
+  have : (A.subgroupOf N).Normal := h.2.normal_of_isNilpotent
   exact Subgroup.le_normalizer_of_normal_subgroupOf h.1
 
 /-- **一意性**: `N` が冪零なら `π`-部分は一意。 -/
 theorem IsHallPart.unique [Finite G] {N A B : Subgroup G} {π : Set ℕ}
     (hN : Group.IsNilpotent ↥N) (hA : IsHallPart N A π)
     (hB : IsHallPart N B π) : A = B := by
-  haveI := hN
-  haveI : (A.subgroupOf N).Normal := hA.2.normal_of_isNilpotent
+  have := hN
+  have : (A.subgroupOf N).Normal := hA.2.normal_of_isNilpotent
   have hsub : A.subgroupOf N = B.subgroupOf N :=
     IsHallSubgroup.eq_of_normal hA.2 hB.2 inferInstance
   have := congrArg (Subgroup.map N.subtype) hsub
@@ -110,7 +110,7 @@ theorem IsHallPart.sup_eq [Finite G] {N A B : Subgroup G} {π : Set ℕ}
 theorem IsHallPart.commute [Finite G] {N A B : Subgroup G} {π : Set ℕ}
     (hN : Group.IsNilpotent ↥N) (hA : IsHallPart N A π)
     (hB : IsHallPart N B πᶜ) : ∀ x ∈ A, ∀ y ∈ B, Commute x y := by
-  haveI := hN
+  have := hN
   intro x hx y hy
   have hcomm := commute_of_isHallSubgroup_of_isHallSubgroup_compl (G := ↥N) hA.2 hB.2
     ⟨x, hA.1 hx⟩ (Subgroup.mem_subgroupOf.mpr hx) ⟨y, hB.1 hy⟩ (Subgroup.mem_subgroupOf.mpr hy)
@@ -176,8 +176,8 @@ theorem IsHallPart.map_conj [Finite G] {N A : Subgroup G} {π : Set ℕ}
 /-- 冪零部分群に含まれる部分群は冪零。 -/
 theorem isNilpotent_of_le {A N : Subgroup G} (hN : Group.IsNilpotent ↥N) (hAN : A ≤ N) :
     Group.IsNilpotent ↥A := by
-  haveI := hN
-  haveI : Group.IsNilpotent ↥(A.subgroupOf N) := inferInstance
+  have := hN
+  have : Group.IsNilpotent ↥(A.subgroupOf N) := inferInstance
   exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hAN)
 
 /-- 共役部分群の冪零性。 -/
@@ -202,7 +202,7 @@ theorem nilPiPart_eq [Finite G] {N A : Subgroup G} {π : Set ℕ}
     exact ⟨fun hB => IsHallPart.unique hN hB hA, fun hB => hB ▸ hA⟩
   rw [nilPiPart, hset, sSup_singleton]
 
-theorem isHallPart_nilPiPart [Finite G] {N : Subgroup G} [IsSolvable ↥N] (π : Set ℕ)
+theorem isHallPart_nilPiPart [Finite G] {N : Subgroup G} [Group.IsSolvable ↥N] (π : Set ℕ)
     (hN : Group.IsNilpotent ↥N) : IsHallPart N (nilPiPart N π) π := by
   obtain ⟨A, hA⟩ := exists_isHallPart N π
   rw [nilPiPart_eq hN hA]
@@ -212,11 +212,11 @@ theorem isHallPart_nilPiPart [Finite G] {N : Subgroup G} [IsSolvable ↥N] (π :
 
 `N` の `π`-部分は `↥N` の中で正規 Hall `π`-部分群なので、`π`-部分群をすべて含む
 (`isPiSubgroup_le_of_isHallSubgroup_of_le_normalizer`)。 -/
-theorem le_nilPiPart_of_isPiGroup [Finite G] {N A : Subgroup G} [IsSolvable ↥N] {π : Set ℕ}
+theorem le_nilPiPart_of_isPiGroup [Finite G] {N A : Subgroup G} [Group.IsSolvable ↥N] {π : Set ℕ}
     (hN : Group.IsNilpotent ↥N) (hAN : A ≤ N) (hA : Subgroup.IsPiGroup π A) :
     A ≤ nilPiPart N π := by
   have hpart := isHallPart_nilPiPart (N := N) π hN
-  haveI : ((nilPiPart N π).subgroupOf N).Normal := hpart.2.normal_of_isNilpotent
+  have : ((nilPiPart N π).subgroupOf N).Normal := hpart.2.normal_of_isNilpotent
   have hsub : A.subgroupOf N ≤ (nilPiPart N π).subgroupOf N := by
     refine isPiSubgroup_le_of_isHallSubgroup_of_le_normalizer hpart.2
       (Subgroup.IsPiGroup.subgroupOf hAN hA) ?_
@@ -227,20 +227,21 @@ theorem le_nilPiPart_of_isPiGroup [Finite G] {N A : Subgroup G} [IsSolvable ↥N
     (hsub (Subgroup.mem_subgroupOf.mpr hx))
 
 /-- `π`-部分は共役同変 (関数版)。 -/
-theorem nilPiPart_map_conj [Finite G] [IsSolvable G] {N : Subgroup G} [IsSolvable ↥N] (π : Set ℕ)
+theorem nilPiPart_map_conj [Finite G] [Group.IsSolvable G] {N : Subgroup G}
+    [Group.IsSolvable ↥N] (π : Set ℕ)
     (hN : Group.IsNilpotent ↥N) (g : G) :
     nilPiPart (N.map (MulAut.conj g).toMonoidHom) π
       = (nilPiPart N π).map (MulAut.conj g).toMonoidHom :=
   nilPiPart_eq (isNilpotent_map_conj hN g) ((isHallPart_nilPiPart π hN).map_conj g)
 
 /-- `π`-部分は自己同型同変 (関数版)。 -/
-theorem nilPiPart_map_mulAut [Finite G] {N : Subgroup G} [IsSolvable ↥N] (π : Set ℕ)
+theorem nilPiPart_map_mulAut [Finite G] {N : Subgroup G} [Group.IsSolvable ↥N] (π : Set ℕ)
     (hN : Group.IsNilpotent ↥N) (ψ : MulAut G) :
     nilPiPart (N.map ψ.toMonoidHom) π = (nilPiPart N π).map ψ.toMonoidHom :=
   nilPiPart_eq (isNilpotent_map_mulAut hN ψ) ((isHallPart_nilPiPart π hN).map_mulAut ψ)
 
 /-- 正規な冪零部分群の `π`-部分は正規 (一意性から共役不変)。 -/
-theorem nilPiPart_normal [Finite G] [IsSolvable G] {N : Subgroup G} [IsSolvable ↥N]
+theorem nilPiPart_normal [Finite G] [Group.IsSolvable G] {N : Subgroup G} [Group.IsSolvable ↥N]
     (hN : Group.IsNilpotent ↥N)
     [N.Normal] (π : Set ℕ) : (nilPiPart N π).Normal := by
   refine Subgroup.normal_iff_map_conj_eq.mpr fun g => ?_

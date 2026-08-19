@@ -49,14 +49,14 @@ theorem derivedInG_eq_Msigma_of_cyclic_complement [Finite G]
     derivedInG M = OddOrder.BG.Ch3.S10.Msigma M := by
   classical
   set Mσ' : Subgroup ↥M := (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M with hMσ'def
-  haveI hMσnorm : Mσ'.Normal := by
+  have hMσnorm : Mσ'.Normal := by
     rw [hMσ'def, OddOrder.BG.Ch3.S10.Msigma_subgroupOf]
     infer_instance
-  haveI : IsCyclic ↥(E.subgroupOf M) := isCyclic_of_surjective
+  have : IsCyclic ↥(E.subgroupOf M) := isCyclic_of_surjective
     (Subgroup.subgroupOfEquivOfLe hEM).symm.toMonoidHom
     (Subgroup.subgroupOfEquivOfLe hEM).symm.surjective
   -- The quotient `M/M_σ` is a surjective image of the cyclic complement.
-  haveI : IsCyclic (↥M ⧸ Mσ') := by
+  have : IsCyclic (↥M ⧸ Mσ') := by
     refine isCyclic_of_surjective
       ((QuotientGroup.mk' Mσ').comp (E.subgroupOf M).subtype) (fun q => ?_)
     obtain ⟨m, rfl⟩ := QuotientGroup.mk'_surjective Mσ' q
@@ -69,7 +69,7 @@ theorem derivedInG_eq_Msigma_of_cyclic_complement [Finite G]
       rw [← hprod, map_mul, hker, one_mul]
     exact h1.symm
   -- Cyclic quotient ⟹ abelian ⟹ `[M, M] ≤ M_σ`.
-  letI : CommGroup (↥M ⧸ Mσ') := IsCyclic.commGroup
+  let : CommGroup (↥M ⧸ Mσ') := IsCyclic.commGroup
   have hcomm : _root_.commutator ↥M ≤ Mσ' := by
     rw [_root_.commutator_def, Subgroup.commutator_le]
     intro a _ b _
@@ -99,14 +99,14 @@ theorem e5_exists_nonabelian_sylow_of_ii [Finite G]
       A.Normal ∧ IsMulCommutative ↥A ∧ A.index = p) :
     ∃ S : Sylow p G, ¬ IsMulCommutative (S : Subgroup G) := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨S, hSeq⟩ := e5_exists_sylow_eq_opiCore hG hM hp hpσ hMσnil
   refine ⟨S, fun habel => ?_⟩
   rw [hSeq] at habel
   -- `O_p(M)` abelian ⟹ `Ω₁(O_p(M))` abelian, and (ii) fails.
   apply hii
   set Ω : Subgroup ↥(opiCoreInG {p} M) := Omega ↥(opiCoreInG {p} M) p 1 with hΩdef
-  haveI hΩcomm : IsMulCommutative ↥Ω :=
+  have hΩcomm : IsMulCommutative ↥Ω :=
     ⟨⟨fun a b => Subtype.ext (habel.is_comm.comm
       (a : ↥(opiCoreInG {p} M)) (b : ↥(opiCoreInG {p} M)))⟩⟩
   have hpg : IsPGroup p ↥Ω := (isPGroup_opiCoreInG_singleton M).to_subgroup _
@@ -150,7 +150,7 @@ theorem le_opiCoreInG_singleton_of_isPGroup [Finite G]
     (hMσnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M))
     (hQM : Q ≤ M) (hQpg : IsPGroup p ↥Q) :
     Q ≤ opiCoreInG {p} M := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hnorm : ((opiCoreInG {p} M).subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer (opiCoreInG_le _ _)).mpr
       (OddOrder.GroupTheory.le_normalizer_opiCoreInG {p} M)
@@ -185,7 +185,7 @@ theorem e5_R_noncyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M) (hp2 : p ∈ tau2 N)
     (hMσnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M)) :
     ¬ IsCyclic ↥(opiCoreInG {p} M ⊓ N) := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨A, hA, hAE⟩ := exists_elemAb_rank_two_le_E_of_tau2 hG hsetup hp2
   obtain ⟨hAelem, hAcard⟩ := mem_elemAbelianOfRank.mp hA
   have hAMN : A ≤ M ⊓ N := hEmn ▸ hAE
@@ -196,8 +196,8 @@ theorem e5_R_noncyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hAR : A ≤ opiCoreInG {p} M ⊓ N := le_inf hAOp (hAMN.trans inf_le_right)
   intro hRcyc
   -- A cyclic `R` would make the rank-2 elementary abelian `A` cyclic.
-  haveI := hRcyc
-  haveI : IsCyclic ↥(A.subgroupOf (opiCoreInG {p} M ⊓ N)) := inferInstance
+  have := hRcyc
+  have : IsCyclic ↥(A.subgroupOf (opiCoreInG {p} M ⊓ N)) := inferInstance
   have hAcyc : IsCyclic ↥A := isCyclic_of_surjective
     (Subgroup.subgroupOfEquivOfLe hAR).toMonoidHom
     (Subgroup.subgroupOfEquivOfLe hAR).surjective
@@ -224,9 +224,9 @@ theorem normalizer_zpowers_le_of_centralizer_singleton [Finite G]
     rcases hG.simple.eq_bot_or_eq_top_of_normal _ hnorm with hbot | htop2
     · exact hx1 (Subgroup.mem_bot.mp (hbot ▸ Subgroup.mem_zpowers x))
     · refine hG.notSolvable ?_
-      haveI : IsCyclic G := ⟨⟨x, fun g =>
+      have : IsCyclic G := ⟨⟨x, fun g =>
         Subgroup.mem_zpowers_iff.mp (htop2 ▸ Subgroup.mem_top g)⟩⟩
-      letI : CommGroup G := IsCyclic.commGroup
+      let : CommGroup G := IsCyclic.commGroup
       infer_instance
   obtain ⟨L, hLco, hLle⟩ := (eq_top_or_exists_le_coatom _).resolve_left hne
   have hLmem : L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) :=
@@ -271,7 +271,7 @@ theorem e5_msigma_index_prime_of_ii_hdc [Finite G]
           (⊤ : Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) (n + 2)) :
     ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index.Prime := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hx1 : x ≠ 1 := fun h => hp.one_lt.ne' (by rw [← hord, h, orderOf_one])
   -- The `(E.29)` neighbour bundle.
   obtain ⟨hNmax, hP2N, hCN, hCNσx, hcompl, hptau2, hsingleton, K₁, U₁, hK₁MN, hU₁MN, hU₁ne,
@@ -282,7 +282,7 @@ theorem e5_msigma_index_prime_of_ii_hdc [Finite G]
   obtain ⟨hFM, -, -, E₀, hE₀M, hE₀compl, hE₀cyc, hE₀frob⟩ :=
     centralizer_escape_final_local hG hM hNmax ⟨hxM, hx1⟩ hesc hNmem hNnotF'
   -- `M_σ` nilpotent (Prop 16.1 taxonomy, type-`F` branch).
-  haveI hMσnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+  have hMσnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
     (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hM).mp
       (maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2 hG hM (Or.inl hFM))
   -- The primes: `p ∈ σ(M)`, `p ∈ (κ(N) ∪ σ(N))'`, `p` odd.
@@ -310,8 +310,8 @@ theorem e5_msigma_index_prime_of_ii_hdc [Finite G]
     rw [Set.mem_compl_iff, Set.mem_union] at hpκσN
     exact hpκσN (Or.inl (h ▸ hkκ))
   -- BG Theorem A(4): `C_{U₁}(c) = 1` for `c ∈ K₁^#`.
-  haveI : Fact (Nat.card ↥K₁).Prime := ⟨hkprime⟩
-  haveI : IsCyclic ↥K₁ := isCyclic_of_prime_card (p := Nat.card ↥K₁) rfl
+  have : Fact (Nat.card ↥K₁).Prime := ⟨hkprime⟩
+  have : IsCyclic ↥K₁ := isCyclic_of_prime_card (p := Nat.card ↥K₁) rfl
   have hCU₁ : ∀ c ∈ K₁, c ≠ 1 → U₁ ⊓ Subgroup.centralizer ({c} : Set G) = ⊥ :=
     OddOrder.BG.Ch4.S14.typeP_hall_inf_centralizer_kappaElement_eq_bot hG hNmax hP2N.1
       hK₁N hU₁N hK₁hallN rfl hU₁hallN
@@ -523,7 +523,7 @@ theorem maximalSubgroups_isTypeI_or_isTypeII [Finite G]
     ∀ L : Subgroup G, L ∈ maximalSubgroups G →
       OddOrder.GroupTheory.IsTypeI L ∨ OddOrder.GroupTheory.IsTypeII L := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hx1 : x ≠ 1 := fun h => hp.one_lt.ne' (by rw [← hord, h, orderOf_one])
   -- Shared data: the `(E.29)` neighbour bundle and the 15.9 Frobenius complement.
   obtain ⟨hNmax, hP2N, hCN, hCNσx, hcompl, hptau2, hsingleton, K₁, U₁, hK₁MN, hU₁MN, hU₁ne,
@@ -532,7 +532,7 @@ theorem maximalSubgroups_isTypeI_or_isTypeII [Finite G]
   have hNnotF' : ¬ OddOrder.BG.Ch4.S14.IsTypeF N := fun hF => hNnotF ⟨hNmax, hF⟩
   obtain ⟨hFM, -, -, E₀, hE₀M, hE₀compl, hE₀cyc, hE₀frob⟩ :=
     centralizer_escape_final_local hG hM hNmax ⟨hxM, hx1⟩ hesc hNmem hNnotF'
-  haveI hMσnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+  have hMσnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
     (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hM).mp
       (maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2 hG hM (Or.inl hFM))
   have hpκσN : p ∈ (kappa N ∪ OddOrder.BG.Ch3.S10.sigma N)ᶜ :=
@@ -553,8 +553,8 @@ theorem maximalSubgroups_isTypeI_or_isTypeII [Finite G]
     intro h
     rw [Set.mem_compl_iff, Set.mem_union] at hpκσN
     exact hpκσN (Or.inl (h ▸ hkκ))
-  haveI : Fact (Nat.card ↥K₁).Prime := ⟨hkprime⟩
-  haveI : IsCyclic ↥K₁ := isCyclic_of_prime_card (p := Nat.card ↥K₁) rfl
+  have : Fact (Nat.card ↥K₁).Prime := ⟨hkprime⟩
+  have : IsCyclic ↥K₁ := isCyclic_of_prime_card (p := Nat.card ↥K₁) rfl
   have hCU₁ : ∀ c ∈ K₁, c ≠ 1 → U₁ ⊓ Subgroup.centralizer ({c} : Set G) = ⊥ :=
     typeP_hall_inf_centralizer_kappaElement_eq_bot hG hNmax hP2N.1
       hK₁N hU₁N hK₁hallN rfl hU₁hallN
@@ -698,7 +698,7 @@ theorem maximalSubgroups_isTypeI_or_isTypeII [Finite G]
   -- Cardinal identities.
   have hNcard : Nat.card ↥N
       = Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma N) * Nat.card ↥(M ⊓ N) := by
-    have h := hcompl.card_mul
+    have h := hcompl.card_mul_card
     rw [Nat.card_congr
         (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch3.S10.Msigma_le N)).toEquiv,
       Nat.card_congr

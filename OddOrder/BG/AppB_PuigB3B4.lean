@@ -36,7 +36,7 @@ variable {G : Type*} [Group G]
 `L_{2n}(S) ⊆ L_{2n}(T) ⊆ L_{2n+1}(T) ⊆ L_{2n+1}(S)` (`T = O_p(G)`).
 偶段は Thm A.5(2) (`P = L_{2n+1}(T)`, `X = L_{2n+2}(S)`) で `L_{2n+2}(S) ⊆ T` を得て従う. -/
 private theorem b3_interleave [Finite G] {p : ℕ} [Fact p.Prime] (hp_odd : p ≠ 2)
-    (hsolv : IsSolvable G) (hodd : Odd (Nat.card G))
+    (hsolv : Group.IsSolvable G) (hodd : Odd (Nat.card G))
     (hOp' : oPiCore {q | q ≠ p} G = ⊥) (S : Sylow p G) :
     ∀ n, lNIn (S : Subgroup G) (2 * n) ≤ lNIn (opCore p G) (2 * n) ∧
       lNIn (opCore p G) (2 * n) ≤ lNIn (opCore p G) (2 * n + 1) ∧
@@ -55,9 +55,9 @@ private theorem b3_interleave [Finite G] {p : ℕ} [Fact p.Prime] (hp_odd : p �
   | succ n ih =>
       obtain ⟨_, _, hTS⟩ := ih
       -- Step 1 (A.5): L_{2n+2}(S) ⊆ T
-      haveI hP_char : (lNIn (opCore p G) (2 * n + 1)).Characteristic :=
+      have hP_char : (lNIn (opCore p G) (2 * n + 1)).Characteristic :=
         lNIn_characteristic_of_characteristic (opCore.characteristic p G) (2 * n + 1)
-      haveI hP_normal : (lNIn (opCore p G) (2 * n + 1)).Normal := inferInstance
+      have hP_normal : (lNIn (opCore p G) (2 * n + 1)).Normal := inferInstance
       have hP_pg : IsPGroup p ↥(lNIn (opCore p G) (2 * n + 1)) := hT_pg.to_le (lNIn_le_self _ _)
       have hX : lNIn (S : Subgroup G) (2 * n + 2) ≤ ⨆ A ∈ {A : Subgroup G | IsMulCommutative ↥A ∧
           IsPGroup p ↥A ∧ lNIn (opCore p G) (2 * n + 1) ≤ Subgroup.normalizer (A : Set G)}, A := by
@@ -92,7 +92,7 @@ private theorem b3_interleave [Finite G] {p : ℕ} [Fact p.Prime] (hp_odd : p �
 /-- **BG Lemma B.3** (mmd L4646): `p` odd, `G` solvable of odd order, `O_{p'}(G)=1`,
 `S ∈ Syl_p(G)`, `T = O_p(G)` ⇒ `L_*(S) ⊆ L_*(T) ⊆ L(T) ⊆ L(S)`. -/
 theorem b3_chain [Finite G] {p : ℕ} [Fact p.Prime] (hp_odd : p ≠ 2)
-    (hsolv : IsSolvable G) (hodd : Odd (Nat.card G))
+    (hsolv : Group.IsSolvable G) (hodd : Odd (Nat.card G))
     (hOp' : oPiCore {q | q ≠ p} G = ⊥) (S : Sylow p G) :
     lStarIn (S : Subgroup G) ≤ lStarIn (opCore p G) ∧
       lStarIn (opCore p G) ≤ lOddIn (opCore p G) ∧
@@ -158,7 +158,7 @@ theorem zCenterLOdd_isMulCommutative (H : Subgroup G) :
 `Z(L(S))` は `S` 内で `L(S) ⊇ L_*(S)` を中心化 ⇒ 相対 B.1(f) で `L_*(S)` に入り,
 B.3 で `L_*(S) ⊆ L_*(T) ⊆ L(T)`; かつ `L(T) ⊆ L(S)` ゆえ `L(T)` も中心化. -/
 theorem zCenterLOdd_sylow_le_zCenterLOdd_opCore [Finite G] {p : ℕ} [Fact p.Prime]
-    (hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd : Odd (Nat.card G))
+    (hp_odd : p ≠ 2) (hsolv : Group.IsSolvable G) (hodd : Odd (Nat.card G))
     (hOp' : oPiCore {q | q ≠ p} G = ⊥) (S : Sylow p G) :
     zCenterLOdd (S : Subgroup G) ≤ zCenterLOdd (opCore p G) := by
   obtain ⟨hSS, hST, hTS⟩ := b3_chain hp_odd hsolv hodd hOp' S
@@ -308,22 +308,22 @@ theorem normalInf_isSylow_coe {p : ℕ} [Fact p.Prime] [Finite G]
   `C_G(Y) ⊔ N_G(C∩S) = ⊤`.
 * **FINAL**: `⊤ = C_G(Y) ⊔ N_G(C∩S) ≤ N_G(Z(L(S)))` (左枝 `Z ⊆ Y`, 右枝 Step3 + center 同変). -/
 theorem zCenter_lOdd_normal_of_oPiCore_eq_bot [Finite G] {p : ℕ} [Fact p.Prime]
-    (hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd : Odd (Nat.card G))
+    (hp_odd : p ≠ 2) (hsolv : Group.IsSolvable G) (hodd : Odd (Nat.card G))
     (hOp' : oPiCore {q | q ≠ p} G = ⊥) (S : Sylow p G) :
     (zCenterLOdd (S : Subgroup G)).Normal := by
   -- Step 2: Z(L(S)) ⊆ Y = Z(L(T))
   have hZ_le_Y : zCenterLOdd (S : Subgroup G) ≤ zCenterLOdd (opCore p G) :=
     zCenterLOdd_sylow_le_zCenterLOdd_opCore hp_odd hsolv hodd hOp' S
   -- Y = Z(L(T)) は characteristic-of-characteristic ルートで正規
-  haveI hLT_char : (lOddIn (opCore p G)).Characteristic :=
+  have hLT_char : (lOddIn (opCore p G)).Characteristic :=
     lOddIn_characteristic_of_characteristic (opCore.characteristic p G)
-  haveI hLT_normal : (lOddIn (opCore p G)).Normal := inferInstance
-  haveI hY_normal : (zCenterLOdd (opCore p G)).Normal := by
+  have hLT_normal : (lOddIn (opCore p G)).Normal := inferInstance
+  have hY_normal : (zCenterLOdd (opCore p G)).Normal := by
     unfold zCenterLOdd; infer_instance
   set Y := zCenterLOdd (opCore p G) with hY_def
   -- C₀ = C_G(Y) は正規 (`centralizer` 頭で保持, set しない — A.5 出力の quotient instance 用)
-  haveI hC₀_normal : (Subgroup.centralizer (Y : Set G)).Normal := inferInstance
-  haveI hC_normal :
+  have hC₀_normal : (Subgroup.centralizer (Y : Set G)).Normal := inferInstance
+  have hC_normal :
       ((opCore p (G ⧸ Subgroup.centralizer (Y : Set G))).comap
         (QuotientGroup.mk' (Subgroup.centralizer (Y : Set G)))).Normal := inferInstance
   set C := (opCore p (G ⧸ Subgroup.centralizer (Y : Set G))).comap
@@ -362,7 +362,7 @@ theorem zCenter_lOdd_normal_of_oPiCore_eq_bot [Finite G] {p : ℕ} [Fact p.Prime
     have h := normalizer_le_normalizer_lOddIn CapS
     rwa [hLeq] at h
   -- === Step 4: Frattini + 吸収 ⟹ C₀ ⊔ N_G(C∩S) = ⊤ ===
-  haveI : Finite (Sylow p ↥C) := inferInstance
+  have : Finite (Sylow p ↥C) := inferInstance
   have hQcs_map : ((normalInf_isSylow (N := C) S : Sylow p ↥C) : Subgroup ↥C).map C.subtype
       = CapS := by
     rw [normalInf_isSylow_coe, Subgroup.subgroupOf_map_subtype, hCapS_def, inf_assoc, inf_idem,

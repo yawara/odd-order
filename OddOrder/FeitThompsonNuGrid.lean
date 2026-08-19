@@ -96,7 +96,7 @@ theorem colT_finNeg (i : Fin tp.q) :
   ext w
   simp only [Peterfalvi.S05.TICyclicHypothesis.omegaProdChar, MonoidHom.one_comp,
     MulEquiv.toMonoidHom_eq_coe, MonoidHom.coe_comp, MonoidHom.coe_coe, Subgroup.coe_subtype,
-    Function.comp_apply, MonoidHom.mul_apply, Peterfalvi.S05.TICyclicHypothesis.wFst_apply,
+    Function.comp_apply, MonoidHom.mul_apply,
     MonoidHom.one_apply, mul_one, MonoidHom.inv_apply, Units.val_inv_eq_inv_val]
   exact Units.val_inv_eq_inv_val _
 
@@ -143,6 +143,7 @@ theorem rowT_zero : rowT hG mp tp ⟨0, tp.p_prime.pos⟩ = 0 := by
     ((mp.certainTypeT hG).w1CharEquiv_zero).symm
 
 omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeS hG mp).W1)] in
+set_option backward.isDefEq.respectTransparency false in
 /-- The transported row enumeration intertwines `finNeg` with the certain-type `rowInv`. -/
 theorem rowT_finNeg_eq_rowInv (j : Fin tp.p) :
     rowT hG mp tp (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j)
@@ -159,6 +160,7 @@ noncomputable def omegaT (i : Fin tp.q) (j : Fin tp.p) : ClassFunction ↥tp.W �
     ((mp.certainTypeT hG).chiColumn (colT hG mp tp i) (rowT hG mp tp j) :
       ClassFunction ↥(mp.certainTypeT hG).sdiffTICyclicHypothesis.W ℂ)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The S- and T-side constructions give the same shared `ω`-grid. -/
 theorem omegaS_eq_omegaT (i : Fin tp.q) (j : Fin tp.p) :
     omegaS hG mp tp i j = omegaT hG mp tp i j := by
@@ -486,7 +488,7 @@ theorem nuT_diff_support (Tdata : TypePData mp.T) (_hU : Tdata.U = tp.V)
       OddOrder.Peterfalvi.S04.supportInSubgroup
         (OddOrder.Peterfalvi.S10.typePACore0 mp.T Tdata) mp.T := by
   classical
-  haveI : NeZero (Nat.card ↥(hyp46TmpCore hG mp tp Tdata hW1 hW2).W1) :=
+  have : NeZero (Nat.card ↥(hyp46TmpCore hG mp tp Tdata hW1 hW2).W1) :=
     inferInstanceAs (NeZero (Nat.card ↥(mp.certainTypeT hG).W1))
   have hχi : colT hG mp tp i ≠ 1 := by
     intro hc
@@ -525,13 +527,13 @@ theorem nuT_reducible_dichotomy {X : Subgroup ↥mp.T} {ψ : ClassFunction ↥mp
     ∃ i : Fin tp.q, i ≠ ⟨0, tp.q_prime.pos⟩ ∧
       ψ = ∑ j : Fin tp.p, nuT hG mp tp i j := by
   classical
-  haveI hcyc : IsCyclic ↥((mp.certainTypeT hG).W1 ⊔ (mp.certainTypeT hG).W2) :=
+  have hcyc : IsCyclic ↥((mp.certainTypeT hG).W1 ⊔ (mp.certainTypeT hG).W2) :=
     (mp.certainTypeT hG).isCyclic_sup
-  letI : CommGroup ↥((mp.certainTypeT hG).W1 ⊔ (mp.certainTypeT hG).W2) :=
+  let : CommGroup ↥((mp.certainTypeT hG).W1 ⊔ (mp.certainTypeT hG).W2) :=
     IsCyclic.commGroup
-  letI : Fintype ↥mp.T := Fintype.ofFinite _
-  letI : Fintype ↥(mp.certainTypeT hG).K := Fintype.ofFinite _
-  letI : Fintype ↥((mp.certainTypeT hG).W1 ⊔ (mp.certainTypeT hG).W2) :=
+  let : Fintype ↥mp.T := Fintype.ofFinite _
+  let : Fintype ↥(mp.certainTypeT hG).K := Fintype.ofFinite _
+  let : Fintype ↥((mp.certainTypeT hG).W1 ⊔ (mp.certainTypeT hG).W2) :=
     Fintype.ofFinite _
   obtain ⟨θ, hθne, hθker, rfl⟩ := hψ
   have hFk : ∀ i : Fin tp.q, (∑ j : Fin tp.p, nuT hG mp tp i j) =

@@ -103,38 +103,38 @@ theorem eq_principalBlock_of_inducedBlockOfCentralizer_eq_of_roots (hp : p.Prime
       = principalBlock πG hπG hlinG hnilG) :
     b = principalBlock πH hπH hlinH hnilH := by
   classical
-  haveI : Fintype ιG := Fintype.ofFinite _
-  haveI : Fintype ιH := Fintype.ofFinite _
-  haveI : Fintype (Block πG hπG hlinG) := Fintype.ofFinite _
-  haveI : Fintype (Block πH hπH hlinH) := Fintype.ofFinite _
+  have : Fintype ιG := Fintype.ofFinite _
+  have : Fintype ιH := Fintype.ofFinite _
+  have : Fintype (Block πG hπG hlinG) := Fintype.ofFinite _
+  have : Fintype (Block πH hπH hlinH) := Fintype.ofFinite _
   have hQ : IsPGroup p ↥(Subgroup.zpowers x) := isPGroup_zpowers_of_isPElement hx
   have hQH : Subgroup.zpowers x ≤ centralizerOf x := zpowers_le_centralizerOf x
   have hCH : Subgroup.centralizer ((Subgroup.zpowers x : Subgroup G) : Set G) ≤ centralizerOf x :=
     centralizer_zpowers_le_centralizerOf x
   -- the intermediate group `C = C_G(⟨x⟩)` and its instances
-  haveI : Fintype ↥(Subgroup.centralizer ((Subgroup.zpowers x : Subgroup G) : Set G)) :=
+  have : Fintype ↥(Subgroup.centralizer ((Subgroup.zpowers x : Subgroup G) : Set G)) :=
     Fintype.ofFinite _
-  haveI : Invertible
+  have : Invertible
       (Nat.card ↥(Subgroup.centralizer ((Subgroup.zpowers x : Subgroup G) : Set G)) : K) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : NeZero
+  have : NeZero
       (Nat.card ↥(Subgroup.centralizer ((Subgroup.zpowers x : Subgroup G) : Set G)) : K) :=
     ⟨Nat.cast_ne_zero.mpr Nat.card_pos.ne'⟩
   -- the ordinary splitting of `K[C]`
   obtain ⟨nC, dC, hdC, ⟨eC⟩⟩ := exists_algEquiv_pi_matrix_monoidAlgebra K
     ↥(Subgroup.centralizer ((Subgroup.zpowers x : Subgroup G) : Set G))
-  haveI : ∀ i, NeZero (dC i) := hdC
-  haveI : ∀ i, Nonempty (Fin (dC i)) := fun i => ⟨0⟩
+  have : ∀ i, NeZero (dC i) := hdC
+  have : ∀ i, Nonempty (Fin (dC i)) := fun i => ⟨0⟩
   -- the modular datum of `C`
   obtain ⟨ιC, hιC, nnC, hnnC, hdecC, hneC, πC, hπC, hlinC, hkerJC, hnilC⟩ :=
     GroupAlgebra.exists_modularDatum (ResidueField 𝒪)
       ↥(Subgroup.centralizer ((Subgroup.zpowers x : Subgroup G) : Set G))
-  letI := hιC
-  letI := hnnC
-  letI := hdecC
-  letI := hneC
-  haveI : Fintype ιC := Fintype.ofFinite _
-  haveI : Fintype (Block πC hπC hlinC) := Fintype.ofFinite _
+  let := hιC
+  let := hnnC
+  let := hdecC
+  let := hneC
+  have : Fintype ιC := Fintype.ofFinite _
+  have : Fintype (Block πC hπC hlinC) := Fintype.ofFinite _
   -- roots of unity for the three groups
   obtain ⟨ωG, hωG⟩ := hroot (pRegularExponent p G) (not_dvd_pRegularExponent hp)
     pRegularExponent_pos.ne'

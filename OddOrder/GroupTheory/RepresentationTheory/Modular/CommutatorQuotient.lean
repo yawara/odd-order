@@ -82,13 +82,13 @@ theorem mkQ_mem_span_range_out (x : MonoidAlgebra k G) :
     (commutatorSubmodule k G).mkQ x ∈ Submodule.span k (Set.range fun C : ConjClasses G =>
       (commutatorSubmodule k G).mkQ (single C.out (1 : k))) := by
   induction x using MonoidAlgebra.induction_on with
-  | hM a =>
+  | of a =>
     rw [MonoidAlgebra.of_apply, mkQ_single_eq_mkQ_single_out]
     exact Submodule.subset_span ⟨ConjClasses.mk a, rfl⟩
-  | hadd x y hx hy =>
+  | add x y hx hy =>
     rw [map_add]
     exact Submodule.add_mem _ hx hy
-  | hsmul c x hx =>
+  | smul c x hx =>
     rw [map_smul]
     exact Submodule.smul_mem _ _ hx
 

@@ -65,7 +65,7 @@ theorem conjugation_twice (n : ℕ) (x : Field n) :
     conjugation n (conjugation n x) = x := by
   change (FiniteField.Extension.frob (BaseField n) 2 2 ^ 2) x = x
   rw [FiniteField.Extension.frob_iterate_apply, ← FiniteField.natCard_extension]
-  letI : Fintype (Field n) := Fintype.ofFinite (Field n)
+  let : Fintype (Field n) := Fintype.ofFinite (Field n)
   simpa only [Nat.card_eq_fintype_card] using FiniteField.pow_card x
 
 noncomputable instance instStar (n : ℕ) : Star (Field n) where

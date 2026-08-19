@@ -52,10 +52,10 @@ theorem isSubnormal_le_fitting_of_isNilpotent :
   intro G _ _ H hcard hsub hnil
   classical
   rcases eq_or_ne H ⊤ with rfl | hne
-  · haveI := hnil
+  · have := hnil
     exact Ch01.nilpotent_normal_le_fitting
   obtain ⟨M, hMnormal, hHM, hMlt⟩ := hsub.exists_normal_and_le_and_lt_top_of_ne hne
-  haveI := hMnormal
+  have := hMnormal
   have hMcard : Nat.card ↥M < n := by
     subst hcard
     have hmul := Subgroup.card_mul_index M
@@ -188,7 +188,7 @@ theorem isNilpotent_of_subnormal_partition_aux :
       (isSubnormal_restrictPartition_parts P hH hsub)
   -- 段 2: `F(G) = ⊤` なら終わり
   by_cases hftop : Ch01.fitting G = ⊤
-  · haveI hfn : Group.IsNilpotent ↥(Ch01.fitting G) := Ch01.fitting.isNilpotent
+  · have hfn : Group.IsNilpotent ↥(Ch01.fitting G) := Ch01.fitting.isNilpotent
     rw [hftop] at hfn
     exact Group.nilpotent_of_surjective (G := ↥(⊤ : Subgroup G))
       Subgroup.topEquiv.toMonoidHom (fun x => ⟨⟨x, Subgroup.mem_top x⟩, rfl⟩)
@@ -219,9 +219,9 @@ theorem isNilpotent_of_subnormal_partition_aux :
         rw [this, le_bot_iff] at hXle
         exact P.nontrivial X hX hXle
       exact absurd (hXY ▸ hle : H ≤ X) (not_le_of_gt hXH)
-    haveI := step1 H hHtop hHY
+    have := step1 H hHtop hHY
     refine hXnil ?_
-    haveI : Group.IsNilpotent ↥(X.subgroupOf H) := inferInstance
+    have : Group.IsNilpotent ↥(X.subgroupOf H) := inferInstance
     exact Group.nilpotent_of_surjective (G := ↥(X.subgroupOf H))
       (Subgroup.subgroupOfEquivOfLe hXH.le).toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hXH.le).surjective
@@ -231,7 +231,7 @@ theorem isNilpotent_of_subnormal_partition_aux :
     rcases lt_or_eq_of_le hXM with hlt | heq
     · exact absurd (hmax M hlt) (ne_of_lt hMlt)
     · exact heq
-  haveI : X.Normal := hXM' ▸ hMn
+  have : X.Normal := hXM' ▸ hMn
   -- 段 4: 他の部分は `X` の補群ゆえ `F(G)` に入る
   have hother : ∀ Y ∈ P.parts, Y ≠ X → Y ≤ Ch01.fitting G := by
     intro Y hY hYX
@@ -263,9 +263,9 @@ theorem isNilpotent_of_subnormal_partition_aux :
       change x * t ∈ Subgroup.zpowers y
       rw [hx1, one_mul]
       exact ht
-    haveI : IsCyclic ↥Y := hYS ▸ Subgroup.isCyclic_zpowers y
-    letI : CommGroup ↥Y := IsCyclic.commGroup
-    haveI : Group.IsNilpotent ↥Y := inferInstance
+    have : IsCyclic ↥Y := hYS ▸ Subgroup.isCyclic_zpowers y
+    let : CommGroup ↥Y := IsCyclic.commGroup
+    have : Group.IsNilpotent ↥Y := inferInstance
     exact isSubnormal_le_fitting_of_isNilpotent (Nat.card G) Y rfl (hsub Y hY) inferInstance
   -- 段 5: `G = X ∪ F(G)` で矛盾
   exfalso

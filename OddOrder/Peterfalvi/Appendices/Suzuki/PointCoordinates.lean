@@ -65,7 +65,7 @@ noncomputable def quotientHMap (x : G ⧸ hyp.H) : Ω :=
 
 theorem quotientHMap_bijective : Function.Bijective hyp.quotientHMap := by
   have h2 := hyp.doubly_transitive
-  haveI : IsPretransitive G Ω := isPretransitive_of_is_two_pretransitive
+  have : IsPretransitive G Ω := isPretransitive_of_is_two_pretransitive
   constructor
   · intro x y hxy
     induction x using QuotientGroup.induction_on with

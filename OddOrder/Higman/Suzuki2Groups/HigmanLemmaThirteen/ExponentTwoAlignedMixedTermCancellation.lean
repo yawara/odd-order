@@ -223,15 +223,15 @@ theorem exists_aligned_common_factor_and_cancelled_pairwise_mixedTerms
       ∀ beta, M₁ a beta + M₂ b (t * beta) = 0 := by
   classical
   dsimp only
-  letI : IsMulCommutative (frattini J) :=
+  let : IsMulCommutative (frattini J) :=
     IsMulCommutative.of_comm hEAJ.comm
-  letI : CommGroup (frattini J) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini J)) :=
+  let : CommGroup (frattini J) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini J)) :=
     hEAJ.zmodModule
-  letI : IsMulCommutative (frattini K) :=
+  let : IsMulCommutative (frattini K) :=
     IsMulCommutative.of_comm hEAK.comm
-  letI : CommGroup (frattini K) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini K)) :=
+  let : CommGroup (frattini K) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini K)) :=
     hEAK.zmodModule
   intro hCommonJ hCommonK
     hK1J htermJ hSqJ hAgemoJ hK0J

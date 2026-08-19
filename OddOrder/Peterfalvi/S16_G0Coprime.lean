@@ -58,8 +58,8 @@ theorem not_mem_conjClassSet_sharp_W [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     (hQ : g ∉ conjClassSet (sharpSubgroup hyp.Q)) :
     g ∉ conjClassSet (sharpSubgroup hyp.W) := by
   rintro ⟨w, ⟨hwW, hwne⟩, y, rfl⟩
-  letI := hyp.W_cyclic
-  letI : CommGroup ↥hyp.W := IsCyclic.commGroup
+  let := hyp.W_cyclic
+  let : CommGroup ↥hyp.W := IsCyclic.commGroup
   have hW1le : hyp.W1 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_left
   have hW2le : hyp.W2 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_right
   -- decompose `w = x · z` with `x ∈ W₁`, `z ∈ W₂` inside the commutative `W`
@@ -192,7 +192,7 @@ theorem coprime_q_card_derivedS [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
     Nat.Coprime hyp.q (Nat.card ↥(derivedInG hyp.S)) := by
   have hcard : Nat.card ↥(derivedInG hyp.S)
       = Nat.card ↥hyp.Sdata.H * Nat.card ↥hyp.Sdata.U := by
-    have hmul := hyp.Sdata.derived_complement.card_mul
+    have hmul := hyp.Sdata.derived_complement.card_mul_card
     rw [← hmul,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Sdata.H_le).toEquiv,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Sdata.U_le).toEquiv]
@@ -245,13 +245,13 @@ theorem card_S_eq_pow_mul [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     Nat.card ↥hyp.S = hyp.p ^ hyp.q * (Nat.card ↥hyp.Sdata.U * hyp.q) := by
   have hS' : Nat.card ↥(derivedInG hyp.S)
       = Nat.card ↥hyp.Sdata.H * Nat.card ↥hyp.Sdata.U := by
-    have hmul := hyp.Sdata.derived_complement.card_mul
+    have hmul := hyp.Sdata.derived_complement.card_mul_card
     rw [← hmul,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Sdata.H_le).toEquiv,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Sdata.U_le).toEquiv]
   have hS : Nat.card ↥hyp.S = Nat.card ↥(derivedInG hyp.S) * hyp.q := by
     have hDle : derivedInG hyp.S ≤ hyp.S := Subgroup.map_subtype_le _
-    have hmul := hyp.Sdata.M_complement.card_mul
+    have hmul := hyp.Sdata.M_complement.card_mul_card
     have h1 : Nat.card ↥((derivedInG hyp.S).subgroupOf hyp.S)
         = Nat.card ↥(derivedInG hyp.S) :=
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hDle).toEquiv
@@ -272,7 +272,7 @@ theorem exists_sylow_coe_eq_P [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
     haveI : Fact hyp.p.Prime := ⟨hyp.p_prime⟩
     ∃ S₀ : Sylow hyp.p G, (S₀ : Subgroup G) = hyp.P := by
-  haveI : Fact hyp.p.Prime := ⟨hyp.p_prime⟩
+  have : Fact hyp.p.Prime := ⟨hyp.p_prime⟩
   have hPle : hyp.P ≤ hyp.S := by
     rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le _
   have hPcard : Nat.card ↥hyp.P = hyp.p ^ hyp.q := hyp.card_P_eq hG hyp.Sdata_W2_eq
@@ -314,7 +314,7 @@ in some Sylow, and Sylow conjugacy moves that Sylow onto `P`. -/
 theorem exists_conj_mem_P_of_orderOf_eq_p [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) {a : G}
     (ha : orderOf a = hyp.p) : ∃ y : G, y * a * y⁻¹ ∈ hyp.P := by
-  haveI : Fact hyp.p.Prime := ⟨hyp.p_prime⟩
+  have : Fact hyp.p.Prime := ⟨hyp.p_prime⟩
   obtain ⟨S₀, hS₀⟩ := exists_sylow_coe_eq_P hG hyp
   have hA : IsPGroup hyp.p ↥(Subgroup.zpowers a) :=
     IsPGroup.of_card (by rw [Nat.card_zpowers, ha, pow_one])
@@ -375,7 +375,7 @@ theorem FieldNormalizerData.derived_inf_centralizer_le_P
     {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
     {x : G} (hx : x ∈ sharpSubgroup hyp.base.P) :
     derivedInG hyp.base.S ⊓ Subgroup.centralizer ({x} : Set G) ≤ hyp.base.P := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   rintro g' ⟨hg'S', hg'cent⟩
   -- `S' = P ⊔ U` is the image of `kernel ⊔ complement` under `σ`
   have hg'mem : g' ∈ (fnKernel hyp ⊔ fnComplement hyp).map
@@ -542,7 +542,7 @@ theorem coprime_p_card_derivedT [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
     OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp
   have hcard : Nat.card ↥(derivedInG hyp.T)
       = Nat.card ↥tpd.H * Nat.card ↥tpd.U := by
-    have hmul := tpd.derived_complement.card_mul
+    have hmul := tpd.derived_complement.card_mul_card
     rw [← hmul,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe tpd.H_le).toEquiv,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe tpd.U_le).toEquiv]
@@ -577,7 +577,7 @@ theorem exists_sylow_coe_eq_Q [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) (hTII : IsTypeII hyp.T) :
     haveI : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
     ∃ S₀ : Sylow hyp.q G, (S₀ : Subgroup G) = hyp.Q := by
-  haveI : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
+  have : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
   have hQle : hyp.Q ≤ hyp.T := by
     rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le _
   have hQcard : Nat.card ↥hyp.Q = hyp.q ^ hyp.p :=
@@ -623,7 +623,7 @@ theorem exists_sylow_coe_eq_Q [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 theorem exists_conj_mem_Q_of_orderOf_eq_q [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) (hTII : IsTypeII hyp.T) {a : G}
     (ha : orderOf a = hyp.q) : ∃ y : G, y * a * y⁻¹ ∈ hyp.Q := by
-  haveI : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
+  have : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
   obtain ⟨S₀, hS₀⟩ := exists_sylow_coe_eq_Q hG hyp hTII
   have hA : IsPGroup hyp.q ↥(Subgroup.zpowers a) :=
     IsPGroup.of_card (by rw [Nat.card_zpowers, ha, pow_one])
@@ -820,7 +820,7 @@ theorem TFieldModelData.derived_inf_centralizer_le_Q [Finite G]
     {hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)} (data : TFieldModelData hyp)
     {x : G} (hx : x ∈ sharpSubgroup hyp.Q) :
     derivedInG hyp.T ⊓ Subgroup.centralizer ({x} : Set G) ≤ hyp.Q := by
-  letI : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
+  let : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
   rintro g' ⟨hg'T', hg'cent⟩
   -- `T' = Q ⊔ V` is the image of `kernel ⊔ complement` under `σ`
   have hg'mem : g' ∈ (tFieldKernel hyp ⊔ tFieldComplement hyp).map data.sigma := by
@@ -879,7 +879,7 @@ theorem tFieldModelData_of_repr (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := 
              = ((μ v : (GaloisField hyp.q hyp.p)ˣ) : GaloisField hyp.q hyp.p) *
                  e (Additive.ofMul x)) :
     Nonempty (TFieldModelData hyp) := by
-  letI : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
+  let : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
   have hcompatLift :=
     OddOrder.RepresentationTheory.SemilinearFieldModel.hcompatLift_of_equivariant
       e μ hμ_inj hμ_range hVQ hcompat

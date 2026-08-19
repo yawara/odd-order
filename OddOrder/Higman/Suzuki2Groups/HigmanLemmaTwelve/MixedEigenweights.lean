@@ -120,10 +120,10 @@ theorem ambientLayerOneLinearEquivFrattini_equivariant
   dsimp only
   let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
     IsAInvariant.of_characteristic Y.subtype
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : CommGroup ↑(frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+  let : CommGroup ↑(frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive ↑(frattini P)) :=
     hEA.zmodModule
   intro g v
   change ambientLayerOneLinearEquivFrattini hEA hK1 hterm
@@ -191,9 +191,9 @@ theorem ambientCenterCoordinate_compat {Y : Subgroup (MulAut P)} {n : ℕ}
       nu * ambientCenterCoordinate hEA hK1 hterm ePhi v := by
   let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
     IsAInvariant.of_characteristic Y.subtype
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   have hcompatPhi : ∀ w,
       ePhi (elabRepresentation 2 hPhiInv.restrict c w) = nu * ePhi w := by
     intro w
@@ -557,9 +557,9 @@ theorem exists_factorFamily_of_commutative [Finite P]
       (∀ x : lowerCentralTerm P 0, (x : P) ∈ S →
         (1 : GaloisField 2 n) ⊗ₜ[ZMod 2] layerZeroClass x ∈
           Submodule.span (GaloisField 2 n) (Set.range family)) := by
-  letI : CommGroup ↥S :=
+  let : CommGroup ↥S :=
     { (inferInstance : Group ↥S) with mul_comm := data.hcomm.is_comm.comm }
-  letI : IsMulCommutative (↥S ⧸ Agemo (↥S) 2 1) :=
+  let : IsMulCommutative (↥S ⧸ Agemo (↥S) 2 1) :=
     IsMulCommutative.of_comm mul_comm
   have h2 : ∀ q : Additive (↥S ⧸ Agemo (↥S) 2 1), 2 • q = 0 := by
     intro q
@@ -568,7 +568,7 @@ theorem exists_factorFamily_of_commutative [Finite P]
     obtain ⟨x, hx⟩ := QuotientGroup.mk_surjective (Additive.toMul q)
     rw [← hx, ← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
     simpa using Agemo.mem_of_eq_pow (G := ↥S) (p := 2) (n := 1) x
-  letI : Module (ZMod 2) (Additive (↥S ⧸ Agemo (↥S) 2 1)) :=
+  let : Module (ZMod 2) (Additive (↥S ⧸ Agemo (↥S) 2 1)) :=
     AddCommGroup.zmodModule h2
   let eQuotLin : Additive (↥S ⧸ Agemo (↥S) 2 1) ≃ₗ[ZMod 2] GaloisField 2 n :=
     { data.eQuot with
@@ -671,9 +671,9 @@ theorem exists_mixedFrobeniusWeightEquation_of_xiLengthThree
   have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
     frattini_isElementaryAbelian_of_xiLengthThree
       hP hncomm hmulti hxi hlen hprime
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+  let : Module (ZMod 2) (Additive ↑(frattini P)) :=
     hEA.zmodModule
   set n := Module.finrank (ZMod 2) (Additive ↑(frattini P)) with hn
   obtain ⟨factors, c, ePhi, nu, left, right,

@@ -47,7 +47,7 @@ variable (ρ : Representation k G V)
 
 /-- `ρ g` as a `k`-linear automorphism of `V`. -/
 noncomputable def repEquiv (g : G) : V ≃ₗ[k] V :=
-  LinearEquiv.ofLinear (ρ g) (ρ g⁻¹)
+  LinearEquiv.ofLinearMap (ρ g) (ρ g⁻¹)
     (by rw [← Module.End.mul_eq_comp, ← map_mul, mul_inv_cancel, map_one, Module.End.one_eq_id])
     (by rw [← Module.End.mul_eq_comp, ← map_mul, inv_mul_cancel, map_one, Module.End.one_eq_id])
 
@@ -248,8 +248,8 @@ theorem character_subRep_conj_eq [IsAlgClosed k] [FiniteDimensional k V] [IsSimp
     ((Subrepresentation.ofSubmodule'
         (W.map (conjSemilinearEnd (H := H) ρ g))).toRepresentation).character
       = ((Subrepresentation.ofSubmodule' W).toRepresentation).character := by
-  haveI := subRep_isIrreducible (resRep ρ H) W
-  haveI : FiniteDimensional k ↥((Subrepresentation.ofSubmodule' W).toSubmodule) := inferInstance
+  have := subRep_isIrreducible (resRep ρ H) W
+  have : FiniteDimensional k ↥((Subrepresentation.ofSubmodule' W).toSubmodule) := inferInstance
   funext h
   rw [character_subRep_conj]
   by_cases hmem : h ∈ Subgroup.center ↥H
@@ -270,11 +270,11 @@ theorem submodule_iso_of_character_eq [IsAlgClosed k] [FiniteDimensional k V] [F
           (W.map (conjSemilinearEnd (H := H) ρ g))).toRepresentation).character
         = ((Subrepresentation.ofSubmodule' W).toRepresentation).character) :
     Nonempty (↥W ≃ₗ[k[↥H]] ↥(W.map (conjSemilinearEnd (H := H) ρ g))) := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
-  haveI : IsSimpleModule k[↥H] ↥(W.map (conjSemilinearEnd (H := H) ρ g)) :=
+  have : Fintype ↥H := Fintype.ofFinite _
+  have : IsSimpleModule k[↥H] ↥(W.map (conjSemilinearEnd (H := H) ρ g)) :=
     isSimpleModule_map_conjSemilinearEnd ρ g W
-  haveI := subRep_isIrreducible (resRep ρ H) W
-  haveI := subRep_isIrreducible (resRep ρ H) (W.map (conjSemilinearEnd (H := H) ρ g))
+  have := subRep_isIrreducible (resRep ρ H) W
+  have := subRep_isIrreducible (resRep ρ H) (W.map (conjSemilinearEnd (H := H) ρ g))
   have h2 : (Nat.card ↥H : k)⁻¹ * ∑ h : ↥H,
       ((Subrepresentation.ofSubmodule' W).toRepresentation).character h
         * ((Subrepresentation.ofSubmodule' W).toRepresentation).character h⁻¹ = 1 := by
@@ -320,10 +320,10 @@ prime, the corresponding subgroup of
 theorem extraspecial_center_le_of_normal_ne_bot {p : ℕ} [Fact p.Prime] {P : Type*} [Group P]
     [Finite P] (h : OddOrder.GroupTheory.IsExtraspecial p P) {N : Subgroup P} [N.Normal]
     (hN : N ≠ ⊥) : Subgroup.center P ≤ N := by
-  haveI hNnt : Nontrivial N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN
+  have hNnt : Nontrivial N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN
   have hinf : Nontrivial ↥(N ⊓ Subgroup.center P) :=
     OddOrder.Isaacs.Ch01.IsPGroup.normal_inf_center_nontrivial h.isPGroup hNnt
-  haveI : Fact (Nat.card ↥(Subgroup.center P)).Prime := ⟨h.center_card.symm ▸ Fact.out⟩
+  have : Fact (Nat.card ↥(Subgroup.center P)).Prime := ⟨h.center_card.symm ▸ Fact.out⟩
   rcases (N.subgroupOf (Subgroup.center P)).eq_bot_or_eq_top_of_prime_card with hbot | htop
   · exfalso
     rw [Subgroup.subgroupOf_eq_bot, disjoint_iff] at hbot
@@ -352,7 +352,7 @@ theorem extraspecial_constituent_faithful {p : ℕ} [Fact p.Prime] [ρ.IsIrreduc
   by_contra hne
   have hZker : Subgroup.center ↥H ≤ (Subrepresentation.ofSubmodule' W).toRepresentation.ker :=
     extraspecial_center_le_of_normal_ne_bot hPe hne
-  haveI : Nontrivial ↥(Subgroup.center ↥H) := by
+  have : Nontrivial ↥(Subgroup.center ↥H) := by
     rw [← Finite.one_lt_card_iff_nontrivial, hPe.center_card]; exact (Fact.out : p.Prime).one_lt
   obtain ⟨c, hc⟩ := exists_ne (1 : ↥(Subgroup.center ↥H))
   set z₀ : ↥H := (c : ↥H) with hz₀def
@@ -405,18 +405,18 @@ theorem restriction_isIrreducible_of_faithful_constituents [ρ.IsIrreducible] [I
     (hf : ∀ W : Submodule k[↥H] (resRep ρ H).asModule, W ≠ ⊥ → IsSimpleModule k[↥H] ↥W →
         Function.Injective ((Subrepresentation.ofSubmodule' W).toRepresentation)) :
     (resRep ρ H).IsIrreducible := by
-  haveI : NeZero (Nat.card ↥H : k) := inferInstance
-  haveI : Module.Finite k (resRep ρ H).asModule := inferInstance
-  haveI : Module.Finite k[↥H] (resRep ρ H).asModule :=
+  have : NeZero (Nat.card ↥H : k) := inferInstance
+  have : Module.Finite k (resRep ρ H).asModule := inferInstance
+  have : Module.Finite k[↥H] (resRep ρ H).asModule :=
     Module.Finite.of_restrictScalars_finite k k[↥H] (resRep ρ H).asModule
-  haveI : IsSemisimpleModule k[↥H] (resRep ρ H).asModule := by
+  have : IsSemisimpleModule k[↥H] (resRep ρ H).asModule := by
     rw [← isSemisimpleRepresentation_iff_isSemisimpleModule_asModule]; infer_instance
-  haveI : Nontrivial (resRep ρ H).asModule := ‹Nontrivial V›
+  have : Nontrivial (resRep ρ H).asModule := ‹Nontrivial V›
   obtain ⟨W, hWs⟩ := IsSemisimpleModule.exists_simple_submodule k[↥H] (resRep ρ H).asModule
-  haveI := hWs
+  have := hWs
   have hWne : W ≠ ⊥ := by
     rintro rfl
-    haveI : Nontrivial ↥(⊥ : Submodule k[↥H] (resRep ρ H).asModule) :=
+    have : Nontrivial ↥(⊥ : Submodule k[↥H] (resRep ρ H).asModule) :=
       IsSimpleModule.nontrivial k[↥H] _
     exact false_of_nontrivial_of_subsingleton ↥(⊥ : Submodule k[↥H] (resRep ρ H).asModule)
   exact restriction_isIrreducible ρ x hgen W hWne (fun g =>
@@ -439,7 +439,7 @@ theorem restriction_isIrreducible_of_extraspecial {p : ℕ} [Fact p.Prime] [ρ.I
     (resRep ρ H).IsIrreducible :=
   restriction_isIrreducible_of_faithful_constituents ρ x hgen hPe.commutator_eq_center.le hxZ
     (fun W hWne hWs => by
-      haveI := hWs; exact extraspecial_constituent_faithful ρ hρf hPe W hWne)
+      have := hWs; exact extraspecial_constituent_faithful ρ hρf hPe W hWne)
 
 end Materialize
 

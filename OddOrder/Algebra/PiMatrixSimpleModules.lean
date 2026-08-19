@@ -52,8 +52,8 @@ theorem piNaturalModule_smul (i : ι) (r : ∀ j, Matrix (nn j) (nn j) k) (v : n
 theorem isSimpleModule_piNatural [∀ i, Nonempty (nn i)] (i : ι) :
     letI := piNaturalModule k nn i
     IsSimpleModule (∀ j, Matrix (nn j) (nn j) k) (nn i → k) := by
-  letI := piNaturalModule k nn i
-  haveI : RingHomSurjective (Pi.evalRingHom (fun j => Matrix (nn j) (nn j) k) i) :=
+  let := piNaturalModule k nn i
+  have : RingHomSurjective (Pi.evalRingHom (fun j => Matrix (nn j) (nn j) k) i) :=
     ⟨PiModule.surjective_evalRingHom i⟩
   let l : (nn i → k) →ₛₗ[Pi.evalRingHom (fun j => Matrix (nn j) (nn j) k) i] (nn i → k) :=
     { toFun := id
@@ -65,7 +65,7 @@ theorem isSimpleModule_piNatural [∀ i, Nonempty (nn i)] (i : ι) :
 theorem idem_smul_piNatural [DecidableEq ι] (i : ι) (v : nn i → k) :
     letI := piNaturalModule k nn i
     PiModule.idem (fun j => Matrix (nn j) (nn j) k) i • v = v := by
-  letI := piNaturalModule k nn i
+  let := piNaturalModule k nn i
   rw [piNaturalModule_smul]
   simp [PiModule.idem]
 
@@ -77,8 +77,8 @@ theorem nonempty_linearEquiv_natural_of_idem [DecidableEq ι] [∀ i, Nonempty (
     (hi : ∀ s : M, PiModule.idem (fun j => Matrix (nn j) (nn j) k) i • s = s) :
     letI := PiModule.factorModule M hi
     Nonempty (M ≃ₗ[Matrix (nn i) (nn i) k] (nn i → k)) := by
-  letI := PiModule.factorModule M hi
-  haveI : IsSimpleModule (Matrix (nn i) (nn i) k) M :=
+  let := PiModule.factorModule M hi
+  have : IsSimpleModule (Matrix (nn i) (nn i) k) M :=
     PiModule.isSimpleModule_factor hi fun _ _ => rfl
   exact linearEquiv_natural_of_isSimpleModule M
 
@@ -109,7 +109,7 @@ theorem isScalarTower_blockModule [Algebra k A] {π : A →+* ∀ j, Matrix (nn 
     (hπ : ∀ (c : k) (a : A), π (c • a) = c • π a) (i : ι) :
     letI := blockModule nn π i
     IsScalarTower k A (nn i → k) := by
-  letI := blockModule nn π i
+  let := blockModule nn π i
   refine ⟨fun c a v => ?_⟩
   change π (c • a) i *ᵥ v = c • (π a i *ᵥ v)
   rw [hπ, Pi.smul_apply, Matrix.smul_mulVec]
@@ -119,8 +119,8 @@ theorem isSimpleModule_blockModule [∀ i, Nonempty (nn i)]
     {π : A →+* ∀ j, Matrix (nn j) (nn j) k} (hπ : Function.Surjective π) (i : ι) :
     letI := blockModule nn π i
     IsSimpleModule A (nn i → k) := by
-  letI := piNaturalModule k nn i
-  haveI := isSimpleModule_piNatural (k := k) (nn := nn) i
+  let := piNaturalModule k nn i
+  have := isSimpleModule_piNatural (k := k) (nn := nn) i
   exact isSimpleModule_compHom π hπ
 
 /-- **Every simple module is a block.**  Combined with `isSimpleModule_blockModule` and the
@@ -133,15 +133,15 @@ theorem exists_linearEquiv_blockModule [Finite ι] [∀ i, Nonempty (nn i)]
     ∃ i : ι, letI := blockModule nn π i
       Nonempty (M ≃ₗ[A] (nn i → k)) := by
   classical
-  letI := moduleOfSurjective π hπ h
-  haveI := isSimpleModule_of_surjective π hπ h
+  let := moduleOfSurjective π hπ h
+  have := isSimpleModule_of_surjective π hπ h
   obtain ⟨i, hi, -⟩ := PiModule.exists_unique_idem_smul_eq_self
     (R := fun j => Matrix (nn j) (nn j) k) (M := M)
-  letI := PiModule.factorModule M hi
-  haveI : IsSimpleModule (Matrix (nn i) (nn i) k) M :=
+  let := PiModule.factorModule M hi
+  have : IsSimpleModule (Matrix (nn i) (nn i) k) M :=
     PiModule.isSimpleModule_factor hi fun _ _ => rfl
   obtain ⟨e⟩ := linearEquiv_natural_of_isSimpleModule (k := k) (n := nn i) M
-  letI := blockModule nn π i
+  let := blockModule nn π i
   have hsmul : ∀ (a : A) (m : M), e (a • m) = a • e m := by
     intro a m
     have hfac : a • m = (π a i) • m := by

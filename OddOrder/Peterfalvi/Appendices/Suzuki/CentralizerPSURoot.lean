@@ -145,7 +145,7 @@ theorem centralizerQuotientQ_isSuzuki2Group_of_psu3Target
     letI := hyp.centralizerQuotientMulAction hXV
     let qhyp := hyp.centralizerQuotientHypothesis hXV hA3
     IsSuzuki2Group qhyp.Q := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   let qhyp := hyp.centralizerQuotientHypothesis hXV hA3
   exact qhyp.q_isSuzuki2Group_of_psu3Target result.L result.normal
     result.oddIndex data
@@ -167,7 +167,7 @@ theorem natCard_centralizerQuotientQ_eq_baseField_cube_of_psu3Target
     letI := hyp.centralizerQuotientMulAction hXV
     let qhyp := hyp.centralizerQuotientHypothesis hXV hA3
     Nat.card qhyp.Q = Nat.card (BaseField data.n) ^ 3 := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   let qhyp := hyp.centralizerQuotientHypothesis hXV hA3
   exact qhyp.natCard_Q_eq_baseField_cube_of_psu3Target result.L result.normal
     result.oddIndex data
@@ -209,7 +209,7 @@ theorem centralizerCQ_isSuzuki2Group_of_psu3Target
         result.L) :
     IsSuzuki2Group
       ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))) := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   exact OddOrder.GroupTheory.SpecificGroups.Suzuki.IsSuzuki2Group.of_equiv
     (RootGroup.isSuzuki2Group data.n data.one_lt_n)
       (hyp.centralizerCQMulEquivPSURoot hXV hA3 result data).symm
@@ -231,7 +231,7 @@ theorem natCard_centralizerCQ_eq_baseField_cube_of_psu3Target
     letI := hyp.centralizerQuotientMulAction hXV
     Nat.card ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))) =
       Nat.card (BaseField data.n) ^ 3 := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   have hn0 : 0 < data.n := Nat.zero_lt_one.trans data.one_lt_n
   calc
     Nat.card ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))) =
@@ -317,7 +317,7 @@ theorem natCard_centralizerQ0_eq_baseField_of_psu3Target
     letI := hyp.centralizerQuotientMulAction hXV
     Nat.card ↥(hyp.Q0.subgroupOf (Subgroup.centralizer (X : Set G))) =
       Nat.card (BaseField data.n) := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   have hn0 : 0 < data.n := Nat.zero_lt_one.trans data.one_lt_n
   calc
     Nat.card ↥(hyp.Q0.subgroupOf (Subgroup.centralizer (X : Set G))) =
@@ -345,7 +345,7 @@ theorem natCard_centralizerCQ_eq_centralizerQ0_cube_of_psu3Target
         result.L) :
     Nat.card ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))) =
       Nat.card ↥(hyp.Q0.subgroupOf (Subgroup.centralizer (X : Set G))) ^ 3 := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   rw [hyp.natCard_centralizerCQ_eq_baseField_cube_of_psu3Target
       hXV hA3 result data,
     hyp.natCard_centralizerQ0_eq_baseField_of_psu3Target

@@ -25,7 +25,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 3C.6 の形式化
 `o(ȳ) = o(z̄)` となり, 互いに素性から両方 1, つまり `y, z ∈ ⁅G,G⁆`。
 
 あとは `⁅G,G⁆` へ降りて帰納する。`G` が非自明可解なら `⁅G,G⁆ < ⊤`
-(`IsSolvable.commutator_lt_top_of_nontrivial`) なので `|⁅G,G⁆| < |G|`。書籍の
+(`Group.IsSolvable.commutator_lt_top_of_nontrivial`) なので `|⁅G,G⁆| < |G|`。書籍の
 「導来長に関する帰納」を **`|G|` に関する強帰納**で実装している (導来列が真に減ることを
 位数で測るだけなので同値)。
 
@@ -85,7 +85,7 @@ theorem mem_commutator_of_mul_eq_one_of_coprime_orders {G : Type u} [Group G] {x
   exact ⟨hmem x hfx1, hmem y hfy1, hmem z hfz1⟩
 
 /-- 3C.6 の帰納本体: `|G| ≤ n` に関する帰納。1 段ごとに `⁅G,G⁆` へ降りる。 -/
-private theorem eq_one_aux : ∀ (n : ℕ) {G : Type u} [Group G] [Finite G] [IsSolvable G]
+private theorem eq_one_aux : ∀ (n : ℕ) {G : Type u} [Group G] [Finite G] [Group.IsSolvable G]
     (x y z : G), Nat.card G ≤ n →
     Nat.Coprime (orderOf x) (orderOf y) → Nat.Coprime (orderOf x) (orderOf z) →
     Nat.Coprime (orderOf y) (orderOf z) → x * y * z = 1 → x = 1 ∧ y = 1 ∧ z = 1 := by
@@ -100,7 +100,7 @@ private theorem eq_one_aux : ∀ (n : ℕ) {G : Type u} [Group G] [Finite G] [Is
     · exact ⟨Subsingleton.elim _ _, Subsingleton.elim _ _, Subsingleton.elim _ _⟩
     · obtain ⟨hx, hy, hz⟩ := mem_commutator_of_mul_eq_one_of_coprime_orders hxy hxz hyz h
       -- `G` 非自明可解 ⟹ `⁅G,G⁆ < ⊤` ⟹ `|⁅G,G⁆| < |G| ≤ n+1`
-      have hlt : commutator G < ⊤ := IsSolvable.commutator_lt_top_of_nontrivial G
+      have hlt : commutator G < ⊤ := Group.IsSolvable.commutator_lt_top_of_nontrivial G
       obtain ⟨g, hg⟩ : ∃ g : G, g ∉ commutator G := by
         by_contra hcon
         push Not at hcon
@@ -122,8 +122,8 @@ private theorem eq_one_aux : ∀ (n : ℕ) {G : Type u} [Group G] [Finite G] [Is
 ⚠ 可解性は本質的: `A₅` は位数 2 の `a` と位数 3 の `b` で `ab` が位数 5 になるものをもつ
 ((2,3,5) 三角群としての表示; 例 `a = (1 2)(3 4)`, `b = (1 3 5)` で `ab` は 5-巡回)。
 `c := (ab)⁻¹` とおけば `abc = 1` で位数 `2, 3, 5` は対ごとに互いに素。 -/
-theorem eq_one_of_mul_eq_one_of_coprime_orders {G : Type u} [Group G] [Finite G] [IsSolvable G]
-    {x y z : G}
+theorem eq_one_of_mul_eq_one_of_coprime_orders {G : Type u} [Group G] [Finite G]
+    [Group.IsSolvable G] {x y z : G}
     (hxy : Nat.Coprime (orderOf x) (orderOf y))
     (hxz : Nat.Coprime (orderOf x) (orderOf z))
     (hyz : Nat.Coprime (orderOf y) (orderOf z))

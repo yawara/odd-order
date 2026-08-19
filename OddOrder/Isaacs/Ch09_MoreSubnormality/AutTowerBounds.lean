@@ -182,7 +182,7 @@ def mulAutEquivCongr {A B : Type*} [Group A] [Group B] (e : A ≃* B) : MulAut A
 theorem card_mulAut_dvd_factorial_pred (M : Type*) [Group M] [Finite M] :
     Nat.card (MulAut M) ∣ (Nat.card M - 1)! := by
   classical
-  haveI := Fintype.ofFinite M
+  have := Fintype.ofFinite M
   have hcard_range : Nat.card ↥(mulAutPermNeOne M).range = Nat.card (MulAut M) :=
     Nat.card_congr (MonoidHom.ofInjective (mulAutPermNeOne_injective M)).toEquiv.symm
   have hdvd : Nat.card ↥(mulAutPermNeOne M).range

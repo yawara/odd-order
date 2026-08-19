@@ -40,11 +40,11 @@ theorem trace_eq_add_trace_restrict_of_isCompl {W W' : Submodule R M}
     intro i; fin_cases i
     · exact hW
     · exact hW'
-  haveI : ∀ i : Fin 2, Module.Finite R (N i) := by
+  have : ∀ i : Fin 2, Module.Finite R (N i) := by
     intro i; fin_cases i
     · exact ‹Module.Finite R W›
     · exact ‹Module.Finite R W'›
-  haveI : ∀ i : Fin 2, Module.Free R (N i) := by
+  have : ∀ i : Fin 2, Module.Free R (N i) := by
     intro i; fin_cases i
     · exact ‹Module.Free R W›
     · exact ‹Module.Free R W'›

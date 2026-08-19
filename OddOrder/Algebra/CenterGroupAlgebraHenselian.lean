@@ -50,10 +50,10 @@ noncomputable abbrev centerIdeal : Ideal ↥(Subalgebra.center 𝒪 (MonoidAlgeb
 theorem isAdicComplete_centerGroupAlgebra (hG : Finite G) :
     IsAdicComplete I ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)) := by
   classical
-  haveI := hG
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI hfc : Finite (ConjClasses G) := Quotient.finite _
-  haveI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  have := hG
+  have : Fintype G := Fintype.ofFinite G
+  have hfc : Finite (ConjClasses G) := Quotient.finite _
+  have : Fintype (ConjClasses G) := Fintype.ofFinite _
   exact isAdicComplete_of_basis I hfc centerBasis
 
 /-- **`Z(𝒪G)` is complete for the extended ideal `I·Z(𝒪G)`.** -/

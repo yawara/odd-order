@@ -35,7 +35,7 @@ theorem commute_of_coprime_orderOf_of_isNilpotent {L : Type*} [Group L] [Finite 
     [Group.IsNilpotent L] {x y : L} (hxy : Nat.Coprime (orderOf x) (orderOf y)) :
     Commute x y := by
   classical
-  haveI := Fintype.ofFinite L
+  have := Fintype.ofFinite L
   have hn : ∀ {q : ℕ} [Fact q.Prime] (Q : Sylow q L), Q.Normal := fun Q =>
     Ch01.Sylow.normal_of_isNilpotent Q
   set e := Sylow.directProductOfNormal hn with he
@@ -44,7 +44,7 @@ theorem commute_of_coprime_orderOf_of_isNilpotent {L : Type*} [Group L] [Finite 
   have hcomp : ∀ (p : (Nat.card L).primeFactors) (P : Sylow (p : ℕ) L),
       Commute (e.symm x p P) (e.symm y p P) := by
     intro p P
-    haveI : Fact (p : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors p.2⟩
+    have : Fact (p : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors p.2⟩
     -- The order of a component divides the order of the original element.
     have hdvd : ∀ z : L, orderOf (e.symm z p P) ∣ orderOf z := by
       intro z

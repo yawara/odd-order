@@ -76,7 +76,7 @@ theorem hasNormalPComplement_of_isCyclic_sylow_of_dvd_index [Finite G] {p : ℕ}
     have hmul : N.relIndex Y * Y.index = N.index := Subgroup.relIndex_mul_index hNY
     exact ((Nat.Prime.dvd_mul Fact.out).mp (hmul ▸ hpN)).resolve_right hYidx
   -- `↥Y` に Thm 5.17 を適用: `p ∤ |commutator ↥Y|`
-  haveI hcyc : IsCyclic ↥((P.subtype hPY : Sylow p ↥Y) : Subgroup ↥Y) :=
+  have hcyc : IsCyclic ↥((P.subtype hPY : Sylow p ↥Y) : Subgroup ↥Y) :=
     isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe hPY).symm.toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hPY).symm.surjective
   have hcommYle : (_root_.commutator ↥Y) ≤ N.subgroupOf Y := by

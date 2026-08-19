@@ -122,8 +122,8 @@ normal subgroup `H`). -/
 theorem sMember_support_subset_H (hyp : SibleyDadeHypothesis G L H)
     {χ : ClassFunction ↥L ℂ} (hχS : χ ∈ hyp.S) :
     χ.support ⊆ (H : Set ↥L) := by
-  letI : H.Normal := hyp.H_normal
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  let : H.Normal := hyp.H_normal
+  have : Fintype ↥H := Fintype.ofFinite _
   rw [hyp.S_eq] at hχS
   obtain ⟨θ, -, hχeq⟩ := hχS
   rw [hχeq]
@@ -261,8 +261,8 @@ theorem sMember_charValue_one_eq_mul_anchor (hyp : SibleyDadeHypothesis G L H)
     {χ χ₁ : ClassFunction ↥L ℂ} (hχS : χ ∈ hyp.S)
     (hχ₁deg : χ₁ 1 = (Nat.card hyp.W1 : ℂ)) :
     ∃ a : ℕ, 0 < a ∧ χ 1 = (a : ℂ) * χ₁ 1 := by
-  letI : H.Normal := hyp.H_normal
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  let : H.Normal := hyp.H_normal
+  have : Fintype ↥H := Fintype.ofFinite _
   rw [hyp.S_eq] at hχS
   obtain ⟨θ, -, hχeq⟩ := hχS
   obtain ⟨a, ha_pos, ha⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
@@ -291,9 +291,9 @@ theorem exists_charValue_one_eq_mul_xBaseBlock_anchor_of_irreducible_X
     {χ χ₁ : ClassFunction ↥L ℂ} (hχX : χ ∈ hyp.Xset Z) (hχ₁base : χ₁ ∈ hyp.xBaseBlock Z) :
     ∃ d : ℕ, 0 < d ∧ χ 1 = (d : ℂ) * χ₁ 1 := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
-  letI : H.Normal := hyp.H_normal
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fact p.Prime := ⟨hp⟩
+  let : H.Normal := hyp.H_normal
+  have : Fintype ↥H := Fintype.ofFinite _
   -- sources of `χ` and `χ₁`.
   have hχS : χ ∈ hyp.S := hyp.Xset_subset_S hχX
   have hχ₁S : χ₁ ∈ hyp.S := hyp.Xset_subset_S (hyp.xBaseBlock_subset Z hχ₁base)
@@ -675,8 +675,8 @@ theorem sum_re_sq_induce_kernelFilter_eq (hyp : SibleyDadeHypothesis G L H)
         (fun θ => ClassFunction.induce H θ.toClassFunction),
         ((χ 1).re) ^ 2
       = (H.index : ℝ) * ((Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1) := by
-  letI : H.Normal := hyp.H_normal
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  let : H.Normal := hyp.H_normal
+  have : Fintype ↥H := Fintype.ofFinite _
   have hB2 := sum_div_normSq_induce_kernelFilter_eq (G := ↥L) (H := H) (A := A)
   have hsummand : ∀ χ ∈ (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
       (↑(A.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
@@ -728,7 +728,7 @@ theorem sum_re_sq_Xset_eq (hyp : SibleyDadeHypothesis G L H)
           (fun θ => ClassFunction.induce H θ.toClassFunction)),
         ((χ 1).re) ^ 2
       = (H.index : ℝ) * ((Nat.card ↥H : ℝ) - (Nat.card (↥H ⧸ Z.subgroupOf H) : ℝ)) := by
-  letI : H.Normal := hyp.H_normal
+  let : H.Normal := hyp.H_normal
   have hbotker : ∀ θ : IrreducibleCharacter ↥H,
       (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆
         OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥H ℂ) := by
@@ -797,8 +797,8 @@ theorem sum_re_sq_Xset_eq_of_irreducible_X (hyp : SibleyDadeHypothesis G L H)
           (fun θ => ClassFunction.induce H θ.toClassFunction)),
         ((χ 1).re) ^ 2
       = (H.index : ℝ) * ((Nat.card ↥H : ℝ) - (Nat.card (↥H ⧸ Z.subgroupOf H) : ℝ)) := by
-  letI : H.Normal := hyp.H_normal
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  let : H.Normal := hyp.H_normal
+  have : Fintype ↥H := Fintype.ofFinite _
   have hbotker : ∀ θ : IrreducibleCharacter ↥H,
       (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆
         OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥H ℂ) := by

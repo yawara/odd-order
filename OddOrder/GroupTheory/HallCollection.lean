@@ -240,7 +240,7 @@ section Depth
 theorem conj_mem_lowerCentralSeries {r : ℕ} {w : G}
     (hw : w ∈ (⊤ : Subgroup G).lowerCentralSeries r) (g : G) :
     g⁻¹ * w * g ∈ (⊤ : Subgroup G).lowerCentralSeries r := by
-  haveI hN : ((⊤ : Subgroup G).lowerCentralSeries r).Normal := inferInstance
+  have hN : ((⊤ : Subgroup G).lowerCentralSeries r).Normal := inferInstance
   simpa [mul_assoc] using hN.conj_mem _ hw g⁻¹
 
 /-- The two facts the recursion needs about depths: the fresh commutator produced

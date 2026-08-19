@@ -494,7 +494,7 @@ theorem RegularOperatorSetup.eigenvalue_step {R B : Type*} [Group R] [Group B] [
         (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S)
         (i + 2)) :
     (r₁ : ZMod p) = (r₀ : ZMod p) * (r : ZMod p) := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   set T : Subgroup ↥S := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hT
   set σ := hSinv.restrict (⟨a, ha⟩ : ↥hyp.A) with hσ
   set x := commutatorIterate w v i with hx
@@ -698,7 +698,7 @@ theorem RegularOperatorSetup.quotient_action_eq_one_of_eigenvalue_one {R B : Typ
         (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) (i + 1))
     (h1 : (s : ZMod p) = 1) :
     (quotientMulAutHom (hyp.isAInvariant_subgroupOf_chain hSinv i)) ⟨a, ha⟩ = 1 := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   set T : Subgroup ↥S := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hT
   set N := (OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) (i + 1)).subgroupOf
     (OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i) with hN
@@ -770,9 +770,9 @@ theorem RegularOperatorSetup.exists_chain_length {R B : Type*} [Group R] [Group 
         (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i ≠ ⊥) ∧
       Nat.card ↥(Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) = p ^ n := by
   classical
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   set T : Subgroup ↥S := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hT
-  haveI : Group.IsNilpotent ↥S := (hyp.R_pGroup.to_subgroup S).isNilpotent
+  have : Group.IsNilpotent ↥S := (hyp.R_pGroup.to_subgroup S).isNilpotent
   have hex : ∃ m, OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) m = ⊥ :=
     OddOrder.Isaacs.Ch04.iterCommutator_eq_bot_of_isNilpotent_ambient T (⊤ : Subgroup ↥S)
   set n := Nat.find hex with hn
@@ -847,7 +847,7 @@ theorem RegularOperatorSetup.card_le_pow_card_A {R B : Type*} [Group R] [Group B
     (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p)
     (hSinv : IsAInvariant (hyp.act.comp hyp.A.subtype) S) :
     Nat.card ↥S ≤ p ^ q := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   set T : Subgroup ↥S := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hT
   obtain ⟨n, hlive, hTcard⟩ := hyp.exists_chain_length hR₀S hexp hS
   -- `|S| = |T| · |S : T| = pⁿ · p`
@@ -864,7 +864,7 @@ theorem RegularOperatorSetup.card_le_pow_card_A {R B : Type*} [Group R] [Group B
   have h0live : OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) 0 ≠ ⊥ := hlive 0 hnpos
   -- BG's `a ∈ A^#`
   obtain ⟨a, ha, hane⟩ : ∃ a, ∃ h : a ∈ hyp.A, (⟨a, h⟩ : ↥hyp.A) ≠ 1 := by
-    haveI : Nontrivial ↥hyp.A := by
+    have : Nontrivial ↥hyp.A := by
       have hcard := hyp.A_card
       rw [Subgroup.nontrivial_iff_ne_bot]
       intro h
@@ -912,7 +912,7 @@ theorem RegularOperatorSetup.card_le_pow {R B : Type*} [Group R] [Group B] [Fini
     (hexp : ∀ x : ↥S, x ^ p = 1)
     (hSinv : IsAInvariant (hyp.act.comp hyp.A.subtype) S) :
     Nat.card ↥S ≤ p ^ q := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   rcases le_or_gt (Nat.card ↥S) (p ^ 3) with hle | hgt
   · refine hle.trans (Nat.pow_le_pow_right hyp.p_prime.pos ?_)
     obtain ⟨k, hk⟩ := hyp.q_odd

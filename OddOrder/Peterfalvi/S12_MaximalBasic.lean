@@ -86,7 +86,8 @@ fixed-point-freely (its fixed points on `M'` are `C_{M'}(x) = W₂` by `TypePDat
 `W₂ ⊆ M''` by `TypePData.W2_le`), so `w₁ ∣ |M':M''| − 1`
 (`S08.caseB_W1_dvd_index_of_centralizer_le`,
 the `W₁`-conjugation action on `H = M'.subgroupOf M` with `M'' = ⁅H,H⁆`); with all orders odd and
-`M'' < M'` (`M'` solvable nontrivial, `IsSolvable.commutator_lt_top_of_nontrivial`) this forces
+`M'' < M'`
+    (`M'` solvable nontrivial, `Group.IsSolvable.commutator_lt_top_of_nontrivial`) this forces
 `|M':M''| ≥ 2w₁+1` (`S08.two_mul_add_one_le_of_odd_dvd`).  Then `|M'| = |M''|·|M':M''| ≥ w₂·(2w₁+1)`
 (`Subgroup.index_mul_card`) since `w₂ = |W₂| ≤ |M''|` (`W₂ ⊆ M''`).  Genuine group theory,
 **proven**; the one upstream citation is `typePData_W1_hall_coprime`, the shared §10 type-P
@@ -94,7 +95,7 @@ coprimality. -/
 theorem Hypothesis.card_derived_ge [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
     (2 * hyp.w1 + 1) * hyp.w2 ≤ Nat.card ↥(derivedInG M) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
   -- `derivedInG K = ⁅K, K⁆` (the commutator of `K` with itself in `G`).
@@ -106,7 +107,7 @@ theorem Hypothesis.card_derived_ge [Finite G]
   have hKcomm : H = _root_.commutator ↥M := by
     rw [hHdef, derivedInG, Subgroup.subgroupOf,
       Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
-  haveI hHnorm : H.Normal := by rw [hKcomm]; infer_instance
+  have hHnorm : H.Normal := by rw [hKcomm]; infer_instance
   have hHmap : H.map M.subtype = derivedInG M := by
     rw [hHdef, Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hM'le]
   have hmapcomm : (⁅H, H⁆ : Subgroup ↥M).map M.subtype = secondDerivedInAmbient M := by
@@ -114,10 +115,10 @@ theorem Hypothesis.card_derived_ge [Finite G]
   have hW2leM' : hyp.typeP.W2 ≤ derivedInG M :=
     (hyp.typeP.W2_le.trans inf_le_right).trans (Subgroup.map_subtype_le _)
   -- `↥H` is solvable and nontrivial, so `M'' = ⁅H,H⁆ < H` and the index is `> 1`.
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hyp.maximal
-  haveI hHsolv : IsSolvable ↥H :=
-    solvable_of_solvable_injective (f := H.subtype) (Subgroup.subtype_injective H)
-  haveI hHnt : Nontrivial ↥H := by
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hyp.maximal
+  have hHsolv : Group.IsSolvable ↥H :=
+    Group.isSolvable_of_isSolvable_injective (f := H.subtype) (Subgroup.subtype_injective H)
+  have hHnt : Nontrivial ↥H := by
     have h1 : 1 < Nat.card ↥H := by
       rw [hHdef, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'le).toEquiv]
       calc 1 < Nat.card ↥hyp.typeP.W2 :=
@@ -153,7 +154,7 @@ theorem Hypothesis.card_derived_ge [Finite G]
   have hidxgt : 1 < (_root_.commutator ↥H).index := by
     have hne1 : (_root_.commutator ↥H).index ≠ 1 := by
       rw [Ne, Subgroup.index_eq_one]
-      exact (IsSolvable.commutator_lt_top_of_nontrivial ↥H).ne
+      exact (Group.IsSolvable.commutator_lt_top_of_nontrivial ↥H).ne
     have hpos : (_root_.commutator ↥H).index ≠ 0 :=
       Subgroup.index_ne_zero_of_finite
     omega
@@ -197,7 +198,7 @@ This is the strict inequality Peterfalvi (10.8) uses at line 87 to turn `w₁/|M
 theorem Hypothesis.card_typePA_div_card_lt_inv_w1 [Finite G]
     {M : Subgroup G} (hyp : Hypothesis M) :
     (Nat.card ↥(typePA M hyp.typeP) : ℚ) / (Nat.card ↥M : ℚ) < 1 / (hyp.w1 : ℚ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
   -- `|A(M)| = |M'| − 1` (sharp of the derived subgroup).
   have hcardA : Nat.card ↥(typePA M hyp.typeP) = Nat.card ↥(derivedInG M) - 1 := by
@@ -335,7 +336,7 @@ theorem Hypothesis.chiRhoNormSq_zeta_le_line83 [Finite G]
         + (Nat.card G : ℝ)⁻¹ * ((Nat.card (hyp.toFamilyHypothesis71).G0 : ℝ)
           - ((Finset.univ.filter (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport
               ∧ (orderOf g).Coprime hyp.w1)).card : ℝ)) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   -- `F.A 0 = A(M)`, `F.L 0 = M` (structure projections).
   have hA0 : (hyp.toFamilyHypothesis71).A 0 = typePA M hyp.typeP := rfl
   have hL0 : (hyp.toFamilyHypothesis71).L 0 = M := rfl
@@ -499,8 +500,8 @@ theorem exists_prime_dvd_orderOf_of_mem_typePV [Finite G] {M : Subgroup G}
     rw [h1]
     exact orderOf_dvd_natCard _
   have hcomm : Commute v₁ v₂ := by
-    haveI := data.W_cyclic
-    letI : CommGroup ↥data.W := IsCyclic.commGroup
+    have := data.W_cyclic
+    let : CommGroup ↥data.W := IsCyclic.commGroup
     have := mul_comm (⟨v₁, hW1le hv₁⟩ : ↥data.W) ⟨v₂, hW2le hv₂⟩
     exact Subtype.ext_iff.mp this
   refine ⟨p, hp, ?_, hpW1⟩
@@ -640,8 +641,8 @@ theorem typePData_Msigma_inf_centralizer_W1_eq_W2 [Finite G]
     · intro x hx
       rw [Subgroup.mem_centralizer_iff]
       intro w hw
-      haveI := data.W_cyclic
-      letI : CommGroup ↥data.W := IsCyclic.commGroup
+      have := data.W_cyclic
+      let : CommGroup ↥data.W := IsCyclic.commGroup
       have := mul_comm (⟨w, hW1le hw⟩ : ↥data.W) ⟨x, hW2le hx⟩
       exact Subtype.ext_iff.mp this
 
@@ -710,7 +711,7 @@ theorem Hypothesis.g1_card_le_of_partner [Finite G] {M S : Subgroup G} (hyp : Hy
   have hcard0 : Nat.card (hyp.toFamilyHypothesis71).G0
       = (Finset.univ.filter
           (fun g : G => g ∉ hyp.toHypothesis71.hyp.dadeSupport)).card := by
-    rw [hG0eq, Nat.card_coe_set_eq, Set.ncard_eq_toFinset_card', Set.toFinset_setOf]
+    rw [hG0eq, Nat.card_coe_set_eq, Set.ncard_eq_toFinset_card', Set.toFinset_ofPred]
   -- split the complement along `w₁`-coprimality
   have hsplit : (Finset.univ.filter
         (fun g : G => g ∉ hyp.toHypothesis71.hyp.dadeSupport)).card
@@ -754,7 +755,7 @@ theorem Hypothesis.g1_card_le_of_partner [Finite G] {M S : Subgroup G} (hyp : Hy
           ∧ ¬ (orderOf g).Coprime hyp.w1)).card
         = {g : G | g ∉ hyp.toHypothesis71.hyp.dadeSupport
             ∧ ¬ (orderOf g).Coprime hyp.w1}.ncard := by
-          rw [Set.ncard_eq_toFinset_card', Set.toFinset_setOf]
+          rw [Set.ncard_eq_toFinset_card', Set.toFinset_ofPred]
       _ ≤ (conjClassSet ((data.H : Set G) \ {1})
             ∪ conjClassSet (typePV S data)).ncard :=
           Set.ncard_le_ncard hsub (Set.toFinite _)
@@ -862,12 +863,12 @@ theorem typePData_card_eq_H_mul_U_mul_W1 [Finite G] {M : Subgroup G} (data : Typ
   have h1 : Nat.card ↥(derivedInG M) * Nat.card ↥data.W1 = Nat.card ↥M := by
     rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'le).toEquiv,
       ← Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.W1_le).toEquiv]
-    exact data.M_complement.card_mul
+    exact data.M_complement.card_mul_card
   -- `|H|·|U| = |M'|` (the `M' = H ⋊ U` complement).
   have h2 : Nat.card ↥data.H * Nat.card ↥data.U = Nat.card ↥(derivedInG M) := by
     rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.H_le).toEquiv,
       ← Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.U_le).toEquiv]
-    exact data.derived_complement.card_mul
+    exact data.derived_complement.card_mul_card
   calc Nat.card ↥M = Nat.card ↥(derivedInG M) * Nat.card ↥data.W1 := h1.symm
     _ = Nat.card ↥data.H * Nat.card ↥data.U * Nat.card ↥data.W1 := by rw [← h2]
 
@@ -911,7 +912,7 @@ theorem Hypothesis.chiRhoNormSq_zeta_ge_line78 [Finite G]
     (_hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta) :
     (1 : ℝ) - (hyp.w1 : ℝ) / (Nat.card ↥(derivedInG M) : ℝ)
       ≤ (hyp.toFamilyHypothesis71).chiRhoNormSq (coh.tau1 params.zeta) 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   -- **Setup**: `H = M' = derivedInG M`, `K = M'.subgroupOf M ⊴ M`.
   have hHL : derivedInG M ≤ M := Subgroup.map_subtype_le _
@@ -920,7 +921,7 @@ theorem Hypothesis.chiRhoNormSq_zeta_ge_line78 [Finite G]
       Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
     infer_instance
   set K : Subgroup ↥M := (derivedInG M).subgroupOf M with hKdef
-  haveI : K.Normal := hKnormal0
+  have : K.Normal := hKnormal0
   have hHnorm : ∀ (l : ↥M) ⦃h : G⦄, h ∈ derivedInG M →
       (↑l : G) * h * (↑l : G)⁻¹ ∈ derivedInG M := by
     intro l h hh
@@ -1027,7 +1028,7 @@ theorem Hypothesis.chiRhoNormSq_zeta_ge_line78 [Finite G]
             (ClassFunction.mem_supportedSubmodule).mpr (hsupp_full i)⟩ := by
       change ((hyp.dadeData.dade.fullDadeIsometryData).restrict Set.subset_union_left
           hnorm).toDadeMap ⟨_, psi_support i⟩ = _
-      rw [OddOrder.Peterfalvi.S04.FullDadeIsometryData.restrict_apply]
+      -- `restrict_apply` は `rfl` なので `exact` が直接見通す (v4.33 では `rw` が照合できない)
       exact congrArg _ (Subtype.ext rfl)
     rw [hbridge]; exact hcohag
   -- **Assemble** the (7.8) Dade certificate.

@@ -109,8 +109,8 @@ theorem card_fiber_eq_of_card_eq {α β : Type*} [Finite α] [Finite β]
     (hcard : Nat.card α = Nat.card β * M - 1) :
     (∀ b, b ≠ b₀ → {a | Φ a = b}.ncard = M) ∧ {a | Φ a = b₀}.ncard = M - 1 := by
   classical
-  haveI : Fintype α := Fintype.ofFinite _
-  haveI : Fintype β := Fintype.ofFinite _
+  have : Fintype α := Fintype.ofFinite _
+  have : Fintype β := Fintype.ofFinite _
   have hconv : ∀ b : β, {a | Φ a = b}.ncard
       = (Finset.univ.filter fun a => Φ a = b).card := by
     intro b
@@ -217,8 +217,8 @@ theorem card_rootsOfUnity_ge {E : Type*} [Field E] [Finite E] {r : ℕ} (hr : r 
     (hcard : Nat.card Eˣ = r * (r + 2)) :
     r + 2 ≤ Nat.card ↥(rootsOfUnity (r + 2) E) := by
   classical
-  haveI : Fintype E := Fintype.ofFinite E
-  haveI : NeZero r := ⟨hr⟩
+  have : Fintype E := Fintype.ofFinite E
+  have : NeZero r := ⟨hr⟩
   -- `u ↦ u^r` lands in the norm-one subgroup
   have hrange : (powMonoidHom r : Eˣ →* Eˣ).range ≤ rootsOfUnity (r + 2) E := by
     rintro _ ⟨u, rfl⟩
@@ -288,7 +288,7 @@ theorem exists_add_inv_eq {E : Type*} [Field E] [Finite E] [Fact (Nat.Prime 2)] 
     (hα : α ^ 2 ^ m = α) :
     ∃ β : E, β ≠ 0 ∧ β + β⁻¹ = α ∧ (β ^ 2 ^ m = β ∨ β ^ (2 ^ m + 1) = 1) := by
   classical
-  haveI : Fintype E := Fintype.ofFinite E
+  have : Fintype E := Fintype.ofFinite E
   obtain ⟨r, hr⟩ : ∃ r, 2 ^ m = r + 1 := ⟨2 ^ m - 1, by
     have : 2 ≤ 2 ^ m := by
       calc (2:ℕ) = 2 ^ 1 := (pow_one 2).symm
@@ -932,7 +932,7 @@ theorem eq_self_of_add_eq_const {F : Type*} [Field F] [Finite F] (h2 : (2 : F) =
     (hconst : ∀ X : F, X ≠ 0 → X ≠ z → X + θ X = c)
     (hcard : 5 ≤ Nat.card F) (X : F) : θ X = X := by
   classical
-  haveI : Fintype F := Fintype.ofFinite F
+  have : Fintype F := Fintype.ofFinite F
   have hcardF : 5 ≤ Fintype.card F := by rwa [← Nat.card_eq_fintype_card]
   -- an element outside `{0, z}`
   obtain ⟨x, hx⟩ : ∃ x : F, x ∉ ({0, z} : Finset F) := by
@@ -1018,7 +1018,7 @@ theorem eq_one_and_eq_of_star {E : Type*} [Field E] [Finite E] (h2 : (2 : E) = 0
     (hstar : ∀ X : E, X ≠ 0 → X ≠ z → α ^ 2 + w ^ 2 + w * (X + θ X) = 0) :
     (∀ X : E, θ X = X) ∧ α = w := by
   classical
-  haveI : Fintype E := Fintype.ofFinite E
+  have : Fintype E := Fintype.ofFinite E
   have hcardE : 5 ≤ Fintype.card E := by rwa [← Nat.card_eq_fintype_card]
   -- `X + X^θ` is the same constant for every admissible `X`
   have hconst : ∀ X : E, X ≠ 0 → X ≠ z → X + θ X = (α ^ 2 + w ^ 2) / w := by
@@ -1158,7 +1158,7 @@ half, where `X + X^θ` has to be constant on `F − {0, z}` to force `θ = 1`. -
 theorem exists_ne_zero_ne {α : Type*} [Zero α] [Finite α] (hcard : 3 ≤ Nat.card α)
     (z : α) : ∃ x : α, x ≠ 0 ∧ x ≠ z := by
   classical
-  haveI : Fintype α := Fintype.ofFinite α
+  have : Fintype α := Fintype.ofFinite α
   have hcard' : 3 ≤ Fintype.card α := by rwa [← Nat.card_eq_fintype_card]
   by_contra hcon
   push Not at hcon

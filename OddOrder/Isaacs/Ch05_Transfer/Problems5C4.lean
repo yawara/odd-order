@@ -53,7 +53,7 @@ theorem normal_map_subtype_of_characteristic {N : Subgroup G} [N.Normal] {M : Su
 /-- Z-群の Schur–Zassenhaus 補群は `G/G'` と同型ゆえ巡回。 -/
 theorem isCyclic_of_isComplement'_commutator [Finite G] [IsZGroup G] {H : Subgroup G}
     (hH : Subgroup.IsComplement' (commutator G) H) : IsCyclic ↥H := by
-  haveI : IsCyclic (G ⧸ commutator G) := IsZGroup.isCyclic_abelianization
+  have : IsCyclic (G ⧸ commutator G) := IsZGroup.isCyclic_abelianization
   set f : ↥H →* G ⧸ commutator G := (QuotientGroup.mk' (commutator G)).comp H.subtype with hf
   have hinj : Function.Injective f := by
     rw [← MonoidHom.ker_eq_bot_iff, eq_bot_iff]
@@ -88,7 +88,7 @@ theorem isCyclic_of_isComplement'_commutator [Finite G] [IsZGroup G] {H : Subgro
 theorem exists_subgroup_card_eq_of_isZGroup [Finite G] [IsZGroup G]
     {m : ℕ} (hm : m ∣ Nat.card G) : ∃ K : Subgroup G, Nat.card ↥K = m := by
   classical
-  haveI : IsCyclic ↥(commutator G) := IsZGroup.isCyclic_commutator G
+  have : IsCyclic ↥(commutator G) := IsZGroup.isCyclic_commutator G
   have hcop : Nat.Coprime (Nat.card ↥(commutator G)) (commutator G).index :=
     IsZGroup.coprime_commutator_index G
   have hmul : Nat.card ↥(commutator G) * (commutator G).index = Nat.card G :=
@@ -98,8 +98,8 @@ theorem exists_subgroup_card_eq_of_isZGroup [Finite G] [IsZGroup G]
   -- `M ≤ G'` : 位数 `m₁`
   obtain ⟨M', hM'⟩ := exists_subgroup_card_eq_of_isCyclic
     (C := ↥(commutator G)) (Nat.gcd_dvd_right m (Nat.card ↥(commutator G)))
-  haveI : M'.Characteristic := characteristic_of_isCyclic M'
-  haveI : (M'.map (commutator G).subtype).Normal := normal_map_subtype_of_characteristic
+  have : M'.Characteristic := characteristic_of_isCyclic M'
+  have : (M'.map (commutator G).subtype).Normal := normal_map_subtype_of_characteristic
   have hMcard : Nat.card ↥(M'.map (commutator G).subtype)
       = Nat.gcd m (Nat.card ↥(commutator G)) := by
     rw [← hM']
@@ -107,9 +107,9 @@ theorem exists_subgroup_card_eq_of_isZGroup [Finite G] [IsZGroup G]
       (Subgroup.equivMapOfInjective M' _ (Subgroup.subtype_injective _)).toEquiv.symm
   -- `H` : Schur–Zassenhaus 補群 (巡回), その中の位数 `m₂` の部分群 `H₂`
   obtain ⟨H, hH⟩ := Subgroup.exists_right_complement'_of_coprime hcop
-  haveI : IsCyclic ↥H := isCyclic_of_isComplement'_commutator hH
+  have : IsCyclic ↥H := isCyclic_of_isComplement'_commutator hH
   have hHcard : Nat.card ↥H = (commutator G).index := by
-    have h := hH.card_mul
+    have h := hH.card_mul_card
     rw [← hmul] at h
     have hpos : 0 < Nat.card ↥(commutator G) := Nat.card_pos
     exact Nat.eq_of_mul_eq_mul_left hpos h
@@ -185,7 +185,7 @@ theorem card_inf_commutator [Finite G] [IsZGroup G] (K : Subgroup G) :
 theorem inf_commutator_eq_of_card_eq [Finite G] [IsZGroup G] {K₁ K₂ : Subgroup G}
     (h : Nat.card ↥K₁ = Nat.card ↥K₂) :
     K₁ ⊓ commutator G = K₂ ⊓ commutator G := by
-  haveI : IsCyclic ↥(commutator G) := IsZGroup.isCyclic_commutator G
+  have : IsCyclic ↥(commutator G) := IsZGroup.isCyclic_commutator G
   have hcard : Nat.card ↥((K₁ ⊓ commutator G).subgroupOf (commutator G))
       = Nat.card ↥((K₂ ⊓ commutator G).subgroupOf (commutator G)) := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (inf_le_right :
@@ -200,8 +200,8 @@ theorem inf_commutator_eq_of_card_eq [Finite G] [IsZGroup G] {K₁ K₂ : Subgro
 /-- `K ⊓ G'` は `G` で正規 (`G'` 巡回ゆえその部分群は特性)。 -/
 theorem normal_inf_commutator [Finite G] [IsZGroup G] (K : Subgroup G) :
     (K ⊓ commutator G).Normal := by
-  haveI : IsCyclic ↥(commutator G) := IsZGroup.isCyclic_commutator G
-  haveI : ((K ⊓ commutator G).subgroupOf (commutator G)).Characteristic :=
+  have : IsCyclic ↥(commutator G) := IsZGroup.isCyclic_commutator G
+  have : ((K ⊓ commutator G).subgroupOf (commutator G)).Characteristic :=
     characteristic_of_isCyclic _
   have hmap : ((K ⊓ commutator G).subgroupOf (commutator G)).map (commutator G).subtype
       = K ⊓ commutator G :=
@@ -230,7 +230,7 @@ theorem card_map_mk'_mul_card [Finite G] {N L : Subgroup G} [N.Normal] (hNL : N 
 theorem sup_commutator_eq_of_card_eq [Finite G] [IsZGroup G] {K₁ K₂ : Subgroup G}
     (h : Nat.card ↥K₁ = Nat.card ↥K₂) :
     K₁ ⊔ commutator G = K₂ ⊔ commutator G := by
-  haveI : IsCyclic (G ⧸ commutator G) := IsZGroup.isCyclic_abelianization
+  have : IsCyclic (G ⧸ commutator G) := IsZGroup.isCyclic_abelianization
   have hNne : Nat.card ↥(commutator G) ≠ 0 := Nat.card_pos.ne'
   -- `|K₁ ⊔ G'| = |K₂ ⊔ G'|`
   have hsupcard : Nat.card ↥(K₁ ⊔ commutator G) = Nat.card ↥(K₂ ⊔ commutator G) := by
@@ -296,7 +296,7 @@ theorem exists_conj_of_card_eq_of_isZGroup [Finite G] [IsZGroup G] {K₁ K₂ : 
     (h : Nat.card ↥K₁ = Nat.card ↥K₂) :
     ∃ g : G, K₁.map (MulAut.conj g).toMonoidHom = K₂ := by
   classical
-  haveI : IsCyclic ↥(commutator G) := IsZGroup.isCyclic_commutator G
+  have : IsCyclic ↥(commutator G) := IsZGroup.isCyclic_commutator G
   have hcop : Nat.Coprime (Nat.card ↥(commutator G)) (commutator G).index :=
     IsZGroup.coprime_commutator_index G
   have hM := inf_commutator_eq_of_card_eq h
@@ -326,7 +326,7 @@ theorem exists_conj_of_card_eq_of_isZGroup [Finite G] [IsZGroup G] {K₁ K₂ : 
     exact Subgroup.disjoint_of_coprime_natCard (by rw [hQ]; exact hfN)
   -- `Q_i ≤ L` かつ `Q_i` は `↥L` の中で `N` の補群
   have hNL : commutator G ≤ K₁ ⊔ commutator G := le_sup_right
-  haveI : ((commutator G).subgroupOf (K₁ ⊔ commutator G)).Normal :=
+  have : ((commutator G).subgroupOf (K₁ ⊔ commutator G)).Normal :=
     Subgroup.normal_subgroupOf
   have hcardN' : Nat.card ↥((commutator G).subgroupOf (K₁ ⊔ commutator G))
       = Nat.card ↥(commutator G) :=
@@ -370,7 +370,7 @@ theorem exists_conj_of_card_eq_of_isZGroup [Finite G] [IsZGroup G] {K₁ K₂ : 
   have hKeq : ∀ (K Q : Subgroup G), Q ≤ K → Nat.card ↥Q = f →
       Nat.card ↥K = Nat.card ↥(K ⊓ commutator G) * f → Q ⊔ (K ⊓ commutator G) = K := by
     intro K Q hQK hQ hKf
-    haveI : (K ⊓ commutator G).Normal := normal_inf_commutator K
+    have : (K ⊓ commutator G).Normal := normal_inf_commutator K
     have hdisj : Q ⊓ (K ⊓ commutator G) = ⊥ := by
       rw [eq_bot_iff]
       intro x hx
@@ -381,7 +381,7 @@ theorem exists_conj_of_card_eq_of_isZGroup [Finite G] [IsZGroup G] {K₁ K₂ : 
     exact Subgroup.eq_of_le_of_card_ge (sup_le hQK inf_le_left) (le_of_eq hcard.symm)
   have hK₁eq := hKeq K₁ Q₁ hQ₁K hQ₁card hfK₁
   have hK₂eq := hKeq K₂ Q₂ hQ₂K hQ₂card hf'K₂
-  haveI : (K₁ ⊓ commutator G).Normal := normal_inf_commutator K₁
+  have : (K₁ ⊓ commutator G).Normal := normal_inf_commutator K₁
   have hMconj : (K₁ ⊓ commutator G).map (MulAut.conj (n : G)).toMonoidHom
       = K₁ ⊓ commutator G :=
     Subgroup.mem_normalizer_iff_map_conj_eq.mp (mem_normalizer_of_normal _)

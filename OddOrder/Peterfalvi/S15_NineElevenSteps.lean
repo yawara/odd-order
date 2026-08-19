@@ -69,7 +69,7 @@ theorem Hypothesis.sSet_mem_Snorm_pos [Finite G]
     {χ : ClassFunction ↥hyp.S ℂ}
     (hχ : χ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG)) :
     0 < OddOrder.Peterfalvi.S07.Snorm χ := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hpos := OddOrder.Peterfalvi.S08.inducedKernelFamily_inner_self_real_pos
     (hyp.sSet_subset_inducedKernelFamily hG hχ)
@@ -124,7 +124,7 @@ theorem Hypothesis.nineElevenSTwoExtractionS [Finite G]
         (chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupS hG)) |
       IsIrreducibleCharacter χ ∧
         χ 1 = (((hyp.toTypesIIIIIIVSetupS hG).q * caseA.a : ℕ) : ℂ)} := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   intro χ hχS₂
   by_contra hnot
@@ -208,7 +208,7 @@ theorem Hypothesis.sSet_sThree_coherent_dade [Finite G]
       (sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S)) := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   obtain ⟨χ₀, hχ₀⟩ := hS₃ne
   -- `𝒮₃` is conjugation-closed
   have hconj : ∀ a ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) \ S₂,
@@ -386,8 +386,8 @@ theorem exists_cuSubOf_centralizer_witness {M : Subgroup G} [Finite G]
       (Subgroup.card_subgroup_dvd_card X)
   -- `H` is solvable (a proper subgroup of the minimal counterexample)
   have hHM : data.typeP.H ≤ M := data.typeP.H_le.trans (Subgroup.map_subtype_le _)
-  have hHsolv : IsSolvable ↥data.typeP.H :=
-    hG.solvable_of_lt_top _ (lt_of_le_of_lt hHM
+  have hHsolv : Group.IsSolvable ↥data.typeP.H :=
+    hG.isSolvable_of_lt_top _ (lt_of_le_of_lt hHM
       ((show IsCoatom M from data.maximal).1.lt_top))
   -- the quotient fixed subgroup contains the summand `H̄ᵢ` (kernel elements act trivially)
   have hfix : caseA.Hpart i
@@ -485,7 +485,7 @@ theorem Hypothesis.mem_typePACore_of_mem_H_sup_cuSubOf [Finite G]
     have hyπ' : OddOrder.GroupTheory.IsPiElement ((OddOrder.BG.Ch3.S10.sigma hyp.S)ᶜ) y :=
       OddOrder.BG.Ch4.S14.isPiElement_compl_of_piPart_eq_one hone
     set Kg : Subgroup G := (hyp.toTypesIIIIIIVSetupS hG).H ⊔ cuSubOf caseA i with hKgdef
-    haveI hKsolv : IsSolvable ↥Kg := hG.solvable_of_lt_top Kg
+    have hKsolv : Group.IsSolvable ↥Kg := hG.isSolvable_of_lt_top Kg
       (lt_of_le_of_lt hKS ((show IsCoatom hyp.S from hyp.S_maximal).1.lt_top))
     have hnorm : cuSubOf caseA i ≤ Subgroup.normalizer
         (((hyp.toTypesIIIIIIVSetupS hG).H : Set G)) :=
@@ -516,7 +516,7 @@ theorem Hypothesis.mem_typePACore_of_mem_H_sup_cuSubOf [Finite G]
     -- both `σ`-sided.  (General type `P`: `U₁` itself need not be `σ`-free — for type III
     -- the `σ`-part of `U` may be nontrivial — but its `σ`-elements are caught by the
     -- `piPart` branch, and the `σ′`-conjugation only needs *some* Hall-`σ′` inside `U₁`.)
-    haveI hU₁solv : IsSolvable ↥((cuSubOf caseA i).subgroupOf Kg) := inferInstance
+    have hU₁solv : Group.IsSolvable ↥((cuSubOf caseA i).subgroupOf Kg) := inferInstance
     obtain ⟨P₁, hP₁Hall, -⟩ := OddOrder.Isaacs.Ch03.hall_D
       (G := ↥((cuSubOf caseA i).subgroupOf Kg))
       (U := ⊥) (fun p hp => by
@@ -641,8 +641,8 @@ theorem Hypothesis.nineElevenAlphaSupportS [Finite G]
       - ψ₁).support
       ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S := by
   classical
-  haveI := hyp.finiteG
-  haveI : Fintype G := Fintype.ofFinite G
+  have := hyp.finiteG
+  have : Fintype G := Fintype.ofFinite G
   -- `γ(1) = q·a = ψ₁(1)`: the difference vanishes at the identity
   have hγ1 : ClassFunction.induce
       ((hyp.toTypesIIIIIIVSetupS hG).H.subgroupOf hyp.S
@@ -735,7 +735,7 @@ theorem Hypothesis.nineElevenFourNormInputsS [Finite G]
         α.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S ∧
         ClassFunction.inner α α = (N : ℂ) := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hq0 : 0 < (hyp.toTypesIIIIIIVSetupS hG).q :=
     (hyp.toTypesIIIIIIVSetupS hG).nontrivial.2.1.pos
   -- the explicit TI-witness `U₁ = cuSubOf caseA 0` and its (9.11.2) facts

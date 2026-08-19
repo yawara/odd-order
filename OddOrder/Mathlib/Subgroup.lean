@@ -179,7 +179,7 @@ theorem centralizer_inf_eq_of_le_of_singleton_inf_eq {K R₀ R : Subgroup G}
     (hcent : ∀ x ∈ (R : Set G), x ≠ 1 →
       centralizer ({x} : Set G) ⊓ K = centralizer (R : Set G) ⊓ K) :
     centralizer (R₀ : Set G) ⊓ K = centralizer (R : Set G) ⊓ K := by
-  haveI : Nontrivial R₀ := (Subgroup.nontrivial_iff_ne_bot R₀).mpr hR₀
+  have : Nontrivial R₀ := (Subgroup.nontrivial_iff_ne_bot R₀).mpr hR₀
   obtain ⟨y, hy⟩ := exists_ne (1 : R₀)
   refine le_antisymm ?_ ?_
   · calc centralizer (R₀ : Set G) ⊓ K
@@ -428,7 +428,7 @@ images in `G / N` still complement each other. -/
 theorem IsComplement'.map_quotient_of_normal_le_left {G : Type*} [Group G]
     {K R N : Subgroup G} [K.Normal] [N.Normal] (hC : IsComplement' K R) (hNK : N ≤ K) :
     IsComplement' (K.map (QuotientGroup.mk' N)) (R.map (QuotientGroup.mk' N)) := by
-  haveI : (K.map (QuotientGroup.mk' N)).Normal :=
+  have : (K.map (QuotientGroup.mk' N)).Normal :=
     (inferInstance : K.Normal).map (QuotientGroup.mk' N) (QuotientGroup.mk'_surjective N)
   refine isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
   · rw [disjoint_iff, eq_bot_iff]
@@ -499,7 +499,7 @@ theorem nat_card_quotient_subgroupOf_map_subtype_eq {H : Subgroup G}
       (B.subgroupOf A).map eA.toMonoidHom =
         (B.map H.subtype).subgroupOf (A.map H.subtype) := by
     simpa [eA] using subgroupOf_map_subtype_eq_map_subgroupOf (H := H) hBA
-  haveI : ((B.map H.subtype).subgroupOf (A.map H.subtype)).Normal :=
+  have : ((B.map H.subtype).subgroupOf (A.map H.subtype)).Normal :=
     normal_subgroupOf_map_subtype (H := H) hBA
   exact (Nat.card_congr
     (QuotientGroup.congr (B.subgroupOf A)
@@ -529,7 +529,7 @@ theorem card_mul_card_of_complement_normal {G : Type*} [Group G] [Finite G] {N V
     [N.Normal] (hinf : N ⊓ V = ⊥) (hsup : N ⊔ V = ⊤) :
     Nat.card N * Nat.card V = Nat.card G :=
   (Subgroup.isComplement'_of_disjoint_and_mul_eq_univ (disjoint_iff.mpr hinf)
-    (by rw [← Subgroup.normal_mul, hsup, Subgroup.coe_top])).card_mul
+    (by rw [← Subgroup.normal_mul, hsup, Subgroup.coe_top])).card_mul_card
 
 /-- Package complementary subgroups inside a specified ambient subgroup. -/
 theorem isComplement'_subgroupOf_of_disjoint_mul_eq_univ {G : Type*} [Group G]
@@ -792,7 +792,7 @@ theorem inf_sup_eq_of_le_normalizer_of_inf_eq_bot
     (W ⊔ A) ⊓ L = W := by
   apply le_antisymm
   · intro x ⟨hxWA, hxL⟩
-    haveI : (W.subgroupOf (A ⊔ W)).Normal :=
+    have : (W.subgroupOf (A ⊔ W)).Normal :=
       Subgroup.normal_subgroupOf_sup_of_le_normalizer hAnorm
     have hx_AW : x ∈ A ⊔ W := by rw [sup_comm]; exact hxWA
     have hmem : (⟨x, hx_AW⟩ : ↥(A ⊔ W)) ∈ (W.subgroupOf (A ⊔ W)) ⊔ (A.subgroupOf (A ⊔ W)) := by

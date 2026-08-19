@@ -69,10 +69,10 @@ theorem not_isSimpleGroup_of_card_eq_oneeighty {G : Type*} [Group G] [Finite G]
     (hG : Nat.card G = 180) : ¬ IsSimpleGroup G := by
   intro hsimple
   classical
-  haveI := hsimple
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Fact (Nat.Prime 5) := ⟨by norm_num⟩
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have := hsimple
+  have : Fintype G := Fintype.ofFinite G
+  have : Fact (Nat.Prime 5) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   have h5dec : ∀ P : Sylow 5 G,
       Nat.card ↥(P : Subgroup G) = 5 ∧ (P : Subgroup G).index = 36 := fun P => by
     have hh := sylow_card_and_index_of_card_eq_mul (q := 5) (m := 36) (k := 1)
@@ -167,7 +167,7 @@ theorem not_isSimpleGroup_of_card_eq_oneeighty {G : Type*} [Group G] [Finite G]
     have hSylowUnique : ∀ ℓ : ℕ, ℓ.Prime → Nat.card ↥N = ℓ * 3 ^ 2 → ¬ 3 ∣ ℓ →
         ℓ % 3 ≠ 1 → False := by
       intro ℓ hℓ hNc hnd hmod
-      haveI : Subsingleton (Sylow 3 ↥N) :=
+      have : Subsingleton (Sylow 3 ↥N) :=
         (Nat.card_eq_one_iff_unique.mp (card_sylow_eq_one_of_card_eq_prime_mul_pow
           (q := 3) (ℓ := ℓ) (k := 2) hℓ hNc hnd hmod)).1
       exact hST (Sylow.subtype_injective (hP := hS_le) (hQ := hT_le) (Subsingleton.elim _ _))
@@ -265,8 +265,8 @@ theorem not_isSimpleGroup_of_card_eq_twofourty {G : Type*} [Group G] [Finite G]
     (hG : Nat.card G = 240) : ¬ IsSimpleGroup G := by
   intro hsimple
   classical
-  haveI := hsimple
-  haveI : Fact (Nat.Prime 2) := ⟨by norm_num⟩
+  have := hsimple
+  have : Fact (Nat.Prime 2) := ⟨by norm_num⟩
   have hdec : ∀ P : Sylow 2 G,
       Nat.card ↥(P : Subgroup G) = 16 ∧ (P : Subgroup G).index = 15 := fun P => by
     have hh := sylow_card_and_index_of_card_eq_mul (q := 2) (m := 15) (k := 4)
@@ -407,10 +407,10 @@ theorem not_isSimpleGroup_of_card_eq_twofivetwo {G : Type*} [Group G] [Finite G]
     (hG : Nat.card G = 252) : ¬ IsSimpleGroup G := by
   intro hsimple
   classical
-  haveI := hsimple
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Fact (Nat.Prime 7) := ⟨by norm_num⟩
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have := hsimple
+  have : Fintype G := Fintype.ofFinite G
+  have : Fact (Nat.Prime 7) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   have h7dec : ∀ P : Sylow 7 G,
       Nat.card ↥(P : Subgroup G) = 7 ∧ (P : Subgroup G).index = 36 := fun P => by
     have hh := sylow_card_and_index_of_card_eq_mul (q := 7) (m := 36) (k := 1)
@@ -498,7 +498,7 @@ theorem not_isSimpleGroup_of_card_eq_twofivetwo {G : Type*} [Group G] [Finite G]
         ((Subgroup.eq_of_le_of_card_ge hS_le (le_of_eq (by rw [heN, (h3dec S).1]))).trans
           (Subgroup.eq_of_le_of_card_ge hT_le (le_of_eq (by rw [heN, (h3dec T).1]))).symm))
     · -- `|N| = 18`: 位数 18 の Sylow `3` は一意
-      haveI : Subsingleton (Sylow 3 ↥N) :=
+      have : Subsingleton (Sylow 3 ↥N) :=
         (Nat.card_eq_one_iff_unique.mp (card_sylow_eq_one_of_card_eq_prime_mul_pow
           (q := 3) (ℓ := 2) (k := 2) (by norm_num) (by rw [he, he1]; norm_num) (by norm_num)
           (by norm_num))).1

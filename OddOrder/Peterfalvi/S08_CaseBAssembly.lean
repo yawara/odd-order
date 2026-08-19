@@ -345,7 +345,7 @@ theorem sum_constituentWeight_sq_subtype {M : Type*} [Group M] [Finite M]
     ∑ i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ},
         ((constituentWeight hφ' i.val : ℤ)) ^ 2 = ((K.subgroupOf H).index : ℤ) := by
   classical
-  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  have : Fintype ↥H := Fintype.ofFinite ↥H
   -- the full square-sum over `Irr H`, in `ℤ`-form
   have hfull : (∑ θ : IrreducibleCharacter ↥H, ((constituentWeight hφ' θ : ℤ)) ^ 2)
       = ((K.subgroupOf H).index : ℤ) := by
@@ -392,8 +392,8 @@ theorem caseB_hagg
     Xagg - (((W2.subgroupOf H).index : ℤ) : ℂ) • Y₀
       = ∑ i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ},
           ((constituentWeight hφ' i.val : ℤ) : ℂ) • ((D i).X - (D i).Y) := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
-  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥W2 := Fintype.ofFinite _
   have hagg := aggregate_eq_sum_of_constituent (L := L) Finset.univ hyp.tau
     (fun i => ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)
       - constituentWeight hφ' i.val • η₁)
@@ -446,8 +446,8 @@ theorem caseB_per_phi_anchored
     (i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ}) :
     hyp.tau (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ) - constituentWeight hφ' i.val • η₁)
       = (D i).X - (constituentWeight hφ' i.val : ℂ) • cY.extension η₁ := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
-  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥W2 := Fintype.ofFinite _
   exact per_phi_anchored_image hyp cY hη₁ Finset.univ D htau1 hXaggorth
     (caseB_hagg hyp hW2H hcen hφ' D htau1 hdecomp)
     (sum_constituentWeight_sq_subtype hW2H hcen hφ')
@@ -982,7 +982,7 @@ theorem caseB_S_member_column_or_irreducible
     (∃ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 ∧
         OddOrder.Peterfalvi.S06.columnSum h46 χ₂ = x)
       ∨ IsIrreducibleCharacter x := by
-  rw [hyp.S_eq, Set.mem_setOf_eq] at hx
+  rw [hyp.S_eq, Set.mem_ofPred_eq] at hx
   obtain ⟨θ, hθne, rfl⟩ := hx
   have hθne' : (θ : ClassFunction ↥H ℂ) ≠ trivialClassFunction ↥H := fun heq =>
     hθne (Subtype.ext (heq.trans (IrreducibleCharacter.coe_trivialIrreducibleCharacter).symm))
@@ -1003,7 +1003,7 @@ theorem caseB_Xset_orthogonal_Yset
     [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     {W2 : Subgroup ↥L} (hW2comm : W2 ≤ ⁅H, H⁆) :
     ∀ x ∈ hyp.Xset W2, ∀ y ∈ hyp.Yset, ClassFunction.inner x y = 0 := by
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   have hdisj : Disjoint (hyp.Xset W2) hyp.Yset := by
     have hYsub : hyp.Yset ⊆ hyp.SsubFiltration W2 :=
       hyp.SsubFiltration_antitone hW2comm

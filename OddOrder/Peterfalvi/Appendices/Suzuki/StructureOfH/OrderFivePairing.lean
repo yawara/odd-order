@@ -142,8 +142,8 @@ theorem sq_mem_Q0_of_mem_Q
 /-- Two elements of `K` commute (`K` is cyclic). -/
 theorem mul_comm_of_mem_K {x y : G} (hx : x ∈ hyp.K) (hy : y ∈ hyp.K) :
     x * y = y * x := by
-  haveI := hyp.K_isCyclic
-  letI : CommGroup ↥hyp.K := IsCyclic.commGroup
+  have := hyp.K_isCyclic
+  let : CommGroup ↥hyp.K := IsCyclic.commGroup
   exact congrArg (Subtype.val (p := fun z => z ∈ hyp.K))
     (mul_comm (⟨x, hx⟩ : ↥hyp.K) ⟨y, hy⟩)
 
@@ -436,7 +436,7 @@ theorem structureConjugator_mul_conj_inv_pairwise
     k₁ = k₂ := by
   obtain ⟨F, instF, γ, β, h2, hadd, hker, hequiv⟩ :=
     hyp.exists_quotient_field_coordinate hZQ0 hQEA hKfree hQcard
-  letI : Field F := instF
+  let : Field F := instF
   have hk₁K : k₁ ∈ hyp.K := by rw [← SetLike.mem_coe, hyp.coe_K]; exact hk₁
   have hk₂K : k₂ ∈ hyp.K := by rw [← SetLike.mem_coe, hyp.coe_K]; exact hk₂
   have haK : a ∈ hyp.K := by rw [← SetLike.mem_coe, hyp.coe_K]; exact ha

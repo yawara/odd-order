@@ -606,7 +606,7 @@ theorem exists_finEnum_irreducible {Γ : Type*} [Group Γ] {T : Set (ClassFuncti
     ∃ (k : ℕ) (χ : Fin k → IrreducibleCharacter Γ),
       Function.Injective χ ∧ Set.range (fun j => (χ j : ClassFunction Γ ℂ)) = T := by
   classical
-  haveI : Fintype T := hTfin.fintype
+  have : Fintype T := hTfin.fintype
   let e := Fintype.equivFin T
   refine ⟨Fintype.card T, fun j => ⟨(e.symm j : ClassFunction Γ ℂ), hTirr _ (e.symm j).2⟩, ?_, ?_⟩
   · intro i j hij

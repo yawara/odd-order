@@ -320,13 +320,13 @@ theorem lowerCentralSquareMapAdditive_add
       lowerCentralSquareMapAdditive H hSq u +
         lowerCentralSquareMapAdditive H hSq v +
           lowerCentralCommutatorBilinear H u v := by
-  letI : IsMulCommutative (lowerCentralLayer H 0) :=
+  let : IsMulCommutative (lowerCentralLayer H 0) :=
     lowerCentralLayerIsMulCommutative H 0
-  letI : IsMulCommutative (lowerCentralLayer H 1) :=
+  let : IsMulCommutative (lowerCentralLayer H 1) :=
     lowerCentralLayerIsMulCommutative H 1
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer H 0)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer H 0)) :=
     lowerCentralLayerZmodModule H 0
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
     lowerCentralLayerZmodModule H 1
   simpa [lowerCentralSquareMapAdditive,
     lowerCentralCommutatorBilinear_apply] using
@@ -389,13 +389,13 @@ theorem lowerCentralSquareQuadraticMap_polarBilin
       lowerCentralLayerZmodModule H 1
     (lowerCentralSquareQuadraticMap H hSq).polarBilin =
       lowerCentralCommutatorBilinear H := by
-  letI : IsMulCommutative (lowerCentralLayer H 0) :=
+  let : IsMulCommutative (lowerCentralLayer H 0) :=
     lowerCentralLayerIsMulCommutative H 0
-  letI : IsMulCommutative (lowerCentralLayer H 1) :=
+  let : IsMulCommutative (lowerCentralLayer H 1) :=
     lowerCentralLayerIsMulCommutative H 1
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer H 0)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer H 0)) :=
     lowerCentralLayerZmodModule H 0
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
     lowerCentralLayerZmodModule H 1
   apply LinearMap.ext
   intro u
@@ -471,13 +471,13 @@ theorem lowerCentralSquareMapAdditive_equivariant
         (lowerCentralLayerRepresentation phi 0 g u) =
       lowerCentralLayerRepresentation phi 1 g
         (lowerCentralSquareMapAdditive H hSq u) := by
-  letI : IsMulCommutative (lowerCentralLayer H 0) :=
+  let : IsMulCommutative (lowerCentralLayer H 0) :=
     lowerCentralLayerIsMulCommutative H 0
-  letI : IsMulCommutative (lowerCentralLayer H 1) :=
+  let : IsMulCommutative (lowerCentralLayer H 1) :=
     lowerCentralLayerIsMulCommutative H 1
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer H 0)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer H 0)) :=
     lowerCentralLayerZmodModule H 0
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
     lowerCentralLayerZmodModule H 1
   rw [show u = Additive.ofMul (Additive.toMul u) from rfl]
   rw [lowerCentralLayerRepresentation_apply]
@@ -545,13 +545,13 @@ theorem lowerCentralSquareMapBaseChange_add
           TensorProduct.mk (ZMod 2) K
             (Additive (lowerCentralLayer H 1)) 1
             (lowerCentralCommutatorBilinear H u v) := by
-  letI : IsMulCommutative (lowerCentralLayer H 0) :=
+  let : IsMulCommutative (lowerCentralLayer H 0) :=
     lowerCentralLayerIsMulCommutative H 0
-  letI : IsMulCommutative (lowerCentralLayer H 1) :=
+  let : IsMulCommutative (lowerCentralLayer H 1) :=
     lowerCentralLayerIsMulCommutative H 1
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer H 0)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer H 0)) :=
     lowerCentralLayerZmodModule H 0
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
     lowerCentralLayerZmodModule H 1
   unfold lowerCentralSquareMapBaseChange
   simpa only [map_add] using congrArg
@@ -584,13 +584,13 @@ theorem lowerCentralSquareMapBaseChange_equivariant
         (lowerCentralLayerRepresentation phi 0 g u) =
       (lowerCentralLayerRepresentation phi 1 g).baseChange K
         (lowerCentralSquareMapBaseChange K H hSq u) := by
-  letI : IsMulCommutative (lowerCentralLayer H 0) :=
+  let : IsMulCommutative (lowerCentralLayer H 0) :=
     lowerCentralLayerIsMulCommutative H 0
-  letI : IsMulCommutative (lowerCentralLayer H 1) :=
+  let : IsMulCommutative (lowerCentralLayer H 1) :=
     lowerCentralLayerIsMulCommutative H 1
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer H 0)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer H 0)) :=
     lowerCentralLayerZmodModule H 0
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
     lowerCentralLayerZmodModule H 1
   unfold lowerCentralSquareMapBaseChange
   rw [lowerCentralSquareMapAdditive_equivariant phi hSq g u]
@@ -754,7 +754,7 @@ theorem eq_of_same_add_law_and_equivariant_of_no_injective_intertwiner
       change d (rho₁ c v) = 0
       change d v = 0 at hv
       rw [hinter, hv, map_zero] }
-  letI : Representation.IsIrreducible rho₁ := hirr₁
+  let : Representation.IsIrreducible rho₁ := hirr₁
   rcases eq_bot_or_eq_top S with hS | hS
   · exfalso
     apply hno
@@ -933,7 +933,7 @@ theorem lowerCentralUpperQuadraticCandidate_add
           TensorProduct.mk (ZMod 2) K
             (Additive (lowerCentralLayer H 1)) 1
             (lowerCentralCommutatorBilinear H x y) := by
-  letI : CharP K 2 :=
+  let : CharP K 2 :=
     charP_of_injective_algebraMap
       (algebraMap (ZMod 2) K).injective 2
   let beta := lowerCentralCommutatorBilinearBaseChange K H

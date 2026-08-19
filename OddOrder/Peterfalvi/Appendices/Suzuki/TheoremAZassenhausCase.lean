@@ -68,7 +68,7 @@ theorem eq_one_of_three_fixedPoints_of_V_eq_bot (hV : hyp.V = ⊥)
     {a b c : Ω} (hab : a ≠ b) (hac : a ≠ c) (hbc : b ≠ c)
     {g : G} (hga : g • a = a) (hgb : g • b = b) (hgc : g • c = c) : g = 1 := by
   classical
-  haveI := hyp.finite_Omega
+  have := hyp.finite_Omega
   have htb : hyp.basept ≠ hyp.t • hyp.basept := fun hcon =>
     hyp.smul_basept_ne_of_not_mem_H hyp.t_not_mem_H hcon.symm
   obtain ⟨h, hha, hhb⟩ :=
@@ -134,7 +134,7 @@ subgroup has even order — that is `O_{2′}(G) = 1` (`even_card_of_normal_ne_b
 theorem natCard_normal_ne_natCard_Omega (N : Subgroup G) (hN : N.Normal) :
     Nat.card ↥N ≠ Nat.card Ω := by
   classical
-  haveI := hyp.finite_Omega
+  have := hyp.finite_Omega
   intro hcard
   have hQpos : 0 < Nat.card ↥hyp.Q := Nat.card_pos
   have hodd : Odd (Nat.card Ω) := by

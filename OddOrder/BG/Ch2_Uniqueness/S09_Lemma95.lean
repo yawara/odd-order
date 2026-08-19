@@ -36,7 +36,7 @@ of `K`, then `D` centralizes `K`. -/
 private theorem le_centralizer_of_le_chiefFactorCentralizer_chain
     {M : Type*} [Group M] [Finite M] {K D E : Subgroup M} [K.Normal]
     (hcop : (Nat.card ↥D).Coprime (Nat.card ↥K))
-    (hsolv : IsSolvable ↥D ∨ IsSolvable ↥K)
+    (hsolv : Group.IsSolvable ↥D ∨ Group.IsSolvable ↥K)
     (hDE : D ≤ E)
     (hcent : ∀ i, E ≤ chiefFactorCentralizer
       (chiefSeriesInside K i) (chiefSeriesInside K (i + 1))) :
@@ -86,15 +86,15 @@ private structure Cor419ChiefFactorData (M : Type*) [Group M] [Finite M]
 This isolates the prime-selection part needed when Lemma 9.5 feeds a local chief
 factor into BG Corollary 4.19. -/
 private theorem exists_prime_isPGroup_chiefFactor_quotient
-    {M : Type*} [Group M] [Finite M] [IsSolvable M]
+    {M : Type*} [Group M] [Finite M] [Group.IsSolvable M]
     {U V : Subgroup M} (hChief : IsChiefFactor U V) :
     haveI : V.Normal := hChief.normal_bot
     ∃ q : ℕ, q.Prime ∧ IsPGroup q ↥(U.map (QuotientGroup.mk' V)) := by
-  haveI : V.Normal := hChief.normal_bot
+  have : V.Normal := hChief.normal_bot
   have hMin : OddOrder.Isaacs.Ch02.IsMinimalNormal (U.map (QuotientGroup.mk' V)) :=
     hChief.isMinimalNormal_map_quotient
   obtain ⟨q, hq, hElem⟩ :=
-    OddOrder.Isaacs.Ch03.solvable_minimal_normal_isElementaryAbelian hMin
+    OddOrder.Isaacs.Ch03.minimal_normal_isElementaryAbelian_of_isSolvable hMin
   exact ⟨q, hq, hElem.isPGroup⟩
 
 /-- In an odd-order ambient group, the prime attached to a nontrivial chief-factor
@@ -106,8 +106,8 @@ private theorem odd_prime_of_chiefFactor_quotient_isPGroup
       haveI : V.Normal := hChief.normal_bot
       IsPGroup q ↥(U.map (QuotientGroup.mk' V))) :
     Odd q := by
-  haveI : V.Normal := hChief.normal_bot
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : V.Normal := hChief.normal_bot
+  have : Fact q.Prime := ⟨hq⟩
   have hMin : OddOrder.Isaacs.Ch02.IsMinimalNormal (U.map (QuotientGroup.mk' V)) :=
     hChief.isMinimalNormal_map_quotient
   have hUbar_ne : U.map (QuotientGroup.mk' V) ≠ ⊥ := hMin.2.1
@@ -169,12 +169,12 @@ private theorem chiefSeriesInside_le_opiCoreInG_sup_of_nilpotent
   have hU_le_K : U ≤ K := by
     simpa [U] using chiefSeriesInside_le K i
   have hU_nilp : Group.IsNilpotent ↥U := by
-    haveI : Group.IsNilpotent ↥K := hKnilp
+    have : Group.IsNilpotent ↥K := hKnilp
     exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hU_le_K)
   change U ≤ X
   refine S08.le_of_sylow_le_of_nilpotent hU_nilp ?_
   intro r
-  haveI hrFact : Fact (Nat.Prime (r : ℕ)) :=
+  have hrFact : Fact (Nat.Prime (r : ℕ)) :=
     ⟨Nat.prime_of_mem_primeFactors r.2⟩
   let S : Sylow (r : ℕ) ↥U := default
   let Sm : Subgroup M := (S : Subgroup ↥U).map U.subtype
@@ -232,7 +232,7 @@ private def cor419ChiefFactorData_chiefSeriesInside_of_opiCoreInG
 ambient `q`-core of `K`.  After the rank and oddness bridges, the only remaining
 input is the nilpotent absorption statement `U ≤ O_q(K) V`. -/
 private noncomputable def cor419ChiefFactorData_chiefSeriesInside_of_opiCoreInG_absorption
-    {M : Type*} [Group M] [Finite M] [IsSolvable M] (hoddM : Odd (Nat.card M))
+    {M : Type*} [Group M] [Finite M] [Group.IsSolvable M] (hoddM : Odd (Nat.card M))
     {K : Subgroup M} [K.Normal] (hK_rank : rank ↥K ≤ 2) (i : ℕ)
     (hU_ne : chiefSeriesInside K i ≠ ⊥)
     (habsorb : ∀ q : ℕ, q.Prime →
@@ -256,7 +256,7 @@ private noncomputable def cor419ChiefFactorData_chiefSeriesInside_of_opiCoreInG_
 
 /-- Nilpotent version of the chief-series Corollary 4.19 data package. -/
 private noncomputable def cor419ChiefFactorData_chiefSeriesInside_of_nilpotent
-    {M : Type*} [Group M] [Finite M] [IsSolvable M] (hoddM : Odd (Nat.card M))
+    {M : Type*} [Group M] [Finite M] [Group.IsSolvable M] (hoddM : Odd (Nat.card M))
     {K : Subgroup M} [K.Normal] (hKnilp : Group.IsNilpotent ↥K)
     (hK_rank : rank ↥K ≤ 2) :
     ∀ i, chiefSeriesInside K i ≠ ⊥ →
@@ -265,7 +265,7 @@ private noncomputable def cor419ChiefFactorData_chiefSeriesInside_of_nilpotent
   exact cor419ChiefFactorData_chiefSeriesInside_of_opiCoreInG_absorption
     hoddM hK_rank i hU_ne
     (fun q hq hUbar => by
-      haveI : Fact q.Prime := ⟨hq⟩
+      have : Fact q.Prime := ⟨hq⟩
       exact chiefSeriesInside_le_opiCoreInG_sup_of_nilpotent (q := q) hKnilp i hUbar)
 
 /-- Chief-series layers contained in a normal rank-two `q`-subgroup already have
@@ -311,8 +311,8 @@ private theorem local_derived_le_chiefFactorCentralizer_chain_of_cor419Data
   · let d := hdata i hU0
     have hChief : IsChiefFactor (chiefSeriesInside K i) (chiefSeriesInside K (i + 1)) :=
       isChiefFactor_chiefSeriesInside hU0
-    haveI : Fact d.q.Prime := ⟨d.q_prime⟩
-    haveI : d.R.Normal := d.R_normal
+    have : Fact d.q.Prime := ⟨d.q_prime⟩
+    have : d.R.Normal := d.R_normal
     have hcomm : _root_.commutator M ≤
         chiefFactorCentralizer (chiefSeriesInside K i) (chiefSeriesInside K (i + 1)) :=
       OddOrder.BG.Ch1.S04.commutator_le_chiefFactorCentralizer_of_pRank_le_two_of_le_sup
@@ -328,7 +328,7 @@ private theorem le_centralizer_of_local_derived_chiefFactorCentralizer_chain
     (hP0D : P0 ≤ derivedInG H) (hKH : K ≤ H)
     (hcop : (Nat.card ↥(P0.subgroupOf H)).Coprime
       (Nat.card ↥(K.subgroupOf H)))
-    (hsolv : IsSolvable ↥(P0.subgroupOf H) ∨ IsSolvable ↥(K.subgroupOf H))
+    (hsolv : Group.IsSolvable ↥(P0.subgroupOf H) ∨ Group.IsSolvable ↥(K.subgroupOf H))
     (hcent : ∀ i, derivedInG (⊤ : Subgroup ↥H) ≤
       chiefFactorCentralizer
         (chiefSeriesInside (K.subgroupOf H) i)
@@ -354,7 +354,7 @@ private theorem le_centralizer_of_local_cor419Data_chain
     (hoddH : Odd (Nat.card ↥H)) (hP0D : P0 ≤ derivedInG H) (hKH : K ≤ H)
     (hcop : (Nat.card ↥(P0.subgroupOf H)).Coprime
       (Nat.card ↥(K.subgroupOf H)))
-    (hsolv : IsSolvable ↥(P0.subgroupOf H) ∨ IsSolvable ↥(K.subgroupOf H))
+    (hsolv : Group.IsSolvable ↥(P0.subgroupOf H) ∨ Group.IsSolvable ↥(K.subgroupOf H))
     (hdata : ∀ i, chiefSeriesInside (K.subgroupOf H) i ≠ ⊥ →
       Cor419ChiefFactorData (↥H)
         (chiefSeriesInside (K.subgroupOf H) i)
@@ -405,8 +405,8 @@ private theorem le_centralizer_inf_of_local_cor419Data_chain
     (hcop : (Nat.card ↥(P0.subgroupOf (L ⊓ M))).Coprime
       (Nat.card ↥((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M))))
     (hsolv :
-      IsSolvable ↥(P0.subgroupOf (L ⊓ M)) ∨
-        IsSolvable ↥((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M)))
+      Group.IsSolvable ↥(P0.subgroupOf (L ⊓ M)) ∨
+        Group.IsSolvable ↥((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M)))
     (hdata :
       letI : (((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M) :
           Subgroup ↥(L ⊓ M))).Normal :=
@@ -419,7 +419,7 @@ private theorem le_centralizer_inf_of_local_cor419Data_chain
     P0 ≤ Subgroup.centralizer ((D ⊓ L : Subgroup G) : Set G) := by
   have hDL_le_LM : (D ⊓ L : Subgroup G) ≤ L ⊓ M :=
     le_inf inf_le_right (inf_le_left.trans hDM)
-  haveI : (((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M) :
+  have : (((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M) :
       Subgroup ↥(L ⊓ M))).Normal :=
     inf_subgroupOf_inf_normal_of_le_normalizer hDM hMnormD
   exact le_centralizer_of_local_cor419Data_chain
@@ -441,7 +441,7 @@ step.  The solvability of the local group supplies the chief-factor prime, and
 nilpotence supplies the `O_q(K)` absorption for every chief layer. -/
 private theorem le_centralizer_inf_of_local_nilpotent_rank_chain
     [Finite G] (hG : IsMinimalSimpleOdd G) {D L M P0 : Subgroup G}
-    [IsSolvable ↥(L ⊓ M)]
+    [Group.IsSolvable ↥(L ⊓ M)]
     (hDM : D ≤ M) (hMnormD : M ≤ Subgroup.normalizer (D : Set G))
     (hP0_der : P0 ≤ derivedInG (L ⊓ M))
     (hcop : (Nat.card ↥(P0.subgroupOf (L ⊓ M))).Coprime
@@ -452,13 +452,13 @@ private theorem le_centralizer_inf_of_local_nilpotent_rank_chain
       rank ↥(((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M) : Subgroup ↥(L ⊓ M))) ≤ 2) :
     P0 ≤ Subgroup.centralizer ((D ⊓ L : Subgroup G) : Set G) := by
   have hK_solv :
-      IsSolvable
+      Group.IsSolvable
         ↥(((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M) : Subgroup ↥(L ⊓ M))) := by
-    haveI : Group.IsNilpotent
+    have : Group.IsNilpotent
         ↥(((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M) : Subgroup ↥(L ⊓ M))) :=
       hKnilp
     infer_instance
-  haveI : (((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M) :
+  have : (((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M) :
       Subgroup ↥(L ⊓ M))).Normal :=
     inf_subgroupOf_inf_normal_of_le_normalizer hDM hMnormD
   exact le_centralizer_inf_of_local_cor419Data_chain
@@ -498,14 +498,14 @@ private theorem le_centralizer_inf_opiCoreFitting_of_pSubgroup_local_derived
   have hP0H : P0 ≤ H := by
     simpa [H] using hP0_der.trans (derivedInG_le_self (L ⊓ M))
   have hD_nilp : Group.IsNilpotent ↥D := by
-    haveI : Group.IsNilpotent ↥(S08.fittingInG M) := S08.fittingInG_isNilpotent M
+    have : Group.IsNilpotent ↥(S08.fittingInG M) := S08.fittingInG_isNilpotent M
     exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hD_le_F)
   have hK_nilp_ambient : Group.IsNilpotent ↥K := by
-    haveI : Group.IsNilpotent ↥D := hD_nilp
+    have : Group.IsNilpotent ↥D := hD_nilp
     exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe inf_le_left)
   have hK_nilp :
       Group.IsNilpotent ↥((K.subgroupOf H : Subgroup ↥H)) := by
-    haveI : Group.IsNilpotent ↥K := hK_nilp_ambient
+    have : Group.IsNilpotent ↥K := hK_nilp_ambient
     exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hK_le_H).symm
   have hK_rank_ambient : rank ↥K ≤ 2 := by
     simpa [D, K] using
@@ -527,9 +527,9 @@ private theorem le_centralizer_inf_opiCoreFitting_of_pSubgroup_local_derived
     isPiSubgroup_subgroupOf_of_le hK_le_H hKpic_ambient
   have hcop : (Nat.card ↥(P0.subgroupOf H)).Coprime (Nat.card ↥(K.subgroupOf H)) :=
     coprime_card_of_isPiSubgroup_of_isPiSubgroup_compl hP0pi hKpic
-  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-  haveI hHsolv : IsSolvable ↥H :=
-    solvable_of_solvable_injective (f := Subgroup.inclusion (inf_le_right : H ≤ M))
+  have hMsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
+  have hHsolv : Group.IsSolvable ↥H :=
+    Group.isSolvable_of_isSolvable_injective (f := Subgroup.inclusion (inf_le_right : H ≤ M))
       (Subgroup.inclusion_injective (inf_le_right : H ≤ M))
   simpa [D, H, K] using
     (le_centralizer_inf_of_local_nilpotent_rank_chain
@@ -628,7 +628,7 @@ private theorem normalizer_isUniquelyMaximal_and_le_maximal_of_rank_three_fittin
   have hN0lt : N0 < ⊤ := by
     rw [lt_top_iff_ne_top]
     intro hN0top
-    haveI : P0.Normal := Subgroup.normalizer_eq_top_iff.mp hN0top
+    have : P0.Normal := Subgroup.normalizer_eq_top_iff.mp hN0top
     rcases hG.simple.eq_bot_or_eq_top_of_normal P0 inferInstance with hP0bot | hP0top
     · exact hP0ne hP0bot
     · have htop_le_M : (⊤ : Subgroup G) ≤ M := by
@@ -770,7 +770,7 @@ private theorem normalizer_le_maximal_of_three_le_rank_opiCoreFitting_centralize
   obtain ⟨q, hq, h3Dq⟩ :=
     exists_pRank_ge_of_pos_le_rank (G := ↥D) (n := 3) (by norm_num)
       (by simpa [D] using h3D)
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   exact normalizer_le_maximal_of_three_le_pRank_opiCoreFitting_centralizer
     (G := G) (p := p) (q := q) hG hM (by simpa [D] using h3Dq)
     hP0centD hP0M hP0ne
@@ -792,7 +792,7 @@ private theorem normalizer_isUniquelyMaximal_and_le_maximal_of_three_le_rank_opi
   obtain ⟨q, hq, h3Dq⟩ :=
     exists_pRank_ge_of_pos_le_rank (G := ↥D) (n := 3) (by norm_num)
       (by simpa [D] using h3D)
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   exact normalizer_isUniquelyMaximal_and_le_maximal_of_three_le_pRank_opiCoreFitting
     (G := G) (p := p) (q := q) hG hM (by simpa [D] using h3Dq)
     hP0centD hP0M hP0ne
@@ -888,7 +888,7 @@ private theorem normalizer_isUniquelyMaximal_and_eq_maximal_of_maximal_le_normal
   have hN0lt : N0 < ⊤ := by
     rw [lt_top_iff_ne_top]
     intro hN0top
-    haveI : P0.Normal := Subgroup.normalizer_eq_top_iff.mp hN0top
+    have : P0.Normal := Subgroup.normalizer_eq_top_iff.mp hN0top
     rcases hG.simple.eq_bot_or_eq_top_of_normal P0 inferInstance with hP0bot | hP0top
     · exact hP0ne hP0bot
     · have htop_le_M : (⊤ : Subgroup G) ≤ M := by
@@ -956,7 +956,7 @@ private theorem commutator_normalizer_ne_bot_of_isSylow [Finite G]
       Subgroup.isComplement'_bot_left.mp (hNbot ▸ hNcompl P)
     have hGp : IsPGroup p G :=
       (hPtop ▸ P.isPGroup' : IsPGroup p ↥(⊤ : Subgroup G)).of_equiv Subgroup.topEquiv
-    haveI := hGp.isNilpotent
+    have := hGp.isNilpotent
     exact hG.notSolvable inferInstance
   · -- `N = ⊤` ⇒ `P = ⊥` ⇒ `p ∤ |G|`, contradicting `hp_dvd`.
     have hPbot : (P : Subgroup G) = ⊥ :=
@@ -978,7 +978,7 @@ private theorem pRank_le_pRank_oPiCore_compl_of_nilpotent
   have hiff : Group.IsNilpotent N ↔
       ∀ (p' : ℕ) (_hp : Fact p'.Prime) (P : Sylow p' N), (↑P : Subgroup N).Normal :=
     (Group.isNilpotent_of_finite_tfae (G := N)).out 0 3
-  haveI hSnorm : (S : Subgroup N).Normal := hiff.mp inferInstance q inferInstance S
+  have hSnorm : (S : Subgroup N).Normal := hiff.mp inferInstance q inferInstance S
   have hSpi : Ch03.Subgroup.IsPiGroup {r : ℕ | r ≠ p} (S : Subgroup N) := by
     intro r hr
     obtain ⟨k, hk⟩ := S.isPGroup'.exists_card_eq
@@ -1000,7 +1000,7 @@ private theorem rank_fitting_subtype_le_two_of_low_rank
     (hp' : rank ↥(opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) ≤ 2) :
     rank ↥(Ch01.fitting ↥M) ≤ 2 := by
   classical
-  haveI : Group.IsNilpotent ↥(S08.fittingInG M) := S08.fittingInG_isNilpotent M
+  have : Group.IsNilpotent ↥(S08.fittingInG M) := S08.fittingInG_isNilpotent M
   have hcompl : (({p} : Set ℕ)ᶜ) = {r : ℕ | r ≠ p} := by
     ext r; simp [Set.mem_compl_iff, Set.mem_singleton_iff]
   refine (rank_le_of_injective
@@ -1009,7 +1009,7 @@ private theorem rank_fitting_subtype_le_two_of_low_rank
     (Subgroup.equivMapOfInjective _ _ M.subtype_injective).injective).trans ?_
   rw [rank_le_iff]
   intro q hq
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   by_cases hqp : q = p
   · subst hqp; exact hp
   · have h1 : pRank ↥(S08.fittingInG M) q ≤
@@ -1033,8 +1033,8 @@ private theorem derivedInG_le_fittingInG_of_low_rank
     (hp : pRank ↥(S08.fittingInG M) p ≤ 2)
     (hp' : rank ↥(opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) ≤ 2) :
     derivedInG M ≤ S08.fittingInG M := by
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-  haveI : Nontrivial ↥M :=
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
+  have : Nontrivial ↥M :=
     (Subgroup.nontrivial_iff_ne_bot M).mpr fun hM0 => hAne (le_bot_iff.mp (hM0 ▸ hAM))
   have hoddM : Odd (Nat.card ↥M) := by
     rcases Nat.even_or_odd (Nat.card ↥M) with he | ho
@@ -1095,12 +1095,12 @@ private theorem top_le_oPiCore_singleton_sup_compl_of_isNilpotent
   classical
   have hfit : Ch01.fitting K = ⊤ := by
     refine top_le_iff.mp ?_
-    haveI : Group.IsNilpotent ↥(⊤ : Subgroup K) := Group.isNilpotent_top.mpr inferInstance
+    have : Group.IsNilpotent ↥(⊤ : Subgroup K) := Group.isNilpotent_top.mpr inferInstance
     exact Ch01.nilpotent_normal_le_fitting
   rw [← hfit, Ch01.fitting_eq_iSup_primeFactors]
   refine iSup_le fun q => ?_
   obtain ⟨qval, hq_mem⟩ := q
-  haveI : Fact qval.Prime := ⟨(Nat.mem_primeFactors.mp hq_mem).1⟩
+  have : Fact qval.Prime := ⟨(Nat.mem_primeFactors.mp hq_mem).1⟩
   rw [show (Ch01.opCore qval K) = Ch03.oPiCore ({qval} : Set ℕ) K from
       (Ch04.oPiCore_singleton_eq_opCore qval).symm]
   by_cases hqeq : qval = p
@@ -1116,7 +1116,7 @@ private theorem fittingInG_le_opiCoreInG_sup_compl [Finite G] (p : ℕ) (M : Sub
     S08.fittingInG M ≤ opiCoreInG ({p} : Set ℕ) (S08.fittingInG M)
       ⊔ opiCoreInG (({p} : Set ℕ)ᶜ) (S08.fittingInG M) := by
   classical
-  haveI : Group.IsNilpotent ↥(S08.fittingInG M) := S08.fittingInG_isNilpotent M
+  have : Group.IsNilpotent ↥(S08.fittingInG M) := S08.fittingInG_isNilpotent M
   have hmap := Subgroup.map_mono (f := (S08.fittingInG M).subtype)
     (top_le_oPiCore_singleton_sup_compl_of_isNilpotent (K := ↥(S08.fittingInG M)) p)
   rw [Subgroup.map_sup, ← MonoidHom.range_eq_map, Subgroup.range_subtype] at hmap
@@ -1144,7 +1144,7 @@ theorem scn3_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)
     intro x hx; rw [Subgroup.mem_centralizer_iff]; intro y hy; exact (hAcomm_set y hy x hx)
   -- `p ∣ |G|`
   have hp_dvd : p ∣ Nat.card G := by
-    haveI : Nontrivial ↥A := (Subgroup.nontrivial_iff_ne_bot A).mpr hAne
+    have : Nontrivial ↥A := (Subgroup.nontrivial_iff_ne_bot A).mpr hAne
     obtain ⟨k, hk⟩ := hAp.exists_card_eq
     have hk1 : k ≠ 0 := by
       rintro rfl; rw [pow_zero] at hk; exact (Finite.one_lt_card (α := ↥A)).ne' hk
@@ -1212,7 +1212,7 @@ theorem scn3_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)
         set FP : Subgroup ↥M' := Ch01.fitting ↥M' ⊔ (P : Subgroup G).subgroupOf M' with hFPdef
         have hcomm_FP : commutator ↥M' ≤ FP := by
           rw [hFPdef]; exact hcomm_le.trans le_sup_left
-        haveI hFPnorm : FP.Normal :=
+        have hFPnorm : FP.Normal :=
           Subgroup.Normal.of_commutator_le (G := ↥M') (H := FP) hcomm_FP
         have hPM'_le_FP : (PM' : Subgroup ↥M') ≤ FP := by rw [hPM'coe]; exact le_sup_right
         -- Frattini argument in `↥M'`: `N_{M'}(P) ⊔ FP = ⊤`.
@@ -1232,7 +1232,7 @@ theorem scn3_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)
             fun x hx => S08.mem_normalizer_fittingInG_of_mem hx
           have hM'_norm_Op : M' ≤ Subgroup.normalizer (Op : Set G) :=
             le_normalizer_opiCoreInG_of_le_normalizer ({p} : Set ℕ) hM'_norm_F
-          haveI hOpnorm : (Op.subgroupOf M').Normal :=
+          have hOpnorm : (Op.subgroupOf M').Normal :=
             (Subgroup.normal_subgroupOf_iff_le_normalizer hOp_le_M').mpr hM'_norm_Op
           have hOpp : IsPGroup p ↥(Op.subgroupOf M') :=
             (isPGroup_opiCoreInG_singleton (S08.fittingInG M')).comap_of_injective
@@ -1295,7 +1295,7 @@ theorem scn3_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)
   have hZbot : Subgroup.center G = ⊥ := by
     rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
     · exact h
-    · exact absurd (isSolvable_of_comm fun a b =>
+    · exact absurd (Group.isSolvable_of_comm fun a b =>
         (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm) hG.notSolvable
   have hCxlt : Subgroup.centralizer ({x} : Set G) < ⊤ := by
     rw [lt_top_iff_ne_top]
@@ -1342,14 +1342,14 @@ theorem centralizer_lt_top_of_two_le_rank [Finite G] (hG : IsMinimalSimpleOdd G)
   have hZbot : Subgroup.center G = ⊥ := by
     rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
     · exact h
-    · exact absurd (isSolvable_of_comm fun a b =>
+    · exact absurd (Group.isSolvable_of_comm fun a b =>
         (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm) hG.notSolvable
   have hKne : K ≠ ⊥ := by
     obtain ⟨p, hp, A, _hAea, hAK, hAnc⟩ :=
       exists_isElementaryAbelian_not_isCyclic_le_of_two_le_rank K hr
     intro hKbot
     have hA_bot : A = ⊥ := le_bot_iff.mp (hAK.trans (le_of_eq hKbot))
-    haveI : Nontrivial ↥A := Nontrivial.of_not_isCyclic hAnc
+    have : Nontrivial ↥A := Nontrivial.of_not_isCyclic hAnc
     exact ((Subgroup.nontrivial_iff_ne_bot A).mp inferInstance) hA_bot
   rw [lt_top_iff_ne_top]
   intro hCtop
@@ -1367,7 +1367,7 @@ theorem isUniquelyMaximal_of_three_le_rank_of_lt_top [Finite G]
   classical
   obtain ⟨p, hp, hpRankK⟩ :=
     exists_pRank_ge_of_pos_le_rank (G := ↥K) (n := 3) (by norm_num) hr3
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨B₀, hB₀ea, hB₀log⟩ :=
     exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank
       (G := ↥K) (p := p) (n := 3) (by norm_num) hpRankK
@@ -1416,7 +1416,7 @@ theorem isUniquelyMaximal_of_three_le_rank_of_lt_top [Finite G]
   have hAU : IsUniquelyMaximal A :=
     scn3_isUniquelyMaximal hG hAglobal
   have hAab : IsMulCommutative A := by
-    haveI : IsMulCommutative A₀ := hA₀scn.isSCN.isMulCommutative
+    have : IsMulCommutative A₀ := hA₀scn.isSCN.isMulCommutative
     change IsMulCommutative (A₀.map (P : Subgroup G).subtype)
     infer_instance
   have hAp : IsPGroup p A := by

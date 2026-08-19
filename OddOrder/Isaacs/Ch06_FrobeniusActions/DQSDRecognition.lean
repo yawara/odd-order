@@ -467,12 +467,12 @@ theorem exists_sq_eq_of_isCyclic_two_group_involution_of_card_ne_two
     {x : Q} (hx_ne : x ≠ 1) (hx_sq : x ^ 2 = 1) (hcard_ne_two : Nat.card Q ≠ 2) :
     ∃ y : Q, y ^ 2 = x := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨g, hg_gen⟩ := IsCyclic.exists_generator (α := Q)
   obtain ⟨k, hcard⟩ := (IsPGroup.iff_card (p := 2) (G := Q)).mp hQ
   have hcard_ne_one : Nat.card Q ≠ 1 := by
     intro hcard_one
-    haveI : Subsingleton Q := (Nat.card_eq_one_iff_unique.mp hcard_one).1
+    have : Subsingleton Q := (Nat.card_eq_one_iff_unique.mp hcard_one).1
     exact hx_ne (Subsingleton.elim x 1)
   have hk_pos : 0 < k := by
     by_contra hk_not
@@ -515,7 +515,7 @@ private lemma two_le_exponent_of_nonabelian_index_two
     2 ≤ k := by
   by_contra hk_not
   have hk_eq : k = 1 := by omega
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hcard : Nat.card P = 2 ^ 2 := by
     have h := (Subgroup.zpowers c).index_mul_card
     rw [h_idx, Nat.card_zpowers, h_order, hk_eq] at h
@@ -663,7 +663,7 @@ theorem semiDihedral_of_twistConjugation
     (h_conj : a * c * a⁻¹ = z * c⁻¹) :
     ∃ k : ℕ, 2 ^ k = orderOf c ∧ Nonempty (P ≃* SemiDihedralGroup k) := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨k, h_order⟩ := (IsPGroup.iff_orderOf.mp hP) c
   have hk_pos : 0 < k := by
     obtain ⟨_h_z_half, _h_order_even, h_half_pos⟩ :=
@@ -716,7 +716,7 @@ private lemma exists_orderOf_eq_four_of_card_eight_nonabelian
     (h_card : Nat.card P = 8) (h_nonab : ∃ x y : P, x * y ≠ y * x) :
     ∃ c : P, orderOf c = 4 := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hP : IsPGroup 2 P := IsPGroup.of_card (p := 2) (n := 3) (by
     rw [h_card]
     norm_num)
@@ -745,7 +745,7 @@ private lemma exists_orderOf_eq_four_of_card_eight_nonabelian
       rw [h_order, hk3, h_card]
       norm_num)
     obtain ⟨x, y, hxy⟩ := h_nonab
-    haveI : IsCyclic P := hcyc
+    have : IsCyclic P := hcyc
     exact hxy (Std.Commutative.comm x y)
   have hk_eq : k = 2 := by omega
   exact ⟨c, by rw [h_order, hk_eq]; norm_num⟩
@@ -793,7 +793,7 @@ theorem dihedralOrQuaternion_of_card_eight
     (h_card : Nat.card P = 8) (h_nonab : ∃ x y : P, x * y ≠ y * x) :
     Nonempty (P ≃* DihedralGroup 4) ∨ Nonempty (P ≃* QuaternionGroup 2) := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hP : IsPGroup 2 P := IsPGroup.of_card (p := 2) (n := 3) (by
     rw [h_card]
     norm_num)
@@ -855,7 +855,7 @@ theorem dihedralOrQuaternion_of_self_centralizing_cyclic_card_four
   have hquot_le : Nat.card (P ⧸ C) ≤ Nat.card (MulAut C) :=
     quotient_card_le_mulAut_of_self_centralizing hCent
   have hmulAut_card : Nat.card (MulAut C) = 2 := by
-    haveI : IsCyclic C := hC_cyclic
+    have : IsCyclic C := hC_cyclic
     rw [IsCyclic.card_mulAut, hC_card]
     decide
   have hquot_le_two : Nat.card (P ⧸ C) ≤ 2 := by
@@ -866,7 +866,7 @@ theorem dihedralOrQuaternion_of_self_centralizing_cyclic_card_four
       rw [← Subgroup.topEquiv.isCyclic]
       rwa [← hC_top]
     obtain ⟨x, y, hxy⟩ := h_nonab
-    haveI : IsCyclic P := hP_cyclic
+    have : IsCyclic P := hP_cyclic
     exact hxy (Std.Commutative.comm x y)
   have hquot_gt_one : 1 < Nat.card (P ⧸ C) :=
     Finite.one_lt_card_iff_nontrivial.mpr

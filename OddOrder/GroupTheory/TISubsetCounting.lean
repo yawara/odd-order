@@ -63,8 +63,8 @@ theorem sum_conjClassSet [Finite G] {A : Set G} {L : Subgroup G}
     ∑ x ∈ (Set.toFinite (conjClassSet A)).toFinset, f x
       = L.index • ∑ a ∈ (Set.toFinite A).toFinset, f a := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Fintype (G ⧸ L) := Fintype.ofFinite _
+  have : Fintype G := Fintype.ofFinite G
+  have : Fintype (G ⧸ L) := Fintype.ofFinite _
   -- The coset-indexed conjugate family `B (gL) = g • A` (well-defined by `L`-stability).
   have hwd : ∀ g₁ g₂ : G, QuotientGroup.leftRel L g₁ g₂ →
       MulAut.conj g₁ • A = MulAut.conj g₂ • A := by

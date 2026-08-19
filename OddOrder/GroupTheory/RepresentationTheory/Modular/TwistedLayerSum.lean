@@ -81,7 +81,7 @@ multiplication by `ω`. -/
 theorem conj_smul_twistedSum (hp : 1 < p) {ζ : R} (hζ : ζ ^ p = 1) {h : G}
     {v : ZMod p → MonoidAlgebra R G} (hv : ∀ i, h • v i = v (i + 1)) :
     h • twistedSum p ζ v = ζ • twistedSum p ζ v := by
-  haveI : Fact (1 < p) := ⟨hp⟩
+  have : Fact (1 < p) := ⟨hp⟩
   rw [twistedSum, Finset.smul_sum, Finset.smul_sum]
   have hshift : ∀ i : ZMod p, h • (ζ ^ (-i).val • v i) = ζ ^ (-i).val • v (i + 1) := fun i => by
     rw [OddOrder.GroupAlgebra.conj_smul_smul, hv]

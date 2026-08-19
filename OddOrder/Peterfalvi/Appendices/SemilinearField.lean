@@ -73,7 +73,7 @@ lies in `D` (`LinearMap.lsmul`).  Hence every `D`-submodule of `M` is closed und
 `D`-submodules either. -/
 theorem isSimpleModule_end :
     IsSimpleModule (Module.End (MonoidAlgebra k T) M) M := by
-  haveI : Nontrivial M := IsSimpleModule.nontrivial (MonoidAlgebra k T) M
+  have : Nontrivial M := IsSimpleModule.nontrivial (MonoidAlgebra k T) M
   refine { eq_bot_or_eq_top := fun N => ?_ }
   -- the carrier of the `D`-submodule `N` is a `k[T]`-submodule
   let N' : Submodule (MonoidAlgebra k T) M :=
@@ -106,9 +106,9 @@ open scoped Classical in
 /-- `|End_{k[T]}(M)| = |M|`: as `M` is a `1`-dimensional `D`-space, `|M| = |D|¹`. -/
 theorem natCard_end_eq :
     Nat.card (Module.End (MonoidAlgebra k T) M) = Nat.card M := by
-  haveI := finite_end (k := k) (T := T) (M := M)
-  haveI : Fintype M := Fintype.ofFinite M
-  haveI : Fintype (Module.End (MonoidAlgebra k T) M) := Fintype.ofFinite _
+  have := finite_end (k := k) (T := T) (M := M)
+  have : Fintype M := Fintype.ofFinite M
+  have : Fintype (Module.End (MonoidAlgebra k T) M) := Fintype.ofFinite _
   have h : Fintype.card M =
       Fintype.card (Module.End (MonoidAlgebra k T) M) ^
         Module.finrank (Module.End (MonoidAlgebra k T) M) M :=
@@ -139,15 +139,15 @@ theorem exists_field_of_irreducible.{u} {p : ℕ} [Fact p.Prime] {E : Type u} [C
     (hirr : ∀ U : Subgroup E, IsAInvariant ψ U → U = ⊥ ∨ U = ⊤) :
     ∃ (F : Type u) (_ : Field F) (_ : Module F (Additive E)) (_ : Finite F),
       Module.finrank F (Additive E) = 1 ∧ Nat.card F = Nat.card E := by
-  haveI hEcomm : IsMulCommutative E := ⟨⟨mul_comm⟩⟩
+  have hEcomm : IsMulCommutative E := ⟨⟨mul_comm⟩⟩
   have hpsmul : ∀ x : Additive E, (p : ℕ) • x = 0 := by
     intro x
     apply Additive.toMul.injective
     rw [toMul_nsmul, toMul_zero]
     exact hE.pow_eq_one x.toMul
-  haveI : Module (ZMod p) (Additive E) := AddCommGroup.zmodModule hpsmul
+  have : Module (ZMod p) (Additive E) := AddCommGroup.zmodModule hpsmul
   let ρ : Representation (ZMod p) T (Additive E) := (mulAutToEnd E p).comp ψ
-  letI instKT : Module (MonoidAlgebra (ZMod p) T) (Additive E) :=
+  let instKT : Module (MonoidAlgebra (ZMod p) T) (Additive E) :=
     Module.compHom (Additive E) ρ.asAlgebraHom.toRingHom
   have key : ∀ (t : T) (x : Additive E),
       (MonoidAlgebra.of (ZMod p) T t) • x = Additive.ofMul ((ψ t) (Additive.toMul x)) := by
@@ -156,8 +156,8 @@ theorem exists_field_of_irreducible.{u} {p : ℕ} [Fact p.Prime] {E : Type u} [C
           = ρ.asAlgebraHom (MonoidAlgebra.of (ZMod p) T t) x from rfl,
         Representation.asAlgebraHom_of]
     rfl
-  haveI hsimp : IsSimpleModule (MonoidAlgebra (ZMod p) T) (Additive E) := by
-    haveI : Nontrivial (Additive E) := inferInstanceAs (Nontrivial (Additive E))
+  have hsimp : IsSimpleModule (MonoidAlgebra (ZMod p) T) (Additive E) := by
+    have : Nontrivial (Additive E) := inferInstanceAs (Nontrivial (Additive E))
     refine { eq_bot_or_eq_top := fun N => ?_ }
     let H : Subgroup E :=
       { carrier := {e : E | Additive.ofMul e ∈ N}
@@ -193,6 +193,7 @@ theorem exists_field_of_irreducible.{u} {p : ℕ} [Fact p.Prime] {E : Type u} [C
   exact natCard_end_eq.trans (Nat.card_congr Additive.toMul)
 
 open scoped Classical in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi, Appendix I, Proposition 2(a)+(b)** (textbook form, with semilinearity).
 In addition to the field `F` of part (a), every `g : MulAut E` that *normalizes* the `T`-action —
 i.e. `ψ (c t) = g · ψ t · g⁻¹` for some `c : T ≃* T` — acts `F`-semilinearly on `E` (written
@@ -209,13 +210,13 @@ theorem exists_field_semilinear.{u} {p : ℕ} [Fact p.Prime] {E : Type u} [CommG
       ∀ (g : MulAut E) (c : T ≃* T), (∀ t, ψ (c t) = g * ψ t * g⁻¹) →
         ∃ σ : F ≃+* F, ∀ (a : F) (x : Additive E),
           (MulEquiv.toAdditive g) (a • x) = σ a • (MulEquiv.toAdditive g) x := by
-  haveI hEcomm : IsMulCommutative E := ⟨⟨mul_comm⟩⟩
+  have hEcomm : IsMulCommutative E := ⟨⟨mul_comm⟩⟩
   have hpsmul : ∀ x : Additive E, (p : ℕ) • x = 0 := by
     intro x; apply Additive.toMul.injective; rw [toMul_nsmul, toMul_zero]
     exact hE.pow_eq_one x.toMul
-  haveI : Module (ZMod p) (Additive E) := AddCommGroup.zmodModule hpsmul
+  have : Module (ZMod p) (Additive E) := AddCommGroup.zmodModule hpsmul
   let ρ : Representation (ZMod p) T (Additive E) := (mulAutToEnd E p).comp ψ
-  letI instKT : Module (MonoidAlgebra (ZMod p) T) (Additive E) :=
+  let instKT : Module (MonoidAlgebra (ZMod p) T) (Additive E) :=
     Module.compHom (Additive E) ρ.asAlgebraHom.toRingHom
   have key : ∀ (t : T) (x : Additive E),
       (MonoidAlgebra.of (ZMod p) T t) • x = Additive.ofMul ((ψ t) (Additive.toMul x)) := by
@@ -224,8 +225,8 @@ theorem exists_field_semilinear.{u} {p : ℕ} [Fact p.Prime] {E : Type u} [CommG
           = ρ.asAlgebraHom (MonoidAlgebra.of (ZMod p) T t) x from rfl,
         Representation.asAlgebraHom_of]
     rfl
-  haveI hsimp : IsSimpleModule (MonoidAlgebra (ZMod p) T) (Additive E) := by
-    haveI : Nontrivial (Additive E) := inferInstanceAs (Nontrivial (Additive E))
+  have hsimp : IsSimpleModule (MonoidAlgebra (ZMod p) T) (Additive E) := by
+    have : Nontrivial (Additive E) := inferInstanceAs (Nontrivial (Additive E))
     refine { eq_bot_or_eq_top := fun N => ?_ }
     let H : Subgroup E :=
       { carrier := {e : E | Additive.ofMul e ∈ N}
@@ -270,7 +271,7 @@ theorem exists_field_semilinear.{u} {p : ℕ} [Fact p.Prime] {E : Type u} [CommG
       uLin (r • x) = (τ r) • (uLin x) := by
     intro r
     refine MonoidAlgebra.induction_on
-      (p := fun r => ∀ x : Additive E, uLin (r • x) = (τ r) • (uLin x))
+      (motive := fun r => ∀ x : Additive E, uLin (r • x) = (τ r) • (uLin x))
       r (fun t x => ?_) (fun a b ha hb x => ?_) (fun s a ha x => ?_)
     · have e1 : (MonoidAlgebra.of (ZMod p) T t) • x = (mulAutToEnd E p (ψ t)) x := by
         change ρ.asAlgebraHom (MonoidAlgebra.of (ZMod p) T t) x = _
@@ -290,8 +291,8 @@ theorem exists_field_semilinear.{u} {p : ℕ} [Fact p.Prime] {E : Type u} [CommG
     · rw [add_smul, map_add, ha, hb, map_add, add_smul]
     · rw [smul_assoc, map_smul, ha, map_smul, smul_assoc]
   let τRing : MonoidAlgebra (ZMod p) T ≃+* MonoidAlgebra (ZMod p) T := τ.toRingEquiv
-  haveI := RingHomInvPair.of_ringEquiv τRing
-  haveI := RingHomInvPair.of_ringEquiv τRing.symm
+  have := RingHomInvPair.of_ringEquiv τRing
+  have := RingHomInvPair.of_ringEquiv τRing.symm
   let eSL : Additive E ≃ₛₗ[(τRing : MonoidAlgebra (ZMod p) T →+* MonoidAlgebra (ZMod p) T)]
       Additive E :=
     { toFun := uLin, map_add' := uLin.map_add, map_smul' := fun r x => hsemi r x,
@@ -303,6 +304,7 @@ theorem exists_field_semilinear.{u} {p : ℕ} [Fact p.Prime] {E : Type u} [CommG
   rw [LinearEquiv.symm_apply_apply]
 
 open scoped Classical in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi, Appendix I, Proposition 2(a)+(b)**, with the scalar
 realization of `T` retained.  The old `exists_field_semilinear` theorem remains
 unchanged; this stronger result is the interface required by Part II, Ch. I
@@ -320,15 +322,15 @@ theorem exists_field_semilinear_with_scalar.{u} {p : ℕ} [Fact p.Prime]
         ∃ σ : F ≃+* F, ∀ (a : F) (x : Additive E),
           (MulEquiv.toAdditive g) (a • x) =
             σ a • (MulEquiv.toAdditive g) x := by
-  haveI hEcomm : IsMulCommutative E := ⟨⟨mul_comm⟩⟩
+  have hEcomm : IsMulCommutative E := ⟨⟨mul_comm⟩⟩
   have hpsmul : ∀ x : Additive E, (p : ℕ) • x = 0 := by
     intro x
     apply Additive.toMul.injective
     rw [toMul_nsmul, toMul_zero]
     exact hE.pow_eq_one x.toMul
-  haveI : Module (ZMod p) (Additive E) := AddCommGroup.zmodModule hpsmul
+  have : Module (ZMod p) (Additive E) := AddCommGroup.zmodModule hpsmul
   let ρ : Representation (ZMod p) T (Additive E) := (mulAutToEnd E p).comp ψ
-  letI instKT : Module (MonoidAlgebra (ZMod p) T) (Additive E) :=
+  let instKT : Module (MonoidAlgebra (ZMod p) T) (Additive E) :=
     Module.compHom (Additive E) ρ.asAlgebraHom.toRingHom
   have key : ∀ (t : T) (x : Additive E),
       (MonoidAlgebra.of (ZMod p) T t) • x =
@@ -338,8 +340,8 @@ theorem exists_field_semilinear_with_scalar.{u} {p : ℕ} [Fact p.Prime]
           ρ.asAlgebraHom (MonoidAlgebra.of (ZMod p) T t) x from rfl,
         Representation.asAlgebraHom_of]
     rfl
-  haveI hsimp : IsSimpleModule (MonoidAlgebra (ZMod p) T) (Additive E) := by
-    haveI : Nontrivial (Additive E) :=
+  have hsimp : IsSimpleModule (MonoidAlgebra (ZMod p) T) (Additive E) := by
+    have : Nontrivial (Additive E) :=
       inferInstanceAs (Nontrivial (Additive E))
     refine { eq_bot_or_eq_top := fun N ↦ ?_ }
     let H : Subgroup E :=
@@ -403,7 +405,7 @@ theorem exists_field_semilinear_with_scalar.{u} {p : ℕ} [Fact p.Prime]
         uLin (r • x) = (τ r) • (uLin x) := by
       intro r
       refine MonoidAlgebra.induction_on
-        (p := fun r => ∀ x : Additive E, uLin (r • x) = (τ r) • (uLin x))
+        (motive := fun r => ∀ x : Additive E, uLin (r • x) = (τ r) • (uLin x))
         r (fun t x => ?_) (fun a b ha hb x => ?_)
         (fun s a ha x => ?_)
       · have e1 : (MonoidAlgebra.of (ZMod p) T t) • x =
@@ -434,8 +436,8 @@ theorem exists_field_semilinear_with_scalar.{u} {p : ℕ} [Fact p.Prime]
       · rw [smul_assoc, map_smul, ha, map_smul, smul_assoc]
     let τRing : MonoidAlgebra (ZMod p) T ≃+*
         MonoidAlgebra (ZMod p) T := τ.toRingEquiv
-    haveI := RingHomInvPair.of_ringEquiv τRing
-    haveI := RingHomInvPair.of_ringEquiv τRing.symm
+    have := RingHomInvPair.of_ringEquiv τRing
+    have := RingHomInvPair.of_ringEquiv τRing.symm
     let eSL : Additive E
         ≃ₛₗ[(τRing : MonoidAlgebra (ZMod p) T →+*
           MonoidAlgebra (ZMod p) T)] Additive E :=
@@ -584,9 +586,9 @@ theorem exists_ne_one_fixed_of_prime_pow_eq_one {p₀ : ℕ} [Fact p₀.Prime]
   classical
   obtain ⟨F, instF, instMod, instFin, hdim, -, ⟨μ, hμ⟩, hsemi⟩ :=
     exists_field_semilinear_with_scalar hE ψ hirr
-  letI : Field F := instF
-  letI : Module F (Additive E) := instMod
-  letI : Finite F := instFin
+  let : Field F := instF
+  let : Module F (Additive E) := instMod
+  let : Finite F := instFin
   obtain ⟨σ, hσ⟩ := hsemi g c hc
   set g' : Additive E ≃+ Additive E := MulEquiv.toAdditive g with hg'
   have hg'apply : ∀ x : Additive E, g' x = Additive.ofMul (g (Additive.toMul x)) :=
@@ -717,9 +719,9 @@ theorem exists_field_scalar_realization {p : ℕ} [Fact p.Prime]
     omega
   obtain ⟨F, instF, instMod, instFin, hdim, hcardF, ⟨μ₀, hμ₀⟩, -⟩ :=
     exists_field_semilinear_with_scalar hE ψ hirr
-  letI : Field F := instF
-  letI : Module F (Additive E) := instMod
-  letI : Finite F := instFin
+  let : Field F := instF
+  let : Module F (Additive E) := instMod
+  let : Finite F := instFin
   have hμ₀' : ∀ (t : T) (y : E), ((μ₀ t : Fˣ) : F) • (Additive.ofMul y)
       = Additive.ofMul (ψ t y) := fun t y => hμ₀ t (Additive.ofMul y)
   have hμinj : Function.Injective μ₀ := by
@@ -729,8 +731,8 @@ theorem exists_field_scalar_realization {p : ℕ} [Fact p.Prime]
     have h := hμ₀' t y
     rw [ht1, Units.val_one, one_smul] at h
     exact (Additive.ofMul.injective h).symm
-  haveI : Fintype F := Fintype.ofFinite F
-  haveI : Fintype T := Fintype.ofFinite _
+  have : Fintype F := Fintype.ofFinite F
+  have : Fintype T := Fintype.ofFinite _
   have hunits : Nat.card Fˣ = Nat.card E - 1 := by
     rw [Nat.card_eq_fintype_card, Fintype.card_units, ← Nat.card_eq_fintype_card, hcardF]
   have hμbij : Function.Bijective μ₀ := by
@@ -771,9 +773,9 @@ theorem exists_field_coordinate_of_irreducible {p : ℕ} [Fact p.Prime]
         = ((μ t : Fˣ) : F) * α (Additive.ofMul y) := by
   obtain ⟨F, instF, instMod, instFin, hdim, hcardF, ⟨μ, hμ⟩, -⟩ :=
     exists_field_semilinear_with_scalar hE ψ hirr
-  letI : Field F := instF
-  letI : Module F (Additive E) := instMod
-  letI : Finite F := instFin
+  let : Field F := instF
+  let : Module F (Additive E) := instMod
+  let : Finite F := instFin
   obtain ⟨α, hα⟩ := exists_addEquiv_of_finrank_eq_one (F := F) (E := E) hdim
   refine ⟨F, instF, instFin, μ, α, hcardF, fun t y => ?_⟩
   have hval : ((μ t : Fˣ) : F) • (Additive.ofMul y)
@@ -797,9 +799,9 @@ theorem exists_field_coordinate_realization {p : ℕ} [Fact p.Prime]
         = ((μ t : Fˣ) : F) * α (Additive.ofMul y) := by
   obtain ⟨F, instF, instMod, instFin, hdim, hcardF, μ, hμ⟩ :=
     exists_field_scalar_realization hE ψ hfree hcard
-  letI : Field F := instF
-  letI : Module F (Additive E) := instMod
-  letI : Finite F := instFin
+  let : Field F := instF
+  let : Module F (Additive E) := instMod
+  let : Finite F := instFin
   obtain ⟨α, hα⟩ := exists_addEquiv_of_finrank_eq_one (F := F) (E := E) hdim
   refine ⟨F, instF, instFin, μ, α, hcardF, fun t y => ?_⟩
   have hval : ((μ t : Fˣ) : F) • (Additive.ofMul y)

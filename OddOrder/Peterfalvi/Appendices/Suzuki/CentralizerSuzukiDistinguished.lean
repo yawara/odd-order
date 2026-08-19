@@ -531,7 +531,7 @@ theorem orderOf_distinguishedInvolution_mul_t_of_centralizer_suzukiTarget
       SuzukiInductionTarget (Omega := ↥(MulAction.fixedPoints X Omega))
         result.L) :
     orderOf (hyp.distinguishedInvolution * hyp.t) = 5 := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   let qhyp := hyp.centralizerQuotientHypothesis hXV hA3
   have hquotOrder :
       orderOf (qhyp.distinguishedInvolution * qhyp.t) = 5 :=

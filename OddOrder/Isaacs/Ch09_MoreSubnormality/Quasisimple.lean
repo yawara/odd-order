@@ -107,7 +107,7 @@ theorem isMulCommutative_of_commutator_eq_bot (h : commutator G = ⊥) :
 (Isaacs 9.1/9.2 で繰り返し使う「中心的補部分をもつ商は可換」の形.) -/
 theorem commutator_le_of_sup_center_eq_top {N : Subgroup G} (hN : N.Normal)
     (h : N ⊔ center G = ⊤) : commutator G ≤ N := by
-  haveI := hN
+  have := hN
   have hcover : (center G).map (QuotientGroup.mk' N) = ⊤ := by
     have hmap := congrArg (Subgroup.map (QuotientGroup.mk' N)) h
     have hNbot : N.map (QuotientGroup.mk' N) = ⊥ :=
@@ -115,7 +115,7 @@ theorem commutator_le_of_sup_center_eq_top {N : Subgroup G} (hN : N.Normal)
     rw [Subgroup.map_sup, hNbot, bot_sup_eq,
       Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective N)] at hmap
     exact hmap
-  haveI : IsMulCommutative (G ⧸ N) := isMulCommutative_of_map_center_eq_top hcover
+  have : IsMulCommutative (G ⧸ N) := isMulCommutative_of_map_center_eq_top hcover
   have hmapcomm : (commutator G).map (QuotientGroup.mk' N) = ⊥ := by
     rw [_root_.commutator_def, Subgroup.map_commutator,
       Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective N), ← _root_.commutator_def,
@@ -127,7 +127,7 @@ theorem commutator_le_of_sup_center_eq_top {N : Subgroup G} (hN : N.Normal)
 (`Z(G)` が maximal normal であることの実働形.) -/
 theorem normal_sup_center_eq_top (hs : IsSimpleGroup (G ⧸ center G)) {N : Subgroup G}
     (hN : N.Normal) (hnle : ¬N ≤ center G) : N ⊔ center G = ⊤ := by
-  haveI := hs
+  have := hs
   have hmapne : N.map (QuotientGroup.mk' (center G)) ≠ ⊥ := fun hbot =>
     hnle fun n hn => by
       have hmem : (QuotientGroup.mk' (center G)) n ∈ N.map (QuotientGroup.mk' (center G)) :=
@@ -151,10 +151,10 @@ theorem not_isMulCommutative_of_isSimpleGroup_quotient_center
     (hs : IsSimpleGroup (G ⧸ center G)) :
     ¬IsMulCommutative (G ⧸ center G) := by
   intro hcomm
-  haveI := hs
-  haveI := hcomm
-  haveI : IsCyclic (G ⧸ center G) := IsSimpleGroup.isCyclic
-  haveI : IsMulCommutative G :=
+  have := hs
+  have := hcomm
+  have : IsCyclic (G ⧸ center G) := IsSimpleGroup.isCyclic
+  have : IsMulCommutative G :=
     MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center (QuotientGroup.mk' (center G))
       (QuotientGroup.ker_mk' (center G)).le
   have hZ : center G = ⊤ :=
@@ -169,7 +169,7 @@ theorem not_isMulCommutative_of_isSimpleGroup_quotient_center
 /-- nonabelian simple 商は perfect: `commutator (G/Z(G)) = ⊤`. -/
 theorem commutator_quotient_center_eq_top (hs : IsSimpleGroup (G ⧸ center G)) :
     commutator (G ⧸ center G) = ⊤ := by
-  haveI := hs
+  have := hs
   have hnorm : (commutator (G ⧸ center G)).Normal := by
     rw [_root_.commutator_def]
     exact Subgroup.commutator_normal ⊤ ⊤
@@ -235,7 +235,7 @@ theorem commutator_subtype_comp_mk'_surjective (hs : IsSimpleGroup (G ⧸ center
 可換になって矛盾するから `⊥`.) -/
 theorem center_commutator_eq_subgroupOf (hs : IsSimpleGroup (G ⧸ center G)) :
     center ↥(commutator G) = (center G).subgroupOf (commutator G) := by
-  haveI := hs
+  have := hs
   set ψ : ↥(commutator G) →* G ⧸ center G :=
     (QuotientGroup.mk' (center G)).comp (commutator G).subtype with hψdef
   have hψ : Function.Surjective ψ := commutator_subtype_comp_mk'_surjective hs
@@ -271,7 +271,7 @@ theorem isQuasisimple_commutator (hs : IsSimpleGroup (G ⧸ center G)) :
     IsQuasisimple ↥(commutator G) where
   isPerfect := isPerfect_commutator hs
   isSimpleGroup_quotient := by
-    haveI := hs
+    have := hs
     exact (commutatorQuotientCenterEquiv hs).isSimpleGroup
 
 end
@@ -280,7 +280,7 @@ section /- 9A: Lemma 9.2 (p. 272) と quasisimple の基本 API -/
 
 /-- quasisimple 群は nontrivial. -/
 theorem IsQuasisimple.nontrivial (hq : IsQuasisimple G) : Nontrivial G := by
-  haveI := hq.isSimpleGroup_quotient
+  have := hq.isSimpleGroup_quotient
   obtain ⟨q₁, q₂, hne⟩ := exists_pair_ne (G ⧸ center G)
   obtain ⟨g₁, rfl⟩ := QuotientGroup.mk'_surjective (center G) q₁
   obtain ⟨g₂, rfl⟩ := QuotientGroup.mk'_surjective (center G) q₂
@@ -289,7 +289,7 @@ theorem IsQuasisimple.nontrivial (hq : IsQuasisimple G) : Nontrivial G := by
 /-- quasisimple 群の中心は proper. -/
 theorem IsQuasisimple.center_ne_top (hq : IsQuasisimple G) : center G ≠ ⊤ := by
   intro h
-  haveI := hq.isSimpleGroup_quotient
+  have := hq.isSimpleGroup_quotient
   have hone : ∀ q : G ⧸ center G, q = 1 := fun q => by
     obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective (center G) q
     exact (QuotientGroup.eq_one_iff x).mpr (by rw [h]; exact Subgroup.mem_top x)
@@ -314,14 +314,14 @@ theorem IsQuasisimple.normal_le_center (hq : IsQuasisimple G) {N : Subgroup G}
 /-- **Isaacs Lemma 9.2 (第 2 主張)**: quasisimple 群の nonidentity 商は quasisimple. -/
 theorem IsQuasisimple.quotient (hq : IsQuasisimple G) {N : Subgroup G}
     (hN : N.Normal) (hne : N ≠ ⊤) : IsQuasisimple (G ⧸ N) := by
-  haveI := hN
-  haveI := hq.isPerfect
+  have := hN
+  have := hq.isPerfect
   have hNZ : N ≤ center G := hq.normal_le_center hN hne
-  haveI hZbar : ((center G).map (QuotientGroup.mk' N)).Normal :=
+  have hZbar : ((center G).map (QuotientGroup.mk' N)).Normal :=
     Subgroup.Normal.map inferInstance _ (QuotientGroup.mk'_surjective N)
   have e := QuotientGroup.quotientQuotientEquivQuotient N (center G) hNZ
-  haveI := hq.isSimpleGroup_quotient
-  haveI hsimp : IsSimpleGroup ((G ⧸ N) ⧸ (center G).map (QuotientGroup.mk' N)) :=
+  have := hq.isSimpleGroup_quotient
+  have hsimp : IsSimpleGroup ((G ⧸ N) ⧸ (center G).map (QuotientGroup.mk' N)) :=
     e.isSimpleGroup
   refine ⟨inferInstance, ?_⟩
   have hcenter : center (G ⧸ N) = (center G).map (QuotientGroup.mk' N) := by
@@ -335,7 +335,7 @@ theorem IsQuasisimple.quotient (hq : IsQuasisimple G) {N : Subgroup G}
     · exfalso
       have hcomm : IsMulCommutative ((G ⧸ N) ⧸ (center G).map (QuotientGroup.mk' N)) :=
         isMulCommutative_of_map_center_eq_top h
-      haveI := hcomm
+      have := hcomm
       exact not_isMulCommutative_of_isSimpleGroup_quotient_center hq.isSimpleGroup_quotient
         (isMulCommutative_of_surjective e.toMonoidHom e.surjective)
   exact (QuotientGroup.quotientMulEquivOfEq hcenter).isSimpleGroup
@@ -344,9 +344,9 @@ theorem IsQuasisimple.quotient (hq : IsQuasisimple G) {N : Subgroup G}
 theorem IsQuasisimple.of_mulEquiv {H : Type*} [Group H] (e : G ≃* H)
     (hq : IsQuasisimple G) : IsQuasisimple H := by
   refine ⟨?_, ?_⟩
-  · haveI := hq.isPerfect
+  · have := hq.isPerfect
     exact Group.IsPerfect.ofSurjective (f := e.toMonoidHom) e.surjective
-  · haveI := hq.isSimpleGroup_quotient
+  · have := hq.isSimpleGroup_quotient
     exact ((QuotientGroup.congr (center G) (center H) e (map_center_mulEquiv e)).symm).isSimpleGroup
 
 end

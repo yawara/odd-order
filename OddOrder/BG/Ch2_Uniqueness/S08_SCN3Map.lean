@@ -41,10 +41,10 @@ theorem scn3_map_le_fittingInG_of_fittingInG_isPGroup [Finite G]
     rintro rfl
     rw [Nat.odd_iff] at hp_odd_prop
     omega
-  have hsolvM : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hsolvM : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hoddM : Odd (Nat.card ↥M) :=
     hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
-  haveI hAcomm : IsMulCommutative A :=
+  have hAcomm : IsMulCommutative A :=
     IsMulCommutative.of_setLike_mul_comm fun a ha b hb =>
       congrArg Subtype.val (isMulCommutative_iff_of_setLike.mp hA.1.isMulCommutative
         (⟨a, hAP ha⟩ : ↥(P : Subgroup ↥M)) (Subgroup.mem_subgroupOf.mpr ha)
@@ -68,7 +68,7 @@ theorem sylow_map_mem_range_of_normalizer_le_normalizer [Finite G]
       Subgroup.normalizer (K : Set G)) :
     ∃ Q : Sylow p G, (Q : Subgroup G) = (S : Subgroup ↥M).map M.subtype := by
   classical
-  haveI : IsSimpleGroup G := hG.simple
+  have : IsSimpleGroup G := hG.simple
   set SH : Subgroup G := (S : Subgroup ↥M).map M.subtype with hSH_def
   have hSH_p : IsPGroup p SH := S.isPGroup'.map M.subtype
   obtain ⟨PH, hSH_le_PH⟩ := IsPGroup.exists_le_sylow hSH_p
@@ -92,7 +92,7 @@ theorem sylow_map_mem_range_of_normalizer_le_normalizer [Finite G]
   have hSH_lt_PH : SH < (PH : Subgroup G) := lt_of_le_of_ne hSH_le_PH (by
     intro h
     exact hPH_not_le (le_of_eq h.symm))
-  haveI : Group.IsNilpotent ↥(PH : Subgroup G) := PH.isPGroup'.isNilpotent
+  have : Group.IsNilpotent ↥(PH : Subgroup G) := PH.isPGroup'.isNilpotent
   have hNC : NormalizerCondition ↥(PH : Subgroup G) :=
     Group.normalizerCondition_of_isNilpotent (G := ↥(PH : Subgroup G))
   have hSH_subOf_lt_top : SH.subgroupOf (PH : Subgroup G) < ⊤ := by
@@ -280,7 +280,7 @@ theorem opiCoreInG_singleton_compl_centralizer_scn3_map_le_fittingInG_of_fitting
     (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M))) :
     opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer (A.map M.subtype : Set G)) ≤
       fittingInG M := by
-  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hMsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   let C : Subgroup G := Subgroup.centralizer (A.map M.subtype : Set G)
   let K : Subgroup G := opiCoreInG ({p} : Set ℕ)ᶜ C
   change K ≤ fittingInG M

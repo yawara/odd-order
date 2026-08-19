@@ -109,13 +109,13 @@ theorem typePData_exists_conj_U [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
   have hU1_le : d1.U ≤ derivedInG M := d1.U_le
   have hU2_le : d2.U ≤ derivedInG M := d2.U_le
   -- Solvability of `↥M'` (transport along the inclusion `↥M' ↪ ↥M`).
-  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-  haveI hM'solv : IsSolvable ↥(derivedInG M) :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective hM'_le_M)
+  have hMsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
+  have hM'solv : Group.IsSolvable ↥(derivedInG M) :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective hM'_le_M)
   -- `H ◁ M'` (set-form normalizer, `M' ≤ M ≤ N_G(H)`).
   have hM'_le_NH : derivedInG M ≤ Subgroup.normalizer (maxNilpotentNormalHall M : Set G) :=
     hM'_le_M.trans (maxNilpotentNormalHall_le_normalizer M)
-  haveI hHn_normal : ((maxNilpotentNormalHall M).subgroupOf (derivedInG M)).Normal :=
+  have hHn_normal : ((maxNilpotentNormalHall M).subgroupOf (derivedInG M)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hH_le).mpr hM'_le_NH
   -- Both `U_i` complement `H` in `M'` (`derived_complement`, rewritten via `H = M_F`).
   have hK1 : ((maxNilpotentNormalHall M).subgroupOf (derivedInG M)).IsComplement'
@@ -244,7 +244,7 @@ theorem typePData_W1_prime_not_mem_sigma [Finite G]
     (data : TypePData M) {p : ℕ} (hp : p ∈ (Nat.card ↥data.W1).primeFactors) :
     p ∉ OddOrder.BG.Ch3.S10.sigma M := by
   intro hpσ
-  haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+  have : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
   -- An order-`p` element `g ∈ W₁` and the cyclic subgroup `L = ⟨g⟩` of order `p`.
   obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' (G := ↥data.W1) p (Nat.dvd_of_mem_primeFactors
       hp)
@@ -295,7 +295,7 @@ theorem typePData_kappa_nonempty_of_rank1 [Finite G]
   obtain ⟨p, hpp, hpdvd⟩ := Nat.exists_prime_and_dvd hW1card
   have hp : p ∈ (Nat.card ↥data.W1).primeFactors :=
     Nat.mem_primeFactors.mpr ⟨hpp, hpdvd, Nat.card_pos.ne'⟩
-  haveI : Fact p.Prime := ⟨hpp⟩
+  have : Fact p.Prime := ⟨hpp⟩
   -- An order-`p` element `g ∈ W₁` and the rank-one subgroup `P = ⟨g⟩`.
   obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' (G := ↥data.W1) p hpdvd
   have hgord : orderOf ((g : G)) = p :=
@@ -337,20 +337,20 @@ theorem typePData_isCyclic_isElementaryAbelian_of_not_dvd_card_derived [Finite G
     {M : Subgroup G} (data : TypePData M) {q : ℕ} (hq : q.Prime)
     (hndvd : ¬ q ∣ Nat.card ↥(derivedInG M))
     {A : Subgroup ↥M} (hA : A.IsElementaryAbelian q) : IsCyclic ↥A := by
-  haveI : Fact q.Prime := ⟨hq⟩
-  haveI : IsCyclic ↥data.W1 := data.W1_cyclic
+  have : Fact q.Prime := ⟨hq⟩
+  have : IsCyclic ↥data.W1 := data.W1_cyclic
   set N : Subgroup ↥M := (derivedInG M).subgroupOf M with hNdef
   -- `N = commutator ↥M`, hence normal.
   have hN_eq : N = commutator ↥M := by
     rw [hNdef, derivedInG, Subgroup.subgroupOf,
       Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
-  haveI hNnorm : N.Normal := by rw [hN_eq]; infer_instance
+  have hNnorm : N.Normal := by rw [hN_eq]; infer_instance
   -- `↥M ⧸ N ≃* ↥(W₁.subgroupOf M)` is cyclic.
-  haveI : IsCyclic ↥(data.W1.subgroupOf M) := by
+  have : IsCyclic ↥(data.W1.subgroupOf M) := by
     have e : ↥(data.W1.subgroupOf M) ≃* ↥data.W1 := Subgroup.subgroupOfEquivOfLe data.W1_le
     exact isCyclic_of_surjective e.symm e.symm.surjective
   have ecyc : (↥M ⧸ N) ≃* ↥(data.W1.subgroupOf M) := (data.M_complement.symm).QuotientMulEquiv
-  haveI : IsCyclic (↥M ⧸ N) := isCyclic_of_surjective ecyc.symm ecyc.symm.surjective
+  have : IsCyclic (↥M ⧸ N) := isCyclic_of_surjective ecyc.symm ecyc.symm.surjective
   -- `A ⊓ N = ⊥`: `|A|` is a `q`-power and `q ∤ |N| = |M'|`.
   have hNcard : Nat.card ↥N = Nat.card ↥(derivedInG M) :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe (Subgroup.map_subtype_le _)).toEquiv
@@ -369,7 +369,7 @@ theorem typePData_isCyclic_isElementaryAbelian_of_not_dvd_card_derived [Finite G
     have hmem : (a : ↥M) ∈ A ⊓ N := ⟨a.2, ha⟩
     rw [hAN, Subgroup.mem_bot] at hmem
     exact Subgroup.mem_bot.mpr (Subtype.ext hmem)
-  haveI : IsCyclic ↥φ.range := inferInstance
+  have : IsCyclic ↥φ.range := inferInstance
   exact isCyclic_of_surjective (MonoidHom.ofInjective hφinj).symm
     (MonoidHom.ofInjective hφinj).symm.surjective
 
@@ -384,7 +384,7 @@ theorem typePData_pRank_eq_one_of_not_dvd_card_derived [Finite G]
     (hqW1 : q ∣ Nat.card ↥data.W1)
     (hndvd : ¬ q ∣ Nat.card ↥(derivedInG M)) :
     pRank ↥M q = 1 := by
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   refine le_antisymm ?_ ?_
   · exact pRank_le_one_of_forall_isElementaryAbelian_isCyclic (fun A hA =>
       typePData_isCyclic_isElementaryAbelian_of_not_dvd_card_derived data hq hndvd hA)
@@ -478,7 +478,7 @@ theorem prime_dvd_card_inf_centralizer_of_mem_normalizer [Finite G]
     (hxq : IsPGroup q ↥(Subgroup.zpowers x))
     (hdvd : q ∣ Nat.card ↥N) :
     q ∣ Nat.card ↥(N ⊓ Subgroup.centralizer ({x} : Set G)) := by
-  letI : MulAction ↥(Subgroup.zpowers x) ↥N :=
+  let : MulAction ↥(Subgroup.zpowers x) ↥N :=
     MulAction.compHom ↥N (conjActionOfMemNormalizer hx)
   have hmod := hxq.card_modEq_card_fixedPoints (α := ↥N)
   -- The fixed points of the conjugation action are `N ⊓ C(x)`.
@@ -500,8 +500,8 @@ theorem typePData_not_dvd_card_W2_of_card_W1_prime [Finite G] {M : Subgroup G}
     (data : TypePData M) (hq : (Nat.card ↥data.W1).Prime) :
     ¬ (Nat.card ↥data.W1) ∣ Nat.card ↥data.W2 := by
   intro hdvd
-  haveI : Fact (Nat.card ↥data.W1).Prime := ⟨hq⟩
-  haveI : IsCyclic ↥data.W := data.W_cyclic
+  have : Fact (Nat.card ↥data.W1).Prime := ⟨hq⟩
+  have : IsCyclic ↥data.W := data.W_cyclic
   have hW2leM' : data.W2 ≤ derivedInG M := le_trans data.W2_le (le_trans inf_le_left data.H_le)
   have hW1W2 : data.W1 ⊓ data.W2 = ⊥ := by
     rw [eq_bot_iff]
@@ -549,7 +549,7 @@ factor `W₁` has *prime* order `q = |W₁|` (the `TypePNontrivialCore` of types
 theorem isTypeP_of_typePData_of_card_W1_prime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (data : TypePData M)
     (hqprime : (Nat.card ↥data.W1).Prime) : S14.IsTypeP M := by
-  haveI : Fact (Nat.card ↥data.W1).Prime := ⟨hqprime⟩
+  have : Fact (Nat.card ↥data.W1).Prime := ⟨hqprime⟩
   refine typePData_kappa_nonempty_of_rank1 hG hM data (fun p hp => ?_)
   have hpq : p = Nat.card ↥data.W1 := by
     rcases hqprime.eq_one_or_self_of_dvd p (Nat.dvd_of_mem_primeFactors hp) with h | h
@@ -566,7 +566,7 @@ theorem isTypeP_of_typePData_of_card_W1_prime [Finite G] (hG : OddOrder.BG.IsMin
       rw [derivedInG, Subgroup.subgroupOf,
         Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
     have hle : derivedInG M ≤ M := Subgroup.map_subtype_le _
-    haveI hnorm : ((derivedInG M).subgroupOf M).Normal := by rw [hsubeq]; infer_instance
+    have hnorm : ((derivedInG M).subgroupOf M).Normal := by rw [hsubeq]; infer_instance
     have hxnorm : (x : G) ∈ Subgroup.normalizer (derivedInG M : Set G) :=
       (Subgroup.normal_subgroupOf_iff_le_normalizer hle).mp hnorm (data.W1_le x.2)
     have hxpg : IsPGroup (Nat.card ↥data.W1) ↥(Subgroup.zpowers (x : G)) :=
@@ -672,7 +672,7 @@ theorem typePData_nontrivialCore_of_isTypeP1_mf_ne_msigma [Finite G]
     (data : TypePData M) (hUne : data.U ≠ ⊥) :
     TypePNontrivialCore M data := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   refine ⟨hUne, ?_, ?_⟩
   · -- `|W₁| = [M:M'] = |K| = p` prime (Theorem A(8)).
     obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
@@ -690,7 +690,7 @@ theorem typePData_nontrivialCore_of_isTypeP1_mf_ne_msigma [Finite G]
       by_cases hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M
       · exact Set.mem_union_right _ hpσ
       · exact Set.mem_union_left _ (hP1.2 ▸ ⟨hp, hpσ⟩)
-    haveI : IsCyclic ↥K := (typeP_auxiliary_structure hG hM hKM bot_le hK rfl hU).2.1
+    have : IsCyclic ↥K := (typeP_auxiliary_structure hG hM hKM bot_le hK rfl hU).2.1
     obtain ⟨_, _, p, hp, hKp⟩ := theoremA8_structure hG hM hKM hK rfl hU hne
     rw [data.card_W1_eq_derived_index, ← card_kappaHall_eq_derived_index hG hM hP1.1 hKM hK, hKp]
     exact hp
@@ -710,9 +710,9 @@ theorem normalizer_le_normalizer_map_sylow_of_isNilpotent [Finite G] {U : Subgro
     Subgroup.normalizer (U : Set G) ≤
       Subgroup.normalizer (((P : Subgroup ↥U).map U.subtype : Subgroup G) : Set G) := by
   classical
-  haveI := hUnil
-  haveI hPnormal : (P : Subgroup ↥U).Normal := Ch01.Sylow.normal_of_isNilpotent P
-  letI : Unique (Sylow p ↥U) := P.unique_of_normal hPnormal
+  have := hUnil
+  have hPnormal : (P : Subgroup ↥U).Normal := Ch01.Sylow.normal_of_isNilpotent P
+  let : Unique (Sylow p ↥U) := P.unique_of_normal hPnormal
   set Pbar : Subgroup G := (P : Subgroup ↥U).map U.subtype with hPbardef
   have hPbar_le_U : Pbar ≤ U := Subgroup.map_subtype_le _
   -- `|P̄|` is the full `p`-part of `|U|`.
@@ -843,7 +843,7 @@ theorem isTypeIII_or_IV_of_isTypeP1_mf_ne_msigma [Finite G]
     (hP1 : S14.IsTypeP1 M) (hne : S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M) :
     OddOrder.GroupTheory.IsTypeIII M ∨ OddOrder.GroupTheory.IsTypeIV M := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
   set K : Subgroup G := K'.map M.subtype with hKdef
   have hKM : K ≤ M := Subgroup.map_subtype_le K'
@@ -884,7 +884,7 @@ theorem isTypeIII_or_IV_of_isTypeP1_mf_ne_msigma [Finite G]
     (show Nat.card ↥U ≠ 1 from fun h => hUne (Subgroup.card_eq_one.mp h))
   have hpπU : p ∈ (Nat.card ↥U).primeFactors :=
     Nat.mem_primeFactors.mpr ⟨hpp, hpdvd, Nat.card_pos.ne'⟩
-  haveI : Fact p.Prime := ⟨hpp⟩
+  have : Fact p.Prime := ⟨hpp⟩
   obtain ⟨hpσ, hfact⟩ :=
     typeP1_complement_mem_sigma_and_factorization hG hM hP1 hsup hinf hpπU
   have hUM : U ≤ M := hUle.trans (Subgroup.map_subtype_le _)
@@ -941,19 +941,19 @@ theorem derivedDerived_le_fittingInAmbient [Finite G]
 /-- **BG Theorem A(6), proper containment `M' ⊊ M`** (mmd L4363, the `M' ⊂ M` end of the chain
 `1 ⊂ M_F ⊆ M_σ ⊆ M' ⊂ M`): the derived subgroup of a maximal subgroup `M` of a minimal simple
 group is proper.  `M` is nontrivial (`M_σ ≠ ⊥`, `M_σ ≤ M`) and solvable, so `M' = [M, M] ⊊ M`
-(`IsSolvable.commutator_lt_top_of_nontrivial`, transported into `G` along the injective
+(`Group.IsSolvable.commutator_lt_top_of_nontrivial`, transported into `G` along the injective
 `M.subtype`). -/
 theorem derivedInG_lt_of_maximal [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) : derivedInG M < M := by
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hMne : M ≠ ⊥ := fun h =>
     OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM
       (le_bot_iff.mp (h ▸ OddOrder.BG.Ch3.S10.Msigma_le M))
-  haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMne
+  have : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMne
   rw [derivedInG]
   conv_rhs => rw [← Subgroup.range_subtype M, MonoidHom.range_eq_map]
   rw [Subgroup.map_lt_map_iff_of_injective M.subtype_injective]
-  exact IsSolvable.commutator_lt_top_of_nontrivial (G := ↥M)
+  exact Group.IsSolvable.commutator_lt_top_of_nontrivial (G := ↥M)
 
 /-- **BG Theorem A(6), nontriviality `1 ⊂ M_F`** (mmd L4363, the `1 ⊂ M_F` end of the chain): the
 Fitting kernel `M_F` of a maximal subgroup `M` is nontrivial.  Book Theorem 15.2 proof by cases on
@@ -1011,7 +1011,7 @@ theorem derivedInG_quotient_maxNilpotentNormalHall_isNilpotent [Finite G]
       intro x hx
       rw [Subgroup.mem_subgroupOf]
       exact h2 (Subgroup.mem_map_of_mem _ hx)
-    haveI : IsMulCommutative (↥(derivedInG M) ⧸ (S15.MF M).subgroupOf (derivedInG M)) :=
+    have : IsMulCommutative (↥(derivedInG M) ⧸ (S15.MF M).subgroupOf (derivedInG M)) :=
       Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr hcomm
     exact CommGroup.isNilpotent
   · -- type `P₁`: `M_σ = M'`, `Q ≤ M_F`, `M_σ = Q ⋊ D`, `D` nilpotent.  Work directly in `M'`.
@@ -1023,21 +1023,21 @@ theorem derivedInG_quotient_maxNilpotentNormalHall_isNilpotent [Finite G]
       hMσderived ▸ S15.maxNilpotentNormalHall_le_Msigma hG hM
     have hM'M : derivedInG M ≤ M := hMσderived ▸ OddOrder.BG.Ch3.S10.Msigma_le M
     have hQM' : Q ≤ derivedInG M := hQMF.trans hMFM'
-    haveI hQnM' : (Q.subgroupOf (derivedInG M)).Normal :=
+    have hQnM' : (Q.subgroupOf (derivedInG M)).Normal :=
       (Subgroup.normal_subgroupOf_iff_le_normalizer hQM').mpr (hM'M.trans hMnormQ)
     -- `↥(D.subgroupOf M')` is nilpotent (embeds in the nilpotent `↥D` via `D ⊓ M'`).
-    haveI hDnil' : Group.IsNilpotent ↥D := hDnil
-    haveI hInfNil : Group.IsNilpotent ↥(D ⊓ derivedInG M) :=
+    have hDnil' : Group.IsNilpotent ↥D := hDnil
+    have hInfNil : Group.IsNilpotent ↥(D ⊓ derivedInG M) :=
       Group.nilpotent_of_mulEquiv
         (Subgroup.subgroupOfEquivOfLe (inf_le_left : D ⊓ derivedInG M ≤ D))
-    haveI hDsubNil : Group.IsNilpotent ↥(D.subgroupOf (derivedInG M)) := by
+    have hDsubNil : Group.IsNilpotent ↥(D.subgroupOf (derivedInG M)) := by
       have econgr : ↥(D.subgroupOf (derivedInG M)) ≃*
           ↥((D ⊓ derivedInG M).subgroupOf (derivedInG M)) :=
         MulEquiv.subgroupCongr (Subgroup.inf_subgroupOf_right D (derivedInG M)).symm
       exact Group.nilpotent_of_mulEquiv (econgr.trans
         (Subgroup.subgroupOfEquivOfLe (inf_le_right : D ⊓ derivedInG M ≤ derivedInG M))).symm
     -- `M'/Q ≅ ↥(D.subgroupOf M')` is nilpotent (complement iso, `Q` normal).
-    haveI hNilM'Q : Group.IsNilpotent (↥(derivedInG M) ⧸ Q.subgroupOf (derivedInG M)) :=
+    have hNilM'Q : Group.IsNilpotent (↥(derivedInG M) ⧸ Q.subgroupOf (derivedInG M)) :=
       Group.nilpotent_of_mulEquiv (hcomplQD.symm.QuotientMulEquiv).symm
     -- `M'/M_F` is a quotient of the nilpotent `M'/Q` (Noether III, `Q ≤ M_F`), hence nilpotent.
     have hsub : Q.subgroupOf (derivedInG M) ≤ (S15.MF M).subgroupOf (derivedInG M) :=

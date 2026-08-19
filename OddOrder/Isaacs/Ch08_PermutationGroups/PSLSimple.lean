@@ -311,6 +311,7 @@ private def pslIwasawaStructure :
       exact Subgroup.mem_map.mpr ⟨t, mem_rootSubgroup_single hij c hc, rfl⟩
     exact SetLike.mem_coe.mpr (Subgroup.mem_iSup_of_mem _ hmem)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- `PSL` is nontrivial: the class of a transvection is not the identity. -/
 private lemma nontrivial_psl [Nontrivial ι] :
     Nontrivial (Matrix.ProjectiveSpecialLinearGroup ι K) := by
@@ -355,7 +356,7 @@ latter is exactly `q > 3`; the book states the result for `n ≥ 3` or
 theorem isSimpleGroup_projectiveSpecialLinearGroup [Nontrivial ι]
     (h : 3 ≤ Nat.card ι ∨ ∃ β : K, β ≠ 0 ∧ β ^ 2 ≠ 1) :
     IsSimpleGroup (Matrix.ProjectiveSpecialLinearGroup ι K) := by
-  haveI := nontrivial_psl (ι := ι) (K := K)
+  have := nontrivial_psl (ι := ι) (K := K)
   exact (pslIwasawaStructure ι K).isSimpleGroup (commutator_psl_eq_top h)
     inferInstance
 

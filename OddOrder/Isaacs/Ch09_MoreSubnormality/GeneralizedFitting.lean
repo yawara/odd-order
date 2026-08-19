@@ -72,9 +72,9 @@ theorem centralizer_genFitting_le_genFitting [Finite G] :
   set F := genFitting G with hFdef
   set C := Subgroup.centralizer (F : Set G) with hCdef
   set Z := C ⊓ F with hZdef
-  haveI hFnormal : F.Normal := genFitting.normal
-  haveI hCnormal : C.Normal := Subgroup.normal_centralizer
-  haveI hZnormal : Z.Normal := Subgroup.normal_inf_normal C F
+  have hFnormal : F.Normal := genFitting.normal
+  have hCnormal : C.Normal := Subgroup.normal_centralizer
+  have hZnormal : Z.Normal := Subgroup.normal_inf_normal C F
   have hZC : Z ≤ C := hZdef.le.trans inf_le_left
   by_contra hnle
   -- `Z` の元は `C` の元と可換 (`Z ≤ F*` で `C = C_G(F*)`)
@@ -87,13 +87,13 @@ theorem centralizer_genFitting_le_genFitting [Finite G] :
     have hle := (Subgroup.map_eq_bot_iff _).mp h
     rw [QuotientGroup.ker_mk'] at hle
     exact hnle fun c hc => (Subgroup.mem_inf.mp (hle hc)).2
-  haveI hCbar_normal : (C.map π).Normal :=
+  have hCbar_normal : (C.map π).Normal :=
     Subgroup.Normal.map hCnormal π (QuotientGroup.mk'_surjective Z)
   obtain ⟨Mbar, hMbar_min, hMbar_leC⟩ :=
     Ch02.exists_isMinimalNormal_le_of_normal (C.map π) hCbar_ne
-  haveI := hMbar_min.1
+  have := hMbar_min.1
   set M := Mbar.comap π with hMdef
-  haveI hMnormal : M.Normal := Subgroup.Normal.comap hMbar_min.1 π
+  have hMnormal : M.Normal := Subgroup.Normal.comap hMbar_min.1 π
   have hmemM : ∀ x : G, x ∈ M ↔ π x ∈ Mbar := fun _ => Subgroup.mem_comap
   have hMC : M ≤ C := by
     have h1 : M ≤ (C.map π).comap π := Subgroup.comap_mono hMbar_leC
@@ -109,15 +109,15 @@ theorem centralizer_genFitting_le_genFitting [Finite G] :
     exact Subtype.ext (hcomm _ hz _ (hMC m.2)).symm
   rcases isMulCommutative_or_isSemisimpleGroup_of_isMinimalNormal hMbar_min with habel | hsemi
   · -- abelian 枝: `M` nilpotent → `M ≤ F(G) ≤ F*` → `M ≤ Z` → `M̄ = ⊥` 矛盾
-    haveI := habel
+    have := habel
     have hφker : (π.comp M.subtype).ker = Z.subgroupOf M := by
       ext x
       simp [hπdef, MonoidHom.mem_ker, Subgroup.mem_subgroupOf, QuotientGroup.eq_one_iff]
     have hφrange : (π.comp M.subtype).range = Mbar := by
       rw [MonoidHom.range_comp, Subgroup.range_subtype]
       exact hMmap
-    haveI hnilM : Group.IsNilpotent ↥M := by
-      haveI : Group.IsNilpotent ↥((π.comp M.subtype).range) :=
+    have hnilM : Group.IsNilpotent ↥M := by
+      have : Group.IsNilpotent ↥((π.comp M.subtype).range) :=
         Group.nilpotent_of_mulEquiv (MulEquiv.subgroupCongr hφrange).symm
       exact Subgroup.isNilpotent_of_ker_le_center (π.comp M.subtype).rangeRestrict
         (by rw [MonoidHom.ker_rangeRestrict, hφker]; exact hZcM)
@@ -127,7 +127,7 @@ theorem centralizer_genFitting_le_genFitting [Finite G] :
       rw [← hMmap]
       exact (Subgroup.map_eq_bot_iff _).mpr (by rw [QuotientGroup.ker_mk']; exact hMZ))
   · -- semisimple 枝: `↥M̄` の minimal normal `T̄` → `S := π⁻¹(T̄)` → `⁅S,S⁆` component
-    haveI : Nontrivial ↥Mbar := (Subgroup.nontrivial_iff_ne_bot Mbar).mpr hMbar_min.2.1
+    have : Nontrivial ↥Mbar := (Subgroup.nontrivial_iff_ne_bot Mbar).mpr hMbar_min.2.1
     have htop_ne : (⊤ : Subgroup ↥Mbar) ≠ ⊥ := by
       intro h
       obtain ⟨x, hx⟩ := exists_ne (1 : ↥Mbar)
@@ -135,7 +135,7 @@ theorem centralizer_genFitting_le_genFitting [Finite G] :
     obtain ⟨Tbar, hTbar_min, -⟩ :=
       Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup ↥Mbar) htop_ne
     obtain ⟨hTbar_simple, hTbar_ncomm⟩ := hsemi.isSimpleGroup_of_isMinimalNormal hTbar_min
-    haveI := hTbar_simple
+    have := hTbar_simple
     -- `Ḡ = G/Z` へ押し出し
     set T₀ := Tbar.map Mbar.subtype with hT₀def
     have hT₀le : T₀ ≤ Mbar := Subgroup.map_subtype_le Tbar
@@ -238,7 +238,7 @@ theorem centralizer_genFitting_le_genFitting [Finite G] :
       have h1 : (⁅S, S⁆ : Subgroup G).map π = ⊥ :=
         (Subgroup.map_eq_bot_iff _).mpr (by rw [QuotientGroup.ker_mk']; exact hS'Z)
       rwa [Subgroup.map_commutator, hSmap] at h1
-    haveI habelT₀ : IsMulCommutative ↥T₀ := by
+    have habelT₀ : IsMulCommutative ↥T₀ := by
       have hle := Subgroup.commutator_eq_bot_iff_le_centralizer.mp hcommT₀
       exact IsMulCommutative.of_comm fun a b => Subtype.ext
         (Subgroup.mem_centralizer_iff.mp (hle a.2) (b : G ⧸ Z) b.2).symm
@@ -258,8 +258,8 @@ theorem genFitting_eq_fitting_of_centralizer_fitting_le [Finite G]
   rw [genFitting, sup_le_iff]
   refine ⟨le_rfl, ?_⟩
   -- E(G) ≤ C_G(F(G)) ≤ F(G)
-  haveI : IsSolvable ↥(Ch01.fitting G) := by
-    haveI := Ch01.fitting.isNilpotent (G := G)
+  have : Group.IsSolvable ↥(Ch01.fitting G) := by
+    have := Ch01.fitting.isNilpotent (G := G)
     exact IsNilpotent.to_isSolvable
   have hcomm : ⁅layer G, Ch01.fitting G⁆ = ⊥ :=
     commutator_layer_eq_bot_of_normal_isSolvable inferInstance

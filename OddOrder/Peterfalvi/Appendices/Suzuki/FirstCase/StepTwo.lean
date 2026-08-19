@@ -55,7 +55,7 @@ theorem exists_four_subgroup_of_quotient {A : Type*} [Group A] [Finite A]
       ring
     exact Nat.eq_of_mul_eq_mul_right (Nat.pos_of_ne_zero hipos) hmul
   -- the Sylow `2`-subgroup of `E'` has order `4`
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨S⟩ : Nonempty (Sylow 2 ↥E') := inferInstance
   have hfact : (Nat.card ↥E').factorization 2 = 2 := by
     rw [hE'card, Nat.factorization_mul (by norm_num) Nat.card_pos.ne']
@@ -193,7 +193,7 @@ theorem exists_affineNearFieldModel :
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     ∃ (F : Type uG) (_ : NearFields.NearField F),
       Nonempty (NearFields.AffineNearFieldModel fc.rankOneQuotient F) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   exact NearFields.rankOne_affine_nearField fc.rankOneQuotient
 
 end FirstCaseHypothesis

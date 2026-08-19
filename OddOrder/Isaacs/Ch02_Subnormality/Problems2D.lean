@@ -70,13 +70,13 @@ theorem le_centralizer_of_inf_eq_bot {M N : Subgroup G} [M.Normal] [N.Normal]
 theorem fitting_inf_eq_bot_of_fitting_eq_bot [Finite G] {N : Subgroup G} [N.Normal]
     (hFN : fitting ↥N = ⊥) : fitting G ⊓ N = ⊥ := by
   have hle : fitting G ⊓ N ≤ N := inf_le_right
-  haveI hnorm : ((fitting G ⊓ N).subgroupOf N).Normal :=
+  have hnorm : ((fitting G ⊓ N).subgroupOf N).Normal :=
     (Subgroup.normal_inf_normal (fitting G) N).subgroupOf N
-  haveI hfitnilp : Group.IsNilpotent ↥(fitting G) := fitting.isNilpotent
-  haveI : Group.IsNilpotent ↥(fitting G ⊓ N) :=
+  have hfitnilp : Group.IsNilpotent ↥(fitting G) := fitting.isNilpotent
+  have : Group.IsNilpotent ↥(fitting G ⊓ N) :=
     Group.nilpotent_of_mulEquiv
       (Subgroup.subgroupOfEquivOfLe (inf_le_left : fitting G ⊓ N ≤ fitting G))
-  haveI hnilp : Group.IsNilpotent ↥((fitting G ⊓ N).subgroupOf N) :=
+  have hnilp : Group.IsNilpotent ↥((fitting G ⊓ N).subgroupOf N) :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hle).symm
   have hsub : (fitting G ⊓ N).subgroupOf N ≤ fitting ↥N :=
     (le_fitting_iff_isNilpotent_and_isSubnormal _).mpr ⟨hnilp, hnorm.isSubnormal⟩
@@ -98,7 +98,7 @@ theorem card_lt_card_of_fitting_eq_bot [Finite G] {N A : Subgroup G} [N.Normal]
     Nat.card ↥A < Nat.card ↥N := by
   by_contra hcon
   push Not at hcon
-  haveI : Nontrivial G := by
+  have : Nontrivial G := by
     rcases (Subgroup.nontrivial_iff_ne_bot N).mpr hN with ⟨a, b, hab⟩
     exact ⟨(a : G), (b : G), fun h => hab (Subtype.ext h)⟩
   have hFne := inf_fitting_ne_bot_of_abelian_card_ge_index hA_ab
@@ -125,7 +125,7 @@ theorem card_lt_card_of_coprime [Finite G] {N A : Subgroup G} [N.Normal]
     Nat.card ↥A < Nat.card ↥N := by
   by_contra hcon
   push Not at hcon
-  haveI : Nontrivial G := by
+  have : Nontrivial G := by
     rcases (Subgroup.nontrivial_iff_ne_bot N).mpr hN with ⟨a, b, hab⟩
     exact ⟨(a : G), (b : G), fun h => hab (Subtype.ext h)⟩
   have hFne := inf_fitting_ne_bot_of_abelian_card_ge_index hA_ab
@@ -138,7 +138,7 @@ theorem card_lt_card_of_coprime [Finite G] {N A : Subgroup G} [N.Normal]
       (Nat.mem_primeFactors.mp hq).2.1.trans (Subgroup.card_dvd_of_le inf_le_left)
     exact (Nat.mem_primeFactors.mp hq).1.one_lt.ne' (Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hqN hqA))
   -- `↥F(G)` は冪零ゆえ部分群はすべて部分正規、2A.1 で `O_π(↥F(G))` に落ちる
-  haveI hfitnilp : Group.IsNilpotent ↥(fitting G) := fitting.isNilpotent
+  have hfitnilp : Group.IsNilpotent ↥(fitting G) := fitting.isNilpotent
   have hcardeq : Nat.card ↥((A ⊓ fitting G).subgroupOf (fitting G)) = Nat.card ↥(A ⊓ fitting G) :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe
       (inf_le_right : A ⊓ fitting G ≤ fitting G)).toEquiv
@@ -149,7 +149,7 @@ theorem card_lt_card_of_coprime [Finite G] {N A : Subgroup G} [N.Normal]
       (fun q hq => hAF_pi q (by rwa [hcardeq] at hq))
   -- `Q := O_π(↥F(G))` の押し出しは `G`-正規な π-群
   set Q : Subgroup G := (oPiCore π ↥(fitting G)).map (fitting G).subtype with hQ
-  haveI : Q.Normal := inferInstance
+  have : Q.Normal := inferInstance
   have hQpi : Subgroup.IsPiGroup π Q := by
     intro q hq
     refine oPiCore.isPiGroup (G := ↥(fitting G)) π q ?_
@@ -157,7 +157,7 @@ theorem card_lt_card_of_coprime [Finite G] {N A : Subgroup G} [N.Normal]
       (fitting G).subtype_injective).toEquiv] at hq
   have hQN : Q ⊓ N = ⊥ := by
     by_contra hne
-    haveI : Nontrivial ↥(Q ⊓ N) := (Subgroup.nontrivial_iff_ne_bot _).mpr hne
+    have : Nontrivial ↥(Q ⊓ N) := (Subgroup.nontrivial_iff_ne_bot _).mpr hne
     obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd (Finite.one_lt_card (α := ↥(Q ⊓ N))).ne'
     exact hQpi q (Nat.mem_primeFactors.mpr ⟨hq,
       hqdvd.trans (Subgroup.card_dvd_of_le inf_le_left), Nat.card_pos.ne'⟩)

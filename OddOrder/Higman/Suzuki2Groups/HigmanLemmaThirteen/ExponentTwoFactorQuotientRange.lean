@@ -74,9 +74,9 @@ theorem layerZeroToFrattiniQuotientLinear_factorInclusion_eQuot_mk
           hf eQuot
           (eQuot (Additive.ofMul (QuotientGroup.mk' N g)))) =
       Additive.ofMul (QuotientGroup.mk' (frattini P) (f g)) := by
-  letI : CommGroup (P ⧸ frattini P) :=
+  let : CommGroup (P ⧸ frattini P) :=
     frattiniQuotientCommGroup P hP
-  letI : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
+  let : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
     frattiniQuotientZModTwoModule P hP
   rw [factorInclusion_eQuot_mk,
     layerZeroToFrattiniQuotientLinear_apply]
@@ -110,9 +110,9 @@ theorem factorInclusion_frattiniQuotient_range_eq
       (elabSubmoduleSubgroupEquiv 2).symm
         (W.map (QuotientGroup.mk' (frattini P))) := by
   classical
-  letI : CommGroup (P ⧸ frattini P) :=
+  let : CommGroup (P ⧸ frattini P) :=
     frattiniQuotientCommGroup P hP
-  letI : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
+  let : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
     frattiniQuotientZModTwoModule P hP
   ext v
   rw [mem_symm_elabSubmoduleSubgroupEquiv]
@@ -201,22 +201,22 @@ theorem restrictedFactorAmbientInclusion_frattiniQuotient_range_eq
       (elabSubmoduleSubgroupEquiv 2).symm
         (W.map (QuotientGroup.mk' (frattini P))) := by
   classical
-  letI : IsMulCommutative (frattini S) :=
+  let : IsMulCommutative (frattini S) :=
     IsMulCommutative.of_comm hEAS.comm
-  letI : CommGroup (frattini S) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini S)) :=
+  let : CommGroup (frattini S) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini S)) :=
     hEAS.zmodModule
-  letI : CommGroup (P ⧸ frattini P) :=
+  let : CommGroup (P ⧸ frattini P) :=
     frattiniQuotientCommGroup P hP
-  letI : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
+  let : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
     frattiniQuotientZModTwoModule P hP
   let d :=
     data.toInclusionData hEAS eS
       hK1S htermS hSqS hAgemoS hK0S
-  letI := d.group
-  letI := d.normal
-  letI := d.quotComm
-  letI := d.quotModule
+  let := d.group
+  let := d.normal
+  let := d.quotComm
+  let := d.quotModule
   let f : d.H →* P := S.subtype.comp d.f
   have hf : ∀ g ∈ d.N, f g ∈ frattini P := by
     intro g hg

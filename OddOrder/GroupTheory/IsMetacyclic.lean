@@ -77,12 +77,12 @@ group isomorphism `(commutator G).subgroupOf N ≃* commutator G`.
 **BG §4** Thm 4.12(a) の補題段 (mmd L1592: "R metacyclic ⇒ R′ cyclic"). -/
 theorem isCyclic_commutator (hmeta : IsMetacyclic G) : IsCyclic (commutator G) := by
   obtain ⟨N, hN, hN_cyc, hQ_cyc⟩ := hmeta
-  haveI := hN
-  haveI : IsCyclic (G ⧸ N) := hQ_cyc
+  have := hN
+  have : IsCyclic (G ⧸ N) := hQ_cyc
   have hle : commutator G ≤ N :=
     Subgroup.Normal.quotient_commutative_iff_commutator_le.mp inferInstance
-  haveI : IsCyclic N := hN_cyc
-  haveI : IsCyclic ↥((commutator G).subgroupOf N) := Subgroup.isCyclic _
+  have : IsCyclic N := hN_cyc
+  have : IsCyclic ↥((commutator G).subgroupOf N) := Subgroup.isCyclic _
   exact isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe hle).toMonoidHom
     (Subgroup.subgroupOfEquivOfLe hle).surjective
 
@@ -97,10 +97,10 @@ cyclic group) and `H ⧸ N.map f` is a surjective image of `G ⧸ N` (the compos
 theorem of_surjective {H : Type*} [Group H] {f : G →* H} (hf : Function.Surjective f)
     (h : IsMetacyclic G) : IsMetacyclic H := by
   obtain ⟨N, hN, hN_cyc, hQ_cyc⟩ := h
-  haveI := hN
-  haveI : IsCyclic N := hN_cyc
-  haveI : IsCyclic (G ⧸ N) := hQ_cyc
-  haveI : (N.map f).Normal := Subgroup.Normal.map hN f hf
+  have := hN
+  have : IsCyclic N := hN_cyc
+  have : IsCyclic (G ⧸ N) := hQ_cyc
+  have : (N.map f).Normal := Subgroup.Normal.map hN f hf
   refine ⟨N.map f, inferInstance, ?_, ?_⟩
   · exact isCyclic_of_surjective (f.subgroupMap N) (f.subgroupMap_surjective N)
   · -- `G ⧸ N` surjects onto `H ⧸ N.map f` via the descent of `mk' (N.map f) ∘ f`.
@@ -130,10 +130,10 @@ mathlib v4.29.1 has no `IsMetacyclic`.)
 theorem subgroup {H : Subgroup G} (h : IsMetacyclic G) : IsMetacyclic ↥H := by
   classical
   obtain ⟨N, hN, hN_cyc, hQ_cyc⟩ := h
-  haveI := hN
+  have := hN
   refine ⟨N.subgroupOf H, hN.subgroupOf H, ?_, ?_⟩
   · -- cyclic normal part: `N.subgroupOf H` injects into the cyclic `N`.
-    haveI : IsCyclic N := hN_cyc
+    have : IsCyclic N := hN_cyc
     let g : (N.subgroupOf H) →* N :=
       { toFun := fun x => ⟨(x : G), by have hx := x.2; rwa [Subgroup.mem_subgroupOf] at hx⟩
         map_one' := rfl, map_mul' := fun _ _ => rfl }
@@ -142,8 +142,8 @@ theorem subgroup {H : Subgroup G} (h : IsMetacyclic G) : IsMetacyclic ↥H := by
     have h1 : ((g a : N) : G) = ((g b : N) : G) := congrArg (fun z : N => (z : G)) hab
     exact Subtype.ext (Subtype.ext h1)
   · -- cyclic quotient part: `H ⧸ (N.subgroupOf H)` injects into the cyclic `G ⧸ N`.
-    haveI : (N.subgroupOf H).Normal := hN.subgroupOf H
-    haveI : IsCyclic (G ⧸ N) := hQ_cyc
+    have : (N.subgroupOf H).Normal := hN.subgroupOf H
+    have : IsCyclic (G ⧸ N) := hQ_cyc
     have hf_ker : N.subgroupOf H ≤ ((QuotientGroup.mk' N).comp H.subtype).ker := by
       intro x hx
       rw [Subgroup.mem_subgroupOf] at hx
@@ -163,13 +163,13 @@ theorem subgroup {H : Subgroup G} (h : IsMetacyclic G) : IsMetacyclic ↥H := by
 /-- A metacyclic group is solvable.
 
 Cyclic groups are commutative hence solvable. The extension `1 → N → G → G ⧸ N → 1`
-with both ends solvable yields `IsSolvable G` via `solvable_of_ker_le_range`. -/
-theorem isSolvable (h : IsMetacyclic G) : IsSolvable G := by
+with both ends solvable yields `Group.IsSolvable G` via `Group.isSolvable_of_ker_le_range`. -/
+theorem isSolvable (h : IsMetacyclic G) : Group.IsSolvable G := by
   obtain ⟨N, hN, hN_cyc, hQ_cyc⟩ := h
-  haveI := hN
-  letI : CommGroup ↥N := IsCyclic.commGroup
-  letI : CommGroup (G ⧸ N) := IsCyclic.commGroup
-  exact solvable_of_ker_le_range N.subtype (QuotientGroup.mk' N) (by
+  have := hN
+  let : CommGroup ↥N := IsCyclic.commGroup
+  let : CommGroup (G ⧸ N) := IsCyclic.commGroup
+  exact Group.isSolvable_of_ker_le_range N.subtype (QuotientGroup.mk' N) (by
     rw [QuotientGroup.ker_mk', Subgroup.range_subtype])
 
 end IsMetacyclic
@@ -181,7 +181,7 @@ theorem isMetacyclic_semidirectProduct {N A : Type*} [Group N] [Group A] [IsCycl
   have hrange : (SemidirectProduct.inl : N →* SemidirectProduct N A φ).range
       = (SemidirectProduct.rightHom : SemidirectProduct N A φ →* A).ker :=
     SemidirectProduct.range_inl_eq_ker_rightHom
-  haveI hN : (SemidirectProduct.inl : N →* SemidirectProduct N A φ).range.Normal := by
+  have hN : (SemidirectProduct.inl : N →* SemidirectProduct N A φ).range.Normal := by
     rw [hrange]
     infer_instance
   refine ⟨(SemidirectProduct.inl : N →* SemidirectProduct N A φ).range, hN, ?_, ?_⟩

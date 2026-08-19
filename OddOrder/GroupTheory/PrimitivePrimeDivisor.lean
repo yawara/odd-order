@@ -38,7 +38,7 @@ be `1`, since `(p : ZMod r) = 1` would give `0 = ∑ (p:ZMod r)^i = q` in `ZMod 
 theorem orderOf_eq_of_prime_dvd_geomSum {p q r : ℕ} (hq : q.Prime)
     (hr : r.Prime) (hrq : r ≠ q) (hrn : r ∣ ∑ i ∈ range q, p ^ i) :
     orderOf (p : ZMod r) = q := by
-  haveI : Fact r.Prime := ⟨hr⟩
+  have : Fact r.Prime := ⟨hr⟩
   -- In `ZMod r`, the geometric sum vanishes: `∑ (p:ZMod r)^i = 0`.
   have hsum0 : ∑ i ∈ range q, (p : ZMod r) ^ i = 0 := by
     have : ((∑ i ∈ range q, p ^ i : ℕ) : ZMod r) = 0 :=
@@ -73,7 +73,7 @@ vanishes, so `(p:ZMod q)^q = 1`; but `(p:ZMod q)^q = (p:ZMod q)` (Frobenius), gi
 `(p:ZMod q) = 1`. -/
 theorem dvd_sub_one_of_dvd_geomSum {p q : ℕ} (hp : 2 ≤ p) (hq : q.Prime)
     (hqn : q ∣ ∑ i ∈ range q, p ^ i) : q ∣ p - 1 := by
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   have hsum0 : ∑ i ∈ range q, (p : ZMod q) ^ i = 0 := by
     have : ((∑ i ∈ range q, p ^ i : ℕ) : ZMod q) = 0 :=
       (ZMod.natCast_eq_zero_iff _ _).mpr hqn
@@ -94,7 +94,7 @@ theorem dvd_sub_one_of_dvd_geomSum {p q : ℕ} (hp : 2 ≤ p) (hq : q.Prime)
 `n·(p-1) = p^q - 1` we get `v_q(n) = 1`. -/
 theorem not_sq_dvd_geomSum {p q : ℕ} (hp : 2 ≤ p) (hq : q.Prime) (hq2 : q ≠ 2) :
     ¬ q ^ 2 ∣ ∑ i ∈ range q, p ^ i := by
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   by_cases hqn : q ∣ ∑ i ∈ range q, p ^ i
   · -- `q ∣ n`: LTE ⟹ `v_q(n) = 1`.
     have hqp1 : q ∣ p - 1 := dvd_sub_one_of_dvd_geomSum hp hq hqn

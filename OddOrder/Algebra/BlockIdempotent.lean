@@ -74,7 +74,7 @@ theorem blockCharacterPi_apply (z : Subalgebra.center k A) (c : Block π hπ hli
 /-- **The central characters realise every function on the blocks.**  The image separates the
 blocks by construction, and a separating subalgebra of `blocks → k` is everything. -/
 theorem surjective_blockCharacterPi : Function.Surjective (blockCharacterPi π hπ hlin) := by
-  haveI : Finite (Block π hπ hlin) := Quotient.finite _
+  have : Finite (Block π hπ hlin) := Quotient.finite _
   rw [← AlgHom.range_eq_top]
   refine Subalgebra.eq_top_of_separates fun c c' hcc => ?_
   induction c using Quotient.ind with | _ i =>

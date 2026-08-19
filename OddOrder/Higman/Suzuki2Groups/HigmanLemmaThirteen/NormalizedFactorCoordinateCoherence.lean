@@ -130,7 +130,7 @@ theorem NoncommutativeFactorCoordinateData.theta_eq_of_normalized_equivariant
       dataS.lambda ^ (2 ^ n - 1) = 1 := by
     have hfin : Finite (GaloisField 2 n) :=
       Nat.finite_of_card_ne_zero (by rw [hcard]; positivity)
-    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    let : Fintype (GaloisField 2 n) := Fintype.ofFinite _
     have h := FiniteField.pow_card_sub_one_eq_one dataS.lambda hlamNe
     rwa [← Nat.card_eq_fintype_card, hcard] at h
   have hordlam : orderOf dataS.lambda = 2 ^ n - 1 :=

@@ -54,7 +54,7 @@ theorem sum_degreeSq_ker_subset_not_subset
         ((χ : ClassFunction K ℂ) 1) ^ 2
       = (Nat.card (K ⧸ N) : ℂ) - (Nat.card (K ⧸ (N ⊔ M)) : ℂ) := by
   classical
-  letI : Fintype K := Fintype.ofFinite _
+  let : Fintype K := Fintype.ofFinite _
   have hker_iff : ∀ χ : IrreducibleCharacter K,
       (((N : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ)) ∧
         ((M : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ)))
@@ -287,11 +287,11 @@ theorem d_dvd_card_sub_one_of_le_Q1 [Finite G] {Z : Subgroup G} (hZQ1 : Z ≤ hy
   classical
   by_cases hd1 : hyp.d = 1
   · rw [hd1]; exact one_dvd _
-  letI : SMul ↥hyp.D ↥Z :=
+  let : SMul ↥hyp.D ↥Z :=
     ⟨fun δ z => ⟨(δ : G) * z * (δ : G)⁻¹, hZinv δ δ.2 z z.2⟩⟩
   have hsmul_def : ∀ (δ : ↥hyp.D) (z : ↥Z),
       ((δ • z : ↥Z) : G) = (δ : G) * z * (δ : G)⁻¹ := fun _ _ => rfl
-  letI : MulAction ↥hyp.D ↥Z :=
+  let : MulAction ↥hyp.D ↥Z :=
     { one_smul := fun z => Subtype.ext (by rw [hsmul_def]; simp)
       mul_smul := fun δ₁ δ₂ z => Subtype.ext (by
         rw [hsmul_def, hsmul_def, hsmul_def]
@@ -302,7 +302,7 @@ theorem d_dvd_card_sub_one_of_le_Q1 [Finite G] {Z : Subgroup G} (hZQ1 : Z ≤ hy
     exact Subtype.ext (by rw [hsmul_def]; simp)
   have huniq : ∀ z : ↥Z, z ∈ MulAction.fixedPoints ↥hyp.D ↥Z → z = 1 := by
     intro z hz
-    haveI : Nontrivial ↥hyp.D := by
+    have : Nontrivial ↥hyp.D := by
       apply Finite.one_lt_card_iff_nontrivial.mp
       have hpos : 0 < Nat.card ↥hyp.D := Nat.card_pos
       have : Nat.card ↥hyp.D ≠ 1 := hd1
@@ -410,7 +410,7 @@ theorem sum_degreeSq_SsetOf [Finite G] (R : Subgroup G)
       = (Nat.card (↥hyp.H ⧸ R.subgroupOf hyp.H) : ℂ)
         - (Nat.card (↥hyp.H ⧸ ((R.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H))) : ℂ) := by
   classical
-  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  let : Fintype ↥hyp.H := Fintype.ofFinite _
   have hcongr : ∀ χb : IrreducibleCharacter ↥hyp.H,
       ((χb : ClassFunction ↥hyp.H ℂ) ∈ hyp.SsetOf R)
       ↔ (((R.subgroupOf hyp.H : Subgroup ↥hyp.H) : Set ↥hyp.H)
@@ -442,8 +442,8 @@ theorem exists_apply_one_eq_d_mul [Finite G]
     {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset) :
     ∃ m : ℕ, 0 < m ∧ χ (1 : ↥hyp.H) = (hyp.d : ℂ) * (m : ℂ) := by
   classical
-  letI : Fintype ↥hyp.H := Fintype.ofFinite _
-  letI : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
+  let : Fintype ↥hyp.H := Fintype.ofFinite _
+  let : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
   have hχ' := hχ
   rw [Sset_eq_induced_of_Q hyp] at hχ'
   obtain ⟨φ, ⟨hφirr, -⟩, rfl⟩ := hχ'
@@ -468,7 +468,7 @@ theorem sum_degreeSq_SsetOf_toFinset [Finite G]
       = (Nat.card (↥hyp.H ⧸ R.subgroupOf hyp.H) : ℂ)
         - (Nat.card (↥hyp.H ⧸ ((R.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H))) : ℂ) := by
   classical
-  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  let : Fintype ↥hyp.H := Fintype.ofFinite _
   rw [← hyp.sum_degreeSq_SsetOf R]
   refine Finset.sum_bij'
     (fun x hx => (⟨x, ((hfin.mem_toFinset.mp hx).1.1 :)⟩ : IrreducibleCharacter ↥hyp.H))
@@ -571,7 +571,7 @@ and off `Q` both `χ` and `χ̄` vanish. -/
 theorem conj_diff_support_subset_A_of_mem_Sset [Finite G]
     {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset) :
     ((χ.conj - χ : ClassFunction ↥hyp.H ℂ)).support ⊆ hyp.A := by
-  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  let : Fintype ↥hyp.H := Fintype.ofFinite _
   intro x hx
   rw [ClassFunction.mem_support] at hx
   by_contra hxA
@@ -732,7 +732,7 @@ theorem scaled_diff_support_subset_A_of_mem_Sset [Finite G]
     {a b : ClassFunction ↥hyp.H ℂ} (ha : a ∈ hyp.Sset) (hb : b ∈ hyp.Sset)
     {n m : ℕ} (hdeg : (n : ℂ) * a (1 : ↥hyp.H) = (m : ℂ) * b (1 : ↥hyp.H)) :
     ((n • a - m • b : ClassFunction ↥hyp.H ℂ)).support ⊆ hyp.A := by
-  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  let : Fintype ↥hyp.H := Fintype.ofFinite _
   intro x hx
   rw [ClassFunction.mem_support] at hx
   by_contra hxA

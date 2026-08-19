@@ -136,26 +136,26 @@ statement "`H` is simple".
 
 `hMinCounterexample` says that every proper normal subgroup of `H` is solvable
 and every proper quotient is solvable.  Combined with the existence theorem for
-solvable extensions (`solvable_of_ker_le_range`), this forces `H` to have no
+solvable extensions (`Group.isSolvable_of_ker_le_range`), this forces `H` to have no
 nontrivial proper normal subgroup, i.e., `H` is simple. -/
 theorem isSimpleGroup_of_minCounterexample
     {H : Type*} [Group H] [Nontrivial H]
-    (hH_nsol : ¬ IsSolvable H)
-    (hN_solvable : ∀ N : Subgroup H, N ≠ ⊤ → N.Normal → IsSolvable N)
-    (hQ_solvable : ∀ (N : Subgroup H) [N.Normal], N ≠ ⊥ → IsSolvable (H ⧸ N)) :
+    (hH_nsol : ¬ Group.IsSolvable H)
+    (hN_solvable : ∀ N : Subgroup H, N ≠ ⊤ → N.Normal → Group.IsSolvable N)
+    (hQ_solvable : ∀ (N : Subgroup H) [N.Normal], N ≠ ⊥ → Group.IsSolvable (H ⧸ N)) :
     IsSimpleGroup H := by
   refine ⟨fun N hN_norm => ?_⟩
   by_contra h_not_bot_top
   push Not at h_not_bot_top
   obtain ⟨h_ne_bot, h_ne_top⟩ := h_not_bot_top
   -- N solvable as subgroup
-  have hN_sol : IsSolvable N := hN_solvable N h_ne_top hN_norm
+  have hN_sol : Group.IsSolvable N := hN_solvable N h_ne_top hN_norm
   -- H/N solvable as quotient
-  have hQ_sol : IsSolvable (H ⧸ N) := hQ_solvable N h_ne_bot
+  have hQ_sol : Group.IsSolvable (H ⧸ N) := hQ_solvable N h_ne_bot
   -- Build H solvable from extension: N → H → H/N
-  have hH_sol : IsSolvable H := by
+  have hH_sol : Group.IsSolvable H := by
     -- Use f = N.subtype, g = mk' N.  ker g = N = range f.
-    refine solvable_of_ker_le_range (N.subtype) (QuotientGroup.mk' N) ?_
+    refine Group.isSolvable_of_ker_le_range (N.subtype) (QuotientGroup.mk' N) ?_
     rw [QuotientGroup.ker_mk']
     exact N.range_subtype.ge
   exact hH_nsol hH_sol
@@ -170,10 +170,10 @@ private theorem Nat.card_pos_of_finite {H : Type*} [Group H] [Finite H] :
 If `H` were a `p`-group it would be nilpotent (mathlib `IsPGroup.isNilpotent`)
 hence solvable, contradicting non-solvability. -/
 private theorem not_isPGroup_of_nonsolvable {H : Type*} [Group H] [Finite H]
-    {p : ℕ} [Fact p.Prime] (hH_nsol : ¬ IsSolvable H) :
+    {p : ℕ} [Fact p.Prime] (hH_nsol : ¬ Group.IsSolvable H) :
     ¬ IsPGroup p H := by
   intro h_pgroup
-  haveI : Group.IsNilpotent H := h_pgroup.isNilpotent
+  have : Group.IsNilpotent H := h_pgroup.isNilpotent
   exact hH_nsol inferInstance
 
 /-- **§7D helper**: in a finite simple non-solvable group, the `r`-core is
@@ -184,9 +184,9 @@ were `⊤` then `G` would be an `r`-group, hence nilpotent and solvable,
 contradicting non-solvability. -/
 theorem opCore_eq_bot_of_simple_nonsolvable
     {H : Type*} [Group H] [Finite H] {r : ℕ} [Fact r.Prime]
-    (_hH_simple : IsSimpleGroup H) (hH_nsol : ¬ IsSolvable H) :
+    (_hH_simple : IsSimpleGroup H) (hH_nsol : ¬ Group.IsSolvable H) :
     OddOrder.Isaacs.Ch01.opCore r H = ⊥ := by
-  haveI := OddOrder.Isaacs.Ch01.opCore.normal r H
+  have := OddOrder.Isaacs.Ch01.opCore.normal r H
   rcases Subgroup.Normal.eq_bot_or_eq_top
     (OddOrder.Isaacs.Ch01.opCore.normal r H) with h | h
   · exact h
@@ -209,17 +209,17 @@ divided `|H|`, then `|H| = r^n` (by unique factorization), so `H` is an
 `r`-group by `IsPGroup.of_card`, hence solvable. -/
 theorem two_primes_dvd_of_simple_nonsolvable
     {H : Type*} [Group H] [Finite H]
-    (_hH_simple : IsSimpleGroup H) (hH_nsol : ¬ IsSolvable H) :
+    (_hH_simple : IsSimpleGroup H) (hH_nsol : ¬ Group.IsSolvable H) :
     ∃ r₁ r₂ : ℕ, r₁.Prime ∧ r₂.Prime ∧ r₁ ≠ r₂ ∧
       r₁ ∣ Nat.card H ∧ r₂ ∣ Nat.card H := by
   classical
   by_contra h_not_two
   push Not at h_not_two
-  haveI : Nontrivial H := (inferInstance : IsSimpleGroup H).toNontrivial
+  have : Nontrivial H := (inferInstance : IsSimpleGroup H).toNontrivial
   have hH_card_gt : 1 < Nat.card H := Finite.one_lt_card
   -- Pick any prime divisor.
   obtain ⟨r, hr_prime, hr_dvd⟩ := Nat.exists_prime_and_dvd hH_card_gt.ne'
-  haveI : Fact r.Prime := ⟨hr_prime⟩
+  have : Fact r.Prime := ⟨hr_prime⟩
   -- Every prime divisor equals r.
   have hr_only : ∀ s ∈ Nat.primeFactorsList (Nat.card H), s = r := by
     intro s hs
@@ -240,7 +240,7 @@ dividing `p^a * q^b` (with `p ≠ q` prime) has its order divisible by both
 theorem p_and_q_dvd_card_of_simple_nonsolvable
     {H : Type*} [Group H] [Finite H] {p q : ℕ}
     [Fact p.Prime] [Fact q.Prime] (_hpq : p ≠ q)
-    (hH_simple : IsSimpleGroup H) (hH_nsol : ¬ IsSolvable H)
+    (hH_simple : IsSimpleGroup H) (hH_nsol : ¬ Group.IsSolvable H)
     {a b : ℕ} (hH_dvd : Nat.card H ∣ p ^ a * q ^ b) :
     p ∣ Nat.card H ∧ q ∣ Nat.card H := by
   obtain ⟨r₁, r₂, hr₁_prime, hr₂_prime, hr_ne, hr₁_dvd, hr₂_dvd⟩ :=
@@ -276,7 +276,7 @@ theorem normalClosure_eq_top_of_simple_of_ne_bot
     {G : Type*} [Group G] [hG : IsSimpleGroup G]
     {V : Subgroup G} (hV_ne_bot : V ≠ ⊥) :
     Subgroup.normalClosure (V : Set G) = ⊤ := by
-  haveI := Subgroup.normalClosure_normal (s := (V : Set G))
+  have := Subgroup.normalClosure_normal (s := (V : Set G))
   rcases Subgroup.Normal.eq_bot_or_eq_top
     (Subgroup.normalClosure_normal (s := (V : Set G))) with h | h
   · -- V ≤ normalClosure V = ⊥ ⇒ V = ⊥, contradiction.
@@ -350,7 +350,7 @@ theorem exists_isPCentral {G : Type*} [Group G] [Finite G] {p : ℕ}
     [Fact p.Prime] (hp_dvd : p ∣ Nat.card G) :
     ∃ x : G, IsPCentral p x := by
   classical
-  haveI : Nontrivial G := by
+  have : Nontrivial G := by
     rw [← Finite.one_lt_card_iff_nontrivial]
     exact lt_of_lt_of_le (Fact.out (p := p.Prime)).one_lt
       (Nat.le_of_dvd Nat.card_pos hp_dvd)
@@ -358,8 +358,8 @@ theorem exists_isPCentral {G : Type*} [Group G] [Finite G] {p : ℕ}
   obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
   have hP_ne_bot : (P : Subgroup G) ≠ ⊥ := Sylow.ne_bot_of_dvd_card hp_dvd P
   -- P is a finite nontrivial p-group, so its center is nontrivial.
-  haveI : Nontrivial ↥(P : Subgroup G) := P.toSubgroup.nontrivial_iff_ne_bot.mpr hP_ne_bot
-  haveI : Finite ↥(P : Subgroup G) := inferInstance
+  have : Nontrivial ↥(P : Subgroup G) := P.toSubgroup.nontrivial_iff_ne_bot.mpr hP_ne_bot
+  have : Finite ↥(P : Subgroup G) := inferInstance
   have hPpg : IsPGroup p ↥(P : Subgroup G) := P.isPGroup'
   have h_center_nt : Nontrivial (Subgroup.center ↥(P : Subgroup G)) :=
     hPpg.center_nontrivial
@@ -382,7 +382,7 @@ dividing `p^a * q^b`, every Sylow `p`-subgroup is nontrivial. -/
 theorem sylow_ne_bot_of_simple_nonsolvable_paqb
     {H : Type*} [Group H] [Finite H] {p q : ℕ}
     [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
-    (hH_simple : IsSimpleGroup H) (hH_nsol : ¬ IsSolvable H)
+    (hH_simple : IsSimpleGroup H) (hH_nsol : ¬ Group.IsSolvable H)
     {a b : ℕ} (hH_dvd : Nat.card H ∣ p ^ a * q ^ b)
     (P : Sylow p H) : (P : Subgroup H) ≠ ⊥ :=
   Sylow.ne_bot_of_dvd_card
@@ -437,9 +437,9 @@ theorem exists_isPCentral_centralizing
   obtain ⟨P, hVP⟩ := IsPGroup.exists_le_sylow hV_pgroup
   have hP_ne_bot : (P : Subgroup G) ≠ ⊥ := Sylow.ne_bot_of_dvd_card hp_dvd P
   -- P nontrivial p-group ⇒ Z(P) nontrivial.
-  haveI : Nontrivial ↥(P : Subgroup G) :=
+  have : Nontrivial ↥(P : Subgroup G) :=
     (P : Subgroup G).nontrivial_iff_ne_bot.mpr hP_ne_bot
-  haveI : Finite ↥(P : Subgroup G) := inferInstance
+  have : Finite ↥(P : Subgroup G) := inferInstance
   have hPpg : IsPGroup p ↥(P : Subgroup G) := P.isPGroup'
   have h_center_nt : Nontrivial (Subgroup.center ↥(P : Subgroup G)) :=
     hPpg.center_nontrivial
@@ -475,10 +475,10 @@ contradiction with Step 6 ("`q`-central elements normalize no nontrivial
 `p`-subgroup"). -/
 theorem matsuyama_of_simple_nonsolvable_q_two
     {H : Type*} [Group H] [Finite H]
-    (hH_simple : IsSimpleGroup H) (hH_nsol : ¬ IsSolvable H)
+    (hH_simple : IsSimpleGroup H) (hH_nsol : ¬ Group.IsSolvable H)
     {t : H} (ht_sq : t * t = 1) (ht_ne_one : t ≠ 1) :
     ∃ x : H, ∃ p : ℕ, p.Prime ∧ Odd p ∧ orderOf x = p ∧ t * x * t = x⁻¹ := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   -- t ∉ O_2(H) since O_2(H) = ⊥ in a simple non-solvable group.
   have hO2_bot : OddOrder.Isaacs.Ch01.opCore 2 H = ⊥ :=
     opCore_eq_bot_of_simple_nonsolvable hH_simple hH_nsol
@@ -678,17 +678,17 @@ theorem maximal_isPType_or_isQType
     [Fact p.Prime] [Fact q.Prime] (_hpq : p ≠ q)
     {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
     {M : Subgroup H} (hM_max : IsCoatom M) (hM_ne_bot : M ≠ ⊥)
-    (hM_solvable : IsSolvable M) :
+    (hM_solvable : Group.IsSolvable M) :
     IsPType p M ∨ IsQType q M := by
   classical
   have hp_prime : p.Prime := Fact.out
   have hq_prime : q.Prime := Fact.out
   -- M is nontrivial since M ≠ ⊥ (in the §7D application H is non-solvable, so
   -- |H| is not prime and a maximal subgroup is never trivial).
-  haveI hM_nontriv : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
+  have hM_nontriv : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
   -- F(M) ≠ ⊥.
   have hF_ne_bot : OddOrder.Isaacs.Ch01.fitting ↥M ≠ ⊥ :=
-    OddOrder.Isaacs.Ch01.fitting_ne_bot_of_solvable_nontrivial ↥M
+    OddOrder.Isaacs.Ch01.fitting_ne_bot_of_isSolvable_nontrivial ↥M
   -- F(M) = ⨆_{r ∈ primeFactors |M|} O_r(M).
   rw [OddOrder.Isaacs.Ch01.fitting_eq_iSup_primeFactors] at hF_ne_bot
   -- primeFactors |M| ⊆ {p, q}.
@@ -755,7 +755,7 @@ theorem mem_closure_conjCentralizers_of_not_isCyclic
     ∀ n ∈ N, n ∈ Subgroup.closure
       {x : G | x ∈ N ∧ ∃ a : G, a ∈ A ∧ a ≠ 1 ∧ a * x * a⁻¹ = x} := by
   classical
-  letI : MulDistribMulAction ↥A ↥N := conjActionOfNormalizes A N hAN
+  let : MulDistribMulAction ↥A ↥N := conjActionOfNormalizes A N hAN
   -- `a • n = ⟨↑a * ↑n * (↑a)⁻¹⟩` for `a : ↥A`, `n : ↥N`.
   have hsmul_coe : ∀ (a : ↥A) (n : ↥N), ((a • n : ↥N) : G) = (↑a) * (↑n) * (↑a)⁻¹ := by
     intro a n; rfl
@@ -887,7 +887,7 @@ This is Isaacs L3970-3973: `M ∩ X = N_X(K_p)` is `p`-local in the solvable `X`
 Theorem 4.33.  Here `X'` plays the role of `↥X`, `W = K_p`, `Y = K_q`; the
 hypothesis `N_{X'}(W) ≤ N_{X'}(Y)` is `K_q ⊴ M ∩ X`. -/
 theorem qSubgroup_le_opCore_of_normal_in_pLocal
-    {X' : Type*} [Group X'] [Finite X'] [IsSolvable X'] {p q : ℕ}
+    {X' : Type*} [Group X'] [Finite X'] [Group.IsSolvable X'] {p q : ℕ}
     [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
     {a b : ℕ} (hX_dvd : Nat.card X' ∣ p ^ a * q ^ b)
     {W : Subgroup X'} (hW_ne_bot : W ≠ ⊥) (hW_p : IsPGroup p W)
@@ -898,7 +898,7 @@ theorem qSubgroup_le_opCore_of_normal_in_pLocal
   classical
   have hp_prime : p.Prime := Fact.out
   have hq_prime : q.Prime := Fact.out
-  haveI : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) X' := inferInstance
+  have : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) X' := inferInstance
   set π' : Set ℕ := {r | r ∉ ({p} : Set ℕ)} with hπ'_def
   -- `L = N_{X'}(W)` is `p`-local.
   set L : Subgroup X' := Subgroup.normalizer (W : Set X') with hL_def
@@ -906,7 +906,7 @@ theorem qSubgroup_le_opCore_of_normal_in_pLocal
   have hY_le_L : Y ≤ L := hY_le
   set Ysub : Subgroup ↥L := Y.subgroupOf L with hYsub_def
   -- `Ysub` is normal in `L` (every `l ∈ L` normalizes `Y` by `hY_normalized`).
-  haveI hYsub_normal : Ysub.Normal := by
+  have hYsub_normal : Ysub.Normal := by
     rw [hYsub_def]
     refine ⟨fun y hy l => ?_⟩
     have hl_norm : (l : X') ∈ Subgroup.normalizer (Y : Set X') := hY_normalized l.2
@@ -921,7 +921,7 @@ theorem qSubgroup_le_opCore_of_normal_in_pLocal
       obtain ⟨k, hk⟩ := (IsPGroup.iff_card.mp hY_q)
       rw [hk] at hr_dvd_Y
       exact (Nat.prime_dvd_prime_iff_eq hr_prime hq_prime).mp (hr_prime.dvd_of_dvd_pow hr_dvd_Y)
-    rw [hπ'_def, Set.mem_setOf_eq, Set.mem_singleton_iff, hr_eq_q]; exact hpq.symm
+    rw [hπ'_def, Set.mem_ofPred_eq, Set.mem_singleton_iff, hr_eq_q]; exact hpq.symm
   have hYsub_pi' : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π' Ysub :=
     OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.subgroupOf hY_le_L hY_pi'
   -- `Ysub ≤ O_{p'}(L)`.
@@ -948,7 +948,7 @@ theorem qSubgroup_le_opCore_of_normal_in_pLocal
       obtain ⟨hr_prime, hr_dvd_Z, _⟩ := Nat.mem_primeFactors.mp hr
       have hr_ne_p : r ≠ p := by
         have := hZ_pi r hr
-        rwa [hπ'_def, Set.mem_setOf_eq, Set.mem_singleton_iff] at this
+        rwa [hπ'_def, Set.mem_ofPred_eq, Set.mem_singleton_iff] at this
       have hr_dvd_X : r ∣ Nat.card X' := hr_dvd_Z.trans Z.card_subgroup_dvd_card
       have hr_dvd_paqb : r ∣ p ^ a * q ^ b := hr_dvd_X.trans hX_dvd
       rcases (Nat.Prime.dvd_mul hr_prime).mp hr_dvd_paqb with h | h
@@ -956,7 +956,7 @@ theorem qSubgroup_le_opCore_of_normal_in_pLocal
           (hr_prime.dvd_of_dvd_pow h)) hr_ne_p
       · simp only [Set.mem_singleton_iff]
         exact (Nat.prime_dvd_prime_iff_eq hr_prime hq_prime).mp (hr_prime.dvd_of_dvd_pow h)
-    haveI : Z.Normal := OddOrder.Isaacs.Ch03.oPiCore.normal π' X'
+    have : Z.Normal := OddOrder.Isaacs.Ch03.oPiCore.normal π' X'
     exact OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore hZ_q
   exact hY_le_oPi'.trans hOpi'_q
 
@@ -979,7 +979,7 @@ theorem step1_unique_maximal_containing_nilpotent
     {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
     [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
     {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
-    (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K)
+    (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → Group.IsSolvable K)
     {K : Subgroup H} (hK_nilp : Group.IsNilpotent ↥K)
     (hp_dvd : p ∣ Nat.card ↥K) (hq_dvd : q ∣ Nat.card ↥K)
     (hM_max : IsCoatom (Subgroup.normalizer (K : Set H) : Subgroup H))
@@ -1031,7 +1031,7 @@ theorem step1_unique_maximal_containing_nilpotent
       obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := ↥K)
       have hP_ne_bot : (P : Subgroup ↥K) ≠ ⊥ :=
         OddOrder.Isaacs.Ch07.Sylow.ne_bot_of_dvd_card hp_dvd P
-      haveI : (P : Subgroup ↥K).Normal := OddOrder.Isaacs.Ch01.Sylow.normal_of_isNilpotent P
+      have : (P : Subgroup ↥K).Normal := OddOrder.Isaacs.Ch01.Sylow.normal_of_isNilpotent P
       have hP_le_Op : (P : Subgroup ↥K) ≤ OddOrder.Isaacs.Ch01.opCore p ↥K :=
         OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore P.isPGroup'
       intro hbot
@@ -1041,7 +1041,7 @@ theorem step1_unique_maximal_containing_nilpotent
       obtain ⟨Q⟩ := Sylow.nonempty (p := q) (G := ↥K)
       have hQ_ne_bot : (Q : Subgroup ↥K) ≠ ⊥ :=
         OddOrder.Isaacs.Ch07.Sylow.ne_bot_of_dvd_card hq_dvd Q
-      haveI : (Q : Subgroup ↥K).Normal := OddOrder.Isaacs.Ch01.Sylow.normal_of_isNilpotent Q
+      have : (Q : Subgroup ↥K).Normal := OddOrder.Isaacs.Ch01.Sylow.normal_of_isNilpotent Q
       have hQ_le_Oq : (Q : Subgroup ↥K) ≤ OddOrder.Isaacs.Ch01.opCore q ↥K :=
         OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore Q.isPGroup'
       intro hbot
@@ -1057,7 +1057,7 @@ theorem step1_unique_maximal_containing_nilpotent
       rw [Subgroup.map_eq_bot_iff_of_injective _ K.subtype_injective] at hbot
       exact hOqK_ne_bot hbot
     -- `Kp` characteristic in `↥K`; hence `M = N_H(K) ≤ N_H(Kp)` and `M = N_H(Kp)`.
-    haveI hOpK_char : (OddOrder.Isaacs.Ch01.opCore p ↥K).Characteristic :=
+    have hOpK_char : (OddOrder.Isaacs.Ch01.opCore p ↥K).Characteristic :=
       OddOrder.Isaacs.Ch01.opCore.characteristic p ↥K
     have hM_le_NKp : M ≤ (Subgroup.normalizer (Kp : Set H) : Subgroup H) := by
       rw [hKp_def]
@@ -1066,7 +1066,7 @@ theorem step1_unique_maximal_containing_nilpotent
     have hM_eq_NKp : (Subgroup.normalizer (Kp : Set H) : Subgroup H) = M :=
       maximal_eq_normalizer_of_M_normalizes hM_max hKp_ne_bot hKp_le_M hM_le_NKp
     -- Symmetric facts for `Kq`.
-    haveI hOqK_char : (OddOrder.Isaacs.Ch01.opCore q ↥K).Characteristic :=
+    have hOqK_char : (OddOrder.Isaacs.Ch01.opCore q ↥K).Characteristic :=
       OddOrder.Isaacs.Ch01.opCore.characteristic q ↥K
     have hM_le_NKq : M ≤ (Subgroup.normalizer (Kq : Set H) : Subgroup H) := by
       rw [hKq_def]; exact normalizer_le_normalizer_map_of_characteristic
@@ -1077,7 +1077,7 @@ theorem step1_unique_maximal_containing_nilpotent
     have hKp_le_X : Kp ≤ X := le_trans hKp_le_K hKX
     have hKq_le_X : Kq ≤ X := le_trans hKq_le_K hKX
     -- `X` solvable (proper subgroup of simple `H`).
-    haveI hX_solv : IsSolvable ↥X := hSubgroupsSolvable X hX_max.1
+    have hX_solv : Group.IsSolvable ↥X := hSubgroupsSolvable X hX_max.1
     have hX_card_dvd : Nat.card ↥X ∣ p ^ a * q ^ b := by
       rw [← hH_card]; exact X.card_subgroup_dvd_card
     -- Reusable: lift "`Kr ≤ O_r(X)`-image" via the Thm-4.33 helper inside `↥X`.
@@ -1162,17 +1162,17 @@ theorem step1_unique_maximal_containing_nilpotent
       intro hbot
       exact hKp_ne_bot (le_bot_iff.mp (le_trans hLp_extract (hbot ▸ le_sup_left)))
     -- `L` nilpotent: `OpX ⊔ OqX` is nilpotent (normal coprime), and `L` is its image.
-    haveI hOpX_nilp : Group.IsNilpotent ↥OpX := by
+    have hOpX_nilp : Group.IsNilpotent ↥OpX := by
       rw [hOpX_def]; exact (OddOrder.Isaacs.Ch01.opCore_isPGroup p ↥X).isNilpotent
-    haveI hOqX_nilp : Group.IsNilpotent ↥OqX := by
+    have hOqX_nilp : Group.IsNilpotent ↥OqX := by
       rw [hOqX_def]; exact (OddOrder.Isaacs.Ch01.opCore_isPGroup q ↥X).isNilpotent
-    haveI hOpX_normal : OpX.Normal := by rw [hOpX_def]; infer_instance
-    haveI hOqX_normal : OqX.Normal := by rw [hOqX_def]; infer_instance
-    haveI : Group.IsNilpotent (↥(OpX ⊔ OqX)) :=
+    have hOpX_normal : OpX.Normal := by rw [hOpX_def]; infer_instance
+    have hOqX_normal : OqX.Normal := by rw [hOqX_def]; infer_instance
+    have : Group.IsNilpotent (↥(OpX ⊔ OqX)) :=
       OddOrder.Isaacs.Ch01.sup_isNilpotent_of_normal_nilpotent OpX OqX
     have hL_eq_map : L = (OpX ⊔ OqX).map X.subtype := by
       rw [hL_def, hLp_def, hLq_def, ← Subgroup.map_sup]
-    haveI hL_nilp : Group.IsNilpotent ↥L := by
+    have hL_nilp : Group.IsNilpotent ↥L := by
       rw [hL_eq_map]
       exact Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective (OpX ⊔ OqX) X.subtype
         X.subtype_injective)
@@ -1202,7 +1202,7 @@ theorem step1_unique_maximal_containing_nilpotent
     have hq_dvd_L : q ∣ Nat.card ↥L :=
       hq_dvd_Kq.trans (Subgroup.card_dvd_of_le (le_trans hLq_extract le_sup_right))
     -- `X = N_H(L)`: `L` is the image of the characteristic `OpX ⊔ OqX`.
-    haveI hOpqX_char : (OpX ⊔ OqX).Characteristic := by
+    have hOpqX_char : (OpX ⊔ OqX).Characteristic := by
       rw [Subgroup.characteristic_iff_map_eq]
       intro φ
       rw [Subgroup.map_sup,

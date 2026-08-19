@@ -93,6 +93,7 @@ theorem repr_extendOfIsLattice {κ : Type*} {L : Submodule 𝒪 V} [L.IsLattice 
 
 variable {G : Type*} [Group G]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **The restriction of an ordinary representation to a `G`-stable lattice.** -/
 def latticeRepresentation (ρ : Representation K G V) {L : Submodule 𝒪 V}
     (hL : ∀ (g : G), ∀ v ∈ L, ρ g v ∈ L) : Representation 𝒪 G L where
@@ -121,7 +122,7 @@ theorem algebraMap_trace_latticeRepresentation (ρ : Representation K G V) {L : 
   classical
   set b := Module.Free.chooseBasis 𝒪 L with hb
   set b' := b.extendOfIsLattice K with hb'
-  haveI : Module.Finite K V := Module.Finite.of_basis b'
+  have : Module.Finite K V := Module.Finite.of_basis b'
   rw [LinearMap.trace_eq_matrix_trace 𝒪 b, LinearMap.trace_eq_matrix_trace K b',
     Matrix.trace, Matrix.trace, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -156,7 +157,7 @@ lets the decomposition map be applied to every element of `Irr(G)`. -/
 theorem exists_isLattice_invariant [Finite G] [FiniteDimensional K V] (ρ : Representation K G V) :
     ∃ L : Submodule 𝒪 V, L.IsLattice K ∧ ∀ (g : G), ∀ v ∈ L, ρ g v ∈ L := by
   obtain ⟨L₀, hL₀⟩ := exists_isLattice (𝒪 := 𝒪) (K := K) (V := V)
-  haveI := hL₀
+  have := hL₀
   exact ⟨averagedLattice ρ L₀, isLattice_averagedLattice ρ L₀,
     fun h _ hv => mem_averagedLattice_of_mem ρ L₀ h hv⟩
 

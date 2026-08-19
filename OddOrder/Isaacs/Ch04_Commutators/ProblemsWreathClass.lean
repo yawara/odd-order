@@ -254,7 +254,7 @@ theorem nilpotencyClass_wreath_eq [Fintype Q] {r n : ℕ} (hr : Nat.Prime r) (hn
   have htop : Subgroup.lowerCentralSeries (⊤ : Subgroup (D ≀[Q] Q)) (n * (r - 1) + 1) = ⊥ := by
     rw [lowerCentralSeries_eq_map_shiftSubSeq (D := D) hqgen (n * (r - 1)),
       shiftSubSeq_eq_bot_of_exponent hr hn hD hq hQcard, Subgroup.map_bot]
-  haveI : Group.IsNilpotent (D ≀[Q] Q) :=
+  have : Group.IsNilpotent (D ≀[Q] Q) :=
     Subgroup.nilpotent_iff_lowerCentralSeries.mpr ⟨_, htop⟩
   have hle := Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mp htop
   have hlow : Subgroup.lowerCentralSeries (⊤ : Subgroup (D ≀[Q] Q)) (n * (r - 1)) ≠ ⊥ := by
@@ -314,7 +314,7 @@ theorem commutator_ker_augHom_self [Fintype Q] {q : Q} (hq : ∀ q' : Q, ∃ k :
     exact hf
   refine le_antisymm ?_ (hkey ▸ Subgroup.commutator_mono hle le_rfl)
   rw [← hkey]
-  haveI hnormal : (⁅(coordProdHom (D := D) (Q := Q)).ker.map (inl : (Q → D) →* D ≀[Q] Q),
+  have hnormal : (⁅(coordProdHom (D := D) (Q := Q)).ker.map (inl : (Q → D) →* D ≀[Q] Q),
       (augHom (D := D) (Q := Q)).ker⁆).Normal := by
     rw [hkey, ← lowerCentralSeries_eq_map_shiftSubSeq hq 1]
     infer_instance
@@ -376,7 +376,7 @@ theorem nilpotencyClass_ker_augHom_eq [Fintype Q] {r n : ℕ} (hr : Nat.Prime r)
     rw [show n * (r - 1) - 1 + 1 = n * (r - 1) by omega,
       show n * (r - 1) - 1 + 2 = n * (r - 1) + 1 by omega] at hidx
     rw [hidx, shiftSubSeq_eq_bot_of_exponent hr hn hD hq hQcard, Subgroup.map_bot]
-  haveI : Group.IsNilpotent ↥((augHom (D := D) (Q := Q)).ker) :=
+  have : Group.IsNilpotent ↥((augHom (D := D) (Q := Q)).ker) :=
     (Subgroup.isNilpotent_iff_lowerCentralSeries _).mpr ⟨_, hbot⟩
   have hle := (nilpotencyClass_le_iff_lowerCentralSeries_eq_bot _).mpr hbot
   have hnlt : ¬ Group.nilpotencyClass ↥((augHom (D := D) (Q := Q)).ker) ≤ n * (r - 1) - 1 := by
@@ -453,7 +453,7 @@ theorem isMaximalClassPGroup_wreath_iff [Finite Q] [Finite D] [IsCyclic D] {r n 
     (hr : Nat.Prime r) (hn : n ≠ 0) (hD : Nat.card D = r ^ n) {q : Q}
     (hqgen : ∀ q' : Q, ∃ k : ℕ, q' = q ^ k) (hQ : Nat.card Q = r) :
     IsMaximalClassPGroup r (D ≀[Q] Q) ↔ n = 1 := by
-  letI : Fintype Q := Fintype.ofFinite Q
+  let : Fintype Q := Fintype.ofFinite Q
   have hr2 := hr.two_le
   have hexp : ∀ d : D, d ^ r ^ n = 1 := fun d => by rw [← hD]; exact pow_card_eq_one'
   obtain ⟨c, hc⟩ := exists_pow_prime_pow_sub_one_ne_one hr.one_lt hn hD

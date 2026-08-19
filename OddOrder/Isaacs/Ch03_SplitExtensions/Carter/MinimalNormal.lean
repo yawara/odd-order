@@ -44,7 +44,7 @@ import OddOrder.Isaacs.Ch01_Sylow.Problems
 
 namespace OddOrder.Isaacs.Ch03
 
-open Subgroup Pointwise
+open _root_.OddOrder.Isaacs.Ch03.Subgroup Pointwise
 
 section /- 3C.7(b): 極小正規部分群の場合 -/
 
@@ -54,7 +54,7 @@ variable {G : Type*} [Group G]
 theorem isNilpotent_of_isCarterSubgroup_eq_top {C : Subgroup G} (hC : IsCarterSubgroup C)
     (h : C = ⊤) : Group.IsNilpotent G := by
   subst h
-  haveI := hC.1
+  have := hC.1
   exact Group.nilpotent_of_mulEquiv Subgroup.topEquiv
 
 /-- `N ⊴ G` が可換で `C ⊔ N = ⊤` なら `C ⊓ N ⊴ G`。
@@ -93,7 +93,7 @@ theorem normal_inf_of_comm_of_sup_eq_top {C N : Subgroup G} [N.Normal]
 theorem exists_mem_normalizer_notMem_of_isNilpotent {X Y : Subgroup G}
     (hX : Group.IsNilpotent ↥X) (hYX : Y ≤ X) (hne : Y ≠ X) :
     ∃ y ∈ X, y ∉ Y ∧ y ∈ Subgroup.normalizer (Y : Set G) := by
-  haveI := hX
+  have := hX
   have hlt : Y.subgroupOf X < ⊤ := by
     rw [lt_top_iff_ne_top]
     intro htop
@@ -114,7 +114,7 @@ theorem exists_mem_normalizer_notMem_of_isNilpotent {X Y : Subgroup G}
 theorem sylow_normal_of_isPGroup_of_isNilpotent_quotient [Finite G] {p : ℕ} [Fact p.Prime]
     {N : Subgroup G} [N.Normal] (hN : IsPGroup p ↥N)
     (hnil : Group.IsNilpotent (G ⧸ N)) (P : Sylow p G) : (P : Subgroup G).Normal := by
-  haveI := hnil
+  have := hnil
   obtain ⟨Pbar⟩ : Nonempty (Sylow p (G ⧸ N)) := inferInstance
   have hPbarNormal : (Pbar : Subgroup (G ⧸ N)).Normal :=
     Sylow.normal_of_normalizerCondition Group.normalizerCondition_of_isNilpotent Pbar
@@ -125,7 +125,7 @@ theorem sylow_normal_of_isPGroup_of_isNilpotent_quotient [Finite G] {p : ℕ} [F
     MonoidHom.mem_range.mpr (QuotientGroup.mk'_surjective N x)
   have hP'Normal : ((Pbar : Subgroup (G ⧸ N)).comap (QuotientGroup.mk' N)).Normal :=
     hPbarNormal.comap _
-  haveI : Unique (Sylow p G) :=
+  have : Unique (Sylow p G) :=
     Sylow.unique_of_normal (Pbar.comapOfKerIsPGroup (QuotientGroup.mk' N) hker hrange) hP'Normal
   have hPe : P = Pbar.comapOfKerIsPGroup (QuotientGroup.mk' N) hker hrange :=
     Subsingleton.elim _ _
@@ -143,7 +143,7 @@ theorem sup_inf_eq_and_commute_of_isNilpotent [Finite G] {π : Set ℕ} {C P Q :
     [P.Normal] (hPhall : IsHallSubgroup π P) (hCnil : Group.IsNilpotent ↥C)
     (hQ : IsHallSubgroup πᶜ Q) (hQC : Q ≤ C) :
     (C ⊓ P) ⊔ Q = C ∧ ∀ x ∈ C ⊓ P, ∀ y ∈ Q, Commute x y := by
-  haveI := hCnil
+  have := hCnil
   have hS : IsHallSubgroup π (P.subgroupOf C) := isHallSubgroup_subgroupOf_of_normal_left hPhall
   have hL : IsHallSubgroup πᶜ (Q.subgroupOf C) := isHallSubgroup_subgroupOf_of_le hQ hQC
   refine ⟨?_, ?_⟩
@@ -212,7 +212,7 @@ theorem eq_of_isCarterSubgroup_of_hall_eq [Finite G] {p : ℕ} [Fact p.Prime]
 3. 可解群の Hall 共役性 (`hall_C`) で `Q_C^x = Q_D` にでき, `C^x` と `D` は同じ
    `Q_D` を Hall `p'` 部分に持つ。
 4. `eq_of_isCarterSubgroup_of_hall_eq` で `C^x = D`。 -/
-theorem exists_conj_of_isCarterSubgroup_of_isComplement [Finite G] [IsSolvable G] {p : ℕ}
+theorem exists_conj_of_isCarterSubgroup_of_isComplement [Finite G] [Group.IsSolvable G] {p : ℕ}
     [Fact p.Prime] {C D N : Subgroup G} [N.Normal] (hC : IsCarterSubgroup C)
     (hD : IsCarterSubgroup D) (hNp : IsPGroup p ↥N)
     (hCN : C ⊔ N = ⊤) (hCiN : C ⊓ N = ⊥) (hDN : D ⊔ N = ⊤) (hDiN : D ⊓ N = ⊥) :
@@ -237,11 +237,11 @@ theorem exists_conj_of_isCarterSubgroup_of_isComplement [Finite G] [IsSolvable G
       rw [sup_map_mk'_eq_map_mk']
       exact isNilpotent_map_of_isNilpotent hC.1 _
     rw [hCN, Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective N)] at h1
-    haveI := h1
+    have := h1
     exact Group.nilpotent_of_mulEquiv Subgroup.topEquiv
   -- (3) `G` の Sylow `p`-部分群 `P` は正規。
   obtain ⟨P⟩ : Nonempty (Sylow p G) := inferInstance
-  haveI hPnormal : (P : Subgroup G).Normal :=
+  have hPnormal : (P : Subgroup G).Normal :=
     sylow_normal_of_isPGroup_of_isNilpotent_quotient hNp hquot P
   have hPhall : IsHallSubgroup ({p} : Set ℕ) (P : Subgroup G) :=
     Ch01.sylow_isHallSubgroup_singleton P
@@ -271,38 +271,38 @@ theorem exists_conj_of_isCarterSubgroup_of_isComplement [Finite G] [IsSolvable G
 
 /-- **3C.7(b) step 4**: `N` が極小正規で `C ⊔ N = D ⊔ N = ⊤` なら `C` と `D` は共役。
 
-`N` は可換 (`solvable_minimal_normal_isAbelian`) なので `C ⊓ N ⊴ G`, 極小性から
+`N` は可換 (`minimal_normal_isAbelian_of_isSolvable`) なので `C ⊓ N ⊴ G`, 極小性から
 `C ⊓ N` は `⊥` か `N`。`N ≤ C` なら `C = ⊤` で `G` 自身が冪零, ゆえに `D = ⊤ = C`
 (`IsCarterSubgroup.eq_top_of_isNilpotent`)。`D` 側も同様。
 残るのは `C`, `D` がともに `N` の補元の場合で,
 `exists_conj_of_isCarterSubgroup_of_isComplement` が処理する。 -/
-theorem exists_conj_of_isCarterSubgroup_of_isMinimalNormal [Finite G] [IsSolvable G]
+theorem exists_conj_of_isCarterSubgroup_of_isMinimalNormal [Finite G] [Group.IsSolvable G]
     {C D N : Subgroup G} (hC : IsCarterSubgroup C) (hD : IsCarterSubgroup D)
     (hN : Ch02.IsMinimalNormal N) (hCN : C ⊔ N = ⊤) (hDN : D ⊔ N = ⊤) :
     ∃ g : G, C.map (MulAut.conj g).toMonoidHom = D := by
-  haveI := hN.1
-  have habel := solvable_minimal_normal_isAbelian hN
+  have := hN.1
+  have habel := minimal_normal_isAbelian_of_isSolvable hN
   -- 極小性から `K ⊓ N` は `⊥` か `N`。
   have hdicho : ∀ {K : Subgroup G}, K ⊔ N = ⊤ → K ⊓ N = ⊥ ∨ N ≤ K := by
     intro K hKN
-    haveI := normal_inf_of_comm_of_sup_eq_top (C := K) habel hKN
+    have := normal_inf_of_comm_of_sup_eq_top (C := K) habel hKN
     rcases hN.2.2 (K ⊓ N) inferInstance inf_le_right with h | h
     · exact Or.inl h
     · exact Or.inr (h ▸ (inf_le_left : K ⊓ N ≤ K))
   rcases hdicho hCN with hCiN | hNC
   · rcases hdicho hDN with hDiN | hND
     · -- `C`, `D` はともに `N` の補元。
-      obtain ⟨p, hp, hNel⟩ := solvable_minimal_normal_isElementaryAbelian hN
-      haveI : Fact p.Prime := ⟨hp⟩
+      obtain ⟨p, hp, hNel⟩ := minimal_normal_isElementaryAbelian_of_isSolvable hN
+      have : Fact p.Prime := ⟨hp⟩
       have hNp : IsPGroup p ↥N := fun g => ⟨1, by simpa using hNel.2 g⟩
       exact exists_conj_of_isCarterSubgroup_of_isComplement hC hD hNp hCN hCiN hDN hDiN
     · -- `N ≤ D` ⟹ `D = ⊤` ⟹ `G` 冪零 ⟹ `C = ⊤ = D`。
       have hDtop : D = ⊤ := by rw [← hDN, sup_eq_left.mpr hND]
-      haveI := isNilpotent_of_isCarterSubgroup_eq_top hD hDtop
+      have := isNilpotent_of_isCarterSubgroup_eq_top hD hDtop
       exact ⟨1, by rw [map_conj_one, hC.eq_top_of_isNilpotent, hDtop]⟩
   · -- `N ≤ C` ⟹ `C = ⊤` ⟹ `G` 冪零 ⟹ `D = ⊤ = C`。
     have hCtop : C = ⊤ := by rw [← hCN, sup_eq_left.mpr hNC]
-    haveI := isNilpotent_of_isCarterSubgroup_eq_top hC hCtop
+    have := isNilpotent_of_isCarterSubgroup_eq_top hC hCtop
     exact ⟨1, by rw [map_conj_one, hCtop, hD.eq_top_of_isNilpotent]⟩
 
 end -- 3C.7(b): 極小正規部分群の場合

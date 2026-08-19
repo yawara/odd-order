@@ -43,23 +43,23 @@ theorem caseB_exists_galoisField_repr [Finite G] {M : Subgroup G}
         e (Additive.ofMul ((MonoidHom.range (uActionHom data chief)).subtype u x)) =
           ((μ u : (GaloisField chief.p data.q)ˣ) : GaloisField chief.p data.q) *
             e (Additive.ofMul x) := by
-  letI : Fact chief.p.Prime := ⟨chief.p_prime⟩
-  haveI : chief.N.Normal := chief.N_normal
-  letI : CommGroup (↥data.H ⧸ chief.N) :=
+  let : Fact chief.p.Prime := ⟨chief.p_prime⟩
+  have : chief.N.Normal := chief.N_normal
+  let : CommGroup (↥data.H ⧸ chief.N) :=
     { (inferInstance : Group (↥data.H ⧸ chief.N)) with
       mul_comm := chief.quotient_elementaryAbelian.comm }
-  letI : Module (ZMod chief.p) (Additive (↥data.H ⧸ chief.N)) :=
+  let : Module (ZMod chief.p) (Additive (↥data.H ⧸ chief.N)) :=
     chief.quotient_elementaryAbelian.zmodModule
-  haveI : Finite (↥data.H ⧸ chief.N) :=
+  have : Finite (↥data.H ⧸ chief.N) :=
     Finite.of_surjective (QuotientGroup.mk' chief.N)
       (QuotientGroup.mk'_surjective chief.N)
-  letI : CommGroup ↥(MonoidHom.range (uActionHom data chief)) :=
+  let : CommGroup ↥(MonoidHom.range (uActionHom data chief)) :=
     { (inferInstance : Group ↥(MonoidHom.range (uActionHom data chief))) with
       mul_comm := uActionHom_range_comm chief }
   have hcard : Nat.card (↥data.H ⧸ chief.N) = chief.p ^ data.q :=
     chiefFactor_quotient_card chief
   have hqpos : 0 < data.q := data.nontrivial.2.1.pos
-  haveI hnt : Nontrivial (↥data.H ⧸ chief.N) :=
+  have hnt : Nontrivial (↥data.H ⧸ chief.N) :=
     Finite.one_lt_card_iff_nontrivial.mp (by
       rw [hcard]
       exact Nat.one_lt_pow hqpos.ne' chief.p_prime.one_lt)
@@ -81,7 +81,7 @@ theorem caseB_exists_galoisField_repr [Finite G] {M : Subgroup G}
     elabRepresentation_isSimpleModule_and_faithful
       (p := chief.p) (φ := (MonoidHom.range (uActionHom data chief)).subtype)
       hnt hirr hfaith
-  haveI : Finite (elabRepresentation chief.p
+  have : Finite (elabRepresentation chief.p
       (MonoidHom.range (uActionHom data chief)).subtype).asModule :=
     ‹Finite (↥data.H ⧸ chief.N)›
   have hcardM : Nat.card (elabRepresentation chief.p
@@ -161,7 +161,7 @@ theorem caseB_exists_galoisField_repr_basePoint [Finite G] {M : Subgroup G}
           ((μ u : (GaloisField chief.p data.q)ˣ) : GaloisField chief.p data.q) *
             e (Additive.ofMul x)) ∧
       e (Additive.ofMul s) = 1 := by
-  letI : Fact chief.p.Prime := ⟨chief.p_prime⟩
+  let : Fact chief.p.Prime := ⟨chief.p_prime⟩
   obtain ⟨e, μ, hμinj, hcompat⟩ := caseB_exists_galoisField_repr chars caseB
   have hs0 : e (Additive.ofMul s) ≠ 0 := fun h =>
     hs (by simpa using e.injective (h.trans (map_zero e).symm))
@@ -200,7 +200,7 @@ theorem caseB_addSubgroup_closure_scalarRange_eq_top [Finite G] {M : Subgroup G}
     AddSubgroup.closure
         (Set.range fun u : ↥(MonoidHom.range (uActionHom data chief)) =>
           ((μ u : (GaloisField chief.p data.q)ˣ) : GaloisField chief.p data.q)) = ⊤ := by
-  haveI := chief.N_normal
+  have := chief.N_normal
   refine OddOrder.RepresentationTheory.addSubgroup_closure_eq_top_of_irreducible
     ⟨1, by simp⟩ ?_ ?_
   · rintro _ ⟨u, rfl⟩ _ ⟨u', rfl⟩
@@ -210,15 +210,15 @@ theorem caseB_addSubgroup_closure_scalarRange_eq_top [Finite G] {M : Subgroup G}
     let J : Subgroup (↥data.H ⧸ chief.N) :=
       { carrier := {x | e (Additive.ofMul x) ∈ A}
         one_mem' := by
-          simp only [Set.mem_setOf_eq]
+          simp only [Set.mem_ofPred_eq]
           rw [show Additive.ofMul (1 : ↥data.H ⧸ chief.N) = 0 from rfl, map_zero]
           exact A.zero_mem
         mul_mem' := fun {x y} hx hy => by
-          simp only [Set.mem_setOf_eq] at hx hy ⊢
+          simp only [Set.mem_ofPred_eq] at hx hy ⊢
           rw [show Additive.ofMul (x * y) = Additive.ofMul x + Additive.ofMul y from rfl, map_add]
           exact A.add_mem hx hy
         inv_mem' := fun {x} hx => by
-          simp only [Set.mem_setOf_eq] at hx ⊢
+          simp only [Set.mem_ofPred_eq] at hx ⊢
           rw [show Additive.ofMul x⁻¹ = -Additive.ofMul x from rfl, map_neg]
           exact A.neg_mem hx }
     have hJinv : IsAInvariant (uActionHom data chief) J := by
@@ -312,7 +312,7 @@ theorem w1_conj_mem_uActionHom_range {M : Subgroup G} (data : TypesIIIIIIVSetup 
     {B : MulAut (↥data.H ⧸ chief.N)} (hB : B ∈ MonoidHom.range (uActionHom data chief)) :
     w1ActionHom data chief w * B * (w1ActionHom data chief w)⁻¹
       ∈ MonoidHom.range (uActionHom data chief) := by
-  haveI : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal :=
+  have : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal :=
     (typeP_uW1_frobenius data.typeP data.nontrivial.1).isNormal
   obtain ⟨x, rfl⟩ := hB
   refine ⟨⟨(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype w *
@@ -338,10 +338,10 @@ impossible since `q` is prime, hence `≥ 2`. -/
 theorem w1ActionHom_injective [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
     (chief : ChiefFactorData data) :
     Function.Injective (w1ActionHom data chief) := by
-  haveI := chief.N_normal
+  have := chief.N_normal
   have hcardW1 : Nat.card ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) = data.q :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right : data.typeP.W1 ≤ _)).toEquiv
-  haveI : Fact (Nat.card ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))).Prime :=
+  have : Fact (Nat.card ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))).Prime :=
     ⟨hcardW1 ▸ data.nontrivial.2.1⟩
   rw [← MonoidHom.ker_eq_bot_iff]
   rcases (w1ActionHom data chief).ker.eq_bot_or_eq_top_of_prime_card with hbot | htop
@@ -487,7 +487,7 @@ theorem caseB_exists_galoisField_repr_withAut [Finite G] {M : Subgroup G}
       (∀ (w : ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
         (h : ↥data.H ⧸ chief.N),
         η w (e (Additive.ofMul h)) = e (Additive.ofMul (w1ActionHom data chief w h))) := by
-  letI : Fact chief.p.Prime := ⟨chief.p_prime⟩
+  let : Fact chief.p.Prime := ⟨chief.p_prime⟩
   obtain ⟨s, hsfix, hs1⟩ := chiefFactor_exists_fixedByE_ne_one chief
   obtain ⟨e, μ, hμinj, hcompat, hnorm⟩ :=
     caseB_exists_galoisField_repr_basePoint chars caseB hs1
@@ -499,7 +499,7 @@ theorem caseB_exists_galoisField_repr_withAut [Finite G] {M : Subgroup G}
     hμinj, hcompat, ?_, fun w h => by simp⟩
   have hcardAut : Nat.card (RingAut (GaloisField chief.p data.q)) = data.q :=
     natCard_ringAut_galoisField chief.p data.q data.nontrivial.2.1.ne_zero
-  haveI : Finite (RingAut (GaloisField chief.p data.q)) :=
+  have : Finite (RingAut (GaloisField chief.p data.q)) :=
     Nat.finite_of_card_ne_zero (by rw [hcardAut]; exact data.nontrivial.2.1.ne_zero)
   refine (Nat.bijective_iff_injective_and_card _).mpr
     ⟨ringAutHomOfAddAutHom_injective _ hgen _ (caseB_etaHom_injective e), ?_⟩
@@ -535,7 +535,7 @@ theorem caseB_exists_galoisField_repr_of_cSub_eq_bot [Finite G] {M : Subgroup G}
               (le_sup_left : data.typeP.U ≤ data.typeP.U ⊔ data.typeP.W1)).symm u) x)) =
           ((μ u : (GaloisField chief.p data.q)ˣ) : GaloisField chief.p data.q) *
             e (Additive.ofMul x) := by
-  letI : Fact chief.p.Prime := ⟨chief.p_prime⟩
+  let : Fact chief.p.Prime := ⟨chief.p_prime⟩
   obtain ⟨e, μbar, hμbar, hcompat⟩ := caseB_exists_galoisField_repr chars caseB
   let eU := Subgroup.subgroupOfEquivOfLe
     (le_sup_left : data.typeP.U ≤ data.typeP.U ⊔ data.typeP.W1)

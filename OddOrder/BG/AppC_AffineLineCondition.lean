@@ -274,7 +274,7 @@ scalars. -/
 theorem condCLine_of_condC {S : Set V} (hC : CondC (p := p) S) (x : V) :
     CondCLine {k : ZMod p | k • x ∈ S} := by
   intro b y hsub hb hadd k
-  simp only [Set.mem_setOf_eq] at hsub hb hadd ⊢
+  simp only [Set.mem_ofPred_eq] at hsub hb hadd ⊢
   rw [sub_smul] at hsub
   rw [add_smul] at hadd
   rw [add_smul, mul_smul]
@@ -318,7 +318,7 @@ theorem eq_univ_of_condC [Finite V] (hp : 5 ≤ p) {S : Set V} (hC : CondC (p :=
     refine two_mul_ncard_le_of_condCLine_ne_univ hp (condCLine_of_condC hC' x) ?_
     intro huniv
     have h0 : (0 : ZMod p) ∈ {k : ZMod p | k • x ∈ S'} := by rw [huniv]; trivial
-    simp only [Set.mem_setOf_eq, zero_smul] at h0
+    simp only [Set.mem_ofPred_eq, zero_smul] at h0
     exact h0' h0
   -- Double count `{(x, k) | x ≠ 0, k ≠ 0, k • x ∈ S'}`.
   set Vs : Finset V := {x ∈ Finset.univ | x ≠ 0} with hVsdef
@@ -343,12 +343,12 @@ theorem eq_univ_of_condC [Finite V] (hp : 5 ≤ p) {S : Set V} (hC : CondC (p :=
     have hk0 : k ≠ 0 := by simpa [hKsdef] using hk
     refine Finset.card_nbij' (fun x => k • x) (fun s => k⁻¹ • s) ?_ ?_ ?_ ?_
     · intro x hx
-      simp only [Finset.coe_filter, Set.mem_setOf_eq, hVsdef, Finset.mem_filter] at hx
+      simp only [Finset.coe_filter, Set.mem_ofPred_eq, hVsdef, Finset.mem_filter] at hx
       simp [hSsdef, hx.2]
     · intro s hs
       simp only [Finset.mem_coe, hSsdef, Finset.mem_filter] at hs
       have hs0 : s ≠ 0 := fun h => h0' (h ▸ hs.2)
-      simp only [Finset.coe_filter, Set.mem_setOf_eq, hVsdef, Finset.mem_filter]
+      simp only [Finset.coe_filter, Set.mem_ofPred_eq, hVsdef, Finset.mem_filter]
       refine ⟨⟨Finset.mem_univ _, smul_ne_zero_of_ne_zero (inv_ne_zero hk0) hs0⟩, ?_⟩
       rw [smul_smul, mul_inv_cancel₀ hk0, one_smul]
       exact hs.2
@@ -361,7 +361,7 @@ theorem eq_univ_of_condC [Finite V] (hp : 5 ≤ p) {S : Set V} (hC : CondC (p :=
     refine le_trans (Nat.mul_le_mul_left 2 ?_) (hline x hx0)
     have hsub : (↑({k ∈ Ks | k • x ∈ S'}) : Set (ZMod p)) ⊆ {k : ZMod p | k • x ∈ S'} := by
       intro k hk
-      simp only [Finset.coe_filter, Set.mem_setOf_eq] at hk
+      simp only [Finset.coe_filter, Set.mem_ofPred_eq] at hk
       exact hk.2
     calc ({k ∈ Ks | k • x ∈ S'}).card = (↑({k ∈ Ks | k • x ∈ S'}) : Set (ZMod p)).ncard :=
           (Set.ncard_coe_finset _).symm

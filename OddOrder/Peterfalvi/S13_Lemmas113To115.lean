@@ -50,14 +50,15 @@ theorem coherent_S_of_coherent_SH0C [Finite G]
   have hH0CleHC : hyp.H0C ≤ hyp.HC :=
     sup_le (hyp.H0_lt_H.le.trans le_sup_left) le_sup_right
   -- instances for the oracle
-  haveI : IsSolvable ↥M := _hG.solvable_of_lt_top M (lt_top_iff_ne_top.mpr hyp.base.maximal.1)
-  haveI : IsSolvable ↥((derivedInG M).subgroupOf M) := inferInstance
-  haveI hHCnil : Group.IsNilpotent ↥(hyp.HC.subgroupOf M) := by
-    haveI := hyp.HC_isNilpotent
+  have : Group.IsSolvable ↥M :=
+    _hG.isSolvable_of_lt_top M (lt_top_iff_ne_top.mpr hyp.base.maximal.1)
+  have : Group.IsSolvable ↥((derivedInG M).subgroupOf M) := inferInstance
+  have hHCnil : Group.IsNilpotent ↥(hyp.HC.subgroupOf M) := by
+    have := hyp.HC_isNilpotent
     exact Group.nilpotent_of_surjective
       (Subgroup.subgroupOfEquivOfLe hHCleM).symm.toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hHCleM).symm.surjective
-  haveI hH₁n : (hyp.H0C.subgroupOf M).Normal := hyp.H0C_subgroupOf_normal
+  have hH₁n : (hyp.H0C.subgroupOf M).Normal := hyp.H0C_subgroupOf_normal
   have hHnorm : (hyp.HC.subgroupOf M).Normal := hyp.HC_subgroupOf_normal
   -- strictness `H₀C-trace < HC-trace`
   have hH₁H : hyp.H0C.subgroupOf M < hyp.HC.subgroupOf M := by
@@ -130,15 +131,15 @@ theorem coherent_quotient_bound_of_noncoherent [Finite G]
     H1.relIndex (derivedInG M) ≤ 2 * hyp.q * hyp.C.relIndex hyp.U + 1 := by
   classical
   -- normality instances for the section subgroups and their traces
-  haveI hA'n : ((H1.subgroupOf M)).Normal :=
+  have hA'n : ((H1.subgroupOf M)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer
       (hH1_lt.le.trans (Subgroup.map_subtype_le _))).mpr hH1_norm
-  haveI hBn : ((hyp.H0C.subgroupOf M)).Normal := hyp.H0C_subgroupOf_normal
-  haveI : ((H1.subgroupOf M).subgroupOf ((derivedInG M).subgroupOf M)).Normal :=
+  have hBn : ((hyp.H0C.subgroupOf M)).Normal := hyp.H0C_subgroupOf_normal
+  have : ((H1.subgroupOf M).subgroupOf ((derivedInG M).subgroupOf M)).Normal :=
     hA'n.subgroupOf _
-  haveI : ((hyp.H0C.subgroupOf M).subgroupOf ((derivedInG M).subgroupOf M)).Normal :=
+  have : ((hyp.H0C.subgroupOf M).subgroupOf ((derivedInG M).subgroupOf M)).Normal :=
     hBn.subgroupOf _
-  haveI : ((hyp.H0C.subgroupOf M).subgroupOf (hyp.HC.subgroupOf M)).Normal :=
+  have : ((hyp.H0C.subgroupOf M).subgroupOf (hyp.HC.subgroupOf M)).Normal :=
     hBn.subgroupOf _
   -- coherence dichotomy at the pinned family (`SOf_eq`; `tau`/`A0` are definitional)
   have hAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
@@ -183,7 +184,7 @@ theorem coherent_quotient_bound_of_noncoherent [Finite G]
   have hsq : Nat.card (↥(hyp.HC.subgroupOf M) ⧸
       (hyp.HC.subgroupOf M).subgroupOf (hyp.HC.subgroupOf M)) = 1 := by
     rw [Subgroup.subgroupOf_self]
-    haveI : Subsingleton (↥(hyp.HC.subgroupOf M) ⧸ (⊤ : Subgroup ↥(hyp.HC.subgroupOf M))) :=
+    have : Subsingleton (↥(hyp.HC.subgroupOf M) ⧸ (⊤ : Subgroup ↥(hyp.HC.subgroupOf M))) :=
       QuotientGroup.subsingleton_quotient_top
     exact Nat.card_unique
   rw [hsq] at hbound
@@ -229,7 +230,7 @@ theorem HC_lt_derived [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
   have hHle : hyp.base.typeP.H ≤ M := hyp.base.typeP.H_le.trans (Subgroup.map_subtype_le _)
   have hCle : hyp.C ≤ M := (hyp.C_le_U.trans hyp.base.typeP.U_le).trans
     (Subgroup.map_subtype_le _)
-  haveI hHn : ((hyp.base.typeP.H).subgroupOf M).Normal :=
+  have hHn : ((hyp.base.typeP.H).subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hHle).mpr hyp.H_normalized_by_M
   have huM : u ∈ M := (hyp.HC_le_derived.trans (Subgroup.map_subtype_le _)) huHC
   have hmem : (⟨u, huM⟩ : ↥M) ∈
@@ -432,7 +433,7 @@ theorem coherent_SOf_HC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone
       (Subgroup.subgroupOf_mono M hyp.secondDerived_le_HC)
   -- a genuine member `ζ ∈ S(HC)` from the proper trace `HC ⊊ M'`
-  haveI hHCKnorm : ((hyp.HC.subgroupOf M).subgroupOf ((derivedInG M).subgroupOf M)).Normal :=
+  have hHCKnorm : ((hyp.HC.subgroupOf M).subgroupOf ((derivedInG M).subgroupOf M)).Normal :=
     hyp.HC_subgroupOf_normal.subgroupOf _
   have hne : (hyp.HC.subgroupOf M).subgroupOf ((derivedInG M).subgroupOf M) ≠ ⊤ := by
     rw [Ne, Subgroup.subgroupOf_eq_top]
@@ -1116,7 +1117,7 @@ noncomputable def typeV_caseA_coherence [Finite G]
       OddOrder.Peterfalvi.S12.typeVSibleyDadeHypothesis_tau_agree hG hyp dV hTI hφ.2)
   refine OddOrder.Peterfalvi.S07.isCoherent_of_supportedSpan_le c1 ?_ ?_
   · -- `ℤ[S, A₀] ⊆ ℤ[S, (M')^#]`: members vanish off `M'`, and `1 ∉ A₀`
-    haveI hHnorm : ((derivedInG M).subgroupOf M).Normal := by
+    have hHnorm : ((derivedInG M).subgroupOf M).Normal := by
       rw [show (derivedInG M).subgroupOf M = commutator ↥M by
         rw [derivedInG, Subgroup.subgroupOf,
           Subgroup.comap_map_eq_self_of_injective M.subtype_injective]]

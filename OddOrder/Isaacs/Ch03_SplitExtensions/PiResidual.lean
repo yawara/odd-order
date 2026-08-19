@@ -31,7 +31,7 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
 
 namespace OddOrder.Isaacs.Ch03
 
-open Subgroup QuotientGroup
+open _root_.OddOrder.Isaacs.Ch03.Subgroup QuotientGroup
 
 variable {G : Type*} [Group G] {π : Set ℕ}
 
@@ -70,7 +70,7 @@ theorem isPiGroup_quotient_of_mem_piQuotientNormals {N : Subgroup G} [N.Normal]
 
 theorem top_mem_piQuotientNormals : (⊤ : Subgroup G) ∈ piQuotientNormals π G := by
   refine ⟨inferInstance, fun q hq => ?_⟩
-  haveI : Subsingleton (G ⧸ (⊤ : Subgroup G)) := QuotientGroup.subsingleton_quotient_top
+  have : Subsingleton (G ⧸ (⊤ : Subgroup G)) := QuotientGroup.subsingleton_quotient_top
   rw [Nat.card_eq_one_iff_unique.mpr ⟨inferInstance, inferInstance⟩, Nat.primeFactors_one] at hq
   exact absurd hq (Finset.notMem_empty q)
 
@@ -79,8 +79,8 @@ theorem top_mem_piQuotientNormals : (⊤ : Subgroup G) ∈ piQuotientNormals π 
 theorem inf_mem_piQuotientNormals [Finite G] {N₁ N₂ : Subgroup G}
     (h₁ : N₁ ∈ piQuotientNormals π G) (h₂ : N₂ ∈ piQuotientNormals π G) :
     N₁ ⊓ N₂ ∈ piQuotientNormals π G := by
-  haveI := normal_of_mem_piQuotientNormals h₁
-  haveI := normal_of_mem_piQuotientNormals h₂
+  have := normal_of_mem_piQuotientNormals h₁
+  have := normal_of_mem_piQuotientNormals h₂
   have hpg₁ := isPiGroup_quotient_of_mem_piQuotientNormals h₁
   have hpg₂ := isPiGroup_quotient_of_mem_piQuotientNormals h₂
   refine ⟨inferInstance, ?_⟩
@@ -96,8 +96,8 @@ theorem inf_mem_piQuotientNormals [Finite G] {N₁ N₂ : Subgroup G}
 最小元 `N₀` をもち, `sInf = N₀` となる。これから `O^π(G)` の正規性と `G/O^π` の π-群性が従う。 -/
 theorem oPiResidual_mem_piQuotientNormals [Finite G] :
     oPiResidual π G ∈ piQuotientNormals π G := by
-  haveI : Finite (Subgroup G) := Finite.of_injective _ (SetLike.coe_injective (A := Subgroup G))
-  haveI : WellFoundedLT (Subgroup G) := Finite.to_wellFoundedLT
+  have : Finite (Subgroup G) := Finite.of_injective _ (SetLike.coe_injective (A := Subgroup G))
+  have : WellFoundedLT (Subgroup G) := Finite.to_wellFoundedLT
   obtain ⟨N₀, hN₀⟩ :=
     exists_minimal_of_wellFoundedLT (· ∈ piQuotientNormals π G) ⟨⊤, top_mem_piQuotientNormals⟩
   have hmin : ∀ M ∈ piQuotientNormals π G, N₀ ≤ M := fun M hM =>
@@ -143,12 +143,12 @@ theorem oPiResidual_eq_closure_piPrimeElements [Finite G] :
     oPiResidual π G = Subgroup.closure {g : G | ∀ q ∈ (orderOf g).primeFactors, q ∉ π} := by
   set S : Set G := {g : G | ∀ q ∈ (orderOf g).primeFactors, q ∉ π} with hS
   -- W = closure S は正規 (S は共役不変)
-  haveI hWnorm : (Subgroup.closure S).Normal := by
+  have hWnorm : (Subgroup.closure S).Normal := by
     refine ⟨fun a ha g => ?_⟩
     induction ha using Subgroup.closure_induction with
     | mem x hx =>
       refine Subgroup.subset_closure ?_
-      rw [hS, Set.mem_setOf_eq, orderOf_conj_eq]; exact hx
+      rw [hS, Set.mem_ofPred_eq, orderOf_conj_eq]; exact hx
     | one => simp
     | mul x y _ _ hgx hgy =>
       rw [show g * (x * y) * g⁻¹ = (g * x * g⁻¹) * (g * y * g⁻¹) by group]
@@ -159,7 +159,7 @@ theorem oPiResidual_eq_closure_piPrimeElements [Finite G] :
   · -- O^π ≤ W: G/W は π-群
     refine oPiResidual_le_of_isPiGroup_quotient (fun q hq => ?_)
     by_contra hqπ
-    haveI : Fact q.Prime := ⟨(Nat.mem_primeFactors.mp hq).1⟩
+    have : Fact q.Prime := ⟨(Nat.mem_primeFactors.mp hq).1⟩
     obtain ⟨xbar, hxbar⟩ := exists_prime_orderOf_dvd_card' q (Nat.mem_primeFactors.mp hq).2.1
     obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective xbar
     have hqn : q ∣ orderOf x :=
@@ -175,7 +175,7 @@ theorem oPiResidual_eq_closure_piPrimeElements [Finite G] :
     have hox : orderOf (x ^ m) = q ^ k := by
       rw [orderOf_pow, hn, Nat.gcd_eq_right ⟨q ^ k, by ring⟩, Nat.mul_div_cancel _ hm_pos]
     have hxmW : x ^ m ∈ Subgroup.closure S := Subgroup.subset_closure (by
-      rw [hS, Set.mem_setOf_eq]
+      rw [hS, Set.mem_ofPred_eq]
       intro r hr
       rw [hox] at hr
       have hrp := Nat.prime_of_mem_primeFactors hr

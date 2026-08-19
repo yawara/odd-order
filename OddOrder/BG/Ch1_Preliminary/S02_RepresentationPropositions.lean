@@ -167,7 +167,7 @@ issue 0177 の一括走査で訂正, 2026-08-08。)
    nonisomorphic, sum direct), `dim M = p · dim L ∣ p · |H| = |G|`.
 
 **形式化方針**:
-- Prop 2.2 + `IsSolvable` 帰納 + Module restrict/induce で.
+- Prop 2.2 + `Group.IsSolvable` 帰納 + Module restrict/induce で.
 - 依存 chain: §2B Prop 2.2 ⟸ Isaacs Ch.6 §6F Clifford 完成必須.
 
 **下流引用**: **0** (audit 実測). §9 にも cite 無し (旧ノート誤り).

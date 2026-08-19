@@ -52,7 +52,7 @@ theorem exists_algHom_pi_matrix_of_isAlgClosed (k : Type*) [Field k] [IsAlgClose
       Function.Surjective π ∧
         RingHom.ker (π : A →+* ∀ i, Matrix (Fin (d i)) (Fin (d i)) k) = Ring.jacobson A ∧
         ∀ x ∈ RingHom.ker (π : A →+* ∀ i, Matrix (Fin (d i)) (Fin (d i)) k), IsNilpotent x := by
-  haveI : IsArtinianRing A := IsArtinianRing.of_finite k A
+  have : IsArtinianRing A := IsArtinianRing.of_finite k A
   obtain ⟨m, hm⟩ : IsNilpotent (Ring.jacobson A) := IsSemiprimaryRing.isNilpotent
   obtain ⟨n, d, hd, ⟨e⟩⟩ :=
     IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed k (A ⧸ Ring.jacobson A)

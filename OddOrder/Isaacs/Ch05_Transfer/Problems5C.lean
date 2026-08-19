@@ -199,7 +199,7 @@ theorem transfer_inv_pow_mul_mem_map {A : Type*} [CommGroup A] [Finite G] {p : �
     (ϕ ⟨x, hVP hx⟩ ^ (P : Subgroup G).index)⁻¹ * MonoidHom.transfer ϕ x ∈
       (U.subgroupOf (P : Subgroup G)).map ϕ := by
   classical
-  haveI : Fintype (MulAction.orbitRel.Quotient (Subgroup.zpowers x) (G ⧸ (P : Subgroup G))) :=
+  have : Fintype (MulAction.orbitRel.Quotient (Subgroup.zpowers x) (G ⧸ (P : Subgroup G))) :=
     Fintype.ofFinite _
   set n : MulAction.orbitRel.Quotient (Subgroup.zpowers x) (G ⧸ (P : Subgroup G)) → ℕ :=
     fun q => Function.minimalPeriod (fun y : G ⧸ (P : Subgroup G) => x • y) q.out with hn
@@ -404,7 +404,7 @@ theorem card_eq_two_of_characteristic_relIndex_eq_two [Finite G] [IsSimpleGroup 
     · exact absurd (not_mem_of_commutator_eq_top P hab htop hUP hVP hfus hsq haV haU)
         (by simp)
   -- 可換単純 ⇒ 素数位数, かつ `a ≠ 1` が 2-元なので `2 ∣ |G|`
-  letI : CommGroup G := { (inferInstance : Group G) with mul_comm := hcomm }
+  let : CommGroup G := { (inferInstance : Group G) with mul_comm := hcomm }
   have hprime : (Nat.card G).Prime := IsSimpleGroup.prime_card
   have ha1 : a ≠ 1 := fun hcon => haU (hcon ▸ U₀.one_mem)
   obtain ⟨k, hk⟩ := IsPGroup.iff_orderOf.mp P.2 (⟨a, hVP haV⟩ : ↥(P : Subgroup G))
@@ -566,8 +566,8 @@ theorem exists_characteristic_relIndex_two_of_card_32 {Q : Type*} [Group Q]
     exact hpair (powImage Q 2) ⊤ inferInstance inferInstance le_top
       (by rw [hcardTop, hbj])
   · -- `|℧₁| = 32` ⇒ `|Ω₁| = 1` だが位数 2 の元が存在: 矛盾
-    haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-    haveI : Fintype Q := Fintype.ofFinite Q
+    have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+    have : Fintype Q := Fintype.ofFinite Q
     obtain ⟨y, hy⟩ := exists_prime_orderOf_dvd_card (G := Q) 2
       (by rw [← Nat.card_eq_fintype_card, hcard]; norm_num)
     have hyK : y ∈ powKernel Q 2 := by
@@ -595,8 +595,8 @@ theorem sq_eq_one_of_card_sylow_two_eq_32 [Finite G] [IsSimpleGroup G] (P : Sylo
   by_contra hy
   obtain ⟨U, W, hU, hW, hidx⟩ :=
     exists_characteristic_relIndex_two_of_card_32 (Q := ↥(P : Subgroup G)) hcard hy
-  haveI := hU
-  haveI := hW
+  have := hU
+  have := hW
   have hab : ∀ a ∈ (P : Subgroup G), ∀ b ∈ (P : Subgroup G), a * b = b * a := fun a ha b hb =>
     congrArg Subtype.val (mul_comm' (⟨a, ha⟩ : ↥(P : Subgroup G)) ⟨b, hb⟩)
   have h2 := card_eq_two_of_characteristic_relIndex_eq_two P hab hidx

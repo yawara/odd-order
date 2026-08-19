@@ -65,21 +65,21 @@ theorem stabilizer_inf_eq_bot_of_isMulCommutative_of_isPretransitive
 theorem exists_elementaryAbelian_regular_normal_of_isMultiplyPretransitive
     [Finite G] [FaithfulSMul G Ω]
     (h2 : MulAction.IsMultiplyPretransitive G Ω 2)
-    {N : Subgroup G} [N.Normal] (hN : N ≠ ⊥) (hsolv : IsSolvable ↥N) :
+    {N : Subgroup G} [N.Normal] (hN : N ≠ ⊥) (hsolv : Group.IsSolvable ↥N) :
     ∃ (p : ℕ) (F : Subgroup G), p.Prime ∧ F.Normal ∧ F ≤ N ∧ F ≠ ⊥ ∧
       IsMulCommutative ↥F ∧ (∀ x ∈ F, x ^ p = 1) ∧ IsPGroup p ↥F ∧
       MulAction.IsPretransitive F Ω ∧
       ∀ ω : Ω, MulAction.stabilizer G ω ⊓ F = ⊥ := by
   classical
-  haveI hprim : IsPreprimitive G Ω := isPreprimitive_of_is_two_pretransitive h2
+  have hprim : IsPreprimitive G Ω := isPreprimitive_of_is_two_pretransitive h2
   -- `G`-minimal normal `F ≤ N`.
   obtain ⟨F, ⟨hFnormal, hFne, hFmin⟩, hFN⟩ :=
     OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal N hN
-  haveI := hFnormal
-  haveI : Nontrivial ↥F := (Subgroup.nontrivial_iff_ne_bot F).mpr hFne
+  have := hFnormal
+  have : Nontrivial ↥F := (Subgroup.nontrivial_iff_ne_bot F).mpr hFne
   -- `↥F` は可解 (`F ≤ N`, `↥N` 可解).
-  haveI : IsSolvable ↥F :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective hFN)
+  have : Group.IsSolvable ↥F :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective hFN)
   -- abelian: `⁅F,F⁆ ⊴ G` は `F` より真に小さいので minimality で `⊥`.
   have hFF : ⁅F, F⁆ = ⊥ := by
     have hlt := OddOrder.Isaacs.Ch04.commutator_lt_self_of_isSolvable_subtype F
@@ -90,7 +90,7 @@ theorem exists_elementaryAbelian_regular_normal_of_isMultiplyPretransitive
   -- 素数 `p ∣ |F|`.
   obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd
     (fun h1 => hFne (Subgroup.eq_bot_of_card_eq F h1))
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   -- exponent-`p` 部分群 `Fp := {x ∈ F | x^p = 1}` (`F` abelian ゆえ部分群).
   set Fp : Subgroup G :=
     { carrier := {x | x ∈ F ∧ x ^ p = 1}
@@ -105,14 +105,14 @@ theorem exists_elementaryAbelian_regular_normal_of_isMultiplyPretransitive
       inv_mem' := fun {a} ha => ⟨F.inv_mem ha.1, by rw [inv_pow, ha.2, inv_one]⟩ }
     with hFpdef
   have hFpF : Fp ≤ F := fun x hx => hx.1
-  haveI hFpnormal : Fp.Normal := by
+  have hFpnormal : Fp.Normal := by
     constructor
     intro n hn g
     exact ⟨hFnormal.conj_mem n hn.1 g, by
       rw [conj_pow, hn.2, mul_one, mul_inv_cancel]⟩
   -- Cauchy: `p ∣ |F|` から位数 `p` の元 ⟹ `Fp ≠ ⊥` ⟹ minimality で `Fp = F`.
   have hFpne : Fp ≠ ⊥ := by
-    haveI : Fintype ↥F := Fintype.ofFinite _
+    have : Fintype ↥F := Fintype.ofFinite _
     obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card (G := ↥F) p
       (by rwa [← Nat.card_eq_fintype_card])
     intro hbot
@@ -148,7 +148,7 @@ theorem exists_elementaryAbelian_regular_normal_of_isMultiplyPretransitive
     obtain ⟨ω, hω⟩ := this
     intro huniv
     exact hω ((huniv ▸ Set.mem_univ ω : ω ∈ fixedPoints F Ω) x)
-  haveI htrans : MulAction.IsPretransitive F Ω :=
+  have htrans : MulAction.IsPretransitive F Ω :=
     IsQuasiPreprimitive.isPretransitive_of_normal hfix
   exact ⟨p, F, hp, hFnormal, hFN, hFne, hcomm, hexp, hFpgroup, htrans,
     stabilizer_inf_eq_bot_of_isMulCommutative_of_isPretransitive hcomm htrans⟩

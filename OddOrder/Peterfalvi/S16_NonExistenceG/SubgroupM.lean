@@ -45,7 +45,7 @@ theorem frobenius_PU_of_field_repr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
       (hyp.base.P.subgroupOf (derivedInG hyp.base.S))
       (hyp.base.U.subgroupOf (derivedInG hyp.base.S)) := by
   classical
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   have hP_le : hyp.base.P ≤ derivedInG hyp.base.S := by
     rw [hyp.base.S_deriv_eq_PU]; exact le_sup_left
   have hU_le : hyp.base.U ≤ derivedInG hyp.base.S := by
@@ -80,7 +80,7 @@ theorem frobenius_PU_of_field_repr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
       rw [P_inf_U_eq_bot hG hyp, Subgroup.mem_bot] at this
       exact Subtype.ext this
     · -- `N ⊔ A = ⊤` (carrier `S' = P ⊔ U`) and `N` normal ⟹ `↑N * ↑A = univ`
-      haveI := hnormal
+      have := hnormal
       have hsup : hyp.base.P.subgroupOf (derivedInG hyp.base.S)
           ⊔ hyp.base.U.subgroupOf (derivedInG hyp.base.S) = ⊤ := by
         rw [← Subgroup.subgroupOf_sup hP_le hU_le, ← hyp.base.S_deriv_eq_PU]
@@ -257,7 +257,7 @@ theorem t_side_caseB_fieldModel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) : Nonempty (TFieldModelData hyp.base) := by
-  letI : Fact hyp.base.q.Prime := ⟨hyp.base.q_prime⟩
+  let : Fact hyp.base.q.Prime := ⟨hyp.base.q_prime⟩
   -- `V` normalizes `Q`: `V ≤ T' ≤ T = N_G(Q)` (`normalizer_Q_eq_T`).
   have hVN : hyp.base.V ≤ Subgroup.normalizer (hyp.base.Q : Set G) := by
     intro g hg
@@ -503,7 +503,7 @@ theorem MHypothesis.chiRhoNormSq_psi_le_line83 [Finite G]
           / (Nat.card ↥Mdata.M : ℝ)
         + (Nat.card G : ℝ)⁻¹ * ((Nat.card (Mdata.toFamilyHypothesis71).G0 : ℝ)
           - ((Finset.univ.filter (fun g : G => g ∈ Mdata.G0)).card : ℝ)) := by
-  haveI := Mdata.finiteG
+  have := Mdata.finiteG
   have hA0 : (Mdata.toFamilyHypothesis71).A 0
       = OddOrder.GroupTheory.typeIA Mdata.M Mdata.typeIHyp.typeI := rfl
   have hL0 : (Mdata.toFamilyHypothesis71).L 0 = Mdata.M := rfl
@@ -608,7 +608,7 @@ theorem centralizerSupport_sharpSubgroup_eq_of_frobenius [Finite G] {M N : Subgr
       = OddOrder.GroupTheory.sharpSubgroup N := by
   ext y
   simp only [OddOrder.GroupTheory.centralizerSupport, OddOrder.GroupTheory.sharpSubgroup,
-    Set.mem_setOf_eq, Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff]
+    Set.mem_ofPred_eq, Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff]
   constructor
   · rintro ⟨hyM, hy1, x, ⟨hxN, hx1⟩, hyx⟩
     have hxM : x ∈ M := hNM hxN
@@ -684,7 +684,7 @@ theorem isTISubset_sdiff_sup_of_normalizer_eq [Finite G] {W W1 W2 : Subgroup G}
     OddOrder.GroupTheory.IsTISubset ((W : Set G) \ ((W1 : Set G) ∪ (W2 : Set G))) W := by
   classical
   set vset : Set G := (W : Set G) \ ((W1 : Set G) ∪ (W2 : Set G)) with hvset
-  haveI : IsCyclic ↥W := hWcyc
+  have : IsCyclic ↥W := hWcyc
   have hW1le : W1 ≤ W := hWeq ▸ le_sup_left
   have hW2le : W2 ≤ W := hWeq ▸ le_sup_right
   have mem_norm_sing : ∀ c z : G,
@@ -885,7 +885,7 @@ theorem MHypothesis.famG0_sub_filter_card_le_orbit_ncard [Finite G] {hyp : Hypot
         + ((OddOrder.GroupTheory.conjClassSet
             (OddOrder.GroupTheory.sharpSubgroup hyp.base.Q)).ncard : ℝ) := by
   classical
-  haveI := Mdata.finiteG
+  have := Mdata.finiteG
   set famG0 := (Mdata.toFamilyHypothesis71).G0 with hfamdef
   set Worb := OddOrder.GroupTheory.conjClassSet
     ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)))
@@ -941,7 +941,7 @@ theorem MHypothesis.line83_le_displayed_upper [Finite G]
         + 2 / ((hyp.base.p * hyp.base.q : ℕ) : ℝ)
         + 1 / ((hyp.base.u * hyp.base.q : ℕ) : ℝ)
         + 1 / ((hyp.base.v * hyp.base.p : ℕ) : ℝ) := by
-  haveI := Mdata.finiteG
+  have := Mdata.finiteG
   -- abbreviations
   have hW1le : hyp.base.W1 ≤ hyp.base.W := hyp.base.W_eq_join ▸ le_sup_left
   have hW2le : hyp.base.W2 ≤ hyp.base.W := hyp.base.W_eq_join ▸ le_sup_right

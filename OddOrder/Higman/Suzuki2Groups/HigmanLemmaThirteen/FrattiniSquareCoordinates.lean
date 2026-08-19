@@ -100,10 +100,10 @@ theorem exists_frattiniSquareSingerCoordinates_of_exponent_four
     (frattiniSquareNormalInvariant Y.subtype).2.2
   have hEA : IsElementaryAbelian 2 (frattiniSquare P) :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : CommGroup (frattiniSquare P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : CommGroup (frattiniSquare P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hEA.zmodModule
   let n := Module.finrank (ZMod 2) (Additive (frattiniSquare P))
   let rho : Representation (ZMod 2) Y (Additive (frattiniSquare P)) :=
@@ -170,8 +170,8 @@ theorem exists_frattiniSquareSingerCoordinates_of_exponent_four
     have hnle : n ≤ 1 := by omega
     interval_cases n <;>
       norm_num only [pow_zero, pow_one] at hcard <;> omega
-  letI : IsCyclic Y := hxi.cyclic
-  letI : CommGroup Y := IsCyclic.commGroup
+  let : IsCyclic Y := hxi.cyclic
+  let : CommGroup Y := IsCyclic.commGroup
   obtain ⟨c, hcgen⟩ := IsCyclic.exists_generator (α := Y)
   obtain ⟨e, nu, b, hprim, hconj, hgen, hb⟩ :=
     exists_singerFrobeniusEigenbasis_of_transitive_generator

@@ -117,12 +117,12 @@ theorem IsIrreducibleCharacter.determinant_spec [Finite G] {χ : ClassFunction G
     [FiniteDimensional ℂ W] (σ : Representation ℂ G W)
     (hσ : (χ : G → ℂ) = σ.character) :
     hχ.determinant = representationDeterminant σ := by
-  letI := hχ.choose_spec.choose
-  letI := hχ.choose_spec.choose_spec.choose
-  letI := hχ.choose_spec.choose_spec.choose_spec.choose
+  let := hχ.choose_spec.choose
+  let := hχ.choose_spec.choose_spec.choose
+  let := hχ.choose_spec.choose_spec.choose_spec.choose
   obtain ⟨hirr₀, hchar₀⟩ := hχ.choose_spec.choose_spec.choose_spec.choose_spec.choose_spec
-  haveI := hirr₀
-  haveI : Invertible (Nat.card G : ℂ) :=
+  have := hirr₀
+  have : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   obtain ⟨Φ⟩ := nonempty_equiv_of_character_eq
     (hχ.choose_spec.choose_spec.choose_spec.choose_spec.choose) σ

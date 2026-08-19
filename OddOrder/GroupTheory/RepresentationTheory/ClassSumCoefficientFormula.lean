@@ -21,6 +21,7 @@ open OddOrder.GroupTheory.CenterClassSum
 
 variable {G : Type*} [Group G]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The chosen representative of a conjugacy class lies in that class. -/
 theorem conjClass_mk_out (C : ConjClasses G) : ConjClasses.mk C.out = C := by
   rw [← ConjClasses.quotient_mk_eq_mk, Quotient.out_eq]
@@ -57,9 +58,9 @@ theorem sum_classSumCoeff_mul_irreducibleCharacter_apply
         (χ : ClassFunction G ℂ) (1 : G) := by
   classical
   obtain ⟨V, _, _, _, ρ, hρ, hχ⟩ := χ.isIrreducible
-  haveI : Representation.IsIrreducible ρ := hρ
+  have : Representation.IsIrreducible ρ := hρ
   have hdegree : ρ.character (1 : G) ≠ 0 := by
-    haveI := nontrivial_of_isIrreducible ρ
+    have := nontrivial_of_isIrreducible ρ
     rw [ρ.char_one]
     exact Nat.cast_ne_zero.mpr Module.finrank_pos.ne'
   let ω : ConjClasses G → ℂ := fun C =>
@@ -130,7 +131,7 @@ theorem classSumCoeff_mul_centralizer_card_eq_sum_irreducibleCharacter
           (χ : ClassFunction G ℂ) (1 : G)) *
           (χ : ClassFunction G ℂ) Cs.out⁻¹ := by
   classical
-  letI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  let : Fintype (ConjClasses G) := Fintype.ofFinite _
   let coeff : ConjClasses G → ℂ := fun C => (classSumCoeff Ci Cj C : ℂ)
   let invVal : IrreducibleCharacter G → ℂ := fun χ =>
     (χ : ClassFunction G ℂ) Cs.out⁻¹

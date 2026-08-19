@@ -52,9 +52,9 @@ theorem sigmaCoeff_trichotomy (hyp : TICyclicHypothesis G) [Fintype hyp.W]
       (∃ (i₀ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (c : ℂ), c ≠ 0 ∧
         (∀ q, hyp.sigmaCoeff hVeq app ψ (i₀, q) = c) ∧
         ∀ p q, p ≠ i₀ → hyp.sigmaCoeff hVeq app ψ (p, q) = 0) := by
-  haveI : Finite G := Finite.of_fintype G
-  haveI : Nonempty ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := ⟨1⟩
-  haveI : Nonempty ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := ⟨1⟩
+  have : Finite G := Finite.of_fintype G
+  have : Nonempty ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := ⟨1⟩
+  have : Nonempty ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := ⟨1⟩
   refine grid_trichotomy (fun pq => hyp.sigmaCoeff hVeq app ψ pq)
     (fun p p' q q' => hyp.sigmaCoeff_add_eq hVeq app hψ p p' q q') ?_ ?_
   · rw [hyp.card_charGroup_subgroupOf hyp.W1_le_W, hyp.card_charGroup_subgroupOf hyp.W2_le_W]
@@ -185,7 +185,7 @@ theorem exists_sigmaBeta_column (hyp : TICyclicHypothesis G) [Fintype hyp.W]
       (∀ pq, ClassFunction.inner β (hyp.chiFam hVeq app pq) = 0) ∧
       ψ = c • (∑ p, hyp.chiFam hVeq app (p, j₀)) + β := by
   classical
-  haveI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
   obtain ⟨β, hβ, hψ⟩ := hyp.exists_sigmaBeta hVeq app ψ
   refine ⟨β, hβ, ?_⟩
   rw [hψ]
@@ -209,7 +209,7 @@ theorem exists_sigmaBeta_row (hyp : TICyclicHypothesis G) [Fintype hyp.W]
       (∀ pq, ClassFunction.inner β (hyp.chiFam hVeq app pq) = 0) ∧
       ψ = c • (∑ q, hyp.chiFam hVeq app (i₀, q)) + β := by
   classical
-  haveI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
   obtain ⟨β, hβ, hψ⟩ := hyp.exists_sigmaBeta hVeq app ψ
   refine ⟨β, hβ, ?_⟩
   rw [hψ]
@@ -273,11 +273,11 @@ theorem sigmaCoeff_eq_zero_of_vanishOnV (hyp : TICyclicHypothesis G) [Fintype hy
     {X : ClassFunction G ℂ} (hXZ : X ∈ ZIrr G) (hX2 : ClassFunction.inner X X = 2)
     (hXV : ∀ v ∈ hyp.V, X v = 0) :
     ∀ pq, hyp.sigmaCoeff hVeq app X pq = 0 := by
-  haveI : Finite G := Finite.of_fintype G
-  haveI : Nonempty ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := ⟨1⟩
-  haveI : Nonempty ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := ⟨1⟩
-  haveI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
-  haveI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have : Finite G := Finite.of_fintype G
+  have : Nonempty ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := ⟨1⟩
+  have : Nonempty ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := ⟨1⟩
+  have : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
   set a : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) → ℂ :=
     fun pq => hyp.sigmaCoeff hVeq app X pq with ha
   have hadd : ∀ p p' q q', a (p, q) + a (p', q') = a (p, q') + a (p', q) :=
@@ -306,7 +306,7 @@ theorem sigmaCoeff_eq_zero_of_vanishOnV (hyp : TICyclicHypothesis G) [Fintype hy
     have hsub : (Set.image (fun p : (hyp.W1.subgroupOf hyp.W) →* ℂˣ => (p, j₀))
         Set.univ) ⊆ {x | a x ≠ 0} := by
       rintro _ ⟨p, -, rfl⟩
-      rw [Set.mem_setOf_eq, hcol p]
+      rw [Set.mem_ofPred_eq, hcol p]
       exact hc0
     have hge : 3 ≤ {x | a x ≠ 0}.ncard := by
       have himg : (Set.image (fun p : (hyp.W1.subgroupOf hyp.W) →* ℂˣ => (p, j₀))
@@ -324,7 +324,7 @@ theorem sigmaCoeff_eq_zero_of_vanishOnV (hyp : TICyclicHypothesis G) [Fintype hy
     have hsub : (Set.image (fun q : (hyp.W2.subgroupOf hyp.W) →* ℂˣ => (i₀, q))
         Set.univ) ⊆ {x | a x ≠ 0} := by
       rintro _ ⟨q, -, rfl⟩
-      rw [Set.mem_setOf_eq, hrow q]
+      rw [Set.mem_ofPred_eq, hrow q]
       exact hc0
     have hge : 3 ≤ {x | a x ≠ 0}.ncard := by
       have himg : (Set.image (fun q : (hyp.W2.subgroupOf hyp.W) →* ℂˣ => (i₀, q))
@@ -486,11 +486,11 @@ theorem eq_smul_chiFam_diff_of_vanishOnV (hyp : TICyclicHypothesis G) [Fintype h
         (X - (s : ℂ) • (hyp.chiFam hVeq app P1 - hyp.chiFam hVeq app P2)) v = 0) :
     X = (s : ℂ) • (hyp.chiFam hVeq app P1 - hyp.chiFam hVeq app P2) := by
   classical
-  haveI : Finite G := Finite.of_fintype G
-  haveI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
-  haveI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
-  haveI : Nonempty ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := ⟨1⟩
-  haveI : Nonempty ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := ⟨1⟩
+  have : Finite G := Finite.of_fintype G
+  have : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have : Nonempty ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := ⟨1⟩
+  have : Nonempty ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := ⟨1⟩
   apply hyp.eq_smul_chiFam_diff_of_all_sigmaCoeff_zero hVeq app hX2 hPne hs
   set a : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) → ℂ :=
     fun pq => hyp.sigmaCoeff hVeq app
@@ -510,7 +510,7 @@ theorem eq_smul_chiFam_diff_of_vanishOnV (hyp : TICyclicHypothesis G) [Fintype h
     have hsub : {x | a x ≠ 0} ⊆ {x | Gr x ≠ 0} ∪ {P1, P2} := by
       intro x hx
       by_contra hcon
-      simp only [Set.mem_union, Set.mem_setOf_eq, Set.mem_insert_iff, Set.mem_singleton_iff,
+      simp only [Set.mem_union, Set.mem_ofPred_eq, Set.mem_insert_iff, Set.mem_singleton_iff,
         not_or, not_not] at hcon
       exact hx (by rw [hae x, hcon.1, if_neg (Ne.symm hcon.2.1), if_neg (Ne.symm hcon.2.2)]; ring)
     have hbpair : ({P1, P2} : Set _).ncard ≤ 2 :=
@@ -595,7 +595,7 @@ theorem eq_sum_sigmaCoeff_smul_chiFam_of_inner_self_eq (hyp : TICyclicHypothesis
       = ∑ pq, hyp.sigmaCoeff hVeq app X pq * star (hyp.sigmaCoeff hVeq app X pq)) :
     X = ∑ pq, hyp.sigmaCoeff hVeq app X pq • hyp.chiFam hVeq app pq := by
   classical
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   -- `sigmaCoeff` is by definition `⟨X, χ_pq⟩`.
   have hXchi : ∀ pq, ClassFunction.inner X (hyp.chiFam hVeq app pq)
       = hyp.sigmaCoeff hVeq app X pq := fun _ => rfl
@@ -675,7 +675,7 @@ theorem eq_smul_chiFam_column_of_vanishOnV (hyp : TICyclicHypothesis G) [Fintype
     (X = δ • ∑ p, hyp.chiFam hVeq app (p, kcol)) ∨
       (X = (-δ) • ∑ p, hyp.chiFam hVeq app (p, jcol)) := by
   classical
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   -- every coefficient is real (`{0, ±δ}` with `δ = ±1`); off the two columns it vanishes.
   have hstar : ∀ pq, star (hyp.sigmaCoeff hVeq app X pq) = hyp.sigmaCoeff hVeq app X pq := by
     intro pq

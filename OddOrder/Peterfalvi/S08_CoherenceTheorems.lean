@@ -64,16 +64,16 @@ noncomputable def sibleySetup_is_coherent {G : Type*} [Group G] [Fintype G]
     · -- (c1) Frobenius
       exact nonempty_coherent_S_of_frobenius hyp hF hXne
     · -- (c2) certain-type: reduce to `H` a `p`-group ((6.5)), case-split (6.8.A/B) on `Z(H) ∩ W₂`.
-      haveI : Finite ↥h46.W1 := inferInstance
-      haveI : NeZero (Nat.card h46.W1) := ⟨Nat.card_pos.ne'⟩
-      haveI : Invertible (Nat.card ↥h46.K : ℂ) := by
+      have : Finite ↥h46.W1 := inferInstance
+      have : NeZero (Nat.card h46.W1) := ⟨Nat.card_pos.ne'⟩
+      have : Invertible (Nat.card ↥h46.K : ℂ) := by
         have h : (Nat.card ↥h46.K : ℂ) = (Nat.card ↥H : ℂ) := by rw [hHK]
         rw [h]; infer_instance
-      haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
-      haveI : Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ) :=
+      have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+      have : Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ) :=
         invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
-      haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
-      haveI : Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ) :=
+      have : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+      have : Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ) :=
         invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
       have hW2H : h46.W2 ≤ H := hW2comm.trans (by
         rw [Subgroup.commutator_le]; intro a ha b _hb; rw [commutatorElement_def]
@@ -91,14 +91,14 @@ noncomputable def sibleySetup_is_coherent {G : Type*} [Group G] [Fintype G]
         rw [inf_comm]; exact disjoint_iff.mp hA
       case caseB =>
         intro p hp hHp hB
-        haveI : Fintype ↥H := Fintype.ofFinite _
-        haveI : Invertible (Nat.card ↥h46.W2 : ℂ) :=
+        have : Fintype ↥H := Fintype.ofFinite _
+        have : Invertible (Nat.card ↥h46.W2 : ℂ) :=
           invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
-        haveI : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
-        haveI : Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ) :=
+        have : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
+        have : Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ) :=
           invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
         have hW2cenL : h46.W2 ≤ Subgroup.center ↥L := caseB_W2_le_center_L hyp h46 hW1 hW2H hB
-        haveI : h46.W2.Normal := ⟨fun w hw g => by
+        have : h46.W2.Normal := ⟨fun w hw g => by
           have hc : g * w = w * g := Subgroup.mem_center_iff.mp (hW2cenL hw) g
           have hgw : g * w * g⁻¹ = w := by rw [hc, mul_assoc, mul_inv_cancel, mul_one]
           rw [hgw]; exact hw⟩
@@ -120,7 +120,7 @@ noncomputable def sibleySetup_is_coherent {G : Type*} [Group G] [Fintype G]
             exact H.mul_mem (H.mul_mem (H.mul_mem ha _hb) (H.inv_mem ha)) (H.inv_mem _hb)
           have hr1 : (h46.W2.subgroupOf H).relIndex (commutator ↥H) = 1 := by
             have hne0 : (h46.W2.subgroupOf H).relIndex (commutator ↥H) ≠ 0 := by
-              haveI : Finite ↥(commutator ↥H) := inferInstance
+              have : Finite ↥(commutator ↥H) := inferInstance
               exact Subgroup.index_ne_zero_of_finite
             have hle1 : (h46.W2.subgroupOf H).relIndex (commutator ↥H) ≤ 1 := Nat.not_lt.mp hWMgt
             omega

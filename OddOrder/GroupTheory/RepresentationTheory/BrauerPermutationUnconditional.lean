@@ -96,15 +96,15 @@ def Subrepresentation.dualOrderIso :
   invFun S := Subrepresentation.dualAnnihilator ρ (OrderDual.ofDual S)
   left_inv S := by
     apply Subrepresentation.toSubmodule_injective
-    haveI : FiniteDimensional k S.toSubmodule := inferInstance
+    have : FiniteDimensional k S.toSubmodule := inferInstance
     exact Subspace.dualCoannihilator_dualAnnihilator_eq
   right_inv S := by
     apply OrderDual.toDual.injective
     apply Subrepresentation.toSubmodule_injective
     exact Subspace.dualAnnihilator_dualCoannihilator_eq
   map_rel_iff' {S T} := by
-    haveI : FiniteDimensional k S.toSubmodule := inferInstance
-    haveI : FiniteDimensional k T.toSubmodule := inferInstance
+    have : FiniteDimensional k S.toSubmodule := inferInstance
+    have : FiniteDimensional k T.toSubmodule := inferInstance
     change T.toSubmodule.dualCoannihilator ≤ S.toSubmodule.dualCoannihilator ↔
       S.toSubmodule ≤ T.toSubmodule
     rw [← Subspace.dualAnnihilator_le_dualAnnihilator_iff (W := S.toSubmodule.dualCoannihilator)
@@ -137,7 +137,7 @@ If `φ = χ_ρ` for an irreducible representation `ρ`, then `φ̄(g) = star(χ_
 theorem IsIrreducibleCharacter.conj [Finite G] {φ : ClassFunction G ℂ}
     (hφ : IsIrreducibleCharacter φ) : IsIrreducibleCharacter φ.conj := by
   obtain ⟨V, _, _, _, ρ, hρ, hχ⟩ := hφ
-  haveI : Representation.IsIrreducible ρ := hρ
+  have : Representation.IsIrreducible ρ := hρ
   refine ⟨Module.Dual ℂ V, inferInstance, inferInstance, inferInstance, ρ.dual,
     Representation.IsIrreducible.dual ρ, ?_⟩
   funext g
@@ -197,8 +197,8 @@ For a finite group `G`, the number of real irreducible complex characters equals
 self-inverse (real) conjugacy classes. -/
 theorem brauer_permutation_lemma' :
     Nat.card (RealIrreducibleCharacter G) = Nat.card (ConjClasses.RealClass G) := by
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Invertible (Nat.card G : ℂ) :=
+  have : Fintype G := Fintype.ofFinite G
+  have : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   exact brauer_permutation_lemma (instCharacterTableIndexingOfFinite (G := G))
     (CharacterTableWeightedRowOrthogonality.ofRowOrthogonality

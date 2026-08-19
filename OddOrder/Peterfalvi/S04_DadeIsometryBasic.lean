@@ -412,7 +412,7 @@ theorem mem_H_of_mem_centralizer_coprime (hyp : Hypothesis G A L)
     have hmem := hyp.H_normalized a c⁻¹ (Subgroup.inv_mem _ hc) _ hh
     have heq : c⁻¹ * (c * h * c⁻¹) * (c⁻¹)⁻¹ = h := by group
     rwa [heq] at hmem
-  haveI hnormal : ((hyp.H a).subgroupOf C).Normal :=
+  have hnormal : ((hyp.H a).subgroupOf C).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hHaC).mpr hCnorm
   -- `[C_G(a) : H(a)] = |C_L(a)|`.
   have hindex : ((hyp.H a).subgroupOf C).index = m := by
@@ -670,7 +670,7 @@ theorem sum_card_centralizerIn_eq [Fintype {a : G // a ∈ A}]
         (fun a : {a : G // a ∈ A} => ∃ x ∈ hyp.H a, IsConj (a.1 * x) g),
       Nat.card (centralizerIn L a.1) = Nat.card L := by
   classical
-  letI : Fintype L := Fintype.ofFinite L
+  let : Fintype L := Fintype.ofFinite L
   obtain ⟨a₀, x₀, hx₀, hca₀⟩ := hyp.mem_dadeSupport_iff.mp hg
   let φ : L → {a : G // a ∈ A} :=
     fun l => ⟨(l : G) * a₀.1 * (l : G)⁻¹, hyp.L_normalizes_A l a₀.2⟩
@@ -1037,7 +1037,7 @@ theorem isComplement'_subgroupOf (hyp : Hypothesis G A L)
     Subgroup.IsComplement'
       ((nLStabilizerIn hyp B).subgroupOf (mBSubgroup hyp B hB))
       ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)) := by
-  haveI : Finite (mBSubgroup hyp B hB) := Subtype.finite
+  have : Finite (mBSubgroup hyp B hB) := Subtype.finite
   refine Subgroup.isComplement'_of_card_mul_and_disjoint ?_ ?_
   · -- `|N_sub| · |H_sub| = |M(B)|`
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (hyp.nLStabilizerIn_le_mBSubgroup hB)).toEquiv,
@@ -1078,7 +1078,7 @@ theorem ker_dadeQuotientHom (hyp : Hypothesis G A L)
     {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
     (hyp.dadeQuotientHom hB).ker
       = (hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB) := by
-  haveI : ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)).Normal :=
+  have : ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)).Normal :=
     hyp.hIntersection_subgroupOf_normal hB
   -- the post-`mk'` part of `f_B`
   set post :=
@@ -1113,7 +1113,7 @@ theorem alphaB_mem_ZIrr (hyp : Hypothesis G A L)
     {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) {α : ClassFunction L ℂ}
     (hα : α ∈ ZIrr L) :
     alphaB hyp hB α ∈ ZIrr (mBSubgroup hyp B hB) := by
-  haveI : Finite (mBSubgroup hyp B hB) := Subtype.finite
+  have : Finite (mBSubgroup hyp B hB) := Subtype.finite
   exact ClassFunction.compHom_mem_ZIrr (hyp.dadeQuotientHom hB) hα
 
 /-- `IsComplement'.QuotientMulEquiv` is a retraction onto the complement: on the class of a
@@ -1131,7 +1131,7 @@ theorem dadeQuotientHom_coe_of_mem_nLStabilizerIn (hyp : Hypothesis G A L)
     {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
     (m : mBSubgroup hyp B hB) (hm : (m : G) ∈ nLStabilizerIn hyp B) :
     ((hyp.dadeQuotientHom hB m : L) : G) = (m : G) := by
-  haveI : ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)).Normal :=
+  have : ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)).Normal :=
     hyp.hIntersection_subgroupOf_normal hB
   set κ : (nLStabilizerIn hyp B).subgroupOf (mBSubgroup hyp B hB) :=
     ⟨m, (Subgroup.mem_subgroupOf).mpr hm⟩ with hκ

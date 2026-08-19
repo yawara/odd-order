@@ -77,13 +77,15 @@ theorem invariants_normal_eq_bot_or_top_of_isIrreducible
 /-- **BG Theorem 3.10(a)+(b), the induction base case** (mmd L1346 "we can assume that `K` is a
 minimal normal subgroup of `KR`; since `KR` is solvable, this implies that `K` is an elementary
 abelian `q`-group").  When the Frobenius kernel `K` is minimal normal in the (solvable) group `G`,
-it is elementary abelian (`solvable_minimal_normal_isElementaryAbelian`), in particular abelian, so
+it is elementary abelian (`minimal_normal_isElementaryAbelian_of_isSolvable`),
+in particular abelian, so
 the abelian-kernel rank theorem `prime_card_and_finrank_of_abelian_frobenius_weight` applies and
 yields (a) `|R|` prime and (b) `finrank V = |R| · finrank C_V(R)`.
 
 This is the base of the `K₀`-reduction induction (issue 8013 piece 3): the recursive step reduces a
 general kernel to this case via `invariants_normal_eq_bot_or_top_of_isIrreducible`. -/
-theorem prime_card_and_finrank_of_minimalNormal_kernel [Finite G] [IsAlgClosed F] [IsSolvable G]
+theorem prime_card_and_finrank_of_minimalNormal_kernel [Finite G] [IsAlgClosed F]
+    [Group.IsSolvable G]
     (ρ : Representation F G V) [FiniteDimensional F V] [Nontrivial V]
     {K R : Subgroup G} [K.Normal] (hRne : R ≠ ⊥)
     (hKmin : OddOrder.Isaacs.Ch02.IsMinimalNormal K)
@@ -95,7 +97,8 @@ theorem prime_card_and_finrank_of_minimalNormal_kernel [Finite G] [IsAlgClosed F
         = finrank F (Representation.invariants (ρ.comp R.subtype))) :
     ∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p ∧
       finrank F V = Nat.card ↥R * finrank F (Representation.invariants (ρ.comp R.subtype)) := by
-  obtain ⟨q, _hq, hKea⟩ := OddOrder.Isaacs.Ch03.solvable_minimal_normal_isElementaryAbelian hKmin
+  obtain ⟨q, _hq, hKea⟩ :=
+    OddOrder.Isaacs.Ch03.minimal_normal_isElementaryAbelian_of_isSolvable hKmin
   have hKab : ∀ a b : ↥K, (a : G) * (b : G) = (b : G) * (a : G) := by
     intro a b
     rw [← Subgroup.coe_mul, ← Subgroup.coe_mul, hKea.comm]
@@ -187,7 +190,7 @@ over.  Supplies the `[IsIrreducible ρ̄]` instance needed to apply the inductio
 theorem isIrreducible_lift_of_trivial [Nontrivial V] (ρ : Representation F G V) [ρ.IsIrreducible]
     {K₀ : Subgroup G} [K₀.Normal] (hker : ∀ x ∈ K₀, ρ x = 1) :
     Representation.IsIrreducible (QuotientGroup.lift K₀ ρ hker) := by
-  haveI hnt : Nontrivial (Subrepresentation (QuotientGroup.lift K₀ ρ hker)) := by
+  have hnt : Nontrivial (Subrepresentation (QuotientGroup.lift K₀ ρ hker)) := by
     refine ⟨⊥, ⊤, fun h => ?_⟩
     exact absurd (congrArg Subrepresentation.toSubmodule h) bot_ne_top
   refine { eq_bot_or_eq_top := fun S => ?_ }
@@ -216,7 +219,7 @@ theorem fpf_lift_of_centralizer_bot [Finite G] {K₀ K : Subgroup G} [K₀.Norma
     (hrK : r ∈ Subgroup.normalizer (K : Set G)) (hK₀K : K₀ ≤ K)
     (hKK₀ : K ≤ Subgroup.normalizer (K₀ : Set G)) (hrK₀ : r ∈ Subgroup.normalizer (K₀ : Set G))
     (hcop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers r)) (Nat.card ↥K))
-    (hsolv : IsSolvable ↥(Subgroup.zpowers r) ∨ IsSolvable ↥K)
+    (hsolv : Group.IsSolvable ↥(Subgroup.zpowers r) ∨ Group.IsSolvable ↥K)
     (hCbot : ∀ k ∈ K, r * k * r⁻¹ = k → k = 1)
     {k : G} (hkK : k ∈ K) (hfix : r * k * r⁻¹ * k⁻¹ ∈ K₀) :
     k ∈ K₀ := by
@@ -225,7 +228,7 @@ theorem fpf_lift_of_centralizer_bot [Finite G] {K₀ K : Subgroup G} [K₀.Norma
   have hzK₀ : Subgroup.zpowers r ≤ Subgroup.normalizer (K₀ : Set G) := Subgroup.zpowers_le.mpr hrK₀
   set φ : ↥(Subgroup.zpowers r) →* MulAut ↥K :=
     (Subgroup.normalizerMonoidHom K).comp (Subgroup.inclusion hzK) with hφ
-  haveI hK₀_normal : (K₀.subgroupOf K).Normal :=
+  have hK₀_normal : (K₀.subgroupOf K).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hK₀K).mpr hKK₀
   have hMinv : OddOrder.Isaacs.Ch03.IsAInvariant φ (K₀.subgroupOf K) := by
     rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
@@ -294,7 +297,7 @@ Pick a minimal normal `K₀ ⊴ G` with `K₀ ≤ K` and run the `⊥`/`⊤` dic
   `card_map_mk'_eq_of_disjoint`, `isIrreducible_lift_of_trivial`, `fpf_lift_of_centralizer_bot`
   supply the lifted hypotheses (`Coprime |R| |K|` is needed for the last). -/
 private theorem frobenius_general_aux [IsAlgClosed F] [FiniteDimensional F V] [Nontrivial V] :
-    ∀ (n : ℕ) {G : Type*} [Group G] [Finite G] [IsSolvable G] {K R : Subgroup G} [K.Normal]
+    ∀ (n : ℕ) {G : Type*} [Group G] [Finite G] [Group.IsSolvable G] {K R : Subgroup G} [K.Normal]
       (ρ : Representation F G V) [ρ.IsIrreducible],
       R ≠ ⊥ → K ≠ ⊥ → (Nat.card ↥K : F) ≠ 0 → Nat.Coprime (Nat.card ↥R) (Nat.card ↥K) →
       Representation.invariants (ρ.comp K.subtype) = ⊥ →
@@ -311,7 +314,7 @@ private theorem frobenius_general_aux [IsAlgClosed F] [FiniteDimensional F V] [N
     intro G _ _ _ K R _ ρ _ hRne hKne hKcard hcop hCVK hFrob hcond3 hn
     -- A minimal normal `K₀ ⊴ G` contained in `K`; it is `≠ ⊥`, normal, with `|K₀| ≠ 0` in `F`.
     obtain ⟨K₀, hK₀min, hK₀leK⟩ := OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal K hKne
-    haveI hK₀norm : K₀.Normal := hK₀min.1
+    have hK₀norm : K₀.Normal := hK₀min.1
     have hK₀ne : K₀ ≠ ⊥ := hK₀min.2.1
     have hK₀card : (Nat.card ↥K₀ : F) ≠ 0 := by
       obtain ⟨c, hc⟩ := Subgroup.card_dvd_of_le hK₀leK
@@ -336,11 +339,11 @@ private theorem frobenius_general_aux [IsAlgClosed F] [FiniteDimensional F V] [N
         exact hFrob g hgR hg1 g hgK hg1 (by group)
       have hdisj : Disjoint R K₀ := hdisjK.mono_right hK₀leK
       -- The lift `ρ̄` to `G ⧸ K₀` is irreducible; the quotient is finite and `K.map mk'` is normal.
-      haveI : Representation.IsIrreducible (QuotientGroup.lift K₀ ρ hker) :=
+      have : Representation.IsIrreducible (QuotientGroup.lift K₀ ρ hker) :=
         isIrreducible_lift_of_trivial ρ hker
-      haveI : (K.map (QuotientGroup.mk' K₀)).Normal :=
+      have : (K.map (QuotientGroup.mk' K₀)).Normal :=
         (‹K.Normal›).map (QuotientGroup.mk' K₀) (QuotientGroup.mk'_surjective K₀)
-      haveI : Finite (G ⧸ K₀) := Finite.of_surjective _ (QuotientGroup.mk'_surjective K₀)
+      have : Finite (G ⧸ K₀) := Finite.of_surjective _ (QuotientGroup.mk'_surjective K₀)
       -- `K.map mk' = K / K₀ ≠ ⊥` (else `K = K₀`, forcing `⊥ = C_V(K) = C_V(K₀) = ⊤`).
       have hKmapne : K.map (QuotientGroup.mk' K₀) ≠ ⊥ := by
         rw [Ne, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
@@ -409,7 +412,7 @@ private theorem frobenius_general_aux [IsAlgClosed F] [FiniteDimensional F V] [N
           rw [← Nat.card_congr (QuotientGroup.quotientKerEquivRange φ).toEquiv]
           exact Subgroup.card_eq_card_quotient_mul_card_subgroup φ.ker
         have hkerbot : φ.ker ≠ ⊥ := by
-          haveI : Nontrivial ↥K₀ := (Subgroup.nontrivial_iff_ne_bot K₀).mpr hK₀ne
+          have : Nontrivial ↥K₀ := (Subgroup.nontrivial_iff_ne_bot K₀).mpr hK₀ne
           obtain ⟨⟨k₀, hk₀K₀⟩, hk₀ne⟩ := exists_ne (1 : ↥K₀)
           have hk₀1 : k₀ ≠ 1 := fun h => hk₀ne (Subtype.ext h)
           intro hbot
@@ -440,7 +443,7 @@ solvable group `G` over an algebraically closed field `F` (`char F ∤ |K|`, enc
 
 This is the general-kernel form needed by §15.2 (Theorem 15.2 step 4, issue 8012): there `K = D` may
 be non-abelian.  The proof is the `K₀`-reduction strong induction `frobenius_general_aux`. -/
-theorem prime_card_and_finrank_of_frobenius_general [Finite G] [IsAlgClosed F] [IsSolvable G]
+theorem prime_card_and_finrank_of_frobenius_general [Finite G] [IsAlgClosed F] [Group.IsSolvable G]
     (ρ : Representation F G V) [FiniteDimensional F V] [Nontrivial V] [ρ.IsIrreducible]
     {K R : Subgroup G} [K.Normal] (hRne : R ≠ ⊥) (hKne : K ≠ ⊥)
     (hKcard : (Nat.card ↥K : F) ≠ 0) (hcop : Nat.Coprime (Nat.card ↥R) (Nat.card ↥K))

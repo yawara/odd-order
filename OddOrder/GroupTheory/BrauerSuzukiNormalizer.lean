@@ -51,7 +51,7 @@ theorem card_X : Nat.card Q.X = 2 ^ Q.n := by
 relative index `[C : X]` is odd.  Obtained from `S ∩ C = X` and the
 Sylow-intersect-normal lemma applied inside `N` (where `C` is normal). -/
 theorem two_not_dvd_relIndex_C : ¬ 2 ∣ Q.X.relIndex Q.C := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   -- the Sylow-intersect-normal lemma inside `↥N`
   have h := sylow_relIndex_normal_not_dvd (Q.S.subtype Q.S_le_N) (Q.C.subgroupOf Q.N)
   rw [Sylow.coe_subtype, relIndex_subgroupOf Q.C_le_N] at h
@@ -66,7 +66,7 @@ theorem x_mem_C : Q.x ∈ Q.C :=
 there is a Sylow `2`-subgroup of `C` equal to `X.subgroupOf C`; it is cyclic. -/
 theorem exists_sylow_C_eq :
     ∃ P : Sylow 2 ↥Q.C, (P : Subgroup ↥Q.C) = Q.X.subgroupOf Q.C := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   -- `X.subgroupOf C` is a `2`-group…
   have hcard : Nat.card (Q.X.subgroupOf Q.C) = 2 ^ Q.n := by
     rw [Nat.card_congr (subgroupOfEquivOfLe Q.X_le_C).toEquiv, Q.card_X]
@@ -116,14 +116,14 @@ theorem exists_normal_two_complement :
     ∃ K₀ : Subgroup ↥Q.C, K₀.Normal ∧ ¬ 2 ∣ Nat.card K₀ ∧
       (∀ c : ↥Q.C, c ∈ K₀ ↔ Odd (orderOf c)) ∧
       K₀ ⊔ Q.X.subgroupOf Q.C = ⊤ := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨P, hPX⟩ := Q.exists_sylow_C_eq
-  haveI hXcyc : IsCyclic ↥Q.X := by
+  have hXcyc : IsCyclic ↥Q.X := by
     rw [show Q.X = Subgroup.zpowers Q.x from rfl]
     exact ⟨⟨⟨Q.x, mem_zpowers Q.x⟩, by
       rintro ⟨g, k, rfl⟩
       exact ⟨k, by ext; simp⟩⟩⟩
-  haveI hcyc : IsCyclic (P : Subgroup ↥Q.C) := by
+  have hcyc : IsCyclic (P : Subgroup ↥Q.C) := by
     rw [hPX]
     exact isCyclic_of_surjective (subgroupOfEquivOfLe Q.X_le_C).symm.toMonoidHom
       (subgroupOfEquivOfLe Q.X_le_C).symm.surjective
@@ -252,7 +252,7 @@ theorem card_T : Nat.card ↥Q.T = 2 ^ (Q.n - 1) := by
 Lemma 5.4.1): `N/C` embeds in `Aut(T)`, a `2`-group since `T` is a cyclic `2`-group. -/
 theorem mem_C_of_odd_of_mem_N {g : G} (hgN : g ∈ Q.N) (hodd : Odd (orderOf g)) :
     g ∈ Q.C := by
-  haveI := Q.isCyclic_T
+  have := Q.isCyclic_T
   set φ : ↥Q.N →* MulAut ↥Q.T := Subgroup.normalizerMonoidHom Q.T with hφ
   have hker : φ ⟨g, hgN⟩ = 1 := by
     have h1 : orderOf g = orderOf (⟨g, hgN⟩ : ↥Q.N) :=
@@ -302,15 +302,15 @@ instance : (Q.H.subgroupOf Q.N).Normal := by
 element of odd prime order (its `p`-part would be an odd-order element of `N` outside
 `H`), so the image of the Sylow `2`-subgroup `S` has index `1`. -/
 theorem S_sup_H_eq_N : (Q.S : Subgroup G) ⊔ Q.H = Q.N := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   set K : Subgroup ↥Q.N := Q.H.subgroupOf Q.N with hK
   set P' : Sylow 2 ↥Q.N := Q.S.subtype Q.S_le_N with hP'
   set π := QuotientGroup.mk' K with hπ
   -- no odd prime divides `|N ⧸ H|`
   have hodd_free : ∀ p : ℕ, p.Prime → p ≠ 2 → ¬ p ∣ Nat.card (↥Q.N ⧸ K) := by
     intro p hp hp2 hdvd
-    haveI : Fact p.Prime := ⟨hp⟩
-    haveI : Fintype (↥Q.N ⧸ K) := Fintype.ofFinite _
+    have : Fact p.Prime := ⟨hp⟩
+    have : Fintype (↥Q.N ⧸ K) := Fintype.ofFinite _
     rw [Nat.card_eq_fintype_card] at hdvd
     obtain ⟨gbar, hgbar⟩ := exists_prime_orderOf_dvd_card p hdvd
     obtain ⟨y, rfl⟩ := QuotientGroup.mk'_surjective K gbar

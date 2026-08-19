@@ -99,9 +99,9 @@ theorem isTypeB_of_mixedTerm
           (lowerCentralCommutatorBilinear P (left.incl α) (right.incl β)) =
         (epsilon : GaloisField 2 n) * (α * phi β)) :
     IsTypeB.{uP, 0} P := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   refine ⟨TypeBData.ofExtension n n_pos card_field phi phi_odd epsilon hEpsilon
     (ambientProductExtension hK0
       (ambientProductEquivOfFactors left right hRnormal hinf hsup hΦR) ePhi)
@@ -163,9 +163,9 @@ theorem isTypeB_of_squareCoordinate
           (lowerCentralSquareMapAdditive P hSqamb (e w)) =
         typeBQuadraticMap phi (epsilon : GaloisField 2 n) w) :
     IsTypeB.{uP, 0} P := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   exact ⟨TypeBData.ofExtension n n_pos card_field phi phi_odd epsilon hEpsilon
     (ambientProductExtension hK0 e ePhi) hcentral
     (fun x => ambientProductExtension_hsq_of_coordinate hEA hK1amb htermamb
@@ -218,9 +218,9 @@ theorem isTypeC_of_mixedTerm
           ((frobeniusEquiv (GaloisField 2 n) 2)⁻¹ α *
             (frobeniusEquiv (GaloisField 2 n) 2 * theta) β)) :
     IsTypeC.{uP, 0} P := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   refine ⟨TypeCData.ofExtension n n_pos card_field theta theta_two_sq epsilon
     hEpsilon
     (ambientProductExtension hK0
@@ -280,9 +280,9 @@ theorem isTypeD_of_mixedTerm
           (lowerCentralCommutatorBilinear P (left.incl α) (right.incl β)) =
         (epsilon : GaloisField 2 n) * ((theta ^ 3) α * theta β)) :
     IsTypeD.{uP, 0} P := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   refine ⟨TypeDData.ofExtension n n_pos card_field theta theta_pow_five
     theta_ne_one epsilon hEpsilon
     (ambientProductExtension hK0

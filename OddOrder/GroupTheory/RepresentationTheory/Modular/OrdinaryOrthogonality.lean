@@ -89,11 +89,11 @@ theorem map_asAlgebraHom_of_intertwiningMap {ρ : Representation K G V} {σ : Re
     (f : IntertwiningMap ρ σ) (a : MonoidAlgebra K G) (v : V) :
     f.toLinearMap (ρ.asAlgebraHom a v) = σ.asAlgebraHom a (f.toLinearMap v) := by
   induction a using MonoidAlgebra.induction_on with
-  | hM g =>
+  | of g =>
     rw [Representation.asAlgebraHom_of, Representation.asAlgebraHom_of]
     exact congrFun (congrArg DFunLike.coe (f.isIntertwining' g)) v
-  | hadd a b ha hb => simp only [map_add, LinearMap.add_apply, ha, hb]
-  | hsmul c a ha => simp only [map_smul, LinearMap.smul_apply, ha]
+  | add a b ha hb => simp only [map_add, LinearMap.add_apply, ha, hb]
+  | smul c a ha => simp only [map_smul, LinearMap.smul_apply, ha]
 
 /-- **There is no nonzero intertwining map between different Wedderburn blocks.**  The `i`-th
 central idempotent acts as the identity upstairs and as zero downstairs. -/
@@ -169,7 +169,7 @@ blocks the character sum vanishes, because the space of intertwining maps does. 
 theorem sum_character_mul_character_inv_eq_zero {i j : ι'} (h : i ≠ j) :
     ∑ g : G, (wedderburnRepresentation e j).character g
       * (wedderburnRepresentation e i).character g⁻¹ = 0 := by
-  haveI := subsingleton_intertwiningMap_of_ne e h
+  have := subsingleton_intertwiningMap_of_ne e h
   have hfin := Representation.card_inv_mul_sum_char_mul_char_eq_finrank
     (wedderburnRepresentation e i) (wedderburnRepresentation e j)
   rw [finrank_zero_of_subsingleton, Nat.cast_zero] at hfin

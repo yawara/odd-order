@@ -67,7 +67,7 @@ private lemma opCore_quotient_opCore_eq_bot {G : Type*} [Group G] [Finite G]
     -- |K/(N.subgroupOf K)| = |K.map f| = |Kbar| is p-power
     -- |N.subgroupOf K| ≃ N (since N ≤ K), is p-power
     -- So |K| = p-power · p-power = p-power.
-    haveI : Finite K := Subtype.finite
+    have : Finite K := Subtype.finite
     -- Use IsPGroup.of_card after computing |K|.
     have h_quot_card : Nat.card (↥K ⧸ N.subgroupOf K) = Nat.card Kbar := by
       let g : ↥K →* G ⧸ N := f.comp K.subtype
@@ -147,13 +147,13 @@ private lemma odd_of_opCore_two_eq_bot_aux {G : Type*} [Group G] [Finite G]
          ∃ S : Sylow 2 H, (S : Subgroup H).Normal)
     (hO2 : opCore 2 G = ⊥) :
     Odd (Nat.card G) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   -- 1. Suppose |G| is even.
   by_contra heven
   rw [Nat.not_odd_iff_even] at heven
   have h_dvd : 2 ∣ Nat.card G := heven.two_dvd
   -- 2. Cauchy: there's t : G with orderOf t = 2.
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   obtain ⟨t, ht_ord⟩ : ∃ t : G, orderOf t = 2 := by
     have h_dvd' : 2 ∣ Fintype.card G := by
       rwa [Nat.card_eq_fintype_card] at h_dvd
@@ -173,7 +173,7 @@ private lemma odd_of_opCore_two_eq_bot_aux {G : Type*} [Group G] [Finite G]
   obtain ⟨x, p, hp_prime, hp_odd, hx_ord, hxt⟩ := matsuyama ht_sq ht_notin
   -- 4. X := ⟨x⟩ is a non-trivial p-subgroup.
   set X : Subgroup G := Subgroup.zpowers x with hX_def
-  haveI hp_fact : Fact p.Prime := ⟨hp_prime⟩
+  have hp_fact : Fact p.Prime := ⟨hp_prime⟩
   have hX_pgroup : IsPGroup p X := by
     apply IsPGroup.of_card (n := 1)
     rw [Nat.card_zpowers, hx_ord, pow_one]
@@ -221,7 +221,7 @@ private lemma odd_of_opCore_two_eq_bot_aux {G : Type*} [Group G] [Finite G]
       rw [hyeq, ← hk, h_conj_pow]
       rw [hX_def]; exact Subgroup.zpow_mem _ (Subgroup.mem_zpowers x) _
   -- 7. By hypothesis, H has a normal Sylow 2.
-  haveI hH_finite : Finite ↥H := Subtype.finite
+  have hH_finite : Finite ↥H := Subtype.finite
   obtain ⟨S, hS_normal⟩ := h p hp_prime hp_odd H hH_pLocal
   -- Now show t (lifted to ↥H) lies in S.
   set t_H : ↥H := ⟨t, ht_inH⟩ with ht_H_def
@@ -238,7 +238,7 @@ private lemma odd_of_opCore_two_eq_bot_aux {G : Type*} [Group G] [Finite G]
     rw [this, ht_ord]
   -- Get some Sylow Q containing zpowers t_H, then use uniqueness from normality.
   obtain ⟨Q, hQ_le⟩ := h_zpowers_pgroup.exists_le_sylow
-  haveI : Subsingleton (Sylow 2 ↥H) := by
+  have : Subsingleton (Sylow 2 ↥H) := by
     have huniq := Sylow.unique_of_normal S hS_normal
     exact Unique.instSubsingleton
   have hQS : Q = S := Subsingleton.elim Q S
@@ -247,7 +247,7 @@ private lemma odd_of_opCore_two_eq_bot_aux {G : Type*} [Group G] [Finite G]
     rw [hQS] at this
     exact this
   -- 8. X.subgroupOf H is normal in H (since X ⊴ H = normalizer X).
-  haveI hX_subOf_H_normal : (X.subgroupOf H).Normal := by
+  have hX_subOf_H_normal : (X.subgroupOf H).Normal := by
     rw [hH_def]; exact Subgroup.normal_in_normalizer
   have hX_subOf_H_pgroup : IsPGroup p (X.subgroupOf H) :=
     hX_pgroup.comap_of_injective H.subtype Subtype.coe_injective
@@ -312,7 +312,7 @@ private lemma transfer_hypothesis_to_quotient {G : Type*} [Group G] [Finite G]
       ∀ Mbar : Subgroup (G ⧸ opCore 2 G), IsPLocal p Mbar →
       ∃ S' : Sylow 2 Mbar, (S' : Subgroup Mbar).Normal := by
   intro p hp_prime hp_odd Mbar hMbar_pLocal
-  haveI hp_fact : Fact p.Prime := ⟨hp_prime⟩
+  have hp_fact : Fact p.Prime := ⟨hp_prime⟩
   -- Step 1: Lift Mbar to a p-local L of G with L.map f = Mbar.
   obtain ⟨L, hL_pLocal, hL_map⟩ := isPLocal_of_quotient hMbar_pLocal
   -- Step 2: Get normal Sylow 2 of L.
@@ -321,7 +321,7 @@ private lemma transfer_hypothesis_to_quotient {G : Type*} [Group G] [Finite G]
   -- Restrict f to L: f|_L : L → L.map f = Mbar. This is surjective.
   set f : G →* G ⧸ opCore 2 G := QuotientGroup.mk' (opCore 2 G) with hf_def
   -- The map L → L.map f = Mbar.
-  haveI hL_finite : Finite ↥L := Subtype.finite
+  have hL_finite : Finite ↥L := Subtype.finite
   set fL : ↥L →* ↥(L.map f) := f.subgroupMap L with hfL_def
   have hfL_surj : Function.Surjective fL := f.subgroupMap_surjective L
   -- Apply Sylow.mapSurjective.
@@ -359,7 +359,7 @@ theorem normal_sylow_two_of_odd_pLocal_normal_sylow_two [Finite G]
     (h : ∀ p : ℕ, p.Prime → Odd p → ∀ H : Subgroup G, IsPLocal p H →
          ∃ S : Sylow 2 H, (S : Subgroup H).Normal) :
     ∃ S : Sylow 2 G, (↑S : Subgroup G).Normal := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   -- Set N := opCore 2 G.
   set N : Subgroup G := opCore 2 G with hN_def
   -- Transfer hypothesis to G/N.
@@ -533,7 +533,7 @@ theorem normalizer_map_of_coprime_kernel [Finite G] {N : Subgroup G} [N.Normal] 
   · -- Mbar ≤ L.map f: requires the Frattini argument.
     -- Step 5: Set up the Frattini argument.
     -- (1) U.subgroupOf M ⊴ ↥M (since M = normalizer U).
-    haveI hUM_normal : (U.subgroupOf M).Normal := by
+    have hUM_normal : (U.subgroupOf M).Normal := by
       rw [hM_eq_norm_U]; exact Subgroup.normal_in_normalizer
     have hP_le_U : P ≤ U := le_sup_left
     have hN_le_U : N ≤ U := le_sup_right
@@ -635,7 +635,7 @@ theorem normalizer_map_of_coprime_kernel [Finite G] {N : Subgroup G} [N.Normal] 
     have hP_subU_not_dvd : ¬ p ∣ (P.subgroupOf U).index := by
       rw [hP_subU_index]; exact hp_coprime
     -- P.subgroupOf U is a p-group (since it is isomorphic to P).
-    haveI : Finite ↥U := Subtype.finite
+    have : Finite ↥U := Subtype.finite
     have hP_subU_pgroup : IsPGroup p ↥(P.subgroupOf U) :=
       hP_pgroup.of_equiv (Subgroup.subgroupOfEquivOfLe hP_le_U).symm
     let PS : Sylow p ↥U := hP_subU_pgroup.toSylow hP_subU_not_dvd
@@ -643,8 +643,8 @@ theorem normalizer_map_of_coprime_kernel [Finite G] {N : Subgroup G} [N.Normal] 
       hP_subU_pgroup.toSylow_coe hP_subU_not_dvd
     -- (3) Build P_M : Sylow p ↥(U.subgroupOf M) using e := subgroupOfEquivOfLe hU_le_M.
     have hU_le_M : U ≤ M := by rw [hM_eq_norm_U]; exact Subgroup.le_normalizer
-    haveI : Finite ↥M := Subtype.finite
-    haveI : Finite ↥(U.subgroupOf M) := Subtype.finite
+    have : Finite ↥M := Subtype.finite
+    have : Finite ↥(U.subgroupOf M) := Subtype.finite
     let e : ↥(U.subgroupOf M) ≃* ↥U := Subgroup.subgroupOfEquivOfLe hU_le_M
     let P_M : Sylow p ↥(U.subgroupOf M) :=
       Sylow.ofCard ((PS : Subgroup ↥U).comap e.toMonoidHom) (by
@@ -868,7 +868,7 @@ open scoped IsMulCommutative in
 /-- `Subgroup.center G ≤ fitting G`. Center は abelian → 冪零, 正規部分群. -/
 private lemma center_le_fitting (G : Type*) [Group G] [Finite G] :
     Subgroup.center G ≤ fitting G := by
-  haveI : Group.IsNilpotent ↥(Subgroup.center G) := inferInstance
+  have : Group.IsNilpotent ↥(Subgroup.center G) := inferInstance
   exact nilpotent_normal_le_fitting
 
 /-- 有限群 `M` は **その全 Sylow 部分群の sup** で生成される: 各素因子 `p` ごとの
@@ -890,7 +890,7 @@ private lemma iSup_sylow_eq_top {M : Type*} [Group M] [Finite M] :
   have h_pow_dvd : ∀ p ∈ (Nat.card M).primeFactors,
       p ^ (Nat.card M).factorization p ∣ Nat.card sup := by
     intro p hp
-    haveI hp_prime : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+    have hp_prime : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
     have hP_le : ((default : Sylow p M) : Subgroup M) ≤ sup := by
       rw [hsup_def]
       refine le_trans ?_ (le_iSup (fun q : (Nat.card M).primeFactors =>
@@ -927,7 +927,7 @@ private lemma sup_isPGroup_of_le_opCore_left {H : Type*} [Group H] [Finite H]
     (hS : S ≤ opCore p H) (hS' : IsPGroup p S') :
     IsPGroup p ↥(S ⊔ S' : Subgroup H) := by
   have h_op_pgroup : IsPGroup p ↥(opCore p H) := opCore_isPGroup p H
-  haveI : (opCore p H).Normal := opCore.normal p H
+  have : (opCore p H).Normal := opCore.normal p H
   have h_op_sup : IsPGroup p ↥(opCore p H ⊔ S' : Subgroup H) :=
     h_op_pgroup.to_sup_of_normal_left hS'
   exact h_op_sup.to_le (sup_le_sup_right hS _)
@@ -1061,7 +1061,7 @@ private theorem zenkov_wlog_aux : ∀ n : ℕ,
       simp_rw [Subgroup.map_iSup]
     rw [hM_eq_sup]
     refine iSup_le fun p => iSup_le fun P => ?_
-    haveI hp_prime : Fact p.val.Prime := ⟨Nat.prime_of_mem_primeFactors p.2⟩
+    have hp_prime : Fact p.val.Prime := ⟨Nat.prime_of_mem_primeFactors p.2⟩
     set P_in_G : Subgroup G := (P : Subgroup ↥M).map M.subtype with hPG_def
     have hP_pgroup : IsPGroup p.val ↥P_in_G := P.2.map M.subtype
     have hP_in_M : P_in_G ≤ M := by
@@ -1196,10 +1196,10 @@ theorem inf_fitting_ne_bot_of_abelian_card_ge_index [Finite G] [Nontrivial G] {A
       intro g
       exact hG_commute g x
     -- G is nilpotent.
-    haveI hGnilp : Group.IsNilpotent G := ⟨1, by
+    have hGnilp : Group.IsNilpotent G := ⟨1, by
       rw [Subgroup.upperCentralSeries_one]; exact hcenter⟩
     -- ↥⊤ is also nilpotent.
-    haveI : Group.IsNilpotent ↥(⊤ : Subgroup G) :=
+    have : Group.IsNilpotent ↥(⊤ : Subgroup G) :=
       Group.nilpotent_of_mulEquiv Subgroup.topEquiv.symm
     -- F(G) = ⊤.
     have hFtop : fitting G = ⊤ := top_le_iff.mp (nilpotent_normal_le_fitting (N := ⊤))
@@ -1207,7 +1207,7 @@ theorem inf_fitting_ne_bot_of_abelian_card_ge_index [Finite G] [Nontrivial G] {A
     exact top_ne_bot
   · -- Case 2: A < ⊤.
     -- Pick g₀ minimizing |A ⊓ A^g| over g ∈ G.
-    haveI : Fintype G := Fintype.ofFinite G
+    have : Fintype G := Fintype.ofFinite G
     set M : G → Subgroup G := fun g => A ⊓ ((MulAut.conj g) • A : Subgroup G) with hM_def
     obtain ⟨g₀, _, hg₀_min⟩ := Finset.exists_min_image Finset.univ
       (fun g => Nat.card ↥(M g)) Finset.univ_nonempty
@@ -1300,7 +1300,7 @@ theorem lucchini_K_pos_reduction [Finite G] {A : Subgroup G}
       (A.map (QuotientGroup.mk' A.normalCore)).index) :
     (A.normalCore.subgroupOf A).index < A.index := by
   set K := A.normalCore with hKdef
-  haveI hKnormal : K.Normal := A.normalCore_normal
+  have hKnormal : K.Normal := A.normalCore_normal
   have hK_le_A : K ≤ A := Subgroup.normalCore_le A
   -- Set up the quotient map f : G →* G/K.
   let f : G →* G ⧸ K := QuotientGroup.mk' K
@@ -1321,7 +1321,7 @@ theorem lucchini_K_pos_reduction [Finite G] {A : Subgroup G}
         rw [hĀ_def, QuotientGroup.comap_map_mk']
       rw [h_comap_eq, sup_of_le_right hK_le_A] at h_comap_le
       exact h_comap_le
-    haveI : (Subgroup.comap f Ā.normalCore).Normal :=
+    have : (Subgroup.comap f Ā.normalCore).Normal :=
       (Subgroup.normalCore_normal Ā).comap f
     have h_comap_le_K : Subgroup.comap f Ā.normalCore ≤ K :=
       Subgroup.normal_le_normalCore.mpr h_subset

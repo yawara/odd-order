@@ -54,10 +54,10 @@ theorem mem_opiCoreInG_singleton_of_nilpotent [Finite G] {p : ℕ} (hp : p.Prime
     {M W : Subgroup G} (hWM : W ≤ M) (hWnorm : (W.subgroupOf M).Normal)
     (hWnil : Group.IsNilpotent ↥W) {x : G} (hxW : x ∈ W) (hord : orderOf x = p) :
     x ∈ opiCoreInG {p} M := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   set W' : Subgroup ↥M := W.subgroupOf M with hW'def
-  haveI : W'.Normal := hWnorm
-  haveI : Group.IsNilpotent ↥W' :=
+  have : W'.Normal := hWnorm
+  have : Group.IsNilpotent ↥W' :=
     (Group.isNilpotent_congr (Subgroup.subgroupOfEquivOfLe hWM)).mpr hWnil
   have hxM : x ∈ M := hWM hxW
   set ξ : ↥W' := ⟨⟨x, hxM⟩, by rwa [Subgroup.mem_subgroupOf]⟩ with hξdef
@@ -113,7 +113,7 @@ theorem le_of_isPGroup_of_not_dvd_relIndex [Finite G] {p : ℕ} (hp : p.Prime)
     (hnorm : (L.subgroupOf K).Normal) (hpH : IsPGroup p ↥H)
     (hnd : ¬ p ∣ L.relIndex K) : H ≤ L := by
   intro g hg
-  haveI := hnorm
+  have := hnorm
   set gbar : ↥K ⧸ L.subgroupOf K := QuotientGroup.mk' _ ⟨g, hHK hg⟩ with hgbardef
   obtain ⟨k, hk⟩ := hpH ⟨g, hg⟩
   have hcoe : ((⟨g, hHK hg⟩ : ↥K) ^ p ^ k) = 1 := by
@@ -156,7 +156,7 @@ theorem e5_R_eq_centralizer [Finite G]
     x ∈ opiCoreInG {p} M ∧
       opiCoreInG {p} M ⊓ N ≤ U₁ ∧
       opiCoreInG {p} M ⊓ N = opiCoreInG {p} M ⊓ Subgroup.centralizer ({x} : Set G) := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   -- `x ∈ O_p(M)`, through the nilpotent `M_σ ⊴ M`.
   have hMσnorm : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
     rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]
@@ -197,8 +197,8 @@ its (normal, by nilpotency) Sylow subgroup, and disjoint normal subgroups commut
 theorem commute_of_orderOf_prime_ne {H : Type*} [Group H] [Finite H]
     [Group.IsNilpotent H] {a b : H} {pa pb : ℕ} (hpa : pa.Prime) (hpb : pb.Prime)
     (hne : pa ≠ pb) (ha : orderOf a = pa) (hb : orderOf b = pb) : Commute a b := by
-  haveI : Fact pa.Prime := ⟨hpa⟩
-  haveI : Fact pb.Prime := ⟨hpb⟩
+  have : Fact pa.Prime := ⟨hpa⟩
+  have : Fact pb.Prime := ⟨hpb⟩
   have hapg : IsPGroup pa ↥(Subgroup.zpowers a) :=
     IsPGroup.of_card (by rw [Nat.card_zpowers, ha, pow_one])
   have hbpg : IsPGroup pb ↥(Subgroup.zpowers b) :=
@@ -224,7 +224,7 @@ theorem e5_kappaHall_inf_Msigma_eq_bot [Finite G]
     (hCU₁ : ∀ c ∈ K₁, c ≠ 1 → U₁ ⊓ Subgroup.centralizer ({c} : Set G) = ⊥) :
     K₁ ⊓ OddOrder.BG.Ch3.S10.Msigma M = ⊥ := by
   by_contra hne
-  haveI : Nontrivial ↥(K₁ ⊓ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) :=
+  have : Nontrivial ↥(K₁ ⊓ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) :=
     (Subgroup.nontrivial_iff_ne_bot _).mpr hne
   obtain ⟨w, hwne⟩ := exists_ne (1 : ↥(K₁ ⊓ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G))
   have hwK₁ : (w : G) ∈ K₁ := w.2.1
@@ -243,7 +243,7 @@ theorem e5_kappaHall_inf_Msigma_eq_bot [Finite G]
     · exact absurd (orderOf_eq_one_iff.mp h1) hwne1
     · exact h1
   -- `x` and `w` commute inside the nilpotent `M_σ`.
-  haveI := hMσnil
+  have := hMσnil
   have hordξ : orderOf (⟨x, hxMσ⟩ : ↥(OddOrder.BG.Ch3.S10.Msigma M)) = p := by
     have h1 := orderOf_injective (OddOrder.BG.Ch3.S10.Msigma M).subtype
       (Subgroup.subtype_injective _) ⟨x, hxMσ⟩
@@ -300,7 +300,7 @@ theorem e5_opiCore_sylow_card [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M)
     (hMσnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M)) :
     Nat.card ↥(opiCoreInG {p} M) = p ^ (Nat.card G).factorization p := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
   have hMσhallG : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M)
       (OddOrder.BG.Ch3.S10.Msigma M) := OddOrder.BG.Ch3.S10.Msigma_isHall hG hM
@@ -314,10 +314,10 @@ theorem e5_opiCore_sylow_card [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact hr' ▸ hpσ
   -- The Sylow `p` of `M_σ` (as `subgroupOf M`) lands inside `O_p(M)`.
   set W' : Subgroup ↥M := (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M with hW'def
-  haveI : W'.Normal := by
+  have : W'.Normal := by
     rw [hW'def, OddOrder.BG.Ch3.S10.Msigma_subgroupOf]
     infer_instance
-  haveI : Group.IsNilpotent ↥W' :=
+  have : Group.IsNilpotent ↥W' :=
     (Group.isNilpotent_congr (Subgroup.subgroupOfEquivOfLe hMσM)).mpr hMσnil
   obtain ⟨P⟩ := (inferInstance : Nonempty (Sylow p ↥W'))
   have hPchar : (P : Subgroup ↥W').Characteristic :=
@@ -381,7 +381,7 @@ theorem e5_exists_sylow_eq_opiCore [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
     (hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M)
     (hMσnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M)) :
     ∃ S : Sylow p G, (S : Subgroup G) = opiCoreInG {p} M := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨S, hle⟩ := (isPGroup_opiCoreInG_singleton (q := p) M).exists_le_sylow
   refine ⟨S, (Subgroup.eq_of_le_of_card_ge hle ?_).symm⟩
   rw [e5_opiCore_sylow_card hG hM hp hpσ hMσnil, S.card_eq_multiplicity]
@@ -404,7 +404,7 @@ theorem e5_zpowers_eq_canonical_line [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     N ≤ Subgroup.normalizer ((Subgroup.zpowers x : Subgroup G) : Set G) ∧
       OddOrder.BG.Ch3.S10.Msigma N ≤
         Subgroup.centralizer ((Subgroup.zpowers x : Subgroup G) : Set G) := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨A, hA, hAE⟩ := exists_elemAb_rank_two_le_E_of_tau2 hG hsetup hp2
   obtain ⟨A₀, hA₀eq, hA₀card, hA₀A, hMσC, hdich, habs⟩ :=
     exists_canonical_line_of_nonabelianSylow hG hsetup hp2 hA hAE hnonab
@@ -448,7 +448,7 @@ theorem e5_centralizer_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     ∃ R₁ : Subgroup G, R₁ ≤ R ∧ IsCyclic ↥R₁ ∧ R₁ ≠ ⊥ ∧
       Subgroup.zpowers x ⊓ R₁ = ⊥ ∧ R = Subgroup.zpowers x ⊔ R₁ := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   -- Canonical-line machinery.
   obtain ⟨A, hA, hAE⟩ := exists_elemAb_rank_two_le_E_of_tau2 hG hsetup hp2
   obtain ⟨A₀, hA₀eq, hA₀card, hA₀A, hMσC, hdich, habs⟩ :=
@@ -472,7 +472,7 @@ theorem e5_centralizer_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
   -- The decomposition `R = ⟨x⟩ ⊔ (R ⊓ E₀)`.
   have hEmnN : Emn ≤ Subgroup.normalizer (A₀ : Set G) := hsetup.E_le.trans hMnorm
   have hA₀Emn : A₀ ≤ Emn := hA₀supE₀ ▸ le_sup_left
-  haveI hA₀norm' : (A₀.subgroupOf Emn).Normal := by
+  have hA₀norm' : (A₀.subgroupOf Emn).Normal := by
     refine ⟨fun n hn k => ?_⟩
     rw [Subgroup.mem_subgroupOf] at hn ⊢
     have hk := Subgroup.mem_normalizer_iff.mp (hEmnN k.2) (n : G)
@@ -575,9 +575,9 @@ theorem e5_centralizer_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     (inf_le_left.trans (hRle.trans hsetup.E_le)).trans hNnorm
   have hNσne : OddOrder.BG.Ch3.S10.Msigma N ≠ ⊥ :=
     OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hsetup.mem_maximal
-  haveI : Nontrivial ↥(OddOrder.BG.Ch3.S10.Msigma N) :=
+  have : Nontrivial ↥(OddOrder.BG.Ch3.S10.Msigma N) :=
     (Subgroup.nontrivial_iff_ne_bot _).mpr hNσne
-  letI : MulDistribMulAction ↥(R ⊓ E₀ : Subgroup G) ↥(OddOrder.BG.Ch3.S10.Msigma N) :=
+  let : MulDistribMulAction ↥(R ⊓ E₀ : Subgroup G) ↥(OddOrder.BG.Ch3.S10.Msigma N) :=
     MulDistribMulAction.compHom _ (conjActionHom hR₁N)
   have hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusAction
       ↥(R ⊓ E₀ : Subgroup G) ↥(OddOrder.BG.Ch3.S10.Msigma N) := by
@@ -682,7 +682,7 @@ noncomputable def e5Setup [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (Subgroup.subgroupOfEquivOfLe hR₁Op).symm.toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hR₁Op).symm.surjective
     centralizer_eq := by
-      haveI : Fact p.Prime := ⟨hp⟩
+      have : Fact p.Prime := ⟨hp⟩
       have hzOp : Subgroup.zpowers x ≤ opiCoreInG {p} M := Subgroup.zpowers_le.mpr hxOp
       have h1 : Subgroup.centralizer
           ((Subgroup.zpowers (⟨x, hxOp⟩ : ↥(opiCoreInG {p} M)) : Subgroup _) :
@@ -867,7 +867,7 @@ at most `p²`).  This is BG's *"Hence, by (ii), `|S| ≥ p⁴`"*. -/
 theorem exists_normal_abelian_index_prime_of_card_le_cube {S : Type*} [Group S] [Finite S]
     {p n : ℕ} (hp : p.Prime) (hcard : Nat.card S = p ^ n) (hn1 : 1 ≤ n) (hn3 : n ≤ 3) :
     ∃ A : Subgroup S, A.Normal ∧ IsMulCommutative ↥A ∧ A.index = p := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨A, hA⟩ := Sylow.exists_subgroup_card_pow_prime p
     (n := n - 1) (by rw [hcard]; exact pow_dvd_pow p (by omega))
   have hidx : A.index = p := by
@@ -887,8 +887,8 @@ theorem exists_normal_abelian_index_prime_of_card_le_cube {S : Type*} [Group S] 
   · have hA1 : A = ⊥ := Subgroup.card_eq_one.mp (by simpa using hA)
     subst hA1
     exact ⟨⟨fun a b => Subsingleton.elim _ _⟩⟩
-  · haveI : IsCyclic ↥A := isCyclic_of_prime_card (by simpa using hA)
-    letI : CommGroup ↥A := IsCyclic.commGroup
+  · have : IsCyclic ↥A := isCyclic_of_prime_card (by simpa using hA)
+    let : CommGroup ↥A := IsCyclic.commGroup
     exact ⟨⟨fun a b => mul_comm a b⟩⟩
   · exact IsPGroup.isMulCommutative_of_card_eq_prime_sq (by simpa using hA)
 
@@ -900,7 +900,7 @@ theorem e5_card_omega_ge_of_ii [Finite G] {M : Subgroup G} {x : G} {p : ℕ}
     (hii : ¬ ∃ A : Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1),
       A.Normal ∧ IsMulCommutative ↥A ∧ A.index = p) :
     p ^ 4 ≤ Nat.card ↥(Omega ↥(opiCoreInG {p} M) p 1) := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hpg : IsPGroup p ↥(Omega ↥(opiCoreInG {p} M) p 1) :=
     (isPGroup_opiCoreInG_singleton M).to_subgroup _
   obtain ⟨m, hm⟩ := hpg.exists_card_eq
@@ -967,7 +967,7 @@ theorem e5_derived_index_eq_of_ii_hdc [Finite G] (hG : OddOrder.BG.IsMinimalSimp
               Set ↥(Omega ↥(opiCoreInG {p} M) p 1)))
           (⊤ : Subgroup ↥(Omega ↥(opiCoreInG {p} M) p 1)) (n + 2)) :
     ((derivedInG M).subgroupOf M).index = k := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hcard4 := e5_card_omega_ge_of_ii hp hxOp hord hii
   -- The corrected E.4 forces `E` to fix `⟨x⟩`.
   have hfix : ∀ b : ↥E,
@@ -1013,17 +1013,17 @@ theorem e5_derived_index_eq_of_ii_hdc [Finite G] (hG : OddOrder.BG.IsMinimalSimp
       hEK₁]
     exact hcardK₁
   -- `M' = M_σ`: the quotient has prime order `k`, hence is abelian.
-  haveI hMσnorm' : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
+  have hMσnorm' : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
     rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]
     infer_instance
   have hderle : derivedInG M ≤ OddOrder.BG.Ch3.S10.Msigma M := by
-    haveI : Fact k.Prime := ⟨hk⟩
+    have : Fact k.Prime := ⟨hk⟩
     have hcardQ : Nat.card (↥M ⧸ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) = k := by
       rw [← Subgroup.index_eq_card]
       exact hidxσ
-    haveI : IsCyclic (↥M ⧸ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) :=
+    have : IsCyclic (↥M ⧸ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) :=
       isCyclic_of_prime_card hcardQ
-    letI : CommGroup (↥M ⧸ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) :=
+    let : CommGroup (↥M ⧸ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) :=
       IsCyclic.commGroup
     have hcomm : _root_.commutator ↥M ≤ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M := by
       rw [_root_.commutator_def, Subgroup.commutator_le]
@@ -1063,14 +1063,14 @@ theorem inf_eq_kappaHall_of_le_cyclic [Finite G]
     (hCU₁ : ∀ k ∈ K₁, k ≠ 1 → U₁ ⊓ Subgroup.centralizer ({k} : Set G) = ⊥) :
     E ⊓ N = K₁ := by
   classical
-  haveI : Nontrivial ↥K₁ := (Subgroup.nontrivial_iff_ne_bot K₁).mpr hK₁ne
+  have : Nontrivial ↥K₁ := (Subgroup.nontrivial_iff_ne_bot K₁).mpr hK₁ne
   obtain ⟨k₀', hk₀ne'⟩ := exists_ne (1 : ↥K₁)
   have hk₀K₁ : (k₀' : G) ∈ K₁ := k₀'.2
   have hk₀ne : (k₀' : G) ≠ 1 := fun h => hk₀ne' (Subtype.ext h)
   -- Elements of `E` commute (cyclic ⇒ abelian).
   have hEcomm : ∀ a b : G, a ∈ E → b ∈ E → Commute a b := by
     intro a b ha hb
-    letI : CommGroup ↥E := IsCyclic.commGroup
+    let : CommGroup ↥E := IsCyclic.commGroup
     have h2 : a * b = b * a := by
       have h := mul_comm (⟨a, ha⟩ : ↥E) ⟨b, hb⟩
       simpa using congrArg (fun z : ↥E => (z : G)) h
@@ -1079,7 +1079,7 @@ theorem inf_eq_kappaHall_of_le_cyclic [Finite G]
   intro c hc
   have hcMN : c ∈ M ⊓ N := ⟨hEM hc.1, hc.2⟩
   -- Decompose `c = k * u` inside `↥(M ⊓ N)`, where `U₁` is normal.
-  haveI := hU₁norm
+  have := hU₁norm
   have hK₁le : K₁ ≤ M ⊓ N := hsupMN ▸ le_sup_left
   have hU₁le : U₁ ≤ M ⊓ N := hsupMN ▸ le_sup_right
   have hsubSup : (K₁.subgroupOf (M ⊓ N)) ⊔ (U₁.subgroupOf (M ⊓ N)) = ⊤ := by
@@ -1132,10 +1132,10 @@ theorem e5_exists_suitable_complement [Finite G] (hG : OddOrder.BG.IsMinimalSimp
         ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (E.subgroupOf M) ∧
       K₁ ≤ E := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   set Mσ' : Subgroup ↥M := (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M with hMσ'def
   set E₀' : Subgroup ↥M := E₀.subgroupOf M with hE₀'def
-  haveI hMσ'norm : Mσ'.Normal := by
+  have hMσ'norm : Mσ'.Normal := by
     rw [hMσ'def, OddOrder.BG.Ch3.S10.Msigma_subgroupOf]
     infer_instance
   have hMσhall : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M) Mσ' :=
@@ -1177,10 +1177,10 @@ theorem e5_exists_suitable_complement [Finite G] (hG : OddOrder.BG.IsMinimalSimp
   have hfrob' := OddOrder.Isaacs.Ch06.isFrobeniusGroup_map_equiv hE₀frob e
   rw [hMσmap, hg'] at hfrob'
   -- `H` is cyclic (isomorphic to the cyclic `E₀`).
-  haveI : IsCyclic ↥E₀' := isCyclic_of_surjective
+  have : IsCyclic ↥E₀' := isCyclic_of_surjective
     (Subgroup.subgroupOfEquivOfLe hE₀M).symm.toMonoidHom
     (Subgroup.subgroupOfEquivOfLe hE₀M).symm.surjective
-  haveI hHcyc : IsCyclic ↥H := by
+  have hHcyc : IsCyclic ↥H := by
     have h1 : IsCyclic ↥(E₀'.map e.toMonoidHom) := isCyclic_of_surjective
       (e.subgroupMap E₀').toMonoidHom (e.subgroupMap E₀').surjective
     exact hg' ▸ h1
@@ -1264,7 +1264,7 @@ theorem e5_neighbour_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     hNtype'.resolve_left fun hF => hNnotF ⟨hNmax', hF⟩
   -- `p ∈ τ₂(N)`: the signalizer `τ₂`-conjunct at the single prime of `ord(x) = p`.
   have hptau2 : p ∈ tau2 N := hxtau2' p (by
-    rw [OddOrder.BG.Ch4.S14.piSet, Set.mem_setOf_eq, ← Subgroup.zpowers_eq_closure,
+    rw [OddOrder.BG.Ch4.S14.piSet, Set.mem_ofPred_eq, ← Subgroup.zpowers_eq_closure,
       Nat.card_zpowers, hord]
     exact Nat.mem_primeFactors.mpr ⟨hp, dvd_rfl, hp.pos.ne'⟩)
   -- `M ∩ N` complements `N_σ` in `N` (signalizer conjunct at `M' := M`).

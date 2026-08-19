@@ -106,9 +106,9 @@ theorem exists_restrictedFactorAmbientEigenFamily_spanning_restrictedSubgroup
                 (subgroupLowerCentralTermZeroHom S x)) ∈
           Submodule.span (GaloisField 2 n) (Set.range family)) := by
   classical
-  letI : IsMulCommutative (frattini S) :=
+  let : IsMulCommutative (frattini S) :=
     IsMulCommutative.of_comm hEAS.comm
-  letI : Module (ZMod 2) (Additive (frattini S)) := hEAS.zmodModule
+  let : Module (ZMod 2) (Additive (frattini S)) := hEAS.zmodModule
   obtain ⟨family, hfamily, hcoordinate, hright⟩ :=
     exists_restrictedFactorAmbientEigenFamily
       hSinv hEAS eS c right hK1S htermS hSqS hAgemoS hK0S
@@ -117,7 +117,7 @@ theorem exists_restrictedFactorAmbientEigenFamily_spanning_restrictedSubgroup
   have hxSup : (x : S) ∈ factors.left ⊔ factors.right := by
     rw [factors.sup_eq_top]
     exact Subgroup.mem_top _
-  letI : factors.right.Normal := factors.right_normal
+  let : factors.right.Normal := factors.right_normal
   obtain ⟨a, ha, b, hb, hab⟩ :=
     Subgroup.mem_sup_of_normal_right.mp hxSup
   let xa : lowerCentralTerm S 0 := ⟨a, Subgroup.mem_top a⟩

@@ -64,7 +64,7 @@ theorem kernelOrder_eq :
 theorem zeta_ind1H_apply_one :
     (data.h78 hG).hyp76.zeta ((data.h78 hG).ind1H) (1 : ↥L)
       = ((data.h78 hG).complementIndex : ℂ) := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   rw [data.complementIndex_eq hG]
   change ClassFunction.induce data.kernelIn (data.θ data.ind1H : ClassFunction _ ℂ) (1 : ↥L)
     = ((data.kernelIn).index : ℂ)
@@ -76,7 +76,7 @@ theorem zeta_ind1H_normSq :
     ClassFunction.inner ((data.h78 hG).hyp76.zeta ((data.h78 hG).ind1H))
       ((data.h78 hG).hyp76.zeta ((data.h78 hG).ind1H))
       = ((data.h78 hG).complementIndex : ℂ) := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   rw [data.complementIndex_eq hG]
   change ClassFunction.inner
       (ClassFunction.induce data.kernelIn (data.θ data.ind1H : ClassFunction _ ℂ))
@@ -95,7 +95,7 @@ theorem zeta_zero_apply_one :
 /-- **The (7.8) source-side norm evaluation** `‖Ind 1_H − ζ‖² = e + 1`. -/
 theorem sourceDiffNormEvaluation :
     (data.h78 hG).SourceDiffNormEvaluation := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   refine (data.h78 hG).sourceDiffNormEvaluation_of_inner_values_of_zeta_irreducible
     (data.zeta_ind1H_normSq hG) ?_ ?_ (data.h78_zeta_irreducible hG)
   · exact induce_family_orthogonal_of_injective data.kernelIn data.θ data.inj 0 data.ind1H
@@ -103,6 +103,7 @@ theorem sourceDiffNormEvaluation :
   · exact induce_family_orthogonal_of_injective data.kernelIn data.θ data.inj data.ind1H 0
       data.ind1H_ne_zero
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **The (1.5.d) family degree-square sum** in the `star` form consumed by the
 (7.8.b) `NormEstimates` producer: `Σ_{i ≠ ind1H} ζ_i(1)·(ζ_i(1))*/‖ζ_i‖² = (h−1)·e`. -/
 theorem degree_sum_star :
@@ -111,7 +112,7 @@ theorem degree_sum_star :
           * star ((data.h78 hG).hyp76.zeta i (1 : ↥L)) /
           ClassFunction.inner ((data.h78 hG).hyp76.zeta i) ((data.h78 hG).hyp76.zeta i))
       = (((data.h78 hG).kernelOrder : ℂ) - 1) * ((data.h78 hG).complementIndex : ℂ) := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   have hstar : ∀ i ∈ Finset.univ.erase (data.h78 hG).ind1H,
       (data.h78 hG).hyp76.zeta i (1 : ↥L)
           * star ((data.h78 hG).hyp76.zeta i (1 : ↥L)) /
@@ -141,7 +142,7 @@ theorem degree_sum_star :
 /-- **`2e + 1 ≤ h`** (`smallIndex`): the Frobenius kernel of odd order is more than
 twice the complement. -/
 theorem smallIndex : (data.h78 hG).smallIndex := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   have hKodd : Odd (Nat.card ↥data.kernelIn) :=
     (hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card L)).of_dvd_nat
       (Subgroup.card_subgroup_dvd_card _)
@@ -163,7 +164,7 @@ theorem smallIndex : (data.h78 hG).smallIndex := by
 
 /-- `d_{ind1H} = 1` for the constructor-computed `hyp76.d`. -/
 theorem hyp76_d_ind1H_eq_one : (data.h78 hG).hyp76.d ((data.h78 hG).ind1H) = 1 := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   change ClassFunction.induce data.kernelIn (data.θ data.ind1H : ClassFunction _ ℂ) (1 : ↥L) /
       ClassFunction.induce data.kernelIn (data.θ 0 : ClassFunction _ ℂ) (1 : ↥L) = 1
   rw [← data.zeta_deg_match, div_self (induce_apply_one_ne_zero _ (data.θ 0))]
@@ -175,7 +176,7 @@ theorem hagree_hyp76 (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
       (data.h78 hG).hyp76.hyp71.τ ((data.h78 hG).hyp76.psiSupp i)
         = (data.h78 hG).nu ((data.h78 hG).hyp76.zeta i)
           - (data.h78 hG).hyp76.d i • (data.h78 hG).nu ((data.h78 hG).hyp76.zeta 0) := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   intro i hi0 hii
   have hz0 : ClassFunction.induce data.kernelIn (data.θ 0 : ClassFunction _ ℂ) (1 : ↥L) ≠ 0 :=
     induce_apply_one_ne_zero _ (data.θ 0)
@@ -201,7 +202,7 @@ theorem zetaNuRhoNormSq_eq_normQuad (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     (data.h78 hG).zetaNuRhoNormSq =
       (data.h78 hG).normQuadraticCorrection (data.betaDecomp hG) +
         (1 - ((data.h78 hG).complementIndex : ℝ) / ((data.h78 hG).kernelOrder : ℝ)) := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   have hz0 : ClassFunction.induce data.kernelIn (data.θ 0 : ClassFunction _ ℂ) (1 : ↥L) ≠ 0 :=
     induce_apply_one_ne_zero _ (data.θ 0)
   have hz0_compl : ClassFunction.induce data.kernelIn
@@ -258,7 +259,7 @@ theorem zetaNuRhoNormSq_eq_normQuad (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
 `1 − e/h ≤ ‖ζ_0^{νρ}‖²` and the residual bound `‖Γ‖² ≤ e − 1`. -/
 theorem normEstimates (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     (data.h78 hG).NormEstimates (data.betaDecomp hG) := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   refine (data.h78 hG).normEstimates_of_irreducible_source_data (data.betaDecomp hG)
     (data.sourceDiffNormEvaluation hG) ?_ ?_ (data.zeta_zero_apply_one hG)
     (data.degree_sum_star hG) (data.zetaNuRhoNormSq_eq_normQuad hG)
@@ -271,7 +272,7 @@ theorem normEstimates (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
 
 /-- `d_0 = 1` (the distinguished source is linear: `ζ_0(1) = e = [L:H]·θ_0(1)`). -/
 theorem d_zero_eq_one : data.d 0 = 1 := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   have h := data.zeta_deg 0
   have hz0 : data.zeta 0 (1 : ↥L) ≠ 0 := induce_apply_one_ne_zero _ (data.θ 0)
   have h2 : data.d 0 * data.zeta 0 (1 : ↥L) = 1 * data.zeta 0 (1 : ↥L) := by
@@ -318,7 +319,7 @@ theorem inner_beta_nu_zeta_eq
         ((dataL.h78 hG).nu ((dataL.h78 hG).hyp76.zeta i))
       = dataL.d i * ClassFunction.inner ((dataM.h78 hG).beta)
           ((dataL.h78 hG).nu ((dataL.h78 hG).hyp76.zeta 0)) := by
-  haveI := dataL.kernelIn_normal
+  have := dataL.kernelIn_normal
   by_cases hi0 : i = 0
   · subst hi0
     rw [dataL.d_zero_eq_one, one_mul]
@@ -363,6 +364,7 @@ theorem pair_cross_orthogonal'
   rw [OddOrder.RepresentationTheory.inner_conj_symm,
     pair_cross_orthogonal dataL dataM hG hL hM hnc hi hj, star_zero]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **The residual `Γ_M` pairs with the `L`-family exactly as `β_M` does**: for
 `i ≠ ind1H`, `⟨Γ_M, φ_i^ν⟩ = d_i·a` where `a = ⟨β_M, φ_0^ν⟩` — the `1_G`, `ζ_M^ν`,
 and weighted-`M`-sum components of `β_M` are all orthogonal to the `L`-family. -/
@@ -374,7 +376,7 @@ theorem inner_gamma_nu_zeta_eq
         ((dataL.h78 hG).nu ((dataL.h78 hG).hyp76.zeta i))
       = dataL.d i * ClassFunction.inner ((dataM.h78 hG).beta)
           ((dataL.h78 hG).nu ((dataL.h78 hG).hyp76.zeta 0)) := by
-  haveI := dataL.kernelIn_normal
+  have := dataL.kernelIn_normal
   have hi_h78 : i ≠ (dataL.h78 hG).ind1H := by rw [dataL.h78_ind1H_eq]; exact hi
   set phi := (dataL.h78 hG).nu ((dataL.h78 hG).hyp76.zeta i) with hphi
   -- `Γ_M = β_M − 1_G + ζ_M^ν − a_M•W_M` from the (7.8.a) decomposition.
@@ -427,8 +429,8 @@ theorem bessel_bound_of_inner_beta_zeta_ne_zero
     ((Nat.card ↥dataL.kernelIn : ℚ) - 1) / (((dataL.kernelIn).index : ℕ) : ℚ)
       ≤ (((dataM.h78 hG).complementIndex : ℕ) : ℚ) - 1 := by
   classical
-  haveI := dataL.kernelIn_normal
-  haveI := dataM.kernelIn_normal
+  have := dataL.kernelIn_normal
+  have := dataM.kernelIn_normal
   -- The pairing value is an integer `a ≠ 0`.
   have hβZ : (dataM.h78 hG).beta ∈ ZIrr G :=
     (dataM.h78 hG).beta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible

@@ -56,10 +56,10 @@ theorem map_quotient_le_center
     [A.Normal]
     (h : NormalInvariantCover act A C) :
     C.map (QuotientGroup.mk' A) ≤ Subgroup.center (G ⧸ A) := by
-  letI : C.Normal := h.right.1
+  let : C.Normal := h.right.1
   let q : G →* G ⧸ A := QuotientGroup.mk' A
   let Cbar : Subgroup (G ⧸ A) := C.map q
-  haveI : Cbar.Normal :=
+  have : Cbar.Normal :=
     Subgroup.Normal.map h.right.1 q (QuotientGroup.mk'_surjective A)
   have hCbar_ne : Cbar ≠ ⊥ := by
     intro hbot
@@ -69,7 +69,7 @@ theorem map_quotient_le_center
     exact h.lt.2 hCA
   let Y : Subgroup (G ⧸ A) := Cbar ⊓ Subgroup.center (G ⧸ A)
   have hYne : Y ≠ ⊥ := by
-    haveI : Nontrivial Cbar :=
+    have : Nontrivial Cbar :=
       (Subgroup.nontrivial_iff_ne_bot Cbar).mpr hCbar_ne
     have hnon : Nontrivial ↥(Cbar ⊓ Subgroup.center (G ⧸ A)) :=
       OddOrder.Isaacs.Ch01.IsPGroup.normal_inf_center_nontrivial
@@ -85,7 +85,7 @@ theorem map_quotient_le_center
   let D : Subgroup G := Y.comap q
   have hDInv : IsAInvariant act D := by
     simpa [D, q] using h.left.2.comap_quotient hYInv
-  haveI : D.Normal := Subgroup.Normal.comap inferInstance q
+  have : D.Normal := Subgroup.Normal.comap inferInstance q
   have hAD : A ≤ D := by
     intro a ha
     change q a ∈ Y
@@ -151,11 +151,11 @@ theorem invariant_subgroup_quotient_eq_bot_or_top
       aInvariant_map_subtype_of_restrict hCbarInv hU
   have hUbarCenter : Ubar ≤ Subgroup.center (G ⧸ A) :=
     (Subgroup.map_subtype_le U).trans (h.map_quotient_le_center hG)
-  haveI : Ubar.Normal := normal_of_le_center hUbarCenter
+  have : Ubar.Normal := normal_of_le_center hUbarCenter
   let D : Subgroup G := Ubar.comap q
   have hDInv : IsAInvariant act D := by
     simpa [D, q] using h.left.2.comap_quotient hUbarInv
-  haveI : D.Normal := Subgroup.Normal.comap inferInstance q
+  have : D.Normal := Subgroup.Normal.comap inferInstance q
   have hAD : A ≤ D := by
     intro a ha
     change q a ∈ Ubar
@@ -209,7 +209,7 @@ theorem restrict_injective_of_regular_on_involutions
     intro hC
     have hlt : A < ⊥ := hC ▸ h.lt
     exact (not_lt_of_ge bot_le) hlt
-  letI : Nontrivial C := (Subgroup.nontrivial_iff_ne_bot C).mpr hCne
+  let : Nontrivial C := (Subgroup.nontrivial_iff_ne_bot C).mpr hCne
   have hCtwo : IsPGroup 2 C := hG.to_subgroup C
   have hcard_ne : Nat.card C ≠ 1 :=
     ne_of_gt (Finite.one_lt_card_iff_nontrivial.mpr inferInstance)
@@ -475,7 +475,7 @@ theorem lowerCentralLayerZero_nontrivial
         (Subgroup.map_eq_bot_iff C).mp hbot
       simpa using hker
     exact h.lt.2 hCA
-  letI : Nontrivial ↥(C.map (QuotientGroup.mk' A)) :=
+  let : Nontrivial ↥(C.map (QuotientGroup.mk' A)) :=
     (Subgroup.nontrivial_iff_ne_bot _).mpr hCbar_ne
   exact (lowerCentralLayerZeroEquivMap hG h hPhi).toEquiv.nontrivial
 
@@ -548,9 +548,9 @@ theorem lowerCentralLayerZeroLinearEquivMap_equivariant
           (lowerCentralLayerZeroLinearEquivMap hG h hPhi v) := by
   dsimp only
   let hEA := coverMap_isElementaryAbelian hG h hPhi
-  letI : IsMulCommutative ↥(C.map (QuotientGroup.mk' A)) :=
+  let : IsMulCommutative ↥(C.map (QuotientGroup.mk' A)) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2)
+  let : Module (ZMod 2)
       (Additive ↥(C.map (QuotientGroup.mk' A))) := hEA.zmodModule
   intro g v
   apply Additive.toMul.injective
@@ -571,7 +571,7 @@ theorem lowerCentralLayerZeroRepresentation_isIrreducible
     Representation.IsIrreducible
       (lowerCentralLayerRepresentation h.right.2.restrict 0) := by
   classical
-  letI : Nontrivial (lowerCentralLayer C 0) :=
+  let : Nontrivial (lowerCentralLayer C 0) :=
     lowerCentralLayerZero_nontrivial hG h hPhi
   let rho := lowerCentralLayerRepresentation h.right.2.restrict 0
   let Phi : Submodule (ZMod 2) (Additive (lowerCentralLayer C 0)) ≃o
@@ -586,7 +586,7 @@ theorem lowerCentralLayerZeroRepresentation_isIrreducible
   have hbot_ne_top : (⊥ : Subrepresentation rho) ≠ ⊤ := by
     exact fun hEq => bot_ne_top
       (congrArg Subrepresentation.toSubmodule hEq)
-  letI : Nontrivial (Subrepresentation rho) :=
+  let : Nontrivial (Subrepresentation rho) :=
     ⟨⊥, ⊤, hbot_ne_top⟩
   refine IsSimpleOrder.of_forall_eq_top fun S hSne => ?_
   have hJinv : IsAInvariant
@@ -749,7 +749,7 @@ private theorem lowerCentralTermEquivAgemoAt_equivariant
           (lowerCentralTermAction hCinv.restrict i g x) =
         agemoRestrictAction hAinv.restrict s g
           (lowerCentralTermEquivAgemoAt A C i s hB x) := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
   intro i s hB g x
   apply Subtype.ext
@@ -827,7 +827,7 @@ private theorem lowerCentralLayerEquivAgemoSuccAt_equivariant
           (lowerCentralLayerAction hCinv.restrict i g q) =
         agemoSuccQuotientAction hAinv.restrict s g
           (lowerCentralLayerEquivAgemoSuccAt A C hAcomm i s hB hD q) := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
   intro i s hB hD g q
   refine QuotientGroup.induction_on q ?_
@@ -903,12 +903,12 @@ theorem lowerCentralLayerLinearEquivAgemoSuccAt_equivariant
         agemoSuccQuotientRepresentation hAinv.restrict s g
           (lowerCentralLayerLinearEquivAgemoSuccAt
             A C hAcomm i s hB hD q) := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
   intro i s hB hD
-  letI : IsMulCommutative (lowerCentralLayer C i) :=
+  let : IsMulCommutative (lowerCentralLayer C i) :=
     lowerCentralLayerIsMulCommutative C i
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer C i)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer C i)) :=
     lowerCentralLayerZmodModule C i
   intro g q
   apply Additive.toMul.injective
@@ -991,7 +991,7 @@ noncomputable def lowerCentralLayerOneEquivAgemoSucc
         QuotientGroup.mk'
           ((Agemo A 2 (s + 1)).subgroupOf (Agemo A 2 s))
           (lowerCentralTermOneEquivAgemo A C s hB x) := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
   intro s hB hD x
   exact subgroupQuotientEquivOfInjectiveAmbientMaps_mk
@@ -1017,7 +1017,7 @@ theorem lowerCentralTermOneEquivAgemo_equivariant
           (lowerCentralTermAction hCinv.restrict 1 g x) =
         agemoRestrictAction hAinv.restrict s g
           (lowerCentralTermOneEquivAgemo A C s hB x) := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
   intro s hB g x
   apply Subtype.ext
@@ -1056,7 +1056,7 @@ theorem lowerCentralLayerOneEquivAgemoSucc_equivariant
           (lowerCentralLayerAction hCinv.restrict 1 g q) =
         agemoSuccQuotientAction hAinv.restrict s g
           (lowerCentralLayerOneEquivAgemoSucc A C hAcomm s hB hD q) := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
   intro s hB hD g q
   refine QuotientGroup.induction_on q ?_
@@ -1127,11 +1127,11 @@ noncomputable def lowerCentralLayerOneLinearEquivAgemoSucc
       lowerCentralLayerOneLinearEquivAgemoSucc A C hAcomm s hB hD q =
         Additive.ofMul
           (lowerCentralLayerOneEquivAgemoSucc A C hAcomm s hB hD q.toMul) := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
-  letI : IsMulCommutative (lowerCentralLayer C 1) :=
+  let : IsMulCommutative (lowerCentralLayer C 1) :=
     lowerCentralLayerIsMulCommutative C 1
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer C 1)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer C 1)) :=
     lowerCentralLayerZmodModule C 1
   intro s hB hD q
   rfl
@@ -1157,11 +1157,11 @@ theorem lowerCentralLayerOneLinearEquivAgemoSucc_equivariant
           (lowerCentralLayerRepresentation hCinv.restrict 1 g q) =
         agemoSuccQuotientRepresentation hAinv.restrict s g
           (lowerCentralLayerOneLinearEquivAgemoSucc A C hAcomm s hB hD q) := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
-  letI : IsMulCommutative (lowerCentralLayer C 1) :=
+  let : IsMulCommutative (lowerCentralLayer C 1) :=
     lowerCentralLayerIsMulCommutative C 1
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer C 1)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer C 1)) :=
     lowerCentralLayerZmodModule C 1
   intro s hB hD g q
   apply Additive.toMul.injective
@@ -1273,7 +1273,7 @@ theorem agemo_one_termOneIn_map_le_kernelOneIn
     (Agemo (lowerCentralTermOneIn A C) 2 1).map
       (lowerCentralTermOneIn A C).subtype ≤
         lowerCentralLayerKernelOneIn A C := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
   intro x hx
   obtain ⟨b, hb, rfl⟩ := Subgroup.mem_map.mp hx
@@ -1367,11 +1367,11 @@ theorem exists_lowerCentralLayerOne_linearEquiv_agemoSucc_of_classification
         ∀ g q,
           E (lowerCentralLayerRepresentation hCinv.restrict 1 g q) =
             agemoSuccQuotientRepresentation hAinv.restrict s g (E q) := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
-  letI : IsMulCommutative (lowerCentralLayer C 1) :=
+  let : IsMulCommutative (lowerCentralLayer C 1) :=
     lowerCentralLayerIsMulCommutative C 1
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer C 1)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer C 1)) :=
     lowerCentralLayerZmodModule C 1
   intro classify hderived
   let B : Subgroup A := lowerCentralTermOneIn A C
@@ -1454,10 +1454,10 @@ theorem LemmaSevenSpectralCertificate.false
     (phi : X →* MulAut H)
     (d : LemmaSevenSpectralCertificate phi) : False := by
   let n := Module.finrank (ZMod 2) (Additive (lowerCentralLayer H 1))
-  letI : Nontrivial (Additive (lowerCentralLayer H 1)) :=
+  let : Nontrivial (Additive (lowerCentralLayer H 1)) :=
     Module.nontrivial_of_finrank_pos
       (lt_of_lt_of_le (by omega : 0 < 2) d.finrank_second_ge_two)
-  letI : Nontrivial (Additive (lowerCentralLayer H 0)) :=
+  let : Nontrivial (Additive (lowerCentralLayer H 0)) :=
     d.layerEquiv.toEquiv.nontrivial
   have htransFirst : ∀ v w : Additive (lowerCentralLayer H 0),
       v ≠ 0 → w ≠ 0 →

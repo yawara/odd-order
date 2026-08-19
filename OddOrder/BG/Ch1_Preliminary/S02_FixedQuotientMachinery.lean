@@ -56,7 +56,7 @@ private theorem fixedOnSubmoduleAndQuotientSubgroup_rep_pow_prime_eq_one
     (W : Submodule F V) (ρ : Representation F G V)
     {g : G} (hg : g ∈ fixedOnSubmoduleAndQuotientSubgroup W ρ) :
     (ρ g : Module.End F V) ^ p = 1 := by
-  haveI : CharP (Module.End F V) p := IsPGroup.charP_End_of_field
+  have : CharP (Module.End F V) p := IsPGroup.charP_End_of_field
   have hsq :
       (((ρ g : Module.End F V) - 1) ^ 2 : Module.End F V) = 0 :=
     fixedOnSubmoduleAndQuotientSubgroup_sub_pow_two_eq_zero W ρ hg
@@ -1136,7 +1136,7 @@ private theorem normal_pSubgroup_le_sylow
     {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite (Sylow p G)]
     (N : Subgroup G) (hNnormal : N.Normal) (hN : IsPGroup p N) (P : Sylow p G) :
     N ≤ (P : Subgroup G) := by
-  haveI : N.Normal := hNnormal
+  have : N.Normal := hNnormal
   obtain ⟨Q, hNQ⟩ := hN.exists_le_sylow
   obtain ⟨g, hgQ⟩ := MulAction.exists_smul_eq G Q P
   calc (N : Subgroup G)
@@ -1174,7 +1174,7 @@ private theorem commutator_le_sylow_of_finrank_two_invariant_submodule
   have hVpos : 0 < Module.finrank F V := by
     rw [hdim]
     norm_num
-  haveI : Nontrivial V := Module.nontrivial_of_finrank_pos (R := F) (M := V) hVpos
+  have : Nontrivial V := Module.nontrivial_of_finrank_pos (R := F) (M := V) hVpos
   exact commutator_le_sylow_of_le_normal_pSubgroup
     (fixedOnSubmoduleAndQuotientSubgroup W ρ)
     (fixedOnSubmoduleAndQuotientSubgroup_normal_of_finrank_two
@@ -1359,7 +1359,7 @@ private theorem commutator_le_sylow_of_nontrivial_normal_p_fixed_space
   have hVpos : 0 < Module.finrank F V := by
     rw [hdim]
     norm_num
-  haveI : Nontrivial V := Module.nontrivial_of_finrank_pos (R := F) (M := V) hVpos
+  have : Nontrivial V := Module.nontrivial_of_finrank_pos (R := F) (M := V) hVpos
   exact commutator_le_sylow_of_le_normal_pSubgroup
     (fixedOnSubmoduleAndQuotientSubgroup W ρ)
     (by

@@ -45,7 +45,7 @@ theorem isFrobeniusGroup_subgroupOf_sup
     IsFrobeniusGroup ↥(N ⊔ R) (N.subgroupOf (N ⊔ R)) (R.subgroupOf (N ⊔ R)) where
   isNormal := Subgroup.normal_subgroupOf_of_le_normalizer (sup_le Subgroup.le_normalizer hNinv)
   isComplement := by
-    haveI : (N.subgroupOf (N ⊔ R)).Normal :=
+    have : (N.subgroupOf (N ⊔ R)).Normal :=
       Subgroup.normal_subgroupOf_of_le_normalizer (sup_le Subgroup.le_normalizer hNinv)
     refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
     · refine disjoint_iff.mpr (eq_bot_iff.mpr fun x hx => ?_)
@@ -94,7 +94,7 @@ commutator map `k ↦ k · (c k c⁻¹)⁻¹` is surjective onto `K`
 theorem normal_le_kernel_of_not_kernel_le {G : Type*} [Group G] [Finite G]
     {K R N : Subgroup G} (hFrob : IsFrobeniusGroup G K R) [hNnorm : N.Normal]
     (hKN : ¬ K ≤ N) : N ≤ K := by
-  haveI hKnorm : K.Normal := hFrob.isNormal
+  have hKnorm : K.Normal := hFrob.isNormal
   intro c hcN
   by_contra hcK
   -- Conjugation by `c` is fixed-point-free on `K` (via `centralizer_kernel_le`).
@@ -298,6 +298,7 @@ theorem trivial_of_invariants_comp_ne_bot
     exact hv ⟨g, hg⟩
 
 open OddOrder.RepresentationTheory in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Inner conjugates are trivial** (orbit-machinery entry point for step 9).  For `g ∈ H`, the
 conjugate `M^g = M.map (conjSemilinearEnd ρ g)` of an `F[H]`-submodule `M` equals `M` itself: `ρ g`
 preserves the `H`-submodule `M` (it is the action of the group element `single ⟨g,·⟩ 1`).
@@ -348,7 +349,7 @@ theorem nonempty_linearEquiv_map_conjSemilinearEnd_forall
         = ((Subrepresentation.ofSubmodule' M).toRepresentation).character) :
     ∀ g : G, Nonempty (↥M ≃ₗ[MonoidAlgebra F ↥H]
       ↥(M.map (conjSemilinearEnd (H := H) ρ g))) := by
-  haveI : Invertible (Nat.card ↥H : F) := invertibleOfNonzero hHchar
+  have : Invertible (Nat.card ↥H : F) := invertibleOfNonzero hHchar
   set χ := ((Subrepresentation.ofSubmodule' M).toRepresentation).character with hχ
   -- Conjugation composition law for `conjNormalMulAut`.
   have hcomp : ∀ (a b : G) (h : ↥H),
@@ -409,7 +410,7 @@ theorem resRep_isIrreducible_of_char_eq_generator
               (M.map (conjSemilinearEnd (H := H) ρ x))).toRepresentation).character
         = ((Subrepresentation.ofSubmodule' M).toRepresentation).character) :
     (resRep ρ H).IsIrreducible := by
-  haveI : NeZero (Nat.card ↥H : F) := ⟨hHchar⟩
+  have : NeZero (Nat.card ↥H : F) := ⟨hHchar⟩
   exact restriction_isIrreducible ρ x hgen M hM
     (nonempty_linearEquiv_map_conjSemilinearEnd_forall ρ hHchar M x hgen hx)
 
@@ -540,7 +541,7 @@ theorem inf_iSup_map_conjSemilinearEnd_eq_bot
     set s : Set (Submodule (MonoidAlgebra F ↥H) (resRep ρ H).asModule) :=
       (fun i => M.map (conjSemilinearEnd (H := H) ρ (x ^ i))) '' Set.Ioo 0 p with hs
     have hssup : sSup s = Sup := by rw [hs, sSup_image]
-    haveI hsimple : ∀ m : s, IsSimpleModule (MonoidAlgebra F ↥H)
+    have hsimple : ∀ m : s, IsSimpleModule (MonoidAlgebra F ↥H)
         ↥(m : Submodule (MonoidAlgebra F ↥H) (resRep ρ H).asModule) := by
       rintro ⟨_, i, _, rfl⟩
       exact isSimpleModule_map_conjSemilinearEnd ρ (x ^ i) M
@@ -637,12 +638,12 @@ theorem finrank_eq_one_of_not_iso_generator
       rwa [Module.End.mul_apply, ← hTm, ha] at h
     let Stab : Subgroup G :=
       { carrier := {g | ρ g (T m) = T m}
-        one_mem' := by simp only [Set.mem_setOf_eq, map_one, Module.End.one_apply]
+        one_mem' := by simp only [Set.mem_ofPred_eq, map_one, Module.End.one_apply]
         mul_mem' := fun {b c} hb hc => by
-          simp only [Set.mem_setOf_eq, map_mul] at *
+          simp only [Set.mem_ofPred_eq, map_mul] at *
           rw [Module.End.mul_apply, hc, hb]
         inv_mem' := fun {b} hb => by
-          simp only [Set.mem_setOf_eq] at *
+          simp only [Set.mem_ofPred_eq] at *
           have h1 : ρ b⁻¹ (ρ b (T m)) = T m := by
             rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply]
           rwa [hb] at h1 }
@@ -650,8 +651,8 @@ theorem finrank_eq_one_of_not_iso_generator
     intro r
     exact hRStab r.2
   -- dimension count.
-  haveI : Nontrivial ↥M := IsSimpleModule.nontrivial (MonoidAlgebra F ↥H) ↥M
-  haveI : Module.Finite F ↥M :=
+  have : Nontrivial ↥M := IsSimpleModule.nontrivial (MonoidAlgebra F ↥H) ↥M
+  have : Module.Finite F ↥M :=
     Module.Finite.of_injective (M.subtype.restrictScalars F) Subtype.val_injective
   have hle : Module.finrank F ↥M ≤ 1 := by
     rw [← hCV1]
@@ -780,7 +781,7 @@ theorem exists_conjChar_eq_of_irreducible (ρ : Representation F G W) {H K' : Su
     {χ₁ χ₂ : ↥K' → F} (h₁ : weightSpace ρ K' χ₁ ≠ ⊥) (h₂ : weightSpace ρ K' χ₂ ≠ ⊥) :
     ∃ h : ↥H, conjChar K' (h : G) χ₁ = χ₂ := by
   classical
-  haveI := hHirr
+  have := hHirr
   set O : Set (↥K' → F) := {χ | ∃ h : ↥H, conjChar K' (h : G) χ₁ = χ} with hO
   set V : Submodule F W := ⨆ χ ∈ O, weightSpace ρ K' χ with hV
   have hmemO : ∀ χ, χ ∈ O → weightSpace ρ K' χ ≤ V :=
@@ -861,14 +862,14 @@ theorem false_of_two_weights (ρ : Representation F G W) [FiniteDimensional F W]
     have hc := hcomm k'' ⟨k', hk'⟩
     rw [mul_assoc, hc, ← mul_assoc, inv_mul_cancel, one_mul]
   -- MulActions of `↥K` and `↥R` on characters via conjugation.
-  letI actK : MulAction ↥K (↥K' → F) :=
+  let actK : MulAction ↥K (↥K' → F) :=
     { smul := fun k χ => conjChar K' (k : G) χ
       one_smul := fun χ => by
         change conjChar K' ((1 : ↥K) : G) χ = χ; rw [OneMemClass.coe_one, conjChar_one]
       mul_smul := fun a b χ => by
         change conjChar K' ((a * b : ↥K) : G) χ = conjChar K' (a : G) (conjChar K' (b : G) χ)
         rw [Subgroup.coe_mul, conjChar_mul] }
-  letI actR : MulAction ↥R (↥K' → F) :=
+  let actR : MulAction ↥R (↥K' → F) :=
     { smul := fun r χ => conjChar K' (r : G) χ
       one_smul := fun χ => by
         change conjChar K' ((1 : ↥R) : G) χ = χ; rw [OneMemClass.coe_one, conjChar_one]
@@ -919,7 +920,7 @@ theorem false_of_two_weights (ρ : Representation F G W) [FiniteDimensional F W]
   -- `|Ω| ∣ gcd(|K|, |R|) = 1`.
   have hΩ1 : Nat.card ↥Ω = 1 := Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hcardK hcardR)
   -- but `χ₁, χ₂ ∈ Ω` are distinct, so `|Ω| ≥ 2`.
-  haveI hΩfin : Finite ↥Ω := by
+  have hΩfin : Finite ↥Ω := by
     rw [← horbK]; exact Set.finite_coe_iff.mpr (Set.finite_range _)
   have hnt : Nontrivial ↥Ω := ⟨⟨χ₁, h₁⟩, ⟨χ₂, h₂⟩, fun h => hne (Subtype.ext_iff.mp h)⟩
   rw [← Finite.one_lt_card_iff_nontrivial, hΩ1] at hnt
@@ -1016,15 +1017,15 @@ theorem invariants_ne_bot_of_not_irreducible_sup [Finite G] [FiniteDimensional F
     (hCV1 : Module.finrank F (Representation.invariants (σ.comp R.subtype)) = 1)
     (hNRnotirr : ¬ Representation.IsIrreducible (σ.comp (N ⊔ R).subtype)) :
     Representation.invariants (σ.comp N.subtype) ≠ ⊥ := by
-  haveI : NeZero (Nat.card ↥(N ⊔ R) : F) := ⟨hcharNR⟩
-  haveI : Nontrivial (resRep σ (N ⊔ R)).asModule := inferInstanceAs (Nontrivial W)
-  haveI hss : IsSemisimpleModule (MonoidAlgebra F ↥(N ⊔ R)) (resRep σ (N ⊔ R)).asModule := by
+  have : NeZero (Nat.card ↥(N ⊔ R) : F) := ⟨hcharNR⟩
+  have : Nontrivial (resRep σ (N ⊔ R)).asModule := inferInstanceAs (Nontrivial W)
+  have hss : IsSemisimpleModule (MonoidAlgebra F ↥(N ⊔ R)) (resRep σ (N ⊔ R)).asModule := by
     rw [← Representation.isSemisimpleRepresentation_iff_isSemisimpleModule_asModule]; infer_instance
   -- a simple `F[N⊔R]`-submodule `A`, necessarily proper (else `ρ|_{NR}` irreducible).
   obtain ⟨A, hAsimple⟩ :=
     IsSemisimpleModule.exists_simple_submodule (MonoidAlgebra F ↥(N ⊔ R))
       (resRep σ (N ⊔ R)).asModule
-  haveI := hAsimple
+  have := hAsimple
   have hAne : A ≠ ⊥ := IsSimpleModule.isAtom.1
   have hAtop : A ≠ ⊤ := by
     rintro rfl
@@ -1075,7 +1076,7 @@ theorem finrank_eq_one_of_weight_fixed [Finite G] [FiniteDimensional F W] [Nontr
     (hKRirr : Representation.IsIrreducible (σ.comp (K' ⊔ R).subtype))
     {χ : ↥K' → F} (hχne : weightSpace σ K' χ ≠ ⊥) (hχfix : conjChar K' x χ = χ) :
     Module.finrank F W = 1 := by
-  haveI := hKRirr
+  have := hKRirr
   -- `K' ⊔ R = ⟨K', x⟩`.
   have hgen : Subgroup.closure ((K' : Set G) ∪ {x}) = K' ⊔ R := by
     rw [Subgroup.closure_union, Subgroup.closure_eq, ← Subgroup.zpowers_eq_closure, hxR]
@@ -1103,9 +1104,9 @@ theorem finrank_eq_one_of_weight_fixed [Finite G] [FiniteDimensional F W] [Nontr
         { carrier := {g | conjChar K' g χ = χ}
           one_mem' := conjChar_one K' χ
           mul_mem' := fun {a b} ha hb => by
-            simp only [Set.mem_setOf_eq] at *; rw [conjChar_mul, hb, ha]
+            simp only [Set.mem_ofPred_eq] at *; rw [conjChar_mul, hb, ha]
           inv_mem' := fun {a} ha => by
-            simp only [Set.mem_setOf_eq] at *
+            simp only [Set.mem_ofPred_eq] at *
             conv_lhs => rw [← ha]
             rw [← conjChar_mul, inv_mul_cancel, conjChar_one] } := by
       rw [← hgen, Subgroup.closure_le]
@@ -1129,12 +1130,12 @@ theorem finrank_eq_one_of_weight_fixed [Finite G] [FiniteDimensional F W] [Nontr
   have hcommx : ∀ g ∈ K' ⊔ R, σ g * σ x = σ x * σ g := by
     have hle : (K' ⊔ R : Subgroup G) ≤
         { carrier := {g | σ g * σ x = σ x * σ g}
-          one_mem' := by simp only [Set.mem_setOf_eq, map_one, one_mul, mul_one]
+          one_mem' := by simp only [Set.mem_ofPred_eq, map_one, one_mul, mul_one]
           mul_mem' := fun {a b} ha hb => by
-            simp only [Set.mem_setOf_eq, map_mul] at *
+            simp only [Set.mem_ofPred_eq, map_mul] at *
             rw [mul_assoc, hb, ← mul_assoc, ha, mul_assoc]
           inv_mem' := fun {a} ha => by
-            simp only [Set.mem_setOf_eq] at *
+            simp only [Set.mem_ofPred_eq] at *
             have hcomm : Commute (↑(σ.asGroupHom a)) (σ x) := by
               rw [σ.asGroupHom_apply]; exact ha
             have hinv := hcomm.units_inv_left
@@ -1166,16 +1167,16 @@ theorem finrank_eq_one_of_weight_fixed [Finite G] [FiniteDimensional F W] [Nontr
     have hle : (K' ⊔ R : Subgroup G) ≤
         { carrier := {g | σ g v ∈ Submodule.span F {v}}
           one_mem' := by
-            simp only [Set.mem_setOf_eq, map_one, Module.End.one_apply]
+            simp only [Set.mem_ofPred_eq, map_one, Module.End.one_apply]
             exact Submodule.mem_span_singleton_self v
           mul_mem' := fun {a b} ha hb => by
-            simp only [Set.mem_setOf_eq] at *
+            simp only [Set.mem_ofPred_eq] at *
             rw [map_mul, Module.End.mul_apply]
             obtain ⟨c, hc⟩ := Submodule.mem_span_singleton.mp hb
             rw [← hc, map_smul]
             exact Submodule.smul_mem _ c ha
           inv_mem' := fun {a} ha => by
-            simp only [Set.mem_setOf_eq] at *
+            simp only [Set.mem_ofPred_eq] at *
             obtain ⟨c, hc⟩ := Submodule.mem_span_singleton.mp ha
             have hc0 : c ≠ 0 := by
               rintro rfl
@@ -1239,22 +1240,22 @@ theorem invariants_commutator_ne_bot_of_irreducible
     (hcomm : ∀ a b : ↥(⁅K, K⁆ : Subgroup G), (a : G) * (b : G) = (b : G) * (a : G))
     (hCV1 : Module.finrank F (Representation.invariants (σ.comp R.subtype)) = 1) :
     Representation.invariants (σ.comp (⁅K, K⁆ : Subgroup G).subtype) ≠ ⊥ := by
-  haveI hKnorm : K.Normal := hFrob.isNormal
-  haveI hK'norm : (⁅K, K⁆ : Subgroup G).Normal := Subgroup.commutator_normal K K
+  have hKnorm : K.Normal := hFrob.isNormal
+  have hK'norm : (⁅K, K⁆ : Subgroup G).Normal := Subgroup.commutator_normal K K
   have hK'le : (⁅K, K⁆ : Subgroup G) ≤ K := Subgroup.commutator_le_right K K
   have hRnormK' : R ≤ Subgroup.normalizer (⁅K, K⁆ : Subgroup G) :=
     Subgroup.le_normalizer_of_normal
-  haveI : NeZero (Nat.card ↥K : F) := ⟨hcharK⟩
+  have : NeZero (Nat.card ↥K : F) := ⟨hcharK⟩
   -- a simple `F[K]`-constituent `M`.
-  haveI hssK : IsSemisimpleModule (MonoidAlgebra F ↥K) (resRep σ K).asModule := by
+  have hssK : IsSemisimpleModule (MonoidAlgebra F ↥K) (resRep σ K).asModule := by
     rw [← Representation.isSemisimpleRepresentation_iff_isSemisimpleModule_asModule]; infer_instance
-  haveI : Nontrivial (resRep σ K).asModule := ‹Nontrivial W›
+  have : Nontrivial (resRep σ K).asModule := ‹Nontrivial W›
   obtain ⟨M, hMs⟩ :=
     IsSemisimpleModule.exists_simple_submodule (MonoidAlgebra F ↥K) (resRep σ K).asModule
-  haveI := hMs
+  have := hMs
   have hMne : M ≠ ⊥ := by
     rintro rfl
-    haveI : Nontrivial ↥(⊥ : Submodule (MonoidAlgebra F ↥K) (resRep σ K).asModule) :=
+    have : Nontrivial ↥(⊥ : Submodule (MonoidAlgebra F ↥K) (resRep σ K).asModule) :=
       IsSimpleModule.nontrivial (MonoidAlgebra F ↥K) _
     exact false_of_nontrivial_of_subsingleton
       ↥(⊥ : Submodule (MonoidAlgebra F ↥K) (resRep σ K).asModule)
@@ -1268,27 +1269,27 @@ theorem invariants_commutator_ne_bot_of_irreducible
       have hcharK' : (Nat.card ↥(⁅K, K⁆ : Subgroup G) : F) ≠ 0 := by
         obtain ⟨m, hm⟩ := Subgroup.card_dvd_of_le hK'le
         intro h0; exact hcharK (by rw [hm, Nat.cast_mul, h0, zero_mul])
-      haveI : NeZero (Nat.card ↥(⁅K, K⁆ : Subgroup G) : F) := ⟨hcharK'⟩
-      haveI hssK' : IsSemisimpleModule (MonoidAlgebra F ↥(⁅K, K⁆ : Subgroup G))
+      have : NeZero (Nat.card ↥(⁅K, K⁆ : Subgroup G) : F) := ⟨hcharK'⟩
+      have hssK' : IsSemisimpleModule (MonoidAlgebra F ↥(⁅K, K⁆ : Subgroup G))
           (resRep σ (⁅K, K⁆ : Subgroup G)).asModule := by
         rw [← Representation.isSemisimpleRepresentation_iff_isSemisimpleModule_asModule]
         infer_instance
-      haveI : Nontrivial (resRep σ (⁅K, K⁆ : Subgroup G)).asModule := ‹Nontrivial W›
+      have : Nontrivial (resRep σ (⁅K, K⁆ : Subgroup G)).asModule := ‹Nontrivial W›
       obtain ⟨M', hM's⟩ := IsSemisimpleModule.exists_simple_submodule
         (MonoidAlgebra F ↥(⁅K, K⁆ : Subgroup G)) (resRep σ (⁅K, K⁆ : Subgroup G)).asModule
-      haveI := hM's
+      have := hM's
       have hM'ne : M' ≠ ⊥ := by
         rintro rfl
-        haveI : Nontrivial ↥(⊥ : Submodule (MonoidAlgebra F ↥(⁅K, K⁆ : Subgroup G))
+        have : Nontrivial ↥(⊥ : Submodule (MonoidAlgebra F ↥(⁅K, K⁆ : Subgroup G))
             (resRep σ (⁅K, K⁆ : Subgroup G)).asModule) :=
           IsSimpleModule.nontrivial (MonoidAlgebra F ↥(⁅K, K⁆ : Subgroup G)) _
         exact false_of_nontrivial_of_subsingleton
           ↥(⊥ : Submodule (MonoidAlgebra F ↥(⁅K, K⁆ : Subgroup G))
             (resRep σ (⁅K, K⁆ : Subgroup G)).asModule)
-      haveI : IsMulCommutative ↥(⁅K, K⁆ : Subgroup G) :=
+      have : IsMulCommutative ↥(⁅K, K⁆ : Subgroup G) :=
         ⟨⟨fun a b => Subtype.ext (hcomm a b)⟩⟩
-      haveI := subRep_isIrreducible (resRep σ (⁅K, K⁆ : Subgroup G)) M'
-      haveI : Module.Finite F ↥M' :=
+      have := subRep_isIrreducible (resRep σ (⁅K, K⁆ : Subgroup G)) M'
+      have : Module.Finite F ↥M' :=
         Module.Finite.of_injective ((M'.subtype).restrictScalars F) Subtype.val_injective
       have hM'dim : Module.finrank F ↥M' = 1 :=
         Representation.IsIrreducible.finrank_eq_one_of_isMulCommutative
@@ -1373,7 +1374,7 @@ theorem finrank_invariants_subrep_eq_one {F : Type*} [Field F]
     rw [← hCV1, (Submodule.equivMapOfInjective U.toSubmodule.subtype
       U.toSubmodule.injective_subtype _).finrank_eq]
     exact Submodule.finrank_mono hsubset
-  haveI : Nontrivial (Representation.invariants (U.toRepresentation.comp R.subtype)) :=
+  have : Nontrivial (Representation.invariants (U.toRepresentation.comp R.subtype)) :=
     Submodule.nontrivial_iff_ne_bot.mpr hne
   have hpos : 0 < Module.finrank F
       (Representation.invariants (U.toRepresentation.comp R.subtype)) :=

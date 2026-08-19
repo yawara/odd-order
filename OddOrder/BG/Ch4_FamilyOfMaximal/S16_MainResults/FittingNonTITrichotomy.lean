@@ -134,7 +134,7 @@ theorem fitting_not_ti_structure_e [Finite G]
        (Nat.card ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) = p ^ 3 ∧ S14.IsTypeP1 M ∧
           ((S15.MF M).subgroupOf M).index ∣ p + 1))) := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   by_cases habel : IsMulCommutative ↥(S15.MF M)
   · -- **(e1)**: `M_F` abelian ⟹ `M` is of type `F` and `r(M_F) = 2`.
     exact Or.inl ⟨S15.isTypeF_of_isMulCommutative_mf_of_not_fittingIsTI hG hM hnotTI habel, habel,
@@ -142,7 +142,7 @@ theorem fitting_not_ti_structure_e [Finite G]
   · -- `M_F` non-abelian: the shared conjuncts, then the inner `(e2)`/`(e3)` disjunction.
     obtain ⟨p, X₁, hp, hpσ, hX₁card, hX₁Mσ, -, hCGnotM, hrank3, hX₁X⟩ :=
       S15.exists_orderP_witness_of_inf_conj_fitting_ne_bot hG hM hgM hXne
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     obtain ⟨hcases, hmf, -, -, -⟩ := S15.fitting_not_ti_cases hG hM hnotTI
     have hX₁MF : X₁ ≤ S15.MF M := hX₁Mσ.trans hmf.symm.le
     obtain ⟨hpπ, hcyc⟩ :=
@@ -179,7 +179,7 @@ theorem fitting_not_ti_structure_e [Finite G]
         by_cases hqσ : q ∈ OddOrder.BG.Ch3.S10.sigma M
         · exact Set.mem_union_right _ hqσ
         · exact Set.mem_union_left _ (hP1.2 ▸ ⟨hq, hqσ⟩)
-      haveI hKcyc : IsCyclic ↥K := (typeP_auxiliary_structure hG hM hKM bot_le hK rfl hU).2.1
+      have hKcyc : IsCyclic ↥K := (typeP_auxiliary_structure hG hM hKM bot_le hK rfl hU).2.1
       have hindex : ((S15.MF M).subgroupOf M).index = Nat.card ↥K :=
         index_mf_subgroupOf_eq_card_kappaHall hG hM hP1 hKM hK hmf
       rcases typeP1_kappaHall_dvd_sub_one_or_singer_of_not_fittingIsTI hG hM hP1 hmf hKM hK hU

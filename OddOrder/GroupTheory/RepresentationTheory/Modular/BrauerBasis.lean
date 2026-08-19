@@ -166,7 +166,7 @@ theorem eq_zero_of_vecMul_brauerCharacterMatrix {d : ι → K}
     (hd : d ᵥ* brauerCharacterMatrix (K := K) hp hπ hlin hkerJ = 0) : d = 0 := by
   classical
   have hinj : Function.Injective (algebraMap 𝒪 K) := FaithfulSMul.algebraMap_injective 𝒪 K
-  letI : Algebra (FractionRing 𝒪) K := (IsFractionRing.lift hinj).toAlgebra
+  let : Algebra (FractionRing 𝒪) K := (IsFractionRing.lift hinj).toAlgebra
   have halg : ∀ x : 𝒪, algebraMap (FractionRing 𝒪) K (algebraMap 𝒪 (FractionRing 𝒪) x)
       = algebraMap 𝒪 K x := fun x => IsFractionRing.lift_algebraMap hinj x
   have hmap : brauerCharacterMatrix (K := K) hp hπ hlin hkerJ

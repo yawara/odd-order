@@ -82,7 +82,7 @@ theorem le_of_le_sup_of_coprime_card [Finite G] {N P H : Subgroup G}
   have hNL : N ≤ L := le_sup_left
   have hPL : P ≤ L := le_sup_right
   have hL_norm : L ≤ Subgroup.normalizer (N : Set G) := sup_le Subgroup.le_normalizer hPN
-  haveI hNsub_norm : (N.subgroupOf L).Normal := by
+  have hNsub_norm : (N.subgroupOf L).Normal := by
     constructor
     intro n hn g
     rw [Subgroup.mem_subgroupOf] at hn ⊢
@@ -364,9 +364,9 @@ theorem normalizer_Malpha_sup_sylow_of_mem_sigma [Finite G] (hG : IsMinimalSimpl
     M ≤ Subgroup.normalizer
       ((S10.Malpha M ⊔ (SM : Subgroup ↥M).map M.subtype : Subgroup G) : Set G) := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   set N : Subgroup ↥M := (S10.Malpha M).subgroupOf M with hNdef
-  haveI hN_norm : N.Normal := by rw [hNdef, S10.Malpha_subgroupOf]; infer_instance
+  have hN_norm : N.Normal := by rw [hNdef, S10.Malpha_subgroupOf]; infer_instance
   set π : ↥M →* ↥M ⧸ N := QuotientGroup.mk' N with hπdef
   -- the image of `SM` is a Sylow `p`-subgroup of the quotient.
   set Sb : Sylow p (↥M ⧸ N) := SM.mapSurjective (QuotientGroup.mk'_surjective N) with hSbdef
@@ -388,7 +388,7 @@ theorem normalizer_Malpha_sup_sylow_of_mem_sigma [Finite G] (hG : IsMinimalSimpl
   have hSbF_norm : (SbF : Subgroup ↥(Ch01.fitting (↥M ⧸ N))).Normal := by
     have htfae := (Group.isNilpotent_of_finite_tfae (G := ↥(Ch01.fitting (↥M ⧸ N)))).out 0 3
     exact htfae.mp inferInstance p ⟨Fact.out⟩ SbF
-  haveI hSbF_char : (SbF : Subgroup ↥(Ch01.fitting (↥M ⧸ N))).Characteristic :=
+  have hSbF_char : (SbF : Subgroup ↥(Ch01.fitting (↥M ⧸ N))).Characteristic :=
     Sylow.characteristic_of_normal SbF hSbF_norm
   have hSb_norm : (Sb : Subgroup (↥M ⧸ N)).Normal := by
     have h1 := OddOrder.BG.AppB.normalizer_le_normalizer_map_of_characteristic
@@ -637,7 +637,7 @@ theorem normalizer_lt_top_of_le_of_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
     Subgroup.normalizer (X : Set G) < ⊤ := by
   rw [lt_top_iff_ne_top]
   intro hNtop
-  haveI hXnormal : X.Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
+  have hXnormal : X.Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
   rcases hG.simple.eq_bot_or_eq_top_of_normal X inferInstance with hXbot | hXtop
   · exact hXne hXbot
   · exact (mem_maximalSubgroups.mp hM).1 (top_le_iff.mp (hXtop ▸ hXM))
@@ -769,7 +769,7 @@ theorem le_of_forall_line_inf_centralizer_le [Finite G] {p : ℕ} [Fact p.Prime]
     nlinarith
   obtain ⟨X₀, hX₀, hX₀A⟩ := exists_line_le hA.1 hAne
   -- conjugation action of `A` on `W`.
-  letI act : MulDistribMulAction ↥A ↥W :=
+  let act : MulDistribMulAction ↥A ↥W :=
     MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (W : Set G))) ↥W
       (Subgroup.inclusion hWinv)
   set φ : ↥A →* MulAut ↥W := MulDistribMulAction.toMulAut ↥A ↥W with hφdef
@@ -781,7 +781,7 @@ theorem le_of_forall_line_inf_centralizer_le [Finite G] {p : ℕ} [Fact p.Prime]
   have hAnc : ¬ IsCyclic ↥A := by
     refine not_isCyclic_of_isElementaryAbelian_of_two_le_log_card hA.1 ?_
     rw [hA.2, Nat.log_pow (Fact.out : p.Prime).one_lt]
-  haveI : IsMulCommutative ↥A := ⟨⟨hA.1.comm⟩⟩
+  have : IsMulCommutative ↥A := ⟨⟨hA.1.comm⟩⟩
   have hgen :=
     OddOrder.BG.Ch1.S01.cocyclicFixedByClosure_eq_top_of_not_isCyclic φ hcop hAnc
   -- the fixed points of a cocyclic subgroup land in `T`.
@@ -971,13 +971,13 @@ theorem mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne [Finite G]
     obtain ⟨z', hz', rfl⟩ := hz
     have hz'c : z' ∈ Subgroup.center ↥Pg := (mem_omega1OfAbelian.mp hz').1
     exact (congrArg Subtype.val (Subgroup.mem_center_iff.mp hz'c ⟨q, hq⟩)).symm
-  haveI : Nontrivial ↥Pg := by
+  have : Nontrivial ↥Pg := by
     rw [← Finite.one_lt_card_iff_nontrivial]
     calc 1 < p ^ 2 := Nat.one_lt_pow two_ne_zero (Fact.out : p.Prime).one_lt
       _ = Nat.card ↥A := hA.2.symm
       _ ≤ Nat.card ↥Pg := Nat.le_of_dvd Nat.card_pos (Subgroup.card_dvd_of_le hAP)
   have hZ_ne : Z ≠ ⊥ := by
-    haveI hcent_nt : Nontrivial ↥(Subgroup.center ↥Pg) := hPg_pg.center_nontrivial
+    have hcent_nt : Nontrivial ↥(Subgroup.center ↥Pg) := hPg_pg.center_nontrivial
     have hp_center : p ∣ Nat.card ↥(Subgroup.center ↥Pg) := by
       obtain ⟨k, hk⟩ := (hPg_pg.to_subgroup (Subgroup.center ↥Pg)).exists_card_eq
       have hne1 : Nat.card ↥(Subgroup.center ↥Pg) ≠ 1 :=
@@ -1085,7 +1085,7 @@ theorem mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne [Finite G]
     have hcard_ne : Nat.card ↥(S10.Malpha M) ≠ 1 := fun h =>
       hne' (Subgroup.card_eq_one.mp h)
     obtain ⟨q, hq_prime, hq_dvd⟩ := Nat.exists_prime_and_dvd hcard_ne
-    haveI : Fact q.Prime := ⟨hq_prime⟩
+    have : Fact q.Prime := ⟨hq_prime⟩
     have hqα : q ∈ S10.alpha M := S10.Malpha_isPiGroup M q
       (Nat.mem_primeFactors.mpr ⟨hq_prime, hq_dvd, Nat.card_pos.ne'⟩)
     have h3 : 3 ≤ pRank ↥M q := ((S10.mem_alpha_iff M q).mp hqα).2
@@ -1111,7 +1111,7 @@ theorem mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne [Finite G]
         _ ≤ rank ↥(Subgroup.centralizer (A : Set G) ⊓ M) := pRank_le_rank q
     omega
   -- (9) `M_σ` is nilpotent.
-  haveI hM'nil := isNilpotent_derived_of_Malpha_eq_bot hG hM hMαbot
+  have hM'nil := isNilpotent_derived_of_Malpha_eq_bot hG hM hMαbot
   have hMσM' : S10.Msigma M ≤ derivedInG M := S10.Msigma_le_derived hG hM
   have hMσnil : Group.IsNilpotent ↥(S10.Msigma M) :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hMσM')
@@ -1119,7 +1119,7 @@ theorem mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne [Finite G]
   have hPW_norm : (PW : Subgroup ↥(S10.Msigma M)).Normal := by
     have htfae := (Group.isNilpotent_of_finite_tfae (G := ↥(S10.Msigma M))).out 0 3
     exact htfae.mp hMσnil p ⟨Fact.out⟩ PW
-  haveI hPW_char : (PW : Subgroup ↥(S10.Msigma M)).Characteristic :=
+  have hPW_char : (PW : Subgroup ↥(S10.Msigma M)).Characteristic :=
     Sylow.characteristic_of_normal PW hPW_norm
   have hM_norm_P : M ≤ Subgroup.normalizer (Pg : Set G) := by
     have h1 := OddOrder.BG.AppB.normalizer_le_normalizer_map_of_characteristic

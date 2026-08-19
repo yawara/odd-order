@@ -90,7 +90,7 @@ theorem mem_invImageF_iff {x : G}
         ((fc.toHypothesis.H.subgroupOf
           (Subgroup.centralizer (fc.P : Set G))).normalCore) ⟨x, hxL⟩ ∈
         MonoidHom.range model.emb := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   constructor
   · rintro ⟨y, hy, hyx⟩
     have hye : y = (⟨x, hxL⟩ : ↥(Subgroup.centralizer (fc.P : Set G))) :=
@@ -108,7 +108,7 @@ image of `st` is a translation (`mk_distinguishedInvolution_mul_t_mem_range_emb`
 theorem distinguishedInvolution_mul_t_mem_invImageF :
     fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t
       ∈ fc.invImageF model := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   have hsL : fc.toHypothesis.distinguishedInvolution
       ∈ Subgroup.centralizer (fc.P : Set G) :=
     fc.toHypothesis.distinguishedInvolution_mem_centralizer_of_le_V fc.P_le_V
@@ -126,9 +126,9 @@ quotient (`range_normal`), and normality pulls back along the quotient map. -/
 theorem conj_mem_invImageF {c r : G}
     (hc : c ∈ Subgroup.centralizer (fc.P : Set G))
     (hr : r ∈ fc.invImageF model) : c * r * c⁻¹ ∈ fc.invImageF model := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   obtain ⟨y, hy, rfl⟩ := hr
-  haveI hn : ((MonoidHom.range model.emb).comap
+  have hn : ((MonoidHom.range model.emb).comap
       (QuotientGroup.mk' ((fc.toHypothesis.H.subgroupOf
         (Subgroup.centralizer (fc.P : Set G))).normalCore))).Normal :=
     model.range_normal.comap _
@@ -280,7 +280,7 @@ theorem eq_P_or_eq_invImageF_of_conj_invariant
     (hinv : ∀ c ∈ Subgroup.centralizer (fc.P : Set G), ∀ s ∈ S, c * s * c⁻¹ ∈ S) :
     S = fc.P ∨ S = fc.invImageF model := by
   classical
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
   set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
   have hSL : S ≤ L := hSR.trans (fc.invImageF_le_centralizer model)
@@ -347,7 +347,7 @@ translation subgroup `emb(F)`, which is abelian, so commutators die in `N = P`
 theorem commutator_invImageF_le_P (ind : Hypothesis.TheoremAInductionBelow G Ω)
     {r₁ r₂ : G} (h₁ : r₁ ∈ fc.invImageF model) (h₂ : r₂ ∈ fc.invImageF model) :
     r₁ * r₂ * r₁⁻¹ * r₂⁻¹ ∈ fc.P := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
   set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
   have h₁L : r₁ ∈ L := fc.invImageF_le_centralizer model h₁
@@ -377,7 +377,7 @@ theorem commutator_invImageF_le_P (ind : Hypothesis.TheoremAInductionBelow G Ω)
 theorem card_invImageF (ind : Hypothesis.TheoremAInductionBelow G Ω) :
     Nat.card ↥(fc.invImageF model) = Nat.card F * Nat.card ↥fc.P := by
   classical
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
   set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
   set Sbar : Subgroup (↥L ⧸ N') := MonoidHom.range model.emb with hSbardef
@@ -428,7 +428,7 @@ theorem card_centralizer_P (ind : Hypothesis.TheoremAInductionBelow G Ω) :
     Nat.card ↥(Subgroup.centralizer (fc.P : Set G))
       = Nat.card ↥fc.P * (Nat.card F *
           (Nat.card ↥(fc.rankOneQuotient).Q * Nat.card ↥(fc.rankOneQuotient).D)) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
   set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
@@ -436,7 +436,7 @@ theorem card_centralizer_P (ind : Hypothesis.TheoremAInductionBelow G Ω) :
   have h3 : Nat.card ↥L = Nat.card (↥L ⧸ N') * Nat.card ↥N' :=
     Subgroup.card_eq_card_quotient_mul_card_subgroup N'
   have h4 : Nat.card ↥(MonoidHom.range model.emb) * Nat.card ↥(fc.rankOneQuotient).H
-      = Nat.card (↥L ⧸ N') := model.isComplement.card_mul
+      = Nat.card (↥L ⧸ N') := model.isComplement.card_mul_card
   have hDH : (fc.rankOneQuotient).D ≤ (fc.rankOneQuotient).H := by
     rw [(fc.rankOneQuotient).D_def]; exact inf_le_left
   have hmul : ∀ x ∈ (fc.rankOneQuotient).H, ∃ q ∈ (fc.rankOneQuotient).Q,
@@ -451,7 +451,7 @@ theorem card_centralizer_P (ind : Hypothesis.TheoremAInductionBelow G Ω) :
   have hDQbot : (fc.rankOneQuotient).D ⊓ (fc.rankOneQuotient).Q = ⊥ := by
     rw [inf_comm]; exact (fc.rankOneQuotient).Q_inf_D_eq_bot
   have h5 := (Subgroup.isComplement'_subgroupOf_of_disjoint_mul_eq_univ
-    hDH (fc.rankOneQuotient).Q_le_H hDQbot hmul).card_mul
+    hDH (fc.rankOneQuotient).Q_le_H hDQbot hmul).card_mul_card
   have hQc : Nat.card ↥((fc.rankOneQuotient).Q.subgroupOf (fc.rankOneQuotient).H)
       = Nat.card ↥(fc.rankOneQuotient).Q :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe (fc.rankOneQuotient).Q_le_H).toEquiv
@@ -536,7 +536,7 @@ theorem false_of_ppart_subgroup_center_P {S : Subgroup G} {k c : ℕ}
     (hC : Nat.card ↥(Subgroup.centralizer (fc.P : Set G)) = fc.p ^ k * c)
     (hpc : ¬ fc.p ∣ c)
     (hGdvd : fc.p ^ (k + 1) ∣ Nat.card G) : False := by
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
   have hSp : IsPGroup fc.p ↥S := IsPGroup.of_card hcard
   obtain ⟨X, hSX⟩ := hSp.exists_le_sylow
   have hXdvd : fc.p ^ (k + 1) ∣ Nat.card ↥(X : Subgroup G) := by
@@ -586,9 +586,9 @@ theorem invImageF_mul_comm_of_not_dvd_card_D
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D →
       ∀ r₁ ∈ fc.invImageF model, ∀ r₂ ∈ fc.invImageF model, r₁ * r₂ = r₂ * r₁ := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
-  haveI : Finite F := Nat.finite_of_card_ne_zero
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Finite F := Nat.finite_of_card_ne_zero
     (by rw [hFcard]; exact (Nat.pow_pos fc.p_prime.pos).ne')
   intro hSigma
   by_contra hcon
@@ -603,8 +603,8 @@ theorem invImageF_mul_comm_of_not_dvd_card_D
         * Nat.card ↥(fc.rankOneQuotient).D) := by
     rw [fc.card_centralizer_P model ind, fc.card_P, hFcard]; ring
   have hQcard : Nat.card ↥(fc.rankOneQuotient).Q = fc.p ^ m - 1 := by
-    haveI := Fintype.ofFinite F
-    haveI := Classical.decEq F
+    have := Fintype.ofFinite F
+    have := Classical.decEq F
     rw [Nat.card_congr model.qEquiv.toEquiv, Nat.card_eq_fintype_card,
       Fintype.card_units, ← Nat.card_eq_fintype_card, hFcard]
   have hm1 : 1 ≤ m := by
@@ -635,7 +635,7 @@ theorem eq_one_of_dAut_sigmaElt_eq_id
     (hwW : w ∈ fc.toHypothesis.W) (hwP : w ∈ Subgroup.centralizer (fc.P : Set G))
     (hdw : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
       ∀ x : F, model.dAut (fc.sigmaElt hwW hwP) x = x) : w = 1 := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
   set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
   -- `dAut 1 = id` (specialize `dAut_conj` at the identity).
@@ -671,7 +671,7 @@ theorem not_forall_comm_of_mem_centralizer_W
     (hwW : w ∈ fc.toHypothesis.W) (hwP : w ∈ Subgroup.centralizer (fc.P : Set G))
     (hw1 : w ≠ 1) :
     ¬ (∀ r ∈ fc.invImageF model, w * r = r * w) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   intro hcen
   set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
   set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
@@ -703,7 +703,7 @@ quotient (the affine complement), hence lies in `N = P` (step (7)); and `P ⊓ W
 theorem invImageF_inf_centralizer_W_eq_bot
     (ind : Hypothesis.TheoremAInductionBelow G Ω) :
     fc.invImageF model ⊓ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) = ⊥ := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
   set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
   rw [eq_bot_iff]
@@ -771,7 +771,7 @@ theorem card_sup_invImageF_centralizer_W
     rw [inf_comm]
     exact fc.invImageF_inf_centralizer_W_eq_bot model ind
   have hcompl := (Subgroup.isComplement'_subgroupOf_of_disjoint_mul_eq_univ
-    (le_sup_right : CW ≤ R ⊔ CW) (le_sup_left : R ≤ R ⊔ CW) hbot hmul).card_mul
+    (le_sup_right : CW ≤ R ⊔ CW) (le_sup_left : R ≤ R ⊔ CW) hbot hmul).card_mul_card
   have hRc : Nat.card ↥(R.subgroupOf (R ⊔ CW)) = Nat.card ↥R :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv
   have hCWc : Nat.card ↥(CW.subgroupOf (R ⊔ CW)) = Nat.card ↥CW :=
@@ -792,7 +792,7 @@ theorem sup_centralizer_W_inf_centralizer_eq_P
         ((fc.invImageF model ⊔
           (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G) : Set G)
       = fc.P := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
   set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
   set R : Subgroup G := fc.invImageF model with hRdef
@@ -887,9 +887,9 @@ theorem invImageF_mul_comm_of_card_D_eq_p
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     Nat.card ↥(fc.rankOneQuotient).D = fc.p →
       ∀ r₁ ∈ fc.invImageF model, ∀ r₂ ∈ fc.invImageF model, r₁ * r₂ = r₂ * r₁ := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
-  haveI : Finite F := Nat.finite_of_card_ne_zero
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Finite F := Nat.finite_of_card_ne_zero
     (by rw [hF]; exact (Nat.pow_pos fc.p_prime.pos).ne')
   intro hD
   by_contra hcon
@@ -914,8 +914,8 @@ theorem invImageF_mul_comm_of_card_D_eq_p
     rw [fc.card_centralizer_P model ind, fc.card_P, hF, hD]
     ring
   have hQcard : Nat.card ↥(fc.rankOneQuotient).Q = fc.p ^ 2 - 1 := by
-    haveI := Fintype.ofFinite F
-    haveI := Classical.decEq F
+    have := Fintype.ofFinite F
+    have := Classical.decEq F
     rw [Nat.card_congr model.qEquiv.toEquiv, Nat.card_eq_fintype_card,
       Fintype.card_units, ← Nat.card_eq_fintype_card, hF]
   have hpQ : ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).Q := by
@@ -939,7 +939,7 @@ theorem invImageF_mul_comm
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
     (hm : Nat.card F = fc.p ^ m) :
     ∀ r₁ ∈ fc.invImageF model, ∀ r₂ ∈ fc.invImageF model, r₁ * r₂ = r₂ * r₁ := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   obtain ⟨e⟩ := fc.sigma_mulEquiv_centralizer_W ind
   have hDCW : Nat.card ↥(fc.rankOneQuotient).D
       = Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) :=

@@ -41,7 +41,7 @@ theorem CharacterDegreeCore.exists_hSharpBase [Finite G]
           Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
         OddOrder.Peterfalvi.S03.characterKernel
           (φ₀ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ)) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   obtain ⟨j, δ, θ, hj, hδ, hθirr, hθ1, hθP, hμeq, hμτ⟩ :=
     core.mu_col_tau1_eta_col_one
   exact ⟨⟨θ, hθirr⟩, hθP⟩
@@ -62,7 +62,7 @@ theorem CharacterDegreeCore.exists_hSharpBase_ne_lambda [Finite G]
           (φ₀ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ)) ∧
       ClassFunction.induce (hyp.H.subgroupOf hyp.S)
           (φ₀ : ClassFunction ↥(hyp.H.subgroupOf hyp.S) ℂ) ≠ lam.lambda := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   obtain ⟨j, δ, θ, hj, hδ, hθirr, hθ1, hθP, hμeq, hμτ⟩ :=
     core.mu_col_tau1_eta_col_one
   refine ⟨⟨θ, hθirr⟩, hθP, ?_⟩
@@ -80,7 +80,7 @@ theorem lambda_tau1_norm_one_core [Finite G] {hyp : Hypothesis (G := G)}
     core.tau1S lam.lambda ∈ ZIrr G ∧
       ClassFunction.inner (core.tau1S lam.lambda) (core.tau1S lam.lambda) = 1 ∧
       ClassFunction.inner lam.lambda lam.lambda = 1 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   obtain ⟨θ, hθirr, -, hlamEq, x₀, hx₀P, hx₀ker⟩ :=
     lam.lambda_induced_from_PC_linear
   have hθP : ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :

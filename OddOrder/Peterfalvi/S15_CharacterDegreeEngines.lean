@@ -123,16 +123,16 @@ theorem Hypothesis.exists_muT_index_core_of_base_condition [Finite G]
   set HU : Subgroup ↥hyp.T := huSub data with hHU
   have hHUeq : HU = (derivedInG hyp.T).subgroupOf hyp.T :=
     huSub_eq_derivedInG_subgroupOf data
-  haveI hHUnorm : HU.Normal := huSub_normal data
+  have hHUnorm : HU.Normal := huSub_normal data
   -- Subgroup bookkeeping: `Q ≤ T`, `Q.subgroupOf T` normal & abelian, `K = QD = Q` (`hD`),
   -- `Q ≤ T' = HU`.
   have hQT : hyp.Q ≤ hyp.T := by
     rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
-  haveI hQnorm : (hyp.Q.subgroupOf hyp.T).Normal :=
+  have hQnorm : (hyp.Q.subgroupOf hyp.T).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQT).mpr (by
       rw [hyp.Q_eq_TF]
       exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.T)
-  haveI hQsubComm : IsMulCommutative ↥(hyp.Q.subgroupOf hyp.T) := by
+  have hQsubComm : IsMulCommutative ↥(hyp.Q.subgroupOf hyp.T) := by
     have e := Subgroup.subgroupOfEquivOfLe hQT
     exact ⟨⟨fun a b => e.injective (by
       rw [map_mul, map_mul]
@@ -725,13 +725,13 @@ theorem Q_sharp_hypothesis76_base_cCoeff_int [Finite G]
   intro i
   set K : Subgroup ↥hyp.T := (Q_sharp_hypothesis76_base hG hyp hvd φ₀).H.subgroupOf hyp.T
     with hKdef
-  haveI hKnorm : K.Normal :=
+  have hKnorm : K.Normal :=
     OddOrder.Peterfalvi.S09.Cert.subgroupOf_normal_of_conj
       (Q_sharp_hypothesis76_base hG hyp hvd φ₀).H_normal_in_L
   -- `K ≅ Q` is abelian, so every `θ_j` is linear and all `ζ_j` have degree `[T:K]`.
   have hQT : hyp.Q ≤ hyp.T := by
     rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
-  haveI hKcomm : IsMulCommutative ↥K := by
+  have hKcomm : IsMulCommutative ↥K := by
     have e := Subgroup.subgroupOfEquivOfLe
       (show (Q_sharp_hypothesis76_base hG hyp hvd φ₀).H ≤ hyp.T from hQT)
     exact ⟨⟨fun a b => e.injective (by

@@ -68,7 +68,7 @@ private lemma commutator_le_center_of_index_pow_two
     {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
     (h_idx : (Subgroup.center T).index = p ^ 2) :
     _root_.commutator T ≤ Subgroup.center T := by
-  haveI hZnorm : (Subgroup.center T).Normal := inferInstance
+  have hZnorm : (Subgroup.center T).Normal := inferInstance
   -- `T ⧸ Z(T)` of order p² is abelian.
   have h_card_quot : Nat.card (T ⧸ Subgroup.center T) = p ^ 2 := by
     rw [← Subgroup.index_eq_card]; exact h_idx
@@ -84,7 +84,7 @@ private lemma normal_of_center_le_of_center_index_pow_two
     {T : Type*} [Group T] [Finite T] {p : ℕ} [hp : Fact p.Prime]
     (h_idx : (Subgroup.center T).index = p ^ 2)
     {C : Subgroup T} (hZ_le_C : Subgroup.center T ≤ C) : C.Normal := by
-  haveI hZnorm : (Subgroup.center T).Normal := inferInstance
+  have hZnorm : (Subgroup.center T).Normal := inferInstance
   -- T/Z(T) of order p² is abelian.
   have h_card_quot : Nat.card (T ⧸ Subgroup.center T) = p ^ 2 := by
     rw [← Subgroup.index_eq_card]; exact h_idx
@@ -93,7 +93,7 @@ private lemma normal_of_center_le_of_center_index_pow_two
       (IsPGroup.isMulCommutative_of_card_eq_prime_sq (p := p) h_card_quot)
   -- Image of C under the quotient map: C/Z(T) ≤ T/Z(T).
   let C' : Subgroup (T ⧸ Subgroup.center T) := C.map (QuotientGroup.mk' (Subgroup.center T))
-  haveI hC'Norm : C'.Normal := by
+  have hC'Norm : C'.Normal := by
     -- Subgroups of an abelian quotient are normal: g*n*g⁻¹ = n via mul_comm.
     refine ⟨fun n hn g => ?_⟩
     have h_eq : g * n * g⁻¹ = n := by
@@ -150,7 +150,7 @@ theorem quotient_commutator_not_isCyclic_of_center_index_prime_sq
   have hker : f.ker ≤ Subgroup.center T := by
     rw [QuotientGroup.ker_mk']
     exact commutator_le_center_of_index_pow_two h_idx
-  haveI : IsCyclic (T ⧸ _root_.commutator T) := h_cyc
+  have : IsCyclic (T ⧸ _root_.commutator T) := h_cyc
   exact hxy ((f.isMulCommutative_of_isCyclic_of_ker_le_center hker).is_comm.comm x y)
 
 /-- **Lem 6.15 `p = 2` setup**: the image of Isaacs's cyclic subgroup `C` in `T/T'`
@@ -165,9 +165,9 @@ theorem quotient_commutator_image_cyclic_index_two_of_center_index_four
     (hC_lt_T : C < ⊤) (hZ_lt_C : Subgroup.center T < C) :
     IsCyclic (C.map (QuotientGroup.mk' (_root_.commutator T))) ∧
       (C.map (QuotientGroup.mk' (_root_.commutator T))).index = 2 := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   constructor
-  · haveI : IsCyclic C := hC_cyclic
+  · have : IsCyclic C := hC_cyclic
     exact isCyclic_of_surjective
       ((QuotientGroup.mk' (_root_.commutator T)).subgroupMap C)
       ((QuotientGroup.mk' (_root_.commutator T)).subgroupMap_surjective C)
@@ -195,7 +195,7 @@ private lemma card_commutator_eq_prime_of_lem_6_15
     index_eq_prime_of_center_lt_of_center_index_pow_two h_idx hZ_lt_C hC_lt_T
   -- Cyclic quotient T/C.
   have hCT_card : Nat.card (T ⧸ C) = p := by rw [← Subgroup.index_eq_card]; exact hC_idx
-  haveI : IsCyclic (T ⧸ C) := isCyclic_of_prime_card hCT_card
+  have : IsCyclic (T ⧸ C) := isCyclic_of_prime_card hCT_card
   -- Use Lem 4.6: |commutator T| · |C ⊓ Z(T)| = |C|.
   have h_lem46 :
       Nat.card (_root_.commutator T) * Nat.card (C ⊓ Subgroup.center T : Subgroup T)
@@ -205,8 +205,8 @@ private lemma card_commutator_eq_prime_of_lem_6_15
       (A := C) ?_ ?_
     · -- C abelian (cyclic)
       intro a ha b hb
-      haveI := hC_cyclic
-      letI : CommGroup C := IsCyclic.commGroup
+      have := hC_cyclic
+      let : CommGroup C := IsCyclic.commGroup
       have h_comm : ∀ x y : ↥C, x * y = y * x := mul_comm
       exact congrArg (fun (z : ↥C) => (z : T)) (h_comm ⟨a, ha⟩ ⟨b, hb⟩)
     · -- T/C cyclic
@@ -261,7 +261,7 @@ private lemma pow_p_mem_center_of_index_pow_two_odd
     (h_idx : (Subgroup.center T).index = p ^ 2) (x : T) :
     x ^ p ∈ Subgroup.center T := by
   -- T/Z(T) has order p² and is noncyclic (otherwise T abelian, contradiction).
-  haveI hZnorm : (Subgroup.center T).Normal := inferInstance
+  have hZnorm : (Subgroup.center T).Normal := inferInstance
   have h_card_quot : Nat.card (T ⧸ Subgroup.center T) = p ^ 2 := by
     rw [← Subgroup.index_eq_card]; exact h_idx
   -- Get T is nonabelian:
@@ -272,12 +272,12 @@ private lemma pow_p_mem_center_of_index_pow_two_odd
     let f : T →* T ⧸ Subgroup.center T := QuotientGroup.mk' (Subgroup.center T)
     have hker : f.ker ≤ Subgroup.center T := by
       rw [QuotientGroup.ker_mk']
-    letI : IsCyclic (T ⧸ Subgroup.center T) := h_cyc
+    let : IsCyclic (T ⧸ Subgroup.center T) := h_cyc
     have h_comm : ∀ a b : T, a * b = b * a :=
       (f.isMulCommutative_of_isCyclic_of_ker_le_center hker).is_comm.comm
     exact hab (h_comm a b)
   -- T/Z(T) of order p² noncyclic ⇒ exponent = p.
-  haveI hp_prime : Fact p.Prime := hp
+  have hp_prime : Fact p.Prime := hp
   have h_quot_exp : Monoid.exponent (T ⧸ Subgroup.center T) = p :=
     (not_isCyclic_iff_exponent_eq_prime hp.out h_card_quot).mp h_quot_not_cyclic
   -- So every element x : T satisfies (x : T/Z(T))^p = 1, i.e., x^p ∈ Z(T).
@@ -353,10 +353,10 @@ private lemma card_setOfPowEqOne_inf_le_prime
   -- Every element x ∈ K ⊓ C satisfies x^p = 1, so orderOf x ∣ p, i.e., orderOf x = 1 or p.
   -- A finite cyclic group all of whose elements have order dividing p has order ≤ p.
   -- Approach: take generator g of K ⊓ C (cyclic); g^p = 1; orderOf g ≤ p; |K ⊓ C| = orderOf g.
-  haveI : IsCyclic ((K ⊓ C : Subgroup T).subgroupOf C) :=
+  have : IsCyclic ((K ⊓ C : Subgroup T).subgroupOf C) :=
     Subgroup.isCyclic_of_le (le_top : (K ⊓ C : Subgroup T).subgroupOf C ≤ ⊤)
   -- The subgroup K ⊓ C ↪ C is cyclic.
-  haveI : IsCyclic (K ⊓ C : Subgroup T) := by
+  have : IsCyclic (K ⊓ C : Subgroup T) := by
     -- Use isCyclic_of_le with K ⊓ C ≤ C: but this needs a coercion from Subgroup C, while
     -- here both K ⊓ C and C are subgroups of T. We use the equivalence via subgroupOf.
     refine isCyclic_of_injective ((K ⊓ C : Subgroup T).inclusion (inf_le_right : K ⊓ C ≤ C)) ?_
@@ -449,7 +449,7 @@ private theorem char_elementaryAbelian_p_sq_of_index_p_sq_odd
       IsElementaryAbelian p K ∧ Nat.card K = p ^ 2 := by
   have hC : _root_.commutator T ≤ Subgroup.center T :=
     commutator_le_center_of_index_pow_two h_idx
-  haveI hC_normal : C.Normal :=
+  have hC_normal : C.Normal :=
     normal_of_center_le_of_center_index_pow_two h_idx hZ_lt_C.le
   -- |commutator T| = p
   have h_card_comm : Nat.card (_root_.commutator T) = p :=
@@ -584,13 +584,13 @@ private theorem char_elementaryAbelian_4_of_noncyclic_abelian_2group
     -- (c) |K ⊓ D| = 2: lower from involution z = d^(|D|/2); upper from cyclic K∩D / exponent 2.
     -- (d) D.relIndex K ∣ D.index = 2 (D normal).
     -- (e) For |K| ≥ 4: construct a' ∈ K \ D, then (K ⊓ D as sub of K) has index ≥ 2 in K.
-    haveI hD_norm : D.Normal := by
+    have hD_norm : D.Normal := by
       refine ⟨fun n hn g => ?_⟩
       have h_eq : g * n * g⁻¹ = n := by
         rw [hAb g n, mul_assoc, mul_inv_cancel, mul_one]
       rw [h_eq]; exact hn
     -- |D| is a 2-power.
-    haveI hp2 : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+    have hp2 : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
     have hD_two : IsPGroup 2 (D : Subgroup A) := h_two.to_subgroup D
     obtain ⟨kD, hD_pow⟩ := (IsPGroup.iff_card (p := 2) (G := (D : Subgroup A))).mp hD_two
     -- |D| ≠ 1 (else |A| = 2 ⇒ cyclic).
@@ -665,14 +665,14 @@ private theorem char_elementaryAbelian_4_of_noncyclic_abelian_2group
         intro hmem
         rw [Finset.mem_singleton] at hmem
         exact h_ne hmem.symm
-      haveI : Fintype (K ⊓ D : Subgroup A) := Fintype.ofFinite _
+      have : Fintype (K ⊓ D : Subgroup A) := Fintype.ofFinite _
       have h_le_card : ({⟨1, h1_in⟩, ⟨z, hz_in⟩} : Finset (K ⊓ D : Subgroup A)).card
           ≤ Fintype.card (K ⊓ D : Subgroup A) := Finset.card_le_univ _
       rw [Nat.card_eq_fintype_card]
       omega
     -- |K ⊓ D| ≤ 2: K ⊓ D ≤ D cyclic, exponent dvd 2.
     have h_inf_le_two : Nat.card (K ⊓ D : Subgroup A) ≤ 2 := by
-      haveI : IsCyclic ((K ⊓ D : Subgroup A) : Subgroup A) := by
+      have : IsCyclic ((K ⊓ D : Subgroup A) : Subgroup A) := by
         refine isCyclic_of_injective ((K ⊓ D : Subgroup A).inclusion
           (inf_le_right : K ⊓ D ≤ D)) ?_
         exact Subgroup.inclusion_injective _
@@ -854,7 +854,7 @@ private theorem char_elementaryAbelian_4_of_noncyclic_abelian_2group
     -- Define the four elements as a Finset in K.
     have h_one_in_K : (1 : A) ∈ K := K.one_mem
     -- Now build the cardinality.
-    haveI : Fintype K := Fintype.ofFinite _
+    have : Fintype K := Fintype.ofFinite _
     let S : Finset K :=
       {⟨1, h_one_in_K⟩, ⟨z, hz_K_in⟩, ⟨a', ha'_in_K⟩, ⟨a' * z, ha'z_in_K⟩}
     have hS_card : S.card = 4 := by
@@ -975,8 +975,8 @@ theorem card_lift_quotient_commutator_eq_eight_of_center_index_four
     (hE_image_card :
       Nat.card (E.map (QuotientGroup.mk' (_root_.commutator T))) = 4) :
     Nat.card E = 8 := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI : C.Normal :=
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : C.Normal :=
     normal_of_center_le_of_center_index_pow_two (p := 2) h_idx hZ_lt_C.le
   have hcomm_card : Nat.card (_root_.commutator T) = 2 :=
     card_commutator_eq_prime_of_lem_6_15
@@ -1041,7 +1041,7 @@ private lemma not_isCyclic_of_quotient_commutator_image_four
     not_isCyclic_of_isElementaryAbelian_two_card_four
       hE_image_elem hE_image_card
   intro hE_cyclic
-  haveI : IsCyclic E := hE_cyclic
+  have : IsCyclic E := hE_cyclic
   exact hImage_not (isCyclic_of_surjective
     ((QuotientGroup.mk' (_root_.commutator T)).subgroupMap E)
     ((QuotientGroup.mk' (_root_.commutator T)).subgroupMap_surjective E))
@@ -1050,7 +1050,7 @@ private lemma not_isCyclic_of_quotient_commutator_image_four
 lemma subgroupOf_isCyclic_of_isCyclic
     {T : Type*} [Group T] {C E : Subgroup T} (hC_cyclic : IsCyclic C) :
     IsCyclic (C.subgroupOf E) := by
-  haveI : IsCyclic C := hC_cyclic
+  have : IsCyclic C := hC_cyclic
   let f : C.subgroupOf E →* C := {
     toFun := fun x => ⟨((x : C.subgroupOf E) : E), by
       have hx : ((x : C.subgroupOf E) : E) ∈ C.subgroupOf E := x.2
@@ -1129,9 +1129,9 @@ private lemma mem_of_pow_card_eq_one_of_isCyclic_subgroup
     (K : Subgroup A) {x : A} (hx : x ^ Nat.card K = 1) :
     x ∈ K := by
   classical
-  haveI : IsCyclic A := hA_cyclic
-  haveI : Fintype A := Fintype.ofFinite A
-  letI : CommGroup A := IsCyclic.commGroup
+  have : IsCyclic A := hA_cyclic
+  have : Fintype A := Fintype.ofFinite A
+  let : CommGroup A := IsCyclic.commGroup
   let P : Subgroup A := {
     carrier := {x | x ^ Nat.card K = 1}
     one_mem' := by simp
@@ -1151,7 +1151,7 @@ private lemma mem_of_pow_card_eq_one_of_isCyclic_subgroup
         (⟨y, hy⟩ : K) ^ Nat.card K = 1 := pow_card_eq_one'
     exact congrArg Subtype.val h_sub
   have hP_card_le : Nat.card P ≤ Nat.card K := by
-    haveI : Fintype P := Fintype.ofFinite P
+    have : Fintype P := Fintype.ofFinite P
     have hroot :=
       (IsCyclic.card_pow_eq_one_le (α := A) (n := Nat.card K) Nat.card_pos)
     rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
@@ -1167,7 +1167,7 @@ private lemma le_index_two_subgroup_of_lt_top_of_cyclic_two_group
     {A : Type*} [Group A] [Finite A] (hA_two : IsPGroup 2 A) (hA_cyclic : IsCyclic A)
     {Z H : Subgroup A} (hZ_idx : Z.index = 2) (hH_lt_top : H < ⊤) :
     H ≤ Z := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨kA, hA_card⟩ := (IsPGroup.iff_card (p := 2) (G := A)).mp hA_two
   obtain ⟨kH, hH_card⟩ := (IsPGroup.iff_card (p := 2) (G := H)).mp
     (hA_two.to_subgroup H)
@@ -1303,7 +1303,7 @@ theorem exists_lift_order_eight_noncyclic_cyclic_index_two_of_center_index_four
   obtain ⟨E, hE_char, hcomm_le_E, hE_image_elem, hE_image_card, hE_card⟩ :=
     exists_lift_quotient_commutator_order_eight_of_center_index_four
       hT_two h_idx hC_cyclic hC_lt_T hZ_lt_C
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hC_idx : C.index = 2 :=
     index_eq_prime_of_center_lt_of_center_index_pow_two
       (p := 2) h_idx hZ_lt_C hC_lt_T
@@ -1323,7 +1323,7 @@ theorem exists_lift_order_eight_noncyclic_cyclic_index_two_of_center_index_four
     not_ge_of_ne_of_ne_top_of_index_two hC_idx hE_ne_C hE_ne_top
   have hE_not_le_C : ¬ E ≤ C := by
     intro hE_le_C
-    haveI : IsCyclic C := hC_cyclic
+    have : IsCyclic C := hC_cyclic
     exact hE_not_cyclic (Subgroup.isCyclic_of_le hE_le_C)
   have hCE_idx : (C.subgroupOf E).index = 2 := by
     simpa [Subgroup.relIndex] using
@@ -1355,7 +1355,7 @@ theorem exists_lift_order_eight_noncyclic_abelian_cyclic_index_two_of_center_ind
     hE_not_cyclic, hCE_cyclic, hCE_idx⟩ :=
     exists_lift_order_eight_noncyclic_cyclic_index_two_of_center_index_four
       hT_two hT_card_ne h_idx hC_cyclic hC_lt_T hZ_lt_C
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hC_idx : C.index = 2 :=
     index_eq_prime_of_center_lt_of_center_index_pow_two
       (p := 2) h_idx hZ_lt_C hC_lt_T

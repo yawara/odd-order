@@ -87,7 +87,7 @@ theorem exists_int_block_sum_eq_irreducibleBrauerCharacter (hN : N ≠ 0)
         algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π μ₀ g)
           = ∑ i : ι', (a i : K) * algebraMap 𝒪 K (ordinaryCharacter (𝒪 := 𝒪) e i g) := by
   classical
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   have hinj : Function.Injective (algebraMap 𝒪 K) := IsFractionRing.injective 𝒪 K
   -- (1) Navarro (2.16) gives integers; move the identity to `𝒪`
   obtain ⟨a, ha⟩ := exists_int_sum_wedderburnRepresentation e hN hgN hωBT hp

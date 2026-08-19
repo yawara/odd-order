@@ -97,7 +97,7 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
   obtain ⟨M, hMmax, hxMσ⟩ := hne
   have hord1 : orderOf x ≠ 1 := fun h => hx (orderOf_eq_one_iff.mp h)
   obtain ⟨q, hqp, hqdvd⟩ := (orderOf x).exists_prime_and_dvd hord1
-  haveI : Fact q.Prime := ⟨hqp⟩
+  have : Fact q.Prime := ⟨hqp⟩
   obtain ⟨gsub, hgord⟩ := exists_prime_orderOf_dvd_card' q
     (show q ∣ Nat.card ↥(Subgroup.zpowers x) by rw [Nat.card_zpowers]; exact hqdvd)
   have hgord' : orderOf (gsub : G) = q :=
@@ -208,7 +208,7 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
     -- Decompose `c = v * a` with `v ∈ N_σ`, `a ∈ M ⊓ N` (in `↥N`, since `N_σ ⊴ N`).
     have hcN : c ∈ N := ((Subgroup.centralizer_le_normalizer (X : Set G)).trans hNge) hcC
     have hMσN_le : OddOrder.BG.Ch3.S10.Msigma N ≤ N := OddOrder.BG.Ch3.S10.Msigma_le N
-    haveI hH'normal : ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).Normal := by
+    have hH'normal : ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).Normal := by
       rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
     have hsup' : (OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N ⊔ (M ⊓ N).subgroupOf N = ⊤ := by
       rw [← Subgroup.subgroupOf_sup hMσN_le inf_le_right, hsigmaSup, Subgroup.subgroupOf_self]
@@ -272,7 +272,7 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
     rw [← Subgroup.zpowers_eq_closure, Nat.card_zpowers]
   have hπτ2 : ∀ p ∈ piSet (Subgroup.closure {x}), p ∈ tau2 N := by
     -- A nonidentity `w ∈ N_σ` centralizing `x` (from `R(x) ≠ 1`).
-    haveI : Nontrivial ↥(OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G)) :=
+    have : Nontrivial ↥(OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G)) :=
       (Subgroup.nontrivial_iff_ne_bot _).mpr hRx
     obtain ⟨wsub, hwsub⟩ :=
       exists_ne (1 : ↥(OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G)))
@@ -289,7 +289,7 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
     have hxσN : ∀ p ∈ piSet (Subgroup.closure {x}), p ∉ OddOrder.BG.Ch3.S10.sigma N := by
       intro p hp
       have hp' : p ∈ (orderOf x).primeFactors := by
-        rw [piSet, Set.mem_setOf_eq, hcardx] at hp; exact hp
+        rw [piSet, Set.mem_ofPred_eq, hcardx] at hp; exact hp
       have hpσM : p ∈ OddOrder.BG.Ch3.S10.sigma M :=
         OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p (Nat.mem_primeFactors.mpr
           ⟨Nat.prime_of_mem_primeFactors hp', (Nat.dvd_of_mem_primeFactors hp').trans
@@ -301,7 +301,7 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
     rcases sigma_diagnostic hG D hNmax hwsharp hxN hx hxCw hxσN with ⟨hκ, _⟩ | ⟨hτ2, _, _⟩
     · exfalso
       have hqπ : q ∈ piSet (Subgroup.closure ({x} : Set G)) := by
-        rw [piSet, Set.mem_setOf_eq, hcardx]
+        rw [piSet, Set.mem_ofPred_eq, hcardx]
         exact Nat.mem_primeFactors.mpr ⟨hqp, hqdvd, (orderOf_pos x).ne'⟩
       have h2 := ((mem_tau2_iff N q).mp hqτ2N).2
       rcases (hκ q hqπ).2.1 with h1 | h3
@@ -314,7 +314,7 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
   refine ⟨N, ⟨hNmax, hCxN, hRx, ?_, hπτ2, ?_, ?_⟩, ?_⟩
   · -- `R(x) = N_σ ∩ C_G(x)` is a Hall `σ(N)`-subgroup of `C_G(x)`: it is a `σ(N)`-group, and its
     -- index `(N_σ).relIndex C_G(x) ∣ (N_σ).relIndex N = [N : N_σ] ∣ [G : N_σ]` is `σ(N)'`.
-    haveI hK₀normal : ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).Normal := by
+    have hK₀normal : ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).Normal := by
       rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
     refine ⟨?_, ?_⟩
     · intro p hp
@@ -362,7 +362,7 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
     -- (`q ∈ π(⟨x⟩) ⊆ τ₂(N)`).
     intro M₂ hM₂mem
     obtain ⟨hM₂max, hxM₂σ⟩ := hM₂mem
-    haveI hMσNnormal : ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).Normal := by
+    have hMσNnormal : ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).Normal := by
       rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
     have hMσN_le : OddOrder.BG.Ch3.S10.Msigma N ≤ N := OddOrder.BG.Ch3.S10.Msigma_le N
     have hXM₂σ : X ≤ OddOrder.BG.Ch3.S10.Msigma M₂ := hXx.trans (Subgroup.zpowers_le.mpr hxM₂σ)
@@ -372,7 +372,7 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
         ⟨hqp, hqdvd.trans ((OddOrder.BG.Ch3.S10.Msigma M₂).orderOf_dvd_natCard hxM₂σ),
           Nat.card_pos.ne'⟩)
     have hqπ : q ∈ piSet (Subgroup.closure ({x} : Set G)) := by
-      rw [piSet, Set.mem_setOf_eq, hcardx]
+      rw [piSet, Set.mem_ofPred_eq, hcardx]
       exact Nat.mem_primeFactors.mpr ⟨hqp, hqdvd, (orderOf_pos x).ne'⟩
     have hqnσN : q ∉ OddOrder.BG.Ch3.S10.sigma N := fun h => tau2_subset_sigma_compl N (hπτ2 q hqπ)
         h
@@ -407,12 +407,12 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
       intro p hp
       obtain ⟨hpτ2N, hppiN⟩ := hp
       have hpp : p.Prime := Nat.prime_of_mem_primeFactors hppiN
-      haveI : Fact p.Prime := ⟨hpp⟩
+      have : Fact p.Prime := ⟨hpp⟩
       have hM₂N_pi : Subgroup.IsPiSubgroup ((OddOrder.BG.Ch3.S10.sigma N)ᶜ) (M₂ ⊓ N) := by
         intro r hr
         rw [Set.mem_compl_iff]
         intro hrσN
-        haveI : Fact r.Prime := ⟨Nat.prime_of_mem_primeFactors hr⟩
+        have : Fact r.Prime := ⟨Nat.prime_of_mem_primeFactors hr⟩
         obtain ⟨z, hz⟩ := exists_prime_orderOf_dvd_card' r
           (Nat.dvd_of_mem_primeFactors hr : r ∣ Nat.card ↥(M₂ ⊓ N))
         have hzord : orderOf (z : G) = r :=
@@ -461,7 +461,8 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
           · rw [← Subgroup.normal_mul, ← Subgroup.subgroupOf_sup hMσN_le inf_le_right,
               hsigmaSup₂, Subgroup.subgroupOf_self, Subgroup.coe_top]
         have hcardEq : Nat.card ↥(EN.subgroupOf N) = Nat.card ↥((M₂ ⊓ N).subgroupOf N) :=
-          Nat.eq_of_mul_eq_mul_left Nat.card_pos (hcompl_EN.card_mul.trans hcompl_M₂N.card_mul.symm)
+          Nat.eq_of_mul_eq_mul_left Nat.card_pos
+              (hcompl_EN.card_mul_card.trans hcompl_M₂N.card_mul_card.symm)
         have hcard : Nat.card ↥EN = Nat.card ↥(M₂ ⊓ N) := by
           rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hN_E.E_le).toEquiv,
             ← Nat.card_congr (Subgroup.subgroupOfEquivOfLe (inf_le_right : M₂ ⊓ N ≤ N)).toEquiv]
@@ -666,10 +667,10 @@ theorem sigma_eq_of_mem_sigma_of_mem_sigma [Finite G]
       (OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG hM hM' hnc) hpM hpM'
   ext q
   refine ⟨fun hq => ?_, fun hq => ?_⟩
-  · haveI : Fact q.Prime :=
+  · have : Fact q.Prime :=
       ⟨Nat.prime_of_mem_primeFactors ((OddOrder.BG.Ch3.S10.mem_sigma_iff M q).mp hq).1⟩
     exact OddOrder.BG.Ch3.S10.sigma_conj g hq
-  · haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors
+  · have : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors
       ((OddOrder.BG.Ch3.S10.mem_sigma_iff (MulAut.conj g • M) q).mp hq).1⟩
     have h := OddOrder.BG.Ch3.S10.sigma_conj g⁻¹ hq
     rwa [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at h
@@ -683,7 +684,7 @@ theorem exists_mem_sigma_of_prime_dvd_card [Finite G] (hG : OddOrder.BG.IsMinima
     {p : ℕ} [Fact p.Prime] (hpG : p ∣ Nat.card G) :
     ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ p ∈ OddOrder.BG.Ch3.S10.sigma M := by
   classical
-  haveI : IsSimpleGroup G := hG.simple
+  have : IsSimpleGroup G := hG.simple
   obtain ⟨P⟩ : Nonempty (Sylow p G) := inferInstance
   have hPcard : Nat.card ↥(P : Subgroup G) = p ^ (Nat.card G).factorization p :=
     P.card_eq_multiplicity
@@ -699,7 +700,7 @@ theorem exists_mem_sigma_of_prime_dvd_card [Finite G] (hG : OddOrder.BG.IsMinima
       have hPG : IsPGroup p G := by
         have he : IsPGroup p ↥(⊤ : Subgroup G) := ht ▸ P.isPGroup'
         exact he.of_equiv Subgroup.topEquiv
-      haveI := hPG.isNilpotent
+      have := hPG.isNilpotent
       infer_instance
   obtain ⟨M, hMco, hNM⟩ := (eq_top_or_exists_le_coatom _).resolve_left hNne
   have hM : M ∈ maximalSubgroups G := mem_maximalSubgroups.mpr hMco
@@ -746,7 +747,7 @@ theorem sigmaLength_eq_zero_iff [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
     by_contra hx1
     have hox : orderOf x ≠ 1 := fun h => hx1 (orderOf_eq_one_iff.mp h)
     obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hox
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     obtain ⟨M, hMmax, hpσ⟩ :=
       exists_mem_sigma_of_prime_dvd_card hG (hpdvd.trans (orderOf_dvd_natCard x))
     have hne : sigmaPart M x ≠ 1 := by
@@ -777,7 +778,8 @@ theorem exists_mem_Msigma_of_isPiElement_sigma [Finite G]
   have hclosne : Subgroup.closure ({x} : Set G) ≠ ⊥ := fun h =>
     hx (Subgroup.mem_bot.mp (h ▸ Subgroup.subset_closure (Set.mem_singleton x)))
   have hlt : Subgroup.closure ({x} : Set G) < ⊤ := by
-    refine lt_top_iff_ne_top.mpr (fun htop => hG.notSolvable (isSolvable_of_comm fun a b => ?_))
+    refine lt_top_iff_ne_top.mpr (fun htop => hG.notSolvable
+        (Group.isSolvable_of_comm fun a b => ?_))
     have hmem : ∀ y : G, y ∈ Subgroup.zpowers x := fun y => by
       rw [Subgroup.zpowers_eq_closure, htop]; exact Subgroup.mem_top y
     obtain ⟨m, rfl⟩ := hmem a
@@ -824,7 +826,7 @@ theorem sigmaLength_eq_one_iff [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     obtain ⟨⟨M₀, hM₀, hy_eq⟩, hyne⟩ := hyMem
     have hxσ : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M₀) x := by
       intro p hp
-      haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+      have : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
       obtain ⟨L, hL, hpL⟩ := exists_mem_sigma_of_prime_dvd_card hG
         ((Nat.dvd_of_mem_primeFactors hp).trans (orderOf_dvd_natCard x))
       have hLne : sigmaPart L x ≠ 1 := fun hc =>
@@ -875,7 +877,7 @@ theorem tau2_element_sigmaLength_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
   -- a `τ₂(M)`-prime `p ∣ |x'|`, and a rank-two `τ₂(M)` elementary abelian `A ≤ E`.
   have hord_ne : orderOf x' ≠ 1 := by rwa [Ne, orderOf_eq_one_iff]
   obtain ⟨p, hp_prime, hp_dvd⟩ := (orderOf x').exists_prime_and_dvd hord_ne
-  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have : Fact p.Prime := ⟨hp_prime⟩
   have hpτ2 : p ∈ tau2 M :=
     hpiSet p (Nat.mem_primeFactors.mpr ⟨hp_prime, hp_dvd, (orderOf_pos x').ne'⟩)
   obtain ⟨A, hAea, hAE⟩ := exists_elemAb_rank_two_le_E_of_tau2 hG hsetup hpτ2
@@ -893,7 +895,7 @@ theorem tau2_element_sigmaLength_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
   -- every prime of `x'` lands in `σ(N)`, so `x'` is a `σ(N)`-element.
   have hx'σ : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma N) x' := by
     intro q hq
-    haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hq⟩
+    have : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hq⟩
     exact (tau2_prime_mem_sigma_diff_beta hG hsetup hpτ2 hAea hAE hNcontain
       (Nat.prime_of_mem_primeFactors hq) (hpiSet q hq)).1
   exact (sigmaLength_eq_one_iff hG x').mpr
@@ -913,7 +915,7 @@ theorem exists_length_one_factor [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
       OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M)ᶜ x' := by
   classical
   obtain ⟨p, hp, hpg⟩ := (orderOf g).exists_prime_and_dvd (fun h => hg (orderOf_eq_one_iff.mp h))
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hpG : p ∣ Nat.card G := hpg.trans (orderOf_dvd_natCard g)
   obtain ⟨M, hM, hpσM⟩ := exists_mem_sigma_of_prime_dvd_card hG hpG
   obtain ⟨x, x', hmul, hcomm, hxπ, hx'π, hxz, hx'z⟩ :=
@@ -1010,7 +1012,7 @@ theorem isPiElement_sigmaCompl_of_mem_Rsub [Finite G]
     have hcardz : Nat.card ↥(Subgroup.closure ({z} : Set G)) = orderOf z := by
       rw [← Subgroup.zpowers_eq_closure, Nat.card_zpowers]
     have hqπ : q ∈ piSet (Subgroup.closure ({z} : Set G)) := by
-      rw [piSet, Set.mem_setOf_eq, hcardz]
+      rw [piSet, Set.mem_ofPred_eq, hcardz]
       exact Nat.mem_primeFactors.mpr ⟨hqp, hqdvd, (orderOf_pos z).ne'⟩
     have hqσM : q ∈ OddOrder.BG.Ch3.S10.sigma M :=
       OddOrder.BG.Ch3.S10.Msigma_isPiGroup M q (Nat.mem_primeFactors.mpr

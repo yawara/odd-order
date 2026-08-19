@@ -24,7 +24,7 @@ theorem P_inf_U_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     hyp.base.P ⊓ hyp.base.U = ⊥ := by
   obtain ⟨data, _⟩ := OddOrder.Peterfalvi.S15.basic_structure hG hyp.base
-  haveI : IsMulCommutative ↥hyp.base.P :=
+  have : IsMulCommutative ↥hyp.base.P :=
     IsMulCommutative.of_comm data.P_elementaryAbelian.comm
   have hP_le_cent : hyp.base.P ≤ Subgroup.centralizer (hyp.base.P : Set G) :=
     Subgroup.le_centralizer (H := hyp.base.P)
@@ -316,7 +316,7 @@ theorem fieldNormalizerKernelTransport_injective (hyp : Hypothesis (G := G))
     (e : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
          Additive ↥hyp.base.P ≃+ GaloisField hyp.base.p hyp.base.q) :
     Function.Injective (fieldNormalizerKernelTransport hyp e) := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   intro m n hmn
   rw [fieldNormalizerKernelTransport_apply, fieldNormalizerKernelTransport_apply] at hmn
   have h1 : (Additive.toMul (e.symm (Multiplicative.toAdd m)) : ↥hyp.base.P) =
@@ -331,7 +331,7 @@ theorem fieldNormalizerKernelTransport_range (hyp : Hypothesis (G := G))
     (e : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
          Additive ↥hyp.base.P ≃+ GaloisField hyp.base.p hyp.base.q) :
     (fieldNormalizerKernelTransport hyp e).range = hyp.base.P := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   apply le_antisymm
   · rintro _ ⟨m, rfl⟩
     rw [fieldNormalizerKernelTransport_apply]
@@ -380,7 +380,7 @@ theorem fieldNormalizerComplementTransport_exists (hyp : Hypothesis (G := G))
     ∃ v : ↥hyp.base.U,
       (μ v : (GaloisField hyp.base.p hyp.base.q)ˣ) = (u : (GaloisField hyp.base.p hyp.base.q)ˣ) ∧
         fieldNormalizerComplementTransport hyp μ hμ_inj hμ_range u = (v : G) := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   set μ' : ↥hyp.base.U →* ↥(OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q) :=
     { toFun := fun u => ⟨μ u, hμ_range ▸ MonoidHom.mem_range.mpr ⟨u, rfl⟩⟩
       map_one' := by ext; simp
@@ -411,7 +411,7 @@ theorem fieldNormalizerComplementTransport_injective (hyp : Hypothesis (G := G))
     (hμ_range : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
          μ.range = OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q) :
     Function.Injective (fieldNormalizerComplementTransport hyp μ hμ_inj hμ_range) := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   intro a b hab
   obtain ⟨va, hva_mu, hva⟩ := fieldNormalizerComplementTransport_exists hyp μ hμ_inj hμ_range a
   obtain ⟨vb, hvb_mu, hvb⟩ := fieldNormalizerComplementTransport_exists hyp μ hμ_inj hμ_range b
@@ -430,7 +430,7 @@ theorem fieldNormalizerComplementTransport_range (hyp : Hypothesis (G := G))
     (hμ_range : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
          μ.range = OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q) :
     (fieldNormalizerComplementTransport hyp μ hμ_inj hμ_range).range = hyp.base.U := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   apply le_antisymm
   · rintro _ ⟨u, rfl⟩
     obtain ⟨v, _, hv⟩ := fieldNormalizerComplementTransport_exists hyp μ hμ_inj hμ_range u
@@ -451,6 +451,7 @@ theorem fieldNormalizerComplementTransport_range (hyp : Hypothesis (G := G))
     change (hyp.base.U.subtype.comp eU.symm.toMonoidHom) (eU ⟨g, hg⟩) = g
     simp
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **(14.7) σ-bridge assembly.**  Given the full Peterfalvi (14.2)(a) field model
 (the additive isomorphism `e`, the multiplicative character `μ` realizing `U = U*`, the
 `U`-equivariance `hcompat`, the prime-line/`W₂` identification `hW2`), together with the
@@ -487,7 +488,7 @@ theorem fieldNormalizerData_of_repr (hyp : Hypothesis (G := G))
     (yQ : G) (hyQ_mem : yQ ∈ hyp.base.Q)
     (hW2_conj_y : MulAut.conj yQ • hyp.base.W2 ≤ Subgroup.normalizer (hyp.base.U : Set G)) :
     Nonempty (FieldNormalizerData hyp) := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   -- the `SemidirectProduct.lift` compatibility: `fN (u • s) = fU u * fN s * (fU u)⁻¹`,
   -- which is exactly the (14.2)(a) `U`-equivariance `hcompat` transported through the iso.
   have hcompatLift : ∀ u : OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q,
@@ -598,8 +599,8 @@ theorem fieldNormalizerData_of_repr (hyp : Hypothesis (G := G))
       OddOrder.BG.AppC.NormSet.normOneFrobeniusSubspaceKernel]
     rw [Subgroup.map_map, hsigma, SemidirectProduct.lift_comp_inl]
     exact hW2
-  haveI : Finite G := hyp.base.finiteG
-  haveI : Fact hyp.base.q.Prime := ⟨hyp.base.q_prime⟩
+  have : Finite G := hyp.base.finiteG
+  have : Fact hyp.base.q.Prime := ⟨hyp.base.q_prime⟩
   exact ⟨{
     sigma := sigma
     sigma_injective := hsigma_inj
@@ -695,12 +696,12 @@ theorem exists_pu_field_repr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
             ↥hyp.base.P))
           = ((μ v : (GaloisField hyp.base.p hyp.base.q)ˣ) :
               GaloisField hyp.base.p hyp.base.q) * e (Additive.ofMul x) := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
-  haveI : NeZero hyp.base.p := ⟨hyp.base.p_prime.ne_zero⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  have : NeZero hyp.base.p := ⟨hyp.base.p_prime.ne_zero⟩
   obtain ⟨data, _⟩ := OddOrder.Peterfalvi.S15.basic_structure hG hyp.base
-  haveI hPcomm : IsMulCommutative ↥hyp.base.P :=
+  have hPcomm : IsMulCommutative ↥hyp.base.P :=
     IsMulCommutative.of_comm data.P_elementaryAbelian.comm
-  letI hUcomm : CommGroup ↥hyp.base.U :=
+  let hUcomm : CommGroup ↥hyp.base.U :=
     { (inferInstance : Group ↥hyp.base.U) with
       mul_comm := fun a b => (isMulCommutative_iff.mp data.U_commutative) a b }
   have hpsmul : ∀ x : Additive ↥hyp.base.P, (hyp.base.p : ℕ) • x = 0 := by
@@ -708,7 +709,7 @@ theorem exists_pu_field_repr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     apply Additive.toMul.injective
     rw [toMul_nsmul, toMul_zero]
     exact data.P_elementaryAbelian.pow_eq_one x.toMul
-  haveI hPmod : Module (ZMod hyp.base.p) (Additive ↥hyp.base.P) :=
+  have hPmod : Module (ZMod hyp.base.p) (Additive ↥hyp.base.P) :=
     AddCommGroup.zmodModule hpsmul
   -- the conjugation representation of `U` on `Additive ↥P`
   let conjHom : ↥hyp.base.U →* MulAut ↥hyp.base.P :=
@@ -719,7 +720,7 @@ theorem exists_pu_field_repr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hρ_apply : ∀ (c : ↥hyp.base.U) (a : Additive ↥hyp.base.P),
       ρ c a = Additive.ofMul ((conjHom c) (Additive.toMul a)) := fun _ _ => rfl
   -- `Additive ↥P` as an `𝔽_p[U]`-module *directly* (sidesteps the `asModule` synth trap)
-  letI hPmodAlg :
+  let hPmodAlg :
       Module (MonoidAlgebra (ZMod hyp.base.p) ↥hyp.base.U) (Additive ↥hyp.base.P) :=
     Module.compHom (Additive ↥hyp.base.P) (ρ.asAlgebraHom).toRingHom
   have hof_smul : ∀ (c : ↥hyp.base.U) (a : Additive ↥hyp.base.P),
@@ -730,7 +731,7 @@ theorem exists_pu_field_repr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       change (ρ.asAlgebraHom (MonoidAlgebra.of (ZMod hyp.base.p) ↥hyp.base.U c)) a = ρ c a
       rw [Representation.asAlgebraHom_of]
     rw [h, hρ_apply]
-  haveI hNeZero : NeZero (Nat.card ↥hyp.base.U : ZMod hyp.base.p) := by
+  have hNeZero : NeZero (Nat.card ↥hyp.base.U : ZMod hyp.base.p) := by
     refine ⟨fun h => ?_⟩
     rw [hu_full] at h
     have hdvd : hyp.base.p ∣ (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) :=
@@ -794,7 +795,7 @@ theorem mu_range_eq_normOneUnits {hyp : Hypothesis (G := G)}
     (hinj : Function.Injective μ) :
     letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
     μ.range = OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   set d := (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) with hd
   have hq0 : hyp.base.q ≠ 0 := hyp.base.q_prime.ne_zero
   have hGcard : Nat.card (GaloisField hyp.base.p hyp.base.q)ˣ = hyp.base.p ^ hyp.base.q - 1 := by
@@ -871,17 +872,17 @@ theorem field_repr_rescale_to_W2 (hyp : Hypothesis (G := G))
             ({(1 : GaloisField hyp.base.p hyp.base.q)} :
               Set (GaloisField hyp.base.p hyp.base.q))).toAddSubgroup).toSubgroup).map
           (fieldNormalizerKernelTransport hyp e) = hyp.base.W2 := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
-  haveI : NeZero hyp.base.p := ⟨hyp.base.p_prime.ne_zero⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  have : NeZero hyp.base.p := ⟨hyp.base.p_prime.ne_zero⟩
   -- `ZMod p`-linearity reduces to `nsmul` (any module over `ZMod p`)
   have hsmul_red : ∀ (r : ZMod hyp.base.p) (x : GaloisField hyp.base.p hyp.base.q),
       r • x = r.val • x := by
     intro r x
     rw [← Nat.cast_smul_eq_nsmul (ZMod hyp.base.p) r.val x, ZMod.natCast_rightInverse r]
   -- a nonidentity element of the prime line `W₂ ≤ P`
-  haveI hW2fin : Finite ↥hyp.base.W2 := Nat.finite_of_card_ne_zero (by
+  have hW2fin : Finite ↥hyp.base.W2 := Nat.finite_of_card_ne_zero (by
     rw [← hyp.base.p_eq_card_W2]; exact hyp.base.p_prime.ne_zero)
-  haveI : Nontrivial ↥hyp.base.W2 := Finite.one_lt_card_iff_nontrivial.mp (by
+  have : Nontrivial ↥hyp.base.W2 := Finite.one_lt_card_iff_nontrivial.mp (by
     rw [← hyp.base.p_eq_card_W2]; exact hyp.base.p_prime.one_lt)
   obtain ⟨w0', hw0'_ne⟩ := exists_ne (1 : ↥hyp.base.W2)
   have hw0G_ne : (w0' : G) ≠ 1 := fun h => hw0'_ne (OneMemClass.coe_eq_one.mp h)
@@ -977,7 +978,7 @@ theorem exists_pu_field_repr_W2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
             ({(1 : GaloisField hyp.base.p hyp.base.q)} :
               Set (GaloisField hyp.base.p hyp.base.q))).toAddSubgroup).toSubgroup).map
           (fieldNormalizerKernelTransport hyp e) = hyp.base.W2 := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   obtain ⟨e₀, μ, hμinj, hcompat₀⟩ := exists_pu_field_repr hG hyp hu_full
   obtain ⟨e, hcompat, hW2⟩ := field_repr_rescale_to_W2 hyp hW2_le_P e₀ μ hcompat₀
   exact ⟨e, μ, hμinj, hcompat, hW2⟩

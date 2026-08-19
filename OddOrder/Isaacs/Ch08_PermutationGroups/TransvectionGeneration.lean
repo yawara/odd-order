@@ -268,6 +268,7 @@ private lemma det_listTransvec_prod (L : List (TransvectionStruct n 𝕜)) :
 private def tsSL (t : TransvectionStruct n 𝕜) : Matrix.SpecialLinearGroup n 𝕜 :=
   ⟨t.toMatrix, t.det⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The special-linear lift of a list of transvection structures. -/
 private lemma coe_listTransvecSL_prod (L : List (TransvectionStruct n 𝕜)) :
     (((L.map tsSL).prod : Matrix.SpecialLinearGroup n 𝕜) : Matrix n n 𝕜) =

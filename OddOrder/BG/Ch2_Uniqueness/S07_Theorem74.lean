@@ -193,6 +193,7 @@ theorem kSubgroup_eq_bot_of_centralizer_isPiSubgroup [Finite G] {A : Subgroup G}
     kSubgroup A = ⊥ :=
   opiCoreInG_compl_eq_bot_of_isPiSubgroup hCpi
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **BG §7 の Note** (Hypothesis 7.1 直後, mmd L2145): Hypothesis 7.1 のもとで、
 `C_G(A)` の任意の `π'`-元は `K = O_{π'}(C_G(A))` に入る。
 
@@ -235,7 +236,7 @@ theorem mem_kSubgroup_of_piPrime_mem_centralizer [Finite G] (hG : IsMinimalSimpl
       apply le_antisymm le_top
       rw [← hX_top]
       exact hX_le
-    haveI hA_normal : A.Normal := Subgroup.normalizer_eq_top_iff.mp hnorm_top
+    have hA_normal : A.Normal := Subgroup.normalizer_eq_top_iff.mp hnorm_top
     rcases hG.simple.eq_bot_or_eq_top_of_normal A hA_normal with h | h
     · exact hA.ne_bot h
     · exact hA.proper.ne h
@@ -275,7 +276,7 @@ theorem mem_kSubgroup_of_piPrime_mem_centralizer [Finite G] (hG : IsMinimalSimpl
     exact Nat.mem_primeFactors.mpr ⟨(Nat.mem_primeFactors.mp hr).1,
       dvd_trans (Nat.mem_primeFactors.mp hr).2.1
         (Subgroup.card_dvd_of_le inf_le_left), Nat.card_pos.ne'⟩
-  haveI hWC_normal : (W.subgroupOf C).Normal := by
+  have hWC_normal : (W.subgroupOf C).Normal := by
     constructor
     intro n hn g
     rw [Subgroup.mem_subgroupOf] at hn ⊢
@@ -323,7 +324,7 @@ theorem lt_normalizer_inf_of_pgroup_lt [Finite G] {q : ℕ} [Fact q.Prime]
     {P Q : Subgroup G} (hP : IsPGroup q ↥P) (hQP : Q < P) :
     Q < P ⊓ Subgroup.normalizer Q := by
   classical
-  haveI : Group.IsNilpotent ↥P := hP.isNilpotent
+  have : Group.IsNilpotent ↥P := hP.isNilpotent
   have hNC : NormalizerCondition ↥P := Group.normalizerCondition_of_isNilpotent (G := ↥P)
   have hQ_le : Q ≤ P := le_of_lt hQP
   have hsub_lt_top : Q.subgroupOf P < ⊤ := by
@@ -352,9 +353,9 @@ theorem lt_top_of_mem_hInvariantStar [Finite G] (hG : IsMinimalSimpleOdd G)
     hQtop ▸ hInvariantStar_isPiSubgroup hQ
   have hpg : IsPGroup q ↥(⊤ : Subgroup G) :=
     OddOrder.Isaacs.Ch04.isPGroup_of_isPiGroup_singleton hpi
-  haveI : Group.IsNilpotent ↥(⊤ : Subgroup G) := hpg.isNilpotent
+  have : Group.IsNilpotent ↥(⊤ : Subgroup G) := hpg.isNilpotent
   exact hG.notSolvable
-    (solvable_of_surjective (MonoidHom.range_eq_top.mp (Subgroup.range_subtype ⊤)))
+    (Group.isSolvable_of_surjective (MonoidHom.range_eq_top.mp (Subgroup.range_subtype ⊤)))
 
 /-! ## Lemma 7.1 — 推移性の基底補題 -/
 
@@ -376,7 +377,7 @@ theorem commonConstruction [Finite G] (hG : IsMinimalSimpleOdd G)
   set N : Subgroup G := opiCoreInG (primesOf A)ᶜ H with hN_def
   have hN_le_H : N ≤ H := opiCoreInG_le _ _
   have hN_lt : N < ⊤ := lt_of_le_of_lt hN_le_H hHproper
-  haveI hN_solv : IsSolvable ↥N := hG.solvable_of_lt_top N hN_lt
+  have hN_solv : Group.IsSolvable ↥N := hG.isSolvable_of_lt_top N hN_lt
   have hN_inv : Ch03.IsAInvariant (conjAction A) N := by
     rw [isAInvariant_conjAction_iff]
     exact le_trans hAH (le_normalizer_opiCoreInG (primesOf A)ᶜ H)
@@ -593,7 +594,7 @@ theorem inductiveLemma [Finite G] (hG : IsMinimalSimpleOdd G)
       have hNQ_lt : Subgroup.normalizer ((Q₁ ⊓ Q₂ : Subgroup G) : Set G) < ⊤ := by
         rw [lt_top_iff_ne_top]
         intro htop
-        haveI hnorm : (Q₁ ⊓ Q₂).Normal := Subgroup.normalizer_eq_top_iff.mp htop
+        have hnorm : (Q₁ ⊓ Q₂).Normal := Subgroup.normalizer_eq_top_iff.mp htop
         rcases hG.simple.eq_bot_or_eq_top_of_normal (Q₁ ⊓ Q₂) hnorm with hh | hh
         · exact hQinf hh
         · exact (ne_of_lt hQ_proper) hh
@@ -710,7 +711,7 @@ theorem exists_mem_inf_centralizer_ne_bot_of_not_isCyclic [Finite G]
       exact hcon ⟨(x : G), x.2, fun h => hx_ne (Subtype.ext (by rw [h]; rfl)), hne⟩
     rw [hxbot, Subgroup.bot_subgroupOf]
   rw [htop, top_le_iff] at hle
-  haveI : Nontrivial ↥Q := (Subgroup.nontrivial_iff_ne_bot Q).mpr hQ
+  have : Nontrivial ↥Q := (Subgroup.nontrivial_iff_ne_bot Q).mpr hQ
   exact bot_ne_top hle
 
 /-- **BG Prop 1.16(2), conjugation form**: a noncyclic abelian `B ≤ G` normalizing a coprime
@@ -747,7 +748,7 @@ theorem exists_cocyclic_inf_centralizer_ne_bot_of_not_isCyclic [Finite G]
     rw [hcon Y (Subgroup.map_subtype_le _) hYcocyc] at hmemG
     exact Subgroup.mem_bot.mpr (Subtype.ext (Subgroup.mem_bot.mp hmemG))
   rw [htop, top_le_iff] at hle
-  haveI : Nontrivial ↥Q := (Subgroup.nontrivial_iff_ne_bot Q).mpr hQ
+  have : Nontrivial ↥Q := (Subgroup.nontrivial_iff_ne_bot Q).mpr hQ
   exact bot_ne_top hle
 
 /-- `n ≤ rank G` で `n > 0` なら、ある素数 `p` で `n ≤ pRank G p` (`rank_le_iff` の逆向き)。 -/
@@ -814,10 +815,10 @@ private theorem not_isCyclic_of_cocyclic [Finite G] {p : ℕ} (hp2 : 2 ≤ p) {B
     (hYB : Y ≤ B) {b : G} (hb : b ∈ B) (hsup : Y ⊔ Subgroup.zpowers b = B) :
     ¬ IsCyclic ↥Y := by
   classical
-  haveI : IsMulCommutative ↥B := IsMulCommutative.of_comm hB_ea.1
+  have : IsMulCommutative ↥B := IsMulCommutative.of_comm hB_ea.1
   set Y' : Subgroup ↥B := Y.subgroupOf B with hY'
   set K : Subgroup ↥B := (Subgroup.zpowers b).subgroupOf B with hK
-  haveI : Y'.Normal := Subgroup.normal_of_isMulCommutative _
+  have : Y'.Normal := Subgroup.normal_of_isMulCommutative _
   have hzple : Subgroup.zpowers b ≤ B := Subgroup.zpowers_le.mpr hb
   have hsup' : Y' ⊔ K = ⊤ := by
     apply Subgroup.map_injective B.subtype_injective
@@ -870,7 +871,7 @@ theorem centralizer_singleton_lt_top [Finite G] (hG : IsMinimalSimpleOdd G) {x :
   have hZbot : Subgroup.center G = ⊥ := by
     rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
     · exact h
-    · exact absurd (isSolvable_of_comm fun a b =>
+    · exact absurd (Group.isSolvable_of_comm fun a b =>
         (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm) hG.notSolvable
   rw [lt_top_iff_ne_top]
   intro htop
@@ -913,12 +914,12 @@ theorem transitive_of_three_le_rank_center [Finite G] (hG : IsMinimalSimpleOdd G
     exact (hQ₁.2 Q₂ (hInvariantStar_mem_hInvariant hQ₂) (by rw [hQ₁bot]; exact bot_le)).symm
   · have hQ₂bot : Q₂ ≠ ⊥ := fun h =>
       hQ₁bot ((hQ₂.2 Q₁ (hInvariantStar_mem_hInvariant hQ₁) (by rw [h]; exact bot_le)).trans h)
-    haveI : IsMulCommutative ↥B := IsMulCommutative.of_comm hB_ea.1
+    have : IsMulCommutative ↥B := IsMulCommutative.of_comm hB_ea.1
     obtain ⟨Y, hYB, ⟨b, hbB, hsup⟩, hYQ₁⟩ :=
       exists_cocyclic_inf_centralizer_ne_bot_of_not_isCyclic
         (le_trans hBA (hInvariantStar_le_normalizer hQ₁)) hB_nc (hCop hBA hQ₁) hQ₁bot
     have hY_nc : ¬ IsCyclic ↥Y := not_isCyclic_of_cocyclic hp2 hB_ea hB_log hYB hbB hsup
-    haveI : IsMulCommutative ↥Y :=
+    have : IsMulCommutative ↥Y :=
       IsMulCommutative.of_comm fun x y => Subtype.ext (by
         change (x : G) * (y : G) = (y : G) * (x : G)
         exact congrArg (Subtype.val : ↥B → G) (hB_ea.1 ⟨(x : G), hYB x.2⟩ ⟨(y : G), hYB y.2⟩))
@@ -962,6 +963,7 @@ theorem hInvariantStar_eq_of_three_le_rank_center_of_centralizer_isPiSubgroup [F
   hInvariantStar_eq_of_three_le_rank_center_of_kSubgroup_eq_bot hG hA hq hm
     (kSubgroup_eq_bot_of_centralizer_isPiSubgroup hCpi) hQ₁ hQ₂
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **BG Theorem 7.3** (mmd L2187): Hypothesis 7.1, `q ∈ π'`, `m(Z(A)) ≥ 2` かつ
 `q ∈ π(C_G(A))` ⇒ `K` は `ℋ_G*(A;q)` 上推移的。`R ⊇ Sylow_q(C_G(A))` 経由で Lem 7.1 を連鎖。 -/
 theorem transitive_of_two_le_rank_center_of_dvd [Finite G] (hG : IsMinimalSimpleOdd G)
@@ -974,7 +976,7 @@ theorem transitive_of_two_le_rank_center_of_dvd [Finite G] (hG : IsMinimalSimple
   have hZbot : Subgroup.center G = ⊥ := by
     rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
     · exact h
-    · exact absurd (isSolvable_of_comm fun a b =>
+    · exact absurd (Group.isSolvable_of_comm fun a b =>
         (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm) hG.notSolvable
   have hCGx_proper : ∀ x : G, x ≠ 1 → Subgroup.centralizer ({x} : Set G) < ⊤ := by
     intro x hx
@@ -987,7 +989,7 @@ theorem transitive_of_two_le_rank_center_of_dvd [Finite G] (hG : IsMinimalSimple
   -- `B ≤ Z(A)` noncyclic elementary abelian.
   obtain ⟨p, B, hB_ea, hB_nc, _hB_log, hBA, hB_cent⟩ :=
     exists_elementaryAbelian_le_center_of_le_rank (n := 2) le_rfl hm
-  haveI : IsMulCommutative ↥B := IsMulCommutative.of_comm hB_ea.1
+  have : IsMulCommutative ↥B := IsMulCommutative.of_comm hB_ea.1
   -- coprimality `(|B|, |Q|) = 1` for any `Q ∈ ℋ_G*(A;q)`.
   have hCop_BQ : ∀ Q : Subgroup G, Q ∈ hInvariantStar ⊤ A {q} →
       Nat.Coprime (Nat.card ↥B) (Nat.card ↥Q) := by

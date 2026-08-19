@@ -33,7 +33,7 @@ Isaacs Problem 3D.1(b) (`G` の `p`-length ≤ Sylow `p`-部分群の冪零類) 
 
 namespace OddOrder.Isaacs.Ch03
 
-open Subgroup
+open _root_.OddOrder.Isaacs.Ch03.Subgroup
 
 section /- 3D: π-length -/
 
@@ -59,7 +59,7 @@ instance oPiCoreOver.normal (π : Set ℕ) (N : Subgroup G) : (oPiCoreOver π N)
   rw [oPiCoreOver]
   split
   · rename_i h
-    haveI := h
+    have := h
     infer_instance
   · infer_instance
 
@@ -138,7 +138,7 @@ theorem oPiCoreOver_eq_comap_map (π : Set ℕ) {M N : Subgroup G} [M.Normal] [N
     (hMN : M ≤ N) :
     oPiCoreOver π N
       = (oPiCoreOver π (N.map (QuotientGroup.mk' M))).comap (QuotientGroup.mk' M) := by
-  haveI hNbar : (N.map (QuotientGroup.mk' M)).Normal :=
+  have hNbar : (N.map (QuotientGroup.mk' M)).Normal :=
     (inferInstance : N.Normal).map _ (QuotientGroup.mk'_surjective M)
   set e := QuotientGroup.quotientQuotientEquivQuotient M N hMN with he
   have hoPi : (oPiCore π (G ⧸ N)).comap

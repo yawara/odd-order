@@ -50,10 +50,10 @@ theorem ordProj_dvd_finrank_of_character_eq_zero [Fact p.Prime] (S : Sylow p G)
     (hvan : ∀ x : G, ¬ IsPRegular p x → ρ.character x = 0) :
     ordProj[p] (Nat.card G) ∣ Module.finrank K V := by
   classical
-  letI : Fintype ↥(S : Subgroup G) := Fintype.ofFinite _
+  let : Fintype ↥(S : Subgroup G) := Fintype.ofFinite _
   have hcard : Fintype.card ↥(S : Subgroup G) = ordProj[p] (Nat.card G) := by
     rw [← Nat.card_eq_fintype_card]; exact S.card_eq_multiplicity
-  haveI : Invertible ((Fintype.card ↥(S : Subgroup G) : ℕ) : K) := by
+  have : Invertible ((Fintype.card ↥(S : Subgroup G) : ℕ) : K) := by
     refine invertibleOfNonzero ?_
     rw [hcard]
     exact_mod_cast pow_ne_zero _ (Fact.out (p := p.Prime)).pos.ne'

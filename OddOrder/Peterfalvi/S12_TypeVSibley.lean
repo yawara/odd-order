@@ -198,7 +198,7 @@ theorem TypeVData.isNilpotent_derivedInG_subgroupOf [Finite G] {M : Subgroup G}
     Group.IsNilpotent ↥((derivedInG M).subgroupOf M) := by
   have hMF : derivedInG M = maxNilpotentNormalHall M :=
     (TypeVData.derivedInG_eq_H dV dV.typeP).trans dV.typeP.H_eq
-  haveI : Group.IsNilpotent ↥(derivedInG M) := by
+  have : Group.IsNilpotent ↥(derivedInG M) := by
     rw [hMF]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent M
   exact Group.nilpotent_of_mulEquiv

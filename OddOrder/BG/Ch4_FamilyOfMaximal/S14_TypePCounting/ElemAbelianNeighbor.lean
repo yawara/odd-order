@@ -85,9 +85,9 @@ theorem msigma_structure_of_notMem_sigma_kappa [Finite G]
       have := hA.1.comm (⟨b, hb⟩ : ↥A) (⟨a, ha⟩ : ↥A)
       exact congrArg (Subtype.val) this
     -- Hypotheses for Theorem 3.7 (`N = M_σ`, `R = A`).
-    haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-    haveI : IsSolvable ↥(OddOrder.BG.Ch3.S10.Msigma M ⊔ A) :=
-      solvable_of_solvable_injective
+    have hMsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
+    have : Group.IsSolvable ↥(OddOrder.BG.Ch3.S10.Msigma M ⊔ A) :=
+      Group.isSolvable_of_isSolvable_injective
         (Subgroup.inclusion_injective (sup_le (OddOrder.BG.Ch3.S10.Msigma_le M) hAM))
     have hAnorm : A ≤ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma M) :=
       hAM.trans (le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M)
@@ -230,7 +230,7 @@ theorem Msigma_centralizer_E23_eq_bot_of_caseTau1 [Finite G]
       intro hb; exact hUne (by rw [hb, hE3, bot_sup_eq])
     have hcard2 : Nat.card ↥E₂ ≠ 1 := fun hc => hE2 (Subgroup.card_eq_one.mp hc)
     obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd hcard2
-    haveI : Fact q.Prime := ⟨hq⟩
+    have : Fact q.Prime := ⟨hq⟩
     obtain ⟨y', hy'⟩ := exists_prime_orderOf_dvd_card' (G := ↥E₂) q hqdvd
     have hy'E2 : (y' : G) ∈ E₂ := y'.2
     have hy'ord : orderOf (y' : G) = q :=
@@ -267,7 +267,7 @@ theorem Msigma_centralizer_E23_eq_bot_of_caseTau1 [Finite G]
   · -- Case `E₃ ≠ ⊥`: pick `p ∈ τ₃(M)` and a cyclic rank-one `A = ⟨g⟩ ≤ E₃`.
     have hcard3 : Nat.card ↥E₃ ≠ 1 := fun hc => hE3 (Subgroup.card_eq_one.mp hc)
     obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hcard3
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' (G := ↥E₃) p hpdvd
     have hgE3 : (g : G) ∈ E₃ := g.2
     have hgord : orderOf (g : G) = p :=
@@ -326,7 +326,7 @@ theorem isTISubset_sigmaSharp_of_sigma_eq_beta [Finite G]
         MulAut.conj g • OddOrder.BG.Ch3.S10.Msigma M) ≠ 1 := fun h =>
       hga1 (Subgroup.mem_bot.mp ((Subgroup.card_eq_one.mp h) ▸ hmemInf))
     obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hcard
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     -- `p ∈ σ(M)` since the intersection is `≤ M_σ`.
     have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M :=
       OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p (Nat.mem_primeFactors.mpr
@@ -357,7 +357,7 @@ theorem sigma_eq_beta_and_prime_card_E1_of_caseTau1 [Finite G]
     OddOrder.BG.Ch3.S10.sigma M = OddOrder.BG.Ch3.S10.beta M ∧
       ∃ q : ℕ, q.Prime ∧ Nat.card ↥E₁ = q := by
   classical
-  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
+  have hMsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups h.mem_maximal
   have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
   have hUleE_sup : (E₂ ⊔ E₃ : Subgroup G) ≤ E := sup_le h.E₂_le h.E₃_le
   -- `E = E₁ ⋉ U` is Frobenius; `C_{M_σ}(U) = 1` and `M_σ` is nilpotent.
@@ -380,8 +380,8 @@ theorem sigma_eq_beta_and_prime_card_E1_of_caseTau1 [Finite G]
     exact inf_le_inf_left _
       (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr hg₀E1))
   -- **Task B**: `U = [U, E₁] ≤ E'`.
-  haveI hE1solv : IsSolvable ↥E₁ :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective (h.E₁_le.trans h.E_le))
+  have hE1solv : Group.IsSolvable ↥E₁ :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective (h.E₁_le.trans h.E_le))
   have hUleE' : (E₂ ⊔ E₃ : Subgroup G) ≤ derivedInG E := by
     have hUcomm : (E₂ ⊔ E₃ : Subgroup G) ≤ ⁅E₁, E₂ ⊔ E₃⁆ :=
       OddOrder.BG.Ch2.S08.le_commutator_of_coprime_inf_centralizer_eq_bot
@@ -410,8 +410,8 @@ theorem sigma_eq_beta_and_prime_card_E1_of_caseTau1 [Finite G]
     rw [Nat.coprime_comm] at h1
     rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E_le).toEquiv,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσM).toEquiv] at h1
-  haveI hsolvME : IsSolvable ↥(OddOrder.BG.Ch3.S10.Msigma M ⊔ E) :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective (sup_le hMσM h.E_le))
+  have hsolvME : Group.IsSolvable ↥(OddOrder.BG.Ch3.S10.Msigma M ⊔ E) :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective (sup_le hMσM h.E_le))
   -- **Theorem 3.10(a)**: `|E₁|` has prime order.
   have hKprime : ∃ q : ℕ, q.Prime ∧ Nat.card ↥E₁ = q :=
     OddOrder.BG.Ch1.S03.prime_card_complement_of_frobenius_conj hsolvME hUleE_sup h.E₁_le hfrob
@@ -496,7 +496,7 @@ theorem E23_ne_bot_of_isTypeP2_caseTau1 [Finite G]
     intro p hp
     obtain ⟨hpπ, hpσ⟩ := hp
     obtain ⟨hpp, hpdvdM, _⟩ := Nat.mem_primeFactors.mp hpπ
-    haveI : Fact p.Prime := ⟨hpp⟩
+    have : Fact p.Prime := ⟨hpp⟩
     have hpnMσ : ¬ p ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) := fun hdvd =>
       hpσ (OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p
         (Nat.mem_primeFactors.mpr ⟨hpp, hdvd, Nat.card_pos.ne'⟩))
@@ -536,7 +536,7 @@ theorem typeP_sylow_not_le_kstar [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
   -- ## Part A: `ℳ(K*) ≠ {M}` — some maximal `Mi ≠ M` contains `K*`.
   obtain ⟨p₀, hp₀, hp₀dvd⟩ :=
     (Nat.card ↥K).exists_prime_and_dvd (fun hc => hKne (Subgroup.card_eq_one.mp hc))
-  haveI : Fact p₀.Prime := ⟨hp₀⟩
+  have : Fact p₀.Prime := ⟨hp₀⟩
   obtain ⟨w, hw⟩ := exists_prime_orderOf_dvd_card' p₀ hp₀dvd
   have hXcard : Nat.card ↥(Subgroup.zpowers (w : G)) = p₀ := by
     rw [Nat.card_zpowers]
@@ -627,7 +627,7 @@ theorem kstar_ne_msigma_aux [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     OddOrder.BG.Ch3.S10.Msigma_ne_bot hG h.mem_maximal
   obtain ⟨p, hp, hpdvd⟩ := (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)).exists_prime_and_dvd
     (fun hc => hMσne (Subgroup.card_eq_one.mp hc))
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨S, hSMσ, hSq, _, hScard⟩ := exists_einvariant_sylow_Msigma hG h p
   have hSmax : ∀ T : Subgroup G, T ≤ OddOrder.BG.Ch3.S10.Msigma M → IsPGroup p ↥T → S ≤ T → S = T :=
     fun T hTM hTq hST => eq_of_le_of_isPGroup_card_eq_factorization hScard hTM hTq hST
@@ -738,7 +738,7 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       -- (`hEnorm`), and `K^* = C_{M_σ}(K) ≤ C_G(X) ≤ N_G(X)`, `K^* ≤ M_σ ≤ M`.  `⊆` (BG "clear",
       -- needs the `M = M_σ ⋊ E` semidirect structure) is deferred.
       intro p hp X hXrank hXK
-      haveI : Fact p.Prime := ⟨hp⟩
+      have : Fact p.Prime := ⟨hp⟩
       refine le_antisymm ?_ ?_
       · -- ⊆: decompose `n = s·e` (`s ∈ M_σ`, `e ∈ E`) in `↥M`; for `g ∈ X#`, `s·(ege⁻¹)·s⁻¹ =
         -- ngn⁻¹ ∈ X ≤ E`, so `[s, ege⁻¹] ∈ M_σ ∩ E = 1`, i.e. `s` centralizes `ege⁻¹ ∈ E#`.
@@ -746,7 +746,7 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         intro n hn
         rw [Subgroup.mem_inf] at hn
         obtain ⟨hnX, hnM⟩ := hn
-        haveI hMσnorm : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
+        have hMσnorm : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
           rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
         have hsuptop : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ⊔ E.subgroupOf M = ⊤ := by
           rw [← Subgroup.subgroupOf_sup (OddOrder.BG.Ch3.S10.Msigma_le M) hsetup.E_le,
@@ -820,7 +820,7 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       obtain ⟨q, hq, hqdvd⟩ :=
         (Nat.card ↥(Kstar ⊓ (MulAut.conj g • M))).exists_prime_and_dvd
           (fun hc => hne (Subgroup.card_eq_one.mp hc))
-      haveI : Fact q.Prime := ⟨hq⟩
+      have : Fact q.Prime := ⟨hq⟩
       obtain ⟨w, hw⟩ := exists_prime_orderOf_dvd_card' q hqdvd
       have hXcard : Nat.card ↥(Subgroup.zpowers (w : G)) = q := by
         rw [Nat.card_zpowers]
@@ -876,7 +876,7 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         intro p hp
         obtain ⟨hpπ, hpσ⟩ := hp
         obtain ⟨hpp, hpdvdM, _⟩ := Nat.mem_primeFactors.mp hpπ
-        haveI : Fact p.Prime := ⟨hpp⟩
+        have : Fact p.Prime := ⟨hpp⟩
         have hpnMσ : ¬ p ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) := fun hdvd =>
           hpσ (OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p
             (Nat.mem_primeFactors.mpr ⟨hpp, hdvd, Nat.card_pos.ne'⟩))
@@ -889,7 +889,7 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     · -- (c) `ℳ(C_G(X)) = {M}` for `X ∈ ℰ¹(K*)`: `K* = C_{M_σ}(K) = C_{M_σ}(E)` (`K = E`),
       -- so the `C(E)`-form Corollary 12.14 helper (`…_centralizer_E`) applies directly.
       intro p hp X hXelem hXKstar
-      haveI : Fact p.Prime := ⟨hp⟩
+      have : Fact p.Prime := ⟨hp⟩
       exact maximalContaining_centralizer_of_le_Msigma_centralizer_E hG hsetup hE1ne hXelem
         (hKEeq ▸ hKstar ▸ hXKstar)
     · -- (e-core) `K* ⊊ M_σ` (BG Prop 14.2(e)): apply `kstar_ne_msigma_aux` with `E₁ ≤ K = E`.
@@ -904,7 +904,7 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   · -- Case `κ(M) ⊆ τ₁(M)`: `κ = τ₁`, and `K` is `M`-conjugate to `E₁` (both Hall `κ(M)`).
     -- Conjugate the `E`-setup by `w` (`conj w • E₁ = K`) and read the conjuncts off the new setup
     -- via the `E₁`-lemmas (Theorem 13.5 etc.), exactly as in case `τ₃` with `E₁` in place of `E`.
-    haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hsetup.mem_maximal
+    have hMsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hsetup.mem_maximal
     have hκτ1 : ∀ p ∈ kappa M, p ∈ tau1 M := fun p hpκ =>
       (kappa_subset_tau1_union_tau3 hpκ).resolve_right
         (fun hpτ3 => hτ3 ⟨p, Set.mem_inter hpκ hpτ3⟩)
@@ -940,11 +940,11 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       -- `ngn⁻¹ = bgb⁻¹`, so `s' := b⁻¹n` centralizes `g`, hence `s' ∈ C_{M_σ}(K) = K*` (prime
       -- action), `n = b·s'`, and `b = n·s'⁻¹ ∈ N_G(X) ⊓ E' ≤ K` by the Frobenius normalizer lemma.
       intro p hp X hXrank hXK
-      haveI : Fact p.Prime := ⟨hp⟩
+      have : Fact p.Prime := ⟨hp⟩
       have hKstar_ne : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) ≠ ⊥ :=
         Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular hKprime (le_refl K) hKnonreg
       have hKcentX : K ≤ Subgroup.centralizer (X : Set G) := by
-        letI : CommGroup ↥K := (subgroupE_basic hG h').2.2.2.1.1.commGroup
+        let : CommGroup ↥K := (subgroupE_basic hG h').2.2.2.1.1.commGroup
         intro k hk
         rw [Subgroup.mem_centralizer_iff]
         intro y hy
@@ -954,7 +954,7 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         intro n hn
         rw [Subgroup.mem_inf] at hn
         obtain ⟨hnX, hnM⟩ := hn
-        haveI hMσnorm : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
+        have hMσnorm : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
           rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
         have hsuptop : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ⊔
             (MulAut.conj w • E).subgroupOf M = ⊤ := by
@@ -1050,7 +1050,7 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       obtain ⟨q, hq, hqdvd⟩ :=
         (Nat.card ↥(Kstar ⊓ (MulAut.conj g • M))).exists_prime_and_dvd
           (fun hc => hne (Subgroup.card_eq_one.mp hc))
-      haveI : Fact q.Prime := ⟨hq⟩
+      have : Fact q.Prime := ⟨hq⟩
       obtain ⟨w', hw'⟩ := exists_prime_orderOf_dvd_card' q hqdvd
       have hXcard : Nat.card ↥(Subgroup.zpowers (w' : G)) = q := by
         rw [Nat.card_zpowers]
@@ -1097,7 +1097,7 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     · -- (c) `ℳ(C_G(X)) = {M}` for `X ∈ ℰ¹(K*)`: `K* = C_{M_σ}(K) = C_{M_σ}(E₁')` (`K = E₁'`),
       -- so the `C(E₁)`-form Corollary 12.14 helper (`…_centralizer_E1`) applies directly.
       intro p hp X hXelem hXKstar
-      haveI : Fact p.Prime := ⟨hp⟩
+      have : Fact p.Prime := ⟨hp⟩
       exact maximalContaining_centralizer_of_le_Msigma_centralizer_E1 hG h' hKne hXelem
         (hKstar ▸ hXKstar)
     · -- (e-core) `K* ⊊ M_σ` (BG Prop 14.2(e)): apply `kstar_ne_msigma_aux` with `E₁' = K`.
@@ -1161,7 +1161,7 @@ theorem typeP2_Msigma_isNilpotent [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     exact hP2.2 (kappa_eq_sigmaComplementPrimes_of_isPiGroup_card_E hG hsetup
       (fun q hq => mem_kappa_of_mem_primeFactors_card_E hG hsetup hEprime hxE3 hxne hxC hq))
   · -- `κ(M) ⊆ τ₁(M)`: conjugate the setup so its `E₁` is `K`, then apply Lemma 14.1 to `U`.
-    haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hsetup.mem_maximal
+    have hMsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hsetup.mem_maximal
     have hκτ1 : ∀ p ∈ kappa M, p ∈ tau1 M := fun p hpκ =>
       (kappa_subset_tau1_union_tau3 hpκ).resolve_right
         (fun hpτ3 => hτ3 ⟨p, Set.mem_inter hpκ hpτ3⟩)

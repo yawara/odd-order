@@ -62,7 +62,7 @@ theorem exists_projective_frame (hdim : finrank K V = 2)
       LinearIndependent K ![u, v] ∧
         mk K u hu = P₁ ∧ mk K v hv = P₂ ∧ mk K (u + v) huv = P₃ := by
   classical
-  haveI : FiniteDimensional K V := .of_finrank_eq_succ hdim
+  have : FiniteDimensional K V := .of_finrank_eq_succ hdim
   have hli : LinearIndependent K ![P₁.rep, P₂.rep] := linearIndependent_pair_iff_ne.mpr h12
   have hcard : Fintype.card (Fin 2) = finrank K V := by simp [hdim]
   set B : Basis (Fin 2) K V := basisOfLinearIndependentOfCardEqFinrank hli hcard with hBdef
@@ -113,7 +113,7 @@ theorem exists_projective_frame (hdim : finrank K V = 2)
 theorem exists_linearEquiv_frame (hdim : finrank K V = 2)
     {u v u' v' : V} (h : LinearIndependent K ![u, v]) (h' : LinearIndependent K ![u', v']) :
     ∃ T : V ≃ₗ[K] V, T u = u' ∧ T v = v' := by
-  haveI : FiniteDimensional K V := .of_finrank_eq_succ hdim
+  have : FiniteDimensional K V := .of_finrank_eq_succ hdim
   have hcard : Fintype.card (Fin 2) = finrank K V := by simp [hdim]
   have hB : ⇑(basisOfLinearIndependentOfCardEqFinrank h hcard) = ![u, v] :=
     coe_basisOfLinearIndependentOfCardEqFinrank h hcard
@@ -144,7 +144,7 @@ theorem exists_specialLinearGroup_frame (hdim : finrank K V = 2)
     {u v u' v' : V} (h : LinearIndependent K ![u, v]) (h' : LinearIndependent K ![u', v']) :
     ∃ (A : SpecialLinearGroup K V) (μ : K), μ ≠ 0 ∧
       (A : V ≃ₗ[K] V) u = μ • u' ∧ (A : V ≃ₗ[K] V) v = μ • v' := by
-  haveI : FiniteDimensional K V := .of_finrank_eq_succ hdim
+  have : FiniteDimensional K V := .of_finrank_eq_succ hdim
   obtain ⟨T, hTu, hTv⟩ := exists_linearEquiv_frame hdim h h'
   obtain ⟨μ, hμ⟩ := hsq ((T.det : K)⁻¹)
   have hdet0 : (T.det : K) ≠ 0 := T.det.ne_zero
@@ -185,7 +185,7 @@ theorem eq_one_of_fixes_three [CharP K 2] (hdim : finrank K V = 2)
     {P₁ P₂ P₃ : ℙ K V} (h12 : P₁ ≠ P₂) (h13 : P₁ ≠ P₃) (h23 : P₂ ≠ P₃)
     {A : SpecialLinearGroup K V} (hA1 : A • P₁ = P₁) (hA2 : A • P₂ = P₂)
     (hA3 : A • P₃ = P₃) : A = 1 := by
-  haveI : FiniteDimensional K V := .of_finrank_eq_succ hdim
+  have : FiniteDimensional K V := .of_finrank_eq_succ hdim
   obtain ⟨u, v, hu, hv, huv, hli, hP1, hP2, hP3⟩ := exists_projective_frame hdim h12 h13 h23
   subst hP1; subst hP2; subst hP3
   obtain ⟨a, -, hau⟩ := exists_smul_eq_of_smul_mk_eq hu hA1
@@ -246,7 +246,7 @@ theorem existsUnique_specialLinearGroup_of_three_distinct [CharP K 2]
     (hP12 : P₁ ≠ P₂) (hP13 : P₁ ≠ P₃) (hP23 : P₂ ≠ P₃)
     (hQ12 : Q₁ ≠ Q₂) (hQ13 : Q₁ ≠ Q₃) (hQ23 : Q₂ ≠ Q₃) :
     ∃! A : SpecialLinearGroup K V, A • P₁ = Q₁ ∧ A • P₂ = Q₂ ∧ A • P₃ = Q₃ := by
-  haveI : FiniteDimensional K V := .of_finrank_eq_succ hdim
+  have : FiniteDimensional K V := .of_finrank_eq_succ hdim
   obtain ⟨u, v, hu, hv, huv, hli, hP1, hP2, hP3⟩ := exists_projective_frame hdim hP12 hP13 hP23
   obtain ⟨u', v', hu', hv', huv', hli', hQ1, hQ2, hQ3⟩ :=
     exists_projective_frame hdim hQ12 hQ13 hQ23

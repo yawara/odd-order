@@ -40,7 +40,7 @@ theorem exists_unique_smul_eq_self_of_completeOrthogonal [Fintype κ]
     [IsSimpleModule A M] :
     ∃! i : κ, ∀ s : M, e i • s = s := by
   classical
-  haveI := IsSimpleModule.nontrivial A M
+  have := IsSimpleModule.nontrivial A M
   obtain ⟨s, hs⟩ := exists_ne (0 : M)
   have hsum : ∑ i : κ, e i • s = s := by
     rw [← Finset.sum_smul, he.complete, one_smul]

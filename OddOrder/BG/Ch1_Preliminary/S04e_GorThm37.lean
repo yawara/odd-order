@@ -153,8 +153,8 @@ theorem acts_trivially_of_trivial_on_normal_quotient
     {ψ : A} {N : Subgroup P} [N.Normal] (hN : IsAInvariant φ N)
     (hfix : ∀ n ∈ N, (φ ψ) n = n) (hquot : ∀ g : P, (φ ψ) g * g⁻¹ ∈ N) :
     ∀ g : P, (φ ψ) g = g := by
-  haveI : Group.IsNilpotent P := hP.isNilpotent
-  haveI : IsSolvable P := inferInstance
+  have : Group.IsNilpotent P := hP.isNilpotent
+  have : Group.IsSolvable P := inferInstance
   -- Act through the cyclic subgroup `C = ⟨ψ⟩ ≤ A`.
   set C : Subgroup A := Subgroup.zpowers ψ with hC_def
   set φC : C →* MulAut P := φ.comp C.subtype with hφC_def
@@ -181,7 +181,7 @@ theorem acts_trivially_of_trivial_on_normal_quotient
     rw [hC_def, Subgroup.zpowers_le]; exact hψ_ker
   -- Apply the group stability lemma to `C`.
   have hconc : ∀ c : C, ∀ g : P, (φC c) g = g :=
-    coprime_actsTrivially_of_normal_and_quotient hCcop (Or.inr ‹IsSolvable P›) hN_C
+    coprime_actsTrivially_of_normal_and_quotient hCcop (Or.inr ‹Group.IsSolvable P›) hN_C
       (fun c n hn => hC_fix c.2 n hn)
       (fun c g => by
         -- `c ∈ ker φ̄`, so `(φ c) g` and `g` agree mod `N`; take `x = g⁻¹ * (φ c) g ∈ N`.
@@ -218,8 +218,8 @@ theorem isSpecial_of_pprimeAction_trivialOnProper
     (∃ g : P, (φ ψ) g * g⁻¹ ∉ commutator P) ∧
     IsSpecial p P := by
   classical
-  haveI : Group.IsNilpotent P := hP.isNilpotent
-  haveI hPntriv : Nontrivial P := by
+  have : Group.IsNilpotent P := hP.isNilpotent
+  have hPntriv : Nontrivial P := by
     by_contra h
     rw [not_nontrivial_iff_subsingleton] at h
     exact hψ_ntriv fun g => Subsingleton.elim _ _
@@ -236,12 +236,12 @@ theorem isSpecial_of_pprimeAction_trivialOnProper
     simp only [not_exists, not_not] at h
     exact hψ_ntriv (acts_trivially_of_trivial_on_normal_quotient φ hP hCop hP'_inv hψP' h)
   -- ## Quotient `P̄ = P/P'` setup.
-  haveI hP'_normal : (commutator P).Normal := inferInstance
+  have hP'_normal : (commutator P).Normal := inferInstance
   have hPbar_comm : ∀ x y : P ⧸ commutator P, x * y = y * x :=
     isMulCommutative_iff.mp
       ((Subgroup.Normal.quotient_commutative_iff_commutator_le
         (N := commutator P)).mpr le_rfl)
-  letI hPbar_cg : CommGroup (P ⧸ commutator P) :=
+  let hPbar_cg : CommGroup (P ⧸ commutator P) :=
     { (inferInstance : Group (P ⧸ commutator P)) with mul_comm := hPbar_comm }
   have hPbar_pgroup : IsPGroup p (P ⧸ commutator P) := hP.to_quotient _
   set φbar : A →* MulAut (P ⧸ commutator P) := quotientMulAutHom hP'_inv with hφbar_def
@@ -259,8 +259,8 @@ theorem isSpecial_of_pprimeAction_trivialOnProper
     intro Y hY hYne q hq
     set Q := Y.comap (QuotientGroup.mk' (commutator P)) with hQ_def
     have hQinv : IsAInvariant φ Q := isAInvariant_comap_mk' hP'_inv hY
-    haveI : Y.Normal := inferInstance
-    haveI : Q.Normal := inferInstance
+    have : Y.Normal := inferInstance
+    have : Q.Normal := inferInstance
     have hsurj := QuotientGroup.mk'_surjective (commutator P)
     have hQne : Q ≠ ⊤ := by
       intro hQtop
@@ -269,7 +269,7 @@ theorem isSpecial_of_pprimeAction_trivialOnProper
     obtain ⟨g, rfl⟩ := hsurj q
     have hgQ : g ∈ Q := by rw [hQ_def, Subgroup.mem_comap]; exact hq
     rw [hφbar_def, quotientMulAutHom_apply_mk', hψQ g hgQ]
-  haveI : IsSolvable P := inferInstance
+  have : Group.IsSolvable P := inferInstance
   -- conjuncts.
   -- STEP 4 (= conjunct ii.a): `P̄` is elementary abelian, via `Ω₁(P̄) = ⊤`.
   have hPbar_elemab : IsElementaryAbelian p (P ⧸ commutator P) := by
@@ -372,13 +372,13 @@ theorem isSpecial_of_pprimeAction_trivialOnProper
   have h_i : commutator P ≤ Subgroup.center P := by
     -- `B` = pointwise stabilizer of `P'`: normal in `A`, contains `ψ`, centralizes `P'`.
     set B : Subgroup A := fixerSubgroup φ hP'_inv with hB_def
-    haveI hB_normal : B.Normal := fixerSubgroup_normal φ hP'_inv
+    have hB_normal : B.Normal := fixerSubgroup_normal φ hP'_inv
     have hψB : ψ ∈ B := hψP'
     set φB : B →* MulAut P := φ.comp B.subtype with hφB_def
     -- (6a) `[P, B] = ⊤`.
     have hPB_top : actionCommutator φB = ⊤ := by
       have hH_inv : IsAInvariant φ (actionCommutator φB) := isAInvariant_actionCommutator_comp φ
-      haveI hH_normal : (actionCommutator φB).Normal := actionCommutator.normal φB
+      have hH_normal : (actionCommutator φB).Normal := actionCommutator.normal φB
       by_contra hHne
       by_cases hHP' : actionCommutator φB ≤ commutator P
       · -- `H ⊆ P'`: `B` is trivial on `H`, so Thm 3.6 forces `H = ⊥`, i.e. `ψ` trivial — contra.
@@ -393,7 +393,7 @@ theorem isSpecial_of_pprimeAction_trivialOnProper
           exact b.2 (h : P) (hHP' h.2)
         have hHbot : actionCommutator φB = ⊥ := by
           have h36 := actionCommutator_restrict_self_map_subtype_eq (φ := φB) hBcop
-            (Or.inr ‹IsSolvable P›)
+            (Or.inr ‹Group.IsSolvable P›)
           rw [hInner_bot, Subgroup.map_bot] at h36
           exact h36.symm
         rw [actionCommutator_eq_bot_iff_acts_trivially] at hHbot
@@ -579,7 +579,7 @@ theorem exists_minimal_aInvariant_isSpecial_of_pprimeAction
     fun N hN_inv hN_le hN_nt => le_antisymm hN_le (hQ_min ⟨hN_inv, hN_nt⟩ hN_le)
   refine ⟨Q, hQ_inv, hψ_nt, ?_, hmin⟩
   -- Apply Theorem 3.7 to the restricted action `φ|_Q : A →* MulAut ↥Q`.
-  haveI : Finite ↥Q := inferInstance
+  have : Finite ↥Q := inferInstance
   have hQ_pgroup : IsPGroup p ↥Q := hP.to_subgroup Q
   have hQ_cop : Nat.Coprime (Nat.card A) (Nat.card ↥Q) :=
     hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card Q)
@@ -637,12 +637,12 @@ theorem exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction_with_minimality
     exists_minimal_aInvariant_isSpecial_of_pprimeAction φ hP hCop hψ_ntriv
   refine ⟨Q, hQ_inv, hψ_nt, hQ_special, ?_, hmin⟩
   set φQ : A →* MulAut ↥Q := hQ_inv.restrict with hφQ_def
-  haveI : Finite ↥Q := inferInstance
+  have : Finite ↥Q := inferInstance
   have hQ_pgroup : IsPGroup p ↥Q := hP.to_subgroup Q
-  haveI hQ_nilp : Group.IsNilpotent ↥Q := hQ_pgroup.isNilpotent
+  have hQ_nilp : Group.IsNilpotent ↥Q := hQ_pgroup.isNilpotent
   have hQ_cop : Nat.Coprime (Nat.card A) (Nat.card ↥Q) :=
     hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card Q)
-  haveI hQ_nt : Nontrivial ↥Q := by
+  have hQ_nt : Nontrivial ↥Q := by
     obtain ⟨g, hgQ, hg⟩ := hψ_nt
     have hg1 : g ≠ 1 := fun h => hg (by rw [h, map_one])
     exact ⟨⟨g, hgQ⟩, 1, fun h => hg1 (congrArg Subtype.val h)⟩
@@ -696,7 +696,7 @@ theorem exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction_with_minimality
   have hOmega_top : Omega ↥Q p 1 = ⊤ := by
     by_contra hne
     have hOmega_inv : IsAInvariant φQ (Omega ↥Q p 1) := IsAInvariant.of_characteristic φQ
-    haveI : (Omega ↥Q p 1).Normal := inferInstance
+    have : (Omega ↥Q p 1).Normal := inferInstance
     exact hψ_nt_Q (acts_trivially_of_trivial_on_normal_quotient φQ hQ_pgroup hQ_cop
       hOmega_inv (hψ_triv_proper _ hOmega_inv hne) hquot)
   -- exponent `= p`.

@@ -51,7 +51,7 @@ theorem orderOf_lambda_eq_of_normalized_twisted_norm
   have hcard : Nat.card (GaloisField 2 n) = 2 ^ n := by
     simpa [Nat.card_eq_fintype_card] using GaloisField.card 2 n hn
   have hlambdaPow : lambda ^ (2 ^ n - 1) = 1 := by
-    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    let : Fintype (GaloisField 2 n) := Fintype.ofFinite _
     have h := FiniteField.pow_card_sub_one_eq_one lambda hlambdaNe
     rwa [← Nat.card_eq_fintype_card, hcard] at h
   rcases hnorm with hthetaOne |

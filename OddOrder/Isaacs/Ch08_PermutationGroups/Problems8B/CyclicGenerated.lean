@@ -158,7 +158,7 @@ theorem isPreprimitive_sup_zpowers_addRight_one {n m : ℕ} [NeZero n]
     rw [hxg]
     exact addRight_one_pow_apply j c
   have hcast : ∀ c : ZMod n, ((c.val : ℕ) : ZMod n) = c := ZMod.natCast_rightInverse
-  haveI hpre : IsPretransitive
+  have hpre : IsPretransitive
       ↥(H ⊔ Subgroup.zpowers (Equiv.addRight (1 : ZMod n))) (ZMod n) := by
     refine ⟨fun c d => ⟨xg ^ (d - c).val, ?_⟩⟩
     rw [hxpow, hcast]
@@ -195,11 +195,11 @@ theorem isPreprimitive_sup_zpowers_addRight_one {n m : ℕ} [NeZero n]
     · exact subset_of_isBlock_of_mem_of_notMem hΛblock htrans
         (by simpa using (by tauto : (c + d).val < m)) hcdΛ (by simpa using hcm) hcΛ
   -- `0, 1 ∈ Λ` ⟹ `x • Λ = Λ` ⟹ `Λ = univ`
-  have h0 : (0 : ZMod n) ∈ Λ := hS (by simp only [Set.mem_setOf_eq, ZMod.val_zero]; omega)
+  have h0 : (0 : ZMod n) ∈ Λ := hS (by simp only [Set.mem_ofPred_eq, ZMod.val_zero]; omega)
   have h1val : ((1 : ZMod n)).val = 1 := by
-    haveI : Fact (1 < n) := ⟨by omega⟩
+    have : Fact (1 < n) := ⟨by omega⟩
     exact ZMod.val_one n
-  have h1 : (1 : ZMod n) ∈ Λ := hS (by simp only [Set.mem_setOf_eq, h1val]; omega)
+  have h1 : (1 : ZMod n) ∈ Λ := hS (by simp only [Set.mem_ofPred_eq, h1val]; omega)
   have hxΛ : xg • Λ = Λ := by
     refine hΛblock.smul_eq_of_mem h0 ?_
     have : xg • (0 : ZMod n) = 1 := by
@@ -534,7 +534,6 @@ lemma isCycle_mCycle (hm : 2 ≤ m) (hmn : m < n) : (mCycle n m hmn.le).IsCycle 
 lemma sign_mCycle (hm : 2 ≤ m) (hmn : m < n) :
     Equiv.Perm.sign (mCycle n m hmn.le) = -(-1 : ℤˣ) ^ m := by
   rw [(isCycle_mCycle hm hmn).sign, support_mCycle hm hmn, card_filter_val_lt hmn]
-  rfl
 
 lemma support_addRight_one (hn : 2 ≤ n) :
     (Equiv.addRight (1 : ZMod n)).support = Finset.univ := by
@@ -546,7 +545,7 @@ lemma support_addRight_one (hn : 2 ≤ n) :
     have := congrArg (fun z => z - c) hc
     simpa using this
   have h1 : ((1 : ZMod n)).val = 1 := by
-    haveI : Fact (1 < n) := ⟨by omega⟩
+    have : Fact (1 < n) := ⟨by omega⟩
     exact ZMod.val_one n
   rw [this, ZMod.val_zero] at h1
   omega
@@ -556,7 +555,7 @@ lemma isCycle_addRight_one (hn : 2 ≤ n) : (Equiv.addRight (1 : ZMod n)).IsCycl
   · simp only [Ne, Equiv.coe_addRight, zero_add]
     intro hc
     have h1 : ((1 : ZMod n)).val = 1 := by
-      haveI : Fact (1 < n) := ⟨by omega⟩
+      have : Fact (1 < n) := ⟨by omega⟩
       exact ZMod.val_one n
     rw [hc, ZMod.val_zero] at h1
     omega
@@ -567,7 +566,6 @@ lemma sign_addRight_one (hn : 2 ≤ n) :
     Equiv.Perm.sign (Equiv.addRight (1 : ZMod n)) = -(-1 : ℤˣ) ^ n := by
   rw [(isCycle_addRight_one hn).sign, support_addRight_one hn, Finset.card_univ,
     ZMod.card n]
-  rfl
 
 /-- 交代群を含み奇置換をもつ部分群は `S_n` 全体。 -/
 lemma eq_top_of_alternatingGroup_le_of_sign_ne_one {α : Type*} [DecidableEq α] [Fintype α]
@@ -639,7 +637,7 @@ lemma eq_stabilizer_of_index_eq_of_fixed {H : Subgroup (Equiv.Perm α)}
     MulAction.index_stabilizer_of_transitive _ a
   have hmul := Subgroup.relIndex_mul_index hle
   rw [hstab, hidx] at hmul
-  haveI : Nonempty α := ⟨a⟩
+  have : Nonempty α := ⟨a⟩
   have hpos : 0 < Nat.card α := Nat.card_pos
   have hrel : H.relIndex (MulAction.stabilizer (Equiv.Perm α) a) = 1 :=
     Nat.eq_of_mul_eq_mul_right hpos (by rw [hmul, one_mul])
@@ -811,7 +809,7 @@ theorem two_transitive_of_index_eq_of_ne_stabilizer {H : Subgroup (Equiv.Perm α
     (hidx : H.index = Nat.card α)
     (hns : ∀ a : α, H ≠ MulAction.stabilizer (Equiv.Perm α) a) :
     ∀ a b c d : α, a ≠ b → c ≠ d → ∃ h : ↥H, h • a = c ∧ h • b = d := by
-  haveI := isPretransitive_of_index_eq_of_ne_stabilizer hidx hns
+  have := isPretransitive_of_index_eq_of_ne_stabilizer hidx hns
   refine two_transitive_of_coprime_index
     (fun a b c d hab hcd => exists_perm_apply_eq_apply_eq hab hcd) ?_
   rw [hidx]
@@ -830,8 +828,8 @@ theorem isPreprimitive_of_index_eq_of_ne_stabilizer {H : Subgroup (Equiv.Perm α
     (hidx : H.index = Nat.card α)
     (hns : ∀ a : α, H ≠ MulAction.stabilizer (Equiv.Perm α) a) :
     MulAction.IsPreprimitive ↥H α := by
-  haveI := isPretransitive_of_index_eq_of_ne_stabilizer hidx hns
-  haveI : MulAction.IsMultiplyPretransitive ↥H α 2 :=
+  have := isPretransitive_of_index_eq_of_ne_stabilizer hidx hns
+  have : MulAction.IsMultiplyPretransitive ↥H α 2 :=
     MulAction.is_two_pretransitive_iff.mpr
       (fun {a b c d} hab hcd =>
         two_transitive_of_index_eq_of_ne_stabilizer hidx hns a b c d hab hcd)
@@ -861,13 +859,13 @@ theorem card_eq_six_of_index_eq_of_ne_stabilizer {H : Subgroup (Equiv.Perm α)}
     (hns : ∀ a : α, H ≠ MulAction.stabilizer (Equiv.Perm α) a) :
     Nat.card α = 6 := by
   classical
-  haveI : Fintype α := Fintype.ofFinite α
+  have : Fintype α := Fintype.ofFinite α
   have hn1 : 1 ≤ Nat.card α := by
     by_contra hc
     have h0 : Nat.card α = 0 := by omega
     rw [h0] at hidx
     exact H.index_ne_zero_of_finite hidx
-  haveI := isPretransitive_of_index_eq_of_ne_stabilizer hidx hns
+  have := isPretransitive_of_index_eq_of_ne_stabilizer hidx hns
   have hprim := isPreprimitive_of_index_eq_of_ne_stabilizer hidx hns
   -- `|H| = (n-1)!`
   have hHcard : Nat.card ↥H * Nat.card α = (Nat.card α).factorial := by
@@ -892,7 +890,7 @@ theorem card_eq_six_of_index_eq_of_ne_stabilizer {H : Subgroup (Equiv.Perm α)}
     by_cases halt : alternatingGroup α ≤ H
     · rcases Nat.lt_or_ge (Nat.card α) 2 with h | h
       · omega
-      · haveI : Nontrivial α := by
+      · have : Nontrivial α := by
           by_contra hcon
           rw [not_nontrivial_iff_subsingleton] at hcon
           have hc1 : Nat.card α = 1 := Nat.card_eq_one_iff_unique.mpr ⟨hcon, ⟨a⟩⟩
@@ -916,7 +914,7 @@ theorem card_eq_six_of_index_eq_of_ne_stabilizer {H : Subgroup (Equiv.Perm α)}
     omega
   rcases hcases with h1 | h6
   · exfalso
-    haveI : Subsingleton α := (Nat.card_eq_one_iff_unique.mp h1).1
+    have : Subsingleton α := (Nat.card_eq_one_iff_unique.mp h1).1
     refine hns a ?_
     refine le_antisymm (fun g _ => MulAction.mem_stabilizer_iff.mpr (Subsingleton.elim _ _)) ?_
     intro g _

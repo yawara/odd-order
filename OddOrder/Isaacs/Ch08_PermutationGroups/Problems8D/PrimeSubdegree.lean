@@ -44,7 +44,7 @@ theorem not_dvd_sq_card_stabilizer_of_prime_subdegree [Nontrivial Ω] [IsPreprim
     {p : ℕ} (hp : p.Prime) {α β : Ω} (hβ : Set.ncard (orbit ↥(stabilizer G α) β) = p) :
     ¬ p ^ 2 ∣ Nat.card ↥(stabilizer G α) := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   set D : Subgroup G := stabilizer G β ⊓ stabilizer G α with hD
   have hDα : D ≤ stabilizer G α := inf_le_right
   have hDβ : D ≤ stabilizer G β := inf_le_left
@@ -78,7 +78,7 @@ theorem not_dvd_sq_card_stabilizer_of_prime_subdegree [Nontrivial Ω] [IsPreprim
       omega
     · exact hcoat.2 _ hlt
   -- したがって `R ◁ G`, かつ `R ≤ G_α` なので忠実性から `R = ⊥`
-  haveI : R.Normal := by
+  have : R.Normal := by
     rw [← Subgroup.normalizer_eq_top_iff, eq_top_iff, ← hsup]
     exact sup_le hnormα hnormβ
   have hRle : R ≤ stabilizer G α := by

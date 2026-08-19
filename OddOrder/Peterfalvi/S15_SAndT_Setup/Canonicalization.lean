@@ -131,7 +131,7 @@ theorem H_sharp_cCoeff_int [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)
   classical
   intro i
   set K : Subgroup ↥hyp.S := (H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S with hKdef
-  haveI hKnorm : K.Normal := H_sharp_subgroupOf_normal hyp
+  have hKnorm : K.Normal := H_sharp_subgroupOf_normal hyp
   -- `K ≅ H` is abelian, so every `θ_j` is linear and all `ζ_j` have degree `[S:K]`.
   have hHS : hyp.H ≤ hyp.S := by
     have hUS : hyp.U ≤ hyp.S := by
@@ -141,7 +141,7 @@ theorem H_sharp_cCoeff_int [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)
     refine sup_le ?_ ?_
     · rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
     · rw [hyp.C_eq]; exact le_trans inf_le_left hUS
-  haveI hKcomm : IsMulCommutative ↥K := by
+  have hKcomm : IsMulCommutative ↥K := by
     have hH := hyp.H_mulCommutative hG
     have e := Subgroup.subgroupOfEquivOfLe
       (show (H_sharp_hypothesis76 hG hyp).H ≤ hyp.S from hHS)
@@ -197,7 +197,7 @@ theorem sum_finset_sharp_normSq_eq {L : Type*} [Group L] [Finite L]
     {n : ℕ} (hn : ClassFunction.inner ψ ψ = (n : ℂ)) :
     ∑ x ∈ F, ‖f x‖ ^ 2 = (Nat.card ↥K : ℝ) * (n : ℝ) - ‖f 1‖ ^ 2 := by
   classical
-  haveI : Fintype L := Fintype.ofFinite L
+  have : Fintype L := Fintype.ofFinite L
   have hFeq : F = (Finset.univ.filter (· ∈ K)).erase 1 := by
     ext x
     rw [hF, Finset.mem_erase, Finset.mem_filter]
@@ -214,7 +214,7 @@ theorem sum_finset_sharp_transport [Finite G] {M : Type*} [AddCommMonoid M]
     (f : G → M) :
     ∑ x ∈ F, f ↑x = ∑ x ∈ (Set.toFinite (sharpSubgroup K)).toFinset, f x := by
   classical
-  haveI : Fintype ↥L := Fintype.ofFinite ↥L
+  have : Fintype ↥L := Fintype.ofFinite ↥L
   have hFeq : F = (Finset.univ.filter (· ∈ K.subgroupOf L)).erase 1 := by
     ext x
     rw [hF, Finset.mem_erase, Finset.mem_filter, Subgroup.mem_subgroupOf]

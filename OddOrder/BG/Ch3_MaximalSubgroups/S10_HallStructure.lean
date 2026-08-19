@@ -77,7 +77,7 @@ theorem rank_quotient_Malpha_le_two_of_isHall [Finite G] {M : Subgroup G}
     rank (↥M ⧸ (Malpha M).subgroupOf M) ≤ 2 := by
   rw [rank_le_iff]
   intro p hp
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   by_cases hpα : p ∈ alpha M
   · by_contra hpRank
     have hpos : 0 < pRank (↥M ⧸ (Malpha M).subgroupOf M) p := by omega
@@ -117,7 +117,7 @@ theorem rank_fitting_quotient_Malpha_le_two [Finite G] (M : Subgroup G) :
   change rank ↥(Ch01.fitting Q) ≤ 2
   rw [rank_le_iff]
   intro p hp
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   by_cases hpα : p ∈ alpha M
   · by_contra hpRank
     have h3 : 3 ≤ pRank ↥(Ch01.fitting Q) p := by omega
@@ -161,8 +161,8 @@ theorem derived_quotient_Malpha_le_fitting [Finite G]
   change commutator Q ≤ Ch01.fitting Q
   have hFQrank : rank ↥(Ch01.fitting Q) ≤ 2 :=
     rank_fitting_quotient_Malpha_le_two M
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-  haveI : IsSolvable Q := inferInstance
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable Q := inferInstance
   have hoddM : Odd (Nat.card ↥M) := by
     rcases Nat.even_or_odd (Nat.card ↥M) with he | ho
     · exfalso
@@ -186,7 +186,7 @@ theorem derived_quotient_Malpha_le_fitting [Finite G]
     have hx1 : x = 1 := hsub.elim x 1
     rw [hx1]
     exact (Ch01.fitting Q).one_mem
-  · haveI : Nontrivial Q := hnontriv
+  · have : Nontrivial Q := hnontriv
     exact OddOrder.BG.Ch1.S05.derived_le_fitting_of_rank_fitting_le_two hoddQ hFQrank
 
 /-- **BG Theorem 10.2(d), `M_σ/M_α` Fitting containment** (mmd L2733-2738):
@@ -342,12 +342,12 @@ theorem top_le_oPiCore_sup_compl_of_isNilpotent
   classical
   have hfit : Ch01.fitting K = ⊤ := by
     refine top_le_iff.mp ?_
-    haveI : Group.IsNilpotent ↥(⊤ : Subgroup K) := Group.isNilpotent_top.mpr inferInstance
+    have : Group.IsNilpotent ↥(⊤ : Subgroup K) := Group.isNilpotent_top.mpr inferInstance
     exact Ch01.nilpotent_normal_le_fitting
   rw [← hfit, Ch01.fitting_eq_iSup_primeFactors]
   refine iSup_le fun q => ?_
   obtain ⟨qval, hq_mem⟩ := q
-  haveI : Fact qval.Prime := ⟨(Nat.mem_primeFactors.mp hq_mem).1⟩
+  have : Fact qval.Prime := ⟨(Nat.mem_primeFactors.mp hq_mem).1⟩
   rw [show Ch01.opCore qval K = Ch03.oPiCore ({qval} : Set ℕ) K from
     (OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := K) qval).symm]
   by_cases hqπ : qval ∈ π
@@ -547,7 +547,7 @@ the normal local `σ(M)`-core is contained in any Hall `σ(M)`-subgroup of `M`. 
 theorem Msigma_subgroupOf_le_hallSigmaSubgroup [Finite G] {M S : Subgroup G}
     (hHallσ : Ch03.IsHallSubgroup (sigma M) (S.subgroupOf M)) :
     (Msigma M).subgroupOf M ≤ S.subgroupOf M := by
-  haveI : ((Msigma M).subgroupOf M).Normal := by
+  have : ((Msigma M).subgroupOf M).Normal := by
     rw [Msigma_subgroupOf]
     infer_instance
   have hMsigmaσ : Ch03.Subgroup.IsPiGroup (sigma M) ((Msigma M).subgroupOf M) := by
@@ -582,7 +582,7 @@ inside `M`, the local `σ`-core `M_σ` is a Hall `σ(M)`-subgroup. -/
 theorem Msigma_subgroupOf_isHall [Finite G]
     (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
     Ch03.IsHallSubgroup (sigma M) ((Msigma M).subgroupOf M) := by
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   obtain ⟨H, hH⟩ := Ch03.hall_E_exists (G := ↥M) (sigma M)
   set S : Subgroup G := H.map M.subtype with hSdef
   have hSM : S ≤ M := by
@@ -605,7 +605,7 @@ theorem Msigma_isHall [Finite G]
   refine ⟨Msigma_isPiGroup M, ?_⟩
   intro p hpidx hpσ
   have hp_prime : p.Prime := (Nat.mem_primeFactors.mp hpidx).1
-  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have : Fact p.Prime := ⟨hp_prime⟩
   have hrel : ((Msigma M).subgroupOf M).index * M.index = (Msigma M).index :=
     Subgroup.relIndex_mul_index (Msigma_le M)
   have hp_dvd_prod : p ∣ ((Msigma M).subgroupOf M).index * M.index := by
@@ -680,7 +680,7 @@ theorem exists_hallSigmaSubgroup_containing_alphaSubgroup [Finite G]
     (hAM : A ≤ M) (hAα : Ch03.Subgroup.IsPiGroup (alpha M) A) :
     ∃ S : Subgroup G,
       S ≤ M ∧ Ch03.IsHallSubgroup (sigma M) (S.subgroupOf M) ∧ A ≤ S := by
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   let φ : Unit →* MulAut ↥M := 1
   have hA_sub_σ : Ch03.Subgroup.IsPiGroup (sigma M) (A.subgroupOf M) := by
     intro p hp
@@ -735,7 +735,7 @@ Hall-E gives a local Hall `α(M)`-subgroup `A` of `M`; the previous theorem puts
 theorem Malpha_isHall [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
     Ch03.IsHallSubgroup (alpha M) (Malpha M) := by
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   obtain ⟨H, hH⟩ := Ch03.hall_E_exists (G := ↥M) (alpha M)
   set A : Subgroup G := H.map M.subtype with hAdef
   have hAM : A ≤ M := by
@@ -796,7 +796,7 @@ theorem opiCoreInG_singleton_ne_bot_of_sylowMap_eq [Finite G] {M : Subgroup G} {
     (hqM : q ∈ (Nat.card ↥M).primeFactors) (P : Sylow q ↥M)
     (hP : (P : Subgroup ↥M).map M.subtype = opiCoreInG ({q} : Set ℕ) M) :
     opiCoreInG ({q} : Set ℕ) M ≠ ⊥ := by
-  haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hqM⟩
+  have : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hqM⟩
   have hP_ne : (P : Subgroup ↥M) ≠ ⊥ :=
     OddOrder.Isaacs.Ch07.Sylow.ne_bot_of_dvd_card (Nat.dvd_of_mem_primeFactors hqM) P
   intro hOq
@@ -856,7 +856,7 @@ theorem Msigma_ne_bot_of_characteristicSylowSeriesPackage [Finite G]
     Msigma M ≠ ⊥ := by
   obtain ⟨i, _hi, hqM, P, hP⟩ :=
     OddOrder.BG.Ch1.S04.CharacteristicSylowSeriesPackage.exists_terminal_normal_sylow pkg
-  haveI : Fact (pkg.series.step i).q.Prime := (pkg.series.step i).q_prime
+  have : Fact (pkg.series.step i).q.Prime := (pkg.series.step i).q_prime
   exact Msigma_ne_bot_of_normal_local_sylow hG hM P hP hqM
 
 /-- Rank-`≤ 2` Fitting input for the hard branch of BG Theorem 10.2(e): applying BG
@@ -866,7 +866,7 @@ theorem Msigma_ne_bot_of_rank_fittingInG_le_two [Finite G] (hG : IsMinimalSimple
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) [Nontrivial ↥M]
     (hrank : rank ↥(Ch2.S08.fittingInG M) ≤ 2) :
     Msigma M ≠ ⊥ := by
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hodd : Odd (Nat.card ↥M) := by
     rcases Nat.even_or_odd (Nat.card ↥M) with he | ho
     · exfalso
@@ -897,7 +897,7 @@ theorem rank_fittingInG_le_rank [Finite G] (M : Subgroup G) :
 theorem Msigma_ne_bot_of_rank_le_two [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hrank : rank ↥M ≤ 2) :
     Msigma M ≠ ⊥ := by
-  haveI : Nontrivial ↥M :=
+  have : Nontrivial ↥M :=
     (Subgroup.nontrivial_iff_ne_bot M).mpr (hG.ne_bot_of_mem_maximalSubgroups hM)
   exact Msigma_ne_bot_of_rank_fittingInG_le_two hG hM
     ((rank_fittingInG_le_rank M).trans hrank)
@@ -909,7 +909,7 @@ theorem rank_le_two_of_Malpha_eq_bot_of_isHall [Finite G] {M : Subgroup G}
     rank ↥M ≤ 2 := by
   rw [rank_le_iff]
   intro p hp
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   by_contra hpRank
   have h3 : 3 ≤ pRank ↥M p := by omega
   have hpos : 0 < pRank ↥M p := by omega

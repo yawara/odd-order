@@ -122,7 +122,7 @@ theorem not_p_dvd_card_Q : ¬ fc.p ∣ Nat.card ↥fc.toHypothesis.Q := by
   obtain ⟨S⟩ : Nonempty (Sylow 2 ↥fc.toHypothesis.Q) := inferInstance
   have hcard : Nat.card ↥(S : Subgroup ↥fc.toHypothesis.Q) *
       Nat.card ↥fc.toHypothesis.Q1Subgroup = Nat.card ↥fc.toHypothesis.Q :=
-    (fc.toHypothesis.sylowTwo_isComplement'_Q1Subgroup S).card_mul
+    (fc.toHypothesis.sylowTwo_isComplement'_Q1Subgroup S).card_mul_card
   rw [← hcard] at hdvd
   rcases (Nat.Prime.dvd_mul fc.p_prime).mp hdvd with hS | hQ1
   · -- `p` odd cannot divide the `2`-group `S`
@@ -150,7 +150,7 @@ theorem card_Q_eq_card_inf_centralizer_pow :
       Nat.card ↥(fc.toHypothesis.Q ⊓
         Subgroup.centralizer (fc.P : Set G)) ^ fc.p := by
   classical
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
   -- `L = KP` acts on `Q` by conjugation (`L ≤ H ≤ N_G(Q)`).
   set L : Subgroup G := fc.toHypothesis.K ⊔ fc.P with hLdef
   have hLH : L ≤ fc.toHypothesis.H :=
@@ -176,7 +176,7 @@ theorem card_Q_eq_card_inf_centralizer_pow :
   have hLD : L ≤ fc.toHypothesis.D :=
     sup_le fc.toHypothesis.K_le_D
       (fc.P_le_V.trans fc.toHypothesis.V_le_D)
-  haveI hUnormal : U.Normal := by
+  have hUnormal : U.Normal := by
     constructor
     intro n hn g
     have hn' : (n : G) ∈ fc.toHypothesis.K := hn
@@ -244,13 +244,13 @@ theorem card_Q_eq_card_inf_centralizer_pow :
     OddOrder.Isaacs.Ch06.isFrobeniusGroup_of_prime_complement_fixedFree
       hcompl (by rw [hcardE]; exact fc.p_prime) hUne hfpf
   -- `Q` is solvable (nilpotent) and `(|Q|, |L|) = 1`.
-  haveI hQsolv : IsSolvable ↥fc.toHypothesis.Q := by
-    letI := fc.toHypothesis.isNilpotent_Q
+  have hQsolv : Group.IsSolvable ↥fc.toHypothesis.Q := by
+    let := fc.toHypothesis.isNilpotent_Q
     infer_instance
   have hcoprime :
       Nat.Coprime (Nat.card ↥fc.toHypothesis.Q) (Nat.card ↥L) := by
     have hcardL : Nat.card ↥L = Nat.card ↥U * Nat.card ↥E :=
-      hcompl.card_mul.symm
+      hcompl.card_mul_card.symm
     rw [hcardL, hcardU]
     refine Nat.Coprime.mul_right fc.toHypothesis.coprime_card_Q_K ?_
     rw [hcardE]

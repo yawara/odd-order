@@ -56,10 +56,10 @@ theorem nilpotencyClass_overgroup_le_two
     (hR₁le : R₁ ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
     (hcard : Nat.card ↥R₁ = fc.p ^ 3) :
     Group.nilpotencyClass ↥R₁ ≤ 2 := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
-  haveI : Group.IsNilpotent ↥R₁ := (IsPGroup.of_card hcard).isNilpotent
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Group.IsNilpotent ↥R₁ := (IsPGroup.of_card hcard).isNilpotent
   have hcommT := fc.commutator_eq_sInvertedT model ind hB2 hm hGp hSigma hRle
     hR₁le hcard
   have hcomm := fc.sInvertedT_mul_comm_of_mem model ind hB2 hm hGp hSigma
@@ -94,9 +94,9 @@ theorem factorization_ne_three
     (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
       ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) :
     (Nat.card G).factorization fc.p ≠ 3 := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
   intro hfact
   obtain ⟨R₁, hRle, hR₁le, hcard, hR₁n⟩ :=
     fc.exists_normal_overgroup_cube model ind hB2 hm hGp hSigma
@@ -148,7 +148,7 @@ theorem factorization_ne_three
   set Tbar : Subgroup (Abelianization ↥((P₁ : Subgroup G))) :=
     Subgroup.map (Abelianization.of)
       ((fc.sInvertedOvergroup R₁).subgroupOf ((P₁ : Subgroup G))) with hTbar_def
-  haveI hTbarN : Tbar.Normal := ⟨fun n hn g => by
+  have hTbarN : Tbar.Normal := ⟨fun n hn g => by
     rw [mul_comm g n, mul_assoc, mul_inv_cancel, mul_one]; exact hn⟩
   set π := QuotientGroup.mk' Tbar with hπ_def
   -- membership transport: the normalizer of `R₁` is `N_G(R)` (δ4).
@@ -221,8 +221,8 @@ theorem factorization_ne_three
           (_root_.commutator ↥((P₁ : Subgroup G)))
     have hQp : IsPGroup fc.p
         (Abelianization ↥((P₁ : Subgroup G)) ⧸ Tbar) := hAb.to_quotient Tbar
-    haveI : Finite (Abelianization ↥((P₁ : Subgroup G))) := Quotient.finite _
-    haveI : Finite (Abelianization ↥((P₁ : Subgroup G)) ⧸ Tbar) :=
+    have : Finite (Abelianization ↥((P₁ : Subgroup G))) := Quotient.finite _
+    have : Finite (Abelianization ↥((P₁ : Subgroup G)) ⧸ Tbar) :=
       Quotient.finite _
     obtain ⟨k, hk⟩ := hQp.exists_card_eq
     have h_am : a ^ (((P₁ : Subgroup G)).subgroupOf K).index = 1 := htrans.symm
@@ -276,9 +276,9 @@ theorem step_twelve
       fc.p = 3 ∧ Nat.card F = 9 ∧ IsCyclic ↥fc.toHypothesis.W ∧
       (Nat.card ↥fc.toHypothesis.W = 3 ∨ Nat.card ↥fc.toHypothesis.W = 9) ∧
       3 ^ (Nat.card G).factorization 3 = 3 ^ 4 * Nat.card ↥fc.toHypothesis.W := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
   obtain ⟨m, hm1, hm⟩ := fc.card_field_eq_prime_pow model hB2
   rcases fc.step_ten_dichotomy ind model hB2 hm with ⟨hnSig, hfact⟩ | h102
   · -- case (10.1): first `m = 1`, then the transfer contradiction.

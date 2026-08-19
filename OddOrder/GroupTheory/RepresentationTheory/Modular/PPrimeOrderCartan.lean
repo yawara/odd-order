@@ -63,7 +63,7 @@ theorem sum_decompositionMatrix_mul_card_eq (i : ι') :
     ∑ φ, decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ * Fintype.card (nn φ)
       = Fintype.card (m i) := by
   classical
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   have hdec := trace_eq_sum_decompositionMatrix hp hω hω' hπ hlin hkerJ e i 1 (isPRegular_one hp)
   rw [Finset.sum_congr rfl fun φ (_ : φ ∈ Finset.univ) => by
     rw [irreducibleBrauerCharacter_one (p := p) (𝒪 := 𝒪) π hp φ]] at hdec
@@ -89,9 +89,9 @@ column `d_{·φ}` to vanish, hence the whole column of `C`; but `C` is invertibl
 theorem one_le_cartanMatrix_self (φ : ι) :
     1 ≤ cartanMatrix hp hω hω' hπ hlin hkerJ e φ φ := by
   classical
-  letI : Fintype G := Fintype.ofFinite G
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
-  haveI : Invertible (Nat.card G : K) :=
+  let : Fintype G := Fintype.ofFinite G
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : Invertible (Nat.card G : K) :=
     invertibleOfNonzero (by exact_mod_cast (Nat.card_pos (α := G)).ne')
   by_contra hcon
   have hzero : cartanMatrix hp hω hω' hπ hlin hkerJ e φ φ = 0 := by omega
@@ -118,8 +118,8 @@ theorem cartanMatrix_eq_ite_of_not_dvd_card [IsAlgClosed (ResidueField 𝒪)]
     (hG : ¬ p ∣ Nat.card G) (φ μ : ι) :
     cartanMatrix hp hω hω' hπ hlin hkerJ e φ μ = if φ = μ then 1 else 0 := by
   classical
-  letI : Fintype G := Fintype.ofFinite G
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  let : Fintype G := Fintype.ofFinite G
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   set n : ι → ℕ := fun φ => Fintype.card (nn φ) with hn
   set D : ι' → ι → ℕ := decompositionMatrix hp hω hω' hπ hlin hkerJ e with hD
   set c : ι → ι → ℕ := cartanMatrix hp hω hω' hπ hlin hkerJ e with hc

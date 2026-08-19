@@ -19,7 +19,7 @@ This file fills the **general-case conjugacy** assuming `N` or `G/N` is solvable
 ## Main result
 
 * `Subgroup.IsComplement'.exists_conj_of_coprime`: For `N ⊴ G` finite with
-  `(|N|, |G:N|) = 1` and `IsSolvable N ∨ IsSolvable (G ⧸ N)`, any two complements
+  `(|N|, |G:N|) = 1` and `Group.IsSolvable N ∨ Group.IsSolvable (G ⧸ N)`, any two complements
   to `N` are conjugate by an element of `N`.
 
 ## Proof outline (Isaacs Thm 3.12)
@@ -119,7 +119,7 @@ theorem IsComplement'.inf_centralizer_of_normalizer {N K H : Subgroup G} {a : G}
       ((K ⊓ Subgroup.centralizer ({a} : Set G)).subgroupOf (Subgroup.centralizer ({a} : Set G)))
       ((H ⊓ Subgroup.centralizer ({a} : Set G)).subgroupOf
         (Subgroup.centralizer ({a} : Set G))) := by
-  haveI := hKnorm
+  have := hKnorm
   -- `K ⊓ H = ⊥` in `G`, from the `↥N`-disjointness of the complement.
   have hKHbot : Disjoint K H := by
     rw [disjoint_iff, eq_bot_iff]
@@ -199,7 +199,7 @@ private def IH (G : Type u) [Group G] [Finite G] : Prop :=
   ∀ (G' : Type u) [Group G'] [Finite G'],
     Nat.card G' < Nat.card G → ∀ {N' : Subgroup G'} [N'.Normal],
       Nat.Coprime (Nat.card N') N'.index →
-      (IsSolvable N' ∨ IsSolvable (G' ⧸ N')) →
+      (Group.IsSolvable N' ∨ Group.IsSolvable (G' ⧸ N')) →
       ∀ {K K' : Subgroup G'}, IsComplement' N' K → IsComplement' N' K' →
       ∃ n : G', n ∈ N' ∧ K.map (MulAut.conj n).toMonoidHom = K'
 
@@ -211,22 +211,24 @@ private def subgroupOfInclToN (N U : Subgroup G) : ↥(N.subgroupOf U) →* ↥N
   map_one' := rfl
   map_mul' _ _ := rfl
 
+set_option backward.isDefEq.respectTransparency false in
 private theorem subgroupOfInclToN_injective (N U : Subgroup G) :
     Function.Injective (subgroupOfInclToN N U) := by
   intro x y h
   simp only [subgroupOfInclToN, MonoidHom.coe_mk, OneHom.coe_mk, Subtype.mk.injEq] at h
   exact Subtype.ext (Subtype.ext h)
 
-/-- `IsSolvable N ⇒ IsSolvable (N.subgroupOf U)`. -/
-instance subgroupOf_isSolvable_of_isSolvable (N U : Subgroup G) [IsSolvable N] :
-    IsSolvable (N.subgroupOf U) :=
-  solvable_of_solvable_injective (subgroupOfInclToN_injective N U)
+/-- `Group.IsSolvable N ⇒ Group.IsSolvable (N.subgroupOf U)`. -/
+instance subgroupOf_isSolvable_of_isSolvable (N U : Subgroup G) [Group.IsSolvable N] :
+    Group.IsSolvable (N.subgroupOf U) :=
+  Group.isSolvable_of_isSolvable_injective (subgroupOfInclToN_injective N U)
 
-/-- `IsSolvable (G ⧸ N) ⇒ IsSolvable (U ⧸ N.subgroupOf U)` for any `U ≤ G`.
+set_option backward.isDefEq.respectTransparency false in
+/-- `Group.IsSolvable (G ⧸ N) ⇒ Group.IsSolvable (U ⧸ N.subgroupOf U)` for any `U ≤ G`.
 Proof: `U ⧸ N.subgroupOf U ≃ (U ⊔ N) ⧸ N.subgroupOf (U ⊔ N)` (second iso theorem), and
 the latter embeds into `G ⧸ N` via `QuotientGroup.lift`. -/
 instance quotient_subgroupOf_isSolvable_of_quotient {U N : Subgroup G} [N.Normal]
-    [IsSolvable (G ⧸ N)] : IsSolvable (U ⧸ N.subgroupOf U) := by
+    [Group.IsSolvable (G ⧸ N)] : Group.IsSolvable (U ⧸ N.subgroupOf U) := by
   -- Step 1: define φ : (U ⊔ N) ⧸ N.subgroupOf (U ⊔ N) →* G ⧸ N via lift.
   let φ : ((U ⊔ N : Subgroup G) ⧸ N.subgroupOf (U ⊔ N)) →* G ⧸ N :=
     QuotientGroup.lift (N.subgroupOf (U ⊔ N))
@@ -243,11 +245,11 @@ instance quotient_subgroupOf_isSolvable_of_quotient {U N : Subgroup G} [N.Normal
     -- ⟦x⟧ = 1 in (U ⊔ N) ⧸ N.subgroupOf (U ⊔ N): x ∈ N.subgroupOf (U ⊔ N).
     rw [Subgroup.mem_bot]
     exact (QuotientGroup.eq_one_iff _).mpr hx
-  haveI hUN : IsSolvable ((U ⊔ N : Subgroup G) ⧸ N.subgroupOf (U ⊔ N)) :=
-    solvable_of_solvable_injective hφ_inj
+  have hUN : Group.IsSolvable ((U ⊔ N : Subgroup G) ⧸ N.subgroupOf (U ⊔ N)) :=
+    Group.isSolvable_of_isSolvable_injective hφ_inj
   -- Step 2: Transfer back via second iso (direction U ⧸ ... → (U ⊔ N) ⧸ ...).
   let e := QuotientGroup.quotientInfEquivProdNormalQuotient U N
-  exact solvable_of_solvable_injective (f := e.toMonoidHom) e.injective
+  exact Group.isSolvable_of_isSolvable_injective (f := e.toMonoidHom) e.injective
 
 variable [Finite G]
 
@@ -282,7 +284,7 @@ private theorem map_subtype_conj_subgroupOf {U : Subgroup G} (n' : ↥U) (K : Su
 gives an element `n ∈ N` conjugating `K` to `K'`. -/
 private theorem step_restriction
     (h1 : Nat.Coprime (Nat.card N) N.index)
-    (hSolv : IsSolvable N ∨ IsSolvable (G ⧸ N))
+    (hSolv : Group.IsSolvable N ∨ Group.IsSolvable (G ⧸ N))
     (ih : IH G)
     {K K' : Subgroup G} (hK : IsComplement' N K) (hK' : IsComplement' N K')
     {U : Subgroup G} (hKU : K ≤ U) (hK'U : K' ≤ U) (hU_lt : U ≠ ⊤) :
@@ -301,10 +303,10 @@ private theorem step_restriction
   have h_cop : Nat.Coprime (Nat.card (N.subgroupOf U)) (N.subgroupOf U).index :=
     (h1.coprime_dvd_left h_card_dvd).coprime_dvd_right h_index_dvd
   -- Solvability transfer.
-  have h_solv : IsSolvable (N.subgroupOf U) ∨ IsSolvable (↥U ⧸ N.subgroupOf U) := by
+  have h_solv : Group.IsSolvable (N.subgroupOf U) ∨ Group.IsSolvable (↥U ⧸ N.subgroupOf U) := by
     rcases hSolv with h | h
-    · left; haveI := h; infer_instance
-    · right; haveI := h; infer_instance
+    · left; have := h; infer_instance
+    · right; have := h; infer_instance
   -- Helper A: restrict complements to ↥U.
   have hK_U : IsComplement' (N.subgroupOf U) (K.subgroupOf U) := hK.subgroupOf_of_le hKU
   have hK'_U : IsComplement' (N.subgroupOf U) (K'.subgroupOf U) := hK'.subgroupOf_of_le hK'U
@@ -338,7 +340,7 @@ private theorem mk'_comp_conj_eq {L : Subgroup G} [L.Normal] (g : G) :
 `(K^g) ⊔ L = K' ⊔ L`. -/
 private theorem step_factor
     (h1 : Nat.Coprime (Nat.card N) N.index)
-    (hSolv : IsSolvable N ∨ IsSolvable (G ⧸ N))
+    (hSolv : Group.IsSolvable N ∨ Group.IsSolvable (G ⧸ N))
     (ih : IH G)
     {K K' : Subgroup G} (hK : IsComplement' N K) (hK' : IsComplement' N K')
     {L : Subgroup G} [L.Normal] (hL_ne_bot : L ≠ ⊥) :
@@ -363,11 +365,11 @@ private theorem step_factor
     (h1.coprime_dvd_left (Subgroup.card_map_dvd _ _)).coprime_dvd_right
       (N.index_map_dvd (QuotientGroup.mk'_surjective L))
   -- Solvability transfer to G/L.
-  have h_solv_q : IsSolvable (N.map (QuotientGroup.mk' L)) ∨
-                   IsSolvable ((G ⧸ L) ⧸ (N.map (QuotientGroup.mk' L))) := by
+  have h_solv_q : Group.IsSolvable (N.map (QuotientGroup.mk' L)) ∨
+                   Group.IsSolvable ((G ⧸ L) ⧸ (N.map (QuotientGroup.mk' L))) := by
     rcases hSolv with h | h
     · left
-      haveI : IsSolvable N := h
+      have : Group.IsSolvable N := h
       -- N → N.map mk' is surjective.
       let f : N →* ↥(N.map (QuotientGroup.mk' L)) :=
         ((QuotientGroup.mk' L).comp N.subtype).codRestrict _ (fun x =>
@@ -376,9 +378,9 @@ private theorem step_factor
         rintro ⟨y, hy⟩
         obtain ⟨n, hn, hny⟩ := Subgroup.mem_map.mp hy
         exact ⟨⟨n, hn⟩, by ext; exact hny⟩
-      exact solvable_of_surjective hf_surj
+      exact Group.isSolvable_of_surjective hf_surj
     · right
-      haveI : IsSolvable (G ⧸ N) := h
+      have : Group.IsSolvable (G ⧸ N) := h
       -- (G ⧸ L) ⧸ (N.map mk') is quotient of (G ⧸ N) via lift.
       -- φ : G ⧸ N →* (G ⧸ L) ⧸ (N.map mk') sending ⟦g⟧_N ↦ ⟦⟦g⟧_L⟧_{N.map mk'}.
       let φ : G ⧸ N →* (G ⧸ L) ⧸ (N.map (QuotientGroup.mk' L)) :=
@@ -392,7 +394,7 @@ private theorem step_factor
       have hφ_surj : Function.Surjective φ := by
         rintro ⟨⟨g⟩⟩
         exact ⟨QuotientGroup.mk g, rfl⟩
-      exact solvable_of_surjective hφ_surj
+      exact Group.isSolvable_of_surjective hφ_surj
   -- Apply IH on G/L.
   obtain ⟨x, hx_mem, hx_conj⟩ := ih (G ⧸ L) hcard_lt h_cop_q h_solv_q hK_q hK'_q
   -- Lift x to g ∈ N.
@@ -413,11 +415,11 @@ mathlib v4.29.1 にこの形の lemma がないため自前. -/
 private theorem minimal_normal_isCommutative_of_solvable
     {N L : Subgroup G} [N.Normal] [L.Normal] (hL_le : L ≤ N) (hL_ne : L ≠ ⊥)
     (hL_min : ∀ L' : Subgroup G, L'.Normal → L' ≤ L → L' ≠ ⊥ → L' = L)
-    (hN_solv : IsSolvable N) : IsMulCommutative L := by
-  haveI hN_solv' : IsSolvable N := hN_solv
+    (hN_solv : Group.IsSolvable N) : IsMulCommutative L := by
+  have hN_solv' : Group.IsSolvable N := hN_solv
   -- [L, L] ≤ L, [L, L] is G-normal.
   have h_LL_le : ⁅L, L⁆ ≤ L := Subgroup.commutator_le_self L
-  haveI h_LL_normal : (⁅L, L⁆ : Subgroup G).Normal := Subgroup.commutator_normal L L
+  have h_LL_normal : (⁅L, L⁆ : Subgroup G).Normal := Subgroup.commutator_normal L L
   -- By minimality, [L, L] = ⊥ or [L, L] = L.
   by_cases h : (⁅L, L⁆ : Subgroup G) = ⊥
   · -- [L, L] = ⊥ ⇒ L is commutative in G ⇒ IsMulCommutative L.
@@ -431,10 +433,10 @@ private theorem minimal_normal_isCommutative_of_solvable
     exfalso
     have h_eq : (⁅L, L⁆ : Subgroup G) = L := hL_min _ h_LL_normal h_LL_le h
     -- L ≃* L.subgroupOf N, the latter is solvable, hence L solvable.
-    haveI hL_solv : IsSolvable L := by
-      haveI : IsSolvable (L.subgroupOf N) := inferInstance
+    have hL_solv : Group.IsSolvable L := by
+      have : Group.IsSolvable (L.subgroupOf N) := inferInstance
       let e := (subgroupOfEquivOfLe hL_le).symm
-      exact solvable_of_solvable_injective (f := e.toMonoidHom) e.injective
+      exact Group.isSolvable_of_isSolvable_injective (f := e.toMonoidHom) e.injective
     -- ⁅⊤_L, ⊤_L⁆.map L.subtype = ⁅L, L⁆.
     have h_comm_map : (⁅(⊤ : Subgroup ↥L), ⊤⁆ : Subgroup ↥L).map L.subtype = ⁅L, L⁆ := by
       rw [Subgroup.map_commutator, ← L.subtype.range_eq_map, Subgroup.range_subtype]
@@ -453,7 +455,7 @@ private theorem minimal_normal_isCommutative_of_solvable
       | zero => rfl
       | succ n ih => rw [derivedSeries_succ]; rw [ih]; exact h_comm_top
     -- L is nontrivial (since L ≠ ⊥ in G).
-    haveI : Nontrivial ↥L := (Subgroup.bot_or_nontrivial L).resolve_left hL_ne
+    have : Nontrivial ↥L := (Subgroup.bot_or_nontrivial L).resolve_left hL_ne
     -- L solvable: derivedSeries L n = ⊥ for some n.
     obtain ⟨n, hn⟩ := hL_solv.solvable
     -- Contradiction: (⊤ : Subgroup ↥L) = ⊥.
@@ -467,18 +469,18 @@ The commutativity follows from `minimal_normal_isCommutative_of_solvable`; the
 `p`-group structure follows from the `p`-primary component being characteristic in `L`
 (and hence normal in the ambient group), then minimality forces the `p`-primary = `L`. -/
 private theorem minimal_normal_isPGroup_of_solvable
-    {L : Subgroup G} [Finite G] [L.Normal] [IsSolvable L]
+    {L : Subgroup G} [Finite G] [L.Normal] [Group.IsSolvable L]
     (hL_ne : L ≠ ⊥)
     (hL_min : ∀ L' : Subgroup G, L'.Normal → L' ≤ L → L' ≠ ⊥ → L' = L) :
     ∃ p : ℕ, p.Prime ∧ IsPGroup p L := by
   -- L commutative.
-  haveI hL_comm : IsMulCommutative L :=
+  have hL_comm : IsMulCommutative L :=
     minimal_normal_isCommutative_of_solvable (N := L) le_rfl hL_ne hL_min inferInstance
-  haveI hL_nontriv : Nontrivial L := (Subgroup.bot_or_nontrivial L).resolve_left hL_ne
+  have hL_nontriv : Nontrivial L := (Subgroup.bot_or_nontrivial L).resolve_left hL_ne
   have hL_card_pos : 1 < Nat.card L := Finite.one_lt_card
   obtain ⟨p, hp_prime, hp_dvd⟩ := Nat.exists_prime_and_dvd hL_card_pos.ne'
   refine ⟨p, hp_prime, ?_⟩
-  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have : Fact p.Prime := ⟨hp_prime⟩
   -- T := p-torsion of L as a Subgroup of ↥L.
   let T : Subgroup ↥L :=
     { carrier := {x | x ^ p = 1}
@@ -495,7 +497,7 @@ private theorem minimal_normal_isPGroup_of_solvable
         change a ^ p = 1 at ha
         rw [inv_pow, ha, inv_one] }
   -- T characteristic in ↥L (image of p-torsion under any automorphism is p-torsion).
-  haveI hT_char : T.Characteristic := by
+  have hT_char : T.Characteristic := by
     rw [Subgroup.characteristic_iff_le_comap]
     intro φ x hx
     rw [Subgroup.mem_comap]
@@ -515,7 +517,7 @@ private theorem minimal_normal_isPGroup_of_solvable
     rw [hbot, Subgroup.mem_bot] at hx_T
     exact hx_ne_one hx_T
   -- T.map L.subtype ⊴ G (characteristic in normal), ≤ L, ≠ ⊥.
-  haveI hTL_normal : (T.map L.subtype).Normal := inferInstance
+  have hTL_normal : (T.map L.subtype).Normal := inferInstance
   have hTL_le : T.map L.subtype ≤ L := by
     rintro _ ⟨y, _, rfl⟩
     exact y.2
@@ -657,7 +659,7 @@ step_restriction. If `HL = G`, then `L = N` (cardinality), so `N` is abelian and
 mathlib `Subgroup.exists_smul_eq` (abelian SZ conjugacy). -/
 private theorem step_caseA
     (h1 : Nat.Coprime (Nat.card N) N.index)
-    (hN_solv : IsSolvable N)
+    (hN_solv : Group.IsSolvable N)
     (ih : IH G)
     {K K' : Subgroup G} (hK : IsComplement' N K) (hK' : IsComplement' N K') :
     ∃ n : G, n ∈ N ∧ K.map (MulAut.conj n).toMonoidHom = K' := by
@@ -675,11 +677,11 @@ private theorem step_caseA
     ext x
     simp
   -- Nontrivial case: take minimal normal L ⊆ N, abelian, then case split on K^g ⊔ L.
-  haveI hN_normal_inst : N.Normal := inferInstance
+  have hN_normal_inst : N.Normal := inferInstance
   obtain ⟨L, hL_normal, hL_le, hL_ne_bot, hL_min⟩ :=
     exists_minimal_normal_le hN_normal_inst hN_bot
-  haveI : L.Normal := hL_normal
-  haveI hL_comm : IsMulCommutative L :=
+  have : L.Normal := hL_normal
+  have hL_comm : IsMulCommutative L :=
     minimal_normal_isCommutative_of_solvable hL_le hL_ne_bot hL_min hN_solv
   -- Apply step_factor with L.
   obtain ⟨g_f, hg_f_N, h_factor⟩ :=
@@ -748,9 +750,9 @@ private theorem step_caseA
     -- |L| = |N| from |K^g_f| * |L| = |G| = |N| * |K^g_f|.
     have h_card_L_eq_N : Nat.card ↥L = Nat.card N := by
       have h1' : Nat.card (K.map (MulAut.conj g_f).toMonoidHom) * Nat.card ↥L = Nat.card G :=
-        hKgL_compl.card_mul
+        hKgL_compl.card_mul_card
       have h2' : Nat.card ↥N * Nat.card (K.map (MulAut.conj g_f).toMonoidHom) = Nat.card G :=
-        hK_g_compl.card_mul
+        hK_g_compl.card_mul_card
       have h_swap : Nat.card (K.map (MulAut.conj g_f).toMonoidHom) * Nat.card ↥N = Nat.card G := by
         rw [mul_comm]; exact h2'
       exact Nat.eq_of_mul_eq_mul_left Nat.card_pos (h1'.trans h_swap.symm)
@@ -784,7 +786,7 @@ not necessarily in `N`. (Also generalizes the inline proof in `step_caseA`.) -/
 theorem isComplement'_conj {N K : Subgroup G} [N.Normal]
     (hK : IsComplement' N K) (g : G) :
     IsComplement' N (K.map (MulAut.conj g).toMonoidHom) := by
-  haveI hN_normal : N.Normal := inferInstance
+  have hN_normal : N.Normal := inferInstance
   apply isComplement'_of_disjoint_and_mul_eq_univ
   · -- Disjoint: N ⊓ K^g = ⊥.
     rw [disjoint_iff]
@@ -839,7 +841,7 @@ Proof outline (Isaacs Thm 3.12, mmd L1644-1660):
       giving `K^{g' * g_f} = K'` with `g' * g_f ∈ N`. -/
 private theorem step_caseB
     (h1 : Nat.Coprime (Nat.card N) N.index)
-    (hQN_solv : IsSolvable (G ⧸ N))
+    (hQN_solv : Group.IsSolvable (G ⧸ N))
     (ih : IH G)
     {K K' : Subgroup G} (hK : IsComplement' N K) (hK' : IsComplement' N K') :
     ∃ n : G, n ∈ N ∧ K.map (MulAut.conj n).toMonoidHom = K' := by
@@ -870,7 +872,7 @@ private theorem step_caseB
     ext x
     simp
   -- Main: N ≠ ⊥, N ≠ ⊤.
-  haveI hGN_nontriv : Nontrivial (G ⧸ N) := by
+  have hGN_nontriv : Nontrivial (G ⧸ N) := by
     have h_idx : 1 < N.index := Subgroup.one_lt_index_of_ne_top hN_top
     have h_card : 1 < Nat.card (G ⧸ N) := h_idx
     exact Finite.one_lt_card_iff_nontrivial.mp h_card
@@ -884,10 +886,10 @@ private theorem step_caseB
     exact hab (ha.trans hb.symm)
   obtain ⟨M_bar, hM_bar_normal, _, hM_bar_ne_bot, hM_bar_min⟩ :=
     exists_minimal_normal_le (N := (⊤ : Subgroup (G ⧸ N))) inferInstance h_top_ne_bot
-  haveI : M_bar.Normal := hM_bar_normal
+  have : M_bar.Normal := hM_bar_normal
   -- M := M̄.comap (mk' N) ⊴ G.
   let M : Subgroup G := M_bar.comap (QuotientGroup.mk' N)
-  haveI hM_normal : M.Normal := M_bar.normal_comap (QuotientGroup.mk' N)
+  have hM_normal : M.Normal := M_bar.normal_comap (QuotientGroup.mk' N)
   -- N ≤ M.
   have hN_le_M : N ≤ M := by
     intro n hn
@@ -897,10 +899,10 @@ private theorem step_caseB
   -- M ≠ ⊥ (since N ⊆ M and N ≠ ⊥).
   have hM_ne_bot : M ≠ ⊥ := fun hbot => hN_bot (le_bot_iff.mp (hN_le_M.trans hbot.le))
   -- M_bar is a p-group (Isaacs Lem 3.11).
-  haveI : IsSolvable M_bar := inferInstance
+  have : Group.IsSolvable M_bar := inferInstance
   obtain ⟨p, hp_prime, hp_pgroup⟩ :=
     minimal_normal_isPGroup_of_solvable (L := M_bar) hM_bar_ne_bot hM_bar_min
-  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have : Fact p.Prime := ⟨hp_prime⟩
   -- Apply step_factor with L := M.
   obtain ⟨g_f, hg_f_N, h_factor⟩ :=
     step_factor h1 (Or.inr hQN_solv) ih hK hK' hM_ne_bot
@@ -967,7 +969,7 @@ private theorem step_caseB
       push Not at h
       interval_cases k
       rw [pow_zero] at hk_eq
-      haveI hM_bar_nontriv : Nontrivial M_bar :=
+      have hM_bar_nontriv : Nontrivial M_bar :=
         (Subgroup.bot_or_nontrivial _).resolve_left hM_bar_ne_bot
       have : 1 < Nat.card M_bar := Finite.one_lt_card
       omega
@@ -1000,7 +1002,7 @@ private theorem step_caseB
     have h_MH_subgroupOf_card :
         Nat.card ((M ⊓ H : Subgroup G).subgroupOf M) = p ^ (Nat.card ↥M).factorization p := by
       rw [h_MH_subgroupOf_card_eq, h_MH_card_eq_pk, h_M_factorization]
-    haveI : Fact p.Prime := ⟨hp_prime⟩
+    have : Fact p.Prime := ⟨hp_prime⟩
     let P_H : Sylow p ↥M := Sylow.ofCard ((M ⊓ H : Subgroup G).subgroupOf M) h_MH_subgroupOf_card
     -- Step 8: K' analog. K'M = G ⇒ |M ⊓ K'| = p^k.
     have hK'M_top : K' ⊔ M = ⊤ := by rw [← h_factor]; exact hHM_top
@@ -1068,7 +1070,7 @@ private theorem step_caseB
       rw [← h_push]
       ext x
       simp only [Subgroup.mem_inf, Subgroup.mem_map, MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
-      haveI : M.Normal := inferInstance
+      have : M.Normal := inferInstance
       constructor
       · rintro ⟨hxM, y, hyK', rfl⟩
         refine ⟨y, ⟨?_, hyK'⟩, rfl⟩
@@ -1098,7 +1100,7 @@ private theorem step_caseB
       intro h hHmem
       rw [Subgroup.mem_normalizer_iff]
       intro x
-      haveI : M.Normal := inferInstance
+      have : M.Normal := inferInstance
       constructor
       · rintro ⟨hxM, hxH⟩
         refine ⟨(inferInstance : M.Normal).conj_mem _ hxM _, ?_⟩
@@ -1117,7 +1119,7 @@ private theorem step_caseB
       intro k hKmem
       rw [Subgroup.mem_normalizer_iff]
       intro x
-      haveI : M.Normal := inferInstance
+      have : M.Normal := inferInstance
       constructor
       · intro hxL
         have hxL' : x ∈ (M ⊓ K'm : Subgroup G) := hL_eq ▸ hxL
@@ -1143,7 +1145,7 @@ private theorem step_caseB
     have hK'm_compl : IsComplement' N K'm := isComplement'_conj hK' m
     by_cases hNL_top : normalizer (L : Set G) = ⊤
     · -- Case N_G(L) = G: L ⊴ G, apply step_factor with H, K', L.
-      haveI hL_normal : L.Normal := by
+      have hL_normal : L.Normal := by
         refine ⟨fun n hn g => ?_⟩
         have hg_mem : g ∈ normalizer (L : Set G) := by rw [hNL_top]; trivial
         exact (Subgroup.mem_normalizer_iff.mp hg_mem n).mp hn
@@ -1270,7 +1272,7 @@ private theorem main_aux {n : ℕ} :
     ∀ {G : Type u} [Group G] [Finite G] (_hG : Nat.card G = n)
       {N : Subgroup G} [N.Normal]
       (_h1 : Nat.Coprime (Nat.card N) N.index)
-      (_hSolv : IsSolvable N ∨ IsSolvable (G ⧸ N))
+      (_hSolv : Group.IsSolvable N ∨ Group.IsSolvable (G ⧸ N))
       {K K' : Subgroup G} (_hK : IsComplement' N K) (_hK' : IsComplement' N K'),
       ∃ n : G, n ∈ N ∧ K.map (MulAut.conj n).toMonoidHom = K' := by
   induction n using Nat.strongRecOn with
@@ -1292,7 +1294,7 @@ element of `N`. -/
 theorem IsComplement'.exists_conj_of_coprime {G : Type u} [Group G] [Finite G]
     {N : Subgroup G} [N.Normal]
     (hN : Nat.Coprime (Nat.card N) N.index)
-    (hSolv : IsSolvable N ∨ IsSolvable (G ⧸ N))
+    (hSolv : Group.IsSolvable N ∨ Group.IsSolvable (G ⧸ N))
     {K K' : Subgroup G} (hK : IsComplement' N K) (hK' : IsComplement' N K') :
     ∃ n : G, n ∈ N ∧ K.map (MulAut.conj n).toMonoidHom = K' :=
   SchurZassenhausConj.main_aux rfl hN hSolv hK hK'

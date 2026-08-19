@@ -195,7 +195,7 @@ theorem card_K_eq_card_Q0_sub_one :
   have hset : {x : G | x ^ 2 = 1 ∧ x ≠ 1 ∧ x ∈ hyp.H} =
       (hyp.Q0 : Set G) \ {1} := by
     ext x
-    simp only [Set.mem_setOf_eq, Set.mem_sdiff, SetLike.mem_coe,
+    simp only [Set.mem_ofPred_eq, Set.mem_sdiff, SetLike.mem_coe,
       hyp.mem_Q0_iff, Set.mem_singleton_iff]
     tauto
   calc

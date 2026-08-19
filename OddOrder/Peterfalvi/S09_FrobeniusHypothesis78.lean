@@ -111,12 +111,12 @@ theorem exists_sibley_distinguished_char [Fintype G] [Invertible (Nat.card G : �
     (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C) :
     ∃ χ ∈ (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).S,
       χ (1 : ↥(F.L i)) = (((F.H i).subgroupOf (F.L i)).index : ℂ) := by
-  haveI : ((F.H i).subgroupOf (F.L i)).Normal := hFrob.isNormal
-  haveI : Nontrivial ↥((F.H i).subgroupOf (F.L i)) :=
+  have : ((F.H i).subgroupOf (F.L i)).Normal := hFrob.isNormal
+  have : Nontrivial ↥((F.H i).subgroupOf (F.L i)) :=
     (Subgroup.nontrivial_iff_ne_bot _).mpr hFrob.ne_bot_kernel
-  haveI : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)) := hnilp
+  have : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)) := hnilp
   have hcomm : commutator ↥((F.H i).subgroupOf (F.L i)) ≠ ⊤ :=
-    (IsSolvable.commutator_lt_top_of_nontrivial _).ne
+    (Group.IsSolvable.commutator_lt_top_of_nontrivial _).ne
   obtain ⟨θ, hθ_ne, hθ_deg⟩ :=
     OddOrder.Peterfalvi.S08.exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top
       hcomm

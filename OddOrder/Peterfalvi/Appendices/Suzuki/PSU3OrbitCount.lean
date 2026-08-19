@@ -128,7 +128,7 @@ theorem index_range_mu {m : ℕ} (hm : m ≠ 0) (M : hyp.QuotientFieldModel m)
     (hK : Nat.card ↥hyp.actualKActor = 2 ^ m - 1) :
     (MonoidHom.range M.mu).index = (2 ^ m + 1) / Nat.card ↥hyp.W := by
   classical
-  haveI : Fintype M.E := Fintype.ofFinite _
+  have : Fintype M.E := Fintype.ofFinite _
   have hrange : Nat.card ↥(MonoidHom.range M.mu)
       = (2 ^ m - 1) * Nat.card ↥hyp.W := by
     have e1 : Nat.card (↥hyp.actualKActor × ↥hyp.W) = Nat.card ↥(MonoidHom.range M.mu) :=

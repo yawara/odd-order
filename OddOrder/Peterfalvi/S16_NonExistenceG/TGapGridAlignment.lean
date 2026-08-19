@@ -90,10 +90,10 @@ theorem alignedOmegaSourceCharacter_injective [Finite G]
   classical
   intro ⟨i, j⟩ ⟨i', j'⟩ hij
   let h := (s12.toCertainTypeHypothesis hG hodd).toHypothesis
-  haveI : NeZero (Nat.card h.W1) :=
+  have : NeZero (Nat.card h.W1) :=
     ⟨by have := h.one_lt_card_W1; omega⟩
-  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
   have hW1le : s12.typeP.W1 ≤ M := s12.typeP.W1_le
   have hW2le : s12.typeP.W2 ≤ M :=
     OddOrder.Peterfalvi.S12.typePData_W2_le_self s12.typeP
@@ -102,7 +102,7 @@ theorem alignedOmegaSourceCharacter_injective [Finite G]
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = s12.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) :=
+  have : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) :=
     ⟨Nat.card_pos.ne'⟩
   let χ₂ : Fin s12.w2 → (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
     fun k => OddOrder.Peterfalvi.S12.finCardEquivCharacterGroup _
@@ -134,6 +134,7 @@ theorem alignedOmegaSourceCharacter_injective [Finite G]
         hfactors.2)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- The aligned S12 source character separates as its column-zero character
 times its row-zero character.  This is the honest factorization used to build
 a coordinate-respecting eta reindex; it does not assume that the abstract S15
@@ -147,10 +148,10 @@ theorem alignedOmegaSourceCharacter_eq_mul_axes [Finite G]
         s12.alignedOmegaSourceCharacter hG hodd 0 j := by
   classical
   let h := (s12.toCertainTypeHypothesis hG hodd).toHypothesis
-  haveI : NeZero (Nat.card h.W1) :=
+  have : NeZero (Nat.card h.W1) :=
     ⟨by have := h.one_lt_card_W1; omega⟩
-  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
   have hW1le : s12.typeP.W1 ≤ M := s12.typeP.W1_le
   have hW2le : s12.typeP.W2 ≤ M :=
     OddOrder.Peterfalvi.S12.typePData_W2_le_self s12.typeP
@@ -159,7 +160,7 @@ theorem alignedOmegaSourceCharacter_eq_mul_axes [Finite G]
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = s12.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) :=
+  have : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) :=
     ⟨Nat.card_pos.ne'⟩
   let χ₂ : Fin s12.w2 → (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
     fun k => OddOrder.Peterfalvi.S12.finCardEquivCharacterGroup _
@@ -203,6 +204,7 @@ theorem alignedOmegaSourceCharacter_eq_mul_axes [Finite G]
   exact hpcomp
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- The source row-zero character is trivial on the first type-P factor.
 After reconciliation this factor is the target `W₂`. -/
 theorem alignedOmegaSourceCharacter_zero_row_apply_of_mem_W1 [Finite G]
@@ -215,10 +217,10 @@ theorem alignedOmegaSourceCharacter_zero_row_apply_of_mem_W1 [Finite G]
     s12.alignedOmegaSourceCharacter hG hodd 0 j x = 1 := by
   classical
   let h := (s12.toCertainTypeHypothesis hG hodd).toHypothesis
-  haveI : NeZero (Nat.card h.W1) :=
+  have : NeZero (Nat.card h.W1) :=
     ⟨by have := h.one_lt_card_W1; omega⟩
-  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
   have hW1le : s12.typeP.W1 ≤ M := s12.typeP.W1_le
   have hW2le : s12.typeP.W2 ≤ M :=
     OddOrder.Peterfalvi.S12.typePData_W2_le_self s12.typeP
@@ -227,7 +229,7 @@ theorem alignedOmegaSourceCharacter_zero_row_apply_of_mem_W1 [Finite G]
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = s12.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) :=
+  have : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) :=
     ⟨Nat.card_pos.ne'⟩
   let χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
     OddOrder.Peterfalvi.S12.finCardEquivCharacterGroup _
@@ -273,6 +275,7 @@ theorem alignedOmegaSourceCharacter_zero_row_apply_of_mem_W1 [Finite G]
     hchi, Units.val_one, one_mul]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- The source column-zero character is trivial on the second type-P factor.
 After reconciliation this factor is the target `W₁`. -/
 theorem alignedOmegaSourceCharacter_zero_column_apply_of_mem_W2 [Finite G]
@@ -285,10 +288,10 @@ theorem alignedOmegaSourceCharacter_zero_column_apply_of_mem_W2 [Finite G]
     s12.alignedOmegaSourceCharacter hG hodd i 0 x = 1 := by
   classical
   let h := (s12.toCertainTypeHypothesis hG hodd).toHypothesis
-  haveI : NeZero (Nat.card h.W1) :=
+  have : NeZero (Nat.card h.W1) :=
     ⟨by have := h.one_lt_card_W1; omega⟩
-  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
   have hW1le : s12.typeP.W1 ≤ M := s12.typeP.W1_le
   have hW2le : s12.typeP.W2 ≤ M :=
     OddOrder.Peterfalvi.S12.typePData_W2_le_self s12.typeP
@@ -297,7 +300,7 @@ theorem alignedOmegaSourceCharacter_zero_column_apply_of_mem_W2 [Finite G]
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = s12.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) :=
+  have : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) :=
     ⟨Nat.card_pos.ne'⟩
   let χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
     OddOrder.Peterfalvi.S12.finCardEquivCharacterGroup _
@@ -388,6 +391,7 @@ noncomputable def alignedOmegaRowIndex [Finite G]
   (omegaW2RestrictionEquiv base).symm
     (alignedOmegaSourceW2Restriction hG base s12 hW hodd i)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The target column-zero omega character selected from the source `W₂`
 axis equals that transported source character on all of `W`. -/
 theorem omegaMonoidHom_alignedOmegaColumnIndex [Finite G]
@@ -425,6 +429,7 @@ theorem omegaMonoidHom_alignedOmegaColumnIndex [Finite G]
       exact hW2.symm ▸ Subgroup.mem_subgroupOf.mp y.property
     exact htarget.trans hsource.symm
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The target row-zero omega character selected from the source `W₁` axis
 equals that transported source character on all of `W`. -/
 theorem omegaMonoidHom_alignedOmegaRowIndex [Finite G]
@@ -460,6 +465,7 @@ theorem omegaMonoidHom_alignedOmegaRowIndex [Finite G]
         (alignedOmegaSourceW2Restriction hG base s12 hW hodd i)) y
     exact hy
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The transported source character at `(0,0)` is the trivial character.
 The proof uses the two reconciled factors rather than any global uniqueness
 claim for the sigma map. -/
@@ -922,6 +928,7 @@ theorem alignedOmegaEtaGrid_orthonormal [Finite G]
     rw [if_neg hindex, if_neg h]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- The concrete S12 sigma-grid and the abstract S15 eta-grid agree on the
 shared regular set after reindexing by `alignedOmegaEtaIndex`.  Both sides
 restore the same transported multiplicative character there. -/
@@ -1185,7 +1192,7 @@ theorem eta_eq_of_norm_one_regular_value_eq [Finite G]
           ClassFunction.inner φ (base.eta x.1 x.2) ≠ 0} := by
       intro x hx
       by_contra hcon
-      simp only [Set.mem_union, Set.mem_setOf_eq, not_or, not_not] at hcon
+      simp only [Set.mem_union, Set.mem_ofPred_eq, not_or, not_not] at hcon
       apply hx
       rw [hψ, ClassFunction.inner_sub_left, hcon.1, hcon.2, sub_zero]
     calc {x : Fin base.q × Fin base.p |
@@ -1207,7 +1214,7 @@ theorem eta_eq_of_norm_one_regular_value_eq [Finite G]
           ClassFunction.inner ψ (base.eta x.1 x.2) ≠ 0).card
         = {x : Fin base.q × Fin base.p |
             ClassFunction.inner ψ (base.eta x.1 x.2) ≠ 0}.toFinset.card := by
-          rw [Set.toFinset_setOf]
+          rw [Set.toFinset_ofPred]
       _ = {x : Fin base.q × Fin base.p |
             ClassFunction.inner ψ (base.eta x.1 x.2) ≠ 0}.ncard :=
           (Set.ncard_eq_toFinset_card' _).symm

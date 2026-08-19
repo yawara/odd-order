@@ -58,10 +58,10 @@ theorem actionCommutator_eq_bot_of_omega1_le_fixedPoints
     fixedPoints_inf_actionCommutator_eq_bot_of_abelian φ hCop
   by_contra hH
   -- `H := [G, A]` is a nontrivial `p`-group; extract an order-`p` element (Cauchy).
-  haveI hHne : Nontrivial (actionCommutator φ) :=
+  have hHne : Nontrivial (actionCommutator φ) :=
     (Subgroup.nontrivial_iff_ne_bot _).mpr hH
   have hHp : IsPGroup p (actionCommutator φ) := hG.to_subgroup _
-  haveI : Fintype (actionCommutator φ) := Fintype.ofFinite _
+  have : Fintype (actionCommutator φ) := Fintype.ofFinite _
   have hpH : p ∣ Nat.card (actionCommutator φ) := by
     rcases hHp.card_eq_or_dvd with h1 | hd
     · exact absurd h1 (by simpa using (Finite.one_lt_card (α := actionCommutator φ)).ne')

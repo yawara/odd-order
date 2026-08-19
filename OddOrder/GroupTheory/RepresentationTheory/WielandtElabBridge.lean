@@ -76,9 +76,9 @@ theorem card_fixedSubgroup_eq_pow_finrank (p : ℕ) [Fact p.Prime] [Module (ZMod
     [Finite V] (φ : L →* MulAut V) (X : Subgroup L) :
     Nat.card ↥(fixedSubgroup φ X) =
       p ^ Module.finrank (ZMod p) ↥(invariants ((elabRepresentation p φ).comp X.subtype)) := by
-  haveI : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
+  have : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
   classical
-  letI : Fintype ↥(invariants ((elabRepresentation p φ).comp X.subtype)) := Fintype.ofFinite _
+  let : Fintype ↥(invariants ((elabRepresentation p φ).comp X.subtype)) := Fintype.ofFinite _
   rw [card_fixedSubgroup_eq_card_invariants p, Nat.card_eq_fintype_card,
     Module.card_eq_pow_finrank (K := ZMod p), ZMod.card]
 
@@ -110,9 +110,9 @@ theorem card_fixedSubgroup_wielandt_of_dim (p : ℕ) [Fact p.Prime] [Module (ZMo
         Module.finrank (ZMod p) ↥(invariants ((elabRepresentation p φ).comp U.subtype))) :
     Nat.card ↥(fixedSubgroup φ ⊤) ^ Nat.card E * Nat.card V =
       Nat.card ↥(fixedSubgroup φ E) ^ Nat.card E * Nat.card ↥(fixedSubgroup φ U) := by
-  haveI : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
+  have : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
   classical
-  letI : Fintype V := Fintype.ofFinite _
+  let : Fintype V := Fintype.ofFinite _
   have hV : Nat.card V = p ^ Module.finrank (ZMod p) (Additive V) := by
     rw [Nat.card_eq_fintype_card, ← Fintype.card_additive V,
       Module.card_eq_pow_finrank (K := ZMod p), ZMod.card]

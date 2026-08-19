@@ -50,7 +50,7 @@ theorem inf_conj_fitting_isPGroup_of_not_isMulCommutative [Finite G]
     (hnab : ¬ IsMulCommutative ↥(MF M)) :
     IsPGroup p ↥(fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M : Subgroup G) := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   set X : Subgroup G := fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M with hXdef
   have hMFeq : MF M = OddOrder.BG.Ch3.S10.Msigma M := mf_eq_msigma_of_not_fittingIsTI hG hM hnotTI
   -- `X ≤ M_F` and `X ≤ M_F^g` (Theorem 15.7(b), with `M_F = M_σ`).
@@ -63,7 +63,7 @@ theorem inf_conj_fitting_isPGroup_of_not_isMulCommutative [Finite G]
   refine IsPGroup.of_card (Nat.eq_prime_pow_of_unique_prime_dvd Nat.card_pos.ne' ?_)
   intro d hd hdvd
   by_contra hdp
-  haveI : Fact d.Prime := ⟨hd⟩
+  have : Fact d.Prime := ⟨hd⟩
   -- an order-`d` subgroup `Z ≤ X`, hence `Z ≤ M_F` and `Z ≤ M_F^g`.
   obtain ⟨z, hzord⟩ := exists_prime_orderOf_dvd_card' (G := ↥X) d hdvd
   set Z : Subgroup G := (Subgroup.zpowers z).map X.subtype with hZdef
@@ -77,7 +77,7 @@ theorem inf_conj_fitting_isPGroup_of_not_isMulCommutative [Finite G]
   have hle : opiCoreInG ({d} : Set ℕ) (MF M) ≤ opiCoreInG (({p} : Set ℕ)ᶜ) (MF M) :=
     Subgroup.map_mono (OddOrder.Isaacs.Ch03.oPiCore_mono
       (Set.singleton_subset_iff.mpr (Set.mem_compl_singleton_iff.mpr hdp)) ↥(MF M))
-  haveI : IsCyclic ↥(opiCoreInG (({p} : Set ℕ)ᶜ) (MF M)) := hRcyc
+  have : IsCyclic ↥(opiCoreInG (({p} : Set ℕ)ᶜ) (MF M)) := hRcyc
   exact Subgroup.isCyclic_of_le hle
 
 /-- **BG Theorem 15.7(e), conjunct A per-prime witness** (Coq `oZ`: `|Ω₁(Z(O_q(H)))| = q`): for the
@@ -108,9 +108,9 @@ theorem exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI [Finite G]
       M ≤ Subgroup.normalizer (Z : Set G) ∧ ¬ X₁ ≤ Z ∧
       (q = p → Z = OddOrder.BG.Ch3.S10.omega1CenterInG (opiCoreInG ({p} : Set ℕ) (MF M)) p) := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : Fact q.Prime := ⟨hq⟩
-  haveI hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
+  have : Fact p.Prime := ⟨hp⟩
+  have : Fact q.Prime := ⟨hq⟩
+  have hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
   have hMNMF : M ≤ Subgroup.normalizer ((MF M : Subgroup G) : Set G) :=
     maxNilpotentNormalHall_le_normalizer M
   by_cases hqp : q = p
@@ -123,7 +123,7 @@ theorem exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI [Finite G]
     have hX₁P : X₁ ≤ P :=
       OddOrder.BG.Ch2.S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent hMFnil hX₁MF hX₁pg
     have hPne : P ≠ ⊥ := fun h => hX₁ne (le_bot_iff.mp (h ▸ hX₁P))
-    haveI : Nontrivial ↥P := (Subgroup.nontrivial_iff_ne_bot P).mpr hPne
+    have : Nontrivial ↥P := (Subgroup.nontrivial_iff_ne_bot P).mpr hPne
     have hPpg : IsPGroup p ↥P := isPGroup_opiCoreInG_singleton (MF M)
     -- `P` non-abelian; `C₁ = C_{M_F}(X₁)` abelian.
     have hPnab : ¬ IsMulCommutative ↥P :=
@@ -212,7 +212,7 @@ theorem exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI [Finite G]
     have hZpow : Nat.card ↥Z = p ^ (Nat.log p (Nat.card ↥Z)) := by
       rw [hZea.log_card_eq_finrank]; exact hZea.card_eq_pow_finrank
     have hZne : Z ≠ ⊥ := by
-      haveI hcNt : Nontrivial ↥(Subgroup.center ↥P) := hPpg.center_nontrivial
+      have hcNt : Nontrivial ↥(Subgroup.center ↥P) := hPpg.center_nontrivial
       have hcdvd : Nat.card ↥(Subgroup.center ↥P) ∣ Nat.card ↥P :=
         Subgroup.card_subgroup_dvd_card _
       obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hPpg
@@ -271,10 +271,10 @@ theorem exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI [Finite G]
     have hOqle : opiCoreInG ({q} : Set ℕ) (MF M) ≤ opiCoreInG (({p} : Set ℕ)ᶜ) (MF M) :=
       Subgroup.map_mono (OddOrder.Isaacs.Ch03.oPiCore_mono
         (Set.singleton_subset_iff.mpr (Set.mem_compl_singleton_iff.mpr hqp)) ↥(MF M))
-    haveI : IsCyclic ↥(opiCoreInG (({p} : Set ℕ)ᶜ) (MF M)) := hcyc
-    haveI hOqcyc : IsCyclic ↥(opiCoreInG ({q} : Set ℕ) (MF M)) := Subgroup.isCyclic_of_le hOqle
+    have : IsCyclic ↥(opiCoreInG (({p} : Set ℕ)ᶜ) (MF M)) := hcyc
+    have hOqcyc : IsCyclic ↥(opiCoreInG ({q} : Set ℕ) (MF M)) := Subgroup.isCyclic_of_le hOqle
     -- `Z.subgroupOf O_q(M_F)` is characteristic (subgroup of a cyclic group).
-    haveI hWchar : (Z.subgroupOf (opiCoreInG ({q} : Set ℕ) (MF M))).Characteristic :=
+    have hWchar : (Z.subgroupOf (opiCoreInG ({q} : Set ℕ) (MF M))).Characteristic :=
       OddOrder.Isaacs.Ch04.characteristic_of_subgroup_of_isCyclic _
     -- `M ≤ N(O_q(M_F)) ≤ N(Z)`.
     have hMNOq : M ≤ Subgroup.normalizer ((opiCoreInG ({q} : Set ℕ) (MF M) : Subgroup G) : Set G) :=
@@ -331,8 +331,8 @@ theorem exists_rankTwo_elemAbelian_of_witness [Finite G]
       Nat.card ↥(X₁ ⊔ Z) = p ^ 2 ∧
       (X₁ ⊔ Z) ≤ MF M ⊓ Subgroup.centralizer (X₁ : Set G) := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
+  have : Fact p.Prime := ⟨hp⟩
+  have hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
   set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (MF M) with hPdef
   have hX₁pg : IsPGroup p ↥X₁ := IsPGroup.of_card (n := 1) (by rw [hX₁card, pow_one])
   have hX₁P : X₁ ≤ P :=
@@ -402,8 +402,8 @@ theorem exists_sylow_eq_opiCore_of_mf_eq_msigma [Finite G]
     (hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M) :
     ∃ S : Sylow p G, (S : Subgroup G) = opiCoreInG ({p} : Set ℕ) (MF M) := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
+  have : Fact p.Prime := ⟨hp⟩
+  have hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
   set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (MF M) with hPdef
   -- `P` is a `p`-group: `|P| = p^a`.
   have hPpg : IsPGroup p ↥P := isPGroup_opiCoreInG_singleton (MF M)
@@ -464,8 +464,8 @@ theorem isMaximalElementaryAbelian_sup_omega1Center_of_witness [Finite G]
     (hBcard : Nat.card ↥(X₁ ⊔ Z) = p ^ 2) :
     IsMaximalElementaryAbelian p (X₁ ⊔ Z) := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
+  have : Fact p.Prime := ⟨hp⟩
+  have hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
   set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (MF M) with hPdef
   have hX₁pg : IsPGroup p ↥X₁ := IsPGroup.of_card (n := 1) (by rw [hX₁card, pow_one])
   have hX₁P : X₁ ≤ P :=
@@ -509,11 +509,11 @@ theorem isMaximalElementaryAbelian_sup_omega1Center_of_witness [Finite G]
   -- σ-Hall tameness (BG Cor 15.3(b)) at the Hall subgroup `P` of `M_σ`.
   have hPMσ : P ≤ OddOrder.BG.Ch3.S10.Msigma M := hmf ▸ hPMF
   have hPne : P ≠ ⊥ := fun h => hX₁ne (le_bot_iff.mp (h ▸ hX₁P))
-  haveI hMσnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) := hmf ▸ hMFnil
+  have hMσnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) := hmf ▸ hMFnil
   have hPpg : IsPGroup p ↥P := isPGroup_opiCoreInG_singleton (MF M)
   have hPpiSet : S14.piSet P = ({p} : Set ℕ) := by
     ext q
-    simp only [S14.piSet, Set.mem_setOf_eq, Set.mem_singleton_iff]
+    simp only [S14.piSet, Set.mem_ofPred_eq, Set.mem_singleton_iff]
     constructor
     · intro hq
       obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hPpg
@@ -632,10 +632,10 @@ theorem inf_conj_fitting_eq_of_not_isMulCommutative [Finite G]
     (hnab : ¬ IsMulCommutative ↥(MF M)) :
     (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M : Subgroup G) = X₁ := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   set X : Subgroup G := fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M with hXdef
   have hmf : MF M = OddOrder.BG.Ch3.S10.Msigma M := mf_eq_msigma_of_not_fittingIsTI hG hM hnotTI
-  haveI hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
+  have hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
   set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (MF M) with hPdef
   have hXMF : X ≤ MF M := (inf_conj_fitting_le_Msigma hG hM hgM).trans (le_of_eq hmf.symm)
   have hX₁MF : X₁ ≤ MF M := hX₁X.trans hXMF
@@ -643,7 +643,7 @@ theorem inf_conj_fitting_eq_of_not_isMulCommutative [Finite G]
     inf_conj_fitting_isPGroup_of_not_isMulCommutative hG hM hnotTI hgM hp hX₁card hX₁MF hCGnotM hnab
   have hXP : X ≤ P :=
     OddOrder.BG.Ch2.S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent hMFnil hXMF hXpg
-  haveI hXcyc : IsCyclic ↥X := inf_conj_fitting_isCyclic hG hM hgM
+  have hXcyc : IsCyclic ↥X := inf_conj_fitting_isCyclic hG hM hgM
   have hX₁pg : IsPGroup p ↥X₁ := IsPGroup.of_card (n := 1) (by rw [hX₁card, pow_one])
   have hX₁P : X₁ ≤ P :=
     OddOrder.BG.Ch2.S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent hMFnil hX₁MF hX₁pg
@@ -797,11 +797,11 @@ theorem kstar_card_eq_witness_prime_of_isTypeP1 [Finite G]
     (hcyc : IsCyclic ↥(opiCoreInG (({p} : Set ℕ)ᶜ) (MF M))) :
     Nat.card ↥Kstar = p := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
+  have : Fact p.Prime := ⟨hp⟩
+  have hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
   -- `O_{p'}(M_F)` is commutative, transferred from the ambient copy to the subtype level.
-  haveI := hcyc
-  haveI hcyc' : IsCyclic ↥(Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥(MF M)) := by
+  have := hcyc
+  have hcyc' : IsCyclic ↥(Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥(MF M)) := by
     have he : ↥(Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥(MF M)) ≃*
         ↥(opiCoreInG (({p} : Set ℕ)ᶜ) (MF M)) :=
       Subgroup.equivMapOfInjective _ (MF M).subtype (MF M).subtype_injective
@@ -821,7 +821,7 @@ theorem kstar_card_eq_witness_prime_of_isTypeP1 [Finite G]
     (isPGroup_opiCoreInG_singleton (MF M)).to_le hKsP
   -- Prime order plus `p`-group forces `|K*| = p`.
   have hprime : (Nat.card ↥Kstar).Prime := kstar_card_prime_of_inputs hG hM hP1 hKM hK hKstar
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := p) (G := ↥Kstar)).mp hKspg
   rw [hn] at hprime ⊢
   have hn0 : n ≠ 0 := by

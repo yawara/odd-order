@@ -190,7 +190,7 @@ theorem lowerCentralSeries_sup_eq_bot {A K : Subgroup G} [A.Normal] [K.Normal]
     Subgroup.lowerCentralSeries (A ⊔ K) 2 = ⊥ := by
   have hKA : ⁅K, A⁆ = ⊥ := by rw [Subgroup.commutator_comm]; exact hAK
   set N : Subgroup G := ⁅A, A⁆ ⊔ ⁅K, K⁆ with hN
-  haveI : N.Normal := by rw [hN]; infer_instance
+  have : N.Normal := by rw [hN]; infer_instance
   have hAA : Subgroup.lowerCentralSeries A 1 = ⁅A, A⁆ := by
     rw [Subgroup.lowerCentralSeries_succ, Subgroup.lowerCentralSeries_zero]
   have hKK : Subgroup.lowerCentralSeries K 1 = ⁅K, K⁆ := by
@@ -268,15 +268,15 @@ theorem exists_characteristic_selfCentralizing_class_le_two [Finite G] [Group.Is
     (p := fun K : Subgroup G => K.Characteristic ∧ Subgroup.lowerCentralSeries K 2 = ⊥)
     (a := ⊥) ⟨inferInstance, by simp⟩
   obtain ⟨hKchar, hKcls⟩ := hKmax.prop
-  haveI := hKchar
+  have := hKchar
   refine ⟨K, hKchar, hKcls, ?_⟩
   set C : Subgroup G := Subgroup.centralizer (K : Set G) with hCdef
-  haveI hCchar : C.Characteristic := by rw [hCdef]; infer_instance
+  have hCchar : C.Characteristic := by rw [hCdef]; infer_instance
   -- 吸収補題
   have habsorb : ∀ A : Subgroup G, A.Characteristic → Subgroup.lowerCentralSeries A 2 = ⊥ →
       A ≤ C → A ≤ K := by
     intro A hAchar hAcls hAC
-    haveI := hAchar
+    have := hAchar
     have hAK : ⁅A, K⁆ = ⊥ := by
       rw [Subgroup.commutator_eq_bot_iff_le_centralizer]
       exact hAC

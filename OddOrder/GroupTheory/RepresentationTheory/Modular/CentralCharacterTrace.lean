@@ -120,6 +120,7 @@ theorem centralScalar_classSum_mul_character_one (C : ConjClasses G) :
   · rw [if_neg h, if_neg h, zero_mul]
 
 open scoped Classical in
+set_option backward.isDefEq.respectTransparency false in
 /-- **`ω_i(K̂) · χ_i(1) = |K| · χ_i(x_K)`.**  The character is constant on the class, so the sum
 `∑_{g ∈ K} χ_i(g)` is `|K|` copies of its value at a representative.  This is the form in which
 Navarro's `p^{a-d(K)}` normalisation extracts the `p`-part of `|K|`. -/

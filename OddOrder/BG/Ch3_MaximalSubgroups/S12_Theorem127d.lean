@@ -114,7 +114,7 @@ theorem elemAb_le_E2_of_prime_eq [Finite G] (hG : IsMinimalSimpleOdd G)
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₂_le).toEquiv]
     exact card_E2_eq_pow h hp hprime_eq
   set SE₂ : Sylow p ↥E := Sylow.ofCard (E₂.subgroupOf E) hE₂card with hSE₂def
-  haveI hAnormal : (A.subgroupOf E).Normal :=
+  have hAnormal : (A.subgroupOf E).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hAE).mpr
       (elemAb_normal_in_E_of_tau2 hG h hp hA hAE).1.1
   obtain ⟨TA, hATA⟩ := hA.1.isPGroup.comap_subtype.exists_le_sylow (G := E)
@@ -271,7 +271,7 @@ theorem exists_complement_of_canonical_line [Finite G] (hG : IsMinimalSimpleOdd 
   have hcardE₂_eq : Nat.card ↥E₂ = p * Nat.card ↥Z' := by
     rw [hE₂_eq_sup,
       card_sup_eq_mul_of_le_normalizer_of_disjoint hA₀_norm_Z' hA₀Z'_bot, hA₀card]
-  haveI hZ''norm : (Z'.subgroupOf E₂).Normal := by
+  have hZ''norm : (Z'.subgroupOf E₂).Normal := by
     constructor
     intro n hn g
     have heq : g * n * g⁻¹ = n := by
@@ -299,7 +299,7 @@ theorem exists_complement_of_canonical_line [Finite G] (hG : IsMinimalSimpleOdd 
   -- the conjugation action `φ : ↥E₁ →* MulAut ↥E₂` (`E₁ ≤ N_G(E₂)` by 12.1(e)).
   have hE₁_norm_E₂ : E₁ ≤ Subgroup.normalizer ((E₂ : Subgroup G) : Set G) :=
     le_sup_left.trans (h.E2_normal_in_E12 hG)
-  letI act : MulDistribMulAction ↥E₁ ↥E₂ :=
+  let act : MulDistribMulAction ↥E₁ ↥E₂ :=
     MulDistribMulAction.compHom
       (M := ↥(Subgroup.normalizer ((E₂ : Subgroup G) : Set G))) ↥E₂
       (Subgroup.inclusion hE₁_norm_E₂)

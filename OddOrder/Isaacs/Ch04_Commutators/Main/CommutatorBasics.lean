@@ -86,7 +86,7 @@ theorem nilpotencyClass_eq_one_of_normal_abelian_cyclic_quotient_inf_center_prim
     (hAcard : Nat.card A = p)
     (hAZcard : Nat.card (A ⊓ Subgroup.center P : Subgroup P) = p) :
     Group.nilpotencyClass P = 1 := by
-  haveI : Group.IsNilpotent P := hP.isNilpotent
+  have : Group.IsNilpotent P := hP.isNilpotent
   -- A ⊓ Z(P) ⊆ A, 等カード ⇒ A ⊓ Z(P) = A ⇒ A ⊆ Z(P)
   have hAZ_eq_A : A ⊓ Subgroup.center P = A :=
     Subgroup.eq_of_le_of_card_ge inf_le_left (by rw [hAcard, hAZcard])
@@ -193,7 +193,7 @@ theorem nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_ca
     have := hp.out.one_lt
     omega
   | succ k ih =>
-    haveI : Group.IsNilpotent P := hP.isNilpotent
+    have : Group.IsNilpotent P := hP.isNilpotent
     rcases Nat.eq_zero_or_pos k with rfl | hk_pos
     · -- k = 0, i.e., m = 1: use existing base case
       have hAcard' : Nat.card A = p := by rw [hAcard]; ring
@@ -205,7 +205,7 @@ theorem nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_ca
     have hp1 : 1 < p := hp_prime.one_lt
     -- Step 1: commutator P ≤ A (P/A cyclic ⇒ abelian)
     have hG'_le_A : _root_.commutator P ≤ A := by
-      letI : CommGroup (P ⧸ A) := IsCyclic.commGroup
+      let : CommGroup (P ⧸ A) := IsCyclic.commGroup
       exact Subgroup.Normal.quotient_commutative_iff_commutator_le.mp ⟨⟨mul_comm⟩⟩
     -- Step 2: |commutator P| = p^k via Lem 4.6 cardinality
     have hG'_card : Nat.card (_root_.commutator P) = p^k := by
@@ -218,7 +218,7 @@ theorem nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_ca
       rw [← Finite.one_lt_card_iff_nontrivial, hG'_card]
       exact one_lt_pow₀ hp1 hk_pos.ne'
     -- Step 4: Thm 1.19 ⇒ commutator P ⊓ Z(P) nontrivial
-    haveI : Nontrivial ((_root_.commutator P) ⊓ Subgroup.center P : Subgroup P) :=
+    have : Nontrivial ((_root_.commutator P) ⊓ Subgroup.center P : Subgroup P) :=
       OddOrder.Isaacs.Ch01.IsPGroup.normal_inf_center_nontrivial hP
         (N := _root_.commutator P) hG'_nontriv
     -- Step 5: commutator P ⊓ Z(P) ⊆ A ⊓ Z(P), and |A ⊓ Z(P)| = p, so equality holds
@@ -251,7 +251,7 @@ theorem nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_ca
         rw [h_inf_eq]; exact hx
       exact (Subgroup.mem_inf.mp hx_in_inf).1
     -- Z is normal in P (Z ≤ Z(P))
-    haveI hZ_normal : Z.Normal := by
+    have hZ_normal : Z.Normal := by
       refine ⟨fun x hx g => ?_⟩
       have hxZ : x ∈ Subgroup.center P := hZ_le_center hx
       rw [Subgroup.mem_center_iff] at hxZ
@@ -260,11 +260,11 @@ theorem nilpotencyClass_eq_of_normal_abelian_cyclic_quotient_inf_center_prime_ca
     -- Step 6: Work in P̄ = P / Z
     let φ : P →* P ⧸ Z := QuotientGroup.mk' Z
     have hφ_surj : Function.Surjective φ := QuotientGroup.mk_surjective
-    haveI : Finite (P ⧸ Z) := Finite.of_surjective φ hφ_surj
+    have : Finite (P ⧸ Z) := Finite.of_surjective φ hφ_surj
     have hφ_ker : φ.ker = Z := QuotientGroup.ker_mk' Z
     -- Ā := image of A
     let Abar : Subgroup (P ⧸ Z) := A.map φ
-    haveI hAbar_normal : Abar.Normal := Subgroup.Normal.map ‹A.Normal› φ hφ_surj
+    have hAbar_normal : Abar.Normal := Subgroup.Normal.map ‹A.Normal› φ hφ_surj
     -- Ā abelian
     have hAbar_Ab : ∀ a ∈ Abar, ∀ b ∈ Abar, a * b = b * a := by
       intro a ha b hb

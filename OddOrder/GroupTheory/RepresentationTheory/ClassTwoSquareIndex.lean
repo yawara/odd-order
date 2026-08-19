@@ -30,7 +30,7 @@ contradiction.  In the Coq formalization this is the `extraspecial`-order step o
 
 namespace OddOrder.RepresentationTheory
 
-open Representation
+open _root_.OddOrder.RepresentationTheory.Representation
 
 variable {P : Type*} [Group P]
 
@@ -42,10 +42,10 @@ theorem exists_mem_center_of_normal_of_isPGroup [Finite P] {p : ℕ} (hp : p.Pri
     (hP : IsPGroup p P) {K : Subgroup P} (hK : K.Normal) (hKne : K ≠ ⊥) :
     ∃ w : P, w ∈ K ∧ w ∈ Subgroup.center P ∧ w ≠ 1 := by
   classical
-  haveI := hK
-  haveI := Fact.mk hp
+  have := hK
+  have := Fact.mk hp
   -- conjugation action of `P` on `↥K`
-  letI : MulDistribMulAction P ↥K :=
+  let : MulDistribMulAction P ↥K :=
     MulDistribMulAction.compHom ↥K (MulAut.conjNormal (H := K))
   have hmod := hP.card_modEq_card_fixedPoints ↥K
   -- `p ∣ |K|`
@@ -57,12 +57,12 @@ theorem exists_mem_center_of_normal_of_isPGroup [Finite P] {p : ℕ} (hp : p.Pri
     (Nat.modEq_zero_iff_dvd.mp ((hmod.symm.trans (Nat.modEq_zero_iff_dvd.mpr hpdvd))))
   -- `1` is a fixed point, and `|fixedPoints| ≥ p ≥ 2` gives a second one
   have h1fix : (1 : ↥K) ∈ MulAction.fixedPoints P ↥K := fun g => smul_one g
-  haveI : Finite ↥(MulAction.fixedPoints P ↥K) := Subtype.finite
+  have : Finite ↥(MulAction.fixedPoints P ↥K) := Subtype.finite
   have hpos : 0 < Nat.card ↥(MulAction.fixedPoints P ↥K) :=
     Nat.card_pos_iff.mpr ⟨⟨⟨1, h1fix⟩⟩, inferInstance⟩
   have hcard2 : 2 ≤ Nat.card ↥(MulAction.fixedPoints P ↥K) :=
     le_trans hp.two_le (Nat.le_of_dvd hpos hpfix)
-  haveI hnontriv : Nontrivial ↥(MulAction.fixedPoints P ↥K) :=
+  have hnontriv : Nontrivial ↥(MulAction.fixedPoints P ↥K) :=
     Finite.one_lt_card_iff_nontrivial.mp hcard2
   obtain ⟨w, hwne⟩ := exists_ne (⟨⟨1, K.one_mem⟩, h1fix⟩ : ↥(MulAction.fixedPoints P ↥K))
   -- unpack: `w` is a fixed point of the conjugation action, i.e. central
@@ -113,14 +113,14 @@ theorem exists_faithful_irreducible_of_card_center_eq_prime [Finite P] {p : ℕ}
       (ρ : Representation ℂ P V), ρ.IsIrreducible ∧ Function.Injective ρ := by
   classical
   -- a nontrivial central element
-  haveI hZnt : Nontrivial ↥(Subgroup.center P) :=
+  have hZnt : Nontrivial ↥(Subgroup.center P) :=
     Finite.one_lt_card_iff_nontrivial.mp (hZ ▸ hp.one_lt)
   obtain ⟨z', hz'ne⟩ := exists_ne (1 : ↥(Subgroup.center P))
   have hzc : (z' : P) ∈ Subgroup.center P := z'.2
   have hzne : (z' : P) ≠ 1 := fun h => hz'ne (Subtype.ext h)
   obtain ⟨χ, hχ⟩ := exists_irreducibleCharacter_apply_ne hzne
   obtain ⟨V, _, _, _, ρ, hirr, hchar⟩ := χ.2
-  haveI := hirr
+  have := hirr
   refine ⟨V, ‹_›, ‹_›, ‹_›, ρ, hirr, ?_⟩
   -- `ρ z ≠ 1`
   have hρz : ρ (z' : P) ≠ 1 := by
@@ -138,15 +138,15 @@ theorem exists_faithful_irreducible_of_card_center_eq_prime [Finite P] {p : ℕ}
     { carrier := {g | ρ g = 1}
       one_mem' := map_one ρ
       mul_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_setOf_eq] at ha hb ⊢
+        simp only [Set.mem_ofPred_eq] at ha hb ⊢
         rw [map_mul, ha, hb, one_mul]
       inv_mem' := fun {a} ha => by
-        simp only [Set.mem_setOf_eq] at ha ⊢
+        simp only [Set.mem_ofPred_eq] at ha ⊢
         have h := map_mul ρ a⁻¹ a
         rw [inv_mul_cancel, map_one, ha, mul_one] at h
         exact h.symm }
   have hmemK : ∀ g : P, g ∈ K ↔ ρ g = 1 := fun g => Iff.rfl
-  haveI hKnorm : K.Normal := by
+  have hKnorm : K.Normal := by
     refine ⟨fun n hn g => ?_⟩
     rw [hmemK] at hn ⊢
     rw [map_mul, map_mul, hn, mul_one, ← map_mul, mul_inv_cancel, map_one]
@@ -192,8 +192,8 @@ theorem card_quotient_center_isSquare_of_class_two [Finite P] {p : ℕ} (hp : p.
     IsSquare (Nat.card (P ⧸ Subgroup.center P)) := by
   obtain ⟨V, _, _, _, ρ, hirr, hinj⟩ :=
     exists_faithful_irreducible_of_card_center_eq_prime hp hP hZ
-  haveI := hirr
-  haveI : Invertible (Nat.card P : ℂ) :=
+  have := hirr
+  have : Invertible (Nat.card P : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   exact ⟨Module.finrank ℂ V, by
     rw [← sq_finrank_eq_card_quotient_center ρ hinj hcl, sq]⟩

@@ -40,7 +40,7 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.MinimalNormal
 
 namespace OddOrder.Isaacs.Ch03
 
-open Subgroup Pointwise
+open _root_.OddOrder.Isaacs.Ch03.Subgroup Pointwise
 
 section /- 3C.7(b): Carter 部分群の共役性 -/
 
@@ -57,8 +57,8 @@ variable {G : Type*} [Group G]
 合わせて `g ∈ C ⊔ N`。
 
 帰納法の仮説 `IH` は「`|H| < |G|` なる可解群 `H` の Carter 部分群は共役」。 -/
-theorem normalizer_sup_eq_self_of_ih {G : Type u} [Group G] [Finite G] [IsSolvable G]
-    (IH : ∀ {H : Type u} [Group H] [Finite H] [IsSolvable H] (C' D' : Subgroup H),
+theorem normalizer_sup_eq_self_of_ih {G : Type u} [Group G] [Finite G] [Group.IsSolvable G]
+    (IH : ∀ {H : Type u} [Group H] [Finite H] [Group.IsSolvable H] (C' D' : Subgroup H),
       Nat.card H < Nat.card G → IsCarterSubgroup C' → IsCarterSubgroup D' →
       ∃ h : H, C'.map (MulAut.conj h).toMonoidHom = D')
     {C : Subgroup G} (hC : IsCarterSubgroup C) (N : Subgroup G) [N.Normal] :
@@ -79,7 +79,7 @@ theorem normalizer_sup_eq_self_of_ih {G : Type u} [Group G] [Finite G] [IsSolvab
   have hCarterC : IsCarterSubgroup (C.subgroupOf K) := hC.subgroupOf hCK
   have hCarterCg : IsCarterSubgroup ((C.map (MulAut.conj g).toMonoidHom).subgroupOf K) :=
     (hC.map_conj g).subgroupOf hCgK
-  haveI : IsSolvable ↥K := inferInstance
+  have : Group.IsSolvable ↥K := inferInstance
   obtain ⟨y, hy⟩ := IH (C.subgroupOf K) ((C.map (MulAut.conj g).toMonoidHom).subgroupOf K)
     hKlt hCarterC hCarterCg
   -- Translate the conjugacy back to `G`.
@@ -101,8 +101,8 @@ theorem normalizer_sup_eq_self_of_ih {G : Type u} [Group G] [Finite G] [IsSolvab
 冪零性は `(C ⊔ N)/N = C/N` (`sup_map_mk'_eq_map_mk'`) と `C` の冪零性の像
 (`isNilpotent_map_of_isNilpotent`), 自己正規化性は step 1 を対応定理
 (`normalizer_eq_iff_map_mk'`) で商へ送る。 -/
-theorem isCarterSubgroup_map_mk'_of_ih {G : Type u} [Group G] [Finite G] [IsSolvable G]
-    (IH : ∀ {H : Type u} [Group H] [Finite H] [IsSolvable H] (C' D' : Subgroup H),
+theorem isCarterSubgroup_map_mk'_of_ih {G : Type u} [Group G] [Finite G] [Group.IsSolvable G]
+    (IH : ∀ {H : Type u} [Group H] [Finite H] [Group.IsSolvable H] (C' D' : Subgroup H),
       Nat.card H < Nat.card G → IsCarterSubgroup C' → IsCarterSubgroup D' →
       ∃ h : H, C'.map (MulAut.conj h).toMonoidHom = D')
     {C : Subgroup G} (hC : IsCarterSubgroup C) (N : Subgroup G) [N.Normal] :
@@ -118,8 +118,8 @@ theorem isCarterSubgroup_map_mk'_of_ih {G : Type u} [Group G] [Finite G] [IsSolv
 `G/N` は `|G|` より小さいので帰納法の仮説が使え, step 2 の 2 つの Carter 部分群
 `(C ⊔ N)/N`, `(D ⊔ N)/N` が `G/N` 内で共役。それを `exists_conj_of_map_mk'_conj` で
 `G` に引き戻すと `(C ⊔ N)^g = D ⊔ N`, `N` は正規なので左辺は `C^g ⊔ N`。 -/
-theorem exists_conj_sup_eq_sup_of_ih {G : Type u} [Group G] [Finite G] [IsSolvable G]
-    (IH : ∀ {H : Type u} [Group H] [Finite H] [IsSolvable H] (C' D' : Subgroup H),
+theorem exists_conj_sup_eq_sup_of_ih {G : Type u} [Group G] [Finite G] [Group.IsSolvable G]
+    (IH : ∀ {H : Type u} [Group H] [Finite H] [Group.IsSolvable H] (C' D' : Subgroup H),
       Nat.card H < Nat.card G → IsCarterSubgroup C' → IsCarterSubgroup D' →
       ∃ h : H, C'.map (MulAut.conj h).toMonoidHom = D')
     {C D : Subgroup G} (hC : IsCarterSubgroup C) (hD : IsCarterSubgroup D)
@@ -135,7 +135,7 @@ theorem exists_conj_sup_eq_sup_of_ih {G : Type u} [Group G] [Finite G] [IsSolvab
   rw [← hg, Subgroup.map_sup, hNconj]
 
 /-- 3C.7(b) の `|G|` 強帰納本体。型を量化して 1 段ずつ小さい群へ降りる。 -/
-private theorem exists_conj_aux : ∀ (n : ℕ) {G : Type u} [Group G] [Finite G] [IsSolvable G]
+private theorem exists_conj_aux : ∀ (n : ℕ) {G : Type u} [Group G] [Finite G] [Group.IsSolvable G]
     (C D : Subgroup G), Nat.card G ≤ n → IsCarterSubgroup C → IsCarterSubgroup D →
     ∃ g : G, C.map (MulAut.conj g).toMonoidHom = D := by
   intro n
@@ -145,7 +145,7 @@ private theorem exists_conj_aux : ∀ (n : ℕ) {G : Type u} [Group G] [Finite G
     exact absurd (Nat.le_zero.mp hcard) Nat.card_pos.ne'
   | succ n ih =>
     intro G _ _ _ C D hcard hC hD
-    have IH : ∀ {H : Type u} [Group H] [Finite H] [IsSolvable H] (C' D' : Subgroup H),
+    have IH : ∀ {H : Type u} [Group H] [Finite H] [Group.IsSolvable H] (C' D' : Subgroup H),
         Nat.card H < Nat.card G → IsCarterSubgroup C' → IsCarterSubgroup D' →
         ∃ h : H, C'.map (MulAut.conj h).toMonoidHom = D' := fun C' D' hlt hC' hD' =>
       ih C' D' (Nat.lt_succ_iff.mp (lt_of_lt_of_le hlt hcard)) hC' hD'
@@ -156,7 +156,7 @@ private theorem exists_conj_aux : ∀ (n : ℕ) {G : Type u} [Group G] [Finite G
       exact ⟨1, by rw [map_conj_one, hCbot, hDbot]⟩
     -- 極小正規部分群 `N` を取る。
     obtain ⟨N, hN, -⟩ := Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) hGtriv
-    haveI := hN.1
+    have := hN.1
     -- step 3: `C` を共役して `C₀ ⊔ N = D ⊔ N` にする。
     obtain ⟨g₀, hg₀⟩ := exists_conj_sup_eq_sup_of_ih IH hC hD N hN.2.1
     have hC₀ : IsCarterSubgroup (C.map (MulAut.conj g₀).toMonoidHom) := hC.map_conj g₀
@@ -186,7 +186,7 @@ private theorem exists_conj_aux : ∀ (n : ℕ) {G : Type u} [Group G] [Finite G
 
 書籍は証明を与えない (challenge problem)。証明は `|G|` の強帰納で、極小正規部分群 `N` を
 取り step 1–4 (ファイル冒頭) を積む。 -/
-theorem exists_conj_of_isCarterSubgroup {G : Type u} [Group G] [Finite G] [IsSolvable G]
+theorem exists_conj_of_isCarterSubgroup {G : Type u} [Group G] [Finite G] [Group.IsSolvable G]
     {C D : Subgroup G} (hC : IsCarterSubgroup C) (hD : IsCarterSubgroup D) :
     ∃ g : G, C.map (MulAut.conj g).toMonoidHom = D :=
   exists_conj_aux (Nat.card G) C D le_rfl hC hD

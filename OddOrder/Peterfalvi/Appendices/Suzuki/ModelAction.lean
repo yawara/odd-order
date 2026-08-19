@@ -564,9 +564,9 @@ theorem isElementaryAbelian_inducingIdAuts_model
 theorem isSolvable_inducingIdAuts_model
     (φ : LinearMap.BilinMap (ZMod 2) M.E
       ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 m)) :
-    IsSolvable
+    Group.IsSolvable
       ↥((Suzuki2Groups.BilinearTwistedProduct.groupExtension φ).inducingIdAuts) :=
-  isSolvable_of_comm (hyp.isElementaryAbelian_inducingIdAuts_model M φ).comm
+  Group.isSolvable_of_comm (hyp.isElementaryAbelian_inducingIdAuts_model M φ).comm
 
 /-- `|U|` is a power of `2` — the coprimality input to the Zassenhaus step, against
 the odd `|K W|` of `card_actualKActor_prod_W_odd`. -/
@@ -576,7 +576,7 @@ theorem card_inducingIdAuts_model
     ∃ n : ℕ, Nat.card
       ↥((Suzuki2Groups.BilinearTwistedProduct.groupExtension φ).inducingIdAuts)
         = 2 ^ n := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   exact (hyp.isElementaryAbelian_inducingIdAuts_model M φ).isPGroup.exists_card_eq
 
 /-! ## Step (4): the two actions are conjugate -/

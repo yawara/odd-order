@@ -97,8 +97,8 @@ theorem opCore_map_le_centralizer [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     (OddOrder.Isaacs.Ch01.opCore q' ↥hyp.H).map hyp.H.subtype
       ≤ Subgroup.centralizer (hyp.U : Set G) := by
   classical
-  haveI : Fact q'.Prime := ⟨hq'⟩
-  haveI hHnil : Group.IsNilpotent ↥hyp.H := hyp.H_isNilpotent
+  have : Fact q'.Prime := ⟨hq'⟩
+  have hHnil : Group.IsNilpotent ↥hyp.H := hyp.H_isNilpotent
   obtain ⟨hp_prime, hcard⟩ := hyp.p_prime_and_card_H_eq hG
   set CUa := hyp.H ⊓ Subgroup.centralizer (hyp.U : Set G) with hCUa
   have hKle : CUa ≤ hyp.H := inf_le_left
@@ -185,8 +185,8 @@ theorem disjoint_opCore_pComplementCore [Finite G]
   have hindep : iSupIndep O := by
     apply OddOrder.Isaacs.Ch01.iSupIndep_of_coprime_card_of_normal O
     intro i j hij
-    haveI : Fact (i : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors i.2⟩
-    haveI : Fact (j : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors j.2⟩
+    have : Fact (i : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors i.2⟩
+    have : Fact (j : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors j.2⟩
     have hne : (i : ℕ) ≠ (j : ℕ) := fun h => hij (Subtype.ext h)
     exact IsPGroup.coprime_card_of_ne (i : ℕ) (j : ℕ) hne _ _
       (OddOrder.Isaacs.Ch01.opCore_isPGroup (i : ℕ) ↥hyp.H)
@@ -206,13 +206,13 @@ theorem isPGroup_of_pComplementCore_eq_bot [Finite G]
     {M : Subgroup G} (hyp : Hypothesis M) (hbot : hyp.pComplementCore = ⊥) :
     IsPGroup hyp.p ↥hyp.H := by
   classical
-  haveI hHnil : Group.IsNilpotent ↥hyp.H := hyp.H_isNilpotent
+  have hHnil : Group.IsNilpotent ↥hyp.H := hyp.H_isNilpotent
   -- every prime factor `q' ≠ p` has trivial core, hence trivial Sylow — impossible
   have hsub : (Nat.card ↥hyp.H).primeFactors ⊆ {hyp.p} := by
     intro q' hq'
     rw [Finset.mem_singleton]
     by_contra hne
-    haveI : Fact q'.Prime := ⟨Nat.prime_of_mem_primeFactors hq'⟩
+    have : Fact q'.Prime := ⟨Nat.prime_of_mem_primeFactors hq'⟩
     have hcore : OddOrder.Isaacs.Ch01.opCore q' ↥hyp.H = ⊥ := by
       refine le_bot_iff.mp ?_
       rw [← hbot, pComplementCore]
@@ -255,7 +255,7 @@ theorem opCore_sup_pComplementCore_eq_top [Finite G] (_hG : OddOrder.BG.IsMinima
     {M : Subgroup G} (hyp : Hypothesis M) :
     OddOrder.Isaacs.Ch01.opCore hyp.p ↥hyp.H ⊔ hyp.pComplementCore = ⊤ := by
   classical
-  haveI hHnil : Group.IsNilpotent ↥hyp.H := hyp.H_isNilpotent
+  have hHnil : Group.IsNilpotent ↥hyp.H := hyp.H_isNilpotent
   have htop : (⨆ q : (Nat.card ↥hyp.H).primeFactors,
       OddOrder.Isaacs.Ch01.opCore (q : ℕ) ↥hyp.H) = ⊤ := by
     have hrw : (⨆ q : (Nat.card ↥hyp.H).primeFactors,
@@ -263,7 +263,7 @@ theorem opCore_sup_pComplementCore_eq_top [Finite G] (_hG : OddOrder.BG.IsMinima
         = ⨆ q : (Nat.card ↥hyp.H).primeFactors,
             ((default : Sylow (q : ℕ) ↥hyp.H) : Subgroup ↥hyp.H) :=
       iSup_congr fun q => by
-        haveI : Fact (q : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors q.2⟩
+        have : Fact (q : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors q.2⟩
         exact (OddOrder.Isaacs.Ch01.Sylow.eq_opCore_of_normal default
           (OddOrder.Isaacs.Ch01.Sylow.normal_of_isNilpotent default)).symm
     rw [hrw]
@@ -331,10 +331,10 @@ theorem secondDerived_le_pKernel_sup_derivedU [Finite G]
   have hRle : hyp.pComplement ≤ M := hyp.pComplement_le_H.trans hHle
   have hM'eq : derivedInG M = hyp.base.typeP.H ⊔ hyp.base.typeP.U := by
     rw [hyp.base.typeP.derivedInG_eq_fitting_sup_U, hyp.base.typeP.H_eq]
-  haveI hKn : (hyp.pKernel.subgroupOf M).Normal :=
+  have hKn : (hyp.pKernel.subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hKle).mpr hyp.pKernel_normalized_by_M
   -- `H`-elements split as `o·r` along `O_p ⊔ R = ⊤` (`O_p` is normal in `↥H`)
-  haveI : (OddOrder.Isaacs.Ch01.opCore hyp.p ↥hyp.H).Characteristic :=
+  have : (OddOrder.Isaacs.Ch01.opCore hyp.p ↥hyp.H).Characteristic :=
     OddOrder.Isaacs.Ch01.opCore.characteristic hyp.p ↥hyp.H
   have hHsplit : ∀ h ∈ hyp.H, ∃ o ∈ (OddOrder.Isaacs.Ch01.opCore hyp.p ↥hyp.H).map
       hyp.H.subtype, ∃ r ∈ hyp.pComplement, h = o * r := by
@@ -483,7 +483,7 @@ theorem secondDerived_le_pKernel_sup_derivedU [Finite G]
 theorem H_le_normalizer_opCore_map [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
     hyp.H ≤ Subgroup.normalizer
       (((OddOrder.Isaacs.Ch01.opCore hyp.p ↥hyp.H).map hyp.H.subtype : Subgroup G) : Set G) := by
-  haveI : (OddOrder.Isaacs.Ch01.opCore hyp.p ↥hyp.H).Characteristic :=
+  have : (OddOrder.Isaacs.Ch01.opCore hyp.p ↥hyp.H).Characteristic :=
     OddOrder.Isaacs.Ch01.opCore.characteristic hyp.p ↥hyp.H
   have h := Subgroup.le_normalizer_map
     (H := OddOrder.Isaacs.Ch01.opCore hyp.p ↥hyp.H) hyp.H.subtype
@@ -571,8 +571,8 @@ theorem pComplementCore_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
       exact Subgroup.mul_mem _ (Subgroup.mul_mem _ (Subgroup.mul_mem _ hg₁ hg₂)
         (Subgroup.inv_mem _ hg₁)) (Subgroup.inv_mem _ hg₂)
   -- Step 3: perfect + nilpotent ⇒ trivial
-  haveI hHnil : Group.IsNilpotent ↥hyp.H := hyp.H_isNilpotent
-  haveI hAnil : Group.IsNilpotent ↥hyp.pComplementCore := Subgroup.isNilpotent _
+  have hHnil : Group.IsNilpotent ↥hyp.H := hyp.H_isNilpotent
+  have hAnil : Group.IsNilpotent ↥hyp.pComplementCore := Subgroup.isNilpotent _
   have hcommtop : _root_.commutator ↥hyp.pComplementCore = ⊤ := by
     have h1 : (⁅hyp.pComplementCore, hyp.pComplementCore⁆).subgroupOf hyp.pComplementCore
         = _root_.commutator ↥hyp.pComplementCore :=
@@ -651,7 +651,7 @@ theorem secondDerived_le_hKernel_sup_derivedU [Finite G]
   have hKle : hyp.hKernel ≤ M := hyp.hKernel_le_H.trans hHle
   have hM'eq : derivedInG M = hyp.base.typeP.H ⊔ hyp.base.typeP.U := by
     rw [hyp.base.typeP.derivedInG_eq_fitting_sup_U, hyp.base.typeP.H_eq]
-  haveI hKn : (hyp.hKernel.subgroupOf M).Normal :=
+  have hKn : (hyp.hKernel.subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hKle).mpr hyp.hKernel_normalized_by_M
   set φ := QuotientGroup.mk' (hyp.hKernel.subgroupOf M) with hφ
   -- mod-`K₁` commutation from ambient commutator membership

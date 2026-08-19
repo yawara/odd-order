@@ -94,10 +94,10 @@ theorem exists_ambientFrattiniSingerCoordinates_of_exponent_two
     IsAInvariant.of_characteristic Y.subtype
   have hEA : IsElementaryAbelian 2 (frattini P) :=
     frattini_isElementaryAbelian_of_exponent_two htwo
-  letI : IsMulCommutative (frattini P) :=
+  let : IsMulCommutative (frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : CommGroup (frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini P)) :=
+  let : CommGroup (frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini P)) :=
     hEA.zmodModule
   let n := Module.finrank (ZMod 2) (Additive (frattini P))
   let rho : Representation (ZMod 2) Y (Additive (frattini P)) :=
@@ -169,8 +169,8 @@ theorem exists_ambientFrattiniSingerCoordinates_of_exponent_two
     have hnle : n ≤ 1 := by omega
     interval_cases n <;>
       norm_num only [pow_zero, pow_one] at hcard <;> omega
-  letI : IsCyclic Y := hxi.cyclic
-  letI : CommGroup Y := IsCyclic.commGroup
+  let : IsCyclic Y := hxi.cyclic
+  let : CommGroup Y := IsCyclic.commGroup
   obtain ⟨c, hcgen⟩ := IsCyclic.exists_generator (α := Y)
   obtain ⟨e, nu, b, hprim, hconj, hgen, hb⟩ :=
     exists_singerFrobeniusEigenbasis_of_transitive_generator
@@ -305,15 +305,15 @@ theorem pairwiseJoinFrattiniLinearEquivAmbientFrattini_equivariant
     IsElementaryAbelian.of_mulEquiv
       (pairwiseJoinFrattiniEquivAmbientFrattini hMap).symm
       hPhiEA
-  letI : IsMulCommutative (frattini J) :=
+  let : IsMulCommutative (frattini J) :=
     IsMulCommutative.of_comm hJoinEA.comm
-  letI : CommGroup (frattini J) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini J)) :=
+  let : CommGroup (frattini J) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini J)) :=
     hJoinEA.zmodModule
-  letI : IsMulCommutative (frattini P) :=
+  let : IsMulCommutative (frattini P) :=
     IsMulCommutative.of_comm hPhiEA.comm
-  letI : CommGroup (frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini P)) :=
+  let : CommGroup (frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini P)) :=
     hPhiEA.zmodModule
   intro g v
   change pairwiseJoinFrattiniLinearEquivAmbientFrattini
@@ -406,15 +406,15 @@ theorem pairwiseJoinFrattiniSingerCoordinate_conj
     IsElementaryAbelian.of_mulEquiv
       (pairwiseJoinFrattiniEquivAmbientFrattini hMap).symm
       hPhiEA
-  letI : IsMulCommutative (frattini J) :=
+  let : IsMulCommutative (frattini J) :=
     IsMulCommutative.of_comm hJoinEA.comm
-  letI : CommGroup (frattini J) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini J)) :=
+  let : CommGroup (frattini J) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini J)) :=
     hJoinEA.zmodModule
-  letI : IsMulCommutative (frattini P) :=
+  let : IsMulCommutative (frattini P) :=
     IsMulCommutative.of_comm hPhiEA.comm
-  letI : CommGroup (frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini P)) :=
+  let : CommGroup (frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini P)) :=
     hPhiEA.zmodModule
   let E := pairwiseJoinFrattiniLinearEquivAmbientFrattini
     hPhiEA hMap

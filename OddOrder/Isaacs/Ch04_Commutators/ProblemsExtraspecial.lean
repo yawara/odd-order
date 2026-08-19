@@ -210,7 +210,7 @@ theorem card_closure_pair_eq [Finite P] [Fact p.Prime]
       _ = y * x := by rw [← hxeq]
   -- 位数を数える
   have hcardmap : Nat.card (U.map (QuotientGroup.mk' Z)) = p ^ 2 := by
-    haveI hnormy : (Subgroup.zpowers ((y : P ⧸ Z))).Normal := by
+    have hnormy : (Subgroup.zpowers ((y : P ⧸ Z))).Normal := by
       refine ⟨fun n hn g => ?_⟩
       have hgn : g * n * g⁻¹ = n := by rw [helem.comm g n, mul_assoc, mul_inv_cancel, mul_one]
       rwa [hgn]

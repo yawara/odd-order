@@ -97,10 +97,10 @@ theorem lowerCentralCommutatorBilinear_eq_zero_of_primitive_left_eigen_seed
     have hpowTwo : 2 ^ 1 ≤ 2 ^ n :=
       Nat.pow_le_pow_right (by norm_num) hnpos
     omega
-  letI : NeZero (2 ^ n - 1) := ⟨hNpos.ne'⟩
+  let : NeZero (2 ^ n - 1) := ⟨hNpos.ne'⟩
   have hcard : Nat.card (GaloisField 2 n) = 2 ^ n :=
     GaloisField.card 2 n hn
-  letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+  let : Fintype (GaloisField 2 n) := Fintype.ofFinite _
   have hequivariant (g : Y)
       (u v : Additive (lowerCentralLayer P 0)) :
       lowerCentralLayerRepresentation Y.subtype 1 g
@@ -175,9 +175,9 @@ theorem layerZeroToFrattiniQuotientLinear_ambientLayerZeroClass
     layerZeroToFrattiniQuotientLinear P hP
         (ambientLayerZeroClass P x) =
       Additive.ofMul (QuotientGroup.mk' (frattini P) x) := by
-  letI : CommGroup (P ⧸ frattini P) :=
+  let : CommGroup (P ⧸ frattini P) :=
     frattiniQuotientCommGroup P hP
-  letI : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
+  let : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
     frattiniQuotientZModTwoModule P hP
   rw [ambientLayerZeroClass, layerZeroClass,
     layerZeroToFrattiniQuotientLinear_apply,
@@ -231,9 +231,9 @@ theorem invariantGraphPreimage_commutes_of_primitive_eigen_seed
         (elabSubmoduleSubgroupEquiv 2).symm
           (W.map (QuotientGroup.mk' (frattini P))) →
       ∀ u ∈ U, ∀ w ∈ W, Commute u w := by
-  letI : CommGroup (P ⧸ frattini P) :=
+  let : CommGroup (P ⧸ frattini P) :=
     frattiniQuotientCommGroup P hP
-  letI : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
+  let : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
     frattiniQuotientZModTwoModule P hP
   intro U W hUmap hWrange u hu w hw
   have hbracket :=

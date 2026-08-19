@@ -118,9 +118,9 @@ theorem
           U.map (QuotientGroup.mk' (frattini P)) = D := by
   classical
   dsimp only
-  letI : CommGroup (P ⧸ frattini P) :=
+  let : CommGroup (P ⧸ frattini P) :=
     frattiniQuotientCommGroup P hP
-  letI : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
+  let : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
     frattiniQuotientZModTwoModule P hP
   intro n iXq iZq iTq hiXq hiZq hiTq hXZ hXZ_T hRangeT
     a b c hab g hggen lambda hlambda hX hZ hT

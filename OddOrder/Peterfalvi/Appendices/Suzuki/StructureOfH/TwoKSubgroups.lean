@@ -460,7 +460,7 @@ theorem exists_kSubgroupSquare_complement {A : Subgroup G} (hAD : A ≤ hyp.D)
       (∀ a ∈ A, ∀ y ∈ N', a * y * a⁻¹ ∈ N') ∧
       Nat.card ↥N' = Nat.card ↥hyp.Q0 ^ 2 ∧ N ≠ N' := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hAH : A ≤ hyp.H := hAD.trans hyp.D_le_H
   set U : Subgroup (↥hyp.Q ⧸ Subgroup.center ↥hyp.Q) :=
     (N.subgroupOf hyp.Q).map
@@ -521,7 +521,7 @@ theorem exists_kSubgroupSquare_complement {A : Subgroup G} (hAD : A ≤ hyp.D)
   have hinf' : U ⊓ W = ⊥ := hinf
   have hsup' : U ⊔ W = ⊤ := hsup
   -- the complement has order `|Q₀|`
-  haveI hUnormal : U.Normal :=
+  have hUnormal : U.Normal :=
     ⟨fun x hx g => by
       rw [hEA.comm g x, mul_assoc, mul_inv_cancel, mul_one]; exact hx⟩
   have hcompl : IsCompl U W := ⟨disjoint_iff.mpr hinf', codisjoint_iff.mpr hsup'⟩
@@ -661,8 +661,8 @@ theorem exists_two_kSubgroups_unique_of_card_cube
     refine ⟨fun n hn g => ?_⟩
     rw [hqcomm g n, mul_assoc, mul_inv_cancel, mul_one]
     exact hn
-  haveI := hnormal csplit.left
-  haveI := hnormal csplit.right
+  have := hnormal csplit.left
+  have := hnormal csplit.right
   refine ⟨hyp.liftCentralQuotient csplit.left, hyp.liftCentralQuotient csplit.right,
     ⟨liftCentralQuotient_le_Q _, Q0_le_liftCentralQuotient hZQ0 _,
       kInvariant_liftCentralQuotient csplit.leftInvariant,
@@ -867,8 +867,8 @@ theorem exists_two_kSubgroups_invariant_of_card_cube
     refine ⟨fun x hx g => ?_⟩
     rw [hqcomm g x, mul_assoc, mul_inv_cancel, mul_one]
     exact hx
-  haveI := hnormal csplit.left
-  haveI := hnormal csplit.right
+  have := hnormal csplit.left
+  have := hnormal csplit.right
   have hXpack : hyp.IsKSubgroupSquare (hyp.liftCentralQuotient csplit.left) :=
     ⟨liftCentralQuotient_le_Q _, Q0_le_liftCentralQuotient hZQ0 _,
       kInvariant_liftCentralQuotient csplit.leftInvariant,

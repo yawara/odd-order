@@ -64,16 +64,16 @@ theorem map_eq_self_imp_eq_trivial_of_fpf (β : MulAut G)
   -- `Ω` := the class `C` as a subtype, nonempty (it has a representative).
   obtain ⟨x₀, hx₀⟩ := ConjClasses.mk_surjective C
   let Ω := {y : G // ConjClasses.mk y = C}
-  haveI : Nonempty Ω := ⟨⟨x₀, hx₀⟩⟩
+  have : Nonempty Ω := ⟨⟨x₀, hx₀⟩⟩
   -- `G` acts on `Ω` by conjugation (class-preserving).
-  letI mulG : MulAction G Ω := {
+  let mulG : MulAction G Ω := {
     smul := fun g y => ⟨g * y.1 * g⁻¹,
       (ConjClasses.mk_eq_mk_iff_isConj.mpr (isConj_iff.mpr ⟨g⁻¹, by group⟩)).trans y.2⟩
     one_smul := fun y => Subtype.ext (by change (1 : G) * y.1 * (1 : G)⁻¹ = y.1; group)
     mul_smul := fun g g' y =>
       Subtype.ext (by change (g * g') * y.1 * (g * g')⁻¹ = g * (g' * y.1 * g'⁻¹) * g⁻¹; group) }
   -- `A = ⟨β⟩` acts on `Ω` via `φ` (well-defined since every `a ∈ ⟨β⟩` fixes `C`).
-  letI mulA : MulAction (↥(Subgroup.zpowers β)) Ω := {
+  let mulA : MulAction (↥(Subgroup.zpowers β)) Ω := {
     smul := fun a y => ⟨(φ a) y.1, by rw [← mulAut_smul_mk, y.2, hAfix a]⟩
     one_smul := fun y => Subtype.ext (by change (φ 1) y.1 = y.1; simp)
     mul_smul := fun a b y =>
@@ -90,7 +90,8 @@ theorem map_eq_self_imp_eq_trivial_of_fpf (β : MulAut G)
     obtain ⟨c, hc⟩ := isConj_iff.mp (ConjClasses.mk_eq_mk_iff_isConj.mp (y.2.trans z.2.symm))
     exact ⟨c, Subtype.ext hc⟩
   -- `⟨β⟩` is commutative, hence solvable (so Glauberman's solvability hypothesis holds).
-  haveI : IsSolvable (↥(Subgroup.zpowers β)) := isSolvable_of_comm fun a b => mul_comm' a b
+  have : Group.IsSolvable (↥(Subgroup.zpowers β)) :=
+    Group.isSolvable_of_comm fun a b => mul_comm' a b
   -- Glauberman 3.24(a): a `⟨β⟩`-fixed element of `Ω` exists.
   obtain ⟨ω₀, hω₀⟩ := glauberman_fixed_point_exists (G := G) (A := ↥(Subgroup.zpowers β)) (φ := φ)
     hCop (Or.inl inferInstance) (Ω := Ω) hCompat hG_trans
@@ -165,9 +166,9 @@ theorem gamma_free_off_trivial_simple
   have horbS : Nat.card (orbitRel.Quotient Γ (Fin N))
       = 1 + (Nat.card (Fin N) - 1) / Nat.card Γ := by rw [← hBr, horbC, hNcl]
   have hdvdS : Nat.card Γ ∣ Nat.card (Fin N) - 1 := by rw [hNcl]; exact hdvdC
-  haveI : Nonempty (Fin N) := by
+  have : Nonempty (Fin N) := by
     have hpos : 0 < Nat.card (Fin N) := by
-      rw [hNcl]; haveI : Nonempty (ConjClasses G) := ⟨ConjClasses.mk 1⟩; exact Nat.card_pos
+      rw [hNcl]; have : Nonempty (ConjClasses G) := ⟨ConjClasses.mk 1⟩; exact Nat.card_pos
     rw [Nat.card_eq_fintype_card, Fintype.card_fin] at hpos
     exact Fin.pos_iff_nonempty.mp hpos
   -- 3d.3a: every simples orbit has size `1` or `|Γ|`, with at most one fixed point.
@@ -178,7 +179,7 @@ theorem gamma_free_off_trivial_simple
     mem_fixedPoints.mpr fun γ => by rw [hsi]; exact hi₀ (ψ γ)
   refine ⟨i₀, hi₀fix, fun i hi => hatmost i i₀ hi hi₀fix, fun i hi => ?_⟩
   rcases hsize i with h1 | hdd
-  · haveI : Fintype (orbit Γ i) := Fintype.ofFinite _
+  · have : Fintype (orbit Γ i) := Fintype.ofFinite _
     exact absurd (mem_fixedPoints_iff_card_orbit_eq_one.mpr
       (by rw [← Nat.card_eq_fintype_card]; exact h1)) hi
   · exact hdd

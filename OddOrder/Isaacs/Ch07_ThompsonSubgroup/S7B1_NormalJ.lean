@@ -68,7 +68,7 @@ private theorem q_subgroup_in_K_le_centralizer_zCenter
     {Q : Subgroup G} (hQ_q : IsPGroup q Q)
     (hQ_le_K : Q ≤ Subgroup.centralizer (omega1ZCenterOpCore G p : Set G)) :
     Q ≤ Subgroup.centralizer (zCenterOpCoreSubgroup G p : Set G) := by
-  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have : Fact q.Prime := ⟨hq_prime⟩
   -- (1) Q is a p'-group: q ≠ p prime + |Q| = q^k ⇒ p ∤ |Q|.
   have hQp' : ¬ p ∣ Nat.card Q := by
     obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hQ_q
@@ -160,7 +160,7 @@ private theorem q_subgroup_in_K_eq_bot
     {Q : Subgroup G} (hQ_q : IsPGroup q Q)
     (hQ_le_K : Q ≤ Subgroup.centralizer (omega1ZCenterOpCore G p : Set G)) :
     Q = ⊥ := by
-  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have : Fact q.Prime := ⟨hq_prime⟩
   have hQ_le_P : Q ≤ (P : Subgroup G) :=
     q_subgroup_in_K_le_sylow hOp' P h_centralizer_center hq_prime hqp hQ_q hQ_le_K
   -- Q is a q-group and Q ≤ P which is a p-group; coprime ⇒ |Q| = 1.
@@ -256,7 +256,7 @@ theorem centralizer_omega1ZCenterOpCore_isPGroup
     · exact hqeq
   -- Q := Subgroup.zpowers h is a q-group of K.
   have hQ_q : IsPGroup q (Subgroup.zpowers h_elem) := by
-    haveI : Fact q.Prime := ⟨hq_prime⟩
+    have : Fact q.Prime := ⟨hq_prime⟩
     rw [IsPGroup.iff_card]
     refine ⟨1, ?_⟩
     rw [Nat.card_zpowers, hh_ord, pow_one]
@@ -461,7 +461,7 @@ theorem omega1ZCenterOpCore_relIndex_inter_A_le
   have hV_cent_D : V ≤ Subgroup.centralizer (D : Set G) :=
     hV_cent_U.trans (Subgroup.centralizer_le hD_le_U)
   -- V ⊔ D is elementary abelian.
-  haveI : V.Normal := omega1ZCenterOpCore_normal
+  have : V.Normal := omega1ZCenterOpCore_normal
   have hVD_el : (V ⊔ D : Subgroup G).IsElementaryAbelian p :=
     sup_isElementaryAbelian_of_centralizing hV_el hD_el hV_cent_D
   -- V ⊔ D ≤ P.
@@ -513,9 +513,9 @@ theorem omega1ZCenterOpCore_relIndex_inter_A_le
   set VD : Subgroup G := V ⊔ D with hVD_def
   have hD_le_VD : D ≤ VD := hVD_def ▸ le_sup_right
   -- Apply second iso: |V/(D ⊓ V).subgroupOf V| = |VD/D.subgroupOf VD|.
-  letI hD_normal_in_V : (D.subgroupOf V).Normal :=
+  let hD_normal_in_V : (D.subgroupOf V).Normal :=
     Subgroup.normal_subgroupOf_of_le_normalizer hV_norm_D
-  letI hD_normal_in_VD : (D.subgroupOf VD).Normal :=
+  let hD_normal_in_VD : (D.subgroupOf VD).Normal :=
     Subgroup.normal_subgroupOf_sup_of_le_normalizer hV_norm_D
   have h_card_quot_V : Nat.card (V ⧸ D.subgroupOf V) =
       Nat.card (VD ⧸ D.subgroupOf VD) :=

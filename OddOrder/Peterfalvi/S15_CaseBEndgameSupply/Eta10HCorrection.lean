@@ -44,7 +44,7 @@ theorem Hypothesis.eta10_alphaCF_one_ne_zero_base_core [Fintype G]
   classical
   intro hzero
   obtain ⟨y', hy'⟩ : ∃ y' : ↥hyp.W2, y' ≠ 1 := by
-    haveI : Nontrivial ↥hyp.W2 := Finite.one_lt_card_iff_nontrivial.mp
+    have : Nontrivial ↥hyp.W2 := Finite.one_lt_card_iff_nontrivial.mp
       (by rw [← hyp.p_eq_card_W2]; exact hyp.p_prime.one_lt)
     exact exists_ne 1
   have hyW2 : (y' : G) ∈ hyp.W2 := y'.2
@@ -94,8 +94,8 @@ theorem CharacterDegreeCore.exists_caseB_data_eta10_H_core [Finite G]
       (∑ x ∈ (Set.toFinite (sharpSubgroup hyp.H)).toFinset, ‖α x‖ ^ 2 = (s : ℝ)) ∧
       1 ≤ n ∧ s + d ^ 2 = Nat.card ↥hyp.H * n ∧
       (hyp.p ^ hyp.q - 1) * d ^ 2 ≤ s ∧ (n = 1 → d ^ 2 = 1) := by
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Invertible (Nat.card G : ℂ) :=
+  have : Fintype G := Fintype.ofFinite G
+  have : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   obtain ⟨φ₀, hφ₀P⟩ := core.exists_hSharpBase
   set αS : ↥hyp.S → ℂ :=
@@ -116,7 +116,7 @@ theorem CharacterDegreeCore.exists_caseB_data_eta10_H_core [Finite G]
   refine ⟨fun g => if h : g ∈ hyp.S then αS ⟨g, h⟩ else 0, ?_⟩
   set K : Subgroup ↥hyp.S :=
     (H_sharp_hypothesis76_base hG hyp φ₀).H.subgroupOf hyp.S with hKdef
-  haveI : Fintype ↥K := FiniteInduce.finiteSubFintype K
+  have : Fintype ↥K := FiniteInduce.finiteSubFintype K
   set F : Finset ↥hyp.S := (Finset.univ.filter (· ∈ K)).erase 1 with hFdef
   have hFK : ∀ x : ↥hyp.S, x ∈ F ↔ (x ∈ K ∧ x ≠ 1) := fun x => by
     rw [hFdef, Finset.mem_erase, Finset.mem_filter]
@@ -234,7 +234,7 @@ theorem CharacterDegreeCore.exists_caseB_data_eta10_H_core [Finite G]
     obtain ⟨ε, ξ, hε, hψeq⟩ :=
       OddOrder.RepresentationTheory.exists_zsmul_irreducibleCharacter_of_inner_self_one
         hψZ hn'
-    haveI : IsMulCommutative ↥K := by
+    have : IsMulCommutative ↥K := by
       have hH := hyp.H_mulCommutative hG
       have e := Subgroup.subgroupOfEquivOfLe
         (show (H_sharp_hypothesis76_base hG hyp φ₀).H ≤ hyp.S from hHS)
@@ -274,7 +274,7 @@ theorem CharacterDegreeCore.eta10_Hsharp_norm_lower_core [Finite G]
       calc 3 ≤ hyp.p := hyp.three_le_p
         _ ≤ hyp.p ^ hyp.q := Nat.le_self_pow hyp.q_prime.ne_zero _
     omega
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   exact caseB_eta_norm_bound (S := G) α (fun x => hyp.eta10 x)
     ((Set.toFinite (sharpSubgroup hyp.H)).toFinset)
     (Hcard := Nat.card ↥hyp.H) (P := hyp.p ^ hyp.q - 1 + 1)

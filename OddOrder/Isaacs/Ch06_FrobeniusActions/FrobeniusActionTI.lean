@@ -135,7 +135,7 @@ theorem ncard_conjugates_eq_index_of_TI [Finite G]
     (h_TI : ∀ g : G, g ∉ A → A ⊓ (MulAut.conj g • A) = ⊥) :
     (Set.range (fun g : G => MulAut.conj g • A)).ncard = A.index := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   have hNGA : Subgroup.normalizer A = A := normalizer_eq_self_of_TI hA_ne h_TI
   set conjs : Set (Subgroup G) := Set.range (fun g : G => MulAut.conj g • A) with hconjs_def
   -- Define `f : G → conjs` by `g ↦ ⟨MulAut.conj g • A, ⟨g, rfl⟩⟩`.
@@ -199,12 +199,12 @@ theorem card_notConjugateSet_eq_index [Finite G]
     (h_TI : ∀ g : G, g ∉ A → A ⊓ (MulAut.conj g • A) = ⊥) :
     (notConjugateSet A).ncard = A.index := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   rcases eq_or_ne A ⊥ with rfl | hA_ne
   · -- Case `A = ⊥`: every element of `G` lies in `notConjugateSet ⊥`.
     have h_univ : notConjugateSet (⊥ : Subgroup G) = Set.univ := by
       ext x
-      simp only [notConjugateSet, Set.mem_setOf_eq, Set.mem_univ, iff_true]
+      simp only [notConjugateSet, Set.mem_ofPred_eq, Set.mem_univ, iff_true]
       intro a ha h_ne
       rw [Subgroup.mem_bot] at ha
       exact absurd ha h_ne
@@ -221,7 +221,7 @@ theorem card_notConjugateSet_eq_index [Finite G]
       constructor
       · -- `x ∈ Xᶜ`: exists `a ∈ A`, `a ≠ 1`, `IsConj a x`.
         intro hx
-        rw [Set.mem_compl_iff, notConjugateSet, Set.mem_setOf_eq] at hx
+        rw [Set.mem_compl_iff, notConjugateSet, Set.mem_ofPred_eq] at hx
         push Not at hx
         obtain ⟨a, haA, ha_ne, hIsConj⟩ := hx
         -- `IsConj a x` means `∃ c, c * a * c⁻¹ = x`.
@@ -383,8 +383,8 @@ private theorem mem_subgroupsOfCard {G : Type*} [Group G] [Finite G] {n : ℕ}
     H ∈ subgroupsOfCard G n ↔ Nat.card H = n := by
   classical
   unfold subgroupsOfCard
-  haveI : Finite (Subgroup G) := finite_subgroups_of_finite (G := G)
-  haveI : Fintype (Subgroup G) := Fintype.ofFinite (Subgroup G)
+  have : Finite (Subgroup G) := finite_subgroups_of_finite (G := G)
+  have : Fintype (Subgroup G) := Fintype.ofFinite (Subgroup G)
   simp
 
 variable {G : Type*} [Group G] (partn : SubgroupPartition G)
@@ -492,7 +492,7 @@ theorem nonidentitySigmaTo_surjective :
 private theorem card_ne_one_subtype {G : Type*} [Group G] [Finite G] :
     Nat.card {g : G // g ≠ 1} = Nat.card G - 1 := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   have hfilter :
       (Finset.univ.filter fun g : G => g ≠ 1) = Finset.univ.erase 1 := by
     ext g
@@ -514,7 +514,7 @@ theorem parts_card_mul_sub_one_eq_card_sub_one [Finite G] {c : ℕ}
   let domain :=
     Σ X : {X : Subgroup G // X ∈ partn.parts}, {x : X.1 // x ≠ 1}
   let codomain := {g : G // g ≠ 1}
-  haveI : Fintype {X : Subgroup G // X ∈ partn.parts} := inferInstance
+  have : Fintype {X : Subgroup G // X ∈ partn.parts} := inferInstance
   have hdomain_sigma :
       Nat.card domain =
         ∑ X : {X : Subgroup G // X ∈ partn.parts}, Nat.card {x : X.1 // x ≠ 1} := by
@@ -565,13 +565,13 @@ noncomputable def elementaryAbelianPrimeSquare
       exact pow_lt_pow_right₀ hp.one_lt (by norm_num : (1 : ℕ) < 2)
     exact (ne_of_lt hp_lt_sq) hp_eq_sq
   cover := by
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     intro g
     by_cases hg : g = 1
     · have hCard_gt_one : 1 < Nat.card G := by
         rw [hCard]
         exact one_lt_pow₀ hp.one_lt two_ne_zero
-      haveI : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp hCard_gt_one
+      have : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp hCard_gt_one
       obtain ⟨x, hx_ne⟩ := exists_ne (1 : G)
       let X : Subgroup G := Subgroup.zpowers x
       have hX_card : Nat.card X = p := by
@@ -796,7 +796,7 @@ theorem quotient_isFrobeniusAction_of_fixedBy_le
     @IsFrobeniusAction A (N ⧸ M) _ _
       (IsFrobeniusAction.invariantQuotientMulDistribMulAction M hM) := by
   classical
-  letI : MulDistribMulAction A (N ⧸ M) :=
+  let : MulDistribMulAction A (N ⧸ M) :=
     IsFrobeniusAction.invariantQuotientMulDistribMulAction M hM
   intro a ha q hq_ne hfix
   revert hq_ne hfix
@@ -850,9 +850,9 @@ theorem quotient_isFrobeniusAction_of_fixedBy_le
     exact hM (c : A) m hm
   have hCopCM : Nat.Coprime (Nat.card C) (Nat.card M) :=
     hCopAM.coprime_dvd_left (Subgroup.card_subgroup_dvd_card C)
-  haveI : IsCyclic C := Subgroup.isCyclic_zpowers a
-  letI : CommGroup C := IsCyclic.commGroup
-  have hSolvC : IsSolvable C ∨ IsSolvable M := Or.inl inferInstance
+  have : IsCyclic C := Subgroup.isCyclic_zpowers a
+  let : CommGroup C := IsCyclic.commGroup
+  have hSolvC : Group.IsSolvable C ∨ Group.IsSolvable M := Or.inl inferInstance
   have hg_fix_C : ∀ c : C, ∃ m ∈ M, φC c n = n * m := by
     intro c
     simpa [φC, P] using hC_le_P c.2
@@ -896,7 +896,7 @@ theorem exists_aInvariant_sylow_eq_top_of_prime_dvd_index_of_proper_invariant_le
     {A N : Type*} [Group A] [Finite A] [Group N] [Finite N] [MulDistribMulAction A N]
     {K : Subgroup N} {p : ℕ} [Fact p.Prime]
     (hCop : Nat.Coprime (Nat.card A) (Nat.card N))
-    (hSolv : IsSolvable A ∨ IsSolvable N)
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable N)
     (hpK : p ∣ K.index)
     (hproper : ∀ P : Subgroup N,
       (∀ a : A, ∀ n ∈ P, a • n ∈ P) → P ≠ ⊤ → P ≤ K) :
@@ -922,7 +922,7 @@ theorem exists_aInvariant_sylow_eq_top_of_prime_dvd_index_of_proper_invariant_le
 In the theorem's p-group case, `N` is solvable, so `N' < N`; invariance is functorial under
 automorphisms. -/
 theorem commutator_le_of_proper_invariant_le_of_isSolvable
-    {A N : Type*} [Group A] [Group N] [Finite N] [Nontrivial N] [IsSolvable N]
+    {A N : Type*} [Group A] [Group N] [Finite N] [Nontrivial N] [Group.IsSolvable N]
     [MulDistribMulAction A N] {K : Subgroup N}
     (hproper : ∀ P : Subgroup N,
       (∀ a : A, ∀ n ∈ P, a • n ∈ P) → P ≠ ⊤ → P ≤ K) :
@@ -936,7 +936,7 @@ theorem commutator_le_of_proper_invariant_le_of_isSolvable
     intro a n hn
     simpa [φ] using hcomm_inv a n hn
   exact hproper (_root_.commutator N) hcomm_smul
-    (IsSolvable.commutator_lt_top_of_nontrivial N).ne
+    (Group.IsSolvable.commutator_lt_top_of_nontrivial N).ne
 
 /-- Isaacs's product `u_H = ∏_{h ∈ H} u^h`, written for an action by automorphisms. -/
 noncomputable def orbitProduct {A U : Type*} [Group A] [CommGroup U]
@@ -1048,11 +1048,11 @@ theorem partitionNonidentityOrbitProduct_eq_partitionSigmaNonidentityOrbitProduc
       partitionSigmaNonidentityOrbitProduct φ partn u := by
   classical
   rw [partitionNonidentityOrbitProduct, partitionSigmaNonidentityOrbitProduct]
-  letI : Fintype A := Fintype.ofFinite A
-  letI : Fintype {X : Subgroup A // X ∈ partn.parts} := Fintype.ofFinite _
-  letI : ∀ X : {X : Subgroup A // X ∈ partn.parts}, Fintype X.1 :=
+  let : Fintype A := Fintype.ofFinite A
+  let : Fintype {X : Subgroup A // X ∈ partn.parts} := Fintype.ofFinite _
+  let : ∀ X : {X : Subgroup A // X ∈ partn.parts}, Fintype X.1 :=
     fun X => Fintype.ofFinite X.1
-  letI :
+  let :
       ∀ X : {X : Subgroup A // X ∈ partn.parts}, Fintype {x : X.1 // x ≠ 1} :=
     fun X => Subtype.fintype (fun x : X.1 => x ≠ 1)
   rw [Finset.prod_subtype partn.parts (fun X => Iff.rfl)
@@ -1078,11 +1078,11 @@ theorem partitionSigmaNonidentityOrbitProduct_eq_nonidentityOrbitProduct
       nonidentityOrbitProduct φ u := by
   classical
   rw [partitionSigmaNonidentityOrbitProduct, nonidentityOrbitProduct]
-  letI : Fintype A := Fintype.ofFinite A
-  letI : Fintype {X : Subgroup A // X ∈ partn.parts} := Fintype.ofFinite _
-  letI : ∀ X : {X : Subgroup A // X ∈ partn.parts}, Fintype X.1 :=
+  let : Fintype A := Fintype.ofFinite A
+  let : Fintype {X : Subgroup A // X ∈ partn.parts} := Fintype.ofFinite _
+  let : ∀ X : {X : Subgroup A // X ∈ partn.parts}, Fintype X.1 :=
     fun X => Fintype.ofFinite X.1
-  letI :
+  let :
       ∀ X : {X : Subgroup A // X ∈ partn.parts}, Fintype {x : X.1 // x ≠ 1} :=
     fun X => Subtype.fintype (fun x : X.1 => x ≠ 1)
   exact Fintype.prod_bijective partn.nonidentitySigmaTo
@@ -1116,8 +1116,8 @@ theorem topOrbitProduct_eq_mul_nonidentityOrbitProduct
     topOrbitProduct φ u = u * nonidentityOrbitProduct φ u := by
   classical
   rw [topOrbitProduct, orbitProduct, nonidentityOrbitProduct]
-  letI : Fintype A := Fintype.ofFinite A
-  letI : Fintype (⊤ : Subgroup A) := Fintype.ofFinite (⊤ : Subgroup A)
+  let : Fintype A := Fintype.ofFinite A
+  let : Fintype (⊤ : Subgroup A) := Fintype.ofFinite (⊤ : Subgroup A)
   calc
     (∏ h : (⊤ : Subgroup A), (φ (h : A)) u)
         = ∏ a : A, (φ a) u := by
@@ -1148,7 +1148,7 @@ theorem partitionOrbitProduct_eq_pow_mul_partitionNonidentityOrbitProduct
                subgroupNonidentityOrbitProduct φ X u)) := by
             refine Finset.prod_congr rfl ?_
             intro X hX
-            letI : Fintype X := Fintype.ofFinite X
+            let : Fintype X := Fintype.ofFinite X
             exact orbitProduct_eq_mul_subgroupNonidentityOrbitProduct φ X u
     _ = (∏ X ∈ partn.parts, u) *
           ∏ X ∈ partn.parts,
@@ -1203,7 +1203,7 @@ theorem partitionOrbitProduct_eq_one_of_parts_fixedPoints_eq_bot
   classical
   rw [partitionOrbitProduct, Finset.prod_eq_one]
   intro X hX
-  letI : Fintype X := Fintype.ofFinite X
+  let : Fintype X := Fintype.ofFinite X
   exact orbitProduct_eq_one_of_actionFixedPoints_eq_bot φ X u (hfix X hX)
 
 /-- If every partition part has trivial fixed points, then the full fixed-point subgroup is
@@ -1247,7 +1247,7 @@ theorem exists_part_actionFixedPoints_ne_bot_of_orbitProduct_identity
   have htop_one :
       topOrbitProduct φ u = 1 := by
     rw [topOrbitProduct]
-    letI : Fintype (⊤ : Subgroup A) := Fintype.ofFinite (⊤ : Subgroup A)
+    let : Fintype (⊤ : Subgroup A) := Fintype.ofFinite (⊤ : Subgroup A)
     exact orbitProduct_eq_one_of_actionFixedPoints_eq_bot φ (⊤ : Subgroup A) u htop
   have hident := hidentity u
   rw [hprod, htop_one, one_mul] at hident
@@ -1374,8 +1374,8 @@ theorem false_of_frobeniusAction_partition_of_sub_one_dvd_actor_card
     False := by
   have hcop_AU : (Nat.card A).Coprime (Nat.card U) := by
     classical
-    haveI : Fintype A := Fintype.ofFinite A
-    haveI : Fintype U := Fintype.ofFinite U
+    have : Fintype A := Fintype.ofFinite A
+    have : Fintype U := Fintype.ofFinite U
     simpa only [Fintype.card_eq_nat_card] using
       (IsFrobeniusAction.coprime_card (A := A) (N := U) hFrob).symm
   exact false_of_frobeniusAction_partition_of_coprime_card hFrob partn

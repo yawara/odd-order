@@ -56,7 +56,7 @@ Sylow `p`-部分群は位数 `p`。Sylow の個数 `nₚ ∣ [G:P] = m < p` か�
 theorem exists_unique_subgroup_card_eq_of_prime_gt {G : Type*} [Group G] [Finite G] {p m : ℕ}
     (hp : p.Prime) (hcard : Nat.card G = p * m) (hpm : m < p) :
     ∃! P : Subgroup G, Nat.card P = p := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨P⟩ := (Sylow.nonempty : Nonempty (Sylow p G))
   have hcardpos : 0 < Nat.card G := Nat.card_pos
   have hm0 : 0 < m := by
@@ -144,7 +144,7 @@ theorem prime_dvd_index_normalizer_of_prime_pow {G : Type*} [Group G] [Finite G]
     (hp : p.Prime) {H : Subgroup G} (hH : Nat.card H = p ^ n) (hdvd : p ∣ H.index) :
     p ∣ Nat.card (Subgroup.normalizer (H : Set G) ⧸
       H.comap (Subgroup.normalizer (H : Set G)).subtype) := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨s, hs⟩ := hdvd
   refine Sylow.prime_dvd_card_quotient_normalizer ⟨s, ?_⟩ hH
   rw [← Subgroup.card_mul_index H, hH, hs, pow_succ]; ring
@@ -168,7 +168,7 @@ theorem card_doubleCoset_mul_card_inf_conj {G : Type*} [Group G] [Finite G]
       simp only [← map_inv, inv_inv, MulAut.smul_def, MulAut.conj_apply]
     rw [hy]
   -- 両側作用 (h,k)•x = h x k⁻¹
-  letI act : MulAction (H × K) G :=
+  let act : MulAction (H × K) G :=
     { smul := fun p x => (p.1 : G) * x * (p.2 : G)⁻¹
       one_smul := fun x => by
         change ((1 : H × K).1 : G) * x * ((1 : H × K).2 : G)⁻¹ = x
@@ -344,7 +344,7 @@ theorem sum_card_fixedBy_nat {M β : Type*} [Group M] [Fintype M] [MulAction M �
     ∑ m : M, Nat.card (fixedBy β m) = Nat.card (orbitRel.Quotient M β) * Nat.card M := by
   classical
   obtain ⟨_⟩ := nonempty_fintype β
-  haveI : Fintype (orbitRel.Quotient M β) := Fintype.ofFinite _
+  have : Fintype (orbitRel.Quotient M β) := Fintype.ofFinite _
   simp only [Nat.card_eq_fintype_card]
   exact sum_card_fixedBy_eq_card_orbits_mul_card_group M β
 
@@ -358,7 +358,7 @@ open MulAction in
 theorem card_not_mem_conj_ge {G : Type*} [Group G] [Finite G] {H : Subgroup G} (hH : H ≠ ⊤) :
     Nat.card H ≤ Nat.card {g : G // ∀ x : G, x⁻¹ * g * x ∉ H} := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   -- (a) g fixes QuotientGroup.mk x ⟺ x⁻¹g⁻¹x ∈ H
   have hfix : ∀ g x : G,
       g • (QuotientGroup.mk x : G ⧸ H) = QuotientGroup.mk x ↔ x⁻¹ * g⁻¹ * x ∈ H := fun g x => by
@@ -375,7 +375,7 @@ theorem card_not_mem_conj_ge {G : Type*} [Group G] [Finite G] {H : Subgroup G} (
   -- (G-side) ∑ χ = |G|
   have hsumG : ∑ g : G, Nat.card (fixedBy (G ⧸ H) g) = Nat.card G := by
     rw [sum_card_fixedBy_nat]
-    haveI : Subsingleton (orbitRel.Quotient G (G ⧸ H)) :=
+    have : Subsingleton (orbitRel.Quotient G (G ⧸ H)) :=
       (pretransitive_iff_subsingleton_quotient G (G ⧸ H)).mp inferInstance
     rw [show Nat.card (orbitRel.Quotient G (G ⧸ H)) = 1 from Nat.card_unique, one_mul]
   -- (H-side) 2|H| ≤ ∑_{h∈H} χ(↑h)
@@ -401,7 +401,7 @@ theorem card_not_mem_conj_ge {G : Type*} [Group G] [Finite G] {H : Subgroup G} (
     Nat.card_congr ((Equiv.inv G).subtypeEquiv fun g => by
       rw [Equiv.inv_apply, hχzero]; simp only [inv_inv])]
   -- Finset counting
-  haveI : Fintype {g : G // Nat.card (fixedBy (G ⧸ H) g) = 0} := Fintype.ofFinite _
+  have : Fintype {g : G // Nat.card (fixedBy (G ⧸ H) g) = 0} := Fintype.ofFinite _
   set f : G → ℕ := fun g => Nat.card (fixedBy (G ⧸ H) g) with hf
   set SH := Finset.univ.filter (fun g => g ∈ H) with hSHd
   set SHc := Finset.univ.filter (fun g => g ∉ H) with hSHcd
@@ -507,7 +507,7 @@ theorem mul_isSubgroup_iff_le_sylow {p : ℕ} [Fact p.Prime] {G : Type*} [Group 
 theorem exists_subgroup_card_eq_prime_mul_ker {A B : Type*} [Group A] [Group B] [Finite A]
     (f : A →* B) (hf : Function.Surjective f) {p : ℕ} [Fact p.Prime] (hp : p ∣ Nat.card B) :
     ∃ R : Subgroup A, f.ker ≤ R ∧ Nat.card R = p * Nat.card f.ker := by
-  haveI : Finite B := Finite.of_surjective f hf
+  have : Finite B := Finite.of_surjective f hf
   obtain ⟨b, hb⟩ := exists_prime_orderOf_dvd_card' p hp
   set C : Subgroup B := Subgroup.zpowers b with hCdef
   have hCcard : Nat.card C = p := by rw [hCdef, Nat.card_zpowers, hb]
@@ -682,7 +682,7 @@ open Pointwise in
 theorem exists_sylow_map_eq {G K : Type*} [Group G] [Group K] [Finite G]
     {θ : G →* K} (hθ : Function.Surjective θ) {p : ℕ} [Fact p.Prime] (T : Sylow p K) :
     ∃ S : Sylow p G, (S : Subgroup G).map θ = (T : Subgroup K) := by
-  haveI : Finite K := Finite.of_surjective θ hθ
+  have : Finite K := Finite.of_surjective θ hθ
   obtain ⟨S₀⟩ := (Sylow.nonempty : Nonempty (Sylow p G))
   obtain ⟨Q, hQ⟩ := exists_sylow_coe_eq_of_isHallSubgroup_singleton
     (IsHallSubgroup.map_of_surjective hθ (sylow_isHallSubgroup_singleton S₀))
@@ -697,7 +697,7 @@ theorem exists_sylow_map_eq {G K : Type*} [Group G] [Group K] [Finite G]
 theorem card_sylow_le_of_surjective {G K : Type*} [Group G] [Group K] [Finite G]
     {θ : G →* K} (hθ : Function.Surjective θ) {p : ℕ} [Fact p.Prime] :
     Nat.card (Sylow p K) ≤ Nat.card (Sylow p G) := by
-  haveI : Finite K := Finite.of_surjective θ hθ
+  have : Finite K := Finite.of_surjective θ hθ
   refine Nat.card_le_card_of_surjective
     (fun S : Sylow p G => (exists_sylow_coe_eq_of_isHallSubgroup_singleton
       (IsHallSubgroup.map_of_surjective hθ (sylow_isHallSubgroup_singleton S))).choose) ?_
@@ -766,7 +766,7 @@ theorem isHallSubgroup_inf_of_mul_isSubgroup {π : Set ℕ} {G : Type*} [Group G
 theorem oPiCore_le_of_isHallSubgroup {π : Set ℕ} {G : Type*} [Group G] [Finite G]
     {H : Subgroup G} (hH : IsHallSubgroup π H) : oPiCore π G ≤ H := by
   set N := oPiCore π G with hN
-  haveI : N.Normal := by rw [hN]; infer_instance
+  have : N.Normal := by rw [hN]; infer_instance
   have hNpi : Subgroup.IsPiGroup π N := by rw [hN]; exact oPiCore.isPiGroup π
   have hsub : N ⊔ H ≤ H := by
     rw [← Subgroup.relIndex_eq_one]
@@ -809,7 +809,7 @@ theorem oPiCore_eq_iInf_isHallSubgroup {π : Set ℕ} {G : Type*} [Group G] [Fin
   have hNpi : Subgroup.IsPiGroup π
       (⨅ H : {H : Subgroup G // IsHallSubgroup π H}, (H : Subgroup G)) :=
     fun q hq => hH₀.1 q (Nat.primeFactors_mono (Subgroup.card_dvd_of_le hNle) Nat.card_pos.ne' hq)
-  haveI hNnorm : (⨅ H : {H : Subgroup G // IsHallSubgroup π H}, (H : Subgroup G)).Normal := by
+  have hNnorm : (⨅ H : {H : Subgroup G // IsHallSubgroup π H}, (H : Subgroup G)).Normal := by
     apply Subgroup.Normal.of_conjugate_fixed
     intro g
     ext x
@@ -942,7 +942,7 @@ theorem card_sylow_subgroup_le {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [F
 theorem powerOrder_eq_iUnion_sylow {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] :
     {x : G | ∃ k, orderOf x = p ^ k} = ⋃ P : Sylow p G, (P : Set G) := by
   ext x
-  simp only [Set.mem_setOf_eq, Set.mem_iUnion, SetLike.mem_coe]
+  simp only [Set.mem_ofPred_eq, Set.mem_iUnion, SetLike.mem_coe]
   constructor
   · rintro ⟨k, hk⟩
     have hpg : IsPGroup p (Subgroup.zpowers x) :=
@@ -988,9 +988,9 @@ theorem prime_dvd_card_orderOf_prime_pow {p : ℕ} [Fact p.Prime] {G : Type*} [G
     p ∣ Nat.card {x : G // ∃ k, orderOf x = p ^ k} := by
   obtain ⟨P⟩ : Nonempty (Sylow p G) := inferInstance
   set X := {x : G // ∃ k, orderOf x = p ^ k} with hXdef
-  haveI hXfin : Finite X := Subtype.finite
+  have hXfin : Finite X := Subtype.finite
   -- ↥P の X への共役作用
-  letI act : MulAction (↥(P : Subgroup G)) X :=
+  let act : MulAction (↥(P : Subgroup G)) X :=
     { smul := fun h x => ⟨(h : G) * (x : G) * (h : G)⁻¹, by
         obtain ⟨k, hk⟩ := x.2
         refine ⟨k, ?_⟩
@@ -1055,7 +1055,7 @@ theorem prime_dvd_card_orderOf_prime_pow {p : ℕ} [Fact p.Prime] {G : Type*} [G
     rw [P.card_eq_multiplicity]
     exact dvd_pow_self p ((Fact.out : p.Prime).factorization_pos_of_dvd
       (Nat.card_pos).ne' hp).ne'
-  haveI : Nontrivial (↥(P : Subgroup G)) :=
+  have : Nontrivial (↥(P : Subgroup G)) :=
     Finite.one_lt_card_iff_nontrivial.mp
       (lt_of_lt_of_le (Fact.out : p.Prime).one_lt (Nat.le_of_dvd Nat.card_pos hPdvd))
   have hZdvd : p ∣ Nat.card (Subgroup.center (↥(P : Subgroup G))) := by
@@ -1261,7 +1261,7 @@ theorem card_subgroup_card_eq_modEq {p : ℕ} [Fact p.Prime] {G : Type*} [Group 
       ≡ Nat.card {D' : Subgroup ↥(P : Subgroup G) // Nat.card D' = p ^ a} [MOD p] := by
   classical
   -- ↥P の S_a(G) への共役作用
-  letI actG : MulAction ↥(P : Subgroup G) {D : Subgroup G // Nat.card D = p ^ a} :=
+  let actG : MulAction ↥(P : Subgroup G) {D : Subgroup G // Nat.card D = p ^ a} :=
     { smul := fun h D => ⟨MulAut.conj (h : G) • D.1,
         (Nat.card_congr (Subgroup.equivSMul (MulAut.conj (h : G)) D.1).symm.toEquiv).trans D.2⟩
       one_smul := fun D => by
@@ -1274,7 +1274,7 @@ theorem card_subgroup_card_eq_modEq {p : ℕ} [Fact p.Prime] {G : Type*} [Group 
           = MulAut.conj (h₁ : G) • MulAut.conj (h₂ : G) • D.1
         rw [Subgroup.coe_mul, map_mul, mul_smul] }
   -- ↥P の S_a(P) への共役作用
-  letI actP : MulAction ↥(P : Subgroup G)
+  let actP : MulAction ↥(P : Subgroup G)
       {D' : Subgroup ↥(P : Subgroup G) // Nat.card D' = p ^ a} :=
     { smul := fun h D => ⟨MulAut.conj h • D.1,
         (Nat.card_congr (Subgroup.equivSMul (MulAut.conj h) D.1).symm.toEquiv).trans D.2⟩

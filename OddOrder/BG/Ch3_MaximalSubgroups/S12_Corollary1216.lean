@@ -108,6 +108,7 @@ private theorem derivedInG_mono {H K : Subgroup G} (hHK : H ≤ K) :
     show derivedInG K = ⁅(K : Subgroup G), K⁆ from Subgroup.map_subtype_commutator K]
   exact Subgroup.commutator_mono hHK hHK
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The order of `(g • K)'` equals that of `K'` (conjugation is `G`-card-preserving:
 `derivedInG (g • K) = (derivedInG K).map (conj g)`). -/
 private theorem card_derivedInG_conj (g : G) (K : Subgroup G) :
@@ -117,7 +118,8 @@ private theorem card_derivedInG_conj (g : G) (K : Subgroup G) :
         = ⁅(MulAut.conj g • K : Subgroup G), MulAut.conj g • K⁆ := Subgroup.map_subtype_commutator _
     have e2 : derivedInG K = ⁅(K : Subgroup G), K⁆ := Subgroup.map_subtype_commutator _
     rw [e1, e2]
-    simp only [Subgroup.pointwise_smul_def, Subgroup.map_commutator]
+    simp only [Subgroup.pointwise_smul_def]
+    exact (Subgroup.map_commutator _ _ _).symm
   rw [hmapeq]
   exact Subgroup.card_map_of_injective (MulAut.conj g).injective
 
@@ -155,7 +157,7 @@ are conjugate (`hall_C`), and `hall_D` puts `Y` inside one of them, hence inside
 
 Used in the general `σ(M)`-subgroup form of Cor 12.16(a) to push `Y` into the `M ∩ M*` factor. -/
 private theorem exists_conj_smul_le_of_index_isPiCompl {G' : Type*} [Group G'] [Finite G']
-    [IsSolvable G'] {π : Set ℕ} {H Y : Subgroup G'}
+    [Group.IsSolvable G'] {π : Set ℕ} {H Y : Subgroup G'}
     (hHidx : ∀ p ∈ H.index.primeFactors, p ∉ π)
     (hYπ : ∀ p ∈ (Nat.card ↥Y).primeFactors, p ∈ π) :
     ∃ g : G', MulAut.conj g • Y ≤ H := by
@@ -318,7 +320,7 @@ element of `N`) into any `H ≤ N` whose relative index `[N : H]` is a `π'`-num
 `exists_conj_smul_le_of_index_isPiCompl` inside `↥N` and transports the result back via
 `map_subtype_conj_smul`. -/
 private theorem exists_conj_smul_le_of_relIndex_isPiCompl [Finite G]
-    {N : Subgroup G} [IsSolvable ↥N] {π : Set ℕ} {H Y : Subgroup G}
+    {N : Subgroup G} [Group.IsSolvable ↥N] {π : Set ℕ} {H Y : Subgroup G}
     (hHN : H ≤ N) (hYN : Y ≤ N)
     (hHidx : ∀ p ∈ (H.relIndex N).primeFactors, p ∉ π)
     (hYπ : ∀ p ∈ (Nat.card ↥Y).primeFactors, p ∈ π) :
@@ -419,7 +421,7 @@ private theorem pRank_normalizer_le_one_core [Finite G] (hG : IsMinimalSimpleOdd
       exists_Mstar_factorization hG h hYne hYq hqσ hYMσ hpE hpβ hNYM
     have hKle : K ≤ Mstar := hMstarFact ▸ le_sup_right
     have hidx : ¬ p ∣ ((M ⊓ Mstar).subgroupOf Mstar).index := by
-      haveI := hKnorm
+      have := hKnorm
       have htop : (M ⊓ Mstar).subgroupOf Mstar ⊔ K.subgroupOf Mstar = ⊤ := by
         rw [← Subgroup.subgroupOf_sup inf_le_right hKle, ← hMstarFact, Subgroup.subgroupOf_self]
       exact not_dvd_index_of_sup_top_normal htop
@@ -535,7 +537,7 @@ private theorem not_mem_primeFactors_derived_of_tau1_core [Finite G] (hG : IsMin
     have hKle : K ≤ Mstar := hMstarFact ▸ le_sup_right
     have hNMstar : H ⊓ Subgroup.normalizer (Y : Set G) ≤ Mstar := inf_le_right.trans hMstar_ge
     have hpMstar' : ¬ p ∣ Nat.card ↥(derivedInG Mstar) := by
-      haveI := hKnorm
+      have := hKnorm
       have hAK_top : (M ⊓ Mstar).subgroupOf Mstar ⊔ K.subgroupOf Mstar = ⊤ := by
         rw [← Subgroup.subgroupOf_sup inf_le_right hKle, ← hMstarFact, Subgroup.subgroupOf_self]
       have hcrux := commutator_le_commutator_sup_normal ((M ⊓ Mstar).subgroupOf Mstar)
@@ -661,16 +663,16 @@ private theorem exists_char_qSubgroup [Finite G] (hG : IsMinimalSimpleOdd G)
     ∃ q : ℕ, q.Prime ∧ ∃ X : Subgroup G,
       X ≤ Y ∧ X ≠ ⊥ ∧ IsPGroup q ↥X ∧ q ∈ S10.sigma M ∧
         Subgroup.normalizer (Y : Set G) ≤ Subgroup.normalizer (X : Set G) := by
-  haveI : IsSolvable ↥Y := hG.solvable_of_lt_top Y hYlt
-  haveI : Nontrivial ↥Y := (Subgroup.nontrivial_iff_ne_bot Y).mpr hYne
+  have : Group.IsSolvable ↥Y := hG.isSolvable_of_lt_top Y hYlt
+  have : Nontrivial ↥Y := (Subgroup.nontrivial_iff_ne_bot Y).mpr hYne
   have hFcard_ne : Nat.card ↥(Ch2.S08.fittingInG Y) ≠ 1 := by
     rw [Ch2.S08.fittingInG, Subgroup.card_map_of_injective Y.subtype_injective]
-    exact fun hc => Ch01.fitting_ne_bot_of_solvable_nontrivial ↥Y (Subgroup.card_eq_one.mp hc)
+    exact fun hc => Ch01.fitting_ne_bot_of_isSolvable_nontrivial ↥Y (Subgroup.card_eq_one.mp hc)
   obtain ⟨q, hq_mem⟩ : (Nat.card ↥(Ch2.S08.fittingInG Y)).primeFactors.Nonempty :=
     Nat.nonempty_primeFactors.mpr
       (lt_of_le_of_ne (Nat.one_le_iff_ne_zero.mpr Nat.card_pos.ne') (Ne.symm hFcard_ne))
   have hq_prime : q.Prime := Nat.prime_of_mem_primeFactors hq_mem
-  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have : Fact q.Prime := ⟨hq_prime⟩
   have hOqFne : opiCoreInG ({q} : Set ℕ) (Ch2.S08.fittingInG Y) ≠ ⊥ :=
     Ch2.S08.opiCoreInG_singleton_fittingInG_ne_bot_of_mem_primeFactors hq_mem
   have hOqYne : opiCoreInG ({q} : Set ℕ) Y ≠ ⊥ := fun hbot =>
@@ -698,7 +700,7 @@ theorem sigma_subgroup_pRank_normalizer_le_one [Finite G] (hG : IsMinimalSimpleO
   have hYH : Y ≤ H := (mem_maximalSubgroupsContaining.mp hHY).2
   have hYlt : Y < ⊤ := lt_of_le_of_lt hYH hHco.lt_top
   obtain ⟨q, hq_prime, X, hXY, hXne, hXq, hqσ, hNYX⟩ := exists_char_qSubgroup hG hYne hYlt hYpi
-  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have : Fact q.Prime := ⟨hq_prime⟩
   have hHX : H ∈ maximalSubgroupsContaining X :=
     mem_maximalSubgroupsContaining.mpr ⟨hHco, hXY.trans hYH⟩
   have hcore := Cor1216.pRank_normalizer_le_one hG h hXne hXq hqσ hpE hpβ hHX hHnc
@@ -720,7 +722,7 @@ theorem sigma_subgroup_not_mem_primeFactors_derived_of_tau1 [Finite G] (hG : IsM
   have hYH : Y ≤ H := (mem_maximalSubgroupsContaining.mp hHY).2
   have hYlt : Y < ⊤ := lt_of_le_of_lt hYH hHco.lt_top
   obtain ⟨q, hq_prime, X, hXY, hXne, hXq, hqσ, hNYX⟩ := exists_char_qSubgroup hG hYne hYlt hYpi
-  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have : Fact q.Prime := ⟨hq_prime⟩
   have hHX : H ∈ maximalSubgroupsContaining X :=
     mem_maximalSubgroupsContaining.mpr ⟨hHco, hXY.trans hYH⟩
   have hcore := Cor1216.not_mem_primeFactors_derived_of_tau1 hG h hXne hXq hqσ hpE hpβ hpτ1 hHX hHnc
@@ -755,7 +757,7 @@ theorem sigma_subgroup_conj_into_Msigma_general [Finite G] (hG : IsMinimalSimple
     ∃ g : G, MulAut.conj g • Y ≤ S10.Msigma M := by
   classical
   obtain ⟨q, hq_prime, X, hXY, hXne, hXq, hqσ, hNYX⟩ := exists_char_qSubgroup hG hYne hYlt hYpi
-  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have : Fact q.Prime := ⟨hq_prime⟩
   obtain ⟨g₀, hg₀X⟩ := Cor1216.exists_conj_qSubgroup_le_Msigma hG hM hqσ hXq
   -- Reduce to conjugating the already-shifted `g₀ • Y`.
   suffices h : ∃ g : G, MulAut.conj g • (MulAut.conj g₀ • Y) ≤ S10.Msigma M by
@@ -795,7 +797,7 @@ theorem sigma_subgroup_conj_into_Msigma_general [Finite G] (hG : IsMinimalSimple
       Cor1216.exists_Mstar_factorization_sigma hG hM hX₀ne hX₀q hqσ hg₀X hNX₀M
     have hY₀Mstar : MulAut.conj g₀ • Y ≤ Mstar :=
       le_trans (le_trans Subgroup.le_normalizer hNY₀X₀) hMstar_ge
-    haveI : IsSolvable ↥Mstar := hG.solvable_of_mem_maximalSubgroups hMstar_max
+    have : Group.IsSolvable ↥Mstar := hG.isSolvable_of_mem_maximalSubgroups hMstar_max
     have hidx : ∀ p ∈ ((M ⊓ Mstar).relIndex Mstar).primeFactors, p ∉ S10.sigma M := by
       intro p hp hpσM
       have hp_prime : p.Prime := Nat.prime_of_mem_primeFactors hp
@@ -805,7 +807,7 @@ theorem sigma_subgroup_conj_into_Msigma_general [Finite G] (hG : IsMinimalSimple
       have hpK : ¬ p ∣ Nat.card ↥K := fun hdvd =>
         hpσMstar (hKσ p (Nat.mem_primeFactors.mpr ⟨hp_prime, hdvd, Nat.card_pos.ne'⟩))
       have hKle : K ≤ Mstar := hMstarFact ▸ le_sup_right
-      haveI := hKnorm
+      have := hKnorm
       have htop : (M ⊓ Mstar).subgroupOf Mstar ⊔ K.subgroupOf Mstar = ⊤ := by
         rw [← Subgroup.subgroupOf_sup inf_le_right hKle, ← hMstarFact, Subgroup.subgroupOf_self]
       exact Cor1216.not_dvd_index_of_sup_top_normal htop

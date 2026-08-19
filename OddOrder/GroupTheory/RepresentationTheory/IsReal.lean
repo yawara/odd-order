@@ -166,6 +166,7 @@ end ClassFunction
 
 variable {G : Type*} [Group G]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp] theorem trivialClassFunction_isReal :
     ClassFunction.IsReal (trivialClassFunction G) := by
   unfold ClassFunction.IsReal

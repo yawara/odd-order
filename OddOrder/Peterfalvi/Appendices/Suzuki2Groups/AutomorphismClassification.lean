@@ -82,9 +82,9 @@ theorem exists_semilinear_of_aut
             (typeBQuadraticMap (1 : RingAut F) ε) basis Φ v) =
           lam * σ (equivProd ε v) := by
   classical
-  haveI : Fact (Irreducible (fieldModelPoly ε)) :=
+  have : Fact (Irreducible (fieldModelPoly ε)) :=
     ⟨fieldModelPoly_irreducible ε hq⟩
-  letI : Fintype (FieldModel ε ≃ₐ[ZMod 2] FieldModel ε) := Fintype.ofFinite _
+  let : Fintype (FieldModel ε ≃ₐ[ZMod 2] FieldModel ε) := Fintype.ofFinite _
   have hε : ε ≠ 0 := epsilon_ne_zero_of_anisotropic ε hq
   have hrad : ∀ w : F × F,
       (∀ v' : F × F, typeBQuadraticMap (1 : RingAut F) ε (w + v') =
@@ -189,7 +189,7 @@ theorem exists_aut_of_semilinear {n : ℕ}
             (typeBQuadraticMap (1 : RingAut F) ε) basis Φ v) =
           lam * σ (equivProd ε v) := by
   classical
-  haveI : Fact (Irreducible (fieldModelPoly ε)) :=
+  have : Fact (Irreducible (fieldModelPoly ε)) :=
     ⟨fieldModelPoly_irreducible ε hq⟩
   have hε : ε ≠ 0 := epsilon_ne_zero_of_anisotropic ε hq
   -- `σ` commutes with the conjugation: the Galois group is cyclic

@@ -51,7 +51,7 @@ theorem sum_eq_sum_conjClasses {M : Type*} [AddCommMonoid M] [Fintype G]
     ∑ g : G, f g
       = ∑ C : ConjClasses G, conjugacyClassSize C • f (conjugacyClassRepresentative C) := by
   classical
-  letI : ∀ C : ConjClasses G, Fintype C.carrier := fun _ => Fintype.ofFinite _
+  let : ∀ C : ConjClasses G, Fintype C.carrier := fun _ => Fintype.ofFinite _
   rw [← Fintype.sum_equiv conjClassesSigmaCarrierEquiv (fun x => f x.2.1) f fun _ => rfl,
     Fintype.sum_sigma]
   refine Finset.sum_congr rfl fun C _ => ?_
@@ -234,8 +234,8 @@ theorem sum_character_inv_mul_character (x y : G) :
         * (wedderburnRepresentation e i).character y
       = if IsConj x y then (Nat.card (Subgroup.centralizer ({x} : Set G)) : K) else 0 := by
   classical
-  letI : DecidableEq ι' := Classical.decEq ι'
-  letI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  let : DecidableEq ι' := Classical.decEq ι'
+  let : Fintype (ConjClasses G) := Fintype.ofFinite _
   set j := (equivConjClasses e).symm (ConjClasses.mk x) with hj
   set j' := (equivConjClasses e).symm (ConjClasses.mk y) with hj'
   have hxc : IsConj x (classRep e j) := by

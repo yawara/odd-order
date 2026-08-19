@@ -2044,7 +2044,7 @@ set_option linter.style.longLine false in
   OddOrder.Isaacs.Ch04.exists_orbit_card_mul_of_coprime_orbit_card
 
 -- Ch.3 (Split Extensions): Thm 3.12 Schur-Zassenhaus conjugacy ⭐⭐⭐ **FT クリティカル**
--- N ⊴ G finite, (|N|, |G:N|) = 1, IsSolvable N or IsSolvable (G/N) ⇒
+-- N ⊴ G finite, (|N|, |G:N|) = 1, Group.IsSolvable N or Group.IsSolvable (G/N) ⇒
 -- any two complements of N are conjugate by an element of N.
 #assert_only_allowed_axioms Subgroup.IsComplement'.exists_conj_of_coprime
 
@@ -3101,7 +3101,7 @@ one-element lemma).  All axiom-clean. -/
 
 -- BG **Theorem 6.4** solvability input (issue 3026): `X/F(X)` nilpotent forces `X` solvable
 -- (`F(X)` nilpotent ⟹ solvable, quotient nilpotent ⟹ solvable, extension), and the Thm-6.4-shaped
--- assembly deriving `IsSolvable G` from the hypotheses on `G₀` and `G/G₀`.  BG Proposition 1.5,
+-- assembly deriving `Group.IsSolvable G` from the hypotheses on `G₀` and `G/G₀`.  BG Proposition 1.5,
 -- the engine Case 1 ends with, requires solvability.  Axiom-clean.
 #assert_only_allowed_axioms
   OddOrder.BG.Ch1.S06.isSolvable_of_isNilpotent_quotient_fitting
@@ -4953,7 +4953,7 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.SsubFiltration_nonempty_of_commutator_quotient_ne_top
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.SsubFiltration_nonempty_of_nontrivial_solvable_quotient
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.SsubFiltration_nonempty_of_nontrivial_isSolvable_quotient
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.SsubFiltration_nonempty_of_subgroupOf_ne_top
 #assert_only_allowed_axioms
@@ -5421,7 +5421,7 @@ set_option linter.style.longLine false in
 
 -- Minimal-counterexample reduction: *if* no minimal simple group of odd order exists,
 -- *then* every finite group of odd order is solvable. Pure group theory (strong induction
--- on `|G|` + `solvable_of_ker_le_range`).  The complete downstream chain is guarded again
+-- on `|G|` + `Group.isSolvable_of_ker_le_range`).  The complete downstream chain is guarded again
 -- at the end of this file after the Section 16 producers.
 #assert_only_allowed_axioms OddOrder.feitThompson_of_noMinimalSimpleOdd
 
@@ -6807,14 +6807,14 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.isFrobeniusGroup_quotient_of_normal_not_le_kernel
 -- BG Lemma 3.2 **plus its Note** (§3 逐条監査 2026-08-08, issue 0177): the書籍 states Lemma 3.2
 -- with a solvable kernel and then notes that solvability is unnecessary (Thompson's Thesis).  The
--- three declarations above formalize the lemma *before* the Note; these discharge `IsSolvable ↥K`
+-- three declarations above formalize the lemma *before* the Note; these discharge `Group.IsSolvable ↥K`
 -- via `IsFrobeniusGroup.isNilpotent_kernel` (Isaacs Thm 6.24 = BG Thm 3.7), so the repository
 -- states the book's actual reach.  Separate file because Thompson sits downstream of §3.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.isSolvable_kernel_of_isFrobeniusGroup
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.bgLemma32
 -- BG Theorem 3.5 **plus its Note** (same 逐条監査): Thm 3.5 carries the identical Note ("Just as
 -- for Lemma 3.2 … the assumption that `K` is solvable is not necessary"), and `S03e.thm35` /
--- `thm35_algClosed` assume `IsSolvable ↥K`.  These discharge it the same way.
+-- `thm35_algClosed` assume `Group.IsSolvable ↥K`.  These discharge it the same way.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.bgThm35_algClosed
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.bgThm35
 -- BG Theorem 3.8 (§3D): `G = KR` solvable of odd order, `K ⊴ G`, `(|R|,|K|)=1`, `C_K(x)=C_K(R)` for

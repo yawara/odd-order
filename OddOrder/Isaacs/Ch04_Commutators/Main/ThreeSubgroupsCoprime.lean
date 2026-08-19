@@ -250,7 +250,7 @@ theorem derivedSeries_le_ker_of_iter_inl_inr_eq_bot
   -- Apply abstract form with X = inr(A).range, E = inl(G).range
   set XG : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inl : G →* G ⋊[φ] A).range
   set YA : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inr : A →* G ⋊[φ] A).range
-  haveI hXG_normal : XG.Normal := OddOrder.Isaacs.Ch03.inl_range_normal φ
+  have hXG_normal : XG.Normal := OddOrder.Isaacs.Ch03.inl_range_normal φ
   -- YA ≤ Subgroup.normalizer XG (XG normal ⇒ normalizer = ⊤)
   have h_norm : YA ≤ Subgroup.normalizer XG := by
     intro y _
@@ -351,7 +351,7 @@ i.e., `c = g * n` for `n ∈ [G, A]`. Then `g = c * n⁻¹ ∈ C_G(A) * [G, A]`.
 theorem fixedPoints_sup_actionCommutator_eq_top
     {A G : Type*} [Group A] [Group G] [Finite A] [Finite G]
     {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G) :
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G) :
     Subgroup.fixedPointsOfMulAut φ ⊔ actionCommutator φ = ⊤ := by
   rw [eq_top_iff]
   intro g _
@@ -400,7 +400,7 @@ theorem iterCommutator_inl_inr_two_eq_one
     {A G : Type*} [Group A] [Group G] [Finite A] [Finite G]
     {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G) :
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G) :
     iterCommutator (SemidirectProduct.inl : G →* G ⋊[φ] A).range
                    (SemidirectProduct.inr : A →* G ⋊[φ] A).range 2 =
     iterCommutator (SemidirectProduct.inl : G →* G ⋊[φ] A).range
@@ -409,7 +409,7 @@ theorem iterCommutator_inl_inr_two_eq_one
   set YA : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inr : A →* G ⋊[φ] A).range
   -- I1 = ⁅XG, YA⁆ = [G, A]_Γ, I2 = ⁅I1, YA⁆ = [G, A, A]_Γ
   -- I1.Normal in Γ (Lem 4.1 系 via XG ⊔ YA = ⊤)
-  haveI hI1_normal : (⁅XG, YA⁆).Normal :=
+  have hI1_normal : (⁅XG, YA⁆).Normal :=
     commutator_normal_of_sup_eq_top SemidirectProduct.inl_range_sup_inr_range_eq_top
   refine le_antisymm ?_ ?_
   · -- I2 ≤ I1 (trivial: I1 normal in Γ, so ⁅I1, F⁆ ≤ I1)
@@ -487,7 +487,7 @@ theorem iterCommutator_inl_inr_two_eq_one
       rw [h_inv, ← map_mul, ← map_mul]
     rw [h_lift]
     -- c * x * c⁻¹ ∈ actionCommutator (G-normal)
-    haveI : (actionCommutator φ).Normal := actionCommutator.normal φ
+    have : (actionCommutator φ).Normal := actionCommutator.normal φ
     have h_cxc_ac : c * x * c⁻¹ ∈ actionCommutator φ :=
       ‹(actionCommutator φ).Normal›.conj_mem _ hx_ac c
     -- inl(c * x * c⁻¹) ∈ (actionCommutator).map inl = ⁅XG, YA⁆ (= I1)
@@ -516,7 +516,7 @@ theorem iterCommutator_inl_inr_two_eq_one_of_coprime
                    (SemidirectProduct.inr : A →* G ⋊[φ] A).range 1 := by
   set XG : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inl : G →* G ⋊[φ] A).range
   set YA : Subgroup (G ⋊[φ] A) := (SemidirectProduct.inr : A →* G ⋊[φ] A).range
-  haveI hI1_normal : (⁅XG, YA⁆).Normal :=
+  have hI1_normal : (⁅XG, YA⁆).Normal :=
     commutator_normal_of_sup_eq_top SemidirectProduct.inl_range_sup_inr_range_eq_top
   refine le_antisymm ?_ ?_
   · -- I2 ≤ I1 (trivial: I1 normal in Γ)
@@ -540,7 +540,7 @@ theorem iterCommutator_inl_inr_two_eq_one_of_coprime
     -- ⟨a⟩ acts coprimely and is cyclic, hence solvable: the solvable case applies.
     have hCopB : Nat.Coprime (Nat.card ↥(Subgroup.zpowers a)) (Nat.card G) :=
       Nat.Coprime.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _) hCop
-    haveI hBsolv : IsSolvable ↥(Subgroup.zpowers a) := by
+    have hBsolv : Group.IsSolvable ↥(Subgroup.zpowers a) := by
       -- ⟨a⟩ は可換 (`Subgroup.zpowers_isMulCommutative`); scoped instance で CommGroup 化.
       open scoped IsMulCommutative in exact inferInstance
     have h29B : iterCommutator XGB YBB 2 = iterCommutator XGB YBB 1 :=
@@ -695,7 +695,7 @@ theorem prime_dvd_card_of_faithful_iterCommutator_eq_bot
     {p : ℕ} (hp : p.Prime) (hpA : p ∣ Nat.card A) :
     p ∣ Nat.card G := by
   by_contra hpG
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   let P : Sylow p A := default
   let ψ : P →* MulAut G := φ.comp (P : Subgroup A).subtype
   have h_iter_P :
@@ -707,9 +707,9 @@ theorem prime_dvd_card_of_faithful_iterCommutator_eq_bot
     obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp P.isPGroup'
     rw [hn]
     exact Nat.Coprime.pow_left n ((Nat.Prime.coprime_iff_not_dvd hp).mpr hpG)
-  have hSolv : IsSolvable P ∨ IsSolvable G := by
+  have hSolv : Group.IsSolvable P ∨ Group.IsSolvable G := by
     left
-    haveI : Group.IsNilpotent P := P.isPGroup'.isNilpotent
+    have : Group.IsNilpotent P := P.isPGroup'.isNilpotent
     infer_instance
   have h_two :
       iterCommutator (SemidirectProduct.inl : G →* G ⋊[ψ] P).range
@@ -778,7 +778,7 @@ private theorem actionCommutator_isPGroup_of_iter_eq_bot_aux
         ih ψN hm h_iter_N (Nat.le_of_lt_succ (hN_card_lt.trans_le h_le))
       set U : Subgroup N := OddOrder.Isaacs.Ch01.opCore p N with hU_def
       set U_G : Subgroup G := U.map N.subtype with hUG_def
-      haveI hUG_normal : U_G.Normal := by
+      have hUG_normal : U_G.Normal := by
         dsimp [U_G]
         infer_instance
       have hU_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ U_G := by
@@ -792,7 +792,7 @@ private theorem actionCommutator_isPGroup_of_iter_eq_bot_aux
       have h_ac_bar : actionCommutator φbar = Nbar := by
         rw [actionCommutator_quotient_eq_map hU_inv]
       have hNA_le_U : actionCommutator ψN ≤ U := by
-        haveI : (actionCommutator ψN).Normal := actionCommutator.normal ψN
+        have : (actionCommutator ψN).Normal := actionCommutator.normal ψN
         simpa [U, hU_def] using
           (OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore
             (N := actionCommutator ψN) hNA_pgroup)
@@ -846,7 +846,7 @@ private theorem actionCommutator_isPGroup_of_iter_eq_bot_aux
       have hNbar_pi_top :
           OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ∉ ({p} : Set ℕ)}
             (⊤ : Subgroup Nbar) := by
-        letI : IsMulCommutative Nbar := hNbar_comm
+        let : IsMulCommutative Nbar := hNbar_comm
         exact isPiGroup_compl_top_of_isMulCommutative_opCore_eq_bot
           (G := Nbar) (p := p) hOpNbar
       have hNbar_pi :
@@ -862,9 +862,9 @@ private theorem actionCommutator_isPGroup_of_iter_eq_bot_aux
       have hCop : Nat.Coprime (Nat.card A) (Nat.card Nbar) :=
         OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
           Nat.card_pos.ne' Nat.card_pos.ne' hA_pi_card hNbar_pi
-      have hSolv : IsSolvable A ∨ IsSolvable Nbar := by
+      have hSolv : Group.IsSolvable A ∨ Group.IsSolvable Nbar := by
         left
-        haveI : Group.IsNilpotent A := hA.isNilpotent
+        have : Group.IsNilpotent A := hA.isNilpotent
         exact IsNilpotent.to_isSolvable
       have hNbar_inv : OddOrder.Isaacs.Ch03.IsAInvariant φbar Nbar := by
         rw [← h_ac_bar]
@@ -926,7 +926,7 @@ private theorem actionCommutator_isNilpotent_of_iter_eq_bot_aux :
       intro A G _ _ _ _ φ m hm h_iter h_le
       by_cases hA_nontriv : Nontrivial A
       swap
-      · haveI : Subsingleton A := not_nontrivial_iff_subsingleton.mp hA_nontriv
+      · have : Subsingleton A := not_nontrivial_iff_subsingleton.mp hA_nontriv
         have hbot : actionCommutator φ = ⊥ := by
           rw [actionCommutator_eq_bot_iff_acts_trivially]
           intro a g
@@ -937,7 +937,7 @@ private theorem actionCommutator_isNilpotent_of_iter_eq_bot_aux :
       by_cases hSylowTop :
           ∃ p0 : (Nat.card A).primeFactors, ∃ P : Sylow p0.val A, (P : Subgroup A) = ⊤
       · rcases hSylowTop with ⟨p0, P, hPtop⟩
-        haveI hp0 : Fact p0.val.Prime := ⟨Nat.prime_of_mem_primeFactors p0.property⟩
+        have hp0 : Fact p0.val.Prime := ⟨Nat.prime_of_mem_primeFactors p0.property⟩
         have hA_pgroup : IsPGroup p0.val A := by
           have hP_pgroup : IsPGroup p0.val (P : Subgroup A) := P.isPGroup'
           rw [hPtop] at hP_pgroup
@@ -952,7 +952,7 @@ private theorem actionCommutator_isNilpotent_of_iter_eq_bot_aux :
             ∀ p0 : (Nat.card A).primeFactors, ∀ P : Sylow p0.val A,
               (P : Subgroup A) ≤ φF.ker := by
           intro p0 P a haP
-          haveI hp0 : Fact p0.val.Prime := ⟨Nat.prime_of_mem_primeFactors p0.property⟩
+          have hp0 : Fact p0.val.Prime := ⟨Nat.prime_of_mem_primeFactors p0.property⟩
           have hP_ne_top : (P : Subgroup A) ≠ ⊤ := fun hPtop =>
             hSylowTop ⟨p0, P, hPtop⟩
           let ψP : P →* MulAut G := φ.comp (P : Subgroup A).subtype
@@ -966,8 +966,8 @@ private theorem actionCommutator_isNilpotent_of_iter_eq_bot_aux :
           have hNilpP : Group.IsNilpotent (actionCommutator ψP) :=
             ih ψP hm h_iter_P (Nat.le_of_lt_succ (hP_card_lt.trans_le h_le))
           have hP_comm_le_F : actionCommutator ψP ≤ F := by
-            haveI : (actionCommutator ψP).Normal := actionCommutator.normal ψP
-            haveI : Group.IsNilpotent (actionCommutator ψP) := hNilpP
+            have : (actionCommutator ψP).Normal := actionCommutator.normal ψP
+            have : Group.IsNilpotent (actionCommutator ψP) := hNilpP
             simpa [F] using
               (OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
                 (G := G) (N := actionCommutator ψP))
@@ -1095,7 +1095,7 @@ theorem fixedPoints_inf_actionCommutator_eq_bot_of_abelian
   -- c is A-fixed
   have hc_fixed : ∀ a : A, (φ a) c = c := hc_fix
   -- c ∈ ker θ via actionCommutator ⊆ ker θ
-  haveI : Fintype A := Fintype.ofFinite A
+  have : Fintype A := Fintype.ofFinite A
   have hc_ker : fittingProductHom φ c = 1 :=
     actionCommutator_le_ker_fittingProductHom φ hc_ac
   -- θ c = c^|A| from hc_fixed
@@ -1154,8 +1154,8 @@ theorem actionCommutator_eq_bot_of_abelian_pgroup_of_fixes_order_p
     rw [Subgroup.eq_bot_iff_forall]
     exact h
   -- actionCommutator is nontrivial subgroup of p-group ⇒ has order-p element
-  haveI hG_AC : IsPGroup p (actionCommutator φ) := hG.to_subgroup _
-  haveI : Nontrivial (actionCommutator φ) := ⟨⟨g_elem, hg_in⟩, 1, by
+  have hG_AC : IsPGroup p (actionCommutator φ) := hG.to_subgroup _
+  have : Nontrivial (actionCommutator φ) := ⟨⟨g_elem, hg_in⟩, 1, by
     intro h
     apply hg_ne
     exact (Subtype.ext_iff.mp h)⟩

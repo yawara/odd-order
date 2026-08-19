@@ -85,7 +85,7 @@ theorem inf_ker_transfer_eq_bot_of_le_center {G A : Type*} [Group G] [CommGroup 
     (ϕ : H →* A) (hϕ : Function.Injective ϕ)
     (hcop : Nat.Coprime (Nat.card H) H.index) :
     H ⊓ (transfer ϕ).ker = ⊥ := by
-  haveI := normal_of_le_center hH
+  have := normal_of_le_center hH
   rw [eq_bot_iff]
   rintro h ⟨hhH, hker⟩
   rw [Subgroup.mem_bot]
@@ -108,7 +108,7 @@ theorem sup_ker_transfer_eq_top_of_le_center {G A : Type*} [Group G] [CommGroup 
     {H : Subgroup G} [H.FiniteIndex] (hH : H ≤ Subgroup.center G)
     (ϕ : H →* A) (hcop : Nat.Coprime (Nat.card H) H.index) :
     H ⊔ (transfer ϕ).ker = ⊤ := by
-  haveI := normal_of_le_center hH
+  have := normal_of_le_center hH
   -- `x ↦ x ^ n` は `↥H` 上で単射, したがって全射
   have hfinj : Function.Injective
       (fun x : H => (⟨(x : G) ^ H.index, H.pow_mem x.2 _⟩ : H)) := by
@@ -158,8 +158,8 @@ theorem transfer_top_eq_apply {G A : Type*} [Group G] [CommGroup A]
     [(⊤ : Subgroup G).FiniteIndex] (ϕ : (⊤ : Subgroup G) →* A) (g : G) :
     transfer ϕ g = ϕ ⟨g, Subgroup.mem_top g⟩ := by
   classical
-  haveI hss : Subsingleton (G ⧸ (⊤ : Subgroup G)) := QuotientGroup.subsingleton_quotient_top
-  letI hfin : Fintype (G ⧸ (⊤ : Subgroup G)) := Subgroup.fintypeQuotientOfFiniteIndex
+  have hss : Subsingleton (G ⧸ (⊤ : Subgroup G)) := QuotientGroup.subsingleton_quotient_top
+  let hfin : Fintype (G ⧸ (⊤ : Subgroup G)) := Subgroup.fintypeQuotientOfFiniteIndex
   have hconj : ∀ x : G,
       ϕ ⟨x⁻¹ * (g * x), Subgroup.mem_top _⟩ = ϕ ⟨g, Subgroup.mem_top g⟩ := by
     intro x
@@ -564,9 +564,9 @@ theorem transfer_transfer {G A : Type*} [Group G] [CommGroup A] {H K : Subgroup 
   ext g
   set T : K.LeftTransversal := default with hT
   set S : (H.subgroupOf K).LeftTransversal := default with hS
-  letI := H.fintypeQuotientOfFiniteIndex
-  letI := K.fintypeQuotientOfFiniteIndex
-  letI := (H.subgroupOf K).fintypeQuotientOfFiniteIndex
+  let := H.fintypeQuotientOfFiniteIndex
+  let := K.fintypeQuotientOfFiniteIndex
+  let := (H.subgroupOf K).fintypeQuotientOfFiniteIndex
   rw [MonoidHom.transfer_def (MonoidHom.transfer ϕ') T g,
     MonoidHom.transfer_def ϕ (mulTransversal hHK T S) g, diff_eq_prod, diff_eq_prod]
   symm

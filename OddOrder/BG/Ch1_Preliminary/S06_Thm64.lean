@@ -245,7 +245,7 @@ theorem le_of_isPiSubgroup_of_quotient_isPiGroup [Finite G] {π : Set ℕ} {N : 
 theorem exists_centralizing_conj_sup_isPiGroup [Finite G] {A N : Subgroup G}
     (hAN : A ≤ Subgroup.normalizer (N : Set G))
     (hcop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥N))
-    [IsSolvable ↥N] {π : Set ℕ} {J₁ J₂ : Subgroup G}
+    [Group.IsSolvable ↥N] {π : Set ℕ} {J₁ J₂ : Subgroup G}
     (hJ₁N : J₁ ≤ N) (hJ₁pi : Subgroup.IsPiSubgroup π J₁)
     (hJ₁A : A ≤ Subgroup.normalizer (J₁ : Set G))
     (hJ₂N : J₂ ≤ N) (hJ₂pi : Subgroup.IsPiSubgroup π J₂)
@@ -253,7 +253,7 @@ theorem exists_centralizing_conj_sup_isPiGroup [Finite G] {A N : Subgroup G}
     ∃ w : G, w ∈ N ∧ w ∈ Subgroup.centralizer (A : Set G) ∧
       Subgroup.IsPiSubgroup π ((MulAut.conj w • J₁) ⊔ J₂) := by
   classical
-  letI act : MulDistribMulAction ↥A ↥N :=
+  let act : MulDistribMulAction ↥A ↥N :=
     MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (N : Set G))) ↥N
       (Subgroup.inclusion hAN)
   set φ : ↥A →* MulAut ↥N := MulDistribMulAction.toMulAut ↥A ↥N with hφ
@@ -344,13 +344,13 @@ theorem mem_centralizer_of_mem_normalizer_of_commutator_le {N H : Subgroup G}
 /-- **Fitting 長 `≤ 2` の有限群は可解**: `X/F(X)` が冪零なら `X` は可解。
 
 `F(X)` は冪零 (`Isaacs.Ch01.fitting.isNilpotent`) ゆえ可解, 仮定より `X/F(X)` も冪零ゆえ
-可解, そして可解群による可解群の拡大は可解 (`solvable_of_ker_le_range` を
+可解, そして可解群による可解群の拡大は可解 (`Group.isSolvable_of_ker_le_range` を
 `F(X) ↪ X ↠ X/F(X)` に適用; `ker (mk' F(X)) = F(X) = range F(X).subtype`)。 -/
 theorem isSolvable_of_isNilpotent_quotient_fitting {X : Type*} [Group X] [Finite X]
-    (h : Group.IsNilpotent (X ⧸ Ch01.fitting X)) : IsSolvable X := by
-  haveI := h
-  haveI : Group.IsNilpotent ↥(Ch01.fitting X) := Ch01.fitting.isNilpotent
-  refine solvable_of_ker_le_range (Ch01.fitting X).subtype
+    (h : Group.IsNilpotent (X ⧸ Ch01.fitting X)) : Group.IsSolvable X := by
+  have := h
+  have : Group.IsNilpotent ↥(Ch01.fitting X) := Ch01.fitting.isNilpotent
+  refine Group.isSolvable_of_ker_le_range (Ch01.fitting X).subtype
     (QuotientGroup.mk' (Ch01.fitting X)) ?_
   rw [QuotientGroup.ker_mk', Subgroup.range_subtype]
 
@@ -359,20 +359,20 @@ theorem isSolvable_of_isNilpotent_quotient_fitting {X : Type*} [Group X] [Finite
 
 Theorem 6.4 の仮説はまさに `N = G₀` に対するこの形 (`G₀` は `G` の正規 Hall 部分群で
 `G₀/F(G₀)` と `(G/G₀)/F(G/G₀)` が冪零) なので, 本補題が場合 1 のエンジンである
-Proposition 1.5 (`exists_centralizing_conj_sup_isPiGroup` の `[IsSolvable ↥N]` 仮説) を
+Proposition 1.5 (`exists_centralizing_conj_sup_isPiGroup` の `[Group.IsSolvable ↥N]` 仮説) を
 使えるようにする。
 
 証明: `isSolvable_of_isNilpotent_quotient_fitting` を `↥N` と `X ⧸ N` に適用して
-`IsSolvable ↥N`, `IsSolvable (X ⧸ N)` を得, 再び `solvable_of_ker_le_range` を
+`Group.IsSolvable ↥N`, `Group.IsSolvable (X ⧸ N)` を得, 再び `Group.isSolvable_of_ker_le_range` を
 `N ↪ X ↠ X/N` に適用する。Hall 性はここでは不要。 -/
 theorem isSolvable_of_isNilpotent_quotient_fitting_of_normal {X : Type*} [Group X] [Finite X]
     (N : Subgroup X) [N.Normal]
     (hN : Group.IsNilpotent (↥N ⧸ Ch01.fitting ↥N))
     (hQ : Group.IsNilpotent ((X ⧸ N) ⧸ Ch01.fitting (X ⧸ N))) :
-    IsSolvable X := by
-  haveI : IsSolvable ↥N := isSolvable_of_isNilpotent_quotient_fitting hN
-  haveI : IsSolvable (X ⧸ N) := isSolvable_of_isNilpotent_quotient_fitting hQ
-  refine solvable_of_ker_le_range N.subtype (QuotientGroup.mk' N) ?_
+    Group.IsSolvable X := by
+  have : Group.IsSolvable ↥N := isSolvable_of_isNilpotent_quotient_fitting hN
+  have : Group.IsSolvable (X ⧸ N) := isSolvable_of_isNilpotent_quotient_fitting hQ
+  refine Group.isSolvable_of_ker_le_range N.subtype (QuotientGroup.mk' N) ?_
   rw [QuotientGroup.ker_mk', Subgroup.range_subtype]
 
 /-! ## 帰納法の測度 `|G| + |H|` とその減少 -/
@@ -766,12 +766,12 @@ BG p. 50 の場合 1 が「Let `N` be a minimal normal subgroup of `G` contained
 theorem opCore_ne_bot_of_mem_primeFactors_card_fitting [Finite G] {p : ℕ} [Fact p.Prime]
     (hp : p ∈ (Nat.card ↥(Ch01.fitting G)).primeFactors) : Ch01.opCore p G ≠ ⊥ := by
   classical
-  haveI : Group.IsNilpotent ↥(Ch01.fitting G) := Ch01.fitting.isNilpotent
+  have : Group.IsNilpotent ↥(Ch01.fitting G) := Ch01.fitting.isNilpotent
   set P : Sylow p ↥(Ch01.fitting G) := default with hPdef
-  haveI hPnormal : (P : Subgroup ↥(Ch01.fitting G)).Normal := Ch01.Sylow.normal_of_isNilpotent P
-  haveI : (P : Subgroup ↥(Ch01.fitting G)).Characteristic :=
+  have hPnormal : (P : Subgroup ↥(Ch01.fitting G)).Normal := Ch01.Sylow.normal_of_isNilpotent P
+  have : (P : Subgroup ↥(Ch01.fitting G)).Characteristic :=
     Sylow.characteristic_of_normal _ hPnormal
-  haveI : (((P : Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype)).Normal :=
+  have : (((P : Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype)).Normal :=
     inferInstance
   have hle : (P : Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype ≤ Ch01.opCore p G :=
     Ch01.normal_pgroup_le_opCore (P.2.map (Ch01.fitting G).subtype)
@@ -805,14 +805,14 @@ BG p. 50 の場合 1 の「In this case, `H` is a Hall `p'`-subgroup of `HN`.
 Take `z ∈ N` such that `(H^y)^z = H`」の段。共役子が `N` の内部に取れることが
 本質的 (`Subgroup.IsComplement'.exists_conj_of_coprime` はそれを与える)。 -/
 theorem exists_conj_smul_eq_of_sup_eq [Finite G] {N H K : Subgroup G} [N.Normal]
-    (hsolv : IsSolvable ↥N) (hcop : Nat.Coprime (Nat.card ↥N) (Nat.card ↥H))
+    (hsolv : Group.IsSolvable ↥N) (hcop : Nat.Coprime (Nat.card ↥N) (Nat.card ↥H))
     (hHN : H ⊓ N = ⊥) (hKN : K ⊓ N = ⊥) (hsup : H ⊔ N = K ⊔ N) :
     ∃ z ∈ N, MulAut.conj z • K = H := by
   classical
   have hHU : H ≤ H ⊔ N := le_sup_left
   have hNU : N ≤ H ⊔ N := le_sup_right
   have hKU : K ≤ H ⊔ N := hsup ▸ le_sup_left
-  haveI : (N.subgroupOf (H ⊔ N)).Normal := (inferInstance : N.Normal).subgroupOf _
+  have : (N.subgroupOf (H ⊔ N)).Normal := (inferInstance : N.Normal).subgroupOf _
   -- `↥(H ⊔ N)` の中で `H`, `K` はともに `N` の補群
   have hcompl : ∀ A : Subgroup G, A ≤ H ⊔ N → A ⊓ N = ⊥ → A ⊔ N = H ⊔ N →
       Subgroup.IsComplement' (N.subgroupOf (H ⊔ N)) (A.subgroupOf (H ⊔ N)) := by
@@ -840,9 +840,9 @@ theorem exists_conj_smul_eq_of_sup_eq [Finite G] {N H K : Subgroup G} [N.Normal]
   have hcop' : Nat.Coprime (Nat.card ↥(N.subgroupOf (H ⊔ N)))
       (N.subgroupOf (H ⊔ N)).index := by
     rw [hcardN, hidx]; exact hcop
-  haveI : IsSolvable ↥N := hsolv
-  haveI : IsSolvable ↥(N.subgroupOf (H ⊔ N)) :=
-    solvable_of_solvable_injective
+  have : Group.IsSolvable ↥N := hsolv
+  have : Group.IsSolvable ↥(N.subgroupOf (H ⊔ N)) :=
+    Group.isSolvable_of_isSolvable_injective
       (f := (Subgroup.subgroupOfEquivOfLe hNU).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe hNU).injective
   obtain ⟨n, hnN, hnconj⟩ :=
@@ -942,8 +942,8 @@ theorem thm64_case_exists_prime_not_mem {X : Type u} [Group X] [Finite X] (π : 
     Thm64Statement π H G₀ J₁ J₂ := by
   intro hH hG₀hall hG₀nil hQnil hJ₁pi hJ₂pi hJ₁norm hJ₂norm
   classical
-  haveI hpfact : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hpF⟩
-  haveI hXsolv : IsSolvable X :=
+  have hpfact : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hpF⟩
+  have hXsolv : Group.IsSolvable X :=
     isSolvable_of_isNilpotent_quotient_fitting_of_normal G₀ hG₀nil hQnil
   -- `H` は `p ∉ π(H)` ゆえ `{p}'`-部分群
   have hHp : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ H := by
@@ -954,7 +954,7 @@ theorem thm64_case_exists_prime_not_mem {X : Type u} [Group X] [Finite X] (π : 
   -- ## 1. `L := ⟨J₁, J₂⟩` は `G = LH` ゆえ `G` で正規
   have hHnormL : H ≤ Subgroup.normalizer ((J₁ ⊔ J₂ : Subgroup X) : Set X) :=
     le_normalizer_sup hJ₁norm hJ₂norm
-  haveI hLnormal : (J₁ ⊔ J₂ : Subgroup X).Normal := by
+  have hLnormal : (J₁ ⊔ J₂ : Subgroup X).Normal := by
     rw [← Subgroup.normalizer_eq_top_iff, ← top_le_iff, ← hsup]
     exact sup_le Subgroup.le_normalizer hHnormL
   -- ## 2. `N := O_p(G)` は非自明な正規 `p`-部分群で `H ⊓ N = ⊥`
@@ -963,7 +963,7 @@ theorem thm64_case_exists_prime_not_mem {X : Type u} [Group X] [Finite X] (π : 
     ⟨Ch01.opCore p X, Ch01.opCore.normal p X,
       isPiSubgroup_of_isPGroup (Ch01.opCore_isPGroup p X),
       opCore_ne_bot_of_mem_primeFactors_card_fitting hpF⟩
-  haveI : N.Normal := hNnormal
+  have : N.Normal := hNnormal
   have hHN : H ⊓ N = ⊥ := inf_eq_bot_of_isPiSubgroup_compl hHp hNp
   -- ## 3. (6.2): `G/L` は `H` の像なので `p'`-群, ゆえに `N ≤ L`
   have hHmapL : H.map (QuotientGroup.mk' (J₁ ⊔ J₂)) = ⊤ := by
@@ -981,7 +981,7 @@ theorem thm64_case_exists_prime_not_mem {X : Type u} [Group X] [Finite X] (π : 
     intro q hq
     exact h1 q (by rwa [Subgroup.card_top])
   -- ## 4. `G ⧸ N` で帰納法の仮定 — (6.3)
-  haveI hG₀mapnormal : (G₀.map (QuotientGroup.mk' N)).Normal :=
+  have hG₀mapnormal : (G₀.map (QuotientGroup.mk' N)).Normal :=
     (OddOrder.GroupTheory.normal_coprime_card_index_map_mk' inferInstance hG₀hall N).1
   have hmeas : Nat.card (X ⧸ N) + Nat.card ↥(H.map (QuotientGroup.mk' N))
       < Nat.card X + Nat.card ↥H := card_quotient_add_card_map_mk'_lt hNne H
@@ -1062,7 +1062,7 @@ theorem thm64_case_exists_prime_not_mem {X : Type u} [Group X] [Finite X] (π : 
     intro q hq
     simp only [Set.mem_compl_iff, Set.mem_union, Set.mem_singleton_iff, not_or]
     exact ⟨hH q hq, hHp q hq⟩
-  haveI : IsSolvable ↥((MulAut.conj (z * y) • J₁) ⊔ J₂ ⊔ N : Subgroup X) := inferInstance
+  have : Group.IsSolvable ↥((MulAut.conj (z * y) • J₁) ⊔ J₂ ⊔ N : Subgroup X) := inferInstance
   obtain ⟨w, hwmem, hwc, hwpi⟩ :=
     exists_centralizing_conj_sup_isPiGroup (A := H)
       (N := ((MulAut.conj (z * y) • J₁) ⊔ J₂ ⊔ N : Subgroup X)) hLstarnorm hcop

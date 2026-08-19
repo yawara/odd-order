@@ -47,13 +47,13 @@ theorem existsUnique_isIdempotentElem_centerGroupAlgebra_of_isAlgClosed
     ∃! e : ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)),
       IsIdempotentElem e ∧ e - c ∈ centerIdeal (G := G) (maximalIdeal 𝒪) := by
   classical
-  haveI := hG
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI hfc : Finite (ConjClasses G) := Quotient.finite _
-  haveI : Fintype (ConjClasses G) := Fintype.ofFinite _
-  haveI : Module.Free 𝒪 ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)) :=
+  have := hG
+  have : Fintype G := Fintype.ofFinite G
+  have hfc : Finite (ConjClasses G) := Quotient.finite _
+  have : Fintype (ConjClasses G) := Fintype.ofFinite _
+  have : Module.Free 𝒪 ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)) :=
     Module.Free.of_basis centerBasis
-  haveI : Module.Finite 𝒪 ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)) :=
+  have : Module.Finite 𝒪 ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)) :=
     Module.Finite.of_basis centerBasis
   exact existsUnique_isIdempotentElem_sub_mem_of_isAlgClosed hc
 

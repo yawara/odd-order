@@ -42,13 +42,13 @@ theorem commutator_eq_bot_of_normal_pgroup_minimalNormal {q : ℕ} [Fact q.Prime
     {K V : Subgroup H} [K.Normal] (hK : IsPGroup q K) (hV : IsPGroup q V)
     (hVmin : OddOrder.Isaacs.Ch02.IsMinimalNormal V) :
     ⁅K, V⁆ = ⊥ := by
-  haveI hVnorm : V.Normal := hVmin.1
+  have hVnorm : V.Normal := hVmin.1
   rw [Subgroup.commutator_eq_bot_iff_le_centralizer, ← Subgroup.le_centralizer_iff]
   -- goal: `V ≤ centralizer K`
-  haveI : (Subgroup.centralizer (K : Set H)).Normal := Subgroup.normal_centralizer
+  have : (Subgroup.centralizer (K : Set H)).Normal := Subgroup.normal_centralizer
   have hCne : V ⊓ Subgroup.centralizer (K : Set H) ≠ ⊥ := by
     have hKV : IsPGroup q (K ⊔ V : Subgroup H) := hK.to_sup_of_normal_left hV
-    haveI : (V.subgroupOf (K ⊔ V)).Normal := Subgroup.normal_subgroupOf
+    have : (V.subgroupOf (K ⊔ V)).Normal := Subgroup.normal_subgroupOf
     have hV'ne : V.subgroupOf (K ⊔ V) ≠ ⊥ := by
       rw [Ne, Subgroup.subgroupOf_eq_bot]
       exact fun hdisj => hVmin.2.1 (hdisj.eq_bot_of_le le_sup_right)
@@ -65,7 +65,7 @@ theorem commutator_eq_bot_of_normal_pgroup_minimalNormal {q : ℕ} [Fact q.Prime
     have hxmem : (x : H) ∈ V ⊓ Subgroup.centralizer (K : Set H) := ⟨hxV, hxC⟩
     rw [hbot, Subgroup.mem_bot] at hxmem
     exact Subtype.ext hxmem
-  haveI hCnorm : (V ⊓ Subgroup.centralizer (K : Set H)).Normal := inferInstance
+  have hCnorm : (V ⊓ Subgroup.centralizer (K : Set H)).Normal := inferInstance
   rcases hVmin.2.2 (V ⊓ Subgroup.centralizer (K : Set H)) hCnorm inf_le_left with h | h
   · exact absurd h hCne
   · rw [← h]; exact inf_le_right
@@ -146,7 +146,7 @@ theorem chiefFactorConjAction_smul_eq_self_iff_mem {G : Type*} [Group G] {X Y : 
     [X.Normal] [Y.Normal] (g : G) :
     letI := chiefFactorConjAction X Y
     (∀ v : ↥X ⧸ Y.subgroupOf X, g • v = v) ↔ g ∈ chiefFactorCentralizer X Y := by
-  letI := chiefFactorConjAction X Y
+  let := chiefFactorConjAction X Y
   have hcoe : ∀ x : ↥X, (↑(ConjAct.toConjAct g • x) : G) = g * ↑x * g⁻¹ := fun _ => rfl
   have hL : (∀ v : ↥X ⧸ Y.subgroupOf X, g • v = v)
       ↔ ∀ x : ↥X, (g * (↑x)⁻¹ * g⁻¹ * ↑x : G) ∈ Y := by
@@ -206,15 +206,15 @@ theorem coprime_kernel_le_chiefFactorCentralizer
     (hFPF : letI := chiefFactorConjAction X Y
             ∀ v : ↥X ⧸ Y.subgroupOf X, (∀ r : R, (r : G) • v = v) → v = 1) :
     K ≤ chiefFactorCentralizer X Y := by
-  haveI : NeZero s := ⟨(Fact.out : s.Prime).ne_zero⟩
-  letI : CommGroup (↥X ⧸ Y.subgroupOf X) :=
+  have : NeZero s := ⟨(Fact.out : s.Prime).ne_zero⟩
+  let : CommGroup (↥X ⧸ Y.subgroupOf X) :=
     { (inferInstance : Group (↥X ⧸ Y.subgroupOf X)) with mul_comm := hVelem.comm }
-  letI := hVelem.zmodModule
-  letI := chiefFactorConjAction X Y
+  let := hVelem.zmodModule
+  let := chiefFactorConjAction X Y
   have hL : ∀ l : G, l ∈ L → ∀ v : ↥X ⧸ Y.subgroupOf X, l • v = v := by
     intro l hl v
     exact (chiefFactorConjAction_smul_eq_self_iff_mem l).mpr (hLcent hl) v
-  letI := mulDistribMulActionQuotientOfTrivial L hL
+  let := mulDistribMulActionQuotientOfTrivial L hL
   have hFPF' : ∀ v : ↥X ⧸ Y.subgroupOf X,
       (∀ r : R.map (QuotientGroup.mk' L), (r : G ⧸ L) • v = v) → v = 1 := by
     intro v hv
@@ -234,7 +234,7 @@ with kernel `K/N` and complement `RN/N`. The coprimality of `⟨x⟩` with `K` (
 theorem frobenius_quotient_of_normal_lt_kernel
     {G : Type*} [Group G] [Finite G] {K R N : Subgroup G} [N.Normal]
     (h : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G K R) (hNK : N ≤ K) (hKN : ¬ K ≤ N)
-    (hSolvK : IsSolvable ↥K) :
+    (hSolvK : Group.IsSolvable ↥K) :
     OddOrder.Isaacs.Ch06.IsFrobeniusGroup (G ⧸ N)
       (K.map (QuotientGroup.mk' N)) (R.map (QuotientGroup.mk' N)) := by
   refine OddOrder.BG.Ch1.S03.quotient_isFrobeniusGroup_of_le_kernel_of_coprime_zpowers
@@ -252,7 +252,7 @@ open OddOrder.GroupTheory in
 `X.map(mk' Y)`-form (`isMinimalNormal_le_fitting_and_isElementaryAbelian`) across the first
 isomorphism `↥X ⧸ Y.subgroupOf X ≃* ↥(X.map (mk' Y))`. -/
 theorem chiefFactor_isElementaryAbelian
-    {G : Type*} [Group G] [Finite G] [IsSolvable G] {X Y : Subgroup G} [Y.Normal]
+    {G : Type*} [Group G] [Finite G] [Group.IsSolvable G] {X Y : Subgroup G} [Y.Normal]
     (hChief : IsChiefFactor X Y) :
     ∃ s : ℕ, s.Prime ∧ IsElementaryAbelian s (↥X ⧸ Y.subgroupOf X) := by
   have hMin := hChief.isMinimalNormal_map_quotient
@@ -283,7 +283,7 @@ theorem frobenius_kernel_conj_fixed_eq_one
     {G : Type*} [Group G] {K R : Subgroup G} (h : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G K R)
     {c : G} (hcK : c ∈ K) (hfix : ∀ r ∈ R, r * c * r⁻¹ = c) : c = 1 := by
   by_contra hc1
-  haveI : Nontrivial ↥R := (Subgroup.nontrivial_iff_ne_bot R).mpr h.ne_bot_complement
+  have : Nontrivial ↥R := (Subgroup.nontrivial_iff_ne_bot R).mpr h.ne_bot_complement
   obtain ⟨r, hr⟩ := exists_ne (1 : ↥R)
   have hrR : (r : G) ∈ R := r.2
   have hr1 : (r : G) ≠ 1 := by simpa using hr
@@ -312,12 +312,12 @@ for a chief factor `X/Y` with `X ⊆ K`, the complement `R` acts fixed-point-fre
 `coprime_fixedPoints_quotient_of_coprime_normal`) to an `R`-fixed element of `X ≤ K`, which is `1`
 by `frobenius_kernel_conj_fixed_eq_one`. -/
 theorem chiefFactor_fixedPointFree
-    {G : Type*} [Group G] [Finite G] [IsSolvable G] {K R X Y : Subgroup G}
+    {G : Type*} [Group G] [Finite G] [Group.IsSolvable G] {K R X Y : Subgroup G}
     [X.Normal] [Y.Normal]
     (h : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G K R) (hXK : X ≤ K) :
     letI := chiefFactorConjAction X Y
     ∀ v : ↥X ⧸ Y.subgroupOf X, (∀ r : R, (r : G) • v = v) → v = 1 := by
-  letI := chiefFactorConjAction X Y
+  let := chiefFactorConjAction X Y
   set ψ : ↥R →* MulAut G := MulAut.conj.comp R.subtype with hψ
   have hXinv : OddOrder.Isaacs.Ch03.IsAInvariant ψ X :=
     fun a => Subgroup.Normal.conj_smul_eq_self (a : G) X
@@ -328,7 +328,7 @@ theorem chiefFactor_fixedPointFree
   have hCop : Nat.Coprime (Nat.card ↥R) (Nat.card ↥(Y.subgroupOf X)) :=
     (frobenius_coprime_complement_subgroup h hXK).coprime_dvd_right
       (Subgroup.card_subgroup_dvd_card (Y.subgroupOf X))
-  have hSolv : IsSolvable ↥R ∨ IsSolvable ↥(Y.subgroupOf X) := Or.inr inferInstance
+  have hSolv : Group.IsSolvable ↥R ∨ Group.IsSolvable ↥(Y.subgroupOf X) := Or.inr inferInstance
   have hrestrict : ∀ (a : ↥R) (x : ↥X),
       (hXinv.restrict a) x = ConjAct.toConjAct (a : G) • x := fun _ _ => rfl
   intro v hv
@@ -460,7 +460,7 @@ theorem chiefFactor_invariant_eq_bot_or_top {G : Type*} [Group G] {X Y : Subgrou
     letI := chiefFactorConjAction X Y
     ∀ N : Subgroup (↥X ⧸ Y.subgroupOf X),
       (∀ g : G, ∀ n : ↥X ⧸ Y.subgroupOf X, n ∈ N → g • n ∈ N) → N = ⊥ ∨ N = ⊤ := by
-  letI := chiefFactorConjAction X Y
+  let := chiefFactorConjAction X Y
   intro N hNinv
   have hYleX : Y ≤ X := hChief.lt.le
   set q : ↥X →* (↥X ⧸ Y.subgroupOf X) := QuotientGroup.mk' (Y.subgroupOf X) with hq
@@ -520,14 +520,14 @@ theorem samePrime_kernel_le_chiefFactorCentralizer
     {L : Subgroup G} [L.Normal] (hLcent : L ≤ chiefFactorCentralizer X Y)
     (hKbar : IsPGroup s (K.map (QuotientGroup.mk' L))) :
     K ≤ chiefFactorCentralizer X Y := by
-  letI := chiefFactorConjAction X Y
+  let := chiefFactorConjAction X Y
   have hVs : IsPGroup s (↥X ⧸ Y.subgroupOf X) :=
     fun v => ⟨1, by rw [pow_one]; exact hVelem.pow_eq_one v⟩
   have hL : ∀ l : G, l ∈ L → ∀ v : ↥X ⧸ Y.subgroupOf X, l • v = v := by
     intro l hl v
     exact (chiefFactorConjAction_smul_eq_self_iff_mem l).mpr (hLcent hl) v
-  letI := mulDistribMulActionQuotientOfTrivial L hL
-  haveI : (K.map (QuotientGroup.mk' L)).Normal :=
+  let := mulDistribMulActionQuotientOfTrivial L hL
+  have : (K.map (QuotientGroup.mk' L)).Normal :=
     (inferInstance : K.Normal).map (QuotientGroup.mk' L) (QuotientGroup.mk'_surjective L)
   have hirr : ∀ N : Subgroup (↥X ⧸ Y.subgroupOf X),
       (∀ gq : G ⧸ L, ∀ n : ↥X ⧸ Y.subgroupOf X, n ∈ N → gq • n ∈ N) → N = ⊥ ∨ N = ⊤ := by
@@ -548,7 +548,7 @@ the kernel `K` centralizes `X/Y`. Case `s = q` is the same-prime branch
 (`samePrime_kernel_le_chiefFactorCentralizer`); case `s ≠ q` gives `s ∤ |K/L|` (a `q`-power), the
 coprime branch (`coprime_kernel_le_chiefFactorCentralizer` + the Frobenius FPF). -/
 theorem kernel_le_chiefFactorCentralizer_dichotomy
-    {G : Type*} [Group G] [Finite G] [IsSolvable G] {K R X Y : Subgroup G}
+    {G : Type*} [Group G] [Finite G] [Group.IsSolvable G] {K R X Y : Subgroup G}
     [K.Normal] [X.Normal] [Y.Normal] {s q : ℕ} [Fact s.Prime] [Fact q.Prime]
     (h : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G K R)
     (hChief : IsChiefFactor X Y) (hXK : X ≤ K)
@@ -594,7 +594,7 @@ theorem isPGroup_map_mk'_of_isElementaryAbelian {G : Type*} [Group G] {K L : Sub
 open OddOrder.GroupTheory in
 /-- Group-order strong-induction core of BG Theorem 3.7. -/
 private theorem frobeniusKernelIsNilpotent_aux : ∀ (n : ℕ) {G : Type*} [Group G] [Finite G]
-    [IsSolvable G] (K R : Subgroup G), OddOrder.Isaacs.Ch06.IsFrobeniusGroup G K R →
+    [Group.IsSolvable G] (K R : Subgroup G), OddOrder.Isaacs.Ch06.IsFrobeniusGroup G K R →
     (∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p) → Nat.card ↥K = n → Group.IsNilpotent ↥K := by
   intro n
   induction n using Nat.strong_induction_on with
@@ -602,8 +602,8 @@ private theorem frobeniusKernelIsNilpotent_aux : ∀ (n : ℕ) {G : Type*} [Grou
     intro G _ _ _ K R h hR hn
     by_cases hK : K = ⊥
     · subst hK; infer_instance
-    · haveI hKnorm : K.Normal := h.isNormal
-      haveI hLnorm : (maxProperNormalOrBot K).Normal := maxProperNormalOrBot_normal K
+    · have hKnorm : K.Normal := h.isNormal
+      have hLnorm : (maxProperNormalOrBot K).Normal := maxProperNormalOrBot_normal K
       set L := maxProperNormalOrBot K with hLdef
       have hLK : L ≤ K := maxProperNormalOrBot_le K
       have hLltK : L < K := maxProperNormalOrBot_lt_of_ne_bot hK
@@ -623,13 +623,13 @@ private theorem frobeniusKernelIsNilpotent_aux : ∀ (n : ℕ) {G : Type*} [Grou
             obtain ⟨p, hp, hpc⟩ := hR
             exact ⟨p, hp, by
               rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv]; exact hpc⟩
-          haveI : Group.IsNilpotent ↥(L.subgroupOf (L ⊔ R)) :=
+          have : Group.IsNilpotent ↥(L.subgroupOf (L ⊔ R)) :=
             IH _ hcardlt (L.subgroupOf (L ⊔ R)) (R.subgroupOf (L ⊔ R)) hLR hRprime' rfl
           exact Group.nilpotent_of_surjective
             (Subgroup.subgroupOfEquivOfLe (le_sup_left : L ≤ L ⊔ R)).toMonoidHom
             (Subgroup.subgroupOfEquivOfLe (le_sup_left : L ≤ L ⊔ R)).surjective
       have hLfit : L ≤ OddOrder.Isaacs.Ch01.fitting G := by
-        haveI : Group.IsNilpotent ↥L := hLnil
+        have : Group.IsNilpotent ↥L := hLnil
         exact OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
       have hChiefKL : IsChiefFactor K L := by
         have h0 := isChiefFactor_chiefSeriesInside (K := K) (n := 0)
@@ -637,7 +637,7 @@ private theorem frobeniusKernelIsNilpotent_aux : ∀ (n : ℕ) {G : Type*} [Grou
         rw [chiefSeriesInside_zero, chiefSeriesInside_succ, chiefSeriesInside_zero, ← hLdef] at h0
         exact h0
       obtain ⟨q, hq, hKLelem⟩ := chiefFactor_isElementaryAbelian hChiefKL
-      haveI : Fact q.Prime := ⟨hq⟩
+      have : Fact q.Prime := ⟨hq⟩
       have hKbar : IsPGroup q (K.map (QuotientGroup.mk' L)) :=
         isPGroup_map_mk'_of_isElementaryAbelian hKLelem
       refine isNilpotent_of_chief_factor_centralization (fun i => ?_)
@@ -646,9 +646,9 @@ private theorem frobeniusKernelIsNilpotent_aux : ∀ (n : ℕ) {G : Type*} [Grou
       · have hChiefVi := isChiefFactor_chiefSeriesInside hVibot
         have hViK : chiefSeriesInside K i ≤ K := chiefSeriesInside_le K i
         obtain ⟨s, hs, hVelem⟩ := chiefFactor_isElementaryAbelian hChiefVi
-        haveI : Fact s.Prime := ⟨hs⟩
-        haveI := hChiefVi.normal_top
-        haveI := hChiefVi.normal_bot
+        have : Fact s.Prime := ⟨hs⟩
+        have := hChiefVi.normal_top
+        have := hChiefVi.normal_bot
         have hLcent :
             L ≤ chiefFactorCentralizer (chiefSeriesInside K i) (chiefSeriesInside K (i + 1)) :=
           hLfit.trans (OddOrder.BG.Ch1.S01.fitting_le_chiefFactorCentralizer hChiefVi)
@@ -662,7 +662,7 @@ open OddOrder.GroupTheory in
 /-- **BG Theorem 3.7** (Thompson/Higman, solvable odd case): if `G = KR` is a solvable group with
 `K ⊴ G` and complement `R` of prime order, and `C_K(R) = 1` (so `G` is a Frobenius group with kernel
 `K`), then `K` is nilpotent. -/
-theorem frobeniusKernelIsNilpotent {G : Type*} [Group G] [Finite G] [IsSolvable G]
+theorem frobeniusKernelIsNilpotent {G : Type*} [Group G] [Finite G] [Group.IsSolvable G]
     {K R : Subgroup G} (h : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G K R)
     (hR : ∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p) : Group.IsNilpotent ↥K :=
   frobeniusKernelIsNilpotent_aux (Nat.card ↥K) K R h hR rfl
@@ -675,7 +675,7 @@ with kernel `N.subgroupOf (N ⊔ R)` and complement `R.subgroupOf (N ⊔ R)`, th
 `frobeniusKernelIsNilpotent`. (In BG Thm 11.3, `N = M_σ` and `R = A₀^g` for
 `g ∈ N_G(P) − N_M(P)`; the fixed-point-freeness comes from Corollary 11.2(b).) -/
 theorem isNilpotent_of_normalizing_primeOrder_fixedPointFree {G : Type*} [Group G] [Finite G]
-    {N R : Subgroup G} [IsSolvable ↥(N ⊔ R)]
+    {N R : Subgroup G} [Group.IsSolvable ↥(N ⊔ R)]
     (hRnorm : R ≤ Subgroup.normalizer N) (hdisj : Disjoint N R)
     (hNne : N ≠ ⊥) (hRne : R ≠ ⊥) (hRprime : ∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p)
     (hFPF : ∀ r ∈ R, r ≠ 1 → ∀ n ∈ N, n ≠ 1 → r * n * r⁻¹ ≠ n) :
@@ -700,7 +700,7 @@ theorem isNilpotent_of_normalizing_primeOrder_fixedPointFree {G : Type*} [Group 
         have hmem : (x : G) ∈ N ⊓ R := ⟨hx.1, hx.2⟩
         rw [hdisj.eq_bot, Subgroup.mem_bot] at hmem
         rw [Subgroup.mem_bot]; exact Subtype.ext (by simpa using hmem)
-      · haveI := hKnormal
+      · have := hKnormal
         have hKRtop : (N.subgroupOf (N ⊔ R)) ⊔ (R.subgroupOf (N ⊔ R)) = ⊤ := by
           rw [← Subgroup.subgroupOf_sup hNleH hRleH, Subgroup.subgroupOf_self]
         have hmul := Subgroup.normal_mul (N.subgroupOf (N ⊔ R)) (R.subgroupOf (N ⊔ R))
@@ -724,7 +724,7 @@ theorem isNilpotent_of_normalizing_primeOrder_fixedPointFree {G : Type*} [Group 
     obtain ⟨p, hp, hpc⟩ := hRprime
     exact ⟨p, hp, by
       rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRleH).toEquiv]; exact hpc⟩
-  haveI : Group.IsNilpotent ↥(N.subgroupOf (N ⊔ R)) := frobeniusKernelIsNilpotent hfrob hRprime'
+  have : Group.IsNilpotent ↥(N.subgroupOf (N ⊔ R)) := frobeniusKernelIsNilpotent hfrob hRprime'
   exact Group.nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hNleH).toMonoidHom
     (Subgroup.subgroupOfEquivOfLe hNleH).surjective
 

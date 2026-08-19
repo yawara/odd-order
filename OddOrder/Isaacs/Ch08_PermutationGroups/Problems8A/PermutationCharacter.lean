@@ -296,7 +296,7 @@ theorem card_orbits_cube_eq_five_iff [IsPretransitive G Ω]
   · -- 5 軌道 ⟹ 3-transitive: 5 つの代表元が全体を尽くすので, 全相異の三つ組は
     -- 退化パターンのどの代表元とも別軌道 ⟹ 第 5 の軌道にしか行けない。
     intro hcard a b c x y z hab hac hbc hxy hxz hyz
-    haveI : Finite (MulAction.orbitRel.Quotient G (Ω × Ω × Ω)) :=
+    have : Finite (MulAction.orbitRel.Quotient G (Ω × Ω × Ω)) :=
       Nat.finite_of_card_ne_zero (by omega)
     have huniv : ({Quotient.mk'' (α, α, α), Quotient.mk'' (α, α, β), Quotient.mk'' (α, β, α),
         Quotient.mk'' (β, α, α), Quotient.mk'' (α, β, γ)} :

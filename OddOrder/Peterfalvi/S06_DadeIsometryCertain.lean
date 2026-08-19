@@ -40,7 +40,7 @@ open OddOrder.RepresentationTheory
 `Subgroup.commute_of_mem_of_isCyclic`.) -/
 theorem commute_of_mem_of_isCyclic {L : Type*} [Group L] {H : Subgroup L}
     (hH : IsCyclic H) {x y : L} (hx : x ∈ H) (hy : y ∈ H) : Commute x y := by
-  haveI := hH
+  have := hH
   have hcomm : (⟨x, hx⟩ : H) * ⟨y, hy⟩ = ⟨y, hy⟩ * ⟨x, hx⟩ :=
     (MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center (MonoidHom.id H)
       (fun z hz => by
@@ -143,7 +143,7 @@ open scoped IsMulCommutative in
 is abelian, so it is the internal product of `W₁` and `W₂`). -/
 theorem exists_mul_of_mem_sup {w : L} (hw : w ∈ h.W1 ⊔ h.W2) :
     ∃ x ∈ h.W1, ∃ y ∈ h.W2, x * y = w := by
-  haveI := h.isMulCommutative_sup
+  have := h.isMulCommutative_sup
   have hmem : (⟨w, hw⟩ : ↥(h.W1 ⊔ h.W2)) ∈
       h.W1.subgroupOf (h.W1 ⊔ h.W2) ⊔ h.W2.subgroupOf (h.W1 ⊔ h.W2) := by
     rw [h.W1_subgroupOf_sup_W2_subgroupOf_eq_top]
@@ -344,8 +344,8 @@ theorem card_sup_eq_mul :
 internal direct product of the cyclic groups `W₁`, `W₂` of coprime orders, so the
 product of two generators has order `|W₁|·|W₂| = |W|` (`card_sup_eq_mul`). -/
 theorem isCyclic_sup [Finite L] : IsCyclic ↥(h.W1 ⊔ h.W2) := by
-  haveI hc1 := h.W1_cyclic
-  haveI hc2 := h.W2_cyclic
+  have hc1 := h.W1_cyclic
+  have hc2 := h.W2_cyclic
   obtain ⟨a, ha⟩ := IsCyclic.exists_generator (α := ↥h.W1)
   obtain ⟨b, hb⟩ := IsCyclic.exists_generator (α := ↥h.W2)
   have hoa : orderOf (Subgroup.inclusion (le_sup_left : h.W1 ≤ h.W1 ⊔ h.W2) a) =
@@ -395,7 +395,7 @@ noncomputable def toTICyclicHypothesisOfV [Fintype L] (V : Set L)
   V_subset_W := hVW
   W_normalizes_V := by
     intro w v hv
-    haveI := h.isMulCommutative_sup
+    have := h.isMulCommutative_sup
     have h1 : (⟨v, hVW hv⟩ : ↥(h.W1 ⊔ h.W2)) * w = w * ⟨v, hVW hv⟩ := mul_comm _ _
     have h2 : (w : L) * v = v * (w : L) := (Subtype.ext_iff.mp h1).symm
     have h3 : (w : L) * v * (w : L)⁻¹ = v := by

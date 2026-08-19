@@ -214,7 +214,7 @@ noncomputable def chi2enum :
 /-- The normalized column enumeration sends column `0` to the trivial character (Peterfalvi's
 column-`0` convention; the `j = 0` base of `nu_definition`). -/
 @[simp] theorem chi2enum_zero : chi2enum hG mp tp ⟨0, tp.p_prime.pos⟩ = 1 := by
-  haveI := (mp.certainTypeS hG).sdiffTICyclicHypothesis.isCyclic_charGroup_subgroupOf
+  have := (mp.certainTypeS hG).sdiffTICyclicHypothesis.isCyclic_charGroup_subgroupOf
     (mp.certainTypeS hG).sdiffTICyclicHypothesis.W2_le_W
   rw [chi2enum, OddOrder.Peterfalvi.S06.cyclicPowEnum_apply]
   simp
@@ -224,7 +224,7 @@ column-`0` convention; the `j = 0` base of `nu_definition`). -/
 theorem chi2enum_finNeg (j : Fin tp.p) :
     chi2enum hG mp tp (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j)
       = (chi2enum hG mp tp j)⁻¹ := by
-  haveI := (mp.certainTypeS hG).sdiffTICyclicHypothesis.isCyclic_charGroup_subgroupOf
+  have := (mp.certainTypeS hG).sdiffTICyclicHypothesis.isCyclic_charGroup_subgroupOf
     (mp.certainTypeS hG).sdiffTICyclicHypothesis.W2_le_W
   rw [chi2enum]
   refine OddOrder.Peterfalvi.S06.cyclicPowEnum_eq_inv_of_add_mod_eq_zero _ ?_
@@ -300,6 +300,7 @@ theorem muS_definition (i : Fin tp.q) (j : Fin tp.p) :
   simp only [deltaS, muS, eqQ_zero hG mp tp, Int.cast_smul_eq_zsmul]
   exact (mp.certainTypeS hG).induce_chiColumn_diff_mu_diff (chi2enum hG mp tp j) (eqQ hG mp tp i)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (9.8)/(9.11) reverse dichotomy at the `S`-instance certain-type grid** — the
 producer supply for the `mu_reducible_dichotomy` field (issue 9092).  A *reducible* member of the
 kernel-filter family `S(X)` over `S' = (derivedInG mp.S).subgroupOf mp.S` (any kernel demand `X`)
@@ -314,12 +315,12 @@ theorem muS_reducible_dichotomy {X : Subgroup ↥mp.S} {ψ : ClassFunction ↥mp
     (hred : ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ) :
     ∃ j : Fin tp.p, j ≠ ⟨0, tp.p_prime.pos⟩ ∧ ψ = ∑ i : Fin tp.q, muS hG mp tp i j := by
   classical
-  haveI hcyc : IsCyclic ↥((mp.certainTypeS hG).W1 ⊔ (mp.certainTypeS hG).W2) :=
+  have hcyc : IsCyclic ↥((mp.certainTypeS hG).W1 ⊔ (mp.certainTypeS hG).W2) :=
     (mp.certainTypeS hG).isCyclic_sup
-  letI : CommGroup ↥((mp.certainTypeS hG).W1 ⊔ (mp.certainTypeS hG).W2) := IsCyclic.commGroup
-  letI : Fintype ↥mp.S := Fintype.ofFinite _
-  letI : Fintype ↥(mp.certainTypeS hG).K := Fintype.ofFinite _
-  letI : Fintype ↥((mp.certainTypeS hG).W1 ⊔ (mp.certainTypeS hG).W2) := Fintype.ofFinite _
+  let : CommGroup ↥((mp.certainTypeS hG).W1 ⊔ (mp.certainTypeS hG).W2) := IsCyclic.commGroup
+  let : Fintype ↥mp.S := Fintype.ofFinite _
+  let : Fintype ↥(mp.certainTypeS hG).K := Fintype.ofFinite _
+  let : Fintype ↥((mp.certainTypeS hG).W1 ⊔ (mp.certainTypeS hG).W2) := Fintype.ofFinite _
   obtain ⟨θ, hθne, hθker, rfl⟩ := hψ
   -- the μ-column sum is `Ind_{S'} χ_j` (reversing the `mu_colSum_eq_induce` identity)
   have hFk : ∀ j : Fin tp.p, (∑ i : Fin tp.q, muS hG mp tp i j)
@@ -358,8 +359,8 @@ theorem monoidHom_eq_of_eqOn_W1_W2 {χ χ' : ↥tp.W →* ℂˣ}
     (h1 : ∀ w : ↥tp.W, (w : G) ∈ tp.W1 → χ w = χ' w)
     (h2 : ∀ w : ↥tp.W, (w : G) ∈ tp.W2 → χ w = χ' w) :
     χ = χ' := by
-  haveI := tp.W_cyclic
-  letI : CommGroup ↥tp.W := IsCyclic.commGroup
+  have := tp.W_cyclic
+  let : CommGroup ↥tp.W := IsCyclic.commGroup
   have hW1le : tp.W1 ≤ tp.W := by rw [tp.W_eq_join]; exact le_sup_left
   have hW2le : tp.W2 ≤ tp.W := by rw [tp.W_eq_join]; exact le_sup_right
   have htop : (tp.W1.subgroupOf tp.W) ⊔ (tp.W2.subgroupOf tp.W) = ⊤ := by

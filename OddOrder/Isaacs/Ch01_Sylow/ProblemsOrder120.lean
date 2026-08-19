@@ -51,7 +51,7 @@ open Pointwise in
 theorem card_sup_of_normal_of_coprime {G : Type*} [Group G] [Finite G]
     {N S : Subgroup G} (hN : N.Normal) (h : Nat.Coprime (Nat.card N) (Nat.card S)) :
     Nat.card ↥(N ⊔ S) = Nat.card N * Nat.card S := by
-  haveI := hN
+  have := hN
   have hinf : Nat.card ↥(N ⊓ S) = 1 := by
     have hd : Nat.card ↥(N ⊓ S) ∣ Nat.gcd (Nat.card N) (Nat.card S) :=
       Nat.dvd_gcd (Subgroup.card_dvd_of_le inf_le_left) (Subgroup.card_dvd_of_le inf_le_right)
@@ -72,8 +72,8 @@ open scoped Classical in
 theorem exists_finset_orderOf_eq_card_sylow_mul {G : Type*} [Group G] [Finite G] {q : ℕ}
     [Fact q.Prime] (hq : ∀ P : Sylow q G, Nat.card (P : Subgroup G) = q) :
     ∃ U : Finset G, U.card = Nat.card (Sylow q G) * (q - 1) ∧ ∀ x, x ∈ U ↔ orderOf x = q := by
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Fintype (Sylow q G) := Fintype.ofFinite _
+  have : Fintype G := Fintype.ofFinite G
+  have : Fintype (Sylow q G) := Fintype.ofFinite _
   have hqprime : q.Prime := Fact.out
   refine ⟨(Finset.univ : Finset (Sylow q G)).biUnion
       (fun P => (P : Subgroup G).carrier.toFinset \ {1}), ?_, ?_⟩
@@ -127,7 +127,7 @@ theorem exists_finset_orderOf_eq_card_sylow_mul {G : Type*} [Group G] [Finite G]
 theorem natCard_orderOf_eq_of_sylow_card_eq {G : Type*} [Group G] [Finite G] {q : ℕ}
     [Fact q.Prime] (hq : ∀ P : Sylow q G, Nat.card (P : Subgroup G) = q) :
     Nat.card {x : G // orderOf x = q} = Nat.card (Sylow q G) * (q - 1) := by
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   classical
   obtain ⟨U, hUcard, hUmem⟩ := exists_finset_orderOf_eq_card_sylow_mul hq
   rw [Nat.card_eq_fintype_card, Fintype.card_subtype, ← hUcard]
@@ -142,7 +142,7 @@ theorem card_sylow_mul_add_card_sylow_mul_le {G : Type*} [Group G] [Finite G] {q
     (h₁ : ∀ P : Sylow q₁ G, Nat.card (P : Subgroup G) = q₁)
     (h₂ : ∀ P : Sylow q₂ G, Nat.card (P : Subgroup G) = q₂) :
     Nat.card (Sylow q₁ G) * (q₁ - 1) + Nat.card (Sylow q₂ G) * (q₂ - 1) ≤ Nat.card G - 1 := by
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   classical
   obtain ⟨U₁, hU₁card, hU₁ord⟩ := exists_finset_orderOf_eq_card_sylow_mul h₁
   obtain ⟨U₂, hU₂card, hU₂ord⟩ := exists_finset_orderOf_eq_card_sylow_mul h₂
@@ -209,9 +209,9 @@ private lemma eq_two_of_dvd_fourteen_of_dvd_eight {n : ℕ} (h14 : n ∣ 14) (h8
 (位数 2) との join が位数 10 (指数 3) または位数 6 (指数 5) を与える。 -/
 theorem exists_subgroup_index_eq_three_or_five_of_card_thirty {H : Type*} [Group H] [Finite H]
     (h30 : Nat.card H = 30) : ∃ K : Subgroup H, K.index = 3 ∨ K.index = 5 := by
-  haveI f2 : Fact (Nat.Prime 2) := ⟨by norm_num⟩
-  haveI f3 : Fact (Nat.Prime 3) := ⟨by norm_num⟩
-  haveI f5 : Fact (Nat.Prime 5) := ⟨by norm_num⟩
+  have f2 : Fact (Nat.Prime 2) := ⟨by norm_num⟩
+  have f3 : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have f5 : Fact (Nat.Prime 5) := ⟨by norm_num⟩
   obtain ⟨S₂⟩ := (Sylow.nonempty : Nonempty (Sylow 2 H))
   obtain ⟨P₃⟩ := (Sylow.nonempty : Nonempty (Sylow 3 H))
   obtain ⟨P₅⟩ := (Sylow.nonempty : Nonempty (Sylow 5 H))
@@ -253,7 +253,7 @@ theorem exists_subgroup_index_eq_three_or_five_of_card_thirty {H : Type*} [Group
   have hS₂card : Nat.card (S₂ : Subgroup H) = 2 := hc2 S₂
   rcases hkey with h5 | h3
   · -- Sylow 5 正規 → `P₅ ⊔ S₂` は位数 10、指数 3
-    haveI : Subsingleton (Sylow 5 H) := (Nat.card_eq_one_iff_unique.mp h5).1
+    have : Subsingleton (Sylow 5 H) := (Nat.card_eq_one_iff_unique.mp h5).1
     have hnorm : (P₅ : Subgroup H).Normal := Sylow.normal_of_subsingleton P₅
     have hcop : Nat.Coprime (Nat.card (P₅ : Subgroup H)) (Nat.card (S₂ : Subgroup H)) := by
       rw [hc5 P₅, hS₂card]
@@ -265,7 +265,7 @@ theorem exists_subgroup_index_eq_three_or_five_of_card_thirty {H : Type*} [Group
     rw [hK, h30] at hmi
     omega
   · -- Sylow 3 正規 → `P₃ ⊔ S₂` は位数 6、指数 5
-    haveI : Subsingleton (Sylow 3 H) := (Nat.card_eq_one_iff_unique.mp h3).1
+    have : Subsingleton (Sylow 3 H) := (Nat.card_eq_one_iff_unique.mp h3).1
     have hnorm : (P₃ : Subgroup H).Normal := Sylow.normal_of_subsingleton P₃
     have hcop : Nat.Coprime (Nat.card (P₃ : Subgroup H)) (Nat.card (S₂ : Subgroup H)) := by
       rw [hc3 P₃, hS₂card]
@@ -287,8 +287,8 @@ Hint 通り `n₂(G) ∈ {1, 3, 5, 15}` で場合分けする。核心の `n₂ 
 (`exists_subgroup_index_eq_three_or_five_of_card_thirty`) を `comap` で引き戻す。 -/
 theorem exists_subgroup_index_eq_three_or_five_of_card_onetwenty {G : Type*} [Group G]
     [Finite G] (h120 : Nat.card G = 120) : ∃ K : Subgroup G, K.index = 3 ∨ K.index = 5 := by
-  haveI f2 : Fact (Nat.Prime 2) := ⟨by norm_num⟩
-  haveI f5 : Fact (Nat.Prime 5) := ⟨by norm_num⟩
+  have f2 : Fact (Nat.Prime 2) := ⟨by norm_num⟩
+  have f5 : Fact (Nat.Prime 5) := ⟨by norm_num⟩
   obtain ⟨P⟩ := (Sylow.nonempty : Nonempty (Sylow 2 G))
   -- Sylow 2 は位数 8
   have hc2 : ∀ Q : Sylow 2 G, Nat.card (Q : Subgroup G) = 8 := by
@@ -306,7 +306,7 @@ theorem exists_subgroup_index_eq_three_or_five_of_card_onetwenty {G : Type*} [Gr
   have hn2_dvd : Nat.card (Sylow 2 G) ∣ 15 := hPidx ▸ P.card_dvd_index
   rcases eq_of_dvd_fifteen Nat.card_pos hn2_dvd with hn2 | hn2 | hn2 | hn2
   · -- n₂ = 1: `P ⊴ G`、`P ⊔ F` (F ∈ Syl₅) は位数 40 = 指数 3
-    haveI : Subsingleton (Sylow 2 G) := (Nat.card_eq_one_iff_unique.mp hn2).1
+    have : Subsingleton (Sylow 2 G) := (Nat.card_eq_one_iff_unique.mp hn2).1
     have hnorm : (P : Subgroup G).Normal := Sylow.normal_of_subsingleton P
     obtain ⟨F⟩ := (Sylow.nonempty : Nonempty (Sylow 5 G))
     have hF5 : Nat.card (F : Subgroup G) = 5 :=
@@ -329,9 +329,9 @@ theorem exists_subgroup_index_eq_three_or_five_of_card_onetwenty {G : Type*} [Gr
     rw [← Sylow.card_eq_index_normalizer P]; exact hn2
   · -- n₂ = 15: 交わり最大対 → `|S ∩ T| = 4` → `N_G(S ∩ T)` の解析
     classical
-    haveI : Fintype (Sylow 2 G) := Fintype.ofFinite _
+    have : Fintype (Sylow 2 G) := Fintype.ofFinite _
     have hgt : 1 < Nat.card (Sylow 2 G) := by rw [hn2]; norm_num
-    haveI : Nontrivial (Sylow 2 G) := by
+    have : Nontrivial (Sylow 2 G) := by
       apply Fintype.one_lt_card_iff_nontrivial.mp
       rwa [← Nat.card_eq_fintype_card]
     obtain ⟨S₀, T₀, hST₀⟩ := exists_pair_ne (Sylow 2 G)
@@ -435,7 +435,7 @@ theorem exists_subgroup_index_eq_three_or_five_of_card_onetwenty {G : Type*} [Gr
     · -- |N| = 120: `D ⊴ G`、`G/D` は位数 30 → 位数 30 補題を comap で引き戻す
       have hNtop : N = ⊤ := Subgroup.eq_top_of_card_eq _ (by rw [hm, hmv, h120])
       have hDnorm : D.Normal := Subgroup.normalizer_eq_top_iff.mp (hNdef ▸ hNtop)
-      haveI := hDnorm
+      have := hDnorm
       have hDidx : D.index = 30 := by
         have hidxS : (S : Subgroup G).index = 15 := by
           have hmi := Subgroup.card_mul_index (S : Subgroup G)

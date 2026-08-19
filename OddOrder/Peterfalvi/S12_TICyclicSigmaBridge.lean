@@ -286,8 +286,8 @@ theorem ticyclic_V_nonempty (hyp : OddOrder.Peterfalvi.S05.TICyclicHypothesis G)
   have hne2 : hyp.W2.subgroupOf hyp.W ≠ ⊥ := by
     rw [ne_eq, Subgroup.subgroupOf_eq_bot]
     exact fun hd => hyp.W2_nontrivial (hd.eq_bot_of_le hyp.W2_le_W)
-  haveI := (Subgroup.nontrivial_iff_ne_bot _).mpr hne1
-  haveI := (Subgroup.nontrivial_iff_ne_bot _).mpr hne2
+  have := (Subgroup.nontrivial_iff_ne_bot _).mpr hne1
+  have := (Subgroup.nontrivial_iff_ne_bot _).mpr hne2
   obtain ⟨a, ha⟩ := exists_ne (1 : ↥(hyp.W1.subgroupOf hyp.W))
   obtain ⟨b, hb⟩ := exists_ne (1 : ↥(hyp.W2.subgroupOf hyp.W))
   refine ⟨(((hyp.supportInVdiffEquiv.symm (⟨a, ha⟩, ⟨b, hb⟩)).1 : ↥hyp.W) : G), ?_⟩
@@ -482,7 +482,7 @@ theorem ticyclic_wFstSnd_inclusion_of_swap
       ∧ hyp₁.wSnd (Subgroup.inclusion hW.ge w)
         = subgroupOfTransport hW.ge hW21.ge (hyp₂.wFst w) := by
   have hcomm : hyp₂.wProj2 w * hyp₂.wProj1 w = w := by
-    haveI := hyp₂.isMulCommutative_W
+    have := hyp₂.isMulCommutative_W
     rw [mul_comm]
     exact hyp₂.wProj1_mul_wProj2 w
   have hsymm : hyp₁.wProdEquiv.symm (Subgroup.inclusion hW.ge w)

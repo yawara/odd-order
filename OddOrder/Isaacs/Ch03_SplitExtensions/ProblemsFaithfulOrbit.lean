@@ -111,10 +111,10 @@ def fixSubgroup (g : G) : Subgroup P where
   carrier := {u | (φ u) g = g}
   one_mem' := by simp
   mul_mem' := fun {a b} ha hb => by
-    simp only [Set.mem_setOf_eq] at *
+    simp only [Set.mem_ofPred_eq] at *
     rw [map_mul, MulAut.mul_apply, hb, ha]
   inv_mem' := fun {a} ha => by
-    simp only [Set.mem_setOf_eq] at *
+    simp only [Set.mem_ofPred_eq] at *
     rw [map_inv]
     conv_lhs => rw [← ha]
     simp
@@ -127,10 +127,10 @@ def orbitKernel (g : G) : Subgroup P where
   carrier := {u | ∀ v : P, (φ u) ((φ v) g) = (φ v) g}
   one_mem' := by intro v; simp
   mul_mem' := fun {a b} ha hb v => by
-    simp only [Set.mem_setOf_eq] at *
+    simp only [Set.mem_ofPred_eq] at *
     rw [map_mul, MulAut.mul_apply, hb v, ha v]
   inv_mem' := fun {a} ha v => by
-    simp only [Set.mem_setOf_eq] at *
+    simp only [Set.mem_ofPred_eq] at *
     rw [map_inv]
     conv_lhs => rw [← ha v]
     simp
@@ -322,7 +322,7 @@ theorem opCore_semidirectProduct_eq_bot (hP : IsPGroup p P) (hG : ¬ p ∣ Nat.c
     · simpa using hcard
     · exact absurd ((dvd_pow_self p hpos.ne').trans (hcard ▸ d2)) hG
   -- `O_p(Γ) ≤ C_Γ(inl(G))`
-  haveI hXnormal : ((SemidirectProduct.inl : G →* G ⋊[φ] P).range).Normal := by
+  have hXnormal : ((SemidirectProduct.inl : G →* G ⋊[φ] P).range).Normal := by
     rw [SemidirectProduct.range_inl_eq_ker_rightHom]
     infer_instance
   have hcent : OddOrder.Isaacs.Ch01.opCore p (G ⋊[φ] P) ≤
@@ -364,7 +364,7 @@ theorem exists_faithful_orbit (hP : IsPGroup p P) (hG : ¬ p ∣ Nat.card G)
     (hφ : Function.Injective φ) :
     ∃ g : G, ∀ u : P, (∀ v : P, (φ u) ((φ v) g) = (φ v) g) → u = 1 := by
   classical
-  haveI : Nonempty G := ⟨1⟩
+  have : Nonempty G := ⟨1⟩
   set F : G → ℕ := fun a => Nat.card ↥(((SemidirectProduct.inr : P →* G ⋊[φ] P).range) ⊓
     conjInrRange (φ := φ) a) with hF
   obtain ⟨g, hgmin⟩ : ∃ g : G, ∀ a : G, F g ≤ F a :=

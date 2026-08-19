@@ -220,6 +220,7 @@ theorem brauerCharacter_one :
     rfl
   rw [htop, finrank_top, rootLift_one hn hn0.ne', nsmul_eq_mul, mul_one]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **The Brauer character is a lift of the ordinary trace.**  Reducing `φ_V(g)` modulo the
 maximal ideal of `𝒪` returns the trace of `ρ g` computed in characteristic `p`.
 

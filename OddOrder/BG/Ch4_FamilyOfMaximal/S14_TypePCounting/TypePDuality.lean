@@ -23,8 +23,8 @@ join `K ⊔ K*` is cyclic — hence abelian — every element of it centralizes 
 theorem mem_centralizer_of_mem_sup_isCyclic {K Kstar : Subgroup G}
     (hcyc : IsCyclic ↥(K ⊔ Kstar)) {y : G} (hyZ : y ∈ K ⊔ Kstar) :
     y ∈ Subgroup.centralizer (K : Set G) := by
-  haveI := hcyc
-  letI : CommGroup ↥(K ⊔ Kstar) := IsCyclic.commGroup
+  have := hcyc
+  let : CommGroup ↥(K ⊔ Kstar) := IsCyclic.commGroup
   rw [Subgroup.mem_centralizer_iff]
   intro k hk
   have hkZ : k ∈ K ⊔ Kstar := Subgroup.mem_sup_left (SetLike.mem_coe.mp hk)
@@ -189,7 +189,7 @@ theorem exists_zTilde_conjClass_gt_half_of_isTypeP [Finite G]
       Ch03.IsHallSubgroup ((kappa H ∪ OddOrder.BG.Ch3.S10.sigma H)ᶜ) (Uu.subgroupOf H) ∧
       Nat.card G < 2 * (conjClassSet (zTilde L Lstar)).ncard := by
   classical
-  haveI : IsSolvable ↥H := hG.solvable_of_mem_maximalSubgroups hHmax
+  have : Group.IsSolvable ↥H := hG.isSolvable_of_mem_maximalSubgroups hHmax
   -- Hall `κ(H)`-subgroup `L` of `H`.
   obtain ⟨L', hL'⟩ := Ch03.hall_E_exists (G := ↥H) (kappa H)
   have hLeq : (L'.map H.subtype).subgroupOf H = L' :=
@@ -391,7 +391,7 @@ theorem typeP_partner_centralizer_singleton [Finite G] (hG : OddOrder.BG.IsMinim
   classical
   obtain ⟨hMstarmax, hMstarP, hKstarMstar, hKstar_hall, hK_eq⟩ :=
     typeP_partner_structure hG hM hP hKM hK hKstar hU hMstarmem hMstarne hpart
-  haveI : IsSolvable ↥Mstar := hG.solvable_of_mem_maximalSubgroups hMstarmax
+  have : Group.IsSolvable ↥Mstar := hG.isSolvable_of_mem_maximalSubgroups hMstarmax
   obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥Mstar)
     ((kappa Mstar ∪ OddOrder.BG.Ch3.S10.sigma Mstar)ᶜ)
   have hUeq : (U'.map Mstar.subtype).subgroupOf Mstar = U' :=
@@ -507,7 +507,7 @@ theorem typeP_covering [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rcases hmatch with hne | hne
   · obtain ⟨p, hp, hpd⟩ := Nat.exists_prime_and_dvd
       (fun h => hne (Subgroup.eq_bot_of_card_eq _ h))
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     obtain ⟨y, hyord⟩ := exists_prime_orderOf_dvd_card' p hpd
     have hyord' : orderOf (y : G) = p :=
       (orderOf_injective _ (MulAut.conj c • Lstar ⊓ K).subtype_injective y).trans hyord
@@ -521,7 +521,7 @@ theorem typeP_covering [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         hYea (hYS.trans inf_le_right)))
   · obtain ⟨p, hp, hpd⟩ := Nat.exists_prime_and_dvd
       (fun h => hne (Subgroup.eq_bot_of_card_eq _ h))
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     obtain ⟨y, hyord⟩ := exists_prime_orderOf_dvd_card' p hpd
     have hyord' : orderOf (y : G) = p :=
       (orderOf_injective _ (MulAut.conj c • Lstar ⊓ Kstar).subtype_injective y).trans hyord
@@ -543,12 +543,12 @@ theorem isCyclic_kappaHall_of_le_nilpotent [Finite G] (hG : OddOrder.BG.IsMinima
     {N K' W : Subgroup G} (hK'N : K' ≤ N)
     (hK'_hall : Ch03.IsHallSubgroup (kappa N) (K'.subgroupOf N))
     (hK'W : K' ≤ W) [Group.IsNilpotent ↥W] : IsCyclic ↥K' := by
-  haveI : Group.IsNilpotent ↥K' :=
+  have : Group.IsNilpotent ↥K' :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hK'W)
   have hodd : Odd (Nat.card ↥K') :=
     hG.odd.of_dvd_nat ((Subgroup.card_dvd_of_le hK'N).trans (Subgroup.card_subgroup_dvd_card N))
   refine isCyclic_of_odd_of_isNilpotent_of_forall_pRank_le_one hodd fun p hp => ?_
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   by_cases hpK : p ∈ (Nat.card ↥K').primeFactors
   · have hpκ : p ∈ kappa N := hK'_hall.1 p (by
       rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hK'N).toEquiv])
@@ -578,7 +578,7 @@ theorem msigma_isNilpotent_of_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSim
   obtain ⟨p, hpπ, hpκ⟩ := Set.exists_of_ssubset (ssubset_of_subset_of_ne hsub hP2.2)
   obtain ⟨hpM, hpσ⟩ := hpπ
   have hp : p.Prime := Nat.prime_of_mem_primeFactors hpM
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   -- A maximal-rank elementary abelian `p`-subgroup `A = B.map M.subtype ≤ M`.
   obtain ⟨B, hBea, hBlog⟩ :=
     exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank (G := ↥M) (p := p)
@@ -617,15 +617,15 @@ theorem typeP_Z_isCyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rcases isTypeP2_or_isTypeP2_partner hG D hM hP hKM hK hKstar hU hpart with hM2 | hMstar2
   · -- `M` is type-`P₂`: `|K|` prime ⟹ `K` cyclic; `K* ≤ M_σ` (nilpotent) ⟹ `K*` cyclic.
     obtain ⟨q, hq, hKq, -⟩ := ((typeP_structure hG hM hP hKM hK hKstar hU).2.2.2.2.1 hM2).2
-    haveI : Fact q.Prime := ⟨hq⟩
-    haveI : IsCyclic ↥K := isCyclic_of_prime_card hKq
-    haveI : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+    have : Fact q.Prime := ⟨hq⟩
+    have : IsCyclic ↥K := isCyclic_of_prime_card hKq
+    have : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
       msigma_isNilpotent_of_isTypeP2 hG hM hM2
-    haveI : IsCyclic ↥Kstar :=
+    have : IsCyclic ↥Kstar :=
       isCyclic_kappaHall_of_le_nilpotent hG hKstarMstar hKstar_hall (hKstar.le.trans inf_le_left)
     exact isCyclic_kappaHall_sup_Kstar_of_cyclic hKM hK hKstar
   · -- `M*` is type-`P₂`: `|K*|` prime ⟹ `K*` cyclic; `K ≤ M*_σ` (nilpotent) ⟹ `K` cyclic.
-    haveI : IsSolvable ↥Mstar := hG.solvable_of_mem_maximalSubgroups hMstarmax
+    have : Group.IsSolvable ↥Mstar := hG.isSolvable_of_mem_maximalSubgroups hMstarmax
     obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥Mstar)
       ((kappa Mstar ∪ OddOrder.BG.Ch3.S10.sigma Mstar)ᶜ)
     have hUeq : (U'.map Mstar.subtype).subgroupOf Mstar = U' :=
@@ -635,11 +635,11 @@ theorem typeP_Z_isCyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     obtain ⟨q, hq, hKstarq, -⟩ :=
       ((typeP_structure hG hMstarmax hMstarP hKstarMstar hKstar_hall hKeq hUstar).2.2.2.2.1
         hMstar2).2
-    haveI : Fact q.Prime := ⟨hq⟩
-    haveI : IsCyclic ↥Kstar := isCyclic_of_prime_card hKstarq
-    haveI : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma Mstar) :=
+    have : Fact q.Prime := ⟨hq⟩
+    have : IsCyclic ↥Kstar := isCyclic_of_prime_card hKstarq
+    have : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma Mstar) :=
       msigma_isNilpotent_of_isTypeP2 hG hMstarmax hMstar2
-    haveI : IsCyclic ↥K :=
+    have : IsCyclic ↥K :=
       isCyclic_kappaHall_of_le_nilpotent hG hKM hK (hKeq.le.trans inf_le_left)
     have hcyc : IsCyclic ↥(Kstar ⊔ K) :=
       isCyclic_kappaHall_sup_Kstar_of_cyclic hKstarMstar hKstar_hall hKeq
@@ -685,7 +685,7 @@ theorem typeP_partner_existsUnique [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
   -- A line `X = ⟨x⟩ ∈ ℰ¹(K)` (needed for both the existence data and the uniqueness pin).
   obtain ⟨p, hpκ⟩ := id hP
   have hp : p.Prime := prime_of_mem_kappa hpκ
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hpK : p ∣ Nat.card ↥K := by
     obtain ⟨_, _, P, hPelem, hPM, _⟩ := id hpκ
     have hPcard : Nat.card ↥P = p := by rw [(mem_elemAbelianOfRank.mp hPelem).2, pow_one]
@@ -720,7 +720,7 @@ theorem typeP_partner_existsUnique [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
       typeP_covering hG hM hP hKM hK hKstar hU hMstarmem hMstarne hpart hHmax hHP⟩, ?_⟩
   -- Uniqueness: any competitor `M*'` satisfies `ℳ(C_G(X)) = {M*'}` via the partner symmetry.
   rintro Mstar' ⟨hMstar'max, hMstar'P, -, ⟨hKstarMstar', hKstar'_hall, hKeq'⟩, -, -, -, -⟩
-  haveI : IsSolvable ↥Mstar' := hG.solvable_of_mem_maximalSubgroups hMstar'max
+  have : Group.IsSolvable ↥Mstar' := hG.isSolvable_of_mem_maximalSubgroups hMstar'max
   obtain ⟨U'', hU''⟩ := Ch03.hall_E_exists (G := ↥Mstar')
     ((kappa Mstar' ∪ OddOrder.BG.Ch3.S10.sigma Mstar')ᶜ)
   have hU''eq : (U''.map Mstar'.subtype).subgroupOf Mstar' = U'' :=
@@ -755,7 +755,7 @@ theorem derivedInG_eq_Msigma_sup_derivedInG_complement [Finite G]
     OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM
   refine le_antisymm (fun x hx => ?_) (sup_le hMσM' ?_)
   · have hxM : x ∈ M := Subgroup.map_subtype_le _ hx
-    haveI : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
+    have : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
       rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
     have hsuptop : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ⊔ E.subgroupOf M = ⊤ := by
       rw [← Subgroup.subgroupOf_sup (OddOrder.BG.Ch3.S10.Msigma_le M) h.E_le,
@@ -791,7 +791,7 @@ theorem typeP_derivedInG_complement_of_eq_complement [Finite G]
   have hEbot : derivedInG E = ⊥ := by
     rw [← hKE, show derivedInG K = ⁅K, K⁆ from Subgroup.map_subtype_commutator K]
     refine Subgroup.commutator_eq_bot_iff_le_centralizer.mpr (fun x hx => ?_)
-    letI : CommGroup ↥K := IsCyclic.commGroup
+    let : CommGroup ↥K := IsCyclic.commGroup
     refine Subgroup.mem_centralizer_iff.mpr (fun y hy => ?_)
     exact congrArg Subtype.val (mul_comm (⟨y, hy⟩ : ↥K) (⟨x, hx⟩ : ↥K))
   -- `M' = M_σ ⊔ E' = M_σ`.
@@ -848,7 +848,7 @@ theorem typeP_derivedInG_isComplement_kappaHall [Finite G]
       Subgroup.eq_of_le_of_card_ge hKE (Nat.dvd_antisymm hEdvdK (Subgroup.card_dvd_of_le hKE)).le
     exact typeP_derivedInG_complement_of_eq_complement hG hsetup hKEeq
   · -- Case `κ(M) ⊆ τ₁(M)`: conjugate the setup so its `E₁` is `K`.
-    haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hsetup.mem_maximal
+    have hMsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hsetup.mem_maximal
     have hκτ1 : ∀ p ∈ kappa M, p ∈ tau1 M := fun p hpκ =>
       (kappa_subset_tau1_union_tau3 hpκ).resolve_right
         (fun hpτ3 => hτ3 ⟨p, Set.mem_inter hpκ hpτ3⟩)
@@ -903,8 +903,9 @@ theorem typeP_derivedInG_isComplement_kappaHall [Finite G]
         rw [eq_bot_iff, ← hr]
         exact inf_le_inf_left _ (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr hg₀K))
       -- `U = [K, U] ≤ E' = derivedInG Ebar`.
-      haveI hKsolv : IsSolvable ↥K :=
-        solvable_of_solvable_injective (Subgroup.inclusion_injective (hKleEbar.trans h'.E_le))
+      have hKsolv : Group.IsSolvable ↥K :=
+        Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective
+            (hKleEbar.trans h'.E_le))
       have hUleE' : (Ebar₂ ⊔ Ebar₃ : Subgroup G) ≤ derivedInG Ebar := by
         have hUcomm : (Ebar₂ ⊔ Ebar₃ : Subgroup G) ≤ ⁅K, Ebar₂ ⊔ Ebar₃⁆ :=
           OddOrder.BG.Ch2.S08.le_commutator_of_coprime_inf_centralizer_eq_bot
@@ -917,14 +918,14 @@ theorem typeP_derivedInG_isComplement_kappaHall [Finite G]
         rw [derivedInG, Subgroup.subgroupOf,
           Subgroup.comap_map_eq_self_of_injective Ebar.subtype_injective]
       have hdEbar : derivedInG Ebar = (Ebar₂ ⊔ Ebar₃ : Subgroup G) := by
-        haveI hUnorm : ((Ebar₂ ⊔ Ebar₃).subgroupOf Ebar).Normal :=
+        have hUnorm : ((Ebar₂ ⊔ Ebar₃).subgroupOf Ebar).Normal :=
           Subgroup.normal_subgroupOf_of_le_normalizer (h'.E23_normal hG)
         have hUcommE : (Ebar₂ ⊔ Ebar₃).subgroupOf Ebar ≤ commutator ↥Ebar := by
           rw [← hcommEbar_eq]; exact Subgroup.comap_mono hUleE'
         have hsupcomm := commutator_eq_sup_commutator_of_isComplement' hcompl_Ebar hUcommE
         have hKbarbot : ⁅K.subgroupOf Ebar, K.subgroupOf Ebar⁆ = ⊥ := by
           refine Subgroup.commutator_eq_bot_iff_le_centralizer.mpr (fun x hx => ?_)
-          letI : CommGroup ↥K := IsCyclic.commGroup
+          let : CommGroup ↥K := IsCyclic.commGroup
           refine Subgroup.mem_centralizer_iff.mpr (fun y hy => Subtype.ext ?_)
           have hxK : (x : G) ∈ K := Subgroup.mem_subgroupOf.mp hx
           have hyK : (y : G) ∈ K := Subgroup.mem_subgroupOf.mp hy
@@ -1002,7 +1003,7 @@ theorem typeP_duality [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         IsConjugateSubgroup H M ∨ IsConjugateSubgroup H Mstar) := by
   classical
   -- A Hall `(κ(M) ∪ σ(M))'`-subgroup `U` of `M` (Hall's theorem in the solvable `M`).
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥M)
     ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
   have hUeq : (U'.map M.subtype).subgroupOf M = U' :=
@@ -1013,9 +1014,9 @@ theorem typeP_duality [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- cyclic (subgroup of a cyclic group); this is what Proposition 14.2(a)/part (h) consumes.
   obtain ⟨Mstar, hMstarne, hMstarmem, hpart⟩ :=
     exists_partner hG (dummySigmaDecomposition G) hM hP hKM hK hKstar hU
-  haveI hZcyc : IsCyclic ↥(K ⊔ Kstar) :=
+  have hZcyc : IsCyclic ↥(K ⊔ Kstar) :=
     typeP_Z_isCyclic hG (dummySigmaDecomposition G) hM hP hKM hK hKstar hU hMstarmem hMstarne hpart
-  haveI : IsCyclic ↥K :=
+  have : IsCyclic ↥K :=
     (Subgroup.subgroupOfEquivOfLe (le_sup_left : K ≤ K ⊔ Kstar)).isCyclic.mp inferInstance
   -- Part (h): `M' = [M,M]` complements `K` in `M` (Proposition 14.2(a): `M' = U M_σ`).
   have hparth : Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M) :=
@@ -1039,7 +1040,7 @@ theorem kappa_conj_smul [Finite G] (g : G) (M : Subgroup G) :
     exact h g⁻¹ (MulAut.conj g • M) (hMeq.symm ▸ hp)
   intro a N p hp
   obtain ⟨hpp, hτ, P, hPelem, hPN, hPC⟩ := hp
-  haveI : Fact p.Prime := ⟨hpp⟩
+  have : Fact p.Prime := ⟨hpp⟩
   have hinv : MulAut.conj a⁻¹ • (MulAut.conj a • N) = N := by
     rw [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
   refine ⟨hpp, ?_, MulAut.conj a⁻¹ • P, conj_smul_mem_elemAbelianOfRank a⁻¹ hPelem, ?_, ?_⟩
@@ -1091,10 +1092,10 @@ theorem isTypeP1_conj_smul [Finite G] (g : G) (M : Subgroup G) :
 two Hall `π`-subgroups are conjugate (`hall_C`), and a normal one is fixed by conjugation, so they
 coincide.  Used to pin the Theorem D normal complement `R(x)` (a normal Hall complement in `C_G(x)`)
 to the canonical signalizer `Rsub`. -/
-theorem eq_of_isHall_of_normal {K : Type*} [Group K] [Finite K] [IsSolvable K] {π : Set ℕ}
+theorem eq_of_isHall_of_normal {K : Type*} [Group K] [Finite K] [Group.IsSolvable K] {π : Set ℕ}
     {H₁ H₂ : Subgroup K} (hH₁ : Ch03.IsHallSubgroup π H₁) (hH₂ : Ch03.IsHallSubgroup π H₂)
     (hN : H₁.Normal) : H₁ = H₂ := by
-  haveI := hN
+  have := hN
   obtain ⟨g, hg⟩ := Ch03.hall_C hH₁ hH₂
   rw [← hg]
   exact (Subgroup.Normal.conj_smul_eq_self g H₁).symm
@@ -1155,7 +1156,7 @@ theorem conjClassSet_zTilde_eq_of_isConjugate [Finite G]
     rw [← hg]; exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hKNN
   have hHallM : Ch03.IsHallSubgroup (kappa M) ((MulAut.conj g • KN).subgroupOf M) :=
     isHall_kappa_subgroupOf_conj g hg hKNN hKN
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hMmax
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hMmax
   obtain ⟨w, hwM, hw⟩ :=
     OddOrder.BG.Ch1.S06.exists_conj_eq_of_isHall_subgroupOf inferInstance hle hKM hHallM hK
   -- `conj (w*g)` carries `N`'s `κ`-Hall and ambient maximal exactly onto `M`'s.
@@ -1212,7 +1213,7 @@ theorem exists_typeP_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M) ∧
       Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) ∧
       Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M) := by
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   obtain ⟨HK, hHK⟩ := Ch03.hall_E_exists (G := ↥M) (kappa M)
   obtain ⟨HU, hHU⟩ :=
     Ch03.hall_E_exists (G := ↥M) ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
@@ -1322,7 +1323,7 @@ theorem sigmaLength_le_two_of_mem_zTilde_of_isTypeP [Finite G]
   obtain ⟨hzW, hznot⟩ := hz
   have hzW' : z ∈ Kref ⊔ Kstarref := SetLike.mem_coe.mp hzW
   -- `K ◁ (K ⊔ K*)` (`K*` centralises `K`), so the split `z = k·k*` exists (no `CommGroup` needed).
-  haveI hKrefnorm : (Kref.subgroupOf (Kref ⊔ Kstarref)).Normal := by
+  have hKrefnorm : (Kref.subgroupOf (Kref ⊔ Kstarref)).Normal := by
     rw [Subgroup.normal_subgroupOf_iff_le_normalizer le_sup_left]
     exact sup_le Subgroup.le_normalizer
       (le_trans (hKstarref.trans_le inf_le_right)

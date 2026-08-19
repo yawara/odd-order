@@ -55,7 +55,7 @@ theorem Hypothesis.sSet_reducible_eq_muColumnSum [Finite G]
     (hirr : ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter η) :
     ∃ j : Fin hyp.p, j ≠ ⟨0, hyp.p_prime.pos⟩ ∧ η = ∑ i : Fin hyp.q, hyp.mu i j := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   obtain ⟨ξ, hξ, rfl⟩ := hη
   -- `ξ ≠ trivial`: else `Ker ξ = univ ⊇ hInHu`, contradicting `ξ ∈ 𝒳`.
   have hξne : ξ ≠ trivialIrreducibleCharacter ↥(huSub (hyp.toTypesIIIIIIVSetupS hG)) := by
@@ -91,7 +91,7 @@ theorem Hypothesis.sSet_reducible_conj_not_irr [Finite G] (hyp : Hypothesis (G :
     {η : ClassFunction ↥hyp.S ℂ}
     (hirr : ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter η) :
     ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter (η : ClassFunction ↥hyp.S ℂ).conj := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   intro h
   apply hirr
   rw [← ClassFunction.conj_conj η]
@@ -137,8 +137,8 @@ theorem Hypothesis.sSet_member_conjDiff_supported [Finite G]
     {η : ClassFunction ↥hyp.S ℂ} (hη : η ∈ sSet (hyp.toTypesIIIIIIVSetupS hG)) :
     ((η : ClassFunction ↥hyp.S ℂ).conj - η).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S := by
-  haveI := hyp.finiteG
-  letI : Fintype G := Fintype.ofFinite G
+  have := hyp.finiteG
+  let : Fintype G := Fintype.ofFinite G
   obtain ⟨ξ, hξ, rfl⟩ := hη
   exact hyp.sSet_member_diffsupp hG hξ
 
@@ -169,8 +169,8 @@ theorem Hypothesis.tauS_muColumn_diff_eq [Finite G]
         (η - (η : ClassFunction ↥hyp.S ℂ).conj)
       = ∑ i : Fin hyp.q, (hyp.eta i j - hyp.eta i k) := by
   classical
-  haveI := hyp.finiteG
-  letI : Fintype ↥hyp.S := Fintype.ofFinite _
+  have := hyp.finiteG
+  let : Fintype ↥hyp.S := Fintype.ofFinite _
   -- `η − η̄ = ∑ᵢ(μ_{ij} − μ_{ik})`.
   have hsub : (η - (η : ClassFunction ↥hyp.S ℂ).conj)
       = ∑ i : Fin hyp.q, (hyp.mu i j - hyp.mu i k) := by
@@ -297,8 +297,8 @@ theorem Hypothesis.dadeHypS_muColumn_diff [Finite G]
         ((∑ i : Fin hyp.q, hyp.mu i j) - (∑ i : Fin hyp.q, hyp.mu i k))
       = ∑ i : Fin hyp.q, (hyp.eta i j - hyp.eta i k) := by
   classical
-  haveI := hyp.finiteG
-  letI : Fintype ↥hyp.S := Fintype.ofFinite _
+  have := hyp.finiteG
+  let : Fintype ↥hyp.S := Fintype.ofFinite _
   have hAsupp := hyp.muColumn_diff_supported hG chief hj hk
   have hA0supp := hAsupp.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono
     (S10.typePACore_subset_A0Set hyp.Sdata))
@@ -509,7 +509,7 @@ theorem Hypothesis.mu_colSum_ne_of_inner_zero [Finite G] (hyp : Hypothesis (G :=
       (∑ i : Fin hyp.q, hyp.mu i b) = 0) :
     a ≠ b := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   rintro rfl
   have hself : ClassFunction.inner (∑ i : Fin hyp.q, hyp.mu i a)
       (∑ i : Fin hyp.q, hyp.mu i a) = (hyp.q : ℂ) := by
@@ -908,7 +908,7 @@ theorem Hypothesis.sSet_coherent_extension_eq_sum_memberRFamily [Finite G]
     {ψ : ClassFunction ↥hyp.S ℂ} (hψT : ψ ∈ T) (hψcT : ψ.conj ∈ T) :
     ∃ E ⊆ (hyp.sSet_memberRFamily hG hnoV (hTsub hψT)).imageSet,
       c'.extension ψ = ∑ α ∈ E, α := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hne : ψ ≠ ψ.conj := fun h =>
     sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupS hG) (hyp.oddCardS hG)
@@ -971,7 +971,7 @@ theorem Hypothesis.sSet_coherent_extension_cross_orthogonal [Finite G]
     (hψT : ψ ∈ T₁) (hψcT : ψ.conj ∈ T₁) (hlamT : lam ∈ T₂) (hlamcT : lam.conj ∈ T₂)
     (hne1 : ψ ≠ lam) (hne2 : ψ ≠ lam.conj) :
     ClassFunction.inner (c₁.extension ψ) (c₂.extension lam) = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have h1 : ClassFunction.inner ψ lam = 0 :=
     sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupS hG) (hT₁sub hψT) (hT₂sub hlamT) hne1

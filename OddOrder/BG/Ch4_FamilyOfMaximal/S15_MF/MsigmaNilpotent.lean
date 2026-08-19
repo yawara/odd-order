@@ -94,7 +94,7 @@ theorem isNilpotent_sup_of_commutator_eq_bot {A B : Subgroup G}
   set f : ↥A × ↥B →* G := (A.subtype).noncommCoprod (B.subtype) hcomm' with hf
   have hrange : f.range = A ⊔ B := by
     rw [hf, MonoidHom.noncommCoprod_range, Subgroup.range_subtype, Subgroup.range_subtype]
-  haveI : Group.IsNilpotent ↥(f.range) :=
+  have : Group.IsNilpotent ↥(f.range) :=
     Group.nilpotent_of_surjective f.rangeRestrict f.rangeRestrict_surjective
   exact hrange ▸ this
 
@@ -259,13 +259,13 @@ theorem le_sup_inf_centralizer_of_commutator_le [Finite G]
     (hDM₀ : D ≤ Subgroup.normalizer (M₀ : Set G))
     (hcomm : ⁅N, D⁆ ≤ M₀)
     (hcop : Nat.Coprime (Nat.card ↥D) (Nat.card ↥N))
-    (hSolv : IsSolvable ↥D ∨ IsSolvable ↥N) :
+    (hSolv : Group.IsSolvable ↥D ∨ Group.IsSolvable ↥N) :
     N ≤ M₀ ⊔ (N ⊓ Subgroup.centralizer (D : Set G)) := by
   -- The conjugation action of `D` on `↥N` (`D ≤ N_G(N)`).
   set φ : ↥D →* MulAut ↥N :=
     (Subgroup.normalizerMonoidHom N).comp (Subgroup.inclusion hDN) with hφ
   -- `M₀.subgroupOf N` is normal in `↥N` and `D`-invariant.
-  haveI hM₀N_normal : (M₀.subgroupOf N).Normal :=
+  have hM₀N_normal : (M₀.subgroupOf N).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hM₀N).mpr hN_M₀
   have hMinv : OddOrder.Isaacs.Ch03.IsAInvariant φ (M₀.subgroupOf N) := by
     rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
@@ -333,7 +333,7 @@ theorem le_of_commutator_le_centralizerCap [Finite G]
     (hDQ0 : D ≤ Subgroup.normalizer (Q0 : Set G))
     (hcomm : ⁅Q1, D⁆ ≤ Q0)
     (hcop : Nat.Coprime (Nat.card ↥D) (Nat.card ↥Q1))
-    (hSolv : IsSolvable ↥D ∨ IsSolvable ↥Q1) :
+    (hSolv : Group.IsSolvable ↥D ∨ Group.IsSolvable ↥Q1) :
     Q1 ≤ Q0 := by
   have hlift := le_sup_inf_centralizer_of_commutator_le hQ01 hDQ1 hQ1Q0 hDQ0 hcomm hcop hSolv
   have hcap : Q1 ⊓ Subgroup.centralizer (D : Set G) ≤ Q0 := by
@@ -349,7 +349,7 @@ theorem le_of_commutator_le_of_inf_centralizer_le [Finite G] {N M₀ D : Subgrou
     (hN_M₀ : N ≤ Subgroup.normalizer (M₀ : Set G))
     (hDM₀ : D ≤ Subgroup.normalizer (M₀ : Set G))
     (hcomm : ⁅N, D⁆ ≤ M₀) (hcop : Nat.Coprime (Nat.card ↥D) (Nat.card ↥N))
-    (hSolv : IsSolvable ↥D ∨ IsSolvable ↥N)
+    (hSolv : Group.IsSolvable ↥D ∨ Group.IsSolvable ↥N)
     (hcap : N ⊓ Subgroup.centralizer (D : Set G) ≤ M₀) :
     N ≤ M₀ :=
   (le_sup_inf_centralizer_of_commutator_le hM₀N hDN hN_M₀ hDM₀ hcomm hcop hSolv).trans
@@ -369,9 +369,9 @@ theorem commutator_eq_bot_of_isNilpotent_of_normal_isPGroup
     {q : ℕ} [Fact q.Prime] {A B : Subgroup 𝓗} [A.Normal] (hA : IsPGroup q A)
     (hB : q ∉ (Nat.card ↥B).primeFactors) :
     ⁅A, B⁆ = ⊥ := by
-  haveI : Group.IsNilpotent ↥(⊤ : Subgroup 𝓗) :=
+  have : Group.IsNilpotent ↥(⊤ : Subgroup 𝓗) :=
     Group.nilpotent_of_mulEquiv Subgroup.topEquiv.symm
-  haveI hOnorm : (opiCoreInG ({q}ᶜ : Set ℕ) (⊤ : Subgroup 𝓗)).Normal :=
+  have hOnorm : (opiCoreInG ({q}ᶜ : Set ℕ) (⊤ : Subgroup 𝓗)).Normal :=
     opiCoreInG_normal ({q}ᶜ : Set ℕ)
   -- `B ≤ O_{q′}` (a `q′`-subgroup of a nilpotent group).
   have hBO : B ≤ opiCoreInG ({q}ᶜ : Set ℕ) (⊤ : Subgroup 𝓗) := by
@@ -412,8 +412,8 @@ theorem commutator_le_of_quotient_isNilpotent {N : Type*} [Group N] [Finite N]
     (hNilp : Group.IsNilpotent (N ⧸ Q0'))
     (hA0 : IsPGroup q A0) (hB0 : q ∉ (Nat.card ↥B0).primeFactors) :
     ⁅A0, B0⁆ ≤ Q0' := by
-  haveI := hNilp
-  haveI : (A0.map (QuotientGroup.mk' Q0')).Normal :=
+  have := hNilp
+  have : (A0.map (QuotientGroup.mk' Q0')).Normal :=
     ‹A0.Normal›.map _ (QuotientGroup.mk'_surjective Q0')
   have hAq : IsPGroup q (A0.map (QuotientGroup.mk' Q0')) := hA0.map _
   have hBq' : q ∉ (Nat.card ↥(B0.map (QuotientGroup.mk' Q0'))).primeFactors := fun hq =>
@@ -440,7 +440,7 @@ theorem isNilpotent_quotient_subgroupOf_of_isNilpotent_map {G : Type*} [Group G]
     rw [hφ, ← MonoidHom.comap_ker, QuotientGroup.ker_mk']; rfl
   have hrange : φ.range = H.map (QuotientGroup.mk' N) := by
     rw [hφ, MonoidHom.range_comp, Subgroup.range_subtype]
-  haveI : Group.IsNilpotent ↥φ.range := by rw [hrange]; exact hNilp
+  have : Group.IsNilpotent ↥φ.range := by rw [hrange]; exact hNilp
   have e : ↥H ⧸ N.subgroupOf H ≃* ↥φ.range :=
     (QuotientGroup.quotientMulEquivOfEq hker.symm).trans (QuotientGroup.quotientKerEquivRange φ)
   exact Group.nilpotent_of_mulEquiv e.symm
@@ -455,7 +455,7 @@ Ambient `P = D ⊔ Q₁ ⊔ K₁` (so `Q₀ ⊴ P`), `Γ = ↥P / Q₀`; push `D
 transfers it to the quotient.  Feeds `commutator_le_of_quotient_isNilpotent` (B1). -/
 theorem isNilpotent_DQ1_quotient_of_regular [Finite G]
     {D Q1 K1 Q0 : Subgroup G} [(Q0.subgroupOf (D ⊔ Q1)).Normal]
-    (hPsolv : IsSolvable ↥(D ⊔ Q1 ⊔ K1))
+    (hPsolv : Group.IsSolvable ↥(D ⊔ Q1 ⊔ K1))
     (hPQ0 : D ⊔ Q1 ⊔ K1 ≤ Subgroup.normalizer (Q0 : Set G))
     (hK1DQ1 : K1 ≤ Subgroup.normalizer ((D ⊔ Q1 : Subgroup G) : Set G))
     (hK1prime : ∃ p : ℕ, p.Prime ∧ Nat.card ↥K1 = p)
@@ -466,7 +466,7 @@ theorem isNilpotent_DQ1_quotient_of_regular [Finite G]
     Group.IsNilpotent (↥(D ⊔ Q1) ⧸ (Q0.subgroupOf (D ⊔ Q1))) := by
   have hDQ1P : D ⊔ Q1 ≤ D ⊔ Q1 ⊔ K1 := le_sup_left
   have hK1P : K1 ≤ D ⊔ Q1 ⊔ K1 := le_sup_right
-  haveI hQ0P_normal : (Q0.subgroupOf (D ⊔ Q1 ⊔ K1)).Normal :=
+  have hQ0P_normal : (Q0.subgroupOf (D ⊔ Q1 ⊔ K1)).Normal :=
     Subgroup.normal_subgroupOf_of_le_normalizer hPQ0
   set π : ↥(D ⊔ Q1 ⊔ K1) →* ↥(D ⊔ Q1 ⊔ K1) ⧸ (Q0.subgroupOf (D ⊔ Q1 ⊔ K1)) :=
     QuotientGroup.mk' _ with hπ
@@ -474,7 +474,7 @@ theorem isNilpotent_DQ1_quotient_of_regular [Finite G]
     π.comp (Subgroup.inclusion hDQ1P) with hψ
   set ρ : ↥K1 →* ↥(D ⊔ Q1 ⊔ K1) ⧸ (Q0.subgroupOf (D ⊔ Q1 ⊔ K1)) :=
     π.comp (Subgroup.inclusion hK1P) with hρ
-  haveI := hPsolv
+  have := hPsolv
   -- Kernels of `ψ`, `ρ` and the "trivial image ⟺ lies in `Q₀`" criteria.
   have hkerψ : ψ.ker = Q0.subgroupOf (D ⊔ Q1) := by
     rw [hψ, ← MonoidHom.comap_ker, QuotientGroup.ker_mk']; rfl
@@ -494,14 +494,14 @@ theorem isNilpotent_DQ1_quotient_of_regular [Finite G]
       Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
   have hψval : ∀ b : ↥(D ⊔ Q1), ψ b = π (Subgroup.inclusion hDQ1P b) := fun b => rfl
   have hρval : ∀ c : ↥K1, ρ c = π (Subgroup.inclusion hK1P c) := fun c => rfl
-  haveI : IsSolvable ↥(ψ.range ⊔ ρ.range) :=
-    solvable_of_solvable_injective (Subgroup.subtype_injective _)
+  have : Group.IsSolvable ↥(ψ.range ⊔ ρ.range) :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.subtype_injective _)
   -- `ψ.range` is normal in `Γ`: `P = D ⊔ Q₁ ⊔ K₁ ≤ N_G(D ⊔ Q₁)` (as `K₁` normalizes `D ⊔ Q₁`).
   have hψrange : ψ.range = ((D ⊔ Q1).subgroupOf (D ⊔ Q1 ⊔ K1)).map π := by
     rw [hψ, MonoidHom.range_comp, Subgroup.inclusion_range]
-  haveI hNPnormal : ((D ⊔ Q1).subgroupOf (D ⊔ Q1 ⊔ K1)).Normal :=
+  have hNPnormal : ((D ⊔ Q1).subgroupOf (D ⊔ Q1 ⊔ K1)).Normal :=
     Subgroup.normal_subgroupOf_of_le_normalizer (sup_le Subgroup.le_normalizer hK1DQ1)
-  haveI hψrange_normal : (ψ.range).Normal := by
+  have hψrange_normal : (ψ.range).Normal := by
     rw [hψrange]; exact hNPnormal.map π (QuotientGroup.mk'_surjective _)
   have hNilpN : Group.IsNilpotent ↥(ψ.range) := by
     refine OddOrder.BG.Ch1.S03c.isNilpotent_of_normalizing_primeOrder_fixedPointFree
@@ -531,7 +531,7 @@ theorem isNilpotent_DQ1_quotient_of_regular [Finite G]
       rwa [hbot, Subgroup.mem_bot] at hmem
     · -- `ρ.range ≠ ⊥`: `K₁` is nontrivial and meets `Q₀` trivially.
       obtain ⟨p, hp, hcard⟩ := hK1prime
-      haveI : Nontrivial ↥K1 :=
+      have : Nontrivial ↥K1 :=
         Finite.one_lt_card_iff_nontrivial.mp (by rw [hcard]; exact hp.one_lt)
       obtain ⟨k, hk1⟩ := exists_ne (1 : ↥K1)
       intro hbot
@@ -576,7 +576,7 @@ quotient.  Used in Theorem 15.2 step (c)(d) with `N = M_σ`, `Q₀ = Q`, to prov
 ("`K` acts regularly on `M_σ/Q`", since `C_{M_σ}(K) = K* ⊆ Q`). -/
 theorem isNilpotent_quotient_of_regular_general [Finite G]
     {N K1 Q0 : Subgroup G} [(Q0.subgroupOf N).Normal]
-    (hPsolv : IsSolvable ↥(N ⊔ K1))
+    (hPsolv : Group.IsSolvable ↥(N ⊔ K1))
     (hPQ0 : N ⊔ K1 ≤ Subgroup.normalizer (Q0 : Set G))
     (hK1N : K1 ≤ Subgroup.normalizer (N : Set G))
     (hK1prime : ∃ p : ℕ, p.Prime ∧ Nat.card ↥K1 = p)
@@ -587,7 +587,7 @@ theorem isNilpotent_quotient_of_regular_general [Finite G]
     Group.IsNilpotent (↥N ⧸ (Q0.subgroupOf N)) := by
   have hNP : N ≤ N ⊔ K1 := le_sup_left
   have hK1P : K1 ≤ N ⊔ K1 := le_sup_right
-  haveI hQ0P_normal : (Q0.subgroupOf (N ⊔ K1)).Normal :=
+  have hQ0P_normal : (Q0.subgroupOf (N ⊔ K1)).Normal :=
     Subgroup.normal_subgroupOf_of_le_normalizer hPQ0
   set π : ↥(N ⊔ K1) →* ↥(N ⊔ K1) ⧸ (Q0.subgroupOf (N ⊔ K1)) :=
     QuotientGroup.mk' _ with hπ
@@ -595,7 +595,7 @@ theorem isNilpotent_quotient_of_regular_general [Finite G]
     π.comp (Subgroup.inclusion hNP) with hψ
   set ρ : ↥K1 →* ↥(N ⊔ K1) ⧸ (Q0.subgroupOf (N ⊔ K1)) :=
     π.comp (Subgroup.inclusion hK1P) with hρ
-  haveI := hPsolv
+  have := hPsolv
   have hkerψ : ψ.ker = Q0.subgroupOf N := by
     rw [hψ, ← MonoidHom.comap_ker, QuotientGroup.ker_mk']; rfl
   have hkerρ : ρ.ker = Q0.subgroupOf K1 := by
@@ -613,13 +613,13 @@ theorem isNilpotent_quotient_of_regular_general [Finite G]
       Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
   have hψval : ∀ b : ↥N, ψ b = π (Subgroup.inclusion hNP b) := fun b => rfl
   have hρval : ∀ c : ↥K1, ρ c = π (Subgroup.inclusion hK1P c) := fun c => rfl
-  haveI : IsSolvable ↥(ψ.range ⊔ ρ.range) :=
-    solvable_of_solvable_injective (Subgroup.subtype_injective _)
+  have : Group.IsSolvable ↥(ψ.range ⊔ ρ.range) :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.subtype_injective _)
   have hψrange : ψ.range = (N.subgroupOf (N ⊔ K1)).map π := by
     rw [hψ, MonoidHom.range_comp, Subgroup.inclusion_range]
-  haveI hNPnormal : (N.subgroupOf (N ⊔ K1)).Normal :=
+  have hNPnormal : (N.subgroupOf (N ⊔ K1)).Normal :=
     Subgroup.normal_subgroupOf_of_le_normalizer (sup_le Subgroup.le_normalizer hK1N)
-  haveI hψrange_normal : (ψ.range).Normal := by
+  have hψrange_normal : (ψ.range).Normal := by
     rw [hψrange]; exact hNPnormal.map π (QuotientGroup.mk'_surjective _)
   have hNilpN : Group.IsNilpotent ↥(ψ.range) := by
     refine OddOrder.BG.Ch1.S03c.isNilpotent_of_normalizing_primeOrder_fixedPointFree
@@ -645,7 +645,7 @@ theorem isNilpotent_quotient_of_regular_general [Finite G]
       have hmem : ψ ⟨x, hxN⟩ ∈ ψ.range := MonoidHom.mem_range.mpr ⟨_, rfl⟩
       rwa [hbot, Subgroup.mem_bot] at hmem
     · obtain ⟨p, hp, hcard⟩ := hK1prime
-      haveI : Nontrivial ↥K1 :=
+      have : Nontrivial ↥K1 :=
         Finite.one_lt_card_iff_nontrivial.mp (by rw [hcard]; exact hp.one_lt)
       obtain ⟨k, hk1⟩ := exists_ne (1 : ↥K1)
       intro hbot
@@ -727,7 +727,7 @@ theorem fpf_of_centralizer_inf_le [Finite G]
     (hDQ1Q0 : D ⊔ Q1 ≤ Subgroup.normalizer (Q0 : Set G))
     (hQ0DQ1 : Q0 ≤ D ⊔ Q1)
     (hcop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers k)) (Nat.card ↥(D ⊔ Q1)))
-    (hsolv : IsSolvable ↥(Subgroup.zpowers k) ∨ IsSolvable ↥(D ⊔ Q1))
+    (hsolv : Group.IsSolvable ↥(Subgroup.zpowers k) ∨ Group.IsSolvable ↥(D ⊔ Q1))
     (hCk : Subgroup.centralizer ({k} : Set G) ⊓ (D ⊔ Q1) ≤ Q0) :
     ∀ x ∈ D ⊔ Q1, k * x⁻¹ * k⁻¹ * x ∈ Q0 → x ∈ Q0 := by
   have hkz : Subgroup.zpowers k ≤ Subgroup.normalizer ((D ⊔ Q1 : Subgroup G) : Set G) :=
@@ -736,7 +736,7 @@ theorem fpf_of_centralizer_inf_le [Finite G]
     Subgroup.zpowers_le.mpr hk_normQ0
   set φ : ↥(Subgroup.zpowers k) →* MulAut ↥(D ⊔ Q1) :=
     (Subgroup.normalizerMonoidHom (D ⊔ Q1)).comp (Subgroup.inclusion hkz) with hφ
-  haveI hQ0_normal : (Q0.subgroupOf (D ⊔ Q1)).Normal :=
+  have hQ0_normal : (Q0.subgroupOf (D ⊔ Q1)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQ0DQ1).mpr hDQ1Q0
   have hMinv : OddOrder.Isaacs.Ch03.IsAInvariant φ (Q0.subgroupOf (D ⊔ Q1)) := by
     rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
@@ -807,7 +807,7 @@ theorem fpf_of_centralizer_inf_le_general [Finite G]
     (hAQ0 : A ≤ Subgroup.normalizer (Q0 : Set G))
     (hQ0A : Q0 ≤ A)
     (hcop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers k)) (Nat.card ↥A))
-    (hsolv : IsSolvable ↥(Subgroup.zpowers k) ∨ IsSolvable ↥A)
+    (hsolv : Group.IsSolvable ↥(Subgroup.zpowers k) ∨ Group.IsSolvable ↥A)
     (hCk : Subgroup.centralizer ({k} : Set G) ⊓ A ≤ Q0) :
     ∀ x ∈ A, k * x⁻¹ * k⁻¹ * x ∈ Q0 → x ∈ Q0 := by
   have hkz : Subgroup.zpowers k ≤ Subgroup.normalizer (A : Set G) :=
@@ -816,7 +816,7 @@ theorem fpf_of_centralizer_inf_le_general [Finite G]
     Subgroup.zpowers_le.mpr hk_normQ0
   set φ : ↥(Subgroup.zpowers k) →* MulAut ↥A :=
     (Subgroup.normalizerMonoidHom A).comp (Subgroup.inclusion hkz) with hφ
-  haveI hQ0_normal : (Q0.subgroupOf A).Normal :=
+  have hQ0_normal : (Q0.subgroupOf A).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQ0A).mpr hAQ0
   have hMinv : OddOrder.Isaacs.Ch03.IsAInvariant φ (Q0.subgroupOf A) := by
     rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
@@ -887,7 +887,7 @@ theorem hFPF_of_kstar_condition [Finite G]
     (hDQ1Q0 : D ⊔ Q1 ≤ Subgroup.normalizer (Q0 : Set G))
     (hQ0DQ1 : Q0 ≤ D ⊔ Q1)
     (hcop : ∀ k ∈ K1, Nat.Coprime (Nat.card ↥(Subgroup.zpowers k)) (Nat.card ↥(D ⊔ Q1)))
-    (hsolv : IsSolvable ↥(D ⊔ Q1)) :
+    (hsolv : Group.IsSolvable ↥(D ⊔ Q1)) :
     ∀ k ∈ K1, k ≠ 1 → ∀ x ∈ D ⊔ Q1, k * x⁻¹ * k⁻¹ * x ∈ Q0 → x ∈ Q0 := by
   intro k hk hk1
   have hCk := centralizer_inf_DQ1_le_Q0 (hprime_manner k hk hk1) hKstarQ hDQ1Mσ hQ1Q hDQ hDnormQ1
@@ -904,7 +904,7 @@ collapse, this yields the `K*`-condition contradiction. -/
 theorem commutator_le_Q0_of_fpf [Finite G]
     {D Q1 K1 Q0 : Subgroup G} {q : ℕ} [Fact q.Prime]
     [(Q0.subgroupOf (D ⊔ Q1)).Normal] [(Q1.subgroupOf (D ⊔ Q1)).Normal]
-    (hPsolv : IsSolvable ↥(D ⊔ Q1 ⊔ K1))
+    (hPsolv : Group.IsSolvable ↥(D ⊔ Q1 ⊔ K1))
     (hPQ0 : D ⊔ Q1 ⊔ K1 ≤ Subgroup.normalizer (Q0 : Set G))
     (hK1DQ1 : K1 ≤ Subgroup.normalizer ((D ⊔ Q1 : Subgroup G) : Set G))
     (hK1prime : ∃ p : ℕ, p.Prime ∧ Nat.card ↥K1 = p)
@@ -952,7 +952,7 @@ theorem false_of_kstar_condition_of_lt [Finite G]
     (hDq' : q ∉ (Nat.card ↥(D.subgroupOf (D ⊔ Q1))).primeFactors)
     (hcopZ : ∀ k ∈ K1, Nat.Coprime (Nat.card ↥(Subgroup.zpowers k)) (Nat.card ↥(D ⊔ Q1)))
     (hcopDQ1 : Nat.Coprime (Nat.card ↥D) (Nat.card ↥Q1))
-    (hsolvDQ1 : IsSolvable ↥(D ⊔ Q1)) (hPsolv : IsSolvable ↥(D ⊔ Q1 ⊔ K1))
+    (hsolvDQ1 : Group.IsSolvable ↥(D ⊔ Q1)) (hPsolv : Group.IsSolvable ↥(D ⊔ Q1 ⊔ K1))
     (hcond : Kstar ≤ Q0 ∨ ¬ Kstar ≤ Q1)
     (hcap : Q1 ⊓ Subgroup.centralizer (D : Set G) ≤ Q0) :
     False := by
@@ -963,9 +963,10 @@ theorem false_of_kstar_condition_of_lt [Finite G]
   have hcomm := commutator_le_Q0_of_fpf (q := q) hPsolv hPQ0 hK1DQ1 hK1prime hdisj hK1Q0disj
     (hQ0lt.trans_le le_sup_right) hQ1q hDq' hQ0DQ1 hFPF
   -- `Q₁ ≤ Q₀` (collapse), contradicting `Q₀ < Q₁`.
-  haveI := hsolvDQ1
-  haveI hsolvQ1 : IsSolvable ↥Q1 :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective (le_sup_right : Q1 ≤ D ⊔ Q1))
+  have := hsolvDQ1
+  have hsolvQ1 : Group.IsSolvable ↥Q1 :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective
+        (le_sup_right : Q1 ≤ D ⊔ Q1))
   have hle := le_of_commutator_le_of_inf_centralizer_le hQ0lt.le hDnormQ1
     (le_sup_right.trans hDQ1Q0) (le_sup_left.trans hDQ1Q0) hcomm hcopDQ1 (Or.inr hsolvQ1) hcap
   exact absurd (lt_of_lt_of_le hQ0lt hle) (lt_irrefl Q0)
@@ -992,7 +993,7 @@ theorem kstar_le_Q1_of_inputs [Finite G]
     (hDq' : q ∉ (Nat.card ↥(D.subgroupOf (D ⊔ Q1))).primeFactors)
     (hcopZ : ∀ k ∈ K1, Nat.Coprime (Nat.card ↥(Subgroup.zpowers k)) (Nat.card ↥(D ⊔ Q1)))
     (hcopDQ1 : Nat.Coprime (Nat.card ↥D) (Nat.card ↥Q1))
-    (hsolvDQ1 : IsSolvable ↥(D ⊔ Q1)) (hPsolv : IsSolvable ↥(D ⊔ Q1 ⊔ K1))
+    (hsolvDQ1 : Group.IsSolvable ↥(D ⊔ Q1)) (hPsolv : Group.IsSolvable ↥(D ⊔ Q1 ⊔ K1))
     (hcap : Q1 ⊓ Subgroup.centralizer (D : Set G) ≤ Q0) :
     ¬ Kstar ≤ Q0 ∧ Kstar ≤ Q1 := by
   have hkey : ¬ (Kstar ≤ Q0 ∨ ¬ Kstar ≤ Q1) := fun hcond =>
@@ -1022,7 +1023,7 @@ theorem Q1_eq_Q_of_inputs [Finite G]
     (hK1prime : ∃ p : ℕ, p.Prime ∧ Nat.card ↥K1 = p)
     (hQ_pg : IsPGroup q Q) (hD_q' : q ∉ (Nat.card ↥D).primeFactors)
     (hcopZ : ∀ k ∈ K1, Nat.Coprime (Nat.card ↥(Subgroup.zpowers k)) (Nat.card ↥(D ⊔ Q)))
-    (hcopDQ : Nat.Coprime (Nat.card ↥D) (Nat.card ↥Q)) (hsolv : IsSolvable ↥(D ⊔ Q ⊔ K1))
+    (hcopDQ : Nat.Coprime (Nat.card ↥D) (Nat.card ↥Q)) (hsolv : Group.IsSolvable ↥(D ⊔ Q ⊔ K1))
     (hcap : Q ⊓ Subgroup.centralizer (D : Set G) ≤ Q1)
     (hQM : Q ≤ M) (hMnormQ : M ≤ Subgroup.normalizer (Q : Set G))
     (hDM : D ≤ M) (hK1M : K1 ≤ M)
@@ -1052,17 +1053,17 @@ theorem Q1_eq_Q_of_inputs [Finite G]
     fun k hk => (hcopZ k hk).coprime_dvd_right (Subgroup.card_dvd_of_le (sup_le_sup_left hQ2Q D))
   have hcopDQ2 : Nat.Coprime (Nat.card ↥D) (Nat.card ↥Q2) :=
     hcopDQ.coprime_dvd_right (Subgroup.card_dvd_of_le hQ2Q)
-  haveI := hsolv
-  have hsolv2 : IsSolvable ↥(D ⊔ Q2) :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective
+  have := hsolv
+  have hsolv2 : Group.IsSolvable ↥(D ⊔ Q2) :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective
       ((sup_le_sup_left hQ2Q D).trans (le_sup_left : D ⊔ Q ≤ D ⊔ Q ⊔ K1)))
-  have hPsolv2 : IsSolvable ↥(D ⊔ Q2 ⊔ K1) :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective
+  have hPsolv2 : Group.IsSolvable ↥(D ⊔ Q2 ⊔ K1) :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective
       (sup_le_sup_right (sup_le_sup_left hQ2Q D) K1))
   have hcap2 : Q2 ⊓ Subgroup.centralizer (D : Set G) ≤ Q1 := (inf_le_inf_right _ hQ2Q).trans hcap
-  haveI : (Q1.subgroupOf (D ⊔ Q2)).Normal :=
+  have : (Q1.subgroupOf (D ⊔ Q2)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQ1DQ2).mpr hDQ2normQ1
-  haveI : (Q2.subgroupOf (D ⊔ Q2)).Normal :=
+  have : (Q2.subgroupOf (D ⊔ Q2)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer le_sup_right).mpr
       (sup_le hDnormQ2 Subgroup.le_normalizer)
   exact false_of_kstar_condition_of_lt hprime_manner hKstarQ hKstar_prime hDQ2Mσ hQ2Q hQ1DQ2
@@ -1111,10 +1112,11 @@ theorem chiefFactor_Q0_normal_minimal_of_inputs [Finite G]
   set Mσ : Subgroup G := OddOrder.BG.Ch3.S10.Msigma M with hMσ
   set Q0 : Subgroup G := Q ⊓ Subgroup.centralizer (D : Set G) with hQ0def
   have hMσM : Mσ ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-  haveI : IsSolvable ↥Mσ := solvable_of_solvable_injective (Subgroup.inclusion_injective hMσM)
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥Mσ :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective hMσM)
   have hQpg : IsPGroup q ↥Q := by rw [hQ]; exact isPGroup_opiCoreInG_singleton M
-  haveI hQnil : Group.IsNilpotent ↥Q := hQpg.isNilpotent
+  have hQnil : Group.IsNilpotent ↥Q := hQpg.isNilpotent
   have hDM : D ≤ M := hDMσ.trans hMσM
   have hQM : Q ≤ M := hQMσ.trans hMσM
   -- `Q ⊔ D = M_σ` (complement), so `M_σ` not nilpotent gives `Q₀ = C_Q(D) ⊊ Q`.
@@ -1137,7 +1139,7 @@ theorem chiefFactor_Q0_normal_minimal_of_inputs [Finite G]
   have hprime := actsPrimeManner_of_typeP hG hM hP1.1 hKM hK hKstar
   have hKcard1 : Nat.card ↥K ≠ 1 := fun hc => hKne (Subgroup.card_eq_one.mp hc)
   obtain ⟨r, hr_prime, hr_dvd⟩ := Nat.exists_prime_and_dvd hKcard1
-  haveI : Fact r.Prime := ⟨hr_prime⟩
+  have : Fact r.Prime := ⟨hr_prime⟩
   obtain ⟨c, hc_ord⟩ := exists_prime_orderOf_dvd_card' (G := ↥K) r hr_dvd
   set K1 : Subgroup G := Subgroup.zpowers (c : G) with hK1
   have hcK : (c : G) ∈ K := c.2
@@ -1208,16 +1210,16 @@ theorem chiefFactor_Q0_normal_minimal_of_inputs [Finite G]
       (Subgroup.card_dvd_of_le (le_trans hDQ1Mσ le_rfl))
   have hcopDQ1 : Nat.Coprime (Nat.card ↥D) (Nat.card ↥Q1) :=
     hcopDQ.coprime_dvd_right (Subgroup.card_dvd_of_le hQ1Q)
-  have hsolvDQ1 : IsSolvable ↥(D ⊔ Q1) :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective (hDQ1Mσ.trans hMσM))
-  have hPsolvQ1 : IsSolvable ↥(D ⊔ Q1 ⊔ K1) :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective
+  have hsolvDQ1 : Group.IsSolvable ↥(D ⊔ Q1) :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective (hDQ1Mσ.trans hMσM))
+  have hPsolvQ1 : Group.IsSolvable ↥(D ⊔ Q1 ⊔ K1) :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective
       (sup_le (hDQ1Mσ.trans hMσM) hK1M))
   have hcapQ1 : Q1 ⊓ Subgroup.centralizer (D : Set G) ≤ Q0 := by
     rw [hQ0def]; exact inf_le_inf_right _ hQ1Q
-  haveI hQ0normDQ1 : (Q0.subgroupOf (D ⊔ Q1)).Normal :=
+  have hQ0normDQ1 : (Q0.subgroupOf (D ⊔ Q1)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQ0DQ1).mpr hDQ1Q0
-  haveI hQ1normDQ1 : (Q1.subgroupOf (D ⊔ Q1)).Normal :=
+  have hQ1normDQ1 : (Q1.subgroupOf (D ⊔ Q1)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer (le_sup_right)).mpr
       (sup_le hDnormQ1 Subgroup.le_normalizer)
   -- `¬ K* ≤ Q₀` and `K* ≤ Q₁`.
@@ -1228,8 +1230,8 @@ theorem chiefFactor_Q0_normal_minimal_of_inputs [Finite G]
   have hcopZQ : ∀ k ∈ K1, Nat.Coprime (Nat.card ↥(Subgroup.zpowers k)) (Nat.card ↥(D ⊔ Q)) :=
     fun k hk => (hcopKMσ k (hK1K hk)).coprime_dvd_right
       (Subgroup.card_dvd_of_le (hDQMσ.trans le_rfl))
-  have hsolvDQK1 : IsSolvable ↥(D ⊔ Q ⊔ K1) :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective
+  have hsolvDQK1 : Group.IsSolvable ↥(D ⊔ Q ⊔ K1) :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective
       (sup_le (hDQMσ.trans hMσM) hK1M))
   have hcapQ : Q ⊓ Subgroup.centralizer (D : Set G) ≤ Q1 := by rw [← hQ0def]; exact hQ0Q1.le
   have hQ1eqQ : Q1 = Q :=
@@ -1269,13 +1271,13 @@ the chief factor `Q/Q₀` is elementary abelian (and nontrivial).
 
 Proof: the image `E = Q/Q₀` of `Q` in the solvable quotient `M/Q₀` is a *minimal normal* subgroup —
 the lattice-minimality `hmin` transfers along the correspondence `comap (mk' Q₀)` — so by Isaacs
-Theorem 3.11 (`solvable_minimal_normal_isElementaryAbelian`) it is elementary abelian for some
+Theorem 3.11 (`minimal_normal_isElementaryAbelian_of_isSolvable`) it is elementary abelian for some
 prime; the first isomorphism theorem (`quotientKerEquivRange` of `↥Q → M/Q₀`) identifies `E` with
 `↥Q ⧸ Q₀.subgroupOf Q`, and as a quotient of the `q`-group `Q` that prime is `q`.
 
 Discharges the `hEA`/`hNT` hypotheses of `chiefFactor_card_and_commutator_of_inputs`. -/
 theorem isElementaryAbelian_chiefFactor_of_minimalNormal [Finite G]
-    {M Q Q0 : Subgroup G} {q : ℕ} [Fact q.Prime] [IsSolvable ↥M] [(Q0.subgroupOf Q).Normal]
+    {M Q Q0 : Subgroup G} {q : ℕ} [Fact q.Prime] [Group.IsSolvable ↥M] [(Q0.subgroupOf Q).Normal]
     (hQ0Q : Q0 < Q) (hQM : Q ≤ M) (hQpg : IsPGroup q ↥Q)
     (hMnormQ : M ≤ Subgroup.normalizer (Q : Set G))
     (hMnormQ0 : M ≤ Subgroup.normalizer (Q0 : Set G))
@@ -1284,13 +1286,13 @@ theorem isElementaryAbelian_chiefFactor_of_minimalNormal [Finite G]
       Nontrivial (↥Q ⧸ Q0.subgroupOf Q) := by
   classical
   have hQ0M : Q0 ≤ M := hQ0Q.le.trans hQM
-  haveI hQ0nM : (Q0.subgroupOf M).Normal :=
+  have hQ0nM : (Q0.subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQ0M).mpr hMnormQ0
-  haveI hQnM : (Q.subgroupOf M).Normal :=
+  have hQnM : (Q.subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQM).mpr hMnormQ
   -- `Nontrivial Q̄` (`Q₀ < Q`).
   obtain ⟨x0, hx0Q, hx0Q0⟩ := (SetLike.lt_iff_le_and_exists.mp hQ0Q).2
-  haveI hNT : Nontrivial (↥Q ⧸ Q0.subgroupOf Q) := by
+  have hNT : Nontrivial (↥Q ⧸ Q0.subgroupOf Q) := by
     refine ⟨QuotientGroup.mk ⟨x0, hx0Q⟩, 1, ?_⟩
     rw [Ne, QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf]
     exact hx0Q0
@@ -1313,7 +1315,7 @@ theorem isElementaryAbelian_chiefFactor_of_minimalNormal [Finite G]
       exact hQ0Q.ne (le_antisymm hQ0Q.le hQle)
     · -- minimality via the correspondence.
       intro N' hN'norm hN'E
-      haveI := hN'norm
+      have := hN'norm
       set N'' : Subgroup ↥M := Subgroup.comap (QuotientGroup.mk' N0) N' with hN''def
       have hN0N'' : N0 ≤ N'' := QuotientGroup.le_comap_mk' N0 N'
       have hN''QM : N'' ≤ Q.subgroupOf M := by
@@ -1348,7 +1350,7 @@ theorem isElementaryAbelian_chiefFactor_of_minimalNormal [Finite G]
         rw [hN'eq, hN''QMeq, hEdef]
   -- elementary abelian for some prime `p`.
   obtain ⟨p, hp_prime, hEAp⟩ :=
-    OddOrder.Isaacs.Ch03.solvable_minimal_normal_isElementaryAbelian hEmin
+    OddOrder.Isaacs.Ch03.minimal_normal_isElementaryAbelian_of_isSolvable hEmin
   -- the first isomorphism `↥Q ⧸ Q₀ ≃* ↥E`.
   set f : ↥Q →* (↥M ⧸ N0) := (QuotientGroup.mk' N0).comp (Subgroup.inclusion hQM) with hfdef
   have hfker : f.ker = Q0.subgroupOf Q := by
@@ -1366,8 +1368,8 @@ theorem isElementaryAbelian_chiefFactor_of_minimalNormal [Finite G]
     OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv e.symm hEAp
   have hpgp : IsPGroup p (↥Q ⧸ Q0.subgroupOf Q) := hEAp'.isPGroup
   have hpgq : IsPGroup q (↥Q ⧸ Q0.subgroupOf Q) := hQpg.to_quotient (Q0.subgroupOf Q)
-  haveI : Finite (↥Q ⧸ Q0.subgroupOf Q) := inferInstance
-  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have : Finite (↥Q ⧸ Q0.subgroupOf Q) := inferInstance
+  have : Fact p.Prime := ⟨hp_prime⟩
   have hpq : p = q := by
     obtain ⟨a, ha⟩ := hpgp.exists_card_eq
     obtain ⟨b, hb⟩ := hpgq.exists_card_eq
@@ -1406,13 +1408,13 @@ theorem mem_centralizer_of_centralizes_quotient [Finite G]
     (hQQ0 : Q ≤ Subgroup.normalizer (Q0 : Set G))
     (hDQ0 : D ≤ Subgroup.normalizer (Q0 : Set G))
     (hcop : Nat.Coprime (Nat.card ↥D) (Nat.card ↥Q))
-    (hSolv : IsSolvable ↥D ∨ IsSolvable ↥Q)
+    (hSolv : Group.IsSolvable ↥D ∨ Group.IsSolvable ↥Q)
     {x : G} (hxQ : x ∈ Q) (hfix : ∀ d ∈ D, ⁅d, x⁆ ∈ Q0) :
     x ∈ Q0 := by
   have hQ0Q : Q0 ≤ Q := by rw [hQ0]; exact inf_le_left
   set φ : ↥D →* MulAut ↥Q :=
     (Subgroup.normalizerMonoidHom Q).comp (Subgroup.inclusion hDQ) with hφ
-  haveI hQ0_normal : (Q0.subgroupOf Q).Normal :=
+  have hQ0_normal : (Q0.subgroupOf Q).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQ0Q).mpr hQQ0
   -- `Q₀.subgroupOf Q` is `D`-invariant.
   have hMinv : OddOrder.Isaacs.Ch03.IsAInvariant φ (Q0.subgroupOf Q) := by

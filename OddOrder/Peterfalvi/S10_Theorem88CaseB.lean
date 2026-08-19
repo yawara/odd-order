@@ -114,8 +114,8 @@ theorem normalizer_V_of_isTISubset {A B : Subgroup G} (hcyc : IsCyclic ↥(A ⊔
     ∀ X : Set G, X.Nonempty →
       X ⊆ ((A ⊔ B : Subgroup G) : Set G) \ ((A : Set G) ∪ (B : Set G)) →
       Subgroup.normalizer X = A ⊔ B := by
-  haveI := hcyc
-  letI : CommGroup ↥(A ⊔ B) := IsCyclic.commGroup
+  have := hcyc
+  let : CommGroup ↥(A ⊔ B) := IsCyclic.commGroup
   refine fun X hX hXV => hTI.set_normalizer_eq_of_subset_of_commute Set.sdiff_subset ?_ hX hXV
   exact fun x hx y hy => congrArg Subtype.val (mul_comm (⟨x, hx⟩ : ↥(A ⊔ B)) ⟨y, hy⟩)
 
@@ -140,7 +140,7 @@ def V : Set G := (cb.W : Set G) \ ((cb.W1 : Set G) ∪ (cb.W2 : Set G))
 /-- `V = W − (W₁ ∪ W₂)` is nonempty: a generator of the cyclic `W` lies in no proper subgroup,
 and both `W₁` and `W₂` are proper (if `W₁ = W` then `W₂ ≤ W₁`, so `W₂ = W₁ ⊓ W₂ = 1`). -/
 theorem V_nonempty : cb.V.Nonempty := by
-  haveI := cb.W_cyclic
+  have := cb.W_cyclic
   obtain ⟨g0, hg0⟩ := IsCyclic.exists_generator (α := ↥cb.W)
   -- A proper subgroup of `W` misses the generator.
   have hnot : ∀ A : Subgroup G, A ≤ cb.W → (cb.W : Set G) ⊆ (A : Set G) ∨ (g0 : G) ∉ A := by
@@ -169,8 +169,8 @@ theorem V_nonempty : cb.V.Nonempty := by
 /-- Decompose an element of `W = W₁ ⊔ W₂` as a product `a · b` with `a ∈ W₁`, `b ∈ W₂`.
 `W` is cyclic, hence abelian, so `Subgroup.mem_sup` applies inside `↥W`. -/
 theorem mem_W_decomp {x : G} (hx : x ∈ cb.W) : ∃ a ∈ cb.W1, ∃ b ∈ cb.W2, a * b = x := by
-  haveI := cb.W_cyclic
-  letI : CommGroup ↥cb.W := IsCyclic.commGroup
+  have := cb.W_cyclic
+  let : CommGroup ↥cb.W := IsCyclic.commGroup
   have hsup : cb.W1.subgroupOf cb.W ⊔ cb.W2.subgroupOf cb.W = ⊤ := by
     rw [← Subgroup.subgroupOf_sup cb.W1_le_W cb.W2_le_W, ← cb.W_eq, Subgroup.subgroupOf_self]
   have hmem : (⟨x, hx⟩ : ↥cb.W) ∈ cb.W1.subgroupOf cb.W ⊔ cb.W2.subgroupOf cb.W := by
@@ -193,7 +193,7 @@ theorem W2_le_derivedInG_S [Finite G] : cb.W2 ≤ derivedInG cb.S := by
   have hidx : ((derivedInG cb.S).subgroupOf cb.S).index = Nat.card ↥cb.W1 := by
     rw [cb.S_compl.symm.index_eq_card,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe cb.W1_le_S).toEquiv]
-  haveI : ((derivedInG cb.S).subgroupOf cb.S).Normal := by
+  have : ((derivedInG cb.S).subgroupOf cb.S).Normal := by
     rw [show (derivedInG cb.S).subgroupOf cb.S = commutator ↥cb.S from
       Subgroup.comap_map_eq_self_of_injective cb.S.subtype_injective _]
     infer_instance
@@ -272,13 +272,13 @@ complement `W₁` is chosen") together with (8.8.b1). -/
 theorem derivedInG_inf_centralizer_W1_eq [Finite G] (data : TypePData cb.S)
     (hW1 : data.W1 = cb.W1) :
     derivedInG cb.S ⊓ Subgroup.centralizer (cb.W1 : Set G) = cb.W2 := by
-  haveI := cb.W_cyclic
-  letI : CommGroup ↥cb.W := IsCyclic.commGroup
+  have := cb.W_cyclic
+  let : CommGroup ↥cb.W := IsCyclic.commGroup
   -- (8.4.d) with `M = S`: the intersection is the cyclic `W₂` of the type-`P` datum.
   have hkey : derivedInG cb.S ⊓ Subgroup.centralizer (cb.W1 : Set G) = data.W2 := by
     rw [← hW1]; exact data.derivedInG_inf_centralizer_W1_eq
-  haveI := data.W2_cyclic
-  letI : CommGroup ↥data.W2 := IsCyclic.commGroup
+  have := data.W2_cyclic
+  let : CommGroup ↥data.W2 := IsCyclic.commGroup
   -- `W₂ ⊆ C_{S'}(W₁)`: `W₂ ⊆ S'`, and `W₁`, `W₂` commute inside the abelian `W`.
   have hle1 : cb.W2 ≤ data.W2 := by
     rw [← hkey]

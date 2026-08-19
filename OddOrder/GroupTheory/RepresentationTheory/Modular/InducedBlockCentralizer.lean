@@ -121,7 +121,7 @@ theorem blockCharacter_toLinearMap_inducedBlockOfCentralizer (b : Block π hπ h
     (blockCharacter πG hπG hlinG
         (inducedBlockOfCentralizer x π hπ hlin πG hπG hlinG hnilG hp hx b)).toLinearMap
       = inducedCentralCharacter (centralizerOf x) (blockCharacter π hπ hlin b).toLinearMap := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   rw [inducedBlockOfCentralizer, inducedBlockOfNormalizer, inducedBlock,
     blockCharacter_blockOfCentralCharacter]
   exact inducedCentralCharacterAlgHom_toLinearMap π hπ hlin

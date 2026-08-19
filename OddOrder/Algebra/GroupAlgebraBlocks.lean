@@ -54,12 +54,12 @@ theorem exists_blockIdempotents_defectGroups_conj (k : Type*) [Field k] [IsAlgCl
         ∃ g : G, D = MulAut.conj g • D' := by
   classical
   obtain ⟨n, d, hd, π, hπ, -, hker⟩ := exists_algHom_pi_matrix_of_isAlgClosed k (MonoidAlgebra k G)
-  haveI : ∀ i, NeZero (d i) := hd
-  haveI : ∀ i, Nonempty (Fin (d i)) := fun i => ⟨0⟩
+  have : ∀ i, NeZero (d i) := hd
+  have : ∀ i, Nonempty (Fin (d i)) := fun i => ⟨0⟩
   set π' : MonoidAlgebra k G →+* ∀ i, Matrix (Fin (d i)) (Fin (d i)) k := π.toRingHom with hπ'def
   have hlin : ∀ (c : k) (a : MonoidAlgebra k G), π' (c • a) = c • π' a := fun c a => map_smul π c a
-  haveI : Finite (Block π' hπ hlin) := Quotient.finite _
-  haveI : Fintype (Block π' hπ hlin) := Fintype.ofFinite _
+  have : Finite (Block π' hπ hlin) := Quotient.finite _
+  have : Fintype (Block π' hπ hlin) := Fintype.ofFinite _
   -- The nil-kernel hypothesis of the block theory, from nilness of `ker π`.
   have hnil : ∀ x : Subalgebra.center k (MonoidAlgebra k G),
       blockCharacterPi π' hπ hlin x = 0 → IsNilpotent x := by
@@ -105,8 +105,8 @@ theorem exists_modularDatum (k : Type*) [Field k] [IsAlgClosed k] (G : Type*) [G
   classical
   obtain ⟨n, d, hd, π, hπ, hkerJ, hker⟩ :=
     exists_algHom_pi_matrix_of_isAlgClosed k (MonoidAlgebra k G)
-  haveI : ∀ i, NeZero (d i) := hd
-  haveI : ∀ i, Nonempty (Fin (d i)) := fun i => ⟨0⟩
+  have : ∀ i, NeZero (d i) := hd
+  have : ∀ i, Nonempty (Fin (d i)) := fun i => ⟨0⟩
   set π' : MonoidAlgebra k G →+* ∀ i, Matrix (Fin (d i)) (Fin (d i)) k := π.toRingHom with hπ'def
   have hlin : ∀ (c : k) (a : MonoidAlgebra k G), π' (c • a) = c • π' a := fun c a => map_smul π c a
   refine ⟨Fin n, inferInstance, fun i => Fin (d i), inferInstance, inferInstance, inferInstance,
@@ -132,7 +132,7 @@ theorem isNilpotent_of_blockCharacterPi_eq_zero {k : Type*} [Field k]
     (hkerJ : RingHom.ker π = Ring.jacobson A)
     (z : Subalgebra.center k A) (hz : MatrixModule.blockCharacterPi π hπ hlin z = 0) :
     IsNilpotent z := by
-  haveI : IsArtinianRing A := IsArtinianRing.of_finite k A
+  have : IsArtinianRing A := IsArtinianRing.of_finite k A
   obtain ⟨m, hm⟩ : IsNilpotent (Ring.jacobson A) := IsSemiprimaryRing.isNilpotent
   have hmem : (z : A) ∈ Ring.jacobson A := by
     rw [← hkerJ]

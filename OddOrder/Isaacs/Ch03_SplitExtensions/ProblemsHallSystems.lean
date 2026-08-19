@@ -60,7 +60,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 3C の形式化
 
 namespace OddOrder.Isaacs.Ch03
 
-open Subgroup
+open _root_.OddOrder.Isaacs.Ch03.Subgroup
 
 section /- 3C: Problem 3C.2 (p. 90) -/
 
@@ -417,7 +417,7 @@ private theorem inf_erase_mul_inf_erase {Hc : ℕ → Subgroup G}
 書籍 Hint のとおり: Hall E-定理 (`hall_E_exists`) で各素数 `q` の `q`-補元 `Hc q` を取り,
 `P p := ⋂_{q ∈ pf(|G|), q ≠ p} Hc q` と置くと, 3C.2 からこれが Sylow `p`-部分群で,
 `P p · P q = ⋂_{r ≠ p,q} Hc r = P q · P p` (`inf_erase_mul_inf_erase`) が可換性を与える。 -/
-theorem exists_isSylowSystem [IsSolvable G] :
+theorem exists_isSylowSystem [Group.IsSolvable G] :
     ∃ P : ℕ → Subgroup G, IsSylowSystem P := by
   classical
   choose Hc hHc using fun q : ℕ => hall_E_exists (G := G) ({q}ᶜ : Set ℕ)

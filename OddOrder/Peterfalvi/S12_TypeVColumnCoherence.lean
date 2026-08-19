@@ -373,7 +373,7 @@ theorem Hypothesis.SHC_tau_muColumnZero_sub_zeta [Finite G] {M : Subgroup G}
   -- `w₁ ≥ 3`, so the row `0` for the (10.10.4) α-pairing exists
   have h3 : (3 : ℕ) ≤ hyp.w1 :=
     (typePData_toTICyclicHypothesis hyp.typeP hodd).three_le_card_W1
-  haveI : NeZero hyp.w1 := ⟨by omega⟩
+  have : NeZero hyp.w1 := ⟨by omega⟩
   -- the (10.9) coherence-free σ-coefficients: `⟨ψ, ω_{ij'}^σ⟩ = [j' = 0]`
   have hψω : ∀ (i : Fin hyp.w1) (j' : Fin hyp.w2),
       ClassFunction.inner (hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ))
@@ -581,7 +581,7 @@ theorem Hypothesis.muColumnSum_sub_smul_zeta_support [Finite G]
   have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
     rw [derivedInG, Subgroup.subgroupOf,
       Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
-  haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
+  have hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
   have hζvanish : ∀ {w : ↥M}, w ∉ (derivedInG M).subgroupOf M → ζ w = 0 := fun {w} hw => by
     rw [hζeq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hw
   intro z hz

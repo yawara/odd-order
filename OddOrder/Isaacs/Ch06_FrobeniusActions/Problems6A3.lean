@@ -419,12 +419,12 @@ instance fact_prime_331 : Fact (Nat.Prime 331) := ⟨by norm_num⟩
 
 /-- `𝔽₃₃₁` の乗法群に位数 11 の元がある (`74`)。 -/
 theorem exists_orderOf_eq_eleven_zmod_331 : ∃ α : ZMod 331, orderOf α = 11 := by
-  haveI : Fact (Nat.Prime 11) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 11) := ⟨by norm_num⟩
   exact ⟨74, orderOf_eq_prime (by decide) (by decide)⟩
 
 /-- `𝔽₃₃₁` の乗法群に位数 5 の元がある (`64`)。 -/
 theorem exists_orderOf_eq_five_zmod_331 : ∃ ε : ZMod 331, orderOf ε = 5 := by
-  haveI : Fact (Nat.Prime 5) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 5) := ⟨by norm_num⟩
   exact ⟨64, orderOf_eq_prime (by decide) (by decide)⟩
 
 /-- **Isaacs Problem 6A.3** (p. 185) ⭐ 書籍の主張そのもの: 位数 `5²·11` の**非巡回**群で

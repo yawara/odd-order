@@ -127,10 +127,10 @@ namespace CyclotomicModEq
 theorem add_pow_prime_pow [CharZero K] (hω : IsIntegral ℤ ω) (hp : p.Prime) {x y : K}
     (hx : x ∈ Algebra.adjoin ℤ ({ω} : Set K)) (hy : y ∈ Algebra.adjoin ℤ ({ω} : Set K)) (s : ℕ) :
     CyclotomicModEq ω p ((x + y) ^ p ^ s) (x ^ p ^ s + y ^ p ^ s) := by
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : CharP (↥(Algebra.adjoin ℤ ({ω} : Set K)) ⧸ adjoinPrimeIdeal ω p) p :=
+  have : Fact p.Prime := ⟨hp⟩
+  have : CharP (↥(Algebra.adjoin ℤ ({ω} : Set K)) ⧸ adjoinPrimeIdeal ω p) p :=
     charP_quotient_adjoinPrimeIdeal hω
-  haveI : ExpChar (↥(Algebra.adjoin ℤ ({ω} : Set K)) ⧸ adjoinPrimeIdeal ω p) p :=
+  have : ExpChar (↥(Algebra.adjoin ℤ ({ω} : Set K)) ⧸ adjoinPrimeIdeal ω p) p :=
     ExpChar.prime hp
   have hxy : (x + y) ^ p ^ s ∈ Algebra.adjoin ℤ ({ω} : Set K) :=
     Subalgebra.pow_mem _ (Subalgebra.add_mem _ hx hy) _
@@ -147,8 +147,8 @@ theorem add_pow_prime_pow [CharZero K] (hω : IsIntegral ℤ ω) (hp : p.Prime) 
 /-- **Fermat** modulo `p · ℤ[ω]`. -/
 theorem natCast_pow_prime_pow [CharZero K] (hω : IsIntegral ℤ ω) (hp : p.Prime) (n s : ℕ) :
     CyclotomicModEq ω p ((n : K) ^ p ^ s) (n : K) := by
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : CharP (↥(Algebra.adjoin ℤ ({ω} : Set K)) ⧸ adjoinPrimeIdeal ω p) p :=
+  have : Fact p.Prime := ⟨hp⟩
+  have : CharP (↥(Algebra.adjoin ℤ ({ω} : Set K)) ⧸ adjoinPrimeIdeal ω p) p :=
     charP_quotient_adjoinPrimeIdeal hω
   have hn : (n : K) ∈ Algebra.adjoin ℤ ({ω} : Set K) := Subalgebra.natCast_mem _ _
   have hnp : (n : K) ^ p ^ s ∈ Algebra.adjoin ℤ ({ω} : Set K) := Subalgebra.pow_mem _ hn _

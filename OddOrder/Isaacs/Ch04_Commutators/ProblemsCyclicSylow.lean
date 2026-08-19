@@ -79,7 +79,7 @@ theorem centralizer_oPiCore_eq (p : ℕ) [Ch03.IsPiSeparable ({p} : Set ℕ) G]
   intro x hx
   rw [Subgroup.mem_centralizer_iff]
   intro y hy
-  letI := hcyc.commGroup
+  let := hcyc.commGroup
   have := mul_comm (⟨y, hy⟩ : ↥(Ch03.oPiCore ({p} : Set ℕ) G)) ⟨x, hx⟩
   exact congrArg Subtype.val this
 
@@ -117,7 +117,7 @@ theorem exists_sylow_coe_eq_oPiCore_of_isCyclic (p : ℕ) [Fact p.Prime]
     Ch03.Subgroup.isPiGroup_singleton_iff_isPGroup.mp (Ch03.oPiCore.isPiGroup ({p} : Set ℕ))
   obtain ⟨Q, hQ⟩ := hOp.exists_le_sylow
   have hcomm := commutator_le_oPiCore_of_isCyclic p hp' hcyc
-  haveI hQnormal : (Q : Subgroup G).Normal := by
+  have hQnormal : (Q : Subgroup G).Normal := by
     rw [← Subgroup.normalizer_eq_top_iff]
     refine top_le_iff.mp (le_normalizer_of_commutator_le ?_)
     refine le_trans (Subgroup.commutator_mono le_top le_rfl) (hcomm.trans hQ)
@@ -131,7 +131,7 @@ theorem exists_sylow_coe_eq_oPiCore_of_isCyclic (p : ℕ) [Fact p.Prime]
 theorem exists_orderOf_eq_prime_of_ne_bot {P : Type*} [Group P] [Finite P] {p : ℕ}
     [Fact p.Prime] (hP : IsPGroup p P) {N : Subgroup P} (hN : N ≠ ⊥) :
     ∃ x : P, x ∈ N ∧ orderOf x = p := by
-  haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN
+  have : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN
   obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := p) (G := ↥N)).mp (hP.to_subgroup N)
   have hk0 : k ≠ 0 := by
     rintro rfl
@@ -140,7 +140,7 @@ theorem exists_orderOf_eq_prime_of_ne_bot {P : Type*} [Group P] [Finite P] {p : 
   have hdvd : p ∣ Nat.card ↥N := by
     rw [hk]
     exact dvd_pow_self p hk0
-  haveI : Fintype ↥N := Fintype.ofFinite _
+  have : Fintype ↥N := Fintype.ofFinite _
   have hdvd' : p ∣ Fintype.card ↥N := by rwa [← Nat.card_eq_fintype_card]
   obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card (G := ↥N) p hdvd'
   have hne : (x : P) ≠ 1 := by
@@ -213,7 +213,7 @@ theorem le_centralizer_of_isCyclic_of_exists_fixed {p : ℕ} [Fact p.Prime]
     (hKcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥P))
     {x : G} (hxP : x ∈ P) (hxne : x ≠ 1) (hxfix : ∀ k ∈ K, k * x * k⁻¹ = x) :
     K ≤ Subgroup.centralizer (P : Set G) := by
-  letI : CommGroup ↥P := hcyc.commGroup
+  let : CommGroup ↥P := hcyc.commGroup
   set ψ : ↥K →* MulAut ↥P := (MulAut.conjNormal (H := P)).comp K.subtype with hψ
   have hbot := fixedPoints_inf_actionCommutator_eq_bot_of_abelian ψ hKcop
   have hfixne : Subgroup.fixedPointsOfMulAut ψ ≠ ⊥ := by
@@ -261,14 +261,14 @@ theorem eq_bot_of_oPiCore_compl_eq_bot (p : ℕ) [Fact p.Prime]
     Ch03.Subgroup.isPiGroup_singleton_iff_isPGroup.mp (Ch03.oPiCore.isPiGroup ({p} : Set ℕ))
   have hOcyc : IsCyclic ↥(Ch03.oPiCore ({p} : Set ℕ) G) := by
     obtain ⟨Q, hQ⟩ := hOp.exists_le_sylow
-    haveI := hcyc Q
+    have := hcyc Q
     exact isCyclic_of_surjective
       (Subgroup.subgroupOfEquivOfLe hQ).toMonoidHom (Equiv.surjective _)
   -- `P := O_p(G)` は正規 Sylow
   obtain ⟨P, hP⟩ := exists_sylow_coe_eq_oPiCore_of_isCyclic p hp' hOcyc
-  haveI hPnormal : (P : Subgroup G).Normal := by rw [hP]; infer_instance
+  have hPnormal : (P : Subgroup G).Normal := by rw [hP]; infer_instance
   -- `p ∣ |N_G(K)|` から位数 `p` の元 `x ∈ N_G(K)`
-  haveI : Fintype ↥(Subgroup.normalizer (K : Set G)) := Fintype.ofFinite _
+  have : Fintype ↥(Subgroup.normalizer (K : Set G)) := Fintype.ofFinite _
   obtain ⟨x₀, hx₀⟩ := exists_prime_orderOf_dvd_card
     (G := ↥(Subgroup.normalizer (K : Set G))) p (by rwa [← Nat.card_eq_fintype_card])
   set x : G := (x₀ : G) with hxdef
@@ -293,12 +293,12 @@ theorem eq_bot_of_oPiCore_compl_eq_bot (p : ℕ) [Fact p.Prime]
       rw [IsPGroup.iff_card, Nat.card_zpowers, hxo]
       exact ⟨1, (pow_one p).symm⟩
     obtain ⟨Q, hQ⟩ := hzp.exists_le_sylow
-    haveI := Sylow.unique_of_normal P hPnormal
+    have := Sylow.unique_of_normal P hPnormal
     have hQP : Q = P := Subsingleton.elim Q P
     rw [hQP] at hQ
     exact hQ (Subgroup.mem_zpowers x)
   -- `⟨x⟩ ⊴ G`
-  haveI hzn : (Subgroup.zpowers x).Normal := by
+  have hzn : (Subgroup.zpowers x).Normal := by
     refine normal_of_le_of_isCyclic (P := (P : Subgroup G)) ?_ ?_
     · rw [hP]; exact hOcyc
     · exact (Subgroup.zpowers_le).mpr hxP
@@ -406,7 +406,7 @@ theorem le_oPiCore_compl_of_sylow_isCyclic (p : ℕ) [Fact p.Prime]
       (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩)
     exact this rfl
   -- 位数 `p` の `x ∈ N_G(K)`
-  haveI : Fintype ↥(Subgroup.normalizer (K : Set G)) := Fintype.ofFinite _
+  have : Fintype ↥(Subgroup.normalizer (K : Set G)) := Fintype.ofFinite _
   obtain ⟨x₀, hx₀⟩ := exists_prime_orderOf_dvd_card
     (G := ↥(Subgroup.normalizer (K : Set G))) p (by rwa [← Nat.card_eq_fintype_card])
   have hxN : (x₀ : G) ∈ Subgroup.normalizer (K : Set G) := x₀.2

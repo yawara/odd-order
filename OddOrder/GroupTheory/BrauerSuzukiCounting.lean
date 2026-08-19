@@ -141,7 +141,7 @@ theorem sum_degWeight_inner_eq_zero
           / (χ : ClassFunction G ℂ) 1)
           * ClassFunction.inner Q.thetaStar (χ : ClassFunction G ℂ) = 0 := by
   classical
-  haveI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  have : Fintype (ConjClasses G) := Fintype.ofFinite _
   rw [← Q.sum_classSumCoeff_thetaStar_eq_zero]
   -- rewrite `⟨θ*, χ⟩` as the weighted class sum, then swap the order of summation
   rw [Finset.sum_congr rfl fun χ _ => by
@@ -235,8 +235,8 @@ theorem lem_1_9
     [Invertible (Nat.card ↥(Q.C.subgroupOf Q.N) : ℂ)] :
     ∃ χ : IrreducibleCharacter G, (∃ d : ℕ, 2 ≤ d ∧ (χ : ClassFunction G ℂ) 1 = (d : ℂ)) ∧
       ∀ u : G, orderOf u = 2 → (χ : ClassFunction G ℂ) u = (χ : ClassFunction G ℂ) 1 := by
-  haveI : Fintype G := Fintype.ofFinite _
-  haveI : Fintype ↥Q.N := Fintype.ofFinite _
+  have : Fintype G := Fintype.ofFinite _
+  have : Fintype ↥Q.N := Fintype.ofFinite _
   obtain ⟨χ₁, χ, _, _, _, hdecomp, hdeg⟩ := Q.thetaStar_decomposition
   have h18 := Q.lem_1_8_relation hdecomp
   set u₀ := Q.involutionClass.out with hu₀

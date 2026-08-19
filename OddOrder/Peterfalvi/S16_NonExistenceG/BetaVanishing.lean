@@ -162,7 +162,7 @@ theorem W2conj_le_normalizer_U_of_LHypothesis
       Ldata.typeI_data.frobenius.complement.map (Ldata.typeI_data.L).subtype) :
     (MulAut.conj y • hyp.base.W2 : Subgroup G) ≤
       Subgroup.normalizer (hyp.base.U : Set G) := by
-  haveI : (hyp.base.U.subgroupOf Ldata.H).Characteristic := hchar
+  have : (hyp.base.U.subgroupOf Ldata.H).Characteristic := hchar
   have hU_le_H : hyp.base.U ≤ Ldata.H := by
     rw [← Ldata.typeI_data_H_eq]; exact Ldata.typeI_data.U_le_H
   intro a ha
@@ -293,7 +293,7 @@ theorem field_normalizer_of_U_characteristic [Finite G]
 so `K` is characteristic.  Used for the (14.12) `L ≅ M` case where `H` is cyclic. -/
 theorem characteristic_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCyclic C]
     (K : Subgroup C) : K.Characteristic := by
-  letI : CommGroup C := IsCyclic.commGroup
+  let : CommGroup C := IsCyclic.commGroup
   have key : ∀ A : Subgroup C, A = (powMonoidHom (Nat.card A) : C →* C).ker := by
     intro A
     have hle : A ≤ (powMonoidHom (Nat.card A) : C →* C).ker := by
@@ -326,12 +326,12 @@ theorem V_cyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hncH0C : OddOrder.Peterfalvi.S13.H0CNoncoherenceRefuter G)
     (hyp : Hypothesis (G := G)) : IsCyclic ↥hyp.base.V := by
-  letI : Fact hyp.base.q.Prime := ⟨hyp.base.q_prime⟩
-  haveI : NeZero hyp.base.q := ⟨hyp.base.q_prime.ne_zero⟩
-  haveI hTII : IsTypeII hyp.base.T := T_typeII hG hnoV hncH0C hyp
+  let : Fact hyp.base.q.Prime := ⟨hyp.base.q_prime⟩
+  have : NeZero hyp.base.q := ⟨hyp.base.q_prime.ne_zero⟩
+  have hTII : IsTypeII hyp.base.T := T_typeII hG hnoV hncH0C hyp
   have hQea : IsElementaryAbelian hyp.base.q ↥hyp.base.Q := Q_elemAbelian_S hG hnoV hncH0C hyp
-  haveI hQcomm : IsMulCommutative ↥hyp.base.Q := IsMulCommutative.of_comm hQea.comm
-  letI hVcomm : CommGroup ↥hyp.base.V :=
+  have hQcomm : IsMulCommutative ↥hyp.base.Q := IsMulCommutative.of_comm hQea.comm
+  let hVcomm : CommGroup ↥hyp.base.V :=
     { (inferInstance : Group ↥hyp.base.V) with
       mul_comm := fun a b =>
         (isMulCommutative_iff.mp
@@ -351,7 +351,7 @@ theorem V_cyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     apply Additive.toMul.injective
     rw [toMul_nsmul, toMul_zero]
     exact hQea.pow_eq_one x.toMul
-  haveI hQmod : Module (ZMod hyp.base.q) (Additive ↥hyp.base.Q) :=
+  have hQmod : Module (ZMod hyp.base.q) (Additive ↥hyp.base.Q) :=
     AddCommGroup.zmodModule hqsmul
   -- the conjugation representation of `V` on `Additive ↥Q`
   let conjHom : ↥hyp.base.V →* MulAut ↥hyp.base.Q :=
@@ -361,7 +361,7 @@ theorem V_cyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (OddOrder.BG.Ch1_Preliminary.mulAutToEnd ↥hyp.base.Q hyp.base.q).comp conjHom
   have hρ_apply : ∀ (c : ↥hyp.base.V) (a : Additive ↥hyp.base.Q),
       ρ c a = Additive.ofMul ((conjHom c) (Additive.toMul a)) := fun _ _ => rfl
-  letI hQmodAlg :
+  let hQmodAlg :
       Module (MonoidAlgebra (ZMod hyp.base.q) ↥hyp.base.V) (Additive ↥hyp.base.Q) :=
     Module.compHom (Additive ↥hyp.base.Q) (ρ.asAlgebraHom).toRingHom
   have hof_smul : ∀ (c : ↥hyp.base.V) (a : Additive ↥hyp.base.Q),
@@ -372,7 +372,7 @@ theorem V_cyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       change (ρ.asAlgebraHom (MonoidAlgebra.of (ZMod hyp.base.q) ↥hyp.base.V c)) a = ρ c a
       rw [Representation.asAlgebraHom_of]
     rw [h, hρ_apply]
-  haveI hNeZero : NeZero (Nat.card ↥hyp.base.V : ZMod hyp.base.q) := by
+  have hNeZero : NeZero (Nat.card ↥hyp.base.V : ZMod hyp.base.q) := by
     refine ⟨fun h => ?_⟩
     rw [hv_full] at h
     have hdvd : hyp.base.q ∣ (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) :=
@@ -456,7 +456,7 @@ theorem H_cyclic_of_L_conj_M [Finite G]
     (_hconj : ∃ g : G, MulAut.conj g • Ldata.L = Mdata.M) :
     IsCyclic ↥Ldata.H := by
   obtain ⟨g, hg⟩ := _hconj
-  haveI := MHypothesis_kernel_cyclic _hG hnoV hncH0C hyp Mdata
+  have := MHypothesis_kernel_cyclic _hG hnoV hncH0C hyp Mdata
   rw [Ldata.H_eq_LF]
   -- `M_F` is the `conj g`-image of `L_F`: `conj g • L_F = (conj g • L)_F = M_F = K`.
   have hmap : (maxNilpotentNormalHall Ldata.L).map ((MulAut.conj g : MulAut G) : G →* G)
@@ -480,7 +480,7 @@ theorem field_normalizer_of_L_conj_M [Finite G]
     (Ldata : LHypothesis hyp) (Mdata : MHypothesis hyp)
     (hconj : ∃ g : G, MulAut.conj g • Ldata.L = Mdata.M) :
     Nonempty (FieldNormalizerData hyp) := by
-  haveI : IsCyclic ↥Ldata.H := H_cyclic_of_L_conj_M hG hnoV hncH0C hyp Ldata Mdata hconj
+  have : IsCyclic ↥Ldata.H := H_cyclic_of_L_conj_M hG hnoV hncH0C hyp Ldata Mdata hconj
   exact field_normalizer_of_U_characteristic hG hnoV hncH0C hyp Ldata
     (characteristic_of_isCyclic (hyp.base.U.subgroupOf Ldata.H))
 

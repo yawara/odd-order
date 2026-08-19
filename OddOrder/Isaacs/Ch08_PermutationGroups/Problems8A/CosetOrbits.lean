@@ -104,8 +104,8 @@ theorem two_mul_card_orbits_le_index [Finite G] [Finite Ω] [IsPretransitive G �
     (H : Subgroup G) (α : Ω) (hns : ∀ ω : Ω, ¬ (MulAction.stabilizer G ω ≤ H)) :
     2 * Nat.card (MulAction.orbitRel.Quotient H Ω) ≤ H.index := by
   classical
-  haveI : Fintype (G ⧸ H) := Fintype.ofFinite _
-  haveI : Fintype (MulAction.orbitRel.Quotient H Ω) := Fintype.ofFinite _
+  have : Fintype (G ⧸ H) := Fintype.ofFinite _
+  have : Fintype (MulAction.orbitRel.Quotient H Ω) := Fintype.ofFinite _
   have hfib : ∀ o : MulAction.orbitRel.Quotient H Ω,
       2 ≤ (Finset.univ.filter fun c => cosetToOrbit H α c = o).card := by
     intro o
@@ -179,7 +179,7 @@ lemma relIndex_stabilizer_eq_ncard_orbit (K : Subgroup G) (x : Ω) :
 lemma relIndex_stabilizer_eq_index [Finite Ω] [IsPretransitive G Ω] {H : Subgroup G}
     [IsPretransitive ↥H Ω] (α : Ω) :
     H.relIndex (MulAction.stabilizer G α) = H.index := by
-  haveI : Nonempty Ω := ⟨α⟩
+  have : Nonempty Ω := ⟨α⟩
   have hn : 0 < Nat.card Ω := Nat.card_pos
   have e1 : (MulAction.stabilizer G α).relIndex H * H.index
       = (H ⊓ MulAction.stabilizer G α).index := by

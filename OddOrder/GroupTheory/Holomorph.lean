@@ -85,8 +85,8 @@ theorem normal_iff_characteristic {K : Subgroup (Holomorph G)}
     have := hnormal.conj_mem _ hmem (inr σ)
     rwa [conj_inl] at this
   · intro hchar
-    haveI := hchar
-    haveI : (K.comap (inl : G →* Holomorph G)).Normal := inferInstance
+    have := hchar
+    have : (K.comap (inl : G →* Holomorph G)).Normal := inferInstance
     refine ⟨fun n hn y => ?_⟩
     obtain ⟨x, rfl⟩ := hK hn
     have hxK : x ∈ K.comap (inl : G →* Holomorph G) := hn

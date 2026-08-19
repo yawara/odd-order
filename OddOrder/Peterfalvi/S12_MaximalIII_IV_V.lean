@@ -136,7 +136,7 @@ theorem Hypothesis.sum_alignedOmegaSigma_zeroColumn_isReal [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     (hodd : Odd (Nat.card G)) :
     ClassFunction.IsReal (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   choose σ hσ using fun i => hyp.exists_rowInv_alignedOmegaSigma_conj hG hodd i
   have hbridge : ∀ X : ClassFunction G ℂ,
@@ -190,7 +190,7 @@ theorem Hypothesis.a_even_of_eq_inner_sumOmegaSigma [Finite G]
     {a : ℤ} (ha : (a : ℂ)
       = ClassFunction.inner (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) β) :
     Even a := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hωZ : (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) ∈ ZIrr G :=
     Submodule.sum_mem _ fun r _ => hyp.alignedOmegaSigmaGrid_mem_ZIrr hG hodd r 0
   have hωr := hyp.sum_alignedOmegaSigma_zeroColumn_isReal hG hodd
@@ -657,7 +657,7 @@ theorem Hypothesis.exists_coherentImage_SHC [Finite G] {M : Subgroup G}
       R.card = (Finset.univ.filter (fun χ : IrreducibleCharacter ↥M =>
         (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
           ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ))).card := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   set p : IrreducibleCharacter ↥M → Prop := fun χ =>
     (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
@@ -735,7 +735,7 @@ theorem Hypothesis.induce_derived_apply_one_eq_w1_mul [Finite G] {M : Subgroup G
         (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ)) (1 : ↥M)
       = (hyp.w1 : ℂ) * (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ)
           (1 : ↥((derivedInG M).subgroupOf M)) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hidx : ((derivedInG M).subgroupOf M).index = hyp.w1 :=
     hyp.typeP.card_W1_eq_derived_index.symm
   rw [ClassFunction.induce_apply_one, hidx]
@@ -755,7 +755,7 @@ theorem Hypothesis.muGrid_column_sum_apply_one_eq_qu [Finite G]
     (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i k) (1 : ↥M)
       = (((hyp.toTypesIIIIIIVSetup htype hnt).q *
           (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief).u : ℕ) : ℂ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   obtain ⟨hmem, hred⟩ :=
     hyp.muGrid_column_sum_mem_sOf_H0_and_reducible hG htype hnt chief k hk
   exact reducible_mem_sOf_H0_apply_one_eq_qu hG
@@ -781,12 +781,12 @@ theorem Hypothesis.exists_muGrid_column_eq_of_inducedFamily_reducible [Finite G]
     {y : ClassFunction ↥M ℂ} (hyS : y ∈ inducedFamily M)
     (hred : ¬ IsIrreducibleCharacter y) :
     ∃ k : Fin hyp.w2, k ≠ 0 ∧ y = ∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
-  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
-  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  have hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
   have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
   have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
   have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
@@ -794,7 +794,7 @@ theorem Hypothesis.exists_muGrid_column_eq_of_inducedFamily_reducible [Finite G]
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
   -- `y = Ind_{h.K} θ` (`h.K = M'` defeq), `θ ≠ 1`.
   obtain ⟨θ, hθne, hyeq⟩ := hyS
   rw [hyeq] at hred
@@ -848,7 +848,7 @@ theorem Hypothesis.inducedFamily_reducible_apply_one_eq_qu [Finite G]
     {y : ClassFunction ↥M ℂ} (hyS : y ∈ inducedFamily M) (hred : ¬ IsIrreducibleCharacter y) :
     y (1 : ↥M) = (((hyp.toTypesIIIIIIVSetup htype hnt).q *
         (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief).u : ℕ) : ℂ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hmem : y ∈ OddOrder.Peterfalvi.S11.sOf (hyp.toTypesIIIIIIVSetup htype hnt) chief.H0 := by
     -- (9.5)/(4.5.b) family identification: the reducible `inducedFamily`-member is a nonzero
     -- μ-column (`exists_muGrid_column_eq_of_inducedFamily_reducible`), which lies in `𝒮(H₀)`.
@@ -912,7 +912,7 @@ takes (with `X = S(HC)`, `Y = S₂`). -/
 theorem Hypothesis.SHCSet_inner_diff_eq_zero [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
     {x y : ClassFunction ↥M ℂ} (hx : x ∈ hyp.SHCSet) (hy : y ∈ hyp.Sset \ hyp.SHCSet) :
     ClassFunction.inner x y = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hne : x ≠ y := fun h => hy.2 (h ▸ hx)
   exact inducedFamily_pairwiseOrthogonal hx.1 hy.1 hne
 
@@ -927,7 +927,7 @@ theorem Hypothesis.span_inner_SHCSet_diff_eq_zero [Finite G] {M : Subgroup G} (h
     {u v : ClassFunction ↥M ℂ}
     (hu : u ∈ Submodule.span ℤ hyp.SHCSet) (hv : v ∈ Submodule.span ℤ (hyp.Sset \ hyp.SHCSet)) :
     ClassFunction.inner u v = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hright : ∀ x ∈ hyp.SHCSet, ∀ w ∈ Submodule.span ℤ (hyp.Sset \ hyp.SHCSet),
       ClassFunction.inner x w = 0 := by
     intro x hx w hw

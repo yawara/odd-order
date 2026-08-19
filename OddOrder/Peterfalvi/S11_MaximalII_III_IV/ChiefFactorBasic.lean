@@ -111,8 +111,8 @@ the index `[M : HU]`). -/
 theorem induceHU_apply_one [Finite G] (data : TypesIIIIIIVSetup M)
     (χ : ClassFunction ↥(huSub data) ℂ) :
     induceHU data χ (1 : ↥M) = ((huSub data).index : ℂ) * χ (1 : ↥(huSub data)) := by
-  letI : Fintype ↥M := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  let : Fintype ↥M := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   exact ClassFunction.induce_apply_one (huSub data) χ
 
@@ -196,11 +196,11 @@ degree and inner-product counts treat `𝒮`-members as characters. -/
 theorem induceHU_mem_ZIrr [Finite G] (data : TypesIIIIIIVSetup M)
     (χ : IrreducibleCharacter ↥(huSub data)) :
     induceHU data (χ : ClassFunction ↥(huSub data) ℂ) ∈ ZIrr ↥M := by
-  letI : Fintype ↥M := Fintype.ofFinite _
-  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥M : ℂ) :=
+  let : Fintype ↥M := Fintype.ofFinite _
+  let : Fintype ↥(huSub data) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥M : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  let : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   exact ClassFunction.induce_mem_ZIrr (huSub data) χ.mem_ZIrr
 
@@ -300,10 +300,10 @@ theorem cSub_normalized_by_uW1 [Finite G] (data : TypesIIIIIIVSetup M)
     (chief : ChiefFactorData data) :
     data.typeP.U ⊔ data.typeP.W1 ≤ Subgroup.normalizer (cSub data chief : Set G) := by
   have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
-  haveI hUnorm : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal :=
+  have hUnorm : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal :=
     (typeP_uW1_frobenius data.typeP hU).isNormal
-  haveI hKnorm : (quotientMulAutHom chief.N_aInvariant).ker.Normal := MonoidHom.normal_ker _
-  haveI hInfNorm : ((data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))
+  have hKnorm : (quotientMulAutHom chief.N_aInvariant).ker.Normal := MonoidHom.normal_ker _
+  have hInfNorm : ((data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))
       ⊓ (quotientMulAutHom chief.N_aInvariant).ker).Normal :=
     Subgroup.normal_inf_normal _ _
   -- `C` realised in `L = ↥(U ⊔ W₁)` is `U' ⊓ ker(quotientMulAutHom)`.
@@ -340,7 +340,7 @@ theorem mem_cSub_of_mem_U_of_centralizes [Finite G] {M : Subgroup G}
     (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) {x : G}
     (hxU : x ∈ data.typeP.U) (hxC : x ∈ Subgroup.centralizer (data.typeP.H : Set G)) :
     x ∈ cSub data chief := by
-  haveI : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+  have : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
   have hxUW1 : x ∈ data.typeP.U ⊔ data.typeP.W1 := Subgroup.mem_sup_left hxU
   -- the `U`-action element with `G`-coordinate `x`
   set a : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) :=
@@ -439,6 +439,7 @@ theorem hInHu_inf_cInHu_eq_bot {M : Subgroup G} (data : TypesIIIIIIVSetup M)
   exact Subtype.ext (Subtype.ext key)
 
 open Subgroup in
+set_option backward.isDefEq.respectTransparency false in
 /-- **`C ◁ U` inside `HU`** (realized form): `cInHu ◁ uInHu`, transported from `cSub ◁ U`
 (`cSub_subgroupOf_U_normal`) along the realization iso `↥uInHu ≃* ↥U`.  Comap of a normal subgroup
 is normal. -/
@@ -497,7 +498,7 @@ inner automorphism of the *abelian* `H̄`, hence is trivial, so the element lies
 theorem hInHu_inf_uInHu_le_cInHu [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
     (chief : ChiefFactorData data) :
     hInHu data ⊓ uInHu data ≤ cInHu data chief := by
-  haveI : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+  have : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
   intro x hx
   obtain ⟨hxH, hxU⟩ := hx
   have hgH : (((x : ↥(huSub data)) : ↥M) : G) ∈ data.H := by
@@ -542,7 +543,7 @@ input of (9.9.a). -/
 theorem uInHu_inf_hcInHu_eq_cInHu [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
     (chief : ChiefFactorData data) :
     uInHu data ⊓ (hInHu data ⊔ cInHu data chief) = cInHu data chief := by
-  haveI := hInHu_normal data
+  have := hInHu_normal data
   apply le_antisymm
   · rintro x ⟨hxU, hxHC⟩
     obtain ⟨hh, hhmem, cc, ccmem, rfl⟩ := Subgroup.mem_sup_of_normal_left.mp hxHC
@@ -565,7 +566,7 @@ theorem index_hcInHu_eq_relindex_cInHu [Finite G] {M : Subgroup G} (data : Types
     (chief : ChiefFactorData data) :
     (hInHu data ⊔ cInHu data chief).index
       = ((cInHu data chief).subgroupOf (uInHu data)).index := by
-  haveI : (hInHu data ⊔ cInHu data chief).Normal := hcInHu_normal data chief
+  have : (hInHu data ⊔ cInHu data chief).Normal := hcInHu_normal data chief
   have htop : uInHu data ⊔ (hInHu data ⊔ cInHu data chief) = ⊤ := by
     rw [← sup_assoc, sup_comm (uInHu data) (hInHu data), hInHu_sup_uInHu_eq_top, top_sup_eq]
   have he := Nat.card_congr (QuotientGroup.quotientInfEquivProdNormalQuotient

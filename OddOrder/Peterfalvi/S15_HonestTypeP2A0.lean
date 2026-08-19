@@ -259,7 +259,7 @@ theorem Hypothesis.residueS_mu2_diff_support [Finite G] (hyp : Hypothesis (G := 
   classical
   -- `Prop`-side bridge: the §6 lemma searches for the `hyp46S`-form `NeZero` (data instances all
   -- come from the scoped `FiniteInduce` constants, so they unify without bridging)
-  haveI : NeZero (Nat.card ↥(hyp.hyp46S hG).W1) :=
+  have : NeZero (Nat.card ↥(hyp.hyp46S hG).W1) :=
     inferInstanceAs (NeZero (Nat.card ↥(hyp.s06S hG).W1))
   -- nontrivial columns: the enumeration sends only `0` to the trivial character
   have hχj : (hyp.s06S hG).charGroupW2Equiv j ≠ 1 := by

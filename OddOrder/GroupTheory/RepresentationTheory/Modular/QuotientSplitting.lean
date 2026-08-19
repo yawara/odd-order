@@ -113,13 +113,13 @@ include hπ hlin hN in
 theorem quotientPi_mapDomain (x : MonoidAlgebra k G) :
     quotientPi π hπ hlin hN (quotientMap x) = π x := by
   induction x using MonoidAlgebra.induction_on with
-  | hM g =>
+  | of g =>
       rw [show (MonoidAlgebra.of k G g : MonoidAlgebra k G) = single g (1 : k) from rfl,
         show quotientMap (single g (1 : k))
           = single (QuotientGroup.mk g : G ⧸ N) (1 : k) from MonoidAlgebra.mapDomain_single,
         quotientPi_single]
-  | hadd x y hx hy => simp only [map_add, hx, hy]
-  | hsmul c x hx => rw [map_smul, map_smul, hx, hlin]
+  | add x y hx hy => simp only [map_add, hx, hy]
+  | smul c x hx => rw [map_smul, map_smul, hx, hlin]
 
 include hπ hlin hN in
 theorem quotientPi_surjective : Function.Surjective (quotientPi π hπ hlin hN) := fun y => by

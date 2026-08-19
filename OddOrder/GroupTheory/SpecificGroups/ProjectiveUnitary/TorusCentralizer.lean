@@ -77,7 +77,7 @@ open scoped Pointwise
 theorem natCard_units_field (n : ℕ) (hn : 0 < n) :
     Nat.card (Field n)ˣ = 2 ^ (2 * n) - 1 := by
   classical
-  haveI : Fintype (Field n) := Fintype.ofFinite (Field n)
+  have : Fintype (Field n) := Fintype.ofFinite (Field n)
   rw [Nat.card_eq_fintype_card, Fintype.card_units, ← Nat.card_eq_fintype_card,
     natCard_field n hn]
 

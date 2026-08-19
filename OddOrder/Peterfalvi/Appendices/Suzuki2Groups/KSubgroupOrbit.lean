@@ -85,11 +85,11 @@ theorem no_nontrivial_fixed_of_equivariant_cosetRepresentatives
     obtain ⟨z, hzN, hz⟩ := hequivariant c b
     refine ⟨z, hzN, ?_⟩
     simpa only [psi, MonoidHom.comp_apply, Subgroup.coe_subtype, hCfix c] using hz
-  haveI : IsSolvable C :=
-    isSolvable_of_comm fun c d => mul_comm' c d
+  have : Group.IsSolvable C :=
+    Group.isSolvable_of_comm fun c d => mul_comm' c d
   obtain ⟨x, hxfix, z, hzN, hx⟩ :=
     OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal
-      (φ := psi) hcop (Or.inl (inferInstance : IsSolvable C)) hNpsi hcoset
+      (φ := psi) hcop (Or.inl (inferInstance : Group.IsSolvable C)) hNpsi hcoset
   let aC : C := ⟨a, Subgroup.mem_zpowers a⟩
   have hfixa : phi a x = x := by
     simpa only [psi, aC, MonoidHom.comp_apply, Subgroup.coe_subtype] using hxfix aC

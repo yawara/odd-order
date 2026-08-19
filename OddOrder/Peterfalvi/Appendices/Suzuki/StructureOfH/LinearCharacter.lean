@@ -194,15 +194,15 @@ quotient has odd order, hence is solvable by the **Feit–Thompson theorem**, an
 is non-trivial because `QK ≠ H` (hypothesis (C1): `V ≠ 1`). -/
 theorem commutator_quotient_QK_ne_top (hV : hyp.V ≠ ⊥) :
     _root_.commutator (↥hyp.H ⧸ hyp.QK.subgroupOf hyp.H) ≠ ⊤ := by
-  haveI : IsSolvable (↥hyp.H ⧸ hyp.QK.subgroupOf hyp.H) :=
+  have : Group.IsSolvable (↥hyp.H ⧸ hyp.QK.subgroupOf hyp.H) :=
     OddOrder.feitThompson hyp.odd_card_quotient_QK
-  haveI : Nontrivial (↥hyp.H ⧸ hyp.QK.subgroupOf hyp.H) := by
+  have : Nontrivial (↥hyp.H ⧸ hyp.QK.subgroupOf hyp.H) := by
     have h1 : (hyp.QK.subgroupOf hyp.H).index ≠ 1 := fun h =>
       hyp.QK_subgroupOf_ne_top hV (Subgroup.index_eq_one.mp h)
     rcases subsingleton_or_nontrivial (↥hyp.H ⧸ hyp.QK.subgroupOf hyp.H) with hs | hn
     · exact absurd (Nat.card_eq_one_iff_unique.mpr ⟨hs, ⟨1⟩⟩ : _root_.Nat.card _ = 1) h1
     · exact hn
-  exact (IsSolvable.commutator_lt_top_of_nontrivial _).ne
+  exact (Group.IsSolvable.commutator_lt_top_of_nontrivial _).ne
 
 /-- **Peterfalvi Part II, Ch. III, Theorem C, step (4)** (p. 115): "Let `λ` be a
 linear character of `H`, `λ ≠ 1_H`, such that `QK ⊂ Ker λ`.  There is such a
@@ -242,9 +242,9 @@ theorem coprime_card_K_V (ind : Hypothesis.TheoremAInductionBelow G Ω)
   classical
   by_contra hcop
   obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hcop
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : Fintype ↥sc.toHypothesis.K := Fintype.ofFinite _
-  haveI : Fintype ↥sc.toHypothesis.V := Fintype.ofFinite _
+  have : Fact p.Prime := ⟨hp⟩
+  have : Fintype ↥sc.toHypothesis.K := Fintype.ofFinite _
+  have : Fintype ↥sc.toHypothesis.V := Fintype.ofFinite _
   obtain ⟨xK, hxord⟩ := exists_prime_orderOf_dvd_card (G := ↥sc.toHypothesis.K) p
     (by rw [← Nat.card_eq_fintype_card]; exact hpdvd.trans (Nat.gcd_dvd_left _ _))
   obtain ⟨yV, hyord⟩ := exists_prime_orderOf_dvd_card (G := ↥sc.toHypothesis.V) p
@@ -318,7 +318,7 @@ theorem coprime_card_K_V (ind : Hypothesis.TheoremAInductionBelow G Ω)
       _ = y * x := by group
   -- (4) `E = ⟨x, y⟩` is abelian and contained in `D`
   set E : Subgroup G := Subgroup.closure ({x, y} : Set G) with hEdef
-  haveI : IsMulCommutative ↥E := by
+  have : IsMulCommutative ↥E := by
     refine Subgroup.isMulCommutative_closure ?_
     rintro a (rfl | rfl) b (rfl | rfl)
     · rfl
@@ -330,7 +330,7 @@ theorem coprime_card_K_V (ind : Hypothesis.TheoremAInductionBelow G Ω)
     rintro a (rfl | rfl)
     · exact sc.toHypothesis.K_le_D hxK
     · exact hyD
-  haveI : IsCyclic ↥E := sc.isCyclic_of_isMulCommutative_le_D ind hQ1 hED
+  have : IsCyclic ↥E := sc.isCyclic_of_isMulCommutative_le_D ind hQ1 hED
   -- (5) inside the cyclic `E`, `⟨x⟩` and `⟨y⟩` both have order `p`, so `x ∈ V`
   have hxE : x ∈ E := Subgroup.subset_closure (by simp)
   have hyE : y ∈ E := Subgroup.subset_closure (by simp)
@@ -429,17 +429,17 @@ theorem card_quotient_Q_eq_card_D :
 
 This is what lets Chapter III apply Hall's theorems inside `H` (the book's "by a
 theorem of Hall" in step (6)). -/
-instance isSolvable_H : IsSolvable ↥hyp.H := by
-  haveI : Group.IsNilpotent ↥hyp.Q := hyp.isNilpotent_Q
-  haveI : IsSolvable ↥(hyp.Q.subgroupOf hyp.H) := by
-    haveI : IsSolvable ↥hyp.Q := inferInstance
-    exact solvable_of_solvable_injective
+instance isSolvable_H : Group.IsSolvable ↥hyp.H := by
+  have : Group.IsNilpotent ↥hyp.Q := hyp.isNilpotent_Q
+  have : Group.IsSolvable ↥(hyp.Q.subgroupOf hyp.H) := by
+    have : Group.IsSolvable ↥hyp.Q := inferInstance
+    exact Group.isSolvable_of_isSolvable_injective
       (f := (Subgroup.subgroupOfEquivOfLe hyp.Q_le_H).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe hyp.Q_le_H).injective
-  haveI : IsSolvable (↥hyp.H ⧸ hyp.Q.subgroupOf hyp.H) :=
+  have : Group.IsSolvable (↥hyp.H ⧸ hyp.Q.subgroupOf hyp.H) :=
     OddOrder.feitThompson (by
       rw [hyp.card_quotient_Q_eq_card_D]; exact hyp.D_odd)
-  exact solvable_of_ker_le_range
+  exact Group.isSolvable_of_ker_le_range
     (hyp.Q.subgroupOf hyp.H).subtype (QuotientGroup.mk' (hyp.Q.subgroupOf hyp.H))
     (by rw [QuotientGroup.ker_mk', Subgroup.range_subtype])
 
@@ -532,7 +532,7 @@ theorem isHallSubgroup_V_subgroupOf (ind : Hypothesis.TheoremAInductionBelow G �
   constructor
   · intro p hp
     rw [hVcard] at hp
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     intro hmem
     have hpV : p ∣ Nat.card ↥sc.toHypothesis.V := Nat.dvd_of_mem_primeFactors hp
     have hpQK : p ∣ Nat.card ↥sc.toHypothesis.QK := Nat.dvd_of_mem_primeFactors hmem
@@ -540,7 +540,7 @@ theorem isHallSubgroup_V_subgroupOf (ind : Hypothesis.TheoremAInductionBelow G �
     exact hprime.one_lt.ne'
       (Nat.eq_one_of_dvd_coprimes (sc.coprime_card_QK_V ind hQ1) hpQK hpV)
   · intro p hp
-    simp only [Set.mem_setOf_eq, not_not]
+    simp only [Set.mem_ofPred_eq, not_not]
     rwa [sc.toHypothesis.index_V_subgroupOf_eq_card_QK] at hp
 
 end SecondCaseHypothesis
@@ -596,7 +596,7 @@ theorem isHallSubgroup_QK_subgroupOf (ind : Hypothesis.TheoremAInductionBelow G 
   refine ⟨fun p hp => ?_, fun p hp => ?_⟩
   · rw [hcard] at hp; exact hp
   · rw [sc.toHypothesis.index_QK_subgroupOf_eq_card_V] at hp
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     intro hmem
     have hprime : p.Prime := Nat.prime_of_mem_primeFactors hp
     exact hprime.one_lt.ne'
@@ -664,7 +664,7 @@ theorem apply_eq_of_piFactorization (ind : Hypothesis.TheoremAInductionBelow G �
     sc.mem_QK_of_piElement ind hQ1 ha
   have hθa : (θ : ↥sc.toHypothesis.H → ℂ) a = 1 := by
     have hmem := hker haQK
-    rw [OddOrder.Peterfalvi.S03.characterKernel, Set.mem_setOf_eq] at hmem
+    rw [OddOrder.Peterfalvi.S03.characterKernel, Set.mem_ofPred_eq] at hmem
     rw [hmem, OddOrder.Peterfalvi.S03.characterDegree, hdeg]
   rw [← hab, hθ.map_mul_of_apply_one_eq_one hdeg, hθa, one_mul]
 

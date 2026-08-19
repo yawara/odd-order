@@ -58,7 +58,7 @@ theorem exists_central_phi_data
       ClassFunction.restrict (W2.subgroupOf H) (θ : ClassFunction ↥H ℂ)
         = (θ : ClassFunction ↥H ℂ) 1 •
           ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
   obtain ⟨φN, hφNirr, hφN1, hres, _⟩ :=
     θ.2.exists_central_linear_restriction (W2.subgroupOf H) hcen
   set e := Subgroup.subgroupOfEquivOfLe hW2H with he
@@ -125,7 +125,7 @@ theorem exists_decomposition_caseB_coherentYset
         ∧ hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
             - ((W2.subgroupOf H).index : ℂ) • η₁)
           = X - ((W2.subgroupOf H).index : ℂ) • hyp.coherentYset.extension η₁ := by
-  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have : Fintype ↥W2 := Fintype.ofFinite _
   have hW2H : W2 ≤ H := by
     have hle : ⁅H, H⁆ ≤ H := by
       rw [Subgroup.commutator_le]; intro a ha b hb; rw [commutatorElement_def]
@@ -179,7 +179,7 @@ theorem exists_decomposition_caseB_anchorCY
         ∧ hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
             - ((W2.subgroupOf H).index : ℂ) • η₁)
           = X - ((W2.subgroupOf H).index : ℂ) • cY.extension η₁ := by
-  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have : Fintype ↥W2 := Fintype.ofFinite _
   have hW2H : W2 ≤ H := by
     have hle : ⁅H, H⁆ ≤ H := by
       rw [Subgroup.commutator_le]; intro a ha b hb; rw [commutatorElement_def]
@@ -212,7 +212,7 @@ theorem caseB_column_W2_nonconstant
     ∃ w : ↥(h46.W2.subgroupOf H),
       (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)) (w : ↥H)
         ≠ (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)) 1 := by
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   classical
   by_contra hc
   push Not at hc
@@ -273,10 +273,10 @@ theorem caseB_column_anchored_image
       hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁)
         = X - (a : ℂ) • hyp.coherentYset.extension η₁ := by
   classical
-  haveI : Fintype ↥H := Fintype.ofFinite _
-  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
-  haveI : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
-  haveI : Fintype ↥h46.W2 := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  have : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
+  have : Fintype ↥h46.W2 := Fintype.ofFinite _
   have hWne := caseB_column_W2_nonconstant h46 hHK hχ₂
   have hθirr : IsIrreducibleCharacter
       (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)) := by
@@ -373,11 +373,11 @@ theorem caseB_member_anchored_image
       ClassFunction.inner X (cY.extension η₁) = 0 ∧
       X ∈ ZIrr G := by
   classical
-  haveI : Fintype ↥H := Fintype.ofFinite _
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
-  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
-  haveI : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
-  haveI : Fintype ↥h46.W2 := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  have : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
+  have : Fintype ↥h46.W2 := Fintype.ofFinite _
   obtain ⟨φ, hφ', hφirr, hφ1, hweight, hreseq⟩ := exists_central_phi_data hW2H hcen θ
   have hφne : ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ
       ≠ trivialClassFunction ↥(h46.W2.subgroupOf H) :=

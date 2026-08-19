@@ -128,7 +128,7 @@ theorem isFrobeniusGroup_commutator_K_sup (hW : hyp.W = ⊥) {X : Subgroup G}
     simpa [mul_assoc] using h2
   have hLnorm : L ≤ Subgroup.normalizer (U : Set G) :=
     sup_le Subgroup.le_normalizer hXnorm
-  haveI : (U.subgroupOf L).Normal :=
+  have : (U.subgroupOf L).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hUL).mpr hLnorm
   -- `U ⊓ X = ⊥` since `U ≤ K` and `X ≤ V`
   have hUX : U ⊓ X = ⊥ := by
@@ -167,8 +167,8 @@ theorem isFrobeniusGroup_commutator_K_sup (hW : hyp.W = ⊥) {X : Subgroup G}
     rw [Subgroup.mem_bot]
     exact congrArg (Subtype.val (p := fun z => z ∈ L)) this
   have hKcomm : ∀ a ∈ hyp.K, ∀ b ∈ hyp.K, a * b = b * a := by
-    haveI := hyp.K_isCyclic
-    letI : CommGroup ↥hyp.K := IsCyclic.commGroup
+    have := hyp.K_isCyclic
+    let : CommGroup ↥hyp.K := IsCyclic.commGroup
     intro a ha b hb
     exact congrArg (Subtype.val (p := fun z => z ∈ hyp.K))
       (mul_comm (⟨a, ha⟩ : ↥hyp.K) ⟨b, hb⟩)
@@ -230,9 +230,9 @@ theorem natCard_eq_pow_natCard_inf_centralizer (hW : hyp.W = ⊥) {X : Subgroup 
     have h2 := hNnorm g⁻¹ (hyp.H.inv_mem hgH) _ hz
     simpa [mul_assoc] using h2
   -- `N` is solvable and coprime to the acting group
-  have hsolv : IsSolvable ↥N := by
-    haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-    haveI := hN2.isNilpotent
+  have hsolv : Group.IsSolvable ↥N := by
+    have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+    have := hN2.isNilpotent
     infer_instance
   have hcop2 : Nat.Coprime (Nat.card ↥N) (Nat.card ↥(U ⊔ X)) := by
     obtain ⟨k, hk⟩ := hN2.exists_card_eq
@@ -276,7 +276,7 @@ theorem natCard_eq_pow_natCard_inf_centralizer (hW : hyp.W = ⊥) {X : Subgroup 
 same residue. -/
 theorem _root_.OddOrder.Nat.prime_dvd_pow_self_sub_one_iff {p a : ℕ} (hp : p.Prime)
     (ha : 1 ≤ a) : p ∣ a ^ p - 1 ↔ p ∣ a - 1 := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hap : (1 : ℕ) ≤ a ^ p := Nat.one_le_pow _ _ (by omega)
   have key : ((a ^ p - 1 : ℕ) : ZMod p) = ((a - 1 : ℕ) : ZMod p) := by
     rw [Nat.cast_sub hap, Nat.cast_sub ha, Nat.cast_pow, Nat.cast_one, ZMod.pow_card]

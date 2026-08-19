@@ -72,7 +72,7 @@ theorem exists_subgroupESetup [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
     ∃ E E₁ E₂ E₃ : Subgroup G, SubgroupESetup M E E₁ E₂ E₃ := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   -- `M ≤ N_G(M_σ)`, hence `M_σ.subgroupOf M` is normal.
   have hM_norm_Mσ : M ≤ Subgroup.normalizer ((S10.Msigma M) : Set G) := by
     rw [S10.Msigma, OddOrder.GroupTheory.opiCoreInG]
@@ -81,7 +81,7 @@ theorem exists_subgroupESetup [Finite G] (hG : IsMinimalSimpleOdd G)
     rwa [Subgroup.normalizer_eq_top, ← MonoidHom.range_eq_map,
       Subgroup.range_subtype] at hle
   set N : Subgroup ↥M := (S10.Msigma M).subgroupOf M with hNdef
-  haveI hN_normal : N.Normal := by
+  have hN_normal : N.Normal := by
     constructor
     intro n hn g
     rw [hNdef, Subgroup.mem_subgroupOf] at hn ⊢
@@ -127,11 +127,11 @@ theorem exists_subgroupESetup [Finite G] (hG : IsMinimalSimpleOdd G)
         exact le_sup_right
     exact h1 ⟨⟨m, hm⟩, hm', rfl⟩
   -- `E` is solvable; fix a Hall `τ₁∪τ₂`-subgroup `K₀` and Hall pieces inside it.
-  haveI : IsSolvable ↥E :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective hE_le)
+  have : Group.IsSolvable ↥E :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective hE_le)
   obtain ⟨K₀, hK₀⟩ := Ch03.hall_E_exists (G := ↥E) (tau1 M ∪ tau2 M)
-  haveI : IsSolvable ↥K₀ :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective (le_top (a := K₀)))
+  have : Group.IsSolvable ↥K₀ :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective (le_top (a := K₀)))
   obtain ⟨H₁, hH₁⟩ := Ch03.hall_E_exists (G := ↥K₀) (tau1 M)
   obtain ⟨H₂, hH₂⟩ := Ch03.hall_E_exists (G := ↥K₀) (tau2 M)
   obtain ⟨H₃, hH₃⟩ := Ch03.hall_E_exists (G := ↥E) (tau3 M)
@@ -272,7 +272,7 @@ theorem exists_conj_smul_le_hallPiece [Finite G] (hG : IsMinimalSimpleOdd G)
     (hXpi : Ch03.Subgroup.IsPiGroup π (X.subgroupOf M)) :
     ∃ w ∈ M, MulAut.conj w • X ≤ F := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups h.mem_maximal
   obtain ⟨H, hH_hall, -, hX_le_H⟩ :=
     Ch1.S01.aInvariant_piSubgroup_le_aInvariant_hall
       (A := Unit) (φ := (1 : Unit →* MulAut ↥M))
@@ -407,7 +407,7 @@ theorem tau2_prime_mem_sigma_diff_beta [Finite G] (hG : IsMinimalSimpleOdd G)
   by_cases hqp : q = p
   · subst hqp
     exact mem_sigma_of_tau2_of_mem_maximalContaining hG h hq hA hAE hMstar
-  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have : Fact q.Prime := ⟨hq_prime⟩
   -- `A_q ∈ ℰ_q²(E)` を押し込みで構成。
   obtain ⟨w, hwM, hwle⟩ := exists_conj_smul_le_hallPiece hG h h.E₂_le h.E₂_hall
     (tau2_subset_sigma_compl M) hA₁M (by
@@ -525,7 +525,7 @@ theorem index_primeFactors_subset_tau1_union_tau2 [Finite G] (hG : IsMinimalSimp
   classical
   by_contra hr12
   have hr_prime : r.Prime := Nat.prime_of_mem_primeFactors hr
-  haveI : Fact r.Prime := ⟨hr_prime⟩
+  have : Fact r.Prime := ⟨hr_prime⟩
   obtain ⟨hMst_co, hNMst⟩ := mem_maximalSubgroupsContaining.mp hMstar
   have hMst_mem : Mstar ∈ maximalSubgroups G := mem_maximalSubgroups.mpr hMst_co
   have hEN : E ≤ Subgroup.normalizer (A : Set G) := E_le_normalizer_of_tau2 hG h hp hA hAE
@@ -625,7 +625,7 @@ theorem index_primeFactors_subset_tau1_union_tau2 [Finite G] (hG : IsMinimalSimp
     exact dvd_pow_self p two_ne_zero
   obtain ⟨K, hKnorm, hKcompl⟩ :=
     ((S10.isHall_Mbeta hG hMst_mem).2.2.2 p (Fact.out : p.Prime) hpMst hpβ).1
-  haveI : K.Normal := hKnorm
+  have : K.Normal := hKnorm
   set KG : Subgroup G := K.map (derivedInG Mstar).subtype with hKGdef
   -- `Q ≤ K_G`: 商 `D/K` は `p`-群、`Q` は `r ≠ p` の `r`-群。
   have hQKG : Q ≤ KG := by
@@ -863,7 +863,7 @@ private theorem exists_line_package [Finite G] (hG : IsMinimalSimpleOdd G)
     rwa [tau1_pRank_eq_one hqτ₁] at h1
   -- `C* := C.subgroupOf N` is normal in `↥N` (`N_G(A) ≤ N_G(C_G(A))`).
   have hCN : C ≤ N := Subgroup.centralizer_le_normalizer _
-  haveI hCnormal : ((C.subgroupOf N)).Normal :=
+  have hCnormal : ((C.subgroupOf N)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hCN).mpr
       (normalizer_le_normalizer_centralizer A)
   -- Sylow `q`-subgroup of `C*` and its `G`-level image `Q₁ ≤ C`.
@@ -1009,7 +1009,7 @@ theorem tau2_normalSylow_abelianSylow_of_mem_index_card [Finite G]
     (∃ Q : Sylow q G, (Q : Subgroup G) ≤ Mstar ∧ IsMulCommutative ↥(Q : Subgroup G)) := by
   classical
   have hq_prime : q.Prime := Nat.prime_of_mem_primeFactors hqi
-  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have : Fact q.Prime := ⟨hq_prime⟩
   obtain ⟨hMst_co, hNMst⟩ := mem_maximalSubgroupsContaining.mp hMstar
   have hMst_mem : Mstar ∈ maximalSubgroups G := mem_maximalSubgroups.mpr hMst_co
   have hAne : A ≠ ⊥ := by
@@ -1116,7 +1116,7 @@ theorem tau2_normalSylow_abelianSylow_of_mem_index_card [Finite G]
     have hPW_norm : (PW : Subgroup ↥(S10.Msigma Mstar)).Normal := by
       have htfae := (Group.isNilpotent_of_finite_tfae (G := ↥(S10.Msigma Mstar))).out 0 3
       exact htfae.mp hnilp p ⟨Fact.out⟩ PW
-    haveI hPW_char : (PW : Subgroup ↥(S10.Msigma Mstar)).Characteristic :=
+    have hPW_char : (PW : Subgroup ↥(S10.Msigma Mstar)).Characteristic :=
       Sylow.characteristic_of_normal PW hPW_norm
     have h1 := OddOrder.BG.AppB.normalizer_le_normalizer_map_of_characteristic
       (K := S10.Msigma Mstar) (W := (PW : Subgroup ↥(S10.Msigma Mstar)))

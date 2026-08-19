@@ -159,23 +159,23 @@ theorem isSimpleGroup_of_orbits_eq [Finite G] [FaithfulSMul G Ω] [IsPretransiti
     (hcover : ∀ δ : Ω, δ ≠ α →
       δ ∈ orbit ↥(stabilizer G α) β ∨ δ ∈ orbit ↥(stabilizer G α) γ) :
     IsSimpleGroup G := by
-  haveI : Finite Ω := Nat.finite_of_card_ne_zero (by omega)
-  haveI : Fact (Nat.Prime 5) := ⟨by norm_num⟩
-  haveI : IsPreprimitive G Ω := isPreprimitive_of_orbits_eq hΩ α hβ hγ h22 h77 hcover
+  have : Finite Ω := Nat.finite_of_card_ne_zero (by omega)
+  have : Fact (Nat.Prime 5) := ⟨by norm_num⟩
+  have : IsPreprimitive G Ω := isPreprimitive_of_orbits_eq hΩ α hβ hγ h22 h77 hcover
   -- `100 ∣ |G|` なので `G` は非自明
   have h100G : (100 : ℕ) ∣ Nat.card G := by
     have h := index_stabilizer_of_transitive (G := G) (x := α)
     rw [hΩ] at h
     exact h ▸ Subgroup.index_dvd_card _
-  haveI : Nonempty G := ⟨1⟩
-  haveI : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp
+  have : Nonempty G := ⟨1⟩
+  have : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp
     (lt_of_lt_of_le (by norm_num) (Nat.le_of_dvd Nat.card_pos h100G))
   refine ⟨fun N hN => ?_⟩
   by_contra hcon
   push Not at hcon
   obtain ⟨hNbot, hNtop⟩ := hcon
-  haveI := hN
-  haveI : IsPretransitive ↥N Ω := isPretransitive_of_normal_of_isPreprimitive (Ω := Ω) N hNbot
+  have := hN
+  have : IsPretransitive ↥N Ω := isPretransitive_of_normal_of_isPreprimitive (Ω := Ω) N hNbot
   have hstabN : stabilizer ↥N α = ⊥ :=
     stabilizer_eq_bot_of_normal_of_isSimpleGroup_stabilizer α hsimple hNtop
   have hNcard : Nat.card ↥N = 100 := by
@@ -197,8 +197,8 @@ theorem isSimpleGroup_of_orbits_eq [Finite G] [FaithfulSMul G Ω] [IsPretransiti
       Nat.mem_divisors.mpr ⟨hdvd, by norm_num⟩
     unfold Nat.ModEq at hmod
     rcases hcases _ hmem with h | h | h <;> rw [h] at hmod ⊢ <;> omega
-  haveI : Subsingleton (Sylow 5 ↥N) := (Nat.card_eq_one_iff_unique.mp hn5).1
-  haveI : (P : Subgroup ↥N).Characteristic := Sylow.characteristic_of_subsingleton P
+  have : Subsingleton (Sylow 5 ↥N) := (Nat.card_eq_one_iff_unique.mp hn5).1
+  have : (P : Subgroup ↥N).Characteristic := Sylow.characteristic_of_subsingleton P
   -- `P` を `G` の部分群として見ると位数 25 の非自明正規部分群
   have hP'card : Nat.card ↥((P : Subgroup ↥N).map N.subtype) = 25 := by
     rw [← hPcard]
@@ -208,7 +208,7 @@ theorem isSimpleGroup_of_orbits_eq [Finite G] [FaithfulSMul G Ω] [IsPretransiti
     intro h
     rw [h] at hP'card
     simp at hP'card
-  haveI : IsPretransitive ↥((P : Subgroup ↥N).map N.subtype) Ω :=
+  have : IsPretransitive ↥((P : Subgroup ↥N).map N.subtype) Ω :=
     isPretransitive_of_normal_of_isPreprimitive (Ω := Ω) _ hP'bot
   -- 推移的なら `100 ∣ 25`
   have h100 : (100 : ℕ) ∣ 25 := by

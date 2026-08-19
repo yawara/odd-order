@@ -36,11 +36,11 @@ theorem exists_kappaHall_invariant_complement_to_MF (hG : OddOrder.BG.IsMinimalS
     ∃ U : Subgroup G, derivedInG M = maxNilpotentNormalHall M ⊔ U ∧
       K ≤ Subgroup.normalizer (U : Set G) ∧ maxNilpotentNormalHall M ⊓ U = ⊥ := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   -- `M' ≤ M` is solvable.
   have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
-  haveI : IsSolvable ↥(derivedInG M) :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective hM'le)
+  have : Group.IsSolvable ↥(derivedInG M) :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective hM'le)
   -- `M_F ≤ M' ≤ M`.
   have hMFle' : maxNilpotentNormalHall M ≤ derivedInG M := maxNilpotentNormalHall_le_derived hG hM
   have hMFleM : maxNilpotentNormalHall M ≤ M := maxNilpotentNormalHall_le M

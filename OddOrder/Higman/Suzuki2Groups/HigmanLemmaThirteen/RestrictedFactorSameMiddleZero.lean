@@ -70,7 +70,7 @@ theorem frattiniMiddleCommutatorBilinear_eq_zero_on_restrictedLayer
     frattiniMiddleCommutatorBilinear hP hxi hPhiComm hexists
         (subgroupLowerCentralLayerZeroLinear S u)
         (subgroupLowerCentralLayerZeroLinear S v) = 0 := by
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   obtain ⟨x, hx⟩ := QuotientGroup.mk'_surjective
@@ -125,7 +125,7 @@ theorem
         hP hxi hPhiComm hexists
         ((subgroupLowerCentralLayerZeroLinear S).baseChange F x)
         ((subgroupLowerCentralLayerZeroLinear S).baseChange F y) = 0 := by
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   induction x using TensorProduct.induction_on with
@@ -177,7 +177,7 @@ theorem
           ((subgroupLowerCentralLayerZeroLinear S).comp iotaS) i)
         (factorAmbientEigenFamily eQ
           ((subgroupLowerCentralLayerZeroLinear S).comp iotaS) j) = 0 := by
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   let b := conjugateTensorBasisOfLinearEquiv F eQ
@@ -249,12 +249,12 @@ theorem
         hP hxi hPhiComm hexists (family i) (family j) = 0 := by
   classical
   dsimp only
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
-  letI : IsMulCommutative (frattini S) :=
+  let : IsMulCommutative (frattini S) :=
     IsMulCommutative.of_comm hEAS.comm
-  letI : Module (ZMod 2) (Additive (frattini S)) := hEAS.zmodModule
+  let : Module (ZMod 2) (Additive (frattini S)) := hEAS.zmodModule
   intro i j
   let d := data.toInclusionData hEAS eS hK1S htermS hSqS hAgemoS hK0S
   have hzero :=

@@ -473,7 +473,7 @@ theorem constituent_P_not_subset_ker
         (ClassFunction.restrict H (s : ClassFunction ↥PU ℂ)) ≠ 0) :
     ¬ ((D.P : Set ↥PU) ⊆
       OddOrder.Peterfalvi.S03.characterKernel (s : ClassFunction ↥PU ℂ)) := by
-  haveI : Finite ↥PU := Finite.of_fintype _
+  have : Finite ↥PU := Finite.of_fintype _
   intro hker
   -- `Res_H s` is a genuine character, and `θ` is one of its constituents (`⟨Res_H s, θ⟩ ≠ 0`).
   have hResChar : IsCharacter (ClassFunction.restrict H (s : ClassFunction ↥PU ℂ)) :=
@@ -520,8 +520,8 @@ theorem induce_H_mem_zSpan_calS
       OddOrder.Peterfalvi.S03.characterKernel θ)) :
     ClassFunction.induce PU (ClassFunction.induce H θ) ∈ zSpan D.calS := by
   classical
-  haveI : Finite ↥PU := Finite.of_fintype _
-  haveI : Fintype (IrreducibleCharacter ↥PU) := Fintype.ofFinite _
+  have : Finite ↥PU := Finite.of_fintype _
+  have : Fintype (IrreducibleCharacter ↥PU) := Fintype.ofFinite _
   -- Constituent expansion `Ind_H^{PU} θ = ∑_s ⟨θ, Res_H s⟩ • s`, then push `Ind_{PU}^S` inside.
   rw [induce_eq_sum_inner_restrict_smul θ, ClassFunction.induce_sum]
   refine Submodule.sum_mem _ fun s _ => ?_

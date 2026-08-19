@@ -109,7 +109,7 @@ theorem isCyclic_of_card_dvd_four_of_unique_involution {H : Type*} [Group H] [Fi
     (hcard : Nat.card H ∣ 4)
     (huniq : ∀ a b : H, a ^ 2 = 1 → a ≠ 1 → b ^ 2 = 1 → b ≠ 1 → a = b) : IsCyclic H := by
   classical
-  letI := Fintype.ofFinite H
+  let := Fintype.ofFinite H
   refine isCyclic_of_card_pow_eq_one_le fun n hn => ?_
   set d := Nat.gcd n 4 with hd
   have hd4 : d ∣ 4 := Nat.gcd_dvd_right n 4
@@ -263,8 +263,8 @@ theorem orbit_eq_of_odd_of_subset_card_three {H α : Type*} [Group H] [Finite H]
     (hs : s.card = 3) (hsub : ∀ h : H, h • x ∈ s) (hne : ∃ h : H, h • x ≠ x) :
     ∀ y ∈ s, ∃ h : H, h • x = y := by
   classical
-  letI := Fintype.ofFinite H
-  letI : Fintype (MulAction.orbit H x) := Fintype.ofFinite _
+  let := Fintype.ofFinite H
+  let : Fintype (MulAction.orbit H x) := Fintype.ofFinite _
   have hcard : Fintype.card (MulAction.orbit H x) = (MulAction.stabilizer H x).index := by
     rw [← Nat.card_eq_fintype_card, Nat.card_congr (MulAction.orbitEquivQuotientStabilizer H x),
       Subgroup.index_eq_card]

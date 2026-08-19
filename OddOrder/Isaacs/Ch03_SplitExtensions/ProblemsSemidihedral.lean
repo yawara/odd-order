@@ -134,7 +134,7 @@ theorem semidihedralAut_ne_zero (n : ℕ) [NeZero n] (hn : 8 ∣ n) : semidihedr
 /-- **Isaacs Problem 3A.1(a)** (位数 2, まとめ). -/
 theorem semidihedralAut_addOrderOf (n : ℕ) [NeZero n] (hn : 8 ∣ n) :
     addOrderOf (semidihedralAut n hn) = 2 := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   refine addOrderOf_eq_prime ?_ (semidihedralAut_ne_zero n hn)
   rw [two_nsmul]; exact semidihedralAut_add_self n hn
 
@@ -260,7 +260,7 @@ theorem semidihedralReflection_orderOf_eq_two_iff (n : ℕ) [NeZero n] (hn : 8 �
     (x : Multiplicative (ZMod n)) :
     orderOf (semidihedralReflection n hn x) = 2
       ↔ ((n / 2 : ℕ) : ZMod n) * Multiplicative.toAdd x = 0 := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   rw [← semidihedralReflection_sq_eq_one_iff n hn x]
   constructor
   · intro h; rw [← h]; exact pow_orderOf_eq_one _
@@ -271,7 +271,7 @@ theorem semidihedralReflection_orderOf_eq_four_iff (n : ℕ) [NeZero n] (hn : 8 
     (x : Multiplicative (ZMod n)) :
     orderOf (semidihedralReflection n hn x) = 4
       ↔ ((n / 2 : ℕ) : ZMod n) * Multiplicative.toAdd x ≠ 0 := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   rw [ne_eq, ← semidihedralReflection_sq_eq_one_iff n hn x]
   constructor
   · intro h hsq
@@ -433,7 +433,7 @@ theorem semidihedralReflection_isConj_of_four (n : ℕ) [NeZero n] (hn : 8 ∣ n
 /-- `σ` の位数は 2。 -/
 theorem semidihedralMulAut_orderOf (n : ℕ) [NeZero n] (hn : 8 ∣ n) :
     orderOf (semidihedralMulAut n hn) = 2 := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   exact orderOf_eq_prime (by rw [pow_two]; exact semidihedralMulAut_sq n hn)
     (semidihedralMulAut_ne_one n hn)
 

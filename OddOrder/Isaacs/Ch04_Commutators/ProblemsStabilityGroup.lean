@@ -84,7 +84,7 @@ theorem commutator_lowerCentralSeries_le (hs : StabilizesChain H A)
     simpa using hs.commutator_le_pred i
   | succ j ih =>
     intro i
-    haveI := hnorm (i - (j + 2))
+    have := hnorm (i - (j + 2))
     -- `⁅⁅A, H i⁆, γ_{j+1}(A)⁆ ≤ H (i - (j+2))`
     have h1 : ⁅⁅A, H i⁆, Subgroup.lowerCentralSeries A j⁆ ≤ H (i - (j + 2)) := by
       have hA : ⁅A, H i⁆ ≤ H (i - 1) := by

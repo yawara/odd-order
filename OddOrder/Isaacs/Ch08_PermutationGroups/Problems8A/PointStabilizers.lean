@@ -242,10 +242,10 @@ theorem isFrobeniusAction_of_comm_of_half_transitive [Finite A] [Finite N] [Fait
     { carrier := {x : N | a • x = x}
       one_mem' := smul_one a
       mul_mem' := fun {u v} hu hv => by
-        simp only [Set.mem_setOf_eq] at hu hv ⊢
+        simp only [Set.mem_ofPred_eq] at hu hv ⊢
         rw [smul_mul', hu, hv]
       inv_mem' := fun {u} hu => by
-        simp only [Set.mem_setOf_eq] at hu ⊢
+        simp only [Set.mem_ofPred_eq] at hu ⊢
         rw [smul_inv', hu] }
   have hFinv : ∀ b : A, ∀ x ∈ F, b • x ∈ F := fun b x hx =>
     smul_mem_fixedBy_of_comm hcomm a b hx

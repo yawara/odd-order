@@ -77,7 +77,7 @@ theorem exists_decomposition_of_finrank_le (m : ℕ) :
   induction m with
   | zero =>
     intro V _ _ _ ρ hm
-    haveI : Subsingleton V := Module.finrank_zero_iff.mp (Nat.le_zero.mp hm)
+    have : Subsingleton V := Module.finrank_zero_iff.mp (Nat.le_zero.mp hm)
     refine ⟨0, fun g _ => by simp [brauerCharacter_eq_zero_of_subsingleton], ?_⟩
     intro i z c hi _
     exact absurd rfl hi
@@ -88,8 +88,8 @@ theorem exists_decomposition_of_finrank_le (m : ℕ) :
       intro i z c hi _
       exact absurd rfl hi
     obtain ⟨W, hWinv, hWne, hWmin⟩ := exists_minimal_invariant ρ
-    haveI : Nontrivial W := Submodule.nontrivial_iff_ne_bot.mpr hWne
-    haveI := isSimpleModule_subrepresentation_of_minimal ρ hWinv hWne hWmin
+    have : Nontrivial W := Submodule.nontrivial_iff_ne_bot.mpr hWne
+    have := isSimpleModule_subrepresentation_of_minimal ρ hWinv hWne hWmin
     -- the minimal piece is one of the irreducibles, with matching central character
     obtain ⟨i, hi, hic⟩ := exists_irreducibleBrauerCharacter_eq (nn := nn)
       (ρ.subrepresentation W hWinv) hπ hlin

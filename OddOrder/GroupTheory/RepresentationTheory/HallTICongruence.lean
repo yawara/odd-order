@@ -313,7 +313,7 @@ theorem nonidentityZClassCoeffSum_cong_hall [Finite G] {H Q Z : Subgroup G}
         [ALGMOD (Nat.card ↥Q : ℤ)] := by
   classical
   set ρ₀ : Representation ℂ G ℂ := Representation.trivial ℂ G ℂ with hρ₀
-  haveI : ρ₀.IsIrreducible := isIrreducible_complex_rep ρ₀
+  have : ρ₀.IsIrreducible := isIrreducible_complex_rep ρ₀
   have hchar0 : ∀ g : G, ρ₀.character g = 1 := by
     intro g; simp [hρ₀, Representation.character]
   let C₁ : ConjClasses G := ConjClasses.mk z

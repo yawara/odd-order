@@ -119,7 +119,7 @@ theorem sumDegreeSq_kernelInterval (N K : Subgroup G) [N.Normal] [K.Normal] :
       rw [inflate_apply_one]
   rw [htransfer]
   -- `sumNonInflatedDegreeSq` in `G ⧸ N` with `N := Kbar`.
-  haveI : Kbar.Normal := hKbar ▸ Subgroup.Normal.map inferInstance (QuotientGroup.mk' N)
+  have : Kbar.Normal := hKbar ▸ Subgroup.Normal.map inferInstance (QuotientGroup.mk' N)
     (QuotientGroup.mk'_surjective N)
   rw [sumNonInflatedDegreeSq (G := G ⧸ N) (N := Kbar)]
   -- `|(G ⧸ N) ⧸ Kbar| = |G ⧸ (K ⊔ N)|` by the third isomorphism theorem (`Kbar = (K ⊔ N).map`).

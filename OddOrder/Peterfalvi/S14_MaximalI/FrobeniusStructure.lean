@@ -213,8 +213,8 @@ theorem Sset_sum_re_sq_induce_kernelFilter_eq [Finite G] {L : Subgroup G} (hyp :
       = (((hyp.typeI.typeF.H).subgroupOf L).index : ℝ) *
         ((Nat.card (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
           A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)) : ℝ) - 1) := by
-  haveI := hyp.finiteG
-  haveI : ((hyp.typeI.typeF.H).subgroupOf L).Normal := typeF_H_subgroupOf_normal hyp
+  have := hyp.finiteG
+  have : ((hyp.typeI.typeF.H).subgroupOf L).Normal := typeF_H_subgroupOf_normal hyp
   have hB2 := OddOrder.Peterfalvi.S08.sum_div_normSq_induce_kernelFilter_eq (G := ↥L)
     (H := (hyp.typeI.typeF.H).subgroupOf L) (A := A)
   have hsummand : ∀ χ ∈ (Finset.univ.filter
@@ -232,7 +232,7 @@ theorem Sset_sum_re_sq_induce_kernelFilter_eq [Finite G] {L : Subgroup G} (hyp :
       (Finset.mem_filter.mp hθ).2.2
     have hχS : ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
         (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) ∈ hyp.Sset := by
-      simp only [Hypothesis.Sset, Set.mem_setOf_eq]; exact ⟨θ, hθne, rfl⟩
+      simp only [Hypothesis.Sset, Set.mem_ofPred_eq]; exact ⟨θ, hθne, rfl⟩
     have hirr := Sset_isIrreducibleCharacter hyp hfrob hχS
     have hinner : ClassFunction.inner
         (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
@@ -305,7 +305,7 @@ theorem Sset_index_le_two_psi [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
     obtain ⟨θ, hθ, rfl⟩ := Finset.mem_image.mp hχ
     obtain ⟨-, hker, hne⟩ := Finset.mem_filter.mp hθ
     apply hSA_S1
-    simp only [Hypothesis.SsubFiltration, Set.mem_setOf_eq]
+    simp only [Hypothesis.SsubFiltration, Set.mem_ofPred_eq]
     exact ⟨θ, hne, hker, rfl⟩
   have hchain : (((hyp.typeI.typeF.H).subgroupOf L).index : ℝ) *
       ((Nat.card (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
@@ -337,8 +337,8 @@ theorem Sset_index_le_two_psi [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **`Sset` is finite** — a subset of the (finite) range of `θ ↦ Ind_K^L θ`. -/
 theorem Sset_finite [Finite G] {L : Subgroup G} (hyp : Hypothesis L) : hyp.Sset.Finite := by
-  haveI := hyp.finiteG
-  haveI := finite_irreducibleCharacter (G := ↥((hyp.typeI.typeF.H).subgroupOf L))
+  have := hyp.finiteG
+  have := finite_irreducibleCharacter (G := ↥((hyp.typeI.typeF.H).subgroupOf L))
   have hsub : hyp.Sset ⊆ Set.range
       (fun θ : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) =>
         ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) θ.toClassFunction) := by
@@ -359,7 +359,7 @@ theorem SsubFiltration_closedUnderConjugate [Finite G] {L : Subgroup G} (hyp : H
     (A : Subgroup ↥L) : OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.SsubFiltration A) := by
   classical
   intro χ hχ
-  simp only [Hypothesis.SsubFiltration, Set.mem_setOf_eq] at hχ ⊢
+  simp only [Hypothesis.SsubFiltration, Set.mem_ofPred_eq] at hχ ⊢
   obtain ⟨θ, hθ_ne, hker, hφeq⟩ := hχ
   refine ⟨⟨(θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ).conj,
     θ.isIrreducible.conj⟩, ?_, ?_, ?_⟩
@@ -408,13 +408,13 @@ theorem exists_mem_SsubFiltration_degree_index [Finite G] {L : Subgroup G} (hyp 
       A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)) ≠ ⊤) :
     ∃ φ, φ ∈ hyp.SsubFiltration A ∧
       φ 1 = (((hyp.typeI.typeF.H).subgroupOf L).index : ℂ) := by
-  haveI := hyp.finiteG
-  haveI : (A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)).Normal := (‹A.Normal›).subgroupOf _
+  have := hyp.finiteG
+  have : (A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)).Normal := (‹A.Normal›).subgroupOf _
   obtain ⟨θ, hθne, hθker, hθdeg⟩ :=
    OddOrder.Peterfalvi.S08.exists_irreducibleCharacter_ne_trivial_subset_kernel_of_commutator_ne_top
       (A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)) h
   refine ⟨ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) θ.toClassFunction, ?_, ?_⟩
-  · simp only [Hypothesis.SsubFiltration, Set.mem_setOf_eq]; exact ⟨θ, hθne, hθker, rfl⟩
+  · simp only [Hypothesis.SsubFiltration, Set.mem_ofPred_eq]; exact ⟨θ, hθne, hθker, rfl⟩
   · rw [ClassFunction.induce_apply_one, hθdeg, mul_one]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -458,7 +458,7 @@ theorem Sset_six_two_index_bound [Finite G] {L : Subgroup G} (hyp : Hypothesis L
     (hS₁B.trans hyp.SsubFiltration_subset_Sset) hS₁conj ((SsubFiltration_finite hyp B).subset hS₁B)
     hAS₁ hS₁coh.some (hAS₁ hχ₁SA) hχ₁deg hψS (Sset_isIrreducibleCharacter hyp hfrob hψS)
     hψnotS1 hψcnotS1 hncoh
-  simp only [Hypothesis.SsubFiltration, Set.mem_setOf_eq] at hψB
+  simp only [Hypothesis.SsubFiltration, Set.mem_ofPred_eq] at hψB
   obtain ⟨θ, hθne, hθker, hψeq⟩ := hψB
   refine ⟨θ, hθker, ?_⟩
   rw [hψeq] at hbound
@@ -639,7 +639,7 @@ theorem SsubFiltration_commutator_closedUnderConjugate [Finite G] {L : Subgroup 
     χ.conj ∈ hyp.SsubFiltration
       ⁅(hyp.typeI.typeF.H).subgroupOf L, (hyp.typeI.typeF.H).subgroupOf L⁆ := by
   classical
-  simp only [Hypothesis.SsubFiltration, Set.mem_setOf_eq] at hχ ⊢
+  simp only [Hypothesis.SsubFiltration, Set.mem_ofPred_eq] at hχ ⊢
   obtain ⟨θ, hθ_ne, hker, hφeq⟩ := hχ
   refine ⟨⟨(θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ).conj,
     θ.isIrreducible.conj⟩, ?_, ?_, ?_⟩
@@ -776,7 +776,7 @@ theorem frobenius_typeI_coherent_of_abelianKernel [Finite G]
     hyp.typeIA_eq_sharp_of_frobenius hfrob
   -- `S` is finite: a subset of the (finite) range of `θ ↦ Ind_H^L θ`.
   have hSfin : hyp.Sset.Finite := by
-    haveI := finite_irreducibleCharacter (G := ↥((hyp.typeI.typeF.H).subgroupOf L))
+    have := finite_irreducibleCharacter (G := ↥((hyp.typeI.typeF.H).subgroupOf L))
     have hsub : hyp.Sset ⊆ Set.range
         (fun θ : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) =>
           ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) θ.toClassFunction) := by
@@ -791,21 +791,21 @@ theorem frobenius_typeI_coherent_of_abelianKernel [Finite G]
     have h := disjoint_iff.mp hdisj
     rw [inf_of_le_left hyp.typeI.typeF.H_le] at h
     exact hyp.typeI.typeF.H_nontrivial h
-  haveI : Nontrivial ↥((hyp.typeI.typeF.H).subgroupOf L) :=
+  have : Nontrivial ↥((hyp.typeI.typeF.H).subgroupOf L) :=
     (Subgroup.nontrivial_iff_ne_bot _).mpr hHsub_ne
   obtain ⟨g, hg⟩ := exists_ne (1 : ↥((hyp.typeI.typeF.H).subgroupOf L))
-  haveI : Nontrivial (ConjClasses ↥((hyp.typeI.typeF.H).subgroupOf L)) :=
+  have : Nontrivial (ConjClasses ↥((hyp.typeI.typeF.H).subgroupOf L)) :=
     ⟨ConjClasses.mk g, ConjClasses.mk 1,
       fun h => hg (isConj_one_left.mp (ConjClasses.mk_eq_mk_iff_isConj.mp h))⟩
-  haveI := finite_irreducibleCharacter (G := ↥((hyp.typeI.typeF.H).subgroupOf L))
-  haveI : Nontrivial (IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L)) :=
+  have := finite_irreducibleCharacter (G := ↥((hyp.typeI.typeF.H).subgroupOf L))
+  have : Nontrivial (IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L)) :=
     Finite.one_lt_card_iff_nontrivial.mp
       (by rw [card_irreducibleCharacter_eq];
           exact Finite.one_lt_card_iff_nontrivial.mpr inferInstance)
   obtain ⟨θ, hθ⟩ := exists_ne (trivialIrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L))
   set χ0 := ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) θ.toClassFunction with hχ0
   have hχ0S : χ0 ∈ hyp.Sset := by
-    simp only [hχ0, Hypothesis.Sset, Set.mem_setOf_eq]
+    simp only [hχ0, Hypothesis.Sset, Set.mem_ofPred_eq]
     refine ⟨θ, hθ, ?_⟩
     rfl
   have hχ0cS : χ0.conj ∈ hyp.Sset := Sset_closedUnderConjugate hyp hχ0S
@@ -854,10 +854,10 @@ theorem SsubFiltration_commutator_coherent [Finite G] {L : Subgroup G}
       (hyp.SsubFiltration ⁅(hyp.typeI.typeF.H).subgroupOf L, (hyp.typeI.typeF.H).subgroupOf L⁆)
       hyp.A) := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   -- `S(H′) ⊆ Sset` is finite.
   have hSsetfin : hyp.Sset.Finite := by
-    haveI := finite_irreducibleCharacter (G := ↥((hyp.typeI.typeF.H).subgroupOf L))
+    have := finite_irreducibleCharacter (G := ↥((hyp.typeI.typeF.H).subgroupOf L))
     have hsub : hyp.Sset ⊆ Set.range
         (fun θ : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) =>
           ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) θ.toClassFunction) := by
@@ -873,24 +873,24 @@ theorem SsubFiltration_commutator_coherent [Finite G] {L : Subgroup G}
     have h := disjoint_iff.mp hdisj
     rw [inf_of_le_left hyp.typeI.typeF.H_le] at h
     exact hyp.typeI.typeF.H_nontrivial h
-  haveI : Nontrivial ↥((hyp.typeI.typeF.H).subgroupOf L) :=
+  have : Nontrivial ↥((hyp.typeI.typeF.H).subgroupOf L) :=
     (Subgroup.nontrivial_iff_ne_bot _).mpr hHsub_ne
   -- `K/⁅K,K⁆` is nontrivial (`K` nilpotent nontrivial is not perfect).
   have hcomm_lt : commutator ↥((hyp.typeI.typeF.H).subgroupOf L) < ⊤ :=
-    IsSolvable.commutator_lt_top_of_nontrivial ↥((hyp.typeI.typeF.H).subgroupOf L)
-  haveI : Nontrivial (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
+    Group.IsSolvable.commutator_lt_top_of_nontrivial ↥((hyp.typeI.typeF.H).subgroupOf L)
+  have : Nontrivial (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
       commutator ↥((hyp.typeI.typeF.H).subgroupOf L)) := by
     rw [QuotientGroup.nontrivial_iff]; exact hcomm_lt.ne
   -- a nontrivial character of the abelianization, inflated to a member `θ0` of `S(H′)`.
-  haveI := finite_irreducibleCharacter (G := ↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
+  have := finite_irreducibleCharacter (G := ↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
     commutator ↥((hyp.typeI.typeF.H).subgroupOf L))
   obtain ⟨g, hg⟩ := exists_ne (1 : ↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
     commutator ↥((hyp.typeI.typeF.H).subgroupOf L))
-  haveI : Nontrivial (ConjClasses (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
+  have : Nontrivial (ConjClasses (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
       commutator ↥((hyp.typeI.typeF.H).subgroupOf L))) :=
     ⟨ConjClasses.mk g, ConjClasses.mk 1,
       fun h => hg (isConj_one_left.mp (ConjClasses.mk_eq_mk_iff_isConj.mp h))⟩
-  haveI : Nontrivial (IrreducibleCharacter (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
+  have : Nontrivial (IrreducibleCharacter (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
       commutator ↥((hyp.typeI.typeF.H).subgroupOf L))) :=
     Finite.one_lt_card_iff_nontrivial.mp
       (by rw [card_irreducibleCharacter_eq]
@@ -905,7 +905,7 @@ theorem SsubFiltration_commutator_coherent [Finite G] {L : Subgroup G}
     ((inflate (commutator ↥((hyp.typeI.typeF.H).subgroupOf L)) χbar).toClassFunction) with hχ0def
   have hχ0S : χ0 ∈ hyp.SsubFiltration
       ⁅(hyp.typeI.typeF.H).subgroupOf L, (hyp.typeI.typeF.H).subgroupOf L⁆ := by
-    simp only [Hypothesis.SsubFiltration, Set.mem_setOf_eq]
+    simp only [Hypothesis.SsubFiltration, Set.mem_ofPred_eq]
     refine ⟨inflate (commutator ↥((hyp.typeI.typeF.H).subgroupOf L)) χbar, hθ0ne, ?_, rfl⟩
     rw [OddOrder.Peterfalvi.S08.commutator_subgroupOf_self]
     exact subset_characterKernel_inflate (commutator ↥((hyp.typeI.typeF.H).subgroupOf L)) χbar
@@ -949,8 +949,8 @@ nilpotent (`maxNilpotentNormalHall_isNilpotent`), and `K ≃* L_F` (`subgroupOfE
 transfers nilpotency. -/
 theorem typeF_H_subgroupOf_isNilpotent [Finite G] {L : Subgroup G} (hyp : Hypothesis L) :
     Group.IsNilpotent ↥((hyp.typeI.typeF.H).subgroupOf L) := by
-  haveI := hyp.finiteG
-  haveI : Group.IsNilpotent ↥(hyp.typeI.typeF.H) := by
+  have := hyp.finiteG
+  have : Group.IsNilpotent ↥(hyp.typeI.typeF.H) := by
     rw [hyp.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent L
   exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hyp.typeI.typeF.H_le).symm
@@ -982,17 +982,17 @@ theorem frobenius_typeI_coherent_of_cyclicQuotient [Finite G]
         IsCyclic ↥(OddOrder.GroupTheory.opiCoreInG {p}ᶜ hyp.typeI.typeF.H)) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   obtain ⟨C, hfrob⟩ := _hfrob
   have hfrobK : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L
       ((hyp.typeI.typeF.H).subgroupOf L) C := hfrob
   have hodd : Odd (Nat.card ↥L) := _hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card L)
   have hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1} :=
     hyp.typeIA_eq_sharp_of_frobenius hfrobK
-  haveI hKnilp : Group.IsNilpotent ↥((hyp.typeI.typeF.H).subgroupOf L) :=
+  have hKnilp : Group.IsNilpotent ↥((hyp.typeI.typeF.H).subgroupOf L) :=
     typeF_H_subgroupOf_isNilpotent hyp
-  haveI hKnorm : ((hyp.typeI.typeF.H).subgroupOf L).Normal := typeF_H_subgroupOf_normal hyp
-  haveI hKntriv : Nontrivial ↥((hyp.typeI.typeF.H).subgroupOf L) := by
+  have hKnorm : ((hyp.typeI.typeF.H).subgroupOf L).Normal := typeF_H_subgroupOf_normal hyp
+  have hKntriv : Nontrivial ↥((hyp.typeI.typeF.H).subgroupOf L) := by
     rw [Subgroup.nontrivial_iff_ne_bot, Ne, Subgroup.subgroupOf_eq_bot]
     intro hdisj
     have h := disjoint_iff.mp hdisj
@@ -1002,7 +1002,7 @@ theorem frobenius_typeI_coherent_of_cyclicQuotient [Finite G]
   have hH'lt : (⁅(hyp.typeI.typeF.H).subgroupOf L, (hyp.typeI.typeF.H).subgroupOf L⁆
       : Subgroup ↥L) < (hyp.typeI.typeF.H).subgroupOf L := by
     have h1 : _root_.commutator ↥((hyp.typeI.typeF.H).subgroupOf L) < ⊤ :=
-      IsSolvable.commutator_lt_top_of_nontrivial _
+      Group.IsSolvable.commutator_lt_top_of_nontrivial _
     rw [← OddOrder.Peterfalvi.S08.commutator_subgroupOf_self] at h1
     refine lt_of_le_of_ne (Subgroup.commutator_le_left _ _) (fun heq => ?_)
     rw [heq, Subgroup.subgroupOf_self] at h1
@@ -1017,7 +1017,7 @@ theorem frobenius_typeI_coherent_of_cyclicQuotient [Finite G]
   have hdvd : ∀ p : ℕ, p.Prime → p ∣ Nat.card ↥((hyp.typeI.typeF.H).subgroupOf L) →
       ((hyp.typeI.typeF.H).subgroupOf L).index ∣ p - 1 := by
     have hCodd : Odd (Nat.card ↥C) := Odd.of_dvd_nat hodd C.card_subgroup_dvd_card
-    haveI hZC : _root_.IsZGroup ↥C :=
+    have hZC : _root_.IsZGroup ↥C :=
       OddOrder.Peterfalvi.S10.isZGroup_of_isFrobeniusGroup_of_odd hfrobK hCodd
     have hN : Nat.Coprime (Nat.card ↥((hyp.typeI.typeF.H).subgroupOf L))
         ((hyp.typeI.typeF.H).subgroupOf L).index := by
@@ -1027,9 +1027,9 @@ theorem frobenius_typeI_coherent_of_cyclicQuotient [Finite G]
       (Or.inl inferInstance) hfrobK.isComplement hyp.typeI.typeF.complement
     have e := Subgroup.equivMapOfInjective C (MulAut.conj n).toMonoidHom (MulAut.conj n).injective
     rw [hconj] at e
-    haveI hZUsub : _root_.IsZGroup ↥((hyp.typeI.typeF.U).subgroupOf L) :=
+    have hZUsub : _root_.IsZGroup ↥((hyp.typeI.typeF.U).subgroupOf L) :=
       _root_.IsZGroup.of_injective (f := e.symm.toMonoidHom) e.symm.injective
-    haveI hZU : _root_.IsZGroup ↥(hyp.typeI.typeF.U) :=
+    have hZU : _root_.IsZGroup ↥(hyp.typeI.typeF.U) :=
       _root_.IsZGroup.of_injective
         (f := (Subgroup.subgroupOfEquivOfLe hyp.typeI.typeF.U_le).symm.toMonoidHom)
         (Subgroup.subgroupOfEquivOfLe hyp.typeI.typeF.U_le).symm.injective
@@ -1059,10 +1059,10 @@ theorem frobenius_typeI_coherent_of_cyclicQuotient [Finite G]
         fun hle => lt_irrefl _ (lt_of_le_of_lt (le_trans hle hAle) hH'lt)
       have hAne : A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L) ≠ ⊤ := by
         rw [Ne, Subgroup.subgroupOf_eq_top]; exact hnle
-      haveI : Nontrivial (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
+      have : Nontrivial (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
           A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)) :=
         Subgroup.nontrivial_quotient_of_ne_top hAne
-      exact (IsSolvable.commutator_lt_top_of_nontrivial _).ne
+      exact (Group.IsSolvable.commutator_lt_top_of_nontrivial _).ne
   · -- **Abelian branch:** `⁅K,K⁆ = ⊥`, so `S(⁅K,K⁆) = S(⊥) = Sset` is coherent by `hcoh`.
     push Not at hnonab
     have hcomm_bot : (⁅(hyp.typeI.typeF.H).subgroupOf L,

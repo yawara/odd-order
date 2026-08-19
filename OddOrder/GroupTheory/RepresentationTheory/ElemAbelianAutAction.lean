@@ -64,9 +64,9 @@ theorem isCyclic_of_faithful_isIrreducible {F : Type*} [Field F] {Q : Type*} [Co
     [Finite Q] {V : Type*} [AddCommGroup V] [Module F V] (ρ : Representation F Q V)
     [ρ.IsIrreducible] (hfaith : Function.Injective ρ) : IsCyclic Q := by
   -- `ρ.asModule` is a simple `F[Q]`-module, so its annihilator is a maximal ideal.
-  haveI hsimple : IsSimpleModule F[Q] ρ.asModule := inferInstance
+  have hsimple : IsSimpleModule F[Q] ρ.asModule := inferInstance
   set ann : Ideal F[Q] := Module.annihilator F[Q] ρ.asModule with hann
-  haveI hmax : ann.IsMaximal := IsSimpleModule.annihilator_isMaximal
+  have hmax : ann.IsMaximal := IsSimpleModule.annihilator_isMaximal
   -- `E := F[Q] ⧸ ann` is an integral domain (`ann` maximal ⟹ prime).
   -- The multiplicative embedding `Q ↪ E`.
   let f : Q →* (F[Q] ⧸ ann) :=
@@ -103,7 +103,7 @@ theorem elemAbelian_aut_action {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (hpq : 
       ∃ α : Q, α ≠ 1 ∧ ∃ r : (ZMod p)ˣ, orderOf r = q ∧ ∀ x : P, ρ α x = (r : ZMod p) • x := by
   classical
   -- Basic instances.
-  haveI hne : NeZero ((Nat.card Q : ℕ) : ZMod p) := by
+  have hne : NeZero ((Nat.card Q : ℕ) : ZMod p) := by
     refine ⟨fun hcontra => ?_⟩
     rw [hQcard, ZMod.natCast_eq_zero_iff] at hcontra
     exact hpq ((Nat.prime_dvd_prime_iff_eq Fact.out Fact.out).mp
@@ -117,17 +117,17 @@ theorem elemAbelian_aut_action {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (hpq : 
   -- `ρ` is not irreducible (else the crux would make `Q` cyclic).
   have hnotirr : ¬ ρ.IsIrreducible := by
     intro hirr
-    letI : CommGroup Q := { (inferInstance : Group Q) with mul_comm := hQea.comm }
-    haveI := hirr
+    let : CommGroup Q := { (inferInstance : Group Q) with mul_comm := hQea.comm }
+    have := hirr
     exact hnotcyclic (isCyclic_of_faithful_isIrreducible ρ hfaith)
   -- `P` is nontrivial, hence so is the subrepresentation lattice.
-  haveI hntP : Nontrivial P := Module.nontrivial_of_finrank_pos (by rw [hP]; norm_num)
+  have hntP : Nontrivial P := Module.nontrivial_of_finrank_pos (by rw [hP]; norm_num)
   have hbnt : (⊥ : Subrepresentation ρ) ≠ (⊤ : Subrepresentation ρ) := by
     intro h
     have h2 := congrArg Subrepresentation.toSubmodule h
     rw [hbotTS, htopTS] at h2
     exact bot_ne_top h2
-  haveI hntSub : Nontrivial (Subrepresentation ρ) := ⟨⊥, ⊤, hbnt⟩
+  have hntSub : Nontrivial (Subrepresentation ρ) := ⟨⊥, ⊤, hbnt⟩
   -- Extract a proper nonzero subrepresentation `W`.
   have hmid : ∃ W : Subrepresentation ρ, W ≠ ⊥ ∧ W ≠ ⊤ := by
     by_contra hcon
@@ -137,7 +137,7 @@ theorem elemAbelian_aut_action {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (hpq : 
     exact hcon ⟨W, fun h => hW (Or.inl h), fun h => hW (Or.inr h)⟩
   obtain ⟨W, hWbot, hWtop⟩ := hmid
   -- Maschke: `ρ` is semisimple, so `W` has a complement `W'`.
-  haveI : Representation.IsSemisimpleRepresentation ρ := inferInstance
+  have : Representation.IsSemisimpleRepresentation ρ := inferInstance
   obtain ⟨W', hWW'⟩ := exists_isCompl W
   -- Translate `IsCompl` from subrepresentations to `𝔽_p`-submodules.
   have hbot : W.toSubmodule ⊓ W'.toSubmodule = ⊥ := by

@@ -95,7 +95,7 @@ theorem TypeIOverNormalizerData.prime_dvd_sq_sub_one_of_omega1Center [Finite G]
         ((R : Subgroup ↥data.H).map data.H.subtype) r) = r ^ 2) :
     hyp.p ∣ r ^ 2 - 1 := by
   classical
-  letI : Fact r.Prime := ⟨hr⟩
+  let : Fact r.Prime := ⟨hr⟩
   let Rg : Subgroup G := (R : Subgroup ↥data.H).map data.H.subtype
   have hHL : data.H ≤ data.L := by
     rw [data.H_eq_LF]
@@ -130,12 +130,12 @@ theorem TypeIOverNormalizerData.prime_dvd_sq_sub_one_of_omega1Center [Finite G]
   have hAcard : Nat.card ↥A = hyp.p := by
     change Nat.card ↥(MulAut.conj y • hyp.W2 : Subgroup G) = hyp.p
     rw [card_pointwise_smul, ← hyp.p_eq_card_W2]
-  haveI hHnilp : Group.IsNilpotent ↥data.H := by
+  have hHnilp : Group.IsNilpotent ↥data.H := by
     rw [data.H_eq_LF]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent data.L
   have hRnormal : (R : Subgroup ↥data.H).Normal :=
     OddOrder.Isaacs.Ch01.Sylow.normal_of_isNilpotent R
-  haveI hRchar : (R : Subgroup ↥data.H).Characteristic :=
+  have hRchar : (R : Subgroup ↥data.H).Characteristic :=
     Sylow.characteristic_of_normal R hRnormal
   have hARg : A ≤ Subgroup.normalizer (Rg : Set G) := by
     intro a ha

@@ -123,7 +123,7 @@ private theorem lemma103_core
     Subgroup.center P ≤ A ∧ Nat.card (Subgroup.center P) = p ∧
       Nat.card (_root_.commutator P) = p ^ (t - 1) := by
   have hp_prime : p.Prime := hp.out
-  haveI hA_normal : A.Normal := by rw [hgen]; infer_instance
+  have hA_normal : A.Normal := by rw [hgen]; infer_instance
   have hAb : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x := elemAb_comm hEA
   -- a ∈ A and a has order p
   have ha_mem : a ∈ A := hgen.symm ▸ Subgroup.subset_normalClosure (Set.mem_singleton a)
@@ -141,7 +141,7 @@ private theorem lemma103_core
     rcases hp_prime.eq_one_or_self_of_dvd _ (orderOf_dvd_of_pow_eq_one hpow_a) with h1 | h
     · exact absurd (orderOf_eq_one_iff.mp h1) ha_ne
     · exact h
-  haveI : Nontrivial P := ⟨⟨a, 1, ha_ne⟩⟩
+  have : Nontrivial P := ⟨⟨a, 1, ha_ne⟩⟩
   -- the quotient P ⧸ A has order p, hence is cyclic
   have hQcard : Nat.card (P ⧸ A) = p := by rw [← Subgroup.index_eq_card]; exact hidx
   have hCyc : IsCyclic (P ⧸ A) := isCyclic_of_prime_card hQcard
@@ -150,7 +150,7 @@ private theorem lemma103_core
     by_contra hnot
     have hAcent : A ≤ Subgroup.center P := le_center_of_center_not_le hidx hAb hnot
     -- but then the conjugacy class of a is {a}, so A = ⟨a⟩ is too small
-    haveI hz_norm : (Subgroup.zpowers a).Normal := by
+    have hz_norm : (Subgroup.zpowers a).Normal := by
       constructor
       intro g hg x
       have hg_center : g ∈ Subgroup.center P :=
@@ -171,10 +171,10 @@ private theorem lemma103_core
     omega
   -- Step 2: P' ≤ A
   have hG'le : _root_.commutator P ≤ A := by
-    letI : CommGroup (P ⧸ A) := IsCyclic.commGroup
+    let : CommGroup (P ⧸ A) := IsCyclic.commGroup
     exact Subgroup.Normal.quotient_commutative_iff_commutator_le.mp ⟨⟨mul_comm⟩⟩
   -- Step 3: A = ⟨a⟩ ⊔ P' (the sup is normal and contains a, hence the normal closure)
-  haveI hH_normal : (Subgroup.zpowers a ⊔ _root_.commutator P).Normal := by
+  have hH_normal : (Subgroup.zpowers a ⊔ _root_.commutator P).Normal := by
     constructor
     intro h hh g
     have h1 : ⁅g, h⁆ ∈ _root_.commutator P := by
@@ -207,7 +207,7 @@ private theorem lemma103_core
     hAb hCyc
   rw [inf_eq_right.mpr hZle, hcard] at hkey
   -- Step 6: |Z(P)| ≥ p (nontrivial center of a p-group)
-  haveI : Nontrivial (Subgroup.center P) := hP.center_nontrivial
+  have : Nontrivial (Subgroup.center P) := hP.center_nontrivial
   obtain ⟨n, hn_pos, hn⟩ :=
     ((hP.to_subgroup (Subgroup.center P)).nontrivial_iff_card).mp ‹_›
   have hZ_ge : p ≤ Nat.card (Subgroup.center P) := by
@@ -274,11 +274,11 @@ theorem isElementaryAbelian_commutator_of_elementaryAbelian_normalClosure_index_
     {A : Subgroup P} (hidx : A.index = p) (hEA : A.IsElementaryAbelian p)
     {a : P} (hgen : A = Subgroup.normalClosure {a}) :
     (_root_.commutator P).IsElementaryAbelian p := by
-  haveI hA_normal : A.Normal := by rw [hgen]; infer_instance
+  have hA_normal : A.Normal := by rw [hgen]; infer_instance
   have hQcard : Nat.card (P ⧸ A) = p := by rw [← Subgroup.index_eq_card]; exact hidx
   have hCyc : IsCyclic (P ⧸ A) := isCyclic_of_prime_card hQcard
   have hG'le : _root_.commutator P ≤ A := by
-    letI : CommGroup (P ⧸ A) := IsCyclic.commGroup
+    let : CommGroup (P ⧸ A) := IsCyclic.commGroup
     exact Subgroup.Normal.quotient_commutative_iff_commutator_le.mp ⟨⟨mul_comm⟩⟩
   refine ⟨fun x y => Subtype.ext (elemAb_comm hEA _ (hG'le x.2) _ (hG'le y.2)),
     fun x => ?_⟩
@@ -294,7 +294,7 @@ theorem nilpotencyClass_eq_of_elementaryAbelian_normalClosure_index_prime
     {t : ℕ} (ht : 2 ≤ t) (hcard : Nat.card A = p ^ t)
     {a : P} (hgen : A = Subgroup.normalClosure {a}) :
     Group.nilpotencyClass P = t := by
-  haveI hA_normal : A.Normal := by rw [hgen]; infer_instance
+  have hA_normal : A.Normal := by rw [hgen]; infer_instance
   have hQcard : Nat.card (P ⧸ A) = p := by rw [← Subgroup.index_eq_card]; exact hidx
   have hCyc : IsCyclic (P ⧸ A) := isCyclic_of_prime_card hQcard
   obtain ⟨hZle, hZcard, -⟩ := lemma103_core hP hidx hEA ht hcard hgen
@@ -387,7 +387,7 @@ theorem finrank_ge_of_iterate_sum_ne_zero
     (f : M →+ M) (hfp : ∀ x, f^[p] x = x) {a : M}
     (ha : ∑ i ∈ Finset.range p, f^[i] a ≠ 0) :
     p ≤ Module.finrank (ZMod p) M := by
-  haveI : Module.Finite (ZMod p) M := Module.Finite.of_finite
+  have : Module.Finite (ZMod p) M := Module.Finite.of_finite
   set T : Module.End (ZMod p) M := AddMonoidHom.toZModLinearMap p f with hT_def
   have hiter : ∀ (i : ℕ) (x : M), (T ^ i) x = f^[i] x := by
     intro i
@@ -515,7 +515,7 @@ private lemma conjClass_toFinset_eq_image [DecidableEq P] {A : Subgroup P} [A.No
   have hp_prime : p.Prime := hp.out
   have horder := orderOf_mk_eq_of_notMem hidx hu
   ext b
-  rw [Set.Finite.mem_toFinset, Set.mem_setOf_eq, Finset.mem_image]
+  rw [Set.Finite.mem_toFinset, Set.mem_ofPred_eq, Finset.mem_image]
   constructor
   · intro hconj
     obtain ⟨c, hc⟩ := isConj_iff.mp hconj
@@ -599,6 +599,7 @@ lemma exists_notMem_of_index_prime {A : Subgroup P} (hidx : A.index = p) :
   obtain ⟨u, -, hu⟩ := SetLike.exists_of_lt (lt_top_iff_ne_top.mpr hA_ne_top)
   exact ⟨u, hu⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The `Finset.noncommProd` of the conjugacy class of a noncentral `a ∈ A` equals
 the list product `∏_{i<p} a^{uⁱ}` for any `u ∉ A` (class enumeration
 `conjClass_toFinset_eq_image` + injectivity `conj_pow_injOn`). Shared bridge for
@@ -661,10 +662,10 @@ private lemma exists_card_eq_pow_ge_of_conj_list_prod_ne_one {A : Subgroup P} [A
     have hc := hAb (u ^ p) hupA ((x : ↥A) : P) x.2
     rw [hc]; group
   -- pass to the additive F_p-vector space
-  letI : IsMulCommutative ↥A := IsMulCommutative.of_comm hEA'.comm
-  letI : CommGroup ↥A := inferInstance
-  letI := hEA'.zmodModule
-  haveI : Finite (Additive ↥A) := inferInstanceAs (Finite ↥A)
+  let : IsMulCommutative ↥A := IsMulCommutative.of_comm hEA'.comm
+  let : CommGroup ↥A := inferInstance
+  let := hEA'.zmodModule
+  have : Finite (Additive ↥A) := inferInstanceAs (Finite ↥A)
   -- the product of the conjugates, computed in the abelian ↥A, is nontrivial
   have hprodA : (∏ i ∈ Finset.range p, ê i) ≠ 1 := by
     intro h1
@@ -737,7 +738,7 @@ private lemma nonempty_mulEquiv_wreath_of_card_pow
   have hcardZA : Nat.card ((Subgroup.center P).subgroupOf A) = p := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hZle).toEquiv, hZ]
   have hcardK : p * Nat.card K = p ^ m := by
-    have h1 := hK.card_mul
+    have h1 := hK.card_mul_card
     rw [hcardZA, hcardA] at h1
     exact h1
   have hm1 : 1 ≤ m := le_trans hp_prime.one_lt.le hm
@@ -911,8 +912,8 @@ private theorem cor105_aux (n : ℕ) :
         · exact h
       -- the center has order ≥ p²
       have ha_ne : a ≠ 1 := fun h => haZ (h ▸ Subgroup.one_mem _)
-      haveI : Nontrivial Q := ⟨⟨a, 1, ha_ne⟩⟩
-      haveI := hQ.center_nontrivial
+      have : Nontrivial Q := ⟨⟨a, 1, ha_ne⟩⟩
+      have := hQ.center_nontrivial
       obtain ⟨k, hk_pos, hkcard⟩ :=
         ((hQ.to_subgroup (Subgroup.center Q)).nontrivial_iff_card).mp ‹_›
       have hk2 : 2 ≤ k := by
@@ -942,7 +943,7 @@ private theorem cor105_aux (n : ℕ) :
         · exact h
       set Z := Subgroup.zpowers z with hZ_def
       have hZ_le_cent : Z ≤ Subgroup.center Q := Subgroup.zpowers_le.mpr hz_cent
-      haveI hZnormal : Z.Normal := by
+      have hZnormal : Z.Normal := by
         constructor
         intro g hg x
         have h1 : x * g * x⁻¹ = g := by
@@ -961,7 +962,7 @@ private theorem cor105_aux (n : ℕ) :
       have hπsurj : Function.Surjective π := QuotientGroup.mk'_surjective Z
       have hkerπ : π.ker = Z := QuotientGroup.ker_mk' Z
       have hZ_le_A : Z ≤ A := Subgroup.zpowers_le.mpr hzA
-      haveI : (A.map π).Normal := Subgroup.Normal.map ‹A.Normal› π hπsurj
+      have : (A.map π).Normal := Subgroup.Normal.map ‹A.Normal› π hπsurj
       have hidx' : (A.map π).index = p := by
         rw [A.index_map_eq hπsurj (by rw [hkerπ]; exact hZ_le_A), hidx]
       have hEA' : (A.map π).IsElementaryAbelian p :=
@@ -1205,7 +1206,7 @@ private lemma mulSingle_mem_normalClosure (q : Multiplicative (ZMod p))
 private lemma wreathBase_eq_normalClosure :
     wreathBase p = Subgroup.normalClosure {wreathGen p} := by
   classical
-  haveI : (wreathBase p).Normal := by
+  have : (wreathBase p).Normal := by
     rw [wreathBase]
     infer_instance
   have hsub : Subgroup.normalClosure {wreathGen p} ≤ wreathBase p := by

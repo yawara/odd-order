@@ -88,14 +88,14 @@ theorem sylow_center_le_U_sylow_of_centralizer_witness [Finite G]
         ((R : Subgroup ↥K).map K.subtype).subtype ≤
       (R₀ : Subgroup ↥hyp.U).map hyp.U.subtype := by
   classical
-  letI := Fintype.ofFinite G
-  letI : Fact r.Prime := ⟨hr⟩
+  let := Fintype.ofFinite G
+  let : Fact r.Prime := ⟨hr⟩
   have hUS : hyp.U ≤ hyp.S := by
     rw [← hyp.Sdata_U_eq]
     exact hyp.Sdata.U_le.trans (Subgroup.map_subtype_le _)
   have hR₀card : r ∣ Nat.card ↥(R₀ : Subgroup ↥hyp.U) :=
     R₀.isPGroup'.card_eq_or_dvd.resolve_left fun hcard => hR₀nc <| by
-      letI : Subsingleton ↥(R₀ : Subgroup ↥hyp.U) :=
+      let : Subsingleton ↥(R₀ : Subgroup ↥hyp.U) :=
         (Nat.card_eq_one_iff_unique.mp hcard).1
       exact isCyclic_of_subsingleton
   have hrU : r ∣ Nat.card ↥hyp.U :=

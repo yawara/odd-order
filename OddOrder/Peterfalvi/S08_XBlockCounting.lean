@@ -31,8 +31,8 @@ theorem two_le_xBaseBlock_ncard_c2_caseA (hyp : SibleyDadeHypothesis G L H)
     (hA : Subgroup.center ↥H ⊓ cert.W2.subgroupOf H = ⊥)
     (hXne : (hyp.Xset hyp.centralCommutator).Nonempty) :
     2 ≤ (hyp.xBaseBlock hyp.centralCommutator).ncard := by
-  haveI := hyp.H_normal
-  haveI := hyp.centralCommutator_normal
+  have := hyp.H_normal
+  have := hyp.centralCommutator_normal
   exact hyp.two_le_xBaseBlock_ncard_of_irreducible_X hyp.centralCommutator_le
     (fun _ h => hyp.isIrreducibleCharacter_of_mem_Xset_c2_caseA hK hW1 hA h) hXne
 
@@ -93,7 +93,7 @@ theorem inner_extension_Xset_centralCommutator_Yset_eq_zero_general
     {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset) :
     ClassFunction.inner (cX.extension χ) (cY.extension η) = 0 := by
   classical
-  haveI : (hyp.centralCommutator).Normal := hyp.centralCommutator_normal
+  have : (hyp.centralCommutator).Normal := hyp.centralCommutator_normal
   set hXc := cX with hXc_def
   set hYc := cY with hYc_def
   -- irreducibility of members
@@ -216,7 +216,7 @@ theorem inner_extension_Xset_centralCommutator_Yset_eq_zero_general_c2_caseA
     {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset) :
     ClassFunction.inner (cX.extension χ) (cY.extension η) = 0 := by
   classical
-  haveI : (hyp.centralCommutator).Normal := hyp.centralCommutator_normal
+  have : (hyp.centralCommutator).Normal := hyp.centralCommutator_normal
   set hXc := cX with hXc_def
   set hYc := cY with hYc_def
   -- irreducibility of members
@@ -591,7 +591,7 @@ theorem restrict_extension_Yset_degree_value_eq_of_frobenius
       = -(ClassFunction.inner (ClassFunction.restrict L (hyp.coherentYset.extension η)) χ₁)
           * (Nat.card ↥L : ℂ) := by
   classical
-  haveI : (hyp.centralCommutator).Normal := hyp.centralCommutator_normal
+  have : (hyp.centralCommutator).Normal := hyp.centralCommutator_normal
   set R := ClassFunction.restrict L (hyp.coherentYset.extension η) with hRdef
   have hval : R z - R 1 = ∑ a : IrreducibleCharacter ↥L,
       ClassFunction.inner R (a : ClassFunction ↥L ℂ) *
@@ -663,7 +663,7 @@ theorem restrict_extension_Yset_degree_value_eq_c2_caseA
       = -(ClassFunction.inner (ClassFunction.restrict L (hyp.coherentYset.extension η)) χ₁)
           * (Nat.card ↥L : ℂ) := by
   classical
-  haveI : (hyp.centralCommutator).Normal := hyp.centralCommutator_normal
+  have : (hyp.centralCommutator).Normal := hyp.centralCommutator_normal
   set R := ClassFunction.restrict L (hyp.coherentYset.extension η) with hRdef
   have hval : R z - R 1 = ∑ a : IrreducibleCharacter ↥L,
       ClassFunction.inner R (a : ClassFunction ↥L ℂ) *
@@ -1055,7 +1055,7 @@ nontrivial `a ∈ Ĥ` and its conjugate witness the TI hypothesis), and `≥` ho
 theorem normalizer_map_subtype_eq (hyp : SibleyDadeHypothesis G L H) [H.Normal] :
     Subgroup.normalizer (H.map L.subtype) = L := by
   apply le_antisymm
-  · haveI : Nontrivial ↥H := H.nontrivial_iff_ne_bot.mpr hyp.H_ne_bot
+  · have : Nontrivial ↥H := H.nontrivial_iff_ne_bot.mpr hyp.H_ne_bot
     obtain ⟨x, hx1⟩ := exists_ne (1 : ↥H)
     set a : G := ((x : ↥L) : G) with ha_def
     have haĤ : a ∈ H.map L.subtype := Subgroup.mem_map.mpr ⟨(x : ↥L), x.2, rfl⟩
@@ -1085,7 +1085,7 @@ theorem sylow_map_subtype_of_coprime (hyp : SibleyDadeHypothesis G L H) [H.Norma
     (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
     {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H) :
     ∃ Q : Sylow p G, (Q : Subgroup G) = H.map L.subtype := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   set Ĥ : Subgroup G := H.map L.subtype with hĤ_def
   -- `Ĥ` is a `p`-group (image of the `p`-group `H` under the injective `L.subtype`).
   have hĤp : IsPGroup p ↥Ĥ := hHp.map L.subtype
@@ -1103,8 +1103,8 @@ theorem sylow_map_subtype_of_coprime (hyp : SibleyDadeHypothesis G L H) [H.Norma
   -- `H` is the unique (normal) Sylow `p`-subgroup of `↥L`.
   set HSyl : Sylow p ↥L := hHp.toSylow hpidx with hHSyl_def
   have hHSyl : (HSyl : Subgroup ↥L) = H := IsPGroup.toSylow_coe hHp hpidx
-  haveI hHSylNormal : (HSyl : Subgroup ↥L).Normal := by rw [hHSyl]; exact ‹H.Normal›
-  haveI : Unique (Sylow p ↥L) := Sylow.unique_of_normal HSyl hHSylNormal
+  have hHSylNormal : (HSyl : Subgroup ↥L).Normal := by rw [hHSyl]; exact ‹H.Normal›
+  have : Unique (Sylow p ↥L) := Sylow.unique_of_normal HSyl hHSylNormal
   have hpsub : ∀ K : Subgroup ↥L, IsPGroup p K → K ≤ H := by
     intro K hK
     obtain ⟨R, hR⟩ := hK.exists_le_sylow
@@ -1160,7 +1160,7 @@ theorem peterfalvi_67_centralCommutator (hyp : SibleyDadeHypothesis G L H) [H.No
     (hψconst : ∀ w ∈ hyp.centralCommutator.map L.subtype, w ≠ 1 →
         ρ.character w = ρ.character z) :
     ρ.character z ≡ ρ.character 1 [ALGMOD (Nat.card ↥H : ℤ)] := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   classical
   obtain ⟨Q, hQeq⟩ := hyp.sylow_map_subtype_of_frobenius hF hp hHp
   have hNorm : Subgroup.normalizer ((Q : Subgroup G) : Set G) = L := by
@@ -1229,7 +1229,7 @@ theorem peterfalvi_67_centralCommutator_c2_caseA (hyp : SibleyDadeHypothesis G L
     (hψconst : ∀ w ∈ hyp.centralCommutator.map L.subtype, w ≠ 1 →
         ρ.character w = ρ.character z) :
     ρ.character z ≡ ρ.character 1 [ALGMOD (Nat.card ↥H : ℤ)] := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   classical
   have hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1) := by
     have h := cert.card_coprime; rw [hK, hW1] at h; exact h
@@ -1321,7 +1321,7 @@ theorem restrict_extension_Yset_charValue_cong_of_frobenius
     intro g
     rw [hηtε, ← Int.cast_smul_eq_zsmul ℂ ε (ξ : ClassFunction G ℂ), ClassFunction.smul_apply]
   obtain ⟨V, _, _, _, ρ, hρ, hξρ⟩ := ξ.isIrreducible
-  haveI : ρ.IsIrreducible := hρ
+  have : ρ.IsIrreducible := hρ
   have hzGmem : (L.subtype z) ∈ hyp.centralCommutator.map L.subtype :=
     Subgroup.mem_map.mpr ⟨z, hz, rfl⟩
   have hzG1 : (L.subtype z) ≠ 1 := fun h => hz1 (L.subtype_injective (by simpa using h))
@@ -1382,7 +1382,7 @@ theorem restrict_extension_Yset_charValue_cong_c2_caseA
     intro g
     rw [hηtε, ← Int.cast_smul_eq_zsmul ℂ ε (ξ : ClassFunction G ℂ), ClassFunction.smul_apply]
   obtain ⟨V, _, _, _, ρ, hρ, hξρ⟩ := ξ.isIrreducible
-  haveI : ρ.IsIrreducible := hρ
+  have : ρ.IsIrreducible := hρ
   have hzGmem : (L.subtype z) ∈ hyp.centralCommutator.map L.subtype :=
     Subgroup.mem_map.mpr ⟨z, hz, rfl⟩
   have hzG1 : (L.subtype z) ≠ 1 := fun h => hz1 (L.subtype_injective (by simpa using h))

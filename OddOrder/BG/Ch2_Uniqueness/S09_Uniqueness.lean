@@ -129,7 +129,7 @@ theorem isUniquelyMaximal_of_mem_e2_not_maximal [Finite G] (hG : IsMinimalSimple
       exact congrArg Subtype.val
         (hAea.comm (⟨a, hAtop ▸ Subgroup.mem_top a⟩ : A)
           (⟨b, hAtop ▸ Subgroup.mem_top b⟩ : A))
-    exact hG.notSolvable (isSolvable_of_comm hcomm)
+    exact hG.notSolvable (Group.isSolvable_of_comm hcomm)
   exact uniquenessTheorem hG hAlt hr2
     (Or.inr (three_le_rank_centralizer_of_mem_e2_not_maximal hA2 hAns))
 

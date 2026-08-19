@@ -85,10 +85,10 @@ simple (`alternatingGroup.isSimpleGroup`, = Isaacs Thm 8.27), so it is `⊥` or 
 theorem normal_perm_eq_bot_or_alternating_or_top (hα : 5 ≤ Fintype.card α)
     (N : Subgroup (Perm α)) [N.Normal] :
     N = ⊥ ∨ N = alternatingGroup α ∨ N = ⊤ := by
-  haveI : Nontrivial α := Fintype.one_lt_card_iff_nontrivial.mp (by omega)
-  haveI hsimple : IsSimpleGroup (alternatingGroup α) :=
+  have : Nontrivial α := Fintype.one_lt_card_iff_nontrivial.mp (by omega)
+  have hsimple : IsSimpleGroup (alternatingGroup α) :=
     alternatingGroup.isSimpleGroup (by rwa [Nat.card_eq_fintype_card])
-  haveI : (N.subgroupOf (alternatingGroup α)).Normal := Subgroup.Normal.subgroupOf ‹N.Normal› _
+  have : (N.subgroupOf (alternatingGroup α)).Normal := Subgroup.Normal.subgroupOf ‹N.Normal› _
   rcases hsimple.eq_bot_or_eq_top_of_normal (N.subgroupOf (alternatingGroup α)) inferInstance with
     hbot | htop
   · -- `N ⊓ A = 1`: `sign` separates the elements of `N`, so `N ≤ Z(Sym Ω) = 1`.

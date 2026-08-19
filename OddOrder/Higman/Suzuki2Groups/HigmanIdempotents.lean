@@ -109,7 +109,7 @@ theorem exists_four_nsmul_mul_sub_self_eq_zero_of_conjNormal_inv
         mul_comm := hAcomm.is_comm.comm }
     ∃ ν : AddMonoid.End (Additive A),
       4 • (ν * ν - ν) = 0 := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   let α : MulAut A := MulAut.conjNormal (H := A) u⁻¹
@@ -271,7 +271,7 @@ theorem exists_common_zero_one_vector [Finite ι] [Nontrivial V]
     (hcomm : Pairwise fun i j ↦ Commute (f i) (f j)) :
     ∃ v : V, v ≠ 0 ∧ ∀ i, f i v = 0 ∨ f i v = v := by
   classical
-  letI := Fintype.ofFinite ι
+  let := Fintype.ofFinite ι
   obtain ⟨v₀, hv₀⟩ := exists_ne (0 : V)
   simpa using
     exists_common_zero_one_vector_finset f hidem hcomm

@@ -54,7 +54,7 @@ theorem eq_smul_of_baseChange_eq_smul {f : L →ₗ[𝒪] L} {c : K}
     ∃ c' : 𝒪, algebraMap 𝒪 K c' = c ∧ f = c' • LinearMap.id := by
   classical
   set b := Module.Free.chooseBasis 𝒪 L with hb
-  haveI : Nonempty (Module.Free.ChooseBasisIndex 𝒪 L) := b.index_nonempty
+  have : Nonempty (Module.Free.ChooseBasisIndex 𝒪 L) := b.index_nonempty
   obtain ⟨i₀⟩ := ‹Nonempty (Module.Free.ChooseBasisIndex 𝒪 L)›
   -- coordinates of the base-changed equation, read in the lifted basis
   have key : ∀ i j, algebraMap 𝒪 K (b.repr (f (b i)) j)
@@ -85,7 +85,7 @@ theorem smul_id_injective {c₁ c₂ : 𝒪}
     (h : (c₁ • LinearMap.id : L →ₗ[𝒪] L) = c₂ • LinearMap.id) : c₁ = c₂ := by
   classical
   set b := Module.Free.chooseBasis 𝒪 L with hb
-  haveI : Nonempty (Module.Free.ChooseBasisIndex 𝒪 L) := b.index_nonempty
+  have : Nonempty (Module.Free.ChooseBasisIndex 𝒪 L) := b.index_nonempty
   obtain ⟨i₀⟩ := ‹Nonempty (Module.Free.ChooseBasisIndex 𝒪 L)›
   have := congrArg (fun F => b.repr (F (b i₀)) i₀) h
   simpa using this

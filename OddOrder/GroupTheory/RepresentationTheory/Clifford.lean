@@ -390,7 +390,7 @@ theorem restrictionMultiplicity_eq_finrank_intertwiningMap
         (Representation.IntertwiningMap σ (ρ.comp H.subtype :
           Representation ℂ ↥H V)) : ℂ) := by
   classical
-  haveI : Finite ↥H := Finite.of_fintype _
+  have : Finite ↥H := Finite.of_fintype _
   set ρ' : Representation ℂ ↥H V := ρ.comp H.subtype with hρ'
   rw [restrictionMultiplicity, inner_eq_inv_card_mul_innerSum, innerSum]
   have hcharρ' : ∀ h : ↥H, χ (h : G) = ρ'.character h := fun h => by
@@ -475,9 +475,9 @@ theorem IsIrreducibleCharacter.conjBy [H.Normal]
     {θ : ClassFunction H ℂ} (hθ : IsIrreducibleCharacter θ) (g : G) :
     IsIrreducibleCharacter (conjBy (G := G) (H := H) g θ) := by
   rcases hθ with ⟨V, hVAdd, hVModule, hVFinite, ρ, hρ, hchar⟩
-  letI : AddCommGroup V := hVAdd
-  letI : Module ℂ V := hVModule
-  letI : FiniteDimensional ℂ V := hVFinite
+  let : AddCommGroup V := hVAdd
+  let : Module ℂ V := hVModule
+  let : FiniteDimensional ℂ V := hVFinite
   let ρg : Representation ℂ H V :=
     ρ.comp (conjByMulEquiv (G := G) (H := H) g).toMonoidHom
   refine ⟨V, inferInstance, inferInstance, inferInstance, ρg, ?_, ?_⟩
@@ -635,7 +635,7 @@ theorem exists_liesOver [Finite G]
     (χ : IrreducibleCharacter G) :
     ∃ θ : IrreducibleCharacter H, LiesOver H χ θ := by
   classical
-  haveI : Finite H := Subtype.finite
+  have : Finite H := Subtype.finite
   -- The restricted character is nonzero: its value at `1` is the positive degree `χ(1)`.
   have hne : ClassFunction.restrict H (χ : ClassFunction G ℂ) ≠ 0 := by
     obtain ⟨n, hpos, hval, _⟩ :=

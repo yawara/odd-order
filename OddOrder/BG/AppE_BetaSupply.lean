@@ -44,7 +44,7 @@ variable {G : Type*} [Group G] {T : Subgroup G}
 theorem scale_zpow_of_scale [T.Characteristic] (σ : G →* G) {q : G} {t : ℤ}
     (hσq : (q ^ t)⁻¹ * σ q ∈ iterCommutator T (⊤ : Subgroup G) 1) (m : ℤ) :
     ((q ^ m) ^ t)⁻¹ * σ (q ^ m) ∈ iterCommutator T (⊤ : Subgroup G) 1 := by
-  haveI : (iterCommutator T (⊤ : Subgroup G) 1).Normal := iterCommutator_normal 1
+  have : (iterCommutator T (⊤ : Subgroup G) 1).Normal := iterCommutator_normal 1
   set N := iterCommutator T (⊤ : Subgroup G) 1
   have h1 : ((q ^ t : G) : G ⧸ N) = ((σ q : G) : G ⧸ N) := QuotientGroup.eq.mpr hσq
   refine QuotientGroup.eq.mp ?_
@@ -83,8 +83,8 @@ theorem scale_iterCommutator_of_two_step [T.Characteristic] (σ : G →* G) {q :
     rw [iterCommutator_zero] at hy
     simpa using hbase y hy
   | succ a ih =>
-    haveI : T.Normal := inferInstance
-    haveI : (iterCommutator T (⊤ : Subgroup G) (a + 1 + 1)).Normal :=
+    have : T.Normal := inferInstance
+    have : (iterCommutator T (⊤ : Subgroup G) (a + 1 + 1)).Normal :=
       iterCommutator_normal _
     set N := iterCommutator T (⊤ : Subgroup G) (a + 1 + 1) with hNdef
     intro y hy

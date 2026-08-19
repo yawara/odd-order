@@ -40,7 +40,7 @@ theorem sum_eq_sum_fixedPoints (hp : p.Prime) (hP : IsPGroup p P) (hchar : ∀ a
     (s : Finset α) (hs : ∀ x, x ∈ s ↔ ∀ u : P, u • x = x) :
     ∑ x : α, F x = ∑ x ∈ s, F x := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   rw [← Finset.sum_add_sum_compl s F]
   suffices h : ∑ x ∈ sᶜ, F x = 0 by rw [h, add_zero]
   rw [← Finset.sum_fiberwise sᶜ (Quotient.mk'' : α → Quotient (orbitRel P α)) F]
@@ -82,7 +82,7 @@ theorem sum_eq_sum_fixedPoints (hp : p.Prime) (hP : IsPGroup p P) (hchar : ∀ a
   have hne : Nat.card (orbit P a) ≠ 1 := by
     intro h1
     refine hanotin ((hs a).mpr fun v => ?_)
-    haveI : Fintype (orbit P a) := Fintype.ofFinite _
+    have : Fintype (orbit P a) := Fintype.ofFinite _
     rw [Nat.card_eq_fintype_card] at h1
     exact mem_fixedPoints.mp (mem_fixedPoints_iff_card_orbit_eq_one.mpr h1) v
   have hn0 : n ≠ 0 := by rintro rfl; exact hne (by simpa using hn)

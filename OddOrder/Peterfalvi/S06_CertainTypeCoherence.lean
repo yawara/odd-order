@@ -335,7 +335,7 @@ theorem certainType_columnSign_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)
     (hdeg : (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
       = (∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1)) :
     (h.columnFamily χ₂).sign = (h.columnFamily χ₂').sign := by
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   exact certainType_sign_eq_of_degree_eq h.toCore χ₂ χ₂' 0
     (forall_columnFamily_mu_apply_one_eq_of_sum_eq h χ₂ χ₂' hdeg 0)
 
@@ -511,7 +511,7 @@ theorem columnSum_inv_apply_one (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     (k : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
     (∑ i, ((h.columnFamily k⁻¹).mu i : ClassFunction ↥L ℂ) 1)
       = (∑ i, ((h.columnFamily k).mu i : ClassFunction ↥L ℂ) 1) := by
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   rw [← columnSum_apply_one, ← columnSum_apply_one]
   have h1 : columnSum h k⁻¹
       = ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (columnSum h k) := by

@@ -310,7 +310,7 @@ private theorem exists_two_rootGroup_involutions (n : ℕ) (hn : 1 < n) :
       Nat.pow_le_pow_right (by omega) (by omega)
     norm_num at hpow ⊢
     omega
-  letI : Nontrivial ((BaseField n)ˣ) :=
+  let : Nontrivial ((BaseField n)ˣ) :=
     Finite.one_lt_card_iff_nontrivial.mp hcard
   obtain ⟨c, hc⟩ := exists_ne (1 : (BaseField n)ˣ)
   let x : RootGroup n := RootGroup.centralInvolution n
@@ -421,7 +421,7 @@ private theorem isSuzuki2Group_of_mulEquiv
   let autEquiv : MulAut P ≃* MulAut Q := MulAut.congr e
   let f : ↥A →* MulAut Q := autEquiv.toMonoidHom.comp A.subtype
   let B : Subgroup (MulAut Q) := f.range
-  letI : IsCyclic ↥A := hAcyc
+  let : IsCyclic ↥A := hAcyc
   have hQtwo : IsPGroup 2 Q := hPtwo.of_equiv e
   have hQnoncomm : ¬ IsMulCommutative Q := by
     intro hQcomm

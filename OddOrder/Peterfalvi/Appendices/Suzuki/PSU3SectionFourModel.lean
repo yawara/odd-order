@@ -80,7 +80,7 @@ theorem residualQuotientHypothesis_V_eq_W :
       details.residualQuotientEquiv.toMonoidHom
     (hyp.residualQuotientHypothesis details).V
       = (hyp.residualQuotientHypothesis details).W := by
-  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+  let := MulAction.compHom (ULift.{v} (Unital data.n))
     details.residualQuotientEquiv.toMonoidHom
   exact Hypothesis.ofMulEquivPullback_V_eq_W _ _
     (standardHypothesisULift_V_eq_W data.n data.one_lt_n)
@@ -90,7 +90,7 @@ theorem natCard_residualQuotientHypothesis_Q0 :
     letI := MulAction.compHom (ULift.{v} (Unital data.n))
       details.residualQuotientEquiv.toMonoidHom
     Nat.card ((hyp.residualQuotientHypothesis details).Q0) = 2 ^ data.n := by
-  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+  let := MulAction.compHom (ULift.{v} (Unital data.n))
     details.residualQuotientEquiv.toMonoidHom
   exact (Hypothesis.ofMulEquivPullback_natCard_Q0 _ _).trans
     (natCard_standardHypothesisULift_Q0.{v} data.n data.one_lt_n)
@@ -101,7 +101,7 @@ theorem natCard_residualQuotientHypothesis_Q :
       details.residualQuotientEquiv.toMonoidHom
     Nat.card ((hyp.residualQuotientHypothesis details).Q)
       = Nat.card ((hyp.residualQuotientHypothesis details).Q0) ^ 3 := by
-  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+  let := MulAction.compHom (ULift.{v} (Unital data.n))
     details.residualQuotientEquiv.toMonoidHom
   exact calc Nat.card ((hyp.residualQuotientHypothesis details).Q)
       = Nat.card ((standardHypothesisULift.{v} data.n data.one_lt_n).Q) :=
@@ -117,7 +117,7 @@ theorem residualQuotientHypothesis_orderOf_distinguishedInvolution_mul_t :
       details.residualQuotientEquiv.toMonoidHom
     orderOf ((hyp.residualQuotientHypothesis details).distinguishedInvolution *
         (hyp.residualQuotientHypothesis details).t) = 3 := by
-  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+  let := MulAction.compHom (ULift.{v} (Unital data.n))
     details.residualQuotientEquiv.toMonoidHom
   exact (Hypothesis.ofMulEquivPullback_orderOf_distinguishedInvolution_mul_t _ _).trans
     (standardHypothesisULift_orderOf_distinguishedInvolution_mul_t data.n data.one_lt_n)
@@ -127,7 +127,7 @@ theorem exists_ne_one_mem_residualQuotientHypothesis_W :
     letI := MulAction.compHom (ULift.{v} (Unital data.n))
       details.residualQuotientEquiv.toMonoidHom
     ∃ x ∈ (hyp.residualQuotientHypothesis details).W, x ≠ 1 := by
-  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+  let := MulAction.compHom (ULift.{v} (Unital data.n))
     details.residualQuotientEquiv.toMonoidHom
   exact Hypothesis.ofMulEquivPullback_exists_ne_one_mem_W _ _
     (exists_ne_one_mem_standardHypothesisULift_W data.n data.one_lt_n)
@@ -139,7 +139,7 @@ theorem isSuzuki2Group_residualQuotientHypothesis_Q :
       details.residualQuotientEquiv.toMonoidHom
     OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group
       ↥((hyp.residualQuotientHypothesis details).Q) := by
-  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+  let := MulAction.compHom (ULift.{v} (Unital data.n))
     details.residualQuotientEquiv.toMonoidHom
   refine OddOrder.GroupTheory.SpecificGroups.Suzuki.IsSuzuki2Group.of_equiv
     (standardRootSubgroup_isSuzuki2Group data.n data.one_lt_n) ?_
@@ -157,7 +157,7 @@ theorem theoremAInductionBelow_residualQuotient (hXV : X ≤ hyp.V) (hX : X ≠ 
     TheoremAInductionBelow
       (↥(residual (G := G) X) ⧸ Subgroup.center ↥(residual (G := G) X))
       (ULift.{v} (Unital data.n)) := by
-  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+  let := MulAction.compHom (ULift.{v} (Unital data.n))
     details.residualQuotientEquiv.toMonoidHom
   intro A Λ'' _ _ _ hlt hA
   exact ih (hlt.trans (hyp.natCard_residualQuotient_lt hXV hX)) hA
@@ -175,7 +175,7 @@ theorem nonempty_standingData_residualQuotient (hXV : X ≤ hyp.V) (hX : X ≠ �
       details.residualQuotientEquiv.toMonoidHom
     Nonempty ((hyp.residualQuotientHypothesis details).LemmaFiveSetup data.n) ∧
       Nonempty ((hyp.residualQuotientHypothesis details).QuotientFieldModel data.n) := by
-  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+  let := MulAction.compHom (ULift.{v} (Unital data.n))
     details.residualQuotientEquiv.toMonoidHom
   obtain ⟨w, hwW, hw1⟩ := hyp.exists_ne_one_mem_residualQuotientHypothesis_W details
   have hst := hyp.residualQuotientHypothesis_orderOf_distinguishedInvolution_mul_t details
@@ -199,7 +199,7 @@ theorem exists_center_Q_ne_one_residualQuotient :
     letI := MulAction.compHom (ULift.{v} (Unital data.n))
       details.residualQuotientEquiv.toMonoidHom
     ∃ x₀ : ↥(Subgroup.center (hyp.residualQuotientHypothesis details).Q), x₀ ≠ 1 := by
-  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+  let := MulAction.compHom (ULift.{v} (Unital data.n))
     details.residualQuotientEquiv.toMonoidHom
   exact (hyp.residualQuotientHypothesis details).exists_center_Q_ne_one
 
@@ -214,7 +214,7 @@ theorem mu_injective_residualQuotient (hXV : X ≤ hyp.V) (hX : X ≠ ⊥)
     ∀ (_sfive : (hyp.residualQuotientHypothesis details).LemmaFiveSetup data.n)
       (M : (hyp.residualQuotientHypothesis details).QuotientFieldModel data.n),
       Function.Injective M.mu := by
-  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+  let := MulAction.compHom (ULift.{v} (Unital data.n))
     details.residualQuotientEquiv.toMonoidHom
   have ihq : TheoremAInductionBelow
       (↥(residual (G := G) X) ⧸ Subgroup.center ↥(residual (G := G) X))

@@ -104,6 +104,7 @@ theorem cuSub_subgroupOf_U_normal (caseA : CliffordCaseAData chars) :
   exact (MonoidHom.normal_ker _).map e.toMonoidHom e.surjective
 
 open Subgroup in
+set_option backward.isDefEq.respectTransparency false in
 /-- **`C_U(S₀) ◁ U`** realized inside `HU` (mirrors `cInHu_normal`): `cuInHu ◁ uInHu`, transported
 from `cuSub ◁ U` along `↥uInHu ≃* ↥U`. -/
 theorem cuInHu_normal (caseA : CliffordCaseAData chars) :
@@ -288,8 +289,8 @@ theorem hcuLambdaHom_eq_one_of_mem_hInHu [Finite G] (caseA : CliffordCaseAData c
     {x : ↥(hInHu data ⊔ cuInHu caseA)}
     (hx : x ∈ (hInHu data).subgroupOf (hInHu data ⊔ cuInHu caseA)) :
     hcuLambdaHom caseA lam x = 1 := by
-  haveI := hInHu_normal data
-  letI : ((hInHu data).subgroupOf (cuInHu caseA ⊔ hInHu data)).Normal :=
+  have := hInHu_normal data
+  let : ((hInHu data).subgroupOf (cuInHu caseA ⊔ hInHu data)).Normal :=
     (hInHu_normal data).subgroupOf _
   simp only [hcuLambdaHom, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom,
     QuotientGroup.mk'_apply]
@@ -305,8 +306,8 @@ quotient map and the lift evaluates `λ`. -/
 theorem hcuLambdaHom_inclusion [Finite G] (caseA : CliffordCaseAData chars)
     (lam : ↥(cuInHu caseA) →* ℂˣ) (c : ↥(cuInHu caseA)) :
     hcuLambdaHom caseA lam (Subgroup.inclusion (cuInHu_le_hcuInHu caseA) c) = lam c := by
-  haveI := hInHu_normal data
-  letI : ((hInHu data).subgroupOf (cuInHu caseA ⊔ hInHu data)).Normal :=
+  have := hInHu_normal data
+  let : ((hInHu data).subgroupOf (cuInHu caseA ⊔ hInHu data)).Normal :=
     (hInHu_normal data).subgroupOf _
   have hfwd : (QuotientGroup.quotientInfEquivProdNormalQuotient (cuInHu caseA)
         (hInHu data))
@@ -333,7 +334,7 @@ theorem hcuLambdaHom_inclusion [Finite G] (caseA : CliffordCaseAData chars)
 input for `[HU : H·C_U(S₀)] = [U : C_U(S₀)]`.  Mirrors `uInHu_inf_hcInHu_eq_cInHu`. -/
 theorem uInHu_inf_hcuInHu_eq_cuInHu [Finite G] (caseA : CliffordCaseAData chars) :
     uInHu data ⊓ (hInHu data ⊔ cuInHu caseA) = cuInHu caseA := by
-  haveI := hInHu_normal data
+  have := hInHu_normal data
   apply le_antisymm
   · rintro x ⟨hxU, hxHC⟩
     obtain ⟨hh, hhmem, cc, ccmem, rfl⟩ := Subgroup.mem_sup_of_normal_left.mp hxHC
@@ -354,7 +355,7 @@ theorem uInHu_inf_hcuInHu_eq_cuInHu [Finite G] (caseA : CliffordCaseAData chars)
 theorem index_hcuInHu_eq_relindex_cuInHu [Finite G] (caseA : CliffordCaseAData chars) :
     (hInHu data ⊔ cuInHu caseA).index
       = ((cuInHu caseA).subgroupOf (uInHu data)).index := by
-  haveI : (hInHu data ⊔ cuInHu caseA).Normal := hcuInHu_normal caseA
+  have : (hInHu data ⊔ cuInHu caseA).Normal := hcuInHu_normal caseA
   have htop : uInHu data ⊔ (hInHu data ⊔ cuInHu caseA) = ⊤ := by
     rw [← sup_assoc, sup_comm (uInHu data) (hInHu data), hInHu_sup_uInHu_eq_top, top_sup_eq]
   have he := Nat.card_congr (QuotientGroup.quotientInfEquivProdNormalQuotient
@@ -481,15 +482,15 @@ theorem chiefFactor_clifford_dim_dvd_q [Finite G] {M : Subgroup G}
           chief.N_aInvariant).U.subtype) J → J ≤ S₀ → J = ⊥ ∨ J = S₀) := by
   classical
   have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
-  haveI : chief.N.Normal := chief.N_normal
-  haveI := Fact.mk chief.p_prime
+  have : chief.N.Normal := chief.N_normal
+  have := Fact.mk chief.p_prime
   -- The descended `U W₁`-action on the chief factor `H̄` and its restriction to the kernel `U`.
   set act := typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant with hact
   set φU := act.φ.comp act.U.subtype with hφU
   have hUnorm : act.U.Normal := (typeP_uW1_frobenius data.typeP hU).isNormal
   have hKcard : Nat.card (↥data.H ⧸ chief.N) = chief.p ^ data.q := chiefFactor_quotient_card chief
   have hq_pos : 0 < data.q := Nat.card_pos
-  haveI hKnt : Nontrivial (↥data.H ⧸ chief.N) :=
+  have hKnt : Nontrivial (↥data.H ⧸ chief.N) :=
     Finite.one_lt_card_iff_nontrivial.mp (by
       rw [hKcard]; exact Nat.one_lt_pow hq_pos.ne' chief.p_prime.one_lt)
   -- A minimal nonzero `U`-invariant subgroup `S₀` (the `U`-irreducible Clifford piece).
@@ -591,21 +592,21 @@ theorem chiefFactor_caseB_image_cyclic [Finite G] {M : Subgroup G}
           chief.N_aInvariant).U.subtype).range) ∣ chief.p ^ data.q - 1 := by
   classical
   have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
-  haveI : chief.N.Normal := chief.N_normal
-  haveI : NeZero chief.p := ⟨chief.p_prime.pos.ne'⟩
+  have : chief.N.Normal := chief.N_normal
+  have : NeZero chief.p := ⟨chief.p_prime.pos.ne'⟩
   set act := typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant with hact
   set φU := act.φ.comp act.U.subtype with hφU
   -- `H̄ = ↥H ⧸ N` is finite elementary abelian `p`, nontrivial, of order `p^q`.
   have hKcard : Nat.card (↥data.H ⧸ chief.N) = chief.p ^ data.q := chiefFactor_quotient_card chief
   have hq_pos : 0 < data.q := Nat.card_pos
-  haveI hKnt : Nontrivial (↥data.H ⧸ chief.N) :=
+  have hKnt : Nontrivial (↥data.H ⧸ chief.N) :=
     Finite.one_lt_card_iff_nontrivial.mp (by
       rw [hKcard]; exact Nat.one_lt_pow hq_pos.ne' chief.p_prime.one_lt)
   -- Module instances for the Singer mechanism, from `chief.quotient_elementaryAbelian`.
-  letI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+  let : IsMulCommutative (↥data.H ⧸ chief.N) :=
     IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
-  letI : CommGroup (↥data.H ⧸ chief.N) := inferInstance
-  letI : Module (ZMod chief.p) (Additive (↥data.H ⧸ chief.N)) :=
+  let : CommGroup (↥data.H ⧸ chief.N) := inferInstance
+  let : Module (ZMod chief.p) (Additive (↥data.H ⧸ chief.N)) :=
     chief.quotient_elementaryAbelian.zmodModule
   -- An element of `U W₁` centralizing `H` acts trivially on `H̄`.
   have hcentral_triv : ∀ g : ↥(data.typeP.U ⊔ data.typeP.W1),
@@ -688,21 +689,21 @@ theorem chiefFactor_caseB_image_coprime [Finite G] {M : Subgroup G}
           chief.N_aInvariant).U.subtype).range)) (chief.p - 1) := by
   classical
   have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
-  haveI : chief.N.Normal := chief.N_normal
-  haveI : NeZero chief.p := ⟨chief.p_prime.pos.ne'⟩
-  haveI : Fact chief.p.Prime := ⟨chief.p_prime⟩
+  have : chief.N.Normal := chief.N_normal
+  have : NeZero chief.p := ⟨chief.p_prime.pos.ne'⟩
+  have : Fact chief.p.Prime := ⟨chief.p_prime⟩
   set act := typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant with hact
   set φU := act.φ.comp act.U.subtype with hφU
-  haveI hUnorm : act.U.Normal := (typeP_uW1_frobenius data.typeP hU).isNormal
+  have hUnorm : act.U.Normal := (typeP_uW1_frobenius data.typeP hU).isNormal
   have hKcard : Nat.card (↥data.H ⧸ chief.N) = chief.p ^ data.q := chiefFactor_quotient_card chief
   have hq_pos : 0 < data.q := Nat.card_pos
-  haveI hKnt : Nontrivial (↥data.H ⧸ chief.N) :=
+  have hKnt : Nontrivial (↥data.H ⧸ chief.N) :=
     Finite.one_lt_card_iff_nontrivial.mp (by
       rw [hKcard]; exact Nat.one_lt_pow hq_pos.ne' chief.p_prime.one_lt)
-  letI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+  let : IsMulCommutative (↥data.H ⧸ chief.N) :=
     IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
-  letI : CommGroup (↥data.H ⧸ chief.N) := inferInstance
-  letI : Module (ZMod chief.p) (Additive (↥data.H ⧸ chief.N)) :=
+  let : CommGroup (↥data.H ⧸ chief.N) := inferInstance
+  let : Module (ZMod chief.p) (Additive (↥data.H ⧸ chief.N)) :=
     chief.quotient_elementaryAbelian.zmodModule
   -- Abelianness, irreducibility, faithfulness of `Ū = φU.range` (as in
   -- `chiefFactor_caseB_image_cyclic`).
@@ -789,8 +790,8 @@ theorem chiefFactor_caseB_image_coprime [Finite G] {M : Subgroup G}
       (typeP_uW1_frobenius data.typeP hU).coprime_card_kernel_complement
     exact Nat.Coprime.coprime_dvd_left
       (Subgroup.card_dvd_of_le (Subgroup.zpowers_le.mpr hw₀E)) hkc.symm
-  have hSolv : IsSolvable ↥(Subgroup.zpowers w₀) ∨ IsSolvable ↥act.U :=
-    Or.inl (isSolvable_of_comm fun a b => by
+  have hSolv : Group.IsSolvable ↥(Subgroup.zpowers w₀) ∨ Group.IsSolvable ↥act.U :=
+    Or.inl (Group.isSolvable_of_comm fun a b => by
       obtain ⟨i, hi⟩ := Subgroup.mem_zpowers_iff.mp a.2
       obtain ⟨j, hj⟩ := Subgroup.mem_zpowers_iff.mp b.2
       exact Subtype.ext (by rw [Subgroup.coe_mul, Subgroup.coe_mul, ← hi, ← hj]; group))
@@ -910,7 +911,7 @@ theorem chiefFactor_caseB_action_fpf [Finite G] {M : Subgroup G}
           chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
           chief.N_aInvariant).U.subtype) g x = x) : x = 1 := by
   classical
-  haveI : chief.N.Normal := chief.N_normal
+  have : chief.N.Normal := chief.N_normal
   set act := typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant with hact
   set φU := act.φ.comp act.U.subtype with hφU
   -- An element of `U W₁` centralizing `H` acts trivially on `H̄`.
@@ -976,7 +977,7 @@ theorem chiefFactor_caseB_char_inertia [Finite G] {M : Subgroup G}
       (typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U.subtype) g
         = 1 := by
   classical
-  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+  have : IsMulCommutative (↥data.H ⧸ chief.N) :=
     IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
   by_contra hne
   have hfpf : MonoidHom.FixedPointFree
@@ -1016,7 +1017,7 @@ theorem chiefFactor_caseA_char_inertia_gen [Finite G] {M : Subgroup G}
     (hinv : ∀ x, (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) ((uActionHom data chief) g x)
         = (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x) :
     (uActionHom data chief) g = 1 := by
-  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+  have : IsMulCommutative (↥data.H ⧸ chief.N) :=
     IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
   refine mulAut_eq_one_of_fixes_regular_on_prime_span ((uActionHom data chief) g) Hpart
     (fun i => ?_) (fun i x hx => ?_) hspan θ hreg hinv
@@ -1044,13 +1045,14 @@ theorem chiefFactor_caseA_char_inertia [Finite G] {M : Subgroup G}
     (hinv : ∀ x, (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) ((uActionHom data chief) g x)
         = (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x) :
     (uActionHom data chief) g = 1 := by
-  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+  have : IsMulCommutative (↥data.H ⧸ chief.N) :=
     IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
   refine mulAut_eq_one_of_fixes_regular_on_prime_span ((uActionHom data chief) g) caseA.Hpart
     (fun i => ?_) (fun i x hx => ?_) caseA.Hpart_iSup θ hreg hinv
   · rw [caseA.Hpart_order i]; exact chief.p_prime
   · exact (caseA.Hpart_aInvariant i).smul_mem g hx
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (9.8.d) single-factor char-inertia core**: the single-factor analog of
 `chiefFactor_caseA_char_inertia`.  For a character `θ₁` nontrivial on the order-`p` orbit generator
 `S₀ = H₁` (`hreg` on `caseA.S0`), a `U`-element `g` fixing `θ₁` acts *trivially on `S₀`*, i.e.
@@ -1073,7 +1075,7 @@ theorem chiefFactor_caseA_char_inertia_single [Finite G] {M : Subgroup G}
     (hinv : ∀ x, (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) ((uActionHom data chief) g x)
         = (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x) :
     aInvariantRestrictAut caseA.S0_aInvariant g = 1 := by
-  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+  have : IsMulCommutative (↥data.H ⧸ chief.N) :=
     IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
   -- `φg = uActionHom g` acts as the identity on the prime-order summand `S₀` (single-factor core).
   have hS0card : Nat.card ↥caseA.S0 = chief.p := by

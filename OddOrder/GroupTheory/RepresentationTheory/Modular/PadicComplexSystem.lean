@@ -81,7 +81,7 @@ instance : CharP (ResidueField 𝓞_ℂ_[p]) p := by
     rw [← map_natCast (residue 𝓞_ℂ_[p]), residue_eq_zero_iff]
     exact natCast_mem_maximalIdeal_padicComplexInt p
   obtain ⟨q, hq⟩ := CharP.exists (ResidueField 𝓞_ℂ_[p])
-  haveI := hq
+  have := hq
   have hdvd : q ∣ p := (CharP.cast_eq_zero_iff _ q p).mp h0
   have hq1 : q ≠ 1 := by
     rintro rfl
@@ -126,23 +126,23 @@ theorem hasEnoughRootsOfUnity_residueField_padicComplexInt {n : ℕ} (hn : ¬ p 
 /-- **`𝓞_ℂ_[p]` has all `n`-th roots of unity for `p ∤ n`.** -/
 theorem hasEnoughRootsOfUnity_padicComplexInt {n : ℕ} (hn : ¬ p ∣ n) (hn0 : n ≠ 0) :
     HasEnoughRootsOfUnity 𝓞_ℂ_[p] n := by
-  haveI : NeZero n := ⟨hn0⟩
-  haveI := hasEnoughRootsOfUnity_residueField_padicComplexInt p hn hn0
+  have : NeZero n := ⟨hn0⟩
+  have := hasEnoughRootsOfUnity_residueField_padicComplexInt p hn hn0
   exact hasEnoughRootsOfUnity_of_residueField (p := p) hn
 
 /-- A primitive `n`-th root of unity exists in `𝓞_ℂ_[p]` for every `n` prime to `p`.  Together
 with the residue-field version this supplies both `ω` and `ω'` of the decomposition matrix. -/
 theorem exists_isPrimitiveRoot_padicComplexInt {n : ℕ} (hn : ¬ p ∣ n) (hn0 : n ≠ 0) :
     ∃ ζ : 𝓞_ℂ_[p], IsPrimitiveRoot ζ n := by
-  haveI : NeZero n := ⟨hn0⟩
-  haveI := hasEnoughRootsOfUnity_padicComplexInt p hn hn0
+  have : NeZero n := ⟨hn0⟩
+  have := hasEnoughRootsOfUnity_padicComplexInt p hn hn0
   exact HasEnoughRootsOfUnity.exists_primitiveRoot _ n
 
 /-- The residue-field companion of `exists_isPrimitiveRoot_padicComplexInt`. -/
 theorem exists_isPrimitiveRoot_residueField_padicComplexInt {n : ℕ} (hn : ¬ p ∣ n) (hn0 : n ≠ 0) :
     ∃ ζ : ResidueField 𝓞_ℂ_[p], IsPrimitiveRoot ζ n := by
-  haveI : NeZero n := ⟨hn0⟩
-  haveI := hasEnoughRootsOfUnity_residueField_padicComplexInt p hn hn0
+  have : NeZero n := ⟨hn0⟩
+  have := hasEnoughRootsOfUnity_residueField_padicComplexInt p hn hn0
   exact HasEnoughRootsOfUnity.exists_primitiveRoot _ n
 
 /-- **`ℂ_[p]` has a primitive `n`-th root of unity for every `n ≠ 0`.**
@@ -155,7 +155,7 @@ This is what `exists_intBlockCoeff` (Navarro (3.16) collected over `IBr`) needs:
 characterisation of virtual characters runs over `ℚ(ζ_{|G|})`, and `|G|` is divisible by `p`. -/
 theorem exists_isPrimitiveRoot_padicComplex {n : ℕ} (hn0 : n ≠ 0) :
     ∃ ζ : ℂ_[p], IsPrimitiveRoot ζ n := by
-  haveI : NeZero ((n : ℕ) : ℂ_[p]) := ⟨Nat.cast_ne_zero.mpr hn0⟩
+  have : NeZero ((n : ℕ) : ℂ_[p]) := ⟨Nat.cast_ne_zero.mpr hn0⟩
   exact HasEnoughRootsOfUnity.exists_primitiveRoot ℂ_[p] n
 
 /-- **A primitive `p`-th root of unity in `𝓞_ℂ_[p]`, congruent to `1` modulo `𝔪`.**
@@ -170,7 +170,7 @@ the `p`-th root of unity used to separate the `p`-part of an element. -/
 theorem exists_pow_eq_one_residue_eq_one_padicComplexInt :
     ∃ ζ : 𝓞_ℂ_[p], ζ ^ p = 1 ∧ residue 𝓞_ℂ_[p] ζ = 1 ∧
       algebraMap 𝓞_ℂ_[p] ℂ_[p] ζ ≠ 1 := by
-  haveI : NeZero ((p : ℕ) : ℂ_[p]) := ⟨Nat.cast_ne_zero.mpr hp.out.ne_zero⟩
+  have : NeZero ((p : ℕ) : ℂ_[p]) := ⟨Nat.cast_ne_zero.mpr hp.out.ne_zero⟩
   obtain ⟨z, hz⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot ℂ_[p] p
   have hzp : z ^ p = 1 := hz.pow_eq_one
   have hz1 : z ≠ 1 := hz.ne_one hp.out.one_lt
@@ -204,7 +204,7 @@ Wedderburn components — the row index of the decomposition matrix. -/
 theorem exists_algEquiv_pi_matrix_padicComplex (G : Type*) [Group G] [Finite G] :
     ∃ (n : ℕ) (d : Fin n → ℕ), (∀ i, NeZero (d i)) ∧
       Nonempty (MonoidAlgebra ℂ_[p] G ≃ₐ[ℂ_[p]] ∀ i, Matrix (Fin (d i)) (Fin (d i)) ℂ_[p]) := by
-  haveI : NeZero (Nat.card G : ℂ_[p]) :=
+  have : NeZero (Nat.card G : ℂ_[p]) :=
     ⟨Nat.cast_ne_zero.mpr Nat.card_pos.ne'⟩
   exact IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed ℂ_[p] (MonoidAlgebra ℂ_[p] G)
 

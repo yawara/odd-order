@@ -59,6 +59,7 @@ variable {K G : Type*} [Field K] [CharZero K] [Group G] [Fintype G] {ι' : Type*
   {N : ℕ} {ω : K} {𝒳 : Set (Subgroup G)}
 
 include e in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Gorenstein Lemma 7.8.**  For every prime `p` there is an integer-valued element of `v_R(G)`
 congruent to `1` modulo `p` at every element of `G`. -/
 theorem exists_congr_one_mod_prime (h𝒳 : IsElementaryFamily 𝒳) (hN : N ≠ 0)
@@ -67,8 +68,8 @@ theorem exists_congr_one_mod_prime (h𝒳 : IsElementaryFamily 𝒳) (hN : N ≠
       (∀ y : G, χ y = (b y : K)) ∧ (∀ y z : G, IsConj y z → χ y = χ z) ∧
       ∀ y : G, b y ≡ 1 [ZMOD (p : ℤ)] := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  have : Fact p.Prime := ⟨hp⟩
+  have : Fintype (ConjClasses G) := Fintype.ofFinite _
   have hωint : IsIntegral ℤ ω := isIntegral_of_pow_eq_one hN hωN.pow_eq_one
   -- one `p`-regular representative per class: the `p'`-part of the chosen representative
   obtain ⟨u, hu⟩ : ∃ f : ConjClasses G → G, ∀ C, f C = pRegularPart p C.out := ⟨_, fun _ => rfl⟩

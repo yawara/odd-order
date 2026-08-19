@@ -66,7 +66,7 @@ theorem finrank_eq_card_mul_sum_out (ρ : Representation k G V) [Fintype G] [Fin
     finrank k V
       = Fintype.card G * ∑ ω : orbitRel.Quotient G ι, finrank k ↥(A ω.out) := by
   classical
-  haveI : ∀ ω : orbitRel.Quotient G ι, Fintype (orbit G ω.out) := fun _ => Fintype.ofFinite _
+  have : ∀ ω : orbitRel.Quotient G ι, Fintype (orbit G ω.out) := fun _ => Fintype.ofFinite _
   have h1 : finrank k V = ∑ i : ι, finrank k ↥(A i) := by
     rw [← (LinearEquiv.ofBijective (DirectSum.coeLinearMap A) hint).finrank_eq, finrank_directSum]
   -- group the summands by `G`-orbit (`selfEquivSigmaOrbits`).

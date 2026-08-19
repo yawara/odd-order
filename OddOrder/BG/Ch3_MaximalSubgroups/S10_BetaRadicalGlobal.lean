@@ -52,7 +52,7 @@ private theorem rank_le_one_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCycl
   rw [pRank_le_iff]
   intro A hA
   -- `A` is cyclic, elementary abelian `q`, so `|A| = exponent A ∣ q`, hence `|A| ≤ q`.
-  haveI : IsCyclic ↥A := Subgroup.isCyclic A
+  have : IsCyclic ↥A := Subgroup.isCyclic A
   have hexp : Monoid.exponent ↥A ∣ q :=
     Monoid.exponent_dvd_of_forall_pow_eq_one (fun g => hA.pow_eq_one g)
   rw [IsCyclic.exponent_eq_card (α := ↥A)] at hexp
@@ -136,7 +136,7 @@ theorem beta_global_structure [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [
     -- `2 ≤ rank ↥R` ⇒ `R` noncyclic ⇒ `R` has `E ∈ ℰ²(↥R)` (S04).
     have hR_nc : ¬ IsCyclic ↥R := by
       intro hRc
-      haveI := hRc
+      have := hRc
       have : rank ↥R ≤ 1 := rank_le_one_of_isCyclic (C := ↥R)
       omega
     obtain ⟨E, hE_elem, hE_card⟩ :=
@@ -161,7 +161,7 @@ theorem beta_global_structure [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [
       intro hRtop
       have hGpg : IsPGroup p G :=
         hR_pg.of_equiv (hRtop ▸ Subgroup.topEquiv : (↥R : Type _) ≃* G)
-      haveI : Group.IsNilpotent G := hGpg.isNilpotent
+      have : Group.IsNilpotent G := hGpg.isNilpotent
       exact hG.notSolvable inferInstance
     exact isUniquelyMaximal_of_le_of_lt_top hAU hAR hR_lt
   -- ===== Part (c) =====
@@ -243,7 +243,7 @@ theorem beta_global_structure [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [
     have hQeqP : Q = (P : Subgroup G) := by
       by_contra hQne
       have hQlt : Q < (P : Subgroup G) := lt_of_le_of_ne hQP hQne
-      haveI : Group.IsNilpotent ↥(P : Subgroup G) := P.2.isNilpotent
+      have : Group.IsNilpotent ↥(P : Subgroup G) := P.2.isNilpotent
       have hNC : NormalizerCondition ↥(P : Subgroup G) :=
         Group.normalizerCondition_of_isNilpotent (G := ↥(P : Subgroup G))
       have hQsub_lt : Q.subgroupOf (P : Subgroup G) < ⊤ := by
@@ -278,16 +278,16 @@ theorem normalizer_le_of_nontrivial_beta_subgroup [Finite G] (hG : IsMinimalSimp
   classical
   have hM_co : IsCoatom M := mem_maximalSubgroups.mp hM
   -- `↥Y` is finite, solvable and nontrivial, so `F(↥Y) ≠ 1` and `q ∣ |F(↥Y)|` for some prime `q`.
-  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-  haveI hYsolv : IsSolvable ↥Y :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective hYM)
-  haveI hYnt : Nontrivial ↥Y := (Subgroup.nontrivial_iff_ne_bot Y).mpr hYne
-  have hFne : Ch01.fitting ↥Y ≠ ⊥ := Ch01.fitting_ne_bot_of_solvable_nontrivial ↥Y
-  haveI hFnt : Nontrivial ↥(Ch01.fitting ↥Y) := (Subgroup.nontrivial_iff_ne_bot _).mpr hFne
+  have hMsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
+  have hYsolv : Group.IsSolvable ↥Y :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective hYM)
+  have hYnt : Nontrivial ↥Y := (Subgroup.nontrivial_iff_ne_bot Y).mpr hYne
+  have hFne : Ch01.fitting ↥Y ≠ ⊥ := Ch01.fitting_ne_bot_of_isSolvable_nontrivial ↥Y
+  have hFnt : Nontrivial ↥(Ch01.fitting ↥Y) := (Subgroup.nontrivial_iff_ne_bot _).mpr hFne
   obtain ⟨q, hq_prime, hq_dvdF⟩ :=
     (Nat.card ↥(Ch01.fitting ↥Y)).exists_prime_and_dvd
       (by have := Finite.one_lt_card_iff_nontrivial.mpr hFnt; omega)
-  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have : Fact q.Prime := ⟨hq_prime⟩
   -- `q ∈ π(F(↥Y)) ⊆ π(Y)`, hence `q ∈ β(M)`: `idealPrime q G` and `q ∈ α(M) ⊆ σ(M)`.
   have hq_piY : q ∈ (Nat.card ↥Y).primeFactors := by
     refine Nat.mem_primeFactors.mpr ⟨hq_prime, hq_dvdF.trans ?_, Nat.card_pos.ne'⟩
@@ -417,21 +417,21 @@ theorem isNilpotent_of_normalSylowQ_of_nilpotent_qQuotient {W : Type*} [Group W]
   have hPpcard : Nat.card ↥((PN : Subgroup ↥N).map N.subtype) =
       p ^ (Nat.card W).factorization p := by
     rw [Subgroup.card_subtype, Sylow.card_eq_multiplicity PN, hfact]
-  haveI hPpnorm : ((PN : Subgroup ↥N).map N.subtype).Normal :=
+  have hPpnorm : ((PN : Subgroup ↥N).map N.subtype).Normal :=
     OddOrder.GroupTheory.normal_map_subtype_of_characteristic hPNchar
   set Psyl : Sylow p W := Sylow.ofCard _ hPpcard with hPsyl
   have hPsyl_coe : (Psyl : Subgroup W) = (PN : Subgroup ↥N).map N.subtype :=
     Sylow.coe_ofCard _ hPpcard
-  haveI hPsylnorm : (Psyl : Subgroup W).Normal := by rw [hPsyl_coe]; exact hPpnorm
+  have hPsylnorm : (Psyl : Subgroup W).Normal := by rw [hPsyl_coe]; exact hPpnorm
   -- Every Sylow of `W` is normal ⟹ `W` nilpotent.
   have hAllNormalW : ∀ (r : ℕ), Fact r.Prime → ∀ (P : Sylow r W), (↑P : Subgroup W).Normal := by
     intro r hr_fact P
-    haveI := hr_fact
+    have := hr_fact
     by_cases hrW : r ∈ (Nat.card W).primeFactors
     · rcases hWpq r hrW with rfl | rfl
-      · haveI := Sylow.unique_of_normal Psyl hPsylnorm
+      · have := Sylow.unique_of_normal Psyl hPsylnorm
         rw [Subsingleton.elim P Psyl]; exact hPsylnorm
-      · haveI := Sylow.unique_of_normal Qs hQnorm
+      · have := Sylow.unique_of_normal Qs hQnorm
         rw [Subsingleton.elim P Qs]; exact hQnorm
     · -- `r ∉ π(W)`: the Sylow `r`-subgroup is trivial.
       have hr_ndvd : ¬ r ∣ Nat.card W := fun hdvd =>
@@ -452,14 +452,14 @@ theorem betacompl_subgroup_derived_isNilpotent [Finite G] (hG : IsMinimalSimpleO
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {V : Subgroup G} (hVD : V ≤ derivedInG M)
     (hVβ : ∀ r ∈ (Nat.card ↥V).primeFactors, r ∉ beta M) :
     Group.IsNilpotent ↥V := by
-  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-  haveI hDsolv : IsSolvable ↥(derivedInG M) := by
+  have hMsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
+  have hDsolv : Group.IsSolvable ↥(derivedInG M) := by
     let e := Subgroup.equivMapOfInjective (commutator ↥M) M.subtype M.subtype_injective
-    exact solvable_of_surjective (f := e.toMonoidHom) e.surjective
+    exact Group.isSolvable_of_surjective (f := e.toMonoidHom) e.surjective
   -- `W*`: a nilpotent Hall `β(M)'`-subgroup of `M'` (Lemma 10.8(b)).
   obtain ⟨Wstar, hWstar_le, hWstar_hall, hWstar_nilp⟩ := (isHall_Mbeta hG hM).2.1
-  haveI := hWstar_nilp
-  haveI hWstar'_nilp : Group.IsNilpotent ↥(Wstar.subgroupOf (derivedInG M)) :=
+  have := hWstar_nilp
+  have hWstar'_nilp : Group.IsNilpotent ↥(Wstar.subgroupOf (derivedInG M)) :=
     Group.nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hWstar_le).symm.toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hWstar_le).symm.surjective
   -- `V.subgroupOf M'` is a `β(M)'`-subgroup; embed it in a Hall `β(M)'`-subgroup `W'` (Hall-D).
@@ -470,14 +470,14 @@ theorem betacompl_subgroup_derived_isNilpotent [Finite G] (hG : IsMinimalSimpleO
   obtain ⟨W', hW'_hall, hV'_le⟩ := Ch03.hall_D (G := ↥(derivedInG M)) hV'β
   -- `W'` is conjugate to `W*` (Hall-C), hence nilpotent.
   obtain ⟨g, hg⟩ := Ch03.hall_C hWstar_hall hW'_hall
-  haveI hW'_nilp : Group.IsNilpotent ↥W' := by
+  have hW'_nilp : Group.IsNilpotent ↥W' := by
     rw [← hg]
     exact Group.nilpotent_of_surjective
       (Subgroup.equivMapOfInjective (Wstar.subgroupOf (derivedInG M))
         (MulAut.conj g).toMonoidHom (MulEquiv.injective _)).toMonoidHom (MulEquiv.surjective _)
   -- `V ≤ W'` (in `M'`) and `W'` nilpotent ⟹ `V` nilpotent.
-  haveI : Group.IsNilpotent ↥((V.subgroupOf (derivedInG M)).subgroupOf W') := inferInstance
-  haveI hV'_nilp : Group.IsNilpotent ↥(V.subgroupOf (derivedInG M)) :=
+  have : Group.IsNilpotent ↥((V.subgroupOf (derivedInG M)).subgroupOf W') := inferInstance
+  have hV'_nilp : Group.IsNilpotent ↥(V.subgroupOf (derivedInG M)) :=
     Group.nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hV'_le).toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hV'_le).surjective
   exact Group.nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hVD).toMonoidHom

@@ -117,7 +117,7 @@ generates an elementary abelian subgroup of order `p`). -/
 theorem one_le_pRank_of_mem_primeFactors {H : Type*} [Group H] [Finite H] {p : ℕ}
     (hp : p ∈ (Nat.card H).primeFactors) : 1 ≤ pRank H p := by
   obtain ⟨hprime, hdvd, -⟩ := Nat.mem_primeFactors.mp hp
-  haveI : Fact p.Prime := ⟨hprime⟩
+  have : Fact p.Prime := ⟨hprime⟩
   obtain ⟨x, hx⟩ := Ch01.cauchy hdvd
   have hcard : Nat.card ↥(Subgroup.zpowers x) = p := by rw [Nat.card_zpowers, hx]
   have helem : (Subgroup.zpowers x).IsElementaryAbelian p := by
@@ -228,7 +228,7 @@ omit [Finite G] in
 `M_σ ∩ E = 1`; `M_σ ⊴ M` makes the disjoint join a genuine complement). -/
 theorem isComplement'_subgroupOf (h : SubgroupESetup M E E₁ E₂ E₃) :
     ((S10.Msigma M).subgroupOf M).IsComplement' (E.subgroupOf M) := by
-  haveI : ((S10.Msigma M).subgroupOf M).Normal := by
+  have : ((S10.Msigma M).subgroupOf M).Normal := by
     rw [S10.Msigma_subgroupOf]; infer_instance
   apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ
   · rw [disjoint_iff]
@@ -242,7 +242,7 @@ omit [Finite G] in
 /-- `|M_σ| · |E| = |M|`. -/
 theorem card_Msigma_mul_card_E (h : SubgroupESetup M E E₁ E₂ E₃) :
     Nat.card ↥(S10.Msigma M) * Nat.card ↥E = Nat.card ↥M := by
-  have hc := h.isComplement'_subgroupOf.card_mul
+  have hc := h.isComplement'_subgroupOf.card_mul_card
   rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (S10.Msigma_le M)).toEquiv,
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E_le).toEquiv] at hc
 
@@ -278,7 +278,7 @@ theorem pRank_M_le_two (hG : IsMinimalSimpleOdd G) (h : SubgroupESetup M E E₁ 
 /-- `r_p(E) ≤ 2` for every prime `p`. -/
 theorem pRank_le_two (hG : IsMinimalSimpleOdd G) (h : SubgroupESetup M E E₁ E₂ E₃)
     {p : ℕ} (hp : p.Prime) : pRank ↥E p ≤ 2 := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   by_cases hpE : p ∈ (Nat.card ↥E).primeFactors
   · exact le_trans (pRank_le_of_injective (Subgroup.inclusion_injective h.E_le))
       (h.pRank_M_le_two hG hpE)
@@ -297,7 +297,7 @@ theorem mem_tau_union_of_mem_primeFactors (hG : IsMinimalSimpleOdd G)
     (hp : p ∈ (Nat.card ↥E).primeFactors) :
     p ∈ tau1 M ∪ tau2 M ∪ tau3 M := by
   have hprime : p.Prime := Nat.prime_of_mem_primeFactors hp
-  haveI : Fact p.Prime := ⟨hprime⟩
+  have : Fact p.Prime := ⟨hprime⟩
   have hσ : p ∉ S10.sigma M := h.not_mem_sigma_of_mem_primeFactors hG hp
   have h1M : 1 ≤ pRank ↥M p :=
     (one_le_pRank_of_mem_primeFactors hp).trans
@@ -321,7 +321,7 @@ theorem inf_derivedInG_le_derivedInG (h : SubgroupESetup M E E₁ E₂ E₃) :
   intro x hx
   have hxM : x ∈ M := h.E_le hx.1
   set Nσ : Subgroup ↥M := (S10.Msigma M).subgroupOf M with hNσ
-  haveI : Nσ.Normal := by rw [hNσ, S10.Msigma_subgroupOf]; infer_instance
+  have : Nσ.Normal := by rw [hNσ, S10.Msigma_subgroupOf]; infer_instance
   set π : ↥M →* ↥M ⧸ Nσ := QuotientGroup.mk' Nσ with hπ
   -- the complement surjects onto the quotient
   have hEtop : (E.subgroupOf M).map π = ⊤ := by
@@ -406,7 +406,7 @@ theorem dvd_card_derived_of_mem_tau3 (hG : IsMinimalSimpleOdd G)
         (Subgroup.subtype_injective M)).toEquiv).symm
     have := Nat.dvd_of_mem_primeFactors hp.2.1
     rwa [hcardeq] at this
-  haveI : ((S10.Msigma M).subgroupOf M).Normal := by
+  have : ((S10.Msigma M).subgroupOf M).Normal := by
     rw [S10.Msigma_subgroupOf]; infer_instance
   have hsupcard : Nat.card ↥((S10.Msigma M).subgroupOf M ⊔ (E ⊓ derivedInG M).subgroupOf M)
       ∣ Nat.card ↥((S10.Msigma M).subgroupOf M) *
@@ -461,10 +461,10 @@ group is a nilpotent Z-group. Packages the `E₁`/`E₃` cyclicity argument of L
 theorem isCyclic_of_odd_of_isNilpotent_of_forall_pRank_le_one {H : Type*} [Group H] [Finite H]
     [Group.IsNilpotent H] (hodd : Odd (Nat.card H))
     (hrank : ∀ p : ℕ, p.Prime → pRank H p ≤ 1) : IsCyclic H := by
-  haveI : _root_.IsZGroup H := by
+  have : _root_.IsZGroup H := by
     rw [isZGroup_iff]
     intro r hr R
-    haveI : Fact r.Prime := ⟨hr⟩
+    have : Fact r.Prime := ⟨hr⟩
     rcases eq_or_ne r 2 with rfl | hrne
     · -- `|H|` is odd, so the Sylow `2`-subgroup is trivial.
       have h2 : ¬ 2 ∣ Nat.card H := by
@@ -476,7 +476,7 @@ theorem isCyclic_of_odd_of_isNilpotent_of_forall_pRank_le_one {H : Type*} [Group
         · simpa using hk
         · exact absurd ((dvd_pow_self 2 hkpos.ne').trans
             (hk ▸ (R : Subgroup H).card_subgroup_dvd_card)) h2
-      haveI : Subsingleton ↥(R : Subgroup H) := (Nat.card_eq_one_iff_unique.mp hR1).1
+      have : Subsingleton ↥(R : Subgroup H) := (Nat.card_eq_one_iff_unique.mp hR1).1
       infer_instance
     · exact S10.isCyclic_of_pRank_le_one R.isPGroup' (hr.odd_of_ne_two hrne)
         (le_trans (pRank_le_of_injective (Subgroup.subtype_injective _)) (hrank r hr))
@@ -509,9 +509,10 @@ theorem SubgroupESetup.derived_isNilpotent [Finite G] (hG : IsMinimalSimpleOdd G
       exact le_bot_iff.mp (Subgroup.map_subtype_le _)
     rw [hbot]
     infer_instance
-  · haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
-    haveI : IsSolvable ↥E := solvable_of_solvable_injective (Subgroup.inclusion_injective h.E_le)
-    haveI : Nontrivial ↥E := (Subgroup.nontrivial_iff_ne_bot _).mpr hE
+  · have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups h.mem_maximal
+    have : Group.IsSolvable ↥E :=
+      Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective h.E_le)
+    have : Nontrivial ↥E := (Subgroup.nontrivial_iff_ne_bot _).mpr hE
     have hodd : Odd (Nat.card ↥E) :=
       hG.odd.of_dvd_nat
         ((Subgroup.card_dvd_of_le h.E_le).trans (Subgroup.card_subgroup_dvd_card M))
@@ -520,7 +521,7 @@ theorem SubgroupESetup.derived_isNilpotent [Finite G] (hG : IsMinimalSimpleOdd G
         (h.rank_le_two hG)
     have hderived : commutator ↥E ≤ Ch01.fitting ↥E :=
       Ch1.S05.derived_le_fitting_of_rank_fitting_le_two hodd hrankF
-    haveI : Group.IsNilpotent ↥(commutator ↥E) :=
+    have : Group.IsNilpotent ↥(commutator ↥E) :=
       Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hderived)
     exact Group.nilpotent_of_mulEquiv
       (Subgroup.equivMapOfInjective (commutator ↥E) E.subtype (Subgroup.subtype_injective E))
@@ -565,14 +566,14 @@ theorem sylow_le_derived_of_mem_tau3 [Finite G] (hG : IsMinimalSimpleOdd G)
     rw [Nat.odd_iff] at hodd
     omega
   -- `P` is cyclic (`r_p(M) = 1` on `τ₃`)
-  haveI hPcyc : IsCyclic ↥(P : Subgroup ↥E) := by
+  have hPcyc : IsCyclic ↥(P : Subgroup ↥E) := by
     refine S10.isCyclic_of_pRank_le_one P.isPGroup' hpodd ?_
     refine le_trans (pRank_le_of_injective (Subgroup.subtype_injective _)) ?_
     refine le_trans (pRank_le_of_injective (Subgroup.inclusion_injective h.E_le)) ?_
     exact le_of_eq hp.2.2
   -- Sylow `p`-subgroup `Q` of the normalizer `W`, with its complement `K`
-  haveI hQnorm : (P.subtype P.le_normalizer).Normal := P.normal_in_normalizer
-  haveI hQcyc : IsCyclic ↥(P.subtype P.le_normalizer : Subgroup
+  have hQnorm : (P.subtype P.le_normalizer).Normal := P.normal_in_normalizer
+  have hQcyc : IsCyclic ↥(P.subtype P.le_normalizer : Subgroup
       ↥(sylowNormalizerE E P)) := by
     rw [P.coe_subtype]
     exact isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe P.le_normalizer).symm.surjective
@@ -613,7 +614,7 @@ theorem sylow_le_derived_of_mem_tau3 [Finite G] (hG : IsMinimalSimpleOdd G)
       exact congrArg Subtype.val (Subgroup.mem_centralizer_iff.mp hxcent ⟨y, hyW⟩ hyQ)
     obtain ⟨N, hNnorm, hNcompl⟩ :=
       OddOrder.Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer P htop
-    haveI := hNnorm
+    have := hNnorm
     have hcompl := hNcompl P
     -- `E' ≤ N` (the quotient is the abelian Sylow `P`)
     have hE'N : commutator ↥E ≤ N := by
@@ -702,7 +703,7 @@ theorem sylow_le_derived_of_mem_tau3 [Finite G] (hG : IsMinimalSimpleOdd G)
         rw [Subgroup.commutator_comm]
         exact hself
       -- Prop 1.6(d): fixed points form a complement of `⊤`, hence are trivial
-      letI : CommGroup ↥(sylowSelfE E P) :=
+      let : CommGroup ↥(sylowSelfE E P) :=
         { (inferInstance : Group ↥(sylowSelfE E P)) with
           mul_comm := fun a b => by
             have hcentral : sylowSelfE E P
@@ -764,7 +765,7 @@ theorem SubgroupESetup.E3_le_derived [Finite G] (hG : IsMinimalSimpleOdd G)
     rw [Nat.coprime_comm]
     by_contra hncop
     obtain ⟨p, hprime, hp1, hp2⟩ := Nat.Prime.not_coprime_iff_dvd.mp hncop
-    haveI : Fact p.Prime := ⟨hprime⟩
+    have : Fact p.Prime := ⟨hprime⟩
     have hcardE₃ : Nat.card ↥(E₃.subgroupOf E) = Nat.card ↥E₃ :=
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₃_le).toEquiv
     have hpτ₃ : p ∈ tau3 M := h.isPiGroup_tau3 p (Nat.mem_primeFactors.mpr
@@ -800,7 +801,7 @@ theorem SubgroupESetup.E3_normal [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
     E ≤ Subgroup.normalizer ((E₃ : Subgroup G) : Set G) := by
   classical
-  haveI hnilp : Group.IsNilpotent ↥(derivedInG E) := h.derived_isNilpotent hG
+  have hnilp : Group.IsNilpotent ↥(derivedInG E) := h.derived_isNilpotent hG
   have hE₃D : E₃ ≤ derivedInG E := h.E3_le_derived hG
   have hcoreHall : Ch03.IsHallSubgroup (tau3 M) (Ch03.oPiCore (tau3 M) ↥(derivedInG E)) :=
     S10.oPiCore_isHall_of_isNilpotent (tau3 M)
@@ -840,14 +841,14 @@ nilpotent `E'` with all `p`-ranks `≤ 1`). -/
 theorem SubgroupESetup.E3_isCyclic [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
     IsCyclic ↥E₃ := by
-  haveI hnilp : Group.IsNilpotent ↥(derivedInG E) := h.derived_isNilpotent hG
-  haveI : Group.IsNilpotent ↥E₃ :=
+  have hnilp : Group.IsNilpotent ↥(derivedInG E) := h.derived_isNilpotent hG
+  have : Group.IsNilpotent ↥E₃ :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (h.E3_le_derived hG))
   have hodd : Odd (Nat.card ↥E₃) :=
     hG.odd.of_dvd_nat
       ((Subgroup.card_dvd_of_le h.E3_le_M).trans (Subgroup.card_subgroup_dvd_card M))
   refine isCyclic_of_odd_of_isNilpotent_of_forall_pRank_le_one hodd fun p hp => ?_
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   by_cases hpE : p ∈ (Nat.card ↥E₃).primeFactors
   · have hp3 : p ∈ tau3 M := h.isPiGroup_tau3 p hpE
     exact le_trans (pRank_le_of_injective (Subgroup.inclusion_injective h.E3_le_M))
@@ -865,7 +866,7 @@ theorem SubgroupESetup.centralizer_inf_E3_eq_bot [Finite G] (hG : IsMinimalSimpl
   rw [← Subgroup.card_eq_one]
   by_contra hne
   obtain ⟨p, hprime, hdvd⟩ := Nat.exists_prime_and_dvd hne
-  haveI : Fact p.Prime := ⟨hprime⟩
+  have : Fact p.Prime := ⟨hprime⟩
   have hpE₃ : p ∈ (Nat.card ↥E₃).primeFactors := Nat.mem_primeFactors.mpr
     ⟨hprime, hdvd.trans (Subgroup.card_dvd_of_le inf_le_right), Nat.card_pos.ne'⟩
   have hpτ₃ : p ∈ tau3 M := h.isPiGroup_tau3 p hpE₃
@@ -944,12 +945,12 @@ theorem SubgroupESetup.E1_isCyclic [Finite G] (hG : IsMinimalSimpleOdd G)
     have hcentral : E₁ ≤ Subgroup.centralizer (E₁ : Set G) :=
       Subgroup.commutator_eq_bot_iff_le_centralizer.mp hcomm
     exact Subtype.ext (Subgroup.mem_centralizer_iff.mp (hcentral a.2) (b : G) b.2).symm
-  letI : CommGroup ↥E₁ := { (inferInstance : Group ↥E₁) with mul_comm := hab }
+  let : CommGroup ↥E₁ := { (inferInstance : Group ↥E₁) with mul_comm := hab }
   have hodd : Odd (Nat.card ↥E₁) :=
     hG.odd.of_dvd_nat
       ((Subgroup.card_dvd_of_le (h.E1_le_M)).trans (Subgroup.card_subgroup_dvd_card M))
   refine isCyclic_of_odd_of_isNilpotent_of_forall_pRank_le_one hodd fun p hp => ?_
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   by_cases hpE : p ∈ (Nat.card ↥E₁).primeFactors
   · have hp1 : p ∈ tau1 M := h.isPiGroup_tau1 p hpE
     exact le_trans (pRank_le_of_injective (Subgroup.inclusion_injective h.E1_le_M))
@@ -999,7 +1000,7 @@ theorem SubgroupESetup.E23_normal [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
     E ≤ Subgroup.normalizer ((E₂ ⊔ E₃ : Subgroup G) : Set G) := by
   classical
-  haveI hE₃norm : ((E₃.subgroupOf E)).Normal :=
+  have hE₃norm : ((E₃.subgroupOf E)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer h.E₃_le).mpr (h.E3_normal hG)
   -- `(E₂ ⊔ E₃).subgroupOf E` is a Hall `τ₂ ∪ τ₃`-subgroup of `↥E`
   have hsgsup : (E₂ ⊔ E₃).subgroupOf E = E₂.subgroupOf E ⊔ E₃.subgroupOf E :=
@@ -1045,7 +1046,7 @@ theorem SubgroupESetup.E23_normal [Finite G] (hG : IsMinimalSimpleOdd G)
     exact h.isPiGroup_tau23_derived hG p (hcardeq ▸ hp)
   have hcomm_le : commutator ↥E ≤ (E₂ ⊔ E₃).subgroupOf E :=
     Ch03.Subgroup.IsPiGroup.normal_le_hall hcommpi hHall
-  haveI : ((E₂ ⊔ E₃).subgroupOf E).Normal := normal_of_commutator_le hcomm_le
+  have : ((E₂ ⊔ E₃).subgroupOf E).Normal := normal_of_commutator_le hcomm_le
   exact (Subgroup.normal_subgroupOf_iff_le_normalizer (sup_le h.E₂_le h.E₃_le)).mp
     inferInstance
 
@@ -1060,7 +1061,7 @@ theorem SubgroupESetup.eq_sup [Finite G] (hG : IsMinimalSimpleOdd G)
     by_contra hne
     have hne0 : ((E₁ ⊔ E₂ ⊔ E₃).subgroupOf E).index ≠ 0 := Subgroup.index_ne_zero_of_finite
     obtain ⟨p, hprime, hdvd⟩ := Nat.exists_prime_and_dvd hne
-    haveI : Fact p.Prime := ⟨hprime⟩
+    have : Fact p.Prime := ⟨hprime⟩
     have hsg : (E₁ ⊔ E₂ ⊔ E₃).subgroupOf E
         = E₁.subgroupOf E ⊔ E₂.subgroupOf E ⊔ E₃.subgroupOf E := by
       rw [Subgroup.subgroupOf_sup (sup_le h.E₁_le h.E₂_le) h.E₃_le,
@@ -1141,7 +1142,7 @@ theorem SubgroupESetup.E2_normal_in_E12 [Finite G] (hG : IsMinimalSimpleOdd G)
       exact ⟨hp.1, hp.2.1.trans hidx, Subgroup.index_ne_zero_of_finite⟩
   have hcomm_le : commutator ↥J ≤ E₂.subgroupOf J :=
     Ch03.Subgroup.IsPiGroup.normal_le_hall hcommtau2 hHallJ
-  haveI : (E₂.subgroupOf J).Normal := normal_of_commutator_le hcomm_le
+  have : (E₂.subgroupOf J).Normal := normal_of_commutator_le hcomm_le
   exact (Subgroup.normal_subgroupOf_iff_le_normalizer hE₂J).mp inferInstance
 
 /-- The complement `E` is nontrivial: `M_σ ≤ M' ⊊ M` for the solvable nontrivial `M`. -/
@@ -1152,8 +1153,8 @@ theorem SubgroupESetup.E_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
   have hMσ : S10.Msigma M = M := by
     have := h.E_compl_sup
     rwa [hbot, sup_bot_eq] at this
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
-  haveI : Nontrivial ↥M := by
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups h.mem_maximal
+  have : Nontrivial ↥M := by
     refine (Subgroup.nontrivial_iff_ne_bot M).mpr fun hM => ?_
     exact S10.Msigma_ne_bot hG h.mem_maximal (hMσ.trans hM)
   have hcomm : commutator ↥M = ⊤ := by
@@ -1166,7 +1167,7 @@ theorem SubgroupESetup.E_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
     rw [← hD, eq_top_iff]
     intro x _
     exact Subgroup.mem_subgroupOf.mpr (hled x.2)
-  exact absurd hcomm (IsSolvable.commutator_lt_top_of_nontrivial ↥M).ne
+  exact absurd hcomm (Group.IsSolvable.commutator_lt_top_of_nontrivial ↥M).ne
 
 /-- **BG Lemma 12.1(c)** (mmd L3053): if `E₂ = 1` then `E₁ ≠ 1` (otherwise `E = E₃ ≤ E'`
 would make the nontrivial solvable `E` perfect). -/
@@ -1177,9 +1178,10 @@ theorem SubgroupESetup.E1_ne_bot_of_E2_eq_bot [Finite G] (hG : IsMinimalSimpleOd
   have hE3 : E = E₃ := by
     have := h.eq_sup hG
     rwa [h1, h2, bot_sup_eq, bot_sup_eq] at this
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
-  haveI : IsSolvable ↥E := solvable_of_solvable_injective (Subgroup.inclusion_injective h.E_le)
-  haveI : Nontrivial ↥E := (Subgroup.nontrivial_iff_ne_bot E).mpr (h.E_ne_bot hG)
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups h.mem_maximal
+  have : Group.IsSolvable ↥E :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective h.E_le)
+  have : Nontrivial ↥E := (Subgroup.nontrivial_iff_ne_bot E).mpr (h.E_ne_bot hG)
   have hled : E ≤ derivedInG E := hE3 ▸ (hE3 ▸ h.E3_le_derived hG)
   have hcomm : commutator ↥E = ⊤ := by
     have hD : (derivedInG E).subgroupOf E = commutator ↥E := by
@@ -1188,7 +1190,7 @@ theorem SubgroupESetup.E1_ne_bot_of_E2_eq_bot [Finite G] (hG : IsMinimalSimpleOd
     rw [← hD, eq_top_iff]
     intro x _
     exact Subgroup.mem_subgroupOf.mpr (hled x.2)
-  exact absurd hcomm (IsSolvable.commutator_lt_top_of_nontrivial ↥E).ne
+  exact absurd hcomm (Group.IsSolvable.commutator_lt_top_of_nontrivial ↥E).ne
 
 /-- **BG Lemma 12.1** (mmd L3035): §12 setup のもと、
 (a) `E'` nilpotent; (b) `E₃ ⊆ E'` かつ `E₃ ⊴ E`; (c) `E₂=1 → E₁≠1`; (d) `E₁`,`E₃` cyclic;
@@ -1282,8 +1284,8 @@ theorem prime_mem_sigma_or_tau2 [Finite G] (hG : IsMinimalSimpleOdd G)
         have h3 : pRank ↥(PM : Subgroup ↥Mstar) p = pRank ↥Mstar p := pRank_sylow_eq PM
         omega
       have hPr1 : pRank ↥P p ≤ 1 := by rw [hPrank]; exact hr1
-      haveI : IsCyclic ↥P := S10.isCyclic_of_pRank_le_one hPpg hodd hPr1
-      haveI : (X.subgroupOf P).Characteristic :=
+      have : IsCyclic ↥P := S10.isCyclic_of_pRank_le_one hPpg hodd hPr1
+      have : (X.subgroupOf P).Characteristic :=
         Ch04.characteristic_of_subgroup_of_isCyclic (X.subgroupOf P)
       have hNPX : Subgroup.normalizer (P : Set G) ≤ Subgroup.normalizer (X : Set G) := by
         have h := OddOrder.BG.AppB.normalizer_le_normalizer_map_of_characteristic

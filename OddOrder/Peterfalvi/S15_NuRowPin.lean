@@ -67,7 +67,7 @@ theorem Hypothesis.nuRow_inner [Finite G] (hyp : Hypothesis (G := G))
     (pins : NuGridSupplyData hyp) (r s : Fin hyp.q) :
     ClassFunction.inner (∑ j : Fin hyp.p, hyp.nu r j) (∑ j : Fin hyp.p, hyp.nu s j)
       = if r = s then (hyp.p : ℂ) else 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   by_cases hrs : r = s
   · subst hrs; rw [if_pos rfl, OddOrder.RepresentationTheory.inner_sum_left]
     calc ∑ j : Fin hyp.p, ClassFunction.inner (hyp.nu r j) (∑ j' : Fin hyp.p, hyp.nu r j')
@@ -89,7 +89,7 @@ norm `1`.  Mirror of `muColumn_not_irreducible`. -/
 theorem Hypothesis.nuRow_not_irreducible [Finite G] (hyp : Hypothesis (G := G))
     (pins : NuGridSupplyData hyp) (i : Fin hyp.q) :
     ¬ IsIrreducibleCharacter (∑ j : Fin hyp.p, hyp.nu i j) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   intro hirr
   have h1 := hirr.inner_self_eq_one
   rw [hyp.nuRow_inner pins i i, if_pos rfl] at h1
@@ -156,7 +156,7 @@ theorem Hypothesis.coherentIndT_nuRow_diff [Finite G]
     c.extension (∑ j : Fin hyp.p, hyp.nu r j) - c.extension (∑ j : Fin hyp.p, hyp.nu s j)
       = (∑ j : Fin hyp.p, hyp.eta r j) - (∑ j : Fin hyp.p, hyp.eta s j) := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hAsupp := hyp.nuRow_diff_supported hG pins hvd chief hr hs
   have hmemSpan : ((∑ j : Fin hyp.p, hyp.nu r j) - (∑ j : Fin hyp.p, hyp.nu s j)) ∈
       OddOrder.Peterfalvi.S07.zSupportedSpan (sSet (hyp.toTypesIIIIIIVSetupT hG hvd))
@@ -207,7 +207,7 @@ theorem coherentIndT_image_inner_eta_eq_zero [Finite G]
     (hζirr : IsIrreducibleCharacter ζ) :
     ∀ (i : Fin hyp.q) (j : Fin hyp.p),
       ClassFunction.inner (coh.extension ζ) (hyp.eta i j) = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hζc : ζ.conj ∈ S := hconj hζ
   -- `ζ − ζ̄` lies in the `A(T)`-supported span of `𝒮`.
   have hdiffSpan : ζ - ζ.conj ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.T) S :=
@@ -286,7 +286,7 @@ theorem Hypothesis.coherentIndT_extension_irr_vanish_regular [Finite G]
       ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G)))) :
     c.extension ξ x = 0 := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hcrux := coherentIndT_image_inner_eta_eq_zero hG hnoV hyp hTP Tdata hW1 hW2
     (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupT hG hvd))
     (sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupT hG hvd) (hyp.oddCardT hG))
@@ -328,7 +328,7 @@ theorem Hypothesis.coherentIndT_nuRow_vanish_regular [Finite G]
       ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G)))) :
     c.extension (∑ j : Fin hyp.p, hyp.nu i j) x = 0 := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   set νrow : ClassFunction ↥hyp.T ℂ := ∑ j : Fin hyp.p, hyp.nu i j with hνdef
   have hνmem : νrow ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd) :=
     sOf_subset_sSet _ chief.H0 (hyp.nu_rowSum_mem_sOf_H0_T hG pins hvd chief i hi)
@@ -415,7 +415,7 @@ orthonormality `eta_orthonormal`.  Mirror of `etaColumn_inner`. -/
 theorem Hypothesis.etaRow_inner [Finite G] (hyp : Hypothesis (G := G)) (r s : Fin hyp.q) :
     ClassFunction.inner (∑ j : Fin hyp.p, hyp.eta r j) (∑ j : Fin hyp.p, hyp.eta s j)
       = if r = s then (hyp.p : ℂ) else 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   by_cases hrs : r = s
   · subst hrs; rw [if_pos rfl, OddOrder.RepresentationTheory.inner_sum_left]
     calc ∑ j : Fin hyp.p, ClassFunction.inner (hyp.eta r j) (∑ j' : Fin hyp.p, hyp.eta r j')
@@ -474,7 +474,7 @@ theorem Hypothesis.coherentIndT_nuRow_pin_of_irr [Finite G]
           = ∑ j : Fin hyp.p, hyp.nu s j ∧
         c.extension (∑ j : Fin hyp.p, hyp.nu i j) = -∑ j : Fin hyp.p, hyp.eta s j := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   set νrow : ClassFunction ↥hyp.T ℂ := ∑ j : Fin hyp.p, hyp.nu i j with hνdef
   have hνmem : νrow ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd) :=
     sOf_subset_sSet _ chief.H0 (hyp.nu_rowSum_mem_sOf_H0_T hG pins hvd chief i hi)
@@ -754,7 +754,7 @@ theorem Hypothesis.coherentIndT_nuRow_eq_etaRow_of_pivot [Finite G]
     {i : Fin hyp.q} (hi : i ≠ ⟨0, hyp.q_prime.pos⟩) :
     c.extension (∑ j : Fin hyp.p, hyp.nu i j) = ∑ j : Fin hyp.p, hyp.eta i j := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hq1 : (⟨1, hyp.q_prime.one_lt⟩ : Fin hyp.q) ≠ ⟨0, hyp.q_prime.pos⟩ := by
     intro h; exact absurd (congrArg Fin.val h) one_ne_zero
   by_cases hiq : i = ⟨1, hyp.q_prime.one_lt⟩
@@ -800,7 +800,7 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible_T [Finite G]
         (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T),
       c.extension (∑ j : Fin hyp.p, hyp.nu ⟨1, hyp.q_prime.one_lt⟩ j)
         = ∑ j : Fin hyp.p, hyp.eta ⟨1, hyp.q_prime.one_lt⟩ j := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   -- pivot / second-row index arithmetic
   have hi1_0 : (⟨1, hyp.q_prime.one_lt⟩ : Fin hyp.q) ≠ ⟨0, hyp.q_prime.pos⟩ := by
@@ -1083,7 +1083,7 @@ theorem Hypothesis.sSet_coherent_indT_A_pinned [Finite G]
         i' ≠ ⟨0, hyp.q_prime.pos⟩ → i ≠ i' →
         c.extension (∑ j : Fin hyp.p, hyp.nu i j) = -∑ j : Fin hyp.p, hyp.eta i' j) := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hq1 : (⟨1, hyp.q_prime.one_lt⟩ : Fin hyp.q) ≠ ⟨0, hyp.q_prime.pos⟩ := by
     intro h; exact absurd (congrArg Fin.val h) one_ne_zero
   have hpne0 : (hyp.p : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.p_prime.pos.ne'

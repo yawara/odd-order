@@ -156,8 +156,8 @@ theorem exists_maschke_split [Finite G] [NeZero (Nat.card G : F)] (ρ : Represen
     [Nontrivial V] (hirr : ¬ Representation.IsIrreducible ρ) :
     ∃ U U' : Subrepresentation ρ, U ≠ ⊥ ∧ U' ≠ ⊥ ∧
       U.toSubmodule ⊔ U'.toSubmodule = ⊤ ∧ U.toSubmodule ⊓ U'.toSubmodule = ⊥ := by
-  haveI : Representation.IsSemisimpleRepresentation ρ := inferInstance
-  haveI : Nontrivial (Subrepresentation ρ) :=
+  have : Representation.IsSemisimpleRepresentation ρ := inferInstance
+  have : Nontrivial (Subrepresentation ρ) :=
     ⟨⊥, ⊤, fun h => absurd (congrArg Subrepresentation.toSubmodule h) bot_ne_top⟩
   obtain ⟨U, hUbot, hUtop⟩ : ∃ U : Subrepresentation ρ, U ≠ ⊥ ∧ U ≠ ⊤ := by
     by_contra hcon
@@ -188,7 +188,7 @@ applies to both pieces (`finrank` strictly smaller), the hypotheses restrict
 of `finrank` and of the invariants over the direct sum (`finrank_inf_invariants_sup_of_disjoint`).
 The prime-manner hypothesis is carried in **subspace-equality** form so it restricts to `U, U'`. -/
 private theorem frobenius_elemAbelian_ab_aux
-    [IsAlgClosed F] [Finite G] [IsSolvable G] [NeZero (Nat.card G : F)]
+    [IsAlgClosed F] [Finite G] [Group.IsSolvable G] [NeZero (Nat.card G : F)]
     {K R : Subgroup G} [K.Normal]
     (hcop : Nat.Coprime (Nat.card ↥R) (Nat.card ↥K)) (hRne : R ≠ ⊥) (hKne : K ≠ ⊥)
     (hFrob : ∀ r ∈ R, r ≠ 1 → ∀ k ∈ K, k ≠ 1 → r * k * r⁻¹ ≠ k) :
@@ -217,9 +217,9 @@ private theorem frobenius_elemAbelian_ab_aux
       obtain ⟨U, U', hUbot, hU'ne, hsup, hinf⟩ := exists_maschke_split ρ hirr
       have hsum : finrank F ↥U.toSubmodule + finrank F ↥U'.toSubmodule = finrank F V :=
         Submodule.finrank_add_eq_of_isCompl ⟨disjoint_iff.mpr hinf, codisjoint_iff.mpr hsup⟩
-      haveI : Nontrivial ↥U.toSubmodule := Submodule.nontrivial_iff_ne_bot.mpr
+      have : Nontrivial ↥U.toSubmodule := Submodule.nontrivial_iff_ne_bot.mpr
         (fun h => hUbot (Subrepresentation.toSubmodule_injective h))
-      haveI : Nontrivial ↥U'.toSubmodule := Submodule.nontrivial_iff_ne_bot.mpr
+      have : Nontrivial ↥U'.toSubmodule := Submodule.nontrivial_iff_ne_bot.mpr
         (fun h => hU'ne (Subrepresentation.toSubmodule_injective h))
       have hUpos : 0 < finrank F ↥U.toSubmodule := finrank_pos
       have hU'pos : 0 < finrank F ↥U'.toSubmodule := finrank_pos
@@ -249,7 +249,7 @@ This drops piece 3's `[ρ.IsIrreducible]` hypothesis (the reducible case is the 
 `frobenius_elemAbelian_ab_aux`).  The §15.2 application's `M = Q̄`, possibly reducible as a
 `KD`-module over `F̄_q`, is exactly this case. -/
 theorem prime_card_and_finrank_of_frobenius_elemAbelian
-    [IsAlgClosed F] [Finite G] [IsSolvable G] [NeZero (Nat.card G : F)]
+    [IsAlgClosed F] [Finite G] [Group.IsSolvable G] [NeZero (Nat.card G : F)]
     (ρ : Representation F G V) [FiniteDimensional F V] [Nontrivial V]
     {K R : Subgroup G} [K.Normal] (hRne : R ≠ ⊥) (hKne : K ≠ ⊥)
     (hcop : Nat.Coprime (Nat.card ↥R) (Nat.card ↥K))
@@ -273,7 +273,7 @@ one-dimensionality of `C_V(R)` come from the `(a)+(b)` result `…_frobenius_ele
 reducible case splits `⊤ = U ⊕ U'`, the cyclicity restricts (`C_U(R) ≤ C_V(R)`), and the conclusions
 `ρ g = 1` on `U` and on `U'` recombine to `ρ g = 1` on `V = U ⊕ U'`. -/
 private theorem frobenius_elemAbelian_c_aux
-    [IsAlgClosed F] [Finite G] [IsSolvable G] [NeZero (Nat.card G : F)]
+    [IsAlgClosed F] [Finite G] [Group.IsSolvable G] [NeZero (Nat.card G : F)]
     {K R : Subgroup G} [K.Normal]
     (hIsFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G K R) (hRne : R ≠ ⊥) (hKne : K ≠ ⊥) :
     ∀ (n : ℕ) {V : Type*} [AddCommGroup V] [Module F V] [FiniteDimensional F V] [Nontrivial V]
@@ -306,9 +306,9 @@ private theorem frobenius_elemAbelian_c_aux
       obtain ⟨U, U', hUbot, hU'ne, hsup, hinf⟩ := exists_maschke_split ρ hirr
       have hsum : finrank F ↥U.toSubmodule + finrank F ↥U'.toSubmodule = finrank F V :=
         Submodule.finrank_add_eq_of_isCompl ⟨disjoint_iff.mpr hinf, codisjoint_iff.mpr hsup⟩
-      haveI : Nontrivial ↥U.toSubmodule := Submodule.nontrivial_iff_ne_bot.mpr
+      have : Nontrivial ↥U.toSubmodule := Submodule.nontrivial_iff_ne_bot.mpr
         (fun h => hUbot (Subrepresentation.toSubmodule_injective h))
-      haveI : Nontrivial ↥U'.toSubmodule := Submodule.nontrivial_iff_ne_bot.mpr
+      have : Nontrivial ↥U'.toSubmodule := Submodule.nontrivial_iff_ne_bot.mpr
         (fun h => hU'ne (Subrepresentation.toSubmodule_injective h))
       have hUpos : 0 < finrank F ↥U.toSubmodule := finrank_pos
       have hU'pos : 0 < finrank F ↥U'.toSubmodule := finrank_pos
@@ -351,7 +351,7 @@ private theorem frobenius_elemAbelian_c_aux
 group `G = KR` acting on an elementary abelian `M = V` (over alg-closed `F`, `char F ∤ |G|`) with
 `C_V(K) = ⊥` and prime-manner action, if `C_V(R)` is cyclic (`finrank ≤ 1`) then `K' ⊆ C_K(V)`. -/
 theorem commutator_eq_one_of_frobenius_elemAbelian
-    [IsAlgClosed F] [Finite G] [IsSolvable G] [NeZero (Nat.card G : F)]
+    [IsAlgClosed F] [Finite G] [Group.IsSolvable G] [NeZero (Nat.card G : F)]
     (ρ : Representation F G V) [FiniteDimensional F V] [Nontrivial V]
     {K R : Subgroup G} [K.Normal]
     (hIsFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G K R) (hRne : R ≠ ⊥) (hKne : K ≠ ⊥)
@@ -400,7 +400,7 @@ base-changing to the algebraic closure and applying the general-kernel reducible
 `prime_card_and_finrank_of_frobenius_elemAbelian`.  The subspace-form prime-manner hypothesis
 transfers to the closure via `invariants_baseChangeRepresentation_comp_eq`. -/
 theorem prime_card_and_finrank_of_elemAbelian_general {p : ℕ} [Fact p.Prime]
-    {H : Type*} [Group H] [Finite H] [IsSolvable H]
+    {H : Type*} [Group H] [Finite H] [Group.IsSolvable H]
     {M : Type*} [CommGroup M] [Finite M] [Nontrivial M]
     [Module (ZMod p) (Additive M)] [MulDistribMulAction H M]
     {K R : Subgroup H} [K.Normal] (hRne : R ≠ ⊥) (hKne : K ≠ ⊥)
@@ -417,18 +417,18 @@ theorem prime_card_and_finrank_of_elemAbelian_general {p : ℕ} [Fact p.Prime]
   set ρ : Representation (ZMod p) H (Additive M) :=
     Representation.ofDistribMulAction (ZMod p) H (Additive M) with hρ
   set ρ' := baseChangeRepresentation (AlgebraicClosure (ZMod p)) ρ with hρ'
-  haveI : FiniteDimensional (ZMod p) (Additive M) := Module.Finite.of_finite
-  haveI : FiniteDimensional (AlgebraicClosure (ZMod p))
+  have : FiniteDimensional (ZMod p) (Additive M) := Module.Finite.of_finite
+  have : FiniteDimensional (AlgebraicClosure (ZMod p))
       (TensorProduct (ZMod p) (AlgebraicClosure (ZMod p)) (Additive M)) := inferInstance
-  haveI hChar : CharP (AlgebraicClosure (ZMod p)) p :=
+  have hChar : CharP (AlgebraicClosure (ZMod p)) p :=
     (Algebra.charP_iff (ZMod p) (AlgebraicClosure (ZMod p)) p).mp inferInstance
-  haveI hntM : Nontrivial (Additive M) := inferInstanceAs (Nontrivial (Additive M))
-  haveI : Nontrivial (TensorProduct (ZMod p) (AlgebraicClosure (ZMod p)) (Additive M)) :=
+  have hntM : Nontrivial (Additive M) := inferInstanceAs (Nontrivial (Additive M))
+  have : Nontrivial (TensorProduct (ZMod p) (AlgebraicClosure (ZMod p)) (Additive M)) :=
     (Module.FaithfullyFlat.nontrivial_tensorProduct_iff_right (R := ZMod p)
       (M := AlgebraicClosure (ZMod p)) (N := Additive M)).mpr hntM
   -- `p ∤ |H|` gives `(|H| : F̄) ≠ 0`, hence the `NeZero` instance Maschke needs, and
   -- `(|K| : F̄) ≠ 0`.
-  haveI hNeZeroH : NeZero (Nat.card H : AlgebraicClosure (ZMod p)) :=
+  have hNeZeroH : NeZero (Nat.card H : AlgebraicClosure (ZMod p)) :=
     ⟨by rw [Ne, CharP.cast_eq_zero_iff (AlgebraicClosure (ZMod p)) p]; exact hpH⟩
   have hpK : ¬ p ∣ Nat.card ↥K := fun hdvd => hpH (hdvd.trans (Subgroup.card_subgroup_dvd_card K))
   -- **Bridge**: `ρ g v = v` over `Additive M` ⟺ `(g:H) • (toMul v) = toMul v` in `M`.
@@ -501,7 +501,7 @@ Both `|M|` and `|C_M(R)|` are powers of `p` with exponents `finrank (Additive M)
 `finrank (Additive M) = |R| · finrank C_M(R)` turns the first into the `|R|`-th power of the
 second. -/
 theorem card_eq_pow_card_invariants_of_elemAbelian_general {p : ℕ} [Fact p.Prime]
-    {H : Type*} [Group H] [Finite H] [IsSolvable H]
+    {H : Type*} [Group H] [Finite H] [Group.IsSolvable H]
     {M : Type*} [CommGroup M] [Finite M] [Nontrivial M]
     [Module (ZMod p) (Additive M)] [MulDistribMulAction H M]
     {K R : Subgroup H} [K.Normal] (hRne : R ≠ ⊥) (hKne : K ≠ ⊥)
@@ -517,9 +517,9 @@ theorem card_eq_pow_card_invariants_of_elemAbelian_general {p : ℕ} [Fact p.Pri
   obtain ⟨_, _, _, hfr⟩ := prime_card_and_finrank_of_elemAbelian_general hRne hKne hpH hcop hCK
     hFrob
     hcond3
-  haveI : FiniteDimensional (ZMod p) (Additive M) := Module.Finite.of_finite
-  haveI : Fintype (Additive M) := Fintype.ofFinite _
-  haveI : Fintype ↥(Representation.invariants
+  have : FiniteDimensional (ZMod p) (Additive M) := Module.Finite.of_finite
+  have : Fintype (Additive M) := Fintype.ofFinite _
+  have : Fintype ↥(Representation.invariants
     ((Representation.ofDistribMulAction (ZMod p) H (Additive M)).comp R.subtype)) :=
       Fintype.ofFinite _
   change Nat.card (Additive M) = (Nat.card ↥(Representation.invariants
@@ -544,7 +544,7 @@ Base-changes to the algebraic closure where the reducible-module Theorem 3.10 (c
 `commutator_eq_one_of_frobenius_elemAbelian` gives `ρ̄ g = 1`; faithful flatness of the extension
 descends this to `ρ g = 1` over `ZMod p`, and the action bridge turns it into `(g : H) • m = m`. -/
 theorem commutator_acts_trivially_of_elemAbelian_general {p : ℕ} [Fact p.Prime]
-    {H : Type*} [Group H] [Finite H] [IsSolvable H]
+    {H : Type*} [Group H] [Finite H] [Group.IsSolvable H]
     {M : Type*} [CommGroup M] [Finite M] [Nontrivial M]
     [Module (ZMod p) (Additive M)] [MulDistribMulAction H M]
     {K R : Subgroup H} [K.Normal]
@@ -560,16 +560,16 @@ theorem commutator_acts_trivially_of_elemAbelian_general {p : ℕ} [Fact p.Prime
   set ρ : Representation (ZMod p) H (Additive M) :=
     Representation.ofDistribMulAction (ZMod p) H (Additive M) with hρ
   set ρ' := baseChangeRepresentation (AlgebraicClosure (ZMod p)) ρ with hρ'
-  haveI : FiniteDimensional (ZMod p) (Additive M) := Module.Finite.of_finite
-  haveI : FiniteDimensional (AlgebraicClosure (ZMod p))
+  have : FiniteDimensional (ZMod p) (Additive M) := Module.Finite.of_finite
+  have : FiniteDimensional (AlgebraicClosure (ZMod p))
       (TensorProduct (ZMod p) (AlgebraicClosure (ZMod p)) (Additive M)) := inferInstance
-  haveI hChar : CharP (AlgebraicClosure (ZMod p)) p :=
+  have hChar : CharP (AlgebraicClosure (ZMod p)) p :=
     (Algebra.charP_iff (ZMod p) (AlgebraicClosure (ZMod p)) p).mp inferInstance
-  haveI hntM : Nontrivial (Additive M) := inferInstanceAs (Nontrivial (Additive M))
-  haveI : Nontrivial (TensorProduct (ZMod p) (AlgebraicClosure (ZMod p)) (Additive M)) :=
+  have hntM : Nontrivial (Additive M) := inferInstanceAs (Nontrivial (Additive M))
+  have : Nontrivial (TensorProduct (ZMod p) (AlgebraicClosure (ZMod p)) (Additive M)) :=
     (Module.FaithfullyFlat.nontrivial_tensorProduct_iff_right (R := ZMod p)
       (M := AlgebraicClosure (ZMod p)) (N := Additive M)).mpr hntM
-  haveI hNeZeroH : NeZero (Nat.card H : AlgebraicClosure (ZMod p)) :=
+  have hNeZeroH : NeZero (Nat.card H : AlgebraicClosure (ZMod p)) :=
     ⟨by rw [Ne, CharP.cast_eq_zero_iff (AlgebraicClosure (ZMod p)) p]; exact hpH⟩
   have hbridge : ∀ (g : H) (v : Additive M),
       ρ g v = v ↔ (g : H) • Additive.toMul v = Additive.toMul v := by

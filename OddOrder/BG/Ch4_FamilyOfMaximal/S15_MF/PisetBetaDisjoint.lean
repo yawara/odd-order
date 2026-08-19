@@ -40,7 +40,7 @@ theorem mf_eq_msigma_of_piSet_inf_beta_disjoint [Finite G]
     (hdisj : ∀ q : ℕ, q ∈ S14.piSet (MF M) → q ∉ OddOrder.BG.Ch3.S10.beta M) :
     MF M = OddOrder.BG.Ch3.S10.Msigma M := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   by_contra hne
   -- A Hall `κ(M)`-subgroup `K` of `M` exists by Hall's theorem in the solvable group `↥M`.
   obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
@@ -250,9 +250,9 @@ theorem typeP2_mf_internal_fitting_decomposition [Finite G]
   set σ := OddOrder.BG.Ch3.S10.sigma M with hσdef
   set Mσ := OddOrder.BG.Ch3.S10.Msigma M with hMσdef
   set F := fittingInAmbient M with hFdef
-  haveI hFnil : Group.IsNilpotent ↥F := OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
+  have hFnil : Group.IsNilpotent ↥F := OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
   -- `M_F = M_σ`: `M_σ` is nilpotent for type `P₂`.
-  haveI hMσnil : Group.IsNilpotent ↥Mσ := S14.msigma_isNilpotent_of_isTypeP2 hG hM hP2
+  have hMσnil : Group.IsNilpotent ↥Mσ := S14.msigma_isNilpotent_of_isTypeP2 hG hM hP2
   have hMFMσ : maxNilpotentNormalHall M = Mσ :=
     (maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hM).mpr hMσnil
   -- Lemma 15.1(b): `M' = U ⊔ M_σ`.
@@ -306,7 +306,7 @@ theorem typeP2_mf_internal_fitting_decomposition [Finite G]
         have hr2 : pRank ↥M p = 2 := ((mem_tau2_iff M p).mp hpτ2).2
         rw [hr1] at hr2; exact absurd hr2 (by norm_num)
       · exact hpσ hpσ'
-    haveI hYnorm_M : (Y.subgroupOf M).Normal := by
+    have hYnorm_M : (Y.subgroupOf M).Normal := by
       rw [hYdef]; exact OddOrder.BG.Ch2.S08.opiCoreInG_fittingInG_subgroupOf_normal σᶜ M
     have hsub_le : Y.subgroupOf M ≤ U.subgroupOf M :=
       Ch03.Subgroup.IsPiGroup.normal_le_hall hY_pi hU
@@ -319,7 +319,7 @@ theorem typeP2_mf_internal_fitting_decomposition [Finite G]
     rw [← hsplit, hOσMσ, hMFMσ]
   -- `M_F ≤ F(M)`.
   have hMF_le_F : maxNilpotentNormalHall M ≤ F := by
-    haveI : Group.IsNilpotent ↥(maxNilpotentNormalHall M) := maxNilpotentNormalHall_isNilpotent M
+    have : Group.IsNilpotent ↥(maxNilpotentNormalHall M) := maxNilpotentNormalHall_isNilpotent M
     exact le_fittingInAmbient_of_subgroupOf_normal_of_isNilpotent
       (maxNilpotentNormalHall_le M) (maxNilpotentNormalHall_subgroupOf_normal M)
   -- `F(M) = M_F ⊔ (U ⊓ C_M(M_F))`.
@@ -339,7 +339,7 @@ theorem typeP2_mf_internal_fitting_decomposition [Finite G]
   refine ⟨?_, ?_, hFiteq⟩
   · -- `hDcompl`: `M_F = M_σ` complements `U` in `M'`.
     rw [hMFMσ]
-    haveI hMσnorm' : ((Mσ).subgroupOf (derivedInG M)).Normal :=
+    have hMσnorm' : ((Mσ).subgroupOf (derivedInG M)).Normal :=
       (Subgroup.normal_subgroupOf_iff_le_normalizer hMσ_le_M').mpr
         (hM'_le_M.trans (OddOrder.GroupTheory.le_normalizer_opiCoreInG σ M))
     refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
@@ -361,7 +361,7 @@ theorem typeP2_mf_internal_fitting_decomposition [Finite G]
 kernel of `x ↦ x ^ |A|`, which depends only on `|A|`). -/
 theorem eq_of_card_eq_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCyclic C]
     {H K : Subgroup C} (h : Nat.card ↥H = Nat.card ↥K) : H = K := by
-  letI : CommGroup C := IsCyclic.commGroup
+  let : CommGroup C := IsCyclic.commGroup
   have key : ∀ A : Subgroup C, A = (powMonoidHom (Nat.card ↥A) : C →* C).ker := by
     intro A
     have hcard : Nat.card ↥((powMonoidHom (Nat.card ↥A) : C →* C).ker) = Nat.card ↥A := by
@@ -460,13 +460,13 @@ theorem mem_sigma_of_prime_dvd_card_inf_conj_fitting [Finite G]
     (hpdvd : p ∣ Nat.card ↥(fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M)) :
     p ∈ OddOrder.BG.Ch3.S10.sigma M := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   by_contra hpσ
   set F := fittingInAmbient M with hFdef
   set σ := OddOrder.BG.Ch3.S10.sigma M with hσdef
   have hFleM : F ≤ M := OddOrder.BG.Ch2.S08.fittingInG_le M
   -- `O_{σᶜ}(F)` is cyclic and normalized by `M`.
-  haveI hcyc : IsCyclic ↥(opiCoreInG σᶜ F) := opiCoreInG_sigmaCompl_fittingInAmbient_isCyclic hG hM
+  have hcyc : IsCyclic ↥(opiCoreInG σᶜ F) := opiCoreInG_sigmaCompl_fittingInAmbient_isCyclic hG hM
   have hMNOσc : M ≤ Subgroup.normalizer ((opiCoreInG σᶜ F : Subgroup G) : Set G) :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer
       ((OddOrder.GroupTheory.opiCoreInG_le σᶜ F).trans hFleM)).mp
@@ -550,7 +550,7 @@ theorem three_le_pRank_mf_of_mem_beta [Finite G]
     3 ≤ pRank ↥(MF M) r := by
   have hrmem : r ∈ (Nat.card ↥(MF M)).primeFactors := hrπ
   have hrp : r.Prime := Nat.prime_of_mem_primeFactors hrmem
-  haveI : Fact r.Prime := ⟨hrp⟩
+  have : Fact r.Prime := ⟨hrp⟩
   -- `M_F` is `π(M_F)`-Hall in `M`; `r ∈ π(M_F)` ⟹ `r ∤ [M : M_F]`.
   have hHall := maxNilpotentNormalHall_isHall (G := G) M
   have hidx : ¬ r ∣ ((MF M).subgroupOf M).index := fun hdvd =>
@@ -605,7 +605,7 @@ theorem exists_orderP_witness_of_inf_conj_fitting_ne_bot [Finite G]
   have hXcard : Nat.card ↥(fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M) ≠ 1 :=
     fun h => hXne (Subgroup.card_eq_one.mp h)
   obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hXcard
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M :=
     mem_sigma_of_prime_dvd_card_inf_conj_fitting hG hM hgM hp hpdvd
   -- An order-`p` subgroup `X₁ ≤ X`.
@@ -722,9 +722,9 @@ theorem not_isCyclic_opiCore_mf_of_orderP_le_conj [Finite G]
     ¬ IsCyclic ↥(opiCoreInG ({p} : Set ℕ) (MF M)) := by
   classical
   intro hcyc
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   set C : Subgroup G := opiCoreInG ({p} : Set ℕ) (MF M) with hCdef
-  haveI : IsCyclic ↥C := hcyc
+  have : IsCyclic ↥C := hcyc
   -- `M ≤ N(C)` since `C = O_p(M_F)` is characteristic in `M_F ⊴ M`.
   have hMNC : M ≤ Subgroup.normalizer (C : Set G) :=
     le_normalizer_opiCoreInG_of_le_normalizer _ (maxNilpotentNormalHall_le_normalizer M)
@@ -855,7 +855,7 @@ theorem isMulCommutative_of_isNilpotent_of_sylow_comm {N : Type*} [Group N] [Fin
     (h : ∀ (p : ℕ) [Fact p.Prime] (P : Sylow p N), IsMulCommutative ↥(P : Subgroup N)) :
     IsMulCommutative N := by
   classical
-  haveI : Fintype N := Fintype.ofFinite N
+  have : Fintype N := Fintype.ofFinite N
   have hnorm : ∀ {p : ℕ} [Fact p.Prime] (P : Sylow p N), (↑P : Subgroup N).Normal :=
     fun P => OddOrder.Isaacs.Ch01.Sylow.normal_of_isNilpotent P
   let e := Sylow.directProductOfNormal (G := N) hnorm
@@ -864,7 +864,7 @@ theorem isMulCommutative_of_isNilpotent_of_sylow_comm {N : Type*} [Group N] [Fin
       a * b = b * a := by
     intro a b
     funext p P
-    haveI : Fact (p : ℕ).Prime := Fact.mk (Nat.prime_of_mem_primeFactors p.2)
+    have : Fact (p : ℕ).Prime := Fact.mk (Nat.prime_of_mem_primeFactors p.2)
     exact (isMulCommutative_iff.mp (h p P)) (a p P) (b p P)
   -- Transport commutativity across `e : (Π Sylows) ≃* N`.
   refine isMulCommutative_iff.mpr fun x y => ?_
@@ -890,9 +890,9 @@ theorem isMulCommutative_mf_inf_centralizer_of_not_le [Finite G]
   set C1 : Subgroup G := MF M ⊓ Subgroup.centralizer (X₁ : Set G) with hC1def
   have hC1MF : C1 ≤ MF M := inf_le_left
   -- `C1` is nilpotent (a subgroup of the nilpotent `M_F`).
-  haveI hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
-  haveI : Group.IsNilpotent ↥(C1.subgroupOf (MF M)) := Subgroup.isNilpotent (C1.subgroupOf (MF M))
-  haveI hC1nil : Group.IsNilpotent ↥C1 :=
+  have hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
+  have : Group.IsNilpotent ↥(C1.subgroupOf (MF M)) := Subgroup.isNilpotent (C1.subgroupOf (MF M))
+  have hC1nil : Group.IsNilpotent ↥C1 :=
     Group.nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hC1MF).toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hC1MF).surjective
   -- `C1 < ⊤` and `C1` is not uniquely maximal.
@@ -926,8 +926,8 @@ fixed-point-freely on the kernel `M_σ`, it gives `|U₀| ∣ q - 1`, hence
 theorem card_dvd_sub_one_of_isFrobeniusAction {A N : Type*} [Group A] [Finite A] [Group N]
     [Finite N] [MulDistribMulAction A N] (h : OddOrder.Isaacs.Ch06.IsFrobeniusAction A N) :
     Nat.card A ∣ Nat.card N - 1 := by
-  haveI : Fintype A := Fintype.ofFinite A
-  haveI : Fintype N := Fintype.ofFinite N
+  have : Fintype A := Fintype.ofFinite A
+  have : Fintype N := Fintype.ofFinite N
   have hmod : Nat.card N ≡ 1 [MOD Nat.card A] := by
     simpa only [Nat.card_eq_fintype_card] using h.card_modEq_one
   exact (Nat.modEq_iff_dvd' Nat.card_pos).mp hmod.symm
@@ -960,10 +960,10 @@ theorem isCyclic_of_isMulCommutative_of_rank_le_one {N : Type*} [Group N] [Finit
     (hcomm : ∀ x y : N, x * y = y * x) (hodd : Odd (Nat.card N)) (hrank : rank N ≤ 1) :
     IsCyclic N := by
   classical
-  haveI hmc : IsMulCommutative N := isMulCommutative_iff.mpr hcomm
-  haveI hZ : _root_.IsZGroup N := by
+  have hmc : IsMulCommutative N := isMulCommutative_iff.mpr hcomm
+  have hZ : _root_.IsZGroup N := by
     refine ⟨fun q hq P => ?_⟩
-    haveI : Fact q.Prime := ⟨hq⟩
+    have : Fact q.Prime := ⟨hq⟩
     by_contra hPnc
     rcases subsingleton_or_nontrivial ↥(P : Subgroup N) with _ | hnt
     · exact hPnc inferInstance
@@ -1001,11 +1001,11 @@ theorem opiCore_singleton_not_isMulCommutative_of_witness [Finite G]
     (hnab : ¬ IsMulCommutative ↥(MF M)) :
     ¬ IsMulCommutative ↥(opiCoreInG ({p} : Set ℕ) (MF M)) := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hX₁ne : X₁ ≠ ⊥ :=
     fun h => hp.one_lt.ne' (by rw [← hX₁card, h, Subgroup.card_bot])
   have hX₁pg : IsPGroup p ↥X₁ := IsPGroup.of_card (n := 1) (by rw [hX₁card, pow_one])
-  haveI hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
+  have hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
   set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (MF M) with hPdef
   set R : Subgroup G := opiCoreInG (({p} : Set ℕ)ᶜ) (MF M) with hRdef
   have hX₁P : X₁ ≤ P :=
@@ -1053,10 +1053,10 @@ theorem typeF_nonabelian_cyclic_opiCore_compl [Finite G]
     p ∈ (Nat.card ↥(MF M)).primeFactors ∧
       IsCyclic ↥(opiCoreInG (({p} : Set ℕ)ᶜ) (MF M)) := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hX₁ne : X₁ ≠ ⊥ := fun h => hp.one_lt.ne' (by rw [← hX₁card, h, Subgroup.card_bot])
   have hX₁pg : IsPGroup p ↥X₁ := IsPGroup.of_card (n := 1) (by rw [hX₁card, pow_one])
-  haveI hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
+  have hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
   -- `p ∈ π(M_F)`: `p = |X₁| ∣ |M_F|`.
   have hpπ : p ∈ (Nat.card ↥(MF M)).primeFactors :=
     Nat.mem_primeFactors.mpr ⟨hp, hX₁card ▸ Subgroup.card_dvd_of_le hX₁MF, Nat.card_pos.ne'⟩
@@ -1158,7 +1158,7 @@ theorem inf_conj_fitting_le_Msigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
   set F : Subgroup G := fittingInAmbient M with hFdef
   set X : Subgroup G := F ⊓ MulAut.conj g • F with hXdef
   have hXF : X ≤ F := hXdef ▸ inf_le_left
-  haveI hFnil : Group.IsNilpotent ↥F := OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
+  have hFnil : Group.IsNilpotent ↥F := OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
   -- Every prime of `X` lies in `σ(M)` (BG's `p ∈ π(X) ⟹ p ∈ σ(M)` step).
   have hXpi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup
       (OddOrder.BG.Ch3.S10.sigma M) (X.subgroupOf F) := by
@@ -1243,7 +1243,7 @@ theorem Msigma_inf_conj_isCyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     by_contra hcon
     obtain ⟨p, hp, A, hAea, hAle, hAnc⟩ :=
       exists_isElementaryAbelian_not_isCyclic_le_of_two_le_rank K (by omega)
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     have hAmeet : A ≤ OddOrder.BG.Ch3.S10.Msigma M ⊓ MulAut.conj g • M := hKdef ▸ hAle
     have hAMσ : A ≤ OddOrder.BG.Ch3.S10.Msigma M := hAmeet.trans inf_le_left
     have hAM : A ≤ M := hAMσ.trans (OddOrder.BG.Ch3.S10.Msigma_le M)
@@ -1279,7 +1279,7 @@ theorem inf_conj_fitting_isCyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     le_inf (inf_conj_fitting_le_Msigma hG hM hgM)
       ((inf_conj_fitting_le_conj_Msigma hG hM hgM).trans
         (Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr (OddOrder.BG.Ch3.S10.Msigma_le M)))
-  haveI : IsCyclic ↥(OddOrder.BG.Ch3.S10.Msigma M ⊓ MulAut.conj g • M : Subgroup G) :=
+  have : IsCyclic ↥(OddOrder.BG.Ch3.S10.Msigma M ⊓ MulAut.conj g • M : Subgroup G) :=
     Msigma_inf_conj_isCyclic hG hM hgM
   exact Subgroup.isCyclic_of_le hle
 

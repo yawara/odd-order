@@ -176,8 +176,8 @@ theorem exists_restrictionMultiplicity_ne_zero_intermediate
         ClassFunction.restrictionMultiplicity (N.subgroupOf T) (ψ : ClassFunction ↥T ℂ)
           (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hNT).toMonoidHom θ) ≠ 0 := by
   classical
-  haveI : Finite (IrreducibleCharacter ↥T) := finite_irreducibleCharacter (G := ↥T)
-  letI : Fintype (IrreducibleCharacter ↥T) := Fintype.ofFinite _
+  have : Finite (IrreducibleCharacter ↥T) := finite_irreducibleCharacter (G := ↥T)
+  let : Fintype (IrreducibleCharacter ↥T) := Fintype.ofFinite _
   by_contra hcon
   push Not at hcon
   apply hne
@@ -335,8 +335,8 @@ theorem tau_mem_ZIrr [Fintype G] [Invertible (Nat.card G : ℂ)]
     [Invertible (Nat.card ↥hyp.H : ℂ)] {φ : ClassFunction ↥hyp.H ℂ}
     (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.H) hyp.Sset) :
     hyp.tau φ ∈ ZIrr G := by
-  haveI : Finite G := Finite.of_fintype G
-  haveI : Fintype ↥hyp.H := Fintype.ofFinite _
+  have : Finite G := Finite.of_fintype G
+  have : Fintype ↥hyp.H := Fintype.ofFinite _
   exact ClassFunction.induce_mem_ZIrr hyp.H (hyp.zSpan_Sset_le_ZIrr hφ)
 
 /-- **Lemma 2(b), degree clause** (proved, sorry-free): `τ` preserves the degree-zero condition,
@@ -592,7 +592,7 @@ theorem delta_notMem_inertia_Q1 [Finite G] [(hyp.Q1.subgroupOf hyp.H).Normal] {�
     {θ : IrreducibleCharacter ↥(hyp.Q1.subgroupOf hyp.H)}
     (hθ : θ ≠ trivialIrreducibleCharacter _) :
     δ ∉ IrreducibleCharacter.inertia (G := ↥hyp.H) (H := hyp.Q1.subgroupOf hyp.H) θ := by
-  haveI : Finite ↥(hyp.Q1.subgroupOf hyp.H) := Finite.of_injective _ Subtype.val_injective
+  have : Finite ↥(hyp.Q1.subgroupOf hyp.H) := Finite.of_injective _ Subtype.val_injective
   exact not_mem_inertia_of_ne_trivial_of_card_fixedClasses_eq_one δ
     (hyp.card_fixedClasses_Q1_eq_one hδD hδ1) hθ
 
@@ -861,27 +861,27 @@ theorem Sset_eq_induced_of_Q [Finite G] :
         {φ | IsIrreducibleCharacter φ ∧
           ¬ ∀ x : ↥(hyp.Q.subgroupOf hyp.H), ((x : ↥hyp.H) : G) ∈ hyp.Q1 → φ x = φ 1} := by
   classical
-  haveI hQ1n : (hyp.Q1.subgroupOf hyp.H).Normal := hyp.Q1_subgroupOf_H_normal
+  have hQ1n : (hyp.Q1.subgroupOf hyp.H).Normal := hyp.Q1_subgroupOf_H_normal
   have hHT : hyp.Q1.subgroupOf hyp.H ≤ hyp.Q.subgroupOf hyp.H := fun x hx =>
     Subgroup.mem_subgroupOf.mpr (hyp.Q1_le_Q (Subgroup.mem_subgroupOf.mp hx))
   -- finiteness / invertibility bookkeeping
-  letI : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
-  letI : Fintype ↥(hyp.Q1.subgroupOf hyp.H) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥(hyp.Q1.subgroupOf hyp.H) : ℂ) :=
+  let : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
+  let : Fintype ↥(hyp.Q1.subgroupOf hyp.H) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥(hyp.Q1.subgroupOf hyp.H) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Fintype ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) :=
+  let : Fintype ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) :=
     Fintype.ofFinite _
-  letI : Invertible
+  let : Invertible
       ((Nat.card ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : Finite (IrreducibleCharacter
+  have : Finite (IrreducibleCharacter
       ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))) :=
     finite_irreducibleCharacter
-  letI : Fintype (IrreducibleCharacter
+  let : Fintype (IrreducibleCharacter
       ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))) := Fintype.ofFinite _
-  haveI : Finite (IrreducibleCharacter ↥(hyp.Q1.subgroupOf hyp.H)) :=
+  have : Finite (IrreducibleCharacter ↥(hyp.Q1.subgroupOf hyp.H)) :=
     finite_irreducibleCharacter
-  letI : Fintype (IrreducibleCharacter ↥(hyp.Q1.subgroupOf hyp.H)) := Fintype.ofFinite _
+  let : Fintype (IrreducibleCharacter ↥(hyp.Q1.subgroupOf hyp.H)) := Fintype.ofFinite _
   ext χ
   constructor
   · -- `𝒮 ⊆` the induced set
@@ -1022,8 +1022,8 @@ the `A`-support hypotheses of Lemma 1(a) at the Theorem's call sites. -/
 theorem apply_eq_zero_of_mem_Sset_of_not_mem_Q [Finite G]
     {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset)
     {h : ↥hyp.H} (hh : (h : G) ∉ hyp.Q) : χ h = 0 := by
-  letI : Fintype ↥hyp.H := Fintype.ofFinite _
-  haveI : (hyp.Q.subgroupOf hyp.H).Normal := hyp.Q_subgroupOf_H_normal
+  let : Fintype ↥hyp.H := Fintype.ofFinite _
+  have : (hyp.Q.subgroupOf hyp.H).Normal := hyp.Q_subgroupOf_H_normal
   have hmem := hχ
   rw [Sset_eq_induced_of_Q hyp] at hmem
   obtain ⟨φ, _, rfl⟩ := hmem
@@ -1064,7 +1064,7 @@ theorem induction_isometry_on_degree_zero
     ClassFunction.inner (hyp.tau φ) (hyp.tau ψ) = ClassFunction.inner φ ψ ∧
       hyp.tau φ ∈ ZIrr G ∧ (hyp.tau φ) (1 : G) = 0 := by
   refine ⟨?_, hyp.tau_mem_ZIrr hφ, hyp.tau_apply_one hφ1⟩
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   -- degree-zero members of `ℤ[𝒮]` vanish off the TI-subset `A = Q \ {1}`
   have hoff : ∀ ρ : ClassFunction ↥hyp.H ℂ,
       ρ ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥hyp.H) hyp.Sset → ρ (1 : ↥hyp.H) = 0 →
@@ -1109,14 +1109,14 @@ theorem hasNoRealCharacters_Sset [Finite G] (hd : Odd hyp.d)
     (hQ1odd : Odd (Nat.card ↥hyp.Q1)) :
     OddOrder.Peterfalvi.S03.HasNoRealCharacters hyp.Sset := by
   classical
-  haveI hQ1n : (hyp.Q1.subgroupOf hyp.H).Normal := hyp.Q1_subgroupOf_H_normal
-  letI : Fintype ↥hyp.H := Fintype.ofFinite _
-  letI : Fintype ↥(hyp.Q1.subgroupOf hyp.H) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥(hyp.Q1.subgroupOf hyp.H) : ℂ) :=
+  have hQ1n : (hyp.Q1.subgroupOf hyp.H).Normal := hyp.Q1_subgroupOf_H_normal
+  let : Fintype ↥hyp.H := Fintype.ofFinite _
+  let : Fintype ↥(hyp.Q1.subgroupOf hyp.H) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥(hyp.Q1.subgroupOf hyp.H) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : Finite (IrreducibleCharacter ↥(hyp.Q1.subgroupOf hyp.H)) :=
+  have : Finite (IrreducibleCharacter ↥(hyp.Q1.subgroupOf hyp.H)) :=
     finite_irreducibleCharacter
-  letI : Fintype (IrreducibleCharacter ↥(hyp.Q1.subgroupOf hyp.H)) := Fintype.ofFinite _
+  let : Fintype (IrreducibleCharacter ↥(hyp.Q1.subgroupOf hyp.H)) := Fintype.ofFinite _
   intro χ hχmem hreal
   obtain ⟨hχirr, hχker⟩ := hχmem
   have hconjχ : χ.conj = χ := hreal

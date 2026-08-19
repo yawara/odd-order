@@ -73,28 +73,28 @@ group elements. -/
 theorem mul_sub_mul_mem (x y : MonoidAlgebra k G) :
     x * y - y * x ∈ conjDiffSubmodule k G := by
   induction x using MonoidAlgebra.induction_on with
-  | hM a =>
+  | of a =>
     induction y using MonoidAlgebra.induction_on with
-    | hM b =>
+    | of b =>
       simpa only [MonoidAlgebra.of_apply] using single_mul_sub_mul_mem (k := k) a b 1 1
-    | hadd y₁ y₂ h₁ h₂ =>
+    | add y₁ y₂ h₁ h₂ =>
       have hexp : (of k G) a * (y₁ + y₂) - (y₁ + y₂) * (of k G) a
           = ((of k G) a * y₁ - y₁ * (of k G) a) + ((of k G) a * y₂ - y₂ * (of k G) a) := by
         noncomm_ring
       rw [hexp]
       exact Submodule.add_mem _ h₁ h₂
-    | hsmul c y h =>
+    | smul c y h =>
       have hexp : (of k G) a * (c • y) - (c • y) * (of k G) a
           = c • ((of k G) a * y - y * (of k G) a) := by
         rw [smul_sub, mul_smul_comm, smul_mul_assoc]
       rw [hexp]
       exact Submodule.smul_mem _ _ h
-  | hadd x₁ x₂ h₁ h₂ =>
+  | add x₁ x₂ h₁ h₂ =>
     have hexp : (x₁ + x₂) * y - y * (x₁ + x₂) = (x₁ * y - y * x₁) + (x₂ * y - y * x₂) := by
       noncomm_ring
     rw [hexp]
     exact Submodule.add_mem _ h₁ h₂
-  | hsmul c x h =>
+  | smul c x h =>
     have hexp : (c • x) * y - y * (c • x) = c • (x * y - y * x) := by
       rw [smul_sub, smul_mul_assoc, mul_smul_comm]
     rw [hexp]

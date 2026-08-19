@@ -61,8 +61,8 @@ theorem exists_datum_padicComplex (H : Type*) [Group H] [Finite H] :
       IsPrimitiveRoot _ω' (pRegularExponent p H) := by
   classical
   obtain ⟨n, d, hd, ⟨e⟩⟩ := exists_algEquiv_pi_matrix_padicComplex p H
-  haveI : ∀ i, NeZero (d i) := hd
-  haveI : ∀ i, Nonempty (Fin (d i)) := fun i => ⟨0⟩
+  have : ∀ i, NeZero (d i) := hd
+  have : ∀ i, Nonempty (Fin (d i)) := fun i => ⟨0⟩
   obtain ⟨ι, hιfin, nn, hnnfin, hnndec, hnnne, π, hπ, hlin, hkerJ, hnil⟩ :=
     OddOrder.GroupAlgebra.exists_modularDatum (ResidueField 𝓞_ℂ_[p]) H
   obtain ⟨ω, hω⟩ := exists_isPrimitiveRoot_pRegularExponent p H

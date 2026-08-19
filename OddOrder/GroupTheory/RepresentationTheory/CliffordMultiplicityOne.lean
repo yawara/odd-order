@@ -59,6 +59,7 @@ theorem conjMonoidAlgRingHom_conj_inv (x : G) (r : k[↥H]) :
 
 variable {H}
 
+set_option backward.isDefEq.respectTransparency false in
 /-- `ρ x⁻¹` followed by `ρ x` (as semilinear maps on the restriction) is the identity. -/
 theorem conjSemilinearEnd_conj_inv (x : G) (v : (resRep ρ H).asModule) :
     conjSemilinearEnd (H := H) ρ x (conjSemilinearEnd (H := H) ρ x⁻¹ v) = v := by
@@ -72,6 +73,7 @@ theorem conjSemilinearEnd_one_apply (v : (resRep ρ H).asModule) :
     conjSemilinearEnd (H := H) ρ 1 v = v := by
   rw [conjSemilinearEnd_apply, map_one]; rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- `conjSemilinearEnd ρ` is multiplicative (pointwise): `ρ (g₁ g₂) = ρ g₁ ∘ ρ g₂`. -/
 theorem conjSemilinearEnd_mul_apply (g₁ g₂ : G) (v : (resRep ρ H).asModule) :
     conjSemilinearEnd (H := H) ρ (g₁ * g₂) v
@@ -263,14 +265,14 @@ theorem restriction_isSimpleModule [ρ.IsIrreducible] [IsAlgClosed k] [Module.Fi
     (W : Submodule k[↥H] (resRep ρ H).asModule) (hW : W ≠ ⊥) [IsSimpleModule k[↥H] W]
     (hconj : ∀ g : G, Nonempty (W ≃ₗ[k[↥H]] (W.map (conjSemilinearEnd (H := H) ρ g)))) :
     IsSimpleModule k[↥H] (resRep ρ H).asModule := by
-  haveI hVnt : Nontrivial (resRep ρ H).asModule := ‹Nontrivial V›
-  haveI hVfin : Module.Finite k (resRep ρ H).asModule := inferInstance
-  haveI : IsNoetherian k (resRep ρ H).asModule := inferInstance
-  haveI hHfin : Module.Finite k[↥H] (resRep ρ H).asModule :=
+  have hVnt : Nontrivial (resRep ρ H).asModule := ‹Nontrivial V›
+  have hVfin : Module.Finite k (resRep ρ H).asModule := inferInstance
+  have : IsNoetherian k (resRep ρ H).asModule := inferInstance
+  have hHfin : Module.Finite k[↥H] (resRep ρ H).asModule :=
     Module.Finite.of_restrictScalars_finite k k[↥H] (resRep ρ H).asModule
-  haveI hWfin : Module.Finite k ↥W :=
+  have hWfin : Module.Finite k ↥W :=
     Module.Finite.of_injective ((W.subtype).restrictScalars k) Subtype.val_injective
-  haveI hss : IsSemisimpleModule k[↥H] (resRep ρ H).asModule :=
+  have hss : IsSemisimpleModule k[↥H] (resRep ρ H).asModule :=
     isSemisimpleModule_resRep_of_isIrreducible ρ
   -- The restriction is `W`-isotypic, hence `V_H ≅ Wⁿ`.
   have hiso : IsIsotypicOfType k[↥H] (resRep ρ H).asModule ↥W :=
@@ -283,16 +285,16 @@ theorem restriction_isSimpleModule [ρ.IsIrreducible] [IsAlgClosed k] [Module.Fi
   -- `n ≠ 0`: otherwise `V_H` would be a subsingleton.
   have hn0 : n ≠ 0 := by
     rintro rfl
-    haveI : Subsingleton (resRep ρ H).asModule := e.toEquiv.subsingleton
+    have : Subsingleton (resRep ρ H).asModule := e.toEquiv.subsingleton
     exact not_subsingleton _ this
-  haveI hne : Nonempty (Fin n) := ⟨⟨0, Nat.pos_of_ne_zero hn0⟩⟩
+  have hne : Nonempty (Fin n) := ⟨⟨0, Nat.pos_of_ne_zero hn0⟩⟩
   -- `Ψ : E ≅ M_n(k)`.
   let Ψ : Module.End k[↥H] (resRep ρ H).asModule ≃ₐ[k] Matrix (Fin n) (Fin n) k :=
     (e.conjAlgEquiv k).trans
       ((endVecAlgEquivMatrixEnd ..).trans schur.symm.mapMatrix)
-  haveI : IsSimpleRing (Module.End k[↥H] (resRep ρ H).asModule) :=
+  have : IsSimpleRing (Module.End k[↥H] (resRep ρ H).asModule) :=
     IsSimpleRing.of_ringEquiv Ψ.symm.toRingEquiv inferInstance
-  haveI : FiniteDimensional k (Module.End k[↥H] (resRep ρ H).asModule) :=
+  have : FiniteDimensional k (Module.End k[↥H] (resRep ρ H).asModule) :=
     Module.Finite.equiv Ψ.symm.toLinearEquiv
   -- Skolem–Noether: the fixed-scalar automorphism `cliffordConj ρ x` forces `finrank k E = 1`.
   have hrank : Module.finrank k (Module.End k[↥H] (resRep ρ H).asModule) = 1 :=

@@ -65,7 +65,7 @@ solvable CN-group so that Gorenstein's Corollary 1.6 applies to it. -/
 theorem IsCNGroup.to_subgroup (h : IsCNGroup G) (H : Subgroup G) : IsCNGroup ↥H := by
   intro x hx
   have hxG : (x : G) ≠ 1 := fun hc => hx (Subtype.ext hc)
-  haveI hnil : Group.IsNilpotent ↥(Subgroup.centralizer ({(x : G)} : Set G)) := h (x : G) hxG
+  have hnil : Group.IsNilpotent ↥(Subgroup.centralizer ({(x : G)} : Set G)) := h (x : G) hxG
   -- The inclusion `C_H(x) → C_G(x)`.
   let f : ↥(Subgroup.centralizer ({x} : Set ↥H)) →*
       ↥(Subgroup.centralizer ({(x : G)} : Set G)) :=
@@ -81,7 +81,7 @@ theorem IsCNGroup.to_subgroup (h : IsCNGroup G) (H : Subgroup G) : IsCNGroup ↥
     have h1 : ((a : ↥H) : G) = ((b : ↥H) : G) :=
       congrArg (fun (z : ↥(Subgroup.centralizer ({(x : G)} : Set G))) => (z : G)) hab
     exact Subtype.ext (Subtype.ext h1)
-  haveI : Group.IsNilpotent ↥f.range := inferInstance
+  have : Group.IsNilpotent ↥f.range := inferInstance
   exact Group.nilpotent_of_mulEquiv (MonoidHom.ofInjective hf).symm
 
 /-- The standing hypothesis for BG Appendix D: `G` is a **minimal simple** CN-group of odd order.
@@ -105,7 +105,7 @@ variable [Finite G]
 hence nilpotent, hence solvable. -/
 theorem oPiCore_eq_bot (hyp : MinimalSimpleCNHypothesis G) (p : ℕ) [Fact p.Prime] :
     Isaacs.Ch03.oPiCore ({p} : Set ℕ) G = ⊥ := by
-  haveI := hyp.minimalSimpleOdd.simple
+  have := hyp.minimalSimpleOdd.simple
   rcases (IsSimpleGroup.eq_bot_or_eq_top_of_normal (Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)
     inferInstance) with hbot | htop
   · exact hbot
@@ -113,16 +113,16 @@ theorem oPiCore_eq_bot (hyp : MinimalSimpleCNHypothesis G) (p : ℕ) [Fact p.Pri
     have hpg : IsPGroup p ↥(Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) :=
       Isaacs.Ch04.isPGroup_of_isPiGroup_singleton (Isaacs.Ch03.oPiCore.isPiGroup ({p} : Set ℕ))
     rw [htop] at hpg
-    haveI : Group.IsNilpotent ↥(⊤ : Subgroup G) := hpg.isNilpotent
-    haveI : Group.IsNilpotent G :=
+    have : Group.IsNilpotent ↥(⊤ : Subgroup G) := hpg.isNilpotent
+    have : Group.IsNilpotent G :=
       Group.nilpotent_of_mulEquiv (G := ↥(⊤ : Subgroup G)) Subgroup.topEquiv
     exact hyp.minimalSimpleOdd.notSolvable inferInstance
 
 /-- A proper subgroup of `G` is a solvable CN-group; this is the package Gorenstein's
 Corollary 1.6 consumes. -/
-theorem solvable_cn_of_lt_top (hyp : MinimalSimpleCNHypothesis G) {M : Subgroup G} (hM : M < ⊤) :
-    IsSolvable ↥M ∧ IsCNGroup ↥M :=
-  ⟨hyp.minimalSimpleOdd.solvable_of_lt_top M hM, hyp.cn.to_subgroup M⟩
+theorem isSolvable_cn_of_lt_top (hyp : MinimalSimpleCNHypothesis G) {M : Subgroup G} (hM : M < ⊤) :
+    Group.IsSolvable ↥M ∧ IsCNGroup ↥M :=
+  ⟨hyp.minimalSimpleOdd.isSolvable_of_lt_top M hM, hyp.cn.to_subgroup M⟩
 
 end MinimalSimpleCNHypothesis
 

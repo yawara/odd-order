@@ -422,7 +422,7 @@ For the canonical central root involution `s` and standard Weyl involution `w`,
 the product `sw` has exact order five. -/
 theorem orderOf_standardRootInvolution_mul_weylElement (m : ℕ) :
     orderOf (standardRootInvolution m * weylElement m) = 5 := by
-  letI : Fact (Nat.Prime 5) := ⟨by decide⟩
+  let : Fact (Nat.Prime 5) := ⟨by decide⟩
   exact orderOf_eq_prime (standardRootInvolution_mul_weyl_pow_five m)
     (standardRootInvolution_mul_weyl_ne_one m)
 

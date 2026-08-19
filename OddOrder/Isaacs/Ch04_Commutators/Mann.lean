@@ -504,7 +504,7 @@ section /- 4B: Theorem 4.15 — self-centralizing normal K forces class(M(G)) �
 most `n` as a group in its own right. -/
 theorem nilpotencyClass_le_of_lowerCentralSeries_eq_bot {S : Subgroup G} {n : ℕ}
     (h : S.lowerCentralSeries n = ⊥) : Group.nilpotencyClass ↥S ≤ n := by
-  haveI : Group.IsNilpotent ↥S := Subgroup.isNilpotent_of_lowerCentralSeries_eq_bot h
+  have : Group.IsNilpotent ↥S := Subgroup.isNilpotent_of_lowerCentralSeries_eq_bot h
   rw [← Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le,
     ← Subgroup.map_subtype_inj (H := S), Subgroup.map_bot,
     Subgroup.top_subtype_lowerCentralSeries]
@@ -620,6 +620,7 @@ theorem exists_mem_center_of_normal_ne_bot_of_isNilpotent [Group.IsNilpotent G]
     exact hcon w hw
   exact ⟨w, hW_le_N hwW, hW_center hwW, hw1⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Isaacs Lemma 4.16** (nilpotent generalization). In a nilpotent group `G`
 (finiteness not needed), a normal subgroup `A` maximal among abelian normal subgroups
 is self-centralizing: `C_G(A) = A`.
@@ -646,10 +647,10 @@ theorem centralizer_eq_self_of_maximal_abelian_normal_of_isNilpotent
   by_contra hnot
   set H := Subgroup.centralizer (A : Set G) with hH_def
   have hAH : A < H := lt_of_le_of_ne hA_le fun h => hnot (h ▸ le_refl _)
-  haveI : H.Normal := inferInstance
+  have : H.Normal := inferInstance
   set q := QuotientGroup.mk' A with hq_def
   set Hbar := H.map q with hHbar_def
-  haveI : Hbar.Normal := Subgroup.Normal.map inferInstance q (QuotientGroup.mk'_surjective A)
+  have : Hbar.Normal := Subgroup.Normal.map inferInstance q (QuotientGroup.mk'_surjective A)
   -- `H̄ ≠ ⊥`: pick `h ∈ H \ A`
   have hHbar_ne : Hbar ≠ ⊥ := by
     obtain ⟨h, hhH, hhA⟩ := SetLike.exists_of_lt hAH
@@ -664,13 +665,13 @@ theorem centralizer_eq_self_of_maximal_abelian_normal_of_isNilpotent
   -- the preimage `X` of `⟨x̄⟩` is normal in `G` and contains `A`
   have hzp_le_center : Subgroup.zpowers xbar ≤ Subgroup.center (G ⧸ A) :=
     Subgroup.zpowers_le.mpr hxbar_center
-  haveI hzp_normal : (Subgroup.zpowers xbar).Normal :=
+  have hzp_normal : (Subgroup.zpowers xbar).Normal :=
     { conj_mem := fun n hn g => by
         rw [Subgroup.mem_center_iff.mp (hzp_le_center hn) g, mul_assoc,
           mul_inv_cancel, mul_one]
         exact hn }
   set X := (Subgroup.zpowers xbar).comap q with hX_def
-  haveI : X.Normal := inferInstance
+  have : X.Normal := inferInstance
   have hAX : A ≤ X := by
     intro m hm
     rw [hX_def, Subgroup.mem_comap, hq_def, QuotientGroup.mk'_apply,
@@ -728,14 +729,14 @@ theorem exists_normal_abelian_centralizer_eq_self (G : Type*) [Group G] [Finite 
     ∃ K : Subgroup G, K.Normal ∧ (∀ x ∈ K, ∀ y ∈ K, x * y = y * x) ∧
       Subgroup.centralizer (K : Set G) = K := by
   classical
-  haveI : Finite (Subgroup G) :=
+  have : Finite (Subgroup G) :=
     Finite.of_injective (fun H : Subgroup G => (H : Set G)) SetLike.coe_injective
   have hfin : {B : Subgroup G | B.Normal ∧ ∀ x ∈ B, ∀ y ∈ B, x * y = y * x}.Finite :=
     Set.toFinite _
   obtain ⟨A, hAs, hAmax⟩ := hfin.exists_maximalFor (fun B : Subgroup G => Nat.card B) _
     ⟨⊥, inferInstance, by simp⟩
   obtain ⟨hAnormal, hAcomm⟩ := hAs
-  haveI := hAnormal
+  have := hAnormal
   refine ⟨A, hAnormal, hAcomm, ?_⟩
   apply centralizer_eq_self_of_maximal_abelian_normal_of_isNilpotent hAcomm
   intro B hBn hBcomm hAB
@@ -760,7 +761,7 @@ theorem lowerCentralSeries_mannSubgroup_eq_bot_of_isNilpotent (G : Type*) [Group
     [Finite G] [Group.IsNilpotent G] :
     (mannSubgroup G).lowerCentralSeries 3 = ⊥ := by
   obtain ⟨K, hKn, _, hself⟩ := exists_normal_abelian_centralizer_eq_self G
-  haveI := hKn
+  have := hKn
   exact lowerCentralSeries_mannSubgroup_eq_bot_of_centralizer_eq_self hself
 
 /-- **Isaacs Theorem 4.14 (Mann)**, nilpotency form: for finite nilpotent `G`,
@@ -813,11 +814,11 @@ theorem lowerCentralSeries_map_fitting_mannSubgroup_eq_bot (G : Type*) [Group G]
       (mannSubgroup G).subtype).lowerCentralSeries 4 = ⊥ := by
   classical
   -- `F ⊴ G`: characteristic in `M(G) ⊴ G`
-  haveI hFnormal : ((OddOrder.Isaacs.Ch01.fitting ↥(mannSubgroup G)).map
+  have hFnormal : ((OddOrder.Isaacs.Ch01.fitting ↥(mannSubgroup G)).map
       (mannSubgroup G).subtype).Normal := inferInstance
-  haveI : Group.IsNilpotent ↥(OddOrder.Isaacs.Ch01.fitting ↥(mannSubgroup G)) :=
+  have : Group.IsNilpotent ↥(OddOrder.Isaacs.Ch01.fitting ↥(mannSubgroup G)) :=
     OddOrder.Isaacs.Ch01.fitting.isNilpotent
-  haveI hFnilp : Group.IsNilpotent ↥((OddOrder.Isaacs.Ch01.fitting ↥(mannSubgroup G)).map
+  have hFnilp : Group.IsNilpotent ↥((OddOrder.Isaacs.Ch01.fitting ↥(mannSubgroup G)).map
       (mannSubgroup G).subtype) :=
     Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ _
       (mannSubgroup G).subtype_injective)
@@ -846,7 +847,7 @@ theorem lowerCentralSeries_map_fitting_mannSubgroup_eq_bot (G : Type*) [Group G]
       have hmem := Subgroup.commutator_eq_bot_iff_le_centralizer.mp hbot ha
       exact (Subgroup.mem_centralizer_iff.mp hmem b hb).symm
     -- `K ⊴ G`, so Corollary 4.18 applies
-    haveI : (F.lowerCentralSeries (m + 2)).Normal := inferInstance
+    have : (F.lowerCentralSeries (m + 2)).Normal := inferInstance
     have h18 : ⁅F.lowerCentralSeries (m + 2), mannSubgroup G⁆ ≤ Subgroup.center G :=
       commutator_mannSubgroup_le_center hKcomm
     -- `γ_{n-1}(F) ≤ Z(G)`, hence `γ_n(F) = 1`: contradiction with minimality of `n`

@@ -48,8 +48,8 @@ theorem exists_dvd_pow_sub_one_of_dvd_card_mulAut {P : Type*} [Group P] [Finite 
     (hdvd : q ∣ Nat.card (MulAut P)) : ∃ m, 1 ≤ m ∧ m ≤ n ∧ q ∣ p ^ m - 1 := by
   classical
   have hp2le : 2 ≤ p := hp.two_le
-  haveI : Fact q.Prime := ⟨hq⟩
-  haveI : Fintype (MulAut P) := Fintype.ofFinite _
+  have : Fact q.Prime := ⟨hq⟩
+  have : Fintype (MulAut P) := Fintype.ofFinite _
   obtain ⟨σ, hσ⟩ := exists_prime_orderOf_dvd_card (G := MulAut P) q
     (by rwa [← Nat.card_eq_fintype_card])
   -- `S := ⟨σ⟩` は位数 `q` の `q`-群
@@ -153,13 +153,13 @@ theorem hasNormalPComplement_of_minFac_of_not_dvd_pow_three [Finite G] {p : ℕ}
     by_contra hc
     exact h3 (dvd_trans (pow_dvd_pow p (by omega)) (hn ▸ hPdvd))
   -- `P` は可換
-  haveI hPab : IsMulCommutative ↥(P : Subgroup G) := by
+  have hPab : IsMulCommutative ↥(P : Subgroup G) := by
     interval_cases n
     · refine IsMulCommutative.of_comm fun a b => ?_
       have hc1 : Nat.card ↥(P : Subgroup G) = 1 := by simpa using hn
-      haveI := (Nat.card_eq_one_iff_unique.mp hc1).1
+      have := (Nat.card_eq_one_iff_unique.mp hc1).1
       exact Subsingleton.elim _ _
-    · haveI : IsCyclic ↥(P : Subgroup G) :=
+    · have : IsCyclic ↥(P : Subgroup G) :=
         isCyclic_of_prime_card (p := p) (by simpa using hn)
       infer_instance
     · exact IsPGroup.isMulCommutative_of_card_eq_prime_sq (p := p) hn

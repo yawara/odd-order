@@ -188,8 +188,8 @@ theorem card_quotient_center_le_sq_finrank [FiniteDimensional F V] [Finite P]
     (hf : Function.Injective ρ) (hcl : commutator P ≤ Subgroup.center P) :
     Nat.card (P ⧸ Subgroup.center P) ≤ Module.finrank F V ^ 2 := by
   classical
-  haveI : Fintype P := Fintype.ofFinite P
-  haveI : Fintype (P ⧸ Subgroup.center P) := Fintype.ofFinite _
+  have : Fintype P := Fintype.ofFinite P
+  have : Fintype (P ⧸ Subgroup.center P) := Fintype.ofFinite _
   -- coset membership of `out c · (out c')⁻¹` ↔ `c = c'`
   have hco : ∀ c : P ⧸ Subgroup.center P, (↑(Quotient.out c) : P ⧸ Subgroup.center P) = c :=
     fun c => Quotient.out_eq' c
@@ -240,8 +240,8 @@ theorem sq_finrank_eq_card_quotient_center [FiniteDimensional F V] [Finite P]
     (hf : Function.Injective ρ) (hcl : commutator P ≤ Subgroup.center P) :
     Module.finrank F V ^ 2 = Nat.card (P ⧸ Subgroup.center P) := by
   classical
-  haveI : Fintype P := Fintype.ofFinite P
-  haveI : Fintype (P ⧸ Subgroup.center P) := Fintype.ofFinite _
+  have : Fintype P := Fintype.ofFinite P
+  have : Fintype (P ⧸ Subgroup.center P) := Fintype.ofFinite _
   set v : (P ⧸ Subgroup.center P) → Module.End F V := fun c => ρ (Quotient.out c) with hv
   have hco : ∀ c : P ⧸ Subgroup.center P, (↑(Quotient.out c) : P ⧸ Subgroup.center P) = c :=
     fun c => Quotient.out_eq' c
@@ -260,9 +260,9 @@ theorem sq_finrank_eq_card_quotient_center [FiniteDimensional F V] [Finite P]
   have hsub : ∀ r : MonoidAlgebra F P, ρ.asAlgebraHom r ∈ Submodule.span F (Set.range v) := by
     intro r
     induction r using MonoidAlgebra.induction_on with
-    | hM g => rw [asAlgebraHom_of]; exact hmem_span g
-    | hadd x y hx hy => rw [map_add]; exact Submodule.add_mem _ hx hy
-    | hsmul c x hx => rw [map_smul]; exact Submodule.smul_mem _ _ hx
+    | of g => rw [asAlgebraHom_of]; exact hmem_span g
+    | add x y hx hy => rw [map_add]; exact Submodule.add_mem _ hx hy
+    | smul c x hx => rw [map_smul]; exact Submodule.smul_mem _ _ hx
   have hspan : Submodule.span F (Set.range v) = ⊤ := by
     rw [eq_top_iff]
     intro A _

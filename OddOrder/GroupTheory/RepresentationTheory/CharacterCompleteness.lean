@@ -172,7 +172,7 @@ theorem transportRep_isIrreducible {W X : Type*} [AddCommGroup W] [Module ℂ W]
   let L := LinearEquiv.ofBijective
       (Representation.IntertwiningMap.equivLinearMapAsModule σ (transportRep σ e)
         φ.toIntertwiningMap) hbij
-  haveI hσs := (Representation.irreducible_iff_isSimpleModule_asModule σ).mp
+  have hσs := (Representation.irreducible_iff_isSimpleModule_asModule σ).mp
     ‹Representation.IsIrreducible σ›
   rw [Representation.irreducible_iff_isSimpleModule_asModule]
   exact IsSimpleModule.congr L.symm
@@ -184,7 +184,7 @@ theorem exists_isIrreducibleCharacter_eq {W : Type*} [AddCommGroup W] [Module �
     [FiniteDimensional ℂ W] (σ : Representation ℂ G W) [Representation.IsIrreducible σ] :
     ∃ φ : ClassFunction G ℂ, IsIrreducibleCharacter φ ∧ (φ : G → ℂ) = σ.character := by
   let e : W ≃ₗ[ℂ] (Fin (finrank ℂ W) → ℂ) := (Module.finBasis ℂ W).equivFun
-  haveI : Representation.IsIrreducible (transportRep σ e) := transportRep_isIrreducible σ e
+  have : Representation.IsIrreducible (transportRep σ e) := transportRep_isIrreducible σ e
   refine ⟨repCharacterClassFunction (transportRep σ e),
     ⟨Fin (finrank ℂ W) → ℂ, inferInstance, inferInstance, inferInstance, transportRep σ e,
       inferInstance, rfl⟩, ?_⟩
@@ -210,7 +210,7 @@ theorem Representation.IsIrreducible.of_equiv {ρ : Representation ℂ G V}
     φ.toLinearEquiv.bijective
   let L := LinearEquiv.ofBijective
       (Representation.IntertwiningMap.equivLinearMapAsModule ρ σ φ.toIntertwiningMap) hbij
-  haveI := (Representation.irreducible_iff_isSimpleModule_asModule ρ).mp
+  have := (Representation.irreducible_iff_isSimpleModule_asModule ρ).mp
     ‹Representation.IsIrreducible ρ›
   rw [Representation.irreducible_iff_isSimpleModule_asModule]
   exact IsSimpleModule.congr L.symm
@@ -230,7 +230,7 @@ theorem nonempty_equiv_of_character_eq [Finite G] [Invertible (Nat.card G : ℂ)
     (ρ : Representation ℂ G V) [Representation.IsIrreducible ρ]
     (σ : Representation ℂ G W) (hchar : σ.character = ρ.character) :
     Nonempty (ρ.Equiv σ) := by
-  haveI : Fintype G := Fintype.ofFinite _
+  have : Fintype G := Fintype.ofFinite _
   -- `dim Hom_G(ρ, σ) = dim Hom_G(ρ, ρ) = 1`
   have h1 := Representation.card_inv_mul_sum_char_mul_char_eq_finrank ρ σ
   have h2 := Representation.card_inv_mul_sum_char_mul_char_eq_finrank ρ ρ
@@ -248,7 +248,7 @@ theorem nonempty_equiv_of_character_eq [Finite G] [Invertible (Nat.card G : ℂ)
         = finrank ℂ (Representation.IntertwiningMap ρ ρ) := by exact_mod_cast h3
     rw [h4, hrr]
   -- a nonzero intertwiner exists
-  haveI : Nontrivial (Representation.IntertwiningMap ρ σ) :=
+  have : Nontrivial (Representation.IntertwiningMap ρ σ) :=
     Module.nontrivial_of_finrank_pos (by rw [hfr]; norm_num)
   obtain ⟨T, hT0⟩ := exists_ne (0 : Representation.IntertwiningMap ρ σ)
   -- its kernel is a proper subrepresentation of the irreducible `ρ`, hence trivial
@@ -364,7 +364,7 @@ theorem character_mem_ZIrr {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDi
   by_cases hn0 : n = 0
   · subst hn0
     have hV0 : finrank ℂ V = 0 := hn
-    haveI : Subsingleton V := Module.finrank_zero_iff.mp hV0
+    have : Subsingleton V := Module.finrank_zero_iff.mp hV0
     have hchar0 : (⟨ρ.character, fun g h => ρ.char_conj g h⟩ : ClassFunction G ℂ) = 0 := by
       apply ClassFunction.ext
       intro g
@@ -375,7 +375,7 @@ theorem character_mem_ZIrr {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDi
     exact Submodule.zero_mem _
   -- Otherwise `n > 0`, so `V` is nontrivial.
   have hpos : 0 < finrank ℂ V := by rw [hn]; exact Nat.pos_of_ne_zero hn0
-  haveI : Nontrivial V := Module.nontrivial_of_finrank_pos hpos
+  have : Nontrivial V := Module.nontrivial_of_finrank_pos hpos
   by_cases hirr : Representation.IsIrreducible ρ
   · -- Irreducible case: the character is an irreducible character, hence in `ZIrr`.
     obtain ⟨φ, hφirr, hφeq⟩ := exists_isIrreducibleCharacter_eq ρ
@@ -387,10 +387,10 @@ theorem character_mem_ZIrr {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDi
     rw [this]
     exact hφirr.mem_ZIrr
   · -- Reducible nonzero case: split off a proper nonzero subrepresentation.
-    haveI : NeZero (Nat.card G : ℂ) :=
+    have : NeZero (Nat.card G : ℂ) :=
       ⟨Nat.cast_ne_zero.mpr Nat.card_pos.ne'⟩
     -- `ρ` is not a simple order on `Subrepresentation ρ`; but it *is* nontrivial.
-    haveI : Nontrivial (Subrepresentation ρ) := by
+    have : Nontrivial (Subrepresentation ρ) := by
       refine ⟨⟨⊥, ⊤, ?_⟩⟩
       intro hbt
       have : (⊥ : Subrepresentation ρ).toSubmodule = (⊤ : Subrepresentation ρ).toSubmodule :=
@@ -520,6 +520,7 @@ theorem ofSubmodulePrime_isIrreducible {W : Type*} [AddCommGroup W] [Module ℂ 
   exact (ofSubmodulePrimeAsModuleEquiv ρ N).isSimpleModule_iff.mp inferInstance
 
 omit [Invertible (Nat.card G : ℂ)] in
+set_option backward.isDefEq.respectTransparency false in
 /-- The class-function operator on the subrepresentation `ofSubmodule' N` is the ambient operator
 restricted: `(classFunctionOperator cf (ofSubmodule' N).toRepresentation w).val
 = classFunctionOperator cf ρ w.val`. Each summand's value matches because
@@ -550,8 +551,8 @@ so Schur's lemma forces `T` to vanish there (`classFunctionOperator_eq_zero_of_s
 theorem classFunction_eq_zero_of_orthogonal (f : ClassFunction G ℂ)
     (hf : ∀ χ : IrreducibleCharacter G, ClassFunction.inner f (χ : ClassFunction G ℂ) = 0) :
     f = 0 := by
-  haveI : Finite G := Finite.of_fintype G
-  haveI : NeZero (Nat.card G : ℂ) := ⟨Invertible.ne_zero _⟩
+  have : Finite G := Finite.of_fintype G
+  have : NeZero (Nat.card G : ℂ) := ⟨Invertible.ne_zero _⟩
   -- `Representation.ofMulAction` の対象は v4.32 で `G →₀ ℂ` から `ℂ[G]` (structure) になった。
   let reg : Representation ℂ G (MonoidAlgebra ℂ G) := Representation.ofMulAction ℂ G G
   have hreg : reg = Representation.ofMulAction ℂ G G := rfl
@@ -565,18 +566,18 @@ theorem classFunction_eq_zero_of_orthogonal (f : ClassFunction G ℂ)
   -- (inside `Submodule.addCommGroup`) and the `Zero ℂ` argument of `Finsupp.instAddCommGroup`
   -- exceed the synthesis nesting limit when `V = G →₀ ℂ` is concrete, so `AddCommGroup ↥N`
   -- and `Representation.IsIrreducible σN` below would otherwise fail to elaborate.
-  letI : AddCommGroup (G →₀ ℂ) := inferInstance
-  letI : AddCommGroup reg.asModule := inferInstance
+  let : AddCommGroup (G →₀ ℂ) := inferInstance
+  let : AddCommGroup reg.asModule := inferInstance
   -- Each simple `ℂ[G]`-submodule lies in `ker Ti`.
   have hsimple_le : ∀ N : Submodule ℂ[G] reg.asModule, IsSimpleModule ℂ[G] (↥N) →
       N ≤ LinearMap.ker Ti := by
     intro N hN
-    haveI := hN
-    haveI : Nontrivial (↥N) := IsSimpleModule.nontrivial ℂ[G] (↥N)
+    have := hN
+    have : Nontrivial (↥N) := IsSimpleModule.nontrivial ℂ[G] (↥N)
     set σN : Representation ℂ G _ := (Subrepresentation.ofSubmodule' N).toRepresentation with hσN
-    haveI : Representation.IsIrreducible σN := ofSubmodulePrime_isIrreducible reg N
-    haveI : Nontrivial ((Subrepresentation.ofSubmodule' N).toSubmodule) := ‹Nontrivial (↥N)›
-    haveI : FiniteDimensional ℂ ((Subrepresentation.ofSubmodule' N).toSubmodule) :=
+    have : Representation.IsIrreducible σN := ofSubmodulePrime_isIrreducible reg N
+    have : Nontrivial ((Subrepresentation.ofSubmodule' N).toSubmodule) := ‹Nontrivial (↥N)›
+    have : FiniteDimensional ℂ ((Subrepresentation.ofSubmodule' N).toSubmodule) :=
       inferInstance
     -- `T` restricted to the subrepresentation `σN` vanishes by Schur + orthogonality.
     have hzero : classFunctionOperator (classFunctionInv f) σN = 0 :=
@@ -596,7 +597,7 @@ theorem classFunction_eq_zero_of_orthogonal (f : ClassFunction G ℂ)
     rw [← hval, hzero]
     rfl
   -- `ker Ti = ⊤` since the supremum of simple submodules is `⊤` (Maschke).
-  haveI : IsSemisimpleModule ℂ[G] reg.asModule :=
+  have : IsSemisimpleModule ℂ[G] reg.asModule :=
     (Representation.isSemisimpleRepresentation_iff_isSemisimpleModule_asModule reg).mp inferInstance
   have hker : LinearMap.ker Ti = ⊤ := by
     refine le_antisymm le_top ?_
@@ -662,11 +663,11 @@ The `≤` direction is `card_irreducibleCharacter_le` (linear independence). For
 whence `|ConjClasses G| = finrank ℂ (ClassFunction G ℂ) ≤ finrank ℂ (Irr G → ℂ) = |Irr G|`. -/
 theorem card_irreducibleCharacter_eq [Finite G] :
     Nat.card (IrreducibleCharacter G) = Nat.card (ConjClasses G) := by
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Invertible (Nat.card G : ℂ) :=
+  have : Fintype G := Fintype.ofFinite G
+  have : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI := finite_irreducibleCharacter (G := G)
-  haveI : Fintype (IrreducibleCharacter G) := Fintype.ofFinite _
+  have := finite_irreducibleCharacter (G := G)
+  have : Fintype (IrreducibleCharacter G) := Fintype.ofFinite _
   refine le_antisymm (card_irreducibleCharacter_le (G := G)) ?_
   -- The inner-product map against the irreducible characters is injective by completeness.
   have hinj : Function.Injective (innerAgainstIrreducibleCharacters (G := G)) := by
@@ -688,9 +689,9 @@ independence (`linearIndependent_irreducibleCharacter`) with the count
 theorem span_irreducibleCharacter_eq_top [Finite G] :
     Submodule.span ℂ (Set.range (fun χ : IrreducibleCharacter G => (χ : ClassFunction G ℂ)))
       = ⊤ := by
-  haveI := finite_irreducibleCharacter (G := G)
-  haveI : Fintype (IrreducibleCharacter G) := Fintype.ofFinite _
-  haveI : Nonempty (IrreducibleCharacter G) := ⟨trivialIrreducibleCharacter G⟩
+  have := finite_irreducibleCharacter (G := G)
+  have : Fintype (IrreducibleCharacter G) := Fintype.ofFinite _
+  have : Nonempty (IrreducibleCharacter G) := ⟨trivialIrreducibleCharacter G⟩
   refine LinearIndependent.span_eq_top_of_card_eq_finrank
     (linearIndependent_irreducibleCharacter (G := G)) ?_
   rw [finrank_classFunction (G := G), ← Nat.card_eq_fintype_card, card_irreducibleCharacter_eq]
@@ -756,7 +757,7 @@ noncomputable def CharacterTableIndexing.ofFinite' (G : Type*) [Group G] [Finite
   haveI := finite_irreducibleCharacter (G := G)
   haveI : Fintype (IrreducibleCharacter G) := Fintype.ofFinite _
   refine CharacterTableIndexing.ofFinite (G := G) ?_
-  letI : Fintype (ConjClasses G) := conjClassesFintypeOfFinite G
+  let : Fintype (ConjClasses G) := conjClassesFintypeOfFinite G
   rw [← Nat.card_eq_fintype_card (α := IrreducibleCharacter G),
     ← Nat.card_eq_fintype_card (α := ConjClasses G), card_irreducibleCharacter_eq]
 

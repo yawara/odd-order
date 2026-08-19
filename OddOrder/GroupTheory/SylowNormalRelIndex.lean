@@ -37,7 +37,7 @@ theorem sylow_relIndex_normal_not_dvd {M : Type*} [Group M] [Finite M] {p : ℕ}
   rw [hqn] at e2
   -- `e2 : N.relIndex Q * Q.relIndex (Q ⊔ N) = (Q ⊓ N).relIndex (Q ⊔ N)`
   have hpos : 0 < N.relIndex Q := by
-    haveI : Finite ↥Q := inferInstance
+    have : Finite ↥Q := inferInstance
     have h : (N.subgroupOf Q).index ≠ 0 := Subgroup.index_ne_zero_of_finite
     exact Nat.pos_of_ne_zero h
   have hmul : N.relIndex Q * Q.relIndex (Q ⊔ N) = N.relIndex Q * Q.relIndex N := by

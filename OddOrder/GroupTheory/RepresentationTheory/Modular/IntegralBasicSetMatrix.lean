@@ -240,7 +240,7 @@ theorem sum_decompositionMatrix_mul_intBasicSetMatrix {A : ιG → κ → ℤ}
     (∑ μ : ιG, (decompositionMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG i μ : ℤ)
         * intBasicSetMatrix eG A t j₀ μ j)
       = signRelationRow (basicSetSign eG t) j₀ i j := by
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   have hεj := character_involution_mul_self hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil hnilG hω'
     hζ hζk hζK hconv hNp hquot S hφ₀ ht hconjall ht1 hcart hjB
   have hεj₀ := character_involution_mul_self hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil hnilG hω'
@@ -279,7 +279,7 @@ theorem sum_intBasicSetMatrix_mul_cartanMatrix {A : ιG → κ → ℤ}
         * (cartanMatrix (𝒪 := 𝒪) (nn := nnG) hp hωG hω'G hπG hlinG hkerJG eG μ τ : ℤ)
         * intBasicSetMatrix eG A t j₀ τ k)
       = 1 + (if j = k then 1 else 0) := by
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   have hεj := character_involution_mul_self hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil hnilG hω'
     hζ hζk hζK hconv hNp hquot S hφ₀ ht hconjall ht1 hcart hjB
   have hεk := character_involution_mul_self hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil hnilG hω'

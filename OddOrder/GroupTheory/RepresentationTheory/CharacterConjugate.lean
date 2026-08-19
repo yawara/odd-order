@@ -44,7 +44,7 @@ variable {G V : Type*} [Group G] [Finite G]
 theorem character_inv (ρ : Representation ℂ G V) (g : G) :
     ρ.character g⁻¹ = star (ρ.character g) := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   let b := Module.Free.chooseBasis ℂ V
   let Mat : G → Matrix (Module.Free.ChooseBasisIndex ℂ V) (Module.Free.ChooseBasisIndex ℂ V) ℂ :=
     fun h => LinearMap.toMatrix b b (ρ h)

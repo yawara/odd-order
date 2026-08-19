@@ -134,7 +134,7 @@ theorem centralScalar_smul (hπ : Function.Surjective π) {z : A} (hz : z ∈ Se
     (v : nn i → k) :
     letI := blockModule nn π i
     z • v = centralScalar π i z • v := by
-  letI := blockModule nn π i
+  let := blockModule nn π i
   change π z i *ᵥ v = _
   rw [scalar_centralScalar π i hπ hz, Matrix.scalar_apply]
   funext j
@@ -153,7 +153,7 @@ theorem eq_centralScalar_of_forall_smul_eq (hπ : Function.Surjective π) {z : A
     (h : letI := blockModule nn π i; ∀ v : nn i → k, z • v = c • v) :
     c = centralScalar π i z := by
   classical
-  letI := blockModule nn π i
+  let := blockModule nn π i
   set a := Classical.arbitrary (nn i) with ha
   have hv : (c : k) • (Pi.single a 1 : nn i → k)
       = centralScalar π i z • (Pi.single a 1 : nn i → k) := by

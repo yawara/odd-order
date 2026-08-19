@@ -349,7 +349,7 @@ theorem finrank_eigenspace_eq_card_contributing [Finite κ]
       b.repr (∑ l : ZMod h, ((ε ^ m)⁻¹ ^ l.val) • (T ^ l.val) (b s)) s ≠ 0) :
     Module.finrank F (Module.End.eigenspace T (ε ^ m)) = S.card := by
   classical
-  haveI : Fintype κ := Fintype.ofFinite κ
+  have : Fintype κ := Fintype.ofFinite κ
   have hspan : Module.End.eigenspace T (ε ^ m) = Submodule.span F (Set.range fun i : ↥S =>
       ∑ l : ZMod h, ((ε ^ m)⁻¹ ^ l.val) • (T ^ l.val) (b (i : κ))) := by
     rw [eigenspace_eq_span_fourier b T hε hεh hTh hh m]
@@ -396,8 +396,8 @@ theorem finrank_eigenspace_fixed_succ [Finite κ]
     Module.finrank F (Module.End.eigenspace T (ε ^ 0))
       = Module.finrank F (Module.End.eigenspace T (ε ^ m)) + 1 := by
   classical
-  haveI : Fintype κ := Fintype.ofFinite κ
-  letI inst : Setoid κ := orbitSetoid σ hσ
+  have : Fintype κ := Fintype.ofFinite κ
+  let inst : Setoid κ := orbitSetoid σ hσ
   have hε0 : ε ≠ 0 := hprim.ne_zero (NeZero.ne h)
   have hεh : ε ^ h = 1 := hprim.pow_eq_one
   set rep : κ → κ := fun c => (Quotient.mk inst c).out with hrepdef

@@ -61,7 +61,7 @@ Proof: `card_fixedSubgroup_eq_mul_of_normal` gives the split with the ambient mi
 theorem card_fixedSubgroup_eq_mul_of_invariantNormal
     {A G : Type*} [Group A] [Finite A] [Group G] [Finite G] {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G)
     {N : Subgroup G} [N.Normal] (hN : IsAInvariant φ N) (B : Subgroup A) :
     Nat.card ↥(fixedSubgroup φ B) =
       Nat.card ↥(fixedSubgroup hN.restrict B) *
@@ -80,13 +80,13 @@ The action is presented as `φ := MulDistribMulAction.toMulAut H M : H →* MulA
 induced action on `M ⧸ M₀`.  The invariance hypothesis `IsAInvariant (toMulAut H M) M₀` is
 definitionally `∀ h : H, M₀.map (MulDistribMulAction.toMulEquiv M h) = M₀`. -/
 theorem card_fixedSubgroup_eq_mul_of_mulDistribMulAction
-    {H M : Type*} [Group H] [Finite H] [Group M] [Finite M] [IsSolvable M]
+    {H M : Type*} [Group H] [Finite H] [Group M] [Finite M] [Group.IsSolvable M]
     [MulDistribMulAction H M] (hcop : Nat.Coprime (Nat.card H) (Nat.card M))
     (R : Subgroup H) {M₀ : Subgroup M} [M₀.Normal]
     (hM₀inv : IsAInvariant (MulDistribMulAction.toMulAut H M) M₀) :
     Nat.card ↥(fixedSubgroup (MulDistribMulAction.toMulAut H M) R) =
       Nat.card ↥(fixedSubgroup hM₀inv.restrict R) *
         Nat.card ↥(fixedSubgroup hM₀inv.quotientMulAutHom R) :=
-  card_fixedSubgroup_eq_mul_of_invariantNormal hcop (Or.inr ‹IsSolvable M›) hM₀inv R
+  card_fixedSubgroup_eq_mul_of_invariantNormal hcop (Or.inr ‹Group.IsSolvable M›) hM₀inv R
 
 end OddOrder.BG.Ch1.S03g

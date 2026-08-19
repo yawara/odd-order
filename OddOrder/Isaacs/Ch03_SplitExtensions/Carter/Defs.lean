@@ -71,7 +71,7 @@ theorem isCarterSubgroup_top_of_isNilpotent [Group.IsNilpotent G] :
 /-- Carter 性は共役で保たれる。 -/
 theorem IsCarterSubgroup.map_conj {C : Subgroup G} (h : IsCarterSubgroup C) (g : G) :
     IsCarterSubgroup (C.map (MulAut.conj g).toMonoidHom) := by
-  haveI := h.1
+  have := h.1
   refine ⟨Group.nilpotent_of_mulEquiv
       (Subgroup.equivMapOfInjective C (MulAut.conj g).toMonoidHom (MulAut.conj g).injective), ?_⟩
   rw [← Subgroup.map_equiv_normalizer_eq C (MulAut.conj g), h.2]
@@ -83,7 +83,7 @@ theorem IsCarterSubgroup.map_conj {C : Subgroup G} (h : IsCarterSubgroup C) (g :
 正規化群を移し, 冪零性は `Subgroup.subgroupOfEquivOfLe` で移す。 -/
 theorem IsCarterSubgroup.subgroupOf {C K : Subgroup G} (h : IsCarterSubgroup C) (hCK : C ≤ K) :
     IsCarterSubgroup (C.subgroupOf K) := by
-  haveI := h.1
+  have := h.1
   exact ⟨Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hCK).symm,
     by rw [← Subgroup.subgroupOf_normalizer_eq hCK, h.2]⟩
 

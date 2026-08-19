@@ -107,7 +107,7 @@ structure CoprimeFrobeniusAction (L H : Type*) [Group L] [Group H] where
   U : Subgroup L
   E : Subgroup L
   frobenius : OddOrder.Isaacs.Ch06.IsFrobeniusGroup L U E
-  H_solvable : IsSolvable H
+  H_solvable : Group.IsSolvable H
   /-- The action of the Frobenius group `L = U ⋊ E` on `H` by automorphisms. -/
   φ : L →* MulAut H
   coprime_order : Nat.Coprime (Nat.card H) (Nat.card L)
@@ -163,7 +163,7 @@ quotient `L / N`, so `|K| ∣ [L : N] = |A|`, which is prime to `|N|`
 theorem IsFrobeniusGroup.coprime_card_of_inf_kernel_eq_bot
     (h : Ch06.IsFrobeniusGroup L N A) {K : Subgroup L} (hKN : K ⊓ N = ⊥) :
     Nat.Coprime (Nat.card ↥K) (Nat.card ↥N) := by
-  haveI := h.isNormal
+  have := h.isNormal
   have hinj : Function.Injective ((QuotientGroup.mk' N).comp K.subtype) := by
     rw [injective_iff_map_eq_one]
     intro a ha
@@ -208,7 +208,7 @@ theorem IsFrobeniusGroup.frobeniusGroup_sup_of_invariant_le_kernel
   have hPle : P ≤ P ⊔ Q := le_sup_left
   have hQle : Q ≤ P ⊔ Q := le_sup_right
   -- `P` is normalized by `Q` (given) and by itself, so `P ◁ P ⊔ Q`.
-  haveI hPnormal : (P.subgroupOf (P ⊔ Q)).Normal := by
+  have hPnormal : (P.subgroupOf (P ⊔ Q)).Normal := by
     rw [Subgroup.normal_subgroupOf_iff_le_normalizer hPle]
     exact sup_le Subgroup.le_normalizer hQP
   -- `P ⊓ Q = ⊥` since `P ≤ N` and `Q ⊓ N = ⊥`.
@@ -285,7 +285,7 @@ theorem IsFrobeniusGroup.frobeniusGroup_sup_of_invariant_le_kernel_ambient
   obtain ⟨C, hFrobA⟩ := hFrobL
   have hPle : P ≤ P ⊔ A := le_sup_left
   have hAle : A ≤ P ⊔ A := le_sup_right
-  haveI hPnormal : (P.subgroupOf (P ⊔ A)).Normal := by
+  have hPnormal : (P.subgroupOf (P ⊔ A)).Normal := by
     rw [Subgroup.normal_subgroupOf_iff_le_normalizer hPle]
     exact sup_le Subgroup.le_normalizer hAP
   have hPA_bot : P ⊓ A = ⊥ := by

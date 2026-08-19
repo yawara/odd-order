@@ -205,11 +205,11 @@ theorem conjPerm_not_mem_conjByOrbit {K : Type*} [Group K] [Finite K] {H : Subgr
     IrreducibleCharacter.conjPerm ↥H θ ∉ IrreducibleCharacter.conjByOrbit (G := K) θ := by
   intro hmem
   classical
-  haveI : Fintype K := Fintype.ofFinite K
-  haveI : Fintype ↥H := Fintype.ofFinite ↥H
-  haveI : Invertible (Nat.card K : ℂ) := invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
-  haveI : Invertible (Nat.card ↥H : ℂ) := invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
-  haveI : Fintype ↥(IrreducibleCharacter.conjByOrbit (G := K) θ) := Fintype.ofFinite _
+  have : Fintype K := Fintype.ofFinite K
+  have : Fintype ↥H := Fintype.ofFinite ↥H
+  have : Invertible (Nat.card K : ℂ) := invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
+  have : Invertible (Nat.card ↥H : ℂ) := invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
+  have : Fintype ↥(IrreducibleCharacter.conjByOrbit (G := K) θ) := Fintype.ofFinite _
   have hoddH : Odd (Nat.card ↥H) := hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card H)
   set f : Function.End ↥(IrreducibleCharacter.conjByOrbit (G := K) θ) :=
     fun η => ⟨IrreducibleCharacter.conjPerm ↥H η.1, conjPerm_mem_conjByOrbit hmem η.2⟩ with hf
@@ -246,7 +246,7 @@ theorem inducedFamily_hasNoRealCharacters {M : Subgroup G} [Finite G]
   classical
   intro χ hχ hreal
   obtain ⟨θ, hθne, rfl⟩ := hχ
-  haveI : ((derivedInG M).subgroupOf M).Normal := by
+  have : ((derivedInG M).subgroupOf M).Normal := by
     rw [derivedInG, Subgroup.subgroupOf,
       Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
     infer_instance
@@ -284,7 +284,7 @@ theorem inducedFamily_pairwiseOrthogonal {M : Subgroup G} [Finite G] :
   intro χ ψ hχ hψ hne
   obtain ⟨θ, hθne, rfl⟩ := hχ
   obtain ⟨θ', hθ'ne, rfl⟩ := hψ
-  haveI : ((derivedInG M).subgroupOf M).Normal := by
+  have : ((derivedInG M).subgroupOf M).Normal := by
     rw [derivedInG, Subgroup.subgroupOf,
       Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
     infer_instance
@@ -298,7 +298,7 @@ finite type `IrreducibleCharacter M'` (`finite_irreducibleCharacter`, `M' = [M,M
 instantiates the S07 orthogonal glue `exists_integralCharacterMap_glue_of_orthogonal`. -/
 theorem inducedFamily_finite {M : Subgroup G} [Finite G] : (inducedFamily M).Finite := by
   classical
-  haveI : Finite (IrreducibleCharacter ↥((derivedInG M).subgroupOf M)) :=
+  have : Finite (IrreducibleCharacter ↥((derivedInG M).subgroupOf M)) :=
     finite_irreducibleCharacter
   refine Set.Finite.subset (Set.finite_range
     (fun θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
@@ -416,7 +416,7 @@ commutes with it (`dadeIntegralCharacterMap_mapRingEquiv_comm`).  Taking `σc = 
 theorem tau_mapRingEquiv_comm [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
     (σc : ℂ ≃+* ℂ) {φ : ClassFunction ↥M ℂ} (hφ : φ.support ⊆ hyp.A0) :
     hyp.tau (ClassFunction.mapRingEquiv σc φ) = ClassFunction.mapRingEquiv σc (hyp.tau φ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mapRingEquiv_comm
     hyp.dadeData.dade (hyp.dadeData.dade.fullDadeIsometryData) σc hφ
 
@@ -431,7 +431,7 @@ This is the `M`-stability input to `toHypothesis71` / `toFamilyHypothesis71` (th
 Peterfalvi (10.8)), so those §7 constructions are self-contained from the genuine `Hypothesis`. -/
 theorem le_normalizer_typePA {M : Subgroup G} (hyp : Hypothesis M) :
     M ≤ Subgroup.normalizer (typePA M hyp.typeP) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   intro m hm
   rw [Subgroup.mem_set_normalizer_iff]
   -- forward `M`-invariance, applied to both `m` and `m⁻¹`.
@@ -441,7 +441,7 @@ theorem le_normalizer_typePA {M : Subgroup G} (hyp : Hypothesis M) :
     have hb := hfwd m⁻¹ (inv_mem hm) _ hh
     simpa [mul_assoc] using hb
   intro a ha y hy
-  simp only [typePA, centralizerSupport, Set.mem_setOf_eq] at hy ⊢
+  simp only [typePA, centralizerSupport, Set.mem_ofPred_eq] at hy ⊢
   obtain ⟨hyM', hy1, x, hxM, hyx⟩ := hy
   -- (i) `a y a⁻¹ ∈ M' = derivedInG M` (`M` normalizes its derived subgroup).
   have hM'inv : MulAut.conj a • derivedInG M = derivedInG M := by
@@ -653,8 +653,8 @@ a group embedding into the cyclic `↥W` is cyclic, and a finite cyclic product 
 coprime factor orders (`coprime_card_of_isCyclic_prod`). -/
 theorem typePData_coprime_card_W1_W2 [Finite G] {M : Subgroup G} (data : TypePData M) :
     Nat.Coprime (Nat.card ↥data.W1) (Nat.card ↥data.W2) := by
-  haveI hcyc : IsCyclic ↥data.W := data.W_cyclic
-  letI : CommGroup ↥data.W := hcyc.commGroup
+  have hcyc : IsCyclic ↥data.W := data.W_cyclic
+  let : CommGroup ↥data.W := hcyc.commGroup
   have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
   have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
   have hdisj := typePData_disjoint_W1_W2 data
@@ -674,7 +674,7 @@ theorem typePData_coprime_card_W1_W2 [Finite G] {M : Subgroup G} (data : TypePDa
       exact Subgroup.mem_bot.mp hmem
     have hb1 : (b : G) = 1 := by rw [ha1, one_mul] at hG; exact hG
     exact Prod.ext (Subtype.ext ha1) (Subtype.ext hb1)
-  haveI : IsCyclic (↥data.W1 × ↥data.W2) := isCyclic_of_injective _ hinj
+  have : IsCyclic (↥data.W1 × ↥data.W2) := isCyclic_of_injective _ hinj
   exact coprime_card_of_isCyclic_prod (↥data.W1) (↥data.W2)
 
 /-- The cyclic factor product `W = W₁ × W₂` of a type-`P` maximal subgroup has odd order.
@@ -714,11 +714,11 @@ product (`card_sup_eq_card_mul_card_of_disjoint_normal`).  Fundamental structura
 type-`P` torus, used throughout §10--§11 (the `(4.5)` reducible characters, the `V^G` counting). -/
 theorem typePData_card_W [Finite G] {M : Subgroup G} (data : TypePData M) :
     Nat.card ↥data.W = Nat.card ↥data.W1 * Nat.card ↥data.W2 := by
-  haveI hcyc : IsCyclic ↥data.W := data.W_cyclic
-  letI : CommGroup ↥data.W := hcyc.commGroup
+  have hcyc : IsCyclic ↥data.W := data.W_cyclic
+  let : CommGroup ↥data.W := hcyc.commGroup
   have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
   have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
-  haveI hBnorm : (data.W2.subgroupOf data.W).Normal := ⟨fun n hn g => by
+  have hBnorm : (data.W2.subgroupOf data.W).Normal := ⟨fun n hn g => by
     have h : g * n * g⁻¹ = n := by rw [mul_comm g n]; group
     rw [h]; exact hn⟩
   have hdisjAB : data.W1.subgroupOf data.W ⊓ data.W2.subgroupOf data.W = ⊥ := by
@@ -747,7 +747,7 @@ theorem typePData_typePV_ncard [Finite G] {M : Subgroup G} (data : TypePData M) 
     (typePV M data).ncard
       = Nat.card ↥data.W1 * Nat.card ↥data.W2 - Nat.card ↥data.W1 - Nat.card ↥data.W2 + 1 := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
   have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
   -- set cardinalities of the subgroups
@@ -877,7 +877,7 @@ theorem exists_conj_mem_typePV_of_not_mem_derived [Finite G] {S : Subgroup G}
       (fun {d} hd hdvd => Set.mem_singleton_iff.mp
         (haπ d (Nat.mem_primeFactors.mpr ⟨hd, hdvd, (orderOf_pos a).ne'⟩)))
   -- Sylow: conjugate the `p`-element `a` into `W₁`, inside `↥S`
-  haveI : Fact p.Prime := ⟨hprime⟩
+  have : Fact p.Prime := ⟨hprime⟩
   have hcardS : Nat.card ↥S = Nat.card ↥(derivedInG S) * p := by
     have h := Subgroup.card_mul_index ((derivedInG S).subgroupOf S)
     have hle : derivedInG S ≤ S := Subgroup.map_subtype_le _
@@ -975,7 +975,7 @@ theorem exists_conj_mem_of_isHallSubgroup_of_orderOf_pow [Finite G] {H : Subgrou
     {a : G} (hoa : orderOf a = p ^ k) :
     ∃ g : G, g * a * g⁻¹ ∈ H := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   -- the Hall index is prime to `p`, so `p` has full multiplicity in `H`
   have hidx : ¬ p ∣ H.index := fun hdvd =>
     hHall.2 p (Nat.mem_primeFactors.mpr ⟨hp, hdvd, Subgroup.index_ne_zero_of_finite⟩)
@@ -1193,7 +1193,7 @@ theorem typePData_W1_hall_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     (hP : OddOrder.BG.Ch4.S14.IsTypeP M) (data : TypePData M) :
     Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1) := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   -- A Hall `κ(M)`-subgroup `K ≤ M`.
   obtain ⟨K, hKM, hK, -⟩ :=
     OddOrder.BG.Ch4.S14.exists_isHallSubgroup_kappa_ge hG hM (X := ⊥) bot_le (by simp)
@@ -1206,7 +1206,7 @@ theorem typePData_W1_hall_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
   have hU : Ch03.IsHallSubgroup ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
       ((U'.map M.subtype).subgroupOf M) := by rw [hUeq]; exact hU'hall
   -- `K` is cyclic by BG Theorem A (the sorry-free faithful `typeP_auxiliary_structure`).
-  haveI : IsCyclic ↥K :=
+  have : IsCyclic ↥K :=
     (OddOrder.BG.Ch4.S15.typeP_auxiliary_structure hG hM hKM (Subgroup.map_subtype_le U')
       hK rfl hU).2.1
   -- Coprimality `gcd(|K|, |M'|) = 1` from the κ-Hall complement (mirrors S14_TypePComplement).
@@ -1380,7 +1380,7 @@ theorem exists_nontrivial_linearIrreducibleCharacter {K : Type*} [Group K] [Fini
     by_contra h
     push Not at h
     exact hK (top_le_iff.mp fun x _ => h x)
-  haveI : Finite (Abelianization K) := Quotient.finite _
+  have : Finite (Abelianization K) := Quotient.finite _
   have hā : (Abelianization.of a) ≠ 1 := by
     rw [ne_eq, ← MonoidHom.mem_ker, Abelianization.ker_of]; exact ha
   obtain ⟨φ, hφ⟩ := CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity
@@ -1412,7 +1412,7 @@ theorem exists_zeta_in_inducedFamily_degree_w1 [Finite G] {M : Subgroup G}
       ζ 1 = (Nat.card ↥data.W1 : ℂ) := by
   classical
   let h : OddOrder.Peterfalvi.S06.Hypothesis ↥M := typePData_toS06Hypothesis data hodd hHall
-  haveI hNeZ : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  have hNeZ : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
   have hKeq : h.K = (derivedInG M).subgroupOf M := rfl
   have hKcomm : h.K = commutator ↥M := by
     rw [hKeq, derivedInG, Subgroup.subgroupOf,
@@ -1423,42 +1423,42 @@ theorem exists_zeta_in_inducedFamily_degree_w1 [Finite G] {M : Subgroup G}
   -- quotient `M'/M_F ≃ U` is nilpotent (`U_nilpotent`) via `derived_complement` — and nontrivial
   -- (`W₂ ≠ ⊥`, `W₂ ≤ M_F ≤ M'`); a nontrivial solvable group is not perfect.
   have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
-  haveI hHnorm : (data.H.subgroupOf (derivedInG M)).Normal := by
+  have hHnorm : (data.H.subgroupOf (derivedInG M)).Normal := by
     refine (Subgroup.normal_subgroupOf_iff_le_normalizer data.H_le).mpr ?_
     rw [data.H_eq]
     exact hM'le.trans (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M)
-  haveI : IsSolvable ↥(data.H.subgroupOf (derivedInG M)) := by
-    haveI : Group.IsNilpotent ↥data.H := by
+  have : Group.IsSolvable ↥(data.H.subgroupOf (derivedInG M)) := by
+    have : Group.IsNilpotent ↥data.H := by
       rw [data.H_eq]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent M
-    haveI : IsSolvable ↥data.H := IsNilpotent.to_isSolvable
-    exact solvable_of_solvable_injective
+    have : Group.IsSolvable ↥data.H := IsNilpotent.to_isSolvable
+    exact Group.isSolvable_of_isSolvable_injective
       (f := (Subgroup.subgroupOfEquivOfLe data.H_le).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe data.H_le).injective
-  haveI : IsSolvable ↥(data.U.subgroupOf (derivedInG M)) := by
-    haveI : Group.IsNilpotent ↥data.U := data.U_nilpotent
-    haveI : IsSolvable ↥data.U := IsNilpotent.to_isSolvable
-    exact solvable_of_solvable_injective
+  have : Group.IsSolvable ↥(data.U.subgroupOf (derivedInG M)) := by
+    have : Group.IsNilpotent ↥data.U := data.U_nilpotent
+    have : Group.IsSolvable ↥data.U := IsNilpotent.to_isSolvable
+    exact Group.isSolvable_of_isSolvable_injective
       (f := (Subgroup.subgroupOfEquivOfLe data.U_le).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe data.U_le).injective
-  haveI : IsSolvable (↥(derivedInG M) ⧸ data.H.subgroupOf (derivedInG M)) :=
-    solvable_of_solvable_injective
+  have : Group.IsSolvable (↥(derivedInG M) ⧸ data.H.subgroupOf (derivedInG M)) :=
+    Group.isSolvable_of_isSolvable_injective
       (f := data.derived_complement.symm.QuotientMulEquiv.toMonoidHom)
       data.derived_complement.symm.QuotientMulEquiv.injective
-  haveI : IsSolvable ↥(derivedInG M) :=
-    solvable_of_ker_le_range ((data.H.subgroupOf (derivedInG M)).subtype)
+  have : Group.IsSolvable ↥(derivedInG M) :=
+    Group.isSolvable_of_ker_le_range ((data.H.subgroupOf (derivedInG M)).subtype)
       (QuotientGroup.mk' (data.H.subgroupOf (derivedInG M)))
       (by rw [QuotientGroup.ker_mk']; exact (data.H.subgroupOf (derivedInG M)).range_subtype.ge)
-  haveI : Nontrivial ↥(derivedInG M) :=
+  have : Nontrivial ↥(derivedInG M) :=
     (Subgroup.nontrivial_iff_ne_bot _).mpr fun hbot =>
       data.W2_nontrivial (le_bot_iff.mp (hbot ▸ data.W2_le.trans (inf_le_left.trans data.H_le)))
   have hcomm_K : commutator ↥h.K ≠ ⊤ := by
     intro hperf
     have hperfM' : Group.IsPerfect ↥(derivedInG M) := by
-      haveI : Group.IsPerfect ↥((derivedInG M).subgroupOf M) := ⟨hperf⟩
+      have : Group.IsPerfect ↥((derivedInG M).subgroupOf M) := ⟨hperf⟩
       exact Group.IsPerfect.ofSurjective (f := (Subgroup.subgroupOfEquivOfLe hM'le).toMonoidHom)
         (Subgroup.subgroupOfEquivOfLe hM'le).surjective
     exact absurd hperfM'.commutator_eq_top
-      (IsSolvable.commutator_lt_top_of_nontrivial ↥(derivedInG M)).ne
+      (Group.IsSolvable.commutator_lt_top_of_nontrivial ↥(derivedInG M)).ne
   obtain ⟨θ, hθne, hθ1⟩ := exists_nontrivial_linearIrreducibleCharacter hcomm_K
   -- the crux: `θ` avoids every `chiRestrict χ₂`.
   have havoid : ∀ χ₂, h.chiRestrict χ₂ ≠ θ := by

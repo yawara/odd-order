@@ -50,13 +50,13 @@ is `x ↦ x ^ (p ^ n)`. -/
 theorem exists_pow_eq (σ : _root_.RingAut F) :
     ∃ s : ℕ, 0 < s ∧ ∀ x : F, σ x = x ^ s := by
   classical
-  haveI : Fintype F := Fintype.ofFinite F
+  have : Fintype F := Fintype.ofFinite F
   obtain ⟨p, hp⟩ := CharP.exists F
-  haveI : Fact (Nat.Prime p) := ⟨CharP.char_is_prime F p⟩
-  haveI : CharP F p := hp
-  haveI : Fintype (ZMod p) := ZMod.fintype p
-  letI : Algebra (ZMod p) F := ZMod.algebra F p
-  haveI : Algebra.IsAlgebraic (ZMod p) F := Algebra.IsIntegral.isAlgebraic
+  have : Fact (Nat.Prime p) := ⟨CharP.char_is_prime F p⟩
+  have : CharP F p := hp
+  have : Fintype (ZMod p) := ZMod.fintype p
+  let : Algebra (ZMod p) F := ZMod.algebra F p
+  have : Algebra.IsAlgebraic (ZMod p) F := Algebra.IsIntegral.isAlgebraic
   -- `σ` fixes the prime field, hence is an algebra automorphism
   let σA : F ≃ₐ[ZMod p] F :=
     AlgEquiv.ofRingEquiv (f := σ) fun r => by
@@ -122,7 +122,7 @@ theorem exists_ne_zero_mul_pow_eq {s n : ℕ} (hs : 1 < s)
     (hnorm : c ^ ((Nat.card F - 1) / (s - 1)) = 1) :
     ∃ v : F, v ≠ 0 ∧ c * v ^ s = v := by
   classical
-  haveI : Fintype F := Fintype.ofFinite F
+  have : Fintype F := Fintype.ofFinite F
   have hunits : Nat.card Fˣ = Nat.card F - 1 := Nat.card_units F
   have hdvd : (s - 1) ∣ Nat.card F - 1 := by
     rw [hcard]
@@ -161,13 +161,13 @@ theorem exists_generator_pow_natCard_fixedSet {B : Subgroup (_root_.RingAut F)}
       (∀ a : F, σ a = a ^ Nat.card (fixedSet B)) ∧
       Nat.card F = Nat.card (fixedSet B) ^ p := by
   classical
-  haveI : Fintype F := Fintype.ofFinite F
+  have : Fintype F := Fintype.ofFinite F
   obtain ⟨p₀, hp₀⟩ := CharP.exists F
-  haveI : Fact (Nat.Prime p₀) := ⟨CharP.char_is_prime F p₀⟩
-  haveI : CharP F p₀ := hp₀
-  haveI : Fintype (ZMod p₀) := ZMod.fintype p₀
-  letI : Algebra (ZMod p₀) F := ZMod.algebra F p₀
-  haveI : Algebra.IsAlgebraic (ZMod p₀) F := Algebra.IsIntegral.isAlgebraic
+  have : Fact (Nat.Prime p₀) := ⟨CharP.char_is_prime F p₀⟩
+  have : CharP F p₀ := hp₀
+  have : Fintype (ZMod p₀) := ZMod.fintype p₀
+  let : Algebra (ZMod p₀) F := ZMod.algebra F p₀
+  have : Algebra.IsAlgebraic (ZMod p₀) F := Algebra.IsIntegral.isAlgebraic
   set K₀ : Subfield F := FixedPoints.subfield (↥B) F with hK₀
   set s : ℕ := Nat.card (fixedSet B) with hs
   have hscard : s = Nat.card ↥K₀ := by
@@ -176,13 +176,13 @@ theorem exists_generator_pow_natCard_fixedSet {B : Subgroup (_root_.RingAut F)}
   have hArtin : Module.finrank (↥K₀) F = p := by
     rw [hK₀, finrank_fixedSet B, hB]
   have hcard : Nat.card F = s ^ p := by
-    haveI : Fintype ↥K₀ := Fintype.ofFinite _
+    have : Fintype ↥K₀ := Fintype.ofFinite _
     rw [hscard, ← hArtin]
     simpa [Nat.card_eq_fintype_card] using
       (Module.card_eq_pow_finrank (K := ↥K₀) (V := F))
   -- `s` is a power of the characteristic
   have hFcard : Nat.card F = p₀ ^ Module.finrank (ZMod p₀) F := by
-    haveI : Fintype (ZMod p₀) := inferInstance
+    have : Fintype (ZMod p₀) := inferInstance
     simpa [Nat.card_eq_fintype_card, ZMod.card] using
       (Module.card_eq_pow_finrank (K := ZMod p₀) (V := F))
   have hsdvd : s ∣ p₀ ^ Module.finrank (ZMod p₀) F := by
@@ -205,7 +205,7 @@ theorem exists_generator_pow_natCard_fixedSet {B : Subgroup (_root_.RingAut F)}
     have haK : a ∈ K₀ := by
       have := (fixedSet_eq_subfield B) ▸ ha
       exact this
-    haveI : Fintype ↥K₀ := Fintype.ofFinite _
+    have : Fintype ↥K₀ := Fintype.ofFinite _
     have hpow : (⟨a, haK⟩ : ↥K₀) ^ Nat.card ↥K₀ = ⟨a, haK⟩ := by
       simpa [Nat.card_eq_fintype_card] using FiniteField.pow_card (⟨a, haK⟩ : ↥K₀)
     rw [hscard]
@@ -213,7 +213,7 @@ theorem exists_generator_pow_natCard_fixedSet {B : Subgroup (_root_.RingAut F)}
   -- `τ ≠ 1`
   have hs2 : 2 ≤ s := by
     rw [hscard]
-    haveI : Fintype ↥K₀ := Fintype.ofFinite _
+    have : Fintype ↥K₀ := Fintype.ofFinite _
     have : 1 < Nat.card ↥K₀ := Finite.one_lt_card_iff_nontrivial.mpr inferInstance
     omega
   have hτne : τ ≠ 1 := by
@@ -222,7 +222,7 @@ theorem exists_generator_pow_natCard_fixedSet {B : Subgroup (_root_.RingAut F)}
       intro a
       rw [← hτapp a, h]; rfl
     -- every unit would satisfy `a ^ (s - 1) = 1`, bounding the order of `Fˣ`
-    haveI : Fintype F := Fintype.ofFinite F
+    have : Fintype F := Fintype.ofFinite F
     obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := Fˣ)
     have hgord : orderOf g = Nat.card Fˣ := orderOf_eq_card_of_forall_mem_zpowers hg
     have hunits : Nat.card Fˣ = Nat.card F - 1 := Nat.card_units F
@@ -281,7 +281,7 @@ theorem _root_.OddOrder.exists_ne_zero_fixed_of_semilinear
     {p : ℕ} (hp : p.Prime) (hTp : ∀ x : M, T^[p] x = x) (hσne : σ ≠ 1) :
     ∃ x : M, x ≠ 0 ∧ T x = x := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hinj : Function.Injective (fun a : F => a • e₀) := smul_left_injective F he₀
   -- iterating the semilinearity
   have hiter : ∀ (n : ℕ) (a : F) (x : M), T^[n] (a • x) = (σ ^ n) a • T^[n] x := by
@@ -361,7 +361,7 @@ theorem _root_.OddOrder.exists_ne_zero_fixed_of_semilinear
       rw [← pow_mul, ← pow_succ, geom_sum_succ, mul_comm s]
   -- `s ≥ 2`
   have hFge : 2 ≤ Nat.card F := by
-    haveI : Fintype F := Fintype.ofFinite F
+    have : Fintype F := Fintype.ofFinite F
     have := Finite.one_lt_card_iff_nontrivial.mpr (inferInstance : Nontrivial F)
     omega
   have hs2 : 2 ≤ s := by

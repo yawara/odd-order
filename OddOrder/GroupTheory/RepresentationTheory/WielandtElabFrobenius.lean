@@ -70,7 +70,7 @@ theorem finrank_eq_card_mul_finrank_invariants_kernelFPF_zmod {U E : Subgroup L}
     Module.finrank (ZMod p) V =
       Fintype.card ↥E * Module.finrank (ZMod p) ↥(invariants (ρV.comp E.subtype)) := by
   let K := AlgebraicClosure (ZMod p)
-  haveI : NeZero (Nat.card ↥U : K) :=
+  have : NeZero (Nat.card ↥U : K) :=
     ⟨fun h => hpU ((CharP.cast_eq_zero_iff K p _).mp h)⟩
   have hbarU : invariants ((baseChangeRepresentation K ρV).comp U.subtype) = ⊥ := by
     rw [← baseChangeRepresentation_comp]
@@ -99,7 +99,7 @@ theorem htag_of_frobenius {U E : Subgroup L} [U.Normal] [Fintype ↥E]
       Fintype.card ↥E * Module.finrank (ZMod p)
         ↥(LinearMap.ker (averageMap (ρV.comp U.subtype)) ⊓ invariants (ρV.comp E.subtype)) := by
   classical
-  haveI : FiniteDimensional (ZMod p) V := Module.Finite.of_finite
+  have : FiniteDimensional (ZMod p) V := Module.Finite.of_finite
   -- Make the augmentation submodule `[V,U]` opaque (its defining `averageMap` is `whnf`-heavy).
   obtain ⟨W₀, hW₀⟩ : ∃ W₀ : Submodule (ZMod p) V,
       W₀ = LinearMap.ker (averageMap (ρV.comp U.subtype)) := ⟨_, rfl⟩
@@ -169,9 +169,9 @@ theorem card_eq_card_fixedSubgroup_pow_of_frobenius {U E : Subgroup L} [U.Normal
     (hVU : fixedSubgroup φ U = ⊥) :
     Nat.card V = Nat.card ↥(fixedSubgroup φ E) ^ Nat.card ↥E := by
   classical
-  haveI : Fintype ↥E := Fintype.ofFinite _
-  haveI : FiniteDimensional (ZMod p) (Additive V) := Module.Finite.of_finite
-  haveI : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
+  have : Fintype ↥E := Fintype.ofFinite _
+  have : FiniteDimensional (ZMod p) (Additive V) := Module.Finite.of_finite
+  have : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
   -- `V^U = 0` in module form, from `C_V(U) = 1`.
   have hinvU : invariants ((elabRepresentation p φ).comp U.subtype) = ⊥ := by
     rw [Submodule.eq_bot_iff]
@@ -194,7 +194,7 @@ theorem card_eq_card_fixedSubgroup_pow_of_frobenius {U E : Subgroup L} [U.Normal
   -- (†) over `𝔽_p` and the cardinality bridges.
   have hkey := finrank_eq_card_mul_finrank_invariants_kernelFPF_zmod
     hsup hcopUE hEnt hfpf hpU (elabRepresentation p φ) hinvU
-  haveI : Fintype (Additive V) := Fintype.ofFinite _
+  have : Fintype (Additive V) := Fintype.ofFinite _
   have hcardV : Nat.card V = p ^ Module.finrank (ZMod p) (Additive V) := by
     rw [Nat.card_congr (Additive.ofMul (α := V)), Nat.card_eq_fintype_card,
       Module.card_eq_pow_finrank (K := ZMod p), ZMod.card]

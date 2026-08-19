@@ -73,7 +73,7 @@ theorem not_isConj_inv_of_isTISubset {p : ℕ} [Fact p.Prime] (P : Sylow p G)
   set L : Subgroup G := Subgroup.normalizer ((P : Subgroup G) : Set G) with hL
   -- `L` is finite: its order is odd, hence nonzero.
   have hcard_ne : Nat.card L ≠ 0 := by rcases hodd with ⟨k, hk⟩; omega
-  haveI : Finite L := (Nat.card_ne_zero.mp hcard_ne).2
+  have : Finite L := (Nat.card_ne_zero.mp hcard_ne).2
   -- `z, z⁻¹ ∈ P^# = P ∖ {1}`.
   have hzA : z ∈ (P : Set G) \ {1} := ⟨hzP, by simpa using hz1⟩
   have hzinvA : z⁻¹ ∈ (P : Set G) \ {1} :=

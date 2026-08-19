@@ -104,9 +104,9 @@ theorem isNilpotent_or_exists_fixed_mul_eq {b : MonoidAlgebra k G} (hbfix : ∀ 
     IsNilpotent (b * x) ∨
       ∃ u : MonoidAlgebra k G, (∀ g : G, g • u = u) ∧ u * (b * x) = b := by
   set Z := Subalgebra.center k (MonoidAlgebra k G) with hZ
-  haveI : Module.Finite k ↥Z :=
+  have : Module.Finite k ↥Z :=
     Module.Finite.of_injective Z.toSubmodule.subtype Subtype.val_injective
-  haveI : IsArtinianRing ↥Z := IsArtinianRing.of_finite k _
+  have : IsArtinianRing ↥Z := IsArtinianRing.of_finite k _
   set b' : ↥Z := ⟨b, mem_center_iff_forall_smul_eq.mpr hbfix⟩ with hb'def
   set x' : ↥Z := ⟨x, mem_center_iff_forall_smul_eq.mpr hx⟩ with hx'def
   have hb' : IsIdempotentElem b' := Subtype.ext hb

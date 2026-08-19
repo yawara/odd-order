@@ -65,7 +65,7 @@ theorem r_eq_one_iff (i : ZMod n) : (r i : _root_.DihedralGroup n) = 1 ↔ i = 0
 /-- **回転部分の involution 判定**: `r i` の位数が `2` ⟺ `i ≠ 0` かつ `2i = 0`。 -/
 theorem orderOf_r_eq_two_iff (i : ZMod n) :
     orderOf (r i : _root_.DihedralGroup n) = 2 ↔ i ≠ 0 ∧ i + i = 0 := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   constructor
   · intro h
     have hsq : (r i : _root_.DihedralGroup n) ^ 2 = 1 := h ▸ pow_orderOf_eq_one _
@@ -96,7 +96,7 @@ theorem orderOf_eq_two_iff (g : _root_.DihedralGroup n) :
 /-- `n` が奇数なら `2i = 0` をみたす `i : ZMod n` は `0` のみ (`2` が `ZMod n` の単元)。 -/
 theorem eq_zero_of_add_self_eq_zero_of_odd (hn : Odd n) {i : ZMod n} (h : i + i = 0) :
     i = 0 := by
-  haveI : NeZero n := ⟨by rintro rfl; simp at hn⟩
+  have : NeZero n := ⟨by rintro rfl; simp at hn⟩
   have h2 : (2 : ZMod n) * i = 0 := by rw [two_mul]; exact h
   have hu : IsUnit (2 : ZMod n) :=
     (ZMod.isUnit_iff_coprime 2 n).mpr (Nat.coprime_two_left.mpr hn)
@@ -117,7 +117,7 @@ theorem orderOf_eq_two_iff_of_odd (hn : Odd n) (g : _root_.DihedralGroup n) :
 ちょうど `n` 個。 -/
 theorem card_involutions_of_odd (hn : Odd n) :
     Nat.card {g : _root_.DihedralGroup n // orderOf g = 2} = n := by
-  haveI : NeZero n := ⟨by rintro rfl; simp at hn⟩
+  have : NeZero n := ⟨by rintro rfl; simp at hn⟩
   have hset : {g : _root_.DihedralGroup n | orderOf g = 2} = Set.range sr := by
     ext g
     simpa [eq_comm] using orderOf_eq_two_iff_of_odd hn g
@@ -143,7 +143,7 @@ theorem r_conj_sr (i j : ZMod n) :
 単一の共役類をなす (`2` が `ZMod n` の単元なので `sr i ↦ sr (i - 2j)` が推移的)。 -/
 theorem isConj_sr_of_odd (hn : Odd n) (i j : ZMod n) :
     IsConj (sr i : _root_.DihedralGroup n) (sr j) := by
-  haveI : NeZero n := ⟨by rintro rfl; simp at hn⟩
+  have : NeZero n := ⟨by rintro rfl; simp at hn⟩
   -- `2` は単元ゆえ `k + k = i - j` なる `k` が取れる
   obtain ⟨u, hu⟩ : IsUnit (2 : ZMod n) :=
     (ZMod.isUnit_iff_coprime 2 n).mpr (Nat.coprime_two_left.mpr hn)
@@ -165,7 +165,7 @@ theorem isConj_sr_of_odd (hn : Odd n) (i j : ZMod n) :
 /-- `n = m + m` (偶数, `m ≥ 1`) のとき `2i = 0` の解はちょうど `i = 0` と `i = m` の 2 つ。 -/
 theorem add_self_eq_zero_iff_of_even {m : ℕ} (hm : 0 < m) (i : ZMod (m + m)) :
     i + i = 0 ↔ i = 0 ∨ i = (m : ZMod (m + m)) := by
-  haveI : NeZero (m + m) := ⟨by omega⟩
+  have : NeZero (m + m) := ⟨by omega⟩
   constructor
   · intro h
     have hcast : ((i.val + i.val : ℕ) : ZMod (m + m)) = 0 := by
@@ -214,11 +214,11 @@ theorem orderOf_eq_two_iff_of_even {m : ℕ} (hm : 0 < m)
 `n + 1` 個 (鏡映 `n` 個 + 回転 `r m` 1 個)。 -/
 theorem card_involutions_of_even {m : ℕ} (hm : 0 < m) :
     Nat.card {g : _root_.DihedralGroup (m + m) // orderOf g = 2} = m + m + 1 := by
-  haveI : NeZero (m + m) := ⟨by omega⟩
+  have : NeZero (m + m) := ⟨by omega⟩
   have hset : {g : _root_.DihedralGroup (m + m) | orderOf g = 2}
       = Set.range sr ∪ {r (m : ZMod (m + m))} := by
     ext g
-    rw [Set.mem_setOf_eq, orderOf_eq_two_iff_of_even hm g]
+    rw [Set.mem_ofPred_eq, orderOf_eq_two_iff_of_even hm g]
     simp only [Set.mem_union, Set.mem_range, Set.mem_singleton_iff]
     exact or_congr (exists_congr fun _ => eq_comm) Iff.rfl
   have hrange : (Set.range (sr : ZMod (m + m) → _root_.DihedralGroup (m + m))).ncard = m + m := by
@@ -261,7 +261,7 @@ def parityHom (m : ℕ) : ZMod (m + m) →+* ZMod 2 :=
 
 theorem parityHom_apply {m : ℕ} [NeZero m] (i : ZMod (m + m)) :
     parityHom m i = ((i.val : ℕ) : ZMod 2) := by
-  haveI : NeZero (m + m) := ⟨by have := NeZero.ne m; omega⟩
+  have : NeZero (m + m) := ⟨by have := NeZero.ne m; omega⟩
   rw [parityHom, ZMod.castHom_apply, ← ZMod.natCast_val]
 
 /-- 「和が 2 で割れる」判定: `parityHom m i = 0 ⟺ i` が二倍元。 -/
@@ -271,7 +271,7 @@ theorem parityHom_eq_zero_iff {m : ℕ} [NeZero m] (i : ZMod (m + m)) :
   · intro h
     rw [parityHom_apply, ZMod.natCast_eq_zero_iff] at h
     obtain ⟨s, hs⟩ := h
-    haveI : NeZero (m + m) := ⟨by have := NeZero.ne m; omega⟩
+    have : NeZero (m + m) := ⟨by have := NeZero.ne m; omega⟩
     refine ⟨(s : ZMod (m + m)), ?_⟩
     have : ((i.val : ℕ) : ZMod (m + m)) = ((s : ZMod (m + m)) + (s : ZMod (m + m))) := by
       rw [hs]; push_cast; ring
@@ -331,7 +331,7 @@ theorem conjClass_r_natCast_half_eq {m : ℕ} :
     {g : _root_.DihedralGroup (m + m) | IsConj (r (m : ZMod (m + m))) g}
       = {r (m : ZMod (m + m))} := by
   ext g
-  rw [Set.mem_setOf_eq, Set.mem_singleton_iff, isConj_iff]
+  rw [Set.mem_ofPred_eq, Set.mem_singleton_iff, isConj_iff]
   constructor
   · rintro ⟨c, rfl⟩
     rw [Subgroup.mem_center_iff.mp r_natCast_half_mem_center c]
@@ -343,12 +343,12 @@ theorem conjClass_r_natCast_half_eq {m : ℕ} :
 間の全単射、かつ 2 つで `ZMod (m+m)` を分割する)。 -/
 theorem ncard_parityHom_fiber {m : ℕ} [NeZero m] (c : ZMod 2) :
     {k : ZMod (m + m) | parityHom m k = c}.ncard = m := by
-  haveI : NeZero (m + m) := ⟨by have := NeZero.ne m; omega⟩
+  have : NeZero (m + m) := ⟨by have := NeZero.ne m; omega⟩
   -- fiber 1 は fiber 0 の `(· + 1)` 像
   have himg : {k : ZMod (m + m) | parityHom m k = 1}
       = (fun x => x + 1) '' {k : ZMod (m + m) | parityHom m k = 0} := by
     ext k
-    simp only [Set.mem_setOf_eq, Set.mem_image]
+    simp only [Set.mem_ofPred_eq, Set.mem_image]
     constructor
     · exact fun h => ⟨k - 1, by rw [map_sub, h, map_one, sub_self], by ring⟩
     · rintro ⟨x, hx, rfl⟩
@@ -360,7 +360,7 @@ theorem ncard_parityHom_fiber {m : ℕ} [NeZero m] (c : ZMod 2) :
   have hcompl : {k : ZMod (m + m) | parityHom m k = 0}ᶜ
       = {k : ZMod (m + m) | parityHom m k = 1} := by
     ext k
-    simp only [Set.mem_compl_iff, Set.mem_setOf_eq]
+    simp only [Set.mem_compl_iff, Set.mem_ofPred_eq]
     constructor
     · intro h
       rcases (by decide : ∀ x : ZMod 2, x = 0 ∨ x = 1) (parityHom m k) with h0 | h1
@@ -382,7 +382,7 @@ theorem conjClass_sr_eq {m : ℕ} [NeZero m] (i : ZMod (m + m)) :
     {g : _root_.DihedralGroup (m + m) | IsConj (sr i) g}
       = sr '' {k : ZMod (m + m) | parityHom m k = parityHom m i} := by
   ext g
-  simp only [Set.mem_setOf_eq, Set.mem_image]
+  simp only [Set.mem_ofPred_eq, Set.mem_image]
   constructor
   · intro h
     obtain ⟨k, rfl⟩ := exists_sr_of_isConj_sr h
@@ -446,7 +446,7 @@ private theorem conj_pow_eq_inv {x u : G} (h : x * u * x⁻¹ = u⁻¹) (j : ℕ
 theorem exists_involution_commuting_of_not_isConj [Finite G] {s t : G}
     (hs : orderOf s = 2) (ht : orderOf t = 2) (hnc : ¬ IsConj s t) :
     ∃ z : G, orderOf z = 2 ∧ z ≠ s ∧ z ≠ t ∧ Commute z s ∧ Commute z t := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hs2 : s * s = 1 := by rw [← sq]; exact hs ▸ pow_orderOf_eq_one s
   have ht2 : t * t = 1 := by rw [← sq]; exact ht ▸ pow_orderOf_eq_one t
   have hs1 : s ≠ 1 := fun h => by rw [h, orderOf_one] at hs; omega
@@ -510,7 +510,7 @@ variable {G : Type*} [Group G]
 /-- involution はある Sylow 2-部分群に属する (`⟨s⟩` は位数 2 の 2-群)。 -/
 theorem exists_sylow_two_mem [Finite G] {s : G} (hs : orderOf s = 2) :
     ∃ P : Sylow 2 G, s ∈ P := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hpg : IsPGroup 2 (Subgroup.zpowers s) :=
     IsPGroup.of_card (n := 1) (by rw [Nat.card_zpowers, hs, pow_one])
   obtain ⟨P, hP⟩ := hpg.exists_le_sylow
@@ -521,7 +521,7 @@ theorem exists_sylow_two_mem [Finite G] {s : G} (hs : orderOf s = 2) :
 theorem exists_sylow_two_mem_of_commute [Finite G] {s z : G}
     (hs : orderOf s = 2) (hz : orderOf z = 2) (hcz : Commute s z) :
     ∃ P : Sylow 2 G, s ∈ P ∧ z ∈ P := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hs2 : s * s = 1 := by rw [← sq]; exact hs ▸ pow_orderOf_eq_one s
   have hz2 : z * z = 1 := by rw [← sq]; exact hz ▸ pow_orderOf_eq_one z
   set k : Set G := {s, z} with hkdef
@@ -592,7 +592,7 @@ theorem isConj_of_orderOf_eq_two_of_sylow_ti [Finite G]
     (hmany : ∃ P Q : Sylow 2 G, P ≠ Q)
     (hti : ∀ P Q : Sylow 2 G, P ≠ Q → (P : Subgroup G) ⊓ (Q : Subgroup G) = ⊥)
     {s t : G} (hs : orderOf s = 2) (ht : orderOf t = 2) : IsConj s t := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨Ps, hsP⟩ := exists_sylow_two_mem hs
   obtain ⟨Pt, htP⟩ := exists_sylow_two_mem ht
   by_cases hPQ : Ps = Pt
@@ -620,13 +620,13 @@ theorem isConj_of_orderOf_eq_two_of_sylow_ti [Finite G]
 位数 2 の元がある。 -/
 theorem exists_orderOf_eq_two_of_exists_sylow_two_ne [Finite G]
     (hmany : ∃ P Q : Sylow 2 G, P ≠ Q) : ∃ s : G, orderOf s = 2 := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨P₁, P₂, hne⟩ := hmany
   obtain ⟨P, hP⟩ : ∃ P : Sylow 2 G, (P : Subgroup G) ≠ ⊥ := by
     by_contra h
     push Not at h
     exact hne (Sylow.ext ((h P₁).trans (h P₂).symm))
-  haveI : Nontrivial ↥(P : Subgroup G) := (Subgroup.nontrivial_iff_ne_bot _).mpr hP
+  have : Nontrivial ↥(P : Subgroup G) := (Subgroup.nontrivial_iff_ne_bot _).mpr hP
   obtain ⟨n, hn⟩ := P.2.exists_card_eq
   have hcard1 : 1 < Nat.card ↥(P : Subgroup G) := Finite.one_lt_card
   have hdvd : 2 ∣ Nat.card ↥(P : Subgroup G) := by
@@ -684,7 +684,7 @@ theorem generalizedDihedral_tfae (hB : B.index = 2) :
       [∃ t : G, t ∉ B ∧ orderOf t = 2 ∧ ∀ b ∈ B, t * b * t⁻¹ = b⁻¹,
         ∀ t : G, t ∉ B → orderOf t = 2,
         ∀ t : G, t ∉ B → orderOf t = 2 ∧ ∀ b ∈ B, t * b * t⁻¹ = b⁻¹] := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   tfae_have 1 → 2 := by
     rintro ⟨t, htB, ht2, htinv⟩ x hx
     have htt : t * t = 1 := by rw [← sq]; exact ht2 ▸ pow_orderOf_eq_one t
@@ -744,7 +744,7 @@ variable {G : Type*} [Group G] {p : ℕ}
 /-- 正規 Sylow `p`-部分群は `O_p(G)` に一致する。 -/
 theorem coe_eq_opCore_of_normal [Finite G] [Fact p.Prime] (P : Sylow p G)
     (hP : (P : Subgroup G).Normal) : (P : Subgroup G) = opCore p G := by
-  haveI := hP
+  have := hP
   exact le_antisymm (normal_pgroup_le_opCore P.2) (opCore_le P)
 
 /-- `p`-冪位数の元で生成される有限群が正規 Sylow `p`-部分群をもつ ⟺ それ自身が `p`-群。
@@ -756,7 +756,7 @@ theorem exists_normal_sylow_iff_isPGroup {K : Type*} [Group K] [Finite K] [Fact 
     (∃ Q : Sylow p K, (Q : Subgroup K).Normal) ↔ IsPGroup p K := by
   constructor
   · rintro ⟨Q, hQ⟩
-    letI := Q.unique_of_normal hQ
+    let := Q.unique_of_normal hQ
     have htop : (Q : Subgroup K) = ⊤ := by
       refine top_le_iff.mp ?_
       rw [← hgen, Subgroup.closure_le]
@@ -817,7 +817,7 @@ theorem exists_normal_sylow_iff_forall_conj_pair [Finite G] [Fact p.Prime] :
       have hpg : IsPGroup p ↥(Subgroup.zpowers x) :=
         IsPGroup.of_card (n := n) (by rw [Nat.card_zpowers, hn])
       obtain ⟨P', hP'⟩ := hpg.exists_le_sylow
-      letI := P.unique_of_normal hP
+      let := P.unique_of_normal hP
       exact (Subsingleton.elim P' P) ▸ hP' (Subgroup.mem_zpowers x)
     refine (baerSuzuki_pCore x).mp ?_ g
     rw [← coe_eq_opCore_of_normal P hP]

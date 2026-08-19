@@ -66,7 +66,7 @@ every value is a `|G|`-th root of unity (`pow_card_eq_one'`), and `rootsOfUnity`
 is finite.  Gives `Finite ((K ⧸ H) →* ℂˣ)`, the index type of the Gallagher decomposition. -/
 instance {G M : Type*} [Group G] [Finite G] [CommRing M] [IsDomain M] :
     Finite (G →* Mˣ) := by
-  haveI : NeZero (Nat.card G) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card G) := ⟨Nat.card_pos.ne'⟩
   have hmem : ∀ (f : G →* Mˣ) (g : G), f g ∈ rootsOfUnity (Nat.card G) M := fun f g => by
     rw [mem_rootsOfUnity, ← map_pow, pow_card_eq_one', map_one]
   refine Finite.of_injective
@@ -95,7 +95,7 @@ theorem injective_mul_linearClassFunction_of_coprime [Finite K]
     {d : ℕ} (hd_χ : χ 1 = (d : ℂ)) (hcop : Nat.Coprime H.index d) :
     Function.Injective fun β : (K ⧸ H) →* ℂˣ =>
       χ * linearClassFunction (β.comp (QuotientGroup.mk' H)) := by
-  letI : Fintype K := Fintype.ofFinite K
+  let : Fintype K := Fintype.ofFinite K
   intro β₁ β₂ hcoe
   simp only at hcoe
   set f₁ := β₁.comp (QuotientGroup.mk' H) with hf₁
@@ -163,11 +163,11 @@ theorem induce_eq_sum_mul_linearClassFunction [Finite K] [Fintype K]
     ClassFunction.induce H θ
       = ∑ β : (K ⧸ H) →* ℂˣ, χ * linearClassFunction (β.comp (QuotientGroup.mk' H)) := by
   classical
-  letI : Fintype ↥H := Fintype.ofFinite _
-  haveI : Finite (IrreducibleCharacter K) := finite_irreducibleCharacter (G := K)
-  letI : Fintype (IrreducibleCharacter K) := Fintype.ofFinite _
+  let : Fintype ↥H := Fintype.ofFinite _
+  have : Finite (IrreducibleCharacter K) := finite_irreducibleCharacter (G := K)
+  let : Fintype (IrreducibleCharacter K) := Fintype.ofFinite _
   -- the quotient is a finite abelian group
-  letI : CommGroup (K ⧸ H) :=
+  let : CommGroup (K ⧸ H) :=
     { (inferInstance : Group (K ⧸ H)) with
       mul_comm := fun a b => by
         obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective a
@@ -179,7 +179,7 @@ theorem induce_eq_sum_mul_linearClassFunction [Finite K] [Fintype K]
           group
         rw [h1]
         exact hab y⁻¹ x⁻¹ }
-  haveI : NeZero (Monoid.exponent (K ⧸ H)) := ⟨by exact Monoid.exponent_ne_zero_of_finite⟩
+  have : NeZero (Monoid.exponent (K ⧸ H)) := ⟨by exact Monoid.exponent_ne_zero_of_finite⟩
   -- self-duality of the finite abelian quotient: `[K:H]` linear characters
   have hcard_hom : Nat.card ((K ⧸ H) →* ℂˣ) = H.index :=
     CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity (K ⧸ H) ℂ
@@ -280,7 +280,7 @@ theorem sum_linearClassFunction_apply_eq_zero_of_not_mem_normal [Finite K]
     [Invertible (Nat.card K : ℂ)] [Invertible (Nat.card ↥H : ℂ)]
     [Fintype ((K ⧸ H) →* ℂˣ)] (hab : ∀ x y : K, ⁅x, y⁆ ∈ H) {g : K} (hg : g ∉ H) :
     (∑ β : (K ⧸ H) →* ℂˣ, linearClassFunction (β.comp (QuotientGroup.mk' H))) g = 0 := by
-  haveI : Fintype K := Fintype.ofFinite K
+  have : Fintype K := Fintype.ofFinite K
   rw [← induce_trivial_eq_sum_linearClassFunction hab]
   exact ClassFunction.induce_apply_eq_zero_of_not_mem_normal H (trivialClassFunction ↥H) hg
 

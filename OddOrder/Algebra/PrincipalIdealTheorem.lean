@@ -276,7 +276,7 @@ noncomputable def transferFactorSum (S : K.LeftTransversal) (g : G) :
 
 theorem transferFactorSum_mem (S : K.LeftTransversal) (g : G) :
     transferFactorSum G K S g ∈ augmentationIdealOf G K := by
-  letI := K.fintypeQuotientOfFiniteIndex
+  let := K.fintypeQuotientOfFiniteIndex
   exact Submodule.sum_mem _ fun q _ =>
     sub_one_mem_augmentationIdealOf G K (transferFactor_mem G K S g q)
 
@@ -287,7 +287,7 @@ theorem transversalInvSum_mul_sub_one_sub_mem (S : K.LeftTransversal)
     transversalInvSum G K S * (MonoidAlgebra.of ℤ G g - 1)
         - transferFactorSum G K S g
       ∈ augmentationIdealOf G K * augmentationIdeal G := by
-  letI := K.fintypeQuotientOfFiniteIndex
+  let := K.fintypeQuotientOfFiniteIndex
   have key : transversalInvSum G K S * (MonoidAlgebra.of ℤ G g - 1)
       - transferFactorSum G K S g
       = ∑ q : G ⧸ K,
@@ -334,7 +334,7 @@ theorem abelianizationEquiv_transfer (S : K.LeftTransversal) (g : G) :
         (MonoidHom.transfer (Abelianization.of : K →* Abelianization K) g)
       = Multiplicative.ofAdd (Submodule.Quotient.mk
           ⟨transferFactorSum G K S g, transferFactorSum_mem G K S g⟩) := by
-  letI := K.fintypeQuotientOfFiniteIndex
+  let := K.fintypeQuotientOfFiniteIndex
   have hprod : MonoidHom.transfer
         (Abelianization.of : K →* Abelianization K) g
       = ∏ q : G ⧸ K, Abelianization.of
@@ -803,7 +803,7 @@ theorem augmentationCoquotientMulLeft_sectionSum_congr
     augmentationCoquotientMulLeft G K hK (sectionSum G K f₁)
       = augmentationCoquotientMulLeft G K hK (sectionSum G K f₂) := by
   apply augmentationCoquotientMulLeft_eq_of_sub_mem_right
-  letI := K.fintypeQuotientOfFiniteIndex
+  let := K.fintypeQuotientOfFiniteIndex
   rw [sectionSum, sectionSum, ← Finset.sum_sub_distrib]
   apply Submodule.sum_mem
   intro q _
@@ -825,7 +825,7 @@ theorem transferXi_eq_mulLeft_sectionSum (S : K.LeftTransversal)
     {f : G ⧸ K → G} (hf : ∀ q, (↑(f q) : G ⧸ K) = q) :
     transferXi G K hK S
       = augmentationCoquotientMulLeft G K hK (sectionSum G K f) := by
-  letI := K.fintypeQuotientOfFiniteIndex
+  let := K.fintypeQuotientOfFiniteIndex
   have hsec : transversalInvSum G K S
       = sectionSum G K (fun q => (S.2.leftQuotientEquiv q⁻¹ : G)⁻¹) := by
     rw [transversalInvSum, sectionSum]
@@ -943,8 +943,8 @@ theorem augmentationCoquotientModule_mapDomain_smul (h : _root_.commutator G ≤
     letI := augmentationCoquotientModule G K
     (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K) x) • a
       = augmentationCoquotientMulLeft G K hK x a := by
-  letI := quotientCommGroup G K h
-  letI := augmentationCoquotientModule G K
+  let := quotientCommGroup G K h
+  let := augmentationCoquotientModule G K
   change augmentationCoquotientAlgHom G K
     (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K) x) a = _
   rw [augmentationCoquotientAlgHom_mapDomain]
@@ -959,8 +959,8 @@ theorem restrictScalars_augmentationRingIdeal_smul_top
     Submodule.restrictScalars ℤ (augmentationRingIdeal G K •
         (⊤ : Submodule (MonoidAlgebra ℤ (G ⧸ K)) (AugmentationCoquotient G K)))
       = augmentationCoquotientSqImage G K := by
-  letI := quotientCommGroup G K h
-  letI := augmentationCoquotientModule G K
+  let := quotientCommGroup G K h
+  let := augmentationCoquotientModule G K
   apply le_antisymm
   · intro w hw
     rw [Submodule.restrictScalars_mem] at hw
@@ -1024,8 +1024,8 @@ theorem nat_card_quotient_augmentationRingIdeal_smul_top
     Nat.card (AugmentationCoquotient G K ⧸ (augmentationRingIdeal G K •
         (⊤ : Submodule (MonoidAlgebra ℤ (G ⧸ K)) (AugmentationCoquotient G K))))
       = Nat.card (Abelianization G) := by
-  letI := quotientCommGroup G K h
-  letI := augmentationCoquotientModule G K
+  let := quotientCommGroup G K h
+  let := augmentationCoquotientModule G K
   rw [← nat_card_quotient_augmentationCoquotientSqImage G K,
     ← restrictScalars_augmentationRingIdeal_smul_top G K h]
   rfl
@@ -1036,9 +1036,9 @@ omit [hK : K.Normal] in
 /-- `Δ(G)‾` is finitely generated as an additive group (`G` finite). -/
 theorem moduleFinite_augmentationCoquotient [Finite G] :
     Module.Finite ℤ (AugmentationCoquotient G K) := by
-  letI : Module.Finite ℤ (MonoidAlgebra ℤ G) :=
+  let : Module.Finite ℤ (MonoidAlgebra ℤ G) :=
     Module.Finite.equiv (MonoidAlgebra.coeffLinearEquiv (R := ℤ) (S := ℤ) (M := G)).symm
-  letI : Module.Finite ℤ (augmentationIdeal G) := inferInstance
+  let : Module.Finite ℤ (augmentationIdeal G) := inferInstance
   exact Module.Finite.of_surjective (augmentationCorel G K).mkQ
     (Submodule.mkQ_surjective _)
 
@@ -1046,7 +1046,7 @@ omit [hK : K.Normal] in
 /-- The additive group `⊤` of `Δ(G)‾` is finitely generated (`G` finite). -/
 theorem fg_top_augmentationCoquotient [Finite G] :
     (⊤ : AddSubgroup (AugmentationCoquotient G K)).FG := by
-  letI := moduleFinite_augmentationCoquotient G K
+  let := moduleFinite_augmentationCoquotient G K
   have h := Module.Finite.fg_top (R := ℤ) (M := AugmentationCoquotient G K)
   rw [Submodule.fg_iff_addSubgroup_fg] at h
   simpa using h
@@ -1055,7 +1055,7 @@ theorem fg_top_augmentationCoquotient [Finite G] :
 (`G` finite, so `ℤ[G/K]` is a Noetherian `ℤ`-module). -/
 theorem fg_augmentationRingIdeal [Finite G] :
     (augmentationRingIdeal G K).toAddSubgroup.FG := by
-  letI : Module.Finite ℤ (MonoidAlgebra ℤ (G ⧸ K)) :=
+  let : Module.Finite ℤ (MonoidAlgebra ℤ (G ⧸ K)) :=
     Module.Finite.equiv (MonoidAlgebra.coeffLinearEquiv (R := ℤ) (S := ℤ) (M := G ⧸ K)).symm
   have h : ((augmentationRingIdeal G K).restrictScalars ℤ).FG :=
     IsNoetherian.noetherian _
@@ -1069,8 +1069,8 @@ theorem finite_quotient_augmentationRingIdeal_smul_top [Finite G]
     letI := augmentationCoquotientModule G K
     Finite (AugmentationCoquotient G K ⧸ (augmentationRingIdeal G K •
       (⊤ : Submodule (MonoidAlgebra ℤ (G ⧸ K)) (AugmentationCoquotient G K)))) := by
-  letI := quotientCommGroup G K h
-  letI := augmentationCoquotientModule G K
+  let := quotientCommGroup G K h
+  let := augmentationCoquotientModule G K
   have hpos : Nat.card (Abelianization G) ≠ 0 := Nat.card_pos.ne'
   rw [← nat_card_quotient_augmentationRingIdeal_smul_top G K h] at hpos
   exact Nat.finite_of_card_ne_zero hpos
@@ -1157,7 +1157,7 @@ theorem mapDomain_sectionWeightedSum (e : G ⧸ K → ℤ) {f : G ⧸ K → G}
     (hf : ∀ q, (↑(f q) : G ⧸ K) = q) (q : G ⧸ K) :
     (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K)
         (sectionWeightedSum G K e f)).coeff q = e q := by
-  letI := K.fintypeQuotientOfFiniteIndex
+  let := K.fintypeQuotientOfFiniteIndex
   rw [sectionWeightedSum, map_sum]
   have hterm : ∀ p : G ⧸ K,
       (MonoidAlgebra.mapDomainAlgHom ℤ ℤ (QuotientGroup.mk' K)
@@ -1231,7 +1231,7 @@ theorem augmentation_sectionWeightedSum [K.FiniteIndex] (e : G ⧸ K → ℤ)
     (f : G ⧸ K → G) :
     letI := K.fintypeQuotientOfFiniteIndex
     augmentation ℤ G (sectionWeightedSum G K e f) = ∑ q : G ⧸ K, e q := by
-  letI := K.fintypeQuotientOfFiniteIndex
+  let := K.fintypeQuotientOfFiniteIndex
   rw [sectionWeightedSum, map_sum]
   exact Finset.sum_congr rfl fun q _ => augmentation_single ℤ G (f q) (e q)
 
@@ -1241,10 +1241,10 @@ theorem exists_annihilator_transferXi [Finite G] (h : _root_.commutator G ≤ K)
     (S : K.LeftTransversal) :
     ∃ c : ℤ, (Nat.card (G ⧸ K) : ℤ) * c = (Nat.card (Abelianization G) : ℤ) ∧
       c • transferXi G K hK S = 0 := by
-  letI := quotientCommGroup G K h
-  letI := augmentationCoquotientModule G K
-  haveI := finite_quotient_augmentationRingIdeal_smul_top G K h
-  letI := K.fintypeQuotientOfFiniteIndex
+  let := quotientCommGroup G K h
+  let := augmentationCoquotientModule G K
+  have := finite_quotient_augmentationRingIdeal_smul_top G K h
+  let := K.fintypeQuotientOfFiniteIndex
   -- Theorem 10.26 over `R = ℤ[G/K]`
   obtain ⟨γ, hγann, hγcong⟩ := exists_smul_eq_zero_and_sub_card_mem
     (augmentationRingIdeal G K) (fg_augmentationRingIdeal G K)

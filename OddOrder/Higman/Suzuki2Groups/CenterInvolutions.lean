@@ -40,7 +40,7 @@ theorem involutions_subset_center_of_transitive [Finite P] [Nontrivial P]
     (hP : IsPGroup 2 P) (X : Subgroup (MulAut P))
     (htrans : ActsTransitivelyOnInvolutions X) :
     involutions P ⊆ (Subgroup.center P : Set P) := by
-  letI : Nontrivial ↥(Subgroup.center P) := hP.center_nontrivial
+  let : Nontrivial ↥(Subgroup.center P) := hP.center_nontrivial
   have hZ2 : IsPGroup 2 ↥(Subgroup.center P) :=
     hP.to_subgroup (Subgroup.center P)
   have hZcard_ne : Nat.card ↥(Subgroup.center P) ≠ 1 :=
@@ -66,7 +66,7 @@ involution and use transitivity of the defining actor on all involutions. -/
 theorem involutions_subset_center [Finite P] (hP : IsSuzuki2Group P) :
     involutions P ⊆ (Subgroup.center P : Set P) := by
   rcases hP with ⟨hP2, _, ⟨u, v, _hu, _hv, huv⟩, A, _, hreg⟩
-  letI : Nontrivial P := ⟨⟨u, v, huv⟩⟩
+  let : Nontrivial P := ⟨⟨u, v, huv⟩⟩
   exact involutions_subset_center_of_transitive hP2 A hreg.transitive
 
 /-- The central exponent-`2` subgroup: the identity together with all central

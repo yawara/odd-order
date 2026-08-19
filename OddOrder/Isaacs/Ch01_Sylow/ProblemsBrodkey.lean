@@ -53,7 +53,7 @@ theorem exists_sylow_pair_inf_center_eq_bot (h : opCore p G = ⊥) :
       ((S : Subgroup G) ⊓ centralizer ((S : Subgroup G) : Set G)) ⊓
         ((T : Subgroup G) ⊓ centralizer ((T : Subgroup G) : Set G)) = ⊥ := by
   classical
-  haveI := Fintype.ofFinite (Sylow p G)
+  have := Fintype.ofFinite (Sylow p G)
   obtain ⟨ST, -, hminST⟩ :=
     (Finset.univ : Finset (Sylow p G × Sylow p G)).exists_min_image
       (fun ST => Nat.card ((ST.1 : Subgroup G) ⊓ (ST.2 : Subgroup G) : Subgroup G))
@@ -172,7 +172,7 @@ theorem exists_faithful_orbit_of_faithful_conj {N : Subgroup G} [hN : N.Normal] 
     ∃ x ∈ N, ∀ u ∈ (P : Subgroup G),
       (∀ g ∈ (P : Subgroup G), u * (g * x * g⁻¹) * u⁻¹ = g * x * g⁻¹) → u = 1 := by
   classical
-  haveI : Fintype ↥N := Fintype.ofFinite _
+  have : Fintype ↥N := Fintype.ofFinite _
   -- `O_p(G) = 1`
   have hOp : opCore p G = ⊥ := by
     refine le_bot_iff.mp fun z hz => ?_

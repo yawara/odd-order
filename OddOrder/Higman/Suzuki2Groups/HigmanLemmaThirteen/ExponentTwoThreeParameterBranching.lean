@@ -182,25 +182,25 @@ theorem coherent_threePairCoordinates_parameterBranching
   let hZTEA : IsElementaryAbelian 2 (frattini ↥(Z ⊔ T)) :=
     IsElementaryAbelian.of_mulEquiv
       (pairwiseJoinFrattiniEquivAmbientFrattini hMapZT).symm hPhiEA
-  letI : IsMulCommutative (frattini P) :=
+  let : IsMulCommutative (frattini P) :=
     IsMulCommutative.of_comm hPhiEA.comm
-  letI : CommGroup (frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini P)) :=
+  let : CommGroup (frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini P)) :=
     hPhiEA.zmodModule
-  letI : IsMulCommutative (frattini ↥(X ⊔ Z)) :=
+  let : IsMulCommutative (frattini ↥(X ⊔ Z)) :=
     IsMulCommutative.of_comm hXZEA.comm
-  letI : CommGroup (frattini ↥(X ⊔ Z)) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini ↥(X ⊔ Z))) :=
+  let : CommGroup (frattini ↥(X ⊔ Z)) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini ↥(X ⊔ Z))) :=
     hXZEA.zmodModule
-  letI : IsMulCommutative (frattini ↥(X ⊔ T)) :=
+  let : IsMulCommutative (frattini ↥(X ⊔ T)) :=
     IsMulCommutative.of_comm hXTEA.comm
-  letI : CommGroup (frattini ↥(X ⊔ T)) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini ↥(X ⊔ T))) :=
+  let : CommGroup (frattini ↥(X ⊔ T)) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini ↥(X ⊔ T))) :=
     hXTEA.zmodModule
-  letI : IsMulCommutative (frattini ↥(Z ⊔ T)) :=
+  let : IsMulCommutative (frattini ↥(Z ⊔ T)) :=
     IsMulCommutative.of_comm hZTEA.comm
-  letI : CommGroup (frattini ↥(Z ⊔ T)) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini ↥(Z ⊔ T))) :=
+  let : CommGroup (frattini ↥(Z ⊔ T)) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini ↥(Z ⊔ T))) :=
     hZTEA.zmodModule
   intro xz xt zt hthetaX hthetaZ hthetaT hcoincidence
   rcases

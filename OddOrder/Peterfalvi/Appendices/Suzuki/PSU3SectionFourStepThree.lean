@@ -71,7 +71,7 @@ theorem corollaryTwo_intrinsicResidualQuotient (hXV : X ≤ hyp.V) (hX : X ≠ �
           ∃ ω ∈ (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q,
             ω ∉ (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q0 ∧
               f₂ ω = ζ⁻¹ * ω⁻¹ * ζ ∧ k₂ ω = ζ ^ 3 := by
-  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+  let := MulAction.compHom (ULift.{v} (Unital data.n))
     details.residualQuotientEquiv.toMonoidHom
   intro ζ hζW hζ1
   obtain ⟨ψ, hH, hQ, hD, ht⟩ :=
@@ -134,7 +134,7 @@ theorem exists_f_eq_conj_inv_residual {f g h : G → G}
         f (x : G) = (z : G)⁻¹ * (x : G)⁻¹ * (z : G) ∧
         ∃ c ∈ Subgroup.center ↥(residualImage (G := G) X),
           h (x : G) = ((z ^ 3 * c : ↥(residualImage (G := G) X)) : G) := by
-  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+  let := MulAction.compHom (ULift.{v} (Unital data.n))
     details.residualQuotientEquiv.toMonoidHom
   intro ζ hζW hζ1
   obtain ⟨f₂, g₂, k₂, H₂, ω, hωQ, hωQ0, hfω, hkω⟩ :=

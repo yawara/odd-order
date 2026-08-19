@@ -581,7 +581,7 @@ theorem adjoint_formula
     ClassFunction.inner (τ α) χ =
       ClassFunction.inner (α : ClassFunction L ℂ) ψ := by
   classical
-  letI : Fintype {a : G // a ∈ A} := Fintype.ofFinite _
+  let : Fintype {a : G // a ∈ A} := Fintype.ofFinite _
   set aα : {a : G // a ∈ A} → ℂ :=
     fun a => (α : ClassFunction L ℂ) ⟨a.1, hyp.subset_L a.2⟩ with haα
   set F : G → ℂ := fun g => (τ α) g * star (χ g) with hF
@@ -866,7 +866,7 @@ theorem Hypothesis.dadeMap_eq_neg_sum_mobiusTermCF
             simp only [neg_inj]
             refine Finset.sum_congr rfl fun C _ => ?_
             by_cases hC : (hyp.transversalRep C).Nonempty
-            · letI : Invertible (Nat.card (mBSubgroup hyp (hyp.transversalRep C) hC) : ℂ) :=
+            · let : Invertible (Nat.card (mBSubgroup hyp (hyp.transversalRep C) hC) : ℂ) :=
                 invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
               rw [hyp.mobiusTermCF_of_nonempty _ g hC,
                 hyp.mobiusTermCF_of_nonempty _ (x * g * x⁻¹) hC]
@@ -878,8 +878,8 @@ theorem Hypothesis.dadeMap_eq_neg_sum_mobiusTermCF
                 hyp.mobiusTermCF_of_not_nonempty _ (x * g * x⁻¹) hC]⟩
           : ClassFunction G ℂ) := by
   classical
-  letI := hyp.conjFinsetAction
-  letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+  let := hyp.conjFinsetAction
+  let : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
   refine ClassFunction.ext fun g => ?_
   change hyp.dadeValue (α : SupportedClassFunctions (G := G) ℂ A L) g
     = -∑ C : hyp.conjClassQuotient,
@@ -896,7 +896,7 @@ theorem Hypothesis.dadeMap_eq_neg_sum_mobiusTermCF
       neg_zero]
     refine Finset.sum_eq_zero fun C _ => ?_
     by_cases hC : (hyp.transversalRep C).Nonempty
-    · letI : Invertible (Nat.card (mBSubgroup hyp (hyp.transversalRep C) hC) : ℂ) :=
+    · let : Invertible (Nat.card (mBSubgroup hyp (hyp.transversalRep C) hC) : ℂ) :=
         invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
       rw [hyp.mobiusTermCF_of_nonempty _ g hC, hyp.induceAlphaBTerm_apply _ hC,
         hyp.induce_alphaB_apply_eq_zero_of_not_mem_dadeSupport hC α hg, mul_zero]
@@ -905,6 +905,7 @@ theorem Hypothesis.dadeMap_eq_neg_sum_mobiusTermCF
 open scoped Classical in
 omit [Fintype ↥L] in
 omit [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
+set_option backward.isDefEq.respectTransparency false in
 /-- The transversal sum of `mobiusTermCF` reindexes over the `Finset` of nonempty subsets that are
 their own conjugacy-class representative (`transversalRep (mk'' B) = B`), with the summand the
 packaged induced character:
@@ -928,9 +929,9 @@ theorem Hypothesis.sum_mobiusTermCF_transversalRep_eq_sum_subtype
           (fun p => hyp.transversalRep (Quotient.mk'' p.1) = p.1),
           ((-1 : ℂ) ^ p.1.card) * hyp.induceAlphaBTerm (α : ClassFunction L ℂ) p g := by
   classical
-  letI := hyp.conjFinsetAction
-  letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
-  letI : Fintype {B : Finset {a : G // a ∈ A} // B.Nonempty} := Fintype.ofFinite _
+  let := hyp.conjFinsetAction
+  let : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+  let : Fintype {B : Finset {a : G // a ∈ A} // B.Nonempty} := Fintype.ofFinite _
   -- restrict the left sum to nonempty-rep classes (empty reps contribute `0`).
   rw [← Finset.sum_filter_of_ne (p := fun C : hyp.conjClassQuotient =>
         (hyp.transversalRep C).Nonempty) ?_]
@@ -997,9 +998,9 @@ theorem Hypothesis.preservesVirtualCharacters_dadeMap :
     PreservesVirtualCharacters (G := G) (A := A) (L := L) (hyp.dadeMap (k := ℂ)) := by
   refine preservesVirtualCharacters_dadeMap_of_eq_induceAlphaBTerm_sum ?_
   intro α _
-  letI := hyp.conjFinsetAction
-  letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
-  letI : Fintype {B : Finset {a : G // a ∈ A} // B.Nonempty} := Fintype.ofFinite _
+  let := hyp.conjFinsetAction
+  let : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+  let : Fintype {B : Finset {a : G // a ∈ A} // B.Nonempty} := Fintype.ofFinite _
   refine ⟨(Finset.univ : Finset {B : Finset {a : G // a ∈ A} // B.Nonempty}).filter
       (fun p => hyp.transversalRep (Quotient.mk'' p.1) = p.1),
     fun p => -((-1 : ℤ) ^ p.1.card), ?_⟩

@@ -82,9 +82,9 @@ theorem factorPair_frobenius_parameter_eq
   let hEA : IsElementaryAbelian 2 (frattini P) :=
     frattini_isElementaryAbelian_of_xiLengthThree
       hP hncomm hmulti hxi hlen hprime
-  letI : IsMulCommutative (frattini P) :=
+  let : IsMulCommutative (frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive (frattini P)) :=
+  let : Module (ZMod 2) (Additive (frattini P)) :=
     hEA.zmodModule
   intro n c ePhi nu left right r hnTwo hnuPrimitive hconj
     hleftSource hrightSource hr0 hrhalf htheta
@@ -158,11 +158,11 @@ theorem factorPair_frobenius_parameter_eq
     rw [hzero, zero_pow (by norm_num)] at hmu2
     exact hnune hmu2.symm
   have hlampow : right.lambda ^ (2 ^ n - 1) = 1 := by
-    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    let : Fintype (GaloisField 2 n) := Fintype.ofFinite _
     have h := FiniteField.pow_card_sub_one_eq_one right.lambda hlamne
     rwa [← Nat.card_eq_fintype_card, hcard] at h
   have hmupow : left.lambda ^ (2 ^ n - 1) = 1 := by
-    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    let : Fintype (GaloisField 2 n) := Fintype.ofFinite _
     have h := FiniteField.pow_card_sub_one_eq_one left.lambda hmune
     rwa [← Nat.card_eq_fintype_card, hcard] at h
   obtain ⟨hordlam, -⟩ :=
@@ -283,13 +283,13 @@ theorem exists_sharpRestrictedFactorPairCoordinates_of_frattiniSquareSinger
   let hMap : (frattini S).map S.subtype = frattiniSquare P :=
     frattini_map_eq_frattiniSquare_of_restricted_lengthThree_exponent_four
       hP hmulti hxi hprime hPhiComm hexists hSinv hPhiS hlenS hncommS
-  letI : IsMulCommutative (frattini S) :=
+  let : IsMulCommutative (frattini S) :=
     IsMulCommutative.of_comm hEAS.comm
-  letI : Module (ZMod 2) (Additive (frattini S)) :=
+  let : Module (ZMod 2) (Additive (frattini S)) :=
     hEAS.zmodModule
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
   intro n c eSquare nu hnTwo hcgen hnuPrimitive hconj
   obtain ⟨factors, left, right, hleft, hleftTheta, hleftSource,

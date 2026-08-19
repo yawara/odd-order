@@ -91,11 +91,11 @@ theorem exists_normal_isElementaryAbelian_card_prime_sq_le_omega1UpperCentralTwo
     ∃ W : Subgroup R, W.Normal ∧ W.IsElementaryAbelian p ∧ Nat.card W = p ^ 2
       ∧ W ≤ omega1UpperCentralTwo R p := by
   have hp : p.Prime := Fact.out
-  haveI hRnil : Group.IsNilpotent R := hR.isNilpotent
+  have hRnil : Group.IsNilpotent R := hR.isNilpotent
   -- (1) Lemma 4.5(a): a normal `E_{p²}`.
   obtain ⟨W, hWn, hWea, hWcard⟩ :=
     exists_normal_isElementaryAbelian_card_prime_sq_of_not_isCyclic hR hp_odd hnc
-  haveI : W.Normal := hWn
+  have : W.Normal := hWn
   have hW_ne_bot : W ≠ ⊥ := by
     intro h
     rw [h, Subgroup.card_bot] at hWcard
@@ -108,7 +108,7 @@ theorem exists_normal_isElementaryAbelian_card_prime_sq_le_omega1UpperCentralTwo
   have hC_le_center : ⁅W, (⊤ : Subgroup R)⁆ ≤ Subgroup.center R := by
     by_cases hCbot : ⁅W, (⊤ : Subgroup R)⁆ = ⊥
     · rw [hCbot]; exact bot_le
-    · haveI hCnt : Nontrivial ↥(⁅W, (⊤ : Subgroup R)⁆) :=
+    · have hCnt : Nontrivial ↥(⁅W, (⊤ : Subgroup R)⁆) :=
         (Subgroup.nontrivial_iff_ne_bot _).mpr hCbot
       have hC_dvd : Nat.card ↥(⁅W, (⊤ : Subgroup R)⁆) ∣ p ^ 2 :=
         hWcard ▸ Subgroup.card_dvd_of_le hC_le_W
@@ -187,7 +187,7 @@ theorem omega1UpperCentralTwo_not_isCyclic_and_card_prime_sq_le_of_not_isCyclic
   refine ⟨?_, ?_, fun _ hg => pow_eq_one_of_mem_omega1UpperCentralTwo hp_odd hg⟩
   · -- noncyclic: `W ≤ Ω₁(Z₂(R))` with `W` noncyclic; a subgroup of a cyclic group is cyclic.
     intro hcyc
-    haveI := hcyc
+    have := hcyc
     have hWnc : ¬ IsCyclic ↥W :=
       IsElementaryAbelian.not_isCyclic_of_card_prime_sq hp hWea hWcard
     exact hWnc (isCyclic_of_injective (Subgroup.inclusion hW_le)
@@ -212,12 +212,12 @@ theorem exists_normal_isElementaryAbelian_card_prime_sq_le_of_normal_not_isCycli
     (hSnc : ¬ IsCyclic ↥S) :
     ∃ L : Subgroup R, L ≤ S ∧ L.Normal ∧ L.IsElementaryAbelian p ∧ Nat.card L = p ^ 2 := by
   have hp : p.Prime := Fact.out
-  haveI hSpg : IsPGroup p ↥S := hR.to_subgroup S
+  have hSpg : IsPGroup p ↥S := hR.to_subgroup S
   -- `Z = Ω₁(Z₂(↥S))`, characteristic in `↥S`, with `|Z| ≥ p²`.
   have hZcard_ge : p ^ 2 ≤ Nat.card ↥(omega1UpperCentralTwo ↥S p) :=
     card_prime_sq_le_omega1UpperCentralTwo_of_not_isCyclic hSpg hp_odd hSnc
   -- `Z' = Z.map S.subtype ⊴ R`.
-  haveI hZ'norm : ((omega1UpperCentralTwo ↥S p).map S.subtype).Normal :=
+  have hZ'norm : ((omega1UpperCentralTwo ↥S p).map S.subtype).Normal :=
     OddOrder.GroupTheory.normal_map_subtype_of_characteristic inferInstance
   -- Exponent `p` on `Z'`.
   have hZ'_exp : ∀ g ∈ (omega1UpperCentralTwo ↥S p).map S.subtype, g ^ p = 1 := by
@@ -257,7 +257,7 @@ theorem exists_normal_isElementaryAbelian_card_prime_sq_le_of_normal_not_isCycli
   -- `L` of order `p²` with exponent `p` is noncyclic, hence elementary abelian.
   have hL_nc : ¬ IsCyclic ↥L := by
     intro hcyc
-    haveI := hcyc
+    have := hcyc
     have h2 : Monoid.exponent ↥L ∣ p := Monoid.exponent_dvd_iff_forall_pow_eq_one.mpr hL_exp
     rw [IsCyclic.exponent_eq_card, hLcard] at h2
     have hp_lt_sq : p < p ^ 2 := by

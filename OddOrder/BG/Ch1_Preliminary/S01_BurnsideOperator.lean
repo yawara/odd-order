@@ -90,11 +90,11 @@ theorem frattini_le_commutator_sup_pow_closure
     frattini R ≤ commutator R ⊔ Subgroup.closure (Set.range (fun x : R => x ^ p)) := by
   let Pows : Subgroup R := Subgroup.closure (Set.range (fun x : R => x ^ p))
   let K : Subgroup R := commutator R ⊔ Pows
-  haveI hPowsChar : Pows.Characteristic := by
+  have hPowsChar : Pows.Characteristic := by
     dsimp [Pows]
     exact pow_closure_characteristic
-  haveI hPowsNorm : Pows.Normal := inferInstance
-  haveI hKNorm : K.Normal := by
+  have hPowsNorm : Pows.Normal := inferInstance
+  have hKNorm : K.Normal := by
     dsimp [K]
     infer_instance
   have hElem : OddOrder.GroupTheory.IsElementaryAbelian p (R ⧸ K) := by
@@ -134,8 +134,8 @@ theorem commutator_sup_pow_closure_eq_frattini
 **証明**: Isaacs Cor 3.29 (`OddOrder.Isaacs.Ch04.aFixed_quotient_frattini`:
 Prop 1.5(d) + Lem 1.7(a) 合成形) を `G ↦ R` で適用するだけ.
 
-⚠ 2026-07-19 以前は Cor 3.29 が `IsSolvable A ∨ IsSolvable G` を要求していたので、
-ここで `R` p-群 ⇒ `IsNilpotent R` ⇒ `IsSolvable R` を経由して `Or.inr` を渡していた。
+⚠ 2026-07-19 以前は Cor 3.29 が `Group.IsSolvable A ∨ Group.IsSolvable G` を要求していたので、
+ここで `R` p-群 ⇒ `IsNilpotent R` ⇒ `Group.IsSolvable R` を経由して `Or.inr` を渡していた。
 Cor 3.29 が**書籍どおり可解性なしに一般化された**ため、その経由は不要になった。
 
 **Isaacs 対応**: Isaacs FGT Thm 1.8 (完全一致). 本実装は Ch.4 forward §3E coprime action
@@ -197,7 +197,7 @@ theorem coprime_actsTrivially_of_normal_and_quotient
     {G : Type*} [Group G] [Finite G]
     {A : Type*} [Group A] [Finite A]
     {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G)
     {N : Subgroup G} [N.Normal]
     (hN_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ N)
     (h_triv_N : ∀ a : A, ∀ n ∈ N, (φ a) n = n)
@@ -228,7 +228,7 @@ elementwise に従う (§5 Thm 5.5 がこの形で使用)。AppA (PSTAB) の cha
 theorem coprime_stabilizes_chain_trivial
     {K : Type*} [Group K] [Finite K] {A : Type*} [Group A] [Finite A]
     (ψ : A →* MulAut K) (hcop : (Nat.card A).Coprime (Nat.card K))
-    (hsolv : IsSolvable A ∨ IsSolvable K)
+    (hsolv : Group.IsSolvable A ∨ Group.IsSolvable K)
     (s : ℕ → Subgroup K) (hanti : Antitone s) (hs0 : s 0 = ⊤) {n : ℕ} (hsn : s n = ⊥)
     (hnorm : ∀ i, (s i).Normal)
     (hinv : ∀ i, IsAInvariant ψ (s i))
@@ -238,13 +238,13 @@ theorem coprime_stabilizes_chain_trivial
   have stepdown : ∀ i, (∀ a : A, ∀ x, x ∈ s (i + 1) → (ψ a) x = x) →
       ∀ a : A, ∀ x, x ∈ s i → (ψ a) x = x := by
     intro i hIH
-    haveI hN1 : (s (i + 1)).Normal := hnorm (i + 1)
+    have hN1 : (s (i + 1)).Normal := hnorm (i + 1)
     have hcopi : (Nat.card A).Coprime (Nat.card ↥(s i)) :=
       hcop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card (s i))
-    have hsolvi : IsSolvable A ∨ IsSolvable ↥(s i) := by
+    have hsolvi : Group.IsSolvable A ∨ Group.IsSolvable ↥(s i) := by
       rcases hsolv with h | h
       · exact Or.inl h
-      · haveI := h; exact Or.inr inferInstance
+      · have := h; exact Or.inr inferInstance
     have hInvN : IsAInvariant ((hinv i).restrict) ((s (i + 1)).subgroupOf (s i)) := by
       rw [isAInvariant_iff_smul_mem]
       intro a' g hg
@@ -303,7 +303,7 @@ stabilize するものとする. このとき `A/C_A(K)` は π-群. `C_A(K) = �
 elementwise に使ってよい. -/
 theorem primeFactors_card_quotient_ker_subset_of_stabilizes_chain
     {K : Type*} [Group K] [Finite K] {A : Type*} [Group A] [Finite A]
-    {π : Set ℕ} (hK : ↑(Nat.card K).primeFactors ⊆ π) (hsolvK : IsSolvable K)
+    {π : Set ℕ} (hK : ↑(Nat.card K).primeFactors ⊆ π) (hsolvK : Group.IsSolvable K)
     (ψ : A →* MulAut K)
     (s : ℕ → Subgroup K) (hanti : Antitone s) (hs0 : s 0 = ⊤) {n : ℕ} (hsn : s n = ⊥)
     (hnorm : ∀ i, (s i).Normal)
@@ -314,7 +314,7 @@ theorem primeFactors_card_quotient_ker_subset_of_stabilizes_chain
   rw [Finset.mem_coe, Nat.mem_primeFactors] at hq
   obtain ⟨hqprime, hqdvd, -⟩ := hq
   by_contra hqπ
-  haveI : Fact q.Prime := ⟨hqprime⟩
+  have : Fact q.Prime := ⟨hqprime⟩
   -- `q ∤ |K|` (all prime factors of `|K|` lie in `π`, and `q ∉ π`).
   have hqK : ¬ q ∣ Nat.card K := fun hdvd =>
     hqπ (hK (Finset.mem_coe.mpr (Nat.mem_primeFactors.mpr ⟨hqprime, hdvd, Nat.card_pos.ne'⟩)))
@@ -394,13 +394,13 @@ theorem coprime_nilpotent_acts_trivially_of_centralizer_self
   -- `N := N_G(C)` is `A`-invariant, contains `C`.
   have hNC_inv : IsAInvariant φ (Subgroup.normalizer (C : Set G)) := hC_inv.normalizer
   have hC_le_NC : C ≤ Subgroup.normalizer (C : Set G) := Subgroup.le_normalizer
-  haveI : (C.subgroupOf (Subgroup.normalizer (C : Set G))).Normal := Subgroup.normal_in_normalizer
+  have : (C.subgroupOf (Subgroup.normalizer (C : Set G))).Normal := Subgroup.normal_in_normalizer
   -- coprimality / solvability descend to `↥N`.
   have hcardNC : Nat.card ↥(Subgroup.normalizer (C : Set G)) ∣ Nat.card G :=
     (Subgroup.normalizer (C : Set G)).card_subgroup_dvd_card
   have hCopNC : Nat.Coprime (Nat.card A) (Nat.card ↥(Subgroup.normalizer (C : Set G))) :=
     hCop.coprime_dvd_right hcardNC
-  haveI : IsSolvable G := inferInstance
+  have : Group.IsSolvable G := inferInstance
   -- engine hypotheses (acting via `restrictAction hNC_inv` on `↥N`).
   have hNinv_eng : IsAInvariant (restrictAction hNC_inv)
       (C.subgroupOf (Subgroup.normalizer (C : Set G))) := by

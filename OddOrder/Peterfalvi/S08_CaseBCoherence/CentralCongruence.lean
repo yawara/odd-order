@@ -467,7 +467,7 @@ theorem SibleyDadeHypothesis.peterfalvi_67_central (hyp : SibleyDadeHypothesis G
     {z : G} (hz : z ∈ Z.map L.subtype) (hz1 : z ≠ 1)
     (hψconst : ∀ w ∈ Z.map L.subtype, w ≠ 1 → ρ.character w = ρ.character z) :
     ρ.character z ≡ ρ.character 1 [ALGMOD (Nat.card ↥H : ℤ)] := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   classical
   obtain ⟨Q, hQeq⟩ := hyp.sylow_map_subtype_of_coprime hcop hp hHp
   have hNorm : Subgroup.normalizer ((Q : Subgroup G) : Set G) = L := by
@@ -558,7 +558,7 @@ theorem SibleyDadeHypothesis.restrict_extension_Yset_charValue_cong_caseB
     intro g
     rw [hηtε, ← Int.cast_smul_eq_zsmul ℂ ε (ξ : ClassFunction G ℂ), ClassFunction.smul_apply]
   obtain ⟨V, _, _, _, ρ, hρ, hξρ⟩ := ξ.isIrreducible
-  haveI : ρ.IsIrreducible := hρ
+  have : ρ.IsIrreducible := hρ
   have hzGmem : (L.subtype z) ∈ W2.map L.subtype :=
     Subgroup.mem_map.mpr ⟨z, hz, rfl⟩
   have hzG1 : (L.subtype z) ≠ 1 := fun h => hz1 (L.subtype_injective (by simpa using h))
@@ -612,7 +612,7 @@ theorem SibleyDadeHypothesis.card_H_dvd_card_W2_mul_regCharCoeff
   set f : ClassFunction ↥W2 ℂ :=
     ClassFunction.restrict W2 (ClassFunction.restrict L (hyp.coherentYset.extension η)) with hfdef
   -- a witness `z₀ ∈ W₂^#` (`|W₂|` prime ⇒ nontrivial).
-  haveI : Nontrivial ↥W2 := Finite.one_lt_card_iff_nontrivial.mp hprime.one_lt
+  have : Nontrivial ↥W2 := Finite.one_lt_card_iff_nontrivial.mp hprime.one_lt
   obtain ⟨z₀, hz₀1⟩ := exists_ne (1 : ↥W2)
   -- `f` is constant on `W₂^#`.
   have hfconst : ∀ a : ↥W2, a ≠ 1 → f a = f z₀ := by
@@ -726,7 +726,7 @@ theorem SibleyDadeHypothesis.inner_tau_alpha_dvd_index
           (hyp.coherentYset.extension η') = (n : ℂ)
         ∧ ((W2.subgroupOf H).index : ℤ) ∣ n := by
   classical
-  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have : Fintype ↥W2 := Fintype.ofFinite _
   have hW2H : W2 ≤ H := by
     have hle : ⁅H, H⁆ ≤ H := by
       rw [Subgroup.commutator_le]

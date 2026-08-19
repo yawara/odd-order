@@ -198,7 +198,7 @@ theorem intModEq_of_mem_adjoinSpan [Finite G] (hω : IsIntegral ℤ ω) (hp : p.
     {χ : G → K} (hχ : χ ∈ adjoinSpan ω (virtualCharacters K G)) (y : G)
     {a b : ℤ} (ha : χ y = (a : K)) (hb : χ (pRegularPart p y) = (b : K)) :
     a ≡ b [ZMOD (p : ℤ)] := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨s, hs⟩ := exists_pow_prime_pow_eq_pRegularPart hp y
   have hcongr := pow_prime_pow_congr_of_mem_adjoinSpan hm hωm hgm hω hp hs hχ
   rw [ha, hb] at hcongr

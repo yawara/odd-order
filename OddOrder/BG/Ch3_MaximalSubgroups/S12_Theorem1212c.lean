@@ -110,7 +110,7 @@ theorem card_finsetSup_eq_prod [Finite G] {H : Subgroup G} (T : Finset ℕ) (Z :
   | insert q T' hq ih =>
     have hqmem : q ∈ insert q T' := Finset.mem_insert_self q T'
     have hsubT' : ∀ {p}, p ∈ T' → p ∈ insert q T' := fun hp => Finset.mem_insert_of_mem hp
-    haveI : Fact q.Prime := ⟨hTp q hqmem⟩
+    have : Fact q.Prime := ⟨hTp q hqmem⟩
     have hcardT' : Nat.card ↥(T'.sup Z) = ∏ p ∈ T', Nat.card ↥(Z p) :=
       ih (fun p hp => hTp p (hsubT' hp)) (fun p hp => hZH p (hsubT' hp))
         (fun p hp => hZnorm p (hsubT' hp)) (fun p hp => hZpg p (hsubT' hp))
@@ -122,7 +122,7 @@ theorem card_finsetSup_eq_prod [Finite G] {H : Subgroup G} (T : Finset ℕ) (Z :
     have hcop : Nat.Coprime (Nat.card ↥(Z q)) (Nat.card ↥(T'.sup Z : Subgroup G)) := by
       rw [hm, hcardT']
       refine Nat.Coprime.pow_left _ (Nat.Coprime.prod_right fun p hp => ?_)
-      haveI : Fact p.Prime := ⟨hTp p (hsubT' hp)⟩
+      have : Fact p.Prime := ⟨hTp p (hsubT' hp)⟩
       obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp (hZpg p (hsubT' hp))
       rw [hk]
       exact Nat.Coprime.pow_right _
@@ -143,12 +143,12 @@ theorem mem_Z_of_orderOf_prime_mem [Finite G] {H : Subgroup G} (T : Finset ℕ) 
     {r : ℕ} (hr : r ∈ T) {a : G} (ha : a ∈ T.sup Z) (har : orderOf a = r) :
     a ∈ Z r := by
   classical
-  haveI : Fact r.Prime := ⟨hTp r hr⟩
+  have : Fact r.Prime := ⟨hTp r hr⟩
   have hZrle : Z r ≤ T.sup Z := Finset.le_sup hr
   have hnorm : (T.sup Z : Subgroup G) ≤ Subgroup.normalizer (Z r : Set G) :=
     (Finset.sup_le hZH).trans (hZnorm r hr)
   set K' : Subgroup ↥(T.sup Z) := (Z r).subgroupOf (T.sup Z) with hK'
-  haveI : K'.Normal := (Subgroup.normal_subgroupOf_iff_le_normalizer hZrle).mpr hnorm
+  have : K'.Normal := (Subgroup.normal_subgroupOf_iff_le_normalizer hZrle).mpr hnorm
   set a' : ↥(T.sup Z) := ⟨a, ha⟩ with ha'
   have hord_a' : orderOf a' = r := (Subgroup.orderOf_coe a').symm.trans har
   -- `[T.sup Z : Z r] = ∏_{p ∈ T.erase r} |Z p|`, coprime to `r`.
@@ -162,7 +162,7 @@ theorem mem_Z_of_orderOf_prime_mem [Finite G] {H : Subgroup G} (T : Finset ℕ) 
   have hcop : Nat.Coprime r (∏ p ∈ T.erase r, Nat.card ↥(Z p)) := by
     refine Nat.Coprime.prod_right fun p hp => ?_
     have hpT : p ∈ T := Finset.mem_of_mem_erase hp
-    haveI : Fact p.Prime := ⟨hTp p hpT⟩
+    have : Fact p.Prime := ⟨hTp p hpT⟩
     obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp (hZpg p hpT)
     rw [hk]
     exact Nat.Coprime.pow_right _
@@ -223,7 +223,7 @@ theorem frobFact_partA_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
       ∀ x ∈ S10.Msigma M, x ≠ 1 → E ⊓ Subgroup.centralizer ({x} : Set G) ≤ A₀ := by
   classical
   obtain ⟨p, hpE, hp⟩ := hτ2
-  haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hpE⟩
+  have : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hpE⟩
   obtain ⟨A, hA, hAE⟩ := exists_elemAb_rank_two_le_E_of_tau2 hG h hp
   obtain ⟨S, hAS⟩ := hA.1.isPGroup.exists_le_sylow
   have hSab : IsMulCommutative ↥(S : Subgroup G) := habel p hpE hp S
@@ -232,14 +232,14 @@ theorem frobFact_partA_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
   intro x hxMσ hxne
   -- `C_E(x) = E ⊓ C_G(x)` is a `τ₂`-subgroup of `E`; the normal Hall `τ₂`-subgroup `E₂` contains
   -- it.
-  haveI : ((E₂).subgroupOf E).Normal :=
+  have : ((E₂).subgroupOf E).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer h.E₂_le).mpr hE₂norm
   have hpi : Ch03.Subgroup.IsPiGroup (tau2 M)
       ((E ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf E) := by
     intro q hq
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe inf_le_left).toEquiv] at hq
     obtain ⟨hqp, hqd, _⟩ := Nat.mem_primeFactors.mp hq
-    haveI : Fact q.Prime := ⟨hqp⟩
+    have : Fact q.Prime := ⟨hqp⟩
     have hqE : q ∈ (Nat.card ↥E).primeFactors :=
       Nat.mem_primeFactors.mpr ⟨hqp, hqd.trans (Subgroup.card_dvd_of_le inf_le_left),
         Nat.card_pos.ne'⟩
@@ -309,7 +309,7 @@ theorem exists_tau2_product [Finite G] (hG : IsMinimalSimpleOdd G)
         Monoid.exponent ↥Z = Monoid.exponent ↥(S : Subgroup G)) ∧
       ∀ z ∈ Z, z ≠ 1 → S10.Msigma M ⊓ Subgroup.centralizer ({z} : Set G) = ⊥ := by
     intro p hp
-    haveI : Fact p.Prime := ⟨hTp p hp⟩
+    have : Fact p.Prime := ⟨hTp p hp⟩
     exact exists_regular_cyclic_of_mem_tau2 hG h (hTτ2 p hp) (habel p (hTpf p hp) (hTτ2 p hp)) hreg
   choose! Zf hZfE hZfcyc hZfne hZfpg hZfN hZfSyl hZfreg using hex
   set ZZ : Subgroup G := T.sup Zf with hZZdef
@@ -325,7 +325,7 @@ theorem exists_tau2_product [Finite G] (hG : IsMinimalSimpleOdd G)
     intro q hqp hqd
     rw [hZZcard] at hqd
     obtain ⟨p, hpT, hqdp⟩ := (Nat.Prime.prime hqp).exists_mem_finset_dvd hqd
-    haveI : Fact p.Prime := ⟨hTp p hpT⟩
+    have : Fact p.Prime := ⟨hTp p hpT⟩
     obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp (hZfpg p hpT)
     rw [hk] at hqdp
     rwa [(Nat.prime_dvd_prime_iff_eq hqp (hTp p hpT)).mp (hqp.dvd_of_dvd_pow hqdp)]
@@ -347,7 +347,7 @@ theorem exists_tau2_product [Finite G] (hG : IsMinimalSimpleOdd G)
   by_cases hrp : r.Prime
   · by_cases hrE : r ∈ (Nat.card ↥E).primeFactors
     · have hrT : r ∈ T := by rw [hTdef, Finset.mem_filter]; exact ⟨hrE, hrτ2⟩
-      haveI : Fact r.Prime := ⟨hrp⟩
+      have : Fact r.Prime := ⟨hrp⟩
       obtain ⟨S, hSE, hexpZS⟩ := hZfSyl r hrT
       have hScard : Nat.card ↥((S : Subgroup G).subgroupOf E) =
           r ^ (Nat.card ↥E).factorization r := by
@@ -403,8 +403,9 @@ theorem frobFact_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
     FrobFactConclusion M E := by
   classical
   obtain ⟨ZZ, hZZE, hZZne, hZZN, hZZpi, hZZreg, hZZexp⟩ := exists_tau2_product hG h hτ2 habel hreg
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
-  haveI : IsSolvable ↥E := solvable_of_solvable_injective (Subgroup.inclusion_injective h.E_le)
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups h.mem_maximal
+  have : Group.IsSolvable ↥E :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective h.E_le)
   -- `K` = a Hall `τ₂(M)'`-subgroup of `E`.
   obtain ⟨K', hK'hall⟩ := Ch03.hall_E_exists (G := ↥E) ((tau2 M)ᶜ)
   set K : Subgroup G := K'.map E.subtype with hKdef
@@ -427,7 +428,7 @@ theorem frobFact_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
       Nat.mul_comm]
   have hZZE₀ : ZZ ≤ E₀ := le_sup_left
   have hE₀NZZ : E₀ ≤ Subgroup.normalizer (ZZ : Set G) := hE₀E.trans hZZN
-  haveI : (ZZ.subgroupOf E₀).Normal :=
+  have : (ZZ.subgroupOf E₀).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hZZE₀).mpr hE₀NZZ
   have hE₀ne : E₀ ≠ ⊥ := fun hbot => hZZne (le_bot_iff.mp (hbot ▸ hZZE₀))
   -- **Part (b) regularity**: every nonidentity element of `E₀` is regular on `M_σ`.
@@ -468,7 +469,7 @@ theorem frobFact_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
   -- **Part (b) exponent**: `exp(E₀) = exp(E)`.
   have hexp : Monoid.exponent ↥E₀ = Monoid.exponent ↥E := by
     refine exponent_eq_of_forall_factorization_le hE₀E fun r hrp => ?_
-    haveI : Fact r.Prime := ⟨hrp⟩
+    have : Fact r.Prime := ⟨hrp⟩
     by_cases hrτ2 : r ∈ tau2 M
     · -- `τ₂`-part realized inside `ZZ`.
       obtain ⟨g, hg⟩ := hrp.exists_orderOf_eq_pow_factorization_exponent ↥ZZ
@@ -528,7 +529,7 @@ theorem frobenius_factorization_of_regular [Finite G] (hG : IsMinimalSimpleOdd G
       ∃ S : Sylow p G, ¬ IsMulCommutative ↥(S : Subgroup G)
   · -- **Case 2**: a `τ₂`-prime with a nonabelian Sylow.
     obtain ⟨p, hpE, hp, hS⟩ := hnonab
-    haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hpE⟩
+    have : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hpE⟩
     obtain ⟨A, hA, hAE⟩ := exists_elemAb_rank_two_le_E_of_tau2 hG h hp
     exact frobFact_of_nonabelianSylow hG h hp hA hAE hS hreg
   · -- No `τ₂`-prime has a nonabelian Sylow: all relevant Sylows are abelian.

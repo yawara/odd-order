@@ -66,9 +66,9 @@ theorem commutator_eq_frattini_and_frattini_le_center_of_xiLengthThree
       hP hncomm hmulti hxi hlen hprime
   have hcommNe : _root_.commutator P ≠ (⊥ : Subgroup P) :=
     fun h => hncomm ((commutator_eq_bot_iff P).mp h)
-  letI : Nontrivial (_root_.commutator P) :=
+  let : Nontrivial (_root_.commutator P) :=
     (Subgroup.nontrivial_iff_ne_bot (_root_.commutator P)).mpr hcommNe
-  letI : Nontrivial P :=
+  let : Nontrivial P :=
     (_root_.commutator P).subtype_injective.nontrivial
   have hinvComm : involutions P ⊆ _root_.commutator P :=
     involutions_subset_of_nontrivial_invariant
@@ -242,7 +242,7 @@ theorem lowerCentralLayerKernel_one_eq_bot_of_xiLengthThree
   have hEAOne : IsElementaryAbelian 2 ↑(lowerCentralTerm P 1) := by
     rw [htermOne]
     exact hEA
-  letI : CommGroup ↑(lowerCentralTerm P 1) :=
+  let : CommGroup ↑(lowerCentralTerm P 1) :=
     { (inferInstance : Group ↑(lowerCentralTerm P 1)) with
       mul_comm := hEAOne.comm }
   have hAgemo : Agemo ↑(lowerCentralTerm P 1) 2 1 = ⊥ := by
@@ -385,10 +385,10 @@ theorem factorLayerOneLinearEquivAmbientFrattini_equivariant
   dsimp only
   let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
     IsAInvariant.of_characteristic Y.subtype
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : CommGroup ↑(frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+  let : CommGroup ↑(frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive ↑(frattini P)) :=
     hEA.zmodModule
   intro g v
   change factorLayerOneLinearEquivAmbientFrattini
@@ -464,10 +464,10 @@ theorem exists_ambientFrattiniSingerCoordinates_of_xiLengthThree
   have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
     frattini_isElementaryAbelian_of_xiLengthThree
       hP hncomm hmulti hxi hlen hprime
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : CommGroup ↑(frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+  let : CommGroup ↑(frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive ↑(frattini P)) :=
     hEA.zmodModule
   let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
   let rho : Representation (ZMod 2) Y (Additive ↑(frattini P)) :=
@@ -538,8 +538,8 @@ theorem exists_ambientFrattiniSingerCoordinates_of_xiLengthThree
     have hnle : n ≤ 1 := by omega
     interval_cases n <;>
       norm_num only [pow_zero, pow_one] at hcard <;> omega
-  letI : IsCyclic Y := hxi.cyclic
-  letI : CommGroup Y := IsCyclic.commGroup
+  let : IsCyclic Y := hxi.cyclic
+  let : CommGroup Y := IsCyclic.commGroup
   obtain ⟨c, hcgen⟩ := IsCyclic.exists_generator (α := Y)
   obtain ⟨e, nu, b, hprim, hconj, hgen, hb⟩ :=
     exists_singerFrobeniusEigenbasis_of_transitive_generator
@@ -735,10 +735,10 @@ theorem frattini_finrank_eq_parameter [Finite P]
       hEA.zmodModule
     Module.finrank (ZMod 2) (Additive ↑(frattini P)) =
       data.left_model.parameter := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : CommGroup ↑(frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+  let : CommGroup ↑(frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive ↑(frattini P)) :=
     hEA.zmodModule
   apply Nat.pow_right_injective le_rfl
   calc

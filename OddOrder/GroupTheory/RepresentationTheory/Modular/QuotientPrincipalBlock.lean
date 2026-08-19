@@ -98,13 +98,13 @@ theorem augmentation_quotientMap (x : MonoidAlgebra k G) :
     OddOrder.Algebra.augmentation k (G ⧸ N) ((quotientMap (k := k) (G := G) (N := N)) x)
       = OddOrder.Algebra.augmentation k G x := by
   induction x using MonoidAlgebra.induction_on with
-  | hM g =>
+  | of g =>
       rw [show (MonoidAlgebra.of k G g : MonoidAlgebra k G) = single g (1 : k) from rfl,
         show (quotientMap (k := k) (G := G) (N := N)) (single g (1 : k))
           = single (QuotientGroup.mk g : G ⧸ N) (1 : k) from MonoidAlgebra.mapDomain_single,
         OddOrder.Algebra.augmentation_single, OddOrder.Algebra.augmentation_single]
-  | hadd x y hx hy => simp only [map_add, hx, hy]
-  | hsmul c x hx => simp only [map_smul, hx]
+  | add x y hx hy => simp only [map_add, hx, hy]
+  | smul c x hx => simp only [map_smul, hx]
 
 omit [Finite G] in
 /-- The restriction of `augmentation_quotientMap` to the centre. -/

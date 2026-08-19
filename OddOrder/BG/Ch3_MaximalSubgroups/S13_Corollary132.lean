@@ -66,7 +66,7 @@ theorem le_centralizer_of_forall_prime_isPGroup [Finite G] {K C : Subgroup G}
     · have hn0 : n ≠ 0 := by rw [← hyord]; exact (orderOf_pos y).ne'
       -- pick a prime `r ∣ n`.
       obtain ⟨r, hr, hrdvd⟩ := n.exists_prime_and_dvd hn1
-      haveI : Fact r.Prime := ⟨hr⟩
+      have : Fact r.Prime := ⟨hr⟩
       set ra : ℕ := ordProj[r] n with hra
       set m : ℕ := ordCompl[r] n with hmdef
       have hsplit : ra * m = n := Nat.ordProj_mul_ordCompl_eq_self n r
@@ -128,7 +128,7 @@ theorem eq_of_le_of_forall_full_prime_pow [Finite G] {H C : Subgroup G} (hCH : C
     rw [← Nat.factorization_le_iff_dvd Nat.card_pos.ne' Nat.card_pos.ne']
     intro q
     by_cases hq : q.Prime
-    · haveI : Fact q.Prime := ⟨hq⟩
+    · have : Fact q.Prime := ⟨hq⟩
       obtain ⟨S, hSC, hScard⟩ := hS q hq
       have hpow : q ^ (Nat.card ↥H).factorization q ∣ Nat.card ↥C :=
         hScard ▸ Subgroup.card_dvd_of_le hSC
@@ -148,11 +148,11 @@ Encapsulates the `MulDistribMulAction`/`φ`-action boilerplate around
 `Isaacs.Ch04.exists_aInvariant_sylow` (Isaacs Thm 3.23(a)); reusable for §13 coprime arguments. -/
 theorem exists_aInvariant_sylow_subgroup [Finite G] {A N : Subgroup G}
     (hAN : A ≤ Subgroup.normalizer (N : Set G)) (hcop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥N))
-    (hSolv : IsSolvable ↥A ∨ IsSolvable ↥N) (q : ℕ) [Fact q.Prime] :
+    (hSolv : Group.IsSolvable ↥A ∨ Group.IsSolvable ↥N) (q : ℕ) [Fact q.Prime] :
     ∃ S : Subgroup G, S ≤ N ∧ IsPGroup q ↥S ∧ A ≤ Subgroup.normalizer (S : Set G) ∧
       Nat.card ↥S = q ^ (Nat.card ↥N).factorization q := by
   classical
-  letI act : MulDistribMulAction ↥A ↥N :=
+  let act : MulDistribMulAction ↥A ↥N :=
     MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (N : Set G))) ↥N
       (Subgroup.inclusion hAN)
   set φ : ↥A →* MulAut ↥N := MulDistribMulAction.toMulAut ↥A ↥N with hφ
@@ -182,7 +182,7 @@ theorem exists_aInvariant_sylow_subgroup [Finite G] {A N : Subgroup G}
 theorem mem_primeFactors_of_isPGroup_le [Finite G] {r : ℕ} (hr : r.Prime)
     {R H : Subgroup G} (hRH : R ≤ H) (hRne : R ≠ ⊥) (hRr : IsPGroup r ↥R) :
     r ∈ (Nat.card ↥H).primeFactors := by
-  haveI : Fact r.Prime := ⟨hr⟩
+  have : Fact r.Prime := ⟨hr⟩
   obtain ⟨k, hk⟩ := hRr.exists_card_eq
   have hRcard1 : Nat.card ↥R ≠ 1 := fun hh => hRne (Subgroup.card_eq_one.mp hh)
   have hk0 : k ≠ 0 := by rintro rfl; rw [pow_zero] at hk; exact hRcard1 hk
@@ -252,14 +252,14 @@ theorem msigma_centralizer_le_of_invariant_sylow_centralized [Finite G]
           (Nat.mem_primeFactors.mp hq).2.1.trans (Subgroup.card_dvd_of_le hNMsig),
               Nat.card_pos.ne'⟩))
   have hNM : N ≤ M := hNMsig.trans (S10.Msigma_le M)
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
-  haveI hNsolv : IsSolvable ↥N :=
-    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hNM).toMonoidHom)
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups h.mem_maximal
+  have hNsolv : Group.IsSolvable ↥N :=
+    Group.isSolvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hNM).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe hNM).surjective
   -- order argument: every prime `q` admits an invariant Sylow `q` of `N` inside `N ⊓ C_G(R)`.
   have hkey : N ⊓ Subgroup.centralizer (R : Set G) = N := by
     refine eq_of_le_of_forall_full_prime_pow inf_le_left (fun q hq => ?_)
-    haveI : Fact q.Prime := ⟨hq⟩
+    have : Fact q.Prime := ⟨hq⟩
     obtain ⟨S, hSN, hSpg, hSinv, hScard⟩ :=
       exists_aInvariant_sylow_subgroup hAN hcop (Or.inr hNsolv) q
     exact ⟨S, le_inf hSN (hcore q hq S hSN hSpg hSinv), hScard⟩
@@ -275,7 +275,7 @@ theorem commutator_inf_centralizer_eq_bot_of_isCommutative [Finite G] {A R : Sub
     (hcop : Nat.Coprime (Nat.card ↥R) (Nat.card ↥A)) :
     ⁅A, R⁆ ⊓ Subgroup.centralizer (R : Set G) = ⊥ := by
   classical
-  letI : CommGroup ↥A := { (inferInstance : Group ↥A) with
+  let : CommGroup ↥A := { (inferInstance : Group ↥A) with
     mul_comm := fun a b => Subtype.ext (hAcomm a a.2 b b.2) }
   set φ : ↥R →* MulAut ↥A :=
     (Subgroup.normalizerMonoidHom A).comp (Subgroup.inclusion hRA) with hφ
@@ -375,7 +375,7 @@ theorem tau13_pSubgroup_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
       intro r hr R hRQ hRr
       rcases eq_or_ne R ⊥ with hRbot | hRbot
       · rw [hRbot]; exact bot_le
-      · haveI : Fact r.Prime := ⟨hr⟩
+      · have : Fact r.Prime := ⟨hr⟩
         have hRE : R ≤ E := hRQ.trans (hQ.trans inf_le_left)
         have hRMstar : R ≤ Mstar := hRQ.trans (hQ.trans inf_le_right)
         have hrτ1Mstar : r ∉ tau1 Mstar :=

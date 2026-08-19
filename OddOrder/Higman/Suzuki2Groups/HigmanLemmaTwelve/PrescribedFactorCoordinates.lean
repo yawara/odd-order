@@ -260,10 +260,10 @@ theorem exists_typeAQuotientCoordinates_of_prescribedKernel_noncommutative
     (Additive (lowerCentralLayer H 0))
   let n := Module.finrank (ZMod 2)
     (Additive (lowerCentralLayer H 1))
-  letI : Nontrivial (lowerCentralLayer H 0) :=
+  let : Nontrivial (lowerCentralLayer H 0) :=
     lowerCentralLayer_zero_nontrivial_of_xiLengthTwo
       hH hncomm hxi hlen
-  letI : Nontrivial (Additive (lowerCentralLayer H 0)) := inferInstance
+  let : Nontrivial (Additive (lowerCentralLayer H 0)) := inferInstance
   have hmpos : 0 < m := by
     dsimp [m]
     exact Module.finrank_pos
@@ -396,10 +396,10 @@ theorem exists_noncommutativeFactorCoordinates_of_ambientFrattiniSinger
   have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
     frattini_isElementaryAbelian_of_xiLengthThree
       hP hncomm hmulti hxi hlen hprime
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : CommGroup ↑(frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+  let : CommGroup ↑(frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive ↑(frattini P)) :=
     hEA.zmodModule
   intro n c ePhi nu hnTwo hcgen hnuPrimitive hconj
   have hSneBot : S ≠ (⊥ : Subgroup P) :=
@@ -569,12 +569,12 @@ theorem exists_commutativeFactorCoordinates_of_ambientFrattiniSinger
   have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
     frattini_isElementaryAbelian_of_xiLengthThree
       hP hncomm hmulti hxi hlen hprime
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : CommGroup ↑(frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+  let : CommGroup ↑(frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive ↑(frattini P)) :=
     hEA.zmodModule
-  letI : CommGroup S :=
+  let : CommGroup S :=
     { (inferInstance : Group S) with
       mul_comm := hcommS.is_comm.comm }
   intro n c ePhi nu hconj
@@ -594,7 +594,7 @@ theorem exists_commutativeFactorCoordinates_of_ambientFrattiniSinger
   obtain ⟨ι, hι, ⟨ε⟩⟩ :=
     exists_homocyclic_four_of_commutative_xiLengthTwo
       (hP.to_subgroup S) hxiS hlenS hmultiS
-  letI : Fintype ι := hι
+  let : Fintype ι := hι
   have hPhiNeBot : frattini P ≠ (⊥ : Subgroup P) := by
     intro hPhiBot
     have hcommBot : _root_.commutator P = ⊥ :=
@@ -900,14 +900,14 @@ theorem exists_factorCoordinates_of_ambientFrattiniSinger
   have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
     frattini_isElementaryAbelian_of_xiLengthThree
       hP hncomm hmulti hxi hlen hprime
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : CommGroup ↑(frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+  let : CommGroup ↑(frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive ↑(frattini P)) :=
     hEA.zmodModule
   intro n c ePhi nu hnTwo hcgen hnuPrimitive hconj
   by_cases hcommS : IsMulCommutative S
-  · letI : CommGroup S :=
+  · let : CommGroup S :=
       { (inferInstance : Group S) with
         mul_comm := hcommS.is_comm.comm }
     obtain ⟨ι, hι, ε, hN, hcompatKernel, hcompatQuot,
@@ -915,7 +915,7 @@ theorem exists_factorCoordinates_of_ambientFrattiniSinger
       exists_commutativeFactorCoordinates_of_ambientFrattiniSinger
         hP hncomm hmulti hxi hlen hprime
         hSinv hPhiS hStop hcommS c ePhi nu hconj
-    letI : Fintype ι := hι
+    let : Fintype ι := hι
     let eKernel : Additive (Agemo S 2 1) ≃+
         GaloisField 2 n :=
       homocyclicFourPrescribedKernelCoordinate
@@ -1035,10 +1035,10 @@ theorem exists_factorPairCoordinates_of_xiLengthThree
   have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
     frattini_isElementaryAbelian_of_xiLengthThree
       hP hncomm hmulti hxi hlen hprime
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : CommGroup ↑(frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+  let : CommGroup ↑(frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive ↑(frattini P)) :=
     hEA.zmodModule
   let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
   obtain ⟨c, ePhi, nu, _b, hnTwo, hcgen, hnuPrimitive,
@@ -1110,10 +1110,10 @@ theorem exists_complementaryFactorCoordinates_of_xiLengthThree
   have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
     frattini_isElementaryAbelian_of_xiLengthThree
       hP hncomm hmulti hxi hlen hprime
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : CommGroup ↑(frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+  let : CommGroup ↑(frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive ↑(frattini P)) :=
     hEA.zmodModule
   let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
   obtain ⟨factors⟩ :=
@@ -1189,10 +1189,10 @@ theorem exists_noncommutativePairCoordinates_of_xiLengthThree
   have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
     frattini_isElementaryAbelian_of_xiLengthThree
       hP hncomm hmulti hxi hlen hprime
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : CommGroup ↑(frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) :=
+  let : CommGroup ↑(frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive ↑(frattini P)) :=
     hEA.zmodModule
   let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
   obtain ⟨c, ePhi, nu, _b, hnTwo, hcgen, hnuPrimitive,

@@ -162,7 +162,7 @@ theorem typePA0_isTISubset_of_isTypeP1 [Finite G]
     (data : OddOrder.GroupTheory.TypePData M)
     (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M) :
     OddOrder.GroupTheory.IsTISubset (OddOrder.GroupTheory.typePA0 M data) M := by
-  letI := Fintype.ofFinite G
+  let := Fintype.ofFinite G
   let full := (OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePA0_of_isTypeP1
     hG hM data hP1).some
   apply full.dade.isTISubset_of_forall_H_eq_bot
@@ -417,7 +417,7 @@ theorem p_dvd_orderOf_of_mem_sharpP_union_typePV [Finite G]
       OddOrder.GroupTheory.conjClassSetIn hyp.base.S
         (OddOrder.GroupTheory.typePV hyp.base.S hyp.base.Sdata)) :
     hyp.base.p ∣ orderOf y := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   rcases hy with hyP | hyV
   · have hPgroup : IsPGroup hyp.base.p ↥hyp.base.P :=
       IsPGroup.of_card (hyp.base.card_P_eq hG hyp.base.Sdata_W2_eq)

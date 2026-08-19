@@ -325,7 +325,7 @@ lemma ncard_kernelSpread_eq_index_mul [Finite G]
     (F : FrobeniusFamily G k) (i : Fin k) :
     (F.kernelSpread i).ncard = (F.L i).index * (Nat.card (F.H i) - 1) := by
   classical
-  letI : Fintype (G ⧸ F.L i) := Fintype.ofFinite _
+  let : Fintype (G ⧸ F.L i) := Fintype.ofFinite _
   let S : G ⧸ F.L i → Set G := fun q =>
     ((fun x : G => (Quotient.out q : G) * x * (Quotient.out q : G)⁻¹) ''
       ((F.H i : Set G) \ {1}))
@@ -442,8 +442,8 @@ noncomputable def familyHypothesis71 [Fintype G] [Invertible (Nat.card G : ℂ)]
   invertibleL := fun i => invertibleOfNonzero (Nat.cast_ne_zero.mpr (Nat.card_pos (α := F.L i)).ne')
   hyp71 := fun i => F.hypothesis71 i
   isDadeIsometry := fun i => by
-    letI : Fintype ↥(F.L i) := Fintype.ofFinite _
-    letI : Invertible (Nat.card ↥(F.L i) : ℂ) :=
+    let : Fintype ↥(F.L i) := Fintype.ofFinite _
+    let : Invertible (Nat.card ↥(F.L i) : ℂ) :=
       invertibleOfNonzero (Nat.cast_ne_zero.mpr (Nat.card_pos (α := F.L i)).ne')
     exact OddOrder.Peterfalvi.S04.isDadeIsometry_of_isDadeMap (F.hypothesis71 i).hyp
       (F.hypothesis71 i).τ (F.hypothesis71 i).isDadeMap
@@ -477,7 +477,7 @@ lemma card_eq_card_G0_add_sum_card_kernelSpread [Finite G]
     (F : FrobeniusFamily G k) :
     Nat.card G = Nat.card F.G0 + ∑ i : Fin k, Nat.card (F.kernelSpread i) := by
   classical
-  letI := Fintype.ofFinite G
+  let := Fintype.ofFinite G
   have h_disjFin :
       ((Finset.univ : Finset (Fin k)) : Set (Fin k)).PairwiseDisjoint
         (fun i => (F.kernelSpread i).toFinset) := by
@@ -763,7 +763,7 @@ lemma e_eq_card_complement [Finite G] (F : FrobeniusFamily G k) (i : Fin k)
   have hN_card : Nat.card ((F.H i).subgroupOf (F.L i)) = Nat.card (F.H i) :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe (F.kernel_le i)).toEquiv
   have hprod : Nat.card (F.H i) * Nat.card C = Nat.card ↥(F.L i) := by
-    rw [← hN_card]; exact hC.isComplement.card_mul
+    rw [← hN_card]; exact hC.isComplement.card_mul_card
   have h := Nat.mul_div_cancel_left (Nat.card C) (Nat.card_pos (α := F.H i))
   rw [hprod] at h
   exact h
@@ -776,7 +776,7 @@ lemma h_mul_e_eq_card_L [Finite G] (F : FrobeniusFamily G k) (i : Fin k) :
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe (F.kernel_le i)).toEquiv
   have hprod : Nat.card (F.H i) * Nat.card C = Nat.card ↥(F.L i) := by
     rw [← hN_card]
-    exact hC.isComplement.card_mul
+    exact hC.isComplement.card_mul_card
   rw [F.e_eq_card_complement i hC]
   exact hprod
 
@@ -815,7 +815,7 @@ lemma odd_h [Finite G] (F : FrobeniusFamily G k)
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe (F.kernel_le i)).toEquiv
   have hprod : Nat.card (F.H i) * Nat.card C = Nat.card ↥(F.L i) := by
     rw [← hN_card]
-    exact hC.isComplement.card_mul
+    exact hC.isComplement.card_mul_card
   have hLodd : Odd (Nat.card ↥(F.L i)) :=
     hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card (F.L i))
   exact (Nat.odd_mul.mp (hprod ▸ hLodd)).1
@@ -828,7 +828,7 @@ lemma odd_e [Finite G] (F : FrobeniusFamily G k)
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe (F.kernel_le i)).toEquiv
   have hprod : Nat.card (F.H i) * Nat.card C = Nat.card ↥(F.L i) := by
     rw [← hN_card]
-    exact hC.isComplement.card_mul
+    exact hC.isComplement.card_mul_card
   have hLodd : Odd (Nat.card ↥(F.L i)) :=
     hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card (F.L i))
   have hCodd : Odd (Nat.card C) := (Nat.odd_mul.mp (hprod ▸ hLodd)).2

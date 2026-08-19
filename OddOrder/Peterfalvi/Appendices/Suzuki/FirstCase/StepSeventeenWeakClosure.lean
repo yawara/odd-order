@@ -39,11 +39,11 @@ theorem dvd_card_abelianization_of_index_eq_prime [Finite G'] {H : Subgroup G'}
     [H.Normal] {p : ℕ} (hp : p.Prime) (hidx : H.index = p) :
     p ∣ Nat.card (Abelianization G') := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI hcyc : IsCyclic (G' ⧸ H) :=
+  have : Fact p.Prime := ⟨hp⟩
+  have hcyc : IsCyclic (G' ⧸ H) :=
     isCyclic_of_prime_card (α := G' ⧸ H) (p := p)
       (by rw [← Subgroup.index_eq_card, hidx])
-  haveI : IsMulCommutative (G' ⧸ H) := IsCyclic.isMulCommutative
+  have : IsMulCommutative (G' ⧸ H) := IsCyclic.isMulCommutative
   have hcomm : commutator G' ≤ H := by
     rw [commutator_def]
     refine Subgroup.commutator_le.mpr fun a _ b _ => ?_
@@ -279,7 +279,7 @@ theorem mem_zpowers_of_isStronglyReal_of_mem
     (hsr : IsStronglyReal y) :
     y ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
       * fc.toHypothesis.t) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   rcases eq_or_ne y 1 with rfl | hy1
   · exact Subgroup.one_mem _
@@ -330,7 +330,7 @@ theorem map_conj_eq_of_map_conj_zpowers_le
       = (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
           * fc.toHypothesis.t)
         ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
   have hstord : orderOf (fc.toHypothesis.distinguishedInvolution
@@ -394,7 +394,7 @@ theorem map_conj_zpowers_le_sup_nonsplitTorus_V
     (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
         * fc.toHypothesis.t)).map (MulAut.conj x).toMonoidHom
       ≤ fc.nonsplitTorus ⊔ fc.toHypothesis.V := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
   have hstord : orderOf (fc.toHypothesis.distinguishedInvolution
@@ -426,7 +426,7 @@ theorem map_conj_zpowers_le_sup_nonsplitTorus_V
   have hidx := fc.index_subgroupOf_sup_nonsplitTorus_V_eq_three model ind hB2 S hR₁S
   have hminFac : (Nat.card ↥(S : Subgroup G)).minFac = 3 := by
     rcases fc.card_sylow_eq model ind hB2 S with h | h <;> rw [h] <;> norm_num
-  haveI hLVnorm : ((fc.nonsplitTorus ⊔ fc.toHypothesis.V).subgroupOf
+  have hLVnorm : ((fc.nonsplitTorus ⊔ fc.toHypothesis.V).subgroupOf
       (S : Subgroup G)).Normal :=
     Subgroup.normal_of_index_eq_minFac_card (by rw [hidx, hminFac])
   have hrel : (fc.nonsplitTorus ⊔ fc.toHypothesis.V).relIndex B ∣ 3 := by
@@ -666,7 +666,7 @@ theorem normalizer_sylow_eq
     Subgroup.normalizer (((S : Subgroup G)) : Set G)
       = (S : Subgroup G)
         ⊔ Subgroup.zpowers fc.toHypothesis.distinguishedInvolution := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   have hSeq := fc.sylow_eq_centralizer_zpowers model ind hB2 S hR₁S
   have hZeq := fc.inf_centralizer_sylow_eq_zpowers model ind hB2 S hR₁S

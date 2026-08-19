@@ -69,24 +69,24 @@ theorem distinguishedNuAt_chiRhoNormSq_ge_of_reverseCoefficient_ne
       (F.familyHypothesis71).chiRhoNormSq
         (F.distinguishedNuAt hodd hnilp C hFrob i) j := by
   classical
-  letI : Fintype ↥(F.L i) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥(F.L i) : ℂ) :=
+  let : Fintype ↥(F.L i) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥(F.L i) : ℂ) :=
     invertibleOfNonzero
       (Nat.cast_ne_zero.mpr (Nat.card_pos (α := F.L i)).ne')
-  letI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
-  letI : Invertible
+  let : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
+  let : Invertible
       (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : ((F.H i).subgroupOf (F.L i)).Normal := (hFrob i).isNormal
-  letI : Fintype ↥(F.L j) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥(F.L j) : ℂ) :=
+  let : ((F.H i).subgroupOf (F.L i)).Normal := (hFrob i).isNormal
+  let : Fintype ↥(F.L j) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥(F.L j) : ℂ) :=
     invertibleOfNonzero
       (Nat.cast_ne_zero.mpr (Nat.card_pos (α := F.L j)).ne')
-  letI : Fintype ↥((F.H j).subgroupOf (F.L j)) := Fintype.ofFinite _
-  letI : Invertible
+  let : Fintype ↥((F.H j).subgroupOf (F.L j)) := Fintype.ofFinite _
+  let : Invertible
       (Nat.card ↥((F.H j).subgroupOf (F.L j)) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : ((F.H j).subgroupOf (F.L j)).Normal := (hFrob j).isNormal
+  let : ((F.H j).subgroupOf (F.L j)).Normal := (hFrob j).isNormal
   let H78i := F.hypothesis78 i hodd (hnilp i) (C i) (hFrob i)
   let H78j := F.hypothesis78 j hodd (hnilp j) (C j) (hFrob j)
   obtain ⟨eps, xi, heps, hsigned⟩ :=

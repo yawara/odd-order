@@ -89,7 +89,7 @@ theorem lowerCentralSeries_normal (S : Subgroup G) [hS : S.Normal] (n : ℕ) :
   | zero => exact hS
   | succ d hd =>
     rw [Subgroup.lowerCentralSeries_succ]
-    haveI := hd
+    have := hd
     infer_instance
 
 instance nilpotentResidual.normal (S : Subgroup G) [S.Normal] :
@@ -219,10 +219,10 @@ private theorem nilpotentResidual_top_aux (n : ℕ) :
     intro G _ _ hcard S F hS hFnormal hFnilp hSF
     rcases eq_or_ne S ⊤ with rfl | hStop
     · rfl
-    haveI := hFnormal; haveI := hFnilp
+    have := hFnormal; have := hFnilp
     -- proper normal `M ⊇ S` を取る (S ◁◁ G, S ≠ ⊤)
     obtain ⟨M, hMnormal, hSM, hMlt⟩ := hS.exists_normal_and_le_and_lt_top_of_ne hStop
-    haveI := hMnormal
+    have := hMnormal
     -- Dedekind: `M = S(F ∩ M)`
     have hM_eq : S ⊔ F ⊓ M = M := by
       rw [← inf_sup_eq_sup_inf_of_le_of_normal hSM, hSF, inf_top_eq]
@@ -236,8 +236,8 @@ private theorem nilpotentResidual_top_aux (n : ℕ) :
       rw [Subgroup.inf_subgroupOf_right]
       exact hFnormal.comap M.subtype
     have hFM_nilp : Group.IsNilpotent ((F ⊓ M).subgroupOf M) := by
-      haveI : Group.IsNilpotent ((F ⊓ M).subgroupOf F) := inferInstance
-      haveI : Group.IsNilpotent ↥(F ⊓ M) :=
+      have : Group.IsNilpotent ((F ⊓ M).subgroupOf F) := inferInstance
+      have : Group.IsNilpotent ↥(F ⊓ M) :=
         Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe inf_le_left)
       exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe inf_le_right).symm
     have hsup' : S.subgroupOf M ⊔ (F ⊓ M).subgroupOf M = ⊤ := by
@@ -251,11 +251,11 @@ private theorem nilpotentResidual_top_aux (n : ℕ) :
     -- `G/M^∞ = M̄ F̄` は nilpotent normal ふたつの積 ⇒ nilpotent ⇒ `G^∞ ≤ M^∞`
     have hle : nilpotentResidual (⊤ : Subgroup G) ≤ nilpotentResidual M := by
       set π := QuotientGroup.mk' (nilpotentResidual M) with hπ
-      haveI : (M.map π).Normal := hMnormal.map π (QuotientGroup.mk'_surjective _)
-      haveI : (F.map π).Normal := hFnormal.map π (QuotientGroup.mk'_surjective _)
-      haveI : Group.IsNilpotent (M.map π) :=
+      have : (M.map π).Normal := hMnormal.map π (QuotientGroup.mk'_surjective _)
+      have : (F.map π).Normal := hFnormal.map π (QuotientGroup.mk'_surjective _)
+      have : Group.IsNilpotent (M.map π) :=
         nilpotentResidual_le_iff_isNilpotent_map.mp le_rfl
-      haveI : Group.IsNilpotent (F.map π) := isNilpotent_map π hFnilp
+      have : Group.IsNilpotent (F.map π) := isNilpotent_map π hFnilp
       have hMF : M ⊔ F = ⊤ := top_le_iff.mp (hSF ▸ sup_le_sup_right hSM F)
       have hsupQ : M.map π ⊔ F.map π = ⊤ := by
         rw [← Subgroup.map_sup, hMF]
@@ -284,8 +284,8 @@ theorem nilpotentResidual_sup_eq_of_isSubnormal [Finite G] {S F : Subgroup G}
     (hS : S.IsSubnormal) [hFn : F.Normal] [hFnilp : Group.IsNilpotent F] :
     nilpotentResidual (S ⊔ F) = nilpotentResidual S := by
   set T := S ⊔ F with hT
-  haveI : (F.subgroupOf T).Normal := hFn.comap T.subtype
-  haveI : Group.IsNilpotent (F.subgroupOf T) :=
+  have : (F.subgroupOf T).Normal := hFn.comap T.subtype
+  have : Group.IsNilpotent (F.subgroupOf T) :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe le_sup_right).symm
   have hsup' : S.subgroupOf T ⊔ F.subgroupOf T = ⊤ := by
     rw [← Subgroup.subgroupOf_sup le_sup_left le_sup_right, Subgroup.subgroupOf_self]

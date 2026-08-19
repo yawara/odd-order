@@ -122,16 +122,16 @@ theorem prime_pow_mul_card_lowerCentralSeries_dvd [Finite P] [Fact p.Prime] (hP 
 Burnside の基底定理 `isCyclic_of_frattiniQuotient_isCyclic` で `P` が巡回). -/
 theorem isMulCommutative_of_isCyclic_quotient_commutator [Finite P] [Fact p.Prime]
     (hP : IsPGroup p P) (h : IsCyclic (P ⧸ commutator P)) : IsMulCommutative P := by
-  haveI : Group.IsNilpotent P := hP.isNilpotent
+  have : Group.IsNilpotent P := hP.isNilpotent
   have hle : commutator P ≤ frattini P := Ch01.commutator_le_frattini
-  haveI : IsCyclic (P ⧸ frattini P) := by
+  have : IsCyclic (P ⧸ frattini P) := by
     have hsurj : Function.Surjective (QuotientGroup.map (commutator P) (frattini P)
         (MonoidHom.id P) (by simpa using hle)) := by
       intro q
       obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective q
       exact ⟨(g : P ⧸ commutator P), rfl⟩
     exact isCyclic_of_surjective _ hsurj
-  haveI := Ch01.isCyclic_of_frattiniQuotient_isCyclic (P := P) inferInstance
+  have := Ch01.isCyclic_of_frattiniQuotient_isCyclic (P := P) inferInstance
   exact ⟨⟨fun a b => (IsCyclic.commGroup (α := P)).mul_comm a b⟩⟩
 
 /-- 非可換な `p`-群では `p² · |P'| ∣ |P|`, すなわち `p² ∣ |P : P'|`.
@@ -145,7 +145,7 @@ theorem prime_sq_mul_card_commutator_dvd [Finite P] [Fact p.Prime] (hP : IsPGrou
     by_contra hcon
     refine hnc (isMulCommutative_of_isCyclic_quotient_commutator hP ?_)
     interval_cases a
-    · haveI : Subsingleton (P ⧸ commutator P) :=
+    · have : Subsingleton (P ⧸ commutator P) :=
         (Nat.card_eq_one_iff_unique.mp (by simpa using ha)).1
       exact isCyclic_of_subsingleton
     · exact isCyclic_of_prime_card (p := p) (by simpa using ha)
@@ -161,7 +161,7 @@ theorem prime_pow_succ_mul_card_lowerCentralSeries_dvd [Finite P] [Fact p.Prime]
     (hP : IsPGroup p P) (hnc : ¬ IsMulCommutative P) {i : ℕ} (hi1 : 1 ≤ i)
     (hi : i ≤ Group.nilpotencyClass P) :
     p ^ (i + 1) * Nat.card (Subgroup.lowerCentralSeries (⊤ : Subgroup P) i) ∣ Nat.card P := by
-  haveI : Group.IsNilpotent P := hP.isNilpotent
+  have : Group.IsNilpotent P := hP.isNilpotent
   induction i with
   | zero => omega
   | succ i ih =>
@@ -186,7 +186,7 @@ theorem prime_pow_succ_mul_card_lowerCentralSeries_dvd [Finite P] [Fact p.Prime]
 /-- **`p`-群の類の上界**: `|G| = p ^ k` (`k ≥ 2`) なら冪零類は `≤ k - 1`. -/
 theorem nilpotencyClass_le_of_card_eq_prime_pow [Finite P] [Fact p.Prime] (hP : IsPGroup p P)
     {k : ℕ} (hk : 2 ≤ k) (hcard : Nat.card P = p ^ k) : Group.nilpotencyClass P ≤ k - 1 := by
-  haveI : Group.IsNilpotent P := hP.isNilpotent
+  have : Group.IsNilpotent P := hP.isNilpotent
   by_cases hab : IsMulCommutative P
   · have := Group.IsNilpotent.nilpotencyClass_le_one_iff.mpr hab
     omega
@@ -226,7 +226,7 @@ theorem card_lowerCentralSeries_of_isMaximalClass [Finite P] [Fact p.Prime]
     {i : ℕ} (hi1 : 1 ≤ i) (hi : i ≤ n - 1) :
     Nat.card (Subgroup.lowerCentralSeries (⊤ : Subgroup P) i) = p ^ (n - 1 - i) := by
   obtain ⟨hpg, m, hm, hclass⟩ := hP
-  haveI : Group.IsNilpotent P := hpg.isNilpotent
+  have : Group.IsNilpotent P := hpg.isNilpotent
   have hp1 : 1 < p := Nat.Prime.one_lt (Fact.out : p.Prime)
   -- `m = n`
   have hmn : m = n := by
@@ -289,7 +289,7 @@ theorem eq_lowerCentralSeries_of_isMaximalClass_of_index_eq [Finite P] [Fact p.P
   have hquot : Nat.card (P ⧸ N) = p ^ k := by rw [← Subgroup.index_eq_card]; exact hidx
   have hclassQ : Group.nilpotencyClass (P ⧸ N) ≤ k - 1 :=
     nilpotencyClass_le_of_card_eq_prime_pow (hpg.to_quotient N) hk hquot
-  haveI : Group.IsNilpotent (P ⧸ N) := (hpg.to_quotient N).isNilpotent
+  have : Group.IsNilpotent (P ⧸ N) := (hpg.to_quotient N).isNilpotent
   have hbotQ : Subgroup.lowerCentralSeries (⊤ : Subgroup (P ⧸ N)) (k - 1) = ⊥ :=
     Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mpr hclassQ
   have hle : Subgroup.lowerCentralSeries (⊤ : Subgroup P) (k - 1) ≤ N := by

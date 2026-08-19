@@ -64,7 +64,7 @@ theorem lowerCentralNext_subgroupOf_normal (H : Type uH) [Group H] (i : ℕ) :
 instance lowerCentralLayerKernel_normal (H : Type uH) [Group H] (i : ℕ) :
     (lowerCentralLayerKernel H i).Normal := by
   dsimp [lowerCentralLayerKernel]
-  letI : ((lowerCentralTerm H (i + 1)).subgroupOf
+  let : ((lowerCentralTerm H (i + 1)).subgroupOf
       (lowerCentralTerm H i)).Normal :=
     lowerCentralNext_subgroupOf_normal H i
   infer_instance
@@ -138,12 +138,12 @@ theorem lowerCentralLayerKernelInAmbient_normal
     (H : Type uH) [Group H] (i : ℕ) :
     (lowerCentralLayerKernelInAmbient H i).Normal := by
   rw [lowerCentralLayerKernelInAmbient_eq]
-  haveI : (lowerCentralTerm H i).Normal := by
+  have : (lowerCentralTerm H i).Normal := by
     dsimp [lowerCentralTerm]
     infer_instance
-  haveI : ((Agemo (↥(lowerCentralTerm H i)) 2 1).map
+  have : ((Agemo (↥(lowerCentralTerm H i)) 2 1).map
       (lowerCentralTerm H i).subtype).Normal := inferInstance
-  haveI : (lowerCentralTerm H (i + 1)).Normal := by
+  have : (lowerCentralTerm H (i + 1)).Normal := by
     dsimp [lowerCentralTerm]
     infer_instance
   infer_instance
@@ -300,9 +300,9 @@ theorem lowerCentralLayerRepresentation_apply
       lowerCentralLayerZmodModule H i
     lowerCentralLayerRepresentation phi i g (Additive.ofMul q) =
       Additive.ofMul (lowerCentralLayerAction phi i g q) := by
-  letI : IsMulCommutative (lowerCentralLayer H i) :=
+  let : IsMulCommutative (lowerCentralLayer H i) :=
     lowerCentralLayerIsMulCommutative H i
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer H i)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer H i)) :=
     lowerCentralLayerZmodModule H i
   rfl
 
@@ -316,7 +316,7 @@ theorem lowerCentralLayer_card_eq_pow_finrank
       lowerCentralLayerZmodModule H i
     Nat.card (lowerCentralLayer H i) =
       2 ^ Module.finrank (ZMod 2) (Additive (lowerCentralLayer H i)) := by
-  letI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  let : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   exact (lowerCentralLayer_isElementaryAbelian H i).card_eq_pow_finrank
 
 /-- A finite nonabelian `2`-group has a nontrivial second Higman
@@ -363,7 +363,7 @@ theorem lowerCentralLayer_one_nontrivial_of_not_isMulCommutative
         rw [hnextTop]
         exact Subgroup.mem_top xD
       exact hxnext
-  letI : Group.IsNilpotent C := hC.isNilpotent
+  let : Group.IsNilpotent C := hC.isNilpotent
   have hreverse : ∀ n, 1 ≤ n →
       lowerCentralTerm C 1 ≤ lowerCentralTerm C n := by
     intro n hn
@@ -889,9 +889,9 @@ theorem lowerCentralRawBracket_span_eq_top
       lowerCentralLayerZmodModule H 1
     Submodule.span (ZMod 2)
         (Set.range fun z : H × H => Additive.ofMul (lowerCentralRawBracket H z.1 z.2)) = ⊤ := by
-  letI : IsMulCommutative (lowerCentralLayer H 1) :=
+  let : IsMulCommutative (lowerCentralLayer H 1) :=
     lowerCentralLayerIsMulCommutative H 1
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
     lowerCentralLayerZmodModule H 1
   let S : Set H :=
     {c | ∃ x ∈ (⊤ : Subgroup H), ∃ y ∈ (⊤ : Subgroup H), ⁅x, y⁆ = c}
@@ -963,9 +963,9 @@ theorem lowerCentralPairing_span_eq_top_of_apply_mk
     Submodule.span (ZMod 2)
         (Set.range fun z : lowerCentralLayer H 0 × lowerCentralLayer H 0 =>
           b z.1 z.2) = ⊤ := by
-  letI : IsMulCommutative (lowerCentralLayer H 1) :=
+  let : IsMulCommutative (lowerCentralLayer H 1) :=
     lowerCentralLayerIsMulCommutative H 1
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
     lowerCentralLayerZmodModule H 1
   apply top_unique
   rw [← lowerCentralRawBracket_span_eq_top H]
@@ -1007,9 +1007,9 @@ theorem lowerCentralPairing_equivariant_of_apply_mk
     lowerCentralLayerRepresentation phi 1 g (b u v) =
       b (lowerCentralLayerAction phi 0 g u)
         (lowerCentralLayerAction phi 0 g v) := by
-  letI : IsMulCommutative (lowerCentralLayer H 1) :=
+  let : IsMulCommutative (lowerCentralLayer H 1) :=
     lowerCentralLayerIsMulCommutative H 1
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
     lowerCentralLayerZmodModule H 1
   obtain ⟨x, rfl⟩ :=
     QuotientGroup.mk'_surjective (lowerCentralLayerKernel H 0) u

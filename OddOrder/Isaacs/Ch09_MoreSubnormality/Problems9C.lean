@@ -84,7 +84,7 @@ theorem centerPCore_commute {p : ℕ} {z u : G} (hz : z ∈ centerPCore p G)
 /-- `O_p(G) ≠ 1` なら `Z(O_p(G)) ≠ 1` (非自明な `p`-群の中心は非自明)。 -/
 theorem centerPCore_ne_bot [Finite G] {p : ℕ} [Fact p.Prime]
     (hP : Ch03.oPiCore ({p} : Set ℕ) G ≠ ⊥) : centerPCore p G ≠ ⊥ := by
-  haveI : Nontrivial ↥(Ch03.oPiCore ({p} : Set ℕ) G) :=
+  have : Nontrivial ↥(Ch03.oPiCore ({p} : Set ℕ) G) :=
     (Subgroup.nontrivial_iff_ne_bot _).mpr hP
   have hcenter : Subgroup.center ↥(Ch03.oPiCore ({p} : Set ℕ) G) ≠ ⊥ :=
     (Subgroup.nontrivial_iff_ne_bot _).mp isPGroup_oPiCore.center_nontrivial
@@ -152,7 +152,7 @@ theorem relCore_thompsonWielandtCore_eq_bot_or_of_isSubnormal [Finite G] {H K : 
       ((Subgroup.normal_subgroupOf_iff_le_normalizer hKV).mpr hVn)
   -- Thm 9.24: ある `p` で `U` か `V` が `p`-群 ⟹ `O_p(G) > 1`
   obtain ⟨p, hp, hpg⟩ := thompsonWielandt H K hHK hyp
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hPbot : Ch03.oPiCore ({p} : Set ℕ) G ≠ ⊥ := by
     rcases hpg with hg | hg
     · exact fun h => hU (le_bot_iff.mp (h ▸ le_oPiCore_of_isSubnormal hUsn
@@ -218,7 +218,7 @@ theorem pResidualOf_top_eq_sup_of_normal [Finite G] {p : ℕ} [Fact p.Prime] {A 
     pResidualOf p (⊤ : Subgroup G) = pResidualOf p A ⊔ pResidualOf p B := by
   refine le_antisymm ?_ (sup_le (pResidualOf_mono le_top) (pResidualOf_mono le_top))
   set N := pResidualOf p A ⊔ pResidualOf p B with hNdef
-  haveI : N.Normal := Subgroup.sup_normal _ _
+  have : N.Normal := Subgroup.sup_normal _ _
   rw [pResidualOf_top]
   refine pResidual_le_of_isPGroup_quotient ?_
   -- `A`, `B` の像は正規 `p`-群
@@ -226,9 +226,9 @@ theorem pResidualOf_top_eq_sup_of_normal [Finite G] {p : ℕ} [Fact p.Prime] {A 
     isPGroup_map_of_pResidualOf_le le_sup_left
   have hB : IsPGroup p ↥(B.map (QuotientGroup.mk' N)) :=
     isPGroup_map_of_pResidualOf_le le_sup_right
-  haveI : (A.map (QuotientGroup.mk' N)).Normal :=
+  have : (A.map (QuotientGroup.mk' N)).Normal :=
     Subgroup.Normal.map inferInstance _ (QuotientGroup.mk'_surjective N)
-  haveI : (B.map (QuotientGroup.mk' N)).Normal :=
+  have : (B.map (QuotientGroup.mk' N)).Normal :=
     Subgroup.Normal.map inferInstance _ (QuotientGroup.mk'_surjective N)
   -- 両方 `O_p(G/N)` に入り, 生成するので `O_p(G/N) = ⊤`
   have htop : (⊤ : Subgroup (G ⧸ N)) ≤ Ch03.oPiCore ({p} : Set ℕ) (G ⧸ N) := by
@@ -258,8 +258,8 @@ private theorem pResidualOf_sup_aux.{u} (p : ℕ) [Fact p.Prime] (n : ℕ) :
     · exact le_sup_of_le_left (pResidualOf_mono le_top)
     rcases hB.lt_normal with rfl | ⟨B₁, hB₁norm, hBB₁, hB₁lt⟩
     · exact le_sup_of_le_right (pResidualOf_mono le_top)
-    haveI := hA₁norm
-    haveI := hB₁norm
+    have := hA₁norm
+    have := hB₁norm
     have hA₁B₁ : A₁ ⊔ B₁ = ⊤ := by
       refine top_le_iff.mp ?_
       rw [← hjoin]
@@ -320,11 +320,11 @@ private theorem pResidualOf_top_eq_mul_normal_aux.{u} (p : ℕ) [Fact p.Prime] (
     exact absurd (Nat.le_zero.mp hcard) Nat.card_pos.ne'
   | succ n IH =>
     intro G _ _ hcard A B hAnorm hB hprod
-    haveI := hAnorm
+    have := hAnorm
     rcases hB.lt_normal with rfl | ⟨B₁, hB₁norm, hBB₁, hB₁lt⟩
     · -- `B = ⊤`: 右吸収
       exact (GroupTheory.coe_mul_coe_eq_right (pResidualOf_mono le_top)).symm
-    haveI := hB₁norm
+    have := hB₁norm
     -- pair `(A, B₁)` は両方正規: join = 積
     have hAB₁ : A ⊔ B₁ = ⊤ := by
       rw [eq_top_iff, ← GroupTheory.sup_eq_top_of_mul_eq_univ hprod]
@@ -380,7 +380,7 @@ private theorem pResidualOf_top_eq_mul_aux.{u} (p : ℕ) [Fact p.Prime] (n : ℕ
     rcases hA.lt_normal with rfl | ⟨A₁, hA₁norm, hAA₁, hA₁lt⟩
     · -- `A = ⊤`: 左吸収
       exact (GroupTheory.coe_mul_coe_eq_left (pResidualOf_mono le_top)).symm
-    haveI := hA₁norm
+    have := hA₁norm
     -- 第 1 段を pair `(A₁, B)` に適用
     have hprodA₁ : (A₁ : Set G) * (B : Set G) = Set.univ := by
       refine Set.eq_univ_of_forall fun g => ?_
@@ -448,9 +448,9 @@ theorem pResidual_eq_top_of_not_dvd_card_abelianization {Q : Type*} [Group Q] [F
     by_contra hall
     push Not at hall
     exact hne ((Subgroup.eq_top_iff' _).mpr hall)
-  haveI hRnt : Nontrivial (Q ⧸ pResidual p Q) :=
+  have hRnt : Nontrivial (Q ⧸ pResidual p Q) :=
     ⟨⟨QuotientGroup.mk q₀, 1, fun heq => hq₀ ((QuotientGroup.eq_one_iff q₀).mp heq)⟩⟩
-  haveI : Group.IsNilpotent (Q ⧸ pResidual p Q) := IsPGroup.isNilpotent hRp
+  have : Group.IsNilpotent (Q ⧸ pResidual p Q) := IsPGroup.isNilpotent hRp
   have hcomm_ne : commutator (Q ⧸ pResidual p Q) ≠ ⊤ :=
     commutator_ne_top_of_isNilpotent _
   -- `R` の abelianization は非自明な `p`-群なので位数は `p` で割れる
@@ -588,10 +588,10 @@ private theorem mul_eq_univ_coprime_aux.{u} (n : ℕ) :
     swap
     · -- `Subsingleton G`: 全元が `1 = 1 * 1`
       rw [not_nontrivial_iff_subsingleton] at hnt
-      haveI := hnt
+      have := hnt
       refine Set.eq_univ_of_forall fun g => ?_
       exact ⟨1, A.one_mem, 1, B.one_mem, Subsingleton.elim _ _⟩
-    haveI := hnt
+    have := hnt
     have htop_ne_bot : (⊤ : Subgroup G) ≠ ⊥ := by
       intro h
       obtain ⟨x, y, hxy⟩ := hnt
@@ -602,7 +602,7 @@ private theorem mul_eq_univ_coprime_aux.{u} (n : ℕ) :
       rw [hx, hy]
     obtain ⟨N, hN, _⟩ :=
       Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) htop_ne_bot
-    haveI hNnorm : N.Normal := hN.1
+    have hNnorm : N.Normal := hN.1
     -- (a): `G/N` で帰納法 ⟹ 分解 `G = A·N·B`
     have hAbar : (A.map (QuotientGroup.mk' N)).IsSubnormal :=
       hA.map (QuotientGroup.mk'_surjective N)
@@ -620,7 +620,7 @@ private theorem mul_eq_univ_coprime_aux.{u} (n : ℕ) :
       have h_ne_one : Nat.card ↥N ≠ 1 := by
         intro h1
         apply hN.2.1
-        haveI : Subsingleton ↥N := (Nat.card_eq_one_iff_unique.mp h1).1
+        have : Subsingleton ↥N := (Nat.card_eq_one_iff_unique.mp h1).1
         refine (Subgroup.eq_bot_iff_forall N).mpr fun x hx => ?_
         exact congrArg Subtype.val (Subsingleton.elim (⟨x, hx⟩ : ↥N) 1)
       have h_pos : 0 < Nat.card ↥N := Nat.card_pos
@@ -747,7 +747,7 @@ private theorem mul_eq_univ_coprime_aux.{u} (n : ℕ) :
             _ = m * x⁻¹ := by group
       obtain ⟨p, hp, hcardN⟩ :=
         Ch02.exists_prime_card_of_isMinimalNormal_of_le_center hN hNcent
-      haveI : Fact p.Prime := ⟨hp⟩
+      have : Fact p.Prime := ⟨hp⟩
       have hNpg : IsPGroup p ↥N := IsPGroup.of_card (by rw [hcardN, pow_one])
       by_cases hpB : p ∣ Nat.card (Abelianization ↥B)
       · -- 互いに素性から `p ∤ |A:A'|`: 役割交換で endgame

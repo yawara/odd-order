@@ -33,9 +33,9 @@ section /- Problem 8C.6 (p. 257) -/
 位数 2 は素数なので単純。 -/
 theorem isSimpleGroup_mulAut_of_card_eq_three {A : Type*} [Group A] [Finite A]
     (hA : Nat.card A = 3) : IsSimpleGroup (MulAut A) := by
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
-  haveI : IsCyclic A := isCyclic_of_prime_card hA
-  haveI : Fact (Nat.Prime 2) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : IsCyclic A := isCyclic_of_prime_card hA
+  have : Fact (Nat.Prime 2) := ⟨by norm_num⟩
   refine isSimpleGroup_of_prime_card (p := 2) ?_
   rw [IsCyclic.card_mulAut, hA, Nat.totient_prime (by norm_num)]
 

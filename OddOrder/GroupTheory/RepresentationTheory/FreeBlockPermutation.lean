@@ -75,6 +75,7 @@ private theorem proj_of_mem_ne (hW : DirectSum.IsInternal W) {i j : ι} (hij : i
     (hx : x ∈ W i) : proj hW j x = 0 := by
   rw [proj_apply, hW.ofBijective_coeLinearMap_of_mem_ne hij hx, ZeroMemClass.coe_zero]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Reconstruction of a vector from its block components. -/
 private theorem sum_proj (hW : DirectSum.IsInternal W) (v : V) : ∑ i, proj hW i v = v := by
   classical
@@ -103,7 +104,7 @@ private theorem proj_smul_of_mem_invariants [Finite ι] (hW : DirectSum.IsIntern
     {v : V} (hv : v ∈ Representation.invariants (ρ.comp H.subtype)) (h : ↥H) (i : ι) :
     proj hW (h • i) v = ρ (h : G) (proj hW i v) := by
   classical
-  haveI : Fintype ι := Fintype.ofFinite ι
+  have : Fintype ι := Fintype.ofFinite ι
   -- `ρ h v = v`, and applying `ρ h` to the decomposition reshuffles the blocks.
   have hvfix : ρ (h : G) v = v := (mem_invariants_iff ρ H v).1 hv h
   -- The reshuffled decomposition: `v = ∑ j, ρ h (proj hW j v)`, with the `j`-term in block `h•j`.
@@ -228,8 +229,8 @@ private theorem finrank_invariants_eq_sum_orbit [FiniteDimensional F V] [Finite 
     finrank F (Representation.invariants (ρ.comp H.subtype))
       = ∑ o : MulAction.orbitRel.Quotient ↥H ι, finrank F (W (o.out : ι)) := by
   classical
-  haveI : Fintype ι := Fintype.ofFinite ι
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ι := Fintype.ofFinite ι
+  have : Fintype ↥H := Fintype.ofFinite _
   -- The map `v ↦ (proj o.out v)_o` is a linear iso `Vᴴ ≃ ∏_o W o.out`.
   let β : Representation.invariants (ρ.comp H.subtype) →ₗ[F]
       (∀ o : MulAction.orbitRel.Quotient ↥H ι, ↥(W (o.out : ι))) :=
@@ -303,8 +304,8 @@ theorem finrank_invariants_eq_of_isPretransitive_freeBlock
     [MulAction.IsPretransitive ↥H ι] (i₀ : ι) :
     finrank F (Representation.invariants (ρ.comp H.subtype)) = finrank F (W i₀) := by
   classical
-  haveI : Fintype ι := Fintype.ofFinite ι
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ι := Fintype.ofFinite ι
+  have : Fintype ↥H := Fintype.ofFinite _
   -- The orbit map `h ↦ h • i₀` is a bijection `↥H ≃ ι` (free + transitive).
   have hinj : Function.Injective (fun h : ↥H => h • i₀) := by
     intro h₁ h₂ he
@@ -378,9 +379,9 @@ theorem finrank_eq_card_mul_finrank_invariants_of_freeBlock
     (hperm : ∀ (h : ↥H) (i : ι), (W i).map (ρ (h : G)) = W (h • i)) :
     finrank F V = Nat.card ↥H * finrank F (Representation.invariants (ρ.comp H.subtype)) := by
   classical
-  haveI : Fintype ι := Fintype.ofFinite ι
-  haveI : Fintype ↥H := Fintype.ofFinite _
-  haveI : Fintype (MulAction.orbitRel.Quotient ↥H ι) := Fintype.ofFinite _
+  have : Fintype ι := Fintype.ofFinite ι
+  have : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype (MulAction.orbitRel.Quotient ↥H ι) := Fintype.ofFinite _
   -- `finrank V = ∑ i, finrank (W i)` from the internal direct sum.
   have hVsum : finrank F V = ∑ i, finrank F (W i) := by
     rw [← (LinearEquiv.ofBijective (DirectSum.coeLinearMap W) hW).finrank_eq,

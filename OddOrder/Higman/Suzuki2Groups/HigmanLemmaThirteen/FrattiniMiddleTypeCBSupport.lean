@@ -181,7 +181,7 @@ theorem frattiniMiddleCommutatorBilinearBaseChange_typeCB_support_of_ne_zero
         (j.val : ZMod n) = (i.val : ZMod n) + (r : ZMod n) + 2 ∧
           (k.val : ZMod n) = (i.val : ZMod n) + 2 := by
   classical
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   intro i j u v hu hv hne
@@ -215,7 +215,7 @@ theorem frattiniMiddleCommutatorBilinearBaseChange_typeCB_support_of_ne_zero
   have hcard : Nat.card (GaloisField 2 n) = 2 ^ n := by
     simpa [Nat.card_eq_fintype_card] using GaloisField.card 2 n hn0
   have hlambdaPow : lambda ^ (2 ^ n - 1) = 1 := by
-    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    let : Fintype (GaloisField 2 n) := Fintype.ofFinite _
     have h := FiniteField.pow_card_sub_one_eq_one lambda hlambdaNe
     rwa [← Nat.card_eq_fintype_card, hcard] at h
   obtain ⟨hordLambda, -⟩ :=
@@ -228,7 +228,7 @@ theorem frattiniMiddleCommutatorBilinearBaseChange_typeCB_support_of_ne_zero
     rw [hzero, zero_pow (by norm_num)] at hmiddleSquare
     exact hnuNe hmiddleSquare.symm
   have hmiddlePow : middleWeight ^ (2 ^ n - 1) = 1 := by
-    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    let : Fintype (GaloisField 2 n) := Fintype.ofFinite _
     have h := FiniteField.pow_card_sub_one_eq_one middleWeight hmiddleNe
     rwa [← Nat.card_eq_fintype_card, hcard] at h
   obtain ⟨k, hweight⟩ :=

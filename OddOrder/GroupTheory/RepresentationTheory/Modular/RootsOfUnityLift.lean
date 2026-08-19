@@ -82,7 +82,7 @@ theorem eq_of_pow_eq_one_of_sub_mem {n : ℕ} (hn : IsUnit ((n : ℕ) : 𝒪)) {
     (ha : a ^ n = 1) (hb : b ^ n = 1) (hab : a - b ∈ maximalIdeal 𝒪) : a = b := by
   rcases Nat.eq_zero_or_pos n with rfl | hn0
   · rw [Nat.cast_zero] at hn
-    haveI := subsingleton_of_zero_eq_one (isUnit_zero_iff.mp hn)
+    have := subsingleton_of_zero_eq_one (isUnit_zero_iff.mp hn)
     exact Subsingleton.elim a b
   have hbu : IsUnit b := isUnit_of_pow_eq_one hb hn0.ne'
   obtain ⟨k, hk⟩ := (X ^ n - 1 : 𝒪[X]).binomExpansion b (a - b)

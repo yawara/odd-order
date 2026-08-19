@@ -89,9 +89,9 @@ theorem exists_mixedTermBilinear_ne_zero
       IsMulCommutative.of_comm hEA.comm
     letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
     ∃ α β : GaloisField 2 n, mixedTermBilinear left right α β ≠ 0 := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   obtain ⟨x, y, hxL, hyR, hne⟩ :=
     factors.exists_mixed_lowerCentralCommutatorBilinear_ne_zero
       hxi hinvPhi hEA hK1amb
@@ -126,9 +126,9 @@ theorem mixedTermBilinear_swap
       IsMulCommutative.of_comm hEA.comm
     letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
     mixedTermBilinear right left β α = mixedTermBilinear left right α β := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   rw [mixedTermBilinear_apply, mixedTermBilinear_apply]
   exact congrArg _
     (lowerCentralCommutatorBilinear_comm P (left.incl α) (right.incl β))
@@ -177,9 +177,9 @@ theorem exists_typeBData_phi_eq_one_of_mixedTerm_theta_one
     (n_pos : 0 < n)
     (hcard : Nat.card (GaloisField 2 n) = 2 ^ n) :
     ∃ data : TypeBData.{uP, 0} P, data.phi = 1 := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   have hNpos : 0 < 2 ^ n - 1 := by
     have : 2 ^ 1 ≤ 2 ^ n := Nat.pow_le_pow_right (by norm_num) n_pos
     omega
@@ -197,7 +197,7 @@ theorem exists_typeBData_phi_eq_one_of_mixedTerm_theta_one
   have hlampow : lam ^ (2 ^ n - 1) = 1 := by
     have hfin : Finite (GaloisField 2 n) :=
       Nat.finite_of_card_ne_zero (by rw [hcard]; positivity)
-    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    let : Fintype (GaloisField 2 n) := Fintype.ofFinite _
     have h := FiniteField.pow_card_sub_one_eq_one lam hlamne
     rwa [← Nat.card_eq_fintype_card, hcard] at h
   obtain ⟨hordlam, -⟩ :=
@@ -332,9 +332,9 @@ theorem isTypeB_of_mixedTerm_theta_eq
     (n_pos : 0 < n)
     (hcard : Nat.card (GaloisField 2 n) = 2 ^ n) :
     IsTypeB.{uP, 0} P := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   have hNpos : 0 < 2 ^ n - 1 := by
     have : 2 ^ 1 ≤ 2 ^ n := Nat.pow_le_pow_right (by norm_num) n_pos
     omega
@@ -352,7 +352,7 @@ theorem isTypeB_of_mixedTerm_theta_eq
   have hlampow : lam ^ (2 ^ n - 1) = 1 := by
     have hfin : Finite (GaloisField 2 n) :=
       Nat.finite_of_card_ne_zero (by rw [hcard]; positivity)
-    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    let : Fintype (GaloisField 2 n) := Fintype.ofFinite _
     have h := FiniteField.pow_card_sub_one_eq_one lam hlamne
     rwa [← Nat.card_eq_fintype_card, hcard] at h
   obtain ⟨hordlam, -⟩ :=
@@ -451,9 +451,9 @@ theorem isTypeC_of_mixedTerm_right_theta_one
     (n_pos : 0 < n)
     (hcard : Nat.card (GaloisField 2 n) = 2 ^ n) :
     IsTypeC.{uP, 0} P := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   have hNpos : 0 < 2 ^ n - 1 := by
     have : 2 ^ 1 ≤ 2 ^ n := Nat.pow_le_pow_right (by norm_num) n_pos
     omega
@@ -475,11 +475,11 @@ theorem isTypeC_of_mixedTerm_right_theta_one
     rw [h0, zero_pow (by norm_num)] at hmunu
     exact hνne hmunu.symm
   have hlampow : lam ^ (2 ^ n - 1) = 1 := by
-    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    let : Fintype (GaloisField 2 n) := Fintype.ofFinite _
     have h := FiniteField.pow_card_sub_one_eq_one lam hlamne
     rwa [← Nat.card_eq_fintype_card, hcard] at h
   have hmupow : mu ^ (2 ^ n - 1) = 1 := by
-    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    let : Fintype (GaloisField 2 n) := Fintype.ofFinite _
     have h := FiniteField.pow_card_sub_one_eq_one mu hmune
     rwa [← Nat.card_eq_fintype_card, hcard] at h
   obtain ⟨hordlam, -⟩ :=
@@ -579,9 +579,9 @@ theorem isTypeD_of_mixedTerm_monomial
     (n_pos : 0 < n)
     (hcard : Nat.card (GaloisField 2 n) = 2 ^ n) :
     IsTypeD.{uP, 0} P := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   have hn0 : n ≠ 0 := by omega
   have horder : orderOf (frobeniusEquiv (GaloisField 2 n) 2) = n :=
     orderOf_frobeniusEquiv_eq_of_card_eq_two_pow n
@@ -673,9 +673,9 @@ theorem exists_typeBData_phi_eq_one_or_isTypeC_of_commutative_left_factor
   have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
     frattini_isElementaryAbelian_of_xiLengthThree
       hP hncomm hmulti hxi hlen hprime
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   obtain ⟨c, ePhi, nu, dataL0, dataR0, hn2, -, hnuPrim, hconj,
       hnuL0, hnuR0⟩ :=
     exists_factorPairCoordinates_of_xiLengthThree
@@ -929,8 +929,8 @@ theorem higmanLemmaTwelve
   have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
     frattini_isElementaryAbelian_of_xiLengthThree
       hP hncomm hmulti hxi hlen hprime
-  letI : IsMulCommutative ↑(frattini P) := IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : IsMulCommutative ↑(frattini P) := IsMulCommutative.of_comm hEA.comm
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   obtain ⟨factors, c, ePhi, nu, dataL0, dataR0, hn2, -, hnuPrim, hconj,
       hnuL0, hnuR0⟩ :=
     exists_complementaryFactorCoordinates_of_xiLengthThree
@@ -988,7 +988,7 @@ theorem higmanLemmaTwelve
     intro x hxne
     have hfin : Finite (GaloisField 2 n) :=
       Nat.finite_of_card_ne_zero (by rw [hcard]; positivity)
-    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    let : Fintype (GaloisField 2 n) := Fintype.ofFinite _
     have h := FiniteField.pow_card_sub_one_eq_one x hxne
     rwa [← Nat.card_eq_fintype_card, hcard] at h
   have horderF : orderOf (frobeniusEquiv (GaloisField 2 n) 2) = n :=

@@ -382,8 +382,8 @@ theorem exists_index_two_extension_orderOf_four :
       slNegOne slConjReflection slConjReflection_slNegOne slConjReflection_sq
   -- ⚠ `haveI` だと本体を忘れて `hHgrp` と defeq でない別インスタンスが立つ (instance
   -- mismatch でほぼ全ステップが失敗する) ので `letI` を使う。
-  letI : Group H := hHgrp
-  letI : N.Normal := hNnorm
+  let : Group H := hHgrp
+  let : N.Normal := hNnorm
   have hhN : h ∉ N := notMem_of_zpowers_quotientMk_eq_top hgen hcard
   have hsqcoset : ∀ x : SpecialLinearTwoThree,
       (h * (ι x : H)) ^ 2 = (ι (slConjReflection x * slNegOne * x) : H) :=

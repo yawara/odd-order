@@ -62,7 +62,7 @@ open scoped Classical in
 theorem card_subgroup_dvd_card_of_mul_mem [Finite G] (A : Finset G)
     (hA : ∀ x ∈ A, ∀ v : G, v ∈ P → x * v ∈ A) : Nat.card ↥P ∣ A.card := by
   classical
-  letI : Fintype G := Fintype.ofFinite G
+  let : Fintype G := Fintype.ofFinite G
   have hmaps : ∀ x ∈ A, (QuotientGroup.mk x : G ⧸ P)
       ∈ A.image fun x : G => (QuotientGroup.mk x : G ⧸ P) := fun x hx =>
     Finset.mem_image_of_mem _ hx

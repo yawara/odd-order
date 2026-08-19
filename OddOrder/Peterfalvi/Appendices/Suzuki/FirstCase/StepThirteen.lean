@@ -373,7 +373,7 @@ theorem exists_conj_mem_K_of_orderOf_eq
     {w : G} (hwL : w ∈ hyp.orderThreeGeneratedSubgroup) (hwq : orderOf w = q) :
     ∃ g : G, g * w * g⁻¹ ∈ hyp.K ∧ g * w * g⁻¹ ≠ 1 := by
   classical
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   set L : Subgroup G := hyp.orderThreeGeneratedSubgroup with hL_def
   set m : ℕ := Nat.card ↥hyp.Q0 * (Nat.card ↥hyp.Q0 + 1) with hm_def
   have hcardL : Nat.card ↥L = q * m := by
@@ -711,7 +711,7 @@ theorem exists_card_centralizer_st_eq_three_pow
     ∃ n : ℕ, Nat.card ↥(Subgroup.centralizer
         ({fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t}
           : Set G)) = 3 ^ n := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   -- step (12): case (10.2) holds
   obtain ⟨-, hp3, -, -, hW, -⟩ := fc.step_twelve model ind hB2

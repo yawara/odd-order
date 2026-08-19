@@ -100,9 +100,10 @@ theorem quotientCenter_fixedFree_of_centralizer_le_center
   have hCopN : Nat.Coprime (Nat.card (Subgroup.zpowers (φ₀ ^ k.val)))
       (Nat.card (Subgroup.center P)) :=
     (hcop.coprime_dvd_left hAcard).coprime_dvd_right (Subgroup.card_subgroup_dvd_card _)
-  have hSolv : IsSolvable ↥(Subgroup.zpowers (φ₀ ^ k.val)) ∨
-      IsSolvable ↥(Subgroup.center P) :=
-    Or.inr (isSolvable_of_comm fun a b => Subtype.ext (Subgroup.mem_center_iff.mp a.2 b.1).symm)
+  have hSolv : Group.IsSolvable ↥(Subgroup.zpowers (φ₀ ^ k.val)) ∨
+      Group.IsSolvable ↥(Subgroup.center P) :=
+    Or.inr (Group.isSolvable_of_comm fun a b => Subtype.ext
+        (Subgroup.mem_center_iff.mp a.2 b.1).symm)
   have hN_inv : IsAInvariant (Subgroup.zpowers (φ₀ ^ k.val)).subtype (Subgroup.center P) :=
     IsAInvariant.center _
   -- the coset `gZ` is invariant under all powers of `φ₀^k` (since `σ^k` fixes `c`)
@@ -157,7 +158,7 @@ private theorem cyclicEndConj_keystoneData_of_faithful_irreducible
         = Module.finrank F V) := by
   classical
   set ρP : Representation F P V := ρ.comp P.subtype with hρP
-  haveI : Representation.IsIrreducible ρP := hVP
+  have : Representation.IsIrreducible ρP := hVP
   set φ : P ≃* P := conjAutOfNormal P x with hφ
   set T : LinearMap.GeneralLinearGroup F V := ρ.asGroupHom x with hT
   -- `↑T = ρ x`

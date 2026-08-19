@@ -46,7 +46,7 @@ theorem RegularOperatorSetup.centralizer_R₀_mul_comm [Finite R]
     (hyp : RegularOperatorSetup R B p q) :
     ∀ x ∈ Subgroup.centralizer (hyp.R₀ : Set R), ∀ y ∈ Subgroup.centralizer (hyp.R₀ : Set R),
       x * y = y * x := by
-  haveI := hyp.isMulCommutative_centralizer_R₀
+  have := hyp.isMulCommutative_centralizer_R₀
   intro x hx y hy
   exact congrArg Subtype.val
     (‹IsMulCommutative ↥(Subgroup.centralizer (hyp.R₀ : Set R))›.is_comm.comm
@@ -70,12 +70,12 @@ theorem RegularOperatorSetup.seed_pow_eq_one [Finite R] (hyp : RegularOperatorSe
 /-- `R₀ ≤ Ω₁(C_R(R₀))`: `R₀` is central in its own centralizer and has exponent `p`. -/
 theorem RegularOperatorSetup.R₀_le_seed [Finite R] (hyp : RegularOperatorSetup R B p q) :
     hyp.R₀ ≤ hyp.seed := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   intro g hg
   refine ⟨?_, ?_⟩
   · -- `R₀` has prime order, hence is cyclic, hence commutative: it centralizes itself
-    haveI : IsCyclic ↥hyp.R₀ := isCyclic_of_prime_card hyp.R₀_card
-    letI : CommGroup ↥hyp.R₀ := IsCyclic.commGroup
+    have : IsCyclic ↥hyp.R₀ := isCyclic_of_prime_card hyp.R₀_card
+    let : CommGroup ↥hyp.R₀ := IsCyclic.commGroup
     rw [Subgroup.mem_centralizer_iff]
     intro h hh
     exact congrArg Subtype.val (mul_comm (⟨h, hh⟩ : ↥hyp.R₀) ⟨g, hg⟩)
@@ -178,7 +178,7 @@ theorem omegaInG_eq_map {G : Type*} [Group G] (H : Subgroup G) (p n : ℕ) :
   rw [omegaInG, Omega, MonoidHom.map_closure]
   congr 1
   ext x
-  simp only [Set.mem_image, Set.mem_setOf_eq, Subgroup.coe_subtype]
+  simp only [Set.mem_image, Set.mem_ofPred_eq, Subgroup.coe_subtype]
   constructor
   · rintro ⟨hxH, hxp⟩
     exact ⟨⟨x, hxH⟩, Subtype.ext (by simpa using hxp), rfl⟩
@@ -251,7 +251,7 @@ theorem RegularOperatorSetup.eq_omega_of_omegaInG_normalizer_eq [Finite R]
     (hyp : RegularOperatorSetup R B p q) {S : Subgroup R}
     (h : omegaInG (Subgroup.normalizer (S : Set R) ⊓ Omega R p 1) p 1 = S) :
     S = Omega R p 1 := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   set P := Omega R p 1 with hP
   set T := Subgroup.normalizer (S : Set R) ⊓ P with hT
   have hTP : T ≤ P := inf_le_right
@@ -263,8 +263,8 @@ theorem RegularOperatorSetup.eq_omega_of_omegaInG_normalizer_eq [Finite R]
     rw [h] at h1
     exact ⟨h1, hgP⟩
   -- so `T = P`, by the normalizer condition in the `p`-group `P`
-  haveI hPp : IsPGroup p ↥P := hyp.R_pGroup.to_subgroup P
-  haveI : Group.IsNilpotent ↥P := hPp.isNilpotent
+  have hPp : IsPGroup p ↥P := hyp.R_pGroup.to_subgroup P
+  have : Group.IsNilpotent ↥P := hPp.isNilpotent
   have hTtop : T.subgroupOf P = ⊤ := by
     by_contra hne
     obtain ⟨x, hxN, hxT⟩ := SetLike.exists_of_lt
@@ -396,8 +396,8 @@ theorem exists_zpowers_eq_map_of_isCyclic {G H : Type*} [Group G] [Group H]
 /-- `T ⊓ R₁` is cyclic, being a subgroup of the cyclic `R₁`. -/
 theorem RegularOperatorSetup.isCyclic_inf_R₁ (hyp : RegularOperatorSetup R B p q)
     (T : Subgroup R) : IsCyclic ↥(T ⊓ hyp.R₁) := by
-  haveI := hyp.R₁_cyclic
-  haveI : IsCyclic ↥((T ⊓ hyp.R₁).subgroupOf hyp.R₁) := inferInstance
+  have := hyp.R₁_cyclic
+  have : IsCyclic ↥((T ⊓ hyp.R₁).subgroupOf hyp.R₁) := inferInstance
   exact isCyclic_of_surjective
     (Subgroup.subgroupOfEquivOfLe (inf_le_right : T ⊓ hyp.R₁ ≤ hyp.R₁)).toMonoidHom
     (Subgroup.subgroupOfEquivOfLe _).surjective
@@ -413,8 +413,8 @@ theorem RegularOperatorSetup.exists_zpowers_eq_map_sup_inf_R₁ [Finite R]
       Subgroup.zpowers x =
         ((S ⊔ (T ⊓ hyp.R₁)).subgroupOf T).map (QuotientGroup.mk' (S.subgroupOf T)) := by
   -- the image of `T ⊓ R₁`, which is cyclic
-  haveI : IsCyclic ↥((T ⊓ hyp.R₁).subgroupOf T) := by
-    haveI := hyp.isCyclic_inf_R₁ T
+  have : IsCyclic ↥((T ⊓ hyp.R₁).subgroupOf T) := by
+    have := hyp.isCyclic_inf_R₁ T
     exact isCyclic_of_surjective
       (Subgroup.subgroupOfEquivOfLe (inf_le_left : T ⊓ hyp.R₁ ≤ T)).symm.toMonoidHom
       (Subgroup.subgroupOfEquivOfLe _).symm.surjective
@@ -495,7 +495,7 @@ theorem RegularOperatorSetup.index_sup_centralizer_lt [Finite R]
     (hTN : T ≤ Subgroup.normalizer (S : Set R)) {v : R} (hv : Subgroup.zpowers v = hyp.R₀)
     (hvS : v ∈ S) (hv1 : v ≠ 1) :
     ((S ⊔ (T ⊓ Subgroup.centralizer ({v} : Set R))).subgroupOf T).index < p ^ 2 := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   set C : Subgroup R := T ⊓ Subgroup.centralizer ({v} : Set R) with hC
   set T₁ : Subgroup R := S ⊔ C with hT₁
   have hT₁T : T₁ ≤ T := sup_le hST inf_le_left
@@ -605,7 +605,7 @@ already form the subgroup `Ω₁`. -/
 theorem card_omega_le_of_isCyclic {G : Type*} [Group G] [Finite G] [IsCyclic G] {p : ℕ}
     (hp : 0 < p) : Nat.card ↥(Omega G p 1) ≤ p := by
   classical
-  letI := Fintype.ofFinite G
+  let := Fintype.ofFinite G
   obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := G)
   have hcomm : ∀ x ∈ (⊤ : Subgroup G), ∀ y ∈ (⊤ : Subgroup G), x * y = y * x := by
     intro x _ y _
@@ -646,7 +646,7 @@ theorem card_omega_le_prime_sq_of_index_lt {G : Type*} [Group G] [Finite G] {p :
   · -- index `1`: the group is cyclic
     rw [pow_zero] at hjeq
     have htop : Subgroup.zpowers x = ⊤ := Subgroup.index_eq_one.mp hjeq
-    haveI : IsCyclic G := ⟨⟨x, fun y => by
+    have : IsCyclic G := ⟨⟨x, fun y => by
       have hy : y ∈ (⊤ : Subgroup G) := Subgroup.mem_top y
       rwa [← htop] at hy⟩⟩
     exact (card_omega_le_of_isCyclic hp.pos).trans (Nat.le_self_pow two_ne_zero p)
@@ -757,9 +757,9 @@ theorem RegularOperatorSetup.pow_eq_one_of_card_omegaInG_le [Finite R] [Finite B
     (hyp : RegularOperatorSetup R B p q) {T : Subgroup R}
     (hcard : Nat.card ↥(omegaInG T p 1) ≤ p ^ (q + 2))
     {x : R} (hx : x ∈ omegaInG T p 1) : x ^ p = 1 := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   have hpg : IsPGroup p ↥(omegaInG T p 1) := hyp.R_pGroup.to_subgroup _
-  haveI : Group.IsNilpotent ↥(omegaInG T p 1) := hpg.isNilpotent
+  have : Group.IsNilpotent ↥(omegaInG T p 1) := hpg.isNilpotent
   have hcl : Group.nilpotencyClass ↥(omegaInG T p 1) ≤ q + 1 :=
     OddOrder.BG.Ch1.S04.nilpotencyClass_le_of_card_le_pow hpg (by omega) hcard
   -- `q + 1 ≤ p − 1`, from Step 1 and the oddness of `p`, `q`
@@ -788,7 +788,7 @@ theorem isAInvariant_omegaInG {G A : Type*} [Group G] [Group A] {φ : A →* Mul
   rw [omegaInG, MonoidHom.map_closure]
   congr 1
   ext x
-  simp only [Set.mem_image, Set.mem_setOf_eq, MulEquiv.coe_toMonoidHom]
+  simp only [Set.mem_image, Set.mem_ofPred_eq, MulEquiv.coe_toMonoidHom]
   constructor
   · rintro ⟨y, ⟨hyH, hyp⟩, rfl⟩
     exact ⟨hH.smul_mem a hyH, by rw [← map_pow, hyp, map_one]⟩
@@ -800,9 +800,9 @@ theorem isAInvariant_omegaInG {G A : Type*} [Group G] [Group A] {φ : A →* Mul
 theorem RegularOperatorSetup.exists_zpowers_eq_R₀ [Finite R]
     (hyp : RegularOperatorSetup R B p q) :
     ∃ v : R, Subgroup.zpowers v = hyp.R₀ ∧ v ≠ 1 := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   have hcard := hyp.R₀_card
-  haveI : Nontrivial ↥hyp.R₀ := by
+  have : Nontrivial ↥hyp.R₀ := by
     rw [Subgroup.nontrivial_iff_ne_bot]
     intro h
     rw [h, Subgroup.card_bot] at hcard
@@ -847,12 +847,12 @@ Together with `(E.14)` (`inf_centralizer_eq_seed`) this bounds `|C_S(R₀)|` for
 the family — with no rank hypothesis, which is what Step 3 needs. -/
 theorem RegularOperatorSetup.card_seed_le [Finite R] (hyp : RegularOperatorSetup R B p q) :
     Nat.card ↥hyp.seed ≤ p ^ 2 := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   set C : Subgroup R := Subgroup.centralizer (hyp.R₀ : Set R) with hC
   have hR₁C : hyp.R₁ ≤ C := by rw [hC, hyp.centralizer_eq]; exact le_sup_right
   have hseedC : hyp.seed ≤ C := fun x hx => hx.1
-  haveI : IsCyclic ↥(hyp.R₁.subgroupOf C) := by
-    haveI := hyp.R₁_cyclic
+  have : IsCyclic ↥(hyp.R₁.subgroupOf C) := by
+    have := hyp.R₁_cyclic
     exact isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe hR₁C).symm.toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hR₁C).symm.surjective
   have hidx : (hyp.R₁.subgroupOf C).index = p := by
@@ -894,13 +894,13 @@ theorem RegularOperatorSetup.eq_omega_of_maximal [Finite R] [Finite B]
     (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hS : hyp.ExpPFamily S)
     (hmax : ∀ S', hyp.ExpPFamily S' → S ≤ S' → S' = S) :
     S = Omega R p 1 := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   set P : Subgroup R := Omega R p 1 with hP
   set T : Subgroup R := Subgroup.normalizer (S : Set R) ⊓ P with hT
   have hSP : S ≤ P := hyp.expPFamily_le_omega hS
   have hST : S ≤ T := le_inf Subgroup.le_normalizer hSP
   have hTN : T ≤ Subgroup.normalizer (S : Set R) := inf_le_left
-  haveI hn : (S.subgroupOf T).Normal :=
+  have hn : (S.subgroupOf T).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hST).mpr hTN
   have hSW : S ≤ omegaInG T p 1 := fun x hx =>
     mem_omegaInG (hST hx) (by simpa using hS.2.1 x hx)
@@ -1029,7 +1029,7 @@ Step 4 needs the *equality* (Step 3 only needed `≤`): there the conjugacy clas
 to have exactly `|S|/p²` elements, to be matched against `|vS'|`. -/
 theorem RegularOperatorSetup.card_seed [Finite R] (hyp : RegularOperatorSetup R B p q) :
     Nat.card ↥hyp.seed = p ^ 2 := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   refine le_antisymm hyp.card_seed_le ?_
   obtain ⟨k, hk⟩ := (hyp.R_pGroup.to_subgroup hyp.seed).exists_card_eq
   have hlt : Nat.card ↥hyp.R₀ < Nat.card ↥hyp.seed :=
@@ -1055,7 +1055,7 @@ theorem RegularOperatorSetup.orbit_eq_coset [Finite R]
     (hp2 : Nat.card ↥(S ⊓ Subgroup.centralizer (hyp.R₀ : Set R)) = p ^ 2)
     {v : ↥S} (hv : Subgroup.zpowers v = hyp.R₀.subgroupOf S) :
     MulAction.orbit (ConjAct ↥S) v = v • ((_root_.commutator ↥S : Subgroup ↥S) : Set ↥S) := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   have hcls : p ^ 2 * Nat.card (MulAction.orbit (ConjAct ↥S) v) = Nat.card ↥S :=
     hyp.card_conjClass_generator hR₀S.le hp2 hv
   have hquot : Nat.card ↥S = p ^ 2 * Nat.card ↥(_root_.commutator ↥S) := by
@@ -1082,7 +1082,7 @@ theorem RegularOperatorSetup.exists_conj_mem_R₀ [Finite R]
     {y : ↥S} (hy : y ∈ hyp.R₀.subgroupOf S ⊔ _root_.commutator ↥S)
     (hyS' : y ∉ _root_.commutator ↥S) :
     ∃ u ∈ hyp.R₀.subgroupOf S, u ≠ 1 ∧ y ∈ MulAction.orbit (ConjAct ↥S) u := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   set R₀' : Subgroup ↥S := hyp.R₀.subgroupOf S with hR₀'
   have hR₀'card : Nat.card ↥R₀' = p := hyp.card_R₀_subgroupOf hR₀S.le
   -- `y = u * z` with `u ∈ R₀`, `z ∈ S'`
@@ -1121,7 +1121,7 @@ any `β ∈ B` lands in `R₀S' − S'`. -/
 theorem RegularOperatorSetup.inf_derived_omega_eq_bot [Finite R] [Finite B]
     (hyp : RegularOperatorSetup R B p q) :
     hyp.R₀ ⊓ derivedInG (Omega R p 1) = ⊥ := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   by_contra hne
   refine hyp.R₀_not_le_derived_omega ?_
   have hle : hyp.R₀ ⊓ derivedInG (Omega R p 1) ≤ hyp.R₀ := inf_le_left
@@ -1146,7 +1146,7 @@ Step 4's counting runs on the derived subgroup. -/
 theorem RegularOperatorSetup.frattiniInG_omega_eq_derivedInG [Finite R] [Finite B]
     (hyp : RegularOperatorSetup R B p q) :
     frattiniInG (Omega R p 1) = derivedInG (Omega R p 1) := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   unfold frattiniInG derivedInG
   congr 1
   exact frattini_eq_commutator_of_exponent_prime (hyp.R_pGroup.to_subgroup _)

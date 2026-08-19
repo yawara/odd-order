@@ -116,7 +116,7 @@ theorem T_Q_isComplement_V_derived [Finite G] (hyp : Hypothesis (G := G)) :
     rw [hyp.base.T_deriv_eq_QV]; exact le_sup_left
   have hV_le : hyp.base.V ≤ derivedInG hyp.base.T := by
     rw [hyp.base.T_deriv_eq_QV]; exact le_sup_right
-  haveI := T_Q_subgroupOf_derived_normal hyp
+  have := T_Q_subgroupOf_derived_normal hyp
   have hQnVn_inf : (hyp.base.Q.subgroupOf (derivedInG hyp.base.T)) ⊓
       (hyp.base.V.subgroupOf (derivedInG hyp.base.T)) = ⊥ := by
     ext ⟨x, hx⟩
@@ -143,7 +143,7 @@ theorem T_card_quot_Q_derived_eq_card_V [Finite G] (hyp : Hypothesis (G := G)) :
       = Nat.card ↥hyp.base.V := by
   have hV_le : hyp.base.V ≤ derivedInG hyp.base.T := by
     rw [hyp.base.T_deriv_eq_QV]; exact le_sup_right
-  haveI := T_Q_subgroupOf_derived_normal hyp
+  have := T_Q_subgroupOf_derived_normal hyp
   -- `QV/Q ≅ V.subgroupOf QV` via the complement (`Q` normal in the `K`-slot).
   rw [Nat.card_congr (T_Q_isComplement_V_derived hyp).symm.QuotientMulEquiv.toEquiv,
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hV_le).toEquiv]
@@ -198,8 +198,8 @@ theorem calT1_image_induce_card_eq [Finite G] (hyp : Hypothesis (G := G))
     (𝒯.image (fun θ => OddOrder.RepresentationTheory.ClassFunction.induce
         ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction)).card
       = 𝒯.card / hyp.base.p := by
-  haveI : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
-  haveI := hQVnormal
+  have : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
+  have := hQVnormal
   -- The shared-infra orbit count `|image| = |𝒯| / [T:QV]`, with `[T:QV] = p`.
   rw [OddOrder.RepresentationTheory.card_image_induce_eq_div 𝒯 hconj hinertia,
     T_derived_index_eq_p hyp]
@@ -238,8 +238,8 @@ theorem inertia_inflate_eq_of_frobeniusQuotient {Γ : Type*} [Group Γ] [Finite 
     OddOrder.RepresentationTheory.ClassFunction.inertia (G := Γ) (H := H)
         (OddOrder.RepresentationTheory.ClassFunction.compHom q
           (θbar : OddOrder.RepresentationTheory.ClassFunction _ ℂ)) = H := by
-  haveI : Fintype (Γ ⧸ N) := Fintype.ofFinite _
-  haveI : Fintype ↥(H.map (QuotientGroup.mk' N)) := Fintype.ofFinite _
+  have : Fintype (Γ ⧸ N) := Fintype.ofFinite _
+  have : Fintype ↥(H.map (QuotientGroup.mk' N)) := Fintype.ofFinite _
   -- Frobenius ⟹ `I_{Γ/N}(θ̄) = H/N`.
   have hIbar : OddOrder.RepresentationTheory.ClassFunction.inertia
       (G := Γ ⧸ N) (H := H.map (QuotientGroup.mk' N))
@@ -374,17 +374,18 @@ theorem T_typeIII_Q_isComplement_UW1 [Finite G] (hyp : Hypothesis (G := G))
   -- Cardinality `|Q|·|U ⊔ W₁| = |T|`.
   have hcardUW1 : Nat.card ↥(td.typeP.U ⊔ td.typeP.W1) =
       Nat.card ↥td.typeP.U * Nat.card ↥td.typeP.W1 := by
-    rw [← (OddOrder.Peterfalvi.S11.typeP_uW1_frobenius td.typeP td.common.1).isComplement.card_mul,
+    rw [← (OddOrder.Peterfalvi.S11.typeP_uW1_frobenius td.typeP
+        td.common.1).isComplement.card_mul_card,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv]
   have hcardM' : Nat.card ↥td.typeP.H * Nat.card ↥td.typeP.U =
       Nat.card ↥(derivedInG hyp.base.T) := by
-    rw [← td.typeP.derived_complement.card_mul,
+    rw [← td.typeP.derived_complement.card_mul_card,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHle).toEquiv,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUleM').toEquiv]
   have hcardM : Nat.card ↥(derivedInG hyp.base.T) * Nat.card ↥td.typeP.W1 =
       Nat.card ↥hyp.base.T := by
-    rw [← td.typeP.M_complement.card_mul,
+    rw [← td.typeP.M_complement.card_mul_card,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'leM).toEquiv,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1leM).toEquiv]
   have hcard : Nat.card ↥(hyp.base.Q.subgroupOf hyp.base.T) *
@@ -416,7 +417,7 @@ theorem T_typeIII_quotFrobenius_kernel_eq [Finite G] (hyp : Hypothesis (G := G))
         (T_typeIII_Q_isComplement_UW1 hyp td).symm.QuotientMulEquiv.symm).toMonoidHom) =
       ((derivedInG hyp.base.T).subgroupOf hyp.base.T).map
         (QuotientGroup.mk' (hyp.base.Q.subgroupOf hyp.base.T)) := by
-  haveI := hQnormal
+  have := hQnormal
   have hHeqQ : td.typeP.H = hyp.base.Q := by rw [td.typeP.H_eq, hyp.base.Q_eq_TF]
   have hUleUW1 : td.typeP.U ≤ td.typeP.U ⊔ td.typeP.W1 := le_sup_left
   have hQleT : hyp.base.Q ≤ hyp.base.T := hHeqQ ▸ (td.typeP.H_le.trans (Subgroup.map_subtype_le _))
@@ -549,15 +550,15 @@ theorem T_typeIII_calT1_card [Finite G] (hyp : Hypothesis (G := G))
       (𝒯.image (fun θ => ClassFunction.induce
         ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction)).card
         = (Nat.card ↥hyp.base.V - 1) / hyp.base.p := by
-  haveI := hyp.base.finiteG
-  haveI hHnormal : ((derivedInG hyp.base.T).subgroupOf hyp.base.T).Normal :=
+  have := hyp.base.finiteG
+  have hHnormal : ((derivedInG hyp.base.T).subgroupOf hyp.base.T).Normal :=
     T_derivedSubgroupOf_normal hyp
   have hQnormal : (hyp.base.Q.subgroupOf hyp.base.T).Normal := by
     have hQleT : hyp.base.Q ≤ hyp.base.T := by
       rw [hyp.base.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.base.T
     refine (Subgroup.normal_subgroupOf_iff_le_normalizer hQleT).mpr ?_
     rw [hyp.base.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.base.T
-  haveI := hQnormal
+  have := hQnormal
   have hUW1leM : td.typeP.U ⊔ td.typeP.W1 ≤ hyp.base.T :=
     sup_le ((td.typeP.U_le).trans (Subgroup.map_subtype_le _)) td.typeP.W1_le
   have hNH : hyp.base.Q.subgroupOf hyp.base.T ≤ (derivedInG hyp.base.T).subgroupOf hyp.base.T := by
@@ -649,13 +650,13 @@ theorem T_typeIII_calT1_card [Finite G] (hyp : Hypothesis (G := G))
     rw [h𝒯, Finset.card_image_of_injective _ hinfl_inj]
     -- |non-principal Irr(Hbar)| = |Irr Hbar| - 1
     -- |Irr Hbar| = |V| (abelian)
-    haveI hUcomm : IsMulCommutative ↥(td.typeP.U.subgroupOf (td.typeP.U ⊔ td.typeP.W1)) :=
+    have hUcomm : IsMulCommutative ↥(td.typeP.U.subgroupOf (td.typeP.U ⊔ td.typeP.W1)) :=
       OddOrder.GroupTheory.isMulCommutative_of_mulEquiv
         (Subgroup.subgroupOfEquivOfLe (le_sup_left)).symm td.U_commutative
     have hemap : ↥(td.typeP.U.subgroupOf (td.typeP.U ⊔ td.typeP.W1)) ≃* ↥Hbar :=
       (Subgroup.equivMapOfInjective _ e.toMonoidHom e.injective).trans
         (MulEquiv.subgroupCongr himg)
-    haveI hHbarComm : IsMulCommutative ↥Hbar :=
+    have hHbarComm : IsMulCommutative ↥Hbar :=
       OddOrder.GroupTheory.isMulCommutative_of_mulEquiv hemap hUcomm
     have hIrrHbar : Nat.card (IrreducibleCharacter ↥Hbar) = Nat.card ↥hyp.base.V := by
       rw [card_irreducibleCharacter_eq_card_of_commGroup, ← Nat.card_congr hemap.toEquiv,
@@ -713,15 +714,15 @@ theorem T_typeIII_calT1_family_galois [Finite G] (hyp : Hypothesis (G := G))
       (𝒯.image (fun θ => ClassFunction.induce
         ((derivedInG hyp.base.T).subgroupOf hyp.base.T) θ.toClassFunction)).card
         = (Nat.card ↥hyp.base.V - 1) / hyp.base.p := by
-  haveI := hyp.base.finiteG
-  haveI hHnormal : ((derivedInG hyp.base.T).subgroupOf hyp.base.T).Normal :=
+  have := hyp.base.finiteG
+  have hHnormal : ((derivedInG hyp.base.T).subgroupOf hyp.base.T).Normal :=
     T_derivedSubgroupOf_normal hyp
   have hQnormal : (hyp.base.Q.subgroupOf hyp.base.T).Normal := by
     have hQleT : hyp.base.Q ≤ hyp.base.T := by
       rw [hyp.base.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.base.T
     refine (Subgroup.normal_subgroupOf_iff_le_normalizer hQleT).mpr ?_
     rw [hyp.base.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.base.T
-  haveI := hQnormal
+  have := hQnormal
   have hUW1leM : td.typeP.U ⊔ td.typeP.W1 ≤ hyp.base.T :=
     sup_le ((td.typeP.U_le).trans (Subgroup.map_subtype_le _)) td.typeP.W1_le
   have hNH : hyp.base.Q.subgroupOf hyp.base.T ≤ (derivedInG hyp.base.T).subgroupOf hyp.base.T := by
@@ -790,13 +791,13 @@ theorem T_typeIII_calT1_family_galois [Finite G] (hyp : Hypothesis (G := G))
     rw [h𝒯, Finset.mem_image] at hθ
     obtain ⟨θbar, hθbar, rfl⟩ := hθ
     -- `Hbar ≅ U` abelian.
-    haveI hUcomm : IsMulCommutative ↥(td.typeP.U.subgroupOf (td.typeP.U ⊔ td.typeP.W1)) :=
+    have hUcomm : IsMulCommutative ↥(td.typeP.U.subgroupOf (td.typeP.U ⊔ td.typeP.W1)) :=
       OddOrder.GroupTheory.isMulCommutative_of_mulEquiv
         (Subgroup.subgroupOfEquivOfLe (le_sup_left)).symm td.U_commutative
     have hemap : ↥(td.typeP.U.subgroupOf (td.typeP.U ⊔ td.typeP.W1)) ≃* ↥Hbar :=
       (Subgroup.equivMapOfInjective _ e.toMonoidHom e.injective).trans
         (MulEquiv.subgroupCongr himg)
-    haveI hHbarComm : IsMulCommutative ↥Hbar :=
+    have hHbarComm : IsMulCommutative ↥Hbar :=
       OddOrder.GroupTheory.isMulCommutative_of_mulEquiv hemap hUcomm
     change (ClassFunction.compHom q (θbar : ClassFunction ↥Hbar ℂ) :
       ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) → ℂ) 1 = 1
@@ -889,13 +890,13 @@ theorem T_typeIII_calT1_family_galois [Finite G] (hyp : Hypothesis (G := G))
         rfl
     have hcard : 𝒯.card = Nat.card ↥hyp.base.V - 1 := by
       rw [h𝒯, Finset.card_image_of_injective _ hinfl_inj]
-      haveI hUcomm : IsMulCommutative ↥(td.typeP.U.subgroupOf (td.typeP.U ⊔ td.typeP.W1)) :=
+      have hUcomm : IsMulCommutative ↥(td.typeP.U.subgroupOf (td.typeP.U ⊔ td.typeP.W1)) :=
         OddOrder.GroupTheory.isMulCommutative_of_mulEquiv
           (Subgroup.subgroupOfEquivOfLe (le_sup_left)).symm td.U_commutative
       have hemap : ↥(td.typeP.U.subgroupOf (td.typeP.U ⊔ td.typeP.W1)) ≃* ↥Hbar :=
         (Subgroup.equivMapOfInjective _ e.toMonoidHom e.injective).trans
           (MulEquiv.subgroupCongr himg)
-      haveI hHbarComm : IsMulCommutative ↥Hbar :=
+      have hHbarComm : IsMulCommutative ↥Hbar :=
         OddOrder.GroupTheory.isMulCommutative_of_mulEquiv hemap hUcomm
       have hIrrHbar : Nat.card (IrreducibleCharacter ↥Hbar) = Nat.card ↥hyp.base.V := by
         rw [card_irreducibleCharacter_eq_card_of_commGroup, ← Nat.card_congr hemap.toEquiv,
@@ -977,7 +978,7 @@ needs
 theorem T_typeIII_two_p_add_one_le_card_V [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (td : OddOrder.GroupTheory.TypeIIIData hyp.base.T) :
     2 * hyp.base.p + 1 ≤ Nat.card ↥hyp.base.V := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   have hfrob := T_typeIII_UW1_frobenius td
   have hVodd : Odd (Nat.card ↥hyp.base.V) :=
     hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.base.V)
@@ -1019,7 +1020,7 @@ theorem tSideDadeSupport_nonempty [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleO
     (hyp : Hypothesis (G := G)) :
     Nonempty (OddOrder.Peterfalvi.S10.DadeSupportHypothesisData hyp.base.T
       (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T)) := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   -- `T ≤ N_G(M_σ(T))` (`M_σ = O_{σ}(T)` is normal in `T`), so `M_σ^#` is `T`-conj-invariant.
   have hTnorm : hyp.base.T ≤ Subgroup.normalizer
       ((OddOrder.BG.Ch3.S10.Msigma hyp.base.T : Subgroup G) : Set G) :=
@@ -1078,7 +1079,7 @@ theorem tSideDadeMap_isometry_diff (hyp : Hypothesis (G := G)) [Fintype G] [Fint
     (ha : a ∈ S) (hb : b ∈ S) (hc : c ∈ S) (hd : d ∈ S) :
     ClassFunction.inner (tSideDadeMap hyp hG (a - b)) (tSideDadeMap hyp hG (c - d))
       = ClassFunction.inner (a - b) (c - d) := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   -- Both differences live in the supported subspace `CF(T, A₁(T))`; unfold `τ_T` and apply the
   -- Dade supported-span inner-preservation lemma (the same brick `S14.Sset_tau_isometry_diff`
   -- uses).
@@ -1114,7 +1115,7 @@ member differences `nu_0 − zeta ∈ 'CF(T, QV^#) = 'CF(T, 'A1(T))`, PFsection1
 theorem T_typeIII_sigmaSharp_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hIII : OddOrder.GroupTheory.IsTypeIII hyp.base.T) :
     OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T = (derivedInG hyp.base.T : Set G) \ {1} := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   -- `A1 T .III = sigmaSharp T` (support bridge), and `A1 T .III = sharpSubgroup (derivedInG T)`
   -- since `mainSubgroup .III = derivedInG`.
   have hA1 : OddOrder.GroupTheory.A1 hyp.base.T OddOrder.GroupTheory.PeterfalviType.III

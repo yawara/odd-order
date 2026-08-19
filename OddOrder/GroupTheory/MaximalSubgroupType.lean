@@ -239,7 +239,7 @@ theorem TypePData.derivedInG_inf_centralizer_W1_eq {M : Subgroup G} (data : Type
   refine le_antisymm ?_ ?_
   · -- `⊆`: any nontrivial `g ∈ W₁` gives `C(W₁) ≤ C({g})`, then the `centralizer_W1` field.
     obtain ⟨g, hgW1, hgne⟩ : ∃ g ∈ data.W1, g ≠ 1 := by
-      haveI : Nontrivial ↥data.W1 := (Subgroup.nontrivial_iff_ne_bot _).mpr data.W1_nontrivial
+      have : Nontrivial ↥data.W1 := (Subgroup.nontrivial_iff_ne_bot _).mpr data.W1_nontrivial
       obtain ⟨y, hy⟩ := exists_ne (1 : ↥data.W1)
       exact ⟨y, y.2, fun h => hy (Subtype.ext h)⟩
     have hle : Subgroup.centralizer (data.W1 : Set G) ≤ Subgroup.centralizer ({g} : Set G) :=
@@ -254,8 +254,8 @@ theorem TypePData.derivedInG_inf_centralizer_W1_eq {M : Subgroup G} (data : Type
     intro h hh
     have hxW : x ∈ data.W := data.W_eq ▸ Subgroup.mem_sup_right hx
     have hhW : h ∈ data.W := data.W_eq ▸ Subgroup.mem_sup_left hh
-    haveI := data.W_cyclic
-    letI : CommGroup ↥data.W := IsCyclic.commGroup
+    have := data.W_cyclic
+    let : CommGroup ↥data.W := IsCyclic.commGroup
     exact congrArg Subtype.val (mul_comm (⟨h, hhW⟩ : ↥data.W) ⟨x, hxW⟩)
 
 /-- Common type II--IV hypotheses from Peterfalvi (8.6). -/
@@ -512,7 +512,7 @@ is only informative when the index subgroup `K` is *smaller* than the host `H`. 
 theorem centralizerSupport_sharpSubgroup_of_le {K H : Subgroup G} (hHK : H ≤ K) :
     centralizerSupport (sharpSubgroup K) H = sharpSubgroup H := by
   ext y
-  simp only [centralizerSupport, sharpSubgroup, Set.mem_setOf_eq, Set.mem_sdiff_singleton]
+  simp only [centralizerSupport, sharpSubgroup, Set.mem_ofPred_eq, Set.mem_sdiff_singleton]
   constructor
   · rintro ⟨h1, h2, -⟩
     exact ⟨h1, h2⟩
@@ -565,8 +565,8 @@ onto `W`.  No disjointness or coprimality is needed. -/
 theorem TypePData.exists_mul_eq_of_mem_W {M : Subgroup G} (data : TypePData M)
     {v : G} (hv : v ∈ data.W) :
     ∃ v₁ ∈ data.W1, ∃ v₂ ∈ data.W2, v₁ * v₂ = v := by
-  haveI := data.W_cyclic
-  letI : CommGroup ↥data.W := IsCyclic.commGroup
+  have := data.W_cyclic
+  let : CommGroup ↥data.W := IsCyclic.commGroup
   have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
   have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
   set f := (Subgroup.inclusion hW1le).coprod (Subgroup.inclusion hW2le) with hf

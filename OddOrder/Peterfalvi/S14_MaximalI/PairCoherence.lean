@@ -66,7 +66,7 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 theorem decomposition_apply_one_pos_natCast {L : Subgroup G} [Finite G] {hyp : Hypothesis L}
     {chi : ClassFunction ↥L ℂ} (data : CharacterDecompositionData hyp chi) :
     ∃ n : ℕ, 0 < n ∧ chi (1 : ↥L) = (n : ℂ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   choose d hdpos hd using fun φ : IrreducibleCharacter ↥L =>
     irreducibleCharacter_apply_one_eq_pos_natCast φ
@@ -83,7 +83,7 @@ into `|S(χ)|` distinct irreducibles. -/
 theorem decomposition_inner_self_card {L : Subgroup G} [Finite G] {hyp : Hypothesis L}
     {chi : ClassFunction ↥L ℂ} (data : CharacterDecompositionData hyp chi) :
     ClassFunction.inner chi chi = (data.constituents.card : ℂ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   conv_lhs => rw [data.decomp]
   rw [inner_sum_left]
@@ -102,7 +102,7 @@ conjugate of another (`conj_not_mem`), so the multiplicity-one expansions share 
 theorem decomposition_inner_conj_eq_zero {L : Subgroup G} [Finite G] {hyp : Hypothesis L}
     {chi : ClassFunction ↥L ℂ} (data : CharacterDecompositionData hyp chi) :
     ClassFunction.inner chi chi.conj = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   rw [data.decomp, conj_sum, inner_sum_left]
   refine Finset.sum_eq_zero fun φ hφ => ?_
@@ -119,7 +119,7 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 theorem decomposition_ne_conj {L : Subgroup G} [Finite G] {hyp : Hypothesis L}
     {chi : ClassFunction ↥L ℂ} (data : CharacterDecompositionData hyp chi) :
     chi ≠ chi.conj := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   intro h
   have h0 := decomposition_inner_conj_eq_zero data
   rw [← h, decomposition_inner_self_card data] at h0
@@ -136,9 +136,9 @@ means the sources are not `L`-conjugate (`induce_eq_induce_iff_conj`), whence or
 theorem Sset_pairwise_orthogonal {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
     {χ₁ χ₂ : ClassFunction ↥L ℂ} (h₁ : χ₁ ∈ hyp.Sset) (h₂ : χ₂ ∈ hyp.Sset) (hne : χ₁ ≠ χ₂) :
     ClassFunction.inner χ₁ χ₂ = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
-  haveI hnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+  have hnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
     rw [hyp.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
   obtain ⟨θ₁, -, hχ₁eq⟩ := h₁
@@ -188,7 +188,7 @@ theorem constituents_ne_conj {L : Subgroup G} [Finite G] {hyp : Hypothesis L}
       (ψ : ClassFunction ↥L ℂ).conj ≠ (φ' : ClassFunction ↥L ℂ)) :
     φ ≠ OddOrder.Peterfalvi.S07.conjIrreducibleCharacter (L := ↥L) φ' ∧
       OddOrder.Peterfalvi.S07.conjIrreducibleCharacter (L := ↥L) φ ≠ φ' := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   constructor
   · intro h
     exact hcc φ' hφ'
@@ -285,7 +285,7 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 theorem decomposition_mem_ZIrr {L : Subgroup G} [Finite G] {hyp : Hypothesis L}
     {chi : ClassFunction ↥L ℂ} (data : CharacterDecompositionData hyp chi) :
     chi ∈ ZIrr ↥L := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   rw [data.decomp]
   exact Submodule.sum_mem _ fun φ _ => φ.mem_ZIrr
 
@@ -294,7 +294,7 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 theorem decomposition_conj_apply_one {L : Subgroup G} [Finite G] {hyp : Hypothesis L}
     {chi : ClassFunction ↥L ℂ} (data : CharacterDecompositionData hyp chi) :
     chi.conj (1 : ↥L) = chi (1 : ↥L) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   obtain ⟨n, -, hn⟩ := decomposition_apply_one_pos_natCast data
   rw [ClassFunction.conj_apply, hn, star_natCast]
 
@@ -307,7 +307,7 @@ theorem constituents_ne_of_inner_eq_zero {L : Subgroup G} [Finite G] {hyp : Hypo
     (data1 : CharacterDecompositionData hyp chi1) (data2 : CharacterDecompositionData hyp chi2)
     (h : ClassFunction.inner chi1 chi2 = 0) :
     ∀ φ₁ ∈ data1.constituents, ∀ φ₂ ∈ data2.constituents, φ₁ ≠ φ₂ := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hcount : ClassFunction.inner chi1 chi2
       = ((data1.constituents.filter (· ∈ data2.constituents)).card : ℂ) := by
@@ -342,7 +342,7 @@ theorem constituents_not_conj_of_inner_conj_eq_zero {L : Subgroup G} [Finite G]
     (h : ClassFunction.inner chi1 chi2.conj = 0) :
     ∀ φ₁ ∈ data1.constituents, ∀ φ₂ ∈ data2.constituents,
       (φ₁ : ClassFunction ↥L ℂ) ≠ (φ₂ : ClassFunction ↥L ℂ).conj := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hinv : ∀ ψ : IrreducibleCharacter ↥L,
       IrreducibleCharacter.conjPerm ↥L (IrreducibleCharacter.conjPerm ↥L ψ) = ψ := fun ψ =>
@@ -420,7 +420,7 @@ theorem coherent_extension_mem_span_Rset_of_mem {L : Subgroup G} [Finite G]
     (hchiS : chi ∈ S) (hchiConjS : chi.conj ∈ S)
     (hsupp : (chi - chi.conj).support ⊆ hyp.A) :
     coh.extension chi ∈ Submodule.span ℤ (Rset data) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hchi_zSpan : chi ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥L) S :=
     Submodule.subset_span hchiS
@@ -471,7 +471,7 @@ theorem pair_tau_diff_mem_span {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
     (hdeg : χ₁ (1 : ↥L) = χ₂ (1 : ↥L)) :
     hyp.tau (χ₁ - χ₂) ∈
       Submodule.span ℤ (Rset (data χ₁ h₁) ∪ Rset (data χ₂ h₂)) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   by_cases heq : χ₁ = χ₂
   · have h0 : χ₁ - χ₂ = 0 := by rw [heq, sub_self]
@@ -625,7 +625,7 @@ theorem chiRhoCF_inner_eq_of_equal_degree_ofData {L : Subgroup G} [Finite G]
     (hdeg : χ₁ (1 : ↥L) = χ₂ (1 : ↥L)) :
     ClassFunction.inner χ₁ (hyp.toHypothesis71.chiRhoCF ψ)
       = ClassFunction.inner χ₂ (hyp.toHypothesis71.chiRhoCF ψ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hsupp := Sset_diff_support_subset_ambientA_of_sharp_subset hyp hχ₁ hχ₂ hdeg hsub
   set α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ (typeIA L hyp.typeI) L :=
     ⟨χ₁ - χ₂, (ClassFunction.mem_supportedSubmodule).mpr hsupp⟩ with hα
@@ -664,7 +664,7 @@ theorem chiRhoCF_restrict_inner_eq_of_equal_degree_ofData {L : Subgroup G} [Fini
         (hyp.toHypothesis71.chiRhoCF ψ))
       = ClassFunction.inner θ₂ (ClassFunction.restrict ((hyp.typeI.typeF.H).subgroupOf L)
         (hyp.toHypothesis71.chiRhoCF ψ)) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hfact := chiRhoCF_inner_eq_of_equal_degree_ofData hyp data hsub h1A horth hχ₁ hχ₂ hdeg
   rw [hθ₁, hθ₂, ClassFunction.inner_induce_eq_inner_restrict,
     ClassFunction.inner_induce_eq_inner_restrict] at hfact
@@ -694,15 +694,15 @@ theorem chiRhoCF_restrict_constant_off_derived_ofData {L : Subgroup G} [Finite G
         (hyp.toHypothesis71.chiRhoCF ψ) x
       = ClassFunction.restrict ((hyp.typeI.typeF.H).subgroupOf L)
         (hyp.toHypothesis71.chiRhoCF ψ) y := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   set Hc := ((hyp.typeI.typeF.H).subgroupOf L) with hHc
   set g : ClassFunction ↥Hc ℂ :=
     ClassFunction.restrict Hc (hyp.toHypothesis71.chiRhoCF ψ) with hg
-  haveI : Fintype ↥(commutator ↥Hc) := Fintype.ofFinite _
-  haveI : Invertible (Nat.card ↥(commutator ↥Hc) : ℂ) :=
+  have : Fintype ↥(commutator ↥Hc) := Fintype.ofFinite _
+  have : Invertible (Nat.card ↥(commutator ↥Hc) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : Fintype (IrreducibleCharacter ↥Hc) := Fintype.ofFinite _
+  have : Fintype (IrreducibleCharacter ↥Hc) := Fintype.ofFinite _
   refine OddOrder.RepresentationTheory.constant_off_normal_of_inner_block_const g
     (fun θ₁ θ₂ ρ hθ₁t hθ₂t hlo₁ hlo₂ => ?_) (fun θ₁ θ₂ ρ hlo₁ hlo₂ => ?_) hx hy
   · -- Block-constant coefficients on the non-trivial constituents.
@@ -743,7 +743,7 @@ theorem psi_constant_on_kernel_sub_derived_ofData {L : Subgroup G} [Finite G]
     {g₁ g₂ : G} (hg₁ : g₁ ∈ hyp.typeI.typeF.H) (hg₁' : g₁ ∉ derivedInG hyp.typeI.typeF.H)
     (hg₂ : g₂ ∈ hyp.typeI.typeF.H) (hg₂' : g₂ ∉ derivedInG hyp.typeI.typeF.H) :
     ψ g₁ = ψ g₂ := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hg₁1 : g₁ ≠ 1 := fun h => hg₁' (h ▸ Subgroup.one_mem _)
   have hg₂1 : g₂ ≠ 1 := fun h => hg₂' (h ▸ Subgroup.one_mem _)
   set Hc := ((hyp.typeI.typeF.H).subgroupOf L) with hHc

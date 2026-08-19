@@ -115,7 +115,7 @@ theorem inducedKernelFamily_sdiff_eq_irreducible_not_subset_characterKernel
     inducedKernelFamily K ⊥ \ inducedKernelFamily K Z =
       {χ : ClassFunction ↥L ℂ | IsIrreducibleCharacter χ ∧
         ¬ ((Z : Set ↥L) ⊆ OddOrder.Peterfalvi.S03.characterKernel χ)} := by
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
   ext φ
   constructor
   · -- (⊆): `φ ∈ X` is irreducible (`hX`); if `Z ⊆ Ker φ` then `φ ∈ 𝒮(Z)`, contradiction.

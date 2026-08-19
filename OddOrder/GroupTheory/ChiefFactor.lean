@@ -192,7 +192,7 @@ theorem chiefFactorConjAction_smul_eq_self_iff_mem {U V : Subgroup G}
     [U.Normal] [V.Normal] (g : G) :
     letI := chiefFactorConjAction U V
     (∀ v : U ⧸ V.subgroupOf U, g • v = v) ↔ g ∈ chiefFactorCentralizer U V := by
-  letI := chiefFactorConjAction U V
+  let := chiefFactorConjAction U V
   have hcoe : ∀ x : U, (↑(ConjAct.toConjAct g • x) : G) = g * ↑x * g⁻¹ := fun _ => rfl
   have hL : (∀ v : U ⧸ V.subgroupOf U, g • v = v)
       ↔ ∀ x : U, (g * (↑x)⁻¹ * g⁻¹ * ↑x : G) ∈ V := by
@@ -397,7 +397,7 @@ theorem IsChiefFactor.isMinimalNormal_map_quotient
     {U V : Subgroup G} (hChief : IsChiefFactor U V) :
     haveI : V.Normal := hChief.normal_bot
     OddOrder.Isaacs.Ch02.IsMinimalNormal (U.map (QuotientGroup.mk' V)) := by
-  haveI hV_normal : V.Normal := hChief.normal_bot
+  have hV_normal : V.Normal := hChief.normal_bot
   refine ⟨hChief.normal_top.map _ QuotientGroup.mk_surjective, ?_, ?_⟩
   · intro hbot
     have hU_le_V : U ≤ V := by
@@ -409,7 +409,7 @@ theorem IsChiefFactor.isMinimalNormal_map_quotient
     exact hChief.lt.not_ge hU_le_V
   · intro N hN_normal hN_le_Ubar
     let W : Subgroup G := N.comap (QuotientGroup.mk' V)
-    haveI hW_normal : W.Normal := hN_normal.comap _
+    have hW_normal : W.Normal := hN_normal.comap _
     have hV_le_W : V ≤ W := by
       intro v hv
       change (QuotientGroup.mk' V) v ∈ N
@@ -446,16 +446,16 @@ theorem IsChiefFactor.isMinimalNormal_map_quotient
 /-- In a finite solvable group, a chief factor `U/V` is elementary abelian, in
 particular `[U, U] ≤ V`. -/
 theorem IsChiefFactor.commutator_le_of_isSolvable
-    [Finite G] [IsSolvable G] {U V : Subgroup G} (hChief : IsChiefFactor U V) :
+    [Finite G] [Group.IsSolvable G] {U V : Subgroup G} (hChief : IsChiefFactor U V) :
     ⁅U, U⁆ ≤ V := by
-  haveI hV_normal : V.Normal := hChief.normal_bot
-  haveI hU_normal : U.Normal := hChief.normal_top
+  have hV_normal : V.Normal := hChief.normal_bot
+  have hU_normal : U.Normal := hChief.normal_top
   -- `U.map (mk' V)` is a minimal normal subgroup of `G/V`, hence elementary
   -- abelian (chief factor of a finite solvable group).
   have hMin : OddOrder.Isaacs.Ch02.IsMinimalNormal (U.map (QuotientGroup.mk' V)) :=
     hChief.isMinimalNormal_map_quotient
   obtain ⟨p, hp_prime, hElem⟩ :=
-    OddOrder.Isaacs.Ch03.solvable_minimal_normal_isElementaryAbelian hMin
+    OddOrder.Isaacs.Ch03.minimal_normal_isElementaryAbelian_of_isSolvable hMin
   -- `U/V` abelian ⇒ `[u, u'] ∈ V` for `u, u' ∈ U`.
   rw [Subgroup.commutator_le]
   intro u hu u' hu'

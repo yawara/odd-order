@@ -96,7 +96,7 @@ theorem induce_mem_span_induce_irr (K : Subgroup L) [Finite ↥K] [Invertible (N
       (Set.range (fun θ : IrreducibleCharacter ↥K =>
         ClassFunction.induce K (θ : ClassFunction ↥K ℂ))) := by
   classical
-  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  have : Fintype ↥K := Fintype.ofFinite ↥K
   have hφ : φ ∈ Submodule.span ℂ
       (Set.range (fun θ : IrreducibleCharacter ↥K => (θ : ClassFunction ↥K ℂ))) := by
     rw [span_irreducibleCharacter_eq_top]; exact Submodule.mem_top
@@ -118,7 +118,7 @@ theorem supported_mem_span_induce_irr (K : Subgroup L) [K.Normal] [Finite ↥K]
     ψ ∈ Submodule.span ℂ
       (Set.range (fun θ : IrreducibleCharacter ↥K =>
         ClassFunction.induce K (θ : ClassFunction ↥K ℂ))) := by
-  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  have : Fintype ↥K := Fintype.ofFinite ↥K
   rw [eq_induce_restrict_of_supported K ψ hψ]
   exact induce_mem_span_induce_irr K _
 
@@ -453,7 +453,7 @@ theorem induce_norm_ne_zero (K : Subgroup L) [K.Normal] [Finite ↥K] [Invertibl
     [Invertible (Nat.card ↥K : ℂ)] (θ : IrreducibleCharacter ↥K) :
     ClassFunction.inner (ClassFunction.induce K (θ : ClassFunction ↥K ℂ))
       (ClassFunction.induce K (θ : ClassFunction ↥K ℂ)) ≠ 0 := by
-  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  have : Fintype ↥K := Fintype.ofFinite ↥K
   intro h0
   have hkey := card_mul_inner_self_induce_eq_card_inertia (G := L) θ
   rw [h0, mul_zero] at hkey
@@ -467,7 +467,7 @@ degree relation `ζ_i(1) = d_i ζ_0(1)` for the family `ζ_i = Ind_K^L θ_i`. -/
 theorem induce_apply_one_ne_zero (K : Subgroup L) [Finite ↥K] [Invertible (Nat.card ↥K : ℂ)]
     (θ : IrreducibleCharacter ↥K) :
     ClassFunction.induce K (θ : ClassFunction ↥K ℂ) (1 : L) ≠ 0 := by
-  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  have : Fintype ↥K := Fintype.ofFinite ↥K
   rw [ClassFunction.induce_apply_one]
   obtain ⟨d, hd, hval⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
   refine mul_ne_zero (Nat.cast_ne_zero.mpr K.index_ne_zero_of_finite) ?_
@@ -481,7 +481,7 @@ theorem induce_apply_one_star (K : Subgroup L) [Finite ↥K] [Invertible (Nat.ca
     (θ : IrreducibleCharacter ↥K) :
     star (ClassFunction.induce K (θ : ClassFunction ↥K ℂ) (1 : L))
       = ClassFunction.induce K (θ : ClassFunction ↥K ℂ) (1 : L) := by
-  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  have : Fintype ↥K := Fintype.ofFinite ↥K
   rw [ClassFunction.induce_apply_one]
   obtain ⟨d, _, hval⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
   rw [hval, ← Nat.cast_mul]
@@ -500,7 +500,7 @@ theorem induce_family_orthogonal (K : Subgroup L) [K.Normal] [Finite ↥K] [Inve
     ∀ a b : Fin (n + 1), a ≠ b →
       ClassFunction.inner (ClassFunction.induce K (θ a : ClassFunction ↥K ℂ))
         (ClassFunction.induce K (θ b : ClassFunction ↥K ℂ)) = 0 := by
-  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  have : Fintype ↥K := Fintype.ofFinite ↥K
   exact fun a b hab => inner_induce_eq_zero_of_not_conj (θ a) (θ b) (hnc a b hab)
 
 /-- **An injective induced family is pairwise orthogonal** (Peterfalvi (7.6)/(7.7.a)).  When the
@@ -515,7 +515,7 @@ theorem induce_family_orthogonal_of_injective (K : Subgroup L) [K.Normal] [Finit
     ∀ a b : Fin (n + 1), a ≠ b →
       ClassFunction.inner (ClassFunction.induce K (θ a : ClassFunction ↥K ℂ))
         (ClassFunction.induce K (θ b : ClassFunction ↥K ℂ)) = 0 := by
-  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  have : Fintype ↥K := Fintype.ofFinite ↥K
   exact induce_family_orthogonal K θ fun a b hab g hg =>
     hab (hinj ((induce_eq_induce_iff_conj (θ a) (θ b)).mpr ⟨g, hg⟩))
 
@@ -530,7 +530,7 @@ theorem induce_diff_support {K : Subgroup L} [hK : K.Normal] [Finite ↥K]
         = d * ClassFunction.induce K (θ₀ : ClassFunction ↥K ℂ) (1 : L)) :
     (ClassFunction.induce K (θ : ClassFunction ↥K ℂ)
         - d • ClassFunction.induce K (θ₀ : ClassFunction ↥K ℂ)).support ⊆ (K : Set L) \ {1} := by
-  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  have : Fintype ↥K := Fintype.ofFinite ↥K
   have hvanish : ∀ φ : ClassFunction ↥K ℂ, ∀ x : L, x ∉ K → ClassFunction.induce K φ x = 0 := by
     intro φ x hxK
     have hconj : x ∉ ClassFunction.conjugatesInto K := by
@@ -611,7 +611,7 @@ theorem supported_mem_span_psi (K : Subgroup L) [K.Normal] [Finite ↥K]
     (hdeg : ∀ i : Fin (n + 1), ζ i (1 : L) = d i * ζ 0 (1 : L)) (hz0 : ζ 0 (1 : L) ≠ 0)
     {ψ : ClassFunction L ℂ} (hsupp : ∀ y : L, y ∉ K → ψ y = 0) (hψ1 : ψ (1 : L) = 0) :
     ψ ∈ Submodule.span ℂ ((fun i => ζ i - d i • ζ 0) '' {i : Fin (n + 1) | i ≠ 0}) := by
-  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  have : Fintype ↥K := Fintype.ofFinite ↥K
   refine mem_span_psi_of_apply_one_zero ζ d hdeg hz0 ?_ hψ1
   refine Submodule.span_mono ?_ (supported_mem_span_induce_irr K ψ hsupp)
   rintro v ⟨θ, rfl⟩
@@ -681,7 +681,7 @@ theorem exists_distinct_induced_family (K : Subgroup L) [K.Normal] [Finite ↥K]
       ∀ φ : IrreducibleCharacter ↥K,
         ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
           Set.range (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) := by
-  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  have : Fintype ↥K := Fintype.ofFinite ↥K
   exact
     let F := distinctInducedFamily K
     ⟨F.n, F.θ, F.inj, F.cover⟩
@@ -707,7 +707,7 @@ theorem induce_family_comp_perm_covering {K : Subgroup L} [Finite ↥K]
     ∀ φ : IrreducibleCharacter ↥K,
       ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
         Set.range (fun i => ClassFunction.induce K (θ (σ i) : ClassFunction ↥K ℂ)) := by
-  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  have : Fintype ↥K := Fintype.ofFinite ↥K
   intro φ
   obtain ⟨i, hi⟩ := hcover φ
   exact ⟨σ.symm i, by simpa using hi⟩
@@ -736,7 +736,7 @@ theorem exists_placed_induced_family (K : Subgroup L) [K.Normal] [Finite ↥K]
       ∀ φ : IrreducibleCharacter ↥K, ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
         Set.range (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) := by
   classical
-  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  have : Fintype ↥K := Fintype.ofFinite ↥K
   obtain ⟨φ0, hφ0⟩ := hχ_range
   obtain ⟨jd, hjd⟩ := (distinctInducedFamily K).cover φ0
   obtain ⟨jt, hjt⟩ := (distinctInducedFamily K).cover (trivialIrreducibleCharacter ↥K)
@@ -803,7 +803,7 @@ theorem chiRho_decomp_induced {G : Type*} [Group G] [Fintype G] {A : Set G} {L :
           ClassFunction.inner (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
             (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))) *
         ClassFunction.induce K (θ i : ClassFunction ↥K ℂ) x := by
-  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  have : Fintype ↥K := Fintype.ofFinite ↥K
   refine chiRho_decomp_proof H71 (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) d
     psi_support (induce_family_orthogonal_of_injective K θ hinj)
     (fun i => induce_norm_ne_zero K (θ i)) hAconj ?_ χ hx
@@ -851,7 +851,7 @@ theorem chiRho_apply_eq_zeta0_induced {G : Type*} [Group G] [Fintype G] {A : Set
         = -(d i))
     {x : ↥L} (hx : (x : G) ∈ A) :
     H71.chiRho χ x = ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) x := by
-  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  have : Fintype ↥K := Fintype.ofFinite ↥K
   refine chiRho_apply_eq_zeta0_of_inner_tau_uniform H71
     (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) d psi_support
     (induce_family_orthogonal_of_injective K θ hinj)
@@ -921,7 +921,7 @@ theorem supportInSubgroup_sharp_conj_mem_iff (H : Subgroup G) {A : Set G}
     (hHnorm : ∀ (l : ↥L) {h : G}, h ∈ H → (l : G) * h * (l : G)⁻¹ ∈ H) (g h : ↥L) :
     h * g * h⁻¹ ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L ↔
       g ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L := by
-  haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
+  have hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
   rw [mem_supportInSubgroup_sharp_subgroupOf_iff H hAH,
     mem_supportInSubgroup_sharp_subgroupOf_iff H hAH]
   refine and_congr ?_ ?_
@@ -1089,9 +1089,9 @@ theorem hypothesis76OfDadeTrivialBase_zeta_zero
       = ClassFunction.induce (H.subgroupOf L)
           ((trivialIrreducibleCharacter ↥(H.subgroupOf L) : IrreducibleCharacter _) :
             ClassFunction ↥(H.subgroupOf L) ℂ) := by
-  haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
-  letI : Fintype ↥(H.subgroupOf L) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥(H.subgroupOf L) : ℂ) :=
+  have hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
+  let : Fintype ↥(H.subgroupOf L) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥(H.subgroupOf L) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   unfold hypothesis76OfDadeTrivialBase hypothesis76OfFamily
   dsimp only
@@ -1148,9 +1148,9 @@ theorem hypothesis76OfDadeBase_zeta_zero
       invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
     (hypothesis76OfDadeBase H71 hτ H hHL hHnorm hAH φ₀).zeta 0
       = ClassFunction.induce (H.subgroupOf L) (φ₀ : ClassFunction ↥(H.subgroupOf L) ℂ) := by
-  haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
-  letI : Fintype ↥(H.subgroupOf L) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥(H.subgroupOf L) : ℂ) :=
+  have hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
+  let : Fintype ↥(H.subgroupOf L) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥(H.subgroupOf L) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   unfold hypothesis76OfDadeBase hypothesis76OfFamily
   dsimp only

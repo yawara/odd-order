@@ -40,11 +40,11 @@ variable {G : Type*} [Group G]
 /-- 準同型の制限に対する第一同型定理の位数形: `|f(H)| · |H ⊓ ker f| = |H|`. -/
 theorem card_map_mul_card_inf_ker {N : Type*} [Group N] [Finite G] (H : Subgroup G)
     (f : G →* N) : Nat.card (H.map f) * Nat.card ((H ⊓ f.ker : Subgroup G)) = Nat.card H := by
-  have hker : Nat.card ((f.restrict H).ker) = Nat.card ((H ⊓ f.ker : Subgroup G)) := by
-    rw [MonoidHom.ker_restrict, ← Subgroup.inf_subgroupOf_left]
+  have hker : Nat.card ((f.domRestrict H).ker) = Nat.card ((H ⊓ f.ker : Subgroup G)) := by
+    rw [MonoidHom.ker_domRestrict, ← Subgroup.inf_subgroupOf_left]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe (inf_le_left : H ⊓ f.ker ≤ H)).toEquiv
-  have h1 := Subgroup.card_mul_index ((f.restrict H).ker)
-  rw [Subgroup.index_ker, MonoidHom.restrict_range, hker, mul_comm] at h1
+  have h1 := Subgroup.card_mul_index ((f.domRestrict H).ker)
+  rw [Subgroup.index_ker, MonoidHom.domRestrict_range, hker, mul_comm] at h1
   exact h1
 
 /-! ### Lemma 4.6 から出る指数評価 -/
@@ -62,7 +62,7 @@ theorem card_commutator_le_of_normal_cyclic_quotient [Finite G] {Q : Subgroup G}
       ≤ Nat.card (⁅Q, Q⁆ : Subgroup G) * (Subgroup.center G).relIndex Q := by
   set Z : Subgroup G := Subgroup.center G with hZdef
   set K : Subgroup G := ⁅Q, Q⁆ with hKdef
-  haveI : K.Normal := Subgroup.commutator_normal Q Q
+  have : K.Normal := Subgroup.commutator_normal Q Q
   set f : G →* G ⧸ K := QuotientGroup.mk' K with hfdef
   have hfsurj : Function.Surjective f := QuotientGroup.mk'_surjective K
   have hKQ : K ≤ Q := Subgroup.commutator_le_left Q Q
@@ -70,7 +70,7 @@ theorem card_commutator_le_of_normal_cyclic_quotient [Finite G] {Q : Subgroup G}
     rw [_root_.commutator_def]
     exact Subgroup.commutator_mono le_top le_top
   set A : Subgroup (G ⧸ K) := Q.map f with hAdef
-  haveI hAnorm : A.Normal := Subgroup.Normal.map inferInstance f hfsurj
+  have hAnorm : A.Normal := Subgroup.Normal.map inferInstance f hfsurj
   -- `Ā` は可換
   have hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a := by
     rintro _ ⟨x, hx, rfl⟩ _ ⟨y, hy, rfl⟩
@@ -164,7 +164,7 @@ theorem card_commutator_le_pow_choose_two {p : ℕ} [Fact p.Prime] :
     simp [(_root_.commutator_eq_bot_iff_center_eq_top (G := G)).mpr htop]
   | succ n ih =>
     intro G _ _ hP hidx
-    haveI : Group.IsNilpotent G := hP.isNilpotent
+    have : Group.IsNilpotent G := hP.isNilpotent
     rcases eq_or_ne (Subgroup.center G) ⊤ with htop | hne
     · simp only [(_root_.commutator_eq_bot_iff_center_eq_top (G := G)).mpr htop,
         Subgroup.card_bot]
@@ -172,7 +172,7 @@ theorem card_commutator_le_pow_choose_two {p : ℕ} [Fact p.Prime] :
     -- `Z(G)` を含む極大部分群 `Q`
     obtain ⟨Q, hQco, hZQ⟩ :=
       (IsCoatomic.eq_top_or_exists_le_coatom (Subgroup.center G)).resolve_left hne
-    haveI hQnorm : Q.Normal :=
+    have hQnorm : Q.Normal :=
       Subgroup.NormalizerCondition.normal_of_coatom Q
         (Group.normalizerCondition_of_isNilpotent (G := G)) hQco
     have hQprime : (Q.index).Prime :=

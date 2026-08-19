@@ -96,7 +96,7 @@ theorem pow_two_eq_one_of_mem_frattiniSquare
     (hfour : ∀ z : frattini P, z ^ 4 = 1)
     {x : P} (hx : x ∈ frattiniSquare P) :
     x ^ 2 = 1 := by
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   obtain ⟨z, hz, hzx⟩ := Subgroup.mem_map.mp hx
@@ -183,7 +183,7 @@ theorem frattiniSquare_strict_chain_of_exponent_four
         frattiniNormalInvariant Y.subtype ∧
       frattiniNormalInvariant Y.subtype <
         normalInvariantTop Y.subtype := by
-  letI : Nontrivial P := by
+  let : Nontrivial P := by
     obtain ⟨x, y, _, _, hxy⟩ := hmulti
     exact ⟨⟨x, y, hxy⟩⟩
   constructor
@@ -260,13 +260,13 @@ theorem le_frattiniSquare_or_eq_frattini_of_invariant
       intro x hx y hy
       obtain ⟨g, hg⟩ := hxi.transitive x hx y hy
       exact ⟨g, hg⟩)
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   obtain ⟨ι, hι, _e, _he, _hε, classify⟩ :=
     exists_homocyclic_and_invariant_eq_agemo
       (hP.to_subgroup (frattini P)) hPhiInv.restrict htransPhi
-  letI : Fintype ι := hι
+  let : Fintype ι := hι
   let U : Subgroup (frattini P) := C.subgroupOf (frattini P)
   have hUInv : IsAInvariant hPhiInv.restrict U := by
     simpa [U] using hPhiInv.subgroupOf hCinv
@@ -353,7 +353,7 @@ theorem commutator_frattini_top_le_frattiniSquare_of_exponent_four
     apply hSquareNeBot
     exact le_antisymm
       (frattiniSquare_le_frattini.trans (le_of_eq hPhiBot)) bot_le
-  letI : Group.IsNilpotent P := hP.isNilpotent
+  let : Group.IsNilpotent P := hP.isNilpotent
   have hcommLt : ⁅frattini P, (⊤ : Subgroup P)⁆ < frattini P :=
     OddOrder.Isaacs.Ch04.commutator_lt_self_of_isNilpotent_ambient
       (E := frattini P) (F := (⊤ : Subgroup P)) hPhiNeBot

@@ -68,8 +68,8 @@ theorem isTypeB_of_isomorphicOrderQModuleSplit_of_xiLengthThree
   have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
     frattini_isElementaryAbelian_of_xiLengthThree
       hP hncomm hmulti hxi hlen hprime
-  letI : IsMulCommutative ↑(frattini P) := IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : IsMulCommutative ↑(frattini P) := IsMulCommutative.of_comm hEA.comm
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   obtain ⟨factors, c, ePhi, nu, dataL0, dataR0, hn2, -, hnuPrim, hconj,
       hnuL0, hnuR0⟩ :=
     exists_complementaryFactorCoordinates_of_xiLengthThree
@@ -138,7 +138,7 @@ theorem isTypeB_of_isomorphicOrderQModuleSplit_of_xiLengthThree
     intro x hxne
     have hfin : Finite (GaloisField 2 n) :=
       Nat.finite_of_card_ne_zero (by rw [hcard]; positivity)
-    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    let : Fintype (GaloisField 2 n) := Fintype.ofFinite _
     have h := FiniteField.pow_card_sub_one_eq_one x hxne
     rwa [← Nat.card_eq_fintype_card, hcard] at h
   -- normalize each factor by the `A(n, θ) ≅ A(n, θ⁻¹)` flip
@@ -432,7 +432,7 @@ theorem isTypeB_of_isomorphicOrderQModuleSplit_of_card_eq_cube
   have hZcard : Nat.card ↥(Subgroup.center P) = 2 ^ m := by
     have hcomm : ∀ x y : P ⧸ Subgroup.center P, x * y = y * x :=
       isplit.split.quotientEA.comm
-    haveI : (isplit.split.left).Normal := normal_of_mul_comm hcomm _
+    have : (isplit.split.left).Normal := normal_of_mul_comm hcomm _
     have hq : Nat.card (P ⧸ Subgroup.center P) =
         Nat.card ↥(Subgroup.center P) ^ 2 := by
       calc Nat.card (P ⧸ Subgroup.center P)

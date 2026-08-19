@@ -68,11 +68,12 @@ splits the problem via `wielandt_step`, with the per-factor identity on `N` from
 induction hypothesis on the smaller quotient `H/N`. -/
 theorem wielandt_formula_of_perfactor.{u} {L : Type*} [Group L] [Finite L] {U E : Subgroup L}
     (hpf : WielandtPerFactor.{_, u} L U E) :
-    ∀ (H : Type u) [Group H] [Finite H] [IsSolvable H] (φ : L →* MulAut H),
+    ∀ (H : Type u) [Group H] [Finite H] [Group.IsSolvable H] (φ : L →* MulAut H),
       Nat.Coprime (Nat.card L) (Nat.card H) →
       Nat.card ↥(fixedSubgroup φ ⊤) ^ Nat.card ↥E * Nat.card H =
         Nat.card ↥(fixedSubgroup φ E) ^ Nat.card ↥E * Nat.card ↥(fixedSubgroup φ U) := by
-  suffices key : ∀ n : ℕ, ∀ (H : Type u) [Group H] [Finite H] [IsSolvable H] (φ : L →* MulAut H),
+  suffices key : ∀ n : ℕ, ∀ (H : Type u) [Group H] [Finite H] [Group.IsSolvable H]
+      (φ : L →* MulAut H),
       Nat.Coprime (Nat.card L) (Nat.card H) → Nat.card H = n →
       Nat.card ↥(fixedSubgroup φ ⊤) ^ Nat.card ↥E * Nat.card H =
         Nat.card ↥(fixedSubgroup φ E) ^ Nat.card ↥E * Nat.card ↥(fixedSubgroup φ U) by
@@ -84,16 +85,16 @@ theorem wielandt_formula_of_perfactor.{u} {L : Type*} [Group L] [Finite L] {U E 
     intro H _ _ _ φ hcop hcard
     rcases eq_or_ne (Nat.card H) 1 with h1 | h1
     · -- Base case: `H` is trivial, so every fixed-point count is `1`.
-      haveI : Subsingleton H := Nat.card_eq_one_iff_unique.mp h1 |>.1
+      have : Subsingleton H := Nat.card_eq_one_iff_unique.mp h1 |>.1
       have hsub : ∀ K : Subgroup H, Nat.card ↥K = 1 := fun K =>
         Nat.card_eq_one_iff_unique.mpr ⟨⟨fun a b => Subtype.ext (Subsingleton.elim _ _)⟩, ⟨1⟩⟩
       simp only [hsub, h1, one_pow, mul_one]
     · -- Inductive step: peel off an elementary-abelian `L`-invariant normal subgroup `N`.
-      haveI : Nontrivial H :=
+      have : Nontrivial H :=
         Finite.one_lt_card_iff_nontrivial.mp (by have := Nat.card_pos (α := H); omega)
       obtain ⟨N, p, hp, hN_ne, hN_normal, hN_inv, hN_elab⟩ :=
         exists_aInvariant_normal_isElementaryAbelian (φ := φ)
-      haveI : N.Normal := hN_normal
+      have : N.Normal := hN_normal
       -- Coprimality and the quotient action descend to `H / N`.
       have hcopN : Nat.Coprime (Nat.card L) (Nat.card (H ⧸ N)) :=
         hcop.coprime_dvd_right (Subgroup.card_dvd_of_surjective _ (QuotientGroup.mk'_surjective N))

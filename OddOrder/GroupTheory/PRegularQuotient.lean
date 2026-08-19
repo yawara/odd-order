@@ -109,7 +109,7 @@ by the `p`-regular elements.  Their quotient is a `p`-element of `N` and — the
 theorem eq_of_isPRegular_of_mk_eq (hp : p.Prime) (hNp : IsPGroup p ↥N)
     (hcent : ∀ x : G, IsPRegular p x → ∀ z ∈ N, Commute x z) {x y : G} (hx : IsPRegular p x)
     (hy : IsPRegular p y) (h : (QuotientGroup.mk x : G ⧸ N) = QuotientGroup.mk y) : x = y := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hzN : x⁻¹ * y ∈ N := QuotientGroup.eq.mp h
   have hcomm : Commute x (x⁻¹ * y) := hcent x hx _ hzN
   have hxy : Commute x⁻¹ y := by

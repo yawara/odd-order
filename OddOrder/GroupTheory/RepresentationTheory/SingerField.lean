@@ -84,7 +84,7 @@ abelian `P` (`|P| = p^q`) is identified with the additive group of `GF(p^q)`. -/
 theorem nonempty_ringEquiv_galoisField [Fact p.Prime] [Fintype M] {n : ℕ} (hn : n ≠ 0)
     (data : SingerFieldData (p := p) (C := C) (M := M)) (hcard : Fintype.card M = p ^ n) :
     Nonempty (data.K ≃+* GaloisField p n) := by
-  haveI : Fintype (GaloisField p n) := Fintype.ofFinite _
+  have : Fintype (GaloisField p n) := Fintype.ofFinite _
   refine ⟨FiniteField.ringEquivOfCardEq ?_⟩
   rw [data.card_K_eq, hcard, ← Nat.card_eq_fintype_card, GaloisField.card p n hn]
 
@@ -105,10 +105,10 @@ theorem nonempty_singerFieldData [Finite M]
   classical
   obtain ⟨I, hImax, ⟨lequiv⟩⟩ :=
     (isSimpleModule_iff_quot_maximal (R := MonoidAlgebra (ZMod p) C) (M := M)).mp ‹_›
-  haveI : I.IsMaximal := hImax
-  letI : Field (MonoidAlgebra (ZMod p) C ⧸ I) := Ideal.Quotient.field I
-  haveI : Finite (MonoidAlgebra (ZMod p) C ⧸ I) := Finite.of_equiv _ lequiv.toEquiv
-  letI : Fintype (MonoidAlgebra (ZMod p) C ⧸ I) := Fintype.ofFinite _
+  have : I.IsMaximal := hImax
+  let : Field (MonoidAlgebra (ZMod p) C ⧸ I) := Ideal.Quotient.field I
+  have : Finite (MonoidAlgebra (ZMod p) C ⧸ I) := Finite.of_equiv _ lequiv.toEquiv
+  let : Fintype (MonoidAlgebra (ZMod p) C ⧸ I) := Fintype.ofFinite _
   refine ⟨{
     K := MonoidAlgebra (ZMod p) C ⧸ I
     e := lequiv.toAddEquiv
@@ -207,8 +207,8 @@ theorem isSimpleModule_of_isCyclic_faithful_card {q : ℕ} (hq : q.Prime)
   have hp2 : 2 ≤ p := (Fact.out (p := p.Prime)).two_le
   have hq2 : 2 ≤ q := hq.two_le
   have hMpos : 0 < Nat.card M := by rw [hcardM]; positivity
-  haveI : IsSemisimpleModule (MonoidAlgebra (ZMod p) C) M := inferInstance
-  haveI : Nontrivial M := by
+  have : IsSemisimpleModule (MonoidAlgebra (ZMod p) C) M := inferInstance
+  have : Nontrivial M := by
     have hp2q : 2 ≤ p ^ q := le_trans hp2 (Nat.le_self_pow hq.pos.ne' p)
     have : 1 < Nat.card M := by rw [hcardM]; omega
     exact (Finite.one_lt_card_iff_nontrivial).mp this
@@ -221,8 +221,8 @@ theorem isSimpleModule_of_isCyclic_faithful_card {q : ℕ} (hq : q.Prime)
   -- `g^N` fixes every simple constituent `m ∈ s`.
   have hfix : ∀ m ∈ s, ∀ x : M, x ∈ m → MonoidAlgebra.of (ZMod p) C (g ^ N) • x = x := by
     intro m hm x hxm
-    haveI hsm : IsSimpleModule (MonoidAlgebra (ZMod p) C) ↥m := hsimple m hm
-    haveI : Fintype ↥m := Fintype.ofFinite _
+    have hsm : IsSimpleModule (MonoidAlgebra (ZMod p) C) ↥m := hsimple m hm
+    have : Fintype ↥m := Fintype.ofFinite _
     obtain ⟨data⟩ := nonempty_singerFieldData (p := p) (C := C) (M := ↥m)
     -- `|m| = p^d`, `1 ≤ d < q`, `d ∣ D`.
     have hmdvd : Nat.card ↥m ∣ Nat.card M :=
@@ -309,8 +309,8 @@ theorem isSimpleModule_of_abelian_faithful_card {q : ℕ} (hq : q.Prime) (hqodd 
   have hq2 : 2 ≤ q := hq.two_le
   have hq2ne : q ≠ 2 := by rintro rfl; exact (by decide : ¬ Odd 2) hqodd
   have hMpos : 0 < Nat.card M := by rw [hcardM]; positivity
-  haveI : IsSemisimpleModule (MonoidAlgebra (ZMod p) C) M := inferInstance
-  haveI : Nontrivial M := by
+  have : IsSemisimpleModule (MonoidAlgebra (ZMod p) C) M := inferInstance
+  have : Nontrivial M := by
     have hp2q : 2 ≤ p ^ q := le_trans hp2 (Nat.le_self_pow hq.pos.ne' p)
     have : 1 < Nat.card M := by rw [hcardM]; omega
     exact (Finite.one_lt_card_iff_nontrivial).mp this
@@ -323,8 +323,8 @@ theorem isSimpleModule_of_abelian_faithful_card {q : ℕ} (hq : q.Prime) (hqodd 
   have hfix : ∀ (c : C), ∀ m ∈ s, ∀ x : M, x ∈ m →
       MonoidAlgebra.of (ZMod p) C (c ^ N) • x = x := by
     intro c m hm x hxm
-    haveI hsm : IsSimpleModule (MonoidAlgebra (ZMod p) C) ↥m := hsimple m hm
-    haveI : Fintype ↥m := Fintype.ofFinite _
+    have hsm : IsSimpleModule (MonoidAlgebra (ZMod p) C) ↥m := hsimple m hm
+    have : Fintype ↥m := Fintype.ofFinite _
     obtain ⟨data⟩ := nonempty_singerFieldData (p := p) (C := C) (M := ↥m)
     have hmdvd : Nat.card ↥m ∣ Nat.card M :=
       AddSubgroup.card_addSubgroup_dvd_card m.toAddSubgroup
@@ -380,8 +380,8 @@ theorem isSimpleModule_of_abelian_faithful_card {q : ℕ} (hq : q.Prime) (hqodd 
     simpa [LinearMap.mem_eqLocus] using hx
   -- A **primitive prime divisor** `r ∣ card C` with `orderOf (p : ZMod r) = q`.
   obtain ⟨r, hr, hrn, hord⟩ := OddOrder.NumberTheory.exists_prime_orderOf_eq hp2 hq hq2ne
-  haveI : Fact r.Prime := ⟨hr⟩
-  haveI : Fintype C := Fintype.ofFinite _
+  have : Fact r.Prime := ⟨hr⟩
+  have : Fintype C := Fintype.ofFinite _
   have hrdvdC : r ∣ Fintype.card C := by
     rw [← Nat.card_eq_fintype_card, hcardC, ← Nat.geomSum_eq hp2 q]; exact hrn
   obtain ⟨a, ha⟩ := exists_prime_orderOf_dvd_card r hrdvdC
@@ -423,7 +423,7 @@ theorem exists_galoisField_repr_of_faithful_irreducible {q : ℕ} (hq : q ≠ 0)
       ∀ (c : C) (x : M),
         e (MonoidAlgebra.of (ZMod p) C c • x) = (μ c : GaloisField p q) * e x := by
   classical
-  haveI : Fintype M := Fintype.ofFinite _
+  have : Fintype M := Fintype.ofFinite _
   obtain ⟨data⟩ := nonempty_singerFieldData (p := p) (C := C) (M := M)
   obtain ⟨φ⟩ := data.nonempty_ringEquiv_galoisField hq
     (by rw [← Nat.card_eq_fintype_card, hcardM])
@@ -472,7 +472,7 @@ theorem exists_galoisField_repr {q : ℕ} (hq : q.Prime) (hqodd : Odd q)
       Function.Injective μ ∧
       ∀ (c : C) (x : M),
         e (MonoidAlgebra.of (ZMod p) C c • x) = (μ c : GaloisField p q) * e x := by
-  haveI hsimp : IsSimpleModule (MonoidAlgebra (ZMod p) C) M :=
+  have hsimp : IsSimpleModule (MonoidAlgebra (ZMod p) C) M :=
     isSimpleModule_of_abelian_faithful_card hq hqodd hcardM hcardC hfaith
   exact exists_galoisField_repr_of_faithful_irreducible hq.pos.ne' hcardM hfaith
 
@@ -497,8 +497,8 @@ theorem isCyclic_and_card_dvd_card_sub_one_of_faithful_irreducible
     IsCyclic C ∧ Nat.card C ∣ Nat.card M - 1 := by
   classical
   obtain ⟨data⟩ := nonempty_singerFieldData (p := p) (C := C) (M := M)
-  haveI : Fintype M := Fintype.ofFinite M
-  haveI : Fintype data.K := data.fintype
+  have : Fintype M := Fintype.ofFinite M
+  have : Fintype data.K := data.fintype
   -- The realization `μ : C →* Kˣ` is injective by faithfulness.
   have hμinj : Function.Injective data.μ := by
     rw [injective_iff_map_eq_one]
@@ -509,8 +509,8 @@ theorem isCyclic_and_card_dvd_card_sub_one_of_faithful_irreducible
     rw [hc, Units.val_one, one_mul] at hcompat
     exact data.e.injective hcompat
   -- `Kˣ` is cyclic (finite field), so its subgroup `range μ` is cyclic, hence so is `C`.
-  haveI : IsCyclic data.Kˣ := inferInstance
-  haveI : IsCyclic data.μ.range := inferInstance
+  have : IsCyclic data.Kˣ := inferInstance
+  have : IsCyclic data.μ.range := inferInstance
   have hCcyc : IsCyclic C :=
     isCyclic_of_surjective (MonoidHom.ofInjective hμinj).symm.toMonoidHom
       (MonoidHom.ofInjective hμinj).symm.surjective
@@ -630,15 +630,15 @@ theorem isCyclic_and_card_dvd_of_faithful_irreducible_comm [Finite E] [Finite M]
     IsCyclic E ∧ Nat.card E ∣ Nat.card M - 1 := by
   classical
   -- `𝔽_p[E]` is commutative; equip it with a `CommRing` built on its existing `Ring` (no diamond).
-  letI : CommRing (MonoidAlgebra (ZMod p) E) :=
+  let : CommRing (MonoidAlgebra (ZMod p) E) :=
     { (inferInstance : Ring (MonoidAlgebra (ZMod p) E)) with
       mul_comm := mul_comm_monoidAlgebra_of_comm hcomm }
   -- `M` simple over `𝔽_p[E]` ⟹ `M ≅ 𝔽_p[E] ⧸ I` for a maximal ideal `I`; the quotient is a field.
   obtain ⟨I, hImax, ⟨lequiv⟩⟩ :=
     (isSimpleModule_iff_quot_maximal (R := MonoidAlgebra (ZMod p) E) (M := M)).mp ‹_›
-  haveI : I.IsMaximal := hImax
-  letI : Field (MonoidAlgebra (ZMod p) E ⧸ I) := Ideal.Quotient.field I
-  haveI : Finite (MonoidAlgebra (ZMod p) E ⧸ I) := Finite.of_equiv _ lequiv.toEquiv
+  have : I.IsMaximal := hImax
+  let : Field (MonoidAlgebra (ZMod p) E ⧸ I) := Ideal.Quotient.field I
+  have : Finite (MonoidAlgebra (ZMod p) E ⧸ I) := Finite.of_equiv _ lequiv.toEquiv
   -- `μ : E ↪ Kˣ` realizes `E` inside the units of the field `K = 𝔽_p[E] ⧸ I`.
   let μ : E →* (MonoidAlgebra (ZMod p) E ⧸ I)ˣ :=
     (Units.map (Ideal.Quotient.mk I : MonoidAlgebra (ZMod p) E →+* _).toMonoidHom).comp
@@ -653,8 +653,8 @@ theorem isCyclic_and_card_dvd_of_faithful_irreducible_comm [Finite E] [Finite M]
         = (↑(μ e) : MonoidAlgebra (ZMod p) E ⧸ I) * lequiv x := by
       rw [map_smul, Algebra.smul_def, Ideal.Quotient.algebraMap_eq]; rfl
     rw [hcompat, he, Units.val_one, one_mul]
-  haveI : IsCyclic (MonoidAlgebra (ZMod p) E ⧸ I)ˣ := inferInstance
-  haveI : IsCyclic μ.range := inferInstance
+  have : IsCyclic (MonoidAlgebra (ZMod p) E ⧸ I)ˣ := inferInstance
+  have : IsCyclic μ.range := inferInstance
   refine ⟨isCyclic_of_surjective (MonoidHom.ofInjective hμinj).symm.toMonoidHom
       (MonoidHom.ofInjective hμinj).symm.surjective, ?_⟩
   -- `|E| = |μ.range| ∣ |Kˣ| = |K| - 1 = |M| - 1`.
@@ -685,14 +685,14 @@ theorem coprime_card_sub_one_of_faithful_irreducible_comm_nonscalar
         (∃ n : ℕ, ∀ x : M, MonoidAlgebra.of (ZMod p) E e • x = n • x) → e = 1) :
     Nat.Coprime (Nat.card E) (p - 1) := by
   classical
-  letI : CommRing (MonoidAlgebra (ZMod p) E) :=
+  let : CommRing (MonoidAlgebra (ZMod p) E) :=
     { (inferInstance : Ring (MonoidAlgebra (ZMod p) E)) with
       mul_comm := mul_comm_monoidAlgebra_of_comm hcomm }
   obtain ⟨I, hImax, ⟨lequiv⟩⟩ :=
     (isSimpleModule_iff_quot_maximal (R := MonoidAlgebra (ZMod p) E) (M := M)).mp ‹_›
-  haveI : I.IsMaximal := hImax
-  letI : Field (MonoidAlgebra (ZMod p) E ⧸ I) := Ideal.Quotient.field I
-  haveI : Finite (MonoidAlgebra (ZMod p) E ⧸ I) := Finite.of_equiv _ lequiv.toEquiv
+  have : I.IsMaximal := hImax
+  let : Field (MonoidAlgebra (ZMod p) E ⧸ I) := Ideal.Quotient.field I
+  have : Finite (MonoidAlgebra (ZMod p) E ⧸ I) := Finite.of_equiv _ lequiv.toEquiv
   let μ : E →* (MonoidAlgebra (ZMod p) E ⧸ I)ˣ :=
     (Units.map (Ideal.Quotient.mk I : MonoidAlgebra (ZMod p) E →+* _).toMonoidHom).comp
       (MonoidAlgebra.of (ZMod p) E).toHomUnits
@@ -712,7 +712,7 @@ theorem coprime_card_sub_one_of_faithful_irreducible_comm_nonscalar
     rw [hcompat e x, he, Units.val_one, one_mul]
   have hνinj : Function.Injective ν :=
     Units.map_injective (algebraMap (ZMod p) (MonoidAlgebra (ZMod p) E ⧸ I)).injective
-  haveI : IsCyclic (MonoidAlgebra (ZMod p) E ⧸ I)ˣ := inferInstance
+  have : IsCyclic (MonoidAlgebra (ZMod p) E ⧸ I)ˣ := inferInstance
   have hdisj : μ.range ⊓ ν.range = ⊥ := by
     rw [Subgroup.eq_bot_iff_forall]
     intro z hz

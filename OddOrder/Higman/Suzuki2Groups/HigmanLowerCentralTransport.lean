@@ -57,7 +57,7 @@ theorem map_agemo_mulEquiv
   rw [Agemo, MonoidHom.map_closure]
   congr 1
   ext y
-  simp only [Set.mem_image, Set.mem_setOf_eq]
+  simp only [Set.mem_image, Set.mem_ofPred_eq]
   constructor
   · rintro ⟨z, ⟨x, rfl⟩, rfl⟩
     refine ⟨e x, ?_⟩

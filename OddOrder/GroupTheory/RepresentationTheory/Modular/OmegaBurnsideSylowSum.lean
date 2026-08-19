@@ -48,6 +48,7 @@ variable {p : ℕ} [Fact p.Prime]
 set_option maxHeartbeats 1000000 in
 -- Burnside, the class-size bookkeeping and the Sylow reduction all run under the same
 -- instance chains, so they are elaborated together.
+set_option backward.isDefEq.respectTransparency false in
 /-- **Navarro (4.23), with `|K|` cancelled inside the domain.**
 
 `|G|_{p'} · (W · L̂)(x_K) = |Syl_p| · ∑_χ χ(x_K⁻¹) ω_χ(L̂) · dim V_χ^S`,
@@ -63,7 +64,7 @@ theorem ordCompl_mul_coeff_sylowSum_mul (S : Sylow p G) (C L : ConjClasses G) :
             * (Module.finrank K (Representation.invariants
                 ((wedderburnRepresentation e i).comp (S : Subgroup G).subtype)) : K) := by
   classical
-  letI := Fintype.ofFinite ↥(S : Subgroup G)
+  let := Fintype.ofFinite ↥(S : Subgroup G)
   have hmk : ConjClasses.mk C.out = C := by
     rw [← ConjClasses.quotient_mk_eq_mk, Quotient.out_eq]
   -- the class size, the factor being cancelled

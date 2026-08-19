@@ -74,7 +74,7 @@ theorem orderOf_mul_eq_prime_of_pow_mem_odd_kernel
       _ = 1 := inv_mul_cancel _
   have hpow : g ^ p = 1 :=
     OddOrder.GroupTheory.eq_one_of_sq_eq_one_of_odd_card hNodd hpowN hsq
-  letI : Fact p.Prime := ⟨hp⟩
+  let : Fact p.Prime := ⟨hp⟩
   exact orderOf_eq_prime hpow hne
 
 namespace Hypothesis
@@ -204,7 +204,7 @@ theorem centralizerQuotient_distinguishedPair_eq_images
     let qhyp := hyp.centralizerQuotientHypothesis hXV hA3
     pi sL = qhyp.distinguishedInvolution ∧
       pi rL = qhyp.structureConjugator := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   let L : Subgroup G := Subgroup.centralizer (X : Set G)
   let N : Subgroup L := (hyp.H.subgroupOf L).normalCore
   let pi : L →* (L ⧸ N) := QuotientGroup.mk' N
@@ -268,7 +268,7 @@ theorem orderOf_distinguishedInvolution_mul_t_of_quotient_pow
       let qhyp := hyp.centralizerQuotientHypothesis hXV hA3
       (qhyp.distinguishedInvolution * qhyp.t) ^ p = 1) :
     orderOf (hyp.distinguishedInvolution * hyp.t) = p := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   let L : Subgroup G := Subgroup.centralizer (X : Set G)
   let N : Subgroup L := (hyp.H.subgroupOf L).normalCore
   let D_L : Subgroup L := hyp.D.subgroupOf L

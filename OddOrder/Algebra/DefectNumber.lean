@@ -50,7 +50,7 @@ theorem card_defectGroup (hp : p.Prime)
     (hinv : ∀ n : ℕ, ¬ p ∣ n → ∃ v : A, (∀ g : G, g • v = v) ∧ (n • (1 : A)) * v = 1)
     {b : A} (hb : ∀ g : G, g • b = b) :
     Nat.card ↥(defectGroup hb) = p ^ defect p hb := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨n, hn⟩ :=
     (isPGroup_of_isDefectGroup hp hinv (isDefectGroup_defectGroup hb)).exists_card_eq
   rw [defect, hn, hp.factorization_pow, Finsupp.single_eq_same]

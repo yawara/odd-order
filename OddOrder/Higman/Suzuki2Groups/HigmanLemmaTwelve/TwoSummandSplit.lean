@@ -62,10 +62,10 @@ theorem XiLengthTwoTypeAData.natCard_eq_sq
     (hEA : IsElementaryAbelian 2 ↑(frattini P))
     (hPhiS : frattini P ≤ S) :
     Nat.card ↥S = Nat.card ↥(frattini P) ^ 2 := by
-  letI := data.fieldF
-  letI := data.finiteF
-  letI := data.charTwoF
-  letI : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
+  let := data.fieldF
+  let := data.finiteF
+  let := data.charTwoF
+  let : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
   have h1 : Nat.card ↥S = Nat.card (TypeAModel data.phi) :=
     Nat.card_congr data.equivModel.toEquiv
   have h2 : Nat.card ↥(frattini P) = Nat.card data.F :=

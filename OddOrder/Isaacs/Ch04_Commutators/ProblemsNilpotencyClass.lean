@@ -78,7 +78,7 @@ theorem commutator_self_le_lowerCentralSeries_two (a : G) :
     ⁅commutator G ⊔ Subgroup.zpowers a, commutator G ⊔ Subgroup.zpowers a⁆
       ≤ Subgroup.lowerCentralSeries (⊤ : Subgroup G) 2 := by
   set N : Subgroup G := Subgroup.lowerCentralSeries (⊤ : Subgroup G) 2 with hN
-  haveI : N.Normal := by rw [hN]; infer_instance
+  have : N.Normal := by rw [hN]; infer_instance
   set H : Subgroup G := commutator G ⊔ Subgroup.zpowers a with hH
   -- `G'` の元は任意の元と `N` の中で交換する
   have hderived : ∀ x ∈ commutator G, ∀ y : G, ⁅x, y⁆ ∈ N := by
@@ -134,7 +134,7 @@ theorem nilpotencyClass_commutator_sup_zpowers_lt [Group.IsNilpotent G] (a : G)
     rw [show m - 2 + 1 = m - 1 by omega, show m - 2 + 2 = m by omega,
       Subgroup.lowerCentralSeries_nilpotencyClass] at hk
     exact le_bot_iff.mp hk
-  haveI : Group.IsNilpotent ↥H := (Subgroup.isNilpotent_iff_lowerCentralSeries _).mpr ⟨_, hbot⟩
+  have : Group.IsNilpotent ↥H := (Subgroup.isNilpotent_iff_lowerCentralSeries _).mpr ⟨_, hbot⟩
   have hle := (nilpotencyClass_le_iff_lowerCentralSeries_eq_bot H).mpr hbot
   omega
 

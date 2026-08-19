@@ -95,7 +95,7 @@ Both defining conditions collapse: every nonzero element has norm `1`
 (`normN_eq_one_of_two`), and `2 - a = a` because `2 = 0`. -/
 theorem normSetE_eq_setOf_ne_zero_of_two (hq : q ≠ 0) :
     normSetE 2 q = {a : GaloisField 2 q | a ≠ 0} := by
-  haveI : CharP (GaloisField 2 q) 2 := by
+  have : CharP (GaloisField 2 q) 2 := by
     rw [← Algebra.charP_iff (ZMod 2) (GaloisField 2 q) 2]; exact ZMod.charP 2
   have htwo : (2 : GaloisField 2 q) = 0 := by
     change ((2 : ℕ) : GaloisField 2 q) = 0
@@ -114,7 +114,7 @@ theorem normSetE_eq_inv_of_p_eq_two (hq : q ≠ 0) :
     normSetE 2 q = (normSetE 2 q)⁻¹ := by
   rw [normSetE_eq_setOf_ne_zero_of_two q hq]
   ext a
-  simp only [Set.mem_inv, Set.mem_setOf_eq, ne_eq, inv_eq_zero]
+  simp only [Set.mem_inv, Set.mem_ofPred_eq, ne_eq, inv_eq_zero]
 
 end CharTwo
 
@@ -218,7 +218,7 @@ theorem normN_one_add_smul_one_sub [Fact p.Prime] (hq : 0 < q)
     (hEinv : normSetE p q = (normSetE p q)⁻¹) {a : GaloisField p q} (ha : a ∈ normSetE p q)
     (k : ZMod p) :
     (1 + k • (1 - a) : GaloisField p q) ∈ normOneSet p q := by
-  haveI : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
+  have : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
   have hcast : (k • (1 - a) : GaloisField p q) = ((k.val : ℕ) : GaloisField p q) * (1 - a) := by
     rw [Algebra.smul_def, ← map_natCast (algebraMap (ZMod p) (GaloisField p q)) k.val,
       ZMod.natCast_val, ZMod.cast_id]
@@ -244,7 +244,7 @@ theorem condC_normOneSet [Fact p.Prime] (hq : 0 < q)
     (W : Submodule (ZMod p) (GaloisField p q)) (a₀ : GaloisField p q) :
     Affine.CondC (p := p) {w : ↥W | a₀ + (w : GaloisField p q) ∈ normOneSet p q} := by
   intro b x hsub hb hadd k
-  simp only [Set.mem_setOf_eq, Submodule.coe_add, Submodule.coe_sub] at hsub hb hadd ⊢
+  simp only [Set.mem_ofPred_eq, Submodule.coe_add, Submodule.coe_sub] at hsub hb hadd ⊢
   set B : GaloisField p q := a₀ + (b : GaloisField p q) with hB
   set X : GaloisField p q := (x : GaloisField p q) with hX
   have hB1 : normN p q B = 1 := hb
@@ -291,7 +291,7 @@ the prime field. -/
 theorem natDegree_minpoly_eq [Fact p.Prime] (hq : q.Prime) {b : GaloisField p q}
     (hb : b ∉ Set.range (algebraMap (ZMod p) (GaloisField p q))) :
     (minpoly (ZMod p) b).natDegree = q := by
-  haveI : Fintype (GaloisField p q) := Fintype.ofFinite _
+  have : Fintype (GaloisField p q) := Fintype.ofFinite _
   have hirr : Irreducible (minpoly (ZMod p) b) :=
     minpoly.irreducible (IsIntegral.of_finite (ZMod p) b)
   -- `b` is a root of `X^{p^q} - X`, so its minimal polynomial divides that.
@@ -540,7 +540,7 @@ theorem towerSet_succ_subset_normOneSet [Fact p.Prime] (hp5 : 5 ≤ p) (hq : q.P
     towerSet p q b (r + 1) ⊆ normOneSet p q := by
   classical
   set W := towerSubmodule p q b (r + 1) with hW
-  haveI : Finite ↥W := Subtype.finite
+  have : Finite ↥W := Subtype.finite
   set S : Set ↥W := {w : ↥W | (1 : GaloisField p q) + (w : GaloisField p q) ∈ normOneSet p q}
     with hS
   -- Step 1 gives condition (C) for `S`.
@@ -569,7 +569,7 @@ theorem towerSet_succ_subset_normOneSet [Fact p.Prime] (hp5 : 5 ≤ p) (hq : q.P
     exact ⟨g, hdegeq, h0, hirr, hval⟩
   -- Count the complement of `S`.
   have hcompl : (r + 1) * Nat.card ↥(Sᶜ) ≤ p ^ (r + 1) - p := by
-    haveI : Fintype ↥(Sᶜ) := Fintype.ofFinite _
+    have : Fintype ↥(Sᶜ) := Fintype.ofFinite _
     have hchoice : ∀ w : ↥(Sᶜ), ∃ g : (ZMod p)[X], g.natDegree = r + 1 ∧ g.coeff 0 = 1 ∧
         Irreducible g ∧ (1 : GaloisField p q) + ((w : ↥W) : GaloisField p q) = (aeval b) g :=
       fun w => hpoly (w : ↥W) w.2

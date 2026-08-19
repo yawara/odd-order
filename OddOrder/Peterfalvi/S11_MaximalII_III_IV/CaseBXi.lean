@@ -137,7 +137,7 @@ theorem hcuPairHom_eq_one_of_mem_realizedComplement [Finite G] {M : Subgroup G}
       (huSub data)).subgroupOf (hInHu data)).map
         (Subgroup.inclusion (le_sup_left : hInHu data ≤ hInHu data ⊔ cuInHu caseA))) :
     hcuPairHom caseA θ hinv lam x = 1 := by
-  haveI := hInHu_normal data
+  have := hInHu_normal data
   obtain ⟨h, hhmem, hxeq⟩ := hx
   -- `x` is the inclusion of `h ∈ realized W ⊆ hInHu`.
   have hhH : (h : ↥(huSub data)) ∈ hInHu data := h.2
@@ -194,11 +194,11 @@ theorem caseA_realizedComplement_uW_le_normalizer [Finite G] {M : Subgroup G}
     (hWinv : OddOrder.Isaacs.Ch03.IsAInvariant (uActionHom data chief) W) :
     data.H ⊔ data.U
       ≤ Subgroup.normalizer ((caseA_realizedComplement chief W : Subgroup G) : Set G) := by
-  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+  have : IsMulCommutative (↥data.H ⧸ chief.N) :=
     ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
   -- `WH := W.comap (mk' N) ⊴ H` (preimage of a subgroup of the abelian `H̄`).
   set WH : Subgroup ↥data.H := W.comap (QuotientGroup.mk' chief.N) with hWH
-  haveI hWHn : WH.Normal := by
+  have hWHn : WH.Normal := by
     rw [hWH]; exact (Subgroup.normal_of_isMulCommutative W).comap _
   -- `H` normalizes `caseA_realizedComplement = WH.map subtype`.
   have hH_norm : data.H
@@ -287,7 +287,7 @@ theorem caseA_wOrbit_horbit [Finite G] {M : Subgroup G}
         ClassFunction.conjByMulEquiv (H := huSub data) (w₁ : ↥M) s
           ∈ ((caseA_realizedComplement chief (caseA_wComplement caseA)).subgroupOf M).subgroupOf
             (huSub data) := by
-  haveI : chief.N.Normal := chief.N_normal
+  have : chief.N.Normal := chief.N_normal
   intro w₁ hw₁W1 hw₁ne s hs
   -- unpack `s ∈ realized S₀`: get `x_s : ↥H` with `mk'(N) x_s ∈ S₀`, `↑x_s = ↑↑s`.
   rw [Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf] at hs
@@ -362,8 +362,8 @@ theorem hcuZetaPair_summandComplement_subset_ker [Finite G] {M : Subgroup G}
         Set ↥(huSub data)) ⊆
       OddOrder.Peterfalvi.S03.characterKernel (ClassFunction.induce
         (hInHu data ⊔ cuInHu caseA) (hcuPsiPair caseA θ hinv lam)) := by
-  haveI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
-  haveI := caseA_realizedComplement_subgroupOf_huSub_normal hWinv
+  have : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
+  have := caseA_realizedComplement_subgroupOf_huSub_normal hWinv
   refine OddOrder.Peterfalvi.S03.subsetCharacterKernel_induce_of_subgroupOf
     (A := ((caseA_realizedComplement chief W).subgroupOf M).subgroupOf (huSub data))
     (H := hInHu data ⊔ cuInHu caseA)
@@ -420,8 +420,8 @@ theorem caseA_hInHu_le_realizedS0_sup_realizedComplement [Finite G] {M : Subgrou
         S₀ W hfsurj, hsup, Subgroup.comap_top]
   -- Transfer `⊤ = A' ⊔ B'` (in `hInHu`) to `hInHu ≤ A ⊔ B` (in `huSub`).
   -- the realized `S₀` in `hInHu` is normal (`S₀ ◁ H̄` abelian, comap of normal is normal).
-  haveI : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
-  haveI hS0n : ((((caseA_realizedComplement chief S₀).subgroupOf M).subgroupOf
+  have : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+  have hS0n : ((((caseA_realizedComplement chief S₀).subgroupOf M).subgroupOf
       (huSub data)).subgroupOf (hInHu data)).Normal := by
     rw [caseA_realizedComplement_subgroupOf_hInHu_eq_comap chief S₀]
     exact (Subgroup.normal_of_isMulCommutative S₀).comap _
@@ -467,7 +467,7 @@ theorem hcuZetaPair_mem_xiSet [Finite G] {M : Subgroup G}
     (⟨ClassFunction.induce (hInHu data ⊔ cuInHu caseA) (hcuPsiPair caseA θ hinv lam),
         hcuZetaPair_irreducible caseA θ hinv lam hθ₀⟩ :
         IrreducibleCharacter ↥(huSub data)) ∈ xiSet data := by
-  haveI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
+  have : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
   classical
   set ζ : IrreducibleCharacter ↥(huSub data) :=
     ⟨ClassFunction.induce (hInHu data ⊔ cuInHu caseA) (hcuPsiPair caseA θ hinv lam),
@@ -479,7 +479,7 @@ theorem hcuZetaPair_mem_xiSet [Finite G] {M : Subgroup G}
         (hInHu data ⊔ cuInHu caseA) (hcuPsiPair caseA θ hinv lam) := by rw [hζdef]
     rw [← hcoe, OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite ζ ζ, if_pos rfl]
     exact one_ne_zero
-  rw [xiSet, Set.mem_setOf_eq]
+  rw [xiSet, Set.mem_ofPred_eq]
   intro hsub
   apply hθnt
   have hfsurj : Function.Surjective
@@ -568,7 +568,7 @@ theorem hcuZetaPair_induceHU_mem_sOf [Finite G] {M : Subgroup G}
     induceHU data (ClassFunction.induce (hInHu data ⊔ cuInHu caseA)
         (hcuPsiPair caseA θ hinv lam) : ClassFunction ↥(huSub data) ℂ)
       ∈ sOf data (chief.H0 ⊔ uprimeSub data) := by
-  haveI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
+  have : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
   rw [mem_sOf]
   exact ⟨⟨ClassFunction.induce (hInHu data ⊔ cuInHu caseA) (hcuPsiPair caseA θ hinv lam),
       hcuZetaPair_irreducible caseA θ hinv lam hθ₀⟩,
@@ -606,11 +606,11 @@ theorem hcuZetaPair_induceHU_irreducible [Finite G] {M : Subgroup G}
         (hcuPsiPair caseA θ hinv lam) : ClassFunction ↥(huSub data) ℂ) ≠ ⊤) :
     IsIrreducibleCharacter (induceHU data (ClassFunction.induce (hInHu data ⊔ cuInHu caseA)
       (hcuPsiPair caseA θ hinv lam) : ClassFunction ↥(huSub data) ℂ)) := by
-  haveI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
-  letI : Fintype ↥M := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  have : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
+  let : Fintype ↥M := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥M : ℂ) :=
+  let : Invertible (Nat.card ↥M : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   have hIeq : ClassFunction.inertia (ClassFunction.induce (hInHu data ⊔ cuInHu caseA)
       (hcuPsiPair caseA θ hinv lam) : ClassFunction ↥(huSub data) ℂ) = huSub data := by
@@ -627,20 +627,20 @@ character is needed — `inertia_eq_hcInHu` takes any nontrivial `θ`). -/
 theorem exists_chiefFactorHom_ne_one [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
     ∃ θ : (↥data.H ⧸ chief.N) →* ℂˣ, θ ≠ 1 := by
-  haveI := chief.N_normal
-  letI : CommGroup (↥data.H ⧸ chief.N) :=
+  have := chief.N_normal
+  let : CommGroup (↥data.H ⧸ chief.N) :=
     { (inferInstance : Group (↥data.H ⧸ chief.N)) with
       mul_comm := chief.quotient_elementaryAbelian.1 }
-  haveI : Nontrivial (↥data.H ⧸ chief.N) := by
+  have : Nontrivial (↥data.H ⧸ chief.N) := by
     obtain ⟨x, hxH, hxnot⟩ := SetLike.exists_of_lt chief.H0_lt_H
     refine ⟨⟨QuotientGroup.mk ⟨x, hxH⟩, 1, ?_⟩⟩
     rw [ne_eq, QuotientGroup.eq_one_iff]
     intro hmem
     exact hxnot (chief.H0_eq ▸ Subgroup.mem_map.mpr ⟨_, hmem, rfl⟩)
-  haveI : NeZero (Monoid.exponent (↥data.H ⧸ chief.N)) := ⟨Monoid.exponent_ne_zero_of_finite⟩
+  have : NeZero (Monoid.exponent (↥data.H ⧸ chief.N)) := ⟨Monoid.exponent_ne_zero_of_finite⟩
   have hcard : Nat.card ((↥data.H ⧸ chief.N) →* ℂˣ) = Nat.card (↥data.H ⧸ chief.N) :=
     CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity _ ℂ
-  haveI : Nontrivial ((↥data.H ⧸ chief.N) →* ℂˣ) := by
+  have : Nontrivial ((↥data.H ⧸ chief.N) →* ℂˣ) := by
     rw [← Finite.one_lt_card_iff_nontrivial, hcard]
     exact Finite.one_lt_card_iff_nontrivial.mpr ‹_›
   obtain ⟨f, g, hfg⟩ := exists_pair_ne ((↥data.H ⧸ chief.N) →* ℂˣ)
@@ -664,7 +664,7 @@ theorem cInHuEquivC_coe {M : Subgroup G} (data : TypesIIIIIIVSetup M)
 
 /-- **A `C'`-trivial nontrivial linear character of `C` exists** (`C ≠ 1`): `C` is a nontrivial
 solvable group (subgroup of the solvable maximal `M`), so its abelianization is nontrivial
-(`IsSolvable.commutator_lt_top_of_nontrivial`) and carries `|C/C'| > 1` linear characters; any
+(`Group.IsSolvable.commutator_lt_top_of_nontrivial`) and carries `|C/C'| > 1` linear characters; any
 of them kills every element of the realized `C' = ⁅C,C⁆` (commutators die in an abelian
 target).  Supplies the `λ` of the (9.9.c) pair character together with its `hlam` kernel
 hypothesis. -/
@@ -677,25 +677,25 @@ theorem exists_cInHuHom_ne_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
         lam c = 1 := by
   classical
   -- `cInHu` is a nontrivial finite solvable group.
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups data.maximal
-  haveI : IsSolvable ↥(cInHu data chief) :=
-    solvable_of_solvable_injective (f := (huSub data).subtype.comp
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups data.maximal
+  have : Group.IsSolvable ↥(cInHu data chief) :=
+    Group.isSolvable_of_isSolvable_injective (f := (huSub data).subtype.comp
       (cInHu data chief).subtype)
       ((huSub data).subtype_injective.comp (cInHu data chief).subtype_injective)
-  haveI : Nontrivial ↥(cSub data chief) := (Subgroup.nontrivial_iff_ne_bot _).mpr hC
-  haveI : Nontrivial ↥(cInHu data chief) := (cInHuEquivC data chief).toEquiv.nontrivial
+  have : Nontrivial ↥(cSub data chief) := (Subgroup.nontrivial_iff_ne_bot _).mpr hC
+  have : Nontrivial ↥(cInHu data chief) := (cInHuEquivC data chief).toEquiv.nontrivial
   -- the abelianization is nontrivial, so it has more than one linear character.
   have hlt : commutator ↥(cInHu data chief) < ⊤ :=
-    IsSolvable.commutator_lt_top_of_nontrivial ↥(cInHu data chief)
-  haveI : Nontrivial (Abelianization ↥(cInHu data chief)) := by
+    Group.IsSolvable.commutator_lt_top_of_nontrivial ↥(cInHu data chief)
+  have : Nontrivial (Abelianization ↥(cInHu data chief)) := by
     obtain ⟨x, -, hxnot⟩ := SetLike.exists_of_lt hlt
     exact ⟨⟨Abelianization.of x, 1, fun h => hxnot ((QuotientGroup.eq_one_iff x).mp h)⟩⟩
-  haveI : NeZero (Monoid.exponent (Abelianization ↥(cInHu data chief))) :=
+  have : NeZero (Monoid.exponent (Abelianization ↥(cInHu data chief))) :=
     ⟨Monoid.exponent_ne_zero_of_finite⟩
   have hcard : Nat.card (Abelianization ↥(cInHu data chief) →* ℂˣ)
       = Nat.card (Abelianization ↥(cInHu data chief)) :=
     CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity _ ℂ
-  haveI : Nontrivial (Abelianization ↥(cInHu data chief) →* ℂˣ) := by
+  have : Nontrivial (Abelianization ↥(cInHu data chief) →* ℂˣ) := by
     rw [← Finite.one_lt_card_iff_nontrivial, hcard]
     exact Finite.one_lt_card_iff_nontrivial.mpr ‹_›
   have hf : ∃ f : Abelianization ↥(cInHu data chief) →* ℂˣ, f ≠ 1 := by
@@ -775,9 +775,9 @@ theorem lam_eq_one_of_cInHu_subset_ker_zetaPair [Finite G] {M : Subgroup G}
           ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
             (huSub data)) ℂ)))
     (c : ↥(cInHu data chief)) : lam c = 1 := by
-  haveI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+  have : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
       (huSub data)) := Fintype.ofFinite _
-  haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+  have : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
       (huSub data)).Normal := hcInHu_realized_normal chief
   have hdesc := OddOrder.Peterfalvi.S03.mem_characterKernel_of_mem_characterKernel_induce
     (L := ↥(huSub data))
@@ -817,18 +817,18 @@ theorem caseB_no_irreducible_forces_C_bot [Finite G]
     chars.C = ⊥ := by
   classical
   by_contra hC
-  letI : Fintype ↥M := Fintype.ofFinite _
-  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
-  letI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+  let : Fintype ↥M := Fintype.ofFinite _
+  let : Fintype ↥(huSub data) := Fintype.ofFinite _
+  let : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
     (huSub data)) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥M : ℂ) :=
+  let : Invertible (Nat.card ↥M : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  let : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+  let : Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
     M).subgroupOf (huSub data)) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+  have : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
     (huSub data)).Normal := hcInHu_realized_normal chief
   obtain ⟨θ, hθne⟩ := exists_chiefFactorHom_ne_one chief
   obtain ⟨lam, hlamne, hlam⟩ := exists_cInHuHom_ne_one hG chief hC
@@ -857,7 +857,7 @@ theorem caseB_no_irreducible_forces_C_bot [Finite G]
   obtain ⟨ζ', hζ'X, hφeq⟩ := mem_sOf.mp hφH0C
   obtain ⟨w, hw⟩ := (OddOrder.RepresentationTheory.induce_eq_induce_iff_conj
     (G := ↥M) (H := huSub data) ζp ζ').mp hφeq
-  haveI hH0Cnormal := chiefFactor_H0supC_subgroupOf_normal chief
+  have hH0Cnormal := chiefFactor_H0supC_subgroupOf_normal chief
   have hCker : ∀ z : ↥(huSub data), z ∈ cInHu data chief →
       z ∈ OddOrder.Peterfalvi.S03.characterKernel (ζp : ClassFunction ↥(huSub data) ℂ) := by
     intro z hz
@@ -953,7 +953,7 @@ theorem hcConjDescend_hcHom [Finite G] {M : Subgroup G}
     [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
     (x : ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))) :
     hcConjDescend chief g (hcHom chief x) = hcHom chief (ClassFunction.conjByMulEquiv g x) := by
-  letI hK : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+  let hK : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
       (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))).Normal :=
     (realizedH0supC_normal_huSub chief).subgroupOf _
   simp only [hcConjDescend, hcHom, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom,
@@ -1242,7 +1242,7 @@ theorem oXtheta_count [Finite G] {M : Subgroup G}
           (huSub data)) (hcPsi chief θ).toClassFunction).card
       = (chief.p - 1) ^ data.q := by
   classical
-  letI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+  let : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
     (huSub data)) := Fintype.ofFinite _
   set RegF := Finset.univ.filter fun θ : (↥data.H ⧸ chief.N) →* ℂˣ =>
     ∀ i, θ.comp (caseA.Hpart i).subtype ≠ 1 with hRegF
@@ -1326,11 +1326,11 @@ theorem card_ne_one_chiefFactorHom [Finite G] {M : Subgroup G}
     [Fintype ((↥data.H ⧸ chief.N) →* ℂˣ)] :
     (Finset.univ.filter fun θ : (↥data.H ⧸ chief.N) →* ℂˣ => θ ≠ 1).card
       = chief.p ^ data.q - 1 := by
-  haveI := chief.N_normal
-  letI : CommGroup (↥data.H ⧸ chief.N) :=
+  have := chief.N_normal
+  let : CommGroup (↥data.H ⧸ chief.N) :=
     { (inferInstance : Group (↥data.H ⧸ chief.N)) with
       mul_comm := chief.quotient_elementaryAbelian.1 }
-  haveI : NeZero (Monoid.exponent (↥data.H ⧸ chief.N)) := ⟨Monoid.exponent_ne_zero_of_finite⟩
+  have : NeZero (Monoid.exponent (↥data.H ⧸ chief.N)) := ⟨Monoid.exponent_ne_zero_of_finite⟩
   have hcard : Nat.card ((↥data.H ⧸ chief.N) →* ℂˣ) = Nat.card (↥data.H ⧸ chief.N) :=
     CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity _ ℂ
   rw [Finset.filter_ne', Finset.card_erase_of_mem (Finset.mem_univ _), Finset.card_univ,
@@ -1357,7 +1357,7 @@ theorem caseB_oXtheta_count [Finite G] {M : Subgroup G}
           (huSub data)) (hcPsi chief θ).toClassFunction).card
       = chief.p ^ data.q - 1 := by
   classical
-  letI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+  let : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
     (huSub data)) := Fintype.ofFinite _
   set NF := Finset.univ.filter fun θ : (↥data.H ⧸ chief.N) →* ℂˣ => θ ≠ 1 with hNF
   set T := NF.image (hcPsi chief) with hTdef

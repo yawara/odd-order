@@ -85,7 +85,7 @@ theorem mulDistribMulActionQuotientOfTrivial_smul_mk {G M : Type*} [Group G] [Mo
 `Additive M` through `Representation.ofDistribMulAction`. -/
 example {p : ℕ} [Fact p.Prime] {G M : Type*} [Group G] [CommGroup M]
     [MulDistribMulAction G M] (hM : IsElementaryAbelian p M) : True := by
-  letI := hM.zmodModule
+  let := hM.zmodModule
   let _ρ : Representation (ZMod p) G (Additive M) :=
     Representation.ofDistribMulAction (ZMod p) G (Additive M)
   trivial

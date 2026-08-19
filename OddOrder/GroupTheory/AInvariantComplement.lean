@@ -30,7 +30,7 @@ variable {G A : Type*} [Group G] [Finite G] [Group A] [Finite A]
 /-- **Invariant Schur–Zassenhaus, complement form.**  A `φ`-invariant normal Hall subgroup `N` of a
 finite solvable group has a `φ`-invariant complement `U`, provided the action is coprime to
 `|G|`. -/
-theorem exists_aInvariant_complement_of_normal_isHall [IsSolvable G] {φ : A →* MulAut G}
+theorem exists_aInvariant_complement_of_normal_isHall [Group.IsSolvable G] {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
     {N : Subgroup G} [N.Normal] (_hN_inv : IsAInvariant φ N)
     (hN_hall : IsHallSubgroup (Nat.card ↥N).primeFactors N) :
@@ -79,7 +79,7 @@ solvable) and a normal Hall subgroup `N ◁ M'`, with the action coprime (`gcd(|
 Peterfalvi (13.1.b) uses: `K` is the κ-Hall, `M' = S'` the derived subgroup, `N = M_F` the Fitting
 kernel, and the conclusion is the semidirect factorisation `M' = M_F U` with `K ≤ N_G(U)`. -/
 theorem exists_aInvariant_complement_within_normal {G : Type*} [Group G] [Finite G]
-    {M' K N : Subgroup G} [IsSolvable ↥M']
+    {M' K N : Subgroup G} [Group.IsSolvable ↥M']
     (hN_le : N ≤ M') (hM'_norm_N : M' ≤ Subgroup.normalizer (N : Set G))
     (hK_norm_M' : K ≤ Subgroup.normalizer (M' : Set G))
     (hK_norm_N : K ≤ Subgroup.normalizer (N : Set G))
@@ -95,7 +95,7 @@ theorem exists_aInvariant_complement_within_normal {G : Type*} [Group G] [Finite
   have hφval : ∀ (a : ↥K) (x : ↥M'), ((φ a x : ↥M') : G) = (a : G) * (x : G) * (a : G)⁻¹ :=
     fun _ _ => rfl
   -- `N.subgroupOf M'` is normal in `↥M'` and `φ`-invariant (`K` normalizes `N`).
-  haveI hN'_normal : (N.subgroupOf M').Normal :=
+  have hN'_normal : (N.subgroupOf M').Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hN_le).mpr hM'_norm_N
   have hN'_inv : IsAInvariant φ (N.subgroupOf M') := by
     rw [isAInvariant_iff_smul_mem]

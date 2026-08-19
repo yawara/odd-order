@@ -307,7 +307,7 @@ theorem false_of_collisionPair_neg (data : FieldNormalizerData p q G) (hp : p = 
     have := hcp.neg
     rwa [neg_neg] at this
   subst hp
-  haveI : CharP (GaloisField 3 q) 3 := by
+  have : CharP (GaloisField 3 q) 3 := by
     rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
     exact ZMod.charP 3
   have hmem : S ∈ commSubgroup data e := by
@@ -376,7 +376,7 @@ theorem ConjPair.chain (data : FieldNormalizerData p q G) (hp : p = 3)
     (h₁ : ConjPair data e s s') (h₂ : ConjPair data e s' s'') :
     ConjPair data e s'' s := by
   subst hp
-  haveI : CharP (GaloisField 3 q) 3 := by
+  have : CharP (GaloisField 3 q) 3 := by
     rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
     exact ZMod.charP 3
   intro v hv hv0
@@ -431,8 +431,8 @@ private theorem square_dichotomy (hp : p = 3) (hq0 : q ≠ 0) (hqodd : Odd q) :
       ¬ IsSquare (-1 : GaloisField p q) := by
   classical
   subst hp
-  letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
-  haveI : CharP (GaloisField 3 q) 3 := by
+  let : Fintype (GaloisField 3 q) := Fintype.ofFinite _
+  have : CharP (GaloisField 3 q) 3 := by
     rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
     exact ZMod.charP 3
   have hcard : Fintype.card (GaloisField 3 q) = 3 ^ q := by
@@ -740,7 +740,7 @@ theorem false_of_conjPair_spanning (data : FieldNormalizerData p q G) (hp : p = 
     {D : Set (GaloisField p q)} (hD : ∀ s ∈ D, ∃ s', ConjPair data e s s')
     (hspan : AddSubgroup.closure D = ⊤) : False := by
   classical
-  haveI : Finite (layerOne data) := by
+  have : Finite (layerOne data) := by
     have hfin : ((layerOne data : Subgroup G) : Set G).Finite := by
       rw [coe_layerOne_eq_range data]
       exact Set.finite_range _
@@ -758,16 +758,16 @@ theorem false_of_conjPair_spanning (data : FieldNormalizerData p q G) (hp : p = 
         obtain ⟨t', hpair⟩ := hD t ht
         have h1 := hpair 1 ⟨1, (mul_one 1).symm⟩ one_ne_zero
         rw [one_pow, mul_one, mul_one, ha1] at h1
-        rw [Set.mem_setOf_eq, h1, ← SetLike.mem_coe, coe_layerOne_eq_range data]
+        rw [Set.mem_ofPred_eq, h1, ← SetLike.mem_coe, coe_layerOne_eq_range data]
         exact ⟨_, rfl⟩
       have hgrp : AddSubgroup.closure D ≤
           { carrier := {t : GaloisField p q |
               data.s * layerFieldHom data 1 (Multiplicative.ofAdd t) * (data.s)⁻¹ ∈ layerOne data}
             zero_mem' := by
-              simp only [Set.mem_setOf_eq, ofAdd_zero, map_one, mul_one, mul_inv_cancel]
+              simp only [Set.mem_ofPred_eq, ofAdd_zero, map_one, mul_one, mul_inv_cancel]
               exact (layerOne data).one_mem
             add_mem' := fun {a b} ha hb => by
-              simp only [Set.mem_setOf_eq, ofAdd_add, map_mul] at *
+              simp only [Set.mem_ofPred_eq, ofAdd_add, map_mul] at *
               have hsplit : data.s * (layerFieldHom data 1 (Multiplicative.ofAdd a) *
                   layerFieldHom data 1 (Multiplicative.ofAdd b)) * (data.s)⁻¹ =
                   (data.s * layerFieldHom data 1 (Multiplicative.ofAdd a) * (data.s)⁻¹) *
@@ -776,7 +776,7 @@ theorem false_of_conjPair_spanning (data : FieldNormalizerData p q G) (hp : p = 
               rw [hsplit]
               exact (layerOne data).mul_mem ha hb
             neg_mem' := fun {a} ha => by
-              simp only [Set.mem_setOf_eq, ofAdd_neg, map_inv] at *
+              simp only [Set.mem_ofPred_eq, ofAdd_neg, map_inv] at *
               have hinv : data.s * (layerFieldHom data 1 (Multiplicative.ofAdd a))⁻¹ *
                   (data.s)⁻¹ =
                   (data.s * layerFieldHom data 1 (Multiplicative.ofAdd a) * (data.s)⁻¹)⁻¹ := by
@@ -943,9 +943,9 @@ theorem false_of_conjPair_frobenius_family (data : FieldNormalizerData p q G) (h
     exact h6
   have h7 : aeval (frobEnd 3 q) (a₀ ^ 3 - 1) S = 0 := by
     rw [map_sub, LinearMap.sub_apply, h33, map_one, Module.End.one_apply, sub_self]
-  haveI : CharP ((ZMod 3)[X]) 3 :=
+  have : CharP ((ZMod 3)[X]) 3 :=
     charP_of_injective_ringHom (C_injective (R := ZMod 3)) 3
-  haveI : ExpChar ((ZMod 3)[X]) 3 := .prime Nat.prime_three
+  have : ExpChar ((ZMod 3)[X]) 3 := .prime Nat.prime_three
   have hchar : (a₀ - 1) ^ 3 = a₀ ^ 3 - 1 := by
     rw [sub_pow_expChar, one_pow]
   have h8 : aeval (frobEnd 3 q) ((a₀ - 1) ^ 3) S = 0 := by

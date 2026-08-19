@@ -95,7 +95,7 @@ theorem card_centralizerOf_mul_generalizedDecompositionNumber
         * χ (x * ((z⁻¹ : ↥(centralizerOf x)) : G)))
       = (Nat.card ↥(centralizerOf x) : K)
         * generalizedDecompositionNumber x hpC hω' hπ hlin hkerJ χ hχ φ := by
-  haveI : Invertible ((Nat.card ↥(centralizerOf x) : K)) :=
+  have : Invertible ((Nat.card ↥(centralizerOf x) : K)) :=
     (isUnit_card_centralizer (K := K) x).invertible
   exact sum_projectiveIndecomposableCharacter_mul_eq hpC hω hω' hπ hlin hkerJ e φ
     (fun z : ↥(centralizerOf x) => χ (x * ((z⁻¹ : ↥(centralizerOf x)) : G)))
@@ -126,8 +126,8 @@ theorem sum_character_mul_generalizedDecompositionNumber
       = algebraMap 𝒪 K
           (projectiveIndecomposableCharacter hpC hω hω' hπ hlin hkerJ e φ y⁻¹) := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Invertible ((Nat.card ↥(centralizerOf x) : K)) :=
+  have : Fintype G := Fintype.ofFinite G
+  have : Invertible ((Nat.card ↥(centralizerOf x) : K)) :=
     (isUnit_card_centralizer (K := K) x).invertible
   have hCne : (Nat.card ↥(centralizerOf x) : K) ≠ 0 := (isUnit_of_invertible _).ne_zero
   obtain ⟨s, hs⟩ : ∃ s : Finset ↥(centralizerOf x),
@@ -223,8 +223,8 @@ theorem sum_mul_generalizedDecompositionNumber_eq_cartanMatrix
         (fun _ _ h => character_eq_of_isConj _ h) φ)
       = (cartanMatrix hpC hω hω' hπ hlin hkerJ e μ φ : K) := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Invertible ((Nat.card ↥(centralizerOf x) : K)) :=
+  have : Fintype G := Fintype.ofFinite G
+  have : Invertible ((Nat.card ↥(centralizerOf x) : K)) :=
     (isUnit_card_centralizer (K := K) x).invertible
   have hCne : (Nat.card ↥(centralizerOf x) : K) ≠ 0 := (isUnit_of_invertible _).ne_zero
   obtain ⟨s, hs⟩ : ∃ s : Finset ↥(centralizerOf x),
@@ -316,7 +316,7 @@ theorem sum_character_mul_generalizedDecompositionNumber_eq_zero
             ((wedderburnRepresentation eG j).character)
             (fun _ _ h => character_eq_of_isConj _ h) φ) = 0 := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   refine congrFun (eq_zero_of_sum_irreducibleBrauerCharacter_eq_zero hpC hωY' hπY hlinY hkerJY
     (fun τ => ∑ j : J, (wedderburnRepresentation eG j).character v
       * generalizedDecompositionNumber y hpC hωY' hπY hlinY hkerJY
@@ -370,7 +370,7 @@ theorem sum_mul_generalizedDecompositionNumber_eq_zero
         ((wedderburnRepresentation eG j).character)
         (fun _ _ h => character_eq_of_isConj _ h) φ) = 0 := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   refine congrFun (eq_zero_of_sum_irreducibleBrauerCharacter_eq_zero hpC hω' hπ hlin hkerJ
     (fun τ => ∑ j : J, dinv j τ * generalizedDecompositionNumber y hpC hωY' hπY hlinY hkerJY
       ((wedderburnRepresentation eG j).character)

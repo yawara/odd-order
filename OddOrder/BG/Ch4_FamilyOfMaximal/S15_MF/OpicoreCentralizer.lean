@@ -41,7 +41,7 @@ theorem isTypeF_of_isMulCommutative_mf_of_not_fittingIsTI [Finite G]
   have hnP2 : ¬ S14.IsTypeP2 M := fun hP2 => hnotTI (fittingIsTI_of_isTypeP2 hG hM hP2)
   have hP1 : S14.IsTypeP1 M := (S14.isTypeP_iff_isTypeP1_or_isTypeP2.mp hP).resolve_right hnP2
   -- A Hall `κ(M)`-subgroup `K ≤ M` (Hall's theorem in the solvable `M`), and `K* = M_σ ∩ C_G(K)`.
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
   set K : Subgroup G := K'.map M.subtype with hKdef
   have hKM : K ≤ M := hKdef ▸ Subgroup.map_subtype_le K'
@@ -82,7 +82,7 @@ theorem rank_mf_eq_two_of_isMulCommutative_of_not_fittingIsTI [Finite G]
   classical
   obtain ⟨g, p, X₁, hgM, hp, -, hX₁card, hX₁Mσ, hX₁cMσ, -, hrank3, -⟩ :=
     exists_inf_conj_fitting_orderP_witness hG hM hnotTI
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hMFeq : MF M = OddOrder.BG.Ch3.S10.Msigma M := mf_eq_msigma_of_not_fittingIsTI hG hM hnotTI
   have hX₁MF : X₁ ≤ MF M := le_trans hX₁Mσ (le_of_eq hMFeq.symm)
   have hX₁cMF : X₁ ≤ MulAut.conj g • MF M := by rw [hMFeq]; exact hX₁cMσ
@@ -187,7 +187,7 @@ theorem fittingInAmbient_eq_Msigma_of_isTypeP2_of_tau2_empty [Finite G]
     fittingInAmbient M = OddOrder.BG.Ch3.S10.Msigma M := by
   classical
   obtain ⟨Y, -, hYpf, -, -, -, h6, -, -, -, -, -⟩ := fitting_decomposition hG hM
-  haveI : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+  have : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
     msigma_isNilpotent_of_isTypeP2 hG hM hP2
   -- `Y = ⊥`: its order has no prime factors, since they would lie in `τ₂(M) = ∅`.
   have hYbot : Y = ⊥ := by
@@ -239,7 +239,7 @@ theorem maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2_of_tau2_empty [F
     OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM
   have hM'M : derivedInG M ≤ M := Subgroup.map_subtype_le _
   have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
-  haveI hMσnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+  have hMσnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
     msigma_isNilpotent_of_isTypeP2 hG hM hP2
   have hFMσ : fittingInAmbient M = OddOrder.BG.Ch3.S10.Msigma M :=
     fittingInAmbient_eq_Msigma_of_isTypeP2_of_tau2_empty hG hM hP2 htau2
@@ -250,7 +250,7 @@ theorem maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2_of_tau2_empty [F
     exact OddOrder.BG.Ch3.S10.le_normalizer_derivedInG M
   refine le_antisymm ?_ ?_
   · -- `⊆`
-    haveI : Group.IsNilpotent ↥(maxNilpotentNormalHall (derivedInG M)) :=
+    have : Group.IsNilpotent ↥(maxNilpotentNormalHall (derivedInG M)) :=
       maxNilpotentNormalHall_isNilpotent (derivedInG M)
     have hnorm : ((maxNilpotentNormalHall (derivedInG M)).subgroupOf M).Normal :=
       maxNilpotentNormalHall_subgroupOf_normal_of_le_of_normal hM'M hM'normM
@@ -352,7 +352,7 @@ theorem maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2 [Finite G]
     OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM
   have hM'M : derivedInG M ≤ M := Subgroup.map_subtype_le _
   have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
-  haveI hMσnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+  have hMσnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
     msigma_isNilpotent_of_isTypeP2 hG hM hP2
   have hMσnormM : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
     rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
@@ -376,7 +376,7 @@ theorem maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2 [Finite G]
     have hLM' : maxNilpotentNormalHall (derivedInG M) ≤ derivedInG M :=
       maxNilpotentNormalHall_le (derivedInG M)
     have hLM : maxNilpotentNormalHall (derivedInG M) ≤ M := hLM'.trans hM'M
-    haveI : Group.IsNilpotent ↥(maxNilpotentNormalHall (derivedInG M)) :=
+    have : Group.IsNilpotent ↥(maxNilpotentNormalHall (derivedInG M)) :=
       maxNilpotentNormalHall_isNilpotent (derivedInG M)
     -- `maxNilpotentNormalHall M'` is coprime to `[M':·]` (Hall in `M'`).
     have hLcopMid : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall (derivedInG M)))
@@ -448,7 +448,7 @@ theorem card_kappaHall_prime_of_isTypeP2 [Finite G]
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M)) :
     ∃ q : ℕ, q.Prime ∧ Nat.card ↥K = q := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   -- A Hall `(κ(M) ∪ σ(M))'`-subgroup `U` of the solvable `M` (Hall's theorem), lifted to an
   -- ambient `U' ≤ M` with `(U'.map).subgroupOf M` Hall (as in `exists_typeP_data`).
   obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥M)
@@ -487,8 +487,8 @@ theorem typeP2_partner_structure_of_mem [Finite G]
   set Kstar : Subgroup G := OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)
     with hKstardef
   obtain ⟨q, hqprime, hKcard⟩ := card_kappaHall_prime_of_isTypeP2 hG hM hP2 hKM hK
-  haveI : Fact q.Prime := ⟨hqprime⟩
-  haveI hKcyc : IsCyclic ↥K := isCyclic_of_prime_card hKcard
+  have : Fact q.Prime := ⟨hqprime⟩
+  have hKcyc : IsCyclic ↥K := isCyclic_of_prime_card hKcard
   have hKelemq : K ∈ elemAbelianOfRank G q 1 :=
     mem_elemAbelianOfRank.mpr
       ⟨Subgroup.IsElementaryAbelian.of_card_prime hKcard, by rw [hKcard, pow_one]⟩
@@ -497,7 +497,7 @@ theorem typeP2_partner_structure_of_mem [Finite G]
   obtain ⟨hMstmax, hMstP, _hMnc, hMstpair, _hZcyc, _hZti, _hP2or, _hcover⟩ := hMstprop
   -- `𝓜(C(K)) = {Mst}` (`typeP_structure` conjunct 6 for `Mst`, rank-one `K ∈ ℰ_q¹`).
   have huniqMst : maximalSubgroupsContaining (Subgroup.centralizer (K : Set G)) = {Mst} := by
-    haveI hMstsol : IsSolvable ↥Mst := hG.solvable_of_mem_maximalSubgroups hMstmax
+    have hMstsol : Group.IsSolvable ↥Mst := hG.isSolvable_of_mem_maximalSubgroups hMstmax
     obtain ⟨UMst, hUMsthall⟩ : ∃ UMst : Subgroup G, Ch03.IsHallSubgroup
         ((S14.kappa Mst ∪ OddOrder.BG.Ch3.S10.sigma Mst)ᶜ) (UMst.subgroupOf Mst) := by
       obtain ⟨U', hU'hall, -⟩ := Ch03.hall_D (G := ↥Mst)
@@ -533,7 +533,7 @@ theorem exists_rank2_elemAb_le_centralizer_kappa_of_tau2 [Finite G]
     ∃ A : Subgroup G, A ∈ elemAbelianOfRank G q1 2 ∧ A ≤ E ∧
       A ≤ Subgroup.centralizer (K : Set G) := by
   classical
-  haveI : Fact q1.Prime := ⟨hq1prime⟩
+  have : Fact q1.Prime := ⟨hq1prime⟩
   obtain ⟨A, hA_elem, hAE⟩ := exists_elemAb_rank_two_le_E_of_tau2 hG hEsetup hq1
   refine ⟨A, hA_elem, hAE, ?_⟩
   -- `A ⊴ E` (Coq `nsAD`).
@@ -586,7 +586,7 @@ theorem centralizer_kappaCompl_le_of_mem_tau2 [Finite G] (hG : IsMinimalSimpleOd
     {r : ℕ} (hrprime : r.Prime) (hr : r ∈ tau2 M) (_hrU : r ∈ piSet U) :
     Subgroup.centralizer (U : Set G) ≤ M := by
   classical
-  haveI : Fact r.Prime := ⟨hrprime⟩
+  have : Fact r.Prime := ⟨hrprime⟩
   -- `r ∉ κ(M)`: κ-primes lie in `τ₁ ∪ τ₃` (`pRank ≤ 1`), but `r ∈ τ₂` has `pRank = 2`.
   have hrκ : r ∉ kappa M := by
     intro hrk
@@ -670,7 +670,7 @@ theorem not_prime_mem_tau2_of_centralizer_kappaCompl_not_le [Finite G] (hG : IsM
     (hesc : ¬ (Subgroup.centralizer (U : Set G) ≤ M)) :
     ∀ r : ℕ, r.Prime → r ∉ tau2 M := by
   intro r hrprime hr
-  haveI : Fact r.Prime := ⟨hrprime⟩
+  have : Fact r.Prime := ⟨hrprime⟩
   -- `r ∈ (κ(M)∪σ(M))'` (as in `centralizer_kappaCompl_le_of_mem_tau2`).
   have hrκ : r ∉ kappa M := by
     intro hrk
@@ -693,7 +693,7 @@ theorem not_prime_mem_tau2_of_centralizer_kappaCompl_not_le [Finite G] (hG : IsM
       ((Nat.Prime.dvd_mul hrprime).mp (by rw [hlag]; exact hrdvdM)).resolve_right hridx
     exact Nat.mem_primeFactors.mpr ⟨hrprime, hrU, Nat.card_pos.ne'⟩
   have hrU : r ∈ piSet U := by
-    rwa [piSet, Set.mem_setOf_eq, ← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv]
+    rwa [piSet, Set.mem_ofPred_eq, ← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv]
   exact hesc (centralizer_kappaCompl_le_of_mem_tau2 hG hM hKM hUM hU hKNU hrprime hr hrU)
 
 /-- **Phase B/C step 1 of BG Theorem 15.8** (Coq `tau2_P2type_signalizer`, BGsection15.v:1300--1307,
@@ -756,7 +756,7 @@ theorem exists_sylow_eq_opiCore_of_mem_sigma_of_msigma_nilpotent [Finite G]
     exact opiCoreInG_eq_of_normal_le hMσM hMnormMσ (hQdef ▸ hMσ ▸ hQMσ)
   have hQsub_eq : Q.subgroupOf Mσ = Ch03.oPiCore ({q} : Set ℕ) ↥Mσ := by
     rw [hQeqMσ, OddOrder.BG.Ch3.S10.opiCoreInG_subgroupOf]
-  haveI : Group.IsNilpotent ↥Mσ := hMσ ▸ hnil
+  have : Group.IsNilpotent ↥Mσ := hMσ ▸ hnil
   have hQMσHall : Ch03.IsHallSubgroup ({q} : Set ℕ) (Q.subgroupOf Mσ) := by
     rw [hQsub_eq]
     exact OddOrder.BG.Ch3.S10.oPiCore_isHall_of_isNilpotent ({q} : Set ℕ)
@@ -795,7 +795,7 @@ theorem mem_tau2_of_elemAb_rank_two_le_E [Finite G]
     (hEsetup : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} (hpprime : p.Prime)
     {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAE : A ≤ E) :
     p ∈ tau2 M := by
-  haveI : Fact p.Prime := ⟨hpprime⟩
+  have : Fact p.Prime := ⟨hpprime⟩
   obtain ⟨hAea, hAcard⟩ := mem_elemAbelianOfRank.mp hA
   -- `p ∈ π(E)`: `p ∣ |A| = p² ∣ |E|`.
   have hpE : p ∈ (Nat.card ↥E).primeFactors := by
@@ -838,7 +838,7 @@ theorem mem_sigma_and_le_Msigma_of_rank2_centralizer_kappa [Finite G]
     (hACK : A ≤ Subgroup.centralizer (K : Set G)) (hAMstar : A ≤ Mstar) :
     q1 ∈ OddOrder.BG.Ch3.S10.sigma Mstar ∧ A ≤ OddOrder.BG.Ch3.S10.Msigma Mstar := by
   classical
-  haveI : Fact q1.Prime := ⟨hq1prime⟩
+  have : Fact q1.Prime := ⟨hq1prime⟩
   obtain ⟨hAea, hAcard⟩ := mem_elemAbelianOfRank.mp hA
   -- `K ≤ C_G(A)` (symmetrise `A ≤ C_G(K)`).
   have hKCA : K ≤ Subgroup.centralizer (A : Set G) := by
@@ -879,7 +879,7 @@ theorem mem_sigma_and_le_Msigma_of_rank2_centralizer_kappa [Finite G]
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAMstar).toEquiv, hAcard,
       Nat.primeFactors_prime_pow (by norm_num) hq1prime, Finset.mem_singleton] at hp
     exact hp ▸ hq1σ
-  haveI : ((OddOrder.BG.Ch3.S10.Msigma Mstar).subgroupOf Mstar).Normal := by
+  have : ((OddOrder.BG.Ch3.S10.Msigma Mstar).subgroupOf Mstar).Normal := by
     rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
   have hAsubMσ : A.subgroupOf Mstar ≤ (OddOrder.BG.Ch3.S10.Msigma Mstar).subgroupOf Mstar :=
     OddOrder.BG.Ch3.S10.isPiGroup_le_of_normal_isHallSubgroup hMσHall hApiσ
@@ -918,7 +918,7 @@ theorem partner_opiCore_nonabelian [Finite G]
   have hQeqMσ : Q = opiCoreInG ({q} : Set ℕ) Ls := by
     rw [hQdef, hLsdef]
     exact opiCoreInG_eq_of_normal_le hMσM hMnormMσ (hQdef ▸ hLsdef ▸ hQMσ)
-  haveI : Group.IsNilpotent ↥Ls := hLsdef ▸ hnil
+  have : Group.IsNilpotent ↥Ls := hLsdef ▸ hnil
   -- Inside `↥(L_σ)`: `Q̄ = O_q(↥L_σ)`, `Ō = O_{q'}(↥L_σ)`, with `Ō ⊔ Q̄ = ⊤`.
   have hQsub_eq : Q.subgroupOf Ls = Ch03.oPiCore ({q} : Set ℕ) ↥Ls := by
     rw [hQeqMσ, OddOrder.BG.Ch3.S10.opiCoreInG_subgroupOf]
@@ -926,7 +926,7 @@ theorem partner_opiCore_nonabelian [Finite G]
   set Qbar : Subgroup ↥Ls := Q.subgroupOf Ls with hQbardef
   set Obar : Subgroup ↥Ls := Ch03.oPiCore ({q}ᶜ : Set ℕ) ↥Ls with hObardef
   set Kbar : Subgroup ↥Ls := K.subgroupOf Ls with hKbardef
-  haveI hObarN : Obar.Normal := hObardef ▸ Ch03.oPiCore.normal _ _
+  have hObarN : Obar.Normal := hObardef ▸ Ch03.oPiCore.normal _ _
   have hsup : Obar ⊔ Qbar = ⊤ := by
     have h := oPiCore_sup_compl_eq_top (K := ↥Ls) ({q}ᶜ : Set ℕ)
     rw [compl_compl] at h

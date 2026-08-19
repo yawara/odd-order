@@ -23,6 +23,7 @@ variable {M : Subgroup G}
 
 
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **`hcuThetaHom` restricts to `θ₀` on `H`**: on the inclusion of `h ∈ H` into `H·C_U(S₀)`, the
 extension returns the seed value `hcuSeedHom θ h`.  Via `SemidirectProduct.lift_inl` after
 `(mulEquivSubgroup).symm (inclusion h) = inl h` (the complement iso sends the normal factor to
@@ -41,8 +42,8 @@ theorem hcuThetaHom_inclusion_hInHu [Finite G] {M : Subgroup G}
     hcuThetaHom caseA θ hinv (Subgroup.inclusion
         (le_sup_left : hInHu data ≤ hInHu data ⊔ cuInHu caseA) h)
       = hcuSeedHom (chief := chief) θ h := by
-  haveI := hInHu_normal data
-  haveI : ((hInHu data).subgroupOf (hInHu data ⊔ cuInHu caseA)).Normal :=
+  have := hInHu_normal data
+  have : ((hInHu data).subgroupOf (hInHu data ⊔ cuInHu caseA)).Normal :=
     (hInHu_normal data).subgroupOf _
   -- `(mulEquivSubgroup).symm (inclusion h) = inl ⟨incl h, h ∈ H⟩`.
   have hsymm : (SemidirectProduct.mulEquivSubgroup
@@ -144,7 +145,7 @@ theorem hcuPsiPair_inertia_le [Finite G] {M : Subgroup G}
       ≤ ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
           (ClassFunction.compHom (QuotientGroup.mk' chief.N)
             (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ))) := by
-  haveI := hInHu_normal data
+  have := hInHu_normal data
   intro g hg
   rw [ClassFunction.mem_inertia] at hg ⊢
   ext h
@@ -212,7 +213,7 @@ theorem hcuZetaPair_irreducible [Finite G] {M : Subgroup G}
         = hInHu data ⊔ cuInHu caseA) :
     IsIrreducibleCharacter (ClassFunction.induce (hInHu data ⊔ cuInHu caseA)
       (hcuPsiPair caseA θ hinv lam : ClassFunction ↥(hInHu data ⊔ cuInHu caseA) ℂ)) := by
-  haveI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
+  have : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
   exact OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_inertia_eq
     (hcuPsiPair caseA θ hinv lam)
     (hcuPsiPair_inertia_eq_hcu caseA θ hinv lam hθ₀)
@@ -282,7 +283,7 @@ theorem hcuSeedHom_invariance_of_cuInHu_le_inertia [Finite G] {M : Subgroup G}
           ⟨(c : ↥(huSub data)) * (h : ↥(huSub data)) * (c : ↥(huSub data))⁻¹,
             (hInHu_normal data).conj_mem _ h.2 (c : ↥(huSub data))⟩
         = hcuSeedHom (chief := chief) θ h := by
-  haveI := hInHu_normal data
+  have := hInHu_normal data
   intro c h
   -- `θ₀ = linearClassFunction (hcuSeedHom θ)` and `conjBy (c:huSub) θ₀ = θ₀`.
   have hconj : ClassFunction.conjBy (c : ↥(huSub data))
@@ -321,14 +322,14 @@ theorem exists_source_char_hom_caseA [Finite G] {M : Subgroup G}
       (∀ w ∈ W, (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) w
         = (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1) := by
   obtain ⟨W, hWinv, hinf, hsup⟩ := chiefFactor_caseA_S0_complement caseA
-  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+  have : IsMulCommutative (↥data.H ⧸ chief.N) :=
     IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
-  letI : CommGroup (↥data.H ⧸ chief.N) :=
+  let : CommGroup (↥data.H ⧸ chief.N) :=
     { (inferInstance : Group (↥data.H ⧸ chief.N)) with
       mul_comm := isMulCommutative_iff.mp inferInstance }
-  haveI := Fact.mk chief.p_prime
-  haveI : W.Normal := Subgroup.normal_of_isMulCommutative W
-  letI : CommGroup ((↥data.H ⧸ chief.N) ⧸ W) := inferInstance
+  have := Fact.mk chief.p_prime
+  have : W.Normal := Subgroup.normal_of_isMulCommutative W
+  let : CommGroup ((↥data.H ⧸ chief.N) ⧸ W) := inferInstance
   have hcompl : Subgroup.IsComplement' caseA.S0 W :=
     Subgroup.isComplement'_of_disjoint_and_mul_eq_univ (disjoint_iff.mpr hinf)
       (by rw [← Subgroup.mul_normal caseA.S0 W, hsup]; rfl)
@@ -386,14 +387,14 @@ theorem exists_source_char_hom_caseA_nonRegular [Finite G] {M : Subgroup G}
         = (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1) ∧
       ∃ j₁ : Fin data.q, θ.comp (caseA.Hpart j₁).subtype = 1 := by
   obtain ⟨W, hWinv, hinf, hsup, j₁, hj₁le⟩ := caseA_exists_summand_join_complement_S0 caseA
-  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+  have : IsMulCommutative (↥data.H ⧸ chief.N) :=
     IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
-  letI : CommGroup (↥data.H ⧸ chief.N) :=
+  let : CommGroup (↥data.H ⧸ chief.N) :=
     { (inferInstance : Group (↥data.H ⧸ chief.N)) with
       mul_comm := isMulCommutative_iff.mp inferInstance }
-  haveI := Fact.mk chief.p_prime
-  haveI : W.Normal := Subgroup.normal_of_isMulCommutative W
-  letI : CommGroup ((↥data.H ⧸ chief.N) ⧸ W) := inferInstance
+  have := Fact.mk chief.p_prime
+  have : W.Normal := Subgroup.normal_of_isMulCommutative W
+  let : CommGroup ((↥data.H ⧸ chief.N) ⧸ W) := inferInstance
   have hcompl : Subgroup.IsComplement' caseA.S0 W :=
     Subgroup.isComplement'_of_disjoint_and_mul_eq_univ (disjoint_iff.mpr hinf)
       (by rw [← Subgroup.mul_normal caseA.S0 W, hsup]; rfl)
@@ -457,8 +458,8 @@ theorem caseA_exists_irreducible_source_degree_qa [Finite G] {M : Subgroup G}
     ∃ ζ : ClassFunction ↥(huSub data) ℂ,
       IsIrreducibleCharacter ζ ∧ ζ (1 : ↥(huSub data)) = (caseA.a : ℂ) ∧
       induceHU data ζ (1 : ↥M) = ((data.q * caseA.a : ℕ) : ℂ) := by
-  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
-  haveI := hcuInHu_normal caseA
+  have : Fintype ↥(huSub data) := Fintype.ofFinite _
+  have := hcuInHu_normal caseA
   obtain ⟨θ, W, hWinv, hsup, hreg, htriv⟩ := exists_source_char_hom_caseA caseA
   -- the seed inertia `inertia(θ₀) = H·C_U(S₀)` from the full inertia lift
   have hθ₀ : ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
@@ -713,7 +714,7 @@ theorem caseA_wOrbit_one [Finite G] {M : Subgroup G}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) :
     caseA_wOrbit caseA 1 = caseA.S0 := by
   rw [caseA_wOrbit]
-  haveI : chief.N.Normal := chief.N_normal
+  have : chief.N.Normal := chief.N_normal
   change quotientMulAutHom chief.N_aInvariant
       ↑(1 : ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))) • caseA.S0 = caseA.S0
   rw [Subgroup.coe_one, map_one, one_smul]
@@ -726,7 +727,7 @@ theorem caseA_wOrbit_iSup [Finite G] {M : Subgroup G}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) :
     ⨆ w : ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)),
       caseA_wOrbit caseA w = ⊤ := by
-  haveI : chief.N.Normal := chief.N_normal
+  have : chief.N.Normal := chief.N_normal
   have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
   have hS0card : Nat.card ↥caseA.S0 = chief.p := caseA_S0_card caseA
   have hS0ne : caseA.S0 ≠ ⊥ := by
@@ -772,12 +773,12 @@ theorem caseA_wOrbit_iSupIndep [Finite G] {M : Subgroup G}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
     [Finite ↥((data.typeP.W1).subgroupOf (data.typeP.U ⊔ data.typeP.W1))] :
     iSupIndep (caseA_wOrbit caseA) := by
-  haveI : Fintype ↥((data.typeP.W1).subgroupOf (data.typeP.U ⊔ data.typeP.W1)) :=
+  have : Fintype ↥((data.typeP.W1).subgroupOf (data.typeP.U ⊔ data.typeP.W1)) :=
     Fintype.ofFinite _
   classical
-  haveI : chief.N.Normal := chief.N_normal
-  haveI : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
-  letI : CommGroup (↥data.H ⧸ chief.N) :=
+  have : chief.N.Normal := chief.N_normal
+  have : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+  let : CommGroup (↥data.H ⧸ chief.N) :=
     { (inferInstance : Group (↥data.H ⧸ chief.N)) with
       mul_comm := chief.quotient_elementaryAbelian.comm }
   have hS0card : Nat.card ↥caseA.S0 = chief.p := caseA_S0_card caseA
@@ -816,7 +817,7 @@ theorem caseA_wComplement_aInvariant [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) :
     IsAInvariant (uActionHom data chief) (caseA_wComplement caseA) := by
-  haveI : chief.N.Normal := chief.N_normal
+  have : chief.N.Normal := chief.N_normal
   have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
   have hUnorm : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal :=
     (typeP_uW1_frobenius data.typeP hU).isNormal
@@ -880,9 +881,9 @@ theorem inertia_eq_top_of_induceHU_not_irreducible [Finite G] {M : Subgroup G}
     (hred : ¬ IsIrreducibleCharacter
       (ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ))) :
     ClassFunction.inertia (χ : ClassFunction ↥(huSub data) ℂ) = ⊤ := by
-  haveI := huSub_normal data
-  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥M : ℂ) :=
+  have := huSub_normal data
+  let : Fintype ↥(huSub data) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥M : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   have hne : ClassFunction.inertia (χ : ClassFunction ↥(huSub data) ℂ) ≠ huSub data :=
     mt (isIrreducibleCharacter_induce_of_inertia_eq χ) hred
@@ -906,9 +907,9 @@ theorem caseA_induceHU_inj_of_reducible [Finite G] {M : Subgroup G}
     (h : ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ)
       = ClassFunction.induce (huSub data) (ψ : ClassFunction ↥(huSub data) ℂ)) :
     ψ = χ := by
-  haveI := huSub_normal data
-  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥M : ℂ) :=
+  have := huSub_normal data
+  let : Fintype ↥(huSub data) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥M : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   have hinertia := inertia_eq_top_of_induceHU_not_irreducible data χ hχred
   refine induce_injective_of_inertia_stable (fun g => ?_) h
@@ -991,11 +992,11 @@ theorem clifford_caseA_exists_regular_char_on_conjugates [Finite G] {M : Subgrou
         ∃ x ∈ (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
             chief.N_aInvariant).φ ↑w • S₀, θ x ≠ 1 := by
   classical
-  letI : CommGroup (↥data.H ⧸ chief.N) :=
+  let : CommGroup (↥data.H ⧸ chief.N) :=
     { (inferInstance : Group (↥data.H ⧸ chief.N)) with
       mul_comm := chief.quotient_elementaryAbelian.comm }
   set act := typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant with hact
-  haveI : Fintype ↥act.E := Fintype.ofFinite _
+  have : Fintype ↥act.E := Fintype.ofFinite _
   have hUnorm : act.U.Normal := (typeP_uW1_frobenius data.typeP data.nontrivial.1).isNormal
   have hspan0 : ⨆ a, act.φ a • S₀ = ⊤ :=
     iSup_smul_eq_top_of_irreducible (φ := act.φ) chief.quotient_chiefFactor hS₀ne
@@ -1038,11 +1039,11 @@ theorem clifford_caseA_exists_regular_char_not_fixed [Finite G] {M : Subgroup G}
         θ.comp ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
           chief.N_aInvariant).φ ↑w₀).toMonoidHom ≠ θ := by
   classical
-  letI : CommGroup (↥data.H ⧸ chief.N) :=
+  let : CommGroup (↥data.H ⧸ chief.N) :=
     { (inferInstance : Group (↥data.H ⧸ chief.N)) with
       mul_comm := chief.quotient_elementaryAbelian.comm }
   set act := typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant with hact
-  haveI : Fintype ↥act.E := Fintype.ofFinite _
+  have : Fintype ↥act.E := Fintype.ofFinite _
   have hUnorm : act.U.Normal := (typeP_uW1_frobenius data.typeP data.nontrivial.1).isNormal
   have hspan0 : ⨆ a, act.φ a • S₀ = ⊤ :=
     iSup_smul_eq_top_of_irreducible (φ := act.φ) chief.quotient_chiefFactor hS₀ne
@@ -1060,7 +1061,7 @@ theorem clifford_caseA_exists_regular_char_not_fixed [Finite G] {M : Subgroup G}
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
   have hKcard : Nat.card (↥data.H ⧸ chief.N) = (Nat.card ↥S₀) ^ (Fintype.card ↥act.E) := by
     rw [hS₀card, hEcard, chiefFactor_quotient_card chief]
-  haveI : Nontrivial ↥act.E := Finite.one_lt_card_iff_nontrivial.mp
+  have : Nontrivial ↥act.E := Finite.one_lt_card_iff_nontrivial.mp
     (by rw [Nat.card_eq_fintype_card, hEcard]; exact data.nontrivial.2.1.one_lt)
   obtain ⟨w₀, hw₀⟩ := exists_ne (1 : ↥act.E)
   obtain ⟨θ, hreg, hnf⟩ := exists_regular_char_not_fixed

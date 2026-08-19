@@ -90,7 +90,7 @@ the induced action on `M ⧸ N` are the image of `C_M(B)` under `mk' N`.  The `�
 immediate; the `⊆` direction lifts a fixed coset via `coprime_fixedPoints_quotient` (Prop 1.5(d),
 element form), applied to the acting subgroup `↥B`. -/
 private theorem fixedSubgroup_quotientMulAutHom_eq_map [Finite H] [Finite M] {φ : H →* MulAut M}
-    (hCop : Nat.Coprime (Nat.card H) (Nat.card M)) (hSolv : IsSolvable H ∨ IsSolvable M)
+    (hCop : Nat.Coprime (Nat.card H) (Nat.card M)) (hSolv : Group.IsSolvable H ∨ Group.IsSolvable M)
     {N : Subgroup M} [N.Normal] (hN : IsAInvariant φ N) (B : Subgroup H) :
     fixedSubgroup hN.quotientMulAutHom B = (fixedSubgroup φ B).map (QuotientGroup.mk' N) := by
   refine le_antisymm ?_ ?_
@@ -99,7 +99,7 @@ private theorem fixedSubgroup_quotientMulAutHom_eq_map [Finite H] [Finite M] {φ
     rw [mem_fixedSubgroup] at hq
     have hCopB : Nat.Coprime (Nat.card ↥B) (Nat.card M) :=
       hCop.coprime_dvd_left (Subgroup.card_subgroup_dvd_card B)
-    have hSolvB : IsSolvable ↥B ∨ IsSolvable M := by
+    have hSolvB : Group.IsSolvable ↥B ∨ Group.IsSolvable M := by
       rcases hSolv with h | h
       · exact Or.inl inferInstance
       · exact Or.inr h
@@ -131,9 +131,9 @@ private theorem fixedSubgroup_quotientMulAutHom_eq_map [Finite H] [Finite M] {φ
 induction on `|M|` for a finite *solvable* `M` with an automorphic `H`-action `φ`; `H = KR` is a
 fixed finite solvable Frobenius group.  See the module docstring for the dévissage. -/
 private theorem bgThm310_nilpotent_aux
-    [Finite H] [IsSolvable H] {K R : Subgroup H} [K.Normal]
+    [Finite H] [Group.IsSolvable H] {K R : Subgroup H} [K.Normal]
     (hIsFrob : IsFrobeniusGroup H K R) (hRne : R ≠ ⊥) (hKne : K ≠ ⊥) :
-    ∀ (n : ℕ) {M : Type*} [Group M] [Finite M] [Nontrivial M] [IsSolvable M]
+    ∀ (n : ℕ) {M : Type*} [Group M] [Finite M] [Nontrivial M] [Group.IsSolvable M]
       (φ : H →* MulAut M),
       Nat.Coprime (Nat.card H) (Nat.card M) →
       fixedSubgroup φ K = ⊥ →
@@ -149,13 +149,13 @@ private theorem bgThm310_nilpotent_aux
     -- A minimal `H`-invariant normal subgroup `N ◁ M`; it is elementary abelian.
     obtain ⟨N, p, hp, hNne, hNnorm, hNinv, hNea⟩ :=
       exists_aInvariant_normal_isElementaryAbelian (φ := φ)
-    haveI : N.Normal := hNnorm
+    have : N.Normal := hNnorm
     by_cases hNtop : N = ⊤
     · -- **Base case**: `M` is `H`-chief, hence elementary abelian; apply piece 2.
-      haveI : Fact p.Prime := ⟨hp⟩
+      have : Fact p.Prime := ⟨hp⟩
       have hMea : IsElementaryAbelian p M :=
         IsElementaryAbelian.of_mulEquiv Subgroup.topEquiv (hNtop ▸ hNea)
-      letI cg : CommGroup M :=
+      let cg : CommGroup M :=
         { (inferInstance : Group M) with mul_comm := fun a b => hMea.comm a b }
       have hnsmul : ∀ x : Additive M, (p : ℕ) • x = 0 := by
         intro x
@@ -163,8 +163,8 @@ private theorem bgThm310_nilpotent_aux
         show (p • x).toMul = (0 : Additive M).toMul
         rw [toMul_nsmul, toMul_zero]
         exact hMea.pow_eq_one x.toMul
-      letI : Module (ZMod p) (Additive M) := AddCommGroup.zmodModule hnsmul
-      letI actInst : MulDistribMulAction H M := MulDistribMulAction.compHom M φ
+      let : Module (ZMod p) (Additive M) := AddCommGroup.zmodModule hnsmul
+      let actInst : MulDistribMulAction H M := MulDistribMulAction.compHom M φ
       -- The `toMulAut` of the fresh action agrees with `φ`.
       have hbridge : MulDistribMulAction.toMulAut H M = φ :=
         MonoidHom.ext fun l => MulEquiv.ext fun m => rfl
@@ -191,8 +191,8 @@ private theorem bgThm310_nilpotent_aux
         have hc := hpiece2.2.2; rw [hbridge] at hc
         exact hc hcyc g hg m
     · -- **Step case**: peel off the proper elementary-abelian `N` and recurse.
-      haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNne
-      haveI : Nontrivial (M ⧸ N) := QuotientGroup.nontrivial_iff.mpr hNtop
+      have : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNne
+      have : Nontrivial (M ⧸ N) := QuotientGroup.nontrivial_iff.mpr hNtop
       have h1ltN : 1 < Nat.card ↥N := Finite.one_lt_card_iff_nontrivial.mpr inferInstance
       have h1ltQ : 1 < Nat.card (M ⧸ N) := Finite.one_lt_card_iff_nontrivial.mpr inferInstance
       have hcardM_split : Nat.card M = Nat.card (M ⧸ N) * Nat.card ↥N :=
@@ -214,21 +214,22 @@ private theorem bgThm310_nilpotent_aux
         rw [fixedSubgroup_restrict_eq_subgroupOf hNinv (Subgroup.zpowers x),
           fixedSubgroup_restrict_eq_subgroupOf hNinv R, hcond3 x hx hx1]
       have hCKQ : fixedSubgroup hNinv.quotientMulAutHom K = ⊥ := by
-        rw [fixedSubgroup_quotientMulAutHom_eq_map hcop (Or.inr ‹IsSolvable M›) hNinv K, hCK,
+        rw [fixedSubgroup_quotientMulAutHom_eq_map hcop (Or.inr ‹Group.IsSolvable M›) hNinv K, hCK,
           Subgroup.map_bot]
       have hcond3Q : ∀ x ∈ R, x ≠ 1 →
           fixedSubgroup hNinv.quotientMulAutHom (Subgroup.zpowers x)
             = fixedSubgroup hNinv.quotientMulAutHom R := by
         intro x hx hx1
-        rw [fixedSubgroup_quotientMulAutHom_eq_map hcop (Or.inr ‹IsSolvable M›) hNinv
+        rw [fixedSubgroup_quotientMulAutHom_eq_map hcop (Or.inr ‹Group.IsSolvable M›) hNinv
             (Subgroup.zpowers x),
-          fixedSubgroup_quotientMulAutHom_eq_map hcop (Or.inr ‹IsSolvable M›) hNinv R,
+          fixedSubgroup_quotientMulAutHom_eq_map hcop (Or.inr ‹Group.IsSolvable M›) hNinv R,
           hcond3 x hx hx1]
       -- The two induction hypotheses.
       have resN := IH (Nat.card ↥N) hcardN_lt hNinv.restrict hcopN hCKN hcond3N rfl
       have resQ := IH (Nat.card (M ⧸ N)) hcardQ_lt hNinv.quotientMulAutHom hcopQ hCKQ hcond3Q rfl
       -- The Hartley–Turull order split (piece 1).
-      have hpiece1 := card_fixedSubgroup_eq_mul_of_invariantNormal hcop (Or.inr ‹IsSolvable M›)
+      have hpiece1 :=
+        card_fixedSubgroup_eq_mul_of_invariantNormal hcop (Or.inr ‹Group.IsSolvable M›)
         hNinv R
       have hb : Nat.card M = Nat.card ↥(fixedSubgroup φ R) ^ Nat.card ↥R := by
         rw [hcardM_split, resQ.2.1, resN.2.1, ← mul_pow, hpiece1]; ring
@@ -236,7 +237,7 @@ private theorem bgThm310_nilpotent_aux
       refine ⟨resN.1, hb, ?_⟩
       -- (c): assemble the two chain-stabiliser conclusions.
       intro hcyc g hg m
-      haveI : IsCyclic ↥(fixedSubgroup φ R) := hcyc
+      have : IsCyclic ↥(fixedSubgroup φ R) := hcyc
       -- `C_{↥N}(R)` is cyclic: it embeds into the cyclic `C_M(R)`.
       have hcycN : IsCyclic ↥(fixedSubgroup hNinv.restrict R) := by
         -- `C_{↥N}(R)` maps isomorphically (via `N.subtype`) onto a subgroup of the cyclic `C_M(R)`.
@@ -246,14 +247,14 @@ private theorem bgThm310_nilpotent_aux
           intro l hl
           have h2 := congrArg Subtype.val ((mem_fixedSubgroup.mp hx) l hl)
           rwa [IsAInvariant.restrict_apply_val] at h2
-        haveI : IsCyclic ↥((fixedSubgroup hNinv.restrict R).map N.subtype) :=
+        have : IsCyclic ↥((fixedSubgroup hNinv.restrict R).map N.subtype) :=
           Subgroup.isCyclic_of_le hle
         exact ((fixedSubgroup hNinv.restrict R).equivMapOfInjective N.subtype
           N.subtype_injective).isCyclic.mpr inferInstance
       -- `C_{M/N}(R)` is cyclic: it is the image of the cyclic `C_M(R)` under `mk' N`.
       have hmapQ : fixedSubgroup hNinv.quotientMulAutHom R
           = (fixedSubgroup φ R).map (QuotientGroup.mk' N) :=
-        fixedSubgroup_quotientMulAutHom_eq_map hcop (Or.inr ‹IsSolvable M›) hNinv R
+        fixedSubgroup_quotientMulAutHom_eq_map hcop (Or.inr ‹Group.IsSolvable M›) hNinv R
       have hcycQ : IsCyclic ↥(fixedSubgroup hNinv.quotientMulAutHom R) := by
         rw [hmapQ]
         exact isCyclic_of_surjective _
@@ -262,7 +263,7 @@ private theorem bgThm310_nilpotent_aux
       have hkey := OddOrder.BG.Ch1.S01.coprime_actsTrivially_of_normal_and_quotient
         (φ := φ.comp (⁅K, K⁆ : Subgroup H).subtype) (N := N)
         (hcop.coprime_dvd_left (Subgroup.card_subgroup_dvd_card ⁅K, K⁆))
-        (Or.inr ‹IsSolvable M›) (fun a => hNinv (a : H))
+        (Or.inr ‹Group.IsSolvable M›) (fun a => hNinv (a : H))
         (fun a n hn => by
           have h2 := congrArg Subtype.val (resN.2.2 hcycN (a : H) a.2 ⟨n, hn⟩)
           rwa [IsAInvariant.restrict_apply_val] at h2)
@@ -290,12 +291,12 @@ group `M`, forming a Frobenius group `H = KR` with kernel `K ⊴ H` and compleme
 
 Here `C_M(R) = fixedSubgroup (MulDistribMulAction.toMulAut H M) R`.  The proof (the Case-1 dévissage
 `bgThm310_nilpotent_aux`) only uses that `M` is solvable; the nilpotent hypothesis is weakened to
-`IsSolvable M` internally.
+`Group.IsSolvable M` internally.
 
 For the book's own packaging — `R` cyclic of prime order `p` with `(b)` read as `|M| = |C_M(R)|^p`,
 and `R ≠ ⊥` / `K ≠ ⊥` taken from the Frobenius structure rather than assumed — see `bgThm310`. -/
 theorem bgThm310_nilpotent
-    {H : Type*} [Group H] [Finite H] [IsSolvable H]
+    {H : Type*} [Group H] [Finite H] [Group.IsSolvable H]
     {M : Type*} [Group M] [Finite M] [Nontrivial M] (hMnil : Group.IsNilpotent M)
     [MulDistribMulAction H M] {K R : Subgroup H} [K.Normal]
     (hIsFrob : IsFrobeniusGroup H K R) (hRne : R ≠ ⊥) (hKne : K ≠ ⊥)
@@ -308,7 +309,7 @@ theorem bgThm310_nilpotent
       Nat.card M = Nat.card ↥(fixedSubgroup (MulDistribMulAction.toMulAut H M) R) ^ Nat.card ↥R ∧
       (IsCyclic ↥(fixedSubgroup (MulDistribMulAction.toMulAut H M) R) →
         ∀ g ∈ ⁅K, K⁆, ∀ m : M, (g : H) • m = m) := by
-  haveI := hMnil
+  have := hMnil
   obtain ⟨ha, hb, hc⟩ := bgThm310_nilpotent_aux hIsFrob hRne hKne (Nat.card M)
     (MulDistribMulAction.toMulAut H M) hcop hCK hcond3 rfl
   exact ⟨ha, hb, fun hcyc g hg m => hc hcyc g hg m⟩
@@ -336,7 +337,7 @@ statement `K' ⊆ C_K(M)` in acting form (`every g ∈ ⁅K, K⁆ fixes every m 
 
 All the mathematics lives in `bgThm310_nilpotent`; this is the repackaging into the book's shape. -/
 theorem bgThm310
-    {H : Type*} [Group H] [Finite H] [IsSolvable H]
+    {H : Type*} [Group H] [Finite H] [Group.IsSolvable H]
     {M : Type*} [Group M] [Finite M] [Nontrivial M] (hMnil : Group.IsNilpotent M)
     [MulDistribMulAction H M] {K R : Subgroup H} [K.Normal]
     (hIsFrob : IsFrobeniusGroup H K R)
@@ -351,7 +352,7 @@ theorem bgThm310
         ∀ g ∈ ⁅K, K⁆, ∀ m : M, (g : H) • m = m) := by
   obtain ⟨⟨p, hp, hRcard⟩, hb, hc⟩ :=
     bgThm310_nilpotent hMnil hIsFrob hIsFrob.ne_bot_complement hIsFrob.ne_bot_kernel hcop hCK hcond3
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   refine ⟨p, hp, hRcard, ?_, ?_, hc⟩
   · exact isCyclic_of_prime_card (p := p) hRcard
   · rw [← hRcard]; exact hb

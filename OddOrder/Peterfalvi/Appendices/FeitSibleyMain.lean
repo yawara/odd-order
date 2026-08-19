@@ -111,9 +111,9 @@ theorem ssetOf_sder_coherent_of_xset_qder_union
       (hyp.SsetOf hyp.Sder) hyp.A) := by
   classical
   by_contra hfail
-  haveI : ((hyp.Sder.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal :=
+  have : ((hyp.Sder.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal :=
     hyp.Sder_subgroupOf_Q_normal
-  haveI : ((hyp.S ⊔ Z).subgroupOf hyp.H).Normal :=
+  have : ((hyp.S ⊔ Z).subgroupOf hyp.H).Normal :=
     hyp.subgroupOf_H_normal_of_conj_mem fun h hh x hx =>
       conj_mem_sup (fun y hy => hyp.S_normal_in_H hh hy) (fun y hy => hZH h hh y hy) hx
   obtain ⟨η₁, hη₁⟩ := hYne
@@ -226,9 +226,9 @@ theorem ssetOf_sder_coherent_of_nonabelian
   have hZH : ∀ h ∈ hyp.H, ∀ x ∈ Z, h * x * h⁻¹ ∈ Z :=
     fun h hh x hx => hyp.endgameZ_conj_mem_of_mem_H hh hx
   -- the three `H`-normal instances (as in `endgame_Xset_coherent`)
-  haveI : (hyp.Sder.subgroupOf hyp.H).Normal :=
+  have : (hyp.Sder.subgroupOf hyp.H).Normal :=
     hyp.subgroupOf_H_normal_of_conj_mem fun h hh x hx => hyp.Sder_conj_mem_of_mem_H hh hx
-  haveI : (Z.subgroupOf hyp.H).Normal :=
+  have : (Z.subgroupOf hyp.H).Normal :=
     hyp.subgroupOf_H_normal_of_conj_mem hZH
   -- the no-real-character fact (Lemma 2(c)) for the conjugate witnesses
   have hnoreal := hasNoRealCharacters_Sset hyp hd hQ1odd
@@ -261,7 +261,7 @@ theorem ssetOf_sder_coherent_of_nonabelian
       OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) hyp.Sset hyp.A :=
     hyp.keystone_mem_zSupportedSpan hχ₁S hη₁S (by rw [hχ₁deg, hη₁d])
   -- a nontrivial `z ∈ Z^#`
-  haveI : Nontrivial ↥Z := (Subgroup.nontrivial_iff_ne_bot _).mpr hZne
+  have : Nontrivial ↥Z := (Subgroup.nontrivial_iff_ne_bot _).mpr hZne
   obtain ⟨z₀, hz₀ne⟩ := exists_ne (1 : ↥Z)
   have hz₀H : (z₀ : G) ∈ hyp.H := hyp.Q_le_H (hyp.Q1_le_Q (hZQ1 z₀.2))
   set z : ↥hyp.H := ⟨(z₀ : G), hz₀H⟩ with hzdef
@@ -323,7 +323,7 @@ theorem feit_sibley_coherence [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hHallG : Nat.Coprime (Nat.card ↥hyp.Q) hyp.Q.index) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := by
   classical
-  letI : Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ) :=
+  let : Invertible (Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   -- `|Q₁|` is odd (`Q₁ ≤ G`, `|G|` odd) and `≠ 1` (`Q₁` is not a `2`-group)
   have hN1 : Nat.card ↥hyp.Q1 ≠ 1 := fun h1 =>

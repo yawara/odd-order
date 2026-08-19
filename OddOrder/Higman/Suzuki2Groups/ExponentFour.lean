@@ -66,10 +66,10 @@ theorem pow_four_eq_one_of_isTypeA
     {P : Type uP} [Group P] (hP : IsTypeA.{uP, uF} P) (x : P) :
     x ^ 4 = 1 := by
   obtain ⟨data⟩ := hP
-  letI := data.fieldF
-  letI := data.finiteF
-  letI := data.charTwoF
-  letI : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
+  let := data.fieldF
+  let := data.finiteF
+  let := data.charTwoF
+  let : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
   apply data.equivModel.injective
   rw [map_pow, map_one]
   exact quadraticExtension_pow_four_eq_one
@@ -81,10 +81,10 @@ theorem pow_four_eq_one_of_isTypeB
     {P : Type uP} [Group P] (hP : IsTypeB.{uP, uF} P) (x : P) :
     x ^ 4 = 1 := by
   obtain ⟨data⟩ := hP
-  letI := data.fieldF
-  letI := data.finiteF
-  letI := data.charTwoF
-  letI : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
+  let := data.fieldF
+  let := data.finiteF
+  let := data.charTwoF
+  let : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
   apply data.equivModel.injective
   rw [map_pow, map_one]
   exact quadraticExtension_pow_four_eq_one
@@ -96,10 +96,10 @@ theorem pow_four_eq_one_of_isTypeC
     {P : Type uP} [Group P] (hP : IsTypeC.{uP, uF} P) (x : P) :
     x ^ 4 = 1 := by
   obtain ⟨data⟩ := hP
-  letI := data.fieldF
-  letI := data.finiteF
-  letI := data.charTwoF
-  letI : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
+  let := data.fieldF
+  let := data.finiteF
+  let := data.charTwoF
+  let : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
   apply data.equivModel.injective
   rw [map_pow, map_one]
   exact quadraticExtension_pow_four_eq_one
@@ -111,10 +111,10 @@ theorem pow_four_eq_one_of_isTypeD
     {P : Type uP} [Group P] (hP : IsTypeD.{uP, uF} P) (x : P) :
     x ^ 4 = 1 := by
   obtain ⟨data⟩ := hP
-  letI := data.fieldF
-  letI := data.finiteF
-  letI := data.charTwoF
-  letI : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
+  let := data.fieldF
+  let := data.finiteF
+  let := data.charTwoF
+  let : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
   apply data.equivModel.injective
   rw [map_pow, map_one]
   exact quadraticExtension_pow_four_eq_one

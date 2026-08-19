@@ -70,7 +70,7 @@ time with `exists_isRoot_of_monic`; the cofactor is again monic of smaller degre
 theorem exists_multiset_prod_X_sub_C (K : Type*) [Field K] [Algebra A K] [IsFractionRing A K]
     [IsAlgClosed K] {f : A[X]} (hf : f.Monic) :
     ∃ s : Multiset A, f = (s.map fun a => X - C a).prod := by
-  haveI : Nontrivial A := (algebraMap A K).domain_nontrivial
+  have : Nontrivial A := (algebraMap A K).domain_nontrivial
   suffices H : ∀ n : ℕ, ∀ g : A[X], g.Monic → g.natDegree ≤ n →
       ∃ s : Multiset A, g = (s.map fun a => X - C a).prod from H f.natDegree f hf le_rfl
   intro n

@@ -556,7 +556,7 @@ private theorem ff_succ (k : ℕ) :
 /-- Pascal recurrence for the `d₂`-exponent `GG n = 2 * (n+1).choose 3`:
 `k*(k+1) + 2 * (k+1).choose 3 = 2 * (k+2).choose 3`. The skeleton step emits `d₂^(k*(k+1))`,
 which combined with the carried `d₂^GG(k)` gives `d₂^GG(k+1)`; note `k*(k+1) = 2*(k+1).choose 2`
-(`Nat.succ_mul_choose_eq`). -/
+(`Nat.choose_succ_right_eq`). -/
 private theorem gg_succ (k : ℕ) :
     k * (k + 1) + 2 * (k + 1).choose 3 = 2 * (k + 2).choose 3 := by
   -- `k*(k+1) = 2 * (k+1).choose 2`.
@@ -712,7 +712,7 @@ theorem omega1_pow_eq_one (hR : IsPGroup p R) (hp_odd : Odd p)
       { carrier := {g : R | g ^ p = 1}
         mul_mem' := fun {x y} hx hy => hclosed x y hx hy
         one_mem' := one_pow p
-        inv_mem' := fun {x} hx => by rw [Set.mem_setOf_eq, inv_pow, hx, inv_one] }
+        inv_mem' := fun {x} hx => by rw [Set.mem_ofPred_eq, inv_pow, hx, inv_one] }
     have hle : Omega R p 1 ≤ omega1 := by
       rw [Omega, Subgroup.closure_le]
       intro x hx
@@ -739,7 +739,7 @@ theorem omega1_pow_eq_one (hR : IsPGroup p R) (hp_odd : Odd p)
   · -- `⟨x⟩ ≠ ⊤`: take a maximal (normal) subgroup `S ⊇ ⟨x⟩`.
     obtain ⟨S, hS_coatom, hxS_le⟩ :=
       (IsCoatomic.eq_top_or_exists_le_coatom (Subgroup.zpowers x)).resolve_left hxtop
-    haveI hS_normal : S.Normal := hS_coatom.normal_of_isPGroup hR'
+    have hS_normal : S.Normal := hS_coatom.normal_of_isPGroup hR'
     have hxS : x ∈ S := hxS_le (Subgroup.mem_zpowers x)
     -- `|↥S| < |R'| = n`.
     have hScard : Nat.card ↥S < n := by
@@ -749,15 +749,15 @@ theorem omega1_pow_eq_one (hR : IsPGroup p R) (hp_odd : Odd p)
       have h_ne : Nat.card ↥S ≠ Nat.card R' := fun heq =>
         hS_coatom.1 (Subgroup.eq_top_of_card_eq _ heq)
       exact Nat.lt_of_le_of_ne h_le h_ne
-    haveI hSpg : IsPGroup p ↥S := hR'.to_subgroup S
+    have hSpg : IsPGroup p ↥S := hR'.to_subgroup S
     have hc3S := class_le_three_descent hc3' S
     -- Inductive hypothesis: product-closure on `↥S`.
     have IHS : ∀ a b : ↥S, a ^ p = 1 → b ^ p = 1 → (a * b) ^ p = 1 :=
       ih (Nat.card ↥S) hScard hSpg hc3S rfl
     -- `Ω₁(↥S)` (as an `R'`-subgroup) is normal in `R'` and has exponent `p`.
-    haveI : (Omega ↥S p 1).Characteristic := Omega.characteristic
+    have : (Omega ↥S p 1).Characteristic := Omega.characteristic
     set H : Subgroup R' := (Omega ↥S p 1).map S.subtype with hH_def
-    haveI hH_normal : H.Normal := by rw [hH_def]; infer_instance
+    have hH_normal : H.Normal := by rw [hH_def]; infer_instance
     -- Every element of `H` has `p`-th power `1` (via `IHS` and `closure_le`).
     have hHpow : ∀ z ∈ H, z ^ p = 1 := by
       -- `{a : ↥S | a^p = 1}` is a subgroup of `↥S` (by `IHS`), containing the generators.
@@ -765,7 +765,7 @@ theorem omega1_pow_eq_one (hR : IsPGroup p R) (hp_odd : Odd p)
         { carrier := {a : ↥S | a ^ p = 1}
           mul_mem' := fun {a b} ha hb => IHS a b ha hb
           one_mem' := one_pow p
-          inv_mem' := fun {a} ha => by rw [Set.mem_setOf_eq, inv_pow, ha, inv_one] }
+          inv_mem' := fun {a} ha => by rw [Set.mem_ofPred_eq, inv_pow, ha, inv_one] }
       have hΩle : Omega ↥S p 1 ≤ omega1S := by
         rw [Omega, Subgroup.closure_le]
         intro a ha

@@ -270,7 +270,7 @@ theorem exists_homocyclic_decomposition_of_involution_heights
   classical
   obtain ⟨ι, hι, n, hn_gt, ⟨ε⟩⟩ :=
     CommGroup.equiv_prod_multiplicative_zmod_of_finite A
-  letI : Fintype ι := hι
+  let : Fintype ι := hι
   let B := (i : ι) → Multiplicative (ZMod (n i))
   have hB : IsPGroup 2 B := hA.of_equiv ε
   have hn_pow : ∀ i : ι, ∃ m : ℕ, 0 < m ∧ n i = 2 ^ m := by

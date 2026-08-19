@@ -78,7 +78,7 @@ theorem nontrivialActionFixedByClosure_eq_top_of_not_isCyclic' [Finite A] [IsMul
     [Finite G] (φ : A →* MulAut G) (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
     (hNC : ¬ IsCyclic A) :
     nontrivialActionFixedByClosure φ = ⊤ := by
-  letI : MulDistribMulAction A G := MulDistribMulAction.compHom G φ
+  let : MulDistribMulAction A G := MulDistribMulAction.compHom G φ
   have hφ : MulDistribMulAction.toMulAut A G = φ := by ext a g; rfl
   rw [← hφ]
   exact nontrivialActionFixedByClosure_eq_top_of_not_isCyclic hCop hNC
@@ -113,6 +113,7 @@ noncomputable def quotAction [IsMulCommutative A] (φ : A →* MulAut G) (a : A)
   QuotientGroup.lift (Subgroup.zpowers a) (isAInvariant_actionFixedBy φ a).restrict
     (fun _x hx => zpowers_mem_ker_restrict φ a hx)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Compatibility: the `A ⧸ ⟨a⟩`-action on `C_G(a)`, evaluated at `mk z`, agrees with `φ z`. -/
 theorem quotAction_mk_apply_val [IsMulCommutative A] (φ : A →* MulAut G) (a : A) (z : A)
     (g : ↥(actionFixedBy φ a)) :
@@ -162,7 +163,7 @@ theorem cocyclicFixedByClosure_eq_top_of_not_isCyclic
           · -- `A/⟨a⟩` noncyclic: recurse on the `A/⟨a⟩`-action on `C_G(a)`.
             have ha_bot : Subgroup.zpowers a ≠ ⊥ := by
               intro h; exact ha (by simpa [h] using Subgroup.mem_zpowers a)
-            haveI hcomm_quot : IsMulCommutative (A ⧸ Subgroup.zpowers a) :=
+            have hcomm_quot : IsMulCommutative (A ⧸ Subgroup.zpowers a) :=
               IsMulCommutative.of_comm (by
                 intro x y
                 induction x using QuotientGroup.induction_on with | _ x =>

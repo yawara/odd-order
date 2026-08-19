@@ -57,9 +57,9 @@ theorem exists_corner_inverse_blockCharacter
     ∃ y : ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)),
       y = f * y ∧ (f * x) * y = f ∧ y * (f * x) = f := by
   classical
-  haveI : Module.Finite 𝒪 ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)) :=
+  have : Module.Finite 𝒪 ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)) :=
     Module.Finite.of_basis (centerBasis (k := 𝒪) (G := G))
-  haveI : Nontrivial ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)) :=
+  have : Nontrivial ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)) :=
     ⟨0, 1, fun h => one_ne_zero (congrArg Subtype.val h).symm⟩
   -- the residue-field corner inverse
   have hef : IsIdempotentElem (centerReduce φ f) := by

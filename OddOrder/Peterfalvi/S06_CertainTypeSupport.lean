@@ -60,9 +60,9 @@ theorem mem_A_of_apply_ne_zero_of_covers [Finite G]
     (hval : (χ : ClassFunction ↥K ℂ) g ≠ 0) :
     L.subtype (K.subtype g) ∈ A := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   -- `subH` is normal in `K` (a normal subgroup of `L` contained in `K`).
-  haveI hHK_normal : (subH.subgroupOf K).Normal := subH_normal.subgroupOf K
+  have hHK_normal : (subH.subgroupOf K).Normal := subH_normal.subgroupOf K
   -- (1.2) contrapositive: `χ(g) ≠ 0 ⟹ C_subH(g) ≠ 1`.
   have hCne : S03.centralizerInSubgroup (subH.subgroupOf K) g ≠ ⊥ := fun hbot =>
     hval (S03.irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot χ hker hbot)
@@ -182,6 +182,7 @@ open OddOrder.Peterfalvi.S05
 
 variable {L₀ : Type*} [Group L₀] [Fintype L₀] [Invertible (Nat.card L₀ : ℂ)]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (4.7), `j ≥ 1` kernel step** (the `ω_{0j}` argument): for a nontrivial column
 `χ₂ ≠ 1`, the certain-type restriction `χ_j = Res_K μ_{0j}` does **not** contain `W₂` in its
 kernel.  Stated with `W₂` itself (the minimal kernel input); the (4.6.c) form `H ⊄ Ker χ_j`
@@ -319,8 +320,8 @@ theorem Hypothesis.card_reducible_Hnontrivial_induce_eq_W2_sub_one
         ∧ ¬ ((H : Set ↥h.K) ⊆ S03.characterKernel (χ : ClassFunction ↥h.K ℂ))}
       = Nat.card h.W2 - 1 := by
   classical
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite ↥(h.W1 ⊔ h.W2)
-  haveI : Fintype ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite ↥(h.W1 ⊔ h.W2)
+  have : Fintype ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := Fintype.ofFinite _
   -- the forward map sends a nontrivial column `χ₂` to its reducible, `H`-nontrivial `χ_j`
   have hfwd : ∀ p : {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ // χ₂ ≠ 1},
       ¬ IsIrreducibleCharacter (ClassFunction.induce h.K (h.chiRestrict p.1 : ClassFunction ↥h.K ℂ))

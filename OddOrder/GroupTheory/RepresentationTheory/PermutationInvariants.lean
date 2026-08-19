@@ -127,7 +127,7 @@ parametrised by functions on the orbit space `Ω = orbitRel.Quotient G ι` via `
 theorem finrank_invariants_eq_card_orbits (b : Basis ι k V) (ρ : Representation k G V)
     (hρ : ∀ (g : G) (i : ι), ρ g (b i) = b (g • i)) :
     finrank k ↥(invariants ρ) = Nat.card (orbitRel.Quotient G ι) := by
-  haveI : Fintype (orbitRel.Quotient G ι) := Fintype.ofFinite _
+  have : Fintype (orbitRel.Quotient G ι) := Fintype.ofFinite _
   let e : (orbitRel.Quotient G ι → k) ≃ₗ[k] ↥(invariants ρ) :=
     (LinearEquiv.ofInjective (orbitToVec (G := G) b) (orbitToVec_injective b)).trans
       (LinearEquiv.ofEq _ _ (orbitToVec_range_eq b ρ hρ))

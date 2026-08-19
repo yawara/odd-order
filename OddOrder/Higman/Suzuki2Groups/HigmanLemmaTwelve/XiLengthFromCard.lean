@@ -68,7 +68,7 @@ theorem fixedPointFree_of_actsRegularlyOnInvolutions
     intro h0
     rw [h0, pow_zero] at hm
     omega
-  letI : Fintype ↥C := Fintype.ofFinite ↥C
+  let : Fintype ↥C := Fintype.ofFinite ↥C
   obtain ⟨t, ht⟩ := exists_prime_orderOf_dvd_card (G := ↥C) 2 (by
     rw [← Nat.card_eq_fintype_card, hm]
     exact dvd_pow_self 2 hm0)
@@ -104,8 +104,8 @@ theorem card_dvd_card_sub_one_of_fixedPointFree
     {T : Subgroup P} (hT : IsAInvariant φ T) :
     Nat.card A ∣ Nat.card ↥T - 1 := by
   classical
-  letI : Fintype ↥T := Fintype.ofFinite ↥T
-  letI : MulAction A {t : ↥T // t ≠ 1} :=
+  let : Fintype ↥T := Fintype.ofFinite ↥T
+  let : MulAction A {t : ↥T // t ≠ 1} :=
     { smul := fun k t => ⟨hT.restrict k t.1, fun h => t.2 (by
         have := congrArg (hT.restrict k).symm h
         rwa [MulEquiv.symm_apply_apply, map_one] at this)⟩
@@ -220,22 +220,22 @@ theorem le_of_adjoin_frobeniusFixed_eq_top
     m ≤ n := by
   classical
   have hcard : Nat.card (GaloisField 2 m) = 2 ^ m := GaloisField.card 2 m hm
-  haveI : Finite (GaloisField 2 m) :=
+  have : Finite (GaloisField 2 m) :=
     Nat.finite_of_card_ne_zero (by rw [hcard]; positivity)
-  letI : Fintype (GaloisField 2 m) := Fintype.ofFinite _
+  let : Fintype (GaloisField 2 m) := Fintype.ofFinite _
   have h2n : (2 : ℕ) ^ n ≠ 0 := by positivity
   -- the Frobenius-fixed subalgebra
   let T : Subalgebra (ZMod 2) (GaloisField 2 m) :=
     { carrier := {y | y ^ 2 ^ n = y}
       mul_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_setOf_eq] at ha hb ⊢
+        simp only [Set.mem_ofPred_eq] at ha hb ⊢
         rw [mul_pow, ha, hb]
       one_mem' := by simp
       add_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_setOf_eq] at ha hb ⊢
+        simp only [Set.mem_ofPred_eq] at ha hb ⊢
         rw [add_pow_char_pow, ha, hb]
       algebraMap_mem' := fun c => by
-        simp only [Set.mem_setOf_eq, ← map_pow]
+        simp only [Set.mem_ofPred_eq, ← map_pow]
         congr 1
         fin_cases c
         · exact zero_pow h2n
@@ -306,9 +306,9 @@ theorem exists_proper_invariant_subgroup_of_card_sq
   classical
   by_contra hnone
   push Not at hnone
-  letI : CommGroup Q :=
+  let : CommGroup Q :=
     { (inferInstance : Group Q) with mul_comm := hcomm }
-  letI : Module (ZMod 2) (Additive Q) := AddCommGroup.zmodModule (by
+  let : Module (ZMod 2) (Additive Q) := AddCommGroup.zmodModule (by
     intro q
     apply Additive.toMul.injective
     change Additive.toMul q ^ 2 = 1
@@ -317,7 +317,7 @@ theorem exists_proper_invariant_subgroup_of_card_sq
     apply Finite.one_lt_card_iff_nontrivial.mp
     rw [hQcard]
     exact Nat.one_lt_two_pow_iff.mpr (by omega)
-  haveI : Nontrivial (Additive Q) := hQnontriv
+  have : Nontrivial (Additive Q) := hQnontriv
   set rho' : Representation (ZMod 2) K (Additive Q) :=
     OddOrder.GroupTheory.elabRepresentation 2 rho with hrho'
   have hrho'apply : ∀ (k : K) (x : Q),
@@ -335,7 +335,7 @@ theorem exists_proper_invariant_subgroup_of_card_sq
   have hirr : Representation.IsIrreducible rho' := by
     have hbot_ne_top : (⊥ : Subrepresentation rho') ≠ ⊤ := fun h =>
       bot_ne_top (congrArg Subrepresentation.toSubmodule h)
-    letI : Nontrivial (Subrepresentation rho') := ⟨⊥, ⊤, hbot_ne_top⟩
+    let : Nontrivial (Subrepresentation rho') := ⟨⊥, ⊤, hbot_ne_top⟩
     apply IsSimpleOrder.of_forall_eq_top
     intro W hWbot
     set V : Subgroup Q := Φ W.toSubmodule with hV
@@ -407,7 +407,7 @@ theorem exists_proper_invariant_subgroup_of_card_sq
         Nat.card_eq_fintype_card, ZMod.card]
     exact (Nat.pow_right_injective (le_refl 2) h2).symm
   -- the Singer model and the degree contradiction
-  letI : CommGroup K := IsCyclic.commGroup
+  let : CommGroup K := IsCyclic.commGroup
   obtain ⟨e, mu, hmuinj, hcompat⟩ :=
     exists_galoisFieldLinearModel_of_faithful_irreducible rho' (2 * n)
       (by omega) hfin hirr hfaith
@@ -481,7 +481,7 @@ theorem hasXiLengthThree_of_card_eq_cube
   classical
   obtain ⟨hP2, -, hmulti, -, -, -⟩ := id hP
   obtain ⟨u₀, v₀, hu₀, hv₀, huv₀⟩ := hmulti
-  letI : Nontrivial P := ⟨⟨u₀, v₀, huv₀⟩⟩
+  let : Nontrivial P := ⟨⟨u₀, v₀, huv₀⟩⟩
   have hfree := fixedPointFree_of_actsRegularlyOnInvolutions hP2 hreg
   -- `#involutions = |K|` via the regular bijection
   have hmemK : ∀ k : ↥K, (k : MulAut P) u₀ ∈ involutions P := by
@@ -529,7 +529,7 @@ theorem hasXiLengthThree_of_card_eq_cube
       exact Subgroup.one_mem _
     · exact involutions_subset_center_of_transitive hP2 K hreg.transitive
         ⟨(hΩmem x).mp hx, hx1⟩
-  haveI hΩnormal : (involutionSubgroup P).Normal := by
+  have hΩnormal : (involutionSubgroup P).Normal := by
     constructor
     intro x hx g
     have hxc := Subgroup.mem_center_iff.mp (hΩle_center hx) g
@@ -571,8 +571,8 @@ theorem hasXiLengthThree_of_card_eq_cube
       ring_nf
     rw [this] at hsplit
     exact Nat.eq_of_mul_eq_mul_right hq0 hsplit.symm
-  haveI hQP2 : IsPGroup 2 (P ⧸ involutionSubgroup P) := hP2.to_quotient _
-  haveI hQnontriv : Nontrivial (P ⧸ involutionSubgroup P) := by
+  have hQP2 : IsPGroup 2 (P ⧸ involutionSubgroup P) := hP2.to_quotient _
+  have hQnontriv : Nontrivial (P ⧸ involutionSubgroup P) := by
     apply Finite.one_lt_card_iff_nontrivial.mp
     rw [hQcard]
     exact Nat.one_lt_two_pow_iff.mpr (by omega)
@@ -596,7 +596,7 @@ theorem hasXiLengthThree_of_card_eq_cube
             Agemo.mem_of_eq_pow x
           rw [hA] at hx
           simpa using Subgroup.mem_bot.mp hx
-        haveI := hKcyc
+        have := hKcyc
         have hfree' : ∀ k : ↥K, k ≠ 1 →
             ∀ x : P ⧸ involutionSubgroup P,
               IsAInvariant.quotientMulAutHom hΩinv k x = x → x = 1 := by
@@ -623,7 +623,7 @@ theorem hasXiLengthThree_of_card_eq_cube
           IsAInvariant.of_characteristic _⟩
         · -- not the whole group: squaring would be a bijective endomorphism
           intro htop
-          letI : CommGroup (P ⧸ involutionSubgroup P) :=
+          let : CommGroup (P ⧸ involutionSubgroup P) :=
             { (inferInstance : Group _) with mul_comm := hcommQ }
           have hrange : (powMonoidHom 2 :
               P ⧸ involutionSubgroup P →* P ⧸ involutionSubgroup P).range =
@@ -642,7 +642,7 @@ theorem hasXiLengthThree_of_card_eq_cube
             intro h0
             rw [h0, pow_zero] at hm
             exact (Finite.one_lt_card_iff_nontrivial.mpr inferInstance).ne' hm
-          letI : Fintype (P ⧸ involutionSubgroup P) := Fintype.ofFinite _
+          let : Fintype (P ⧸ involutionSubgroup P) := Fintype.ofFinite _
           obtain ⟨t, ht⟩ := exists_prime_orderOf_dvd_card
             (G := P ⧸ involutionSubgroup P) 2 (by
               rw [← Nat.card_eq_fintype_card, hm]
@@ -664,7 +664,7 @@ theorem hasXiLengthThree_of_card_eq_cube
       exact (Subgroup.nontrivial_iff_ne_bot _).mp this rfl
   obtain ⟨V, hVbot, hVtop, hVnormal, hVinv⟩ := hVexists
   -- the preimage gives the middle chain member
-  haveI hBnormal : (V.comap
+  have hBnormal : (V.comap
       (QuotientGroup.mk' (involutionSubgroup P))).Normal :=
     Subgroup.Normal.comap hVnormal _
   have hBinv : IsAInvariant K.subtype

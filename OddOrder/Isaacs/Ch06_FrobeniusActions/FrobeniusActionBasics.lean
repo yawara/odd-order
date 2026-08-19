@@ -95,7 +95,7 @@ theorem fixedBy_eq_singleton_one (h : IsFrobeniusAction A N) {a : A} (ha : a ≠
 theorem subgroup (h : IsFrobeniusAction A N) (M : Subgroup N)
     (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M) :
     @IsFrobeniusAction A M _ _ (invariantSubgroupMulDistribMulAction M hM) := by
-  letI : MulDistribMulAction A M := invariantSubgroupMulDistribMulAction M hM
+  let : MulDistribMulAction A M := invariantSubgroupMulDistribMulAction M hM
   intro a ha m hm hfix
   have hmN : (m : N) ≠ 1 := fun hmN => hm (Subtype.ext hmN)
   exact h a ha (m : N) hmN (Subtype.ext_iff.mp hfix)
@@ -155,7 +155,7 @@ and for `a ≠ 1` it is `{1}` (size 1). So `|N| + (|A| - 1) = (#orbits) * |A|`, 
 theorem card_modEq_one [Fintype A] [Fintype N] (h : IsFrobeniusAction A N) :
     Fintype.card N ≡ 1 [MOD Fintype.card A] := by
   classical
-  haveI : Fintype (MulAction.orbitRel.Quotient A N) := Quotient.fintype _
+  have : Fintype (MulAction.orbitRel.Quotient A N) := Quotient.fintype _
   -- Burnside.
   have hburn := MulAction.sum_card_fixedBy_eq_card_orbits_mul_card_group A N
   -- Compute LHS: split `a = 1` from `a ≠ 1`.
@@ -182,7 +182,7 @@ theorem card_modEq_one [Fintype A] [Fintype N] (h : IsFrobeniusAction A N) :
         Finset.card_erase_of_mem (Finset.mem_univ _), Finset.card_univ, add_comm]
   rw [hLHS] at hburn
   -- Now: |N| + (|A| - 1) = (#orbits) * |A|, so |A| ∣ |N| - 1.
-  haveI : Nonempty (MulAction.orbitRel.Quotient A N) := ⟨⟦1⟧⟩
+  have : Nonempty (MulAction.orbitRel.Quotient A N) := ⟨⟦1⟧⟩
   set k := Fintype.card (MulAction.orbitRel.Quotient A N)
   set a := Fintype.card A
   set n := Fintype.card N
@@ -207,7 +207,7 @@ theorem quotient [Finite A] [Finite N] (h : IsFrobeniusAction A N) (M : Subgroup
     [M.Normal] (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M) :
     @IsFrobeniusAction A (N ⧸ M) _ _ (invariantQuotientMulDistribMulAction M hM) := by
   classical
-  letI : MulDistribMulAction A (N ⧸ M) := invariantQuotientMulDistribMulAction M hM
+  let : MulDistribMulAction A (N ⧸ M) := invariantQuotientMulDistribMulAction M hM
   intro a ha q hq_ne hfix
   revert hq_ne hfix
   refine QuotientGroup.induction_on q ?_
@@ -258,16 +258,16 @@ theorem quotient [Finite A] [Finite N] (h : IsFrobeniusAction A N) (M : Subgroup
     rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
     intro c m hm
     exact hM (c : A) m hm
-  haveI : Fintype A := Fintype.ofFinite A
-  haveI : Fintype N := Fintype.ofFinite N
+  have : Fintype A := Fintype.ofFinite A
+  have : Fintype N := Fintype.ofFinite N
   have hCopAN : Nat.Coprime (Nat.card A) (Nat.card N) := by
     rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
     exact (coprime_card h).symm
   have hCopCN : Nat.Coprime (Nat.card C) (Nat.card N) :=
     hCopAN.coprime_dvd_left (Subgroup.card_subgroup_dvd_card C)
-  haveI : IsCyclic C := Subgroup.isCyclic_zpowers a
-  letI : CommGroup C := IsCyclic.commGroup
-  have hSolvC : IsSolvable C ∨ IsSolvable N := Or.inl inferInstance
+  have : IsCyclic C := Subgroup.isCyclic_zpowers a
+  let : CommGroup C := IsCyclic.commGroup
+  have hSolvC : Group.IsSolvable C ∨ Group.IsSolvable N := Or.inl inferInstance
   have hg_fix_C : ∀ c : C, ∃ m ∈ M, φC c n = n * m := by
     intro c
     simpa [φC, P] using hC_le_P c.2
@@ -309,7 +309,7 @@ theorem quotient_of_fixedPoints_le [Finite A] [Finite N]
     (hfixle : ∀ a : A, a ≠ 1 → ∀ x : N, a • x = x → x ∈ M) :
     @IsFrobeniusAction A (N ⧸ M) _ _ (invariantQuotientMulDistribMulAction M hM) := by
   classical
-  letI : MulDistribMulAction A (N ⧸ M) := invariantQuotientMulDistribMulAction M hM
+  let : MulDistribMulAction A (N ⧸ M) := invariantQuotientMulDistribMulAction M hM
   intro a ha q hq_ne hfix_q
   revert hq_ne hfix_q
   refine QuotientGroup.induction_on q ?_
@@ -360,13 +360,13 @@ theorem quotient_of_fixedPoints_le [Finite A] [Finite N]
     rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
     intro c m hm
     exact hM (c : A) m hm
-  haveI : Fintype A := Fintype.ofFinite A
-  haveI : Fintype N := Fintype.ofFinite N
+  have : Fintype A := Fintype.ofFinite A
+  have : Fintype N := Fintype.ofFinite N
   have hCopCN : Nat.Coprime (Nat.card C) (Nat.card N) :=
     hCop.coprime_dvd_left (Subgroup.card_subgroup_dvd_card C)
-  haveI : IsCyclic C := Subgroup.isCyclic_zpowers a
-  letI : CommGroup C := IsCyclic.commGroup
-  have hSolvC : IsSolvable C ∨ IsSolvable N := Or.inl inferInstance
+  have : IsCyclic C := Subgroup.isCyclic_zpowers a
+  let : CommGroup C := IsCyclic.commGroup
+  have hSolvC : Group.IsSolvable C ∨ Group.IsSolvable N := Or.inl inferInstance
   have hg_fix_C : ∀ c : C, ∃ m ∈ M, φC c n = n * m := by
     intro c
     simpa [φC, P] using hC_le_P c.2
@@ -424,8 +424,8 @@ theorem involution_smul_eq_inv [Finite N] (h : IsFrobeniusAction A N)
 ⇒ every pair in `N` commutes. -/
 theorem commute_of_card_even [Finite A] [Finite N] (h : IsFrobeniusAction A N)
     (h_even : 2 ∣ Nat.card A) (x y : N) : Commute x y := by
-  haveI : Fintype A := Fintype.ofFinite A
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fintype A := Fintype.ofFinite A
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨t, ht_ord⟩ :=
     exists_prime_orderOf_dvd_card 2 (by rwa [Nat.card_eq_fintype_card] at h_even)
   have ht_ne : t ≠ 1 := by
@@ -439,8 +439,8 @@ theorem commute_of_card_even [Finite A] [Finite N] (h : IsFrobeniusAction A N)
 theorem unique_involution [Finite A] [Finite N] (h : IsFrobeniusAction A N)
     (h_even : 2 ∣ Nat.card A) (hN : Nontrivial N) :
     ∃! t : A, t ≠ 1 ∧ t ^ 2 = 1 := by
-  haveI : Fintype A := Fintype.ofFinite A
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fintype A := Fintype.ofFinite A
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨t, ht_ord⟩ :=
     exists_prime_orderOf_dvd_card 2 (by rwa [Nat.card_eq_fintype_card] at h_even)
   have ht_ne : t ≠ 1 := by

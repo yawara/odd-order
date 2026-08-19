@@ -166,7 +166,7 @@ theorem kappaHall_ne_bot_of_isTypeP [Finite G] {M K₀ : Subgroup G}
   intro hK0bot
   obtain ⟨p, hp⟩ := hTP
   -- `p ∈ κ(M) ⊆ π(M) = primeFactors |M|` (a κ-prime has `pRank_M p = 1 > 0`).
-  haveI : Fact p.Prime := ⟨OddOrder.BG.Ch4.S14.prime_of_mem_kappa hp⟩
+  have : Fact p.Prime := ⟨OddOrder.BG.Ch4.S14.prime_of_mem_kappa hp⟩
   have hprk : 0 < pRank ↥M p := by
     rcases OddOrder.BG.Ch4.S14.kappa_subset_tau1_union_tau3 hp with hτ1 | hτ3
     · rw [((OddOrder.BG.Ch3.S12.mem_tau1_iff M p).mp hτ1).2.2]; norm_num

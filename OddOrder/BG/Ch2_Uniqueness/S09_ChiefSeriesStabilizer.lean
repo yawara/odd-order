@@ -354,7 +354,7 @@ private theorem normalizer_le_maximal_of_isUniquelyMaximal_le [Finite G]
       (hQtop ▸ hQp : IsPGroup q ↥(⊤ : Subgroup G)).of_surjective
         (Subgroup.topEquiv : (⊤ : Subgroup G) ≃* G).toMonoidHom
         Subgroup.topEquiv.surjective
-    haveI : Group.IsNilpotent G := hGp.isNilpotent
+    have : Group.IsNilpotent G := hGp.isNilpotent
     exact hG.notSolvable inferInstance
   obtain ⟨N, hNco, hQN⟩ := (eq_top_or_exists_le_coatom Q).resolve_left hQlt.ne
   have hN_eq_M : N = M :=
@@ -525,7 +525,7 @@ private theorem normalizer_le_maximal_of_scn3Global_intermediate_of_characterist
   classical
   obtain ⟨i, hi, PM, hPMnorm⟩ :=
     OddOrder.BG.Ch1.S04.CharacteristicSylowSeries.exists_normal_sylow_of_length_pos S hpos
-  haveI : Fact (S.step i).q.Prime := (S.step i).q_prime
+  have : Fact (S.step i).q.Prime := (S.step i).q_prime
   exact normalizer_le_maximal_of_scn3Global_intermediate_of_normal_local_sylow
     hG hM hA hRp hAR hRlt (hterminal_ne i hi) hRM PM hPMnorm (hterminal_mem i hi)
 
@@ -548,7 +548,7 @@ private theorem normal_sylow_label_ne_of_scn3Global_of_pRank_fittingInG_le_two
   have hAMp : IsPGroup p AM :=
     hAp.of_equiv (Subgroup.subgroupOfEquivOfLe hAM).symm
   obtain ⟨P, hAMP⟩ := hAMp.exists_le_sylow
-  haveI : Unique (Sylow p ↥M) := Sylow.unique_of_normal PM hPMnorm
+  have : Unique (Sylow p ↥M) := Sylow.unique_of_normal PM hPMnorm
   have hAM_PM : AM ≤ (PM : Subgroup ↥M) := by
     have hP_eq : P = PM := Subsingleton.elim P PM
     rwa [← hP_eq]
@@ -571,7 +571,7 @@ private theorem normal_sylow_label_ne_of_scn3Global_of_pRank_fittingInG_le_two
 
 /-- **BG Theorem 4.20(c) package bridge for §9.** A maximal subgroup `M` of the minimal simple
 odd group `G` with `r(F(M)) ≤ 2` carries a characteristic Sylow series package: `M` is solvable
-(`hG.solvable_of_mem_maximalSubgroups`), of odd order (`|M| ∣ |G|`), nontrivial, and
+(`hG.isSolvable_of_mem_maximalSubgroups`), of odd order (`|M| ∣ |G|`), nontrivial, and
 `rank F(↥M) = rank (fittingInG M) ≤ 2` (the two Fitting subgroups are isomorphic via
 `M.subtype`).  This is how the low-rank branch of the Lemma 9.5 normalizer step obtains its
 `(9.7)` Sylow data internally — replacing the (unfulfillable, since `r(F(M))` may be `≥ 3`)
@@ -581,7 +581,7 @@ private theorem exists_characteristicSylowSeriesPackage_of_maximal_of_rank_fitti
     (hM : M ∈ maximalSubgroups G) [Nontrivial ↥M]
     (hrank : rank ↥(S08.fittingInG M) ≤ 2) :
     Nonempty (OddOrder.BG.Ch1.S04.CharacteristicSylowSeriesPackage ↥M) := by
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hodd : Odd (Nat.card ↥M) := by
     rcases Nat.even_or_odd (Nat.card ↥M) with he | ho
     · exfalso
@@ -623,7 +623,7 @@ private theorem normalizer_le_maximal_of_scn3Global_characteristicSylowSeries_lo
   intro i hi
   obtain ⟨PM, hPMnorm⟩ :=
     OddOrder.BG.Ch1.S04.CharacteristicSylowSeries.exists_normal_sylow_of_terminal_step S i hi
-  haveI : Fact (S.step i).q.Prime := (S.step i).q_prime
+  have : Fact (S.step i).q.Prime := (S.step i).q_prime
   exact normal_sylow_label_ne_of_scn3Global_of_pRank_fittingInG_le_two
     hA hAM hFp PM hPMnorm
 
@@ -672,7 +672,7 @@ private theorem normalizer_le_maximal_of_scn3Global_characteristicSylowSeries_ra
   by_cases hrank : rank ↥(S08.fittingInG M) ≤ 2
   · -- low rank: build the §4.20(c) characteristic Sylow series of `M` internally via L2
     have hAM : A ≤ M := hAR.trans hRM
-    haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr fun hM0 =>
+    have : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr fun hM0 =>
       ne_bot_of_mem_scn3Global hA (le_bot_iff.mp (hM0 ▸ hAM))
     obtain ⟨pkg⟩ :=
       exists_characteristicSylowSeriesPackage_of_maximal_of_rank_fittingInG_le_two hG hM.1 hrank
@@ -682,7 +682,7 @@ private theorem normalizer_le_maximal_of_scn3Global_characteristicSylowSeries_ra
     obtain ⟨q, hq, hqp, h3Fq⟩ :=
       exists_pRank_ge_three_ne_of_rank_ge_three_of_pRank_le_two
         (H := ↥(S08.fittingInG M)) (p := p) h3rank hFp
-    haveI : Fact q.Prime := ⟨hq⟩
+    have : Fact q.Prime := ⟨hq⟩
     exact normalizer_le_maximal_of_scn3Global_intermediate_of_high_pRank
       hG hM hA hRp hAR hRlt hqp hRM h3Fq
 
@@ -928,10 +928,10 @@ private theorem not_isCyclic_of_cocyclic_elementary_rank_three [Finite G] {p : �
     (hYB : Y ≤ B) {b : G} (hb : b ∈ B) (hsup : Y ⊔ Subgroup.zpowers b = B) :
     ¬ IsCyclic ↥Y := by
   classical
-  haveI : IsMulCommutative ↥B := IsMulCommutative.of_comm hB_ea.1
+  have : IsMulCommutative ↥B := IsMulCommutative.of_comm hB_ea.1
   set Y' : Subgroup ↥B := Y.subgroupOf B with hY'
   set K : Subgroup ↥B := (Subgroup.zpowers b).subgroupOf B with hK
-  haveI : Y'.Normal := Subgroup.normal_of_isMulCommutative _
+  have : Y'.Normal := Subgroup.normal_of_isMulCommutative _
   have hzple : Subgroup.zpowers b ≤ B := Subgroup.zpowers_le.mpr hb
   have hsup' : Y' ⊔ K = ⊤ := by
     apply Subgroup.map_injective B.subtype_injective
@@ -1054,7 +1054,7 @@ private theorem exists_noncyclic_cocyclic_omega1OfAbelian_not_le_centralizer_inf
     simpa [ΩA] using
       (OddOrder.GroupTheory.omega1OfAbelian_isElementaryAbelian
         (G := G) (H := A) (p := p) (hH := hAcomm_set))
-  haveI : IsMulCommutative ↥ΩA := IsMulCommutative.of_comm hΩea.1
+  have : IsMulCommutative ↥ΩA := IsMulCommutative.of_comm hΩea.1
   have hΩAnc : ¬ IsCyclic ↥ΩA := by
     simpa [ΩA] using
       (not_isCyclic_omega1OfAbelian_of_three_le_pRank
@@ -1106,7 +1106,7 @@ private theorem exists_cocyclic_omega1_not_le_cent_inf_opiCoreFitting
   have h3A : 3 ≤ pRank A p :=
     three_le_pRank_of_isPGroup_of_three_le_rank
       (isPGroup_of_mem_scn3Global hA) (three_le_rank_of_mem_scn3Global hA)
-  haveI hAcomm_inst : IsMulCommutative A := isMulCommutative_of_mem_scn3Global hA
+  have hAcomm_inst : IsMulCommutative A := isMulCommutative_of_mem_scn3Global hA
   have hA_le_M : A ≤ M := by
     exact (Subgroup.le_centralizer A).trans hM.2
   have hM_norm_F : M ≤ Subgroup.normalizer (S08.fittingInG M : Set G) := by
@@ -1208,7 +1208,7 @@ theorem exists_nonU_cocyclic_omega1_witness_maximal_ne [Finite G]
       L ≠ M := by
   obtain ⟨B, hBea, hBnot, hBΩ, hBA, hBnc, hcyc, hnot_cent⟩ :=
     exists_nonU_cocyclic_omega1_not_le_cent_inf_opiCoreFitting hG hAcomm_set hM hA hAnot hP0D
-  haveI hAcomm_inst : IsMulCommutative A := isMulCommutative_of_mem_scn3Global hA
+  have hAcomm_inst : IsMulCommutative A := isMulCommutative_of_mem_scn3Global hA
   have hA_le_M : A ≤ M := (Subgroup.le_centralizer A).trans hM.2
   have hBM : B ≤ M := hBA.trans hA_le_M
   obtain ⟨y, L, hyB, hy1, hCGnotM, hL, hLneM⟩ :=
@@ -1337,7 +1337,7 @@ private theorem rank_le_two_of_no_uniqueMaximal_subgroups_le_fitting
   have h3K : 3 ≤ rank ↥K := by omega
   obtain ⟨q, hq, h3Kq⟩ :=
     exists_pRank_ge_of_pos_le_rank (G := ↥K) (n := 3) (by norm_num) h3K
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   have h3Fq : 3 ≤ pRank ↥(S08.fittingInG M) q :=
     h3Kq.trans
       (pRank_le_of_injective (f := Subgroup.inclusion hKF)
@@ -1411,7 +1411,7 @@ BG Lemma 9.5 after Corollary 4.19 supplies the per-factor stabilizer input. -/
 theorem coprime_chiefSeries_stabilizer_le_centralizer
     {M : Type*} [Group M] [Finite M] {K : Subgroup M} [K.Normal] {D : Subgroup M}
     (hcop : (Nat.card ↥D).Coprime (Nat.card ↥K))
-    (hsolv : IsSolvable ↥D ∨ IsSolvable ↥K)
+    (hsolv : Group.IsSolvable ↥D ∨ Group.IsSolvable ↥K)
     (hstab : ∀ i, ⁅chiefSeriesInside K i, D⁆ ≤ chiefSeriesInside K (i + 1)) :
     D ≤ Subgroup.centralizer (K : Set M) := by
   classical

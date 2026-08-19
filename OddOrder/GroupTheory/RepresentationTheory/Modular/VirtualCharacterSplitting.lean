@@ -81,8 +81,8 @@ theorem exists_eq_sum_wedderburnRepresentation [Fintype ι'] {θ : G → K}
     (hθ : ∀ g h : G, θ (h * g * h⁻¹) = θ g) :
     ∃ a : ι' → K, ∀ g : G, θ g = ∑ i : ι', a i * (wedderburnRepresentation e i).character g := by
   classical
-  letI : Fintype G := Fintype.ofFinite G
-  letI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  let : Fintype G := Fintype.ofFinite G
+  let : Fintype (ConjClasses G) := Fintype.ofFinite _
   refine ⟨fun i => ∑ j : ι', θ (classRep e j) * characterMatrixInv e j i, fun g => ?_⟩
   -- reduce to a class representative
   set j₀ := (equivConjClasses e).symm (ConjClasses.mk g) with hj₀
@@ -165,7 +165,7 @@ theorem eq_of_charPairing_eq [Fintype G] [Finite ι'] {θ θ' : G → K}
     (h : ∀ i : ι', charPairing K θ (wedderburnRepresentation e i).character
       = charPairing K θ' (wedderburnRepresentation e i).character) : θ = θ' := by
   classical
-  letI : Fintype ι' := Fintype.ofFinite ι'
+  let : Fintype ι' := Fintype.ofFinite ι'
   rw [eq_sum_charPairing_wedderburnRepresentation e hθ,
     eq_sum_charPairing_wedderburnRepresentation e hθ']
   exact funext fun g => Finset.sum_congr rfl fun i _ => by rw [h i]
@@ -178,7 +178,7 @@ theorem mem_virtualCharacters_iff [Fintype G] [Finite ι'] {θ : G → K} :
       ∀ i : ι', charPairing K θ (wedderburnRepresentation e i).character
         ∈ (Int.castRingHom K).range := by
   classical
-  letI : Fintype ι' := Fintype.ofFinite ι'
+  let : Fintype ι' := Fintype.ofFinite ι'
   refine ⟨fun hθ => ⟨fun g h => virtualCharacters_conj hθ g h, fun i =>
     charPairing_mem_intRange hθ (mem_virtualCharacters_wedderburnRepresentation e i)⟩, ?_⟩
   rintro ⟨hclass, hint⟩
@@ -200,8 +200,8 @@ pairings on `G` into pairings on `H`, where integrality is splitting-free. -/
 theorem induceFun_mem_virtualCharacters [Fintype G] [Finite ι'] {H : Subgroup G} {ψ : ↥H → K}
     (hψ : ψ ∈ virtualCharacters K ↥H) : induceFun H ψ ∈ virtualCharacters K G := by
   classical
-  letI : Fintype ↥H := Fintype.ofFinite _
-  haveI : Invertible (Nat.card ↥H : K) :=
+  let : Fintype ↥H := Fintype.ofFinite _
+  have : Invertible (Nat.card ↥H : K) :=
     invertibleOfNonzero (natCast_card_subgroup_ne_zero H)
   refine (mem_virtualCharacters_iff e).mpr ⟨fun g h => induceFun_conj ψ g h, fun i => ?_⟩
   rw [charPairing_induceFun ψ (fun g h =>

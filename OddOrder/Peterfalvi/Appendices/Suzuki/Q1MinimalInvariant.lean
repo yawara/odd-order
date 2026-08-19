@@ -90,13 +90,13 @@ this as `r ∤ |K|` for prime divisors `r` of `|Q₁|`. -/
 theorem coprime_card_Q_K :
     Nat.Coprime (Nat.card ↥hyp.Q) (Nat.card ↥hyp.K) := by
   classical
-  letI : MulDistribMulAction ↥hyp.K ↥hyp.Q :=
+  let : MulDistribMulAction ↥hyp.K ↥hyp.Q :=
     MulDistribMulAction.compHom _ hyp.conjQByK
   have hFrob : IsFrobeniusAction ↥hyp.K ↥hyp.Q := by
     intro a ha n hn hann
     exact hn (hyp.conjQByK_fixed_eq_one ha hann)
-  haveI : Fintype ↥hyp.Q := Fintype.ofFinite _
-  haveI : Fintype ↥hyp.K := Fintype.ofFinite _
+  have : Fintype ↥hyp.Q := Fintype.ofFinite _
+  have : Fintype ↥hyp.K := Fintype.ofFinite _
   have h := hFrob.coprime_card
   rwa [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
 
@@ -119,23 +119,23 @@ theorem exists_minimal_invariant_elab {X : Subgroup G} (hX : X ≤ hyp.H)
       (∀ g ∈ X, ∀ m ∈ M, g * m * g⁻¹ ∈ M) ∧
       ∀ B ≤ M, (∀ g ∈ X, ∀ m ∈ B, g * m * g⁻¹ ∈ B) → B ≠ ⊥ → B = M := by
   classical
-  haveI : Fact r.Prime := ⟨hr⟩
+  have : Fact r.Prime := ⟨hr⟩
   -- The candidate family and a minimal element of it.
   set S : Set (Subgroup G) := {A | A ≤ hyp.Q1 ∧ A ≠ ⊥ ∧
     IsElementaryAbelian r ↥A ∧ ∀ g ∈ X, ∀ m ∈ A, g * m * g⁻¹ ∈ A} with hSdef
   have hS_ne : S.Nonempty := by
     -- `Q₁` is nilpotent: it is isomorphic to `Q₁Subgroup ≤ Q` and `Q` is
     -- nilpotent (§2 Proposition 1(b)).
-    haveI : Group.IsNilpotent ↥hyp.Q1 := by
-      letI := hyp.isNilpotent_Q
+    have : Group.IsNilpotent ↥hyp.Q1 := by
+      let := hyp.isNilpotent_Q
       exact Group.nilpotent_of_mulEquiv
         (Subgroup.equivMapOfInjective hyp.Q1Subgroup hyp.Q.subtype
           hyp.Q.subtype_injective)
     -- The Sylow `r`-subgroup of `Q₁`: normal (nilpotency), characteristic,
     -- nontrivial (`r ∣ |Q₁|`).
     obtain ⟨R⟩ : Nonempty (Sylow r ↥hyp.Q1) := inferInstance
-    haveI hRnorm : (R : Subgroup ↥hyp.Q1).Normal := inferInstance
-    haveI : (R : Subgroup ↥hyp.Q1).Characteristic :=
+    have hRnorm : (R : Subgroup ↥hyp.Q1).Normal := inferInstance
+    have : (R : Subgroup ↥hyp.Q1).Characteristic :=
       Sylow.characteristic_of_normal R hRnorm
     have hRne : (R : Subgroup ↥hyp.Q1) ≠ ⊥ := R.ne_bot_of_dvd_card hdvd
     -- The conjugation action of `X` on `Q₁` and its restriction to `R`.
@@ -150,10 +150,10 @@ theorem exists_minimal_invariant_elab {X : Subgroup G} (hX : X ≤ hyp.H)
     set φR : ↥X →* MulAut ↥(R : Subgroup ↥hyp.Q1) := hRinv.restrict with hφR
     -- A minimal nontrivial `X`-invariant normal subgroup of the `r`-group
     -- `R` is elementary abelian of exponent `r`.
-    haveI : Group.IsNilpotent ↥(R : Subgroup ↥hyp.Q1) :=
+    have : Group.IsNilpotent ↥(R : Subgroup ↥hyp.Q1) :=
       IsPGroup.isNilpotent R.isPGroup'
-    haveI : IsSolvable ↥(R : Subgroup ↥hyp.Q1) := inferInstance
-    haveI : Nontrivial ↥(R : Subgroup ↥hyp.Q1) :=
+    have : Group.IsSolvable ↥(R : Subgroup ↥hyp.Q1) := inferInstance
+    have : Nontrivial ↥(R : Subgroup ↥hyp.Q1) :=
       (Subgroup.nontrivial_iff_ne_bot _).mpr hRne
     obtain ⟨N, q, hq, hN_ne, hN_normal, hN_inv, hN_elab⟩ :=
       OddOrder.GroupTheory.exists_aInvariant_normal_isElementaryAbelian
@@ -161,8 +161,8 @@ theorem exists_minimal_invariant_elab {X : Subgroup G} (hX : X ≤ hyp.H)
     -- The exponent `q` is `r`: `N` is a nontrivial subgroup of the
     -- `r`-group `R`.
     have hq_eq : q = r := by
-      haveI : Fact q.Prime := ⟨hq⟩
-      haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN_ne
+      have : Fact q.Prime := ⟨hq⟩
+      have : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN_ne
       obtain ⟨x, hx1⟩ := exists_ne (1 : ↥N)
       have hxq : orderOf x = q := orderOf_eq_prime (hN_elab.pow_eq_one x) hx1
       have hxr : IsPGroup r ↥N := IsPGroup.to_subgroup R.isPGroup' N

@@ -212,7 +212,7 @@ theorem exponent_eq_prime_of_card_prime_cube_and_pow_eq_one
   have hcard_gt_one : 1 < Nat.card G := by
     rw [hcard]
     exact one_lt_pow₀ hp.one_lt (by norm_num : 3 ≠ 0)
-  haveI : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp hcard_gt_one
+  have : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp hcard_gt_one
   rw [Monoid.exponent_eq_prime_iff hp]
   intro g hg
   exact orderOf_eq_prime (hpow g) hg
@@ -369,7 +369,7 @@ theorem center_card_eq_prime_of_noncomm_card_prime_cube
           _ = p * (p ^ 2) := by ring
       exact Nat.eq_of_mul_eq_mul_right (pow_pos hp.pos 2) hmul
     have hcyc : IsCyclic (G ⧸ Subgroup.center G) := isCyclic_of_prime_card hquot_card
-    haveI := hcyc
+    have := hcyc
     have hcomm : ∀ x y : G, x * y = y * x :=
       (MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
         (QuotientGroup.mk' (Subgroup.center G))
@@ -530,8 +530,8 @@ theorem blackburn_noncentral_commutator_facts
   dsimp
   let S : Subgroup R := Omega R p 1
   let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
-  haveI : Group.IsNilpotent R := hR.isNilpotent
-  haveI : S.Normal := by dsimp [S]; infer_instance
+  have : Group.IsNilpotent R := hR.isNilpotent
+  have : S.Normal := by dsimp [S]; infer_instance
   have hS_card_gt_one : 1 < Nat.card S := by
     dsimp [S]
     rw [hΩ_card]
@@ -637,8 +637,8 @@ theorem blackburn_noncentral_centralizer_normalities
   let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
   let C : Subgroup R := Subgroup.centralizer (S : Set R)
   let D : Subgroup R := Subgroup.centralizer (T : Set R)
-  haveI hS_normal : S.Normal := by dsimp [S]; infer_instance
-  haveI hT_normal : T.Normal := by
+  have hS_normal : S.Normal := by dsimp [S]; infer_instance
+  have hT_normal : T.Normal := by
     dsimp [T]
     exact Subgroup.commutator_normal S (⊤ : Subgroup R)
   have hC_normal : C.Normal := by
@@ -691,8 +691,8 @@ private theorem blackburn_noncentral_centralizer_quotient_card_le_prime
   let S : Subgroup R := Omega R p 1
   let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
   have hT_card_le : Nat.card T ≤ p ^ 2 := le_of_eq hT_facts.2.2
-  haveI hS_normal : S.Normal := by dsimp [S]; infer_instance
-  haveI hT_normal : T.Normal := by
+  have hS_normal : S.Normal := by dsimp [S]; infer_instance
+  have hT_normal : T.Normal := by
     dsimp [T]
     exact Subgroup.commutator_normal S (⊤ : Subgroup R)
   let φ : R →* MulAut T := MulAut.conjNormal (H := T)
@@ -758,8 +758,8 @@ theorem blackburn_noncentral_centralizer_quotient_card_eq_prime
   let S : Subgroup R := Omega R p 1
   let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
   let C : Subgroup R := Subgroup.centralizer (T : Set R)
-  haveI hS_normal : S.Normal := by dsimp [S]; infer_instance
-  haveI hT_normal : T.Normal := by
+  have hS_normal : S.Normal := by dsimp [S]; infer_instance
+  have hT_normal : T.Normal := by
     dsimp [T]
     exact Subgroup.commutator_normal S (⊤ : Subgroup R)
   have hC_ne_top : C ≠ ⊤ := by
@@ -823,8 +823,8 @@ theorem blackburn_noncentral_omega1_sup_centralizer_eq_top
   let S : Subgroup R := Omega R p 1
   let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
   let C : Subgroup R := Subgroup.centralizer (T : Set R)
-  haveI hS_normal : S.Normal := by dsimp [S]; infer_instance
-  haveI hT_normal : T.Normal := by
+  have hS_normal : S.Normal := by dsimp [S]; infer_instance
+  have hT_normal : T.Normal := by
     dsimp [T]
     exact Subgroup.commutator_normal S (⊤ : Subgroup R)
   have hquot_card : Nat.card (R ⧸ C) = p := by
@@ -986,9 +986,9 @@ theorem blackburn_noncentral_centralizer_quotient_commutative
   let C : Subgroup R := Subgroup.centralizer (S : Set R)
   let D : Subgroup R := Subgroup.centralizer (T : Set R)
   have hCD_norms := blackburn_noncentral_centralizer_normalities (R := R) (p := p)
-  haveI hCD_normal : (C.subgroupOf D).Normal := hCD_norms.2.2
+  have hCD_normal : (C.subgroupOf D).Normal := hCD_norms.2.2
   have hT_le_S : T ≤ S := hT_facts.2.1.le
-  haveI hS_normal : S.Normal := by dsimp [S]; infer_instance
+  have hS_normal : S.Normal := by dsimp [S]; infer_instance
   have hT_comm : ∀ s ∈ T, ∀ t ∈ T, s * t = t * s := by
     intro s hs t ht
     exact congrArg Subtype.val (hT_elem.1 ⟨s, hs⟩ ⟨t, ht⟩)
@@ -1081,9 +1081,9 @@ private theorem blackburn_noncentral_centralizer_quotient_omega_eq_top
   let C : Subgroup R := Subgroup.centralizer (S : Set R)
   let D : Subgroup R := Subgroup.centralizer (T : Set R)
   have hCD_norms := blackburn_noncentral_centralizer_normalities (R := R) (p := p)
-  haveI hCD_normal : (C.subgroupOf D).Normal := hCD_norms.2.2
+  have hCD_normal : (C.subgroupOf D).Normal := hCD_norms.2.2
   have hT_le_S : T ≤ S := hT_facts.2.1.le
-  haveI hS_normal : S.Normal := by dsimp [S]; infer_instance
+  have hS_normal : S.Normal := by dsimp [S]; infer_instance
   apply eq_top_iff.mpr
   intro q _
   obtain ⟨d, rfl⟩ := QuotientGroup.mk'_surjective (C.subgroupOf D) q
@@ -1142,7 +1142,7 @@ private theorem blackburn_noncentral_centralizer_quotient_isElementaryAbelian
   let C : Subgroup R := Subgroup.centralizer (S : Set R)
   let D : Subgroup R := Subgroup.centralizer (T : Set R)
   have hCD_norms := blackburn_noncentral_centralizer_normalities (R := R) (p := p)
-  haveI hCD_normal : (C.subgroupOf D).Normal := hCD_norms.2.2
+  have hCD_normal : (C.subgroupOf D).Normal := hCD_norms.2.2
   let Q : Type _ := D ⧸ C.subgroupOf D
   have hcomm : ∀ x y : Q, x * y = y * x :=
     blackburn_noncentral_centralizer_quotient_commutative hT_facts hT_elem
@@ -1214,7 +1214,7 @@ theorem blackburn_noncentral_centralizer_complement_sup_commutator_eq_top
   let C : Subgroup R := Subgroup.centralizer (S : Set R)
   let D : Subgroup R := Subgroup.centralizer (T : Set R)
   have hCD_norms := blackburn_noncentral_centralizer_normalities (R := R) (p := p)
-  haveI hCD_normal : (C.subgroupOf D).Normal := hCD_norms.2.2
+  have hCD_normal : (C.subgroupOf D).Normal := hCD_norms.2.2
   have hD_quot_omega_top :=
     blackburn_noncentral_centralizer_quotient_omega_eq_top hT_facts hT_elem
   have hquot_top : X.map (QuotientGroup.mk' (C.subgroupOf D)) ⊔

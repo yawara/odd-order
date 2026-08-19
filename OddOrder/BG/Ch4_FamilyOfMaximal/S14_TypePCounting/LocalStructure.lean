@@ -119,7 +119,7 @@ theorem exists_isHallSubgroup_kappa_ge [Finite G] (hG : OddOrder.BG.IsMinimalSim
     (hXκ : ∀ q ∈ (Nat.card ↥X).primeFactors, q ∈ kappa M) :
     ∃ K : Subgroup G, K ≤ M ∧ Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M) ∧ X ≤ K := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hXsub : ∀ q ∈ (Nat.card ↥(X.subgroupOf M)).primeFactors, q ∈ kappa M := by
     intro q hq
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hXM).toEquiv] at hq
@@ -146,12 +146,12 @@ theorem centralizer_msigma_isPiSubgroup_kappa_compl [Finite G]
     Subgroup.IsPiSubgroup (kappa M)ᶜ
       (Subgroup.centralizer (OddOrder.BG.Ch3.S10.Msigma M : Set G) ⊓ M) := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   intro p hp
   rw [Set.mem_compl_iff]
   intro hpκ
   have hpp : p.Prime := Nat.prime_of_mem_primeFactors hp
-  haveI : Fact p.Prime := ⟨hpp⟩
+  have : Fact p.Prime := ⟨hpp⟩
   have hP : IsTypeP M := ⟨p, hpκ⟩
   -- Cauchy: an order-`p` element `x` of `C = C_M(M_σ)`; `X₀ = ⟨x⟩`.
   have hpdvd : p ∣ Nat.card ↥(Subgroup.centralizer (OddOrder.BG.Ch3.S10.Msigma M : Set G) ⊓ M) :=
@@ -252,7 +252,7 @@ theorem exists_typePESetup_kappaHall [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
       Subgroup.eq_of_le_of_card_ge hKE (Nat.dvd_antisymm hEdvdK (Subgroup.card_dvd_of_le hKE)).le
     exact ⟨E, E₁, E₂, E₃, hsetup, hsetup.E₁_le.trans hKEeq.ge, hKEeq.le, hE1ne⟩
   · -- Case `κ ⊆ τ₁`: `K` is `M`-conjugate to `E₁`; conjugate the setup so its new `E₁ = K`.
-    haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hsetup.mem_maximal
+    have hMsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hsetup.mem_maximal
     have hκτ1 : ∀ p ∈ kappa M, p ∈ tau1 M := fun p hpκ =>
       (kappa_subset_tau1_union_tau3 hpκ).resolve_right
         (fun hpτ3 => hτ3 ⟨p, Set.mem_inter hpκ hpτ3⟩)
@@ -315,12 +315,12 @@ theorem centralizer_hall_isPiSubgroup_kappa_compl [Finite G]
     (hHne : H ≠ ⊥) :
     Subgroup.IsPiSubgroup (kappa M)ᶜ (Subgroup.centralizer (H : Set G) ⊓ M) := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   intro p hp
   rw [Set.mem_compl_iff]
   intro hpκ
   have hpp : p.Prime := Nat.prime_of_mem_primeFactors hp
-  haveI : Fact p.Prime := ⟨hpp⟩
+  have : Fact p.Prime := ⟨hpp⟩
   have hP : IsTypeP M := ⟨p, hpκ⟩
   -- Cauchy: `x ∈ C = C_G(H) ⊓ M` of order `p`; `X₀ = ⟨x⟩`.
   have hpdvd : p ∣ Nat.card ↥(Subgroup.centralizer (H : Set G) ⊓ M) :=
@@ -380,7 +380,7 @@ theorem centralizer_hall_isPiSubgroup_kappa_compl [Finite G]
   -- A prime `q ∈ π(H)` and a Sylow `q`-subgroup `S` of `M_σ` with `S ≤ H ≤ K*`.
   obtain ⟨q, hq, hqdvd⟩ := (Nat.card ↥H).exists_prime_and_dvd
     (fun hc => hHne (Subgroup.card_eq_one.mp hc))
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   obtain ⟨P⟩ : Nonempty (Sylow q ↥H) := Sylow.nonempty
   set S : Subgroup G := (P : Subgroup ↥H).map H.subtype with hSdef
   have hS_le_H : S ≤ H := hSdef ▸ Subgroup.map_subtype_le _
@@ -491,7 +491,7 @@ theorem typeP_hall_small_subgroup_cyclic_tau2 [Finite G] (hG : OddOrder.BG.IsMin
     maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M} ∧
       IsCyclic ↥X ∧ (↑(Nat.card ↥X).primeFactors ⊆ tau2 M) := by
   classical
-  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hMsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hXM : X ≤ M := hXU.trans hUM
   obtain ⟨E, E₁, E₂, E₃, hsetup⟩ := exists_subgroupESetup hG hM
   -- Each prime of `X` lies in `(κ(M) ∪ σ(M))'`, hence `∉ σ`, `∉ κ`, and `∈ π(M)`.
@@ -512,7 +512,7 @@ theorem typeP_hall_small_subgroup_cyclic_tau2 [Finite G] (hG : OddOrder.BG.IsMin
     intro p hp
     obtain ⟨hpσ, hpκ, hpπ⟩ := hXprimes p hp
     obtain ⟨hpp, hpdvdX, _⟩ := Nat.mem_primeFactors.mp hp
-    haveI : Fact p.Prime := ⟨hpp⟩
+    have : Fact p.Prime := ⟨hpp⟩
     by_contra hpτ2
     -- `p ∉ τ₂(M)` with `p ∉ σ(M)` gives `r_p(M) ≠ 2`; rank bounds force `r_p(M) = 1`.
     have hr2 : pRank ↥M p ≠ 2 := fun h => hpτ2 ((mem_tau2_iff M p).mpr ⟨hpσ, h⟩)
@@ -585,18 +585,18 @@ theorem typeP_hall_small_subgroup_cyclic_tau2 [Finite G] (hG : OddOrder.BG.IsMin
       congrArg Subtype.val (hbE₂.is_comm.comm ⟨_, haw⟩ ⟨_, hbw⟩)
     have hcancel := congrArg (fun u => w⁻¹ * u * w) hcomm
     simpa [mul_assoc] using hcancel
-  haveI : IsMulCommutative ↥X := hXab
+  have : IsMulCommutative ↥X := hXab
   -- **Part B(ii)**: every Sylow `p` of `X` is cyclic (else `ℰ_p²(X)` ↝ `C_{M_σ}(X) = 1`).
   have hSylcyc : ∀ p : ℕ, p.Prime → ∀ P : Sylow p ↥X, IsCyclic P := by
     intro p hp P
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     by_contra hPnc
     -- `P` is noncyclic, hence nontrivial, so `p ∣ |X|` and (oddness of `G`) `p` is odd.
     have hpcardP : p ∣ Nat.card ↥(P : Subgroup ↥X) := by
       obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp P.isPGroup'
       rcases Nat.eq_zero_or_pos n with h0 | hpos
       · refine absurd ?_ hPnc
-        haveI : Subsingleton ↥(P : Subgroup ↥X) :=
+        have : Subsingleton ↥(P : Subgroup ↥X) :=
           (Nat.card_eq_one_iff_unique.mp (by rw [hn, h0, pow_zero])).1
         exact isCyclic_of_subsingleton
       · rw [hn]; exact dvd_pow_self p hpos.ne'
@@ -631,7 +631,7 @@ theorem typeP_hall_small_subgroup_cyclic_tau2 [Finite G] (hG : OddOrder.BG.IsMin
     exact inf_le_inf_left _ (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hAX))
   -- `X` abelian with cyclic Sylows ⟹ `X` cyclic.
   have hXcyc : IsCyclic ↥X := by
-    letI : IsMulCommutative ↥X := hXab
+    let : IsMulCommutative ↥X := hXab
     exact OddOrder.Isaacs.Ch06.isCyclic_of_sylow_isCyclic hSylcyc
   refine ⟨?_, hXcyc, fun p hp => hXτ2 p hp⟩
   -- **Part C**: `ℳ(C_G(X)) = {M}` via the cyclic generator `x`.
@@ -671,7 +671,7 @@ theorem sigma_conj_smul_eq [Finite G] (g : G) (M : Subgroup G) :
     OddOrder.BG.Ch3.S10.sigma (MulAut.conj g • M) = OddOrder.BG.Ch3.S10.sigma M := by
   ext p
   by_cases hp : p.Prime
-  · haveI : Fact p.Prime := ⟨hp⟩
+  · have : Fact p.Prime := ⟨hp⟩
     refine ⟨fun hmem => ?_, fun hmem => OddOrder.BG.Ch3.S10.sigma_conj g hmem⟩
     have h2 := OddOrder.BG.Ch3.S10.sigma_conj g⁻¹ hmem
     rwa [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at h2
@@ -762,7 +762,7 @@ theorem sigma_diagnostic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       Nat.nonempty_primeFactors.mpr (lt_of_le_of_ne (Nat.one_le_iff_ne_zero.mpr Nat.card_pos.ne')
         (Ne.symm fun h => hclosne (Subgroup.card_eq_one.mp h)))
     have hq₀prime : q₀.Prime := Nat.prime_of_mem_primeFactors hq₀mem
-    haveI : Fact q₀.Prime := ⟨hq₀prime⟩
+    have : Fact q₀.Prime := ⟨hq₀prime⟩
     have hq₀τ2 : q₀ ∈ tau2 M := hτ2 q₀ hq₀mem
     -- `E`-setup, a rank-2 `A ∈ ℰ_{q₀}²(E)` (push `ℰ_{q₀}²(M)` into `E₂`), and `M* ∈ ℳ(N_G(A))`.
     obtain ⟨E, E₁, E₂, E₃, hsetup⟩ := exists_subgroupESetup hG hM
@@ -814,7 +814,7 @@ theorem sigma_diagnostic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     push Not at hτ2
     obtain ⟨p₀, hp₀mem, hp₀τ2⟩ := hτ2
     have hp₀prime : p₀.Prime := Nat.prime_of_mem_primeFactors hp₀mem
-    haveI : Fact p₀.Prime := ⟨hp₀prime⟩
+    have : Fact p₀.Prime := ⟨hp₀prime⟩
     have hp₀σ : p₀ ∉ OddOrder.BG.Ch3.S10.sigma M := hx'sigma p₀ hp₀mem
     -- `⟨x'⟩ ≤ M`, so `p₀ ∣ |M|`, and `p₀ ∤ |M_σ|`, hence `p₀ ∈ π(E)`.
     obtain ⟨E, E₁, E₂, E₃, hsetup⟩ := exists_subgroupESetup hG hM
@@ -872,7 +872,7 @@ theorem sigma_diagnostic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       rw [hwcard, hp₀prime.primeFactors, Finset.mem_singleton] at hq
       exact hq ▸ hp₀κ
     obtain ⟨K, hKM, hK, hX₀K⟩ := exists_isHallSubgroup_kappa_ge hG hM hX₀M hX₀κ
-    haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+    have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
     obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥M)
       ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
     have hUeq : (U'.map M.subtype).subgroupOf M = U' :=
@@ -909,7 +909,7 @@ theorem sigma_diagnostic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     -- `K` is normal in `K ⊔ K*` (`K*` centralizes `K`), so elements decompose as `k · s`.
     have hKnorm : K ⊔ Kst ≤ Subgroup.normalizer (K : Set G) :=
       sup_le Subgroup.le_normalizer (hKstC.trans (Subgroup.centralizer_le_normalizer _))
-    haveI hKsNorm : ((K).subgroupOf (K ⊔ Kst)).Normal :=
+    have hKsNorm : ((K).subgroupOf (K ⊔ Kst)).Normal :=
       Subgroup.normal_subgroupOf_of_le_normalizer hKnorm
     have hsuptop : (K.subgroupOf (K ⊔ Kst)) ⊔ (Kst.subgroupOf (K ⊔ Kst)) = ⊤ := by
       rw [← Subgroup.subgroupOf_sup le_sup_left le_sup_right, Subgroup.subgroupOf_self]
@@ -967,7 +967,7 @@ theorem sigma_diagnostic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       have hcop : Nat.Coprime (orderOf x') (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)) :=
         coprime_of_forall_prime_not_dvd (fun r hr hrx' hrMσ => by
           exact hx'sigma r (by
-            rw [piSet, Set.mem_setOf_eq, hcardclos]
+            rw [piSet, Set.mem_ofPred_eq, hcardclos]
             exact Nat.mem_primeFactors.mpr ⟨hr, hrx', (orderOf_pos_iff.mpr
               (isOfFinOrder_of_finite x')).ne'⟩)
             (OddOrder.BG.Ch3.S10.Msigma_isPiGroup M r
@@ -999,7 +999,7 @@ theorem sigma_diagnostic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       -- and `C_G(x) ⊆ C_G(X₁) ⊆ M`.
       obtain ⟨p₁, hp₁, hp₁dvd⟩ := Nat.exists_prime_and_dvd
         (show orderOf x ≠ 1 from fun h => hx1 (orderOf_eq_one_iff.mp h))
-      haveI : Fact p₁.Prime := ⟨hp₁⟩
+      have : Fact p₁.Prime := ⟨hp₁⟩
       obtain ⟨v, hv⟩ := exists_prime_orderOf_dvd_card' (G := ↥(Subgroup.zpowers x)) p₁
         (by rw [Nat.card_zpowers]; exact hp₁dvd)
       have hvcard : Nat.card ↥(Subgroup.zpowers (v : G)) = p₁ := by
@@ -1075,7 +1075,7 @@ theorem typeP_neighbor_kappa [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         intro y; by_cases h : y ≠ 1 ∧ (maximalSigmaSubgroupsOfElement y).Nonempty <;> simp [h] }
   -- An element `x ∈ X^#` lands in `M_{iσ}^#`.
   have hXne : X ≠ ⊥ := ne_bot_of_mem_elemAbelianOfRank_one hX
-  haveI : Nontrivial ↥X := (Subgroup.nontrivial_iff_ne_bot X).mpr hXne
+  have : Nontrivial ↥X := (Subgroup.nontrivial_iff_ne_bot X).mpr hXne
   obtain ⟨xsub, hxsub⟩ := exists_ne (1 : ↥X)
   have hxX : (xsub : G) ∈ X := xsub.2
   have hxne : (xsub : G) ≠ 1 := fun h => hxsub (OneMemClass.coe_eq_one.mp h)
@@ -1084,7 +1084,7 @@ theorem typeP_neighbor_kappa [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [sigmaSharp, sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe]
     exact ⟨hXMiσ hxX, hxne⟩
   intro q hq
-  haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hq⟩
+  have : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hq⟩
   -- Cauchy: `x' ∈ K*` of order `q`.
   obtain ⟨x'sub, hx'ord⟩ := exists_prime_orderOf_dvd_card' q
     (Nat.dvd_of_mem_primeFactors hq : q ∣ Nat.card ↥Kstar)

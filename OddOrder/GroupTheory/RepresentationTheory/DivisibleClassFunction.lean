@@ -42,6 +42,7 @@ open OddOrder.GroupTheory
 variable {G K : Type*} [Group G] [Fintype G] [Field K] [CharZero K]
   {N : ℕ} {ω : K} {𝒳 : Set (Subgroup G)}
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Gorenstein Lemma 7.7.**  A class function on `G` whose values are integers divisible by
 `|G|` lies in `v_R(G)`. -/
 theorem mem_adjoinSpan_inducedVirtualCharacters_of_card_dvd (h𝒳 : IsElementaryFamily 𝒳)

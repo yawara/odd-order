@@ -85,7 +85,7 @@ Either `p` divides `|G^{ab}|`, and then `G` is not simple so Ch. I §3 Propositi
 applies, or hypothesis (B2) holds and steps (1)–(17) are contradictory. -/
 theorem theoremB (ind : Hypothesis.TheoremAInductionBelow G Ω) :
     Nonempty (Hypothesis.TheoremAConclusion G Ω) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   by_cases hB2 : fc.p ∣ Nat.card (Abelianization G)
   · exact fc.toHypothesis.theoremAConclusion_of_not_simple
@@ -93,7 +93,7 @@ theorem theoremB (ind : Hypothesis.TheoremAInductionBelow G Ω) :
   · exfalso
     obtain ⟨F, _, ⟨model⟩⟩ :=
       NearFields.rankOne_affine_nearField fc.rankOneQuotient
-    haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+    have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
     obtain ⟨S, hS⟩ : ∃ S : Sylow 3 G,
         fc.sylowThreeNormalizerRSigma model ≤ (S : Subgroup G) := by
       have hp3 : IsPGroup 3 ↥(fc.sylowThreeNormalizerRSigma model) :=

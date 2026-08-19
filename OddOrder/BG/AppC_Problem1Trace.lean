@@ -68,7 +68,7 @@ noncomputable def fieldTrace (p q : ℕ) [Fact p.Prime] (S : GaloisField p q) : 
 /-- The Frobenius has order `q` on `𝔽_{p^q}`. -/
 theorem pow_card_pow (hq : q ≠ 0) (z : GaloisField p q) : z ^ p ^ q = z := by
   classical
-  letI : Fintype (GaloisField p q) := Fintype.ofFinite _
+  let : Fintype (GaloisField p q) := Fintype.ofFinite _
   have hcard : Fintype.card (GaloisField p q) = p ^ q := by
     rw [← Nat.card_eq_fintype_card]
     exact GaloisField.card p q hq
@@ -205,8 +205,8 @@ theorem exists_collisionPair_of_sub_ne_zero (hp : p = 3) (hq : q ≠ 0) (hqodd :
     (hd : normOneVal r₀ ^ e - normOneVal p₀ ^ e ≠ 0) :
     ∃ S S', CollisionPair p q e S S' := by
   subst hp
-  letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
-  haveI : CharP (GaloisField 3 q) 3 := by
+  let : Fintype (GaloisField 3 q) := Fintype.ofFinite _
+  have : CharP (GaloisField 3 q) 3 := by
     rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
     exact ZMod.charP 3
   have hcard : Fintype.card (GaloisField 3 q) = 3 ^ q := by

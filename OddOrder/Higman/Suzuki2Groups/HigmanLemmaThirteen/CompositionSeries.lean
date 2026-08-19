@@ -85,12 +85,12 @@ theorem exists_frattini_composition_series_of_xiLengthFour_exponent_four
           frattiniNormalInvariant Y.subtype ∧
         frattiniNormalInvariant Y.subtype ⋖ B ∧
           B ⋖ normalInvariantTop Y.subtype := by
-  letI : Nontrivial P := by
+  let : Nontrivial P := by
     obtain ⟨x, y, _, _, hxy⟩ := hmulti
     exact ⟨⟨x, y, hxy⟩⟩
   have hPhiNeBot : frattini P ≠ (⊥ : Subgroup P) :=
     frattini_ne_bot_of_not_isMulCommutative hP hncomm
-  letI : Nontrivial (frattini P) :=
+  let : Nontrivial (frattini P) :=
     (Subgroup.nontrivial_iff_ne_bot (frattini P)).mpr hPhiNeBot
   let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
     IsAInvariant.of_characteristic Y.subtype
@@ -101,13 +101,13 @@ theorem exists_frattini_composition_series_of_xiLengthFour_exponent_four
       intro x hx y hy
       obtain ⟨g, hg⟩ := hxi.transitive x hx y hy
       exact ⟨g, hg⟩)
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   obtain ⟨ι, hι, _e, _he, _hε, classifyFull⟩ :=
     exists_homocyclic_and_invariant_eq_agemo
       (hP.to_subgroup (frattini P)) hPhiInv.restrict htransPhi
-  letI : Fintype ι := hι
+  let : Fintype ι := hι
   have classify : ∀ U : Subgroup (frattini P),
       IsAInvariant hPhiInv.restrict U →
         ∃ s : ℕ, U = Agemo (frattini P) 2 s := by

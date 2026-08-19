@@ -189,7 +189,7 @@ theorem exists_addEquiv_norm_of_anisotropic_aux (hm : m ≠ 0)
       (∀ a ∈ frobFixedSubfield E 2 m, ∀ x : E, f (a * x) = a * f x) ∧
       ∀ x : E, χ x = f x * f x ^ 2 ^ m := by
   classical
-  letI : Algebra (ZMod 2) E := ZMod.algebra E 2
+  let : Algebra (ZMod 2) E := ZMod.algebra E 2
   have h2E : (2 : E) = 0 := CharTwo.two_eq_zero
   have hcancel : ∀ a b : E, a + b = 0 → a = b := fun a b h => by
     linear_combination h - b * h2E
@@ -306,7 +306,7 @@ theorem exists_addEquiv_norm_of_anisotropic_aux (hm : m ≠ 0)
     rw [hexp]
     linear_combination (a * b * u) * h2E
   -- ### neither invariant is an Artin–Schreier value
-  haveI : CharP ↥(frobFixedSubfield E 2 m) 2 :=
+  have : CharP ↥(frobFixedSubfield E 2 m) 2 :=
     RingHom.charP (frobFixedSubfield E 2 m).subtype (RingHom.injective _) 2
   have hPnot : (⟨u ^ 2 + u, hPmem⟩ : ↥(frobFixedSubfield E 2 m)) ∉
       (artinSchreier ↥(frobFixedSubfield E 2 m)).range := by

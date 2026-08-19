@@ -150,7 +150,7 @@ theorem exists_mem_not_isCommutator [Finite Q] [Finite D] {𝒯 : Finset (Subgro
       < Nat.card D ^ (Nat.card Q - 1)) :
     ∃ z ∈ ⁅(inl : (Q → D) →* D ≀[Q] Q).range, (inr : Q →* D ≀[Q] Q).range⁆,
       ¬ ∃ x y : D ≀[Q] Q, ⁅x, y⁆ = z := by
-  letI : Fintype (D ≀[Q] Q) := Fintype.ofFinite _
+  let : Fintype (D ≀[Q] Q) := Fintype.ofFinite _
   by_contra hcontra
   have hcon : ∀ z ∈ ⁅(inl : (Q → D) →* D ≀[Q] Q).range, (inr : Q →* D ≀[Q] Q).range⁆,
       ∃ x y : D ≀[Q] Q, ⁅x, y⁆ = z := by
@@ -210,7 +210,7 @@ theorem sum_lt_of_card_lt [Finite Q] [Finite D] {𝒯 : Finset (Subgroup Q)}
     have hone : Nat.card Q = 1 := by
       have := Nat.card_pos (α := Q)
       omega
-    haveI hsub : Subsingleton Q := (Nat.card_eq_one_iff_unique.mp hone).1
+    have hsub : Subsingleton Q := (Nat.card_eq_one_iff_unique.mp hone).1
     refine htop ⟨fun a _ b _ => Subsingleton.elim _ _, 1, 1, le_antisymm ?_ le_top⟩
     intro x _
     rw [Subsingleton.elim x 1]

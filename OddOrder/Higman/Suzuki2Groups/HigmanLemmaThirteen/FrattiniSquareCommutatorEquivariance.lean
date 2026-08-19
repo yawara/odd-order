@@ -110,12 +110,12 @@ theorem frattiniSquareCommutatorBihom_equivariant
     IsAInvariant.of_characteristic Y.subtype
   let hSquareInv : IsAInvariant Y.subtype (frattiniSquare P) :=
     (frattiniSquareNormalInvariant Y.subtype).2.2
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   let hSquareEA :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
   intro c u v
   obtain ⟨z, rfl⟩ := QuotientGroup.mk_surjective u
@@ -176,12 +176,12 @@ theorem frattiniSquareCommutatorBilinear_equivariant
     (frattiniSquareNormalInvariant Y.subtype).2.2
   let hSquareEA :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
   intro c u v
   change Additive.ofMul

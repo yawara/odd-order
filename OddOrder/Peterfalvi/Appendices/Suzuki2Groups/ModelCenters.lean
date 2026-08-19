@@ -342,10 +342,10 @@ private theorem mem_center_map {G : Type uV} {H : Type uW}
 theorem TypeBData.sq_eq_one_of_mem_center {P : Type uP} [Group P]
     (data : TypeBData.{uP, uF} P) {z : P}
     (hz : z ∈ Subgroup.center P) : z ^ 2 = 1 := by
-  letI := data.fieldF
-  letI := data.finiteF
-  letI := data.charTwoF
-  letI : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
+  let := data.fieldF
+  let := data.finiteF
+  let := data.charTwoF
+  let : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
   have hsq : data.equivModel z ^ 2 = 1 :=
     QuadraticExtension.sq_eq_one_of_mem_center _ _
       (typeBQuadraticMap_radical_eq_zero data.phi (data.epsilon : data.F)
@@ -358,10 +358,10 @@ theorem TypeBData.sq_eq_one_of_mem_center {P : Type uP} [Group P]
 theorem TypeCData.sq_eq_one_of_mem_center {P : Type uP} [Group P]
     (data : TypeCData.{uP, uF} P) {z : P}
     (hz : z ∈ Subgroup.center P) : z ^ 2 = 1 := by
-  letI := data.fieldF
-  letI := data.finiteF
-  letI := data.charTwoF
-  letI : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
+  let := data.fieldF
+  let := data.finiteF
+  let := data.charTwoF
+  let : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
   have hsq : data.equivModel z ^ 2 = 1 :=
     QuadraticExtension.sq_eq_one_of_mem_center _ _
       (typeCQuadraticMap_radical_eq_zero data.theta (data.epsilon : data.F)
@@ -374,10 +374,10 @@ theorem TypeCData.sq_eq_one_of_mem_center {P : Type uP} [Group P]
 theorem TypeDData.sq_eq_one_of_mem_center {P : Type uP} [Group P]
     (data : TypeDData.{uP, uF} P) {z : P}
     (hz : z ∈ Subgroup.center P) : z ^ 2 = 1 := by
-  letI := data.fieldF
-  letI := data.finiteF
-  letI := data.charTwoF
-  letI : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
+  let := data.fieldF
+  let := data.finiteF
+  let := data.charTwoF
+  let : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
   have hsq : data.equivModel z ^ 2 = 1 :=
     QuadraticExtension.sq_eq_one_of_mem_center _ _
       (typeDQuadraticMap_radical_eq_zero data.theta data.theta_pow_five
@@ -446,10 +446,10 @@ theorem BilinearTwistedProduct.mem_center_of_quotient_eq_zero
 theorem TypeAData.sq_eq_one_of_mem_center {P : Type uP} [Group P]
     (data : TypeAData.{uP, uF} P) {z : P}
     (hz : z ∈ Subgroup.center P) : z ^ 2 = 1 := by
-  letI := data.fieldF
-  letI := data.finiteF
-  letI := data.charTwoF
-  letI : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
+  let := data.fieldF
+  let := data.finiteF
+  let := data.charTwoF
+  let : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
   have hsq : data.equivModel z ^ 2 = 1 :=
     QuadraticExtension.sq_eq_one_of_mem_center _ _
       (typeAQuadraticMap_radical_eq_zero data.phi data.phi_ne_one)
@@ -465,10 +465,10 @@ quotient coordinate is additive and the field has characteristic `2` — and
 theorem TypeAData.isElementaryAbelian_quotient_center {P : Type uP} [Group P]
     (data : TypeAData.{uP, uF} P) :
     OddOrder.GroupTheory.IsElementaryAbelian 2 (P ⧸ Subgroup.center P) := by
-  letI := data.fieldF
-  letI := data.finiteF
-  letI := data.charTwoF
-  letI : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
+  let := data.fieldF
+  let := data.finiteF
+  let := data.charTwoF
+  let : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
   have hcen : ∀ z : P, (data.equivModel z).quotient = 0 →
       z ∈ Subgroup.center P := by
     intro z hz

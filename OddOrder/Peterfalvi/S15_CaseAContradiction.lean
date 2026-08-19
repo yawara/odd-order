@@ -77,7 +77,7 @@ theorem caseA_false_of_parameters_and_typeIOverNormalizerData [Finite G]
     clear hu
     omega
   obtain ⟨r, hr, hrhalf⟩ := Nat.exists_prime_and_dvd hhalf_ne_one
-  letI : Fact r.Prime := ⟨hr⟩
+  let : Fact r.Prime := ⟨hr⟩
   let R₀ : Sylow r ↥hyp.U := default
   have hR₀nc : ¬ IsCyclic ↥(R₀ : Subgroup ↥hyp.U) :=
     caseA_sylow_U_not_isCyclic_of_parameters
@@ -92,7 +92,7 @@ theorem caseA_false_of_parameters_and_typeIOverNormalizerData [Finite G]
     data.prime_dvd_sq_sub_one_of_omega1Center hr R hcard
   have hR₀card : r ∣ Nat.card ↥(R₀ : Subgroup ↥hyp.U) :=
     R₀.isPGroup'.card_eq_or_dvd.resolve_left fun hcard_one => hR₀nc <| by
-      letI : Subsingleton ↥(R₀ : Subgroup ↥hyp.U) :=
+      let : Subsingleton ↥(R₀ : Subgroup ↥hyp.U) :=
         (Nat.card_eq_one_iff_unique.mp hcard_one).1
       exact isCyclic_of_subsingleton
   have hrU : r ∣ Nat.card ↥hyp.U :=

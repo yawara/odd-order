@@ -87,12 +87,12 @@ theorem exists_transfer_eq_conj_of_index_eq_one {H : Subgroup G} [H.FiniteIndex]
     ∃ r : G, MonoidHom.transfer ϕ g
       = ϕ ⟨r⁻¹ * g * r, by rw [Subgroup.index_eq_one.mp hidx]; trivial⟩ := by
   classical
-  letI := H.fintypeQuotientOfFiniteIndex
-  haveI hsub : Subsingleton (G ⧸ H) := by
+  let := H.fintypeQuotientOfFiniteIndex
+  have hsub : Subsingleton (G ⧸ H) := by
     have h1 : Nat.card (G ⧸ H) = 1 := by rw [← Subgroup.index_eq_card, hidx]
     exact (Nat.card_eq_one_iff_unique.mp h1).1
   rw [MonoidHom.transfer_eq_prod_quotient_orbitRel_zpowers_quot]
-  haveI : Subsingleton (Quotient (MulAction.orbitRel
+  have : Subsingleton (Quotient (MulAction.orbitRel
       (Subgroup.zpowers g) (G ⧸ H))) := Quotient.instSubsingletonQuotient _
   rw [Fintype.prod_subsingleton _
     (Quotient.mk (MulAction.orbitRel (Subgroup.zpowers g) (G ⧸ H))
@@ -196,9 +196,9 @@ private lemma diff_compSection (ϕ : ↥H →* A)
           ⟨Set.range f, isComplement_range_left hf⟩
           ⟨Set.range f', isComplement_range_left hf'⟩ := by
   classical
-  letI := H.fintypeQuotientOfFiniteIndex
-  letI := K.fintypeQuotientOfFiniteIndex
-  letI := (H.subgroupOf K).fintypeQuotientOfFiniteIndex
+  let := H.fintypeQuotientOfFiniteIndex
+  let := K.fintypeQuotientOfFiniteIndex
+  let := (H.subgroupOf K).fintypeQuotientOfFiniteIndex
   set e := Subgroup.quotientEquivProdOfLE' hHK f hf with he_def
   set γ : G ⧸ H → G := compSection hHK f hf s with hγ_def
   set γ' : G ⧸ H → G := compSection hHK f' hf' s with hγ'_def
@@ -423,7 +423,7 @@ theorem transfer_abelianization_range_eq_bot {G : Type*} [Group G] [Finite G]
     exact Subgroup.index_dvd_of_le (Abelianization.commutator_subset_ker v)
   -- … and also divides the `p`-power `|H^{ab}|`.
   have h5 : IsPGroup p (Abelianization ↥H) := hH.to_quotient (commutator ↥H)
-  haveI : Finite (Abelianization ↥H) := Quotient.finite _
+  have : Finite (Abelianization ↥H) := Quotient.finite _
   obtain ⟨k, hk⟩ := h5.exists_card_eq
   have h4 : Nat.card v.range ∣ p ^ k := by
     rw [← hk]

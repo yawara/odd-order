@@ -245,7 +245,7 @@ theorem exists_agemoZero_linearEquiv_succ_of_irreducible
       (agemoSuccQuotientRepresentation φ 0)
       (agemoSuccQuotientRepresentation φ s)
       (agemoZeroToSuccLinearMap_equivariant φ s)
-  letI : Representation.IsIrreducible
+  let : Representation.IsIrreducible
       (agemoSuccQuotientRepresentation φ 0) := hirr
   have hsurj : Function.Surjective f := by
     change Function.Surjective (agemoZeroToSuccLinearMap (A := A) s)
@@ -354,7 +354,7 @@ theorem not_isCyclic_lastAgemoLayer_of_two_involutions
     (hxy : x ≠ y) :
     ¬ IsCyclic ↑(Agemo A 2 (e - 1)) := by
   intro hcyc
-  letI : IsCyclic ↑(Agemo A 2 (e - 1)) := hcyc
+  let : IsCyclic ↑(Agemo A 2 (e - 1)) := hcyc
   let x' : ↑(Agemo A 2 (e - 1)) :=
     ⟨x, (sq_eq_one_iff_mem_lastAgemoLayer ε he).mp hx.1⟩
   let y' : ↑(Agemo A 2 (e - 1)) :=
@@ -403,10 +403,10 @@ theorem not_isCyclic_agemoQuotient_of_two_involutions
     intro a
     refine ⟨QuotientGroup.mk a, ?_⟩
     rfl
-  letI : IsCyclic (M ⧸ D) := hcyc
+  let : IsCyclic (M ⧸ D) := hcyc
   have hnextCyc : IsCyclic (M ⧸ N) :=
     isCyclic_of_surjective q hqsurj
-  letI : IsCyclic (M ⧸ N) := hnextCyc
+  let : IsCyclic (M ⧸ N) := hnextCyc
   have hlastCyc : IsCyclic ↑(Agemo A 2 (e - 1)) :=
     isCyclic_of_surjective
       (agemoSuccQuotientEquivLast ε hs).toMonoidHom
@@ -463,7 +463,7 @@ theorem agemoSucc_finrank_ge_two_of_not_isCyclic
   let Q := AgemoSuccQuotient A s
   have hleQ : Module.finrank (ZMod 2) (Additive Q) ≤ 1 := by
     simpa [Q] using hle
-  haveI : Finite (Additive Q) := inferInstanceAs (Finite Q)
+  have : Finite (Additive Q) := inferInstanceAs (Finite Q)
   have hcard : Nat.card Q =
       2 ^ Module.finrank (ZMod 2) (Additive Q) := by
     calc

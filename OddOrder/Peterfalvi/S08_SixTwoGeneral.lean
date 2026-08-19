@@ -57,8 +57,8 @@ variable {K}
 theorem inducedKernelFamily_finite (X : Subgroup ↥L) :
     (inducedKernelFamily K X).Finite := by
   classical
-  haveI : Fintype ↥K := Fintype.ofFinite _
-  haveI : Finite (IrreducibleCharacter ↥K) := finite_irreducibleCharacter (G := ↥K)
+  have : Fintype ↥K := Fintype.ofFinite _
+  have : Finite (IrreducibleCharacter ↥K) := finite_irreducibleCharacter (G := ↥K)
   refine (Set.finite_range
     (fun θ : IrreducibleCharacter ↥K =>
       ClassFunction.induce K (θ : ClassFunction ↥K ℂ))).subset ?_
@@ -115,7 +115,7 @@ theorem exists_inducedKernelFamily_member_degree_index {X : Subgroup ↥L}
     [(X.subgroupOf K).Normal]
     (hXcomm : commutator (↥K ⧸ X.subgroupOf K) ≠ ⊤) :
     ∃ φ ∈ inducedKernelFamily K X, φ (1 : ↥L) = (K.index : ℂ) := by
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
   obtain ⟨θ, hθne, hθker, hθdeg⟩ :=
     exists_irreducibleCharacter_ne_trivial_subset_kernel_of_commutator_ne_top
       (X.subgroupOf K) hXcomm
@@ -142,7 +142,7 @@ theorem inducedKernelFamily_pairwise_orthogonal {X Y : Subgroup ↥L}
     ClassFunction.inner φ φ' = 0 := by
   obtain ⟨θ, -, -, rfl⟩ := hφ
   obtain ⟨θ', -, -, rfl⟩ := hφ'
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
   refine inner_induce_eq_zero_of_not_conj θ θ' (fun g hg => hne ?_)
   exact (induce_eq_induce_iff_conj θ θ').mpr ⟨g, hg⟩
 
@@ -154,7 +154,7 @@ theorem inducedKernelFamily_inner_self_real_pos {X : Subgroup ↥L}
     ClassFunction.inner φ φ = ((ClassFunction.inner φ φ).re : ℂ) ∧
       0 < (ClassFunction.inner φ φ).re := by
   obtain ⟨θ, -, -, rfl⟩ := hφ
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
   constructor
   · rw [inner_self_eq_realCast (ClassFunction.induce K (θ : ClassFunction ↥K ℂ)),
       Complex.ofReal_re]
@@ -179,7 +179,7 @@ irreducible of an odd-order group is non-real). -/
 theorem inducedKernelFamily_hasNoRealCharacters (hodd : Odd (Nat.card ↥L)) (X : Subgroup ↥L) :
     OddOrder.Peterfalvi.S03.HasNoRealCharacters (inducedKernelFamily K X) := by
   rintro φ ⟨θ, hθne, -, rfl⟩ hreal
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
   -- realness transfers to the sources: `Ind θ = (Ind θ)̄ = Ind θ̄`.
   let θc : IrreducibleCharacter ↥K := ⟨(θ : ClassFunction ↥K ℂ).conj, θ.isIrreducible.conj⟩
   have hind : ClassFunction.induce K (θ : ClassFunction ↥K ℂ)
@@ -211,7 +211,7 @@ theorem inducedKernelFamily_mem_ZIrr [Invertible (Nat.card ↥L : ℂ)] {X : Sub
     {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ inducedKernelFamily K X) :
     φ ∈ ZIrr ↥L := by
   obtain ⟨θ, -, -, rfl⟩ := hφ
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
   exact ClassFunction.induce_mem_ZIrr K θ.mem_ZIrr
 
 /-- **Scaled member differences are `K^#`-supported.**  For members `φ, φ' ∈ S(X)`/`S(Y)` with
@@ -932,7 +932,7 @@ theorem exists_anchor_of_linear_of_inertia_eq {X : Subgroup ↥L}
     (hinertia : ClassFunction.inertia (θ : ClassFunction ↥K ℂ) = K) :
     ∃ χ₁ ∈ inducedKernelFamily K X,
       IsIrreducibleCharacter χ₁ ∧ χ₁ 1 = (K.index : ℂ) := by
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
   refine ⟨ClassFunction.induce K (θ : ClassFunction ↥K ℂ), ⟨θ, hθne, hθker, rfl⟩, ?_, ?_⟩
   · exact isIrreducibleCharacter_induce_of_inertia_eq θ hinertia
   · rw [ClassFunction.induce_apply_one, hθdeg, mul_one]

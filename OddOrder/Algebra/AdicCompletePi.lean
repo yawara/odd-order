@@ -51,8 +51,8 @@ theorem mem_pow_smul_top_self_iff {n : ℕ} (r : R) :
 theorem mem_pow_smul_top_pi_iff (hι : Finite ι) {n : ℕ} (x : ι → R) :
     x ∈ (I ^ n • ⊤ : Submodule R (ι → R)) ↔ ∀ i, x i ∈ I ^ n := by
   classical
-  haveI := hι
-  haveI : Fintype ι := Fintype.ofFinite ι
+  have := hι
+  have : Fintype ι := Fintype.ofFinite ι
   constructor
   · intro hx
     refine Submodule.smul_induction_on hx (fun r hr m _ i => ?_) (fun a b ha hb i => ?_)
@@ -148,9 +148,9 @@ theorem isAdicComplete_of_linearEquiv (e : M ≃ₗ[R] N) [IsAdicComplete I M] :
 /-- **A finite free module over a complete ring is complete.** -/
 theorem isAdicComplete_of_basis {ι : Type*} (hι : Finite ι) (b : Module.Basis ι R M)
     [IsAdicComplete I R] : IsAdicComplete I M := by
-  haveI := hι
-  haveI : Fintype ι := Fintype.ofFinite ι
-  haveI : IsAdicComplete I (ι → R) := isAdicComplete_pi I hι
+  have := hι
+  have : Fintype ι := Fintype.ofFinite ι
+  have : IsAdicComplete I (ι → R) := isAdicComplete_pi I hι
   exact isAdicComplete_of_linearEquiv I b.equivFun.symm
 
 
@@ -172,9 +172,9 @@ theorem isAdicComplete_of_le_of_pow_le {R : Type*} [CommRing R] {I J : Ideal R}
     exact pow_le_pow_left' hJn m
   have hle : ∀ m : ℕ, (I ^ m • ⊤ : Submodule R R) ≤ (J ^ m • ⊤ : Submodule R R) := fun m =>
     Submodule.smul_mono_left (pow_le_pow_left' hIJ m)
-  haveI : IsHausdorff J R :=
+  have : IsHausdorff J R :=
     ⟨fun x hx => IsHausdorff.haus' (I := I) x fun m => SModEq.mono (hpow m) (hx (n * m))⟩
-  haveI : IsPrecomplete J R := by
+  have : IsPrecomplete J R := by
     refine ⟨fun f hf => ?_⟩
     obtain ⟨L, hL⟩ := IsPrecomplete.prec' (I := I) (fun m => f (n * m))
       (fun {a b} hab => SModEq.mono (hpow a) (hf (Nat.mul_le_mul_left n hab)))

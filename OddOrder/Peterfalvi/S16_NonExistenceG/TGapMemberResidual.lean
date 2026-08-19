@@ -62,13 +62,13 @@ theorem s12_muGrid_zeroColumn_sum_eq_induce_trivial [Finite G]
     (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i 0) =
       ClassFunction.induce ((derivedInG M).subgroupOf M)
         (trivialClassFunction ↥((derivedInG M).subgroupOf M)) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   let h := (hyp.toCertainTypeHypothesis hG hG.odd).toHypothesis
-  haveI hNeZ1 : NeZero (Nat.card h.W1) :=
+  have hNeZ1 : NeZero (Nat.card h.W1) :=
     ⟨by have := h.one_lt_card_W1; omega⟩
-  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
   have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
   have hW2le : hyp.typeP.W2 ≤ M :=
     OddOrder.Peterfalvi.S12.typePData_W2_le_self hyp.typeP
@@ -77,7 +77,7 @@ theorem s12_muGrid_zeroColumn_sum_eq_induce_trivial [Finite G]
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) :=
+  have hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) :=
     ⟨Nat.card_pos.ne'⟩
   let chi2 : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
     OddOrder.Peterfalvi.S12.finCardEquivCharacterGroup _

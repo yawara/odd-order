@@ -60,7 +60,7 @@ theorem centralizerSupport_sharp_eq_of_frobenius [Finite G] {M N : Subgroup G} {
       = OddOrder.GroupTheory.sharpSubgroup N := by
   ext y
   simp only [OddOrder.GroupTheory.centralizerSupport, OddOrder.GroupTheory.sharpSubgroup,
-    Set.mem_setOf_eq, Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff]
+    Set.mem_ofPred_eq, Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff]
   constructor
   · rintro ⟨hyM, hy1, x, ⟨hxN, hx1⟩, hyx⟩
     have hxM : x ∈ M := hNM hxN
@@ -202,7 +202,7 @@ noncomputable def sibleyTarget_frobI [Fintype G] {L : Subgroup G} [Fintype ↥L]
       A0_eq := by rw [hset]; rfl }
   -- `H = L_F` is nilpotent: `maxNilpotentNormalHall` nilpotency transported to the
   -- `↥L`-coordinate along `subgroupOfEquivOfLe`.
-  haveI : Group.IsNilpotent ↥(hyp.typeI.typeF.H) := by
+  have : Group.IsNilpotent ↥(hyp.typeI.typeF.H) := by
     rw [hyp.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent L
   exact Group.nilpotent_of_mulEquiv
@@ -256,7 +256,7 @@ theorem Hypothesis.typeIA_eq_sharp_of_frobenius [Finite G] {L : Subgroup G} (hyp
     = OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H
   ext y
   simp only [OddOrder.GroupTheory.centralizerSupport, OddOrder.GroupTheory.sharpSubgroup,
-    Set.mem_setOf_eq, Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff]
+    Set.mem_ofPred_eq, Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff]
   constructor
   · rintro ⟨hyL, hy1, x, ⟨hxN, hx1⟩, hyx⟩
     have hxL : x ∈ L := hyp.typeI.typeF.H_le hxN
@@ -284,9 +284,9 @@ theorem Sset_isIrreducibleCharacter [Finite G] {L : Subgroup G} (hyp : Hypothesi
     {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Sset) :
     IsIrreducibleCharacter χ := by
   classical
-  simp only [Hypothesis.Sset, Set.mem_setOf_eq] at hχ
+  simp only [Hypothesis.Sset, Set.mem_ofPred_eq] at hχ
   obtain ⟨θ, hθ_ne, rfl⟩ := hχ
-  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+  have hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
     rw [hyp.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
   exact isIrreducibleCharacter_induce_of_frobeniusGroup hfrob θ hθ_ne
@@ -303,8 +303,8 @@ theorem Sset_self_mem_constituents [Finite G] {L : Subgroup G} [Finite ↥L]
     {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Sset) (data : CharacterDecompositionData hyp χ) :
     ∃ φ : IrreducibleCharacter ↥L, (φ : ClassFunction ↥L ℂ) = χ ∧ φ ∈ data.constituents := by
   classical
-  haveI : Fintype ↥L := Fintype.ofFinite _
-  haveI := hyp.finiteG
+  have : Fintype ↥L := Fintype.ofFinite _
+  have := hyp.finiteG
   have hirr : IsIrreducibleCharacter χ := Sset_isIrreducibleCharacter hyp hfrob hχ
   obtain ⟨φ₀, hφ₀⟩ := data.constituents_nonempty
   have hone : ClassFunction.inner (φ₀ : ClassFunction ↥L ℂ) χ = 1 := by
@@ -359,11 +359,11 @@ theorem rho_constant_on_H_minus_Hprime {L : Subgroup G} [Finite G] (hyp : Hypoth
       h2 ∉ hyp.Hprime →
       (hyp.toHypothesis71.chiRhoCF psi) ⟨h1, hyp.typeI.typeF.H_le hh1⟩
         = (hyp.toHypothesis71.chiRhoCF psi) ⟨h2, hyp.typeI.typeF.H_le hh2⟩ := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   intro h1 hh1 hh1' h2 hh2 hh2'
   have hHL : hyp.typeI.typeF.H ≤ L := hyp.typeI.typeF.H_le
-  haveI : Fintype (IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L)) := Fintype.ofFinite _
+  have : Fintype (IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L)) := Fintype.ofFinite _
   set g : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ :=
     ClassFunction.restrict ((hyp.typeI.typeF.H).subgroupOf L) (hyp.toHypothesis71.chiRhoCF psi)
     with hg
@@ -385,10 +385,10 @@ theorem rho_constant_on_H_minus_Hprime {L : Subgroup G} [Finite G] (hyp : Hypoth
     have hdeg := commutator_induce_constituents_apply_one_eq ρ θ₁ θ₂ hlo1 hlo2
     have hχ₁mem : ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
         (θ₁ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) ∈ hyp.Sset := by
-      simp only [Hypothesis.Sset, Set.mem_setOf_eq]; exact ⟨θ₁, hne1, rfl⟩
+      simp only [Hypothesis.Sset, Set.mem_ofPred_eq]; exact ⟨θ₁, hne1, rfl⟩
     have hχ₂mem : ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
         (θ₂ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) ∈ hyp.Sset := by
-      simp only [Hypothesis.Sset, Set.mem_setOf_eq]; exact ⟨θ₂, hne2, rfl⟩
+      simp only [Hypothesis.Sset, Set.mem_ofPred_eq]; exact ⟨θ₂, hne2, rfl⟩
     have hχ₁mem' := hχ₁mem
     have hdegχ : (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
           (θ₁ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)) (1 : ↥L)
@@ -418,9 +418,9 @@ theorem Sset_hasNoRealCharacters [Finite G] {L : Subgroup G} (hyp : Hypothesis L
     OddOrder.Peterfalvi.S03.HasNoRealCharacters hyp.Sset := by
   classical
   intro χ hχ
-  simp only [Hypothesis.Sset, Set.mem_setOf_eq] at hχ
+  simp only [Hypothesis.Sset, Set.mem_ofPred_eq] at hχ
   obtain ⟨θ, hθ_ne, rfl⟩ := hχ
-  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+  have hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
     rw [hyp.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
   obtain ⟨ξ, hξcoe, hξreal, _⟩ := frobenius_induce_char_singleton hodd hfrob θ hθ_ne
@@ -435,11 +435,11 @@ theorem Sset_pairwiseOrthogonal [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
     (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C) :
     OddOrder.Peterfalvi.S03.PairwiseOrthogonal hyp.Sset := by
   classical
-  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+  have hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
     rw [hyp.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
   intro χ ψ hχ hψ hne
-  simp only [Hypothesis.Sset, Set.mem_setOf_eq] at hχ hψ
+  simp only [Hypothesis.Sset, Set.mem_ofPred_eq] at hχ hψ
   obtain ⟨θ, hθ_ne, rfl⟩ := hχ
   obtain ⟨θ', hθ'_ne, rfl⟩ := hψ
   obtain ⟨ξ, hξcoe, _, _⟩ := frobenius_induce_char_singleton hodd hfrob θ hθ_ne
@@ -457,9 +457,9 @@ theorem Sset_inner_self_eq_one [Finite G] {L : Subgroup G} (hyp : Hypothesis L) 
     {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Sset) :
     ClassFunction.inner χ χ = 1 := by
   classical
-  simp only [Hypothesis.Sset, Set.mem_setOf_eq] at hχ
+  simp only [Hypothesis.Sset, Set.mem_ofPred_eq] at hχ
   obtain ⟨θ, hθ_ne, rfl⟩ := hχ
-  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+  have hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
     rw [hyp.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
   exact inner_self_induce_eq_one_of_frobeniusGroup hfrob θ hθ_ne
@@ -475,8 +475,8 @@ theorem Sset_apply_one_eq_index [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
     {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Sset) :
     (χ : ↥L → ℂ) 1 = (((hyp.typeI.typeF.H).subgroupOf L).index : ℂ) := by
   classical
-  haveI : IsMulCommutative ↥hyp.typeI.typeF.H := hab
-  simp only [Hypothesis.Sset, Set.mem_setOf_eq] at hχ
+  have : IsMulCommutative ↥hyp.typeI.typeF.H := hab
+  simp only [Hypothesis.Sset, Set.mem_ofPred_eq] at hχ
   obtain ⟨θ, hθ_ne, rfl⟩ := hχ
   rw [ClassFunction.induce_apply_one, θ.isIrreducible.apply_one_eq_one_of_isMulCommutative, mul_one]
 
@@ -493,10 +493,10 @@ theorem SsubFiltration_commutator_apply_one_eq_index [Finite G] {L : Subgroup G}
       ⁅(hyp.typeI.typeF.H).subgroupOf L, (hyp.typeI.typeF.H).subgroupOf L⁆) :
     (χ : ↥L → ℂ) 1 = (((hyp.typeI.typeF.H).subgroupOf L).index : ℂ) := by
   classical
-  simp only [Hypothesis.SsubFiltration, Set.mem_setOf_eq] at hχ
+  simp only [Hypothesis.SsubFiltration, Set.mem_ofPred_eq] at hχ
   obtain ⟨θ, _hθ_ne, hker, rfl⟩ := hχ
   have hθ1 : (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) 1 = 1 := by
-    haveI : IsMulCommutative (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
+    have : IsMulCommutative (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
         commutator ↥((hyp.typeI.typeF.H).subgroupOf L)) :=
       inferInstanceAs (IsMulCommutative (Abelianization ↥((hyp.typeI.typeF.H).subgroupOf L)))
     refine
@@ -616,7 +616,7 @@ theorem Sset_charValue_one_eq_mul_index [Finite G] {L : Subgroup G} (hyp : Hypot
     ∃ d : ℕ, 0 < d ∧
       (χ : ↥L → ℂ) 1 = (d : ℂ) * (((hyp.typeI.typeF.H).subgroupOf L).index : ℂ) := by
   classical
-  simp only [Hypothesis.Sset, Set.mem_setOf_eq] at hχ
+  simp only [Hypothesis.Sset, Set.mem_ofPred_eq] at hχ
   obtain ⟨θ, -, rfl⟩ := hχ
   obtain ⟨d, hd0, hd1, -⟩ := θ.isIrreducible.exists_natDegree_charValue_one_dvd_card
   refine ⟨d, hd0, ?_⟩

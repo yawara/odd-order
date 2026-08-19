@@ -199,7 +199,7 @@ theorem exists_complementary_invariant_quotient_summands_of_xiLengthThree
     exact h
   have hPhiNeTop : frattini P ≠ (⊤ : Subgroup P) :=
     (hPhiB'.trans hBtop').ne
-  letI : Nontrivial (P ⧸ frattini P) :=
+  let : Nontrivial (P ⧸ frattini P) :=
     Subgroup.nontrivial_quotient_of_ne_top hPhiNeTop
   have hinv : (involutions P).Nonempty := by
     obtain ⟨x, _, hx, _, _⟩ := hmulti
@@ -277,7 +277,7 @@ theorem exists_complementary_invariant_frattini_preimage_of_xiLengthThree
       sup_eq_right.mpr hPhiS.le] using hStop
   have hPhiNeTop : frattini P ≠ (⊤ : Subgroup P) :=
     (hPhiS.trans hStop).ne
-  letI : Nontrivial (P ⧸ frattini P) :=
+  let : Nontrivial (P ⧸ frattini P) :=
     Subgroup.nontrivial_quotient_of_ne_top hPhiNeTop
   have hinv : (involutions P).Nonempty := by
     obtain ⟨x, _, hx, _, _⟩ := hmulti

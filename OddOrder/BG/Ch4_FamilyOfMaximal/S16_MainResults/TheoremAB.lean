@@ -96,7 +96,7 @@ theorem theoremA_ungated_conjuncts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
     isTypeP_of_isHall_kappa_subgroupOf_ne_bot hK
       (fun h => hKne (by rw [← Subgroup.map_subgroupOf_eq_of_le hKM, h, Subgroup.map_bot]))
   have haux := typeP_auxiliary_structure hG hM hKM hUM hK hKstar hU
-  haveI hKcyc : IsCyclic ↥K := haux.2.1
+  have hKcyc : IsCyclic ↥K := haux.2.1
   refine ⟨OddOrder.BG.Ch3.S10.Msigma_isHall hG hM, hKcyc, haux.1, ?_, ?_, ?_,
     maxNilpotentNormalHall_le_Msigma hG hM, OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM⟩
   · -- A(4): `C_U(k) = 1`.  Vacuous for `K = ⊥`; else type-`P` element centralizer.
@@ -145,7 +145,7 @@ theorem theoremB_U_sylow_abelian_rank_le_two [Finite G]
     ∀ p : ℕ, p.Prime → ∀ P : Subgroup G, P ≤ U → IsPGroup p ↥P →
       rank ↥P ≤ 2 ∧ IsMulCommutative ↥P := by
   intro p hp P hPU hPp
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hPM : P ≤ M := hPU.trans hUM
   -- `P ≤ U` is a `σ(M)'`-subgroup of `M`.
   have hP_pi : Subgroup.IsPiSubgroup ((OddOrder.BG.Ch3.S10.sigma M)ᶜ) P := by
@@ -228,7 +228,7 @@ theorem uniqueMaximal_of_kappaSigmaCompl_element [Finite G]
     (hyC : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({y} : Set G) ≠ ⊥) :
     maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G)) = {M} := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   set yM : ↥M := ⟨y, hyM⟩ with hyMdef
   -- (i) `⟨y⟩` is a `(κ ∪ σ)ᶜ`-subgroup of `M`.
   have hordeq : orderOf y = orderOf yM :=
@@ -260,7 +260,7 @@ theorem uniqueMaximal_of_kappaSigmaCompl_element [Finite G]
   have hz'Mσ : τ * z * τ⁻¹ ∈ OddOrder.BG.Ch3.S10.Msigma M := by
     have hM_le_NMσ : M ≤ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma M : Set G) := by
       rw [OddOrder.BG.Ch3.S10.Msigma]; exact le_normalizer_opiCoreInG _ _
-    haveI hMσ_norm : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal :=
+    have hMσ_norm : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal :=
       (Subgroup.normal_subgroupOf_iff_le_normalizer
         (OddOrder.BG.Ch3.S10.Msigma_le M)).mpr hM_le_NMσ
     have hzMmem : (⟨z, OddOrder.BG.Ch3.S10.Msigma_le M hzMσ⟩ : ↥M) ∈
@@ -348,7 +348,7 @@ theorem theoremB_A_minus_Msigma_isTISubset [Finite G]
       maximalSubgroupsContaining (Subgroup.centralizer ({piPart π a} : Set G)) = {M} := by
     intro a ha
     obtain ⟨haA, haMσ⟩ := ha
-    simp only [ASet, hatMsigma, Set.mem_inter_iff, Set.mem_setOf_eq, SetLike.mem_coe] at haA
+    simp only [ASet, hatMsigma, Set.mem_inter_iff, Set.mem_ofPred_eq, SetLike.mem_coe] at haA
     obtain ⟨⟨haM, haC⟩, haUMσ⟩ := haA
     -- `w = a_π`, a power of `a`, is a `π`-element of `M`.
     obtain ⟨-, -, -, -, -, hwz, -⟩ := piPart_spec π a
@@ -467,7 +467,7 @@ theorem theoremB_U_and_A_tame [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact hxne (Subtype.ext_iff.mp hmem)
   have hbot := IsFrobeniusGroup.centralizer_inf_kernel_eq_bot_of_not_mem hFrob hgN
   -- The `M̂_σ` witness `m` centralizing `x` gives a nontrivial element of `C_L(g) ⊓ M_σ = ⊥`.
-  simp only [hatMsigma, Set.mem_setOf_eq] at hxhat
+  simp only [hatMsigma, Set.mem_ofPred_eq] at hxhat
   obtain ⟨m, hmmem, hm1⟩ := (Subgroup.bot_or_exists_ne_one _).resolve_left hxhat.2
   obtain ⟨hmMσ, hmC⟩ := Subgroup.mem_inf.mp hmmem
   have hmL : m ∈ L := (le_sup_right : OddOrder.BG.Ch3.S10.Msigma M ≤ L) hmMσ

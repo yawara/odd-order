@@ -95,8 +95,8 @@ theorem fixedSet_fixer_fixedSet (B : Subgroup (_root_.RingAut F)) :
 full automorphism group of a finite field `F`. -/
 theorem finrank_fixedSet (B : Subgroup (_root_.RingAut F)) :
     Module.finrank (FixedPoints.subfield (↥B) F) F = Nat.card B := by
-  haveI : Fintype (↥B) := Fintype.ofFinite _
-  haveI : FaithfulSMul (↥B) F :=
+  have : Fintype (↥B) := Fintype.ofFinite _
+  have : FaithfulSMul (↥B) F :=
     ⟨fun {b₁ b₂} h => Subtype.ext (eq_of_smul_eq_smul (α := F) fun x => h x)⟩
   rw [FixedPoints.finrank_eq_card (↥B) F, Nat.card_eq_fintype_card]
 
@@ -141,9 +141,9 @@ an odd divisor `> 1`, hence `m ≥ 3`. -/
 theorem orderOf_dvd_of_card_eq_pow {p m : ℕ} [Fact p.Prime] [CharP F p]
     (hcard : Nat.card F = p ^ m) (θ : _root_.RingAut F) : orderOf θ ∣ m := by
   classical
-  haveI : Fintype F := Fintype.ofFinite F
-  haveI : Fintype ↥(FixedPoints.subfield (↥(Subgroup.zpowers θ)) F) := Fintype.ofFinite _
-  haveI : CharP ↥(FixedPoints.subfield (↥(Subgroup.zpowers θ)) F) p :=
+  have : Fintype F := Fintype.ofFinite F
+  have : Fintype ↥(FixedPoints.subfield (↥(Subgroup.zpowers θ)) F) := Fintype.ofFinite _
+  have : CharP ↥(FixedPoints.subfield (↥(Subgroup.zpowers θ)) F) p :=
     Subfield.charP (FixedPoints.subfield (↥(Subgroup.zpowers θ)) F) p
   have hrank : Module.finrank ↥(FixedPoints.subfield (↥(Subgroup.zpowers θ)) F) F
       = orderOf θ := by

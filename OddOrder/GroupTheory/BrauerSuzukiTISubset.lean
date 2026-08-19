@@ -199,7 +199,7 @@ theorem orderOf_x_sq : orderOf (Q.x ^ (2 : ℕ)) = 2 ^ (Q.n - 1) := by
 `2`-subgroup, which is `C`-conjugate to `X`. -/
 theorem exists_conj_X_ge {w : G} (hwC : w ∈ Q.C) {k : ℕ} (hk : orderOf w = 2 ^ k) :
     ∃ c ∈ Q.C, Subgroup.zpowers w ≤ Subgroup.zpowers (c * Q.x * c⁻¹) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨P, hP⟩ := Q.exists_sylow_C_eq
   set w' : ↥Q.C := ⟨w, hwC⟩ with hw'def
   have hordw' : orderOf w' = 2 ^ k := by

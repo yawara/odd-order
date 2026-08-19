@@ -285,7 +285,7 @@ theorem centralizer_lNIn_le [Finite G] {p : ℕ} [Fact p.Prime] (hG : IsPGroup p
     Subgroup.centralizer (lNIn (⊤ : Subgroup G) i : Set G) ≤ lNIn (⊤ : Subgroup G) i := by
   obtain ⟨M, hM_normal, hM_comm, hM_max⟩ :=
     OddOrder.Isaacs.Ch06.exists_maximal_normal_isMulCommutative (P := G)
-  haveI : M.Normal := hM_normal
+  have : M.Normal := hM_normal
   have hM_le : M ≤ lNIn (⊤ : Subgroup G) i := abelian_normal_le_lNIn hM_comm hM_normal le_top hi
   have hCent : Subgroup.centralizer (M : Set G) = M :=
     OddOrder.Isaacs.Ch06.centralizer_eq_of_maximal_normal_isMulCommutative hG hM_comm hM_max
@@ -485,8 +485,8 @@ theorem centralizer_lNIn_inf_le [Finite G] {p : ℕ} [Fact p.Prime] {H : Subgrou
     Subgroup.centralizer (lNIn H i : Set G) ⊓ H ≤ lNIn H i := by
   obtain ⟨M', hM'_normal, hM'_comm, hM'_max⟩ :=
     OddOrder.Isaacs.Ch06.exists_maximal_normal_isMulCommutative (P := ↥H)
-  haveI : M'.Normal := hM'_normal
-  haveI : IsMulCommutative ↥M' := hM'_comm
+  have : M'.Normal := hM'_normal
+  have : IsMulCommutative ↥M' := hM'_comm
   have hM_comm : IsMulCommutative ↥(M'.map H.subtype) := inferInstance
   have hM_le_Li : M'.map H.subtype ≤ lNIn H i :=
     abelian_le_lNIn hM_comm (Subgroup.map_subtype_le M')
@@ -518,7 +518,7 @@ theorem lRelIn_map_equiv (φ : G ≃* G) (H X : Subgroup G) :
     rw [Subgroup.map_le_iff_le_comap]
     refine lRelIn_le fun A hcomm hAH hnorm => ?_
     rw [← Subgroup.map_le_iff_le_comap]
-    haveI := hcomm
+    have := hcomm
     refine le_lRelIn inferInstance (Subgroup.map_mono hAH) ?_
     rw [← Subgroup.map_equiv_normalizer_eq A ψ]
     exact Subgroup.map_mono hnorm

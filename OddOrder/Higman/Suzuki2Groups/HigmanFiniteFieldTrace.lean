@@ -49,7 +49,7 @@ private theorem exists_ne_zero_trace_eq_zero
     finrank_top, CommSemiring.finrank_self] at hrank
   have hkerpos : 0 < Module.finrank K (LinearMap.ker (Algebra.trace K L)) := by
     omega
-  letI : Nontrivial (LinearMap.ker (Algebra.trace K L)) :=
+  let : Nontrivial (LinearMap.ker (Algebra.trace K L)) :=
     Module.nontrivial_of_finrank_pos hkerpos
   obtain ⟨z, hz⟩ := exists_ne (0 : LinearMap.ker (Algebra.trace K L))
   exact ⟨z, by simpa using hz, z.property⟩
@@ -286,9 +286,9 @@ theorem higmanLemmaTen
     (hodd : Odd (Module.finrank K L)) (r : ℤ) (ε : L) :
     ∃ α : L, α ≠ 0 ∧
       Algebra.trace K L (α * ((frobeniusEquiv L 2) ^ r) α * ε) = 0 := by
-  letI : Algebra (ZMod 2) K := ZMod.algebra K 2
-  letI : Algebra (ZMod 2) L := ZMod.algebra L 2
-  letI : IsScalarTower (ZMod 2) K L := inferInstance
+  let : Algebra (ZMod 2) K := ZMod.algebra K 2
+  let : Algebra (ZMod 2) L := ZMod.algebra L 2
+  let : IsScalarTower (ZMod 2) K L := inferInstance
   let trF : L →ₗ[ZMod 2] K :=
     (Algebra.trace K L).restrictScalars (ZMod 2)
   let mulε : L →ₗ[ZMod 2] L := LinearMap.mulRight (ZMod 2) ε

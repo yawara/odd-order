@@ -222,8 +222,8 @@ theorem step4_relation_5076 (data : FieldNormalizerData p q G) {c1 c2 c3 : ZMod 
         data.t⁻¹ * (yc⁻¹ * (data.sigma (primeLineElement p q c3))⁻¹ * yc) *
           data.sigma (primeLineElement p q c3) := by
   classical
-  haveI := data.Q_commutative
-  letI : CommGroup ↥data.Q :=
+  have := data.Q_commutative
+  let : CommGroup ↥data.Q :=
     { (inferInstance : Group ↥data.Q) with
       mul_comm := fun a b => Subtype.ext (setLike_mul_comm (s := data.Q) a.2 b.2) }
   set s1 := data.sigma (primeLineElement p q c1) with hs1def

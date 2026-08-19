@@ -52,7 +52,7 @@ irreducible characters have norm `1`. -/
 theorem Hypothesis.muColumn_not_irreducible [Finite G] (hyp : Hypothesis (G := G))
     (j : Fin hyp.p) :
     ¬ IsIrreducibleCharacter (∑ i : Fin hyp.q, hyp.mu i j) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   intro hirr
   have h1 := hirr.inner_self_eq_one
   rw [hyp.muColumn_inner_self j] at h1
@@ -81,7 +81,7 @@ theorem Hypothesis.coherentIndS_muColumn_diff [Finite G]
     c.extension (∑ i : Fin hyp.q, hyp.mu i j) - c.extension (∑ i : Fin hyp.q, hyp.mu i k)
       = (∑ i : Fin hyp.q, hyp.eta i j) - (∑ i : Fin hyp.q, hyp.eta i k) := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hmemSpan : ((∑ i : Fin hyp.q, hyp.mu i j) - (∑ i : Fin hyp.q, hyp.mu i k)) ∈
       OddOrder.Peterfalvi.S07.zSupportedSpan (sSet (hyp.toTypesIIIIIIVSetupS hG))
         (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S) :=
@@ -113,7 +113,7 @@ theorem Hypothesis.coherentIndS_extension_irr_vanish_regular [Finite G]
       ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G)))) :
     c.extension ξ x = 0 := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hcrux := coherentIndS_image_inner_eta_eq_zero hG hnoV hyp
     (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG))
     (sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupS hG) (hyp.oddCardS hG))
@@ -151,7 +151,7 @@ theorem Hypothesis.coherentIndS_muColumn_vanish_regular [Finite G]
       ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G)))) :
     c.extension (∑ i : Fin hyp.q, hyp.mu i j) x = 0 := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   set μcol : ClassFunction ↥hyp.S ℂ := ∑ i : Fin hyp.q, hyp.mu i j with hμdef
   have hμmem : μcol ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) :=
     sOf_subset_sSet _ chief.H0 (hyp.mu_colSum_mem_sOf_H0 hG chief j hj)
@@ -261,7 +261,7 @@ theorem Hypothesis.coherentIndS_muColumn_pin_of_irr [Finite G]
           = ∑ i : Fin hyp.q, hyp.mu i k ∧
         c.extension (∑ i : Fin hyp.q, hyp.mu i j) = -∑ i : Fin hyp.q, hyp.eta i k := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   set μcol : ClassFunction ↥hyp.S ℂ := ∑ i : Fin hyp.q, hyp.mu i j with hμdef
   have hμmem : μcol ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) :=
     sOf_subset_sSet _ chief.H0 (hyp.mu_colSum_mem_sOf_H0 hG chief j hj)
@@ -533,7 +533,7 @@ theorem Hypothesis.coherentIndS_muColumn_eq_etaColumn_of_pivot [Finite G]
     {j : Fin hyp.p} (hj : j ≠ ⟨0, hyp.p_prime.pos⟩) :
     c.extension (∑ i : Fin hyp.q, hyp.mu i j) = ∑ i : Fin hyp.q, hyp.eta i j := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hp1 : (⟨1, hyp.p_prime.one_lt⟩ : Fin hyp.p) ≠ ⟨0, hyp.p_prime.pos⟩ := by
     intro h; exact absurd (congrArg Fin.val h) one_ne_zero
   by_cases hjp : j = ⟨1, hyp.p_prime.one_lt⟩

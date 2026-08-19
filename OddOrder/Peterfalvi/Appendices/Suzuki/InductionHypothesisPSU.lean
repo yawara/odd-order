@@ -55,7 +55,7 @@ For `q = 2^n > 2`, every group concretely isomorphic to the standard
 projective unitary permutation group is simple. -/
 theorem psu3_target_simple {n : ℕ} (hn : 1 < n) {L : Subgroup G}
     (eL : L ≃* standardPermGroup n) : IsSimpleGroup L := by
-  letI : IsSimpleGroup (standardPermGroup n) :=
+  let : IsSimpleGroup (standardPermGroup n) :=
     standardPermGroup_isSimpleGroup hn
   exact eL.isSimpleGroup
 

@@ -52,7 +52,7 @@ nothing; we prove it directly by closure induction using commutativity for the p
 theorem pow_eq_one_of_mem_omega_one_of_comm {Q : Type*} [Group Q]
     (hQ : ∀ x y : Q, x * y = y * x) {g : Q} (hg : g ∈ Omega Q p 1) : g ^ p = 1 := by
   induction hg using Subgroup.closure_induction with
-  | mem x hx => simpa only [Set.mem_setOf_eq, pow_one] using hx
+  | mem x hx => simpa only [Set.mem_ofPred_eq, pow_one] using hx
   | one => exact one_pow p
   | mul a b _ _ ha hb =>
       have hab : Commute a b := hQ a b
@@ -178,14 +178,14 @@ theorem exists_aInvariant_complement_in_omega1_quotient
   -- `E := Ω₁(R ⧸ S)` is elementary abelian, hence an `F_p`-module on `Additive ↥E`.
   have hEea : IsElementaryAbelian p ↥(Omega (R ⧸ S) p 1) :=
     isElementaryAbelian_omega_one_of_comm hQab
-  haveI hEcomm : IsMulCommutative ↥(Omega (R ⧸ S) p 1) := ⟨⟨fun a b => hEea.comm a b⟩⟩
+  have hEcomm : IsMulCommutative ↥(Omega (R ⧸ S) p 1) := ⟨⟨fun a b => hEea.comm a b⟩⟩
   have hpsmul : ∀ x : Additive ↥(Omega (R ⧸ S) p 1), (p : ℕ) • x = 0 := by
     intro x
     apply Additive.toMul.injective
     rw [toMul_nsmul, toMul_zero]
     exact hEea.pow_eq_one x.toMul
-  haveI : Module (ZMod p) (Additive ↥(Omega (R ⧸ S) p 1)) := AddCommGroup.zmodModule hpsmul
-  haveI : NeZero ((Nat.card A : ZMod p)) := neZero_natCast_zmod_of_coprime hcop hpR
+  have : Module (ZMod p) (Additive ↥(Omega (R ⧸ S) p 1)) := AddCommGroup.zmodModule hpsmul
+  have : NeZero ((Nat.card A : ZMod p)) := neZero_natCast_zmod_of_coprime hcop hpR
   have hEinv : IsAInvariant (quotientMulAutHom hS) (Omega (R ⧸ S) p 1) :=
     IsAInvariant.of_characteristic _
   -- the `F_p[A]`-representation `ρ` carried by the restricted quotient action.
@@ -297,14 +297,14 @@ theorem exists_aInvariant_complement_of_isElementaryAbelian
     {U : Subgroup E} (hUinv : IsAInvariant φ U) :
     ∃ W : Subgroup E, IsAInvariant φ W ∧ U ⊓ W = ⊥ ∧ U ⊔ W = ⊤ := by
   classical
-  haveI hEcomm : IsMulCommutative E := IsMulCommutative.of_comm hE.comm
-  letI : CommGroup E := { (inferInstance : Group E) with mul_comm := hE.comm }
-  haveI : NeZero p := ⟨(Fact.out : p.Prime).ne_zero⟩
+  have hEcomm : IsMulCommutative E := IsMulCommutative.of_comm hE.comm
+  let : CommGroup E := { (inferInstance : Group E) with mul_comm := hE.comm }
+  have : NeZero p := ⟨(Fact.out : p.Prime).ne_zero⟩
   have hpsmul : ∀ x : Additive E, (p : ℕ) • x = 0 := by
     intro x; apply Additive.toMul.injective
     rw [toMul_nsmul, toMul_zero]; exact hE.pow_eq_one x.toMul
-  haveI : Module (ZMod p) (Additive E) := AddCommGroup.zmodModule hpsmul
-  haveI : NeZero ((Nat.card A : ZMod p)) := neZero_natCast_zmod_of_coprime hcop hpE
+  have : Module (ZMod p) (Additive E) := AddCommGroup.zmodModule hpsmul
+  have : NeZero ((Nat.card A : ZMod p)) := neZero_natCast_zmod_of_coprime hcop hpE
   set ρ : Representation (ZMod p) A (Additive E) := (mulAutToEnd E p).comp φ with hρ_def
   have key_rho : ∀ (a : A) (v : Additive E),
       Additive.toMul (ρ a v) = (φ a) (Additive.toMul v) := fun _ _ => rfl
@@ -384,7 +384,7 @@ theorem exists_aInvariant_irreducible_summand_disjoint
   have hVnt : Nontrivial V := by
     by_contra h
     rw [not_nontrivial_iff_subsingleton] at h
-    haveI := h
+    have := h
     refine hC (top_le_iff.mp fun x _ => ?_)
     rw [Subsingleton.elim x 1]; exact C.one_mem
   have hpV : p ∣ Nat.card V := by
@@ -439,8 +439,8 @@ theorem exists_aInvariant_complement_of_pow_card_bijective
     (hbij : Function.Bijective fun u : ↥U => u ^ Nat.card A) :
     ∃ N : Subgroup V, N.Normal ∧ IsAInvariant φ N ∧ U ⊓ N = ⊥ ∧ U ⊔ N = ⊤ := by
   classical
-  letI : CommGroup ↥U := { (inferInstance : Group ↥U) with mul_comm := hU_comm }
-  haveI : Fintype A := Fintype.ofFinite A
+  let : CommGroup ↥U := { (inferInstance : Group ↥U) with mul_comm := hU_comm }
+  have : Fintype A := Fintype.ofFinite A
   -- the projection `θ : V →* U` killing the `W`-component
   set e : V ⧸ W ≃* ↥U := hcompl.QuotientMulEquiv with he_def
   set θ : V →* ↥U := e.toMonoidHom.comp (QuotientGroup.mk' W) with hθ_def

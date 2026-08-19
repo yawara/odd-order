@@ -125,7 +125,7 @@ theorem exists_orderOf_eq_and_forall_orderOf_dvd [Finite D] [Finite Q]
   refine ⟨fun x => orderOf_dvd_of_pow_eq_one (pow_prime_pow_succ_eq_one hD hQ x), ?_⟩
   -- `Q` の生成元 (位数 `p` は素数)
   obtain ⟨q, hq⟩ : ∃ q : Q, orderOf q = Fintype.card Q := by
-    haveI : Fact (Nat.card Q).Prime := ⟨hQ ▸ Fact.out (p := p.Prime)⟩
+    have : Fact (Nat.card Q).Prime := ⟨hQ ▸ Fact.out (p := p.Prime)⟩
     obtain ⟨q, hq⟩ := (isCyclic_of_prime_card (α := Q) rfl).exists_generator
     exact ⟨q, by rw [orderOf_eq_card_of_forall_mem_zpowers hq, Nat.card_eq_fintype_card]⟩
   -- `D` の生成元
@@ -521,7 +521,7 @@ theorem card_commutator_range_inl_map_inr [Finite Q] [Finite D] (K : Subgroup Q)
     Nat.card ((⁅(inl : (Q → D) →* D ≀[Q] Q).range, K.map (inr : Q →* D ≀[Q] Q)⁆ :
         Subgroup (D ≀[Q] Q)))
       = Nat.card D ^ (Nat.card Q - K.index) := by
-  letI : Fintype Q := Fintype.ofFinite Q
+  let : Fintype Q := Fintype.ofFinite Q
   have hidx : K.index ≤ Nat.card Q :=
     Nat.le_of_dvd Nat.card_pos (Subgroup.index_dvd_card K)
   have hpos : 0 < Nat.card D ^ K.index := pow_pos Nat.card_pos _
@@ -553,13 +553,13 @@ theorem commutator_range_inl_range_inr_eq [Fintype Q] :
 theorem commutator_eq_commutator_range_inl_range_inr (hQcomm : ∀ a b : Q, a * b = b * a) :
     commutator (D ≀[Q] Q)
       = ⁅(inl : (Q → D) →* D ≀[Q] Q).range, (inr : Q →* D ≀[Q] Q).range⁆ := by
-  haveI : IsMulCommutative ((inl : (Q → D) →* D ≀[Q] Q).range) := by
+  have : IsMulCommutative ((inl : (Q → D) →* D ≀[Q] Q).range) := by
     refine ⟨⟨fun a b => Subtype.ext ?_⟩⟩
     obtain ⟨f, hf⟩ := a.2
     obtain ⟨g, hg⟩ := b.2
     change (a : D ≀[Q] Q) * b = (b : D ≀[Q] Q) * a
     rw [← hf, ← hg, ← map_mul, ← map_mul, mul_comm]
-  haveI : IsMulCommutative ((inr : Q →* D ≀[Q] Q).range) := by
+  have : IsMulCommutative ((inr : Q →* D ≀[Q] Q).range) := by
     refine ⟨⟨fun a b => Subtype.ext ?_⟩⟩
     obtain ⟨q, hq⟩ := a.2
     obtain ⟨q', hq'⟩ := b.2
@@ -638,7 +638,7 @@ theorem forall_commute_ker_augHom_iff [Fintype Q] [Fact p.Prime] (hQcard : Nat.c
   classical
   have hcardQ : Fintype.card Q = p := by rw [← Nat.card_eq_fintype_card, hQcard]
   obtain ⟨d, hd1, hd2⟩ := hd
-  haveI : Nontrivial D := ⟨⟨d, 1, hd1⟩⟩
+  have : Nontrivial D := ⟨⟨d, 1, hd1⟩⟩
   constructor
   · intro hcomm
     -- Step A: `z.right = 1`

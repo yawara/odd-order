@@ -54,7 +54,7 @@ theorem brauerProj_relTrace_eq_zero [Finite G] (hchar : (p : k) = 0) {P Q : Subg
     (hdvd : p ∣ Q.relIndex P) (a : MonoidAlgebra k G) :
     brauerProj P (GAlgebra.relTrace Q P a) = 0 := by
   classical
-  letI : Fintype (↥P ⧸ Q.subgroupOf P) := Fintype.ofFinite _
+  let : Fintype (↥P ⧸ Q.subgroupOf P) := Fintype.ofFinite _
   have hindex : (Q.relIndex P : k) = 0 := by
     obtain ⟨t, ht⟩ := hdvd
     rw [ht, Nat.cast_mul, hchar, zero_mul]
@@ -129,12 +129,12 @@ theorem brauerProj_eq_zero_iff [Finite G] [Fact p.Prime] (hchar : (p : k) = 0)
         fun u hu => smul_single_of_mem_centralizer (Subgroup.mem_inf.mp hu).2 _
       have htmem : t ∈ GAlgebra.relTraceIdeal Q P := ⟨single g (c.coeff g), htfix, rfl⟩
       have htapp_pos : ∀ n : G, (∃ u ∈ P, u * g * u⁻¹ = n) → t.coeff n = c.coeff g := by
-        letI := Fintype.ofFinite G
+        let := Fintype.ofFinite G
         intro n horb
         have h := coeff_relTrace_single P g (c.coeff g) n
         rwa [if_pos horb] at h
       have htapp_neg : ∀ n : G, ¬ (∃ u ∈ P, u * g * u⁻¹ = n) → t.coeff n = 0 := by
-        letI := Fintype.ofFinite G
+        let := Fintype.ofFinite G
         intro n horb
         have h := coeff_relTrace_single P g (c.coeff g) n
         rwa [if_neg horb] at h

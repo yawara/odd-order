@@ -107,7 +107,7 @@ theorem natCard_specialLinearGroup_fin_two :
     Nat.card (Matrix.SpecialLinearGroup (Fin 2) F) =
       Nat.card F * (Nat.card F - 1) * (Nat.card F + 1) := by
   classical
-  letI : Fintype F := Fintype.ofFinite F
+  let : Fintype F := Fintype.ofFinite F
   have hq : 1 < Nat.card F := Finite.one_lt_card
   have hunit : Nat.card Fˣ = Nat.card F - 1 := by
     rw [Nat.card_eq_fintype_card, Fintype.card_units,
@@ -195,7 +195,7 @@ theorem rootSubgroup_index :
 /-- The standard root subgroup has odd index in `PSL(2,F)`. -/
 theorem rootSubgroup_index_odd : Odd (rootSubgroup (F := F)).index := by
   classical
-  letI : Fintype F := Fintype.ofFinite F
+  let : Fintype F := Fintype.ofFinite F
   obtain ⟨n, _, hn⟩ := FiniteField.card F 2
   have hn0 : (n : ℕ) ≠ 0 := n.ne_zero
   have hqeven : Even (Nat.card F) := by

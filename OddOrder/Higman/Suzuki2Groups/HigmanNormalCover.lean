@@ -72,8 +72,8 @@ def ambientFrattini (H : Subgroup G) : Subgroup G :=
 /-- Higman's first p.83 cover consequence: `Phi(C)` lies in `A`. -/
 theorem ambientFrattini_right_le_left [Finite G]
     (h : NormalInvariantCover act A C) : ambientFrattini C ≤ A := by
-  letI : A.Normal := h.left.1
-  letI : C.Normal := h.right.1
+  let : A.Normal := h.left.1
+  let : C.Normal := h.right.1
   obtain ⟨hPhiInv, hPhiNorm, hPhiLeC⟩ :=
     aInvariant_normal_map_of_characteristic h.right.2 (frattini C)
   let PhiC : Subgroup G := ambientFrattini C
@@ -85,7 +85,7 @@ theorem ambientFrattini_right_le_left [Finite G]
   have hPhiLeC' : PhiC ≤ C := by
     simpa [PhiC, ambientFrattini] using hPhiLeC
   have hSupNorm : (A ⊔ PhiC).Normal := by
-    letI : PhiC.Normal := hPhiNorm'
+    let : PhiC.Normal := hPhiNorm'
     infer_instance
   have hcases : A ⊔ PhiC = A ∨ A ⊔ PhiC = C :=
     h.eq_left_or_eq_right ⟨hSupNorm, h.left.2.sup hPhiInv'⟩
@@ -129,7 +129,7 @@ then the ambient image of `Phi(A)` lies in that of `Phi(C)`. -/
 theorem ambientFrattini_left_le_right_of_comm
     [Finite G] (hG : IsPGroup 2 G) (hAcomm : IsMulCommutative A)
     (hAC : A ≤ C) : ambientFrattini A ≤ ambientFrattini C := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
   rw [ambientFrattini, frattini_eq_agemo_one (hG.to_subgroup A)]
   rintro _ ⟨a, ha, rfl⟩
@@ -160,7 +160,7 @@ theorem ambientFrattini_right_eq_left_or_leftFrattini
     (classify : ∀ U : Subgroup A,
       IsAInvariant h.left.2.restrict U → ∃ s : ℕ, U = Agemo A 2 s) :
     ambientFrattini C = A ∨ ambientFrattini C = ambientFrattini A := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
   have hPhiCLeA : ambientFrattini C ≤ A := h.ambientFrattini_right_le_left
   have hPhiALePhiC : ambientFrattini A ≤ ambientFrattini C :=

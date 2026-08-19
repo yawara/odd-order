@@ -50,7 +50,7 @@ theorem eq_one_of_mem_kernel_of_commute (hF : IsFrobeniusGroup G N A) {g : G} (h
 theorem isConj_mul_of_notMem_kernel (hF : IsFrobeniusGroup G N A) {g : G} (hg : g ∉ N)
     {n : G} (hn : n ∈ N) : IsConj g (n * g) := by
   classical
-  haveI := hF.isNormal
+  have := hF.isNormal
   -- `m ↦ m g m⁻¹ g⁻¹` は `N` から `N` への写像
   have hmem : ∀ m : ↥N, (m : G) * g * (m : G)⁻¹ * g⁻¹ ∈ N := by
     intro m
@@ -102,22 +102,22 @@ section /- 6A.5: CA 群 (中心化群がすべて可換) は Frobenius 群 (p. 1
 3. `F ≠ ⊤` (さもないと `G = F` は可換), `F ≠ ⊥` ⟹ **Thm 6.7**
    (`exists_isComplement'_of_centralizer_le`) が Frobenius 構造を与える。 -/
 theorem exists_isFrobeniusGroup_fitting_of_centralizer_comm
-    {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    {G : Type*} [Group G] [Finite G] [Group.IsSolvable G]
     (hnonab : ∃ x y : G, x * y ≠ y * x)
     (hCA : ∀ x : G, x ≠ 1 → ∀ u v : G, u ∈ Subgroup.centralizer ({x} : Set G) →
       v ∈ Subgroup.centralizer ({x} : Set G) → u * v = v * u) :
     ∃ A : Subgroup G, IsFrobeniusGroup G (Ch01.fitting G) A := by
   classical
-  haveI : Nontrivial G := by
+  have : Nontrivial G := by
     obtain ⟨x, y, hxy⟩ := hnonab
     by_contra h
     rw [not_nontrivial_iff_subsingleton] at h
     exact hxy (by rw [Subsingleton.elim x (1 : G), Subsingleton.elim y (1 : G)])
   set F : Subgroup G := Ch01.fitting G with hFdef
-  have hFbot : F ≠ ⊥ := Ch01.fitting_ne_bot_of_solvable_nontrivial G
-  haveI : Nontrivial ↥F := (Subgroup.nontrivial_iff_ne_bot F).mpr hFbot
+  have hFbot : F ≠ ⊥ := Ch01.fitting_ne_bot_of_isSolvable_nontrivial G
+  have : Nontrivial ↥F := (Subgroup.nontrivial_iff_ne_bot F).mpr hFbot
   -- (1) `Z(F) ≠ 1` の元を取って `F` が可換であることを出す
-  haveI hZ : Nontrivial (Subgroup.center ↥F) :=
+  have hZ : Nontrivial (Subgroup.center ↥F) :=
     (Subgroup.nontrivial_iff_ne_bot _).mpr (Group.IsNilpotent.center_ne_bot ↥F)
   obtain ⟨z₀, hz₀ne⟩ := exists_ne (1 : Subgroup.center ↥F)
   set z : G := ((z₀ : ↥F) : G) with hzdef

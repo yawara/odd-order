@@ -296,7 +296,7 @@ theorem orderOf_frobeniusEquiv_eq_of_card_eq_two_pow
     {F : Type*} [Field F] [Finite F] [CharP F 2]
     (n : Nat) (hcard : Nat.card F = 2 ^ n) :
     orderOf (frobeniusEquiv F 2) = n := by
-  letI : Algebra (ZMod 2) F := ZMod.algebra F 2
+  let : Algebra (ZMod 2) F := ZMod.algebra F 2
   rw [orderOf_frobeniusEquiv_eq_finrank 2]
   apply Nat.pow_right_injective (by omega : 2 ≤ 2)
   calc
@@ -370,7 +370,7 @@ private theorem frobeniusPower_ne_one_and_orderOf_odd_of_primitive_shift
     intro hlambda
     have hone := hshift.pow_eq_one
     simp [hlambda, hmodpos.ne'] at hone
-  letI : Fintype F := Fintype.ofFinite F
+  let : Fintype F := Fintype.ofFinite F
   have hcardF : Fintype.card F = 2 ^ n := by
     rw [← Nat.card_eq_fintype_card]
     exact hcard
@@ -398,7 +398,7 @@ private theorem frobeniusPower_ne_one_and_orderOf_odd_of_primitive_shift
     rw [if_neg hnotOdd] at hgcd
     have : 0 < 2 ^ Nat.gcd r.val n := by positivity
     omega
-  letI : Finite (RingAut F) :=
+  let : Finite (RingAut F) :=
     Finite.of_injective (fun sigma : RingAut F => (sigma : F → F))
       DFunLike.coe_injective
   rw [orderOf_pow,
@@ -416,6 +416,7 @@ noncomputable def lowerCentralTermZeroEquivAmbient
   (MulEquiv.subgroupCongr (by simp [lowerCentralTerm])).trans
     Subgroup.topEquiv
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Under the square-layer identity, the ambient first lower-central term
 maps to the kernel defining the zeroth lower-central layer. -/
 private theorem lowerCentralTerm_one_map_zeroEquiv_symm
@@ -1038,17 +1039,17 @@ theorem exists_higmanLemmaElevenFieldCoordinates_with_trackedKernel
   have hmpos : 0 < m := by
     rw [hdegree]
     exact Nat.mul_pos hdpos hnpos
-  letI : IsCyclic Y := hxi.cyclic
-  letI : CommGroup Y := IsCyclic.commGroup
-  letI : NeZero n := ⟨hnpos.ne'⟩
-  letI : NeZero m := ⟨hmpos.ne'⟩
-  letI : NeZero (finrank (ZMod 2) K) := ⟨by
+  let : IsCyclic Y := hxi.cyclic
+  let : CommGroup Y := IsCyclic.commGroup
+  let : NeZero n := ⟨hnpos.ne'⟩
+  let : NeZero m := ⟨hmpos.ne'⟩
+  let : NeZero (finrank (ZMod 2) K) := ⟨by
     rw [hfinK]
     exact hnpos.ne'⟩
-  letI : NeZero (finrank (ZMod 2) L) := ⟨by
+  let : NeZero (finrank (ZMod 2) L) := ⟨by
     rw [hfinL]
     exact hmpos.ne'⟩
-  letI : Algebra K L := iota.toRingHom.toAlgebra
+  let : Algebra K L := iota.toRingHom.toAlgebra
   have hiota : ∀ z : K, iota z = algebraMap K L z := by
     intro z
     rfl
@@ -1384,19 +1385,19 @@ theorem higmanLemmaEleven
       p ∣ (involutions P).ncard) :
     IsTypeA.{uP, 0} P := by
   classical
-  letI : IsCyclic Y := hxi.cyclic
-  letI : CommGroup Y := IsCyclic.commGroup
+  let : IsCyclic Y := hxi.cyclic
+  let : CommGroup Y := IsCyclic.commGroup
   let m := finrank (ZMod 2)
     (Additive (lowerCentralLayer P 0))
   let n := finrank (ZMod 2)
     (Additive (lowerCentralLayer P 1))
-  letI : Nontrivial (lowerCentralLayer P 0) :=
+  let : Nontrivial (lowerCentralLayer P 0) :=
     lowerCentralLayer_zero_nontrivial_of_xiLengthTwo
       hP hncomm hxi hlen
-  letI : Nontrivial (Additive (lowerCentralLayer P 0)) := inferInstance
-  letI : Nontrivial (lowerCentralLayer P 1) :=
+  let : Nontrivial (Additive (lowerCentralLayer P 0)) := inferInstance
+  let : Nontrivial (lowerCentralLayer P 1) :=
     lowerCentralLayer_one_nontrivial_of_not_isMulCommutative hP hncomm
-  letI : Nontrivial (Additive (lowerCentralLayer P 1)) := inferInstance
+  let : Nontrivial (Additive (lowerCentralLayer P 1)) := inferInstance
   have hmpos : 0 < m := by
     dsimp [m]
     exact finrank_pos

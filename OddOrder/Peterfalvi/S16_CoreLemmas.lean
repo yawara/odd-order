@@ -321,7 +321,7 @@ noncomputable def fieldNormalizerComplement (hyp : Hypothesis (G := G)) :
 norm-one complement meet trivially. -/
 theorem fieldNormalizerKernel_inf_complement_eq_bot (hyp : Hypothesis (G := G)) :
     fnKernel hyp ⊓ fnComplement hyp = ⊥ := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   apply le_antisymm ?_ bot_le
   intro x hx
   rcases hx.1 with ⟨p, rfl⟩
@@ -337,7 +337,7 @@ theorem fieldNormalizerKernel_inf_complement_eq_bot (hyp : Hypothesis (G := G)) 
 norm-one complement generate the whole group. -/
 theorem fieldNormalizerKernel_sup_complement_eq_top (hyp : Hypothesis (G := G)) :
     fnKernel hyp ⊔ fnComplement hyp = ⊤ := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   apply le_antisymm le_top
   intro g _
   rw [← SemidirectProduct.inl_left_mul_inr_right g]
@@ -355,7 +355,7 @@ into the assertion that the prime line `P₀` cannot normalize `U`, without
 importing the class-sum file. -/
 theorem fieldNormalizerNormOneUnits_card_gt_one (hyp : Hypothesis (G := G)) :
     1 < Nat.card (fieldNormalizerNormOneUnits hyp) := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   have hp2 : 2 ≤ hyp.base.p := hyp.base.p_prime.two_le
   have hq0 : hyp.base.q ≠ 0 := hyp.base.q_prime.ne_zero
   have hq2 : 2 ≤ hyp.base.q := by
@@ -381,7 +381,7 @@ theorem fieldNormalizerNormOneUnits_card_gt_one (hyp : Hypothesis (G := G)) :
 /-- There is a nonidentity norm-one unit in the concrete complement. -/
 theorem exists_fieldNormalizerNormOneUnit_ne_one (hyp : Hypothesis (G := G)) :
     ∃ u : fieldNormalizerNormOneUnits hyp, u ≠ 1 := by
-  haveI : Nontrivial (fieldNormalizerNormOneUnits hyp) :=
+  have : Nontrivial (fieldNormalizerNormOneUnits hyp) :=
     Finite.one_lt_card_iff_nontrivial.mp
       (fieldNormalizerNormOneUnits_card_gt_one hyp)
   exact exists_ne 1
@@ -407,7 +407,7 @@ noncomputable def fieldNormalizerPrimeLineElement (hyp : Hypothesis (G := G))
 theorem fieldNormalizerPrimeLineElement_mem (hyp : Hypothesis (G := G))
     (c : ZMod hyp.base.p) :
     fieldNormalizerPrimeLineElement hyp c ∈ fnPrimeLine hyp := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   dsimp [fieldNormalizerPrimeLineElement, fnPrimeLine, OddOrder.BG.AppC.primeLine]
   rw [OddOrder.BG.AppC.NormSet.mem_normOneFrobeniusSubspaceKernel_inl]
   have h1 : (1 : GaloisField hyp.base.p hyp.base.q) ∈
@@ -424,7 +424,7 @@ theorem fieldNormalizerPrimeLineElement_mem (hyp : Hypothesis (G := G))
 /-- The scalar `1` element is the distinguished prime-line generator. -/
 theorem fieldNormalizerPrimeLineElement_one (hyp : Hypothesis (G := G)) :
     fieldNormalizerPrimeLineElement hyp 1 = fieldNormalizerPrimeLineGenerator hyp := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   simp [fieldNormalizerPrimeLineElement, fieldNormalizerPrimeLineGenerator]
 
 /-- Prime-line scalar elements invert by negating the scalar. -/
@@ -432,13 +432,13 @@ theorem fieldNormalizerPrimeLineElement_neg (hyp : Hypothesis (G := G))
     (c : ZMod hyp.base.p) :
     fieldNormalizerPrimeLineElement hyp (-c) =
       (fieldNormalizerPrimeLineElement hyp c)⁻¹ := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   simp [fieldNormalizerPrimeLineElement]
 
 /-- The distinguished generator lies in the concrete prime-field line `P₀`. -/
 theorem fieldNormalizerPrimeLineGenerator_mem (hyp : Hypothesis (G := G)) :
     fieldNormalizerPrimeLineGenerator hyp ∈ fnPrimeLine hyp := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   dsimp [fieldNormalizerPrimeLineGenerator, fnPrimeLine, OddOrder.BG.AppC.primeLine]
   rw [OddOrder.BG.AppC.NormSet.mem_normOneFrobeniusSubspaceKernel_inl]
   exact Submodule.subset_span (by simp)
@@ -446,7 +446,7 @@ theorem fieldNormalizerPrimeLineGenerator_mem (hyp : Hypothesis (G := G)) :
 /-- The distinguished generator of `P₀` is nontrivial. -/
 theorem fieldNormalizerPrimeLineGenerator_ne_one (hyp : Hypothesis (G := G)) :
     fieldNormalizerPrimeLineGenerator hyp ≠ 1 := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   intro h
   have hfield : (1 : GaloisField hyp.base.p hyp.base.q) = 0 :=
     ofAdd_eq_one.mp (SemidirectProduct.inl_inj.mp h)
@@ -455,8 +455,8 @@ theorem fieldNormalizerPrimeLineGenerator_ne_one (hyp : Hypothesis (G := G)) :
 /-- The distinguished generator of `P₀` has order dividing `p`. -/
 theorem fieldNormalizerPrimeLineGenerator_pow_p (hyp : Hypothesis (G := G)) :
     (fieldNormalizerPrimeLineGenerator hyp) ^ hyp.base.p = 1 := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
-  haveI : CharP (GaloisField hyp.base.p hyp.base.q) hyp.base.p := by
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  have : CharP (GaloisField hyp.base.p hyp.base.q) hyp.base.p := by
     rw [← Algebra.charP_iff (ZMod hyp.base.p) (GaloisField hyp.base.p hyp.base.q)
       hyp.base.p]
     exact ZMod.charP hyp.base.p
@@ -484,7 +484,7 @@ noncomputable def fieldNormalizerAdditiveFrobeniusHom (hyp : Hypothesis (G := G)
     apply Multiplicative.toAdd.injective
     simp [hyp.base.p_prime.ne_zero]
   map_mul' x y := by
-    letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+    let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
     apply Multiplicative.toAdd.injective
     exact (OddOrder.BG.AppC.NormSet.add_pow_p
       hyp.base.p hyp.base.q x.toAdd y.toAdd).symm
@@ -523,7 +523,7 @@ theorem fieldNormalizerFrobeniusHom_inl (hyp : Hypothesis (G := G))
     (x : fieldNormalizerAdditiveGroup hyp) :
     fieldNormalizerFrobeniusHom hyp (SemidirectProduct.inl x) =
       SemidirectProduct.inl (Multiplicative.ofAdd (x.toAdd ^ hyp.base.p)) := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   simp [fieldNormalizerFrobeniusHom, fieldNormalizerAdditiveFrobeniusHom]
 
 @[simp]
@@ -532,7 +532,7 @@ theorem fieldNormalizerFrobeniusHom_inr (hyp : Hypothesis (G := G))
     fieldNormalizerFrobeniusHom hyp
         (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) =
       SemidirectProduct.inr (u ^ hyp.base.p) := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   simp [fieldNormalizerFrobeniusHom, fieldNormalizerNormOneFrobeniusHom]
 
 /-- The concrete Frobenius fixes the prime-field line pointwise. -/
@@ -540,7 +540,7 @@ theorem fieldNormalizerFrobeniusHom_primeLineElement (hyp : Hypothesis (G := G))
     (c : ZMod hyp.base.p) :
     fieldNormalizerFrobeniusHom hyp (fieldNormalizerPrimeLineElement hyp c) =
       fieldNormalizerPrimeLineElement hyp c := by
-  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   rw [fieldNormalizerPrimeLineElement, fieldNormalizerFrobeniusHom_inl,
     SemidirectProduct.inl_inj]
   change (algebraMap (ZMod hyp.base.p) (GaloisField hyp.base.p hyp.base.q) c) ^

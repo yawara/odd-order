@@ -38,6 +38,7 @@ section /- Problem 4B.5 (p. 131) -/
 
 variable {G : Type*} [Group G]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **超可解群の極大可換正規部分群は自己中心化する**.
 
 したがって超可解群は Theorem 4.15 の仮説を満たす. -/
@@ -50,10 +51,10 @@ theorem exists_normal_centralizer_eq_self_of_isSupersolvable [Finite G]
     (p := fun A : Subgroup G => A.Normal ∧ ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
     (a := ⊥) ⟨inferInstance, by simp⟩
   obtain ⟨hAnorm, hAab⟩ := hAmax.prop
-  haveI := hAnorm
+  have := hAnorm
   refine ⟨A, hAnorm, ?_⟩
   set C : Subgroup G := Subgroup.centralizer (A : Set G) with hCdef
-  haveI hCnorm : C.Normal := by
+  have hCnorm : C.Normal := by
     rw [hCdef]
     exact Subgroup.normal_centralizer
   have hAC : A ≤ C := by
@@ -75,14 +76,14 @@ theorem exists_normal_centralizer_eq_self_of_isSupersolvable [Finite G]
   -- `C/A` 内の minimal normal 部分群
   obtain ⟨Mbar, hMmin, hMle⟩ :=
     Ch02.exists_isMinimalNormal_le_of_normal (C.map (QuotientGroup.mk' A)) hne
-  haveI hMnorm : Mbar.Normal := hMmin.1
+  have hMnorm : Mbar.Normal := hMmin.1
   have hprime : (Nat.card ↥Mbar).Prime :=
     Ch03.card_prime_of_isMinimalNormal_of_isSupersolvable (hG.quotient A) hMmin
-  haveI : Fact (Nat.card ↥Mbar).Prime := ⟨hprime⟩
-  haveI hMcyc : IsCyclic ↥Mbar := isCyclic_of_prime_card (p := Nat.card ↥Mbar) rfl
+  have : Fact (Nat.card ↥Mbar).Prime := ⟨hprime⟩
+  have hMcyc : IsCyclic ↥Mbar := isCyclic_of_prime_card (p := Nat.card ↥Mbar) rfl
   -- 引き戻し `B`
   set B : Subgroup G := Mbar.comap (QuotientGroup.mk' A) with hBdef
-  haveI hBnorm : B.Normal := by rw [hBdef]; infer_instance
+  have hBnorm : B.Normal := by rw [hBdef]; infer_instance
   have hAB : A ≤ B := by
     rw [hBdef]
     intro a ha
@@ -104,19 +105,19 @@ theorem exists_normal_centralizer_eq_self_of_isSupersolvable [Finite G]
     simpa using this
   -- `B` は可換
   have hBab : ∀ a ∈ B, ∀ b ∈ B, a * b = b * a := by
-    have hker : ((QuotientGroup.mk' A).restrict B).ker ≤ Subgroup.center ↥B := by
+    have hker : ((QuotientGroup.mk' A).domRestrict B).ker ≤ Subgroup.center ↥B := by
       intro x hx
       rw [MonoidHom.mem_ker] at hx
       have hxA : (x : G) ∈ A := by
-        rwa [MonoidHom.restrict_apply, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hx
+        rwa [MonoidHom.domRestrict_apply, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hx
       rw [Subgroup.mem_center_iff]
       intro y
       refine Subtype.ext ?_
       have hy : (y : G) ∈ C := hBC y.2
       exact ((Subgroup.mem_centralizer_iff.mp (hCdef ▸ hy)) (x : G) hxA).symm
-    have hcod : ∀ b : ↥B, ((QuotientGroup.mk' A).restrict B) b ∈ Mbar := fun b => b.2
+    have hcod : ∀ b : ↥B, ((QuotientGroup.mk' A).domRestrict B) b ∈ Mbar := fun b => b.2
     -- `B ⧸ A` は `M̄` の中に入るので巡回, かつ核 `A` は `Z(B)` に入る
-    set f : ↥B →* ↥Mbar := ((QuotientGroup.mk' A).restrict B).codRestrict Mbar hcod with hfdef
+    set f : ↥B →* ↥Mbar := ((QuotientGroup.mk' A).domRestrict B).codRestrict Mbar hcod with hfdef
     have hfker : f.ker ≤ Subgroup.center ↥B := by
       intro x hx
       refine hker ?_
@@ -150,7 +151,7 @@ theorem nilpotencyClass_mannSubgroup_le_of_isSupersolvable [Finite G]
     (hG : Ch03.IsSupersolvable G) :
     Group.nilpotencyClass ↥(mannSubgroup G) ≤ 3 := by
   obtain ⟨A, hAnorm, hself⟩ := exists_normal_centralizer_eq_self_of_isSupersolvable hG
-  haveI := hAnorm
+  have := hAnorm
   exact nilpotencyClass_mannSubgroup_le_of_centralizer_eq_self hself
 
 /-- **Isaacs Problem 4B.5** (冪零性): `G` 超可解なら `M(G)` は冪零. -/
@@ -158,7 +159,7 @@ theorem isNilpotent_mannSubgroup_of_isSupersolvable [Finite G]
     (hG : Ch03.IsSupersolvable G) :
     Group.IsNilpotent ↥(mannSubgroup G) := by
   obtain ⟨A, hAnorm, hself⟩ := exists_normal_centralizer_eq_self_of_isSupersolvable hG
-  haveI := hAnorm
+  have := hAnorm
   exact isNilpotent_mannSubgroup_of_centralizer_eq_self hself
 
 end

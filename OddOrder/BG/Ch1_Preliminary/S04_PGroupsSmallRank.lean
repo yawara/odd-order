@@ -46,7 +46,7 @@ theorem card_le_prime_cube_of_pRank_le_two_of_exponent_prime
   -- ── Step (i): take `A ∈ SCN(R)`, get self-centralizing `C_R(A) = A` (BG "Take A ∈ SCN(R)").
   obtain ⟨A, hA_normal, hA_comm, hA_max⟩ :=
     OddOrder.Isaacs.Ch06.exists_maximal_normal_isMulCommutative (P := R)
-  haveI : A.Normal := hA_normal
+  have : A.Normal := hA_normal
   have hCent : Subgroup.centralizer (A : Set R) = A :=
     OddOrder.Isaacs.Ch06.centralizer_eq_of_maximal_normal_isMulCommutative hR hA_comm hA_max
   -- ── Step (ii): `exp p` ⇒ `A` elementary abelian; `|A| = p^kA`, `kA ≤ 2`, so `|A| ≤ p²`.
@@ -55,8 +55,8 @@ theorem card_le_prime_cube_of_pRank_le_two_of_exponent_prime
     apply Subtype.ext
     push_cast
     exact hexp (a : R)
-  letI : IsMulCommutative (↥A) := IsMulCommutative.of_comm hA_ea.comm
-  letI := hA_ea.zmodModule
+  let : IsMulCommutative (↥A) := IsMulCommutative.of_comm hA_ea.comm
+  let := hA_ea.zmodModule
   have hlog_le : Nat.log p (Nat.card (↥A)) ≤ 2 := le_trans (le_pRank A hA_ea) hrank
   have hA_pow : Nat.card (↥A) = p ^ (Nat.log p (Nat.card (↥A))) := by
     rw [hA_ea.log_card_eq_finrank]
@@ -225,7 +225,7 @@ theorem nilpotencyClass_le_of_card_le_pow {p : ℕ} [Fact p.Prime]
       Nat.card R' = N → Nat.card R' ≤ p ^ (j + 1) → Group.nilpotencyClass R' ≤ j
   refine (Nat.strongRecOn (motive := motive) (Nat.card G) ?_) j hj hG rfl hcard
   intro N ih j hj R' _ _ hR' hcardN hcardR'
-  haveI : Group.IsNilpotent R' := hR'.isNilpotent
+  have : Group.IsNilpotent R' := hR'.isNilpotent
   rcases subsingleton_or_nontrivial R' with hsub | hnt
   · -- `Subsingleton R'`: class `= 0 ≤ j`.
     exact le_trans (le_of_eq (Group.nilpotencyClass_zero_iff_subsingleton.mpr hsub)) (Nat.zero_le j)
@@ -249,7 +249,7 @@ theorem nilpotencyClass_le_of_card_le_pow {p : ℕ} [Fact p.Prime]
           exact (Nat.pow_le_pow_iff_right hp.one_lt).mp hpm
         interval_cases m
         · -- `|R'| = p`: cyclic, hence commutative.
-          haveI : IsCyclic R' := isCyclic_of_prime_card (p := p) (by rw [hm, pow_one])
+          have : IsCyclic R' := isCyclic_of_prime_card (p := p) (by rw [hm, pow_one])
           obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := R')
           intro a b
           obtain ⟨i, rfl⟩ := hg a
@@ -361,7 +361,7 @@ theorem omega1_pow_eq_one_of_pRank_le_two_of_three_lt
       { carrier := {g : R | g ^ p = 1}
         mul_mem' := fun {x y} hx hy => hclosed x y hx hy
         one_mem' := one_pow p
-        inv_mem' := fun {x} hx => by rw [Set.mem_setOf_eq, inv_pow, hx, inv_one] }
+        inv_mem' := fun {x} hx => by rw [Set.mem_ofPred_eq, inv_pow, hx, inv_one] }
     have hle : Omega R p 1 ≤ omega1 := by
       rw [Omega, Subgroup.closure_le]
       intro x hx
@@ -390,7 +390,7 @@ theorem omega1_pow_eq_one_of_pRank_le_two_of_three_lt
     · -- `⟨x⟩ ≠ ⊤`: take a maximal (normal) subgroup `S ⊇ ⟨x⟩`.
       obtain ⟨S, hS_coatom, hxS_le⟩ :=
         (IsCoatomic.eq_top_or_exists_le_coatom (Subgroup.zpowers x)).resolve_left hxtop
-      haveI hS_normal : S.Normal := hS_coatom.normal_of_isPGroup hR'
+      have hS_normal : S.Normal := hS_coatom.normal_of_isPGroup hR'
       have hxS : x ∈ S := hxS_le (Subgroup.mem_zpowers x)
       -- `|↥S| < |R'| = n`.
       have hScard : Nat.card ↥S < n := by
@@ -400,7 +400,7 @@ theorem omega1_pow_eq_one_of_pRank_le_two_of_three_lt
         have h_ne : Nat.card ↥S ≠ Nat.card R' := fun heq =>
           hS_coatom.1 (Subgroup.eq_top_of_card_eq _ heq)
         exact Nat.lt_of_le_of_ne h_le h_ne
-      haveI hSpg : IsPGroup p ↥S := hR'.to_subgroup S
+      have hSpg : IsPGroup p ↥S := hR'.to_subgroup S
       have hrankS : OddOrder.GroupTheory.pRank ↥S p ≤ 2 :=
         (OddOrder.GroupTheory.pRank_mono_of_le S).trans hrank'
       -- Inductive hypothesis: product-closure on `↥S`.
@@ -412,7 +412,7 @@ theorem omega1_pow_eq_one_of_pRank_le_two_of_three_lt
           { carrier := {a : ↥S | a ^ p = 1}
             mul_mem' := fun {a b} ha hb => IHS a b ha hb
             one_mem' := one_pow p
-            inv_mem' := fun {a} ha => by rw [Set.mem_setOf_eq, inv_pow, ha, inv_one] }
+            inv_mem' := fun {a} ha => by rw [Set.mem_ofPred_eq, inv_pow, ha, inv_one] }
         have hΩle : Omega ↥S p 1 ≤ omega1S := by
           rw [Omega, Subgroup.closure_le]
           intro a ha
@@ -421,9 +421,9 @@ theorem omega1_pow_eq_one_of_pRank_le_two_of_three_lt
         intro a ha
         simpa [omega1S] using hΩle ha
       -- `Ω₁(↥S)` (as an `R'`-subgroup) is normal in `R'` and has exponent `p`.
-      haveI : (Omega ↥S p 1).Characteristic := Omega.characteristic
+      have : (Omega ↥S p 1).Characteristic := Omega.characteristic
       set H : Subgroup R' := (Omega ↥S p 1).map S.subtype with hH_def
-      haveI hH_normal : H.Normal := by rw [hH_def]; infer_instance
+      have hH_normal : H.Normal := by rw [hH_def]; infer_instance
       have hHpow : ∀ z ∈ H, z ^ p = 1 := by
         intro z hz
         rw [hH_def, Subgroup.mem_map] at hz
@@ -436,7 +436,7 @@ theorem omega1_pow_eq_one_of_pRank_le_two_of_three_lt
         refine ⟨⟨x, hxS⟩, ?_, by rw [Subgroup.coe_subtype]⟩
         exact Omega.mem_of_pow_eq_one (by rw [pow_one]; exact Subtype.ext (by simpa using hxp))
       -- **Step 5**: `|Ω₁(↥S)| ≤ p³` by part (a).
-      haveI hSomega_pg : IsPGroup p ↥(Omega ↥S p 1) := hSpg.to_subgroup _
+      have hSomega_pg : IsPGroup p ↥(Omega ↥S p 1) := hSpg.to_subgroup _
       have hSomega_rank : OddOrder.GroupTheory.pRank ↥(Omega ↥S p 1) p ≤ 2 :=
         (OddOrder.GroupTheory.pRank_mono_of_le (Omega ↥S p 1)).trans hrankS
       have hSomega_exp : ∀ w : ↥(Omega ↥S p 1), w ^ p = 1 := by
@@ -482,7 +482,7 @@ theorem omega1_pow_eq_one_of_pRank_le_two_of_three_lt
           _ ≤ p ^ 3 * p := Nat.mul_le_mul hHcard hYcard
           _ = p ^ 4 := by ring
       -- **Step 7**: `cl(R') ≤ 3`.
-      haveI : Group.IsNilpotent R' := hR'.isNilpotent
+      have : Group.IsNilpotent R' := hR'.isNilpotent
       have hclass : Group.nilpotencyClass R' ≤ 3 :=
         nilpotencyClass_le_of_card_le_pow hR' (j := 3) (by norm_num) (by simpa using hR'card)
       -- **Step 8**: weight-`3` commutators central; apply `omega1_pow_eq_one`.
@@ -504,7 +504,7 @@ theorem omega1_pow_eq_one_of_pRank_le_two_of_three_lt
       have h_ne : Nat.card ↥K ≠ Nat.card R' := fun heq =>
         hxytop (Subgroup.eq_top_of_card_eq _ heq)
       exact Nat.lt_of_le_of_ne h_le h_ne
-    haveI hKpg : IsPGroup p ↥K := hR'.to_subgroup K
+    have hKpg : IsPGroup p ↥K := hR'.to_subgroup K
     have hrankK : OddOrder.GroupTheory.pRank ↥K p ≤ 2 :=
       (OddOrder.GroupTheory.pRank_mono_of_le K).trans hrank'
     have IHK : ∀ a b : ↥K, a ^ p = 1 → b ^ p = 1 → (a * b) ^ p = 1 :=
@@ -525,8 +525,8 @@ private theorem index_eq_prime_of_coatom {Q : Type*} [Group Q] [Finite Q] {p : �
     [Fact p.Prime] (hQpg : IsPGroup p Q) (M : Subgroup Q) [M.Normal] (hM_coatom : IsCoatom M) :
     M.index = p := by
   have hp : p.Prime := Fact.out
-  haveI hQMpg : IsPGroup p (Q ⧸ M) := hQpg.to_quotient M
-  haveI hQMnt : Nontrivial (Q ⧸ M) := QuotientGroup.nontrivial_iff.mpr hM_coatom.1
+  have hQMpg : IsPGroup p (Q ⧸ M) := hQpg.to_quotient M
+  have hQMnt : Nontrivial (Q ⧸ M) := QuotientGroup.nontrivial_iff.mpr hM_coatom.1
   have hpdvd : p ∣ Nat.card (Q ⧸ M) := by
     rcases hQMpg.card_eq_or_dvd with h1 | hd
     · exact absurd (Finite.card_le_one_iff_subsingleton.mp h1.le)
@@ -604,17 +604,17 @@ theorem card_omega1_quotient_le_prime_sq {R : Type*} [Group R] [Finite R] {p : �
   obtain ⟨T₀sub, hT₀mem, hT₀minraw⟩ :=
     Set.exists_min_image {S | Qpred S} (fun S => Nat.card S.1) (Set.toFinite _) hQne
   set T₀ : Subgroup R' := T₀sub.1 with hT₀def
-  haveI hT₀N : T₀.Normal := T₀sub.2
+  have hT₀N : T₀.Normal := T₀sub.2
   have hT₀bad : p ^ 2 < Nat.card (Omega (R' ⧸ T₀) p 1) := hT₀mem
   have hT₀min : ∀ (S : Subgroup R') [S.Normal],
       p ^ 2 < Nat.card (Omega (R' ⧸ S) p 1) → Nat.card T₀ ≤ Nat.card S := by
     intro S hSN hSbad; exact hT₀minraw ⟨S, hSN⟩ hSbad
   have hQpg : IsPGroup p (R' ⧸ T₀) := hR'.to_quotient T₀
   -- `R'/T₀` is nontrivial since `|Ω₁(R'/T₀)| > p² > 1`.
-  haveI hQnt : Nontrivial (R' ⧸ T₀) := by
+  have hQnt : Nontrivial (R' ⧸ T₀) := by
     rcases subsingleton_or_nontrivial (R' ⧸ T₀) with hs | hn
     · exfalso
-      haveI := hs
+      have := hs
       have h1 : Nat.card (Omega (R' ⧸ T₀) p 1) ≤ Nat.card (R' ⧸ T₀) :=
         Subgroup.card_le_card_group _
       have h2 : Nat.card (R' ⧸ T₀) = 1 :=
@@ -637,7 +637,7 @@ theorem card_omega1_quotient_le_prime_sq {R : Type*} [Group R] [Finite R] {p : �
       intro hMtop'
       exact hKtop (by rw [← hMmap, hMtop',
         Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective T₀)])
-    haveI hMpg : IsPGroup p ↥M := hR'.to_subgroup M
+    have hMpg : IsPGroup p ↥M := hR'.to_subgroup M
     have hMcard_lt : Nat.card ↥M < n := by
       rw [← hcard]
       have hdvd : Nat.card ↥M ∣ Nat.card R' := ⟨M.index, by rw [mul_comm, M.index_mul_card]⟩
@@ -671,7 +671,7 @@ theorem card_omega1_quotient_le_prime_sq {R : Type*} [Group R] [Finite R] {p : �
       rw [Omega, Omega, MonoidHom.map_closure]
       congr 1
       ext b
-      simp only [Set.mem_image, Set.mem_setOf_eq, MulEquiv.coe_toMonoidHom]
+      simp only [Set.mem_image, Set.mem_ofPred_eq, MulEquiv.coe_toMonoidHom]
       constructor
       · rintro ⟨a, ha, rfl⟩; rw [← map_pow, ha, map_one]
       · intro hb
@@ -688,7 +688,7 @@ theorem card_omega1_quotient_le_prime_sq {R : Type*} [Group R] [Finite R] {p : �
   -- Step 1: `|T₀| = p`.
   -- ============================================================
   have hT₀card : Nat.card T₀ = p := by
-    haveI hT₀pg : IsPGroup p T₀ := hR'.to_subgroup T₀
+    have hT₀pg : IsPGroup p T₀ := hR'.to_subgroup T₀
     -- `T₀` is nontrivial: if `T₀ = ⊥`, then `R'/⊥ ≃* R'` and `|Ω₁(R'/T₀)| = |Ω₁(R')| ≤ p²`,
     -- contradicting `|Ω₁(R'/T₀)| > p²`.
     have hT₀nt : Nontrivial T₀ := by
@@ -702,7 +702,7 @@ theorem card_omega1_quotient_le_prime_sq {R : Type*} [Group R] [Finite R] {p : �
           (QuotientGroup.quotientMulEquivOfEq hbot).trans (QuotientGroup.quotientBot (G := R'))
         have hmap : (Omega (R' ⧸ T₀) p 1).map e.toMonoidHom = Omega R' p 1 := by
           rw [Omega, Omega, MonoidHom.map_closure]; congr 1; ext b
-          simp only [Set.mem_image, Set.mem_setOf_eq, MulEquiv.coe_toMonoidHom]
+          simp only [Set.mem_image, Set.mem_ofPred_eq, MulEquiv.coe_toMonoidHom]
           constructor
           · rintro ⟨a, ha, rfl⟩; rw [← map_pow, ha, map_one]
           · intro hb; refine ⟨e.symm b, ?_, e.apply_symm_apply b⟩
@@ -731,7 +731,7 @@ theorem card_omega1_quotient_le_prime_sq {R : Type*} [Group R] [Finite R] {p : �
     set Z : Subgroup R' := Subgroup.zpowers z with hZ_def
     have hZ_le_center : Z ≤ Subgroup.center R' := by
       rw [hZ_def, Subgroup.zpowers_le]; exact g.2.2
-    haveI hZ_normal : Z.Normal := by
+    have hZ_normal : Z.Normal := by
       constructor; intro nn hnn g'
       have := Subgroup.mem_center_iff.mp (hZ_le_center hnn) g'
       rw [this, mul_assoc, mul_inv_cancel, mul_one]; exact hnn
@@ -755,8 +755,8 @@ theorem card_omega1_quotient_le_prime_sq {R : Type*} [Group R] [Finite R] {p : �
       calc Z.index = Nat.card R' / Nat.card Z := by
               rw [← hmul, Nat.mul_div_cancel_left _ Nat.card_pos]
         _ < Nat.card R' := Nat.div_lt_self Nat.card_pos hZpos
-    haveI hRZpg : IsPGroup p (R' ⧸ Z) := hR'.to_quotient Z
-    haveI hT₀map_normal : (T₀.map (QuotientGroup.mk' Z)).Normal :=
+    have hRZpg : IsPGroup p (R' ⧸ Z) := hR'.to_quotient Z
+    have hT₀map_normal : (T₀.map (QuotientGroup.mk' Z)).Normal :=
       Subgroup.Normal.map (inferInstance : T₀.Normal) (QuotientGroup.mk' Z)
         (QuotientGroup.mk'_surjective Z)
     -- Induction on `R'/Z` with `T₀/Z = T₀.map (mk' Z)`.
@@ -766,7 +766,7 @@ theorem card_omega1_quotient_le_prime_sq {R : Type*} [Group R] [Finite R] {p : �
     have hmap : (Omega ((R' ⧸ Z) ⧸ (T₀.map (QuotientGroup.mk' Z))) p 1).map e.toMonoidHom
         = Omega (R' ⧸ T₀) p 1 := by
       rw [Omega, Omega, MonoidHom.map_closure]; congr 1; ext b
-      simp only [Set.mem_image, Set.mem_setOf_eq, MulEquiv.coe_toMonoidHom]
+      simp only [Set.mem_image, Set.mem_ofPred_eq, MulEquiv.coe_toMonoidHom]
       constructor
       · rintro ⟨a, ha, rfl⟩; rw [← map_pow, ha, map_one]
       · intro hb; refine ⟨e.symm b, ?_, e.apply_symm_apply b⟩
@@ -869,7 +869,7 @@ theorem card_omega1_quotient_le_prime_sq {R : Type*} [Group R] [Finite R] {p : �
           (IsCoatomic.eq_top_or_exists_le_coatom (⊥ : Subgroup (R' ⧸ T₀))).resolve_left
             (fun hbot => (bot_lt_top (α := Subgroup (R' ⧸ T₀))).ne hbot)
         have hMtop : M ≠ ⊤ := hM_coatom.1
-        haveI : M.Normal := hM_coatom.normal_of_isPGroup hQpg
+        have : M.Normal := hM_coatom.normal_of_isPGroup hQpg
         have hMexp_card : Nat.card M ≤ p ^ 2 :=
           (hexp_card_le M M (le_refl M) (fun k _ => hexp k)).trans (factF M hMtop)
         have hindex : M.index = p := index_eq_prime_of_coatom hQpg M hM_coatom
@@ -891,14 +891,14 @@ theorem card_omega1_quotient_le_prime_sq {R : Type*} [Group R] [Finite R] {p : �
     -- `R'/T₀` is noncyclic (`|Ω₁(R'/T₀)| > p² > p`), hence `R'` is noncyclic.
     have hQnc : ¬ IsCyclic (R' ⧸ T₀) := by
       intro hcyc
-      haveI := hcyc
+      have := hcyc
       have := card_omega1_eq_prime_of_isCyclic hQpg
       rw [this] at hT₀bad
       nlinarith [hp.two_le]
     have hRnc : ¬ IsCyclic R' := by
       intro hcyc
-      haveI := hcyc
-      haveI : IsCyclic (R' ⧸ T₀) :=
+      have := hcyc
+      have : IsCyclic (R' ⧸ T₀) :=
         isCyclic_of_surjective (QuotientGroup.mk' T₀) (QuotientGroup.mk'_surjective T₀)
       exact hQnc inferInstance
     -- Lemma 4.5(a): `R'` has an elementary abelian subgroup `E` of order `p²`; `E ≤ Ω₁(R')`.
@@ -922,14 +922,14 @@ theorem card_omega1_quotient_le_prime_sq {R : Type*} [Group R] [Finite R] {p : �
   -- Step 4: `φ(x) = xᵖ` is a homomorphism `R' →* R'`, image `≤ T₀`.
   -- ============================================================
   -- cl(R') ≤ 3
-  haveI : Group.IsNilpotent R' := hR'.isNilpotent
+  have : Group.IsNilpotent R' := hR'.isNilpotent
   have hclass : Group.nilpotencyClass R' ≤ 3 :=
     nilpotencyClass_le_of_card_le_pow hR' (j := 3) (by norm_num) (by simpa using hR'card.le)
   have hc3 : ∀ a b c : R', ⁅⁅a, b⁆, c⁆ ∈ Subgroup.center R' :=
     pointwise_central_of_nilpotencyClass_le_three hclass
   -- `commutator R' ≤ Ω₁(R')` from `R'/Ω₁(R')` abelian (order p²).
   have hcomm_le : _root_.commutator R' ≤ Omega R' p 1 := by
-    haveI : IsMulCommutative (R' ⧸ Omega R' p 1) :=
+    have : IsMulCommutative (R' ⧸ Omega R' p 1) :=
       IsPGroup.isMulCommutative_of_card_eq_prime_sq hRΩcard
     exact (Subgroup.Normal.quotient_commutative_iff_commutator_le).mp ‹_›
   have hpow_hom : ∀ x y : R', (x * y) ^ p = x ^ p * y ^ p := fun x y =>
@@ -949,10 +949,10 @@ theorem card_omega1_quotient_le_prime_sq {R : Type*} [Group R] [Finite R] {p : �
     let om : Subgroup R' :=
       { carrier := {g : R' | g ^ p = 1}
         mul_mem' := fun {x y} hx hy => by
-          rw [Set.mem_setOf_eq] at hx hy ⊢; rw [hpow_hom, hx, hy, mul_one]
+          rw [Set.mem_ofPred_eq] at hx hy ⊢; rw [hpow_hom, hx, hy, mul_one]
         one_mem' := one_pow p
         inv_mem' := fun {x} hx => by
-          rw [Set.mem_setOf_eq, inv_pow, (by exact hx : x ^ p = 1), inv_one] }
+          rw [Set.mem_ofPred_eq, inv_pow, (by exact hx : x ^ p = 1), inv_one] }
     have hker_eq : φ.ker = om := by
       ext x; simp only [MonoidHom.mem_ker, MonoidHom.mk'_apply, φ]; rfl
     rw [hker_eq]
@@ -1056,8 +1056,8 @@ theorem isPGroup_commutator_of_mulAut_odd_of_pRank_le_two
     norm_num at hp_odd
   -- R trivial: A embeds in the trivial `MulAut R`, so `A` and `A'` are trivial.
   rcases subsingleton_or_nontrivial R with hsub | hnontriv
-  · haveI : Subsingleton (MulAut R) := ⟨fun f g => by ext r; exact Subsingleton.elim _ _⟩
-    haveI : Subsingleton A := ⟨fun a b => hφ (Subsingleton.elim _ _)⟩
+  · have : Subsingleton (MulAut R) := ⟨fun f g => by ext r; exact Subsingleton.elim _ _⟩
+    have : Subsingleton A := ⟨fun a b => hφ (Subsingleton.elim _ _)⟩
     intro g
     exact ⟨0, by
       rw [pow_zero, pow_one]
@@ -1065,7 +1065,7 @@ theorem isPGroup_commutator_of_mulAut_odd_of_pRank_le_two
   -- Theorem 1.13: critical characteristic `H` with `exp H = p`, `C_{Aut R}(H)` a `p`-group.
   obtain ⟨H, hHchar, hHcommtop, hHcommcenter, hHexp, hHaut⟩ :=
     OddOrder.BG.Ch1.S01.thompson_critical_omega (p := p) hp2 hR
-  haveI : H.Characteristic := hHchar
+  have : H.Characteristic := hHchar
   have hH_inv : IsAInvariant φ H := IsAInvariant.of_characteristic φ
   set ψH : A →* MulAut ↥H := OddOrder.BG.Ch1.S01.restrictAction hH_inv with hψH_def
   have hH_pg : IsPGroup p ↥H := hR.to_subgroup H
@@ -1079,7 +1079,7 @@ theorem isPGroup_commutator_of_mulAut_odd_of_pRank_le_two
   have hkerH_pg : IsPGroup p ψH.ker :=
     (hHaut.comap_of_injective φ hφ).to_le hkerH_le
   -- `V = H/Φ(H)` with the induced `A`-action; `C = C_A(V)`.
-  haveI : (_root_.frattini ↥H).Normal := inferInstance
+  have : (_root_.frattini ↥H).Normal := inferInstance
   have hΦ_inv : IsAInvariant ψH (_root_.frattini ↥H) := IsAInvariant.of_characteristic ψH
   set ψV : A →* MulAut (↥H ⧸ _root_.frattini ↥H) :=
     quotientMulAutHom hΦ_inv with hψV_def
@@ -1139,7 +1139,7 @@ theorem isPGroup_commutator_of_mulAut_odd_of_pRank_le_two
     le_trans (pRank_le_of_injective (f := H.subtype) H.subtype_injective) hrank
   have hHcard : Nat.card ↥H ≤ p ^ 3 :=
     card_le_prime_cube_of_pRank_le_two_of_exponent_prime hH_pg hHrank hHexp'
-  haveI hH_nontriv : Nontrivial ↥H := by
+  have hH_nontriv : Nontrivial ↥H := by
     rcases subsingleton_or_nontrivial ↥H with h | h
     · exfalso
       have h1 : Monoid.exponent ↥H = 1 := Monoid.exp_eq_one_of_subsingleton
@@ -1172,10 +1172,10 @@ theorem isPGroup_commutator_of_mulAut_odd_of_pRank_le_two
   -- Case split on `d = m(V)`.
   interval_cases d
   -- (iii) `|V| = p`: `Aut V` is abelian, so `A' ≤ C`.
-  · haveI hVcyc : IsCyclic (↥H ⧸ _root_.frattini ↥H) :=
+  · have hVcyc : IsCyclic (↥H ⧸ _root_.frattini ↥H) :=
       isCyclic_of_prime_card (by simpa using hd)
     let e := IsCyclic.mulAutMulEquiv (↥H ⧸ _root_.frattini ↥H)
-    letI : CommGroup (MulAut (↥H ⧸ _root_.frattini ↥H)) :=
+    let : CommGroup (MulAut (↥H ⧸ _root_.frattini ↥H)) :=
       e.toMonoidHom.commGroupOfInjective e.injective
     have hA'_le : _root_.commutator A ≤ C := by
       rw [_root_.commutator, Subgroup.commutator_le]

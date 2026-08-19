@@ -81,7 +81,7 @@ theorem card_isPRegular_modEq_centralizer [Finite G] (hp : p.Prime) {P : Subgrou
     (hP : IsPGroup p ↥P) :
     Nat.card (PRegularCarrier p G)
       ≡ Nat.card {g : G // IsPRegular p g ∧ g ∈ Subgroup.centralizer (P : Set G)} [MOD p] := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hcard : Nat.card (fixedPoints ↥P (PRegularCarrier p G))
       = Nat.card {g : G // IsPRegular p g ∧ g ∈ Subgroup.centralizer (P : Set G)} :=
     Nat.card_congr
@@ -130,7 +130,7 @@ theorem card_filter_isPRegular [Fintype G] :
 /-- **`p ∤ |G⁰|`**: the number of `p`-regular elements of a finite group is prime to `p`. -/
 theorem not_dvd_card_isPRegular [Finite G] (hp : p.Prime) :
     ¬ p ∣ Nat.card (PRegularCarrier p G) := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨P⟩ : Nonempty (Sylow p G) := inferInstance
   set C : Subgroup G := Subgroup.centralizer ((P : Subgroup G) : Set G) with hC
   -- conjugation by an element of `C` is the identity on `P`

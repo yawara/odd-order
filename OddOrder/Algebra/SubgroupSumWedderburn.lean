@@ -75,7 +75,7 @@ theorem sum_sq_centralScalar_subgroupSum {N : Subgroup G} (hN : N.Normal) :
     ∑ i, (Fintype.card (m i) : K) ^ 2
         * centralScalar e.toAlgHom.toRingHom i (subgroupSum K N)
       = ((Nat.card G : ℕ) : K) := by
-  letI := Fintype.ofFinite G
+  let := Fintype.ofFinite G
   have hgrp : LinearMap.trace K (MonoidAlgebra K G)
       (LinearMap.mulLeft K (subgroupSum K N)) = ((Nat.card G : ℕ) : K) := by
     rw [OddOrder.Algebra.trace_mulLeft_monoidAlgebra, coeff_subgroupSum_one, mul_one,

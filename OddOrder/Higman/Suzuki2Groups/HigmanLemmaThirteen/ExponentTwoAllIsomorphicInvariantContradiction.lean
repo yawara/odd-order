@@ -107,9 +107,9 @@ theorem false_of_threeTermGraph_canonicalPreimage_primitive_eigen_seed
         (elabSubmoduleSubgroupEquiv 2).symm
           (T.map (QuotientGroup.mk' (frattini P))) →
       False := by
-  letI : CommGroup (P ⧸ frattini P) :=
+  let : CommGroup (P ⧸ frattini P) :=
     frattiniQuotientCommGroup P hP
-  letI : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
+  let : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
     frattiniQuotientZModTwoModule P hP
   intro hUmap hTrange
   have hcomm : ∀ u ∈ U, ∀ t ∈ T, Commute u t :=

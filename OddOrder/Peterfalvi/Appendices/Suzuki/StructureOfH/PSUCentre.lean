@@ -65,7 +65,7 @@ theorem CentralizerPSUData.odd_natCard_center_residual (hXV : X ≤ hyp.V)
       ↥(Subgroup.center ↥(Subgroup.primeComplementResidual 2
         (Subgroup.centralizer (X : Set G)))) := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   set C : Subgroup G := Subgroup.centralizer (X : Set G) with hC
   set CQ : Subgroup ↥C := hyp.Q.subgroupOf C with hCQ
   set F : Subgroup ↥C := Subgroup.primeComplementResidual 2 C with hF
@@ -117,7 +117,7 @@ theorem CentralizerPSUData.exists_mem_residual_commute_Q0 (hXV : X ≤ hyp.V)
       ∀ y ∈ hyp.Q0, y ∈ Subgroup.centralizer (X : Set G) →
         Commute ((x : ↥(Subgroup.centralizer (X : Set G))) : G) y := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   set C : Subgroup G := Subgroup.centralizer (X : Set G) with hCdef
   set CQ : Subgroup ↥C := hyp.Q.subgroupOf C with hCQdef
   set F : Subgroup ↥C := Subgroup.primeComplementResidual 2 C with hFdef

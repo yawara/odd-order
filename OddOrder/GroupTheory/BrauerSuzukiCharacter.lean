@@ -557,7 +557,7 @@ theorem thetaStar_apply_one [Fintype G] [Fintype ↥Q.N]
 theorem thetaStar_inner_trivial [Fintype G] [Fintype ↥Q.N] [Invertible (Nat.card G : ℂ)]
     [Invertible (Nat.card ↥Q.N : ℂ)] [Invertible (Nat.card ↥(Q.C.subgroupOf Q.N) : ℂ)] :
     ClassFunction.inner Q.thetaStar (trivialClassFunction G) = 1 := by
-  haveI : Fintype ↥(Q.C.subgroupOf Q.N) := Fintype.ofFinite _
+  have : Fintype ↥(Q.C.subgroupOf Q.N) := Fintype.ofFinite _
   rw [thetaStar, ClassFunction.induce_inner_trivial, theta, ClassFunction.inner_sub_left]
   -- (Ind 1_C, 1_N) = 1, (Ind ψ, 1_N) = 0
   have hT : ClassFunction.inner
@@ -576,7 +576,7 @@ theorem thetaStar_inner_trivial [Fintype G] [Fintype ↥Q.N] [Invertible (Nat.ca
 theorem theta_mem_ZIrr [Fintype ↥Q.N] [Invertible (Nat.card ↥Q.N : ℂ)]
     [Invertible (Nat.card ↥(Q.C.subgroupOf Q.N) : ℂ)] :
     Q.theta ∈ ZIrr ↥Q.N := by
-  haveI : Fintype ↥(Q.C.subgroupOf Q.N) := Fintype.ofFinite _
+  have : Fintype ↥(Q.C.subgroupOf Q.N) := Fintype.ofFinite _
   rw [theta]
   exact sub_mem (ClassFunction.induce_mem_ZIrr _ trivialClassFunction_isIrreducible.mem_ZIrr)
     (ClassFunction.induce_mem_ZIrr _ Q.psiN_isIrr.mem_ZIrr)
@@ -588,6 +588,7 @@ theorem thetaStar_mem_ZIrr [Fintype G] [Fintype ↥Q.N] [Invertible (Nat.card G 
   rw [thetaStar]
   exact ClassFunction.induce_mem_ZIrr _ Q.theta_mem_ZIrr
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Gorenstein Lemma 1.5 (decomposition)**: `θ* = 1_G + χ₁ − χ` for two distinct
 non-principal irreducible characters `χ₁, χ` with `χ(1) = χ₁(1) + 1`.
 

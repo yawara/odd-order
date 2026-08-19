@@ -131,7 +131,7 @@ theorem conj_mem_of_commutator_le {G : Type*} [Group G] {H : Subgroup G}
   exact Subgroup.mul_mem _ hc hy
 
 /-- 3F.2 の帰納本体 (`|K|` に関する強帰納)。 -/
-private theorem isCyclicExtensionTower_aux {G : Type*} [Group G] [Finite G] [IsSolvable G] :
+private theorem isCyclicExtensionTower_aux {G : Type*} [Group G] [Finite G] [Group.IsSolvable G] :
     ∀ (n : ℕ) (K : Subgroup G), Nat.card ↥K ≤ n → IsCyclicExtensionTower K := by
   intro n
   induction n with
@@ -143,11 +143,11 @@ private theorem isCyclicExtensionTower_aux {G : Type*} [Group G] [Finite G] [IsS
     intro K hK
     rcases eq_or_ne K ⊥ with rfl | hKne
     · exact .bot
-    haveI : Nontrivial ↥K := (Subgroup.nontrivial_iff_ne_bot K).mpr hKne
+    have : Nontrivial ↥K := (Subgroup.nontrivial_iff_ne_bot K).mpr hKne
     -- `↥K` の極大部分群 `M ⊇ commutator ↥K`
     obtain ⟨M, hMcoatom, hMle⟩ :=
       (eq_top_or_exists_le_coatom (α := Subgroup ↥K) (_root_.commutator ↥K)).resolve_left
-        (IsSolvable.commutator_lt_top_of_nontrivial (G := ↥K)).ne
+        (Group.IsSolvable.commutator_lt_top_of_nontrivial (G := ↥K)).ne
     obtain ⟨ĝ, hĝ⟩ : ∃ x : ↥K, x ∉ M := by
       by_contra h
       push Not at h
@@ -182,10 +182,10 @@ private theorem isCyclicExtensionTower_aux {G : Type*} [Group G] [Finite G] [IsS
 **Thm 3.36 (巡回拡大)** を繰り返し適用することで構成できる。
 
 `|K|` に関する強帰納。`K ≠ ⊥` なら `↥K` は非自明可解ゆえ `commutator ↥K < ⊤`
-(`IsSolvable.commutator_lt_top_of_nontrivial`) で, それを含む極大部分群 `M` が取れる。
+(`Group.IsSolvable.commutator_lt_top_of_nontrivial`) で, それを含む極大部分群 `M` が取れる。
 `M` は交換子群を含むので `↥K` で正規, 極大性から `ĝ ∉ M` について `M ⊔ ⟨ĝ⟩ = ⊤`。
 `M` を `G` の部分群 `N` に戻せば `|N| < |K|` で帰納法の仮説が使える。 -/
-theorem isCyclicExtensionTower_top (G : Type*) [Group G] [Finite G] [IsSolvable G] :
+theorem isCyclicExtensionTower_top (G : Type*) [Group G] [Finite G] [Group.IsSolvable G] :
     IsCyclicExtensionTower (⊤ : Subgroup G) :=
   isCyclicExtensionTower_aux _ ⊤ le_rfl
 

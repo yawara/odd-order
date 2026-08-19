@@ -23,14 +23,15 @@ variable {G : Type*} [Group G]
 
 
 /-! **Isaacs Lemma 3.18** の役割は本実装では subgroup / quotient 閉包 instance が果たす
-(別 issue で追加予定). 現状は `isPiSeparable_of_solvable` で十分. -/
+(別 issue で追加予定). 現状は `isPiSeparable_of_isSolvable` で十分. -/
 
 /-- **Isaacs Cor 3.19**: `G` 有限 solvable ⇒ 全 π について π-separable. instance 形.
 
 戦略: `Nat.card G ≤ Nat.card (Fₙ) + k` の `k` についての強誘導. 各ステップで
 `Fₙ < ⊤` なら `G/Fₙ` 非自明可解で `exists_oPiCore_ne_bot_or_oPi'Core_ne_bot` 適用,
 `Fₙ < F_{n+1}` ⇒ `|Fₙ| < |F_{n+1}|` で measure 単調減少. -/
-instance isPiSeparable_of_solvable (π : Set ℕ) (G : Type*) [Group G] [Finite G] [IsSolvable G] :
+instance isPiSeparable_of_isSolvable (π : Set ℕ) (G : Type*) [Group G] [Finite G]
+    [Group.IsSolvable G] :
     IsPiSeparable π G where
   exists_top := by
     classical
@@ -53,10 +54,10 @@ instance isPiSeparable_of_solvable (π : Set ℕ) (G : Type*) [Group G] [Finite 
       by_cases h_top : piFittingSeries π G n = ⊤
       · exact ⟨n, h_top⟩
       · have hFn_lt_top : piFittingSeries π G n < ⊤ := lt_of_le_of_ne le_top h_top
-        haveI : Nontrivial (G ⧸ piFittingSeries π G n) := by
+        have : Nontrivial (G ⧸ piFittingSeries π G n) := by
           rw [QuotientGroup.nontrivial_iff]
           exact ne_of_lt hFn_lt_top
-        haveI : IsSolvable (G ⧸ piFittingSeries π G n) := inferInstance
+        have : Group.IsSolvable (G ⧸ piFittingSeries π G n) := inferInstance
         have hOplus : oPiCore π (G ⧸ piFittingSeries π G n) ⊔
             oPiCore {p | p ∉ π} (G ⧸ piFittingSeries π G n) ≠ ⊥ := by
           rcases exists_oPiCore_ne_bot_or_oPi'Core_ne_bot (G := G ⧸ piFittingSeries π G n) π with
@@ -80,16 +81,16 @@ private theorem minimal_normal_isPiGroup_or_isPiGroup_compl_of_isPiSeparable
     {G : Type*} [Group G] [Finite G] (π : Set ℕ) [IsPiSeparable π G]
     {M : Subgroup G} (hM : OddOrder.Isaacs.Ch02.IsMinimalNormal M) :
     Subgroup.IsPiGroup π M ∨ Subgroup.IsPiGroup {p | p ∉ π} M := by
-  haveI hM_normal : M.Normal := hM.1
-  haveI hM_nontrivial : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM.2.1
-  haveI hM_piSep : IsPiSeparable π ↥M := normalSubgroup_isPiSeparable π G M
+  have hM_normal : M.Normal := hM.1
+  have hM_nontrivial : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM.2.1
+  have hM_piSep : IsPiSeparable π ↥M := normalSubgroup_isPiSeparable π G M
   let liftCore (ρ : Set ℕ) (hcore : oPiCore ρ ↥M ≠ ⊥) :
       Subgroup.IsPiGroup ρ M := by
     have hmap_ne_bot : (oPiCore ρ ↥M).map M.subtype ≠ ⊥ := by
       intro hmap
       exact hcore ((Subgroup.map_eq_bot_iff_of_injective
         (H := oPiCore ρ ↥M) M.subtype_injective).mp hmap)
-    haveI hmap_normal : ((oPiCore ρ ↥M).map M.subtype).Normal := inferInstance
+    have hmap_normal : ((oPiCore ρ ↥M).map M.subtype).Normal := inferInstance
     have hmap_le_M : (oPiCore ρ ↥M).map M.subtype ≤ M := by
       simpa [M.range_subtype] using (oPiCore ρ ↥M).map_le_range M.subtype
     have hmap_eq_M : (oPiCore ρ ↥M).map M.subtype = M := by
@@ -126,14 +127,14 @@ private theorem hall_exists_of_piSeparable_aux (π : Set ℕ) : ∀ n : ℕ,
     · exact ih G hPiSep hsmall
     by_cases hG_one : Nat.card G = 1
     · exact ⟨⊥, IsHallSubgroup.bot_of_card_eq_one π hG_one⟩
-    haveI hG_nontrivial : Nontrivial G :=
+    have hG_nontrivial : Nontrivial G :=
       Finite.one_lt_card_iff_nontrivial.mp
         (Nat.one_lt_iff_ne_zero_and_ne_one.mpr ⟨Nat.card_pos.ne', hG_one⟩)
     obtain ⟨M, hM, _⟩ :=
       OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) top_ne_bot
-    haveI hMnormal : M.Normal := hM.1
+    have hMnormal : M.Normal := hM.1
     have hM_ne_bot : M ≠ ⊥ := hM.2.1
-    haveI hM_nontrivial : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
+    have hM_nontrivial : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
     have hM_card_ge_two : 2 ≤ Nat.card ↥M := Finite.one_lt_card
     have hquot_card : Nat.card (G ⧸ M) ≤ n := by
       have key : Nat.card G = Nat.card (G ⧸ M) * Nat.card ↥M :=
@@ -142,7 +143,7 @@ private theorem hall_exists_of_piSeparable_aux (π : Set ℕ) : ∀ n : ℕ,
         rw [key]
         exact Nat.mul_le_mul_left _ hM_card_ge_two
       omega
-    haveI hQuot_piSep : IsPiSeparable π (G ⧸ M) :=
+    have hQuot_piSep : IsPiSeparable π (G ⧸ M) :=
       quotient_isPiSeparable π G M
     obtain ⟨Hbar, hHbar⟩ := ih (G ⧸ M) hQuot_piSep hquot_card
     rcases minimal_normal_isPiGroup_or_isPiGroup_compl_of_isPiSeparable π hM with
@@ -222,11 +223,11 @@ private theorem hall_exists_of_piSeparable_aux (π : Set ℕ) : ∀ n : ℕ,
       have h_coprime_MH : Nat.Coprime (Nat.card ↥(M.subgroupOf H)) (M.subgroupOf H).index := by
         rw [h_card_MH, h_idx_MH]
         exact h_coprime_M_Hbar
-      haveI : (M.subgroupOf H).Normal := hMnormal.subgroupOf H
+      have : (M.subgroupOf H).Normal := hMnormal.subgroupOf H
       obtain ⟨K, hK⟩ := Subgroup.exists_right_complement'_of_coprime h_coprime_MH
       have hK_index : K.index = Nat.card ↥(M.subgroupOf H) := hK.index_eq_card
       have hK_card : Nat.card ↥K = Nat.card Hbar := by
-        have := hK.card_mul
+        have := hK.card_mul_card
         have hH_card_eq : Nat.card H = Nat.card Hbar * Nat.card ↥M := by
           have eq1 : Nat.card H * H.index = Nat.card G := Subgroup.card_mul_index H
           have eq2 : Nat.card Hbar * Hbar.index = Nat.card (G ⧸ M) :=
@@ -335,19 +336,19 @@ private theorem hall_higman_case_pi_body
   set O : Subgroup G := oPiCore π G with hO_def
   set C : Subgroup G := Subgroup.centralizer (O : Set G) with hC_def
   set B : Subgroup G := C ⊓ O with hB_def
-  haveI hO_normal : O.Normal := inferInstance
-  haveI hC_normal : C.Normal := Subgroup.normal_centralizer
-  haveI hB_normal : B.Normal := by rw [hB_def]; infer_instance
+  have hO_normal : O.Normal := inferInstance
+  have hC_normal : C.Normal := Subgroup.normal_centralizer
+  have hB_normal : B.Normal := by rw [hB_def]; infer_instance
   have hBC_lt : B < C := hall_higman_B_lt_C_of_not_le π h_not_le
   set CB : Subgroup (G ⧸ B) := C.map (QuotientGroup.mk' B) with hCB_def
-  haveI hCB_normal : CB.Normal := hC_normal.map _ QuotientGroup.mk_surjective
+  have hCB_normal : CB.Normal := hC_normal.map _ QuotientGroup.mk_surjective
   set K_quot : Subgroup ↥CB := oPiCore π ↥CB
-  haveI hKq_norm : K_quot.Normal := inferInstance
-  haveI hKq_char : K_quot.Characteristic := inferInstance
+  have hKq_norm : K_quot.Normal := inferInstance
+  have hKq_char : K_quot.Characteristic := inferInstance
   set K_GB : Subgroup (G ⧸ B) := K_quot.map CB.subtype with hKGB_def
-  haveI hKGB_norm : K_GB.Normal := inferInstance
+  have hKGB_norm : K_GB.Normal := inferInstance
   set K : Subgroup G := K_GB.comap (QuotientGroup.mk' B) with hK_def
-  haveI hK_norm : K.Normal := inferInstance
+  have hK_norm : K.Normal := inferInstance
   have hKGB_le_CB : K_GB ≤ CB := by
     have hRangEq : CB = (⊤ : Subgroup ↥CB).map CB.subtype := by
       rw [← MonoidHom.range_eq_map]; exact CB.range_subtype.symm
@@ -397,19 +398,19 @@ private theorem hall_higman_case_pi'_body
   set O : Subgroup G := oPiCore π G with hO_def
   set C : Subgroup G := Subgroup.centralizer (O : Set G) with hC_def
   set B : Subgroup G := C ⊓ O with hB_def
-  haveI hO_normal : O.Normal := inferInstance
-  haveI hC_normal : C.Normal := Subgroup.normal_centralizer
-  haveI hB_normal : B.Normal := by rw [hB_def]; infer_instance
+  have hO_normal : O.Normal := inferInstance
+  have hC_normal : C.Normal := Subgroup.normal_centralizer
+  have hB_normal : B.Normal := by rw [hB_def]; infer_instance
   have hBC_lt : B < C := hall_higman_B_lt_C_of_not_le π h_not_le
   set CB : Subgroup (G ⧸ B) := C.map (QuotientGroup.mk' B) with hCB_def
-  haveI hCB_normal : CB.Normal := hC_normal.map _ QuotientGroup.mk_surjective
+  have hCB_normal : CB.Normal := hC_normal.map _ QuotientGroup.mk_surjective
   set K_quot : Subgroup ↥CB := oPiCore {p | p ∉ π} ↥CB
-  haveI hKq_norm : K_quot.Normal := inferInstance
-  haveI hKq_char : K_quot.Characteristic := inferInstance
+  have hKq_norm : K_quot.Normal := inferInstance
+  have hKq_char : K_quot.Characteristic := inferInstance
   set K_GB : Subgroup (G ⧸ B) := K_quot.map CB.subtype with hKGB_def
-  haveI hKGB_norm : K_GB.Normal := inferInstance
+  have hKGB_norm : K_GB.Normal := inferInstance
   set K : Subgroup G := K_GB.comap (QuotientGroup.mk' B) with hK_def
-  haveI hK_norm : K.Normal := inferInstance
+  have hK_norm : K.Normal := inferInstance
   have hKGB_le_CB : K_GB ≤ CB := by
     have hRangEq : CB = (⊤ : Subgroup ↥CB).map CB.subtype := by
       rw [← MonoidHom.range_eq_map]; exact CB.range_subtype.symm
@@ -453,7 +454,7 @@ private theorem hall_higman_case_pi'_body
         (Subgroup.equivMapOfInjective K_quot CB.subtype CB.subtype_injective).symm.toEquiv
     rw [hcard] at hp
     exact (oPiCore.isPiGroup (G := ↥CB) {p | p ∉ π}) p hp
-  haveI hBsub_K_normal : (B.subgroupOf K).Normal := inferInstance
+  have hBsub_K_normal : (B.subgroupOf K).Normal := inferInstance
   have hCoprime : Nat.Coprime (Nat.card ↥(B.subgroupOf K)) (B.subgroupOf K).index :=
     Nat.coprime_of_isPiGroup_of_isPiGroup_compl Nat.card_pos.ne'
       Subgroup.index_ne_zero_of_finite hBsub_pi hKBindex_pi'
@@ -470,7 +471,7 @@ private theorem hall_higman_case_pi'_body
     have hh_in_K : h.val ∈ K := h.property
     have hh_in_C : h.val ∈ C := hKle_C hh_in_K
     exact (Subgroup.mem_centralizer_iff.mp hh_in_C) n.val hnO
-  haveI hH'_normal : H'.Normal := Subgroup.normal_complement_of_commute hH'_compl hCommute
+  have hH'_normal : H'.Normal := Subgroup.normal_complement_of_commute hH'_compl hCommute
   have hH'_card : Nat.card ↥H' = (B.subgroupOf K).index := by
     have hCompl_card : Nat.card ↥(B.subgroupOf K) * Nat.card ↥H' = Nat.card ↥K := by
       rw [← Nat.card_prod]
@@ -491,7 +492,7 @@ private theorem hall_higman_case_pi'_body
     rw [hH'_card] at hp
     exact hKBindex_pi' p hp
   have hH'_le : H' ≤ oPiCore {p | p ∉ π} ↥K := hH'_pi'.le_oPiCore
-  haveI hOpi'_KG_normal : ((oPiCore {p | p ∉ π} ↥K).map K.subtype).Normal := inferInstance
+  have hOpi'_KG_normal : ((oPiCore {p | p ∉ π} ↥K).map K.subtype).Normal := inferInstance
   have hOpi'_KG_pi' : Subgroup.IsPiGroup {p | p ∉ π}
       ((oPiCore {p | p ∉ π} ↥K).map K.subtype) := by
     intro p hp
@@ -546,17 +547,17 @@ theorem hall_higman_1_2_3 [Finite G] (π : Set ℕ) [IsPiSeparable π G]
   set O : Subgroup G := oPiCore π G with hO_def
   set C : Subgroup G := Subgroup.centralizer (O : Set G) with hC_def
   set B : Subgroup G := C ⊓ O with hB_def
-  haveI hO_normal : O.Normal := inferInstance
-  haveI hC_normal : C.Normal := Subgroup.normal_centralizer
-  haveI hB_normal : B.Normal := by rw [hB_def]; infer_instance
+  have hO_normal : O.Normal := inferInstance
+  have hC_normal : C.Normal := Subgroup.normal_centralizer
+  have hB_normal : B.Normal := by rw [hB_def]; infer_instance
   have hBC_lt : B < C := hall_higman_B_lt_C_of_not_le π h_not_le
   set CB : Subgroup (G ⧸ B) := C.map (QuotientGroup.mk' B) with hCB_def
   have hCB_ne_bot : CB ≠ ⊥ := Subgroup.map_quotientGroup_mk_ne_bot_of_lt hBC_lt
-  haveI hCB_nontrivial : Nontrivial ↥CB := (Subgroup.nontrivial_iff_ne_bot CB).mpr hCB_ne_bot
-  haveI hCB_normal : CB.Normal := hC_normal.map _ QuotientGroup.mk_surjective
-  haveI hQuot_piSeparable : IsPiSeparable π (G ⧸ B) :=
+  have hCB_nontrivial : Nontrivial ↥CB := (Subgroup.nontrivial_iff_ne_bot CB).mpr hCB_ne_bot
+  have hCB_normal : CB.Normal := hC_normal.map _ QuotientGroup.mk_surjective
+  have hQuot_piSeparable : IsPiSeparable π (G ⧸ B) :=
     quotient_isPiSeparable π G B
-  haveI hCB_piSeparable : IsPiSeparable π ↥CB :=
+  have hCB_piSeparable : IsPiSeparable π ↥CB :=
     normalSubgroup_isPiSeparable π (G ⧸ B) CB
   rcases exists_oPiCore_ne_bot_or_oPi'Core_ne_bot_of_isPiSeparable (G := ↥CB) π with
     hπCase | hπ'Case
@@ -816,6 +817,7 @@ theorem IsAInvariant.sup {A : Type*} [Group A] {φ : A →* MulAut G} {H K : Sub
     (hH : IsAInvariant φ H) (hK : IsAInvariant φ K) : IsAInvariant φ (H ⊔ K) := fun a => by
   rw [Subgroup.smul_sup, hH a, hK a]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Conjugating an `A`-invariant subgroup by an `A`-fixed element preserves invariance. -/
 theorem IsAInvariant.mulAut_conj_smul_of_fixed {A : Type*} [Group A] {φ : A →* MulAut G}
     {H : Subgroup G} (hH : IsAInvariant φ H) {c : G} (hc : ∀ a : A, (φ a) c = c) :

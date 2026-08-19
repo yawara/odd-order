@@ -69,7 +69,7 @@ theorem commutator_ne_bot_of_index_commutator_eq_four {P : Type*} [Group P] [Fin
 /-- `2`-群で `8 ≤ |P| < 16` なら `|P| = 8`。 -/
 theorem card_eq_eight_of_lt_sixteen {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
     (h8 : 8 ≤ Nat.card P) (h16 : Nat.card P < 16) : Nat.card P = 8 := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨k, hk⟩ := hP.exists_card_eq
   rcases Nat.lt_or_ge k 3 with h | h
   · exfalso
@@ -106,7 +106,7 @@ theorem exists_index_two_zpowers_of_card_le (n : ℕ) :
       obtain ⟨z, hzP', hzZ, hzord⟩ := exists_orderOf_eq_two_mem_commutator_center hP
         (commutator_ne_bot_of_index_commutator_eq_four h8 hidx)
       have hZcenter : Subgroup.zpowers z ≤ Subgroup.center P := Subgroup.zpowers_le.mpr hzZ
-      haveI hZn : (Subgroup.zpowers z).Normal := normal_of_le_center hZcenter
+      have hZn : (Subgroup.zpowers z).Normal := normal_of_le_center hZcenter
       have hZcard : Nat.card ↥(Subgroup.zpowers z) = 2 := by rw [Nat.card_zpowers, hzord]
       have hZle : Subgroup.zpowers z ≤ commutator P := Subgroup.zpowers_le.mpr hzP'
       -- `|P/Z| = |P|/2`
@@ -153,7 +153,7 @@ theorem tausskyTodd {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
     (∃ n : ℕ, Nonempty (P ≃* DihedralGroup n)) ∨
       (∃ n : ℕ, Nonempty (P ≃* QuaternionGroup n)) ∨
       (∃ k : ℕ, Nonempty (P ≃* SemiDihedralGroup k)) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   rcases Nat.lt_or_ge (Nat.card P) 16 with hlt | hge
   · -- `|P| = 8`: `D_8` か `Q_8`
     rcases tausskyTodd_card_eight (card_eq_eight_of_lt_sixteen hP hcard hlt) hidx with h | h

@@ -190,7 +190,7 @@ theorem typeI_centralizer_le_and_unique [Finite G] (hG : OddOrder.BG.IsMinimalSi
     Subgroup.centralizer ({x} : Set G) ≤ T ∧
       ∀ L ∈ maximalSubgroups G, Subgroup.centralizer ({x} : Set G) ≤ L → L = T := by
   classical
-  haveI : IsSolvable ↥T := hG.solvable_of_mem_maximalSubgroups hT
+  have : Group.IsSolvable ↥T := hG.isSolvable_of_mem_maximalSubgroups hT
   have hκ : OddOrder.BG.Ch4.S14.kappa T = ∅ :=
     (OddOrder.Peterfalvi.S10Interface.isTypeI_iff_isTypeF hG hT).mp ⟨dT⟩
   have hMFMσ : maxNilpotentNormalHall T = OddOrder.BG.Ch3.S10.Msigma T :=
@@ -242,7 +242,7 @@ theorem typeI_centralizer_le_and_unique [Finite G] (hG : OddOrder.BG.IsMinimalSi
   obtain ⟨h, hhMF, hh1, hcomm⟩ := hwit
   have hMFle := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le T
   have hh'MF : τ * h * τ⁻¹ ∈ maxNilpotentNormalHall T := by
-    haveI hnorm := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal T
+    have hnorm := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal T
     have hmem : (⟨h, hMFle hhMF⟩ : ↥T) ∈ (maxNilpotentNormalHall T).subgroupOf T :=
       Subgroup.mem_subgroupOf.mpr hhMF
     have := Subgroup.mem_subgroupOf.mp (hnorm.conj_mem _ hmem t)
@@ -528,7 +528,7 @@ theorem typeP_centralizer_unique_of_mem_typePACore [Finite G]
     (hcop : Nat.Coprime (orderOf b) (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma T))) :
     maximalSubgroupsContaining (Subgroup.centralizer ({b} : Set G)) = {T} := by
   classical
-  haveI : IsSolvable ↥T := hG.solvable_of_mem_maximalSubgroups hT
+  have : Group.IsSolvable ↥T := hG.isSolvable_of_mem_maximalSubgroups hT
   obtain ⟨hbM', hb1, u, huS, hbu⟩ := hbA
   have hcardT' : Nat.card ((derivedInG T).subgroupOf T) = Nat.card (derivedInG T) :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe (Subgroup.map_subtype_le _)).toEquiv
@@ -1141,7 +1141,7 @@ theorem eq_of_mem_maximalSigmaSubgroupsOfElement_of_centralizer_le [Finite G]
     M = L := by
   classical
   by_contra hML
-  haveI : Finite (Subgroup G) :=
+  have : Finite (Subgroup G) :=
     Finite.of_injective (fun H : Subgroup G => (H : Set G)) SetLike.coe_injective
   have hlen : D.length x = 1 :=
     OddOrder.BG.Ch4.S14.length_one_of_isPiElement_sigma hG D hM.1 hx1
@@ -1168,7 +1168,7 @@ theorem Rsub_eq_bot_of_centralizer_le [Finite G] (hG : OddOrder.BG.IsMinimalSimp
   have hnot : ¬ (x ≠ 1 ∧ D.length x = 1 ∧
       1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement x).ncard) := by
     rintro ⟨hx1, -, hgt⟩
-    haveI : Finite (Subgroup G) :=
+    have : Finite (Subgroup G) :=
       Finite.of_injective (fun H : Subgroup G => (H : Set G)) SetLike.coe_injective
     have hnt : (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement x).Nontrivial :=
       Set.one_lt_ncard_iff_nontrivial.mp hgt
@@ -1218,10 +1218,10 @@ theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         ((OddOrder.BG.Ch4.S14.maximalTypePFamily G).Nonempty ∧
           Nonempty (BGTheoremENonTypeICovering data)) := by
   classical
-  haveI : Finite (Subgroup G) :=
+  have : Finite (Subgroup G) :=
     Finite.of_injective (fun H : Subgroup G => (H : Set G)) SetLike.coe_injective
   obtain ⟨reps, hrepsMax, hreps⟩ := OddOrder.BG.Ch4.S16.exists_maximal_conjugacy_reps (G := G)
-  haveI : Fintype ↥reps := Fintype.ofFinite _
+  have : Fintype ↥reps := Fintype.ofFinite _
   -- Index the representatives by `Fin n`, then `ULift` to the (universe-polymorphic) struct index.
   let e := Fintype.equivFin (↥reps)
   -- Peterfalvi type label + classification proof for each representative (exhaustiveness).
@@ -1373,7 +1373,7 @@ theorem support_mutual_exclusion_of_typeI_or_II [Finite G]
   have hA1T : A1 T tauT = OddOrder.BG.Ch4.S14.sigmaSharp T :=
     OddOrder.Peterfalvi.S10Interface.A1_eq_sigmaSharp_of_typeI_or_II hG hT hTType htauT
   -- `A₁(S) = M_σ(S)^#` is nonempty: `M_σ ≠ ⊥` holds for *every* maximal subgroup (BG §10).
-  haveI : Nontrivial ↥(OddOrder.BG.Ch3.S10.Msigma S) :=
+  have : Nontrivial ↥(OddOrder.BG.Ch3.S10.Msigma S) :=
     (Subgroup.nontrivial_iff_ne_bot _).mpr (OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hS)
   obtain ⟨y, hyne⟩ := exists_ne (1 : ↥(OddOrder.BG.Ch3.S10.Msigma S))
   have hxA1 : (y : G) ∈ A1 S tauS := by

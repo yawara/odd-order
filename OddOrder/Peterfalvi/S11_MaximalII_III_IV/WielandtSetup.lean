@@ -81,8 +81,8 @@ noncomputable def typeP_quotientCoprimeAction [Finite G] (data : TypePData M) (h
   E := data.W1.subgroupOf (data.U ⊔ data.W1)
   frobenius := typeP_uW1_frobenius data hU
   H_solvable := by
-    haveI := (typeP_coprimeAction data hU).H_solvable
-    exact solvable_of_surjective (QuotientGroup.mk'_surjective N)
+    have := (typeP_coprimeAction data hU).H_solvable
+    exact Group.isSolvable_of_surjective (QuotientGroup.mk'_surjective N)
   φ := OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN
   coprime_order := Nat.Coprime.coprime_dvd_left (Subgroup.card_quotient_dvd_card N)
     (typeP_coprime_H_uW1 data hU)
@@ -155,8 +155,8 @@ theorem coprimeFrobeniusChiefFactor_card_of_summand
     Nat.card ↥S = p ^ Nat.card ↥act.E ∧
       Nat.card ↥(act.fixedByE ⊓ S : Subgroup V) = p := by
   have hSel : IsElementaryAbelian p ↥S := hV.to_subgroup S
-  have hSsolv : IsSolvable ↥S := by
-    letI : CommGroup ↥S := { (inferInstance : Group ↥S) with mul_comm := hSel.comm }
+  have hSsolv : Group.IsSolvable ↥S := by
+    let : CommGroup ↥S := { (inferInstance : Group ↥S) with mul_comm := hSel.comm }
     infer_instance
   -- the restricted Frobenius action on the summand `↥S`
   let act_S : CoprimeFrobeniusAction L ↥S :=
@@ -185,8 +185,8 @@ theorem coprimeFrobeniusChiefFactor_card_of_summand
     exact hSne (Subgroup.card_eq_one.mp hc)
   -- `C_S(E) = C_V(E) ⊓ S` is a subgroup of the cyclic `C_V(E)`, hence cyclic.
   have hEcyc_S : IsCyclic ↥act_S.fixedByE := by
-    haveI : IsCyclic ↥(fixedSubgroup act.φ act.E) := hEcyc
-    haveI : IsCyclic ↥(fixedSubgroup act.φ act.E ⊓ S : Subgroup V) :=
+    have : IsCyclic ↥(fixedSubgroup act.φ act.E) := hEcyc
+    have : IsCyclic ↥(fixedSubgroup act.φ act.E ⊓ S : Subgroup V) :=
       Subgroup.isCyclic_of_le inf_le_left
     have e := Subgroup.equivMapOfInjective
       ((fixedSubgroup act.φ act.E).subgroupOf S) S.subtype S.subtype_injective
@@ -215,15 +215,15 @@ theorem typeP_quotient_fixedByE_cyclic [Finite G] (data : TypePData M) (hU : dat
   have hcopHW1 : Nat.Coprime
       (Nat.card ↥(data.W1.subgroupOf (data.U ⊔ data.W1))) (Nat.card ↥data.H) :=
     (typeP_coprime_H_uW1 data hU).symm.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _)
-  haveI : IsSolvable ↥data.H := (typeP_coprimeAction data hU).H_solvable
+  have : Group.IsSolvable ↥data.H := (typeP_coprimeAction data hU).H_solvable
   have hmap : (fixedSubgroup (typeP_conjAction data)
       (data.W1.subgroupOf (data.U ⊔ data.W1))).map (QuotientGroup.mk' N) = act'.fixedByE :=
     map_fixedSubgroup_eq_fixedSubgroup_quotient hN hcopHW1 (Or.inr inferInstance)
   have hCHW1 : (fixedSubgroup (typeP_conjAction data)
       (data.W1.subgroupOf (data.U ⊔ data.W1))).map data.H.subtype = data.W2 := by
     rw [typeP_fixedSubgroup_map data le_sup_right, typeP_H_inf_centralizer_W1]
-  haveI : IsCyclic ↥data.W2 := data.W2_cyclic
-  haveI hcycCHW1 : IsCyclic ↥(fixedSubgroup (typeP_conjAction data)
+  have : IsCyclic ↥data.W2 := data.W2_cyclic
+  have hcycCHW1 : IsCyclic ↥(fixedSubgroup (typeP_conjAction data)
       (data.W1.subgroupOf (data.U ⊔ data.W1))) := by
     have e := Subgroup.equivMapOfInjective
       (fixedSubgroup (typeP_conjAction data) (data.W1.subgroupOf (data.U ⊔ data.W1)))
@@ -320,7 +320,7 @@ theorem exists_chiefFactor_kernel [Finite G] {M : Subgroup G} (data : TypePData 
            fixedSubgroup (quotientMulAutHom hNinv)
              (data.U.subgroupOf (data.U ⊔ data.W1)) ≠ ⊤) := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   set act_V := typeP_quotientCoprimeAction data hU hN₀ with hact_V
   have hUnorm : act_V.U.Normal := (typeP_uW1_frobenius data hU).isNormal
   have hCinv : IsAInvariant act_V.φ act_V.fixedByU :=
@@ -337,9 +337,9 @@ theorem exists_chiefFactor_kernel [Finite G] {M : Subgroup G} (data : TypePData 
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
   have hScard' : Nat.card ↥S = p ^ Nat.card ↥data.W1 := by rw [hScard, hEcard]
   -- `V` is abelian, so all its subgroups are normal.
-  haveI hSnorm : S.Normal := ⟨fun n hn g => by
+  have hSnorm : S.Normal := ⟨fun n hn g => by
     rwa [show g * n * g⁻¹ = n by rw [hpe.comm g n]; group]⟩
-  haveI hWnorm : W.Normal := ⟨fun n hn g => by
+  have hWnorm : W.Normal := ⟨fun n hn g => by
     rwa [show g * n * g⁻¹ = n by rw [hpe.comm g n]; group]⟩
   -- `S` complements `W` in `V`, so `W.index = |S|`.
   have hcompl : Subgroup.IsComplement' S W :=
@@ -354,7 +354,7 @@ theorem exists_chiefFactor_kernel [Finite G] {M : Subgroup G} (data : TypePData 
   -- `N` is `U W₁`-invariant (preimage of the invariant `W`); hence normal.
   have hNinv : IsAInvariant (typeP_conjAction data) N :=
     OddOrder.BG.Ch1_Preliminary.isAInvariant_comap_mk' hN₀ hWinv
-  haveI hNnorm : N.Normal := inferInstance
+  have hNnorm : N.Normal := inferInstance
   have hNmapW : N.map (QuotientGroup.mk' N₀) = W :=
     Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective N₀) W
   -- `|H/N| = W.index = |S| = p^q`.
@@ -372,7 +372,7 @@ theorem exists_chiefFactor_kernel [Finite G] {M : Subgroup G} (data : TypePData 
     have hcopHW1 : Nat.Coprime
         (Nat.card ↥(data.W1.subgroupOf (data.U ⊔ data.W1))) (Nat.card ↥data.H) :=
       (typeP_coprime_H_uW1 data hU).symm.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _)
-    haveI : IsSolvable ↥data.H := (typeP_coprimeAction data hU).H_solvable
+    have : Group.IsSolvable ↥data.H := (typeP_coprimeAction data hU).H_solvable
     have hmap : CHW1.map (QuotientGroup.mk' N₀) = act_V.fixedByE :=
       map_fixedSubgroup_eq_fixedSubgroup_quotient hN₀ hcopHW1 (Or.inr inferInstance)
     have hCHW1card : Nat.card ↥CHW1 = Nat.card ↥data.W2 := by
@@ -387,10 +387,10 @@ theorem exists_chiefFactor_kernel [Finite G] {M : Subgroup G} (data : TypePData 
   have hcopU : Nat.Coprime (Nat.card ↥(data.U.subgroupOf (data.U ⊔ data.W1)))
       (Nat.card ↥data.H) :=
     (typeP_coprime_H_uW1 data hU).symm.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _)
-  haveI hHsolv : IsSolvable ↥data.H := (typeP_coprimeAction data hU).H_solvable
+  have hHsolv : Group.IsSolvable ↥data.H := (typeP_coprimeAction data hU).H_solvable
   -- **Elementary abelian**: `H/N ≅ (H/N₀)/W` is a quotient of the elementary abelian `V = H/N₀`.
   have hEA : IsElementaryAbelian p (↥data.H ⧸ N) := by
-    haveI : (N.map (QuotientGroup.mk' N₀)).Normal := hNmapW ▸ hWnorm
+    have : (N.map (QuotientGroup.mk' N₀)).Normal := hNmapW ▸ hWnorm
     exact IsElementaryAbelian.of_mulEquiv
       (QuotientGroup.quotientQuotientEquivQuotient N₀ N hN₀leN)
       (isElementaryAbelian_of_surjective
@@ -398,7 +398,7 @@ theorem exists_chiefFactor_kernel [Finite G] {M : Subgroup G} (data : TypePData 
   -- **`C_V(U) ≤ W`**: a `U`-fixed `x = a·b` (`a ∈ S`, `b ∈ W`) has both components `U`-fixed, and
   -- `C_S(U) = C_V(U) ⊓ S = ⊥` kills `a`.
   have hCsubW : act_V.fixedByU ≤ W := by
-    letI : CommGroup (↥data.H ⧸ N₀) :=
+    let : CommGroup (↥data.H ⧸ N₀) :=
       { (inferInstance : Group (↥data.H ⧸ N₀)) with mul_comm := hpe.comm }
     intro x hx
     obtain ⟨a, ha, b, hb, rfl⟩ := Subgroup.mem_sup.mp (hSW_sup ▸ Subgroup.mem_top x)
@@ -439,7 +439,7 @@ theorem exists_chiefFactor_kernel [Finite G] {M : Subgroup G} (data : TypePData 
         (data.U.subgroupOf (data.U ⊔ data.W1)) = ⊥ := by
       rw [← hfixN, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']; exact hCHUleN
     rw [hbot]
-    haveI : Nontrivial (↥data.H ⧸ N) := by
+    have : Nontrivial (↥data.H ⧸ N) := by
       rw [← Finite.one_lt_card_iff_nontrivial, hcardN]
       exact Nat.one_lt_pow Nat.card_pos.ne' hp.one_lt
     exact bot_ne_top
@@ -475,7 +475,7 @@ theorem exists_chiefFactor_kernel [Finite G] {M : Subgroup G} (data : TypePData 
     · -- `J̄ ⊓ S = ⊥`: the component argument gives `J̄ = W`, so `J̃ = N` and `J = ⊥`.
       refine Or.inl ?_
       have hJbleW : Jb ≤ W := by
-        letI : CommGroup (↥data.H ⧸ N₀) :=
+        let : CommGroup (↥data.H ⧸ N₀) :=
           { (inferInstance : Group (↥data.H ⧸ N₀)) with mul_comm := hpe.comm }
         intro x hx
         obtain ⟨a, ha, b, hb, rfl⟩ := Subgroup.mem_sup.mp (hSW_sup ▸ Subgroup.mem_top x)
@@ -549,7 +549,7 @@ theorem eq_top_of_forall_sylow_le {Γ : Type*} [Group Γ] [Finite Γ] {K : Subgr
   rw [← Nat.factorization_le_iff_dvd Nat.card_pos.ne' Nat.card_pos.ne', Finsupp.le_def]
   intro p
   by_cases hp : p.Prime
-  · haveI : Fact p.Prime := ⟨hp⟩
+  · have : Fact p.Prime := ⟨hp⟩
     have hdvd : p ^ (Nat.card Γ).factorization p ∣ Nat.card ↥K := by
       have := Subgroup.card_dvd_of_le (h p (default : Sylow p Γ))
       rwa [Sylow.card_eq_multiplicity] at this
@@ -573,8 +573,8 @@ theorem exists_characteristic_complement_to_sylow_of_nilpotent
   have hindep : iSupIndep O := by
     apply OddOrder.Isaacs.Ch01.iSupIndep_of_coprime_card_of_normal O
     intro i j hij
-    haveI : Fact (i : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors i.2⟩
-    haveI : Fact (j : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors j.2⟩
+    have : Fact (i : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors i.2⟩
+    have : Fact (j : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors j.2⟩
     have hne : (i : ℕ) ≠ (j : ℕ) := fun h => hij (Subtype.ext h)
     exact IsPGroup.coprime_card_of_ne (i : ℕ) (j : ℕ) hne _ _
       (OddOrder.Isaacs.Ch01.opCore_isPGroup (i : ℕ) H)
@@ -588,7 +588,7 @@ theorem exists_characteristic_complement_to_sylow_of_nilpotent
     have hrw : (⨆ q, O q)
         = ⨆ q : (Nat.card H).primeFactors, ((default : Sylow (q : ℕ) H) : Subgroup H) :=
       iSup_congr fun q => by
-        haveI : Fact (q : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors q.2⟩
+        have : Fact (q : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors q.2⟩
         exact (OddOrder.Isaacs.Ch01.Sylow.eq_opCore_of_normal default
           (OddOrder.Isaacs.Ch01.Sylow.normal_of_isNilpotent default)).symm
     rw [hrw]; exact OddOrder.Isaacs.Ch01.iSup_default_sylow_eq_top_of_nilpotent H
@@ -635,7 +635,7 @@ theorem exists_chiefFactor_seed [Finite G] {M : Subgroup G} (data : TypePData M)
       fixedSubgroup (typeP_conjAction data) (data.U.subgroupOf (data.U ⊔ data.W1)) ⊔ N₀ ≠ ⊤ := by
   classical
   -- `H = M_F` is nilpotent.
-  haveI hHnil : Group.IsNilpotent ↥data.H := by
+  have hHnil : Group.IsNilpotent ↥data.H := by
     rw [data.H_eq]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent M
   set CU := fixedSubgroup (typeP_conjAction data) (data.U.subgroupOf (data.U ⊔ data.W1)) with hCU
   -- `U` does not centralise `H`: `C_H(U) = CU ≠ ⊤`.
@@ -647,7 +647,7 @@ theorem exists_chiefFactor_seed [Finite G] {M : Subgroup G} (data : TypePData M)
     by_contra hcon
     push Not at hcon
     exact hCUtop (eq_top_of_forall_sylow_le hcon)
-  haveI := hpfact
+  have := hpfact
   have hp : p.Prime := hpfact.out
   -- `↑P ≠ ⊥` (else `↑P ≤ CU`), so `p ∣ |H|`, i.e. `p ∈ primeFactors |H|`.
   have hPbot : (↑P : Subgroup ↥data.H) ≠ ⊥ := fun h => hP_not (h ▸ bot_le)
@@ -660,25 +660,25 @@ theorem exists_chiefFactor_seed [Finite G] {M : Subgroup G} (data : TypePData M)
   -- The characteristic `p`-complement `Q` (so `H = P × Q` internally).
   obtain ⟨Q, hQchar, hQcompl⟩ :=
     exists_characteristic_complement_to_sylow_of_nilpotent P hp_mem
-  haveI : Q.Characteristic := hQchar
-  haveI : Q.Normal := inferInstance
+  have : Q.Characteristic := hQchar
+  have : Q.Normal := inferInstance
   have hQinv : IsAInvariant (typeP_conjAction data) Q :=
     OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic (typeP_conjAction data)
   -- `↑P` is characteristic (`= O_p(H)`), hence `A`-invariant.
   have hPnorm : (↑P : Subgroup ↥data.H).Normal :=
     OddOrder.Isaacs.Ch01.Sylow.normal_of_isNilpotent P
-  haveI hPchar : (↑P : Subgroup ↥data.H).Characteristic := by
+  have hPchar : (↑P : Subgroup ↥data.H).Characteristic := by
     rw [OddOrder.Isaacs.Ch01.Sylow.eq_opCore_of_normal P hPnorm]; infer_instance
   have hPinv : IsAInvariant (typeP_conjAction data) (↑P : Subgroup ↥data.H) :=
     OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic (typeP_conjAction data)
   -- `B = H/Q` is a `p`-group (`|B| = [H:Q] = |P| = p^k`).
-  haveI hBpgroup : IsPGroup p (↥data.H ⧸ Q) :=
+  have hBpgroup : IsPGroup p (↥data.H ⧸ Q) :=
     IsPGroup.of_card (by
       calc Nat.card (↥data.H ⧸ Q) = Nat.card (↑P : Subgroup ↥data.H) := hQcompl.index_eq_card
         _ = p ^ (Nat.card ↥data.H).factorization p := Sylow.card_eq_multiplicity P)
   -- `N₀ = (mk' Q)⁻¹ Φ(B)`: normal, `A`-invariant, and `H/N₀ ≅ B/Φ(B)` el. abelian `p`.
   set N₀ := Subgroup.comap (QuotientGroup.mk' Q) (frattini (↥data.H ⧸ Q)) with hN₀
-  haveI : N₀.Normal := inferInstance
+  have : N₀.Normal := inferInstance
   have hN₀inv : IsAInvariant (typeP_conjAction data) N₀ :=
     OddOrder.BG.Ch1_Preliminary.isAInvariant_comap_mk' hQinv
       (OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic (quotientMulAutHom hQinv))
@@ -689,7 +689,7 @@ theorem exists_chiefFactor_seed [Finite G] {M : Subgroup G} (data : TypePData M)
   have hN₀map : N₀.map (QuotientGroup.mk' Q) = frattini (↥data.H ⧸ Q) :=
     Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective Q) _
   have hEA : IsElementaryAbelian p (↥data.H ⧸ N₀) := by
-    haveI : (N₀.map (QuotientGroup.mk' Q)).Normal :=
+    have : (N₀.map (QuotientGroup.mk' Q)).Normal :=
       (inferInstance : N₀.Normal).map _ (QuotientGroup.mk'_surjective Q)
     exact IsElementaryAbelian.of_mulEquiv
       ((QuotientGroup.quotientMulEquivOfEq hN₀map).symm.trans
@@ -701,7 +701,7 @@ theorem exists_chiefFactor_seed [Finite G] {M : Subgroup G} (data : TypePData M)
   have hcopU : Nat.Coprime (Nat.card ↥(data.U.subgroupOf (data.U ⊔ data.W1)))
       (Nat.card ↥data.H) :=
     (typeP_coprime_H_uW1 data hU).symm.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _)
-  haveI : IsSolvable ↥data.H := (typeP_coprimeAction data hU).H_solvable
+  have : Group.IsSolvable ↥data.H := (typeP_coprimeAction data hU).H_solvable
   -- Project to `B`: `C_B(U) ⊔ Φ(B) = ⊤`, so by the Frattini argument `C_B(U) = ⊤`.
   have hCUmap := map_fixedSubgroup_eq_fixedSubgroup_quotient
     (φ := typeP_conjAction data) (N := Q) hQinv hcopU (Or.inr inferInstance)
@@ -779,14 +779,14 @@ theorem exists_chiefFactorData [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   classical
   have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
   obtain ⟨p, N₀, hN₀norm, hp, hN₀inv, hpe, hUnc_seed⟩ := exists_chiefFactor_seed data.typeP hU
-  haveI := hN₀norm
+  have := hN₀norm
   -- Convert the action-free non-centrality `C_H(U) ⊔ N₀ ≠ H` to the quotient form `fixedByU ≠ ⊤`.
   have hUnc : (typeP_quotientCoprimeAction data.typeP hU hN₀inv).fixedByU ≠ ⊤ := by
     have hcopU : Nat.Coprime
         (Nat.card ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
         (Nat.card ↥data.typeP.H) :=
       (typeP_coprime_H_uW1 data.typeP hU).symm.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _)
-    haveI : IsSolvable ↥data.typeP.H := (typeP_coprimeAction data.typeP hU).H_solvable
+    have : Group.IsSolvable ↥data.typeP.H := (typeP_coprimeAction data.typeP hU).H_solvable
     have hmap := map_fixedSubgroup_eq_fixedSubgroup_quotient (φ := typeP_conjAction data.typeP)
       (N := N₀) (X := data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) hN₀inv hcopU
       (Or.inr inferInstance)
@@ -801,7 +801,7 @@ theorem exists_chiefFactorData [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   -- The chief-factor kernel and its image `H₀ = N.map subtype`.
   obtain ⟨N, hN₀leN, hNnorm, hNinv, hcardN, hpW2, hEA, hIrr, hNonc⟩ :=
     exists_chiefFactor_kernel data.typeP hU hp hN₀inv hpe hUnc
-  haveI := hNnorm
+  have := hNnorm
   have hqpos : Nat.card ↥data.typeP.W1 ≠ 0 := Nat.card_pos.ne'
   have hNtop : N ≠ ⊤ := by
     intro h

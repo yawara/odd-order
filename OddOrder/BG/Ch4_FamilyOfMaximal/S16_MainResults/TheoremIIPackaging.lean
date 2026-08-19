@@ -460,7 +460,7 @@ theorem exists_kappa_hall_pair [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     ∃ Ki Ui : Subgroup G, Ki ≤ Mi ∧ Ui ≤ Mi ∧
       Ch03.IsHallSubgroup (S14.kappa Mi) (Ki.subgroupOf Mi) ∧
       Ch03.IsHallSubgroup ((S14.kappa Mi ∪ OddOrder.BG.Ch3.S10.sigma Mi)ᶜ) (Ui.subgroupOf Mi) := by
-  haveI : IsSolvable ↥Mi := hG.solvable_of_mem_maximalSubgroups hMimax
+  have : Group.IsSolvable ↥Mi := hG.isSolvable_of_mem_maximalSubgroups hMimax
   obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥Mi) (S14.kappa Mi)
   obtain ⟨U', hU'⟩ :=
     Ch03.hall_E_exists (G := ↥Mi) ((S14.kappa Mi ∪ OddOrder.BG.Ch3.S10.sigma Mi)ᶜ)
@@ -676,7 +676,7 @@ theorem exists_systemOfSupportingSubgroups [Finite G] (hG : OddOrder.BG.IsMinima
     ∃ sys : SystemOfSupportingSubgroups M X,
       ((∃ i, IsTypeII (sys.Mfam i)) → FrobeniusTypeIWithNonTIFitting M) := by
   classical
-  haveI : Finite (Subgroup G) := Finite.of_injective _ SetLike.coe_injective
+  have : Finite (Subgroup G) := Finite.of_injective _ SetLike.coe_injective
   -- Theorem A(3): `U ⊔ M_σ ◁ M`.
   have hnorm : ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer

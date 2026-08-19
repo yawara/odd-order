@@ -49,14 +49,14 @@ theorem exists_fitting_field_model :
           ∃ σ : F ≃+* F, ∀ (a : F) (x : Additive ↥hyp.Q0),
             (MulEquiv.toAdditive g) (a • x) =
               σ a • (MulEquiv.toAdditive g) x := by
-  letI : IsCyclic ↥(fitting hyp.Dbar) := hyp.fitting_Dbar_cyclic_fpf_abelian.1
-  letI : CommGroup ↥(fitting hyp.Dbar) := IsCyclic.commGroup
+  let : IsCyclic ↥(fitting hyp.Dbar) := hyp.fitting_Dbar_cyclic_fpf_abelian.1
+  let : CommGroup ↥(fitting hyp.Dbar) := IsCyclic.commGroup
   obtain ⟨F, hFfield, hFmodule, hFfinite, hdim, hcard, ⟨μ, hμ⟩, hsemi⟩ :=
     exists_field_semilinear_with_scalar hyp.isElementaryAbelian_Q0
       hyp.fittingAction hyp.fittingAction_irreducible
-  letI : Field F := hFfield
-  letI : Module F (Additive ↥hyp.Q0) := hFmodule
-  letI : Finite F := hFfinite
+  let : Field F := hFfield
+  let : Module F (Additive ↥hyp.Q0) := hFmodule
+  let : Finite F := hFfinite
   have hμinj : Function.Injective μ := by
     apply (injective_iff_map_eq_one μ).2
     intro t ht
@@ -232,9 +232,9 @@ theorem exists_semilinear_field_model :
             fieldRingAutOnUnits F (ν z) (μ t) := by
   obtain ⟨F, hF, hmodule, hfinite, hdim, hcard, ⟨μ, hμ⟩, hsemilinear⟩ :=
     hyp.exists_fitting_field_model
-  letI : Field F := hF
-  letI : Module F (Additive ↥hyp.Q0) := hmodule
-  letI : Finite F := hfinite
+  let : Field F := hF
+  let : Module F (Additive ↥hyp.Q0) := hmodule
+  let : Finite F := hfinite
   have hfix : ∀ z : ↥hyp.Vbar, hyp.VbarAction z hyp.sQ0 = hyp.sQ0 :=
     hyp.VbarAction_fix_sQ0
   have hrho : Function.Injective hyp.VbarAction :=
@@ -370,9 +370,9 @@ theorem exists_semilinear_equiv :
   obtain ⟨F, hF, hmodule, hfinite, hdim, hcard,
       μ, ν, νe, _hνinj, hμ, hνsemi, hνe, hcompat⟩ :=
     hyp.exists_semilinear_field_model
-  letI : Field F := hF
-  letI : Module F (Additive ↥hyp.Q0) := hmodule
-  letI : Finite F := hfinite
+  let : Field F := hF
+  let : Module F (Additive ↥hyp.Q0) := hmodule
+  let : Finite F := hfinite
   let A : Subgroup (RingAut F) := MonoidHom.range ν
   have hVcyclic : IsCyclic ↥hyp.Vbar :=
     (νe.symm.isCyclic).mp (ringAutSubgroup_isCyclic_of_finite F A)

@@ -66,7 +66,7 @@ private theorem thm35_aux : ∀ (n : ℕ)
     {G : Type*} [Group G] [Finite G]
     {V : Type*} [AddCommGroup V] [Module F V] [FiniteDimensional F V]
     (ρ : Representation F G V) (K R : Subgroup G),
-    IsFrobeniusGroup G K R → IsSolvable ↥K →
+    IsFrobeniusGroup G K R → Group.IsSolvable ↥K →
     (∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p) →
     (Nat.card G : F) ≠ 0 →
     Module.finrank F (Representation.invariants (ρ.comp R.subtype)) = 1 →
@@ -76,14 +76,14 @@ private theorem thm35_aux : ∀ (n : ℕ)
   induction n using Nat.strong_induction_on with
   | _ n IH =>
     intro F _ _ G _ _ V _ _ _ ρ K R hFrob hKsolv hRp hchar hCV1 hn
-    haveI hKnorm : K.Normal := hFrob.isNormal
+    have hKnorm : K.Normal := hFrob.isNormal
     -- `⁅K, K⁆ ≤ K`.
     have hKK_le : ⁅K, K⁆ ≤ K := Subgroup.commutator_le_right K K
     by_cases hfaithful : Function.Injective ρ
     · -- **faithful branch** (`C_G(V) = 1`): steps (3.4)/(3.5)/(Clifford core).
       obtain ⟨p, hp, hpcard⟩ := hRp
       have hRp' : (Nat.card ↥R).Prime := hpcard ▸ hp
-      haveI : NeZero (Nat.card G : F) := ⟨hchar⟩
+      have : NeZero (Nat.card G : F) := ⟨hchar⟩
       have hkerbot : MonoidHom.ker ρ = ⊥ := (MonoidHom.ker_eq_bot_iff ρ).mpr hfaithful
       -- `char F ∤ |K|`, `char F ∤ |⁅K,K⁆ ⊔ R|`.
       have hcharK : (Nat.card ↥K : F) ≠ 0 := by
@@ -95,7 +95,7 @@ private theorem thm35_aux : ∀ (n : ℕ)
       -- `R = ⟨x⟩` for a generator `x`; `closure (K ∪ {x}) = ⊤`.
       have hRne : R ≠ ⊥ := by
         intro hR; rw [hR, Subgroup.card_bot] at hpcard; exact hp.ne_one hpcard.symm
-      haveI : Nontrivial ↥R := (Subgroup.nontrivial_iff_ne_bot R).mpr hRne
+      have : Nontrivial ↥R := (Subgroup.nontrivial_iff_ne_bot R).mpr hRne
       obtain ⟨xr, hxr1⟩ := exists_ne (1 : ↥R)
       have hx1 : (xr : G) ≠ 1 := fun h => hxr1 (Subtype.ext (by rw [h]; rfl))
       set x := (xr : G) with hxdef
@@ -110,13 +110,13 @@ private theorem thm35_aux : ∀ (n : ℕ)
         intro g hg; rw [hK'eq, Subgroup.mem_bot] at hg; rw [hg]; exact map_one ρ
       · -- `⁅K, K⁆ ≠ ⊥`.
         have hKne : K ≠ ⊥ := fun h => hK'ne (by rw [h, Subgroup.commutator_bot_left])
-        haveI hK'norm : (⁅K, K⁆ : Subgroup G).Normal := Subgroup.commutator_normal K K
+        have hK'norm : (⁅K, K⁆ : Subgroup G).Normal := Subgroup.commutator_normal K K
         have hRnormK' : R ≤ Subgroup.normalizer (⁅K, K⁆ : Subgroup G) :=
           Subgroup.le_normalizer_of_normal
         -- **K' = ⁅K, K⁆ is abelian** (BG steps (3.4)+(5)): `⁅K, K⁆ < K` (solvable),
         -- apply IH to `K'R`.
         have hcomm : ∀ a b : ↥(⁅K, K⁆ : Subgroup G), (a : G) * (b : G) = (b : G) * (a : G) := by
-          haveI : Nontrivial ↥K := (Subgroup.nontrivial_iff_ne_bot K).mpr hKne
+          have : Nontrivial ↥K := (Subgroup.nontrivial_iff_ne_bot K).mpr hKne
           have hK'ltK : (⁅K, K⁆ : Subgroup G) < K := by
             have htop : (⊤ : Subgroup ↥K).map K.subtype = K := by
               rw [← MonoidHom.range_eq_map, Subgroup.range_subtype]
@@ -126,7 +126,7 @@ private theorem thm35_aux : ∀ (n : ℕ)
             calc (commutator ↥K).map K.subtype
                 < (⊤ : Subgroup ↥K).map K.subtype :=
                   (Subgroup.map_lt_map_iff_of_injective K.subtype_injective).mpr
-                    (IsSolvable.commutator_lt_top_of_nontrivial ↥K)
+                    (Group.IsSolvable.commutator_lt_top_of_nontrivial ↥K)
               _ = K := htop
           have hFrobK' := isFrobeniusGroup_subgroupOf_sup hFrob hKK_le hRnormK' hK'ne
           -- `|K'R| < n` (from `|K'| < |K|`).
@@ -134,24 +134,24 @@ private theorem thm35_aux : ∀ (n : ℕ)
             refine lt_of_le_of_ne (Nat.le_of_dvd Nat.card_pos (Subgroup.card_dvd_of_le hKK_le))
               (fun heq => (ne_of_lt hK'ltK) (Subgroup.eq_of_le_of_card_ge hKK_le heq.ge))
           have hlt : Nat.card ↥((⁅K, K⁆ : Subgroup G) ⊔ R) < n := by
-            have e1 := hFrobK'.isComplement.card_mul
-            have e2 := hFrob.isComplement.card_mul
+            have e1 := hFrobK'.isComplement.card_mul_card
+            have e2 := hFrob.isComplement.card_mul_card
             rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left)).toEquiv,
               Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv] at e1
             rw [← hn, ← e2, ← e1]
             exact mul_lt_mul_of_pos_right hK'cardlt Nat.card_pos
           -- solvability of the `K'`-kernel inside `K'R`.
-          haveI hK'solv0 : IsSolvable ↥(⁅K, K⁆ : Subgroup G) := by
-            haveI : IsSolvable ↥((⁅K, K⁆ : Subgroup G).subgroupOf K) := inferInstance
-            exact solvable_of_surjective
+          have hK'solv0 : Group.IsSolvable ↥(⁅K, K⁆ : Subgroup G) := by
+            have : Group.IsSolvable ↥((⁅K, K⁆ : Subgroup G).subgroupOf K) := inferInstance
+            exact Group.isSolvable_of_surjective
               (f := (Subgroup.subgroupOfEquivOfLe hKK_le).toMonoidHom)
               (Subgroup.subgroupOfEquivOfLe hKK_le).surjective
-          haveI hK'solv :
-              IsSolvable ↥((⁅K, K⁆ : Subgroup G).subgroupOf ((⁅K, K⁆ : Subgroup G) ⊔ R)) := by
+          have hK'solv :
+              Group.IsSolvable ↥((⁅K, K⁆ : Subgroup G).subgroupOf ((⁅K, K⁆ : Subgroup G) ⊔ R)) := by
             have e : ↥(⁅K, K⁆ : Subgroup G) ≃*
                 ↥((⁅K, K⁆ : Subgroup G).subgroupOf ((⁅K, K⁆ : Subgroup G) ⊔ R)) :=
               (Subgroup.subgroupOfEquivOfLe (le_sup_left)).symm
-            exact solvable_of_surjective (f := e.toMonoidHom) e.surjective
+            exact Group.isSolvable_of_surjective (f := e.toMonoidHom) e.surjective
           have hRpK' : ∃ q : ℕ, q.Prime ∧
               Nat.card ↥(R.subgroupOf ((⁅K, K⁆ : Subgroup G) ⊔ R)) = q :=
             ⟨p, hp, (Nat.card_congr
@@ -207,8 +207,8 @@ private theorem thm35_aux : ∀ (n : ℕ)
         by_contra hg1
         obtain ⟨U, hUirr, hUg⟩ := OddOrder.BG.Ch1.S03d.exists_irreducible_subrep_apply_ne ρ hg1
         apply hUg
-        haveI := hUirr
-        haveI : Nontrivial ↥U.toSubmodule := by
+        have := hUirr
+        have : Nontrivial ↥U.toSubmodule := by
           by_contra hcon
           rw [not_nontrivial_iff_subsingleton] at hcon
           exact hUg (Subsingleton.elim _ _)
@@ -222,7 +222,7 @@ private theorem thm35_aux : ∀ (n : ℕ)
             hCUK' g hg
     · -- **non-faithful branch**: `C = ker ρ ≠ ⊥`; reduce to `G/C` (Lemma 3.2).
       set C := MonoidHom.ker ρ with hCdef
-      haveI hCnorm : C.Normal := MonoidHom.normal_ker _
+      have hCnorm : C.Normal := MonoidHom.normal_ker _
       by_cases hKC : K ≤ C
       · -- `K ≤ C`: `⁅K, K⁆ ≤ K ≤ C = ker ρ`, so `ρ` kills `⁅K, K⁆`.
         intro g hg
@@ -230,15 +230,15 @@ private theorem thm35_aux : ∀ (n : ℕ)
       · -- `¬ K ≤ C`: `C ⊆ K` (Frobenius normal ⊆ kernel) and `G/C` is Frobenius; apply IH.
         have hCK : C ≤ K := normal_le_kernel_of_not_kernel_le hFrob hKC
         -- `ρ` factors through `G/C` as `ρ̄ = ofQuotient ρ C`.
-        haveI hIsTriv : Representation.IsTrivial (ρ.comp C.subtype) := by
+        have hIsTriv : Representation.IsTrivial (ρ.comp C.subtype) := by
           refine ⟨fun c => ?_⟩
           change ρ (c : G) = LinearMap.id
           rw [MonoidHom.mem_ker.mp c.2]; rfl
         set ρbar := Representation.ofQuotient ρ C with hρbar
-        haveI : (K.map (QuotientGroup.mk' C)).Normal :=
+        have : (K.map (QuotientGroup.mk' C)).Normal :=
           hKnorm.map (QuotientGroup.mk' C) (QuotientGroup.mk'_surjective C)
-        haveI hKbarsolv : IsSolvable ↥(K.map (QuotientGroup.mk' C)) :=
-          solvable_of_surjective (MonoidHom.subgroupMap_surjective (QuotientGroup.mk' C) K)
+        have hKbarsolv : Group.IsSolvable ↥(K.map (QuotientGroup.mk' C)) :=
+          Group.isSolvable_of_surjective (MonoidHom.subgroupMap_surjective (QuotientGroup.mk' C) K)
         -- `|G| = |G/C| · |C|`, so `|G/C| < |G|` (since `C ≠ ⊥`).
         have hCne : C ≠ ⊥ := fun h => hfaithful ((MonoidHom.ker_eq_bot_iff ρ).mp h)
         have hGcard : Nat.card G = Nat.card (G ⧸ C) * Nat.card ↥C :=
@@ -317,7 +317,7 @@ theorem thm35_algClosed
     {G : Type*} [Group G] [Finite G]
     {V : Type*} [AddCommGroup V] [Module F V] [FiniteDimensional F V]
     (ρ : Representation F G V) (K R : Subgroup G)
-    (hFrob : IsFrobeniusGroup G K R) (hKsolv : IsSolvable ↥K)
+    (hFrob : IsFrobeniusGroup G K R) (hKsolv : Group.IsSolvable ↥K)
     (hRp : ∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p)
     (hchar : (Nat.card G : F) ≠ 0)
     (hCV1 : Module.finrank F (Representation.invariants (ρ.comp R.subtype)) = 1) :
@@ -338,7 +338,7 @@ theorem thm35
     {G : Type*} [Group G] [Finite G]
     {V : Type*} [AddCommGroup V] [Module F V] [FiniteDimensional F V]
     (ρ : Representation F G V) (K R : Subgroup G)
-    (hFrob : IsFrobeniusGroup G K R) (hKsolv : IsSolvable ↥K)
+    (hFrob : IsFrobeniusGroup G K R) (hKsolv : Group.IsSolvable ↥K)
     (hRp : ∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p)
     (hchar : (Nat.card G : F) ≠ 0)
     (hCV1 : Module.finrank F (Representation.invariants (ρ.comp R.subtype)) = 1) :

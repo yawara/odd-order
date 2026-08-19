@@ -358,7 +358,7 @@ theorem exists_glue_nu_columnSum_Yset_via_map
           = νX (OddOrder.Peterfalvi.S06.columnSum h46 χ₂))
       ∧ (∀ y ∈ hyp.Yset, ν y = cY.extension y) := by
   classical
-  haveI : Finite ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :=
+  have : Finite ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :=
     SibleyDadeHypothesis.finite_linearCharacters_of_finite
   have hinner : ∀ φ ψ : ClassFunction ↥L ℂ, IsIrreducibleCharacter φ → IsIrreducibleCharacter ψ →
       ClassFunction.inner φ ψ = if φ = ψ then (1 : ℂ) else 0 := by

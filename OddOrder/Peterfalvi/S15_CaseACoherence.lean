@@ -96,7 +96,7 @@ theorem Hypothesis.nineElevenNormBoundS [Finite G]
           (chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief) |
         IsIrreducibleCharacter φ ∧ φ ∉ S₂}.ncard ≤ N := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   -- ── `indS` → honest-Dade conversions for the coherence clauses (as in `nineElevenPairBoundS`)
   obtain ⟨cohS₂_indS⟩ := hS₂coh
   have hindS_dade : ∀ f : ClassFunction ↥hyp.S ℂ,
@@ -539,8 +539,8 @@ theorem Hypothesis.sSet_caseA_nineElevenRefutation [Finite G]
         (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S))) :
     False := by
   classical
-  letI : Fintype ↥hyp.S := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+  let : Fintype ↥hyp.S := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥hyp.S : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   -- numeric positivity inputs of the (9.11.1) squeeze
   have hq : 0 < (hyp.toTypesIIIIIIVSetupS hG).q :=
@@ -755,7 +755,7 @@ theorem Hypothesis.sSet_coherent_indS_A_pinned [Finite G]
         j' ≠ ⟨0, hyp.p_prime.pos⟩ → j ≠ j' →
         c.extension (∑ i : Fin hyp.q, hyp.mu i j) = -∑ i : Fin hyp.q, hyp.eta i j') := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hp1 : (⟨1, hyp.p_prime.one_lt⟩ : Fin hyp.p) ≠ ⟨0, hyp.p_prime.pos⟩ := by
     intro h; exact absurd (congrArg Fin.val h) one_ne_zero
   have hqne : (hyp.q : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hyp.q_prime.pos.ne'
@@ -942,7 +942,7 @@ theorem Hypothesis.tau1S_ofHonest_mu_col_eta_col_one [Finite G]
       hyp.tau1S_ofHonest hG hnoV chief (∑ i : Fin hyp.q, hyp.mu i j)
         = (δ : ℂ) • ∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩ := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hp1 : (⟨1, hyp.p_prime.one_lt⟩ : Fin hyp.p) ≠ ⟨0, hyp.p_prime.pos⟩ := by
     intro h; exact absurd (congrArg Fin.val h) one_ne_zero
   rcases hyp.tau1S_ofHonest_muColumn_formula hG hnoV chief with hclean | ⟨hp3, hflip⟩
@@ -1055,15 +1055,15 @@ theorem Hypothesis.induce_H_mem_zSpan_S [Finite G]
     ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ ∈
       OddOrder.Peterfalvi.S07.zSpan (hyp.mkSection11CharacterDataS_honest hG chief).S := by
   classical
-  haveI := hyp.finiteG
-  letI : Fintype ↥hyp.S := Fintype.ofFinite _
-  letI : Fintype ↥((derivedInG hyp.S).subgroupOf hyp.S) := Fintype.ofFinite _
-  letI : Fintype ↥(hyp.H.subgroupOf hyp.S) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+  have := hyp.finiteG
+  let : Fintype ↥hyp.S := Fintype.ofFinite _
+  let : Fintype ↥((derivedInG hyp.S).subgroupOf hyp.S) := Fintype.ofFinite _
+  let : Fintype ↥(hyp.H.subgroupOf hyp.S) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥hyp.S : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥((derivedInG hyp.S).subgroupOf hyp.S) : ℂ) :=
+  let : Invertible (Nat.card ↥((derivedInG hyp.S).subgroupOf hyp.S) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(hyp.H.subgroupOf hyp.S) : ℂ) :=
+  let : Invertible (Nat.card ↥(hyp.H.subgroupOf hyp.S) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   -- Target family is `sSet data` with `data = toTypesIIIIIIVSetupS hG`.
   rw [OddOrder.Peterfalvi.S11.Section11CharacterData.S_eq]
@@ -1072,8 +1072,8 @@ theorem Hypothesis.induce_H_mem_zSpan_S [Finite G]
   set HU : Subgroup ↥hyp.S := OddOrder.Peterfalvi.S11.huSub data with hHU
   have hHUeq : HU = (derivedInG hyp.S).subgroupOf hyp.S :=
     OddOrder.Peterfalvi.S11.huSub_eq_derivedInG_subgroupOf data
-  letI : Fintype ↥HU := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥HU : ℂ) :=
+  let : Fintype ↥HU := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥HU : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   -- `PC = H.subgroupOf S ≤ S' = HU`.
   have hHderiv : hyp.H ≤ derivedInG hyp.S := by
@@ -1082,8 +1082,8 @@ theorem Hypothesis.induce_H_mem_zSpan_S [Finite G]
     exact sup_le le_sup_left (le_trans (hyp.C_eq ▸ inf_le_left) le_sup_right)
   have hKle : hyp.H.subgroupOf hyp.S ≤ HU := by
     rw [hHUeq]; exact Subgroup.subgroupOf_mono hyp.S hHderiv
-  letI : Fintype ↥((hyp.H.subgroupOf hyp.S).subgroupOf HU) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥((hyp.H.subgroupOf hyp.S).subgroupOf HU) : ℂ) :=
+  let : Fintype ↥((hyp.H.subgroupOf hyp.S).subgroupOf HU) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥((hyp.H.subgroupOf hyp.S).subgroupOf HU) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   -- The transport `θ' = θ ∘ e` of `θ` onto `PC' = (PC).subgroupOf HU ≤ HU`.
   have hθ'irr : OddOrder.RepresentationTheory.IsIrreducibleCharacter
@@ -1236,7 +1236,7 @@ theorem Hypothesis.tau1S_ofHonest_apply_induce_sub [Finite G]
       = ClassFunction.induce hyp.S
           (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ
             - ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ') := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   -- `ℤ[𝒮]` membership of both inductions ((1.5.a))
   have hmem := hyp.induce_H_mem_zSpan_S hG chief θ hθ hθP
   have hmem' := hyp.induce_H_mem_zSpan_S hG chief θ' hθ' hθ'P
@@ -1246,7 +1246,7 @@ theorem Hypothesis.tau1S_ofHonest_apply_induce_sub [Finite G]
           (OddOrder.Peterfalvi.S11.sSet (hyp.toTypesIIIIIIVSetupS hG)) :=
     Submodule.sub_mem _ hmem hmem'
   -- `H = PC` abelian ((13.2.a)): both inducing characters are linear, the difference has degree 0
-  haveI hHcomm : IsMulCommutative ↥(hyp.H.subgroupOf hyp.S) := by
+  have hHcomm : IsMulCommutative ↥(hyp.H.subgroupOf hyp.S) := by
     have hH := hyp.H_mulCommutative hG
     have e := Subgroup.subgroupOfEquivOfLe (show hyp.H ≤ hyp.S from hyp.H_le_S)
     exact ⟨⟨fun a b => e.injective (by

@@ -125,8 +125,8 @@ def affineLinearPartHom : ↥(affineLineGroup F) →* Fˣ where
 
 /-- 平行移動群 (= 線形部分が `1`) は可換。 -/
 instance affineLinearPartHom_ker_isSolvable :
-    IsSolvable ↥(MonoidHom.ker (affineLinearPartHom (F := F))) := by
-  refine isSolvable_of_comm fun p q => ?_
+    Group.IsSolvable ↥(MonoidHom.ker (affineLinearPartHom (F := F))) := by
+  refine Group.isSolvable_of_comm fun p q => ?_
   obtain ⟨a, b, hab⟩ := mem_affineLineGroup_iff.mp (p : ↥(affineLineGroup F)).2
   obtain ⟨a', b', hab'⟩ := mem_affineLineGroup_iff.mp (q : ↥(affineLineGroup F)).2
   have hlin : ∀ (r : ↥(MonoidHom.ker (affineLinearPartHom (F := F)))) (c : Fˣ) (d : F),
@@ -146,8 +146,8 @@ instance affineLinearPartHom_ker_isSolvable :
 /-- **Isaacs Problem 8A.11** (p. 236) の可解性: `AGL(1,F)` は metabelian ゆえ**可解**。
 
 線形部分 `p ↦ a` は `Fˣ` への準同型で, その核は平行移動群 `≅ F⁺` (可換)。 -/
-instance affineLineGroup_isSolvable : IsSolvable ↥(affineLineGroup F) :=
-  solvable_of_ker_le_range (MonoidHom.ker (affineLinearPartHom (F := F))).subtype
+instance affineLineGroup_isSolvable : Group.IsSolvable ↥(affineLineGroup F) :=
+  Group.isSolvable_of_ker_le_range (MonoidHom.ker (affineLinearPartHom (F := F))).subtype
     affineLinearPartHom (le_of_eq (Subgroup.range_subtype _).symm)
 
 end AffineLine

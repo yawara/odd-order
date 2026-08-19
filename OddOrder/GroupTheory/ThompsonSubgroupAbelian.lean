@@ -256,7 +256,7 @@ theorem commute_commutatorElement_of_inv_mul_mem_centralizer
     (hM : ∀ a ∈ A, ∀ b ∈ A, Commute ⁅x, a⁆ ⁅x, b⁆)
     (hd : ⁅x, u⁆⁻¹ * ⁅x, v⁆ ∈ centralizer (A : Set G)) :
     ∀ a ∈ A, Commute (u⁻¹ * v) ⁅x, a⁆ := by
-  haveI := hA
+  have := hA
   have hw : u⁻¹ * v ∈ A := A.mul_mem (A.inv_mem hu) hv
   have hd' : ∀ a ∈ A, a * (⁅x, u⁆⁻¹ * ⁅x, v⁆) = (⁅x, u⁆⁻¹ * ⁅x, v⁆) * a :=
     mem_centralizer_iff.mp hd
@@ -300,7 +300,7 @@ theorem isMulCommutative_sup_of_le_centralizer {H K : Subgroup G}
 /-- 可換性は部分群に遺伝する. -/
 theorem isMulCommutative_of_le {H K : Subgroup G} (hK : IsMulCommutative K)
     (hHK : H ≤ K) : IsMulCommutative H := by
-  haveI := hK
+  have := hK
   exact .of_setLike_mul_comm fun a ha b hb => setLike_mul_comm (hHK ha) (hHK hb)
 
 /-- **Gorenstein の `[x, A]`**: 元 `x` と部分群 `A` の交換子部分群
@@ -362,8 +362,8 @@ theorem card_sup_of_le_centralizer [Finite G] {H K : Subgroup G}
     (hHK : H ≤ centralizer (K : Set G)) :
     Nat.card ↥(H ⊔ K) = (K.subgroupOf H).index * Nat.card K := by
   have hnorm : H ≤ normalizer (K : Set G) := hHK.trans (centralizer_le_normalizer _)
-  haveI := Subgroup.normal_subgroupOf_of_le_normalizer hnorm
-  haveI := Subgroup.normal_subgroupOf_sup_of_le_normalizer hnorm
+  have := Subgroup.normal_subgroupOf_of_le_normalizer hnorm
+  have := Subgroup.normal_subgroupOf_sup_of_le_normalizer hnorm
   rw [Subgroup.card_eq_card_quotient_mul_card_subgroup (K.subgroupOf (H ⊔ K))]
   congr 1
   · rw [Subgroup.index_eq_card]
@@ -388,7 +388,7 @@ theorem index_centralizer_subgroupOf_le_of_elementCommutator [Finite G]
   rw [Subgroup.index_eq_card, Subgroup.index_eq_card]
   have hMcomm : ∀ a ∈ A, ∀ b ∈ A, Commute ⁅x, a⁆ ⁅x, b⁆ := by
     intro a ha b hb
-    haveI := hM
+    have := hM
     exact setLike_mul_comm (commutatorElement_mem_elementCommutator ha)
       (commutatorElement_mem_elementCommutator hb)
   refine Nat.card_le_card_of_injective
@@ -560,9 +560,9 @@ theorem exists_commutatorElement_mem_inf_normalizer [Finite G] {p : ℕ} [Fact p
     mem_normalizer_inf (hAnB ha) (mem_normalizer_normalizer (le_normalizer ha))
   have hH_norm_N : H ≤ normalizer (N : Set G) := sup_le hA_norm_N hB_norm_N
   have hH_norm_B : H ≤ normalizer (B : Set G) := sup_le hAnB le_normalizer
-  haveI hNn : (N.subgroupOf H).Normal :=
+  have hNn : (N.subgroupOf H).Normal :=
     Subgroup.normal_subgroupOf_of_le_normalizer hH_norm_N
-  haveI hBn : (B.subgroupOf H).Normal :=
+  have hBn : (B.subgroupOf H).Normal :=
     Subgroup.normal_subgroupOf_of_le_normalizer hH_norm_B
   have hHP : H ≤ P := sup_le hAP hBP
   have hpH : IsPGroup p ↥H :=
@@ -570,7 +570,7 @@ theorem exists_commutatorElement_mem_inf_normalizer [Finite G] {p : ℕ} [Fact p
   have hpQ : IsPGroup p (↥H ⧸ N.subgroupOf H) := hpH.to_quotient _
   set π := QuotientGroup.mk' (N.subgroupOf H) with hπdef
   set Bbar : Subgroup (↥H ⧸ N.subgroupOf H) := (B.subgroupOf H).map π with hBbardef
-  haveI : Bbar.Normal := hBn.map _ (QuotientGroup.mk'_surjective _)
+  have : Bbar.Normal := hBn.map _ (QuotientGroup.mk'_surjective _)
   -- `B̄` 非自明 (さもなくば `B ≤ N ≤ N(A)`)
   have hBbar_ne : Nontrivial ↥Bbar := by
     by_contra htriv
@@ -648,8 +648,8 @@ theorem thompson_replacement [Finite G] {p : ℕ} [Fact p.Prime] {P A B : Subgro
         intro c hc
         refine mem_centralizer_elementCommutator_of_forall_commute ?_
         intro a ha
-        haveI := hBcomm
-        haveI := hA.2.1
+        have := hBcomm
+        have := hA.2.1
         have hcx : Commute c x := setLike_mul_comm hc.2 hxB
         have hca : Commute c a := setLike_mul_comm hc.1 ha
         have hfull : Commute c ((x * a) * (x⁻¹ * a⁻¹)) :=
@@ -759,10 +759,10 @@ theorem comap_mem_maxAbelianIn_of_injective {N : Type*} [Group N]
   refine ⟨⟨?_, ?_, ?_⟩, hmap_comap⟩
   · rw [← Subgroup.comap_map_eq_self_of_injective hf P]
     exact Subgroup.comap_mono hE_le
-  · haveI := hE_comm
+  · have := hE_comm
     exact E.comap_injective_isMulCommutative hf
   · intro B hB_P hB_comm
-    haveI := hB_comm
+    have := hB_comm
     have hBmap_le : B.map f ≤ P.map f := Subgroup.map_mono hB_P
     have hcard_B : Nat.card (B.map f) = Nat.card B :=
       Subgroup.card_map_of_injective hf
@@ -781,7 +781,7 @@ theorem map_mem_maxAbelianIn_of_injective {N : Type*} [Group N]
     (hA : A ∈ maxAbelianIn P) :
     A.map f ∈ maxAbelianIn (P.map f) := by
   obtain ⟨hA_le, hA_comm, hA_max⟩ := hA
-  haveI := hA_comm
+  have := hA_comm
   refine ⟨Subgroup.map_mono hA_le, map_isMulCommutative A f, ?_⟩
   intro B hB_le hB_comm
   have hB_le_range : B ≤ f.range := hB_le.trans (Subgroup.map_le_range f P)
@@ -790,7 +790,7 @@ theorem map_mem_maxAbelianIn_of_injective {N : Type*} [Group N]
     rw [← Subgroup.comap_map_eq_self_of_injective hf P]
     exact Subgroup.comap_mono hB_le
   have hBcomap_comm : IsMulCommutative (B.comap f) := by
-    haveI := hB_comm
+    have := hB_comm
     exact B.comap_injective_isMulCommutative hf
   have hcard_B : Nat.card B = Nat.card (B.comap f) := by
     conv_lhs => rw [← hB_mapcomap]
@@ -889,7 +889,7 @@ theorem comap_inf_mem_maxAbelianIn_of_disjoint_ker {N : Type*} [Group N]
   refine ⟨⟨inf_le_right,
     isMulCommutative_comap_inf_of_disjoint_ker hker hE_comm, ?_⟩, hmapcomap⟩
   intro B hBP hBcomm
-  haveI := hBcomm
+  have := hBcomm
   have hcard_E : Nat.card E = Nat.card (E.comap f ⊓ P : Subgroup G) := by
     conv_lhs => rw [← hmapcomap]
     exact card_map_of_le_of_disjoint_ker hker inf_le_right
@@ -906,7 +906,7 @@ theorem map_mem_maxAbelianIn_of_disjoint_ker {N : Type*} [Group N]
     (hA : A ∈ maxAbelianIn P) :
     A.map f ∈ maxAbelianIn (P.map f) := by
   obtain ⟨hA_le, hA_comm, hA_max⟩ := hA
-  haveI := hA_comm
+  have := hA_comm
   refine ⟨Subgroup.map_mono hA_le, map_isMulCommutative A f, ?_⟩
   intro B hB_le hB_comm
   have hmapcomap := map_comap_inf_eq_of_le_map hB_le
@@ -1066,7 +1066,7 @@ theorem normal_of_le_center' {C : Subgroup G} (hC : C ≤ center G) : C.Normal :
 /-- 中心的部分群は左スロットで吸収される: `C ≤ Z(G)` なら `⁅X ⊔ C, Y⁆ = ⁅X, Y⁆`. -/
 theorem commutator_sup_central_left {X Y C : Subgroup G} (hC : C ≤ center G) :
     ⁅X ⊔ C, Y⁆ = ⁅X, Y⁆ := by
-  haveI := normal_of_le_center' hC
+  have := normal_of_le_center' hC
   refine le_antisymm ?_ (commutator_mono le_sup_left le_rfl)
   rw [commutator_le]
   intro g hg y hy
@@ -1138,14 +1138,14 @@ theorem commutator_top_sup_eq_of_le {B A : Subgroup G} [B.Normal]
 theorem commutator_top_top_eq_commutator_left {B A : Subgroup G} [B.Normal]
     (hsup : B ⊔ A = ⊤) (hAcomm : IsMulCommutative A) :
     ⁅(⊤ : Subgroup G), (⊤ : Subgroup G)⁆ = ⁅B, (⊤ : Subgroup G)⁆ := by
-  haveI := hAcomm
+  have := hAcomm
   refine le_antisymm ?_ (commutator_mono le_top le_rfl)
   rw [commutator_le]
   intro g₁ _ g₂ _
   obtain ⟨a₁, ha₁, b₁, hb₁, rfl⟩ := exists_mul_of_sup_eq_top' hsup g₁
   have key : ⁅a₁ * b₁, g₂⁆ = (a₁ * ⁅b₁, g₂⁆ * a₁⁻¹) * ⁅a₁, g₂⁆ := by group
   rw [key]
-  haveI : (⁅B, (⊤ : Subgroup G)⁆).Normal := commutator_normal B ⊤
+  have : (⁅B, (⊤ : Subgroup G)⁆).Normal := commutator_normal B ⊤
   have h1 : a₁ * ⁅b₁, g₂⁆ * a₁⁻¹ ∈ ⁅B, (⊤ : Subgroup G)⁆ :=
     ‹(⁅B, (⊤ : Subgroup G)⁆).Normal›.conj_mem _
       (commutator_mem_commutator hb₁ trivial) a₁

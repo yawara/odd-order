@@ -134,8 +134,8 @@ theorem card_G0_lower_bound [Finite G] {k : ℕ}
           (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
               ((F.e i : ℚ) * (F.h i : ℚ)) +
             2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
-  letI : Fintype G := Fintype.ofFinite G
-  letI : Invertible (Nat.card G : ℂ) :=
+  let : Fintype G := Fintype.ofFinite G
+  let : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   exact F.lowerBoundTerm_of_characterEstimateData hodd
     (F.characterEstimateData_of_isNilpotent hodd F.isNilpotent_kernel)

@@ -46,7 +46,7 @@ theorem le_of_isSubnormal_of_coprime_index {G : Type*} [Group G] [Finite G] {K :
     have hcopK' : (K'.index).Coprime (Nat.card K) :=
       Nat.Coprime.coprime_dvd_left (Subgroup.index_dvd_of_le hle) hcop
     have hKK' : K ≤ K' := ih hcopK'
-    haveI := hN
+    have := hN
     -- `|K':H'| = (H'.subgroupOf K').index ∣ |G:H'|` は `|K|` と互いに素
     have hidxdvd : (H'.subgroupOf K').index ∣ H'.index :=
       Subgroup.relIndex_dvd_index_of_le hle
@@ -87,11 +87,11 @@ theorem oPiCore_map_subtype_le_of_isSubnormal {G : Type*} [Group G] [Finite G] {
     exact oPiCore.map_le_of_surjective π (⊤ : Subgroup G).subtype
       (fun g => ⟨⟨g, Subgroup.mem_top g⟩, rfl⟩)
   | @step H' K' hle hsubK' hN ih =>
-    haveI := hN
+    have := hN
     set e := Subgroup.subgroupOfEquivOfLe hle with he
     have htrans : (oPiCore π ↥H').map (e.symm : ↥H' →* ↥(H'.subgroupOf K'))
         = oPiCore π ↥(H'.subgroupOf K') := oPiCore.map_eq_of_mulEquiv π e.symm
-    haveI hnorm : ((oPiCore π ↥(H'.subgroupOf K')).map (H'.subgroupOf K').subtype).Normal :=
+    have hnorm : ((oPiCore π ↥(H'.subgroupOf K')).map (H'.subgroupOf K').subtype).Normal :=
       characteristic_map_subtype_normal (oPiCore π ↥(H'.subgroupOf K'))
     have hpi : Subgroup.IsPiGroup π
         ((oPiCore π ↥(H'.subgroupOf K')).map (H'.subgroupOf K').subtype) := fun q hq =>
@@ -251,7 +251,7 @@ private theorem le_normalizer_of_isSubnormal_aux :
     exact absurd (Nat.card_pos.trans_le hcard) (lt_irrefl 0)
   | succ n ih =>
     intro G _ _ hcard S hSsimp hperm H hH
-    haveI := hSsimp
+    have := hSsimp
     induction hH with
     | top =>
       intro s _
@@ -333,7 +333,7 @@ private theorem le_normalizer_of_isSubnormal_aux :
           rw [← SetLike.mem_coe, hKset] at hx
           obtain ⟨s, hs, h, hh, rfl⟩ := hx
           exact Subgroup.mul_mem _ (ihK' hs) (Subgroup.le_normalizer (h_le hh))
-        haveI hK'norm : (K'.subgroupOf (S ⊔ H)).Normal := by
+        have hK'norm : (K'.subgroupOf (S ⊔ H)).Normal := by
           constructor
           rintro ⟨x, hxKg⟩ hx ⟨k, hkKg⟩
           rw [Subgroup.mem_subgroupOf] at hx ⊢
@@ -435,8 +435,8 @@ theorem exists_subfamily_indep_sSup_eq {G : Type*} [Group G] [Finite G]
   refine ⟨Y, hY₀Y, hYX, hYind, le_antisymm (sSup_le_sSup hYX) (sSup_le fun M hM => ?_)⟩
   by_contra hMle
   have hMnorm : M.Normal := (hX M hM).1
-  haveI := hMnorm
-  haveI hsupnorm : (sSup Y).Normal := Subgroup.sSup_normal _ fun T hT => (hX T (hYX hT)).1
+  have := hMnorm
+  have hsupnorm : (sSup Y).Normal := Subgroup.sSup_normal _ fun T hT => (hX T (hYX hT)).1
   have hdisj : Disjoint M (sSup Y) := by
     rcases (hX M hM).2.2 (M ⊓ sSup Y) (Subgroup.normal_inf_normal M (sSup Y))
         inf_le_left with h | h
@@ -513,8 +513,8 @@ theorem socle_eq_top_of_forall_isMinimalNormal {G : Type*} [Group G] [Finite G]
     {X : Set (Subgroup G)} (hX : ∀ M ∈ X, IsMinimalNormal M) :
     socle ↥(sSup X : Subgroup G) = ⊤ := by
   set N : Subgroup G := sSup X with hNdef
-  haveI hNnorm : N.Normal := Subgroup.sSup_normal _ fun M hM => (hX M hM).1
-  haveI hmap_normal : ((socle ↥N).map N.subtype).Normal := by
+  have hNnorm : N.Normal := Subgroup.sSup_normal _ fun M hM => (hX M hM).1
+  have hmap_normal : ((socle ↥N).map N.subtype).Normal := by
     constructor
     intro x hx g
     obtain ⟨w, hw, rfl⟩ := hx
@@ -524,7 +524,7 @@ theorem socle_eq_top_of_forall_isMinimalNormal {G : Type*} [Group G] [Finite G]
     conv_lhs => rw [hNdef]
     refine sSup_le fun M hM => ?_
     have hMN : M ≤ N := le_sSup hM
-    haveI hMnorm : M.Normal := (hX M hM).1
+    have hMnorm : M.Normal := (hX M hM).1
     have hsub_norm : (M.subgroupOf N).Normal := hMnorm.subgroupOf N
     have hsub_ne : M.subgroupOf N ≠ ⊥ := by
       intro h
@@ -608,9 +608,9 @@ theorem isSimpleGroup_of_isMinimalNormal_of_forall_isMinimalNormal {G : Type*} [
       · exact h ▸ le_sup_left
       · exact le_trans (le_sSup (show T ∈ Y \ {V} from ⟨hT, h⟩)) le_sup_right
   -- 単純性
-  haveI hVnontriv : Nontrivial ↥V := (Subgroup.nontrivial_iff_ne_bot V).mpr hV.2.1
-  haveI hVnorm := hV.1
-  haveI hrestnorm : (sSup (Y \ {V})).Normal :=
+  have hVnontriv : Nontrivial ↥V := (Subgroup.nontrivial_iff_ne_bot V).mpr hV.2.1
+  have hVnorm := hV.1
+  have hrestnorm : (sSup (Y \ {V})).Normal :=
     Subgroup.sSup_normal _ fun T hT => (hYX hT.1).1
   refine ⟨fun K hK => ?_⟩
   -- K₀ := K.map V.subtype ⊴ ↥N
@@ -686,8 +686,8 @@ theorem exists_mem_le_of_normal_le_sSup_of_not_isMulCommutative {G : Type*} [Gro
   apply hUnc
   have hcent : sSup X ≤ Subgroup.centralizer (U : Set G) := by
     refine sSup_le fun M hM => ?_
-    haveI := hU
-    haveI := (hX M hM).1
+    have := hU
+    have := (hX M hM).1
     have hdisj : Disjoint U M := by
       rcases (hX M hM).2.2 (U ⊓ M) (Subgroup.normal_inf_normal U M) inf_le_right with h | h
       · exact disjoint_iff.mpr h
@@ -737,7 +737,7 @@ theorem oPiCore_le_normalizer_of_isSubnormal_of_oPiResidual_eq_top {G : Type*} [
     oPiResidual_le_of_isSubnormal_of_index_isPiNumber hH.subgroupOf hidx
   have hle₂ : H.subgroupOf K ≤ oPiResidual π ↥K :=
     subgroupOf_le_oPiResidual_of_eq_top hHK hperf
-  haveI hnorm : (H.subgroupOf K).Normal := by
+  have hnorm : (H.subgroupOf K).Normal := by
     rw [le_antisymm hle₂ hle₁]; infer_instance
   exact le_sup_right.trans ((Subgroup.normal_subgroupOf_iff_le_normalizer hHK).mp hnorm)
 

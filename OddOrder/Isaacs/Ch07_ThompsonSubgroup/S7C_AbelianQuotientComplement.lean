@@ -38,7 +38,7 @@ theorem quotientComplement_isMulCommutative_of_sylow_isCoatom.{u}
         (G ⧸ OddOrder.Isaacs.Ch01.opCore p G))) :
     IsMulCommutative ↥Nbar := by
   classical
-  letI : Nbar.Normal := hNbar_normal
+  let : Nbar.Normal := hNbar_normal
   let q : G →* G ⧸ OddOrder.Isaacs.Ch01.opCore p G :=
     QuotientGroup.mk' (OddOrder.Isaacs.Ch01.opCore p G)
   have hq : Function.Surjective q :=
@@ -164,15 +164,15 @@ theorem quotientComplement_isMulCommutative_of_sylow_isCoatom.{u}
       exact (Subgroup.map_eq_bot_iff_of_injective _
         Nbar.subtype_injective).mp hWbar_bot
   by_cases hNbar_bot : Nbar = ⊥
-  · haveI : Subsingleton ↥Nbar := by
+  · have : Subsingleton ↥Nbar := by
       rw [hNbar_bot]
       infer_instance
     infer_instance
-  haveI : Nontrivial ↥Nbar :=
+  have : Nontrivial ↥Nbar :=
     Nbar.nontrivial_iff_ne_bot.mpr hNbar_bot
   obtain ⟨r, hr_prime, hr_dvd⟩ :=
     Nat.exists_prime_and_dvd (Finite.one_lt_card (α := ↥Nbar)).ne'
-  letI : Fact r.Prime := ⟨hr_prime⟩
+  let : Fact r.Prime := ⟨hr_prime⟩
   have hp_not_dvd_Nbar : ¬ p ∣ Nat.card ↥Nbar := by
     intro hp_dvd
     apply Pbar.not_dvd_index
@@ -185,10 +185,10 @@ theorem quotientComplement_isMulCommutative_of_sylow_isCoatom.{u}
     rw [hk]
     exact Nat.Coprime.pow_left k
       ((Fact.out : p.Prime).coprime_iff_not_dvd.mpr hp_not_dvd_Nbar)
-  haveI : Group.IsNilpotent
+  have : Group.IsNilpotent
       ↥(Pbar : Subgroup (G ⧸ OddOrder.Isaacs.Ch01.opCore p G)) :=
     IsPGroup.isNilpotent Pbar.isPGroup'
-  haveI : IsSolvable
+  have : Group.IsSolvable
       ↥(Pbar : Subgroup (G ⧸ OddOrder.Isaacs.Ch01.opCore p G)) :=
     inferInstance
   obtain ⟨R, hR_inv⟩ :=
@@ -209,10 +209,10 @@ theorem quotientComplement_isMulCommutative_of_sylow_isCoatom.{u}
       Nat.card ↥Nbar = Nat.card ↥(⊤ : Subgroup ↥Nbar) := by simp
       _ = Nat.card ↥(R : Subgroup ↥Nbar) := by rw [hR_top]
       _ = r ^ k := hk
-  haveI : Group.IsNilpotent ↥Nbar := IsPGroup.isNilpotent hNbar_r
-  haveI : IsSolvable ↥Nbar := inferInstance
+  have : Group.IsNilpotent ↥Nbar := IsPGroup.isNilpotent hNbar_r
+  have : Group.IsSolvable ↥Nbar := inferInstance
   have hcomm_ne_top : commutator ↥Nbar ≠ ⊤ :=
-    (IsSolvable.commutator_lt_top_of_nontrivial ↥Nbar).ne
+    (Group.IsSolvable.commutator_lt_top_of_nontrivial ↥Nbar).ne
   have hcomm_inv :
       OddOrder.Isaacs.Ch03.IsAInvariant phi (commutator ↥Nbar) :=
     OddOrder.Isaacs.Ch03.IsAInvariant.commutator_self phi
@@ -244,14 +244,14 @@ theorem twoSubgroups_commutative_of_minimal_counterexample.{u}
       ∀ x y : ↥S, x * y = y * x := by
   classical
   obtain ⟨Nbar, hNbar_normal, hNbar_complement⟩ := hQuotient
-  letI : Nbar.Normal := hNbar_normal
+  let : Nbar.Normal := hNbar_normal
   have hP_max : IsCoatom (P : Subgroup G) :=
     sylow_isCoatom_of_minimal_counterexample P hHyp ih hG
       ⟨Nbar, hNbar_normal, hNbar_complement⟩
   have hNbar_comm : IsMulCommutative ↥Nbar :=
     quotientComplement_isMulCommutative_of_sylow_isCoatom
       P hP_max hNbar_normal hNbar_complement
-  letI : IsMulCommutative ↥Nbar := hNbar_comm
+  let : IsMulCommutative ↥Nbar := hNbar_comm
   let q : G →* G ⧸ OddOrder.Isaacs.Ch01.opCore p G :=
     QuotientGroup.mk' (OddOrder.Isaacs.Ch01.opCore p G)
   have hq : Function.Surjective q :=

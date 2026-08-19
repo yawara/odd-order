@@ -76,7 +76,7 @@ theorem oPiCorePrime_subgroup_eq_bot_of_opCore_le
   -- `U` lives inside `H` as `U.subgroupOf H = U.comap H.subtype`, normal in `↥H`.
   have hU_le_H : U ≤ H := hUH
   set Usub : Subgroup (↥H) := U.subgroupOf H with hUsub_def
-  haveI hUsub_normal : Usub.Normal :=
+  have hUsub_normal : Usub.Normal :=
     (OddOrder.Isaacs.Ch01.opCore.normal p G).subgroupOf H
   -- `Usub` is a `p`-group (`comap` of the `p`-group `U` along an injective hom).
   have hU_pg : IsPGroup p ↥U := OddOrder.Isaacs.Ch01.opCore_isPGroup p G
@@ -325,7 +325,7 @@ private theorem step3_Abar_centralizes_inter_LBar.{u}
       _ < Nat.card ↥H * H.index := (Nat.mul_lt_mul_left Nat.card_pos).mpr hidx
       _ = Nat.card G := hmul
   -- (b) Descend hypotheses to `↥H`.
-  haveI : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) (↥H) :=
+  have : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) (↥H) :=
     OddOrder.Isaacs.Ch03.Subgroup.isPiSeparable_of_isPiSeparable ({p} : Set ℕ) H
   have h2abelian' : ∀ T : Subgroup ↥H, IsPGroup 2 T → ∀ x y : ↥T, x * y = y * x := by
     intro T hT2
@@ -387,7 +387,7 @@ private theorem step3_Abar_centralizes_inter_LBar.{u}
   have hU_eq_oPi : U = OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G :=
     (OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := G) p).symm
   -- `L.subgroupOf H` is normal in `↥H` (L ⊴ G).
-  haveI hLsub_normal : (L.subgroupOf H).Normal := by
+  have hLsub_normal : (L.subgroupOf H).Normal := by
     rw [hL_def]; exact (opPpPrimeCore_normal (G := G) (p := p)).subgroupOf H
   -- `J(S) ≤ S ≤ P`, so `J(S).map H.subtype` is a `p`-subgroup of `G` inside `P`.
   have hJS_le_S : Subgroup.thompsonJ (S : Subgroup ↥H) p ≤ (S : Subgroup ↥H) :=
@@ -398,7 +398,7 @@ private theorem step3_Abar_centralizes_inter_LBar.{u}
     rw [hS_map] at this
     exact this.trans inf_le_right
   -- `⁅L.subgroupOf H, A.subgroupOf H⁆ ≤ ⁅L.subgroupOf H, J(S)⁆ ≤ (L.subgroupOf H) ⊓ J(S)`.
-  haveI := hJS_normal
+  have := hJS_normal
   have hchain : (⁅L.subgroupOf H, A.subgroupOf H⁆ : Subgroup ↥H) ≤
       (L.subgroupOf H) ⊓ Subgroup.thompsonJ (S : Subgroup ↥H) p := by
     refine le_trans (Subgroup.commutator_mono le_rfl hAsub_le_JS) ?_
@@ -527,7 +527,7 @@ private theorem inf_sup_eq_of_le_normalizer_of_inf_eq_bot
   apply le_antisymm
   · intro x ⟨hxWA, hxL⟩
     -- `W` is normal in `A ⊔ W`, so `x = w * a` with `w ∈ W`, `a ∈ A`.
-    haveI : (W.subgroupOf (A ⊔ W)).Normal := Subgroup.normal_subgroupOf_sup_of_le_normalizer hAnorm
+    have : (W.subgroupOf (A ⊔ W)).Normal := Subgroup.normal_subgroupOf_sup_of_le_normalizer hAnorm
     have hx_AW : x ∈ A ⊔ W := by rw [sup_comm]; exact hxWA
     have hmem : (⟨x, hx_AW⟩ : ↥(A ⊔ W)) ∈ (W.subgroupOf (A ⊔ W)) ⊔ (A.subgroupOf (A ⊔ W)) := by
       rw [← Subgroup.subgroupOf_sup (le_sup_right) (le_sup_left), sup_comm W A,
@@ -720,7 +720,7 @@ private theorem step5_Abar_card_eq_p.{u}
     (h_P_eq_UA : OddOrder.Isaacs.Ch01.opCore p G ⊔ A = (P : Subgroup G)) :
     (OddOrder.Isaacs.Ch01.opCore p G).relIndex A = p := by
   classical
-  haveI : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G := h_pSolvable
+  have : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G := h_pSolvable
   set U : Subgroup G := OddOrder.Isaacs.Ch01.opCore p G with hU_def
   set mk : G →* G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G :=
     QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) with hmk_def
@@ -732,7 +732,7 @@ private theorem step5_Abar_card_eq_p.{u}
   have hU_eq_oPi : U = OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G :=
     (OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := G) p).symm
   have hA_pg : IsPGroup p A := hA_mem.2.1.isPGroup
-  haveI hLbar_normal : Lbar.Normal := by
+  have hLbar_normal : Lbar.Normal := by
     rw [hLbar_def]; exact OddOrder.Isaacs.Ch03.oPiCore.normal _ _
   -- `Ā ⊓ L̄ = ⊥`, `Ā ≠ ⊥`.
   have hAbar_inf_Lbar : Abar ⊓ Lbar = ⊥ := by
@@ -741,7 +741,7 @@ private theorem step5_Abar_card_eq_p.{u}
     rw [hAbar_def, hmk_def]
     exact Abar_ne_bot_of_not_le (by rwa [hU_eq_oPi] at hA_not_le)
   -- The conjugation action `↥Ā ↷ ↥L̄`.  `a • n = ⟨↑a * ↑n * (↑a)⁻¹⟩`.
-  letI : MulDistribMulAction ↥Abar ↥Lbar := subgroupConjActionOnNormal Abar Lbar
+  let : MulDistribMulAction ↥Abar ↥Lbar := subgroupConjActionOnNormal Abar Lbar
   have hsmul_coe : ∀ (a : ↥Abar) (n : ↥Lbar),
       ((a • n : ↥Lbar) : G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) =
         (↑a : G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) * ↑n * (↑a)⁻¹ := by
@@ -752,13 +752,13 @@ private theorem step5_Abar_card_eq_p.{u}
     exact isElementaryAbelian_map_of_isElementaryAbelian mk
       (A := A) ⟨hA_mem.2.1.1, hA_mem.2.1.2⟩
   -- `↥Ā` is abelian.
-  haveI : IsMulCommutative ↥Abar := ⟨⟨hAbar_el.1⟩⟩
+  have : IsMulCommutative ↥Abar := ⟨⟨hAbar_el.1⟩⟩
   -- The action is faithful: `a` fixes all of `L̄` ⇒ `↑a ∈ C_Ḡ(L̄)`, and `Ā ⊓ C_Ḡ(L̄) = ⊥`.
   have hAbar_inf_cent :
       Abar ⊓ Subgroup.centralizer
         (Lbar : Set (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G)) = ⊥ := by
     rw [hAbar_def, hLbar_def]; exact AbarInf_centralizer_LBar_eq_bot hA_pg
-  haveI : FaithfulSMul ↥Abar ↥Lbar := by
+  have : FaithfulSMul ↥Abar ↥Lbar := by
     refine ⟨fun {a b} h => ?_⟩
     -- `↑b⁻¹ * ↑a` centralizes `L̄`.
     set ga : G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G := a.1 with hga
@@ -832,7 +832,7 @@ private theorem step5_Abar_card_eq_p.{u}
   have hAbar_cyclic : IsCyclic ↥Abar :=
     OddOrder.Isaacs.Ch06.isCyclic_of_faithful_trivial_on_proper_invariant hCop hproper
   -- `Ā` is nontrivial, elementary abelian, cyclic `p`-group ⇒ `|Ā| = p`.
-  haveI : Nontrivial ↥Abar := (Subgroup.nontrivial_iff_ne_bot _).mpr hAbar_ne_bot
+  have : Nontrivial ↥Abar := (Subgroup.nontrivial_iff_ne_bot _).mpr hAbar_ne_bot
   have hAbar_card : Nat.card ↥Abar = p :=
     card_eq_prime_of_isElementaryAbelian_isCyclic_nontrivial hAbar_el hAbar_cyclic
   -- Convert `Nat.card Ā = p` to `U.relIndex A = p` via `relIndex_map_map` + diamond.
@@ -926,7 +926,7 @@ private theorem step4_5_normal_J_hypotheses.{u}
   have hLbar_eq : Lbar = OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p}
       (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) := by
     rw [hLbar_def, hL_def, hmk_def]; exact opPpPrimeCore_map_eq_LBar
-  haveI : Lbar.Normal := by rw [hLbar_eq]; exact OddOrder.Isaacs.Ch03.oPiCore.normal _ _
+  have : Lbar.Normal := by rw [hLbar_eq]; exact OddOrder.Isaacs.Ch03.oPiCore.normal _ _
   -- `Ā ⊓ L̄ = ⊥` (p-group vs p'-group) and `Ā ≠ ⊥`.
   have hAbar_inf_Lbar : Abar ⊓ Lbar = ⊥ := by
     rw [hAbar_def, hLbar_eq]; exact AbarInf_LBar_eq_bot hA_pg
@@ -1177,7 +1177,7 @@ private theorem step8a_PBar_normal_GBar
   have hU_eq : U = OddOrder.Isaacs.Ch01.opCore p G :=
     OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := G) p
   -- (Hypothesis 1) `Ḡ` is `p`-separable: instance from `quotient_isPiSeparable`.
-  haveI : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) (G ⧸ U) := inferInstance
+  have : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) (G ⧸ U) := inferInstance
   -- (Hypothesis 3) Every `2`-subgroup of `Ḡ` is abelian, by `quotient_two_subgroup_abelian`.
   have h2abelian_bar :
       ∀ S : Subgroup (G ⧸ U), IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x :=
@@ -1298,7 +1298,7 @@ theorem step8b_pullback_normal_P
     exact hPBar_normal.comap (QuotientGroup.mk' _)
   -- (5) P is a normal p-group ⇒ P ≤ opCore p G = U.
   have hP_pg : IsPGroup p (P : Subgroup G) := P.isPGroup'
-  haveI := hP_normal
+  have := hP_normal
   have hP_le_U : (P : Subgroup G) ≤ OddOrder.Isaacs.Ch01.opCore p G :=
     OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore hP_pg
   -- (6) A ≤ P ≤ U contradicts hA_not_le.
@@ -1363,7 +1363,7 @@ theorem thompsonJ_le_opCore_of_normal_J_hypotheses
     exact normal_thompsonJ_of_le_opCore Q' h_le_op'
   -- Now prove `J(Q) ≤ U` on the running group `H` of order `n` using Step 2 extraction
   -- + the Steps 4-5 axiom + Step 6 (landed) + Step 7 (landed) + Step 8 closure axiom.
-  haveI h_pSolvable_in_H : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) H :=
+  have h_pSolvable_in_H : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) H :=
     inferInstance
   rw [thompsonJ_le_iff]
   intro A hA_mem

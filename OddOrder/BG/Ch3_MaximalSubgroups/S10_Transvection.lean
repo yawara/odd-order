@@ -50,7 +50,7 @@ theorem exists_pow_map_line_eq
     (hW₂ : finrank (ZMod p) W₂ = 1) (hW₂L : W₂ ≠ L) :
     ∃ k : ℕ, W₁.map (φ ^ k).toLinearMap = W₂ := by
   classical
-  haveI : FiniteDimensional (ZMod p) V := .of_finrank_eq_succ hdim
+  have : FiniteDimensional (ZMod p) V := .of_finrank_eq_succ hdim
   -- A generator `e₁` of the fixed line `L`.
   have hLne : L ≠ ⊥ := by rintro rfl; rw [finrank_bot] at hLdim; omega
   obtain ⟨e₁, he₁L, he₁0⟩ := (Submodule.ne_bot_iff L).mp hLne

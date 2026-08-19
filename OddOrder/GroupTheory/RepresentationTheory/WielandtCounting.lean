@@ -92,10 +92,10 @@ theorem invariants_eq_inf_of_sup_eq_top (ρ : Representation k G V) {H₁ H₂ :
       { carrier := {g | ρ g v = v}
         one_mem' := by simp
         mul_mem' := fun {a b} ha hb => by
-          simp only [Set.mem_setOf_eq] at *
+          simp only [Set.mem_ofPred_eq] at *
           rw [map_mul, Module.End.mul_apply, hb, ha]
         inv_mem' := fun {a} ha => by
-          simp only [Set.mem_setOf_eq] at *
+          simp only [Set.mem_ofPred_eq] at *
           have h := congrArg (ρ a⁻¹) ha
           rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one,
             Module.End.one_apply] at h

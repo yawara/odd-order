@@ -21,6 +21,7 @@ variable {G : Type*} [Group G]
 
 
 open scoped FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (11.8.3), the column-conjugation index at row `0`** ((3.9)(a)/(4.9)(a) on the
 row-`0` grids; the `w₂`-side companion of `exists_rowInv_alignedOmegaSigma_conj`, Coq
 `cfAut_cycTIiso`/`prTIirr_aut` + `aut_Iirr_eq0`): there is a column index `k` — the
@@ -43,13 +44,13 @@ theorem Hypothesis.exists_colInv_alignedOmegaSigma_conj [Finite G]
       ∧ ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (hyp.muGrid hG hodd 0 j)
         = hyp.muGrid hG hodd 0 k
       ∧ hyp.muColumnSign hG hodd k = hyp.muColumnSign hG hodd j := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   -- reconstruct the `let`s of `alignedOmegaSigmaGrid`/`muGrid`/`muColumnSign`
   let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
-  haveI : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
-  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  have : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
   have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
   have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
   have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
@@ -57,7 +58,7 @@ theorem Hypothesis.exists_colInv_alignedOmegaSigma_conj [Finite G]
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
   -- the `W₂`-dual of an arbitrary column `b`
   let χ₂ : Fin hyp.w2 → ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := fun b =>
     finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm b)
@@ -90,8 +91,8 @@ theorem Hypothesis.exists_colInv_alignedOmegaSigma_conj [Finite G]
     exact @inv_eq_one ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) _ (χ₂ j)
   -- §5 `G`-level TI-cyclic hypothesis (for `σ`) and the `W ≤ M ≤ G` transport
   let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
-  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
-  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
   let e : ↥tic.W ≃* ↥(h.W1 ⊔ h.W2) :=
     (Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm.trans
       (MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm)
@@ -284,7 +285,7 @@ theorem Hypothesis.beta_isReal [Finite G] {M : Subgroup G}
       (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
         - (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
         + (n : ℂ) • coh.extension ζ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   -- reduce to row `0` (the threaded (4.10) row move)
   have hrow := hyp.beta_row_eq hG coh hodd i j (ζ := ζ) (n := n) h410
@@ -379,11 +380,11 @@ theorem Hypothesis.SHC_extension_inner_alignedOmegaSigma_eq_zero [Finite G] {M :
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hζne : ζ.conj ≠ ζ) (i : Fin hyp.w1) (j : Fin hyp.w2) :
     ClassFunction.inner (coh.extension ζ)
       (hyp.alignedOmegaSigmaGrid hG hodd i j) = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
-  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
-  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
   let app := hyp.canonicalFullDadeApp hG hodd
   have hVeq : tic.V = tic.Vdiff := rfl
   obtain ⟨P, _hPinj, hPeq⟩ := hyp.exists_alignedOmegaSigmaGrid_chiFam_family hG hodd i
@@ -415,7 +416,7 @@ theorem Hypothesis.SHC_extension_inner_alignedOmegaSigma_eq_zero [Finite G] {M :
               (tic.chiFam hVeq app pq) ≠ 0} := by
         intro pq hpq
         by_contra hcon
-        simp only [Set.mem_union, Set.mem_setOf_eq, not_or, not_not] at hcon
+        simp only [Set.mem_union, Set.mem_ofPred_eq, not_or, not_not] at hcon
         apply hpq
         change ClassFunction.inner (hyp.tau (ζ - ζ.conj)) (tic.chiFam hVeq app pq) = 0
         rw [hyp.tau_zeta_sub_conj_eq_SHC_extension hG coh hodd hζS hζirr hζ1,
@@ -471,11 +472,11 @@ theorem Hypothesis.SHC_tau1_zeta_vanishes_on_typePV [Finite G] {M : Subgroup G}
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hζne : ζ.conj ≠ ζ) {v : G} (hv : v ∈ typePV M hyp.typeP) :
     coh.extension ζ v = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
-  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
-  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
   let app := hyp.canonicalFullDadeApp hG hodd
   have hVeq : tic.V = tic.Vdiff := rfl
   have hζcS : ζ.conj ∈ inducedFamily M := inducedFamily_closedUnderConjugate M hζS
@@ -505,7 +506,7 @@ theorem Hypothesis.SHC_tau1_zeta_vanishes_on_typePV [Finite G] {M : Subgroup G}
               (tic.chiFam hVeq app pq) ≠ 0} := by
         intro pq hpq
         by_contra hcon
-        simp only [Set.mem_union, Set.mem_setOf_eq, not_or, not_not] at hcon
+        simp only [Set.mem_union, Set.mem_ofPred_eq, not_or, not_not] at hcon
         apply hpq
         change ClassFunction.inner (hyp.tau (ζ - ζ.conj)) (tic.chiFam hVeq app pq) = 0
         rw [hyp.tau_zeta_sub_conj_eq_SHC_extension hG coh hodd hζS hζirr hζ1,
@@ -660,7 +661,7 @@ theorem Hypothesis.SHC_tau_muGridAlpha_eq [Finite G] {M : Subgroup G}
     hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
       = (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
         - (n : ℂ) • coh.extension ζ := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hXfacts := hyp.SHC_muGridAlpha_tau_X_inner hG coh hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf hδj
     hdζ h0ζ hδpm hα0
@@ -673,8 +674,8 @@ theorem Hypothesis.SHC_tau_muGridAlpha_eq [Finite G] {M : Subgroup G}
     rw [Nat.cast_smul_eq_nsmul]; exact nsmul_mem hτ1ζZ n
   obtain ⟨P, hPinj, hP⟩ := hyp.exists_alignedOmegaSigmaGrid_chiFam_family hG hodd i
   let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
-  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
-  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
   let app := hyp.canonicalFullDadeApp hG hodd
   have hVeq : tic.V = tic.Vdiff := rfl
   have hPne : P j ≠ P 0 := fun h => hj0 (hPinj h)
@@ -798,7 +799,7 @@ theorem Hypothesis.exists_SHC_extension_orthonormal [Finite G] {M : Subgroup G}
       R.card = (Finset.univ.filter fun χ : IrreducibleCharacter ↥M =>
         (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
           (χ : ClassFunction ↥M ℂ) 1 = (hyp.w1 : ℂ)).card := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   set s : Finset (IrreducibleCharacter ↥M) :=
     Finset.univ.filter (fun χ => (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
@@ -1120,12 +1121,12 @@ theorem Hypothesis.SHC_residual_eq_omegaSigma_diff [Finite G] {M : Subgroup G}
       hRn hZ horth hRmem hRrev
   refine ⟨a, Y, hbound, hinner, ?_, hdecompA⟩
   intro ha02
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   obtain ⟨P, hPinj, hP⟩ := hyp.exists_alignedOmegaSigmaGrid_chiFam_family hG hodd i
   let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
-  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
-  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
   let app := hyp.canonicalFullDadeApp hG hodd
   have hVeq : tic.V = tic.Vdiff := rfl
   have hPne : P j ≠ P 0 := fun h => hj0 (hPinj h)

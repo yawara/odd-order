@@ -111,7 +111,7 @@ theorem coeff_relTrace_single (P : Subgroup G) (g : G) (c : k) (n : G) :
       = if ∃ u ∈ P, u * g * u⁻¹ = n then c else 0 := by
   classical
   set Q : Subgroup G := P ⊓ Subgroup.centralizer ({g} : Set G) with hQ
-  letI : Fintype (↥P ⧸ Q.subgroupOf P) := Fintype.ofFinite _
+  let : Fintype (↥P ⧸ Q.subgroupOf P) := Fintype.ofFinite _
   set rep : ↥P ⧸ Q.subgroupOf P → G := fun x => ((x.out : ↥P) : G) with hrep
   have hrepP : ∀ x, rep x ∈ P := fun x => (x.out : ↥P).2
   -- Membership in the stabiliser, stated so that `Q` never has to be rewritten (it occurs in the
@@ -229,8 +229,8 @@ theorem eq_sum_classSum [Fintype (ConjClasses G)] {x : MonoidAlgebra k G}
 theorem mem_span_classSum {x : MonoidAlgebra k G} (hx : ∀ g : G, g • x = x) :
     x ∈ Submodule.span k (Set.range (classSum k : G → MonoidAlgebra k G)) := by
   classical
-  haveI : Finite (ConjClasses G) := Quotient.finite _
-  letI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  have : Finite (ConjClasses G) := Quotient.finite _
+  let : Fintype (ConjClasses G) := Fintype.ofFinite _
   rw [eq_sum_classSum hx]
   exact Submodule.sum_mem _ fun C _ =>
     Submodule.smul_mem _ _ (Submodule.subset_span ⟨C.out, rfl⟩)

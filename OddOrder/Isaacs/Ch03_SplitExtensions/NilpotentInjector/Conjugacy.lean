@@ -33,7 +33,7 @@ problem) ので証明は自前で、Mann の構造定理の経路を採る。
 
 namespace OddOrder.Isaacs.Ch03
 
-open Subgroup Pointwise
+open _root_.OddOrder.Isaacs.Ch03.Subgroup Pointwise
 
 section /- 3C.8: 共役性 -/
 
@@ -87,7 +87,7 @@ theorem IsNilpotentInjector.map_conj [Finite G] {I : Subgroup G} (hI : IsNilpote
 
 `|I_p| = |I|` の `p`-部分で, `I_p = J_p ≤ I ⊓ J` なので `|I|` の各素数冪が `|I ⊓ J|` を
 割る。ゆえに `|I| ∣ |I ⊓ J|` で `I ≤ J`, 極大性から `I = J`。 -/
-theorem eq_of_nilPiPart_eq [Finite G] [IsSolvable G] {I J : Subgroup G}
+theorem eq_of_nilPiPart_eq [Finite G] [Group.IsSolvable G] {I J : Subgroup G}
     (hI : IsNilpotentInjector I) (hJ : IsNilpotentInjector J)
     (h : ∀ p : ℕ, p.Prime → nilPiPart I ({p} : Set ℕ) = nilPiPart J ({p} : Set ℕ)) : I = J := by
   have hdvd : Nat.card ↥I ∣ Nat.card ↥(I ⊓ J) := by
@@ -95,7 +95,7 @@ theorem eq_of_nilPiPart_eq [Finite G] [IsSolvable G] {I J : Subgroup G}
     rw [Finsupp.le_def]
     intro p
     by_cases hp : p.Prime
-    · haveI : Fact p.Prime := ⟨hp⟩
+    · have : Fact p.Prime := ⟨hp⟩
       have hIp := isHallPart_nilPiPart (N := I) ({p} : Set ℕ) hI.1
       have hle : nilPiPart I ({p} : Set ℕ) ≤ I ⊓ J :=
         le_inf hIp.1 (h p hp ▸ (isHallPart_nilPiPart (N := J) ({p} : Set ℕ) hJ.1).1)
@@ -115,7 +115,7 @@ theorem eq_of_nilPiPart_eq [Finite G] [IsSolvable G] {I J : Subgroup G}
   exact (hI.2.2 J hIJ hJ.1).symm
 
 /-- 3C.8 の帰納本体: `π` の外側の素数で `{p}`-部分が一致していれば共役。 -/
-private theorem exists_conj_aux [Finite G] [IsSolvable G] (π : Finset ℕ) :
+private theorem exists_conj_aux [Finite G] [Group.IsSolvable G] (π : Finset ℕ) :
     ∀ {I J : Subgroup G}, IsNilpotentInjector I → IsNilpotentInjector J →
       (∀ p : ℕ, p.Prime → p ∉ π →
         nilPiPart I ({p} : Set ℕ) = nilPiPart J ({p} : Set ℕ)) →
@@ -128,7 +128,7 @@ private theorem exists_conj_aux [Finite G] [IsSolvable G] (π : Finset ℕ) :
   | @insert p s hps ih =>
     intro I J hI hJ hyp
     by_cases hp : p.Prime
-    · haveI : Fact p.Prime := ⟨hp⟩
+    · have : Fact p.Prime := ⟨hp⟩
       have hIp := isHallPart_pCentralizer_of_isNilpotentInjector hI (p := p)
       have hJp := isHallPart_pCentralizer_of_isNilpotentInjector hJ (p := p)
       obtain ⟨c, hcmem, hc⟩ : ∃ c ∈ pCentralizer G p,
@@ -145,7 +145,7 @@ private theorem exists_conj_aux [Finite G] [IsSolvable G] (π : Finset ℕ) :
         by_cases hqp : q = p
         · subst hqp
           exact hc
-        · haveI : Fact q.Prime := ⟨hq⟩
+        · have : Fact q.Prime := ⟨hq⟩
           rw [map_conj_eq_self_of_mem_pCentralizer (Ne.symm hqp)
             (isHallPart_pCentralizer_of_isNilpotentInjector hI (p := q)) hcmem]
           exact hyp q hq (by simp [Finset.mem_insert, hqp, hqs])
@@ -159,7 +159,7 @@ private theorem exists_conj_aux [Finite G] [IsSolvable G] (π : Finset ℕ) :
 (= `F(G)` を含む極大な冪零部分群) は共役。
 
 書籍は証明を与えない (challenge problem)。証明は Mann の構造定理経由 (ファイル冒頭)。 -/
-theorem exists_conj_of_isNilpotentInjector [Finite G] [IsSolvable G] {I J : Subgroup G}
+theorem exists_conj_of_isNilpotentInjector [Finite G] [Group.IsSolvable G] {I J : Subgroup G}
     (hI : IsNilpotentInjector I) (hJ : IsNilpotentInjector J) :
     ∃ g : G, I.map (MulAut.conj g).toMonoidHom = J := by
   classical
@@ -167,7 +167,7 @@ theorem exists_conj_of_isNilpotentInjector [Finite G] [IsSolvable G] {I J : Subg
     -- `p ∤ |G|` なら `I_p = J_p = ⊥`
     have hnot : ¬ p ∣ Nat.card G := fun hdvd =>
       hpn (Nat.mem_primeFactors.mpr ⟨hp, hdvd, Nat.card_pos.ne'⟩)
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     have hbot : ∀ {K : Subgroup G}, Group.IsNilpotent ↥K → nilPiPart K ({p} : Set ℕ) = ⊥ := by
       intro K hK
       have hpart := isHallPart_nilPiPart (N := K) ({p} : Set ℕ) hK

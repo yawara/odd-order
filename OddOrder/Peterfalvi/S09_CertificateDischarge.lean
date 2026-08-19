@@ -231,7 +231,7 @@ theorem zetaNuRhoNormSqGeOfDade
             hzeta_ind1H hdeg_match ν hnu_isometry hagree).kernelOrder : ℝ)
       ≤ (hypothesis78OfDade H71 hτ H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H
           hzeta_ind1H hdeg_match ν hnu_isometry hagree).zetaNuRhoNormSq := by
-  haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
+  have hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
   set H78 := hypothesis78OfDade H71 hτ H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H
     hind1H hzeta_ind1H hdeg_match ν hnu_isometry hagree with hH78
   set hBD := betaDecompOfDade H71 hτ H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H
@@ -434,7 +434,7 @@ theorem betaDecompOfDade_a_eq_zero
     (hph : (p : ℝ) ^ 2 ≤ (Nat.card ↥H : ℝ))
     (h2e : 2 * (((H.subgroupOf L).index : ℝ)) ≤ (p : ℝ) + 1) :
     a = 0 := by
-  haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
+  have hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
   set H78 := hypothesis78OfDade H71 hτ H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H
     hind1H hzeta_ind1H hdeg_match ν hnu_isometry hagree with hH78
   set hBD := betaDecompOfDade H71 hτ H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H
@@ -554,8 +554,8 @@ theorem chiRho_apply_eq_zeta0_sharp
         χ = -(d i))
     {x : ↥L} (hx : (x : G) ∈ A) :
     H71.chiRho χ x = ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) x := by
-  haveI : Fintype ↥(H.subgroupOf L) := Fintype.ofFinite _
-  haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
+  have : Fintype ↥(H.subgroupOf L) := Fintype.ofFinite _
+  have hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
   exact chiRho_apply_eq_zeta0_induced H71 (H.subgroupOf L) θ d psi_support hinj hcover hdeg
     (supportInSubgroup_sharp_conj_mem_iff H hAH hHnorm)
     (fun _ hy => supportInSubgroup_sharp_subset_subgroupOf H hAH hy)
@@ -626,7 +626,7 @@ theorem chiRho_nu_zeta0_apply_eq_zeta0_ofDade
     {x : ↥L} (hx : (x : G) ∈ A) :
     H71.chiRho (ν (ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ))) x
       = ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) x := by
-  haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
+  have hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
   set H78 := hypothesis78OfDade H71 hτ H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H
     hind1H hzeta_ind1H hdeg_match ν hnu_isometry hagree with hH78
   -- `a = 0` (the (12.14) counting).

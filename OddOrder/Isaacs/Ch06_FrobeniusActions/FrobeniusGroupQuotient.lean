@@ -60,7 +60,7 @@ preserves `⊓ = ⊥` and `⊔ = ⊤`), the nontriviality of the two parts (an i
 homomorphism: `e a · e n · (e a)⁻¹ = e (a n a⁻¹)`). -/
 theorem isFrobeniusGroup_map_equiv {N A : Subgroup G} (h : IsFrobeniusGroup G N A) (e : G ≃* H) :
     IsFrobeniusGroup H (N.map e.toMonoidHom) (A.map e.toMonoidHom) := by
-  haveI := h.isNormal
+  have := h.isNormal
   refine ⟨?isNormal, ?isComplement, ?ne_bot_kernel, ?ne_bot_complement, ?conj⟩
   case isNormal =>
     -- image of a normal subgroup under the *surjective* `e`.
@@ -75,7 +75,7 @@ theorem isFrobeniusGroup_map_equiv {N A : Subgroup G} (h : IsFrobeniusGroup G N 
       have hsup : N.map e.toMonoidHom ⊔ A.map e.toMonoidHom = ⊤ := by
         rw [← Subgroup.map_sup, h.isComplement.sup_eq_top, ← MonoidHom.range_eq_map,
           MonoidHom.range_eq_top.mpr e.surjective]
-      haveI : (N.map e.toMonoidHom).Normal := h.isNormal.map e.toMonoidHom e.surjective
+      have : (N.map e.toMonoidHom).Normal := h.isNormal.map e.toMonoidHom e.surjective
       have hmul := Subgroup.normal_mul (N.map e.toMonoidHom) (A.map e.toMonoidHom)
       rw [hsup, Subgroup.coe_top] at hmul
       exact hmul.symm

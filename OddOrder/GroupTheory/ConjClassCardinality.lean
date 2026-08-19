@@ -34,7 +34,7 @@ theorem card_class_eq_index_centralizer (z : G) :
     Nat.card { x : G // ConjClasses.mk x = ConjClasses.mk z }
       = (Subgroup.centralizer {z}).index := by
   classical
-  letI : Fintype G := Fintype.ofFinite G
+  let : Fintype G := Fintype.ofFinite G
   -- `|C_G(z)| = |stabilizer (ConjAct G) z|`: the isomorphism `toConjAct : G ≃* ConjAct G` carries
   -- `C_G(z)` bijectively onto the stabilizer (`stabilizer_eq_centralizer`).
   have hcard_cent : Nat.card (Subgroup.centralizer ({z} : Set G))

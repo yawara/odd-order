@@ -42,8 +42,8 @@ theorem eq_one_or_eq_or_eq_or_eq_of_klein (hcard : Nat.card P = 4) (hexp : ∀ x
     {a b : P} (ha : a ≠ 1) (hb : b ≠ 1) (hab : a ≠ b) (x : P) :
     x = 1 ∨ x = a ∨ x = b ∨ x = a * b := by
   classical
-  haveI : Finite P := Nat.finite_of_card_ne_zero (by rw [hcard]; decide)
-  haveI : Fintype P := Fintype.ofFinite P
+  have : Finite P := Nat.finite_of_card_ne_zero (by rw [hcard]; decide)
+  have : Fintype P := Fintype.ofFinite P
   have hab1 : a * b ≠ 1 := fun h => hab (by
     have h1 : a⁻¹ = b := mul_eq_one_iff_inv_eq.mp h
     have h2 : a⁻¹ = a := mul_eq_one_iff_inv_eq.mp (hexp a)
@@ -68,8 +68,8 @@ it. -/
 theorem exists_ne_ne_one_of_klein (hcard : Nat.card P = 4) {a : P} (ha : a ≠ 1) :
     ∃ b : P, b ≠ 1 ∧ b ≠ a := by
   classical
-  haveI : Finite P := Nat.finite_of_card_ne_zero (by rw [hcard]; decide)
-  haveI : Fintype P := Fintype.ofFinite P
+  have : Finite P := Nat.finite_of_card_ne_zero (by rw [hcard]; decide)
+  have : Fintype P := Fintype.ofFinite P
   by_contra hcon
   have hall : ∀ x : P, x ≠ 1 → x = a := fun x hx => by
     by_contra hxa

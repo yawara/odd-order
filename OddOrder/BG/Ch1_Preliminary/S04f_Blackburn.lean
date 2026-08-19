@@ -116,7 +116,7 @@ private theorem blackburn_noncentral_order_p_mem_commutator
   by_contra hxT
   let X : Subgroup R := Subgroup.zpowers x
   have hp : p.Prime := Fact.out
-  haveI hT_normal : T.Normal := by
+  have hT_normal : T.Normal := by
     dsimp [T]
     exact Subgroup.commutator_normal S (⊤ : Subgroup R)
   have hx_ne : x ≠ 1 := by
@@ -251,7 +251,7 @@ private theorem blackburn_noncentral_centralizer_complement_isCyclic
   have hrelations := blackburn_noncentral_centralizer_relations hT_facts hT_elem
   have hT_le_D : T ≤ D := hrelations.2.1
   have hCD_norms := blackburn_noncentral_centralizer_normalities (R := R) (p := p)
-  haveI hCD_normal : (C.subgroupOf D).Normal := hCD_norms.2.2
+  have hCD_normal : (C.subgroupOf D).Normal := hCD_norms.2.2
   let q : D →* D ⧸ C.subgroupOf D := QuotientGroup.mk' (C.subgroupOf D)
   let f : X →* R := D.subtype.comp X.subtype
   have hf_inj : Function.Injective f := by
@@ -386,12 +386,12 @@ private theorem blackburn_noncentral_commutator_normalities
   let S : Subgroup R := Omega R p 1
   let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
   let Z : Subgroup R := (Subgroup.center S).map S.subtype
-  haveI hS_normal : S.Normal := by dsimp [S]; infer_instance
+  have hS_normal : S.Normal := by dsimp [S]; infer_instance
   have hT_normal : T.Normal := by
     dsimp [T]
     exact Subgroup.commutator_normal S (⊤ : Subgroup R)
   have hT_sub_S_normal : (T.subgroupOf S).Normal := hT_normal.subgroupOf S
-  haveI hT_comm_inst : IsMulCommutative T := ⟨⟨hT_elem.1⟩⟩
+  have hT_comm_inst : IsMulCommutative T := ⟨⟨hT_elem.1⟩⟩
   have hZ_sub_T_normal : (Z.subgroupOf T).Normal :=
     Subgroup.normal_of_isMulCommutative (Z.subgroupOf T)
   exact ⟨hT_normal, hT_sub_S_normal, hZ_sub_T_normal⟩
@@ -462,7 +462,7 @@ private theorem blackburn_noncentral_second_commutator_mem_center_and_ne_one
   intro hyz_one
   have hyz_comm : Commute y z := commutatorElement_eq_one_iff_commute.mp hyz_one
   have hnorms := blackburn_noncentral_commutator_normalities hT_elem
-  haveI hTsub_normal : (T.subgroupOf S).Normal := by
+  have hTsub_normal : (T.subgroupOf S).Normal := by
     simpa [S, T, Z] using hnorms.2.1
   let Tsub : Subgroup S := T.subgroupOf S
   let yS : S := ⟨y, hyS⟩
@@ -659,13 +659,13 @@ private theorem blackburn_noncentral_complement_commutator_not_le_center
   dsimp at hSX_top ⊢
   let S : Subgroup R := Omega R p 1
   let Z : Subgroup R := (Subgroup.center S).map S.subtype
-  haveI hS_normal : S.Normal := by
+  have hS_normal : S.Normal := by
     dsimp [S]
     infer_instance
   have hZ_eq_comm : Z = ⁅S, S⁆ := by
     dsimp [S, Z]
     rw [← hΩ_extraspecial.commutator_eq_center, Subgroup.map_subtype_commutator]
-  haveI hZ_normal : Z.Normal := by
+  have hZ_normal : Z.Normal := by
     rw [hZ_eq_comm]
     infer_instance
   intro hXS
@@ -975,13 +975,13 @@ theorem blackburnRankTwoClassification
           hΩ_extraspecial hSR (by simpa [S] using hSX_top') hXmap_comm)
     have hxS_comm_not_le_Z : ¬ ⁅Subgroup.zpowers x, S⁆ ≤ Z := by
       simpa [hX_map_eq_zpowers] using hX_comm_not_le_Z
-    haveI hS_normal : S.Normal := by
+    have hS_normal : S.Normal := by
       dsimp [S]
       infer_instance
     have hZ_eq_comm : Z = ⁅S, S⁆ := by
       dsimp [S, Z]
       rw [← hΩ_extraspecial.commutator_eq_center, Subgroup.map_subtype_commutator]
-    haveI hZ_normal : Z.Normal := by
+    have hZ_normal : Z.Normal := by
       rw [hZ_eq_comm]
       infer_instance
     obtain ⟨y, hyS, hxyZ⟩ :=
@@ -1082,7 +1082,7 @@ theorem blackburnRankTwoClassification
       rw [hZ_eq_comm]
       exact hS_inv.commutator hS_inv
     let Tsub : Subgroup S := T.subgroupOf S
-    haveI hTsub_normal : Tsub.Normal := by
+    have hTsub_normal : Tsub.Normal := by
       simpa [S, T, Z, Tsub] using hT_norms.2.1
     let yS : S := ⟨y, hyS⟩
     let qy : S ⧸ Tsub := QuotientGroup.mk' Tsub yS
@@ -1102,7 +1102,7 @@ theorem blackburnRankTwoClassification
     have hφy_quot_eq : (QuotientGroup.mk' Tsub φyS : S ⧸ Tsub) = qy ^ jℤ :=
       hjℤ_eq.symm
     let Zsub : Subgroup T := Z.subgroupOf T
-    haveI hZsub_normal : Zsub.Normal := by
+    have hZsub_normal : Zsub.Normal := by
       simpa [S, T, Z, Zsub] using hT_norms.2.2
     let zT : T := ⟨z, hzT⟩
     let qz : T ⧸ Zsub := QuotientGroup.mk' Zsub zT

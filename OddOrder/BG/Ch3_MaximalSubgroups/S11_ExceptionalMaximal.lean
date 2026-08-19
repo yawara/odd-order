@@ -205,7 +205,7 @@ private theorem isSylow_and_mem_hInvariantStar_of_isAInvSylowIn [Finite G]
       Subgroup.relIndex_mul_index hQH
     rw [hsubOf] at htower
     -- `q ∤ [↥H : S]` (Sylow of finite `↥H`) and `q ∤ [G : H]` (Hall, `q ∈ σ(M)`).
-    haveI : (S : Subgroup ↥H).FiniteIndex := ⟨Subgroup.index_ne_zero_of_finite⟩
+    have : (S : Subgroup ↥H).FiniteIndex := ⟨Subgroup.index_ne_zero_of_finite⟩
     have hSidx : ¬ q ∣ (S : Subgroup ↥H).index := by
       have := S.not_dvd_index; simpa using this
     have hHidx : ¬ q ∣ H.index := fun hdvd =>
@@ -213,7 +213,7 @@ private theorem isSylow_and_mem_hInvariantStar_of_isAInvSylowIn [Finite G]
     rw [← htower]
     exact (Fact.out (p := q.Prime)).not_dvd_mul hSidx hHidx
   -- Upgrade `Q` to a Sylow `q`-subgroup of `G`.
-  haveI : Q.FiniteIndex := ⟨fun h => hQidx (h ▸ dvd_zero q)⟩
+  have : Q.FiniteIndex := ⟨fun h => hQidx (h ▸ dvd_zero q)⟩
   let QS : Sylow q G := hQp.toSylow hQidx
   have hQS : (QS : Subgroup G) = Q := hQp.toSylow_coe hQidx
   refine ⟨⟨QS, hQS⟩, ⟨le_top, hAQ, ?_⟩, ?_⟩
@@ -245,7 +245,7 @@ theorem invariant_sylow_disjoint [Finite G] (hG : IsMinimalSimpleOdd G)
     ∀ X : Subgroup G, X ∈ elemAbelianOfRank G p 1 → X ≤ A →
       Subgroup.centralizer (X : Set G) ⊓ Q₁ = ⊥ ∨
       Subgroup.centralizer (X : Set G) ⊓ Q₂ = ⊥ := by
-  haveI : Fact p.Prime := ⟨h.prime⟩
+  have : Fact p.Prime := ⟨h.prime⟩
   -- Basic facts about `A`.
   have hAelem : A.IsElementaryAbelian p := h.A_mem.1
   have hAcomm : IsMulCommutative ↥A := ⟨⟨fun x y => hAelem.comm x y⟩⟩
@@ -261,11 +261,11 @@ theorem invariant_sylow_disjoint [Finite G] (hG : IsMinimalSimpleOdd G)
       (Or.inl ⟨?_, fun N hN => S10.proper_hasPLengthOne hG N hN⟩)
     -- `(A : Set G) = {x | x ∈ C_G(A) ∧ x ^ p = 1}` (= `A = Ω₁(C_G(A))`).
     ext x
-    simp only [Set.mem_setOf_eq, SetLike.mem_coe]
+    simp only [Set.mem_ofPred_eq, SetLike.mem_coe]
     constructor
     · -- `x ∈ A ⟹ x ∈ C_G(A) ∧ x ^ p = 1`.
       intro hx
-      haveI := hAcomm
+      have := hAcomm
       refine ⟨Subgroup.le_centralizer (H := A) hx, ?_⟩
       have hxp1 : (⟨x, hx⟩ : ↥A) ^ p = 1 := hAelem.2 _
       have := congrArg (Subgroup.subtype A) hxp1
@@ -282,7 +282,7 @@ theorem invariant_sylow_disjoint [Finite G] (hG : IsMinimalSimpleOdd G)
         · rw [Set.mem_singleton_iff] at ha; subst ha; exact (hxc b hb).symm
         · rw [Set.mem_singleton_iff] at ha hb; subst ha; subst hb; rfl
       set B : Subgroup G := Subgroup.closure ((A : Set G) ∪ {x}) with hB_def
-      haveI hBcomm : IsMulCommutative ↥B := Subgroup.isMulCommutative_closure hgen_comm
+      have hBcomm : IsMulCommutative ↥B := Subgroup.isMulCommutative_closure hgen_comm
       -- Every generator is `p`-torsion; in the commutative `B`, so is every element.
       have hgen_pow : ∀ w ∈ (A : Set G) ∪ {x}, w ^ p = 1 := by
         rintro w (hw | hw)
@@ -313,7 +313,7 @@ theorem invariant_sylow_disjoint [Finite G] (hG : IsMinimalSimpleOdd G)
       rw [hBeqA] at hxB
       exact hxB
   -- STEP2: bridge `IsAInvSylowIn` to `ℋ_G*(A;q)` for `Q₁` (in `M_σ`) and `Q₂` (in `M_σ^g`).
-  haveI : Fact q.Prime := ‹Fact q.Prime›
+  have : Fact q.Prime := ‹Fact q.Prime›
   have hHallMsigma : Ch03.IsHallSubgroup (S10.sigma M) (S10.Msigma M) :=
     (S10.isHall_Msigma_Malpha hG h.mem_maximal).1
   have hHallConj : Ch03.IsHallSubgroup (S10.sigma M) (MulAut.conj g • S10.Msigma M) :=
@@ -325,7 +325,7 @@ theorem invariant_sylow_disjoint [Finite G] (hG : IsMinimalSimpleOdd G)
   -- `q ∈ π(A)' = {p}ᶜ` because `q ∈ σ(M)` but `p ∉ σ(M)`, so `q ≠ p`.
   have hqp : q ≠ p := by rintro rfl; exact h.notMem_sigma hq
   have hqπ' : q ∈ (Ch2.S07.primesOf A)ᶜ := by
-    simp only [Ch2.S07.primesOf, Set.mem_compl_iff, Set.mem_setOf_eq]
+    simp only [Ch2.S07.primesOf, Set.mem_compl_iff, Set.mem_ofPred_eq]
     intro hmem
     rw [hAcard, Nat.primeFactors_prime_pow (by norm_num) h.prime, Finset.mem_singleton] at hmem
     exact hqp hmem
@@ -382,13 +382,13 @@ theorem invariant_sylow_disjoint [Finite G] (hG : IsMinimalSimpleOdd G)
       have hRidx_eq : R.index = Q₂.index := by
         rw [hReqmap, Subgroup.index_map_equiv Q₂ (MulAut.conj g)⁻¹]
       rw [hRidx_eq, ← hQ₂S]
-      haveI : (Q₂S : Subgroup G).FiniteIndex := ⟨Subgroup.index_ne_zero_of_finite⟩
+      have : (Q₂S : Subgroup G).FiniteIndex := ⟨Subgroup.index_ne_zero_of_finite⟩
       exact Q₂S.not_dvd_index
     -- Build the Sylow `q`-subgroup of `↥M` whose image is `R`.
     have hRsubM_idx : ¬ q ∣ (R.subgroupOf M).index := by
       have htower : (R.subgroupOf M).index * M.index = R.index := Subgroup.relIndex_mul_index hRM
       exact fun hdvd => hRidxG (htower ▸ Dvd.dvd.mul_right hdvd M.index)
-    haveI : (R.subgroupOf M).FiniteIndex := ⟨fun h => hRsubM_idx (h ▸ dvd_zero q)⟩
+    have : (R.subgroupOf M).FiniteIndex := ⟨fun h => hRsubM_idx (h ▸ dvd_zero q)⟩
     let RM : Sylow q ↥M := (hRp.comap_subtype (K := M)).toSylow hRsubM_idx
     have hRM_coe : (RM : Subgroup ↥M).map M.subtype = R := by
       change ((hRp.comap_subtype (K := M)).toSylow hRsubM_idx : Subgroup ↥M).map M.subtype = R
@@ -406,10 +406,10 @@ theorem invariant_sylow_disjoint [Finite G] (hG : IsMinimalSimpleOdd G)
     exact hg hgM
   -- `Z(G) = 1` (simple nonabelian) — used for `C_G(X) < ⊤`.
   have hZbot : Subgroup.center G = ⊥ := by
-    haveI : IsSimpleGroup G := hG.simple
+    have : IsSimpleGroup G := hG.simple
     refine (Subgroup.Normal.eq_bot_or_eq_top Subgroup.instNormalCenter).resolve_right
       (fun htop => ?_)
-    exact hG.notSolvable (isSolvable_of_comm (fun a b =>
+    exact hG.notSolvable (Group.isSolvable_of_comm (fun a b =>
       (Subgroup.mem_center_iff.mp (htop ▸ Subgroup.mem_top a) b).symm))
   -- `M < ⊤`.
   have hMlt : M < ⊤ := lt_top_iff_ne_top.mpr h.mem_maximal.1
@@ -450,7 +450,7 @@ theorem invariant_sylow_disjoint [Finite G] (hG : IsMinimalSimpleOdd G)
       exact h.prime.one_lt.ne' (by simpa using this.symm)
     -- `A ≤ C_G(X)` (`A` abelian, `X ≤ A`).
     have hAcX : A ≤ Subgroup.centralizer (X : Set G) := by
-      haveI := hAcomm
+      have := hAcomm
       exact le_trans (Subgroup.le_centralizer (H := A))
         (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hXA))
     -- `C_G(X) < ⊤` (else `X ≤ Z(G) = ⊥`, contradicting `X ≠ ⊥`).
@@ -480,11 +480,11 @@ theorem exists_isAInvSylowIn [Finite G] {A : Subgroup G} {p : ℕ} [Fact p.Prime
     {P₀ : Subgroup G} (hP₀q : IsPGroup q ↥P₀) (hP₀H : P₀ ≤ H)
     (hP₀inv : A ≤ Subgroup.normalizer (P₀ : Set G)) :
     ∃ Q : Subgroup G, IsAInvSylowIn q A Q H ∧ P₀ ≤ Q := by
-  haveI : Finite ↥A := Subtype.finite
-  haveI : Group.IsNilpotent ↥A := hAp.isNilpotent
-  haveI : IsSolvable ↥A := inferInstance
+  have : Finite ↥A := Subtype.finite
+  have : Group.IsNilpotent ↥A := hAp.isNilpotent
+  have : Group.IsSolvable ↥A := inferInstance
   -- Conjugation action of `↥A` on `↥H` (`A ≤ N_G(H)`), as a `MulAut`-hom `φ`.
-  letI act : MulDistribMulAction ↥A ↥H :=
+  let act : MulDistribMulAction ↥A ↥H :=
     MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (H : Set G))) ↥H
       (Subgroup.inclusion hAH)
   set φ : ↥A →* MulAut ↥H := MulDistribMulAction.toMulAut ↥A ↥H with hφ_def
@@ -560,7 +560,7 @@ private theorem isAInvSylowIn_card_dvd [Finite G] {A H Q : Subgroup G} {q : ℕ}
   have hsubOf : Q.subgroupOf H = (T : Subgroup ↥H) := by
     rw [← hTeqQ, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective H.subtype_injective]
   -- `q ∤ [↥H : T]`, `|↥H| = |T|·[↥H : T]`, `q ∣ |↥H|` ⟹ `q ∣ |T| = |Q|`.
-  haveI : (T : Subgroup ↥H).FiniteIndex := ⟨Subgroup.index_ne_zero_of_finite⟩
+  have : (T : Subgroup ↥H).FiniteIndex := ⟨Subgroup.index_ne_zero_of_finite⟩
   have hTidx : ¬ q ∣ (T : Subgroup ↥H).index := by have := T.not_dvd_index; simpa using this
   have hcardH : Nat.card ↥(T : Subgroup ↥H) * (T : Subgroup ↥H).index = Nat.card ↥H :=
     Subgroup.card_mul_index _
@@ -579,7 +579,7 @@ theorem Msigma_meet_conjugate [Finite G] (hG : IsMinimalSimpleOdd G)
     {g : G} (hg : g ∉ M) (hAg : A ≤ MulAut.conj g • M) :
     S10.Msigma M ⊓ MulAut.conj g • M = ⊥ ∧
     S10.Msigma M ⊓ Subgroup.centralizer ((MulAut.conj g • A₀ : Subgroup G) : Set G) = ⊥ := by
-  haveI : Fact p.Prime := ⟨h.prime⟩
+  have : Fact p.Prime := ⟨h.prime⟩
   have hApg : IsPGroup p ↥A := h.A_mem.1.isPGroup
   have hAcard : Nat.card ↥A = p ^ 2 := h.A_mem.2
   -- `M_σ` is a `σ(M)`-group, and `p ∉ σ(M)`, so `p ∤ |M_σ|`.
@@ -640,7 +640,7 @@ theorem Msigma_meet_conjugate [Finite G] (hG : IsMinimalSimpleOdd G)
       (show Nat.card ↥(S10.Msigma M ⊓ MulAut.conj g • M) ≠ 1 from fun h1 => hne
         (Subgroup.eq_bot_of_card_eq _ h1))
     obtain ⟨hq_prime, hq_dvd⟩ := hq_pf
-    haveI : Fact q.Prime := ⟨hq_prime⟩
+    have : Fact q.Prime := ⟨hq_prime⟩
     have hq_dvd_Msigma : q ∣ Nat.card ↥(S10.Msigma M) :=
       dvd_trans hq_dvd (Subgroup.card_dvd_of_le inf_le_left)
     have hq_sigma : q ∈ S10.sigma M :=
@@ -708,7 +708,7 @@ Theorem 3.7 (`frobeniusKernelIsNilpotent`) から kernel `M_σ` は nilpotent。
 theorem Msigma_isNilpotent [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} {p : ℕ} {A₀ A P : Subgroup G} (h : Hypothesis111 M p A₀ A P) :
     Group.IsNilpotent ↥(S10.Msigma M) := by
-  haveI : Fact p.Prime := ⟨h.prime⟩
+  have : Fact p.Prime := ⟨h.prime⟩
   -- If `M_σ` is trivial it is nilpotent; otherwise build the Frobenius structure.
   by_cases hMsbot : S10.Msigma M = ⊥
   · rw [hMsbot]; infer_instance
@@ -752,10 +752,10 @@ theorem Msigma_isNilpotent [Finite G] (hG : IsMinimalSimpleOdd G)
     rwa [Subgroup.normalizer_eq_top, ← MonoidHom.range_eq_map, Subgroup.range_subtype] at hle
   have hAgnorm : Ag ≤ Subgroup.normalizer ((S10.Msigma M) : Set G) := hAgM.trans hMnormMsM
   -- `M_σ ⊔ A₀^g ⊆ M` is solvable (proper subgroup of a minimal simple group).
-  haveI hMsol : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
+  have hMsol : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups h.mem_maximal
   have hsupleM : S10.Msigma M ⊔ Ag ≤ M := sup_le (S10.Msigma_le M) hAgM
-  haveI : IsSolvable ↥(S10.Msigma M ⊔ Ag) :=
-    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hsupleM).toMonoidHom)
+  have : Group.IsSolvable ↥(S10.Msigma M ⊔ Ag) :=
+    Group.isSolvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hsupleM).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe hsupleM).surjective
   -- Fixed-point-freeness as `r * n * r⁻¹ ≠ n` (using `|A₀^g| = p` prime and Cor 11.2(b)):
   -- if `n ∈ M_σ` commutes with `r ∈ A₀^g − 1`, it commutes with `⟨r⟩ = A₀^g`, so `n ∈ C_G(A₀^g)`.
@@ -922,7 +922,7 @@ theorem sylow_p_isCommutative [Finite G] (hG : IsMinimalSimpleOdd G)
     (S : Sylow p ↥M) :
     IsMulCommutative (S : Subgroup ↥M) := by
   classical
-  haveI : Fact p.Prime := ⟨h.prime⟩
+  have : Fact p.Prime := ⟨h.prime⟩
   have hAea : A.IsElementaryAbelian p := h.A_mem.1
   have hAcard : Nat.card ↥A = p ^ 2 := h.A_mem.2
   -- Step 1: the distinguished Sylow `P` is abelian.
@@ -937,14 +937,14 @@ theorem sylow_p_isCommutative [Finite G] (hG : IsMinimalSimpleOdd G)
     obtain ⟨g, hgN, hgM⟩ := SetLike.not_le_iff_exists.mp h.normalizer_P_not_le
     -- `q ∈ σ(M)` via `M_σ ≠ ⊥`.
     have hMσne : S10.Msigma M ≠ ⊥ := S10.Msigma_ne_bot hG h.mem_maximal
-    haveI : Nontrivial ↥(S10.Msigma M) := (Subgroup.nontrivial_iff_ne_bot _).mpr hMσne
+    have : Nontrivial ↥(S10.Msigma M) := (Subgroup.nontrivial_iff_ne_bot _).mpr hMσne
     obtain ⟨q, hq⟩ : ∃ q, q ∈ (Nat.card ↥(S10.Msigma M)).primeFactors := by
       rcases (Nat.card ↥(S10.Msigma M)).primeFactors.eq_empty_or_nonempty with h0 | h0
       · rcases Nat.primeFactors_eq_empty.mp h0 with h1 | h1
         · exact absurd h1 Nat.card_pos.ne'
         · exact absurd h1 Finite.one_lt_card.ne'
       · exact h0
-    haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hq⟩
+    have : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hq⟩
     have hqσ : q ∈ S10.sigma M := S10.Msigma_isPiGroup M q hq
     have hpq : p ≠ q := fun hpq => h.notMem_sigma (hpq ▸ hqσ)
     -- `P` normalizes `M_σ`, coprimely.
@@ -981,7 +981,7 @@ theorem sylow_p_isCommutative [Finite G] (hG : IsMinimalSimpleOdd G)
       exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr h.P_le
     obtain ⟨-, hkey⟩ := invariant_sylow_disjoint hG h hgM hAgM hqσ hQ₁A hQ₂A
     -- `A` is noncyclic abelian, coprime to the `Qᵢ`.
-    haveI hAcommI : IsMulCommutative ↥A := ⟨⟨fun x y => hAea.1 x y⟩⟩
+    have hAcommI : IsMulCommutative ↥A := ⟨⟨fun x y => hAea.1 x y⟩⟩
     have hAnc : ¬ IsCyclic ↥A := by
       intro hcyc
       have hexp : Monoid.exponent ↥A = p ^ 2 := by
@@ -1125,7 +1125,7 @@ theorem omega1_eq_and_centralizer_trivial [Finite G] (hG : IsMinimalSimpleOdd G)
     A = (Omega ↥P p 1).map P.subtype ∧
     Subgroup.centralizer (A : Set G) ⊓ S10.Msigma M = ⊥ := by
   classical
-  haveI : Fact p.Prime := ⟨h.prime⟩
+  have : Fact p.Prime := ⟨h.prime⟩
   have hAea : A.IsElementaryAbelian p := h.A_mem.1
   -- `P` is abelian (Theorem 11.5, transported from the Sylow `T` with `T.map = P`).
   obtain ⟨T, hPT⟩ := h.P_pgroup.comap_subtype.exists_le_sylow (G := M)
@@ -1174,7 +1174,7 @@ theorem omega1_eq_and_centralizer_trivial [Finite G] (hG : IsMinimalSimpleOdd G)
       rwa [SubmonoidClass.coe_pow, OneMemClass.coe_one] at h1
     · rw [Subgroup.map_le_iff_le_comap, Omega, Subgroup.closure_le]
       intro z hz
-      rw [Set.mem_setOf_eq, pow_one] at hz
+      rw [Set.mem_ofPred_eq, pow_one] at hz
       rw [SetLike.mem_coe, Subgroup.mem_comap]
       refine htrap (P.subtype z) z.2 ?_
       rw [← map_pow, hz, map_one]
@@ -1216,7 +1216,7 @@ theorem exists_distinct_conj_lines [Finite G] (hG : IsMinimalSimpleOdd G)
       Subgroup.centralizer (A₁ : Set G) ⊓ S10.Msigma M = ⊥ ∧
       Subgroup.centralizer (A₂ : Set G) ⊓ S10.Msigma M = ⊥ := by
   classical
-  haveI : Fact p.Prime := ⟨h.prime⟩
+  have : Fact p.Prime := ⟨h.prime⟩
   have hAcard : Nat.card ↥A = p ^ 2 := h.A_mem.2
   set N : Subgroup G := Subgroup.normalizer (P : Set G) with hNdef
   set H : Subgroup ↥N := (N ⊓ M).subgroupOf N with hHdef

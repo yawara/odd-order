@@ -60,8 +60,8 @@ theorem exists_glue_nu_Xset_Yset_via_map
       (∀ x ∈ hyp.Xset h46.W2, ν x = νX x)
       ∧ (∀ y ∈ hyp.Yset, ν y = cY.extension y) := by
   classical
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
-  haveI : Finite ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :=
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Finite ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :=
     SibleyDadeHypothesis.finite_linearCharacters_of_finite
   -- generic irreducible inner product (orthonormality of any two irreducibles)
   have hinner : ∀ φ ψ : ClassFunction ↥L ℂ, IsIrreducibleCharacter φ → IsIrreducibleCharacter ψ →
@@ -136,7 +136,7 @@ theorem caseB_member_seam_all_Yset
     {y : ClassFunction ↥L ℂ} (hy : y ∈ hyp.Yset) :
     ClassFunction.inner X (cY.extension y) = 0 := by
   classical
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   -- `y − η₁` is `H^#`-supported (equal degree `|W₁|`) and lies in the `Y`-span.
   have hydeg : y (1 : ↥L) = η₁ (1 : ↥L) :=
     (hyp.Yset_apply_one hy).trans (hyp.Yset_apply_one hη₁).symm
@@ -426,10 +426,10 @@ theorem nonempty_coherent_S_caseB_of_anchor
       (hyp.Xset h46.W2) (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∧ φ ≠ 0) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
-  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
-  haveI : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  have : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
   exact nonempty_coherent_S_caseB hyp h46 hHK hW1 hcen hcZ hfpf
     ⟨coherentXunionYset_caseB hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp hprime hW2comm hW2cenL
       hc2 hFPF hη₁ cY hcYgood hη₁1 hanchor hχ₁1 hdvd hnonzero⟩
@@ -450,9 +450,9 @@ theorem exists_caseB_Xset_anchor (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     ∃ χ₁ ∈ hyp.Xset W2, χ₁ 1 ≠ 0 ∧
       ∀ f ∈ hyp.Xset W2, ∃ d : ℕ, (f : ClassFunction ↥L ℂ) 1 = (d : ℂ) * χ₁ 1 := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
-  letI : H.Normal := hyp.H_normal
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fact p.Prime := ⟨hp⟩
+  let : H.Normal := hyp.H_normal
+  have : Fintype ↥H := Fintype.ofFinite _
   -- per-member: `f(1) = |W₁|·a` with `a = θ_f(1)` a positive power of `p`.
   have hdeg : ∀ f ∈ hyp.Xset W2, ∃ a : ℕ, 0 < a ∧ (∃ k, a = p ^ k) ∧
       f 1 = ((Nat.card hyp.W1 * a : ℕ) : ℂ) := by
@@ -523,10 +523,10 @@ theorem nonempty_coherent_S_caseB_of_structure
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
   classical
-  haveI : Fintype ↥H := Fintype.ofFinite _
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
-  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
-  haveI : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  have : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
   -- the minimal-degree `X`-anchor and its divisibility.
   obtain ⟨χ₁, hanchor, hχ₁1, hdvd⟩ := exists_caseB_Xset_anchor hyp hp hHp hXne
   -- the `Y`-anchor `η₁` (degree `|W₁| ≠ 0`).
@@ -544,7 +544,7 @@ theorem nonempty_coherent_S_caseB_of_structure
   have hχne : χ ≠ χ.conj := fun heq =>
     (Xset_hasNoRealCharacters_caseB hyp h46 hHK).not_mem_of_isReal (heq.symm : χ.IsReal) hχ
   have hχS := hyp.Xset_subset_S hχ
-  rw [hyp.S_eq, Set.mem_setOf_eq] at hχS
+  rw [hyp.S_eq, Set.mem_ofPred_eq] at hχS
   obtain ⟨θ, -, hθeq⟩ := hχS
   have hnonzero : ∃ φ : ClassFunction ↥L ℂ, φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
       (hyp.Xset h46.W2) (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∧ φ ≠ 0 :=
@@ -581,16 +581,16 @@ theorem nonempty_coherent_S_caseB_edge (hyp : SibleyDadeHypothesis G L H)
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
   classical
-  haveI : Fintype ↥H := Fintype.ofFinite _
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
-  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
-  haveI : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
-  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
-  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
+  have : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  have : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
+  let : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  have : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
   -- `W₂.subgroupOf H = commutator H` (edge), and the weak FPF `|W₁| < |H:W₂|`.
   have hsubeq : h46.W2.subgroupOf H = commutator ↥H := by rw [hWeq, ← commutator_subgroupOf_self]
   have hMgt : 1 < (commutator ↥H).index := by
-    have hne : commutator ↥H ≠ ⊤ := (IsSolvable.commutator_lt_top_of_nontrivial ↥H).ne
+    have hne : commutator ↥H ≠ ⊤ := (Group.IsSolvable.commutator_lt_top_of_nontrivial ↥H).ne
     have h0 : (commutator ↥H).index ≠ 0 := Subgroup.index_ne_zero_of_finite
     have h1 : (commutator ↥H).index ≠ 1 := fun h => hne (Subgroup.index_eq_one.mp h)
     omega
@@ -623,7 +623,7 @@ theorem nonempty_coherent_S_caseB_edge (hyp : SibleyDadeHypothesis G L H)
   have hχne : χ ≠ χ.conj := fun heq =>
     (Xset_hasNoRealCharacters_caseB hyp h46 hHK).not_mem_of_isReal (heq.symm : χ.IsReal) hχ
   have hχS := hyp.Xset_subset_S hχ
-  rw [hyp.S_eq, Set.mem_setOf_eq] at hχS
+  rw [hyp.S_eq, Set.mem_ofPred_eq] at hχS
   obtain ⟨θ, -, hθeq⟩ := hχS
   have hnonzero : ∃ φ : ClassFunction ↥L ℂ, φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
       (hyp.Xset h46.W2) (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∧ φ ≠ 0 :=

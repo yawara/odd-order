@@ -54,7 +54,7 @@ theorem ActsRegularlyOnInvolutions.transitive
 /-- Automorphisms preserve the set of nonidentity involutions. -/
 theorem map_mem_involutions_iff (a : MulAut P) (x : P) :
     a x ∈ involutions P ↔ x ∈ involutions P := by
-  simp only [involutions, Set.mem_setOf_eq]
+  simp only [involutions, Set.mem_ofPred_eq]
   constructor
   · rintro ⟨hx2, hx1⟩
     constructor
@@ -178,7 +178,7 @@ theorem exists_primeSupported_cyclic_actor
     have hp_not_dvd : ¬p ∣ (involutions P).ncard := by
       have hpcomp := hbπ p hp_order_b
       change p ∉ π at hpcomp
-      simpa only [π, Set.mem_setOf_eq] using hpcomp
+      simpa only [π, Set.mem_ofPred_eq] using hpcomp
     exact hp_not_dvd (hpdvd.trans hρb_dvd)
   have hρa : ρ a = ρ g := by
     calc
@@ -231,8 +231,8 @@ theorem involutions_ncard_odd_of_isPGroup
     Odd (involutions P).ncard := by
   classical
   obtain ⟨x, hx⟩ := hinv
-  letI : Nontrivial P := ⟨⟨x, 1, hx.2⟩⟩
-  letI : Fintype P := Fintype.ofFinite P
+  let : Nontrivial P := ⟨⟨x, 1, hx.2⟩⟩
+  let : Fintype P := Fintype.ofFinite P
   let f : Function.End P := fun y => y⁻¹
   have hf2 : f ^ 2 = 1 := by
     funext y

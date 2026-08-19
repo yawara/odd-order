@@ -61,7 +61,7 @@ theorem chiRho_eq_inner_beta_induced {G : Type*} [Group G] [Fintype G] {A : Set 
           - d ind1H • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ),
         psi_support ind1H⟩) χ) := by
   classical
-  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  have : Fintype ↥K := Fintype.ofFinite ↥K
   rw [chiRho_decomp_induced H71 K θ d psi_support hinj hcover hdeg hAconj hAK_off hA_one χ hx]
   have hxK : x ∈ K := hAK_off x (by rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]; exact hx)
   refine sum_collapse_to_single (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
@@ -455,7 +455,7 @@ theorem induce_degree_sum_bot {L : Type*} [Group L] [Fintype L] [Invertible (Nat
         θ ≠ trivialIrreducibleCharacter ↥K)).image
         (fun θ => ClassFunction.induce K θ.toClassFunction),
       χ 1 ^ 2 / ClassFunction.inner χ χ = (K.index : ℂ) * ((Nat.card ↥K : ℂ) - 1) := by
-  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  have : Fintype ↥K := Fintype.ofFinite ↥K
   have hbot : (⊥ : Subgroup L).subgroupOf K = ⊥ := by
     ext x; simp
   have h := OddOrder.Peterfalvi.S08.sum_div_normSq_induce_kernelFilter_eq (G := L) (H := K) (A := ⊥)
@@ -497,7 +497,7 @@ theorem family_degree_sum {L : Type*} [Group L] [Fintype L] [Invertible (Nat.car
           ClassFunction.inner (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
             (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) =
       (K.index : ℂ) * ((Nat.card ↥K : ℂ) - 1) := by
-  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  have : Fintype ↥K := Fintype.ofFinite ↥K
   rw [← induce_degree_sum_bot K,
     ← Finset.sum_image (f := fun φ : ClassFunction L ℂ => φ 1 ^ 2 / ClassFunction.inner φ φ)
       (g := fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
@@ -545,7 +545,7 @@ theorem family_degree_sum_Ioi {L : Type*} [Group L] [Fintype L] [Invertible (Nat
           ClassFunction.inner (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
             (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) =
       (K.index : ℂ) * ((Nat.card ↥K : ℂ) - 1) - (K.index : ℂ) ^ 2 := by
-  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  have : Fintype ↥K := Fintype.ofFinite ↥K
   have hIoi : (Finset.Ioi (0 : Fin (n + 1))).erase ind1H
       = (Finset.univ.erase ind1H).erase 0 := by
     ext i

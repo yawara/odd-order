@@ -99,8 +99,8 @@ theorem frobTrace_mul_of_mem {c : E}
 using `z^{q²} = z` for `|E| = q²`. -/
 theorem frobTrace_mem (hcard : Nat.card E = (2 ^ m) ^ 2) (z : E) :
     frobTrace (E := E) m z ∈ OddOrder.FiniteField.frobFixedSubfield E 2 m := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI : Fintype E := Fintype.ofFinite E
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fintype E := Fintype.ofFinite E
   have hcardF : Fintype.card E = 2 ^ (m + m) := by
     rw [← Nat.card_eq_fintype_card, hcard, ← pow_mul]
     congr 1
@@ -119,7 +119,7 @@ theorem frobTrace_mem (hcard : Nat.card E = (2 ^ m) ^ 2) (z : E) :
 (nonzero, `F`-valued) trace normalizes it. -/
 theorem exists_frobTrace_eq_one (hm : m ≠ 0) (hcard : Nat.card E = (2 ^ m) ^ 2) :
     ∃ u : E, frobTrace (E := E) m u = 1 := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨e, he⟩ : ∃ e : E, frobTrace (E := E) m e ≠ 0 := by
     by_contra hcon
     push Not at hcon
@@ -184,8 +184,8 @@ theorem exists_bilinear_frobFixed_of_diag (hm : m ≠ 0) (hcard : Nat.card E = (
       (∀ x y : E, ψ x y = φ x y + u * frobTrace (E := E) m (φ x y)) ∧
       (∀ x y : E, ψ x y ∈ OddOrder.FiniteField.frobFixedSubfield E 2 m) ∧
       ∀ x : E, ψ x x = φ x x := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI : SMulCommClass E (ZMod 2) E := SMulCommClass.symm _ _ _
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : SMulCommClass E (ZMod 2) E := SMulCommClass.symm _ _ _
   obtain ⟨u, hu⟩ := exists_frobTrace_eq_one (E := E) m hm hcard
   refine ⟨u, φ + u • φ.compr₂ (frobTrace (E := E) m), fun x y => ?_, fun x y => ?_, fun x => ?_⟩
   · simp only [LinearMap.add_apply, LinearMap.smul_apply, LinearMap.compr₂_apply,

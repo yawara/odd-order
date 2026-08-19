@@ -92,7 +92,7 @@ theorem RegularOperatorSetup.card_inf_omega_centralizer [Finite R] [Finite B]
 of a subgroup is the ambient commutator `⁅S, S⁆`, which any automorphism preserves. -/
 theorem RegularOperatorSetup.smul_derivedInG_omega (hyp : RegularOperatorSetup R B p q)
     (b : B) : (hyp.act b) • derivedInG (Omega R p 1) = derivedInG (Omega R p 1) := by
-  haveI : (Omega R p 1).Characteristic := Omega.characteristic
+  have : (Omega R p 1).Characteristic := Omega.characteristic
   have hS : (Omega R p 1).map ((hyp.act b : MulAut R) : R →* R) = Omega R p 1 :=
     Subgroup.characteristic_iff_map_eq.mp inferInstance (hyp.act b)
   have hd : derivedInG (Omega R p 1) = ⁅Omega R p 1, Omega R p 1⁆ :=
@@ -102,7 +102,7 @@ theorem RegularOperatorSetup.smul_derivedInG_omega (hyp : RegularOperatorSetup R
 /-- `Ω₁(R)` is `B`-invariant (it is characteristic in `R`). -/
 theorem RegularOperatorSetup.smul_omega (hyp : RegularOperatorSetup R B p q) (b : B) :
     (hyp.act b) • Omega R p 1 = Omega R p 1 := by
-  haveI : (Omega R p 1).Characteristic := Omega.characteristic
+  have : (Omega R p 1).Characteristic := Omega.characteristic
   rw [pointwise_mulAut_smul_eq_map]
   exact Subgroup.characteristic_iff_map_eq.mp inferInstance (hyp.act b)
 
@@ -121,7 +121,7 @@ theorem RegularOperatorSetup.exists_conj_smul_R₀ [Finite R] [Finite B]
     (hB : ∀ b : B, (hyp.act b) • (hyp.R₀ ⊔ derivedInG (Omega R p 1)) =
       hyp.R₀ ⊔ derivedInG (Omega R p 1)) (b : B) :
     ∃ x ∈ Omega R p 1, (hyp.act b) • hyp.R₀ = (MulAut.conj x) • hyp.R₀ := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   obtain ⟨v, hgen, hvne⟩ := hyp.exists_zpowers_eq_R₀
   have hvR₀ : v ∈ hyp.R₀ := hgen ▸ Subgroup.mem_zpowers v
   have hvS : v ∈ Omega R p 1 := hyp.R₀_le_omega hvR₀
@@ -215,15 +215,15 @@ theorem RegularOperatorSetup.exists_smul_R₀_invariant [Finite R] [Finite B]
       hyp.R₀ ⊔ derivedInG (Omega R p 1)) :
     ∃ y ∈ Omega R p 1, ∀ b : B,
       (hyp.act b) • ((MulAut.conj y) • hyp.R₀) = (MulAut.conj y) • hyp.R₀ := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   have hSinv : IsAInvariant hyp.act (Omega R p 1) := by
-    haveI : (Omega R p 1).Characteristic := Omega.characteristic
+    have : (Omega R p 1).Characteristic := Omega.characteristic
     exact IsAInvariant.of_characteristic hyp.act
   -- `Ω` = the `S`-conjugates of `R₀`.
   let Ω := { W : Subgroup R // ∃ s : ↥(Omega R p 1), W = (MulAut.conj (s : R)) • hyp.R₀ }
-  haveI : Nonempty Ω := ⟨⟨hyp.R₀, 1, by rw [Subgroup.coe_one, map_one, one_smul]⟩⟩
+  have : Nonempty Ω := ⟨⟨hyp.R₀, 1, by rw [Subgroup.coe_one, map_one, one_smul]⟩⟩
   -- `S` acts by conjugation.
-  letI mulS : MulAction ↥(Omega R p 1) Ω :=
+  let mulS : MulAction ↥(Omega R p 1) Ω :=
     { smul := fun s ω => ⟨(MulAut.conj (s : R)) • ω.val, by
         obtain ⟨t, ht⟩ := ω.property
         exact ⟨s * t, by rw [ht, Subgroup.coe_mul, map_mul, mul_smul]⟩⟩
@@ -235,7 +235,7 @@ theorem RegularOperatorSetup.exists_smul_R₀_invariant [Finite R] [Finite B]
           (MulAut.conj (s : R)) • ((MulAut.conj (t : R)) • ω.val)
         rw [Subgroup.coe_mul, map_mul, mul_smul]) }
   -- `B` acts through `act`; this is where `exists_conj_smul_R₀` is consumed.
-  letI mulB : MulAction B Ω :=
+  let mulB : MulAction B Ω :=
     { smul := fun b ω => ⟨(hyp.act b) • ω.val, by
         obtain ⟨t, ht⟩ := ω.property
         obtain ⟨x, hxS, hx⟩ := hyp.exists_conj_smul_R₀ hB b
@@ -273,8 +273,8 @@ theorem RegularOperatorSetup.exists_smul_R₀_invariant [Finite R] [Finite B]
     rw [hk]
     exact Nat.Coprime.pow_right k
       (((Nat.Prime.coprime_iff_not_dvd hyp.p_prime).mpr hyp.p_not_dvd_card_B).symm)
-  haveI hSsolv : IsSolvable ↥(Omega R p 1) := by
-    haveI : Group.IsNilpotent ↥(Omega R p 1) :=
+  have hSsolv : Group.IsSolvable ↥(Omega R p 1) := by
+    have : Group.IsNilpotent ↥(Omega R p 1) :=
       IsPGroup.isNilpotent (hyp.R_pGroup.to_subgroup (Omega R p 1))
     infer_instance
   obtain ⟨ω, hω⟩ := OddOrder.Isaacs.Ch04.glauberman_fixed_point_exists
@@ -309,13 +309,13 @@ theorem RegularOperatorSetup.B_fixes_R₀_of_fixes_frattini [Finite R] [Finite B
     (hB : ∀ b : B, (hyp.act b) • (hyp.R₀ ⊔ frattiniInG (Omega R p 1)) =
       hyp.R₀ ⊔ frattiniInG (Omega R p 1)) :
     ∀ b : B, (hyp.act b) • hyp.R₀ = hyp.R₀ := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   rw [hyp.frattiniInG_omega_eq_derivedInG] at hB
   obtain ⟨y, hyS, hyinv⟩ := hyp.exists_smul_R₀_invariant hB
   set φA : ↥hyp.A →* MulAut R := hyp.act.comp hyp.A.subtype with hφA
   set N : Subgroup R := Omega R p 1 ⊓ Subgroup.normalizer hyp.R₀ with hNdef
   have hSinvA : IsAInvariant φA (Omega R p 1) := by
-    haveI : (Omega R p 1).Characteristic := Omega.characteristic
+    have : (Omega R p 1).Characteristic := Omega.characteristic
     exact IsAInvariant.of_characteristic φA
   have hNinv : IsAInvariant φA N := hSinvA.inf hyp.isAInvariant_R₀.normalizer
   -- The coset `y·N_S(R₀)` is `A`-invariant.
@@ -336,8 +336,8 @@ theorem RegularOperatorSetup.B_fixes_R₀_of_fixes_frattini [Finite R] [Finite B
     rw [hyp.A_card, hk]
     exact Nat.Coprime.pow_right k
       ((Nat.coprime_primes hyp.q_prime hyp.p_prime).mpr (Ne.symm hyp.p_ne_q))
-  haveI hNsolv : IsSolvable ↥N := by
-    haveI : Group.IsNilpotent ↥N := IsPGroup.isNilpotent (hyp.R_pGroup.to_subgroup N)
+  have hNsolv : Group.IsSolvable ↥N := by
+    have : Group.IsNilpotent ↥N := IsPGroup.isNilpotent (hyp.R_pGroup.to_subgroup N)
     infer_instance
   obtain ⟨c, ⟨n, hn, hcn⟩, hcfix⟩ :=
     OddOrder.Isaacs.Ch04.aInvariant_coset_mem_centralizer_of_coprime_subgroup
@@ -348,7 +348,7 @@ theorem RegularOperatorSetup.B_fixes_R₀_of_fixes_frattini [Finite R] [Finite B
     have hc := hyp.A_card
     rw [h, Subgroup.card_bot] at hc
     exact hyp.q_prime.one_lt.ne hc
-  haveI : Nontrivial ↥hyp.A := (Subgroup.nontrivial_iff_ne_bot _).mpr hAne
+  have : Nontrivial ↥hyp.A := (Subgroup.nontrivial_iff_ne_bot _).mpr hAne
   obtain ⟨a, ha⟩ := exists_ne (1 : ↥hyp.A)
   have hc1 : c = 1 :=
     hyp.A_regular a.val a.property (fun h => ha (Subtype.ext h)) c (hcfix a)

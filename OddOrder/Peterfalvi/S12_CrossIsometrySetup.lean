@@ -527,13 +527,13 @@ theorem Hypothesis.tau1_zeta_inner_alignedGrid_eq_zero [Finite G] {M : Subgroup 
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (i : Fin hyp.w1) (j : Fin hyp.w2) :
     ClassFunction.inner (coh.tau1 ζ) (hyp.alignedOmegaSigmaGrid hG hodd i j) = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
   have hζne : ζ.conj ≠ ζ := inducedFamily_hasNoRealCharacters hModd hζS
   let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
-  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
-  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
   let app := hyp.canonicalFullDadeApp hG hodd
   have hVeq : tic.V = tic.Vdiff := rfl
   obtain ⟨P, -, hPeq⟩ := hyp.exists_alignedOmegaSigmaGrid_chiFam_family hG hodd i
@@ -564,7 +564,7 @@ theorem Hypothesis.tau1_zeta_inner_alignedGrid_eq_zero [Finite G] {M : Subgroup 
           {pq | ClassFunction.inner (coh.tau1 ζ.conj) (tic.chiFam hVeq app pq) ≠ 0} := by
         intro pq hpq
         by_contra hcon
-        simp only [Set.mem_union, Set.mem_setOf_eq, not_or, not_not] at hcon
+        simp only [Set.mem_union, Set.mem_ofPred_eq, not_or, not_not] at hcon
         apply hpq
         change ClassFunction.inner (hyp.tau (ζ - ζ.conj)) (tic.chiFam hVeq app pq) = 0
         rw [hyp.tau_zeta_sub_conj_eq_tau1 hG hodd coh hζS hζirr,

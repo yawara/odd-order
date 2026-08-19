@@ -49,8 +49,8 @@ theorem witness_L_sylow_cyclic_of_dvd_complement [Finite G]
     (hqU : q ∣ Nat.card ↥typeI.typeF.U) (Q : Sylow q ↥data.L) :
     IsCyclic ↥(Q : Subgroup ↥data.L) := by
   classical
-  haveI : Fact q.Prime := ⟨hq⟩
-  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  have : Fact q.Prime := ⟨hq⟩
+  have : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
   -- `P₀ ≤ H`, so `p ∣ |H|`.
   have hP0H : ctr.P0 ≤ typeI.typeF.H := by
     rw [typeI.typeF.H_eq]; exact witness_P0_le_kernel hG hnoV data
@@ -74,7 +74,7 @@ theorem witness_L_sylow_cyclic_of_dvd_complement [Finite G]
         (typeI.typeF.prime_dvd_sq_sub_one_of_abelian_kernel hab hrank.le hq hpH hqU)
     · have hpmem : ctr.p ∈ (Nat.card ↥typeI.typeF.H).primeFactors :=
         Nat.mem_primeFactors.mpr ⟨ctr.p_prime, hpH, Nat.card_pos.ne'⟩
-      haveI : Fintype ↥typeI.typeF.U := Fintype.ofFinite _
+      have : Fintype ↥typeI.typeF.U := Fintype.ofFinite _
       obtain ⟨u, hu⟩ := exists_prime_orderOf_dvd_card (G := ↥typeI.typeF.U) q
         (by rwa [← Nat.card_eq_fintype_card])
       have hqp1 : q ∣ ctr.p - 1 :=
@@ -93,7 +93,7 @@ theorem witness_L_sylow_cyclic_of_dvd_complement [Finite G]
     exact Q.not_dvd_index
   · -- Noncyclicity transfers along `Q ≅ Q.map L.subtype`.
     intro hc
-    haveI := hc
+    have := hc
     exact hnc (isCyclic_of_surjective
       (Subgroup.equivMapOfInjective (Q : Subgroup ↥data.L) data.L.subtype
         data.L.subtype_injective).symm.toMonoidHom
@@ -121,7 +121,7 @@ theorem witness_L_complement_isZGroup [Finite G] (hG : OddOrder.BG.IsMinimalSimp
   classical
   rw [isZGroup_iff]
   intro q hq P
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   by_cases hqU : q ∣ Nat.card ↥typeI.typeF.U
   · -- `q ∣ |U|`: embed `P` into `L`, contain it in a cyclic Sylow `q`-subgroup of `L`.
     -- `P`, pushed along `U ↪ L`, is a `q`-subgroup of `L`.
@@ -133,10 +133,10 @@ theorem witness_L_complement_isZGroup [Finite G] (hG : OddOrder.BG.IsMinimalSimp
       (P.2.map (Subgroup.inclusion typeI.typeF.U_le))
     obtain ⟨Q, hQle⟩ := hPLpg.exists_le_sylow
     -- The containing Sylow `q`-subgroup of `L` is cyclic (minimality core).
-    haveI hQcyc : IsCyclic ↥(Q : Subgroup ↥data.L) :=
+    have hQcyc : IsCyclic ↥(Q : Subgroup ↥data.L) :=
       witness_L_sylow_cyclic_of_dvd_complement hG hnoV data typeI hq hqU Q
     -- A subgroup of a cyclic group is cyclic; `PL ≤ Q ≅ P`.
-    haveI : IsCyclic ↥PL := Subgroup.isCyclic_of_le hQle
+    have : IsCyclic ↥PL := Subgroup.isCyclic_of_le hQle
     exact isCyclic_of_surjective _
       (Subgroup.equivMapOfInjective (P : Subgroup ↥typeI.typeF.U)
         (Subgroup.inclusion typeI.typeF.U_le) hincl).symm.surjective
@@ -149,7 +149,7 @@ theorem witness_L_complement_isZGroup [Finite G] (hG : OddOrder.BG.IsMinimalSimp
       by_contra hk0
       exact hqU ((dvd_pow_self q hk0).trans hqk)
     have hcard1 : Nat.card ↥(P : Subgroup ↥typeI.typeF.U) = 1 := by rw [hk, hk0, pow_zero]
-    haveI : Subsingleton ↥(P : Subgroup ↥typeI.typeF.U) :=
+    have : Subsingleton ↥(P : Subgroup ↥typeI.typeF.U) :=
       (Finite.card_le_one_iff_subsingleton).mp (by omega)
     infer_instance
 
@@ -280,11 +280,11 @@ theorem witness_MinfL_pprime_subgroup_eq_bot [Finite G] (hG : OddOrder.BG.IsMini
     (hAML : A ≤ ctr.M ⊓ data.L) (hAH : A ⊓ maxNilpotentNormalHall data.L = ⊥) (hAne : A ≠ ⊥) :
     False := by
   classical
-  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  have : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
   set H : Subgroup G := maxNilpotentNormalHall data.L with hHdef
   have hAM : A ≤ ctr.M := hAML.trans inf_le_left
   have hAL : A ≤ data.L := hAML.trans inf_le_right
-  haveI hHnilp : Group.IsNilpotent ↥H := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent
+  have hHnilp : Group.IsNilpotent ↥H := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent
       data.L
   have hHL : H ≤ data.L := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le data.L
   have hHnorm : data.L ≤ Subgroup.normalizer (H : Set G) :=
@@ -329,9 +329,9 @@ theorem witness_MinfL_pprime_subgroup_eq_bot [Finite G] (hG : OddOrder.BG.IsMini
     sup_le (le_inf hP_le_M (hP_le_H.trans hHL)) hAML
   -- `K` is solvable (subgroup of the solvable maximal `M`).
   have hKM : ctr.K ≤ ctr.M := ctr.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le ctr.M
-  haveI hMsolv : IsSolvable ↥ctr.M := hG.solvable_of_mem_maximalSubgroups ctr.M_maximal
-  haveI hKsolv : IsSolvable ↥ctr.K :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective hKM)
+  have hMsolv : Group.IsSolvable ↥ctr.M := hG.isSolvable_of_mem_maximalSubgroups ctr.M_maximal
+  have hKsolv : Group.IsSolvable ↥ctr.K :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective hKM)
   -- Coprimality of the `P ⊔ A`-action on `K`.
   have hcop : Nat.Coprime (Nat.card ↥ctr.K) (Nat.card ↥(P ⊔ A)) :=
     (card_MinfL_coprime_card_K hG hnoV data).symm.coprime_dvd_right (Subgroup.card_dvd_of_le hPA_ML)
@@ -394,7 +394,7 @@ theorem intersection_le_kernel [Finite G]
   set H : Subgroup G := maxNilpotentNormalHall data.L with hHdef
   have hHL : H ≤ data.L := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le data.L
   have hMLL : ctr.M ⊓ data.L ≤ data.L := inf_le_right
-  haveI hHnorm : (H.subgroupOf data.L).Normal :=
+  have hHnorm : (H.subgroupOf data.L).Normal :=
     OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal data.L
   -- `|M ∩ L|` is coprime to `[L : H]`.
   have hcop : Nat.Coprime (Nat.card ↥((ctr.M ⊓ data.L).subgroupOf data.L))
@@ -402,7 +402,7 @@ theorem intersection_le_kernel [Finite G]
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMLL).toEquiv, Nat.coprime_iff_gcd_eq_one]
     by_contra hgcd
     obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd hgcd
-    haveI : Fact q.Prime := ⟨hq⟩
+    have : Fact q.Prime := ⟨hq⟩
     rw [Nat.dvd_gcd_iff] at hqdvd
     obtain ⟨hqML, hqidx⟩ := hqdvd
     -- A Sylow `q`-subgroup `Q` of `M ∩ L` is nontrivial, meets `H` trivially, contradicts the core.

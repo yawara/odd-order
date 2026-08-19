@@ -39,7 +39,7 @@ subgroup `N ⊓ Z(R)` of `N` must be all of `N`, so `N ≤ Z(R)`.
 theorem le_center_of_card_eq_prime_of_normal (hR : IsPGroup p R)
     {N : Subgroup R} [N.Normal] (hN : Nat.card N = p) : N ≤ Subgroup.center R := by
   have hp : p.Prime := Fact.out
-  haveI hNnt : Nontrivial N :=
+  have hNnt : Nontrivial N :=
     Finite.one_lt_card_iff_nontrivial.mp (by rw [hN]; exact hp.one_lt)
   have hmeet : Nontrivial ((N ⊓ Subgroup.center R : Subgroup R)) :=
     OddOrder.Isaacs.Ch01.IsPGroup.normal_inf_center_nontrivial hR hNnt
@@ -67,7 +67,7 @@ The `p`-th power map `φ : x ↦ xᵖ` is a homomorphism (abelian) with `ker φ 
 theorem card_quotient_frattini_le_card_omega1_of_comm (hR : IsPGroup p R)
     (hcomm : ∀ x y : R, x * y = y * x) :
     Nat.card (R ⧸ frattini R) ≤ Nat.card (Omega R p 1) := by
-  letI : CommGroup R := { (inferInstance : Group R) with mul_comm := hcomm }
+  let : CommGroup R := { (inferInstance : Group R) with mul_comm := hcomm }
   -- `φ : x ↦ xᵖ`, a homomorphism since `R` is abelian.
   let φ : R →* R :=
     { toFun := fun x => x ^ p
@@ -131,12 +131,12 @@ theorem exists_generators_le_two_of_isPGroup_of_card_le_prime_sq {Q : Type*} [Gr
       interval_cases k
       · refine absurd ?_ hcyc
         have h1 : Nat.card Q = 1 := by rw [hk]; simp
-        haveI : Subsingleton Q := (Nat.card_eq_one_iff_unique.mp h1).1
+        have : Subsingleton Q := (Nat.card_eq_one_iff_unique.mp h1).1
         exact ⟨⟨1, fun x => Subgroup.mem_zpowers_iff.mpr ⟨0, Subsingleton.elim _ _⟩⟩⟩
       · exact absurd (isCyclic_of_prime_card (p := p) (by rw [hk, pow_one])) hcyc
       · rfl
     rw [hk2] at hk
-    haveI : Nontrivial Q := by
+    have : Nontrivial Q := by
       rw [← Finite.one_lt_card_iff_nontrivial, hk]
       exact Nat.one_lt_pow (by norm_num) hp.one_lt
     obtain ⟨g₁, hg₁⟩ := exists_ne (1 : Q)
@@ -236,7 +236,7 @@ theorem isMetacyclic_of_omega1_card_le_prime_sq_of_comm (hR : IsPGroup p R)
     (hcomm : ∀ x y : R, x * y = y * x) (hΩ : Nat.card (Omega R p 1) ≤ p ^ 2) :
     OddOrder.GroupTheory.IsMetacyclic R := by
   classical
-  letI : CommGroup R := { (inferInstance : Group R) with mul_comm := hcomm }
+  let : CommGroup R := { (inferInstance : Group R) with mul_comm := hcomm }
   have hQ : Nat.card (R ⧸ frattini R) ≤ p ^ 2 :=
     le_trans (card_quotient_frattini_le_card_omega1_of_comm hR hcomm) hΩ
   obtain ⟨T, hTcard, hTgen⟩ := exists_generators_le_two_of_card_quotient_frattini_le_prime_sq hR hQ
@@ -330,7 +330,7 @@ theorem exists_metacyclic_lift_of_isMetacyclic_quotient_center_prime (_hR : IsPG
   set T : Subgroup R := Subgroup.zpowers z with hT
   -- ⟨STEP 1⟩ Unpack `IsMetacyclic (R ⧸ T)`.
   obtain ⟨N, hNnorm, hNcyc, hQcyc⟩ := hmeta
-  haveI := hNnorm; haveI := hNcyc; haveI := hQcyc
+  have := hNnorm; have := hNcyc; have := hQcyc
   -- ⟨STEP 2⟩ A generator `ngen` of `N`, lifted to `a ∈ R`; so `N = ⟨mk' T a⟩`.
   obtain ⟨ngen, hngen⟩ := hNcyc.exists_generator
   obtain ⟨a, ha⟩ := QuotientGroup.mk'_surjective T ngen
@@ -348,7 +348,7 @@ theorem exists_metacyclic_lift_of_isMetacyclic_quotient_center_prime (_hR : IsPG
     · rw [Subgroup.zpowers_le]; exact haN
   -- ⟨STEP 3⟩ `K := comap (mk' T) N`; normal, contains `T`, and maps onto `N`.
   set K : Subgroup R := N.comap (QuotientGroup.mk' T) with hK
-  haveI hKnorm : K.Normal := hNnorm.comap _
+  have hKnorm : K.Normal := hNnorm.comap _
   have hTleK : T ≤ K := QuotientGroup.le_comap_mk' T N
   have hKmap : K.map (QuotientGroup.mk' T) = N :=
     Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective T) N
@@ -417,7 +417,7 @@ theorem exists_metacyclic_lift_of_isMetacyclic_quotient_center_prime (_hR : IsPG
       rw [hT, Subgroup.zpowers_le]; exact hzin
     rw [sup_eq_left.mpr hTin] at hsup; exact hsup
   -- ⟨STEP 6 = (iv)⟩ `K / (T.subgroupOf K)` is cyclic (`≅ K.map (mk' T) = N`).
-  haveI hiv : IsCyclic (K ⧸ (T.subgroupOf K)) := by
+  have hiv : IsCyclic (K ⧸ (T.subgroupOf K)) := by
     -- `φ := mk' T ∘ K.subtype : K →* R/T`, with `range φ = K.map (mk' T) = N` and
     -- `ker φ = T.subgroupOf K`.
     set φ : K →* (R ⧸ T) := (QuotientGroup.mk' T).comp K.subtype with hφ
@@ -425,16 +425,16 @@ theorem exists_metacyclic_lift_of_isMetacyclic_quotient_center_prime (_hR : IsPG
       rw [hφ, MonoidHom.range_comp, Subgroup.range_subtype]; exact hKmap
     have hkereq : φ.ker = T.subgroupOf K := by
       rw [hφ, ← MonoidHom.comap_ker, QuotientGroup.ker_mk']; rfl
-    haveI : IsCyclic ↥φ.range := by rw [hrange]; exact hNcyc
-    haveI : IsCyclic (K ⧸ φ.ker) :=
+    have : IsCyclic ↥φ.range := by rw [hrange]; exact hNcyc
+    have : IsCyclic (K ⧸ φ.ker) :=
       isCyclic_of_surjective (QuotientGroup.quotientKerEquivRange φ).symm.toMonoidHom
         (QuotientGroup.quotientKerEquivRange φ).symm.surjective
-    haveI : (T.subgroupOf K).Normal := (inferInstance : T.Normal).subgroupOf K
+    have : (T.subgroupOf K).Normal := (inferInstance : T.Normal).subgroupOf K
     -- transport `IsCyclic (K ⧸ φ.ker)` along the equality `φ.ker = T.subgroupOf K`.
     exact isCyclic_of_surjective (QuotientGroup.quotientMulEquivOfEq hkereq).toMonoidHom
       (QuotientGroup.quotientMulEquivOfEq hkereq).surjective
   -- ⟨STEP 7 = (v)⟩ `R / K` is cyclic (`≅ (R/T)/N`).
-  haveI hv : IsCyclic (R ⧸ K) := by
+  have hv : IsCyclic (R ⧸ K) := by
     -- `(R/T)/N ≃ (R/T)/(K.map (mk' T)) ≃ R/K`, and the first is cyclic.
     have e : ((R ⧸ T) ⧸ N) ≃* (R ⧸ K) :=
       (QuotientGroup.quotientMulEquivOfEq hKmap.symm).trans
@@ -500,7 +500,7 @@ theorem isMetacyclic_of_isCyclic_commutator_of_card_omega1_le
   have hp : p.Prime := Fact.out
   -- ⟨STEP 0⟩ If `R` is cyclic, it is metacyclic; otherwise work with `hRcyc : ¬ IsCyclic R`.
   by_cases hRcyc : IsCyclic R
-  · haveI := hRcyc
+  · have := hRcyc
     exact OddOrder.GroupTheory.IsMetacyclic.of_isCyclic
   -- ⟨STEP 1⟩ Maximal cyclic `S` subject to `R' ⊆ S`, from finiteness (witness = `R'`).
   obtain ⟨S, hSsub, hSmax⟩ :=
@@ -508,12 +508,12 @@ theorem isMetacyclic_of_isCyclic_commutator_of_card_omega1_le
       (p := fun H : Subgroup R => IsCyclic ↥H ∧ _root_.commutator R ≤ H) ⟨hcyc, le_refl _⟩
   have hScyc : IsCyclic ↥S := hSmax.1.1
   have hRprime_le : _root_.commutator R ≤ S := hSmax.1.2
-  haveI := hScyc
+  have := hScyc
   -- ⟨STEP 2⟩ `S ⊴ R` (since `R' ⊆ S`) and `S ≠ ⊤` (since `R` is not cyclic).
   have hSnorm : S.Normal := OddOrder.Isaacs.Ch06.normal_of_commutator_le hRprime_le
-  haveI := hSnorm
+  have := hSnorm
   -- `R/S` is a `p`-group.
-  haveI hQpg : IsPGroup p (R ⧸ S) := hR.to_quotient S
+  have hQpg : IsPGroup p (R ⧸ S) := hR.to_quotient S
   -- ⟨STEP 5⟩ Uniqueness of order-`p` subgroups of `R/S` ⇒ `R/S` cyclic.
   have hRScyc : IsCyclic (R ⧸ S) := by
     refine OddOrder.Isaacs.Ch06.isCyclic_of_subgroups_card_prime_unique_of_odd hQpg hp_odd ?_
@@ -575,7 +575,7 @@ theorem isMetacyclic_of_isCyclic_commutator_of_card_omega1_le
       have hΩR_not_le_S : ¬ Omega R p 1 ≤ S := by
         intro hle
         -- `S` is nontrivial (it contains the nontrivial `Ω₁(R)`, of order `p²`).
-        haveI hS_nt : Nontrivial ↥S := by
+        have hS_nt : Nontrivial ↥S := by
           rw [← Finite.one_lt_card_iff_nontrivial]
           have h1 : Nat.card (Omega R p 1) ≤ Nat.card ↥S := Subgroup.card_le_of_le hle
           have h2 : 1 < Nat.card (Omega R p 1) := by
@@ -725,13 +725,13 @@ private theorem exists_lift_commutator_eq_of_isMetacyclic_quotient_center_prime
   -- ⟨STEP 4⟩ The `(4.7)` lift.
   obtain ⟨a, b, K, hKnorm, hKeq, hRp_le_K, hgen, hKTcyc, hRKcyc⟩ :=
     exists_metacyclic_lift_of_isMetacyclic_quotient_center_prime hR hz hzp hmeta
-  haveI := hKnorm
+  have := hKnorm
   refine ⟨a, b, K, hKnorm, hKeq, hRp_le_K, hgen, hKTcyc, hRKcyc, ?_⟩
   -- ⟨STEP 5a⟩ `R/Z` is not cyclic (else `R/Z(R)` cyclic ⇒ `R` abelian, Lemma 4.1).
   have hZ_le_center : Z ≤ Subgroup.center R := by rw [hZ_def, Subgroup.zpowers_le]; exact hz
   have hRZ_ncyc : ¬ IsCyclic (R ⧸ Z) := by
     intro hcyc
-    haveI := hcyc
+    have := hcyc
     apply hnc
     intro x y
     exact (MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
@@ -756,7 +756,7 @@ private theorem exists_lift_commutator_eq_of_isMetacyclic_quotient_center_prime
       · rw [hZ_def, Subgroup.zpowers_le]; exact Subgroup.subset_closure (by simp)
     apply hRZ_ncyc
     -- transport `IsCyclic (R ⧸ K)` along `K = Z`.
-    haveI := hRKcyc
+    have := hRKcyc
     exact isCyclic_of_surjective (QuotientGroup.quotientMulEquivOfEq hKeqZ).toMonoidHom
       (QuotientGroup.quotientMulEquivOfEq hKeqZ).surjective
   have haK : a ∈ K := hKeq ▸ Subgroup.subset_closure (by simp)
@@ -790,7 +790,7 @@ private theorem exists_lift_commutator_eq_of_isMetacyclic_quotient_center_prime
     | mul x y _ _ hx hy =>
         rw [show g * (x * y) * g⁻¹ = (g * x * g⁻¹) * (g * y * g⁻¹) by group]; exact W.mul_mem hx hy
     | inv x _ hx => rw [show g * x⁻¹ * g⁻¹ = (g * x * g⁻¹)⁻¹ by group]; exact W.inv_mem hx
-  haveI := hW_normal
+  have := hW_normal
   -- ⟨STEP 5d⟩ `a ∉ W`: else `a = (aᵖ)^k z^m ⇒ a^{1-pk} ∈ Z ⇒ (mk'Z a)^{1-pk} = 1`,
   -- so `orderOf (mk'Z a) ∣ 1 - pk`; but `p ∣ orderOf (mk'Z a)` forces `p ∣ 1`, contradiction.
   have haW : a ∉ W := by
@@ -818,7 +818,7 @@ private theorem exists_lift_commutator_eq_of_isMetacyclic_quotient_center_prime
       exact ha_in_Z
     -- `p ∣ orderOf (mk'Z a)` (nontrivial p-group element).
     have hp_dvd_ord : (p : ℤ) ∣ (orderOf (QuotientGroup.mk' Z a) : ℤ) := by
-      haveI hQpg : IsPGroup p (R ⧸ Z) := hR.to_quotient Z
+      have hQpg : IsPGroup p (R ⧸ Z) := hR.to_quotient Z
       obtain ⟨t, ht⟩ := (IsPGroup.iff_orderOf.mp hQpg) (QuotientGroup.mk' Z a)
       have ht_pos : 0 < t := by
         rcases Nat.eq_zero_or_pos t with h0 | hpos
@@ -926,12 +926,12 @@ theorem isMetacyclic_of_omega1_card_le_prime_sq (hR : IsPGroup p R) (hp3 : 3 < p
     rw [hRp]
     intro hc
     exact hab (fun x y => ((commutator_eq_bot_iff R').mp hc).is_comm.comm x y)
-  haveI hRp_nt : Nontrivial Rp := (Subgroup.nontrivial_iff_ne_bot Rp).mpr hRp_ne
-  haveI hRp_normal : Rp.Normal := by rw [hRp]; infer_instance
+  have hRp_nt : Nontrivial Rp := (Subgroup.nontrivial_iff_ne_bot Rp).mpr hRp_ne
+  have hRp_normal : Rp.Normal := by rw [hRp]; infer_instance
   -- `℧¹(R') = (Agemo Rp p 1).map Rp.subtype`, pushed into `R'`; characteristic in `Rp ◁ R'`,
   -- hence normal in `R'`.
   set U₀ : Subgroup R' := (Agemo Rp p 1).map Rp.subtype with hU₀
-  haveI hU₀_normal : U₀.Normal := by rw [hU₀]; infer_instance
+  have hU₀_normal : U₀.Normal := by rw [hU₀]; infer_instance
   have hU₀_le : U₀ ≤ Rp := by rw [hU₀]; exact Subgroup.map_subtype_le _
   -- Branch on `℧¹(R') = ⊥`; this drives both the choice of `z` and the closing step.
   by_cases h𝒰 : U₀ = ⊥
@@ -944,7 +944,7 @@ theorem isMetacyclic_of_omega1_card_le_prime_sq (hR : IsPGroup p R) (hp3 : 3 < p
     set Z : Subgroup R' := Subgroup.zpowers z with hZ_def
     have hZ_le_center : Z ≤ Subgroup.center R' := by
       rw [hZ_def, Subgroup.zpowers_le]; exact hz_center
-    haveI hZ_normal : Z.Normal := by
+    have hZ_normal : Z.Normal := by
       constructor; intro nn hnn g'
       have := Subgroup.mem_center_iff.mp (hZ_le_center hnn) g'
       rw [this, mul_assoc, mul_inv_cancel, mul_one]; exact hnn
@@ -1030,7 +1030,7 @@ theorem isMetacyclic_of_omega1_card_le_prime_sq (hR : IsPGroup p R) (hp3 : 3 < p
       have hcomm_eq : _root_.commutator R' = Subgroup.zpowers c := by
         apply le_antisymm
         · -- `R'/⟨c⟩` is abelian (generators `a, b, z` commute mod `⟨c⟩`), so `R' ≤ ⟨c⟩`.
-          haveI hZc_normal : (Subgroup.zpowers c).Normal := by
+          have hZc_normal : (Subgroup.zpowers c).Normal := by
             constructor; intro nn hnn g'
             have := Subgroup.mem_center_iff.mp (Subgroup.zpowers_le.mpr hc_center hnn) g'
             rw [this, mul_assoc, mul_inv_cancel, mul_one]; exact hnn
@@ -1103,14 +1103,14 @@ theorem isMetacyclic_of_omega1_card_le_prime_sq (hR : IsPGroup p R) (hp3 : 3 < p
   -- BRANCH `℧¹(R') ≠ ⊥`  (STEP 6): `z ∈ ℧¹(R') ⊓ Z(R')`.
   -- ============================================================
   · -- ⟨STEP 2⟩ extract a central `z` of order `p` in `U₀ = ℧¹(R') ≤ Rp`.
-    haveI hU₀_nt : Nontrivial U₀ := (Subgroup.nontrivial_iff_ne_bot U₀).mpr h𝒰
+    have hU₀_nt : Nontrivial U₀ := (Subgroup.nontrivial_iff_ne_bot U₀).mpr h𝒰
     obtain ⟨z, hzU₀, hz_center, hzp⟩ :=
       exists_central_orderOf_eq_prime_mem_of_normal hR' (V := U₀) hU₀_nt
     have hzRp : z ∈ Rp := hU₀_le hzU₀
     set Z : Subgroup R' := Subgroup.zpowers z with hZ_def
     have hZ_le_center : Z ≤ Subgroup.center R' := by
       rw [hZ_def, Subgroup.zpowers_le]; exact hz_center
-    haveI hZ_normal : Z.Normal := by
+    have hZ_normal : Z.Normal := by
       constructor; intro nn hnn g'
       have := Subgroup.mem_center_iff.mp (hZ_le_center hnn) g'
       rw [this, mul_assoc, mul_inv_cancel, mul_one]; exact hnn
@@ -1156,7 +1156,7 @@ theorem isMetacyclic_of_omega1_card_le_prime_sq (hR : IsPGroup p R) (hp3 : 3 < p
         · exact Subgroup.mem_zpowers _
         · exact hz_in_a
       · rw [Subgroup.zpowers_le]; exact Subgroup.subset_closure (by simp)
-    haveI hKcyc : IsCyclic K := by rw [hK_eq_zpa]; infer_instance
+    have hKcyc : IsCyclic K := by rw [hK_eq_zpa]; infer_instance
     -- `⟨K, R/K⟩` witnesses metacyclicity.
     exact ⟨K, hKnorm, hKcyc, hRKcyc⟩
 

@@ -64,7 +64,7 @@ theorem typeI_frobenius_of_pi_empty [Finite G] (hG : OddOrder.BG.IsMinimalSimple
       (hrel ▸ Subgroup.relIndex_dvd_index_of_le data.typeF.H_le)
   -- Every Sylow `q`-subgroup `P` of `U` is cyclic.
   refine ⟨fun q hq P => ?_⟩
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   by_contra hnc
   -- `P ≠ ⊥`, so `q ∣ |U|`, and `|H|` has no `q`.
   have hPcard : Nat.card ↥(P : Subgroup ↥U) = q ^ (Nat.card ↥U).factorization q :=
@@ -104,7 +104,7 @@ theorem typeI_frobenius_of_pi_empty [Finite G] (hG : OddOrder.BG.IsMinimalSimple
       (by omega)
   · -- `¬ IsCyclic ↥Pm`: `Pm ≃* P` and `P` is noncyclic.
     intro hc
-    haveI := hc
+    have := hc
     exact hnc (isCyclic_of_surjective
       (Subgroup.equivMapOfInjective (P : Subgroup ↥U) U.subtype
           U.subtype_injective).symm.toMonoidHom
@@ -221,7 +221,7 @@ outside `[K, K]`. -/
 theorem exists_ne_one_actionFixedBy_not_le_commutator
     {A K : Type*} [Group A] [Finite A] [IsMulCommutative A] [Group K] [Finite K]
     (φ : A →* MulAut K) (hCop : Nat.Coprime (Nat.card A) (Nat.card K))
-    (hSolv : IsSolvable A ∨ IsSolvable K) (hNC : ¬ IsCyclic A)
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable K) (hNC : ¬ IsCyclic A)
     (hK' : commutator K ≠ ⊤) :
     ∃ a : A, a ≠ 1 ∧ ¬ (Ch06.actionFixedBy φ a ≤ commutator K) := by
   classical
@@ -254,9 +254,9 @@ theorem exists_ne_one_actionFixedBy_not_le_commutator
     -- Coprime fixed-point lifting (Isaacs Cor 3.28) on the cyclic group `⟨a⟩`.
     have hCop' : Nat.Coprime (Nat.card ↥(Subgroup.zpowers a)) (Nat.card K) :=
       hCop.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _)
-    have hSolv' : IsSolvable ↥(Subgroup.zpowers a) ∨ IsSolvable K := by
+    have hSolv' : Group.IsSolvable ↥(Subgroup.zpowers a) ∨ Group.IsSolvable K := by
       rcases hSolv with hA | hK
-      · haveI := hA; exact Or.inl inferInstance
+      · have := hA; exact Or.inl inferInstance
       · exact Or.inr hK
     obtain ⟨c, hc_fix, n, hn, hcn⟩ :=
       Ch04.coprime_fixedPoints_quotient hCop' hSolv'
@@ -291,7 +291,7 @@ Specialization of `exists_ne_one_actionFixedBy_not_le_commutator` to the conjuga
 theorem exists_mem_centralizer_inf_not_le_commutator
     {A K : Subgroup G} [Finite ↥A] [IsMulCommutative ↥A] [Finite ↥K]
     (hAK : A ≤ Subgroup.normalizer K) (hCop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥K))
-    (hSolv : IsSolvable ↥A ∨ IsSolvable ↥K) (hNC : ¬ IsCyclic ↥A) (hK' : ⁅K, K⁆ ≠ K) :
+    (hSolv : Group.IsSolvable ↥A ∨ Group.IsSolvable ↥K) (hNC : ¬ IsCyclic ↥A) (hK' : ⁅K, K⁆ ≠ K) :
     ∃ x : G, x ∈ A ∧ x ≠ 1 ∧ ¬ (Subgroup.centralizer {x} ⊓ K ≤ ⁅K, K⁆) := by
   classical
   -- The conjugation action `φ : A → MulAut K` and the `K.subtype`-image of `[↥K, ↥K]`.
@@ -344,9 +344,9 @@ theorem exists_orderP_centralizer_witness [Finite G]
     ∃ x : G, x ∈ ctr.P0 ∧ x ≠ 1 ∧ x ^ ctr.p = 1 ∧
       ¬ (Subgroup.centralizer ({x} : Set G) ⊓ ctr.K ≤ ctr.Kprime) := by
   classical
-  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
-  haveI := habelian
-  haveI : Group.IsNilpotent ↥ctr.P0 := ctr.P0_pGroup.isNilpotent
+  have : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  have := habelian
+  have : Group.IsNilpotent ↥ctr.P0 := ctr.P0_pGroup.isNilpotent
   -- `K' = ⁅K, K⁆`.
   have hKprime : ctr.Kprime = ⁅ctr.K, ctr.K⁆ :=
     ctr.Kprime_eq.trans (Subgroup.map_subtype_commutator ctr.K)
@@ -414,8 +414,8 @@ theorem exists_sigmaKappaCompl_hall_ge_P0 [Finite G] (hG : OddOrder.BG.IsMinimal
         ((OddOrder.BG.Ch4.S14.kappa ctr.M ∪ OddOrder.BG.Ch3.S10.sigma ctr.M)ᶜ)
         (U.subgroupOf ctr.M) := by
   classical
-  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
-  haveI hMsolv : IsSolvable ↥ctr.M := hG.solvable_of_mem_maximalSubgroups ctr.M_maximal
+  have : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  have hMsolv : Group.IsSolvable ↥ctr.M := hG.isSolvable_of_mem_maximalSubgroups ctr.M_maximal
   -- κ(M) = ∅ (Type I ⟹ Type F, Prop 16.1 clause (a)).
   have hκ : OddOrder.BG.Ch4.S14.kappa ctr.M = ∅ :=
     (OddOrder.BG.Ch4.S16.proposition_type_classification hG ctr.M_maximal).1.mp ctr.M_typeI
@@ -489,7 +489,7 @@ load-bearing**; the only remaining gap is the `(κ ∪ σ)ᶜ`-Hall complement o
 theorem counterexample_P0_K_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (ctr : CounterexampleHypothesis (G := G)) :
     IsMulCommutative ↥ctr.P0 ∧ rank ↥ctr.P0 = 2 := by
-  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  have : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
   obtain ⟨U, hP0U, hUM, hU⟩ := exists_sigmaKappaCompl_hall_ge_P0 hG ctr
   obtain ⟨hrank_le, habelian⟩ :=
     OddOrder.BG.Ch4.S16.theoremB_U_sylow_abelian_rank_le_two hG ctr.M_maximal hUM hU
@@ -514,7 +514,7 @@ in `σ(M)`: `M_σ` is `σ(M)`-Hall in `G` and `p ∤ |M_σ| = |M_F|` (as `M_F` i
 theorem p_not_mem_sigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (ctr : CounterexampleHypothesis (G := G)) :
     ctr.p ∉ OddOrder.BG.Ch3.S10.sigma ctr.M := by
-  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  have : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
   have hMFσ : maxNilpotentNormalHall ctr.M = OddOrder.BG.Ch3.S10.Msigma ctr.M :=
     (OddOrder.BG.Ch4.S16.proposition_type_classification hG ctr.M_maximal).2.2.2.2.2.mpr
       (Or.inl ctr.M_typeI)
@@ -550,7 +550,7 @@ centralize `K`" step of Peterfalvi (12.11). -/
 theorem P0_not_le_centralizer_K [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (ctr : CounterexampleHypothesis (G := G)) :
     ¬ ctr.P0 ≤ Subgroup.centralizer (ctr.K : Set G) := by
-  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  have : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
   intro hP0C
   -- `P₀` is a `σ(M)ᶜ`-subgroup (a `p`-group with `p ∉ σ(M)`).
   have hpσ : ctr.p ∉ OddOrder.BG.Ch3.S10.sigma ctr.M := p_not_mem_sigma hG ctr

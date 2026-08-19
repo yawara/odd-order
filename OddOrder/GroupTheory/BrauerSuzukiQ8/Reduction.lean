@@ -45,7 +45,7 @@ variable {G : Type*} [Group G] [Finite G]
 both a power of `2` and an odd number. -/
 theorem sylowTwo_inf_oPiCore_eq_bot (T : Sylow 2 G) :
     (T : Subgroup G) ⊓ oPiCore {p | p ≠ 2} G = ⊥ := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hKodd : ¬ 2 ∣ Nat.card ↥(oPiCore {p | p ≠ 2} G) := fun h2 =>
     (oPiCore.isPiGroup {p | p ≠ 2}) 2
       (Nat.mem_primeFactors.mpr ⟨Nat.prime_two, h2, Nat.card_pos.ne'⟩) rfl
@@ -91,7 +91,7 @@ theorem mem_center_of_normal_of_isCyclic {N : Subgroup G} [N.Normal] [IsCyclic �
 theorem nonempty_mulEquiv_quaternionTwo_of_sylow (T S : Sylow 2 G)
     (e : ↥(T : Subgroup G) ≃* QuaternionGroup 2) :
     Nonempty (↥(S : Subgroup G) ≃* QuaternionGroup 2) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G T S
   have hcoe : (S : Subgroup G) = MulAut.conj g • (T : Subgroup G) := by rw [← hg]; rfl
   exact ⟨((MulEquiv.subgroupCongr hcoe).trans
@@ -104,7 +104,7 @@ theorem nonempty_mulEquiv_quaternionTwo_of_sylow (T S : Sylow 2 G)
 number `[G : T]`. -/
 theorem not_two_dvd_index_inf_subgroupOf (T : Sylow 2 G) (N : Subgroup G) [N.Normal] :
     ¬ 2 ∣ (((T : Subgroup G) ⊓ N).subgroupOf N).index := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   set S := ((T : Subgroup G) ⊓ N).subgroupOf N with hS
   have hcard : Nat.card ↥S = Nat.card ↥((T : Subgroup G) ⊓ N) :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe (H := (T : Subgroup G) ⊓ N) inf_le_right).toEquiv
@@ -138,7 +138,7 @@ theorem q8_mem_center_of_mem_normal_of_not_le (hO : oPiCore {p | p ≠ 2} G = �
     {N : Subgroup G} [N.Normal] (hTN : ¬ (T : Subgroup G) ≤ N) (hzN : z ∈ N) :
     z ∈ Subgroup.center G := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   -- `T ⊓ N` is a Sylow `2`-subgroup of `N`
   have hpgTN : IsPGroup 2 ↥((T : Subgroup G) ⊓ N) := T.isPGroup'.to_le inf_le_left
   have hpg : IsPGroup 2 ↥(((T : Subgroup G) ⊓ N).subgroupOf N) :=
@@ -155,8 +155,8 @@ theorem q8_mem_center_of_mem_normal_of_not_le (hO : oPiCore {p | p ≠ 2} G = �
       = N.subgroupOf (T : Subgroup G) := by
     rw [show (T : Subgroup G) ⊓ N = N ⊓ (T : Subgroup G) from inf_comm _ _]
     exact Subgroup.inf_subgroupOf_right N (T : Subgroup G)
-  haveI hcycInf : IsCyclic ↥((T : Subgroup G) ⊓ N) := by
-    haveI := hcycT
+  have hcycInf : IsCyclic ↥((T : Subgroup G) ⊓ N) := by
+    have := hcycT
     exact isCyclic_of_surjective
       ((MulEquiv.subgroupCongr hstep).symm.trans
         (Subgroup.subgroupOfEquivOfLe (H := (T : Subgroup G) ⊓ N) inf_le_left)).toMonoidHom
@@ -182,7 +182,7 @@ theorem q8_mem_center_of_mem_normal_of_not_le (hO : oPiCore {p | p ≠ 2} G = �
       rwa [Subgroup.orderOf_mk] at this
     · rintro ⟨hxN, hodd⟩
       exact ⟨⟨x, hxN⟩, (hLmem ⟨x, hxN⟩).mpr (by rwa [Subgroup.orderOf_mk]), rfl⟩
-  haveI hLgnorm : (L.map N.subtype).Normal := by
+  have hLgnorm : (L.map N.subtype).Normal := by
     refine ⟨fun x hx g => ?_⟩
     obtain ⟨hxN, hodd⟩ := (hLgmem x).mp hx
     refine (hLgmem _).mpr ⟨Subgroup.Normal.conj_mem ‹N.Normal› x hxN g, ?_⟩
@@ -202,7 +202,7 @@ theorem q8_mem_center_of_mem_normal_of_not_le (hO : oPiCore {p | p ≠ 2} G = �
     exact Subgroup.mem_bot.mpr (Subtype.ext this)
   -- so `N` is its own Sylow `2`-subgroup: cyclic
   have hPtop : (P : Subgroup ↥N) = ⊤ := by rw [← hLsup, hLbot, bot_sup_eq]
-  haveI : IsCyclic ↥N :=
+  have : IsCyclic ↥N :=
     isCyclic_of_surjective ((MulEquiv.subgroupCongr hPtop).trans Subgroup.topEquiv).toMonoidHom
       (MulEquiv.surjective _)
   exact mem_center_of_normal_of_isCyclic hzN hz
@@ -215,7 +215,7 @@ normal `2`-subgroup of `N`, hence contained in every Sylow `2`-subgroup of `N`
 theorem mem_sylow_of_mem_center_of_orderOf_eq_two (T : Sylow 2 G) {N : Subgroup G} [N.Normal]
     (hTN : (T : Subgroup G) ≤ N) {u : G} (huN : u ∈ N) (hu : orderOf u = 2)
     (huc : ∀ x ∈ N, x * u = u * x) : u ∈ (T : Subgroup G) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hinf : (T : Subgroup G) ⊓ N = (T : Subgroup G) := inf_eq_left.mpr hTN
   -- `T.subgroupOf N` is a Sylow `2`-subgroup of `N`
   have hpgT : IsPGroup 2 ↥((T : Subgroup G) ⊓ N) := T.isPGroup'.to_le inf_le_left
@@ -230,7 +230,7 @@ theorem mem_sylow_of_mem_center_of_orderOf_eq_two (T : Sylow 2 G) {N : Subgroup 
   have hvc : v ∈ Subgroup.center ↥N := by
     rw [Subgroup.mem_center_iff]
     exact fun g => Subtype.ext (huc (g : G) g.2)
-  haveI hnorm : (Subgroup.zpowers v).Normal := by
+  have hnorm : (Subgroup.zpowers v).Normal := by
     refine ⟨fun a ha g => ?_⟩
     have hcomm := Subgroup.mem_center_iff.mp (Subgroup.zpowers_le.mpr hvc ha) g
     rw [hcomm, mul_inv_cancel_right]
@@ -294,8 +294,8 @@ hence normal in `G`, and it is a `2'`-group, so it sits inside `O_{2'}(G)`. -/
 theorem oPiCore_subgroup_eq_bot {N : Subgroup G} [N.Normal] (hO : oPiCore {p | p ≠ 2} G = ⊥) :
     oPiCore {p | p ≠ 2} ↥N = ⊥ := by
   set K : Subgroup ↥N := oPiCore {p | p ≠ 2} ↥N with hK
-  haveI : K.Characteristic := oPiCore.characteristic _ _
-  haveI : (K.map N.subtype).Normal := normal_map_subtype_of_characteristic ‹K.Characteristic›
+  have : K.Characteristic := oPiCore.characteristic _ _
+  have : (K.map N.subtype).Normal := normal_map_subtype_of_characteristic ‹K.Characteristic›
   have hcard : Nat.card ↥(K.map N.subtype) = Nat.card ↥K :=
     Nat.card_congr (Subgroup.equivMapOfInjective K N.subtype N.subtype_injective).symm.toEquiv
   have hpi : Subgroup.IsPiGroup {p | p ≠ 2} (K.map N.subtype) := by
@@ -319,9 +319,9 @@ own fusion — which is what forces two distinct `T`-classes of elements of orde
 proper: such a complement is a normal subgroup of odd order, hence trivial, forcing `T = G`. -/
 theorem not_hasNormalPComplement_of_oPiCore_eq_bot (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 2 G)
     (hTG : (T : Subgroup G) ≠ ⊤) : ¬ OddOrder.Isaacs.Ch05.HasNormalPComplement 2 G := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   rintro ⟨N, hNnorm, hcompl⟩
-  haveI := hNnorm
+  have := hNnorm
   have hc := hcompl T
   have hodd : ¬ 2 ∣ Nat.card ↥N := by
     rw [← hc.index_eq_card]; exact T.not_dvd_index
@@ -335,7 +335,7 @@ theorem not_hasNormalPComplement_of_oPiCore_eq_bot (hO : oPiCore {p | p ≠ 2} G
 /-- **`T` does not control its own `G`-fusion** (Navarro p. 139), by Isaacs Thm 5.25. -/
 theorem not_controlsOwnFusion_of_oPiCore_eq_bot (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 2 G)
     (hTG : (T : Subgroup G) ≠ ⊤) : ¬ T.ControlsOwnFusion := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   exact fun h => not_hasNormalPComplement_of_oPiCore_eq_bot hO T hTG
     ((OddOrder.Isaacs.Ch05.hasNormalPComplement_iff_controlsOwnFusion T).mpr h)
 
@@ -344,7 +344,7 @@ divides the odd number `[G : T]`.  This is the form the fusion argument uses, `T
 stabilizer of every inverse pair (`image_eq_self_of_conj`). -/
 theorem not_two_dvd_relIndex_normalizer (T : Sylow 2 G) :
     ¬ 2 ∣ (T : Subgroup G).relIndex (Subgroup.normalizer (T : Subgroup G)) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   exact fun h =>
     T.not_dvd_index (h.trans (Subgroup.relIndex_dvd_index_of_le Subgroup.le_normalizer))
 
@@ -356,7 +356,7 @@ through a group of odd order. -/
 theorem not_two_dvd_relIndex_sup_centralizer (T : Sylow 2 G) :
     ¬ 2 ∣ (((T : Subgroup G) ⊔ Subgroup.centralizer (T : Set G)).relIndex
       (Subgroup.normalizer (T : Subgroup G))) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hle1 : (T : Subgroup G) ≤ (T : Subgroup G) ⊔ Subgroup.centralizer (T : Set G) := le_sup_left
   have hcle : Subgroup.centralizer (T : Set G) ≤ Subgroup.normalizer (T : Subgroup G) := by
     intro c hc
@@ -418,7 +418,7 @@ theorem exists_mem_normalizer_conj_mem_zpowers (T : Sylow 2 G)
     {y z : G} (hyT : y ∈ (T : Subgroup G)) (hzT : z ∈ (T : Subgroup G))
     {g : G} (hg : g * y * g⁻¹ = z) :
     ∃ u, u ∈ Subgroup.normalizer (T : Subgroup G) ∧ u * y * u⁻¹ ∈ Subgroup.zpowers z := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   classical
   have hpow : ∀ k : ℤ, z ^ k = g * y ^ k * g⁻¹ := by
     intro k; rw [← hg]; simp [conj_zpow]
@@ -588,7 +588,7 @@ theorem isConj_of_orderFour (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 2 G)
     (hv2 : v ^ 2 ≠ 1) (hw2 : w ^ 2 ≠ 1) :
     ∃ g ∈ Subgroup.normalizer ((T : Subgroup G) : Set G), g * v * g⁻¹ = w := by
   classical
-  letI : Fintype ↥(T : Subgroup G) := Fintype.ofFinite _
+  let : Fintype ↥(T : Subgroup G) := Fintype.ofFinite _
   set V : ↥(T : Subgroup G) := ⟨v, hv⟩ with hVdef
   set W : ↥(T : Subgroup G) := ⟨w, hw⟩ with hWdef
   have hV2 : V ^ 2 ≠ 1 := fun h => hv2 (congrArg Subtype.val h)
@@ -677,7 +677,7 @@ theorem sylow_centralizer_eq_zpowers (T : Sylow 2 G)
     (S : Sylow 2 ↥(Subgroup.centralizer ({y} : Set G))) :
     (S : Subgroup ↥(Subgroup.centralizer ({y} : Set G)))
       = Subgroup.zpowers (⟨y, hy⟩ : ↥(Subgroup.centralizer ({y} : Set G))) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   -- `⟨y⟩` is central in `C_G(y)`, hence normal there
   have hcentral : Subgroup.zpowers (⟨y, hy⟩ : ↥(Subgroup.centralizer ({y} : Set G)))
       ≤ Subgroup.center ↥(Subgroup.centralizer ({y} : Set G)) := by
@@ -685,7 +685,7 @@ theorem sylow_centralizer_eq_zpowers (T : Sylow 2 G)
     refine Subgroup.mem_center_iff.mpr fun h => Subtype.ext ?_
     push_cast
     exact ((Subgroup.mem_centralizer_iff.mp h.2) y rfl).symm
-  haveI : (Subgroup.zpowers (⟨y, hy⟩ : ↥(Subgroup.centralizer ({y} : Set G)))).Normal :=
+  have : (Subgroup.zpowers (⟨y, hy⟩ : ↥(Subgroup.centralizer ({y} : Set G)))).Normal :=
     ⟨fun n hn g => by
       have hc : g * n = n * g := Subgroup.mem_center_iff.mp (hcentral hn) g
       have hrw : g * n * g⁻¹ = n := by rw [hc, mul_assoc, mul_inv_cancel, mul_one]
@@ -763,7 +763,7 @@ theorem hasNormalPComplement_centralizer_orderFour (T : Sylow 2 G)
     (e : ↥(T : Subgroup G) ≃* QuaternionGroup 2) {y : G} (hyT : y ∈ (T : Subgroup G))
     (hy2 : y ^ 2 ≠ 1) :
     OddOrder.Isaacs.Ch05.HasNormalPComplement 2 ↥(Subgroup.centralizer ({y} : Set G)) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hy : y ∈ Subgroup.centralizer ({y} : Set G) :=
     Subgroup.mem_centralizer_iff.mpr fun m hm => by
       rw [Set.mem_singleton_iff] at hm; subst hm; rfl
@@ -869,7 +869,7 @@ theorem isConj_of_sq_eq_one_quotient_centralizer (hO : oPiCore {p | p ≠ 2} G =
       Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G)))}
     (hx1 : x ≠ 1) (hx2 : x ^ 2 = 1) (hy1 : y ≠ 1) (hy2 : y ^ 2 = 1) : IsConj x y := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   set Tbar : Sylow 2 (↥(Subgroup.centralizer ({t} : Set G)) ⧸
       Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G)))) :=
     (T.subtype (sylowQ8_le_centralizer_involution T e htT ht2 ht1)).mapSurjective
@@ -925,7 +925,7 @@ theorem sq_eq_one_of_isPGroup_zpowers_quotient_centralizer (T : Sylow 2 G)
       Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G)))}
     (hv : IsPGroup 2 (Subgroup.zpowers v)) : v ^ 2 = 1 := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   set Tbar : Sylow 2 (↥(Subgroup.centralizer ({t} : Set G)) ⧸
       Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G)))) :=
     (T.subtype (sylowQ8_le_centralizer_involution T e htT ht2 ht1)).mapSurjective
@@ -983,7 +983,7 @@ theorem card_sylow_quotient_centralizer (T : Sylow 2 G)
     Nat.card ↥(S : Subgroup (↥(Subgroup.centralizer ({t} : Set G)) ⧸
       Subgroup.zpowers (⟨t, htC⟩ : ↥(Subgroup.centralizer ({t} : Set G))))) = 4 := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hTC : (T : Subgroup G) ≤ Subgroup.centralizer ({t} : Set G) :=
     sylowQ8_le_centralizer_involution T e htT ht2 ht1
   set T' : Sylow 2 ↥(Subgroup.centralizer ({t} : Set G)) := T.subtype hTC with hT'

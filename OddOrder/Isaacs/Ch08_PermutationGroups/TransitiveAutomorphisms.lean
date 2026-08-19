@@ -50,11 +50,11 @@ theorem isElementaryAbelian_of_isPretransitive_nonidentity
     (A : Type*) [Group A] [MulDistribMulAction A N] [Nontrivial N]
     [IsPretransitive A {h : N // h ≠ 1}] :
     ∃ p : ℕ, p.Prime ∧ IsElementaryAbelian p N := by
-  haveI := Fintype.ofFinite N
+  have := Fintype.ofFinite N
   -- an element of prime order `p` (Cauchy for the least prime factor)
   have hcard : Fintype.card N ≠ 1 := Fintype.one_lt_card.ne'
   have hpp : (Fintype.card N).minFac.Prime := Nat.minFac_prime hcard
-  haveI : Fact (Fintype.card N).minFac.Prime := ⟨hpp⟩
+  have : Fact (Fintype.card N).minFac.Prime := ⟨hpp⟩
   obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card (G := N) _ (Nat.minFac_dvd _)
   set p := (Fintype.card N).minFac
   have hx1 : x ≠ 1 := by
@@ -74,7 +74,7 @@ theorem isElementaryAbelian_of_isPretransitive_nonidentity
     rcases eq_or_ne g 1 with rfl | hg
     · exact ⟨0, one_pow _⟩
     · exact ⟨1, by rw [pow_one, ← horder g hg, pow_orderOf_eq_one]⟩
-  haveI := hpN.center_nontrivial
+  have := hpN.center_nontrivial
   obtain ⟨⟨z, hzc⟩, hz1⟩ := exists_ne (1 : Subgroup.center N)
   have hz1' : z ≠ 1 := fun h => hz1 (Subtype.ext h)
   -- a central nonidentity element is carried to every nonidentity element,
@@ -125,7 +125,7 @@ theorem isElementaryAbelian_two_or_natCard_eq_three
     (A : Type*) [Group A] [MulDistribMulAction A N] [Nontrivial N]
     [IsMultiplyPretransitive A {h : N // h ≠ 1} 2] :
     IsElementaryAbelian 2 N ∨ Nat.card N = 3 := by
-  haveI : IsPretransitive A {h : N // h ≠ 1} :=
+  have : IsPretransitive A {h : N // h ≠ 1} :=
     isPretransitive_of_is_two_pretransitive
   obtain ⟨p, hpp, hEA⟩ :=
     isElementaryAbelian_of_isPretransitive_nonidentity (N := N) A
@@ -158,7 +158,7 @@ theorem isElementaryAbelian_two_or_natCard_eq_three
   have hle : Nat.card N ≤ 3 := by
     by_contra hgt
     rw [not_le] at hgt
-    haveI := Fintype.ofFinite N
+    have := Fintype.ofFinite N
     classical
     obtain ⟨y, hy⟩ : ∃ y : N, y ∉ ({1, x, x⁻¹} : Finset N) := by
       refine exists_notMem_of_card_lt ?_
@@ -200,14 +200,14 @@ theorem natCard_le_four_of_isMultiplyPretransitive_nonidentity
     Nat.card N ≤ 4 := by
   by_contra hgt
   rw [not_le] at hgt
-  haveI : Nontrivial N := Finite.one_lt_card_iff_nontrivial.mp (by omega)
-  haveI := Fintype.ofFinite N
+  have : Nontrivial N := Finite.one_lt_card_iff_nontrivial.mp (by omega)
+  have := Fintype.ofFinite N
   classical
   have hsub : Nat.card {h : N // h ≠ 1} = Nat.card N - 1 := by
     rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
     exact Set.card_ne_eq 1
   -- descend to 2-transitivity (legitimate: ≥ 4 nonidentity elements)
-  haveI : IsMultiplyPretransitive A {h : N // h ≠ 1} 2 :=
+  have : IsMultiplyPretransitive A {h : N // h ≠ 1} 2 :=
     isMultiplyPretransitive_of_le (m := 2) (n := 3) (by omega) (by rw [hsub]; omega)
   rcases isElementaryAbelian_two_or_natCard_eq_three (N := N) A with hEA | h3
   swap

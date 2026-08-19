@@ -86,9 +86,9 @@ theorem blockRepresentation_eq_one_of_mem_normal_pSubgroup {p : ℕ} [Fact p.Pri
     {N : Subgroup G} [hNnorm : N.Normal] (hN : IsPGroup p ↥N) (i : ι) {u : G} (hu : u ∈ N) :
     blockRepresentation π i u = 1 := by
   classical
-  letI := blockModule nn π i
-  haveI := isScalarTower_blockModule hlin i
-  haveI hsimple : IsSimpleModule (MonoidAlgebra k G) (nn i → k) :=
+  let := blockModule nn π i
+  have := isScalarTower_blockModule hlin i
+  have hsimple : IsSimpleModule (MonoidAlgebra k G) (nn i → k) :=
     isSimpleModule_blockModule hπ i
   set ρ : Representation k G (nn i → k) := blockRepresentation π i with hρ
   set W : Submodule k (nn i → k) :=
@@ -103,7 +103,7 @@ theorem blockRepresentation_eq_one_of_mem_normal_pSubgroup {p : ℕ} [Fact p.Pri
   have hstable : ∀ (a : MonoidAlgebra k G) {v : nn i → k}, v ∈ W → a • v ∈ W := by
     intro a
     induction a using MonoidAlgebra.induction_on with
-    | hM g =>
+    | of g =>
       intro v hv
       have hgv : (of k G g : MonoidAlgebra k G) • v = ρ g v :=
         (blockRepresentation_eq_smul π i g v).symm
@@ -115,11 +115,11 @@ theorem blockRepresentation_eq_one_of_mem_normal_pSubgroup {p : ℕ} [Fact p.Pri
       calc ρ n (ρ g v) = ρ (n * g) v := by rw [← Module.End.mul_apply, ← map_mul]
         _ = ρ g (ρ (g⁻¹ * n * g) v) := by rw [hrw, map_mul, Module.End.mul_apply]
         _ = ρ g v := by rw [(hmemW v).mp hv _ hconj]
-    | hadd x y hx hy =>
+    | add x y hx hy =>
       intro v hv
       rw [add_smul]
       exact W.add_mem (hx hv) (hy hv)
-    | hsmul c x hx =>
+    | smul c x hx =>
       intro v hv
       rw [smul_assoc]
       exact W.smul_mem c (hx hv)
@@ -163,9 +163,9 @@ theorem blockRepresentation_eq_one_of_sup_eq_top {p : ℕ} [Fact p.Prime] [CharP
     (i : ι) (hNtriv : ∀ u ∈ N, blockRepresentation π i u = 1) (g : G) :
     blockRepresentation π i g = 1 := by
   classical
-  letI := blockModule nn π i
-  haveI := isScalarTower_blockModule hlin i
-  haveI hsimple : IsSimpleModule (MonoidAlgebra k G) (nn i → k) :=
+  let := blockModule nn π i
+  have := isScalarTower_blockModule hlin i
+  have hsimple : IsSimpleModule (MonoidAlgebra k G) (nn i → k) :=
     isSimpleModule_blockModule hπ i
   set ρ : Representation k G (nn i → k) := blockRepresentation π i with hρ
   -- every element of `G` is `n * x` with `n ∈ N`, `x ∈ P`
@@ -195,7 +195,7 @@ theorem blockRepresentation_eq_one_of_sup_eq_top {p : ℕ} [Fact p.Prime] [CharP
   have hstable : ∀ (a : MonoidAlgebra k G) {v : nn i → k}, v ∈ W → a • v ∈ W := by
     intro a
     induction a using MonoidAlgebra.induction_on with
-    | hM y =>
+    | of y =>
       intro v hv
       have hyv : (of k G y : MonoidAlgebra k G) • v = ρ y v :=
         (blockRepresentation_eq_smul π i y v).symm
@@ -203,8 +203,8 @@ theorem blockRepresentation_eq_one_of_sup_eq_top {p : ℕ} [Fact p.Prime] [CharP
       exact (Representation.mem_invariants ρ _).mpr fun z => by
         rw [← Module.End.mul_apply, ← map_mul]
         simp only [(Representation.mem_invariants ρ v).mp hv]
-    | hadd u w hu hw => intro v hv; rw [add_smul]; exact W.add_mem (hu hv) (hw hv)
-    | hsmul c u hu => intro v hv; rw [smul_assoc]; exact W.smul_mem c (hu hv)
+    | add u w hu hw => intro v hv; rw [add_smul]; exact W.add_mem (hu hv) (hw hv)
+    | smul c u hu => intro v hv; rw [smul_assoc]; exact W.smul_mem c (hu hv)
   let W' : Submodule (MonoidAlgebra k G) (nn i → k) :=
     { carrier := (W : Set (nn i → k))
       add_mem' := W.add_mem

@@ -40,7 +40,7 @@ theorem typeP1_msigma_eq_derivedInG [Finite G]
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'le).toEquiv
   have hcardK' : Nat.card ↥(K.subgroupOf M) = Nat.card ↥K :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv
-  have hmul := hcomplD.card_mul
+  have hmul := hcomplD.card_mul_card
   rw [hcardM', hcardK'] at hmul
   have hcardM := S14.typeP1_card_eq hG hM hP1 hKM hK
   have heq : Nat.card ↥(derivedInG M) = Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
@@ -63,7 +63,7 @@ theorem actsPrimeManner_of_typeP [Finite G]
     ∀ x ∈ K, x ≠ 1 →
       Subgroup.centralizer ({x} : Set G) ⊓ OddOrder.BG.Ch3.S10.Msigma M = Kstar := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥M)
     ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
   have hUeq : (U'.map M.subtype).subgroupOf M = U' :=
@@ -127,7 +127,7 @@ theorem exists_sylow_eq_opiCore [Finite G] {M Q : Subgroup G} {q : ℕ} [Fact q.
     ∃ P : Sylow q ↥M, Q = (P : Subgroup ↥M).map M.subtype := by
   have hQsubpg : IsPGroup q ↥(Q.subgroupOf M) := hQpg.comap_subtype
   refine ⟨hQsubpg.toSylow hidx, ?_⟩
-  haveI hPnorm : (hQsubpg.toSylow hidx : Subgroup ↥M).Normal := by
+  have hPnorm : (hQsubpg.toSylow hidx : Subgroup ↥M).Normal := by
     rw [hQsubpg.toSylow_coe hidx]
     exact (Subgroup.normal_subgroupOf_iff_le_normalizer hQM).mpr hMnormQ
   rw [OddOrder.BG.Ch3.S10.sylowMap_eq_opiCoreInG_singleton_of_normal _ hPnorm, ← hQ]
@@ -150,7 +150,7 @@ theorem frattini_factorization [Finite G] {M Q H : Subgroup G}
     (hQHnorm : ((Q ⊔ H).subgroupOf M).Normal)
     (hdisj : Disjoint Q H)
     (hcop : Nat.Coprime (Nat.card ↥Q) (Nat.card ↥H))
-    (hsolv : IsSolvable ↥M) :
+    (hsolv : Group.IsSolvable ↥M) :
     ∀ m ∈ M, ∃ n a : G, n ∈ Subgroup.normalizer (H : Set G) ∧ a ∈ Q ∧ m = n * a := by
   classical
   have hQL : Q ≤ Q ⊔ H := le_sup_left
@@ -161,11 +161,11 @@ theorem frattini_factorization [Finite G] {M Q H : Subgroup G}
   have hMNL : M ≤ Subgroup.normalizer ((Q ⊔ H : Subgroup G) : Set G) :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hLM).mp hQHnorm
   -- `Q ⊴ L` (as a subgroup of `↥(Q ⊔ H)`).
-  haveI hQnL : (Q.subgroupOf (Q ⊔ H)).Normal :=
+  have hQnL : (Q.subgroupOf (Q ⊔ H)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQL).mpr (le_trans hLM hMNQ)
   -- `↥(Q ⊔ H)` is solvable, hence so is its quotient by `Q.subgroupOf (Q ⊔ H)`.
-  haveI hLsolv : IsSolvable ↥(Q ⊔ H) :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective hLM)
+  have hLsolv : Group.IsSolvable ↥(Q ⊔ H) :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective hLM)
   -- A complement-builder inside `↥(Q ⊔ H)`: a `K ≤ L` with `Q ⊓ K = ⊥` and `Q ⊔ K = Q ⊔ H`
   -- complements `Q` in `L`.
   have mk_compl : ∀ K : Subgroup G, K ≤ Q ⊔ H → (Q ⊓ K : Subgroup G) = ⊥ → Q ⊔ K = Q ⊔ H →
@@ -288,7 +288,7 @@ theorem isHallSubgroup_eq_oPiCore_of_nilpotent {Γ : Type*} [Group Γ] [Finite �
     OddOrder.BG.Ch3.S10.oPiCore_isHall_of_isNilpotent π
   have hOpi : Ch03.Subgroup.IsPiGroup π (Ch03.oPiCore π Γ) := Ch03.oPiCore.isPiGroup π
   have hHpi : Ch03.Subgroup.IsPiGroup π H := fun p hp => hHall.1 p hp
-  haveI : (Ch03.oPiCore π Γ).Normal := inferInstance
+  have : (Ch03.oPiCore π Γ).Normal := inferInstance
   have hHle : H ≤ Ch03.oPiCore π Γ :=
     OddOrder.BG.Ch3.S10.isPiGroup_le_of_normal_isHallSubgroup hOHall hHpi
   have hdvd : Nat.card ↥(Ch03.oPiCore π Γ) ∣ Nat.card ↥H := hHall.card_dvd_of_isPiGroup hOpi
@@ -328,11 +328,11 @@ with `Γ = ↥M_σ`, `N = Q.subgroupOf M_σ` (`= O_q(M_σ)`, characteristic), `H
 theorem characteristic_sup_hall_of_quotient_nilpotent {Γ : Type*} [Group Γ] [Finite Γ]
     {N : Subgroup Γ} [N.Characteristic] (hNil : Group.IsNilpotent (Γ ⧸ N)) {π : Set ℕ}
     {H : Subgroup Γ} (hHall : Ch03.IsHallSubgroup π H) : (N ⊔ H).Characteristic := by
-  haveI := hNil
+  have := hNil
   have hHbar : Ch03.IsHallSubgroup π (H.map (QuotientGroup.mk' N)) := isHallSubgroup_map_mk' hHall
   have hHbar_eq : H.map (QuotientGroup.mk' N) = Ch03.oPiCore π (Γ ⧸ N) :=
     isHallSubgroup_eq_oPiCore_of_nilpotent hHbar
-  haveI hHbar_char : (H.map (QuotientGroup.mk' N)).Characteristic := by
+  have hHbar_char : (H.map (QuotientGroup.mk' N)).Characteristic := by
     rw [hHbar_eq]; exact Ch03.oPiCore.characteristic π (Γ ⧸ N)
   rw [← QuotientGroup.comap_map_mk' N H]
   exact Subgroup.Characteristic.comap_quotient_mk hHbar_char
@@ -514,7 +514,7 @@ theorem mf_centralizer_msigma_decomp [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
         (Subgroup.centralizer (OddOrder.BG.Ch3.S10.Msigma M : Set G) ⊓
           OddOrder.BG.Ch3.S10.Msigma M) ⊔ X := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   set Mσ := OddOrder.BG.Ch3.S10.Msigma M with hMσdef
   set C : Subgroup G := Subgroup.centralizer (Mσ : Set G) ⊓ M with hCdef
   have hC_le_M : C ≤ M := inf_le_right
@@ -527,7 +527,7 @@ theorem mf_centralizer_msigma_decomp [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
   have hC_norm_MσinfC : C ≤ Subgroup.normalizer ((Mσ ⊓ C : Subgroup G) : Set G) := by
     have h1 : C ≤ Subgroup.normalizer (Mσ : Set G) := hC_le_M.trans hM_norm_Mσ
     exact (le_inf h1 Subgroup.le_normalizer).trans Subgroup.inf_normalizer_le_normalizer_inf
-  haveI hN_normal : ((Mσ ⊓ C).subgroupOf C).Normal :=
+  have hN_normal : ((Mσ ⊓ C).subgroupOf C).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hMσinfC_le_C).mpr hC_norm_MσinfC
   set N : Subgroup ↥C := (Mσ ⊓ C).subgroupOf C with hNdef
   have hN_eq_Mσ : N = Mσ.subgroupOf C := by rw [hNdef, Subgroup.inf_subgroupOf_right]
@@ -541,7 +541,7 @@ theorem mf_centralizer_msigma_decomp [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
       (Nat.primeFactors_mono (Subgroup.card_dvd_of_le (inf_le_left : Mσ ⊓ C ≤ Mσ))
         Nat.card_pos.ne' hp)
   -- `N.index = M_σ.relIndex C ∣ (M_σ.subgroupOf M).index`, a `σ'`-number.
-  haveI hMσM_normal : ((Mσ).subgroupOf M).Normal := by
+  have hMσM_normal : ((Mσ).subgroupOf M).Normal := by
     rw [hMσdef, OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
   have hNindex_dvd : N.index ∣ (Mσ.subgroupOf M).index := by
     have hNi : N.index = Mσ.relIndex C := by rw [hN_eq_Mσ]; rfl
@@ -644,7 +644,7 @@ theorem mf_centralizer_hall_decomp_of_kappaCompl [Finite G]
       Subgroup.centralizer (H : Set G) ⊓ M =
         (Subgroup.centralizer (H : Set G) ⊓ OddOrder.BG.Ch3.S10.Msigma M) ⊔ X := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   set Mσ := OddOrder.BG.Ch3.S10.Msigma M with hMσdef
   set C : Subgroup G := Subgroup.centralizer (H : Set G) ⊓ M with hCdef
   have hC_le_M : C ≤ M := inf_le_right
@@ -656,7 +656,7 @@ theorem mf_centralizer_hall_decomp_of_kappaCompl [Finite G]
   have hC_norm_MσinfC : C ≤ Subgroup.normalizer ((Mσ ⊓ C : Subgroup G) : Set G) := by
     have h1 : C ≤ Subgroup.normalizer (Mσ : Set G) := hC_le_M.trans hM_norm_Mσ
     exact (le_inf h1 Subgroup.le_normalizer).trans Subgroup.inf_normalizer_le_normalizer_inf
-  haveI hN_normal : ((Mσ ⊓ C).subgroupOf C).Normal :=
+  have hN_normal : ((Mσ ⊓ C).subgroupOf C).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hMσinfC_le_C).mpr hC_norm_MσinfC
   set N : Subgroup ↥C := (Mσ ⊓ C).subgroupOf C with hNdef
   have hN_eq_Mσ : N = Mσ.subgroupOf C := by rw [hNdef, Subgroup.inf_subgroupOf_right]
@@ -668,7 +668,7 @@ theorem mf_centralizer_hall_decomp_of_kappaCompl [Finite G]
     exact OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p
       (Nat.primeFactors_mono (Subgroup.card_dvd_of_le (inf_le_left : Mσ ⊓ C ≤ Mσ))
         Nat.card_pos.ne' hp)
-  haveI hMσM_normal : ((Mσ).subgroupOf M).Normal := by
+  have hMσM_normal : ((Mσ).subgroupOf M).Normal := by
     rw [hMσdef, OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
   have hNindex_dvd : N.index ∣ (Mσ.subgroupOf M).index := by
     have hNi : N.index = Mσ.relIndex C := by rw [hN_eq_Mσ]; rfl
@@ -810,7 +810,7 @@ theorem eq_top_of_forall_sylow_le {H : Type*} [Group H] [Finite H] {K : Subgroup
   rw [← Subgroup.index_eq_one]
   by_contra hne
   obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hne
-  haveI := Fact.mk hp
+  have := Fact.mk hp
   obtain ⟨P⟩ : Nonempty (Sylow p H) := inferInstance
   exact P.not_dvd_index (hpdvd.trans (Subgroup.index_dvd_of_le (h p P)))
 
@@ -860,7 +860,7 @@ theorem sylow_isHall_piSet_subgroupOf_Msigma [Finite G] {M : Subgroup G}
     rintro rfl; rw [pow_zero, Subgroup.card_eq_one] at hn; exact hSne hn
   have hpiS : S14.piSet (S : Subgroup G) = {p} := by
     ext r
-    rw [S14.piSet, Set.mem_setOf_eq, hn, Nat.primeFactors_prime_pow hn0 Fact.out,
+    rw [S14.piSet, Set.mem_ofPred_eq, hn, Nat.primeFactors_prime_pow hn0 Fact.out,
       Finset.mem_singleton, Set.mem_singleton_iff]
   -- `card (S.subgroupOf M_σ) = card S`, so its prime factors are `{p} = π(S)`.
   have hcardK : Nat.card ↥((S : Subgroup G).subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)) =
@@ -945,7 +945,7 @@ theorem sylow_le_Msigma_of_le_centralizer_sylow [Finite G]
         inf_le_right.trans
           (OddOrder.GroupTheory.le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M)
       exact (le_inf h1 h2).trans Subgroup.inf_normalizer_le_normalizer_inf
-    haveI hA_normal : (A.subgroupOf C).Normal :=
+    have hA_normal : (A.subgroupOf C).Normal :=
       (Subgroup.normal_subgroupOf_iff_le_normalizer_inf).mpr
         (by rw [inf_eq_left.mpr hA_C]; exact hC_norm_A)
     -- `q ∤ |A|`: `A ≤ M_σ` is a `σ(M)`-group and `q ∉ σ(M)`.
@@ -985,10 +985,10 @@ theorem sylow_le_Msigma_of_le_centralizer_sylow [Finite G]
       rw [Subgroup.mem_bot]
       exact Subtype.ext hmem
     -- `↥C ⧸ a` is cyclic: it is a quotient image of the cyclic `↥x` (image of `X ≤ C`).
-    haveI hxcyc : IsCyclic ↥(X.subgroupOf C) := by
-      haveI : IsCyclic ↥X := hXcyc
+    have hxcyc : IsCyclic ↥(X.subgroupOf C) := by
+      have : IsCyclic ↥X := hXcyc
       exact isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe hX_C).symm.surjective
-    haveI hquot_cyc : IsCyclic (↥C ⧸ A.subgroupOf C) := by
+    have hquot_cyc : IsCyclic (↥C ⧸ A.subgroupOf C) := by
       have hsurj : Function.Surjective
           ((QuotientGroup.mk' (A.subgroupOf C)).comp (X.subgroupOf C).subtype) := by
         rw [← MonoidHom.range_eq_top, MonoidHom.range_comp, Subgroup.range_subtype]
@@ -1001,13 +1001,13 @@ theorem sylow_le_Msigma_of_le_centralizer_sylow [Finite G]
         rw [h1]
       exact isCyclic_of_surjective _ hsurj
     -- Hence `Qc` is cyclic (iso to a subgroup of the cyclic `↥C ⧸ a`).
-    haveI hQc_cyc : IsCyclic ↥(Qbar.subgroupOf C) :=
+    have hQc_cyc : IsCyclic ↥(Qbar.subgroupOf C) :=
       isCyclic_of_surjective _ (MonoidHom.ofInjective hinj).symm.surjective
     -- `Qbar` is cyclic (`Qbar ≅ Qc`).
-    haveI hQbar_cyc : IsCyclic ↥Qbar :=
+    have hQbar_cyc : IsCyclic ↥Qbar :=
       isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe hQbar_C).surjective
     -- `Q` is cyclic (`Q ≅ Qbar`).
-    haveI hQ_cyc : IsCyclic ↥(Q : Subgroup ↥M) :=
+    have hQ_cyc : IsCyclic ↥(Q : Subgroup ↥M) :=
       isCyclic_of_surjective _
         (Subgroup.equivMapOfInjective _ M.subtype M.subtype_injective).symm.surjective
     -- `q ∈ τ₂(M)`: `q ∣ |Qbar| ∣ a.index ∣ |X|`, and `π(X) ⊆ τ₂(M)`.
@@ -1046,13 +1046,13 @@ theorem nilpotent_hall_embeds_in_msigma [Finite G]
     ∃ M : Subgroup G, M ∈ maximalSubgroupsContaining H ∧
       H ≤ OddOrder.BG.Ch3.S10.Msigma M := by
   classical
-  haveI := hHnil
+  have := hHnil
   -- Step 1: pick a prime `p₀ ∣ |H|` and the (unique, normal) Sylow `p₀`-subgroup `S` of `↥H`.
   obtain ⟨p₀, hp₀⟩ : ∃ p, p ∈ (Nat.card ↥H).primeFactors := by
     have hne1 : Nat.card ↥H ≠ 1 := fun h => hHne (Subgroup.card_eq_one.mp h)
     obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hne1
     exact ⟨p, Nat.mem_primeFactors.mpr ⟨hp, hpdvd, Nat.card_pos.ne'⟩⟩
-  haveI : Fact p₀.Prime := ⟨Nat.prime_of_mem_primeFactors hp₀⟩
+  have : Fact p₀.Prime := ⟨Nat.prime_of_mem_primeFactors hp₀⟩
   set S : Sylow p₀ ↥H := default with hSdef
   set Sbar : Subgroup G := (S : Subgroup ↥H).map H.subtype with hSbar
   have hSbar_le_H : Sbar ≤ H := Subgroup.map_subtype_le _
@@ -1094,11 +1094,11 @@ theorem nilpotent_hall_embeds_in_msigma [Finite G]
     have hSpnormal : (Sp : Subgroup G).Normal := Subgroup.normalizer_eq_top_iff.mp htop
     rcases hG.simple.eq_bot_or_eq_top_of_normal _ hSpnormal with hbot | htop'
     · exact hSbar_ne (hSpcoe ▸ hbot)
-    · haveI : IsSolvable ↥(Sp : Subgroup G) := by
-        haveI := Sp.isPGroup'.isNilpotent; infer_instance
+    · have : Group.IsSolvable ↥(Sp : Subgroup G) := by
+        have := Sp.isPGroup'.isNilpotent; infer_instance
       rw [htop'] at this
-      haveI := this
-      exact hG.notSolvable (solvable_of_surjective
+      have := this
+      exact hG.notSolvable (Group.isSolvable_of_surjective
         (f := (Subgroup.topEquiv (G := G)).toMonoidHom) (Subgroup.topEquiv (G := G)).surjective)
   obtain ⟨M, hMco, hNM⟩ :=
     (eq_top_or_exists_le_coatom (Subgroup.normalizer ((Sp : Subgroup G) : Set G))).resolve_left
@@ -1126,7 +1126,7 @@ theorem nilpotent_hall_embeds_in_msigma [Finite G]
       by_cases hqp : q = p₀
       · -- `q = p₀`: `P = S` (unique Sylow of nilpotent `↥H`), so `Pbar = Sbar ≤ M_σ`.
         subst hqp
-        haveI : Unique (Sylow q ↥H) := P.unique_of_normal hP_normal
+        have : Unique (Sylow q ↥H) := P.unique_of_normal hP_normal
         have hPS : P = S := Subsingleton.elim _ _
         rw [hPbar, hPS]; exact hSbar_Mσ
       · -- `q ≠ p₀`: `[P, S] = 1`, so `Pbar ≤ C_G(Sbar) ≤ M`, a Sylow `q` of `M`; KEY LEMMA.

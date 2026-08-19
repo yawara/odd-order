@@ -154,8 +154,8 @@ theorem ringAut_sq_eq_one_of_card_prime_or_prime_sq {F : Type*} [Field F]
     [Finite F] {q : ℕ} (hq : q.Prime)
     (hcard : Nat.card F = q ∨ Nat.card F = q ^ 2) (σ : RingAut F) :
     σ ^ 2 = 1 := by
-  haveI : Fact q.Prime := ⟨hq⟩
-  haveI : Fintype F := Fintype.ofFinite F
+  have : Fact q.Prime := ⟨hq⟩
+  have : Fintype F := Fintype.ofFinite F
   have hcardfin : Fintype.card F = Nat.card F := (Nat.card_eq_fintype_card).symm
   have happ2 : ∀ x : F, (σ ^ 2) x = σ (σ x) := fun x => by rw [sq]; rfl
   ext x
@@ -217,8 +217,8 @@ theorem card_eq_and_aut_trivial_of_field_units_two_pow {F : Type*} [Field F]
     (hDodd : Odd (Nat.card D)) (φ : D →* RingAut F)
     (hφinj : Function.Injective φ) :
     (Nat.card F = f ∨ Nat.card F = 9) ∧ Nat.card D = 1 := by
-  haveI : Fact f.Prime := ⟨hf⟩
-  haveI : Fintype F := Fintype.ofFinite F
+  have : Fact f.Prime := ⟨hf⟩
+  have : Fintype F := Fintype.ofFinite F
   obtain ⟨a, -, hcard_fa⟩ := FiniteField.card (K := F) f
   have hNcard : Nat.card F = f ^ (a : ℕ) := by
     rw [Nat.card_eq_fintype_card]; exact hcard_fa
@@ -257,7 +257,7 @@ theorem card_eq_and_aut_trivial_of_field_units_two_pow {F : Type*} [Field F]
     · exfalso
       have hdvd : (2 : ℕ) ∣ Nat.card D := h2 ▸ orderOf_dvd_natCard d
       exact (Nat.not_even_iff_odd.mpr hDodd) (even_iff_two_dvd.mpr hdvd)
-  haveI : Subsingleton D := ⟨fun x y => by rw [hDtriv x, hDtriv y]⟩
+  have : Subsingleton D := ⟨fun x y => by rw [hDtriv x, hDtriv y]⟩
   exact Nat.card_eq_one_iff_unique.mpr ⟨inferInstance, ⟨1⟩⟩
 
 namespace Hypothesis
@@ -270,7 +270,7 @@ its Sylow `2`-subgroup. -/
 theorem card_Q_eq_two_pow_of_Q1_eq_bot (h : hyp.Q1 = ⊥) :
     ∃ n : ℕ, Nat.card ↥hyp.Q = 2 ^ n := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨S⟩ : Nonempty (Sylow 2 ↥hyp.Q) := inferInstance
   have hcompl := hyp.sylowTwo_isComplement'_Q1Subgroup S
   have hQ1bot : hyp.Q1Subgroup = ⊥ := by
@@ -279,7 +279,7 @@ theorem card_Q_eq_two_pow_of_Q1_eq_bot (h : hyp.Q1 = ⊥) :
     exact Subgroup.eq_bot_of_card_eq _ hc.symm
   obtain ⟨n, hn⟩ := S.isPGroup'.exists_card_eq
   refine ⟨n, ?_⟩
-  have hmul := hcompl.card_mul
+  have hmul := hcompl.card_mul_card
   rw [hQ1bot, Subgroup.card_bot, mul_one] at hmul
   rw [← hmul, hn]
 
@@ -350,16 +350,16 @@ theorem card_field_eq_and_D_eq_one_of_comm :
       fc.toHypothesis.Q1 = ⊥ → (∀ x y : F, x * y = y * x) →
       (Nat.card F = model.char ∨ Nat.card F = 9) ∧
         Nat.card ↥fc.rankOneQuotient.D = 1 := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   intro F instF model hQ1 hcomm
   classical
-  letI : Field F := NearFields.fieldOfComm hcomm
-  haveI : Finite F := by
+  let : Field F := NearFields.fieldOfComm hcomm
+  have : Finite F := by
     have hinj : Function.Injective
         (fun x : F => model.emb (Multiplicative.ofAdd x)) :=
       fun a b hab => Multiplicative.ofAdd.injective (model.emb_injective hab)
     exact Finite.of_injective _ hinj
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   -- `|F^*| = |C_Q(P)|` is a power of `2` (from `Q₁ = 1`)
   obtain ⟨e⟩ := fc.centralizer_inf_mulEquiv_units model
   obtain ⟨n, hQn⟩ := fc.toHypothesis.card_Q_eq_two_pow_of_Q1_eq_bot hQ1
@@ -384,7 +384,7 @@ theorem card_field_eq_and_D_eq_one_of_comm :
     · simp at hFxeven
     · exact hpos
   -- `CharP F (model.char)`
-  haveI : CharP F model.char := by
+  have : CharP F model.char := by
     have hchar0 : (model.char : F) = 0 := by
       have h := model.char_spec 1
       rwa [nsmul_eq_mul, mul_one] at h
@@ -392,7 +392,7 @@ theorem card_field_eq_and_D_eq_one_of_comm :
       have hdvd : ringChar F ∣ model.char := ringChar.dvd hchar0
       rcases (Nat.Prime.eq_one_or_self_of_dvd model.char_prime _ hdvd) with h1 | h
       · exfalso
-        haveI : CharP F 1 := h1 ▸ ringChar.charP F
+        have : CharP F 1 := h1 ▸ ringChar.charP F
         have h10 : (1 : F) = 0 := by
           have hc := (CharP.cast_eq_zero_iff F 1 1).mpr (dvd_refl 1)
           rwa [Nat.cast_one] at hc
@@ -477,7 +477,7 @@ theorem dMulAutHom_injective {F : Type uG} [NearFields.NearField F]
     (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
       NearFields.AffineNearFieldModel fc.rankOneQuotient F) :
     Function.Injective (fc.dMulAutHom model) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   refine (injective_iff_map_eq_one _).mpr fun g hg => ?_
   apply model.dAut_injective
   refine AddEquiv.ext fun x => ?_
@@ -504,7 +504,7 @@ theorem card_D_le_three_of_noncomm {F : Type uG} [NearFields.NearField F]
     (hncomm : ¬ ∀ x y : F, x * y = y * x) :
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     Nat.card ↥fc.rankOneQuotient.D = 1 ∨ Nat.card ↥fc.rankOneQuotient.D = 3 := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   -- `|F| = 9` from step (5)
   rcases fc.card_nearField_eq_nine_and_Q1_eq_bot model with hcomm | ⟨hF9, -, -⟩
@@ -535,7 +535,7 @@ theorem card_field_and_D_of_Q1_eq_bot :
       ((¬ ∀ x y : F, x * y = y * x) →
         Nat.card ↥fc.rankOneQuotient.D = 1 ∨
           Nat.card ↥fc.rankOneQuotient.D = 3) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   intro F instF model hQ1
   exact ⟨fun hcomm => fc.card_field_eq_and_D_eq_one_of_comm model hQ1 hcomm,
     fun hncomm => fc.card_D_le_three_of_noncomm model hncomm⟩

@@ -64,8 +64,8 @@ carries the `k`-linearity that the Brauer-character API asks for. -/
 theorem exists_algEquiv_pi_matrix_monoidAlgebra [IsSemisimpleRing (MonoidAlgebra k Q)] :
     ∃ (n : ℕ) (d : Fin n → ℕ) (_ : ∀ i, NeZero (d i)),
       Nonempty (MonoidAlgebra k Q ≃ₐ[k] ∀ i, Matrix (Fin (d i)) (Fin (d i)) k) := by
-  haveI : Fintype Q := Fintype.ofFinite Q
-  haveI : FiniteDimensional k (MonoidAlgebra k Q) :=
+  have : Fintype Q := Fintype.ofFinite Q
+  have : FiniteDimensional k (MonoidAlgebra k Q) :=
     Module.Finite.of_basis (MonoidAlgebra.basis Q k)
   obtain ⟨n, d, hd, he⟩ :=
     IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed k (MonoidAlgebra k Q)
@@ -82,7 +82,7 @@ theorem exists_splitting_of_not_dvd_card {p : ℕ} (hp : p.Prime) (hk : (p : k) 
       Function.Surjective π ∧
         (∀ (c : k) (a : MonoidAlgebra k Q), π (c • a) = c • π a) ∧
         RingHom.ker π = Ring.jacobson (MonoidAlgebra k Q) := by
-  haveI := isSemisimpleRing_monoidAlgebra_of_not_dvd_card hp hk hQ
+  have := isSemisimpleRing_monoidAlgebra_of_not_dvd_card hp hk hQ
   obtain ⟨n, d, hd, ⟨e⟩⟩ := exists_algEquiv_pi_matrix_monoidAlgebra k Q
   refine ⟨n, d, hd, e.toRingEquiv.toRingHom, e.surjective,
     fun c a => e.toLinearEquiv.map_smul c a, ?_⟩
@@ -136,15 +136,15 @@ theorem restrict_irreducibleBrauerCharacter_mem_virtualCharacters
     (fun g => algebraMap 𝒪 K (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π μ₀ g)) ∘ Q.subtype
       ∈ virtualCharacters K ↥Q := by
   classical
-  haveI : Fintype ↥Q := Fintype.ofFinite _
-  haveI : NeZero (Nat.card ↥Q : K) := ⟨natCard_subgroup_ne_zero (K := K) Q⟩
-  haveI : Invertible (Nat.card ↥Q : K) := invertibleOfNonzero (natCard_subgroup_ne_zero (K := K) Q)
+  have : Fintype ↥Q := Fintype.ofFinite _
+  have : NeZero (Nat.card ↥Q : K) := ⟨natCard_subgroup_ne_zero (K := K) Q⟩
+  have : Invertible (Nat.card ↥Q : K) := invertibleOfNonzero (natCard_subgroup_ne_zero (K := K) Q)
   have hkres : ((p : ℕ) : ResidueField 𝒪) = 0 := CharP.cast_eq_zero (ResidueField 𝒪) p
   -- the two splitting data for `Q`
   obtain ⟨n, d, hd, πQ, hπQ, hlinQ, hkerQ⟩ := exists_splitting_of_not_dvd_card hp hkres hQ
-  haveI : ∀ i, Nonempty (Fin (d i)) := fun i => ⟨⟨0, Nat.pos_of_ne_zero (hd i).out⟩⟩
+  have : ∀ i, Nonempty (Fin (d i)) := fun i => ⟨⟨0, Nat.pos_of_ne_zero (hd i).out⟩⟩
   obtain ⟨n', d', hd', ⟨eQ⟩⟩ := exists_algEquiv_pi_matrix_monoidAlgebra K ↥Q
-  haveI : ∀ i, Nonempty (Fin (d' i)) := fun i => ⟨⟨0, Nat.pos_of_ne_zero (hd' i).out⟩⟩
+  have : ∀ i, Nonempty (Fin (d' i)) := fun i => ⟨⟨0, Nat.pos_of_ne_zero (hd' i).out⟩⟩
   -- the roots of unity, inherited from `G`
   have hdvd : pRegularExponent p ↥Q ∣ pRegularExponent p G := pRegularExponent_subgroup_dvd Q
   have hprod : pRegularExponent p G

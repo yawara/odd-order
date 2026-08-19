@@ -216,9 +216,9 @@ theorem exists_invariant_mem_of_kEquivariantMulEquiv
   have hcardU : Nat.card ↥U₂ = Nat.card ↥U₁ :=
     Nat.card_congr e.toMulEquiv.symm.toEquiv
   -- decompose `v = x * y`
-  haveI : U₁.Normal := ⟨fun n hn g => by
+  have : U₁.Normal := ⟨fun n hn g => by
     rw [hcomm g n, mul_assoc, mul_inv_cancel, mul_one]; exact hn⟩
-  haveI : U₂.Normal := ⟨fun n hn g => by
+  have : U₂.Normal := ⟨fun n hn g => by
     rw [hcomm g n, mul_assoc, mul_inv_cancel, mul_one]; exact hn⟩
   have hmem : v ∈ ((U₁ ⊔ U₂ : Subgroup E) : Set E) := by
     rw [hcompl.sup_eq_top]; trivial
@@ -235,7 +235,7 @@ theorem exists_invariant_mem_of_kEquivariantMulEquiv
   obtain ⟨k, hk⟩ := htrans (e.toMulEquiv ⟨x, hx⟩) ⟨y, hy⟩ hex1
     (fun h => hy1 (congrArg Subtype.val h))
   -- the graph of `z ↦ k · e z`
-  letI : CommGroup E := { (inferInstance : Group E) with mul_comm := hcomm }
+  let : CommGroup E := { (inferInstance : Group E) with mul_comm := hcomm }
   set g : ↥U₁ →* E :=
     U₂.subtype.comp (((hU₂inv.restrict k).toMonoidHom).comp
       e.toMulEquiv.toMonoidHom) with hgdef
@@ -301,8 +301,8 @@ theorem OrderQModuleSplit.nonempty_summandEquiv_of_isomorphic
       csplit.rightInvariant.restrict) := by
   classical
   have hcomm : ∀ x y : P ⧸ Z, x * y = y * x := csplit.quotientEA.comm
-  haveI : (csplit.left).Normal := normal_of_mul_comm hcomm _
-  haveI : (csplit.right).Normal := normal_of_mul_comm hcomm _
+  have : (csplit.left).Normal := normal_of_mul_comm hcomm _
+  have : (csplit.right).Normal := normal_of_mul_comm hcomm _
   have hcV₁ := isplit.split.leftCard
   have hcV₂ := isplit.split.rightCard
   have hcU₁ := csplit.leftCard

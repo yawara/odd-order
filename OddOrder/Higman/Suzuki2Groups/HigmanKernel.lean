@@ -49,7 +49,7 @@ theorem HigmanEndomorphismFamily.modTwo_eq_zero_of_coe_mem
     ∀ (F : HigmanEndomorphismFamily
         (fun u : C ↦ MulAut.conjNormal (H := A) (u : P)⁻¹))
       (u : C), (u : P) ∈ A → F.modTwo u = 0 := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   intro F u hu
@@ -118,7 +118,7 @@ theorem actualHigmanFamily_commutator_inv_mem_agemo_two_of_modTwo_eq_zero
       F.modTwo u = 0 →
         ∀ a : A, ⁅(u : P)⁻¹, (a : P)⁆ ∈
           (Agemo A 2 2).map A.subtype := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   intro F hzero a
@@ -198,7 +198,7 @@ theorem actualHigmanFamily_commutator_zpowers_le_agemo_two_of_modTwo_eq_zero
       F.modTwo u = 0 →
         ⁅Subgroup.zpowers (u : P), A⁆ ≤
           (Agemo A 2 2).map A.subtype := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   intro F hzero
@@ -247,7 +247,7 @@ theorem actualHigmanFamily_mem_of_modTwo_eq_zero
     ∀ F : HigmanEndomorphismFamily
         (fun v : C ↦ MulAut.conjNormal (H := A) (v : P)⁻¹),
       F.modTwo u = 0 → (u : P) ∈ A := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   intro F hzero
@@ -284,7 +284,7 @@ theorem actualHigmanFamily_modTwo_eq_zero_iff_mem
     ∀ F : HigmanEndomorphismFamily
         (fun v : C ↦ MulAut.conjNormal (H := A) (v : P)⁻¹),
       F.modTwo u = 0 ↔ (u : P) ∈ A := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   intro F
@@ -319,7 +319,7 @@ theorem actualHigmanFamily_modTwoHom_ker_eq
     ∀ F : HigmanEndomorphismFamily
         (fun v : C ↦ MulAut.conjNormal (H := A) (v : P)⁻¹),
       (F.modTwoHom ε he subgroupConjInv_mul).ker = A.subgroupOf C := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   intro F

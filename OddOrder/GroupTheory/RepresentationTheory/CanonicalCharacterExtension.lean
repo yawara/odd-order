@@ -178,8 +178,8 @@ theorem IsIrreducibleCharacter.exists_extension_not_dvd_orderOf_determinant [Fin
       ClassFunction.restrict H χ = θ ∧ ¬ p ∣ orderOf hχ.determinant := by
   obtain ⟨χ', hχ', hr⟩ := hθ.exists_extension_of_conjBy_eq hgen hinv
   subst hr
-  letI : Fintype K := Fintype.ofFinite K
-  haveI : Invertible (Nat.card K : ℂ) :=
+  let : Fintype K := Fintype.ofFinite K
+  have : Invertible (Nat.card K : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   have hdet_res : hθ.determinant = hχ'.determinant.comp H.subtype :=
     hχ'.determinant_restrict hθ
@@ -409,12 +409,12 @@ theorem exists_extension_of_forall_conjBy_eq_aux {K : Type*} [Group K] [Finite K
       by_contra hcon
       push Not at hcon
       exact htop ((Subgroup.eq_top_iff' H).mpr hcon)
-    haveI : Nontrivial (K ⧸ H) :=
+    have : Nontrivial (K ⧸ H) :=
       ⟨⟨QuotientGroup.mk x₀, 1, fun hcon => hx₀ ((QuotientGroup.eq_one_iff x₀).mp hcon)⟩⟩
-    letI : Fintype (K ⧸ H) := Fintype.ofFinite _
+    let : Fintype (K ⧸ H) := Fintype.ofFinite _
     set p := (Nat.card (K ⧸ H)).minFac with hp_def
     have hp : p.Prime := Nat.minFac_prime (Finite.one_lt_card (α := K ⧸ H)).ne'
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     obtain ⟨xbar, hxbar⟩ := exists_prime_orderOf_dvd_card (G := K ⧸ H) p
       (by rw [← Nat.card_eq_fintype_card]; exact Nat.minFac_dvd _)
     obtain ⟨x, hx⟩ := QuotientGroup.mk'_surjective H xbar
@@ -426,7 +426,7 @@ theorem exists_extension_of_forall_conjBy_eq_aux {K : Type*} [Group K] [Finite K
       change QuotientGroup.mk' H a ∈ Subgroup.zpowers xbar
       rw [h1]
       exact one_mem _
-    haveI hN₁normal : N₁.Normal := by
+    have hN₁normal : N₁.Normal := by
       constructor
       intro a ha y
       have h1 : y * a * y⁻¹ = ⁅y, a⁆ * a := by
@@ -434,7 +434,7 @@ theorem exists_extension_of_forall_conjBy_eq_aux {K : Type*} [Group K] [Finite K
         group
       rw [h1]
       exact N₁.mul_mem (hHN₁ (hab y a)) ha
-    haveI : (H.subgroupOf N₁).Normal := ‹H.Normal›.subgroupOf N₁
+    have : (H.subgroupOf N₁).Normal := ‹H.Normal›.subgroupOf N₁
     -- the relative index `[N₁ : H]` is `p`
     have hrel : (H.subgroupOf N₁).index = p := by
       have h1 : Subgroup.comap (QuotientGroup.mk' H) (⊥ : Subgroup (K ⧸ H)) = H := by

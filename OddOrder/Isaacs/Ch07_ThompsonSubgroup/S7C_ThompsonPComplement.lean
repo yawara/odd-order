@@ -317,7 +317,7 @@ theorem exists_badNormalizerPSubgroup_of_not_hasThompsonLocalPComplements
   · set Z : Subgroup G := (Subgroup.center ↥S).map S.subtype with hZ_def
     have hZ_ne : Z ≠ ⊥ := by
       rw [hZ_def, Ne, Subgroup.map_eq_bot_iff_of_injective _ S.subtype_injective]
-      haveI : Nontrivial ↥S := S.nontrivial_iff_ne_bot.mpr hS_ne
+      have : Nontrivial ↥S := S.nontrivial_iff_ne_bot.mpr hS_ne
       exact (Subgroup.center ↥S).nontrivial_iff_ne_bot.mp hS_p.center_nontrivial
     have hZ_p : IsPGroup p Z := by
       rw [hZ_def]
@@ -351,7 +351,7 @@ theorem lt_normalizer_inf_sylow_of_lt
     (S : Sylow p H) {D : Subgroup H} (hD_lt : D < (S : Subgroup H)) :
     D < Subgroup.normalizer D ⊓ (S : Subgroup H) := by
   classical
-  haveI : Group.IsNilpotent ↥(S : Subgroup H) := S.isPGroup'.isNilpotent
+  have : Group.IsNilpotent ↥(S : Subgroup H) := S.isPGroup'.isNilpotent
   have hNC : NormalizerCondition ↥(S : Subgroup H) :=
     Group.normalizerCondition_of_isNilpotent (G := ↥(S : Subgroup H))
   have hD_le : D ≤ (S : Subgroup H) := le_of_lt hD_lt
@@ -429,7 +429,7 @@ theorem exists_lexicographically_maximal_badNormalizerPSubgroup
       (∀ X : Subgroup G, IsBadNormalizerPSubgroup p X →
         normalizerPPart p X = normalizerPPart p U → Nat.card X ≤ Nat.card U) := by
   classical
-  letI : Fintype (Subgroup G) := Fintype.ofFinite _
+  let : Fintype (Subgroup G) := Fintype.ofFinite _
   let family : Finset (Subgroup G) :=
     Finset.univ.filter (IsBadNormalizerPSubgroup p)
   obtain ⟨U₀, hU₀⟩ := exists_isBadNormalizerPSubgroup hG
@@ -497,7 +497,7 @@ theorem maximal_badNormalizer_normalizer_eq_top.{u}
     rw [hN_def]
     exact Subgroup.le_normalizer
   have hUN_p : IsPGroup p (U.subgroupOf N) := hU_bad.2.1.comap_subtype
-  haveI hUN_normal : (U.subgroupOf N).Normal := by
+  have hUN_normal : (U.subgroupOf N).Normal := by
     rw [hN_def]
     exact Subgroup.normal_in_normalizer
   have hUN_le_S : U.subgroupOf N ≤ (S : Subgroup N) :=
@@ -598,7 +598,7 @@ theorem maximal_badNormalizer_eq_opCore.{u}
     U = OddOrder.Isaacs.Ch01.opCore p G := by
   have hNU_top :=
     maximal_badNormalizer_normalizer_eq_top hHyp ih hU_bad hU_weight_max
-  haveI hU_normal : U.Normal := Subgroup.normalizer_eq_top_iff.mp hNU_top
+  have hU_normal : U.Normal := Subgroup.normalizer_eq_top_iff.mp hNU_top
   set O : Subgroup G := OddOrder.Isaacs.Ch01.opCore p G with hO_def
   have hU_le_O : U ≤ O := by
     rw [hO_def]
@@ -805,7 +805,7 @@ theorem maximal_badNormalizer_quotient_hasNormalPComplement.{u}
       (Pbar : Subgroup (G ⧸ U)).subtype with hZbar_def
   set Jbar : Subgroup (G ⧸ U) :=
     Subgroup.thompsonJ (Pbar : Subgroup (G ⧸ U)) p with hJbar_def
-  haveI : Nontrivial ↥(Pbar : Subgroup (G ⧸ U)) :=
+  have : Nontrivial ↥(Pbar : Subgroup (G ⧸ U)) :=
     (Pbar : Subgroup (G ⧸ U)).nontrivial_iff_ne_bot.mpr hPbar_bot
   have hZbar_ne : Zbar ≠ ⊥ := by
     rw [hZbar_def, Ne,
@@ -862,7 +862,7 @@ theorem isPiSeparable_of_normalPSubgroup_quotient_hasNormalPComplement
   classical
   let F1 : Subgroup G :=
     OddOrder.Isaacs.Ch03.piFittingSeries ({p} : Set ℕ) G 1
-  haveI hF1_normal : F1.Normal := by
+  have hF1_normal : F1.Normal := by
     dsimp [F1]
     infer_instance
   have hU_pi :
@@ -878,7 +878,7 @@ theorem isPiSeparable_of_normalPSubgroup_quotient_hasNormalPComplement
         (N := OddOrder.Isaacs.Ch03.piFittingSeries
           ({p} : Set ℕ) G 0) hU_pi).le_oPiCore.trans le_sup_left
   obtain ⟨Nbar, hNbar_normal, hNbar_complement⟩ := hQ
-  letI : Nbar.Normal := hNbar_normal
+  let : Nbar.Normal := hNbar_normal
   obtain ⟨Pbar⟩ := (inferInstance : Nonempty (Sylow p (G ⧸ U)))
   have hNbar_card :
       Nat.card Nbar = (Pbar : Subgroup (G ⧸ U)).index :=
@@ -888,13 +888,13 @@ theorem isPiSeparable_of_normalPSubgroup_quotient_hasNormalPComplement
         {q | q ∉ ({p} : Set ℕ)} Nbar := by
     intro q hq
     rw [hNbar_card] at hq
-    simp only [Set.mem_setOf_eq, Set.mem_singleton_iff]
+    simp only [Set.mem_ofPred_eq, Set.mem_singleton_iff]
     rintro rfl
     exact Pbar.not_dvd_index (Nat.dvd_of_mem_primeFactors hq)
   let qU : G →* G ⧸ U := QuotientGroup.mk' U
   have hqU : Function.Surjective qU := QuotientGroup.mk'_surjective U
   let K : Subgroup G := Nbar.comap qU
-  haveI hK_normal : K.Normal := hNbar_normal.comap qU
+  have hK_normal : K.Normal := hNbar_normal.comap qU
   have hU_le_K : U ≤ K := by
     intro x hx
     change qU x ∈ Nbar
@@ -905,7 +905,7 @@ theorem isPiSeparable_of_normalPSubgroup_quotient_hasNormalPComplement
   have hK_map_qU : K.map qU = Nbar := by
     dsimp [K]
     exact Subgroup.map_comap_eq_self_of_surjective hqU Nbar
-  haveI hK_map_qU_normal : (K.map qU).Normal :=
+  have hK_map_qU_normal : (K.map qU).Normal :=
     Subgroup.Normal.map hK_normal qU hqU
   let q1 : G →* G ⧸ F1 := QuotientGroup.mk' F1
   have hq1 : Function.Surjective q1 := QuotientGroup.mk'_surjective F1
@@ -923,7 +923,7 @@ theorem isPiSeparable_of_normalPSubgroup_quotient_hasNormalPComplement
       K.map q1 = K.map (r1.comp qU) := by rw [hr1_comp]
       _ = (K.map qU).map r1 := by rw [Subgroup.map_map]
       _ = Nbar.map r1 := by rw [hK_map_qU]
-  haveI hK_map_q1_normal : (K.map q1).Normal :=
+  have hK_map_q1_normal : (K.map q1).Normal :=
     Subgroup.Normal.map hK_normal q1 hq1
   have hNbar_map_r1_pi' :
       OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup
@@ -938,7 +938,7 @@ theorem isPiSeparable_of_normalPSubgroup_quotient_hasNormalPComplement
     exact hNbar_map_r1_pi'
   let F2 : Subgroup G :=
     OddOrder.Isaacs.Ch03.piFittingSeries ({p} : Set ℕ) G 2
-  haveI hF2_normal : F2.Normal := by
+  have hF2_normal : F2.Normal := by
     dsimp [F2]
     infer_instance
   have hK_le_F2 : K ≤ F2 := by
@@ -1007,7 +1007,7 @@ theorem hasNormalPComplement_of_quotient_of_isPiGroup_compl
     OddOrder.Isaacs.Ch05.HasNormalPComplement p G := by
   classical
   obtain ⟨Nbar, hNbar_normal, hNbar_complement⟩ := hQ
-  letI : Nbar.Normal := hNbar_normal
+  let : Nbar.Normal := hNbar_normal
   obtain ⟨Qbar⟩ := (inferInstance : Nonempty (Sylow p (G ⧸ N)))
   have hNbar_card : Nat.card Nbar = (Qbar : Subgroup (G ⧸ N)).index :=
     ((hNbar_complement Qbar).index_eq_card).symm
@@ -1021,7 +1021,7 @@ theorem hasNormalPComplement_of_quotient_of_isPiGroup_compl
   let q : G →* G ⧸ N := QuotientGroup.mk' N
   have hq : Function.Surjective q := QuotientGroup.mk'_surjective N
   let K : Subgroup G := Nbar.comap q
-  haveI hK_normal : K.Normal := hNbar_normal.comap q
+  have hK_normal : K.Normal := hNbar_normal.comap q
   have hN_le_K : N ≤ K := by
     dsimp [K, q]
     exact QuotientGroup.le_comap_mk' N Nbar
@@ -1121,7 +1121,7 @@ theorem oPiPrimeCore_eq_bot_of_minimal_counterexample.{u}
   classical
   set N : Subgroup G :=
     OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G with hN_def
-  haveI hN_normal : N.Normal := by
+  have hN_normal : N.Normal := by
     dsimp [N]
     infer_instance
   have hN_pi' :
@@ -1145,7 +1145,7 @@ theorem oPiPrimeCore_eq_bot_of_minimal_counterexample.{u}
   have hPbar_coe :
       (Pbar : Subgroup (G ⧸ N)) = (P : Subgroup G).map q := by
     rw [hPbar_def, Sylow.coe_mapSurjective]
-  haveI : Nontrivial ↥(P : Subgroup G) :=
+  have : Nontrivial ↥(P : Subgroup G) :=
     (P : Subgroup G).nontrivial_iff_ne_bot.mpr hP_ne
   set Z : Subgroup G :=
     (Subgroup.center ↥(P : Subgroup G)).map

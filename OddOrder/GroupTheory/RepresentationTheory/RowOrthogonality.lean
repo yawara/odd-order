@@ -50,7 +50,7 @@ theorem characterTableRowOrthogonality :
   refine ⟨fun χ => ?_, fun χ ψ hχψ => ?_⟩
   · -- Diagonal entry `(χ, χ)` equals `1`.
     obtain ⟨V, _, _, _, ρ, hρ, hχ⟩ := χ.isIrreducible
-    haveI : Representation.IsIrreducible ρ := hρ
+    have : Representation.IsIrreducible ρ := hρ
     have hsum : ∑ g : G, (χ : ClassFunction G ℂ) g * star ((χ : ClassFunction G ℂ) g)
         = ∑ g : G, ρ.character g * ρ.character g⁻¹ :=
       Finset.sum_congr rfl fun g _ => by rw [congrFun hχ g, ← character_inv ρ g]
@@ -59,8 +59,8 @@ theorem characterTableRowOrthogonality :
   · -- Off-diagonal entry `(χ, ψ)` with `χ ≠ ψ` equals `0`.
     obtain ⟨Vχ, _, _, _, ρ, hρ, hχ⟩ := χ.isIrreducible
     obtain ⟨Vψ, _, _, _, σ, hσ, hψ⟩ := ψ.isIrreducible
-    haveI : Representation.IsIrreducible ρ := hρ
-    haveI : Representation.IsIrreducible σ := hσ
+    have : Representation.IsIrreducible ρ := hρ
+    have : Representation.IsIrreducible σ := hσ
     have hsum : ∑ g : G, (χ : ClassFunction G ℂ) g * star ((ψ : ClassFunction G ℂ) g)
         = ∑ g : G, ρ.character g * σ.character g⁻¹ :=
       Finset.sum_congr rfl fun g _ => by

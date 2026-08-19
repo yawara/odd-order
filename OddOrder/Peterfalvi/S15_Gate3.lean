@@ -291,8 +291,8 @@ theorem typeI_U_le_fitting_of_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimp
   have hW1leL : hyp.W1 ≤ L := hyp.W1_normalizes_U.trans hNUL
   have hLFleL : maxNilpotentNormalHall L ≤ L := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le L
   obtain ⟨bdata, _⟩ := basic_structure hG hyp
-  have hsolv : IsSolvable ↥(maxNilpotentNormalHall L) := by
-    haveI := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent L
+  have hsolv : Group.IsSolvable ↥(maxNilpotentNormalHall L) := by
+    have := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent L
     exact IsNilpotent.to_isSolvable
   -- piece 3: `W₁ ⊓ L_F = ⊥`, since `q = |W₁|` divides `p q` and `|L_F| ⟂ p q`.
   have hcopLFq : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) hyp.q :=
@@ -309,7 +309,7 @@ theorem typeI_U_le_fitting_of_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimp
       OddOrder.GroupTheory.IsFrobeniusGroup.coprime_card_of_inf_kernel_eq_bot_le
         hLFleL hW1leL hfrobLF hW1LF
     have hcardUW1 : Nat.card ↥(hyp.U ⊔ hyp.W1) = Nat.card ↥hyp.U * Nat.card ↥hyp.W1 := by
-      rw [← bdata.UW1_frobenius.isComplement.card_mul,
+      rw [← bdata.UW1_frobenius.isComplement.card_mul_card,
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv,
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv]
     have hcopUW1 : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L))
@@ -396,8 +396,8 @@ theorem typeI_V_le_fitting_of_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimp
         (hyp.W2.subgroupOf (hyp.V ⊔ hyp.W2)) := by
     have h := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius tpd htpdVne
     rwa [htpdV, htpdW2] at h
-  have hsolv : IsSolvable ↥(maxNilpotentNormalHall L) := by
-    haveI := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent L
+  have hsolv : Group.IsSolvable ↥(maxNilpotentNormalHall L) := by
+    have := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent L
     exact IsNilpotent.to_isSolvable
   have hcopLFp : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) hyp.p :=
     Nat.Coprime.coprime_dvd_right (dvd_mul_right hyp.p hyp.q) hcop
@@ -412,7 +412,7 @@ theorem typeI_V_le_fitting_of_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimp
       OddOrder.GroupTheory.IsFrobeniusGroup.coprime_card_of_inf_kernel_eq_bot_le
         hLFleL hW2leL hfrobLF hW2LF
     have hcardVW2 : Nat.card ↥(hyp.V ⊔ hyp.W2) = Nat.card ↥hyp.V * Nat.card ↥hyp.W2 := by
-      rw [← hVW2frob.isComplement.card_mul,
+      rw [← hVW2frob.isComplement.card_mul_card,
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv,
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv]
     have hcopVW2 : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L))
@@ -516,7 +516,7 @@ theorem exists_typeI_maximal_overNormalizer_U [Finite G]
     (mem_maximalSubgroups.mp hyp.S_maximal).1 (top_le_iff.mp (hUtop ▸ hUleS))
   have hNUtop : Subgroup.normalizer (hyp.U : Set G) ≠ ⊤ := by
     intro hNtop
-    haveI hUnormal : (hyp.U).Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
+    have hUnormal : (hyp.U).Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
     rcases _hG.simple.eq_bot_or_eq_top_of_normal hyp.U hUnormal with h | h
     · exact hUne h
     · exact hUneTop h
@@ -577,7 +577,7 @@ theorem exists_typeI_maximal_overNormalizer_U [Finite G]
       rw [hidxUeq]
       exact hcop.mul_right frobcop
     exact absurd (normalizer_le_of_isHall_subgroupOf_of_conj
-        (_hG.solvable_of_mem_maximalSubgroups hyp.S_maximal) hUleS
+        (_hG.isSolvable_of_mem_maximalSubgroups hyp.S_maximal) hUleS
         (isHall_subgroupOf_primeFactors_of_coprime_index hUleS hUhall_cop) hg hNUL) hNUS
   · -- `L` conjugate to `T` is excluded (`_hLconjT`): `|L_F| = q^p` forces `W₁ ⊆ L_F` and
     -- `[U,W₁] ⊆ L_F ∩ U = 1`, contradicting the `U W₁` Frobenius structure (13.2.a).
@@ -727,7 +727,7 @@ theorem exists_typeI_maximal_overNormalizer_V [Finite G]
     (mem_maximalSubgroups.mp hyp.T_maximal).1 (top_le_iff.mp (hVtop ▸ hVleT))
   have hNVtop : Subgroup.normalizer (hyp.V : Set G) ≠ ⊤ := by
     intro hNtop
-    haveI hVnormal : (hyp.V).Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
+    have hVnormal : (hyp.V).Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
     rcases _hG.simple.eq_bot_or_eq_top_of_normal hyp.V hVnormal with h | h
     · exact hVne h
     · exact hVneTop h
@@ -811,7 +811,7 @@ theorem exists_typeI_maximal_overNormalizer_V [Finite G]
       rw [hidxVeq]
       exact hcop.mul_right frobcop
     exact absurd (normalizer_le_of_isHall_subgroupOf_of_conj
-        (_hG.solvable_of_mem_maximalSubgroups hyp.T_maximal) hVleT
+        (_hG.isSolvable_of_mem_maximalSubgroups hyp.T_maximal) hVleT
         (isHall_subgroupOf_primeFactors_of_coprime_index hVleT hVhall_cop) hg hNVL) hNVT
 
 /-- **Peterfalvi (13.17.c), explicit-`D = ⊥` Huppert step.**  If `W₁` lies in a Frobenius
@@ -851,7 +851,7 @@ theorem complement_le_QW2_of_D_eq_bot [Finite G]
     (Subgroup.card_subgroup_dvd_card E).trans (Subgroup.card_subgroup_dvd_card L)
   have hodd : Odd (Nat.card ↥E) := _hG.odd.of_dvd_nat hEdvd
   -- Huppert V.8.18 b): `W₁` is normal in `E`, so `E` normalizes `W₁` in `↥L`.
-  haveI hRnormal : R.Normal :=
+  have hRnormal : R.Normal :=
     OddOrder.Isaacs.Ch06.normal_of_card_prime_of_isFrobeniusGroup_of_odd
       frob.frobenius hodd hyp.q_prime hRcard
   have hEnorm := (Subgroup.normal_subgroupOf_iff_le_normalizer hW1L_le_E).mp hRnormal
@@ -911,7 +911,7 @@ theorem Q_W2_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- `p ≠ q`: else `W₁` and `W₂` are equal order-`q` subgroups of the cyclic `W`.
   have hpq : hyp.p ≠ hyp.q := by
     intro heq
-    haveI : IsCyclic ↥hyp.W := hyp.W_cyclic
+    have : IsCyclic ↥hyp.W := hyp.W_cyclic
     have hW1W : hyp.W1 ≤ hyp.W := le_sup_left.trans hyp.W_eq_join.ge
     have hW2W : hyp.W2 ≤ hyp.W := le_sup_right.trans hyp.W_eq_join.ge
     have hW1card : Nat.card ↥(hyp.W1.subgroupOf hyp.W) = hyp.q := by

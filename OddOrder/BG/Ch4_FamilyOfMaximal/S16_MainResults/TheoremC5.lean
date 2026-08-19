@@ -84,7 +84,7 @@ theorem theoremC_5_overgroup_unique [Finite G] (hG : OddOrder.BG.IsMinimalSimple
   refine ⟨?_, ?_⟩
   · -- **First half** (Proposition 14.2(c) for `M`): `𝓜(C_G(X)) = {M}` for prime-order `X ≤ K*`.
     rintro X hXle ⟨p, hp, hXcard⟩
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     have hXelem : X ∈ elemAbelianOfRank G p 1 :=
       mem_elemAbelianOfRank.mpr
         ⟨Subgroup.IsElementaryAbelian.of_card_prime hXcard, by rw [hXcard, pow_one]⟩
@@ -97,13 +97,13 @@ theorem theoremC_5_overgroup_unique [Finite G] (hG : OddOrder.BG.IsMinimalSimple
     obtain ⟨hMstmax, hMstP, _hMnc, hpair, _rest⟩ := hP0
     -- Prop 14.2(c) applied to `M*` with `(K*, K)` in the role of `(K, K*)`.
     rintro Y hYle ⟨p, hp, hYcard⟩
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     have hYelem : Y ∈ elemAbelianOfRank G p 1 :=
       mem_elemAbelianOfRank.mpr
         ⟨Subgroup.IsElementaryAbelian.of_card_prime hYcard, by rw [hYcard, pow_one]⟩
     -- A Hall `(κ(M*) ∪ σ(M*))'`-subgroup of `M*` (solvable ⟹ Hall's theorem; `typeP_structure`
     -- does not use it, but requires it as an argument).
-    haveI hMstsol : IsSolvable ↥Mstar := hG.solvable_of_mem_maximalSubgroups hMstmax
+    have hMstsol : Group.IsSolvable ↥Mstar := hG.isSolvable_of_mem_maximalSubgroups hMstmax
     obtain ⟨UMst, hUMsthall⟩ : ∃ UMst : Subgroup G, Ch03.IsHallSubgroup
         ((S14.kappa Mstar ∪ OddOrder.BG.Ch3.S10.sigma Mstar)ᶜ) (UMst.subgroupOf Mstar) := by
       obtain ⟨U', hU'hall, -⟩ := Ch03.hall_D (G := ↥Mstar)

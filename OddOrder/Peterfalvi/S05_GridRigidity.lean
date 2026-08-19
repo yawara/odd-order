@@ -66,7 +66,7 @@ theorem ncard_inner_grid_ne_zero_le_one {Idx : Type*}
     {X : ClassFunction G ℂ} (hX : X ∈ ZIrr G) (hX1 : ClassFunction.inner X X = 1) :
     {i : Idx | ClassFunction.inner X (χ i) ≠ 0}.ncard ≤ 1 := by
   classical
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   obtain ⟨ε, μ, hε, hXrepr⟩ := exists_zsmul_irreducibleCharacter_of_inner_self_one hX hX1
   -- any index in the support has `χ i = ±μ`
   have hkey : ∀ i, ClassFunction.inner X (χ i) ≠ 0 →
@@ -113,7 +113,7 @@ theorem ncard_inner_grid_ne_zero_le_two {Idx : Type*} [Finite Idx]
     {X : ClassFunction G ℂ} (hX : X ∈ ZIrr G) (hX2 : ClassFunction.inner X X = 2) :
     {i : Idx | ClassFunction.inner X (χ i) ≠ 0}.ncard ≤ 2 := by
   classical
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hX
   have hsum : ∑ a ∈ c.support, c a ^ 2 = 2 := by exact_mod_cast hsq.symm.trans hX2
   obtain ⟨α, β, hαβ, hs, -, -⟩ := exists_pair_of_sum_sq_eq_two
@@ -135,8 +135,8 @@ theorem ncard_inner_grid_ne_zero_le_two {Idx : Type*} [Finite Idx]
     {i | ClassFunction.inner β (χ i) ≠ 0})
     ?_ (Set.toFinite _)) (le_trans (Set.ncard_union_le _ _) ?_)
   · intro i hi
-    simp only [Set.mem_setOf_eq] at hi
-    rw [Set.mem_union, Set.mem_setOf_eq, Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq] at hi
+    rw [Set.mem_union, Set.mem_ofPred_eq, Set.mem_ofPred_eq]
     by_contra hcon
     push Not at hcon
     exact hi (by rw [hXαβ, ClassFunction.inner_add_left, ClassFunction.inner_smul_left,
@@ -158,7 +158,7 @@ theorem inner_grid_eq_zero_or_pm_one_of_inner_self_two {Idx : Type*}
     ClassFunction.inner X (χ i) = 0 ∨ ClassFunction.inner X (χ i) = 1 ∨
       ClassFunction.inner X (χ i) = -1 := by
   classical
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hX
   have hsum : ∑ a ∈ c.support, c a ^ 2 = 2 := by exact_mod_cast hsq.symm.trans hX2
   obtain ⟨α, β, hαβ, hs, hcα, hcβ⟩ := exists_pair_of_sum_sq_eq_two
@@ -292,12 +292,12 @@ theorem orthonormalGrid_diff_rigidity {ι κ : Type*} [Finite ι] [Finite κ]
           + ClassFunction.inner (X - (s : ℂ) • (χ P1 - χ P2)) (χ (i', j))) :
     X = (s : ℂ) • (χ P1 - χ P2) := by
   classical
-  haveI : Finite G := Finite.of_fintype G
-  haveI : Fintype ι := Fintype.ofFinite _
-  haveI : Fintype κ := Fintype.ofFinite _
-  haveI : Nonempty ι :=
+  have : Finite G := Finite.of_fintype G
+  have : Fintype ι := Fintype.ofFinite _
+  have : Fintype κ := Fintype.ofFinite _
+  have : Nonempty ι :=
     Fintype.card_pos_iff.mp (by rw [← Nat.card_eq_fintype_card]; omega)
-  haveI : Nonempty κ :=
+  have : Nonempty κ :=
     Fintype.card_pos_iff.mp (by rw [← Nat.card_eq_fintype_card]; omega)
   apply eq_smul_grid_diff_of_all_inner_zero χ horth_diag horth_off hX2 hPne hs
   set a : ι × κ → ℂ :=
@@ -316,7 +316,7 @@ theorem orthonormalGrid_diff_rigidity {ι κ : Type*} [Finite ι] [Finite κ]
     have hsub : {x | a x ≠ 0} ⊆ {x | Gr x ≠ 0} ∪ {P1, P2} := by
       intro x hx
       by_contra hcon
-      simp only [Set.mem_union, Set.mem_setOf_eq, Set.mem_insert_iff, Set.mem_singleton_iff,
+      simp only [Set.mem_union, Set.mem_ofPred_eq, Set.mem_insert_iff, Set.mem_singleton_iff,
         not_or, not_not] at hcon
       exact hx (by rw [hae x, hcon.1, if_neg (Ne.symm hcon.2.1), if_neg (Ne.symm hcon.2.2)]; ring)
     have hbpair : ({P1, P2} : Set _).ncard ≤ 2 :=

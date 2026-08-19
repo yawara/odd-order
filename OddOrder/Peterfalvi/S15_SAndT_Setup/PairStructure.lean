@@ -36,8 +36,8 @@ theorem Hypothesis.p_ne_q [Finite G] (hyp : Hypothesis (G := G)) : hyp.p ≠ hyp
   intro hpq
   have hW1W : hyp.W1 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_left
   have hW2W : hyp.W2 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_right
-  haveI : IsCyclic ↥hyp.W := hyp.W_cyclic
-  haveI : Fintype ↥hyp.W := Fintype.ofFinite _
+  have : IsCyclic ↥hyp.W := hyp.W_cyclic
+  have : Fintype ↥hyp.W := Fintype.ofFinite _
   classical
   set W1' : Subgroup ↥hyp.W := hyp.W1.subgroupOf hyp.W with hW1def
   set W2' : Subgroup ↥hyp.W := hyp.W2.subgroupOf hyp.W with hW2def
@@ -72,7 +72,7 @@ theorem Hypothesis.p_ne_q [Finite G] (hyp : Hypothesis (G := G)) : hyp.p ≠ hyp
   have htot := IsCyclic.card_orderOf_eq_totient (α := ↥hyp.W) hqdvd
   -- ... but `W₁^# ∪ {y}` (`y ∈ W₂^#`) already has `q` elements of order `q`.
   obtain ⟨y', hy'⟩ : ∃ y' : ↥W2', y' ≠ 1 := by
-    haveI : Nontrivial ↥W2' := Finite.one_lt_card_iff_nontrivial.mp
+    have : Nontrivial ↥W2' := Finite.one_lt_card_iff_nontrivial.mp
       (by rw [hc2]; exact hyp.q_prime.one_lt)
     exact exists_ne 1
   have hy1 : (y' : ↥hyp.W) ≠ 1 := by
@@ -128,7 +128,7 @@ theorem Hypothesis.W1_le_derivedInG_T [Finite G] (hyp : Hypothesis (G := G)) :
   -- `T' ⊴ T`
   have hid : (derivedInG hyp.T).subgroupOf hyp.T = commutator ↥hyp.T :=
     Subgroup.comap_map_eq_self_of_injective hyp.T.subtype_injective (commutator ↥hyp.T)
-  haveI hM'norm : ((derivedInG hyp.T).subgroupOf hyp.T).Normal := by rw [hid]; infer_instance
+  have hM'norm : ((derivedInG hyp.T).subgroupOf hyp.T).Normal := by rw [hid]; infer_instance
   -- `[T : T'] = |W₂| = p`
   have hindex : ((derivedInG hyp.T).subgroupOf hyp.T).index = hyp.p := by
     rw [hyp.W2_isComplement_T_deriv.symm.index_eq_card,
@@ -216,7 +216,7 @@ theorem Hypothesis.isNilpotent_V [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
   have hT_le_NQ : hyp.T ≤ Subgroup.normalizer (hyp.Q : Set G) := by
     rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.T
-  haveI hQn_normal : (hyp.Q.subgroupOf (derivedInG hyp.T)).Normal :=
+  have hQn_normal : (hyp.Q.subgroupOf (derivedInG hyp.T)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQ_le).mpr (hM'_le_T.trans hT_le_NQ)
   -- `Q` complements `V` in `T'`.
   have hVcompl : (hyp.Q.subgroupOf (derivedInG hyp.T)).IsComplement'
@@ -259,26 +259,27 @@ theorem Hypothesis.isNilpotent_V [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     exact Nat.Coprime.coprime_dvd_right hdvd h0
   have hQ_lt_top : hyp.Q < ⊤ :=
     lt_of_le_of_lt hQ_le_T (lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hyp.T_maximal).1)
-  haveI hQsolv : IsSolvable ↥hyp.Q := hG.solvable_of_lt_top hyp.Q hQ_lt_top
-  have hsolv : IsSolvable ↥(hyp.Q.subgroupOf (derivedInG hyp.T)) ∨
-      IsSolvable (↥(derivedInG hyp.T) ⧸ hyp.Q.subgroupOf (derivedInG hyp.T)) :=
-    Or.inl (solvable_of_solvable_injective
+  have hQsolv : Group.IsSolvable ↥hyp.Q := hG.isSolvable_of_lt_top hyp.Q hQ_lt_top
+  have hsolv : Group.IsSolvable ↥(hyp.Q.subgroupOf (derivedInG hyp.T)) ∨
+      Group.IsSolvable (↥(derivedInG hyp.T) ⧸ hyp.Q.subgroupOf (derivedInG hyp.T)) :=
+    Or.inl (Group.isSolvable_of_isSolvable_injective
       (f := (Subgroup.subgroupOfEquivOfLe hQ_le).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe hQ_le).injective)
   -- Schur–Zassenhaus conjugates `tpd0.U` onto `V` inside `T'`; push nilpotency forward.
   obtain ⟨n, _hnQ, hn⟩ :=
     Subgroup.IsComplement'.exists_conj_of_coprime hcop hsolv hUcompl hVcompl
-  haveI : Group.IsNilpotent ↥tpd0.U := tpd0.U_nilpotent
+  have : Group.IsNilpotent ↥tpd0.U := tpd0.U_nilpotent
   have h1 : Group.IsNilpotent ↥(tpd0.U.subgroupOf (derivedInG hyp.T)) :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hU_le).symm
-  haveI := h1
+  have := h1
   have h2 : Group.IsNilpotent
       ↥((tpd0.U.subgroupOf (derivedInG hyp.T)).map (MulAut.conj n).toMonoidHom) :=
     Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ _ (MulAut.conj n).injective)
   have h3 : Group.IsNilpotent ↥(hyp.V.subgroupOf (derivedInG hyp.T)) := hn ▸ h2
-  haveI := h3
+  have := h3
   exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hV_le)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **A type-`P` datum on `T` whose complement is the abstract `V` (and whose kernel is `Q`).**
 The §13-level producer `typePData_of_isTypeNonI T_nonI` gives *some* `tpd0 : TypePData T`; its
 complement `tpd0.U` and the §16-chosen `V` both complement `Q = T_F` in `T' = QV`, so
@@ -303,7 +304,7 @@ theorem Hypothesis.exists_typePData_U_eq_V [Finite G] (hG : OddOrder.BG.IsMinima
     rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
   have hT_le_NQ : hyp.T ≤ Subgroup.normalizer (hyp.Q : Set G) := by
     rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.T
-  haveI hQn_normal : (hyp.Q.subgroupOf (derivedInG hyp.T)).Normal :=
+  have hQn_normal : (hyp.Q.subgroupOf (derivedInG hyp.T)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQ_le).mpr (hM'_le_T.trans hT_le_NQ)
   -- `Q` complements `V` in `T'` (verbatim from `isNilpotent_V`).
   have hVcompl : (hyp.Q.subgroupOf (derivedInG hyp.T)).IsComplement'
@@ -345,10 +346,10 @@ theorem Hypothesis.exists_typePData_U_eq_V [Finite G] (hG : OddOrder.BG.IsMinima
     exact Nat.Coprime.coprime_dvd_right hdvd h0
   have hQ_lt_top : hyp.Q < ⊤ :=
     lt_of_le_of_lt hQ_le_T (lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hyp.T_maximal).1)
-  haveI hQsolv : IsSolvable ↥hyp.Q := hG.solvable_of_lt_top hyp.Q hQ_lt_top
-  have hsolv : IsSolvable ↥(hyp.Q.subgroupOf (derivedInG hyp.T)) ∨
-      IsSolvable (↥(derivedInG hyp.T) ⧸ hyp.Q.subgroupOf (derivedInG hyp.T)) :=
-    Or.inl (solvable_of_solvable_injective
+  have hQsolv : Group.IsSolvable ↥hyp.Q := hG.isSolvable_of_lt_top hyp.Q hQ_lt_top
+  have hsolv : Group.IsSolvable ↥(hyp.Q.subgroupOf (derivedInG hyp.T)) ∨
+      Group.IsSolvable (↥(derivedInG hyp.T) ⧸ hyp.Q.subgroupOf (derivedInG hyp.T)) :=
+    Or.inl (Group.isSolvable_of_isSolvable_injective
       (f := (Subgroup.subgroupOfEquivOfLe hQ_le).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe hQ_le).injective)
   obtain ⟨n, _hnQ, hn⟩ :=
@@ -418,10 +419,10 @@ theorem coprime_card_derivedInG_index_of_isTypeP [Finite G]
       (fun q hq => by rw [Subgroup.card_bot] at hq; simp at hq)
   set Kstar : Subgroup G :=
     OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) with hKstar
-  haveI hKcyc : IsCyclic ↥K := by
+  have hKcyc : IsCyclic ↥K := by
     obtain ⟨_, _, _, ⟨_, _, _, _, hcyc, _, _, _⟩, _⟩ :=
       OddOrder.BG.Ch4.S14.typeP_duality hG hM hP hKM hKhall hKstar
-    haveI : IsCyclic ↥(K ⊔ Kstar) := hcyc
+    have : IsCyclic ↥(K ⊔ Kstar) := hcyc
     exact Subgroup.isCyclic_of_le (le_sup_left : K ≤ K ⊔ Kstar)
   have hcompl :=
     OddOrder.BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall hG hM hP hKM hKhall
@@ -451,15 +452,15 @@ theorem Hypothesis.W2_isKappaHall_T [Finite G] (hG : OddOrder.BG.IsMinimalSimple
       (fun q hq => by rw [Subgroup.card_bot] at hq; simp at hq)
   set Kstar : Subgroup G :=
     OddOrder.BG.Ch3.S10.Msigma hyp.T ⊓ Subgroup.centralizer (K : Set G) with hKstar
-  haveI hKcyc : IsCyclic ↥K := by
+  have hKcyc : IsCyclic ↥K := by
     obtain ⟨_, _, _, ⟨_, _, _, _, hcyc, _, _, _⟩, _⟩ :=
       OddOrder.BG.Ch4.S14.typeP_duality hG hyp.T_maximal hP hKM hKhall hKstar
-    haveI : IsCyclic ↥(K ⊔ Kstar) := hcyc
+    have : IsCyclic ↥(K ⊔ Kstar) := hcyc
     exact Subgroup.isCyclic_of_le (le_sup_left : K ≤ K ⊔ Kstar)
   have hcomplK :=
     OddOrder.BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall hG hyp.T_maximal hP hKM hKhall
-  haveI : IsSolvable ↥hyp.T := hG.solvable_of_mem_maximalSubgroups hyp.T_maximal
-  haveI hNnorm : ((derivedInG hyp.T).subgroupOf hyp.T).Normal := by
+  have : Group.IsSolvable ↥hyp.T := hG.isSolvable_of_mem_maximalSubgroups hyp.T_maximal
+  have hNnorm : ((derivedInG hyp.T).subgroupOf hyp.T).Normal := by
     rw [show (derivedInG hyp.T).subgroupOf hyp.T = commutator ↥hyp.T from
       Subgroup.comap_map_eq_self_of_injective hyp.T.subtype_injective (commutator ↥hyp.T)]
     infer_instance
@@ -494,15 +495,15 @@ theorem isKappaHall_of_isComplement_derivedInG [Finite G]
       (fun q hq => by rw [Subgroup.card_bot] at hq; simp at hq)
   set Kstar : Subgroup G :=
     OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) with hKstar
-  haveI hKcyc : IsCyclic ↥K := by
+  have hKcyc : IsCyclic ↥K := by
     obtain ⟨_, _, _, ⟨_, _, _, _, hcyc, _, _, _⟩, _⟩ :=
       OddOrder.BG.Ch4.S14.typeP_duality hG hM hP hKM hKhall hKstar
-    haveI : IsCyclic ↥(K ⊔ Kstar) := hcyc
+    have : IsCyclic ↥(K ⊔ Kstar) := hcyc
     exact Subgroup.isCyclic_of_le (le_sup_left : K ≤ K ⊔ Kstar)
   have hcomplK :=
     OddOrder.BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall hG hM hP hKM hKhall
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-  haveI hNnorm : ((derivedInG M).subgroupOf M).Normal := by
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
+  have hNnorm : ((derivedInG M).subgroupOf M).Normal := by
     rw [show (derivedInG M).subgroupOf M = commutator ↥M from
       Subgroup.comap_map_eq_self_of_injective M.subtype_injective (commutator ↥M)]
     infer_instance
@@ -636,7 +637,7 @@ theorem Hypothesis.W1_eq_Msigma_T_inf_centralizer_W2 [Finite G]
     OddOrder.BG.Ch3.S10.Msigma hyp.S ⊓ Subgroup.centralizer (hyp.W1 : Set G) with hKstarSdef
   have hKstarSW2 : KstarS = hyp.W2 := by
     rw [hKstarSdef]; exact hyp.Msigma_S_inf_centralizer_W1_eq_W2 hG
-  haveI : IsSolvable ↥hyp.S := hG.solvable_of_mem_maximalSubgroups hyp.S_maximal
+  have : Group.IsSolvable ↥hyp.S := hG.isSolvable_of_mem_maximalSubgroups hyp.S_maximal
   obtain ⟨US, hUS'⟩ := OddOrder.Isaacs.Ch03.hall_E_exists (G := ↥hyp.S)
     ((OddOrder.BG.Ch4.S14.kappa hyp.S ∪ OddOrder.BG.Ch3.S10.sigma hyp.S)ᶜ)
   have hU_S : OddOrder.Isaacs.Ch03.IsHallSubgroup
@@ -703,7 +704,7 @@ theorem Hypothesis.W1_eq_Msigma_T_inf_centralizer_W2 [Finite G]
   have hconjW2hall := OddOrder.BG.Ch4.S14.isHall_kappa_subgroupOf_conj g⁻¹ hg0 hW2T hW2hallT
   have hconjW2le : MulAut.conj g⁻¹ • hyp.W2 ≤ Mstar := by
     rw [← hg0]; exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hW2T
-  haveI : IsSolvable ↥Mstar := hG.solvable_of_mem_maximalSubgroups hMstarmax
+  have : Group.IsSolvable ↥Mstar := hG.isSolvable_of_mem_maximalSubgroups hMstarmax
   obtain ⟨w, hwMstar, hw⟩ := OddOrder.BG.Ch1.S06.exists_conj_eq_of_isHall_subgroupOf
     inferInstance hconjW2le hKstarleMstar hconjW2hall hKstar_hall
   set n : G := w * g⁻¹ with hn_def
@@ -782,7 +783,7 @@ theorem reconciled_typePData_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   have hW2W : hyp.W2 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_right
   have hW1W : hyp.W1 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_left
   have hWT : hyp.W ≤ hyp.T := by rw [hyp.W_eq_inter]; exact inf_le_right
-  haveI hWcyc : IsCyclic ↥hyp.W := hyp.W_cyclic
+  have hWcyc : IsCyclic ↥hyp.W := hyp.W_cyclic
   -- Cyclic factors: a subgroup of the cyclic `W` is cyclic (transport along `subgroupOfEquivOfLe`).
   have hW2cyc : IsCyclic ↥hyp.W2 :=
     isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe hW2W).surjective
@@ -863,7 +864,7 @@ theorem reconciled_typePData_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
       have hM'_le_T : derivedInG hyp.T ≤ hyp.T := Subgroup.map_subtype_le _
       have hT_le_NQ : hyp.T ≤ Subgroup.normalizer (hyp.Q : Set G) := by
         rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.T
-      haveI hQn_normal : (hyp.Q.subgroupOf (derivedInG hyp.T)).Normal :=
+      have hQn_normal : (hyp.Q.subgroupOf (derivedInG hyp.T)).Normal :=
         (Subgroup.normal_subgroupOf_iff_le_normalizer hQ_le).mpr (hM'_le_T.trans hT_le_NQ)
       refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
       · rw [disjoint_iff]

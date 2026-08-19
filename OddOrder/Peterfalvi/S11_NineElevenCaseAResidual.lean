@@ -85,7 +85,7 @@ theorem caseA_sThree_coherent [Finite G] {M : Subgroup G} {A : Set G}
       (OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)) := by
   classical
-  haveI := derivedInG_subgroupOf_normal M
+  have := derivedInG_subgroupOf_normal M
   have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
   have hIKF : ∀ ⦃x : ClassFunction ↥M ℂ⦄,
       x ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) →
@@ -187,7 +187,7 @@ theorem caseA_normBound_of_sevenEightRefutation [Finite G] {M : Subgroup G} {A :
       (OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M) := by
   classical
-  haveI := derivedInG_subgroupOf_normal M
+  have := derivedInG_subgroupOf_normal M
   intro S₂ hS₁sub hS₂sub hS₂conj hS₂coh hS₃ne hpairs h2a hCUprime hS3deg hcount hFbound hS2deg
   set A0 : Set ↥M := OddOrder.Peterfalvi.S04.supportInSubgroup
     (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M with hA0def
@@ -447,7 +447,7 @@ theorem caseA_sevenEightRefutation [Finite G] {M : Subgroup G} {A : Set G}
       (OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M) := by
   classical
-  haveI := derivedInG_subgroupOf_normal M
+  have := derivedInG_subgroupOf_normal M
   set A0 : Set ↥M := OddOrder.Peterfalvi.S04.supportInSubgroup
     (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M with hA0def
   set tau : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G :=

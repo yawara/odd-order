@@ -36,7 +36,7 @@ sorry-free の**条件付き補題**として与える: `Ḡ = G/O_{p'}(G)` へ�
 Thompson subgroup `Subgroup.thompsonJAbelian` (issue 9403 の設計裁定; BG は `J` を
 自前定義せず "**G**" を引用するのみ) で, Glauberman `Z(J)`-定理本体
 (`GroupTheory/GlaubermanZJ.lean`, Gorenstein Ch.8 §2 の完全形式化) に商の
-p-stability (`AppA.isPStableOp_of_odd_solvable`) + p-constraint (Hall-Higman) を
+p-stability (`AppA.isPStableOp_of_odd_isSolvable`) + p-constraint (Hall-Higman) を
 供給して閉じた. 以下の elementary-`thompsonJ` 版の条件付き補題は歴史的経緯
 (elementary 版では Gorenstein Lem 2.1 が偽で `hZJ` は discharge 不能).
 
@@ -86,16 +86,16 @@ variable {G : Type u} [Group G]
 `GroupTheory/GlaubermanZJ.lean` の `inf_zCenter_thompsonJAbelian_normal` を使って**無条件で**
 証明済. 本定理は初等可換版の条件付きミラーであり, 書籍 6.2 の未形式化を意味しない. -/
 theorem zCenterThompsonJ_sup_oPiCore_normal_of_reduced [Finite G] {p : ℕ} [Fact p.Prime]
-    (_hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd : Odd (Nat.card G)) (S : Sylow p G)
-    (hZJ : ∀ (H : Type u) [Group H] [Finite H], IsSolvable H → Odd (Nat.card H) →
+    (_hp_odd : p ≠ 2) (hsolv : Group.IsSolvable G) (hodd : Odd (Nat.card G)) (S : Sylow p G)
+    (hZJ : ∀ (H : Type u) [Group H] [Finite H], Group.IsSolvable H → Odd (Nat.card H) →
       oPiCore {q | q ≠ p} H = ⊥ → ∀ (T : Sylow p H),
         (Subgroup.centralizer (Subgroup.thompsonJ (T : Subgroup H) p : Set H) ⊓
           Subgroup.thompsonJ (T : Subgroup H) p).Normal) :
     (Subgroup.centralizer (Subgroup.thompsonJ (S : Subgroup G) p : Set G) ⊓
         Subgroup.thompsonJ (S : Subgroup G) p ⊔ oPiCore {q | q ≠ p} G).Normal := by
-  haveI : IsSolvable G := hsolv
+  have : Group.IsSolvable G := hsolv
   set N := oPiCore {q | q ≠ p} G with hN_def
-  haveI hN_normal : N.Normal := by rw [hN_def]; infer_instance
+  have hN_normal : N.Normal := by rw [hN_def]; infer_instance
   set J := Subgroup.thompsonJ (S : Subgroup G) p with hJ_def
   -- `¬ p ∣ |N|` (N は `p'`-群)
   have hpN : ¬ p ∣ Nat.card ↥N := fun hd =>
@@ -175,16 +175,16 @@ open Subgroup in
 
 証明 = Gorenstein Thm 8.2.11 の引き戻し形
 (`Subgroup.zCenter_thompsonJAbelian_sup_oPiCorePrime_normal`) へ商
-`Ḡ = G/O_{p'}(G)` の p-stability (`AppA.isPStableOp_of_odd_solvable` =
+`Ḡ = G/O_{p'}(G)` の p-stability (`AppA.isPStableOp_of_odd_isSolvable` =
 Gorenstein 6.5.3 / BG Thm A.4 系) と p-constraint (Hall-Higman
 `hall_higman_solvable_specialization` = BG Prop 1.15(a)) を供給。
 Issue 3017/3024/9403. -/
 theorem zCenterThompsonJAbelian_sup_oPiCore_normal [Finite G] {p : ℕ} [Fact p.Prime]
-    (hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd : Odd (Nat.card G)) (S : Sylow p G) :
+    (hp_odd : p ≠ 2) (hsolv : Group.IsSolvable G) (hodd : Odd (Nat.card G)) (S : Sylow p G) :
     (Subgroup.centralizer (Subgroup.thompsonJAbelian (S : Subgroup G) : Set G)
         ⊓ Subgroup.thompsonJAbelian (S : Subgroup G)
       ⊔ oPiCore {q | q ≠ p} G).Normal := by
-  haveI : IsSolvable G := hsolv
+  have : Group.IsSolvable G := hsolv
   set N := oPiCore {q | q ≠ p} G with hN_def
   have hoddbar : Odd (Nat.card (G ⧸ N)) := by
     obtain ⟨c, hc⟩ := N.index_dvd_card
@@ -192,7 +192,7 @@ theorem zCenterThompsonJAbelian_sup_oPiCore_normal [Finite G] {p : ℕ} [Fact p.
     exact (Nat.odd_mul.mp hodd).1
   -- p-stability on `Ḡ` (Gorenstein 6.5.3)
   have hstable : Subgroup.IsPStableOp p (G ⧸ N) :=
-    OddOrder.BG.AppA.isPStableOp_of_odd_solvable hp_odd inferInstance hoddbar
+    OddOrder.BG.AppA.isPStableOp_of_odd_isSolvable hp_odd inferInstance hoddbar
   -- p-constraint on `Ḡ` (Hall-Higman; `O_{p'}(Ḡ) = ⊥`)
   have hset : {q | q ∉ ({p} : Set ℕ)} = {q | q ≠ p} := by ext q; simp
   have hconstr := OddOrder.BG.Ch1.S01.hall_higman_solvable_specialization

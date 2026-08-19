@@ -847,7 +847,7 @@ theorem exists_mem_K_mu_sq_inv_eq {m : ℕ} (hm : m ≠ 0)
     (hc : c ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m) (hc0 : c ≠ 0) :
     ∃ (a : G) (haK : a ∈ hyp.K),
       ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E)⁻¹ = c := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   -- a square root of `c⁻¹` inside `F`
   have hcinv : c⁻¹ ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m :=
     Subfield.inv_mem _ hc
@@ -890,7 +890,7 @@ and fixes their sum — `w` is the trace of `ζ`. -/
 theorem mu_W_add_inv_mem_frobFixed {m : ℕ} (M : hyp.QuotientFieldModel m) (v : ↥hyp.W) :
     ((M.mu (1, v) : M.Eˣ) : M.E) + ((M.mu (1, v) : M.Eˣ) : M.E)⁻¹
       ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   rw [OddOrder.FiniteField.mem_frobFixedSubfield, ← M.bar_apply, map_add, M.bar_mu_W v,
     map_inv₀, M.bar_mu_W v, inv_inv, add_comm]
 
@@ -1121,7 +1121,7 @@ theorem stepThree_star_all (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
           + (((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)
               + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹) * (X + θ X) = 0 := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have h2E : (2 : M.E) = 0 := by
     have := M.charTwo
     simpa using (CharP.cast_eq_zero M.E 2)
@@ -1247,7 +1247,7 @@ theorem stepThree (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
           hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0)
         = ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)
           + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹ := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have h2E : (2 : M.E) = 0 := by
     have := M.charTwo
     simpa using (CharP.cast_eq_zero M.E 2)
@@ -1314,7 +1314,7 @@ theorem stepThree_of_odd (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
           hyp.centerCoord sfive M ι hyp.distinguishedInvolution_mem_Q0)
         = ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)
           + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹ := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have h2E : (2 : M.E) = 0 := by
     have := M.charTwo
     simpa using (CharP.cast_eq_zero M.E 2)
@@ -1338,7 +1338,7 @@ theorem stepThree_of_odd (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     linear_combination hs - (((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)
       + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹) * (X : M.E) * h2E
   · -- `θ|_F ≠ 1`: the odd order forces `m ≥ 3`, i.e. the book's `|F| ≥ 8`
-    haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+    have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
     have hm3 : 3 ≤ m :=
       OddOrder.RingAut.three_le_of_odd_orderOf (p := 2)
         (OddOrder.FiniteField.natCard_frobFixedSubfield M.card hm) hodd hne
@@ -1388,7 +1388,7 @@ theorem thetaModel_eq_id_on_frobFixed {m : ℕ} (M : hyp.QuotientFieldModel m)
     (hστ : ∀ a ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, σ a = τ a) :
     (∀ a ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, σ a = a) ∧
       (∀ a ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, θm a = a) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have h2E : (2 : M.E) = 0 := by
     have := M.charTwo
     simpa using (CharP.cast_eq_zero M.E 2)

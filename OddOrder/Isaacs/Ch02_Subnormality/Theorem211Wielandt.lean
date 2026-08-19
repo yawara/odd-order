@@ -96,7 +96,7 @@ private theorem subset_fitting_aux : ∀ n : ℕ,
       rw [Subgroup.mem_center_iff]
       intro ⟨g, hg⟩
       exact Subtype.ext (hAab g hg x hx)
-    haveI hA_nilp : Group.IsNilpotent ↥A := ⟨1, by
+    have hA_nilp : Group.IsNilpotent ↥A := ⟨1, by
       rw [Subgroup.upperCentralSeries_one]; exact hA_center_top⟩
     -- Case split: A subnormal in G.
     by_cases hA_sn : A.IsSubnormal
@@ -106,7 +106,7 @@ private theorem subset_fitting_aux : ∀ n : ℕ,
     -- IH gives `A.subgroupOf K` subnormal in K for every proper K ⊇ A.
     have hAK_sn : ∀ K : Subgroup G, A ≤ K → K ≠ ⊤ → (A.subgroupOf K).IsSubnormal := by
       intro K hAK hKne
-      haveI : Finite K := inferInstance
+      have : Finite K := inferInstance
       have hKcard : Nat.card K ≤ n := by
         have hKlt_card : Nat.card K < Nat.card G := by
           have hKlag := K.card_mul_index
@@ -505,7 +505,7 @@ private theorem le_fitting_of_baer_aux :
         have hHy_le_K : ((MulAut.conj (y : G)) • H : Subgroup G) ≤ K :=
           Subgroup.conj_smul_le_of_le hHK y
         rw [← Subgroup.subgroupOf_sup hHK hHy_le_K]
-        haveI : Group.IsNilpotent
+        have : Group.IsNilpotent
             ↥(H ⊔ ((MulAut.conj (y : G)) • H) : Subgroup G) := hN (y : G)
         have hsup_le_K : (H ⊔ ((MulAut.conj (y : G)) • H) : Subgroup G) ≤ K :=
           sup_le hHK hHy_le_K
@@ -522,8 +522,8 @@ private theorem le_fitting_of_baer_aux :
         intro h_top
         apply hSnneg
         rw [h_top] at hNx
-        haveI := hNx
-        haveI hG_nilp : Group.IsNilpotent G :=
+        have := hNx
+        have hG_nilp : Group.IsNilpotent G :=
           Group.nilpotent_of_mulEquiv (Subgroup.topEquiv : (⊤ : Subgroup G) ≃* G)
         exact isSubnormal_of_isNilpotent_finite H
       -- ⟨H, H^x⟩ ≤ M (M は H を含む唯一の極大).
@@ -733,10 +733,10 @@ theorem mem_opCore_of_le_fitting_of_isPGroup [Finite G] {p : ℕ} [Fact p.Prime]
     hH_pgroup.of_equiv (Subgroup.subgroupOfEquivOfLe hH_fit).symm
   -- Sylow p of fitting G containing Hin.
   obtain ⟨Q, hHin_le_Q⟩ := hHin_pgroup.exists_le_sylow
-  haveI hQ_normal : (Q : Subgroup (fitting G)).Normal := Sylow.normal_of_isNilpotent _
-  haveI hQ_char : (Q : Subgroup (fitting G)).Characteristic :=
+  have hQ_normal : (Q : Subgroup (fitting G)).Normal := Sylow.normal_of_isNilpotent _
+  have hQ_char : (Q : Subgroup (fitting G)).Characteristic :=
     Sylow.characteristic_of_normal _ hQ_normal
-  haveI : ((Q : Subgroup (fitting G)).map (fitting G).subtype).Normal := inferInstance
+  have : ((Q : Subgroup (fitting G)).map (fitting G).subtype).Normal := inferInstance
   have hpgroupG : IsPGroup p ((Q : Subgroup (fitting G)).map (fitting G).subtype) :=
     Q.2.map (fitting G).subtype
   have hQ_le_op : (Q : Subgroup (fitting G)).map (fitting G).subtype ≤ opCore p G :=
@@ -768,7 +768,7 @@ Matsuyama の核心):
 theorem matsuyama [Finite G] {t : G} (ht_sq : t * t = 1)
     (ht_notin : t ∉ opCore 2 G) :
     ∃ x : G, ∃ p : ℕ, p.Prime ∧ Odd p ∧ orderOf x = p ∧ t * x * t = x⁻¹ := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   -- Step 1: t ≠ 1.
   have ht_ne_one : t ≠ 1 := fun h => ht_notin (h ▸ Subgroup.one_mem _)
   set T : Subgroup G := Subgroup.zpowers t with hT_def
@@ -819,7 +819,7 @@ theorem matsuyama [Finite G] {t : G} (ht_sq : t * t = 1)
     ext x
     simp [Set.mem_insert_iff, Set.mem_singleton_iff, or_comm]
   rw [h_sup_eq] at hg
-  haveI hClosure_fin : Finite ↥(Subgroup.closure ({s, t} : Set G)) := Subtype.finite
+  have hClosure_fin : Finite ↥(Subgroup.closure ({s, t} : Set G)) := Subtype.finite
   -- Step 7: ⟨{s, t}⟩ not 2-group.
   have h_not_pgroup : ¬ IsPGroup 2 ↥(Subgroup.closure ({s, t} : Set G)) := fun h =>
     hg h.isNilpotent
@@ -828,7 +828,7 @@ theorem matsuyama [Finite G] {t : G} (ht_sq : t * t = 1)
     h_not_pgroup (IsPGroup.iff_card.mpr ⟨k, hk⟩)
   obtain ⟨q, hq_prime, hq_dvd, hq_odd⟩ :=
     exists_odd_prime_dvd_of_not_pow_two _ Nat.card_pos h_card_not_pow
-  haveI hq_fact : Fact q.Prime := ⟨hq_prime⟩
+  have hq_fact : Fact q.Prime := ⟨hq_prime⟩
   -- Step 8: Cauchy ⇒ ∃ y of order q.
   obtain ⟨y, hy_ord⟩ := exists_prime_orderOf_dvd_card' q hq_dvd
   have h_ord_y_G : orderOf (y : G) = q := by
@@ -1007,7 +1007,7 @@ theorem isPLocal_of_quotient [Finite G] {N : Subgroup G} [N.Normal] {p : ℕ} [F
   -- U ≤ M.
   have hU_le_M : U ≤ M := by rw [hM_eq_norm]; exact Subgroup.le_normalizer
   -- Step 3: pick a Sylow p-subgroup of U and lift to G.
-  haveI : Finite ↥U := Subtype.finite
+  have : Finite ↥U := Subtype.finite
   let P : Sylow p ↥U := default
   set P_G : Subgroup G := (P : Subgroup ↥U).map U.subtype with hPG_def
   have hP_pgroup : IsPGroup p ↥P_G := P.2.map U.subtype
@@ -1154,7 +1154,7 @@ theorem isPLocal_of_quotient [Finite G] {N : Subgroup G} [N.Normal] {p : ℕ} [F
   -- Apply Sylow.normalizer_sup_eq_top to get N_↥M(P_M.map _) ⊔ U.subgroupOf M = ⊤.
   have hM_le_N_sup_L : M ≤ N ⊔ L := by
     -- Set up the normality of U.subgroupOf M.
-    haveI hUM_normal : (U.subgroupOf M).Normal := by
+    have hUM_normal : (U.subgroupOf M).Normal := by
       rw [hM_eq_norm]
       exact Subgroup.normal_in_normalizer
     -- The isomorphism ↥(U.subgroupOf M) ≃* ↥U lifts the Sylow P.
@@ -1179,8 +1179,8 @@ theorem isPLocal_of_quotient [Finite G] {N : Subgroup G} [N.Normal] {p : ℕ} [F
           }
         rw [h_card_eq, Sylow.card_eq_multiplicity P])
     -- Apply Sylow.normalizer_sup_eq_top in ↥M.
-    haveI : Finite ↥M := Subtype.finite
-    haveI : Finite ↥(U.subgroupOf M) := Subtype.finite
+    have : Finite ↥M := Subtype.finite
+    have : Finite ↥(U.subgroupOf M) := Subtype.finite
     have h_frattini : Subgroup.normalizer (P_M.map (U.subgroupOf M).subtype) ⊔
         U.subgroupOf M = ⊤ :=
       Sylow.normalizer_sup_eq_top P_M

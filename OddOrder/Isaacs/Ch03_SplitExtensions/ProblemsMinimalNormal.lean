@@ -45,7 +45,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 3C.4 の形式化
 
 namespace OddOrder.Isaacs.Ch03
 
-open Subgroup Pointwise
+open _root_.OddOrder.Isaacs.Ch03.Subgroup Pointwise
 
 section /- 3C: Problem 3C.4 (p. 90) -/
 
@@ -60,7 +60,7 @@ theorem inf_centralizer_eq_bot_of_isMinimalNormal_lt
     {M L : Subgroup G} (hmin : Ch02.IsMinimalNormal M)
     (hcent : Subgroup.centralizer (M : Set G) = M) [L.Normal] (hML : M < L) :
     M ⊓ Subgroup.centralizer (L : Set G) = ⊥ := by
-  haveI := hmin.1
+  have := hmin.1
   rcases hmin.2.2 (M ⊓ Subgroup.centralizer (L : Set G)) inferInstance inf_le_left with h | h
   · exact h
   · exfalso
@@ -77,8 +77,8 @@ theorem not_isPGroup_of_isMinimalNormal_centralizer_lt
     {M L : Subgroup G} (hmin : Ch02.IsMinimalNormal M)
     (hcent : Subgroup.centralizer (M : Set G) = M) [L.Normal] (hML : M < L)
     {p : ℕ} [Fact p.Prime] (hL : IsPGroup p ↥L) : False := by
-  haveI := hmin.1
-  haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hmin.2.1
+  have := hmin.1
+  have : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hmin.2.1
   have hM : IsPGroup p ↥M := hL.to_le hML.le
   -- `L` の `M` への共役作用の固定点部分群は非自明
   have hfix := Ch04.fixedPoints_ne_bot_of_pgroup_action_pgroup hM hL
@@ -101,7 +101,7 @@ theorem not_isPGroup_of_isMinimalNormal_centralizer_lt
 /-- 3C.4 の setup (書籍 Hint): `M < ⊤` のとき, `G/M` の極小正規 `L/M` の引き戻し `L` と
 `Q ∈ Syl_q(L)` (`q` は `L/M` の素数) について, `q ∤ |M|`, `|Q| = q`-part of `|L|`,
 `|Q| · |M| = |L|`, `M ⊔ Q = L` が全て成り立つ。 -/
-private theorem exists_sylow_frattini_setup [IsSolvable G]
+private theorem exists_sylow_frattini_setup [Group.IsSolvable G]
     {M : Subgroup G} (hmin : Ch02.IsMinimalNormal M)
     (hcent : Subgroup.centralizer (M : Set G) = M) (hMtop : M ≠ ⊤) :
     ∃ (L : Subgroup G) (q : ℕ) (_ : q.Prime) (Q : Sylow q ↥L),
@@ -111,9 +111,9 @@ private theorem exists_sylow_frattini_setup [IsSolvable G]
       Nat.card ↥((Q : Subgroup ↥L).map L.subtype) * Nat.card ↥M = Nat.card ↥L ∧
       M ⊔ ((Q : Subgroup ↥L).map L.subtype) = L := by
   classical
-  haveI := hmin.1
+  have := hmin.1
   -- `G/M` は非自明
-  haveI : Nontrivial (G ⧸ M) := by
+  have : Nontrivial (G ⧸ M) := by
     obtain ⟨g, hg⟩ : ∃ g, g ∉ M := by
       by_contra h
       push Not at h
@@ -122,14 +122,14 @@ private theorem exists_sylow_frattini_setup [IsSolvable G]
   -- `G/M` の極小正規 `Lbar` を取り, elementary abelian `q`-群
   obtain ⟨Lbar, hLbar_min, -⟩ :=
     Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup (G ⧸ M)) top_ne_bot
-  obtain ⟨q, hq, hLbar_ea⟩ := solvable_minimal_normal_isElementaryAbelian hLbar_min
-  haveI : Fact q.Prime := ⟨hq⟩
+  obtain ⟨q, hq, hLbar_ea⟩ := minimal_normal_isElementaryAbelian_of_isSolvable hLbar_min
+  have : Fact q.Prime := ⟨hq⟩
   have hLbar_pgroup : IsPGroup q ↥Lbar := hLbar_ea.isPGroup
   obtain ⟨k, hLbar_card⟩ := (IsPGroup.iff_card (p := q)).mp hLbar_pgroup
-  haveI := hLbar_min.1
+  have := hLbar_min.1
   -- 引き戻し `L`
   set L : Subgroup G := Lbar.comap (QuotientGroup.mk' M) with hL_def
-  haveI hL_normal : L.Normal := Subgroup.Normal.comap hLbar_min.1 _
+  have hL_normal : L.Normal := Subgroup.Normal.comap hLbar_min.1 _
   have hML_le : M ≤ L := fun m hm => Subgroup.mem_comap.mpr (by
     rw [show (QuotientGroup.mk' M) m = 1 from (QuotientGroup.eq_one_iff m).mpr hm]
     exact Lbar.one_mem)
@@ -142,9 +142,9 @@ private theorem exists_sylow_frattini_setup [IsSolvable G]
       (QuotientGroup.mk'_surjective M) Lbar, QuotientGroup.ker_mk']
   -- `M` は `p`-群で `q ≠ p`, したがって `q ∤ |M|`
   have hqM : ¬ q ∣ Nat.card ↥M := by
-    haveI : IsSolvable ↥M := inferInstance
-    obtain ⟨p, hp, hM_ea⟩ := solvable_minimal_normal_isElementaryAbelian hmin
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Group.IsSolvable ↥M := inferInstance
+    obtain ⟨p, hp, hM_ea⟩ := minimal_normal_isElementaryAbelian_of_isSolvable hmin
+    have : Fact p.Prime := ⟨hp⟩
     obtain ⟨a, hM_card⟩ := (IsPGroup.iff_card (p := p)).mp hM_ea.isPGroup
     intro hdvd
     have hqp : q = p := by
@@ -185,7 +185,7 @@ private theorem exists_sylow_frattini_setup [IsSolvable G]
     exact Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd
       (Subgroup.card_dvd_of_le inf_le_left) (Subgroup.card_dvd_of_le inf_le_right))
   -- card で `Msub ⊔ Q = ⊤`
-  haveI : (M.subgroupOf L).Normal := hmin.1.subgroupOf L
+  have : (M.subgroupOf L).Normal := hmin.1.subgroupOf L
   have hsup_card : Nat.card ↥(M.subgroupOf L ⊔ (Q : Subgroup ↥L)) = Nat.card ↥L := by
     have hprod := Ch01.card_mul_card_inf (M.subgroupOf L) (Q : Subgroup ↥L)
     rw [hbot, Subgroup.card_bot, mul_one] at hprod
@@ -221,17 +221,17 @@ private theorem map_conj_map_subtype {L : Subgroup G} (x : ↥L) (P : Subgroup �
 
 /-- 3C.4 の本体 (`M ≠ ⊤` の場合): `Q ∈ Syl_q(L)` の正規化群 `H = N_G(Q)` が `M` の補元で,
 さらに `M` の任意の補元は `H` に共役。 -/
-private theorem exists_complement_conj_normalizer [IsSolvable G]
+private theorem exists_complement_conj_normalizer [Group.IsSolvable G]
     {M : Subgroup G} (hmin : Ch02.IsMinimalNormal M)
     (hcent : Subgroup.centralizer (M : Set G) = M) (hMtop : M ≠ ⊤) :
     ∃ H : Subgroup G, Subgroup.IsComplement' M H ∧
       ∀ K : Subgroup G, Subgroup.IsComplement' M K →
         ∃ g : G, K.map (MulAut.conj g).toMonoidHom = H := by
   classical
-  haveI := hmin.1
+  have := hmin.1
   obtain ⟨L, q, hq, Q, hL_normal, hML, hqM, hQm_card, hQm_mul, hMQL⟩ :=
     exists_sylow_frattini_setup hmin hcent hMtop
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   set Qm : Subgroup G := (Q : Subgroup ↥L).map L.subtype with hQm_def
   set H : Subgroup G := Subgroup.normalizer (Qm : Set G) with hH_def
   -- `M ⊓ Qm = ⊥` (位数が互いに素)
@@ -365,7 +365,7 @@ private theorem exists_complement_conj_normalizer [IsSolvable G]
     have h1 : Nat.card ↥Kx = Nat.card ↥K :=
       Subgroup.card_map_of_injective (MulAut.conj (x : G)).injective
     have h2 : Nat.card ↥M * Nat.card ↥K = Nat.card ↥M * Nat.card ↥H := by
-      rw [hK.card_mul, hcompl.card_mul]
+      rw [hK.card_mul_card, hcompl.card_mul_card]
     rw [h1]
     exact Nat.eq_of_mul_eq_mul_left Nat.card_pos h2
   refine ⟨(x : G), ?_⟩
@@ -376,7 +376,7 @@ private theorem exists_complement_conj_normalizer [IsSolvable G]
 
 /-- **Isaacs Problem 3C.4, 分裂** (p. 90)。`M` が有限可解群 `G` の極小正規部分群で
 `M = C_G(M)` なら, `G` は `M` 上分裂する (`M` の補元が存在する)。 -/
-theorem exists_isComplement'_of_isMinimalNormal_centralizer_eq [IsSolvable G]
+theorem exists_isComplement'_of_isMinimalNormal_centralizer_eq [Group.IsSolvable G]
     {M : Subgroup G} (hmin : Ch02.IsMinimalNormal M)
     (hcent : Subgroup.centralizer (M : Set G) = M) :
     ∃ K : Subgroup G, Subgroup.IsComplement' M K := by
@@ -387,7 +387,7 @@ theorem exists_isComplement'_of_isMinimalNormal_centralizer_eq [IsSolvable G]
 
 /-- **Isaacs Problem 3C.4, 補元の共役性** (p. 90)。`M` が有限可解群 `G` の極小正規部分群で
 `M = C_G(M)` なら, `M` の任意の 2 つの補元は共役。 -/
-theorem isComplement'_conj_of_isMinimalNormal_centralizer_eq [IsSolvable G]
+theorem isComplement'_conj_of_isMinimalNormal_centralizer_eq [Group.IsSolvable G]
     {M K K' : Subgroup G} (hmin : Ch02.IsMinimalNormal M)
     (hcent : Subgroup.centralizer (M : Set G) = M)
     (hK : Subgroup.IsComplement' M K) (hK' : Subgroup.IsComplement' M K') :
@@ -397,7 +397,7 @@ theorem isComplement'_conj_of_isMinimalNormal_centralizer_eq [IsSolvable G]
     subst hMtop
     have hbot : ∀ {J : Subgroup G}, Subgroup.IsComplement' ⊤ J → J = ⊥ := by
       intro J hJ
-      have h1 := hJ.card_mul
+      have h1 := hJ.card_mul_card
       rw [Subgroup.card_top] at h1
       exact Subgroup.card_eq_one.mp
         (Nat.eq_of_mul_eq_mul_left Nat.card_pos (h1.trans (mul_one _).symm))

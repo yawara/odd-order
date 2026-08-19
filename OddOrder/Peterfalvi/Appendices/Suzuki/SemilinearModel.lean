@@ -106,8 +106,8 @@ variable (F : Type*) [Field F] [Finite F]
 
 /-- The ring automorphism group of a finite field is cyclic. -/
 theorem ringAut_isCyclic_of_finite : IsCyclic (RingAut F) := by
-  letI : Fact (Nat.Prime (ringChar F)) := ⟨CharP.prime_ringChar F⟩
-  letI : Algebra (ZMod (ringChar F)) F := ZMod.algebra F (ringChar F)
+  let : Fact (Nat.Prime (ringChar F)) := ⟨CharP.prime_ringChar F⟩
+  let : Algebra (ZMod (ringChar F)) F := ZMod.algebra F (ringChar F)
   exact isCyclic_of_injective
     (OddOrder.RepresentationTheory.ringAutMulEquivAlgAut F (ringChar F)).toMonoidHom
     (OddOrder.RepresentationTheory.ringAutMulEquivAlgAut F (ringChar F)).injective

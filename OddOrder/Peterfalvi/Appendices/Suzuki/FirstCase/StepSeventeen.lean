@@ -45,7 +45,7 @@ theorem not_W_le_sylowThree_of_card_W_eq_nine
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
     (hW9 : Nat.card ↥fc.toHypothesis.W = 9) :
     ¬ fc.toHypothesis.W ≤ fc.sylowThreeNormalizerRSigma model := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   intro hWR₁
   have hR₁card := fc.card_sylowThreeNormalizerRSigma model ind hB2
@@ -86,9 +86,9 @@ theorem three_dvd_card_abelianization_of_card_W_eq_nine
     (hW9 : Nat.card ↥fc.toHypothesis.W = 9) :
     (3 : ℕ) ∣ Nat.card (Abelianization ↥((S : Subgroup G)
       ⊔ Subgroup.zpowers fc.toHypothesis.distinguishedInvolution)) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   set s : G := fc.toHypothesis.distinguishedInvolution with hs_def
   have hsord : orderOf s = 2 :=
     orderOf_eq_prime fc.toHypothesis.distinguishedInvolution_sq
@@ -106,7 +106,7 @@ theorem three_dvd_card_abelianization_of_card_W_eq_nine
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hR₁S).toEquiv, hR₁card,
       hScard] at h
     omega
-  haveI hR₁norm : ((fc.sylowThreeNormalizerRSigma model).subgroupOf
+  have hR₁norm : ((fc.sylowThreeNormalizerRSigma model).subgroupOf
       (S : Subgroup G)).Normal :=
     Subgroup.normal_of_index_eq_minFac_card (by rw [hR₁idx, hScard]; norm_num)
   have hconjR₁ : ∀ g ∈ (S : Subgroup G), ∀ a ∈ fc.sylowThreeNormalizerRSigma model,
@@ -289,7 +289,7 @@ theorem three_dvd_card_abelianization_of_card_W_eq_nine
   have hleSs : fc.sylowThreeNormalizerRSigma model ⊔ Subgroup.zpowers s
       ≤ (S : Subgroup G) ⊔ Subgroup.zpowers s :=
     sup_le (hR₁S.trans le_sup_left) le_sup_right
-  haveI hnormSub : ((fc.sylowThreeNormalizerRSigma model
+  have hnormSub : ((fc.sylowThreeNormalizerRSigma model
       ⊔ Subgroup.zpowers s).subgroupOf
         ((S : Subgroup G) ⊔ Subgroup.zpowers s)).Normal := by
     constructor
@@ -315,7 +315,7 @@ theorem zpowers_inf_sigma_sup_P_eq_bot
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
     Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t)
       ⊓ ((fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ⊔ fc.P) = ⊥ := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   rw [eq_bot_iff]
   intro y hy
   rw [Subgroup.mem_bot]
@@ -330,7 +330,7 @@ theorem zpowers_le_commutator_sylowThree
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
     Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t)
       ≤ ⁅fc.sylowThreeNormalizerRSigma model, fc.sylowThreeNormalizerRSigma model⁆ := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   rw [← fc.commutator_sup_eq_zpowers model ind hB2]
   exact Subgroup.commutator_mono (fc.sup_le_sylowThreeNormalizerRSigma model ind hB2)
     (fc.sup_le_sylowThreeNormalizerRSigma model ind hB2)
@@ -349,7 +349,7 @@ theorem not_sigma_sup_P_le_commutator_sylowThree
     ¬ ((fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ⊔ fc.P)
       ≤ ⁅fc.sylowThreeNormalizerRSigma model,
         fc.sylowThreeNormalizerRSigma model⁆ := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   intro hle
   obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
@@ -426,7 +426,7 @@ theorem card_commutator_sylowThree_le
         ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P) :
     Nat.card ↥(⁅fc.sylowThreeNormalizerRSigma model,
       fc.sylowThreeNormalizerRSigma model⁆ : Subgroup G) ≤ 9 := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨-, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
   have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
@@ -646,9 +646,9 @@ theorem commutator_sylowThree_le_zpowers_sup_sigma_sup_P
       ≤ (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
           * fc.toHypothesis.t)
         ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   obtain ⟨-, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
   have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
   have hZ₁R : Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
@@ -664,7 +664,7 @@ theorem commutator_sylowThree_le_zpowers_sup_sigma_sup_P
       (fc.sup_le_sylowThreeNormalizerRSigma model ind hB2)
   have hcommZ := fc.commutator_zpowers_sup_sigma_sup_P_sylowThree_le model ind hB2
   -- `Z₁ΣP` is normal in `R₁`
-  haveI hnorm : (((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
+  have hnorm : (((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
         * fc.toHypothesis.t)
       ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P).subgroupOf
         (fc.sylowThreeNormalizerRSigma model)).Normal := by
@@ -696,7 +696,7 @@ theorem commutator_sylowThree_le_zpowers_sup_sigma_sup_P
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hZSP_R₁).toEquiv, hZSPcard,
       hR₁card] at h
     omega
-  haveI : IsMulCommutative (↥(fc.sylowThreeNormalizerRSigma model)
+  have : IsMulCommutative (↥(fc.sylowThreeNormalizerRSigma model)
       ⧸ ((Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
           * fc.toHypothesis.t)
         ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P).subgroupOf
@@ -755,9 +755,9 @@ theorem three_dvd_card_abelianization_of_card_W_eq_three
     (hW3 : Nat.card ↥fc.toHypothesis.W = 3) :
     (3 : ℕ) ∣ Nat.card (Abelianization ↥((S : Subgroup G)
       ⊔ Subgroup.zpowers fc.toHypothesis.distinguishedInvolution)) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   obtain ⟨-, hp3, hF9, -, -, hGp⟩ := fc.step_twelve model ind hB2
   set s : G := fc.toHypothesis.distinguishedInvolution with hs_def
   set R₁ : Subgroup G := fc.sylowThreeNormalizerRSigma model with hR₁_def
@@ -1081,7 +1081,7 @@ theorem false_of_transfer_control
       (3 : ℕ) ∣ Nat.card (Abelianization ↥((S : Subgroup G)
         ⊔ Subgroup.zpowers fc.toHypothesis.distinguishedInvolution))) :
     False := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   obtain ⟨-, -, -, -, hW, -⟩ := fc.step_twelve model ind hB2
   have hNeq : Subgroup.normalizer ((((Subgroup.zpowers
         (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t)

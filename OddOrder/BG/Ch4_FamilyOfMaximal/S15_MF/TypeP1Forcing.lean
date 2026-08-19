@@ -49,12 +49,12 @@ theorem msigma_eq_commutator_kappa_of_isComplement' [Finite G]
       (K.subgroupOf M)) :
     ⁅(OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M, K.subgroupOf M⁆
       = (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M := by
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hM_le_NMσ :
       M ≤ Subgroup.normalizer ((OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) := by
     rw [OddOrder.BG.Ch3.S10.Msigma]
     exact le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M
-  haveI hMσ_norm : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal :=
+  have hMσ_norm : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer
       (OddOrder.BG.Ch3.S10.Msigma_le M)).mpr hM_le_NMσ
   have hMσ_le : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ≤ commutator ↥M := by
@@ -93,7 +93,7 @@ theorem centralizer_kappa_inf_fittingInAmbient_ne_bot_of_inputs [Finite G]
     Subgroup.centralizer (K.subgroupOf M : Set ↥M)
         ⊓ fittingInAmbient ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) ≠ ⊥ := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   -- `M` has odd order (divisor of `|G|`).
   have hoddM : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
   -- `M_σ` non-nilpotent (else `M_F = M_σ`), transported to the `subgroupOf` realization.
@@ -102,7 +102,7 @@ theorem centralizer_kappa_inf_fittingInAmbient_ne_bot_of_inputs [Finite G]
   have hMσ'_not_nil :
       ¬ Group.IsNilpotent ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) := by
     intro hnil
-    haveI := hnil
+    have := hnil
     exact hMσ_not_nil
       (Group.nilpotent_of_mulEquiv
         (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch3.S10.Msigma_le M)))
@@ -111,7 +111,7 @@ theorem centralizer_kappa_inf_fittingInAmbient_ne_bot_of_inputs [Finite G]
       M ≤ Subgroup.normalizer ((OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) := by
     rw [OddOrder.BG.Ch3.S10.Msigma]
     exact le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M
-  haveI hMσ_norm : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal :=
+  have hMσ_norm : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer
       (OddOrder.BG.Ch3.S10.Msigma_le M)).mpr hM_le_NMσ
   -- Contrapositive of Theorem 3.8: assume `C_{F(M_σ)}(K) = 1`.
@@ -154,7 +154,7 @@ theorem kstar_le_fittingInAmbient_of_inputs [Finite G]
       ≤ fittingInAmbient ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) := by
   have hcore :=
     centralizer_kappa_inf_fittingInAmbient_ne_bot_of_inputs hG hM hcompl hcop hcond2 hne
-  haveI : Fact (Nat.card ↥(Subgroup.centralizer (K.subgroupOf M : Set ↥M)
+  have : Fact (Nat.card ↥(Subgroup.centralizer (K.subgroupOf M : Set ↥M)
       ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)).Prime := ⟨hq⟩
   -- `K* ⊓ F(M_σ) = C(K) ⊓ F(M_σ) ≠ ⊥` (since `F(M_σ) ≤ M_σ`).
   have hInf_ne : (Subgroup.centralizer (K.subgroupOf M : Set ↥M)
@@ -182,7 +182,7 @@ theorem kstar_le_opiCore_of_le_fittingInAmbient [Finite G]
         ≤ fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M)) :
     OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)
         ≤ opiCoreInG ({q} : Set ℕ) M := by
-  haveI : Group.IsNilpotent ↥(fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M)) :=
+  have : Group.IsNilpotent ↥(fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M)) :=
     OddOrder.BG.Ch2.S08.fittingInG_isNilpotent _
   -- step A: `K* ⊆ O_q(F(M_σ))` — a `q`-subgroup of the nilpotent `F(M_σ)`.
   have hA : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)
@@ -309,9 +309,9 @@ theorem complement_isNilpotent_of_inputs [Finite G]
     (hCentleQ : ∀ r ∈ (K : Set G), r ≠ 1 →
       Subgroup.centralizer ({r} : Set G) ⊓ OddOrder.BG.Ch3.S10.Msigma M ≤ Q) :
     Group.IsNilpotent ↥D := by
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-  haveI : IsSolvable ↥(D ⊔ K₁) :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective (sup_le hDM hK₁M))
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥(D ⊔ K₁) :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective (sup_le hDM hK₁M))
   refine OddOrder.BG.Ch1.S03c.isNilpotent_of_normalizing_primeOrder_fixedPointFree
     hK₁norm hDK₁disj hDne hK₁ne hK₁prime ?_
   intro r hrK₁ hr1 n hnD hn1 hfix
@@ -358,7 +358,7 @@ theorem isTypeP1_of_mf_ne_msigma [Finite G]
     have hEne : E ≠ ⊥ := hsetup.E_ne_bot hG
     have hEcard : Nat.card ↥E ≠ 1 := fun hc => hEne (Subgroup.card_eq_one.mp hc)
     obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hEcard
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     have hpE : p ∈ (Nat.card ↥E).primeFactors :=
       Nat.mem_primeFactors.mpr ⟨hp, hpdvd, Nat.card_pos.ne'⟩
     have hpσ : p ∉ OddOrder.BG.Ch3.S10.sigma M :=
@@ -421,7 +421,7 @@ theorem kstar_card_prime_of_inputs [Finite G]
   have hMstar2 : S14.IsTypeP2 Mstar :=
     hP2disj.resolve_left (fun hM2 => S14.not_isTypeP1_and_isTypeP2 ⟨hP1, hM2⟩)
   -- A Hall `(κ(M*) ∪ σ(M*))'`-subgroup `U*` of `M*` (Hall's theorem in the solvable `M*`).
-  haveI : IsSolvable ↥Mstar := hG.solvable_of_mem_maximalSubgroups hMstarMax
+  have : Group.IsSolvable ↥Mstar := hG.isSolvable_of_mem_maximalSubgroups hMstarMax
   obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥Mstar)
     ((S14.kappa Mstar ∪ OddOrder.BG.Ch3.S10.sigma Mstar)ᶜ)
   have hUeq : (U'.map Mstar.subtype).subgroupOf Mstar = U' :=

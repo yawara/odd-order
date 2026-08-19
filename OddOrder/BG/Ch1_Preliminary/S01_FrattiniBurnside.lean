@@ -277,7 +277,7 @@ private instance hallSubgroupsConjAction {G : Type*} [Group G] [Finite G] (π : 
     MulAction G (HallSubgroups π G) :=
   MulAction.compHom (HallSubgroups π G) (MulAut.conj : G →* MulAut G)
 
-private theorem hallSubgroups_pretransitive {G : Type*} [Group G] [Finite G] [IsSolvable G]
+private theorem hallSubgroups_pretransitive {G : Type*} [Group G] [Finite G] [Group.IsSolvable G]
     (π : Set ℕ) :
     MulAction.IsPretransitive G (HallSubgroups π G) := by
   constructor
@@ -296,14 +296,14 @@ group `A` with coprime orders, then `A` fixes some Hall `π`-subgroup of `G`.
 Proof: let `G` act by conjugation and `A` act through `φ` on the type of Hall `π`-subgroups.
 Hall existence makes this type nonempty, Hall conjugacy makes the `G`-action transitive, and
 Glauberman's fixed-point lemma gives an `A`-fixed Hall subgroup. -/
-theorem exists_aInvariant_hall {G A : Type*} [Group G] [Finite G] [IsSolvable G]
+theorem exists_aInvariant_hall {G A : Type*} [Group G] [Finite G] [Group.IsSolvable G]
     [Group A] [Finite A] {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) (π : Set ℕ) :
     ∃ H : Subgroup G, OddOrder.Isaacs.Ch03.IsHallSubgroup π H ∧
       OddOrder.Isaacs.Ch03.IsAInvariant φ H := by
   let Ω := HallSubgroups π G
-  letI : MulAction A Ω := MulAction.compHom Ω φ
-  haveI hΩ_nonempty : Nonempty Ω := by
+  let : MulAction A Ω := MulAction.compHom Ω φ
+  have hΩ_nonempty : Nonempty Ω := by
     obtain ⟨H, hH⟩ := OddOrder.Isaacs.Ch03.hall_E_exists (G := G) π
     exact ⟨⟨H, hH⟩⟩
   have hcompat : OddOrder.Isaacs.Ch04.IsCompatibleMulAction φ Ω := by
@@ -327,7 +327,7 @@ theorem exists_aInvariant_hall {G A : Type*} [Group G] [Finite G] [IsSolvable G]
 under a coprime operator group are conjugate by an element fixed by every operator in `A`.
 
 This is the Hall-subgroup specialization of Glauberman's conjugacy fixed-point lemma. -/
-theorem aInvariant_hall_conj {G A : Type*} [Group G] [Finite G] [IsSolvable G]
+theorem aInvariant_hall_conj {G A : Type*} [Group G] [Finite G] [Group.IsSolvable G]
     [Group A] [Finite A] {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) {π : Set ℕ}
     {H K : Subgroup G}
@@ -337,7 +337,7 @@ theorem aInvariant_hall_conj {G A : Type*} [Group G] [Finite G] [IsSolvable G]
     (hK_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ K) :
     ∃ c : G, (∀ a : A, (φ a) c = c) ∧ MulAut.conj c • H = K := by
   let Ω := HallSubgroups π G
-  letI : MulAction A Ω := MulAction.compHom Ω φ
+  let : MulAction A Ω := MulAction.compHom Ω φ
   let HΩ : Ω := ⟨H, hH_hall⟩
   let KΩ : Ω := ⟨K, hK_hall⟩
   have hH_fix : ∀ a : A, a • HΩ = HΩ := by
@@ -474,7 +474,7 @@ private theorem isPiGroup_map_mk'
 private theorem card_quotient_lt_card_of_ne_bot
     {G : Type*} [Group G] [Finite G] {N : Subgroup G} [N.Normal] (hN_ne_bot : N ≠ ⊥) :
     Nat.card (G ⧸ N) < Nat.card G := by
-  haveI : Nontrivial N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN_ne_bot
+  have : Nontrivial N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN_ne_bot
   have hN_one_lt : 1 < Nat.card N := Finite.one_lt_card
   have hQ_pos : 0 < Nat.card (G ⧸ N) := Nat.card_pos
   rw [Subgroup.card_eq_card_quotient_mul_card_subgroup N]
@@ -616,14 +616,14 @@ minimality is only among `A`-invariant normal subgroups below `M`, not among all
 subgroups.  Solvability still forces `⁅M, M⁆ < M`; since `⁅M, M⁆` is again normal and
 `A`-invariant, minimality makes the commutator trivial. -/
 private theorem isMulCommutative_of_minimal_normal_aInvariant
-    {G A : Type*} [Group G] [Finite G] [IsSolvable G]
+    {G A : Type*} [Group G] [Finite G] [Group.IsSolvable G]
     [Group A] {φ : A →* MulAut G} {M : Subgroup G} [M.Normal]
     (hM_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ M)
     (hM_ne_bot : M ≠ ⊥)
     (hM_min : ∀ N : Subgroup G, N.Normal →
       OddOrder.Isaacs.Ch03.IsAInvariant φ N → N ≤ M → N ≠ ⊥ → M ≤ N) :
     IsMulCommutative M := by
-  have hcomm_lt : ⁅M, M⁆ < M := IsSolvable.commutator_lt_of_ne_bot hM_ne_bot
+  have hcomm_lt : ⁅M, M⁆ < M := Group.IsSolvable.commutator_lt_of_ne_bot hM_ne_bot
   have hcomm_bot : (⁅M, M⁆ : Subgroup G) = ⊥ := by
     by_contra hcomm_ne_bot
     have hM_le_comm : M ≤ ⁅M, M⁆ :=
@@ -643,7 +643,7 @@ After the preceding commutativity lemma, a Sylow subgroup of `M` is characterist
 its image in `G` is therefore again normal and `A`-invariant. Minimality forces that image to
 be all of `M`. -/
 private theorem exists_prime_isPGroup_of_minimal_normal_aInvariant
-    {G A : Type*} [Group G] [Finite G] [IsSolvable G]
+    {G A : Type*} [Group G] [Finite G] [Group.IsSolvable G]
     [Group A] {φ : A →* MulAut G} {M : Subgroup G} [M.Normal]
     (hM_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ M)
     (hM_ne_bot : M ≠ ⊥)
@@ -651,16 +651,16 @@ private theorem exists_prime_isPGroup_of_minimal_normal_aInvariant
       OddOrder.Isaacs.Ch03.IsAInvariant φ N → N ≤ M → N ≠ ⊥ → M ≤ N) :
     ∃ p : ℕ, p.Prime ∧ IsPGroup p M := by
   classical
-  haveI hM_comm : IsMulCommutative M :=
+  have hM_comm : IsMulCommutative M :=
     isMulCommutative_of_minimal_normal_aInvariant hM_inv hM_ne_bot hM_min
   have hM_card_ne_one : Nat.card M ≠ 1 := by
     intro hcard
     exact hM_ne_bot ((Subgroup.eq_bot_iff_card M).mpr hcard)
   obtain ⟨p, hp_prime, hp_dvd⟩ := Nat.exists_prime_and_dvd hM_card_ne_one
-  haveI hpFact : Fact p.Prime := ⟨hp_prime⟩
+  have hpFact : Fact p.Prime := ⟨hp_prime⟩
   let P : Sylow p M := default
   have hP_normal : (P : Subgroup M).Normal := Subgroup.normal_of_isMulCommutative (P : Subgroup M)
-  haveI hP_char : (P : Subgroup M).Characteristic :=
+  have hP_char : (P : Subgroup M).Characteristic :=
     Sylow.characteristic_of_normal P hP_normal
   let Pmap : Subgroup G := (P : Subgroup M).map M.subtype
   have hPmap_normal : Pmap.Normal := by
@@ -804,7 +804,7 @@ An invariant Hall subgroup `Q` complements `M`; inside `K ⊔ M`, the subgroups 
 of `K ⊔ M`.  The conjugate of `Q` is the desired invariant Hall overgroup of `K`.
 -/
 private theorem top_preimage_branch_frame
-    {G A : Type*} [Group G] [Finite G] [IsSolvable G]
+    {G A : Type*} [Group G] [Finite G] [Group.IsSolvable G]
     [Group A] [Finite A] {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
     {π : Set ℕ} {K M : Subgroup G} [M.Normal]
@@ -948,7 +948,7 @@ open OddOrder.Isaacs.Ch03.IsAInvariant
 /-- Induction kernel for BG Prop. 1.5(b). -/
 private theorem aInvariant_piSubgroup_le_aInvariant_hall_aux :
     ∀ n : ℕ,
-      ∀ (G A : Type*) [Group G] [Finite G] [IsSolvable G]
+      ∀ (G A : Type*) [Group G] [Finite G] [Group.IsSolvable G]
         [Group A] [Finite A],
         Nat.card G ≤ n → ∀ {φ : A →* MulAut G}
         (_hCop : Nat.Coprime (Nat.card A) (Nat.card G))
@@ -979,13 +979,13 @@ private theorem aInvariant_piSubgroup_le_aInvariant_hall_aux :
           simp at hp)
       have hG_card_gt_one : 1 < Nat.card G :=
         Nat.one_lt_iff_ne_zero_and_ne_one.mpr ⟨Nat.card_pos.ne', hG_card_ne_one⟩
-      haveI : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp hG_card_gt_one
+      have : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp hG_card_gt_one
       obtain ⟨M, hM_normal, hM_inv, hM_ne_bot, hM_min⟩ :=
         exists_minimal_normal_aInvariant (G := G) (A := A) (φ := φ)
-      haveI : M.Normal := hM_normal
+      have : M.Normal := hM_normal
       obtain ⟨p, hp_prime, hM_p⟩ :=
         exists_prime_isPGroup_of_minimal_normal_aInvariant hM_inv hM_ne_bot hM_min
-      haveI : Fact p.Prime := ⟨hp_prime⟩
+      have : Fact p.Prime := ⟨hp_prime⟩
       have hquot_lt : Nat.card (G ⧸ M) < Nat.card G :=
         card_quotient_lt_card_of_ne_bot hM_ne_bot
       have hquot_le_n : Nat.card (G ⧸ M) ≤ n := by
@@ -1040,7 +1040,7 @@ private theorem aInvariant_piSubgroup_le_aInvariant_hall_aux :
  group `A` with coprime order, every `A`-invariant `π`-subgroup is contained in an
 `A`-invariant Hall `π`-subgroup. -/
 theorem aInvariant_piSubgroup_le_aInvariant_hall
-    {G A : Type*} [Group G] [Finite G] [IsSolvable G]
+    {G A : Type*} [Group G] [Finite G] [Group.IsSolvable G]
     [Group A] [Finite A] {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
     {π : Set ℕ} {K : Subgroup G}
@@ -1127,7 +1127,7 @@ For `g = k*h` with `k ∈ K ≤ C_G(A)` and `h ∈ H`, each generator
 `g⁻¹ * (φ a) g` of `[G,A]` reduces to `h⁻¹ * (φ a) h ∈ H`; hence `[G,A] ≤ H`.
 Since `[G,A]` is normal, it is a normal `π`-subgroup and therefore lies in `O_π(G)`. -/
 theorem actionCommutator_le_oPiCore_of_fixedPoints_contains_hallComplement
-    {G A : Type*} [Group G] [Finite G] [IsSolvable G]
+    {G A : Type*} [Group G] [Finite G] [Group.IsSolvable G]
     [Group A] [Finite A] {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
     {π : Set ℕ} {K : Subgroup G}
@@ -1168,7 +1168,7 @@ theorem iterCommutator_inl_inr_one_eq_bot_of_two_eq_bot
     {G A : Type*} [Group G] [Finite G] [Group A] [Finite A]
     {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G)
     (h_two : OddOrder.Isaacs.Ch04.iterCommutator
         (SemidirectProduct.inl : G →* G ⋊[φ] A).range
         (SemidirectProduct.inr : A →* G ⋊[φ] A).range 2 = ⊥) :
@@ -1185,7 +1185,7 @@ theorem iterCommutator_inl_inr_one_eq_bot_of_two_eq_bot
 Lean packages the internal direct product as a complement: multiplication from
 `C_G(A) × [G,A]` onto `G` is bijective. -/
 theorem fixedPoints_isComplement_actionCommutator_of_abelian
-    {G A : Type*} [CommGroup G] [Finite G] [IsSolvable G]
+    {G A : Type*} [CommGroup G] [Finite G] [Group.IsSolvable G]
     [Group A] [Finite A] {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) :
     Subgroup.IsComplement' (Subgroup.fixedPointsOfMulAut φ)

@@ -33,7 +33,7 @@ theorem typeP_family_sigma_covers [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
   rw [card_kappaHall_sup_Kstar hKM hK hKstar] at hpZ
   rcases hp.dvd_mul.mp hpZ with hpK | hpKstar
   · -- `p ∣ k`: a line `X ∈ ℰ_p¹(K)` and its type-`P` partner is a family member.
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' p hpK
     have hxord : orderOf (x : G) = p :=
       (orderOf_injective K.subtype K.subtype_injective x).trans hx
@@ -155,7 +155,7 @@ theorem isPiElementCompl_mem_left_of_commute [Finite G] {A B Z : Subgroup G} {π
   have hdisj : A ⊓ B = ⊥ := (Subgroup.disjoint_of_coprime_natCard hcop).eq_bot
   have hnorm : Z ≤ Subgroup.normalizer (A : Set G) := by
     rw [hswap]; exact (sup_le_normalizer_inf_of_commute hcent).trans inf_le_left
-  haveI hAnZ : (A.subgroupOf Z).Normal :=
+  have hAnZ : (A.subgroupOf Z).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hAZ).mpr hnorm
   have hZcard : Nat.card ↥Z = Nat.card ↥A * Nat.card ↥B := by
     rw [hswap]; exact card_sup_of_commute_of_disjoint hcomm hdisj
@@ -201,7 +201,7 @@ theorem typeP_family_member_dData [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
   classical
   obtain ⟨hNmax, hPN, _, KN, hKNN, hKN, hswap, hcanon, _⟩ :=
     typeP_family_member_data hG hM hP hKM hK hKstar hU hN
-  haveI : IsSolvable ↥N := hG.solvable_of_mem_maximalSubgroups hNmax
+  have : Group.IsSolvable ↥N := hG.isSolvable_of_mem_maximalSubgroups hNmax
   obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥N)
     ((kappa N ∪ OddOrder.BG.Ch3.S10.sigma N)ᶜ)
   have hUeq : (U'.map N.subtype).subgroupOf N = U' :=
@@ -584,7 +584,7 @@ theorem typeP_family_T_form [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   · rw [Subgroup.mem_centralizer_iff]
     intro w hw; rw [Set.mem_singleton_iff] at hw; subst hw; exact hcomm
   · intro p hp
-    simp only [piSet, Set.mem_setOf_eq] at hp
+    simp only [piSet, Set.mem_ofPred_eq] at hp
     obtain ⟨hpp, hpdc, -⟩ := Nat.mem_primeFactors.mp hp
     have hpKN : p ∣ Nat.card ↥KN := hpdc.trans (Subgroup.card_dvd_of_le
       (by rw [← Subgroup.zpowers_eq_closure]; exact Subgroup.zpowers_le.mpr hy'KN))
@@ -826,7 +826,7 @@ theorem ZFamilyFinset_one_lt_card [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     have hpidx : ¬ p ∣ (K.subgroupOf M).index := fun hd =>
       hK.2 p (Nat.mem_primeFactors.mpr ⟨hpprime, hd, Subgroup.index_ne_zero_of_finite⟩) hpκ
     exact (hpprime.dvd_mul.mp (hlag.symm ▸ hpM)).resolve_right hpidx
-  haveI : Fact p.Prime := ⟨hpprime⟩
+  have : Fact p.Prime := ⟨hpprime⟩
   obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' p hpK
   have hxord : orderOf (x : G) = p := (orderOf_injective K.subtype K.subtype_injective x).trans hx
   have hXcard : Nat.card ↥(Subgroup.zpowers (x : G)) = p := by rw [Nat.card_zpowers, hxord]
@@ -1029,7 +1029,7 @@ theorem isPiSubgroup_le_left_of_commute [Finite G] {A B Z L : Subgroup G} {π : 
   have hdisj : A ⊓ B = ⊥ := (Subgroup.disjoint_of_coprime_natCard hcop).eq_bot
   have hnorm : Z ≤ Subgroup.normalizer (A : Set G) := by
     rw [hswap]; exact (sup_le_normalizer_inf_of_commute hcent).trans inf_le_left
-  haveI hAnZ : (A.subgroupOf Z).Normal :=
+  have hAnZ : (A.subgroupOf Z).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hAZ).mpr hnorm
   have hZcard : Nat.card ↥Z = Nat.card ↥A * Nat.card ↥B := by
     rw [hswap]; exact card_sup_of_commute_of_disjoint hcomm hdisj
@@ -1071,7 +1071,7 @@ theorem family_card_eq_two [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   obtain ⟨hMimax, hMiP, hZMi, KNi, hKNiMi, hKNi, hswapi, hcanoni, hnei⟩ :=
     typeP_family_member_data hG hM hP hKM hK hKstar hU (mem_ZFamilyFinset.mp hMi𝓕)
   -- `|KNi| = q` is prime (Proposition 14.2(g))
-  haveI : IsSolvable ↥Mi := hG.solvable_of_mem_maximalSubgroups hMimax
+  have : Group.IsSolvable ↥Mi := hG.isSolvable_of_mem_maximalSubgroups hMimax
   obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥Mi)
     ((kappa Mi ∪ OddOrder.BG.Ch3.S10.sigma Mi)ᶜ)
   have hUeq : (U'.map Mi.subtype).subgroupOf Mi = U' :=
@@ -1198,7 +1198,7 @@ theorem kappaHall_primes_subset_sigma_partner [Finite G]
     {p : ℕ} (hp : p.Prime) (hpK : p ∣ Nat.card ↥K) :
     p ∈ OddOrder.BG.Ch3.S10.sigma Mstar := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' p hpK
   have hxord : orderOf (x : G) = p := (orderOf_injective K.subtype K.subtype_injective x).trans hx
   have hXcard : Nat.card ↥(Subgroup.zpowers (x : G)) = p := by rw [Nat.card_zpowers, hxord]

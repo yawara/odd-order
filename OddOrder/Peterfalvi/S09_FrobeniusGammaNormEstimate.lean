@@ -116,7 +116,7 @@ theorem hypothesis78_betaNormSq_eq_orthogonal_expand :
             (localBD F i hodd hnilp C hFrob) := by
   let H78 := localH78 F i hodd hnilp C hFrob
   let hBD := localBD F i hodd hnilp C hFrob
-  letI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
+  let : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
   have hzeta_norm :
       ClassFunction.inner
         (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
@@ -232,15 +232,15 @@ theorem gammaAt_inner_self_re_le (i : Fin k) :
       (F.gammaAt hodd hnilp C hFrob i)).re ≤
         (F.e i : ℝ) - 1 := by
   classical
-  letI : Fintype ↥(F.L i) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥(F.L i) : ℂ) :=
+  let : Fintype ↥(F.L i) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥(F.L i) : ℂ) :=
     invertibleOfNonzero
       (Nat.cast_ne_zero.mpr (Nat.card_pos (α := F.L i)).ne')
-  letI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
-  letI : Invertible
+  let : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
+  let : Invertible
       (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : ((F.H i).subgroupOf (F.L i)).Normal := (hFrob i).isNormal
+  let : ((F.H i).subgroupOf (F.L i)).Normal := (hFrob i).isNormal
   simpa only [gammaAt] using
     (F.hypothesis78_gamma_inner_self_re_le
       i hodd (hnilp i) (C i) (hFrob i))

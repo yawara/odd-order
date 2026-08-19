@@ -43,8 +43,8 @@ variable {k Q : Type*} [Field k] [Group Q] [Finite Q] {p : ℕ}
 invertible in `k` and `k[Q]` is semisimple. -/
 theorem isSemisimpleRing_monoidAlgebra_of_not_dvd_card (hp : p.Prime) (hk : (p : k) = 0)
     (hQ : ¬ p ∣ Nat.card Q) : IsSemisimpleRing (MonoidAlgebra k Q) := by
-  haveI : CharP k p := (CharP.charP_iff_prime_eq_zero hp).mpr hk
-  haveI : NeZero (Nat.card Q : k) := ⟨fun h => hQ ((CharP.cast_eq_zero_iff k p _).mp h)⟩
+  have : CharP k p := (CharP.charP_iff_prime_eq_zero hp).mpr hk
+  have : NeZero (Nat.card Q : k) := ⟨fun h => hQ ((CharP.cast_eq_zero_iff k p _).mp h)⟩
   infer_instance
 
 theorem jacobson_monoidAlgebra_eq_bot (hp : p.Prime) (hk : (p : k) = 0)
@@ -82,7 +82,7 @@ theorem sum_sq_card_eq_card_of_bijective {ι : Type*} [Fintype ι] {n : ι → T
     (hlin : ∀ (c : k) (x : MonoidAlgebra k Q), π (c • x) = c • π x) :
     ∑ j, Fintype.card (n j) ^ 2 = Nat.card Q := by
   classical
-  letI : Fintype Q := Fintype.ofFinite Q
+  let : Fintype Q := Fintype.ofFinite Q
   let e : MonoidAlgebra k Q ≃ₗ[k] ∀ j, Matrix (n j) (n j) k :=
     { toFun := π, map_add' := π.map_add, map_smul' := hlin,
       invFun := Function.surjInv hπ.2,

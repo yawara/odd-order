@@ -46,9 +46,9 @@ theorem m_eq_one_of_factorization
     (hSigma : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
       ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) :
     m = 1 := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
-  haveI : Finite F := Nat.finite_of_card_ne_zero
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Finite F := Nat.finite_of_card_ne_zero
     (by rw [hm]; exact (Nat.pow_pos fc.p_prime.pos).ne')
   have hGp : fc.p ^ (m + 2) ∣ Nat.card G := by
     have h1 : fc.p ^ (m + 2) = fc.p ^ ((Nat.card G).factorization fc.p) := by rw [hfact]
@@ -117,11 +117,11 @@ theorem orbit_eq_setOf_prime_order
         ↥(Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)) fc.P
       = {P₁ : Subgroup G | P₁ ≤ fc.invImageF model ∧ Nat.card ↥P₁ = fc.p ∧
           ¬ P₁ ≤ fc.sInvertedT model} := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   set NR : Subgroup G :=
     Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) with hNRdef
-  letI act : MulAction ↥NR (Subgroup G) :=
+  let act : MulAction ↥NR (Subgroup G) :=
     MulAction.compHom _ ((MulAut.conj : G →* MulAut G).comp NR.subtype)
   -- subset (same argument as in the index theorem).
   have hsub : MulAction.orbit ↥NR fc.P ⊆ {P₁ : Subgroup G |
@@ -195,7 +195,7 @@ theorem centralizer_invImageF_eq
     (hm : Nat.card F = fc.p ^ m) :
     Subgroup.centralizer ((fc.invImageF model : Subgroup G) : Set G)
       = fc.invImageF model := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
   set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
@@ -336,9 +336,9 @@ theorem mul_comm_invImageF_of_forall_conj_smul_eq
     (hfix : ∀ P₁ : Subgroup G, P₁ ≤ fc.invImageF model → Nat.card ↥P₁ = fc.p →
       ¬ P₁ ≤ fc.sInvertedT model → MulAut.conj n • P₁ = P₁) :
     ∀ r ∈ fc.invImageF model, n * r = r * n := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
   obtain ⟨hTle, -, -, hTinf⟩ := fc.sInvertedT_spec model ind hB2 hm
   have hab := fc.invImageF_mul_comm model ind hB2 hm
   -- `n` centralizes `P`.
@@ -518,7 +518,7 @@ theorem mem_invImageF_iff_forall_conj_smul_eq
     n ∈ fc.invImageF model ↔
       (∀ P₁ : Subgroup G, P₁ ≤ fc.invImageF model → Nat.card ↥P₁ = fc.p →
         ¬ P₁ ≤ fc.sInvertedT model → MulAut.conj n • P₁ = P₁) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   have hab := fc.invImageF_mul_comm model ind hB2 hm
   constructor
   · intro hnR P₁ hP₁le hP₁card hP₁T
@@ -563,9 +563,9 @@ include model in
 theorem sigmaComponent_eq_one_of_card_F_eq_p (hF : Nat.card F = fc.p) :
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     ∀ d : ↥(fc.rankOneQuotient).D, d = 1 := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   intro d
-  haveI : Finite F := Nat.finite_of_card_ne_zero (by rw [hF]; exact fc.p_prime.pos.ne')
+  have : Finite F := Nat.finite_of_card_ne_zero (by rw [hF]; exact fc.p_prime.pos.ne')
   -- `1` additively generates `F`.
   have hgen : ∀ y : F, y ∈ AddSubgroup.zmultiples (1 : F) := by
     intro y
@@ -578,7 +578,7 @@ theorem sigmaComponent_eq_one_of_card_F_eq_p (hF : Nat.card F = fc.p) :
       rw [htop]
       trivial
     · exfalso
-      haveI hsing := (Nat.card_eq_one_iff_unique.mp heq).1
+      have hsing := (Nat.card_eq_one_iff_unique.mp heq).1
       have h1 : (⟨1, AddSubgroup.mem_zmultiples 1⟩ :
           ↥(AddSubgroup.zmultiples (1 : F)))
           = ⟨0, zero_mem _⟩ := Subsingleton.elim _ _
@@ -610,11 +610,11 @@ include model in
 theorem card_rankOneQ_eq_pred_card_F {m : ℕ} (hm : Nat.card F = fc.p ^ m) :
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     Nat.card ↥(fc.rankOneQuotient).Q = Nat.card F - 1 := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Finite F := Nat.finite_of_card_ne_zero
+  have : Finite F := Nat.finite_of_card_ne_zero
     (by rw [hm]; exact (Nat.pow_pos fc.p_prime.pos).ne')
-  haveI := Fintype.ofFinite F
+  have := Fintype.ofFinite F
   rw [Nat.card_congr model.qEquiv.toEquiv, Nat.card_eq_fintype_card,
     Nat.card_eq_fintype_card, Fintype.card_units]
 
@@ -634,7 +634,7 @@ theorem index_invImageF_subgroupOf_normalizer
         (Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))).index
       = fc.p ^ m * (Nat.card ↥(fc.rankOneQuotient).Q
           * Nat.card ↥(fc.rankOneQuotient).D) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   set NR : Subgroup G :=
     Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) with hNRdef
@@ -658,7 +658,7 @@ theorem index_invImageF_subgroupOf_normalizer
     fc.card_invImageF model ind] at hlagR
   -- combine and cancel `|F|·|P| ≠ 0`.
   rw [← hlagR, hNPeq] at hlag
-  haveI : Finite F := Nat.finite_of_card_ne_zero
+  have : Finite F := Nat.finite_of_card_ne_zero
     (by rw [hm]; exact (Nat.pow_pos fc.p_prime.pos).ne')
   have hpos : 0 < Nat.card F * Nat.card ↥fc.P :=
     Nat.mul_pos Nat.card_pos Nat.card_pos
@@ -685,7 +685,7 @@ theorem card_quotient_invImageF_eq
         ⧸ (fc.invImageF model).subgroupOf
           (Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)))
       = fc.p * (fc.p - 1) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   have hidx := fc.index_invImageF_subgroupOf_normalizer model ind hB2 hm hGp hSigma
   have hQ : Nat.card ↥(fc.rankOneQuotient).Q = fc.p - 1 := by
     rw [fc.card_rankOneQ_eq_pred_card_F model hm, hm, pow_one]
@@ -717,7 +717,7 @@ theorem exists_normal_overgroup_cube
       Nat.card ↥R₁ = fc.p ^ 3 ∧
       ∀ n ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G),
         ∀ x ∈ R₁, n * x * n⁻¹ ∈ R₁ := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   set NR : Subgroup G :=
     Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) with hNRdef
@@ -775,8 +775,8 @@ theorem exists_normal_overgroup_cube
   · -- `R₁ ⊴ N_G(R)`.
     intro n hn x hx
     obtain ⟨y, hy, rfl⟩ := hx
-    haveI : (Subgroup.zpowers σ).Normal := hσnorm
-    haveI : Rc.Normal := Subgroup.Normal.comap this (QuotientGroup.mk' R')
+    have : (Subgroup.zpowers σ).Normal := hσnorm
+    have : Rc.Normal := Subgroup.Normal.comap this (QuotientGroup.mk' R')
     have h1 : (⟨n, hn⟩ : ↥NR) * y * (⟨n, hn⟩ : ↥NR)⁻¹ ∈ Rc :=
       this.conj_mem y hy ⟨n, hn⟩
     exact ⟨_, h1, rfl⟩
@@ -794,11 +794,11 @@ theorem conj_sInvertedT_eq_of_mem_normalizer
       ¬ fc.p ∣ Nat.card ↥(fc.rankOneQuotient).D) {n : G}
     (hn : n ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G)) :
     MulAut.conj n • fc.sInvertedT model = fc.sInvertedT model := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   set NR : Subgroup G :=
     Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) with hNRdef
-  letI act : MulAction ↥NR (Subgroup G) :=
+  let act : MulAction ↥NR (Subgroup G) :=
     MulAction.compHom _ ((MulAut.conj : G →* MulAut G).comp NR.subtype)
   have horb := fc.orbit_eq_setOf_prime_order model ind hB2 hm hGp hSigma
   obtain ⟨hTle, -, -, hTinf⟩ := fc.sInvertedT_spec model ind hB2 hm
@@ -858,13 +858,13 @@ theorem quotient_conj_eq_inv_of_sq_eq_one
     (hσ : orderOf σ = fc.p) (hσn : (Subgroup.zpowers σ).Normal)
     (hu2 : u ^ 2 = 1) (hu1 : u ≠ 1) :
     u * σ * u⁻¹ = σ⁻¹ := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   set NR : Subgroup G :=
     Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) with hNRdef
   set R' : Subgroup ↥NR := (fc.invImageF model).subgroupOf NR with hR'def
   have horb := fc.orbit_eq_setOf_prime_order model ind hB2 hm hGp hSigma
-  letI actNR : MulAction ↥NR (Subgroup G) :=
+  let actNR : MulAction ↥NR (Subgroup G) :=
     MulAction.compHom _ ((MulAut.conj : G →* MulAut G).comp NR.subtype)
   set A : Set (Subgroup G) := {P₁ : Subgroup G | P₁ ≤ fc.invImageF model ∧
     Nat.card ↥P₁ = fc.p ∧ ¬ P₁ ≤ fc.sInvertedT model} with hAdef
@@ -879,7 +879,7 @@ theorem quotient_conj_eq_inv_of_sq_eq_one
     change (n * k) • fc.P = MulAut.conj (n : G) • X
     rw [mul_smul, hk']
     rfl
-  letI actA : MulAction ↥NR ↥A :=
+  let actA : MulAction ↥NR ↥A :=
     { smul := fun n X => ⟨MulAut.conj (n : G) • (X : Subgroup G), hpres n X X.2⟩
       one_smul := fun X => Subtype.ext (by
         change MulAut.conj ((1 : ↥NR) : G) • (X : Subgroup G) = X
@@ -905,10 +905,10 @@ theorem quotient_conj_eq_inv_of_sq_eq_one
     have h4 : (φ x) X = X := h3
     simpa using h4
   set ψ : (↥NR ⧸ R') →* Equiv.Perm ↥A := QuotientGroup.lift R' φ hker with hψdef
-  letI actQ : MulAction (↥NR ⧸ R') ↥A := MulAction.compHom _ ψ
+  let actQ : MulAction (↥NR ⧸ R') ↥A := MulAction.compHom _ ψ
   have hsmulQ : ∀ (n : ↥NR) (X : ↥A),
       (QuotientGroup.mk' R' n) • X = n • X := fun n X => rfl
-  haveI hfaith : FaithfulSMul (↥NR ⧸ R') ↥A := by
+  have hfaith : FaithfulSMul (↥NR ⧸ R') ↥A := by
     constructor
     intro m₁ m₂ h
     have h1 : ∀ X : ↥A, (m₂⁻¹ * m₁) • X = X := by
@@ -925,7 +925,7 @@ theorem quotient_conj_eq_inv_of_sq_eq_one
       rw [← hn, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
       exact h2
     exact (inv_mul_eq_one.mp h4).symm
-  haveI htrans : MulAction.IsPretransitive (↥NR ⧸ R') ↥A := by
+  have htrans : MulAction.IsPretransitive (↥NR ⧸ R') ↥A := by
     constructor
     intro X Y
     have hX : (X : Subgroup G) ∈ MulAction.orbit ↥NR fc.P := by
@@ -981,9 +981,9 @@ theorem commutator_eq_sInvertedT
     (hR₁le : R₁ ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
     (hcard : Nat.card ↥R₁ = fc.p ^ 3) :
     ⁅R₁, R₁⁆ = fc.sInvertedT model := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
   obtain ⟨hTle, -, -, hTinf⟩ := fc.sInvertedT_spec model ind hB2 hm
   have hTcard : Nat.card ↥(fc.sInvertedT model) = fc.p := by
     rw [fc.card_sInvertedT model ind hB2 hm, hm, pow_one]
@@ -1009,7 +1009,7 @@ theorem commutator_eq_sInvertedT
     omega
   -- `T ⊴ R₁`, and `R₁/T` has order `p²`, hence is abelian.
   have hTR₁ : fc.sInvertedT model ≤ R₁ := hTle.trans hRle
-  haveI hTnorm : ((fc.sInvertedT model).subgroupOf R₁).Normal := by
+  have hTnorm : ((fc.sInvertedT model).subgroupOf R₁).Normal := by
     constructor
     intro t ht n
     rw [Subgroup.mem_subgroupOf] at ht ⊢
@@ -1028,7 +1028,7 @@ theorem commutator_eq_sInvertedT
     calc fc.p * Nat.card (↥R₁ ⧸ (fc.sInvertedT model).subgroupOf R₁)
         = fc.p ^ 3 := h1
       _ = fc.p * fc.p ^ 2 := by ring
-  haveI hcomm : IsMulCommutative (↥R₁ ⧸ (fc.sInvertedT model).subgroupOf R₁) :=
+  have hcomm : IsMulCommutative (↥R₁ ⧸ (fc.sInvertedT model).subgroupOf R₁) :=
     IsPGroup.isMulCommutative_of_card_eq_prime_sq hq
   -- commutators land in `T`.
   have hle : ⁅R₁, R₁⁆ ≤ fc.sInvertedT model := by
@@ -1064,7 +1064,7 @@ theorem distinguishedInvolution_mem_normalizer_invImageF
     (hm : Nat.card F = fc.p ^ m) :
     fc.toHypothesis.distinguishedInvolution
       ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   set s : G := fc.toHypothesis.distinguishedInvolution with hsdef
   obtain ⟨hTle, hTinv, -, -⟩ := fc.sInvertedT_spec model ind hB2 hm
   have hsP : ∀ y ∈ fc.P, s * y * s⁻¹ = y := by
@@ -1114,9 +1114,9 @@ theorem mem_P_of_mem_of_distinguishedInvolution_conj_eq
     (hfix : fc.toHypothesis.distinguishedInvolution * x
       * fc.toHypothesis.distinguishedInvolution⁻¹ = x) :
     x ∈ fc.P := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
   set s : G := fc.toHypothesis.distinguishedInvolution with hsdef
   obtain ⟨hTle, hTinv, -, -⟩ := fc.sInvertedT_spec model ind hB2 hm
   set NR : Subgroup G :=
@@ -1257,9 +1257,9 @@ theorem sInvertedT_mul_comm_of_mem
     (hR₁le : R₁ ≤ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
     (hcard : Nat.card ↥R₁ = fc.p ^ 3) :
     ∀ t ∈ fc.sInvertedT model, ∀ x ∈ R₁, x * t = t * x := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
   intro t ht x hx
   by_cases ht1 : t = 1
   · rw [ht1, mul_one, one_mul]
@@ -1366,9 +1366,9 @@ theorem mul_comm_of_conj_eq_inv
     (hyi : fc.toHypothesis.distinguishedInvolution * y
       * fc.toHypothesis.distinguishedInvolution⁻¹ = y⁻¹) :
     x * y = y * x := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
   obtain ⟨hTle, hTinv, -, -⟩ := fc.sInvertedT_spec model ind hB2 hm
   have hcT : ⁅x, y⁆ ∈ fc.sInvertedT model := by
     rw [← fc.commutator_eq_sInvertedT model ind hB2 hm hGp hSigma hRle hR₁le hcard]

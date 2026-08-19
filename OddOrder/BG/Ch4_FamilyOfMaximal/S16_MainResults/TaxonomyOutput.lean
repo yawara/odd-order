@@ -177,7 +177,7 @@ theorem theoremI_nilpotentHall_conjugacy_and_type_dichotomy [Finite G]
       push Not at hall
       obtain ⟨S, hS, hSnotI⟩ := hall
       have hSP : S14.IsTypeP S := notTypeI_imp_typeP S hS hSnotI
-      haveI : IsSolvable ↥S := hG.solvable_of_mem_maximalSubgroups hS
+      have : Group.IsSolvable ↥S := hG.isSolvable_of_mem_maximalSubgroups hS
       -- Produce the `κ(S)`-Hall subgroup `K` of `S` (Hall's theorem in the solvable `S`).
       obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥S) (S14.kappa S)
       set K : Subgroup G := K'.map S.subtype with hKdef
@@ -242,8 +242,8 @@ theorem theoremI_nilpotentHall_conjugacy_and_type_dichotomy [Finite G]
         · intro w hw
           have hfix : ∀ n ∈ (K ⊔ Kstar : Subgroup G), w * n * w⁻¹ = n := by
             intro n hn
-            haveI := hcyc
-            letI : CommGroup ↥(K ⊔ Kstar : Subgroup G) := IsCyclic.commGroup
+            have := hcyc
+            let : CommGroup ↥(K ⊔ Kstar : Subgroup G) := IsCyclic.commGroup
             have hcm := congrArg Subtype.val
               (mul_comm (⟨w, hw⟩ : ↥(K ⊔ Kstar : Subgroup G)) ⟨n, hn⟩)
             simp only [Subgroup.coe_mul] at hcm

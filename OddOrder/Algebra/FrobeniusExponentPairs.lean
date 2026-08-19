@@ -81,7 +81,7 @@ theorem frobIndex_pair_eq_of_pow_mul_eq {F : Type*} [Field F] [Finite F]
     ((i : ZMod n) = (k : ZMod n) ∧ (j : ZMod n) = (l : ZMod n)) ∨
       ((i : ZMod n) = (l : ZMod n) ∧ (j : ZMod n) = (k : ZMod n)) := by
   classical
-  haveI : Fintype F := Fintype.ofFinite F
+  have : Fintype F := Fintype.ofFinite F
   obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := Fˣ)
   have hordg : orderOf ((g : F)) = 2 ^ n - 1 := by
     rw [orderOf_units, orderOf_eq_card_of_forall_mem_zpowers hg,
@@ -112,7 +112,7 @@ theorem odd_orderOf_inv_mul_of_mul_eq_mul {F : Type*} [Field F] [Finite F] [Char
     {n : ℕ} (hn : n ≠ 0) (hcard : Nat.card F = 2 ^ n) (σ τ ψ φ : RingAut F)
     (hodd : Odd (orderOf φ)) (hmul : ∀ a : F, σ a * τ a = ψ a * φ (ψ a)) :
     Odd (orderOf (σ⁻¹ * τ)) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨i, hi⟩ := exists_pow_eq_of_ringAut hcard hn σ
   obtain ⟨j, hj⟩ := exists_pow_eq_of_ringAut hcard hn τ
   obtain ⟨s, hs⟩ := exists_pow_eq_of_ringAut hcard hn ψ
@@ -185,8 +185,8 @@ theorem odd_orderOf_of_mul_self_surjective {F : Type*} [Field F] [Finite F] [Cha
     (hsurj : ∀ a : F, a ≠ 0 → ∃ b : F, b ≠ 0 ∧ b * ρ b = a) :
     Odd (orderOf ρ) := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI : Fintype F := Fintype.ofFinite F
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fintype F := Fintype.ofFinite F
   -- a surjective self-map of the finite group `F^×` is injective
   have hker : ∀ a : F, a ≠ 0 → a * ρ a = 1 → a = 1 := by
     set ν : Fˣ →* Fˣ := MonoidHom.id Fˣ * Units.map ρ.toRingHom.toMonoidHom with hν
@@ -330,7 +330,7 @@ noncomputable def restrictToFrobFixed (α : E ≃+* E) :
        map_add' := fun a b => Subtype.ext (by simp) } :
       ↥(frobFixedSubfield E 2 m) →+* ↥(frobFixedSubfield E 2 m))
     (by
-      haveI : Finite ↥(frobFixedSubfield E 2 m) := Subtype.finite
+      have : Finite ↥(frobFixedSubfield E 2 m) := Subtype.finite
       have hinj : Function.Injective
           (fun a : ↥(frobFixedSubfield E 2 m) =>
             (⟨α (a : E), map_mem_frobFixedSubfield α a.2⟩ :
@@ -376,8 +376,8 @@ theorem restrict_pair_eq_of_mul_eq_on_frobFixed (hm : m ≠ 0)
     (∀ a ∈ frobFixedSubfield E 2 m, a ^ 2 ^ i = a ^ 2 ^ i' ∧ a ^ 2 ^ j = a ^ 2 ^ j') ∨
       (∀ a ∈ frobFixedSubfield E 2 m,
         a ^ 2 ^ i = a ^ 2 ^ j' ∧ a ^ 2 ^ j = a ^ 2 ^ i') := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI : Finite ↥(frobFixedSubfield E 2 m) := Subtype.finite
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Finite ↥(frobFixedSubfield E 2 m) := Subtype.finite
   -- the hypothesis, read inside `F`
   have hF : ∀ a : ↥(frobFixedSubfield E 2 m),
       a ^ 2 ^ i * a ^ 2 ^ j = a ^ 2 ^ i' * a ^ 2 ^ j' := by
@@ -414,8 +414,8 @@ theorem odd_orderOf_restrictToFrobFixed_inv_mul (hm : m ≠ 0)
         = ((ψ a : ↥(frobFixedSubfield E 2 m)) : E)
           * ((φ (ψ a) : ↥(frobFixedSubfield E 2 m)) : E)) :
     Odd (orderOf ((restrictToFrobFixed (m := m) σ)⁻¹ * restrictToFrobFixed (m := m) τ)) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI : Finite ↥(frobFixedSubfield E 2 m) := Subtype.finite
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Finite ↥(frobFixedSubfield E 2 m) := Subtype.finite
   refine odd_orderOf_inv_mul_of_mul_eq_mul (F := ↥(frobFixedSubfield E 2 m)) hm
     (natCard_frobFixedSubfield hcard hm) _ _ ψ φ hodd fun a => ?_
   apply Subtype.ext
@@ -433,8 +433,8 @@ theorem odd_orderOf_restrictToFrobFixed_of_mul_self_surjective (hm : m ≠ 0)
     (hsurj : ∀ a ∈ frobFixedSubfield E 2 m, a ≠ 0 →
       ∃ b ∈ frobFixedSubfield E 2 m, b ≠ 0 ∧ b * θ b = a) :
     Odd (orderOf (restrictToFrobFixed (m := m) θ)) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI : Finite ↥(frobFixedSubfield E 2 m) := Subtype.finite
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Finite ↥(frobFixedSubfield E 2 m) := Subtype.finite
   refine odd_orderOf_of_mul_self_surjective (F := ↥(frobFixedSubfield E 2 m)) hm
     (natCard_frobFixedSubfield hcard hm) _ fun a ha0 => ?_
   obtain ⟨b, hbF, hb0, hb⟩ := hsurj (a : E) a.2 fun h => ha0 (Subtype.ext h)

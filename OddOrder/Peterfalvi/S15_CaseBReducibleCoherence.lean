@@ -207,7 +207,7 @@ theorem Hypothesis.sSet_subset_inducedKernelFamily [Finite G]
     sSet (hyp.toTypesIIIIIIVSetupS hG) ⊆
       OddOrder.Peterfalvi.S08.inducedKernelFamily
         ((derivedInG hyp.S).subgroupOf hyp.S) (⊥ : Subgroup ↥hyp.S) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   rintro η ⟨ξ, hξ, rfl⟩
   have hξne : ξ ≠ trivialIrreducibleCharacter ↥(huSub (hyp.toTypesIIIIIIVSetupS hG)) := by
     intro htriv
@@ -379,7 +379,7 @@ theorem Hypothesis.sSet_scaledDiff_support [Finite G]
     (hdeg : (φ : ↥hyp.S → ℂ) 1 = (c : ℂ) * (ψ : ↥hyp.S → ℂ) 1) :
     (φ - c • ψ).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hnsmul : ∀ y : ↥hyp.S, (c • ψ : ClassFunction ↥hyp.S ℂ) y = (c : ℂ) * ψ y := fun y => by
     rw [← Nat.cast_smul_eq_nsmul ℂ c ψ, ClassFunction.smul_apply]
   have hzero : (φ - c • ψ) (1 : ↥hyp.S) = 0 := by
@@ -410,7 +410,7 @@ theorem Hypothesis.zSpan_sSet_support_subset [Finite G]
     (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan (sSet (hyp.toTypesIIIIIIVSetupS hG))) :
     φ.support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S ∪ {1} := by
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   induction hφ using Submodule.span_induction with
   | mem x hx => exact hyp.sSet_member_support_subset hG hx
   | zero => simp
@@ -433,7 +433,7 @@ theorem Hypothesis.zSpan_sSet_degree_zero_support [Finite G]
     (hφ1 : φ (1 : ↥hyp.S) = 0) :
     φ.support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S := by
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   intro z hz
   rcases hyp.zSpan_sSet_support_subset hG hφ hz with h | h
   · exact h
@@ -484,7 +484,7 @@ theorem Hypothesis.nineElevenPairBoundS [Finite G]
         OddOrder.Peterfalvi.S07.sumnS F
           ≤ 2 * ((hyp.toTypesIIIIIIVSetupS hG).q : ℝ) ^ 2 * (caseA.a : ℝ) * (d : ℝ) := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   obtain ⟨hχS, hχnotS₂⟩ := hχ
   obtain ⟨cohS₂_indS⟩ := hS₂coh
   -- (1) Dade-side coherence via `congrMap`: `indS = Ind_S^G = τ` on `A(S)`-supported class
@@ -790,7 +790,7 @@ theorem Hypothesis.exists_pinned_coherent_sSet_of_all_reducible [Finite G]
         (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.S) hyp.S),
       c.extension (∑ i : Fin hyp.q, hyp.mu i ⟨1, hyp.p_prime.one_lt⟩)
         = ∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩ := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   -- pivot / second-column index arithmetic
   have hj1_0 : (⟨1, hyp.p_prime.one_lt⟩ : Fin hyp.p) ≠ ⟨0, hyp.p_prime.pos⟩ := by

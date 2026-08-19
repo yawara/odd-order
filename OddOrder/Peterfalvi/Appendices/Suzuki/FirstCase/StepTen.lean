@@ -113,7 +113,7 @@ theorem card_Kbar_mul_card_Vbar :
 theorem dvd_card_Q1_of_odd_prime_dvd_card_Q {r : ℕ} (hr : r.Prime) (hodd : Odd r)
     (hdvd : r ∣ Nat.card ↥hyp.Q) : r ∣ Nat.card ↥hyp.Q1 := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   let S : Sylow 2 ↥hyp.Q := default
   have hQ : Nat.card ↥hyp.Q =
       Nat.card ↥(S : Subgroup ↥hyp.Q) * Nat.card ↥hyp.Q1Subgroup := by
@@ -144,7 +144,7 @@ theorem finite_of_model {F : Type uG} [NearFields.NearField F]
     (model : letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
       NearFields.AffineNearFieldModel fc.rankOneQuotient F) :
     Finite F := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   have hinj : Function.Injective (fun x : F => model.emb (Multiplicative.ofAdd x)) :=
     fun a b hab => Multiplicative.ofAdd.injective (model.emb_injective hab)
   exact Finite.of_injective _ hinj
@@ -161,23 +161,23 @@ theorem card_field_eq_prime_pow {F : Type uG} [NearFields.NearField F]
       NearFields.AffineNearFieldModel fc.rankOneQuotient F)
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
     ∃ m, 1 ≤ m ∧ Nat.card F = fc.p ^ m := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
-  haveI : Finite F := fc.finite_of_model model
-  haveI : Fintype F := Fintype.ofFinite F
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Finite F := fc.finite_of_model model
+  have : Fintype F := Fintype.ofFinite F
   have hcharp : model.char = fc.p := fc.char_eq_p model hB2
   have hchar : ∀ a : F, fc.p • a = 0 := by
     intro a; rw [← hcharp]; exact model.char_spec a
   -- every prime dividing `|F|` equals `p`
   have huniq : ∀ {d : ℕ}, Nat.Prime d → d ∣ Nat.card F → d = fc.p := by
     intro d hd hdvd
-    haveI : Fact d.Prime := ⟨hd⟩
+    have : Fact d.Prime := ⟨hd⟩
     obtain ⟨a, ha⟩ := exists_prime_addOrderOf_dvd_card d
       (Nat.card_eq_fintype_card (α := F) ▸ hdvd)
     have hdp : d ∣ fc.p := ha ▸ addOrderOf_dvd_of_nsmul_eq_zero (hchar a)
     exact (Nat.prime_dvd_prime_iff_eq hd fc.p_prime).mp hdp
-  haveI : Nonempty F := ⟨0⟩
+  have : Nonempty F := ⟨0⟩
   have hne : Nat.card F ≠ 0 := Nat.card_pos.ne'
   refine ⟨(Nat.card F).primeFactorsList.length,
     ?_, Nat.eq_prime_pow_of_unique_prime_dvd hne huniq⟩
@@ -201,12 +201,12 @@ theorem padicValNat_card_Q_add_one {F : Type uG} [NearFields.NearField F]
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
     (hm : Nat.card F = fc.p ^ m) :
     padicValNat fc.p (Nat.card fc.toHypothesis.Q + 1) = m + 1 := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
-  haveI : Finite F := fc.finite_of_model model
-  haveI : Fintype F := Fintype.ofFinite F
-  haveI : Nonempty F := ⟨0⟩
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Finite F := fc.finite_of_model model
+  have : Fintype F := Fintype.ofFinite F
+  have : Nonempty F := ⟨0⟩
   -- `|Q| = (|F| − 1)^p`
   obtain ⟨e⟩ := fc.centralizer_inf_mulEquiv_units model
   have hCQ : Nat.card ↥(fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)) =
@@ -243,7 +243,7 @@ theorem card_Kbar_eq_two_pow_sub_one :
 by Fermat (`2^p ≡ 2`), so `p ∤ |K̄|`. -/
 theorem not_p_dvd_card_Kbar :
     ¬ fc.p ∣ Nat.card ↥fc.toHypothesis.Kbar := by
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
   rw [fc.card_Kbar_eq_two_pow_sub_one]
   intro hdvd
   have h1le : 1 ≤ 2 ^ fc.p := Nat.one_le_two_pow
@@ -351,7 +351,7 @@ theorem Q1_eq_bot_of_p_dvd_card_centralizer_W
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
     (hpSig : fc.p ∣ Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) :
     fc.toHypothesis.Q1 = ⊥ := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   by_contra hQ1
   -- `|Σ| ≠ 1` since `p ∣ |Σ|` and `p > 1`
@@ -437,9 +437,9 @@ theorem not_p_dvd_card_W_of_not_p_dvd_card_centralizer_W
       Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) :
     ¬ fc.p ∣ Nat.card ↥fc.toHypothesis.W := by
   classical
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
   -- `P` acts on `W` by conjugation, via `P ≤ N_G(W)`
-  letI : MulAction ↥fc.P ↥fc.toHypothesis.W :=
+  let : MulAction ↥fc.P ↥fc.toHypothesis.W :=
     MulAction.compHom _ (Subgroup.inclusion fc.P_le_normalizer_W)
   have hval : ∀ (p : ↥fc.P) (w : ↥fc.toHypothesis.W),
       ((p • w : ↥fc.toHypothesis.W) : G) = (p : G) * (w : G) * (p : G)⁻¹ := fun _ _ => rfl
@@ -510,7 +510,7 @@ theorem card_field_eq_nine_of_p_dvd_card_centralizer_W
       Nat.card ↥(fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)) = 8 ∧
       Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) = 3 ∧
       ¬ ∀ x y : F, x * y = y * x := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   have hQ1 : fc.toHypothesis.Q1 = ⊥ :=
     fc.Q1_eq_bot_of_p_dvd_card_centralizer_W ind model hB2 hpSig
   obtain ⟨e⟩ := fc.sigma_mulEquiv_centralizer_W ind
@@ -562,7 +562,7 @@ theorem w_cyclic_of_p_dvd_card_centralizer_W
     fc.p = 3 ∧ Nat.card F = 9 ∧ IsCyclic ↥fc.toHypothesis.W ∧
       (Nat.card ↥fc.toHypothesis.W = 3 ∨ Nat.card ↥fc.toHypothesis.W = 9) ∧
       3 ^ (Nat.card G).factorization 3 = 3 ^ 4 * Nat.card ↥fc.toHypothesis.W := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   obtain ⟨hp3, hF9, hCQ8, hSig3, hncomm⟩ :=
     fc.card_field_eq_nine_of_p_dvd_card_centralizer_W ind model hB2 hpSig
   -- `|s·t| = char = 3` (`|F| = 9`)

@@ -113,6 +113,7 @@ end Agree
 
 /-! ### Realizing prescribed behavior by multiple transitivity -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- A subgroup of `Perm α` that is `|S|`-transitive contains an element
 agreeing with any prescribed permutation on the finset `S`. -/
 private lemma exists_agree_of_isMultiplyPretransitive
@@ -120,7 +121,7 @@ private lemma exists_agree_of_isMultiplyPretransitive
     (hT : IsMultiplyPretransitive G α S.card) (τ : Perm α) :
     ∃ k : Perm α, k ∈ G ∧ ∀ b ∈ S, k b = τ b := by
   classical
-  haveI := hT
+  have := hT
   set e : Fin S.card ≃ {b // b ∈ S} := S.equivFin.symm with he
   set ι₁ : Fin S.card ↪ α :=
     ⟨fun i => ↑(e i), fun i j hij => e.injective (Subtype.ext hij)⟩ with hι₁
@@ -212,7 +213,7 @@ private lemma exists_mul_mem_normalizer_zpowers {p : ℕ} (hp : p.Prime)
     {k : M} (hk : ∀ q ∈ F, k * q * k⁻¹ ∈ F) :
     ∃ h ∈ F, h * k ∈ Subgroup.normalizer (Subgroup.zpowers g) := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hcard0 : Nat.card F ≠ 0 := Nat.card_pos.ne'
   -- `p` divides `|F|` exactly once
   have hordF : orderOf (⟨g, hgF⟩ : F) = p :=
@@ -319,7 +320,7 @@ private lemma commute_commutator_of_mem_normalizer {g x₁ x₂ : M}
     (h₂ : x₂ ∈ Subgroup.normalizer (Subgroup.zpowers g : Set M)) :
     Commute ⁅x₁, x₂⁆ g := by
   classical
-  haveI : IsCyclic ↥(Subgroup.zpowers g) := by
+  have : IsCyclic ↥(Subgroup.zpowers g) := by
     refine ⟨⟨⟨g, Subgroup.mem_zpowers g⟩, fun w => ?_⟩⟩
     obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp w.2
     exact ⟨n, Subtype.ext (by simpa using hn)⟩
@@ -381,7 +382,7 @@ theorem alternatingGroup_le_of_isPreprimitive_of_isCycle_mem
       ext b
       simp [SubMulAction.mem_ofFixingSubgroup_iff]
   have hMT : IsMultiplyPretransitive G α (g.supportᶜ : Finset α).card := by
-    haveI := hMPP.isMultiplyPretransitive
+    have := hMPP.isMultiplyPretransitive
     have hcc : (g.supportᶜ : Finset α).card = n + 1 := by
       rw [Finset.card_compl, hgp, ← Nat.card_eq_fintype_card]
       omega

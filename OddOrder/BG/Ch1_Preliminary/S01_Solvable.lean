@@ -136,7 +136,7 @@ theorem corollary_1_12 {A G : Type*} [Group A] [Group G] [Finite A] [Finite G]
     have h2 := congrArg Subtype.val this
     rwa [restrictAction_apply] at h2
   -- Step 5: conclude via BG Prop 1.10.
-  haveI : Group.IsNilpotent G := hG.isNilpotent
+  have : Group.IsNilpotent G := hG.isNilpotent
   have hCop : Nat.Coprime (Nat.card A) (Nat.card G) := by
     obtain ⟨n, hn⟩ := hG.exists_card_eq
     rw [hn]
@@ -511,17 +511,17 @@ theorem centralizer_comap_mk'_eq_centralizer_sup_of_pGroup_coprime
 `O_{p'}(G) = ⊥` ⇒ `C_G(O_p(G)) ⊆ O_p(G)`.
 
 **形式化**: Phase 1 `OddOrder.Isaacs.Ch03.hall_higman_1_2_3` の π = {p} 特殊化.
-Ch.3 §3D の Hall-Higman は `[IsPiSeparable π G]` 版で, ここでは `[IsSolvable G]`
-から `isPiSeparable_of_solvable` instance を使って適用する.
+Ch.3 §3D の Hall-Higman は `[IsPiSeparable π G]` 版で, ここでは `[Group.IsSolvable G]`
+から `isPiSeparable_of_isSolvable` instance を使って適用する.
 
 **BG 原 statement (`T` Sylow p of `O_{p',p}(G)` ⇒ `C_G(T) ⊆ O_{p',p}(G)`) との関係**:
 G を G/O_{p'}(G) に置き換えると `T` は `O_p(G/O_{p'}(G))` に一致 (Sylow p of p-group は
 全体). この特殊形が下の statement.
 
-CLAUDE.md no-wrapper policy 例外 (仮定特殊化: `IsSolvable G` instance + π = {p}
+CLAUDE.md no-wrapper policy 例外 (仮定特殊化: `Group.IsSolvable G` instance + π = {p}
 specialization). -/
 theorem hall_higman_solvable_specialization
-    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] [Group.IsSolvable G]
     (hp' : OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G = ⊥) :
     Subgroup.centralizer (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G : Set G) ≤
       OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G :=
@@ -538,8 +538,8 @@ transporting that special case to `Ḡ = G/O_{π'}(G)` (where `O_{π'}(Ḡ) = 1`
 recognizing `O_π(Ḡ)` pulled back as `O_{π',π}(G)` — exactly Isaacs' own reduction in the proof
 of Thm 3.22. This is the form BG §9 Thm 9.1 needs.
 
-`IsSolvable` callers obtain `[IsPiSeparable π G]` for free via the instance
-`OddOrder.Isaacs.Ch03.isPiSeparable_of_solvable`. -/
+`Group.IsSolvable` callers obtain `[IsPiSeparable π G]` for free via the instance
+`OddOrder.Isaacs.Ch03.isPiSeparable_of_isSolvable`. -/
 theorem centralizer_oPiPrimePiCore_le
     {G : Type*} [Group G] [Finite G] (π : Set ℕ) [OddOrder.Isaacs.Ch03.IsPiSeparable π G] :
     Subgroup.centralizer (OddOrder.Isaacs.Ch03.oPiPrimePiCore π G : Set G) ≤
@@ -549,7 +549,7 @@ theorem centralizer_oPiPrimePiCore_le
   let mk : G →* G ⧸ OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π} G :=
     QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π} G)
   -- `Ḡ` is π-separable and `O_{π'}(Ḡ) = ⊥` (self-quotient identity at the complement set).
-  haveI : OddOrder.Isaacs.Ch03.IsPiSeparable π
+  have : OddOrder.Isaacs.Ch03.IsPiSeparable π
       (G ⧸ OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π} G) := inferInstance
   have hbot : OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π}
       (G ⧸ OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π} G) = ⊥ :=
@@ -592,8 +592,8 @@ Proof: pass to `Ḡ = G/O_{π'}(G)`.  The covering hypothesis makes the image of
 `O_π(Ḡ)`, so `C_G(T)` maps into `C_Ḡ(O_π(Ḡ))`, which lies in `O_π(Ḡ)` by the `O_{π'} = 1`
 Hall–Higman (`Isaacs.Ch03.hall_higman_1_2_3`); pulling back gives `O_{π',π}(G)`.
 
-`IsSolvable` callers obtain `[IsPiSeparable π G]` for free via
-`OddOrder.Isaacs.Ch03.isPiSeparable_of_solvable`. -/
+`Group.IsSolvable` callers obtain `[IsPiSeparable π G]` for free via
+`OddOrder.Isaacs.Ch03.isPiSeparable_of_isSolvable`. -/
 theorem centralizer_le_oPiPrimePiCore_of_cover
     {G : Type*} [Group G] [Finite G] (π : Set ℕ)
     [OddOrder.Isaacs.Ch03.IsPiSeparable π G] {T : Subgroup G}
@@ -649,7 +649,7 @@ centralizes `T := O_p(G)`. Proof mirrors `BG.AppA.thmA5_part2`: `⟨u⟩` acts b
 because `C_{RT}(R) ⊆ C_G(R)` centralizes `u` (`[c,u] ∈ RT ⊓ M = ⊥`, since `M ⊴ C_G(R)` and `u`
 normalizes `RT`). Proposition 1.10 then makes `⟨u⟩` act trivially on `RT ⊇ T`. -/
 private theorem mem_centralizer_opCore_of_mem_oPiPrimeCore_centralizer
-    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] [Group.IsSolvable G]
     {R : Subgroup G} (hR : IsPGroup p R)
     {u : G} (huM : u ∈ OddOrder.GroupTheory.opiCoreInG ({p} : Set ℕ)ᶜ
       (Subgroup.centralizer (R : Set G))) :
@@ -677,7 +677,7 @@ private theorem mem_centralizer_opCore_of_mem_oPiPrimeCore_centralizer
       rwa [Subgroup.orderOf_mk] at h
     exact Nat.Coprime.coprime_dvd_left hdvd hMp'
   -- `T` normal, `RT` a `p`-group; `RT ⊓ M = ⊥`.
-  haveI hTnorm : T.Normal := by rw [hT]; exact OddOrder.Isaacs.Ch01.opCore.normal p G
+  have hTnorm : T.Normal := by rw [hT]; exact OddOrder.Isaacs.Ch01.opCore.normal p G
   have hRT_pg : IsPGroup p ↥RT :=
     hR.to_sup_of_normal_right (OddOrder.Isaacs.Ch01.opCore_isPGroup p G)
   have hRTM_disj : RT ⊓ M = ⊥ := inf_eq_bot_of_pGroup_coprime hRT_pg hMp'
@@ -753,7 +753,7 @@ private theorem mem_centralizer_opCore_of_mem_oPiPrimeCore_centralizer
         ≤ Subgroup.centralizer ((R.subgroupOf RT : Subgroup ↥RT) : Set ↥RT) :=
           Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hR_le_fix)
       _ ≤ Subgroup.fixedPointsOfMulAut φ := hCRTR_le_fix
-  haveI : Group.IsNilpotent ↥RT := hRT_pg.isNilpotent
+  have : Group.IsNilpotent ↥RT := hRT_pg.isNilpotent
   have hcop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers u)) (Nat.card ↥RT) := by
     obtain ⟨n, hn⟩ := hRT_pg.exists_card_eq
     rw [Nat.card_zpowers, hn]
@@ -778,7 +778,7 @@ trivial `p'`-core and `R` is a `p`-subgroup, then `O_{p'}(C_G(R)) = ⊥`. From t
 `C_G(O_p(G)) ⊆ O_p(G)` (Prop 1.15(a)): `O_{p'}(C_G(R))` is both a `p`-subgroup (`≤ O_p(G)`) and a
 `p'`-group, hence `⊥`. The general form (below) reduces to this case modulo `O_{p'}(G)`. -/
 theorem oPiPrimeCore_centralizer_eq_bot_of_oPiPrimeCore_eq_bot
-    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] [Group.IsSolvable G]
     {R : Subgroup G} (hR : IsPGroup p R)
     (hbot : OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)ᶜ G = ⊥) :
     OddOrder.GroupTheory.opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer (R : Set G)) = ⊥ := by
@@ -823,7 +823,7 @@ This reduces the general statement to the `O_{p'}(G) = ⊥` case
 `K.subgroupOf C̄ ≤ O_{p'}(↥C̄)`, i.e. `K ≤ O_{p'}(C_Ḡ(R̄))`. The special case at `Ḡ` (where
 `O_{p'}(Ḡ) = ⊥` by `oPiCore_quotient_self_eq_bot`) forces `K = ⊥`, hence `M ≤ ker f = M₀`. -/
 theorem oPiPrimeCore_centralizer_le_oPiPrimeCore
-    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    {p : ℕ} [Fact p.Prime] {G : Type*} [Group G] [Finite G] [Group.IsSolvable G]
     {R : Subgroup G} (hR : IsPGroup p R) :
     OddOrder.GroupTheory.opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer (R : Set G)) ≤
       OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)ᶜ G := by
@@ -831,7 +831,7 @@ theorem oPiPrimeCore_centralizer_le_oPiPrimeCore
     (Subgroup.centralizer (R : Set G)) with hMdef
   set M₀ : Subgroup G := OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ)ᶜ G with hM₀def
   -- goal is now `M ≤ M₀`.
-  haveI hM₀norm : M₀.Normal := by rw [hM₀def]; infer_instance
+  have hM₀norm : M₀.Normal := by rw [hM₀def]; infer_instance
   set f : G →* G ⧸ M₀ := QuotientGroup.mk' M₀ with hfdef
   have hsurj : Function.Surjective f := QuotientGroup.mk'_surjective M₀
   have hker : f.ker = M₀ := QuotientGroup.ker_mk' M₀
@@ -876,7 +876,7 @@ theorem oPiPrimeCore_centralizer_le_oPiPrimeCore
     rw [heq]
     exact Subgroup.mem_map_of_mem f hconj
   -- (C) `K.subgroupOf Cbar` is normal in `↥Cbar`.
-  haveI hK_norm : (K.subgroupOf Cbar).Normal := by
+  have hK_norm : (K.subgroupOf Cbar).Normal := by
     refine ⟨fun n hn g => ?_⟩
     rw [Subgroup.mem_subgroupOf] at hn ⊢
     simp only [Subgroup.coe_mul, Subgroup.coe_inv]
@@ -1006,12 +1006,12 @@ theorem normal_subgroup_card_pow_le_of_pGroup
   | succ r ih =>
     obtain ⟨L₀, hL₀_norm, hL₀_le_N, hL₀_card⟩ :=
       ih (dvd_trans (pow_dvd_pow p (Nat.le_succ _)) hr_dvd)
-    haveI : L₀.Normal := hL₀_norm
+    have : L₀.Normal := hL₀_norm
     let f : G →* G ⧸ L₀ := QuotientGroup.mk' L₀
     have hf_surj : Function.Surjective f := QuotientGroup.mk'_surjective _
     have hf_ker : f.ker = L₀ := QuotientGroup.ker_mk' L₀
     let N' : Subgroup (G ⧸ L₀) := N.map f
-    haveI hN'_normal : N'.Normal := hN.map f hf_surj
+    have hN'_normal : N'.Normal := hN.map f hf_surj
     have hG'_pgroup : IsPGroup p (G ⧸ L₀) := hG.to_quotient L₀
     have hN'_comap : (N.map f).comap f = N := by
       rw [Subgroup.comap_map_eq, hf_ker, sup_eq_left]; exact hL₀_le_N
@@ -1027,7 +1027,7 @@ theorem normal_subgroup_card_pow_le_of_pGroup
       exact Nat.dvd_of_mul_dvd_mul_right hpr_pos h2
     have hN'_card_gt : 1 < Nat.card N' :=
       lt_of_lt_of_le hp.out.one_lt (Nat.le_of_dvd Nat.card_pos hp_dvd_N')
-    haveI hN'_nontrivial : Nontrivial N' :=
+    have hN'_nontrivial : Nontrivial N' :=
       Finite.one_lt_card_iff_nontrivial.mp hN'_card_gt
     have hinter_nontrivial :
         Nontrivial ((N' ⊓ Subgroup.center (G ⧸ L₀) : Subgroup (G ⧸ L₀))) :=
@@ -1044,7 +1044,7 @@ theorem normal_subgroup_card_pow_le_of_pGroup
         · simp at hinter_card_gt
         · exact Nat.succ_pos _
       exact dvd_pow_self p this.ne'
-    haveI : Fintype ((N' ⊓ Subgroup.center (G ⧸ L₀) : Subgroup (G ⧸ L₀))) := Fintype.ofFinite _
+    have : Fintype ((N' ⊓ Subgroup.center (G ⧸ L₀) : Subgroup (G ⧸ L₀))) := Fintype.ofFinite _
     have hp_dvd_fintype :
         p ∣ Fintype.card ((N' ⊓ Subgroup.center (G ⧸ L₀) : Subgroup (G ⧸ L₀))) := by
       rwa [← Nat.card_eq_fintype_card]
@@ -1060,7 +1060,7 @@ theorem normal_subgroup_card_pow_le_of_pGroup
     have hK_card : Nat.card K = p := by
       rw [Nat.card_zpowers, hx_orderOf]
     have hx_comm : ∀ g, g * x = x * g := Subgroup.mem_center_iff.mp hx_in_center
-    haveI hK_normal : K.Normal := by
+    have hK_normal : K.Normal := by
       refine ⟨fun a ha g => ?_⟩
       obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp ha
       have hgx : Commute g x := hx_comm g
@@ -1089,7 +1089,7 @@ Proof: `|H| = |O_p(Ḡ)| · |O_{p'}(G)|` with `|O_p(Ḡ)| = p ^ k` and `|O_{p'}(
 so the `p`-part of `|H|` is exactly `|O_p(Ḡ)|`, whence `|T| = |O_p(Ḡ)|`.  Since
 `T ⊓ O_{p'}(G) = ⊥`, the image of `T` in `Ḡ` still has order `|O_p(Ḡ)|` and is contained in
 `O_p(Ḡ)`, so it equals `O_p(Ḡ)`; pulling back along `mk` gives `T ⊔ O_{p'}(G) = H`. -/
-theorem sup_oPiCore_compl_eq_oPiPrimePiCore_of_isSylow [IsSolvable G]
+theorem sup_oPiCore_compl_eq_oPiPrimePiCore_of_isSylow [Group.IsSolvable G]
     {T : Subgroup G} (hT : IsPGroup p T)
     (hTle : T ≤ OddOrder.Isaacs.Ch03.oPiPrimePiCore ({p} : Set ℕ) G)
     (hTcard : Nat.card T

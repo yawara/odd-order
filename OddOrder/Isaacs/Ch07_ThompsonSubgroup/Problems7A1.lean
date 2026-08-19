@@ -50,7 +50,7 @@ theorem exists_sylow_eq_of_maximal_pSubgroup_in_normalizer {G : Type*} [Group G]
   have hHne : (P.subgroupOf (S : Subgroup G)) ≠ ⊤ := by
     intro htop
     exact hnot (Subgroup.subgroupOf_eq_top.mp htop)
-  haveI : Group.IsNilpotent ↥(S : Subgroup G) := S.isPGroup'.isNilpotent
+  have : Group.IsNilpotent ↥(S : Subgroup G) := S.isPGroup'.isNilpotent
   have hlt := Group.normalizerCondition_of_isNilpotent (G := ↥(S : Subgroup G))
     (P.subgroupOf (S : Subgroup G)) (lt_top_iff_ne_top.mpr hHne)
   obtain ⟨x, hxnorm, hxnot⟩ := SetLike.exists_of_lt hlt
@@ -101,12 +101,12 @@ theorem exists_mul_centralizing_of_isNilpotent {G : Type*} [Group G] [Finite G] 
     ∃ u ∈ (Pm : Subgroup ↥M).map M.subtype, ∃ h : G,
       (∀ v ∈ (Pm : Subgroup ↥M).map M.subtype, h * v = v * h) ∧ m = u * h := by
   classical
-  haveI := hMnil
-  haveI hPnormal : (Pm : Subgroup ↥M).Normal :=
+  have := hMnil
+  have hPnormal : (Pm : Subgroup ↥M).Normal :=
     Sylow.normal_of_normalizerCondition Group.normalizerCondition_of_isNilpotent Pm
   obtain ⟨N, hNnormal, hNcompl⟩ :=
     OddOrder.Isaacs.Ch05.hasNormalPComplement_of_isNilpotent (H := ↥M) (p := p)
-  haveI := hNnormal
+  have := hNnormal
   have hcompl := hNcompl Pm
   have hcomm := Subgroup.commute_of_normal_of_disjoint N (Pm : Subgroup ↥M) hNnormal hPnormal
     hcompl.disjoint
@@ -160,8 +160,8 @@ theorem isPGroup_two_of_isNilpotent_of_isCoatom {G : Type*} [Group G] [Finite G]
       exact hcon ⟨q, hq, hqd, hq2⟩
     exact IsPGroup.of_card
       (Nat.eq_prime_pow_of_unique_prime_dvd Nat.card_pos.ne' fun {q} hq hqd => hall q hq hqd)
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI := hnil
+  have : Fact p.Prime := ⟨hp⟩
+  have := hnil
   obtain ⟨Pm⟩ : Nonempty (Sylow p ↥M) := inferInstance
   -- `P` = `M` の Sylow `p` を `G` の部分群として見たもの
   have hPM : (Pm : Subgroup ↥M).map M.subtype ≤ M := by
@@ -181,7 +181,7 @@ theorem isPGroup_two_of_isNilpotent_of_isCoatom {G : Type*} [Group G] [Finite G]
       le_normalizer_of_isNilpotent hnil Pm hYP hYnorm
     have hne : Subgroup.normalizer (Y : Set G) ≠ ⊤ := by
       intro htop
-      haveI hYnormal : Y.Normal := Subgroup.normalizer_eq_top_iff.mp htop
+      have hYnormal : Y.Normal := Subgroup.normalizer_eq_top_iff.mp htop
       rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal Y hYnormal with hb | ht
       · exact hYne hb
       · exact hM.1 (top_le_iff.mp ((ht ▸ hYP).trans hPM))
@@ -209,7 +209,7 @@ theorem isPGroup_two_of_isNilpotent_of_isCoatom {G : Type*} [Group G] [Finite G]
       OddOrder.Isaacs.Ch05.HasNormalPComplement p
         ↥(Subgroup.normalizer ((X.map (S : Subgroup G).subtype : Subgroup G) : Set G)) := by
     intro X hXchar hXne
-    haveI := hXchar
+    have := hXchar
     have hYP : X.map (S : Subgroup G).subtype ≤ (Pm : Subgroup ↥M).map M.subtype := by
       rw [← hSeq]
       rintro _ ⟨u, _, rfl⟩

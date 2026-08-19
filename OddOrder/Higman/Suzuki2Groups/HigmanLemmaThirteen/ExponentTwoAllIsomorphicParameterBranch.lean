@@ -155,24 +155,24 @@ theorem false_of_allIsomorphicParameterBranch_exponent_two
   let hZTEA : IsElementaryAbelian 2 (frattini ↥(Z ⊔ T)) :=
     IsElementaryAbelian.of_mulEquiv
       (pairwiseJoinFrattiniEquivAmbientFrattini hMapZT).symm hPhiEA
-  letI : IsMulCommutative (frattini P) :=
+  let : IsMulCommutative (frattini P) :=
     IsMulCommutative.of_comm hPhiEA.comm
-  letI : CommGroup (frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini P)) :=
+  let : CommGroup (frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini P)) :=
     hPhiEA.zmodModule
-  letI : IsMulCommutative (frattini ↥(X ⊔ T)) :=
+  let : IsMulCommutative (frattini ↥(X ⊔ T)) :=
     IsMulCommutative.of_comm hXTEA.comm
-  letI : CommGroup (frattini ↥(X ⊔ T)) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini ↥(X ⊔ T))) :=
+  let : CommGroup (frattini ↥(X ⊔ T)) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini ↥(X ⊔ T))) :=
     hXTEA.zmodModule
-  letI : IsMulCommutative (frattini ↥(Z ⊔ T)) :=
+  let : IsMulCommutative (frattini ↥(Z ⊔ T)) :=
     IsMulCommutative.of_comm hZTEA.comm
-  letI : CommGroup (frattini ↥(Z ⊔ T)) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini ↥(Z ⊔ T))) :=
+  let : CommGroup (frattini ↥(Z ⊔ T)) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini ↥(Z ⊔ T))) :=
     hZTEA.zmodModule
-  letI : CommGroup (P ⧸ frattini P) :=
+  let : CommGroup (P ⧸ frattini P) :=
     frattiniQuotientCommGroup P hP
-  letI : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
+  let : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
     frattiniQuotientZModTwoModule P hP
   intro n hn g ePhi nu hggen hnuPrimitive hconj xt zt
     hthetaTcopy hAll

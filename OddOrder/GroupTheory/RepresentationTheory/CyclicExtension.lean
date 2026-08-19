@@ -93,7 +93,7 @@ theorem Representation.isIrreducible_of_isIrreducible_comp
     (σ : Representation F G' V) (hσ : Representation.IsIrreducible (σ.comp f)) :
     Representation.IsIrreducible σ := by
   have h1 : IsSimpleOrder (Subrepresentation (σ.comp f)) := hσ
-  haveI := h1.toNontrivial
+  have := h1.toNontrivial
   -- restrict the invariance condition of a `σ`-subrepresentation to the image of `f`
   let ι : Subrepresentation σ → Subrepresentation (σ.comp f) := fun R =>
     { toSubmodule := R.toSubmodule
@@ -106,7 +106,7 @@ theorem Representation.isIrreducible_of_isIrreducible_comp
   have hVne : (⊥ : Submodule F V) ≠ ⊤ := fun h2 =>
     bot_ne_top (α := Subrepresentation (σ.comp f))
       (Subrepresentation.toSubmodule_injective (by rw [hbotC, htopC]; exact h2))
-  haveI hnt : Nontrivial (Subrepresentation σ) :=
+  have hnt : Nontrivial (Subrepresentation σ) :=
     ⟨⟨⊥, ⊤, fun hbt => hVne (by rw [← hbotS, hbt, htopS])⟩⟩
   exact ⟨fun S => by
     rcases h1.eq_bot_or_eq_top (ι S) with h | h
@@ -315,12 +315,12 @@ theorem exists_normalized_conjugation_unit_of_nonempty_equiv [Finite K] [IsAlgCl
     simpa only [Units.val_mul, Representation.asGroupHom_apply] using this
   -- … hence is a nonzero scalar `c` by Schur
   obtain ⟨c, hc⟩ := exists_smul_id_of_forall_mul_comm ρ _ hTcomm
-  haveI : Nontrivial V := by
-    haveI h1 : Nontrivial (Subrepresentation ρ) := IsSimpleOrder.toNontrivial
+  have : Nontrivial V := by
+    have h1 : Nontrivial (Subrepresentation ρ) := IsSimpleOrder.toNontrivial
     have h2 : Nontrivial (Submodule F V) :=
       (Subrepresentation.toSubmodule_injective (ρ := ρ)).nontrivial
     exact (Submodule.nontrivial_iff F).mp h2
-  haveI : Nontrivial (Module.End F V) := ⟨1, 0, fun h1 => by
+  have : Nontrivial (Module.End F V) := ⟨1, 0, fun h1 => by
     obtain ⟨v, hv⟩ := exists_ne (0 : V)
     exact hv (by simpa using LinearMap.congr_fun h1 v)⟩
   have hc0 : c ≠ 0 := by

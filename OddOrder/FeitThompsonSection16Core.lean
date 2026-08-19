@@ -622,7 +622,7 @@ theorem exists_section16MaximalPair_data {G : Type*} [Group G] [Finite G]
   · push Not at hall
     obtain ⟨S, hS, hSnotI⟩ := hall
     have hSP : BG.Ch4.S14.IsTypeP S := notTypeI_imp_typeP S hS hSnotI
-    haveI : IsSolvable ↥S := hG.solvable_of_mem_maximalSubgroups hS
+    have : Group.IsSolvable ↥S := hG.isSolvable_of_mem_maximalSubgroups hS
     obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥S) (BG.Ch4.S14.kappa S)
     set K : Subgroup G := K'.map S.subtype with hKdef
     have hKeq : K.subgroupOf S = K' :=
@@ -740,7 +740,7 @@ theorem typePData_of_kappaHall_hallComplement_W2 {G : Type*} [Group G] [Finite G
     (hKnorm : K ≤ Subgroup.normalizer (U : Set G))
     (hKstar : Kstar = BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
     (typePData_of_kappaHall_hallComplement hG hM hP2 hKM hKne hK hUM hUhall hKnorm).W2 = Kstar := by
-  haveI := (Subgroup.nontrivial_iff_ne_bot K).mpr hKne
+  have := (Subgroup.nontrivial_iff_ne_bot K).mpr hKne
   obtain ⟨⟨x, hxK⟩, hxne⟩ := exists_ne (1 : ↥K)
   have hxne' : x ≠ 1 := by rintro rfl; exact hxne rfl
   have hW1 :
@@ -872,7 +872,7 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
     Section16TypePStructure mp := by
   -- **W-side** from `mp`'s canonical partner witness (`typeP_pair_W_structure`, BG 14.7).  A Hall
   -- `(κ ∪ σ)'`-subgroup `U₀` of `S` (needed only to invoke the lemma) comes from Hall's theorem.
-  haveI : IsSolvable ↥mp.S := hG.solvable_of_mem_maximalSubgroups mp.S_maximal
+  haveI : Group.IsSolvable ↥mp.S := hG.isSolvable_of_mem_maximalSubgroups mp.S_maximal
   have hUex : ∃ U₀ : Subgroup G,
       Ch03.IsHallSubgroup ((BG.Ch4.S14.kappa mp.S ∪ BG.Ch3.S10.sigma mp.S)ᶜ)
         (U₀.subgroupOf mp.S) := by
@@ -1087,7 +1087,7 @@ theorem Section16MaximalPair.W_structure {G : Type*} [Group G] [Finite G]
     (hG : IsMinimalSimpleOdd G) (mp : Section16MaximalPair G) :
     mp.S ⊓ mp.T = mp.K ⊔ mp.Kstar ∧ IsCyclic ↥(mp.S ⊓ mp.T) ∧
       mp.K ⊓ mp.Kstar = ⊥ ∧ (∀ x ∈ mp.K, ∀ y ∈ mp.Kstar, Commute x y) := by
-  haveI : IsSolvable ↥mp.S := hG.solvable_of_mem_maximalSubgroups mp.S_maximal
+  have : Group.IsSolvable ↥mp.S := hG.isSolvable_of_mem_maximalSubgroups mp.S_maximal
   have hUex : ∃ U₀ : Subgroup G,
       Ch03.IsHallSubgroup ((BG.Ch4.S14.kappa mp.S ∪ BG.Ch3.S10.sigma mp.S)ᶜ)
         (U₀.subgroupOf mp.S) := by
@@ -1112,7 +1112,7 @@ theorem Section16TypePStructure.W1_eq_K_and_W2_eq_Kstar {G : Type*} [Group G] [F
     tp.W1 = mp.K ∧ tp.W2 = mp.Kstar := by
   obtain ⟨hWjoin, _, hKbot, _⟩ := mp.W_structure hG
   have hWeq : tp.W = mp.K ⊔ mp.Kstar := tp.W_eq_inter.trans hWjoin
-  haveI : IsCyclic ↥tp.W := tp.W_cyclic
+  have : IsCyclic ↥tp.W := tp.W_cyclic
   have hKle : mp.K ≤ tp.W := hWeq ▸ le_sup_left
   have hKstarle : mp.Kstar ≤ tp.W := hWeq ▸ le_sup_right
   have hW1le : tp.W1 ≤ tp.W := tp.W_eq_join ▸ le_sup_left

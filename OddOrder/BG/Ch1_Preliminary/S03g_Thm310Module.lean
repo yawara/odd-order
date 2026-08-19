@@ -64,7 +64,7 @@ theorem prime_card_and_finrank_of_abelian_frobenius_weight [Finite G] [IsAlgClos
     ∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p ∧
       finrank F V = Nat.card ↥R * finrank F (Representation.invariants (ρ.comp R.subtype)) := by
   classical
-  haveI : Finite ↥R := Subtype.finite
+  have : Finite ↥R := Subtype.finite
   -- The trivial character's weight space is `C_V(K) = 0`.
   have hTrivWS : weightSpace ρ K (fun _ => (1 : F)) = ⊥ := by
     have hset : weightSpace ρ K (fun _ => (1 : F))
@@ -78,8 +78,8 @@ theorem prime_card_and_finrank_of_abelian_frobenius_weight [Finite G] [IsAlgClos
   -- The block index set: characters with nonzero weight space.
   set ι : Type _ := {χ : ↥K → F // weightSpace ρ K χ ≠ ⊥} with hι
   -- (1) Instances on `ι`.
-  haveI hindep : iSupIndep (weightSpace ρ K) := iSupIndep_weightSpace ρ hKab
-  haveI : Fintype ι := hindep.fintypeNeBotOfFiniteDimensional
+  have hindep : iSupIndep (weightSpace ρ K) := iSupIndep_weightSpace ρ hKab
+  have : Fintype ι := hindep.fintypeNeBotOfFiniteDimensional
   -- (2) The `↥R`-action on `ι` via conjugation of characters.
   have hpres : ∀ (r : ↥R) (χ : ↥K → F), weightSpace ρ K χ ≠ ⊥ →
       weightSpace ρ K (conjChar K (r : G) χ) ≠ ⊥ := by
@@ -90,7 +90,7 @@ theorem prime_card_and_finrank_of_abelian_frobenius_weight [Finite G] [IsAlgClos
     have hmem : ρ (r : G) v ∈ (weightSpace ρ K χ).map (ρ (r : G)) := Submodule.mem_map_of_mem hv
     rw [hbot, Submodule.mem_bot] at hmem
     exact hv0 ((ρ.apply_bijective (r : G)).injective (hmem.trans (map_zero _).symm))
-  letI : MulAction ↥R ι :=
+  let : MulAction ↥R ι :=
     { smul := fun r i => ⟨conjChar K (r : G) i.1, hpres r i.1 i.2⟩
       one_smul := fun i => by
         apply Subtype.ext
@@ -219,15 +219,15 @@ theorem prime_card_and_finrank_of_elemAbelian {p : ℕ} [Fact p.Prime]
     (AlgebraicClosure (ZMod p)) ρ with hρ'
   -- Finite dimensionality of `Additive M` over `ZMod p` (a finite module over a field), and of the
   -- base change (synthesised now, with the module a genuine instance).
-  haveI : FiniteDimensional (ZMod p) (Additive M) := Module.Finite.of_finite
-  haveI : FiniteDimensional (AlgebraicClosure (ZMod p))
+  have : FiniteDimensional (ZMod p) (Additive M) := Module.Finite.of_finite
+  have : FiniteDimensional (AlgebraicClosure (ZMod p))
       (TensorProduct (ZMod p) (AlgebraicClosure (ZMod p)) (Additive M)) := inferInstance
   -- Characteristic of the algebraic closure is `p`.
-  haveI hChar : CharP (AlgebraicClosure (ZMod p)) p :=
+  have hChar : CharP (AlgebraicClosure (ZMod p)) p :=
     (Algebra.charP_iff (ZMod p) (AlgebraicClosure (ZMod p)) p).mp inferInstance
   -- `Additive M` is nontrivial, hence so is the base change (faithfully flat field extension).
-  haveI hntM : Nontrivial (Additive M) := inferInstanceAs (Nontrivial (Additive M))
-  haveI : Nontrivial (TensorProduct (ZMod p) (AlgebraicClosure (ZMod p)) (Additive M)) :=
+  have hntM : Nontrivial (Additive M) := inferInstanceAs (Nontrivial (Additive M))
+  have : Nontrivial (TensorProduct (ZMod p) (AlgebraicClosure (ZMod p)) (Additive M)) :=
     (Module.FaithfullyFlat.nontrivial_tensorProduct_iff_right (R := ZMod p)
       (M := AlgebraicClosure (ZMod p)) (N := Additive M)).mpr hntM
   -- **Bridge**: `ρ g v = v` over `Additive M` ⟺ `(g:H) • (toMul v) = toMul v` in `M`.
@@ -349,8 +349,8 @@ theorem prime_card_of_elemAbelian_mulDistrib {p : ℕ} [Fact p.Prime]
     (hcond3 : ∀ x : H, x ∈ R → x ≠ 1 →
       ∀ m : M, ((x : H) • m = m) ↔ (∀ s : ↥R, (s : H) • m = m)) :
     ∃ p' : ℕ, p'.Prime ∧ Nat.card ↥R = p' := by
-  haveI : NeZero p := ⟨(Fact.out : p.Prime).ne_zero⟩
-  letI : Module (ZMod p) (Additive M) := hM.zmodModule
+  have : NeZero p := ⟨(Fact.out : p.Prime).ne_zero⟩
+  let : Module (ZMod p) (Additive M) := hM.zmodModule
   exact prime_card_of_elemAbelian_aux hRne hKab hpK hCK hFrob hcond3
 
 end ElemAbelian

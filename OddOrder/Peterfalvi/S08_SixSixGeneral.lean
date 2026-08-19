@@ -104,7 +104,7 @@ theorem exists_index_primePow_degree_of_mem_inducedKernelFamily
     {p : ℕ} (hp : p.Prime) (hKp : IsPGroup p ↥K) {X : Subgroup ↥L}
     {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ inducedKernelFamily K X) :
     ∃ k : ℕ, χ 1 = ((K.index * p ^ k : ℕ) : ℂ) := by
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
   obtain ⟨θ, -, -, rfl⟩ := hχ
   obtain ⟨k, hk⟩ := exists_primePow_natDegree_of_isPGroup hp hKp θ
   exact ⟨k, by rw [ClassFunction.induce_apply_one, hk]; push_cast; ring⟩
@@ -123,7 +123,7 @@ theorem exists_source_primePow_centralBound_of_mem_xSet
     {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ xSet K Z) :
     ∃ k : ℕ, χ 1 = ((K.index * p ^ k : ℕ) : ℂ)
       ∧ (p ^ k) ^ 2 ≤ Nat.card (↥K ⧸ Z.subgroupOf K) := by
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
   obtain ⟨θ, -, -, rfl⟩ := hχ.1
   obtain ⟨k, hk⟩ := exists_primePow_natDegree_of_isPGroup hp hKp θ
   refine ⟨k, by rw [ClassFunction.induce_apply_one, hk]; push_cast; ring, ?_⟩

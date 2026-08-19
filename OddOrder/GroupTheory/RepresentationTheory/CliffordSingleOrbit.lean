@@ -29,7 +29,7 @@ characters this says their characters lie in one orbit of the conjugation action
 
 namespace OddOrder.RepresentationTheory
 
-open Representation
+open _root_.OddOrder.RepresentationTheory.Representation
 open scoped MonoidAlgebra
 
 variable {G : Type*} [Group G]
@@ -56,7 +56,7 @@ theorem character_conj_of_simpleSubmodule [ρ.IsIrreducible] [FiniteDimensional 
       = fun h => ((Subrepresentation.ofSubmodule' N).toRepresentation).character
           (conjNormalMulAut H g⁻¹ h) := by
   classical
-  haveI : ∀ S : (Set.range fun g : G => N.map (conjSemilinearEnd (H := H) ρ g)),
+  have : ∀ S : (Set.range fun g : G => N.map (conjSemilinearEnd (H := H) ρ g)),
       IsSimpleModule k[↥H] (S : Submodule k[↥H] (resRep ρ H).asModule) := by
     rintro ⟨_, g, rfl⟩
     exact isSimpleModule_map_conjSemilinearEnd ρ g N
@@ -93,7 +93,7 @@ theorem exists_simpleSubmodule_character_eq_of_ne_zero_intertwiner [FiniteDimens
     {f : Representation.IntertwiningMap σ (resRep ρ H)} (hf : f ≠ 0) :
     ∃ N : Submodule k[↥H] (resRep ρ H).asModule, IsSimpleModule k[↥H] ↥N ∧
       ((Subrepresentation.ofSubmodule' N).toRepresentation).character = σ.character := by
-  haveI : IsSimpleModule k[↥H] σ.asModule :=
+  have : IsSimpleModule k[↥H] σ.asModule :=
     (Representation.irreducible_iff_isSimpleModule_asModule σ).mp inferInstance
   set fam := Representation.IntertwiningMap.equivLinearMapAsModule σ (resRep ρ H) f with hfam
   have hfam_ne : fam ≠ 0 := by
@@ -126,7 +126,7 @@ theorem restrictionConstituentsSingleOrbit_of_isIrreducible
     IrreducibleCharacter.RestrictionConstituentsSingleOrbit (G := G) (H := H) χ := by
   classical
   obtain ⟨V, _, _, _, ρ, hρirr, hρchar⟩ := χ.isIrreducible
-  haveI := hρirr
+  have := hρirr
   -- Every constituent `ψ` of `Res χ` is the character of a simple `k[H]`-submodule of `Res ρ`.
   have wrapper : ∀ ψ : IrreducibleCharacter ↥H,
       IrreducibleCharacter.LiesOver (G := G) (H := H) χ ψ →
@@ -135,12 +135,12 @@ theorem restrictionConstituentsSingleOrbit_of_isIrreducible
           = (ψ : ClassFunction ↥H ℂ) := by
     intro ψ hψ
     obtain ⟨W, _, _, _, σ, hσirr, hσchar⟩ := ψ.isIrreducible
-    haveI := hσirr
+    have := hσirr
     have hfr := ClassFunction.restrictionMultiplicity_eq_finrank_intertwiningMap (H := H) ρ σ
       hρchar hσchar
     have hfr_ne : Module.finrank ℂ (Representation.IntertwiningMap σ (ρ.comp H.subtype)) ≠ 0 :=
       fun h0 => hψ (by rw [hfr, h0, Nat.cast_zero])
-    haveI : Nontrivial (Representation.IntertwiningMap σ (ρ.comp H.subtype)) :=
+    have : Nontrivial (Representation.IntertwiningMap σ (ρ.comp H.subtype)) :=
       Module.nontrivial_of_finrank_pos (Nat.pos_of_ne_zero hfr_ne)
     obtain ⟨f, hf⟩ := exists_ne (0 : Representation.IntertwiningMap σ (ρ.comp H.subtype))
     obtain ⟨N, hNsimple, hNchar⟩ :=
@@ -149,8 +149,8 @@ theorem restrictionConstituentsSingleOrbit_of_isIrreducible
   intro θ η hθ hη
   obtain ⟨Nθ, hNθsimple, hNθchar⟩ := wrapper θ hθ
   obtain ⟨Nη, hNηsimple, hNηchar⟩ := wrapper η hη
-  haveI := hNθsimple
-  haveI := hNηsimple
+  have := hNθsimple
+  have := hNηsimple
   have hNη_ne : Nη ≠ ⊥ := Nη.nontrivial_iff_ne_bot.mp (IsSimpleModule.nontrivial ℂ[↥H] ↥Nη)
   obtain ⟨g, hg⟩ := character_conj_of_simpleSubmodule ρ Nη Nθ hNη_ne
   -- `hg : χ_{N_θ} = fun h => χ_{N_η} (g⁻¹ h g)`; substitute the constituent characters.
@@ -184,7 +184,7 @@ theorem exists_conj_of_common_induce_constituent
     (h₂ : ClassFunction.inner (ClassFunction.induce H (θ₂ : ClassFunction ↥H ℂ))
         (χ : ClassFunction G ℂ) ≠ 0) :
     ∃ g : G, IrreducibleCharacter.conjBy g θ₁ = θ₂ := by
-  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  have : Fintype ↥H := Fintype.ofFinite ↥H
   exact (restrictionConstituentsSingleOrbit_of_isIrreducible (H := H) χ).exists_conj
     ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H χ θ₁).mp h₁)
     ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H χ θ₂).mp h₂)
@@ -208,7 +208,7 @@ theorem induce_constituents_disjoint_of_not_conj [Fintype G] [Invertible (Nat.ca
       (Finset.univ.filter fun χ : IrreducibleCharacter G =>
         ClassFunction.inner (ClassFunction.induce H (θ₂ : ClassFunction ↥H ℂ))
           (χ : ClassFunction G ℂ) ≠ 0) := by
-  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  have : Fintype ↥H := Fintype.ofFinite ↥H
   classical
   rw [Finset.disjoint_left]
   intro χ hχ1 hχ2
@@ -228,7 +228,7 @@ theorem exists_induce_inner_ne_zero [Finite G] [Fintype G] [Invertible (Nat.card
     ∃ ρ : IrreducibleCharacter ↥H,
       ClassFunction.inner (ClassFunction.induce H (ρ : ClassFunction ↥H ℂ))
         (φ : ClassFunction G ℂ) ≠ 0 := by
-  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  have : Fintype ↥H := Fintype.ofFinite ↥H
   obtain ⟨ρ, hρ⟩ := IrreducibleCharacter.exists_liesOver (H := H) φ
   exact ⟨ρ, (IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H φ ρ).mpr hρ⟩
 
@@ -241,7 +241,7 @@ theorem exists_liesOver_of_subgroup [Finite G] [Invertible (Nat.card G : ℂ)]
     {H : Subgroup G} [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
     (σ : IrreducibleCharacter ↥H) :
     ∃ ψ : IrreducibleCharacter G, IrreducibleCharacter.LiesOver H ψ σ := by
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   classical
   have hne : ClassFunction.induce H (σ : ClassFunction ↥H ℂ) ≠ 0 := by
     intro hzero
@@ -278,7 +278,7 @@ theorem exists_induce_constituent_partition [Finite G]
       (↑parts : Set (Finset (IrreducibleCharacter G))).PairwiseDisjoint id ∧
       ∀ A ∈ parts, ∃ ρ : IrreducibleCharacter ↥H, ∀ θ : IrreducibleCharacter G,
         θ ∈ A ↔ IrreducibleCharacter.LiesOver H θ ρ := by
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   classical
   let lam : IrreducibleCharacter G → IrreducibleCharacter ↥H :=
     fun φ => (IrreducibleCharacter.exists_liesOver (H := H) φ).choose
@@ -342,8 +342,8 @@ theorem restrict_eq_restrictionMultiplicity_smul_of_invariant
     ClassFunction.restrict H (χ : ClassFunction G ℂ)
       = ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ) (θ : ClassFunction ↥H ℂ)
           • (θ : ClassFunction ↥H ℂ) := by
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Fintype (IrreducibleCharacter ↥H) := Fintype.ofFinite (IrreducibleCharacter ↥H)
+  have : Fintype G := Fintype.ofFinite G
+  have : Fintype (IrreducibleCharacter ↥H) := Fintype.ofFinite (IrreducibleCharacter ↥H)
   classical
   have hsingle := restrictionConstituentsSingleOrbit_of_isIrreducible (H := H) χ
   conv_lhs => rw [← sum_inner_irreducibleCharacter_smul
@@ -382,8 +382,8 @@ theorem apply_one_eq_restrictionMultiplicity_mul_index_inertia
       = ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ) (θ₀ : ClassFunction ↥H ℂ)
           * ((IrreducibleCharacter.inertia (G := G) (H := H) θ₀).index : ℂ)
           * (θ₀ : ClassFunction ↥H ℂ) 1 := by
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Fintype (IrreducibleCharacter ↥H) := Fintype.ofFinite (IrreducibleCharacter ↥H)
+  have : Fintype G := Fintype.ofFinite G
+  have : Fintype (IrreducibleCharacter ↥H) := Fintype.ofFinite (IrreducibleCharacter ↥H)
   classical
   have hsingle := restrictionConstituentsSingleOrbit_of_isIrreducible (G := G) (H := H) χ
   have hcommon :=
@@ -439,8 +439,8 @@ theorem restrictionMultiplicity_eq_of_liesOver_of_apply_one_eq
     ClassFunction.restrictionMultiplicity H (φ₁ : ClassFunction G ℂ) (ρ : ClassFunction ↥H ℂ)
       = ClassFunction.restrictionMultiplicity H (φ₂ : ClassFunction G ℂ)
           (ρ : ClassFunction ↥H ℂ) := by
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Fintype (IrreducibleCharacter ↥H) := Fintype.ofFinite (IrreducibleCharacter ↥H)
+  have : Fintype G := Fintype.ofFinite G
+  have : Fintype (IrreducibleCharacter ↥H) := Fintype.ofFinite (IrreducibleCharacter ↥H)
   have e1 := apply_one_eq_restrictionMultiplicity_mul_index_inertia φ₁ ρ h₁
   have e2 := apply_one_eq_restrictionMultiplicity_mul_index_inertia φ₂ ρ h₂
   rw [hdeg] at e1
@@ -523,7 +523,7 @@ theorem apply_one_le_induce_apply_one_of_liesOver
     (hover : IrreducibleCharacter.LiesOver I χ ψ) :
     (χ : ClassFunction G ℂ) (1 : G) ≤
       ClassFunction.induce I (ψ : ClassFunction ↥I ℂ) (1 : G) := by
-  haveI : Fintype (IrreducibleCharacter G) := Fintype.ofFinite (IrreducibleCharacter G)
+  have : Fintype (IrreducibleCharacter G) := Fintype.ofFinite (IrreducibleCharacter G)
   classical
   -- For each irreducible `η` of `G`, the coefficient `⟨Ind ψ, η⟩` equals the restriction
   -- multiplicity `⟨Res η, ψ⟩` (Frobenius + the real-valuedness of the multiplicity).
@@ -615,9 +615,9 @@ theorem apply_one_eq_index_of_liesOver_linear_inertia
     (hψover : IrreducibleCharacter.LiesOver I χ ψ)
     (hψdeg : (ψ : ClassFunction ↥I ℂ) (1 : ↥I) = 1) :
     (χ : ClassFunction G ℂ) (1 : G) = (I.index : ℂ) := by
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Fintype (IrreducibleCharacter G) := Fintype.ofFinite (IrreducibleCharacter G)
-  haveI : Fintype (IrreducibleCharacter ↥H) := Fintype.ofFinite (IrreducibleCharacter ↥H)
+  have : Fintype G := Fintype.ofFinite G
+  have : Fintype (IrreducibleCharacter G) := Fintype.ofFinite (IrreducibleCharacter G)
+  have : Fintype (IrreducibleCharacter ↥H) := Fintype.ofFinite (IrreducibleCharacter ↥H)
   classical
   -- The constituent multiplicity `e = ⟨Res χ, θ₀⟩` is a non-negative integer `m`, and `m ≥ 1`
   -- because `χ` lies over `θ₀`.

@@ -46,7 +46,7 @@ IH-free segment of the minimal-counterexample proof.  From the phase A facts it 
 `R`-invariant complement `K` to `V = F(H)` in the preimage of `F(H/V)`, an invariant Sylow
 `p`-subgroup `P` of `N_H(K)`, and the structure facts (3.12)–(3.16) they satisfy. -/
 theorem complement_structure
-    {G : Type*} [Group G] [Finite G] [IsSolvable G] {p : ℕ} (hp : p.Prime)
+    {G : Type*} [Group G] [Finite G] [Group.IsSolvable G] {p : ℕ} (hp : p.Prime)
     {H R : Subgroup G} [H.Normal]
     (hcompl : Subgroup.IsComplement' H R)
     (hHall : Nat.Coprime (Nat.card ↥H) (Nat.card ↥R))
@@ -84,9 +84,9 @@ theorem complement_structure
       K.subgroupOf (Subgroup.normalizer (K : Set ↥H))
         = OddOrder.Isaacs.Ch01.fitting ↥(Subgroup.normalizer (K : Set ↥H)) ∧
       Subgroup.centralizer (K : Set ↥H) ≤ K := by
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     set V : Subgroup ↥H := OddOrder.Isaacs.Ch01.fitting ↥H with hVdef
-    haveI hVnorm : V.Normal := by rw [hVdef]; infer_instance
+    have hVnorm : V.Normal := by rw [hVdef]; infer_instance
     have hVoPi : V = OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) ↥H := by
       rw [hfit, ← OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore]
     -- `F(H/V)` is a `p'`-group (so `V` is a normal Hall `p`-subgroup of the preimage `U` of
@@ -101,7 +101,7 @@ theorem complement_structure
       set Q : Type _ := ↥H ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) ↥H with hQ
       intro q hqF hqπ
       have hq_prime : q.Prime := (Nat.mem_primeFactors.mp hqF).1
-      haveI : Fact q.Prime := ⟨hq_prime⟩
+      have : Fact q.Prime := ⟨hq_prime⟩
       have hq_dvd : q ∣ Nat.card ↥(OddOrder.Isaacs.Ch01.fitting Q) :=
         (Nat.mem_primeFactors.mp hqF).2.1
       obtain ⟨P⟩ : Nonempty (Sylow q ↥(OddOrder.Isaacs.Ch01.fitting Q)) := inferInstance
@@ -112,9 +112,9 @@ theorem complement_structure
       have hPbar_pg : IsPGroup q ↥Pbar := P.2.map _
       have hPnorm : (P : Subgroup ↥(OddOrder.Isaacs.Ch01.fitting Q)).Normal :=
         OddOrder.Isaacs.Ch01.Sylow.normal_of_isNilpotent P
-      haveI : (P : Subgroup ↥(OddOrder.Isaacs.Ch01.fitting Q)).Characteristic :=
+      have : (P : Subgroup ↥(OddOrder.Isaacs.Ch01.fitting Q)).Characteristic :=
         Sylow.characteristic_of_normal P hPnorm
-      haveI : Pbar.Normal := hPbar ▸ inferInstance
+      have : Pbar.Normal := hPbar ▸ inferInstance
       have hPbar_le_op : Pbar ≤ OddOrder.Isaacs.Ch01.opCore q Q :=
         OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore hPbar_pg
       have hPbar_ne : Pbar ≠ ⊥ := by
@@ -147,10 +147,10 @@ theorem complement_structure
         (Nat.mem_primeFactors.mpr ⟨hp, hdvd, Nat.card_pos.ne'⟩)
       simp at this
     -- `U := preimage of F(↥H/V)` in `↥H`: characteristic (hence `R`-invariant), and contains `V`.
-    haveI hVchar : V.Characteristic := by rw [hVdef]; infer_instance
+    have hVchar : V.Characteristic := by rw [hVdef]; infer_instance
     set U : Subgroup ↥H :=
       (OddOrder.Isaacs.Ch01.fitting (↥H ⧸ V)).comap (QuotientGroup.mk' V) with hUdef
-    haveI hUchar : U.Characteristic := Subgroup.Characteristic.comap_quotient_mk inferInstance
+    have hUchar : U.Characteristic := Subgroup.Characteristic.comap_quotient_mk inferInstance
     have hVU : V ≤ U := by
       rw [hUdef]
       intro v hv
@@ -396,7 +396,7 @@ theorem complement_structure
     -- — and by `N`, and `↥H = VN` by (3.12)) and `R`-invariant, so their `G`-lifts are normal in
     -- `G`, and (3.11) kills one of them.  `[V,K] = ⊥` would give `K ≤ C_H(V) = V` ((3.10)), so
     -- `K = ⊥` and `⁅K,P⁆ = ⊥`, contradicting (3.13).
-    letI : CommGroup ↥V := { (inferInstance : Group ↥V) with mul_comm := fun a b => hVelem.1 a b }
+    let : CommGroup ↥V := { (inferInstance : Group ↥V) with mul_comm := fun a b => hVelem.1 a b }
     set φKV : ↥K →* MulAut ↥V := (MulAut.conjNormal (G := ↥H) (H := V)).comp K.subtype with hφKV
     have hφKV_val : ∀ (k : ↥K) (v : ↥V),
         ((φKV k v : ↥V) : ↥H) = (k : ↥H) * v * (k : ↥H)⁻¹ := by
@@ -490,11 +490,11 @@ theorem complement_structure
       have h2 : (v * x) * nn * (v * x)⁻¹ = v * (x * nn * x⁻¹) * v⁻¹ := by group
       rw [h2, hcomm]
       simpa using h1
-    haveI hBnorm : (⁅V, K⁆ : Subgroup ↥H).Normal := by
+    have hBnorm : (⁅V, K⁆ : Subgroup ↥H).Normal := by
       refine hnormal_of_VN _ (Subgroup.commutator_le_left V K) fun x hx => ?_
       rw [Subgroup.map_commutator, Subgroup.characteristic_iff_map_eq.mp hVchar (MulAut.conj x),
         hconjK x hx]
-    haveI hCnorm : (V ⊓ Subgroup.centralizer (K : Set ↥H)).Normal := by
+    have hCnorm : (V ⊓ Subgroup.centralizer (K : Set ↥H)).Normal := by
       refine hnormal_of_VN _ inf_le_left fun x hx => ?_
       rw [Subgroup.map_inf _ _ _ (MulAut.conj x).injective,
         Subgroup.characteristic_iff_map_eq.mp hVchar (MulAut.conj x), hconjC x hx]
@@ -521,9 +521,9 @@ theorem complement_structure
         _ = (φ r) (y * (φ r)⁻¹ k) := by rw [hyc _ hk']
         _ = (φ r) y * k := by rw [map_mul, MulAut.apply_inv_self]
     -- the `G`-lifts are normal in `G` (normal in `↥H` + `R`-invariant + `G = HR`).
-    haveI hBnormG : ((⁅V, K⁆ : Subgroup ↥H).map H.subtype).Normal :=
+    have hBnormG : ((⁅V, K⁆ : Subgroup ↥H).map H.subtype).Normal :=
       normal_map_subtype_of_isAInvariant_conjNormal hcompl.sup_eq_top hB_inv
-    haveI hCnormG : ((V ⊓ Subgroup.centralizer (K : Set ↥H)).map H.subtype).Normal :=
+    have hCnormG : ((V ⊓ Subgroup.centralizer (K : Set ↥H)).map H.subtype).Normal :=
       normal_map_subtype_of_isAInvariant_conjNormal hcompl.sup_eq_top hC_inv
     -- the two factors intersect trivially and generate `V` (image of `IsComplement'`).
     have hCB_inf : (V ⊓ Subgroup.centralizer (K : Set ↥H)) ⊓ (⁅V, K⁆ : Subgroup ↥H) = ⊥ := by

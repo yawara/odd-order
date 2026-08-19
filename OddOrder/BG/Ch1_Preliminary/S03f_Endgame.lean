@@ -53,7 +53,7 @@ with `⁅K,P⁆ = K` ((3.24)/(3.25)), `A = P·R₀` acting with `C_A(K) = ⊥` (
 equations (3.29)–(3.37) force `K` elementary abelian of order `> q²`, and the orbit-parity
 count (3.38) yields the contradiction. -/
 theorem endgame_contradiction
-    {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    {G : Type*} [Group G] [Finite G] [Group.IsSolvable G]
     {p q r : ℕ} (hp : p.Prime) (hq_prime : q.Prime) (hr_prime : r.Prime)
     (hq_ne_p : q ≠ p) (hq_ne_r : q ≠ r) (hpr : p ≠ r) (hodd : Odd (Nat.card G))
     {H : Subgroup G} {V K P : Subgroup ↥H} {R₀ VG KG S₁ A : Subgroup G}
@@ -98,9 +98,9 @@ theorem endgame_contradiction
     (hR₀_le_NPG : R₀ ≤ Subgroup.normalizer ((P.map H.subtype : Subgroup G) : Set G))
     (hdisjPR : Disjoint (P.map H.subtype : Subgroup G) R₀) :
     False := by
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     have hKG_le_H : KG ≤ H := hKG ▸ Subgroup.map_subtype_le K
-    haveI : Fact q.Prime := ⟨hq_prime⟩
+    have : Fact q.Prime := ⟨hq_prime⟩
     have hq_ndvd_A : ¬ q ∣ Nat.card ↥A := by
       rw [hAcard]
       intro hdvd
@@ -126,7 +126,7 @@ theorem endgame_contradiction
       · rw [hcomm, hfrat]
     -- pin the `Normal` instance locally: with `IsMulCommutative (K/K')` in scope below, the
     -- bare search wanders into `Subgroup.normal_of_isMulCommutative` and times out
-    haveI hK'norm : (commutator ↥KG).Normal := inferInstance
+    have hK'norm : (commutator ↥KG).Normal := inferInstance
     have hK'_inv : OddOrder.Isaacs.Ch03.IsAInvariant φA (commutator ↥KG) :=
       OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic φA
     set φAQ : ↥A →* MulAut (↥KG ⧸ commutator ↥KG) :=
@@ -194,7 +194,7 @@ theorem endgame_contradiction
     have h330 : ¬ ((KG ⊓ Subgroup.centralizer (R₀ : Set G)) ≤ ⁅KG, KG⁆) := by
       intro hsub
       -- `K/K'` as a `ZMod q`-module
-      haveI hQbar_comm : IsMulCommutative (↥KG ⧸ commutator ↥KG) := ⟨⟨hQbar_mul_comm⟩⟩
+      have hQbar_comm : IsMulCommutative (↥KG ⧸ commutator ↥KG) := ⟨⟨hQbar_mul_comm⟩⟩
       have hexpQ : ∀ g : ↥KG ⧸ commutator ↥KG, g ^ q = 1 := by
         intro g
         refine QuotientGroup.induction_on g fun k => ?_
@@ -207,9 +207,9 @@ theorem endgame_contradiction
         apply Additive.toMul.injective
         rw [toMul_nsmul, toMul_zero]
         exact hexpQ x.toMul
-      haveI hQmod : Module (ZMod q) (Additive (↥KG ⧸ commutator ↥KG)) :=
+      have hQmod : Module (ZMod q) (Additive (↥KG ⧸ commutator ↥KG)) :=
         AddCommGroup.zmodModule hqsmul
-      haveI : Module.Finite (ZMod q) (Additive (↥KG ⧸ commutator ↥KG)) :=
+      have : Module.Finite (ZMod q) (Additive (↥KG ⧸ commutator ↥KG)) :=
         Module.Finite.of_finite
       set ρ : Representation (ZMod q) ↥A (Additive (↥KG ⧸ commutator ↥KG)) :=
         (OddOrder.BG.Ch1_Preliminary.mulAutToEnd (↥KG ⧸ commutator ↥KG) q).comp φAQ
@@ -224,7 +224,7 @@ theorem endgame_contradiction
         rw [hAdef]
         exact sup_le Subgroup.le_normalizer
           (fun _g hg => hR₀_le_NPG hg)
-      haveI hPGnormA : (((P.map H.subtype).subgroupOf A) : Subgroup ↥A).Normal :=
+      have hPGnormA : (((P.map H.subtype).subgroupOf A) : Subgroup ↥A).Normal :=
         Subgroup.normal_subgroupOf_of_le_normalizer hA_le_NPG
       have hPGcardA : Nat.card ↥((P.map H.subtype).subgroupOf A)
           = Nat.card ↥(P.map H.subtype : Subgroup G) :=
@@ -438,7 +438,7 @@ theorem endgame_contradiction
     -- Proposition 1.6(d) core: `C_K(R₀) ∩ ⁅K,R₀⁆ ≤ K'`
     have hCcap : (KG ⊓ Subgroup.centralizer (R₀ : Set G)) ⊓ (⁅KG, R₀⁆ : Subgroup G)
         ≤ ⁅KG, KG⁆ := by
-      letI : CommGroup (↥KG ⧸ commutator ↥KG) :=
+      let : CommGroup (↥KG ⧸ commutator ↥KG) :=
         { (inferInstance : Group (↥KG ⧸ commutator ↥KG)) with mul_comm := hQbar_mul_comm }
       have hCop16 : Nat.Coprime (Nat.card ↥(R₀.subgroupOf A))
           (Nat.card (↥KG ⧸ commutator ↥KG)) := by
@@ -521,7 +521,7 @@ theorem endgame_contradiction
       rw [hTdef]
       exact sup_le Subgroup.le_normalizer
         (OddOrder.Isaacs.Ch04.subgroup_le_normalizer_commutator_self_right KG R₀)
-    haveI hKRnormT : ((⁅KG, R₀⁆ : Subgroup G).subgroupOf T).Normal :=
+    have hKRnormT : ((⁅KG, R₀⁆ : Subgroup G).subgroupOf T).Normal :=
       Subgroup.normal_subgroupOf_of_le_normalizer hT_le_NKR
     have hT_le_S₁ : T ≤ S₁ := by
       rw [hTdef]
@@ -576,14 +576,14 @@ theorem endgame_contradiction
     have hFrobT := S03d.isFrobeniusGroup_of_prime_complement_fixedFree
       hcomplT hrTprime hKRT_ne_bot hFixT
     -- the conjugation representation of `T` on the `𝔽_p`-space `V_G` ((3.19) pattern)
-    haveI hVGcommT : IsMulCommutative ↥VG := ⟨⟨fun a b => hVGelem.1 a b⟩⟩
+    have hVGcommT : IsMulCommutative ↥VG := ⟨⟨fun a b => hVGelem.1 a b⟩⟩
     have hpsmulT : ∀ x : Additive ↥VG, (p : ℕ) • x = 0 := by
       intro x
       apply Additive.toMul.injective
       rw [toMul_nsmul, toMul_zero]
       exact hVGelem.2 x.toMul
-    haveI hVGmodT : Module (ZMod p) (Additive ↥VG) := AddCommGroup.zmodModule hpsmulT
-    haveI : Module.Finite (ZMod p) (Additive ↥VG) := Module.Finite.of_finite
+    have hVGmodT : Module (ZMod p) (Additive ↥VG) := AddCommGroup.zmodModule hpsmulT
+    have : Module.Finite (ZMod p) (Additive ↥VG) := Module.Finite.of_finite
     set ρT : Representation (ZMod p) ↥T (Additive ↥VG) :=
       (OddOrder.BG.Ch1_Preliminary.mulAutToEnd ↥VG p).comp
         ((MulAut.conjNormal (G := G) (H := VG)).comp T.subtype) with hρT
@@ -630,7 +630,7 @@ theorem endgame_contradiction
         fun z => by apply Subtype.ext; rfl⟩
     have hCV1T : Module.finrank (ZMod p)
         ↥(Representation.invariants (ρT.comp (R₀.subgroupOf T).subtype)) = 1 := by
-      haveI : Fintype ↥(Representation.invariants (ρT.comp (R₀.subgroupOf T).subtype)) :=
+      have : Fintype ↥(Representation.invariants (ρT.comp (R₀.subgroupOf T).subtype)) :=
         Fintype.ofFinite _
       have h2 : Nat.card
           ↥(Representation.invariants (ρT.comp (R₀.subgroupOf T).subtype))
@@ -781,7 +781,7 @@ theorem endgame_contradiction
         rwa [show (⟨(k : G), hxK⟩ : ↥KG) = k from Subtype.ext rfl] at hAC
       have hFPP_bot : Subgroup.fixedPointsOfMulAut
           (φAQ.comp ((P.map H.subtype).subgroupOf A).subtype) = ⊥ := by
-        letI : CommGroup (↥KG ⧸ commutator ↥KG) :=
+        let : CommGroup (↥KG ⧸ commutator ↥KG) :=
           { (inferInstance : Group (↥KG ⧸ commutator ↥KG)) with
             mul_comm := hQbar_mul_comm }
         have hCopP : Nat.Coprime (Nat.card ↥((P.map H.subtype).subgroupOf A))
@@ -968,7 +968,7 @@ theorem endgame_contradiction
     -- `⁅K,R₀⁆ ⊴ K`
     have hKG_le_NKR : KG ≤ Subgroup.normalizer ((⁅KG, R₀⁆ : Subgroup G) : Set G) :=
       OddOrder.Isaacs.Ch04.subgroup_le_normalizer_commutator_self KG R₀
-    haveI hKRsnorm : ((⁅KG, R₀⁆ : Subgroup G).subgroupOf KG).Normal :=
+    have hKRsnorm : ((⁅KG, R₀⁆ : Subgroup G).subgroupOf KG).Normal :=
       Subgroup.normal_subgroupOf_of_le_normalizer hKG_le_NKR
     -- `|K| = |⁅K,R₀⁆|·q`
     have hCs_card : Nat.card ↥((KG ⊓ Subgroup.centralizer (R₀ : Set G)).subgroupOf KG)
@@ -1039,7 +1039,7 @@ theorem endgame_contradiction
         _ = (⁅KG, R₀⁆ : Subgroup G).map (MulAut.conj x).toMonoidHom := by
             rw [map_conj_eq_self_of_mem_normalizer (hKG_le_NKR hy)]
         _ = KRx := hKRxdef.symm
-    haveI hKRxsnorm : (KRx.subgroupOf KG).Normal :=
+    have hKRxsnorm : (KRx.subgroupOf KG).Normal :=
       Subgroup.normal_subgroupOf_of_le_normalizer hKG_le_NKRx
     have hKRxs_card : Nat.card ↥(KRx.subgroupOf KG)
         = Nat.card ↥(⁅KG, R₀⁆ : Subgroup G) :=
@@ -1177,7 +1177,7 @@ theorem endgame_contradiction
         · exact hc
       have hQcard : Nat.card (↥KG ⧸ commutator ↥KG) = q ^ 2 := by
         rw [← Subgroup.index_eq_card, hcomm_eq, hj, hj2]
-      haveI hQbar_comm36 : IsMulCommutative (↥KG ⧸ commutator ↥KG) := ⟨⟨hQbar_mul_comm⟩⟩
+      have hQbar_comm36 : IsMulCommutative (↥KG ⧸ commutator ↥KG) := ⟨⟨hQbar_mul_comm⟩⟩
       have hexpQ36 : ∀ g : ↥KG ⧸ commutator ↥KG, g ^ q = 1 := by
         intro g
         refine QuotientGroup.induction_on g fun k => ?_
@@ -1190,12 +1190,12 @@ theorem endgame_contradiction
         apply Additive.toMul.injective
         rw [toMul_nsmul, toMul_zero]
         exact hexpQ36 v.toMul
-      haveI hQmod36 : Module (ZMod q) (Additive (↥KG ⧸ commutator ↥KG)) :=
+      have hQmod36 : Module (ZMod q) (Additive (↥KG ⧸ commutator ↥KG)) :=
         AddCommGroup.zmodModule hqsmul36
-      haveI : Module.Finite (ZMod q) (Additive (↥KG ⧸ commutator ↥KG)) :=
+      have : Module.Finite (ZMod q) (Additive (↥KG ⧸ commutator ↥KG)) :=
         Module.Finite.of_finite
       have hdim2 : Module.finrank (ZMod q) (Additive (↥KG ⧸ commutator ↥KG)) = 2 := by
-        haveI : Fintype (Additive (↥KG ⧸ commutator ↥KG)) := Fintype.ofFinite _
+        have : Fintype (Additive (↥KG ⧸ commutator ↥KG)) := Fintype.ofFinite _
         have h2 : Nat.card (Additive (↥KG ⧸ commutator ↥KG))
             = q ^ Module.finrank (ZMod q) (Additive (↥KG ⧸ commutator ↥KG)) := by
           rw [Nat.card_eq_fintype_card, Module.card_eq_pow_finrank (K := ZMod q),
@@ -1256,9 +1256,9 @@ theorem endgame_contradiction
     -- so `K/Z(K)` is cyclic and `K` is abelian, hence elementary abelian ((3.26))
     have hj01 : Nat.card (↥KG ⧸ Subgroup.center ↥KG) = q ^ j := by
       rw [← Subgroup.index_eq_card, hj]
-    haveI hcyc : IsCyclic (↥KG ⧸ Subgroup.center ↥KG) := by
+    have hcyc : IsCyclic (↥KG ⧸ Subgroup.center ↥KG) := by
       rcases j with _ | _ | _ | j4
-      · haveI : Subsingleton (↥KG ⧸ Subgroup.center ↥KG) := by
+      · have : Subsingleton (↥KG ⧸ Subgroup.center ↥KG) := by
           rw [pow_zero] at hj01
           exact (Nat.card_eq_one_iff_unique.mp hj01).1
         exact isCyclic_of_subsingleton
@@ -1291,14 +1291,14 @@ theorem endgame_contradiction
     have h337 : q ^ 2 < Nat.card ↥KG := by
       by_contra hle
       push Not at hle
-      haveI hKGcommM : IsMulCommutative ↥KG := ⟨⟨hKcomm⟩⟩
+      have hKGcommM : IsMulCommutative ↥KG := ⟨⟨hKcomm⟩⟩
       have hqsmulK : ∀ v : Additive ↥KG, (q : ℕ) • v = 0 := by
         intro v
         apply Additive.toMul.injective
         rw [toMul_nsmul, toMul_zero]
         exact h336ea.2 v.toMul
-      haveI hKmod : Module (ZMod q) (Additive ↥KG) := AddCommGroup.zmodModule hqsmulK
-      haveI : Module.Finite (ZMod q) (Additive ↥KG) := Module.Finite.of_finite
+      have hKmod : Module (ZMod q) (Additive ↥KG) := AddCommGroup.zmodModule hqsmulK
+      have : Module.Finite (ZMod q) (Additive ↥KG) := Module.Finite.of_finite
       set ρ3 : Representation (ZMod q) ↥A (Additive ↥KG) :=
         (OddOrder.BG.Ch1_Preliminary.mulAutToEnd ↥KG q).comp φA with hρ3
       have hρ3_apply : ∀ (g : ↥A) (v : Additive ↥KG),
@@ -1324,7 +1324,7 @@ theorem endgame_contradiction
         rw [hbot, Subgroup.commutator_bot_left]
       -- `A` is abelian whatever the dimension (≤ 2) — contradiction with (3.21)/(3.13)
       have hAcomm37 : ∀ a b : ↥A, a * b = b * a := by
-        haveI : Fintype (Additive ↥KG) := Fintype.ofFinite _
+        have : Fintype (Additive ↥KG) := Fintype.ofFinite _
         have hcardK : Nat.card (Additive ↥KG)
             = q ^ Module.finrank (ZMod q) (Additive ↥KG) := by
           rw [Nat.card_eq_fintype_card, Module.card_eq_pow_finrank (K := ZMod q),

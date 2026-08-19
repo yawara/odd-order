@@ -78,8 +78,8 @@ theorem char_mul_char_inv_of_mem_center_complex [Finite G] (ρ : Representation 
   obtain ⟨c', hc'⟩ := exists_central_scalar ρ (Subgroup.inv_mem _ hz)
   -- `V` is nontrivial because `ρ` is irreducible (`Subrepresentation ρ` is a simple, hence
   -- nontrivial, order, and `toSubmodule` is injective into `Submodule ℂ V`).
-  haveI : Nontrivial V := by
-    haveI h1 : Nontrivial (Subrepresentation ρ) := IsSimpleOrder.toNontrivial
+  have : Nontrivial V := by
+    have h1 : Nontrivial (Subrepresentation ρ) := IsSimpleOrder.toNontrivial
     have h2 : Nontrivial (Submodule ℂ V) :=
       (Subrepresentation.toSubmodule_injective (ρ := ρ)).nontrivial
     exact (Submodule.nontrivial_iff ℂ).mp h2
@@ -195,7 +195,7 @@ theorem IsIrreducibleCharacter.exists_degree_sq_le_index {φ : ClassFunction G �
     (hφ : IsIrreducibleCharacter φ) (Z : Subgroup G) (hZ : Z ≤ Subgroup.center G) :
     ∃ d : ℕ, (φ : G → ℂ) 1 = (d : ℂ) ∧ d ^ 2 ≤ Z.index := by
   obtain ⟨W, _, _, _, ρ, hρ, hcoe⟩ := hφ
-  haveI : Representation.IsIrreducible ρ := hρ
+  have : Representation.IsIrreducible ρ := hρ
   refine ⟨finrank ℂ W, ?_, finrank_sq_le_index ρ Z hZ⟩
   rw [congrFun hcoe 1, ρ.char_one]
 
@@ -229,6 +229,7 @@ theorem isIrreducible_complex_rep {H : Type*} [Group H] (ρ : Representation ℂ
     · exact Or.inl (Subrepresentation.toSubmodule_injective h)
     · exact Or.inr (Subrepresentation.toSubmodule_injective h)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Isaacs, Character Theory of Finite Groups, Lemma 2.27 (central restriction).**
 
 Let `χ` be an irreducible (complex) character of `G` and let `Z ≤ Z(G)`.  There is a
@@ -247,8 +248,8 @@ theorem IsIrreducibleCharacter.exists_central_linear_restriction
       ∀ z : ↥Z, χ (z : G) = φ z * χ 1 := by
   classical
   obtain ⟨W, _, _, _, ρ, hirr, hchar⟩ := hχ
-  haveI : Representation.IsIrreducible ρ := hirr
-  haveI := nontrivial_of_isIrreducible ρ
+  have : Representation.IsIrreducible ρ := hirr
+  have := nontrivial_of_isIrreducible ρ
   -- the central scalar function from Schur's lemma
   choose c hc using fun z : ↥Z => exists_central_scalar ρ (hZ z.2)
   have huniq : ∀ {c₁ c₂ : ℂ}, (c₁ • LinearMap.id : W →ₗ[ℂ] W) = c₂ • LinearMap.id →

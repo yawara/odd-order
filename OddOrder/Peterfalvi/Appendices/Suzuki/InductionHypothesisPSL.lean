@@ -48,7 +48,7 @@ theorem psl2_degree_twoPower {F : Type u} [Field F] [Finite F] [CharP F 2]
       _ = Nat.card F + 1 :=
         Projectivization.card_of_finrank_two F (Fin 2 → F)
           (Module.finrank_fin_fun F)
-  letI : Fintype F := Fintype.ofFinite F
+  let : Fintype F := Fintype.ofFinite F
   obtain ⟨n, _, hn⟩ := FiniteField.card F 2
   refine ⟨(n : ℕ), ?_⟩
   calc
@@ -64,7 +64,7 @@ theorem psl2_target_simple {F : Type u} [Field F] [Finite F] [CharP F 2]
     (eL : L ≃* Matrix.ProjectiveSpecialLinearGroup (Fin 2) F) :
     IsSimpleGroup L := by
   classical
-  letI : Fintype F := Fintype.ofFinite F
+  let : Fintype F := Fintype.ofFinite F
   have hUnits : 1 < Fintype.card Fˣ := by
     rw [Fintype.card_units, Fintype.card_eq_nat_card]
     omega
@@ -76,7 +76,7 @@ theorem psl2_target_simple {F : Type u} [Field F] [Finite F] [CharP F 2]
   have huSq : (u : F) ^ 2 ≠ 1 := by
     rw [sq_ne_one_iff]
     exact ⟨huOne, by simpa only [CharTwo.neg_eq] using huOne⟩
-  letI : IsSimpleGroup (Matrix.ProjectiveSpecialLinearGroup (Fin 2) F) :=
+  let : IsSimpleGroup (Matrix.ProjectiveSpecialLinearGroup (Fin 2) F) :=
     OddOrder.Isaacs.Ch08.isSimpleGroup_projectiveSpecialLinearGroup
       (Or.inr ⟨(u : F), Units.ne_zero u, huSq⟩)
   exact eL.isSimpleGroup

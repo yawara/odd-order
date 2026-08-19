@@ -347,7 +347,7 @@ theorem witness_charValue_cong [Fintype G]
     e' z ≡ e' 1 [ALGMOD (Nat.card ↥hyp.Q : ℤ)] := by
   classical
   obtain ⟨V, _, _, _, ρ, hρ, hξρ⟩ := ξ.isIrreducible
-  haveI : ρ.IsIrreducible := hρ
+  have : ρ.IsIrreducible := hρ
   have hεceo : (ε : ℂ) ≠ 0 := Int.cast_ne_zero.mpr hεne
   have hεint : IsIntegral ℤ (ε : ℂ) := by
     simpa using (isIntegral_algebraMap (R := ℤ) (A := ℂ) (x := ε))
@@ -393,8 +393,8 @@ theorem exists_min_anchor_dvd [Finite G] [Invertible (Nat.card G : ℂ)]
     ∃ χ₁ ∈ hyp.XsetOf hyp.Sder Z, ∀ χ ∈ hyp.XsetOf ⊥ Z,
       ∃ b : ℕ, 0 < b ∧ χ (1 : ↥hyp.H) = (b : ℂ) * χ₁ (1 : ↥hyp.H) := by
   classical
-  letI : Fintype G := Fintype.ofFinite G
-  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  let : Fintype G := Fintype.ofFinite G
+  let : Fintype ↥hyp.H := Fintype.ofFinite _
   have hX1fin : (hyp.XsetOf hyp.Sder Z).Finite := hyp.XsetOf_finite hyp.Sder Z
   have hX1ne : (hyp.XsetOf hyp.Sder Z).Nonempty :=
     hyp.XsetOf_nonempty hyp.Sder_le_S hZQ1 hZne
@@ -477,8 +477,8 @@ theorem leKer_Qder_of_apply_one_eq_d [Finite G] [Invertible (Nat.card G : ℂ)]
     {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.Sset) (hχ1 : χ (1 : ↥hyp.H) = (hyp.d : ℂ)) :
     hyp.LeKer χ hyp.Qder := by
   classical
-  letI : Fintype ↥hyp.H := Fintype.ofFinite _
-  letI : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
+  let : Fintype ↥hyp.H := Fintype.ofFinite _
+  let : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
   have hχ' := hχ
   rw [Sset_eq_induced_of_Q hyp] at hχ'
   obtain ⟨φ, ⟨hφirr, -⟩, rfl⟩ := hχ'
@@ -534,8 +534,8 @@ theorem exists_anchor_data [Finite G] [Invertible (Nat.card G : ℂ)]
       ∀ χ ∈ hyp.XsetOf ⊥ Z, ∃ b : ℕ, 0 < b ∧
         χ - b • χ₁ ∈
           OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) (hyp.XsetOf ⊥ Z) hyp.A := by
-  letI : Fintype G := Fintype.ofFinite G
-  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  let : Fintype G := Fintype.ofFinite G
+  let : Fintype ↥hyp.H := Fintype.ofFinite _
   obtain ⟨χ₁, hχ₁X1, hdvd⟩ := hyp.exists_min_anchor_dvd hp hQ1p hZQ1 hZne hZH
   obtain ⟨k₁, hk₁⟩ :=
     hyp.exists_apply_one_eq_d_mul_pow hp hQ1p (hyp.XsetOf_subset_SsetOf _ _ hχ₁X1)

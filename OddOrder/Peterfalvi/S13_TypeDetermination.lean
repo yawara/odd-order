@@ -102,8 +102,8 @@ theorem card_kappaHall_lt_of_isTypeIIIorIV {G : Type*} [Group G] [Finite G]
   -- `K` is cyclic, as a subgroup of the cyclic `Z = K ⊔ K*` (BG 14.7(d), via `typeP_duality`).
   obtain ⟨_, _, _, ⟨_, _, _, _, hcyc, _, _, _⟩, _⟩ :=
     BG.Ch4.S14.typeP_duality hG hS hSP hKS hK hKstar
-  haveI : IsCyclic ↥(K ⊔ Kstar) := hcyc
-  haveI : IsCyclic ↥K :=
+  have : IsCyclic ↥(K ⊔ Kstar) := hcyc
+  have : IsCyclic ↥K :=
     isCyclic_of_injective (Subgroup.inclusion (le_sup_left : K ≤ K ⊔ Kstar))
       (Subgroup.inclusion_injective _)
   -- Build the §10 hypothesis on `S` (type III/IV ⊆ III/IV/V).

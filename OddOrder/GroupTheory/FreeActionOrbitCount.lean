@@ -67,6 +67,7 @@ theorem orbit_eq_singleton_of_mem_fixedPoints {x : S} (hx : x ∈ fixedPoints Γ
   · rintro rfl; exact ⟨1, one_smul _ _⟩
 
 omit [Finite Γ] in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Free-action orbit count.**  If a finite group `Γ` of order `d > 1` acts on a finite nonempty
 type `S` of size `n`, with exactly `1 + (n − 1) / d` orbits and `d ∣ n − 1`, then every orbit has
 size `1` or `d`, and there is at most one fixed point.  (For Peterfalvi (9.1): the count carried
@@ -79,7 +80,7 @@ theorem orbit_trivial_or_free_of_card_orbits [Nonempty S]
       (∀ x y : S, x ∈ fixedPoints Γ S → y ∈ fixedPoints Γ S → x = y) := by
   classical
   set d := Nat.card Γ with hd_def
-  haveI : Fintype (orbitRel.Quotient Γ S) := Fintype.ofFinite _
+  have : Fintype (orbitRel.Quotient Γ S) := Fintype.ofFinite _
   have hn_pos : 1 ≤ Nat.card S := Nat.card_pos
   -- per-orbit cardinality facts.
   have hs_dvd : ∀ ω : orbitRel.Quotient Γ S, Nat.card ω.orbit ∣ d := by
@@ -91,14 +92,14 @@ theorem orbit_trivial_or_free_of_card_orbits [Nonempty S]
     intro ω
     obtain ⟨a, rfl⟩ := Quotient.mk''_surjective ω
     rw [orbitRel.Quotient.orbit_mk]
-    haveI : Nonempty (orbit Γ a) := ⟨⟨a, mem_orbit_self a⟩⟩
-    haveI : Finite (orbit Γ a) := Set.finite_coe_iff.mpr (Set.toFinite _)
+    have : Nonempty (orbit Γ a) := ⟨⟨a, mem_orbit_self a⟩⟩
+    have : Finite (orbit Γ a) := Set.finite_coe_iff.mpr (Set.toFinite _)
     exact Nat.card_pos
   have hs_le : ∀ ω : orbitRel.Quotient Γ S, Nat.card ω.orbit ≤ d :=
     fun ω => Nat.le_of_dvd (by omega) (hs_dvd ω)
   -- the partition sum and the count hypothesis give the defect sum `∑ (d - sω) = d - 1`.
   have hsum : ∑ ω : orbitRel.Quotient Γ S, Nat.card ω.orbit = Nat.card S := by
-    haveI : ∀ ω : orbitRel.Quotient Γ S, Finite ω.orbit :=
+    have : ∀ ω : orbitRel.Quotient Γ S, Finite ω.orbit :=
       fun ω => Set.finite_coe_iff.mpr (Set.toFinite _)
     rw [← Nat.card_sigma]
     exact Nat.card_congr (selfEquivSigmaOrbits' Γ S).symm
@@ -198,8 +199,8 @@ theorem card_orbits_eq_of_free_off_unique_fixed
     Nat.card (orbitRel.Quotient Γ S) = 1 + (Nat.card S - 1) / Nat.card Γ := by
   classical
   set d := Nat.card Γ with hd_def
-  haveI : Fintype (orbitRel.Quotient Γ S) := Fintype.ofFinite _
-  haveI : Nonempty (orbitRel.Quotient Γ S) := ⟨Quotient.mk'' x₀⟩
+  have : Fintype (orbitRel.Quotient Γ S) := Fintype.ofFinite _
+  have : Nonempty (orbitRel.Quotient Γ S) := ⟨Quotient.mk'' x₀⟩
   have hd_pos : 0 < d := Nat.card_pos
   -- the fixed orbit `⟦x₀⟧` has size `1`; every other orbit has size `d`.
   have h1 : Nat.card (orbitRel.Quotient.orbit (Quotient.mk'' x₀ : orbitRel.Quotient Γ S)) = 1 := by
@@ -212,7 +213,7 @@ theorem card_orbits_eq_of_free_off_unique_fixed
     exact hfree a fun hmem => hne (by rw [huniq a hmem])
   -- the orbits partition `S`, and the defect sum collapses to the single fixed orbit.
   have hsum : ∑ ω : orbitRel.Quotient Γ S, Nat.card ω.orbit = Nat.card S := by
-    haveI : ∀ ω : orbitRel.Quotient Γ S, Finite ω.orbit :=
+    have : ∀ ω : orbitRel.Quotient Γ S, Finite ω.orbit :=
       fun ω => Set.finite_coe_iff.mpr (Set.toFinite _)
     rw [← Nat.card_sigma]
     exact Nat.card_congr (selfEquivSigmaOrbits' Γ S).symm
@@ -257,11 +258,11 @@ theorem dvd_card_sub_one_of_free_off_unique_fixed
     (hfree : ∀ x : S, x ∉ fixedPoints Γ S → Nat.card (orbit Γ x) = Nat.card Γ) :
     Nat.card Γ ∣ Nat.card S - 1 := by
   classical
-  haveI : Fintype (orbitRel.Quotient Γ S) := Fintype.ofFinite _
+  have : Fintype (orbitRel.Quotient Γ S) := Fintype.ofFinite _
   set d := Nat.card Γ with hd_def
   -- orbit sizes sum to `|S|`; the fixed orbit `⟦x₀⟧` has size `1`, every other orbit size `d`.
   have hsum : ∑ ω : orbitRel.Quotient Γ S, Nat.card ω.orbit = Nat.card S := by
-    haveI : ∀ ω : orbitRel.Quotient Γ S, Finite ω.orbit :=
+    have : ∀ ω : orbitRel.Quotient Γ S, Finite ω.orbit :=
       fun ω => Set.finite_coe_iff.mpr (Set.toFinite _)
     rw [← Nat.card_sigma]
     exact Nat.card_congr (selfEquivSigmaOrbits' Γ S).symm
@@ -400,7 +401,7 @@ theorem exists_mem_orbit_of_card_mul_eq {R : Set S}
   have hcards : Nat.card (R × Γ) = Nat.card S := by
     rw [Nat.card_prod, hcard]
   have hsurj : Function.Surjective (fun p : R × Γ => p.2 • (p.1 : S)) := by
-    haveI : Finite R := Subtype.finite
+    have : Finite R := Subtype.finite
     exact (Nat.bijective_iff_injective_and_card _).mpr ⟨hinj, hcards⟩ |>.2
   obtain ⟨⟨⟨y, hy⟩, a⟩, hxa⟩ := hsurj x
   exact ⟨y, hy, a, hxa⟩

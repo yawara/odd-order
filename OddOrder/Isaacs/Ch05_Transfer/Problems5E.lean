@@ -38,23 +38,23 @@ universe u
 
 /-- **Isaacs Problem 5E.2** (p. 175) ⭐: 有限群の真部分群がすべて超可解なら, その群は可解。 -/
 theorem isSolvable_of_forall_proper_isSupersolvable {G : Type u} [Group G] [Finite G]
-    (hsub : ∀ K : Subgroup G, K ≠ ⊤ → Ch03.IsSupersolvable ↥K) : IsSolvable G := by
+    (hsub : ∀ K : Subgroup G, K ≠ ⊤ → Ch03.IsSupersolvable ↥K) : Group.IsSolvable G := by
   classical
   let motive : ℕ → Prop := fun n =>
     ∀ (H : Type u) [Group H] [Finite H], Nat.card H = n →
-      (∀ K : Subgroup H, K ≠ ⊤ → Ch03.IsSupersolvable ↥K) → IsSolvable H
+      (∀ K : Subgroup H, K ≠ ⊤ → Ch03.IsSupersolvable ↥K) → Group.IsSolvable H
   suffices hmain : motive (Nat.card G) from hmain G rfl hsub
   refine Nat.strong_induction_on (Nat.card G) ?_
   intro n ih H _ _ hcard hHsub
   have ih' : ∀ (K : Type u) [Group K] [Finite K], Nat.card K < Nat.card H →
-      (∀ L : Subgroup K, L ≠ ⊤ → Ch03.IsSupersolvable ↥L) → IsSolvable K := by
+      (∀ L : Subgroup K, L ≠ ⊤ → Ch03.IsSupersolvable ↥L) → Group.IsSolvable K := by
     intro K _ _ hK hKsub
     exact ih (Nat.card K) (by simpa only [hcard] using hK) K rfl hKsub
   -- 場合分け: 非自明な真の正規部分群があるか
   by_cases hN : ∃ N : Subgroup H, N.Normal ∧ N ≠ ⊥ ∧ N ≠ ⊤
   · obtain ⟨N, hNnormal, hNbot, hNtop⟩ := hN
-    haveI := hNnormal
-    haveI : IsSolvable ↥N := (hHsub N hNtop).isSolvable
+    have := hNnormal
+    have : Group.IsSolvable ↥N := (hHsub N hNtop).isSolvable
     have hlt : Nat.card (H ⧸ N) < Nat.card H := by
       have hmul : Nat.card ↥N * N.index = Nat.card H := Subgroup.card_mul_index N
       have hidx : N.index = Nat.card (H ⧸ N) := Subgroup.index_eq_card N
@@ -69,7 +69,7 @@ theorem isSolvable_of_forall_proper_isSupersolvable {G : Type u} [Group G] [Fini
         (Nat.mul_lt_mul_right hqpos).mpr h1
       rw [one_mul] at hstep
       omega
-    haveI : IsSolvable (H ⧸ N) := by
+    have : Group.IsSolvable (H ⧸ N) := by
       refine ih' (H ⧸ N) hlt (fun L hL => ?_)
       have hcomap : Subgroup.comap (QuotientGroup.mk' N) L ≠ ⊤ := by
         intro htop
@@ -77,12 +77,13 @@ theorem isSolvable_of_forall_proper_isSupersolvable {G : Type u} [Group G] [Fini
         rw [← Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective N) L,
           htop, Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective N)]
       refine (hHsub _ hcomap).of_surjective
-        (f := ((QuotientGroup.mk' N).restrict (Subgroup.comap (QuotientGroup.mk' N) L)).codRestrict
+        (f :=
+          ((QuotientGroup.mk' N).domRestrict (Subgroup.comap (QuotientGroup.mk' N) L)).codRestrict
           L (fun x => x.2)) ?_
       rintro ⟨y, hy⟩
       obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective N y
       exact ⟨⟨x, hy⟩, rfl⟩
-    exact solvable_of_ker_le_range (N.subtype) (QuotientGroup.mk' N)
+    exact Group.isSolvable_of_ker_le_range (N.subtype) (QuotientGroup.mk' N)
       (by rw [QuotientGroup.ker_mk', N.range_subtype])
   -- `H` は単純 (または自明)
   push Not at hN
@@ -91,10 +92,10 @@ theorem isSolvable_of_forall_proper_isSupersolvable {G : Type u} [Group G] [Fini
     exact ⟨⟨0, Subsingleton.elim _ _⟩⟩
   set p : ℕ := (Nat.card H).minFac with hpdef
   have hpprime : p.Prime := Nat.minFac_prime htriv
-  haveI : Fact p.Prime := ⟨hpprime⟩
+  have : Fact p.Prime := ⟨hpprime⟩
   have hpdvd : p ∣ Nat.card H := Nat.minFac_dvd _
   by_cases hHp : IsPGroup p H
-  · haveI := hHp.isNilpotent
+  · have := hHp.isNilpotent
     infer_instance
   -- 非自明 `p`-部分群の正規化群は真部分群ゆえ超可解、そこから正規 `p`-補群
   have hlocal : ∀ X : Subgroup H, X ≠ ⊥ → IsPGroup p X →
@@ -108,7 +109,7 @@ theorem isSolvable_of_forall_proper_isSupersolvable {G : Type u} [Group G] [Fini
         exact this.of_equiv Subgroup.topEquiv)
     have hNXtop : Subgroup.normalizer (X : Set H) ≠ ⊤ := by
       intro htop
-      haveI : X.Normal := Subgroup.normalizer_eq_top_iff.mp htop
+      have : X.Normal := Subgroup.normalizer_eq_top_iff.mp htop
       rcases hN X inferInstance hXbot with h
       exact hXtop h
     have hss : Ch03.IsSupersolvable ↥(Subgroup.normalizer (X : Set H)) := hHsub _ hNXtop
@@ -119,14 +120,14 @@ theorem isSolvable_of_forall_proper_isSupersolvable {G : Type u} [Group G] [Fini
       refine Nat.minFac_le_of_dvd (Nat.mem_primeFactors.mp hr).1.two_le ?_
       exact (Nat.mem_primeFactors.mp hr).2.1.trans (Subgroup.card_subgroup_dvd_card _)
     obtain ⟨K, hKnormal, hpK, k, hk⟩ := Ch03.exists_normal_qComplement hpprime hmax hsmall
-    haveI := hKnormal
+    have := hKnormal
     exact hasNormalPComplement_of_normal_of_index_eq_pow (X := K) (a := k) hpK hk
   have hHcompl : HasNormalPComplement p H :=
     hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer.mpr
       (isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement hlocal)
   -- 正規 `p`-補群 `K` は `⊥` でも `⊤` でもなく単純性に矛盾
   obtain ⟨K, hKnormal, hKcompl⟩ := hHcompl
-  haveI := hKnormal
+  have := hKnormal
   obtain ⟨Q⟩ := (inferInstance : Nonempty (Sylow p H))
   have hpK : ¬ p ∣ Nat.card ↥K := not_dvd_card_of_isComplement'_sylow Q (hKcompl Q)
   have hKtop : K ≠ ⊤ := by
@@ -176,7 +177,7 @@ theorem hasNormalPComplement_of_forall_two_generator {G : Type*} [Group G] [Fini
   have hxH : x ∈ H := Subgroup.subset_closure (by simp)
   have hyH : y ∈ H := Subgroup.subset_closure (by simp)
   obtain ⟨K', hK'normal, hK'compl⟩ := hgen x y
-  haveI := hK'normal
+  have := hK'normal
   obtain ⟨S⟩ := (inferInstance : Nonempty (Sylow p ↥H))
   have hcompl := hK'compl S
   have hpK' : ¬ p ∣ Nat.card ↥K' := not_dvd_card_of_isComplement'_sylow S hcompl

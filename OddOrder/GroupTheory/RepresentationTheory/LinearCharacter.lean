@@ -191,8 +191,8 @@ theorem IsIrreducibleCharacter.apply_one_eq_one_of_isMulCommutative [IsMulCommut
     {φ : ClassFunction G ℂ} (hφ : IsIrreducibleCharacter φ) :
     (φ : G → ℂ) 1 = 1 := by
   obtain ⟨V, _, _, _, ρ, hirr, hχ⟩ := hφ
-  haveI : Representation.IsIrreducible ρ := hirr
-  haveI := nontrivial_of_isIrreducible ρ
+  have : Representation.IsIrreducible ρ := hirr
+  have := nontrivial_of_isIrreducible ρ
   have hdim : Module.finrank ℂ V = 1 :=
     Representation.IsIrreducible.finrank_eq_one_of_isMulCommutative (ρ := ρ)
   rw [congrFun hχ 1, ρ.char_one, hdim, Nat.cast_one]

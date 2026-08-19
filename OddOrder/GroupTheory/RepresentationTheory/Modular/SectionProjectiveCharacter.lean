@@ -220,7 +220,7 @@ theorem inner_sectionProjectiveCharacter_eq [Fintype G] [∀ i, Nonempty (m i)]
     (Nat.card G : K)⁻¹ * ∑ u : G, algebraMap 𝒪 K
         (sectionProjectiveCharacter hpC hω hω' hπ hlin hkerJ e hx μ u) * χ u⁻¹
       = d μ := by
-  haveI : Invertible ((Nat.card ↥(centralizerOf x) : K)) :=
+  have : Invertible ((Nat.card ↥(centralizerOf x) : K)) :=
     (isUnit_card_centralizer (K := K) x).invertible
   have hGne : (Nat.card G : K) ≠ 0 := (isUnit_of_invertible _).ne_zero
   have hCne : (Nat.card ↥(centralizerOf x) : K) ≠ 0 := (isUnit_of_invertible _).ne_zero

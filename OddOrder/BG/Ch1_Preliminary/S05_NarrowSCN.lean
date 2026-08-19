@@ -102,7 +102,7 @@ theorem omega1Center_lt_omega1UpperCentralTwo_of_not_isCyclic
   intro hZW
   have hZcyc : IsCyclic ↥(omega1Center R p) := isCyclic_of_prime_card hZcard
   have hWcyc : IsCyclic ↥(omega1UpperCentralTwo R p) := by
-    haveI : IsCyclic ↥(omega1Center R p) := hZcyc
+    have : IsCyclic ↥(omega1Center R p) := hZcyc
     exact isCyclic_of_surjective (MulEquiv.subgroupCongr hZW).toMonoidHom
       (MulEquiv.subgroupCongr hZW).surjective
   exact hWnc hWcyc
@@ -150,7 +150,7 @@ theorem exists_normal_isElementaryAbelian_card_prime_cube_of_scn3
     ∃ B : Subgroup R, B.Normal ∧ B.IsElementaryAbelian p ∧ Nat.card B = p ^ 3 := by
   have hA_scn : IsSCN A := hA.isSCN
   have hA_comm : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x := by
-    letI : IsMulCommutative A := hA_scn.isMulCommutative
+    let : IsMulCommutative A := hA_scn.isMulCommutative
     intro x hx y hy
     exact congrArg Subtype.val (mul_comm (⟨x, hx⟩ : A) ⟨y, hy⟩)
   set H : Subgroup R := omega1OfAbelian R A p hA_comm with hHdef
@@ -173,7 +173,7 @@ theorem exists_normal_isElementaryAbelian_card_prime_cube_of_scn3
     simpa [hHdef] using
       (pow_dvd_card_omega1OfAbelian_of_pos_le_pRank (G := R) (H := A)
         (p := p) (hH := hA_comm) (n := 3) (by norm_num) hA.le_pRank)
-  haveI : H.Normal := hH_normal
+  have : H.Normal := hH_normal
   obtain ⟨B, hB_normal, hB_le_H, hB_card⟩ :=
     OddOrder.BG.Ch1.S01.normal_subgroup_card_pow_le_of_pGroup
       (G := R) (p := p) hpg (N := H) (r := 3) hH_dvd
@@ -193,7 +193,7 @@ theorem bStar_normal_isElementaryAbelian_of_normal_isElementaryAbelian
     (E ⊔ (B ⊓ Subgroup.centralizer (E : Set R))).Normal ∧
       (E ⊔ (B ⊓ Subgroup.centralizer (E : Set R))).IsElementaryAbelian p := by
   constructor
-  · haveI : (Subgroup.centralizer (E : Set R)).Normal := Subgroup.normal_centralizer
+  · have : (Subgroup.centralizer (E : Set R)).Normal := Subgroup.normal_centralizer
     infer_instance
   · let K : Subgroup R := B ⊓ Subgroup.centralizer (E : Set R)
     have hK_le_B : K ≤ B := by
@@ -334,8 +334,8 @@ theorem bStar_card_ge_prime_cube_of_card_prime_cube
   have hBstar_elem : Bstar.IsElementaryAbelian p := by
     simpa [Bstar] using
       Subgroup.IsElementaryAbelian.sup_of_le_centralizer hE hK_elem hE_le_cent_K
-  letI : IsMulCommutative Bstar := IsMulCommutative.of_comm hBstar_elem.comm
-  letI := hBstar_elem.zmodModule
+  let : IsMulCommutative Bstar := IsMulCommutative.of_comm hBstar_elem.comm
+  let := hBstar_elem.zmodModule
   let m : ℕ := Module.finrank (ZMod p) (Additive Bstar)
   have hBstar_card_pow : Nat.card Bstar = p ^ m := by
     dsimp [m]
@@ -414,7 +414,7 @@ theorem mem_scn3_of_normal_isElementaryAbelian_card_prime_sq [Finite R] {p : ℕ
   obtain ⟨A, hA⟩ := scn3_nonempty_of_three_le_pRank hp hpg h3
   obtain ⟨B, hB_normal, hB, hBcard⟩ :=
     exists_normal_isElementaryAbelian_card_prime_cube_of_scn3 hpg hA
-  haveI : B.Normal := hB_normal
+  have : B.Normal := hB_normal
   have hBstar_card : p ^ 3 ≤ Nat.card ↥(E ⊔ (B ⊓ Subgroup.centralizer (E : Set R))) :=
     bStar_card_ge_prime_cube_of_card_prime_cube hE hEcard hB hBcard
   exact exists_scn3_ge_of_bStar_card_ge_prime_cube hpg hE hB hBstar_card
@@ -441,14 +441,14 @@ theorem omega1UpperCentralTwo_not_isCyclic_of_three_le_pRank
   obtain ⟨A, hA⟩ := scn3_nonempty_of_three_le_pRank hp hpg h3
   obtain ⟨B, hB_normal, hB_elem, hBcard⟩ :=
     exists_normal_isElementaryAbelian_card_prime_cube_of_scn3 hpg hA
-  haveI : B.Normal := hB_normal
+  have : B.Normal := hB_normal
   have hB_dvd : p ^ 2 ∣ Nat.card B := by
     rw [hBcard]
     exact pow_dvd_pow p (by norm_num : 2 ≤ 3)
   obtain ⟨S, hS_normal, hS_le_B, hScard⟩ :=
     OddOrder.BG.Ch1.S01.normal_subgroup_card_pow_le_of_pGroup
       (G := R) (p := p) hpg (N := B) (r := 2) hB_dvd
-  haveI : S.Normal := hS_normal
+  have : S.Normal := hS_normal
   have hS_elem : S.IsElementaryAbelian p := by
     have hS_sub_elem : (S.subgroupOf B).IsElementaryAbelian p :=
       hB_elem.to_subgroup (S.subgroupOf B)
@@ -459,14 +459,14 @@ theorem omega1UpperCentralTwo_not_isCyclic_of_three_le_pRank
     have hp_sq_gt_one : 1 < p ^ 2 :=
       one_lt_pow₀ (Fact.out : p.Prime).one_lt two_ne_zero
     exact (ne_of_gt hp_sq_gt_one) (by rw [← hScard, hcard_one])
-  haveI : Group.IsNilpotent R := IsPGroup.isNilpotent hpg
+  have : Group.IsNilpotent R := IsPGroup.isNilpotent hpg
   let H : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
   have hHlt : H < S := by
     dsimp [H]
     exact OddOrder.Isaacs.Ch04.commutator_lt_self_of_isNilpotent_ambient
       (E := S) (F := (⊤ : Subgroup R)) hS_ne_bot
   have hH_le_S : H ≤ S := hHlt.le
-  haveI hH_normal : H.Normal := by
+  have hH_normal : H.Normal := by
     dsimp [H]
     infer_instance
   have hH_le_center : H ≤ Subgroup.center R := by
@@ -517,10 +517,10 @@ theorem omega1UpperCentralTwo_not_isCyclic_of_three_le_pRank
     hS_elem.not_isCyclic_of_card_prime_sq (Fact.out : p.Prime) hScard
   intro hWcyc
   have hSsub_cyc : IsCyclic ↥(S.subgroupOf W) := by
-    haveI : IsCyclic ↥W := by simpa [W] using hWcyc
+    have : IsCyclic ↥W := by simpa [W] using hWcyc
     exact Subgroup.isCyclic _
   have hS_cyc : IsCyclic ↥S := by
-    haveI : IsCyclic ↥(S.subgroupOf W) := hSsub_cyc
+    have : IsCyclic ↥(S.subgroupOf W) := hSsub_cyc
     exact isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe hS_le_W).toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hS_le_W).surjective
   exact hS_not_cyclic hS_cyc
@@ -609,9 +609,9 @@ theorem omega1Center_lt_and_card_eq_prime_of_maximalElementaryAbelian_card_prime
   have hE_card_gt_one : 1 < Nat.card E := by
     rw [hEcard]
     exact one_lt_pow₀ (Fact.out : p.Prime).one_lt two_ne_zero
-  haveI : Nontrivial E := Finite.one_lt_card_iff_nontrivial.mp hE_card_gt_one
+  have : Nontrivial E := Finite.one_lt_card_iff_nontrivial.mp hE_card_gt_one
   obtain ⟨e, he_ne⟩ := exists_ne (1 : E)
-  haveI : Nontrivial R := ⟨⟨(e : R), 1, fun heq => he_ne (Subtype.ext heq)⟩⟩
+  have : Nontrivial R := ⟨⟨(e : R), 1, fun heq => he_ne (Subtype.ext heq)⟩⟩
   obtain ⟨K, hK_le_center, hKcard⟩ := hpg.exists_subgroup_le_center_card_prime
   have hK_le_Z : K ≤ omega1Center R p := by
     intro x hx
@@ -707,7 +707,7 @@ theorem omega1UpperCentralTwo_le_normalizer_of_maximalElementaryAbelian_card_pri
 
 private theorem zpowers_isElementaryAbelian_of_pow_eq_one {p : ℕ} {x : R} (hxp : x ^ p = 1) :
     (Subgroup.zpowers x).IsElementaryAbelian p := by
-  letI : IsMulCommutative (Subgroup.zpowers x) := Subgroup.zpowers_isMulCommutative x
+  let : IsMulCommutative (Subgroup.zpowers x) := Subgroup.zpowers_isMulCommutative x
   refine ⟨?_, ?_⟩
   · intro a b
     exact Subtype.ext (congrArg Subtype.val (mul_comm a b))
@@ -806,13 +806,13 @@ theorem omega1UpperCentralTwo_inf_centralizer_ne_of_maximalElementaryAbelian_car
   intro hCW_eq
   have hE_normal : E.Normal :=
     normal_of_omega1UpperCentralTwo_inf_centralizer_eq hp hpg h3 hEcard hEstar hCW_eq
-  letI : E.Normal := hE_normal
+  let : E.Normal := hE_normal
   obtain ⟨A, hA, hEA⟩ :=
     mem_scn3_of_normal_isElementaryAbelian_card_prime_sq hp hpg h3 E
       hEstar.isElementaryAbelian hEcard
   have hA_scn : IsSCN A := hA.isSCN
   have hA_comm : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x := by
-    letI : IsMulCommutative A := hA_scn.isMulCommutative
+    let : IsMulCommutative A := hA_scn.isMulCommutative
     intro x hx y hy
     exact congrArg Subtype.val (mul_comm (⟨x, hx⟩ : A) ⟨y, hy⟩)
   let F : Subgroup R := omega1OfAbelian R A p hA_comm
@@ -1110,10 +1110,10 @@ theorem centralizer_omega1UpperCentralTwo_index_eq_prime_of_maximalElementaryAbe
     (Subgroup.centralizer (omega1UpperCentralTwo R p : Set R)).index = p := by
   let W : Subgroup R := omega1UpperCentralTwo R p
   let T : Subgroup R := Subgroup.centralizer (W : Set R)
-  haveI hW_normal : W.Normal := by
+  have hW_normal : W.Normal := by
     dsimp [W]
     infer_instance
-  haveI hT_normal : T.Normal := by
+  have hT_normal : T.Normal := by
     dsimp [T, W]
     infer_instance
   have hWcard : Nat.card W = p ^ 2 := by
@@ -1224,8 +1224,8 @@ theorem pRank_centralizer_le_two_of_narrow_witness
   let C : Subgroup R := Subgroup.centralizer (S : Set R)
   have hScomm : ∀ a ∈ S, ∀ b ∈ S, a * b = b * a := by
     have hScyc : IsCyclic S := isCyclic_of_prime_card hScard
-    haveI : IsCyclic S := hScyc
-    letI : CommGroup S := IsCyclic.commGroup
+    have : IsCyclic S := hScyc
+    let : CommGroup S := IsCyclic.commGroup
     intro a ha b hb
     exact congrArg Subtype.val (mul_comm (⟨a, ha⟩ : S) (⟨b, hb⟩ : S))
   have hSleC : S ≤ C := by
@@ -1243,7 +1243,7 @@ theorem pRank_centralizer_le_two_of_narrow_witness
   have hSsub_card : Nat.card Ssub = p := by
     exact (Nat.card_congr (Subgroup.subgroupOfEquivOfLe hSleC).toEquiv).trans hScard
   have hKsub_cyc : IsCyclic Ksub := by
-    haveI : IsCyclic K := hKcyc
+    have : IsCyclic K := hKcyc
     exact isCyclic_of_injective (Subgroup.subgroupOfEquivOfLe hKleC).toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hKleC).injective
   have hSsub_inf : Ssub ⊓ Ksub = ⊥ := by
@@ -1261,7 +1261,7 @@ theorem pRank_centralizer_le_two_of_narrow_witness
     intro c
     apply Subtype.ext
     exact (Subgroup.mem_centralizer_iff.mp c.2 (s : R) hs).symm
-  haveI hSsub_normal : Ssub.Normal := by
+  have hSsub_normal : Ssub.Normal := by
     refine { conj_mem := fun x hx g => ?_ }
     have hx_center : x ∈ Subgroup.center C := hSsub_le_center hx
     have hconj : g * x * g⁻¹ = x := by
@@ -1299,7 +1299,7 @@ theorem pRank_centralizer_le_two_of_narrow_witness
     rw [Omega]
     intro a ha
     exact Subgroup.subset_closure (by
-      rw [Set.mem_setOf_eq, pow_one]
+      rw [Set.mem_ofPred_eq, pow_one]
       exact congrArg Subtype.val (hA.pow_eq_one ⟨a, ha⟩))
   have hAcard_le : Nat.card A ≤ Nat.card (Omega C p 1) := Subgroup.card_le_of_le hA_le_omega
   have hlog_le : Nat.log p (Nat.card A) ≤ Nat.log p (p ^ 2) :=
@@ -1337,7 +1337,7 @@ theorem inf_omega1Center_eq_bot_of_card_prime_centralizer_pRank_le_two
       pRank_le_of_injective (G := C) (H := R) (f := toC) htoC_inj
     exact absurd (hRrank_le_C.trans hSrank) (by omega)
   let H : Subgroup S := (S ⊓ Z).subgroupOf S
-  haveI : Fact (Nat.card S).Prime := ⟨by rw [hScard]; exact (Fact.out : p.Prime)⟩
+  have : Fact (Nat.card S).Prime := ⟨by rw [hScard]; exact (Fact.out : p.Prime)⟩
   rcases Subgroup.eq_bot_or_eq_top_of_prime_card H with hHbot | hHtop
   · refine le_antisymm ?_ bot_le
     intro x hx

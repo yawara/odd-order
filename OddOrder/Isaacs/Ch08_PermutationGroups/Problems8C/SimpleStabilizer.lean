@@ -45,7 +45,7 @@ theorem stabilizer_eq_bot_of_normal_of_isSimpleGroup_stabilizer (α : Ω)
     (hsimple : IsSimpleGroup ↥(stabilizer G α))
     {N : Subgroup G} [hN : N.Normal] [IsPretransitive ↥N Ω] (hNtop : N ≠ ⊤) :
     stabilizer ↥N α = ⊥ := by
-  haveI := hsimple
+  have := hsimple
   rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (N.subgroupOf (stabilizer G α))
       inferInstance with hbot | htop
   · have hdisj : Disjoint N (stabilizer G α) := Subgroup.subgroupOf_eq_bot.mp hbot
@@ -111,9 +111,9 @@ theorem isSimpleGroup_of_two_transitive_of_isSimpleGroup_stabilizer
     {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hpq : p ≠ q)
     (hpΩ : p ∣ Nat.card Ω) (hqΩ : q ∣ Nat.card Ω) :
     IsSimpleGroup G := by
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : Fact q.Prime := ⟨hq⟩
-  haveI : Nonempty G := ⟨1⟩
+  have : Fact p.Prime := ⟨hp⟩
+  have : Fact q.Prime := ⟨hq⟩
+  have : Nonempty G := ⟨1⟩
   -- `|Ω| ∣ |G|` なので `G` は非自明
   have hdvdG : Nat.card Ω ∣ Nat.card G := by
     have h := index_stabilizer_of_transitive (G := G) (x := α)
@@ -123,14 +123,14 @@ theorem isSimpleGroup_of_two_transitive_of_isSimpleGroup_stabilizer
     · rw [h, zero_dvd_iff] at hdvdG
       exact absurd hdvdG Nat.card_pos.ne'
     · exact h
-  haveI : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp
+  have : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp
     (lt_of_lt_of_le hp.one_lt ((Nat.le_of_dvd hΩpos hpΩ).trans (Nat.le_of_dvd Nat.card_pos hdvdG)))
   refine ⟨fun N hN => ?_⟩
   by_contra hcon
   push Not at hcon
   obtain ⟨hNbot, hNtop⟩ := hcon
-  haveI := hN
-  haveI : IsPretransitive ↥N Ω := isPretransitive_of_normal_ne_bot_of_two_transitive h2 hNbot
+  have := hN
+  have : IsPretransitive ↥N Ω := isPretransitive_of_normal_ne_bot_of_two_transitive h2 hNbot
   -- `N` は regular
   have hstabN : stabilizer ↥N α = ⊥ :=
     stabilizer_eq_bot_of_normal_of_isSimpleGroup_stabilizer α hsimple hNtop
@@ -220,16 +220,16 @@ theorem isSimpleGroup_of_two_transitive_of_prime_card [Finite Ω]
     {r : ℕ} (hr : r.Prime) (hΩ : Nat.card Ω = r)
     (hne : Nat.card ↥(stabilizer G α) ≠ r - 1) :
     IsSimpleGroup G := by
-  haveI : Fact r.Prime := ⟨hr⟩
-  haveI : Nonempty G := ⟨1⟩
-  haveI := faithfulSMul_ofStabilizer (G := G) α
-  haveI := isPretransitive_ofStabilizer_of_two_transitive (G := G) α h2
+  have : Fact r.Prime := ⟨hr⟩
+  have : Nonempty G := ⟨1⟩
+  have := faithfulSMul_ofStabilizer (G := G) α
+  have := isPretransitive_ofStabilizer_of_two_transitive (G := G) α h2
   -- `(r - 1) ∣ |G_α|`: `G_α` は `Ω ∖ {α}` に推移的
   have hcard1 : Nat.card ↥(SubMulAction.ofStabilizer G α) = r - 1 := by
     rw [card_ofStabilizer, hΩ]
   have hr2 : 2 ≤ r := hr.two_le
   have hdvd1 : r - 1 ∣ Nat.card ↥(stabilizer G α) := by
-    haveI : Nonempty ↥(SubMulAction.ofStabilizer G α) :=
+    have : Nonempty ↥(SubMulAction.ofStabilizer G α) :=
       (Nat.card_pos_iff.mp (by omega : 0 < Nat.card ↥(SubMulAction.ofStabilizer G α))).1
     obtain ⟨x⟩ := (inferInstance : Nonempty ↥(SubMulAction.ofStabilizer G α))
     have h := index_stabilizer_of_transitive
@@ -239,19 +239,19 @@ theorem isSimpleGroup_of_two_transitive_of_prime_card [Finite Ω]
   -- `G` は非自明
   have hdvdG : Nat.card Ω ∣ Nat.card G :=
     (index_stabilizer_of_transitive (G := G) (x := α)) ▸ Subgroup.index_dvd_card _
-  haveI : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp
+  have : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp
     (lt_of_lt_of_le hr.one_lt (hΩ ▸ Nat.le_of_dvd Nat.card_pos hdvdG))
   refine ⟨fun N hN => ?_⟩
   by_contra hcon
   push Not at hcon
   obtain ⟨hNbot, hNtop⟩ := hcon
-  haveI := hN
-  haveI : IsPretransitive ↥N Ω := isPretransitive_of_normal_ne_bot_of_two_transitive h2 hNbot
+  have := hN
+  have : IsPretransitive ↥N Ω := isPretransitive_of_normal_ne_bot_of_two_transitive h2 hNbot
   have hstabN : stabilizer ↥N α = ⊥ :=
     stabilizer_eq_bot_of_normal_of_isSimpleGroup_stabilizer α hsimple hNtop
   have hNcard : Nat.card ↥N = r := by
     rw [card_eq_card_of_stabilizer_eq_bot α hstabN, hΩ]
-  haveI : IsCyclic ↥N := isCyclic_of_prime_card hNcard
+  have : IsCyclic ↥N := isCyclic_of_prime_card hNcard
   -- `G_α ↪ Aut(N)`
   set f : ↥(stabilizer G α) →* MulAut ↥N :=
     (MulAut.conjNormal (H := N)).comp (stabilizer G α).subtype with hf

@@ -187,7 +187,7 @@ theorem finrank_eq_index_mul_finrank_of_not_linearEquiv_conj
   set W' : Fin (H.index) → Submodule k[↥H] (resRep ρ H).asModule :=
     fun i => W.map (conjSemilinearEnd (H := H) ρ (x ^ (i : ℕ))) with hW'
   -- Quotient bookkeeping: `a = xH` has order `p = [G:H]` in the cyclic group `G ⧸ H`.
-  haveI : Fintype (G ⧸ H) := Fintype.ofFinite _
+  have : Fintype (G ⧸ H) := Fintype.ofFinite _
   have hidx : H.index = Nat.card (G ⧸ H) := rfl
   have hcardQ : Fintype.card (G ⧸ H) = H.index := by rw [hidx, Nat.card_eq_fintype_card]
   set a : G ⧸ H := QuotientGroup.mk' H x with ha_def
@@ -276,10 +276,10 @@ theorem finrank_eq_index_mul_finrank_of_not_linearEquiv_conj
       rw [hW', ← hkey, hWinv]
     rw [hval]
     exact le_iSup W' i
-  haveI : DirectSum.IsInternal W' :=
+  have : DirectSum.IsInternal W' :=
     (DirectSum.isInternal_submodule_iff_iSupIndep_and_iSup_eq_top W').mpr ⟨hindep, htop⟩
   -- Assemble the `k`-dimension.
-  haveI hfin : ∀ i, Module.Finite k (W' i) := fun i =>
+  have hfin : ∀ i, Module.Finite k (W' i) := fun i =>
     Module.Finite.of_injective ((W' i).subtype.restrictScalars k) Subtype.val_injective
   have e : (⨁ i, (W' i : Type _)) ≃ₗ[k[↥H]] (resRep ρ H).asModule :=
     LinearEquiv.ofBijective (DirectSum.coeLinearMap W') ‹DirectSum.IsInternal W'›

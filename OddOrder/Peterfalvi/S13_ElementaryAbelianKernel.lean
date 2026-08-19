@@ -87,12 +87,12 @@ theorem exists_normal_subgroup_index_prime [Finite K] {p : ℕ}
     ∃ Q : Subgroup K, Q.Normal ∧ Q ≤ N ∧ ⁅(⊤ : Subgroup K), N⁆ ≤ Q ∧
       Nat.card ↥N = p * Nat.card ↥Q := by
   classical
-  haveI := Fact.mk hp
-  haveI : Group.IsNilpotent K := hK.isNilpotent
+  have := Fact.mk hp
+  have : Group.IsNilpotent K := hK.isNilpotent
   have hRlt : ⁅(⊤ : Subgroup K), N⁆ < N := commutator_top_lt_of_normal_of_ne_bot hNne
-  haveI hRnorm : (⁅(⊤ : Subgroup K), N⁆).Normal := Subgroup.commutator_normal ⊤ N
+  have hRnorm : (⁅(⊤ : Subgroup K), N⁆).Normal := Subgroup.commutator_normal ⊤ N
   set R' : Subgroup ↥N := (⁅(⊤ : Subgroup K), N⁆).subgroupOf N with hR'def
-  haveI : R'.Normal := Subgroup.normal_subgroupOf
+  have : R'.Normal := Subgroup.normal_subgroupOf
   -- the quotient `Ā = N/[K,N]` is a nontrivial finite `p`-group
   have hAbar_pgroup : IsPGroup p (↥N ⧸ R') := (hK.to_subgroup N).to_quotient R'
   obtain ⟨m, hm⟩ := IsPGroup.iff_card.mp hAbar_pgroup
@@ -179,7 +179,7 @@ theorem quotient_classTwo_structure [Finite K] {p : ℕ} (_hp : p.Prime)
     Nat.card ↥(N.map (QuotientGroup.mk' Q)) = p ∧
       commutator (K ⧸ Q) = N.map (QuotientGroup.mk' Q) ∧
       N.map (QuotientGroup.mk' Q) ≤ Subgroup.center (K ⧸ Q) := by
-  haveI := hQnorm
+  have := hQnorm
   refine ⟨?_, ?_, ?_⟩
   · -- `|N/Q| = p`: first isomorphism for `mk' Q` restricted to `N`
     set f : ↥N →* K ⧸ Q := (QuotientGroup.mk' Q).comp N.subtype with hf
@@ -287,9 +287,9 @@ theorem exists_pow_eq_of_mapsTo_of_card_prime {p : ℕ} (hp : p.Prime)
     (hmem : ∀ h ∈ T, e h ∈ T) :
     ∃ k : ℕ, ¬ p ∣ k ∧ ∀ h ∈ T, e h = h ^ k := by
   classical
-  haveI : Finite ↥T := Nat.finite_of_card_ne_zero (hT ▸ hp.pos.ne')
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : IsCyclic ↥T := isCyclic_of_prime_card hT
+  have : Finite ↥T := Nat.finite_of_card_ne_zero (hT ▸ hp.pos.ne')
+  have : Fact p.Prime := ⟨hp⟩
+  have : IsCyclic ↥T := isCyclic_of_prime_card hT
   obtain ⟨t, ht⟩ := IsCyclic.exists_generator (α := ↥T)
   have htord : orderOf t = p := by
     rw [orderOf_eq_card_of_forall_mem_zpowers ht, hT]
@@ -377,11 +377,11 @@ theorem chiefKernel_caseB_false [Finite G] {M : Subgroup G}
         chief.N_aInvariant).U.subtype) J → J = ⊥ ∨ J = ⊤) :
     False := by
   classical
-  haveI := Fact.mk chief.p_prime
+  have := Fact.mk chief.p_prime
   -- the index-`p` normal subgroup `Q` and the class-`2` structure of `Ĥ = H/Q`
   obtain ⟨Q, hQnorm, hQle, hRQ, hcard⟩ :=
     exists_normal_subgroup_index_prime chief.p_prime hpK hNne
-  haveI := hQnorm
+  have := hQnorm
   obtain ⟨hNhatCard, hcommHat, hNhatLe⟩ :=
     quotient_classTwo_structure chief.p_prime hQnorm hQle hRQ hcard hNcomm
   -- the projection `π : Ĥ → H̄`
@@ -657,9 +657,9 @@ theorem exists_exponent_fun_of_card_prime {Γ A : Type*} [Group Γ] [Group A] {p
   classical
   choose e hep he using fun v : A =>
     exists_pow_eq_of_mapsTo_of_card_prime hp hT (φ v) (hmem v)
-  haveI : Finite ↥T := Nat.finite_of_card_ne_zero (hT ▸ hp.pos.ne')
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : IsCyclic ↥T := isCyclic_of_prime_card hT
+  have : Finite ↥T := Nat.finite_of_card_ne_zero (hT ▸ hp.pos.ne')
+  have : Fact p.Prime := ⟨hp⟩
+  have : IsCyclic ↥T := isCyclic_of_prime_card hT
   obtain ⟨t, ht⟩ := IsCyclic.exists_generator (α := ↥T)
   have htord : orderOf (↑t : Γ) = p := by
     have h := orderOf_injective T.subtype T.subtype_injective t
@@ -727,7 +727,7 @@ theorem caseA_fixes_of_action_chain [Finite G] {M : Subgroup G}
     ∀ (v : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))),
       ∀ s ∈ S₀, quotientMulAutHom chief.N_aInvariant ↑v s = s := by
   classical
-  haveI := Fact.mk chief.p_prime
+  have := Fact.mk chief.p_prime
   -- the `U`-action morphism `φ : A →* MulAut (H̄)`
   set φ : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) →*
       MulAut (↥data.H ⧸ chief.N) :=
@@ -742,8 +742,8 @@ theorem caseA_fixes_of_action_chain [Finite G] {M : Subgroup G}
   have hne : ∀ v, f v ≠ 0 := fun v h =>
     hep v ((CharP.cast_eq_zero_iff (ZMod chief.p) chief.p (e v)).mp h)
   -- `S₀` is cyclic of order `p`; fix a generator `g`
-  haveI hfin : Finite ↥S₀ := Nat.finite_of_card_ne_zero (hcardS₀ ▸ chief.p_prime.pos.ne')
-  haveI : IsCyclic ↥S₀ := isCyclic_of_prime_card hcardS₀
+  have hfin : Finite ↥S₀ := Nat.finite_of_card_ne_zero (hcardS₀ ▸ chief.p_prime.pos.ne')
+  have : IsCyclic ↥S₀ := isCyclic_of_prime_card hcardS₀
   obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := ↥S₀)
   have hgS : (g : ↥data.H ⧸ chief.N) ∈ S₀ := g.2
   have hordg : orderOf (g : ↥data.H ⧸ chief.N) = chief.p := by
@@ -819,7 +819,7 @@ theorem caseA_commutator_chain [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
         ∀ s ∈ S₀, quotientMulAutHom chief.N_aInvariant ↑v
           (quotientMulAutHom chief.N_aInvariant ↑(σ v) s) = s := by
   classical
-  haveI := Fact.mk chief.p_prime
+  have := Fact.mk chief.p_prime
   set L := data.typeP.U ⊔ data.typeP.W1 with hLdef
   set φ := OddOrder.Peterfalvi.S11.typeP_conjAction data.typeP with hφdef
   -- `U ◁ L` (the Frobenius kernel), so conjugation `σ = conjNormal w` acts on `U.subgroupOf L`.
@@ -862,7 +862,7 @@ theorem caseA_commutator_chain [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
         (Nat.card ↥(data.typeP.W1.subgroupOf L)) (Nat.card ↥data.typeP.H) :=
       (OddOrder.Peterfalvi.S11.typeP_coprime_H_uW1 data.typeP hU).symm.coprime_dvd_left
         (Subgroup.card_subgroup_dvd_card _)
-    haveI : IsSolvable ↥data.typeP.H :=
+    have : Group.IsSolvable ↥data.typeP.H :=
       (OddOrder.Peterfalvi.S11.typeP_coprimeAction data.typeP hU).H_solvable
     have hmap : F.map (QuotientGroup.mk' chief.N) = act.fixedByE :=
       OddOrder.GroupTheory.map_fixedSubgroup_eq_fixedSubgroup_quotient chief.N_aInvariant hcopHW1
@@ -908,12 +908,12 @@ theorem caseA_commutator_chain [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     have hUEnorm : data.typeP.U ⊔ data.typeP.W1 ≤ Subgroup.normalizer (chief.H0 : Set G) :=
       sup_le (hUM.trans chief.H0_normalized_by_M)
         (data.typeP.W1_le.trans chief.H0_normalized_by_M)
-    haveI : Group.IsNilpotent ↥data.typeP.H := by
+    have : Group.IsNilpotent ↥data.typeP.H := by
       rw [data.typeP.H_eq]
       exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent M
-    haveI : IsSolvable ↥data.typeP.H := IsNilpotent.to_isSolvable
-    haveI hsolv : IsSolvable ↥chief.H0 :=
-      solvable_of_solvable_injective
+    have : Group.IsSolvable ↥data.typeP.H := IsNilpotent.to_isSolvable
+    have hsolv : Group.IsSolvable ↥chief.H0 :=
+      Group.isSolvable_of_isSolvable_injective
         (f := (Subgroup.subgroupOfEquivOfLe hH0le).symm.toMonoidHom)
         (Subgroup.subgroupOfEquivOfLe hH0le).symm.injective
     have hcop : Nat.Coprime (Nat.card ↥chief.H0)
@@ -947,7 +947,7 @@ theorem caseA_commutator_chain [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   -- ###########################################################################
   obtain ⟨Q, hQnorm, hQle, hRQ, hcardQ⟩ :=
     exists_normal_subgroup_index_prime chief.p_prime hpK hNne
-  haveI := hQnorm
+  have := hQnorm
   obtain ⟨hNhatCard, hcommHat, hNhatLe⟩ :=
     quotient_classTwo_structure chief.p_prime hQnorm hQle hRQ hcardQ hNcomm
   -- `mk'Q : H → H/Q` and `π : H/Q → H/N`.
@@ -996,8 +996,8 @@ theorem caseA_commutator_chain [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     exists_exponent_fun_of_card_prime chief.p_prime hcardS₀ Φ
       (fun v s hs => by rw [hΦv]; exact hmem v s hs)
   -- `S₀` is cyclic of order `p` with generator `g`.
-  haveI hfin : Finite ↥S₀ := Nat.finite_of_card_ne_zero (hcardS₀ ▸ chief.p_prime.pos.ne')
-  haveI : IsCyclic ↥S₀ := isCyclic_of_prime_card hcardS₀
+  have hfin : Finite ↥S₀ := Nat.finite_of_card_ne_zero (hcardS₀ ▸ chief.p_prime.pos.ne')
+  have : IsCyclic ↥S₀ := isCyclic_of_prime_card hcardS₀
   obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := ↥S₀)
   have hgS : (g : ↥data.typeP.H ⧸ chief.N) ∈ S₀ := g.2
   have hordg : orderOf (g : ↥data.typeP.H ⧸ chief.N) = chief.p := by
@@ -1013,7 +1013,7 @@ theorem caseA_commutator_chain [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   suffices hantisym : ∃ (w : ↥L),
       ∀ v : ↥L', (e v : ZMod chief.p) * (e (MulAut.conjNormal w v) : ZMod chief.p) = 1 by
     obtain ⟨w, hrel⟩ := hantisym
-    haveI := hUnorm
+    have := hUnorm
     refine ⟨MulAut.conjNormal w, orderOf w, ?_, ?_, ?_⟩
     · -- `orderOf w` is odd (divides `|G|`).
       exact hG.odd.of_dvd_nat ((orderOf_dvd_natCard w).trans (Subgroup.card_subgroup_dvd_card L))
@@ -1155,7 +1155,7 @@ theorem caseA_commutator_chain [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   -- `L'` is normal in `L`, so `a⁻¹ v a ∈ L'` for `v ∈ L'`, `a ∈ L`.
   have hconjL' : ∀ (a : ↥L) (v : ↥L'), (a⁻¹ * (v : ↥L) * a) ∈ L' := by
     intro a v
-    haveI := hUnorm
+    have := hUnorm
     have := hUnorm.conj_mem (v : ↥L) v.2 a⁻¹
     simpa [mul_assoc] using this
   -- the action `φ (v:↥L) (xC a)` agrees, mod `N`, with `(xC a)^{e(a⁻¹ v a)}`.

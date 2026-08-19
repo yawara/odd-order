@@ -145,7 +145,7 @@ it, provided `x` is not centralised by `h_p`. -/
 theorem conjLevel_eq (hp : p.Prime) (hh : IsOfFinOrder h) {x : G}
     (hx : ¬ Commute (pPart p h) x) {k : ℤ} (hk : x = h ^ k * conjRep h x * (h ^ k)⁻¹) :
     conjLevel p h x = (k : ZMod p) := by
-  haveI : NeZero p := ⟨hp.ne_zero⟩
+  have : NeZero p := ⟨hp.ne_zero⟩
   set r : G := conjRep h x with hrdef
   set k₀ : ℤ := (exists_conjRep h x).choose with hk₀def
   have hk₀ : x = h ^ k₀ * r * (h ^ k₀)⁻¹ := (exists_conjRep h x).choose_spec

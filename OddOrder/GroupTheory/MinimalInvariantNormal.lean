@@ -70,13 +70,13 @@ theorem exists_minimal_aInvariant_normal [Finite H] [Nontrivial H] :
 
 /-- A minimal nontrivial `L`-invariant normal subgroup of a finite solvable group is
 commutative. -/
-theorem isMulCommutative_of_minimal_aInvariant_normal [Finite H] [IsSolvable H]
+theorem isMulCommutative_of_minimal_aInvariant_normal [Finite H] [Group.IsSolvable H]
     {N : Subgroup H} [N.Normal]
     (hN_inv : IsAInvariant φ N)
     (hN_ne_bot : N ≠ ⊥)
     (hN_min : ∀ M : Subgroup H, M.Normal → IsAInvariant φ M → M ≤ N → M ≠ ⊥ → N ≤ M) :
     IsMulCommutative N := by
-  have hcomm_lt : ⁅N, N⁆ < N := IsSolvable.commutator_lt_of_ne_bot hN_ne_bot
+  have hcomm_lt : ⁅N, N⁆ < N := Group.IsSolvable.commutator_lt_of_ne_bot hN_ne_bot
   have hcomm_bot : (⁅N, N⁆ : Subgroup H) = ⊥ := by
     by_contra hcomm_ne_bot
     have hN_le_comm : N ≤ ⁅N, N⁆ :=
@@ -92,24 +92,24 @@ theorem isMulCommutative_of_minimal_aInvariant_normal [Finite H] [IsSolvable H]
 
 /-- A minimal nontrivial `L`-invariant normal subgroup of a finite solvable group is a
 `p`-group for some prime `p`. -/
-theorem exists_prime_isPGroup_of_minimal_aInvariant_normal [Finite H] [IsSolvable H]
+theorem exists_prime_isPGroup_of_minimal_aInvariant_normal [Finite H] [Group.IsSolvable H]
     {N : Subgroup H} [N.Normal]
     (hN_inv : IsAInvariant φ N)
     (hN_ne_bot : N ≠ ⊥)
     (hN_min : ∀ M : Subgroup H, M.Normal → IsAInvariant φ M → M ≤ N → M ≠ ⊥ → N ≤ M) :
     ∃ p : ℕ, p.Prime ∧ IsPGroup p N := by
   classical
-  haveI hN_comm : IsMulCommutative N :=
+  have hN_comm : IsMulCommutative N :=
     isMulCommutative_of_minimal_aInvariant_normal hN_inv hN_ne_bot hN_min
   have hN_card_ne_one : Nat.card N ≠ 1 := by
     intro hcard
     exact hN_ne_bot ((Subgroup.eq_bot_iff_card N).mpr hcard)
   obtain ⟨p, hp_prime, hp_dvd⟩ := Nat.exists_prime_and_dvd hN_card_ne_one
-  haveI hpFact : Fact p.Prime := ⟨hp_prime⟩
+  have hpFact : Fact p.Prime := ⟨hp_prime⟩
   let P : Sylow p N := default
   have hP_normal : (P : Subgroup N).Normal :=
     Subgroup.normal_of_isMulCommutative (P : Subgroup N)
-  haveI hP_char : (P : Subgroup N).Characteristic :=
+  have hP_char : (P : Subgroup N).Characteristic :=
     Sylow.characteristic_of_normal P hP_normal
   let Pmap : Subgroup H := (P : Subgroup N).map N.subtype
   obtain ⟨hPmap_inv, hPmap_normal, hPmap_le_N⟩ :=
@@ -141,7 +141,7 @@ theorem exists_prime_isPGroup_of_minimal_aInvariant_normal [Finite H] [IsSolvabl
 /-- **Existence of an elementary-abelian `L`-invariant normal subgroup.**  A nontrivial finite
 solvable group `H` carrying an action `φ : L →* MulAut H` has a nontrivial `L`-invariant normal
 subgroup `N ◁ H` that is elementary abelian (of some prime exponent `p`). -/
-theorem exists_aInvariant_normal_isElementaryAbelian [Finite H] [IsSolvable H]
+theorem exists_aInvariant_normal_isElementaryAbelian [Finite H] [Group.IsSolvable H]
     [Nontrivial H] :
     ∃ (N : Subgroup H) (p : ℕ), p.Prime ∧ N ≠ ⊥ ∧ N.Normal ∧ IsAInvariant φ N ∧
       IsElementaryAbelian p ↥N := by
@@ -154,18 +154,18 @@ theorem exists_aInvariant_normal_isElementaryAbelian [Finite H] [IsSolvable H]
     by_cases hM0 : M = ⊥
     · exact Or.inl hM0
     · exact Or.inr (le_antisymm hMle (hN_min M hMnorm hMinv hMle hM0))
-  haveI : N.Normal := hN_normal
-  haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN_ne
-  haveI : IsSolvable ↥N := inferInstance
+  have : N.Normal := hN_normal
+  have : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN_ne
+  have : Group.IsSolvable ↥N := inferInstance
   -- Step 1: `↥N` is abelian.
   have hN_comm : IsMulCommutative ↥N :=
     isMulCommutative_of_minimal_aInvariant_normal hN_inv hN_ne hN_min
   have hab : ∀ x y : ↥N, x * y = y * x := fun x y => hN_comm.is_comm.comm x y
   -- Step 2: `↥N` has prime exponent `p` (the subgroup of `p`-th powers is trivial).
-  letI : CommGroup ↥N := { (inferInstance : Group ↥N) with mul_comm := hab }
+  let : CommGroup ↥N := { (inferInstance : Group ↥N) with mul_comm := hab }
   obtain ⟨p, hp, hN_pgroup⟩ :=
     exists_prime_isPGroup_of_minimal_aInvariant_normal hN_inv hN_ne hN_min
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨n, hN_card⟩ := (IsPGroup.iff_card (p := p) (G := N)).mp hN_pgroup
   have hpdvd : p ∣ Nat.card N := by
     rw [hN_card]
@@ -180,7 +180,7 @@ theorem exists_aInvariant_normal_isElementaryAbelian [Finite H] [IsSolvable H]
     rw [Subgroup.characteristic_iff_map_le]
     rintro ϕ _ ⟨_, ⟨z, rfl⟩, rfl⟩
     exact ⟨ϕ z, by simp only [powMonoidHom_apply, map_pow, MulEquiv.coe_toMonoidHom]⟩
-  haveI := hPchar
+  have := hPchar
   obtain ⟨hinv, hnorm, hle⟩ :=
     aInvariant_normal_map_of_characteristic hN_inv ((powMonoidHom p).range)
   rcases hkill _ hnorm hinv hle with h | h
@@ -199,7 +199,7 @@ theorem exists_aInvariant_normal_isElementaryAbelian [Finite H] [IsSolvable H]
       MonoidHom.range_eq_top.mp htop
     have hinj : Function.Injective (powMonoidHom p : ↥N →* ↥N) :=
       Finite.injective_iff_surjective.mpr hsurj
-    haveI : Fintype ↥N := Fintype.ofFinite _
+    have : Fintype ↥N := Fintype.ofFinite _
     obtain ⟨g, hg⟩ :=
       exists_prime_orderOf_dvd_card p (by rwa [Nat.card_eq_fintype_card] at hpdvd)
     have hgp : (powMonoidHom p : ↥N →* ↥N) g = (powMonoidHom p : ↥N →* ↥N) 1 := by

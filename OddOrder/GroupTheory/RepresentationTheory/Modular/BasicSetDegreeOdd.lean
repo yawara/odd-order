@@ -96,7 +96,7 @@ theorem exists_odd_intCast_principalBasicSet
     (hjne : j ≠ j₀) :
     ∃ s : ℤ, ((s : ℤ) : K) = principalBasicSet eG hπG hlinG hnilG t j₀ j 1 ∧ Odd s := by
   classical
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   -- `ε_j = ±1` as an integer
   have hεsq := character_involution_mul_self hp hx hω e eG hπG hlinG hπ hlin hkerJ hnil hnilG hω'
     hζ hζk hζK hconv hNp hquot S hφ₀ ht hconjall ht1 hcart hjB

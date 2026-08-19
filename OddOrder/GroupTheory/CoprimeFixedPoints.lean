@@ -61,7 +61,7 @@ coset `gN` contains an `X`-fixed representative `c`, so `gN = cN` lies in the im
 theorem map_fixedSubgroup_eq_fixedSubgroup_quotient [N.Normal] [Finite ↥X] [Finite H]
     (hN : IsAInvariant φ N)
     (hCop : Nat.Coprime (Nat.card ↥X) (Nat.card H))
-    (hSolv : IsSolvable ↥X ∨ IsSolvable H) :
+    (hSolv : Group.IsSolvable ↥X ∨ Group.IsSolvable H) :
     (fixedSubgroup φ X).map (QuotientGroup.mk' N) =
       fixedSubgroup (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) X := by
   ext q
@@ -100,7 +100,7 @@ theorem and Noether's first isomorphism theorem give the product. -/
 theorem card_fixedSubgroup_eq_mul [N.Normal] [Finite ↥X] [Finite H]
     (hN : IsAInvariant φ N)
     (hCop : Nat.Coprime (Nat.card ↥X) (Nat.card H))
-    (hSolv : IsSolvable ↥X ∨ IsSolvable H) :
+    (hSolv : Group.IsSolvable ↥X ∨ Group.IsSolvable H) :
     Nat.card ↥(fixedSubgroup φ X) =
       Nat.card ↥((fixedSubgroup φ X ⊓ N : Subgroup H)) *
         Nat.card ↥(fixedSubgroup (OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) X) := by
@@ -183,7 +183,7 @@ This is the inductive step of `wielandt_fixedPoint_frobenius`: the chief-step mu
 `|C_H(X) ⊓ N| · |C_{H/N}(X)|`,
 `|H| = |N| · |H/N|`, and `wielandt_card_combine` multiplies `hfac` and `hIH`. -/
 theorem wielandt_step [Finite L] [Finite H] {φ : L →* MulAut H} {U E : Subgroup L}
-    {N : Subgroup H} [N.Normal] [IsSolvable H] (hN : IsAInvariant φ N)
+    {N : Subgroup H} [N.Normal] [Group.IsSolvable H] (hN : IsAInvariant φ N)
     (hcop : Nat.Coprime (Nat.card L) (Nat.card H))
     (hfac : Nat.card ↥(fixedSubgroup φ ⊤ ⊓ N) ^ Nat.card ↥E * Nat.card ↥N =
       Nat.card ↥(fixedSubgroup φ E ⊓ N) ^ Nat.card ↥E *

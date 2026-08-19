@@ -61,7 +61,7 @@ omit [Fintype G] in
 theorem eq_pRegularPart_of_mem_leftCosetOf (hp : p.Prime) (hu : IsPRegular p u)
     (hPp : IsPGroup p ↥P) (hcomm : ∀ v ∈ P, Commute u v) {g : G}
     (hg : g ∈ leftCosetOf u P) : u = pRegularPart p g := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hv : u⁻¹ * g ∈ P := hg
   have hprod : u * (u⁻¹ * g) = g := by group
   exact (eq_pPart_of_commute hp (hcomm _ hv).symm
@@ -87,7 +87,7 @@ theorem conjugateCount_self (hp : p.Prime) (hu : IsPRegular p u) (hPp : IsPGroup
     conjugateCount (leftCosetOf u P) u
       = Nat.card ↥(Subgroup.centralizer ({u} : Set G)) := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hset : (Finset.univ.filter fun x : G => x⁻¹ * u * x ∈ leftCosetOf u P)
       = Finset.univ.filter fun x : G => x ∈ Subgroup.centralizer ({u} : Set G) := by
     ext x

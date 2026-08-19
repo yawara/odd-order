@@ -50,8 +50,8 @@ theorem exists_isPrimitiveRoot_pRegularExponent_standardSystem
     (G : Type*) [Group G] [Finite G] :
     ∃ ω : ResidueField (StandardSystem p), IsPrimitiveRoot ω (pRegularExponent p G) := by
   have hpos : 0 < pRegularExponent p G := pRegularExponent_pos
-  haveI : NeZero (pRegularExponent p G) := ⟨hpos.ne'⟩
-  haveI := hasEnoughRootsOfUnity_residueField_standardSystem p
+  have : NeZero (pRegularExponent p G) := ⟨hpos.ne'⟩
+  have := hasEnoughRootsOfUnity_residueField_standardSystem p
     (not_dvd_pRegularExponent (G := G) Fact.out) hpos.ne'
   exact HasEnoughRootsOfUnity.exists_primitiveRoot _ _
 

@@ -339,8 +339,8 @@ theorem zpWreathBase_spec (H : Type*) [Group H] (p : ℕ) [Fact p.Prime] :
       Nonempty ((zpWreath H p ⧸ zpWreathBase H p) ≃* H) ∧
       Subgroup.centralizer ((zpWreathBase H p : Subgroup (zpWreath H p)) :
         Set (zpWreath H p)) = zpWreathBase H p := by
-  haveI : Fact (1 < p) := ⟨(Fact.out (p := p.Prime)).one_lt⟩
-  haveI : Nontrivial (Multiplicative (ZMod p)) :=
+  have : Fact (1 < p) := ⟨(Fact.out (p := p.Prime)).one_lt⟩
+  have : Nontrivial (Multiplicative (ZMod p)) :=
     Multiplicative.ofAdd.injective.nontrivial
   have hker : zpWreathBase H p = (rightHom : zpWreath H p →* H).ker :=
     range_inl_eq_ker_rightHom

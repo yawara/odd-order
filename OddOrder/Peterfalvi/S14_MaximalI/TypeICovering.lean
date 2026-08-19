@@ -129,6 +129,7 @@ private theorem allTypeI_centralizer_le (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     OddOrder.BG.Ch4.S16.exists_RData_escape_structure hG hM hx hesc
   exact hxA.2 (typeI_hatMsigma_subset_Msigma hG hnoV hNmem.1 (hall N hNmem.1) hxA.1.1)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (8.13.c1)+(2.3), all-type-I case** — the escaping-centralizer control makes
 each type-I kernel's Fitting subgroup a `TI`-subgroup, supplying the `FittingIsTI` gate of the
 (12.17) `isTI` covering input.
@@ -255,7 +256,7 @@ theorem exists_typeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   classical
   -- `BGTheoremECoverData.ι : Type*` is universe-polymorphic; pin the index type to `Type 0`.
   obtain ⟨data, hcover⟩ := OddOrder.Peterfalvi.S10.bgTheoremE_cover_data.{_, 0} hG
-  haveI : Fintype data.ι := data.finite_index
+  have : Fintype data.ι := data.finite_index
   -- **Every representative is type I**, so `data.tau i = .I` and hence
   -- `mainSubgroup (M_i) (τ_i) = (M_i)_F`.  Type exclusivity is
   -- `not_isTypeI_of_isTypeNonI` (BG §16): a type-`P` (= non-type-I) maximal is not type I.
@@ -293,7 +294,7 @@ theorem exists_typeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       -- empty class would force `|G#| = 0`, both impossible.  No counting of disjoint unions is
       -- needed: a one-element index makes the cover `⋃ᵢ thickenedA1(Mᵢ)` equal to a single
       -- `thickenedA1(M)`, whose cardinality is strictly below `|G#|`.
-      haveI : Nontrivial G := hG.simple.toNontrivial
+      have : Nontrivial G := hG.simple.toNontrivial
       by_contra hlt
       rw [Nat.not_le] at hlt
       have hcard01 : Fintype.card data.ι = 0 ∨ Fintype.card data.ι = 1 := by omega
@@ -526,7 +527,7 @@ theorem theorem88_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
   · refine Or.inr ?_
     push Not at hall
     obtain ⟨S, hS, hSnotI⟩ := hall
-    haveI : IsSolvable ↥S := hG.solvable_of_mem_maximalSubgroups hS
+    have : Group.IsSolvable ↥S := hG.isSolvable_of_mem_maximalSubgroups hS
     have hSP : OddOrder.BG.Ch4.S14.IsTypeP S := notTypeI_imp_typeP S hS hSnotI
     -- A `κ(S)`-Hall subgroup `K` of `S` (Hall's theorem in the solvable `S`).
     obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥S) (OddOrder.BG.Ch4.S14.kappa S)

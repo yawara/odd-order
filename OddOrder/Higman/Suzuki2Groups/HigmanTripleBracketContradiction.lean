@@ -157,9 +157,9 @@ theorem not_exists_equivariant_linearEquiv_of_higman_bracket_of_transitive
   rintro ⟨e, he⟩
   have hfin₁ : Module.finrank (ZMod 2) V₁ = n :=
     e.finrank_eq.trans hfin₂
-  letI : Nontrivial V₂ :=
+  let : Nontrivial V₂ :=
     Module.nontrivial_of_finrank_pos (by rw [hfin₂]; omega)
-  letI : Nontrivial V₁ := e.toEquiv.nontrivial
+  let : Nontrivial V₁ := e.toEquiv.nontrivial
   have htrans₁ : ∀ v w : V₁, v ≠ 0 → w ≠ 0 →
       ∃ c : C, rho₁ c v = w := by
     intro v w hv hw
@@ -341,7 +341,7 @@ theorem not_exists_equivariant_linearEquiv_of_higman_tripleBracket_of_faithful_f
         e (lowerCentralLayerRepresentation phi 1 c v) =
           lowerCentralLayerRepresentation phi 2 c (e v) := by
   classical
-  letI : Nontrivial (Additive (lowerCentralLayer H 1)) :=
+  let : Nontrivial (Additive (lowerCentralLayer H 1)) :=
     Module.nontrivial_of_finrank_pos (by rw [hfin₂]; omega)
   rintro ⟨e, hequiv⟩
   have hfin₁ : Module.finrank (ZMod 2)
@@ -356,7 +356,7 @@ theorem not_exists_equivariant_linearEquiv_of_higman_tripleBracket_of_faithful_f
     rcases hnodd with ⟨d, hd⟩
     omega
   have hn0 : n ≠ 0 := by omega
-  letI : NeZero n := ⟨hn0⟩
+  let : NeZero n := ⟨hn0⟩
   have hfaith₂ : Function.Injective
       (lowerCentralLayerRepresentation phi 1) :=
     lowerCentralLayerOneRepresentation_injective_of_equivariant_linearEquiv
@@ -549,9 +549,9 @@ theorem
   classical
   let D := MonoidHom.range phi
   let psi : D →* MulAut H := D.subtype
-  letI : Finite D := Finite.of_surjective phi.rangeRestrict
+  let : Finite D := Finite.of_surjective phi.rangeRestrict
     phi.rangeRestrict_surjective
-  letI : CommGroup D :=
+  let : CommGroup D :=
     { (inferInstance : Group D) with
       mul_comm := by
         intro a b
@@ -560,7 +560,7 @@ theorem
         apply Subtype.ext
         change (a : MulAut H) * b = b * a
         rw [← hx, ← hy, ← map_mul, mul_comm, map_mul] }
-  letI : IsCyclic D :=
+  let : IsCyclic D :=
     isCyclic_of_surjective phi.rangeRestrict
       phi.rangeRestrict_surjective
   have hcomp (i : ℕ) :

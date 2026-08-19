@@ -28,7 +28,7 @@ theorem top_ne_bot_of_prime_dvd_card
   have hcard_gt : 1 < Nat.card G :=
     lt_of_lt_of_le (Fact.out (p := p.Prime)).one_lt
       (Nat.le_of_dvd Nat.card_pos hp_dvd)
-  haveI : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp hcard_gt
+  have : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp hcard_gt
   exact top_ne_bot
 
 /-- If the ambient group is abelian, then the Sylow conclusion of
@@ -70,7 +70,7 @@ theorem sylow_commutative_and_commutator_le_of_exists_nontrivial_normal_pSubgrou
     Std.Commutative (· * · : P → P → P) ∧
       commutator G ≤ (P : Subgroup G) := by
   rcases hexists with ⟨K, hKnormal, hK, hK_ne_bot⟩
-  haveI : K.Normal := hKnormal
+  have : K.Normal := hKnormal
   exact sylow_commutative_and_commutator_le_of_nontrivial_normal_p_fixed_space
     K ρ hfaithful hK hdim hK_ne_bot P
 
@@ -105,7 +105,7 @@ theorem sylow_commutative_and_commutator_le_of_nontrivial_determinantKernel_pGro
     (P : Sylow p G) :
     Std.Commutative (· * · : P → P → P) ∧
       commutator G ≤ (P : Subgroup G) := by
-  haveI : (determinantKernelSubgroup ρ).Normal :=
+  have : (determinantKernelSubgroup ρ).Normal :=
     determinantKernelSubgroup_normal ρ
   exact sylow_commutative_and_commutator_le_of_nontrivial_normal_p_fixed_space
     (determinantKernelSubgroup ρ) ρ hfaithful hdet_p hdim hdet_ne_bot P
@@ -137,15 +137,15 @@ theorem exists_prime_opCore_ne_bot_of_commutative
   have hcard_ne_one : Nat.card G ≠ 1 := (Finite.one_lt_card (α := G)).ne'
   obtain ⟨r, hr_prime, hr_dvd⟩ :=
     Nat.exists_prime_and_dvd hcard_ne_one
-  haveI : Fact r.Prime := ⟨hr_prime⟩
-  haveI : Finite (Sylow r G) := inferInstance
+  have : Fact r.Prime := ⟨hr_prime⟩
+  have : Finite (Sylow r G) := inferInstance
   obtain ⟨P⟩ := Sylow.nonempty (p := r) (G := G)
   have hP_ne_bot : (P : Subgroup G) ≠ ⊥ := P.ne_bot_of_dvd_card hr_dvd
   have hPnormal : (P : Subgroup G).Normal := by
     refine ⟨fun x hx g => ?_⟩
     rw [hGcomm.comm g x]
     simpa [mul_assoc] using hx
-  haveI : (P : Subgroup G).Normal := hPnormal
+  have : (P : Subgroup G).Normal := hPnormal
   exact ⟨r, hr_prime,
     opCore_ne_bot_of_nontrivial_normal_pSubgroup
       (G := G) (K := (P : Subgroup G)) P.2 hP_ne_bot⟩
@@ -170,7 +170,7 @@ theorem exists_prime_opCore_ne_bot_of_commutator_le_sylow
       rw [(commutator_eq_bot_iff_center_eq_top (G := G)).mp hcomm_bot]
       trivial
     exact (Subgroup.mem_center_iff.mp hxcenter y).symm
-  · haveI : (commutator G).Normal :=
+  · have : (commutator G).Normal :=
       Subgroup.Normal.of_commutator_le (G := G) (H := commutator G) le_rfl
     have hcomm_p : IsPGroup p (commutator G) := P.2.to_le hcomm_le
     exact ⟨p, Fact.out,

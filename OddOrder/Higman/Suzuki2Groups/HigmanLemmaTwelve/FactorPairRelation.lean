@@ -76,9 +76,9 @@ theorem XiLengthThreeTypeAFactorData.exists_normalizedFactorPairRelation
   have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
     frattini_isElementaryAbelian_of_xiLengthThree
       hP hncomm hmulti hxi hlen hprime
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   let n := Module.finrank (ZMod 2) (Additive ↑(frattini P))
   obtain ⟨c, ePhi, nu, left, right, hnTwo, _hcgen, hnuPrimitive,
       hconj, _hsourceL, _hsourceR⟩ :=

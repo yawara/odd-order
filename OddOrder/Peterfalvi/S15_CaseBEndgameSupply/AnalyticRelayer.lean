@@ -251,7 +251,7 @@ theorem Hypothesis.analyticCounting_disjointCover_of_caseB_facts [Finite G]
         + ((Nat.card hyp.H - 1 : ℕ) : ℚ) / (Nat.card hyp.S : ℚ)
         + ((hyp.q : ℚ) - 1) / ((hyp.p : ℚ) * (hyp.q : ℚ) ^ hyp.p) := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   have hQ : Nat.card ↥hyp.Q = hyp.q ^ hyp.p := hyp.card_Q_eq_qp hG
   have hd1 : hyp.d = 1 := by rw [hyp.d_eq_card_D, hD, Subgroup.card_bot]
   have hq3 : 3 ≤ hyp.q := hyp.three_le_q
@@ -341,8 +341,8 @@ theorem CharacterDegreeCore.G0_nonvanishing_dichotomy_core [Finite G]
     (core : CharacterDegreeCore hyp) (lam : LambdaClusterData hyp) :
     ∀ x ∈ hyp.G0Finset, core.tau1S lam.lambda x ≠ 0 ∨ hyp.eta10 x ≠ 0 := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Invertible (Nat.card G : ℂ) :=
+  have : Fintype G := Fintype.ofFinite G
+  have : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   intro x hxF
   have hxG0 : x ∈ hyp.G0 := (Set.Finite.mem_toFinset _).mp hxF

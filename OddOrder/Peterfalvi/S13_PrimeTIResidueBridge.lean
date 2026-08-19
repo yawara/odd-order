@@ -107,7 +107,7 @@ theorem typePACore_subset_typePA {M : Subgroup G}
   rw [S10.mem_typePACore] at hy
   obtain ⟨hyM', hy1, x, hx, hxcent⟩ := hy
   simp only [OddOrder.GroupTheory.typePA, OddOrder.GroupTheory.centralizerSupport,
-    Set.mem_setOf_eq]
+    Set.mem_ofPred_eq]
   rw [OddOrder.GroupTheory.sharpSubgroup, Set.mem_sdiff_singleton] at hx
   exact ⟨hyM', hy1, x, by
     rw [OddOrder.GroupTheory.sharpSubgroup, Set.mem_sdiff_singleton]

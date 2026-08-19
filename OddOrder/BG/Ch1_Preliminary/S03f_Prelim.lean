@@ -43,11 +43,11 @@ The Fitting subgroup is the supremum of the `p`-cores `O_q(G)` over the prime fa
 theorem fitting_eq_opCore_of_oPiCore_compl_eq_bot {G : Type*} [Group G] [Finite G]
     {p : ℕ} (hp : p.Prime) (h : OddOrder.Isaacs.Ch03.oPiCore ({p}ᶜ : Set ℕ) G = ⊥) :
     OddOrder.Isaacs.Ch01.fitting G = OddOrder.Isaacs.Ch01.opCore p G := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   refine le_antisymm ?_ (OddOrder.Isaacs.Ch01.opCore_le_fitting ⟨p, hp⟩ G)
   rw [OddOrder.Isaacs.Ch01.fitting_eq_iSup_primeFactors]
   refine iSup_le (fun q => ?_)
-  haveI : Fact (q : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors q.2⟩
+  have : Fact (q : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors q.2⟩
   by_cases hq : (q : ℕ) = p
   · subst hq; exact le_refl _
   · have hle : OddOrder.Isaacs.Ch01.opCore (q : ℕ) G
@@ -86,7 +86,7 @@ theorem frattini_fitting_map_characteristic {Hb : Type*} [Group Hb] [Finite Hb] 
     ((_root_.frattini ↥(OddOrder.Isaacs.Ch01.fitting Hb)).map
       (OddOrder.Isaacs.Ch01.fitting Hb).subtype).Characteristic := by
   set V : Subgroup Hb := OddOrder.Isaacs.Ch01.fitting Hb with hVdef
-  haveI hVchar : V.Characteristic := by rw [hVdef]; infer_instance
+  have hVchar : V.Characteristic := by rw [hVdef]; infer_instance
   rw [Subgroup.characteristic_iff_map_le]
   intro φ y hy
   rw [Subgroup.mem_map] at hy ⊢
@@ -112,7 +112,7 @@ Burnside (Theorem 1.8, `mulAut_eq_one_of_coprime_orderOf_of_frattini`) trivially
 the `p`-group `V` it is trivial.  Hence `W` is a `p`-group, so its image `Ō` is both a `p`- and a
 `p'`-group, i.e. trivial. -/
 theorem oPiCore_compl_quotient_frattini_fitting_eq_bot
-    {p : ℕ} [hp : Fact p.Prime] {Hb : Type*} [Group Hb] [Finite Hb] [IsSolvable Hb]
+    {p : ℕ} [hp : Fact p.Prime] {Hb : Type*} [Group Hb] [Finite Hb] [Group.IsSolvable Hb]
     (hVp : IsPGroup p ↥(OddOrder.Isaacs.Ch01.fitting Hb))
     [hPhiNorm : ((_root_.frattini ↥(OddOrder.Isaacs.Ch01.fitting Hb)).map
       (OddOrder.Isaacs.Ch01.fitting Hb).subtype).Normal] :
@@ -121,13 +121,13 @@ theorem oPiCore_compl_quotient_frattini_fitting_eq_bot
         (OddOrder.Isaacs.Ch01.fitting Hb).subtype)) = ⊥ := by
   classical
   set V : Subgroup Hb := OddOrder.Isaacs.Ch01.fitting Hb with hVdef
-  haveI hVnorm : V.Normal := by rw [hVdef]; infer_instance
+  have hVnorm : V.Normal := by rw [hVdef]; infer_instance
   set Phi : Subgroup Hb := (_root_.frattini ↥V).map V.subtype with hPhidef
   set Ō : Subgroup (Hb ⧸ Phi) := OddOrder.Isaacs.Ch03.oPiCore ({p}ᶜ : Set ℕ) (Hb ⧸ Phi) with hOdef
   set W : Subgroup Hb := Ō.comap (QuotientGroup.mk' Phi) with hWdef
   set Vbar : Subgroup (Hb ⧸ Phi) := V.map (QuotientGroup.mk' Phi) with hVbardef
   -- `Vbar` is a normal `p`-group; `Ō` is a `p'`-group.
-  haveI hVbarNorm : Vbar.Normal :=
+  have hVbarNorm : Vbar.Normal :=
     hVbardef ▸ hVnorm.map (QuotientGroup.mk' Phi) (QuotientGroup.mk'_surjective Phi)
   have hVbarP : IsPGroup p ↥Vbar :=
     hVbardef ▸ hVp.of_surjective (MonoidHom.subgroupMap (QuotientGroup.mk' Phi) V)
@@ -273,9 +273,9 @@ isomorphism is a normal nilpotent subgroup, hence contained in the Fitting subgr
 theorem fitting_map_le_of_mulEquiv {G G' : Type*} [Group G] [Finite G] [Group G'] [Finite G']
     (f : G ≃* G') :
     (OddOrder.Isaacs.Ch01.fitting G).map f.toMonoidHom ≤ OddOrder.Isaacs.Ch01.fitting G' := by
-  haveI : ((OddOrder.Isaacs.Ch01.fitting G).map f.toMonoidHom).Normal :=
+  have : ((OddOrder.Isaacs.Ch01.fitting G).map f.toMonoidHom).Normal :=
     Subgroup.Normal.map inferInstance f.toMonoidHom f.surjective
-  haveI : Group.IsNilpotent ↥((OddOrder.Isaacs.Ch01.fitting G).map f.toMonoidHom) := by
+  have : Group.IsNilpotent ↥((OddOrder.Isaacs.Ch01.fitting G).map f.toMonoidHom) := by
     have e' := Subgroup.equivMapOfInjective (OddOrder.Isaacs.Ch01.fitting G) f.toMonoidHom
       f.injective
     exact Group.nilpotent_of_surjective e'.toMonoidHom e'.surjective
@@ -363,6 +363,7 @@ theorem mem_normalizer_commutator {G : Type*} [Group G] {A B : Subgroup G} {g : 
     rw [Subgroup.map_commutator, map_conj_eq_self_of_mem_normalizer hA,
       map_conj_eq_self_of_mem_normalizer hB])
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Lifted characteristic subgroups inherit normalizer elements**: if `g` normalizes `W ≤ G`,
 then `g` normalizes `C.map W.subtype` for every characteristic `C ≤ ↥W` (conjugation by `g`
 restricts to an automorphism of `↥W`, which fixes `C`).  Used at BG Theorem 3.6 (3.22) for
@@ -450,7 +451,7 @@ theorem oPiCore_compl_eq_bot_of_isPGroup_centralizer_le {p : ℕ} [hp : Fact p.P
     (hCent : Subgroup.centralizer (N : Set W) ≤ N) :
     OddOrder.Isaacs.Ch03.oPiCore ({p}ᶜ : Set ℕ) W = ⊥ := by
   set O : Subgroup W := OddOrder.Isaacs.Ch03.oPiCore ({p}ᶜ : Set ℕ) W with hO
-  haveI hOnorm : O.Normal := by rw [hO]; infer_instance
+  have hOnorm : O.Normal := by rw [hO]; infer_instance
   have hOp' : ¬ p ∣ Nat.card ↥O := by
     intro hd
     have hmem := OddOrder.Isaacs.Ch03.oPiCore.isPiGroup (G := W) ({p}ᶜ : Set ℕ) p
@@ -483,7 +484,7 @@ theorem oPiCore_eq_bot_of_subgroupOf_normal {G : Type*} [Group G] [Finite G] {π
     (hB : OddOrder.Isaacs.Ch03.oPiCore π ↥B = ⊥) :
     OddOrder.Isaacs.Ch03.oPiCore π ↥A = ⊥ := by
   set O : Subgroup ↥A := OddOrder.Isaacs.Ch03.oPiCore π ↥A with hO
-  haveI hOchar : O.Characteristic := by rw [hO]; infer_instance
+  have hOchar : O.Characteristic := by rw [hO]; infer_instance
   set L : Subgroup G := O.map A.subtype with hL
   have hLA : L ≤ A := Subgroup.map_subtype_le O
   have hLB : L ≤ B := hLA.trans hAB
@@ -508,7 +509,7 @@ theorem oPiCore_eq_bot_of_subgroupOf_normal {G : Type*} [Group G] [Finite G] {π
         group
       rwa [h4] at h2
   -- the lift `L` is normal in context `↥B`
-  haveI hLnorm : (L.subgroupOf B).Normal := by
+  have hLnorm : (L.subgroupOf B).Normal := by
     constructor
     intro n hn b
     rw [Subgroup.mem_subgroupOf] at hn ⊢
@@ -548,7 +549,7 @@ theorem card_sup_of_le_normalizer_of_disjoint {G : Type*} [Group G] [Finite G]
   have hA_le : A ≤ S := le_sup_left
   have hB_le : B ≤ S := le_sup_right
   have hnorm : S ≤ Subgroup.normalizer (A : Set G) := sup_le Subgroup.le_normalizer hn
-  haveI hAnormal : ((A.subgroupOf S) : Subgroup ↥S).Normal :=
+  have hAnormal : ((A.subgroupOf S) : Subgroup ↥S).Normal :=
     Subgroup.normal_subgroupOf_of_le_normalizer hnorm
   have hcompl' : Subgroup.IsComplement' (A.subgroupOf S) (B.subgroupOf S) := by
     refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
@@ -564,7 +565,7 @@ theorem card_sup_of_le_normalizer_of_disjoint {G : Type*} [Group G] [Finite G]
       have hmul := Subgroup.normal_mul ((A.subgroupOf S) : Subgroup ↥S) (B.subgroupOf S)
       rw [hsup, Subgroup.coe_top] at hmul
       exact hmul.symm
-  have hcard := hcompl'.card_mul
+  have hcard := hcompl'.card_mul_card
   rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hA_le).toEquiv,
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hB_le).toEquiv] at hcard
   exact hcard.symm

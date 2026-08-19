@@ -184,7 +184,7 @@ theorem betaL_grid_coeff_bessel [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
     ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (m i j) ^ 2
       ≤ (hyp.base.p * hyp.base.q : ℤ) := by
   classical
-  haveI := dataL.kernelIn_normal
+  have := dataL.kernelIn_normal
   set H78 := dataL.h78 hG with hH78
   set BD := dataL.betaDecomp hG with hBD
   -- `ζ_0^ν ⊥ η_ij` and every family member `ζ_k^ν ⊥ η_ij` (Coq `o_tauLeta`, full family).
@@ -470,7 +470,7 @@ theorem lSide_expansion_classification [Finite G] (hG : OddOrder.BG.IsMinimalSim
         (∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p,
             (signs i j : ℂ) • hyp.base.eta i j) - chi := by
   classical
-  haveI := dataL.kernelIn_normal
+  have := dataL.kernelIn_normal
   obtain ⟨m, hcoeff, hprin, hrow, hcol, -⟩ :=
     lSideGridCoeffData hG hnoV hncH0C hyp hLmax dataL hq3 hp5 hepq hub_u hub_v
   -- (3.7) four-corner relation on `m_ij` (from `betaL_grid_relation`, via the integrality bridge).
@@ -551,7 +551,7 @@ theorem typeICoherent78_complementIndex_eq_pq [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
     (Ldata : LHypothesis hyp) (dataL : TypeICoherent78Data Ldata.L) :
     (dataL.h78 hG).complementIndex = hyp.base.p * hyp.base.q := by
-  haveI := dataL.kernelIn_normal
+  have := dataL.kernelIn_normal
   have hLeq : Ldata.typeI_data.L = Ldata.L := Ldata.typeI_data_L_eq
   -- `complementIndex = |dataL.C|` (Frobenius complement of `kernelIn`).
   have hcomplD : Nat.card ↥dataL.kernelIn * Nat.card ↥dataL.C = Nat.card ↥Ldata.L :=

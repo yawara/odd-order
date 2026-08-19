@@ -160,9 +160,9 @@ theorem tSideCoherentExtension_conj [Finite G]
     (hirr : ∀ χ ∈ S, IsIrreducibleCharacter χ)
     {ζ : ClassFunction ↥hyp.base.T ℂ} (hζ : ζ ∈ S) :
     (coh.extension ζ).conj = coh.extension ζ.conj := by
-  haveI : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
+  have : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
   let K := (derivedInG hyp.base.T).subgroupOf hyp.base.T
-  haveI : K.Normal := T_derivedSubgroupOf_normal hyp
+  have : K.Normal := T_derivedSubgroupOf_normal hyp
   have hSsub : S ⊆ OddOrder.Peterfalvi.S08.inducedKernelFamily K ⊥ := by
     intro φ hφ
     rw [hS, Finset.mem_coe, Finset.mem_image] at hφ

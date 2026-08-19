@@ -180,7 +180,7 @@ variable {A B : Type*} [Group A] [Group B]
 theorem isComplement'_map_of_mulEquiv [Finite A] (e : A ≃* B) {N K : Subgroup A}
     (h : N.IsComplement' K) :
     (N.map (e : A →* B)).IsComplement' (K.map (e : A →* B)) := by
-  haveI : Finite B := Finite.of_equiv A e.toEquiv
+  have : Finite B := Finite.of_equiv A e.toEquiv
   rw [Subgroup.isComplement'_iff_card_mul_and_disjoint] at h ⊢
   obtain ⟨hcard, hdisj⟩ := h
   refine ⟨?_, ?_⟩
@@ -211,7 +211,7 @@ theorem isFrobeniusGroup_map_of_mulEquiv [Finite A] (e : A ≃* B) {N K : Subgro
 /-- The `p`-rank is invariant under a group isomorphism (finite source). -/
 theorem pRank_eq_of_mulEquiv [Finite A] (e : A ≃* B) (p : ℕ) :
     pRank A p = pRank B p := by
-  haveI : Finite B := Finite.of_equiv A e.toEquiv
+  have : Finite B := Finite.of_equiv A e.toEquiv
   exact le_antisymm (pRank_le_of_injective (f := e.toMonoidHom) e.injective)
     (pRank_le_of_injective (f := e.symm.toMonoidHom) e.symm.injective)
 
@@ -361,18 +361,18 @@ theorem fitting_map_subtype_pointwise_smul (M : Subgroup G) :
   have hfit : (OddOrder.Isaacs.Ch01.fitting ↥M).map (e : ↥M →* ↥(φ • M)) =
       OddOrder.Isaacs.Ch01.fitting ↥(φ • M) := by
     refine le_antisymm ?_ ?_
-    · haveI : ((OddOrder.Isaacs.Ch01.fitting ↥M).map (e : ↥M →* ↥(φ • M))).Normal :=
+    · have : ((OddOrder.Isaacs.Ch01.fitting ↥M).map (e : ↥M →* ↥(φ • M))).Normal :=
         Subgroup.Normal.map inferInstance (e : ↥M →* ↥(φ • M)) e.surjective
-      haveI : Group.IsNilpotent ↥((OddOrder.Isaacs.Ch01.fitting ↥M).map (e : ↥M →* ↥(φ • M))) :=
+      have : Group.IsNilpotent ↥((OddOrder.Isaacs.Ch01.fitting ↥M).map (e : ↥M →* ↥(φ • M))) :=
         Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ (e : ↥M →* ↥(φ • M))
             e.injective)
       exact OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
     · -- pull back along `e.symm`
       have h2 : (OddOrder.Isaacs.Ch01.fitting ↥(φ • M)).map (e.symm : ↥(φ • M) →* ↥M) ≤
           OddOrder.Isaacs.Ch01.fitting ↥M := by
-        haveI : ((OddOrder.Isaacs.Ch01.fitting ↥(φ • M)).map (e.symm : ↥(φ • M) →* ↥M)).Normal :=
+        have : ((OddOrder.Isaacs.Ch01.fitting ↥(φ • M)).map (e.symm : ↥(φ • M) →* ↥M)).Normal :=
           Subgroup.Normal.map inferInstance (e.symm : ↥(φ • M) →* ↥M) e.symm.surjective
-        haveI : Group.IsNilpotent
+        have : Group.IsNilpotent
             ↥((OddOrder.Isaacs.Ch01.fitting ↥(φ • M)).map (e.symm : ↥(φ • M) →* ↥M)) :=
           Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ (e.symm : ↥(φ • M) →* ↥M)
             e.symm.injective)

@@ -342,7 +342,7 @@ theorem _root_.Subgroup.exists_conj_range_eq_of_mul_inv_mem {G' : Type*} [Group 
     (hng : g.range ≤ Subgroup.normalizer (U : Set G'))
     (hdf : U ⊓ f.range = ⊥) (hdg : U ⊓ g.range = ⊥)
     (hcop : Nat.Coprime (Nat.card U) (Nat.card f.range))
-    (hsolv : IsSolvable U) :
+    (hsolv : Group.IsSolvable U) :
     ∃ u ∈ U, f.range.map (MulAut.conj u).toMonoidHom = g.range := by
   classical
   set H : Subgroup G' := U ⊔ f.range with hHdef
@@ -353,7 +353,7 @@ theorem _root_.Subgroup.exists_conj_range_eq_of_mul_inv_mem {G' : Type*} [Group 
   have hHnorm : H ≤ Subgroup.normalizer (U : Set G') :=
     sup_le Subgroup.le_normalizer hnf
   -- `U` is normal in `H`
-  haveI hUn : (U.subgroupOf H).Normal := by
+  have hUn : (U.subgroupOf H).Normal := by
     refine ⟨fun n hn h => ?_⟩
     rw [Subgroup.mem_subgroupOf] at hn ⊢
     exact (Subgroup.mem_normalizer_iff.mp (hHnorm h.2) (n : G')).mp hn
@@ -390,9 +390,9 @@ theorem _root_.Subgroup.exists_conj_range_eq_of_mul_inv_mem {G' : Type*} [Group 
     rw [hcardU, hcf.symm.index_eq_card, hcardf]
     exact hcop
   -- solvability transported into `H`
-  have hsolv' : IsSolvable ↥(U.subgroupOf H) ∨ IsSolvable (↥H ⧸ U.subgroupOf H) := by
+  have hsolv' : Group.IsSolvable ↥(U.subgroupOf H) ∨ Group.IsSolvable (↥H ⧸ U.subgroupOf H) := by
     left
-    exact solvable_of_solvable_injective
+    exact Group.isSolvable_of_isSolvable_injective
       (f := (Subgroup.subgroupOfEquivOfLe hUH).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe hUH).injective
   obtain ⟨n, hn, hconj⟩ :=

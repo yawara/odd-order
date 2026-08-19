@@ -86,7 +86,7 @@ theorem W_ne_bot_of_card_cube
     have hodd : Odd (Nat.card ↥P) := sc.toHypothesis.D_odd.of_dvd_nat hdvd
     rw [hPcard, h] at hodd
     exact (Nat.not_odd_iff_even.mpr even_two) hodd
-  letI := sc.toHypothesis.centralizerQuotientMulAction hPV
+  let := sc.toHypothesis.centralizerQuotientMulAction hPV
   obtain ⟨data⟩ := sc.toHypothesis.centralizer_trichotomy_of_induction hPV hPne
     (sc.twoRank_centralizer_ge_two P hPV p hp hPcard) ind
   rcases data.branch with ⟨d, -, det⟩ | ⟨d, -, det⟩ | ⟨d, -, det⟩

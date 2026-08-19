@@ -361,8 +361,8 @@ def lowerCentralLayerZeroToAgemoZeroHom
       QuotientGroup.mk'
         ((Agemo A 2 1).subgroupOf (Agemo A 2 0))
         (coverSquareRepresentative hP hPhi c) := by
-  letI : A.Normal := h.left.1
-  letI : CommGroup A :=
+  let : A.Normal := h.left.1
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
   rfl
 
@@ -380,8 +380,8 @@ def lowerCentralLayerZeroToAgemoZeroHom
         (QuotientGroup.mk' (lowerCentralLayerKernel C 0) x) =
       coverSquareToAgemoZeroHom hP h hAcomm hPhi hderived
         ((lowerCentralTerm C 0).subtype x) := by
-  letI : A.Normal := h.left.1
-  letI : CommGroup A :=
+  let : A.Normal := h.left.1
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
   rfl
 
@@ -398,8 +398,8 @@ private theorem lowerCentralLayerZeroToAgemoZeroHom_surjective
     Function.Surjective
       (lowerCentralLayerZeroToAgemoZeroHom
         hP h hAcomm hPhi hderived) := by
-  letI : A.Normal := h.left.1
-  letI : CommGroup A :=
+  let : A.Normal := h.left.1
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
   exact lowerCentralLayerZeroToAgemoZeroHomRaw_surjective
     hP h hPhi hderived
@@ -423,7 +423,7 @@ theorem lowerCentralLayerZeroToAgemoZeroHom_equivariant
             hP h hAcomm hPhi hderived q) := by
   have hAinv : IsAInvariant act A := h.left.2
   have hCinv : IsAInvariant act C := h.right.2
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
   change ∀ (g : X) (q : lowerCentralLayer C 0),
     lowerCentralLayerZeroToAgemoZeroHom hP h hAcomm hPhi hderived
@@ -520,11 +520,11 @@ private theorem lowerCentralLayerZeroToAgemoZeroLinearMap_surjective
     Function.Surjective
       (lowerCentralLayerZeroToAgemoZeroLinearMap
         hP h hAcomm hPhi hderived) := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
-  letI : IsMulCommutative (lowerCentralLayer C 0) :=
+  let : IsMulCommutative (lowerCentralLayer C 0) :=
     lowerCentralLayerIsMulCommutative C 0
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer C 0)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer C 0)) :=
     lowerCentralLayerZmodModule C 0
   intro q
   obtain ⟨v, hv⟩ :=
@@ -558,11 +558,11 @@ theorem lowerCentralLayerZeroToAgemoZeroLinearMap_equivariant
             hP h hAcomm hPhi hderived v) := by
   have hAinv : IsAInvariant act A := h.left.2
   have hCinv : IsAInvariant act C := h.right.2
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
-  letI : IsMulCommutative (lowerCentralLayer C 0) :=
+  let : IsMulCommutative (lowerCentralLayer C 0) :=
     lowerCentralLayerIsMulCommutative C 0
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer C 0)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer C 0)) :=
     lowerCentralLayerZmodModule C 0
   change ∀ (g : X) (v : Additive (lowerCentralLayer C 0)),
     lowerCentralLayerZeroToAgemoZeroLinearMap
@@ -585,9 +585,9 @@ private theorem agemoZeroQuotient_nontrivial_of_ne_bot
     letI : CommGroup A :=
       { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
     Nontrivial (AgemoSuccQuotient A 0) := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
-  letI : Nontrivial A := (Subgroup.nontrivial_iff_ne_bot A).mpr hAne
+  let : Nontrivial A := (Subgroup.nontrivial_iff_ne_bot A).mpr hAne
   have hAgemo_ne : Agemo A 2 1 ≠ ⊤ := by
     intro htop
     have hPhiTop : frattini A = ⊤ := by
@@ -701,11 +701,11 @@ theorem lowerCentralLayerZeroToAgemoZeroLinearEquiv_equivariant
             hP h hAcomm hAne hPhi hderived v) := by
   have hAinv : IsAInvariant act A := h.left.2
   have hCinv : IsAInvariant act C := h.right.2
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
-  letI : IsMulCommutative (lowerCentralLayer C 0) :=
+  let : IsMulCommutative (lowerCentralLayer C 0) :=
     lowerCentralLayerIsMulCommutative C 0
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer C 0)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer C 0)) :=
     lowerCentralLayerZmodModule C 0
   change ∀ (g : X) (v : Additive (lowerCentralLayer C 0)),
     lowerCentralLayerZeroToAgemoZeroLinearEquiv
@@ -753,20 +753,20 @@ private theorem higmanLemmaSeven_isMulCommutative_of_overlap
           agemoSuccQuotientRepresentation hcover.left.2.restrict 0 g
             (E0 q)) →
       IsMulCommutative C := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
   intro E0 hE0
-  letI : A.Normal := hcover.left.1
-  letI : IsCyclic X := hXcyc
-  letI : CommGroup X := IsCyclic.commGroup
+  let : A.Normal := hcover.left.1
+  let : IsCyclic X := hXcyc
+  let : CommGroup X := IsCyclic.commGroup
   by_contra hncomm
   have hCtwo : IsPGroup 2 C := hP.to_subgroup C
-  letI : Nontrivial (lowerCentralLayer C 1) :=
+  let : Nontrivial (lowerCentralLayer C 1) :=
     lowerCentralLayer_one_nontrivial_of_not_isMulCommutative hCtwo hncomm
-  letI : Nontrivial (lowerCentralLayer C 0) :=
+  let : Nontrivial (lowerCentralLayer C 0) :=
     NormalInvariantCover.lowerCentralLayerZero_nontrivial
       hP hcover hPhi
-  letI : Nontrivial (AgemoSuccQuotient A 0) :=
+  let : Nontrivial (AgemoSuccQuotient A 0) :=
     E0.symm.toEquiv.nontrivial
   obtain ⟨x, y, hx, hy, hxy⟩ := hmulti
   have hAne : A ≠ ⊥ := by
@@ -800,12 +800,12 @@ private theorem higmanLemmaSeven_isMulCommutative_of_overlap
   obtain ⟨ι, hι, e, he, hε, classify⟩ :=
     exists_homocyclic_and_invariant_eq_agemo
       (hP.to_subgroup A) hcover.left.2.restrict htransA
-  letI : Fintype ι := hι
+  let : Fintype ι := hι
   obtain ⟨ε⟩ := hε
   obtain ⟨s, hse, E2, hE2⟩ :=
     exists_lowerCentralLayerOne_linearEquiv_agemoSucc_of_classification
       X.subtype A C hAcomm hcover.left.2 hcover.right.2 classify hderived
-  letI : Nontrivial (AgemoSuccQuotient A s) :=
+  let : Nontrivial (AgemoSuccQuotient A s) :=
     E2.symm.toEquiv.nontrivial
   let xA : A := ⟨x, hinvA hx⟩
   let yA : A := ⟨y, hinvA hy⟩
@@ -916,7 +916,7 @@ theorem higmanLemmaSeven_isMulCommutative_of_transitive
       (Subgroup.map_eq_bot_iff_of_injective
         (_root_.commutator C) C.subtype_injective).mp hmap_bot
     exact (commutator_eq_bot_iff C).mp hcomm_bot
-  · letI : CommGroup A :=
+  · let : CommGroup A :=
       { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
     let E0 : Additive (lowerCentralLayer C 0) ≃ₗ[ZMod 2]
         Additive (AgemoSuccQuotient A 0) :=

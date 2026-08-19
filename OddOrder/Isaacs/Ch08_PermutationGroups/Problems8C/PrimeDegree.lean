@@ -40,8 +40,8 @@ variable {G Ω : Type*} [Group G] [Finite G] [MulAction G Ω] [FaithfulSMul G Ω
 theorem isPretransitive_of_card_eq_prime {p : ℕ} (hp : p.Prime) (hΩ : Nat.card Ω = p)
     (H : Subgroup G) (hH : Nat.card H = p) :
     IsPretransitive ↥H Ω := by
-  haveI : Finite Ω := Nat.finite_of_card_ne_zero (by rw [hΩ]; exact hp.pos.ne')
-  haveI : Nontrivial ↥H := Finite.one_lt_card_iff_nontrivial.mp (by rw [hH]; exact hp.one_lt)
+  have : Finite Ω := Nat.finite_of_card_ne_zero (by rw [hΩ]; exact hp.pos.ne')
+  have : Nontrivial ↥H := Finite.one_lt_card_iff_nontrivial.mp (by rw [hH]; exact hp.one_lt)
   obtain ⟨h, hh1⟩ := exists_ne (1 : ↥H)
   obtain ⟨ω, hω⟩ : ∃ ω : Ω, h • ω ≠ ω := by
     by_contra hc
@@ -71,8 +71,8 @@ omit [Finite G] in
 theorem le_centralizer_of_card_eq_prime {p : ℕ} (hp : p.Prime) (H : Subgroup G)
     (hH : Nat.card H = p) :
     H ≤ Subgroup.centralizer (H : Set G) := by
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : IsCyclic ↥H := isCyclic_of_prime_card hH
+  have : Fact p.Prime := ⟨hp⟩
+  have : IsCyclic ↥H := isCyclic_of_prime_card hH
   intro a ha
   refine Subgroup.mem_centralizer_iff.mpr fun b hb => ?_
   exact congrArg Subtype.val (mul_comm' (⟨b, hb⟩ : ↥H) ⟨a, ha⟩)
@@ -87,9 +87,9 @@ theorem le_centralizer_of_card_eq_prime {p : ℕ} (hp : p.Prime) (H : Subgroup G
 theorem centralizer_eq_of_card_eq_prime {p : ℕ} (hp : p.Prime) (hΩ : Nat.card Ω = p)
     (H : Subgroup G) (hH : Nat.card H = p) :
     Subgroup.centralizer (H : Set G) = H := by
-  haveI : Finite Ω := Nat.finite_of_card_ne_zero (by rw [hΩ]; exact hp.pos.ne')
-  haveI := isPretransitive_of_card_eq_prime hp hΩ H hH
-  haveI : Nonempty Ω := (Nat.card_pos_iff.mp (by rw [hΩ]; exact hp.pos)).1
+  have : Finite Ω := Nat.finite_of_card_ne_zero (by rw [hΩ]; exact hp.pos.ne')
+  have := isPretransitive_of_card_eq_prime hp hΩ H hH
+  have : Nonempty Ω := (Nat.card_pos_iff.mp (by rw [hΩ]; exact hp.pos)).1
   obtain ⟨ω⟩ := (inferInstance : Nonempty Ω)
   set C := Subgroup.centralizer (H : Set G) with hC
   -- `C` の `ω` における安定化群は自明 (半正則性)
@@ -118,8 +118,8 @@ theorem centralizer_eq_of_card_eq_prime {p : ℕ} (hp : p.Prime) (hΩ : Nat.card
 theorem card_normalizer_dvd_of_card_eq_prime {p : ℕ} (hp : p.Prime)
     (hΩ : Nat.card Ω = p) (H : Subgroup G) (hH : Nat.card H = p) :
     Nat.card ↥(Subgroup.normalizer (H : Set G)) ∣ p * (p - 1) := by
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : IsCyclic ↥H := isCyclic_of_prime_card hH
+  have : Fact p.Prime := ⟨hp⟩
+  have : IsCyclic ↥H := isCyclic_of_prime_card hH
   have hCH : Subgroup.centralizer (H : Set G) = H := centralizer_eq_of_card_eq_prime hp hΩ H hH
   set N := Subgroup.normalizer (H : Set G) with hN
   set K := (Subgroup.centralizer (H : Set G)).subgroupOf N with hK
@@ -145,7 +145,7 @@ theorem card_normalizer_dvd_of_card_eq_prime {p : ℕ} (hp : p.Prime)
 theorem card_normalizer_sylow_eleven_eq_55 (hΩ : Nat.card Ω = 11)
     (hG : Nat.card G = 7920) (P : Sylow 11 G) :
     Nat.card ↥(Subgroup.normalizer ((P : Subgroup G) : Set G)) = 55 := by
-  haveI : Fact (Nat.Prime 11) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 11) := ⟨by norm_num⟩
   have hfact : (7920 : ℕ).factorization 11 = 1 := by
     rw [show (7920 : ℕ) = 11 * 720 from by norm_num,
       Nat.factorization_mul (by norm_num) (by norm_num), Finsupp.add_apply,

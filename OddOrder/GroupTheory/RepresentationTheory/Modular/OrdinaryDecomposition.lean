@@ -63,8 +63,8 @@ theorem exists_ordinaryCharacter_eq (ρ : Representation K G V)
           = (algebraMap K (MonoidAlgebra K G) c) • m) →
         c = MatrixModule.centralCharacterAlg π i hπ hlin z := by
   obtain ⟨i, ⟨e⟩⟩ := MatrixModule.exists_linearEquiv_blockModule (nn := nn) hπ hker
-  letI := MatrixModule.blockModule nn π i
-  haveI := MatrixModule.isScalarTower_blockModule (nn := nn) hlin i
+  let := MatrixModule.blockModule nn π i
+  have := MatrixModule.isScalarTower_blockModule (nn := nn) hlin i
   refine ⟨i, fun g => ?_, fun {z c} hzc => ?_⟩
   · set f : V ≃ₗ[K] (nn i → K) :=
       (ρ.asModuleEquiv.symm).trans (e.restrictScalars K) with hf
@@ -114,7 +114,7 @@ theorem exists_ordinary_decomposition_of_finrank_le (m : ℕ) :
   induction m with
   | zero =>
     intro V _ _ _ ρ hm
-    haveI : Subsingleton V := Module.finrank_zero_iff.mp (Nat.le_zero.mp hm)
+    have : Subsingleton V := Module.finrank_zero_iff.mp (Nat.le_zero.mp hm)
     refine ⟨0, fun g => ?_, ?_⟩
     · rw [show ρ g = 0 from Subsingleton.elim _ _, map_zero]
       simp
@@ -129,8 +129,8 @@ theorem exists_ordinary_decomposition_of_finrank_le (m : ℕ) :
       · intro i z c hi _
         exact absurd rfl hi
     obtain ⟨W, hWinv, hWne, hWmin⟩ := exists_minimal_invariant ρ
-    haveI : Nontrivial W := Submodule.nontrivial_iff_ne_bot.mpr hWne
-    haveI := isSimpleModule_subrepresentation_of_minimal ρ hWinv hWne hWmin
+    have : Nontrivial W := Submodule.nontrivial_iff_ne_bot.mpr hWne
+    have := isSimpleModule_subrepresentation_of_minimal ρ hWinv hWne hWmin
     obtain ⟨i, hi, hic⟩ := exists_ordinaryCharacter_eq (nn := nn)
       (ρ.subrepresentation W hWinv) hπ hlin
       (hkerJ ▸ IsSemisimpleModule.jacobson_le_annihilator _ _)

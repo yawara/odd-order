@@ -87,7 +87,7 @@ theorem mem_frattini_of_nongenerating (u : G)
     (hu : ∀ X : Set G, Subgroup.closure X ≠ ⊤ → Subgroup.closure (X ∪ {u}) ≠ ⊤) :
     u ∈ frattini G := by
   -- `frattini G = ⨅ (M coatom), M`, so it suffices to show `u ∈ M` for every coatom `M`.
-  simp only [frattini, Order.radical, Subgroup.mem_iInf, Set.mem_setOf_eq]
+  simp only [frattini, Order.radical, Subgroup.mem_iInf, Set.mem_ofPred_eq]
   intro M hM
   by_contra hMu
   -- `closure ↑M = M ≠ ⊤`, so the hypothesis applies to `X = ↑M`.
@@ -219,7 +219,7 @@ theorem finsetSup_normal (s : Finset ι) (M : ι → Subgroup G) (hnorm : ∀ i,
     (s.sup M).Normal := by
   refine Finset.sup_induction ?_ (fun a ha b hb => ?_) (fun i _ => hnorm i)
   · infer_instance
-  · haveI := ha; haveI := hb; infer_instance
+  · have := ha; have := hb; infer_instance
 
 /-- **Isaacs, Finite Group Theory, Theorem X.22** (hard direction, `Finset` form).
 If, for every `k ∈ s`, the subgroup `M k` meets the join of the earlier members trivially, then
@@ -274,7 +274,7 @@ theorem supIndep_of_prefix (M : ι → Subgroup G) (hnorm : ∀ i, (M i).Normal)
           rw [hMiR] at hdt; exact hdt
         have hAiR : Disjoint (M i) (((s.erase t).erase i).sup M) :=
           (Finset.supIndep_iff_disjoint_erase.mp hs') i hi'
-        haveI : (((s.erase t).erase i).sup M).Normal := finsetSup_normal _ M hnorm
+        have : (((s.erase t).erase i).sup M).Normal := finsetSup_normal _ M hnorm
         exact disjoint_sup_of_normal hAiR hBt
 
 /-- **Isaacs, Finite Group Theory, Theorem X.22** (internal direct-product criterion).
@@ -290,7 +290,7 @@ theorem iSupIndep_iff_disjoint_biSup_lt [Finite ι] (M : ι → Subgroup G)
     (hnorm : ∀ i, (M i).Normal) :
     iSupIndep M ↔ ∀ k, Disjoint (⨆ j, ⨆ _ : j < k, M j) (M k) := by
   classical
-  haveI := Fintype.ofFinite ι
+  have := Fintype.ofFinite ι
   constructor
   · intro h k
     have hmono : (⨆ j, ⨆ _ : j < k, M j) ≤ ⨆ j, ⨆ _ : j ≠ k, M j :=

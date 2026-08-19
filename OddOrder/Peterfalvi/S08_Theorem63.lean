@@ -46,7 +46,7 @@ theorem sum_re_div_normSq_SsubFiltration_eq (hyp : SibleyDadeHypothesis G L H)
           (fun θ => ClassFunction.induce H θ.toClassFunction),
         ((χ 1).re) ^ 2 / (ClassFunction.inner χ χ).re
       = (H.index : ℝ) * ((Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1) := by
-  letI : H.Normal := hyp.H_normal
+  let : H.Normal := hyp.H_normal
   -- the complex weighted `S(A)` identity.
   have hcomplex := @sum_div_normSq_induce_kernelFilter_eq ↥L _ _ _ H _ _ A _
   -- per-summand real conversion `χ(1)²/⟨χ,χ⟩ = (χ(1).re²/⟨χ,χ⟩.re : ℂ)`.
@@ -90,8 +90,8 @@ theorem exists_SsubFiltration_member_degree_index (hyp : SibleyDadeHypothesis G 
     {A : Subgroup ↥L} [A.Normal]
     (hAne : commutator (↥H ⧸ A.subgroupOf H) ≠ ⊤) :
     ∃ φ ∈ hyp.SsubFiltration A, φ (1 : ↥L) = (H.index : ℂ) := by
-  letI : H.Normal := hyp.H_normal
-  haveI : (A.subgroupOf H).Normal := (inferInstance : A.Normal).subgroupOf H
+  let : H.Normal := hyp.H_normal
+  have : (A.subgroupOf H).Normal := (inferInstance : A.Normal).subgroupOf H
   obtain ⟨θ, hθne, hθker, hθdeg⟩ :=
     exists_irreducibleCharacter_ne_trivial_subset_kernel_of_commutator_ne_top
       (A.subgroupOf H) hAne
@@ -132,8 +132,8 @@ theorem sSubFiltration_sum_le_two_psi_caseB
     (H.index : ℝ) * ((Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1)
       ≤ 2 * (ψ 1).re * (η 1).re := by
   classical
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
-  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
   obtain ⟨k, χmem, mc, hinj, hrange, hmemS1, hmcpos, hmcnorm, hfambound⟩ :=
     sMember_degreeSqNormReBound_of_not_coherent hyp h46 hHK hW1 hS₁sub hS₁conj hS₁fin hS₁coh hηY
       hηS₁ hψS hψirr hψnotS1 hψcnotS1 hnc
@@ -192,7 +192,7 @@ theorem sSubFiltration_sum_le_two_psi_caseB_columnBreak
     (H.index : ℝ) * ((Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1)
       ≤ 2 * (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b 1).re * (η 1).re := by
   classical
-  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  have : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
   obtain ⟨k, χmem, mc, hinj, hrange, hmemS1, hmcpos, hmcnorm, hfambound⟩ :=
     sMember_degreeSqNormReBound_of_not_coherent_columnBreak hyp h46 hHK hW1 hS₁sub hS₁conj hS₁fin
       hS₁coh hηY hηS₁ hχ₂b hψnotS1 hψcnotS1 hnc

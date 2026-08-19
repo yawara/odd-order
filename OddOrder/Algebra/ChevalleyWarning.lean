@@ -102,7 +102,7 @@ theorem exists_ne_zero_bilinear_twist_zero
     (hdim : 2 * Module.finrank F W < Module.finrank F V) :
     ∃ x : V, x ≠ 0 ∧ B x (T x) = 0 := by
   classical
-  letI : Fintype F := Fintype.ofFinite F
+  let : Fintype F := Fintype.ofFinite F
   let bV : Basis (Fin (Module.finrank F V)) F V := Module.finBasis F V
   let bW : Basis (Fin (Module.finrank F W)) F W := Module.finBasis F W
   let f : Fin (Module.finrank F W) → MvPolynomial (Fin (Module.finrank F V)) F :=

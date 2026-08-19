@@ -73,8 +73,8 @@ theorem exists_bilinear_lift_of_pinned_restriction [Finite F]
         (∀ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F), c στ ≠ 0 → στ.1 a * στ.2 a = b) →
         ∀ x y : F, φ (a * x) (a * y) = b * φ x y := by
   classical
-  letI : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
-  haveI : SMulCommClass F (ZMod 2) F := SMulCommClass.symm _ _ _
+  let : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
+  have : SMulCommClass F (ZMod 2) F := SMulCommClass.symm _ _ _
   -- put each pair in the order matching `(α, β)`
   set P : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) → Prop := fun στ =>
     ∀ a ∈ A, στ.1 a = α a ∧ στ.2 a = β a with hP

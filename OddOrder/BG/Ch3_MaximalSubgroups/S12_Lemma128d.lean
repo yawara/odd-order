@@ -114,11 +114,11 @@ private theorem card_opiCoreInG_dvd_of_nilpotent [Finite G]
 theorem E3_le_fittingInG [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
     E₃ ≤ Ch2.S08.fittingInG E := by
-  haveI hcyc : IsCyclic ↥E₃ := h.E3_isCyclic hG
-  letI : CommGroup ↥E₃ := IsCyclic.commGroup
-  haveI h1 : (E₃.subgroupOf E).Normal :=
+  have hcyc : IsCyclic ↥E₃ := h.E3_isCyclic hG
+  let : CommGroup ↥E₃ := IsCyclic.commGroup
+  have h1 : (E₃.subgroupOf E).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer h.E₃_le).mpr (h.E3_normal hG)
-  haveI h3 : Group.IsNilpotent ↥(E₃.subgroupOf E) :=
+  have h3 : Group.IsNilpotent ↥(E₃.subgroupOf E) :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe h.E₃_le).symm
   calc E₃ = (E₃.subgroupOf E).map E.subtype :=
         (Subgroup.map_subgroupOf_eq_of_le h.E₃_le).symm
@@ -145,7 +145,7 @@ theorem normalizer_chain_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
       = Subgroup.normalizer ((Ch2.S08.fittingInG E : Subgroup G) : Set G) := by
   classical
   set FE : Subgroup G := Ch2.S08.fittingInG E with hFEdef
-  haveI : Group.IsNilpotent ↥FE := Ch2.S08.fittingInG_isNilpotent E
+  have : Group.IsNilpotent ↥FE := Ch2.S08.fittingInG_isNilpotent E
   have hSE : (S : Subgroup G) ≤ E :=
     (le_centralizer_of_le_of_le hSab le_rfl hAS).trans
       (centralizer_le_E_of_tau2 hG h hp hA hAE).1
@@ -163,7 +163,7 @@ theorem normalizer_chain_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
     rw [hE₂eq]
     exact Subgroup.map_subtype_le _
   have hE₃_le_FE : E₃ ≤ FE := E3_le_fittingInG hG h
-  haveI hE₂nilp : Group.IsNilpotent ↥E₂ :=
+  have hE₂nilp : Group.IsNilpotent ↥E₂ :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hE₂_le_FE)
   -- prime-part bookkeeping for `K := E₂ ⊔ E₃`.
   set K : Subgroup G := E₂ ⊔ E₃ with hKdef
@@ -187,7 +187,7 @@ theorem normalizer_chain_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
     card_sup_eq_mul_of_le_normalizer_of_disjoint
       (h.E₂_le.trans (h.E3_normal hG)) hE₂E₃_bot
   have hK_le_FE : K ≤ FE := sup_le hE₂_le_FE hE₃_le_FE
-  haveI hKnilp : Group.IsNilpotent ↥K :=
+  have hKnilp : Group.IsNilpotent ↥K :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hK_le_FE)
   -- `ν_r(E) = ν_r(E₂)` for `r ∈ τ₂` and `= ν_r(E₃)` for `r ∈ τ₃`.
   have hfacE₂ : ∀ r : ℕ, r.Prime → r ∈ tau2 M →
@@ -354,11 +354,11 @@ theorem normalizer_chain_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
       hchain.2.2.1.trans (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hAS))
     -- `F(E) ≤ F(C)`.
     have hFE_le_FC : FE ≤ Ch2.S08.fittingInG C := by
-      haveI h1 : (FE.subgroupOf C).Normal := by
+      have h1 : (FE.subgroupOf C).Normal := by
         refine (Subgroup.normal_subgroupOf_iff_le_normalizer hFE_le_C).mpr ?_
         intro c hc
         exact Ch2.S08.mem_normalizer_fittingInG_of_mem (hC_le_E hc)
-      haveI h3 : Group.IsNilpotent ↥(FE.subgroupOf C) :=
+      have h3 : Group.IsNilpotent ↥(FE.subgroupOf C) :=
         Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hFE_le_C).symm
       calc FE = (FE.subgroupOf C).map C.subtype :=
             (Subgroup.map_subgroupOf_eq_of_le hFE_le_C).symm
@@ -369,13 +369,13 @@ theorem normalizer_chain_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
     have hFC_le_FN : Ch2.S08.fittingInG C ≤ Ch2.S08.fittingInG N := by
       have hFC_le_C : Ch2.S08.fittingInG C ≤ C := Ch2.S08.fittingInG_le C
       have hFC_le_N : Ch2.S08.fittingInG C ≤ N := hFC_le_C.trans hC_le_N
-      haveI h1 : ((Ch2.S08.fittingInG C).subgroupOf N).Normal := by
+      have h1 : ((Ch2.S08.fittingInG C).subgroupOf N).Normal := by
         refine (Subgroup.normal_subgroupOf_iff_le_normalizer hFC_le_N).mpr ?_
         refine hN_norm_C.trans ?_
         exact AppB.normalizer_le_normalizer_map_of_characteristic
           (K := C) (W := Ch01.fitting ↥C)
-      haveI : Group.IsNilpotent ↥(Ch2.S08.fittingInG C) := Ch2.S08.fittingInG_isNilpotent C
-      haveI h3 : Group.IsNilpotent ↥((Ch2.S08.fittingInG C).subgroupOf N) :=
+      have : Group.IsNilpotent ↥(Ch2.S08.fittingInG C) := Ch2.S08.fittingInG_isNilpotent C
+      have h3 : Group.IsNilpotent ↥((Ch2.S08.fittingInG C).subgroupOf N) :=
         Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hFC_le_N).symm
       calc Ch2.S08.fittingInG C
           = ((Ch2.S08.fittingInG C).subgroupOf N).map N.subtype :=
@@ -424,7 +424,7 @@ theorem relative_normality_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G
     sup_le (Subgroup.centralizer_le_normalizer _) hX_le_N
   -- `H ⊴ N_G(S)` (it contains the derived subgroup).
   have hN_norm_H : NS ≤ Subgroup.normalizer ((H : Subgroup G) : Set G) := by
-    haveI : (H.subgroupOf NS).Normal := by
+    have : (H.subgroupOf NS).Normal := by
       refine Ch06.normal_of_commutator_le ?_
       intro x hx
       rw [Subgroup.mem_subgroupOf]
@@ -458,7 +458,7 @@ theorem relative_normality_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G
       rw [Subgroup.commutator_le]
       intro s hs g hg
       -- decompose `g = c * x` inside `↥NS` using `C_G(S) ⊴ N_G(S)`.
-      haveI hCnorm : ((Subgroup.centralizer ((S : Subgroup G) : Set G)).subgroupOf
+      have hCnorm : ((Subgroup.centralizer ((S : Subgroup G) : Set G)).subgroupOf
           NS).Normal := by
         refine Ch06.normal_of_commutator_le ?_
         intro y hy
@@ -532,7 +532,7 @@ theorem fittingInG_le_centralizer_opiCoreInG [Finite G] {E : Subgroup G} {π : S
       Subgroup.centralizer ((opiCoreInG π (Ch2.S08.fittingInG E) : Subgroup G) : Set G) := by
   classical
   set FE : Subgroup G := Ch2.S08.fittingInG E with hFEdef
-  haveI : Group.IsNilpotent ↥FE := Ch2.S08.fittingInG_isNilpotent E
+  have : Group.IsNilpotent ↥FE := Ch2.S08.fittingInG_isNilpotent E
   set O1 : Subgroup ↥FE := Ch03.oPiCore π ↥FE with hO1def
   set O2 : Subgroup ↥FE := Ch03.oPiCore πᶜ ↥FE with hO2def
   have hO1_le_C : O1.map FE.subtype ≤
@@ -543,8 +543,8 @@ theorem fittingInG_le_centralizer_opiCoreInG [Finite G] {E : Subgroup G} {π : S
     have hcomm : ⁅O2, O1⁆ = ⊥ := by
       rw [← le_bot_iff]
       calc ⁅O2, O1⁆ ≤ O2 ⊓ O1 := by
-            haveI : O2.Normal := Ch03.oPiCore.normal _ _
-            haveI : O1.Normal := Ch03.oPiCore.normal _ _
+            have : O2.Normal := Ch03.oPiCore.normal _ _
+            have : O1.Normal := Ch03.oPiCore.normal _ _
             exact le_inf (Subgroup.commutator_le_left _ _)
               (Subgroup.commutator_le_right _ _)
         _ ≤ ⊥ := by
@@ -591,11 +591,11 @@ theorem central_line_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
   classical
   intro X hXq hXE₁ hCX
   obtain ⟨q, hq_prime, hX⟩ := hXq
-  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have : Fact q.Prime := ⟨hq_prime⟩
   have hXE : X ≤ E := hXE₁.trans h.E₁_le
   refine ⟨hXE, ?_⟩
   set FE : Subgroup G := Ch2.S08.fittingInG E with hFEdef
-  haveI : Group.IsNilpotent ↥FE := Ch2.S08.fittingInG_isNilpotent E
+  have : Group.IsNilpotent ↥FE := Ch2.S08.fittingInG_isNilpotent E
   obtain ⟨⟨hE₂ab, hE_norm_E₂⟩, hE₂hallG, hE₂eq⟩ :=
     E2_abelian_normal_hall_of_abelianSylow hG h hp hA hAE hSab
   have hchain := sylow_chain_of_abelianSylow hG h hp hA hAE hAS hSab
@@ -646,8 +646,8 @@ theorem central_line_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
     have ha := tau2_pRank_eq_two hr2
     have hb := tau3_pRank_eq_one hr3
     omega
-  haveI hE₃cyc : IsCyclic ↥E₃ := h.E3_isCyclic hG
-  letI : CommGroup ↥E₃ := IsCyclic.commGroup
+  have hE₃cyc : IsCyclic ↥E₃ := h.E3_isCyclic hG
+  let : CommGroup ↥E₃ := IsCyclic.commGroup
   have hE₃ab : IsMulCommutative ↥E₃ := ⟨⟨fun a b => mul_comm a b⟩⟩
   have hKab : IsMulCommutative ↥K := by
     refine isMulCommutative_of_le_centralizer ?_
@@ -731,7 +731,7 @@ theorem central_line_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
         (Subgroup.centralizer_le_normalizer _)
     have hHK_le_NS : HK ≤ NS := sup_le hCK_le_NS hX_le_NS
     have hNS_norm_HK : NS ≤ Subgroup.normalizer ((HK : Subgroup G) : Set G) := by
-      haveI : (HK.subgroupOf NS).Normal := by
+      have : (HK.subgroupOf NS).Normal := by
         refine Ch06.normal_of_commutator_le ?_
         intro y hy
         rw [Subgroup.mem_subgroupOf]
@@ -742,7 +742,7 @@ theorem central_line_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
       refine le_antisymm ?_ (Subgroup.commutator_mono le_rfl le_sup_right)
       rw [Subgroup.commutator_le]
       intro k hk g hg
-      haveI hCnorm : ((Subgroup.centralizer ((K : Subgroup G) : Set G)).subgroupOf
+      have hCnorm : ((Subgroup.centralizer ((K : Subgroup G) : Set G)).subgroupOf
           NS).Normal := by
         refine Ch06.normal_of_commutator_le ?_
         intro y hy
@@ -873,8 +873,8 @@ theorem central_line_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
   -- conclude.
   have hK_le_CX : K ≤ Subgroup.centralizer (X : Set G) :=
     Subgroup.commutator_eq_bot_iff_le_centralizer.mp hKX_bot
-  haveI hE₁cyc : IsCyclic ↥E₁ := h.E1_isCyclic hG
-  letI : CommGroup ↥E₁ := IsCyclic.commGroup
+  have hE₁cyc : IsCyclic ↥E₁ := h.E1_isCyclic hG
+  let : CommGroup ↥E₁ := IsCyclic.commGroup
   have hE₁ab : IsMulCommutative ↥E₁ := ⟨⟨fun a b => mul_comm a b⟩⟩
   have hE₁_le_CX : E₁ ≤ Subgroup.centralizer (X : Set G) :=
     le_centralizer_of_le_of_le hE₁ab le_rfl hXE₁

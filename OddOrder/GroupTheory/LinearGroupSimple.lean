@@ -97,8 +97,8 @@ theorem isSimpleGroup_linearEquiv [FiniteDimensional K V]
     (hK : ∀ x : K, x = 0 ∨ x = 1) (h3 : 3 ≤ Module.finrank K V) :
     IsSimpleGroup (V ≃ₗ[K] V) := by
   classical
-  haveI := isPreprimitive_nonzeroVector (V := V) K hK
-  haveI : Nontrivial (V ≃ₗ[K] V) := by
+  have := isPreprimitive_nonzeroVector (V := V) K hK
+  have : Nontrivial (V ≃ₗ[K] V) := by
     obtain ⟨w, v, hwv, hw0, hv0⟩ : ∃ w v : V, w ≠ v ∧ w ≠ 0 ∧ v ≠ 0 := by
       have hB := Module.finBasis K V
       refine ⟨hB ⟨0, by omega⟩, hB ⟨1, by omega⟩, ?_, hB.ne_zero _, hB.ne_zero _⟩

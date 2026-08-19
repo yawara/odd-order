@@ -48,7 +48,7 @@ produces, at the ambient (`G`) level: `[K,R₀] ≠ 1` ((3.17)), `C_{S₁}(V_G) 
 `V_G ⊴ G` elementary abelian with `|C_{V_G}(R₀)| = p` ((3.19)), and `⁅P_G, R₀⁆ = P_G`
 ((3.21)), plus the bookkeeping facts `¬ r ∣ |K|`, `V ≠ ⊥`, `p ≠ r`. -/
 theorem r0_action_facts
-    {G : Type*} [Group G] [Finite G] [IsSolvable G] (hodd : Odd (Nat.card G))
+    {G : Type*} [Group G] [Finite G] [Group.IsSolvable G] (hodd : Odd (Nat.card G))
     {p r a : ℕ} (hp : p.Prime) (hr_prime : r.Prime)
     {H R R₀ : Subgroup G} [H.Normal]
     (hcompl : Subgroup.IsComplement' H R)
@@ -88,31 +88,31 @@ theorem r0_action_facts
     IsElementaryAbelian p ↥(V.map H.subtype : Subgroup G) ∧
     Nat.card ↥((V.map H.subtype : Subgroup G) ⊓ Subgroup.centralizer (R₀ : Set G)) = p ∧
     (⁅(P.map H.subtype : Subgroup G), R₀⁆ : Subgroup G) = P.map H.subtype := by
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     set φ : ↥R →* MulAut ↥H := (MulAut.conjNormal (G := G) (H := H)).comp R.subtype with hφ
     have h317 : ¬ ((K.map H.subtype : Subgroup G) ≤ Subgroup.centralizer (R₀ : Set G)) := by
       intro hKcent
       -- `K` is a nilpotent `Z`-group, hence cyclic.
-      haveI hKG_Z : _root_.IsZGroup ↥(K.map H.subtype) := by
+      have hKG_Z : _root_.IsZGroup ↥(K.map H.subtype) := by
         have hle : K.map H.subtype ≤ H ⊓ Subgroup.centralizer (R₀ : Set G) :=
           le_inf (Subgroup.map_subtype_le K) hKcent
-        haveI := isZGroup_iff_mathlib.mp hZ
+        have := isZGroup_iff_mathlib.mp hZ
         exact IsZGroup.of_injective (Subgroup.inclusion_injective hle)
-      haveI hK_nilp : Group.IsNilpotent ↥(K.map H.subtype) := by
+      have hK_nilp : Group.IsNilpotent ↥(K.map H.subtype) := by
         have e1 := Subgroup.equivMapOfInjective K H.subtype H.subtype_injective
         have e2 := Subgroup.subgroupOfEquivOfLe hK_le_N
-        haveI : Group.IsNilpotent ↥(K.subgroupOf N) := by
+        have : Group.IsNilpotent ↥(K.subgroupOf N) := by
           rw [hKN_fit]
           infer_instance
         refine Group.nilpotent_of_surjective (e1.toMonoidHom.comp e2.toMonoidHom) ?_
         rw [MonoidHom.coe_comp]
         exact e1.surjective.comp e2.surjective
-      haveI hKG_cyc : IsCyclic ↥(K.map H.subtype) := inferInstance
-      haveI hK_cyc : IsCyclic ↥K := by
+      have hKG_cyc : IsCyclic ↥(K.map H.subtype) := inferInstance
+      have hK_cyc : IsCyclic ↥K := by
         have e1 := Subgroup.equivMapOfInjective K H.subtype H.subtype_injective
         exact isCyclic_of_surjective e1.symm e1.symm.surjective
       -- hence `F(H/V) ≅ K` is cyclic (`mk' V` is injective on `K` since `V ⊓ K = ⊥`).
-      haveI hFQ_cyc : IsCyclic ↥(OddOrder.Isaacs.Ch01.fitting (↥H ⧸ V)) := by
+      have hFQ_cyc : IsCyclic ↥(OddOrder.Isaacs.Ch01.fitting (↥H ⧸ V)) := by
         have hinj : Function.Injective ((QuotientGroup.mk' V).comp K.subtype) := by
           rw [← MonoidHom.ker_eq_bot_iff, eq_bot_iff]
           intro x hx
@@ -211,7 +211,7 @@ theorem r0_action_facts
         rw [MulAut.apply_inv_self] at hv2
         have h3 := hv2.symm.trans hkeq
         exact mul_left_cancel (mul_right_cancel h3)
-    haveI hKG'norm : ((KG.subgroupOf S₁) : Subgroup ↥S₁).Normal :=
+    have hKG'norm : ((KG.subgroupOf S₁) : Subgroup ↥S₁).Normal :=
       Subgroup.normal_subgroupOf_of_le_normalizer hS₁norm
     -- complement `KG' ⋊ R₀'` inside `S₁`, and the resulting cardinalities.
     have hdisjKR : Disjoint KG R₀ :=
@@ -242,7 +242,7 @@ theorem r0_action_facts
       have h2 : r ∣ Nat.card ↥R := hr_card ▸ Subgroup.card_dvd_of_le hR₀R
       have := Nat.Coprime.eq_one_of_dvd (hHall.coprime_dvd_left h1) h2
       exact hr_prime.one_lt.ne' this
-    haveI hVGnorm : VG.Normal := by
+    have hVGnorm : VG.Normal := by
       constructor
       intro n hn gg
       obtain ⟨v, hv, rfl⟩ := hn
@@ -279,7 +279,7 @@ theorem r0_action_facts
         rw [Subgroup.mem_bot, hkb]
         simp
       -- `C.subgroupOf S₁` is normal (`C_G(V_G) ⊴ G` since `V_G ⊴ G`).
-      haveI hC'norm : ((C.subgroupOf S₁) : Subgroup ↥S₁).Normal := by
+      have hC'norm : ((C.subgroupOf S₁) : Subgroup ↥S₁).Normal := by
         constructor
         intro c hc s
         rw [Subgroup.mem_subgroupOf] at hc ⊢
@@ -302,7 +302,7 @@ theorem r0_action_facts
             * Nat.card ↥(KG.subgroupOf S₁) :=
           Subgroup.card_eq_card_quotient_mul_card_subgroup _
         have h2 : Nat.card ↥(KG.subgroupOf S₁) * Nat.card ↥(R₀.subgroupOf S₁)
-            = Nat.card ↥S₁ := hcompl₁.card_mul
+            = Nat.card ↥S₁ := hcompl₁.card_mul_card
         rw [← h2, mul_comm (Nat.card ↥(KG.subgroupOf S₁))] at h1
         have h3 := Nat.eq_of_mul_eq_mul_right (Nat.card_pos (α := ↥(KG.subgroupOf S₁))) h1
         rw [← h3]
@@ -369,10 +369,10 @@ theorem r0_action_facts
               (C.subgroupOf S₁ : Subgroup ↥S₁)]
             exact mul_dvd_mul hrdvd_quot (dvd_of_eq hCr.symm)
           have hS₁card : Nat.card ↥S₁ = Nat.card ↥K * r := by
-            rw [← hcompl₁.card_mul, hKG'card, hR₀'card]
+            rw [← hcompl₁.card_mul_card, hKG'card, hR₀'card]
           rw [hS₁card] at hr2
           exact hr_ndvd_K ((Nat.mul_dvd_mul_iff_right hr_prime.pos).mp hr2)
-        haveI hR₀'norm : ((R₀.subgroupOf S₁) : Subgroup ↥S₁).Normal := hCR₀ ▸ hC'norm
+        have hR₀'norm : ((R₀.subgroupOf S₁) : Subgroup ↥S₁).Normal := hCR₀ ▸ hC'norm
         have hcomm_bot :
             (⁅(KG.subgroupOf S₁ : Subgroup ↥S₁), R₀.subgroupOf S₁⁆ : Subgroup ↥S₁) = ⊥ := by
           rw [eq_bot_iff, ← hcompl₁.disjoint.eq_bot]
@@ -409,8 +409,8 @@ theorem r0_action_facts
       rw [h1, Nat.dvd_one] at hdvd
       exact hp.ne_one hdvd
     have hV_ne_bot : V ≠ ⊥ := by
-      haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hH_ne_bot
-      exact hVdef ▸ OddOrder.Isaacs.Ch01.fitting_ne_bot_of_solvable_nontrivial ↥H
+      have : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hH_ne_bot
+      exact hVdef ▸ OddOrder.Isaacs.Ch01.fitting_ne_bot_of_isSolvable_nontrivial ↥H
     have ha0 : a ≠ 0 := by
       intro h0
       exact hV_ne_bot (Subgroup.eq_bot_of_card_eq _ (by rw [hVa, h0, pow_zero]))
@@ -424,7 +424,7 @@ theorem r0_action_facts
         exact Subgroup.card_dvd_of_le hR₀R
       exact hp.ne_one (Nat.Coprime.eq_one_of_dvd (hHall.coprime_dvd_left h1) h2)
     have hS₁card : Nat.card ↥S₁ = Nat.card ↥K * r := by
-      rw [← hcompl₁.card_mul, hKG'card, hR₀'card]
+      rw [← hcompl₁.card_mul_card, hKG'card, hR₀'card]
     have hp_ndvd_S₁ : ¬ p ∣ Nat.card ↥S₁ := by
       rw [hS₁card]
       intro hdvd
@@ -444,14 +444,14 @@ theorem r0_action_facts
     -- trivially on `V_G`; by (3.18) it is then trivial, contradicting (3.17).
     have h319a : VG ⊓ Subgroup.centralizer (R₀ : Set G) ≠ ⊥ := by
       intro hCVbot
-      haveI hVGcomm : IsMulCommutative ↥VG := ⟨⟨fun a b => hVGelem.1 a b⟩⟩
+      have hVGcomm : IsMulCommutative ↥VG := ⟨⟨fun a b => hVGelem.1 a b⟩⟩
       have hpsmul : ∀ x : Additive ↥VG, (p : ℕ) • x = 0 := by
         intro x
         apply Additive.toMul.injective
         rw [toMul_nsmul, toMul_zero]
         exact hVGelem.2 x.toMul
-      haveI hVGmod : Module (ZMod p) (Additive ↥VG) := AddCommGroup.zmodModule hpsmul
-      haveI : Module.Finite (ZMod p) (Additive ↥VG) := Module.Finite.of_finite
+      have hVGmod : Module (ZMod p) (Additive ↥VG) := AddCommGroup.zmodModule hpsmul
+      have : Module.Finite (ZMod p) (Additive ↥VG) := Module.Finite.of_finite
       set ρ : Representation (ZMod p) ↥S₁ (Additive ↥VG) :=
         (OddOrder.BG.Ch1_Preliminary.mulAutToEnd ↥VG p).comp
           ((MulAut.conjNormal (G := G) (H := VG)).comp S₁.subtype) with hρdef
@@ -613,7 +613,7 @@ theorem r0_action_facts
       have hyT : (y : G) ∈ T := hYT (Subgroup.mem_zpowers _)
       have hT_norm : T ≤ Subgroup.normalizer (A : Set G) :=
         sup_le Subgroup.le_normalizer (Subgroup.zpowers_le.mpr hy_normA)
-      haveI hA''norm : ((A.subgroupOf T) : Subgroup ↥T).Normal :=
+      have hA''norm : ((A.subgroupOf T) : Subgroup ↥T).Normal :=
         Subgroup.normal_subgroupOf_of_le_normalizer hT_norm
       have hA''card : Nat.card ↥(A.subgroupOf T) = p :=
         (Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAT).toEquiv).trans (by rw [hA]; exact h319)
@@ -669,18 +669,18 @@ theorem r0_action_facts
         rw [Subgroup.zpowers_le]
         exact ⟨Subgroup.map_subtype_le P hyP, hyC⟩
       -- `T` is cyclic (`p`-subgroup of a `Z`-group).
-      haveI hTZ : _root_.IsZGroup ↥T := by
-        haveI := isZGroup_iff_mathlib.mp hZ
+      have hTZ : _root_.IsZGroup ↥T := by
+        have := isZGroup_iff_mathlib.mp hZ
         exact IsZGroup.of_injective (Subgroup.inclusion_injective hT_le_Z)
-      haveI hTcyc : IsCyclic ↥T := by
+      have hTcyc : IsCyclic ↥T := by
         have h1 : IsPGroup p ↥(⊤ : Subgroup ↥T) :=
           hTp.of_injective (⊤ : Subgroup ↥T).subtype (⊤ : Subgroup ↥T).subtype_injective
-        haveI := IsPGroup.isCyclic_of_isZGroup h1
+        have := IsPGroup.isCyclic_of_isZGroup h1
         exact isCyclic_of_surjective _ (Subgroup.topEquiv (G := ↥T)).surjective
       -- the `p`-torsion of the cyclic `T` has at most `p` elements, and `A` already fills it;
       -- so `y ∈ A ≤ V_G`, contradicting `P_G ⊓ V_G = ⊥`.
       classical
-      haveI := Fintype.ofFinite ↥T
+      have := Fintype.ofFinite ↥T
       have hle : (Finset.univ.filter (fun a : ↥T => a ^ p = 1)).card ≤ p := by
         convert IsCyclic.card_pow_eq_one_le (α := ↥T) (n := p) hp.pos using 2
       have hsubset : Set.toFinset ((A.subgroupOf T : Subgroup ↥T) : Set ↥T)

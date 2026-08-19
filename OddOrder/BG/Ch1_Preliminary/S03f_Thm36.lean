@@ -112,7 +112,7 @@ IH-free セグメント (Phase B/C, (3.29)–(3.38)) は `S03f_ComplementK` / `S
 巨大で、既定の 200000 を超える。IH を消費する Phase A–E は誘導の内側から切り出せないため、
 これ以上の分割は IH 自体の仮説化が要る。) -/
 private theorem thm36_aux : ∀ (n : ℕ)
-    {G : Type*} [Group G] [Finite G] [IsSolvable G],
+    {G : Type*} [Group G] [Finite G] [Group.IsSolvable G],
     Odd (Nat.card G) →
     ∀ {H R : Subgroup G} [H.Normal],
     Subgroup.IsComplement' H R →
@@ -126,7 +126,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
   induction n using Nat.strong_induction_on with
   | _ n IH =>
     intro G _ _ _ hodd H R _ hcompl hHall R₀ hR₀R hR₀p hZ p hp hn
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     by_contra hcounter
     -- `⁅H,R⁆ ≤ H` (H normal).
     have hHR_le_H : (⁅H, R⁆ : Subgroup G) ≤ H := Subgroup.commutator_le_left H R
@@ -142,7 +142,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
       have hSnorm : S ≤ Subgroup.normalizer (⁅H, R⁆ : Subgroup G) :=
         sup_le Subgroup.le_normalizer
           (Subgroup.commutator_comm R H ▸ subgroup_le_normalizer_commutator_self R H)
-      haveI hH'normal : ((⁅H, R⁆ : Subgroup G).subgroupOf S).Normal :=
+      have hH'normal : ((⁅H, R⁆ : Subgroup G).subgroupOf S).Normal :=
         Subgroup.normal_subgroupOf_of_le_normalizer hSnorm
       -- card transport: `|⁅H,R⁆.subgroupOf S| = |⁅H,R⁆|`, `|R.subgroupOf S| = |R|`.
       have hHRcard : Nat.card ↥((⁅H, R⁆ : Subgroup G).subgroupOf S)
@@ -198,17 +198,17 @@ private theorem thm36_aux : ∀ (n : ℕ)
           have hcomm := (Subgroup.mem_centralizer_iff.mp hacent) (⟨g, hgS⟩ : ↥S)
             (Subgroup.mem_subgroupOf.mpr hg)
           exact congrArg (Subtype.val) hcomm
-        haveI : _root_.IsZGroup ↥(H ⊓ Subgroup.centralizer (R₀ : Set G)) :=
+        have : _root_.IsZGroup ↥(H ⊓ Subgroup.centralizer (R₀ : Set G)) :=
           isZGroup_iff_mathlib.mp hZ
-        haveI : _root_.IsZGroup ↥(A.map S.subtype) :=
+        have : _root_.IsZGroup ↥(A.map S.subtype) :=
           IsZGroup.of_injective (Subgroup.inclusion_injective hle)
         have e := Subgroup.equivMapOfInjective A S.subtype (Subgroup.subtype_injective S)
-        haveI : _root_.IsZGroup ↥A := IsZGroup.of_injective (f := e.toMonoidHom) e.injective
+        have : _root_.IsZGroup ↥A := IsZGroup.of_injective (f := e.toMonoidHom) e.injective
         exact isZGroup_iff_mathlib.mpr ‹_root_.IsZGroup ↥A›
       have hScard : Nat.card ↥S < n := by
         have e1 : Nat.card ↥((⁅H, R⁆ : Subgroup G).subgroupOf S) * Nat.card ↥(R.subgroupOf S)
-            = Nat.card ↥S := hcompl'.card_mul
-        have e2 : Nat.card ↥H * Nat.card ↥R = Nat.card G := hcompl.card_mul
+            = Nat.card ↥S := hcompl'.card_mul_card
+        have e2 : Nat.card ↥H * Nat.card ↥R = Nat.card G := hcompl.card_mul_card
         rw [hHRcard, hRcard] at e1
         have hHRltcard : Nat.card ↥(⁅H, R⁆ : Subgroup G) < Nat.card ↥H := by
           refine lt_of_le_of_ne (Nat.le_of_dvd Nat.card_pos (Subgroup.card_dvd_of_le hHR_le_H))
@@ -246,7 +246,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
         exact (lt_mul_iff_one_lt_right Nat.card_pos).mpr hcardX
       have hoddQ : Odd (Nat.card (G ⧸ X)) := by
         rw [hcardG, Nat.odd_mul] at hodd; exact hodd.1
-      haveI hHQnorm : (H.map (QuotientGroup.mk' X)).Normal :=
+      have hHQnorm : (H.map (QuotientGroup.mk' X)).Normal :=
         (inferInstance : H.Normal).map (QuotientGroup.mk' X) (QuotientGroup.mk'_surjective X)
       have hcomplQ : Subgroup.IsComplement' (H.map (QuotientGroup.mk' X))
           (R.map (QuotientGroup.mk' X)) :=
@@ -328,9 +328,9 @@ private theorem thm36_aux : ∀ (n : ℕ)
               rwa [Subgroup.coe_mul] at hh
             rw [hcval, map_mul, show (QuotientGroup.mk' X) (nn : G) = 1 from
               (QuotientGroup.eq_one_iff _).mpr (Subgroup.mem_subgroupOf.mp hnnN), mul_one]
-        haveI : _root_.IsZGroup ↥(H ⊓ Subgroup.centralizer (R₀ : Set G)) :=
+        have : _root_.IsZGroup ↥(H ⊓ Subgroup.centralizer (R₀ : Set G)) :=
           isZGroup_iff_mathlib.mp hZ
-        haveI : _root_.IsZGroup
+        have : _root_.IsZGroup
             ↥((H ⊓ Subgroup.centralizer (R₀ : Set G)).map (QuotientGroup.mk' X)) :=
           IsZGroup.of_surjective (MonoidHom.subgroupMap_surjective (QuotientGroup.mk' X) _)
         exact isZGroup_iff_mathlib.mpr (IsZGroup.of_injective (Subgroup.inclusion_injective hle))
@@ -357,8 +357,8 @@ private theorem thm36_aux : ∀ (n : ℕ)
       by_contra h38ne
       -- capture the `oPiCore` instances, then make `N` opaque (avoids `set`+`rw` motive errors).
       set N : Subgroup ↥H := OddOrder.Isaacs.Ch03.oPiCore ({p}ᶜ : Set ℕ) ↥H with hN
-      haveI hNnormal : N.Normal := OddOrder.Isaacs.Ch03.oPiCore.normal ({p}ᶜ : Set ℕ) ↥H
-      haveI hNchar : N.Characteristic := OddOrder.Isaacs.Ch03.oPiCore.characteristic ({p}ᶜ) ↥H
+      have hNnormal : N.Normal := OddOrder.Isaacs.Ch03.oPiCore.normal ({p}ᶜ : Set ℕ) ↥H
+      have hNchar : N.Characteristic := OddOrder.Isaacs.Ch03.oPiCore.characteristic ({p}ᶜ) ↥H
       have hNpi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup ({p}ᶜ : Set ℕ) N :=
         OddOrder.Isaacs.Ch03.oPiCore.isPiGroup (G := ↥H) ({p}ᶜ : Set ℕ)
       clear_value N
@@ -368,7 +368,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
       have hsubgroupOf : (N.map H.subtype).subgroupOf H = N :=
         Subgroup.comap_map_eq_self_of_injective H.subtype_injective N
       -- `N.map H.subtype ⊴ G`: characteristic in the normal `H` (conjugation = `conjNormal`).
-      haveI hXnormal : (N.map H.subtype).Normal := by
+      have hXnormal : (N.map H.subtype).Normal := by
         refine ⟨fun n hn g => ?_⟩
         have hnH : n ∈ H := hXH hn
         have hmemN : (⟨n, hnH⟩ : ↥H) ∈ N := by
@@ -402,7 +402,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
     have hVp : IsPGroup p ↥(OddOrder.Isaacs.Ch01.fitting ↥H) := by
       rw [hfit]; exact OddOrder.Isaacs.Ch01.opCore_isPGroup p ↥H
     -- `Φ(V)` lifted to `↥H` is characteristic (hence normal, and its further `G`-lift is normal).
-    haveI hPhiChar :
+    have hPhiChar :
         ((_root_.frattini ↥(OddOrder.Isaacs.Ch01.fitting ↥H)).map
           (OddOrder.Isaacs.Ch01.fitting ↥H).subtype).Characteristic :=
       frattini_fitting_map_characteristic
@@ -484,8 +484,8 @@ private theorem thm36_aux : ∀ (n : ℕ)
       hfalse_of_pndvd, hKmap, h313, h314C, hVN_inf, hKN_fit, h316⟩ :=
       complement_structure hp hcompl hHall hcounter h36 h38 hfit hVp hVelem hCHV h311
     set V : Subgroup ↥H := OddOrder.Isaacs.Ch01.fitting ↥H with hVdef
-    haveI hVnorm : V.Normal := by rw [hVdef]; infer_instance
-    haveI hVchar : V.Characteristic := by rw [hVdef]; infer_instance
+    have hVnorm : V.Normal := by rw [hVdef]; infer_instance
+    have hVchar : V.Characteristic := by rw [hVdef]; infer_instance
     obtain ⟨a, hVa⟩ := hVp.exists_card_eq
     set N : Subgroup ↥H := Subgroup.normalizer (K : Set ↥H) with hNdef
     have hK_le_N : K ≤ N := Subgroup.le_normalizer
@@ -510,7 +510,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
     have hR₀_le_S₁ : R₀ ≤ S₁ := le_sup_right
     have hKG_le_H : KG ≤ H := Subgroup.map_subtype_le K
     have hdisjKR : Disjoint KG R₀ := hcompl.disjoint.mono hKG_le_H hR₀R
-    haveI hVGnorm : VG.Normal := hVGnorm'
+    have hVGnorm : VG.Normal := hVGnorm'
     -- ===== Phase D (3.22)–(3.31): the structure of `G` =====
     -- **(3.22)** `[X, P] = ⊥` for every `PR₀`-invariant `X ≤ K` with `VXPR₀ ≠ G`.  Set
     -- `HX := VXP` and `S₂ := HX·R₀ < G`.  By minimality (IH on `S₂`), `[HX, R₀]` has `p`-length
@@ -552,7 +552,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
           mem_normalizer_map_subtype_of_isAInvariant hP_inv (hR₀R hg)
         rw [hHXdef]
         exact mem_normalizer_sup (mem_normalizer_sup hgV hgX) hgP
-      haveI hHX'normal : ((HX.subgroupOf S₂) : Subgroup ↥S₂).Normal :=
+      have hHX'normal : ((HX.subgroupOf S₂) : Subgroup ↥S₂).Normal :=
         Subgroup.normal_subgroupOf_of_le_normalizer hS₂_le_NHX
       -- complement/Hall/odd/Z-group transports for the IH on `S₂` (the (3.6) battery)
       have hdisjHX : Disjoint HX R₀ := hcompl.disjoint.mono hHX_le_H hR₀R
@@ -600,12 +600,12 @@ private theorem thm36_aux : ∀ (n : ℕ)
           have hcomm := (Subgroup.mem_centralizer_iff.mp hacent) (⟨g, hgS⟩ : ↥S₂)
             (Subgroup.mem_subgroupOf.mpr hg)
           exact congrArg (Subtype.val) hcomm
-        haveI : _root_.IsZGroup ↥(H ⊓ Subgroup.centralizer (R₀ : Set G)) :=
+        have : _root_.IsZGroup ↥(H ⊓ Subgroup.centralizer (R₀ : Set G)) :=
           isZGroup_iff_mathlib.mp hZ
-        haveI : _root_.IsZGroup ↥(A.map S₂.subtype) :=
+        have : _root_.IsZGroup ↥(A.map S₂.subtype) :=
           IsZGroup.of_injective (Subgroup.inclusion_injective hle)
         have e := Subgroup.equivMapOfInjective A S₂.subtype (Subgroup.subtype_injective S₂)
-        haveI : _root_.IsZGroup ↥A := IsZGroup.of_injective (f := e.toMonoidHom) e.injective
+        have : _root_.IsZGroup ↥A := IsZGroup.of_injective (f := e.toMonoidHom) e.injective
         exact isZGroup_iff_mathlib.mpr ‹_root_.IsZGroup ↥A›
       have hcard₂ : Nat.card ↥S₂ < n := by
         have hdvd : Nat.card ↥S₂ ∣ Nat.card G := Subgroup.card_subgroup_dvd_card S₂
@@ -875,7 +875,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
       have hKPnorm : KP ≤ Subgroup.normalizer (KG : Set G) := by
         rw [hKPdef]
         exact sup_le Subgroup.le_normalizer hPG_le_NKG
-      haveI : ((KG.subgroupOf KP) : Subgroup ↥KP).Normal :=
+      have : ((KG.subgroupOf KP) : Subgroup ↥KP).Normal :=
         Subgroup.normal_subgroupOf_of_le_normalizer hKPnorm
       have hcop : Nat.Coprime (Nat.card ↥(KG.subgroupOf KP))
           (Nat.card ↥((P.map H.subtype).subgroupOf KP)) := by
@@ -918,10 +918,10 @@ private theorem thm36_aux : ∀ (n : ℕ)
     -- nilpotent, so `K = ⨆_ℓ O_ℓ(K)`; if no single prime carries all of `K`, every `O_ℓ(K)` is a
     -- proper characteristic (hence `PR₀`-invariant) subgroup of `K`, centralized by `P` by the
     -- unconditional (3.22) — so `[K,P] = ⊥`, contradicting (3.13).
-    haveI hKG_nilp : Group.IsNilpotent ↥KG := by
+    have hKG_nilp : Group.IsNilpotent ↥KG := by
       have e1 := Subgroup.equivMapOfInjective K H.subtype H.subtype_injective
       have e2 := Subgroup.subgroupOfEquivOfLe hK_le_N
-      haveI : Group.IsNilpotent ↥(K.subgroupOf N) := by
+      have : Group.IsNilpotent ↥(K.subgroupOf N) := by
         rw [hKN_fit]
         infer_instance
       refine Group.nilpotent_of_surjective (e1.toMonoidHom.comp e2.toMonoidHom) ?_
@@ -936,7 +936,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
       have hcard_ne : Nat.card ↥KG ≠ 1 := fun h =>
         hKG_ne_bot (Subgroup.eq_bot_of_card_eq _ h)
       obtain ⟨q, hq_prime, hq_dvd⟩ := Nat.exists_prime_and_dvd hcard_ne
-      haveI : Fact q.Prime := ⟨hq_prime⟩
+      have : Fact q.Prime := ⟨hq_prime⟩
       have hKGK : Nat.card ↥KG = Nat.card ↥K := by
         rw [hKG, Subgroup.card_map_of_injective H.subtype_injective]
       refine ⟨q, hq_prime, ?_, ?_, ?_⟩
@@ -953,7 +953,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
         have hproper : ∀ ℓ : (Nat.card ↥KG).primeFactors,
             (OddOrder.Isaacs.Ch01.opCore (ℓ : ℕ) ↥KG).map KG.subtype ≠ KG := by
           intro ℓ heq
-          haveI : Fact (ℓ : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors ℓ.2⟩
+          have : Fact (ℓ : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors ℓ.2⟩
           have h2 : Nat.card ↥((OddOrder.Isaacs.Ch01.opCore (ℓ : ℕ) ↥KG).map KG.subtype)
               = Nat.card ↥(OddOrder.Isaacs.Ch01.opCore (ℓ : ℕ) ↥KG) :=
             Subgroup.card_map_of_injective (Subgroup.subtype_injective KG)
@@ -971,7 +971,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
             (OddOrder.Isaacs.Ch01.opCore (ℓ : ℕ) ↥KG).map KG.subtype
               ≤ Subgroup.centralizer ((P.map H.subtype : Subgroup G) : Set G) := by
           intro ℓ
-          haveI : Fact (ℓ : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors ℓ.2⟩
+          have : Fact (ℓ : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors ℓ.2⟩
           refine Subgroup.commutator_eq_bot_iff_le_centralizer.mp ?_
           refine h322' _ (Subgroup.map_subtype_le _) (hproper ℓ) ?_ ?_
           · exact fun g hg => mem_normalizer_map_subtype_of_characteristic (hR₀_le_NKG hg)
@@ -979,7 +979,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
         -- nilpotency: `F(K) = ⊤`, so `K = ⨆_ℓ O_ℓ(K)` and the centralizer absorbs all of `K`
         have hfit_top : OddOrder.Isaacs.Ch01.fitting ↥KG = ⊤ := by
           refine le_antisymm le_top ?_
-          haveI : Group.IsNilpotent ↥(⊤ : Subgroup ↥KG) :=
+          have : Group.IsNilpotent ↥(⊤ : Subgroup ↥KG) :=
             Group.nilpotent_of_surjective (Subgroup.topEquiv (G := ↥KG)).symm.toMonoidHom
               (Subgroup.topEquiv (G := ↥KG)).symm.surjective
           exact OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
@@ -1020,7 +1020,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
         (fun g hg => mem_normalizer_map_subtype_of_isAInvariant hP_inv (hR₀R hg))
         (hcompl.disjoint.mono (Subgroup.map_subtype_le P) hR₀R)
     obtain ⟨hK_special, hK_exp⟩ : IsSpecial q ↥KG ∧ Monoid.exponent ↥KG = q := by
-      haveI : Fact q.Prime := ⟨hq_prime⟩
+      have : Fact q.Prime := ⟨hq_prime⟩
       -- `q` is odd (`q ∣ |K| ∣ |G|` and `|G|` is odd)
       have hKG_ne_bot : KG ≠ ⊥ := by
         intro hbot
@@ -1139,7 +1139,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
       by_contra hne
       obtain ⟨ℓ, hℓ_prime, hℓ_dvd⟩ := Nat.exists_prime_and_dvd
         (fun h1 => hne (Subgroup.eq_bot_of_card_eq _ h1))
-      haveI : Fact ℓ.Prime := ⟨hℓ_prime⟩
+      have : Fact ℓ.Prime := ⟨hℓ_prime⟩
       obtain ⟨y, hy_ord⟩ := exists_prime_orderOf_dvd_card' ℓ hℓ_dvd
       have hyMem := Subgroup.mem_inf.mp y.2
       have hy_ordG : orderOf ((y : G)) = ℓ := by
@@ -1169,7 +1169,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
           rw [hAdef]
           exact sup_le Subgroup.le_normalizer
             (fun g hg => mem_normalizer_map_subtype_of_isAInvariant hP_inv (hR₀R hg))
-        haveI hPGnormA : (((P.map H.subtype).subgroupOf A) : Subgroup ↥A).Normal :=
+        have hPGnormA : (((P.map H.subtype).subgroupOf A) : Subgroup ↥A).Normal :=
           Subgroup.normal_subgroupOf_of_le_normalizer hA_le_NPG
         have hPGpos : 0 < Nat.card ↥(P.map H.subtype : Subgroup G) := Nat.card_pos
         have hquot_card : Nat.card
@@ -1210,7 +1210,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
         rw [hybot, orderOf_one] at hy_ordG
         exact hp.one_lt.ne' hy_ordG.symm
       · -- `ℓ = r`: Sylow II inside `A` transfers `K`-centralizing from `⟨y⟩` to `R₀`
-        haveI : Fact r.Prime := ⟨hr_prime⟩
+        have : Fact r.Prime := ⟨hr_prime⟩
         set yA : ↥A := ⟨(y : G), hyMem.1⟩ with hyAdef
         have hyA_ord : orderOf yA = r := by
           rw [← hy_ordG]
@@ -1292,7 +1292,7 @@ The vertex of the §3 subprogram (engine of BG Theorem 10.6); proved by a minima
 argument (equations (3.6)–(3.38)) that consumes Lemma 1.21, Theorems 3.4 and 3.5, Gorenstein 5.3.7,
 and many §1 propositions.  See `notes/bg/s03_thm36_plan.md` for the phase-by-phase plan. -/
 theorem thm36
-    {G : Type*} [Group G] [Finite G] [IsSolvable G] (hodd : Odd (Nat.card G))
+    {G : Type*} [Group G] [Finite G] [Group.IsSolvable G] (hodd : Odd (Nat.card G))
     {H R : Subgroup G} [H.Normal] (hcompl : Subgroup.IsComplement' H R)
     (hHall : Nat.Coprime (Nat.card ↥H) (Nat.card ↥R))
     {R₀ : Subgroup G} (hR₀R : R₀ ≤ R) (hR₀p : ∃ r : ℕ, r.Prime ∧ Nat.card ↥R₀ = r)

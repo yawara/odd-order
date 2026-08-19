@@ -84,11 +84,11 @@ theorem Msigma_E_relations [Finite G] (hG : IsMinimalSimpleOdd G)
     Subgroup.centralizer (E : Set G) ⊓ S10.Msigma M ≤ derivedInG (S10.Msigma M) ∧
     ⁅S10.Msigma M, E⁆ = S10.Msigma M := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups h.mem_maximal
   have hMσM : S10.Msigma M ≤ M := S10.Msigma_le M
   -- Complement data inside `↥M`: `M_σ` is a normal Hall subgroup of `M` with complement `E`.
   have hcomplement := h.isComplement'_subgroupOf
-  haveI hMσ_norm : ((S10.Msigma M).subgroupOf M).Normal := by
+  have hMσ_norm : ((S10.Msigma M).subgroupOf M).Normal := by
     rw [S10.Msigma_subgroupOf]; infer_instance
   have hid : (derivedInG M).subgroupOf M = commutator ↥M :=
     Subgroup.comap_map_eq_self_of_injective M.subtype_injective (commutator ↥M)
@@ -142,7 +142,7 @@ theorem Msigma_E_relations [Finite G] (hG : IsMinimalSimpleOdd G)
 factorizations agree), then a Hall `π`-subgroup of `C` is a Hall `π`-subgroup of `Nsub`. Used to
 turn "centralizes a Sylow `p` of `M_σ` for every `p ∈ π`" into "centralizes a Hall `π`-subgroup". -/
 private theorem exists_hall_subgroupOf_of_full_factorization [Finite G] {Nsub C : Subgroup G}
-    [IsSolvable ↥C] (π : Set ℕ) (hCN : C ≤ Nsub)
+    [Group.IsSolvable ↥C] (π : Set ℕ) (hCN : C ≤ Nsub)
     (hfull : ∀ r ∈ π, (Nat.card ↥C).factorization r = (Nat.card ↥Nsub).factorization r) :
     ∃ W : Subgroup G, W ≤ C ∧ Ch03.IsHallSubgroup π (W.subgroupOf Nsub) := by
   classical
@@ -201,7 +201,7 @@ then `A` acts trivially on some Hall `π`-subgroup of `N`. Witness = the `A`-inv
 `D`-fixed, so `D` fixes `H₀`; the elements fixing `H₀` form a subgroup containing every Sylow,
 hence all of `A`. -/
 private theorem exists_hall_actsTrivially_of_forall_sylow
-    {N A : Type*} [Group N] [Finite N] [IsSolvable N] [Group A] [Finite A]
+    {N A : Type*} [Group N] [Finite N] [Group.IsSolvable N] [Group A] [Finite A]
     {φ : A →* MulAut N} (hCop : Nat.Coprime (Nat.card A) (Nat.card N)) (π : Set ℕ)
     (hsylow : ∀ (q : ℕ), q.Prime → ∀ (D : Sylow q A),
       ∃ H : Subgroup N, Ch03.IsHallSubgroup π H ∧ ∀ a ∈ (D : Subgroup A), ∀ h ∈ H, (φ a) h = h) :
@@ -252,7 +252,7 @@ private theorem exists_hall_actsTrivially_of_forall_sylow
   rw [← Subgroup.index_eq_one]
   by_contra hne
   obtain ⟨q, hq_prime, hq_dvd⟩ := Nat.exists_prime_and_dvd hne
-  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have : Fact q.Prime := ⟨hq_prime⟩
   obtain ⟨D⟩ := (inferInstance : Nonempty (Sylow q A))
   have hDcard : Nat.card ↥(D : Subgroup A) = q ^ (Nat.card A).factorization q :=
     D.card_eq_multiplicity
@@ -283,10 +283,10 @@ theorem derivedE_centralizes_betaComplement [Finite G] (hG : IsMinimalSimpleOdd 
       Ch03.IsHallSubgroup (S10.beta M)ᶜ (W.subgroupOf (S10.Msigma M)) ∧
       derivedInG E ≤ Subgroup.centralizer (W : Set G) := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups h.mem_maximal
   have hMσM : S10.Msigma M ≤ M := S10.Msigma_le M
-  haveI hMσsolv : IsSolvable ↥(S10.Msigma M) :=
-    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hMσM).toMonoidHom)
+  have hMσsolv : Group.IsSolvable ↥(S10.Msigma M) :=
+    Group.isSolvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hMσM).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe hMσM).surjective
   have hE'_le_E : derivedInG E ≤ E := Subgroup.map_subtype_le _
   have hE'M : derivedInG E ≤ M := hE'_le_E.trans h.E_le
@@ -305,7 +305,7 @@ theorem derivedE_centralizes_betaComplement [Finite G] (hG : IsMinimalSimpleOdd 
   have hcop : Nat.Coprime (Nat.card ↥(derivedInG E)) (Nat.card ↥(S10.Msigma M)) :=
     hcop_MσE.symm.coprime_dvd_left (Subgroup.card_dvd_of_le hE'_le_E)
   -- conjugation action `φ : ↥E' →* MulAut ↥M_σ`.
-  letI act : MulDistribMulAction ↥(derivedInG E) ↥(S10.Msigma M) :=
+  let act : MulDistribMulAction ↥(derivedInG E) ↥(S10.Msigma M) :=
     MulDistribMulAction.compHom
       (M := ↥(Subgroup.normalizer ((S10.Msigma M : Subgroup G) : Set G))) ↥(S10.Msigma M)
       (Subgroup.inclusion hE'_norm_Mσ)
@@ -319,7 +319,7 @@ theorem derivedE_centralizes_betaComplement [Finite G] (hG : IsMinimalSimpleOdd 
       ∃ H : Subgroup ↥(S10.Msigma M), Ch03.IsHallSubgroup (S10.beta M)ᶜ H ∧
         ∀ a ∈ (D : Subgroup ↥(derivedInG E)), ∀ x ∈ H, (φ a) x = x := by
     intro q hq D
-    haveI : Fact q.Prime := ⟨hq⟩
+    have : Fact q.Prime := ⟨hq⟩
     set X_G : Subgroup G := (D : Subgroup ↥(derivedInG E)).map (derivedInG E).subtype with hXGdef
     have hXG_le_E' : X_G ≤ derivedInG E := Subgroup.map_subtype_le _
     have hXG_le_M' : X_G ≤ derivedInG M := hXG_le_E'.trans hE'_le_M'
@@ -328,8 +328,9 @@ theorem derivedE_centralizes_betaComplement [Finite G] (hG : IsMinimalSimpleOdd 
       D.2.of_equiv (Subgroup.equivMapOfInjective _ _ (derivedInG E).subtype_injective)
     set C : Subgroup G := Subgroup.centralizer (X_G : Set G) ⊓ S10.Msigma M with hCdef
     have hC_le_Mσ : C ≤ S10.Msigma M := inf_le_right
-    haveI : IsSolvable ↥C :=
-      solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe (hC_le_Mσ.trans hMσM)).toMonoidHom)
+    have : Group.IsSolvable ↥C :=
+      Group.isSolvable_of_surjective (f :=
+        (Subgroup.subgroupOfEquivOfLe (hC_le_Mσ.trans hMσM)).toMonoidHom)
         (Subgroup.subgroupOfEquivOfLe (hC_le_Mσ.trans hMσM)).surjective
     have hfull : ∀ r ∈ (S10.beta M)ᶜ,
         (Nat.card ↥C).factorization r = (Nat.card ↥(S10.Msigma M)).factorization r := by
@@ -339,7 +340,7 @@ theorem derivedE_centralizes_betaComplement [Finite G] (hG : IsMinimalSimpleOdd 
           (Subgroup.card_dvd_of_le hC_le_Mσ) r) ?_
       by_cases hrMσ : r ∈ (Nat.card ↥(S10.Msigma M)).primeFactors
       · have hr_prime := Nat.prime_of_mem_primeFactors hrMσ
-        haveI : Fact r.Prime := ⟨hr_prime⟩
+        have : Fact r.Prime := ⟨hr_prime⟩
         obtain ⟨R, hR_le_C, hR_card⟩ : ∃ R : Subgroup G, R ≤ C ∧
             Nat.card ↥R = r ^ (Nat.card ↥(S10.Msigma M)).factorization r := by
           by_cases hXG_bot : X_G = ⊥
@@ -474,7 +475,7 @@ theorem rank_centralizer_Malpha_le_one_of_not_uniqueMaximal [Finite G]
   have hNXlt : Subgroup.normalizer (X : Set G) < ⊤ := by
     rw [lt_top_iff_ne_top]
     intro hNtop
-    haveI hXnormal : X.Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
+    have hXnormal : X.Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
     rcases hG.simple.eq_bot_or_eq_top_of_normal X inferInstance with hXbot | hXtop
     · exact hXne hXbot
     · exact hMcoatom.1 (top_le_iff.mp (hXtop ▸ hXM))
@@ -518,7 +519,7 @@ theorem exists_charSubgroup_exponent_not_centralized [Finite G]
     ∃ R₁ : Subgroup G, R₁ ≤ R ∧ (R₁.subgroupOf R).Characteristic ∧
       Monoid.exponent ↥R₁ = r ∧ ¬ Q ≤ Subgroup.centralizer (R₁ : Set G) := by
   classical
-  haveI : Nontrivial ↥R := (Subgroup.nontrivial_iff_ne_bot R).mpr hRne
+  have : Nontrivial ↥R := (Subgroup.nontrivial_iff_ne_bot R).mpr hRne
   -- `r ∣ |G|`, hence `r` is odd, so `r ≠ 2`.
   have hr_dvd : r ∣ Nat.card G := by
     obtain ⟨n, hn⟩ := hRr.exists_card_eq
@@ -545,7 +546,7 @@ theorem exists_charSubgroup_exponent_not_centralized [Finite G]
   · -- if `Q` centralized `R₁`, conjugation would be trivial on `R`.
     intro hQcent
     apply hnc
-    letI act : MulDistribMulAction ↥Q ↥R :=
+    let act : MulDistribMulAction ↥Q ↥R :=
       MulDistribMulAction.compHom
         (M := ↥(Subgroup.normalizer (R : Set G))) ↥R (Subgroup.inclusion hQnorm)
     set φ : ↥Q →* MulAut ↥R := MulDistribMulAction.toMulAut ↥Q ↥R with hφ
@@ -606,9 +607,10 @@ theorem exists_invariant_sylow_Malpha_rank_three [Finite G] (hG : IsMinimalSimpl
     ∃ R : Subgroup G, R ≤ S10.Malpha M ∧ IsPGroup r ↥R ∧
       X ≤ Subgroup.normalizer (R : Set G) ∧ 3 ≤ rank ↥R ∧ P₀ ≤ R := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-  haveI : IsSolvable ↥(S10.Malpha M) :=
-    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe (S10.Malpha_le M)).toMonoidHom)
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥(S10.Malpha M) :=
+    Group.isSolvable_of_surjective
+      (f := (Subgroup.subgroupOfEquivOfLe (S10.Malpha_le M)).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe (S10.Malpha_le M)).surjective
   have hX_norm_Ma : X ≤ Subgroup.normalizer (S10.Malpha M : Set G) :=
     hXM.trans (le_normalizer_opiCoreInG (S10.alpha M) M)
@@ -616,7 +618,7 @@ theorem exists_invariant_sylow_Malpha_rank_three [Finite G] (hG : IsMinimalSimpl
     Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl (π := (S10.alpha M)ᶜ)
       Nat.card_pos.ne' Nat.card_pos.ne' hXpi
       (fun q hq hqc => hqc (S10.Malpha_isPiGroup M q hq))
-  letI act : MulDistribMulAction ↥X ↥(S10.Malpha M) :=
+  let act : MulDistribMulAction ↥X ↥(S10.Malpha M) :=
     MulDistribMulAction.compHom
       (M := ↥(Subgroup.normalizer (S10.Malpha M : Set G))) ↥(S10.Malpha M)
       (Subgroup.inclusion hX_norm_Ma)
@@ -690,7 +692,7 @@ theorem card_sup_eq_mul_of_le_normalizer_of_disjoint {G : Type*} [Group G] [Fini
     Nat.card ↥(A ⊔ B) = Nat.card ↥A * Nat.card ↥B := by
   have hAle : A ≤ A ⊔ B := le_sup_left
   have hBle : B ≤ A ⊔ B := le_sup_right
-  haveI hBn : (B.subgroupOf (A ⊔ B)).Normal :=
+  have hBn : (B.subgroupOf (A ⊔ B)).Normal :=
     Subgroup.normal_subgroupOf_sup_of_le_normalizer hAB
   have hdisj' : A.subgroupOf (A ⊔ B) ⊓ B.subgroupOf (A ⊔ B) = ⊥ := by
     rw [eq_bot_iff]; intro x hx
@@ -777,7 +779,7 @@ theorem tau1_Malpha_centralizer_P_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
     (hαne : S10.Malpha M ≠ ⊥) (hqα : q ∉ S10.alpha M) :
     S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥ := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   -- `P` facts.
   obtain ⟨hPea, hPcard1⟩ := mem_elemAbelianOfRank.mp hP
   have hPp : IsPGroup p ↥P := hPea.isPGroup
@@ -811,7 +813,7 @@ theorem tau1_Malpha_centralizer_P_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
     have hne1 : Nat.card ↥(S10.Malpha M) ≠ 1 := fun h => hαne (Subgroup.card_eq_one.mp h)
     obtain ⟨r, hrp, hrdvd⟩ := (Nat.card ↥(S10.Malpha M)).exists_prime_and_dvd hne1
     exact ⟨r, S10.Malpha_isPiGroup M r (Nat.mem_primeFactors.mpr ⟨hrp, hrdvd, Nat.card_pos.ne'⟩)⟩
-  haveI : Fact r.Prime := ⟨Nat.prime_of_mem_primeFactors ((S10.mem_alpha_iff M r).mp hrα).1⟩
+  have : Fact r.Prime := ⟨Nat.prime_of_mem_primeFactors ((S10.mem_alpha_iff M r).mp hrα).1⟩
   have hqr : q ≠ r := fun h => hqα (h ▸ hrα)
   have hrp_ne : r ≠ p := fun h => hpα (h ▸ hrα)
   -- `X := P ⊔ Q` is an `α(M)'`-subgroup of `M`.
@@ -859,7 +861,7 @@ theorem tau1_Malpha_centralizer_P_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
   -- `R₁` = Thompson characteristic subgroup of `R`, exponent `r`, not centralized by `Q`.
   obtain ⟨R₁, hR₁R, hR₁char, hR₁exp, hQncR₁⟩ :=
     exists_charSubgroup_exponent_not_centralized hG.odd hqr hRr hRne hQq hQnormR hQncR
-  haveI : (R₁.subgroupOf R).Characteristic := hR₁char
+  have : (R₁.subgroupOf R).Characteristic := hR₁char
   have hR₁r : IsPGroup r ↥R₁ := by
     obtain ⟨n, hn⟩ := hRr.exists_card_eq
     obtain ⟨m, _, hm⟩ := (Nat.dvd_prime_pow Fact.out).mp (hn ▸ Subgroup.card_dvd_of_le hR₁R)
@@ -909,8 +911,8 @@ theorem tau1_Malpha_centralizer_P_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
     have hFPFbot : (Q ⊔ R₁) ⊓ Subgroup.centralizer (P : Set G) = ⊥ :=
       inf_centralizer_sup_eq_bot_of_le_normalizer hQinv hPnormR₁ hQnormR₁ hQR₁disj hCQP hCR₁P
     have hYM : (Q ⊔ R₁) ⊔ P ≤ M := sup_le (sup_le hQM hR₁M) hPM
-    haveI : IsSolvable ↥((Q ⊔ R₁) ⊔ P) :=
-      solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hYM).toMonoidHom)
+    have : Group.IsSolvable ↥((Q ⊔ R₁) ⊔ P) :=
+      Group.isSolvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hYM).toMonoidHom)
         (Subgroup.subgroupOfEquivOfLe hYM).surjective
     have hQR₁card : Nat.card ↥(Q ⊔ R₁) = Nat.card ↥Q * Nat.card ↥R₁ :=
       card_sup_eq_mul_of_le_normalizer_of_disjoint hQnormR₁ hQR₁disj

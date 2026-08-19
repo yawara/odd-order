@@ -77,7 +77,7 @@ mathlib 既収載で本ファイルでは wrapper を書かないもの:
 * `IsZGroup.coprime_commutator_index` (`ZGroup.lean:280`) = **Thm 5.16 part 3** (|G'|, |G:G'|
 coprime).
 * `isZGroup_iff_exists_mulEquiv` (`ZGroup.lean:315`) = **Thm 5.16 part 4** (semidirect product 形).
-* `IsZGroup → IsSolvable` instance (`ZGroup.lean:102`) = **Cor 5.15** (Z-group solvable).
+* `IsZGroup → Group.IsSolvable` instance (`ZGroup.lean:102`) = **Cor 5.15** (Z-group solvable).
 * `Subgroup.focalSubgroup`, `focalSubgroupOf`, `transferFocal` (`Focal.lean:58, 67, 151`) =
   Focal subgroup の定義 (Isaacs §5D 冒頭).
 * `Subgroup.ker_restrict_transferFocal_eq_focalSubgroupOf` (`Focal.lean:191`) = **Thm 5.20**
@@ -168,7 +168,7 @@ theorem fitting_coprime_abelian_decomp
   have hCop : Nat.Coprime (Nat.card KN) (Nat.card P) := by
     rw [hKN_card]
     exact h_coprime.symm
-  have hSolv : IsSolvable KN ∨ IsSolvable P := by
+  have hSolv : Group.IsSolvable KN ∨ Group.IsSolvable P := by
     right
     infer_instance
   have h_inf_P :
@@ -457,7 +457,7 @@ theorem normalizer_controls_centralizer_fusion
   let P_K : Sylow p K := P.subtype hP_le_K
   let Pg_K : Sylow p K := (g • P).subtype hPg_le_K
   -- Sylow II in K: there exists c : K with c • Pg_K = P_K
-  haveI : Finite K := inferInstance
+  have : Finite K := inferInstance
   obtain ⟨c, hc⟩ := MulAction.exists_smul_eq (M := K) Pg_K P_K
   -- Translate back: c • Pg_K = P_K via Sylow.smul_subtype ⇒ (c.val • (g • P)).subtype = P.subtype
   have h_subtype_eq : ((c : G) • g • P).subtype (Sylow.smul_le hPg_le_K c) = P_K := by
@@ -506,7 +506,7 @@ theorem hasNormalPComplement_of_sylow_normalizer_le_centralizer
     exact Nat.card_congr (Sylow.equiv Q P).toEquiv
   have hcard : Nat.card N * Nat.card (Q : Subgroup G) = Nat.card G := by
     rw [hcardQ]
-    exact hNP.card_mul
+    exact hNP.card_mul_card
   exact Subgroup.isComplement'_of_card_mul_and_disjoint hcard hdisj
 
 /-- mathlib `commutator_inf_eq_focalSubgroup` のリネーム (Focal Subgroup Theorem の
@@ -639,12 +639,12 @@ theorem isaacs_thm_5_17
     [hPcyc : IsCyclic ↥(P : Subgroup G)] :
     ¬ p ∣ Nat.card (commutator G) ∨ ¬ p ∣ (commutator G).index := by
   -- P abelian (cyclic)
-  haveI hPab : IsMulCommutative ↥(P : Subgroup G) := inferInstance
+  have hPab : IsMulCommutative ↥(P : Subgroup G) := inferInstance
   -- N := N_G(P), P_N := P.subgroupOf N (normal in N)
   set N := Subgroup.normalizer (P : Set G) with hN_def
   set P_N : Subgroup ↥N := (P : Subgroup G).subgroupOf N with hP_N_def
-  haveI hP_N_normal : P_N.Normal := Subgroup.normal_in_normalizer
-  haveI : Finite ↥N := inferInstance
+  have hP_N_normal : P_N.Normal := Subgroup.normal_in_normalizer
+  have : Finite ↥N := inferInstance
   -- coprime(|P_N|, |N : P_N|): |P_N| = |P| = p^a, |N:P_N| ∣ |G:P| coprime to p
   have hP_le_N : (P : Subgroup G) ≤ N := Subgroup.le_normalizer
   have h_coprime_P_N : Nat.Coprime (Nat.card ↥P_N) P_N.index := by
@@ -754,7 +754,7 @@ theorem isaacs_thm_5_17
       rw [MonoidHom.mem_ker, map_commutatorElement,
           commutatorElement_eq_one_iff_mul_comm]
       -- ↥P abelian (IsCyclic ⇒ IsMulCommutative)
-      haveI hPab : IsMulCommutative ↥(P : Subgroup G) := inferInstance
+      have hPab : IsMulCommutative ↥(P : Subgroup G) := inferInstance
       exact mul_comm _ _
     -- p ∤ |commutator G|
     intro h_p_dvd_comm
@@ -783,7 +783,7 @@ theorem not_isSimpleGroup_of_isCyclic_sylow_two
     (hP_nontrivial : (P : Subgroup G) ≠ ⊥) :
     ¬ IsSimpleGroup G := by
   intro hSimp
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   -- |P| = 2^a, a ≥ 1
   obtain ⟨a, hP_card⟩ := IsPGroup.iff_card.mp P.isPGroup'
   have ha_pos : 1 ≤ a := by
@@ -823,7 +823,7 @@ theorem not_isSimpleGroup_of_isCyclic_sylow_two
     calc n * t = n * t * n⁻¹ * n := by group
       _ = t * n := by rw [h_g_eq]
   -- Apply 5.18 strong: t ∉ commutator G
-  haveI hPab : IsMulCommutative ↥(P : Subgroup G) := inferInstance
+  have hPab : IsMulCommutative ↥(P : Subgroup G) := inferInstance
   have h_t_not_in_comm : t ∉ commutator G := by
     intro h_t_in
     exact ht_ne_one
@@ -954,8 +954,8 @@ lemma OPrime_index_isPGroup (p : ℕ) (G : Type*) [Group G] [Finite G] [Fact p.P
     ∃ k : ℕ, (OPrime p G).index = p ^ k := by
   classical
   let ι : Type _ := {N : Subgroup G // N.Normal ∧ ∃ k : ℕ, N.index = p ^ k}
-  haveI : Finite ι := Subtype.finite
-  haveI : Fintype ι := Fintype.ofFinite ι
+  have : Finite ι := Subtype.finite
+  have : Fintype ι := Fintype.ofFinite ι
   -- Diagonal hom φ : G →* ∀ i : ι, G ⧸ i.val (instance found via OPrime_index_subtype_normal)
   let φ : G →* (∀ i : ι, G ⧸ (i.val : Subgroup G)) :=
     MonoidHom.pi fun i : ι => QuotientGroup.mk' i.val
@@ -976,7 +976,7 @@ lemma OPrime_index_isPGroup (p : ℕ) (G : Type*) [Group G] [Finite G] [Fact p.P
       rw [OPrime, Subgroup.mem_iInf] at h
       exact h i
   -- Lagrange: |range φ| ∣ |∀ i, G/i.val|
-  haveI : Finite (∀ i : ι, G ⧸ (i.val : Subgroup G)) := Pi.finite
+  have : Finite (∀ i : ι, G ⧸ (i.val : Subgroup G)) := Pi.finite
   have h_card_range : Nat.card φ.range ∣ Nat.card (∀ i : ι, G ⧸ (i.val : Subgroup G)) :=
     Subgroup.card_subgroup_dvd_card _
   -- |G/OPrime| = |range φ| via first iso
@@ -1042,8 +1042,8 @@ lemma APrime_index_isPGroup (p : ℕ) (G : Type*) [Group G] [Finite G] [Fact p.P
   classical
   let ι : Type _ :=
     {K : Subgroup G // K.Normal ∧ commutator G ≤ K ∧ ∃ k : ℕ, K.index = p ^ k}
-  haveI : Finite ι := Subtype.finite
-  haveI : Fintype ι := Fintype.ofFinite ι
+  have : Finite ι := Subtype.finite
+  have : Fintype ι := Fintype.ofFinite ι
   let φ : G →* (∀ i : ι, G ⧸ (i.val : Subgroup G)) :=
     MonoidHom.pi fun i : ι => QuotientGroup.mk' i.val
   have h_ker : φ.ker = APrime p G := by
@@ -1061,7 +1061,7 @@ lemma APrime_index_isPGroup (p : ℕ) (G : Type*) [Group G] [Finite G] [Fact p.P
         QuotientGroup.eq_one_iff]
       rw [APrime, Subgroup.mem_iInf] at h
       exact h i
-  haveI : Finite (∀ i : ι, G ⧸ (i.val : Subgroup G)) := Pi.finite
+  have : Finite (∀ i : ι, G ⧸ (i.val : Subgroup G)) := Pi.finite
   have h_card_range : Nat.card φ.range ∣ Nat.card (∀ i : ι, G ⧸ (i.val : Subgroup G)) :=
     Subgroup.card_subgroup_dvd_card _
   have h_card_quot : Nat.card (G ⧸ APrime p G) = Nat.card φ.range := by
@@ -1174,10 +1174,10 @@ theorem APrime_eq_transferFocal_ker [Finite G] {p : ℕ} [Fact p.Prime]
   classical
   let A : Subgroup G := APrime p G
   let K : Subgroup G := P.transferFocal.ker
-  haveI : A.Normal := by
+  have : A.Normal := by
     dsimp [A]
     infer_instance
-  haveI : K.Normal := by
+  have : K.Normal := by
     dsimp [K]
     infer_instance
   have hA_le_K : A ≤ K := by
@@ -1241,7 +1241,7 @@ lemma APrime_le_subgroupOf_APrime_of_sylow_le [Finite G] {p : ℕ} [Fact p.Prime
     APrime p H ≤ (APrime p G).subgroupOf H := by
   classical
   let A : Subgroup G := APrime p G
-  haveI hA_normal : A.Normal := inferInstance
+  have hA_normal : A.Normal := inferInstance
   have hA_index_pow : ∃ k : ℕ, A.index = p ^ k := by
     simpa [A] using APrime_index_isPGroup p G
   have hPA_top : (P : Subgroup G) ⊔ A = ⊤ := by

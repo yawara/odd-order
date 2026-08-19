@@ -31,7 +31,7 @@ theorem eq_top_of_forall_exists_sylow_le [Finite G] {H : Subgroup G}
   rw [← Subgroup.index_eq_one]
   by_contra hne
   obtain ⟨r, hr, hrdvd⟩ := Nat.exists_prime_and_dvd hne
-  haveI : Fact r.Prime := ⟨hr⟩
+  have : Fact r.Prime := ⟨hr⟩
   obtain ⟨P, hPH⟩ := h r hr
   -- `|P|` is the full `r`-part of `|G|`, and it divides `|H|`.
   have hPcard : Nat.card ↥(P : Subgroup G) = r ^ (Nat.card G).factorization r :=

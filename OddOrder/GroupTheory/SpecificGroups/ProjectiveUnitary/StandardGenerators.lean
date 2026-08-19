@@ -524,11 +524,13 @@ theorem weylPerm_infinity (n : ℕ) :
     weylPerm n (infinity n) = affine (1 : RootGroup n) := by
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem weylPerm_origin (n : ℕ) :
     weylPerm n (affine (1 : RootGroup n)) = infinity n := by
   simp [weylPerm, weylPoint, infinity, affine]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem weylPerm_affine_of_ne_one {n : ℕ} (u : RootGroup n) (hu : u ≠ 1) :
     weylPerm n (affine u) = affine (RootGroup.weylReciprocal u hu) := by

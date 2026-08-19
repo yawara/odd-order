@@ -183,9 +183,9 @@ theorem mulAut_eq_one_of_eq_id_on_iSup {H : Type*} [Group H] (α : MulAut H)
     { carrier := {x | α x = x}
       one_mem' := map_one α
       mul_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_setOf_eq] at ha hb ⊢; rw [map_mul, ha, hb]
+        simp only [Set.mem_ofPred_eq] at ha hb ⊢; rw [map_mul, ha, hb]
       inv_mem' := fun {a} ha => by
-        simp only [Set.mem_setOf_eq] at ha ⊢; rw [map_inv, ha] } with hS
+        simp only [Set.mem_ofPred_eq] at ha ⊢; rw [map_inv, ha] } with hS
   have htop : S = ⊤ := top_le_iff.mp (hspan ▸ iSup_le (fun i x hx => htriv i x hx))
   ext x
   change α x = x
@@ -291,7 +291,7 @@ theorem mulAut_fixes_char_of_id_on_summand_triv_complement {Hbar : Type*} [Group
     (θ : IrreducibleCharacter Hbar)
     (htriv : ∀ w ∈ W, (θ : ClassFunction Hbar ℂ) w = (θ : ClassFunction Hbar ℂ) 1) :
     ∀ x, (θ : ClassFunction Hbar ℂ) (φg x) = (θ : ClassFunction Hbar ℂ) x := by
-  haveI : IsMulCommutative Hbar := inferInstance
+  have : IsMulCommutative Hbar := inferInstance
   obtain ⟨χ, hχ⟩ := θ.isIrreducible.exists_linearIrreducibleCharacter_eq_of_isMulCommutative
   have hcoe : ∀ x, (θ : ClassFunction Hbar ℂ) x = (χ x : ℂ) := by
     intro x; rw [← hχ]; exact linearIrreducibleCharacter_apply χ x
@@ -302,7 +302,7 @@ theorem mulAut_fixes_char_of_id_on_summand_triv_complement {Hbar : Type*} [Group
     have h1 := htriv w hw
     rw [hcoe, hcoe] at h1
     rw [h1, map_one, Units.val_one]
-  letI : CommGroup Hbar :=
+  let : CommGroup Hbar :=
     { (inferInstance : Group Hbar) with mul_comm := isMulCommutative_iff.mp inferInstance }
   intro x
   -- Decompose `x = s * w` with `s ∈ S₀`, `w ∈ W`.
@@ -321,7 +321,7 @@ theorem mulAut_fixes_char_of_id_on_summand_triv_complement {Hbar : Type*} [Group
 construction of Peterfalvi (9.8.c): a character nontrivial on each order-`p` Clifford summand. -/
 theorem exists_ne_one_hom_of_prime_card {K : Type*} [CommGroup K] [Finite K]
     (hp : (Nat.card K).Prime) : ∃ ψ : K →* ℂˣ, ψ ≠ 1 := by
-  haveI : Nontrivial K := Finite.one_lt_card_iff_nontrivial.mp hp.one_lt
+  have : Nontrivial K := Finite.one_lt_card_iff_nontrivial.mp hp.one_lt
   obtain ⟨a, ha⟩ := exists_ne (1 : K)
   obtain ⟨ψ, hψa⟩ :=
     CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity (G := K) (M := ℂ) ha
@@ -337,7 +337,7 @@ theorem exists_ne_one_hom_comp_ne {K K' : Type*} [CommGroup K] [CommGroup K'] [F
     (hp : 3 ≤ Nat.card K') (α : K ≃* K') (A : K →* ℂˣ) :
     ∃ B : K' →* ℂˣ, B ≠ 1 ∧ B.comp α.toMonoidHom ≠ A := by
   classical
-  haveI : Fintype (K' →* ℂˣ) := Fintype.ofFinite _
+  have : Fintype (K' →* ℂˣ) := Fintype.ofFinite _
   set C : K' →* ℂˣ := A.comp α.symm.toMonoidHom with hC
   by_contra hcon
   push Not at hcon
@@ -448,6 +448,7 @@ theorem constant_of_perm_invariant_of_transitive {ι α : Type*}
   obtain ⟨k, hk⟩ := htrans i j
   rw [← hk, key]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Regular character from a bijective product map.**  The char-construction core of
 `exists_regular_char`, taking the internal-direct-product witness as `noncommPiCoprod` *bijective*
 (rather than `iSupIndep` + spanning).  This lets the elementary `(9.7)` count
@@ -474,6 +475,7 @@ theorem exists_regular_char_of_bijective {Hbar : Type*} [CommGroup Hbar] [Finite
     MonoidHom.noncommPiCoprod_mulSingle]
   exact hz
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **A character with prescribed restriction to each factor**, from a bijective product map.
 Given per-factor characters `ψ i : S i →* ℂˣ`, the composite `(∏ ψ) ∘ e⁻¹` (with `e` the
 internal-direct-product iso) restricts to `ψ i` on `S i`.  The construction underlying
@@ -556,7 +558,7 @@ theorem card_regular_chars {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
     {p : ℕ} (hp : ∀ i, Nat.card ↥(S i) = p) :
     Nat.card {χ : Hbar →* ℂˣ // ∀ i, χ.comp (S i).subtype ≠ 1} = (p - 1) ^ (Fintype.card ι) := by
   classical
-  haveI : ∀ i, Fintype (↥(S i) →* ℂˣ) := fun _ => Fintype.ofFinite _
+  have : ∀ i, Fintype (↥(S i) →* ℂˣ) := fun _ => Fintype.ofFinite _
   have e1 : {χ : Hbar →* ℂˣ // ∀ i, χ.comp (S i).subtype ≠ 1} ≃
       {ψ : ∀ i, ↥(S i) →* ℂˣ // ∀ i, ψ i ≠ 1} :=
     (charRestrictEquiv hcomm hbij).subtypeEquiv (fun _ => Iff.rfl)
@@ -627,7 +629,7 @@ theorem exists_regular_char {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
     (hindep : iSupIndep Hpart) (hspan : ⨆ i, Hpart i = ⊤)
     (hp : ∀ i, (Nat.card ↥(Hpart i)).Prime) :
     ∃ θ : Hbar →* ℂˣ, ∀ i, ∃ x ∈ Hpart i, θ x ≠ 1 := by
-  haveI : Fintype ι := Fintype.ofFinite ι
+  have : Fintype ι := Fintype.ofFinite ι
   have hcomm : Pairwise fun i j : ι => ∀ x y : Hbar, x ∈ Hpart i → y ∈ Hpart j → Commute x y :=
     fun i j _ x y _ _ => mul_comm x y
   refine exists_regular_char_of_bijective hcomm ⟨?_, ?_⟩ hp
@@ -719,7 +721,7 @@ theorem card_regular_chars_Hbar [Finite G] {M : Subgroup G} {data : TypesIIIIIIV
     (caseA : CliffordCaseAData chars) :
     Nat.card {χ : (↥data.H ⧸ chief.N) →* ℂˣ // ∀ i, χ.comp (caseA.Hpart i).subtype ≠ 1}
       = (chief.p - 1) ^ data.q := by
-  haveI : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+  have : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
   have hcomm : Pairwise fun i j : Fin data.q =>
       ∀ x y : (↥data.H ⧸ chief.N), x ∈ caseA.Hpart i → y ∈ caseA.Hpart j → Commute x y :=
     fun i j _ x y _ _ => mul_comm x y
@@ -782,7 +784,7 @@ theorem centralizer_map_mk'_eq_of_coprime_zpowers {Γ : Type*} [Group Γ] [Finit
       change (MulAut.conj (c : Γ)) n ∈ N
       rw [MulAut.conj_apply]
       exact (inferInstance : N.Normal).conj_mem n hn (c : Γ)
-    haveI : IsCyclic ↥(Subgroup.zpowers x) := Subgroup.isCyclic_zpowers x
+    have : IsCyclic ↥(Subgroup.zpowers x) := Subgroup.isCyclic_zpowers x
     have hcomm : Commute (QuotientGroup.mk' N x) (QuotientGroup.mk' N g) :=
       Subgroup.mem_centralizer_iff.mp hgbar _ (Set.mem_singleton _)
     have hg_fix : ∀ c : ↥(Subgroup.zpowers x), ∃ n ∈ N, φ c g = g * n := by

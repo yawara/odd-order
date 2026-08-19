@@ -61,7 +61,7 @@ theorem det_eq_one_of_compLinearMap_alternating [Finite ι]
     (hω : ω ≠ 0) {f : M →ₗ[R] M} (hf : ω.compLinearMap f = ω) :
     LinearMap.det f = 1 := by
   classical
-  haveI : Fintype ι := Fintype.ofFinite ι
+  have : Fintype ι := Fintype.ofFinite ι
   have hbasis : ω e ≠ 0 := (ω.map_basis_ne_zero_iff e).mpr hω
   -- `ω (f ∘ e) = ω e` (preservation) and `= ω e * det f` (top-form scaling).
   have h2 : ω (⇑f ∘ ⇑e) = ω ⇑e := by
@@ -291,7 +291,7 @@ private theorem card_dvd_of_injective_to_cyclic_forall_pow {C : Type*}
     [Group C] [Finite C] [IsCyclic C] (μ : K →* C) (hμ : Function.Injective μ)
     {n : ℕ} (h : ∀ k : K, μ k ^ n = 1) : Nat.card K ∣ n := by
   have hKn : ∀ k : K, k ^ n = 1 := fun k => hμ (by rw [map_pow, h k, map_one])
-  haveI : IsCyclic K := isCyclic_of_surjective (MonoidHom.ofInjective hμ).symm.toMonoidHom
+  have : IsCyclic K := isCyclic_of_surjective (MonoidHom.ofInjective hμ).symm.toMonoidHom
     (MonoidHom.ofInjective hμ).symm.surjective
   obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := K)
   rw [(orderOf_eq_card_of_forall_mem_zpowers hg).symm]
@@ -324,14 +324,14 @@ theorem card_dvd_succ_of_primeAction_extraspecial (_hodd : Odd p)
     (hKcyc : IsCyclic K) (hKp' : ¬ p ∣ Nat.card K) (hndvd : ¬ Nat.card K ∣ p - 1) :
     Nat.card K ∣ p + 1 := by
   classical
-  haveI : NeZero p := ⟨Fact.out (p := p.Prime).ne_zero⟩
+  have : NeZero p := ⟨Fact.out (p := p.Prime).ne_zero⟩
   -- `V = P / Z(P)` is an elementary abelian `𝔽_p`-space.
   have hEA : IsElementaryAbelian p (P ⧸ commutator P) :=
     IsElementaryAbelian.of_mulEquiv
       (QuotientGroup.quotientMulEquivOfEq hP.commutator_eq_frattini).symm
       (IsPGroup.quotient_frattini_isElementaryAbelian hP.isPGroup)
-  haveI hVcomm : IsMulCommutative (P ⧸ commutator P) := ⟨⟨hEA.comm⟩⟩
-  haveI hVmod : Module (ZMod p) (Additive (P ⧸ commutator P)) :=
+  have hVcomm : IsMulCommutative (P ⧸ commutator P) := ⟨⟨hEA.comm⟩⟩
+  have hVmod : Module (ZMod p) (Additive (P ⧸ commutator P)) :=
     AddCommGroup.zmodModule (n := p) (fun x => by
       apply Additive.toMul.injective
       rw [toMul_nsmul, toMul_zero]
@@ -413,7 +413,7 @@ theorem card_dvd_succ_of_primeAction_extraspecial (_hodd : Odd p)
       (QuotientGroup.eq_one_iff x).mpr hxZ]
     rfl
   -- `ρ` is faithful.
-  haveI hVnt : Nontrivial (Additive (P ⧸ commutator P)) :=
+  have hVnt : Nontrivial (Additive (P ⧸ commutator P)) :=
     Module.nontrivial_of_finrank_eq_succ (n := 1) (by rw [hdim])
   have hfaith : Function.Injective ρ := by
     intro a b hab
@@ -469,7 +469,7 @@ theorem card_dvd_succ_of_primeAction_extraspecial (_hodd : Odd p)
   have hirr : Representation.IsIrreducible ρ := by
     have hbnt : (⊥ : Subrepresentation ρ) ≠ ⊤ := fun h =>
       bot_ne_top (congrArg Subrepresentation.toSubmodule h)
-    haveI : Nontrivial (Subrepresentation ρ) := ⟨⊥, ⊤, hbnt⟩
+    have : Nontrivial (Subrepresentation ρ) := ⟨⊥, ⊤, hbnt⟩
     refine ⟨fun W => ?_⟩
     by_contra hW
     push Not at hW
@@ -478,7 +478,7 @@ theorem card_dvd_succ_of_primeAction_extraspecial (_hodd : Odd p)
       hWbot (Subrepresentation.toSubmodule_injective (by rw [h]; rfl))
     have hWsub_top : W.toSubmodule ≠ ⊤ := fun h =>
       hWtop (Subrepresentation.toSubmodule_injective (by rw [h]; rfl))
-    haveI : Module.Finite (ZMod p) ↥W.toSubmodule := Module.Finite.of_finite
+    have : Module.Finite (ZMod p) ↥W.toSubmodule := Module.Finite.of_finite
     have hpos : 0 < Module.finrank (ZMod p) ↥W.toSubmodule := by
       have := Submodule.finrank_lt_finrank_of_lt (s := (⊥ : Submodule (ZMod p) _))
         (t := W.toSubmodule) (lt_of_le_of_ne bot_le (Ne.symm hWsub_bot))
@@ -506,26 +506,26 @@ theorem card_dvd_succ_of_primeAction_extraspecial (_hodd : Odd p)
   have hcommK : ∀ a b : K, a * b = b * a :=
     ((MonoidHom.id K).isMulCommutative_of_isCyclic_of_ker_le_center
       (by rw [MonoidHom.ker_id]; exact bot_le)).is_comm.comm
-  letI : Module (MonoidAlgebra (ZMod p) K) (Additive (P ⧸ commutator P)) :=
+  let : Module (MonoidAlgebra (ZMod p) K) (Additive (P ⧸ commutator P)) :=
     Module.compHom (Additive (P ⧸ commutator P)) (ρ.asAlgebraHom).toRingHom
   have hsmul : ∀ (k : K) (x : Additive (P ⧸ commutator P)),
       MonoidAlgebra.of (ZMod p) K k • x = ρ k x := fun k x => by
     change (ρ.asAlgebraHom (MonoidAlgebra.of (ZMod p) K k)) x = ρ k x
     rw [Representation.asAlgebraHom_of]
-  haveI : IsSimpleModule (MonoidAlgebra (ZMod p) K) (Additive (P ⧸ commutator P)) :=
+  have : IsSimpleModule (MonoidAlgebra (ZMod p) K) (Additive (P ⧸ commutator P)) :=
     (Representation.irreducible_iff_isSimpleModule_asModule ρ).mp hirr
   -- Realize the Singer field `Kf = 𝔽_p[K]/I ≅ 𝔽_{p²}` with `μ : K ↪ Kfˣ` (no `CommGroup K`
   -- instance: the commutative `𝔽_p[K]` is built from the commutativity *proof*).
-  letI : CommRing (MonoidAlgebra (ZMod p) K) :=
+  let : CommRing (MonoidAlgebra (ZMod p) K) :=
     { (inferInstance : Ring (MonoidAlgebra (ZMod p) K)) with
       mul_comm := OddOrder.RepresentationTheory.mul_comm_monoidAlgebra_of_comm hcommK }
   obtain ⟨I, hImax, ⟨lequiv⟩⟩ :=
     (isSimpleModule_iff_quot_maximal (R := MonoidAlgebra (ZMod p) K)
       (M := Additive (P ⧸ commutator P))).mp ‹_›
-  haveI : I.IsMaximal := hImax
-  letI : Field (MonoidAlgebra (ZMod p) K ⧸ I) := Ideal.Quotient.field I
-  haveI : Finite (MonoidAlgebra (ZMod p) K ⧸ I) := Finite.of_equiv _ lequiv.toEquiv
-  haveI : (I : Ideal (MonoidAlgebra (ZMod p) K)).IsTwoSided := inferInstance
+  have : I.IsMaximal := hImax
+  let : Field (MonoidAlgebra (ZMod p) K ⧸ I) := Ideal.Quotient.field I
+  have : Finite (MonoidAlgebra (ZMod p) K ⧸ I) := Finite.of_equiv _ lequiv.toEquiv
+  have : (I : Ideal (MonoidAlgebra (ZMod p) K)).IsTwoSided := inferInstance
   let Kf := MonoidAlgebra (ZMod p) K ⧸ I
   let μ : K →* Kfˣ :=
     (Units.map (Ideal.Quotient.mk I : MonoidAlgebra (ZMod p) K →+* Kf).toMonoidHom).comp

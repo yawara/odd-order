@@ -694,7 +694,7 @@ theorem mem_normalizer_of_mem_normalizer_subgroupOf {K S : Subgroup G} (hSK : S 
 Step 4 の Sylow 結論部と Step 5 の「`R ⊓ P > S`」の両方で使う。 -/
 theorem lt_inf_normalizer_of_lt_of_isPGroup {p : ℕ} [Fact p.Prime] [Finite G] {S P : Subgroup G}
     (hP : IsPGroup p ↥P) (hlt : S < P) : S < P ⊓ Subgroup.normalizer S := by
-  haveI : Group.IsNilpotent ↥P := hP.isNilpotent
+  have : Group.IsNilpotent ↥P := hP.isNilpotent
   have hsub : S.subgroupOf P < ⊤ := by
     rw [lt_top_iff_ne_top]
     intro h
@@ -743,8 +743,8 @@ theorem not_dvd_index_of_normalizer_le {p : ℕ} [Fact p.Prime] [Finite G]
 /-- 非自明な有限 `p`-群 `P` の中心化群は非自明 (`Z(P) ≠ 1` から)。 -/
 theorem centralizer_ne_bot_of_isPGroup {p : ℕ} [Fact p.Prime] [Finite G] {P : Subgroup G}
     (hP : IsPGroup p ↥P) (hPbot : P ≠ ⊥) : Subgroup.centralizer (P : Set G) ≠ ⊥ := by
-  haveI : Nontrivial ↥P := (Subgroup.nontrivial_iff_ne_bot P).mpr hPbot
-  haveI := hP.center_nontrivial
+  have : Nontrivial ↥P := (Subgroup.nontrivial_iff_ne_bot P).mpr hPbot
+  have := hP.center_nontrivial
   obtain ⟨z, hz⟩ := exists_ne (1 : ↥(Subgroup.center ↥P))
   refine fun hbot => hz ?_
   have hmem : ((z : ↥P) : G) ∈ Subgroup.centralizer (P : Set G) := by
@@ -873,8 +873,8 @@ theorem bartels_step_five {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
     {M N : Subgroup G} (hM : IsCoatom M) (hN : IsCoatom N) (hXM : X ≤ M) (hXN : X ≤ N) :
     M = N := by
   by_contra hMN
-  haveI : Finite (Subgroup G) := Finite.of_injective _ (SetLike.coe_injective (A := Subgroup G))
-  haveI : WellFoundedGT (Subgroup G) := Finite.to_wellFoundedGT
+  have : Finite (Subgroup G) := Finite.of_injective _ (SetLike.coe_injective (A := Subgroup G))
+  have : WellFoundedGT (Subgroup G) := Finite.to_wellFoundedGT
   have hcand : ∃ S : Subgroup G, IsBartelsPairSylow p X S := by
     obtain ⟨S, hXS, hSMN, hSp, hSidx⟩ := exists_sylow_ge_of_isPGroup (le_inf hXM hXN) hXp
     exact ⟨S, M, N, hM, hN, hMN, hXS, hSMN, hSp, hSidx⟩
@@ -893,8 +893,8 @@ theorem bartels_step_five {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
   -- (2) `S` は `G` に normal でない: さもなくば `X ◁◁ G` で `X^{(G)} = X` が subnormal.
   have hNStop : Subgroup.normalizer (S : Set G) ≠ ⊤ := by
     intro htop
-    haveI : S.Normal := Subgroup.normalizer_eq_top_iff.mp htop
-    haveI : Group.IsNilpotent ↥S := hSp.isNilpotent
+    have : S.Normal := Subgroup.normalizer_eq_top_iff.mp htop
+    have : Group.IsNilpotent ↥S := hSp.isNilpotent
     have hXsn : X.IsSubnormal :=
       Subgroup.IsSubnormal.trans hXS
         (OddOrder.Isaacs.Ch02.isSubnormal_of_isNilpotent_finite (X.subgroupOf S))
@@ -972,7 +972,7 @@ theorem bartels_step_six {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
   have hXne : X ≠ ⊤ := fun h => hKtop (top_le_iff.mp (h ▸ le_strongClosure X))
   -- `W = X^G` (正規閉包).
   set W : Subgroup G := Subgroup.normalClosure (X : Set G) with hWdef
-  haveI : W.Normal := Subgroup.normalClosure_normal
+  have : W.Normal := Subgroup.normalClosure_normal
   have hXW : X ≤ W := Subgroup.subset_normalClosure
   have hWfix : ∀ g : G, ConjAct.toConjAct g • W = W := fun g =>
     Subgroup.conjAct_pointwise_smul_eq_self
@@ -1027,8 +1027,8 @@ theorem bartels_step_six {G : Type u} [Group G] [Finite G] (hIH : BartelsIH G)
 theorem strongClosure_isSubnormal_of_bartelsIH {G : Type u} [Group G] [Finite G]
     (hIH : BartelsIH G) (X : Subgroup G) : (strongClosure X).IsSubnormal := by
   by_contra hX
-  haveI : Finite (Subgroup G) := Finite.of_injective _ (SetLike.coe_injective (A := Subgroup G))
-  haveI : WellFoundedLT (Subgroup G) := Finite.to_wellFoundedLT
+  have : Finite (Subgroup G) := Finite.of_injective _ (SetLike.coe_injective (A := Subgroup G))
+  have : WellFoundedLT (Subgroup G) := Finite.to_wellFoundedLT
   obtain ⟨X₀, hX₀, hX₀min⟩ :=
     exists_minimal_of_wellFoundedLT
       (fun Y : Subgroup G => ¬ (strongClosure Y).IsSubnormal) ⟨X, hX⟩
@@ -1037,7 +1037,7 @@ theorem strongClosure_isSubnormal_of_bartelsIH {G : Type u} [Group G] [Finite G]
     by_contra hYc
     exact hY.ne (le_antisymm hY.le (hX₀min hYc hY.le))
   obtain ⟨p, hp, hX₀p⟩ := bartels_step_two hmin hX₀
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hX₀bot : X₀ ≠ ⊥ := by
     intro h
     exact hX₀ (by rw [h, strongClosure_bot]; exact Subgroup.IsSubnormal.bot)

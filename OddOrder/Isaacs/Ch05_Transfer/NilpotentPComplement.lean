@@ -41,7 +41,7 @@ theorem not_dvd_card_of_isComplement'_sylow {K : Subgroup H} (P : Sylow p H)
   have hcardP : Nat.card ↥(P : Subgroup H) = p ^ (Nat.card H).factorization p :=
     P.card_eq_multiplicity
   have hpow : p ^ ((Nat.card H).factorization p + 1) ∣ Nat.card H := by
-    conv_rhs => rw [← hC.card_mul]
+    conv_rhs => rw [← hC.card_mul_card]
     rw [pow_succ, mul_comm (p ^ _) p, ← hcardP]
     exact mul_dvd_mul hdvd dvd_rfl
   have := (Nat.Prime.pow_dvd_iff_le_factorization hp.out Nat.card_pos.ne').mp hpow
@@ -61,14 +61,14 @@ theorem eq_of_normal_pcomplement {K K' : Subgroup H} [K.Normal] [K'.Normal]
       Subgroup.IsComplement' L (Q : Subgroup H) →
       Subgroup.IsComplement' L' (Q' : Subgroup H) → L' ≤ L := by
     intro L L' Q Q' hLn hL'n hL hL'
-    haveI := hLn
+    have := hLn
     -- the image of `L'` in `H ⧸ L` has order dividing both a `p'`-number and a `p`-power
     have h1 : Nat.card ↥(L'.map (QuotientGroup.mk' L)) ∣ Nat.card L' :=
       Subgroup.card_map_dvd _ _
     have h2 : Nat.card ↥(L'.map (QuotientGroup.mk' L)) ∣ p ^ (Nat.card H).factorization p := by
       have hquot : Nat.card (H ⧸ L) = p ^ (Nat.card H).factorization p := by
         have hidx : L.index = Nat.card ↥(Q : Subgroup H) := by
-          have hmul := hL.card_mul
+          have hmul := hL.card_mul_card
           have hmul' := Subgroup.card_mul_index (H := L)
           exact Nat.eq_of_mul_eq_mul_left Nat.card_pos (by rw [hmul, hmul'])
         rw [← Q.card_eq_multiplicity, ← hidx]
@@ -92,7 +92,7 @@ theorem eq_of_normal_pcomplement {K K' : Subgroup H} [K.Normal] [K'.Normal]
 theorem map_mulAut_of_normal_pcomplement {K : Subgroup H} [K.Normal]
     {P : Sylow p H} (hK : Subgroup.IsComplement' K (P : Subgroup H)) (ψ : MulAut H) :
     K.map ψ.toMonoidHom = K := by
-  haveI hmapn : (K.map ψ.toMonoidHom).Normal :=
+  have hmapn : (K.map ψ.toMonoidHom).Normal :=
     Subgroup.Normal.map ‹K.Normal› ψ.toMonoidHom ψ.surjective
   -- `ψ • P` is a Sylow `p`-subgroup with carrier `ψ(P)`
   have hPcoe : ((ψ • P : Sylow p H) : Subgroup H) = (P : Subgroup H).map ψ.toMonoidHom := by
@@ -105,7 +105,7 @@ theorem map_mulAut_of_normal_pcomplement {K : Subgroup H} [K.Normal]
     · rw [(Nat.card_congr (Subgroup.equivMapOfInjective _ _ ψ.injective).toEquiv).symm,
         (Nat.card_congr
           (Subgroup.equivMapOfInjective (P : Subgroup H) _ ψ.injective).toEquiv).symm]
-      exact hK.card_mul
+      exact hK.card_mul_card
     · rw [disjoint_iff, ← Subgroup.map_inf _ _ ψ.toMonoidHom ψ.injective,
         disjoint_iff.mp hK.disjoint, Subgroup.map_bot]
   exact eq_of_normal_pcomplement hcompl hK
@@ -157,8 +157,8 @@ theorem hasNormalPComplement_of_isNilpotent [Group.IsNilpotent H] :
     rw [hv₁, Pi.mulSingle_eq_same, hv₂, Pi.mulSingle_eq_same]
   -- the kernel of `f` complements the (unique) Sylow `p`-subgroup
   refine ⟨f.ker, inferInstance, fun Q => ?_⟩
-  haveI : Subsingleton (Sylow p H) := by
-    haveI := Sylow.unique_of_normal P inferInstance
+  have : Subsingleton (Sylow p H) := by
+    have := Sylow.unique_of_normal P inferInstance
     infer_instance
   rw [Subsingleton.elim Q P]
   -- coprime cardinalities: `[H : ker f] = |P|` is the full `p`-part

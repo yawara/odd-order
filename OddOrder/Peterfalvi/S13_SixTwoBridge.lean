@@ -62,7 +62,7 @@ theorem mderivSharp_subset_A0 (hyp : Hypothesis M) :
 /-- **`h1A` pin: `1 ∉ A₀(M)`** (`S04.Hypothesis.ne_one`: the Dade support avoids the
 identity). -/
 theorem one_notMem_A0 (hyp : Hypothesis M) : (1 : ↥M) ∉ hyp.A0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   intro h
   exact hyp.dadeData.dade.ne_one (a := ((1 : ↥M) : G)) h (OneMemClass.coe_one M)
 
@@ -80,7 +80,7 @@ theorem coprime_card_W1_derived [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
     (htype : IsTypeIII M ∨ IsTypeIV M) :
     Nat.Coprime (Nat.card ↥hyp.W1) (Nat.card ↥(derivedInG M)) := by
-  haveI : Fintype G := Fintype.ofFinite _
+  have : Fintype G := Fintype.ofFinite _
   have hnt : TypePNontrivialCore M hyp.typeP :=
     typePNontrivialCore_of_isTypeIIIorIV htype hyp.typeP
   have hU : hyp.typeP.U ≠ ⊥ := hnt.1
@@ -105,7 +105,7 @@ theorem coprime_card_W1_derived [Finite G]
   -- combine over `|M'| = |H| · |U|` (`derived_complement`).
   have hcard : Nat.card ↥(derivedInG M)
       = Nat.card ↥hyp.typeP.H * Nat.card ↥hyp.typeP.U := by
-    have hmul := hyp.typeP.derived_complement.card_mul
+    have hmul := hyp.typeP.derived_complement.card_mul_card
     rw [← hmul,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.typeP.H_le).toEquiv,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.typeP.U_le).toEquiv]
@@ -134,25 +134,25 @@ theorem exists_anchor [Finite G]
 `M'/(X ⊓ M')` is a nontrivial solvable group, so its commutator subgroup is proper.  This is the
 hypothesis feeding both the anchor (`exists_anchor`) and the `S(X)`-nonemptiness
 (`inducedKernelFamily_nonempty_of_commutator_ne_top`); `M` is solvable as a proper subgroup of
-the minimal counterexample (`solvable_of_lt_top`). -/
+the minimal counterexample (`isSolvable_of_lt_top`). -/
 theorem commutator_quotient_ne_top [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
     {X : Subgroup ↥M} [(X.subgroupOf ((derivedInG M).subgroupOf M)).Normal]
     (hXne : X.subgroupOf ((derivedInG M).subgroupOf M) ≠ ⊤) :
     commutator (↥((derivedInG M).subgroupOf M)
       ⧸ X.subgroupOf ((derivedInG M).subgroupOf M)) ≠ ⊤ := by
-  haveI : IsSolvable ↥M := hG.solvable_of_lt_top M (lt_top_iff_ne_top.mpr hyp.maximal.1)
-  haveI : IsSolvable ↥((derivedInG M).subgroupOf M) := inferInstance
-  haveI : IsSolvable (↥((derivedInG M).subgroupOf M)
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_lt_top M (lt_top_iff_ne_top.mpr hyp.maximal.1)
+  have : Group.IsSolvable ↥((derivedInG M).subgroupOf M) := inferInstance
+  have : Group.IsSolvable (↥((derivedInG M).subgroupOf M)
       ⧸ X.subgroupOf ((derivedInG M).subgroupOf M)) := inferInstance
-  haveI : Nontrivial (↥((derivedInG M).subgroupOf M)
+  have : Nontrivial (↥((derivedInG M).subgroupOf M)
       ⧸ X.subgroupOf ((derivedInG M).subgroupOf M)) := by
     obtain ⟨y, hy⟩ : ∃ y, y ∉ X.subgroupOf ((derivedInG M).subgroupOf M) := by
       by_contra hall
       push Not at hall
       exact hXne ((Subgroup.eq_top_iff' _).mpr hall)
     exact ⟨QuotientGroup.mk y, 1, fun h => hy ((QuotientGroup.eq_one_iff y).mp h)⟩
-  exact (IsSolvable.commutator_lt_top_of_nontrivial _).ne
+  exact (Group.IsSolvable.commutator_lt_top_of_nontrivial _).ne
 
 end Hypothesis
 
@@ -247,8 +247,8 @@ theorem exists_source_index_le_two_psi
         2 * (ClassFunction.induce ((derivedInG M).subgroupOf M)
           (θ : ClassFunction
             ↥((derivedInG M).subgroupOf M) ℂ) 1).re := by
-  haveI := hyp.finiteG
-  haveI : ((derivedInG M).subgroupOf M).Normal := by
+  have := hyp.finiteG
+  have : ((derivedInG M).subgroupOf M).Normal := by
     rw [derivedInG, Subgroup.subgroupOf,
       Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
     infer_instance
@@ -312,7 +312,7 @@ theorem exists_source_index_le_two_psi_of_ne_top
         2 * (ClassFunction.induce ((derivedInG M).subgroupOf M)
           (θ : ClassFunction
             ↥((derivedInG M).subgroupOf M) ℂ) 1).re := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   refine hyp.exists_source_index_le_two_psi hG
     (exists_anchor (hyp.commutator_quotient_ne_top hG hA'ne)) ?_ hdatum hAcoh hBncoh
   exact OddOrder.Peterfalvi.S08.inducedKernelFamily_nonempty_of_commutator_ne_top
@@ -359,7 +359,7 @@ theorem sixTwoDecompositionData_of_reducible_break [Finite G]
             (hyp.dadeData.dade.fullDadeIsometryData)) χ 0,
         D.imageFamily.Orthogonal Da.imageFamily ∧
         D.tau1 χ = hS₁coh.extension χ := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   -- ψ is a nonzero μ-column sum; pick its conjugate column
   obtain ⟨k, hk0, hψcol⟩ := hyp.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum
@@ -646,7 +646,7 @@ theorem sixTwoMemberDatum_of_reducible_member [Finite G]
           (card_odd_of_isMinimalSimpleOdd hG hyp) hyp.mderivSharp_subset_A0 hS₁sub hψB hψirr
           hψnotS1 hψcnotS1 hχ₁S₁ hψdeg).1.imageFamily ∧
       D.tau1 χ = hS₁coh.extension χ := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   obtain ⟨hSne, sExt, hSie, hSeos, hSmz⟩ := hS₁coh
   -- `χ` is a nonzero μ-column sum; pick its conjugate column
@@ -931,8 +931,8 @@ theorem six_two_dichotomy_bound
     (Nat.card (↥((derivedInG M).subgroupOf M) ⧸
         A'.subgroupOf ((derivedInG M).subgroupOf M)) : ℝ) - 1 ≤
       2 * (C.index : ℝ) * Real.sqrt (Nat.card (↥C ⧸ D.subgroupOf C) : ℝ) := by
-  haveI := hyp.finiteG
-  haveI : Fintype ↥C := Fintype.ofFinite _
+  have := hyp.finiteG
+  have : Fintype ↥C := Fintype.ofFinite _
   exact OddOrder.Peterfalvi.S08.six_two_general hBD hCK hcentral
     (hyp.exists_source_of_coherence_dichotomy hG hmu hδpm hδj hzS hz1 htype hnt chief hA'ne hBne
         hAcoh hBncoh)

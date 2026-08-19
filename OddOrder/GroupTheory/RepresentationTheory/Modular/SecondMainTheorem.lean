@@ -113,11 +113,11 @@ theorem generalizedDecompositionNumber_eq_zero (hp : p.Prime) {x : G} (hx : IsPE
         (fun g => LinearMap.trace K V (σ g))
         (fun _ _ hgh => character_eq_of_isConj σ hgh) j = 0 := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Fintype ↥(centralizerOf x) := Fintype.ofFinite _
-  haveI : Fintype ι' := Fintype.ofFinite ι'
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
-  haveI : NeZero (Nat.card ↥(centralizerOf x) : K) :=
+  have : Fintype G := Fintype.ofFinite G
+  have : Fintype ↥(centralizerOf x) := Fintype.ofFinite _
+  have : Fintype ι' := Fintype.ofFinite ι'
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : NeZero (Nat.card ↥(centralizerOf x) : K) :=
     ⟨Nat.cast_ne_zero.mpr Nat.card_pos.ne'⟩
   -- `x` lies in `H = C_G(x)` and is central there
   have hxmem : x ∈ centralizerOf x := Subgroup.mem_centralizer_iff.mpr (by rintro y rfl; rfl)

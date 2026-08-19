@@ -51,7 +51,7 @@ variable {G Ω : Type*} [Group G] [MulAction G Ω]
 lemma prime_card_of_isCoatom_bot [Finite G] (h : IsCoatom (⊥ : Subgroup G)) :
     (Nat.card G).Prime := by
   classical
-  haveI := Fintype.ofFinite G
+  have := Fintype.ofFinite G
   have hnt : Nontrivial G := by
     by_contra hc
     rw [not_nontrivial_iff_subsingleton] at hc
@@ -60,7 +60,7 @@ lemma prime_card_of_isCoatom_bot [Finite G] (h : IsCoatom (⊥ : Subgroup G)) :
   have hcard1 : Nat.card G ≠ 1 := fun hc =>
     (not_nontrivial_iff_subsingleton.mpr (Nat.card_eq_one_iff_unique.mp hc).1) hnt
   obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hcard1
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨y, hy⟩ := exists_prime_orderOf_dvd_card (G := G) p
     (by rwa [← Nat.card_eq_fintype_card])
   have hy1 : y ≠ 1 := fun hc => hp.ne_one (by rw [hc, orderOf_one] at hy; exact hy.symm)
@@ -109,7 +109,7 @@ theorem stabilizer_eq_bot_and_prime_card_of_fixed_point [Finite G] [FaithfulSMul
     simp only [mem_stabilizer_iff, mul_smul, inv_smul_eq_iff]
   have hgnorm : g ∈ Subgroup.normalizer (stabilizer G α) :=
     Subgroup.mem_normalizer_iff''.mpr hconj
-  haveI hnormal : (stabilizer G α).Normal := by
+  have hnormal : (stabilizer G α).Normal := by
     rw [← Subgroup.normalizer_eq_top_iff]
     exact hcoatom.2 _ (lt_of_le_of_ne Subgroup.le_normalizer fun hc => hgnot (hc ▸ hgnorm))
   -- 正規な点安定化群はすべての点を固定 ⟹ 忠実性から自明。
@@ -189,7 +189,7 @@ theorem card_stabilizer_eq_two_of_suborbit_ncard_eq_two [Finite G] [FaithfulSMul
     rw [hDeq, hcardeq] at hcardα
     omega
   -- 極大性 ⟹ `G_α ⊔ G_β = ⊤` ⟹ `D ⊴ G`。
-  haveI : (stabilizer G β ⊓ stabilizer G α).Normal := by
+  have : (stabilizer G β ⊓ stabilizer G α).Normal := by
     rw [← Subgroup.normalizer_eq_top_iff]
     refine eq_top_iff.mpr ?_
     have hjoin : stabilizer G α ⊔ stabilizer G β = ⊤ :=
@@ -231,7 +231,7 @@ lemma inf_stabilizer_eq_bot_of_card_stabilizer_eq_two [Finite G] [FaithfulSMul G
 lemma odd_card_of_card_stabilizer_eq_two [Finite G] [Finite Ω] [FaithfulSMul G Ω]
     [IsPreprimitive G Ω] [Nontrivial Ω] {α : Ω}
     (hcard : Nat.card ↥(stabilizer G α) = 2) : Odd (Nat.card Ω) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hpg : IsPGroup 2 ↥(stabilizer G α) := IsPGroup.of_card (n := 1) (by simpa using hcard)
   have hfix : MulAction.fixedPoints ↥(stabilizer G α) Ω = {α} := by
     ext γ
@@ -267,7 +267,7 @@ theorem exists_regular_normal_of_card_stabilizer_eq_two [Finite G] [Finite Ω]
     (hcard : Nat.card ↥(stabilizer G α) = 2) :
     ∃ K : Subgroup G, K.Normal ∧ Nat.card ↥K = Nat.card Ω ∧
       K ⊓ stabilizer G α = ⊥ ∧ Function.Bijective (smulBase K α) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hodd : Odd (Nat.card Ω) := odd_card_of_card_stabilizer_eq_two hcard
   have hΩ2 : ¬ (2 ∣ Nat.card Ω) := by
     obtain ⟨k, hk⟩ := hodd
@@ -292,7 +292,7 @@ theorem exists_regular_normal_of_card_stabilizer_eq_two [Finite G] [Finite Ω]
     OddOrder.GroupTheory.exists_normal_complement_of_isCyclic_sylow P hPcyc
       (by rw [hPcoe, hcard, Nat.totient_two]; exact Nat.coprime_one_right _)
   rw [hPcoe, hcard] at hKcard
-  haveI := hKnormal
+  have := hKnormal
   have hKΩ : Nat.card ↥K = Nat.card Ω := by omega
   -- `|K|` は奇数なので `K ⊓ G_α = 1`。
   have hinf : K ⊓ stabilizer G α = ⊥ := by
@@ -330,10 +330,10 @@ theorem exists_inverting_involution_of_card_stabilizer_eq_two [Finite G] [Finite
       stabilizer G α = Subgroup.zpowers t ∧ orderOf t = 2 ∧
       ∀ k ∈ K, t * k * t⁻¹ = k⁻¹ := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨K, hKnormal, hKΩ, hKinf, -⟩ :=
     exists_regular_normal_of_card_stabilizer_eq_two hcard
-  haveI := hKnormal
+  have := hKnormal
   have hΩ2 : 2 ≤ Nat.card Ω := by
     have h0 : Nat.card Ω ≠ 0 := Nat.card_pos.ne'
     have h1 : Nat.card Ω ≠ 1 := fun hc =>
@@ -401,7 +401,7 @@ theorem prime_card_of_card_stabilizer_eq_two [Finite G] [Finite Ω] [FaithfulSMu
   classical
   obtain ⟨K, t, hKnormal, hKΩ, hKinf, hsup, hzt, -, hinvK⟩ :=
     exists_inverting_involution_of_card_stabilizer_eq_two hcard
-  haveI := hKnormal
+  have := hKnormal
   have hΩ2 : 2 ≤ Nat.card Ω := by
     have h0 : Nat.card Ω ≠ 0 := Nat.card_pos.ne'
     have h1 : Nat.card Ω ≠ 1 := fun hc =>
@@ -421,7 +421,7 @@ theorem prime_card_of_card_stabilizer_eq_two [Finite G] [Finite Ω] [FaithfulSMu
   -- `K` の部分群は `⊥` か `K` のみ。
   have hsubgroup : ∀ L : Subgroup G, L ≤ K → L = ⊥ ∨ L = K := by
     intro L hLK
-    haveI : L.Normal := by
+    have : L.Normal := by
       have hKnorm : K ≤ Subgroup.normalizer (L : Set G) := by
         intro x hx
         rw [Subgroup.mem_normalizer_iff]
@@ -476,8 +476,8 @@ theorem prime_card_of_card_stabilizer_eq_two [Finite G] [Finite Ω] [FaithfulSMu
   -- 素因数を取り Cauchy。
   have hKne1 : Nat.card ↥K ≠ 1 := by rw [hKΩ]; omega
   obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hKne1
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI := Fintype.ofFinite ↥K
+  have : Fact p.Prime := ⟨hp⟩
+  have := Fintype.ofFinite ↥K
   obtain ⟨y, hy⟩ := exists_prime_orderOf_dvd_card (G := ↥K) p
     (by rwa [← Nat.card_eq_fintype_card])
   have hyord : orderOf (y : G) = p := by rw [← hy, Subgroup.orderOf_coe]
@@ -697,7 +697,7 @@ theorem card_stabilizer_eq_three_mul_two_pow_of_suborbit_ncard_eq_three [Finite 
     have hpos : 0 < Nat.card ↥(stabilizer G α) := Nat.card_pos
     omega
   -- `oddCore D ⊴ G` ⟹ `= ⊥`。
-  haveI : (oddCore (stabilizer G α ⊓ stabilizer G β)).Normal := by
+  have : (oddCore (stabilizer G α ⊓ stabilizer G β)).Normal := by
     rw [← Subgroup.normalizer_eq_top_iff]
     have hcoatom : IsCoatom (stabilizer G α) :=
       IsPreprimitive.isCoatom_stabilizer_of_isPreprimitive (G := G) α
@@ -707,7 +707,7 @@ theorem card_stabilizer_eq_three_mul_two_pow_of_suborbit_ncard_eq_three [Finite 
   have hbot : oddCore (stabilizer G α ⊓ stabilizer G β) = ⊥ :=
     eq_bot_of_normal_le_stabilizer ((oddCore_le _).trans inf_le_left)
   -- `D` は 2-群。
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨e, he⟩ := (isPGroup_two_of_oddCore_eq_bot hbot).exists_card_eq
   exact ⟨e, by rw [← hDcard, he]⟩
 

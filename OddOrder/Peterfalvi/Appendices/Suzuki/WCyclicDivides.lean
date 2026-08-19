@@ -293,8 +293,8 @@ theorem isCyclic_W_and_card_dvd_of_orderThree
         have hrank : Module.finrank (GaloisField 2 m) ↥S = 1 :=
           finrank_span_singleton hvec
         have h2 : Nat.card ↥S = 2 ^ m := by
-          haveI : Fintype ↥S := Fintype.ofFinite _
-          haveI : Fintype (GaloisField 2 m) := Fintype.ofFinite _
+          have : Fintype ↥S := Fintype.ofFinite _
+          have : Fintype (GaloisField 2 m) := Fintype.ofFinite _
           rw [Nat.card_eq_fintype_card, Module.card_eq_pow_finrank
             (K := GaloisField 2 m) (V := ↥S), hrank, pow_one,
             ← Nat.card_eq_fintype_card, GaloisField.card 2 m hm]

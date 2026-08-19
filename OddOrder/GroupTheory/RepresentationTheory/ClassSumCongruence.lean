@@ -265,7 +265,7 @@ theorem exists_central_scalar_asAlgebraHom (ρ : Representation ℂ G V) [IsIrre
 theorem centralScalar_eq (ρ : Representation ℂ G V) [IsIrreducible ρ]
     {x : ℂ[G]} {c : ℂ} (hc : ρ.asAlgebraHom x = c • LinearMap.id) :
     c = LinearMap.trace ℂ V (ρ.asAlgebraHom x) / (finrank ℂ V : ℂ) := by
-  haveI := nontrivial_of_isIrreducible ρ
+  have := nontrivial_of_isIrreducible ρ
   have hfr : (finrank ℂ V : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Module.finrank_pos.ne'
   rw [hc, map_smul, LinearMap.trace_id, smul_eq_mul, mul_div_assoc, div_self hfr, mul_one]
 
@@ -282,13 +282,13 @@ noncomputable def centralCharacterOfRep (ρ : Representation ℂ G V) [IsIrreduc
   toFun x := LinearMap.trace ℂ V (ρ.asAlgebraHom x.val) / (finrank ℂ V : ℂ)
   map_one' := by
     have hfr : (finrank ℂ V : ℂ) ≠ 0 := by
-      haveI := nontrivial_of_isIrreducible ρ
+      have := nontrivial_of_isIrreducible ρ
       exact Nat.cast_ne_zero.mpr Module.finrank_pos.ne'
     change LinearMap.trace ℂ V (ρ.asAlgebraHom (1 : ℂ[G])) / (finrank ℂ V : ℂ) = 1
     rw [map_one, LinearMap.trace_one, div_self hfr]
   map_mul' x y := by
     have hfr : (finrank ℂ V : ℂ) ≠ 0 := by
-      haveI := nontrivial_of_isIrreducible ρ
+      have := nontrivial_of_isIrreducible ρ
       exact Nat.cast_ne_zero.mpr Module.finrank_pos.ne'
     obtain ⟨cx, hcx⟩ := exists_central_scalar_asAlgebraHom ρ x.property
     obtain ⟨cy, hcy⟩ := exists_central_scalar_asAlgebraHom ρ y.property
@@ -312,7 +312,7 @@ noncomputable def centralCharacterOfRep (ρ : Representation ℂ G V) [IsIrreduc
     rw [hadd, map_add, map_add, add_div]
   commutes' r := by
     have hfr : (finrank ℂ V : ℂ) ≠ 0 := by
-      haveI := nontrivial_of_isIrreducible ρ
+      have := nontrivial_of_isIrreducible ρ
       exact Nat.cast_ne_zero.mpr Module.finrank_pos.ne'
     change LinearMap.trace ℂ V (ρ.asAlgebraHom ((algebraMap ℂ (Subalgebra.center ℂ (ℂ[G])) r)).val)
         / (finrank ℂ V : ℂ) = r
@@ -392,7 +392,7 @@ The identity class is the singleton `{1}`, so `ω_ρ(⟦1⟧) = (1 · χ_ρ(1)) 
 theorem centralCharacterOfRep_one (ρ : Representation ℂ G V) [IsIrreducible ρ] :
     centralCharacterOfRep ρ ⟨classSum 1, classSum_mem_center 1⟩ = 1 := by
   classical
-  haveI := nontrivial_of_isIrreducible ρ
+  have := nontrivial_of_isIrreducible ρ
   have hfr : (finrank ℂ V : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Module.finrank_pos.ne'
   have hmk : ConjClasses.mk (1 : G) = (1 : ConjClasses G) := (ConjClasses.one_eq_mk_one).symm
   rw [centralCharacterOfRep_classSum, sum_character_eq_card_mul ρ (1 : ConjClasses G) hmk]
@@ -564,7 +564,7 @@ theorem character_one_mul_centralCharacterOfRep_mk (ρ : Representation ℂ G V)
       = (Nat.card { x : G // ConjClasses.mk x = ConjClasses.mk z } : ℂ) * ρ.character z := by
   rw [centralCharacterOfRep_classSum ρ (ConjClasses.mk z),
     sum_character_eq_card_mul ρ (ConjClasses.mk z) (g := z) rfl, ρ.char_one]
-  haveI := nontrivial_of_isIrreducible ρ
+  have := nontrivial_of_isIrreducible ρ
   have hd : (finrank ℂ V : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Module.finrank_pos.ne'
   field_simp [hd]
 
@@ -585,8 +585,8 @@ theorem centralCharacterOfRep_classSum_isIntegral (ρ : Representation ℂ G V) 
     (C : ConjClasses G) :
     IsIntegral ℤ (ω ρ C) := by
   classical
-  haveI : Finite (ConjClasses G) := Finite.of_surjective _ ConjClasses.mk_surjective
-  haveI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  have : Finite (ConjClasses G) := Finite.of_surjective _ ConjClasses.mk_surjective
+  have : Fintype (ConjClasses G) := Fintype.ofFinite _
   -- The finite spanning set: `{1}` together with all central-character values.
   set s : Set ℂ := insert 1 (Set.range (fun Cs : ConjClasses G => ω ρ Cs)) with hs
   have hsfin : s.Finite := (Set.finite_range _).insert 1
@@ -652,7 +652,7 @@ theorem isIntegral_card_mul_character_div (ρ : Representation ℂ G V) [IsIrred
     IsIntegral ℤ
       ((Nat.card { x : G // ConjClasses.mk x = C } : ℂ) * ρ.character g / ρ.character 1) := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   have hval :
       (Nat.card { x : G // ConjClasses.mk x = C } : ℂ) * ρ.character g / ρ.character 1 =
         centralCharacterOfRep ρ ⟨classSum C, classSum_mem_center C⟩ := by
@@ -695,7 +695,7 @@ integer. -/
 theorem character_isIntegral (ρ : Representation ℂ G V) [Finite G] (g : G) :
     IsIntegral ℤ (ρ.character g) := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   set n : ℕ := Nat.card G with hn_def
   have hn : n ≠ 0 := Nat.card_pos.ne'
   -- `(ρ g) ^ n = ρ (g ^ n) = ρ 1 = 1`, using `g ^ |G| = 1`.
@@ -738,7 +738,7 @@ theorem rep_eq_id_of_character_eq_one (ρ : Representation ℂ G V) [Finite G] {
     (h : ρ.character g = ρ.character 1) :
     ρ g = LinearMap.id := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   set n : ℕ := Nat.card G with hn_def
   have hn : n ≠ 0 := Nat.card_pos.ne'
   -- `(ρ g) ^ n = 1` since `g ^ |G| = 1`.
@@ -814,7 +814,7 @@ This is the general-`g` companion of the central Schur equality `‖χ(z)‖² =
 theorem norm_character_le_finrank (ρ : Representation ℂ G V) [Finite G] (g : G) :
     ‖ρ.character g‖ ≤ (Module.finrank ℂ V : ℝ) := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   set n : ℕ := Nat.card G with hn_def
   have hn : n ≠ 0 := Nat.card_pos.ne'
   have hfn : (ρ g) ^ n = 1 := by rw [← map_pow, pow_card_eq_one', map_one]
@@ -976,6 +976,7 @@ theorem nonidentityZClassCoeffSum_isIntegral (Z : Subgroup G) (Ci Cj : ConjClass
   exact isIntegral_sum_classSum_mul_coeff Ci Cj _
 
 omit [DecidableEq G] [Fintype (ConjClasses G)] in
+set_option backward.isDefEq.respectTransparency false in
 /-- **The term `ψ(1)·a_{ijs}·ω(C_s)` evaluated** (Peterfalvi (6.7.2), per-class term).  For an
 irreducible representation `ρ` with character `ψ = χ_ρ`, the contribution of class `C_s` to
 `ψ(1)·ω(C_i)·ω(C_j)` is `χ_ρ(1)·a_{ijs}·ω_ρ(C_s) = (a_{ijs}|C_s|)·χ_ρ(C_s.out)`, where
@@ -986,7 +987,7 @@ theorem character_one_mul_coeff_mul_centralChar (ρ : Representation ℂ G V) [I
     ρ.character 1 * (((classSum Ci * classSum Cj : ℂ[G]).coeff Cs.out : ℂ) * (ω ρ Cs))
       = (classSumCoeff Ci Cj Cs : ℂ) * ρ.character Cs.out := by
   classical
-  haveI := nontrivial_of_isIrreducible ρ
+  have := nontrivial_of_isIrreducible ρ
   have hd : ρ.character 1 ≠ 0 := by
     rw [ρ.char_one]; exact Nat.cast_ne_zero.mpr Module.finrank_pos.ne'
   have hmkout : ConjClasses.mk Cs.out = Cs := by

@@ -39,7 +39,7 @@ strictly contained in `N_G(X) ⊓ S`. (File-local; same statement as the private
 private theorem lt_inf_normalizer_of_lt_of_isPGroup [Finite G] {p : ℕ} [Fact p.Prime]
     {X S : Subgroup G} (hXS : X < S) (hS : IsPGroup p ↥S) :
     X < Subgroup.normalizer X ⊓ S := by
-  haveI : Group.IsNilpotent ↥S := hS.isNilpotent
+  have : Group.IsNilpotent ↥S := hS.isNilpotent
   have hNC : NormalizerCondition ↥S := Group.normalizerCondition_of_isNilpotent (G := ↥S)
   have hsub_lt : X.subgroupOf S < ⊤ := by
     rw [lt_top_iff_ne_top]
@@ -97,7 +97,7 @@ theorem mem_sigma_normalizer_le_of_two_maximals [Finite G] (hG : IsMinimalSimple
     (hPnab : ¬ IsMulCommutative ↥P) (hM : M ∈ maximalSubgroups G) (hPM : P ≤ M) :
     p ∈ S10.sigma M ∧ Subgroup.normalizer (P : Set G) ≤ M := by
   obtain ⟨E, E₁, E₂, E₃, hsetup⟩ := exists_subgroupESetup hG hM
-  haveI : Group.IsNilpotent ↥P := hPp.isNilpotent
+  have : Group.IsNilpotent ↥P := hPp.isNilpotent
   have hcor := nilpotent_sigmaComplement_abelian hG hsetup
   -- `P` is a `σ(M)'`-`p`-subgroup only if `p ∉ σ(M)`; its primes are all `p`.
   have hPpi : p ∉ S10.sigma M → Subgroup.IsPiSubgroup ((S10.sigma M)ᶜ) P := by
@@ -114,7 +114,7 @@ theorem mem_sigma_normalizer_le_of_two_maximals [Finite G] (hG : IsMinimalSimple
   -- `N_G(P) ⊆ M`: 12.10(d), `P` noncyclic.
   refine hcor.2.2.2.1 p hpσM P hPM hPp ?_
   intro hcyc
-  haveI := hcyc
+  have := hcyc
   exact hPnab (IsMulCommutative.of_comm (IsCyclic.commGroup (α := ↥P)).mul_comm)
 
 /-- **Conjugates of a noncentral element cover its central coset** in an exponent-`p` extraspecial
@@ -208,7 +208,7 @@ theorem exists_conj_smul_zpowers_eq_of_expPExtraspecial {Q : Type*} [Group Q] [F
     have h2 := congrArg (Subgroup.subtype (Subgroup.center Q)) h1
     simpa using h2
   -- choose `j` with `i * j ≡ 1 (mod p)`.
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hi0 : (i : ZMod p) ≠ 0 := fun h => hpi ((ZMod.intCast_zmod_eq_zero_iff_dvd i p).mp h)
   set j : ℤ := (((i : ZMod p)⁻¹).val : ℤ) with hjdef
   have hij1 : (p : ℤ) ∣ (i * j - 1) := by
@@ -298,7 +298,7 @@ theorem exists_conj_smul_eq_of_lines_of_expPExtraspecial [Finite G] {p : ℕ} [F
   -- generators of the two lines.
   have getgen : ∀ {R : Subgroup G}, Nat.card ↥R = p → ∃ r : G, r ∈ R ∧ Subgroup.zpowers r = R := by
     intro R hR
-    haveI : Nontrivial ↥R := Finite.one_lt_card_iff_nontrivial.mp (by rw [hR]; exact hpp.one_lt)
+    have : Nontrivial ↥R := Finite.one_lt_card_iff_nontrivial.mp (by rw [hR]; exact hpp.one_lt)
     obtain ⟨rbar, hrbar⟩ := exists_ne (1 : ↥R)
     exact ⟨rbar, rbar.2, OddOrder.BG.Ch1.S03d.zpowers_eq_of_prime_card (by rw [hR]; exact hpp)
       rbar.2 (fun h => hrbar (Subtype.ext h))⟩
@@ -507,7 +507,7 @@ theorem exists_elemAbelianOfRank_two_le_of_expPExtraspecial [Finite G]
   -- `Q` is non-cyclic: cyclic ⟹ abelian ⟹ `[Q,Q]=⊥`, but `[Q,Q]=Z(Q)` has order `p`.
   have hQnc : ¬ IsCyclic ↥Q := by
     intro hcyc
-    haveI := hcyc
+    have := hcyc
     have hcomm : IsMulCommutative ↥Q :=
       IsMulCommutative.of_comm (IsCyclic.commGroup (α := ↥Q)).mul_comm
     have hbot : Subgroup.center ↥Q = ⊥ := by
@@ -674,7 +674,7 @@ theorem maximalContaining_normalizer_center_ne_of_two_maximals [Finite G]
   -- Proposition 12.4(a) give `K ⊆ M⋆`, then `M = (M ∩ M⋆)M_α` (Cor 10.9(b)) + Lemma 6.5(b)
   -- (coprimality `p ∉ α(M)` from `r(S) ≤ 2`) give `N_M(Z) ⊆ M⋆`.
   have hNMZ : Subgroup.normalizer (Z : Set G) ⊓ M ≤ Mstar := by
-    haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+    have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
     have hpp : p.Prime := Fact.out
     have hZ_le_inf : Z ≤ M ⊓ Mstar := (Subgroup.map_subtype_le _).trans hQ_le
     have hZM : Z ≤ M := hZ_le_inf.trans inf_le_left
@@ -699,7 +699,7 @@ theorem maximalContaining_normalizer_center_ne_of_two_maximals [Finite G]
           conj_smul_eq_self_of_mem_normalizer (hQ_norm_Z hq),
           conj_smul_eq_self_of_mem_normalizer (hQ_norm_Mα hq)]
       -- (2) conjugation action of `Q` on `K`, factoring through `Q/Z(Q)`.
-      letI act : MulDistribMulAction ↥Q ↥K :=
+      let act : MulDistribMulAction ↥Q ↥K :=
         MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (K : Set G))) ↥K
           (Subgroup.inclusion hQK)
       set ψ : ↥Q →* MulAut ↥K := MulDistribMulAction.toMulAut ↥Q ↥K with hψ
@@ -717,7 +717,7 @@ theorem maximalContaining_normalizer_center_ne_of_two_maximals [Finite G]
           _ = (x : G) := by rw [hcomm]; group
       set φ : (↥Q ⧸ Subgroup.center ↥Q) →* MulAut ↥K := QuotientGroup.lift _ ψ hker with hφ
       -- (3) `Q/Z(Q)` is noncyclic abelian acting coprimely on `K` ⟹ `cocyclicFixedByClosure φ = ⊤`.
-      haveI hQZcomm : IsMulCommutative (↥Q ⧸ Subgroup.center ↥Q) := by
+      have hQZcomm : IsMulCommutative (↥Q ⧸ Subgroup.center ↥Q) := by
         refine ⟨⟨fun a b => ?_⟩⟩
         obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective a
         obtain ⟨y, rfl⟩ := QuotientGroup.mk_surjective b
@@ -737,12 +737,12 @@ theorem maximalContaining_normalizer_center_ne_of_two_maximals [Finite G]
             hpK.trans (Subgroup.card_dvd_of_le inf_le_right), Nat.card_pos.ne'⟩))
       have hNC : ¬ IsCyclic (↥Q ⧸ Subgroup.center ↥Q) := by
         intro hcyc
-        haveI := hcyc
+        have := hcyc
         have hcomm_Q : ∀ a b : ↥Q, a * b = b * a :=
           (MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
             (QuotientGroup.mk' (Subgroup.center ↥Q))
             (QuotientGroup.ker_mk' _).le).is_comm.comm
-        haveI : IsMulCommutative ↥Q := ⟨⟨hcomm_Q⟩⟩
+        have : IsMulCommutative ↥Q := ⟨⟨hcomm_Q⟩⟩
         have hbot : commutator ↥Q = ⊥ := commutator_eq_bot ↥Q
         rw [hQ_es.isExtraspecial.commutator_eq_center] at hbot
         have h1 : Nat.card ↥(Subgroup.center ↥Q) = 1 := by rw [hbot]; exact Subgroup.card_bot
@@ -776,7 +776,7 @@ theorem maximalContaining_normalizer_center_ne_of_two_maximals [Finite G]
           intro hY1
           rw [hY1, bot_sup_eq] at hYa
           exact hNC (isCyclic_iff_exists_zpowers_eq_top.mpr ⟨a, hYa⟩)
-        haveI : Nontrivial ↥Y := (Subgroup.nontrivial_iff_ne_bot Y).mpr hY_ne
+        have : Nontrivial ↥Y := (Subgroup.nontrivial_iff_ne_bot Y).mpr hY_ne
         obtain ⟨⟨yb₀, hyb₀Y⟩, hyb₀ne⟩ := exists_ne (1 : ↥Y)
         have hyb₀1 : yb₀ ≠ 1 := fun h => hyb₀ne (Subtype.ext h)
         obtain ⟨q₀, rfl⟩ := QuotientGroup.mk_surjective yb₀
@@ -881,7 +881,7 @@ theorem nonabelian_pgroup_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd 
     intro hPtop
     have hGp : IsPGroup p G :=
       (hPtop ▸ hPp : IsPGroup p ↥(⊤ : Subgroup G)).of_equiv Subgroup.topEquiv
-    haveI := hGp.isNilpotent
+    have := hGp.isNilpotent
     exact hG.notSolvable IsNilpotent.to_isSolvable
   obtain ⟨M, hMcoatom, hPM⟩ := (IsCoatomic.eq_top_or_exists_le_coatom P).resolve_left hPlt.ne
   refine IsUniquelyMaximal.of_unique_maximal hPlt (mem_maximalSubgroups.mpr hMcoatom) hPM ?_

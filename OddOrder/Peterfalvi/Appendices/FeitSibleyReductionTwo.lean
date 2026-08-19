@@ -87,7 +87,7 @@ theorem card_quot_sup_Q1_eq_d_mul [Finite G] {A' : Subgroup G} (hA' : A' ≤ hyp
     Nat.card (↥hyp.H ⧸ ((A'.subgroupOf hyp.H) ⊔ (hyp.Q1.subgroupOf hyp.H)))
       = hyp.d * Nat.card (↥hyp.S ⧸ A'.subgroupOf hyp.S) := by
   classical
-  haveI : (hyp.S.subgroupOf hyp.H).Normal :=
+  have : (hyp.S.subgroupOf hyp.H).Normal :=
     hyp.subgroupOf_H_normal_of_conj_mem fun h hh x hx => hyp.S_normal_in_H hh hx
   -- (i) `|H⧸A'| = |Q₁| · |H⧸A'Q₁|`
   have hi := hyp.card_quot_eq_card_quot_Q1_mul (R := A')
@@ -251,8 +251,8 @@ theorem centerLiftQ1_conj_mem_of_mem_H [Finite G] {h : G} (hh : h ∈ hyp.H)
 nilpotency (`Group.IsNilpotent.center_ne_bot`). -/
 theorem centerLiftQ1_ne_bot [Finite G] (hnil : Group.IsNilpotent ↥hyp.Q1) :
     hyp.centerLiftQ1 ≠ ⊥ := by
-  haveI := hnil
-  haveI : Nontrivial ↥hyp.Q1 := hyp.nontrivial_Q1
+  have := hnil
+  have : Nontrivial ↥hyp.Q1 := hyp.nontrivial_Q1
   have hcne := Group.IsNilpotent.center_ne_bot (G := ↥hyp.Q1)
   obtain ⟨x, hxC, hxb⟩ := SetLike.exists_of_lt (bot_lt_iff_ne_bot.mpr hcne)
   intro hbot
@@ -504,7 +504,7 @@ theorem ssetOf_S_coherent_step
       have h2 : s⁻¹ * (1 : G) ∈ S₁ := hmem
       rw [mul_one] at h2
       simpa using S₁.inv_mem h2
-    haveI : Nontrivial (↥hyp.S ⧸ S₁.subgroupOf hyp.S) := ⟨_, _, hne⟩
+    have : Nontrivial (↥hyp.S ⧸ S₁.subgroupOf hyp.S) := ⟨_, _, hne⟩
     exact Finite.one_lt_card
   -- close the contradiction
   exact false_of_reduction_two_bounds hyp.d_pos Nat.card_pos h21 h22 h23
@@ -577,11 +577,11 @@ theorem ssetOf_coherent_of_le_sder
           intro hbot
           rw [hbot] at hS₃S₁
           exact not_lt_bot hS₃S₁
-        haveI : Nontrivial ↥hyp.S := (Subgroup.nontrivial_iff_ne_bot hyp.S).mpr
+        have : Nontrivial ↥hyp.S := (Subgroup.nontrivial_iff_ne_bot hyp.S).mpr
           (fun hbot => hS₁ne (eq_bot_iff.mpr
             ((hS₁le.trans hyp.Sder_le_S).trans (le_of_eq hbot))))
-        haveI := hyp.S_nilpotent
-        apply (IsSolvable.commutator_lt_top_of_nontrivial ↥hyp.S).ne
+        have := hyp.S_nilpotent
+        apply (Group.IsSolvable.commutator_lt_top_of_nontrivial ↥hyp.S).ne
         rw [eq_top_iff]
         intro x _
         have hx : (x : G) ∈ Subgroup.map hyp.S.subtype (commutator ↥hyp.S) := by
@@ -592,21 +592,21 @@ theorem ssetOf_coherent_of_le_sder
         obtain ⟨y, hy, hyx⟩ := hx
         rwa [show y = x from Subtype.ext hyx] at hy
       -- the relativised `Normal` instances
-      haveI : (S₁.subgroupOf hyp.H).Normal :=
+      have : (S₁.subgroupOf hyp.H).Normal :=
         hyp.subgroupOf_H_normal_of_conj_mem hS₁H
-      haveI : (hyp.Q1.subgroupOf hyp.H).Normal :=
+      have : (hyp.Q1.subgroupOf hyp.H).Normal :=
         hyp.subgroupOf_H_normal_of_conj_mem fun h' hh' x hx =>
           hyp.Q1_normal_in_H hh' hx
-      haveI : ((S₃'.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal :=
+      have : ((S₃'.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal :=
         hyp.subgroupOf_Q_normal_of_conj_mem fun q hq x hx =>
           hinvH q (hyp.Q_le_H hq) x hx
       have hZH : ∀ h' ∈ hyp.H, ∀ x ∈ hyp.centralLiftIn hyp.S S₃' hinvS,
           h' * x * h'⁻¹ ∈ hyp.centralLiftIn hyp.S S₃' hinvS := fun h' hh' x hx =>
         hyp.centralLiftIn_conj_mem_of_mem_H hyp.S hinvS hinvH
           (fun h'' hh'' y hy => hyp.S_normal_in_H hh'' hy) hh' hx
-      haveI : ((hyp.centralLiftIn hyp.S S₃' hinvS).subgroupOf hyp.H).Normal :=
+      have : ((hyp.centralLiftIn hyp.S S₃' hinvS).subgroupOf hyp.H).Normal :=
         hyp.subgroupOf_H_normal_of_conj_mem hZH
-      haveI : (((hyp.centralLiftIn hyp.S S₃' hinvS) ⊔ hyp.centerLiftQ1).subgroupOf
+      have : (((hyp.centralLiftIn hyp.S S₃' hinvS) ⊔ hyp.centerLiftQ1).subgroupOf
           hyp.H).Normal :=
         hyp.subgroupOf_H_normal_of_conj_mem fun h' hh' x hx =>
           conj_mem_sup (fun y hy => hZH h' hh' y hy)

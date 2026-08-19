@@ -174,9 +174,9 @@ theorem forall_smul_eq_iff_mem_center {x : MonoidAlgebra R G} :
   constructor
   · intro h y
     induction y using MonoidAlgebra.induction_on with
-    | hM m => exact ((smul_eq_self_iff_commute m x).mp (h m)).symm
-    | hadd y z hy hz => rw [mul_add, add_mul, hy, hz]
-    | hsmul r y hy => rw [mul_smul_comm, smul_mul_assoc, hy]
+    | of m => exact ((smul_eq_self_iff_commute m x).mp (h m)).symm
+    | add y z hy hz => rw [mul_add, add_mul, hy, hz]
+    | smul r y hy => rw [mul_smul_comm, smul_mul_assoc, hy]
   · intro h g
     exact (smul_eq_self_iff_commute g x).mpr (h _).symm
 

@@ -39,7 +39,7 @@ Mann の構造定理の主要部分:
 
 namespace OddOrder.Isaacs.Ch03
 
-open Subgroup Pointwise
+open _root_.OddOrder.Isaacs.Ch03.Subgroup Pointwise
 
 section /- 3C.8: injector の {p}-部分 -/
 
@@ -133,13 +133,13 @@ theorem isNilpotent_sup_of_commute [Finite G] {A B : Subgroup G}
     sup_le (fun a ha => Subgroup.centralizer_le_normalizer _
       (Subgroup.mem_centralizer_iff.mpr fun b hb => (hcomm a ha b hb).symm))
       Subgroup.le_normalizer
-  haveI : (A.subgroupOf (A ⊔ B)).Normal :=
+  have : (A.subgroupOf (A ⊔ B)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hAK).mpr hAnorm
-  haveI : (B.subgroupOf (A ⊔ B)).Normal :=
+  have : (B.subgroupOf (A ⊔ B)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hBK).mpr hBnorm
-  haveI hAn : Group.IsNilpotent ↥(A.subgroupOf (A ⊔ B)) :=
+  have hAn : Group.IsNilpotent ↥(A.subgroupOf (A ⊔ B)) :=
     haveI := hA; Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hAK).symm
-  haveI hBn : Group.IsNilpotent ↥(B.subgroupOf (A ⊔ B)) :=
+  have hBn : Group.IsNilpotent ↥(B.subgroupOf (A ⊔ B)) :=
     haveI := hB; Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hBK).symm
   have hAfit : A.subgroupOf (A ⊔ B) ≤ Ch01.fitting ↥(A ⊔ B) := Ch01.nilpotent_normal_le_fitting
   have hBfit : B.subgroupOf (A ⊔ B) ≤ Ch01.fitting ↥(A ⊔ B) := Ch01.nilpotent_normal_le_fitting
@@ -152,12 +152,12 @@ theorem isNilpotent_sup_of_commute [Finite G] {A B : Subgroup G}
     refine le_antisymm le_top ?_
     rw [← hsup]
     exact sup_le hAfit hBfit
-  haveI : Group.IsNilpotent ↥(⊤ : Subgroup ↥(A ⊔ B)) :=
+  have : Group.IsNilpotent ↥(⊤ : Subgroup ↥(A ⊔ B)) :=
     htop ▸ Ch01.fitting.isNilpotent (G := ↥(A ⊔ B))
   exact Group.nilpotent_of_mulEquiv Subgroup.topEquiv
 
 /-- `C_G(F_p) ⊓ C(p) ≤ C_G(F(G))` (`F = F_p ⊔ F_{p'}` だから)。 -/
-theorem centralizer_nilPiPart_inf_pCentralizer_le [Finite G] [IsSolvable G] (p : ℕ) :
+theorem centralizer_nilPiPart_inf_pCentralizer_le [Finite G] [Group.IsSolvable G] (p : ℕ) :
     Subgroup.centralizer ((nilPiPart (Ch01.fitting G) ({p} : Set ℕ) : Subgroup G) : Set G)
         ⊓ pCentralizer G p
       ≤ Subgroup.centralizer ((Ch01.fitting G : Subgroup G) : Set G) := by
@@ -169,7 +169,7 @@ theorem centralizer_nilPiPart_inf_pCentralizer_le [Finite G] [IsSolvable G] (p :
 
 /-- **Mann の構造定理 (主要部分)**: nilpotent injector `I` の `{p}`-部分は
 `C(p) = C_G(F_{p'})` の Sylow `p`-部分群である。 -/
-theorem isHallPart_pCentralizer_of_isNilpotentInjector [Finite G] [IsSolvable G]
+theorem isHallPart_pCentralizer_of_isNilpotentInjector [Finite G] [Group.IsSolvable G]
     {I : Subgroup G} (hI : IsNilpotentInjector I) {p : ℕ} [Fact p.Prime] :
     IsHallPart (pCentralizer G p) (nilPiPart I ({p} : Set ℕ)) ({p} : Set ℕ) := by
   have hIpPart := isHallPart_nilPiPart (N := I) ({p} : Set ℕ) hI.1
@@ -189,8 +189,8 @@ theorem isHallPart_pCentralizer_of_isNilpotentInjector [Finite G] [IsSolvable G]
   have hFpIp : nilPiPart (Ch01.fitting G) ({p} : Set ℕ) ≤ nilPiPart I ({p} : Set ℕ) :=
     le_nilPiPart_of_isPiGroup hI.1 (hFpPart.1.trans hI.2.1) hFpPart.isPiGroup
   have hcommI := IsHallPart.commute hI.1 hIpPart hIp'Part
-  haveI : (nilPiPart (Ch01.fitting G) ({p} : Set ℕ)).Normal := nilPiPart_normal inferInstance _
-  haveI : (Subgroup.centralizer
+  have : (nilPiPart (Ch01.fitting G) ({p} : Set ℕ)).Normal := nilPiPart_normal inferInstance _
+  have : (Subgroup.centralizer
       ((nilPiPart (Ch01.fitting G) ({p} : Set ℕ) : Subgroup G) : Set G)).Normal :=
     normal_centralizer inferInstance
   have hIp'D : nilPiPart I (({p} : Set ℕ)ᶜ)

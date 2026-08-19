@@ -55,8 +55,8 @@ theorem isIrreducible_of_projective_no_nontrivial_fixed
     (hfree : ∀ e : E, e ≠ 1 → ∀ L : Projectivization F V,
       (OddOrder.BG.Ch1.S02.representationToGeneralLinearGroup rho e) • L ≠ L) :
     rho.IsIrreducible := by
-  haveI : FiniteDimensional F V := .of_finrank_eq_succ hdim
-  haveI : Nontrivial V := Module.nontrivial_of_finrank_pos (by rw [hdim]; omega)
+  have : FiniteDimensional F V := .of_finrank_eq_succ hdim
+  have : Nontrivial V := Module.nontrivial_of_finrank_pos (by rw [hdim]; omega)
   refine { toNontrivial := ?_, eq_bot_or_eq_top := fun W => ?_ }
   · refine ⟨⊥, ⊤, fun h => ?_⟩
     have h' : (⊥ : Submodule F V) = ⊤ :=
@@ -122,16 +122,16 @@ theorem isCyclic_and_card_dvd_card_add_one_of_projective_no_nontrivial_fixed
       (OddOrder.BG.Ch1.S02.representationToGeneralLinearGroup rho e) • L ≠ L) :
     IsCyclic E ∧ Nat.card E ∣ Nat.card F + 1 := by
   classical
-  haveI : FiniteDimensional F V := .of_finrank_eq_succ hdim
-  letI : Finite V :=
+  have : FiniteDimensional F V := .of_finrank_eq_succ hdim
+  let : Finite V :=
     Finite.of_equiv (Fin (Module.finrank F V) → F)
       (Module.finBasis F V).equivFun.symm.toEquiv
   rcases subsingleton_or_nontrivial E with hEsub | hEnt
-  · letI : Subsingleton E := hEsub
+  · let : Subsingleton E := hEsub
     have hcardE : Nat.card E = 1 :=
       Nat.card_eq_one_iff_unique.mpr ⟨hEsub, ⟨1⟩⟩
     exact ⟨isCyclic_of_subsingleton, by rw [hcardE]; exact one_dvd _⟩
-  · letI : Nontrivial E := hEnt
+  · let : Nontrivial E := hEnt
     have hirr : rho.IsIrreducible :=
       isIrreducible_of_projective_no_nontrivial_fixed rho hdim hfree
     have hchar : ∀ p : Nat, p.Prime → p ∣ Nat.card E → ¬ CharP F p := by
@@ -143,10 +143,10 @@ theorem isCyclic_and_card_dvd_card_add_one_of_projective_no_nontrivial_fixed
     have hcomm : ∀ a b : E, a * b = b * a :=
       (OddOrder.BG.Ch1.S02.odd_two_dim_abelian hodd hdim rho hfaith hchar).comm
     have hcyclic : IsCyclic E := by
-      letI : CommGroup E := { (inferInstance : Group E) with mul_comm := hcomm }
-      letI : rho.IsIrreducible := hirr
+      let : CommGroup E := { (inferInstance : Group E) with mul_comm := hcomm }
+      let : rho.IsIrreducible := hirr
       exact isCyclic_of_faithful_isIrreducible rho hfaith
-    letI : MulAction E (Projectivization F V) :=
+    let : MulAction E (Projectivization F V) :=
       MulAction.compHom _
         (OddOrder.BG.Ch1.S02.representationToGeneralLinearGroup rho)
     refine ⟨hcyclic, ?_⟩

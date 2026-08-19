@@ -54,8 +54,8 @@ theorem eq_one_of_pow_eq_one_of_sum_eq_card {ι : Type*} [Fintype ι] {m : ℕ} 
   have hint : ∀ x ∈ Set.range ε, IsIntegral ℚ x := by
     rintro _ ⟨j, rfl⟩
     exact ⟨X ^ m - C 1, monic_X_pow_sub_C 1 hm, by simp [hε j]⟩
-  haveI : _root_.Algebra.IsIntegral ℚ ↥A := _root_.Algebra.IsIntegral.adjoin hint
-  haveI : _root_.Algebra.IsAlgebraic ℚ ↥A := inferInstance
+  have : _root_.Algebra.IsIntegral ℚ ↥A := _root_.Algebra.IsIntegral.adjoin hint
+  have : _root_.Algebra.IsAlgebraic ℚ ↥A := inferInstance
   -- an embedding into `ℂ`
   let f : ↥A →ₐ[ℚ] ℂ := IsAlgClosed.lift
   let e : ι → ↥A := fun j => ⟨ε j, _root_.Algebra.subset_adjoin ⟨j, rfl⟩⟩
@@ -109,7 +109,7 @@ Pass to the fraction field. -/
 theorem eq_one_of_pow_eq_one_of_sum_eq_card' {R : Type*} [CommRing R] [IsDomain R] [CharZero R]
     {ι : Type*} [Fintype ι] {m : ℕ} (hm : m ≠ 0) {ε : ι → R} (hε : ∀ i, ε i ^ m = 1)
     (hsum : ∑ i, ε i = (Fintype.card ι : R)) (i : ι) : ε i = 1 := by
-  haveI : CharZero (FractionRing R) :=
+  have : CharZero (FractionRing R) :=
     charZero_of_injective_algebraMap (IsFractionRing.injective R (FractionRing R))
   have hinj := IsFractionRing.injective R (FractionRing R)
   refine hinj ?_

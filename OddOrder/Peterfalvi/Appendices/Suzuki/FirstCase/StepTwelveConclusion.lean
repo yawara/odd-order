@@ -52,7 +52,7 @@ theorem conj_mul_inv_mem_sInvertedT_of_mem_invImageF
     (hk : k ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
     (hr : r ∈ fc.invImageF model) :
     k * r * k⁻¹ * r⁻¹ ∈ fc.sInvertedT model := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨hTle, -, -, -⟩ := fc.sInvertedT_spec model ind hB2 hm
   have hcommT := fc.commutator_eq_sInvertedT model ind hB2 hm hGp hSigma hRle
@@ -129,9 +129,9 @@ theorem mem_of_conj_smul_eq_of_ne
     (hk : k ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
     (hfix : MulAut.conj k • X = X) :
     k ∈ R₁ := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
   obtain ⟨hTle, hTinv, -, -⟩ := fc.sInvertedT_spec model ind hB2 hm
   have hTcard : Nat.card ↥(fc.sInvertedT model) = fc.p := by
     rw [fc.card_sInvertedT model ind hB2 hm, hm, pow_one]
@@ -373,7 +373,7 @@ theorem conj_mem_of_le_of_mem
     (hTX : fc.sInvertedT model ≤ X) (hXle : X ≤ R₁) {r x : G}
     (hr : r ∈ R₁) (hx : x ∈ X) :
     r * x * r⁻¹ ∈ X := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   have hcommT := fc.commutator_eq_sInvertedT model ind hB2 hm hGp hSigma hRle
     hR₁le hcard
   have h1 : ⁅r, x⁆ ∈ fc.sInvertedT model := by
@@ -391,7 +391,7 @@ theorem not_p_dvd_index_subgroupOf_normalizer_overgroup
     (hfact : (Nat.card G).factorization fc.p = 3) {R₁ : Subgroup G}
     (hcard : Nat.card ↥R₁ = fc.p ^ 3) {N : Subgroup G} (hle : R₁ ≤ N) :
     ¬ fc.p ∣ (R₁.subgroupOf N).index := by
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
   intro hdvd
   have h1 := (R₁.subgroupOf N).card_mul_index
   have h2 : Nat.card ↥(R₁.subgroupOf N) = fc.p ^ 3 := by
@@ -419,8 +419,8 @@ theorem finset_card_lines_le {A T' : Subgroup G} (hT'A : T' ≤ A)
     (hmem : ∀ Y ∈ 𝒮, T' ≤ Y ∧ Y ≤ A ∧ Nat.card ↥Y = fc.p ^ 2) :
     𝒮.card ≤ fc.p + 1 := by
   classical
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
-  haveI := Fintype.ofFinite G
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have := Fintype.ofFinite G
   have hpairinf : ∀ Y ∈ 𝒮, ∀ Y' ∈ 𝒮, Y ≠ Y' → Y ⊓ Y' = T' := by
     intro Y hY Y' hY' hne
     obtain ⟨hTY, hYA, hYc⟩ := hmem Y hY
@@ -523,6 +523,7 @@ theorem finset_card_lines_le {A T' : Subgroup G} (hT'A : T' ≤ A)
   exact Nat.le_of_mul_le_mul_right hle hpos
 
 include model in
+set_option backward.isDefEq.respectTransparency false in
 /-- **`N_G(R₁) = N_G(R)`** ((12) tail, δ4-D): the coset-to-line map
 `m·N_G(R) ↦ m•R` is injective into the lines avoiding `T₁`, so
 `s' := [N_G(R₁) : N_G(R)] ≤ p`; a proper element `n` spawns `p - 1` distinct
@@ -544,9 +545,9 @@ theorem normalizer_overgroup_eq_normalizer_invImageF
       ∀ x ∈ R₁, n * x * n⁻¹ ∈ R₁) :
     Subgroup.normalizer ((R₁ : Subgroup G) : Set G)
       = Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
   set NR : Subgroup G :=
     Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G) with hNRdef
   set N : Subgroup G := Subgroup.normalizer ((R₁ : Subgroup G) : Set G) with hNdef
@@ -603,7 +604,7 @@ theorem normalizer_overgroup_eq_normalizer_invImageF
       exact (Nat.card_congr
         (Subgroup.equivSMul (MulAut.conj m) (fc.invImageF model)).toEquiv).symm
   -- the coset-to-line map `Φ`.
-  haveI := Fintype.ofFinite (↥N ⧸ NR.subgroupOf N)
+  have := Fintype.ofFinite (↥N ⧸ NR.subgroupOf N)
   set Φ : (↥N ⧸ NR.subgroupOf N) → Subgroup G :=
     Quotient.lift (fun m : ↥N => MulAut.conj (m : G) • fc.invImageF model)
       (by
@@ -670,7 +671,7 @@ theorem normalizer_overgroup_eq_normalizer_invImageF
         rw [hΦmk]
         exact hline (m : G) m.2
   -- lower bound: `s' ≥ p` via the `[k·n]`-family.
-  haveI := Fintype.ofFinite (↥NR ⧸ R₁.subgroupOf NR)
+  have := Fintype.ofFinite (↥NR ⧸ R₁.subgroupOf NR)
   set ψ : (↥NR ⧸ R₁.subgroupOf NR) → (↥N ⧸ NR.subgroupOf N) :=
     Quotient.lift (fun k : ↥NR => (QuotientGroup.mk
         (⟨(k : G) * n, mul_mem (hNRle k.2) hnN⟩ : ↥N) : ↥N ⧸ NR.subgroupOf N))
@@ -840,9 +841,9 @@ theorem commutator_mem_sInvertedOvergroup
     (hk : k ∈ Subgroup.normalizer ((fc.invImageF model : Subgroup G) : Set G))
     (hy : y ∈ R₁) :
     ⁅k, y⁆ ∈ fc.sInvertedOvergroup R₁ := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
   obtain ⟨hTle, -, -, -⟩ := fc.sInvertedT_spec model ind hB2 hm
   obtain ⟨hT₁card, hTsubT₁, -⟩ := fc.card_sInvertedOvergroup model ind hB2 hm
     hGp hSigma hRle hR₁le hcard hR₁n

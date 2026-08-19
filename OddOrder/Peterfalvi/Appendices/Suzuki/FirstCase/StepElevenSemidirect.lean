@@ -101,7 +101,7 @@ theorem emb_fieldCoord
         ((fc.toHypothesis.H.subgroupOf
           (Subgroup.centralizer (fc.P : Set G))).normalCore)
         ⟨(x : G), fc.sInvertedT_le_centralizer model ind hB2 hm x.2⟩ := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   exact congrArg Subtype.val
     ((MonoidHom.ofInjective model.emb_injective).apply_symm_apply
       ⟨_, fc.mk_mem_range_emb_of_mem_sInvertedT model ind hB2 hm x⟩)
@@ -113,7 +113,7 @@ theorem fieldCoord_injective
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {m : ℕ}
     (hm : Nat.card F = fc.p ^ m) :
     Function.Injective (fc.fieldCoord model ind hB2 hm) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
   set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
   have hNP : fc.kernelN = fc.P :=
@@ -147,7 +147,7 @@ noncomputable def sInvertedTEquivField
   classical
   refine MulEquiv.ofBijective (fc.fieldCoord model ind hB2 hm)
     ⟨fc.fieldCoord_injective model ind hB2 hm, ?_⟩
-  haveI : Finite F := Nat.finite_of_card_ne_zero (by
+  have : Finite F := Nat.finite_of_card_ne_zero (by
     rw [hm]; exact pow_ne_zero _ fc.p_prime.pos.ne')
   have hcard : Nat.card ↥(fc.sInvertedT model) = Nat.card (Multiplicative F) := by
     rw [fc.card_sInvertedT model ind hB2 hm]
@@ -194,7 +194,7 @@ theorem fieldCoord_conj
         (Multiplicative.toAdd (fc.fieldCoord model ind hB2 hm x) *
           ((model.qEquiv
               ⟨_, fc.mk_mem_rankOneQuotient_Q haQ haL⟩⁻¹ : Fˣ) : F)) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
   set N' : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hN'def
   set π := QuotientGroup.mk' N' with hπ

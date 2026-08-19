@@ -36,17 +36,17 @@ Used in (12.11): with `V = M ∩ L` (a complement of `K` by the first assertion 
 `p'`-subgroup `A ≤ M ∩ L` and the witness `x ∈ P₀ ⊆ M ∩ L` land in this abelian `W` (via
 `C_K(A) ≠ 1` and `C_K(x) ≠ 1`), so `A` centralizes `x`. -/
 theorem exists_abelian_centralizer_le_of_isComplement [Finite G] {M : Subgroup G}
-    (hMsolv : IsSolvable ↥M) (typeF : TypeFData M) {V : Subgroup G} (hV_le : V ≤ M)
+    (hMsolv : Group.IsSolvable ↥M) (typeF : TypeFData M) {V : Subgroup G} (hV_le : V ≤ M)
     (hVcompl : Subgroup.IsComplement' (typeF.H.subgroupOf M) (V.subgroupOf M)) :
     ∃ W : Subgroup G, IsMulCommutative ↥W ∧
       ∀ y ∈ typeF.H, y ≠ 1 → V ⊓ Subgroup.centralizer ({y} : Set G) ≤ W := by
   classical
-  haveI hHnormal : (typeF.H.subgroupOf M).Normal := by
+  have hHnormal : (typeF.H.subgroupOf M).Normal := by
     rw [typeF.H_eq]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal M
   have hcop : Nat.Coprime (Nat.card ↥(typeF.H.subgroupOf M)) (typeF.H.subgroupOf M).index := by
     rw [typeF.H_eq]; exact (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall M).coprime_index
   -- Schur–Zassenhaus: `U` and `V` are conjugate in `↥M` by `n ∈ H = M_F`.
-  haveI : IsSolvable ↥M := hMsolv
+  have : Group.IsSolvable ↥M := hMsolv
   obtain ⟨n, hn_mem, hn_conj⟩ :=
     Subgroup.IsComplement'.exists_conj_of_coprime hcop (Or.inl inferInstance) typeF.complement
       hVcompl
@@ -144,7 +144,7 @@ theorem exists_second_maximal [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     ∃ (L : Subgroup G) (Lt : PeterfalviType), L ∈ maximalSubgroups G ∧ L ≠ ctr.M ∧
       HasPeterfalviType Lt L ∧ ctr.P0 ≤ mainSubgroup L Lt := by
   classical
-  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  have : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
   -- `p ∈ π(G)`: `p ∣ [M : M_F] ∣ |M| ∣ |G|`.
   have hp_in_G : ctr.p ∈ (Nat.card G).primeFactors := by
     refine Nat.mem_primeFactors.mpr ⟨ctr.p_prime, ?_, Nat.card_pos.ne'⟩
@@ -230,7 +230,7 @@ theorem centralizer_control_of_CKx [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
     Subgroup.normalizer ((Subgroup.closure ({x} : Set G) : Subgroup G) : Set G) ≤ ctr.M ∧
       ¬ (Subgroup.centralizer ({x} : Set G) ≤ L) := by
   classical
-  haveI : IsSimpleGroup G := hG.simple
+  have : IsSimpleGroup G := hG.simple
   have hMcoatom : IsCoatom ctr.M := ctr.M_maximal
   have hLcoatom : IsCoatom L := hL
   have hxM : x ∈ ctr.M := ctr.P0_le_M hx
@@ -276,7 +276,7 @@ theorem exists_rankTwoWitness [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     IsMulCommutative ↥ctr.P0 ∧ rank ↥ctr.P0 = 2 ∧ Nonempty (RankTwoWitnessData ctr) := by
   obtain ⟨hab, hrank⟩ := counterexample_P0_K_structure hG ctr
   refine ⟨hab, hrank, ?_⟩
-  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  have : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
   have hKM : ctr.K ≤ ctr.M := ctr.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le ctr.M
   -- `P₀` coprime to `K`: `(8.11)` makes `M_F` Hall (`p ∤ |M_F|` from `p ∣ [M : M_F] ∣ [G : M_F]`).
   have hcop : Nat.Coprime (Nat.card ↥ctr.P0) (Nat.card ↥ctr.K) := by
@@ -297,12 +297,12 @@ theorem exists_rankTwoWitness [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hperf : ⁅ctr.K, ctr.K⁆ ≠ ctr.K := by
     obtain ⟨tiData⟩ := ctr.M_typeI
     have hKH : ctr.K = tiData.typeF.H := ctr.K_eq_MF.trans tiData.typeF.H_eq.symm
-    haveI : Nontrivial ↥ctr.K :=
+    have : Nontrivial ↥ctr.K :=
       ctr.K.nontrivial_iff_ne_bot.mpr (hKH ▸ tiData.typeF.H_nontrivial)
-    haveI : Group.IsNilpotent ↥ctr.K :=
+    have : Group.IsNilpotent ↥ctr.K :=
       ctr.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent ctr.M
     have hlt : commutator ↥ctr.K < ⊤ :=
-      IsSolvable.commutator_lt_top_of_nontrivial (G := ↥ctr.K)
+      Group.IsSolvable.commutator_lt_top_of_nontrivial (G := ↥ctr.K)
     intro hEq
     have htop_map : (⊤ : Subgroup ↥ctr.K).map ctr.K.subtype = ctr.K := by
       ext g
@@ -340,7 +340,7 @@ theorem typeIIIorIV_noncyclic_le_fitting [Finite G]
     {Lt : PeterfalviType} (hLhasType : HasPeterfalviType Lt L)
     (hP0 : P0 ≤ mainSubgroup L Lt) :
     P0 ≤ maxNilpotentNormalHall L := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   -- The genuine content, for types III/IV where `mainSubgroup L = L' = [L,L]`.  For types I/II/V
   -- `mainSubgroup L = M_F` and the goal is exactly `hP0`.
   have key : P0 ≤ derivedInG L → P0 ≤ maxNilpotentNormalHall L := by
@@ -349,7 +349,7 @@ theorem typeIIIorIV_noncyclic_le_fitting [Finite G]
     obtain ⟨hyp12⟩ := OddOrder.Peterfalvi.S12.exists_hypothesis_of_typeIIIorIVorV hG hL
       (hIIIIV.imp id Or.inl)
     obtain ⟨s13, -⟩ := OddOrder.Peterfalvi.S13.exists_hypothesis_of_isTypeIIIorIV hG hyp12 hIIIIV
-    haveI : NeZero (Nat.card (s13.base.toHypothesis46 hG hG.odd).W1) := ⟨Nat.card_pos.ne'⟩
+    have : NeZero (Nat.card (s13.base.toHypothesis46 hG hG.odd).W1) := ⟨Nat.card_pos.ne'⟩
     -- **(11.9.c)/(9.7.b): `U` is cyclic** (Peterfalvi §11.9, proven sorry-free in
     -- `S13_NonGaloisExclusion`).  Available here now that the §12–16 import inversion is resolved
     -- (HUB RULING, issue 9093: the §16 pair-data structures were extracted to
@@ -402,10 +402,10 @@ theorem typeIIIorIV_noncyclic_le_fitting [Finite G]
       have hcompl : Subgroup.IsComplement'
           ((maxNilpotentNormalHall L).subgroupOf (derivedInG L))
           (d.U.subgroupOf (derivedInG L)) := by rw [← d.H_eq]; exact d.derived_complement
-      haveI : ((maxNilpotentNormalHall L).subgroupOf (derivedInG L)).Normal := hNnorm
-      haveI hUcyc' : IsCyclic ↥(d.U.subgroupOf (derivedInG L)) :=
+      have : ((maxNilpotentNormalHall L).subgroupOf (derivedInG L)).Normal := hNnorm
+      have hUcyc' : IsCyclic ↥(d.U.subgroupOf (derivedInG L)) :=
         (Subgroup.subgroupOfEquivOfLe d.U_le).isCyclic.mpr hUcyc
-      haveI hQcyc :
+      have hQcyc :
           IsCyclic (↥(derivedInG L) ⧸ (maxNilpotentNormalHall L).subgroupOf (derivedInG L)) :=
         (hcompl.symm.QuotientMulEquiv).isCyclic.mpr hUcyc'
       -- `P₀ ↪ L'/M_F` (kernel `P₀ ∩ M_F = 1`), so `P₀` is cyclic.
@@ -422,13 +422,13 @@ theorem typeIIIorIV_noncyclic_le_fitting [Finite G]
         have hbot : ((x : ↥(derivedInG L)) : G) ∈ P0 ⊓ maxNilpotentNormalHall L := ⟨hxP0, hxN⟩
         rw [hP0inf, Subgroup.mem_bot] at hbot
         exact Subtype.ext (Subtype.ext hbot)
-      haveI : IsCyclic ↥(P0.subgroupOf (derivedInG L)) := isCyclic_of_injective _ hinj
+      have : IsCyclic ↥(P0.subgroupOf (derivedInG L)) := isCyclic_of_injective _ hinj
       exact (Subgroup.subgroupOfEquivOfLe hP0').isCyclic.mp inferInstance
     -- With `p ∤ |U|`, `|P₀|` (a `p`-power) is coprime to `|U| = [L' : M_F]`, so `P₀ ≤ M_F`.
     obtain ⟨n, hn⟩ := (IsPGroup.iff_card).mp hP0p
     have hcop : Nat.Coprime (Nat.card ↥P0) (Nat.card ↥d.U) := by
       rw [hn]; exact (hp.coprime_iff_not_dvd.mpr hpU).pow_left n
-    haveI : ((maxNilpotentNormalHall L).subgroupOf (derivedInG L)).Normal := hNnorm
+    have : ((maxNilpotentNormalHall L).subgroupOf (derivedInG L)).Normal := hNnorm
     have hle : P0.subgroupOf (derivedInG L)
         ≤ (maxNilpotentNormalHall L).subgroupOf (derivedInG L) := by
       apply OddOrder.BG.Ch4.S14.le_of_coprime_index
@@ -686,10 +686,10 @@ theorem _root_.OddOrder.GroupTheory.TypeFData.prime_dvd_sq_sub_one_of_abelian_ke
     (hqU : q ∣ Nat.card ↥typeF.U) :
     q ∣ p ^ 2 - 1 := by
   classical
-  haveI : Fact q.Prime := ⟨hq⟩
-  haveI : Fintype ↥typeF.U := Fintype.ofFinite _
-  haveI : Fintype ↥typeF.U0 := Fintype.ofFinite _
-  haveI : Fintype ↥typeF.H := Fintype.ofFinite _
+  have : Fact q.Prime := ⟨hq⟩
+  have : Fintype ↥typeF.U := Fintype.ofFinite _
+  have : Fintype ↥typeF.U0 := Fintype.ofFinite _
+  have : Fintype ↥typeF.H := Fintype.ofFinite _
   -- Abelian commutation witness for `Ω₁(H)`.
   have hcomm : ∀ x ∈ typeF.H, ∀ y ∈ typeF.H, x * y = y * x := fun x hx y hy =>
     congrArg Subtype.val (hab.is_comm.comm (⟨x, hx⟩ : ↥typeF.H) (⟨y, hy⟩ : ↥typeF.H))
@@ -827,7 +827,7 @@ theorem four_mul_card_Kprime_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
     (ctr : CounterexampleHypothesis (G := G)) :
     4 * Nat.card ↥ctr.Kprime ≤ Nat.card ↥ctr.K := by
   classical
-  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  have : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
   obtain ⟨tI⟩ := ctr.M_typeI
   have hHK : tI.typeF.H = ctr.K := tI.typeF.H_eq.trans ctr.K_eq_MF.symm
   -- `p ∣ |U|` (the type-I complement realizes `[M : M_F]`).
@@ -838,18 +838,18 @@ theorem four_mul_card_Kprime_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
     rw [← hHK, tI.typeF.complement.symm.index_eq_card] at h1
     rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe tI.typeF.U_le).toEquiv] at h1
   -- An order-`p` element `u ∈ U₀` (Cauchy through `exp U₀ = exp U`).
-  haveI : Fintype ↥tI.typeF.U := Fintype.ofFinite _
+  have : Fintype ↥tI.typeF.U := Fintype.ofFinite _
   obtain ⟨xU, hxU⟩ := exists_prime_orderOf_dvd_card (G := ↥tI.typeF.U) ctr.p
     (by rwa [Nat.card_eq_fintype_card] at hpU)
   have hpU0 : ctr.p ∣ Nat.card ↥tI.typeF.U0 := by
-    haveI : Fintype ↥tI.typeF.U0 := Fintype.ofFinite _
+    have : Fintype ↥tI.typeF.U0 := Fintype.ofFinite _
     have hexp : Monoid.exponent ↥tI.typeF.U0 ∣ Nat.card ↥tI.typeF.U0 := by
       rw [Nat.card_eq_fintype_card]
       exact Group.exponent_dvd_card
     refine Dvd.dvd.trans ?_ hexp
     rw [tI.typeF.exponent_eq]
     exact hxU ▸ Monoid.order_dvd_exponent xU
-  haveI : Fintype ↥tI.typeF.U0 := Fintype.ofFinite _
+  have : Fintype ↥tI.typeF.U0 := Fintype.ofFinite _
   obtain ⟨u0, hu0⟩ := exists_prime_orderOf_dvd_card (G := ↥tI.typeF.U0) ctr.p
     (by rwa [Nat.card_eq_fintype_card] at hpU0)
   set u : G := (u0 : G) with hu_def
@@ -883,7 +883,7 @@ theorem four_mul_card_Kprime_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
   have hN_inv : Ch03.IsAInvariant φ (commutator ↥ctr.K) :=
     Ch03.IsAInvariant.of_characteristic φ
   set ψ := quotientMulAutHom hN_inv with hψ
-  letI : MulAction ↥(Subgroup.zpowers u) (↥ctr.K ⧸ commutator ↥ctr.K) :=
+  let : MulAction ↥(Subgroup.zpowers u) (↥ctr.K ⧸ commutator ↥ctr.K) :=
     MulAction.compHom _ ψ
   -- `p ∤ |K|`, so Isaacs 3.28 lifts quotient fixed points; FPF then leaves only `1`.
   have hCop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers u)) (Nat.card ↥ctr.K) := by
@@ -918,8 +918,8 @@ theorem four_mul_card_Kprime_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
       change ψ a 1 = 1
       exact map_one (ψ a)
   -- Orbit counting: `|K/K'| ≡ 1 (mod p)`.
-  haveI : Fintype (↥ctr.K ⧸ commutator ↥ctr.K) := Fintype.ofFinite _
-  haveI : Fintype (MulAction.fixedPoints ↥(Subgroup.zpowers u)
+  have : Fintype (↥ctr.K ⧸ commutator ↥ctr.K) := Fintype.ofFinite _
+  have : Fintype (MulAction.fixedPoints ↥(Subgroup.zpowers u)
     (↥ctr.K ⧸ commutator ↥ctr.K)) := Fintype.ofFinite _
   have hApG : IsPGroup ctr.p ↥(Subgroup.zpowers u) :=
     IsPGroup.of_card (n := 1) (by rw [Nat.card_zpowers, hu_ord, pow_one])
@@ -935,12 +935,12 @@ theorem four_mul_card_Kprime_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
   -- `|K/K'| ≠ 1` (`K` is nilpotent and nontrivial, hence not perfect).
   have hQne1 : Nat.card (↥ctr.K ⧸ commutator ↥ctr.K) ≠ 1 := by
     intro h1
-    haveI : Nontrivial ↥ctr.K :=
+    have : Nontrivial ↥ctr.K :=
       (Subgroup.nontrivial_iff_ne_bot ctr.K).mpr (hHK ▸ tI.typeF.H_nontrivial)
-    haveI : Group.IsNilpotent ↥ctr.K :=
+    have : Group.IsNilpotent ↥ctr.K :=
       ctr.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent ctr.M
     have hcomm_ne : commutator ↥ctr.K ≠ ⊤ :=
-      (IsSolvable.commutator_lt_top_of_nontrivial ↥ctr.K).ne
+      (Group.IsSolvable.commutator_lt_top_of_nontrivial ↥ctr.K).ne
     exact hcomm_ne (Subgroup.index_eq_one.mp h1)
   -- `p ≥ 3` (odd), so `|K/K'| ≥ p + 1 ≥ 4`.
   have hpG : ctr.p ∣ Nat.card G := by

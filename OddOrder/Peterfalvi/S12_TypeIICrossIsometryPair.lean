@@ -55,12 +55,12 @@ theorem Hypothesis.mem_zSpan_inducedFamily_support_sharp_derived [Finite G] {M :
     (hφ1 : φ 1 = 0) :
     φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
       (sharpSubgroup (derivedInG M)) M := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
     rw [derivedInG, Subgroup.subgroupOf,
       Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
-  haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
+  have hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
   -- every lattice element vanishes off `M′` (span induction, the property is ℤ-linear)
   have hvanish : ∀ χ ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M) (inducedFamily M),
       ∀ w : ↥M, w ∉ (derivedInG M).subgroupOf M → χ w = 0 := by
@@ -245,7 +245,7 @@ theorem typeP_pair_base_bare_not_isConj [Finite G]
     ¬ IsConj a b := by
   classical
   intro hconj
-  haveI : IsSolvable ↥mp.S := hG.solvable_of_mem_maximalSubgroups mp.S_maximal
+  have : Group.IsSolvable ↥mp.S := hG.isSolvable_of_mem_maximalSubgroups mp.S_maximal
   obtain ⟨c, hc⟩ := isConj_iff.mp hconj
   obtain ⟨hbM', hb1, u, huS, hbu⟩ := hbS
   have ha1 : a ≠ 1 := fun h0 => haM'.2 (Set.mem_singleton_iff.mpr h0)
@@ -263,7 +263,7 @@ theorem typeP_pair_base_bare_not_isConj [Finite G]
   have hSP : OddOrder.BG.Ch4.S14.IsTypeP mp.S :=
     OddOrder.BG.Ch4.S14.isTypeP_of_isTypeP2 mp.S_typeP2
   have hW1hall := typePData_W1_isHallSubgroup_kappa hG mp.S_maximal hSP data.typeP
-  haveI : IsCyclic ↥data.typeP.W1 := data.typeP.W1_cyclic
+  have : IsCyclic ↥data.typeP.W1 := data.typeP.W1_cyclic
   have hcompl := OddOrder.BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall hG
     mp.S_maximal hSP data.typeP.W1_le hW1hall
   have hcardS' : Nat.card ((derivedInG mp.S).subgroupOf mp.S) = Nat.card (derivedInG mp.S) :=
@@ -838,9 +838,9 @@ theorem typeII_HU_frobenius_of_coherent_at_pair [Finite G]
     OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(derivedInG mp.S)
       (data.typeP.H.subgroupOf (derivedInG mp.S))
       (data.typeP.U.subgroupOf (derivedInG mp.S)) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
-  haveI : NeZero (Nat.card (typeIIHypothesis46 hG mp.S_maximal
+  have : NeZero (Nat.card (typeIIHypothesis46 hG mp.S_maximal
       (section16_S_isTypeII hG mp) data.typeP).W1) := ⟨Nat.card_pos.ne'⟩
   -- the (10.3) canonical parameters carrying the grid/`ζ` pins
   obtain ⟨params', hmu, hos, hzS, hz1, hzconj, hδpm, hδj⟩ := hyp.exists_charParameters_full hG
@@ -926,7 +926,7 @@ theorem typeII_HU_frobenius_of_coherent' [Finite G]
     OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(derivedInG S)
       (data.typeP.H.subgroupOf (derivedInG S))
       (data.typeP.U.subgroupOf (derivedInG S)) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   -- WLOG: transport the datum onto the canonical pair member, `H`/`U` tracked
   obtain ⟨mp, u, dataS, hT, hKstar, huS, hSW1, hSW2, hH, hU⟩ :=

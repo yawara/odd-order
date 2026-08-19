@@ -18,7 +18,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 3C.5 の形式化
 ## 証明
 
 `M` を任意の極小正規部分群とする (有限非自明群に存在)。`G` 可解なので `M` は可換
-(Thm 3.11 前半 `solvable_minimal_normal_isAbelian`)。
+(Thm 3.11 前半 `minimal_normal_isAbelian_of_isSolvable`)。
 
 * **`M ⊔ H = ⊤`**: `M ⊴ G` かつ `M ≠ ⊥` なので `M ≤ H` なら `M ≤ core_G(H) = ⊥` で矛盾。
   ゆえに `H < M ⊔ H` で, `H` の極大性から `M ⊔ H = ⊤`。
@@ -45,7 +45,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 3C.5 の形式化
 
 namespace OddOrder.Isaacs.Ch03
 
-open Subgroup Pointwise
+open _root_.OddOrder.Isaacs.Ch03.Subgroup Pointwise
 
 section /- 3C: Problem 3C.5 (p. 91) -/
 
@@ -78,13 +78,13 @@ variable [Finite G]
 /-- **Isaacs Problem 3C.5, 前半** (書籍 p. 91)。`H` が有限可解群 `G` の極大部分群で
 `core_G(H) = 1` なら, `G` は極小正規部分群 `M` を**ただ一つ**もち, `H` は `M` の補元で
 `M = C_G(M)`。 -/
-theorem exists_isMinimalNormal_isComplement'_of_isCoatom_normalCore_eq_bot [IsSolvable G]
+theorem exists_isMinimalNormal_isComplement'_of_isCoatom_normalCore_eq_bot [Group.IsSolvable G]
     {H : Subgroup G} (hH : IsCoatom H) (hcore : H.normalCore = ⊥) :
     ∃ M : Subgroup G, Ch02.IsMinimalNormal M ∧ Subgroup.IsComplement' M H ∧
       Subgroup.centralizer (M : Set G) = M ∧
       ∀ N : Subgroup G, Ch02.IsMinimalNormal N → N = M := by
   -- `G` は非自明 (自明なら `H = ⊤` で極大性に矛盾)
-  haveI hGnt : Nontrivial G := by
+  have hGnt : Nontrivial G := by
     rcases subsingleton_or_nontrivial G with _ | hn
     · refine absurd (le_antisymm le_top fun x _ => ?_) hH.1
       rw [Subsingleton.elim x 1]
@@ -96,8 +96,8 @@ theorem exists_isMinimalNormal_isComplement'_of_isCoatom_normalCore_eq_bot [IsSo
     exact hx (Subgroup.mem_bot.mp (h ▸ Subgroup.mem_top x))
   -- 極小正規部分群 `M` を取り, 可解性から可換 (Thm 3.11 前半)
   obtain ⟨M, hmin, -⟩ := Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) htop_ne_bot
-  haveI := hmin.1
-  have habel : ∀ x ∈ M, ∀ y ∈ M, x * y = y * x := solvable_minimal_normal_isAbelian hmin
+  have := hmin.1
+  have habel : ∀ x ∈ M, ∀ y ∈ M, x * y = y * x := minimal_normal_isAbelian_of_isSolvable hmin
   -- `M ≰ H` (さもなくば `M ≤ core_G(H) = ⊥`)
   have hMnotle : ¬ M ≤ H := fun hle =>
     hmin.2.1 (le_bot_iff.mp (hcore ▸ Subgroup.normal_le_normalCore.mpr hle))
@@ -107,7 +107,7 @@ theorem exists_isMinimalNormal_isComplement'_of_isCoatom_normalCore_eq_bot [IsSo
     exact le_sup_left.trans heq.ge
   -- `M ⊓ H` は `G`-正規 (`M` 可換 + `H` が正規化) ゆえ `core_G(H) = ⊥` に落ちる
   have hMHbot : M ⊓ H = ⊥ := by
-    haveI : (M ⊓ H).Normal := by
+    have : (M ⊓ H).Normal := by
       refine normal_of_sup_eq_top hsup (fun m hm x hx => ?_) (fun h hh x hx => ?_)
       · calc m * x * m⁻¹ = x * m * m⁻¹ := by rw [habel m hm x hx.1]
           _ = x := by group
@@ -117,12 +117,12 @@ theorem exists_isMinimalNormal_isComplement'_of_isCoatom_normalCore_eq_bot [IsSo
     apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ (disjoint_iff.mpr hMHbot)
     rw [← Subgroup.normal_mul M H, hsup, Subgroup.coe_top]
   -- `C := C_G(M)` は正規で `M ≤ C`
-  haveI hCnormal : (Subgroup.centralizer (M : Set G)).Normal := Subgroup.normal_centralizer
+  have hCnormal : (Subgroup.centralizer (M : Set G)).Normal := Subgroup.normal_centralizer
   have hMC : M ≤ Subgroup.centralizer (M : Set G) := fun x hx =>
     Subgroup.mem_centralizer_iff.mpr fun y hy => habel y hy x hx
   -- `C ⊓ H` も同じ論法で `G`-正規 ゆえ `⊥`
   have hCHbot : Subgroup.centralizer (M : Set G) ⊓ H = ⊥ := by
-    haveI : (Subgroup.centralizer (M : Set G) ⊓ H).Normal := by
+    have : (Subgroup.centralizer (M : Set G) ⊓ H).Normal := by
       refine normal_of_sup_eq_top hsup (fun m hm x hx => ?_) (fun h hh x hx => ?_)
       · have hxm : m * x = x * m := Subgroup.mem_centralizer_iff.mp hx.1 m hm
         calc m * x * m⁻¹ = x * m * m⁻¹ := by rw [hxm]
@@ -147,7 +147,7 @@ theorem exists_isMinimalNormal_isComplement'_of_isCoatom_normalCore_eq_bot [IsSo
     exact hm
   refine ⟨M, hmin, hcompl, hcent, fun N hN => ?_⟩
   -- 一意性: `N ⊓ M = ⊥` から `⁅N, M⁆ = ⊥`, つまり `N ≤ C_G(M) = M`, ゆえに `N = ⊥` で矛盾
-  haveI := hN.1
+  have := hN.1
   by_contra hne
   have hNM : N ⊓ M = ⊥ := by
     rcases hmin.2.2 (N ⊓ M) inferInstance inf_le_right with h | h
@@ -172,7 +172,7 @@ theorem exists_isMinimalNormal_isComplement'_of_isCoatom_normalCore_eq_bot [IsSo
 
 /-- **Isaacs Problem 3C.5** (書籍 p. 91)。核が自明な極大部分群をもつ有限可解群は
 極小正規部分群を**ただ一つ**もつ。 -/
-theorem existsUnique_isMinimalNormal_of_isCoatom_normalCore_eq_bot [IsSolvable G]
+theorem existsUnique_isMinimalNormal_of_isCoatom_normalCore_eq_bot [Group.IsSolvable G]
     {H : Subgroup G} (hH : IsCoatom H) (hcore : H.normalCore = ⊥) :
     ∃! M : Subgroup G, Ch02.IsMinimalNormal M := by
   obtain ⟨M, hmin, -, -, huniq⟩ :=
@@ -184,7 +184,7 @@ theorem existsUnique_isMinimalNormal_of_isCoatom_normalCore_eq_bot [IsSolvable G
 
 一意性から両者は**同じ**極小正規部分群 `M` の補元であり, `M = C_G(M)` なので
 Problem 3C.4 の補元共役性が使える。 -/
-theorem conj_of_isCoatom_normalCore_eq_bot [IsSolvable G] {H K : Subgroup G}
+theorem conj_of_isCoatom_normalCore_eq_bot [Group.IsSolvable G] {H K : Subgroup G}
     (hH : IsCoatom H) (hHcore : H.normalCore = ⊥)
     (hK : IsCoatom K) (hKcore : K.normalCore = ⊥) :
     ∃ g : G, H.map (MulAut.conj g).toMonoidHom = K := by

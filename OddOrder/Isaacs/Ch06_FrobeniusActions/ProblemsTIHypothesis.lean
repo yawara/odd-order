@@ -82,7 +82,7 @@ theorem exists_inf_conj_ne_bot_of_TI [Finite G] {A B : Subgroup G}
     rw [Set.mem_union] at hx
     push Not at hx
     obtain ⟨hxA, hxB⟩ := hx
-    simp only [notConjugateSet, Set.mem_setOf_eq, not_forall, not_not] at hxA hxB
+    simp only [notConjugateSet, Set.mem_ofPred_eq, not_forall, not_not] at hxA hxB
     obtain ⟨a, ha, hane, hcja⟩ := hxA
     obtain ⟨b, hb, hbne, hcjb⟩ := hxB
     -- `a` と `b` は共役: `a = h b h⁻¹`
@@ -219,7 +219,7 @@ theorem TI_of_normalizer_le [Finite G] {A : Subgroup G}
   -- (2) `D` に含まれる極大 `p`-部分群は `G` の Sylow `p`-部分群
   have hDcard : Nat.card ↥D ≠ 1 := fun h => hD (Subgroup.card_eq_one.mp h)
   obtain ⟨p, hp, hpD⟩ := Nat.exists_prime_and_dvd hDcard
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨x₀, hx₀⟩ := exists_prime_orderOf_dvd_card' (G := ↥D) p hpD
   have hxD : (x₀ : G) ∈ D := x₀.2
   have hxord : orderOf (x₀ : G) = p := by rw [Subgroup.orderOf_coe]; exact hx₀
@@ -242,7 +242,7 @@ theorem TI_of_normalizer_le [Finite G] {A : Subgroup G}
   have hPeq : P = (S : Subgroup G) := by
     by_contra hne
     have hlt : P < (S : Subgroup G) := lt_of_le_of_ne hPS hne
-    haveI : Group.IsNilpotent ↥(S : Subgroup G) := S.isPGroup'.isNilpotent
+    have : Group.IsNilpotent ↥(S : Subgroup G) := S.isPGroup'.isNilpotent
     have hlt2 : P.subgroupOf (S : Subgroup G) < ⊤ := by
       rw [lt_top_iff_ne_top, Ne, Subgroup.subgroupOf_eq_top]
       exact fun h => hlt.ne (le_antisymm hPS h)
@@ -398,7 +398,7 @@ theorem exists_sylow_coe_eq_of_maximal_pGroup_of_TI [Finite G] {A : Subgroup G}
   refine ⟨S, ?_⟩
   by_contra hne
   have hlt : P < (S : Subgroup G) := lt_of_le_of_ne hPS (fun h => hne h.symm)
-  haveI : Group.IsNilpotent ↥(S : Subgroup G) := S.isPGroup'.isNilpotent
+  have : Group.IsNilpotent ↥(S : Subgroup G) := S.isPGroup'.isNilpotent
   have hlt2 : P.subgroupOf (S : Subgroup G) < ⊤ := by
     rw [lt_top_iff_ne_top, Ne, Subgroup.subgroupOf_eq_top]
     exact fun h => hlt.ne (le_antisymm hPS h)
@@ -423,7 +423,7 @@ theorem exists_sylow_coe_eq_of_maximal_pGroup_of_TI [Finite G] {A : Subgroup G}
 theorem commutator_sup_eq_top_of_TI [Finite G] {A : Subgroup G} (hAne : A ≠ ⊥)
     (hATI : ∀ x : G, x ∉ A → A ⊓ (MulAut.conj x • A) = ⊥) :
     commutator G ⊔ A = ⊤ := by
-  haveI hnorm : (commutator G ⊔ A).Normal := by
+  have hnorm : (commutator G ⊔ A).Normal := by
     constructor
     intro h hh g
     have hc : g * h * g⁻¹ * h⁻¹ ∈ commutator G :=
@@ -476,7 +476,7 @@ theorem eq_top_of_forall_sylow_le {H : Type*} [Group H] [Finite H] {K : Subgroup
   rw [← Subgroup.index_eq_one]
   by_contra hne
   obtain ⟨p, hp, hdvd⟩ := Nat.exists_prime_and_dvd hne
-  haveI hfp : Fact p.Prime := ⟨hp⟩
+  have hfp : Fact p.Prime := ⟨hp⟩
   obtain ⟨P⟩ : Nonempty (Sylow p H) := inferInstance
   have hcard : Nat.card ↥(P : Subgroup H) = p ^ (Nat.card H).factorization p :=
     P.card_eq_multiplicity

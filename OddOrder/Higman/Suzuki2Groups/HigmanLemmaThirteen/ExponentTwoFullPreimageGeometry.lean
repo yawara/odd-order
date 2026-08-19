@@ -69,9 +69,9 @@ theorem
       hXZtop, hXTtop, hZTtop, hXZ_Tinf, hXZ_Tsup⟩ :=
     exists_three_invariant_frattini_preimages_of_xiLengthFour_exponent_two
       hP hncomm hmulti hxi hlen hprime htwo
-  letI : X.Normal := hXnormal
-  letI : Z.Normal := hZnormal
-  letI : T.Normal := hTnormal
+  let : X.Normal := hXnormal
+  let : Z.Normal := hZnormal
+  let : T.Normal := hTnormal
   have left_lt_sup_of_inf_eq_frattini :
       ∀ {A B : Subgroup P}, frattini P < B →
         A ⊓ B = frattini P → A < A ⊔ B := by

@@ -121,7 +121,7 @@ theorem coherent_sOf_H0Cprime_of_section9 [Finite G]
     (htype : IsTypeIII M ∨ IsTypeIV M) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
       (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0) := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   have hCeq : hyp.C = OddOrder.Peterfalvi.S11.cSub hyp.s11Setup hyp.chief :=
     C_eq_cSub_of_noncoherent hG hyp hnc htype
@@ -193,7 +193,7 @@ theorem coherent_sOf_H0C [Finite G]
     (htype : IsTypeIII M ∨ IsTypeIV M) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
       (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) hyp.base.A0) := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   rcases OddOrder.Peterfalvi.S11.clifford_dichotomy hG
       (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief) with hA | hB
@@ -250,7 +250,7 @@ theorem exists_glue_nu_H0C [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
     ∃ ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G,
       (∀ x ∈ hyp.SOf hyp.HC, ν x = coh.extension x) ∧
       (∀ y ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C, ν y = hY.extension y) := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   -- X-side bridge: `S(HC) = inducedKernelFamily K (HC.subgroupOf M)`
   have hXbridge : ∀ ⦃x : ClassFunction ↥M ℂ⦄, x ∈ hyp.SOf hyp.HC →
@@ -287,6 +287,7 @@ theorem exists_glue_nu_H0C [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
     coh.extension hY.extension
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- **World-bridge for the σ-grids** (issue 1023 tick¹²): the §6 certain-type σ-image
 `certainTypeOmegaSigma` of the `μ`-column character, dispatched by the `SOf_memberRFamily`
 machinery over `h46 = hyp.toHypothesis46`, **is** the §10 `alignedOmegaSigmaGrid` entry.
@@ -304,7 +305,7 @@ theorem certainTypeOmegaSigma_muColumnChar_eq_aligned [Finite G]
     OddOrder.Peterfalvi.S06.certainTypeOmegaSigma (hyp.toHypothesis46 hG hG.odd)
         (hyp.muColumnChar hG hG.odd j) (finCongr hcw1.symm i)
       = hyp.alignedOmegaSigmaGrid hG hG.odd i j := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   -- the two setups agree definitionally (`toHypothesis46.tic` is the grid `tic` by field literal)
   change (OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hG.odd)).sigma rfl
@@ -479,7 +480,7 @@ theorem coherent_sOf_H0C_extension_muColumnSum_pin_of_irr [Finite G]
     (htype : IsTypeIII M ∨ IsTypeIV M) :
     c.extension (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩)
       = ∑ i : Fin hyp.base.w1, hyp.base.alignedOmegaSigmaGrid hG hG.odd i ⟨1, hw2⟩ := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   set μ : ClassFunction ↥M ℂ := ∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩
     with hμdef
@@ -746,7 +747,7 @@ theorem exists_pinned_coherent_sOf_H0C_of_all_reducible [Finite G]
         (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C) hyp.base.A0,
       c.extension (∑ i : Fin hyp.base.w1, hyp.base.muGrid hG hG.odd i ⟨1, hw2⟩)
         = ∑ i : Fin hyp.base.w1, hyp.base.alignedOmegaSigmaGrid hG hG.odd i ⟨1, hw2⟩ := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   set F : Set (ClassFunction ↥M ℂ) := OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C
     with hFdef
@@ -1042,7 +1043,7 @@ theorem coherent_SOf_H0C_of_column_identities [Finite G]
       hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
     (htype : IsTypeIII M ∨ IsTypeIV M) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   -- The reducible μ-column bridge anchor `χ = ∑ᵢ μ_{i1} ∈ 𝒮(H₀C)`, at the nonzero column `j = 1`.
   have hw2 : 1 < hyp.base.w2 := hyp.params.w2_prime.one_lt
@@ -1272,7 +1273,7 @@ theorem zeta_residual_not_orthogonal_H0C_of_refuter [Finite G]
   -- `coh` = the `ν` (h_orth-derived `S(HC)` coherence) restricted to `S(HC) ⊆ SHCSet`
   -- (`isCoherent_of_subset`, keeping `coh.extension = ν.extension`); the narrow capstone consumes
   -- `hcol` and the unconditional `𝒮(H₀C)`-coherence (`coherent_sOf_H0C`, threaded inside).
-  haveI : NeZero (Nat.card (s13hyp.base.toHypothesis46 hG hG.odd).W1) :=
+  have : NeZero (Nat.card (s13hyp.base.toHypothesis46 hG hG.odd).W1) :=
     ⟨by have := (s13hyp.base.toHypothesis46 hG hG.odd).one_lt_card_W1; omega⟩
   exact hrefute s13hyp (coherent_SOf_H0C_of_column_identities hG s13hyp
     (isCoherent_of_subset ν (SOf_HC_subset_SHCSet hG s13hyp)
@@ -1304,7 +1305,7 @@ theorem exists_zeta_residual_not_orthogonal_H0C_of_refuter [Finite G]
           ((hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hG.odd i' 0) - ζ))
             - ∑ i' : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i' 0)
           (hyp.alignedOmegaSigmaGrid hG hG.odd i j) = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   obtain ⟨ζ, hζS, hζirr, hζdeg⟩ :=
     OddOrder.Peterfalvi.S12.exists_zeta_in_inducedFamily_degree_w1 hyp.typeP hG.odd
       (OddOrder.Peterfalvi.S12.typePData_W1_hall_coprime hG hyp.maximal (hyp.bgTypeP hG) hyp.typeP)

@@ -74,7 +74,7 @@ theorem exists_zpow_eq_of_mem_frobFixed {m : ℕ} (sfive : hyp.LemmaFiveSetup m)
     ∃ b ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, b ≠ 0 ∧ b ^ d = a := by
   classical
   -- a base point of the action, and its coordinate
-  haveI : Nontrivial ↥(Subgroup.center hyp.Q) :=
+  have : Nontrivial ↥(Subgroup.center hyp.Q) :=
     (Subgroup.nontrivial_iff_ne_bot _).mpr sfive.centerNeBot
   obtain ⟨x₀, hx₀⟩ := exists_ne (1 : ↥(Subgroup.center hyp.Q))
   have hc₀0 : ((ι (Additive.ofMul x₀) :

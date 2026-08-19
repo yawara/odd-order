@@ -48,7 +48,7 @@ theorem card_sup_eq_mul_of_le_normalizer {A B : Subgroup G'}
     exact ⟨a, ha, b, hb, rfl⟩
   have hbot : B ⊓ A = ⊥ := by rw [inf_comm]; exact hinf
   have hcompl := (Subgroup.isComplement'_subgroupOf_of_disjoint_mul_eq_univ
-    (le_sup_right : B ≤ A ⊔ B) (le_sup_left : A ≤ A ⊔ B) hbot hmul).card_mul
+    (le_sup_right : B ≤ A ⊔ B) (le_sup_left : A ≤ A ⊔ B) hbot hmul).card_mul_card
   have hAc : Nat.card ↥(A.subgroupOf (A ⊔ B)) = Nat.card ↥A :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv
   have hBc : Nat.card ↥(B.subgroupOf (A ⊔ B)) = Nat.card ↥B :=
@@ -228,7 +228,7 @@ theorem isCyclic_and_card_nonsplitTorus
     (ind : Hypothesis.TheoremAInductionBelow G Ω)
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
     IsCyclic ↥fc.nonsplitTorus ∧ Nat.card ↥fc.nonsplitTorus = 9 := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   rw [fc.nonsplitTorus_def]
   obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
@@ -276,7 +276,7 @@ theorem isCyclic_and_card_nonsplitTorus
     exact isCyclic_of_surjective _
       (Subgroup.equivMapOfInjective S L₀.subtype (Subgroup.subtype_injective _)).surjective
   -- `S'` is abelian and contains `st`, so it centralizes `st`; and `S' ≤ L₀`
-  haveI : IsMulCommutative ↥S' := IsCyclic.isMulCommutative
+  have : IsMulCommutative ↥S' := IsCyclic.isMulCommutative
   have hS'le : S' ≤ Subgroup.centralizer ({z} : Set G) ⊓ L₀ := by
     intro x hx
     obtain ⟨y, hy, rfl⟩ := hx
@@ -382,7 +382,7 @@ theorem nonsplitTorus_inf_P_eq_bot
     (ind : Hypothesis.TheoremAInductionBelow G Ω)
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
     fc.nonsplitTorus ⊓ fc.P = ⊥ := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨-, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
   have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
@@ -452,7 +452,7 @@ theorem P_le_normalizer_nonsplitTorus
     (ind : Hypothesis.TheoremAInductionBelow G Ω)
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
     fc.P ≤ Subgroup.normalizer ((fc.nonsplitTorus : Subgroup G) : Set G) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨-, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
   have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
@@ -483,7 +483,7 @@ theorem card_nonsplitTorus_sup_P
     (ind : Hypothesis.TheoremAInductionBelow G Ω)
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
     Nat.card ↥(fc.nonsplitTorus ⊔ fc.P) = 27 := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
   obtain ⟨-, hLcard⟩ := fc.isCyclic_and_card_nonsplitTorus model ind hB2
   rw [card_sup_eq_mul_of_le_normalizer
@@ -514,7 +514,7 @@ theorem nonsplitTorus_le_normalizer_zpowers_sup_P
     have h := (Z.subgroupOf M).card_mul_index
     rw [hNcard, hMcard] at h
     omega
-  haveI hnorm : (Z.subgroupOf M).Normal :=
+  have hnorm : (Z.subgroupOf M).Normal :=
     Subgroup.normal_of_index_eq_minFac_card (by rw [hidx, hMcard]; norm_num)
   have hconj : ∀ g ∈ M, ∀ y ∈ Z, g * y * g⁻¹ ∈ Z := by
     intro g hgM y hyZ
@@ -576,7 +576,7 @@ theorem mem_zpowers_st_of_mem_nonsplitTorus_of_pow_three
     {x : G} (hx : x ∈ fc.nonsplitTorus) (hx3 : x ^ 3 = 1) :
     x ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
       * fc.toHypothesis.t) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
   obtain ⟨hLcyc, hLcard⟩ := fc.isCyclic_and_card_nonsplitTorus model ind hB2
@@ -615,7 +615,7 @@ theorem nonsplitTorus_inf_V_eq_bot
     (ind : Hypothesis.TheoremAInductionBelow G Ω)
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
     fc.nonsplitTorus ⊓ fc.toHypothesis.V = ⊥ := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
   obtain ⟨-, hLcard⟩ := fc.isCyclic_and_card_nonsplitTorus model ind hB2
@@ -690,10 +690,10 @@ theorem conj_distinguishedInvolution_eq_inv_of_mem_nonsplitTorus
     {x : G} (hx : x ∈ fc.nonsplitTorus) :
     fc.toHypothesis.distinguishedInvolution * x * fc.toHypothesis.distinguishedInvolution
       = x⁻¹ := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨hLcyc, -⟩ := fc.isCyclic_and_card_nonsplitTorus model ind hB2
-  haveI : IsMulCommutative ↥fc.nonsplitTorus := IsCyclic.isMulCommutative
+  have : IsMulCommutative ↥fc.nonsplitTorus := IsCyclic.isMulCommutative
   set s : G := fc.toHypothesis.distinguishedInvolution with hs_def
   have hs2 : s * s = 1 := by rw [← sq]; exact fc.toHypothesis.distinguishedInvolution_sq
   have hsQ0 : s ∈ fc.toHypothesis.Q0 :=
@@ -750,7 +750,7 @@ theorem pow_three_eq_one_of_mem_sup_invImageF_centralizer_W
     {x : G} (hx : x ∈ (fc.invImageF model
       ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G)) :
     x ^ 3 = 1 := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨hpSig, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
   obtain ⟨-, -, -, hSig3, -⟩ :=

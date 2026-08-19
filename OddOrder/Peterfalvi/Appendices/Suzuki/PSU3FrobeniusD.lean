@@ -105,7 +105,7 @@ theorem isZGroup_D_of_freeD (hfree : hyp.FreeD)
     (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
     {ω : G} (hωQ : ω ∈ hyp.Q) (hωQ0 : ω ∉ hyp.Q0) :
     IsZGroup ↥hyp.D := by
-  haveI : Nontrivial (↥hyp.Q ⧸ Subgroup.center ↥hyp.Q) := by
+  have : Nontrivial (↥hyp.Q ⧸ Subgroup.center ↥hyp.Q) := by
     refine ⟨((⟨ω, hωQ⟩ : ↥hyp.Q) : ↥hyp.Q ⧸ Subgroup.center ↥hyp.Q), 1,
       fun hcon => hωQ0 ?_⟩
     rw [QuotientGroup.eq_one_iff, hZ, Subgroup.mem_subgroupOf] at hcon

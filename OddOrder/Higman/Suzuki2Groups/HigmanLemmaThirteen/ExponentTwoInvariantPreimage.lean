@@ -128,8 +128,8 @@ theorem exists_typeA_frattini_preimage_of_invariant_quotient_pair_exponent_two
         W = U ⊓ W := (inf_eq_right.mpr hWU).symm
         _ = frattini P := hUWinf
     exact hPhiW.ne hWphi.symm
-  letI : U.Normal := hUnormal
-  letI : W.Normal := hWnormal
+  let : U.Normal := hUnormal
+  let : W.Normal := hWnormal
   let phiTerm := frattiniNormalInvariant Y.subtype
   let uTerm : NormalInvariantSubgroup Y.subtype :=
     ⟨U, ⟨hUnormal, hUinv⟩⟩

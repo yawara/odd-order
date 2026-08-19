@@ -36,8 +36,9 @@ theorem exists_einvariant_sylow_Msigma [Finite G] (hG : IsMinimalSimpleOdd G)
     ∃ S : Subgroup G, S ≤ S10.Msigma M ∧ IsPGroup q ↥S ∧
       E ≤ Subgroup.normalizer (S : Set G) ∧
       Nat.card ↥S = q ^ (Nat.card ↥(S10.Msigma M)).factorization q := by
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
-  haveI : IsSolvable ↥E := solvable_of_solvable_injective (Subgroup.inclusion_injective h.E_le)
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups h.mem_maximal
+  have : Group.IsSolvable ↥E :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective h.E_le)
   have hEnorm : E ≤ Subgroup.normalizer ((S10.Msigma M : Subgroup G) : Set G) :=
     h.E_le.trans (by rw [S10.Msigma]; exact le_normalizer_opiCoreInG (S10.sigma M) M)
   have hcop : Nat.Coprime (Nat.card ↥E) (Nat.card ↥(S10.Msigma M)) := by
@@ -46,7 +47,7 @@ theorem exists_einvariant_sylow_Msigma [Finite G] (hG : IsMinimalSimpleOdd G)
     exact (SubgroupESetup.isPiGroup_sigma_compl hG h s
         (Nat.mem_primeFactors.mpr ⟨hsp, hsE, Nat.card_pos.ne'⟩))
       (S10.Msigma_isPiGroup M s (Nat.mem_primeFactors.mpr ⟨hsp, hsMσ, Nat.card_pos.ne'⟩))
-  exact exists_aInvariant_sylow_subgroup hEnorm hcop (Or.inl ‹IsSolvable ↥E›) q
+  exact exists_aInvariant_sylow_subgroup hEnorm hcop (Or.inl ‹Group.IsSolvable ↥E›) q
 
 /-- **Thm 13.9 tail の核** (BG: "By Lemma 13.6, `C_S(P)=1`; therefore by Lemma 13.1(a),
 `p∈τ₁(M*)`"): `M*` 非共役, `p∈π(E)∩π(M*)`, `P ≤ M∩M*` が `p`-群, `S ≤ M_σ∩M*` 非自明で
@@ -172,7 +173,7 @@ theorem sigma_disjoint_of_nonconjugate [Finite G] (hG : IsMinimalSimpleOdd G)
     have hcard1 : Nat.card ↥E₂ ≠ 1 :=
       (Finite.one_lt_card_iff_nontrivial.mpr ((Subgroup.nontrivial_iff_ne_bot E₂).mpr hE2ne)).ne'
     obtain ⟨p, hpprime, hpdvd⟩ := (Nat.card ↥E₂).exists_prime_and_dvd hcard1
-    haveI : Fact p.Prime := ⟨hpprime⟩
+    have : Fact p.Prime := ⟨hpprime⟩
     have hc2 : Nat.card ↥(E₂.subgroupOf E) = Nat.card ↥E₂ :=
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₂_le).toEquiv
     have hpτ2 : p ∈ tau2 M :=
@@ -185,7 +186,7 @@ theorem sigma_disjoint_of_nonconjugate [Finite G] (hG : IsMinimalSimpleOdd G)
   intro q hq
   rw [Set.mem_inter_iff] at hq
   obtain ⟨hqM, hqMstar⟩ := hq
-  haveI hqfact : Fact q.Prime :=
+  have hqfact : Fact q.Prime :=
     ⟨Nat.prime_of_mem_primeFactors ((S10.mem_sigma_iff M q).mp hqM).1⟩
   -- `S` = an `E`-invariant Sylow `q`-subgroup of `M_σ`; it is a Sylow `q` of `G`, maximal, `≠ 1`.
   obtain ⟨S, hSMσ, hSq, hSEnorm, hScard⟩ := exists_einvariant_sylow_Msigma hG h q
@@ -223,7 +224,7 @@ theorem sigma_disjoint_of_nonconjugate [Finite G] (hG : IsMinimalSimpleOdd G)
   have hE1card1 : Nat.card ↥E₁ ≠ 1 :=
     (Finite.one_lt_card_iff_nontrivial.mpr ((Subgroup.nontrivial_iff_ne_bot E₁).mpr hE1ne)).ne'
   obtain ⟨p, hpprime, hpdvd⟩ := (Nat.card ↥E₁).exists_prime_and_dvd hE1card1
-  haveI : Fact p.Prime := ⟨hpprime⟩
+  have : Fact p.Prime := ⟨hpprime⟩
   have hc1 : Nat.card ↥(E₁.subgroupOf E) = Nat.card ↥E₁ :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₁_le).toEquiv
   have hpτ1 : p ∈ tau1 M :=
@@ -341,7 +342,7 @@ theorem inf_centralizer_eq_bot_of_coprime_cyclic [Finite G] {q : ℕ} [Fact q.Pr
   classical
   have hQne : Q ≠ ⊥ := fun hb => hnc (hb ▸ bot_le)
   have hQab : ∀ a ∈ Q, ∀ b ∈ Q, a * b = b * a := by
-    letI : CommGroup ↥Q := IsCyclic.commGroup
+    let : CommGroup ↥Q := IsCyclic.commGroup
     intro a ha b hb
     exact Subtype.ext_iff.mp (mul_comm (⟨a, ha⟩ : ↥Q) (⟨b, hb⟩ : ↥Q))
   have hcomm : ⁅Q, P⁆ ⊓ Subgroup.centralizer (P : Set G) = ⊥ :=
@@ -397,7 +398,7 @@ theorem exists_tau3_regular_qsubgroup_of_not_centralize [Finite G] (hG : IsMinim
       Q ⊓ Subgroup.centralizer (P : Set G) = ⊥ ∧
       P ≤ Subgroup.normalizer (Q : Set G) := by
   classical
-  haveI hE3cyc : IsCyclic ↥E₃ := h.E3_isCyclic hG
+  have hE3cyc : IsCyclic ↥E₃ := h.E3_isCyclic hG
   have hPcardp : Nat.card ↥P = p := by rw [← pow_one p]; exact hP.2
   -- `P ≤ N_G(E₃)`.
   have hPN3 : P ≤ Subgroup.normalizer (E₃ : Set G) :=
@@ -419,7 +420,7 @@ theorem exists_tau3_regular_qsubgroup_of_not_centralize [Finite G] (hG : IsMinim
     rw [hPcardp]; exact (Nat.Prime.coprime_iff_not_dvd Fact.out).mpr hpndvd
   -- `E₃` abelian.
   have hE3ab : ∀ a ∈ E₃, ∀ b ∈ E₃, a * b = b * a := by
-    letI : CommGroup ↥E₃ := IsCyclic.commGroup
+    let : CommGroup ↥E₃ := IsCyclic.commGroup
     intro a ha b hb
     exact Subtype.ext_iff.mp (mul_comm (⟨a, ha⟩ : ↥E₃) (⟨b, hb⟩ : ↥E₃))
   -- `K = ⁅E₃, P⁆`: regular under `P`, nontrivial, `≤ E₃`.
@@ -443,7 +444,7 @@ theorem exists_tau3_regular_qsubgroup_of_not_centralize [Finite G] (hG : IsMinim
     Finite.one_lt_card_iff_nontrivial.mpr ((Subgroup.nontrivial_iff_ne_bot _).mpr hKne)
   set q := (Nat.card ↥(⁅E₃, P⁆)).minFac with hq
   have hqprime : q.Prime := Nat.minFac_prime (by omega)
-  haveI : Fact q.Prime := ⟨hqprime⟩
+  have : Fact q.Prime := ⟨hqprime⟩
   have hqdvd : q ∣ Nat.card ↥(⁅E₃, P⁆) := Nat.minFac_dvd _
   obtain ⟨Q₀, hQ₀card⟩ :=
     Sylow.exists_subgroup_card_pow_prime (G := ↥(⁅E₃, P⁆)) q (n := 1) (by rwa [pow_one])
@@ -488,10 +489,10 @@ theorem exists_tau3_sylowM_regular_of_not_centralize [Finite G] (hG : IsMinimalS
       P ≤ Subgroup.normalizer (Q : Set G) ∧
       (∀ T : Subgroup G, T ≤ M → IsPGroup q ↥T → Q ≤ T → Q = T) := by
   classical
-  haveI hE3cyc : IsCyclic ↥E₃ := h.E3_isCyclic hG
+  have hE3cyc : IsCyclic ↥E₃ := h.E3_isCyclic hG
   obtain ⟨q, hqprime, hqτ3, Q', hQ'p, hQ'E3, hQ'ne, hQ'C, hQ'N⟩ :=
     exists_tau3_regular_qsubgroup_of_not_centralize hG h hP hPE1 hPnc
-  haveI : Fact q.Prime := ⟨hqprime⟩
+  have : Fact q.Prime := ⟨hqprime⟩
   -- `p ∈ τ₁(M)`, hence `q ≠ p`.
   have hPcardp : Nat.card ↥P = p := by rw [← pow_one p]; exact hP.2
   have hc1 : Nat.card ↥(E₁.subgroupOf E) = Nat.card ↥E₁ :=
@@ -501,10 +502,10 @@ theorem exists_tau3_sylowM_regular_of_not_centralize [Finite G] (hG : IsMinimalS
       ⟨Fact.out, hPcardp ▸ Subgroup.card_dvd_of_le hPE1, Nat.card_pos.ne'⟩)
   have hpq : q ≠ p := fun heq => not_mem_tau3_of_mem_tau1 hpτ1 (heq ▸ hqτ3)
   -- full Sylow `q`-subgroup of `↥E₃`.
-  letI : CommGroup ↥E₃ := IsCyclic.commGroup
+  let : CommGroup ↥E₃ := IsCyclic.commGroup
   obtain ⟨S₃⟩ : Nonempty (Sylow q ↥E₃) := inferInstance
-  haveI : (S₃ : Subgroup ↥E₃).Normal := Subgroup.normal_of_isMulCommutative _
-  haveI : Unique (Sylow q ↥E₃) := S₃.unique_of_normal inferInstance
+  have : (S₃ : Subgroup ↥E₃).Normal := Subgroup.normal_of_isMulCommutative _
+  have : Unique (Sylow q ↥E₃) := S₃.unique_of_normal inferInstance
   set Q : Subgroup G := (S₃ : Subgroup ↥E₃).map E₃.subtype with hQdef
   have hQE3 : Q ≤ E₃ := Subgroup.map_subtype_le _
   have hQcardE3 : Nat.card ↥Q = q ^ (Nat.card ↥E₃).factorization q := by
@@ -512,7 +513,7 @@ theorem exists_tau3_sylowM_regular_of_not_centralize [Finite G] (hG : IsMinimalS
   have hQcardM : Nat.card ↥Q = q ^ (Nat.card ↥M).factorization q := by
     rw [hQcardE3, factorization_M_eq_E3_of_mem_tau3 h hqprime hqτ3]
   have hQp : IsPGroup q ↥Q := IsPGroup.iff_card.mpr ⟨_, hQcardE3⟩
-  haveI hQcyc : IsCyclic ↥Q :=
+  have hQcyc : IsCyclic ↥Q :=
     isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe hQE3).toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hQE3).surjective
   -- `Q' ≤ Q` (the rank-1 line lies in the unique Sylow `q`-subgroup of `E₃`).
@@ -574,7 +575,7 @@ theorem exists_maximal_over_normalizer_not_conj_of_le_E3 [Finite G] (hG : IsMini
   have hQM : Q ≤ M := hQE3.trans (h.E₃_le.trans h.E_le)
   have hNQne : Subgroup.normalizer (Q : Set G) ≠ ⊤ := by
     intro htop
-    haveI : Q.Normal := Subgroup.normalizer_eq_top_iff.mp htop
+    have : Q.Normal := Subgroup.normalizer_eq_top_iff.mp htop
     rcases hG.simple.eq_bot_or_eq_top_of_normal Q inferInstance with hb | ht
     · exact hQne hb
     · exact (mem_maximalSubgroups.mp h.mem_maximal).1 (top_le_iff.mp (ht ▸ hQM))
@@ -599,7 +600,7 @@ theorem malpha_centralizer_facts_of_not_centralize [Finite G] (hG : IsMinimalSim
   classical
   obtain ⟨q, hqprime, hqτ3, hpq, Q, hQq, hQE3, hQne, hCQ, hPNQ, hQsyl⟩ :=
     exists_tau3_sylowM_regular_of_not_centralize hG h hP hPE1 hPnc
-  haveI : Fact q.Prime := ⟨hqprime⟩
+  have : Fact q.Prime := ⟨hqprime⟩
   have hPcardp : Nat.card ↥P = p := by rw [← pow_one p]; exact hP.2
   have hc1 : Nat.card ↥(E₁.subgroupOf E) = Nat.card ↥E₁ :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₁_le).toEquiv
@@ -744,9 +745,10 @@ theorem exists_Einvariant_sylow_inf_Msigma_Mstar [Finite G] (hG : IsMinimalSimpl
   set N : Subgroup G := S10.Msigma M ⊓ Mstar with hNdef
   have hNMσ : N ≤ S10.Msigma M := inf_le_left
   have hMσM : S10.Msigma M ≤ M := S10.Msigma_le M
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
-  haveI hNsolv : IsSolvable ↥N :=
-    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe (hNMσ.trans hMσM)).toMonoidHom)
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups h.mem_maximal
+  have hNsolv : Group.IsSolvable ↥N :=
+    Group.isSolvable_of_surjective (f :=
+      (Subgroup.subgroupOfEquivOfLe (hNMσ.trans hMσM)).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe (hNMσ.trans hMσM)).surjective
   have hENMσ : E ≤ Subgroup.normalizer ((S10.Msigma M : Subgroup G) : Set G) :=
     h.E_le.trans (le_normalizer_opiCoreInG (S10.sigma M) M)
@@ -793,7 +795,7 @@ theorem sylow_Msigma_Mstar_maximal_in_inf [Finite G] (hG : IsMinimalSimpleOdd G)
 gives `Q ≤ ⁅P,Q⁆` (`le_commutator_of_coprime_inf_centralizer_eq_bot`), and `⁅P,Q⁆ ≤ ⁅E,E⁆ =
 derivedInG E` by monotonicity. -/
 theorem le_derivedInG_E_of_inf_centralizer_eq_bot [Finite G] {E P Q : Subgroup G}
-    (hPE : P ≤ E) (hQE : Q ≤ E) [IsSolvable ↥P]
+    (hPE : P ≤ E) (hQE : Q ≤ E) [Group.IsSolvable ↥P]
     (hPN : P ≤ Subgroup.normalizer (Q : Set G)) (hcop : Nat.Coprime (Nat.card ↥P) (Nat.card ↥Q))
     (hCQ : Q ⊓ Subgroup.centralizer (P : Set G) = ⊥) :
     Q ≤ derivedInG E := by
@@ -942,7 +944,7 @@ theorem E1_regular_on_E3_of_noncentralize [Finite G] (hG : IsMinimalSimpleOdd G)
       S10.Msigma M ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥) := by
   classical
   obtain ⟨p, hpprime, P, hPmem, hPE1, hPnc⟩ := hP
-  haveI : Fact p.Prime := ⟨hpprime⟩
+  have : Fact p.Prime := ⟨hpprime⟩
   refine ⟨?_, ?_, ?_⟩
   · -- (a) `E₁` acts regularly on `E₃`: `E₁E₃` not prime on `M_σ` (GAP B) ⟹ Lemma 13.7
     -- contrapositive.
@@ -957,7 +959,7 @@ theorem E1_regular_on_E3_of_noncentralize [Finite G] (hG : IsMinimalSimpleOdd G)
     have hE3prime : ActsPrimeOn (S10.Msigma M) E₃ := (cyclicSylow_actsPrime hG h).2
     obtain ⟨q, hqprime, hqτ3, hpq, Q, hQq, hQE3, hQne, hCQ, hPNQ, hQsyl⟩ :=
       exists_tau3_sylowM_regular_of_not_centralize hG h hPmem hPE1 hPnc
-    haveI : Fact q.Prime := ⟨hqprime⟩
+    have : Fact q.Prime := ⟨hqprime⟩
     obtain ⟨Mstar, hMstarMax, hNQM, hnc⟩ :=
       exists_maximal_over_normalizer_not_conj_of_le_E3 hG h hqτ3 hQE3 hQne hQq
     have hMMstar : M ≠ Mstar := fun heq => hnc ⟨1, by rw [heq, map_one, one_smul]⟩
@@ -979,7 +981,8 @@ theorem E1_regular_on_E3_of_noncentralize [Finite G] (hG : IsMinimalSimpleOdd G)
     obtain ⟨_, _, _, hCMαP, hCMαPQ⟩ :=
       (tau1_Malpha_interaction hG h.mem_maximal hpq hpτ1 hPmem hPM hQM hQne hQq hPNQ hCQ hMNQ).2
           hQsyl
-    haveI hPsolv : IsSolvable ↥P := isSolvable_of_comm (mem_elemAbelianOfRank.mp hPmem).1.1
+    have hPsolv : Group.IsSolvable ↥P :=
+      Group.isSolvable_of_comm (mem_elemAbelianOfRank.mp hPmem).1.1
     obtain ⟨kq, hQk⟩ := IsPGroup.iff_card.mp hQq
     have hcopPQ : Nat.Coprime (Nat.card ↥P) (Nat.card ↥Q) := by
       rw [hPcardp, hQk]; exact ((Nat.coprime_primes hpprime hqprime).mpr hpq.symm).pow_right kq
@@ -1000,7 +1003,7 @@ theorem E1_regular_on_E3_of_noncentralize [Finite G] (hG : IsMinimalSimpleOdd G)
       rw [Ne, Subgroup.card_eq_one]; exact hMσMstarne
     obtain ⟨qs, hqsprime, hqsdvd⟩ :=
       (Nat.card ↥(S10.Msigma M ⊓ Mstar)).exists_prime_and_dvd hcardne1
-    haveI : Fact qs.Prime := ⟨hqsprime⟩
+    have : Fact qs.Prime := ⟨hqsprime⟩
     have hqsσ : qs ∈ S10.sigma M :=
       isPiSubgroup_opiCoreInG (S10.sigma M) M qs (Nat.mem_primeFactors.mpr
         ⟨hqsprime, hqsdvd.trans (Subgroup.card_dvd_of_le inf_le_left), Nat.card_pos.ne'⟩)
@@ -1039,7 +1042,7 @@ theorem E1_regular_on_E3_of_noncentralize [Finite G] (hG : IsMinimalSimpleOdd G)
       hPNQ ((hPE1.trans h.E₁_le).trans hQstarinv) hCQ hCQstar hNQM hNQstar
   · -- (c) `C_{M_σ}(P) ≠ 1` for every such `P`: from `C_{M_α}(P) ≠ 1` and `M_α ≤ M_σ`.
     intro p' hp'prime P' hP'mem hP'E1 hP'nc
-    haveI : Fact p'.Prime := ⟨hp'prime⟩
+    have : Fact p'.Prime := ⟨hp'prime⟩
     obtain ⟨_, _, _, hCMαP', _⟩ :=
       malpha_centralizer_facts_of_not_centralize hG h hP'mem hP'E1 hP'nc
     intro hbot

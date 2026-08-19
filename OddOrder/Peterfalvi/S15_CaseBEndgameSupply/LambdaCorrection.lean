@@ -43,7 +43,7 @@ theorem H_sharp_hypothesis76_base_cCoeff_int [Fintype G]
   intro i
   set K : Subgroup ↥hyp.S := (H_sharp_hypothesis76_base hG hyp φ₀).H.subgroupOf hyp.S
     with hKdef
-  haveI hKnorm : K.Normal := H_sharp_subgroupOf_normal hyp
+  have hKnorm : K.Normal := H_sharp_subgroupOf_normal hyp
   have hHS : hyp.H ≤ hyp.S := by
     have hUS : hyp.U ≤ hyp.S := by
       have h1 : hyp.U ≤ derivedInG hyp.S := by
@@ -56,7 +56,7 @@ theorem H_sharp_hypothesis76_base_cCoeff_int [Fintype G]
       exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
     · rw [hyp.C_eq]
       exact le_trans inf_le_left hUS
-  haveI hKcomm : IsMulCommutative ↥K := by
+  have hKcomm : IsMulCommutative ↥K := by
     have hH := hyp.H_mulCommutative hG
     have e := Subgroup.subgroupOfEquivOfLe
       (show (H_sharp_hypothesis76_base hG hyp φ₀).H ≤ hyp.S from hHS)
@@ -212,7 +212,7 @@ theorem lambda_tau1_apply_mul_eq_zero_core [Finite G]
     (lam : LambdaClusterData hyp)
     {x y : G} (hx : x ∈ hyp.W2) (hy : y ∈ hyp.W1) (hx1 : x ≠ 1) (hy1 : y ≠ 1) :
     core.tau1S lam.lambda (x * y) = 0 := by
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   obtain ⟨θ, hθirr, -, hlamEq, x₀, hx₀P, hx₀ker⟩ :=
     lam.lambda_induced_from_PC_linear
   have hθP : ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
@@ -281,11 +281,11 @@ theorem CharacterDegreeCore.exists_lambda_alphaFun_one_qb_base [Fintype G]
     core.exists_lambda_index_base hG lam φ₀ hφ₀P hφ₀ne
   obtain ⟨hZtau, -, hnormLam⟩ := lambda_tau1_norm_one_core core lam
   obtain ⟨x', hx'⟩ : ∃ x' : ↥hyp.W2, x' ≠ 1 := by
-    haveI : Nontrivial ↥hyp.W2 := Finite.one_lt_card_iff_nontrivial.mp
+    have : Nontrivial ↥hyp.W2 := Finite.one_lt_card_iff_nontrivial.mp
       (by rw [← hyp.p_eq_card_W2]; exact hyp.p_prime.one_lt)
     exact exists_ne 1
   obtain ⟨y', hy'⟩ : ∃ y' : ↥hyp.W1, y' ≠ 1 := by
-    haveI : Nontrivial ↥hyp.W1 := Finite.one_lt_card_iff_nontrivial.mp
+    have : Nontrivial ↥hyp.W1 := Finite.one_lt_card_iff_nontrivial.mp
       (by rw [← hyp.q_eq_card_W1]; exact hyp.q_prime.one_lt)
     exact exists_ne 1
   have hxW2 : (x' : G) ∈ hyp.W2 := x'.2
@@ -457,8 +457,8 @@ theorem CharacterDegreeCore.exists_caseB_data_lambda_core [Finite G]
       ((hyp.p ^ hyp.q - 1 : ℕ) : ℝ) * ((hyp.q : ℝ) * (b : ℝ)) ^ 2
         ≤ ∑ x ∈ (Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S)).erase 1,
             ‖α x‖ ^ 2 := by
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Invertible (Nat.card G : ℂ) :=
+  have : Fintype G := Fintype.ofFinite G
+  have : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   obtain ⟨φ₀, hφ₀P, hφ₀ne⟩ := core.exists_hSharpBase_ne_lambda lam
   obtain ⟨i₁, hi₁pos, hi₁ker, hi₁eq, hi₁c, hmiddle⟩ :=

@@ -212,7 +212,7 @@ theorem certainTypeSet_finite
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     (k : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :
     (OddOrder.Peterfalvi.S06.certainTypeSet h46 k).Finite := by
-  haveI : Finite ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :=
+  have : Finite ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :=
     SibleyDadeHypothesis.finite_linearCharacters_of_finite
   refine Set.Finite.subset (Set.finite_range (OddOrder.Peterfalvi.S06.columnSum h46)) ?_
   rintro f ⟨χ₂, -, -, rfl⟩

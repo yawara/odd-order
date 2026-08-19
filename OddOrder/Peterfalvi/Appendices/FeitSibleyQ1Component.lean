@@ -227,11 +227,11 @@ theorem exists_restrict_eq_nsmul [Finite G] [Fintype ↥(hyp.Q.subgroupOf hyp.H)
         ClassFunction.restrict ((hyp.Q1.subgroupOf hyp.H).subgroupOf
           (hyp.Q.subgroupOf hyp.H)) φ = (e : ℂ) • θ := by
   classical
-  haveI : ((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal :=
+  have : ((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal :=
     hyp.subgroupOf_Q_normal_of_conj_mem fun q hq x hx => hyp.Q1_conj_mem_of_mem_Q hq hx
-  letI : Fintype ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) :=
+  let : Fintype ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) :=
     Fintype.ofFinite _
-  letI : Invertible ((Nat.card ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf
+  let : Invertible ((Nat.card ↥((hyp.Q1.subgroupOf hyp.H).subgroupOf
       (hyp.Q.subgroupOf hyp.H)) : ℕ) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   set B := (hyp.Q1.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H) with hBdef
@@ -335,13 +335,13 @@ theorem exists_anchor_of_mem_XsetOf [Finite G]
       χθ (1 : ↥hyp.H) = (hyp.d : ℂ) * (tθ : ℂ) ∧
       ψ (1 : ↥hyp.H) = (hyp.d : ℂ) * ((e * tθ : ℕ) : ℂ) := by
   classical
-  letI : Fintype ↥hyp.H := Fintype.ofFinite _
-  letI : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
-  letI : Invertible ((Nat.card G : ℕ) : ℂ) :=
+  let : Fintype ↥hyp.H := Fintype.ofFinite _
+  let : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
+  let : Invertible ((Nat.card G : ℕ) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible ((Nat.card ↥hyp.H : ℕ) : ℂ) :=
+  let : Invertible ((Nat.card ↥hyp.H : ℕ) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible ((Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℕ) : ℂ) :=
+  let : Invertible ((Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℕ) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   obtain ⟨hψS, hψZ⟩ := hψ
   have hψSset : ψ ∈ hyp.Sset := hψS.1

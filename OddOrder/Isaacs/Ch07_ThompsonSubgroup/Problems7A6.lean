@@ -41,7 +41,7 @@ variable {m : ℕ}
 /-- 位数 `≥ 16` の一般四元数群では位数 `2 ^ (m+1) > 4` の元は `a i` の形に限る。 -/
 private theorem eq_a_of_orderOf (hm : 2 ≤ m) {y : QuaternionGroup (2 ^ m)}
     (hy : orderOf y = 2 * 2 ^ m) : ∃ j, y = a j := by
-  haveI : NeZero (2 ^ m) := ⟨pow_ne_zero m two_ne_zero⟩
+  have : NeZero (2 ^ m) := ⟨pow_ne_zero m two_ne_zero⟩
   cases y with
   | a i => exact ⟨i, rfl⟩
   | xa i =>
@@ -64,14 +64,14 @@ private theorem a_pow (i : ZMod (2 * 2 ^ m)) (k : ℕ) :
 /-- `a i = (a 1) ^ i.val`。 -/
 private theorem a_eq_a_one_pow (i : ZMod (2 * 2 ^ m)) :
     (a 1 : QuaternionGroup (2 ^ m)) ^ i.val = a i := by
-  haveI : NeZero (2 * 2 ^ m) := ⟨by positivity⟩
+  have : NeZero (2 * 2 ^ m) := ⟨by positivity⟩
   rw [a_one_pow, ZMod.natCast_val, ZMod.cast_id]
 
 /-- 位数 `≥ 16` の一般四元数群の自己同型は `⟨a⟩` を保ち, `a i ↦ a (i * j)` の形になる。 -/
 private theorem exists_mulAut_apply_a (hm : 2 ≤ m)
     (σ : MulAut (QuaternionGroup (2 ^ m))) :
     ∃ j : ZMod (2 * 2 ^ m), ∀ i, σ (a i) = a (i * j) := by
-  haveI : NeZero (2 ^ m) := ⟨pow_ne_zero m two_ne_zero⟩
+  have : NeZero (2 ^ m) := ⟨pow_ne_zero m two_ne_zero⟩
   have hord : orderOf (σ (a 1 : QuaternionGroup (2 ^ m))) = 2 * 2 ^ m :=
     (orderOf_injective σ.toMonoidHom σ.injective (a 1)).trans orderOf_a_one
   obtain ⟨j, hj⟩ := eq_a_of_orderOf hm hord
@@ -83,8 +83,8 @@ variable {p : ℕ}
 /-- **位数 `≥ 16` の一般四元数群の自己同型群は奇素数位数の元をもたない**。 -/
 theorem mulAut_eq_one_of_pow_prime_eq_one (hm : 2 ≤ m) (hp : p.Prime) (hodd : Odd p)
     (σ : MulAut (QuaternionGroup (2 ^ m))) (hσ : σ ^ p = 1) : σ = 1 := by
-  haveI : NeZero (2 ^ m) := ⟨pow_ne_zero m two_ne_zero⟩
-  haveI : NeZero (2 * 2 ^ m) := ⟨by positivity⟩
+  have : NeZero (2 ^ m) := ⟨pow_ne_zero m two_ne_zero⟩
+  have : NeZero (2 * 2 ^ m) := ⟨by positivity⟩
   have hp2 : p ≠ 2 := by
     rintro rfl
     exact (Nat.not_odd_iff_even.mpr even_two) hodd
@@ -194,9 +194,9 @@ theorem eq_three_and_card_eq_eight_of_odd_prime_dvd_card_mulAut
     (hdvd : p ∣ Nat.card (MulAut (QuaternionGroup (2 ^ m)))) :
     p = 3 ∧ Nat.card (QuaternionGroup (2 ^ m)) = 8 := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : NeZero (2 ^ m) := ⟨pow_ne_zero m two_ne_zero⟩
-  letI : Fintype (MulAut (QuaternionGroup (2 ^ m))) := Fintype.ofFinite _
+  have : Fact p.Prime := ⟨hp⟩
+  have : NeZero (2 ^ m) := ⟨pow_ne_zero m two_ne_zero⟩
+  let : Fintype (MulAut (QuaternionGroup (2 ^ m))) := Fintype.ofFinite _
   obtain ⟨σ, hσ⟩ := exists_prime_orderOf_dvd_card (G := MulAut (QuaternionGroup (2 ^ m))) p
     (by rwa [← Nat.card_eq_fintype_card])
   -- `m ≥ 2` なら `σ = 1` となり `orderOf σ = p > 1` に矛盾

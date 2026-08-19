@@ -42,7 +42,7 @@ Isaacs, *Finite Group Theory*, Problem 3C.8 (書籍 p. 91):
 
 namespace OddOrder.Isaacs.Ch03
 
-open Subgroup Pointwise
+open _root_.OddOrder.Isaacs.Ch03.Subgroup Pointwise
 
 section /- 3C.8: nilpotent injector -/
 
@@ -74,15 +74,15 @@ def fittingPPrimePart (G : Type*) [Group G] (p : ℕ) : Subgroup G :=
 def pCentralizer (G : Type*) [Group G] (p : ℕ) : Subgroup G :=
   Subgroup.centralizer ((fittingPPrimePart G p : Subgroup G) : Set G)
 
-theorem isHallPart_fittingPPrimePart [Finite G] [IsSolvable G] (p : ℕ) :
+theorem isHallPart_fittingPPrimePart [Finite G] [Group.IsSolvable G] (p : ℕ) :
     IsHallPart (Ch01.fitting G) (fittingPPrimePart G p) ({p}ᶜ) :=
   isHallPart_nilPiPart _ inferInstance
 
-theorem fittingPPrimePart_le [Finite G] [IsSolvable G] (p : ℕ) :
+theorem fittingPPrimePart_le [Finite G] [Group.IsSolvable G] (p : ℕ) :
     fittingPPrimePart G p ≤ Ch01.fitting G := (isHallPart_fittingPPrimePart p).le
 
 /-- `F_{p'}` は共役で不変 (`F(G)` が正規で `π`-部分が一意だから)。 -/
-theorem fittingPPrimePart_map_conj [Finite G] [IsSolvable G] (p : ℕ) (g : G) :
+theorem fittingPPrimePart_map_conj [Finite G] [Group.IsSolvable G] (p : ℕ) (g : G) :
     (fittingPPrimePart G p).map (MulAut.conj g).toMonoidHom = fittingPPrimePart G p := by
   have hconj : (Ch01.fitting G).map (MulAut.conj g).toMonoidHom = Ch01.fitting G :=
     Subgroup.Normal.map_conj_eq (Ch01.fitting G) g
@@ -90,7 +90,7 @@ theorem fittingPPrimePart_map_conj [Finite G] [IsSolvable G] (p : ℕ) (g : G) :
   rw [hconj] at this
   exact this.symm
 
-instance fittingPPrimePart_normal [Finite G] [IsSolvable G] (p : ℕ) :
+instance fittingPPrimePart_normal [Finite G] [Group.IsSolvable G] (p : ℕ) :
     (fittingPPrimePart G p).Normal :=
   nilPiPart_normal inferInstance _
 
@@ -106,11 +106,11 @@ theorem normal_centralizer {N : Subgroup G} (hN : N.Normal) :
     _ = g * (x * (g⁻¹ * h * g)) * g⁻¹ := by rw [this]
     _ = (g * x * g⁻¹) * h := by group
 
-instance pCentralizer_normal [Finite G] [IsSolvable G] (p : ℕ) : (pCentralizer G p).Normal :=
+instance pCentralizer_normal [Finite G] [Group.IsSolvable G] (p : ℕ) : (pCentralizer G p).Normal :=
   normal_centralizer inferInstance
 
 /-- `p ≠ q` なら `F(G)` の `{p}`-部分は `F_{q'}` に入る (`{p}`-群は `{q}ᶜ`-群)。 -/
-theorem nilPiPart_singleton_le_fittingPPrimePart [Finite G] [IsSolvable G] {p q : ℕ}
+theorem nilPiPart_singleton_le_fittingPPrimePart [Finite G] [Group.IsSolvable G] {p q : ℕ}
     (hpq : p ≠ q) : nilPiPart (Ch01.fitting G) ({p} : Set ℕ) ≤ fittingPPrimePart G q := by
   have hp := isHallPart_nilPiPart (N := Ch01.fitting G) ({p} : Set ℕ) inferInstance
   refine le_nilPiPart_of_isPiGroup inferInstance hp.1 (fun r hr => ?_)
@@ -120,7 +120,7 @@ theorem nilPiPart_singleton_le_fittingPPrimePart [Finite G] [IsSolvable G] {p q 
 /-- `p ≠ q` なら `F(G) ≤ F_{p'} ⊔ F_{q'}`。
 
 `F(G) = F_p ⊔ F_{p'}` (`IsHallPart.sup_eq`) で `F_p ≤ F_{q'}`。 -/
-theorem fitting_le_sup_fittingPPrimePart [Finite G] [IsSolvable G] {p q : ℕ} (hpq : p ≠ q) :
+theorem fitting_le_sup_fittingPPrimePart [Finite G] [Group.IsSolvable G] {p q : ℕ} (hpq : p ≠ q) :
     Ch01.fitting G ≤ fittingPPrimePart G p ⊔ fittingPPrimePart G q := by
   have hsup : nilPiPart (Ch01.fitting G) ({p} : Set ℕ) ⊔ fittingPPrimePart G p
       = Ch01.fitting G :=
@@ -134,7 +134,7 @@ theorem fitting_le_sup_fittingPPrimePart [Finite G] [IsSolvable G] {p q : ℕ} (
 `F_{p'}` は `K` の `{p}ᶜ`-部分 `B` に含まれ (`le_nilPiPart_of_isPiGroup`)、`K` が冪零なので
 `{p}`-部分は `B` と元ごとに可換 (`IsHallPart.commute`)。よって `{p}`-部分は
 `F_{p'}` を中心化する。 -/
-theorem nilPiPart_singleton_le_pCentralizer [Finite G] [IsSolvable G] {K : Subgroup G}
+theorem nilPiPart_singleton_le_pCentralizer [Finite G] [Group.IsSolvable G] {K : Subgroup G}
     (hK : Group.IsNilpotent ↥K) (hFK : Ch01.fitting G ≤ K) (p : ℕ) :
     nilPiPart K ({p} : Set ℕ) ≤ pCentralizer G p := by
   have hA := isHallPart_nilPiPart (N := K) ({p} : Set ℕ) hK
@@ -162,7 +162,7 @@ theorem centralizer_inf_le_centralizer_sup (A B : Subgroup G) :
   exact (Subgroup.mem_centralizer_iff.mp (key hh) x rfl).symm
 
 /-- `p ≠ q` なら `C(p) ⊓ C(q) ≤ C_G(F(G))`。 -/
-theorem pCentralizer_inf_le_centralizer_fitting [Finite G] [IsSolvable G] {p q : ℕ}
+theorem pCentralizer_inf_le_centralizer_fitting [Finite G] [Group.IsSolvable G] {p q : ℕ}
     (hpq : p ≠ q) :
     pCentralizer G p ⊓ pCentralizer G q
       ≤ Subgroup.centralizer ((Ch01.fitting G : Subgroup G) : Set G) :=

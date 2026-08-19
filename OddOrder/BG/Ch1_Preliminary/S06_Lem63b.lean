@@ -76,12 +76,12 @@ theorem commutator_isHall_of_nilpotent_prime_index [Finite G]
     Nat.Coprime (Nat.card ↥(commutator G)) (commutator G).index := by
   classical
   set p : ℕ := (commutator G).index with hpdef
-  haveI : Fact p.Prime := ⟨hprime⟩
+  have : Fact p.Prime := ⟨hprime⟩
   -- `N = O_{p'}(G')`, and its image `N'` in `G`.
   set N : Subgroup ↥(commutator G) := Ch03.oPiCore {q | q ≠ p} ↥(commutator G) with hNdef
   set N' : Subgroup G := N.map (commutator G).subtype with hN'def
   -- `N'` is normal in `G` (characteristic-in-normal), lies in `G'`, has the same order as `N`.
-  haveI hN'_normal : N'.Normal := by rw [hN'def, hNdef]; infer_instance
+  have hN'_normal : N'.Normal := by rw [hN'def, hNdef]; infer_instance
   have hN'_le : N' ≤ commutator G := by
     rw [hN'def]; rintro _ ⟨a, _, rfl⟩; exact a.2
   have hN'_card : Nat.card ↥N' = Nat.card ↥N := by
@@ -112,17 +112,17 @@ theorem commutator_isHall_of_nilpotent_prime_index [Finite G]
       rcases (Nat.Prime.dvd_mul hq_prime).mp hq_dvd_G with h | h
       · exact h
       · exact absurd ((Nat.prime_dvd_prime_iff_eq hq_prime hprime).mp h) hqp'
-    haveI : Fact q.Prime := ⟨hq_prime⟩
+    have : Fact q.Prime := ⟨hq_prime⟩
     obtain ⟨Sq⟩ : Nonempty (Sylow q ↥(commutator G)) := inferInstance
-    haveI : Group.IsNilpotent ↥(commutator G) := hnil
-    haveI hSq_normal : (Sq : Subgroup ↥(commutator G)).Normal := inferInstance
+    have : Group.IsNilpotent ↥(commutator G) := hnil
+    have hSq_normal : (Sq : Subgroup ↥(commutator G)).Normal := inferInstance
     -- `Sq` is a `p'`-group (it is a `q`-group with `q ≠ p`), hence `≤ N`.
     have hSq_pi : Ch03.Subgroup.IsPiGroup {q | q ≠ p} (Sq : Subgroup ↥(commutator G)) := by
       have hSq_q : Ch03.Subgroup.IsPiGroup ({q} : Set ℕ) (Sq : Subgroup ↥(commutator G)) :=
         Ch04.isPiGroup_singleton_of_isPGroup Sq.isPGroup'
       intro r hr
       have hrq : r = q := by simpa using hSq_q r hr
-      simp only [Set.mem_setOf_eq, hrq]; exact hqp'
+      simp only [Set.mem_ofPred_eq, hrq]; exact hqp'
     have hSq_le_N : (Sq : Subgroup ↥(commutator G)) ≤ N := by
       rw [hNdef]; exact Ch03.Subgroup.IsPiGroup.le_oPiCore hSq_pi
     have hSq_dvd_N : Nat.card (Sq : Subgroup ↥(commutator G)) ∣ Nat.card ↥N :=
@@ -160,16 +160,16 @@ theorem commutator_isHall_of_nilpotent_prime_index [Finite G]
   have hcomm_le_frat : commutator (G ⧸ N') ≤ frattini (G ⧸ N') :=
     le_trans le_sup_left
       (OddOrder.GroupTheory.IsPGroup.commutator_sup_pow_closure_le_frattini hQ_pgroup)
-  haveI hcyc_frat : IsCyclic ((G ⧸ N') ⧸ frattini (G ⧸ N')) := by
+  have hcyc_frat : IsCyclic ((G ⧸ N') ⧸ frattini (G ⧸ N')) := by
     have hdvd : Nat.card ((G ⧸ N') ⧸ frattini (G ⧸ N')) ∣ p := by
       have h1 := Subgroup.index_dvd_of_le hcomm_le_frat
       rw [hcomm_index] at h1; exact h1
     rcases hprime.eq_one_or_self_of_dvd _ hdvd with h1 | hpc
-    · haveI : Subsingleton ((G ⧸ N') ⧸ frattini (G ⧸ N')) :=
+    · have : Subsingleton ((G ⧸ N') ⧸ frattini (G ⧸ N')) :=
         (Nat.card_eq_one_iff_unique.mp h1).1
       infer_instance
     · exact isCyclic_of_prime_card hpc
-  haveI hcyc_Q : IsCyclic (G ⧸ N') :=
+  have hcyc_Q : IsCyclic (G ⧸ N') :=
     OddOrder.GroupTheory.isCyclic_of_isCyclic_quotient_frattini hcyc_frat
   -- `Q` cyclic ⟹ abelian ⟹ `⁅Q,Q⁆ = 1` ⟹ `G' ≤ N'`, hence `G' = N'`.
   have hcommQ_bot : commutator (G ⧸ N') = ⊥ := commutator_eq_bot (G := G ⧸ N')
@@ -189,7 +189,7 @@ complement `K` of `G'` in `G` one has `G' = ⁅⊤, K⁆` (`= [G, K]`).
 `G' = ⁅G', K⁆ ≤ ⁅⊤, K⁆ ≤ ⁅⊤, ⊤⁆ = G'`.  (The Hall/nilpotence hypotheses of (b) are not
 needed here — only solvability and that `K` is a complement — but complements exist precisely
 because `G'` is a normal Hall subgroup, cf. `commutator_isHall_of_nilpotent_prime_index`.) -/
-theorem commutator_eq_commutator_top_of_isComplement' [IsSolvable G]
+theorem commutator_eq_commutator_top_of_isComplement' [Group.IsSolvable G]
     {K : Subgroup G} (hK : (commutator G).IsComplement' K) :
     commutator G = ⁅(⊤ : Subgroup G), K⁆ := by
   have h63a : ⁅commutator G, K⁆ = commutator G :=
@@ -204,7 +204,7 @@ theorem commutator_eq_commutator_top_of_isComplement' [IsSolvable G]
 /-- **BG Lemma 6.3(b)** (mmd L2000): let `G` be a finite solvable group.  If `G'` is nilpotent
 and `|G/G'|` is prime, then `G'` is a Hall subgroup of `G` and `G' = ⁅⊤, K⁆` (`= [G, K]`) for
 every complement `K` of `G'` in `G`. -/
-theorem lemma63b [Finite G] [IsSolvable G]
+theorem lemma63b [Finite G] [Group.IsSolvable G]
     (hnil : Group.IsNilpotent ↥(commutator G))
     (hprime : (commutator G).index.Prime) :
     Nat.Coprime (Nat.card ↥(commutator G)) (commutator G).index ∧

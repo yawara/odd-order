@@ -96,10 +96,10 @@ theorem card_mulAut_eq_two_of_isSimpleGroup (hs : IsSimpleGroup (MulAut A))
     rcases hs.eq_bot_or_eq_top_of_normal (Subgroup.center (MulAut A)) inferInstance with hb | ht
     · exact absurd (Subgroup.mem_bot.mp (hb ▸ invMulAut_mem_center (A := A))) hne
     · exact ht
-  haveI : IsMulCommutative (MulAut A) := Subgroup.center_eq_top_iff.mp hcenter
+  have : IsMulCommutative (MulAut A) := Subgroup.center_eq_top_iff.mp hcenter
   have hp : (Nat.card (MulAut A)).Prime := Group.is_simple_iff_prime_card.mp hs
-  haveI : Finite (MulAut A) := Nat.finite_of_card_ne_zero hp.ne_zero
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Finite (MulAut A) := Nat.finite_of_card_ne_zero hp.ne_zero
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hord : orderOf (invMulAut A) = 2 :=
     orderOf_eq_prime (by rw [pow_two, invMulAut_sq]) hne
   have hdvd : (2 : ℕ) ∣ Nat.card (MulAut A) := hord ▸ orderOf_dvd_natCard _
@@ -147,7 +147,7 @@ theorem totient_le_card_mulAut_of_orderOf_eq {n : ℕ} [NeZero n]
       simpa [Nat.ModEq, Nat.mod_eq_of_lt hu, Nat.mod_eq_of_lt hv] using h4
     exact Units.ext (ZMod.val_injective n h5)
   have hcard : Nat.card ((ZMod n)ˣ) = n.totient := by
-    haveI : Fintype (ZMod n) := ZMod.fintype n
+    have : Fintype (ZMod n) := ZMod.fintype n
     rw [Nat.card_eq_fintype_card, ZMod.card_units_eq_totient]
   calc n.totient = Nat.card ((ZMod n)ˣ) := hcard.symm
     _ ≤ Nat.card (MulAut A) := Nat.card_le_card_of_injective F hinj
@@ -159,7 +159,7 @@ theorem totient_le_card_mulAut_of_orderOf_eq {n : ℕ} [NeZero n]
 `totient_le_card_mulAut_of_orderOf_eq` が使える. -/
 theorem totient_exponent_le_card_mulAut :
     Nat.totient (Monoid.exponent A) ≤ Nat.card (MulAut A) := by
-  letI : Module (ZMod (Monoid.exponent A)) (Additive A) :=
+  let : Module (ZMod (Monoid.exponent A)) (Additive A) :=
     zmodModule_of_pow_eq_one (n := Monoid.exponent A) (E := A) fun x =>
       Monoid.pow_exponent_eq_one x
   obtain ⟨g, hg⟩ := Monoid.exists_orderOf_eq_exponent (G := A) Monoid.ExponentExists.of_finite
@@ -255,8 +255,8 @@ theorem mulAutOfSquareZero_ne_one {f : A →* A} (hf : ∀ a, f (f a) = 1) (hne 
 theorem eq_of_ne_one_of_card_eq_two {G : Type*} [Group G] (hG : Nat.card G = 2) {x y : G}
     (hx : x ≠ 1) (hy : y ≠ 1) : x = y := by
   classical
-  haveI : Finite G := Nat.finite_of_card_ne_zero (by omega)
-  haveI := Fintype.ofFinite G
+  have : Finite G := Nat.finite_of_card_ne_zero (by omega)
+  have := Fintype.ofFinite G
   by_contra hxy
   have hcard3 : ({1, x, y} : Finset G).card = 3 := by
     rw [Finset.card_insert_of_notMem (by simp [Ne.symm hx, Ne.symm hy]),
@@ -297,8 +297,8 @@ theorem eq_inv_sq_of_card_mulAut_eq_two (hcard : Nat.card (MulAut A) = 2)
 theorem exists_nontrivial_hom_of_zmodModule {p : ℕ} (hp : p.Prime) {V : Type*} [CommGroup V]
     [Nontrivial V] [Module (ZMod p) (Additive V)] :
     ∃ π : V →* Multiplicative (ZMod p), π ≠ 1 := by
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : Nontrivial (Additive V) := inferInstanceAs (Nontrivial V)
+  have : Fact p.Prime := ⟨hp⟩
+  have : Nontrivial (Additive V) := inferInstanceAs (Nontrivial V)
   set b := Module.Basis.ofVectorSpace (ZMod p) (Additive V) with hb
   obtain ⟨i⟩ := b.index_nonempty
   have hbi : b.coord i (b i) = 1 := by
@@ -325,9 +325,9 @@ theorem exists_prime_nontrivial_hom (Q : Type*) [CommGroup Q] [Finite Q] [Nontri
   set p := (Nat.card Q).minFac with hpdef
   have hcardQ : 1 < Nat.card Q := Finite.one_lt_card_iff_nontrivial.mpr inferInstance
   have hp : p.Prime := Nat.minFac_prime (by omega)
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   -- `p` 乗写像は単射でない (Cauchy) から全射でもない
-  haveI := Fintype.ofFinite Q
+  have := Fintype.ofFinite Q
   obtain ⟨q, hq⟩ : ∃ q : Q, orderOf q = p :=
     exists_prime_orderOf_dvd_card p (by rw [← Nat.card_eq_fintype_card]; exact Nat.minFac_dvd _)
   have hq1 : q ≠ 1 := by
@@ -346,7 +346,7 @@ theorem exists_prime_nontrivial_hom (Q : Type*) [CommGroup Q] [Finite Q] [Nontri
   obtain ⟨v₀, hv₀⟩ : ∃ v : Q, v ∉ R := by
     by_contra hc
     exact hR (Subgroup.eq_top_iff' R |>.mpr fun x => not_not.mp fun hx => hc ⟨x, hx⟩)
-  haveI : Nontrivial (Q ⧸ R) :=
+  have : Nontrivial (Q ⧸ R) :=
     ⟨⟨QuotientGroup.mk v₀, 1, by simpa [QuotientGroup.eq_one_iff] using hv₀⟩⟩
   have hVexp : ∀ v : Q ⧸ R, v ^ p = 1 := by
     intro v
@@ -354,7 +354,7 @@ theorem exists_prime_nontrivial_hom (Q : Type*) [CommGroup Q] [Finite Q] [Nontri
     | H x =>
       rw [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
       exact ⟨x, rfl⟩
-  letI : Module (ZMod p) (Additive (Q ⧸ R)) := zmodModule_of_pow_eq_one (n := p) hVexp
+  let : Module (ZMod p) (Additive (Q ⧸ R)) := zmodModule_of_pow_eq_one (n := p) hVexp
   obtain ⟨π, hπ⟩ := exists_nontrivial_hom_of_zmodModule (V := Q ⧸ R) hp
   refine ⟨p, hp, π.comp (QuotientGroup.mk' R), fun hc => hπ (MonoidHom.ext fun y => ?_)⟩
   obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective R y
@@ -369,7 +369,7 @@ theorem exists_prime_hom_of_ne_top [Finite A] {H : Subgroup A} (hH : H ≠ ⊤) 
   obtain ⟨a₀, ha₀⟩ : ∃ a : A, a ∉ H := by
     by_contra hc
     exact hH (Subgroup.eq_top_iff' H |>.mpr fun x => not_not.mp fun hx => hc ⟨x, hx⟩)
-  haveI : Nontrivial (A ⧸ H) :=
+  have : Nontrivial (A ⧸ H) :=
     ⟨⟨QuotientGroup.mk a₀, 1, by simpa [QuotientGroup.eq_one_iff] using ha₀⟩⟩
   obtain ⟨p, hp, π, hπ⟩ := exists_prime_nontrivial_hom (A ⧸ H)
   refine ⟨p, hp, π.comp (QuotientGroup.mk' H), fun x hx => ?_, ?_⟩
@@ -404,8 +404,8 @@ theorem isCyclic_of_card_mulAut_eq_two [Finite A] (hcard : Nat.card (MulAut A) =
   refine ⟨g, ?_⟩
   by_contra hne
   obtain ⟨p, hp, φ, hφker, hφ⟩ := exists_prime_hom_of_ne_top (A := A) hne
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : NeZero p := ⟨hp.pos.ne'⟩
+  have : Fact p.Prime := ⟨hp⟩
+  have : NeZero p := ⟨hp.pos.ne'⟩
   obtain ⟨a₁, ha₁⟩ : ∃ a : A, φ a ≠ 1 := by
     by_contra hc
     exact hφ (MonoidHom.ext fun a => not_not.mp fun hx => hc ⟨a, hx⟩)
@@ -472,7 +472,7 @@ theorem isCyclic_of_card_mulAut_eq_two [Finite A] (hcard : Nat.card (MulAut A) =
 theorem isCyclic_and_card_of_isSimpleGroup_mulAut [Finite A] (hs : IsSimpleGroup (MulAut A))
     (hexp : ∃ a : A, a ^ 2 ≠ 1) :
     IsCyclic A ∧ (Nat.card A = 3 ∨ Nat.card A = 4 ∨ Nat.card A = 6) := by
-  haveI : IsCyclic A :=
+  have : IsCyclic A :=
     isCyclic_of_card_mulAut_eq_two (card_mulAut_eq_two_of_isSimpleGroup hs hexp) hexp
   refine ⟨inferInstance, ?_⟩
   have hexpA := exponent_mem_of_isSimpleGroup_mulAut hs hexp
@@ -487,7 +487,7 @@ theorem subsingleton_mulAut_of_card_le_two {G : Type*} [Group G] [Finite G]
   rcases eq_or_ne a 1 with rfl | ha
   · simp
   rcases Nat.lt_or_ge (Nat.card G) 2 with hlt | hge
-  · haveI : Subsingleton G := Finite.card_le_one_iff_subsingleton.mp (by omega)
+  · have : Subsingleton G := Finite.card_le_one_iff_subsingleton.mp (by omega)
     exact absurd (Subsingleton.elim a 1) ha
   have hcard : Nat.card G = 2 := le_antisymm hG hge
   have hφ : φ a = a :=
@@ -501,9 +501,9 @@ theorem subsingleton_mulAut_of_card_le_two {G : Type*} [Group G] [Finite G]
 theorem not_isSimpleGroup_of_card_eq_six {G : Type*} [Group G] (hG : Nat.card G = 6) :
     ¬ IsSimpleGroup G := by
   intro hs
-  haveI : Finite G := Nat.finite_of_card_ne_zero (by omega)
-  haveI := Fintype.ofFinite G
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Finite G := Nat.finite_of_card_ne_zero (by omega)
+  have := Fintype.ofFinite G
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   obtain ⟨x, hx⟩ : ∃ x : G, orderOf x = 3 :=
     exists_prime_orderOf_dvd_card 3 (by rw [← Nat.card_eq_fintype_card, hG]; norm_num)
   have hcardH : Nat.card (Subgroup.zpowers x) = 3 := by rw [Nat.card_zpowers, hx]
@@ -511,7 +511,7 @@ theorem not_isSimpleGroup_of_card_eq_six {G : Type*} [Group G] (hG : Nat.card G 
     have hmul := Subgroup.card_mul_index (Subgroup.zpowers x)
     rw [hcardH, hG] at hmul
     omega
-  haveI : (Subgroup.zpowers x).Normal := Subgroup.normal_of_index_eq_two hindex
+  have : (Subgroup.zpowers x).Normal := Subgroup.normal_of_index_eq_two hindex
   rcases hs.eq_bot_or_eq_top_of_normal (Subgroup.zpowers x) inferInstance with hb | ht
   · rw [hb, Subgroup.index_bot, hG] at hindex; omega
   · rw [ht, Subgroup.index_top] at hindex; omega

@@ -114,7 +114,7 @@ theorem sum_apply_mul_eq_zero_of_not_subset_characterKernel (N : Subgroup Γ) [h
     congr 1
     group
   -- the range of `T` is a subrepresentation
-  haveI : Representation.IsIrreducible ρ := hirr
+  have : Representation.IsIrreducible ρ := hirr
   rcases eq_bot_or_eq_top
       ({ toSubmodule := LinearMap.range T
          apply_mem_toSubmodule := by
@@ -165,7 +165,7 @@ theorem sum_subgroup_apply_eq_zero_of_not_subset_characterKernel {N K : Subgroup
     (hker : ¬ ((N : Set Γ) ⊆ OddOrder.Peterfalvi.S03.characterKernel χ)) :
     ∑ y : ↥K, χ (y : Γ) = 0 := by
   classical
-  haveI : Fintype ↥N := Fintype.ofFinite ↥N
+  have : Fintype ↥N := Fintype.ofFinite ↥N
   have hcard : ((Fintype.card ↥N : ℕ) : ℂ) ≠ 0 :=
     Nat.cast_ne_zero.mpr Fintype.card_pos.ne'
   refine mul_left_cancel₀ hcard ?_
@@ -199,10 +199,10 @@ theorem inner_induce_trivial_induce_eq_zero [Invertible (Nat.card Γ : ℂ)]
     ClassFunction.inner (ClassFunction.induce K (trivialClassFunction ↥K))
       (ClassFunction.induce D ζ) = 0 := by
   classical
-  haveI : Fintype ↥K := Fintype.ofFinite ↥K
-  haveI : Fintype ↥D := Fintype.ofFinite ↥D
-  haveI : (N.subgroupOf D).Normal := hNn.subgroupOf D
-  haveI : Fintype ↥(N.subgroupOf D) := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite ↥K
+  have : Fintype ↥D := Fintype.ofFinite ↥D
+  have : (N.subgroupOf D).Normal := hNn.subgroupOf D
+  have : Fintype ↥(N.subgroupOf D) := Fintype.ofFinite _
   -- the subgroup sum `Σ_{y ∈ K} (Ind_D ζ)(y)` vanishes
   have hsum : ∑ y : ↥K, (ClassFunction.induce D ζ) (y : Γ) = 0 := by
     have hval : ∀ y : ↥K, (ClassFunction.induce D ζ) (y : Γ)
@@ -235,7 +235,7 @@ theorem inner_induce_trivial_induce_eq_zero [Invertible (Nat.card Γ : ℂ)]
         rw [Subgroup.mem_subgroupOf, Subgroup.mem_pointwise_smul_iff_inv_smul_mem,
           ← map_inv, inv_inv, MulAut.smul_def, MulAut.conj_apply] at hz
         exact hz
-      haveI : Fintype ↥((MulAut.conj x⁻¹ • K).subgroupOf D) := Fintype.ofFinite _
+      have : Fintype ↥((MulAut.conj x⁻¹ • K).subgroupOf D) := Fintype.ofFinite _
       have hreindex : (∑ y : ↥K, ζ ⟨x⁻¹ * (y : Γ) * x, hD.conj_mem' _ (hKD y.2) x⟩)
           = ∑ z : ↥((MulAut.conj x⁻¹ • K).subgroupOf D), ζ (z : ↥D) := by
         exact Fintype.sum_equiv
@@ -288,7 +288,7 @@ theorem inner_induce_trivial_self_mul_card_sq [Invertible (Nat.card Γ : ℂ)]
       * ((Nat.card ↥K : ℂ) * (Nat.card ↥K : ℂ))
       = ((∑ x : Γ, Nat.card ↥(K ⊓ MulAut.conj x • K) : ℕ) : ℂ) := by
   classical
-  haveI : Fintype ↥K := Fintype.ofFinite ↥K
+  have : Fintype ↥K := Fintype.ofFinite ↥K
   -- the value of `Ind_K 1` at `y ∈ K` is `(1/|K|)·#{x | x⁻¹yx ∈ K}`
   have hval : ∀ y : ↥K,
       (ClassFunction.induce K (trivialClassFunction ↥K)) (y : Γ)
@@ -680,7 +680,7 @@ theorem nineElevenGamma_mem_ZIrr (data : TypesIIIIIIVSetup M) (U₁ : Subgroup G
     [Invertible (Nat.card ↥(data.H.subgroupOf M ⊔ U₁.subgroupOf M) : ℂ)] :
     ClassFunction.induce (data.H.subgroupOf M ⊔ U₁.subgroupOf M)
       (trivialClassFunction ↥(data.H.subgroupOf M ⊔ U₁.subgroupOf M)) ∈ ZIrr ↥M := by
-  haveI : Fintype ↥(data.H.subgroupOf M ⊔ U₁.subgroupOf M) :=
+  have : Fintype ↥(data.H.subgroupOf M ⊔ U₁.subgroupOf M) :=
     Fintype.ofFinite ↥(data.H.subgroupOf M ⊔ U₁.subgroupOf M)
   exact ClassFunction.induce_mem_ZIrr _ trivialClassFunction_isIrreducible.mem_ZIrr
 
@@ -693,7 +693,7 @@ theorem nineElevenGamma_apply_one (data : TypesIIIIIIVSetup M) {U₁ : Subgroup 
     ClassFunction.induce (data.H.subgroupOf M ⊔ U₁.subgroupOf M)
       (trivialClassFunction ↥(data.H.subgroupOf M ⊔ U₁.subgroupOf M)) (1 : ↥M)
       = ((data.q * a : ℕ) : ℂ) := by
-  haveI := hSubgroupOfM_normal data
+  have := hSubgroupOfM_normal data
   have hKle := hSubgroupOfM_sup_le_huSub data hU₁U
   -- `|K| = |H|·|U₁|` and `|HU| = |H|·|U|`
   have hbot := hSubgroupOfM_inf_uSubgroupOfM_eq_bot data
@@ -749,7 +749,7 @@ theorem nineElevenGamma_inner_induceHU (data : TypesIIIIIIVSetup M) {U₁ : Subg
       (ClassFunction.induce (data.H.subgroupOf M ⊔ U₁.subgroupOf M)
         (trivialClassFunction ↥(data.H.subgroupOf M ⊔ U₁.subgroupOf M)))
       (ClassFunction.induce (huSub data) (ζ : ClassFunction ↥(huSub data) ℂ)) = 0 := by
-  haveI := hSubgroupOfM_normal data
+  have := hSubgroupOfM_normal data
   exact inner_induce_trivial_induce_eq_zero (N := data.H.subgroupOf M) le_sup_left
     (hSubgroupOfM_sup_le_huSub data hU₁U) ζ.2 hζ
 
@@ -776,7 +776,7 @@ theorem nineElevenGamma_inner_self_mul_u {chief : ChiefFactorData data}
           (trivialClassFunction ↥(data.H.subgroupOf M ⊔ U₁.subgroupOf M)))
         * (chars.u : ℂ)
       = ((a * chars.u + (data.q - 1) * a ^ 2 : ℕ) : ℂ) := by
-  haveI := hSubgroupOfM_normal data
+  have := hSubgroupOfM_normal data
   have hbot := hSubgroupOfM_inf_uSubgroupOfM_eq_bot data
   -- the `↥M`-realized hypotheses of the fibred count
   have hU₁mU : U₁.subgroupOf M ≤ data.U.subgroupOf M := Subgroup.subgroupOf_mono M hU₁U

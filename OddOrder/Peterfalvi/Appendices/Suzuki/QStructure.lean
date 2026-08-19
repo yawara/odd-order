@@ -182,9 +182,9 @@ theorem isNilpotent_Q : Group.IsNilpotent ↥hyp.Q := by
     · intro hh
       have h2 := hyp.Q_normal_in_H x⁻¹ (inv_mem hxH) _ hh
       simpa [mul_assoc] using h2
-  letI : MulDistribMulAction ↥(Subgroup.zpowers x) ↥hyp.Q :=
+  let : MulDistribMulAction ↥(Subgroup.zpowers x) ↥hyp.Q :=
     MulDistribMulAction.compHom _ (Subgroup.inclusion hle)
-  haveI : Nontrivial ↥(Subgroup.zpowers x) := by
+  have : Nontrivial ↥(Subgroup.zpowers x) := by
     rw [Subgroup.nontrivial_iff_ne_bot]
     exact fun h => hx1 (Subgroup.zpowers_eq_bot.mp h)
   have hFrob : IsFrobeniusAction ↥(Subgroup.zpowers x) ↥hyp.Q := by
@@ -221,8 +221,8 @@ lemma exists_involution_mem_center_Q :
     ∃ u : G, u ∈ hyp.Q ∧ u ^ 2 = 1 ∧ u ≠ 1 ∧
       ∀ v ∈ hyp.Q, u * v = v * u := by
   classical
-  haveI := hyp.isNilpotent_Q
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have := hyp.isNilpotent_Q
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨S⟩ : Nonempty (Sylow 2 ↥hyp.Q) := Sylow.nonempty
   have hSne : (S : Subgroup ↥hyp.Q) ≠ ⊥ := by
     intro hbot

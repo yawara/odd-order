@@ -269,7 +269,7 @@ theorem E3_not_regular_of_mem_kappa_tau3 [Finite G] (hG : OddOrder.BG.IsMinimalS
     {p : ℕ} (hp : p.Prime) (hpκ : p ∈ kappa M) (hpτ3 : p ∈ tau3 M) :
     E₃ ≠ ⊥ ∧ ¬ ActsRegularlyOn (OddOrder.BG.Ch3.S10.Msigma M) E₃ := by
   obtain ⟨_, _, P, hPelem, hPM, hPC⟩ := hpκ
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hPcard : Nat.card ↥P = p := by rw [(mem_elemAbelianOfRank.mp hPelem).2, pow_one]
   have hPpi : Ch03.Subgroup.IsPiGroup (tau3 M) (P.subgroupOf M) := by
     intro q hq
@@ -312,7 +312,7 @@ theorem E1_not_regular_of_mem_kappa_tau1 [Finite G] (hG : OddOrder.BG.IsMinimalS
     {p : ℕ} (hp : p.Prime) (hpκ : p ∈ kappa M) (hpτ1 : p ∈ tau1 M) :
     E₁ ≠ ⊥ ∧ ¬ ActsRegularlyOn (OddOrder.BG.Ch3.S10.Msigma M) E₁ := by
   obtain ⟨_, _, P, hPelem, hPM, hPC⟩ := hpκ
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hPcard : Nat.card ↥P = p := by rw [(mem_elemAbelianOfRank.mp hPelem).2, pow_one]
   have hPpi : Ch03.Subgroup.IsPiGroup (tau1 M) (P.subgroupOf M) := by
     intro q hq
@@ -383,7 +383,7 @@ theorem mem_tau1_union_tau3_of_mem_primeFactors_card_E [Finite G]
     (hxC : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥)
     {p : ℕ} (hp : p ∈ (Nat.card ↥E).primeFactors) : p ∈ tau1 M ∪ tau3 M := by
   obtain ⟨hpp, hpdvdE, -⟩ := Nat.mem_primeFactors.mp hp
-  haveI : Fact p.Prime := ⟨hpp⟩
+  have : Fact p.Prime := ⟨hpp⟩
   have hpσ : p ∉ OddOrder.BG.Ch3.S10.sigma M := h.not_mem_sigma_of_mem_primeFactors hG hp
   have hr2 : pRank ↥M p ≤ 2 := h.pRank_M_le_two hG hp
   -- `p ∣ |M|`, so `r_p(M) ≥ 1`.
@@ -420,7 +420,7 @@ theorem mem_kappa_of_mem_primeFactors_card_E [Finite G]
     (hxC : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥)
     {p : ℕ} (hp : p ∈ (Nat.card ↥E).primeFactors) : p ∈ kappa M := by
   obtain ⟨hpp, hpdvdE, -⟩ := Nat.mem_primeFactors.mp hp
-  haveI : Fact p.Prime := ⟨hpp⟩
+  have : Fact p.Prime := ⟨hpp⟩
   have hτ13 : p ∈ tau1 M ∪ tau3 M :=
     mem_tau1_union_tau3_of_mem_primeFactors_card_E hG h hxE3 hxne hxC hp
   -- `C_{M_σ}(E) ≠ 1` from the witness `x` and prime action.
@@ -468,7 +468,7 @@ theorem mem_kappa_of_mem_primeFactors_card_E1 [Finite G]
     (hCE1 : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (E₁ : Set G) ≠ ⊥)
     {p : ℕ} (hp : p ∈ (Nat.card ↥E₁).primeFactors) : p ∈ kappa M := by
   obtain ⟨hpp, hpdvdE1, -⟩ := Nat.mem_primeFactors.mp hp
-  haveI : Fact p.Prime := ⟨hpp⟩
+  have : Fact p.Prime := ⟨hpp⟩
   have hpτ1 : p ∈ tau1 M := h.E₁_hall.1 p (by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₁_le).toEquiv]; exact hp)
   obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' p hpdvdE1

@@ -48,16 +48,16 @@ theorem proper_hasPLengthOne [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [F
       (Ch1.hasPLengthOne_subgroup hMpl (H.subgroupOf M))
   by_cases hpα : p ∈ alpha M
   · -- `r_p(M) ≥ 3` branch (`p ∈ α(M)`): the representation-theory keystone (BG Theorem 3.6).
-    haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+    have hMsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
     have hoddM : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
     have hp_dvd_M : p ∣ Nat.card ↥M :=
       (Nat.mem_primeFactors.mp (alpha_subset_primeFactors M hpα)).2.1
-    haveI hMnt : Nontrivial ↥M := by
+    have hMnt : Nontrivial ↥M := by
       rw [← Finite.one_lt_card_iff_nontrivial]
       exact lt_of_lt_of_le (Fact.out : p.Prime).one_lt (Nat.le_of_dvd Nat.card_pos hp_dvd_M)
     -- `N := M_α` viewed inside `↥M`: a normal Hall `α(M)`-subgroup.
     set N : Subgroup ↥M := (Malpha M).subgroupOf M with hN_def
-    haveI hNnorm : N.Normal := by rw [hN_def]; infer_instance
+    have hNnorm : N.Normal := by rw [hN_def]; infer_instance
     have hHallN : Ch03.IsHallSubgroup (alpha M) N := by
       rw [hN_def]; exact Malpha_subgroupOf_isHall_of_isHall (Malpha_isHall hG hM)
     have hcoprime : Nat.Coprime (Nat.card ↥N) N.index := hHallN.coprime_index
@@ -72,7 +72,7 @@ theorem proper_hasPLengthOne [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [F
         _ = commutator ↥M :=
             Subgroup.comap_map_eq_self_of_injective M.subtype_injective (commutator ↥M)
     have hN_lt : N < ⊤ :=
-      lt_of_le_of_lt hN_der (IsSolvable.commutator_lt_top_of_nontrivial (G := ↥M))
+      lt_of_le_of_lt hN_der (Group.IsSolvable.commutator_lt_top_of_nontrivial (G := ↥M))
     -- `p ∣ |N|` (Hall + `p ∈ α(M)`), hence `M_α ≠ 1`.
     have hp_dvd_N : p ∣ Nat.card ↥N := by
       have hp_prod : p ∣ Nat.card ↥N * N.index := by
@@ -94,10 +94,11 @@ theorem proper_hasPLengthOne [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [F
       rw [hKbot, sup_bot_eq] at hsup
       exact hN_lt.ne hsup
     -- Choose a prime `q ∈ π(K/K')` (`K` is solvable and nontrivial, hence not perfect).
-    haveI hKnt : Nontrivial ↥K := (Subgroup.nontrivial_iff_ne_bot K).mpr hK_ne
-    haveI hKsolv : IsSolvable ↥K := solvable_of_solvable_injective K.subtype_injective
+    have hKnt : Nontrivial ↥K := (Subgroup.nontrivial_iff_ne_bot K).mpr hK_ne
+    have hKsolv : Group.IsSolvable ↥K :=
+      Group.isSolvable_of_isSolvable_injective K.subtype_injective
     have hidx_ne1 : (commutator ↥K).index ≠ 1 := fun h =>
-      (IsSolvable.commutator_lt_top_of_nontrivial (G := ↥K)).ne
+      (Group.IsSolvable.commutator_lt_top_of_nontrivial (G := ↥K)).ne
         (Subgroup.index_eq_one.mp h)
     obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd hidx_ne1
     have hqK' : q ∈ ((commutator ↥K).index).primeFactors :=
@@ -151,11 +152,11 @@ private theorem exists_sigma_maximal_of_sylow [Finite G] (hG : IsMinimalSimpleOd
     have hPnormal : (P : Subgroup G).Normal := Subgroup.normalizer_eq_top_iff.mp htop
     rcases hG.simple.eq_bot_or_eq_top_of_normal _ hPnormal with hbot | htop'
     · exact hPne hbot
-    · have hsolv : IsSolvable ↥(P : Subgroup G) := by
-        haveI := (P.isPGroup').isNilpotent; infer_instance
+    · have hsolv : Group.IsSolvable ↥(P : Subgroup G) := by
+        have := (P.isPGroup').isNilpotent; infer_instance
       rw [htop'] at hsolv
-      haveI := hsolv
-      exact hG.notSolvable (solvable_of_surjective
+      have := hsolv
+      exact hG.notSolvable (Group.isSolvable_of_surjective
         (f := (Subgroup.topEquiv (G := G)).toMonoidHom) (Subgroup.topEquiv (G := G)).surjective)
   obtain ⟨M, hMco, hNM⟩ :=
     (eq_top_or_exists_le_coatom (Subgroup.normalizer ((P : Subgroup G) : Set G))).resolve_left
@@ -187,7 +188,7 @@ private theorem omega_map_mulEquiv {A B : Type*} [Group A] [Group B] (e : A ≃*
   rw [Omega, MonoidHom.map_closure]
   congr 1
   ext h
-  simp only [Set.mem_image, Set.mem_setOf_eq, MulEquiv.coe_toMonoidHom]
+  simp only [Set.mem_image, Set.mem_ofPred_eq, MulEquiv.coe_toMonoidHom]
   constructor
   · rintro ⟨g, hg, rfl⟩; rw [← map_pow, hg, map_one]
   · intro hh; exact ⟨e.symm h, by rw [← map_pow, hh, map_one], e.apply_symm_apply h⟩
@@ -291,7 +292,7 @@ private theorem sylow_structure_a [Finite G] (hG : IsMinimalSimpleOdd G) {p : �
     exact ⟨by rw [hPne]; simp, hPne ▸ bot_le⟩
   -- Main case: pull in a maximal `M ⊇ N_G(P)` with `p ∈ σ(M)`.
   obtain ⟨M, hM, hNM, hpσ, hPM⟩ := exists_sigma_maximal_of_sylow hG P hPne
-  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hMsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hMlt : M < ⊤ := (mem_maximalSubgroups.mp hM).lt_top
   have hpl1 : Ch1.hasPLengthOne p ↥M := proper_hasPLengthOne hG M hMlt
   -- `P` restricts to a Sylow `p`-subgroup `Q` of `↥M`.
@@ -316,8 +317,8 @@ private theorem sylow_structure_a [Finite G] (hG : IsMinimalSimpleOdd G) {p : �
   have hPN : (P : Subgroup G) ≤ N := Subgroup.le_normalizer
   have hVN : V ≤ N := hV
   have hNlt : N < ⊤ := lt_of_le_of_lt hNM hMlt
-  haveI hNsolv : IsSolvable ↥N := hG.solvable_of_lt_top N hNlt
-  haveI hPsubN_normal : ((P : Subgroup G).subgroupOf N).Normal :=
+  have hNsolv : Group.IsSolvable ↥N := hG.isSolvable_of_lt_top N hNlt
+  have hPsubN_normal : ((P : Subgroup G).subgroupOf N).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hPN).mpr hNdef.le
   have hinf : ((P : Subgroup G).subgroupOf N) ⊓ (V.subgroupOf N) = ⊥ := by
     rw [eq_bot_iff]
@@ -391,7 +392,7 @@ private theorem sylow_structure_b [Finite G] (hG : IsMinimalSimpleOdd G) {p : �
     apply Subgroup.map_injective (P : Subgroup G).subtype_injective
     rw [hmapeq, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
   -- Blackburn 4.16 hypotheses.
-  haveI hPnt : Nontrivial ↥(P : Subgroup G) := (Subgroup.nontrivial_iff_ne_bot _).mpr hPne
+  have hPnt : Nontrivial ↥(P : Subgroup G) := (Subgroup.nontrivial_iff_ne_bot _).mpr hPne
   have hpdvdG : p ∣ Nat.card G := by
     obtain ⟨n, hn⟩ := P.isPGroup'.exists_card_eq
     have hn0 : n ≠ 0 := fun h => hPne (Subgroup.card_eq_one.mp (by rw [hn, h, pow_zero]))
@@ -404,7 +405,7 @@ private theorem sylow_structure_b [Finite G] (hG : IsMinimalSimpleOdd G) {p : �
     set N : Subgroup G := Subgroup.normalizer ((P : Subgroup G) : Set G) with hNdef
     have hPN : (P : Subgroup G) ≤ N := Subgroup.le_normalizer
     have hVN : V ≤ N := hV
-    haveI hPsubN_normal : ((P : Subgroup G).subgroupOf N).Normal :=
+    have hPsubN_normal : ((P : Subgroup G).subgroupOf N).Normal :=
       (Subgroup.normal_subgroupOf_iff_le_normalizer hPN).mpr hNdef.le
     have hinf : ((P : Subgroup G).subgroupOf N) ⊓ (V.subgroupOf N) = ⊥ := by
       rw [eq_bot_iff]
@@ -468,7 +469,7 @@ private theorem sylow_structure_b [Finite G] (hG : IsMinimalSimpleOdd G) {p : �
   refine ⟨P₁, P₂, Subgroup.map_subtype_le _, Subgroup.map_subtype_le _, ⟨hP₁es, hP₁exp⟩, hP₁card,
     ?_, ?_, ?_⟩
   · -- `IsCyclic ↥P₂` by transport along `ι₂`.
-    haveI := hR₂cyc
+    have := hR₂cyc
     exact isCyclic_of_surjective ι₂.toMonoidHom ι₂.surjective
   · -- `Ω₁(P₂) = Z(P₁)` (in `G`), transported from Blackburn's `↥P`-level equality.
     have key := congrArg (Subgroup.map (P : Subgroup G).subtype) hΩeq
@@ -496,7 +497,7 @@ private theorem sylow_structure_c [Finite G] (hG : IsMinimalSimpleOdd G) {p : �
   by_cases hPne : (P : Subgroup G) = ⊥
   · exact absurd (le_bot_iff.mp (hPne ▸ hQP)) hQbot
   obtain ⟨M, hM, hNM, hpσ, hPM⟩ := exists_sigma_maximal_of_sylow hG P hPne
-  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hMsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hMlt : M < ⊤ := (mem_maximalSubgroups.mp hM).lt_top
   have hpl1 : Ch1.hasPLengthOne p ↥M := proper_hasPLengthOne hG M hMlt
   obtain ⟨PM, hPM_eq⟩ := exists_sylow_subgroupOf_of_le P hPM
@@ -661,7 +662,7 @@ theorem exists_sylow_complement_normalizer [Finite G] {p : ℕ} [Fact p.Prime]
       (P : Subgroup G) ⊔ V = Subgroup.normalizer ((P : Subgroup G) : Set G) := by
   set N : Subgroup G := Subgroup.normalizer ((P : Subgroup G) : Set G) with hNdef
   have hPN : (P : Subgroup G) ≤ N := Subgroup.le_normalizer
-  haveI hPsubN_normal : ((P : Subgroup G).subgroupOf N).Normal :=
+  have hPsubN_normal : ((P : Subgroup G).subgroupOf N).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hPN).mpr hNdef.le
   obtain ⟨PN, hPNeq⟩ := exists_sylow_subgroupOf_of_le P hPN
   have hcop : Nat.Coprime (Nat.card ↥((P : Subgroup G).subgroupOf N))
@@ -828,7 +829,7 @@ theorem derived_msigma_hasNormalPComplement_of_not_mem_beta [Finite G]
     (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ}
     [Fact p.Prime] (hpπ : p ∈ (Nat.card ↥M).primeFactors) (hpβ : p ∉ beta M) :
     Ch05.HasNormalPComplement p ↥(derivedInG M) ∧ Ch05.HasNormalPComplement p ↥(Msigma M) := by
-  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hMsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hoddM : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
   have hp_dvd : p ∣ Nat.card ↥M := (Nat.mem_primeFactors.mp hpπ).2.1
   have hM_lt : M < ⊤ := lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hM).1
@@ -893,32 +894,32 @@ theorem isHall_oPiCore_of_forall_hasNormalPComplement {H : Type*} [Group H] [Fin
     apply le_antisymm
     · refine Ch03.Subgroup.IsPiGroup.le_oPiCore (fun q hq => ?_)
       have hqπ : q ∈ π := Ch03.oPiCore.isPiGroup π q hq
-      rw [Set.mem_compl_iff, hT, Set.mem_setOf_eq, not_and, not_not]
+      rw [Set.mem_compl_iff, hT, Set.mem_ofPred_eq, not_and, not_not]
       exact fun _ => hqπ
     · refine Ch03.Subgroup.IsPiGroup.le_oPiCore (fun q hq => ?_)
       have hqTc : q ∈ Tᶜ := Ch03.oPiCore.isPiGroup Tᶜ q hq
-      rw [Set.mem_compl_iff, hT, Set.mem_setOf_eq, not_and, not_not] at hqTc
+      rw [Set.mem_compl_iff, hT, Set.mem_ofPred_eq, not_and, not_not] at hqTc
       exact hqTc (hmemH hq)
   rw [hEq]
   refine ⟨fun q hq => ?_, ?_⟩
   · -- `O_{Tᶜ}(H)` is a `π`-group: a prime divisor `q` is in `Tᶜ` and in `π(H)`, hence in `π`.
     have hqTc : q ∈ Tᶜ := Ch03.oPiCore.isPiGroup Tᶜ q hq
-    rw [Set.mem_compl_iff, hT, Set.mem_setOf_eq, not_and, not_not] at hqTc
+    rw [Set.mem_compl_iff, hT, Set.mem_ofPred_eq, not_and, not_not] at hqTc
     exact hqTc (hmemH hq)
   · -- index coprime to `π`: a prime `r ∈ π` dividing the index gives a Sylow `r` inside `O_{Tᶜ}`.
     intro r hridx hrπ
     obtain ⟨hr_prime, hr_dvd_idx, -⟩ := Nat.mem_primeFactors.mp hridx
-    haveI : Fact r.Prime := ⟨hr_prime⟩
+    have : Fact r.Prime := ⟨hr_prime⟩
     obtain ⟨P⟩ := (inferInstance : Nonempty (Sylow r H))
     have hP_le : (P : Subgroup H) ≤ Ch03.oPiCore Tᶜ H := by
       rw [← Ch03.iInf_oPiCore_compl_singleton T]
       refine le_iInf₂ fun p hp => ?_
       obtain ⟨hpH, hpπ⟩ := hp
       have hp_prime : p.Prime := Nat.prime_of_mem_primeFactors hpH
-      haveI : Fact p.Prime := ⟨hp_prime⟩
+      have : Fact p.Prime := ⟨hp_prime⟩
       have hrp_ne : r ≠ p := fun h => hpπ (h ▸ hrπ)
       obtain ⟨N', hN'normal, hN'compl⟩ := hNPC p hp_prime hpH hpπ
-      haveI := hN'normal
+      have := hN'normal
       obtain ⟨Q⟩ := (inferInstance : Nonempty (Sylow p H))
       have hN'idx : N'.index = Nat.card ↥(Q : Subgroup H) := (hN'compl Q).symm.index_eq_card
       have hcardN' : Nat.card ↥N' = (Q : Subgroup H).index := ((hN'compl Q).index_eq_card).symm
@@ -947,7 +948,7 @@ theorem oPiCore_subgroupOf_eq_of_normal {G' : Type*} [Group G'] [Finite G'] (π 
     (D : Subgroup G') [D.Normal] :
     (Ch03.oPiCore π G').subgroupOf D = Ch03.oPiCore π ↥D := by
   apply le_antisymm
-  · haveI : ((Ch03.oPiCore π G').subgroupOf D).Normal :=
+  · have : ((Ch03.oPiCore π G').subgroupOf D).Normal :=
       Subgroup.Normal.subgroupOf inferInstance D
     refine Ch03.Subgroup.IsPiGroup.le_oPiCore (fun q hq => ?_)
     refine Ch03.oPiCore.isPiGroup (G := G') π q ?_
@@ -959,7 +960,7 @@ theorem oPiCore_subgroupOf_eq_of_normal {G' : Type*} [Group G'] [Finite G'] (π 
     exact Nat.primeFactors_mono (Subgroup.card_dvd_of_le inf_le_left) Nat.card_pos.ne' hq
   · intro x hx
     rw [Subgroup.mem_subgroupOf]
-    haveI : ((Ch03.oPiCore π ↥D).map D.subtype).Normal := inferInstance
+    have : ((Ch03.oPiCore π ↥D).map D.subtype).Normal := inferInstance
     have hpi : Ch03.Subgroup.IsPiGroup π ((Ch03.oPiCore π ↥D).map D.subtype) := by
       intro q hq
       refine Ch03.oPiCore.isPiGroup (G := ↥D) π q ?_
@@ -977,7 +978,7 @@ theorem isNilpotent_of_forall_hasNormalPComplement {H : Type*} [Group H] [Finite
     Group.IsNilpotent H := by
   refine ((Group.isNilpotent_of_finite_tfae (G := H)).out 0 3).mpr ?_
   intro p hp P
-  haveI := hp
+  have := hp
   have hHall : Ch03.IsHallSubgroup ({p} : Set ℕ) (Ch03.oPiCore ({p} : Set ℕ) H) :=
     isHall_oPiCore_of_forall_hasNormalPComplement _ (fun q hq_prime hq_mem _ => h q hq_prime hq_mem)
   have hOp_pg : IsPGroup p ↥(Ch03.oPiCore ({p} : Set ℕ) H) :=
@@ -997,8 +998,8 @@ theorem isNilpotent_of_forall_hasNormalPComplement {H : Type*} [Group H] [Finite
     rw [hk, hfac]
   set Q : Sylow p H := Sylow.ofCard (Ch03.oPiCore ({p} : Set ℕ) H) hcard with hQdef
   have hQcoe : (Q : Subgroup H) = Ch03.oPiCore ({p} : Set ℕ) H := Sylow.coe_ofCard _ hcard
-  haveI hQnorm : (Q : Subgroup H).Normal := by rw [hQcoe]; infer_instance
-  haveI := Sylow.unique_of_normal Q hQnorm
+  have hQnorm : (Q : Subgroup H).Normal := by rw [hQcoe]; infer_instance
+  have := Sylow.unique_of_normal Q hQnorm
   rw [Subsingleton.elim P Q, hQcoe]
   infer_instance
 
@@ -1009,14 +1010,14 @@ A Hall `βᶜ`-subgroup `W` exists by solvability (`hall_E_exists`); each prime 
 lies in `π(K) − β`, so `K` (hence `W ≤ K`) has a normal `p`-complement
 (`hasNormalPComplement_of_subgroup`), making `W` nilpotent
 (`isNilpotent_of_forall_hasNormalPComplement`). -/
-theorem exists_isNilpotent_isHall_compl {K : Type*} [Group K] [Finite K] [IsSolvable K]
+theorem exists_isNilpotent_isHall_compl {K : Type*} [Group K] [Finite K] [Group.IsSolvable K]
     (β : Set ℕ)
     (hNPC : ∀ p : ℕ, p.Prime → p ∈ (Nat.card K).primeFactors → p ∉ β →
       Ch05.HasNormalPComplement p K) :
     ∃ W : Subgroup K, Ch03.IsHallSubgroup βᶜ W ∧ Group.IsNilpotent ↥W := by
   obtain ⟨W, hW⟩ := Ch03.hall_E_exists (G := K) βᶜ
   refine ⟨W, hW, isNilpotent_of_forall_hasNormalPComplement (fun p hp_prime hp_mem => ?_)⟩
-  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have : Fact p.Prime := ⟨hp_prime⟩
   have hpβc : p ∈ βᶜ := hW.1 p hp_mem
   have hpK : p ∈ (Nat.card K).primeFactors :=
     Nat.primeFactors_mono (Subgroup.card_subgroup_dvd_card W) Nat.card_pos.ne' hp_mem
@@ -1037,7 +1038,7 @@ and `not_dvd_index_of_mem_sigma` lift this to `G`. -/
 theorem Mbeta_isHall [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
     Ch03.IsHallSubgroup (beta M) (Mbeta M) := by
-  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hMsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hβσ : beta M ⊆ sigma M := fun p hp => alpha_subset_sigma hG hM (beta_subset_alpha M hp)
   -- internal: `O_{σ(M)}(↥M) ≤ commutator ↥M` (from `M_σ ≤ M'`).
   have hMσ_le : Ch03.oPiCore (sigma M) ↥M ≤ commutator ↥M := by
@@ -1050,7 +1051,7 @@ theorem Mbeta_isHall [Finite G] (hG : IsMinimalSimpleOdd G)
   have hHallD : Ch03.IsHallSubgroup (beta M) (Ch03.oPiCore (beta M) ↥(commutator ↥M)) := by
     apply isHall_oPiCore_of_forall_hasNormalPComplement
     intro p hp_prime hpπD hpβ
-    haveI : Fact p.Prime := ⟨hp_prime⟩
+    have : Fact p.Prime := ⟨hp_prime⟩
     have hpM : p ∈ (Nat.card ↥M).primeFactors :=
       Nat.primeFactors_mono (Subgroup.card_subgroup_dvd_card (commutator ↥M)) Nat.card_pos.ne' hpπD
     have h4 := (derived_msigma_hasNormalPComplement_of_not_mem_beta hG hM hpM hpβ).1
@@ -1076,7 +1077,7 @@ theorem Mbeta_isHall [Finite G] (hG : IsMinimalSimpleOdd G)
   refine isHallSubgroup_of_subgroupOf_isHall_of_forall_not_dvd_index (Mbeta_le M) ?_ ?_
   · simpa only [Mbeta, opiCoreInG_subgroupOf] using hT1
   · intro p hpβ hp_prime
-    haveI : Fact p.Prime := ⟨hp_prime⟩
+    have : Fact p.Prime := ⟨hp_prime⟩
     exact not_dvd_index_of_mem_sigma (hβσ hpβ)
 
 
@@ -1101,25 +1102,25 @@ theorem isHall_Mbeta [Finite G] (hG : IsMinimalSimpleOdd G)
     (∀ p : ℕ, p.Prime → p ∈ (Nat.card ↥M).primeFactors → p ∉ beta M →
       Ch05.HasNormalPComplement p ↥(derivedInG M) ∧
       Ch05.HasNormalPComplement p ↥(Msigma M)) := by
-  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hMsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   -- (c) = Lemma 10.8(c), landed.
   have h4 : ∀ p : ℕ, p.Prime → p ∈ (Nat.card ↥M).primeFactors → p ∉ beta M →
       Ch05.HasNormalPComplement p ↥(derivedInG M) ∧ Ch05.HasNormalPComplement p ↥(Msigma M) :=
     fun p hp_prime hpπ hpβ => by
-      haveI : Fact p.Prime := ⟨hp_prime⟩
+      have : Fact p.Prime := ⟨hp_prime⟩
       exact derived_msigma_hasNormalPComplement_of_not_mem_beta hG hM hpπ hpβ
   -- Common producer for (b): a nilpotent Hall `βᶜ`-subgroup of a subgroup `A ≤ M` with
   -- normal `p`-complements outside `β(M)`.
-  have produce : ∀ A : Subgroup G, IsSolvable ↥A →
+  have produce : ∀ A : Subgroup G, Group.IsSolvable ↥A →
       (∀ p : ℕ, p.Prime → p ∈ (Nat.card ↥A).primeFactors → p ∉ beta M →
         Ch05.HasNormalPComplement p ↥A) →
       ∃ W : Subgroup G, W ≤ A ∧
         Ch03.IsHallSubgroup (beta M)ᶜ (W.subgroupOf A) ∧ Group.IsNilpotent ↥W := by
     intro A hAsolv hANPC
-    haveI := hAsolv
+    have := hAsolv
     obtain ⟨W₀, hW₀hall, hW₀nil⟩ :=
       exists_isNilpotent_isHall_compl (K := ↥A) (beta M) hANPC
-    haveI := hW₀nil
+    have := hW₀nil
     refine ⟨W₀.map A.subtype, Subgroup.map_subtype_le _, ?_, ?_⟩
     · rw [Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective A.subtype_injective]
       exact hW₀hall
@@ -1127,19 +1128,19 @@ theorem isHall_Mbeta [Finite G] (hG : IsMinimalSimpleOdd G)
       exact Group.nilpotent_of_surjective e.toMonoidHom e.surjective
   refine ⟨Mbeta_isHall hG hM, ?_, ?_, h4⟩
   · -- (b) for `M' = derivedInG M`.
-    haveI : IsSolvable ↥(derivedInG M) := by
+    have : Group.IsSolvable ↥(derivedInG M) := by
       let e := Subgroup.equivMapOfInjective (commutator ↥M) M.subtype M.subtype_injective
-      exact solvable_of_surjective (f := e.toMonoidHom) e.surjective
+      exact Group.isSolvable_of_surjective (f := e.toMonoidHom) e.surjective
     refine produce (derivedInG M) inferInstance (fun p hp_prime hpπA hpβ => ?_)
     have hpM : p ∈ (Nat.card ↥M).primeFactors :=
       Nat.primeFactors_mono (Subgroup.card_dvd_of_le (Subgroup.map_subtype_le _))
         Nat.card_pos.ne' hpπA
     exact (h4 p hp_prime hpM hpβ).1
   · -- (b) for `M_σ = Msigma M`.
-    haveI : IsSolvable ↥(Msigma M) := by
+    have : Group.IsSolvable ↥(Msigma M) := by
       let e := Subgroup.equivMapOfInjective (Ch03.oPiCore (sigma M) ↥M) M.subtype
           M.subtype_injective
-      exact solvable_of_surjective (f := e.toMonoidHom) e.surjective
+      exact Group.isSolvable_of_surjective (f := e.toMonoidHom) e.surjective
     refine produce (Msigma M) inferInstance (fun p hp_prime hpπA hpβ => ?_)
     have hpM : p ∈ (Nat.card ↥M).primeFactors :=
       Nat.primeFactors_mono (Subgroup.card_dvd_of_le (Msigma_le M)) Nat.card_pos.ne' hpπA
@@ -1154,7 +1155,7 @@ theorem largestPrime_quotient_oPiCore_compl_of_not_mem_beta [Finite G]
     (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ}
     [Fact p.Prime] (hpπ : p ∈ (Nat.card ↥M).primeFactors) (hpβ : p ∉ beta M) :
     ∀ q ∈ (Nat.card (↥M ⧸ Ch03.oPiCore {r : ℕ | r ≠ p} ↥M)).primeFactors, q ≤ p := by
-  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hMsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hoddM : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
   have hp_dvd : p ∣ Nat.card ↥M := (Nat.mem_primeFactors.mp hpπ).2.1
   have hM_lt : M < ⊤ := lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hM).1

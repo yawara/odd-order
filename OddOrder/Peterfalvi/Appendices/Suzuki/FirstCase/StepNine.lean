@@ -114,14 +114,14 @@ theorem char_eq_p_of_p_dvd_card_Q_add_one
     (hp : fc.p ∣ Nat.card ↥fc.toHypothesis.Q + 1) :
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     model.char = fc.p := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Finite F := by
+  have : Finite F := by
     have hinj : Function.Injective (fun x : F => model.emb (Multiplicative.ofAdd x)) :=
       fun a b hab => Multiplicative.ofAdd.injective (model.emb_injective hab)
     exact Finite.of_injective _ hinj
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
-  haveI : Nonempty F := ⟨0⟩
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Nonempty F := ⟨0⟩
   -- `|Q| = (|F| − 1)^p`
   obtain ⟨e⟩ := fc.centralizer_inf_mulEquiv_units model
   have hCQ : Nat.card ↥(fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)) =
@@ -140,7 +140,7 @@ theorem char_eq_p_of_p_dvd_card_Q_add_one
       exact h0
     exact (ZMod.natCast_eq_zero_iff _ _).mp hz
   -- Cauchy in `(F, +)`: `p ∣ f`
-  haveI : Fintype F := Fintype.ofFinite F
+  have : Fintype F := Fintype.ofFinite F
   obtain ⟨a, ha⟩ := exists_prime_addOrderOf_dvd_card fc.p
     (Nat.card_eq_fintype_card (α := F) ▸ hpF)
   have hdvd : fc.p ∣ model.char := ha ▸ addOrderOf_dvd_of_nsmul_eq_zero (model.char_spec a)
@@ -185,13 +185,13 @@ theorem transfer_eq_pow_card_Q_add_one {A : Type*} [CommGroup A]
   have hxH : x ∈ fc.toHypothesis.H :=
     fc.toHypothesis.D_le_H (fc.toHypothesis.V_le_D (fc.P_le_V hxP))
   have hindex : fc.toHypothesis.H.index = Nat.card fc.toHypothesis.Q + 1 := by
-    haveI := fc.toHypothesis.doubly_transitive
-    haveI : MulAction.IsPretransitive G Ω :=
+    have := fc.toHypothesis.doubly_transitive
+    have : MulAction.IsPretransitive G Ω :=
       MulAction.isPretransitive_of_is_two_pretransitive
     rw [fc.toHypothesis.H_def,
       MulAction.index_stabilizer_of_transitive G fc.toHypothesis.basept,
       fc.toHypothesis.card_Omega]
-  haveI : fc.toHypothesis.H.FiniteIndex := ⟨by rw [hindex]; exact Nat.succ_ne_zero _⟩
+  have : fc.toHypothesis.H.FiniteIndex := ⟨by rw [hindex]; exact Nat.succ_ne_zero _⟩
   rw [OddOrder.GroupTheory.transfer_eq_pow_of_conj_invariant_rightTransversal ϕ
       fc.toHypothesis.isComplement_H_rightTransversalTQ hxH
       (fc.rightTransversalTQ_conj_invariant hxP),
@@ -261,10 +261,10 @@ forces `p ∣ |Q| + 1`. -/
 theorem p_dvd_card_Q_add_one
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
     fc.p ∣ Nat.card fc.toHypothesis.Q + 1 := by
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
   -- pick a nonidentity `x ∈ P`; it has order `p`
   obtain ⟨x, hxP, hx1⟩ : ∃ x, x ∈ fc.P ∧ x ≠ 1 := by
-    haveI : Nontrivial ↥fc.P :=
+    have : Nontrivial ↥fc.P :=
       (Finite.one_lt_card_iff_nontrivial).mp (by rw [fc.card_P]; exact fc.p_prime.one_lt)
     obtain ⟨⟨y, hyP⟩, hy1⟩ := exists_ne (1 : ↥fc.P)
     exact ⟨y, hyP, fun h => hy1 (Subtype.ext h)⟩

@@ -58,7 +58,7 @@ section /- 5A.6: Schur multiplier of the dihedral group (p. 153) -/
 `i.val < 2t` と `i.val = t * q` から `q < 2`。 -/
 theorem eq_zero_or_eq_natCast_of_dvd_val {t : ℕ} (ht : t ≠ 0) {i : ZMod (2 * t)}
     (h : t ∣ i.val) : i = 0 ∨ i = ((t : ℕ) : ZMod (2 * t)) := by
-  haveI : NeZero (2 * t) := ⟨by positivity⟩
+  have : NeZero (2 * t) := ⟨by positivity⟩
   obtain ⟨q, hq⟩ := h
   have hlt : t * q < t * 2 := by
     have := ZMod.val_lt i
@@ -79,7 +79,7 @@ theorem eq_zero_or_eq_natCast_of_dvd_val {t : ℕ} (ht : t ≠ 0) {i : ZMod (2 *
 /-- `DihedralGroup (2t)` の回転 `r t` は位数 2 (`t ≠ 0`)。 -/
 theorem orderOf_r_natCast_self {t : ℕ} (ht : t ≠ 0) :
     orderOf (r ((t : ℕ) : ZMod (2 * t)) : DihedralGroup (2 * t)) = 2 := by
-  haveI : NeZero (2 * t) := ⟨by positivity⟩
+  have : NeZero (2 * t) := ⟨by positivity⟩
   rw [DihedralGroup.orderOf_r, ZMod.val_natCast_of_lt (by omega)]
   rw [Nat.gcd_eq_right ⟨2, by ring⟩]
   rw [Nat.mul_div_assoc 2 (dvd_refl t), Nat.div_self (Nat.pos_of_ne_zero ht), mul_one]
@@ -138,8 +138,8 @@ theorem index_zpowers_r_one (m : ℕ) [NeZero m] :
 theorem isCyclic_quotient_zpowers_r_one (m : ℕ) [NeZero m] :
     letI := zpowers_r_one_normal (m := m)
     IsCyclic (DihedralGroup m ⧸ Subgroup.zpowers (r (1 : ZMod m))) := by
-  letI := zpowers_r_one_normal (m := m)
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  let := zpowers_r_one_normal (m := m)
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   exact isCyclic_of_prime_card (p := 2) (index_zpowers_r_one m)
 
 /-! ### 回転部分群 ∩ 中心 -/
@@ -150,7 +150,7 @@ theorem isCyclic_quotient_zpowers_r_one (m : ℕ) [NeZero m] :
 theorem zpowers_r_one_inf_center {t : ℕ} (ht : t ≠ 0) :
     Subgroup.zpowers (r (1 : ZMod (2 * t))) ⊓ Subgroup.center (DihedralGroup (2 * t))
       = Subgroup.zpowers (r ((t : ℕ) : ZMod (2 * t))) := by
-  haveI : NeZero (2 * t) := ⟨by positivity⟩
+  have : NeZero (2 * t) := ⟨by positivity⟩
   apply le_antisymm
   · rintro x ⟨hx, hxc⟩
     obtain ⟨i, rfl⟩ := mem_zpowers_r_one_iff.mp hx
@@ -196,9 +196,9 @@ Problem 5A.5 (`card_ker_dvd_relIndex_commutator`) を `C` = 回転部分群 (巡
 theorem card_ker_dvd_two_of_dihedral {Γ : Type*} [Group Γ] [Finite Γ] {t : ℕ} (ht : t ≠ 0)
     {f : Γ →* DihedralGroup (2 * t)} (hf : IsStemExtension f) :
     Nat.card f.ker ∣ 2 := by
-  haveI : NeZero (2 * t) := ⟨by positivity⟩
-  letI := zpowers_r_one_normal (m := 2 * t)
-  haveI := isCyclic_quotient_zpowers_r_one (2 * t)
+  have : NeZero (2 * t) := ⟨by positivity⟩
+  let := zpowers_r_one_normal (m := 2 * t)
+  have := isCyclic_quotient_zpowers_r_one (2 * t)
   have hdvd := card_ker_dvd_relIndex_commutator hf
     (C := Subgroup.zpowers (r (1 : ZMod (2 * t))))
     inferInstance (isCyclic_quotient_zpowers_r_one (2 * t))
@@ -249,8 +249,8 @@ theorem dihedralReduce_surjective {m k : ℕ} [NeZero m] [NeZero k] (h : m ∣ k
 theorem ker_dihedralReduce_two_mul {t : ℕ} (ht : t ≠ 0) :
     (dihedralReduce (m := 2 * t) (k := 2 * (2 * t)) ⟨2, by ring⟩).ker =
       Subgroup.zpowers (r (((2 * t : ℕ)) : ZMod (2 * (2 * t)))) := by
-  haveI : NeZero (2 * t) := ⟨by positivity⟩
-  haveI : NeZero (2 * (2 * t)) := ⟨by positivity⟩
+  have : NeZero (2 * t) := ⟨by positivity⟩
+  have : NeZero (2 * (2 * t)) := ⟨by positivity⟩
   apply le_antisymm
   · rintro (i | i) hx
     · rw [MonoidHom.mem_ker, dihedralReduce_r, one_def] at hx
@@ -281,8 +281,8 @@ theorem ker_dihedralReduce_two_mul {t : ℕ} (ht : t ≠ 0) :
 theorem isStemExtension_dihedralReduce {t : ℕ} (ht : t ≠ 0) :
     IsStemExtension (dihedralReduce (m := 2 * t) (k := 2 * (2 * t)) ⟨2, by ring⟩) ∧
       Nat.card (dihedralReduce (m := 2 * t) (k := 2 * (2 * t)) ⟨2, by ring⟩).ker = 2 := by
-  haveI : NeZero (2 * t) := ⟨by positivity⟩
-  haveI : NeZero (2 * (2 * t)) := ⟨by positivity⟩
+  have : NeZero (2 * t) := ⟨by positivity⟩
+  have : NeZero (2 * (2 * t)) := ⟨by positivity⟩
   have hker := ker_dihedralReduce_two_mul ht
   refine ⟨⟨dihedralReduce_surjective _, ?_, ?_⟩, ?_⟩
   · -- ker ≤ commutator: 生成元 `r (2t) = ⁅r t, sr 0⁆`

@@ -47,8 +47,8 @@ theorem omega_principal_eq_trivial [Finite G]
     (hyp : OddOrder.Peterfalvi.S15.Hypothesis (G := G)) :
     hyp.omega ⟨0, hyp.q_prime.pos⟩ ⟨0, hyp.p_prime.pos⟩
       = trivialClassFunction ↥hyp.W := by
-  letI := hyp.W_cyclic
-  letI : CommGroup ↥hyp.W := IsCyclic.commGroup
+  let := hyp.W_cyclic
+  let : CommGroup ↥hyp.W := IsCyclic.commGroup
   have hW1le : hyp.W1 ≤ hyp.W := by
     rw [hyp.W_eq_join]; exact le_sup_left
   have hW2le : hyp.W2 ≤ hyp.W := by

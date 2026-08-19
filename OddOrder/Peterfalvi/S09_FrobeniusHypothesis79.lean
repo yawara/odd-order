@@ -77,7 +77,7 @@ noncomputable def hypothesis79 [Fintype G] [Invertible (Nat.card G : ℂ)]
   first := F.hypothesis78 i hodd hnilp_i C_i hFrob_i
   second := F.hypothesis78 j hodd hnilp_j C_j hFrob_j
   dadeSupport_disjoint := by
-    haveI : Finite G := Finite.of_fintype G
+    have : Finite G := Finite.of_fintype G
     rw [show (F.hypothesis78 i hodd hnilp_i C_i hFrob_i).hyp76.hyp71.hyp.dadeSupport
           = F.kernelSpread i from F.sibley_dadeSupport_eq_kernelSpread i hodd hnilp_i C_i hFrob_i,
         show (F.hypothesis78 j hodd hnilp_j C_j hFrob_j).hyp76.hyp71.hyp.dadeSupport

@@ -64,7 +64,7 @@ private theorem coordMulCoord_add (i j : ι) (w w' : W) :
 private theorem coordMulCoord_smul (i j : ι) (s : S) (w : W) :
     coordMulCoord b i j (s • w) = s • coordMulCoord b i j w := by
   ext v
-  simp only [coordMulCoord_apply, QuadraticMap.smul_apply]
+  simp only [coordMulCoord_apply, smul_apply]
   exact (smul_comm s (b.coord i v * b.coord j v) w).symm
 
 /-- The polar form of an elementary coordinate map. -/
@@ -130,11 +130,11 @@ theorem ext_basis {Q Q' : QuadraticMap (ZMod 2) V W}
   have hps : ∀ x y : V, polar (⇑(Q - Q')) x y =
       polar (⇑Q) x y - polar (⇑Q') x y := by
     intro x y
-    simp only [QuadraticMap.polar, QuadraticMap.sub_apply]
+    simp only [QuadraticMap.polar, sub_apply]
     abel
   refine sub_eq_zero.mp (eq_zero_of_forall_basis b ?_ ?_)
   · intro i
-    rw [QuadraticMap.sub_apply, hval, sub_self]
+    rw [sub_apply, hval, sub_self]
   · intro i j
     rw [hps, hpolar, sub_self]
 
@@ -187,7 +187,7 @@ private theorem ofCoords_basis_value (u : {p : ι × ι // p.1 ≤ p.2} → W)
     ofCoords (S := S) b u (b l) = u ⟨(l, l), le_refl l⟩ := by
   change (∑ p : {p : ι × ι // p.1 ≤ p.2},
     coordMulCoord b p.1.1 p.1.2 (u p)) (b l) = _
-  rw [QuadraticMap.sum_apply]
+  rw [sum_apply]
   rw [Finset.sum_eq_single (⟨(l, l), le_refl l⟩ : {p : ι × ι // p.1 ≤ p.2})]
   · simp
   · intro p _ hp
@@ -211,7 +211,7 @@ private theorem polar_ofCoords_basis (u : {p : ι × ι // p.1 ≤ p.2} → W)
       ∑ p : {p : ι × ι // p.1 ≤ p.2},
         polar (⇑(coordMulCoord b p.1.1 p.1.2 (u p))) x y := by
     intro x y
-    simp only [QuadraticMap.polar, QuadraticMap.sum_apply,
+    simp only [QuadraticMap.polar, sum_apply,
       Finset.sum_sub_distrib]
   rw [hsum]
   rw [Finset.sum_eq_single
@@ -247,7 +247,7 @@ quadratic map `V → W` corresponds to its basis values (diagonal
 coordinates) and basis polars (strictly increasing coordinates). -/
 noncomputable def coordEquiv :
     QuadraticMap (ZMod 2) V W ≃ₗ[S] ({p : ι × ι // p.1 ≤ p.2} → W) := by
-  refine LinearEquiv.ofLinear (toCoords b) (ofCoords b) ?_ ?_
+  refine LinearEquiv.ofLinearMap (toCoords b) (ofCoords b) ?_ ?_
   · -- toCoords ∘ ofCoords = id
     refine LinearMap.ext fun u => funext fun p => ?_
     change toCoords (S := S) b (ofCoords (S := S) b u) p = u p

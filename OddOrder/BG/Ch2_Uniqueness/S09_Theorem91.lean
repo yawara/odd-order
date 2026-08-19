@@ -45,7 +45,7 @@ theorem centralizer_singleton_lt_top [Finite G] (hG : IsMinimalSimpleOdd G) {x :
   have hZbot : Subgroup.center G = ⊥ := by
     rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
     · exact h
-    · exact absurd (isSolvable_of_comm fun a b =>
+    · exact absurd (Group.isSolvable_of_comm fun a b =>
         (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm) hG.notSolvable
   rw [lt_top_iff_ne_top]
   intro htop
@@ -89,7 +89,7 @@ private theorem sSup_hInvariant_le_of_centralizer_le [Finite G]
     (hcent : ∀ b : G, b ∈ B → b ≠ 1 → Subgroup.centralizer ({b} : Set G) ≤ M) :
     sSup (hInvariant ⊤ B ({p} : Set ℕ)ᶜ) ≤ M := by
   classical
-  haveI hBcomm : IsMulCommutative ↥B := IsMulCommutative.of_comm hBea.comm
+  have hBcomm : IsMulCommutative ↥B := IsMulCommutative.of_comm hBea.comm
   have hBpi : Subgroup.IsPiSubgroup ({p} : Set ℕ) B :=
     isPiSubgroup_singleton_of_isPGroup hBea.isPGroup
   -- Reduce to: every member `K` of `ℋ_G(B;p')` lies in `M`.
@@ -136,7 +136,8 @@ Sylow `p`, and `O_p ≤` every Sylow), and `P̄` normalizes `Ȳ`, so `[Ȳ, O_p(X
 (`hall_higman_1_2_3`) gives `C_{X̄}(O_p(X̄)) ≤ O_p(X̄)`, so `Ȳ ≤ O_p(X̄)`; being a `p'`-group it is
 trivial, i.e. `Y ≤ O_{p'}(G')`. -/
 private theorem le_oPiCore_compl_of_sylow_normalizes
-    {p : ℕ} [Fact p.Prime] {G' : Type*} [Group G'] [Finite G'] [IsSolvable G'] (P : Sylow p G')
+    {p : ℕ} [Fact p.Prime] {G' : Type*} [Group G'] [Finite G'] [Group.IsSolvable G']
+        (P : Sylow p G')
     {Y : Subgroup G'} (hPY : (P : Subgroup G') ≤ Subgroup.normalizer Y)
     (hYpi : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ Y) :
     Y ≤ Ch03.oPiCore ({p} : Set ℕ)ᶜ G' := by
@@ -146,7 +147,7 @@ private theorem le_oPiCore_compl_of_sylow_normalizes
   have hsurj : Function.Surjective mk := QuotientGroup.mk'_surjective N
   have hker : mk.ker = N := QuotientGroup.ker_mk' N
   set Q : Subgroup (G' ⧸ N) := Ch03.oPiCore ({p} : Set ℕ) (G' ⧸ N) with hQ
-  haveI hQnorm : Q.Normal := by rw [hQ]; infer_instance
+  have hQnorm : Q.Normal := by rw [hQ]; infer_instance
   set Ybar : Subgroup (G' ⧸ N) := Y.map mk with hYbar
   -- `Q = O_p(X̄)` is a `p`-group; `Ȳ` is a `p'`-group; hence `Q ⊓ Ȳ = ⊥`.
   have hQ_pg : IsPGroup p ↥Q := by
@@ -202,7 +203,7 @@ private theorem le_oPiCore_compl_of_sylow_normalizes
   have hbot : Ch03.oPiCore ({p} : Set ℕ)ᶜ (G' ⧸ N) = ⊥ := by
     have := OddOrder.Isaacs.Ch03.oPiCore_quotient_self_eq_bot (G := G') ({p} : Set ℕ)ᶜ
     simpa [hN] using this
-  haveI : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) (G' ⧸ N) := inferInstance
+  have : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) (G' ⧸ N) := inferInstance
   have hHH : Subgroup.centralizer (Ch03.oPiCore ({p} : Set ℕ) (G' ⧸ N) : Set (G' ⧸ N))
       ≤ Ch03.oPiCore ({p} : Set ℕ) (G' ⧸ N) :=
     -- `({p} : Set ℕ)ᶜ` and `{q | ¬q = p}` are definitionally equal, so `hbot` applies directly.
@@ -222,7 +223,7 @@ theorem normalizer_opiCoreInG_singleton_le_maximal_of_ne_bot [Finite G]
     (hG : IsMinimalSimpleOdd G) {q : ℕ} [Fact q.Prime] {M : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (hOqne : opiCoreInG ({q} : Set ℕ) M ≠ ⊥) :
     Subgroup.normalizer (opiCoreInG ({q} : Set ℕ) M : Set G) ≤ M := by
-  haveI : IsSimpleGroup G := hG.simple
+  have : IsSimpleGroup G := hG.simple
   have hMco : IsCoatom M := mem_maximalSubgroups.mp hM
   have hMleN : M ≤ Subgroup.normalizer (opiCoreInG ({q} : Set ℕ) M : Set G) :=
     le_normalizer_opiCoreInG ({q} : Set ℕ) M
@@ -246,7 +247,7 @@ private theorem normalizer_opiCoreInG_le_maximal_of_ne_bot [Finite G]
     (hG : IsMinimalSimpleOdd G) {π : Set ℕ} {M : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (hOne : opiCoreInG π M ≠ ⊥) :
     Subgroup.normalizer (opiCoreInG π M : Set G) ≤ M := by
-  haveI : IsSimpleGroup G := hG.simple
+  have : IsSimpleGroup G := hG.simple
   have hMco : IsCoatom M := mem_maximalSubgroups.mp hM
   have hMleN : M ≤ Subgroup.normalizer (opiCoreInG π M : Set G) :=
     le_normalizer_opiCoreInG π M
@@ -271,7 +272,7 @@ maximal `M` (here `P` a Sylow of `↥M`, `Pamb` its ambient image), if every `Pa
 `le_oPiCore_compl_of_sylow_normalizes` (in `↥M`, with the Sylow `P`) puts `K ≤ O_{p'}(M)`.
 `≥`: `O_{p'}(M)` is itself a `Pamb`-invariant `p'`-subgroup (normal in `M`, `Pamb ≤ M`). -/
 private theorem sSup_hInvariant_eq_opiCoreInG_singleton_compl [Finite G]
-    {p : ℕ} [Fact p.Prime] {M : Subgroup G} [IsSolvable ↥M] (P : Sylow p ↥M)
+    {p : ℕ} [Fact p.Prime] {M : Subgroup G} [Group.IsSolvable ↥M] (P : Sylow p ↥M)
     (hPle : ∀ K : Subgroup G, K ∈ hInvariant ⊤ ((P : Subgroup ↥M).map M.subtype) ({p} : Set ℕ)ᶜ →
       K ≤ M) :
     sSup (hInvariant ⊤ ((P : Subgroup ↥M).map M.subtype) ({p} : Set ℕ)ᶜ)
@@ -358,7 +359,7 @@ private theorem normalizer_sylow_map_le_maximal [Finite G] (hG : IsMinimalSimple
     Subgroup.normalizer (((P : Subgroup ↥M).map M.subtype) : Set G) ≤ M := by
   classical
   set Pamb : Subgroup G := (P : Subgroup ↥M).map M.subtype with hPamb
-  haveI hM_solvable : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hM_solvable : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   by_cases hOp : opiCoreInG ({p} : Set ℕ)ᶜ M = ⊥
   · -- `O_{p'}(M) = ⊥`: route through `Z(L(P))`.
     have hZnorm :
@@ -417,7 +418,7 @@ private theorem fittingInG_le_of_sylow_of_opiCore_le [Finite G]
   have hfitN : Ch01.fitting ↥H ≤ (R : Subgroup ↥H) ⊔ Ch03.oPiCore ({p} : Set ℕ)ᶜ ↥H := by
     rw [Ch01.fitting_eq_iSup_primeFactors]
     refine iSup_le (fun q => ?_)
-    haveI : Fact (q : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors q.2⟩
+    have : Fact (q : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors q.2⟩
     by_cases hq : (q : ℕ) = p
     · subst hq; exact le_sup_of_le_left (Ch01.opCore_le R)
     · refine le_sup_of_le_right (Ch03.Subgroup.IsPiGroup.le_oPiCore ?_)
@@ -447,7 +448,7 @@ Proof: by Theorem 5.7 (`derived_le_fitting_of_centralizer_rank_le_two` with `E =
 `N ⊴ H`, and Frattini (`Sylow.normalizer_sup_eq_top'`) gives `H = N_H(R)·N`. Mapping back to `G`,
 `N_H(R) ⊆ N_G(R) ⊆ M`, `R ⊆ M`, `O_{p'}(H) ⊆ M`, so `H ⊆ M`. -/
 private theorem le_maximal_of_rank_fitting_le_two_of_sylow [Finite G]
-    {p : ℕ} [Fact p.Prime] {H M : Subgroup G} [IsSolvable ↥H]
+    {p : ℕ} [Fact p.Prime] {H M : Subgroup G} [Group.IsSolvable ↥H]
     (hoddH : Odd (Nat.card ↥H)) (R : Sylow p ↥H)
     (hrank : rank ↥(Ch01.fitting ↥H) ≤ 2)
     (hRM : (R : Subgroup ↥H).map H.subtype ≤ M)
@@ -469,7 +470,7 @@ private theorem le_maximal_of_rank_fitting_le_two_of_sylow [Finite G]
   have hfitN : Ch01.fitting ↥H ≤ N := by
     rw [Ch01.fitting_eq_iSup_primeFactors]
     refine iSup_le (fun q => ?_)
-    haveI : Fact (q : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors q.2⟩
+    have : Fact (q : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors q.2⟩
     by_cases hq : (q : ℕ) = p
     · subst hq; exact le_sup_of_le_left (Ch01.opCore_le R)
     · refine le_sup_of_le_right (Ch03.Subgroup.IsPiGroup.le_oPiCore ?_)
@@ -483,7 +484,7 @@ private theorem le_maximal_of_rank_fitting_le_two_of_sylow [Finite G]
       simp [hrq, hq]
   -- `N ⊴ H` (it contains `H'`), then Frattini's argument.
   have hNnorm : N.Normal := Subgroup.Normal.of_commutator_le _ (hderiv.trans hfitN)
-  haveI := hNnorm
+  have := hNnorm
   have hRN : (R : Subgroup ↥H) ≤ N := le_sup_left
   have hfrattini : Subgroup.normalizer (R : Subgroup ↥H) ⊔ N = ⊤ :=
     Sylow.normalizer_sup_eq_top' R hRN
@@ -518,7 +519,7 @@ theorem two_le_rank_of_noncyclic_pSubgroup [Finite G] (hG : IsMinimalSimpleOdd G
       by_contra hn0
       have hn_zero : n = 0 := by omega
       have hBcard_one : Nat.card B = 1 := by simpa [hn_zero] using hn
-      haveI : Subsingleton ↥B := Finite.card_le_one_iff_subsingleton.mp (by omega)
+      have : Subsingleton ↥B := Finite.card_le_one_iff_subsingleton.mp (by omega)
       exact hBnc isCyclic_of_subsingleton
     rw [hn]
     exact dvd_pow_self p hnpos.ne'
@@ -539,7 +540,7 @@ private theorem pRank_eq_zero_of_isPGroup_of_ne_prime {H : Type*} [Group H] [Fin
     {p q : ℕ} [Fact p.Prime] (hq : q.Prime) (hqp : q ≠ p) (hH : IsPGroup p H) :
     pRank H q = 0 := by
   classical
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   apply le_antisymm ?_ (Nat.zero_le _)
   rw [pRank_le_iff]
   intro E hE
@@ -708,7 +709,7 @@ private theorem rank_fittingInG_le_two_of_no_uniqueMaximal [Finite G] (hG : IsMi
   have h3 : 3 ≤ rank ↥(S08.fittingInG M) := by omega
   obtain ⟨q, hq, h3q⟩ :=
     exists_pRank_ge_of_pos_le_rank (G := ↥(S08.fittingInG M)) (n := 3) (by norm_num) h3
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   obtain ⟨U, hUF, hUU⟩ :=
     exists_isUniquelyMaximal_le_fittingInG_of_three_le_pRank hG hM h3q
   exact hno U hUF hUU
@@ -773,7 +774,7 @@ theorem noncyclic_isUniquelyMaximal_of_centralizer_le [Finite G] (hG : IsMinimal
       sSup (hInvariant ⊤ B {p}ᶜ) ≤ M) :
     IsUniquelyMaximal B := by
   classical
-  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hMsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hBp : IsPGroup p B := hBea.isPGroup
   -- STEP 0: reduce (a) to (b): `sSup ℋ_G(B;p') ≤ M`.
   have hb : sSup (hInvariant ⊤ B ({p} : Set ℕ)ᶜ) ≤ M := by
@@ -800,7 +801,7 @@ theorem noncyclic_isUniquelyMaximal_of_centralizer_le [Finite G] (hG : IsMinimal
     exists_maximal_counterexample_image_of_not_isUniquelyMaximal
       (H := B) (M := M) (w := fun K : Subgroup G => S08.sylowInfCard p K M)
       hBproper hM hBle hBnotU
-  haveI hHsolv : IsSolvable ↥H := hG.solvable_of_mem_maximalSubgroups hH
+  have hHsolv : Group.IsSolvable ↥H := hG.isSolvable_of_mem_maximalSubgroups hH
   have hoddH : Odd (Nat.card ↥H) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card H)
   -- The Eq (9.4) normalizer condition `hNloc` (discharged via Eq (9.3) + maximality).
   have hNloc : ∀ Rinf : Sylow p ↥(H ⊓ M),

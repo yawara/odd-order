@@ -193,7 +193,7 @@ theorem W2_normalizes_Q (data : FieldNormalizerData p q G) :
 /-- `2 ≠ 0` in `𝔽_p`, since `p` is odd. -/
 theorem zmod_two_ne_zero (data : FieldNormalizerData p q G) : (2 : ZMod p) ≠ 0 := by
   intro hzero
-  haveI : NeZero p := ⟨(Fact.out : p.Prime).ne_zero⟩
+  have : NeZero p := ⟨(Fact.out : p.Prime).ne_zero⟩
   have hdvd : (p : ℕ) ∣ 2 := by
     have h : ((2 : ℕ) : ZMod p) = 0 := by exact_mod_cast hzero
     exact (ZMod.natCast_eq_zero_iff 2 p).mp h
@@ -215,7 +215,7 @@ development ever needs from `Q`'s order — the Section 16 route used to derive 
 and `p'`. -/
 theorem eq_one_of_mem_Q_of_pow_p_eq_one (data : FieldNormalizerData p q G)
     {x : G} (hx : x ∈ data.Q) (hxp : x ^ p = 1) : x = 1 := by
-  haveI := data.Q_finite
+  have := data.Q_finite
   have hord : orderOf x ∣ p := orderOf_dvd_of_pow_eq_one hxp
   rcases (Nat.Prime.eq_one_or_self_of_dvd (Fact.out : p.Prime) _ hord) with h1 | hp
   · exact orderOf_eq_one_iff.mp h1

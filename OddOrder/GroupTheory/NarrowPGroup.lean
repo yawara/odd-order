@@ -61,7 +61,7 @@ subgroup and its isomorphic images (BG Thm 5.6: `S ≅ S̄ ≤ G/O_{p'}(G)`,
 `S̄ = O_p(Ḡ)`). -/
 theorem IsNarrow.of_mulEquiv {p : ℕ} {R R' : Type*} [Group R] [Group R'] [Finite R]
     (e : R ≃* R') (h : IsNarrow p R) : IsNarrow p R' := by
-  haveI : Finite R' := Finite.of_equiv R e.toEquiv
+  have : Finite R' := Finite.of_equiv R e.toEquiv
   rcases h with hrank | ⟨R₀, R₁, hcard, hcyc, hinf, hcent⟩
   · exact Or.inl (le_trans
       (pRank_le_of_injective (f := e.symm.toMonoidHom) e.symm.injective) hrank)
@@ -69,7 +69,7 @@ theorem IsNarrow.of_mulEquiv {p : ℕ} {R R' : Type*} [Group R] [Group R'] [Fini
     · rw [← hcard]
       exact (Nat.card_congr
         (Subgroup.equivMapOfInjective R₀ e.toMonoidHom e.injective).toEquiv).symm
-    · haveI := hcyc
+    · have := hcyc
       exact isCyclic_of_surjective _ (e.toMonoidHom.subgroupMap_surjective R₁)
     · rw [← Subgroup.map_inf R₀ R₁ e.toMonoidHom e.injective, hinf, Subgroup.map_bot]
     · have hmap_cent :

@@ -71,7 +71,7 @@ theorem SibleyDadeHypothesis.orthogonal_tau_indW2_add_extension_general_caseB
       ∧ hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
           - ((W2.subgroupOf H).index : ℂ) • η₁)
           + ((W2.subgroupOf H).index : ℂ) • cY.extension η₁ ∈ ZIrr G := by
-  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have : Fintype ↥W2 := Fintype.ofFinite _
   classical
   have hYon : ∀ η η', η ∈ hyp.Yset → η' ∈ hyp.Yset →
       ClassFunction.inner (cY.extension η) (cY.extension η')
@@ -153,7 +153,7 @@ theorem SibleyDadeHypothesis.exists_decomposition_caseB
         ∧ hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
             - ((W2.subgroupOf H).index : ℂ) • η₁)
           = X - ((W2.subgroupOf H).index : ℂ) • cY.extension η₁ := by
-  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have : Fintype ↥W2 := Fintype.ofFinite _
   have hW2H : W2 ≤ H := by
     have hle : ⁅H, H⁆ ≤ H := by
       rw [Subgroup.commutator_le]; intro a ha b hb; rw [commutatorElement_def]
@@ -222,16 +222,16 @@ theorem certainType_index_bounds (h : OddOrder.Peterfalvi.S06.Hypothesis ↥L) [
     2 ≤ (h.W2.subgroupOf h.K).index ∧
     (h.W2.index : ℤ) < ((h.W2.subgroupOf h.K).index : ℤ) ^ 2 := by
   classical
-  haveI : Fintype ↥L := Fintype.ofFinite _
-  haveI : Finite ↥L := inferInstance
-  haveI : Finite ↥h.K := inferInstance
+  have : Fintype ↥L := Fintype.ofFinite _
+  have : Finite ↥L := inferInstance
+  have : Finite ↥h.K := inferInstance
   -- `W₂` is central, hence normal in `↥L`.
   have hW2cen : h.W2 ≤ Subgroup.center ↥L := certainType_W2_le_center h hW2cenK
-  haveI hW2N : h.W2.Normal := ⟨fun w hw g => by
+  have hW2N : h.W2.Normal := ⟨fun w hw g => by
     have hc : g * w = w * g := Subgroup.mem_center_iff.mp (hW2cen hw) g
     have hgw : g * w * g⁻¹ = w := by rw [hc, mul_assoc, mul_inv_cancel, mul_one]
     rw [hgw]; exact hw⟩
-  haveI hKN : h.K.Normal := h.K_normal
+  have hKN : h.K.Normal := h.K_normal
   set Nk := h.K.map (QuotientGroup.mk' h.W2) with hNk
   set Aw := h.W1.map (QuotientGroup.mk' h.W2) with hAw
   -- Frobenius group structure on the quotient `↥L / W₂`.
@@ -242,7 +242,7 @@ theorem certainType_index_bounds (h : OddOrder.Peterfalvi.S06.Hypothesis ↥L) [
   have hAw_ne : Aw ≠ ⊥ :=
     OddOrder.BG.Ch1.S03.quotient_complement_map_ne_bot_of_le_kernel h.isComplement h.W2_le_K
       h.W1_nontrivial
-  haveI hNkN : Nk.Normal := hKN.map (QuotientGroup.mk' h.W2) (QuotientGroup.mk'_surjective h.W2)
+  have hNkN : Nk.Normal := hKN.map (QuotientGroup.mk' h.W2) (QuotientGroup.mk'_surjective h.W2)
   have hcentral : ∀ x ∈ Aw, x ≠ 1 →
       Subgroup.centralizer ({x} : Set (↥L ⧸ h.W2)) ⊓ Nk = ⊥ := by
     intro qx hqxA hqx_ne
@@ -265,8 +265,8 @@ theorem certainType_index_bounds (h : OddOrder.Peterfalvi.S06.Hypothesis ↥L) [
     have hCopx : Nat.Coprime (Nat.card ↥(Subgroup.zpowers x)) (Nat.card ↥h.K) := by
       have hle : Subgroup.zpowers x ≤ h.W1 := Subgroup.zpowers_le.mpr hxW1
       exact Nat.Coprime.coprime_dvd_left (Subgroup.card_dvd_of_le hle) h.card_coprime.symm
-    have hSolv : IsSolvable ↥(Subgroup.zpowers x) ∨ IsSolvable ↥h.K :=
-      Or.inl (isSolvable_of_comm fun a b => by
+    have hSolv : Group.IsSolvable ↥(Subgroup.zpowers x) ∨ Group.IsSolvable ↥h.K :=
+      Or.inl (Group.isSolvable_of_comm fun a b => by
         obtain ⟨m, hm⟩ := a.2
         obtain ⟨n, hn⟩ := b.2
         apply Subtype.ext
@@ -371,8 +371,8 @@ theorem inner_induce_self_eq_index_of_le_center
     ClassFunction.inner (ClassFunction.induce N φ) (ClassFunction.induce N φ)
       = (N.index : ℂ) := by
   classical
-  haveI : Fintype ↥N := Fintype.ofFinite _
-  haveI hNnorm : N.Normal := by
+  have : Fintype ↥N := Fintype.ofFinite _
+  have hNnorm : N.Normal := by
     constructor
     intro n hn g
     have hc : g * n = n * g := (Subgroup.mem_center_iff.mp (hN hn)) g
@@ -401,7 +401,7 @@ theorem inner_induce_self_eq_index_of_le_center
   have hself : ClassFunction.inner φ φ = 1 := by
     have := irreducibleCharacter_inner_eq_ite (⟨φ, hφ⟩ : IrreducibleCharacter ↥N) ⟨φ, hφ⟩
     simpa using this
-  haveI : Nonempty ↥N := ⟨1⟩
+  have : Nonempty ↥N := ⟨1⟩
   have hstep : (Nat.card ↥N : ℂ) *
       ClassFunction.inner φ (ClassFunction.restrict N (ClassFunction.induce N φ))
       = (Nat.card M : ℂ) := by

@@ -36,7 +36,7 @@ inclusion `≤` holds because every element of an order-`d` subgroup satisfies `
 the reverse follows by counting, since the kernel has order `gcd d (Nat.card C) = d`. -/
 theorem cyclic_subgroup_eq_of_card_eq {C : Type*} [Group C] [Finite C] [IsCyclic C]
     {H₁ H₂ : Subgroup C} (h : Nat.card H₁ = Nat.card H₂) : H₁ = H₂ := by
-  letI : CommGroup C := IsCyclic.commGroup
+  let : CommGroup C := IsCyclic.commGroup
   have key : ∀ {N : Subgroup C} {d : ℕ},
       Nat.card N = d → N = (powMonoidHom d : C →* C).ker := by
     intro N d hN
@@ -59,13 +59,13 @@ Deduplicated from two verbatim `private` copies (Isaacs Ch05 `Basic` and
 Higman `AgemoLayers`; issue 0127 ①). -/
 theorem cyclic_eq_of_orderOf_eq_two {C : Type*} [Group C] [Finite C] [IsCyclic C]
     {s t : C} (hs : orderOf s = 2) (ht : orderOf t = 2) : s = t := by
-  letI : Fintype C := Fintype.ofFinite C
+  let : Fintype C := Fintype.ofFinite C
   classical
   have h2_dvd : (2 : ℕ) ∣ Fintype.card C := by
     rw [← hs]; exact orderOf_dvd_card
   have h_card : Fintype.card {x : C // orderOf x = 2} = 1 := by
     rw [Fintype.card_subtype, IsCyclic.card_orderOf_eq_totient h2_dvd, Nat.totient_two]
-  haveI : Subsingleton {x : C // orderOf x = 2} :=
+  have : Subsingleton {x : C // orderOf x = 2} :=
     Fintype.card_le_one_iff_subsingleton.mp h_card.le
   exact congrArg Subtype.val
     (Subsingleton.elim (⟨s, hs⟩ : {x : C // orderOf x = 2}) ⟨t, ht⟩)
@@ -77,7 +77,7 @@ exactly one subgroup of each order dividing `|C|`.  The witness is `(powMonoidHo
 order is `gcd (Nat.card C) d = d`. -/
 theorem exists_subgroup_card_eq_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCyclic C]
     {d : ℕ} (hd : d ∣ Nat.card C) : ∃ H : Subgroup C, Nat.card H = d := by
-  letI : CommGroup C := IsCyclic.commGroup
+  let : CommGroup C := IsCyclic.commGroup
   refine ⟨(powMonoidHom d : C →* C).ker, ?_⟩
   rw [IsCyclic.card_powMonoidHom_ker (G := C) d, Nat.gcd_eq_right hd]
 

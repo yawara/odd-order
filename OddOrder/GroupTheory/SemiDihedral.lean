@@ -294,7 +294,7 @@ theorem ca_zero_sq : (ca 0 : SemiDihedralGroup n) ^ 2 = 1 := by
 /-- The degenerate semidihedral group at `0` is cyclic of order two. -/
 theorem zero_isCyclic : IsCyclic (SemiDihedralGroup 0) := by
   apply isCyclic_of_orderOf_eq_card (ca 0)
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hne : (ca 0 : SemiDihedralGroup 0) ≠ 1 := by
     intro h
     injection h

@@ -138,9 +138,9 @@ theorem induce_eq_coe_of_inner_eq_one_of_apply_one_eq
         = (χ : ClassFunction G ℂ) (1 : G)) :
     ClassFunction.induce I (ψ : ClassFunction ↥I ℂ) = (χ : ClassFunction G ℂ) := by
   classical
-  letI : Fintype ↥I := Fintype.ofFinite _
-  haveI : Finite (IrreducibleCharacter G) := finite_irreducibleCharacter (G := G)
-  letI : Fintype (IrreducibleCharacter G) := Fintype.ofFinite _
+  let : Fintype ↥I := Fintype.ofFinite _
+  have : Finite (IrreducibleCharacter G) := finite_irreducibleCharacter (G := G)
+  let : Fintype (IrreducibleCharacter G) := Fintype.ofFinite _
   -- every Fourier coefficient of `Ind ψ` is a (real, non-negative) restriction multiplicity
   have hcoeff : ∀ η : IrreducibleCharacter G,
       ClassFunction.inner (ClassFunction.induce I (ψ : ClassFunction ↥I ℂ))
@@ -220,8 +220,8 @@ theorem restrictionMultiplicity_mul_le_restrictionMultiplicity
             (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHT).toMonoidHom θ)
       ≤ ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ) θ := by
   classical
-  haveI : Finite (IrreducibleCharacter ↥T) := finite_irreducibleCharacter (G := ↥T)
-  letI : Fintype (IrreducibleCharacter ↥T) := Fintype.ofFinite _
+  have : Finite (IrreducibleCharacter ↥T) := finite_irreducibleCharacter (G := ↥T)
+  let : Fintype (IrreducibleCharacter ↥T) := Fintype.ofFinite _
   set θ' : ClassFunction ↥(H.subgroupOf T) ℂ :=
     ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHT).toMonoidHom θ with hθ'
   have hθ'irr : IsIrreducibleCharacter θ' :=
@@ -304,8 +304,8 @@ theorem sum_restrictionMultiplicity_mul_le_restrictionMultiplicity
               (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHT).toMonoidHom θ)
       ≤ ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ) θ := by
   classical
-  haveI : Finite (IrreducibleCharacter ↥T) := finite_irreducibleCharacter (G := ↥T)
-  letI : Fintype (IrreducibleCharacter ↥T) := Fintype.ofFinite _
+  have : Finite (IrreducibleCharacter ↥T) := finite_irreducibleCharacter (G := ↥T)
+  let : Fintype (IrreducibleCharacter ↥T) := Fintype.ofFinite _
   set θ' : ClassFunction ↥(H.subgroupOf T) ℂ :=
     ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHT).toMonoidHom θ with hθ'
   have hθ'irr : IsIrreducibleCharacter θ' :=
@@ -395,17 +395,17 @@ theorem isIrreducibleCharacter_induce_of_liesOver_of_inertia_eq
         (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHT).toMonoidHom θ) ≠ 0) :
     IsIrreducibleCharacter (ClassFunction.induce T (ψ : ClassFunction ↥T ℂ)) := by
   classical
-  letI : Fintype ↥T := Fintype.ofFinite _
-  letI : Fintype ↥H := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥H : ℂ) :=
+  let : Fintype ↥T := Fintype.ofFinite _
+  let : Fintype ↥H := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥H : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : Finite (IrreducibleCharacter G) := finite_irreducibleCharacter (G := G)
-  letI : Fintype (IrreducibleCharacter G) := Fintype.ofFinite _
-  haveI : Finite (IrreducibleCharacter ↥H) := finite_irreducibleCharacter (G := ↥H)
-  letI : Fintype (IrreducibleCharacter ↥H) := Fintype.ofFinite _
-  haveI : Finite (IrreducibleCharacter ↥(H.subgroupOf T)) :=
+  have : Finite (IrreducibleCharacter G) := finite_irreducibleCharacter (G := G)
+  let : Fintype (IrreducibleCharacter G) := Fintype.ofFinite _
+  have : Finite (IrreducibleCharacter ↥H) := finite_irreducibleCharacter (G := ↥H)
+  let : Fintype (IrreducibleCharacter ↥H) := Fintype.ofFinite _
+  have : Finite (IrreducibleCharacter ↥(H.subgroupOf T)) :=
     finite_irreducibleCharacter (G := ↥(H.subgroupOf T))
-  letI : Fintype (IrreducibleCharacter ↥(H.subgroupOf T)) := Fintype.ofFinite _
+  let : Fintype (IrreducibleCharacter ↥(H.subgroupOf T)) := Fintype.ofFinite _
   -- bundled forms, with definitional coercion bridges
   set θb : IrreducibleCharacter ↥H := ⟨θ, hθ⟩ with hθb
   have hθ'irr : IsIrreducibleCharacter (ClassFunction.compHom
@@ -566,12 +566,12 @@ theorem eq_of_induce_eq_induce_of_liesOver_of_inertia_eq
     ψ = ψ' := by
   classical
   by_contra hne
-  letI : Fintype ↥T := Fintype.ofFinite _
-  letI : Fintype ↥H := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥H : ℂ) :=
+  let : Fintype ↥T := Fintype.ofFinite _
+  let : Fintype ↥H := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥H : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : Finite (IrreducibleCharacter ↥H) := finite_irreducibleCharacter (G := ↥H)
-  haveI : Finite (IrreducibleCharacter ↥(H.subgroupOf T)) :=
+  have : Finite (IrreducibleCharacter ↥H) := finite_irreducibleCharacter (G := ↥H)
+  have : Finite (IrreducibleCharacter ↥(H.subgroupOf T)) :=
     finite_irreducibleCharacter (G := ↥(H.subgroupOf T))
   -- bundled forms, with definitional coercion bridges
   set θb : IrreducibleCharacter ↥H := ⟨θ, hθ⟩ with hθb

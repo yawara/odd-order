@@ -66,8 +66,8 @@ variable [Fintype G] [DecidableEq (ConjClasses G)]
 theorem classSum_linearIndependent :
     LinearIndependent k (classSum (k := k) (G := G)) := by
   -- `Fintype (ConjClasses G)` は型には現れないので証明内で `Finite` から作る。
-  haveI : Finite (ConjClasses G) := Quotient.finite _
-  letI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  have : Finite (ConjClasses G) := Quotient.finite _
+  let : Fintype (ConjClasses G) := Fintype.ofFinite _
   rw [Fintype.linearIndependent_iff]
   intro a ha C
   have hmk : ConjClasses.mk (C.out) = C := by

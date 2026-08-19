@@ -180,7 +180,7 @@ theorem lt_relIndex_arrowKernel [Nontrivial Ω] [FaithfulSMul G Ω] [IsPreprimit
       calc β = ((g : G))⁻¹ • ((g : G) • β) := (inv_smul_smul _ _).symm
         _ = ((g : G))⁻¹ • α := by rw [hc']
         _ = α := hinv
-    haveI : Finite Ω := by
+    have : Finite Ω := by
       have : Nat.card Ω ≠ 0 := by omega
       exact Nat.finite_of_card_ne_zero this
     have hcompl : ({α}ᶜ : Set Ω).ncard = Nat.card Ω - 1 := by

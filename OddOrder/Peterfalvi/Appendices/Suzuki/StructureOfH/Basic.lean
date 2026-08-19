@@ -78,7 +78,7 @@ theorem Q1_inf_centralizer_eq_bot_of_le_V {X : Subgroup G} (hXV : X ≤ hyp.V)
       Nat.card ↥E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
     (ind : TheoremAInductionBelow G Ω) :
     hyp.Q1 ⊓ Subgroup.centralizer (X : Set G) = ⊥ := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   obtain ⟨data⟩ := hyp.centralizer_trichotomy_of_induction hXV hX hA3 ind
   exact data.common.q1_inf_centralizer_eq_bot
 

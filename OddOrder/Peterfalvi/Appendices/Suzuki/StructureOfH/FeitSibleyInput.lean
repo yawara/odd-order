@@ -98,7 +98,7 @@ theorem card_sylowTwoOfQ_mul_card_Q1 :
 
 /-- `S` is a `2`-group. -/
 theorem isPGroup_sylowTwoOfQ : IsPGroup 2 ↥hyp.sylowTwoOfQ := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   refine IsPGroup.of_equiv (default : Sylow 2 ↥hyp.Q).isPGroup' ?_
   exact (Subgroup.equivMapOfInjective _ hyp.Q.subtype hyp.Q.subtype_injective)
 
@@ -186,8 +186,8 @@ theorem H_ne_top : hyp.H ≠ ⊤ := fun h => hyp.t_not_mem_H (h ▸ Subgroup.mem
 /-- `Q₁` is nilpotent, being a subgroup of the nilpotent group `Q`
 (Ch. I §2, Proposition 1(b)). -/
 theorem isNilpotent_Q1 : Group.IsNilpotent ↥hyp.Q1 := by
-  letI : Group.IsNilpotent ↥hyp.Q := hyp.isNilpotent_Q
-  haveI : Group.IsNilpotent ↥hyp.Q1Subgroup := Subgroup.isNilpotent _
+  let : Group.IsNilpotent ↥hyp.Q := hyp.isNilpotent_Q
+  have : Group.IsNilpotent ↥hyp.Q1Subgroup := Subgroup.isNilpotent _
   exact Group.nilpotent_of_mulEquiv
     (Subgroup.equivMapOfInjective hyp.Q1Subgroup hyp.Q.subtype hyp.Q.subtype_injective)
 
@@ -204,7 +204,7 @@ theorem isFrobeniusAction_conjQ1ByD (ind : Hypothesis.TheoremAInductionBelow G �
     letI : MulDistribMulAction ↥sc.toHypothesis.D ↥sc.toHypothesis.Q1 :=
       MulDistribMulAction.compHom _ sc.toHypothesis.conjQ1ByD
     IsFrobeniusAction ↥sc.toHypothesis.D ↥sc.toHypothesis.Q1 := by
-  letI : MulDistribMulAction ↥sc.toHypothesis.D ↥sc.toHypothesis.Q1 :=
+  let : MulDistribMulAction ↥sc.toHypothesis.D ↥sc.toHypothesis.Q1 :=
     MulDistribMulAction.compHom _ sc.toHypothesis.conjQ1ByD
   intro a ha n hn hfix
   refine hn (Subtype.ext ?_)
@@ -215,10 +215,10 @@ theorem isFrobeniusAction_conjQ1ByD (ind : Hypothesis.TheoremAInductionBelow G �
 theorem coprime_card_Q1_D (ind : Hypothesis.TheoremAInductionBelow G Ω) :
     Nat.Coprime (Nat.card ↥sc.toHypothesis.Q1) (Nat.card ↥sc.toHypothesis.D) := by
   classical
-  letI : MulDistribMulAction ↥sc.toHypothesis.D ↥sc.toHypothesis.Q1 :=
+  let : MulDistribMulAction ↥sc.toHypothesis.D ↥sc.toHypothesis.Q1 :=
     MulDistribMulAction.compHom _ sc.toHypothesis.conjQ1ByD
-  haveI : Fintype ↥sc.toHypothesis.Q1 := Fintype.ofFinite _
-  haveI : Fintype ↥sc.toHypothesis.D := Fintype.ofFinite _
+  have : Fintype ↥sc.toHypothesis.Q1 := Fintype.ofFinite _
+  have : Fintype ↥sc.toHypothesis.D := Fintype.ofFinite _
   have h := (sc.isFrobeniusAction_conjQ1ByD ind).coprime_card
   rwa [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
 
@@ -348,10 +348,10 @@ theorem isCyclic_of_isMulCommutative_le_D (ind : Hypothesis.TheoremAInductionBel
     [IsMulCommutative ↥A] : IsCyclic ↥A := by
   classical
   by_contra hnc
-  letI : MulDistribMulAction ↥A ↥sc.toHypothesis.Q1 :=
+  let : MulDistribMulAction ↥A ↥sc.toHypothesis.Q1 :=
     MulDistribMulAction.compHom _
       (sc.toHypothesis.conjQ1ByD.comp (Subgroup.inclusion hAD))
-  haveI : Nontrivial ↥sc.toHypothesis.Q1 := (Subgroup.nontrivial_iff_ne_bot _).mpr hQ1
+  have : Nontrivial ↥sc.toHypothesis.Q1 := (Subgroup.nontrivial_iff_ne_bot _).mpr hQ1
   have hcop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥sc.toHypothesis.Q1) :=
     ((sc.coprime_card_Q1_D ind).symm).coprime_dvd_left (Subgroup.card_dvd_of_le hAD)
   have htop := OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic

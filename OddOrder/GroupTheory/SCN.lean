@@ -100,7 +100,7 @@ theorem map_equiv {G' : Type*} [Group G'] (e : G ≃* G') (h : IsSCN A) :
     IsSCN (A.map e.toMonoidHom) := by
   refine ⟨h.isNormal.map e.toMonoidHom e.surjective, ?_, ?_⟩
   · exact IsMulCommutative.of_setLike_mul_comm fun x hx y hy => by
-      letI : IsMulCommutative A := h.isMulCommutative
+      let : IsMulCommutative A := h.isMulCommutative
       obtain ⟨a, ha, rfl⟩ := Subgroup.mem_map.mp hx
       obtain ⟨b, hb, rfl⟩ := Subgroup.mem_map.mp hy
       have hab : a * b = b * a :=
@@ -159,8 +159,8 @@ supplied by `h.maximal`. -/
 theorem IsMaximalAbelianNormal.isSCN {p : ℕ} [Fact p.Prime] [Finite G] (hG : IsPGroup p G)
     {A : Subgroup G} (h : IsMaximalAbelianNormal A) :
     IsSCN A := by
-  haveI := h.isNormal
-  haveI := h.isMulCommutative
+  have := h.isNormal
+  have := h.isMulCommutative
   -- Element-level commutativity of `A`, needed by Gorenstein 5.3.12.
   have hA_comm : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x := fun x hx y hy =>
     congrArg Subtype.val (mul_comm' (⟨x, hx⟩ : A) ⟨y, hy⟩)
@@ -209,11 +209,11 @@ theorem exists_maxRank_maximalAbelianNormal [Finite G] (p : ℕ) :
     ∃ A : Subgroup G, IsMaximalAbelianNormal A ∧
       ∀ B : Subgroup G, B.Normal → IsMulCommutative B → pRank B p ≤ pRank A p := by
   classical
-  haveI hbot : IsMulCommutative (⊥ : Subgroup G) :=
+  have hbot : IsMulCommutative (⊥ : Subgroup G) :=
     IsMulCommutative.of_comm (fun a b => Subsingleton.elim _ _)
   obtain ⟨A₀, -, hA₀⟩ :=
     exists_maximalAbelianNormal_ge (B := (⊥ : Subgroup G)) inferInstance hbot
-  haveI : Nonempty {A : Subgroup G // IsMaximalAbelianNormal A} := ⟨⟨A₀, hA₀⟩⟩
+  have : Nonempty {A : Subgroup G // IsMaximalAbelianNormal A} := ⟨⟨A₀, hA₀⟩⟩
   obtain ⟨A, hA⟩ := Finite.exists_max
     (fun A : {A : Subgroup G // IsMaximalAbelianNormal A} => pRank (A : Subgroup G) p)
   refine ⟨A.1, A.2, fun B hBnorm hBcomm => ?_⟩

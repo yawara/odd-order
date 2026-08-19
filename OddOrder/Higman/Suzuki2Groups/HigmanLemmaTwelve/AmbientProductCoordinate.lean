@@ -189,7 +189,7 @@ theorem combinedFactorMap_surjective
     (hRnormal : (fR.range).Normal)
     (hsup : fL.range ⊔ fR.range = ⊤) :
     Function.Surjective (combinedFactorMap fL fR hK0 hfL eQuotL hfR eQuotR) := by
-  haveI := hRnormal
+  have := hRnormal
   intro y
   obtain ⟨x, hx⟩ :=
     QuotientGroup.mk'_surjective (lowerCentralLayerKernel P 0) y.toMul
@@ -303,6 +303,7 @@ end AmbientProduct
 
 section AmbientExtension
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Bridge `P / Φ(P) ≃* L₀`: the zeroth lower-central layer is the Frattini
 quotient once the layer kernel is identified with `Φ(P)`. -/
 def frattiniQuotientEquivLayerZero
@@ -412,9 +413,9 @@ theorem ambientCenterCoordinate_squareMap
     ambientCenterCoordinate hEA hK1 hterm ePhi
         (lowerCentralSquareMapAdditive P hSq (layerZeroClass x)) =
       ePhi (Additive.ofMul ⟨(x : P) ^ 2, hx2⟩) := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   rw [show layerZeroClass x =
       Additive.ofMul (QuotientGroup.mk' (lowerCentralLayerKernel P 0) x) from rfl,
     lowerCentralSquareMapAdditive_mk]

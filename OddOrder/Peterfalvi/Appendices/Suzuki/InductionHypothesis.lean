@@ -67,7 +67,7 @@ theorem simple_normal_oddIndex_Q_core (L : Subgroup G)
       L = (⨆ g : G, hyp.Q.map (MulAut.conj g).toMonoidHom) := by
   have hQp := hyp.Q_isPGroup_of_card_Omega_sub_one_eq_two_pow hΩ
   obtain ⟨P, hP⟩ := hyp.exists_sylow_two_eq_Q hQp
-  letI : L.Normal := hLnormal
+  let : L.Normal := hLnormal
   have hLcop : Nat.Coprime 2 L.index := Nat.coprime_two_left.mpr hLodd
   let R : Subgroup G := Subgroup.primeComplementResidual 2 G
   have hPR : (P : Subgroup G) ≤ R :=

@@ -122,7 +122,7 @@ theorem exists_mem_center_of_normal_ne_bot {p : ℕ} [Fact p.Prime] [Finite P]
   have hConj : IsPGroup p (ConjAct P) := hP.of_equiv ConjAct.toConjAct
   -- `p ∣ |K|` since `K` is a nontrivial finite `p`-group.
   have hKp : IsPGroup p K := hP.to_subgroup K
-  haveI : Nontrivial K := (Subgroup.nontrivial_iff_ne_bot K).mpr hK
+  have : Nontrivial K := (Subgroup.nontrivial_iff_ne_bot K).mpr hK
   have hdvd : p ∣ Nat.card K := by
     obtain ⟨n, hn0, hn⟩ := hKp.nontrivial_iff_card.mp inferInstance
     exact hn.symm ▸ dvd_pow_self _ (ne_of_gt hn0)
@@ -151,6 +151,7 @@ theorem exists_mem_center_of_normal_ne_bot {p : ℕ} [Fact p.Prime] [Finite P]
 
 variable [Finite P] {p : ℕ} [Fact p.Prime]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Gorenstein "Finite Groups" Lemma 5.3.12.** If `M` is a normal subgroup of a
 finite `p`-group `P` that is maximal subject to being abelian, then `M` is
 self-centralizing: `C_P(M) = M`.
@@ -182,11 +183,11 @@ theorem centralizer_eq_self_of_maximal_abelian_normal
   set H := Subgroup.centralizer (M : Set P) with hH_def
   have hMH : M < H := lt_of_le_of_ne hM_le (fun h => hnot (h ▸ le_refl _))
   -- `H` is normal in `P` (centralizer of a normal subgroup).
-  haveI : H.Normal := inferInstance
+  have : H.Normal := inferInstance
   -- Image of `H` in `P̄ = P/M`.
   set q := QuotientGroup.mk' M with hq_def
   set Hbar := H.map q with hHbar_def
-  haveI : Hbar.Normal := Subgroup.Normal.map inferInstance q (QuotientGroup.mk'_surjective M)
+  have : Hbar.Normal := Subgroup.Normal.map inferInstance q (QuotientGroup.mk'_surjective M)
   -- `H̄ ≠ ⊥`: pick `h ∈ H \ M`, then `q h ≠ 1`.
   have hHbar_ne : Hbar ≠ ⊥ := by
     obtain ⟨h, hhH, hhM⟩ := SetLike.exists_of_lt hMH
@@ -203,14 +204,14 @@ theorem centralizer_eq_self_of_maximal_abelian_normal
   -- `⟨x̄⟩` is central, hence normal; its preimage `X` is normal in `P`.
   have hzp_le_center : Subgroup.zpowers xbar ≤ Subgroup.center (P ⧸ M) :=
     Subgroup.zpowers_le.mpr hxbar_center
-  haveI hzp_normal : (Subgroup.zpowers xbar).Normal :=
+  have hzp_normal : (Subgroup.zpowers xbar).Normal :=
     { conj_mem := fun n hn g => by
         rw [Subgroup.mem_center_iff.mp (hzp_le_center hn) g, mul_assoc,
           mul_inv_cancel, mul_one]
         exact hn }
   -- The preimage `X` of `⟨x̄⟩` in `P`; it is normal in `P`.
   set X := (Subgroup.zpowers xbar).comap q with hX_def
-  haveI : X.Normal := inferInstance
+  have : X.Normal := inferInstance
   -- `M ≤ X` (since `q` sends `M` to `1 ∈ ⟨x̄⟩`).
   have hMX : M ≤ X := by
     intro m hm
@@ -394,8 +395,8 @@ private def IsCharAbelian (N : Subgroup P) : Prop :=
 subgroup is one, and the subgroup lattice is finite hence well-founded). -/
 private theorem exists_maximal_charAbelian :
     ∃ D : Subgroup P, Maximal (IsCharAbelian (P := P)) D := by
-  haveI : Finite (Subgroup P) := Finite.of_injective _ (SetLike.coe_injective (A := Subgroup P))
-  haveI : WellFoundedGT (Subgroup P) := Finite.to_wellFoundedGT
+  have : Finite (Subgroup P) := Finite.of_injective _ (SetLike.coe_injective (A := Subgroup P))
+  have : WellFoundedGT (Subgroup P) := Finite.to_wellFoundedGT
   obtain ⟨D, _, hD⟩ := exists_maximal_ge_of_wellFoundedGT (IsCharAbelian (P := P)) ⊥
     ⟨Subgroup.botCharacteristic, by simp⟩
   exact ⟨D, hD⟩
@@ -434,10 +435,10 @@ subgroup and `H = C_P(D)`.
 theorem isCritical_exists (hG : IsPGroup p P) : ∃ C : Subgroup P, IsCritical C := by
   obtain ⟨D, hD_max⟩ := exists_maximal_charAbelian (P := P)
   obtain ⟨hD_char, hD_ab⟩ := hD_max.prop
-  haveI : D.Characteristic := hD_char
+  have : D.Characteristic := hD_char
   -- `H = C_P(D)`, characteristic, and `D ≤ H` since `D` is abelian.
   set H := Subgroup.centralizer (D : Set P) with hH_def
-  haveI hH_char : H.Characteristic := Subgroup.characteristic_centralizer
+  have hH_char : H.Characteristic := Subgroup.characteristic_centralizer
   have hDH : D ≤ H := by
     intro d hd
     rw [hH_def, Subgroup.mem_centralizer_iff]
@@ -452,7 +453,7 @@ theorem isCritical_exists (hG : IsPGroup p P) : ∃ C : Subgroup P, IsCritical C
   by_cases hcase : H ≤ D
   · -- **Case A**: `C_P(D) = D`. Take `C = D`.
     have hHD : H = D := le_antisymm hcase hDH
-    haveI : D.Normal := inferInstance
+    have : D.Normal := inferInstance
     refine ⟨D, hD_char, ?_, ?_, ?_⟩
     · -- `commutator ↥D ≤ center ↥D = ⊤`.
       rw [hcenterD]; exact le_top
@@ -467,7 +468,7 @@ theorem isCritical_exists (hG : IsPGroup p P) : ∃ C : Subgroup P, IsCritical C
     have hPbar : IsPGroup p (P ⧸ D) := hG.to_quotient D
     -- `K = preimage of Ω₁(Z(P̄))`, characteristic in `P`.
     set K := (omega1Center (P ⧸ D) p).comap q with hK_def
-    haveI hK_char : K.Characteristic :=
+    have hK_char : K.Characteristic :=
       Subgroup.Characteristic.comap_quotient_mk omega1Center.characteristic
     -- `C = H ⊓ K`.
     set C := H ⊓ K with hC_def
@@ -545,10 +546,10 @@ theorem isCritical_exists (hG : IsPGroup p P) : ∃ C : Subgroup P, IsCritical C
           rw [SetLike.not_le_iff_exists] at hQnotC
           obtain ⟨q₀, hq₀Q, hq₀C⟩ := hQnotC
           -- `Q̄ := Q.map q` is normal and nontrivial.
-          haveI hQchar : (Subgroup.centralizer (C : Set P)).Characteristic :=
+          have hQchar : (Subgroup.centralizer (C : Set P)).Characteristic :=
             Subgroup.characteristic_centralizer (H := C) (hH := hC_char)
           set Qbar := (Subgroup.centralizer (C : Set P)).map q with hQbar_def
-          haveI : Qbar.Normal :=
+          have : Qbar.Normal :=
             Subgroup.Normal.map inferInstance q (QuotientGroup.mk'_surjective D)
           have hQbar_ne : Qbar ≠ ⊥ := by
             intro hbot
@@ -729,7 +730,7 @@ private def omega1OfClassLeTwo (K : Type*) [Group K] (p : ℕ) (hp_odd : Odd p)
   carrier := {g : K | g ^ p = 1}
   mul_mem' := fun {x y} hx hy => mul_pow_prime_eq_one_of_class_le_two hp_odd hcl hx hy
   one_mem' := one_pow p
-  inv_mem' := fun {x} hx => by rw [Set.mem_setOf_eq, inv_pow, hx, inv_one]
+  inv_mem' := fun {x} hx => by rw [Set.mem_ofPred_eq, inv_pow, hx, inv_one]
 
 /-- **Gorenstein "Finite Groups" Lemma 5.3.9(i).** In a group `K` of class `≤ 2`
 with `p` odd, every element of `Ω₁(K) = Omega K p 1` has `p`-th power `1`.
@@ -804,8 +805,8 @@ theorem actionCommutator_le_centralizer_of_acts_trivially_of_characteristic
     {φ : A →* MulAut P} {C : Subgroup P} (hC_char : C.Characteristic)
     (h_triv : (C : Set P) ⊆ Subgroup.fixedPointsOfMulAut φ) :
     actionCommutator φ ≤ Subgroup.centralizer (C : Set P) := by
-  haveI : C.Characteristic := hC_char
-  haveI : C.Normal := inferInstance
+  have : C.Characteristic := hC_char
+  have : C.Normal := inferInstance
   -- Work in `Γ = P ⋊[φ] A`.
   set XG : Subgroup (P ⋊[φ] A) := (SemidirectProduct.inl : P →* P ⋊[φ] A).range with hXG
   set YA : Subgroup (P ⋊[φ] A) := (SemidirectProduct.inr : A →* P ⋊[φ] A).range with hYA
@@ -864,7 +865,7 @@ theorem IsCritical.actionCommutator_eq_bot_of_acts_trivially
     (hA_p' : ¬ p ∣ Nat.card A) {C : Subgroup P} (hC : IsCritical C)
     (h_triv : (C : Set P) ⊆ Subgroup.fixedPointsOfMulAut φ) :
     actionCommutator φ = ⊥ := by
-  haveI : C.Characteristic := hC.characteristic
+  have : C.Characteristic := hC.characteristic
   -- `actionCommutator φ ≤ C_P(C) = Z(C)-image ⊆ C`.
   have h_le_cent : actionCommutator φ ≤ Subgroup.centralizer (C : Set P) :=
     actionCommutator_le_centralizer_of_acts_trivially_of_characteristic hC.characteristic h_triv
@@ -884,8 +885,8 @@ theorem IsCritical.actionCommutator_eq_bot_of_acts_trivially
     exact (Nat.Coprime.pow_right k
       ((Fact.out (p := p.Prime)).coprime_iff_not_dvd.mpr hA_p').symm)
   -- `P` is solvable (`p`-group ⇒ nilpotent ⇒ solvable).
-  haveI : Group.IsNilpotent P := hP.isNilpotent
-  haveI : IsSolvable P := inferInstance
+  have : Group.IsNilpotent P := hP.isNilpotent
+  have : Group.IsSolvable P := inferInstance
   exact actionCommutator_eq_bot_of_acts_trivially_on_self_of_coprime hCop (Or.inr inferInstance)
     h_triv_ac
 
@@ -979,7 +980,7 @@ theorem isPGroup_autFixerOfOrderP (hp_odd : p ≠ 2) (hP : IsPGroup p P) :
   have hn0 : orderOf ψ ≠ 0 := by
     intro h0
     -- `orderOf = 0` impossible in a finite group.
-    haveI : Finite (autFixerOfOrderP P p) := Subtype.finite
+    have : Finite (autFixerOfOrderP P p) := Subtype.finite
     exact (orderOf_pos ψ).ne' h0
   -- The `p'`-part `b := ordCompl[p] (orderOf ψ)` is `> 1` (else `n` is a `p`-power).
   set n := orderOf ψ with hn_def
@@ -998,7 +999,7 @@ theorem isPGroup_autFixerOfOrderP (hp_odd : p ≠ 2) (hP : IsPGroup p P) :
     rw [hσ_def, hb_def, orderOf_pow_of_dvd (Nat.ordProj_pos n p).ne' (Nat.ordProj_dvd n p)]
   -- `A := zpowers σ` has card `b`, coprime to `p`, and lies in the fixer.
   set A : Subgroup (autFixerOfOrderP P p) := Subgroup.zpowers σ with hA_def
-  haveI : Finite A := Subtype.finite
+  have : Finite A := Subtype.finite
   have hAcard : Nat.card A = b := by rw [hA_def, Nat.card_zpowers, hσ_ord]
   -- Map `A` into `MulAut P` via the fixer's `subtype`; the image lies in the fixer.
   set Aimg : Subgroup (MulAut P) := A.map (autFixerOfOrderP P p).subtype with hAimg_def
@@ -1006,7 +1007,7 @@ theorem isPGroup_autFixerOfOrderP (hp_odd : p ≠ 2) (hP : IsPGroup p P) :
     rw [hAimg_def]
     rintro _ ⟨x, _, rfl⟩
     exact x.property
-  haveI : Finite Aimg := Subtype.finite
+  have : Finite Aimg := Subtype.finite
   have hAimg_card : Nat.card Aimg = b := by
     rw [hAimg_def, Nat.card_congr (Subgroup.equivMapOfInjective A _
       (autFixerOfOrderP P p).subtype_injective).symm.toEquiv, hAcard]
@@ -1107,7 +1108,7 @@ in `H`. -/
 theorem IsCritical.commutator_top_le_center_omega1Map {C : Subgroup P} (hC : IsCritical C) :
     ⁅(⊤ : Subgroup P), omega1Map C p⁆ ≤
       (Subgroup.center ↥(omega1Map C p)).map (omega1Map C p).subtype := by
-  haveI : (omega1Map C p).Characteristic := hC.omega1Map_characteristic
+  have : (omega1Map C p).Characteristic := hC.omega1Map_characteristic
   set H := omega1Map C p with hH_def
   -- `⁅⊤, H⁆ ≤ H` (H normal) and `⁅⊤, H⁆ ≤ ⁅⊤, C⁆`.
   have hCH_H : ⁅(⊤ : Subgroup P), H⁆ ≤ H := Subgroup.commutator_le_right _ _
@@ -1162,7 +1163,7 @@ theorem IsCritical.ne_bot [Nontrivial P] {C : Subgroup P} (hC : IsCritical C) : 
 which lies in `Omega ↥C p 1`. -/
 theorem IsCritical.omega1_nontrivial [Nontrivial P] {C : Subgroup P}
     (hG : IsPGroup p P) (hC : IsCritical C) : Nontrivial ↥(Omega ↥C p 1) := by
-  haveI : Nontrivial ↥C := (Subgroup.nontrivial_iff_ne_bot C).mpr hC.ne_bot
+  have : Nontrivial ↥C := (Subgroup.nontrivial_iff_ne_bot C).mpr hC.ne_bot
   have hCp : IsPGroup p ↥C := hG.to_subgroup C
   -- `p ∣ |↥C|`.
   obtain ⟨n, hn0, hn⟩ := hCp.nontrivial_iff_card.mp inferInstance
@@ -1182,7 +1183,7 @@ odd). Transfers `Omega.exponent_eq_of_class_le_two` along the iso
 theorem IsCritical.exponent_omega1Map [Nontrivial P] (hp_odd : p ≠ 2)
     (hG : IsPGroup p P) {C : Subgroup P} (hC : IsCritical C) :
     Monoid.exponent ↥(omega1Map C p) = p := by
-  haveI : Nontrivial ↥(Omega ↥C p 1) := hC.omega1_nontrivial hG
+  have : Nontrivial ↥(Omega ↥C p 1) := hC.omega1_nontrivial hG
   -- exponent of `Omega ↥C p 1` is `p`.
   have hexp : Monoid.exponent ↥(Omega ↥C p 1) = p :=
     Omega.exponent_eq_of_class_le_two (Nat.Prime.odd_of_ne_two (Fact.out (p := p.Prime)) hp_odd)
@@ -1228,13 +1229,13 @@ theorem autCentralizer.eq_bot_of_not_dvd_card (hp_odd : p ≠ 2) (hG : IsPGroup 
     {C : Subgroup P} (hC : IsCritical C)
     {A : Subgroup (MulAut P)} [Finite A] (hA_le : A ≤ autCentralizer (omega1Map C p))
     (hA_p' : ¬ p ∣ Nat.card A) : A = ⊥ := by
-  haveI : C.Characteristic := hC.characteristic
+  have : C.Characteristic := hC.characteristic
   set φ : A →* MulAut P := A.subtype with hφ_def
   -- `C` is `A`-invariant (characteristic), so restrict the action to `↥C`.
   have hC_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ C :=
     OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic φ
   set φC : A →* MulAut ↥C := hC_inv.restrict with hφC_def
-  haveI hCp : IsPGroup p ↥C := hG.to_subgroup C
+  have hCp : IsPGroup p ↥C := hG.to_subgroup C
   -- `A` fixes every order-`p` element of `↥C` (such elements map into `Ω₁(C) = H`).
   have h_fix_C : ∀ g : ↥C, g ^ p = 1 → ∀ a : A, (φC a) g = g := by
     intro g hgp a
@@ -1286,7 +1287,7 @@ theorem IsCritical.isPGroup_autCentralizer_omega1Map (hp_odd : p ≠ 2) (hG : Is
   simp only [not_exists] at hψ
   have hn0 : orderOf ψ ≠ 0 := by
     intro h0
-    haveI : Finite (autCentralizer (omega1Map C p)) := Subtype.finite
+    have : Finite (autCentralizer (omega1Map C p)) := Subtype.finite
     exact (orderOf_pos ψ).ne' h0
   set n := orderOf ψ with hn_def
   set b := ordCompl[p] n with hb_def
@@ -1301,14 +1302,14 @@ theorem IsCritical.isPGroup_autCentralizer_omega1Map (hp_odd : p ≠ 2) (hG : Is
   have hσ_ord : orderOf σ = b := by
     rw [hσ_def, hb_def, orderOf_pow_of_dvd (Nat.ordProj_pos n p).ne' (Nat.ordProj_dvd n p)]
   set A : Subgroup (autCentralizer (omega1Map C p)) := Subgroup.zpowers σ with hA_def
-  haveI : Finite A := Subtype.finite
+  have : Finite A := Subtype.finite
   have hAcard : Nat.card A = b := by rw [hA_def, Nat.card_zpowers, hσ_ord]
   set Aimg : Subgroup (MulAut P) := A.map (autCentralizer (omega1Map C p)).subtype with hAimg_def
   have hAimg_le : Aimg ≤ autCentralizer (omega1Map C p) := by
     rw [hAimg_def]
     rintro _ ⟨x, _, rfl⟩
     exact x.property
-  haveI : Finite Aimg := Subtype.finite
+  have : Finite Aimg := Subtype.finite
   have hAimg_card : Nat.card Aimg = b := by
     rw [hAimg_def, Nat.card_congr (Subgroup.equivMapOfInjective A _
       (autCentralizer (omega1Map C p)).subtype_injective).symm.toEquiv, hAcard]

@@ -189,7 +189,7 @@ lemma odd_card_Dbar : Odd (Nat.card hyp.Dbar) := by
       (Nat.not_odd_iff_even.mpr (even_iff_two_dvd.mpr (dvd_trans he.two_dvd hdvd)))
   · exact ho
 
-instance : IsSolvable hyp.Dbar :=
+instance : Group.IsSolvable hyp.Dbar :=
   OddOrder.feitThompson hyp.odd_card_Dbar
 
 instance : Nontrivial ↥hyp.Q0 := by
@@ -450,10 +450,10 @@ lemma inverted_mem_fitting {x : hyp.Dbar} (hx : hyp.tau x = x⁻¹) :
     rw [← hFmap]
     exact Subgroup.mem_map_of_mem _ hz
   let Q := hyp.Dbar ⧸ F
-  letI : IsMulCommutative Q :=
+  let : IsMulCommutative Q :=
     Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr
       hyp.fitting_Dbar_cyclic_fpf_abelian.2.2
-  letI : CommGroup Q := inferInstance
+  let : CommGroup Q := inferInstance
   let tauQ : Q →* Q :=
     QuotientGroup.map F F hyp.tau.toMonoidHom (fun z hz => htauF z hz)
   have tauQ_mk (z : hyp.Dbar) :
@@ -463,8 +463,8 @@ lemma inverted_mem_fitting {x : hyp.Dbar} (hx : hyp.tau x = x⁻¹) :
     rw [tauQ_mk, tauQ_mk, hyp.tau_involutive]
   let Jq : Subgroup Q := MonoidHom.eqLocus tauQ invMonoidHom
   let B : Subgroup hyp.Dbar := Jq.comap (QuotientGroup.mk' F)
-  haveI hJqN : Jq.Normal := Subgroup.normal_of_isMulCommutative Jq
-  haveI hBN : B.Normal := hJqN.comap (QuotientGroup.mk' F)
+  have hJqN : Jq.Normal := Subgroup.normal_of_isMulCommutative Jq
+  have hBN : B.Normal := hJqN.comap (QuotientGroup.mk' F)
   have hmemB_iff (z : hyp.Dbar) :
       z ∈ B ↔ tauQ (QuotientGroup.mk' F z) = (QuotientGroup.mk' F z)⁻¹ := Iff.rfl
   have hxB : x ∈ B := by
@@ -521,14 +521,14 @@ lemma inverted_mem_fitting {x : hyp.Dbar} (hx : hyp.tau x = x⁻¹) :
     intro z hz
     exact congrArg Subtype.val
       (map_eq_inv_of_forall_fixed_eq_one hoddB sigma hsigma2 hfix ⟨z, hz⟩)
-  haveI hBcomm : IsMulCommutative ↥B := isMulCommutative_iff.mpr fun a b => by
+  have hBcomm : IsMulCommutative ↥B := isMulCommutative_iff.mpr fun a b => by
     apply Subtype.ext
     have hab := hinvB ((a : hyp.Dbar) * b) (B.mul_mem a.2 b.2)
     rw [map_mul, hinvB a a.2, hinvB b b.2, mul_inv_rev] at hab
     have hab' := congrArg Inv.inv hab
     simpa [mul_inv_rev] using hab'.symm
-  letI : CommGroup ↥B := inferInstance
-  haveI : Group.IsNilpotent ↥B := inferInstance
+  let : CommGroup ↥B := inferInstance
+  have : Group.IsNilpotent ↥B := inferInstance
   exact OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting hxB
 
 /-- **Peterfalvi Part II, Ch. I §2, Proposition 2** (p. 103):
@@ -765,7 +765,7 @@ and compare orders using |F(D̄)| = |K|. -/
 theorem exists_KSet_generator :
     ∃ k : G, k ∈ hyp.KSet ∧ (Subgroup.zpowers k : Set G) = hyp.KSet := by
   let F := fitting hyp.Dbar
-  haveI : IsCyclic ↥F := hyp.fitting_Dbar_cyclic_fpf_abelian.1
+  have : IsCyclic ↥F := hyp.fitting_Dbar_cyclic_fpf_abelian.1
   obtain ⟨a, ha⟩ := IsCyclic.exists_generator (α := ↥F)
   obtain ⟨d, hd⟩ := QuotientGroup.mk'_surjective
     (N := hyp.W.subgroupOf hyp.D) (a : hyp.Dbar)

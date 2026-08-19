@@ -85,14 +85,14 @@ def borelSL : Subgroup (SL(2, F)) where
     intro a b ha hb
     change ((a * b : SL(2, F)) : Matrix (Fin 2) (Fin 2) F) 1 0 = 0
     rw [Matrix.SpecialLinearGroup.coe_mul, Matrix.mul_apply, Fin.sum_univ_two]
-    simp only [Set.mem_setOf_eq] at ha hb
+    simp only [Set.mem_ofPred_eq] at ha hb
     rw [ha, hb, zero_mul, mul_zero, add_zero]
   one_mem' := by
     change ((1 : SL(2, F)) : Matrix (Fin 2) (Fin 2) F) 1 0 = 0
     simp
   inv_mem' := by
     intro a ha
-    simp only [Set.mem_setOf_eq] at ha ⊢
+    simp only [Set.mem_ofPred_eq] at ha ⊢
     rw [Matrix.SpecialLinearGroup.SL2_inv_expl]
     simp [ha]
 
@@ -147,7 +147,7 @@ def borelEquiv : (Fˣ × F) ≃ (borelSL : Subgroup (SL(2, F))) where
 theorem natCard_borelSL [Finite F] :
     Nat.card (borelSL : Subgroup (SL(2, F))) = (Nat.card F - 1) * Nat.card F := by
   classical
-  letI : Fintype F := Fintype.ofFinite F
+  let : Fintype F := Fintype.ofFinite F
   rw [← Nat.card_congr borelEquiv, Nat.card_prod]
   congr 1
   rw [Nat.card_eq_fintype_card, Fintype.card_units, Fintype.card_eq_nat_card]
@@ -235,6 +235,7 @@ theorem borelSL_le_normalizer :
   have heq : g⁻¹ * (g * u * g⁻¹) * g⁻¹⁻¹ = u := by group
   rwa [heq] at h
 
+set_option backward.isDefEq.respectTransparency false in
 theorem normalizer_le_borelSL :
     Subgroup.normalizer ((unipotentSL : Subgroup (SL(2, F))) : Set (SL(2, F))) ≤ borelSL := by
   intro g hg
@@ -288,7 +289,7 @@ variable [Finite F] {p : ℕ} [Fact p.Prime] [CharP F p]
 omit [Fact p.Prime] in
 theorem exists_card_eq_prime_pow : ∃ n : ℕ, 0 < n ∧ Nat.card F = p ^ n := by
   classical
-  letI : Fintype F := Fintype.ofFinite F
+  let : Fintype F := Fintype.ofFinite F
   obtain ⟨n, -, hn⟩ := FiniteField.card F p
   exact ⟨(n : ℕ), n.2, by rw [Nat.card_eq_fintype_card, hn]⟩
 

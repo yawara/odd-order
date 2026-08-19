@@ -79,7 +79,7 @@ theorem not_isSimpleGroup_of_sylow_two_cyclic_strict_max_factor
     (hB_exp : ∀ x ∈ B, x ^ (Nat.card A / 2) = 1) :
     ¬ IsSimpleGroup G := by
   intro hSimp
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   -- |A| = 2^k (A ≤ P は 2-group), 2 ≤ |A| ⇒ 2 ∣ |A|
   obtain ⟨k, hk_card⟩ := IsPGroup.iff_card.mp (P.isPGroup'.to_subgroup A)
   have h2_dvd : 2 ∣ Nat.card A := by

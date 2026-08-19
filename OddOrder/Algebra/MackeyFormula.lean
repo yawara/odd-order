@@ -79,12 +79,12 @@ theorem exists_mackey (K : Subgroup G) {L : Subgroup G} {a : A} (ha : ∀ g ∈ 
     ∃ s : Finset G,
       relTrace L ⊤ a = ∑ g ∈ s, relTrace (K ⊓ MulAut.conj g • L) K (g • a) := by
   classical
-  letI := Fintype.ofFinite (G ⧸ L)
-  letI : Fintype (orbitRel.Quotient ↥K (G ⧸ L)) := Fintype.ofFinite _
+  let := Fintype.ofFinite (G ⧸ L)
+  let : Fintype (orbitRel.Quotient ↥K (G ⧸ L)) := Fintype.ofFinite _
   set Ω := orbitRel.Quotient ↥K (G ⧸ L) with hΩ
   set rep : Ω → G := fun ω => ((ω.out : G ⧸ L).out : G) with hrep
   set D : Ω → Subgroup G := fun ω => K ⊓ MulAut.conj (rep ω) • L with hD
-  letI : ∀ ω : Ω, Fintype (↥K ⧸ (D ω).subgroupOf K) := fun _ => Fintype.ofFinite _
+  let : ∀ ω : Ω, Fintype (↥K ⧸ (D ω).subgroupOf K) := fun _ => Fintype.ofFinite _
   have hmk : ∀ ω : Ω, (QuotientGroup.mk (rep ω) : G ⧸ L) = ω.out := fun ω =>
     QuotientGroup.out_eq' _
   -- Orbits of `K` on `G ⧸ L` are indexed by `Ω`, and each is a copy of `K ⧸ (K ∩ ᵍL)`.

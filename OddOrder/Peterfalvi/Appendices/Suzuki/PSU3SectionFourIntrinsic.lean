@@ -468,7 +468,7 @@ theorem sq_eq_one_of_mem_center_Q_centralizerQuotient (hXV : X ≤ hyp.V) {n : �
       Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1) :
     letI := hyp.centralizerQuotientMulAction hXV
     ∀ z ∈ Subgroup.center ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q, z ^ 2 = 1 := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   intro z hz
   set e : ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q ≃* RootGroup n :=
     (hyp.centralizerQQuotientEquiv hXV).symm.trans eRoot with he
@@ -486,7 +486,7 @@ theorem center_Q_eq_Q0_centralizerQuotient (hXV : X ≤ hyp.V) {n : ℕ} (hn : 0
     Subgroup.center ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q
       = (hyp.centralizerQuotientHypothesis hXV hA3).Q0.subgroupOf
         (hyp.centralizerQuotientHypothesis hXV hA3).Q := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   exact (hyp.centralizerQuotientHypothesis hXV hA3).center_Q_eq_Q0_subgroupOf_of_sq_eq_one
     (hyp.sq_eq_one_of_mem_center_Q_centralizerQuotient hXV hn eRoot hA3)
 
@@ -869,7 +869,7 @@ theorem exists_mulEquiv_match_residualQuotient
           = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q ∧
         (hyp.residualQuotientHypothesis details).D.map φ.toMonoidHom
           = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).D := by
-  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+  let := MulAction.compHom (ULift.{v} (Unital data.n))
     details.residualQuotientEquiv.toMonoidHom
   classical
   have hn := data.one_lt_n
@@ -936,7 +936,7 @@ theorem exists_ne_one_mem_W_intrinsicResidualQuotient
     (hZD : Subgroup.center ↥(residualImage (G := G) X)
       ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
     ∃ w ∈ (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).W, w ≠ 1 := by
-  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+  let := MulAction.compHom (ULift.{v} (Unital data.n))
     details.residualQuotientEquiv.toMonoidHom
   obtain ⟨φ, hH, _hQ, hD⟩ :=
     hyp.exists_mulEquiv_match_residualQuotient details hXD htX hCQ hZD
@@ -959,7 +959,7 @@ theorem inf_centralizer_residualQuotientHypothesis
     (hyp.residualQuotientHypothesis details).Q ⊓ Subgroup.centralizer
         (((hyp.residualQuotientHypothesis details).D : Set (↥(residual (G := G) X) ⧸
           Subgroup.center ↥(residual (G := G) X)))) = ⊥ := by
-  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+  let := MulAction.compHom (ULift.{v} (Unital data.n))
     details.residualQuotientEquiv.toMonoidHom
   have hstd : (standardHypothesis data.n data.one_lt_n).Q ⊓ Subgroup.centralizer
       (((standardHypothesis data.n data.one_lt_n).D : Set (standardPermGroup data.n))) = ⊥ :=
@@ -980,7 +980,7 @@ theorem inf_centralizer_intrinsicResidualQuotient
         (((hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).D :
           Set (↥(residualImage (G := G) X) ⧸
             Subgroup.center ↥(residualImage (G := G) X)))) = ⊥ := by
-  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+  let := MulAction.compHom (ULift.{v} (Unital data.n))
     details.residualQuotientEquiv.toMonoidHom
   obtain ⟨φ, _hH, hQ, hD⟩ :=
     hyp.exists_mulEquiv_match_residualQuotient details hXD htX hCQ hZD
@@ -1015,7 +1015,7 @@ theorem exists_mulEquiv_match_residualQuotient_t
           = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).D ∧
         ψ (hyp.residualQuotientHypothesis details).t
           = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).t := by
-  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+  let := MulAction.compHom (ULift.{v} (Unital data.n))
     details.residualQuotientEquiv.toMonoidHom
   obtain ⟨φ, hH, hQ, hD⟩ :=
     hyp.exists_mulEquiv_match_residualQuotient details hXD htX hCQ hZD
@@ -1065,7 +1065,7 @@ theorem V_eq_W_intrinsicResidualQuotient (details : CentralizerPSUData hyp X res
       ≤ hyp.D.subgroupOf (residualImage (G := G) X)) :
     (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).V
       = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).W := by
-  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+  let := MulAction.compHom (ULift.{v} (Unital data.n))
     details.residualQuotientEquiv.toMonoidHom
   obtain ⟨ψ, hH, _hQ, hD, ht⟩ :=
     hyp.exists_mulEquiv_match_residualQuotient_t details hXD htX hCQ hZD
@@ -1143,7 +1143,7 @@ theorem intrinsicResidualQuotientULift_H (details : CentralizerPSUData hyp X res
       (hyp.intrinsicPointEquivULift details hXD htX hCQ hZD)
     (hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).H
       = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).H := by
-  letI := Hypothesis.rankOneSetupAction
+  let := Hypothesis.rankOneSetupAction
     (hyp.intrinsicPointEquivULift details hXD htX hCQ hZD)
   exact ofRankOneSetupOfEquiv_H _ _ _ _ _ _
 
@@ -1156,7 +1156,7 @@ theorem intrinsicResidualQuotientULift_Q (details : CentralizerPSUData hyp X res
       (hyp.intrinsicPointEquivULift details hXD htX hCQ hZD)
     (hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).Q
       = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).Q := by
-  letI := Hypothesis.rankOneSetupAction
+  let := Hypothesis.rankOneSetupAction
     (hyp.intrinsicPointEquivULift details hXD htX hCQ hZD)
   exact ofRankOneSetupOfEquiv_Q _ _ _ _ _ _
 
@@ -1169,7 +1169,7 @@ theorem intrinsicResidualQuotientULift_D (details : CentralizerPSUData hyp X res
       (hyp.intrinsicPointEquivULift details hXD htX hCQ hZD)
     (hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).D
       = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).D := by
-  letI := Hypothesis.rankOneSetupAction
+  let := Hypothesis.rankOneSetupAction
     (hyp.intrinsicPointEquivULift details hXD htX hCQ hZD)
   exact ofRankOneSetupOfEquiv_D _ _ _ _ _ _
 
@@ -1183,6 +1183,8 @@ theorem intrinsicResidualQuotientULift_t (details : CentralizerPSUData hyp X res
     (hyp.intrinsicResidualQuotientULift details hXD htX hCQ hZD).t
       = (hyp.intrinsicResidualQuotient details hXD htX hCQ hZD).t := rfl
 
+-- `letI` は universe level 推論に必須 (v4.33 haveILetI linter の正当な例外)
+set_option linter.style.haveILetI false in
 /-- **The induction hypothesis restricts to `U/Z(U)`** with the intrinsic point set.
 
 `TheoremAInductionBelow` only looks at the order of the group, so this is `ih` composed
@@ -1200,6 +1202,7 @@ theorem theoremAInductionBelow_intrinsicResidualQuotient
     TheoremAInductionBelow
       (↥(residualImage (G := G) X) ⧸ Subgroup.center ↥(residualImage (G := G) X))
       (ULift.{v} (Unital data.n)) := by
+  -- ⚠ `letI` のまま: `let` にすると universe level 推論が落ちる (v4.33 の haveILetI linter 例外)
   letI := Hypothesis.rankOneSetupAction
     ((hyp.intrinsicPointEquiv details hXD htX hCQ hZD).trans Equiv.ulift.symm)
   intro A Λ _ _ _ hlt hA
@@ -1225,7 +1228,7 @@ theorem nonempty_standingData_intrinsicResidualQuotient (hXV : X ≤ hyp.V) (hX 
         data.n) ∧
       Nonempty ((hyp.intrinsicResidualQuotientULift details hXD htX hCQ
         hZD).QuotientFieldModel data.n) := by
-  letI := Hypothesis.rankOneSetupAction
+  let := Hypothesis.rankOneSetupAction
     (hyp.intrinsicPointEquivULift details hXD htX hCQ hZD)
   have hH := hyp.intrinsicResidualQuotientULift_H details hXD htX hCQ hZD
   have hQ := hyp.intrinsicResidualQuotientULift_Q details hXD htX hCQ hZD
@@ -1295,7 +1298,7 @@ theorem exists_isStandardModel_intrinsicResidualQuotient (hXV : X ≤ hyp.V) (hX
           = 2 ^ data.n - 1 ∧
       (hyp.intrinsicResidualQuotientULift details hXD htX hCQ
         hZD).IsStandardModel sfive Mq x₀ := by
-  letI := Hypothesis.rankOneSetupAction
+  let := Hypothesis.rankOneSetupAction
     (hyp.intrinsicPointEquivULift details hXD htX hCQ hZD)
   obtain ⟨⟨sfive⟩, ⟨Mq⟩⟩ := hyp.nonempty_standingData_intrinsicResidualQuotient hXV hX
     common details hXD htX hCQ hZD ih
@@ -1354,7 +1357,7 @@ theorem isStandardModel_centralizerQuotient {m : ℕ} (M : hyp.QuotientFieldMode
     (hmu : Function.Injective M.mu)
     (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥hyp.Q)
     (hCop : Nat.Coprime (Nat.card ↥(s4.P.subgroupOf hyp.D)) (Nat.card ↥hyp.Q))
-    (hSolv : IsSolvable ↥hyp.Q) (hP : s4.P ≠ ⊥)
+    (hSolv : Group.IsSolvable ↥hyp.Q) (hP : s4.P ≠ ⊥)
     (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer ((s4.P : Set G))),
       Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
     (hord : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
@@ -1371,7 +1374,7 @@ theorem isStandardModel_centralizerQuotient {m : ℕ} (M : hyp.QuotientFieldMode
               (hyp.centralizerQuotientHypothesis s4.P_le_V hA3).t) = 3 ∧
         Function.Injective Mq.mu ∧
         (hyp.centralizerQuotientHypothesis s4.P_le_V hA3).IsStandardModel sfive Mq x₀ := by
-  letI := hyp.centralizerQuotientMulAction s4.P_le_V
+  let := hyp.centralizerQuotientMulAction s4.P_le_V
   obtain ⟨n, hn, hQ0card, hcardQ, hst, _hQsuzBar, ⟨sfive⟩, ⟨Mq⟩⟩ :=
     s4.standingData_centralizerQuotient M hZ hmu hQsuz hCop hSolv hP hA3 hord ih
   obtain ⟨x₀, hx₀⟩ :=

@@ -36,7 +36,7 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.NilpotentInjector.Defs
 
 namespace OddOrder.Isaacs.Ch03
 
-open Subgroup Pointwise
+open _root_.OddOrder.Isaacs.Ch03.Subgroup Pointwise
 
 section /- 3C.8: Mann の核心補題 -/
 
@@ -48,18 +48,18 @@ instance normal_centralizer_fitting (G : Type*) [Group G] :
   normal_centralizer inferInstance
 
 /-- 可解群では `Z := C_G(F(G)) ≤ F(G)` なので `Z` は冪零。 -/
-theorem isNilpotent_centralizer_fitting [Finite G] [IsSolvable G] :
+theorem isNilpotent_centralizer_fitting [Finite G] [Group.IsSolvable G] :
     Group.IsNilpotent ↥(Subgroup.centralizer ((Ch01.fitting G : Subgroup G) : Set G)) :=
   isNilpotent_of_le inferInstance OddOrder.GroupTheory.centralizer_fitting_le_fitting
 
 /-- `C_G(F(G)) ≤ C(p)` (`F_{p'} ≤ F(G)` の中心化群は逆向きに大きい)。 -/
-theorem centralizer_fitting_le_pCentralizer [Finite G] [IsSolvable G] (p : ℕ) :
+theorem centralizer_fitting_le_pCentralizer [Finite G] [Group.IsSolvable G] (p : ℕ) :
     Subgroup.centralizer ((Ch01.fitting G : Subgroup G) : Set G) ≤ pCentralizer G p :=
   Subgroup.centralizer_le (by exact_mod_cast fittingPPrimePart_le (G := G) p)
 
 /-- `D ⊴ G` が `D ⊓ C(q) ≤ C_G(F(G))` を満たすなら, `D` と `C(q)` の元の交換子は
 `C_G(F(G))` に入る。 -/
-theorem commutator_mem_centralizer_fitting [Finite G] [IsSolvable G] {q : ℕ} {D : Subgroup G}
+theorem commutator_mem_centralizer_fitting [Finite G] [Group.IsSolvable G] {q : ℕ} {D : Subgroup G}
     [D.Normal]
     (hD : D ⊓ pCentralizer G q ≤ Subgroup.centralizer ((Ch01.fitting G : Subgroup G) : Set G))
     {x y : G} (hx : x ∈ D) (hy : y ∈ pCentralizer G q) :
@@ -75,7 +75,7 @@ theorem commutator_mem_centralizer_fitting [Finite G] [IsSolvable G] {q : ℕ} {
 
 `D = C(p)` (`p ≠ q`) の場合が `map_conj_eq_self_of_mem_pCentralizer`,
 `D = C_G(F_q)` の場合が 3C.8 の injector 側の議論で使われる。 -/
-theorem map_conj_eq_self_of_normal_of_inf_le [Finite G] [IsSolvable G] {q : ℕ}
+theorem map_conj_eq_self_of_normal_of_inf_le [Finite G] [Group.IsSolvable G] {q : ℕ}
     {D S : Subgroup G} [D.Normal]
     (hD : D ⊓ pCentralizer G q ≤ Subgroup.centralizer ((Ch01.fitting G : Subgroup G) : Set G))
     (hS : IsHallPart (pCentralizer G q) S ({q} : Set ℕ))
@@ -90,7 +90,7 @@ theorem map_conj_eq_self_of_normal_of_inf_le [Finite G] [IsSolvable G] {q : ℕ}
   have hZqPart := isHallPart_nilPiPart (N := Z) ({q} : Set ℕ) hZnil
   have hZq'Part := isHallPart_nilPiPart (N := Z) (({q} : Set ℕ)ᶜ) hZnil
   -- (2) `Z_q ≤ S`
-  haveI : Zq.Normal := nilPiPart_normal hZnil _
+  have : Zq.Normal := nilPiPart_normal hZnil _
   have hZq_le_S : Zq ≤ S := by
     have hnorm : (Zq.subgroupOf (pCentralizer G q)).Normal := Subgroup.normal_subgroupOf
     have := Subgroup.IsPiGroup.normal_le_hall (N := Zq.subgroupOf (pCentralizer G q))
@@ -146,7 +146,7 @@ theorem map_conj_eq_self_of_normal_of_inf_le [Finite G] [IsSolvable G] {q : ℕ}
   exact Subgroup.eq_of_le_of_card_ge hle hcard.ge
 
 /-- **Mann の核心補題**: `p ≠ q` のとき `C(p)` の元は `C(q)` の Sylow `q`-部分群を正規化する。 -/
-theorem map_conj_eq_self_of_mem_pCentralizer [Finite G] [IsSolvable G] {p q : ℕ} (hpq : p ≠ q)
+theorem map_conj_eq_self_of_mem_pCentralizer [Finite G] [Group.IsSolvable G] {p q : ℕ} (hpq : p ≠ q)
     {S : Subgroup G} (hS : IsHallPart (pCentralizer G q) S ({q} : Set ℕ))
     {x : G} (hx : x ∈ pCentralizer G p) :
     S.map (MulAut.conj x).toMonoidHom = S :=

@@ -228,7 +228,7 @@ theorem exists_typeP_partner [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   obtain ⟨hnc, hZle, hXMsσ⟩ :=
     typeP_neighbor_embed hG hM hP hKM hK hKstar hU hX hXK hCX hMstarmem
   have hκ := typeP_neighbor_kappa hG hM hP hKM hK hKstar hU hX hXK hCX hMstarmem
-  haveI : Nontrivial ↥Kstar := (Subgroup.nontrivial_iff_ne_bot _).mpr hKstarne
+  have : Nontrivial ↥Kstar := (Subgroup.nontrivial_iff_ne_bot _).mpr hKstarne
   obtain ⟨q, hq⟩ : (Nat.card ↥Kstar).primeFactors.Nonempty :=
     Nat.nonempty_primeFactors.mpr Finite.one_lt_card
   exact ⟨Mstar, hMstarmem, hnc, hZle, hXMsσ, hκ, ⟨q, hκ q hq⟩⟩
@@ -248,7 +248,7 @@ theorem le_centralizerFactor_of_le_sup_of_le_Msigma [Finite G] {Mi Ki Kistar X :
   -- `Ki` is normal in `Ki ⊔ Kistar` (`Kistar` centralizes it), so elements decompose as `a · b`.
   have hKnorm : Ki ⊔ Kistar ≤ Subgroup.normalizer (Ki : Set G) :=
     sup_le Subgroup.le_normalizer (hKistarC.trans (Subgroup.centralizer_le_normalizer _))
-  haveI : ((Ki).subgroupOf (Ki ⊔ Kistar)).Normal :=
+  have : ((Ki).subgroupOf (Ki ⊔ Kistar)).Normal :=
     Subgroup.normal_subgroupOf_of_le_normalizer hKnorm
   have hsuptop : (Ki.subgroupOf (Ki ⊔ Kistar)) ⊔ (Kistar.subgroupOf (Ki ⊔ Kistar)) = ⊤ := by
     rw [← Subgroup.subgroupOf_sup le_sup_left le_sup_right, Subgroup.subgroupOf_self]
@@ -280,7 +280,7 @@ theorem typeP_normalizer_inf_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
     Subgroup.normalizer (X : Set G) ⊓ Mi =
       Ki ⊔ (OddOrder.BG.Ch3.S10.Msigma Mi ⊓ Subgroup.centralizer (Ki : Set G)) := by
   classical
-  haveI : IsSolvable ↥Mi := hG.solvable_of_mem_maximalSubgroups hMi
+  have : Group.IsSolvable ↥Mi := hG.isSolvable_of_mem_maximalSubgroups hMi
   obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥Mi)
     ((kappa Mi ∪ OddOrder.BG.Ch3.S10.sigma Mi)ᶜ)
   have hUeq : (U'.map Mi.subtype).subgroupOf Mi = U' :=
@@ -409,7 +409,7 @@ theorem typeP_swap_Z_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hKiMi : Ki ≤ Mi) (hKi : Ch03.IsHallSubgroup (kappa Mi) (Ki.subgroupOf Mi)) :
     K ⊔ Kstar = Ki ⊔ (OddOrder.BG.Ch3.S10.Msigma Mi ⊓ Subgroup.centralizer (Ki : Set G)) := by
   classical
-  haveI : Fact pstar.Prime := ⟨hpstar⟩
+  have : Fact pstar.Prime := ⟨hpstar⟩
   -- Direction `⊆` (the original swap).
   have hle1 : K ⊔ Kstar ≤
       Ki ⊔ (OddOrder.BG.Ch3.S10.Msigma Mi ⊓ Subgroup.centralizer (Ki : Set G)) :=
@@ -427,7 +427,7 @@ theorem typeP_swap_Z_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hA : Ki ⊔ (OddOrder.BG.Ch3.S10.Msigma Mi ⊓ Subgroup.centralizer (Ki : Set G)) ≤ M := by
     rw [← hZiMi]; exact inf_le_left.trans hNXstarM
   -- A Hall `(κ(Mi) ∪ σ(Mi))'`-subgroup of `Mi` (for Proposition 14.2 applied to `Mi`).
-  haveI : IsSolvable ↥Mi := hG.solvable_of_mem_maximalSubgroups hMimax
+  have : Group.IsSolvable ↥Mi := hG.isSolvable_of_mem_maximalSubgroups hMimax
   obtain ⟨Ui', hUi'⟩ := Ch03.hall_E_exists (G := ↥Mi)
     ((kappa Mi ∪ OddOrder.BG.Ch3.S10.sigma Mi)ᶜ)
   have hUieq : (Ui'.map Mi.subtype).subgroupOf Mi = Ui' :=
@@ -488,7 +488,7 @@ theorem typeP_centralizer_singleton [Finite G] (hG : OddOrder.BG.IsMinimalSimple
     (hYK : Y ≤ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
     maximalSubgroupsContaining (Subgroup.centralizer (Y : Set G)) = {M} := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥M)
     ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
   have hUeq : (U'.map M.subtype).subgroupOf M = U' :=
@@ -518,9 +518,9 @@ theorem typeP_neighbor_Kstar_inf_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSi
   set H := (OddOrder.BG.Ch3.S10.Msigma Mi ⊓ Subgroup.centralizer (Ki : Set G)) ⊓
     (OddOrder.BG.Ch3.S10.Msigma Mj ⊓ Subgroup.centralizer (Kj : Set G)) with hHdef
   -- Cauchy: a prime-order element `z ∈ H`, generating a line `Y ∈ ℰ¹(H)`.
-  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hbot
+  have : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hbot
   obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd (Finite.one_lt_card (α := ↥H)).ne'
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨z, hz⟩ := exists_prime_orderOf_dvd_card' p hpdvd
   have hzH : (z : G) ∈ H := z.2
   have hzord : orderOf (z : G) = p := (orderOf_injective H.subtype H.subtype_injective z).trans hz
@@ -620,7 +620,7 @@ theorem card_iSup_of_pairwise_commute_coprime [Finite G] {ι : Type*} [Fintype �
     (hcoprime : Pairwise fun i j => Nat.Coprime (Nat.card ↥(H i)) (Nat.card ↥(H j))) :
     Nat.card ↥(⨆ i, H i) = ∏ i, Nat.card ↥(H i) := by
   classical
-  haveI : ∀ i, Fintype ↥(H i) := fun i => Fintype.ofFinite _
+  have : ∀ i, Fintype ↥(H i) := fun i => Fintype.ofFinite _
   have hcop' : Pairwise fun i j => Nat.Coprime (Fintype.card ↥(H i)) (Fintype.card ↥(H j)) :=
     fun i j hij => by simpa only [Nat.card_eq_fintype_card] using hcoprime hij
   have hind : iSupIndep H := Subgroup.independent_of_coprime_order hcomm hcop'
@@ -694,11 +694,11 @@ theorem exists_neighbor_kappaHall_swap [Finite G] (hG : OddOrder.BG.IsMinimalSim
   have hNmax : N ∈ maximalSubgroups G :=
     mem_maximalSubgroups.mpr (mem_maximalSubgroupsContaining.mp hN).1
   have hKstarne : Kstar ≠ ⊥ := (typeP_structure hG hM hP hKM hK hKstar hU).2.1
-  haveI : Nontrivial ↥Kstar := (Subgroup.nontrivial_iff_ne_bot _).mpr hKstarne
+  have : Nontrivial ↥Kstar := (Subgroup.nontrivial_iff_ne_bot _).mpr hKstarne
   obtain ⟨q, hq⟩ : (Nat.card ↥Kstar).primeFactors.Nonempty :=
     Nat.nonempty_primeFactors.mpr Finite.one_lt_card
   have hqκN : q ∈ kappa N := hκ q hq
-  haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hq⟩
+  have : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hq⟩
   -- A line `X* ∈ ℰ¹(K*)` of prime order `q`, inside a Hall `κ(N)`-subgroup `K_N`.
   obtain ⟨x', hx'⟩ := exists_prime_orderOf_dvd_card' q (Nat.dvd_of_mem_primeFactors hq)
   have hx'ord : orderOf (x' : G) = q :=
@@ -734,7 +734,7 @@ theorem exists_typeP_neighbor_mem_sigma [Finite G] (hG : OddOrder.BG.IsMinimalSi
     ∃ N : Subgroup G, N ∈ maximalSubgroups G ∧ IsTypeP N ∧ ¬ IsConjugateSubgroup M N ∧
       p ∈ OddOrder.BG.Ch3.S10.sigma N ∧ K ⊔ Kstar ≤ N := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' p hpK
   have hxord : orderOf (x : G) = p := (orderOf_injective K.subtype K.subtype_injective x).trans hx
   have hXcard : Nat.card ↥(Subgroup.zpowers (x : G)) = p := by rw [Nat.card_zpowers, hxord]
@@ -796,8 +796,8 @@ theorem commute_of_le_normalizer_of_disjoint {Z A B : Subgroup G}
     (hAZ : A ≤ Z) (hBZ : B ≤ Z) (hAnorm : Z ≤ Subgroup.normalizer (A : Set G))
     (hBnorm : Z ≤ Subgroup.normalizer (B : Set G)) (hdisj : A ⊓ B = ⊥) :
     ∀ x ∈ A, ∀ y ∈ B, Commute x y := by
-  haveI hAn : (A.subgroupOf Z).Normal := Subgroup.normal_subgroupOf_of_le_normalizer hAnorm
-  haveI hBn : (B.subgroupOf Z).Normal := Subgroup.normal_subgroupOf_of_le_normalizer hBnorm
+  have hAn : (A.subgroupOf Z).Normal := Subgroup.normal_subgroupOf_of_le_normalizer hAnorm
+  have hBn : (B.subgroupOf Z).Normal := Subgroup.normal_subgroupOf_of_le_normalizer hBnorm
   have hdisjZ : Disjoint (A.subgroupOf Z) (B.subgroupOf Z) := by
     rw [Subgroup.disjoint_def]
     intro g hgA hgB
@@ -921,7 +921,7 @@ theorem exists_neighbor_full [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   obtain ⟨_, _, hXNσ⟩ := typeP_neighbor_embed hG hM hP hKM hK hKstar hU hX hXK hCX hN
   have hκ := typeP_neighbor_kappa hG hM hP hKM hK hKstar hU hX hXK hCX hN
   have hKstarne : Kstar ≠ ⊥ := (typeP_structure hG hM hP hKM hK hKstar hU).2.1
-  haveI : Nontrivial ↥Kstar := (Subgroup.nontrivial_iff_ne_bot _).mpr hKstarne
+  have : Nontrivial ↥Kstar := (Subgroup.nontrivial_iff_ne_bot _).mpr hKstarne
   obtain ⟨q, hq⟩ : (Nat.card ↥Kstar).primeFactors.Nonempty :=
     Nat.nonempty_primeFactors.mpr Finite.one_lt_card
   have hPN : IsTypeP N := ⟨q, hκ q hq⟩
@@ -1014,7 +1014,7 @@ theorem exists_neighbor_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   obtain ⟨_, _, hXNσ⟩ := typeP_neighbor_embed hG hM hP hKM hK hKstar hU hX hXK hCX hN
   have hκ := typeP_neighbor_kappa hG hM hP hKM hK hKstar hU hX hXK hCX hN
   have hKstarne : Kstar ≠ ⊥ := (typeP_structure hG hM hP hKM hK hKstar hU).2.1
-  haveI : Nontrivial ↥Kstar := (Subgroup.nontrivial_iff_ne_bot _).mpr hKstarne
+  have : Nontrivial ↥Kstar := (Subgroup.nontrivial_iff_ne_bot _).mpr hKstarne
   obtain ⟨q, hq⟩ : (Nat.card ↥Kstar).primeFactors.Nonempty :=
     Nat.nonempty_primeFactors.mpr Finite.one_lt_card
   have hXcanon : X ≤ (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N :=
@@ -1054,7 +1054,7 @@ theorem typeP_family_member_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
       K, hKM, hK, by rw [hKstar], (hKstarEq.trans hKstar).symm,
       hKstar ▸ (typeP_structure hG hM hP hKM hK hKstar hU).2.1⟩
   · -- neighbour from a line `X`.
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     have hCX : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥ := by
       intro hbot
       refine (typeP_structure hG hM hP hKM hK hKstar hU).2.1 (le_bot_iff.mp ?_)
@@ -1190,7 +1190,7 @@ theorem typeP_family_member_normal [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
       (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G) := by
   rcases hN with hNM | ⟨p, X, hp, hX, hXK, hN⟩
   · rw [hNM]; exact (typeP_self_member hG hM hP hKM hK hKstar hU).2.2.1
-  · haveI : Fact p.Prime := ⟨hp⟩
+  · have : Fact p.Prime := ⟨hp⟩
     have hCX : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥ := by
       intro hbot
       refine (typeP_structure hG hM hP hKM hK hKstar hU).2.1 (le_bot_iff.mp ?_)
@@ -1272,7 +1272,7 @@ theorem typeP_kappaHall_inf_conj_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSi
   have hcard_ne : Nat.card ↥(K ⊓ (MulAut.conj g • K)) ≠ 1 :=
     fun h => hne (Subgroup.eq_bot_of_card_eq _ h)
   obtain ⟨p, hp_prime, hp_dvd⟩ := Nat.exists_prime_and_dvd hcard_ne
-  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have : Fact p.Prime := ⟨hp_prime⟩
   obtain ⟨x, hxord⟩ := exists_prime_orderOf_dvd_card' p hp_dvd
   have hxmem : (x : G) ∈ K ⊓ (MulAut.conj g • K) := x.2
   have hxK : (x : G) ∈ K := (Subgroup.mem_inf.mp hxmem).1

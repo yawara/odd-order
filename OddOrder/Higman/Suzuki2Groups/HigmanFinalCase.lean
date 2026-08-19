@@ -34,6 +34,7 @@ def HigmanEndomorphismFamily.twoSubTwoMap
   addEndToMonoidEnd
     (2 • ((1 : AddMonoid.End (Additive A)) - F.ν u))
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp] theorem HigmanEndomorphismFamily.twoSubTwoMap_apply
     {A C : Type*} [CommGroup A] [Group C]
     {conjInv : C → MulAut A}
@@ -70,7 +71,7 @@ theorem actualHigmanFamily_mul_square_eq
       (u : C) (a : A),
       ((u : P) * (a : P)) ^ 2 =
         (u : P) ^ 2 * ((F.twoSubTwoMap u a : A) : P) := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   intro F u a
@@ -141,7 +142,7 @@ theorem actualHigmanFamily_sq_not_mem_twoSubTwoMap_range
     ∀ F : HigmanEndomorphismFamily
         (fun v : C ↦ MulAut.conjNormal (H := A) (v : P)⁻¹),
       (u : P) ^ 2 ∉ (F.twoSubTwoMap u).range.map A.subtype := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   intro F hu2
@@ -226,7 +227,7 @@ theorem higmanOutsideSquareSet_eq_range_mul_twist
       Set.range (fun a : A ↦
         z * higmanSquareTwist
           (MulAut.conjNormal (H := A) (u : P)⁻¹) a) := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   let z : A := ⟨(u : P) ^ 2, hsq u hu⟩
@@ -313,7 +314,7 @@ theorem higmanOutsideSquare_closure_eq_twist_range_sup_zpowers
       (higmanSquareTwist
         (MulAut.conjNormal (H := A) (u : P)⁻¹)).range ⊔
           Subgroup.zpowers z := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   let z : A := ⟨(u : P) ^ 2, hsq u hu⟩
@@ -443,7 +444,7 @@ theorem higmanSquareTwist_range_isAInvariant
     IsAInvariant hAinv.restrict
       (higmanSquareTwist
         (MulAut.conjNormal (H := A) (u : P)⁻¹)).range := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   rw [isAInvariant_iff_smul_mem]
@@ -491,8 +492,8 @@ theorem isCyclic_sup_zpowers_quotient
     apply Subtype.ext
     change k * d = b
     rw [mul_comm, hdk]
-  haveI : IsCyclic ↑(Subgroup.zpowers z) := Subgroup.isCyclic_zpowers z
-  haveI : IsCyclic Z' := by
+  have : IsCyclic ↑(Subgroup.zpowers z) := Subgroup.isCyclic_zpowers z
+  have : IsCyclic Z' := by
     rw [(Subgroup.subgroupOfEquivOfLe
       (le_sup_right : Subgroup.zpowers z ≤ B)).isCyclic]
     infer_instance
@@ -551,7 +552,7 @@ theorem HigmanEndomorphismFamily.twoSubTwoMap_eq_squareTwist
       F.twoSubTwoMap u =
         higmanSquareTwist
           (MulAut.conjNormal (H := A) (u : P)⁻¹) := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   intro F u
@@ -577,7 +578,7 @@ theorem higmanOutsideSquare_closure_eq_twoSubTwoMap_range_sup_zpowers
       let z : A := ⟨(u : P) ^ 2, hsq u hu⟩
       Subgroup.closure (higmanOutsideSquareSet A C) =
         (F.twoSubTwoMap u).range ⊔ Subgroup.zpowers z := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   intro F u hu
@@ -600,7 +601,7 @@ theorem HigmanEndomorphismFamily.twoSubTwoMap_range_isAInvariant
         (fun v : C ↦ MulAut.conjNormal (H := A) (v : P)⁻¹))
       (u : C) ( _hu : (u : P) ∉ A),
       IsAInvariant hAinv.restrict (F.twoSubTwoMap u).range := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   intro F u _hu
@@ -633,7 +634,7 @@ theorem actualHigmanFamily_second_case_false
       (u : C) (hu : (u : P) ∉ A),
       ((⟨(u : P) ^ 2, hsq u hu⟩ : A) ∉
         (F.twoSubTwoMap u).range) → False := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   intro F u hu hzD
@@ -745,8 +746,8 @@ theorem NormalInvariantCover.pow_four_eq_one_of_frattini_map_eq
       simpa using this
     simp [ha]
   have hAne : A ≠ ⊥ := hAeq
-  letI : A.Normal := hcover.left.1
-  letI : CommGroup A :=
+  let : A.Normal := hcover.left.1
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   have hinvA : involutions P ⊆ A :=
@@ -759,7 +760,7 @@ theorem NormalInvariantCover.pow_four_eq_one_of_frattini_map_eq
   obtain ⟨ι, hι, e, _hepos, hε, classify⟩ :=
     exists_homocyclic_and_invariant_eq_agemo
       (hP.to_subgroup A) hcover.left.2.restrict htransA
-  letI : Fintype ι := hι
+  let : Fintype ι := hι
   obtain ⟨ε⟩ := hε
   intro a
   by_cases he : 3 ≤ e

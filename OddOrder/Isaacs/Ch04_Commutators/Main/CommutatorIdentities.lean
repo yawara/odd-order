@@ -280,11 +280,11 @@ theorem isElementaryAbelian_quotient_center_of_class_le_two
 private lemma index_eq_prime_of_isCoatom_of_pgroup
     {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
     (hP : IsPGroup p P) {M : Subgroup P} (hMax : IsCoatom M) : M.index = p := by
-  haveI : Group.IsNilpotent P := hP.isNilpotent
+  have : Group.IsNilpotent P := hP.isNilpotent
   have hMnormal : M.Normal :=
     Subgroup.NormalizerCondition.normal_of_coatom M
       (Group.normalizerCondition_of_isNilpotent (G := P)) hMax
-  haveI := hMnormal
+  have := hMnormal
   have hPQuot : IsPGroup p (P ⧸ M) := hP.to_quotient M
   obtain ⟨k, hk⟩ := hPQuot.exists_card_eq
   have h_idx : M.index = Nat.card (P ⧸ M) := Subgroup.index_eq_card _
@@ -366,19 +366,19 @@ private lemma commutator_le_of_isCoatom_of_pgroup
     {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
     (hP : IsPGroup p P) {M : Subgroup P} (hMax : IsCoatom M) :
     _root_.commutator P ≤ M := by
-  haveI : Group.IsNilpotent P := hP.isNilpotent
+  have : Group.IsNilpotent P := hP.isNilpotent
   have hMnormal : M.Normal :=
     Subgroup.NormalizerCondition.normal_of_coatom M
       (Group.normalizerCondition_of_isNilpotent (G := P)) hMax
-  haveI := hMnormal
+  have := hMnormal
   have h_idx : M.index = p := index_eq_prime_of_isCoatom_of_pgroup hP hMax
   have h_card_quot : Nat.card (P ⧸ M) = p := by
     rw [← Subgroup.index_eq_card]; exact h_idx
-  haveI : Fact (Nat.card (P ⧸ M)).Prime := ⟨h_card_quot ▸ hp.out⟩
-  haveI : IsCyclic (P ⧸ M) := isCyclic_of_prime_card h_card_quot
+  have : Fact (Nat.card (P ⧸ M)).Prime := ⟨h_card_quot ▸ hp.out⟩
+  have : IsCyclic (P ⧸ M) := isCyclic_of_prime_card h_card_quot
   -- commutator P ≤ M iff P/M abelian
   rw [← Subgroup.Normal.quotient_commutative_iff_commutator_le]
-  letI := IsCyclic.commGroup (α := P ⧸ M)
+  let := IsCyclic.commGroup (α := P ⧸ M)
   exact ⟨⟨mul_comm⟩⟩
 
 /-- For finite `p`-group `P` and maximal `M`, `x^p ∈ M` for all `x : P`. -/
@@ -386,11 +386,11 @@ private lemma pow_p_mem_of_isCoatom_of_pgroup
     {P : Type*} [Group P] [Finite P] {p : ℕ} [hp : Fact p.Prime]
     (hP : IsPGroup p P) {M : Subgroup P} (hMax : IsCoatom M) (x : P) :
     x^p ∈ M := by
-  haveI : Group.IsNilpotent P := hP.isNilpotent
+  have : Group.IsNilpotent P := hP.isNilpotent
   have hMnormal : M.Normal :=
     Subgroup.NormalizerCondition.normal_of_coatom M
       (Group.normalizerCondition_of_isNilpotent (G := P)) hMax
-  haveI := hMnormal
+  have := hMnormal
   have h_idx : M.index = p := index_eq_prime_of_isCoatom_of_pgroup hP hMax
   have h_card_quot : Nat.card (P ⧸ M) = p := by
     rw [← Subgroup.index_eq_card]; exact h_idx
@@ -499,17 +499,17 @@ theorem frattini_le_of_isElementaryAbelian_quotient_of_pgroup
   intro x hx_frat
   by_contra hx_notN
   -- Set up: P/N as CommGroup (via IsMulCommutative instance → CommGroup.ofIsMulCommutative)
-  haveI hPN_comm : IsMulCommutative (P ⧸ N) := ⟨⟨hN.comm⟩⟩
+  have hPN_comm : IsMulCommutative (P ⧸ N) := ⟨⟨hN.comm⟩⟩
   -- Set up: Additive (P/N) as ZMod p-module (vector space over the field ZMod p)
   have hp_smul : ∀ a : Additive (P ⧸ N), (p : ℕ) • a = 0 := fun a => by
     apply Additive.toMul.injective
     show (p • a).toMul = (0 : Additive _).toMul
     rw [toMul_nsmul, toMul_zero]
     exact hN.pow_eq_one _
-  haveI hMod : Module (ZMod p) (Additive (P ⧸ N)) := AddCommGroup.zmodModule hp_smul
-  haveI hFree : Module.Free (ZMod p) (Additive (P ⧸ N)) :=
+  have hMod : Module (ZMod p) (Additive (P ⧸ N)) := AddCommGroup.zmodModule hp_smul
+  have hFree : Module.Free (ZMod p) (Additive (P ⧸ N)) :=
     @Module.Free.of_divisionRing (ZMod p) (Additive (P ⧸ N)) _ _ inferInstance
-  haveI hProj : Module.Projective (ZMod p) (Additive (P ⧸ N)) := Module.Projective.of_free
+  have hProj : Module.Projective (ZMod p) (Additive (P ⧸ N)) := Module.Projective.of_free
   -- xa : Additive (P/N) is nonzero (corresponds to x ∉ N)
   set xa : Additive (P ⧸ N) := Additive.ofMul ((x : P ⧸ N)) with hxa_def
   have hxa_ne_zero : xa ≠ 0 := by
@@ -908,8 +908,8 @@ theorem commutatorRightHom_range_eq_commutator {A : Subgroup G} [A.Normal]
     (hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a)
     {g : G} (hgen : ∀ x : G ⧸ A, x ∈ Subgroup.zpowers ((g : G ⧸ A))) :
     (commutatorRightHom hAb g).range = _root_.commutator G := by
-  haveI := commutatorRightHom_range_normal hAb hgen
-  haveI hCyc : IsCyclic (G ⧸ A) := ⟨⟨(g : G ⧸ A), hgen⟩⟩
+  have := commutatorRightHom_range_normal hAb hgen
+  have hCyc : IsCyclic (G ⧸ A) := ⟨⟨(g : G ⧸ A), hgen⟩⟩
   refine le_antisymm (commutatorRightHom_range_le_commutator hAb g) ?_
   -- commutator G = ⁅A, ⊤⁆ (Lem 4.6 main)
   rw [commutator_eq_commutator_of_normal_abelian_cyclic_quotient hAb hCyc]

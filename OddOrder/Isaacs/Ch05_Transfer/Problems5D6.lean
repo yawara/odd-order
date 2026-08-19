@@ -46,7 +46,7 @@ theorem le_centralizer_of_normal_sylow_of_hasNormalPComplement {H : Type*} [Grou
     ∀ h : H, ∀ x ∈ (S : Subgroup H), h * x = x * h := by
   classical
   obtain ⟨K, hKnormal, hKcompl⟩ := hH
-  haveI := hKnormal
+  have := hKnormal
   have hcompl := hKcompl S
   -- `[K, S] = 1` (ともに正規で交わり自明)
   have hcomm : ∀ k ∈ K, ∀ x ∈ (S : Subgroup H), k * x = x * k := by
@@ -81,6 +81,7 @@ theorem le_centralizer_of_normal_sylow_of_hasNormalPComplement {H : Type*} [Grou
     _ = (x * k) * s := by rw [hcomm k hk x hx]
     _ = x * (k * s) := by group
 
+set_option backward.isDefEq.respectTransparency false in
 /-- 部分群 `H` は自分の交換子群 `⁅H,H⁆` を正規化する。 -/
 theorem le_normalizer_commutator_self (H : Subgroup G) :
     H ≤ Subgroup.normalizer ((⁅H, H⁆ : Subgroup G) : Set G) := by
@@ -97,14 +98,14 @@ theorem hasNormalPComplement_of_mulEquiv {A B : Type*} [Group A] [Group B] [Fini
     {p : ℕ} [Fact p.Prime] (e : A ≃* B) (hA : HasNormalPComplement p A) :
     HasNormalPComplement p B := by
   classical
-  haveI : Finite B := Finite.of_equiv A e.toEquiv
+  have : Finite B := Finite.of_equiv A e.toEquiv
   obtain ⟨N, hNnormal, hNcompl⟩ := hA
-  haveI := hNnormal
+  have := hNnormal
   obtain ⟨Q⟩ := (inferInstance : Nonempty (Sylow p A))
   have hpN : ¬ p ∣ Nat.card ↥N := not_dvd_card_of_isComplement'_sylow Q (hNcompl Q)
   obtain ⟨a, ha⟩ := IsPGroup.iff_card.mp Q.isPGroup'
   have hNidx : N.index = p ^ a := by rw [(hNcompl Q).symm.index_eq_card, ha]
-  haveI : (N.map (e : A →* B)).Normal := hNnormal.map _ e.surjective
+  have : (N.map (e : A →* B)).Normal := hNnormal.map _ e.surjective
   refine hasNormalPComplement_of_normal_of_index_eq_pow (X := N.map (e : A →* B)) (a := a) ?_ ?_
   · rw [Subgroup.card_map_of_injective e.injective]
     exact hpN
@@ -192,7 +193,7 @@ theorem hasNormalPComplement_of_APrime_inf_sylow_eq_commutator_of_abelian
           Subgroup.relIndex_mul_relIndex L (A ⊓ N) A (le_inf hLA hLN) inf_le_left
         exact (Nat.mem_primeFactors.mp hq).2.1.trans (Dvd.intro _ hmul)
     obtain ⟨S, hS⟩ := Ch01.exists_sylow_coe_eq_of_isHallSubgroup_singleton hhallT
-    haveI hSnorm : (S : Subgroup ↥(A ⊓ N)).Normal := by
+    have hSnorm : (S : Subgroup ↥(A ⊓ N)).Normal := by
       rw [hS]
       exact Subgroup.normal_subgroupOf_of_le_normalizer (inf_le_right.trans (le_of_eq hNdef))
     have habS : ∀ x y : ↥(S : Subgroup ↥(A ⊓ N)), x * y = y * x := by
@@ -222,12 +223,12 @@ theorem hasNormalPComplement_of_APrime_inf_sylow_eq_commutator_of_abelian
     have hzAN : ((z : ↥A) : G) ∈ A ⊓ N := ⟨z.2, Subgroup.mem_subgroupOf.mp hz'⟩
     exact Subtype.ext (hcent _ hzAN _ (Subgroup.mem_subgroupOf.mp hy')).symm
   obtain ⟨K', hK'normal, hK'compl⟩ := hAcompl
-  haveI := hK'normal
-  haveI : K'.Characteristic := by
+  have := hK'normal
+  have : K'.Characteristic := by
     rw [Subgroup.characteristic_iff_map_eq]
     intro ψ
     exact map_mulAut_of_normal_pcomplement (hK'compl SA) ψ
-  haveI hKnormal : (K'.map A.subtype).Normal := Ch01.characteristic_map_subtype_normal K'
+  have hKnormal : (K'.map A.subtype).Normal := Ch01.characteristic_map_subtype_normal K'
   have hpK : ¬ p ∣ Nat.card ↥(K'.map A.subtype) := by
     rw [Subgroup.card_map_of_injective (Subgroup.subtype_injective A)]
     exact not_dvd_card_of_isComplement'_sylow SA (hK'compl SA)

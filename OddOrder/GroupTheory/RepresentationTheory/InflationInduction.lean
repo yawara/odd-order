@@ -221,8 +221,8 @@ theorem inner_compHom_mk'_irreducible_eq_zero_of_not_subset_ker {N : Subgroup G}
     (hψ : ¬ ((N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (ψ : ClassFunction G ℂ))) :
     ClassFunction.inner (ClassFunction.compHom (QuotientGroup.mk' N) φ)
         (ψ : ClassFunction G ℂ) = 0 := by
-  haveI : Fintype (G ⧸ N) := Fintype.ofFinite _
-  haveI : Fintype (IrreducibleCharacter (G ⧸ N)) := Fintype.ofFinite _
+  have : Fintype (G ⧸ N) := Fintype.ofFinite _
+  have : Fintype (IrreducibleCharacter (G ⧸ N)) := Fintype.ofFinite _
   have compHom_sum : ∀ (s : Finset (IrreducibleCharacter (G ⧸ N)))
       (a : IrreducibleCharacter (G ⧸ N) → ℂ),
       ClassFunction.compHom (QuotientGroup.mk' N)

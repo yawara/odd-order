@@ -46,9 +46,9 @@ theorem commutator_eq_frattini_and_frattini_le_center_of_exponent_two
     frattini_isElementaryAbelian_of_exponent_two htwo
   have hcommNe : _root_.commutator P ≠ (⊥ : Subgroup P) :=
     fun h => hncomm ((commutator_eq_bot_iff P).mp h)
-  letI : Nontrivial (_root_.commutator P) :=
+  let : Nontrivial (_root_.commutator P) :=
     (Subgroup.nontrivial_iff_ne_bot (_root_.commutator P)).mpr hcommNe
-  letI : Nontrivial P :=
+  let : Nontrivial P :=
     (_root_.commutator P).subtype_injective.nontrivial
   have hinvComm : involutions P ⊆ _root_.commutator P :=
     involutions_subset_of_nontrivial_invariant
@@ -125,7 +125,7 @@ theorem lowerCentralLayerKernel_one_eq_bot_of_exponent_two
   have hEAOne : IsElementaryAbelian 2 (lowerCentralTerm P 1) := by
     rw [htermOne]
     exact hEA
-  letI : CommGroup (lowerCentralTerm P 1) :=
+  let : CommGroup (lowerCentralTerm P 1) :=
     { (inferInstance : Group (lowerCentralTerm P 1)) with
       mul_comm := hEAOne.comm }
   have hAgemo : Agemo (lowerCentralTerm P 1) 2 1 = ⊥ := by

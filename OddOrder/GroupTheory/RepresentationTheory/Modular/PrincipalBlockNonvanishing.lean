@@ -59,12 +59,12 @@ theorem mulVec_eq_augmentation_smul {v : m i → K}
     (hv : ∀ g : G, wedderburnRepresentation e i g v = v) (a : MonoidAlgebra K G) :
     (e a i).mulVec v = OddOrder.Algebra.augmentation K G a • v := by
   induction a using MonoidAlgebra.induction_on with
-  | hM g =>
+  | of g =>
     rw [OddOrder.Algebra.augmentation_of, one_smul, MonoidAlgebra.of_apply]
     exact hv g
-  | hadd x y hx hy =>
+  | add x y hx hy =>
     rw [map_add, Pi.add_apply, Matrix.add_mulVec, hx, hy, map_add, add_smul]
-  | hsmul r x hx =>
+  | smul r x hx =>
     rw [map_smul, Pi.smul_apply, Matrix.smul_mulVec, hx, map_smul, smul_smul,
       smul_eq_mul]
 

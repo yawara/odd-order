@@ -63,8 +63,8 @@ theorem elemAbelian_aut_action_ofModule {p q : ℕ} [Fact p.Prime] [Fact q.Prime
     q ∣ p - 1 ∧
       ∃ a : Q, a ≠ 1 ∧ ∃ r : (ZMod p)ˣ, orderOf r = q ∧
         ∀ x : P, φ a x = x ^ (r : ZMod p).val := by
-  haveI : NeZero p := ⟨(Fact.out : p.Prime).ne_zero⟩
-  haveI : Module.Finite (ZMod p) (Additive P) := Module.Finite.of_finite
+  have : NeZero p := ⟨(Fact.out : p.Prime).ne_zero⟩
+  have : Module.Finite (ZMod p) (Additive P) := Module.Finite.of_finite
   -- `Q ⊆ Aut(P)` becomes a faithful `𝔽_p`-linear representation on `Additive P`.
   have hinj : Function.Injective
       ((OddOrder.BG.Ch1_Preliminary.mulAutToEnd P p).comp φ) := by
@@ -97,10 +97,10 @@ theorem bgLemma27 {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
     q ∣ p - 1 ∧
       ∃ a : Q, a ≠ 1 ∧ ∃ r : ℕ, (∀ x : P, φ a x = x ^ r) ∧
         r ^ q ≡ 1 [MOD p] ∧ ¬ (r ≡ 1 [MOD p]) := by
-  haveI hp : Fact p.Prime := ‹_›
-  haveI : NeZero p := ⟨hp.out.ne_zero⟩
-  letI : IsMulCommutative P := IsMulCommutative.of_comm hPea.comm
-  letI : Module (ZMod p) (Additive P) := hPea.zmodModule
+  have hp : Fact p.Prime := ‹_›
+  have : NeZero p := ⟨hp.out.ne_zero⟩
+  let : IsMulCommutative P := IsMulCommutative.of_comm hPea.comm
+  let : Module (ZMod p) (Additive P) := hPea.zmodModule
   -- `|P| = p²` says exactly that `Additive P` is two-dimensional over `𝔽_p`.
   have hPrank : Module.finrank (ZMod p) (Additive P) = 2 := by
     have h := hPea.card_eq_pow_finrank

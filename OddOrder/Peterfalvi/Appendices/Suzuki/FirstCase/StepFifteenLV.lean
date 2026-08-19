@@ -63,7 +63,7 @@ theorem centralizer_sup (A B : Subgroup G') :
 /-- Elements of a cyclic subgroup commute. -/
 theorem mul_comm_of_mem_of_isCyclic {A : Subgroup G'} (hA : IsCyclic ↥A)
     {a₁ a₂ : G'} (h₁ : a₁ ∈ A) (h₂ : a₂ ∈ A) : a₁ * a₂ = a₂ * a₁ := by
-  haveI : IsMulCommutative ↥A := IsCyclic.isMulCommutative
+  have : IsMulCommutative ↥A := IsCyclic.isMulCommutative
   exact congrArg Subtype.val
     (‹IsMulCommutative ↥A›.is_comm.comm (⟨a₁, h₁⟩ : ↥A) (⟨a₂, h₂⟩ : ↥A))
 
@@ -96,7 +96,7 @@ theorem card_sup_nonsplitTorus_V
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
     Nat.card ↥(fc.nonsplitTorus ⊔ fc.toHypothesis.V)
       = 27 * Nat.card ↥fc.toHypothesis.W := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
   obtain ⟨-, hLcard⟩ := fc.isCyclic_and_card_nonsplitTorus model ind hB2
   rw [card_sup_eq_mul_of_le_normalizer
@@ -127,8 +127,8 @@ theorem index_subgroupOf_sup_nonsplitTorus_V_eq_three
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) (S : Sylow 3 G)
     (hR₁S : fc.sylowThreeNormalizerRSigma model ≤ (S : Subgroup G)) :
     ((fc.nonsplitTorus ⊔ fc.toHypothesis.V).subgroupOf (S : Subgroup G)).index = 3 := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   obtain ⟨-, -, -, -, -, hGp⟩ := fc.step_twelve model ind hB2
   have hScard : Nat.card ↥(S : Subgroup G) = 3 ^ 4 * Nat.card ↥fc.toHypothesis.W := by
     rw [Sylow.card_eq_multiplicity]
@@ -172,7 +172,7 @@ theorem mul_comm_of_mem_sup_nonsplitTorus_W
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G))
     {x y : G} (hx : x ∈ fc.nonsplitTorus ⊔ fc.toHypothesis.W)
     (hy : y ∈ fc.nonsplitTorus ⊔ fc.toHypothesis.W) : x * y = y * x := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   obtain ⟨-, -, -, hWcyc, -, -⟩ := fc.step_twelve model ind hB2
   obtain ⟨hLcyc, -⟩ := fc.isCyclic_and_card_nonsplitTorus model ind hB2
   exact mul_comm_of_mem_sup_of_commute
@@ -211,7 +211,7 @@ theorem nonsplitTorus_inf_centralizer_P_eq_zpowers
     fc.nonsplitTorus ⊓ Subgroup.centralizer (fc.P : Set G)
       = Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
         * fc.toHypothesis.t) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨-, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
   obtain ⟨-, hLcard⟩ := fc.isCyclic_and_card_nonsplitTorus model ind hB2
@@ -266,7 +266,7 @@ theorem sup_nonsplitTorus_W_inf_centralizer_P_eq
       = Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
           * fc.toHypothesis.t)
         ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   have hcoe := coe_sup_eq_mul_of_commute
     (fun _ (ha : _ ∈ fc.nonsplitTorus) _ (hb : _ ∈ fc.toHypothesis.W) =>
@@ -347,7 +347,7 @@ theorem zpowers_st_le_centralizer_P
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
     Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t)
       ≤ Subgroup.centralizer (fc.P : Set G) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   obtain ⟨-, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
   have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
   have habR := fc.invImageF_mul_comm model ind hB2 hm
@@ -370,7 +370,7 @@ theorem sup_nonsplitTorus_V_inf_centralizer_nonsplitTorus_eq
     (fc.nonsplitTorus ⊔ fc.toHypothesis.V)
         ⊓ Subgroup.centralizer (fc.nonsplitTorus : Set G)
       = fc.nonsplitTorus ⊔ fc.toHypothesis.W := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   have hcardLW := fc.card_sup_nonsplitTorus_W model ind hB2
   have hcardLV := fc.card_sup_nonsplitTorus_V model ind hB2
@@ -432,7 +432,7 @@ theorem inf_centralizer_sup_nonsplitTorus_V_eq
       = Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
           * fc.toHypothesis.t)
         ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨-, -, -, hWcyc, -, -⟩ := fc.step_twelve model ind hB2
   obtain ⟨hLcyc, -⟩ := fc.isCyclic_and_card_nonsplitTorus model ind hB2
@@ -477,7 +477,7 @@ theorem mem_sigma_of_mem_W_of_pow_three
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {w : G} (hw : w ∈ fc.toHypothesis.W)
     (hw3 : w ^ 3 = 1) :
     w ∈ fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   obtain ⟨hpSig, -, -, hWcyc, hWcard, -⟩ := fc.step_twelve model ind hB2
   obtain ⟨-, -, -, hSig3, -⟩ :=
     fc.card_field_eq_nine_of_p_dvd_card_centralizer_W ind model hB2 hpSig
@@ -499,7 +499,7 @@ theorem pow_three_eq_one_of_mem_zpowers_sup_sigma
         * fc.toHypothesis.t)
       ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) :
     x ^ 3 = 1 := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   obtain ⟨hpSig, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
   obtain ⟨-, -, -, hSig3, -⟩ :=
     fc.card_field_eq_nine_of_p_dvd_card_centralizer_W ind model hB2 hpSig
@@ -529,7 +529,7 @@ theorem pow_three_eq_one_iff_mem_zpowers_sup_sigma
     x ^ 3 = 1 ↔ x ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
         * fc.toHypothesis.t)
       ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   refine ⟨fun h3 => ?_, fun hmem =>
     fc.pow_three_eq_one_of_mem_zpowers_sup_sigma model ind hB2 hmem⟩
@@ -568,7 +568,7 @@ theorem pow_three_mem_zpowers_sup_sigma
     x ^ 3 ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
         * fc.toHypothesis.t)
       ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨-, -, -, -, hWcard, -⟩ := fc.step_twelve model ind hB2
   obtain ⟨-, hLcard⟩ := fc.isCyclic_and_card_nonsplitTorus model ind hB2
@@ -655,7 +655,7 @@ theorem inv_mul_conj_mem_zpowers_sup_sigma
     a⁻¹ * (q * a * q⁻¹) ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
         * fc.toHypothesis.t)
       ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   have hZScen : (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
         * fc.toHypothesis.t)
       ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)))
@@ -692,7 +692,7 @@ theorem pow_three_eq_one_iff_mem_zpowers_sup_sigma_sup_P
     x ^ 3 = 1 ↔ x ∈ (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
           * fc.toHypothesis.t)
         ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) ⊔ fc.P := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
   have hPcard : Nat.card ↥fc.P = 3 := by rw [fc.card_P, hp3]

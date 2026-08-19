@@ -73,7 +73,7 @@ theorem Representation.not_isSimpleModule_asModule_of_not_isCyclic
     (ρ : Representation (ZMod p) Q M) (hfaith : Function.Injective ρ) (hQ : ¬ IsCyclic Q) :
     ¬ IsSimpleModule (MonoidAlgebra (ZMod p) Q) ρ.asModule := by
   intro hsimple
-  haveI : Finite ρ.asModule := inferInstanceAs (Finite M)
+  have : Finite ρ.asModule := inferInstanceAs (Finite M)
   exact hQ (isCyclic_and_card_dvd_card_sub_one_of_faithful_irreducible
     (p := p) (C := Q) (M := ρ.asModule)
     (Representation.faithful_asModule_of_injective ρ hfaith)).1
@@ -114,14 +114,14 @@ theorem exists_isCompl_finrank_one_of_not_isSimpleModule
     ∃ N₁ N₂ : Submodule R N, IsCompl N₁ N₂ ∧
       Module.finrank K (N₁.restrictScalars K) = 1 ∧
       Module.finrank K (N₂.restrictScalars K) = 1 := by
-  haveI : FiniteDimensional K N :=
+  have : FiniteDimensional K N :=
     FiniteDimensional.of_finrank_pos (K := K) (V := N) (by omega)
-  haveI : Nontrivial N := Module.nontrivial_of_finrank_pos (R := K) (M := N) (by omega)
+  have : Nontrivial N := Module.nontrivial_of_finrank_pos (R := K) (M := N) (by omega)
   obtain ⟨N₁, hN₁simple⟩ := IsSemisimpleModule.exists_simple_submodule R N
-  haveI := hN₁simple
+  have := hN₁simple
   have hbot : N₁ ≠ ⊥ := by
     intro h
-    haveI : Nontrivial ↥N₁ := IsSimpleModule.nontrivial R ↥N₁
+    have : Nontrivial ↥N₁ := IsSimpleModule.nontrivial R ↥N₁
     rw [h] at this
     exact (not_nontrivial_iff_subsingleton.mpr (by infer_instance)) this
   have htop : N₁ ≠ ⊤ := fun h => hnot (IsSimpleModule.congr
@@ -301,9 +301,9 @@ theorem exists_invariant_lines_of_not_isSimpleModule
     ∃ W₁ W₂ : Submodule (ZMod p) M, W₁ ⊔ W₂ = ⊤ ∧
       finrank (ZMod p) W₁ = 1 ∧ finrank (ZMod p) W₂ = 1 ∧
       (∀ g : Q, ∀ x ∈ W₁, ρ g x ∈ W₁) ∧ (∀ g : Q, ∀ x ∈ W₂, ρ g x ∈ W₂) := by
-  haveI : Module.Finite (ZMod p) M := Module.Finite.of_finite
-  haveI : Finite ρ.asModule := inferInstanceAs (Finite M)
-  haveI : Module.Finite (ZMod p) ρ.asModule := Module.Finite.of_finite
+  have : Module.Finite (ZMod p) M := Module.Finite.of_finite
+  have : Finite ρ.asModule := inferInstanceAs (Finite M)
+  have : Module.Finite (ZMod p) ρ.asModule := Module.Finite.of_finite
   have hrank' : finrank (ZMod p) ρ.asModule = 2 := by
     rw [ρ.asModuleEquiv.finrank_eq]; exact hrank
   obtain ⟨N₁, N₂, hcompl, h1, h2⟩ :=
@@ -357,7 +357,7 @@ theorem prime_dvd_sub_one_of_faithful_rank_two {q : ℕ}
     (ρ : Representation (ZMod p) Q M) (hfaith : Function.Injective ρ) :
     q ∣ p - 1 := by
   have hp := (Fact.out : p.Prime)
-  haveI : NeZero (Nat.card Q : ZMod p) := by
+  have : NeZero (Nat.card Q : ZMod p) := by
     refine ⟨?_⟩
     rw [hQcard, Ne, ZMod.natCast_eq_zero_iff]
     intro h
@@ -375,7 +375,7 @@ theorem prime_dvd_sub_one_of_faithful_rank_two {q : ℕ}
   · exfalso
     have hall : ∀ g : Q, g = 1 := fun g => hfaith (by
       rw [eq_one_of_scalars_eq_one_of_sup_eq_top ρ hsup hχ₁ hχ₂ (hboth g).1 (hboth g).2, map_one])
-    haveI hss : Subsingleton Q := ⟨fun a b => by rw [hall a, hall b]⟩
+    have hss : Subsingleton Q := ⟨fun a b => by rw [hall a, hall b]⟩
     have hcard1 : Nat.card Q = 1 := Nat.card_eq_one_iff_unique.mpr ⟨hss, ⟨1⟩⟩
     rw [hQcard] at hcard1
     nlinarith [hq.two_le]
@@ -404,7 +404,7 @@ theorem exists_powerMap_of_faithful_rank_two {q : ℕ}
     (ρ : Representation (ZMod p) Q M) (hfaith : Function.Injective ρ) :
     ∃ α : Q, α ≠ 1 ∧ ∃ r : ZMod p, r ^ q = 1 ∧ r ≠ 1 ∧ ∀ x : M, ρ α x = r • x := by
   have hp := (Fact.out : p.Prime)
-  haveI : NeZero (Nat.card Q : ZMod p) := by
+  have : NeZero (Nat.card Q : ZMod p) := by
     refine ⟨?_⟩
     rw [hQcard, Ne, ZMod.natCast_eq_zero_iff]
     intro h
@@ -449,7 +449,7 @@ theorem exists_powerMap_of_faithful_rank_two {q : ℕ}
   have hex : ∃ x : ψ.ker, x ≠ 1 := by
     by_contra hcon
     push Not at hcon
-    haveI hss : Subsingleton ψ.ker := ⟨fun a b => by rw [hcon a, hcon b]⟩
+    have hss : Subsingleton ψ.ker := ⟨fun a b => by rw [hcon a, hcon b]⟩
     have h1card : Nat.card ψ.ker = 1 := Nat.card_eq_one_iff_unique.mpr ⟨hss, ⟨1⟩⟩
     have := hq.two_le
     omega

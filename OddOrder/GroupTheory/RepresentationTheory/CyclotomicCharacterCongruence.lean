@@ -48,7 +48,7 @@ whence `1 - ε = 1 - (ε^k)^r = (1 - ε^k)·∑_{i<r}(ε^k)^i`.  This is the "ha
 theorem one_sub_pow_dvd_one_sub {p : ℕ} (hp : p.Prime) {ε : ℂ} (hε : IsPrimitiveRoot ε p)
     {k : ℕ} (hk0 : 0 < k) (hkp : k < p) :
     ∃ w : ℂ, IsIntegral ℤ w ∧ (1 - ε) = (1 - ε ^ k) * w := by
-  haveI : NeZero p := ⟨hp.pos.ne'⟩
+  have : NeZero p := ⟨hp.pos.ne'⟩
   have hcop : Nat.Coprime k p :=
     (hp.coprime_iff_not_dvd.mpr (Nat.not_dvd_of_pos_of_lt hk0 hkp)).symm
   have hεk : IsPrimitiveRoot (ε ^ k) p := hε.pow_of_coprime k hcop
@@ -135,7 +135,7 @@ theorem exists_integral_linearChar_apply_sub {p : ℕ} (hp : 0 < p) {ε : ℂ}
     (hε : IsPrimitiveRoot ε p) {A : Type*} [Group A] [Finite A] (α : A →* ℂˣ)
     {x y : A} (hx : x ^ p = 1) :
     ∃ z : ℂ, IsIntegral ℤ z ∧ (α (x * y) : ℂ) - (α y : ℂ) = (1 - ε) * z := by
-  haveI : NeZero p := ⟨hp.ne'⟩
+  have : NeZero p := ⟨hp.ne'⟩
   -- `α(x)` is a `p`-th root of unity, hence `= ε^k`
   have hαxp : (α x : ℂ) ^ p = 1 := by
     rw [← Units.val_pow_eq_pow_val, ← map_pow, hx, map_one, Units.val_one]
@@ -170,7 +170,7 @@ theorem int_dvd_of_zeta_sub_one_dvd {p : ℕ} [hp : Fact p.Prime] (hp2 : p ≠ 2
     {n : ℤ} {a : L} (ha : IsIntegral ℤ a)
     (h : (algebraMap ℤ L n) = (ζ - 1) * a) :
     (p : ℤ) ∣ n := by
-  haveI : NumberField L := inferInstance
+  have : NumberField L := inferInstance
   have hirr : Irreducible (cyclotomic p ℚ) := cyclotomic.irreducible_rat hp.out.pos
   -- the relative degree `[L : ℚ] = p - 1`
   have hfr : finrank ℚ L = p - 1 := by
@@ -246,7 +246,7 @@ theorem exists_integral_apply_sub_of_commute {p : ℕ} (hp : 0 < p) {ε : ℂ}
     {ψ : ClassFunction G ℂ} (hψ : ψ ∈ ZIrr G) {x y : G} (hx : x ^ p = 1) (hxy : Commute x y) :
     ∃ z : ℂ, IsIntegral ℤ z ∧ ψ (x * y) - ψ y = (1 - ε) * z := by
   set A := Subgroup.closure ({x, y} : Set G) with hA
-  haveI : IsMulCommutative ↥A := by
+  have : IsMulCommutative ↥A := by
     refine Subgroup.isMulCommutative_closure (fun a ha b hb => ?_)
     simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at ha hb
     rcases ha with rfl | rfl <;> rcases hb with rfl | rfl

@@ -77,7 +77,7 @@ variable {E : Type*} [Field E] [Finite E] {p n : ℕ} [Fact p.Prime] [CharP E p]
 to the `q²`-power map, which is the identity. -/
 theorem qFrobenius_sq (hcard : Nat.card E = (p ^ n) ^ 2) :
     qFrobenius E p n ^ 2 = 1 := by
-  haveI : Fintype E := Fintype.ofFinite E
+  have : Fintype E := Fintype.ofFinite E
   refine RingEquiv.ext fun x => ?_
   have hx : (qFrobenius E p n ^ 2) x = x ^ ((p ^ n) ^ 2) := by
     rw [pow_two, RingAut.mul_apply, qFrobenius_apply, qFrobenius_apply,
@@ -175,8 +175,8 @@ theorem natCard_fixedSet_qFrobenius (hcard : Nat.card E = (p ^ n) ^ 2) (hn : n �
     exact orderOf_qFrobenius hcard hn
   have hrank : finrank (FixedPoints.subfield (↥B) E) E = 2 :=
     (OddOrder.RingAut.finrank_fixedSet B).trans hBcard
-  haveI : Fintype E := Fintype.ofFinite E
-  haveI : Fintype (FixedPoints.subfield (↥B) E) := Fintype.ofFinite _
+  have : Fintype E := Fintype.ofFinite E
+  have : Fintype (FixedPoints.subfield (↥B) E) := Fintype.ofFinite _
   have hpow : Fintype.card E =
       Fintype.card (FixedPoints.subfield (↥B) E) ^
         finrank (FixedPoints.subfield (↥B) E) E :=
@@ -289,7 +289,7 @@ theorem qFrobenius_eq_one_iff {n j : ℕ} (hcard : Nat.card K = p ^ n) (hn : n �
     rw [Nat.card_units, hcard] at hdvd
     exact (OddOrder.Nat.pow_sub_one_dvd_pow_sub_one_iff hp2 hn).mp hdvd
   · rintro ⟨k, rfl⟩
-    haveI : Fintype K := Fintype.ofFinite K
+    have : Fintype K := Fintype.ofFinite K
     refine RingEquiv.ext fun x => ?_
     rw [qFrobenius_apply, pow_mul]
     have hc : Fintype.card K = p ^ n := by rw [← Nat.card_eq_fintype_card, hcard]
@@ -313,8 +313,8 @@ theorem orderOf_frobenius {n : ℕ} (hcard : Nat.card K = p ^ n) (hn : n ≠ 0) 
 theorem exists_pow_eq_of_ringAut {n : ℕ} (hcard : Nat.card K = p ^ n) (hn : n ≠ 0)
     (θ : RingAut K) : ∃ j : ℕ, ∀ x : K, θ x = x ^ p ^ j := by
   classical
-  letI : Algebra (ZMod p) K := ZMod.algebra K p
-  haveI : Fintype K := Fintype.ofFinite K
+  let : Algebra (ZMod p) K := ZMod.algebra K p
+  have : Fintype K := Fintype.ofFinite K
   -- `[K : 𝐅_p] = n`
   have hfin : Module.finrank (ZMod p) K = n := by
     have hpow : Fintype.card K =

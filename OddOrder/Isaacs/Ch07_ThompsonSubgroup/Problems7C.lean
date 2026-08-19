@@ -85,7 +85,7 @@ theorem hasNormalPComplement_of_normal_of_isPGroup_quotient
     hOpi p (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩) rfl
   -- `[K : O]` は `p`-冪: `N ≤ O` かつ `[K : N] = |Q|`
   obtain ⟨N, hNnormal, hNcompl⟩ := hK
-  haveI := hNnormal
+  have := hNnormal
   obtain ⟨Q⟩ := (inferInstance : Nonempty (Sylow p ↥K))
   have hNpi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup {q | q ≠ p} N := by
     intro q hq
@@ -103,9 +103,9 @@ theorem hasNormalPComplement_of_normal_of_isPGroup_quotient
     exact ⟨j, hj⟩
   obtain ⟨j, hj⟩ := hOidx
   -- `M = O` を `G` の部分群として見る
-  haveI hOchar : O.Characteristic := OddOrder.Isaacs.Ch03.oPiCore.characteristic _ _
+  have hOchar : O.Characteristic := OddOrder.Isaacs.Ch03.oPiCore.characteristic _ _
   set M : Subgroup G := O.map K.subtype with hM_def
-  haveI hMnormal : M.Normal := OddOrder.Isaacs.Ch05.normal_map_subtype_of_characteristic
+  have hMnormal : M.Normal := OddOrder.Isaacs.Ch05.normal_map_subtype_of_characteristic
   have hMcard : Nat.card ↥M = Nat.card ↥O :=
     (Nat.card_congr (Subgroup.equivMapOfInjective O K.subtype K.subtype_injective).toEquiv).symm
   have hMK : M ≤ K := Subgroup.map_subtype_le O
@@ -187,9 +187,9 @@ theorem CharLocalPControl.of_subgroup {p : ℕ} (H : Subgroup G) {S : Subgroup �
     (hS : CharLocalPControl p (S.map H.subtype)) :
     CharLocalPControl (G := ↥H) p S := by
   intro X hX g hg
-  haveI : X.Characteristic := hX
+  have : X.Characteristic := hX
   set e := Subgroup.equivMapOfInjective S H.subtype H.subtype_injective with he
-  haveI hX' : (X.map e.toMonoidHom).Characteristic := characteristic_map_of_mulEquiv e X
+  have hX' : (X.map e.toMonoidHom).Characteristic := characteristic_map_of_mulEquiv e X
   have hmapeq := map_equivMapOfInjective_map_subtype H S X
   -- `g` を `G` に落とすと `N_G` に入る
   have hgG : (g : G) ∈ Subgroup.normalizer
@@ -242,7 +242,7 @@ theorem CharLocalPControl.of_ambient {p : ℕ} {P : Subgroup G}
 theorem characteristic_comap_of_surjective {A B : Type*} [Group A] [Group B]
     {f : A →* B} (hf : Function.Surjective f) (hker : f.ker.Characteristic)
     {K : Subgroup B} (hK : K.Characteristic) : (K.comap f).Characteristic := by
-  haveI := hker
+  have := hker
   rw [Subgroup.characteristic_iff_map_le]
   intro φ
   have hφker : f.ker.map (φ : A →* A) = f.ker := Subgroup.characteristic_iff_map_eq.mp hker φ
@@ -387,9 +387,9 @@ theorem hasNormalPComplement_of_normal_abelian_of_quotient
     OddOrder.Isaacs.Ch05.HasNormalPComplement p G := by
   classical
   obtain ⟨Nbar, hNbarNormal, hNbarCompl⟩ := hQ
-  haveI := hNbarNormal
+  have := hNbarNormal
   set K : Subgroup G := Nbar.comap (QuotientGroup.mk' X) with hK_def
-  haveI hKnormal : K.Normal := hNbarNormal.comap _
+  have hKnormal : K.Normal := hNbarNormal.comap _
   have hXK : X ≤ K := QuotientGroup.le_comap_mk' X Nbar
   -- `[K : X] = |N̄|` は `p` と素
   obtain ⟨Q⟩ := (inferInstance : Nonempty (Sylow p (G ⧸ X)))
@@ -404,7 +404,7 @@ theorem hasNormalPComplement_of_normal_abelian_of_quotient
     exact Nat.eq_of_mul_eq_mul_right
       (Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite) (h1.trans h2.symm)
   -- `[K : C ⊓ K]` は `p`-冪, よって `K ≤ C`
-  haveI hCnormal : (Subgroup.centralizer (X : Set G)).Normal := Subgroup.normal_centralizer
+  have hCnormal : (Subgroup.centralizer (X : Set G)).Normal := Subgroup.normal_centralizer
   obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hCp
   have hKC : K ≤ Subgroup.centralizer (X : Set G) := by
     have hdvd : (Subgroup.centralizer (X : Set G)).relIndex K ∣ p ^ n := by
@@ -454,14 +454,14 @@ private theorem hasNormalPComplement_of_charLocalPControl_aux.{u} {p : ℕ} [Fac
         (X.subgroupOf (P : Subgroup G)).Characteristic ∧ X.Normal
     · -- **Case B**: `P` の非自明 characteristic 部分群で `G` に正規なものがある
       obtain ⟨X₀, hX₀P, hX₀ne, hX₀char, hX₀normal⟩ := hB
-      haveI := hX₀normal
-      haveI := hX₀char
+      have := hX₀normal
+      have := hX₀char
       set X : Subgroup G := X₀ ⊓ Subgroup.centralizer (X₀ : Set G) with hX_def
-      haveI hXnormal : X.Normal := by rw [hX_def]; infer_instance
+      have hXnormal : X.Normal := by rw [hX_def]; infer_instance
       have hXX₀ : X ≤ X₀ := inf_le_left
       have hXP : X ≤ (P : Subgroup G) := hXX₀.trans hX₀P
       have hX₀p : IsPGroup p ↥X₀ := P.isPGroup'.to_le hX₀P
-      haveI : Nontrivial ↥X₀ := (Subgroup.nontrivial_iff_ne_bot _).mpr hX₀ne
+      have : Nontrivial ↥X₀ := (Subgroup.nontrivial_iff_ne_bot _).mpr hX₀ne
       -- `X = Z(X₀)`: 非自明 (`p`-群の中心) で可換
       have hXeq : (Subgroup.center ↥X₀).map X₀.subtype = X := by
         rw [hX_def]; exact map_center_subtype X₀
@@ -483,7 +483,7 @@ private theorem hasNormalPComplement_of_charLocalPControl_aux.{u} {p : ℕ} [Fac
         rw [hXsub]
         exact characteristic_inf hX₀char Subgroup.characteristic_centralizer
       -- 局所条件を `X` に当てると `G/C_G(X)` は `p`-群
-      haveI hCnormal : (Subgroup.centralizer (X : Set G)).Normal := Subgroup.normal_centralizer
+      have hCnormal : (Subgroup.centralizer (X : Set G)).Normal := Subgroup.normal_centralizer
       have hCp : IsPGroup p (G ⧸ Subgroup.centralizer (X : Set G)) := by
         intro gbar
         obtain ⟨g, rfl⟩ :=
@@ -494,7 +494,7 @@ private theorem hasNormalPComplement_of_charLocalPControl_aux.{u} {p : ℕ} [Fac
         exact ⟨k, by rw [← map_pow]; exact (QuotientGroup.eq_one_iff _).mpr hk⟩
       -- `G/X` に帰納法を適用
       have hcardQ : Nat.card (G ⧸ X) ≤ n := by
-        haveI : Nontrivial ↥X := (Subgroup.nontrivial_iff_ne_bot _).mpr hXne
+        have : Nontrivial ↥X := (Subgroup.nontrivial_iff_ne_bot _).mpr hXne
         have h2 : 2 ≤ Nat.card ↥X := Finite.one_lt_card (α := ↥X)
         have hle : 2 * Nat.card (G ⧸ X) ≤ Nat.card G :=
           le_trans (Nat.mul_le_mul_right _ h2)
@@ -511,7 +511,7 @@ private theorem hasNormalPComplement_of_charLocalPControl_aux.{u} {p : ℕ} [Fac
       refine OddOrder.Isaacs.Ch06.hasNormalPComplement_of_forall_characteristic_normalizer
         P hp2 ?_
       intro Xs hXschar hXsne
-      haveI := hXschar
+      have := hXschar
       set X : Subgroup G := Xs.map (P : Subgroup G).subtype with hX_def
       have hXP : X ≤ (P : Subgroup G) := Subgroup.map_subtype_le Xs
       have hXchar : (X.subgroupOf (P : Subgroup G)).Characteristic := by
@@ -524,7 +524,7 @@ private theorem hasNormalPComplement_of_charLocalPControl_aux.{u} {p : ℕ} [Fac
         exact hXsne
       have hNtop : Subgroup.normalizer (X : Set G) ≠ ⊤ := fun htop =>
         hB X hXP hXne hXchar (Subgroup.normalizer_eq_top_iff.mp htop)
-      haveI hXchar' : (X.subgroupOf (P : Subgroup G)).Characteristic := hXchar
+      have hXchar' : (X.subgroupOf (P : Subgroup G)).Characteristic := hXchar
       have hPN : (P : Subgroup G) ≤ Subgroup.normalizer (X : Set G) :=
         Subgroup.le_normalizer_of_normal_subgroupOf hXP
       have hcardN : Nat.card ↥(Subgroup.normalizer (X : Set G)) ≤ n := by

@@ -67,9 +67,9 @@ theorem sq_not_dvd_mul {p n : ℕ} (hp : p ≠ 0) (h : ¬ p ∣ n) : ¬ p ^ 2 �
 theorem normal_sylow_three_of_card_eq [Finite G] {a : ℕ}
     (hcard : Nat.card G = 3 ^ a * 5 * 11) (P : Sylow 3 G) : (P : Subgroup G).Normal := by
   classical
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
-  haveI : Fact (Nat.Prime 5) := ⟨by norm_num⟩
-  haveI : Fact (Nat.Prime 11) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 5) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 11) := ⟨by norm_num⟩
   have hG55 : Nat.card G = 5 * (3 ^ a * 11) := by rw [hcard]; ring
   -- 段 1: 正規 5-補群 `K` (位数 `3^a · 11`)
   obtain ⟨P₅⟩ := (inferInstance : Nonempty (Sylow 5 G))
@@ -81,7 +81,7 @@ theorem normal_sylow_three_of_card_eq [Finite G] {a : ℕ}
     have hco : Nat.Coprime 5 (3 ^ a * 11) :=
       Nat.Coprime.mul_right (Nat.Coprime.pow_right a (by norm_num)) (by norm_num)
     exact absurd (Nat.eq_one_of_dvd_coprimes hco dvd_rfl hc) (by norm_num)
-  haveI : IsCyclic ↥(P₅ : Subgroup G) := isCyclic_of_prime_card (p := 5) hP₅card
+  have : IsCyclic ↥(P₅ : Subgroup G) := isCyclic_of_prime_card (p := 5) hP₅card
   have hcop5 : Nat.Coprime (Nat.card G) (Nat.totient (Nat.card ↥(P₅ : Subgroup G))) := by
     rw [hP₅card, hcard, show Nat.totient 5 = 4 from by decide]
     have h2 : Nat.Coprime (3 ^ a * 5 * 11) 2 :=
@@ -92,7 +92,7 @@ theorem normal_sylow_three_of_card_eq [Finite G] {a : ℕ}
     exact h4
   obtain ⟨K, hKnormal, hKmul, -⟩ :=
     exists_normal_complement_of_isCyclic_sylow P₅ inferInstance hcop5
-  haveI := hKnormal
+  have := hKnormal
   have hKcard : Nat.card ↥K = 3 ^ a * 11 := by
     rw [hP₅card] at hKmul
     rw [hG55] at hKmul
@@ -107,7 +107,7 @@ theorem normal_sylow_three_of_card_eq [Finite G] {a : ℕ}
     intro hc
     have hco : Nat.Coprime 11 (3 ^ a) := Nat.Coprime.pow_right a (by norm_num)
     exact absurd (Nat.eq_one_of_dvd_coprimes hco dvd_rfl hc) (by norm_num)
-  haveI : IsCyclic ↥(Q : Subgroup ↥K) := isCyclic_of_prime_card (p := 11) hQcard
+  have : IsCyclic ↥(Q : Subgroup ↥K) := isCyclic_of_prime_card (p := 11) hQcard
   have hcop11 : Nat.Coprime (Nat.card ↥K) (Nat.totient (Nat.card ↥(Q : Subgroup ↥K))) := by
     rw [hQcard, hKcard, show Nat.totient 11 = 10 from by decide,
       show (10 : ℕ) = 2 * 5 from by norm_num]
@@ -116,7 +116,7 @@ theorem normal_sylow_three_of_card_eq [Finite G] {a : ℕ}
       (Nat.Coprime.mul_left (Nat.Coprime.pow_left a (by norm_num)) (by norm_num))
   obtain ⟨L, hLnormal, hLmul, -⟩ :=
     exists_normal_complement_of_isCyclic_sylow Q inferInstance hcop11
-  haveI := hLnormal
+  have := hLnormal
   have hLcard : Nat.card ↥L = 3 ^ a := by
     rw [hQcard, hK11] at hLmul
     exact Nat.eq_of_mul_eq_mul_right (show 0 < 11 by norm_num) (by rw [hLmul]; ring)
@@ -126,9 +126,9 @@ theorem normal_sylow_three_of_card_eq [Finite G] {a : ℕ}
     exact factorization_three_pow_mul (by norm_num) (by norm_num)
   let L' : Sylow 3 ↥K := Sylow.ofCard L (by rw [hLcard, hfacK])
   have hL'eq : (L' : Subgroup ↥K) = L := by simp [L']
-  haveI : (L' : Subgroup ↥K).Normal := by rw [hL'eq]; exact hLnormal
-  haveI : L.Characteristic := hL'eq ▸ Sylow.characteristic_of_normal L' inferInstance
-  haveI : (L.map K.subtype).Normal := normal_map_subtype_of_characteristic
+  have : (L' : Subgroup ↥K).Normal := by rw [hL'eq]; exact hLnormal
+  have : L.Characteristic := hL'eq ▸ Sylow.characteristic_of_normal L' inferInstance
+  have : (L.map K.subtype).Normal := normal_map_subtype_of_characteristic
   have hmapcard : Nat.card ↥(L.map K.subtype) = 3 ^ a := by
     rw [← hLcard]
     exact Nat.card_congr
@@ -138,8 +138,8 @@ theorem normal_sylow_three_of_card_eq [Finite G] {a : ℕ}
     exact factorization_three_pow_mul (by norm_num) (by norm_num)
   let P₀ : Sylow 3 G := Sylow.ofCard (L.map K.subtype) (by rw [hmapcard, hfacG])
   have hP₀eq : (P₀ : Subgroup G) = L.map K.subtype := by simp [P₀]
-  haveI : (P₀ : Subgroup G).Normal := by rw [hP₀eq]; infer_instance
-  haveI := Sylow.unique_of_normal P₀ inferInstance
+  have : (P₀ : Subgroup G).Normal := by rw [hP₀eq]; infer_instance
+  have := Sylow.unique_of_normal P₀ inferInstance
   rw [Subsingleton.elim P P₀]
   infer_instance
 

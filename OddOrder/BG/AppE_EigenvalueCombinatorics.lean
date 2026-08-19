@@ -100,7 +100,7 @@ theorem RegularOperatorSetup.add_two_le_of_iterCommutator_ne_bot [Finite R] [Fin
       (Subgroup.centralizer (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1)))
       (⊤ : Subgroup ↥(Omega R p 1)) k ≠ ⊥) :
     k + 2 ≤ q := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   set S : Subgroup R := Omega R p 1 with hSdef
   set T : Subgroup ↥S := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hT
   have hS3 : 3 ≤ pRank ↥S p := hyp.three_le_pRank_omega hcard
@@ -160,7 +160,7 @@ theorem exists_commutator_indices {G : Type*} [Group G] {T : Subgroup G}
       ⁅T, T⁆ ≤ H (k - 1) ∧ ¬ (⁅T, T⁆ ≤ H k) ∧
       ⁅H (i + 1), H j⁆ ≤ H k ∧ ⁅H i, H (j + 1)⁆ ≤ H k ∧ ⁅w i, w j⁆ ∉ H k := by
   classical
-  haveI : ∀ a, (H a).Normal := hnorm
+  have : ∀ a, (H a).Normal := hnorm
   have hT : ∀ a : ℕ, H a ≤ T := fun a => h0 ▸ hanti 0 a (Nat.zero_le a)
   -- BG's minimal `k`.
   obtain ⟨k, hk1, hkle, hkspec⟩ := exists_min_index_commutator_not_le h0 hn hne
@@ -195,7 +195,7 @@ theorem exists_commutator_indices {G : Type*} [Group G] {T : Subgroup G}
       have h1 : ⁅H 1, T⁆ ≤ H k := himax 1 (by omega)
       have h2 : ⁅T, H 1⁆ ≤ H k := by
         rw [Subgroup.commutator_comm]; exact h1
-      haveI : (H 1).Normal := hnorm 1
+      have : (H 1).Normal := hnorm 1
       have := commutator_self_le_of_generator (A := T) (A' := H 1) (K := H k) (w := w 0)
         (h0 ▸ hwmem 0) (hT 1) (h0 ▸ hgen 0) h1 h2
       exact this
@@ -250,8 +250,8 @@ theorem RegularOperatorSetup.exists_commutator_indices_chain [Finite R] [Finite 
       ⁅commutatorIterate w v i, commutatorIterate w v j⁆ ∉
         OddOrder.Isaacs.Ch04.iterCommutator
           (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) k := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
-  haveI : Group.IsNilpotent ↥S := IsPGroup.isNilpotent (hyp.R_pGroup.to_subgroup S)
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Group.IsNilpotent ↥S := IsPGroup.isNilpotent (hyp.R_pGroup.to_subgroup S)
   set T : Subgroup ↥S := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hT
   obtain ⟨n, hn⟩ :=
     OddOrder.Isaacs.Ch04.iterCommutator_eq_bot_of_isNilpotent_ambient T (⊤ : Subgroup ↥S)
@@ -384,9 +384,9 @@ theorem RegularOperatorSetup.dvd_sub_mul_eigenvalues_chain [Finite R] [Finite B]
         (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) k) :
     ((r₀ : ZMod p) * (r : ZMod p) ^ i) * ((r₀ : ZMod p) * (r : ZMod p) ^ j) =
       (r₀ : ZMod p) * (r : ZMod p) ^ (k - 1) := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   set T : Subgroup ↥S := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hT
-  haveI hTchar : T.Characteristic := by rw [hT]; infer_instance
+  have hTchar : T.Characteristic := by rw [hT]; infer_instance
   -- Work with `k = d + 1` so that `H k = H (d+1)` and `H (k-1) = H d` hold definitionally.
   obtain ⟨d, rfl⟩ : ∃ d, k = d + 1 := ⟨k - 1, by omega⟩
   set σ : ↥S →* ↥S := (hSinv.restrict ⟨a, ha⟩ : MulAut ↥S).toMonoidHom with hσ
@@ -504,7 +504,7 @@ theorem dvd_sub_mul_of_chain_supply {G : Type*} [Group G] {pp : ℕ} (hp : pp.Pr
       OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) k) :
     ((t₀ : ZMod pp) * (t : ZMod pp) ^ i) * ((t₀ : ZMod pp) * (t : ZMod pp) ^ j) =
       (t₀ : ZMod pp) * (t : ZMod pp) ^ (k - 1) := by
-  haveI : Fact pp.Prime := ⟨hp⟩
+  have : Fact pp.Prime := ⟨hp⟩
   -- Work with `k = d + 1` so that `H k` and `H (k-1) = H d` hold definitionally.
   obtain ⟨d, rfl⟩ : ∃ d, k = d + 1 := ⟨k - 1, by omega⟩
   -- Liveness of the relevant chain terms.
@@ -681,7 +681,7 @@ theorem iterCommutator_commutator_iterCommutator_le {G : Type*} [Group G] {T : S
     rw [hrhs, OddOrder.Isaacs.Ch04.iterCommutator_zero]
     exact Subgroup.commutator_mono le_rfl le_top
   | succ b ih =>
-    haveI : (OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (a + b + 2)).Normal :=
+    have : (OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (a + b + 2)).Normal :=
       OddOrder.Isaacs.Ch04.iterCommutator_normal _
     have key : ⁅⁅OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) b, (⊤ : Subgroup G)⁆,
         OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) a⁆ ≤
@@ -717,7 +717,7 @@ theorem iterCommutator_one_le_two_of_caseB {G : Type*} [Group G] {T Q : Subgroup
     (hT'2 : ⁅T, T⁆ ≤ OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) 2) :
     OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) 1 ≤
       OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) 2 := by
-  haveI : (OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) 2).Normal :=
+  have : (OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) 2).Normal :=
     OddOrder.Isaacs.Ch04.iterCommutator_normal 2
   have hH1 : OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) 1 = ⁅T, ⊤⁆ := by
     rw [OddOrder.Isaacs.Ch04.iterCommutator_succ, OddOrder.Isaacs.Ch04.iterCommutator_zero]
@@ -860,7 +860,7 @@ theorem RegularOperatorSetup.commutator_centralizer_eq_bot_of_beta_supply [Finit
     ⁅Subgroup.centralizer (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1)),
       Subgroup.centralizer
         (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1))⁆ = ⊥ := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   have hR₀S : hyp.R₀ ≤ Omega R p 1 := hyp.R₀_le_omega
   have hexp : ∀ x : ↥(Omega R p 1), x ^ p = 1 := hyp.omega_pow_eq_one'
   have hS3 : 3 ≤ pRank ↥(Omega R p 1) p := hyp.three_le_pRank_omega hcard4

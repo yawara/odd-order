@@ -62,7 +62,7 @@ normal subgroup `[Q₁,Q₁]` of the `p`-group `Q₁` meets the centre nontrivia
 nontriviality up to `Z`. -/
 theorem endgameZ_ne_bot [Finite G] {p : ℕ} (hp : p.Prime) (hQ1p : IsPGroup p ↥hyp.Q1)
     (hnonab : ⁅hyp.Q1, hyp.Q1⁆ ≠ ⊥) : hyp.endgameZ ≠ ⊥ := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   -- `commutator ↥Q₁` is nontrivial, else `⁅Q₁,Q₁⁆ = ⊥`
   have hcomm_nt : Nontrivial (commutator ↥hyp.Q1) := by
     rw [Subgroup.nontrivial_iff_ne_bot]
@@ -135,11 +135,11 @@ theorem endgame_Xset_coherent (hd : Odd hyp.d) {p : ℕ} (hp : p.Prime)
     (hQ1p : IsPGroup p ↥hyp.Q1) (hnonab : ⁅hyp.Q1, hyp.Q1⁆ ≠ ⊥) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
       (hyp.XsetOf (⊥ : Subgroup G) hyp.endgameZ) hyp.A) := by
-  haveI : (hyp.Sder.subgroupOf hyp.H).Normal :=
+  have : (hyp.Sder.subgroupOf hyp.H).Normal :=
     hyp.subgroupOf_H_normal_of_conj_mem fun h hh x hx => hyp.Sder_conj_mem_of_mem_H hh hx
-  haveI : (hyp.endgameZ.subgroupOf hyp.H).Normal :=
+  have : (hyp.endgameZ.subgroupOf hyp.H).Normal :=
     hyp.subgroupOf_H_normal_of_conj_mem fun h hh x hx => hyp.endgameZ_conj_mem_of_mem_H hh hx
-  haveI : ((hyp.S ⊔ hyp.endgameZ).subgroupOf hyp.H).Normal :=
+  have : ((hyp.S ⊔ hyp.endgameZ).subgroupOf hyp.H).Normal :=
     hyp.subgroupOf_H_normal_of_conj_mem fun h hh x hx =>
       conj_mem_sup (fun y hy => hyp.S_normal_in_H hh hy)
         (fun y hy => hyp.endgameZ_conj_mem_of_mem_H hh hy) hx
@@ -457,7 +457,7 @@ theorem tau_scaled_diff_inner_self [Finite G]
       hyp.Sset hyp.A) :
     ClassFunction.inner (hyp.tau (χ - a • η₁)) (hyp.tau (χ - a • η₁)) =
       1 + (a : ℂ) ^ 2 := by
-  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  let : Fintype ↥hyp.H := Fintype.ofFinite _
   rw [hyp.tau_inner_eq_of_supported_Sset hsupp hsupp, ← Nat.cast_smul_eq_nsmul ℂ a η₁]
   simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
     ClassFunction.inner_smul_left, ClassFunction.inner_smul_right, star_natCast]

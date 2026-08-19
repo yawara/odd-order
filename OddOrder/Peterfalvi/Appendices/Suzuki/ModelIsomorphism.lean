@@ -92,7 +92,7 @@ theorem exists_actualKActor_mu_eq (hm : m ≠ 0) (hQ0card : Nat.card ↥hyp.Q0 =
     {a : M.E} (ha : a ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m) (ha0 : a ≠ 0) :
     ∃ k : ↥hyp.actualKActor, ((M.mu (k, 1) : M.Eˣ) : M.E) = a := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   set f : ↥hyp.actualKActor → M.E := fun k => ((M.mu (k, 1) : M.Eˣ) : M.E) with hf
   have hinj : Function.Injective f := fun k k' h => M.mu_K_injective (Units.ext h)
   have hsub : Set.range f ⊆
@@ -428,8 +428,8 @@ theorem exists_bilinear_lift_semilinear (hm : m ≠ 0)
           = b * hyp.centreQuadraticMapE s M ι x) →
         ∀ x y : M.E, φ (a * x) (a * y) = b * φ x y := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  letI : Fintype (M.E ≃ₐ[ZMod 2] M.E) := Fintype.ofFinite _
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  let : Fintype (M.E ≃ₐ[ZMod 2] M.E) := Fintype.ofFinite _
   have hcardE : Nat.card M.E = 2 ^ (m * 2) := by rw [M.card, ← pow_mul]
   have hN : m * 2 ≠ 0 := by positivity
   -- the pinned expansion of the `E`-valued `χ`
@@ -549,7 +549,7 @@ theorem exists_bilinear_lift_normalized (hm : m ≠ 0)
           = b * hyp.centreQuadraticMapE s M ι' x) →
         ∀ x y : M.E, φ (a * x) (a * y) = b * φ x y := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨φ₀, α, β, hdiag, hsemi, hdiagscale⟩ :=
     hyp.exists_bilinear_lift_semilinear s M hm hQ0card ι d hequiv
   have hχ' : ∀ x : M.E,
@@ -580,7 +580,7 @@ theorem exists_bilinear_lift_normalized (hm : m ≠ 0)
     exact map_one α.symm
   · -- the `K`-scaling for the moved coordinate: `α⁻¹` is a Frobenius power, so the
     -- twisted constant is again a power of `μ(k,1)`
-    haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+    have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
     have hcardE : Nat.card M.E = 2 ^ (m * 2) := by rw [M.card, ← pow_mul]
     have hN : m * 2 ≠ 0 := by positivity
     obtain ⟨j, hj0⟩ := OddOrder.FiniteField.exists_pow_eq_of_ringAut
@@ -731,7 +731,7 @@ theorem exists_mulEquiv_bookCocycle (hm : m ≠ 0)
       ∀ e : ↥hyp.Q, (Φ e).quotient =
         M.coord (Additive.ofMul (QuotientGroup.mk' (Subgroup.center hyp.Q) e)) := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨ι', φ₀, θ, hdiag, hsemi, hone, hequiv', hdiagscale⟩ :=
     hyp.exists_bilinear_lift_normalized s M hm hQ0card ι d hequiv
   -- the diagonal already lies in `F`

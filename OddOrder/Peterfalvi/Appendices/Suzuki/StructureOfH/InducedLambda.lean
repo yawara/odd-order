@@ -99,9 +99,9 @@ theorem inner_induce_self_eq_two [Fintype G] [Invertible (Nat.card G : ℂ)]
     ClassFunction.inner (ClassFunction.induce sc.toHypothesis.H θ)
       (ClassFunction.induce sc.toHypothesis.H θ) = 2 := by
   classical
-  haveI : Fintype ↥sc.toHypothesis.H := Fintype.ofFinite _
-  haveI : Finite Ω := sc.toHypothesis.finite_Omega
-  haveI : Nontrivial Ω := by
+  have : Fintype ↥sc.toHypothesis.H := Fintype.ofFinite _
+  have : Finite Ω := sc.toHypothesis.finite_Omega
+  have : Nontrivial Ω := by
     rw [← Finite.one_lt_card_iff_nontrivial, sc.toHypothesis.card_Omega]
     have := Nat.card_pos (α := ↥sc.toHypothesis.Q)
     omega
@@ -151,7 +151,7 @@ theorem exists_induce_eq_add_irreducible [Fintype G]
       f₁ ≠ trivialClassFunction G ∧ f₂ ≠ trivialClassFunction G ∧
       ClassFunction.induce sc.toHypothesis.H θ = f₁ + f₂ := by
   classical
-  haveI : Fintype ↥sc.toHypothesis.H := Fintype.ofFinite _
+  have : Fintype ↥sc.toHypothesis.H := Fintype.ofFinite _
   set Φ := ClassFunction.induce sc.toHypothesis.H θ with hΦ
   have hZ : Φ ∈ ZIrr G := ClassFunction.induce_mem_ZIrr _ hθ.mem_ZIrr
   have h2 : ClassFunction.inner Φ Φ = 2 :=

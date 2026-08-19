@@ -37,8 +37,8 @@ theorem isCyclic_and_card_dvd_of_faithful_one_dim
     (hdim : Module.finrank (ZMod p) V = 1) :
     IsCyclic E ∧ Nat.card E ∣ Nat.card V - 1 := by
   classical
-  haveI : Nontrivial V := Module.nontrivial_of_finrank_eq_succ hdim
-  haveI : Module.Finite (ZMod p) V := Module.Finite.of_finite
+  have : Nontrivial V := Module.nontrivial_of_finrank_eq_succ hdim
+  have : Module.Finite (ZMod p) V := Module.Finite.of_finite
   -- `End_{𝔽_p}(V) ≅ 𝔽_p` via `algebraMap` (bijective in dimension one: every endo is `c • id`).
   have hsurj : Function.Surjective (algebraMap (ZMod p) (Module.End (ZMod p) V)) := by
     intro u
@@ -56,8 +56,8 @@ theorem isCyclic_and_card_dvd_of_faithful_one_dim
     have h1 : (MonoidHom.toHomUnits ρ) a = (MonoidHom.toHomUnits ρ) b :=
       (Units.mapEquiv eRing.toMulEquiv).symm.injective (by simpa [φ] using hab)
     simpa using congrArg (Units.val) h1
-  haveI : IsCyclic (ZMod p)ˣ := inferInstance
-  haveI : IsCyclic φ.range := inferInstance
+  have : IsCyclic (ZMod p)ˣ := inferInstance
+  have : IsCyclic φ.range := inferInstance
   have hcardV : Nat.card V = p := by
     rw [Module.natCard_eq_pow_finrank (K := ZMod p), hdim, pow_one, Nat.card_eq_fintype_card,
       ZMod.card]
@@ -83,7 +83,7 @@ theorem isCyclic_and_card_dvd_of_odd_two_dim_irreducible
     (hdim : Module.finrank (ZMod p) V = 2) (hp_ndvd : ¬ p ∣ Nat.card E) :
     IsCyclic E ∧ Nat.card E ∣ Nat.card V - 1 := by
   classical
-  haveI : Module.Finite (ZMod p) V := Module.Finite.of_finite
+  have : Module.Finite (ZMod p) V := Module.Finite.of_finite
   -- BG 2.6(a): a faithful odd two-dimensional representation has abelian image.
   have hchar : ∀ q : ℕ, q.Prime → q ∣ Nat.card E → ¬ CharP (ZMod p) q := fun q _ hqdvd hcharq =>
     hp_ndvd ((CharP.eq (ZMod p) hcharq (ZMod.charP p)) ▸ hqdvd)
@@ -92,11 +92,11 @@ theorem isCyclic_and_card_dvd_of_odd_two_dim_irreducible
   -- Give `V` the `𝔽_p[E]`-module structure of the representation *directly* (this is
   -- definitionally `ρ.asModule`'s instance, but stated on `V` so that instance synthesis does
   -- not choke on the `ρ.asModule` notation — which it does once `IsIrreducible ρ` is around).
-  letI : Module (MonoidAlgebra (ZMod p) E) V := Module.compHom V (ρ.asAlgebraHom).toRingHom
+  let : Module (MonoidAlgebra (ZMod p) E) V := Module.compHom V (ρ.asAlgebraHom).toRingHom
   have hsmul : ∀ (e : E) (x : V), MonoidAlgebra.of (ZMod p) E e • x = ρ e x := fun e x => by
     change (ρ.asAlgebraHom) (MonoidAlgebra.of (ZMod p) E e) x = ρ e x
     rw [Representation.asAlgebraHom_of]
-  haveI : IsSimpleModule (MonoidAlgebra (ZMod p) E) V :=
+  have : IsSimpleModule (MonoidAlgebra (ZMod p) E) V :=
     (Representation.irreducible_iff_isSimpleModule_asModule ρ).mp hirr
   have hfaith' : ∀ e : E, (∀ x : V, MonoidAlgebra.of (ZMod p) E e • x = x) → e = 1 := by
     intro e he
@@ -125,7 +125,7 @@ theorem isCyclic_and_card_dvd_add_one_of_two_dim_irreducible_nonscalar
     (hnonscalar : ∀ e : E, (∃ n : ℕ, ∀ x : V, ρ e x = n • x) → e = 1) :
     IsCyclic E ∧ Nat.card E ∣ p + 1 := by
   classical
-  haveI : Module.Finite (ZMod p) V := Module.Finite.of_finite
+  have : Module.Finite (ZMod p) V := Module.Finite.of_finite
   -- `|E| ∣ p² - 1` and cyclicity from the irreducible core.
   obtain ⟨hcyc, hdvd_sq⟩ :=
     isCyclic_and_card_dvd_of_odd_two_dim_irreducible hodd ρ hfaith hirr hdim hp_ndvd
@@ -138,11 +138,11 @@ theorem isCyclic_and_card_dvd_add_one_of_two_dim_irreducible_nonscalar
     hp_ndvd ((CharP.eq (ZMod p) hcharq (ZMod.charP p)) ▸ hqdvd)
   have hcomm : ∀ a b : E, a * b = b * a :=
     (OddOrder.BG.Ch1.S02.odd_two_dim_abelian hodd hdim ρ hfaith hchar).comm
-  letI : Module (MonoidAlgebra (ZMod p) E) V := Module.compHom V (ρ.asAlgebraHom).toRingHom
+  let : Module (MonoidAlgebra (ZMod p) E) V := Module.compHom V (ρ.asAlgebraHom).toRingHom
   have hsmul : ∀ (e : E) (x : V), MonoidAlgebra.of (ZMod p) E e • x = ρ e x := fun e x => by
     change (ρ.asAlgebraHom) (MonoidAlgebra.of (ZMod p) E e) x = ρ e x
     rw [Representation.asAlgebraHom_of]
-  haveI : IsSimpleModule (MonoidAlgebra (ZMod p) E) V :=
+  have : IsSimpleModule (MonoidAlgebra (ZMod p) E) V :=
     (Representation.irreducible_iff_isSimpleModule_asModule ρ).mp hirr
   have hfaith' : ∀ e : E, (∀ x : V, MonoidAlgebra.of (ZMod p) E e • x = x) → e = 1 := by
     intro e he
@@ -186,11 +186,11 @@ theorem isCyclic_and_card_dvd_dichotomy_of_fpf_dim_le_two
       (Module.finrank (ZMod p) V = 2 ∧ Representation.IsIrreducible ρ ∧
         Nat.card E ∣ p ^ 2 - 1)) := by
   classical
-  haveI : Module.Finite (ZMod p) V := Module.Finite.of_finite
+  have : Module.Finite (ZMod p) V := Module.Finite.of_finite
   -- Step 1: the FPF hypothesis makes `ρ` faithful.
   -- `V` is nontrivial because `finrank V ≥ 1`, so it has a nonzero vector; a nontrivial element in
   -- the kernel would fix that vector, contradicting `hfpf`.
-  haveI hVnt : Nontrivial V := by
+  have hVnt : Nontrivial V := by
     rcases hdim with h | h
     · exact Module.nontrivial_of_finrank_eq_succ h
     · exact Module.nontrivial_of_finrank_eq_succ (n := 1) (by rw [h])
@@ -220,7 +220,7 @@ theorem isCyclic_and_card_dvd_dichotomy_of_fpf_dim_le_two
     · -- reducible: a proper nonzero invariant line `W` exists; Case A on `W.toRepresentation`.
       have hbnt : (⊥ : Subrepresentation ρ) ≠ ⊤ := fun h =>
         bot_ne_top (congrArg Subrepresentation.toSubmodule h)
-      haveI : Nontrivial (Subrepresentation ρ) := ⟨⊥, ⊤, hbnt⟩
+      have : Nontrivial (Subrepresentation ρ) := ⟨⊥, ⊤, hbnt⟩
       have hnotall : ¬ ∀ W : Subrepresentation ρ, W = ⊥ ∨ W = ⊤ := fun H =>
         hirr { eq_bot_or_eq_top := H }
       push Not at hnotall
@@ -230,8 +230,8 @@ theorem isCyclic_and_card_dvd_dichotomy_of_fpf_dim_le_two
         hWbot (Subrepresentation.toSubmodule_injective (by rw [h]; rfl))
       have hWsub_top : W.toSubmodule ≠ ⊤ := fun h =>
         hWtop (Subrepresentation.toSubmodule_injective (by rw [h]; rfl))
-      haveI : Finite ↥W.toSubmodule := Subtype.finite
-      haveI : Module.Finite (ZMod p) ↥W.toSubmodule := Module.Finite.of_finite
+      have : Finite ↥W.toSubmodule := Subtype.finite
+      have : Module.Finite (ZMod p) ↥W.toSubmodule := Module.Finite.of_finite
       have hpos : 0 < Module.finrank (ZMod p) ↥W.toSubmodule := by
         have := Submodule.finrank_lt_finrank_of_lt (s := (⊥ : Submodule (ZMod p) V))
           (t := W.toSubmodule) (lt_of_le_of_ne bot_le (Ne.symm hWsub_bot))
@@ -277,7 +277,7 @@ theorem isCyclic_and_card_dvd_of_fpf_dim_le_two
     (hp_ndvd : ¬ p ∣ Nat.card E) :
     IsCyclic E ∧ Nat.card E ∣ Nat.card V - 1 := by
   classical
-  haveI : Module.Finite (ZMod p) V := Module.Finite.of_finite
+  have : Module.Finite (ZMod p) V := Module.Finite.of_finite
   obtain ⟨hcyc, hdvd⟩ :=
     isCyclic_and_card_dvd_dichotomy_of_fpf_dim_le_two hodd ρ hfpf hdim hp_ndvd
   refine ⟨hcyc, ?_⟩
@@ -319,7 +319,7 @@ theorem isCyclic_and_card_dvd_of_fpf_mulDistribMulAction
     (hfpf : ∀ e : E, e ≠ 1 → ∀ m : M, e • m = m → m = 1) :
     IsCyclic E ∧ Nat.card E ∣ Nat.card M - 1 := by
   classical
-  haveI : Finite (Additive M) := inferInstanceAs (Finite M)
+  have : Finite (Additive M) := inferInstanceAs (Finite M)
   -- The fixed-point-free hypothesis, transported to the additive representation `ρ = e ↦ (e • ·)`.
   have hfpf' : ∀ e : E, e ≠ 1 → ∀ v : Additive M,
       (Representation.ofDistribMulAction (ZMod p) E (Additive M)) e v = v → v = 0 := by
@@ -352,9 +352,9 @@ theorem isCyclic_and_card_dvd_of_fpf_conj_elemAbelian
     (hfpf : ∀ e : G, e ∈ E → e ≠ 1 → ∀ t : G, t ∈ T → e * t * e⁻¹ = t → t = 1) :
     IsCyclic ↥E ∧ (Nat.card ↥E ∣ p - 1 ∨ Nat.card ↥E ∣ p ^ 2 - 1) := by
   classical
-  letI : CommGroup ↥T := hT.subgroupCommGroup
-  letI : Module (ZMod p) (Additive ↥T) := hT.subgroupZmodModule
-  letI act : MulDistribMulAction ↥E ↥T :=
+  let : CommGroup ↥T := hT.subgroupCommGroup
+  let : Module (ZMod p) (Additive ↥T) := hT.subgroupZmodModule
+  let act : MulDistribMulAction ↥E ↥T :=
     MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (T : Set G))) ↥T
       (Subgroup.inclusion hEnorm)
   -- The conjugation action's coercion: `(ε • τ : G) = ε * τ * ε⁻¹`.
@@ -404,7 +404,7 @@ theorem isCyclic_and_card_dvd_sub_or_add_one_of_fpf_mulDistribMulAction
       ∀ e : E, (∃ n : ℕ, ∀ m : M, e • m = m ^ n) → e = 1) :
     IsCyclic E ∧ (Nat.card E ∣ p - 1 ∨ Nat.card E ∣ p + 1) := by
   classical
-  haveI : Finite (Additive M) := inferInstanceAs (Finite M)
+  have : Finite (Additive M) := inferInstanceAs (Finite M)
   -- The FPF hypothesis, transported to the additive representation `ρ = e ↦ (e • ·)`.
   have hfpf' : ∀ e : E, e ≠ 1 → ∀ v : Additive M,
       (Representation.ofDistribMulAction (ZMod p) E (Additive M)) e v = v → v = 0 := by
@@ -426,7 +426,7 @@ theorem isCyclic_and_card_dvd_sub_or_add_one_of_fpf_mulDistribMulAction
       intro a b hab
       by_contra hne
       have hba : b⁻¹ * a ≠ 1 := fun h => hne (inv_mul_eq_one.mp h).symm
-      haveI : Nontrivial (Additive M) :=
+      have : Nontrivial (Additive M) :=
         Module.nontrivial_of_finrank_eq_succ (n := 1) (by rw [hd2])
       obtain ⟨v, hv⟩ := exists_ne (0 : Additive M)
       refine hv (hfpf' (b⁻¹ * a) hba v ?_)
@@ -463,9 +463,9 @@ theorem isCyclic_and_card_dvd_sub_or_add_one_of_fpf_conj_elemAbelian
       ∀ e : G, e ∈ E → (∃ n : ℕ, ∀ t : G, t ∈ T → e * t * e⁻¹ = t ^ n) → e = 1) :
     IsCyclic ↥E ∧ (Nat.card ↥E ∣ p - 1 ∨ Nat.card ↥E ∣ p + 1) := by
   classical
-  letI : CommGroup ↥T := hT.subgroupCommGroup
-  letI : Module (ZMod p) (Additive ↥T) := hT.subgroupZmodModule
-  letI act : MulDistribMulAction ↥E ↥T :=
+  let : CommGroup ↥T := hT.subgroupCommGroup
+  let : Module (ZMod p) (Additive ↥T) := hT.subgroupZmodModule
+  let act : MulDistribMulAction ↥E ↥T :=
     MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (T : Set G))) ↥T
       (Subgroup.inclusion hEnorm)
   -- The conjugation action's coercion: `(ε • τ : G) = ε * τ * ε⁻¹`.
@@ -531,7 +531,7 @@ theorem witness_complement_dvd_p_sub_or_add_one [Finite G]
       ∀ t : G, t ∈ T → e * t * e⁻¹ = t → t = 1) :
     Nat.card ↥frob.complement ∣ ctr.p - 1 ∨ Nat.card ↥frob.complement ∣ ctr.p + 1 := by
   classical
-  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  have : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
   have hEcard : Nat.card ↥(frob.complement.map data.L.subtype) = Nat.card ↥frob.complement :=
     Subgroup.card_map_of_injective (K := frob.complement) data.L.subtype_injective
   -- `|T| ∈ {p, p²}` from `T ≤ P₀` of rank `2`.
@@ -679,10 +679,10 @@ theorem exists_center_omega1_elemAbelian_fpf_of_witness [Finite G]
       (Nat.card ↥frob.complement ∣ ctr.p ^ 2 - 1 →
         Nat.card ↥frob.complement ∣ ctr.p - 1 ∨ Nat.card ↥frob.complement ∣ ctr.p + 1) := by
   classical
-  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  have : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
   -- `H = L_F` is nilpotent and contains `P₀`; set `P := O_p(H) ⊇ P₀`.
   have hHeq : frob.typeI.typeF.H = maxNilpotentNormalHall data.L := frob.typeI.typeF.H_eq
-  haveI hHnilp : Group.IsNilpotent ↥frob.typeI.typeF.H := by
+  have hHnilp : Group.IsNilpotent ↥frob.typeI.typeF.H := by
     rw [hHeq]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent data.L
   have hP0H : ctr.P0 ≤ frob.typeI.typeF.H := by
     rw [hHeq]; exact witness_P0_le_kernel hG hnoV data
@@ -706,8 +706,8 @@ theorem exists_center_omega1_elemAbelian_fpf_of_witness [Finite G]
   have hP0ne : ctr.P0 ≠ ⊥ := fun h => ctr.P0_noncyclic (h ▸ inferInstance)
   have hPne : P ≠ ⊥ := fun h => hP0ne (le_bot_iff.mp (h ▸ hP0P))
   have hTne : T ≠ ⊥ := by
-    haveI : Nontrivial ↥P := P.nontrivial_iff_ne_bot.mpr hPne
-    haveI : Nontrivial (Subgroup.center ↥P) := hPp.center_nontrivial
+    have : Nontrivial ↥P := P.nontrivial_iff_ne_bot.mpr hPne
+    have : Nontrivial (Subgroup.center ↥P) := hPp.center_nontrivial
     have hZne : Z ≠ ⊥ := by
       intro hbot
       obtain ⟨z, hz1⟩ := exists_ne (1 : Subgroup.center ↥P)
@@ -720,7 +720,7 @@ theorem exists_center_omega1_elemAbelian_fpf_of_witness [Finite G]
     have hkpos : k ≠ 0 := by
       rintro rfl
       exact hZne (Subgroup.card_eq_one.mp (by rw [hk, pow_zero]))
-    haveI : Fintype ↥Z := Fintype.ofFinite _
+    have : Fintype ↥Z := Fintype.ofFinite _
     obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card (G := ↥Z) ctr.p
       (by rw [← Nat.card_eq_fintype_card, hk]; exact dvd_pow_self _ hkpos)
     have hg_ord : orderOf (g : G) = ctr.p := by
@@ -821,7 +821,7 @@ theorem complement_cyclic_order_dvd [Finite G]
       ((Nat.card ↥frob.complement ∣ ctr.p - 1) ∨
         (Nat.card ↥frob.complement ∣ ctr.p + 1)) := by
   classical
-  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  have : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
   -- The Frobenius complement, realized as a subgroup `E'` of the ambient `G`.
   set E' : Subgroup G := frob.complement.map data.L.subtype with hE'
   -- `E ≅ E'` (injective image), so cardinalities agree.
@@ -886,7 +886,7 @@ theorem two_mul_card_complement_le [Finite G]
     (frob : TypeIFrobeniusData data.L) :
     2 * Nat.card ↥frob.complement ≤ ctr.p + 1 := by
   classical
-  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  have : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
   obtain ⟨-, hdvd⟩ := complement_cyclic_order_dvd hG hnoV data frob
   -- `e = |E|` is odd.
   have hodd : Odd (Nat.card ↥frob.complement) :=
@@ -945,9 +945,9 @@ theorem counterexample_not_frobenius_MF [Finite G] (hG : OddOrder.BG.IsMinimalSi
           ((OddOrder.BG.Ch3.S10.Msigma ctr.M).subgroupOf ctr.M) (E.subgroupOf ctr.M) := by
   classical
   rintro ⟨E, hEM, hEcyc, hcompl, -⟩
-  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  have : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
   set Q : Subgroup ↥ctr.M := (OddOrder.BG.Ch3.S10.Msigma ctr.M).subgroupOf ctr.M with hQ
-  haveI hQnormal : Q.Normal := by
+  have hQnormal : Q.Normal := by
     rw [hQ, OddOrder.BG.Ch3.S10.Msigma_subgroupOf]
     infer_instance
   -- `|Q| = |K|`, so `|P₀| = pⁿ` is coprime to `|Q|` (`p ∤ |K|`).
@@ -965,11 +965,11 @@ theorem counterexample_not_frobenius_MF [Finite G] (hG : OddOrder.BG.IsMinimalSi
       exact ((Nat.Prime.coprime_iff_not_dvd ctr.p_prime).mpr (p_not_dvd_card_K ctr)).pow_left n
     exact disjoint_iff.mp (Subgroup.disjoint_of_coprime_natCard hcop)
   -- The quotient `M/Q ≅ E` is cyclic.
-  haveI hEsub_cyc : IsCyclic ↥(E.subgroupOf ctr.M) := by
-    haveI := hEcyc
+  have hEsub_cyc : IsCyclic ↥(E.subgroupOf ctr.M) := by
+    have := hEcyc
     exact isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe hEM).symm.toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hEM).symm.surjective
-  haveI hquot_cyc : IsCyclic (↥ctr.M ⧸ Q) := by
+  have hquot_cyc : IsCyclic (↥ctr.M ⧸ Q) := by
     refine isCyclic_of_surjective
       ((QuotientGroup.mk' Q).comp (E.subgroupOf ctr.M).subtype) ?_
     intro q
@@ -994,7 +994,7 @@ theorem counterexample_not_frobenius_MF [Finite G] (hG : OddOrder.BG.IsMinimalSi
     have hxPQ : (x : ↥ctr.M) ∈ P' ⊓ Q := ⟨x.2, hxQ⟩
     rw [hPQbot, Subgroup.mem_bot] at hxPQ
     exact Subgroup.mem_bot.mpr (Subtype.ext hxPQ)
-  haveI hP'cyc : IsCyclic ↥P' :=
+  have hP'cyc : IsCyclic ↥P' :=
     isCyclic_of_surjective (MonoidHom.ofInjective hinj).symm.toMonoidHom
       (MonoidHom.ofInjective hinj).symm.surjective
   exact ctr.P0_noncyclic (isCyclic_of_surjective

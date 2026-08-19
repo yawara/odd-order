@@ -26,7 +26,7 @@ Bender–Glauberman, _Local Analysis for the Odd Order Theorem_ (LMS LNS 188, 19
 that `K` is actually nilpotent, so the assumption that `K` is solvable is not necessary").
 
 `isFrobeniusGroup_quotient_of_normal_not_le_kernel` (Lemma 3.2) and `S03e.thm35` /
-`S03e.thm35_algClosed` (Theorem 3.5) all carry `IsSolvable ↥K` as a hypothesis, i.e. they
+`S03e.thm35_algClosed` (Theorem 3.5) all carry `Group.IsSolvable ↥K` as a hypothesis, i.e. they
 formalize the results *before* their Notes.  This file discharges that hypothesis, so the book's
 actual reach — the statements **plus** their Notes — is what the repository states.  Detected by
 the BG per-result audit (issue 0177) as a specialization debt in §3.
@@ -37,7 +37,7 @@ Thompson's theorem lives in `Isaacs.Ch06_FrobeniusActions.KernelNilpotent`
 (`IsFrobeniusGroup.isNilpotent_kernel`, Isaacs Thm 6.24 = BG Thm 3.7), and that file imports
 `BG.Ch1_Preliminary.S03c_Thm37`, which in turn imports `S03_FrobeniusActions`.  Discharging the
 hypothesis *in place* would therefore close an import cycle; the general forms have to live
-downstream of both.  The `IsSolvable`-carrying versions stay where they are and remain the
+downstream of both.  The `Group.IsSolvable`-carrying versions stay where they are and remain the
 engines — they are used inside the §3 development, where solvability is already available.
 
 ## Main results
@@ -63,7 +63,7 @@ This is Thompson's theorem (`IsFrobeniusGroup.isNilpotent_kernel` = Isaacs Thm 6
 Thm 3.7) followed by "nilpotent ⟹ solvable"; it is exactly the observation BG makes to say
 that the solvability hypothesis of Lemma 3.2 is unnecessary. -/
 theorem isSolvable_kernel_of_isFrobeniusGroup {G : Type*} [Group G] [Finite G]
-    {K R : Subgroup G} (h : IsFrobeniusGroup G K R) : IsSolvable ↥K :=
+    {K R : Subgroup G} (h : IsFrobeniusGroup G K R) : Group.IsSolvable ↥K :=
   have : Group.IsNilpotent ↥K := h.isNilpotent_kernel
   inferInstance
 
@@ -73,7 +73,7 @@ Let `G = KR` be a finite Frobenius group with kernel `K` and complement `R`, and
 with `K ⊄ N`.  Then `N < K`, and `G/N` is again a Frobenius group with kernel `K̄ = KN/N` and
 complement `R̄ = RN/N`.
 
-`isFrobeniusGroup_quotient_of_normal_not_le_kernel` is the same statement with `IsSolvable ↥K`
+`isFrobeniusGroup_quotient_of_normal_not_le_kernel` is the same statement with `Group.IsSolvable ↥K`
 assumed; the hypothesis is discharged here by `isSolvable_kernel_of_isFrobeniusGroup`. -/
 theorem bgLemma32 {G : Type*} [Group G] [Finite G] {K R N : Subgroup G} [N.Normal]
     (h : IsFrobeniusGroup G K R) (hKN : ¬ K ≤ N) :
@@ -115,7 +115,7 @@ theorem bgThm35_algClosed
 `G = KR` a finite Frobenius group with kernel `K` and prime-order complement `R`, acting on
 `V/F` with `char F ∤ |G|`.  If `C_V(R)` is one-dimensional then `K' ⊆ C_K(V)`.
 
-`S03e.thm35` is the same statement with `IsSolvable ↥K` assumed; the hypothesis is discharged
+`S03e.thm35` is the same statement with `Group.IsSolvable ↥K` assumed; the hypothesis is discharged
 here by `isSolvable_kernel_of_isFrobeniusGroup`, which is exactly the book's Note. -/
 theorem bgThm35
     {F : Type*} [Field F]

@@ -117,9 +117,9 @@ theorem TheoremAConclusion.Q_and_residual (result : TheoremAConclusion G Omega)
       result.L = (⨆ g : G, hyp.Q.map (MulAut.conj g).toMonoidHom) := by
   cases result.target with
   | psl2 data =>
-      letI : Field data.F := data.fieldF
-      letI : Finite data.F := data.finiteF
-      letI : CharP data.F 2 := data.charTwoF
+      let : Field data.F := data.fieldF
+      let : Finite data.F := data.finiteF
+      let : CharP data.F 2 := data.charTwoF
       exact hyp.Q_and_residual_of_psl2_target result.L result.normal
         result.oddIndex data.cardF_gt_two data.groupEquiv data.actionEquiv
         data.actionEquiv_bijective
@@ -188,7 +188,7 @@ theorem centralizer_cQ_isPGroup_of_quotient (hXV : X ≤ hyp.V)
       IsPGroup 2 (hyp.centralizerQuotientHypothesisA1 hXV).Q) :
     IsPGroup 2
       ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))) := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   exact hQbar.of_equiv (hyp.centralizerQQuotientEquiv hXV).symm
 
 /-- **Peterfalvi Part II, Ch. I §3 Proposition 1(c), induction step.**
@@ -202,7 +202,7 @@ theorem centralizer_cQ_isPGroup_of_induction
     (inductionHypothesis : TheoremAInductionBelow G Omega) :
     IsPGroup 2
       ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))) := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   let qhyp := hyp.centralizerQuotientHypothesis hXV hA3
   have hsmall : Nat.card (hyp.centralizerActionQuotient X) < Nat.card G :=
     hyp.card_centralizerActionQuotient_lt hXV hX

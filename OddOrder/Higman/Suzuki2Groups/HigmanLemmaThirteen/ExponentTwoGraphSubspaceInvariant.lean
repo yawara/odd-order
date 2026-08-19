@@ -102,9 +102,9 @@ theorem layerZeroToFrattiniQuotientLinear_comp_eigen
         ((layerZeroToFrattiniQuotientLinear P hP).comp i alpha) =
       (layerZeroToFrattiniQuotientLinear P hP).comp i
         (lambda * alpha) := by
-  letI : CommGroup (P ⧸ frattini P) :=
+  let : CommGroup (P ⧸ frattini P) :=
     frattiniQuotientCommGroup P hP
-  letI : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
+  let : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
     frattiniQuotientZModTwoModule P hP
   change
     Additive.ofMul
@@ -172,13 +172,13 @@ theorem restrictedFactorAmbientInclusion_frattiniQuotient_representation
         (restrictedFactorAmbientInclusion hSinv hEAS eS c data
           hK1S htermS hSqS hAgemoS hK0S)
         (data.lambda * alpha) := by
-  letI : IsMulCommutative (frattini S) :=
+  let : IsMulCommutative (frattini S) :=
     IsMulCommutative.of_comm hEAS.comm
-  letI : Module (ZMod 2) (Additive (frattini S)) :=
+  let : Module (ZMod 2) (Additive (frattini S)) :=
     hEAS.zmodModule
-  letI : CommGroup (P ⧸ frattini P) :=
+  let : CommGroup (P ⧸ frattini P) :=
     frattiniQuotientCommGroup P hP
-  letI : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
+  let : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
     frattiniQuotientZModTwoModule P hP
   apply layerZeroToFrattiniQuotientLinear_comp_eigen
     hP Y.subtype c

@@ -65,9 +65,9 @@ lemma APrime_eq_top_of_eq_OPrime [Finite G] {p : ℕ} [Fact p.Prime]
     APrime p N = ⊤ := by
   classical
   let A : Subgroup N := APrime p N
-  haveI hA_char : A.Characteristic := by
+  have hA_char : A.Characteristic := by
     simpa [A] using APrime_characteristic (p := p) (G := N)
-  haveI hAmap_normal : (A.map N.subtype).Normal := inferInstance
+  have hAmap_normal : (A.map N.subtype).Normal := inferInstance
   have hAmap_le_N : A.map N.subtype ≤ N :=
     Subgroup.map_subtype_le A
   obtain ⟨a, hN_index⟩ : ∃ a : ℕ, N.index = p ^ a := by
@@ -106,7 +106,7 @@ theorem controlsOwnFusion_of_hasNormalPComplement [Finite G] {p : ℕ} [Fact p.P
     (P : Sylow p G) (hG : HasNormalPComplement p G) :
     P.ControlsOwnFusion := by
   obtain ⟨N, hN_normal, hN_compl⟩ := hG
-  haveI : N.Normal := hN_normal
+  have : N.Normal := hN_normal
   rintro x y hx_P hy_P ⟨g, hgxy⟩
   -- g ∈ N ⊔ P = ⊤ ⇒ g = n · p (n ∈ N, p ∈ P)
   have h_sup_top : N ⊔ (P : Subgroup G) = ⊤ := (hN_compl P).sup_eq_top
@@ -175,7 +175,7 @@ lemma OPrime_meet_sylow_eq_bot_of_controlsOwnFusion [Finite G] {p : ℕ} [Fact p
     (P : Sylow p G) (hP : P.ControlsOwnFusion) :
     (P : Subgroup G) ⊓ OPrime p G = ⊥ := by
   set N : Subgroup G := OPrime p G with hN_def
-  haveI hN_normal : N.Normal := inferInstance
+  have hN_normal : N.Normal := inferInstance
   set R : Subgroup G := (P : Subgroup G) ⊓ N with hR_def
   have hR_le_P : R ≤ (P : Subgroup G) := by
     rw [hR_def]
@@ -291,8 +291,8 @@ lemma OPrime_meet_sylow_eq_bot_of_controlsOwnFusion [Finite G] {p : ℕ} [Fact p
       rw [Subgroup.map_commutator, h_top_map]
       exact h_R_le_comm.trans (Subgroup.commutator_mono ih le_rfl)
   -- **Step 6 (termination)**: `P` is a finite p-group ⇒ nilpotent ⇒ `∃ n, lcs ↥P n = ⊥`.
-  haveI hP_pgroup : IsPGroup p ↥(P : Subgroup G) := P.isPGroup'
-  haveI hP_nilp : Group.IsNilpotent ↥(P : Subgroup G) := hP_pgroup.isNilpotent
+  have hP_pgroup : IsPGroup p ↥(P : Subgroup G) := P.isPGroup'
+  have hP_nilp : Group.IsNilpotent ↥(P : Subgroup G) := hP_pgroup.isNilpotent
   obtain ⟨n, hn⟩ := Subgroup.nilpotent_iff_lowerCentralSeries.mp hP_nilp
   have : R ≤ ⊥ := by
     have := h_R_le_lcs n
@@ -315,7 +315,7 @@ theorem hasNormalPComplement_of_controlsOwnFusion [Finite G] {p : ℕ} [Fact p.P
     HasNormalPComplement p G := by
   -- Set N := OPrime p G, the normal-p-complement witness.
   set N : Subgroup G := OPrime p G with hN_def
-  haveI hN_normal : N.Normal := inferInstance
+  have hN_normal : N.Normal := inferInstance
   -- |G : N| is a p-power, say p^a.
   obtain ⟨a, hN_idx_pow⟩ := OPrime_index_isPGroup p G
   -- **Step A** (heart, deferred to helper): `(P : Subgroup G) ⊓ N = ⊥`.
@@ -412,7 +412,7 @@ theorem hasNormalPComplement_of_subgroup [Finite G] {p : ℕ} [Fact p.Prime]
     (hG : HasNormalPComplement p G) (H : Subgroup G) :
     HasNormalPComplement p ↥H := by
   obtain ⟨N, hN_normal, hN_compl⟩ := hG
-  haveI : N.Normal := hN_normal
+  have : N.Normal := hN_normal
   refine ⟨N.subgroupOf H, hN_normal.subgroupOf H, fun Q => ?_⟩
   set M : Subgroup ↥H := N.subgroupOf H with hM_def
   -- Get any Sylow P₀ in G
@@ -524,9 +524,9 @@ theorem isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement
     rw [hSubgroup_top, Subgroup.index_top]
   · -- X ≠ ⊥: hypothesis gives K' normal p-complement, K' ≤ C_n, C_n.index ∣ K'.index = p^a
     obtain ⟨K', hK'_normal, hK'_compl⟩ := h X hX_bot hXp
-    haveI : K'.Normal := hK'_normal
+    have : K'.Normal := hK'_normal
     let X_n : Subgroup ↥N := X.subgroupOf N
-    haveI hX_n_normal : X_n.Normal := by
+    have hX_n_normal : X_n.Normal := by
       change (X.subgroupOf (Subgroup.normalizer (X : Set G))).Normal
       exact Subgroup.normal_in_normalizer
     -- Sylow Q in ↥N
@@ -606,7 +606,7 @@ theorem isPGroup_normalizerQuotientCentralizer_of_prime_subgroups_centralize
     Nat.prod_primeFactorsList hC_index_ne_zero]
   intro q hq
   obtain ⟨hq_prime, hq_dvd_C_index⟩ := (Nat.mem_primeFactorsList hC_index_ne_zero).mp hq
-  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have : Fact q.Prime := ⟨hq_prime⟩
   by_contra hq_ne_p
   obtain ⟨S⟩ := (inferInstance : Nonempty (Sylow q N))
   let Q : Subgroup G := (S : Subgroup N).map N.subtype
@@ -656,7 +656,7 @@ private lemma lt_normalizer_of_pgroup_of_lt_top
     {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
     (hG : IsPGroup p G) {H : Subgroup G} (hH : H < ⊤) :
     H < Subgroup.normalizer (H : Set G) := by
-  haveI : Group.IsNilpotent G := IsPGroup.isNilpotent hG
+  have : Group.IsNilpotent G := IsPGroup.isNilpotent hG
   exact OddOrder.Isaacs.Ch01.lt_normalizer_of_isNilpotent_of_lt_top hH
 
 /-- **Isaacs Lem 5.28**: 仮定「∀ p-subgroup `X` ⊆ `G`, `N_G(X)/C_G(X)` は p-group」
@@ -1008,7 +1008,7 @@ theorem hasNormalPComplement_iff_isPGroup_normalizer_quotient_centralizer
         (↥N_P ⧸ (Subgroup.centralizer ((P : Subgroup G) : Set G)).subgroupOf N_P) :=
       hH P P.isPGroup'
     -- Normal instance for the centralizer subgroupOf
-    haveI : ((Subgroup.centralizer ((P : Subgroup G) : Set G)).subgroupOf N_P).Normal :=
+    have : ((Subgroup.centralizer ((P : Subgroup G) : Set G)).subgroupOf N_P).Normal :=
       centralizer_subgroupOf_normalizer_normal (P : Subgroup G)
     -- N(P) = C(P).subgroupOf N(P) ⊔ P_NP (via helper applied to ↥N(P))
     have hSC_top : (P_NP : Subgroup ↥N_P) ⊔
@@ -1244,7 +1244,7 @@ theorem hasNormalPComplement_of_no_prime_dvd_pow_sub_one
   have hQ_card_gt_one : 1 < Nat.card Q := by
     have hpos : 0 < Nat.card Q := Nat.card_pos
     omega
-  haveI : Nontrivial Q := Finite.one_lt_card_iff_nontrivial.mp hQ_card_gt_one
+  have : Nontrivial Q := Finite.one_lt_card_iff_nontrivial.mp hQ_card_gt_one
   obtain ⟨n, hn_pos, hQ_card_eq⟩ := hQq.nontrivial_iff_card.mp inferInstance
   have hq_dvd_Q : q ∣ Nat.card Q := by
     rw [hQ_card_eq]

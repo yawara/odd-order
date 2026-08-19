@@ -130,9 +130,9 @@ theorem Ideal.sup_pow_le {R : Type*} [CommRing R] (I J : Ideal R) :
     refine le_trans (Ideal.mul_mono_left (Ideal.sup_pow_le I J n)) ?_
     rw [Ideal.sup_mul, Ideal.mul_sup, Ideal.mul_sup]
     refine sup_le (sup_le ?_ ?_) (sup_le ?_ ?_)
-    · exact le_sup_of_le_left Ideal.mul_le_right
-    · exact le_sup_of_le_left Ideal.mul_le_right
     · exact le_sup_of_le_left Ideal.mul_le_left
+    · exact le_sup_of_le_left Ideal.mul_le_left
+    · exact le_sup_of_le_left Ideal.mul_le_right
     · exact le_sup_of_le_right (le_of_eq (pow_succ J n).symm)
 
 /-! ### The reduction `B → k` at `ζ ↦ 1` -/
@@ -226,7 +226,7 @@ theorem isAdicComplete_ker_cyclotomicToResidueField {A : Type*} [CommRing A] [Is
   set I : Ideal B := Ideal.map (algebraMap A B) (maximalIdeal A) with hI
   set J : Ideal B := Ideal.span {AdjoinRoot.root (cyclotomic (q ^ k) A) - 1} with hJ
   set N := RingHom.ker (cyclotomicToResidueField (A := A) (q := q) (k := k) hk) with hN
-  haveI : IsAdicComplete I B :=
+  have : IsAdicComplete I B :=
     (IsAdicComplete.map_algebraMap_iff (I := maximalIdeal A) (M := B)).mpr
       (isAdicComplete_cyclotomicAdjoin (q ^ k) A (maximalIdeal A))
   have hφ : q ^ k - q ^ (k - 1) ≠ 0 := by
@@ -256,8 +256,8 @@ theorem isLocalRing_cyclotomicAdjoin {A : Type*} [CommRing A] [IsLocalRing A]
     {q k : ℕ} [Fact (Nat.Prime q)] [CharP (ResidueField A) q]
     [IsAdicComplete (maximalIdeal A) A] (hk : 0 < k) :
     IsLocalRing (AdjoinRoot (cyclotomic (q ^ k) A)) := by
-  haveI := ker_cyclotomicToResidueField_isMaximal (A := A) (q := q) (k := k) hk
-  haveI := isAdicComplete_ker_cyclotomicToResidueField (A := A) (q := q) (k := k) hk
+  have := ker_cyclotomicToResidueField_isMaximal (A := A) (q := q) (k := k) hk
+  have := isAdicComplete_ker_cyclotomicToResidueField (A := A) (q := q) (k := k) hk
   exact isLocalRing_of_isAdicComplete_maximal
     (RingHom.ker (cyclotomicToResidueField (A := A) (q := q) (k := k) hk))
 
@@ -283,7 +283,7 @@ theorem maximalIdeal_cyclotomicAdjoin {A : Type*} [CommRing A] [IsLocalRing A]
     letI := isLocalRing_cyclotomicAdjoin (A := A) (q := q) (k := k) hk
     maximalIdeal (AdjoinRoot (cyclotomic (q ^ k) A))
       = RingHom.ker (cyclotomicToResidueField (A := A) (q := q) (k := k) hk) := by
-  letI := isLocalRing_cyclotomicAdjoin (A := A) (q := q) (k := k) hk
+  let := isLocalRing_cyclotomicAdjoin (A := A) (q := q) (k := k) hk
   exact (IsLocalRing.eq_maximalIdeal
     (ker_cyclotomicToResidueField_isMaximal (A := A) (q := q) (k := k) hk)).symm
 

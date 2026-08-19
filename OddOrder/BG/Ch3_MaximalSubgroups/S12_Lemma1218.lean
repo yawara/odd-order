@@ -56,13 +56,13 @@ theorem isNilpotent_derived_of_Malpha_eq_bot [Finite G] (hG : IsMinimalSimpleOdd
   have e2 : (↥M ⧸ (S10.Malpha M).subgroupOf M) ≃* ↥M :=
     (QuotientGroup.quotientMulEquivOfEq hbot).trans QuotientGroup.quotientBot
   -- the commutator of the quotient is nilpotent: subgroup of the nilpotent Fitting subgroup.
-  haveI hnil1 : Group.IsNilpotent ↥(commutator (↥M ⧸ (S10.Malpha M).subgroupOf M)) :=
+  have hnil1 : Group.IsNilpotent ↥(commutator (↥M ⧸ (S10.Malpha M).subgroupOf M)) :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe h102)
   have hcomm_eq :
       (commutator (↥M ⧸ (S10.Malpha M).subgroupOf M)).map e2.toMonoidHom = commutator ↥M := by
     rw [_root_.commutator_def, Subgroup.map_commutator,
       Subgroup.map_top_of_surjective _ e2.surjective, ← _root_.commutator_def]
-  haveI hnil2 : Group.IsNilpotent ↥(commutator ↥M) := by
+  have hnil2 : Group.IsNilpotent ↥(commutator ↥M) := by
     rw [← hcomm_eq]
     exact Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ _ e2.injective)
   -- `derivedInG M = (commutator ↥M).map M.subtype`.
@@ -91,7 +91,7 @@ private theorem eq_of_card_eq_of_le_of_isCyclic [Finite G] {C A B : Subgroup G}
   have key : ∀ D : Subgroup ↥C, Nat.card ↥D = r →
       D = Subgroup.zpowers (g ^ (Nat.card ↥C / r)) := by
     intro D hD
-    haveI : Nontrivial ↥D := by
+    have : Nontrivial ↥D := by
       apply Finite.one_lt_card_iff_nontrivial.mp
       rw [hD]; exact hr.one_lt
     obtain ⟨a0, ha0⟩ := exists_ne (1 : ↥D)
@@ -271,8 +271,8 @@ prime `r` (here: `S ≤ R₁` with `Monoid.exponent ↥R₁ = r`) has order exac
 private theorem card_eq_prime_of_le_exponent_prime [Finite G] {S R₁ C : Subgroup G}
     (hC : IsCyclic ↥C) (hSC : S ≤ C) (hSR₁ : S ≤ R₁) {r : ℕ} (hr : r.Prime)
     (hexp : Monoid.exponent ↥R₁ = r) (hSne : S ≠ ⊥) : Nat.card ↥S = r := by
-  haveI := hC
-  haveI hcyc : IsCyclic ↥S := Subgroup.isCyclic_of_le hSC
+  have := hC
+  have hcyc : IsCyclic ↥S := Subgroup.isCyclic_of_le hSC
   obtain ⟨g₀, hg₀⟩ := hcyc.exists_generator
   have hor_card : orderOf g₀ = Nat.card ↥S := orderOf_eq_card_of_forall_mem_zpowers hg₀
   have hdvd_r : orderOf g₀ ∣ r := by
@@ -304,7 +304,7 @@ coprimality of orders would force `Q` to centralize `R₁`. -/
 private theorem inf_centralizer_ne_bot_of_not_le_centralizer [Finite G]
     {p q r : ℕ} [Fact p.Prime] [Fact q.Prime] [Fact r.Prime]
     (hqp : q ≠ p) (hrp : r ≠ p) (hqr : q ≠ r)
-    {P Q R₁ : Subgroup G} (hsolv : IsSolvable ↥((Q ⊔ R₁) ⊔ P))
+    {P Q R₁ : Subgroup G} (hsolv : Group.IsSolvable ↥((Q ⊔ R₁) ⊔ P))
     (hPp : IsPGroup p ↥P) (hPcard : Nat.card ↥P = p)
     (hQq : IsPGroup q ↥Q) (hR₁r : IsPGroup r ↥R₁) (hQne : Q ≠ ⊥)
     (hQinv : P ≤ Subgroup.normalizer (Q : Set G))
@@ -417,7 +417,7 @@ theorem tau1_Malpha_centralizer_PQ_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
     (hqα : q ∉ S10.alpha M) :
     S10.Malpha M ⊓ Subgroup.centralizer ((P ⊔ Q : Subgroup G) : Set G) = ⊥ := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   by_contra hcon
   -- `P` facts (as in the first conjunct).
   obtain ⟨hPea, hPcard1⟩ := mem_elemAbelianOfRank.mp hP
@@ -465,7 +465,7 @@ theorem tau1_Malpha_centralizer_PQ_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
       ↥(S10.Malpha M ⊓ Subgroup.centralizer ((P ⊔ Q : Subgroup G) : Set G)) ≠ 1 := by
     intro h; exact hcon (Subgroup.card_eq_one.mp h)
   obtain ⟨r, hrp', hrdvd⟩ := Nat.exists_prime_and_dvd hCzne
-  haveI : Fact r.Prime := ⟨hrp'⟩
+  have : Fact r.Prime := ⟨hrp'⟩
   have hrα : r ∈ S10.alpha M := by
     apply S10.Malpha_isPiGroup M r
     refine Nat.mem_primeFactors.mpr ⟨hrp', ?_, Nat.card_pos.ne'⟩
@@ -569,7 +569,7 @@ theorem tau1_Malpha_centralizer_PQ_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
   -- `R₁` = Thompson characteristic subgroup of `R`.
   obtain ⟨R₁, hR₁R, hR₁char, hR₁exp, hQncR₁⟩ :=
     exists_charSubgroup_exponent_not_centralized hG.odd hqr hRr hRne hQq hQnormR hQncR
-  haveI : (R₁.subgroupOf R).Characteristic := hR₁char
+  have : (R₁.subgroupOf R).Characteristic := hR₁char
   have hR₁r : IsPGroup r ↥R₁ := hRr.to_le hR₁R
   have hR₁M : R₁ ≤ M := hR₁R.trans hRMle
   have hNRle : Subgroup.normalizer (R : Set G) ≤ Subgroup.normalizer (R₁ : Set G) := by
@@ -584,8 +584,8 @@ theorem tau1_Malpha_centralizer_PQ_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
     rw [hk]; exact ((Nat.coprime_primes Fact.out Fact.out).mpr hqr.symm).pow_left k
   -- `C_{R₁}(P) ≠ 1` (the Theorem 3.7 step, via the extracted helper).
   have hYM37 : (Q ⊔ R₁) ⊔ P ≤ M := sup_le (sup_le hQM hR₁M) hPM
-  have hsolvY37 : IsSolvable ↥((Q ⊔ R₁) ⊔ P) :=
-    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hYM37).toMonoidHom)
+  have hsolvY37 : Group.IsSolvable ↥((Q ⊔ R₁) ⊔ P) :=
+    Group.isSolvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hYM37).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe hYM37).surjective
   have hCR₁Pne : R₁ ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥ :=
     inf_centralizer_ne_bot_of_not_le_centralizer hqp hrp_ne hqr hsolvY37 hPp hPcard hQq hR₁r
@@ -679,18 +679,18 @@ theorem tau1_Malpha_centralizer_PQ_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
       (Nat.Coprime.mul_right (Nat.coprime_comm.mp h1) (Nat.coprime_comm.mp h2))
   set Hgrp : Subgroup G := Y ⊔ P with hHgrp_def
   have hHM : Hgrp ≤ M := sup_le hYM hPM
-  haveI hsolvH : IsSolvable ↥Hgrp :=
-    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hHM).toMonoidHom)
+  have hsolvH : Group.IsSolvable ↥Hgrp :=
+    Group.isSolvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hHM).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe hHM).surjective
-  haveI hsolvYgrp : IsSolvable ↥Y :=
-    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hYM).toMonoidHom)
+  have hsolvYgrp : Group.IsSolvable ↥Y :=
+    Group.isSolvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hYM).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe hYM).surjective
-  haveI hsolvN : IsSolvable ↥N :=
-    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hNM).toMonoidHom)
+  have hsolvN : Group.IsSolvable ↥N :=
+    Group.isSolvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hNM).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe hNM).surjective
   have hHnormR₀ : Hgrp ≤ Subgroup.normalizer (R₀ : Set G) := sup_le hYnormR₀ hPnormR₀
   have hR₀H : R₀ ≤ Hgrp := (hR₀leN.trans le_sup_right).trans le_sup_left
-  haveI hR₀nH : (R₀.subgroupOf Hgrp).Normal := by
+  have hR₀nH : (R₀.subgroupOf Hgrp).Normal := by
     constructor
     intro n hn g
     rw [Subgroup.mem_subgroupOf] at hn ⊢
@@ -698,8 +698,8 @@ theorem tau1_Malpha_centralizer_PQ_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
     exact (Subgroup.mem_normalizer_iff.mp (hHnormR₀ g.2) _).mp hn
   set π : ↥Hgrp →* ↥Hgrp ⧸ R₀.subgroupOf Hgrp :=
     QuotientGroup.mk' (R₀.subgroupOf Hgrp) with hπ_def
-  haveI : IsSolvable (↥Hgrp ⧸ R₀.subgroupOf Hgrp) :=
-    solvable_of_surjective (f := π) (QuotientGroup.mk'_surjective _)
+  have : Group.IsSolvable (↥Hgrp ⧸ R₀.subgroupOf Hgrp) :=
+    Group.isSolvable_of_surjective (f := π) (QuotientGroup.mk'_surjective _)
   set N' : Subgroup (↥Hgrp ⧸ R₀.subgroupOf Hgrp) := (Y.subgroupOf Hgrp).map π with hN'_def
   set R' : Subgroup (↥Hgrp ⧸ R₀.subgroupOf Hgrp) := (P.subgroupOf Hgrp).map π with hR'_def
   -- cardinalities: `|R'| = p`, `p ∤ |N'|`.
@@ -785,13 +785,13 @@ theorem tau1_Malpha_centralizer_PQ_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
       simp only [Subgroup.coe_mul, InvMemClass.coe_inv]
       exact (Subgroup.mem_normalizer_iff''.mp (hPnormY hxtP) _).mp hmt
   -- conjugation action of `↥P` on `↥Y` and `Q`-side action on `↥N` (templates from BB3).
-  letI actP : MulDistribMulAction ↥P ↥Y :=
+  let actP : MulDistribMulAction ↥P ↥Y :=
     MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (Y : Set G))) ↥Y
       (Subgroup.inclusion hPnormY)
   set φP : ↥P →* MulAut ↥Y := MulDistribMulAction.toMulAut ↥P ↥Y with hφP
   have hφP_coe : ∀ (a : ↥P) (x : ↥Y), (Y.subtype ((φP a) x)) = (↑a) * (Y.subtype x) * (↑a)⁻¹ :=
     fun _ _ => rfl
-  haveI hR₀nY : (R₀.subgroupOf Y).Normal := by
+  have hR₀nY : (R₀.subgroupOf Y).Normal := by
     constructor
     intro n hn g
     rw [Subgroup.mem_subgroupOf] at hn ⊢
@@ -891,21 +891,21 @@ theorem tau1_Malpha_centralizer_PQ_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
       exact hnY_R₀
     exact MonoidHom.mem_ker.mp h1
   -- Theorem 3.7: `N' = QN/R₀` is nilpotent.
-  haveI hsolvN'R' : IsSolvable ↥(N' ⊔ R') := inferInstance
+  have hsolvN'R' : Group.IsSolvable ↥(N' ⊔ R') := inferInstance
   have hnil : Group.IsNilpotent ↥N' :=
     OddOrder.BG.Ch1.S03c.isNilpotent_of_normalizing_primeOrder_fixedPointFree
       (N := N') (R := R') hR'norm hdisj' hN'ne hR'ne ⟨p, Fact.out, hR'card⟩ hFPF
   -- coprimality in the nilpotent `N'` forces `Q` to centralize `N/R₀`, whose fixed points
   -- pull back to `C_N(Q) = R₀`: contradiction with `n₀ ∉ R₀`.
   apply hn₀R₀
-  letI actQ : MulDistribMulAction ↥Q ↥N :=
+  let actQ : MulDistribMulAction ↥Q ↥N :=
     MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (N : Set G))) ↥N
       (Subgroup.inclusion hQnormN)
   set φQ : ↥Q →* MulAut ↥N := MulDistribMulAction.toMulAut ↥Q ↥N with hφQ
   have hφQ_coe : ∀ (a : ↥Q) (x : ↥N), (N.subtype ((φQ a) x)) = (↑a) * (N.subtype x) * (↑a)⁻¹ :=
     fun _ _ => rfl
   have hNnormR₀ : N ≤ Subgroup.normalizer (R₀ : Set G) := inf_le_right
-  haveI hR₀nN : (R₀.subgroupOf N).Normal := by
+  have hR₀nN : (R₀.subgroupOf N).Normal := by
     constructor
     intro n hn g
     rw [Subgroup.mem_subgroupOf] at hn ⊢
@@ -966,7 +966,7 @@ theorem tau1_Malpha_centralizer_PQ_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
         obtain ⟨a, ha⟩ := hou; obtain ⟨b, hb⟩ := hon
         rw [ha, hb]
         exact (((Nat.coprime_primes Fact.out Fact.out).mpr hqr).pow_left a).pow_right b
-      haveI := hnil
+      have := hnil
       have hcomm := OddOrder.GroupTheory.commute_of_coprime_orderOf_of_isNilpotent hcop
       have hxy := congrArg Subtype.val hcomm
       simpa [commute_iff_eq] using hxy
@@ -1041,7 +1041,7 @@ theorem tau1_Malpha_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
       S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥ ∧
       S10.Malpha M ⊓ Subgroup.centralizer ((P ⊔ Q : Subgroup G) : Set G) = ⊥) := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hMcoatom : IsCoatom M := mem_maximalSubgroups.mp hM
   obtain ⟨hPea, hPcard1⟩ := mem_elemAbelianOfRank.mp hP
   have hPp : IsPGroup p ↥P := hPea.isPGroup
@@ -1054,7 +1054,7 @@ theorem tau1_Malpha_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
   -- `N_G(Q) < ⊤`; if `M ≤ N_G(Q)` then `N_G(Q) = M` and `ℳ(N_G(Q)) = {M}`, contradiction.
   have hNQne_top : Subgroup.normalizer (Q : Set G) ≠ ⊤ := by
     intro htop
-    haveI : Q.Normal := Subgroup.normalizer_eq_top_iff.mp htop
+    have : Q.Normal := Subgroup.normalizer_eq_top_iff.mp htop
     rcases hG.simple.eq_bot_or_eq_top_of_normal Q inferInstance with h | h
     · exact hQne h
     · exact hMcoatom.1 (top_le_iff.mp (h ▸ hQM))
@@ -1076,8 +1076,8 @@ theorem tau1_Malpha_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
       exact ⟨hMcoatom, le_refl M⟩
   -- Step 1: `Q ≤ M'` — the coprime fixed-point-free action of `P` gives `Q = [Q, P]`.
   have hQM' : Q ≤ derivedInG M := by
-    haveI : IsSolvable ↥Q :=
-      solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hQM).toMonoidHom)
+    have : Group.IsSolvable ↥Q :=
+      Group.isSolvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hQM).toMonoidHom)
         (Subgroup.subgroupOfEquivOfLe hQM).surjective
     have hfix_bot : Subgroup.fixedPointsOfMulAut
         ((Subgroup.normalizerMonoidHom Q).comp (Subgroup.inclusion hQinv)) = ⊥ := by
@@ -1128,7 +1128,7 @@ theorem tau1_Malpha_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
     let S : Sylow q ↥(derivedInG M) := ⟨Q.subgroupOf (derivedInG M), hQ₀pgrp, hmax⟩
     have htfae := (Group.isNilpotent_of_finite_tfae (G := ↥(derivedInG M))).out 0 3
     have hnormal : (Q.subgroupOf (derivedInG M)).Normal := htfae.mp hnil q ⟨Fact.out⟩ S
-    haveI hchar : (Q.subgroupOf (derivedInG M)).Characteristic :=
+    have hchar : (Q.subgroupOf (derivedInG M)).Characteristic :=
       Sylow.characteristic_of_normal S hnormal
     have hNle : Subgroup.normalizer (derivedInG M : Set G) ≤
         Subgroup.normalizer (Q : Set G) := by
@@ -1177,7 +1177,7 @@ theorem tau1_Malpha_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
     apply Set.Subset.antisymm
     · intro r hra
       by_contra hrb
-      haveI : Fact r.Prime :=
+      have : Fact r.Prime :=
         ⟨Nat.prime_of_mem_primeFactors ((S10.mem_alpha_iff M r).mp hra).1⟩
       have hrq : r ≠ q := fun h => hqα (h ▸ hra)
       have hqβ : q ∉ S10.beta M := fun h => hqα (S10.beta_subset_alpha M h)

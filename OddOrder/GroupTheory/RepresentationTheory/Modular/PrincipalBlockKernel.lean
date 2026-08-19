@@ -107,7 +107,7 @@ theorem pi_single_eq_one_principalBlock_of_normalPComplement {p : ℕ} [Fact p.P
     (S : Sylow p G) {i : ι}
     (hiB : Quotient.mk (blockSetoid π hπ hlin) i = principalBlock π hπ hlin hnil) (g : G) :
     π (single g (1 : k)) i = 1 := by
-  haveI := Fintype.ofFinite G
+  have := Fintype.ofFinite G
   refine pi_single_eq_one_principalBlock_of_sup_eq_top π hπ hlin hnil hNp S.isPGroup' ?_ hiB g
   rw [sup_comm]
   exact OddOrder.GroupTheory.sylow_sup_eq_top_of_isPGroup_quotient hquot S

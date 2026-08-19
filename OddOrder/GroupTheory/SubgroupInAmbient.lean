@@ -123,7 +123,7 @@ theorem isPiSubgroup_of_forall_zpowers_isPiSubgroup_compl_eq_one [Finite G]
     Subgroup.IsPiSubgroup π H := by
   intro q hq
   by_contra hq_not_pi
-  haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hq⟩
+  have : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hq⟩
   obtain ⟨x, hx_order⟩ :=
     exists_prime_orderOf_dvd_card' (G := ↥H) q (Nat.mem_primeFactors.mp hq).2.1
   have hxH : (x : G) ∈ H := x.2
@@ -167,7 +167,7 @@ theorem le_opiCoreInG_of_normal_of_isPiSubgroup {π : Set ℕ} {H N : Subgroup G
     (hNH : N ≤ H) (hNnorm : (N.subgroupOf H).Normal)
     (hNpi : Subgroup.IsPiSubgroup π N) :
     N ≤ opiCoreInG π H := by
-  haveI := hNnorm
+  have := hNnorm
   have hNpi_sub : Ch03.Subgroup.IsPiGroup π (N.subgroupOf H) := by
     intro r hr
     refine hNpi r ?_
@@ -274,7 +274,7 @@ theorem le_oPiCore_of_normal_in_isSubnormal [Finite G] {π : Set ℕ} {K : Subgr
   induction hK with
   | top =>
     intro S hSK hSn hSpi
-    haveI : S.Normal := by
+    have : S.Normal := by
       rw [← Subgroup.normalizer_eq_top_iff, eq_top_iff]
       exact (Subgroup.normal_subgroupOf_iff_le_normalizer hSK).mp hSn
     exact Ch03.Subgroup.IsPiGroup.le_oPiCore hSpi
@@ -314,7 +314,7 @@ theorem sylow_coe_eq_of_normalizer_inf_le [Finite G] {p : ℕ} [Fact p.Prime]
     {Q : Sylow p G} {P : Subgroup G} (hPQ : P ≤ (Q : Subgroup G))
     (hle : Subgroup.normalizer P ⊓ (Q : Subgroup G) ≤ P) :
     (Q : Subgroup G) = P := by
-  haveI : Group.IsNilpotent ↥(Q : Subgroup G) := Q.isPGroup'.isNilpotent
+  have : Group.IsNilpotent ↥(Q : Subgroup G) := Q.isPGroup'.isNilpotent
   have hnc : NormalizerCondition ↥(Q : Subgroup G) := Group.normalizerCondition_of_isNilpotent
   -- `P.subgroupOf Q` is self-normalizing in `↥Q`.
   have hself : Subgroup.normalizer (P.subgroupOf (Q : Subgroup G)) =

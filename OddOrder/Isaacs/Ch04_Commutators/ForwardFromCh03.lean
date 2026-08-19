@@ -101,7 +101,7 @@ noncomputable def IsCompatibleMulAction.toMulAction
     [MulAction G Ω] [MulAction A Ω] (h : IsCompatibleMulAction φ Ω) (g : G) (ω : Ω) :
     letI := h.toMulAction
     (SemidirectProduct.inl g : SemidirectProduct G A φ) • ω = g • ω := by
-  letI := h.toMulAction
+  let := h.toMulAction
   change h.toPermHom (SemidirectProduct.inl g) ω = g • ω
   simp [IsCompatibleMulAction.toPermHom, SemidirectProduct.lift_inl]
 
@@ -109,7 +109,7 @@ noncomputable def IsCompatibleMulAction.toMulAction
     [MulAction G Ω] [MulAction A Ω] (h : IsCompatibleMulAction φ Ω) (a : A) (ω : Ω) :
     letI := h.toMulAction
     (SemidirectProduct.inr a : SemidirectProduct G A φ) • ω = a • ω := by
-  letI := h.toMulAction
+  let := h.toMulAction
   change h.toPermHom (SemidirectProduct.inr a) ω = a • ω
   simp [IsCompatibleMulAction.toPermHom, SemidirectProduct.lift_inr]
 
@@ -125,20 +125,20 @@ variable {A : Type*} [Group A] [Finite A] [Finite G]
 
 omit [Finite A] in
 omit [Finite G] in
-/-- `IsSolvable G ⇒ IsSolvable inl.range` (inl の rangeRestrict 経由). -/
-private lemma isSolvable_inlRange_of_isSolvable {φ : A →* MulAut G} [IsSolvable G] :
-    IsSolvable (SemidirectProduct.inl : G →* SemidirectProduct G A φ).range :=
-  solvable_of_surjective (MonoidHom.rangeRestrict_surjective
+/-- `Group.IsSolvable G ⇒ Group.IsSolvable inl.range` (inl の rangeRestrict 経由). -/
+private lemma isSolvable_inlRange_of_isSolvable {φ : A →* MulAut G} [Group.IsSolvable G] :
+    Group.IsSolvable (SemidirectProduct.inl : G →* SemidirectProduct G A φ).range :=
+  Group.isSolvable_of_surjective (MonoidHom.rangeRestrict_surjective
     (SemidirectProduct.inl : G →* SemidirectProduct G A φ))
 
 omit [Finite A] in
 omit [Finite G] in
-/-- `IsSolvable A ⇒ IsSolvable (Γ ⧸ inl.range)`.
-`rightHom` の核が `inl.range` で `rightHom` は全射, 第一同型定理 + 同型による IsSolvable
+/-- `Group.IsSolvable A ⇒ Group.IsSolvable (Γ ⧸ inl.range)`.
+`rightHom` の核が `inl.range` で `rightHom` は全射, 第一同型定理 + 同型による Group.IsSolvable
 の移送. -/
 private lemma isSolvable_quotient_inlRange_of_isSolvable
-    {φ : A →* MulAut G} [IsSolvable A] :
-    IsSolvable (SemidirectProduct G A φ ⧸
+    {φ : A →* MulAut G} [Group.IsSolvable A] :
+    Group.IsSolvable (SemidirectProduct G A φ ⧸
       (SemidirectProduct.inl : G →* SemidirectProduct G A φ).range) := by
   -- Compose two isos: Γ⧸inl.range ≃ Γ⧸rightHom.ker ≃ A.
   have h_ker_eq : (SemidirectProduct.inl : G →* SemidirectProduct G A φ).range =
@@ -156,7 +156,7 @@ private lemma isSolvable_quotient_inlRange_of_isSolvable
   let h_iso : A ≃* SemidirectProduct G A φ ⧸
       (SemidirectProduct.inl : G →* SemidirectProduct G A φ).range :=
     (h_iso1.trans h_iso2).symm
-  exact solvable_of_surjective (f := h_iso.toMonoidHom) h_iso.surjective
+  exact Group.isSolvable_of_surjective (f := h_iso.toMonoidHom) h_iso.surjective
 
 omit [Finite A] in
 /-- `inl.range` の `Γ = G ⋊ A` における index は `Nat.card A`. -/
@@ -186,11 +186,11 @@ complement of `G` in `Γ`. `inr(A)` is too. SZ conjugacy: `H = (inr A)^x` for `x
 Then `x⁻¹ • α` is `A`-invariant. -/
 theorem glauberman_fixed_point_exists
     {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G)
     {Ω : Type*} [MulAction G Ω] [MulAction A Ω] [Nonempty Ω]
     (h : IsCompatibleMulAction φ Ω) (hG_trans : MulAction.IsPretransitive G Ω) :
     ∃ α : Ω, ∀ a : A, a • α = α := by
-  letI := h.toMulAction
+  let := h.toMulAction
   -- Notation.
   set α₀ : Ω := Classical.arbitrary Ω with hα₀_def
   set Γ := SemidirectProduct G A φ with hΓ_def
@@ -198,7 +198,7 @@ theorem glauberman_fixed_point_exists
   set inrA : Subgroup Γ := (SemidirectProduct.inr : A →* Γ).range with hinrA_def
   set U : Subgroup Γ := MulAction.stabilizer Γ α₀ with hU_def
   -- inlG normal in Γ.
-  haveI hinlG_normal : inlG.Normal := by
+  have hinlG_normal : inlG.Normal := by
     rw [hinlG_def, SemidirectProduct.range_inl_eq_ker_rightHom]; infer_instance
   -- inlG.index = Nat.card A.
   have h_index_A : inlG.index = Nat.card A := inlRange_index_eq_card_A
@@ -209,7 +209,7 @@ theorem glauberman_fixed_point_exists
   have h_coprime_inlG : Nat.Coprime (Nat.card inlG) inlG.index := by
     rw [h_card_inlG, h_index_A]; exact hCop.symm
   -- Solvability transfer to inlG or Γ/inlG.
-  have hSolv_inlG : IsSolvable inlG ∨ IsSolvable (Γ ⧸ inlG) := by
+  have hSolv_inlG : Group.IsSolvable inlG ∨ Group.IsSolvable (Γ ⧸ inlG) := by
     rcases hSolv with hA | hG
     · exact Or.inr (isSolvable_quotient_inlRange_of_isSolvable (φ := φ))
     · exact Or.inl (isSolvable_inlRange_of_isSolvable (φ := φ))
@@ -254,7 +254,7 @@ theorem glauberman_fixed_point_exists
   have h_coprime_subof : Nat.Coprime (Nat.card (inlG.subgroupOf U)) (inlG.subgroupOf U).index := by
     rw [h_subof_index]
     exact hCop.symm.coprime_dvd_left h_card_subof_dvd_G
-  haveI hU_finite : Finite U := Subtype.finite
+  have hU_finite : Finite U := Subtype.finite
   obtain ⟨H_in_U, hH_compl_in_U⟩ :=
     Subgroup.exists_right_complement'_of_coprime (N := inlG.subgroupOf U) h_coprime_subof
   -- Step 4: H := H_in_U.map U.subtype is a complement of inlG in Γ.
@@ -289,7 +289,7 @@ theorem glauberman_fixed_point_exists
     rw [hinlG_def, hinrA_def]
     exact OddOrder.Isaacs.Ch03.inl_range_isComplement_inr_range φ
   -- Step 6: SZ conjugacy: ∃ n ∈ inlG, inrA.map (conj n).toMonoidHom = H.
-  haveI hΓ_finite : Finite Γ := by rw [hΓ_def]; infer_instance
+  have hΓ_finite : Finite Γ := by rw [hΓ_def]; infer_instance
   obtain ⟨n, hn_in_inlG, hn_conj⟩ :=
     Subgroup.IsComplement'.exists_conj_of_coprime h_coprime_inlG hSolv_inlG
       h_inrA_compl hH_compl_inlG
@@ -336,7 +336,7 @@ theorem glauberman_fixed_point_exists
 Apply 3.24(a) with (A, H, X) to get x ∈ X A-fixed, i.e., x ∈ C_G(A) ∩ X. -/
 theorem glauberman_fixed_points_conj
     {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G)
     {Ω : Type*} [MulAction G Ω] [MulAction A Ω]
     (h : IsCompatibleMulAction φ Ω) (hG_trans : MulAction.IsPretransitive G Ω)
     {α β : Ω} (hα : ∀ a : A, a • α = α) (hβ : ∀ a : A, a • β = β) :
@@ -366,11 +366,11 @@ theorem glauberman_fixed_points_conj
   -- X := transporter from α to β: { g : G // g • α = β }.
   let X := { g : G // g • α = β }
   -- X nonempty by G transitive.
-  haveI hX_nonempty : Nonempty X := by
+  have hX_nonempty : Nonempty X := by
     obtain ⟨g, hg⟩ := hG_trans.exists_smul_eq α β
     exact ⟨⟨g, hg⟩⟩
   -- H acts on X by left multiplication.
-  letI mulH : MulAction ↥H X := {
+  let mulH : MulAction ↥H X := {
     smul := fun h x => ⟨h.val * x.val, by
       rw [mul_smul, x.property]
       exact h.property⟩
@@ -380,7 +380,7 @@ theorem glauberman_fixed_points_conj
       rw [Subgroup.coe_mul, mul_assoc])
   }
   -- A acts on X via φ.
-  letI mulA : MulAction A X := {
+  let mulA : MulAction A X := {
     smul := fun a x => ⟨(φ a) x.val, by
       have hcompat := h a x.val α
       rw [x.property] at hcompat
@@ -416,11 +416,11 @@ theorem glauberman_fixed_points_conj
   have hCop' : Nat.Coprime (Nat.card A) (Nat.card ↥H) :=
     hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card H)
   -- Solvable A ∨ Solvable H.
-  have hSolv' : IsSolvable A ∨ IsSolvable ↥H := by
+  have hSolv' : Group.IsSolvable A ∨ Group.IsSolvable ↥H := by
     rcases hSolv with hA | hG
     · exact Or.inl hA
-    · haveI := hG; exact Or.inr inferInstance
-  haveI hH_finite : Finite ↥H := Subtype.finite
+    · have := hG; exact Or.inr inferInstance
+  have hH_finite : Finite ↥H := Subtype.finite
   -- Apply Glauberman 3.24(a) with (↥H, A, X).
   obtain ⟨x₀, hx₀_fix⟩ :=
     glauberman_fixed_point_exists (G := ↥H) (A := A) (φ := hH_inv.restrict)
@@ -444,10 +444,10 @@ variable {A : Type*} [Group A] [Finite A] [Finite G]
 `Glauberman 3.24(a)` を `Ω = Sylow p G` に適用 (G 推移 by Sylow C). -/
 theorem exists_aInvariant_sylow
     {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G) (p : ℕ) [Fact p.Prime] :
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G) (p : ℕ) [Fact p.Prime] :
     ∃ P : Sylow p G, IsAInvariant φ (P : Subgroup G) := by
   -- A acts on G via φ as MulDistribMulAction.
-  letI mdma : MulDistribMulAction A G := MulDistribMulAction.compHom G φ
+  let mdma : MulDistribMulAction A G := MulDistribMulAction.compHom G φ
   -- This gives MulAction A (Sylow p G) via Sylow.pointwiseMulAction.
   -- G acts on Sylow p G via conjugation (Sylow.mulAction).
   -- Compatibility: a • (g • P) = (φ a g) • (a • P).
@@ -472,8 +472,8 @@ theorem exists_aInvariant_sylow
       change (φ a) ((MulAut.conj g) z) = MulAut.conj (φ a g) ((φ a) z)
       simp [MulAut.conj_apply, map_mul, map_inv]
   -- G transitive on Sylow p G.
-  haveI hSyl_nonempty : Nonempty (Sylow p G) := inferInstance
-  haveI hSyl_finite : Finite (Sylow p G) := inferInstance
+  have hSyl_nonempty : Nonempty (Sylow p G) := inferInstance
+  have hSyl_finite : Finite (Sylow p G) := inferInstance
   have hG_trans : MulAction.IsPretransitive G (Sylow p G) := Sylow.isPretransitive_of_finite
   -- Apply Glauberman 3.24(a).
   obtain ⟨P, hP_fix⟩ :=
@@ -497,12 +497,12 @@ theorem exists_aInvariant_sylow
 `Glauberman 3.24(b)` の Sylow p G 版. -/
 theorem aInvariant_sylow_conj
     {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G) {p : ℕ} [Fact p.Prime]
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G) {p : ℕ} [Fact p.Prime]
     {S T : Sylow p G} (hS_inv : IsAInvariant φ (S : Subgroup G))
     (hT_inv : IsAInvariant φ (T : Subgroup G)) :
     ∃ c : G, (∀ a : A, (φ a) c = c) ∧ (MulAut.conj c • (S : Subgroup G) = T) := by
   -- Re-establish the Sylow MulAction setup (same as 3.23(a)).
-  letI mdma : MulDistribMulAction A G := MulDistribMulAction.compHom G φ
+  let mdma : MulDistribMulAction A G := MulDistribMulAction.compHom G φ
   have hcompat : IsCompatibleMulAction φ (Sylow p G) := by
     intro a g P
     apply Sylow.ext
@@ -559,7 +559,7 @@ theorem aInvariant_sylow_conj
    つまり `Q` は `G` の Sylow. -/
 theorem aInvariant_pSubgroup_le_aInvariant_sylow
     {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G) {p : ℕ} [Fact p.Prime]
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G) {p : ℕ} [Fact p.Prime]
     {P : Subgroup G} (hP_pgrp : IsPGroup p P) (hP_inv : IsAInvariant φ P) :
     ∃ S : Sylow p G, IsAInvariant φ (S : Subgroup G) ∧ P ≤ S := by
   classical
@@ -573,13 +573,13 @@ theorem aInvariant_pSubgroup_le_aInvariant_sylow
   set N : Subgroup G := Subgroup.normalizer Q with hN_def
   have hQN : Q ≤ N := Subgroup.le_normalizer
   have hN_inv : IsAInvariant φ N := IsAInvariant.normalizer hQ_inv
-  haveI hN_finite : Finite ↥N := Subtype.finite
+  have hN_finite : Finite ↥N := Subtype.finite
   have hCop_N : Nat.Coprime (Nat.card A) (Nat.card ↥N) :=
     hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card N)
-  have hSolv_N : IsSolvable A ∨ IsSolvable ↥N := by
+  have hSolv_N : Group.IsSolvable A ∨ Group.IsSolvable ↥N := by
     rcases hSolv with hA | hG
     · exact Or.inl hA
-    · haveI := hG; exact Or.inr inferInstance
+    · have := hG; exact Or.inr inferInstance
   obtain ⟨R_in_N, hR_in_N_inv⟩ :=
     exists_aInvariant_sylow (G := ↥N) (A := A) (φ := hN_inv.restrict)
       hCop_N hSolv_N p
@@ -639,8 +639,8 @@ theorem aInvariant_pSubgroup_le_aInvariant_sylow
       -- Show T = Q.
       by_contra hT_ne_Q
       have hQT_lt : Q < T := lt_of_le_of_ne hQT (Ne.symm hT_ne_Q)
-      haveI hT_finite : Finite ↥T := Subtype.finite
-      haveI hT_nilp : Group.IsNilpotent ↥T := hT_pgrp.isNilpotent
+      have hT_finite : Finite ↥T := Subtype.finite
+      have hT_nilp : Group.IsNilpotent ↥T := hT_pgrp.isNilpotent
       have hT_nc : NormalizerCondition ↥T := Group.normalizerCondition_of_isNilpotent
       -- Q.subgroupOf T < ⊤ in T.
       have hQT_subOf_lt : Q.subgroupOf T < (⊤ : Subgroup ↥T) := by
@@ -707,15 +707,15 @@ variable {A : Type*} [Group A] [Finite A] [Finite G]
 theorem aInvariant_coset_mem_centralizer_of_coprime_subgroup
     {φ : A →* MulAut G} {N : Subgroup G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card ↥N))
-    (hSolv : IsSolvable A ∨ IsSolvable ↥N)
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable ↥N)
     (hN_inv : IsAInvariant φ N) {g : G}
     (hgN_inv : ∀ a : A, ∃ n ∈ N, φ a g = g * n) :
     ∃ c : G, (∃ n ∈ N, c = g * n) ∧ ∀ a : A, (φ a) c = c := by
   -- Ω := subtype of gN.
   let Ω := { x : G // ∃ n ∈ N, x = g * n }
-  haveI hΩ_nonempty : Nonempty Ω := ⟨⟨g, 1, N.one_mem, (mul_one g).symm⟩⟩
+  have hΩ_nonempty : Nonempty Ω := ⟨⟨g, 1, N.one_mem, (mul_one g).symm⟩⟩
   -- N acts on Ω by right multiplication of inverse (to make it a left action).
-  letI mulN : MulAction ↥N Ω := {
+  let mulN : MulAction ↥N Ω := {
     smul := fun n ω => ⟨ω.val * n.val⁻¹, by
       obtain ⟨m, hm, hω_eq⟩ := ω.property
       refine ⟨m * n.val⁻¹, N.mul_mem hm (N.inv_mem n.property), ?_⟩
@@ -728,7 +728,7 @@ theorem aInvariant_coset_mem_centralizer_of_coprime_subgroup
       rw [Subgroup.coe_mul, mul_inv_rev, mul_assoc])
   }
   -- A acts on Ω via φ.
-  letI mulA : MulAction A Ω := {
+  let mulA : MulAction A Ω := {
     smul := fun a ω => ⟨φ a ω.val, by
       obtain ⟨n, hn, hω_eq⟩ := ω.property
       obtain ⟨m, hm, hg_eq⟩ := hgN_inv a
@@ -761,7 +761,7 @@ theorem aInvariant_coset_mem_centralizer_of_coprime_subgroup
     change ω₁.val * (n₂⁻¹ * n₁)⁻¹ = ω₂.val
     rw [hω₁_eq, hω₂_eq, mul_inv_rev, inv_inv, mul_assoc, ← mul_assoc n₁, mul_inv_cancel, one_mul]
   -- Finite N.
-  haveI hN_finite : Finite ↥N := Subtype.finite
+  have hN_finite : Finite ↥N := Subtype.finite
   -- Apply Glauberman 3.24(a).
   obtain ⟨ω₀, hω₀_fix⟩ :=
     glauberman_fixed_point_exists (G := ↥N) (A := A) (φ := hN_inv.restrict)
@@ -779,16 +779,16 @@ theorem aInvariant_coset_mem_centralizer_of_coprime_subgroup
 hypothesis. -/
 theorem aInvariant_coset_mem_centralizer
     {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G)
     {N : Subgroup G} (hN_inv : IsAInvariant φ N) {g : G}
     (hgN_inv : ∀ a : A, ∃ n ∈ N, φ a g = g * n) :
     ∃ c : G, (∃ n ∈ N, c = g * n) ∧ ∀ a : A, (φ a) c = c := by
   have hCopN : Nat.Coprime (Nat.card A) (Nat.card ↥N) :=
     hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card N)
-  have hSolvN : IsSolvable A ∨ IsSolvable ↥N := by
+  have hSolvN : Group.IsSolvable A ∨ Group.IsSolvable ↥N := by
     rcases hSolv with hA | hG
     · exact Or.inl hA
-    · haveI := hG
+    · have := hG
       exact Or.inr inferInstance
   exact aInvariant_coset_mem_centralizer_of_coprime_subgroup
     hCopN hSolvN hN_inv hgN_inv
@@ -801,7 +801,7 @@ theorem coprime_fixedPoints_quotient_of_coprime_normal
     {φ : A →* MulAut G}
     {N : Subgroup G} [N.Normal]
     (hCop : Nat.Coprime (Nat.card A) (Nat.card ↥N))
-    (hSolv : IsSolvable A ∨ IsSolvable ↥N)
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable ↥N)
     (hN_inv : IsAInvariant φ N) {g : G}
     (hg_fix : ∀ a : A, ∃ n ∈ N, φ a g = g * n) :
     ∃ c : G, (∀ a : A, (φ a) c = c) ∧ (∃ n ∈ N, c = g * n) := by
@@ -813,16 +813,16 @@ theorem coprime_fixedPoints_quotient_of_coprime_normal
 hypothesis. -/
 theorem coprime_fixedPoints_quotient
     {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G)
     {N : Subgroup G} [N.Normal] (hN_inv : IsAInvariant φ N) {g : G}
     (hg_fix : ∀ a : A, ∃ n ∈ N, φ a g = g * n) :
     ∃ c : G, (∀ a : A, (φ a) c = c) ∧ (∃ n ∈ N, c = g * n) := by
   have hCopN : Nat.Coprime (Nat.card A) (Nat.card ↥N) :=
     hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card N)
-  have hSolvN : IsSolvable A ∨ IsSolvable ↥N := by
+  have hSolvN : Group.IsSolvable A ∨ Group.IsSolvable ↥N := by
     rcases hSolv with hA | hG
     · exact Or.inl hA
-    · haveI := hG
+    · have := hG
       exact Or.inr inferInstance
   exact coprime_fixedPoints_quotient_of_coprime_normal
     hCopN hSolvN hN_inv hg_fix
@@ -841,13 +841,13 @@ variable {A : Type*} [Group A] [Finite A] [Finite G]
 
 ⚠ 書籍 3.29 自身は可解性を仮定しない — 本補助形の `hSolv` を巡回還元で外したものが
 `aFixed_quotient_frattini` (下)。 -/
-theorem aFixed_quotient_frattini_of_solvable
+theorem aFixed_quotient_frattini_of_isSolvable
     {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G)
     (h_triv_quot : ∀ a : A, ∀ g : G, ∃ x ∈ (_root_.frattini G), (φ a) g = g * x) :
     ∀ a : A, ∀ g : G, (φ a) g = g := by
   set C : Subgroup G := fixedPointsOfMulAut φ with hC_def
-  haveI hΦ_inv : IsAInvariant φ (_root_.frattini G) := IsAInvariant.frattini φ
+  have hΦ_inv : IsAInvariant φ (_root_.frattini G) := IsAInvariant.frattini φ
   -- Step 1: C ⊔ Φ(G) = ⊤ via Cor 3.28.
   have hCΦ_top : C ⊔ _root_.frattini G = ⊤ := by
     rw [eq_top_iff]
@@ -863,7 +863,7 @@ theorem aFixed_quotient_frattini_of_solvable
     · -- n⁻¹ ∈ Φ
       exact Subgroup.inv_mem _ hn_in
   -- Step 2: Frattini non-generating ⇒ C = ⊤.
-  haveI : IsCoatomic (Subgroup G) := inferInstance
+  have : IsCoatomic (Subgroup G) := inferInstance
   have hC_top : C = ⊤ := frattini_nongenerating hCΦ_top
   -- Step 3: ∀ a g, φ a g = g.
   intro a g
@@ -883,12 +883,12 @@ theorem aFixed_quotient_frattini
     (h_triv_quot : ∀ a : A, ∀ g : G, ∃ x ∈ (_root_.frattini G), (φ a) g = g * x) :
     ∀ a : A, ∀ g : G, (φ a) g = g := by
   intro a g
-  haveI : IsSolvable ↥(Subgroup.zpowers a) := by
-    letI : CommGroup ↥(Subgroup.zpowers a) := IsCyclic.commGroup
+  have : Group.IsSolvable ↥(Subgroup.zpowers a) := by
+    let : CommGroup ↥(Subgroup.zpowers a) := IsCyclic.commGroup
     infer_instance
   have hcop' : Nat.Coprime (Nat.card ↥(Subgroup.zpowers a)) (Nat.card G) :=
     Nat.Coprime.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _) hCop
-  have hres := aFixed_quotient_frattini_of_solvable
+  have hres := aFixed_quotient_frattini_of_isSolvable
     (φ := φ.comp (Subgroup.zpowers a).subtype) hcop' (Or.inl inferInstance)
     (fun b g' => h_triv_quot (b : A) g')
   exact hres ⟨a, Subgroup.mem_zpowers a⟩ g
@@ -944,17 +944,17 @@ compatibility は自己同型性から自明. Glauberman 3.24(a)
 (`glauberman_fixed_point_exists`) で A-固定元を得る. -/
 theorem exists_fixed_isConj_of_aInvariant_class
     {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G)
     {x₀ : G} (hinv : ∀ a : A, IsConj x₀ ((φ a) x₀)) :
     ∃ c : G, IsConj x₀ c ∧ ∀ a : A, (φ a) c = c := by
   classical
-  letI : MulAction G {x : G // IsConj x₀ x} := {
+  let : MulAction G {x : G // IsConj x₀ x} := {
     smul := fun g x => ⟨g * x.val * g⁻¹, x.property.trans (isConj_iff.mpr ⟨g, rfl⟩)⟩
     one_smul := fun x => Subtype.ext (show (1 : G) * x.val * (1 : G)⁻¹ = x.val by simp)
     mul_smul := fun g h x => Subtype.ext (by
       change g * h * x.val * (g * h)⁻¹ = g * (h * x.val * h⁻¹) * g⁻¹
       group) }
-  letI : MulAction A {x : G // IsConj x₀ x} := {
+  let : MulAction A {x : G // IsConj x₀ x} := {
     smul := fun a x => ⟨(φ a) x.val,
       by exact (hinv a).trans ((φ a).toMonoidHom.map_isConj x.property)⟩
     one_smul := fun x => Subtype.ext (show (φ 1) x.val = x.val by simp)
@@ -965,7 +965,7 @@ theorem exists_fixed_isConj_of_aInvariant_class
     refine Subtype.ext ?_
     change (φ a) (g * x.val * g⁻¹) = (φ a) g * (φ a) x.val * ((φ a) g)⁻¹
     simp [map_mul]
-  haveI : Nonempty {x : G // IsConj x₀ x} := ⟨⟨x₀, IsConj.refl x₀⟩⟩
+  have : Nonempty {x : G // IsConj x₀ x} := ⟨⟨x₀, IsConj.refl x₀⟩⟩
   have htrans : MulAction.IsPretransitive G {x : G // IsConj x₀ x} := by
     constructor
     intro x y
@@ -981,19 +981,19 @@ A-固定な `x, y` が `G` で共役なら, A-固定な元 `c` (∈ `C_G(A)`) �
 Glauberman 3.24(b) (`glauberman_fixed_points_conj`). -/
 theorem exists_fixed_conj_of_isConj_of_fixed
     {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G)
     {x y : G} (hx : ∀ a : A, (φ a) x = x) (hy : ∀ a : A, (φ a) y = y)
     (hxy : IsConj x y) :
     ∃ c : G, (∀ a : A, (φ a) c = c) ∧ c * x * c⁻¹ = y := by
   classical
   have hinv : ∀ a : A, IsConj x ((φ a) x) := fun a => by rw [hx a]
-  letI : MulAction G {z : G // IsConj x z} := {
+  let : MulAction G {z : G // IsConj x z} := {
     smul := fun g z => ⟨g * z.val * g⁻¹, z.property.trans (isConj_iff.mpr ⟨g, rfl⟩)⟩
     one_smul := fun z => Subtype.ext (show (1 : G) * z.val * (1 : G)⁻¹ = z.val by simp)
     mul_smul := fun g h z => Subtype.ext (by
       change g * h * z.val * (g * h)⁻¹ = g * (h * z.val * h⁻¹) * g⁻¹
       group) }
-  letI : MulAction A {z : G // IsConj x z} := {
+  let : MulAction A {z : G // IsConj x z} := {
     smul := fun a z => ⟨(φ a) z.val,
       by exact (hinv a).trans ((φ a).toMonoidHom.map_isConj z.property)⟩
     one_smul := fun z => Subtype.ext (show (φ 1) z.val = z.val by simp)
@@ -1032,7 +1032,7 @@ open OddOrder.GroupTheory in
 (no fusion; `exists_fixed_conj_of_isConj_of_fixed` の packaging). -/
 theorem conjClasses_map_fixedSubgroup_injective {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G) :
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G) :
     Function.Injective
       (ConjClasses.map (fixedSubgroup φ (⊤ : Subgroup A)).subtype) := by
   intro d₁ d₂ h
@@ -1050,7 +1050,7 @@ open OddOrder.GroupTheory in
 (`exists_fixed_isConj_of_aInvariant_class` の packaging). -/
 theorem conjClasses_map_fixedSubgroup_surjective_of_aInvariant {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G)
     {c : ConjClasses G} (hc : ∀ a : A, c.map (φ a).toMonoidHom = c) :
     ∃ d : ConjClasses ↥(fixedSubgroup φ (⊤ : Subgroup A)),
       d.map (fixedSubgroup φ (⊤ : Subgroup A)).subtype = c := by
@@ -1068,7 +1068,7 @@ open OddOrder.GroupTheory in
 **`G` の A-不変共役類全体と全単射**. 書籍の `K ↦ K ∩ C` はこの逆写像. -/
 noncomputable def aInvariantConjClassesEquiv {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G) :
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G) :
     ConjClasses ↥(fixedSubgroup φ (⊤ : Subgroup A)) ≃
       {c : ConjClasses G // ∀ a : A, c.map (φ a).toMonoidHom = c} :=
   Equiv.ofBijective
@@ -1112,7 +1112,7 @@ Thm 3.23(b) (`aInvariant_sylow_conj`) で `Q^c = P` (`c ∈ C`). すると
 `P ∩ C ⊇ (Q ∩ C)^c ⊇ S^c` は Sylow `S^c` を含む `C` の `p`-部分群. -/
 theorem card_inf_fixedSubgroup_of_aInvariant_sylow {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G) {p : ℕ} [hp : Fact p.Prime]
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G) {p : ℕ} [hp : Fact p.Prime]
     {P : Sylow p G} (hP_inv : IsAInvariant φ (P : Subgroup G)) :
     Nat.card ↥((P : Subgroup G) ⊓ fixedSubgroup φ (⊤ : Subgroup A)) =
       p ^ (Nat.card ↥(fixedSubgroup φ (⊤ : Subgroup A))).factorization p := by

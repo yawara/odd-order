@@ -42,7 +42,7 @@ theorem APrime_inf_sylow_eq_bot_of_hasNormalPComplement [Finite G] {p : ℕ} [Fa
     APrime p G ⊓ (P : Subgroup G) = ⊥ := by
   classical
   obtain ⟨N, hNnormal, hNcompl⟩ := hG
-  haveI := hNnormal
+  have := hNnormal
   have hcompl := hNcompl P
   -- `commutator G ≤ N`: `G = N · P` と `P` 可換から `G/N` は可換
   have hcomm : _root_.commutator G ≤ N := by
@@ -101,7 +101,7 @@ theorem hasNormalPComplement_of_controlsPTransfer [Finite G] {p : ℕ} [Fact p.P
     (hH : HasNormalPComplement p ↥H) :
     HasNormalPComplement p G := by
   classical
-  haveI hPHab : IsMulCommutative ↥((P.subtype hPH : Sylow p ↥H) : Subgroup ↥H) := by
+  have hPHab : IsMulCommutative ↥((P.subtype hPH : Sylow p ↥H) : Subgroup ↥H) := by
     refine ⟨⟨fun x y => ?_⟩⟩
     have hGeq : (((x : ↥H) : G)) * (((y : ↥H) : G)) = (((y : ↥H) : G)) * (((x : ↥H) : G)) :=
       congrArg Subtype.val
@@ -134,7 +134,7 @@ theorem hasNormalPComplement_of_sylow_le_center [Finite G] {p : ℕ} [Fact p.Pri
     (P : Sylow p G) (hZ : (P : Subgroup G) ≤ Subgroup.center G) :
     HasNormalPComplement p G := by
   classical
-  haveI hPnormal : (P : Subgroup G).Normal := by
+  have hPnormal : (P : Subgroup G).Normal := by
     refine ⟨fun n hn g => ?_⟩
     have hc : g * n = n * g := Subgroup.mem_center_iff.mp (hZ hn) g
     have hfix : g * n * g⁻¹ = n := by rw [hc]; group
@@ -149,7 +149,7 @@ theorem hasNormalPComplement_of_sylow_le_center [Finite G] {p : ℕ} [Fact p.Pri
     have h := Subgroup.normal_mul (N := (P : Subgroup G)) (H := K)
     rw [hK.sup_eq_top] at h
     exact h
-  haveI hKnormal : K.Normal := by
+  have hKnormal : K.Normal := by
     refine ⟨fun y hy g => ?_⟩
     have hgin : g ∈ ((P : Subgroup G) : Set G) * (K : Set G) := by
       rw [← hmul]; exact Subgroup.mem_top g
@@ -183,7 +183,7 @@ example [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G)
   classical
   have hPN : (P : Subgroup G) ≤ Subgroup.normalizer ((P : Subgroup G) : Set G) :=
     Subgroup.le_normalizer
-  haveI hPab : IsMulCommutative ↥(P : Subgroup G) := by
+  have hPab : IsMulCommutative ↥(P : Subgroup G) := by
     refine ⟨⟨fun x y => Subtype.ext ?_⟩⟩
     exact Subgroup.mem_centralizer_iff.mp (hP (hPN y.2)) _ x.2
   -- `N_G(P)` の中で `P` は中心的

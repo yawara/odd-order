@@ -74,7 +74,7 @@ mathlib の `MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center`
 theorem isMulCommutative_comap_of_isCyclic {Γ G : Type*} [Group Γ] [Group G] {f : Γ →* G}
     (hker : f.ker ≤ Subgroup.center Γ) {C : Subgroup G} (hC : IsCyclic ↥C) :
     IsMulCommutative ↥(C.comap f) := by
-  haveI := hC
+  have := hC
   refine MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
     (((f.comp (C.comap f).subtype).codRestrict C (fun a => Subgroup.mem_comap.mp a.2))) ?_
   intro a ha
@@ -104,7 +104,7 @@ theorem relIndex_commutator_eq_card_inf_center {Γ : Type*} [Group Γ] [Finite �
     {A : Subgroup Γ} [A.Normal]
     (hAb : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a) (hCyc : IsCyclic (Γ ⧸ A)) :
     (_root_.commutator Γ).relIndex A = Nat.card (A ⊓ Subgroup.center Γ : Subgroup Γ) := by
-  haveI := hCyc
+  have := hCyc
   -- Γ' ≤ A: Γ/A は cyclic ⇒ 可換
   have hle : _root_.commutator Γ ≤ A :=
     Subgroup.Normal.quotient_commutative_iff_commutator_le.mp inferInstance
@@ -135,7 +135,7 @@ theorem card_ker_dvd_relIndex_commutator {Γ G : Type*} [Group Γ] [Group G] [Fi
     {f : Γ →* G} (hf : IsStemExtension f) {C : Subgroup G} [C.Normal]
     (hC : IsCyclic ↥C) (hGC : IsCyclic (G ⧸ C)) :
     Nat.card f.ker ∣ (_root_.commutator G).relIndex C := by
-  haveI := hGC
+  have := hGC
   -- A := f⁻¹(C)
   have hAb : ∀ a ∈ C.comap f, ∀ b ∈ C.comap f, a * b = b * a :=
     forall_mul_comm_of_isMulCommutative (isMulCommutative_comap_of_isCyclic hf.ker_le_center hC)
@@ -176,7 +176,7 @@ theorem card_ker_dvd_relIndex_commutator {Γ G : Type*} [Group Γ] [Group G] [Fi
 theorem isCyclic_quotient_of_mul_eq_top {G : Type*} [Group G] {B C : Subgroup G} [C.Normal]
     (hB : IsCyclic ↥B) (hBC : ∀ g : G, ∃ b ∈ B, ∃ c ∈ C, g = b * c) :
     IsCyclic (G ⧸ C) := by
-  haveI := hB
+  have := hB
   refine isCyclic_of_surjective ((QuotientGroup.mk' C).comp B.subtype) ?_
   intro x
   obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective x
@@ -201,7 +201,7 @@ theorem card_ker_lt_relIndex_commutator {Γ G : Type*} [Group Γ] [Group G] [Fin
     (hB : IsCyclic ↥B) (hC : IsCyclic ↥C)
     (hBC : ∀ g : G, ∃ b ∈ B, ∃ c ∈ C, g = b * c) (hne : B ⊓ C ≠ ⊥) :
     Nat.card f.ker < (_root_.commutator G).relIndex C := by
-  haveI := isCyclic_quotient_of_mul_eq_top hB hBC
+  have := isCyclic_quotient_of_mul_eq_top hB hBC
   -- A = f⁻¹(C), D = f⁻¹(B) は可換
   have hAcomm := isMulCommutative_comap_of_isCyclic hf.ker_le_center hC
   have hDcomm := isMulCommutative_comap_of_isCyclic hf.ker_le_center hB
@@ -330,7 +330,7 @@ theorem not_dvd_card_commutator_of_sylow_le_center {G : Type*} [Group G] [Finite
     rw [_root_.commutator_def, Subgroup.commutator_le]
     intro a _ b _
     rw [MonoidHom.mem_ker, map_commutatorElement, commutatorElement_eq_one_iff_mul_comm]
-    haveI : IsMulCommutative (P : Subgroup G) :=
+    have : IsMulCommutative (P : Subgroup G) :=
       ⟨⟨fun u v => Subtype.ext (hnorm (Subgroup.le_normalizer v.2) u u.2)⟩⟩
     exact mul_comm (MonoidHom.transferSylow P hnorm a) (MonoidHom.transferSylow P hnorm b)
   intro hdvd

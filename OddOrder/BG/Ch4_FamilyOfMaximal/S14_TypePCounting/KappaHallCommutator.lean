@@ -88,7 +88,7 @@ theorem typeF_complement_q_notMem_tau3 [Finite G] (hG : OddOrder.BG.IsMinimalSim
     (hQF : ¬ Q ≤ OddOrder.BG.Ch2.S08.fittingInG E) :
     q ∉ tau3 M := by
   intro hτ3
-  haveI hE₃norm : (E₃.subgroupOf E).Normal :=
+  have hE₃norm : (E₃.subgroupOf E).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hsetup.E₃_le).mpr (hsetup.E3_normal hG)
   have hQcard : Nat.card ↥Q = q := by rw [hQ.2, pow_one]
   have hQpiG : Ch03.Subgroup.IsPiGroup (tau3 M) (Q.subgroupOf E) := by
@@ -115,7 +115,7 @@ theorem typeF_complement_q_tau1_and_centralizer [Finite G]
     (hQF : ¬ Q ≤ OddOrder.BG.Ch2.S08.fittingInG E) :
     q ∈ tau1 M ∧ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (Q : Set G) = ⊥ := by
   have hqpf : q ∈ (Nat.card ↥E).primeFactors := hq
-  haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hqpf⟩
+  have : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hqpf⟩
   have hqτ1 : q ∈ tau1 M := by
     rcases hsetup.mem_tau_union_of_mem_primeFactors hG hqpf with (h | h) | h
     · exact h
@@ -173,16 +173,16 @@ private theorem Q_le_fittingInG_of_commutator_centralizesQ [Finite G]
     have hRSe : R ≤ Se := fun x hx => ⟨Subgroup.mem_sup_right hx,
       Subgroup.mem_sup_right (hRE_comm (Subgroup.commutator_mem_commutator hx he))⟩
     exact ((sup_le hQSe hRSe : (Q ⊔ R) ≤ Se) hn).2
-  haveI hNnorm : ((Q ⊔ R).subgroupOf E).Normal :=
+  have hNnorm : ((Q ⊔ R).subgroupOf E).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hNE).mpr hEnormN
   have hNab : IsMulCommutative ↥(Q ⊔ R : Subgroup G) := by
     refine isMulCommutative_of_le_centralizer ?_
     rw [centralizer_sup_eq]
     exact le_inf (sup_le (le_centralizer_of_le_of_le hQab le_rfl le_rfl) hC)
       (sup_le hC' (le_centralizer_of_le_of_le hRab le_rfl le_rfl))
-  haveI : IsMulCommutative ↥(Q ⊔ R : Subgroup G) := hNab
-  haveI : Group.IsNilpotent ↥(Q ⊔ R : Subgroup G) := inferInstance
-  haveI : Group.IsNilpotent ↥((Q ⊔ R).subgroupOf E) :=
+  have : IsMulCommutative ↥(Q ⊔ R : Subgroup G) := hNab
+  have : Group.IsNilpotent ↥(Q ⊔ R : Subgroup G) := inferInstance
+  have : Group.IsNilpotent ↥((Q ⊔ R).subgroupOf E) :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hNE).symm
   have hfit : (Q ⊔ R).subgroupOf E ≤ OddOrder.Isaacs.Ch01.fitting ↥E :=
     Ch01.nilpotent_normal_le_fitting
@@ -219,7 +219,7 @@ theorem exists_typeF_complement_cyclic_commutator [Finite G]
       Subgroup.centralizer (Q : Set G) ⊓ K' = ⊥ := by
   classical
   have hqpf : q ∈ (Nat.card ↥E).primeFactors := hq
-  haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hqpf⟩
+  have : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hqpf⟩
   obtain ⟨hqτ1, hCQ⟩ := typeF_complement_q_tau1_and_centralizer hG hsetup hF hq hQ hQE hQF
   have hQM : Q ≤ M := hQE.trans hsetup.E_le
   -- `K := ⁅E, Q⁆` is an abelian `q'`-subgroup of `M`, `σ(M)'`-subgroup.
@@ -272,7 +272,7 @@ theorem exists_typeF_complement_cyclic_commutator [Finite G]
   have hπτ2 : ∀ p ∈ (Nat.card ↥K').primeFactors, p ∈ tau2 M := by
     intro p hp
     obtain ⟨hpp, hpd, -⟩ := Nat.mem_primeFactors.mp hp
-    haveI : Fact p.Prime := ⟨hpp⟩
+    have : Fact p.Prime := ⟨hpp⟩
     by_contra hpτ2
     have hpE : p ∈ (Nat.card ↥E).primeFactors :=
       Nat.mem_primeFactors.mpr ⟨hpp, hpd.trans (Subgroup.card_dvd_of_le hK'E), Nat.card_pos.ne'⟩
@@ -314,7 +314,7 @@ theorem exists_typeF_complement_cyclic_commutator [Finite G]
     exact Msigma_ne_bot hG hsetup.mem_maximal hinf.symm
   -- `Q` acts fixed-point-freely on `K'`: coprime identity `⁅K', Q⁆ = K'`.
   have hqprime : q.Prime := Fact.out
-  haveI hK'ab : IsMulCommutative ↥K' := isMulCommutative_of_le (hKdef ▸ hKab) hK'_le_K
+  have hK'ab : IsMulCommutative ↥K' := isMulCommutative_of_le (hKdef ▸ hKab) hK'_le_K
   have hQNK' : Q ≤ Subgroup.normalizer (K' : Set G) := hQM.trans hMNK'
   have hqnK : ¬ q ∣ Nat.card ↥K := fun hdvd =>
     hKq' q (Nat.mem_primeFactors.mpr ⟨hqprime, hdvd, Nat.card_pos.ne'⟩) rfl
@@ -326,11 +326,11 @@ theorem exists_typeF_complement_cyclic_commutator [Finite G]
   have hcopK'Q : Nat.Coprime (Nat.card ↥K') (Nat.card ↥Q) := by
     rw [hQcard]; exact (hqprime.coprime_iff_not_dvd.mpr hqnK').symm
   have hident : (⁅K', Q⁆ : Subgroup G) = K' := by
-    haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hsetup.mem_maximal
-    haveI : IsSolvable ↥(K ⊔ Q) :=
-      solvable_of_solvable_injective (Subgroup.inclusion_injective (sup_le hKM hQM))
+    have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hsetup.mem_maximal
+    have : Group.IsSolvable ↥(K ⊔ Q) :=
+      Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective (sup_le hKM hQM))
     have hid := commutator_commutator_right_eq_of_le_normalizer (D := K) (Q := Q)
-      ‹IsSolvable ↥(K ⊔ Q)› (le_inf_iff.mp hQNK).1 hcopKQ
+      ‹Group.IsSolvable ↥(K ⊔ Q)› (le_inf_iff.mp hQNK).1 hcopKQ
     rw [← hK'def] at hid
     exact hid
   have hFPF : Subgroup.centralizer (Q : Set G) ⊓ K' = ⊥ := by
@@ -417,14 +417,14 @@ theorem exists_maximal_of_typeF_notMem_fitting [Finite G]
   classical
   obtain ⟨E₁, E₂, E₃, hsetup⟩ := esetup_of_isComplement hG hM hE hEM
   have hqpf : q ∈ (Nat.card ↥E).primeFactors := hq
-  haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hqpf⟩
+  have : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hqpf⟩
   have hqprime : q.Prime := Fact.out
   obtain ⟨K', hK'E, hK'ne, hK'cyc, hK'cent, hMNK', hπK'τ2, hFPF⟩ :=
     exists_typeF_complement_cyclic_commutator hG hsetup hF hq hQ hQE hQF
-  haveI : IsCyclic ↥K' := hK'cyc
+  have : IsCyclic ↥K' := hK'cyc
   obtain ⟨p, hpp, hpd⟩ :=
     Nat.exists_prime_and_dvd (show Nat.card ↥K' ≠ 1 from fun h => hK'ne (Subgroup.card_eq_one.mp h))
-  haveI : Fact p.Prime := ⟨hpp⟩
+  have : Fact p.Prime := ⟨hpp⟩
   have hpτ2 : p ∈ tau2 M := hπK'τ2 p (Nat.mem_primeFactors.mpr ⟨hpp, hpd, Nat.card_pos.ne'⟩)
   obtain ⟨a, ha⟩ := exists_prime_orderOf_dvd_card' (G := ↥K') p hpd
   set L : Subgroup G := Subgroup.zpowers (a : G) with hLdef
@@ -438,7 +438,7 @@ theorem exists_maximal_of_typeF_notMem_fitting [Finite G]
       ⟨Subgroup.IsElementaryAbelian.of_card_prime hLcard, by rw [hLcard, pow_one]⟩
   have hLne : L ≠ ⊥ := ne_bot_of_mem_elemAbelianOfRank_one hLelem
   have hLM_norm : M ≤ Subgroup.normalizer (L : Set G) := by
-    haveI : (L.subgroupOf K').Characteristic := Ch04.characteristic_of_subgroup_of_isCyclic _
+    have : (L.subgroupOf K').Characteristic := Ch04.characteristic_of_subgroup_of_isCyclic _
     intro m hm
     have hmem := OddOrder.BG.Ch1.S03f.mem_normalizer_map_subtype_of_characteristic
       (W := K') (C := L.subgroupOf K') (hMNK' hm)
@@ -479,7 +479,7 @@ theorem exists_maximal_of_typeF_notMem_fitting [Finite G]
     have hENc : E ≤ Subgroup.normalizer (c : Set G) :=
       hcdef ▸ le_normalizer_inf Subgroup.le_normalizer
         (hENA.trans (normalizer_le_normalizer_centralizer A))
-    haveI hcnorm : (c.subgroupOf E).Normal :=
+    have hcnorm : (c.subgroupOf E).Normal :=
       (Subgroup.normal_subgroupOf_iff_le_normalizer hcE).mpr hENc
     have hQ'qg : IsPGroup q ↥(Q.subgroupOf E) := by
       rw [IsPGroup.iff_card]
@@ -514,7 +514,7 @@ theorem exists_maximal_of_typeF_notMem_fitting [Finite G]
     rcases (isTypeP_iff_isTypeP1_or_isTypeP2).mp hPtype with h1 | h2
     · exact h1
     · exfalso
-      haveI : IsSolvable ↥Mstar := hG.solvable_of_mem_maximalSubgroups hMstarmax
+      have : Group.IsSolvable ↥Mstar := hG.isSolvable_of_mem_maximalSubgroups hMstarmax
       obtain ⟨Ksub, hKsub⟩ := Ch03.hall_E_exists (G := ↥Mstar) (kappa Mstar)
       obtain ⟨Usub, hUsub⟩ :=
         Ch03.hall_E_exists (G := ↥Mstar) ((kappa Mstar ∪ OddOrder.BG.Ch3.S10.sigma Mstar)ᶜ)
@@ -542,7 +542,7 @@ theorem exists_maximal_of_typeF_notMem_fitting [Finite G]
       rw [← hcl]; exact (Subgroup.centralizer_closure {X}).symm
     have hτ2cl : ∀ r ∈ piSet (Subgroup.closure ({X} : Set G)), r ∈ tau2 Mstar := by
       intro r hr
-      rw [hcl, piSet, Set.mem_setOf_eq, hQcard, Nat.mem_primeFactors] at hr
+      rw [hcl, piSet, Set.mem_ofPred_eq, hQcard, Nat.mem_primeFactors] at hr
       exact ((Nat.prime_dvd_prime_iff_eq hr.1 hqprime).mp hr.2.1) ▸ hτ2
     have hsingle := maximalContaining_centralizer_eq_singleton_of_tau2_element hG hMstarmax
       (hQMstar hXQ) hX1 hτ2cl (by rw [hCeq]; exact hCMσQ)
@@ -570,7 +570,7 @@ theorem typeP_centralizer_kappaElement_eq [Finite G] (hG : OddOrder.BG.IsMinimal
   -- A prime `p ∣ |k|` and an element `v ∈ ⟨k⟩` of order `p`.
   have hord1 : orderOf k ≠ 1 := fun h => hk1 (orderOf_eq_one_iff.mp h)
   obtain ⟨p, hp, hpk⟩ := (orderOf k).exists_prime_and_dvd hord1
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hpcard : p ∣ Nat.card ↥(Subgroup.zpowers k) := by rw [Nat.card_zpowers]; exact hpk
   obtain ⟨v, hv⟩ := exists_prime_orderOf_dvd_card' p hpcard
   -- `X = ⟨v⟩` is rank-one elementary abelian and `X ≤ K`.
@@ -627,9 +627,9 @@ theorem typeP_sigmaElement_mem_Kstar [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     {y y' : G} (hyMsigma : y ∈ OddOrder.BG.Ch3.S10.Msigma M) (hy'K : y' ∈ K) (hy'1 : y' ≠ 1)
     (hcent : y ∈ Subgroup.centralizer ({y'} : Set G)) :
     y ∈ Kstar := by
-  haveI hcycZ : IsCyclic ↥(K ⊔ Kstar) :=
+  have hcycZ : IsCyclic ↥(K ⊔ Kstar) :=
     typeP_Z_isCyclic hG D hM hP hKM hK hKstar hU hMstarmem hMstarne hpart
-  haveI hcycK : IsCyclic ↥K :=
+  have hcycK : IsCyclic ↥K :=
     (Subgroup.subgroupOfEquivOfLe (le_sup_left : K ≤ K ⊔ Kstar)).isCyclic.mp inferInstance
   have hyM : y ∈ M := OddOrder.BG.Ch3.S10.Msigma_le M hyMsigma
   have hyMC : y ∈ M ⊓ Subgroup.centralizer ({y'} : Set G) := Subgroup.mem_inf.mpr ⟨hyM, hcent⟩
@@ -953,8 +953,8 @@ theorem partner_inf_and_uniq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hMsMst : OddOrder.BG.Ch3.S10.Msigma M ⊓ Mstar = Kstar) :
     M ⊓ Mstar = K ⊔ Kstar ∧ (∀ a : G, K ≤ MulAut.conj a • Mstar → a ∈ Mstar) := by
   classical
-  haveI : IsSolvable ↥Mstar := hG.solvable_of_mem_maximalSubgroups hMstmax
-  haveI := hZcyc
+  have : Group.IsSolvable ↥Mstar := hG.isSolvable_of_mem_maximalSubgroups hMstmax
+  have := hZcyc
   -- A Hall `(κ(M*) ∪ σ(M*))'`-subgroup of `M*`, to feed `typeP_structure`.
   obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥Mstar)
     ((kappa Mstar ∪ OddOrder.BG.Ch3.S10.sigma Mstar)ᶜ)
@@ -968,7 +968,7 @@ theorem partner_inf_and_uniq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hTI := hstruct.2.2.2.1
   -- `K ≤ C(K*)` (`Z = K ⊔ K*` cyclic ⟹ abelian).
   have hKcKstar : K ≤ Subgroup.centralizer (Kstar : Set G) := by
-    letI : CommGroup ↥(K ⊔ Kstar) := IsCyclic.commGroup
+    let : CommGroup ↥(K ⊔ Kstar) := IsCyclic.commGroup
     intro k hk
     rw [Subgroup.mem_centralizer_iff]
     intro s hs
@@ -976,11 +976,11 @@ theorem partner_inf_and_uniq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have hsZ : s ∈ (K ⊔ Kstar : Subgroup G) := Subgroup.mem_sup_right hs
     exact congrArg Subtype.val (mul_comm (⟨s, hsZ⟩ : ↥(K ⊔ Kstar)) (⟨k, hkZ⟩ : ↥(K ⊔ Kstar)))
   -- A characteristic order-`p` line `X ≤ K*` (cyclic `K*`).
-  haveI hKstarcyc : IsCyclic ↥Kstar :=
+  have hKstarcyc : IsCyclic ↥Kstar :=
     (Subgroup.subgroupOfEquivOfLe (le_sup_right : Kstar ≤ K ⊔ Kstar)).isCyclic.mp inferInstance
   obtain ⟨p, hp, hpd⟩ := Nat.exists_prime_and_dvd
     (show Nat.card ↥Kstar ≠ 1 from fun h => hKstarNe (Subgroup.card_eq_one.mp h))
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' (G := ↥Kstar) p hpd
   set X : Subgroup G := Subgroup.zpowers (x : G) with hXdef
   have hxord : orderOf (x : G) = p :=
@@ -991,7 +991,7 @@ theorem partner_inf_and_uniq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     mem_elemAbelianOfRank.mpr
       ⟨Subgroup.IsElementaryAbelian.of_card_prime hXcard, by rw [hXcard, pow_one]⟩
   have hNKstarX : Subgroup.normalizer (Kstar : Set G) ≤ Subgroup.normalizer (X : Set G) := by
-    haveI : (X.subgroupOf Kstar).Characteristic := Ch04.characteristic_of_subgroup_of_isCyclic _
+    have : (X.subgroupOf Kstar).Characteristic := Ch04.characteristic_of_subgroup_of_isCyclic _
     intro g hg
     have hmem := OddOrder.BG.Ch1.S03f.mem_normalizer_map_subtype_of_characteristic
       (W := Kstar) (C := X.subgroupOf Kstar) hg

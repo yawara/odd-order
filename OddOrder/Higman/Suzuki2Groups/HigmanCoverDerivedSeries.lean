@@ -43,13 +43,13 @@ theorem agemo_one_eq_commutator_of_derived_map_eq_left
     (hC : IsPGroup 2 C)
     (hderived : (_root_.commutator C).map C.subtype = A) :
     Agemo C 2 1 = _root_.commutator C := by
-  letI : C.Normal := h.right.1
+  let : C.Normal := h.right.1
   have hCne : C ≠ ⊥ := by
     intro hCbot
     have hlt : A < (⊥ : Subgroup P) := by
       simpa [hCbot] using h.lt
     exact (not_lt_of_ge bot_le) hlt
-  letI : Nontrivial C := (Subgroup.nontrivial_iff_ne_bot C).mpr hCne
+  let : Nontrivial C := (Subgroup.nontrivial_iff_ne_bot C).mpr hCne
   let B : Subgroup P := (Agemo C 2 1).map C.subtype
   obtain ⟨hBinv, hBnormal, hBC⟩ :=
     aInvariant_normal_map_of_characteristic h.right.2 (Agemo C 2 1)
@@ -156,7 +156,7 @@ private theorem agemo_succ_le_lowerCentralTermIn
     letI : CommGroup A :=
       { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
     Agemo A 2 (s + 1) ≤ lowerCentralTermIn A C (i + 1) := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
   intro x hx
   change ((x : A) : P) ∈ (lowerCentralTerm C (i + 1)).map C.subtype
@@ -196,7 +196,7 @@ private theorem lowerCentralTerm_map_eq_agemo_succ
       (lowerCentralTerm C i).subtype ≤ lowerCentralTerm C (i + 1)) :
     (lowerCentralTerm C (i + 1)).map C.subtype =
       (Agemo A 2 (s + 1)).map A.subtype := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
   let U : Subgroup A := lowerCentralTermIn A C (i + 1)
   have hnextLeA : (lowerCentralTerm C (i + 1)).map C.subtype ≤ A := by
@@ -269,7 +269,7 @@ theorem lowerCentralTerm_maps_eq_first_agemo_terms_of_derived_map_eq_left
         (Agemo A 2 1).map A.subtype ∧
       (lowerCentralTerm C 3).map C.subtype =
         (Agemo A 2 2).map A.subtype := by
-  letI : Group.IsNilpotent C := hC.isNilpotent
+  let : Group.IsNilpotent C := hC.isNilpotent
   have htermOne : lowerCentralTerm C 1 = _root_.commutator C := by
     rw [lowerCentralTerm, Subgroup.top_lowerCentralSeries_one]
   have hmapOne : (lowerCentralTerm C 1).map C.subtype = A := by
@@ -408,18 +408,18 @@ theorem exists_lowerCentralLayerOne_linearEquiv_layerTwo_of_derived_map_eq_left
       ∀ g q,
         E (lowerCentralLayerRepresentation h.right.2.restrict 1 g q) =
           lowerCentralLayerRepresentation h.right.2.restrict 2 g (E q) := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hAcomm.is_comm.comm }
-  letI : IsMulCommutative (lowerCentralLayer C 1) :=
+  let : IsMulCommutative (lowerCentralLayer C 1) :=
     lowerCentralLayerIsMulCommutative C 1
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer C 1)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer C 1)) :=
     lowerCentralLayerZmodModule C 1
-  letI : IsMulCommutative (lowerCentralLayer C 2) :=
+  let : IsMulCommutative (lowerCentralLayer C 2) :=
     lowerCentralLayerIsMulCommutative C 2
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer C 2)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer C 2)) :=
     lowerCentralLayerZmodModule C 2
   intro hirr hA1
-  letI : Nontrivial (AgemoSuccQuotient A 1) := hA1
+  let : Nontrivial (AgemoSuccQuotient A 1) := hA1
   obtain ⟨hmapOne, hmapTwo, _hmapThree⟩ :=
     h.lowerCentralTerm_maps_eq_first_agemo_terms_of_derived_map_eq_left
       hC hAcomm classify hderived
@@ -502,9 +502,9 @@ theorem higmanLemmaEight_pow_two_eq_one_of_transitive
     (hAcomm : IsMulCommutative A)
     (hderived : (_root_.commutator C).map C.subtype = A) :
     ∀ a : A, a ^ 2 = 1 := by
-  letI : A.Normal := hcover.left.1
-  letI : IsCyclic X := hXcyc
-  letI : CommGroup X := IsCyclic.commGroup
+  let : A.Normal := hcover.left.1
+  let : IsCyclic X := hXcyc
+  let : CommGroup X := IsCyclic.commGroup
   by_contra hnotexp
   have hCtwo : IsPGroup 2 C := hP.to_subgroup C
   have hAne : A ≠ ⊥ := by
@@ -519,7 +519,7 @@ theorem higmanLemmaEight_pow_two_eq_one_of_transitive
       simpa using ha
     rw [haone]
     simp
-  letI : Nontrivial A := (Subgroup.nontrivial_iff_ne_bot A).mpr hAne
+  let : Nontrivial A := (Subgroup.nontrivial_iff_ne_bot A).mpr hAne
   obtain ⟨x, y, hx, hy, hxy⟩ := hmulti
   have hinvA : involutions P ⊆ A :=
     involutions_subset_of_nontrivial_invariant
@@ -540,7 +540,7 @@ theorem higmanLemmaEight_pow_two_eq_one_of_transitive
   obtain ⟨ι, hι, e, he, hε, classify⟩ :=
     exists_homocyclic_and_invariant_eq_agemo
       (hP.to_subgroup A) hcover.left.2.restrict htransA
-  letI : Fintype ι := hι
+  let : Fintype ι := hι
   obtain ⟨ε⟩ := hε
   have heTwo : 1 < e := by
     by_contra h
@@ -573,9 +573,9 @@ theorem higmanLemmaEight_pow_two_eq_one_of_transitive
   have hncycOne : ¬ IsCyclic (AgemoSuccQuotient A 1) :=
     not_isCyclic_agemoQuotient_of_two_involutions
       ε (by omega) (by omega) hxA hyA hxyA
-  letI : Nontrivial (AgemoSuccQuotient A 1) :=
+  let : Nontrivial (AgemoSuccQuotient A 1) :=
     Nontrivial.of_not_isCyclic hncycOne
-  letI : Nontrivial (AgemoSuccQuotient A 0) :=
+  let : Nontrivial (AgemoSuccQuotient A 0) :=
     Nontrivial.of_not_isCyclic hncycZero
   have htransAZero : ∀ v w : Additive (AgemoSuccQuotient A 0),
       v ≠ 0 → w ≠ 0 →

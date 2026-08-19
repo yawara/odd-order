@@ -345,15 +345,15 @@ theorem T_typeIII_ratio_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   classical
   have hc1 : hyp.base.c = 1 :=
     hyp.base.c_eq_one_of_lambda_dichotomy hG hyp.nuGridSupply
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Invertible (Nat.card G : ℂ) :=
+  have : Fintype G := Fintype.ofFinite G
+  have : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI := hyp.base.finiteG
-  haveI : Fintype ↥hyp.base.T := Fintype.ofFinite _
-  haveI : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
-  haveI : Invertible (Nat.card ↥hyp.base.T : ℂ) :=
+  have := hyp.base.finiteG
+  have : Fintype ↥hyp.base.T := Fintype.ofFinite _
+  have : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
+  have : Invertible (Nat.card ↥hyp.base.T : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : Invertible (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ) :=
+  have : Invertible (Nat.card ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   -- **Carrier 1 (the coherent `τ₁`-image family, now DISCHARGED from the (14.9) coherence).**
   -- The intrinsic type-III datum builds the degree-`p` `Ind_{QV}^T`-family `calT1_set` with all
@@ -794,7 +794,7 @@ theorem isMulCommutative_typePData_U_of_V [Finite G]
   have hT_le_NQ : hyp.base.T ≤ Subgroup.normalizer (hyp.base.Q : Set G) := by
     rw [hyp.base.Q_eq_TF]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.base.T
-  haveI hQn_normal : (hyp.base.Q.subgroupOf (derivedInG hyp.base.T)).Normal :=
+  have hQn_normal : (hyp.base.Q.subgroupOf (derivedInG hyp.base.T)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQ_le).mpr (hM'_le_T.trans hT_le_NQ)
   have hVcompl : (hyp.base.Q.subgroupOf (derivedInG hyp.base.T)).IsComplement'
       (hyp.base.V.subgroupOf (derivedInG hyp.base.T)) := by
@@ -839,10 +839,10 @@ theorem isMulCommutative_typePData_U_of_V [Finite G]
     exact Nat.Coprime.coprime_dvd_right hdvd h0
   have hQ_lt_top : hyp.base.Q < ⊤ :=
     lt_of_le_of_lt hQ_le_T (lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hyp.base.T_maximal).1)
-  haveI hQsolv : IsSolvable ↥hyp.base.Q := hG.solvable_of_lt_top hyp.base.Q hQ_lt_top
-  have hsolv : IsSolvable ↥(hyp.base.Q.subgroupOf (derivedInG hyp.base.T)) ∨
-      IsSolvable (↥(derivedInG hyp.base.T) ⧸ hyp.base.Q.subgroupOf (derivedInG hyp.base.T)) :=
-    Or.inl (solvable_of_solvable_injective
+  have hQsolv : Group.IsSolvable ↥hyp.base.Q := hG.isSolvable_of_lt_top hyp.base.Q hQ_lt_top
+  have hsolv : Group.IsSolvable ↥(hyp.base.Q.subgroupOf (derivedInG hyp.base.T)) ∨
+      Group.IsSolvable (↥(derivedInG hyp.base.T) ⧸ hyp.base.Q.subgroupOf (derivedInG hyp.base.T)) :=
+    Or.inl (Group.isSolvable_of_isSolvable_injective
       (f := (Subgroup.subgroupOfEquivOfLe hQ_le).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe hQ_le).injective)
   obtain ⟨n, _hnQ, hn⟩ :=

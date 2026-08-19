@@ -143,9 +143,9 @@ theorem frattiniQuotient_factorSubmodules_direct_geometry
     Xbar ⊓ Zbar = ⊥ ∧
       (Xbar ⊔ Zbar) ⊓ Tbar = ⊥ := by
   dsimp only
-  letI : CommGroup (P ⧸ frattini P) :=
+  let : CommGroup (P ⧸ frattini P) :=
     frattiniQuotientCommGroup P hP
-  letI : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
+  let : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
     frattiniQuotientZModTwoModule P hP
   let q := QuotientGroup.mk' (frattini P)
   let E := elabSubmoduleSubgroupEquiv (K := P ⧸ frattini P) 2
@@ -193,9 +193,9 @@ theorem frattiniQuotient_factorSubmodules_full_geometry
       (Xbar ⊔ Zbar) ⊓ Tbar = ⊥ ∧
         Xbar ⊔ Zbar ⊔ Tbar = ⊤ := by
   dsimp only
-  letI : CommGroup (P ⧸ frattini P) :=
+  let : CommGroup (P ⧸ frattini P) :=
     frattiniQuotientCommGroup P hP
-  letI : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
+  let : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
     frattiniQuotientZModTwoModule P hP
   let q := QuotientGroup.mk' (frattini P)
   let E := elabSubmoduleSubgroupEquiv (K := P ⧸ frattini P) 2

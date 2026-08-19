@@ -66,7 +66,7 @@ with `Tr^G_D` gives `A^G_Q = A^G_D`, so `b ∈ A^G_Q` and minimality forces `Q =
 theorem isPGroup_of_isDefectGroup (hp : p.Prime)
     (hinv : ∀ n : ℕ, ¬ p ∣ n → ∃ v : A, (∀ g : G, g • v = v) ∧ (n • (1 : A)) * v = 1)
     {b : A} {D : Subgroup G} (hD : IsDefectGroup b D) : IsPGroup p ↥D := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨Q⟩ : Nonempty (Sylow p ↥D) := inferInstance
   set Q' : Subgroup G := Q.1.map D.subtype with hQ'
   have hQ'D : Q' ≤ D := by

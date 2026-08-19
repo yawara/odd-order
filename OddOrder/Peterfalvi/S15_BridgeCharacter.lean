@@ -94,7 +94,7 @@ private theorem indPW1_inner_mu_aux [Finite G] (_hG : OddOrder.BG.IsMinimalSimpl
       (Subgroup.map_subtype_le _)
   have hS_norm_P : hyp.S ≤ Subgroup.normalizer (hyp.P : Set G) := by
     rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
-  haveI hPnorm : (hyp.P.subgroupOf hyp.S).Normal :=
+  have hPnorm : (hyp.P.subgroupOf hyp.S).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hP_le_S).mpr hS_norm_P
   have hNA : hyp.P.subgroupOf hyp.S ≤ (hyp.P ⊔ hyp.W1).subgroupOf hyp.S :=
     Subgroup.comap_mono le_sup_left
@@ -442,11 +442,11 @@ private theorem gammaGrid_orthogonal_one_aux [Finite G]
     ClassFunction.inner (GammaGrid hG hyp)
       (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 0 := by
   classical
-  letI : Fintype ↥hyp.S := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+  let : Fintype ↥hyp.S := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥hyp.S : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Fintype ↥((hyp.P ⊔ hyp.W1).subgroupOf hyp.S) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥((hyp.P ⊔ hyp.W1).subgroupOf hyp.S) : ℂ) :=
+  let : Fintype ↥((hyp.P ⊔ hyp.W1).subgroupOf hyp.S) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥((hyp.P ⊔ hyp.W1).subgroupOf hyp.S) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   -- `⟨Ind_{PW₁}^S 1, 1_S⟩ = 1`.
   have hind : ClassFunction.inner (indPW1 hyp)
@@ -530,6 +530,7 @@ theorem gammaGrid_orthogonal_one_of_c_eq_one [Finite G]
   convert gammaGrid_orthogonal_one_aux hG hnoV hyp hc1 using 2; exact Subsingleton.elim _ _
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- **(13.18.c)** `Γ` is real: `Γ.conj = Γ` — fully proven (Coq `GammaReal`,
 `PFsection13.v:1911`).
 
@@ -1014,9 +1015,9 @@ theorem tauT_nuRow_diff_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         (η - (η : ClassFunction ↥hyp.T ℂ).conj)
       = ∑ j : Fin hyp.p, (hyp.eta r j - hyp.eta s j) := by
   classical
-  haveI := hyp.finiteG
-  letI : Fintype G := Fintype.ofFinite G
-  letI : Fintype ↥hyp.T := Fintype.ofFinite _
+  have := hyp.finiteG
+  let : Fintype G := Fintype.ofFinite G
+  let : Fintype ↥hyp.T := Fintype.ofFinite _
   -- `η − η̄ = ∑_j(ν_{rj} − ν_{sj})`.
   have hsub : (η - (η : ClassFunction ↥hyp.T ℂ).conj)
       = ∑ j : Fin hyp.p, (hyp.nu r j - hyp.nu s j) := by

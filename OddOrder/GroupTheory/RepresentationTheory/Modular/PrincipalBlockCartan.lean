@@ -101,7 +101,7 @@ theorem forall_eq_one_iff_blockOfIrr_eq_principalBlock [CharP (ResidueField 𝒪
     (∀ n ∈ N, wedderburnRepresentation e i n = 1)
       ↔ blockOfIrr e hπG hlinG hnilG i = principalBlock πG hπG hlinG hnilG := by
   classical
-  haveI := hN
+  have := hN
   set zN' : Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) G) :=
     ⟨subgroupSum (ResidueField 𝒪) N, subgroupSum_mem_center hN⟩ with hzN'
   have hcard : ((Nat.card ↥N : ℕ) : ResidueField 𝒪) ≠ 0 := fun h =>
@@ -163,7 +163,7 @@ theorem card_mul_sum_sq_principalBlock [Fintype ι'] [CharP (ResidueField 𝒪) 
           (Fintype.card (m i) : K) ^ 2
       = ((Nat.card G : ℕ) : K) := by
   classical
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   rw [← card_mul_sum_sq_eq_card e hN]
   congr 2
   refine Finset.filter_congr fun i _ => ?_

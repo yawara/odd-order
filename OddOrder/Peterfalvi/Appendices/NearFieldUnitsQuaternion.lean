@@ -69,8 +69,8 @@ theorem unitsMulEquivQuaternionGroup {F : Type*} [NearField F]
     (hcard : Nat.card F = 9) (hncomm : ¬ ∀ x y : F, x * y = y * x) :
     Nonempty (Fˣ ≃* QuaternionGroup 2) := by
   classical
-  haveI : Finite F := (Nat.card_pos_iff.mp (by omega)).2
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Finite F := (Nat.card_pos_iff.mp (by omega)).2
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hcardU : Nat.card Fˣ = 8 := by
     rw [Nat.card_units, hcard]
   have hP2 : IsPGroup 2 Fˣ := IsPGroup.of_card (n := 3) (by rw [hcardU]; norm_num)
@@ -89,7 +89,7 @@ theorem unitsMulEquivQuaternionGroup {F : Type*} [NearField F]
         · rw [← h2]; exact pow_orderOf_eq_one k
       have hkval : (k : F) = -1 := NearField.val_eq_neg_one_of_sq_eq_one hk2 hk1
       -- the involution of `N` is also `-1`, so `k ∈ N`
-      haveI : Nontrivial ↥N := Finite.one_lt_card_iff_nontrivial.mp (by omega)
+      have : Nontrivial ↥N := Finite.one_lt_card_iff_nontrivial.mp (by omega)
       obtain ⟨y, hy1⟩ := exists_ne (1 : ↥N)
       have hyu : (y : Fˣ) ≠ 1 := fun h => hy1 (OneMemClass.coe_eq_one.mp h)
       have hy2 : (y : Fˣ) ^ 2 = 1 := by
@@ -109,7 +109,7 @@ theorem unitsMulEquivQuaternionGroup {F : Type*} [NearField F]
     obtain ⟨x, y, hxy⟩ := hncomm
     have hx0 : x ≠ 0 := fun h => hxy (by rw [h, zero_mul, mul_zero])
     have hy0 : y ≠ 0 := fun h => hxy (by rw [h, zero_mul, mul_zero])
-    haveI := hcyc
+    have := hcyc
     obtain ⟨g, hgen⟩ := IsCyclic.exists_generator (α := Fˣ)
     obtain ⟨m, hm⟩ := Subgroup.mem_zpowers_iff.mp (hgen (Units.mk0 x hx0))
     obtain ⟨l, hl⟩ := Subgroup.mem_zpowers_iff.mp (hgen (Units.mk0 y hy0))
@@ -124,12 +124,12 @@ theorem unitsMulEquivQuaternionGroup {F : Type*} [NearField F]
       exact Nat.card_congr e.toEquiv
     rcases Nat.eq_zero_or_pos n with rfl | hn
     · exfalso
-      haveI : Infinite (ZMod (2 * 0)) := ZMod.infinite
-      haveI : Infinite (QuaternionGroup 0) :=
+      have : Infinite (ZMod (2 * 0)) := ZMod.infinite
+      have : Infinite (QuaternionGroup 0) :=
         Infinite.of_injective (QuaternionGroup.a (n := 0)) fun i j h => by injection h
       rw [Nat.card_eq_zero_of_infinite] at hcards
       omega
-    · haveI : NeZero n := ⟨hn.ne'⟩
+    · have : NeZero n := ⟨hn.ne'⟩
       rw [Nat.card_eq_fintype_card, QuaternionGroup.card] at hcards
       have hn2 : n = 2 := by omega
       subst hn2

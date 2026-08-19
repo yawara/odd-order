@@ -57,7 +57,7 @@ theorem Hypothesis.sSet_coherent_extension_eq_sum_memberRFamily_T [Finite G]
     ∃ E ⊆ (hyp.sSet_memberRFamily_T hG hnoV pins hvd hTP Tdata hU hW1 hW2
         (hFsub hψT)).imageSet,
       c'.extension ψ = ∑ α ∈ E, α := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hne : ψ ≠ ψ.conj := fun h =>
     sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupT hG hvd) (hyp.oddCardT hG)
@@ -125,7 +125,7 @@ theorem Hypothesis.sSet_coherent_extension_cross_orthogonal_T [Finite G]
     (hψT : ψ ∈ T₁) (hψcT : ψ.conj ∈ T₁) (hlamT : lam ∈ T₂) (hlamcT : lam.conj ∈ T₂)
     (hne1 : ψ ≠ lam) (hne2 : ψ ≠ lam.conj) :
     ClassFunction.inner (c₁.extension ψ) (c₂.extension lam) = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have h1 : ClassFunction.inner ψ lam = 0 :=
     sSet_pairwiseOrthogonal (hyp.toTypesIIIIIIVSetupT hG hvd) (hT₁sub hψT) (hT₂sub hlamT) hne1
@@ -221,7 +221,7 @@ theorem Hypothesis.nineElevenSevenEightRefutationT [Finite G]
         (c₃.extension lam) = 0) :
     False := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   obtain ⟨c₁⟩ := hS₂cohD
   -- ── ambient family facts
   have hSfin : (sSet (hyp.toTypesIIIIIIVSetupT hG hvd)).Finite :=

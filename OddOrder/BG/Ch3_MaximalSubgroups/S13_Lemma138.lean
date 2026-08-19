@@ -40,7 +40,7 @@ theorem lt_inf_normalizer_of_lt_of_pgroup [Finite G] {q : ℕ} [Fact q.Prime]
   have hQTle : Q ≤ T := hQT.le
   have hne_top : Q.subgroupOf T ≠ ⊤ := fun htop =>
     hQT.ne (le_antisymm hQTle (Subgroup.subgroupOf_eq_top.mp htop))
-  haveI : Group.IsNilpotent ↥T := IsPGroup.isNilpotent hTq
+  have : Group.IsNilpotent ↥T := IsPGroup.isNilpotent hTq
   have hNC : NormalizerCondition ↥T := Group.normalizerCondition_of_isNilpotent
   have hgrow := hNC (Q.subgroupOf T) (lt_top_iff_ne_top.mpr hne_top)
   rw [← Subgroup.subgroupOf_normalizer_eq hQTle] at hgrow
@@ -242,14 +242,14 @@ theorem hall_le_of_fitting_prime [Finite G] (hG : IsMinimalSimpleOdd G)
     conj_eq_self_of_sigma_pSubgroup_normalizer_le hG hM htσ hYne hYt hNY hYM (hYH.trans hHg)
   rwa [hcollapse] at hHg
 
-/-- **`C_G(P)` は可解** (`P ≠ 1`): minimal simple `G` の真部分群はすべて可解 (`solvable_of_lt_top`)
+/-- **`C_G(P)` は可解** (`P ≠ 1`): minimal simple `G` の真部分群はすべて可解 (`isSolvable_of_lt_top`)
 ゆえ、`C_G(P) < ⊤` を示せばよい。`C_G(P) = ⊤` なら `P ≤ Z(G)`; `G` 単純で `Z(G) = ⊥`
 (`Z(G) = ⊤` なら `G` 可換 → 可解、`notSolvable` に反す) ゆえ `P = ⊥`、仮定に反す。
 Lemma 13.8 GAP 2 で `C_G(P)` の Hall θ-部分群を取るのに必要。 -/
 theorem centralizer_isSolvable_of_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
     {P : Subgroup G} (hP : P ≠ ⊥) :
-    IsSolvable ↥(Subgroup.centralizer (P : Set G)) := by
-  apply hG.solvable_of_lt_top
+    Group.IsSolvable ↥(Subgroup.centralizer (P : Set G)) := by
+  apply hG.isSolvable_of_lt_top
   rw [lt_top_iff_ne_top]
   intro htop
   rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with hc | hc
@@ -261,7 +261,7 @@ theorem centralizer_isSolvable_of_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
     have hg : g ∈ Subgroup.centralizer (P : Set G) := htop ▸ Subgroup.mem_top g
     exact (Subgroup.mem_centralizer_iff.mp hg x hx).symm
   · apply hG.notSolvable
-    apply isSolvable_of_comm
+    apply Group.isSolvable_of_comm
     intro a b
     have ha : a ∈ Subgroup.center G := hc ▸ Subgroup.mem_top a
     exact (Subgroup.mem_center_iff.mp ha b).symm
@@ -274,7 +274,8 @@ theorem exists_hall_theta_ge [Finite G] (hG : IsMinimalSimpleOdd G) {P : Subgrou
     (hUθ : Subgroup.IsPiSubgroup θ U) :
     ∃ H : Subgroup G, H ≤ Subgroup.centralizer (P : Set G) ∧
       Ch03.IsHallSubgroup θ (H.subgroupOf (Subgroup.centralizer (P : Set G))) ∧ U ≤ H := by
-  haveI : IsSolvable ↥(Subgroup.centralizer (P : Set G)) := centralizer_isSolvable_of_ne_bot hG hP
+  have : Group.IsSolvable ↥(Subgroup.centralizer (P : Set G)) :=
+    centralizer_isSolvable_of_ne_bot hG hP
   have hcond : ∀ q ∈ (Nat.card ↥(U.subgroupOf (Subgroup.centralizer (P : Set G)))).primeFactors,
       q ∈ θ := by
     intro q hq
@@ -295,15 +296,15 @@ theorem exists_hall_theta_ge [Finite G] (hG : IsMinimalSimpleOdd G) {P : Subgrou
     exact ⟨⟨x, hxC⟩, hUH₀ (Subgroup.mem_subgroupOf.mpr hxU), rfl⟩
 
 /-- **非自明可解部分群の Fitting には素数がある**: `H ≠ 1` が可解なら `F(H) ≠ 1`
-(`fitting_ne_bot_of_solvable_nontrivial`) ゆえ `|F(H)|` を割る素数が存在。Lemma 13.8 GAP 2 で
+(`fitting_ne_bot_of_isSolvable_nontrivial`) ゆえ `|F(H)|` を割る素数が存在。Lemma 13.8 GAP 2 で
 `s ∈ π(F(H))` (X = O_s(H) 用) と `t ∈ π(F(C_{M_β}(P)))` (Y = O_t 用) を取るのに使う。 -/
 theorem exists_mem_primeFactors_fittingInG [Finite G] {H : Subgroup G}
-    (hHsolv : IsSolvable ↥H) (hH : H ≠ ⊥) :
+    (hHsolv : Group.IsSolvable ↥H) (hH : H ≠ ⊥) :
     ∃ s : ℕ, s ∈ (Nat.card ↥(Ch2.S08.fittingInG H)).primeFactors := by
-  haveI := hHsolv
-  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hH
-  have hFne : Ch01.fitting ↥H ≠ ⊥ := Ch01.fitting_ne_bot_of_solvable_nontrivial ↥H
-  haveI : Nontrivial ↥(Ch01.fitting ↥H) := (Subgroup.nontrivial_iff_ne_bot _).mpr hFne
+  have := hHsolv
+  have : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hH
+  have hFne : Ch01.fitting ↥H ≠ ⊥ := Ch01.fitting_ne_bot_of_isSolvable_nontrivial ↥H
+  have : Nontrivial ↥(Ch01.fitting ↥H) := (Subgroup.nontrivial_iff_ne_bot _).mpr hFne
   have hcard : Nat.card ↥(Ch2.S08.fittingInG H) = Nat.card ↥(Ch01.fitting ↥H) :=
     Subgroup.card_map_of_injective H.subtype_injective
   have hgt : 1 < Nat.card ↥(Ch2.S08.fittingInG H) := by
@@ -329,7 +330,7 @@ theorem exists_prime_betastar_dvd_of_hall_le [Finite G] (hG : IsMinimalSimpleOdd
     (hY₀starβ : Subgroup.IsPiSubgroup (S10.beta Mstar) Y₀star) :
     ∃ r : ℕ, r.Prime ∧ r ∈ S10.beta Mstar ∧
       r ∣ Nat.card ↥(M ⊓ Subgroup.centralizer (P : Set G)) ∧ r ∉ S10.sigma M := by
-  haveI : Nontrivial ↥Y₀star := (Subgroup.nontrivial_iff_ne_bot _).mpr hY₀starne
+  have : Nontrivial ↥Y₀star := (Subgroup.nontrivial_iff_ne_bot _).mpr hY₀starne
   obtain ⟨r, hrp, hrd⟩ := (Nat.card ↥Y₀star).exists_prime_and_dvd
     (by have := Finite.one_lt_card_iff_nontrivial.mpr ‹Nontrivial ↥Y₀star›; omega)
   have hrβstar : r ∈ S10.beta Mstar :=
@@ -383,11 +384,11 @@ theorem oriented_r_existence [Finite G] (hG : IsMinimalSimpleOdd G)
     (hY₀starβ : Subgroup.IsPiSubgroup (S10.beta Mstar) Y₀star) :
     ∃ r : ℕ, r.Prime ∧ r ∈ S10.beta Mstar ∧
       r ∣ Nat.card ↥(M ⊓ Subgroup.centralizer (P : Set G)) ∧ r ∉ S10.sigma M := by
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-  haveI hY₀solv : IsSolvable ↥Y₀ :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective hY₀M)
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
+  have hY₀solv : Group.IsSolvable ↥Y₀ :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective hY₀M)
   obtain ⟨t, htF⟩ := exists_mem_primeFactors_fittingInG hY₀solv hY₀ne
-  haveI : Fact t.Prime := ⟨Nat.prime_of_mem_primeFactors htF⟩
+  have : Fact t.Prime := ⟨Nat.prime_of_mem_primeFactors htF⟩
   have htβ : t ∈ S10.beta M := by
     apply hY₀β
     have hdvd : t ∣ Nat.card ↥Y₀ :=
@@ -448,7 +449,7 @@ theorem gap3_assembly [Finite G] {M Mstar Q P : Subgroup G} (hQM : Q ≤ M)
 theorem opCore_map_le_of_mulEquiv {A B : Type*} [Group A] [Group B] [Finite A] [Finite B]
     {p : ℕ} [Fact p.Prime] (e : A ≃* B) :
     (Ch01.opCore p A).map e.toMonoidHom ≤ Ch01.opCore p B := by
-  haveI : ((Ch01.opCore p A).map e.toMonoidHom).Normal :=
+  have : ((Ch01.opCore p A).map e.toMonoidHom).Normal :=
     (Ch01.opCore.normal p A).map e.toMonoidHom e.surjective
   exact Ch01.normal_pgroup_le_opCore
     ((Ch01.opCore_isPGroup p A).of_equiv
@@ -475,7 +476,7 @@ theorem fitting_card_eq_of_mulEquiv {A B : Type*} [Group A] [Group B] [Finite A]
     unfold Ch01.fitting
     rw [Subgroup.map_iSup]
     refine iSup_congr (fun p => ?_)
-    haveI : Fact (p : ℕ).Prime := ⟨p.2⟩
+    have : Fact (p : ℕ).Prime := ⟨p.2⟩
     exact opCore_map_of_mulEquiv e
   rw [← hmap, Subgroup.card_map_of_injective e.injective]
 
@@ -486,7 +487,7 @@ theorem fitting_card_eq_of_mulEquiv {A B : Type*} [Group A] [Group B] [Finite A]
 13.8 main: `s ∈ π(F(H))` (`H ⊇ C_{M_β}(P)`) を `π(F(H*))` (`H* ⊇ C_{M*_β}(P)`) へ移送し
 WLOG `s ∈ β(M)` / `β(M*)` の向き切替を可能にする。 -/
 theorem fittingInG_primeFactors_eq_of_isHall_subgroupOf [Finite G] {C H K : Subgroup G}
-    [IsSolvable ↥C] {θ : Set ℕ} (hHC : H ≤ C) (hKC : K ≤ C)
+    [Group.IsSolvable ↥C] {θ : Set ℕ} (hHC : H ≤ C) (hKC : K ≤ C)
     (hH : Ch03.IsHallSubgroup θ (H.subgroupOf C)) (hK : Ch03.IsHallSubgroup θ (K.subgroupOf C)) :
     (Nat.card ↥(Ch2.S08.fittingInG H)).primeFactors
       = (Nat.card ↥(Ch2.S08.fittingInG K)).primeFactors := by
@@ -520,7 +521,8 @@ theorem exists_prime_betastar_dvd_or [Finite G] (hG : IsMinimalSimpleOdd G)
     (∃ r : ℕ, r.Prime ∧ r ∈ S10.beta M ∧
       r ∣ Nat.card ↥(Mstar ⊓ Subgroup.centralizer (P : Set G)) ∧ r ∉ S10.sigma Mstar) := by
   classical
-  haveI : IsSolvable ↥(Subgroup.centralizer (P : Set G)) := centralizer_isSolvable_of_ne_bot hG hP1
+  have : Group.IsSolvable ↥(Subgroup.centralizer (P : Set G)) :=
+    centralizer_isSolvable_of_ne_bot hG hP1
   -- `C_{M_α}(P)` / `C_{M*_α}(P)` は `β`-部分群 (`Malpha_isPiGroup` + `α=β`)。
   have hbeta : ∀ {N : Subgroup G}, S10.alpha N = S10.beta N →
       Subgroup.IsPiSubgroup (S10.beta N) (S10.Malpha N ⊓ Subgroup.centralizer (P : Set G)) := by
@@ -551,11 +553,11 @@ theorem exists_prime_betastar_dvd_or [Finite G] (hG : IsMinimalSimpleOdd G)
   -- build `H ⊇ C_{M_β}(P)`, Hall `θ`.
   obtain ⟨H, hHC, hHhall, hYH⟩ :=
     exists_hall_theta_ge hG hP1 hCMαP_le hYMθ (θ := S10.beta M ∪ S10.beta Mstar)
-  haveI : IsSolvable ↥H :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective hHC)
+  have : Group.IsSolvable ↥H :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective hHC)
   have hHne : H ≠ ⊥ := fun h => hCMαP (le_bot_iff.mp (h ▸ hYH))
-  obtain ⟨s, hsF⟩ := exists_mem_primeFactors_fittingInG ‹IsSolvable ↥H› hHne
-  haveI : Fact s.Prime := ⟨Nat.prime_of_mem_primeFactors hsF⟩
+  obtain ⟨s, hsF⟩ := exists_mem_primeFactors_fittingInG ‹Group.IsSolvable ↥H› hHne
+  have : Fact s.Prime := ⟨Nat.prime_of_mem_primeFactors hsF⟩
   -- `s ∈ θ` (F(H) ≤ H, H Hall θ).
   have hsθ : s ∈ S10.beta M ∪ S10.beta Mstar := by
     have hsH : s ∈ (Nat.card ↥H).primeFactors := by
@@ -584,7 +586,7 @@ theorem exists_prime_betastar_dvd_or [Finite G] (hG : IsMinimalSimpleOdd G)
 `Q ≤ ⁅P,Q⁆` (`le_commutator_of_coprime_inf_centralizer_eq_bot`); `P,Q ⊆ M` (resp. `M*`) ゆえ
 `⁅P,Q⁆ ⊆ ⁅M,M⁆ = M'` (resp. `M*'`)。 -/
 theorem pSubgroup_le_derived_inf [Finite G] {M Mstar P Q : Subgroup G}
-    [IsSolvable ↥P] (hPN : P ≤ Subgroup.normalizer (Q : Set G))
+    [Group.IsSolvable ↥P] (hPN : P ≤ Subgroup.normalizer (Q : Set G))
     (hcop : Nat.Coprime (Nat.card ↥P) (Nat.card ↥Q))
     (hCQ : Q ⊓ Subgroup.centralizer (P : Set G) = ⊥)
     (hPM : P ≤ M) (hQM : Q ≤ M) (hPMs : P ≤ Mstar) (hQMs : Q ≤ Mstar) :
@@ -641,7 +643,7 @@ theorem QMbeta_sup_normal_in_M [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgr
   obtain ⟨QD, hQDeq⟩ := sylow_of_maximal_pSubgroup hQDq hQDmax
   -- `M_β ⊔ Q ⊲ M'`.
   have hMβD : S10.Mbeta M ≤ derivedInG M := Mbeta_le_derived hG hM
-  haveI hMβnorm : ((S10.Mbeta M).subgroupOf (derivedInG M)).Normal :=
+  have hMβnorm : ((S10.Mbeta M).subgroupOf (derivedInG M)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hMβD).mpr
       (hDM.trans (le_normalizer_opiCoreInG (S10.beta M) M))
   have hnilp : Group.IsNilpotent (↥(derivedInG M) ⧸ (S10.Mbeta M).subgroupOf (derivedInG M)) :=
@@ -652,14 +654,14 @@ theorem QMbeta_sup_normal_in_M [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgr
     have hqpf : q ∈ (Nat.card ↥(S10.Mbeta M)).primeFactors :=
       Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, (Nat.card_pos (α := ↥(S10.Mbeta M))).ne'⟩
     exact hqβ (S10.Mbeta_isPiGroup M q hqpf)
-  haveI hNorm : ((S10.Mbeta M).subgroupOf (derivedInG M) ⊔
+  have hNorm : ((S10.Mbeta M).subgroupOf (derivedInG M) ⊔
       (QD : Subgroup ↥(derivedInG M))).Normal :=
     S10.normal_sup_sylow_of_quotient_nilpotent hnilp hNq' QD
   -- transport: `(M_β ⊔ Q).subgroupOf M' = M_β.subgroupOf M' ⊔ QD` ⟹ `⊲ ↥M'`.
   have hQMβsub : (S10.Mbeta M ⊔ Q).subgroupOf (derivedInG M) =
       (S10.Mbeta M).subgroupOf (derivedInG M) ⊔ (QD : Subgroup ↥(derivedInG M)) := by
     rw [Subgroup.subgroupOf_sup hMβD hQderiv, hQDeq]
-  haveI hQMβnorm : ((S10.Mbeta M ⊔ Q).subgroupOf (derivedInG M)).Normal := hQMβsub ▸ hNorm
+  have hQMβnorm : ((S10.Mbeta M ⊔ Q).subgroupOf (derivedInG M)).Normal := hQMβsub ▸ hNorm
   -- `|Q| = q ^ v_q(|M'|)` (Q is a Sylow `q` of `↥M'`).
   have hQcard : Nat.card ↥Q = q ^ (Nat.card ↥(derivedInG M)).factorization q := by
     rw [← Sylow.card_eq_multiplicity QD, hQDeq,
@@ -732,7 +734,7 @@ theorem M_eq_normalizer_sup_Mbeta [Finite G] (hG : IsMinimalSimpleOdd G) {M : Su
     M = (M ⊓ Subgroup.normalizer (Q : Set G)) ⊔ S10.Mbeta M := by
   have hMβM : S10.Mbeta M ≤ M := S10.Mbeta_le M
   have hMβQM : S10.Mbeta M ⊔ Q ≤ M := sup_le hMβM hQM
-  haveI hNorm : ((S10.Mbeta M ⊔ Q).subgroupOf M).Normal :=
+  have hNorm : ((S10.Mbeta M ⊔ Q).subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hMβQM).mpr
       (QMbeta_sup_normal_in_M hG hM hQq hQmaxM hqβ hQderiv)
   -- `Q.subgroupOf M` is a Sylow `q` of `↥M`.
@@ -770,15 +772,15 @@ theorem M_eq_normalizer_sup_Mbeta [Finite G] (hG : IsMinimalSimpleOdd G) {M : Su
 `D` は `G` で正規でなくてよい — ambient `D ⊔ Q` (ここで `D ⊴ D⊔Q`) で
 `OperatorQuotientAction.commutator_commutator_right_eq` を適用し `D⊔Q ↪ G` で戻す。 -/
 theorem commutator_commutator_right_eq_of_le_normalizer [Finite G] {D Q : Subgroup G}
-    (hsolv : IsSolvable ↥(D ⊔ Q)) (hQD : Q ≤ Subgroup.normalizer (D : Set G))
+    (hsolv : Group.IsSolvable ↥(D ⊔ Q)) (hQD : Q ≤ Subgroup.normalizer (D : Set G))
     (hcop : Nat.Coprime (Nat.card ↥D) (Nat.card ↥Q)) :
     ⁅⁅D, Q⁆, Q⁆ = ⁅D, Q⁆ := by
   set DQ : Subgroup G := D ⊔ Q with hDQdef
   have hD_le : D ≤ DQ := le_sup_left
   have hQ_le : Q ≤ DQ := le_sup_right
   have hDQnorm : DQ ≤ Subgroup.normalizer (D : Set G) := sup_le Subgroup.le_normalizer hQD
-  haveI : IsSolvable ↥DQ := hsolv
-  haveI : (D.subgroupOf DQ).Normal := Subgroup.normal_subgroupOf_of_le_normalizer hDQnorm
+  have : Group.IsSolvable ↥DQ := hsolv
+  have : (D.subgroupOf DQ).Normal := Subgroup.normal_subgroupOf_of_le_normalizer hDQnorm
   have hcop' : Nat.Coprime (Nat.card ↥(D.subgroupOf DQ)) (Nat.card ↥(Q.subgroupOf DQ)) := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hD_le).toEquiv,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQ_le).toEquiv]
@@ -806,7 +808,7 @@ theorem commutator_le_Malpha_of_coprime_le_derived [Finite G] (hG : IsMinimalSim
   classical
   have hder_le : derivedInG Mstar ≤ Mstar := Subgroup.map_subtype_le _
   set N : Subgroup ↥Mstar := (S10.Malpha Mstar).subgroupOf Mstar with hNdef
-  haveI : N.Normal := S10.Malpha_subgroupOf_normal Mstar
+  have : N.Normal := S10.Malpha_subgroupOf_normal Mstar
   set π : ↥Mstar →* (↥Mstar ⧸ N) := QuotientGroup.mk' N with hπdef
   have hsurj : Function.Surjective π := QuotientGroup.mk'_surjective N
   have hcommmap : (commutator ↥Mstar).map π = commutator (↥Mstar ⧸ N) := by
@@ -912,13 +914,13 @@ theorem gap3_commutator_inf_le_Malpha_star [Finite G] (hG : IsMinimalSimpleOdd G
     exact (((Fact.out : q.Prime).coprime_iff_not_dvd.mpr hq_nd_D).symm).pow_right k
   -- `D ⊔ Q ≤ M*` is solvable.
   have hDQ_le : D ⊔ Q ≤ Mstar := sup_le hD_Mstar hQMstar
-  haveI : IsSolvable ↥Mstar := hG.solvable_of_mem_maximalSubgroups hMstar
-  haveI : IsSolvable ↥(D ⊔ Q) :=
-    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hDQ_le).toMonoidHom)
+  have : Group.IsSolvable ↥Mstar := hG.isSolvable_of_mem_maximalSubgroups hMstar
+  have : Group.IsSolvable ↥(D ⊔ Q) :=
+    Group.isSolvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hDQ_le).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe hDQ_le).surjective
   -- coprime identity `⁅⁅D, Q⁆, Q⁆ = ⁅D, Q⁆`.
   have hid : ⁅⁅D, Q⁆, Q⁆ = ⁅D, Q⁆ :=
-    commutator_commutator_right_eq_of_le_normalizer ‹IsSolvable ↥(D ⊔ Q)› hQD hcopDQ
+    commutator_commutator_right_eq_of_le_normalizer ‹Group.IsSolvable ↥(D ⊔ Q)› hQD hcopDQ
   -- `⁅D, Q⁆ ≤ M*'` (since `D, Q ≤ M*`).
   have heqder : derivedInG Mstar = ⁅(Mstar : Subgroup G), Mstar⁆ :=
     Subgroup.map_subtype_commutator Mstar
@@ -953,7 +955,7 @@ theorem exists_order_r_le_normalizer_centralizer [Finite G]
     (hFrat : M = (M ⊓ Subgroup.normalizer (Q : Set G)) ⊔ S10.Mbeta M)
     (hp_nMβ : ¬ p ∣ Nat.card ↥(S10.Mbeta M)) {r : ℕ} [Fact r.Prime]
     (hrC : r ∣ Nat.card ↥(M ⊓ Subgroup.centralizer (P : Set G)))
-    (hr_nMβ : ¬ r ∣ Nat.card ↥(S10.Mbeta M)) (_hsolvM : IsSolvable ↥M) :
+    (hr_nMβ : ¬ r ∣ Nat.card ↥(S10.Mbeta M)) (_hsolvM : Group.IsSolvable ↥M) :
     ∃ R : Subgroup G, Nat.card ↥R = r ∧ R ≤ M ⊓ Subgroup.normalizer (Q : Set G)
       ∧ R ≤ Subgroup.centralizer (P : Set G) := by
   classical
@@ -970,7 +972,7 @@ theorem exists_order_r_le_normalizer_centralizer [Finite G]
     conj_smul_eq_self_of_mem_normalizer (hMnorm_Mβ (hPM a.2))
   have hN_inv : OddOrder.Isaacs.Ch03.IsAInvariant hHinv.restrict ((S10.Mbeta M).subgroupOf H) :=
     hHinv.subgroupOf hMβinv
-  haveI : ((S10.Mbeta M).subgroupOf H).Normal :=
+  have : ((S10.Mbeta M).subgroupOf H).Normal :=
     Subgroup.normal_subgroupOf_of_le_normalizer (hH_le_M.trans hMnorm_Mβ)
   -- coprimeness `(|P|, |(M_β).subgroupOf H|) = 1`.
   have hN_card : Nat.card ↥((S10.Mbeta M).subgroupOf H) = Nat.card ↥(S10.Mbeta M ⊓ H) := by
@@ -982,8 +984,8 @@ theorem exists_order_r_le_normalizer_centralizer [Finite G]
     rw [hk]
     refine (((Fact.out : p.Prime).coprime_iff_not_dvd.mpr ?_)).pow_left k
     exact fun hpd => hp_nMβ (hpd.trans hN_dvd)
-  haveI : IsSolvable ↥P := by haveI := hPp.isNilpotent; infer_instance
-  have hSolv : IsSolvable ↥P ∨ IsSolvable ↥((S10.Mbeta M).subgroupOf H) := Or.inl ‹_›
+  have : Group.IsSolvable ↥P := by have := hPp.isNilpotent; infer_instance
+  have hSolv : Group.IsSolvable ↥P ∨ Group.IsSolvable ↥((S10.Mbeta M).subgroupOf H) := Or.inl ‹_›
   -- Cauchy: an order-`r` element `y ∈ C_M(P)`.
   obtain ⟨y₀, hy₀⟩ := exists_prime_orderOf_dvd_card' r hrC
   set y : G := (y₀ : G) with hy
@@ -995,7 +997,7 @@ theorem exists_order_r_le_normalizer_centralizer [Finite G]
     exact (orderOf_injective (M ⊓ Subgroup.centralizer (P : Set G)).subtype
       (M ⊓ Subgroup.centralizer (P : Set G)).subtype_injective y₀).trans hy₀
   -- decompose `y = h₀ · a₀` with `h₀ ∈ H`, `a₀ ∈ M_β` (using `M_β ⊴ M`, inside `↥M`).
-  haveI : ((S10.Mbeta M).subgroupOf M).Normal :=
+  have : ((S10.Mbeta M).subgroupOf M).Normal :=
     Subgroup.normal_subgroupOf_of_le_normalizer hMnorm_Mβ
   have hyM' : (⟨y, hyM⟩ : ↥M) ∈ (H.subgroupOf M) ⊔ ((S10.Mbeta M).subgroupOf M) := by
     rw [← Subgroup.subgroupOf_sup hH_le_M (S10.Mbeta_le M), ← hFrat, Subgroup.subgroupOf_self]
@@ -1125,10 +1127,10 @@ private theorem isPiGroup_sup_of_le_centralizer [Finite G] {π : Set ℕ} {P R :
       (Subgroup.mem_centralizer_iff.mp (hcomm hy) x hx).symm
   have hPle : P ≤ P ⊔ R := le_sup_left
   have hRle : R ≤ P ⊔ R := le_sup_right
-  haveI : (P.subgroupOf (P ⊔ R)).Normal :=
+  have : (P.subgroupOf (P ⊔ R)).Normal :=
     Subgroup.normal_subgroupOf_of_le_normalizer
       (sup_le Subgroup.le_normalizer (hcomm.trans (Subgroup.centralizer_le_normalizer _)))
-  haveI : (R.subgroupOf (P ⊔ R)).Normal :=
+  have : (R.subgroupOf (P ⊔ R)).Normal :=
     Subgroup.normal_subgroupOf_of_le_normalizer
       (sup_le (hPcR.trans (Subgroup.centralizer_le_normalizer _)) Subgroup.le_normalizer)
   have hPpi : Ch03.Subgroup.IsPiGroup π (P.subgroupOf (P ⊔ R)) := by
@@ -1159,7 +1161,7 @@ theorem centralizer_msigma_le_of_commute_tau1 [Finite G] (hG : IsMinimalSimpleOd
     S10.Msigma M ⊓ Subgroup.centralizer (P : Set G) ≤
       S10.Msigma M ⊓ Subgroup.centralizer (R : Set G) := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   obtain ⟨-, hPcardp⟩ := mem_elemAbelianOfRank.mp hP
   obtain ⟨-, hRcardr⟩ := mem_elemAbelianOfRank.mp hR
   have hPcardp' : Nat.card ↥P = p := by rw [← pow_one p]; exact hPcardp
@@ -1247,7 +1249,7 @@ theorem gap3_centralizer_Malpha_P_le_Mstar [Finite G] (hG : IsMinimalSimpleOdd G
   classical
   obtain ⟨hPea, -⟩ := mem_elemAbelianOfRank.mp hP
   have hPp : IsPGroup p ↥P := hPea.isPGroup
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   -- `p, r ∉ σ(M)`, hence `∉ β(M)`, hence `∤ |M_β|`.
   have hpσ : p ∉ S10.sigma M := tau1_subset_sigma_compl M hp
   have hp_nMβ : ¬ p ∣ Nat.card ↥(S10.Mbeta M) := fun hpd =>
@@ -1258,7 +1260,8 @@ theorem gap3_centralizer_Malpha_P_le_Mstar [Finite G] (hG : IsMinimalSimpleOdd G
       (S10.Mbeta_isPiGroup M r (Nat.mem_primeFactors.mpr ⟨Fact.out, hrd, Nat.card_pos.ne'⟩))))
   -- (ii): an order-`r` subgroup `R ≤ N_M(Q)` centralized by `P` (coprime action).
   obtain ⟨R, hRcard, hRNQ, hRC⟩ :=
-    exists_order_r_le_normalizer_centralizer hPp hPM hQinv hFrat hp_nMβ hrC hr_nMβ ‹IsSolvable ↥M›
+    exists_order_r_le_normalizer_centralizer hPp hPM hQinv hFrat hp_nMβ hrC hr_nMβ ‹Group.IsSolvable
+        ↥M›
   have hRM : R ≤ M := hRNQ.trans inf_le_left
   have hRMstar : R ≤ Mstar := (hRNQ.trans inf_le_right).trans hNQ
   have hRne : R ≠ ⊥ := by
@@ -1306,7 +1309,7 @@ theorem gap3_false_from_r [Finite G] (hG : IsMinimalSimpleOdd G)
   have hQMstar : Q ≤ Mstar := hQle.trans inf_le_right
   obtain ⟨hPea, hPcard1⟩ := mem_elemAbelianOfRank.mp hP
   have hPp : IsPGroup p ↥P := hPea.isPGroup
-  haveI : IsSolvable ↥P := isSolvable_of_comm hPea.comm
+  have : Group.IsSolvable ↥P := Group.isSolvable_of_comm hPea.comm
   -- `Q` is a maximal `q`-subgroup of `M` (GAP 1.3).
   have hQmaxM : ∀ T : Subgroup G, T ≤ M → IsPGroup q ↥T → Q ≤ T → Q = T := by
     intro T hTM hTq hQT
@@ -1396,10 +1399,10 @@ theorem forbidden_config_impossible [Finite G] (hG : IsMinimalSimpleOdd G)
   -- GAP 2: extract `r`.
   rcases exists_prime_betastar_dvd_or hG hM hMstar hnc hP1 hαβ hαβstar hCMαP hCMstarαP with
     ⟨r, hrp, hrβ, hrC, hrσ⟩ | ⟨r, hrp, hrβ, hrC, hrσ⟩
-  · haveI : Fact r.Prime := ⟨hrp⟩
+  · have : Fact r.Prime := ⟨hrp⟩
     exact gap3_false_from_r hG hM hMstar hnc hp hP hPM hQle hQq hQmax hQinv hCQ hNQ
       hqp hqα hαβ hCMαP hCMαPQ hrβ hrC hrσ
-  · haveI : Fact r.Prime := ⟨hrp⟩
+  · have : Fact r.Prime := ⟨hrp⟩
     exact gap3_false_from_r hG hMstar hM hnc' hpstar hP hPMstar hQstarle' hQstarq
       hQstarmax' hQstarinv hCQstar hNQstar hqpstar hqαstar hαβstar hCMstarαP hCMstarαPQ hrβ hrC hrσ
 

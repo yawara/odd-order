@@ -125,7 +125,7 @@ theorem card_le_cyclotomicQuotient_of_faithful_fpf
         Nat.card U ≤ (p ^ q - 1) / (p - 1)) :
     Nat.card U ≤ (p ^ q - 1) / (p - 1) := by
   by_cases hsimple : IsSimpleModule (MonoidAlgebra (ZMod p) U) M
-  · haveI := hsimple
+  · have := hsimple
     exact card_le_cyclotomicQuotient_of_faithful_irreducible_fpf hq hcardM hfaith σ hfpf
   · exact hReducible hsimple
 

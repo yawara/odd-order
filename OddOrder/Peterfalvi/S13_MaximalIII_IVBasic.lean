@@ -242,7 +242,7 @@ theorem exists_hypothesis_of_isTypeIIIorIV [Finite G]
     (hyp : OddOrder.Peterfalvi.S12.Hypothesis M)
     (htype : IsTypeIII M ∨ IsTypeIV M) :
     ∃ s13 : Hypothesis M, s13.base = hyp := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hnt : OddOrder.GroupTheory.TypePNontrivialCore M hyp.typeP :=
     OddOrder.GroupTheory.typePNontrivialCore_of_isTypeIIIorIV htype hyp.typeP
@@ -516,7 +516,7 @@ with the chief nontriviality `H₀ < H`. -/
 theorem H_not_le_H0C {M : Subgroup G} (hyp : Hypothesis M) :
     ¬ hyp.base.typeP.H ≤ hyp.H0C := by
   intro hle
-  haveI hH0n : ((hyp.chief.H0).subgroupOf M).Normal :=
+  have hH0n : ((hyp.chief.H0).subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer
       (hyp.H0_lt_H.le.trans (hyp.base.typeP.H_le.trans (Subgroup.map_subtype_le _)))).mpr
       hyp.chief.H0_normalized_by_M
@@ -616,7 +616,7 @@ theorem commutator_HC_mem_H0C [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
   have hHle : hyp.base.typeP.H ≤ M := hyp.base.typeP.H_le.trans (Subgroup.map_subtype_le _)
   have hCle : hyp.C ≤ M := (hyp.C_le_U.trans hyp.base.typeP.U_le).trans
     (Subgroup.map_subtype_le _)
-  haveI hHn : ((hyp.base.typeP.H).subgroupOf M).Normal :=
+  have hHn : ((hyp.base.typeP.H).subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hHle).mpr hyp.H_normalized_by_M
   have hdecomp : ∀ z : G, z ∈ hyp.HC → ∃ h ∈ hyp.base.typeP.H, ∃ c ∈ hyp.C, z = h * c := by
     intro z hz
@@ -734,7 +734,7 @@ theorem card_HC [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
   have hHle : hyp.base.typeP.H ≤ hyp.HC := le_sup_left
   have hCle : hyp.C ≤ hyp.HC := le_sup_right
   have hHCleM : hyp.HC ≤ M := hyp.HC_le_derived.trans (Subgroup.map_subtype_le _)
-  haveI hHn : (hyp.base.typeP.H.subgroupOf hyp.HC).Normal :=
+  have hHn : (hyp.base.typeP.H.subgroupOf hyp.HC).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hHle).mpr
       (hHCleM.trans hyp.H_normalized_by_M)
   have hdisj : Disjoint (hyp.base.typeP.H.subgroupOf hyp.HC) (hyp.C.subgroupOf hyp.HC) := by
@@ -753,7 +753,7 @@ theorem card_HC [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
       (hyp.C.subgroupOf hyp.HC) := by
     refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ hdisj ?_
     rw [← Subgroup.normal_mul, hsup, Subgroup.coe_top]
-  have hmul := hcomp.card_mul
+  have hmul := hcomp.card_mul_card
   rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHle).toEquiv,
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCle).toEquiv] at hmul
   exact hmul.symm
@@ -792,7 +792,7 @@ theorem card_H0C [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
   have hHle : hyp.chief.H0 ≤ hyp.H0C := le_sup_left
   have hCle : hyp.C ≤ hyp.H0C := le_sup_right
   have hH0CleM : hyp.H0C ≤ M := hyp.H0C_le_derived.trans (Subgroup.map_subtype_le _)
-  haveI hHn : (hyp.chief.H0.subgroupOf hyp.H0C).Normal :=
+  have hHn : (hyp.chief.H0.subgroupOf hyp.H0C).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hHle).mpr
       (hH0CleM.trans hyp.chief.H0_normalized_by_M)
   have hdisj : Disjoint (hyp.chief.H0.subgroupOf hyp.H0C) (hyp.C.subgroupOf hyp.H0C) := by
@@ -811,7 +811,7 @@ theorem card_H0C [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
       (hyp.C.subgroupOf hyp.H0C) := by
     refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ hdisj ?_
     rw [← Subgroup.normal_mul, hsup, Subgroup.coe_top]
-  have hmul := hcomp.card_mul
+  have hmul := hcomp.card_mul_card
   rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHle).toEquiv,
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCle).toEquiv] at hmul
   exact hmul.symm
@@ -909,10 +909,10 @@ theorem HC_isNilpotent [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
   have hCle : hyp.C ≤ hyp.HC := le_sup_right
   have hHCleM : hyp.HC ≤ M := hyp.HC_le_derived.trans (Subgroup.map_subtype_le _)
   -- both traces are normal in `↥HC`
-  haveI hHn : (hyp.base.typeP.H.subgroupOf hyp.HC).Normal :=
+  have hHn : (hyp.base.typeP.H.subgroupOf hyp.HC).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hHle).mpr
       (hHCleM.trans hyp.H_normalized_by_M)
-  haveI hCn : (hyp.C.subgroupOf hyp.HC).Normal := by
+  have hCn : (hyp.C.subgroupOf hyp.HC).Normal := by
     refine (Subgroup.normal_subgroupOf_iff_le_normalizer hCle).mpr ?_
     refine sup_le (le_trans ?_ (Subgroup.centralizer_le_normalizer (hyp.C : Set G)))
       Subgroup.le_normalizer
@@ -921,20 +921,20 @@ theorem HC_isNilpotent [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
     intro c hc
     exact hyp.commute_of_mem_C_of_mem_H hc hh
   -- both traces are nilpotent
-  haveI hHnil : Group.IsNilpotent ↥hyp.base.typeP.H := by
+  have hHnil : Group.IsNilpotent ↥hyp.base.typeP.H := by
     rw [hyp.base.typeP.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent M
-  haveI hUnil : Group.IsNilpotent ↥hyp.base.typeP.U := hyp.base.typeP.U_nilpotent
-  haveI hCnil : Group.IsNilpotent ↥hyp.C := by
-    haveI : Group.IsNilpotent ↥(hyp.C.subgroupOf hyp.base.typeP.U) := Subgroup.isNilpotent _
+  have hUnil : Group.IsNilpotent ↥hyp.base.typeP.U := hyp.base.typeP.U_nilpotent
+  have hCnil : Group.IsNilpotent ↥hyp.C := by
+    have : Group.IsNilpotent ↥(hyp.C.subgroupOf hyp.base.typeP.U) := Subgroup.isNilpotent _
     exact Group.nilpotent_of_surjective
       (Subgroup.subgroupOfEquivOfLe hyp.C_le_U).toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hyp.C_le_U).surjective
-  haveI hHtr : Group.IsNilpotent ↥(hyp.base.typeP.H.subgroupOf hyp.HC) :=
+  have hHtr : Group.IsNilpotent ↥(hyp.base.typeP.H.subgroupOf hyp.HC) :=
     Group.nilpotent_of_surjective
       (Subgroup.subgroupOfEquivOfLe hHle).symm.toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hHle).symm.surjective
-  haveI hCtr : Group.IsNilpotent ↥(hyp.C.subgroupOf hyp.HC) :=
+  have hCtr : Group.IsNilpotent ↥(hyp.C.subgroupOf hyp.HC) :=
     Group.nilpotent_of_surjective
       (Subgroup.subgroupOfEquivOfLe hCle).symm.toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hCle).symm.surjective
@@ -948,7 +948,7 @@ theorem HC_isNilpotent [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
     exact Subgroup.subgroupOf_self _
   have hfit_top : OddOrder.Isaacs.Ch01.fitting ↥hyp.HC = ⊤ :=
     le_antisymm le_top (hsup ▸ sup_le hHfit hCfit)
-  haveI := OddOrder.Isaacs.Ch01.fitting.isNilpotent (G := ↥hyp.HC)
+  have := OddOrder.Isaacs.Ch01.fitting.isNilpotent (G := ↥hyp.HC)
   have : Group.IsNilpotent ↥(⊤ : Subgroup ↥hyp.HC) := by
     rw [← hfit_top]
     infer_instance
@@ -970,7 +970,7 @@ theorem HC_relIndex_derived [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
     rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCleU').toEquiv] at this
   have hM' : Nat.card ↥(derivedInG M)
       = Nat.card ↥hyp.base.typeP.H * Nat.card ↥hyp.base.typeP.U := by
-    have hmul := hyp.base.typeP.derived_complement.card_mul
+    have hmul := hyp.base.typeP.derived_complement.card_mul_card
     rw [← hmul,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.base.typeP.H_le).toEquiv,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.base.typeP.U_le).toEquiv]
@@ -1038,7 +1038,7 @@ theorem charValue_one_eq_one_of_commutator_le_ker {H : Type*} [Group H] [Finite 
     (hker : ((_root_.commutator H : Subgroup H) : Set H)
       ⊆ OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction H ℂ)) :
     (θ : ClassFunction H ℂ) 1 = 1 := by
-  haveI : IsMulCommutative (H ⧸ _root_.commutator H) :=
+  have : IsMulCommutative (H ⧸ _root_.commutator H) :=
     inferInstanceAs (IsMulCommutative (Abelianization H))
   exact apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
     (N := _root_.commutator H) θ hker
@@ -1076,7 +1076,7 @@ theorem SOf_secondDerived_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       = {φ : ClassFunction ↥M ℂ | φ ∈ OddOrder.Peterfalvi.S12.inducedFamily M ∧
           IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (hyp.base.w1 : ℂ))} := by
   classical
-  haveI : Fintype G := Fintype.ofFinite _
+  have : Fintype G := Fintype.ofFinite _
   -- the trace `K = M\'.subgroupOf M` has index `w₁` (complement `M = M\' ⋊ W₁`)
   have hidx : ((derivedInG M).subgroupOf M).index = hyp.base.w1 := by
     rw [hyp.base.typeP.M_complement.symm.index_eq_card]
@@ -1172,12 +1172,12 @@ theorem q_dvd_secondDerived_relIndex_HC_sub_one [Finite G]
     (htype : IsTypeIII M ∨ IsTypeIV M) :
     hyp.base.w1 ∣ (secondDerivedInAmbient M).relIndex hyp.HC - 1 := by
   classical
-  haveI hHCn : ((hyp.HC.subgroupOf M)).Normal := hyp.HC_subgroupOf_normal
-  haveI hM''n : (((secondDerivedInAmbient M).subgroupOf M)).Normal :=
+  have hHCn : ((hyp.HC.subgroupOf M)).Normal := hyp.HC_subgroupOf_normal
+  have hM''n : (((secondDerivedInAmbient M).subgroupOf M)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer
       ((hyp.secondDerived_le_HC.trans hyp.HC_le_derived).trans
         (Subgroup.map_subtype_le _))).mpr le_normalizer_secondDerived
-  letI act : MulDistribMulAction ↥(hyp.base.typeP.W1.subgroupOf M) ↥(hyp.HC.subgroupOf M) :=
+  let act : MulDistribMulAction ↥(hyp.base.typeP.W1.subgroupOf M) ↥(hyp.HC.subgroupOf M) :=
     MulDistribMulAction.compHom _
       ((MulAut.conjNormal (H := hyp.HC.subgroupOf M)).comp
         (hyp.base.typeP.W1.subgroupOf M).subtype)
@@ -1189,7 +1189,7 @@ theorem q_dvd_secondDerived_relIndex_HC_sub_one [Finite G]
     rw [MulAut.conjNormal_apply]; rfl
   set Msub : Subgroup ↥(hyp.HC.subgroupOf M) :=
     ((secondDerivedInAmbient M).subgroupOf M).subgroupOf (hyp.HC.subgroupOf M) with hMsub
-  haveI : Msub.Normal := hM''n.subgroupOf _
+  have : Msub.Normal := hM''n.subgroupOf _
   have hCop : Nat.Coprime (Nat.card ↥(hyp.base.typeP.W1.subgroupOf M))
       (Nat.card ↥(hyp.HC.subgroupOf M)) := by
     have h1 : Nat.card ↥(hyp.base.typeP.W1.subgroupOf M) = Nat.card ↥hyp.base.typeP.W1 :=
@@ -1259,7 +1259,7 @@ theorem exists_mul_of_mem_sup_of_normalized {M A B : Subgroup G}
     (hAM : A ≤ M) (hBM : B ≤ M)
     (hnorm : M ≤ Subgroup.normalizer (A : Set G)) {x : G} (hx : x ∈ A ⊔ B) :
     ∃ a ∈ A, ∃ b ∈ B, x = a * b := by
-  haveI hAn : (A.subgroupOf M).Normal :=
+  have hAn : (A.subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hAM).mpr hnorm
   have hxM : x ∈ M := (sup_le hAM hBM) hx
   have hmem : (⟨x, hxM⟩ : ↥M) ∈ A.subgroupOf M ⊔ B.subgroupOf M := by
@@ -1283,7 +1283,7 @@ theorem secondDerived_le_H_sup_derivedU [Finite G] {M : Subgroup G} (hyp : Hypot
   have hUle : hyp.base.typeP.U ≤ M := hyp.base.typeP.U_le.trans (Subgroup.map_subtype_le _)
   have hM'eq : derivedInG M = hyp.base.typeP.H ⊔ hyp.base.typeP.U := by
     rw [hyp.base.typeP.derivedInG_eq_fitting_sup_U, hyp.base.typeP.H_eq]
-  haveI hHn : ((hyp.base.typeP.H).subgroupOf M).Normal :=
+  have hHn : ((hyp.base.typeP.H).subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hHle).mpr hyp.H_normalized_by_M
   -- the quotient projection `↥M → ↥M / H`-trace kills the `H`-parts
   set φ := QuotientGroup.mk' ((hyp.base.typeP.H).subgroupOf M) with hφ

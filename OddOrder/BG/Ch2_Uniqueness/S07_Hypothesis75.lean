@@ -47,24 +47,24 @@ private theorem exists_normal_lt_top_of_isSubnormal {Q : Type*} [Group Q] {A' : 
 
 /-- **Theorem 7.4 composition-series 還元** (R1, mmd L2206-2216): `A < P` subnormal, `P` 可解
 (`hG`+`P<⊤`) ⟹ `∃ B`, `A ≤ B < P`, `B ⊴ P`, `|P:B|` 素数。subnormal 系列頂点直下
-(`exists_normal_lt_top_of_isSubnormal`) を素数指数化 (`exists_normal_index_prime_of_solvable`
+(`exists_normal_lt_top_of_isSubnormal`) を素数指数化 (`exists_normal_index_prime_of_isSolvable`
 @`↥P⧸B̄`) し pull back + `↥P`→`G` translate。「`A` subnormal in `B`」は R3 で別途。 -/
 private theorem tp_reduction [Finite G] (hG : IsMinimalSimpleOdd G) {A P : Subgroup G}
     (hAP : A ≤ P) (hAlt : A < P) (hPlt : P < ⊤) (hAsub : (A.subgroupOf P).IsSubnormal) :
     ∃ B : Subgroup G, A ≤ B ∧ B < P ∧ (B.subgroupOf P).Normal ∧ (B.subgroupOf P).index.Prime := by
-  haveI : IsSolvable ↥P := hG.solvable_of_lt_top P hPlt
+  have : Group.IsSolvable ↥P := hG.isSolvable_of_lt_top P hPlt
   have hA'lt : A.subgroupOf P < ⊤ := by
     rw [lt_top_iff_ne_top, Ne, Subgroup.subgroupOf_eq_top]
     exact fun h => hAlt.not_ge h
   obtain ⟨Bbar, hABbar, hBbarlt, hBbarnorm⟩ := exists_normal_lt_top_of_isSubnormal hAsub hA'lt
-  haveI := hBbarnorm
-  haveI hnt : Nontrivial (↥P ⧸ Bbar) := by
+  have := hBbarnorm
+  have hnt : Nontrivial (↥P ⧸ Bbar) := by
     obtain ⟨x, _, hx⟩ := SetLike.exists_of_lt hBbarlt
     exact ⟨QuotientGroup.mk x, 1, by rw [Ne, QuotientGroup.eq_one_iff]; exact hx⟩
   obtain ⟨Nbar, hNbarnorm, hNbarprime⟩ :=
-    OddOrder.GroupTheory.exists_normal_index_prime_of_solvable hnt
+    OddOrder.GroupTheory.exists_normal_index_prime_of_isSolvable hnt
   set C : Subgroup ↥P := Nbar.comap (QuotientGroup.mk' Bbar) with hC
-  haveI : C.Normal := hNbarnorm.comap _
+  have : C.Normal := hNbarnorm.comap _
   have hBbarC : Bbar ≤ C := by
     intro x hx
     rw [hC, Subgroup.mem_comap,
@@ -413,7 +413,7 @@ private theorem tp_c_main [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G
   have hNQ_lt : Subgroup.normalizer (Q : Set G) < ⊤ := by
     rw [lt_top_iff_ne_top]
     intro htop
-    haveI : Q.Normal := Subgroup.normalizer_eq_top_iff.mp htop
+    have : Q.Normal := Subgroup.normalizer_eq_top_iff.mp htop
     rcases hG.simple.eq_bot_or_eq_top_of_normal Q inferInstance with h | h
     · exact hQne h
     · exact (ne_of_lt hQlt) h
@@ -421,7 +421,7 @@ private theorem tp_c_main [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G
   set M : Subgroup G := opiCoreInG π' NQ with hMdef
   have hM_le : M ≤ NQ := opiCoreInG_le _ _
   have hM_lt : M < ⊤ := lt_of_le_of_lt hM_le hNQ_lt
-  haveI hM_solv : IsSolvable ↥M := hG.solvable_of_lt_top M hM_lt
+  have hM_solv : Group.IsSolvable ↥M := hG.isSolvable_of_lt_top M hM_lt
   have hPnM : P ≤ Subgroup.normalizer M := hPnQ.trans (le_normalizer_opiCoreInG π' NQ)
   have hM_inv : Ch03.IsAInvariant (conjAction P) M := isAInvariant_conjAction_iff.mpr hPnM
   have hCop : Nat.Coprime (Nat.card ↥P) (Nat.card ↥M) := by
@@ -506,7 +506,7 @@ private theorem tp_exists_normalized [Finite G] {A P : Subgroup G} {q : ℕ} [Fa
   -- `↥P` acts on `↥S` by conjugation; `conj_smul_mem_hInvariantStar_of_normalizer` keeps us in `S`.
   let smulFn : ↥P → ↥S → ↥S := fun x Q => ⟨MulAut.conj (x : G) • (Q : Subgroup G),
       conj_smul_mem_hInvariantStar_of_normalizer Q.2 (hPnA (x : G) x.2)⟩
-  letI act : MulAction ↥P ↥S :=
+  let act : MulAction ↥P ↥S :=
     { smul := smulFn
       one_smul := fun Q => by
         apply Subtype.ext
@@ -533,7 +533,7 @@ private theorem tp_exists_normalized [Finite G] {A P : Subgroup G} {q : ℕ} [Fa
     exact conj_smul_eq_self_of_mem_normalizer
       ((hInvariantStar_le_normalizer Q.2) hgpA)
   -- `zpowers σ` is a `p`-group: its order `= orderOf σ ∣ p`.
-  haveI hPgroup : IsPGroup p ↥(Subgroup.zpowers σ) := by
+  have hPgroup : IsPGroup p ↥(Subgroup.zpowers σ) := by
     rcases (Nat.dvd_prime (Fact.out (p := p.Prime))).mp
       (orderOf_dvd_of_pow_eq_one hσp) with h | h
     · exact IsPGroup.of_card (n := 0) (by rw [Nat.card_zpowers, h, pow_zero])
@@ -547,7 +547,7 @@ private theorem tp_exists_normalized [Finite G] {A P : Subgroup G} {q : ℕ} [Fa
     rw [hzero] at hmod
     rw [← hSeq]
     exact (Nat.modEq_zero_iff_dvd).mp hmod
-  haveI hne : Nonempty (MulAction.fixedPoints ↥(Subgroup.zpowers σ) ↥S) :=
+  have hne : Nonempty (MulAction.fixedPoints ↥(Subgroup.zpowers σ) ↥S) :=
     (Nat.card_pos_iff.mp (Nat.pos_of_ne_zero hcard_ne)).1
   obtain ⟨Q, hQfix⟩ := hne.some
   -- Unfold the fixed-point property: `σ` fixes `Q`, i.e. `conj g • Q.1 = Q.1`.
@@ -579,10 +579,10 @@ private theorem tp_exists_normalized_of_prime_index [Finite G] {A P : Subgroup G
     (hindex : (A.subgroupOf P).index = p)
     (hpdvd : ¬ p ∣ Nat.card ↥(hInvariantStar ⊤ A {q})) :
     ∃ Q ∈ hInvariantStar ⊤ A {q}, P ≤ Subgroup.normalizer Q := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   set Bbar : Subgroup ↥P := A.subgroupOf P with hBbar
   have hcardQ : Nat.card (↥P ⧸ Bbar) = p := by rw [← Subgroup.index_eq_card]; exact hindex
-  haveI hcyc : IsCyclic (↥P ⧸ Bbar) := isCyclic_of_prime_card hcardQ
+  have hcyc : IsCyclic (↥P ⧸ Bbar) := isCyclic_of_prime_card hcardQ
   obtain ⟨gbar, hgbar⟩ := isCyclic_iff_exists_zpowers_eq_top.mp hcyc
   obtain ⟨g', rfl⟩ := QuotientGroup.mk'_surjective Bbar gbar
   set g : G := (g' : G) with hg_def
@@ -663,17 +663,17 @@ private theorem tp_b [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G}
   have hNA_lt : Subgroup.normalizer (A : Set G) < ⊤ := by
     rw [lt_top_iff_ne_top]
     intro htop
-    haveI : A.Normal := Subgroup.normalizer_eq_top_iff.mp htop
+    have : A.Normal := Subgroup.normalizer_eq_top_iff.mp htop
     rcases hG.simple.eq_bot_or_eq_top_of_normal A inferInstance with h | h
     · exact hAne h
     · exact (ne_of_lt hA.proper) h
   have hKsupP_lt : K ⊔ P < ⊤ := lt_of_le_of_lt (sup_le hKnA hPnA) hNA_lt
-  haveI hKsupP_solv : IsSolvable ↥(K ⊔ P) := hG.solvable_of_lt_top _ hKsupP_lt
+  have hKsupP_solv : Group.IsSolvable ↥(K ⊔ P) := hG.isSolvable_of_lt_top _ hKsupP_lt
   -- `P` normalizes `K` (since `P ≤ N(A)` normalizes `K = O_{π'}(C_G(A))`).
   have hPnK : P ≤ Subgroup.normalizer (K : Set G) :=
     fun x hx => mem_normalizer_of_conj_smul_eq_self (conj_smul_kSubgroup_eq (hPnA hx))
   have hKsupP_le_NK : K ⊔ P ≤ Subgroup.normalizer (K : Set G) := sup_le Subgroup.le_normalizer hPnK
-  haveI hKnorm : (K.subgroupOf (K ⊔ P)).Normal :=
+  have hKnorm : (K.subgroupOf (K ⊔ P)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer le_sup_left).mpr hKsupP_le_NK
   -- `P ⊓ K = ⊥` (coprime orders: `P` is `π`, `K` is `π'`).
   have hCopPK : Nat.Coprime (Nat.card ↥P) (Nat.card ↥K) :=
@@ -718,7 +718,7 @@ private theorem tp_b [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G}
   have hP'_le_V : P' ≤ V := le_inf hP'_le_KsupP hP'nQ₂
   have hK'_le_V : K' ≤ V := le_inf (le_trans inf_le_left le_sup_left) inf_le_right
   have hV_lt : V < ⊤ := lt_of_le_of_lt (le_trans inf_le_left (le_refl _)) hKsupP_lt
-  haveI hV_solv : IsSolvable ↥V := hG.solvable_of_lt_top V hV_lt
+  have hV_solv : Group.IsSolvable ↥V := hG.isSolvable_of_lt_top V hV_lt
   -- `V = K' ⊔ P` (BG `N_{KP}(Q₂) = (K∩N(Q₂))·P`).
   have hKP_mul : (↑(K ⊔ P) : Set G) = (K : Set G) * (P : Set G) :=
     Subgroup.coe_mul_of_right_le_normalizer_left K P hPnK
@@ -754,7 +754,7 @@ private theorem tp_b [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G}
       rw [hNQ₂_def, conj_smul_normalizer_eq, hvQ₂]
     rw [hK'_def, Subgroup.smul_inf, hvNK, hvNNQ₂]
   -- `K'` is normal in `↥V`.
-  haveI hK'_normal : (K'.subgroupOf V).Normal :=
+  have hK'_normal : (K'.subgroupOf V).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hK'_le_V).mpr hVnK'
   -- `IsComplement'` of `K'` and `P` inside `↥V`, giving `|V| = |K'| * |P|`.
   have hdisj : Disjoint (K'.subgroupOf V) (P.subgroupOf V) := by
@@ -769,7 +769,7 @@ private theorem tp_b [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G}
     rw [hsup_top] at hmul
     rw [← hmul]; rfl
   have hVcard : Nat.card ↥K' * Nat.card ↥P = Nat.card ↥V := by
-    have h := hcompl.card_mul
+    have h := hcompl.card_mul_card
     rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hK'_le_V).toEquiv,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hP_le_V).toEquiv] at h
   -- `K'` is a `π'`-group (subgroup of `K`).
@@ -886,16 +886,16 @@ private theorem tp_d [Finite G] (hG : IsMinimalSimpleOdd G) {A : Subgroup G}
   have hNP_lt : NP < ⊤ := by
     rw [hNP_def, lt_top_iff_ne_top]
     intro htop
-    haveI : P.Normal := Subgroup.normalizer_eq_top_iff.mp htop
+    have : P.Normal := Subgroup.normalizer_eq_top_iff.mp htop
     rcases hG.simple.eq_bot_or_eq_top_of_normal P inferInstance with h | h
     · exact hPne h
     · exact (ne_of_lt hPlt) h
-  haveI hNP_solv : IsSolvable ↥NP := hG.solvable_of_lt_top NP hNP_lt
+  have hNP_solv : Group.IsSolvable ↥NP := hG.isSolvable_of_lt_top NP hNP_lt
   -- `OC = O_{π'}(C_G(P)) ⊴ NP`.
   have hOCnNP : NP ≤ Subgroup.normalizer (OC : Set G) := by
     intro x hx
     exact mem_normalizer_of_conj_smul_eq_self (conj_smul_opiCore_centralizer_eq hx)
-  haveI hOC_normal : (OC.subgroupOf NP).Normal :=
+  have hOC_normal : (OC.subgroupOf NP).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hOC_le_NP).mpr hOCnNP
   -- `OC ⊔ (NP ⊓ NQ) = NP` from the factorization, so `K ⊔ U = ⊤` in `↥NP`.
   have hLU : OC ⊔ (NP ⊓ NQ) = NP := by
@@ -945,7 +945,7 @@ private theorem tp_card_hStar_dvd_kSubgroup [Finite G] {A : Subgroup G} {q : ℕ
       ((Subgroup.centralizer_le_normalizer _) (kSubgroup_le_centralizer A k.2))
   let smulFn : ↥K → ↥S → ↥S := fun k Q => ⟨MulAut.conj (k : G) • (Q : Subgroup G),
     conj_smul_mem_hInvariantStar_of_normalizer Q.2 (hkA k)⟩
-  letI act : MulAction ↥K ↥S :=
+  let act : MulAction ↥K ↥S :=
     { smul := smulFn
       one_smul := fun Q => by
         apply Subtype.ext
@@ -958,7 +958,7 @@ private theorem tp_card_hStar_dvd_kSubgroup [Finite G] {A : Subgroup G} {q : ℕ
         rw [Subgroup.coe_mul, map_mul, mul_smul] }
   have hsmul_coe : ∀ (k : ↥K) (Q : ↥S),
       ((k • Q : ↥S) : Subgroup G) = MulAut.conj (k : G) • (Q : Subgroup G) := fun _ _ => rfl
-  haveI hpre : MulAction.IsPretransitive ↥K ↥S := by
+  have hpre : MulAction.IsPretransitive ↥K ↥S := by
     refine ⟨fun Q₁ Q₂ => ?_⟩
     obtain ⟨k, hkK, hkeq⟩ := htrans Q₁ Q₁.2 Q₂ Q₂.2
     refine ⟨⟨k, hkK⟩, ?_⟩
@@ -1120,7 +1120,7 @@ theorem transitivity_propagates [Finite G] (hG : IsMinimalSimpleOdd G)
     · -- `A < P`: reduce to a normal subgroup `B` of prime index.
       have hAltP : A < P := lt_of_le_of_ne hAP hAeqP
       obtain ⟨B, hAB, hBlt, hBnorm, hBindex⟩ := tp_reduction hG hAP hAltP hPproper hAsub
-      haveI := hBnorm
+      have := hBnorm
       have hBP : B ≤ P := le_of_lt hBlt
       -- `B` is a `π(A)`-subgroup; `primesOf B = primesOf A`.
       have hBpi : Subgroup.IsPiSubgroup (primesOf A) B := fun r hr =>
@@ -1131,7 +1131,7 @@ theorem transitivity_propagates [Finite G] (hG : IsMinimalSimpleOdd G)
       by_cases hAeqB : A = B
       · -- `A = B`: prime-index base case.
         subst hAeqB
-        haveI : (A.subgroupOf P).Normal := hBnorm
+        have : (A.subgroupOf P).Normal := hBnorm
         exact tp_base hG hA hq hAP hPpi hPproper hPne
           (p := (A.subgroupOf P).index) hBindex rfl htrans
       · -- `A < B`: double recursion on `(A, B)` and `(B, P)`.

@@ -292,7 +292,7 @@ theorem sOf_sixTwoDecompositionData [Finite G] {M : Subgroup G} {A : Set G}
         D.imageFamily.Orthogonal Da.imageFamily ∧
         D.tau1 χ = hS₁coh.extension χ := by
   classical
-  haveI := derivedInG_subgroupOf_normal M
+  have := derivedInG_subgroupOf_normal M
   have hψbot := sOf_subset_inducedKernelFamily_bot hG hM data Y hψ
   have hψcbot := sOf_subset_inducedKernelFamily_bot hG hM data Y
     (sOf_closedUnderConjugate data Y hψ)
@@ -415,7 +415,7 @@ theorem sOf_mem_Snorm_pos [Finite G] {M : Subgroup G}
     (data : TypesIIIIIIVSetup M) {Y : Subgroup G} {χ : ClassFunction ↥M ℂ}
     (hχ : χ ∈ sOf data Y) : 0 < OddOrder.Peterfalvi.S07.Snorm χ := by
   classical
-  haveI := derivedInG_subgroupOf_normal M
+  have := derivedInG_subgroupOf_normal M
   have hpos := OddOrder.Peterfalvi.S08.inducedKernelFamily_inner_self_real_pos
     (sOf_subset_inducedKernelFamily_bot hG hM data Y hχ)
   obtain ⟨ζ, hζ, rfl⟩ := hχ
@@ -1055,7 +1055,7 @@ theorem caseA_pairBound [Finite G] {M : Subgroup G} {A : Set G}
       (OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M) := by
   classical
-  haveI := derivedInG_subgroupOf_normal M
+  have := derivedInG_subgroupOf_normal M
   intro S₂ hS₁sub hS₂sub hS₂conj hS₂coh ψ hψ hnc
   obtain ⟨hψS, hψnotS₂⟩ := hψ
   obtain ⟨cohS₂⟩ := hS₂coh

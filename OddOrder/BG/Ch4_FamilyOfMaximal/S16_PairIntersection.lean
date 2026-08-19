@@ -131,13 +131,13 @@ theorem typeP_pair_inf_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   obtain ⟨hself1, _, _, hself4⟩ := typeP_self_member hG hM hP hKM hK hKstar hU
   have hKstar_ne : Kstar ≠ ⊥ := fun h => hself4 (hself1.trans h)
   -- `K*` is cyclic (a subgroup of the cyclic `Z`).
-  haveI : IsCyclic ↥(K ⊔ Kstar) := hZcyc
-  haveI hKstarcyc : IsCyclic ↥Kstar :=
+  have : IsCyclic ↥(K ⊔ Kstar) := hZcyc
+  have hKstarcyc : IsCyclic ↥Kstar :=
     (Subgroup.subgroupOfEquivOfLe (le_sup_right : Kstar ≤ K ⊔ Kstar)).isCyclic.mp inferInstance
   -- A prime `p ∣ |K*|` and an order-`p` line `X* ≤ K*`.
   have hcard_ne_one : Nat.card ↥Kstar ≠ 1 := fun h => hKstar_ne (Subgroup.card_eq_one.mp h)
   obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hcard_ne_one
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨g, hg⟩ : ∃ g : ↥Kstar, orderOf g = p := exists_prime_orderOf_dvd_card' p hpdvd
   set X : Subgroup G := Subgroup.zpowers ((g : ↥Kstar) : G) with hXdef
   have hgord : orderOf ((g : ↥Kstar) : G) = p :=
@@ -222,7 +222,7 @@ theorem typeP_pair_W_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     typeP_pair_inf_eq hG hM hP hKM hK hKstar hU hMstar hPstar hnc hKstarMstar hKstar_hall hZcyc
         hK_eq
   refine ⟨heq, heq ▸ hZcyc, kappaHall_inf_Kstar_eq_bot hKM hK hKstar, fun x hx y hy => ?_⟩
-  letI : CommGroup ↥(K ⊔ Kstar) := IsCyclic.commGroup
+  let : CommGroup ↥(K ⊔ Kstar) := IsCyclic.commGroup
   exact congrArg Subtype.val
     (mul_comm (⟨x, Subgroup.mem_sup_left hx⟩ : ↥(K ⊔ Kstar)) ⟨y, Subgroup.mem_sup_right hy⟩)
 

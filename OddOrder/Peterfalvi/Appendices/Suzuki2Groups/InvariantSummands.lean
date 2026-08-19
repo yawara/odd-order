@@ -63,7 +63,7 @@ theorem quotient_fixedPointFree_of_fixedPoints_le
   have hCcop : Nat.Coprime (Nat.card C) (Nat.card ↑Z) :=
     hcop.coprime_dvd_left (Subgroup.card_subgroup_dvd_card C)
   have hZpsi : IsAInvariant psi Z := fun c => hZinv c
-  letI : MulAction K (P ⧸ Z) :=
+  let : MulAction K (P ⧸ Z) :=
     MulAction.compHom (P ⧸ Z) (quotientMulAutHom hZinv)
   have hkStabilizer : k ∈ MulAction.stabilizer K (QuotientGroup.mk' Z g) := by
     rw [MulAction.mem_stabilizer_iff]
@@ -84,11 +84,11 @@ theorem quotient_fixedPointFree_of_fixedPoints_le
     exact ⟨z⁻¹, Z.inv_mem hz, by
       rw [MonoidHom.comp_apply, eq_mul_inv_iff_mul_eq]
       exact hzeq⟩
-  haveI : IsSolvable C :=
-    isSolvable_of_comm fun c d => mul_comm' c d
+  have : Group.IsSolvable C :=
+    Group.isSolvable_of_comm fun c d => mul_comm' c d
   obtain ⟨c, hcfix, z, hz, hc⟩ :=
     OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal
-      (φ := psi) hCcop (Or.inl (inferInstance : IsSolvable C)) hZpsi hcoset
+      (φ := psi) hCcop (Or.inl (inferInstance : Group.IsSolvable C)) hZpsi hcoset
   let kC : C := ⟨k, Subgroup.mem_zpowers k⟩
   have hck : act k c = c := by
     simpa only [psi, kC, MonoidHom.comp_apply, Subgroup.coe_subtype] using hcfix kC
@@ -130,7 +130,7 @@ theorem restrict_transitive_of_fixedPointFree_card
     ∀ a b : U, a ≠ 1 → b ≠ 1 →
       ∃ k : K, hUinv.restrict k a = b := by
   classical
-  letI : Fintype U := Fintype.ofFinite U
+  let : Fintype U := Fintype.ofFinite U
   intro a b ha hb
   let orbitMap : K → {u : U // u ≠ 1} := fun k =>
     ⟨hUinv.restrict k a, by

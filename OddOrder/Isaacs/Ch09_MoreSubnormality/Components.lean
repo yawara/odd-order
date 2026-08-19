@@ -96,7 +96,7 @@ lemma の rotate と `H = H'` (perfect) で `⁅H,N⁆ = ⁅⁅H,H⁆,N⁆ = ⊥
 theorem commutator_eq_bot_of_isMinimalNormal_of_isComponent [Finite G] {N H : Subgroup G}
     (hN : Ch02.IsMinimalNormal N) (hH : IsComponent H) (hnle : ¬H ≤ N) :
     ⁅N, H⁆ = ⊥ := by
-  haveI hNn : N.Normal := hN.1
+  have hNn : N.Normal := hN.1
   have hNle : N ≤ Subgroup.normalizer (H : Set G) :=
     Ch02.isMinimalNormal_le_normalizer_of_isSubnormal hH.isSubnormal hN
   have h1 : ⁅N, H⁆ ≤ H := Subgroup.le_normalizer_iff_commutator_le_right.mp hNle
@@ -117,7 +117,7 @@ theorem commutator_eq_bot_of_isMinimalNormal_of_isComponent [Finite G] {N H : Su
   have h3 : ⁅⁅N, H⁆, H⁆ = ⊥ := Subgroup.commutator_eq_bot_iff_le_centralizer.mpr hcent
   have h4 : ⁅⁅H, N⁆, H⁆ = ⊥ := by rw [Subgroup.commutator_comm H N]; exact h3
   have h5 : ⁅⁅H, H⁆, N⁆ = ⊥ := Subgroup.commutator_commutator_eq_bot_of_rotate h4 h3
-  haveI := hH.isQuasisimple.isPerfect
+  have := hH.isQuasisimple.isPerfect
   rw [Subgroup.commutator_eq_self] at h5
   rw [Subgroup.commutator_comm N H]
   exact h5
@@ -164,8 +164,8 @@ private theorem components_commute_aux (n : ℕ) :
         · exact hK.ne_bot hb'
         exact hne (ht.trans ht'.symm)
       · -- Case 3+: minimal normal `N` を取る
-        haveI : Nontrivial G := by
-          haveI := hH.isQuasisimple.nontrivial
+        have : Nontrivial G := by
+          have := hH.isQuasisimple.nontrivial
           obtain ⟨x, hx1⟩ := exists_ne (1 : ↥H)
           exact ⟨(x : G), 1, fun h => hx1 (Subtype.ext h)⟩
         obtain ⟨N₀, hN₀normal, hN₀bot, hN₀top⟩ :
@@ -176,10 +176,10 @@ private theorem components_commute_aux (n : ℕ) :
             by_cases hb : N' = ⊥
             · exact Or.inl hb
             · exact Or.inr (hno N' hN' hb)⟩
-        haveI := hN₀normal
+        have := hN₀normal
         obtain ⟨N, hNmin, hNle⟩ := Ch02.exists_isMinimalNormal_le_of_normal N₀ hN₀bot
         have hNtop : N ≠ ⊤ := fun h => hN₀top (top_le_iff.mp (h ▸ hNle))
-        haveI := hNmin.1
+        have := hNmin.1
         -- `key`: minimal normal `N'` で両成分の像が異なれば商への帰納 + rotate で閉じる
         have key : ∀ (N' : Subgroup G) [N'.Normal], Ch02.IsMinimalNormal N' → ¬H ≤ N' →
             ¬K ≤ N' → H.map (QuotientGroup.mk' N') ≠ K.map (QuotientGroup.mk' N') →
@@ -205,7 +205,7 @@ private theorem components_commute_aux (n : ℕ) :
             le_bot_iff.mp ((Subgroup.commutator_mono hle le_rfl).trans_eq h93)
           have h2 : ⁅⁅K, H⁆, H⁆ = ⊥ := by rw [Subgroup.commutator_comm K H]; exact h1
           have h5 : ⁅⁅H, H⁆, K⁆ = ⊥ := Subgroup.commutator_commutator_eq_bot_of_rotate h1 h2
-          haveI := hH.isQuasisimple.isPerfect
+          have := hH.isQuasisimple.isPerfect
           rwa [Subgroup.commutator_eq_self] at h5
         by_cases hHN : H ≤ N
         · by_cases hKN : K ≤ N
@@ -238,16 +238,16 @@ private theorem components_commute_aux (n : ℕ) :
                 rw [← hKNtop]
                 exact sup_le Subgroup.le_normalizer
                   (Ch02.isMinimalNormal_le_normalizer_of_isSubnormal hK.isSubnormal hNmin)
-              haveI := hHnormal
-              haveI := hKnormal
+              have := hHnormal
+              have := hKnormal
               have hHK : ⁅H, K⁆ ≤ H ⊓ K :=
                 le_inf (Subgroup.commutator_le_left H K) (Subgroup.commutator_le_right H K)
               by_cases hcomm : ⁅H, K⁆ = ⊥
               · exact hcomm
-              · haveI : (⁅H, K⁆).Normal := Subgroup.commutator_normal H K
+              · have : (⁅H, K⁆).Normal := Subgroup.commutator_normal H K
                 obtain ⟨M, hMmin, hMle⟩ :=
                   Ch02.exists_isMinimalNormal_le_of_normal ⁅H, K⁆ hcomm
-                haveI := hMmin.1
+                have := hMmin.1
                 have hMH : M ≤ H := hMle.trans (hHK.trans inf_le_left)
                 have hMK : M ≤ K := hMle.trans (hHK.trans inf_le_right)
                 have hMtop : M ≠ ⊤ := fun h =>

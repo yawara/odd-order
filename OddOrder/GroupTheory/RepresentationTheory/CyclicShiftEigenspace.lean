@@ -51,7 +51,7 @@ theorem linearIndependent_of_triangular {ι κ : Type*} [Finite κ] (b : Basis �
     (hoff : ∀ a a', a ≠ a' → b.repr (g a) (coord a') = 0) :
     LinearIndependent F g := by
   classical
-  haveI := Fintype.ofFinite κ
+  have := Fintype.ofFinite κ
   rw [Fintype.linearIndependent_iff]
   intro c hc a₀
   have hb : (b.repr (∑ a, c a • g a)) (coord a₀) = 0 := by rw [hc]; simp
@@ -192,7 +192,7 @@ theorem finrank_cyclicEigenspaceFin_cyclicShift (T : Module.End F W) (b : Basis 
     {ε : F} (hε : IsPrimitiveRoot ε h)
     (hb : ∀ j, T (b j) = b (j + 1)) (i : Fin h) :
     finrank F (cyclicEigenspaceFin ε T i) = 1 := by
-  haveI : FiniteDimensional F W := Module.Finite.of_basis b
+  have : FiniteDimensional F W := Module.Finite.of_basis b
   have hε0 : ε ≠ 0 := hε.ne_zero (NeZero.ne h)
   have hεpow : ε ^ h = 1 := hε.pow_eq_one
   -- explicit eigenvector for `ε^{j.1}`, for each `j`

@@ -289,7 +289,7 @@ theorem opiCoreInG_subgroupOf_isHall_of_isHall [Finite G] {π : Set ℕ} {M : Su
 theorem piSubgroup_le_opiCoreInG_of_isHall [Finite G] {π : Set ℕ} {M L : Subgroup G}
     (hHall : Ch03.IsHallSubgroup π (opiCoreInG π M)) (hLM : L ≤ M)
     (hLpi : Ch03.Subgroup.IsPiGroup π L) : L ≤ opiCoreInG π M := by
-  haveI : ((opiCoreInG π M).subgroupOf M).Normal := by
+  have : ((opiCoreInG π M).subgroupOf M).Normal := by
     rw [opiCoreInG_subgroupOf]
     infer_instance
   have hHallM : Ch03.IsHallSubgroup π ((opiCoreInG π M).subgroupOf M) :=
@@ -358,7 +358,7 @@ theorem maximal_hasPLengthOne_of_not_mem_alpha [Finite G]
     Ch1.hasPLengthOne p ↥M := by
   classical
   by_cases hpM : p ∈ (Nat.card ↥M).primeFactors
-  · haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  · have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
     have hoddM : Odd (Nat.card ↥M) :=
       hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
     have hp_dvd : p ∣ Nat.card ↥M := (Nat.mem_primeFactors.mp hpM).2.1
@@ -477,7 +477,7 @@ theorem maximal_normalizer_le_self [Finite G] (hG : IsMinimalSimpleOdd G)
     rcases hG.simple.eq_bot_or_eq_top_of_normal M hnorm with hbot | htop'
     · -- `M = ⊥`: every nontrivial subgroup is `⊤`, so `G` is cyclic, hence solvable.
       have hco' : ∀ b : Subgroup G, ⊥ < b → b = ⊤ := by rw [← hbot]; exact hco.2
-      haveI : Nontrivial G := hG.simple.toNontrivial
+      have : Nontrivial G := hG.simple.toNontrivial
       obtain ⟨g, hg1⟩ := exists_ne (1 : G)
       have hgtop : Subgroup.zpowers g = ⊤ :=
         hco' _ (bot_lt_iff_ne_bot.mpr (fun h => hg1 (Subgroup.zpowers_eq_bot.mp h)))
@@ -486,7 +486,7 @@ theorem maximal_normalizer_le_self [Finite G] (hG : IsMinimalSimpleOdd G)
         obtain ⟨i, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hgtop ▸ Subgroup.mem_top a)
         obtain ⟨j, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hgtop ▸ Subgroup.mem_top b)
         rw [← zpow_add, ← zpow_add, add_comm]
-      exact hG.notSolvable (isSolvable_of_comm hcomm)
+      exact hG.notSolvable (Group.isSolvable_of_comm hcomm)
     · exact hco.1 htop'
 
 /-- **BG Theorem 10.1 part-(b) input** (mmd L2697-2699): for a proper subgroup `L < ⊤` and a
@@ -498,7 +498,7 @@ private theorem frattini_decomp_of_rank_le_two [Finite G] (hG : IsMinimalSimpleO
     (hp_dvd : p ∣ Nat.card ↥L) (hrank : rank ↥(P : Subgroup ↥L) ≤ 2) :
     (⊤ : Subgroup ↥L)
       = Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} ↥L ⊔ Subgroup.normalizer (P : Subgroup ↥L) := by
-  haveI : IsSolvable ↥L := hG.solvable_of_lt_top L hL
+  have : Group.IsSolvable ↥L := hG.isSolvable_of_lt_top L hL
   have hodd : Odd (Nat.card ↥L) := by
     rcases Nat.even_or_odd (Nat.card ↥L) with he | ho
     · exact absurd (he.two_dvd.trans (Subgroup.card_subgroup_dvd_card L))
@@ -517,7 +517,7 @@ nilpotent normalizer condition applied inside `↥S`, transported back to `G` vi
 private theorem lt_inf_normalizer_of_lt_of_isPGroup [Finite G] {p : ℕ} [Fact p.Prime]
     {X S : Subgroup G} (hXS : X < S) (hS : IsPGroup p ↥S) :
     X < Subgroup.normalizer X ⊓ S := by
-  haveI : Group.IsNilpotent ↥S := hS.isNilpotent
+  have : Group.IsNilpotent ↥S := hS.isNilpotent
   have hNC : NormalizerCondition ↥S := Group.normalizerCondition_of_isNilpotent (G := ↥S)
   have hsub_lt : X.subgroupOf S < ⊤ := by
     rw [lt_top_iff_ne_top]
@@ -693,7 +693,7 @@ private theorem fusion_b [Finite G] (hG : IsMinimalSimpleOdd G)
       rcases hG.simple.eq_bot_or_eq_top_of_normal X hXnorm with hbot | htopX
       · exact hXne hbot
       · have hGpg : IsPGroup p G := hXp.of_equiv (htopX ▸ Subgroup.topEquiv)
-        haveI : Group.IsNilpotent G := hGpg.isNilpotent
+        have : Group.IsNilpotent G := hGpg.isNilpotent
         exact hG.notSolvable inferInstance
     have hXcardG : Nat.card ↥X ≤ Nat.card G :=
       Nat.le_of_dvd Nat.card_pos X.card_subgroup_dvd_card
@@ -832,7 +832,7 @@ private theorem fusion_b [Finite G] (hG : IsMinimalSimpleOdd G)
         rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hX₁L).toEquiv]
         exact (X₁.subgroupOf L).card_subgroup_dvd_card
       have hfd := frattini_decomp_of_rank_le_two hG hL_lt P hp_dvd_L hrankP
-      haveI : (Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} ↥L).Normal := Ch03.oPiCore.normal _ _
+      have : (Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} ↥L).Normal := Ch03.oPiCore.normal _ _
       obtain ⟨o, ho, w, hw, how⟩ :=
         Subgroup.mem_sup_of_normal_left.mp (hfd ▸ Subgroup.mem_top (⟨t, htL⟩ : ↥L))
       have hXL : X ≤ L := Subgroup.le_normalizer
@@ -969,7 +969,7 @@ theorem alpha_subset_sigma [Finite G] (hG : IsMinimalSimpleOdd G)
   rw [mem_alpha_iff] at hp
   obtain ⟨hpf, hpr⟩ := hp
   obtain ⟨hp_prime, hp_dvd, -⟩ := Nat.mem_primeFactors.mp hpf
-  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have : Fact p.Prime := ⟨hp_prime⟩
   have hMc : IsCoatom M := mem_maximalSubgroups.mp hM
   have hM_lt : M < ⊤ := lt_top_iff_ne_top.mpr hMc.1
   obtain ⟨P⟩ : Nonempty (Sylow p ↥M) := inferInstance
@@ -1039,7 +1039,7 @@ theorem hallAlphaSubgroup_isHallInG [Finite G] (hG : IsMinimalSimpleOdd G)
     Ch03.IsHallSubgroup (alpha M) A := by
   refine isHallSubgroup_of_subgroupOf_isHall_of_forall_not_dvd_index hAM hHall ?_
   intro p hpα hp_prime
-  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have : Fact p.Prime := ⟨hp_prime⟩
   exact not_dvd_index_of_mem_sigma (alpha_subset_sigma hG hM hpα)
 
 /-- **BG Theorem 10.2, existence of `M(α)`**: for a maximal subgroup `M`, there is
@@ -1048,7 +1048,7 @@ solvable group `M`, transported to `G` using the σ-index fact. -/
 theorem exists_hallAlphaSubgroup_isHallInG [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
     ∃ A : Subgroup G, A ≤ M ∧ Ch03.IsHallSubgroup (alpha M) A := by
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   obtain ⟨H, hH⟩ := Ch03.hall_E_exists (G := ↥M) (alpha M)
   set A : Subgroup G := H.map M.subtype with hAdef
   have hAM : A ≤ M := by
@@ -1072,9 +1072,9 @@ theorem pSubgroup_le_opCore_of_le_fitting [Finite G] {p : ℕ} [Fact p.Prime]
       (Subgroup.subgroupOfEquivOfLe hWF).injective
   obtain ⟨P, hWP⟩ := hW'_pg.exists_le_sylow
   have hPnorm : P.Normal := Ch01.Sylow.normal_of_isNilpotent P
-  haveI : (P : Subgroup ↥(Ch01.fitting G)).Characteristic :=
+  have : (P : Subgroup ↥(Ch01.fitting G)).Characteristic :=
     Sylow.characteristic_of_normal P hPnorm
-  haveI : ((P : Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype).Normal :=
+  have : ((P : Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype).Normal :=
     inferInstance
   have hPmap_pg :
       IsPGroup p ↥((P : Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype) :=
@@ -1095,7 +1095,7 @@ theorem fitting_quotient_oPiCore_isPiGroup_compl [Finite G] (π : Set ℕ) :
   let Q : Type _ := G ⧸ Ch03.oPiCore π G
   intro p hpF hpπ
   have hp_prime : p.Prime := (Nat.mem_primeFactors.mp hpF).1
-  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have : Fact p.Prime := ⟨hp_prime⟩
   have hp_dvd_F : p ∣ Nat.card ↥(Ch01.fitting Q) :=
     (Nat.mem_primeFactors.mp hpF).2.1
   obtain ⟨P⟩ : Nonempty (Sylow p ↥(Ch01.fitting Q)) := inferInstance
@@ -1165,7 +1165,7 @@ private lemma iSup_sylow_eq_top {M : Type*} [Group M] [Finite M] :
   have h_pow_dvd : ∀ p ∈ (Nat.card M).primeFactors,
       p ^ (Nat.card M).factorization p ∣ Nat.card sup := by
     intro p hp
-    haveI hp_prime : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+    have hp_prime : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
     have hP_le : ((default : Sylow p M) : Subgroup M) ≤ sup := by
       rw [hsup_def]
       refine le_trans ?_ (le_iSup (fun q : (Nat.card M).primeFactors =>
@@ -1319,7 +1319,7 @@ theorem hallSigmaSubgroup_le_derived [Finite G] (hG : IsMinimalSimpleOdd G)
     S ≤ derivedInG M := by
   refine le_of_sylow_le ?_
   intro r P
-  haveI : Fact (r : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors r.property⟩
+  have : Fact (r : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors r.property⟩
   set Pbar : Subgroup G := (P : Subgroup ↥S).map S.subtype with hPbar
   have hPbar_le_S : Pbar ≤ S := Subgroup.map_subtype_le _
   have hPbar_le_M : Pbar ≤ M := hPbar_le_S.trans hSM
@@ -1348,7 +1348,7 @@ theorem Msigma_le_derived [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) : Msigma M ≤ derivedInG M := by
   refine le_of_sylow_le ?_
   intro r P
-  haveI : Fact (r : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors r.property⟩
+  have : Fact (r : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors r.property⟩
   set Pbar : Subgroup G := (P : Subgroup ↥(Msigma M)).map (Msigma M).subtype with hPbar
   have hPbar_le_Msigma : Pbar ≤ Msigma M := Subgroup.map_subtype_le _
   have hPbar_le_M : Pbar ≤ M := hPbar_le_Msigma.trans (Msigma_le M)

@@ -35,7 +35,7 @@ theorem exists_involution_mem_of_nontrivial_two_subgroup
     {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
     {C : Subgroup P} (hC_ne : C ≠ ⊥) :
     ∃ z : P, z ∈ C ∧ z ^ 2 = 1 ∧ z ≠ 1 := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hC_two : IsPGroup 2 C := hP.to_subgroup C
   have hC_card_ne_one : Nat.card C ≠ 1 := by
     intro hC_card
@@ -43,7 +43,7 @@ theorem exists_involution_mem_of_nontrivial_two_subgroup
   have hC_card_gt_one : 1 < Nat.card C := by
     have hC_pos : 0 < Nat.card C := Nat.card_pos
     omega
-  haveI : Nontrivial C := Finite.one_lt_card_iff_nontrivial.mp hC_card_gt_one
+  have : Nontrivial C := Finite.one_lt_card_iff_nontrivial.mp hC_card_gt_one
   obtain ⟨n, hn_pos, hC_card⟩ := hC_two.nontrivial_iff_card.mp inferInstance
   have h_two_dvd_card : 2 ∣ Nat.card C := by
     rw [hC_card]
@@ -71,8 +71,8 @@ theorem isCyclic_of_comm_two_group_unique_involution
     (hUnique : ∀ x y : P, x ≠ 1 → x ^ 2 = 1 → y ≠ 1 → y ^ 2 = 1 → x = y) :
     IsCyclic P := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI : IsMulCommutative P := ⟨⟨hcomm⟩⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : IsMulCommutative P := ⟨⟨hcomm⟩⟩
   refine hP.isCyclic_of_subgroups_card_prime_unique ?_
   intro K L hK_card hL_card
   have hK_two_dvd : 2 ∣ Nat.card K := by rw [hK_card]
@@ -175,7 +175,7 @@ theorem exists_distinct_subgroups_card_two_of_external_involution
     (ha_notmem : a ∉ C) (ha_sq : a ^ 2 = 1)
     (hz_mem : z ∈ C) (hz_sq : z ^ 2 = 1) (hz_ne : z ≠ 1) :
     ∃ K L : Subgroup P, Nat.card K = 2 ∧ Nat.card L = 2 ∧ K ≠ L := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have ha_ne : a ≠ 1 := by
     intro ha
     exact ha_notmem (ha ▸ C.one_mem)

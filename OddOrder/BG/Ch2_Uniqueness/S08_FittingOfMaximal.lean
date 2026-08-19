@@ -28,7 +28,7 @@ theorem zCenterLOdd_top_ne_bot_of_isPGroup
     OddOrder.BG.AppB.lOddIn_ne_bot hX
   have hL_pg : IsPGroup p (OddOrder.BG.AppB.lOddIn (⊤ : Subgroup X)) :=
     hX.to_subgroup _
-  haveI hL_nontriv : Nontrivial ↥(OddOrder.BG.AppB.lOddIn (⊤ : Subgroup X)) :=
+  have hL_nontriv : Nontrivial ↥(OddOrder.BG.AppB.lOddIn (⊤ : Subgroup X)) :=
     (Subgroup.nontrivial_iff_ne_bot _).mpr hL_ne
   have hcenter_ne :
       Subgroup.center (OddOrder.BG.AppB.lOddIn (⊤ : Subgroup X) : Subgroup X) ≠ ⊥ :=
@@ -44,7 +44,7 @@ group, is nontrivial. -/
 theorem zCenterLOdd_ne_bot_of_isPGroup [Finite G]
     {p : ℕ} [Fact p.Prime] {H : Subgroup G} (hHp : IsPGroup p H) (hH_ne : H ≠ ⊥) :
     OddOrder.BG.AppB.zCenterLOdd H ≠ ⊥ := by
-  haveI hH_nontriv : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hH_ne
+  have hH_nontriv : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hH_ne
   have htop_ne : OddOrder.BG.AppB.zCenterLOdd (⊤ : Subgroup ↥H) ≠ ⊥ :=
     zCenterLOdd_top_ne_bot_of_isPGroup (X := ↥H) hHp
   have hinj : Function.Injective (H.subtype.comp (⊤ : Subgroup ↥H).subtype) := by
@@ -165,7 +165,7 @@ theorem sylow_map_mem_range_of_fittingInG_isPGroup [Finite G]
     rintro rfl
     rw [Nat.odd_iff] at hp_odd_prop
     omega
-  have hsolvM : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hsolvM : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hoddM : Odd (Nat.card ↥M) :=
     hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
   have hmap_bot : (Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥M).map M.subtype = ⊥ := by
@@ -482,10 +482,10 @@ theorem hInvariant_scn3_map_singleton_compl_eq_bot_of_fittingInG_isPGroup
       exact Nat.mem_primeFactors.mpr ⟨Fact.out, hp_dvd_G, Nat.card_pos.ne'⟩
     have hp_not : p ∈ ({p} : Set ℕ)ᶜ := hYpi p hpY
     exact hp_not (by simp)
-  haveI hYsolv : IsSolvable ↥Y := hG.solvable_of_lt_top Y hYlt
-  haveI hY_nontriv : Nontrivial ↥Y := (Subgroup.nontrivial_iff_ne_bot Y).mpr hYne
+  have hYsolv : Group.IsSolvable ↥Y := hG.isSolvable_of_lt_top Y hYlt
+  have hY_nontriv : Nontrivial ↥Y := (Subgroup.nontrivial_iff_ne_bot Y).mpr hYne
   have hFY_ne : fittingInG Y ≠ ⊥ := by
-    have hF_ne : Ch01.fitting ↥Y ≠ ⊥ := Ch01.fitting_ne_bot_of_solvable_nontrivial ↥Y
+    have hF_ne : Ch01.fitting ↥Y ≠ ⊥ := Ch01.fitting_ne_bot_of_isSolvable_nontrivial ↥Y
     intro hbot
     rw [fittingInG] at hbot
     exact hF_ne ((Subgroup.map_eq_bot_iff_of_injective (Ch01.fitting ↥Y)
@@ -494,7 +494,7 @@ theorem hInvariant_scn3_map_singleton_compl_eq_bot_of_fittingInG_isPGroup
     intro hcard
     exact hFY_ne (Subgroup.card_eq_one.mp hcard)
   obtain ⟨q, hq_prime, hq_dvd⟩ := Nat.exists_prime_and_dvd hFY_card_ne_one
-  haveI hqFact : Fact q.Prime := ⟨hq_prime⟩
+  have hqFact : Fact q.Prime := ⟨hq_prime⟩
   have hqF : q ∈ (Nat.card ↥(fittingInG Y)).primeFactors :=
     Nat.mem_primeFactors.mpr ⟨hq_prime, hq_dvd, Nat.card_pos.ne'⟩
   have hqY : q ∈ (Nat.card ↥Y).primeFactors :=
@@ -543,7 +543,7 @@ theorem opiCoreInG_singleton_compl_eq_bot_of_scn3_map_le_of_fittingInG_isPGroup
 Theorem 6.2 makes `Z(L(R))` normal in `H` for every Sylow `p`-subgroup `R` of `H`. -/
 theorem zCenterLOdd_sylow_map_subgroupOf_normal_of_opiCoreInG_singleton_compl_eq_bot
     [Finite G] (hG : IsMinimalSimpleOdd G) {H : Subgroup G} {p : ℕ} [Fact p.Prime]
-    (hp_dvd_G : p ∣ Nat.card G) (R : Sylow p ↥H) (hH_solvable : IsSolvable ↥H)
+    (hp_dvd_G : p ∣ Nat.card G) (R : Sylow p ↥H) (hH_solvable : Group.IsSolvable ↥H)
     (hOpBot : opiCoreInG ({p} : Set ℕ)ᶜ H = ⊥) :
     (((OddOrder.BG.AppB.zCenterLOdd (R : Subgroup ↥H)).map H.subtype).subgroupOf H).Normal := by
   have hp_odd_prop : Odd p := hG.odd.of_dvd_nat hp_dvd_G
@@ -603,7 +603,7 @@ theorem isSCN3_ne_bot [Finite G] {p : ℕ} [Fact p.Prime] {A : Subgroup G}
   have hprank_le : pRank A p ≤ 0 := by
     rw [pRank_le_iff]
     intro B hB
-    haveI : Subsingleton A := by
+    have : Subsingleton A := by
       rw [hbot]
       infer_instance
     have hBcard : Nat.card B = 1 :=
@@ -758,7 +758,7 @@ theorem lt_inf_normalizer_of_isPGroup_lt [Finite G]
     {p : ℕ} [Fact p.Prime] {K L : Subgroup G}
     (hL : IsPGroup p L) (hKL : K < L) :
     K < L ⊓ Subgroup.normalizer (K : Set G) := by
-  haveI : Group.IsNilpotent ↥L := hL.isNilpotent
+  have : Group.IsNilpotent ↥L := hL.isNilpotent
   have hNC : NormalizerCondition ↥L := Group.normalizerCondition_of_isNilpotent (G := ↥L)
   have hK_le : K ≤ L := le_of_lt hKL
   have hsub_lt_top : K.subgroupOf L < ⊤ := by
@@ -1017,7 +1017,7 @@ theorem exists_maximalSubgroup_containing_normalizer_of_ne_bot_le_maximal [Finit
     (hG : IsMinimalSimpleOdd G) {M K : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hKne : K ≠ ⊥) (hKM : K ≤ M) :
     ∃ L : Subgroup G, L ∈ maximalSubgroups G ∧ Subgroup.normalizer (K : Set G) ≤ L := by
-  haveI : IsSimpleGroup G := hG.simple
+  have : IsSimpleGroup G := hG.simple
   have hMco : IsCoatom M := mem_maximalSubgroups.mp hM
   have hN_ne_top : Subgroup.normalizer (K : Set G) ≠ ⊤ := by
     intro hN_top
@@ -1080,7 +1080,7 @@ theorem sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup [Finite G] (hG : IsMi
       (w := fun K : Subgroup G => sylowInfCard p K M)
       hA_proper hM hA_le_M hnotU
   have hHco : IsCoatom H := mem_maximalSubgroups.mp hH
-  haveI hH_solvable : IsSolvable ↥H := hG.solvable_of_lt_top H hHco.lt_top
+  have hH_solvable : Group.IsSolvable ↥H := hG.isSolvable_of_lt_top H hHco.lt_top
   have hOpComplHBot : opiCoreInG ({p} : Set ℕ)ᶜ H = ⊥ :=
     opiCoreInG_singleton_compl_eq_bot_of_scn3_map_le_of_fittingInG_isPGroup
       hG hM hp P hFp hAP hA hAH
@@ -1277,7 +1277,7 @@ theorem sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup [Finite G] (hG : IsMi
     exists_sylow_subgroupOf_map_eq_of_not_dvd_index hRinf_amb_p hRinf_amb_le_M
       (not_dvd_subgroupOf_index_of_forall_card_le hRinf_amb_p hRinf_amb_le_M
         (forall_card_le_of_normalizer_sylow_inf_map_le_left Rinf hNRinf_le_H))
-  haveI hM_solvable : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hM_solvable : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hOpComplMBot : opiCoreInG ({p} : Set ℕ)ᶜ M = ⊥ :=
     opiCoreInG_singleton_compl_eq_bot_of_fittingInG_isPGroup (M := M) hp hFp
   have hZNormM :

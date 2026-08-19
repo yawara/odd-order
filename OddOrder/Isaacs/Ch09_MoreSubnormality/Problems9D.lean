@@ -436,7 +436,7 @@ def KegelHypothesis (S : Subgroup G) : Prop :=
 /-- **Lemma 9.31** の言い換え: subnormal なら Kegel の仮説をみたす。 -/
 theorem KegelHypothesis.of_isSubnormal [Finite G] {S : Subgroup G} (hS : S.IsSubnormal) :
     KegelHypothesis S := fun p hp P => by
-  haveI := hp
+  have := hp
   exact not_dvd_relIndex_inf_of_isSubnormal hS P
 
 /-- `↥H` の Sylow `p`-部分群は `G` の Sylow `p`-部分群 `P` を使って `(P ⊓ H).subgroupOf H`
@@ -464,7 +464,7 @@ theorem exists_sylow_inf_eq [Finite G] {p : ℕ} [Fact p.Prime] (H : Subgroup G)
 theorem KegelHypothesis.subgroupOf [Finite G] {S H : Subgroup G} (hK : KegelHypothesis S)
     (hSH : S ≤ H) : KegelHypothesis (S.subgroupOf H) := by
   intro p hp Q
-  haveI := hp
+  have := hp
   obtain ⟨P, hPQ⟩ := exists_sylow_inf_eq H Q
   have hmeet : (Q : Subgroup ↥H) ⊓ S.subgroupOf H = ((P : Subgroup G) ⊓ S).subgroupOf H := by
     rw [hPQ]
@@ -482,7 +482,7 @@ theorem KegelHypothesis.subgroupOf [Finite G] {S H : Subgroup G} (hK : KegelHypo
 theorem KegelHypothesis.infNormal [Finite G] {S : Subgroup G} (hK : KegelHypothesis S)
     (N : Subgroup G) [N.Normal] : KegelHypothesis ((S ⊓ N).subgroupOf N) := by
   intro p hp Q
-  haveI := hp
+  have := hp
   obtain ⟨P, hPQ⟩ := exists_sylow_inf_eq N Q
   -- `↥S` の中で `(P ⊓ S).subgroupOf S` は Sylow
   have hPS_pg : IsPGroup p ↥(((P : Subgroup G) ⊓ S).subgroupOf S) :=
@@ -491,7 +491,7 @@ theorem KegelHypothesis.infNormal [Finite G] {S : Subgroup G} (hK : KegelHypothe
   have hPS_idx : ¬ p ∣ (((P : Subgroup G) ⊓ S).subgroupOf S).index := by
     have := hK p hp P
     rwa [Subgroup.relIndex] at this
-  haveI : ((S ⊓ N).subgroupOf S).Normal := by
+  have : ((S ⊓ N).subgroupOf S).Normal := by
     refine (Subgroup.normal_subgroupOf_iff_le_normalizer inf_le_left).mpr ?_
     intro s hs
     rw [Subgroup.mem_normalizer_iff]
@@ -550,7 +550,7 @@ theorem KegelHypothesis.map_mk [Finite G] {S : Subgroup G} (hK : KegelHypothesis
     (N : Subgroup G) [N.Normal] :
     KegelHypothesis (S.map (QuotientGroup.mk' N)) := by
   intro p hp Q
-  haveI := hp
+  have := hp
   have hsurj : Function.Surjective (QuotientGroup.mk' N) := QuotientGroup.mk'_surjective N
   obtain ⟨P, hPQ⟩ := Sylow.mapSurjective_surjective (f := QuotientGroup.mk' N) hsurj p Q
   have hQcoe : (Q : Subgroup (G ⧸ N)) = (P : Subgroup G).map (QuotientGroup.mk' N) := by

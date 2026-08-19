@@ -45,10 +45,10 @@ private def fixerSubgroup (φ : L →* MulAut H) (x : H) : Subgroup L where
   carrier := {l | φ l x = x}
   one_mem' := by simp
   mul_mem' {a b} ha hb := by
-    simp only [Set.mem_setOf_eq] at ha hb ⊢
+    simp only [Set.mem_ofPred_eq] at ha hb ⊢
     rw [map_mul, MulAut.mul_apply, hb, ha]
   inv_mem' {a} ha := by
-    simp only [Set.mem_setOf_eq] at ha ⊢
+    simp only [Set.mem_ofPred_eq] at ha ⊢
     rw [map_inv, MulAut.inv_def]
     exact (MulEquiv.symm_apply_eq (φ a)).mpr ha.symm
 
@@ -100,7 +100,7 @@ action is not a global instance, hence the `letI`). -/
 theorem coe_fixedSubgroup_eq_fixedPoints (φ : L →* MulAut H) (K : Subgroup L) :
     letI : MulAction K H := MulAction.compHom H (φ.comp K.subtype)
     (fixedSubgroup φ K : Set H) = MulAction.fixedPoints K H := by
-  letI : MulAction K H := MulAction.compHom H (φ.comp K.subtype)
+  let : MulAction K H := MulAction.compHom H (φ.comp K.subtype)
   ext x
   constructor
   · intro hx ⟨l, hl⟩
