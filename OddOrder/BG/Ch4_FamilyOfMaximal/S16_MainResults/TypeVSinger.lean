@@ -36,7 +36,7 @@ theorem not_isMulCommutative_mf_of_isTypeP1_mf_eq_msigma [Finite G]
     (hP1 : S14.IsTypeP1 M) (hmf : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M) :
     ¬ IsMulCommutative ↥(S15.MF M) := by
   intro hab
-  haveI := hab
+  have := hab
   set data := typePData_of_isTypeP1_mf_eq_msigma hG hM hP1 hmf with hdata
   -- `M' = M_σ = M_F`, so `M'' = (M_F)' = ⊥` (were `M_F` abelian).
   have hM'MF : derivedInG M = S15.MF M :=
@@ -88,12 +88,12 @@ theorem isNarrow_opiCore_of_three_le_pRank [Finite G]
     (h3 : 3 ≤ pRank ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) p) :
     OddOrder.GroupTheory.IsNarrow p ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (S15.MF M) with hPdef
   have hPMF : P ≤ S15.MF M := opiCoreInG_le _ _
   have hPpg : IsPGroup p ↥P := isPGroup_opiCoreInG_singleton (q := p) (S15.MF M)
   have hX₁pg : IsPGroup p ↥X₁ := IsPGroup.of_card (n := 1) (by rw [hX₁card, pow_one])
-  haveI hMFnil : Group.IsNilpotent ↥(S15.MF M) := S15.maxNilpotentNormalHall_isNilpotent M
+  have hMFnil : Group.IsNilpotent ↥(S15.MF M) := S15.maxNilpotentNormalHall_isNilpotent M
   have hX₁P : X₁ ≤ P :=
     OddOrder.BG.Ch2.S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent hMFnil hX₁MF hX₁pg
   rw [OddOrder.BG.Ch1.S05.narrow_iff_exists_card_prime_centralizer_pRank_le_two hpodd hPpg h3]
@@ -142,12 +142,12 @@ theorem pRank_opiCore_le_two_of_kappaHall [Finite G]
     (hKp1 : ¬ Nat.card ↥K ∣ p - 1) :
     pRank ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) p ≤ 2 := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (S15.MF M) with hPdef
   have hPpg : IsPGroup p ↥P := isPGroup_opiCoreInG_singleton (q := p) (S15.MF M)
-  haveI : IsSolvable ↥K := by
+  have : Group.IsSolvable ↥K := by
     obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := ↥K)
-    refine isSolvable_of_comm fun a b => ?_
+    refine Group.isSolvable_of_comm fun a b => ?_
     obtain ⟨m, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hg a)
     obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hg b)
     rw [← zpow_add, ← zpow_add, add_comm]
@@ -170,7 +170,7 @@ theorem pRank_opiCore_le_two_of_kappaHall [Finite G]
       Subgroup.mem_inf.mpr ⟨k.2, hkmem⟩
     rw [hKfaithful, Subgroup.mem_bot] at hmem
     exact Subtype.ext hmem
-  haveI hKodd : Odd (Nat.card ↥K) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card K)
+  have hKodd : Odd (Nat.card ↥K) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card K)
   obtain ⟨-, -, hb, -⟩ :=
     OddOrder.BG.Ch1.S05.solvableAut_of_narrow hpodd hPpg hPnarrow φ hφinj hKodd
   obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := ↥K)
@@ -205,7 +205,7 @@ theorem card_center_opiCore_eq_prime_of_omega1Center_le_kstar [Finite G]
       (opiCoreInG ({p} : Set ℕ) (S15.MF M)) p) = p) :
     Nat.card ↥(Subgroup.center ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M))) = p := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (S15.MF M) with hPdef
   set Z : Subgroup G := OddOrder.BG.Ch3.S10.omega1CenterInG P p with hZdef
   have hPpg : IsPGroup p ↥P := isPGroup_opiCoreInG_singleton (S15.MF M)
@@ -284,7 +284,7 @@ theorem card_opiCore_eq_prime_cube_singer [Finite G]
     (hZPcard : Nat.card ↥(Subgroup.center ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M))) = p) :
     Nat.card ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) = p ^ 3 := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   -- `P = O_p(M_F)` is a Sylow `p`-subgroup of `G` (`sylP_G`).
   obtain ⟨S, hS⟩ := exists_sylow_eq_opiCore_of_mf_eq_msigma hG hM hmf hp hpσ
   set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (S15.MF M) with hPdef
@@ -306,7 +306,7 @@ theorem card_opiCore_eq_prime_cube_singer [Finite G]
     -- `P₂ ≤ Z(P)` and `|P₂| ≤ |Z(P)| = p`; conversely `Ω₁(P₂) = Z(P₁)` has order `p` (`P₁`
     -- extraspecial), so `|P₂| ≥ p`.  Hence `|P₂| = p`, `P₂ = Ω₁(P₂) = Z(P₁) ≤ P₁`, and
     -- `P = P₁ ⊔ P₂ = P₁`, giving `|P| = |P₁| = p³`.
-    haveI : IsCyclic ↥P₂ := hP₂cyc
+    have : IsCyclic ↥P₂ := hP₂cyc
     -- `|Z(P₁)| = p` (`P₁` extraspecial), and `|Ω₁(P₂).map| = |Z(P₁).map| = p` (`hΩeq`).
     have hΩcard : Nat.card ↥((Omega ↥P₂ p 1).map P₂.subtype) = p := by
       rw [hΩeq, Subgroup.card_map_of_injective P₁.subtype_injective,
@@ -362,8 +362,8 @@ theorem card_dvd_of_injective_to_cyclic_forall_pow {K C : Type*} [Group K] [Fini
   -- `μ` injective ⟹ `∀ k, k ^ n = 1`.
   have hKn : ∀ k : K, k ^ n = 1 := fun k => hμ (by rw [map_pow, h k, map_one])
   -- `K ≃* μ.range ≤ C` is cyclic.
-  haveI : IsCyclic ↥μ.range := inferInstance
-  haveI : IsCyclic K := isCyclic_of_surjective (MonoidHom.ofInjective hμ).symm.toMonoidHom
+  have : IsCyclic ↥μ.range := inferInstance
+  have : IsCyclic K := isCyclic_of_surjective (MonoidHom.ofInjective hμ).symm.toMonoidHom
     (MonoidHom.ofInjective hμ).symm.surjective
   obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := K)
   rw [(orderOf_eq_card_of_forall_mem_zpowers hg).symm]
@@ -409,11 +409,11 @@ theorem isTypeV_of_isTypeP1_mf_eq_msigma [Finite G]
   · -- `¬FittingIsTI` ⟹ disjuncts (e2)/(e3).  The non-TI witness `X₁` (order `p`, `C_G(X₁) ⊄ M`),
     -- the cyclic `O_{p'}(M_F)` (Coq `cycHp'`), and the `M`-normal order-`p` `Z = Ω₁(Z(O_p(M_F)))`
     -- (Coq `oZ`, `exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI`).
-    haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+    have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
     have hnab := not_isMulCommutative_mf_of_isTypeP1_mf_eq_msigma hG hM hP1 hmf
     obtain ⟨g, p, X₁, -, hp, hpσ, hX₁card, hX₁Mσ, -, hCGnotM, hrank3, -⟩ :=
       S15.exists_inf_conj_fitting_orderP_witness hG hM hTI
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     have hX₁MF : X₁ ≤ S15.MF M := by
       rw [S15.mf_eq_msigma_of_not_fittingIsTI hG hM hTI]; exact hX₁Mσ
     obtain ⟨hpπ, hcyc⟩ :=
@@ -434,7 +434,7 @@ theorem isTypeV_of_isTypeP1_mf_eq_msigma [Finite G]
       by_cases hqσ : q ∈ OddOrder.BG.Ch3.S10.sigma M
       · exact Set.mem_union_right _ hqσ
       · exact Set.mem_union_left _ (hP1.2 ▸ ⟨hq, hqσ⟩)
-    haveI hKcyc : IsCyclic ↥K := (typeP_auxiliary_structure hG hM hKM bot_le hK rfl hU).2.1
+    have hKcyc : IsCyclic ↥K := (typeP_auxiliary_structure hG hM hKM bot_le hK rfl hU).2.1
     -- `|W₁| = [M:M'] = |K|`.
     have hW1K : Nat.card ↥data.W1 = Nat.card ↥K :=
       (data.card_W1_eq_derived_index).trans
@@ -505,7 +505,7 @@ theorem isTypeV_of_isTypeP1_mf_eq_msigma [Finite G]
         -- central-product structure (Coq §10.7b) enters via `S10.sylow_structure`.
         exact card_opiCore_eq_prime_cube_singer hG hM hP1 hmf hp hpσ hpπ hrPle2 hPnab hZPcard
       · -- (e3) conjunct 2: `|W₁| ∣ p + 1` via route B (Singer/`SL₂(p)` symplectic divisibility).
-        haveI : Fact p.Prime := ⟨hp⟩
+        have : Fact p.Prime := ⟨hp⟩
         have hPcard3 : Nat.card ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) = p ^ 3 :=
           card_opiCore_eq_prime_cube_singer hG hM hP1 hmf hp hpσ hpπ hrPle2 hPnab hZPcard
         set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (S15.MF M) with hPdef
@@ -617,8 +617,8 @@ theorem typeP1_kappaHall_dvd_sub_one_or_singer_of_not_fittingIsTI [Finite G]
     (∀ q ∈ (Nat.card ↥(S15.MF M)).primeFactors, Nat.card ↥K ∣ q - 1) ∨
       (Nat.card ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) = p ^ 3 ∧ Nat.card ↥K ∣ p + 1) := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Fact p.Prime := ⟨hp⟩
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   -- Coq `cycHp'`: `O_{p'}(M_F)` is cyclic (the shared conjunct of `(e2)`/`(e3)`).
   obtain ⟨-, hcyc⟩ :=
     S15.typeF_nonabelian_cyclic_opiCore_compl hG hM hp hX₁card hX₁MF hCGnotM hnab

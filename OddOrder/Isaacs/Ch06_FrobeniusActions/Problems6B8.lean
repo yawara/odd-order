@@ -41,8 +41,8 @@ theorem exists_orderOf_eq_two_mem_commutator_center {P : Type*} [Group P] [Finit
     (hP : IsPGroup 2 P) (hcomm : (commutator P) ≠ ⊥) :
     ∃ z : P, z ∈ commutator P ∧ z ∈ Subgroup.center P ∧ orderOf z = 2 := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI hnt : Nontrivial ↥(commutator P) := (Subgroup.nontrivial_iff_ne_bot _).mpr hcomm
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hnt : Nontrivial ↥(commutator P) := (Subgroup.nontrivial_iff_ne_bot _).mpr hcomm
   have hK := Ch01.IsPGroup.normal_inf_center_nontrivial hP (N := commutator P) hnt
   obtain ⟨⟨x, hx⟩, hxne⟩ := exists_ne (1 : ↥(commutator P ⊓ Subgroup.center P))
   have hxP : x ≠ 1 := fun h => hxne (Subtype.ext h)
@@ -81,12 +81,12 @@ theorem index_commutator_quotient {P : Type*} [Group P] {Z : Subgroup P} [Z.Norm
 theorem mul_comm_of_center_le_of_isCyclic_quotient {A : Type*} [Group A] {Z : Subgroup A}
     [Z.Normal] (hZ : Z ≤ Subgroup.center A) (hcyc : IsCyclic (A ⧸ Z)) (x y : A) :
     x * y = y * x := by
-  haveI : IsCyclic ↥(QuotientGroup.mk' Z).range := by
-    haveI := hcyc
+  have : IsCyclic ↥(QuotientGroup.mk' Z).range := by
+    have := hcyc
     rw [MonoidHom.range_eq_top.mpr (QuotientGroup.mk'_surjective Z)]
     have e : (A ⧸ Z) ≃* ↥(⊤ : Subgroup (A ⧸ Z)) := Subgroup.topEquiv.symm
     exact isCyclic_of_surjective e.toMonoidHom e.surjective
-  haveI : IsMulCommutative A :=
+  have : IsMulCommutative A :=
     MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center (QuotientGroup.mk' Z)
       (by rwa [QuotientGroup.ker_mk'])
   exact (IsMulCommutative.is_comm (M := A)).comm x y
@@ -96,12 +96,12 @@ theorem mul_comm_of_center_le_of_isCyclic_quotient {A : Type*} [Group A] {Z : Su
 `|P : Z(P)| ∈ {1, 2}` を排除するのに使う。 -/
 theorem mul_comm_of_index_center_le_two {P : Type*} [Group P] [Finite P]
     (h : (Subgroup.center P).index ≤ 2) (x y : P) : x * y = y * x := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI hcyc : IsCyclic (P ⧸ Subgroup.center P) := by
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hcyc : IsCyclic (P ⧸ Subgroup.center P) := by
     have hcard : Nat.card (P ⧸ Subgroup.center P) ≤ 2 := h
     rcases Nat.lt_or_ge (Nat.card (P ⧸ Subgroup.center P)) 2 with hlt | hge
     · have hpos : 0 < Nat.card (P ⧸ Subgroup.center P) := Nat.card_pos
-      haveI : Subsingleton (P ⧸ Subgroup.center P) :=
+      have : Subsingleton (P ⧸ Subgroup.center P) :=
         (Nat.card_eq_one_iff_unique.mp (by omega)).1
       exact isCyclic_of_subsingleton
     · exact isCyclic_of_prime_card (p := 2) (by omega)
@@ -120,7 +120,7 @@ theorem sq_mem_center_of_index_center_eq_four {P : Type*} [Group P] [Finite P]
     have hdvd : orderOf g ∣ 4 := hcard ▸ orderOf_dvd_natCard g
     have hne4 : orderOf g ≠ 4 := by
       intro h4
-      haveI : IsCyclic Q := isCyclic_of_orderOf_eq_card g (by rw [h4, hcard])
+      have : IsCyclic Q := isCyclic_of_orderOf_eq_card g (by rw [h4, hcard])
       have hcomm := mul_comm_of_center_le_of_isCyclic_quotient
         (A := P) (Z := Subgroup.center P) le_rfl ‹IsCyclic Q›
       have htop : Subgroup.center P = ⊤ :=
@@ -302,7 +302,7 @@ theorem index_centralizer_eq_two_of_index_center_eq_four {P : Type*} [Group P] [
 示すのに (対偶で) 使う。 -/
 theorem mul_comm_of_mem_sup_center_zpowers {P : Type*} [Group P] {a b : P}
     (hb : b ∈ Subgroup.center P ⊔ Subgroup.zpowers a) : a * b = b * a := by
-  haveI : (Subgroup.center P).Normal := inferInstance
+  have : (Subgroup.center P).Normal := inferInstance
   rw [← SetLike.mem_coe, Subgroup.normal_mul] at hb
   obtain ⟨z, hz, t, ht, rfl⟩ := hb
   obtain ⟨i, rfl⟩ := Subgroup.mem_zpowers_iff.mp ht
@@ -475,12 +475,12 @@ theorem four_lt_index_center {P : Type*} [Group P] [Finite P]
       have hcard : Nat.card (P ⧸ Subgroup.center P) < 4 := hlt
       have hpos : 0 < Nat.card (P ⧸ Subgroup.center P) := Nat.card_pos
       interval_cases hn : (Nat.card (P ⧸ Subgroup.center P))
-      · haveI : Subsingleton (P ⧸ Subgroup.center P) :=
+      · have : Subsingleton (P ⧸ Subgroup.center P) :=
           (Nat.card_eq_one_iff_unique.mp hn).1
         exact isCyclic_of_subsingleton
-      · haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+      · have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
         exact isCyclic_of_prime_card (p := 2) hn
-      · haveI : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
+      · have : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
         exact isCyclic_of_prime_card (p := 3) hn
     have hall := mul_comm_of_center_le_of_isCyclic_quotient (A := P) le_rfl hcyc
     have hbot : commutator P = ⊥ := by
@@ -543,7 +543,7 @@ theorem exists_index_two_zpowers_of_card_eight {P : Type*} [Group P] [Finite P]
       have hne4 : orderOf w ≠ 4 := fun hh => hcon ⟨w, hh⟩
       have hne8 : orderOf w ≠ 8 := by
         intro h8
-        haveI : IsCyclic P := isCyclic_of_orderOf_eq_card w (by rw [h8, hcard])
+        have : IsCyclic P := isCyclic_of_orderOf_eq_card w (by rw [h8, hcard])
         obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := P)
         obtain ⟨m, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hg u)
         obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hg v)
@@ -572,8 +572,8 @@ theorem exists_index_two_zpowers_of_card_eight {P : Type*} [Group P] [Finite P]
 /-- 巡回部分群に含まれる部分群は巡回。 -/
 theorem isCyclic_of_le_zpowers {G : Type*} [Group G] {H : Subgroup G} {g : G}
     (h : H ≤ Subgroup.zpowers g) : IsCyclic ↥H := by
-  haveI : IsCyclic ↥(Subgroup.zpowers g) := Subgroup.isCyclic_zpowers g
-  haveI : IsCyclic ↥(H.subgroupOf (Subgroup.zpowers g)) := inferInstance
+  have : IsCyclic ↥(Subgroup.zpowers g) := Subgroup.isCyclic_zpowers g
+  have : IsCyclic ↥(H.subgroupOf (Subgroup.zpowers g)) := inferInstance
   have e : ↥(H.subgroupOf (Subgroup.zpowers g)) ≃* ↥H := Subgroup.subgroupOfEquivOfLe h
   exact isCyclic_of_surjective e.toMonoidHom e.surjective
 
@@ -761,7 +761,7 @@ theorem commutator_le_thetaHom_range {P : Type*} [Group P] {A : Subgroup P} {a :
     (hab : ∀ x y : P, x ∈ A → y ∈ A → x * y = y * x) (ha2 : a ^ 2 ∈ A)
     (hnorm : ∀ x ∈ A, a * x * a⁻¹ ∈ A) (hgen : A ⊔ Subgroup.zpowers a = ⊤) :
     commutator P ≤ (thetaHom A a hab hnorm).range := by
-  haveI hRn := thetaHom_range_normal hab ha2 hnorm hgen
+  have hRn := thetaHom_range_normal hab ha2 hnorm hgen
   -- `a` の像は `A` の像と可換
   have hax : ∀ x ∈ A, (QuotientGroup.mk a : P ⧸ (thetaHom A a hab hnorm).range) *
       QuotientGroup.mk x = QuotientGroup.mk x * QuotientGroup.mk a := by
@@ -876,7 +876,7 @@ theorem eq_of_ne_one_of_card_eq_two {G : Type*} [Group G] [Finite G]
     (hcard : Nat.card G = 2) {u v : G} (hu : u ≠ 1) (hv : v ≠ 1) : u = v := by
   classical
   by_contra hne
-  haveI : Fintype G := Fintype.ofFinite _
+  have : Fintype G := Fintype.ofFinite _
   have hc : Fintype.card G = 2 := by rw [← Nat.card_eq_fintype_card]; exact hcard
   have hsub : ({1, u, v} : Finset G).card ≤ 2 := by
     rw [← hc]; exact Finset.card_le_univ _
@@ -892,7 +892,7 @@ theorem isCyclic_commutator {P : Type*} [Group P] [Finite P] (hP : IsPGroup 2 P)
     (hidx : (commutator P).index = 4) :
     IsCyclic ↥(commutator P) := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hgen := sup_zpowers_eq_top_of_index_two hidxA ha
   have hrange : commutator P = (thetaHom A a hab hnorm).range :=
     le_antisymm (commutator_le_thetaHom_range hab ha2 hnorm hgen)
@@ -1131,14 +1131,14 @@ theorem isCyclic_of_index_two_of_index_commutator_eq_four
     (hidxA : A.index = 2) (hidx : (commutator P).index = 4) (hcard : 16 ≤ Nat.card P) :
     IsCyclic ↥A := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   by_contra hnc
   obtain ⟨a, ha⟩ : ∃ a : P, a ∉ A := by
     by_contra hcon
     have htop : A = ⊤ := eq_top_iff.mpr fun x _ => not_not.mp fun h => hcon ⟨x, h⟩
     rw [htop, Subgroup.index_top] at hidxA
     omega
-  haveI hAn : A.Normal := Subgroup.normal_of_index_eq_two hidxA
+  have hAn : A.Normal := Subgroup.normal_of_index_eq_two hidxA
   have ha2 : a ^ 2 ∈ A := by
     have h := A.pow_index_mem a
     rwa [hidxA] at h

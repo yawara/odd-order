@@ -28,6 +28,7 @@ variable {G : Type*} [Group G]
 namespace OrthogonalitySwitchData
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (13.19.b), the M-side `η`-grid orthogonality of `ψ^{τ₁} = ζ_M^ν`.**
 
 The distinguished coherent image `ψ^{τ₁} = ζ_M^ν` (`= (dataM.h78 hG).nu (ζ_{zetaDistinct})`)
@@ -80,6 +81,7 @@ theorem caseB_eta_orthogonal_psi [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
   exact eta_orthogonal_of_norm_one_pair_vanish hyp hpsiZ hconjZ hpsi1 hconj1 hcross hvanish
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (13.19.b), the `η`-grid orthogonality of *every* coherent image `ζ_k^ν`**
 (the Coq `o_tauLeta` for the whole family, not just the distinguished index).  For any family
 member `k ≠ ind1H`, the coherent image `ζ_k^ν = (dataM.h78 hG).nu (ζ_k)` is orthogonal to the
@@ -273,8 +275,8 @@ theorem mSide_dadeSupport_avoids_regular [Finite G]
     rw [← hgx]; group
   have hordx : orderOf x = orderOf w := (SemiconjBy.orderOf_eq g hsemi).symm
   -- decompose `w = a·b` with `a ∈ W₁`, `b ∈ W₂` inside the commutative `W`
-  letI := hyp.base.W_cyclic
-  letI : CommGroup ↥hyp.base.W := IsCyclic.commGroup
+  let := hyp.base.W_cyclic
+  let : CommGroup ↥hyp.base.W := IsCyclic.commGroup
   have hwWmem : w ∈ hyp.base.W := hwW
   have hW1le : hyp.base.W1 ≤ hyp.base.W := by rw [hyp.base.W_eq_join]; exact le_sup_left
   have hW2le : hyp.base.W2 ≤ hyp.base.W := by rw [hyp.base.W_eq_join]; exact le_sup_right
@@ -317,6 +319,7 @@ noncomputable def coherentBeta [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   (dataM.h78 hG).beta
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (13.19.b), invariance of the `eta`-grid coefficients under the choice of
 distinguished coherent-family member.**
 
@@ -351,7 +354,7 @@ theorem typeIGrid_betaL_inner_eta_eq_h78_beta [Finite G]
   have hinvertible : invertibleG =
       OddOrder.Peterfalvi.S12.FiniteInduce.natCardInvCG := Subsingleton.elim _ _
   subst invertibleG
-  haveI := dataM.kernelIn_normal
+  have := dataM.kernelIn_normal
   -- The two selected family members have the same degree, namely the complement index.
   have he : grid.e = dataM.kernelIn.index := by
     rw [← grid.e_eq_index]

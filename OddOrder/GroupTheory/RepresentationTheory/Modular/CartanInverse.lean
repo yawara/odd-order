@@ -127,7 +127,7 @@ theorem sum_eq_sum_pRegularRep [Fintype G] {M : Type*} [AddCommMonoid M] (f : G 
       = ∑ j : ι, conjugacyClassSize (ConjClasses.mk (pRegularRep hp hπ hlin hkerJ j))
           • f (pRegularRep hp hπ hlin hkerJ j) := by
   classical
-  haveI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  have : Fintype (ConjClasses G) := Fintype.ofFinite _
   have hzero : ∀ C : ConjClasses G, C ∈ Finset.univ →
       C ∉ Finset.univ.filter (fun C : ConjClasses G => IsPRegularClass p C) →
       conjugacyClassSize C • f (conjugacyClassRepresentative C) = 0 := by
@@ -301,7 +301,7 @@ theorem sum_projectiveIndecomposableCharacter_mul_eq (μ : ι)
     ∑ y ∈ s, algebraMap 𝒪 K
         (projectiveIndecomposableCharacter hp hω hω' hπ hlin hkerJ e μ y) * F y
       = (Nat.card G : K) * d μ := by
-  letI : Fintype G := Fintype.ofFinite G
+  let : Fintype G := Fintype.ofFinite G
   have hGne : (Nat.card G : K) ≠ 0 := (isUnit_of_invertible _).ne_zero
   have hpair : ∀ τ : ι, (∑ y ∈ s, algebraMap 𝒪 K
         (projectiveIndecomposableCharacter hp hω hω' hπ hlin hkerJ e μ y

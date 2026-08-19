@@ -97,7 +97,7 @@ theorem isCyclic_Vbar : IsCyclic ↥hyp.Vbar := by
 group `V̄ = V/W` (`VtoVbar_eq_one_iff`, `isCyclic_Vbar`). -/
 theorem isMulCommutative_V_of_W_eq_bot (hW : hyp.W = ⊥) :
     IsMulCommutative ↥hyp.V := by
-  haveI := hyp.isCyclic_Vbar
+  have := hyp.isCyclic_Vbar
   refine MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center hyp.VtoVbar ?_
   intro v hv
   have hvW : (v : G) ∈ hyp.W := (hyp.VtoVbar_eq_one_iff v).mp hv
@@ -110,7 +110,7 @@ theorem isMulCommutative_V_of_W_eq_bot (hW : hyp.W = ⊥) :
 theorem V_le_centralizer_of_le_V_of_W_eq_bot (hW : hyp.W = ⊥)
     {P : Subgroup G} (hPV : P ≤ hyp.V) :
     hyp.V ≤ Subgroup.centralizer (P : Set G) := by
-  haveI := hyp.isMulCommutative_V_of_W_eq_bot hW
+  have := hyp.isMulCommutative_V_of_W_eq_bot hW
   intro v hv
   refine Subgroup.mem_centralizer_iff.mpr fun g hg => ?_
   exact congrArg (Subtype.val (p := fun z => z ∈ hyp.V))
@@ -118,6 +118,7 @@ theorem V_le_centralizer_of_le_V_of_W_eq_bot (hW : hyp.W = ⊥)
 
 /-! ## The Galois computation -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi Part II, Ch. III §1, Proposition** (p. 117): "`V` acts as a
 group of field automorphisms on `Q₀` and, by the theorem of Galois,
 `C_V(C_{Q₀}(P)) = P`".
@@ -135,8 +136,8 @@ theorem centralizer_V_centralizer_Q0 {P : Subgroup G} (hPV : P ≤ hyp.V) :
   classical
   obtain ⟨F, hField, hFinite, A, _hcardF, _hVcyc, eQ, μ, νe, _hT, hE, _hκ,
       _eL, _hL1, _hL2, _hL3⟩ := hyp.exists_semilinear_equiv
-  letI : Field F := hField
-  letI : Finite F := hFinite
+  let : Field F := hField
+  let : Finite F := hFinite
   -- the action of `V` on `Q₀` read in `RingAut F`
   set σ : ↥hyp.V →* RingAut F := A.subtype.comp (νe.toMonoidHom.comp hyp.VtoVbar)
     with hσdef
@@ -263,6 +264,7 @@ theorem centralizer_V_centralizer_Q0_of_W_eq_bot (hW : hyp.W = ⊥)
 
 /-! ## Artin's degree formula -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Artin's degree formula**: `|Q₀| = |C_{Q₀}(X)| ^ |X|` for `X ≤ V` acting
 faithfully on `Q₀`, i.e. with `X ⊓ W = 1`.
 
@@ -283,8 +285,8 @@ theorem natCard_Q0_eq_pow {X : Subgroup G} (hXV : X ≤ hyp.V)
   classical
   obtain ⟨F, hField, hFinite, A, hcardF, _hVcyc, eQ, μ, νe, _hT, hE, _hκ,
       _eL, _hL1, _hL2, _hL3⟩ := hyp.exists_semilinear_equiv
-  letI : Field F := hField
-  letI : Finite F := hFinite
+  let : Field F := hField
+  let : Finite F := hFinite
   set σ : ↥hyp.V →* RingAut F := A.subtype.comp (νe.toMonoidHom.comp hyp.VtoVbar)
     with hσdef
   have hσker : ∀ v : ↥hyp.V, σ v = 1 ↔ (v : G) ∈ hyp.W := by
@@ -387,12 +389,12 @@ theorem natCard_Q0_eq_pow {X : Subgroup G} (hXV : X ≤ hyp.V)
     exact Equiv.subtypeEquiv (eQ.toEquiv.trans Multiplicative.toAdd)
       fun x => hfixedSet x
   -- Artin plus the vector-space count
-  haveI : Fintype F := Fintype.ofFinite F
+  have : Fintype F := Fintype.ofFinite F
   have hArtin := OddOrder.RingAut.finrank_fixedSet (F := F) B
   have hVS : Nat.card F =
       Nat.card ↥(FixedPoints.subfield (↥B) F) ^
         Module.finrank (FixedPoints.subfield (↥B) F) F := by
-    haveI : Fintype ↥(FixedPoints.subfield (↥B) F) := Fintype.ofFinite _
+    have : Fintype ↥(FixedPoints.subfield (↥B) F) := Fintype.ofFinite _
     simpa [Nat.card_eq_fintype_card] using
       (Module.card_eq_pow_finrank (K := FixedPoints.subfield (↥B) F) (V := F))
   have hsub : Nat.card ↥(FixedPoints.subfield (↥B) F) =

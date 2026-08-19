@@ -257,7 +257,7 @@ theorem addClosure_paleySet_eq_top [Fintype F] (h3 : ringChar F = 3)
     (h4 : Fintype.card F % 4 = 3) (h9 : 9 < Fintype.card F) :
     AddSubgroup.closure (paleySet F) = ⊤ := by
   classical
-  haveI : CharP F 3 := ringChar.of_eq h3
+  have : CharP F 3 := ringChar.of_eq h3
   have h30 : (3 : F) = 0 := by
     have := CharP.cast_eq_zero F 3
     exact_mod_cast this

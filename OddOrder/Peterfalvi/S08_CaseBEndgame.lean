@@ -152,12 +152,12 @@ theorem W1_dvd_index_of_fixedPoints_le {H W : Type*}
     (M : Subgroup H) [M.Normal] (hMinv : ∀ a : W, ∀ m ∈ M, a • m ∈ M)
     (hfix : ∀ a : W, a ≠ 1 → ∀ x : H, a • x = x → x ∈ M) :
     Nat.card W ∣ M.index - 1 := by
-  letI : MulDistribMulAction W (H ⧸ M) :=
+  let : MulDistribMulAction W (H ⧸ M) :=
     OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantQuotientMulDistribMulAction M hMinv
   have hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusAction W (H ⧸ M) :=
     OddOrder.Isaacs.Ch06.IsFrobeniusAction.quotient_of_fixedPoints_le hCop M hMinv hfix
-  haveI : Fintype W := Fintype.ofFinite _
-  haveI : Fintype (H ⧸ M) := Fintype.ofFinite _
+  have : Fintype W := Fintype.ofFinite _
+  have : Fintype (H ⧸ M) := Fintype.ofFinite _
   have hmod : Nat.card (H ⧸ M) ≡ 1 [MOD Nat.card W] := by
     simpa only [Fintype.card_eq_nat_card] using hFrob.card_modEq_one
   have hidx : M.index = Nat.card (H ⧸ M) := rfl
@@ -184,10 +184,10 @@ theorem caseB_W1_dvd_index_of_centralizer_le {G : Type*} [Group G] [Finite G]
     (hcomm : ∀ a : ↥W1, a ≠ 1 → ∀ x : ↥H,
       (a : ↥L) * (x : ↥L) = (x : ↥L) * (a : ↥L) → x ∈ M) :
     Nat.card ↥W1 ∣ M.index - 1 := by
-  haveI : Finite ↥H := inferInstance
-  haveI : Finite ↥W1 := inferInstance
-  haveI : M.Normal := inferInstance
-  letI act : MulDistribMulAction ↥W1 ↥H :=
+  have : Finite ↥H := inferInstance
+  have : Finite ↥W1 := inferInstance
+  have : M.Normal := inferInstance
+  let act : MulDistribMulAction ↥W1 ↥H :=
     MulDistribMulAction.compHom H ((MulAut.conjNormal (H := H)).comp W1.subtype)
   -- the conjugation action unfolds to `(a:L)·(x:L)·(a:L)⁻¹`
   have hsmul : ∀ (a : ↥W1) (x : ↥H), ((a • x : ↥H) : ↥L) = (a : ↥L) * (x : ↥L) * (a : ↥L)⁻¹ := by
@@ -230,7 +230,7 @@ theorem caseB_W1_dvd_index_commutator {G : Type*} [Group G] [Fintype G]
     (hK : cert.K = H) (hW1 : cert.W1 = hyp.W1) (hW2 : cert.W2 ≤ ⁅H, H⁆)
     (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1)) :
     Nat.card ↥hyp.W1 ∣ (commutator ↥H).index - 1 := by
-  letI : H.Normal := hyp.H_normal
+  let : H.Normal := hyp.H_normal
   refine caseB_W1_dvd_index_of_centralizer_le hyp.W1 hcop.symm (commutator ↥H) ?_
   intro a ha x hcomm
   -- `(x:L)` commutes with `(a:L)`, so lies in `C_L(a)`
@@ -261,9 +261,9 @@ theorem caseB_W1_dvd_relIndex_commutator {G : Type*} [Group G] [Fintype G]
     (hW2cen : cert.W2 ≤ Subgroup.center ↥L)
     (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1)) :
     Nat.card ↥hyp.W1 ∣ (cert.W2.subgroupOf H).relIndex (commutator ↥H) - 1 := by
-  letI : H.Normal := hyp.H_normal
-  haveI : Finite ↥H := inferInstance
-  haveI : Finite ↥hyp.W1 := inferInstance
+  let : H.Normal := hyp.H_normal
+  have : Finite ↥H := inferInstance
+  have : Finite ↥hyp.W1 := inferInstance
   -- `W₂` is normal in `↥L` (it is central)
   have hW2normalL : cert.W2.Normal :=
     { conj_mem := fun n hn g => by
@@ -272,7 +272,7 @@ theorem caseB_W1_dvd_relIndex_commutator {G : Type*} [Group G] [Fintype G]
           rw [hc g, mul_assoc, mul_inv_cancel, mul_one]
         rw [hgn]; exact hn }
   -- the `W₁`-conjugation action on `H`
-  letI actH : MulDistribMulAction ↥hyp.W1 ↥H :=
+  let actH : MulDistribMulAction ↥hyp.W1 ↥H :=
     MulDistribMulAction.compHom H ((MulAut.conjNormal (H := H)).comp hyp.W1.subtype)
   have hsmulH : ∀ (a : ↥hyp.W1) (x : ↥H),
       ((a • x : ↥H) : ↥L) = (a : ↥L) * (x : ↥L) * (a : ↥L)⁻¹ := by
@@ -291,15 +291,15 @@ theorem caseB_W1_dvd_relIndex_commutator {G : Type*} [Group G] [Fintype G]
       rw [← hmap]; exact Subgroup.mem_map_of_mem _ hm
     simpa using hmem
   -- the restricted `W₁`-action on `H′ = commutator ↥H`
-  letI actHp : MulDistribMulAction ↥hyp.W1 ↥(commutator ↥H) :=
+  let actHp : MulDistribMulAction ↥hyp.W1 ↥(commutator ↥H) :=
     OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantSubgroupMulDistribMulAction
       (commutator ↥H) hcommInv
-  haveI : Finite ↥(commutator ↥H) := inferInstance
+  have : Finite ↥(commutator ↥H) := inferInstance
   -- the `H′`-smul coerces to the `H`-action on the underlying element (definitional)
   have hsmulHp : ∀ (a : ↥hyp.W1) (y : ↥(commutator ↥H)),
       ((a • y : ↥(commutator ↥H)) : ↥H) = a • (y : ↥H) := fun _ _ => rfl
-  haveI hW2subH_normal : (cert.W2.subgroupOf H).Normal := hW2normalL.subgroupOf H
-  haveI hMnorm : ((cert.W2.subgroupOf H).subgroupOf (commutator ↥H)).Normal :=
+  have hW2subH_normal : (cert.W2.subgroupOf H).Normal := hW2normalL.subgroupOf H
+  have hMnorm : ((cert.W2.subgroupOf H).subgroupOf (commutator ↥H)).Normal :=
     hW2subH_normal.subgroupOf (commutator ↥H)
   have hCop' : Nat.Coprime (Nat.card ↥hyp.W1) (Nat.card ↥(commutator ↥H)) :=
     hcop.symm.coprime_dvd_right (Subgroup.card_subgroup_dvd_card _)
@@ -348,7 +348,7 @@ theorem caseB_fpf_bound {G : Type*} [Group G] [Fintype G]
     (hMgt : 1 < (commutator ↥H).index)
     (hWMgt : 1 < (cert.W2.subgroupOf H).relIndex (commutator ↥H)) :
     (2 * Nat.card ↥hyp.W1 + 1) ^ 2 ≤ (cert.W2.subgroupOf H).index := by
-  letI : H.Normal := hyp.H_normal
+  let : H.Normal := hyp.H_normal
   have hW2le : cert.W2.subgroupOf H ≤ commutator ↥H := by
     rw [← commutator_subgroupOf_self]
     intro x hx

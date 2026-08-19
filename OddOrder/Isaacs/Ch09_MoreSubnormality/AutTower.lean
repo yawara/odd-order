@@ -72,7 +72,7 @@ instance instFiniteAutTowerType [Finite G] (n : ℕ) : Finite (autTowerType G n)
   induction n with
   | zero => exact ‹Finite G›
   | succ n IH =>
-    haveI := IH
+    have := IH
     change Finite (MulAut (autTowerType G n))
     exact Finite.of_injective (fun f : MulAut (autTowerType G n) => f.toEquiv)
       (fun _ _ h => MulEquiv.ext (fun x => congrArg (fun e : Equiv _ _ => e x) h))

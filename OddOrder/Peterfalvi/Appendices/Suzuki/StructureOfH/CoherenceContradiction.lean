@@ -60,8 +60,8 @@ variable {G : Type uG} {Ω : Type uΩ} [Group G] [MulAction G Ω] [Finite G]
 action on `Ω`, and `|Ω| = |Q| + 1`. -/
 theorem index_H_eq :
     sc.toHypothesis.H.index = Nat.card ↥sc.toHypothesis.Q + 1 := by
-  haveI := sc.toHypothesis.doubly_transitive
-  haveI : MulAction.IsPretransitive G Ω :=
+  have := sc.toHypothesis.doubly_transitive
+  have : MulAction.IsPretransitive G Ω :=
     MulAction.isPretransitive_of_is_two_pretransitive
   rw [sc.toHypothesis.H_def,
     MulAction.index_stabilizer_of_transitive G sc.toHypothesis.basept,
@@ -87,6 +87,7 @@ theorem induce_apply_one_eq [Fintype G]
   push_cast
   ring
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **`λ ∉ 𝒮`**: a class function with `QK` in its kernel kills
 `Q₁ ≤ Q ≤ QK`, while members of `𝒮` do not. -/
 theorem notMem_fs_Sset_of_leKer_QK
@@ -125,18 +126,18 @@ theorem Q1_eq_bot (ind : Hypothesis.TheoremAInductionBelow G Ω) :
   classical
   by_contra hQ1
   -- instances, in both the `sc`-side and `fs`-side syntactic shapes
-  letI instG : Fintype G := Fintype.ofFinite G
-  letI instGi : Invertible (Nat.card G : ℂ) :=
+  let instG : Fintype G := Fintype.ofFinite G
+  let instGi : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI instH : Fintype ↥sc.toHypothesis.H := Fintype.ofFinite _
-  letI : Fintype ↥(sc.feitSibleyHypothesis ind hQ1).H := instH
-  letI instHi : Invertible (Nat.card ↥sc.toHypothesis.H : ℂ) :=
+  let instH : Fintype ↥sc.toHypothesis.H := Fintype.ofFinite _
+  let : Fintype ↥(sc.feitSibleyHypothesis ind hQ1).H := instH
+  let instHi : Invertible (Nat.card ↥sc.toHypothesis.H : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(sc.feitSibleyHypothesis ind hQ1).H : ℂ) := instHi
-  letI instQi : Invertible
+  let : Invertible (Nat.card ↥(sc.feitSibleyHypothesis ind hQ1).H : ℂ) := instHi
+  let instQi : Invertible
       (Nat.card ↥(sc.toHypothesis.Q.subgroupOf sc.toHypothesis.H) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥((sc.feitSibleyHypothesis ind hQ1).Q.subgroupOf
+  let : Invertible (Nat.card ↥((sc.feitSibleyHypothesis ind hQ1).Q.subgroupOf
       (sc.feitSibleyHypothesis ind hQ1).H) : ℂ) := instQi
   -- step (3): coherence
   obtain ⟨hcoh⟩ := sc.sset_isCoherent ind hQ1
@@ -355,7 +356,7 @@ it: under (C1), `Q` is a `2`-group.
 `Q₁ = 1` (`Q1_eq_bot`) leaves `Q` equal to its Sylow `2`-subgroup. -/
 theorem isPGroup_two_Q (ind : Hypothesis.TheoremAInductionBelow G Ω) :
     IsPGroup 2 ↥sc.toHypothesis.Q := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨n, hn⟩ := sc.toHypothesis.isPGroup_sylowTwoOfQ.exists_card_eq
   refine IsPGroup.of_card (n := n) ?_
   rw [← sc.toHypothesis.card_sylowTwoOfQ_mul_card_Q1, sc.Q1_eq_bot ind,

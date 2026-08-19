@@ -92,11 +92,11 @@ theorem Xset_hasNoRealCharacters_caseB
     [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)] :
     OddOrder.Peterfalvi.S03.HasNoRealCharacters (hyp.Xset h46.W2) := by
   classical
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   intro χ hχX
   -- An `X(W₂)`-member is an induced character `Ind^L_H θ` with `θ ≠ 1`.
   have hχS : χ ∈ hyp.S := hyp.Xset_subset_S hχX
-  rw [hyp.S_eq, Set.mem_setOf_eq] at hχS
+  rw [hyp.S_eq, Set.mem_ofPred_eq] at hχS
   obtain ⟨θ, hθne, rfl⟩ := hχS
   have hθne' : (θ : ClassFunction ↥H ℂ) ≠ trivialClassFunction ↥H := fun heq =>
     hθne (Subtype.ext (heq.trans (IrreducibleCharacter.coe_trivialIrreducibleCharacter).symm))
@@ -277,16 +277,16 @@ noncomputable def caseB_member_psiDecomposition
     have hirrx : IsIrreducibleCharacter x :=
       (caseB_S_member_column_or_irreducible hyp h46 hHK hxS).resolve_left hcolumn
     have hreal : ¬ ClassFunction.IsReal x := by
-      have h := hxS; rw [hyp.S_eq, Set.mem_setOf_eq] at h
+      have h := hxS; rw [hyp.S_eq, Set.mem_ofPred_eq] at h
       obtain ⟨θ, hθne, hxeq⟩ := h
       rw [hxeq]; exact caseB_irr_nonreal hyp (hxeq ▸ hirrx)
     have hdiffsupp : (x.conj - x).support ⊆
         OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
-      have h := hxS; rw [hyp.S_eq, Set.mem_setOf_eq] at h
+      have h := hxS; rw [hyp.S_eq, Set.mem_ofPred_eq] at h
       obtain ⟨θ, hθne, hxeq⟩ := h
       rw [hxeq]; exact caseB_irr_conj_diff_support hyp θ
     have hχχbar : ClassFunction.inner x x.conj = 0 := by
-      have h := hxS; rw [hyp.S_eq, Set.mem_setOf_eq] at h
+      have h := hxS; rw [hyp.S_eq, Set.mem_ofPred_eq] at h
       obtain ⟨θ, hθne, hxeq⟩ := h
       rw [hxeq]; exact caseB_irr_conj_inner hyp (hxeq ▸ hirrx)
     exact memberExtensionDecomposition hyp.dade hS₁coh ⟨x, hirrx⟩
@@ -387,16 +387,16 @@ noncomputable def caseB_member_orthoDatum
     have hirrx : IsIrreducibleCharacter x :=
       (caseB_S_member_column_or_irreducible hyp h46 hHK hxS).resolve_left hcolumn
     have hreal : ¬ ClassFunction.IsReal x := by
-      have h := hxS; rw [hyp.S_eq, Set.mem_setOf_eq] at h
+      have h := hxS; rw [hyp.S_eq, Set.mem_ofPred_eq] at h
       obtain ⟨θ, hθne, hxeq⟩ := h
       rw [hxeq]; exact caseB_irr_nonreal hyp (hxeq ▸ hirrx)
     have hdiffsupp : (x.conj - x).support ⊆
         OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
-      have h := hxS; rw [hyp.S_eq, Set.mem_setOf_eq] at h
+      have h := hxS; rw [hyp.S_eq, Set.mem_ofPred_eq] at h
       obtain ⟨θ, hθne, hxeq⟩ := h
       rw [hxeq]; exact caseB_irr_conj_diff_support hyp θ
     have hχχbar : ClassFunction.inner x x.conj = 0 := by
-      have h := hxS; rw [hyp.S_eq, Set.mem_setOf_eq] at h
+      have h := hxS; rw [hyp.S_eq, Set.mem_ofPred_eq] at h
       obtain ⟨θ, hθne, hxeq⟩ := h
       rw [hxeq]; exact caseB_irr_conj_inner hyp (hxeq ▸ hirrx)
     refine ⟨memberExtensionDecomposition hyp.dade hS₁coh ⟨x, hirrx⟩
@@ -490,16 +490,16 @@ noncomputable def caseB_member_orthoDatum_columnBreak
     have hirrx : IsIrreducibleCharacter x :=
       (caseB_S_member_column_or_irreducible hyp h46 hHK hxS).resolve_left hcolumn
     have hreal : ¬ ClassFunction.IsReal x := by
-      have h := hxS; rw [hyp.S_eq, Set.mem_setOf_eq] at h
+      have h := hxS; rw [hyp.S_eq, Set.mem_ofPred_eq] at h
       obtain ⟨θ, hθne, hxeq⟩ := h
       rw [hxeq]; exact caseB_irr_nonreal hyp (hxeq ▸ hirrx)
     have hdiffsupp : (x.conj - x).support ⊆
         OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
-      have h := hxS; rw [hyp.S_eq, Set.mem_setOf_eq] at h
+      have h := hxS; rw [hyp.S_eq, Set.mem_ofPred_eq] at h
       obtain ⟨θ, hθne, hxeq⟩ := h
       rw [hxeq]; exact caseB_irr_conj_diff_support hyp θ
     have hχχbar : ClassFunction.inner x x.conj = 0 := by
-      have h := hxS; rw [hyp.S_eq, Set.mem_setOf_eq] at h
+      have h := hxS; rw [hyp.S_eq, Set.mem_ofPred_eq] at h
       obtain ⟨θ, hθne, hxeq⟩ := h
       rw [hxeq]; exact caseB_irr_conj_inner hyp (hxeq ▸ hirrx)
     refine ⟨memberExtensionDecomposition hyp.dade hS₁coh ⟨x, hirrx⟩
@@ -534,14 +534,14 @@ theorem caseB_S_pairwise_orthogonal
     [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)] :
     ∀ x ∈ hyp.S, ∀ y ∈ hyp.S, x ≠ y → ClassFunction.inner x y = 0 := by
   classical
-  haveI : Fintype ↥H := Fintype.ofFinite _
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   -- helper: an irreducible `S`-member is orthogonal to every certain-type column.
   have hirr_col : ∀ z, IsIrreducibleCharacter z → z ∈ hyp.S →
       ∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ,
       ClassFunction.inner z (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) = 0 := by
     intro z hzirr hzS χ₂
-    rw [hyp.S_eq, Set.mem_setOf_eq] at hzS
+    rw [hyp.S_eq, Set.mem_ofPred_eq] at hzS
     obtain ⟨θ, hθne, rfl⟩ := hzS
     exact caseB_inner_irr_columnSum_eq_zero hyp h46 hW1 hzirr χ₂
   intro x hxS y hyS hxy
@@ -592,8 +592,8 @@ theorem exists_sMemberOrthogonalFamilyW
       (∀ j, 0 < mc j) ∧
       (∀ i j, ClassFunction.inner (χmem i) (χmem j) = if i = j then (mc i : ℂ) else 0) := by
   classical
-  haveI : Fintype ↥H := Fintype.ofFinite _
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   obtain ⟨k, χmem, hinj, hrange⟩ := exists_finEnum_general hS₁fin
   have hmemS1 : ∀ j, χmem j ∈ S₁ := fun j => hrange ▸ Set.mem_range_self j
   refine ⟨k, χmem, fun j => (ClassFunction.inner (χmem j) (χmem j)).re,
@@ -655,11 +655,11 @@ theorem caseB_breakChar_fields
       (∀ χ ∈ S₁, ClassFunction.inner ψ χ = 0) ∧
       (∀ χ ∈ S₁, ClassFunction.inner ψ.conj χ = 0) := by
   classical
-  haveI : Fintype ↥H := Fintype.ofFinite _
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   -- `ψ = Ind^L_H θ` for a (nontrivial) source `θ` (membership in `S`).
   have hψS' := hψS
-  rw [hyp.S_eq, Set.mem_setOf_eq] at hψS'
+  rw [hyp.S_eq, Set.mem_ofPred_eq] at hψS'
   obtain ⟨θ, -, hψeq⟩ := hψS'
   have hψirr' : IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) :=
     hψeq ▸ hψirr
@@ -818,8 +818,8 @@ theorem sMember_degreeSqNormBound_of_not_coherent
       ψ 1 = (a : ℂ) * η 1 ∧
       ∑ j : Fin k, ((deg j : ℝ)) ^ 2 / mc j ≤ 2 * (a : ℝ) := by
   classical
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
-  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
   -- (1) the ψ-independent member family (brick 2).
   obtain ⟨k, χmem, mc, hinj, hrange, hmemS1set, hmcpos, hmemortho⟩ :=
     exists_sMemberOrthogonalFamilyW hyp h46 hHK hW1 hS₁sub hS₁fin
@@ -936,7 +936,7 @@ theorem sMember_degreeSqNormBound_of_not_coherent_columnBreak
       OddOrder.Peterfalvi.S06.columnSum h46 χ₂b 1 = (a : ℂ) * η 1 ∧
       ∑ j : Fin k, ((deg j : ℝ)) ^ 2 / mc j ≤ 2 * (a : ℝ) := by
   classical
-  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  have : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
   -- (1) the ψ-independent member family (brick 2) — identical to the irreducible-break case.
   obtain ⟨k, χmem, mc, hinj, hrange, hmemS1set, hmcpos, hmemortho⟩ :=
     exists_sMemberOrthogonalFamilyW hyp h46 hHK hW1 hS₁sub hS₁fin

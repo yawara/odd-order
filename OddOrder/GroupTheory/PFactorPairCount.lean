@@ -80,7 +80,7 @@ theorem mem_fixedPoints_pFactorPairs_iff (hg : g ∈ Subgroup.centralizer (Q : S
     q ∈ fixedPoints ↥Q (PFactorPairs p g)
       ↔ (q : G × G).1 ∈ Subgroup.centralizer (Q : Set G) ∧
           (q : G × G).2 ∈ Subgroup.centralizer (Q : Set G) := by
-  letI := mulActionPFactorPairs (p := p) hg
+  let := mulActionPFactorPairs (p := p) hg
   simp only [Subgroup.mem_centralizer_iff]
   constructor
   · intro h
@@ -114,8 +114,8 @@ theorem card_pFactorPairs_modEq_centralizer [Finite G] (hp : p.Prime) (hQ : IsPG
       ≡ Nat.card {q : PFactorPairs p g //
           (q : G × G).1 ∈ Subgroup.centralizer (Q : Set G) ∧
             (q : G × G).2 ∈ Subgroup.centralizer (Q : Set G)} [MOD p] := by
-  haveI : Fact p.Prime := ⟨hp⟩
-  letI := mulActionPFactorPairs (p := p) hg
+  have : Fact p.Prime := ⟨hp⟩
+  let := mulActionPFactorPairs (p := p) hg
   have hcard : Nat.card (fixedPoints ↥Q (PFactorPairs p g))
       = Nat.card {q : PFactorPairs p g //
           (q : G × G).1 ∈ Subgroup.centralizer (Q : Set G) ∧
@@ -146,7 +146,7 @@ theorem mem_fixedPoints_pRegular_iff (y : {y : G // IsPRegular p y}) :
     letI := mulActionPRegular p Q
     y ∈ fixedPoints ↥Q {y : G // IsPRegular p y}
       ↔ (y : G) ∈ Subgroup.centralizer (Q : Set G) := by
-  letI := mulActionPRegular p Q
+  let := mulActionPRegular p Q
   simp only [Subgroup.mem_centralizer_iff]
   constructor
   · intro h u hu
@@ -169,8 +169,8 @@ theorem card_pRegular_modEq_centralizer [Finite G] (hp : p.Prime) (hQ : IsPGroup
     Nat.card {y : G // IsPRegular p y}
       ≡ Nat.card {y : {y : G // IsPRegular p y} //
           (y : G) ∈ Subgroup.centralizer (Q : Set G)} [MOD p] := by
-  haveI : Fact p.Prime := ⟨hp⟩
-  letI := mulActionPRegular p Q
+  have : Fact p.Prime := ⟨hp⟩
+  let := mulActionPRegular p Q
   have hcard : Nat.card (fixedPoints ↥Q {y : G // IsPRegular p y})
       = Nat.card {y : {y : G // IsPRegular p y} //
           (y : G) ∈ Subgroup.centralizer (Q : Set G)} :=
@@ -243,8 +243,8 @@ theorem mem_fixedPoints_pFactorPairsMem_iff (hQH : Q ≤ H)
     q ∈ fixedPoints ↥Q {q : PFactorPairs p g // (q : G × G).1 ∈ H ∧ (q : G × G).2 ∈ H}
       ↔ ((q : PFactorPairs p g) : G × G).1 ∈ Subgroup.centralizer (Q : Set G) ∧
           ((q : PFactorPairs p g) : G × G).2 ∈ Subgroup.centralizer (Q : Set G) := by
-  letI := mulActionPFactorPairs (p := p) hg
-  letI := mulActionPFactorPairsMem (p := p) hQH hg
+  let := mulActionPFactorPairs (p := p) hg
+  let := mulActionPFactorPairsMem (p := p) hQH hg
   rw [← mem_fixedPoints_pFactorPairs_iff hg]
   exact ⟨fun h u => Subtype.ext_iff.mp (h u), fun h u => Subtype.ext (h u)⟩
 
@@ -257,8 +257,8 @@ theorem card_pFactorPairsMem_modEq_centralizer [Finite G] (hp : p.Prime) (hQ : I
       ≡ Nat.card {q : PFactorPairs p g //
           (q : G × G).1 ∈ Subgroup.centralizer (Q : Set G) ∧
             (q : G × G).2 ∈ Subgroup.centralizer (Q : Set G)} [MOD p] := by
-  haveI : Fact p.Prime := ⟨hp⟩
-  letI := mulActionPFactorPairsMem (p := p) hQH hg
+  have : Fact p.Prime := ⟨hp⟩
+  let := mulActionPFactorPairsMem (p := p) hQH hg
   have hcard : Nat.card (fixedPoints ↥Q
         {q : PFactorPairs p g // (q : G × G).1 ∈ H ∧ (q : G × G).2 ∈ H})
       = Nat.card {q : PFactorPairs p g //
@@ -290,9 +290,9 @@ theorem card_pRegularMem_modEq_centralizer [Finite G] (hp : p.Prime) (hQ : IsPGr
     Nat.card {y : {y : G // IsPRegular p y} // (y : G) ∈ H}
       ≡ Nat.card {y : {y : G // IsPRegular p y} //
           (y : G) ∈ Subgroup.centralizer (Q : Set G)} [MOD p] := by
-  haveI : Fact p.Prime := ⟨hp⟩
-  letI := mulActionPRegular p Q
-  letI := mulActionPRegularMem p Q H hQH
+  have : Fact p.Prime := ⟨hp⟩
+  let := mulActionPRegular p Q
+  let := mulActionPRegularMem p Q H hQH
   have hfix : ∀ y : {y : {y : G // IsPRegular p y} // (y : G) ∈ H},
       y ∈ fixedPoints ↥Q {y : {y : G // IsPRegular p y} // (y : G) ∈ H}
         ↔ ((y : {y : G // IsPRegular p y}) : G) ∈ Subgroup.centralizer (Q : Set G) := by

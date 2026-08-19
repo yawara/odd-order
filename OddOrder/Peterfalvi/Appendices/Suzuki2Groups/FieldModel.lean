@@ -160,7 +160,7 @@ theorem aeval_conj_root :
 irreducible). -/
 theorem isField (hq : (typeBQuadraticMap (1 : RingAut F) ε).Anisotropic) :
     IsField (FieldModel ε) := by
-  haveI : Fact (Irreducible (fieldModelPoly ε)) :=
+  have : Fact (Irreducible (fieldModelPoly ε)) :=
     ⟨fieldModelPoly_irreducible ε hq⟩
   exact Field.toIsField (FieldModel ε)
 
@@ -234,8 +234,7 @@ omit [CharP F 2] in
 theorem powerBasisFin_apply (i : Fin 2) :
     powerBasisFin ε i = alpha ε ^ (i : ℕ) := by
   simp only [powerBasisFin, Module.Basis.reindex_apply,
-    PowerBasis.basis_eq_pow, AdjoinRoot.powerBasis'_gen, finCongr_symm,
-    finCongr_apply, Fin.val_cast]
+    PowerBasis.basis_eq_pow, AdjoinRoot.powerBasis'_gen]
   rfl
 
 /-- **The `F`-linear identification** of Proposition 1:

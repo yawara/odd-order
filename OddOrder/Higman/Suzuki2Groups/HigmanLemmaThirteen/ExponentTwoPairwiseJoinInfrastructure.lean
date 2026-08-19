@@ -154,15 +154,15 @@ theorem exists_pairwiseJoinLowerCentralData_of_exponent_two
   let hJoinEA : IsElementaryAbelian 2 (frattini J) :=
     IsElementaryAbelian.of_mulEquiv
       (pairwiseJoinFrattiniEquivAmbientFrattini hMap).symm hPhiEA
-  letI : IsMulCommutative (frattini P) :=
+  let : IsMulCommutative (frattini P) :=
     IsMulCommutative.of_comm hPhiEA.comm
-  letI : CommGroup (frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini P)) :=
+  let : CommGroup (frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini P)) :=
     hPhiEA.zmodModule
-  letI : IsMulCommutative (frattini J) :=
+  let : IsMulCommutative (frattini J) :=
     IsMulCommutative.of_comm hJoinEA.comm
-  letI : CommGroup (frattini J) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini J)) :=
+  let : CommGroup (frattini J) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini J)) :=
     hJoinEA.zmodModule
   intro n c ePhi nu hconj
   have hRJoin : R < J := by

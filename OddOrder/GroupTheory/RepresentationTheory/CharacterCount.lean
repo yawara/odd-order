@@ -60,14 +60,14 @@ noncomputable def classFunctionEquivConjClasses :
 /-- The space of complex class functions on a finite group is finite-dimensional. -/
 instance instFiniteDimensionalClassFunction [Finite G] :
     FiniteDimensional ℂ (ClassFunction G ℂ) := by
-  haveI : Finite (ConjClasses G) := Finite.of_surjective _ ConjClasses.mk_surjective
+  have : Finite (ConjClasses G) := Finite.of_surjective _ ConjClasses.mk_surjective
   exact Module.Finite.equiv classFunctionEquivConjClasses.symm
 
 /-- The space of complex class functions on a finite group has dimension equal to the number
 of conjugacy classes. -/
 theorem finrank_classFunction [Finite G] :
     finrank ℂ (ClassFunction G ℂ) = Nat.card (ConjClasses G) := by
-  haveI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  have : Fintype (ConjClasses G) := Fintype.ofFinite _
   rw [classFunctionEquivConjClasses.finrank_eq, Module.finrank_fintype_fun_eq_card,
     Nat.card_eq_fintype_card]
 
@@ -85,8 +85,8 @@ noncomputable def innerDual [Fintype G] [Invertible (Nat.card G : ℂ)]
 orthogonality relation and the biorthogonal system of inner-product functionals. -/
 theorem linearIndependent_irreducibleCharacter [Finite G] :
     LinearIndependent ℂ (fun χ : IrreducibleCharacter G => (χ : ClassFunction G ℂ)) := by
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Invertible (Nat.card G : ℂ) :=
+  have : Fintype G := Fintype.ofFinite G
+  have : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   refine LinearIndependent.of_pairwise_dual_eq_zero_one _
     (fun ψ => innerDual (ψ : ClassFunction G ℂ)) (fun χ ψ hχψ => ?_) (fun χ => ?_)
@@ -102,8 +102,8 @@ theorem finite_irreducibleCharacter [Finite G] : Finite (IrreducibleCharacter G)
 of conjugacy classes. (The reverse inequality — completeness — is the harder direction.) -/
 theorem card_irreducibleCharacter_le [Finite G] :
     Nat.card (IrreducibleCharacter G) ≤ Nat.card (ConjClasses G) := by
-  haveI := finite_irreducibleCharacter (G := G)
-  haveI : Fintype (IrreducibleCharacter G) := Fintype.ofFinite _
+  have := finite_irreducibleCharacter (G := G)
+  have : Fintype (IrreducibleCharacter G) := Fintype.ofFinite _
   rw [Nat.card_eq_fintype_card, ← finrank_classFunction (G := G)]
   exact (linearIndependent_irreducibleCharacter (G := G)).fintype_card_le_finrank
 

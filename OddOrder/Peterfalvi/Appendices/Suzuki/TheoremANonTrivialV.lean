@@ -76,7 +76,7 @@ theorem twoRank_centralizer_le_one_of_not_exists {P : Subgroup G}
   intro E hEC hEexp
   by_contra hlt
   refine h ?_
-  haveI : Fact (Nat.Prime 2) := Fact.mk Nat.prime_two
+  have : Fact (Nat.Prime 2) := Fact.mk Nat.prime_two
   -- `E` is elementary abelian, so `|E| = 2ⁿ` with `n ≥ 2`
   have hE2 : IsPGroup 2 ↥E := fun x => ⟨1, by simpa using Subtype.ext (hEexp (x : G) x.2)⟩
   obtain ⟨n, hn⟩ := hE2.exists_card_eq

@@ -149,7 +149,7 @@ theorem Hypothesis.q_not_dvd_card_H [Finite G] (hG : OddOrder.BG.IsMinimalSimple
     rw [hyp.S_deriv_eq_PU]
     exact sup_le le_sup_left (le_trans (hyp.C_eq ▸ inf_le_left) le_sup_right)
   have hcard_deriv : Nat.card ↥hyp.P * Nat.card ↥hyp.U = Nat.card ↥(derivedInG hyp.S) := by
-    have h := hyp.Sdata.derived_complement.card_mul
+    have h := hyp.Sdata.derived_complement.card_mul_card
     have hPeq : hyp.Sdata.H = hyp.P := by rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
     rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (hPeq ▸ hyp.Sdata.H_le)).toEquiv,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Sdata.U_le).toEquiv, hPeq,
@@ -313,7 +313,7 @@ theorem Hypothesis.sum_univ_split [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleO
 (`Sdata.derived_complement`). -/
 theorem Hypothesis.card_deriv_S_eq [Finite G] (hyp : Hypothesis (G := G)) :
     Nat.card ↥(derivedInG hyp.S) = Nat.card ↥hyp.P * Nat.card ↥hyp.U := by
-  have h := hyp.Sdata.derived_complement.card_mul
+  have h := hyp.Sdata.derived_complement.card_mul_card
   have hPeq : hyp.Sdata.H = hyp.P := by rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
   rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Sdata.H_le).toEquiv,
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Sdata.U_le).toEquiv, hPeq,
@@ -324,7 +324,7 @@ theorem Hypothesis.card_deriv_S_eq [Finite G] (hyp : Hypothesis (G := G)) :
 theorem Hypothesis.card_S_eq_deriv_mul_q [Finite G] (hyp : Hypothesis (G := G)) :
     Nat.card ↥hyp.S = Nat.card ↥(derivedInG hyp.S) * hyp.q := by
   have hle : derivedInG hyp.S ≤ hyp.S := Subgroup.map_subtype_le _
-  have h := hyp.Sdata.M_complement.card_mul
+  have h := hyp.Sdata.M_complement.card_mul_card
   rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv,
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Sdata.W1_le).toEquiv,
     hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1] at h
@@ -386,7 +386,7 @@ theorem Hypothesis.card_H_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       hyp.c_eq_card_C ▸ Subgroup.card_dvd_of_le inf_le_right
     exact Nat.dvd_one.mp (hpc' ▸ Nat.dvd_gcd hd1 hd2)
   -- `|H| = |P|·|C|` (complement `P ◁ H`)
-  haveI hPnormalH : (hyp.P.subgroupOf hyp.H).Normal := by
+  have hPnormalH : (hyp.P.subgroupOf hyp.H).Normal := by
     refine (Subgroup.normal_subgroupOf_iff_le_normalizer hPH).mpr ?_
     have hSnorm : hyp.S ≤ Subgroup.normalizer (hyp.P : Set G) := by
       rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
@@ -405,7 +405,7 @@ theorem Hypothesis.card_H_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hcompl : Subgroup.IsComplement' (hyp.P.subgroupOf hyp.H) (hyp.C.subgroupOf hyp.H) :=
     Subgroup.isComplement'_of_disjoint_and_mul_eq_univ (disjoint_iff.mpr hinf)
       (by rw [← Subgroup.normal_mul, hsup, Subgroup.coe_top])
-  have hmul := hcompl.card_mul
+  have hmul := hcompl.card_mul_card
   rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPH).toEquiv,
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCH).toEquiv, hPcard,
     ← hyp.c_eq_card_C] at hmul
@@ -433,7 +433,7 @@ open scoped FiniteInduce in
 theorem Hypothesis.mu_j_degree [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (j : Fin hyp.p) (hj : j ≠ ⟨0, hyp.p_prime.pos⟩) :
     (∑ i : Fin hyp.q, hyp.mu i j) (1 : ↥hyp.S) = ((hyp.u * hyp.q : ℕ) : ℂ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   obtain ⟨θ, hθirr, hθ1, hθeq⟩ := hyp.mu_j_isIndPC hG j hj
   rw [hθeq, ClassFunction.induce_apply_one, hθ1, mul_one, hyp.H_index_eq_uq hG]
 
@@ -445,7 +445,7 @@ open scoped FiniteInduce in
 theorem Hypothesis.mu_apply_one_column_const [Finite G] (hyp : Hypothesis (G := G))
     (i : Fin hyp.q) (j : Fin hyp.p) :
     hyp.mu i j (1 : ↥hyp.S) = hyp.mu ⟨0, hyp.q_prime.pos⟩ j (1 : ↥hyp.S) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hdef := hyp.mu_definition i j
   have h1 := congrArg (fun f : ClassFunction ↥hyp.S ℂ => f (1 : ↥hyp.S)) hdef
   -- LHS(1) = 0
@@ -473,7 +473,7 @@ theorem Hypothesis.mu_apply_one_eq_u [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     (hyp : Hypothesis (G := G)) (i : Fin hyp.q) (j : Fin hyp.p)
     (hj : j ≠ ⟨0, hyp.p_prime.pos⟩) :
     hyp.mu i j (1 : ↥hyp.S) = ((hyp.u : ℕ) : ℂ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   -- `∑ᵢ μ_{ij}(1) = q·μ_{0j}(1)` and `= uq`
   have hsum := hyp.mu_j_degree hG j hj
   rw [ClassFunction.finset_sum_apply] at hsum
@@ -498,7 +498,7 @@ theorem Hypothesis.mu_apply_one_eq_u [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
 uses only the (proven) `U W₁` Frobenius structure, not the case-(b) Singer field model. -/
 theorem Hypothesis.u_modEq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) : hyp.u ≡ 1 [MOD hyp.q] := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   let setup := hyp.toTypesIIIIIIVSetupS hG
   have hSdataUne := setup.nontrivial.1
   change hyp.Sdata.U ≠ ⊥ at hSdataUne
@@ -509,7 +509,7 @@ theorem Hypothesis.u_modEq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
   have hUW1normP : hyp.Sdata.U ⊔ hyp.Sdata.W1 ≤ Subgroup.normalizer hyp.P :=
     le_trans hUW1leS hSnormP
-  letI : MulDistribMulAction ↥(hyp.Sdata.U ⊔ hyp.Sdata.W1) ↥hyp.P :=
+  let : MulDistribMulAction ↥(hyp.Sdata.U ⊔ hyp.Sdata.W1) ↥hyp.P :=
     MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer hyp.P)) ↥hyp.P
       (Subgroup.inclusion hUW1normP)
   set φ : ↥(hyp.Sdata.U ⊔ hyp.Sdata.W1) →* MulAut ↥hyp.P :=
@@ -648,12 +648,12 @@ theorem Hypothesis.card_T_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   obtain ⟨tpd, hU, hW1, -⟩ := reconciled_typePData_T hG hyp
   -- `|T| = |T'|·p`.
   have hle : derivedInG hyp.T ≤ hyp.T := Subgroup.map_subtype_le _
-  have h1 := tpd.M_complement.card_mul
+  have h1 := tpd.M_complement.card_mul_card
   rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv,
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe tpd.W1_le).toEquiv,
     hW1, ← hyp.p_eq_card_W2] at h1
   -- `|T'| = |Q|·|V| = |Q|·(vd)`.
-  have h2 := tpd.derived_complement.card_mul
+  have h2 := tpd.derived_complement.card_mul_card
   rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe tpd.H_le).toEquiv,
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe tpd.U_le).toEquiv, tpd.H_eq, ← hyp.Q_eq_TF,
     hU, hyp.card_V_eq_vd] at h2
@@ -666,7 +666,7 @@ theorem Hypothesis.card_T_eq_deriv_mul_p [Finite G] (hG : OddOrder.BG.IsMinimalS
     Nat.card ↥hyp.T = Nat.card ↥(derivedInG hyp.T) * hyp.p := by
   obtain ⟨tpd, -, hW1, -⟩ := reconciled_typePData_T hG hyp
   have hle : derivedInG hyp.T ≤ hyp.T := Subgroup.map_subtype_le _
-  have h := tpd.M_complement.card_mul
+  have h := tpd.M_complement.card_mul_card
   rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv,
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe tpd.W1_le).toEquiv,
     hW1, ← hyp.p_eq_card_W2] at h
@@ -747,7 +747,7 @@ theorem P_conj_forall_not_le_T [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     ∀ w : G, ¬ ∀ r ∈ hyp.P, w⁻¹ * r * w ∈ hyp.T := by
   intro w hall
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   -- `|P| = p^q` (13.2.b).
   obtain ⟨-, -, -, hPcard, -, -⟩ := basic_structure hG hyp
   -- The conjugate `P^w = (conj w⁻¹)(P)` lies in `T` and has order `p^q`; Lagrange.
@@ -835,7 +835,7 @@ open scoped Classical in
 /-- `|K^#| = |K| − 1`, `Finset` form. -/
 theorem card_sharp_toFinset [Finite G] (K : Subgroup G) :
     (Set.toFinite (sharpSubgroup K)).toFinset.card = Nat.card ↥K - 1 := by
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   classical
   have h : (Set.toFinite (sharpSubgroup K)).toFinset
       = (Finset.univ.filter (· ∈ K)).erase 1 := by
@@ -856,7 +856,7 @@ theorem Hypothesis.card_univ_split [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
     (hcardQ : Nat.card ↥hyp.Q = hyp.q ^ hyp.p) (hvd : hyp.v * hyp.d ≠ 1) :
     Nat.card G = 1 + hyp.G0Finset.card
       + hyp.S.index * (Nat.card ↥hyp.H - 1) + hyp.T.index * (Nat.card ↥hyp.Q - 1) := by
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   have h := hyp.sum_univ_split hG (fun _ => (1 : ℕ)) (fun _ _ => rfl) hcardQ hvd
   simp only [← Finset.card_eq_sum_ones, Finset.card_univ, smul_eq_mul,
     card_sharp_toFinset] at h
@@ -1032,7 +1032,7 @@ theorem Hypothesis.card_deriv_T_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
     (hyp : Hypothesis (G := G)) :
     Nat.card ↥(derivedInG hyp.T) = Nat.card ↥hyp.Q * (hyp.v * hyp.d) := by
   obtain ⟨tpd, hU, -, -⟩ := reconciled_typePData_T hG hyp
-  have h2 := tpd.derived_complement.card_mul
+  have h2 := tpd.derived_complement.card_mul_card
   rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe tpd.H_le).toEquiv,
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe tpd.U_le).toEquiv, tpd.H_eq, ← hyp.Q_eq_TF,
     hU, hyp.card_V_eq_vd] at h2

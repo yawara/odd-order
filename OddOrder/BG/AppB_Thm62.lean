@@ -36,7 +36,7 @@ private theorem lRelIn_map_le {G' : Type*} [Group G'] (φ : G ≃* G') (H X : Su
   rw [Subgroup.map_le_iff_le_comap]
   refine lRelIn_le fun A hcomm hAH hnorm => ?_
   rw [← Subgroup.map_le_iff_le_comap]
-  haveI := hcomm
+  have := hcomm
   refine le_lRelIn inferInstance (Subgroup.map_mono hAH) ?_
   rw [← Subgroup.map_equiv_normalizer_eq A φ]
   exact Subgroup.map_mono hnorm
@@ -80,14 +80,14 @@ theorem lRelIn_eq_map_subtype {H : Subgroup G} (X : Subgroup G) (hX : X ≤ H) :
       rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hAH]
     rw [hAeq]
     refine Subgroup.map_mono ?_
-    haveI := hcomm
+    have := hcomm
     refine le_lRelIn (Subgroup.comap_injective_isMulCommutative A H.subtype_injective) le_top ?_
     rw [← Subgroup.subgroupOf_normalizer_eq hAH]
     exact Subgroup.comap_mono hnorm
   · rw [Subgroup.map_le_iff_le_comap]
     refine lRelIn_le fun B hcomm hBH hnorm => ?_
     rw [← Subgroup.map_le_iff_le_comap]
-    haveI := hcomm
+    have := hcomm
     have hBsub : B.map H.subtype ≤ H := Subgroup.map_subtype_le B
     refine le_lRelIn inferInstance hBsub ?_
     have hBB : (B.map H.subtype).subgroupOf H = B :=
@@ -206,11 +206,11 @@ theorem map_zCenterLOdd_of_injOn {G' : Type*} [Group G'] (f : G →* G') {H : Su
 `Z(L(S̄)) = mk(Z(L(S)))` (共変性). `Z(L(S̄)) ⊴ Ḡ` (B.4(b)) を引き戻す:
 `Z(L(S))·O_{p'} = mk⁻¹(Z(L(S̄)))` は正規 (`comap` が正規性を保つ). -/
 theorem zCenter_lOdd_sup_oPiCore_normal [Finite G] {p : ℕ} [Fact p.Prime]
-    (hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd : Odd (Nat.card G)) (S : Sylow p G) :
+    (hp_odd : p ≠ 2) (hsolv : Group.IsSolvable G) (hodd : Odd (Nat.card G)) (S : Sylow p G) :
     (zCenterLOdd (S : Subgroup G) ⊔ oPiCore {q | q ≠ p} G).Normal := by
-  haveI : IsSolvable G := hsolv
+  have : Group.IsSolvable G := hsolv
   set N := oPiCore {q | q ≠ p} G with hN_def
-  haveI hN_normal : N.Normal := by rw [hN_def]; infer_instance
+  have hN_normal : N.Normal := by rw [hN_def]; infer_instance
   -- `S ∩ N = ⊥` (p-群 ∩ p'-群)
   have hSN : (↑S : Subgroup G) ⊓ N = ⊥ := by
     have hpg : IsPGroup p ↥((↑S : Subgroup G) ⊓ N) := S.2.to_inf_left

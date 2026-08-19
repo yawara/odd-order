@@ -675,7 +675,7 @@ theorem natCard_standardPermGroup (m : ℕ) :
       2 ^ (2 * (2 * m + 1)) *
         (2 ^ (2 * (2 * m + 1)) + 1) *
           (2 ^ (2 * m + 1) - 1) := by
-  letI : MulAction.IsPretransitive (standardPermGroup m) (Ovoid m) :=
+  let : MulAction.IsPretransitive (standardPermGroup m) (Ovoid m) :=
     standardPermGroup_isPretransitive m
   have hindex := MulAction.index_stabilizer_of_transitive
     (standardPermGroup m) (Ovoid.infinity m)

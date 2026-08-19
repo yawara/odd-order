@@ -77,8 +77,8 @@ theorem ncard_orbit_stabilizer_eq_of_card_eq_eight [IsPreprimitive G Ω]
     (hΩ : Nat.card Ω = 8) {α γ : Ω} (hγ : γ ≠ α) :
     Set.ncard (orbit ↥(stabilizer G α) γ) = 7 := by
   classical
-  haveI : Finite Ω := Nat.finite_of_card_ne_zero (by omega)
-  haveI : Nontrivial Ω := Finite.one_lt_card_iff_nontrivial.mp (by omega)
+  have : Finite Ω := Nat.finite_of_card_ne_zero (by omega)
+  have : Nontrivial Ω := Finite.one_lt_card_iff_nontrivial.mp (by omega)
   have hcompl : ({α}ᶜ : Set Ω).ncard = 7 := by
     have h := Set.ncard_add_ncard_compl ({α} : Set Ω)
     rw [Set.ncard_singleton, hΩ] at h
@@ -92,7 +92,7 @@ theorem ncard_orbit_stabilizer_eq_of_card_eq_eight [IsPreprimitive G Ω]
       have h := index_stabilizer_of_transitive (G := G) (x := α)
       rw [hbot, Subgroup.index_bot, hΩ] at h
       exact h
-    haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+    have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
     obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' (G := G) 2 (by rw [hcard]; norm_num)
     have hcoat : IsCoatom (stabilizer G α) :=
       MulAction.IsPreprimitive.isCoatom_stabilizer_of_isPreprimitive (G := G) α

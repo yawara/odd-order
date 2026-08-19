@@ -104,7 +104,7 @@ theorem fixes_components_of_permutes_indep
     {i j : ι} (hij : i ≠ j) {a b : E} (ha : a ∈ S i) (hb : b ∈ S j)
     (ha1 : a ≠ 1) (hb1 : b ≠ 1) (hfix : (φ x) (a * b) = a * b) :
     (φ x) a = a ∧ (φ x) b = b := by
-  letI : CommGroup E := { (inferInstance : Group E) with mul_comm := hcomm }
+  let : CommGroup E := { (inferInstance : Group E) with mul_comm := hcomm }
   set σi := perm x i with hσi
   set σj := perm x j with hσj
   have hσ_ne : σi ≠ σj := fun h => hij ((perm x).injective h)
@@ -169,7 +169,7 @@ theorem fixes_components_of_permutes_indep
       hpair (Ne.symm hij) (mul_mem hxa_mem (inv_mem hb)) (mul_mem hxb_mem (inv_mem ha)) huv
     have hfa : (φ x) a = b := mul_inv_eq_one.mp hu
     have hfb : (φ x) b = a := mul_inv_eq_one.mp hv
-    letI : MulAction P E := MulAction.compHom E φ
+    let : MulAction P E := MulAction.compHom E φ
     have hsmul : ∀ (y : P) (g : E), y • g = (φ y) g := fun _ _ => rfl
     have hsq : x ^ 2 • a = a := by
       rw [hsmul]
@@ -371,8 +371,8 @@ theorem isCyclic_of_faithful_fpf_pgroup_on_elementaryAbelian
     IsCyclic P := by
   rcases subsingleton_or_nontrivial P with _ | hPnt
   · exact isCyclic_of_subsingleton
-  · haveI : Fact q.Prime := ⟨hq⟩
-    letI : MulAction P E := MulAction.compHom E φ
+  · have : Fact q.Prime := ⟨hq⟩
+    let : MulAction P E := MulAction.compHom E φ
     have hsmul : ∀ (x : P) (e : E), x • e = (φ x) e := fun _ _ => rfl
     -- Step 1: `q ≠ p`, derived from fixed-point-freeness.
     have hqp : q ≠ p := by
@@ -387,13 +387,13 @@ theorem isCyclic_of_faithful_fpf_pgroup_on_elementaryAbelian
       have hpfix : q ∣ Nat.card (MulAction.fixedPoints P E) :=
         (Nat.modEq_zero_iff_dvd).mp
           (hmod.symm.trans ((Nat.modEq_zero_iff_dvd).mpr hqdvd))
-      haveI : Nonempty (MulAction.fixedPoints P E) :=
+      have : Nonempty (MulAction.fixedPoints P E) :=
         ⟨⟨1, fun g => by rw [hsmul]; exact map_one (φ g)⟩⟩
       have hfix_pos : 0 < Nat.card (MulAction.fixedPoints P E) := Nat.card_pos
       have hp2 : 2 ≤ q := hq.two_le
       have hfix_gt1 : 1 < Nat.card (MulAction.fixedPoints P E) :=
         lt_of_lt_of_le one_lt_two (hp2.trans (Nat.le_of_dvd hfix_pos hpfix))
-      haveI : Nontrivial (MulAction.fixedPoints P E) :=
+      have : Nontrivial (MulAction.fixedPoints P E) :=
         Finite.one_lt_card_iff_nontrivial.mp hfix_gt1
       -- a nonidentity common fixed point contradicts fixed-point-freeness
       have key : ∀ e : ↥(MulAction.fixedPoints P E), (e : E) ≠ 1 → False := by
@@ -453,7 +453,7 @@ private theorem iSupIndep_of_proj
     (hkill : ∀ i j, i ≠ j → ∀ v ∈ V j, e i v = 1)
     (hm : ∀ x : M, x ^ m = 1 → x = 1) : iSupIndep V := by
   classical
-  letI : Fintype ι := Fintype.ofFinite ι
+  let : Fintype ι := Fintype.ofFinite ι
   rw [iSupIndep_def]
   intro i
   have h := OddOrder.BG.Ch1.S03f.disjoint_biSup_biSup_of_proj
@@ -536,7 +536,7 @@ private theorem actionFixedPoints_iSup_card_prime_eq_top
     (hcop : Nat.Coprime (Nat.card R) (Nat.card E))
     (hfixTop : actionFixedPoints ψ (⊤ : Subgroup R) = ⊥) :
     (⨆ T : {T : Subgroup R // Nat.card T = p}, actionFixedPoints ψ T) = ⊤ := by
-  letI : CommGroup R := { (inferInstance : Group R) with mul_comm := hR.comm }
+  let : CommGroup R := { (inferInstance : Group R) with mul_comm := hR.comm }
   have hRnc : ¬ IsCyclic R := hR.not_isCyclic_of_card_prime_sq hp hRcard
   have hspanRaw :=
     OddOrder.BG.Ch1.S01.cocyclicFixedByClosure_eq_top_of_not_isCyclic ψ hcop hRnc
@@ -544,7 +544,7 @@ private theorem actionFixedPoints_iSup_card_prime_eq_top
   change Subgroup.closure _ ≤ _
   rw [Subgroup.closure_le]
   rintro v ⟨Y, ⟨a, hYa⟩, hYfix⟩
-  haveI hYnorm : Y.Normal := ⟨fun y hy g => by
+  have hYnorm : Y.Normal := ⟨fun y hy g => by
     have hcomm : g * y * g⁻¹ = y := by
       rw [hR.comm g y]
       group
@@ -613,14 +613,14 @@ theorem exists_aInvariant_complement_of_elementaryAbelian
     {U : Subgroup E} (hUinv : IsAInvariant φ U) :
     ∃ W : Subgroup E, IsAInvariant φ W ∧ U ⊓ W = ⊥ ∧ U ⊔ W = ⊤ := by
   classical
-  haveI hEcomm : IsMulCommutative E := IsMulCommutative.of_comm hE.comm
-  letI : CommGroup E := { (inferInstance : Group E) with mul_comm := hE.comm }
-  haveI : NeZero q := ⟨(Fact.out : q.Prime).ne_zero⟩
+  have hEcomm : IsMulCommutative E := IsMulCommutative.of_comm hE.comm
+  let : CommGroup E := { (inferInstance : Group E) with mul_comm := hE.comm }
+  have : NeZero q := ⟨(Fact.out : q.Prime).ne_zero⟩
   have hqsmul : ∀ x : Additive E, (q : ℕ) • x = 0 := by
     intro x; apply Additive.toMul.injective
     rw [toMul_nsmul, toMul_zero]; exact hE.pow_eq_one x.toMul
-  haveI : Module (ZMod q) (Additive E) := AddCommGroup.zmodModule hqsmul
-  haveI : NeZero ((Nat.card P : ZMod q)) := neZero_natCast_zmod_of_coprime hcop hqE
+  have : Module (ZMod q) (Additive E) := AddCommGroup.zmodModule hqsmul
+  have : NeZero ((Nat.card P : ZMod q)) := neZero_natCast_zmod_of_coprime hcop hqE
   set ρ : Representation (ZMod q) P (Additive E) := (mulAutToEnd E q).comp φ with hρ_def
   have key_rho : ∀ (a : P) (v : Additive E),
       Additive.toMul (ρ a v) = (φ a) (Additive.toMul v) := fun _ _ => rfl
@@ -725,7 +725,7 @@ theorem pGroup_cyclic_fixedPointFree
     (hconst : ∀ a b : E, a ≠ 1 → b ≠ 1 →
       Nat.card ↥(pointStabilizer φ a) = Nat.card ↥(pointStabilizer φ b)) :
     IsCyclic P ∧ ∀ x : P, x ≠ 1 → actionFixedBy φ x = ⊥ := by
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   have hqE : q ∣ Nat.card E := by
     obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := q)).mp hE.isPGroup
     have hn0 : n ≠ 0 := by
@@ -744,8 +744,8 @@ theorem pGroup_cyclic_fixedPointFree
   have hfpf : ∀ x : P, x ≠ 1 → actionFixedBy φ x = ⊥ := by
     by_cases hirr : ∀ U : Subgroup E, IsAInvariant φ U → U = ⊥ ∨ U = ⊤
     · by_cases hcyc : IsCyclic P
-      · haveI := hcyc
-        letI : CommGroup P := IsCyclic.commGroup
+      · have := hcyc
+        let : CommGroup P := IsCyclic.commGroup
         refine fpf_of_abelian_of_irreducible φ hfaithful (fun x y => mul_comm x y) ?_
         intro H hH
         exact hirr H (isAInvariant_iff_smul_mem.mpr hH)
@@ -753,11 +753,11 @@ theorem pGroup_cyclic_fixedPointFree
         -- spaces of the order-`p` lines in a normal subgroup `R ≅ C_p × C_p`.
         -- Orbit-product projections give independence, while conjugation by
         -- `P` permutes at least two nonzero summands; apply part (1).
-        letI : CommGroup E := { (inferInstance : Group E) with mul_comm := hE.comm }
+        let : CommGroup E := { (inferInstance : Group E) with mul_comm := hE.comm }
         obtain ⟨R, hRnorm, hRea, hRcard⟩ :=
           OddOrder.BG.Ch1.S04.exists_normal_isElementaryAbelian_card_prime_sq_of_not_isCyclic
             hP hp_odd hcyc
-        letI : R.Normal := hRnorm
+        let : R.Normal := hRnorm
         have hRfix : actionFixedPoints φ R = ⊥ := by
           have hCinv : IsAInvariant φ (actionFixedPoints φ R) := by
             rw [isAInvariant_iff_smul_mem]
@@ -811,7 +811,7 @@ theorem pGroup_cyclic_fixedPointFree
             ext e
             have he : e ∈ actionFixedBy φ x := by rw [htop]; exact Subgroup.mem_top e
             simpa using mem_actionFixedBy.mp he
-        letI : CommGroup R := { (inferInstance : Group R) with mul_comm := hRea.comm }
+        let : CommGroup R := { (inferInstance : Group R) with mul_comm := hRea.comm }
         set ψ : R →* MulAut E := φ.comp R.subtype with hψdef
         set Vfam : {T : Subgroup R // Nat.card T = p} → Subgroup E := fun T =>
           actionFixedPoints ψ T with hVfamdef
@@ -875,13 +875,13 @@ theorem pGroup_cyclic_fixedPointFree
             exact mem_pointStabilizer.mp
               ((hTi_sup i j hij ▸ sup_le hTi_stab hTj_stab) r.2)
           rwa [hRfixTop] at heTop
-        haveI hιfin : Finite {T : Subgroup R // Nat.card T = p} := by
-          haveI : Finite (Subgroup R) :=
+        have hιfin : Finite {T : Subgroup R // Nat.card T = p} := by
+          have : Finite (Subgroup R) :=
             Finite.of_injective (fun T : Subgroup R => (T : Set R)) SetLike.coe_injective
           exact Subtype.finite
-        letI : Fintype {T : Subgroup R // Nat.card T = p} := Fintype.ofFinite _
-        letI : DecidableEq {T : Subgroup R // Nat.card T = p} := Classical.decEq _
-        haveI instSubFT : ∀ T : Subgroup R, Fintype T := fun _ => Fintype.ofFinite _
+        let : Fintype {T : Subgroup R // Nat.card T = p} := Fintype.ofFinite _
+        let : DecidableEq {T : Subgroup R // Nat.card T = p} := Classical.decEq _
+        have instSubFT : ∀ T : Subgroup R, Fintype T := fun _ => Fintype.ofFinite _
         set efam : {T : Subgroup R // Nat.card T = p} → (E →* E) := fun T =>
           orbitProductHom ψ (T : Subgroup R) with hefamdef
         have hefam_cent : ∀ (i : {T : Subgroup R // Nat.card T = p}) (v : E),
@@ -966,7 +966,7 @@ theorem pGroup_cyclic_fixedPointFree
             rw [← hmap x]
             exact Subgroup.mem_map_of_mem
               (OddOrder.RepresentationTheory.conjNormalMulAut R x).toMonoidHom hr
-          letI : Tbar.Normal := hTbarNorm
+          let : Tbar.Normal := hTbarNorm
           have hTbarCard : Nat.card Tbar = p := by
             rw [hTbar, Subgroup.card_map_of_injective R.subtype_injective, i₀.2]
           have hTbarCenter : Tbar ≤ Subgroup.center P :=
@@ -974,7 +974,7 @@ theorem pGroup_cyclic_fixedPointFree
           have hTcardgt : 1 < Nat.card ↥(i₀ : Subgroup R) := by
             rw [i₀.2]
             exact (Fact.out : p.Prime).one_lt
-          letI hTnt : Nontrivial ↥(i₀ : Subgroup R) :=
+          let hTnt : Nontrivial ↥(i₀ : Subgroup R) :=
             Finite.one_lt_card_iff_nontrivial.mp hTcardgt
           obtain ⟨t, ht1⟩ := exists_ne (1 : ↥(i₀ : Subgroup R))
           have htP1 : (((t : (i₀ : Subgroup R)) : R) : P) ≠ 1 := by
@@ -1044,17 +1044,17 @@ theorem normal_isPGroup_eq_bot_of_faithful_irreducible
       _ = (φ d) ((φ (d⁻¹ * (n : D) * d)) e) := by rw [map_mul]; rfl
       _ = (φ d) e := by rw [he ⟨d⁻¹ * (n : D) * d, hmem⟩]
   have hCne : actionFixedPoints φ N ≠ ⊥ := by
-    letI : MulAction ↥N E := MulAction.compHom E (φ.comp N.subtype)
+    let : MulAction ↥N E := MulAction.compHom E (φ.comp N.subtype)
     have hsmul : ∀ (n : ↥N) (e : E), n • e = (φ (n : D)) e := fun _ _ => rfl
     have hmod := hNq.card_modEq_card_fixedPoints E
     have hpfix : q ∣ Nat.card (MulAction.fixedPoints ↥N E) :=
       (Nat.modEq_zero_iff_dvd).mp (hmod.symm.trans ((Nat.modEq_zero_iff_dvd).mpr hqE))
-    haveI : Nonempty (MulAction.fixedPoints ↥N E) :=
+    have : Nonempty (MulAction.fixedPoints ↥N E) :=
       ⟨⟨1, fun n => by rw [hsmul]; exact map_one _⟩⟩
     have hpos : 0 < Nat.card (MulAction.fixedPoints ↥N E) := Nat.card_pos
     have hgt1 : 1 < Nat.card (MulAction.fixedPoints ↥N E) :=
       lt_of_lt_of_le one_lt_two ((Fact.out : q.Prime).two_le.trans (Nat.le_of_dvd hpos hpfix))
-    haveI : Nontrivial (MulAction.fixedPoints ↥N E) := Finite.one_lt_card_iff_nontrivial.mp hgt1
+    have : Nontrivial (MulAction.fixedPoints ↥N E) := Finite.one_lt_card_iff_nontrivial.mp hgt1
     obtain ⟨a, b, hab⟩ := exists_pair_ne (↥(MulAction.fixedPoints ↥N E))
     have key : ∀ c : ↥(MulAction.fixedPoints ↥N E), (c : E) ≠ 1 → actionFixedPoints φ N ≠ ⊥ := by
       intro c hc hbot
@@ -1121,12 +1121,12 @@ because `F` is cyclic, so `commutator D ≤ ker = C_D(F) ≤ F`, the last inclus
 being self-centralization of the Fitting subgroup in a solvable group
 (`centralizer_fitting_le_fitting`). -/
 theorem commutator_le_fitting_of_isCyclic_fitting
-    [Finite D] [IsSolvable D] (hcyc : IsCyclic ↥(OddOrder.Isaacs.Ch01.fitting D)) :
+    [Finite D] [Group.IsSolvable D] (hcyc : IsCyclic ↥(OddOrder.Isaacs.Ch01.fitting D)) :
     commutator D ≤ OddOrder.Isaacs.Ch01.fitting D := by
   set F : Subgroup D := OddOrder.Isaacs.Ch01.fitting D with hF
-  haveI : F.Normal := OddOrder.Isaacs.Ch01.fitting.normal D
-  haveI : IsCyclic ↥F := hcyc
-  letI : CommGroup (MulAut ↥F) :=
+  have : F.Normal := OddOrder.Isaacs.Ch01.fitting.normal D
+  have : IsCyclic ↥F := hcyc
+  let : CommGroup (MulAut ↥F) :=
     (IsCyclic.mulAutMulEquiv (G := ↥F)).toMonoidHom.commGroupOfInjective
       (IsCyclic.mulAutMulEquiv (G := ↥F)).injective
   refine (Abelianization.commutator_subset_ker (MulAut.conjNormal (H := F))).trans ?_
@@ -1155,8 +1155,8 @@ theorem opCore_isCyclic_and_fpf_of_transitive
     IsCyclic ↥(OddOrder.Isaacs.Ch01.opCore p D) ∧
       ∀ x : ↥(OddOrder.Isaacs.Ch01.opCore p D), x ≠ 1 →
         actionFixedBy (φ.comp (OddOrder.Isaacs.Ch01.opCore p D).subtype) x = ⊥ := by
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact p.Prime := ⟨hp⟩
+  have : Fact q.Prime := ⟨hq⟩
   rcases eq_or_ne (OddOrder.Isaacs.Ch01.opCore p D) ⊥ with hbot | hbot
   · exact ⟨by rw [hbot]; exact isCyclic_of_subsingleton,
       fun x hx => absurd (Subtype.ext (Subgroup.mem_bot.mp (hbot ▸ x.2))) hx⟩
@@ -1192,12 +1192,12 @@ about `O_p(D)` to Sylow/`p`-element facts inside the (nilpotent) Fitting subgrou
 theorem opCore_fitting_map_subtype_eq [Finite D] (p : ℕ) [Fact p.Prime] :
     (opCore p ↥(fitting D)).map (fitting D).subtype = opCore p D := by
   apply le_antisymm
-  · haveI : ((opCore p ↥(fitting D)).map (fitting D).subtype).Normal :=
+  · have : ((opCore p ↥(fitting D)).map (fitting D).subtype).Normal :=
       OddOrder.GroupTheory.normal_map_subtype_of_characteristic
         (opCore.characteristic p ↥(fitting D))
     exact normal_pgroup_le_opCore ((opCore_isPGroup p ↥(fitting D)).map (fitting D).subtype)
   · have hofit : opCore p D ≤ fitting D := opCore_le_fitting ⟨p, Fact.out⟩ D
-    haveI : ((opCore p D).subgroupOf (fitting D)).Normal := Subgroup.normal_subgroupOf
+    have : ((opCore p D).subgroupOf (fitting D)).Normal := Subgroup.normal_subgroupOf
     have hle : (opCore p D).subgroupOf (fitting D) ≤ opCore p ↥(fitting D) :=
       normal_pgroup_le_opCore ((opCore_isPGroup p D).comap_subtype)
     calc opCore p D = ((opCore p D).subgroupOf (fitting D)).map (fitting D).subtype :=
@@ -1212,14 +1212,14 @@ equals an `O_p(D)` (`= ⨅` of Sylows), so `F(D)` is a nilpotent `Z`-group, henc
 theorem isCyclic_fitting_of_forall_opCore_isCyclic [Finite D]
     (h : ∀ p : ℕ, p.Prime → IsCyclic ↥(opCore p D)) :
     IsCyclic ↥(fitting D) := by
-  haveI : _root_.IsZGroup ↥(fitting D) := by
+  have : _root_.IsZGroup ↥(fitting D) := by
     rw [_root_.isZGroup_iff]
     intro p hp P
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     have hPnorm : (↑P : Subgroup ↥(fitting D)).Normal := Sylow.normal_of_isNilpotent P
     have hPchar : (↑P : Subgroup ↥(fitting D)).Characteristic :=
       Sylow.characteristic_of_normal P hPnorm
-    haveI hPmap_norm : ((↑P : Subgroup ↥(fitting D)).map (fitting D).subtype).Normal :=
+    have hPmap_norm : ((↑P : Subgroup ↥(fitting D)).map (fitting D).subtype).Normal :=
       OddOrder.GroupTheory.normal_map_subtype_of_characteristic hPchar
     have hPmap_pg : IsPGroup p ((↑P : Subgroup ↥(fitting D)).map (fitting D).subtype) :=
       P.isPGroup'.map (fitting D).subtype
@@ -1230,7 +1230,7 @@ theorem isCyclic_fitting_of_forall_opCore_isCyclic [Finite D]
       have hQpg : IsPGroup p ((opCore p D).subgroupOf (fitting D)) :=
         (opCore_isPGroup p D).comap_subtype
       obtain ⟨S, hQS⟩ := IsPGroup.exists_le_sylow hQpg
-      haveI := Sylow.unique_of_normal P hPnorm
+      have := Sylow.unique_of_normal P hPnorm
       have hSP : S = P := Subsingleton.elim S P
       calc opCore p D = ((opCore p D).subgroupOf (fitting D)).map (fitting D).subtype :=
             (Subgroup.map_subgroupOf_eq_of_le hofit).symm
@@ -1238,7 +1238,7 @@ theorem isCyclic_fitting_of_forall_opCore_isCyclic [Finite D]
         _ = (↑P : Subgroup ↥(fitting D)).map (fitting D).subtype := by rw [hSP]
     have heq : (↑P : Subgroup ↥(fitting D)).map (fitting D).subtype = opCore p D :=
       le_antisymm hmap_le hop_le
-    haveI : IsCyclic ↥((↑P : Subgroup ↥(fitting D)).map (fitting D).subtype) := heq ▸ h p hp
+    have : IsCyclic ↥((↑P : Subgroup ↥(fitting D)).map (fitting D).subtype) := heq ▸ h p hp
     exact isCyclic_of_surjective _
       (Subgroup.equivMapOfInjective (↑P) (fitting D).subtype
         (fitting D).subtype_injective).symm.surjective
@@ -1263,12 +1263,12 @@ theorem fitting_fpf_of_transitive [Finite D] [Finite E] {q : ℕ}
     | zero => simp
     | succ k ih => rw [pow_succ']; change (φ a) ((φ a ^ k) e) = e; rw [ih, he]
   intro f hfF hf1
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   set f' : ↥(fitting D) := ⟨f, hfF⟩ with hf'def
   have hf'1 : f' ≠ 1 := by rw [hf'def, ne_eq, Subgroup.mk_eq_one]; exact hf1
   have hord_ne : orderOf f' ≠ 1 := fun h => hf'1 (orderOf_eq_one_iff.mp h)
   obtain ⟨p, hp, hpd⟩ := Nat.exists_prime_and_dvd hord_ne
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   set g' : ↥(fitting D) := f' ^ (orderOf f' / p) with hg'def
   have hord_pos : 0 < orderOf f' := orderOf_pos f'
   have hdvd2 : (orderOf f' / p) ∣ orderOf f' := Nat.div_dvd_of_dvd hpd
@@ -1280,7 +1280,7 @@ theorem fitting_fpf_of_transitive [Finite D] [Finite E] {q : ℕ}
   have hg'pg : IsPGroup p (Subgroup.zpowers g') :=
     IsPGroup.of_card (by rw [Nat.card_zpowers, hg'ord, pow_one])
   obtain ⟨S, hgS⟩ := IsPGroup.exists_le_sylow hg'pg
-  haveI := Sylow.unique_of_normal S (Sylow.normal_of_isNilpotent S)
+  have := Sylow.unique_of_normal S (Sylow.normal_of_isNilpotent S)
   have hg'op : g' ∈ opCore p ↥(fitting D) :=
     mem_opCore.mpr fun P => (Subsingleton.elim P S) ▸ hgS (Subgroup.mem_zpowers g')
   have hgD : (g' : D) ∈ opCore p D := by
@@ -1313,10 +1313,10 @@ theorem fitting_cyclic_fixedPointFree
     IsCyclic ↥(OddOrder.Isaacs.Ch01.fitting D) ∧
       (∀ x ∈ OddOrder.Isaacs.Ch01.fitting D, x ≠ 1 → actionFixedBy φ x = ⊥) ∧
       commutator D ≤ OddOrder.Isaacs.Ch01.fitting D := by
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   -- the book says only "of odd order"; solvability is Feit–Thompson, proved in this
   -- repository, so it need not be assumed
-  haveI : IsSolvable D := feitThompson hD_odd
+  have : Group.IsSolvable D := feitThompson hD_odd
   have hqE : q ∣ Nat.card E := by
     obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := q)).mp hE.isPGroup
     have hn0 : n ≠ 0 := by

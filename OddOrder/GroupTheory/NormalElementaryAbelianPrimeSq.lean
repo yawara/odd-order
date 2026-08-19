@@ -88,14 +88,14 @@ theorem exists_normal_isElementaryAbelian_card_prime_sq_le_of_normal
   set Z : Subgroup R := Subgroup.zpowers z with hZdef
   have hZleV : Z ≤ V := (Subgroup.zpowers_le).mpr hzV
   have hZleC : Z ≤ Subgroup.center R := (Subgroup.zpowers_le).mpr hzC
-  haveI hZnormal : Z.Normal := normal_of_le_center hZleC
+  have hZnormal : Z.Normal := normal_of_le_center hZleC
   have hZcard : Nat.card Z = p := card_zpowers_eq_prime_of_pow hzp hz1
   -- (2) pass to `Q = R/Z`; the image of `V` is a nontrivial normal subgroup.
   let mk : R →* R ⧸ Z := QuotientGroup.mk' Z
   have hmk_surj : Function.Surjective mk := QuotientGroup.mk'_surjective Z
   have hker : ∀ x : R, mk x = 1 ↔ x ∈ Z := fun x => QuotientGroup.eq_one_iff x
   set Vbar : Subgroup (R ⧸ Z) := V.map mk with hVbardef
-  haveI hVbar_normal : Vbar.Normal := Subgroup.Normal.map inferInstance mk hmk_surj
+  have hVbar_normal : Vbar.Normal := Subgroup.Normal.map inferInstance mk hmk_surj
   have hQ_pgroup : IsPGroup p (R ⧸ Z) := hR.to_quotient Z
   -- `Vbar ≠ ⊥`: else `V ≤ Z`, contradicting `|V| ≥ p² > p = |Z|`.
   have hVbar_ne : Vbar ≠ ⊥ := by
@@ -201,7 +201,7 @@ theorem exists_normal_isElementaryAbelian_card_prime_sq_of_normal_not_isCyclic
   push Not at hlt
   interval_cases k
   · exact hVnc (by
-      haveI : Subsingleton V := (Nat.card_eq_one_iff_unique.mp (by rw [hk, pow_zero])).1
+      have : Subsingleton V := (Nat.card_eq_one_iff_unique.mp (by rw [hk, pow_zero])).1
       exact isCyclic_of_subsingleton)
   · exact hVnc (isCyclic_of_prime_card (p := p) (by rw [hk, pow_one]))
 
@@ -222,13 +222,13 @@ theorem isMetacyclic_of_isCyclic_selfCentralizing_normal
     {A : Subgroup R} [hAn : A.Normal] (hAcyc : IsCyclic A)
     (hself : Subgroup.centralizer (A : Set R) = A) :
     IsMetacyclic R := by
-  haveI : IsCyclic A := hAcyc
+  have : IsCyclic A := hAcyc
   -- `MulAut A` is cyclic.
   obtain ⟨m, hm⟩ := (IsPGroup.iff_card).mp (hR.to_subgroup A)
-  haveI hMulAutCyc : IsCyclic (MulAut A) := by
+  have hMulAutCyc : IsCyclic (MulAut A) := by
     have e : MulAut A ≃* (ZMod (Nat.card A))ˣ := IsCyclic.mulAutMulEquiv A
     rw [hm] at e
-    haveI : IsCyclic (ZMod (p ^ m))ˣ :=
+    have : IsCyclic (ZMod (p ^ m))ˣ :=
       ZMod.isCyclic_units_of_prime_pow p Fact.out hp2 m
     exact isCyclic_of_surjective e.symm e.symm.surjective
   -- `ker (conjNormal) = C_R(A) = A`.
@@ -254,11 +254,11 @@ theorem isMetacyclic_of_isCyclic_selfCentralizing_normal
       rw [← hc, mul_assoc, mul_inv_cancel, mul_one]
       rfl
   -- `R/A ≅ range (conjNormal) ≤ MulAut A` is cyclic.
-  haveI hker_cyc : IsCyclic (R ⧸ (MulAut.conjNormal (H := A)).ker) := by
+  have hker_cyc : IsCyclic (R ⧸ (MulAut.conjNormal (H := A)).ker) := by
     have e := QuotientGroup.quotientKerEquivRange (MulAut.conjNormal (H := A))
-    haveI : IsCyclic (MulAut.conjNormal (H := A)).range := inferInstance
+    have : IsCyclic (MulAut.conjNormal (H := A)).range := inferInstance
     exact isCyclic_of_surjective e.symm e.symm.surjective
-  haveI hQcyc : IsCyclic (R ⧸ A) :=
+  have hQcyc : IsCyclic (R ⧸ A) :=
     isCyclic_of_surjective (QuotientGroup.quotientMulEquivOfEq hker)
       (QuotientGroup.quotientMulEquivOfEq hker).surjective
   exact ⟨A, hAn, hAcyc, hQcyc⟩

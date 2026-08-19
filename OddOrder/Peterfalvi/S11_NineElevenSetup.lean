@@ -102,7 +102,7 @@ theorem caseA_a_eq_card_Hpart_restrictAut_range {data : TypesIIIIIIVSetup M}
   classical
   set L := data.typeP.U ⊔ data.typeP.W1 with hL
   -- `U ◁ L` (Frobenius kernel), so conjugation by `L`-elements permutes the acting group `U`.
-  haveI hAnorm : (data.typeP.U.subgroupOf L).Normal :=
+  have hAnorm : (data.typeP.U.subgroupOf L).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer le_sup_left).mpr
       (sup_le Subgroup.le_normalizer data.typeP.W1_normalizes_U)
   set wt : ↥L := caseA.orbitRep j with hwt
@@ -460,6 +460,7 @@ theorem card_cuInHuPair_eq {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData
 
 omit [Finite G] in
 open Subgroup in
+set_option backward.isDefEq.respectTransparency false in
 /-- **`C_U(H_i) ∩ C_U(H_j) ◁ U` realized inside `HU`** (mirrors `cuInHu_normal`):
 `cuInHuPair ◁ uInHu`, transported from `(cuSubOf i ⊓ cuSubOf j) ◁ U` along `↥uInHu ≃* ↥U`. -/
 theorem cuInHuPair_normal {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
@@ -513,7 +514,7 @@ theorem uInHu_inf_hcuInHuPair_eq_cuInHuPair {data : TypesIIIIIIVSetup M}
     {chief : ChiefFactorData data} {chars : Section11CharacterData data chief}
     (caseA : CliffordCaseAData chars) (i j : Fin data.q) :
     uInHu data ⊓ (hInHu data ⊔ cuInHuPair caseA i j) = cuInHuPair caseA i j := by
-  haveI := hInHu_normal data
+  have := hInHu_normal data
   apply le_antisymm
   · rintro x ⟨hxU, hxHC⟩
     obtain ⟨hh, hhmem, cc, ccmem, rfl⟩ := Subgroup.mem_sup_of_normal_left.mp hxHC
@@ -537,7 +538,7 @@ theorem index_hcuInHuPair_eq_relindex_cuInHuPair {data : TypesIIIIIIVSetup M}
     (caseA : CliffordCaseAData chars) (i j : Fin data.q) :
     (hInHu data ⊔ cuInHuPair caseA i j).index
       = ((cuInHuPair caseA i j).subgroupOf (uInHu data)).index := by
-  haveI : (hInHu data ⊔ cuInHuPair caseA i j).Normal := hcuInHuPair_normal caseA i j
+  have : (hInHu data ⊔ cuInHuPair caseA i j).Normal := hcuInHuPair_normal caseA i j
   have htop : uInHu data ⊔ (hInHu data ⊔ cuInHuPair caseA i j) = ⊤ := by
     rw [← sup_assoc, sup_comm (uInHu data) (hInHu data), hInHu_sup_uInHu_eq_top, top_sup_eq]
   have he := Nat.card_congr (QuotientGroup.quotientInfEquivProdNormalQuotient

@@ -95,7 +95,7 @@ instance characteristic : (Omega G p n).Characteristic := by
   rw [Omega, MonoidHom.map_closure]
   congr 1
   ext h
-  simp only [Set.mem_image, Set.mem_setOf_eq, MulEquiv.coe_toMonoidHom]
+  simp only [Set.mem_image, Set.mem_ofPred_eq, MulEquiv.coe_toMonoidHom]
   constructor
   · rintro ⟨g, hg, rfl⟩
     rw [← map_pow, hg, map_one]
@@ -165,7 +165,7 @@ instance characteristic : (Agemo G p n).Characteristic := by
   rw [Agemo, MonoidHom.map_closure]
   congr 1
   ext h
-  simp only [Set.mem_image, Set.mem_setOf_eq, MulEquiv.coe_toMonoidHom]
+  simp only [Set.mem_image, Set.mem_ofPred_eq, MulEquiv.coe_toMonoidHom]
   constructor
   · rintro ⟨g, ⟨x, rfl⟩, rfl⟩
     exact ⟨φ x, by rw [map_pow]⟩
@@ -248,7 +248,7 @@ theorem commutator_agemo_one_map_le_agemo_two_map
     (hCA : ⁅C, A⁆ ≤ (Agemo A 2 1).map A.subtype) :
     ⁅C, (Agemo A 2 1).map A.subtype⁆ ≤
       (Agemo A 2 2).map A.subtype := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   rw [Subgroup.commutator_le]
@@ -300,7 +300,7 @@ theorem commutatorElement_sq_mem_agemo_two_map
     (hPA : ⁅(⊤ : Subgroup P), A⁆ ≤ (Agemo A 2 1).map A.subtype)
     (g : P) {a : P} (ha : a ∈ A) :
     ⁅g ^ 2, a⁆ ∈ (Agemo A 2 2).map A.subtype := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   have hP_A2 : ⁅(⊤ : Subgroup P), (Agemo A 2 1).map A.subtype⁆ ≤
@@ -329,11 +329,11 @@ theorem commutator_agemo_two_one_le_agemo_two_map
     (hAcomm : IsMulCommutative A)
     (hPA : ⁅(⊤ : Subgroup P), A⁆ ≤ (Agemo A 2 1).map A.subtype) :
     ⁅Agemo P 2 1, A⁆ ≤ (Agemo A 2 2).map A.subtype := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   let A4 : Subgroup P := (Agemo A 2 2).map A.subtype
-  haveI hA4normal : A4.Normal := by
+  have hA4normal : A4.Normal := by
     dsimp [A4]
     infer_instance
   let K : Subgroup P :=
@@ -527,7 +527,7 @@ theorem card_omega1OfAbelian_eq_of_isCyclic [Finite G]
     {H : Subgroup G} {p : ℕ} (hp : p.Prime) [IsCyclic ↥H]
     {hH : ∀ x ∈ H, ∀ y ∈ H, x * y = y * x} (hdvd : p ∣ Nat.card ↥H) :
     Nat.card ↥(omega1OfAbelian G H p hH) = p := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨y, hy⟩ := exists_prime_orderOf_dvd_card' (G := ↥H) p hdvd
   have hYcard : Nat.card ↥(Subgroup.zpowers y) = p := by rw [Nat.card_zpowers, hy]
   have hkey : (omega1OfAbelian G H p hH).subgroupOf H = Subgroup.zpowers y := by

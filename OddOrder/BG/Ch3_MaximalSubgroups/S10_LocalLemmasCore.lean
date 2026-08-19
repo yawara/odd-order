@@ -75,7 +75,7 @@ private theorem not_isUniquelyMaximal_bot [Finite G] (hG : IsMinimalSimpleOdd G)
     obtain ⟨m, hm⟩ := Subgroup.mem_zpowers_iff.mp (hzp ▸ Subgroup.mem_top a)
     obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp (hzp ▸ Subgroup.mem_top b)
     rw [← hm, ← hn, ← zpow_add, ← zpow_add, add_comm]
-  exact hG.notSolvable (isSolvable_of_comm hcomm)
+  exact hG.notSolvable (Group.isSolvable_of_comm hcomm)
 
 /-- **BG Proposition 10.11(a)** (mmd L2886): `M ∈ ℳ` and `K` a `σ(M)'`-subgroup of `M` imply
 `K ∉ 𝒰`. Exposed separately from `sigma_complement_rank_le_one` because part (b) reapplies it
@@ -90,7 +90,7 @@ theorem sigma_complement_not_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleO
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {K : Subgroup G} (hKM : K ≤ M)
     (hKpi : Subgroup.IsPiSubgroup (sigma M)ᶜ K) : ¬ IsUniquelyMaximal K := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   rcases eq_or_ne K ⊥ with rfl | hKbot
   · exact not_isUniquelyMaximal_bot hG
   -- Step 1: a Hall `σ(M)'`-subgroup `E` of `M` containing `K` (trivial operator group).
@@ -109,7 +109,8 @@ theorem sigma_complement_not_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleO
   have hKE : K ≤ E := fun x hx => by
     rw [hEdef, Subgroup.mem_map]
     exact ⟨⟨x, hKM hx⟩, hKH (Subgroup.mem_subgroupOf.mpr hx), rfl⟩
-  haveI : IsSolvable ↥E := solvable_of_solvable_injective (Subgroup.inclusion_injective hEM)
+  have : Group.IsSolvable ↥E :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective hEM)
   have hcardE : Nat.card ↥E = Nat.card ↥H := by
     rw [hEdef, Subgroup.card_map_of_injective M.subtype_injective]
   have hEpi : ∀ r ∈ (Nat.card ↥E).primeFactors, r ∈ (sigma M)ᶜ := fun r hr => by
@@ -119,7 +120,7 @@ theorem sigma_complement_not_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleO
   have hErank : rank ↥E ≤ 2 := by
     rw [rank_le_iff]
     intro p hp
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     by_contra hcon
     have h3E : 3 ≤ pRank ↥E p := by omega
     have h3M : 3 ≤ pRank ↥M p :=
@@ -130,7 +131,7 @@ theorem sigma_complement_not_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleO
   -- Step 3: the characteristic Sylow series of `E` (Theorem 4.20(c)) has a terminal
   -- normal Sylow `q`-subgroup `Q ⊴ E` with `q ∈ π(E)`.
   have hEne : E ≠ ⊥ := fun h => hKbot (le_bot_iff.mp (hKE.trans_eq h))
-  haveI : Nontrivial ↥E := (Subgroup.nontrivial_iff_ne_bot E).mpr hEne
+  have : Nontrivial ↥E := (Subgroup.nontrivial_iff_ne_bot E).mpr hEne
   have hEodd : Odd (Nat.card ↥E) :=
     hG.odd.of_dvd_nat ((Subgroup.card_dvd_of_le hEM).trans (Subgroup.card_subgroup_dvd_card M))
   have hErankF : rank ↥(Ch01.fitting ↥E) ≤ 2 :=
@@ -146,8 +147,8 @@ theorem sigma_complement_not_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleO
           E ≤ Subgroup.normalizer (R : Set G) := by
     obtain ⟨i, -, hqE, Q, hQnorm⟩ :=
       OddOrder.BG.Ch1.S04.CharacteristicSylowSeriesPackage.exists_terminal_normal_sylow pkg
-    haveI : Fact (pkg.series.step i).q.Prime := (pkg.series.step i).q_prime
-    haveI : (Q : Subgroup ↥E).Normal := hQnorm
+    have : Fact (pkg.series.step i).q.Prime := (pkg.series.step i).q_prime
+    have : (Q : Subgroup ↥E).Normal := hQnorm
     refine ⟨(pkg.series.step i).q, Fact.out, hqE,
       (Q : Subgroup ↥E).map E.subtype, Subgroup.map_subtype_le _, ?_, ?_, ?_⟩
     · exact Q.isPGroup'.of_equiv (Subgroup.equivMapOfInjective _ E.subtype E.subtype_injective)
@@ -159,7 +160,7 @@ theorem sigma_complement_not_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleO
     · have hmap := Ch07.map_le_normalizer_map_of_normal
         (φ := E.subtype) (P := (⊤ : Subgroup ↥E)) (L := (Q : Subgroup ↥E))
       rwa [← MonoidHom.range_eq_map, Subgroup.range_subtype] at hmap
-  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have : Fact q.Prime := ⟨hq_prime⟩
   -- Step 4: `R` is a Sylow `q`-subgroup of `M`: `q ∤ [E : R]` (Sylow) and `q ∤ [M : E]` (Hall).
   have hEsubM : E.subgroupOf M = H := by
     rw [hEdef, Subgroup.subgroupOf,
@@ -207,7 +208,7 @@ theorem sigma_complement_not_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleO
     rcases (le_top : Subgroup.normalizer (R : Set G) ≤ ⊤).lt_or_eq with h | h
     · exact h
     · exfalso
-      haveI : R.Normal := Subgroup.normalizer_eq_top_iff.mp h
+      have : R.Normal := Subgroup.normalizer_eq_top_iff.mp h
       rcases hG.simple.eq_bot_or_eq_top_of_normal R inferInstance with h' | h'
       · exact hRne h'
       · exact (mem_maximalSubgroups.mp hM).1
@@ -235,13 +236,13 @@ theorem rank_centralizer_Msigma_inf_le_one [Finite G] (hG : IsMinimalSimpleOdd G
     (hKpi : Subgroup.IsPiSubgroup (sigma M)ᶜ K) :
     rank ↥(Subgroup.centralizer (Msigma M : Set G) ⊓ K) ≤ 1 := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   set C : Subgroup G := Subgroup.centralizer (Msigma M : Set G) with hCdef
   by_contra hcon
   -- Extract `A ∈ ℰ_p²(G)` with `A ≤ C ⊓ K`.
   obtain ⟨p, hp, hpRank⟩ :=
     exists_pRank_ge_of_pos_le_rank (G := ↥(C ⊓ K)) (n := 2) (by norm_num) (by omega)
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨A₀, hA₀ea, hA₀log⟩ :=
     exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank
       (G := ↥(C ⊓ K)) (p := p) (n := 2) (by norm_num) hpRank
@@ -278,14 +279,14 @@ theorem rank_centralizer_Msigma_inf_le_one [Finite G] (hG : IsMinimalSimpleOdd G
     exact (Subgroup.mem_centralizer_iff.mp (hAC ha) m hm).symm
   -- Choose `q ∈ σ(M)` via `M_σ ≠ ⊥`, and the Sylow `q`-subgroup `S ≤ M_σ` with `N_G(S) ≤ M`.
   have hMσne : Msigma M ≠ ⊥ := Msigma_ne_bot hG hM
-  haveI : Nontrivial ↥(Msigma M) := (Subgroup.nontrivial_iff_ne_bot _).mpr hMσne
+  have : Nontrivial ↥(Msigma M) := (Subgroup.nontrivial_iff_ne_bot _).mpr hMσne
   obtain ⟨q, hq⟩ : ∃ q, q ∈ (Nat.card ↥(Msigma M)).primeFactors := by
     rcases (Nat.card ↥(Msigma M)).primeFactors.eq_empty_or_nonempty with h | h
     · rcases Nat.primeFactors_eq_empty.mp h with h0 | h1
       · exact absurd h0 Nat.card_pos.ne'
       · exact absurd h1 Finite.one_lt_card.ne'
     · exact h
-  haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hq⟩
+  have : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hq⟩
   have hqσ : q ∈ sigma M := Msigma_isPiGroup M q hq
   obtain ⟨S, hSM, hNS_M⟩ := exists_sylow_le_normalizer_le_of_mem_sigma hqσ
   have hSpi : Ch03.Subgroup.IsPiGroup (sigma M) (S : Subgroup G) := fun r hr => by
@@ -338,7 +339,7 @@ theorem rank_centralizer_Msigma_inf_le_one [Finite G] (hG : IsMinimalSimpleOdd G
   have hrankM : rank ↥M ≤ 2 := by
     rw [rank_le_iff]
     intro r hr
-    haveI : Fact r.Prime := ⟨hr⟩
+    have : Fact r.Prime := ⟨hr⟩
     by_contra hcon3
     have h3r : 3 ≤ pRank ↥M r := by omega
     obtain ⟨B₀, hB₀ea, hB₀log⟩ :=
@@ -365,15 +366,15 @@ theorem rank_centralizer_Msigma_inf_le_one [Finite G] (hG : IsMinimalSimpleOdd G
     have := h3CA.trans (pRank_le_rank (G := ↥(Subgroup.centralizer (A : Set G))) r)
     omega
   -- Theorem 4.20(a): `M' ⊆ F(M)`, so `M' = derivedInG M` is nilpotent.
-  haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr
+  have : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr
     (hG.ne_bot_of_isCoatom (mem_maximalSubgroups.mp hM))
   have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
   have hderM : commutator ↥M ≤ Ch01.fitting ↥M :=
     OddOrder.BG.Ch1.S05.derived_le_fitting_of_rank_fitting_le_two hModd
       (le_trans (rank_le_of_injective (Subgroup.subtype_injective (Ch01.fitting ↥M))) hrankM)
-  haveI hM'nil : Group.IsNilpotent ↥(derivedInG M) := by
-    haveI : Group.IsNilpotent ↥(Ch01.fitting ↥M) := Ch01.fitting.isNilpotent
-    haveI : Group.IsNilpotent ↥(commutator ↥M) :=
+  have hM'nil : Group.IsNilpotent ↥(derivedInG M) := by
+    have : Group.IsNilpotent ↥(Ch01.fitting ↥M) := Ch01.fitting.isNilpotent
+    have : Group.IsNilpotent ↥(commutator ↥M) :=
       Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hderM)
     exact Group.nilpotent_of_mulEquiv
       (Subgroup.equivMapOfInjective (commutator ↥M) M.subtype M.subtype_injective)
@@ -407,8 +408,8 @@ theorem rank_centralizer_Msigma_inf_le_one [Finite G] (hG : IsMinimalSimpleOdd G
       exact (Subgroup.mem_normalizer_iff.mp (hM_norm_M' hm) x).mp (hP_le_M' hx)
     obtain ⟨Q₁, hQ₁⟩ := sylow_subgroupOf_of_le (m • P) hsmul_le
     obtain ⟨Q₂, hQ₂⟩ := sylow_subgroupOf_of_le P hP_le_M'
-    haveI : (Q₁ : Subgroup ↥(derivedInG M)).Normal := Ch01.Sylow.normal_of_isNilpotent Q₁
-    haveI : (Q₂ : Subgroup ↥(derivedInG M)).Normal := Ch01.Sylow.normal_of_isNilpotent Q₂
+    have : (Q₁ : Subgroup ↥(derivedInG M)).Normal := Ch01.Sylow.normal_of_isNilpotent Q₁
+    have : (Q₂ : Subgroup ↥(derivedInG M)).Normal := Ch01.Sylow.normal_of_isNilpotent Q₂
     obtain ⟨g', hg'⟩ := MulAction.exists_smul_eq ↥(derivedInG M) Q₁ Q₂
     rw [Sylow.smul_eq_of_normal (g := g') (P := Q₁)] at hg'
     have hcarrier : ((m • P : Sylow p G) : Subgroup G).subgroupOf (derivedInG M) =
@@ -428,7 +429,7 @@ theorem rank_centralizer_Msigma_inf_le_one [Finite G] (hG : IsMinimalSimpleOdd G
     rcases (le_top : Subgroup.normalizer ((P : Subgroup G) : Set G) ≤ ⊤).lt_or_eq with h | h
     · exact h
     · exfalso
-      haveI : (P : Subgroup G).Normal := Subgroup.normalizer_eq_top_iff.mp h
+      have : (P : Subgroup G).Normal := Subgroup.normalizer_eq_top_iff.mp h
       rcases hG.simple.eq_bot_or_eq_top_of_normal (P : Subgroup G) inferInstance with h' | h'
       · exact hPne h'
       · exact (mem_maximalSubgroups.mp hM).1
@@ -459,7 +460,7 @@ theorem sigma_complement_rank_le_one [Finite G] (hG : IsMinimalSimpleOdd G)
         ((Subgroup.centralizer (Msigma M : Set G) ⊓ K ⊓ derivedInG M : Subgroup G) :
           Set G)) := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   refine ⟨sigma_complement_not_isUniquelyMaximal hG hM hKM hKpi,
     rank_centralizer_Msigma_inf_le_one hG hM hKM hKpi, ?_⟩
   -- Part (c). Set `Z := O_{σ(M)'}(F(M))`; `Z` is `M`-invariant.
@@ -477,9 +478,9 @@ theorem sigma_complement_rank_le_one [Finite G] (hG : IsMinimalSimpleOdd G)
   have hM_le_NMσ : M ≤ Subgroup.normalizer (Msigma M : Set G) := by
     rw [Msigma]
     exact le_normalizer_opiCoreInG (sigma M) M
-  haveI hZ_norm : (Z.subgroupOf M).Normal :=
+  have hZ_norm : (Z.subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hZ_le_M).mpr hM_le_NZ
-  haveI hMσ_norm : ((Msigma M).subgroupOf M).Normal :=
+  have hMσ_norm : ((Msigma M).subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer (Msigma_le M)).mpr hM_le_NMσ
   have hZ_le_C : Z ≤ Subgroup.centralizer (Msigma M : Set G) := by
     have hinf : (Msigma M).subgroupOf M ⊓ Z.subgroupOf M = ⊥ := by
@@ -509,17 +510,17 @@ theorem sigma_complement_rank_le_one [Finite G] (hG : IsMinimalSimpleOdd G)
   have hZrank : rank ↥Z ≤ 1 := by
     have h := rank_centralizer_Msigma_inf_le_one hG hM hZ_le_M hZpi
     rwa [inf_eq_right.mpr hZ_le_C] at h
-  haveI hFnil : Group.IsNilpotent ↥F := Ch2.S08.fittingInG_isNilpotent M
-  haveI hZnil : Group.IsNilpotent ↥Z :=
+  have hFnil : Group.IsNilpotent ↥F := Ch2.S08.fittingInG_isNilpotent M
+  have hZnil : Group.IsNilpotent ↥Z :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hZ_le_F)
   have hZodd : Odd (Nat.card ↥Z) :=
     hG.odd.of_dvd_nat ((Subgroup.card_dvd_of_le hZ_le_M).trans
       (Subgroup.card_subgroup_dvd_card M))
-  haveI hZcyc : IsCyclic ↥Z := by
-    haveI : _root_.IsZGroup ↥Z := by
+  have hZcyc : IsCyclic ↥Z := by
+    have : _root_.IsZGroup ↥Z := by
       rw [isZGroup_iff]
       intro r hr R
-      haveI : Fact r.Prime := ⟨hr⟩
+      have : Fact r.Prime := ⟨hr⟩
       rcases eq_or_ne r 2 with rfl | hrne
       · -- `|Z|` is odd, so the Sylow `2`-subgroup is trivial.
         have h2 : ¬ 2 ∣ Nat.card ↥Z := by
@@ -531,7 +532,7 @@ theorem sigma_complement_rank_le_one [Finite G] (hG : IsMinimalSimpleOdd G)
           · simpa using hk
           · exact absurd ((dvd_pow_self 2 hkpos.ne').trans
               (hk ▸ (R : Subgroup ↥Z).card_subgroup_dvd_card)) h2
-        haveI : Subsingleton ↥(R : Subgroup ↥Z) :=
+        have : Subsingleton ↥(R : Subgroup ↥Z) :=
           (Nat.card_eq_one_iff_unique.mp hR1).1
         infer_instance
       · -- odd primes: `pRank ≤ rank Z ≤ 1` makes the Sylow cyclic.
@@ -584,8 +585,8 @@ theorem sigma_complement_rank_le_one [Finite G] (hG : IsMinimalSimpleOdd G)
     rw [Subgroup.mem_centralizer_iff]
     intro f hf
     -- decompose `f = s * z` inside the nilpotent `F`
-    haveI : (Ch03.oPiCore {p | p ∉ sigma M} ↥F).Normal := by
-      haveI := Ch03.oPiCore.characteristic ({p | p ∉ sigma M} : Set ℕ) ↥F
+    have : (Ch03.oPiCore {p | p ∉ sigma M} ↥F).Normal := by
+      have := Ch03.oPiCore.characteristic ({p | p ∉ sigma M} : Set ℕ) ↥F
       infer_instance
     have hf_sup : (⟨f, hf⟩ : ↥F) ∈
         Ch03.oPiCore (sigma M) ↥F ⊔ Ch03.oPiCore {p | p ∉ sigma M} ↥F :=
@@ -612,8 +613,8 @@ theorem sigma_complement_rank_le_one [Finite G] (hG : IsMinimalSimpleOdd G)
   have hX_le_F : X ≤ F := fun x hx =>
     Ch2.S08.centralizer_fittingInG_inf_le_fittingInG ⟨hX_le_CF hx, hX_le_M hx⟩
   have hX_le_Z : X ≤ Z := by
-    haveI : (Ch03.oPiCore ((sigma M)ᶜ : Set ℕ) ↥F).Normal := by
-      haveI := Ch03.oPiCore.characteristic ((sigma M)ᶜ : Set ℕ) ↥F
+    have : (Ch03.oPiCore ((sigma M)ᶜ : Set ℕ) ↥F).Normal := by
+      have := Ch03.oPiCore.characteristic ((sigma M)ᶜ : Set ℕ) ↥F
       infer_instance
     have hXsub : Ch03.Subgroup.IsPiGroup (sigma M)ᶜ (X.subgroupOf F) := by
       intro r hr
@@ -654,7 +655,7 @@ theorem pRank_eq_two_of_normalizer_le [Finite G] (hG : IsMinimalSimpleOdd G)
     (hN : Subgroup.normalizer (X : Set G) ≤ M) :
     pRank ↥M p = 2 ∧ ¬ idealPrime p G ∧ ∃ A ∈ elemAbelianOfRank G p 2, X ≤ A := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hXea : X.IsElementaryAbelian p := hX.1
   have hXcard : Nat.card ↥X = p := by simpa using hX.2
   have hXM : X ≤ M := le_trans Subgroup.le_normalizer hN
@@ -697,8 +698,8 @@ theorem pRank_eq_two_of_normalizer_le [Finite G] (hG : IsMinimalSimpleOdd G)
     rcases Nat.lt_or_ge (pRank ↥M p) 2 with hlt | hge
     · exfalso
       have hr1 : pRank ↥P p ≤ 1 := by rw [hPrank]; omega
-      haveI : IsCyclic ↥P := isCyclic_of_pRank_le_one hPpg hodd hr1
-      haveI : Nontrivial ↥P := by
+      have : IsCyclic ↥P := isCyclic_of_pRank_le_one hPpg hodd hr1
+      have : Nontrivial ↥P := by
         rw [← Finite.one_lt_card_iff_nontrivial]
         calc 1 < p := (Fact.out : p.Prime).one_lt
           _ = Nat.card ↥X := hXcard.symm
@@ -723,7 +724,7 @@ theorem pRank_eq_two_of_normalizer_le [Finite G] (hG : IsMinimalSimpleOdd G)
   refine ⟨hr2, hnotideal, ?_⟩
   -- (iii) `X ≤ A` for some `A ∈ ℰ_p²(G)`: take `A = X·Ω₁(Z(P))`.  Work inside `↥P` with
   -- `X' = X.subgroupOf P` and `Z' = Ω₁(Z(↥P))`; then push the join `A' = X' ⊔ Z'` to `G`.
-  haveI : Nontrivial ↥P := by
+  have : Nontrivial ↥P := by
     rw [← Finite.one_lt_card_iff_nontrivial]
     calc 1 < p := (Fact.out : p.Prime).one_lt
       _ = Nat.card ↥X := hXcard.symm
@@ -827,7 +828,7 @@ theorem sigma_complement_commutator_cyclic_normal [Finite G] (hG : IsMinimalSimp
     IsCyclic ↥(⁅K, P⁆ : Subgroup G) ∧
     M ≤ Subgroup.normalizer ((⁅K, P⁆ : Subgroup G) : Set G) := by
   classical
-  haveI := hKab
+  have := hKab
   set K₀ : Subgroup G := ⁅K, P⁆ with hK₀def
   -- Basic facts about `P`: prime order, normalises `K`, lies in `M`.
   have hPcard : Nat.card ↥P = p := hP.2.trans (pow_one p)
@@ -976,11 +977,11 @@ theorem sigma_complement_commutator_cyclic_normal [Finite G] (hG : IsMinimalSimp
   -- Solvability of `(K₀ ⊔ M_σ) ⊔ P` (proper subgroup of the minimal simple group).
   have hLP_le_M : (K₀ ⊔ Msigma M) ⊔ P ≤ M :=
     sup_le (sup_le (hK₀_le_K.trans hKM) (Msigma_le M)) hP_le_M
-  haveI hMsol : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-  haveI : IsSolvable ↥((K₀ ⊔ Msigma M) ⊔ P) :=
-    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hLP_le_M).toMonoidHom)
+  have hMsol : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥((K₀ ⊔ Msigma M) ⊔ P) :=
+    Group.isSolvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hLP_le_M).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe hLP_le_M).surjective
-  haveI hLnil : Group.IsNilpotent ↥(K₀ ⊔ Msigma M) :=
+  have hLnil : Group.IsNilpotent ↥(K₀ ⊔ Msigma M) :=
     OddOrder.BG.Ch1.S03c.isNilpotent_of_normalizing_primeOrder_fixedPointFree
       hP_norm_L hdisj hLbot hPne ⟨p, Fact.out, hPcard⟩ hFPF
   -- Step 5: `K₀` centralises `M_σ` (coprime-order subgroups of the nilpotent `K₀ ⊔ M_σ` commute).
@@ -1006,7 +1007,7 @@ theorem sigma_complement_commutator_cyclic_normal [Finite G] (hG : IsMinimalSimp
     rw [hK₀def, show derivedInG M = ⁅(M : Subgroup G), M⁆ from Subgroup.map_subtype_commutator M]
     exact Subgroup.commutator_mono hKM hP_le_M
   have hK₀_le_Z : K₀ ≤ Z := le_inf (le_inf hstep5 hK₀_le_K) hK₀_der
-  haveI : IsCyclic ↥Z := hZcyc
+  have : IsCyclic ↥Z := hZcyc
   refine ⟨hstep5, Subgroup.isCyclic_of_le hK₀_le_Z, ?_⟩
   -- `K₀` is characteristic in the cyclic `Z`, hence normalised by `M ≤ N_G(Z)`.
   intro g hgM
@@ -1096,9 +1097,9 @@ private theorem mem_sigma_inter_sigma_imp [Finite G] (hG : IsMinimalSimpleOdd G)
     have hS_le_Msigma : (SM : Subgroup G) ≤ Msigma M :=
       sigma_subgroup_le_Msigma_of_isHall (Msigma_isHall hG hM) hSM_le hSM_pi
     obtain ⟨SMσ, hSMσ⟩ := sylow_subgroupOf_of_le SM hS_le_Msigma
-    haveI := hnil
-    haveI hSMσ_normal : (SMσ : Subgroup ↥(Msigma M)).Normal := Ch01.Sylow.normal_of_isNilpotent SMσ
-    haveI hSMσ_char : (SMσ : Subgroup ↥(Msigma M)).Characteristic :=
+    have := hnil
+    have hSMσ_normal : (SMσ : Subgroup ↥(Msigma M)).Normal := Ch01.Sylow.normal_of_isNilpotent SMσ
+    have hSMσ_char : (SMσ : Subgroup ↥(Msigma M)).Characteristic :=
       Sylow.characteristic_of_normal SMσ hSMσ_normal
     have hSM_eq_map : (SMσ : Subgroup ↥(Msigma M)).map (Msigma M).subtype = (SM : Subgroup G) := by
       rw [hSMσ, Subgroup.map_subgroupOf_eq_of_le hS_le_Msigma]
@@ -1129,7 +1130,7 @@ theorem disjoint_of_not_conj [Finite G] (hG : IsMinimalSimpleOdd G)
   have hα_disj : alpha M ∩ sigma H = ∅ := by
     rw [Set.eq_empty_iff_forall_notMem]
     rintro p ⟨hpα, hpσH⟩
-    haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hpα.1⟩
+    have : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hpα.1⟩
     exact (mem_sigma_inter_sigma_imp hG hM hH hnc (alpha_subset_sigma hG hM hpα) hpσH).1 hpα
   refine ⟨⟨?_, hα_disj⟩, ?_⟩
   · -- `M_α ⊓ H_σ = ⊥`: `π(M_α ⊓ H_σ) ⊆ α(M) ∩ σ(H) = ∅`.
@@ -1143,7 +1144,7 @@ theorem disjoint_of_not_conj [Finite G] (hG : IsMinimalSimpleOdd G)
     have hσ_disj : sigma M ∩ sigma H = ∅ := by
       rw [Set.eq_empty_iff_forall_notMem]
       rintro p ⟨hpσM, hpσH⟩
-      haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hpσM.1⟩
+      have : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hpσM.1⟩
       exact (mem_sigma_inter_sigma_imp hG hM hH hnc hpσM hpσH).2 hMσnil
     refine ⟨?_, hσ_disj⟩
     refine inf_eq_bot_of_isPiSubgroup_of_isPiSubgroup_compl (π := sigma M)

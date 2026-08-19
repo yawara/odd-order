@@ -259,7 +259,7 @@ theorem exists_elemAbelian_centralizing_of_not_regular [Finite G] {E₁ E₃ : S
     have hord1 : orderOf x ≠ 1 := fun hc => hx (orderOf_eq_one_iff.mp hc)
     have hord0 : orderOf x ≠ 0 := (orderOf_pos x).ne'
     obtain ⟨s, hs, hsdvd⟩ := (orderOf x).exists_prime_and_dvd hord1
-    haveI : Fact s.Prime := ⟨hs⟩
+    have : Fact s.Prime := ⟨hs⟩
     set d := orderOf x / s with hd
     have hdvd : d ∣ orderOf x := ⟨s, (Nat.div_mul_cancel hsdvd).symm⟩
     have hd0 : d ≠ 0 := (Nat.div_pos (Nat.le_of_dvd (orderOf_pos x) hsdvd) hs.pos).ne'
@@ -288,7 +288,7 @@ theorem exists_elemAbelian_centralizing_of_not_regular [Finite G] {E₁ E₃ : S
 theorem fixedBy_eq_of_elemAbelian_one [Finite G] {N X P : Subgroup G} {s : ℕ} (hs : s.Prime)
     (hX : ActsPrimeOn N X) (hP : P ∈ elemAbelianOfRank G s 1) (hPX : P ≤ X) :
     fixedBy N P = fixedBy N X := by
-  haveI : Fact s.Prime := ⟨hs⟩
+  have : Fact s.Prime := ⟨hs⟩
   have hPcard : Nat.card P = s := by rw [← pow_one s]; exact hP.2
   have hPne : P ≠ ⊥ := by
     intro hb; rw [hb, Subgroup.card_bot] at hPcard; exact hs.one_lt.ne' hPcard.symm
@@ -354,7 +354,7 @@ theorem E1_centralizes_R_of_hall_tau1 [Finite G] (hG : IsMinimalSimpleOdd G)
     exact (Subgroup.mem_normalizer_iff.mp (hMle hwM) x).mp hx
   -- nontrivial generator `p_elt` of `P` (order `p`).
   have hPcard : Nat.card P = p := by rw [← pow_one p]; exact hP.2
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hPne : P ≠ ⊥ := by
     intro hb; rw [hb, Subgroup.card_bot] at hPcard; exact hp.one_lt.ne' hPcard.symm
   obtain ⟨⟨p_elt, hp_eltP⟩, hp_eltne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hPne
@@ -417,7 +417,7 @@ theorem E_eq_sup_of_E3_centralizer [Finite G] (hG : IsMinimalSimpleOdd G)
     by_contra hE2ne
     obtain ⟨p, hp_prime, hpdvd⟩ :=
       (Nat.card E₂).exists_prime_and_dvd (fun hc => hE2ne (Subgroup.card_eq_one.mp hc))
-    haveI : Fact p.Prime := ⟨hp_prime⟩
+    have : Fact p.Prime := ⟨hp_prime⟩
     have hc2 : Nat.card (E₂.subgroupOf E) = Nat.card E₂ :=
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₂_le).toEquiv
     have hpτ2 : p ∈ tau2 M :=
@@ -431,8 +431,8 @@ theorem E_eq_sup_of_E3_centralizer [Finite G] (hG : IsMinimalSimpleOdd G)
 theorem E_le_normalizer_of_le_E3 [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
     {R : Subgroup G} (hRE3 : R ≤ E₃) : E ≤ Subgroup.normalizer (R : Set G) := by
-  haveI : IsCyclic ↥E₃ := h.E3_isCyclic hG
-  haveI : (R.subgroupOf E₃).Characteristic := Ch04.characteristic_of_subgroup_of_isCyclic _
+  have : IsCyclic ↥E₃ := h.E3_isCyclic hG
+  have : (R.subgroupOf E₃).Characteristic := Ch04.characteristic_of_subgroup_of_isCyclic _
   intro e he
   have hmem := OddOrder.BG.Ch1.S03f.mem_normalizer_map_subtype_of_characteristic (W := E₃)
     (C := R.subgroupOf E₃) (h.E3_normal hG he)
@@ -459,8 +459,8 @@ theorem strict_centralizer_config_false [Finite G] (hG : IsMinimalSimpleOdd G)
     (hRcP : R ≤ Subgroup.centralizer (P : Set G))
     (hlt : fixedBy (S10.Msigma M) E₁ < fixedBy (S10.Msigma M) E₃) : False := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : Fact r.Prime := ⟨hr⟩
+  have : Fact p.Prime := ⟨hp⟩
+  have : Fact r.Prime := ⟨hr⟩
   have hE1ne : E₁ ≠ ⊥ := fun hb =>
     (ne_bot_of_mem_elemAbelianOfRank_one hP) (le_bot_iff.mp (hPE1.trans hb.le))
   have hRne : R ≠ ⊥ := ne_bot_of_mem_elemAbelianOfRank_one hR
@@ -487,7 +487,7 @@ theorem strict_centralizer_config_false [Finite G] (hG : IsMinimalSimpleOdd G)
   have hRM : R ≤ M := hRE3.trans h.E3_le_M
   have hNRne : Subgroup.normalizer (R : Set G) ≠ ⊤ := by
     intro htop
-    haveI : R.Normal := Subgroup.normalizer_eq_top_iff.mp htop
+    have : R.Normal := Subgroup.normalizer_eq_top_iff.mp htop
     rcases hG.simple.eq_bot_or_eq_top_of_normal R inferInstance with hb | ht
     · exact hRne hb
     · exact (mem_maximalSubgroups.mp h.mem_maximal).1 (top_le_iff.mp (ht ▸ hRM))
@@ -526,8 +526,8 @@ theorem strict_centralizer_config_false [Finite G] (hG : IsMinimalSimpleOdd G)
     intro s hs
     by_contra hsτ1
     have hs_prime := Nat.prime_of_mem_primeFactors hs
-    haveI : Fact s.Prime := ⟨hs_prime⟩
-    haveI : Fintype ↥E₁ := Fintype.ofFinite _
+    have : Fact s.Prime := ⟨hs_prime⟩
+    have : Fintype ↥E₁ := Fintype.ofFinite _
     obtain ⟨a, ha⟩ := exists_prime_orderOf_dvd_card (G := ↥E₁) s
       (by rw [← Nat.card_eq_fintype_card]; exact (Nat.mem_primeFactors.mp hs).2.1)
     have hxE1 : (a : G) ∈ E₁ := a.2
@@ -566,8 +566,8 @@ theorem strict_centralizer_config_false [Finite G] (hG : IsMinimalSimpleOdd G)
       hRMsig hRcP
   -- (g) `E₃` centralizes `R`, hence `E` does, contradiction with `C_G(E) ⊓ E₃ = ⊥`.
   have hE3cR : E₃ ≤ Subgroup.centralizer (R : Set G) := by
-    haveI : IsCyclic ↥E₃ := h.E3_isCyclic hG
-    letI : CommGroup ↥E₃ := IsCyclic.commGroup
+    have : IsCyclic ↥E₃ := h.E3_isCyclic hG
+    let : CommGroup ↥E₃ := IsCyclic.commGroup
     intro e he
     rw [Subgroup.mem_centralizer_iff]
     intro u hu
@@ -614,8 +614,8 @@ theorem E1E3_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)
     -- step 1: extract `P ∈ ℰ_p¹(E₁)`, `R ∈ ℰ_r¹(E₃)` with `R ≤ C(P)`.
     obtain ⟨p, r, hp, hr, P, R, hP, hPE1, hR, hRE3, hRcP⟩ :=
       exists_elemAbelian_centralizing_of_not_regular hreg
-    haveI : Fact p.Prime := ⟨hp⟩
-    haveI : Fact r.Prime := ⟨hr⟩
+    have : Fact p.Prime := ⟨hp⟩
+    have : Fact r.Prime := ⟨hr⟩
     have hPcardp : Nat.card P = p := by rw [← pow_one p]; exact hP.2
     have hRcardr : Nat.card R = r := by rw [← pow_one r]; exact hR.2
     have hc1 : Nat.card (E₁.subgroupOf E) = Nat.card E₁ :=

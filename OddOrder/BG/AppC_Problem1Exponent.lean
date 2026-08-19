@@ -174,7 +174,7 @@ theorem exists_odd_cube_exponent (data : FieldNormalizerData p q G) (hp : p = 3)
       ((heemod.mul heemod).mul heemod).trans hcubemod
     rw [hN2n]
     exact (Nat.modEq_and_modEq_iff_modEq_mul h2).mp ⟨hmod2, hmodn⟩
-  letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
+  let : Fintype (GaloisField 3 q) := Fintype.ofFinite _
   have hcardu : Nat.card (GaloisField 3 q)ˣ = N := by
     rw [Nat.card_units, GaloisField.card 3 q hq0]
   have hcube_field : ∀ z : GaloisField 3 q, z ^ (ee * ee * ee) = z := by

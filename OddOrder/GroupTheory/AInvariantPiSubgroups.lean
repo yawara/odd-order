@@ -116,6 +116,7 @@ theorem hInvariantStar_eq_of_le {H A : Subgroup G} {π : Set ℕ} {Q Q' : Subgro
 
 open scoped Pointwise
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Conjugation by an element of the normalizer fixes the subgroup (pointwise-`smul` form). -/
 theorem conj_smul_eq_self_of_mem_normalizer {Q : Subgroup G} {a : G}
     (ha : a ∈ Subgroup.normalizer Q) : MulAut.conj a • Q = Q := by
@@ -135,6 +136,7 @@ theorem conj_smul_eq_self_of_mem_normalizer {Q : Subgroup G} {a : G}
       simp only [MulAut.conj_apply]
       group
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Converse of `conj_smul_eq_self_of_mem_normalizer`. -/
 theorem mem_normalizer_of_conj_smul_eq_self {Q : Subgroup G} {a : G}
     (h : MulAut.conj a • Q = Q) : a ∈ Subgroup.normalizer Q := by

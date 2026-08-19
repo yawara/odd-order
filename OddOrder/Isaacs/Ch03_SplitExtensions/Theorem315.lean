@@ -111,11 +111,11 @@ theorem set_mul_eq_univ_of_coprime_index [Finite G] {H K : Subgroup G}
 注: 教科書と異なり `M ≤ H` は不要 (`H`-正規化と `M ≠ ⊥` のみ使う). -/
 private theorem solvable_of_coprime_index_aux [Finite G] {H K : Subgroup G} {p : ℕ}
     [Fact p.Prime]
-    (hcop : Nat.Coprime H.index K.index) (hKsol : IsSolvable K) (hpK : ¬ p ∣ K.index)
+    (hcop : Nat.Coprime H.index K.index) (hKsol : Group.IsSolvable K) (hpK : ¬ p ∣ K.index)
     {M : Subgroup G} (hM_ne : M ≠ ⊥) (hMp : IsPGroup p M)
     (hM_norm : ∀ u ∈ H, ∀ m ∈ M, u * m * u⁻¹ ∈ M)
-    (hquot : ∀ (N : Subgroup G) [N.Normal], N ≠ ⊥ → IsSolvable (G ⧸ N)) :
-    IsSolvable G := by
+    (hquot : ∀ (N : Subgroup G) [N.Normal], N ≠ ⊥ → Group.IsSolvable (G ⧸ N)) :
+    Group.IsSolvable G := by
   classical
   -- Step 1: `K` contains a full Sylow `p`-subgroup `R` of `G` (as `p ∤ |G:K|`).
   obtain ⟨Q⟩ : Nonempty (Sylow p ↥K) := inferInstance
@@ -157,9 +157,9 @@ private theorem solvable_of_coprime_index_aux [Finite G] {H K : Subgroup G} {p :
       rw [Subgroup.card_mul_index, Subgroup.card_mul_index]
     rw [hK'card] at h1
     exact Nat.eq_of_mul_eq_mul_left Nat.card_pos h1
-  haveI hK'sol : IsSolvable ↥K' := by
-    haveI := hKsol
-    exact solvable_of_surjective
+  have hK'sol : Group.IsSolvable ↥K' := by
+    have := hKsol
+    exact Group.isSolvable_of_surjective
       (f := (Subgroup.equivSMul (MulAut.conj g) K).toMonoidHom)
       (Subgroup.equivSMul (MulAut.conj g) K).surjective
   -- Step 3: `G = K'H` as a set product (Lemma 3.16).
@@ -178,17 +178,17 @@ private theorem solvable_of_coprime_index_aux [Finite G] {H K : Subgroup G} {p :
     rw [SetLike.mem_coe, hkey]
     exact K'.mul_mem (K'.mul_mem hv (hM_le_K' (hM_norm u hu m hmM))) (K'.inv_mem hv)
   -- Step 5: `M^G` is a nontrivial solvable normal subgroup; conclude by extension.
-  haveI hN_normal : (Subgroup.normalClosure (M : Set G)).Normal :=
+  have hN_normal : (Subgroup.normalClosure (M : Set G)).Normal :=
     Subgroup.normalClosure_normal
   have hN_ne : Subgroup.normalClosure (M : Set G) ≠ ⊥ := fun h =>
     hM_ne (le_bot_iff.mp (h ▸ Subgroup.le_normalClosure))
-  haveI hN_sol : IsSolvable ↥(Subgroup.normalClosure (M : Set G)) :=
-    solvable_of_surjective
+  have hN_sol : Group.IsSolvable ↥(Subgroup.normalClosure (M : Set G)) :=
+    Group.isSolvable_of_surjective
       (f := (Subgroup.subgroupOfEquivOfLe hNC_le).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe hNC_le).surjective
-  haveI hQ_sol : IsSolvable (G ⧸ Subgroup.normalClosure (M : Set G)) :=
+  have hQ_sol : Group.IsSolvable (G ⧸ Subgroup.normalClosure (M : Set G)) :=
     hquot _ hN_ne
-  exact solvable_of_ker_le_range (Subgroup.normalClosure (M : Set G)).subtype
+  exact Group.isSolvable_of_ker_le_range (Subgroup.normalClosure (M : Set G)).subtype
     (QuotientGroup.mk' (Subgroup.normalClosure (M : Set G)))
     (by rw [QuotientGroup.ker_mk', Subgroup.range_subtype])
 
@@ -209,25 +209,25 @@ theorem isSolvable_of_pairwise_coprime_index.{u} {G : Type u} [Group G] [Finite 
     (hHK : Nat.Coprime H.index K.index)
     (hHL : Nat.Coprime H.index L.index)
     (hKL : Nat.Coprime K.index L.index)
-    (hH : IsSolvable H) (hK : IsSolvable K) (hL : IsSolvable L) :
-    IsSolvable G := by
+    (hH : Group.IsSolvable H) (hK : Group.IsSolvable K) (hL : Group.IsSolvable L) :
+    Group.IsSolvable G := by
   classical
   let motive : ℕ → Prop := fun n =>
     ∀ (G' : Type u) [Group G'] [Finite G'], Nat.card G' = n →
       ∀ H K L : Subgroup G',
         Nat.Coprime H.index K.index → Nat.Coprime H.index L.index →
         Nat.Coprime K.index L.index →
-        IsSolvable H → IsSolvable K → IsSolvable L → IsSolvable G'
+        Group.IsSolvable H → Group.IsSolvable K → Group.IsSolvable L → Group.IsSolvable G'
   suffices hmain : motive (Nat.card G) by
     exact hmain G rfl H K L hHK hHL hKL hH hK hL
   refine Nat.strong_induction_on (Nat.card G) ?_
   intro n ih G' _ _ hcard H K L hHK hHL hKL hH hK hL
   -- Quotient closure: every quotient by a nontrivial normal subgroup is solvable.
-  have hquot : ∀ (N : Subgroup G') [N.Normal], N ≠ ⊥ → IsSolvable (G' ⧸ N) := by
+  have hquot : ∀ (N : Subgroup G') [N.Normal], N ≠ ⊥ → Group.IsSolvable (G' ⧸ N) := by
     intro N hN hNbot
-    haveI := hN
+    have := hN
     have hlt : Nat.card (G' ⧸ N) < n := by
-      haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNbot
+      have : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNbot
       calc Nat.card (G' ⧸ N)
           < Nat.card (G' ⧸ N) * Nat.card ↥N :=
             (lt_mul_iff_one_lt_right Nat.card_pos).mpr Finite.one_lt_card
@@ -238,14 +238,14 @@ theorem isSolvable_of_pairwise_coprime_index.{u} {G : Type u} [Group G] [Finite 
       Subgroup.index_map_dvd K (QuotientGroup.mk'_surjective N)
     have hdvdL : (L.map (QuotientGroup.mk' N)).index ∣ L.index :=
       Subgroup.index_map_dvd L (QuotientGroup.mk'_surjective N)
-    haveI := hH; haveI := hK; haveI := hL
+    have := hH; have := hK; have := hL
     exact ih _ hlt (G' ⧸ N) rfl _ _ _
       (Nat.Coprime.coprime_dvd_right hdvdK (Nat.Coprime.coprime_dvd_left hdvdH hHK))
       (Nat.Coprime.coprime_dvd_right hdvdL (Nat.Coprime.coprime_dvd_left hdvdH hHL))
       (Nat.Coprime.coprime_dvd_right hdvdL (Nat.Coprime.coprime_dvd_left hdvdK hKL))
-      (solvable_of_surjective ((QuotientGroup.mk' N).subgroupMap_surjective H))
-      (solvable_of_surjective ((QuotientGroup.mk' N).subgroupMap_surjective K))
-      (solvable_of_surjective ((QuotientGroup.mk' N).subgroupMap_surjective L))
+      (Group.isSolvable_of_surjective ((QuotientGroup.mk' N).subgroupMap_surjective H))
+      (Group.isSolvable_of_surjective ((QuotientGroup.mk' N).subgroupMap_surjective K))
+      (Group.isSolvable_of_surjective ((QuotientGroup.mk' N).subgroupMap_surjective L))
   by_cases hHbot : H = ⊥
   · -- `|G:K|` divides `|G| = |G:H|` and is coprime to it, so `K = G`.
     have hKdvd : K.index ∣ H.index := by
@@ -253,19 +253,19 @@ theorem isSolvable_of_pairwise_coprime_index.{u} {G : Type u} [Group G] [Finite 
       exact Subgroup.index_dvd_card K
     have hKtop : K = ⊤ :=
       Subgroup.index_eq_one.mp (Nat.eq_one_of_dvd_coprimes hHK hKdvd dvd_rfl)
-    haveI : IsSolvable (⊤ : Subgroup G') := hKtop ▸ hK
-    exact solvable_of_surjective
+    have : Group.IsSolvable (⊤ : Subgroup G') := hKtop ▸ hK
+    exact Group.isSolvable_of_surjective
       (f := (Subgroup.topEquiv (G := G')).toMonoidHom)
       (Subgroup.topEquiv (G := G')).surjective
   · -- Take a minimal normal subgroup `M₀` of `H`: a `p`-group by Lemma 3.11.
-    haveI := hH
-    haveI hHnt : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hHbot
+    have := hH
+    have hHnt : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hHbot
     obtain ⟨M₀, hM₀min, -⟩ :=
       OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal
         (⊤ : Subgroup ↥H) top_ne_bot
-    haveI hM₀N : M₀.Normal := hM₀min.1
-    obtain ⟨p, hp_prime, hElem⟩ := solvable_minimal_normal_isElementaryAbelian hM₀min
-    haveI : Fact p.Prime := ⟨hp_prime⟩
+    have hM₀N : M₀.Normal := hM₀min.1
+    obtain ⟨p, hp_prime, hElem⟩ := minimal_normal_isElementaryAbelian_of_isSolvable hM₀min
+    have : Fact p.Prime := ⟨hp_prime⟩
     have hM₀p : IsPGroup p M₀ := fun x =>
       ⟨1, by rw [pow_one]; exact hElem.pow_eq_one x⟩
     have hM_ne : M₀.map H.subtype ≠ ⊥ := by
@@ -362,7 +362,7 @@ instance oPiCore.characteristic (π : Set ℕ) (G : Type*) [Group G] :
   rintro ⟨H, hHN, hHpi⟩ h hh
   rw [Subgroup.mem_comap]
   -- φ h ∈ H.map φ.toMonoidHom (which is normal + π-group) ≤ oPiCore π G.
-  haveI hMapN : (H.map φ.toMonoidHom).Normal := hHN.map φ.toMonoidHom φ.surjective
+  have hMapN : (H.map φ.toMonoidHom).Normal := hHN.map φ.toMonoidHom φ.surjective
   have hMapPi : Subgroup.IsPiGroup π (H.map φ.toMonoidHom) := by
     intro p hp
     have hcardEq : Nat.card ↥(H.map φ.toMonoidHom) = Nat.card ↥H :=
@@ -378,7 +378,7 @@ instance oPiCore.characteristic (π : Set ℕ) (G : Type*) [Group G] :
 `G` は π-separable とは, 正規列 `⊥ = F₀ ⊴ F₁ ⊴ ... ⊴ Fₙ = ⊤` で各因子 `Fᵢ₊₁/Fᵢ` が
 π-group または π'-group となるものが存在する場合をいう (Isaacs FGT p.89).
 
-**実装**: mathlib の `IsSolvable` パターンに準拠して `piFittingSeries` (`⊥` から始まり
+**実装**: mathlib の `Group.IsSolvable` パターンに準拠して `piFittingSeries` (`⊥` から始まり
 各ステップで `G/Fₙ` の π-radical と π'-radical の sup を pull back する) の停留条件として
 定式化. `derivedSeries G n = ⊥` パターン参照.
 
@@ -429,7 +429,7 @@ theorem piFittingSeries_monotone (π : Set ℕ) (G : Type*) [Group G] :
 /-- **π-separable 群** (Isaacs Def 3.18): `G` の π-Fitting series が有限ステップで
 `⊤` に到達する. これは `G` が π-group と π'-group の交互の正規列に分解できることと同値.
 
-定式化は mathlib `IsSolvable` パターン (`exists_top : ∃ n, piFittingSeries π G n = ⊤`)
+定式化は mathlib `Group.IsSolvable` パターン (`exists_top : ∃ n, piFittingSeries π G n = ⊤`)
 に準拠. -/
 class IsPiSeparable (π : Set ℕ) (G : Type*) [Group G] : Prop where
   exists_top : ∃ n : ℕ, piFittingSeries π G n = ⊤
@@ -721,7 +721,7 @@ theorem Subgroup.IsPiGroup.normal_le_hall {G : Type*} [Group G] [Finite G] {π :
 theorem oPiCore.isPiGroup [Finite G] (π : Set ℕ) :
     Subgroup.IsPiGroup π (oPiCore π G) := by
   classical
-  haveI hSubF : Fintype {H : Subgroup G // H.Normal ∧ Subgroup.IsPiGroup π H} :=
+  have hSubF : Fintype {H : Subgroup G // H.Normal ∧ Subgroup.IsPiGroup π H} :=
     Fintype.ofFinite _
   -- The iSup over the subtype equals Finset.univ.sup.
   set p : Subgroup G → Prop := fun H => H.Normal ∧ Subgroup.IsPiGroup π H with hp_def
@@ -741,8 +741,8 @@ theorem oPiCore.isPiGroup [Finite G] (π : Set ℕ) :
       intro q hq
       simp at hq
     · rintro a₁ ⟨ha₁N, ha₁Pi⟩ a₂ ⟨ha₂N, ha₂Pi⟩
-      haveI := ha₁N
-      haveI := ha₂N
+      have := ha₁N
+      have := ha₂N
       exact ⟨inferInstance, Subgroup.IsPiGroup.sup_of_normal ha₁Pi ha₂Pi⟩
     · intro b _
       exact ⟨b.2.1, b.2.2⟩
@@ -809,7 +809,7 @@ theorem iInf_oPiCore_compl_singleton {G : Type*} [Group G] [Finite G] (S : Set �
     ⨅ p ∈ S, oPiCore ({p}ᶜ : Set ℕ) G = oPiCore Sᶜ G := by
   apply le_antisymm
   · -- `D := ⨅ p ∈ S, O_{p'}(G)` is a normal `Sᶜ`-group.
-    haveI hDnormal : (⨅ p ∈ S, oPiCore ({p}ᶜ : Set ℕ) G).Normal :=
+    have hDnormal : (⨅ p ∈ S, oPiCore ({p}ᶜ : Set ℕ) G).Normal :=
       Subgroup.normal_iInf_normal fun _ =>
         Subgroup.normal_iInf_normal fun _ => inferInstance
     refine Subgroup.IsPiGroup.le_oPiCore ?_
@@ -837,19 +837,19 @@ Thm 3.11 で `M` elem abelian `p`-group (for some prime `p`). `IsPGroup p ↥M` 
 `|M| = p^n` (`IsPGroup.iff_card`). `n ≥ 1` (`M ≠ ⊥`) で primeFactors `(p^n) = {p}`.
 `p ∈ π` or `p ∉ π` で場合分け: 各々 `M ≤ oPiCore (π or π') G`, `M ≠ ⊥` で結論. -/
 theorem exists_oPiCore_ne_bot_or_oPi'Core_ne_bot
-    {G : Type*} [Group G] [Finite G] [Nontrivial G] [IsSolvable G] (π : Set ℕ) :
+    {G : Type*} [Group G] [Finite G] [Nontrivial G] [Group.IsSolvable G] (π : Set ℕ) :
     oPiCore π G ≠ ⊥ ∨ oPiCore {p | p ∉ π} G ≠ ⊥ := by
   have hTopNeBot : (⊤ : Subgroup G) ≠ ⊥ := top_ne_bot
   obtain ⟨M, hMin, _⟩ :=
     OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal _ hTopNeBot
-  haveI hMNormal : M.Normal := hMin.1
+  have hMNormal : M.Normal := hMin.1
   have hM_ne_bot : M ≠ ⊥ := hMin.2.1
-  obtain ⟨p, hp_prime, hElem⟩ := solvable_minimal_normal_isElementaryAbelian hMin
-  haveI hpFact : Fact p.Prime := ⟨hp_prime⟩
+  obtain ⟨p, hp_prime, hElem⟩ := minimal_normal_isElementaryAbelian_of_isSolvable hMin
+  have hpFact : Fact p.Prime := ⟨hp_prime⟩
   have hIsPGroup : IsPGroup p ↥M := fun x => ⟨1, by
     rw [pow_one]; exact hElem.pow_eq_one x⟩
   obtain ⟨n, hn_card⟩ := (IsPGroup.iff_card (G := ↥M)).mp hIsPGroup
-  haveI hMnt : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
+  have hMnt : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
   have hM_card_gt : 1 < Nat.card ↥M := Finite.one_lt_card
   have hn_ne : n ≠ 0 := by
     intro h
@@ -900,11 +900,12 @@ theorem oPiCore.map_le_of_surjective {G H : Type*} [Group G] [Finite G] [Group H
   rw [oPiCore, Subgroup.map_iSup]
   refine iSup_le ?_
   rintro ⟨K, hKN, hKpi⟩
-  haveI hKmapN : (K.map f).Normal := hKN.map f hf
+  have hKmapN : (K.map f).Normal := hKN.map f hf
   have hKmapPi : Subgroup.IsPiGroup π (K.map f) :=
     fun p hp => hKpi p (Nat.primeFactors_mono (K.card_map_dvd f) Nat.card_pos.ne' hp)
   exact Subgroup.IsPiGroup.le_oPiCore hKmapPi
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The π-Fitting series is contained in the complementary π-Fitting series.
 
 The successor step maps the quotient by `F_n(π)` onto the quotient by `F_n(π')`;
@@ -976,7 +977,7 @@ private theorem oPiCore.map_le_of_mulEquiv {G H : Type*} [Group G] [Group H]
   rw [oPiCore, Subgroup.map_le_iff_le_comap]
   refine iSup_le fun N => ?_
   rw [← Subgroup.map_le_iff_le_comap]
-  haveI : (N.val.map (e : G →* H)).Normal := N.2.1.map _ e.surjective
+  have : (N.val.map (e : G →* H)).Normal := N.2.1.map _ e.surjective
   refine Subgroup.IsPiGroup.le_oPiCore fun q hq => N.2.2 q ?_
   rwa [Nat.card_congr (Subgroup.equivMapOfInjective N.val (e : G →* H) e.injective).toEquiv]
 
@@ -1021,8 +1022,8 @@ theorem oPiCore_quotient_self_eq_bot {G : Type*} [Group G] [Finite G] (π : Set 
   let q : G →* G ⧸ N := QuotientGroup.mk' N
   let Kbar : Subgroup (G ⧸ N) := oPiCore π (G ⧸ N)
   let K : Subgroup G := Kbar.comap q
-  haveI hN_normal : N.Normal := inferInstance
-  haveI hK_normal : K.Normal := inferInstance
+  have hN_normal : N.Normal := inferInstance
+  have hK_normal : K.Normal := inferInstance
   have hN_le_K : N ≤ K := by
     intro x hx
     change q x ∈ Kbar
@@ -1246,8 +1247,8 @@ private theorem piFittingSeries_subgroupOf_le (π : Set ℕ)
     rw [piFittingSeries_zero, Subgroup.bot_subgroupOf, piFittingSeries_zero]
   | succ n ih =>
     intro x hx
-    haveI hFn_normal : (piFittingSeries π G n).Normal := piFittingSeries.normal π G n
-    haveI hF'n_normal : (piFittingSeries π N n).Normal := piFittingSeries.normal π N n
+    have hFn_normal : (piFittingSeries π G n).Normal := piFittingSeries.normal π G n
+    have hF'n_normal : (piFittingSeries π N n).Normal := piFittingSeries.normal π N n
     rw [Subgroup.mem_subgroupOf, piFittingSeries_succ, Subgroup.mem_comap] at hx
     -- hx : (mk' Fn) (x.val) ∈ oPiCore π (G/Fn) ⊔ oPiCore π' (G/Fn).
     -- Apply Bezout in G/Fn.

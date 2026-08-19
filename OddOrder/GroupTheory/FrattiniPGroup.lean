@@ -59,7 +59,7 @@ variable {p : ℕ} [hp : Fact p.Prime] {R : Type*} [Group R] [Finite R]
 /-- For a finite p-group, every maximal subgroup is normal (from finite nilpotent TFAE). -/
 lemma _root_.IsCoatom.normal_of_isPGroup
     (hR : IsPGroup p R) {M : Subgroup R} (hM : IsCoatom M) : M.Normal := by
-  haveI : Group.IsNilpotent R := hR.isNilpotent
+  have : Group.IsNilpotent R := hR.isNilpotent
   exact Subgroup.NormalizerCondition.normal_of_coatom M Group.normalizerCondition_of_isNilpotent hM
 
 set_option linter.unusedSectionVars false in
@@ -93,9 +93,9 @@ private lemma quotient_subgroup_dichotomy {M : Subgroup R} (hM : IsCoatom M) [M.
 lemma _root_.IsCoatom.card_quotient_of_isPGroup
     (hR : IsPGroup p R) {M : Subgroup R} (hM : IsCoatom M) :
     Nat.card (R ⧸ M) = p := by
-  haveI hMnorm : M.Normal := hM.normal_of_isPGroup hR
+  have hMnorm : M.Normal := hM.normal_of_isPGroup hR
   have hQpgroup : IsPGroup p (R ⧸ M) := hR.to_quotient M
-  haveI hntriv : Nontrivial (R ⧸ M) := QuotientGroup.nontrivial_iff.mpr hM.1
+  have hntriv : Nontrivial (R ⧸ M) := QuotientGroup.nontrivial_iff.mpr hM.1
   -- |R⧸M| = p^n for some n ≥ 1.
   obtain ⟨n, hn_card⟩ := IsPGroup.iff_card.mp hQpgroup
   have hn_pos : 0 < n := by
@@ -133,10 +133,10 @@ theorem commutator_mem_frattini
   intro M
   rw [Subgroup.mem_iInf]
   intro hM
-  haveI hMnorm : M.Normal := hM.normal_of_isPGroup hR
+  have hMnorm : M.Normal := hM.normal_of_isPGroup hR
   -- |R⧸M| = p prime ⇒ R/M cyclic ⇒ R/M abelian (use IsCyclic.commutative instance).
   have hcard : Nat.card (R ⧸ M) = p := hM.card_quotient_of_isPGroup hR
-  haveI : IsCyclic (R ⧸ M) := isCyclic_of_prime_card hcard
+  have : IsCyclic (R ⧸ M) := isCyclic_of_prime_card hcard
   -- Sufficient to show `(mk' M) ⁅x, y⁆ = 1`.
   suffices h : (QuotientGroup.mk' M) ⁅x, y⁆ = 1 by
     exact (QuotientGroup.eq_one_iff _).mp h
@@ -150,7 +150,7 @@ theorem pow_mem_frattini
   intro M
   rw [Subgroup.mem_iInf]
   intro hM
-  haveI hMnorm : M.Normal := hM.normal_of_isPGroup hR
+  have hMnorm : M.Normal := hM.normal_of_isPGroup hR
   -- |R⧸M| = p, so `(x̄)^p = 1` by Lagrange.
   have hcard : Nat.card (R ⧸ M) = p := hM.card_quotient_of_isPGroup hR
   suffices h : (QuotientGroup.mk' M) (x ^ p) = 1 by
@@ -233,7 +233,7 @@ Stated for any finite group (the `p`-group hypotheses of this namespace are unus
 the natural home of the Frattini-quotient API.  Used in `IsExtraspecial.of_card_eq_prime_cube`. -/
 theorem _root_.OddOrder.GroupTheory.isCyclic_of_isCyclic_quotient_frattini {G : Type*} [Group G]
     [Finite G] (h : IsCyclic (G ⧸ frattini G)) : IsCyclic G := by
-  haveI := h
+  have := h
   obtain ⟨gbar, hgbar⟩ := IsCyclic.exists_generator (α := G ⧸ frattini G)
   obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective (frattini G) gbar
   have htop : Subgroup.zpowers g ⊔ frattini G = ⊤ := by

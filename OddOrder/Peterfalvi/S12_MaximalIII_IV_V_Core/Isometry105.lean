@@ -25,6 +25,7 @@ variable {G : Type*} [Group G]
 /-! ## (10.5)--(10.6): Dade-isometry calculations -/
 
 open scoped FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (4.8) on the §10 aligned grid, row `0`** (coherence-free): for two nonzero
 columns `j, k`, `(μ_{0j} − μ_{0k})^τ = δ_j·(ω_{0j}^σ − ω_{0k}^σ)`, where `τ = hyp.tau`,
 `ω^σ = alignedOmegaSigmaGrid`, and `δ_j = muColumnSign j`.
@@ -42,16 +43,16 @@ theorem Hypothesis.tau_muGrid_zeroRow_diff [Finite G] (hG : OddOrder.BG.IsMinima
     hyp.tau (hyp.muGrid hG hodd 0 j - hyp.muGrid hG hodd 0 k)
       = (hyp.muColumnSign hG hodd j : ℂ) •
           (hyp.alignedOmegaSigmaGrid hG hodd 0 j - hyp.alignedOmegaSigmaGrid hG hodd 0 k) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   by_cases hjk : j = k
   · subst hjk
     simp
   -- §6 host context (the standard `muGrid`/`alignedOmegaSigmaGrid` let-context)
   let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
-  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
-  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  have : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
   have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
   have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
   have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
@@ -59,7 +60,7 @@ theorem Hypothesis.tau_muGrid_zeroRow_diff [Finite G] (hG : OddOrder.BG.IsMinima
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
   set χ₂ := finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
     (finCongr hcardW2sub.symm j) with hχ₂def
   set χ₂' := finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
@@ -67,13 +68,13 @@ theorem Hypothesis.tau_muGrid_zeroRow_diff [Finite G] (hG : OddOrder.BG.IsMinima
   set i0 : Fin (Nat.card h.W1) := finCongr hcardW1.symm (0 : Fin hyp.w1) with hi0def
   -- §5 tic context
   let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
-  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
-  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
   let e : ↥tic.W ≃* ↥(h.W1 ⊔ h.W2) :=
     (Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm.trans
       (MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm)
   set h46 := hyp.toHypothesis46 hG hodd with hh46
-  haveI : NeZero (Nat.card ↥h46.W1) := hNeZ1
+  have : NeZero (Nat.card ↥h46.W1) := hNeZ1
   -- column-character facts
   have hcol_ne : ∀ (l : Fin hyp.w2), l ≠ 0 →
       finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
@@ -180,6 +181,7 @@ theorem Hypothesis.tau_muGrid_zeroRow_diff [Finite G] (hG : OddOrder.BG.IsMinima
     (hyp.alignedOmegaSigmaGrid hG hodd 0 j - hyp.alignedOmegaSigmaGrid hG hodd 0 k)) esign.symm
 
 open scoped FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (4.10) on the §10 aligned grid** (coherence-free, `δ_j`-scaled): the four-corner
 Dade identity `(μ_{ij} − μ_{0j} − δ_j μ_{i0} + δ_j μ_{00})^τ = δ_j·(ω_{ij}^σ − ω_{0j}^σ − ω_{i0}^σ
 + ω_{00}^σ)`.
@@ -198,13 +200,13 @@ theorem Hypothesis.tau_muGrid_fourCorner [Finite G] (hG : OddOrder.BG.IsMinimalS
       = (hyp.muColumnSign hG hodd j : ℂ) •
           (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd 0 j
             - hyp.alignedOmegaSigmaGrid hG hodd i 0 + hyp.alignedOmegaSigmaGrid hG hodd 0 0) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   -- §6 host context
   let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
-  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
-  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  have : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
   have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
   have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
   have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
@@ -212,7 +214,7 @@ theorem Hypothesis.tau_muGrid_fourCorner [Finite G] (hG : OddOrder.BG.IsMinimalS
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
   set χ₂ := finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
     (finCongr hcardW2sub.symm j) with hχ₂def
   set i' : Fin (Nat.card h.W1) := finCongr hcardW1.symm i with hi'def
@@ -224,13 +226,13 @@ theorem Hypothesis.tau_muGrid_fourCorner [Finite G] (hG : OddOrder.BG.IsMinimalS
       finCardEquivCharacterGroup_zero]
   -- §5 tic context
   let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
-  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
-  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
   let e : ↥tic.W ≃* ↥(h.W1 ⊔ h.W2) :=
     (Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm.trans
       (MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm)
   set h46 := hyp.toHypothesis46 hG hodd with hh46
-  haveI : NeZero (Nat.card ↥h46.W1) := hNeZ1
+  have : NeZero (Nat.card ↥h46.W1) := hNeZ1
   -- signs: `δ_j` matches the §6 column sign, and the trivial column has sign `1`
   have esign : hyp.muColumnSign hG hodd j = (h.columnFamily χ₂).sign := by
     unfold Hypothesis.muColumnSign
@@ -376,7 +378,7 @@ theorem Hypothesis.tau_apply_of_mem_typePV [Finite G] {M : Subgroup G} (hyp : Hy
     {φ : ClassFunction ↥M ℂ} (hφ : φ.support ⊆ hyp.A0)
     {v : G} (hv : v ∈ typePV M hyp.typeP) (hvM : v ∈ M) :
     hyp.tau φ v = φ ⟨v, hvM⟩ := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hvA0 : v ∈ typePA0 M hyp.typeP := by
     rw [typePA0]
     exact Set.mem_union_right _ (OddOrder.GroupTheory.subset_conjClassSetIn hv)
@@ -416,7 +418,7 @@ theorem Hypothesis.tau_muGridAlpha_apply_eq_on_typePV [Finite G]
     hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ) v
       = ((δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j
           - hyp.alignedOmegaSigmaGrid hG hodd i 0)) v := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   -- `v ∈ M` (`V ⊆ W ⊆ M`).
   have hvM : v ∈ M := typePData_W_le_self hyp.typeP (SetLike.mem_coe.mp hv.1)
@@ -429,7 +431,7 @@ theorem Hypothesis.tau_muGridAlpha_apply_eq_on_typePV [Finite G]
     have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
       rw [derivedInG, Subgroup.subgroupOf,
         Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
-    haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
+    have hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
     have hnotmem : (⟨v, hvM⟩ : ↥M) ∉ (derivedInG M).subgroupOf M := by
       rw [Subgroup.mem_subgroupOf]
       exact OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived hyp.typeP hv
@@ -458,7 +460,7 @@ theorem Hypothesis.tau_inner_eq_of_supported [Finite G] {M : Subgroup G}
     [Invertible (Nat.card ↥M : ℂ)] (hyp : Hypothesis M)
     {φ ψ : ClassFunction ↥M ℂ} (hφ : φ.support ⊆ hyp.A0) (hψ : ψ.support ⊆ hyp.A0) :
     ClassFunction.inner (hyp.tau φ) (hyp.tau ψ) = ClassFunction.inner φ ψ := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hS : ∀ s ∈ ({φ, ψ} : Set (ClassFunction ↥M ℂ)),
       s.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (typePA0 M hyp.typeP) M := by
@@ -496,7 +498,7 @@ theorem Hypothesis.muGridAlpha_tau_inner_self [Finite G]
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
       = 2 + (n : ℂ) ^ 2 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hsupp := hyp.muGrid_alpha_support hG hodd hj0 hζS hdeg hμ0 hζ1 hnf hδj
   rw [hyp.tau_inner_eq_of_supported hsupp hsupp]
@@ -519,7 +521,7 @@ theorem Hypothesis.muGridAlpha_inner_zeta_sub_conj [Finite G]
     (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1) :
     ClassFunction.inner (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
         (ζ - ζ.conj) = -(n : ℂ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hconjirr : IsIrreducibleCharacter ζ.conj := hζirr.conj
   -- `ζ̄(1) = ζ(1)`: the degree is a real natural number, fixed by `star`.
@@ -563,7 +565,7 @@ theorem Hypothesis.muGridAlpha_inner_zeta_sub_irr [Finite G]
     (hη1 : η 1 = ζ 1) (hηne : η ≠ ζ) :
     ClassFunction.inner (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
         (ζ - η) = -(n : ℂ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hμijζ : ClassFunction.inner (hyp.muGrid hG hodd i j) ζ = 0 :=
     hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i j hζirr hdζ
@@ -601,7 +603,7 @@ theorem Hypothesis.muGridAlpha_inner_muColumn_sub_conj [Finite G]
     {δ : ℤ} {n d : ℕ} :
     ClassFunction.inner (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
         ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' k) - (d : ℂ) • ζ.conj) = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hconjirr : IsIrreducibleCharacter ζ.conj := hζirr.conj
   have hconj1 : ζ.conj 1 = ζ 1 := by
@@ -655,7 +657,7 @@ theorem Hypothesis.muGridAlpha_inner_muColumn_self_sub_conj [Finite G]
     (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1) {δ : ℤ} {n d : ℕ} :
     ClassFunction.inner (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
         ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j) - (d : ℂ) • ζ.conj) = 1 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hconjirr : IsIrreducibleCharacter ζ.conj := hζirr.conj
   have hconj1 : ζ.conj 1 = ζ 1 := by
@@ -711,7 +713,7 @@ theorem Hypothesis.muGridAlpha_inner_zeroColumnSum_sub_zeta [Finite G]
     (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1) {δ : ℤ} {n : ℕ} :
     ClassFunction.inner (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
         ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ) = (n : ℂ) - (δ : ℂ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hw1 : 1 < hyp.w1 := (Subgroup.one_lt_card_iff_ne_bot _).mpr hyp.typeP.W1_nontrivial
   have hcol0ζ : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0 1 ≠ ζ 1 := fun i' => by
@@ -764,14 +766,14 @@ theorem Hypothesis.inducedFamily_sub_support [Finite G] {M : Subgroup G} (hyp : 
     {ζ₁ ζ₂ : ClassFunction ↥M ℂ} (hζ₁ : ζ₁ ∈ inducedFamily M) (hζ₂ : ζ₂ ∈ inducedFamily M)
     (hdeg : ζ₁ 1 = ζ₂ 1) :
     (ζ₁ - ζ₂).support ⊆ hyp.A0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   obtain ⟨θ₁, _hθ₁ne, hζ₁eq⟩ := hζ₁
   obtain ⟨θ₂, _hθ₂ne, hζ₂eq⟩ := hζ₂
   have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
     rw [derivedInG, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective
         M.subtype_injective]
-  haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
+  have hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
   have hζ₁vanish : ∀ {w : ↥M}, w ∉ (derivedInG M).subgroupOf M → ζ₁ w = 0 := fun {w} hw => by
     rw [hζ₁eq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hw
   have hζ₂vanish : ∀ {w : ↥M}, w ∉ (derivedInG M).subgroupOf M → ζ₂ w = 0 := fun {w} hw => by
@@ -810,7 +812,7 @@ theorem Hypothesis.zeta_sub_conj_support [Finite G] (_hG : OddOrder.BG.IsMinimal
     {M : Subgroup G} (hyp : Hypothesis M) (_hodd : Odd (Nat.card G))
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ) :
     (ζ - ζ.conj).support ⊆ hyp.A0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   -- `ζ̄(1) = ζ(1)`: the degree is a real natural number.
   have hconj1 : ζ.conj 1 = ζ 1 := by
     obtain ⟨nn, _, hn, _⟩ := hζirr.exists_natDegree_charValue_one_dvd_card
@@ -838,7 +840,7 @@ theorem Hypothesis.muGridAlpha_tau_inner_zeta_sub_conj [Finite G]
     ClassFunction.inner
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
         (hyp.tau (ζ - ζ.conj)) = -(n : ℂ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hαsupp := hyp.muGrid_alpha_support hG hodd hj0 hζS hdeg hμ0 hζ1 hnf hδj
   have hζsupp := hyp.zeta_sub_conj_support hG hodd hζS hζirr
@@ -859,13 +861,13 @@ theorem Hypothesis.muColumn_sub_conj_support [Finite G] (hG : OddOrder.BG.IsMini
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     {d : ℕ} (hcol1 : ∀ i, hyp.muGrid hG hodd i k 1 = (d : ℂ)) (hζ1 : ζ 1 = (hyp.w1 : ℂ)) :
     ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k) - (d : ℂ) • ζ.conj).support ⊆ hyp.A0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   obtain ⟨θ, _hθne, hζeq⟩ := hζS
   have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
     rw [derivedInG, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective
         M.subtype_injective]
-  haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
+  have hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
   have hζvanish : ∀ {w : ↥M}, w ∉ (derivedInG M).subgroupOf M → ζ w = 0 := fun {w} hw => by
     rw [hζeq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hw
   have hconj1 : ζ.conj 1 = ζ 1 := by
@@ -919,13 +921,13 @@ theorem Hypothesis.zeroColumnSum_sub_zeta_support [Finite G] (hG : OddOrder.BG.I
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (_hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) :
     ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ).support ⊆ hyp.A0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   obtain ⟨θ, _hθne, hζeq⟩ := hζS
   have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
     rw [derivedInG, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective
         M.subtype_injective]
-  haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
+  have hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
   have hζvanish : ∀ {w : ↥M}, w ∉ (derivedInG M).subgroupOf M → ζ w = 0 := fun {w} hw => by
     rw [hζeq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hw
   have hsumapply : ∀ (w : ↥M), (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) w
@@ -981,7 +983,7 @@ theorem Hypothesis.muGridAlpha_tau_inner_zeroColumnSum_sub_zeta [Finite G]
     ClassFunction.inner
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
         (hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ)) = (n : ℂ) - (δ : ℂ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hαsupp := hyp.muGrid_alpha_support hG hodd hj0 hζS hdeg hμ0 hζ1 hnf hδj
   have hμsupp := hyp.zeroColumnSum_sub_zeta_support hG hodd hζS hζirr hζ1
@@ -1018,7 +1020,7 @@ theorem Hypothesis.muGridAlpha_tau_inner_muColumn_sub_conj [Finite G]
     ClassFunction.inner
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
         (hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' k) - (d : ℂ) • ζ.conj)) = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hαsupp := hyp.muGrid_alpha_support hG hodd hj0 hζS hdeg hμ0 hζ1 hnf hδj
   have hμsupp := hyp.muColumn_sub_conj_support hG hodd k hζS hζirr hcol1 hζ1
@@ -1048,7 +1050,7 @@ theorem Hypothesis.muGridAlpha_tau_inner_muColumn_self_sub_conj [Finite G]
     ClassFunction.inner
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
         (hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j) - (d : ℂ) • ζ.conj)) = 1 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hαsupp := hyp.muGrid_alpha_support hG hodd hj0 hζS hdeg hμ0 hζ1 hnf hδj
   have hμsupp := hyp.muColumn_sub_conj_support hG hodd j hζS hζirr hcol1 hζ1

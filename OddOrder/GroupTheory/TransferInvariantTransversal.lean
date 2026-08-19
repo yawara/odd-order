@@ -78,7 +78,7 @@ theorem transfer_eq_pow_of_conj_invariant_transversal [H.FiniteIndex]
     (hS : ∀ s ∈ (S : Set G), x⁻¹ * s * x ∈ (S : Set G)) :
     MonoidHom.transfer ϕ x = ϕ ⟨x, hx⟩ ^ H.index := by
   classical
-  letI := H.fintypeQuotientOfFiniteIndex
+  let := H.fintypeQuotientOfFiniteIndex
   -- The chosen representative of `x⁻¹ • q` is the `x`-conjugate of that of `q`.
   have hrep : ∀ q : G ⧸ H,
       (S.2.leftQuotientEquiv (x⁻¹ • q) : G)
@@ -122,7 +122,7 @@ theorem transfer_eq_pow_of_map_conj_eq [H.FiniteIndex]
     (hϕ : ∀ s : G, ϕ ⟨s⁻¹ * x * s, hmem s⟩ = ϕ ⟨x, hx⟩) :
     MonoidHom.transfer ϕ x = ϕ ⟨x, hx⟩ ^ H.index := by
   classical
-  letI := H.fintypeQuotientOfFiniteIndex
+  let := H.fintypeQuotientOfFiniteIndex
   set S : H.LeftTransversal := default with hS_def
   -- left multiplication by `x⁻¹` fixes every coset of `H`.
   have hfix : ∀ q : G ⧸ H, x⁻¹ • q = q := by

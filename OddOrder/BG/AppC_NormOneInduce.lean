@@ -306,7 +306,7 @@ theorem normOneFrobeniusKernel_irreducibleCharacter_apply_one_eq_one [Fact p.Pri
     (θ : ClassFunction (normOneFrobeniusKernel p q) ℂ)
         (1 : normOneFrobeniusKernel p q) = 1 := by
   obtain ⟨V, _, _, _, ρ, hρ, hθ⟩ := θ.isIrreducible
-  haveI : Representation.IsIrreducible ρ := hρ
+  have : Representation.IsIrreducible ρ := hρ
   have hdim : Module.finrank ℂ V = 1 :=
     Representation.IsIrreducible.finrank_eq_one_of_isMulCommutative ρ
   change (((θ : ClassFunction (normOneFrobeniusKernel p q) ℂ) :
@@ -323,7 +323,7 @@ theorem normOneFrobeniusKernel_induce_isIrreducible [Fact p.Prime] (hq : 1 < q)
     IsIrreducibleCharacter
       (ClassFunction.induce (normOneFrobeniusKernel p q)
         (θ : ClassFunction (normOneFrobeniusKernel p q) ℂ)) := by
-  letI : (normOneFrobeniusKernel p q).Normal := normOneFrobeniusKernel_normal p q
+  let : (normOneFrobeniusKernel p q).Normal := normOneFrobeniusKernel_normal p q
   exact isIrreducibleCharacter_induce_of_frobeniusGroup
     (normOneFrobenius_isFrobeniusGroup p q hq) θ hθ_ne
 
@@ -335,7 +335,7 @@ theorem normOneFrobeniusKernel_induce_apply_one [Fact p.Prime]
         (1 : normOneFrobeniusGroup p q) =
       (Nat.card (normOneUnits p q) : ℂ) *
         θ (1 : normOneFrobeniusKernel p q) := by
-  letI : (normOneFrobeniusKernel p q).Normal := normOneFrobeniusKernel_normal p q
+  let : (normOneFrobeniusKernel p q).Normal := normOneFrobeniusKernel_normal p q
   rw [ClassFunction.induce_apply_one, normOneFrobeniusKernel_index_eq_normOneUnits_card]
 
 /-- Irreducible characters induced from the additive kernel have degree `|U|`
@@ -356,7 +356,7 @@ theorem normOneFrobeniusKernel_induce_eq_zero_of_not_mem_kernel [Fact p.Prime]
     (θ : ClassFunction (normOneFrobeniusKernel p q) ℂ)
     {g : normOneFrobeniusGroup p q} (hg : g ∉ normOneFrobeniusKernel p q) :
     ClassFunction.induce (normOneFrobeniusKernel p q) θ g = 0 := by
-  letI : (normOneFrobeniusKernel p q).Normal := normOneFrobeniusKernel_normal p q
+  let : (normOneFrobeniusKernel p q).Normal := normOneFrobeniusKernel_normal p q
   exact ClassFunction.induce_eq_zero_of_not_mem_normal θ hg
 
 /-- Equivalently, the support of an induced class function from `P` is contained
@@ -365,7 +365,7 @@ theorem normOneFrobeniusKernel_induce_support_subset_kernel [Fact p.Prime]
     (θ : ClassFunction (normOneFrobeniusKernel p q) ℂ) :
     (ClassFunction.induce (normOneFrobeniusKernel p q) θ).support ⊆
       normOneFrobeniusKernel p q := by
-  letI : (normOneFrobeniusKernel p q).Normal := normOneFrobeniusKernel_normal p q
+  let : (normOneFrobeniusKernel p q).Normal := normOneFrobeniusKernel_normal p q
   exact ClassFunction.support_induce_subset_of_normal (normOneFrobeniusKernel p q) θ
 
 /-- Induced class functions from `P` vanish on nonidentity complement elements. -/
@@ -399,7 +399,7 @@ theorem normOneFrobenius_inl_eq_commutator [Fact p.Prime] (hq : 1 < q)
         (SemidirectProduct.inl (Multiplicative.ofAdd s) :
           normOneFrobeniusGroup p q) := by
   classical
-  haveI : Nontrivial (normOneUnits p q) :=
+  have : Nontrivial (normOneUnits p q) :=
     Finite.one_lt_card_iff_nontrivial.mp (normOneUnits_card_gt_one p q hq)
   obtain ⟨u, hu⟩ := exists_ne (1 : normOneUnits p q)
   let uval : GaloisField p q := ((u : (GaloisField p q)ˣ) : GaloisField p q)
@@ -488,7 +488,7 @@ theorem normOneFrobenius_sum_kernelCharacter_degree_sq_eq_normOneUnits_card
       ((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
         (1 : normOneFrobeniusGroup p q)) ^ 2 =
       (Nat.card (normOneUnits p q) : ℂ) := by
-  letI : (normOneFrobeniusKernel p q).Normal := normOneFrobeniusKernel_normal p q
+  let : (normOneFrobeniusKernel p q).Normal := normOneFrobeniusKernel_normal p q
   rw [OddOrder.RepresentationTheory.sumInflatedDegreeSq
     (N := normOneFrobeniusKernel p q)]
   rw [← Subgroup.index_eq_card, normOneFrobeniusKernel_index_eq_normOneUnits_card]

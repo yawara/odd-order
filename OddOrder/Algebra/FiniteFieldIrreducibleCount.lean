@@ -46,7 +46,7 @@ image of the tautological root is the root sought. -/
 theorem exists_isRoot_galoisField {r : ℕ} (hr : r ≠ 0) {f : (ZMod p)[X]} (hmonic : f.Monic)
     (hirr : Irreducible f) (hdeg : f.natDegree = r) :
     ∃ lam : GaloisField p r, (aeval lam) f = 0 := by
-  haveI : Fact (Irreducible f) := ⟨hirr⟩
+  have : Fact (Irreducible f) := ⟨hirr⟩
   have hne : f ≠ 0 := hmonic.ne_zero
   have hfr : Module.finrank (ZMod p) (AdjoinRoot f) = r := by
     rw [(AdjoinRoot.powerBasis hne).finrank, AdjoinRoot.powerBasis_dim, hdeg]
@@ -102,7 +102,7 @@ theorem mul_card_le {r : ℕ} (hr : 2 ≤ r) {ι : Type*} [Fintype ι]
     r * Fintype.card ι ≤ p ^ r - p := by
   classical
   have hr0 : r ≠ 0 := by omega
-  haveI : Fintype (GaloisField p r) := Fintype.ofFinite _
+  have : Fintype (GaloisField p r) := Fintype.ofFinite _
   set R : ι → Finset (GaloisField p r) := fun i => ((f i).rootSet (GaloisField p r)).toFinset
     with hRdef
   have hRmem : ∀ (i : ι) (x : GaloisField p r), x ∈ R i ↔ (aeval x) (f i) = 0 := by

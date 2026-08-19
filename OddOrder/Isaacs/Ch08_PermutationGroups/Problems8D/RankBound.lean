@@ -42,7 +42,7 @@ theorem card_le_rank_mul_max_subdegree [Finite Ω] (α : Ω) {r n : ℕ}
     (hn : ∀ γ : Ω, Set.ncard (orbit ↥(stabilizer G α) γ) ≤ n) :
     Nat.card Ω ≤ r * n := by
   classical
-  haveI : Fintype (orbitRel.Quotient ↥(stabilizer G α) Ω) := Fintype.ofFinite _
+  have : Fintype (orbitRel.Quotient ↥(stabilizer G α) Ω) := Fintype.ofFinite _
   have hsigma : Nat.card Ω =
       ∑ ω : orbitRel.Quotient ↥(stabilizer G α) Ω,
         Nat.card ↥(orbit ↥(stabilizer G α) ω.out) := by

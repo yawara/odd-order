@@ -366,7 +366,7 @@ private theorem le_fitting_aux :
     by_cases hHtop : H = ⊤
     · -- H = ⊤: `G` 冪零 ⇒ `(⊤ : Subgroup G) ≤ fitting G`
       subst hHtop
-      haveI := hNilp
+      have := hNilp
       exact nilpotent_normal_le_fitting
     · -- H < ⊤: penultimate term `K` を取って IH を `K` に適用
       obtain ⟨K, hKnorm, hHK, hKlt⟩ := hSn.exists_normal_and_le_and_lt_top_of_ne hHtop
@@ -390,8 +390,8 @@ private theorem le_fitting_aux :
       have hpush : H ≤ (fitting K).map K.subtype := by
         rw [← hHeq]; exact Subgroup.map_mono hH_le_fitK
       -- `(fitting K).map K.subtype` は normal (characteristic in K + K ⊴ G) かつ nilpotent.
-      haveI : ((fitting K).map K.subtype).Normal := inferInstance
-      haveI : Group.IsNilpotent ((fitting K).map K.subtype) :=
+      have : ((fitting K).map K.subtype).Normal := inferInstance
+      have : Group.IsNilpotent ((fitting K).map K.subtype) :=
         Group.nilpotent_of_mulEquiv ((fitting K).equivMapOfInjective K.subtype K.subtype_injective)
       exact hpush.trans nilpotent_normal_le_fitting
 
@@ -469,7 +469,7 @@ private theorem isMinimalNormal_le_normalizer_aux :
           exact hmsm
       · -- Case 2: M ⊓ N ≠ ⊥. By minimality of M, M ⊓ N = M, i.e., M ≤ N.
         have hMN_le_M : M ⊓ N ≤ M := inf_le_left
-        haveI hMN_norm : (M ⊓ N).Normal := Subgroup.normal_inf_normal M N
+        have hMN_norm : (M ⊓ N).Normal := Subgroup.normal_inf_normal M N
         have hMN_eq_M : M ⊓ N = M := by
           rcases hM.2.2 (M ⊓ N) hMN_norm hMN_le_M with h | h
           · exact absurd h hMN
@@ -490,7 +490,7 @@ private theorem isMinimalNormal_le_normalizer_aux :
           intro h
           apply hM.2.1
           rw [eq_bot_iff]; rw [h] at hMleN; exact hMleN
-        haveI hNNontriv : Nontrivial N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNne_bot
+        have hNNontriv : Nontrivial N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNne_bot
         -- IH on ↥N.
         have hSsubN_sn : (S.subgroupOf N).IsSubnormal := hS.subgroupOf
         have hIH : ∀ K : Subgroup N, IsMinimalNormal K →
@@ -549,7 +549,7 @@ private theorem isMinimalNormal_le_normalizer_aux :
             · intro hsS; exact absurd (hSleN hsS) hsN
             · intro hgsg; exact absurd (hSleN hgsg) hgsg_notN
         -- M.subgroupOf N is normal in N (since M is normal in G and M ≤ N).
-        haveI hMsubN_norm : (M.subgroupOf N).Normal :=
+        have hMsubN_norm : (M.subgroupOf N).Normal :=
           (Subgroup.normal_subgroupOf_iff_le_normalizer hMleN).mpr
             Subgroup.le_normalizer_of_normal
         -- M.subgroupOf N ≠ ⊥ (since M ≠ ⊥ and M ≤ N).
@@ -580,8 +580,8 @@ private theorem isMinimalNormal_le_normalizer_aux :
           have : k = 1 := Subtype.ext hmem
           rw [this]; exact Subgroup.one_mem _
         -- M ⊓ ((socle N).map N.subtype) is G-normal, ≤ M, ≠ ⊥.
-        haveI hSocLift_normal : ((socle N).map N.subtype).Normal := inferInstance
-        haveI hM_inf_norm : (M ⊓ (socle N).map N.subtype).Normal :=
+        have hSocLift_normal : ((socle N).map N.subtype).Normal := inferInstance
+        have hM_inf_norm : (M ⊓ (socle N).map N.subtype).Normal :=
           Subgroup.normal_inf_normal _ _
         have hM_inf_ne_bot : M ⊓ (socle N).map N.subtype ≠ ⊥ := by
           intro heq
@@ -636,7 +636,7 @@ private theorem isSubnormal_sup_aux :
     case neg =>
       -- Subsingleton G ⇒ every subgroup = ⊤ ⇒ IsSubnormal.top.
       rw [not_nontrivial_iff_subsingleton] at hGnontriv
-      haveI := hGnontriv
+      have := hGnontriv
       have hST_top : (S ⊔ T : Subgroup G) = ⊤ := by
         refine eq_top_iff.mpr (fun x _ => ?_)
         rw [show x = 1 from Subsingleton.elim x 1]
@@ -644,7 +644,7 @@ private theorem isSubnormal_sup_aux :
       rw [hST_top]
       exact Subgroup.IsSubnormal.top
     case pos =>
-      haveI := hGnontriv
+      have := hGnontriv
       -- Pick minimal normal M ≤ ⊤.
       have htop_ne_bot : (⊤ : Subgroup G) ≠ ⊥ := by
         intro h
@@ -656,7 +656,7 @@ private theorem isSubnormal_sup_aux :
         rw [hxbot, hybot]
       obtain ⟨M, hM, _⟩ :=
         exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) htop_ne_bot
-      haveI hMnorm : M.Normal := hM.1
+      have hMnorm : M.Normal := hM.1
       -- Quotient map f : G →* G ⧸ M.
       let f : G →* G ⧸ M := QuotientGroup.mk' M
       have hSbar : (S.map f).IsSubnormal := hS.map (QuotientGroup.mk'_surjective M)
@@ -666,7 +666,7 @@ private theorem isSubnormal_sup_aux :
         have h_ne_one : Nat.card M ≠ 1 := by
           intro h1
           apply hM.2.1
-          haveI hSub : Subsingleton M := Nat.card_eq_one_iff_unique.mp h1 |>.1
+          have hSub : Subsingleton M := Nat.card_eq_one_iff_unique.mp h1 |>.1
           refine eq_bot_iff.mpr (fun x hx => ?_)
           rw [Subgroup.mem_bot]
           exact congrArg Subtype.val (Subsingleton.elim (⟨x, hx⟩ : M) 1)
@@ -1097,7 +1097,7 @@ theorem zipper_lemma [Finite G] {S : Subgroup G}
           rw [← hST] at this
           exact this
         -- T.index < S.index.
-        haveI : S.FiniteIndex := ⟨by rw [hIdx]; omega⟩
+        have : S.FiniteIndex := ⟨by rw [hIdx]; omega⟩
         have hT_idx_lt : T.index < S.index := Subgroup.index_strictAnti hS_lt_T
         -- ¬ T.IsSubnormal:
         -- T ≤ N_G(S) means S.subgroupOf T Normal. If T.IsSubnormal, then S.IsSubnormal via trans.
@@ -1293,7 +1293,7 @@ private theorem isSubnormal_of_nilpotent_or_permutable_aux :
       rcases hyp (y : G) with hnil | hperm
       -- 冪零側: `(S ⊔ S^y).subgroupOf H ≃* S ⊔ S^y` で冪零性を移送.
       · refine Or.inl ?_
-        haveI := hnil
+        have := hnil
         rw [← Subgroup.subgroupOf_sup hSH hSy_le_H]
         exact Group.nilpotent_of_mulEquiv
           (Subgroup.subgroupOfEquivOfLe (sup_le hSH hSy_le_H)).symm
@@ -1328,8 +1328,8 @@ private theorem isSubnormal_of_nilpotent_or_permutable_aux :
         rcases hyp x with hnil | hperm
         · -- `S ⊔ S^x = ⊤` かつ冪零 ⟹ `G` 自身が冪零 ⟹ 全部分群が部分正規, `hSn` に矛盾.
           rw [hSup_top] at hnil
-          haveI := hnil
-          haveI : Group.IsNilpotent G := Group.nilpotent_of_mulEquiv Subgroup.topEquiv
+          have := hnil
+          have : Group.IsNilpotent G := Group.nilpotent_of_mulEquiv Subgroup.topEquiv
           exact hSn (isSubnormal_of_isNilpotent_finite S)
         have hHK_eq : ((S ⊔ ((MulAut.conj x) • S : Subgroup G) : Subgroup G) : Set G)
             = (S : Set G) * (((MulAut.conj x) • S : Subgroup G) : Set G) :=

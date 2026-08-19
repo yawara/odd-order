@@ -56,7 +56,7 @@ theorem quotientFaithfulSMul (N : Subgroup A) [N.Normal]
     (hN : N = (MulAction.toPermHom A Λ).ker) :
     letI := quotientMulAction N hN.le
     FaithfulSMul (A ⧸ N) Λ := by
-  letI := quotientMulAction N hN.le
+  let := quotientMulAction N hN.le
   have hinj : Function.Injective (quotientPermHom N hN.le) :=
     (QuotientGroup.injective_lift_iff N
       (MulAction.toPermHom A Λ) hN.le).mpr hN
@@ -74,7 +74,7 @@ theorem quotientIsMultiplyPretransitive (N : Subgroup A) [N.Normal]
     (htrans : IsMultiplyPretransitive A Λ n) :
     letI := quotientMulAction N hN
     IsMultiplyPretransitive (A ⧸ N) Λ n := by
-  letI := quotientMulAction N hN
+  let := quotientMulAction N hN
   rw [isMultiplyPretransitive_iff] at htrans ⊢
   intro x y
   obtain ⟨a, ha⟩ := htrans x y
@@ -355,7 +355,7 @@ theorem centralizerQuotient_faithful (hXV : X ≤ hyp.V) :
       ↥(MulAction.fixedPoints X Ω) := by
   let L : Subgroup G := Subgroup.centralizer (X : Set G)
   let N : Subgroup L := (hyp.H.subgroupOf L).normalCore
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   exact quotientFaithfulSMul N
     (hyp.normalCore_cH_eq_restrictedAction_ker hXV)
 
@@ -367,7 +367,7 @@ theorem centralizerQuotient_doublyTransitive (hXV : X ≤ hyp.V) :
       ↥(MulAction.fixedPoints X Ω) 2 := by
   let L : Subgroup G := Subgroup.centralizer (X : Set G)
   let N : Subgroup L := (hyp.H.subgroupOf L).normalCore
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   exact quotientIsMultiplyPretransitive N
     (hyp.normalCore_cH_eq_restrictedAction_ker hXV).le 2
     (hyp.centralizer_isMultiplyPretransitive_two hXV)
@@ -420,7 +420,7 @@ theorem natCard_centralizer_lt (hXV : X ≤ hyp.V) (hX : X ≠ ⊥) :
     intro hLtop
     have hXcenter : X ≤ Subgroup.center G := by
       exact (Subgroup.centralizer_eq_top_iff_subset.mp hLtop)
-    letI : X.Normal := ⟨by
+    let : X.Normal := ⟨by
       intro n hn g
       have hcomm : g * n = n * g :=
         Subgroup.mem_center_iff.mp (hXcenter hn) g

@@ -97,10 +97,10 @@ order** is a Z-group (every Sylow subgroup is cyclic).  This bridges the pair fo
 theorem isZGroup_of_isFrobeniusGroup_of_odd {G' : Type*} [Group G'] [Finite G']
     {N A : Subgroup G'} (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G' N A)
     (hodd : Odd (Nat.card ↥A)) : _root_.IsZGroup ↥A := by
-  letI : N.Normal := hFrob.isNormal
-  letI : MulDistribMulAction ↥A ↥N :=
+  let : N.Normal := hFrob.isNormal
+  let : MulDistribMulAction ↥A ↥N :=
     MulDistribMulAction.compHom ↥N ((MulAut.conjNormal (H := N)).comp A.subtype)
-  haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hFrob.ne_bot_kernel
+  have : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hFrob.ne_bot_kernel
   exact OddOrder.Isaacs.Ch06.isZGroup_of_isFrobeniusAction_of_odd hFrob.toFrobeniusAction hodd
 
 /-- **Peterfalvi (8.2.a)**: in type `F`, the chosen `U_0` has order equal to the exponent of the
@@ -128,9 +128,9 @@ theorem typeF_card_U0_eq_exponent [Finite G] (hodd : Odd (Nat.card G)) {M : Subg
   have hdvd : Nat.card ↥data.U0 ∣ Nat.card G := Subgroup.card_subgroup_dvd_card data.U0
   have hoddA : Odd (Nat.card ↥(data.U0.subgroupOf (data.H ⊔ data.U0))) := by
     rw [hcardA]; exact Odd.of_dvd_nat hodd hdvd
-  haveI hZA : _root_.IsZGroup ↥(data.U0.subgroupOf (data.H ⊔ data.U0)) :=
+  have hZA : _root_.IsZGroup ↥(data.U0.subgroupOf (data.H ⊔ data.U0)) :=
     isZGroup_of_isFrobeniusGroup_of_odd data.frobenius_HU0 hoddA
-  haveI hZU0 : _root_.IsZGroup ↥data.U0 := by
+  have hZU0 : _root_.IsZGroup ↥data.U0 := by
     have hinj : Function.Injective ⇑(e.symm.toMonoidHom) := by simpa using e.symm.injective
     exact _root_.IsZGroup.of_injective hinj
   rw [← _root_.IsZGroup.exponent_eq_card (G := ↥data.U0), data.exponent_eq]
@@ -175,7 +175,7 @@ does need oddness — see `typeF_frobenius_iff_isZGroup`. -/
 theorem typeF_frobenius_of_isZGroup [Finite G] {M : Subgroup G}
     (data : TypeFData M) (hZ : _root_.IsZGroup ↥data.U) :
     OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M (data.H.subgroupOf M) (data.U.subgroupOf M) := by
-  haveI := hZ
+  have := hZ
   exact typeF_frobenius_of_card_eq_exponent data
     (_root_.IsZGroup.exponent_eq_card (G := ↥data.U)).symm
 
@@ -205,7 +205,7 @@ theorem typeF_frobenius_iff_isZGroup [Finite G] (hodd : Odd (Nat.card G)) {M : S
     have hodd' : Odd (Nat.card ↥(data.U.subgroupOf M)) := by
       rw [hcard]
       exact Odd.of_dvd_nat hodd (Subgroup.card_subgroup_dvd_card data.U)
-    haveI : _root_.IsZGroup ↥(data.U.subgroupOf M) :=
+    have : _root_.IsZGroup ↥(data.U.subgroupOf M) :=
       isZGroup_of_isFrobeniusGroup_of_odd hfrob hodd'
     have hinj : Function.Injective ⇑(e.symm.toMonoidHom) := by simpa using e.symm.injective
     exact _root_.IsZGroup.of_injective hinj
@@ -251,6 +251,7 @@ private theorem centralizer_eq_of_generator {W : Subgroup G} (g : G)
     rw [← hn]
     simpa using (hc.zpow_left n).eq
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Lift conjugation transport from `↥M` to `G`: `(K^c).map ι = (K.map ι)^(c : G)`. -/
 private theorem map_subtype_conj_smul {M : Subgroup G} (c : ↥M)
     (K : Subgroup ↥M) :
@@ -281,7 +282,7 @@ theorem card_Msigma_inf_centralizer_eq_card_W2 [Finite G]
     Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma S ⊓ Subgroup.centralizer (K : Set G)) =
       Nat.card ↥d.W2 := by
   classical
-  haveI : IsCyclic ↥d.W1 := d.W1_cyclic
+  have : IsCyclic ↥d.W1 := d.W1_cyclic
   obtain ⟨g0, hg0gen⟩ := IsCyclic.exists_generator (α := ↥d.W1)
   set g : G := (g0 : G) with hgdef
   have hgW1 : g ∈ d.W1 := g0.2
@@ -325,9 +326,9 @@ theorem card_Msigma_inf_centralizer_eq_card_W2 [Finite G]
     d.M_complement
   have hNeq : (derivedInG S).subgroupOf S = commutator ↥S :=
     Subgroup.comap_map_eq_self_of_injective S.subtype_injective _
-  haveI hNnormal : ((derivedInG S).subgroupOf S).Normal := by rw [hNeq]; infer_instance
-  haveI : IsSolvable ↥S := hG.solvable_of_mem_maximalSubgroups hS
-  haveI : IsSolvable ↥((derivedInG S).subgroupOf S) := inferInstance
+  have hNnormal : ((derivedInG S).subgroupOf S).Normal := by rw [hNeq]; infer_instance
+  have : Group.IsSolvable ↥S := hG.isSolvable_of_mem_maximalSubgroups hS
+  have : Group.IsSolvable ↥((derivedInG S).subgroupOf S) := inferInstance
   have hcop : Nat.Coprime (Nat.card ↥((derivedInG S).subgroupOf S))
       ((derivedInG S).subgroupOf S).index := by
     rw [hKcompl.symm.index_eq_card]
@@ -381,7 +382,7 @@ theorem exists_typeII_maximal_with_w2_of_typeP [Finite G]
     ∃ S : Subgroup G, S ∈ maximalSubgroups G ∧ IsTypeII S ∧
       ((derivedInG S).subgroupOf S).index = Nat.card ↥data.W2 := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   -- `M` is type `P₁`, hence κ-nonempty (`BG.Ch4.S14.IsTypeP`).
   have hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M := by
     rcases hType with h | h | h
@@ -409,11 +410,11 @@ theorem exists_typeII_maximal_with_w2_of_typeP [Finite G]
   have hMstarII : IsTypeII Mstar :=
     (OddOrder.BG.Ch4.S16.proposition_type_classification hG hMstarMem).2.1.mpr hP2Mstar
   -- `K` and `K*` cyclic (subgroups of cyclic `Z = K ⊔ K*`).
-  haveI : IsCyclic ↥(K ⊔ Kstar) := hcyc
-  haveI : IsCyclic ↥K :=
+  have : IsCyclic ↥(K ⊔ Kstar) := hcyc
+  have : IsCyclic ↥K :=
     isCyclic_of_injective (Subgroup.inclusion (le_sup_left : K ≤ K ⊔ Kstar))
       (Subgroup.inclusion_injective _)
-  haveI : IsCyclic ↥Kstar :=
+  have : IsCyclic ↥Kstar :=
     isCyclic_of_injective (Subgroup.inclusion (le_sup_right : Kstar ≤ K ⊔ Kstar))
       (Subgroup.inclusion_injective _)
   -- `[Mstar:Mstar'] = |K*| = |W₂|`.
@@ -943,7 +944,7 @@ theorem typeII_normalizer_not_le_of_typePData [Finite G]
   have hMFeq : maxNilpotentNormalHall (derivedInG M) = maxNilpotentNormalHall M :=
     td.derived_fitting_eq.trans td.typeP.H_eq
   -- Kernel `N = M_F` inside `M' = derivedInG M`: normal and Hall (hence coprime index).
-  haveI hNnormal : ((maxNilpotentNormalHall (derivedInG M)).subgroupOf (derivedInG M)).Normal :=
+  have hNnormal : ((maxNilpotentNormalHall (derivedInG M)).subgroupOf (derivedInG M)).Normal :=
     OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal (derivedInG M)
   have hcop : Nat.Coprime
       (Nat.card ↥((maxNilpotentNormalHall (derivedInG M)).subgroupOf (derivedInG M)))
@@ -960,10 +961,10 @@ theorem typeII_normalizer_not_le_of_typePData [Finite G]
       (data.U.subgroupOf (derivedInG M)) := by
     have h := data.derived_complement; rwa [data.H_eq, ← hMFeq] at h
   -- `M'` (and hence `M_F ≤ M'`) is solvable, giving Schur–Zassenhaus conjugacy of complements.
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hM'leM : derivedInG M ≤ M := Subgroup.map_subtype_le _
-  haveI : IsSolvable ↥(derivedInG M) :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective hM'leM)
+  have : Group.IsSolvable ↥(derivedInG M) :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective hM'leM)
   obtain ⟨n, -, hnconj⟩ :=
     Subgroup.IsComplement'.exists_conj_of_coprime hcop (Or.inl inferInstance) hTd_compl hData_compl
   -- Lift the `M'`-conjugation to `G`: `conj (↑n) • td.typeP.U = data.U`, with `↑n ∈ M' ≤ M`.

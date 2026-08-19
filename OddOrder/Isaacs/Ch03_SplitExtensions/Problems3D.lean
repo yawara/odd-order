@@ -26,7 +26,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problems 3D。
 
 namespace OddOrder.Isaacs.Ch03
 
-open Subgroup Pointwise
+open _root_.OddOrder.Isaacs.Ch03.Subgroup Pointwise
 
 section /- 3D: π-separable + Hall-Higman (pp. 89-95) -/
 
@@ -171,7 +171,7 @@ theorem oPiCore_quotient_center_eq_map [Finite G] {Z : Subgroup G} [Z.Normal]
     (hZ : Z ≤ Subgroup.center G) (π : Set ℕ) :
     oPiCore π (G ⧸ Z) = (oPiCore π G).map (QuotientGroup.mk' Z) := by
   classical
-  haveI hZnil : Group.IsNilpotent ↥Z := by
+  have hZnil : Group.IsNilpotent ↥Z := by
     refine ⟨⟨1, ?_⟩⟩
     rw [Subgroup.upperCentralSeries_one, eq_top_iff]
     intro a _
@@ -180,7 +180,7 @@ theorem oPiCore_quotient_center_eq_map [Finite G] {Z : Subgroup G} [Z.Normal]
   have hfsurj : Function.Surjective (QuotientGroup.mk' Z) := QuotientGroup.mk'_surjective Z
   refine le_antisymm ?_ ?_
   swap
-  · haveI : ((oPiCore π G).map (QuotientGroup.mk' Z)).Normal :=
+  · have : ((oPiCore π G).map (QuotientGroup.mk' Z)).Normal :=
       (oPiCore.normal π G).map _ hfsurj
     exact Subgroup.IsPiGroup.le_oPiCore (Subgroup.IsPiGroup.map_quotient (oPiCore.isPiGroup π))
   -- `K` = `O_π(G/Z)` の引き戻し
@@ -189,7 +189,7 @@ theorem oPiCore_quotient_center_eq_map [Finite G] {Z : Subgroup G} [Z.Normal]
   have hZK : Z ≤ K := by
     have h := Subgroup.ker_le_comap (QuotientGroup.mk' Z) Q
     rwa [QuotientGroup.ker_mk'] at h
-  haveI hKnormal : K.Normal := (oPiCore.normal π (G ⧸ Z)).comap _
+  have hKnormal : K.Normal := (oPiCore.normal π (G ⧸ Z)).comap _
   have hKmap : K.map (QuotientGroup.mk' Z) = Q :=
     Subgroup.map_comap_eq_self_of_surjective hfsurj _
   -- `|K| = |Z| · |Q|`
@@ -206,7 +206,7 @@ theorem oPiCore_quotient_center_eq_map [Finite G] {Z : Subgroup G} [Z.Normal]
   -- `Z` の `π`/`π'`-部分
   have hZp := isHallPart_nilPiPart (N := Z) π hZnil
   have hZc := isHallPart_nilPiPart (N := Z) (πᶜ) hZnil
-  haveI hZcN : (nilPiPart Z πᶜ).Normal := normal_of_le_center (hZc.1.trans hZ)
+  have hZcN : (nilPiPart Z πᶜ).Normal := normal_of_le_center (hZc.1.trans hZ)
   have hinfZ : nilPiPart Z π ⊓ nilPiPart Z πᶜ = ⊥ := by
     refine (Subgroup.eq_bot_iff_card _).mpr ?_
     by_contra hne
@@ -235,7 +235,7 @@ theorem oPiCore_quotient_center_eq_map [Finite G] {Z : Subgroup G} [Z.Normal]
     · exact oPiCore.isPiGroup (G := G ⧸ Z) π q (Nat.mem_primeFactors.mpr
         ⟨hq.1, h, Nat.card_pos.ne'⟩)
   -- Schur–Zassenhaus
-  haveI : ((nilPiPart Z πᶜ).subgroupOf K).Normal := Subgroup.normal_subgroupOf
+  have : ((nilPiPart Z πᶜ).subgroupOf K).Normal := Subgroup.normal_subgroupOf
   have hcard_sub : Nat.card ↥((nilPiPart Z πᶜ).subgroupOf K) = Nat.card ↥(nilPiPart Z πᶜ) :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hZcK).toEquiv
   have hcop : Nat.Coprime (Nat.card ↥((nilPiPart Z πᶜ).subgroupOf K))
@@ -253,7 +253,7 @@ theorem oPiCore_quotient_center_eq_map [Finite G] {Z : Subgroup G} [Z.Normal]
   have hHsub : (H'.map K.subtype).subgroupOf K = H' :=
     Subgroup.comap_map_eq_self_of_injective K.subtype_injective H'
   have hcardH : Nat.card ↥(H'.map K.subtype) = (nilPiPart Z πᶜ).relIndex K := by
-    have hmul := hH'.card_mul
+    have hmul := hH'.card_mul_card
     have hcH : Nat.card ↥(H'.map K.subtype) = Nat.card ↥H' :=
       Subgroup.card_map_of_injective K.subtype_injective
     refine Nat.eq_of_mul_eq_mul_left (Nat.card_pos (α := ↥(nilPiPart Z πᶜ))) ?_
@@ -290,7 +290,7 @@ theorem oPiCore_quotient_center_eq_map [Finite G] {Z : Subgroup G} [Z.Normal]
         ≤ Subgroup.normalizer ((H'.map K.subtype : Subgroup G) : Set G) :=
       sup_le h1 Subgroup.le_normalizer
     exact hsupK.symm.le.trans h2
-  haveI hHnormal : (H'.map K.subtype).Normal := by
+  have hHnormal : (H'.map K.subtype).Normal := by
     refine Subgroup.normal_iff_map_conj_eq.mpr fun g => ?_
     have hconjK : (H'.map K.subtype).map (MulAut.conj g).toMonoidHom ≤ K := by
       have hKconj : K.map (MulAut.conj g).toMonoidHom = K :=
@@ -402,7 +402,7 @@ theorem smul_eq_self_of_isPGroup_of_trivial_mod_frattini {G Q : Type*} [Group G]
   have hcoset : ∀ g : G, ∃ c : G, (∀ x : Q, x • c = c) ∧ c⁻¹ * g ∈ frattini G := by
     intro g
     set X : Set G := {y : G | g⁻¹ * y ∈ frattini G} with hXdef
-    letI : MulAction Q ↥X :=
+    let : MulAction Q ↥X :=
       { smul := fun x y => ⟨x • (y : G), by
           have h1 : g⁻¹ * (x • (y : G)) = (g⁻¹ * (x • g)) * (x • (g⁻¹ * (y : G))) := by
             rw [smul_mul', smul_inv']
@@ -461,12 +461,12 @@ theorem smul_eq_self_of_trivial_mod_frattini {G H : Type*} [Group G] [Finite G] 
     rw [← Subgroup.index_eq_one]
     by_contra hne
     obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd hne
-    haveI : Fact q.Prime := ⟨hq⟩
+    have : Fact q.Prime := ⟨hq⟩
     have hqH : q ∣ Nat.card H := hqdvd.trans (Subgroup.index_dvd_card K)
     obtain ⟨S⟩ : Nonempty (Sylow q H) := inferInstance
     -- `S` は作用の核に入る
     have hSK : (S : Subgroup H) ≤ K := by
-      letI : MulDistribMulAction ↥(S : Subgroup H) G :=
+      let : MulDistribMulAction ↥(S : Subgroup H) G :=
         MulDistribMulAction.compHom G (S : Subgroup H).subtype
       have hqPhi : ¬ q ∣ Nat.card ↥(frattini G) := fun hdvd =>
         Nat.Prime.one_lt hq |>.ne' (Nat.eq_one_of_dvd_one (hcop ▸ Nat.dvd_gcd hqH hdvd))
@@ -530,8 +530,8 @@ private theorem hasPiLengthLE_nilpotencyClass_aux :
   induction c with
   | zero =>
     intro G _ _ p _ _ P hc
-    haveI : Group.IsNilpotent ↥(P : Subgroup G) := P.isPGroup'.isNilpotent
-    haveI : Subsingleton ↥(P : Subgroup G) :=
+    have : Group.IsNilpotent ↥(P : Subgroup G) := P.isPGroup'.isNilpotent
+    have : Subsingleton ↥(P : Subgroup G) :=
       Group.nilpotencyClass_zero_iff_subsingleton.mp (Nat.le_zero.mp hc)
     have hcard : Nat.card ↥(P : Subgroup G) = 1 :=
       Nat.card_eq_one_iff_unique.mpr ⟨inferInstance, inferInstance⟩
@@ -548,7 +548,7 @@ private theorem hasPiLengthLE_nilpotencyClass_aux :
     exact hnd (hrp ▸ (Nat.mem_primeFactors.mp hr).2.1)
   | succ n ih =>
     intro G _ _ p _ _ P hc
-    haveI hPnil : Group.IsNilpotent ↥(P : Subgroup G) := P.isPGroup'.isNilpotent
+    have hPnil : Group.IsNilpotent ↥(P : Subgroup G) := P.isPGroup'.isNilpotent
     set M : Subgroup G := oPiPrimePiCore ({p} : Set ℕ) G with hM
     have hsurjM : Function.Surjective (QuotientGroup.mk' M) := QuotientGroup.mk'_surjective M
     obtain ⟨Q, hQ⟩ := Ch01.exists_sylow_coe_eq_of_isHallSubgroup_singleton

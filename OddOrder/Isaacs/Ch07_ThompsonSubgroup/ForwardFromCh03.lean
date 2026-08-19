@@ -47,12 +47,12 @@ open OddOrder.Isaacs.Ch03
   (Thm 3.17) で結論. -/
 theorem isSolvable_of_pcomplement_exists.{u} {G : Type u} [Group G] [Finite G]
     (h : ∀ p : ℕ, p.Prime → ∃ H : Subgroup G, IsHallSubgroup {q | q ≠ p} H) :
-    IsSolvable G := by
+    Group.IsSolvable G := by
   classical
   let motive : ℕ → Prop := fun n =>
     ∀ (G' : Type u) [Group G'] [Finite G'], Nat.card G' = n →
       (∀ p : ℕ, p.Prime → ∃ H : Subgroup G', IsHallSubgroup {q | q ≠ p} H) →
-      IsSolvable G'
+      Group.IsSolvable G'
   suffices hmain : motive (Nat.card G) by exact hmain G rfl h
   refine Nat.strong_induction_on (Nat.card G) ?_
   intro n ih G' _ _ hcard h
@@ -101,8 +101,8 @@ theorem isSolvable_of_pcomplement_exists.{u} {G : Type u} [Group G] [Finite G]
         rw [hx0, pow_zero]
       conv_lhs => rw [← h1]
       rw [h2, Finset.prod_pair hpq]
-    haveI : Fact p.Prime := ⟨hp⟩
-    haveI : Fact q.Prime := ⟨hq⟩
+    have : Fact p.Prime := ⟨hp⟩
+    have : Fact q.Prime := ⟨hq⟩
     exact burnside_p_pow_q_pow ⟨_, _, hfact⟩
   · -- ≥ 3 個の素因子: 相異なる素因子 p, q, r を取り Wielandt へ.
     rw [not_le] at hsmall
@@ -134,16 +134,16 @@ theorem isSolvable_of_pcomplement_exists.{u} {G : Type u} [Group G] [Finite G]
         (π := ({s} : Set ℕ)) ?_ ?_
       · intro u hu
         have hus := hW.2 u hu
-        simp only [Set.mem_setOf_eq, not_not] at hus
+        simp only [Set.mem_ofPred_eq, not_not] at hus
         simp [hus]
       · intro u hu
         have hut := hV.2 u hu
-        simp only [Set.mem_setOf_eq, not_not] at hut
+        simp only [Set.mem_ofPred_eq, not_not] at hut
         rw [Set.mem_singleton_iff, hut]
         exact fun hts => hst hts.symm
     -- 任意の素因子 s の complement W は帰納法で可解.
     have hsolv : ∀ (s : ℕ), s.Prime → s ∣ Nat.card G' →
-        ∀ (W : Subgroup G'), IsHallSubgroup {u | u ≠ s} W → IsSolvable W := by
+        ∀ (W : Subgroup G'), IsHallSubgroup {u | u ≠ s} W → Group.IsSolvable W := by
       intro s hs hs_dvd W hW
       have hmul : Nat.card ↥W * W.index = Nat.card G' := Subgroup.card_mul_index W
       have hW_card_lt : Nat.card ↥W < n := by

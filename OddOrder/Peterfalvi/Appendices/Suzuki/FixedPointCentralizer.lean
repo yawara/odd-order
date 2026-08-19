@@ -499,7 +499,7 @@ theorem three_le_ncard_fixedPoints_of_mem_centralizer (hXD : X ≤ hyp.D)
     (hqc : ∀ x ∈ X, x * q = q * x) :
     3 ≤ (fixedPoints X Ω).ncard := by
   classical
-  haveI := hyp.finite_Omega
+  have := hyp.finite_Omega
   have hXstab : ∀ x ∈ X, x • hyp.basept = hyp.basept ∧ x • (hyp.t • hyp.basept)
       = hyp.t • hyp.basept := by
     intro x hx

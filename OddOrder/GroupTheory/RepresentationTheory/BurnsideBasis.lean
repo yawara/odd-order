@@ -43,8 +43,8 @@ theorem linearIndependent_representation_section [FiniteDimensional F V] [Finite
     (t : P ⧸ Subgroup.center P → P) (ht : ∀ c, (↑(t c) : P ⧸ Subgroup.center P) = c) :
     LinearIndependent F (fun c : P ⧸ Subgroup.center P => ρ (t c)) := by
   classical
-  haveI : Fintype P := Fintype.ofFinite P
-  haveI : Fintype (P ⧸ Subgroup.center P) := Fintype.ofFinite _
+  have : Fintype P := Fintype.ofFinite P
+  have : Fintype (P ⧸ Subgroup.center P) := Fintype.ofFinite _
   have hmem : ∀ c c' : P ⧸ Subgroup.center P,
       t c * (t c')⁻¹ ∈ Subgroup.center P ↔ c = c' := by
     intro c c'
@@ -94,9 +94,9 @@ theorem span_range_section_eq_top [FiniteDimensional F V] (ρ : Representation F
   have hsub : ∀ r : MonoidAlgebra F P, ρ.asAlgebraHom r ∈ Submodule.span F (Set.range v) := by
     intro r
     induction r using MonoidAlgebra.induction_on with
-    | hM g => rw [asAlgebraHom_of]; exact hmem_span g
-    | hadd x y hx hy => rw [map_add]; exact Submodule.add_mem _ hx hy
-    | hsmul c x hx => rw [map_smul]; exact Submodule.smul_mem _ _ hx
+    | of g => rw [asAlgebraHom_of]; exact hmem_span g
+    | add x y hx hy => rw [map_add]; exact Submodule.add_mem _ hx hy
+    | smul c x hx => rw [map_smul]; exact Submodule.smul_mem _ _ hx
   rw [eq_top_iff]
   intro A _
   obtain ⟨r, rfl⟩ := asAlgebraHom_surjective_of_isAlgClosed ρ A

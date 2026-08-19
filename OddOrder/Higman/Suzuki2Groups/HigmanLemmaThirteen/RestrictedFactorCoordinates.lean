@@ -84,15 +84,15 @@ theorem restrictedFrattiniSingerCoordinate_conj
     IsAInvariant.of_characteristic hSinv.restrict.range.subtype
   let hSquareInv : IsAInvariant Y.subtype (frattiniSquare P) :=
     (frattiniSquareNormalInvariant Y.subtype).2.2
-  letI : IsMulCommutative (frattini S) :=
+  let : IsMulCommutative (frattini S) :=
     IsMulCommutative.of_comm hFrattiniEA.comm
-  letI : CommGroup (frattini S) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini S)) :=
+  let : CommGroup (frattini S) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini S)) :=
     hFrattiniEA.zmodModule
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : CommGroup (frattiniSquare P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : CommGroup (frattiniSquare P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
   let E := restrictedFrattiniLinearEquivFrattiniSquare
     hFrattiniEA hSquareEA hMap
@@ -241,15 +241,15 @@ theorem exists_restrictedFactorPairCoordinates_of_frattiniSquareSinger
   let hMap : (frattini S).map S.subtype = frattiniSquare P :=
     frattini_map_eq_frattiniSquare_of_restricted_lengthThree_exponent_four
       hP hmulti hxi hprime hPhiComm hexists hSinv hPhiS hlenS hncommS
-  letI : IsMulCommutative (frattini S) :=
+  let : IsMulCommutative (frattini S) :=
     IsMulCommutative.of_comm hEAS.comm
-  letI : CommGroup (frattini S) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini S)) :=
+  let : CommGroup (frattini S) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini S)) :=
     hEAS.zmodModule
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : CommGroup (frattiniSquare P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : CommGroup (frattiniSquare P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
   intro n c eSquare nu hnTwo hcgen hnuPrimitive hconj
   let hPhiInvS : IsAInvariant hSinv.restrict.range.subtype

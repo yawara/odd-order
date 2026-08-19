@@ -107,7 +107,7 @@ BG's Step 1: `A` acts regularly on `R`, hence regularly on `R₀`, which has ord
 Since `p` and `q` are odd, `q ∣ (p-1)/2` (and in particular `p ≥ 2q + 1 ≥ 7`). -/
 theorem RegularOperatorSetup.card_A_dvd_half_p_sub_one [Finite R] [Finite B]
     (hyp : RegularOperatorSetup R B p q) : q ∣ (p - 1) / 2 := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   -- The restricted action of `A` on `R₀`.
   set ψ : ↥hyp.A →* MulAut ↥hyp.R₀ :=
     OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hyp.isAInvariant_R₀ with hψ
@@ -118,7 +118,7 @@ theorem RegularOperatorSetup.card_A_dvd_half_p_sub_one [Finite R] [Finite B]
     rw [h, Subgroup.card_bot] at hc
     have := hyp.p_prime.one_lt
     omega
-  haveI hnt : Nontrivial ↥hyp.R₀ := (Subgroup.nontrivial_iff_ne_bot _).mpr hR₀ne
+  have hnt : Nontrivial ↥hyp.R₀ := (Subgroup.nontrivial_iff_ne_bot _).mpr hR₀ne
   -- `ψ` is injective: a nontrivial `a ∈ A` acting trivially on `R₀` would fix a
   -- nonidentity element of `R`, contradicting regularity.
   have hinj : Function.Injective ψ := by
@@ -133,7 +133,7 @@ theorem RegularOperatorSetup.card_A_dvd_half_p_sub_one [Finite R] [Finite B]
       hyp.A_regular a.val a.property (by simpa using hane) h.val hfix
     exact hh (Subtype.ext (by simpa using hval))
   -- `q = |A|` divides `|Aut R₀| = φ(p) = p - 1`.
-  haveI : IsCyclic ↥hyp.R₀ := isCyclic_of_prime_card hyp.R₀_card
+  have : IsCyclic ↥hyp.R₀ := isCyclic_of_prime_card hyp.R₀_card
   have hdvd : q ∣ p - 1 := by
     have h1 : Nat.card ↥hyp.A ∣ Nat.card (MulAut ↥hyp.R₀) :=
       Subgroup.card_dvd_of_injective ψ hinj
@@ -176,9 +176,9 @@ centralize each other, so their join is abelian
 theorem RegularOperatorSetup.isMulCommutative_centralizer_R₀
     (hyp : RegularOperatorSetup R B p q) :
     IsMulCommutative ↥(Subgroup.centralizer (hyp.R₀ : Set R)) := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
-  haveI : IsCyclic ↥hyp.R₀ := isCyclic_of_prime_card hyp.R₀_card
-  haveI : IsCyclic ↥hyp.R₁ := hyp.R₁_cyclic
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : IsCyclic ↥hyp.R₀ := isCyclic_of_prime_card hyp.R₀_card
+  have : IsCyclic ↥hyp.R₁ := hyp.R₁_cyclic
   rw [hyp.centralizer_eq]
   exact OddOrder.BG.Ch4.S15.isMulCommutative_sup_of_le_centralizer
     IsCyclic.isMulCommutative IsCyclic.isMulCommutative hyp.R₀_le_centralizer_R₁
@@ -214,7 +214,7 @@ This is the rank bound behind BG's elided *"Since `C_R(R₀) = R₀ × R₁` we 
 theorem RegularOperatorSetup.pRank_centralizer_R₀_le_two [Finite R]
     (hyp : RegularOperatorSetup R B p q) :
     pRank ↥(Subgroup.centralizer (hyp.R₀ : Set R)) p ≤ 2 := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   have hR₁le : hyp.R₁ ≤ Subgroup.centralizer (hyp.R₀ : Set R) := by
     rw [hyp.centralizer_eq]
     exact le_sup_right
@@ -272,7 +272,7 @@ theorem RegularOperatorSetup.inf_eq_bot_of_three_le_pRank [Finite R]
     (hyp : RegularOperatorSetup R B p q) {S Z : Subgroup R}
     (hcent : S ≤ Subgroup.centralizer (Z : Set R)) (hS : 3 ≤ pRank ↥S p) :
     hyp.R₀ ⊓ Z = ⊥ := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   -- `|R₀ ⊓ Z|` divides `|R₀| = p`, so it is `1` or `p`.
   have hdvd : Nat.card ↥(hyp.R₀ ⊓ Z) ∣ p := by
     have h := Subgroup.card_dvd_of_le (inf_le_left : hyp.R₀ ⊓ Z ≤ hyp.R₀)
@@ -303,10 +303,10 @@ the start of `(E.9)` and keeps it for the whole of Step 2; several results below
 theorem RegularOperatorSetup.exists_zpowers_eq_R₀_subgroupOf [Finite R]
     (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S) :
     ∃ v : ↥S, Subgroup.zpowers v = hyp.R₀.subgroupOf S := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   set R₀' : Subgroup ↥S := hyp.R₀.subgroupOf S with hR₀'def
   have hR₀'card : Nat.card ↥R₀' = p := hyp.card_R₀_subgroupOf hR₀S
-  haveI : Nontrivial ↥R₀' := by
+  have : Nontrivial ↥R₀' := by
     rw [Subgroup.nontrivial_iff_ne_bot]
     intro h
     rw [h, Subgroup.card_bot] at hR₀'card
@@ -330,7 +330,7 @@ Corollary 5.4 and Theorem 5.3(d) actually consume, and it needs no exponent hypo
 theorem RegularOperatorSetup.pRank_centralizer_subgroupOf_le_two [Finite R]
     (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S) :
     pRank ↥(Subgroup.centralizer ((hyp.R₀.subgroupOf S : Subgroup ↥S) : Set ↥S)) p ≤ 2 := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   set C : Subgroup ↥S :=
     Subgroup.centralizer ((hyp.R₀.subgroupOf S : Subgroup ↥S) : Set ↥S) with hCdef
   have hmem : ∀ x : ↥C, ((x : ↥S) : R) ∈ Subgroup.centralizer (hyp.R₀ : Set R) := by
@@ -355,7 +355,7 @@ theorem RegularOperatorSetup.isNarrow_of_three_le_pRank [Finite R]
     (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
     (hS : 3 ≤ pRank ↥S p) :
     IsNarrow p ↥S := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   exact (OddOrder.BG.Ch1.S05.narrow_iff_exists_card_prime_centralizer_pRank_le_two
     hyp.p_odd (hyp.R_pGroup.to_subgroup S) hS).mpr
     ⟨hyp.R₀.subgroupOf S, hyp.card_R₀_subgroupOf hR₀S,
@@ -371,7 +371,7 @@ theorem RegularOperatorSetup.not_le_derivedInG_of_three_le_pRank [Finite R]
     (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
     (hS : 3 ≤ pRank ↥S p) :
     ¬ hyp.R₀ ≤ derivedInG S := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   intro hle
   -- Theorem 5.3(d) applied inside `↥S` with the order-`p` subgroup `R₀`.
   have hdecomp := OddOrder.BG.Ch1.S05.narrow_centralizer_decomp
@@ -408,7 +408,7 @@ theorem RegularOperatorSetup.card_omega1Center_and_index_centralizer [Finite R]
     Nat.card ↥(OddOrder.BG.Ch1.S05.omega1Center ↥S p) = p ∧
       (Subgroup.centralizer
         (omega1UpperCentralTwo ↥S p : Set ↥S)).index = p := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   obtain ⟨E, hEcard, hEstar⟩ :=
     (OddOrder.BG.Ch1.S05.narrow_iff_exists_maximalElementaryAbelian_card_prime_sq
       hyp.p_odd (hyp.R_pGroup.to_subgroup S) hS).mp
@@ -432,8 +432,8 @@ theorem RegularOperatorSetup.centralizer_inf_eq_sup_omega1Center [Finite R]
     S ⊓ Subgroup.centralizer (hyp.R₀ : Set R)
         = hyp.R₀ ⊔ (OddOrder.BG.Ch1.S05.omega1Center ↥S p).map S.subtype ∧
       Nat.card ↥(S ⊓ Subgroup.centralizer (hyp.R₀ : Set R)) = p ^ 2 := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
-  haveI : IsCyclic ↥hyp.R₀ := isCyclic_of_prime_card hyp.R₀_card
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : IsCyclic ↥hyp.R₀ := isCyclic_of_prime_card hyp.R₀_card
   set C : Subgroup R := Subgroup.centralizer (hyp.R₀ : Set R) with hCdef
   set Z : Subgroup R := (OddOrder.BG.Ch1.S05.omega1Center ↥S p).map S.subtype with hZdef
   -- `|Z| = p` (Lemma 5.2) and `Z ≤ S`, `Z` central in `S`.
@@ -521,7 +521,7 @@ theorem RegularOperatorSetup.card_centralizer_inf_centralizer_eq [Finite R]
     (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p) :
     Nat.card ↥(Subgroup.centralizer ((hyp.R₀.subgroupOf S : Subgroup ↥S) : Set ↥S) ⊓
       Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) = p := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   set R₀' : Subgroup ↥S := hyp.R₀.subgroupOf S with hR₀'
   set CS : Subgroup ↥S := Subgroup.centralizer ((R₀' : Subgroup ↥S) : Set ↥S) with hCS
   set T : Subgroup ↥S :=
@@ -567,7 +567,7 @@ theorem RegularOperatorSetup.card_le_card_commutator_mul_prime [Finite R]
     (hexp : ∀ x : ↥S, x ^ p = 1) (hS : 3 ≤ pRank ↥S p) {H : Subgroup ↥S}
     (hHT : H ≤ Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) :
     Nat.card ↥H ≤ Nat.card ↥⁅hyp.R₀.subgroupOf S, H⁆ * p := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   set R₀' : Subgroup ↥S := hyp.R₀.subgroupOf S with hR₀'def
   have hR₀'card : Nat.card ↥R₀' = p := hyp.card_R₀_subgroupOf hR₀S
   -- pick a generator `v` of the order-`p` group `R₀`

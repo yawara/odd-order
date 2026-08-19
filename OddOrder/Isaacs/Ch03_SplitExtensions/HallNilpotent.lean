@@ -182,8 +182,8 @@ theorem commute_of_isHallSubgroup_of_isHallSubgroup_compl [Finite G] [Group.IsNi
     {π : Set ℕ} {S Q : Subgroup G} (hS : IsHallSubgroup π S)
     (hQ : IsHallSubgroup πᶜ Q) :
     ∀ x ∈ S, ∀ y ∈ Q, Commute x y := by
-  haveI := hS.normal_of_isNilpotent
-  haveI := hQ.normal_of_isNilpotent
+  have := hS.normal_of_isNilpotent
+  have := hQ.normal_of_isNilpotent
   -- `|S|` は `π`-数, `|Q|` は `π'`-数なので互いに素。
   have hcop : Nat.Coprime (Nat.card ↥S) (Nat.card ↥Q) := by
     rw [Nat.coprime_iff_gcd_eq_one]

@@ -162,8 +162,8 @@ theorem mem_commSubgroup_of_square (data : FieldNormalizerData p q G) (hp : p = 
     s ∈ commSubgroup data e := by
   classical
   subst hp
-  letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
-  haveI : CharP (GaloisField 3 q) 3 := by
+  let : Fintype (GaloisField 3 q) := Fintype.ofFinite _
+  have : CharP (GaloisField 3 q) 3 := by
     rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
     exact ZMod.charP 3
   have hcard : Fintype.card (GaloisField 3 q) = 3 ^ q := by
@@ -332,8 +332,8 @@ theorem false_of_mem_commSubgroup_ne_zero (data : FieldNormalizerData p q G) (hp
   classical
   have hq0 : q ≠ 0 := hqprime.ne_zero
   subst hp
-  letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
-  haveI : CharP (GaloisField 3 q) 3 := by
+  let : Fintype (GaloisField 3 q) := Fintype.ofFinite _
+  have : CharP (GaloisField 3 q) 3 := by
     rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
     exact ZMod.charP 3
   have hcard : Fintype.card (GaloisField 3 q) = 3 ^ q := by
@@ -433,8 +433,8 @@ theorem exists_collisionPair_self_of_K_eq (hp : p = 3) (hq : q ≠ 0) (hqodd : O
     (hd : normOneVal r₀ ^ e - normOneVal p₀ ^ e ≠ 0) :
     ∃ S : GaloisField p q, CollisionPair p q e S S := by
   subst hp
-  letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
-  haveI : CharP (GaloisField 3 q) 3 := by
+  let : Fintype (GaloisField 3 q) := Fintype.ofFinite _
+  have : CharP (GaloisField 3 q) 3 := by
     rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
     exact ZMod.charP 3
   have hcard : Fintype.card (GaloisField 3 q) = 3 ^ q := by

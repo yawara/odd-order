@@ -101,7 +101,7 @@ theorem Hypothesis.nineElevenSevenEightRefutationS [Finite G]
         (c₃.extension lam) = 0) :
     False := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   obtain ⟨c₁⟩ := hS₂cohD
   -- ── ambient family facts
   have hSfin : (sSet (hyp.toTypesIIIIIIVSetupS hG)).Finite :=

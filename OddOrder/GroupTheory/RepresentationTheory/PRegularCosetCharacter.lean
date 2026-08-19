@@ -46,7 +46,7 @@ and the two commute. -/
 theorem pRegularPart_pow_mul (hp : p.Prime) (hu : IsPRegular p u) (hPp : IsPGroup p ↥P)
     (hcomm : ∀ v ∈ P, Commute u v) (a : ℕ) {v : G} (hv : v ∈ P) :
     pRegularPart p (u ^ a * v) = u ^ a := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   refine ((eq_pPart_of_commute hp ?_ (isPElement_of_mem_of_isPGroup hPp hv) (hu.pow a) rfl).2).symm
   exact ((hcomm v hv).pow_left a).symm
 

@@ -33,7 +33,7 @@ dimension `d` with `q = k·d`, forcing `(k, d) ∈ {(1, q), (q, 1)}`.  The start
 theorem chiefFactor_quotient_card [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
     (chief : ChiefFactorData data) :
     Nat.card (↥data.H ⧸ chief.N) = chief.p ^ data.q := by
-  haveI := chief.N_normal
+  have := chief.N_normal
   have hH0card : Nat.card ↥chief.H0 = Nat.card ↥chief.N := by
     rw [chief.H0_eq]
     exact (Nat.card_congr (Subgroup.equivMapOfInjective chief.N data.H.subtype
@@ -54,7 +54,7 @@ theorem chiefFactor_card_fixedByE [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
     Nat.card ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1
       chief.N_aInvariant).fixedByE = chief.p := by
-  haveI := chief.N_normal
+  have := chief.N_normal
   have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
   have hHbar : Nat.card (↥data.H ⧸ chief.N) ≠ 1 := by
     rw [chiefFactor_quotient_card chief]
@@ -76,7 +76,7 @@ theorem chiefFactor_exists_fixedByE_ne_one [Finite G] {M : Subgroup G}
     ∃ s : ↥data.H ⧸ chief.N,
       s ∈ (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
         chief.N_aInvariant).fixedByE ∧ s ≠ 1 := by
-  haveI := chief.N_normal
+  have := chief.N_normal
   have hbot : (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
       chief.N_aInvariant).fixedByE ≠ ⊥ := by
     intro h
@@ -96,7 +96,7 @@ theorem chiefFactor_W2_not_le_H0 [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
     ¬ data.W2 ≤ chief.H0 := by
   change ¬ data.typeP.W2 ≤ chief.H0
-  haveI := chief.N_normal
+  have := chief.N_normal
   have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
   have hfixne : (typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant).fixedByE ≠ ⊥ := by
     intro h
@@ -107,7 +107,7 @@ theorem chiefFactor_W2_not_le_H0 [Finite G] {M : Subgroup G}
   have hcopHW1 : Nat.Coprime
       (Nat.card ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))) (Nat.card ↥data.H) :=
     (typeP_coprime_H_uW1 data.typeP hU).symm.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _)
-  haveI : IsSolvable ↥data.H := (typeP_coprimeAction data.typeP hU).H_solvable
+  have : Group.IsSolvable ↥data.H := (typeP_coprimeAction data.typeP hU).H_solvable
   have hmap : (fixedSubgroup (typeP_conjAction data.typeP)
       (data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))).map (QuotientGroup.mk' chief.N)
       = (typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant).fixedByE :=
@@ -176,7 +176,7 @@ theorem chiefFactor_card_W2bar [Finite G] {M : Subgroup G}
     [(chief.H0.subgroupOf M).Normal] :
     Nat.card ↥((data.W2.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M)))
       = chief.p := by
-  haveI := chief.N_normal
+  have := chief.N_normal
   have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
   -- The quotient chief-factor action and `|fixedByE| = p`.
   have hHbar : Nat.card (↥data.typeP.H ⧸ chief.N) ≠ 1 := by
@@ -193,7 +193,7 @@ theorem chiefFactor_card_W2bar [Finite G] {M : Subgroup G}
       (Nat.card ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))) (Nat.card
           ↥data.typeP.H) :=
     (typeP_coprime_H_uW1 data.typeP hU).symm.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _)
-  haveI : IsSolvable ↥data.typeP.H := (typeP_coprimeAction data.typeP hU).H_solvable
+  have : Group.IsSolvable ↥data.typeP.H := (typeP_coprimeAction data.typeP hU).H_solvable
   -- `F = C_H(W₁)`, with `F.map(mk' N) = fixedByE` and `F.map H.subtype = W₂`.
   set F := fixedSubgroup (typeP_conjAction data.typeP)
     (data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) with hF
@@ -540,7 +540,7 @@ theorem sum_comp_mk'_eq {Γ : Type*} [Group Γ] [Fintype Γ] (N : Subgroup Γ) [
 theorem card_eq_card_subgroup_mul_card_map_mk' {Γ : Type*} [Group Γ] [Finite Γ]
     {N H : Subgroup Γ} [N.Normal] (hNH : N ≤ H) :
     Nat.card ↥H = Nat.card ↥N * Nat.card ↥(H.map (QuotientGroup.mk' N)) := by
-  haveI : Fintype Γ := Fintype.ofFinite Γ
+  have : Fintype Γ := Fintype.ofFinite Γ
   set φ := (QuotientGroup.mk' N).comp H.subtype with hφ
   have hrange : φ.range = H.map (QuotientGroup.mk' N) := by
     rw [hφ, MonoidHom.range_comp, Subgroup.range_subtype]
@@ -569,7 +569,7 @@ theorem induce_compHom_subgroupMap_mk' {Γ : Type*} [Group Γ] [Fintype Γ] (N :
       = ClassFunction.compHom (QuotientGroup.mk' N)
           (ClassFunction.induce (H.map (QuotientGroup.mk' N)) χbar) := by
   have hker : (QuotientGroup.mk' N).ker ≤ H := by rw [QuotientGroup.ker_mk']; exact hNH
-  haveI : Invertible (Nat.card ↥N : ℂ) :=
+  have : Invertible (Nat.card ↥N : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   have hnorm : (Nat.card ↥H : ℂ)
       = (Nat.card ↥N : ℂ) * (Nat.card ↥(H.map (QuotientGroup.mk' N)) : ℂ) := by
@@ -645,7 +645,7 @@ noncomputable def chiefFactorQuotientHypothesisGen [Finite G] {M : Subgroup G}
       le_bot_iff.mp (le_trans (le_inf le_rfl hle) hW1inf.le)
     rw [Subgroup.subgroupOf_eq_bot] at hbot
     exact data.typeP.W1_nontrivial (disjoint_self.mp (hbot.mono_right data.typeP.W1_le))
-  · haveI : IsCyclic ↥(data.W1.subgroupOf M) :=
+  · have : IsCyclic ↥(data.W1.subgroupOf M) :=
       isCyclic_of_injective (Subgroup.subgroupOfEquivOfLe data.typeP.W1_le).toMonoidHom
         (Subgroup.subgroupOfEquivOfLe data.typeP.W1_le).injective
     rw [show (data.W1.subgroupOf M).map (QuotientGroup.mk' N')
@@ -654,8 +654,8 @@ noncomputable def chiefFactorQuotientHypothesisGen [Finite G] {M : Subgroup G}
     exact isCyclic_of_surjective _ (MonoidHom.rangeRestrict_surjective _)
   · rw [ne_eq, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
     exact hW2notle
-  · haveI : IsCyclic ↥data.W2 := data.typeP.W2_cyclic
-    haveI : IsCyclic ↥(data.W2.subgroupOf M) :=
+  · have : IsCyclic ↥data.W2 := data.typeP.W2_cyclic
+    have : IsCyclic ↥(data.W2.subgroupOf M) :=
       isCyclic_of_injective (Subgroup.subgroupOfEquivOfLe hW2leM).toMonoidHom
         (Subgroup.subgroupOfEquivOfLe hW2leM).injective
     rw [show (data.W2.subgroupOf M).map (QuotientGroup.mk' N')
@@ -810,9 +810,9 @@ theorem exists_supIndep_aInvariant_family_of_iSup {K : Type*} [Group K] [Finite 
     ∃ t : Finset ι, t.SupIndep S ∧ (∀ i ∈ t, S i ≠ ⊥) ∧ (⨆ i ∈ t, S i = ⊤) ∧
       Nat.card K = n ^ t.card := by
   classical
-  letI : Fintype ι := Fintype.ofFinite ι
+  let : Fintype ι := Fintype.ofFinite ι
   -- `K` is abelian, so its subgroup lattice is modular (used to enlarge `SupIndep` families).
-  letI : CommGroup K := { (inferInstance : Group K) with mul_comm := fun a b => (hcomm a b).eq }
+  let : CommGroup K := { (inferInstance : Group K) with mul_comm := fun a b => (hcomm a b).eq }
   -- Candidate finsets: `SupIndep` subfamilies of nonzero pieces.
   set cands : Finset (Finset ι) :=
     Finset.univ.filter (fun t => t.SupIndep S ∧ ∀ i ∈ t, S i ≠ ⊥) with hcands
@@ -946,7 +946,7 @@ theorem iSup_phi_smul_eq_iSup_W_of_normal {A K : Type*} [Group A] [Group K]
     {φ : A →* MulAut K} {U W : Subgroup A} (hU : U.Normal) {S₀ : Subgroup K}
     (hS₀ : IsAInvariant (φ.comp U.subtype) S₀) :
     ⨆ a : ↥(U ⊔ W), φ ↑a • S₀ = ⨆ w : ↥W, φ ↑w • S₀ := by
-  haveI := hU
+  have := hU
   apply le_antisymm
   · rw [iSup_le_iff]
     rintro ⟨a, ha⟩
@@ -1008,9 +1008,9 @@ theorem elabRepresentation_isIrreducible {A K : Type*} [Group A] [CommGroup K] {
     simp only [hΦ, OrderIso.trans_apply, AddSubgroup.mem_toSubgroup',
       AddSubgroup.toZModSubmodule_symm, Submodule.mem_toAddSubgroup]
   have hbot_ne_top : (⊥ : Subrepresentation (elabRepresentation p φ)) ≠ ⊤ := by
-    haveI : Nontrivial (Additive K) := hnt
+    have : Nontrivial (Additive K) := hnt
     exact fun h => bot_ne_top (congrArg Subrepresentation.toSubmodule h)
-  haveI : Nontrivial (Subrepresentation (elabRepresentation p φ)) := ⟨⊥, ⊤, hbot_ne_top⟩
+  have : Nontrivial (Subrepresentation (elabRepresentation p φ)) := ⟨⊥, ⊤, hbot_ne_top⟩
   refine IsSimpleOrder.of_forall_eq_top fun S hSne => ?_
   have hJinv : IsAInvariant φ (Φ S.toSubmodule) := by
     rw [isAInvariant_iff_smul_mem]
@@ -1040,7 +1040,7 @@ theorem elabRepresentation_isSimpleModule_and_faithful
     IsSimpleModule (MonoidAlgebra (ZMod p) A) (elabRepresentation p φ).asModule ∧
       ∀ a : A, (∀ y : (elabRepresentation p φ).asModule,
         MonoidAlgebra.of (ZMod p) A a • y = y) → a = 1 := by
-  haveI hirrep : IsSimpleOrder (Subrepresentation (elabRepresentation p φ)) :=
+  have hirrep : IsSimpleOrder (Subrepresentation (elabRepresentation p φ)) :=
     elabRepresentation_isIrreducible hnt hirr
   refine ⟨?_, ?_⟩
   · rw [isSimpleModule_iff]
@@ -1133,11 +1133,11 @@ theorem exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative
     {φ : ClassFunction Γ ℂ} (hφ : IsIrreducibleCharacter φ) :
     ∃ θ : Γ →* ℂˣ, ∀ g, (θ g : ℂ) = φ g := by
   obtain ⟨V, _, _, _, ρ, hρ, hχ⟩ := hφ
-  haveI : ρ.IsIrreducible := hρ
+  have : ρ.IsIrreducible := hρ
   have hfin : Module.finrank ℂ V = 1 :=
     Representation.IsIrreducible.finrank_eq_one_of_isMulCommutative ρ
-  haveI : FiniteDimensional ℂ V := .of_finrank_eq_succ hfin
-  haveI : Nontrivial V := Module.nontrivial_of_finrank_eq_succ hfin
+  have : FiniteDimensional ℂ V := .of_finrank_eq_succ hfin
+  have : Nontrivial V := Module.nontrivial_of_finrank_eq_succ hfin
   obtain ⟨x, hx⟩ := exists_ne (0 : V)
   -- `span {x} = ⊤` (1-dimensional), so a linear map is determined by its value on `x`.
   have hspan : Submodule.span ℂ ({x} : Set V) = ⊤ := by
@@ -1242,8 +1242,8 @@ theorem singerAdapter_isCyclic_card_dvd
     IsCyclic A ∧ Nat.card A ∣ Nat.card K - 1 := by
   obtain ⟨hsimp, hfaith'⟩ :=
     elabRepresentation_isSimpleModule_and_faithful (p := p) hnt hirr hfaith
-  haveI := hsimp
-  haveI : Finite (elabRepresentation p φ).asModule := ‹Finite K›
+  have := hsimp
+  have : Finite (elabRepresentation p φ).asModule := ‹Finite K›
   obtain ⟨hcyc, hdvd⟩ := isCyclic_and_card_dvd_of_faithful_irreducible_comm
     (E := A) (M := (elabRepresentation p φ).asModule) (p := p) hcomm hfaith'
   exact ⟨hcyc, by
@@ -1267,8 +1267,8 @@ theorem singerAdapter_coprime_fpf
     Nat.Coprime (Nat.card A) (p - 1) := by
   obtain ⟨hsimp, hfaith'⟩ :=
     elabRepresentation_isSimpleModule_and_faithful (p := p) hnt hirr hfaith
-  haveI := hsimp
-  haveI : Finite (elabRepresentation p φ).asModule := ‹Finite K›
+  have := hsimp
+  have : Finite (elabRepresentation p φ).asModule := ‹Finite K›
   obtain ⟨τ, hτfpf⟩ := exists_addEquiv_asModule_fpf (p := p) (φ := φ) σ hfpf
   exact coprime_card_sub_one_of_faithful_irreducible_comm_fpf
     (E := A) (M := (elabRepresentation p φ).asModule) hcomm hfaith' τ hτfpf
@@ -1282,8 +1282,8 @@ factor `H₁` embeds `U/C_U(H₁)` into the cyclic `Aut(H₁)`). -/
 theorem card_range_dvd_card_sub_one_of_prime_card {A K : Type*} [Group A] [Group K] [Finite K]
     (φ : A →* MulAut K) (hp : (Nat.card K).Prime) :
     Nat.card ↥φ.range ∣ Nat.card K - 1 := by
-  haveI : Fact (Nat.card K).Prime := ⟨hp⟩
-  haveI : IsCyclic K := isCyclic_of_prime_card rfl
+  have : Fact (Nat.card K).Prime := ⟨hp⟩
+  have : IsCyclic K := isCyclic_of_prime_card rfl
   calc Nat.card ↥φ.range ∣ Nat.card (MulAut K) := Subgroup.card_subgroup_dvd_card _
     _ = Nat.totient (Nat.card K) := IsCyclic.card_mulAut K
     _ = Nat.card K - 1 := Nat.totient_prime hp

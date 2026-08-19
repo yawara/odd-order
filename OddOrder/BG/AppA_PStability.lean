@@ -22,7 +22,7 @@ prefix-split 履歴 = issue 0103 第 2 パス → issue 0142 で A.3 クラス�
   `O_p(G) = ⊥` ⇒ `IsPStable p G` (A.3 の対偶).
 * `OddOrder.BG.AppA.thmA4b` / `thmA4c` — **BG Theorem A.4(b)(c)**: solvable 版.
 * `OddOrder.BG.AppA.thmA5_part1` / `thmA5_part2` — **BG Theorem A.5**.
-* `OddOrder.BG.AppA.isPStableOp_of_odd_solvable` — Glauberman ZJ (Thm 2.10/2.11)
+* `OddOrder.BG.AppA.isPStableOp_of_odd_isSolvable` — Glauberman ZJ (Thm 2.10/2.11)
   の仮定形への bridge.
 -/
 namespace OddOrder.BG.AppA
@@ -63,7 +63,7 @@ private theorem coprime_chainStabilizer_le_centralizer
     {M : Type*} [Group M] [Finite M]
     {K : Subgroup M} [K.Normal] (_hK : IsPGroup p K)
     {D : Subgroup M} (hcop : (Nat.card ↥D).Coprime (Nat.card ↥K))
-    (hsolv : IsSolvable ↥D ∨ IsSolvable ↥K)
+    (hsolv : Group.IsSolvable ↥D ∨ Group.IsSolvable ↥K)
     (hstab : ∀ i, ⁅chiefSeriesInside K i, D⁆ ≤ chiefSeriesInside K (i + 1)) :
     D ≤ Subgroup.centralizer (K : Set M) := by
   classical
@@ -164,12 +164,12 @@ factor (`isChiefFactor_chiefSeriesInside`) の場合:
    `ρ' ā = 1` ⇒ faithful で `ā = 1` ⇒ `Ā = 1` ⇒ `A ⊆ H_i` ⇒ `⁅U, A⁆ ≤ V`. ∎
 
 主要 API: `isChiefFactor_chiefSeriesInside`, `IsChiefFactor.isMinimalNormal_map_quotient`,
-`solvable_minimal_normal_isElementaryAbelian`, `AddCommGroup.zmodModule`,
+`minimal_normal_isElementaryAbelian_of_isSolvable`, `AddCommGroup.zmodModule`,
 `OddOrder.BG.Ch1_Preliminary.mulAutToEnd` (共有版, `OperatorMaschke`),
 `IsPGroup.invariants_ne_bot` (step 3 の O_p=1), `thmA4a`, `baseChangeRepresentation`
 (+ `_faithful`). -/
 private theorem stability_perFactor
-    {M : Type*} [Group M] [Finite M] [IsSolvable M]
+    {M : Type*} [Group M] [Finite M] [Group.IsSolvable M]
     (hp_odd : p ≠ 2) (hodd : Odd (Nat.card M))
     {K : Subgroup M} [K.Normal] (hK : IsPGroup p K)
     {A : Subgroup M} (hA_p : IsPGroup p A)
@@ -183,18 +183,18 @@ private theorem stability_perFactor
     isChiefFactor_chiefSeriesInside hU0
   set U : Subgroup M := chiefSeriesInside K i with hUdef
   set V : Subgroup M := chiefSeriesInside K (i + 1) with hVdef
-  haveI hVn : V.Normal := hchief.normal_bot
-  haveI hUn : U.Normal := hchief.normal_top
+  have hVn : V.Normal := hchief.normal_bot
+  have hUn : U.Normal := hchief.normal_top
   -- reduce to A ≤ C_M(U/V)
   suffices hAC : A ≤ chiefFactorCentralizer U V from
     chiefFactorCentralizer.commutator_le_of_le hAC
   -- W := U/V as a (normal, minimal-normal) subgroup of M/V
   set W : Subgroup (M ⧸ V) := U.map (QuotientGroup.mk' V) with hWdef
-  haveI hWn : W.Normal := hUn.map _ (QuotientGroup.mk'_surjective V)
+  have hWn : W.Normal := hUn.map _ (QuotientGroup.mk'_surjective V)
   have hMin : OddOrder.Isaacs.Ch02.IsMinimalNormal W := hchief.isMinimalNormal_map_quotient
   have hW_ne_bot : W ≠ ⊥ := hMin.2.1
   obtain ⟨q, hq_prime, hElem⟩ :=
-    OddOrder.Isaacs.Ch03.solvable_minimal_normal_isElementaryAbelian hMin
+    OddOrder.Isaacs.Ch03.minimal_normal_isElementaryAbelian_of_isSolvable hMin
   -- the elementary-abelian prime is p (W is a section of the p-group K)
   have hq_eq_p : q = p := by
     have hUp : IsPGroup p ↥U := by
@@ -202,9 +202,9 @@ private theorem stability_perFactor
     have hWp : IsPGroup p ↥W := by
       rw [hWdef]; exact hUp.map (QuotientGroup.mk' V)
     have hElemG : OddOrder.GroupTheory.IsElementaryAbelian q ↥W := hElem
-    haveI : Fact q.Prime := ⟨hq_prime⟩
+    have : Fact q.Prime := ⟨hq_prime⟩
     have hp_prime : p.Prime := Fact.out
-    haveI : Nontrivial ↥W := (Subgroup.nontrivial_iff_ne_bot W).mpr hW_ne_bot
+    have : Nontrivial ↥W := (Subgroup.nontrivial_iff_ne_bot W).mpr hW_ne_bot
     obtain ⟨x, hx⟩ := exists_ne (1 : ↥W)
     obtain ⟨ka, hka⟩ := IsPGroup.iff_orderOf.mp hElemG.isPGroup x
     obtain ⟨kb, hkb⟩ := IsPGroup.iff_orderOf.mp hWp x
@@ -216,16 +216,16 @@ private theorem stability_perFactor
   rw [hq_eq_p] at hElem
   have hElemT : OddOrder.GroupTheory.IsElementaryAbelian p ↥W := hElem
   -- module structure on Additive ↥W
-  haveI hWcomm : IsMulCommutative ↥W :=
+  have hWcomm : IsMulCommutative ↥W :=
     ⟨⟨fun a b => hElemT.comm a b⟩⟩
   have hpsmul : ∀ x : Additive ↥W, (p : ℕ) • x = 0 := by
     intro x
     apply Additive.toMul.injective
     rw [toMul_nsmul, toMul_zero]
     exact hElemT.pow_eq_one x.toMul
-  haveI hWmod : Module (ZMod p) (Additive ↥W) := AddCommGroup.zmodModule hpsmul
-  haveI hWnt : Nontrivial ↥W := (Subgroup.nontrivial_iff_ne_bot W).mpr hW_ne_bot
-  haveI : Finite ↥W := inferInstance
+  have hWmod : Module (ZMod p) (Additive ↥W) := AddCommGroup.zmodModule hpsmul
+  have hWnt : Nontrivial ↥W := (Subgroup.nontrivial_iff_ne_bot W).mpr hW_ne_bot
+  have : Finite ↥W := inferInstance
   -- the conjugation representation ρ : M → End (Additive ↥W)
   set ρ : Representation (ZMod p) M (Additive ↥W) :=
     (OddOrder.BG.Ch1_Preliminary.mulAutToEnd ↥W p).comp
@@ -256,7 +256,7 @@ private theorem stability_perFactor
       simp only [hρ_apply, Module.End.one_apply, h, ofMul_toMul]
   -- quotient M̄ := M / C and the lifted (faithful) representation
   set C : Subgroup M := chiefFactorCentralizer U V with hCdef
-  haveI hCn : C.Normal := chiefFactorCentralizer.normal
+  have hCn : C.Normal := chiefFactorCentralizer.normal
   have hC_le_ker : C ≤ (ρ : M →* _).ker := fun g hg => (hker g).mpr hg
   set ρbar : Representation (ZMod p) (M ⧸ C) (Additive ↥W) :=
     QuotientGroup.lift C ρ hC_le_ker with hρbardef
@@ -271,7 +271,7 @@ private theorem stability_perFactor
   have hOp : OddOrder.Isaacs.Ch01.opCore p (M ⧸ C) = ⊥ := by
     set Q : Subgroup (M ⧸ C) := OddOrder.Isaacs.Ch01.opCore p (M ⧸ C) with hQdef
     have hQp : IsPGroup p ↥Q := OddOrder.Isaacs.Ch01.opCore_isPGroup p (M ⧸ C)
-    haveI hQn : Q.Normal := OddOrder.Isaacs.Ch01.opCore.normal p (M ⧸ C)
+    have hQn : Q.Normal := OddOrder.Isaacs.Ch01.opCore.normal p (M ⧸ C)
     -- the restriction of `ρbar` to `Q`, and its (nonzero) invariant submodule
     set σ : Representation (ZMod p) ↥Q (Additive ↥W) := ρbar.comp Q.subtype with hσdef
     have hσ_apply : ∀ (q : ↥Q) (z : Additive ↥W), σ q z = ρbar (Q.subtype q) z :=
@@ -408,7 +408,7 @@ private theorem stability_perFactor
     rw [hKAA] at hc2
     rw [Subgroup.mem_bot.mp hc2, map_one]
   set Kalg := AlgebraicClosure (ZMod p)
-  haveI : CharP Kalg p := inferInstance
+  have : CharP Kalg p := inferInstance
   have hρ'_faithful : Function.Injective (baseChangeRepresentation Kalg ρbar) :=
     baseChangeRepresentation_faithful Kalg ρbar hρbar_faithful
   have hquad' :
@@ -443,7 +443,7 @@ open OddOrder.GroupTheory in
 [= `chiefSeries_stabilizer_isPGroup`]. (4) `H ◁ M` かつ `H/C` p-群 ⇒
 `H/C ⊆ O_p(M/C)` (`normal_pgroup_le_opCore`), `A ≤ H` で結論. -/
 private theorem stabilityLiftAux
-    {M : Type*} [Group M] [Finite M] [IsSolvable M]
+    {M : Type*} [Group M] [Finite M] [Group.IsSolvable M]
     (hp_odd : p ≠ 2) (hodd : Odd (Nat.card M))
     {K : Subgroup M} [K.Normal] (hK : IsPGroup p K)
     {A : Subgroup M} (hA_p : IsPGroup p A)
@@ -452,7 +452,7 @@ private theorem stabilityLiftAux
     A.map (QuotientGroup.mk' C₀) ≤ OddOrder.Isaacs.Ch01.opCore p (M ⧸ C₀) := by
   subst hC₀
   classical
-  haveI hCnorm : (Subgroup.centralizer (K : Set M)).Normal := inferInstance
+  have hCnorm : (Subgroup.centralizer (K : Set M)).Normal := inferInstance
   -- `H := ⨅ᵢ C_M(Pᵢ/Pᵢ₊₁)`, intersection of chief-factor centralizers of the N-chief series of K.
   set H : Subgroup M :=
     ⨅ i : ℕ, chiefFactorCentralizer (chiefSeriesInside K i) (chiefSeriesInside K (i + 1))
@@ -476,7 +476,7 @@ private theorem stabilityLiftAux
     rw [chiefFactorCentralizer.le_iff_commutator_le]
     exact stability_perFactor hp_odd hodd hK hA_p hKAA i
   -- (3) `H ◁ M`.
-  haveI hHnorm : H.Normal := by
+  have hHnorm : H.Normal := by
     rw [hH]; exact Subgroup.normal_iInf_normal (fun _ => inferInstance)
   -- (4) `H / C_M(K)` is a p-group (Gorenstein 6.5.3 steps 4-5, coprime stability).
   have hHmap_pgroup :
@@ -503,8 +503,8 @@ private theorem stabilityLiftAux
     have hstabD' : ∀ i,
         ⁅chiefSeriesInside K i, D.map H.subtype⁆ ≤ chiefSeriesInside K (i + 1) :=
       fun i => le_trans (Subgroup.commutator_mono le_rfl (Subgroup.map_subtype_le D)) (hH_stab i)
-    have hsolvD' : IsSolvable ↥(D.map H.subtype) ∨ IsSolvable ↥K := by
-      haveI := hK.isNilpotent; exact Or.inr inferInstance
+    have hsolvD' : Group.IsSolvable ↥(D.map H.subtype) ∨ Group.IsSolvable ↥K := by
+      have := hK.isNilpotent; exact Or.inr inferInstance
     have hD'C : D.map H.subtype ≤ Subgroup.centralizer (K : Set M) :=
       coprime_chainStabilizer_le_centralizer hK hcop hsolvD' hstabD'
     have hDC : D ≤ (Subgroup.centralizer (K : Set M)).subgroupOf H :=
@@ -534,7 +534,7 @@ private theorem stabilityLiftAux
       rw [hcard_eq, ← hk]; exact Subgroup.index_dvd_of_le hDC
     obtain ⟨j, _, hj⟩ := (Nat.dvd_prime_pow Fact.out).mp hdvd
     exact ⟨j, hj⟩
-  haveI hHmap_norm :
+  have hHmap_norm :
       (H.map (QuotientGroup.mk' (Subgroup.centralizer (K : Set M)))).Normal :=
     hHnorm.map _ (QuotientGroup.mk'_surjective _)
   calc A.map (QuotientGroup.mk' (Subgroup.centralizer (K : Set M)))
@@ -552,7 +552,7 @@ private theorem stabilityLiftAux
 成立 (Gorenstein 6.5.3 proof 末尾)。奇数位数可解 `G` では全 section が `O_p=1` で p-stable
 (= `thmA4a` = `thmA3` 対偶) ⇒ condition (B)。step 分解の記録は
 issue [#0047](../../issues/closed/0047-bg-appa-a4.md) (closed)。 -/
-theorem thmA4c [Finite G] (hp_odd : p ≠ 2) (hsolv : IsSolvable G)
+theorem thmA4c [Finite G] (hp_odd : p ≠ 2) (hsolv : Group.IsSolvable G)
     (hodd : Odd (Nat.card G))
     {P : Subgroup G} (hP : IsPGroup p P)
     (_hPnorm : (OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G ⊔ P).Normal)
@@ -564,7 +564,7 @@ theorem thmA4c [Finite G] (hp_odd : p ≠ 2) (hsolv : IsSolvable G)
       ≤ OddOrder.Isaacs.Ch01.opCore p
           (↥(Subgroup.normalizer (P : Set G)) ⧸
             (Subgroup.centralizer (P : Set G)).subgroupOf (Subgroup.normalizer (P : Set G))) := by
-  haveI : IsSolvable G := hsolv
+  have : Group.IsSolvable G := hsolv
   have hP_le_N : P ≤ Subgroup.normalizer (P : Set G) := Subgroup.le_normalizer
   -- `P.subgroupOf N`, `A.subgroupOf N` inherit the `p`-group property (`≃* P`, `≃* A`).
   have hKp : IsPGroup p ↥(P.subgroupOf (Subgroup.normalizer (P : Set G))) :=
@@ -602,11 +602,11 @@ theorem thmA4c [Finite G] (hp_odd : p ≠ 2) (hsolv : IsSolvable G)
 `centralizer_opCore_le_opCore_of_oPiCorePrime_eq_bot`) で `C_Ḡ(R̄)` は `p`-群 ⇒ 商を
 引き戻して `Ā ⊆ R̄ = O_p(Ḡ)` ⇒ `A ⊆ O_{p',p}(G)`。Gorenstein の Remark (A.4(c) の系) が
 隠す "`A ⊆ P`" 推論を回避するため, A.4(c) でなく 5.2 自身 (= `stabilityLiftAux@K=O_p(Ḡ)`) を翻訳。 -/
-theorem thmA4b [Finite G] (hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd : Odd (Nat.card G))
+theorem thmA4b [Finite G] (hp_odd : p ≠ 2) (hsolv : Group.IsSolvable G) (hodd : Odd (Nat.card G))
     (P : Sylow p G) {A : Subgroup G} (hA_le : A ≤ (P : Subgroup G))
     (hA_norm : (P : Subgroup G) ≤ Subgroup.normalizer (A : Set G)) [IsMulCommutative A] :
     A ≤ OddOrder.Isaacs.Ch03.oPiPrimePiCore ({p} : Set ℕ) G := by
-  haveI : IsSolvable G := hsolv
+  have : Group.IsSolvable G := hsolv
   set N : Subgroup G := OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G with hN
   set mk := QuotientGroup.mk' N with hmk
   set Abar : Subgroup (G ⧸ N) := A.map mk with hAbar
@@ -676,12 +676,12 @@ theorem thmA4b [Finite G] (hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd : Odd 
 のインターフェース形): `p` odd, `M` odd solvable なら `IsPStableOp p M`
 (`GroupTheory/GlaubermanZJ.lean` の Thm 2.10/2.11 の仮定形; issue 3017/3024 の
 discharge 用). -/
-theorem isPStableOp_of_odd_solvable {M : Type*} [Group M] [Finite M]
-    (hp_odd : p ≠ 2) (hsolv : IsSolvable M) (hodd : Odd (Nat.card M)) :
+theorem isPStableOp_of_odd_isSolvable {M : Type*} [Group M] [Finite M]
+    (hp_odd : p ≠ 2) (hsolv : Group.IsSolvable M) (hodd : Odd (Nat.card M)) :
     Subgroup.IsPStableOp p M := by
-  haveI : IsSolvable M := hsolv
+  have : Group.IsSolvable M := hsolv
   intro K A hKnorm hK hA hKAA
-  haveI := hKnorm
+  have := hKnorm
   exact stabilityLiftAux hp_odd hodd hK hA hKAA rfl
 
 open scoped commutatorElement in
@@ -691,14 +691,15 @@ open scoped commutatorElement in
 
 各生成子 `A` (abelian `p`-群, `P`-正規化) は `⁅P,A⁆ ≤ A` ∧ `⁅A,A⁆ = ⊥` ⇒ `⁅⁅P,A⁆,A⁆ = ⊥`
 なので `stabilityLiftAux` (`K := P`, `P ◁ G`) で `A·C/C ⊆ O_p(G/C)`。`X ≤ ⨆ A` を iSup で分解。 -/
-theorem thmA5_part1 [Finite G] (hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd : Odd (Nat.card G))
+theorem thmA5_part1 [Finite G] (hp_odd : p ≠ 2) (hsolv : Group.IsSolvable G) (hodd : Odd
+    (Nat.card G))
     {P : Subgroup G} [P.Normal] (hP : IsPGroup p P)
     {X : Subgroup G}
     (hX : X ≤ ⨆ A ∈ {A : Subgroup G | IsMulCommutative ↥A ∧ IsPGroup p ↥A ∧
         P ≤ Subgroup.normalizer (A : Set G)}, A) :
     X.map (QuotientGroup.mk' (Subgroup.centralizer (P : Set G)))
       ≤ OddOrder.Isaacs.Ch01.opCore p (G ⧸ Subgroup.centralizer (P : Set G)) := by
-  haveI : IsSolvable G := hsolv
+  have : Group.IsSolvable G := hsolv
   refine le_trans (Subgroup.map_mono hX) ?_
   rw [Subgroup.map_iSup]
   refine iSup_le fun A => ?_
@@ -728,7 +729,8 @@ then `X ⊆ O_p(G)`.
 `u ∈ C_G(Q) ⊆ Q` forces `u = 1`. (4) so `C` is a `p`-group (Cauchy), and `C ◁ G` gives `C ≤ Q`.
 (5) `C ≤ Q` lets part (1)'s `XC/C ⊆ O_p(G/C)` pull back (`comap`, `ker(mk' C) = C` a `p`-group)
 to `X ⊆ Q`. -/
-theorem thmA5_part2 [Finite G] (hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd : Odd (Nat.card G))
+theorem thmA5_part2 [Finite G] (hp_odd : p ≠ 2) (hsolv : Group.IsSolvable G)
+    (hodd : Odd (Nat.card G))
     {P : Subgroup G} [P.Normal] (hP : IsPGroup p P)
     {X : Subgroup G}
     (hX : X ≤ ⨆ A ∈ {A : Subgroup G | IsMulCommutative ↥A ∧ IsPGroup p ↥A ∧
@@ -736,7 +738,7 @@ theorem thmA5_part2 [Finite G] (hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd :
     (hOp' : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥)
     (hCP : Subgroup.centralizer (P : Set G) ⊓ OddOrder.Isaacs.Ch01.opCore p G ≤ P) :
     X ≤ OddOrder.Isaacs.Ch01.opCore p G := by
-  haveI : IsSolvable G := hsolv
+  have : Group.IsSolvable G := hsolv
   classical
   set Q : Subgroup G := OddOrder.Isaacs.Ch01.opCore p G with hQ
   set C : Subgroup G := Subgroup.centralizer (P : Set G) with hC
@@ -796,7 +798,7 @@ theorem thmA5_part2 [Finite G] (hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd :
         _ ≤ P.subgroupOf Q := hCQP_le_Psub
         _ ≤ Subgroup.fixedPointsOfMulAut φ := hPsub_le_fix
     -- coprimality + nilpotence for Prop 1.10
-    haveI : Group.IsNilpotent ↥Q := (OddOrder.Isaacs.Ch01.opCore_isPGroup p G).isNilpotent
+    have : Group.IsNilpotent ↥Q := (OddOrder.Isaacs.Ch01.opCore_isPGroup p G).isNilpotent
     have hcop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers u)) (Nat.card ↥Q) := by
       obtain ⟨n, hn⟩ := (OddOrder.Isaacs.Ch01.opCore_isPGroup p G).exists_card_eq
       rw [Nat.card_zpowers, hQ, hn]
@@ -833,7 +835,7 @@ theorem thmA5_part2 [Finite G] (hp_odd : p ≠ 2) (hsolv : IsSolvable G) (hodd :
     refine ⟨_, Nat.eq_prime_pow_of_unique_prime_dvd Nat.card_pos.ne' ?_⟩
     intro q hq hqdvd
     by_contra hqp
-    haveI : Fact q.Prime := ⟨hq⟩
+    have : Fact q.Prime := ⟨hq⟩
     obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' q hqdvd
     have hg_cop : (orderOf (g : G)).Coprime p := by
       rw [Subgroup.orderOf_coe, hg]

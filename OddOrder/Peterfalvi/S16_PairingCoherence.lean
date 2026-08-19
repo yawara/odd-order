@@ -125,7 +125,7 @@ theorem kernelIn_normal : (data.kernelIn).Normal := by
 
 theorem kernel_conj_mem : ∀ (l : ↥L) {h : G}, h ∈ data.kernel →
     (l : G) * h * (l : G)⁻¹ ∈ data.kernel := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   intro l h hh
   have hhL : h ∈ L := data.kernel_le hh
   have hmem : (⟨h, hhL⟩ : ↥L) ∈ data.kernelIn := Subgroup.mem_subgroupOf.mpr hh
@@ -169,7 +169,7 @@ noncomputable def d (i : Fin (data.n + 1)) : ℂ :=
 /-- `ζ_i(1) = d_i · ζ_0(1)`. -/
 theorem zeta_deg (i : Fin (data.n + 1)) :
     data.zeta i (1 : ↥L) = data.d i * data.zeta 0 (1 : ↥L) := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   rw [show data.zeta i (1 : ↥L)
       = ClassFunction.induce data.kernelIn (data.θ i : ClassFunction _ ℂ) (1 : ↥L) from rfl,
     ClassFunction.induce_apply_one data.kernelIn (data.θ i : ClassFunction _ ℂ),
@@ -181,7 +181,7 @@ theorem zeta_deg (i : Fin (data.n + 1)) :
 /-- `ζ_0(1) = ζ_{ind1H}(1)` (both are `[L:H]`). -/
 theorem zeta_deg_match :
     data.zeta 0 (1 : ↥L) = data.zeta data.ind1H (1 : ↥L) := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   change ClassFunction.induce data.kernelIn (data.θ 0 : ClassFunction _ ℂ) (1 : ↥L)
     = ClassFunction.induce data.kernelIn (data.θ data.ind1H : ClassFunction _ ℂ) (1 : ↥L)
   rw [data.deg0, data.triv]
@@ -193,7 +193,7 @@ theorem zeta_deg_match :
 theorem psi_support (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (i : Fin (data.n + 1)) :
     (data.zeta i - data.d i • data.zeta 0).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (typeIA L data.typeIHyp.typeI) L := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   refine (induce_diff_support (data.θ i) (data.θ 0) (data.d i) (data.zeta_deg i)).trans ?_
   intro x hx
   rw [Set.mem_sdiff, SetLike.mem_coe, Set.mem_singleton_iff] at hx
@@ -261,11 +261,12 @@ theorem h78_nu_eq : (data.h78 hG).nu = data.coh.extension := rfl
 /-- The kernel of `h78`'s (7.6) layer is the Fitting kernel (definitional). -/
 theorem h78_H_eq : (data.h78 hG).hyp76.H = data.kernel := rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **The distinguished `ζ_0` is irreducible** (Frobenius kernel induction,
 [Is] Thm 6.34). -/
 theorem h78_zeta_irreducible :
     IsIrreducibleCharacter ((data.h78 hG).hyp76.zeta (data.h78 hG).zetaDistinct) := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   rw [data.h78_zetaDistinct_eq, data.h78_zeta_eq]
   exact isIrreducibleCharacter_induce_of_frobeniusGroup data.hFrob (data.θ 0)
     data.theta_zero_ne_trivial
@@ -273,7 +274,7 @@ theorem h78_zeta_irreducible :
 /-- **The induced principal `ζ_{ind1H} = Ind 1_H` is a virtual character.** -/
 theorem h78_ind_mem_ZIrr :
     (data.h78 hG).hyp76.zeta (data.h78 hG).ind1H ∈ ZIrr ↥L := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   rw [data.h78_ind1H_eq, data.h78_zeta_eq]
   exact ClassFunction.induce_mem_ZIrr _ (data.θ data.ind1H).property.mem_ZIrr
 
@@ -286,7 +287,7 @@ image supported in the Dade support. -/
 
 /-- **The `(7.8)` coherent source set equals the (12.1) family `S`.** -/
 theorem h78_sourceSet_eq : (data.h78 hG).sourceSet = data.typeIHyp.Sset := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   ext φ
   constructor
   · rintro ⟨idx, hidx, rfl⟩
@@ -322,13 +323,14 @@ noncomputable def isCoherentSourceSet :
 theorem h78_nu_eq_isCoherentSourceSet :
     (data.h78 hG).nu = (data.isCoherentSourceSet hG).extension := rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **The conjugate `ζ̄_0` is a family member**: there is `j₁ ≠ ind1H` with
 `ζ_{j₁} = ζ̄_0` (`conjPerm` of the distinguished source is covered). -/
 theorem exists_conjIndex :
     ∃ j₁, j₁ ≠ (data.h78 hG).ind1H ∧
       (data.h78 hG).hyp76.zeta j₁
         = ((data.h78 hG).hyp76.zeta (data.h78 hG).zetaDistinct).conj := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   have hconj_eq : ((data.h78 hG).hyp76.zeta (data.h78 hG).zetaDistinct).conj
       = ClassFunction.induce data.kernelIn
           ((IrreducibleCharacter.conjPerm _ (data.θ 0)) : ClassFunction _ ℂ) := by
@@ -358,12 +360,13 @@ theorem exists_conjIndex :
         rw [e1, ClassFunction.conj_conj]
     _ = (data.h78 hG).hyp76.zeta ((data.h78 hG).ind1H) := e2
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **The distinguished `ζ_0` is not real** (odd order): it is a nontrivial irreducible
 (degree `[L:H] > 1`) of the odd-order group `L`. -/
 theorem h78_zeta_ne_conj (hodd : Odd (Nat.card G)) :
     (data.h78 hG).hyp76.zeta (data.h78 hG).zetaDistinct
       ≠ ((data.h78 hG).hyp76.zeta (data.h78 hG).zetaDistinct).conj := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   have hirr := data.h78_zeta_irreducible hG
   have hodd_L : Odd (Nat.card ↥L) := hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card _)
   -- The kernel is proper (complement nontrivial), so `[L:H] > 1`.
@@ -392,6 +395,7 @@ theorem h78_zeta_ne_conj (hodd : Odd (Nat.card G)) :
   intro h
   exact not_isReal_of_ne_trivial_of_odd_card' hodd_L hne_triv h.symm
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **`ζ_0 − ζ̄_0` is supported on `A(L)`** (equal degree; both vanish off `H`). -/
 theorem zeta_sub_conj_support (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {j₁ : Fin (data.n + 1)}
@@ -400,7 +404,7 @@ theorem zeta_sub_conj_support (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     ((data.h78 hG).hyp76.zeta (data.h78 hG).zetaDistinct
         - (data.h78 hG).hyp76.zeta j₁).support
       ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (typeIA L data.typeIHyp.typeI) L := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   have hdeg : (data.h78 hG).hyp76.zeta ((data.h78 hG).zetaDistinct) (1 : ↥L)
       = ((data.kernelIn).index : ℂ) := by
     rw [data.h78_zetaDistinct_eq, data.h78_zeta_eq]
@@ -419,6 +423,7 @@ theorem zeta_sub_conj_support (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [hx1, hdeg]
     simp
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **`ζ_0^ν − ζ̄_0^ν` is supported in the Dade support** (the coherent extension agrees
 with the Dade isometry on the equal-degree difference). -/
 theorem nu_zeta_sub_conj_support (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -428,7 +433,7 @@ theorem nu_zeta_sub_conj_support (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     ((data.h78 hG).nu ((data.h78 hG).hyp76.zeta (data.h78 hG).zetaDistinct)
         - (data.h78 hG).nu ((data.h78 hG).hyp76.zeta j₁)).support
       ⊆ (data.h78 hG).hyp76.hyp71.hyp.dadeSupport := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   have hzd_mem : (data.h78 hG).hyp76.zeta (data.h78 hG).zetaDistinct
       ∈ data.typeIHyp.Sset := by
     rw [data.h78_zetaDistinct_eq, data.h78_zeta_eq]
@@ -462,7 +467,7 @@ theorem nu_zeta_sub_conj_support (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 /-- `‖ζ_0‖² = 1` (Frobenius irreducibility of the distinguished induced member). -/
 theorem zeta_zero_norm_one :
     ClassFunction.inner (data.zeta 0) (data.zeta 0) = 1 := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   exact inner_self_induce_eq_one_of_frobeniusGroup data.hFrob (data.θ 0)
     data.theta_zero_ne_trivial
 
@@ -503,7 +508,7 @@ theorem zSpan_Sset_support_subset (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {φ : ClassFunction ↥L ℂ}
     (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan data.typeIHyp.Sset) (h1 : φ 1 = 0) :
     φ.support ⊆ data.typeIHyp.A := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   -- `ℤ[S] ⊆ {ψ | ψ.support ⊆ kernelIn}` by span induction.
   have hsuppH : ∀ ψ ∈ OddOrder.Peterfalvi.S07.zSpan data.typeIHyp.Sset,
       ψ.support ⊆ (data.kernelIn : Set ↥L) := by
@@ -539,7 +544,7 @@ theorem zSpan_Sset_support_subset (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
 /-- **The family `S` consists of irreducibles** (Frobenius kernel induction). -/
 theorem Sset_subset_irreducible :
     data.typeIHyp.Sset ⊆ irreducibleCharacters ↥L := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   rintro φ ⟨θ', hθ'_ne, rfl⟩
   exact mem_irreducibleCharacters.mpr
     (isIrreducibleCharacter_induce_of_frobeniusGroup data.hFrob θ' hθ'_ne)
@@ -549,7 +554,7 @@ theorem Sset_subset_irreducible :
 theorem Sset_closedUnderConjugate {φ : ClassFunction ↥L ℂ}
     (hφ : φ ∈ data.typeIHyp.Sset) :
     ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv φ ∈ data.typeIHyp.Sset := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   obtain ⟨θ', hθ'_ne, rfl⟩ := hφ
   have hbridge : ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
       (ClassFunction.induce data.kernelIn (θ' : ClassFunction _ ℂ))
@@ -597,7 +602,7 @@ theorem beta_conj_sub (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
         - (data.h78 hG).nu
             ((data.h78 hG).hyp76.zeta (data.h78 hG).zetaDistinct).conj := by
   classical
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   set hyp := data.typeIHyp.dadeData.dade with hhyp
   set dade := hyp.fullDadeIsometryData with hdade
   obtain ⟨j₁, hj₁ne, hj₁⟩ := data.exists_conjIndex hG
@@ -713,7 +718,7 @@ for `i ≠ ind1H` there is `i' ≠ ind1H` with `ζ_{i'} = ζ̄_i`. -/
 theorem exists_conjIndex_at {i : Fin (data.n + 1)} (hi : i ≠ data.ind1H) :
     ∃ i', i' ≠ (data.h78 hG).ind1H ∧
       (data.h78 hG).hyp76.zeta i' = ((data.h78 hG).hyp76.zeta i).conj := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   have hconj_eq : ((data.h78 hG).hyp76.zeta i).conj
       = ClassFunction.induce data.kernelIn
           ((IrreducibleCharacter.conjPerm _ (data.θ i)) : ClassFunction _ ℂ) := by
@@ -743,7 +748,7 @@ theorem exists_conjIndex_at {i : Fin (data.n + 1)} (hi : i ≠ data.ind1H) :
 theorem zeta_ne_conj_at {i : Fin (data.n + 1)} (hi : i ≠ data.ind1H)
     (hodd : Odd (Nat.card G)) :
     (data.h78 hG).hyp76.zeta i ≠ ((data.h78 hG).hyp76.zeta i).conj := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   have hirr : IsIrreducibleCharacter ((data.h78 hG).hyp76.zeta i) := by
     rw [data.h78_zeta_eq]
     exact isIrreducibleCharacter_induce_of_frobeniusGroup data.hFrob (data.θ i)
@@ -779,13 +784,14 @@ theorem zeta_ne_conj_at {i : Fin (data.n + 1)} (hi : i ≠ data.ind1H)
   intro h
   exact not_isReal_of_ne_trivial_of_odd_card' hodd_L hne_triv h.symm
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **`ζ_i − ζ̄_i` is supported on `A(L)`** for any `i ≠ ind1H`. -/
 theorem zeta_sub_conj_support_at (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {i i' : Fin (data.n + 1)}
     (hi' : (data.h78 hG).hyp76.zeta i' = ((data.h78 hG).hyp76.zeta i).conj) :
     ((data.h78 hG).hyp76.zeta i - (data.h78 hG).hyp76.zeta i').support
       ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (typeIA L data.typeIHyp.typeI) L := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   intro x hx
   rw [ClassFunction.mem_support, ClassFunction.sub_apply, hi', ClassFunction.conj_apply] at hx
   refine (mem_supportInSubgroup_sharp_subgroupOf_iff data.kernel
@@ -811,7 +817,7 @@ theorem nu_zeta_sub_conj_support_at (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     ((data.h78 hG).nu ((data.h78 hG).hyp76.zeta i)
         - (data.h78 hG).nu ((data.h78 hG).hyp76.zeta i')).support
       ⊆ (data.h78 hG).hyp76.hyp71.hyp.dadeSupport := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   have hzi_mem : (data.h78 hG).hyp76.zeta i ∈ data.typeIHyp.Sset := by
     rw [data.h78_zeta_eq]; exact data.zeta_mem_Sset hi
   have hi'_mem : (data.h78 hG).hyp76.zeta i' ∈ data.typeIHyp.Sset := by
@@ -842,7 +848,7 @@ theorem nu_zeta_sub_conj_support_at (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 theorem nu_zeta_norm_one {i : Fin (data.n + 1)} (hi : i ≠ (data.h78 hG).ind1H) :
     ClassFunction.inner ((data.h78 hG).nu ((data.h78 hG).hyp76.zeta i))
       ((data.h78 hG).nu ((data.h78 hG).hyp76.zeta i)) = 1 := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   rw [(data.h78 hG).nu_isometry i i hi hi]
   have hirr : IsIrreducibleCharacter ((data.h78 hG).hyp76.zeta i) := by
     rw [data.h78_zeta_eq]
@@ -854,7 +860,7 @@ theorem nu_zeta_norm_one {i : Fin (data.n + 1)} (hi : i ≠ (data.h78 hG).ind1H)
 `h78_zeta_irreducible`). -/
 theorem zeta_irreducible_at {i : Fin (data.n + 1)} (hi : i ≠ data.ind1H) :
     IsIrreducibleCharacter ((data.h78 hG).hyp76.zeta i) := by
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   rw [data.h78_zeta_eq]
   exact isIrreducibleCharacter_induce_of_frobeniusGroup data.hFrob (data.θ i)
     (data.theta_ne_trivial hi)

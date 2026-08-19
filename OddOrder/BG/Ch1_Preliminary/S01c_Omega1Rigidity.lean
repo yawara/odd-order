@@ -74,7 +74,7 @@ theorem actsTrivially_on_of_fixes_omega1 {p : ℕ} [Fact p.Prime] [Finite G]
     (φ : A →* MulAut G) {H : Subgroup G} (hH_inv : IsAInvariant φ H)
     (hfix : ∀ a : A, ∀ g ∈ H, g ^ p = 1 → φ a g = g) :
     ∀ a : A, ∀ g ∈ H, φ a g = g := by
-  haveI hHp : IsPGroup p ↥H := hG.to_subgroup H
+  have hHp : IsPGroup p ↥H := hG.to_subgroup H
   have habs : ∀ a : A, ∀ x : ↥H, (hH_inv.restrict a) x = x := by
     refine actsTrivially_of_fixes_omega1 hp_odd hHp hA_p' hH_inv.restrict ?_
     intro a x hxp
@@ -98,7 +98,7 @@ theorem actsTrivially_of_fixes_omega1_centralizer {p : ℕ} [Fact p.Prime] [Fini
     (φ : A →* MulAut G) {E : Subgroup G} (hE : E.IsElementaryAbelian p)
     (hfix : ∀ a : A, ∀ g ∈ Subgroup.centralizer (E : Set G), g ^ p = 1 → φ a g = g) :
     ∀ a : A, ∀ g : G, φ a g = g := by
-  haveI : Group.IsNilpotent G := hG.isNilpotent
+  have : Group.IsNilpotent G := hG.isNilpotent
   set C := Subgroup.fixedPointsOfMulAut φ with hC
   have hC_inv : IsAInvariant φ C := by
     rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]

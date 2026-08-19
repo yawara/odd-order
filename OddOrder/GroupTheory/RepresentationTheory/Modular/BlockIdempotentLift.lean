@@ -45,9 +45,9 @@ theorem exists_isIdempotentElem_blockCharacterPi_eq_single
     ∃ f : ↥(Subalgebra.center 𝒪 (MonoidAlgebra 𝒪 G)), IsIdempotentElem f ∧
       blockCharacterPi π hπ hlin (OddOrder.centerReduce (residue 𝒪) f) = Pi.single c 1 := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Finite (ConjClasses G) := Quotient.finite _
-  haveI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  have : Fintype G := Fintype.ofFinite G
+  have : Finite (ConjClasses G) := Quotient.finite _
+  have : Fintype (ConjClasses G) := Fintype.ofFinite _
   obtain ⟨e, ⟨hei, hec⟩, -⟩ := existsUnique_blockIdempotent π hπ hlin hnil c
   obtain ⟨f, ⟨hfi, hfr⟩, -⟩ :=
     OddOrder.existsUnique_isIdempotentElem_mapRingHom_eq_of_isAlgClosed

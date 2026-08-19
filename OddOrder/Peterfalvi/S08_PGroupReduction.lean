@@ -74,7 +74,7 @@ theorem exists_isPGroup_H_of_frobenius_of_card_le (hyp : SibleyDadeHypothesis G 
     (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
     (hbound : Nat.card (Abelianization ↥H) ≤ 4 * Nat.card ↥hyp.W1 ^ 2 + 1) :
     ∃ p : ℕ, Nat.Prime p ∧ IsPGroup p ↥H := by
-  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  let : Group.IsNilpotent ↥H := hyp.H_nilpotent
   exact isPGroup_of_isFrobeniusGroup_of_card_le hF (card_abelianization_H_odd hyp)
     (card_W1_odd hyp) hbound
 
@@ -96,10 +96,10 @@ theorem exists_isPGroup_H_of_c2_of_card_le (hyp : SibleyDadeHypothesis G L H)
       (w : ↥L) * (x : ↥L) * (w : ↥L)⁻¹ = (x : ↥L) → x ∈ commutator ↥H)
     (hbound : Nat.card (Abelianization ↥H) ≤ 4 * Nat.card ↥hyp.W1 ^ 2 + 1) :
     ∃ p : ℕ, Nat.Prime p ∧ IsPGroup p ↥H := by
-  letI : H.Normal := hyp.H_normal
-  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  let : H.Normal := hyp.H_normal
+  let : Group.IsNilpotent ↥H := hyp.H_nilpotent
   -- the `W₁`-conjugation action on `H`.
-  letI actH : MulDistribMulAction ↥hyp.W1 ↥H :=
+  let actH : MulDistribMulAction ↥hyp.W1 ↥H :=
     MulDistribMulAction.compHom H ((MulAut.conjNormal (H := H)).comp hyp.W1.subtype)
   have hsmulH : ∀ (a : ↥hyp.W1) (x : ↥H),
       ((a • x : ↥H) : ↥L) = (a : ↥L) * (x : ↥L) * (a : ↥L)⁻¹ := by
@@ -123,7 +123,7 @@ theorem exists_isPGroup_H_of_c2_of_card_le (hyp : SibleyDadeHypothesis G L H)
 `|L|` is odd, so `p` is an odd prime. -/
 theorem three_le_of_isPGroup_H (hyp : SibleyDadeHypothesis G L H)
     {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H) : 3 ≤ p := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨n, hn⟩ := hHp.exists_card_eq
   have hn0 : n ≠ 0 := by
     rintro rfl
@@ -180,15 +180,15 @@ theorem sq_le_card_abelianization_of_isPGroup_of_noncomm
     {P : Type*} [Group P] [Finite P] {p : ℕ} (hp : p.Prime) (hP : IsPGroup p P)
     (hnc : ¬ ∀ a b : P, a * b = b * a) :
     p ^ 2 ≤ Nat.card (Abelianization P) := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   by_contra hlt
   rw [not_le] at hlt
-  haveI hpg : IsPGroup p (Abelianization P) := hP.to_quotient (commutator P)
+  have hpg : IsPGroup p (Abelianization P) := hP.to_quotient (commutator P)
   obtain ⟨n, hn⟩ := hpg.exists_card_eq
   have hn2 : n < 2 := by
     by_contra h; rw [not_lt] at h
     exact absurd (hn.symm ▸ Nat.pow_le_pow_right hp.pos h) (not_le.mpr hlt)
-  haveI : IsCyclic (Abelianization P) :=
+  have : IsCyclic (Abelianization P) :=
     isCyclic_of_card_dvd_prime (p := p)
       (by rw [hn]; exact (pow_dvd_pow p (by omega : n ≤ 1)).trans (dvd_of_eq (pow_one p)))
   have hcyc : IsCyclic P :=
@@ -240,7 +240,7 @@ theorem nonempty_coherent_SOf_bot_of_index_dvd [Finite ↥L] [Group.IsNilpotent 
           (Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1 ≤
               2 * (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ (SOf ⊥) A0) := by
-  haveI := hHnorm
+  have := hHnorm
   by_contra hncoh
   -- If `|H:H′| > 4|L:H|² + 1`, the (6.3) oracle produces coherence — contradiction.
   have hle : Nat.card (↥H ⧸ (⁅H, H⁆ : Subgroup ↥L).subgroupOf H) ≤ 4 * H.index ^ 2 + 1 := by
@@ -259,9 +259,9 @@ theorem nonempty_coherent_SOf_bot_of_index_dvd [Finite ↥L] [Group.IsNilpotent 
   have hCodd : Odd (Nat.card ↥C) := Odd.of_dvd_nat hLodd C.card_subgroup_dvd_card
   -- **(6.5)(b) reduction:** the nilpotent Frobenius kernel `H` is a `p`-group.
   obtain ⟨p, hp, hHp⟩ := isPGroup_of_isFrobeniusGroup_of_card_le hF hHabodd hCodd hbound
-  haveI : Fact (Nat.Prime p) := ⟨hp⟩
+  have : Fact (Nat.Prime p) := ⟨hp⟩
   -- `p ∣ |H|` (nontrivial `p`-group), hence `p` odd and `|L:H| ∣ p − 1`.
-  haveI : Nontrivial ↥H := by
+  have : Nontrivial ↥H := by
     rcases subsingleton_or_nontrivial ↥H with h | h
     · exact absurd (fun a b => Subsingleton.elim (a * b) (b * a)) hnonab
     · exact h
@@ -284,7 +284,7 @@ theorem nonempty_coherent_SOf_bot_of_index_dvd [Finite ↥L] [Group.IsNilpotent 
 `commutator ↥H ≠ ⊥`.  (If `⁅H,H⁆ = ⊥` then `S(⁅H,H⁆) = S(⊥) = S`, so `X(⁅H,H⁆) = S − S = ∅`.) -/
 theorem commutator_ne_bot_of_Xset_commutator_nonempty (hyp : SibleyDadeHypothesis G L H)
     (hXne : (hyp.Xset ⁅H, H⁆).Nonempty) : _root_.commutator ↥H ≠ ⊥ := by
-  letI : H.Normal := hyp.H_normal
+  let : H.Normal := hyp.H_normal
   intro hbot
   rw [← commutator_subgroupOf_self] at hbot
   have hcommbot : (⁅H, H⁆ : Subgroup ↥L) = ⊥ :=
@@ -308,7 +308,7 @@ theorem nonempty_coherent_S_of_frobenius (hyp : SibleyDadeHypothesis G L H)
     (hXne : (hyp.Xset ⁅H, H⁆).Nonempty) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
-  letI : H.Normal := hyp.H_normal
+  let : H.Normal := hyp.H_normal
   by_contra hncoh
   obtain ⟨p, hp, hHp⟩ := hyp.isPGroup_of_not_coherent hF hncoh
   exact hncoh (hyp.nonempty_coherent_S_caseA_of_frobenius hF
@@ -466,10 +466,10 @@ theorem nonempty_coherent_S_caseB_of_c2_data (hyp : SibleyDadeHypothesis G L H)
     (hXne : (hyp.Xset h46.W2).Nonempty) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
-  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
-  haveI : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  have : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
   have hderiv : h46.W2.subgroupOf H ≤ commutator ↥H := by
     rw [← commutator_subgroupOf_self]
     exact fun x hx => Subgroup.mem_subgroupOf.mpr (hW2comm (Subgroup.mem_subgroupOf.mp hx))
@@ -513,17 +513,17 @@ theorem nonempty_coherent_S_caseB_of_c2 (hyp : SibleyDadeHypothesis G L H)
     (hXne : (hyp.Xset h46.W2).Nonempty) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
-  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
-  haveI : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
-  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
-  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
+  have : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  have : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
+  let : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  have : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
   -- `W₂ ≤ Z(L)` (case-B central datum).
   have hW2cenL : h46.W2 ≤ Subgroup.center ↥L := caseB_W2_le_center_L hyp h46 hW1 hW2H hcen
   -- `H` non-abelian: `⁅H,H⁆ ⊊ H`, so `1 < |H : ⁅H,H⁆|`.
   have hMgt : 1 < (commutator ↥H).index := by
-    have hne : commutator ↥H ≠ ⊤ := (IsSolvable.commutator_lt_top_of_nontrivial ↥H).ne
+    have hne : commutator ↥H ≠ ⊤ := (Group.IsSolvable.commutator_lt_top_of_nontrivial ↥H).ne
     have h0 : (commutator ↥H).index ≠ 0 := Subgroup.index_ne_zero_of_finite
     have h1 : (commutator ↥H).index ≠ 1 := fun h => hne (Subgroup.index_eq_one.mp h)
     omega

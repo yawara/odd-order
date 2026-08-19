@@ -93,7 +93,7 @@ theorem typeII_centralizerSupport_isTISubset [Finite G]
     by_contra hne
     have hNtop : Subgroup.normalizer ((maxNilpotentNormalHall S : Subgroup G) : Set G) = ⊤ :=
       hSmax.2 _ (lt_of_le_of_ne hle fun h => hne h.symm)
-    haveI hHnormal : (maxNilpotentNormalHall S).Normal :=
+    have hHnormal : (maxNilpotentNormalHall S).Normal :=
       Subgroup.normalizer_eq_top_iff.mp hNtop
     rcases hG.simple.eq_bot_or_eq_top_of_normal (maxNilpotentNormalHall S) hHnormal with hb | ht
     · exact hFne hb
@@ -106,7 +106,7 @@ theorem typeII_centralizerSupport_isTISubset [Finite G]
   obtain ⟨U, hU, hder⟩ := OddOrder.BG.Ch4.S16.typeP_exists_hall_derived_eq hG hSmax hP
   have hUM : U ≤ S :=
     (le_sup_left.trans hder.ge).trans (Subgroup.map_subtype_le _)
-  haveI : IsSolvable ↥S := hG.solvable_of_mem_maximalSubgroups hSmax
+  have : Group.IsSolvable ↥S := hG.isSolvable_of_mem_maximalSubgroups hSmax
   obtain ⟨K', hK'⟩ :=
     OddOrder.Isaacs.Ch03.hall_E_exists (G := ↥S) (OddOrder.BG.Ch4.S14.kappa S)
   have hKM : K'.map S.subtype ≤ S := Subgroup.map_subtype_le K'
@@ -268,7 +268,7 @@ theorem typeII_sSet_member_support_subset [Finite G]
       (ξ : ClassFunction ↥(huSub data) ℂ) w ≠ 0 → ((w : ↥S) : G) ≠ 1 →
       ((w : ↥S) : G) ∈ centralizerSupport (sharpSubgroup (Msigma S)) (derivedInG S) := by
     intro w hwval hwne
-    haveI := hInHu_normal data
+    have := hInHu_normal data
     have hCne : OddOrder.Peterfalvi.S03.centralizerInSubgroup (hInHu data) w ≠ ⊥ := fun hbot =>
       hwval
         (OddOrder.Peterfalvi.S03.irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot

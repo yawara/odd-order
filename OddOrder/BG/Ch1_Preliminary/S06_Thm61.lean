@@ -45,7 +45,7 @@ abelian normal 部分群を含む。
 `thmA4b` が担う数学的内容はすべて App.A 側にあり, 本定理はその `p ≠ 2` 仮定を
 教科書どおり任意素数へ外したもの。 -/
 theorem le_oPiPrimePiCore_of_abelian_normal_in_sylow [Finite G]
-    (hsolv : IsSolvable G) (hodd : Odd (Nat.card G))
+    (hsolv : Group.IsSolvable G) (hodd : Odd (Nat.card G))
     {p : ℕ} [Fact p.Prime] (S : Sylow p G) {A : Subgroup G}
     (hA_le : A ≤ (S : Subgroup G))
     (hA_norm : (S : Subgroup G) ≤ Subgroup.normalizer (A : Set G))

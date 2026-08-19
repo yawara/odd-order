@@ -56,7 +56,7 @@ theorem blockTriangular_mul_diag {A B : Matrix (Fin n) (Fin n) F}
 theorem blockTriangular_coe_inv {A : GL (Fin n) F}
     (hA : Matrix.BlockTriangular (A : Matrix (Fin n) (Fin n) F) id) :
     Matrix.BlockTriangular ((A⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) id := by
-  haveI : Invertible (A : Matrix (Fin n) (Fin n) F) := A.invertible
+  have : Invertible (A : Matrix (Fin n) (Fin n) F) := A.invertible
   have h := Matrix.blockTriangular_inv_of_blockTriangular (b := id) hA
   rwa [← Matrix.coe_units_inv] at h
 
@@ -144,7 +144,7 @@ def diagonalGL : Subgroup (GL (Fin n) F) where
     intro A hA
     have hcoe : ((A⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) =
         (A : Matrix (Fin n) (Fin n) F)⁻¹ := by
-      haveI : Invertible (A : Matrix (Fin n) (Fin n) F) := A.invertible
+      have : Invertible (A : Matrix (Fin n) (Fin n) F) := A.invertible
       rw [← Matrix.coe_units_inv]
     obtain ⟨d, hd⟩ : ∃ d, (A : Matrix (Fin n) (Fin n) F) = Matrix.diagonal d :=
       ⟨_, (Matrix.IsDiag.diagonal_diag hA).symm⟩
@@ -513,7 +513,7 @@ theorem existsUnique_isRowInvariant_finrank_eq {k : ℕ} (hk : k ≤ n) :
 
 /-- `GL(n,q)` の元 `A` による行ベクトルへの右作用 `v ↦ v ᵥ* A` (線型同型)。 -/
 def rowActionEquiv (A : GL (Fin n) F) : (Fin n → F) ≃ₗ[F] (Fin n → F) :=
-  LinearEquiv.ofLinear (A : Matrix (Fin n) (Fin n) F).vecMulLinear
+  LinearEquiv.ofLinearMap (A : Matrix (Fin n) (Fin n) F).vecMulLinear
     ((A⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F).vecMulLinear
     (by
       refine LinearMap.ext fun w => ?_

@@ -54,7 +54,7 @@ For `0 < m`, every group concretely isomorphic to the standard Suzuki
 permutation group is simple. -/
 theorem suzuki_target_simple {m : ℕ} (hm : 0 < m) {L : Subgroup G}
     (eL : L ≃* standardPermGroup m) : IsSimpleGroup L := by
-  letI : IsSimpleGroup (standardPermGroup m) :=
+  let : IsSimpleGroup (standardPermGroup m) :=
     standardPermGroup_isSimpleGroup hm
   exact eL.isSimpleGroup
 

@@ -66,7 +66,7 @@ theorem centralCharacterAlg_eq_algebraMap_centralScalar
       = MonoidAlgebra.mapRingHom G (algebraMap 𝒪 K) (z : MonoidAlgebra 𝒪 G)) :
     MatrixModule.centralCharacterAlg π i hπ hlin zK
       = algebraMap 𝒪 K (centralScalar K ψ hEnd z) := by
-  letI := MatrixModule.blockModule nn π i
+  let := MatrixModule.blockModule nn π i
   refine (MatrixModule.eq_centralCharacterAlg_of_forall_smul_eq π i hπ hlin fun v => ?_).symm
   obtain ⟨w, rfl⟩ := e.surjective v
   rw [hzK, ← hint (z : MonoidAlgebra 𝒪 G) w,

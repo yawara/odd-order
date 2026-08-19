@@ -77,7 +77,7 @@ theorem coherent_extension_eq_sum_memberRFamily
     {ψ : ClassFunction ↥M ℂ} (hψT : ψ ∈ T) (hψcT : ψ.conj ∈ T) :
     ∃ E ⊆ (sOf_H0Cprime_memberRFamily hG hyp (hTsub hψT)).imageSet,
       c'.extension ψ = ∑ α ∈ E, α := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   have hψsOf := hTsub hψT
   have hψcsOf := hTsub hψcT
@@ -134,7 +134,7 @@ theorem SOf_coherent_extension_eq_sum_memberRFamily
     {ψ : ClassFunction ↥M ℂ} (hψT : ψ ∈ T) (hψcT : ψ.conj ∈ T) :
     ∃ E ⊆ (SOf_memberRFamily hG hyp (hTsub hψT)).imageSet,
       c'.extension ψ = ∑ α ∈ E, α := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   have hIKF : ∀ ⦃x : ClassFunction ↥M ℂ⦄, x ∈ hyp.SOf N →
       x ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
@@ -195,7 +195,7 @@ theorem SOf_coherent_extension_cross_orthogonal
     (hψT : ψ ∈ T₁) (hψcT : ψ.conj ∈ T₁) (hlamT : lam ∈ T₂) (hlamcT : lam.conj ∈ T₂)
     (hne1 : ψ ≠ lam) (hne2 : ψ ≠ lam.conj) :
     ClassFunction.inner (c₁.extension ψ) (c₂.extension lam) = 0 := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   have hIKF : ∀ ⦃Nz : Subgroup G⦄ ⦃x : ClassFunction ↥M ℂ⦄, x ∈ hyp.SOf Nz →
       x ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily

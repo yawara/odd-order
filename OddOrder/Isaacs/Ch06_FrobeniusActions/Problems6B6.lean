@@ -154,7 +154,7 @@ theorem sq_eq_one_iff_two_pow (hn : 2 ≤ n) (x : ZMod (2 ^ n)) :
 /-- `0 < k < N` なら `(k : ZMod N) ≠ 0`。 -/
 theorem natCast_ne_zero_of_lt {N k : ℕ} (hk : 0 < k) (hkN : k < N) :
     ((k : ℕ) : ZMod N) ≠ 0 := by
-  haveI : NeZero N := ⟨by omega⟩
+  have : NeZero N := ⟨by omega⟩
   intro h
   have hval : ((k : ZMod N)).val = k := ZMod.val_cast_of_lt hkN
   rw [h, ZMod.val_zero] at hval
@@ -228,7 +228,7 @@ theorem ncard_sq_eq_one (hn : 3 ≤ n) : {x : ZMod (2 ^ n) | x ^ 2 = 1}.ncard = 
       ({1, -1, (2 : ZMod (2 ^ n)) ^ (n - 1) + 1, (2 : ZMod (2 ^ n)) ^ (n - 1) - 1} :
         Set (ZMod (2 ^ n))) := by
     ext x
-    simp only [Set.mem_setOf_eq, Set.mem_insert_iff, Set.mem_singleton_iff]
+    simp only [Set.mem_ofPred_eq, Set.mem_insert_iff, Set.mem_singleton_iff]
     exact sq_eq_one_iff_two_pow (by omega) x
   rw [hset]
   exact sqrtOne_pairwise_ne hn
@@ -243,8 +243,8 @@ theorem ncard_sq_eq_one_units (hn : 3 ≤ n) :
         simpa using this⟩
       invFun := fun x =>
         ⟨⟨(x : ZMod (2 ^ n)), (x : ZMod (2 ^ n)),
-          by have := x.2; rw [Set.mem_setOf_eq, pow_two] at this; exact this,
-          by have := x.2; rw [Set.mem_setOf_eq, pow_two] at this; exact this⟩, by
+          by have := x.2; rw [Set.mem_ofPred_eq, pow_two] at this; exact this,
+          by have := x.2; rw [Set.mem_ofPred_eq, pow_two] at this; exact this⟩, by
           have hx : (x : ZMod (2 ^ n)) ^ 2 = 1 := x.2
           refine Units.ext ?_
           simpa using hx⟩
@@ -283,7 +283,7 @@ theorem ncard_orderOf_eq_two_mulAut {C : Type*} [Group C] [Finite C] [IsCyclic C
       _ = 4 := ncard_sq_eq_one_units hn
   have hdiff : {σ : MulAut C | orderOf σ = 2} = {σ : MulAut C | σ ^ 2 = 1} \ {1} := by
     ext σ
-    simp only [Set.mem_setOf_eq, Set.mem_sdiff, Set.mem_singleton_iff]
+    simp only [Set.mem_ofPred_eq, Set.mem_sdiff, Set.mem_singleton_iff]
     constructor
     · intro h
       refine ⟨by rw [← h]; exact pow_orderOf_eq_one σ, fun hσ => ?_⟩

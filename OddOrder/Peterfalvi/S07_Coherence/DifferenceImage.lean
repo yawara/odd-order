@@ -1012,7 +1012,7 @@ omit [Fintype G] in
 /-- The two members `ε·μ` and `-ε·ν` of the two-element family are distinct. -/
 theorem signMu_ne_negSignNu [Finite G] (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
     hχ.sign • (hχ.muClassFunction) ≠ (-hχ.sign) • (hχ.nuClassFunction) := by
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   intro h
   -- `⟨ε·μ, ε·μ⟩ = ε² = 1`, but if `ε·μ = -ε·ν` it equals `⟨ε·μ, -ε·ν⟩ = -ε²⟨μ,ν⟩ = 0`.
   have hself := hχ.inner_signSmul_pair_eq_ite (s := hχ.sign) (t := hχ.sign)
@@ -1266,7 +1266,7 @@ theorem CharacterDifferenceImage.nu_eq_mu_conj
     (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ)
     (hcomm : τ ((χ - χ.conj).conj) = (τ (χ - χ.conj)).conj) :
     hχ.nuClassFunction = hχ.muClassFunction.conj := by
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   classical
   -- Conjugating the image: `((χ−χ̄)^τ)‾ = (χ̄−χ)^τ = −(χ−χ̄)^τ`.
   have hneg : (τ (χ - χ.conj)).conj = -(τ (χ - χ.conj)) := by

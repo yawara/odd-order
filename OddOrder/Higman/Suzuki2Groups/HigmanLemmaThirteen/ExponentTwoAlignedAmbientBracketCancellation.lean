@@ -108,15 +108,15 @@ theorem pairwiseJoinMixedTerm_eq_ambientBracketCoordinate
   let hJoinEA : IsElementaryAbelian 2 (frattini J) :=
     IsElementaryAbelian.of_mulEquiv
       (pairwiseJoinFrattiniEquivAmbientFrattini hMap).symm hPhiEA
-  letI : IsMulCommutative (frattini P) :=
+  let : IsMulCommutative (frattini P) :=
     IsMulCommutative.of_comm hPhiEA.comm
-  letI : CommGroup (frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini P)) :=
+  let : CommGroup (frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini P)) :=
     hPhiEA.zmodModule
-  letI : IsMulCommutative (frattini J) :=
+  let : IsMulCommutative (frattini J) :=
     IsMulCommutative.of_comm hJoinEA.comm
-  letI : CommGroup (frattini J) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini J)) :=
+  let : CommGroup (frattini J) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini J)) :=
     hJoinEA.zmodModule
   intro hK1J htermJ hSqJ hK0J Sl Sr L R alpha beta
   obtain ⟨x, y, _, _, hL, hR, hMixed⟩ :=
@@ -295,20 +295,20 @@ theorem exists_aligned_ambientBracket_family_eq_zero
   let hEAK : IsElementaryAbelian 2 (frattini K) :=
     IsElementaryAbelian.of_mulEquiv
       (pairwiseJoinFrattiniEquivAmbientFrattini hMapK).symm hPhiEA
-  letI : IsMulCommutative (frattini P) :=
+  let : IsMulCommutative (frattini P) :=
     IsMulCommutative.of_comm hPhiEA.comm
-  letI : CommGroup (frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini P)) :=
+  let : CommGroup (frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini P)) :=
     hPhiEA.zmodModule
-  letI : IsMulCommutative (frattini J) :=
+  let : IsMulCommutative (frattini J) :=
     IsMulCommutative.of_comm hEAJ.comm
-  letI : CommGroup (frattini J) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini J)) :=
+  let : CommGroup (frattini J) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini J)) :=
     hEAJ.zmodModule
-  letI : IsMulCommutative (frattini K) :=
+  let : IsMulCommutative (frattini K) :=
     IsMulCommutative.of_comm hEAK.comm
-  letI : CommGroup (frattini K) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini K)) :=
+  let : CommGroup (frattini K) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini K)) :=
     hEAK.zmodModule
   let eJ :=
     (pairwiseJoinFrattiniLinearEquivAmbientFrattini

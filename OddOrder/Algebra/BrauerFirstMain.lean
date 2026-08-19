@@ -51,7 +51,7 @@ variable {k : Type*} [CommRing k] [Finite G]
 /-- The relative trace is `k`-linear. -/
 theorem relTrace_smul (K H : Subgroup G) (r : k) (a : MonoidAlgebra k G) :
     relTrace K H (r • a) = r • relTrace K H a := by
-  letI : Fintype (↥H ⧸ K.subgroupOf H) := Fintype.ofFinite _
+  let : Fintype (↥H ⧸ K.subgroupOf H) := Fintype.ofFinite _
   have hl : relTrace K H (r • a)
       = ∑ x : ↥H ⧸ K.subgroupOf H, (((x.out : ↥H) : G)) • (r • a) := rfl
   have hr : relTrace K H a = ∑ x : ↥H ⧸ K.subgroupOf H, (((x.out : ↥H) : G)) • a := rfl
@@ -140,9 +140,9 @@ theorem brauerProj_ne_zero_of_isDefectGroup (p : ℕ) [Fact p.Prime] [CharP k p]
     {D : Subgroup G} (hD : IsDefectGroup e D) : brauerProj D e ≠ 0 := by
   classical
   intro hbr
-  letI : Fintype G := Fintype.ofFinite G
-  haveI : Finite (ConjClasses G) := Quotient.finite _
-  letI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  let : Fintype G := Fintype.ofFinite G
+  have : Finite (ConjClasses G) := Quotient.finite _
+  let : Fintype (ConjClasses G) := Fintype.ofFinite _
   -- Choose, for each class, a `p`-subgroup of a centraliser that the class sum is a trace from.
   choose S hSC _hSp hSmem using
     fun x : G => exists_isPGroup_le_centralizer_classSum_mem (k := k) (p := p) x

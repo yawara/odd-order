@@ -199,9 +199,9 @@ theorem grid_trichotomy {ι κ : Type*} [Finite ι] [Finite κ] [Nonempty ι] [N
       (∃ (j₀ : κ) (c : ℂ), c ≠ 0 ∧ (∀ i, a (i, j₀) = c) ∧ ∀ i j, j ≠ j₀ → a (i, j) = 0) ∨
       (∃ (i₀ : ι) (c : ℂ), c ≠ 0 ∧ (∀ j, a (i₀, j) = c) ∧ ∀ i j, i ≠ i₀ → a (i, j) = 0) := by
   classical
-  haveI : Fintype ι := Fintype.ofFinite _
-  haveI : Fintype κ := Fintype.ofFinite _
-  rw [Set.ncard_eq_toFinset_card', Set.toFinset_setOf, Nat.card_eq_fintype_card] at hlt
+  have : Fintype ι := Fintype.ofFinite _
+  have : Fintype κ := Fintype.ofFinite _
+  rw [Set.ncard_eq_toFinset_card', Set.toFinset_ofPred, Nat.card_eq_fintype_card] at hlt
   rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card] at hgap
   obtain ⟨f, g, hfg⟩ := exists_param a hadd
   -- rewrite the support filter in terms of `f, g`
@@ -281,7 +281,7 @@ theorem grid_no_constant_column {ι κ : Type*} [Fintype ι] [Finite κ]
     {j₀ : κ} {c : ℂ} (hc : c ≠ 0) (hcol : ∀ i, a (i, j₀) = c)
     (hoff : ∀ i j, j ≠ j₀ → a (i, j) = 0) : False := by
   classical
-  haveI : Finite (ι × κ) := inferInstance
+  have : Finite (ι × κ) := inferInstance
   by_cases hboth : P.2 = j₀ ∧ Q.2 = j₀
   · -- both `P, Q` in column `j₀`: `G P = c + s`, `G Q = c − s` force `c = 0`
     obtain ⟨hPj, hQj⟩ := hboth

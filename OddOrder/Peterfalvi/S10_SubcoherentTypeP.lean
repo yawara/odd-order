@@ -137,7 +137,7 @@ theorem inducedKernelFamily_member_support_subset_derivedInG
     (hφ : φ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
       ((derivedInG M).subgroupOf M) X) :
     φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (derivedInG M : Set G) M := by
-  haveI : ((derivedInG M).subgroupOf M).Normal := by
+  have : ((derivedInG M).subgroupOf M).Normal := by
     rw [derivedInG, Subgroup.subgroupOf,
       Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
     infer_instance

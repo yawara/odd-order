@@ -456,7 +456,8 @@ theorem generatorRelation_step2_primeLine [Fact p.Prime] (hq : q.Prime)
     refine ⟨hc, ?_⟩
     subst c
     have hmul : (((u : Fˣ) : F) * (emb d * s)) = 0 := by
-      simpa [emb] using h
+      simp only [map_zero, zero_mul, zero_add] at h
+      exact h
     have huds : emb d * s = 0 := by
       exact (mul_eq_zero.mp hmul).resolve_left (Units.ne_zero (u : Fˣ))
     have hdemb : emb d = 0 := by

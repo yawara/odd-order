@@ -208,12 +208,12 @@ theorem exists_fixed_not_mem_Q0
     (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
     {P : Subgroup G} (hPD : P ≤ hyp.D)
     (hCop : Nat.Coprime (Nat.card ↥(P.subgroupOf hyp.D)) (Nat.card ↥hyp.Q))
-    (hSolv : IsSolvable ↥hyp.Q)
+    (hSolv : Group.IsSolvable ↥hyp.Q)
     {x : G} (hxQ : x ∈ hyp.Q) (hx0 : x ∉ hyp.Q0)
     (hxfix : ∀ a ∈ P, a * x * a⁻¹ * x⁻¹ ∈ hyp.Q0) :
     ∃ y : G, y ∈ hyp.Q ∧ y ∉ hyp.Q0 ∧ ∀ a ∈ P, a * y * a⁻¹ = y := by
   classical
-  haveI hNnormal : (hyp.Q0.subgroupOf hyp.Q).Normal := by rw [← hZ]; infer_instance
+  have hNnormal : (hyp.Q0.subgroupOf hyp.Q).Normal := by rw [← hZ]; infer_instance
   have hinv := hyp.isAInvariant_conjQByD_Q0
   have hkey := OddOrder.GroupTheory.map_fixedSubgroup_eq_fixedSubgroup_quotient
     (φ := hyp.conjQByD) (X := P.subgroupOf hyp.D) hinv hCop (Or.inr hSolv)
@@ -331,7 +331,7 @@ theorem theoremAInductionBelow_centralizerActionQuotient {X : Subgroup G}
     letI := hyp.centralizerQuotientMulAction hXV
     TheoremAInductionBelow (hyp.centralizerActionQuotient X)
       ↥(MulAction.fixedPoints X Ω) := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   intro A Λ _ _ _ hlt hA
   exact ih (hlt.trans (hyp.card_centralizerActionQuotient_lt hXV hX)) hA
 
@@ -443,7 +443,7 @@ theorem coe_Q0_subgroupOf_centralizer (X : Subgroup G) :
       = {x : ↥(Subgroup.centralizer (X : Set G)) |
           x ^ 2 = 1 ∧ x ∈ hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))} := by
   ext x
-  simp only [Set.mem_setOf_eq, SetLike.mem_coe, Subgroup.mem_subgroupOf, hyp.mem_Q0_iff,
+  simp only [Set.mem_ofPred_eq, SetLike.mem_coe, Subgroup.mem_subgroupOf, hyp.mem_Q0_iff,
     Subtype.ext_iff, Subgroup.coe_pow, Subgroup.coe_one]
 
 /-- **Peterfalvi Part II, Ch. I §3 Proposition 1(c), `Q₀`-version.**
@@ -464,7 +464,7 @@ theorem map_centralizer_Q0_eq_quotient_Q0 {X : Subgroup G} (hXV : X ≤ hyp.V)
         (QuotientGroup.mk'
           (hyp.H.subgroupOf (Subgroup.centralizer (X : Set G))).normalCore)
       = (hyp.centralizerQuotientHypothesis hXV hA3).Q0 := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   let L : Subgroup G := Subgroup.centralizer (X : Set G)
   let N : Subgroup ↥L := (hyp.H.subgroupOf L).normalCore
   let pi : ↥L →* ↥L ⧸ N := QuotientGroup.mk' N
@@ -481,7 +481,7 @@ theorem map_centralizer_Q0_eq_quotient_Q0 {X : Subgroup G} (hXV : X ≤ hyp.V)
   rw [Subgroup.coe_map, hyp.coe_Q0_subgroupOf_centralizer X,
     map_involutionSet_eq_of_odd_kernel (N := N) (H := hyp.H.subgroupOf L) hNodd]
   ext z
-  simp only [Set.mem_setOf_eq, SetLike.mem_coe,
+  simp only [Set.mem_ofPred_eq, SetLike.mem_coe,
     (hyp.centralizerQuotientHypothesis hXV hA3).mem_Q0_iff, hH, pi]
 
 /-- **Peterfalvi Part II, Ch. I §3 Proposition 1(c), `Q₀`-version** — the explicit
@@ -535,7 +535,7 @@ theorem natCard_quotient_Q0_eq {X : Subgroup G} (hXV : X ≤ hyp.V)
     letI := hyp.centralizerQuotientMulAction hXV
     Nat.card ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q0
       = Nat.card ↥(hyp.Q0.subgroupOf (Subgroup.centralizer (X : Set G))) := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   exact Nat.card_congr (hyp.centralizerQ0QuotientEquiv hXV hA3).symm.toEquiv
 
 /-- **`|Q̄| = |C_Q(X)|`** — the `Q`-version of `natCard_quotient_Q0_eq`, from
@@ -546,7 +546,7 @@ theorem natCard_quotient_Q_eq {X : Subgroup G} (hXV : X ≤ hyp.V)
     letI := hyp.centralizerQuotientMulAction hXV
     Nat.card ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q
       = Nat.card ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))) := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   exact Nat.card_congr (hyp.centralizerQQuotientEquiv hXV).symm.toEquiv
 
 /-! ### The order hypotheses of `exists_standardModel` for the centralizer quotient
@@ -566,7 +566,7 @@ theorem natCard_quotient_Q0_eq_pow {X : Subgroup G} (hXV : X ≤ hyp.V)
       = 2 ^ n) :
     letI := hyp.centralizerQuotientMulAction hXV
     Nat.card ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q0 = 2 ^ n := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   rw [hyp.natCard_quotient_Q0_eq hXV hA3, hQ0]
 
 /-- **`|Q̄| = |Q̄₀|³`** — `exists_standardModel`'s `hcardQ` for the centralizer quotient,
@@ -579,7 +579,7 @@ theorem natCard_quotient_Q_eq_Q0_cube {X : Subgroup G} (hXV : X ≤ hyp.V)
     letI := hyp.centralizerQuotientMulAction hXV
     Nat.card ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q
       = Nat.card ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q0 ^ 3 := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   rw [hyp.natCard_quotient_Q_eq hXV hA3, hyp.natCard_quotient_Q0_eq hXV hA3, hcube]
 
 /-- **`Q̄` is a Suzuki `2`-group** — transported from
@@ -594,7 +594,7 @@ theorem isSuzuki2Group_quotient_Q {X : Subgroup G} (hXV : X ≤ hyp.V)
     letI := hyp.centralizerQuotientMulAction hXV
     OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group
       ↥(hyp.centralizerQuotientHypothesis hXV hA3).Q := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   exact OddOrder.GroupTheory.SpecificGroups.Suzuki.IsSuzuki2Group.of_equiv hQsuz
     (hyp.centralizerQQuotientEquiv hXV)
 
@@ -646,7 +646,7 @@ theorem psu3Numerics_and_standingData_centralizerQuotient {X : Subgroup G}
       ∀ w ∈ (hyp.centralizerQuotientHypothesis hXV hA3).W, w ≠ 1 →
         Nonempty ((hyp.centralizerQuotientHypothesis hXV hA3).LemmaFiveSetup n) ∧
         Nonempty ((hyp.centralizerQuotientHypothesis hXV hA3).QuotientFieldModel n) := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   set qhyp := hyp.centralizerQuotientHypothesis hXV hA3 with hqhyp
   obtain ⟨tri⟩ := hyp.centralizer_trichotomy_of_induction hXV hX hA3 ih
   obtain ⟨⟨data, _teq, details⟩⟩ :=
@@ -691,7 +691,7 @@ theorem W_ne_bot_of_psu3_branch {X : Subgroup G} (hXV : X ≤ hyp.V) (hX : X ≠
     (ih : TheoremAInductionBelow G Ω) :
     hyp.W ≠ ⊥ := by
   intro hW
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   obtain ⟨tri⟩ := hyp.centralizer_trichotomy_of_induction hXV hX hA3 ih
   obtain ⟨⟨data, _teq, details⟩⟩ :=
     nonempty_psu3Data_of_orderOf_eq_three tri.branch hord hnea
@@ -853,7 +853,7 @@ theorem P_le_D : s4.P ≤ hyp.D := le_trans s4.P_le_V hyp.V_le_D
 theorem exists_fixed_not_mem_Q0
     (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
     (hCop : Nat.Coprime (Nat.card ↥(s4.P.subgroupOf hyp.D)) (Nat.card ↥hyp.Q))
-    (hSolv : IsSolvable ↥hyp.Q) :
+    (hSolv : Group.IsSolvable ↥hyp.Q) :
     ∃ y : G, y ∈ hyp.Q ∧ y ∉ hyp.Q0 ∧ ∀ a ∈ s4.P, a * y * a⁻¹ = y :=
   hyp.exists_fixed_not_mem_Q0 hZ s4.P_le_D hCop hSolv s4.x_mem_Q s4.x_notMem_Q0
     s4.x_class_fixed
@@ -865,7 +865,7 @@ theorem not_isElementaryAbelian_cQ
     (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥hyp.Q)
     (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
     (hCop : Nat.Coprime (Nat.card ↥(s4.P.subgroupOf hyp.D)) (Nat.card ↥hyp.Q))
-    (hSolv : IsSolvable ↥hyp.Q) :
+    (hSolv : Group.IsSolvable ↥hyp.Q) :
     ¬ OddOrder.GroupTheory.IsElementaryAbelian 2
       ↥(hyp.Q.subgroupOf (Subgroup.centralizer ((s4.P : Set G)))) := by
   obtain ⟨y, hyQ, hy0, hyfix⟩ := s4.exists_fixed_not_mem_Q0 hZ hCop hSolv
@@ -933,15 +933,15 @@ theorem inf_le_sup_centralizer_W {U : Subgroup G}
     (hUC : U ≤ Subgroup.centralizer ((s4.P : Set G)))
     (hfac : ∀ v ∈ hyp.V ⊓ U, ∃ p ∈ s4.P, ∃ w ∈ hyp.W, v = p * w) :
     hyp.V ⊓ U ≤ s4.P ⊔ (hyp.W ⊓ Subgroup.centralizer ((s4.P : Set G))) := by
-  haveI : Fact (Nat.Prime s4.cardP) := ⟨s4.prime_cardP⟩
-  haveI : IsCyclic ↥s4.P := isCyclic_of_prime_card s4.card_P
+  have : Fact (Nat.Prime s4.cardP) := ⟨s4.prime_cardP⟩
+  have : IsCyclic ↥s4.P := isCyclic_of_prime_card s4.card_P
   intro v hv
   obtain ⟨p, hp, w, hw, rfl⟩ := hfac v hv
   refine Subgroup.mul_mem_sup hp ⟨hw, ?_⟩
   refine Subgroup.mem_centralizer_iff.mpr fun a ha => ?_
   -- `p` commutes with `a` because `P` is abelian, and `p * w` because `U ⊆ C_G(P)`
   have hpa : p * a = a * p := by
-    letI := IsCyclic.commGroup (α := ↥s4.P)
+    let := IsCyclic.commGroup (α := ↥s4.P)
     exact congrArg (Subtype.val (p := fun z => z ∈ s4.P))
       (mul_comm (⟨p, hp⟩ : ↥s4.P) (⟨a, ha⟩ : ↥s4.P))
   have hva : a * (p * w) = (p * w) * a :=
@@ -979,10 +979,10 @@ theorem exists_ne_one_mem_W_centralizer (hP : s4.P ≠ ⊥)
     (ih : TheoremAInductionBelow G Ω) :
     ∃ w ∈ hyp.W, w ≠ 1 ∧ w ∈ Subgroup.centralizer ((s4.P : Set G)) := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI : Fact (Nat.Prime s4.cardP) := ⟨s4.prime_cardP⟩
-  haveI : IsCyclic ↥s4.P := isCyclic_of_prime_card s4.card_P
-  letI := hyp.centralizerQuotientMulAction s4.P_le_V
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime s4.cardP) := ⟨s4.prime_cardP⟩
+  have : IsCyclic ↥s4.P := isCyclic_of_prime_card s4.card_P
+  let := hyp.centralizerQuotientMulAction s4.P_le_V
   obtain ⟨tri⟩ := hyp.centralizer_trichotomy_of_induction s4.P_le_V hP hA3 ih
   obtain ⟨⟨data, _teq, details⟩⟩ :=
     nonempty_psu3Data_of_orderOf_eq_three tri.branch hord hnea
@@ -1035,7 +1035,7 @@ theorem exists_ne_one_mem_W_centralizer (hP : s4.P ≠ ⊥)
   have hPC : s4.P ≤ C := by
     intro a ha
     refine Subgroup.mem_centralizer_iff.mpr fun b hb => ?_
-    letI := IsCyclic.commGroup (α := ↥s4.P)
+    let := IsCyclic.commGroup (α := ↥s4.P)
     exact congrArg (Subtype.val (p := fun z => z ∈ s4.P))
       (mul_comm (⟨b, hb⟩ : ↥s4.P) (⟨a, ha⟩ : ↥s4.P))
   have hwC : w ∈ C := by
@@ -1115,7 +1115,7 @@ theorem exists_ne_one_mem_quotient_W {m : ℕ} (M : hyp.QuotientFieldModel m)
     (hζC : ζ ∈ Subgroup.centralizer ((s4.P : Set G))) :
     letI := hyp.centralizerQuotientMulAction s4.P_le_V
     ∃ z ∈ (hyp.centralizerQuotientHypothesis s4.P_le_V hA3).W, z ≠ 1 := by
-  letI := hyp.centralizerQuotientMulAction s4.P_le_V
+  let := hyp.centralizerQuotientMulAction s4.P_le_V
   set C : Subgroup G := Subgroup.centralizer ((s4.P : Set G)) with hCdef
   set N : Subgroup ↥C := (hyp.H.subgroupOf C).normalCore with hNdef
   set pi : ↥C →* ↥C ⧸ N := QuotientGroup.mk' N with hpidef
@@ -1165,7 +1165,7 @@ theorem standingData_centralizerQuotient {m : ℕ} (M : hyp.QuotientFieldModel m
     (hmu : Function.Injective M.mu)
     (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥hyp.Q)
     (hCop : Nat.Coprime (Nat.card ↥(s4.P.subgroupOf hyp.D)) (Nat.card ↥hyp.Q))
-    (hSolv : IsSolvable ↥hyp.Q) (hP : s4.P ≠ ⊥)
+    (hSolv : Group.IsSolvable ↥hyp.Q) (hP : s4.P ≠ ⊥)
     (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer ((s4.P : Set G))),
       Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
     (hord : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
@@ -1181,7 +1181,7 @@ theorem standingData_centralizerQuotient {m : ℕ} (M : hyp.QuotientFieldModel m
         ↥(hyp.centralizerQuotientHypothesis s4.P_le_V hA3).Q ∧
       Nonempty ((hyp.centralizerQuotientHypothesis s4.P_le_V hA3).LemmaFiveSetup n) ∧
       Nonempty ((hyp.centralizerQuotientHypothesis s4.P_le_V hA3).QuotientFieldModel n) := by
-  letI := hyp.centralizerQuotientMulAction s4.P_le_V
+  let := hyp.centralizerQuotientMulAction s4.P_le_V
   have hnea := s4.not_isElementaryAbelian_cQ hQsuz hZ hCop hSolv
   obtain ⟨ω, hωQ, hωQ0, hωfix⟩ := s4.exists_fixed_not_mem_Q0 hZ hCop hSolv
   obtain ⟨ζ, hζW, hζ1, hζC⟩ := s4.exists_ne_one_mem_W_centralizer hP hA3 hord hnea ih
@@ -1234,7 +1234,7 @@ theorem t_mem_primeComplementResidual :
       Subgroup.primeComplementResidual 2
         (Subgroup.centralizer ((s4.P : Set G))) := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   set tC : ↥(Subgroup.centralizer ((s4.P : Set G))) :=
     ⟨hyp.t, s4.t_mem_centralizer⟩ with htCdef
   have htsq : tC ^ 2 = 1 := Subtype.ext (by simpa [htCdef] using hyp.t_sq)

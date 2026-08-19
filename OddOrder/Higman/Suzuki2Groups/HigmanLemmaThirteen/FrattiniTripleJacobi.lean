@@ -55,7 +55,7 @@ theorem frattiniMiddleCommutatorBilinear_comm
           hP hxi hPhiComm hexists x y =
         frattiniMiddleCommutatorBilinear
           hP hxi hPhiComm hexists y x := by
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   intro x y
@@ -98,12 +98,12 @@ theorem frattiniTripleCommutatorTrilinear_jacobi
   dsimp only
   let hSquareEA :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
   intro x y z
   obtain ⟨x₀, hx₀⟩ :=
@@ -221,12 +221,12 @@ theorem frattiniTripleCommutatorTrilinear_swap_last_of_middle_eq_zero
   dsimp only
   let hSquareEA :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
   intro x y z hxy
   have hzero :
@@ -297,12 +297,12 @@ theorem frattiniTripleCommutatorTrilinear_swap_last_of_mem_restricted_factor
   dsimp only
   let hSquareEA :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
   apply frattiniTripleCommutatorTrilinear_swap_last_of_middle_eq_zero
     hP hxi hPhiComm hfour hexists

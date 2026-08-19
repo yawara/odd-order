@@ -117,7 +117,7 @@ theorem centralizer_ne_bot_of_nontrivial_kernel [Finite G] {K R : Subgroup G}
     (hKnt : ∃ k : K, ρ (k : G) ≠ 1) :
     ∃ v : V, v ≠ 0 ∧ ∀ r : R, ρ (r : G) v = v := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   by_contra hCon
   push Not at hCon
   have hCR : ∀ w : V, (∀ r : R, ρ (r : G) w = w) → w = 0 := fun w hw => by

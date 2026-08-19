@@ -112,9 +112,9 @@ theorem exists_conj_smul_eq_of_le_of_card_prime [Finite G] {N : Subgroup G} {p :
   have hB'pg : IsPGroup p ↥B' := by rw [IsPGroup.iff_card]; exact ⟨1, by rw [hB'card, pow_one]⟩
   obtain ⟨P, hA'P⟩ := hA'pg.exists_le_sylow
   obtain ⟨Q, hB'Q⟩ := hB'pg.exists_le_sylow
-  haveI : MulAction.IsPretransitive ↥N (Sylow p ↥N) := Sylow.isPretransitive_of_finite
+  have : MulAction.IsPretransitive ↥N (Sylow p ↥N) := Sylow.isPretransitive_of_finite
   obtain ⟨n, hn⟩ := MulAction.exists_smul_eq ↥N P Q
-  haveI hQcyc : IsCyclic ↥(Q : Subgroup ↥N) :=
+  have hQcyc : IsCyclic ↥(Q : Subgroup ↥N) :=
     OddOrder.BG.Ch3.S10.isCyclic_of_pRank_le_one Q.isPGroup' hodd
       (by rw [pRank_sylow_eq Q]; exact hpr)
   -- `n • A' ≤ Q`.
@@ -165,7 +165,7 @@ theorem kstar_isHall_sigmaM_of_partner [Finite G] (hG : OddOrder.BG.IsMinimalSim
     (hnc : ¬ ∃ g : G, MulAut.conj g • M = Mstar) :
     Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M) (Kstar.subgroupOf Mstar) := by
   classical
-  haveI : IsSolvable ↥Mstar := hG.solvable_of_mem_maximalSubgroups hMstar
+  have : Group.IsSolvable ↥Mstar := hG.isSolvable_of_mem_maximalSubgroups hMstar
   -- `Kstar ≤ M_σ` is a `σ(M)`-group.
   have hKstarMσ : Kstar ≤ OddOrder.BG.Ch3.S10.Msigma M := by rw [hKstar]; exact inf_le_left
   have hKstarpi : ∀ r ∈ (Nat.card ↥(Kstar.subgroupOf Mstar)).primeFactors,
@@ -328,7 +328,7 @@ theorem non_disjoint_signalizer_frobenius [Finite G]
   -- `q ∈ σ(N) ∩ π(M)`, so `q ∈ β(N)` (Theorem 14.4(d)) and `q` is ideal in `G`.
   obtain ⟨q, hqσN, hqπM⟩ := hnd
   have hq_prime : q.Prime := Nat.prime_of_mem_primeFactors hqπM
-  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have : Fact q.Prime := ⟨hq_prime⟩
   have hMmem : M ∈ S14.maximalSigmaSubgroupsOfElement x := ⟨hM, hxM.1⟩
   obtain ⟨hst2NsM, hspM_sbN, -, -⟩ := hNper M hMmem
   have hqβN : q ∈ OddOrder.BG.Ch3.S10.beta N := hspM_sbN ⟨hqσN, hqπM⟩
@@ -337,7 +337,7 @@ theorem non_disjoint_signalizer_frobenius [Finite G]
   have hp_prime : (orderOf x).minFac.Prime :=
     Nat.minFac_prime (fun h => hx1 (orderOf_eq_one_iff.mp h))
   set p : ℕ := (orderOf x).minFac with hpdef
-  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have : Fact p.Prime := ⟨hp_prime⟩
   have hox0 : orderOf x ≠ 0 := by
     rw [← Nat.card_zpowers x]; exact Nat.card_pos.ne'
   have hpordx : p ∈ (orderOf x).primeFactors :=
@@ -410,7 +410,7 @@ theorem non_disjoint_signalizer_frobenius [Finite G]
     · -- Type `P₁`: the dual-pair partner `Mstar = Nᵍ` has `Kstar` as its `κ(Mstar)`-Hall *and*
       -- `σ(M)`-Hall, so `p ∈ σ(M) ∩ π(Mstar)` forces `p ∈ κ(Mstar)` (rank ≤ 1) against
       -- `r_p(Mstar) = 2`.
-      haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+      have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
       -- `q ∈ κ(M)` (type P₁: `κ(M) = π(M) ∖ σ(M)`).
       have hqκ : q ∈ S14.kappa M := by rw [hP1.2]; exact ⟨hqπM, hqσM⟩
       -- A `κ(M)`-Hall `K ⊇ Q`.
@@ -445,7 +445,7 @@ theorem non_disjoint_signalizer_frobenius [Finite G]
         (S14.typeP_duality hG hM hP hKM hK hKstardef).2.2
       have hKMstarσ : K ≤ OddOrder.BG.Ch3.S10.Msigma Mstar := by rw [hKeq]; exact inf_le_left
       -- `ℳ(C(Q)) = {Mstar}` (typeP_structure of `Mstar`, `Q ≤ K = C_{Mstar_σ}(Kstar)`).
-      haveI : IsSolvable ↥Mstar := hG.solvable_of_mem_maximalSubgroups hMstarmax
+      have : Group.IsSolvable ↥Mstar := hG.isSolvable_of_mem_maximalSubgroups hMstarmax
       obtain ⟨Ustar', hUstar'⟩ := Ch03.hall_E_exists (G := ↥Mstar)
         ((S14.kappa Mstar ∪ OddOrder.BG.Ch3.S10.sigma Mstar)ᶜ)
       set Ustar : Subgroup G := Ustar'.map Mstar.subtype with hUstardef
@@ -481,7 +481,7 @@ theorem non_disjoint_signalizer_frobenius [Finite G]
       · have h1 := tau1_pRank_eq_one hτ1; omega
       · have h1 := tau3_pRank_eq_one hτ3; omega
     · -- Type `P₂`: `σ(M) = β(M)` (Proposition 14.2(g)) contradicts `p ∈ σ(M) ∖ β(M)`.
-      haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+      have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
       obtain ⟨K₀, hK₀⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
       obtain ⟨U₀, hU₀⟩ := Ch03.hall_E_exists (G := ↥M)
         ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
@@ -497,7 +497,7 @@ theorem non_disjoint_signalizer_frobenius [Finite G]
   -- ### Part 2: no prime lies in `τ₂(M)`
   have ht2M : ∀ p' : ℕ, p'.Prime → p' ∉ tau2 M := by
     intro p' hp'p hp't2
-    haveI : Fact p'.Prime := ⟨hp'p⟩
+    have : Fact p'.Prime := ⟨hp'p⟩
     have hp'σM : p' ∉ OddOrder.BG.Ch3.S10.sigma M := hp't2.1
     -- Rank-2 witness `A0M ∈ ℰ_p'²(M)`: gives `p' ∈ π(M)`, `¬ idealPrime p'`.
     obtain ⟨A0M, hA0M, hA0leM⟩ :=
@@ -579,7 +579,7 @@ theorem non_disjoint_signalizer_frobenius [Finite G]
         (((E ⊓ Subgroup.centralizer (A : Set G)).subgroupOf E).index).primeFactors := by
       set c : Subgroup G := E ⊓ Subgroup.centralizer (A : Set G) with hcdef
       have hcE : c ≤ E := inf_le_left
-      haveI hcnorm : (c.subgroupOf E).Normal :=
+      have hcnorm : (c.subgroupOf E).Normal :=
         (Subgroup.normal_subgroupOf_iff_le_normalizer hcE).mpr hEN
       have hQ'qg : IsPGroup q ↥(Q.subgroupOf E) := by
         rw [IsPGroup.iff_card]
@@ -681,7 +681,7 @@ theorem signalizer_neighbour_conjugator_in_M [Finite G]
   have hNmax : N ∈ maximalSubgroups G := (mem_maximalSubgroupsContaining.mp hNmem).1
   have hCxN : Subgroup.centralizer ({x} : Set G) ≤ N :=
     (mem_maximalSubgroupsContaining.mp hNmem).2
-  haveI hNsolv : IsSolvable ↥N := hG.solvable_of_mem_maximalSubgroups hNmax
+  have hNsolv : Group.IsSolvable ↥N := hG.isSolvable_of_mem_maximalSubgroups hNmax
   -- `x`-side complement: `M ∩ N` complements `N_σ` in `N`.
   obtain ⟨_, _, hExuX⟩ := exists_RData_escape_structure hG hM hxM hxesc
   obtain ⟨Nx', hNx'P, -⟩ := hExuX
@@ -705,13 +705,14 @@ theorem signalizer_neighbour_conjugator_in_M [Finite G]
     rw [Subgroup.smul_inf, ← Msigma_conj_smul g Ny, hg] at h
     exact h
   -- Schur–Zassenhaus conjugacy of the two complements of `N_σ ◁ N` inside `↥N`.
-  haveI hNσ'normal : ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).Normal := by
+  have hNσ'normal : ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).Normal := by
     rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
   have hcop : Nat.Coprime (Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N))
       ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).index :=
     (OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hNmax).coprime_index
-  haveI hNσ'solv : IsSolvable ↥((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N) :=
-    solvable_of_solvable_injective ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).subtype_injective
+  have hNσ'solv : Group.IsSolvable ↥((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N) :=
+    Group.isSolvable_of_isSolvable_injective
+        ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).subtype_injective
   obtain ⟨n', hn'mem, hn'conj⟩ :=
     (hcomplYg.symm).exists_conj_of_coprime hcop (Or.inl hNσ'solv) hcomplX.symm
   -- `n = ↑n' ∈ M_σ(N) ≤ N`.
@@ -748,7 +749,7 @@ theorem signalizer_neighbour_conjugator_in_M [Finite G]
       (Subgroup.zpowers x) := by
     intro p hp
     rw [Nat.card_zpowers] at hp
-    haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+    have : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
     exact OddOrder.BG.Ch3.S10.sigma_conj (n * g)
       (S14.isPiElement_sigma_of_mem_Msigma hxM.1 p hp)
   have hxMσL : x ∈ OddOrder.BG.Ch3.S10.Msigma (MulAut.conj (n * g) • M) :=

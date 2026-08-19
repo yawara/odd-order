@@ -111,7 +111,7 @@ cyclic.) -/
 theorem exists_subgroup_card_four (n : ℕ) (hn : 1 < n) :
     ∃ E : Subgroup (standardPermGroup n), Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1 := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   set L : Subgroup (standardPermGroup n) :=
     (RootGroup.centerLine n).map (rootHom n) with hL
   -- every element of `L` is an involution

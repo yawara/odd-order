@@ -47,9 +47,9 @@ theorem isXiLengthTwoTypeA_of_xiLengthTwo
       p ∣ (involutions P).ncard) :
     IsXiLengthTwoTypeA.{uP, 0} P := by
   by_cases hcomm : IsMulCommutative P
-  · letI : CommGroup P :=
+  · let : CommGroup P :=
       { (inferInstance : Group P) with mul_comm := hcomm.is_comm.comm }
-    letI : Nontrivial P := by
+    let : Nontrivial P := by
       obtain ⟨x, y, _, _, hxy⟩ := hmulti
       exact ⟨⟨x, y, hxy⟩⟩
     obtain ⟨ι, _, ⟨ε⟩⟩ :=

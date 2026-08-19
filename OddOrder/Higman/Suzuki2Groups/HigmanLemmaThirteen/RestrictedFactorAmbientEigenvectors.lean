@@ -123,9 +123,9 @@ theorem restrictedFactorAmbientInclusion_representation
           hK1S htermS hSqS hAgemoS hK0S alpha) =
       restrictedFactorAmbientInclusion hSinv hEAS eS c data
         hK1S htermS hSqS hAgemoS hK0S (data.lambda • alpha) := by
-  letI : IsMulCommutative (frattini S) :=
+  let : IsMulCommutative (frattini S) :=
     IsMulCommutative.of_comm hEAS.comm
-  letI : Module (ZMod 2) (Additive (frattini S)) := hEAS.zmodModule
+  let : Module (ZMod 2) (Additive (frattini S)) := hEAS.zmodModule
   rw [restrictedFactorAmbientInclusion,
     LinearMap.comp_apply, LinearMap.comp_apply,
     ← subgroupLowerCentralLayerZeroLinear_equivariant hSinv c]
@@ -193,9 +193,9 @@ theorem exists_restrictedFactorAmbientEigenFamily
                 (subgroupLowerCentralTermZeroHom S x)) ∈
           Submodule.span (GaloisField 2 n) (Set.range family)) := by
   classical
-  letI : IsMulCommutative (frattini S) :=
+  let : IsMulCommutative (frattini S) :=
     IsMulCommutative.of_comm hEAS.comm
-  letI : Module (ZMod 2) (Additive (frattini S)) := hEAS.zmodModule
+  let : Module (ZMod 2) (Additive (frattini S)) := hEAS.zmodModule
   let eRefl := LinearEquiv.refl (ZMod 2) (GaloisField 2 n)
   let d := data.toInclusionData hEAS eS hK1S htermS hSqS hAgemoS hK0S
   let iota := restrictedFactorAmbientInclusion hSinv hEAS eS c data

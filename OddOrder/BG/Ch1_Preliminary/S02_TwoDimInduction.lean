@@ -40,7 +40,7 @@ private theorem exists_prime_opCore_ne_bot_of_odd_two_dim_outputs
         commutator G ≤ (P : Subgroup G)) :
     ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r G ≠ ⊥ := by
   by_cases hp_dvd : p ∣ Nat.card G
-  · haveI : Finite (Sylow p G) := inferInstance
+  · have : Finite (Sylow p G) := inferInstance
     obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
     exact exists_prime_opCore_ne_bot_of_commutator_le_sylow
       (p := p) P (hsyl hp_dvd P).2
@@ -79,7 +79,7 @@ theorem determinantKernel_hind_of_odd_two_dim_induction_outputs
     ∃ r : ℕ, r.Prime ∧ OddOrder.Isaacs.Ch01.opCore r N ≠ ⊥ := by
   let Gstar : Subgroup G := determinantKernelSubgroup ρ
   let ρN : Representation F N V := ρ.comp (Gstar.subtype.comp N.subtype)
-  haveI : Nontrivial N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN_ne_bot
+  have : Nontrivial N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN_ne_bot
   have hfaithfulN : Function.Injective ρN := by
     intro x y hxy
     apply Subtype.ext
@@ -109,7 +109,7 @@ private theorem opCore_ne_bot_of_normal_subgroup_opCore_ne_bot
     (hNcore : OddOrder.Isaacs.Ch01.opCore p N ≠ ⊥) :
     OddOrder.Isaacs.Ch01.opCore p G ≠ ⊥ := by
   let K : Subgroup G := (OddOrder.Isaacs.Ch01.opCore p N).map N.subtype
-  haveI : (OddOrder.Isaacs.Ch01.opCore p N).Characteristic :=
+  have : (OddOrder.Isaacs.Ch01.opCore p N).Characteristic :=
     OddOrder.Isaacs.Ch01.opCore.characteristic p N
   have hKnormal : K.Normal := by
     dsimp [K]
@@ -146,7 +146,7 @@ private theorem exists_nontrivial_normal_commutative_qSubgroup_of_opCore_ne_bot
     exact OddOrder.Isaacs.Ch01.opCore_isPGroup q G
   have hO_nontrivial : Nontrivial O :=
     (Subgroup.nontrivial_iff_ne_bot O).mpr hO_ne_bot
-  haveI : Nontrivial O := hO_nontrivial
+  have : Nontrivial O := hO_nontrivial
   have hcenter_nontrivial : Nontrivial (Subgroup.center O) := by
     have htop_nontrivial : Nontrivial (⊤ : Subgroup O) :=
       (Subgroup.nontrivial_iff_ne_bot (⊤ : Subgroup O)).mpr top_ne_bot
@@ -156,10 +156,10 @@ private theorem exists_nontrivial_normal_commutative_qSubgroup_of_opCore_ne_bot
         hO_p htop_nontrivial
     simpa using h
   let Z : Subgroup G := (Subgroup.center O).map O.subtype
-  haveI : O.Normal := by
+  have : O.Normal := by
     rw [hO_def]
     infer_instance
-  haveI : (Subgroup.center O).Characteristic := Subgroup.centerCharacteristic
+  have : (Subgroup.center O).Characteristic := Subgroup.centerCharacteristic
   have hZnormal : Z.Normal := by
     dsimp [Z]
     infer_instance
@@ -203,10 +203,10 @@ private theorem exists_ambient_normal_commutative_qSubgroup_le_determinantKernel
   let Gstar : Subgroup G := determinantKernelSubgroup ρ
   let Ostar : Subgroup Gstar := OddOrder.Isaacs.Ch01.opCore q Gstar
   let Oamb : Subgroup G := Ostar.map Gstar.subtype
-  haveI : Gstar.Normal := by
+  have : Gstar.Normal := by
     dsimp [Gstar]
     exact determinantKernelSubgroup_normal ρ
-  haveI : Ostar.Characteristic := by
+  have : Ostar.Characteristic := by
     dsimp [Ostar]
     exact OddOrder.Isaacs.Ch01.opCore.characteristic q Gstar
   have hOamb_normal : Oamb.Normal := by
@@ -224,7 +224,7 @@ private theorem exists_ambient_normal_commutative_qSubgroup_le_determinantKernel
     exact (Subgroup.map_subtype_inj (H := Gstar)).mp hmap
   have hOamb_nontrivial : Nontrivial Oamb :=
     (Subgroup.nontrivial_iff_ne_bot Oamb).mpr hOamb_ne_bot
-  haveI : Nontrivial Oamb := hOamb_nontrivial
+  have : Nontrivial Oamb := hOamb_nontrivial
   have hcenter_nontrivial : Nontrivial (Subgroup.center Oamb) := by
     have htop_nontrivial : Nontrivial (⊤ : Subgroup Oamb) :=
       (Subgroup.nontrivial_iff_ne_bot (⊤ : Subgroup Oamb)).mpr top_ne_bot
@@ -234,8 +234,8 @@ private theorem exists_ambient_normal_commutative_qSubgroup_le_determinantKernel
         hOamb_p htop_nontrivial
     simpa using h
   let K : Subgroup G := (Subgroup.center Oamb).map Oamb.subtype
-  haveI : Oamb.Normal := hOamb_normal
-  haveI : (Subgroup.center Oamb).Characteristic := Subgroup.centerCharacteristic
+  have : Oamb.Normal := hOamb_normal
+  have : (Subgroup.center Oamb).Characteristic := Subgroup.centerCharacteristic
   have hKnormal : K.Normal := by
     dsimp [K]
     infer_instance
@@ -293,8 +293,8 @@ private theorem commutative_of_determinantKernel_opCore_ne_bot_of_rankOneLinePai
       ρ hcore_ne_bot with
     ⟨K, hKnormal, hK_le_Gstar, hKq, hK_ne_bot, hKcomm⟩
   let D := hline K hKnormal hK_le_Gstar hKq hK_ne_bot hKcomm
-  letI : Module.Free F (D.W 0) := D.freeW0
-  letI : Module.Free F (V ⧸ D.W 0) := D.freeQ0
+  let : Module.Free F (D.W 0) := D.freeW0
+  let : Module.Free F (V ⧸ D.W 0) := D.freeQ0
   exact commutative_of_faithful_representation_permuted_rank_one_complement_of_odd
     D.W ρ hfaithful hodd D.isCompl D.permutes D.finrankW0 D.finrankQ0
 
@@ -336,13 +336,13 @@ theorem commutative_of_determinantKernel_opCore_ne_bot_of_rankOneKSubmodules
   rcases hline K hKnormal hK_le_Gstar hKq hK_ne_bot hKcomm with
     ⟨W, U, hfreeW, hfreeU, hfiniteW, hfiniteU, hfreeQW, hfreeQU,
       hcompl, hdimW, hdimU, hdimQW, hdimQU⟩
-  letI : Module.Free F W.toSubmodule := hfreeW.some
-  letI : Module.Free F U.toSubmodule := hfreeU.some
-  letI : Module.Finite F W.toSubmodule := hfiniteW.some
-  letI : Module.Finite F U.toSubmodule := hfiniteU.some
-  letI : Module.Free F (V ⧸ W.toSubmodule) := hfreeQW.some
-  letI : Module.Free F (V ⧸ U.toSubmodule) := hfreeQU.some
-  haveI : Nontrivial K := (Subgroup.nontrivial_iff_ne_bot K).mpr hK_ne_bot
+  let : Module.Free F W.toSubmodule := hfreeW.some
+  let : Module.Free F U.toSubmodule := hfreeU.some
+  let : Module.Finite F W.toSubmodule := hfiniteW.some
+  let : Module.Finite F U.toSubmodule := hfiniteU.some
+  let : Module.Free F (V ⧸ W.toSubmodule) := hfreeQW.some
+  let : Module.Free F (V ⧸ U.toSubmodule) := hfreeQU.some
+  have : Nontrivial K := (Subgroup.nontrivial_iff_ne_bot K).mpr hK_ne_bot
   obtain ⟨x, hx_ne_one⟩ := exists_ne (1 : K)
   exact commutative_of_determinantKernel_subgroup_rank_one_complement
     ρ hfaithful hodd K hKnormal hK_le_Gstar W U hcompl
@@ -413,7 +413,7 @@ private theorem commutative_of_opCore_ne_bot_of_isAlgClosed_of_determinantKernel
     (hdet_top : determinantKernelSubgroup ρ = ⊤)
     (hcore_ne_bot : OddOrder.Isaacs.Ch01.opCore q G ≠ ⊥) :
     Std.Commutative (· * · : G → G → G) := by
-  haveI : Finite (Sylow q G) := inferInstance
+  have : Finite (Sylow q G) := inferInstance
   rcases exists_nontrivial_normal_commutative_qSubgroup_of_opCore_ne_bot
       (q := q) (G := G) hcore_ne_bot with
     ⟨K, hKnormal, hKq, hK_ne_bot, hKcomm⟩
@@ -425,13 +425,13 @@ private theorem commutative_of_opCore_ne_bot_of_isAlgClosed_of_determinantKernel
       (p := p) (q := q) ρ hdim K hKq hq_ne_p hKcomm with
     ⟨W, U, hfreeW, hfreeU, hfiniteW, hfiniteU, hfreeQW, hfreeQU,
       hcompl, hdimW, hdimU, hdimQW, hdimQU⟩
-  letI : Module.Free F W.toSubmodule := hfreeW.some
-  letI : Module.Free F U.toSubmodule := hfreeU.some
-  letI : Module.Finite F W.toSubmodule := hfiniteW.some
-  letI : Module.Finite F U.toSubmodule := hfiniteU.some
-  letI : Module.Free F (V ⧸ W.toSubmodule) := hfreeQW.some
-  letI : Module.Free F (V ⧸ U.toSubmodule) := hfreeQU.some
-  haveI : Nontrivial K := (Subgroup.nontrivial_iff_ne_bot K).mpr hK_ne_bot
+  let : Module.Free F W.toSubmodule := hfreeW.some
+  let : Module.Free F U.toSubmodule := hfreeU.some
+  let : Module.Finite F W.toSubmodule := hfiniteW.some
+  let : Module.Finite F U.toSubmodule := hfiniteU.some
+  let : Module.Free F (V ⧸ W.toSubmodule) := hfreeQW.some
+  let : Module.Free F (V ⧸ U.toSubmodule) := hfreeQU.some
+  have : Nontrivial K := (Subgroup.nontrivial_iff_ne_bot K).mpr hK_ne_bot
   obtain ⟨x, hx_ne_one⟩ := exists_ne (1 : K)
   exact commutative_of_determinantKernel_subgroup_rank_one_complement
     ρ hfaithful hodd K hKnormal hKle W U hcompl
@@ -454,7 +454,7 @@ private theorem commutative_of_opCore_ne_bot_of_isAlgClosed_charAway_of_determin
     (hdet_top : determinantKernelSubgroup ρ = ⊤)
     (hcore_ne_bot : OddOrder.Isaacs.Ch01.opCore q G ≠ ⊥) :
     Std.Commutative (· * · : G → G → G) := by
-  haveI : Finite (Sylow q G) := inferInstance
+  have : Finite (Sylow q G) := inferInstance
   rcases exists_nontrivial_normal_commutative_qSubgroup_of_opCore_ne_bot
       (q := q) (G := G) hcore_ne_bot with
     ⟨K, hKnormal, _hKq, hK_ne_bot, hKcomm⟩
@@ -462,19 +462,19 @@ private theorem commutative_of_opCore_ne_bot_of_isAlgClosed_charAway_of_determin
     intro x _hx
     rw [hdet_top]
     trivial
-  haveI : NeZero (Nat.card K : F) :=
+  have : NeZero (Nat.card K : F) :=
     neZero_nat_card_cast_of_subgroup_forall_prime_not_char hchar K
   rcases exists_rank_one_KSubmodule_data_of_commutative_of_neZero_card
       ρ hdim K hKcomm with
     ⟨W, U, hfreeW, hfreeU, hfiniteW, hfiniteU, hfreeQW, hfreeQU,
       hcompl, hdimW, hdimU, hdimQW, hdimQU⟩
-  letI : Module.Free F W.toSubmodule := hfreeW.some
-  letI : Module.Free F U.toSubmodule := hfreeU.some
-  letI : Module.Finite F W.toSubmodule := hfiniteW.some
-  letI : Module.Finite F U.toSubmodule := hfiniteU.some
-  letI : Module.Free F (V ⧸ W.toSubmodule) := hfreeQW.some
-  letI : Module.Free F (V ⧸ U.toSubmodule) := hfreeQU.some
-  haveI : Nontrivial K := (Subgroup.nontrivial_iff_ne_bot K).mpr hK_ne_bot
+  let : Module.Free F W.toSubmodule := hfreeW.some
+  let : Module.Free F U.toSubmodule := hfreeU.some
+  let : Module.Finite F W.toSubmodule := hfiniteW.some
+  let : Module.Finite F U.toSubmodule := hfiniteU.some
+  let : Module.Free F (V ⧸ W.toSubmodule) := hfreeQW.some
+  let : Module.Free F (V ⧸ U.toSubmodule) := hfreeQU.some
+  have : Nontrivial K := (Subgroup.nontrivial_iff_ne_bot K).mpr hK_ne_bot
   obtain ⟨x, hx_ne_one⟩ := exists_ne (1 : K)
   exact commutative_of_determinantKernel_subgroup_rank_one_complement
     ρ hfaithful hodd K hKnormal hKle W U hcompl
@@ -492,8 +492,8 @@ private theorem opCore_ne_bot_of_sylow_normalizer
       (Subgroup.normalizer (Q : Set G)) ≠ ⊥ := by
   let N : Subgroup G := Subgroup.normalizer (Q : Set G)
   let QN : Sylow q N := Q.subtype Q.le_normalizer
-  haveI : Finite (Sylow q N) := inferInstance
-  haveI : (QN : Subgroup N).Normal := by
+  have : Finite (Sylow q N) := inferInstance
+  have : (QN : Subgroup N).Normal := by
     change ((Q : Subgroup G).subgroupOf N).Normal
     exact Subgroup.normal_subgroupOf_of_le_normalizer le_rfl
   have hQ_ne_bot : (Q : Subgroup G) ≠ ⊥ := Q.ne_bot_of_dvd_card hq_dvd
@@ -653,8 +653,8 @@ private theorem exists_prime_ne_sylow_normalizer_opCore_ne_bot_of_not_isPGroup
         (Subgroup.normalizer (Q : Set G)) ≠ ⊥ := by
   rcases exists_prime_ne_dvd_card_of_not_isPGroup (p := p) (G := G) hnot_pgroup with
     ⟨q, hq_prime, hq_ne_p, hq_dvd⟩
-  haveI : Fact q.Prime := ⟨hq_prime⟩
-  haveI : Finite (Sylow q G) := inferInstance
+  have : Fact q.Prime := ⟨hq_prime⟩
+  have : Finite (Sylow q G) := inferInstance
   obtain ⟨Q⟩ := Sylow.nonempty (p := q) (G := G)
   exact ⟨q, hq_prime, hq_ne_p, hq_dvd, Q,
     opCore_ne_bot_of_sylow_normalizer Q hq_dvd⟩
@@ -698,14 +698,14 @@ private theorem exists_prime_opCore_ne_bot_of_hasNormalPComplement_induction
   · obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
     have hPtop : (P : Subgroup G) = ⊤ := by
       simpa [hN_bot] using hNcompl P
-    haveI : (P : Subgroup G).Normal := by
+    have : (P : Subgroup G).Normal := by
       rw [hPtop]
       infer_instance
     exact ⟨p, Fact.out,
       opCore_ne_bot_of_nontrivial_normal_pSubgroup
         (G := G) (K := (P : Subgroup G)) P.2
         (P.ne_bot_of_dvd_card hp_dvd)⟩
-  · haveI : N.Normal := hNnormal
+  · have : N.Normal := hNnormal
     have hN_ne_top : N ≠ ⊤ := by
       intro hN_top
       obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
@@ -719,8 +719,8 @@ private theorem exists_prime_opCore_ne_bot_of_hasNormalPComplement_induction
         le_inf hP_le_N le_rfl
       simpa [(hNcompl P).isCompl.inf_eq_bot] using hP_le_inf
     rcases hind N hNnormal hN_bot hN_ne_top with ⟨r, hr_prime, hNcore_ne_bot⟩
-    haveI : Fact r.Prime := ⟨hr_prime⟩
-    haveI : Finite (Sylow r G) := inferInstance
+    have : Fact r.Prime := ⟨hr_prime⟩
+    have : Finite (Sylow r G) := inferInstance
     exact ⟨r, hr_prime,
       opCore_ne_bot_of_normal_subgroup_opCore_ne_bot
         (p := r) (G := G) N hNcore_ne_bot⟩
@@ -746,8 +746,8 @@ private theorem exists_prime_opCore_ne_bot_of_not_isPGroup_via_normalizers
   rcases exists_prime_ne_sylow_normalizer_opCore_ne_bot_of_not_isPGroup
       (p := p) (G := G) hnot_pgroup with
     ⟨q, hq_prime, hq_ne_p, hq_dvd, Q, hQcore_ne_bot⟩
-  haveI : Fact q.Prime := ⟨hq_prime⟩
-  haveI : Finite (Sylow q G) := inferInstance
+  have : Fact q.Prime := ⟨hq_prime⟩
+  have : Finite (Sylow q G) := inferInstance
   have hcomp : OddOrder.Isaacs.Ch05.HasNormalPComplement q G :=
     hasNormalPComplement_of_sylow_normalizer_commutative
       Q (hnormalizer hq_ne_p Q hQcore_ne_bot)
@@ -788,8 +788,8 @@ private theorem exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot
   have hGstar_ne_bot : Gstar ≠ ⊥ := by
     simpa [Gstar] using hdet_ne_bot
   by_cases hGstar_p : IsPGroup p Gstar
-  · haveI : Finite (Sylow p Gstar) := inferInstance
-    haveI : Nontrivial Gstar :=
+  · have : Finite (Sylow p Gstar) := inferInstance
+    have : Nontrivial Gstar :=
       (Subgroup.nontrivial_iff_ne_bot Gstar).mpr hGstar_ne_bot
     exact ⟨p, Fact.out,
       opCore_ne_bot_of_nontrivial_normal_pSubgroup
@@ -833,11 +833,11 @@ private theorem exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot_charAway
   let Gstar : Subgroup G := determinantKernelSubgroup ρ
   have hGstar_ne_bot : Gstar ≠ ⊥ := by
     simpa [Gstar] using hdet_ne_bot
-  haveI : Nontrivial Gstar :=
+  have : Nontrivial Gstar :=
     (Subgroup.nontrivial_iff_ne_bot Gstar).mpr hGstar_ne_bot
   obtain ⟨p, hp_prime, _hp_dvd⟩ :=
     Nat.exists_prime_and_dvd (Finite.one_lt_card (α := Gstar)).ne'
-  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have : Fact p.Prime := ⟨hp_prime⟩
   exact exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot
     (p := p) ρ hdet_ne_bot
     (fun {q} _hq_prime _hq_ne_p Q hQcore =>
@@ -860,7 +860,7 @@ private theorem sylow_commutative_and_commutator_le_of_determinantKernel_opCore_
     Std.Commutative (· * · : P → P → P) ∧
       commutator G ≤ (P : Subgroup G) := by
   let Gstar : Subgroup G := determinantKernelSubgroup ρ
-  haveI : Gstar.Normal := by
+  have : Gstar.Normal := by
     dsimp [Gstar]
     exact determinantKernelSubgroup_normal ρ
   have hGcore_ne_bot : OddOrder.Isaacs.Ch01.opCore p G ≠ ⊥ :=
@@ -912,7 +912,7 @@ private theorem sylow_commutative_and_commutator_le_of_determinantKernel_core_sp
   · subst r
     exact sylow_commutative_and_commutator_le_of_determinantKernel_opCore_ne_bot
       ρ hfaithful hdim hcore_ne_bot P
-  · haveI : Fact r.Prime := ⟨hr_prime⟩
+  · have : Fact r.Prime := ⟨hr_prime⟩
     exact sylow_commutative_and_commutator_le_of_commutative
       (hcore_ne_p_comm (q := r) hr_eq_p hcore_ne_bot) P
 
@@ -1229,7 +1229,7 @@ private theorem commutative_of_determinantKernel_core_spine_charAway
   rcases exists_prime_opCore_ne_bot_of_determinantKernel_ne_bot_charAway
       ρ hdet_ne_bot hnormalizer hind with
     ⟨r, hr_prime, hcore_ne_bot⟩
-  haveI : Fact r.Prime := ⟨hr_prime⟩
+  have : Fact r.Prime := ⟨hr_prime⟩
   exact commutative_of_determinantKernel_opCore_ne_bot_of_algebraicClosure_charAway
     ρ hfaithful hodd hdim hchar hcore_ne_bot
 

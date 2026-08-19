@@ -228,7 +228,7 @@ theorem not_dvd_card_commutator_ker_snd [Finite Γ] [Finite A] {h : Γ →* A ×
   set ΓA := ((MonoidHom.snd A B).comp h).ker with hΓA
   rw [card_commutator_subgroup]
   refine not_dvd_card_commutator_of_ker_le_center
-    (ψ := ((MonoidHom.fst A B).comp h).restrict ΓA) ?_ hp
+    (ψ := ((MonoidHom.fst A B).comp h).domRestrict ΓA) ?_ hp
   intro x hx
   have h1 : (h (x : Γ)).1 = 1 := MonoidHom.mem_ker.mp hx
   have h2 : (h (x : Γ)).2 = 1 := (x : ↥ΓA).2
@@ -246,7 +246,7 @@ theorem not_dvd_card_commutator_ker_fst [Finite Γ] [Finite B] {h : Γ →* A ×
   set ΓB := ((MonoidHom.fst A B).comp h).ker with hΓB
   rw [card_commutator_subgroup]
   refine not_dvd_card_commutator_of_ker_le_center
-    (ψ := ((MonoidHom.snd A B).comp h).restrict ΓB) ?_ hp
+    (ψ := ((MonoidHom.snd A B).comp h).domRestrict ΓB) ?_ hp
   intro x hx
   have h2 : (h (x : Γ)).2 = 1 := MonoidHom.mem_ker.mp hx
   have h1 : (h (x : Γ)).1 = 1 := (x : ↥ΓB).2
@@ -267,7 +267,7 @@ theorem inf_inf_commutator_eq_bot [Finite Γ] [Finite A] [Finite B] {h : Γ →*
   refine Subgroup.disjoint_of_coprime_natCard ?_
   by_contra hne
   obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hne
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hpA : p ∣ Nat.card
       ((h.ker ⊓ ⁅((MonoidHom.snd A B).comp h).ker,
         ((MonoidHom.snd A B).comp h).ker⁆ : Subgroup Γ)) :=
@@ -374,10 +374,10 @@ theorem isStemExtension_lift {K A' : Type*} [Group K] [Group A'] [Finite K]
     have := (Subgroup.mem_center_iff.mp (hcen hy)) k
     exact congrArg (QuotientGroup.mk' N) this
   · -- 位数
-    have hφ : ((QuotientGroup.mk' N).restrict ψ.ker).ker = N.subgroupOf ψ.ker := by
+    have hφ : ((QuotientGroup.mk' N).domRestrict ψ.ker).ker = N.subgroupOf ψ.ker := by
       ext x
       simp [Subgroup.mem_subgroupOf]
-    have hrange : ((QuotientGroup.mk' N).restrict ψ.ker).range =
+    have hrange : ((QuotientGroup.mk' N).domRestrict ψ.ker).range =
         ψ.ker.map (QuotientGroup.mk' N) := by
       ext x
       constructor
@@ -385,7 +385,7 @@ theorem isStemExtension_lift {K A' : Type*} [Group K] [Group A'] [Finite K]
         exact ⟨y, hy, rfl⟩
       · rintro ⟨y, hy, rfl⟩
         exact ⟨⟨y, hy⟩, rfl⟩
-    have hlag := Subgroup.card_mul_index ((QuotientGroup.mk' N).restrict ψ.ker).ker
+    have hlag := Subgroup.card_mul_index ((QuotientGroup.mk' N).domRestrict ψ.ker).ker
     rw [Subgroup.index_ker, hrange, hφ] at hlag
     rw [hker, ← hlag]
     congr 1
@@ -394,16 +394,16 @@ theorem isStemExtension_lift {K A' : Type*} [Group K] [Group A'] [Finite K]
 /-! ### 5A.8(b) の完成: 両側の stem extension -/
 
 /-- `Γ_A` 上の `A` への制限の核は `Z` (を `Γ_A` の部分群として見たもの)。 -/
-theorem ker_restrict_fst (h : Γ →* A × B) :
-    (((MonoidHom.fst A B).comp h).restrict ((MonoidHom.snd A B).comp h).ker).ker
+theorem ker_domRestrict_fst (h : Γ →* A × B) :
+    (((MonoidHom.fst A B).comp h).domRestrict ((MonoidHom.snd A B).comp h).ker).ker
       = h.ker.subgroupOf ((MonoidHom.snd A B).comp h).ker := by
   ext x
   rw [MonoidHom.mem_ker, Subgroup.mem_subgroupOf, MonoidHom.mem_ker]
   exact ⟨fun h1 => Prod.ext h1 x.2, fun h1 => congrArg Prod.fst h1⟩
 
 /-- `Γ_B` 上の `B` への制限の核は `Z`。 -/
-theorem ker_restrict_snd (h : Γ →* A × B) :
-    (((MonoidHom.snd A B).comp h).restrict ((MonoidHom.fst A B).comp h).ker).ker
+theorem ker_domRestrict_snd (h : Γ →* A × B) :
+    (((MonoidHom.snd A B).comp h).domRestrict ((MonoidHom.fst A B).comp h).ker).ker
       = h.ker.subgroupOf ((MonoidHom.fst A B).comp h).ker := by
   ext x
   rw [MonoidHom.mem_ker, Subgroup.mem_subgroupOf, MonoidHom.mem_ker]
@@ -477,16 +477,16 @@ theorem ker_subgroupOf_le_sup_snd [Finite A] [Finite B] {h : Γ →* A × B}
 theorem zB_subgroupOf_le_ker (h : Γ →* A × B) :
     (h.ker ⊓ ⁅((MonoidHom.fst A B).comp h).ker,
         ((MonoidHom.fst A B).comp h).ker⁆).subgroupOf ((MonoidHom.snd A B).comp h).ker ≤
-      (((MonoidHom.fst A B).comp h).restrict ((MonoidHom.snd A B).comp h).ker).ker := by
-  rw [ker_restrict_fst]
+      (((MonoidHom.fst A B).comp h).domRestrict ((MonoidHom.snd A B).comp h).ker).ker := by
+  rw [ker_domRestrict_fst]
   exact Subgroup.comap_mono inf_le_left
 
 /-- `Z_A` (を `Γ_B` の部分群として見たもの) は `Γ_B → B` の核に含まれる。 -/
 theorem zA_subgroupOf_le_ker (h : Γ →* A × B) :
     (h.ker ⊓ ⁅((MonoidHom.snd A B).comp h).ker,
         ((MonoidHom.snd A B).comp h).ker⁆).subgroupOf ((MonoidHom.fst A B).comp h).ker ≤
-      (((MonoidHom.snd A B).comp h).restrict ((MonoidHom.fst A B).comp h).ker).ker := by
-  rw [ker_restrict_snd]
+      (((MonoidHom.snd A B).comp h).domRestrict ((MonoidHom.fst A B).comp h).ker).ker := by
+  rw [ker_domRestrict_snd]
   exact Subgroup.comap_mono inf_le_left
 
 /-- **5A.8(b) の `A` 側 stem extension** `↥Γ_A ⧸ Z_B →* A`。 -/
@@ -494,7 +494,7 @@ noncomputable def prodStemHomFst (h : Γ →* A × B) :
     (↥((MonoidHom.snd A B).comp h).ker ⧸
       (h.ker ⊓ ⁅((MonoidHom.fst A B).comp h).ker,
         ((MonoidHom.fst A B).comp h).ker⁆).subgroupOf ((MonoidHom.snd A B).comp h).ker) →* A :=
-  QuotientGroup.lift _ (((MonoidHom.fst A B).comp h).restrict ((MonoidHom.snd A B).comp h).ker)
+  QuotientGroup.lift _ (((MonoidHom.fst A B).comp h).domRestrict ((MonoidHom.snd A B).comp h).ker)
     (zB_subgroupOf_le_ker h)
 
 /-- **5A.8(b) の `B` 側 stem extension** `↥Γ_B ⧸ Z_A →* B`。 -/
@@ -502,7 +502,7 @@ noncomputable def prodStemHomSnd (h : Γ →* A × B) :
     (↥((MonoidHom.fst A B).comp h).ker ⧸
       (h.ker ⊓ ⁅((MonoidHom.snd A B).comp h).ker,
         ((MonoidHom.snd A B).comp h).ker⁆).subgroupOf ((MonoidHom.fst A B).comp h).ker) →* B :=
-  QuotientGroup.lift _ (((MonoidHom.snd A B).comp h).restrict ((MonoidHom.fst A B).comp h).ker)
+  QuotientGroup.lift _ (((MonoidHom.snd A B).comp h).domRestrict ((MonoidHom.fst A B).comp h).ker)
     (zA_subgroupOf_le_ker h)
 
 /-- `ker h ≤ Γ_A`。 -/
@@ -530,7 +530,7 @@ theorem isStemExtension_prodStemHomFst [Finite Γ] [Finite A] [Finite B] {h : Γ
   have hZB : (h.ker ⊓ ⁅((MonoidHom.fst A B).comp h).ker,
       ((MonoidHom.fst A B).comp h).ker⁆ : Subgroup Γ) ≤ ((MonoidHom.snd A B).comp h).ker :=
     inf_le_left.trans (ker_le_ker_comp_snd h)
-  have hres := isStemExtension_lift (ψ := ((MonoidHom.fst A B).comp h).restrict
+  have hres := isStemExtension_lift (ψ := ((MonoidHom.fst A B).comp h).domRestrict
       ((MonoidHom.snd A B).comp h).ker)
     (by
       intro a
@@ -541,12 +541,12 @@ theorem isStemExtension_prodStemHomFst [Finite Γ] [Finite A] [Finite B] {h : Γ
       exact ⟨⟨γ, hmem⟩, by
         change (h γ).1 = a
         rw [hγ]⟩)
-    (by rw [ker_restrict_fst]; exact ker_subgroupOf_le_center hst.ker_le_center)
+    (by rw [ker_domRestrict_fst]; exact ker_subgroupOf_le_center hst.ker_le_center)
     (zB_subgroupOf_le_ker h)
-    (by rw [ker_restrict_fst]; exact ker_subgroupOf_le_sup_fst hsurj hst hcop)
+    (by rw [ker_domRestrict_fst]; exact ker_subgroupOf_le_sup_fst hsurj hst hcop)
   refine ⟨hres.1, ?_⟩
   have hcard := hres.2
-  rw [ker_restrict_fst,
+  rw [ker_domRestrict_fst,
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hZB).toEquiv,
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe (ker_le_ker_comp_snd h)).toEquiv,
     card_ker_eq_mul hsurj hst hcop, mul_comm] at hcard
@@ -563,7 +563,7 @@ theorem isStemExtension_prodStemHomSnd [Finite Γ] [Finite A] [Finite B] {h : Γ
   have hZA : (h.ker ⊓ ⁅((MonoidHom.snd A B).comp h).ker,
       ((MonoidHom.snd A B).comp h).ker⁆ : Subgroup Γ) ≤ ((MonoidHom.fst A B).comp h).ker :=
     inf_le_left.trans (ker_le_ker_comp_fst h)
-  have hres := isStemExtension_lift (ψ := ((MonoidHom.snd A B).comp h).restrict
+  have hres := isStemExtension_lift (ψ := ((MonoidHom.snd A B).comp h).domRestrict
       ((MonoidHom.fst A B).comp h).ker)
     (by
       intro b
@@ -574,12 +574,12 @@ theorem isStemExtension_prodStemHomSnd [Finite Γ] [Finite A] [Finite B] {h : Γ
       exact ⟨⟨γ, hmem⟩, by
         change (h γ).2 = b
         rw [hγ]⟩)
-    (by rw [ker_restrict_snd]; exact ker_subgroupOf_le_center hst.ker_le_center)
+    (by rw [ker_domRestrict_snd]; exact ker_subgroupOf_le_center hst.ker_le_center)
     (zA_subgroupOf_le_ker h)
-    (by rw [ker_restrict_snd]; exact ker_subgroupOf_le_sup_snd hsurj hst hcop)
+    (by rw [ker_domRestrict_snd]; exact ker_subgroupOf_le_sup_snd hsurj hst hcop)
   refine ⟨hres.1, ?_⟩
   have hcard := hres.2
-  rw [ker_restrict_snd,
+  rw [ker_domRestrict_snd,
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hZA).toEquiv,
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe (ker_le_ker_comp_fst h)).toEquiv,
     card_ker_eq_mul hsurj hst hcop] at hcard

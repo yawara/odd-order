@@ -178,7 +178,7 @@ Proposition 2 applies. -/
 theorem theoremAConclusion_of_orderFiveCarrier_subgroup (hV : hyp.V ≠ ⊥)
     (ind : TheoremAInductionBelow G Ω) : Nonempty (TheoremAConclusion G Ω) := by
   have hnorm := hyp.normal_of_orderFiveCarrier hG₀
-  haveI := hnorm
+  have := hnorm
   have hne : G₀ ≠ ⊤ := by
     intro htop
     refine hV (eq_bot_iff.mpr fun v hv => Subgroup.mem_bot.mpr ?_)
@@ -217,7 +217,7 @@ theorem coe_orderThreeGeneratedSubgroup_eq_orderFiveCarrier
   rw [hyp.coe_orderThreeGeneratedSubgroup_eq_Q0K_union_Q0KtQ0 h3, ← hQ]
   ext g
   simp only [orderFiveCarrier, Set.mem_union, Set.mem_mul, Set.mem_singleton_iff,
-    Set.mem_setOf_eq, SetLike.mem_coe]
+    Set.mem_ofPred_eq, SetLike.mem_coe]
   constructor
   · rintro (⟨q, hq, k, hk, rfl⟩ |
       ⟨-, ⟨-, ⟨q, hq, k, hk, rfl⟩, -, rfl, rfl⟩, q', hq', rfl⟩)

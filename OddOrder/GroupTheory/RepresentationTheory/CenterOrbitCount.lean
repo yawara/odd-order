@@ -158,8 +158,8 @@ theorem finrank_centerRep_invariants_eq_card_orbits [Finite G] [Finite (ConjClas
     finrank k ↥(Representation.invariants (centerRep' (k := k) (G := G)))
       = Nat.card (orbitRel.Quotient (MulAut G) (ConjClasses G)) := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Fintype (ConjClasses G) := Fintype.ofFinite (ConjClasses G)
+  have : Fintype G := Fintype.ofFinite G
+  have : Fintype (ConjClasses G) := Fintype.ofFinite (ConjClasses G)
   exact PermutationInvariants.finrank_invariants_eq_card_orbits centerBasis' centerRep'
     centerRep'_apply_centerBasis'
 

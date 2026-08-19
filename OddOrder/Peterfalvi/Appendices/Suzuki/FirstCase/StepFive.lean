@@ -51,15 +51,15 @@ theorem card_center_eq_two_of_card_eq_eight {T : Type*} [Group T] [Finite T]
     (hcard : Nat.card T = 8) (hnc : ¬ ∀ x y : T, x * y = y * x) :
     Nat.card ↥(Subgroup.center T) = 2 := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hdvd : Nat.card ↥(Subgroup.center T) ∣ 8 :=
     hcard ▸ Subgroup.card_subgroup_dvd_card _
   have h2 : IsPGroup 2 T :=
     IsPGroup.of_card (hcard.trans (by norm_num : (8 : ℕ) = 2 ^ 3))
-  haveI : Nontrivial T := by
+  have : Nontrivial T := by
     apply Finite.one_lt_card_iff_nontrivial.mp
     rw [hcard]; norm_num
-  haveI hZnt : Nontrivial ↥(Subgroup.center T) := h2.center_nontrivial
+  have hZnt : Nontrivial ↥(Subgroup.center T) := h2.center_nontrivial
   have hZge : 2 ≤ Nat.card ↥(Subgroup.center T) :=
     Finite.one_lt_card_iff_nontrivial.mpr hZnt
   have hne8 : Nat.card ↥(Subgroup.center T) ≠ 8 := by
@@ -77,7 +77,7 @@ theorem card_center_eq_two_of_card_eq_eight {T : Type*} [Group T] [Finite T]
         (Subgroup.center T)
       rw [hcard, h4] at hmul
       omega
-    haveI : IsCyclic (T ⧸ Subgroup.center T) := isCyclic_of_prime_card hquot
+    have : IsCyclic (T ⧸ Subgroup.center T) := isCyclic_of_prime_card hquot
     have hcomm := MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
       (QuotientGroup.mk' (Subgroup.center T)) (by
         rw [QuotientGroup.ker_mk'])
@@ -106,8 +106,8 @@ theorem isCyclic_odd_pSubgroup_of_nearField_units {F : Type*}
     [NearFields.NearField F] [Finite F] {q : ℕ} (hq : q.Prime) (hqodd : Odd q)
     (R : Subgroup Fˣ) (hR : IsPGroup q ↥R) : IsCyclic ↥R := by
   classical
-  haveI : Fact q.Prime := ⟨hq⟩
-  haveI : Nontrivial (Multiplicative F) := inferInstanceAs (Nontrivial F)
+  have : Fact q.Prime := ⟨hq⟩
+  have : Nontrivial (Multiplicative F) := inferInstanceAs (Nontrivial F)
   -- the right-multiplication-by-inverse action of `R` on `(F, +)`
   set φ : ↥R →* MulAut (Multiplicative F) :=
     { toFun := fun u => (NearFields.rightMul ((((u : Fˣ))⁻¹ : Fˣ) : F)
@@ -173,21 +173,21 @@ theorem exists_nilpotent_units_sylowTwo_decomp {F : Type*}
       O ≤ Subgroup.center Fˣ ∧
       ¬ ∀ a b : ↥(T : Subgroup Fˣ), a * b = b * a := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI := hnil
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have := hnil
   -- the normal `2`-complement `O` and the normal Sylow `2`-subgroup `T`
   obtain ⟨O, hOnorm, hOcompl⟩ :=
     OddOrder.Isaacs.Ch05.hasNormalPComplement_of_isNilpotent (p := 2) (H := Fˣ)
   obtain ⟨T⟩ : Nonempty (Sylow 2 Fˣ) := inferInstance
   have hcompl : Subgroup.IsComplement' O (T : Subgroup Fˣ) := hOcompl T
-  haveI hTnorm : (T : Subgroup Fˣ).Normal := inferInstance
+  have hTnorm : (T : Subgroup Fˣ).Normal := inferInstance
   have hOodd : ¬ 2 ∣ Nat.card ↥O :=
     OddOrder.Isaacs.Ch05.not_dvd_card_of_isComplement'_sylow T hcompl
   -- `O` is cyclic: odd Sylows of `F^*` are cyclic
-  haveI hOzg : IsZGroup ↥O := by
+  have hOzg : IsZGroup ↥O := by
     rw [isZGroup_iff]
     intro q hq P'
-    haveI : Fact q.Prime := ⟨hq⟩
+    have : Fact q.Prime := ⟨hq⟩
     rcases eq_or_ne q 2 with rfl | hq2
     · -- the Sylow `2`-subgroup of the odd-order group `O` is trivial
       obtain ⟨k, hk⟩ := P'.isPGroup'.exists_card_eq
@@ -210,8 +210,8 @@ theorem exists_nilpotent_units_sylowTwo_decomp {F : Type*}
       exact isCyclic_of_surjective _
         (Subgroup.equivMapOfInjective (P' : Subgroup ↥O) O.subtype
           O.subtype_injective).symm.surjective
-  haveI hOcyc : IsCyclic ↥O := inferInstance
-  letI : CommGroup ↥O := hOcyc.commGroup
+  have hOcyc : IsCyclic ↥O := inferInstance
+  let : CommGroup ↥O := hOcyc.commGroup
   -- units are noncommutative
   have hncU : ¬ ∀ u v : Fˣ, u * v = v * u := by
     intro hUcomm
@@ -288,16 +288,16 @@ theorem nearField_card_eq_nine_of_nilpotent_units {F : Type*}
     (hnc : ¬ ∀ x y : F, x * y = y * x) :
     Nat.card F = 9 ∧ Nat.card Fˣ = 8 := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI := hnil
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have := hnil
   -- normal `2`-complement `O` (cyclic, central) and nonabelian Sylow `2`
   -- subgroup `T`, from the shared decomposition prefix
   obtain ⟨O, T, hOnorm, hcompl, hOodd, hOcyc, hOTcomm, hOle, hTnc⟩ :=
     exists_nilpotent_units_sylowTwo_decomp hnil hnc
-  haveI := hOnorm
-  haveI hTnorm : (T : Subgroup Fˣ).Normal := inferInstance
+  have := hOnorm
+  have hTnorm : (T : Subgroup Fˣ).Normal := inferInstance
   have hOpos : 0 < Nat.card ↥O := Nat.card_pos
-  letI : CommGroup ↥O := hOcyc.commGroup
+  let : CommGroup ↥O := hOcyc.commGroup
   -- `T` is generalized quaternion (2-rank one, [Is] Thm 6.11)
   have hUnique : ∀ K L : Subgroup ↥(T : Subgroup Fˣ),
       Nat.card K = 2 → Nat.card L = 2 → K = L := by
@@ -318,7 +318,7 @@ theorem nearField_card_eq_nine_of_nilpotent_units {F : Type*}
       T.isPGroup' hUnique with hTcyc | ⟨-, n, ⟨eqT⟩⟩
   · exfalso
     apply hTnc
-    letI := hTcyc.commGroup
+    let := hTcyc.commGroup
     exact fun a b => mul_comm a b
   -- pin `n = 2` via exponent `4`
   have horder_dvd : 2 * n ∣ 4 := by
@@ -362,7 +362,7 @@ theorem nearField_card_eq_nine_of_nilpotent_units {F : Type*}
   have hprodcard : ∀ A B : Subgroup Fˣ, B.Normal → Disjoint A B →
       Nat.card ↥(A ⊔ B) = Nat.card ↥A * Nat.card ↥B := by
     intro A B hBnorm hdisj
-    haveI := hBnorm
+    have := hBnorm
     rw [← Nat.card_prod]
     apply Nat.card_congr
     refine (Equiv.ofBijective (fun x : ↥A × ↥B =>
@@ -471,10 +471,10 @@ theorem nearField_card_eq_nine_of_nilpotent_units {F : Type*}
   have hCcard : Nat.card ↥C = 4 * Nat.card ↥O := by
     rw [hCdef, hprodcard _ _ hOnorm hTcOdisj, hTccard]
   -- `C` is cyclic: its Sylow subgroups are cyclic and it is nilpotent
-  haveI hCzg : IsZGroup ↥C := by
+  have hCzg : IsZGroup ↥C := by
     rw [isZGroup_iff]
     intro q hq P'
-    haveI : Fact q.Prime := ⟨hq⟩
+    have : Fact q.Prime := ⟨hq⟩
     rcases eq_or_ne q 2 with rfl | hq2
     · -- a Sylow `2`-subgroup of `C` has order dividing `4`; Klein four is
       -- excluded by the `2`-rank hypothesis, so it is cyclic
@@ -538,12 +538,11 @@ theorem nearField_card_eq_nine_of_nilpotent_units {F : Type*}
       exact isCyclic_of_surjective _
         (Subgroup.equivMapOfInjective (P' : Subgroup ↥C) C.subtype
           C.subtype_injective).symm.surjective
-  haveI hCcyc : IsCyclic ↥C := inferInstance
+  have hCcyc : IsCyclic ↥C := inferInstance
   have hCidx : C.index = 2 := by
     have hmul := Subgroup.card_mul_index C
     have hUcard : Nat.card Fˣ = 8 * Nat.card ↥O := by
       have h := hcompl.card_mul_card
-      simp only [SetLike.coe_sort_coe] at h
       rw [hTcard] at h
       rw [← h]
       ring
@@ -565,7 +564,6 @@ theorem nearField_card_eq_nine_of_nilpotent_units {F : Type*}
     rw [Nat.card_units, hcardF9]
   have hcardU8 : Nat.card Fˣ = 8 * Nat.card ↥O := by
     have h := hcompl.card_mul_card
-    simp only [SetLike.coe_sort_coe] at h
     rw [hTcard] at h
     rw [← h]
     ring
@@ -618,7 +616,7 @@ theorem exists_noncommuting_two_elements_of_nearField_units {F : Type*}
     (hnc : ¬ ∀ x y : F, x * y = y * x) :
     ∃ a b : Fˣ, (∃ k : ℕ, orderOf a = 2 ^ k) ∧ (∃ k : ℕ, orderOf b = 2 ^ k) ∧
       a * b ≠ b * a := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨O, T, -, -, -, -, -, -, hTnc⟩ :=
     exists_nilpotent_units_sylowTwo_decomp hnil hnc
   push Not at hTnc
@@ -656,7 +654,7 @@ theorem centralizer_inf_mulEquiv_units :
       (_model : NearFields.AffineNearFieldModel fc.rankOneQuotient F),
       Nonempty
         (↥(fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)) ≃* Fˣ) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   intro F instF model
   classical
   set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
@@ -747,13 +745,13 @@ theorem Q1_eq_bot_of_card_two_pow {n : ℕ}
 private theorem mem_sylowTwo_of_orderOf_two_pow
     (S : Sylow 2 ↥fc.toHypothesis.Q) {w : ↥fc.toHypothesis.Q} {k : ℕ}
     (hw : orderOf w = 2 ^ k) : w ∈ (S : Subgroup ↥fc.toHypothesis.Q) := by
-  letI : Group.IsNilpotent ↥fc.toHypothesis.Q := fc.toHypothesis.isNilpotent_Q
-  letI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  letI hSnorm : (S : Subgroup ↥fc.toHypothesis.Q).Normal := inferInstance
+  let : Group.IsNilpotent ↥fc.toHypothesis.Q := fc.toHypothesis.isNilpotent_Q
+  let : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  let hSnorm : (S : Subgroup ↥fc.toHypothesis.Q).Normal := inferInstance
   have hzp : IsPGroup 2 ↥(Subgroup.zpowers w) :=
     IsPGroup.of_card (by rw [Nat.card_zpowers, hw])
   obtain ⟨T, hle⟩ := hzp.exists_le_sylow
-  haveI : Unique (Sylow 2 ↥fc.toHypothesis.Q) := Sylow.unique_of_normal S hSnorm
+  have : Unique (Sylow 2 ↥fc.toHypothesis.Q) := Sylow.unique_of_normal S hSnorm
   have hTS : T = S := Subsingleton.elim _ _
   rw [← hTS]
   exact hle (Subgroup.mem_zpowers w)
@@ -782,10 +780,10 @@ theorem card_nearField_eq_nine_and_Q1_eq_bot :
           Nat.card ↥(fc.toHypothesis.Q ⊓
             Subgroup.centralizer (fc.P : Set G)) = 8 ∧
           fc.toHypothesis.Q1 = ⊥) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   intro F instF model
   classical
-  haveI : Finite F := by
+  have : Finite F := by
     have hinj : Function.Injective
         (fun x : F => model.emb (Multiplicative.ofAdd x)) :=
       fun a b hab => Multiplicative.ofAdd.injective (model.emb_injective hab)
@@ -797,8 +795,8 @@ theorem card_nearField_eq_nine_and_Q1_eq_bot :
   obtain ⟨e⟩ := fc.centralizer_inf_mulEquiv_units model
   -- `F^*` is nilpotent: a subgroup of the nilpotent `Q`, transported along `e`
   have hnil : Group.IsNilpotent Fˣ := by
-    letI : Group.IsNilpotent ↥fc.toHypothesis.Q := fc.toHypothesis.isNilpotent_Q
-    haveI : Group.IsNilpotent
+    let : Group.IsNilpotent ↥fc.toHypothesis.Q := fc.toHypothesis.isNilpotent_Q
+    have : Group.IsNilpotent
         ↥((fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)).subgroupOf
           fc.toHypothesis.Q) := inferInstance
     exact Group.nilpotent_of_mulEquiv
@@ -912,10 +910,10 @@ theorem isSuzuki2Group_Q_of_noncomm
       NearFields.AffineNearFieldModel fc.rankOneQuotient F)
     (hnc : ¬ ∀ x y : F, x * y = y * x) :
     OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥fc.toHypothesis.Q := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI : Finite F := by
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Finite F := by
     have hinj : Function.Injective
         (fun x : F => model.emb (Multiplicative.ofAdd x)) :=
       fun a b hab => Multiplicative.ofAdd.injective (model.emb_injective hab)
@@ -931,8 +929,8 @@ theorem isSuzuki2Group_Q_of_noncomm
   -- `e : C_Q(P) ≃* F^*`, and `F^*` is nilpotent (subgroup of nilpotent `Q`)
   obtain ⟨e⟩ := fc.centralizer_inf_mulEquiv_units model
   have hnil : Group.IsNilpotent Fˣ := by
-    letI : Group.IsNilpotent ↥fc.toHypothesis.Q := fc.toHypothesis.isNilpotent_Q
-    haveI : Group.IsNilpotent
+    let : Group.IsNilpotent ↥fc.toHypothesis.Q := fc.toHypothesis.isNilpotent_Q
+    have : Group.IsNilpotent
         ↥((fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)).subgroupOf
           fc.toHypothesis.Q) := inferInstance
     exact Group.nilpotent_of_mulEquiv

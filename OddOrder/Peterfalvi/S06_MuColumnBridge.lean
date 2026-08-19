@@ -51,7 +51,7 @@ theorem induce_omegaColumnDiff_mu_diff {L : Type*} [Group L] [Fintype L]
           ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
       = (h.columnFamily χ₂).sign •
           ((h.columnFamily χ₂).classFunction i - (h.columnFamily χ₂).classFunction 0) := by
-  haveI : Fintype (h.W1 ⊔ h.W2 : Subgroup L) := Fintype.ofFinite _
+  have : Fintype (h.W1 ⊔ h.W2 : Subgroup L) := Fintype.ofFinite _
   rw [h.induce_omegaColumnDiff_eq χ₂ (h.w1CharEquiv i), Equiv.symm_apply_apply]
 
 /-- **Peterfalvi (13.1.e), the `ω`/`μ`-grid difference form** — the exact shape consumed by the
@@ -76,7 +76,7 @@ theorem induce_chiColumn_diff_mu_diff {L : Type*} [Group L] [Fintype L]
       = (h.columnFamily χ₂).sign •
           (((h.columnFamily χ₂).mu i : ClassFunction L ℂ)
             - ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ)) := by
-  haveI : Fintype (h.W1 ⊔ h.W2 : Subgroup L) := Fintype.ofFinite _
+  have : Fintype (h.W1 ⊔ h.W2 : Subgroup L) := Fintype.ofFinite _
   have hchi : (h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
         - (h.chiColumn χ₂ 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
       = (h.omegaColumnDiff (h.w1CharEquiv i) 1 χ₂ :

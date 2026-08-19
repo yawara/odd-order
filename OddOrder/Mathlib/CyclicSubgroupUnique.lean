@@ -42,7 +42,7 @@ theorem le_powMonoidHom_ker_card (B : Subgroup A) :
 theorem eq_powMonoidHom_ker_card [Finite A] [IsCyclic A] (B : Subgroup A) :
     B = (powMonoidHom (Nat.card B) : A →* A).ker := by
   classical
-  haveI : Fintype A := Fintype.ofFinite A
+  have : Fintype A := Fintype.ofFinite A
   have hpos : 0 < Nat.card B := Nat.card_pos
   refine Subgroup.eq_of_le_of_card_ge (le_powMonoidHom_ker_card B) ?_
   have hle : #{a : A | a ^ Nat.card B = 1} ≤ Nat.card B :=

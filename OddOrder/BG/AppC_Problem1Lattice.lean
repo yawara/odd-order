@@ -58,7 +58,7 @@ theorem span_triples_normOne_eq_top (hq : q.Prime) (hq2 : q ≠ 2) {e : ℕ}
                ((u : (GaloisField 3 q)ˣ) : GaloisField 3 q) ^ e,
                ((u : (GaloisField 3 q)ˣ) : GaloisField 3 q) ^ (e * e))} = ⊤ := by
   classical
-  letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
+  let : Fintype (GaloisField 3 q) := Fintype.ofFinite _
   have hq0 : q ≠ 0 := hq.pos.ne'
   have hq3 : 3 ≤ q := by
     have := hq.two_le
@@ -80,7 +80,7 @@ theorem span_triples_normOne_eq_top (hq : q.Prime) (hq2 : q ≠ 2) {e : ℕ}
   set n : ℕ := (3 ^ q - 1) / 2 with hndef
   have hN2n : N = 2 * n := by omega
   have hnodd : n % 2 = 1 := by omega
-  haveI : NeZero N := ⟨by omega⟩
+  have : NeZero N := ⟨by omega⟩
   have hNcard : Nat.card (GaloisField 3 q)ˣ = N := by rw [Nat.card_units, hcardF']
   have hncard : Nat.card (NormSet.normOneUnits 3 q) = n := by
     rw [NormSet.normOneUnits_card 3 q hq0]
@@ -197,7 +197,7 @@ theorem span_triples_normOne_eq_top (hq : q.Prime) (hq2 : q ≠ 2) {e : ℕ}
       a ∈ NormSet.normOneUnits 3 q ∨ -a ∈ NormSet.normOneUnits 3 q := by
     intro b
     have hchar2 : ringChar (GaloisField 3 q) ≠ 2 := by
-      haveI : CharP (GaloisField 3 q) 3 := by
+      have : CharP (GaloisField 3 q) 3 := by
         rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
         exact ZMod.charP 3
       rw [ringChar.eq (GaloisField 3 q) 3]
@@ -242,7 +242,7 @@ theorem span_triples_normOne_eq_top (hq : q.Prime) (hq2 : q ≠ 2) {e : ℕ}
                ((a : GaloisField 3 q)) ^ (![1, ee, ee * ee] 1),
                ((a : GaloisField 3 q)) ^ (![1, ee, ee * ee] 2))} := by
     ext t
-    simp only [Set.mem_setOf_eq, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
+    simp only [Set.mem_ofPred_eq, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
       Matrix.cons_val_two, Matrix.tail_cons, pow_one]
     constructor
     · rintro ⟨u, rfl⟩
@@ -813,9 +813,9 @@ theorem false_of_normalizes_layerOne (data : FieldNormalizerData p q G) (hp : p 
   have hNnorm : N ≤ Subgroup.normalizer ((layerOne data : Subgroup G) : Set G) := by
     rw [hNsup]
     exact sup_le hnorm Subgroup.le_normalizer
-  haveI hBnormal : ((layerOne data).subgroupOf N).Normal :=
+  have hBnormal : ((layerOne data).subgroupOf N).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hBN).mpr hNnorm
-  haveI hPcomm : IsMulCommutative (data.P.subgroupOf N) :=
+  have hPcomm : IsMulCommutative (data.P.subgroupOf N) :=
     ⟨⟨fun a b => Subtype.ext (Subtype.ext (P_mul_comm data a.2 b.2))⟩⟩
   have hsup : (layerOne data).subgroupOf N ⊔ data.P.subgroupOf N = ⊤ := by
     rw [← Subgroup.subgroupOf_sup hBN hPN, sup_comm, ← hNsup, Subgroup.subgroupOf_self]
@@ -968,7 +968,7 @@ theorem false_of_collisionSet_spanning (data : FieldNormalizerData p q G) (hp : 
     (hnotfrob : ∀ j : ℕ, ∃ u : NormSet.normOneUnits p q, u ^ e ≠ u ^ (3 ^ j))
     (hspan : AddSubgroup.closure (collisionSet p q e) = ⊤) : False := by
   classical
-  haveI : Finite (layerOne data) := by
+  have : Finite (layerOne data) := by
     have hfin : ((layerOne data : Subgroup G) : Set G).Finite := by
       rw [coe_layerOne_eq_range data]
       exact Set.finite_range _
@@ -984,10 +984,10 @@ theorem false_of_collisionSet_spanning (data : FieldNormalizerData p q G) (hp : 
           { carrier := {t : GaloisField p q |
               data.s * layerFieldHom data 1 (Multiplicative.ofAdd t) * (data.s)⁻¹ ∈ layerOne data}
             zero_mem' := by
-              simp only [Set.mem_setOf_eq, ofAdd_zero, map_one, mul_one, mul_inv_cancel]
+              simp only [Set.mem_ofPred_eq, ofAdd_zero, map_one, mul_one, mul_inv_cancel]
               exact (layerOne data).one_mem
             add_mem' := fun {a b} ha hb => by
-              simp only [Set.mem_setOf_eq, ofAdd_add, map_mul] at *
+              simp only [Set.mem_ofPred_eq, ofAdd_add, map_mul] at *
               have : data.s * (layerFieldHom data 1 (Multiplicative.ofAdd a) *
                   layerFieldHom data 1 (Multiplicative.ofAdd b)) * (data.s)⁻¹ =
                   (data.s * layerFieldHom data 1 (Multiplicative.ofAdd a) * (data.s)⁻¹) *
@@ -996,7 +996,7 @@ theorem false_of_collisionSet_spanning (data : FieldNormalizerData p q G) (hp : 
               rw [this]
               exact (layerOne data).mul_mem ha hb
             neg_mem' := fun {a} ha => by
-              simp only [Set.mem_setOf_eq, ofAdd_neg, map_inv] at *
+              simp only [Set.mem_ofPred_eq, ofAdd_neg, map_inv] at *
               have : data.s * (layerFieldHom data 1 (Multiplicative.ofAdd a))⁻¹ * (data.s)⁻¹ =
                   (data.s * layerFieldHom data 1 (Multiplicative.ofAdd a) * (data.s)⁻¹)⁻¹ := by
                 group
@@ -1033,7 +1033,7 @@ Together with `false_of_centralizing` (which disposes of `e = 1`, hence of every
 theorem not_isSolvable_of_exp (data : FieldNormalizerData p q G) (hp : p = 3) {e : ℕ}
     (hexp : ∀ w ∈ data.U, conjGen data * w = w ^ e * conjGen data)
     (hnotfrob : ∀ j : ℕ, ∃ u : NormSet.normOneUnits p q, u ^ e ≠ u ^ (3 ^ j)) :
-    ¬ IsSolvable G := by
+    ¬ Group.IsSolvable G := by
   intro hsol
   have hperf := commutator_layerClosure_eq_top_of_exp data hp hexp hnotfrob
   -- every term of the derived series of the perfect group `N` is everything
@@ -1050,7 +1050,7 @@ theorem not_isSolvable_of_exp (data : FieldNormalizerData p q G) (hp : p = 3) {e
     rw [FieldNormalizerData.s]
     intro h
     exact primeLineGenerator_ne_one p q (data.sigma_injective (by rw [h, map_one]))
-  refine not_solvable_of_mem_derivedSeries (G := layerClosure data.P (conjGen data))
+  refine not_isSolvable_of_mem_derivedSeries (G := layerClosure data.P (conjGen data))
     (g := ⟨data.s, hsN⟩) ?_ (fun n => by rw [hder n]; exact Subgroup.mem_top _) inferInstance
   intro h
   exact hsne (congrArg Subtype.val h)

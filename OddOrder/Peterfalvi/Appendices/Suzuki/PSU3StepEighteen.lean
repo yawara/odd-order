@@ -261,12 +261,12 @@ theorem h_mem_W_of_frobeniusD (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
   classical
   have hω1 : ω ≠ 1 := fun hc => hωQ0 (hc ▸ hyp.Q0.one_mem)
   have h18 := hyp.stepEighteen H hC2 hfree hζ hωQ hωQ0 hyQ0 hfω hns hstop
-  haveI : IsZGroup ↥hyp.D := hyp.isZGroup_D_of_freeD hfree hZc hωQ hωQ0
-  haveI := hyp.normal_W_subgroupOf_D
+  have : IsZGroup ↥hyp.D := hyp.isZGroup_D_of_freeD hfree hZc hωQ hωQ0
+  have := hyp.normal_W_subgroupOf_D
   have hWle : hyp.W ≤ hyp.D := hyp.W_le_D
   have hcard : Nat.card ↥(hyp.W.subgroupOf hyp.D) = Nat.card ↥hyp.W :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hWle).toEquiv
-  haveI : IsCyclic ↥(hyp.W.subgroupOf hyp.D) :=
+  have : IsCyclic ↥(hyp.W.subgroupOf hyp.D) :=
     isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe hWle).symm.toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hWle).symm.surjective
   have hgD : h ω * ζ⁻¹ ∈ hyp.D :=

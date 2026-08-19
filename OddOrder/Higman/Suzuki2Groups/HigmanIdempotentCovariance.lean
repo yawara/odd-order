@@ -132,6 +132,7 @@ theorem actualModTwoEnd_neg
   apply eq_neg_of_add_eq_zero_left
   rw [← actualModTwoEnd_add, neg_add_cancel, actualModTwoEnd_zero]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Higman Lemma 3** (p. 84): generic actor covariance of the chosen
 idempotent family on the actual quotient `A / A²`. -/
 theorem HigmanEndomorphismFamily.modTwo_covariant
@@ -250,13 +251,13 @@ theorem all_end_eq_zero_or_one_of_transitive_conjugates_general
   classical
   cases subsingleton_or_nontrivial V with
   | inl hV =>
-      letI : Subsingleton V := hV
+      let : Subsingleton V := hV
       intro i
       left
       ext v
       exact Subsingleton.elim _ _
   | inr hV =>
-      letI : Nontrivial V := hV
+      let : Nontrivial V := hV
       exact all_end_eq_zero_or_one_of_transitive_conjugates
         ρ f hidem hcomm hperm htrans
 
@@ -343,7 +344,7 @@ theorem HigmanEndomorphismFamily.modTwo_eq_zero_or_one_of_compatible_actions
     (hinv : ∀ a ∈ involutions A, ∀ b ∈ involutions A,
       ∃ x : X, (actA x) a = b) :
     ∀ u, F.modTwo u = 0 ∨ F.modTwo u = 1 := by
-  letI : MulAction X C :=
+  let : MulAction X C :=
     { smul := fun x u ↦ actC x u
       one_smul := fun u ↦ by
         change actC 1 u = u
@@ -380,7 +381,7 @@ theorem subgroupConjFamily_all_modTwo_eq_zero_or_one
     ∀ (F : HigmanEndomorphismFamily
       (fun u : C ↦ MulAut.conjNormal (H := A) (u : P)⁻¹)),
       ∀ u : C, F.modTwo u = 0 ∨ F.modTwo u = 1 := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   intro F

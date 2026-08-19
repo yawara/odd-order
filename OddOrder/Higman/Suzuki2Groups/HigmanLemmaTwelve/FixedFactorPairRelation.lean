@@ -100,9 +100,9 @@ theorem exists_normalizedFactorPairRelation_with_witnesses_of_fixedCoordinates
   have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
     frattini_isElementaryAbelian_of_xiLengthThree
       hP hncomm hmulti hxi hlen hprime
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   intro n c ePhi nu hnTwo hnuPrim hconj dataL0 dataR0
   have hK0 :=
     lowerCentralLayerKernel_zero_eq_frattini_subgroupOf_of_xiLengthThree
@@ -145,7 +145,7 @@ theorem exists_normalizedFactorPairRelation_with_witnesses_of_fixedCoordinates
     intro x hxne
     have hfin : Finite (GaloisField 2 n) :=
       Nat.finite_of_card_ne_zero (by rw [hcard]; positivity)
-    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    let : Fintype (GaloisField 2 n) := Fintype.ofFinite _
     have h := FiniteField.pow_card_sub_one_eq_one x hxne
     rwa [← Nat.card_eq_fintype_card, hcard] at h
   have horderF : orderOf (frobeniusEquiv (GaloisField 2 n) 2) = n :=
@@ -380,9 +380,9 @@ theorem exists_normalizedFactorPairRelation_of_fixedCoordinates
   have hEA : IsElementaryAbelian 2 ↑(frattini P) :=
     frattini_isElementaryAbelian_of_xiLengthThree
       hP hncomm hmulti hxi hlen hprime
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   intro n c ePhi nu hnTwo hnuPrim hconj dataL0 dataR0
   obtain ⟨dL, dR, -, -, -, -, hrelation⟩ :=
     factors.exists_normalizedFactorPairRelation_with_witnesses_of_fixedCoordinates

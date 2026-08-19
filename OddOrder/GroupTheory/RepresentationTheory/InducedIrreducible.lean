@@ -133,7 +133,7 @@ theorem card_smul_restrict_induce_eq_inertia_smul_orbitSum (θ : ClassFunction �
         = Nat.card ↥(ClassFunction.inertia (G := G) (H := H) θ) := by
     intro ψ hψ
     obtain ⟨x₀, -, rfl⟩ := Finset.mem_image.mp hψ
-    haveI : Fintype ↥(ClassFunction.inertia (G := G) (H := H) θ) := Fintype.ofFinite _
+    have : Fintype ↥(ClassFunction.inertia (G := G) (H := H) θ) := Fintype.ofFinite _
     rw [Nat.card_eq_fintype_card, ← Finset.card_univ]
     -- Bijection `x ↦ x₀⁻¹·x` from the fibre (the left coset `x₀·I`) onto the inertia group.
     refine (Finset.card_bij' (fun x hx => (⟨x₀⁻¹ * x, ?_⟩ : ↥(ClassFunction.inertia
@@ -218,7 +218,7 @@ theorem inner_induce_eq_zero_of_not_conj (θ ψ : IrreducibleCharacter H)
     (h : ∀ g : G, IrreducibleCharacter.conjBy g θ ≠ ψ) :
     ClassFunction.inner (induce H (θ : ClassFunction ↥H ℂ))
       (induce H (ψ : ClassFunction ↥H ℂ)) = 0 := by
-  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  have : Fintype ↥H := Fintype.ofFinite ↥H
   classical
   have hcardH : (Nat.card H : ℂ) ≠ 0 := by rw [Nat.cast_ne_zero]; exact Nat.card_pos.ne'
   apply mul_left_cancel₀ hcardH
@@ -242,7 +242,7 @@ theorem card_mul_inner_self_induce_eq_card_inertia (θ : IrreducibleCharacter H)
         ClassFunction.inner (induce H (θ : ClassFunction ↥H ℂ))
           (induce H (θ : ClassFunction ↥H ℂ))
       = (Nat.card ↥(ClassFunction.inertia (θ : ClassFunction ↥H ℂ)) : ℂ) := by
-  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  have : Fintype ↥H := Fintype.ofFinite ↥H
   classical
   rw [card_mul_inner_self_induce]
   have hterm : ∀ x : G,
@@ -438,7 +438,7 @@ so `Ind θ = Ind ψ` would force `‖Ind ψ‖² = 0`, contradicting `|H| · ‖
 theorem induce_eq_induce_iff_conj (θ ψ : IrreducibleCharacter H) :
     induce H (θ : ClassFunction ↥H ℂ) = induce H (ψ : ClassFunction ↥H ℂ) ↔
       ∃ g : G, IrreducibleCharacter.conjBy g θ = ψ := by
-  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  have : Fintype ↥H := Fintype.ofFinite ↥H
   classical
   constructor
   · intro heq
@@ -456,7 +456,7 @@ theorem induce_eq_induce_iff_conj (θ ψ : IrreducibleCharacter H) :
       exact hI hcard.symm
     exact hpos h0
   · rintro ⟨g, rfl⟩
-    haveI : Fintype G := Fintype.ofFinite G
+    have : Fintype G := Fintype.ofFinite G
     rw [IrreducibleCharacter.coe_conjBy, induce_conjBy_eq]
 
 omit [Fintype ↥H] in
@@ -469,7 +469,7 @@ route: `Res_H (Ind θ) = [G:H] · θ` for `G`-stable `θ`). -/
 theorem induce_injective_of_inertia_stable {θ ψ : IrreducibleCharacter H}
     (hθ : ∀ g : G, IrreducibleCharacter.conjBy g θ = θ)
     (h : induce H (θ : ClassFunction ↥H ℂ) = induce H (ψ : ClassFunction ↥H ℂ)) : ψ = θ := by
-  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  have : Fintype ↥H := Fintype.ofFinite ↥H
   obtain ⟨g, hg⟩ := (induce_eq_induce_iff_conj θ ψ).mp h
   rw [← hg]; exact hθ g
 
@@ -507,12 +507,12 @@ theorem card_filter_induce_eq_index_inertia (T : Finset (IrreducibleCharacter H)
     (θ₀ : IrreducibleCharacter H) (hθ₀ : θ₀ ∈ T) :
     (T.filter fun θ => induce H θ.toClassFunction = induce H θ₀.toClassFunction).card
       = (IrreducibleCharacter.inertia (G := G) (H := H) θ₀).index := by
-  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  have : Fintype ↥H := Fintype.ofFinite ↥H
   rw [← card_conjByOrbit_eq_index_inertia (G := G) (H := H) θ₀,
     Nat.card_coe_set_eq, ← Set.ncard_coe_finset]
   congr 1
   ext θ
-  simp only [Finset.coe_filter, Set.mem_setOf_eq,
+  simp only [Finset.coe_filter, Set.mem_ofPred_eq,
     IrreducibleCharacter.mem_conjByOrbit, induce_eq_induce_iff_conj]
   constructor
   · rintro ⟨_, g, hg⟩
@@ -536,7 +536,7 @@ theorem sum_div_normSq_induce_image_eq (T : Finset (IrreducibleCharacter H))
     ∑ χ ∈ T.image (fun θ => induce H θ.toClassFunction),
         χ 1 ^ 2 / ClassFunction.inner χ χ
       = (H.index : ℂ) * ∑ θ ∈ T, θ.toClassFunction 1 ^ 2 := by
-  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  have : Fintype ↥H := Fintype.ofFinite ↥H
   have hcH : (Nat.card ↥H : ℂ) ≠ 0 := by rw [Nat.cast_ne_zero]; exact Nat.card_pos.ne'
   rw [Finset.mul_sum, ← Finset.sum_fiberwise_of_maps_to
     (fun θ (hθ : θ ∈ T) => Finset.mem_image_of_mem (fun θ => induce H θ.toClassFunction) hθ)]
@@ -595,7 +595,7 @@ theorem sum_image_induce_div_normSq_apply_eq_zero
     ∑ χ ∈ (Finset.univ : Finset (IrreducibleCharacter ↥H)).image
         (fun θ => induce H θ.toClassFunction),
       χ g / ClassFunction.inner χ χ = 0 := by
-  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  have : Fintype ↥H := Fintype.ofFinite ↥H
   classical
   -- (1) second orthogonality at the abelian `H`: `∑_{θ ∈ Irr H} θ(y) = 0` for `y ≠ 1`
   have hIrr : ∀ y : ↥H, y ≠ 1 →
@@ -741,6 +741,7 @@ theorem exists_single_of_sum_sq_eq_one {ι : Type*} {s : Finset ι} {c : ι → 
   · exact Or.inl h
   · exact Or.inr h
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **A virtual character of squared norm `1` and positive degree is irreducible.**
 
 If `φ ∈ ℤ[Irr G]` has `‖φ‖² = 1` and `φ(1)` is a positive natural number, then `φ` is an
@@ -753,7 +754,7 @@ theorem isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos
     (hpos : ∃ d : ℕ, 0 < d ∧ (φ : G → ℂ) 1 = (d : ℂ)) :
     IsIrreducibleCharacter φ := by
   classical
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hφ
   have hsumC : ∑ a ∈ c.support, (c a : ℂ) ^ 2 = 1 := hsq.symm.trans hnorm
   have hsumZ : ∑ a ∈ c.support, c a ^ 2 = 1 := by exact_mod_cast hsumC
@@ -794,7 +795,7 @@ theorem exists_zsmul_irreducibleCharacter_of_inner_self_one
     ∃ (ε : ℤ) (ξ : IrreducibleCharacter G),
       (ε = 1 ∨ ε = -1) ∧ φ = ε • (ξ : ClassFunction G ℂ) := by
   classical
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hφ
   have hsumC : ∑ a ∈ c.support, (c a : ℂ) ^ 2 = 1 := hsq.symm.trans hnorm
   have hsumZ : ∑ a ∈ c.support, c a ^ 2 = 1 := by exact_mod_cast hsumC
@@ -820,7 +821,7 @@ Norm `1` with positive degree forces irreducibility. -/
 theorem isIrreducibleCharacter_induce_of_inertia_eq (θ : IrreducibleCharacter H)
     (hfree : ClassFunction.inertia (θ : ClassFunction ↥H ℂ) = H) :
     IsIrreducibleCharacter (induce H (θ : ClassFunction ↥H ℂ)) := by
-  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  have : Fintype ↥H := Fintype.ofFinite ↥H
   have hmem : induce H (θ : ClassFunction ↥H ℂ) ∈ ZIrr G :=
     induce_mem_ZIrr H θ.property.mem_ZIrr
   have hcardH : (Nat.card H : ℂ) ≠ 0 := by
@@ -831,7 +832,7 @@ theorem isIrreducibleCharacter_induce_of_inertia_eq (θ : IrreducibleCharacter H
     rw [hfree] at h
     exact mul_left_cancel₀ hcardH (by rw [h, mul_one])
   have hpos : ∃ d : ℕ, 0 < d ∧ (induce H (θ : ClassFunction ↥H ℂ) : G → ℂ) 1 = (d : ℂ) := by
-    haveI : Finite G := Finite.of_fintype G
+    have : Finite G := Finite.of_fintype G
     obtain ⟨e, he, hθ1⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
     have hidx : 0 < H.index := Nat.pos_of_ne_zero fun h0 => by
       have hmc := H.index_mul_card
@@ -866,7 +867,7 @@ theorem inner_self_induce_eq_one_of_frobeniusGroup {W : Subgroup G}
     (θ : IrreducibleCharacter H) (hθ_ne : θ ≠ trivialIrreducibleCharacter H) :
     ClassFunction.inner (induce H (θ : ClassFunction H ℂ))
       (induce H (θ : ClassFunction H ℂ)) = 1 := by
-  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  have : Fintype ↥H := Fintype.ofFinite ↥H
   have hcardH : (Nat.card H : ℂ) ≠ 0 := by rw [Nat.cast_ne_zero]; exact Nat.card_pos.ne'
   have h := card_mul_inner_self_induce_eq_card_inertia θ
   rw [inertia_eq_of_frobeniusGroup hF hθ_ne] at h
@@ -885,7 +886,7 @@ theorem inner_induce_conj_eq_zero_of_frobenius_of_odd {W : Subgroup G}
     (θ : IrreducibleCharacter H) (hθ : θ ≠ trivialIrreducibleCharacter H) :
     ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction H ℂ))
       (ClassFunction.induce H ((θ : ClassFunction H ℂ).conj)) = 0 := by
-  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  have : Fintype ↥H := Fintype.ofFinite ↥H
   -- `θ̄` is again a nontrivial irreducible character of `H`.
   have hθbar_ne : (⟨(θ : ClassFunction H ℂ).conj, θ.isIrreducible.conj⟩ :
       IrreducibleCharacter H) ≠ trivialIrreducibleCharacter H := by

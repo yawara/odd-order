@@ -54,10 +54,10 @@ orthonormality of `Irr`), hence zero by `classFunction_eq_zero_of_orthogonal`, s
 theorem classFunction_span_irreducibleCharacter_eq_top [Finite G] [Invertible (Nat.card G : ℂ)] :
     Submodule.span ℂ (Set.range (fun χ : IrreducibleCharacter G => (χ : ClassFunction G ℂ)))
       = ⊤ := by
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   classical
-  haveI : Finite (IrreducibleCharacter G) := finite_irreducibleCharacter
-  haveI : Fintype (IrreducibleCharacter G) := Fintype.ofFinite _
+  have : Finite (IrreducibleCharacter G) := finite_irreducibleCharacter
+  have : Fintype (IrreducibleCharacter G) := Fintype.ofFinite _
   rw [eq_top_iff]
   rintro f -
   -- `inner · ψ` distributes over the finite `∑_χ ⟨f, χ⟩ • χ` (linear in the left argument)
@@ -240,7 +240,7 @@ theorem induce_apply_eq_self_of_mem_V (hyp : TICyclicHypothesis G)
     ClassFunction.induce hyp.W (α : ClassFunction hyp.W k) a =
       (α : ClassFunction hyp.W k) ⟨a, hyp.V_subset_W ha⟩ := by
   classical
-  haveI : Fintype ↥hyp.W := Fintype.ofFinite _
+  have : Fintype ↥hyp.W := Fintype.ofFinite _
   rw [ClassFunction.induce_apply,
     Finset.sum_congr rfl (fun x _ => hyp.induceTerm_eq_of_mem_V α ha x),
     ← Finset.sum_filter, Finset.sum_const]

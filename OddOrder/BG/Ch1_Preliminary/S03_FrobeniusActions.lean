@@ -203,7 +203,7 @@ theorem fixedPoint_lift_of_zpowers_quotient_fixed
     {G : Type*} [Group G] [Finite G] {K N : Subgroup G} [K.Normal] [N.Normal]
     (hNK : N ≤ K) {x y : G}
     (hCop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers x)) (Nat.card ↥K))
-    (hSolv : IsSolvable ↥(Subgroup.zpowers x) ∨ IsSolvable ↥K)
+    (hSolv : Group.IsSolvable ↥(Subgroup.zpowers x) ∨ Group.IsSolvable ↥K)
     (hyK : y ∈ K)
     (hfixed_all :
       ∀ a ∈ Subgroup.zpowers x,
@@ -214,7 +214,7 @@ theorem fixedPoint_lift_of_zpowers_quotient_fixed
   let A : Subgroup G := Subgroup.zpowers x
   let φ : A →* MulAut K := (MulAut.conjNormal : G →* MulAut K).comp A.subtype
   let N_K : Subgroup K := N.subgroupOf K
-  haveI hN_K_normal : N_K.Normal := (inferInstance : N.Normal).subgroupOf K
+  have hN_K_normal : N_K.Normal := (inferInstance : N.Normal).subgroupOf K
   have hN_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ N_K := by
     rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
     intro a n hn
@@ -288,7 +288,7 @@ theorem fixedPoint_lift_of_generator_quotient_fixed
     {G : Type*} [Group G] [Finite G] {K N : Subgroup G} [K.Normal] [N.Normal]
     (hNK : N ≤ K) {x y : G}
     (hCop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers x)) (Nat.card ↥K))
-    (hSolv : IsSolvable ↥(Subgroup.zpowers x) ∨ IsSolvable ↥K)
+    (hSolv : Group.IsSolvable ↥(Subgroup.zpowers x) ∨ Group.IsSolvable ↥K)
     (hyK : y ∈ K)
     (hgen : (QuotientGroup.mk' N) (x * y * x⁻¹) = (QuotientGroup.mk' N) y) :
     ∃ c : G,
@@ -425,7 +425,7 @@ theorem quotient_isFrobeniusGroup_of_le_kernel_of_centralizer
           K.map (QuotientGroup.mk' N) = ⊥) :
     IsFrobeniusGroup
       (G ⧸ N) (K.map (QuotientGroup.mk' N)) (R.map (QuotientGroup.mk' N)) := by
-  letI : K.Normal := h.isNormal
+  let : K.Normal := h.isNormal
   have hK_normal : (K.map (QuotientGroup.mk' N)).Normal := inferInstance
   have hC :
       Subgroup.IsComplement'
@@ -473,10 +473,10 @@ theorem quotient_isFrobeniusGroup_of_le_kernel_of_coprime_zpowers
     (h : IsFrobeniusGroup G K R) (hNK : N ≤ K) (hKN : ¬ K ≤ N)
     (hCop : ∀ x, x ∈ R → x ≠ 1 →
       Nat.Coprime (Nat.card ↥(Subgroup.zpowers x)) (Nat.card ↥K))
-    (hSolvK : IsSolvable ↥K) :
+    (hSolvK : Group.IsSolvable ↥K) :
     IsFrobeniusGroup
       (G ⧸ N) (K.map (QuotientGroup.mk' N)) (R.map (QuotientGroup.mk' N)) := by
-  letI : K.Normal := h.isNormal
+  let : K.Normal := h.isNormal
   refine quotient_isFrobeniusGroup_of_le_kernel_of_fixedPoint_lift h hNK hKN ?_
   intro x hxR hx_ne y hyK hgen
   exact
@@ -502,11 +502,11 @@ nonidentity `x̂ ∈ K̂` the conjugate `Ĵ^x̂` equals `Ĵ`, so `Ĵ ⊆ R̂ ⊓
 `K ⊓ R = ⊥`, we get `N ⊓ R = ⊥`. -/
 theorem inf_complement_eq_bot_of_normal_not_le_kernel
     {G : Type*} [Group G] [Finite G] {K R N : Subgroup G} [hN : N.Normal]
-    (h : IsFrobeniusGroup G K R) (hKN : ¬ K ≤ N) (hSolvK : IsSolvable ↥K) :
+    (h : IsFrobeniusGroup G K R) (hKN : ¬ K ≤ N) (hSolvK : Group.IsSolvable ↥K) :
     N ⊓ R = ⊥ := by
-  letI : K.Normal := h.isNormal
+  let : K.Normal := h.isNormal
   -- `N ⊓ K` is normal.
-  haveI hHnormal : (N ⊓ K).Normal := by
+  have hHnormal : (N ⊓ K).Normal := by
     constructor
     intro n hn g
     rw [Subgroup.mem_inf] at hn ⊢
@@ -581,7 +581,7 @@ element of `R`.  If some `n ∈ N` were not in `K`, it would be conjugate to a n
 `a ∈ R`; but then `a ∈ N` (normality), so `a ∈ N ⊓ R = ⊥`, a contradiction. -/
 theorem normal_le_kernel_of_not_le
     {G : Type*} [Group G] [Finite G] {K R N : Subgroup G} [hN : N.Normal]
-    (h : IsFrobeniusGroup G K R) (hKN : ¬ K ≤ N) (hSolvK : IsSolvable ↥K) :
+    (h : IsFrobeniusGroup G K R) (hKN : ¬ K ≤ N) (hSolvK : Group.IsSolvable ↥K) :
     N ≤ K := by
   have hNR : N ⊓ R = ⊥ := inf_complement_eq_bot_of_normal_not_le_kernel h hKN hSolvK
   intro n hn
@@ -589,7 +589,7 @@ theorem normal_le_kernel_of_not_le
   have hn_notin : (n : G) ∉ notConjugateSet R := by
     rw [← h.kernel_eq_notConjugateSet]
     exact fun hc => hnK hc
-  simp only [notConjugateSet, Set.mem_setOf_eq, not_forall, not_not] at hn_notin
+  simp only [notConjugateSet, Set.mem_ofPred_eq, not_forall, not_not] at hn_notin
   obtain ⟨a, haR, ha_ne, hconj⟩ := hn_notin
   rw [isConj_iff] at hconj
   obtain ⟨g, hg⟩ := hconj
@@ -610,10 +610,10 @@ This combines part (a) (`normal_le_kernel_of_not_le`) with the `N ≤ K` branch
 (`quotient_isFrobeniusGroup_of_le_kernel_of_coprime_zpowers`). -/
 theorem isFrobeniusGroup_quotient_of_normal_not_le_kernel
     {G : Type*} [Group G] [Finite G] {K R N : Subgroup G} [N.Normal]
-    (h : IsFrobeniusGroup G K R) (hKN : ¬ K ≤ N) (hSolvK : IsSolvable ↥K) :
+    (h : IsFrobeniusGroup G K R) (hKN : ¬ K ≤ N) (hSolvK : Group.IsSolvable ↥K) :
     N < K ∧
       IsFrobeniusGroup (G ⧸ N) (K.map (QuotientGroup.mk' N)) (R.map (QuotientGroup.mk' N)) := by
-  letI : K.Normal := h.isNormal
+  let : K.Normal := h.isNormal
   have hNK : N ≤ K := normal_le_kernel_of_not_le h hKN hSolvK
   have hne : N ≠ K := by rintro rfl; exact hKN le_rfl
   refine ⟨hNK.lt_of_ne hne, ?_⟩

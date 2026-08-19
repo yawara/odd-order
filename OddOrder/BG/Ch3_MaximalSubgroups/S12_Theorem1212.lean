@@ -61,7 +61,7 @@ theorem isCyclic_of_coprime_fpf_pgroup_action
   by_contra hnc
   obtain ⟨B, hB_elem, hB_card⟩ :=
     OddOrder.BG.Ch1.S04.exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic hR hp_odd hnc
-  haveI : IsMulCommutative ↥B := ⟨⟨hB_elem.comm⟩⟩
+  have : IsMulCommutative ↥B := ⟨⟨hB_elem.comm⟩⟩
   have hBnc : ¬ IsCyclic ↥B :=
     OddOrder.GroupTheory.IsElementaryAbelian.not_isCyclic_of_card_prime_sq Fact.out hB_elem hB_card
   have hcop' : Nat.Coprime (Nat.card ↥B) (Nat.card H) :=
@@ -125,7 +125,7 @@ theorem isFrobeniusGroup_of_regular [Finite G] (hG : IsMinimalSimpleOdd G)
       (E₀.subgroupOf (S10.Msigma M ⊔ E₀)) := by
   have hMσne : S10.Msigma M ≠ ⊥ := S10.Msigma_ne_bot hG h.mem_maximal
   -- `M_σ E₀ ≤ M ≤ N_G(M_σ)`, so `M_σ` is normal in the ambient `M_σ E₀`.
-  haveI hMσM_normal : ((S10.Msigma M).subgroupOf M).Normal := by
+  have hMσM_normal : ((S10.Msigma M).subgroupOf M).Normal := by
     rw [S10.Msigma_subgroupOf]; infer_instance
   have hM_le_N : M ≤ Subgroup.normalizer (S10.Msigma M : Set G) :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer (S10.Msigma_le M)).mp hMσM_normal
@@ -141,7 +141,7 @@ theorem isFrobeniusGroup_of_regular [Finite G] (hG : IsMinimalSimpleOdd G)
       ne_bot_complement := ?_
       conj_frobenius := ?_ }
   · -- `M_σ` and `E₀` are complements inside `↥(M_σ E₀)`.
-    haveI : ((S10.Msigma M).subgroupOf (S10.Msigma M ⊔ E₀)).Normal :=
+    have : ((S10.Msigma M).subgroupOf (S10.Msigma M ⊔ E₀)).Normal :=
       (Subgroup.normal_subgroupOf_iff_le_normalizer le_sup_left).mpr hsup_le_N
     apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ
     · rw [disjoint_iff]
@@ -266,7 +266,7 @@ theorem exists_orderOf_eq_rpow_in_complement [Finite G] {E E₀ A₀ : Subgroup 
     (hcompl : (E₀.subgroupOf E).IsComplement' (A₀.subgroupOf E))
     {r : ℕ} (hr : r.Prime) (hcop : Nat.Coprime r (Nat.card ↥A₀)) :
     ∃ g₀ : ↥E₀, orderOf g₀ = r ^ (Monoid.exponent ↥E).factorization r := by
-  haveI := Fact.mk hr
+  have := Fact.mk hr
   obtain ⟨g, hg⟩ := hr.exists_orderOf_eq_pow_factorization_exponent ↥E
   have hcardA₀sub : Nat.card ↥(A₀.subgroupOf E) = Nat.card ↥A₀ :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hA₀E).toEquiv
@@ -433,8 +433,8 @@ theorem frobFact_of_nonabelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
   have hA₀E : A₀ ≤ E := hA₀A.trans hAE
   have hEN : E ≤ Subgroup.normalizer (A₀ : Set G) := h.E_le.trans hMnorm
   have hE₀N : E₀ ≤ Subgroup.normalizer (A₀ : Set G) := hE₀E.trans hEN
-  haveI hA₀comm : IsMulCommutative ↥A₀ := isMulCommutative_of_le ⟨⟨hA.1.comm⟩⟩ hA₀A
-  haveI hA₀norm : (A₀.subgroupOf E).Normal :=
+  have hA₀comm : IsMulCommutative ↥A₀ := isMulCommutative_of_le ⟨⟨hA.1.comm⟩⟩ hA₀A
+  have hA₀norm : (A₀.subgroupOf E).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hA₀E).mpr hEN
   -- regularity in the complement: `E₀ ⊓ C(x) = 1` for `x ∈ M_σ#`.
   have hreg₀ : ∀ x ∈ S10.Msigma M, x ≠ 1 →
@@ -443,7 +443,7 @@ theorem frobFact_of_nonabelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
     rw [← Subgroup.card_eq_one]
     by_contra hcard1
     obtain ⟨r, hr_prime, hr_dvd⟩ := Nat.exists_prime_and_dvd hcard1
-    haveI : Fact r.Prime := ⟨hr_prime⟩
+    have : Fact r.Prime := ⟨hr_prime⟩
     have hrmem : r ∈ (Nat.card ↥(E₀ ⊓ Subgroup.centralizer ({x} : Set G) :
         Subgroup G)).primeFactors :=
       Nat.mem_primeFactors.mpr ⟨hr_prime, hr_dvd, Nat.card_pos.ne'⟩
@@ -505,7 +505,7 @@ theorem frobFact_of_nonabelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
   have hattain : ∀ r : ℕ, r.Prime →
       ∃ g₀ : ↥E₀, (Monoid.exponent ↥E).factorization r ≤ (orderOf g₀).factorization r := by
     intro r hr
-    haveI : Fact r.Prime := ⟨hr⟩
+    have : Fact r.Prime := ⟨hr⟩
     by_cases hrp : r = p
     · subst hrp
       exact exists_factorization_le_at_prime hA₀E₂ h.E₂_le hE₀N hE₂ab hA₀card hE₂sup hA₀E₀

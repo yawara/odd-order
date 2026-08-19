@@ -110,7 +110,7 @@ theorem exists_mem_inf_centralizer_not_mem_Q0
     (hNX : ∀ g ∈ X, ∀ y ∈ N, g * y * g⁻¹ ∈ N) :
     ∃ y ∈ hyp.Q ⊓ Subgroup.centralizer (X : Set G), y ∉ hyp.Q0 := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   set M := ↥hyp.Q ⧸ Subgroup.center ↥hyp.Q with hMdef
   set π : ↥hyp.Q →* M := QuotientGroup.mk' (Subgroup.center ↥hyp.Q) with hπ
   -- the center of `Q` is `Q₀`
@@ -187,12 +187,12 @@ theorem exists_mem_inf_centralizer_not_mem_Q0
     intro hbot
     rw [hbot, Subgroup.card_bot] at hUcard
     omega
-  haveI hUnontriv : Nontrivial ↥U := (Subgroup.nontrivial_iff_ne_bot U).mpr hUne
+  have hUnontriv : Nontrivial ↥U := (Subgroup.nontrivial_iff_ne_bot U).mpr hUne
   have hUEA : IsElementaryAbelian 2 ↥U := hQEA.to_subgroup U
-  letI : CommGroup ↥U := { (inferInstance : Group ↥U) with mul_comm := hUEA.comm }
+  let : CommGroup ↥U := { (inferInstance : Group ↥U) with mul_comm := hUEA.comm }
   -- the restricted actions
-  haveI := hyp.K_isCyclic
-  letI : CommGroup ↥hyp.K := IsCyclic.commGroup
+  have := hyp.K_isCyclic
+  let : CommGroup ↥hyp.K := IsCyclic.commGroup
   set ψ₀ : ↥A →* MulAut ↥U := hUinv.restrict with hψ₀
   set ψ : ↥hyp.K →* MulAut ↥U := ψ₀.comp (Subgroup.inclusion hKA) with hψ
   have hψval : ∀ (k : ↥hyp.K) (u : ↥U),
@@ -206,7 +206,7 @@ theorem exists_mem_inf_centralizer_not_mem_Q0
     refine hUfree (k : G) k.2 (fun h => hkne (Subtype.ext h)) (u : M) u.2 ?_
     rw [← hψval k u, hfix]
   -- the conjugating element `x` and its automorphism `g`
-  haveI : Nontrivial ↥X := by
+  have : Nontrivial ↥X := by
     refine (Subgroup.nontrivial_iff_ne_bot X).mpr fun hbot => ?_
     rw [hbot, Subgroup.card_bot] at hXcard
     exact hp.one_lt.ne hXcard
@@ -355,8 +355,8 @@ theorem exists_mem_inf_centralizer_not_mem_Q0
     have hodd : Odd (Nat.card ↥X) := hyp.D_odd.of_dvd_nat hdvd
     exact ((Nat.Prime.coprime_iff_not_dvd Nat.prime_two).mpr
       (by simpa [Nat.two_dvd_ne_zero] using Nat.odd_iff.mp hodd)).symm
-  have hsolv : IsSolvable ↥hyp.Q := by
-    haveI := hQ2.isNilpotent
+  have hsolv : Group.IsSolvable ↥hyp.Q := by
+    have := hQ2.isNilpotent
     infer_instance
   have hZinv : IsAInvariant (hyp.conjQBy hXH) (Subgroup.center ↥hyp.Q) :=
     IsAInvariant.of_characteristic (hyp.conjQBy hXH)
@@ -457,8 +457,8 @@ theorem exists_mem_inf_centralizer_not_mem_Q0_of_orbit
     refine Nat.eq_of_mul_eq_mul_right hQ0pos ?_
     rw [← h]; ring
   -- the restricted action of `K` on the central quotient
-  haveI := hyp.K_isCyclic
-  letI : CommGroup ↥hyp.K := IsCyclic.commGroup
+  have := hyp.K_isCyclic
+  let : CommGroup ↥hyp.K := IsCyclic.commGroup
   set ψ : ↥hyp.K →* MulAut M :=
     (hyp.conjQuotientBy hAH).comp (Subgroup.inclusion hKA) with hψ
   have hψval : ∀ (k : ↥hyp.K) (u : M),
@@ -490,7 +490,7 @@ theorem exists_mem_inf_centralizer_not_mem_Q0_of_orbit
       exact Subgroup.inv_mem _ hzZ
     exact hu ((hπone y hyQ).mpr (hKfree (k : G) k.2 hk1 y hyQ ((hmemZ _ hmem).mp hval)))
   -- the conjugating element `x` and its automorphism `g`
-  haveI : Nontrivial ↥X := by
+  have : Nontrivial ↥X := by
     refine (Subgroup.nontrivial_iff_ne_bot X).mpr fun hbot => ?_
     rw [hbot, Subgroup.card_bot] at hXcard
     exact hp.one_lt.ne hXcard
@@ -537,7 +537,7 @@ theorem exists_mem_inf_centralizer_not_mem_Q0_of_orbit
           rw [map_mul, map_mul, map_inv, hgdef, hψ, MonoidHom.comp_apply]
   have hxnW : x ∉ hyp.W := notMem_of_not_le_of_prime_card hXW hp hXcard hxX hxne
   -- `K ≠ 1`, since otherwise `x` would centralize `K` and so lie in `W`
-  haveI : Nontrivial ↥hyp.K := by
+  have : Nontrivial ↥hyp.K := by
     refine (Subgroup.nontrivial_iff_ne_bot _).mpr fun hbot => hxnW ?_
     refine ⟨hXV hxX, Subgroup.mem_centralizer_iff.mpr fun k hk => ?_⟩
     have hkK : k ∈ hyp.K := by rw [← SetLike.mem_coe, hyp.coe_K]; exact hk
@@ -546,8 +546,8 @@ theorem exists_mem_inf_centralizer_not_mem_Q0_of_orbit
   -- the field realization of `K` coming from `Q₀`
   obtain ⟨F, instF, instFin, μ, σ, hσne, -, hμσ⟩ :=
     hyp.exists_field_realization_K (hXV hxX) hxnW c hcval
-  letI : Field F := instF
-  letI : Finite F := instFin
+  let : Field F := instF
+  let : Finite F := instFin
   -- there are `q + 1` non-trivial `K`-orbits on `M`, and `p ∤ q + 1`
   have hnd' : ¬ p ∣ (Nat.card M - 1) / Nat.card ↥hyp.K := by
     have hfact : Nat.card ↥hyp.Q0 ^ 2 - 1
@@ -596,8 +596,8 @@ theorem exists_mem_inf_centralizer_not_mem_Q0_of_orbit
     have hodd : Odd (Nat.card ↥X) := hyp.D_odd.of_dvd_nat hdvd
     exact ((Nat.Prime.coprime_iff_not_dvd Nat.prime_two).mpr
       (by simpa [Nat.two_dvd_ne_zero] using Nat.odd_iff.mp hodd)).symm
-  have hsolv : IsSolvable ↥hyp.Q := by
-    haveI := hQ2.isNilpotent
+  have hsolv : Group.IsSolvable ↥hyp.Q := by
+    have := hQ2.isNilpotent
     infer_instance
   have hZinv : IsAInvariant (hyp.conjQBy hXH) (Subgroup.center ↥hyp.Q) :=
     IsAInvariant.of_characteristic (hyp.conjQBy hXH)

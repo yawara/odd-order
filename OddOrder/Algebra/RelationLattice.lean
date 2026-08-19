@@ -47,7 +47,7 @@ nondegenerate (`Algebra.traceForm_nondegenerate`), hence a perfect pairing in fi
 `l ↦ Tr(l · −)` is onto the dual space. -/
 theorem exists_trace_repr (ℓ : F →ₗ[K] K) :
     ∃ l : F, ∀ a : F, ℓ a = Algebra.trace K F (l * a) := by
-  haveI : Module.Finite K F := Module.Finite.of_finite
+  have : Module.Finite K F := Module.Finite.of_finite
   set e := (Algebra.traceForm K F).toDual (traceForm_nondegenerate K F) with he
   refine ⟨e.symm ℓ, fun a => ?_⟩
   have happ : e (e.symm ℓ) = ℓ := LinearEquiv.apply_symm_apply e ℓ

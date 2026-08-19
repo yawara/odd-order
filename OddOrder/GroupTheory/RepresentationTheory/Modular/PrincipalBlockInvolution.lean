@@ -288,7 +288,7 @@ theorem nontrivial_blockOfIrr_principal
     {j₀ : κ} (hj₀ : blockOfIrr eG hπG hlinG hnilG j₀ = principalBlock πG hπG hlinG hnilG) :
     ∃ j₁, blockOfIrr eG hπG hlinG hnilG j₁ = principalBlock πG hπG hlinG hnilG ∧ j₁ ≠ j₀ := by
   classical
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   by_contra hcon
   push Not at hcon
   -- the filtered set is `{j₀}`
@@ -337,7 +337,7 @@ theorem card_blockOfIrr_principal_eq_four_and_character_involution
           (wedderburnRepresentation eG j).character t = 1
             ∨ (wedderburnRepresentation eG j).character t = -1 := by
   classical
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   have h2 : (2 : K) ≠ 0 := two_ne_zero
   set P : κ → Prop :=
     fun j => blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG with hP
@@ -377,7 +377,7 @@ theorem card_blockOfIrr_principal_eq_four_and_character_involution
     rw [show ((1 : ↥(centralizerOf t)) : G) = 1 from rfl, mul_one] at hval
     rw [← hval, hav (j : κ), hzero, Int.cast_zero]
   -- there are at least two of them
-  haveI : Nontrivial (Subtype P) := by
+  have : Nontrivial (Subtype P) := by
     have hne : (Finset.univ.filter P).Nonempty := by
       by_contra hemp
       rw [Finset.not_nonempty_iff_eq_empty] at hemp
@@ -431,7 +431,7 @@ theorem card_character_ne_zero_eq_four_of_isConj_inv
             ∨ (wedderburnRepresentation eG j).character t = 1
             ∨ (wedderburnRepresentation eG j).character t = -1 := by
   classical
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   have h2 : (2 : K) ≠ 0 := two_ne_zero
   -- the trivial character: it lies in `Irr(B_0)` and is `1` everywhere
   obtain ⟨j₁, hj₁, hj₁all⟩ :=
@@ -522,8 +522,8 @@ theorem intCast_card_add_three_mul_character_involution
     ∃ d : ℕ, (Fintype.card (mG j) : K)
         + 3 * (wedderburnRepresentation eG j).character t = 4 * (d : K) := by
   classical
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
-  haveI : Invertible ((Fintype.card ↥P : ℕ) : K) :=
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : Invertible ((Fintype.card ↥P : ℕ) : K) :=
     invertibleOfNonzero (by rw [hPcard]; norm_num)
   -- the average over `P` computes the invariants
   set ρP : Representation K ↥P (mG j → K) :=
@@ -574,7 +574,7 @@ theorem card_modEq_character_involution
     {n : ℤ} (hn : (wedderburnRepresentation eG j).character t = (n : K)) :
     (Fintype.card (mG j) : ℤ) ≡ n [ZMOD 4] := by
   classical
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   obtain ⟨d, hd⟩ := intCast_card_add_three_mul_character_involution hp hx hω e eG hπG hlinG
     hπ hlin hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hconjall hj P hPcard hPsing
   rw [hn] at hd
@@ -737,7 +737,7 @@ theorem exists_character_involution_eq_neg_one
     ∃ j : κ, blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG
       ∧ (wedderburnRepresentation eG j).character t = -1 := by
   classical
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   by_contra hcon
   push Not at hcon
   obtain ⟨hcard, hpm⟩ := card_blockOfIrr_principal_eq_four_and_character_involution hp hx hω e eG
@@ -798,7 +798,7 @@ theorem eq_zero_of_vanishing_on_pRegular_of_apply_eq_zero
     (ha₀ : a j₀ = 0) :
     a = 0 := by
   classical
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   -- the reference relation `a' = (χ(t))` supported on `Irr(B_0)`
   set a' : κ → K := fun j =>
     if blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG
@@ -889,7 +889,7 @@ theorem exists_intColumn_generalizedDecompositionNumber_principalBlock
       ∀ j : κ, blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG →
         (∀ g : G, (wedderburnRepresentation eG j).character g = 1) → a j = 1 := by
   classical
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   set P : κ → Prop :=
     fun j => blockOfIrr eG hπG hlinG hnilG j = principalBlock πG hπG hlinG hnilG with hP
   -- off `Irr(B_0)` the column vanishes

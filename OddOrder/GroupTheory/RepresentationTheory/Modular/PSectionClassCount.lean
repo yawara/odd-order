@@ -138,7 +138,7 @@ end OneSection
 theorem card_conjClasses_eq_sum_card_pPartClass_fiber [Fintype (ConjClasses G)] :
     Nat.card (ConjClasses G)
       = ∑ D : ConjClasses G, Nat.card {C : ConjClasses G // pPartClass p C = D} := by
-  haveI : ∀ D : ConjClasses G, Finite {C : ConjClasses G // pPartClass p C = D} := fun _ =>
+  have : ∀ D : ConjClasses G, Finite {C : ConjClasses G // pPartClass p C = D} := fun _ =>
     Subtype.finite
   rw [← Nat.card_sigma (β := fun D : ConjClasses G => {C : ConjClasses G // pPartClass p C = D})]
   exact Nat.card_congr (Equiv.sigmaFiberEquiv (pPartClass p)).symm
@@ -161,7 +161,7 @@ theorem card_conjClasses_eq_sum_card_pRegularClass (hp : p.Prime) [Fintype (Conj
       Nat.card {C : ConjClasses G // pPartClass p C = D} = 0 := by
     intro D hD
     have hD' : ¬ IsPElementClass p D := (Finset.mem_filter.mp hD).2
-    haveI : IsEmpty {C : ConjClasses G // pPartClass p C = D} :=
+    have : IsEmpty {C : ConjClasses G // pPartClass p C = D} :=
       ⟨fun C => hD' (C.2 ▸ isPElementClass_pPartClass hp C.1)⟩
     exact Nat.card_of_isEmpty
   rw [Finset.sum_congr rfl hzero, Finset.sum_const_zero, add_zero]

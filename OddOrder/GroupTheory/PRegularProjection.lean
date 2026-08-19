@@ -119,7 +119,7 @@ theorem exists_pRegularPart_hom (hp : p.Prime) (hq : q.Prime) (hPq : IsPGroup q 
     (hcomm : ∀ v ∈ P, Commute u v) :
     ∃ f : ↥(pRegularProd u P hcomm) →* G,
       ∀ x : ↥(pRegularProd u P hcomm), f x = pRegularPart p (x : G) := by
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   obtain ⟨M, hM0, hM1⟩ := exists_pRegular_exponent (G := G) hp
   -- on `P` the exponent `M` is either annihilating (`q = p`) or the identity (`q ≠ p`)
   have hP : ∀ v ∈ P, ∀ w ∈ P, (v * w) ^ M = v ^ M * w ^ M := by
@@ -157,7 +157,7 @@ order. -/
 theorem not_dvd_card_of_forall_isPRegular {H : Type*} [Group H] [Finite H] (hp : p.Prime)
     (h : ∀ x : H, IsPRegular p x) : ¬ p ∣ Nat.card H := by
   intro hdvd
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' (G := H) p hdvd
   exact h x (hx ▸ dvd_refl p)
 

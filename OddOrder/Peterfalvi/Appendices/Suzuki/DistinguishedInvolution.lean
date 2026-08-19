@@ -338,8 +338,8 @@ clauses live with the quotient construction (`CentralizerQuotient`). -/
 used, through the transitivity it implies. -/
 theorem mem_normalCore_H_iff {n : G} :
     n ∈ hyp.H.normalCore ↔ ∀ ω : Ω, n • ω = ω := by
-  haveI := hyp.doubly_transitive
-  haveI : MulAction.IsPretransitive G Ω :=
+  have := hyp.doubly_transitive
+  have : MulAction.IsPretransitive G Ω :=
     MulAction.isPretransitive_of_is_two_pretransitive
   constructor
   · intro hn ω
@@ -458,7 +458,7 @@ of §2 onwards all three subgroups of the first clause are trivial. -/
 
 /-- `𝒩(G) = ⋂_x H^x = 1` under (A2). -/
 theorem normalCore_H_eq_bot : hyp.H.normalCore = ⊥ := by
-  haveI := hyp.faithful
+  have := hyp.faithful
   rw [eq_bot_iff]
   intro n hn
   rw [Subgroup.mem_bot]

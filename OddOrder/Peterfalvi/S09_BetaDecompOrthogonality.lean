@@ -36,7 +36,7 @@ subgroup `K ◁ L` and `x ∈ K`, `(Ind_K^L 1_K)(x) = [L:K]`: every conjugate of
 theorem induce_trivialChar_apply_eq_index (K : Subgroup L) [K.Normal] [Finite ↥K]
     [Invertible (Nat.card ↥K : ℂ)] {x : L} (hx : x ∈ K) :
     ClassFunction.induce K (trivialClassFunction ↥K) x = (K.index : ℂ) := by
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
   rw [ClassFunction.induce_apply_of_mem_normal_of_const (le_refl K) (trivialClassFunction ↥K)
       (fun a' _ => trivialClassFunction_apply _) hx, mul_one,
     show (Nat.card L : ℂ) = (K.index : ℂ) * (Nat.card ↥K : ℂ) from by
@@ -53,7 +53,7 @@ theorem induce_trivialChar_normSq_eq_index (K : Subgroup L) [K.Normal] [Finite �
     [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card ↥K : ℂ)] :
     ClassFunction.inner (ClassFunction.induce K (trivialClassFunction ↥K))
       (ClassFunction.induce K (trivialClassFunction ↥K)) = (K.index : ℂ) := by
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
   have hcoe : (trivialIrreducibleCharacter ↥K : ClassFunction ↥K ℂ) = trivialClassFunction ↥K := rfl
   have htop : ClassFunction.inertia (trivialClassFunction ↥K) = ⊤ := by
     rw [eq_top_iff]
@@ -79,7 +79,7 @@ theorem inner_induce_constOne_eq_zero (K : Subgroup L) [Finite ↥K]
     (θ : IrreducibleCharacter ↥K) (hθ : θ ≠ trivialIrreducibleCharacter ↥K) :
     ClassFunction.inner (ClassFunction.induce K (θ : ClassFunction ↥K ℂ))
       (Hypothesis71.constOne L) = 0 := by
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
   rw [ClassFunction.inner_induce_eq_inner_restrict,
     show ClassFunction.restrict K (Hypothesis71.constOne L)
         = (trivialIrreducibleCharacter ↥K : ClassFunction ↥K ℂ) from by
@@ -94,7 +94,7 @@ theorem inner_induce_trivialChar_constOne_eq_one (K : Subgroup L) [Finite ↥K]
     ClassFunction.inner
         (ClassFunction.induce K (trivialIrreducibleCharacter ↥K : ClassFunction ↥K ℂ))
         (Hypothesis71.constOne L) = 1 := by
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
   rw [ClassFunction.inner_induce_eq_inner_restrict,
     show ClassFunction.restrict K (Hypothesis71.constOne L)
         = (trivialIrreducibleCharacter ↥K : ClassFunction ↥K ℂ) from by
@@ -111,7 +111,7 @@ theorem induce_ne_trivialChar_induce (K : Subgroup L) [Finite ↥K]
     (θ : IrreducibleCharacter ↥K) (hθ : θ ≠ trivialIrreducibleCharacter ↥K) :
     ClassFunction.induce K (θ : ClassFunction ↥K ℂ)
       ≠ ClassFunction.induce K (trivialIrreducibleCharacter ↥K : ClassFunction ↥K ℂ) := by
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
   intro h
   have h0 := inner_induce_constOne_eq_zero K θ hθ
   rw [h, inner_induce_trivialChar_constOne_eq_one] at h0
@@ -194,7 +194,7 @@ theorem betaDecomp_orth_one {G : Type*} [Group G] [Fintype G] {A : Set G} {L : S
     ∀ i : Fin (n + 1), i ≠ ind1H →
       ClassFunction.inner (ν (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
         (Hypothesis71.constOne G) = 0 := by
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
   have hne_triv : ∀ j : Fin (n + 1), j ≠ ind1H → θ j ≠ trivialIrreducibleCharacter ↥K := by
     intro j hj hcontra
     apply hj
@@ -241,7 +241,7 @@ theorem inner_family_diff (K : Subgroup L) [K.Normal] [Finite ↥K]
           - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
       = star (d i) * ClassFunction.inner (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
           (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) := by
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
   exact inner_family_diff_gen (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
     (induce_family_orthogonal_of_injective K θ hinj) d hi0 hi_ind hind0
 
@@ -303,7 +303,7 @@ theorem inner_beta_nuDiff {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Sub
           - d i • ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)))
       = star (d i) * ClassFunction.inner (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
           (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) := by
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
   exact inner_beta_nuDiff_gen H71 hτ (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
     (induce_family_orthogonal_of_injective K θ hinj) d psi_support hind0 diffβ hi0 hi_ind ν hagree_i
 
@@ -366,7 +366,7 @@ theorem inner_weightedNuSum_nu {G : Type*} [Group G] [Fintype G] {L : Subgroup G
       (ν (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)))
     = ClassFunction.induce K (θ j : ClassFunction ↥K ℂ) (1 : ↥L) /
         ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥L) := by
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
   exact inner_weightedNuSum_nu_gen (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
     (induce_family_orthogonal_of_injective K θ hinj) (fun j => induce_norm_ne_zero K (θ j))
     (induce_apply_one_ne_zero K (θ 0)) ν hnu hj
@@ -433,7 +433,7 @@ theorem inner_beta_nu_eq {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subg
           (H71.τ ⟨ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
               - ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), diffβ⟩)
           (ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))) + 1) := by
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
   exact inner_beta_nu_eq_gen H71 hτ (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
     (induce_family_orthogonal_of_injective K θ hinj) d psi_support hind0 diffβ hj0 hj_ind ν
     hagree_j hζ0norm
@@ -547,7 +547,7 @@ theorem betaDecomp_gamma_orth_nu {G : Type*} [Group G] [Fintype G] {A : Set G} {
     ClassFunction.inner (β - (Hypothesis71.constOne G
         - ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) + a • W))
       (ν (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ))) = 0 := by
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
   exact betaDecomp_gamma_orth_nu_gen H71 hτ
     (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
     (induce_family_orthogonal_of_injective K θ hinj) (fun j => induce_norm_ne_zero K (θ j))
@@ -617,7 +617,7 @@ theorem betaDecomp_gamma_orth_one {G : Type*} [Group G] [Fintype G] {A : Set G} 
     ClassFunction.inner (β - (Hypothesis71.constOne G
         - ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) + a • W))
       (Hypothesis71.constOne G) = 0 := by
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
   have hθ0 : θ 0 ≠ trivialIrreducibleCharacter ↥K := by
     intro h
     exact hind0 (hinj (by

@@ -282,8 +282,8 @@ theorem mem_xSetFinset_iff_mem_Xset (hyp : SibleyDadeHypothesis G L H)
                 (θ : ClassFunction ↥H ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥H)).image
           (fun θ => ClassFunction.induce H θ.toClassFunction)) ↔
       φ ∈ hyp.Xset Z := by
-  letI : H.Normal := hyp.H_normal
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  let : H.Normal := hyp.H_normal
+  have : Fintype ↥H := Fintype.ofFinite _
   rw [Finset.mem_sdiff]
   constructor
   · rintro ⟨hbot, hnotZ⟩
@@ -297,7 +297,7 @@ theorem mem_xSetFinset_iff_mem_Xset (hyp : SibleyDadeHypothesis G L H)
       ⟨θ', Finset.mem_filter.mpr ⟨Finset.mem_univ _, hker', hne'⟩, heq'.symm⟩)
   · intro hφ
     obtain ⟨hφS, hφnotZ⟩ := hyp.mem_Xset.mp hφ
-    rw [hyp.S_eq, Set.mem_setOf_eq] at hφS
+    rw [hyp.S_eq, Set.mem_ofPred_eq] at hφS
     obtain ⟨θ, hθne, rfl⟩ := hφS
     refine ⟨Finset.mem_image.mpr ⟨θ, Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_, hθne⟩, rfl⟩, ?_⟩
     · intro x hx
@@ -631,8 +631,8 @@ theorem Xset_centralCommutator_nonempty_c2_caseA (hyp : SibleyDadeHypothesis G L
     (hA : Subgroup.center ↥H ⊓ cert.W2.subgroupOf H = ⊥)
     (hHnonab : _root_.commutator ↥H ≠ ⊥) :
     (hyp.Xset hyp.centralCommutator).Nonempty := by
-  haveI := hyp.H_normal
-  haveI := hyp.centralCommutator_normal
+  have := hyp.H_normal
+  have := hyp.centralCommutator_normal
   have hX : ∀ φ ∈ hyp.Xset hyp.centralCommutator, IsIrreducibleCharacter φ :=
     fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_c2_caseA hK hW1 hA hφ
   have hZbot : hyp.centralCommutator.subgroupOf H ≠ ⊥ := by

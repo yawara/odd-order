@@ -48,11 +48,11 @@ Strong induction on `|X|`, iterating the minimal-prime normal-complement engine
 canonical normal `p`-complement `N` carries the inductive Hall radical, whose image in
 `X` is a normal Hall `π`-subgroup and hence equals `O_π(X)`. -/
 theorem isHall_oPiCore_of_isUpperSet_of_rank_fitting_le_two
-    {X : Type*} [Group X] [Finite X] [IsSolvable X] (hodd : Odd (Nat.card X))
+    {X : Type*} [Group X] [Finite X] [Group.IsSolvable X] (hodd : Odd (Nat.card X))
     (hrank : rank ↥(Ch01.fitting X) ≤ 2) {π : Set ℕ} (hπ : IsUpperSet π) :
     Ch03.IsHallSubgroup π (Ch03.oPiCore π X) := by
   classical
-  suffices H : ∀ n : ℕ, ∀ (Y : Type _) [Group Y] [Finite Y] [IsSolvable Y],
+  suffices H : ∀ n : ℕ, ∀ (Y : Type _) [Group Y] [Finite Y] [Group.IsSolvable Y],
       Nat.card Y = n → Odd (Nat.card Y) → rank ↥(Ch01.fitting Y) ≤ 2 →
       Ch03.IsHallSubgroup π (Ch03.oPiCore π Y) from
     H (Nat.card X) X rfl hodd hrank
@@ -69,13 +69,13 @@ theorem isHall_oPiCore_of_isUpperSet_of_rank_fitting_le_two
       have hdvd : (Ch03.oPiCore π Y).index ∣ 1 := hY1 ▸ Subgroup.index_dvd_card _
       rw [Nat.dvd_one.mp hdvd] at hr
       simp at hr
-    haveI : Nontrivial Y := by
+    have : Nontrivial Y := by
       refine Finite.one_lt_card_iff_nontrivial.mp ?_
       have := Nat.card_pos (α := Y)
       omega
     have hp_prime : (Nat.minFac (Nat.card Y)).Prime := Nat.minFac_prime hY1
     set p := Nat.minFac (Nat.card Y) with hpdef
-    haveI : Fact p.Prime := ⟨hp_prime⟩
+    have : Fact p.Prime := ⟨hp_prime⟩
     have hp_dvd : p ∣ Nat.card Y := Nat.minFac_dvd _
     by_cases hpπ : p ∈ π
     · -- minimal prime in `π`: all of `π(Y)` lies in `π`, so `O_π(Y) = ⊤` has index `1`.
@@ -94,7 +94,7 @@ theorem isHall_oPiCore_of_isUpperSet_of_rank_fitting_le_two
     · -- `p ∉ π`: peel the canonical normal `p`-complement `N` and recurse.
       obtain ⟨N, hN_normal, hN_compl⟩ :=
         hasNormalPComplement_minFac_of_rank_fitting_le_two (G := Y) hodd' hrank'
-      haveI := hN_normal
+      have := hN_normal
       obtain ⟨P⟩ := (inferInstance : Nonempty (Sylow p Y))
       have hNidx : N.index = Nat.card ↥(P : Subgroup Y) := (hN_compl P).symm.index_eq_card
       obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp P.isPGroup'
@@ -115,7 +115,7 @@ theorem isHall_oPiCore_of_isUpperSet_of_rank_fitting_le_two
       obtain ⟨hHallN_pi, hHallN_idx⟩ := IH (Nat.card ↥N) hNcard_lt ↥N rfl hNodd hNrank
       -- its image `HN` in `Y` is a normal Hall `π`-subgroup of `Y`.
       set HN : Subgroup Y := (Ch03.oPiCore π ↥N).map N.subtype with hHNdef
-      haveI hHN_normal : HN.Normal := by rw [hHNdef]; infer_instance
+      have hHN_normal : HN.Normal := by rw [hHNdef]; infer_instance
       have hHN_card : Nat.card ↥HN = Nat.card ↥(Ch03.oPiCore π ↥N) := by
         rw [hHNdef, Subgroup.card_map_of_injective N.subtype_injective]
       have hHN_pi : ∀ r ∈ (Nat.card ↥HN).primeFactors, r ∈ π := by

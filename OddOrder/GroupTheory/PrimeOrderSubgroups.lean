@@ -40,7 +40,7 @@ theorem normal_le_center_of_card_eq_prime {P : Type*} [Group P] [Finite P]
     (hP : IsPGroup p P) {Y : Subgroup P} [Y.Normal] (hY : Nat.card Y = p) :
     Y ≤ Subgroup.center P := by
   have hp_prime : p.Prime := hp.out
-  haveI : IsCyclic ↥Y := isCyclic_of_prime_card hY
+  have : IsCyclic ↥Y := isCyclic_of_prime_card hY
   set φ : P →* MulAut ↥Y := MulAut.conjNormal with hφ_def
   -- the image of the conjugation homomorphism is a `p`-group …
   have hrange : IsPGroup p ↥φ.range :=
@@ -83,7 +83,7 @@ theorem subgroup_eq_of_card_eq_prime_of_isCyclic {H : Type*} [Group H] [Finite H
     K = L := by
   classical
   have hp_prime : p.Prime := hp.out
-  letI : Fintype H := Fintype.ofFinite H
+  let : Fintype H := Fintype.ofFinite H
   -- the solution set of `x ^ p = 1`
   set S : Finset H := Finset.univ.filter (fun a : H => a ^ p = 1) with hS_def
   have hS_card : S.card ≤ p := IsCyclic.card_pow_eq_one_le hp_prime.pos

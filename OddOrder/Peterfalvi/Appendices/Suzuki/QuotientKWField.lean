@@ -405,7 +405,7 @@ theorem nonempty_quotientFieldModel_of_orderThree
     {w : G} (hw : w ∈ hyp.W) (hw1 : w ≠ 1) :
     Nonempty (hyp.QuotientFieldModel m) := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hZcard : Nat.card ↥(Subgroup.center hyp.Q) = 2 ^ m := by
     rw [s.centerEqQ0,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Q0_le_Q).toEquiv,
@@ -421,21 +421,21 @@ theorem nonempty_quotientFieldModel_of_orderThree
   obtain ⟨hWcyc, hWdvd⟩ :=
     hyp.isCyclic_W_and_card_dvd_of_orderThree hst hQsuz hm hQ0card hcardQ
       inductionHypothesis
-  haveI := hWcyc
-  letI : CommGroup (↥hyp.Q ⧸ Subgroup.center hyp.Q) :=
+  have := hWcyc
+  let : CommGroup (↥hyp.Q ⧸ Subgroup.center hyp.Q) :=
     { (inferInstance : Group (↥hyp.Q ⧸ Subgroup.center hyp.Q)) with
       mul_comm := hEA.comm }
-  haveI hMnontriv : Nontrivial (↥hyp.Q ⧸ Subgroup.center hyp.Q) := by
+  have hMnontriv : Nontrivial (↥hyp.Q ⧸ Subgroup.center hyp.Q) := by
     refine Finite.one_lt_card_iff_nontrivial.mp ?_
     rw [hMcard]
     calc 1 < 2 ^ m := Nat.one_lt_pow hm (by norm_num)
       _ ≤ (2 ^ m) ^ 2 := Nat.le_self_pow (by norm_num) _
-  letI : CommGroup ↥hyp.actualKActor := IsCyclic.commGroup
-  letI : CommGroup ↥hyp.W := IsCyclic.commGroup
+  let : CommGroup ↥hyp.actualKActor := IsCyclic.commGroup
+  let : CommGroup ↥hyp.W := IsCyclic.commGroup
   obtain ⟨E, instE, instFin, μ, α, hcardE, hμ⟩ :=
     Huppert.exists_field_coordinate_of_irreducible hEA hyp.quotientKWHom hirr
-  letI : Field E := instE
-  haveI : Finite E := instFin
+  let : Field E := instE
+  have : Finite E := instFin
   have htwo : (2 : E) = 0 := by
     obtain ⟨u, hu⟩ := exists_ne (1 : ↥hyp.Q ⧸ Subgroup.center hyp.Q)
     have h1 : Additive.ofMul u + Additive.ofMul u = 0 := by
@@ -450,7 +450,7 @@ theorem nonempty_quotientFieldModel_of_orderThree
       rw [two_mul]; exact h2) with h | h
     · exact h
     · exact absurd h hne
-  haveI : CharP E 2 := OddOrder.FiniteField.charP_two_of_two_eq_zero htwo
+  have : CharP E 2 := OddOrder.FiniteField.charP_two_of_two_eq_zero htwo
   -- `μ (k, 1)` is Frobenius-fixed: its order divides `|K| = q − 1`
   have hKfix : ∀ k : ↥hyp.actualKActor,
       ((μ (k, 1) : Eˣ) : E) ^ 2 ^ m = ((μ (k, 1) : Eˣ) : E) := by

@@ -59,6 +59,7 @@ set_option linter.unusedDecidableInType false in
 set_option linter.unusedFintypeInType false in
 open scoped Classical in
 include hp hω hω' hkerJ e in
+set_option backward.isDefEq.respectTransparency false in
 /-- **`([τ,μ]⁰)` is block diagonal.**  It is the inverse of the Cartan matrix, which is block
 diagonal (`cartanMatrix_eq_zero_of_centralCharacterAlg_ne`); zeroing out the off-block entries of
 a right inverse of a block-diagonal matrix leaves a right inverse, and the inverse is unique. -/

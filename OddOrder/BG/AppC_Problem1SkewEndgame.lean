@@ -662,8 +662,8 @@ theorem false_of_masterFormula_sigma_zero (data : FieldNormalizerData p q G) (hp
       he.neg_pow, he.neg_pow] at h2
     linear_combination h1 - h2
   -- translate to a `powDiff (e²)`-collision on the Paley set
-  letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
-  haveI : CharP (GaloisField 3 q) 3 := by
+  let : Fintype (GaloisField 3 q) := Fintype.ofFinite _
+  have : CharP (GaloisField 3 q) 3 := by
     rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
     exact ZMod.charP 3
   have hchar2 : ringChar (GaloisField 3 q) ≠ 2 := by
@@ -1121,8 +1121,8 @@ theorem false_of_exotic (data : FieldNormalizerData p q G) (hp : p = 3)
   have hq0 : q ≠ 0 := hqprime.ne_zero
   have hneg1 := not_isSquare_neg_one_galois rfl hq0 hqodd
   -- four distinct Paley elements
-  letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
-  haveI : CharP (GaloisField 3 q) 3 := by
+  let : Fintype (GaloisField 3 q) := Fintype.ofFinite _
+  have : CharP (GaloisField 3 q) 3 := by
     rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
     exact ZMod.charP 3
   have h30 : (3 : GaloisField 3 q) = 0 := by

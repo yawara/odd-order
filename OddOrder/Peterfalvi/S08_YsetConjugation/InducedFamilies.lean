@@ -136,7 +136,7 @@ theorem zSupportedSpan_ne_one_eq_sharp (hyp : SibleyDadeHypothesis G L H) :
     OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) hyp.S {x : ↥L | x ≠ 1}
       = OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) hyp.S
           (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
-  haveI := hyp.H_normal
+  have := hyp.H_normal
   refine OddOrder.Peterfalvi.S07.zSupportedSpan_ne_one_eq (fun h1 => ?_) (fun s hs x hx => ?_)
   · exact (OddOrder.Peterfalvi.S04.mem_supportInSubgroup.mp h1).2 rfl
   · -- Members are induced from the normal `H`, so they vanish off `H`; split off `x = 1`.
@@ -190,7 +190,7 @@ theorem support_sub_induce_subset_sharpImage_of_apply_one_eq
     (OddOrder.RepresentationTheory.ClassFunction.induce H θ -
         OddOrder.RepresentationTheory.ClassFunction.induce H ψ).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
-  letI : H.Normal := hyp.H_normal
+  let : H.Normal := hyp.H_normal
   intro x hx
   have hθsupp :
       (OddOrder.RepresentationTheory.ClassFunction.induce H θ).support ⊆ H :=
@@ -285,15 +285,15 @@ theorem inertia_eq_H_of_c2 (hyp : SibleyDadeHypothesis G L H)
     letI : H.Normal := hyp.H_normal
     ClassFunction.inertia (θ : ClassFunction ↥H ℂ) = H := by
   classical
-  letI : H.Normal := hyp.H_normal
-  haveI : Fintype ↥H := Fintype.ofFinite _
-  haveI : Finite ↥L := Fintype.finite (Fintype.ofFinite _)
+  let : H.Normal := hyp.H_normal
+  have : Fintype ↥H := Fintype.ofFinite _
+  have : Finite ↥L := Fintype.finite (Fintype.ofFinite _)
   -- The quotient `Ḡ = L/⁅H,H⁆` and the image `H̄ = H/⁅H,H⁆`.
   set M : Subgroup ↥L := ⁅H, H⁆ with hM_def
-  haveI hMnormal : M.Normal := by rw [hM_def]; infer_instance
+  have hMnormal : M.Normal := by rw [hM_def]; infer_instance
   set mkM : ↥L →* (↥L ⧸ M) := QuotientGroup.mk' M with hmkM_def
   set Hbar : Subgroup (↥L ⧸ M) := H.map mkM with hHbar_def
-  haveI hHbar_normal : Hbar.Normal := by rw [hHbar_def, hmkM_def]; infer_instance
+  have hHbar_normal : Hbar.Normal := by rw [hHbar_def, hmkM_def]; infer_instance
   -- `H̄` is abelian: images of `H` commute since their commutators land in `⁅H,H⁆ = ker mkM`.
   have hHbar_comm : ∀ a b : ↥Hbar, Commute a b := by
     rintro ⟨a, ha⟩ ⟨b, hb⟩
@@ -323,7 +323,7 @@ theorem inertia_eq_H_of_c2 (hyp : SibleyDadeHypothesis G L H)
     ClassFunction.compHom_injective_of_surjective hq_surj
   -- `θ` is linear, hence kills `⁅H,H⁆.subgroupOf H = commutator ↥H`, so inflates from `H̄`.
   set N : Subgroup ↥H := M.subgroupOf H with hN_def
-  haveI hN_normal : N.Normal := by rw [hN_def, hM_def]; exact hMnormal.subgroupOf H
+  have hN_normal : N.Normal := by rw [hN_def, hM_def]; exact hMnormal.subgroupOf H
   have hN_eq : N = _root_.commutator ↥H := by
     rw [hN_def, hM_def, ← Subgroup.map_subtype_commutator H, Subgroup.subgroupOf,
       Subgroup.comap_map_eq_self_of_injective H.subtype_injective]
@@ -460,9 +460,9 @@ theorem inertia_eq_H_of_c2_caseA (hyp : SibleyDadeHypothesis G L H)
     letI : H.Normal := hyp.H_normal
     ClassFunction.inertia (θ : ClassFunction ↥H ℂ) = H := by
   classical
-  letI : H.Normal := hyp.H_normal
-  haveI : Fintype ↥H := Fintype.ofFinite _
-  haveI : Finite ↥L := Fintype.finite (Fintype.ofFinite _)
+  let : H.Normal := hyp.H_normal
+  have : Fintype ↥H := Fintype.ofFinite _
+  have : Finite ↥L := Fintype.finite (Fintype.ofFinite _)
   obtain ⟨φ, hφirr, hφ1, -, hφpt⟩ :=
     θ.isIrreducible.exists_central_linear_restriction (Z.subgroupOf H) hZcentral
   have hφmul : ∀ a b : ↥(Z.subgroupOf H), φ (a * b) = φ a * φ b :=
@@ -554,8 +554,8 @@ theorem isIrreducibleCharacter_induce_of_degree_one (hyp : SibleyDadeHypothesis 
     (hθ_one : (θ : ClassFunction ↥H ℂ) (1 : ↥H) = 1)
     (hθ_ne : θ ≠ trivialIrreducibleCharacter ↥H) :
     IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) := by
-  letI : H.Normal := hyp.H_normal
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  let : H.Normal := hyp.H_normal
+  have : Fintype ↥H := Fintype.ofFinite _
   rcases hyp.cases with hF | ⟨h46, _hdade, hK, hW1, _hprime, hW2, hcop⟩
   · exact isIrreducibleCharacter_induce_of_frobeniusGroup hF θ hθ_ne
   · -- (c2) inertia bridge: `I_L(θ) = H` via the abelian quotient `H/⁅H,H⁆` (Brauer + Isaacs 3.28).

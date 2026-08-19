@@ -53,7 +53,7 @@ theorem isPGroup_quotient_of_mem_pQuotientNormals {N : Subgroup G} [N.Normal]
 
 theorem top_mem_pQuotientNormals : (⊤ : Subgroup G) ∈ pQuotientNormals p G := by
   refine ⟨inferInstance, ?_⟩
-  haveI : Subsingleton (G ⧸ (⊤ : Subgroup G)) := QuotientGroup.subsingleton_quotient_top
+  have : Subsingleton (G ⧸ (⊤ : Subgroup G)) := QuotientGroup.subsingleton_quotient_top
   exact fun g => ⟨0, by rw [pow_zero, pow_one]; exact Subsingleton.elim g 1⟩
 
 /-- 同型 `e : G ≃* K` による `comap` は `p`-群商を保つ: `K/N` が `p`-群なら
@@ -61,7 +61,7 @@ theorem top_mem_pQuotientNormals : (⊤ : Subgroup G) ∈ pQuotientNormals p G :
 theorem isPGroup_quotient_comap {K : Type*} [Group K] (e : G ≃* K) {N : Subgroup K} [N.Normal]
     (hN : IsPGroup p (K ⧸ N)) :
     IsPGroup p (G ⧸ Subgroup.comap (e : G →* K) N) := by
-  haveI : (Subgroup.comap (e : G →* K) N).Normal := ‹N.Normal›.comap _
+  have : (Subgroup.comap (e : G →* K) N).Normal := ‹N.Normal›.comap _
   set f := (QuotientGroup.mk' N).comp (e : G →* K) with hf
   have hsurj : Function.Surjective f :=
     (QuotientGroup.mk'_surjective N).comp e.surjective
@@ -75,7 +75,7 @@ theorem isPGroup_quotient_comap {K : Type*} [Group K] (e : G ≃* K) {N : Subgro
 theorem comap_mem_pQuotientNormals {K : Type*} [Group K] (e : G ≃* K) {N : Subgroup K}
     (hN : N ∈ pQuotientNormals p K) :
     Subgroup.comap (e : G →* K) N ∈ pQuotientNormals p G := by
-  haveI := normal_of_mem_pQuotientNormals hN
+  have := normal_of_mem_pQuotientNormals hN
   exact ⟨‹N.Normal›.comap _,
     isPGroup_quotient_comap e (isPGroup_quotient_of_mem_pQuotientNormals hN)⟩
 
@@ -118,8 +118,8 @@ instance pResidual.normal : (pResidual p G).Normal := inferInstance
 theorem inf_mem_pQuotientNormals [Finite G] [Fact p.Prime] {N₁ N₂ : Subgroup G}
     (h₁ : N₁ ∈ pQuotientNormals p G) (h₂ : N₂ ∈ pQuotientNormals p G) :
     N₁ ⊓ N₂ ∈ pQuotientNormals p G := by
-  haveI := normal_of_mem_pQuotientNormals h₁
-  haveI := normal_of_mem_pQuotientNormals h₂
+  have := normal_of_mem_pQuotientNormals h₁
+  have := normal_of_mem_pQuotientNormals h₂
   have hpg₁ := isPGroup_quotient_of_mem_pQuotientNormals h₁
   have hpg₂ := isPGroup_quotient_of_mem_pQuotientNormals h₂
   refine ⟨inferInstance, ?_⟩
@@ -139,14 +139,14 @@ theorem inf_mem_pQuotientNormals [Finite G] [Fact p.Prime] {N₁ N₂ : Subgroup
 最小元 `N₀` をもち, `sInf = N₀ ∈` 集合ゆえ `G/O^p(G) = G/N₀` は `p`-群. -/
 theorem isPGroup_quotient_pResidual [Finite G] [Fact p.Prime] :
     IsPGroup p (G ⧸ pResidual p G) := by
-  haveI : Finite (Subgroup G) := Finite.of_injective _ (SetLike.coe_injective (A := Subgroup G))
-  haveI : WellFoundedLT (Subgroup G) := Finite.to_wellFoundedLT
+  have : Finite (Subgroup G) := Finite.of_injective _ (SetLike.coe_injective (A := Subgroup G))
+  have : WellFoundedLT (Subgroup G) := Finite.to_wellFoundedLT
   obtain ⟨N₀, hN₀⟩ :=
     exists_minimal_of_wellFoundedLT (· ∈ pQuotientNormals p G) ⟨⊤, top_mem_pQuotientNormals⟩
   have hmin : ∀ M ∈ pQuotientNormals p G, N₀ ≤ M := fun M hM =>
     (hN₀.2 (inf_mem_pQuotientNormals hN₀.1 hM) inf_le_left).trans inf_le_right
   have hpr : pResidual p G = N₀ := le_antisymm (sInf_le hN₀.1) (le_sInf hmin)
-  haveI := normal_of_mem_pQuotientNormals hN₀.1
+  have := normal_of_mem_pQuotientNormals hN₀.1
   exact (isPGroup_quotient_of_mem_pQuotientNormals hN₀.1).of_equiv
     (QuotientGroup.quotientMulEquivOfEq hpr).symm
 
@@ -207,7 +207,7 @@ theorem pResidual_eq_map_subtype_of_sup_isPGroup [Finite G] [Fact p.Prime]
     pResidual p G = (pResidual p ↥S).map S.subtype := by
   set R_S := (pResidual p ↥S).map S.subtype with hRS
   set R_G := pResidual p G with hRG
-  haveI : R_S.Normal := pResidual_map_subtype_normal
+  have : R_S.Normal := pResidual_map_subtype_normal
   have hRS_le_S : R_S ≤ S := Subgroup.map_subtype_le _
   have hRSsub : R_S.subgroupOf S = pResidual p ↥S :=
     Subgroup.comap_map_eq_self_of_injective S.subtype_injective _
@@ -235,7 +235,7 @@ theorem pResidual_eq_map_subtype_of_sup_isPGroup [Finite G] [Fact p.Prime]
       rw [← Subgroup.index_eq_card, ← Subgroup.relIndex_mul_index hRS_le_S, h1, h2]
     rw [hab, ← pow_add]
   · -- `R_S ≤ O^p(G)`
-    haveI : (R_G ⊓ S).Normal := inferInstance
+    have : (R_G ⊓ S).Normal := inferInstance
     have hkey : pResidual p ↥S ≤ (R_G ⊓ S).subgroupOf S := by
       apply pResidual_le_of_isPGroup_quotient
       have hkerf : ((QuotientGroup.mk' R_G).comp S.subtype).ker = (R_G ⊓ S).subgroupOf S := by
@@ -437,8 +437,8 @@ theorem pResidualOf_sup_eq [Finite G] [Fact p.Prime] {S P R : Subgroup G}
     (hPn : R ≤ Subgroup.normalizer (P : Set G))
     (hP : IsPGroup p ↥P) (hsup : S ⊔ P = R) :
     pResidualOf p R = pResidualOf p S := by
-  haveI : (S.subgroupOf R).Normal := (Subgroup.normal_subgroupOf_iff_le_normalizer hSR).mpr hSn
-  haveI : (P.subgroupOf R).Normal := (Subgroup.normal_subgroupOf_iff_le_normalizer hPR).mpr hPn
+  have : (S.subgroupOf R).Normal := (Subgroup.normal_subgroupOf_iff_le_normalizer hSR).mpr hSn
+  have : (P.subgroupOf R).Normal := (Subgroup.normal_subgroupOf_iff_le_normalizer hPR).mpr hPn
   have hP' : IsPGroup p ↥(P.subgroupOf R) :=
     hP.of_injective (Subgroup.subgroupOfEquivOfLe hPR).toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hPR).injective
@@ -470,7 +470,7 @@ theorem pResidual_eq_pResidualOf_of_isSubnormal [Finite G] [Fact p.Prime]
   | top => intro _ _ _ _; exact pResidualOf_top.symm
   | step S K hle _ hSnorm ih =>
     intro P hPnorm hP hsup
-    haveI := hPnorm
+    have := hPnorm
     have hKP : K ⊔ P = ⊤ := by
       rw [eq_top_iff, ← hsup]; exact sup_le_sup_right hle P
     have hSn : K ≤ Subgroup.normalizer (S : Set G) :=
@@ -508,7 +508,7 @@ theorem pResidualOf_sup_eq_of_isSubnormal [Finite G] [Fact p.Prime] {S P R : Sub
     (hPn : R ≤ Subgroup.normalizer (P : Set G))
     (hP : IsPGroup p ↥P) (hsup : S ⊔ P = R) :
     pResidualOf p R = pResidualOf p S := by
-  haveI : (P.subgroupOf R).Normal := (Subgroup.normal_subgroupOf_iff_le_normalizer hPR).mpr hPn
+  have : (P.subgroupOf R).Normal := (Subgroup.normal_subgroupOf_iff_le_normalizer hPR).mpr hPn
   have hP' : IsPGroup p ↥(P.subgroupOf R) :=
     hP.of_injective (Subgroup.subgroupOfEquivOfLe hPR).toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hPR).injective
@@ -552,7 +552,7 @@ theorem le_normalizer_pResidualOf_of_isSubnormal_rel [Finite G] [Fact p.Prime]
     (hS : (S.subgroupOf H).IsSubnormal)
     (hPn : H ≤ Subgroup.normalizer (P : Set G)) (hP : IsPGroup p ↥P) :
     P ≤ Subgroup.normalizer (pResidualOf p S : Set G) := by
-  haveI : (P.subgroupOf H).Normal := (Subgroup.normal_subgroupOf_iff_le_normalizer hPH).mpr hPn
+  have : (P.subgroupOf H).Normal := (Subgroup.normal_subgroupOf_iff_le_normalizer hPH).mpr hPn
   have hPpg : IsPGroup p ↥(P.subgroupOf H) :=
     hP.of_injective (Subgroup.subgroupOfEquivOfLe hPH).toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hPH).injective
@@ -573,7 +573,7 @@ theorem le_normalizer_pResidualOf_of_subnormal_two_rel [Finite G] [Fact p.Prime]
     (hPn : H ≤ Subgroup.normalizer (P : Set G))
     (hSn : T ≤ Subgroup.normalizer (S : Set G)) (hP : IsPGroup p ↥P) :
     P ≤ Subgroup.normalizer (pResidualOf p S : Set G) := by
-  haveI : (T.subgroupOf H).Normal := (Subgroup.normal_subgroupOf_iff_le_normalizer hTH).mpr hTn
+  have : (T.subgroupOf H).Normal := (Subgroup.normal_subgroupOf_iff_le_normalizer hTH).mpr hTn
   have hSTH : S.subgroupOf H ≤ T.subgroupOf H := Subgroup.comap_mono hST
   refine le_normalizer_pResidualOf_of_isSubnormal_rel (hST.trans hTH) hPH ?_ hPn hP
   exact Subgroup.IsSubnormal.step _ _ hSTH ‹(T.subgroupOf H).Normal›.isSubnormal

@@ -146,7 +146,7 @@ theorem tau_conjDiff_inner_self_eq_two (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (⊥ : Subgroup ↥M))
     (hirr : IsIrreducibleCharacter χ) :
     ClassFunction.inner (hyp.tau (χ - χ.conj)) (hyp.tau (χ - χ.conj)) = 2 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hModd : Odd (Nat.card ↥M) := hyp.card_odd_of_isMinimalSimpleOdd hG
   have hχconj : χ.conj ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
       ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) :=
@@ -303,7 +303,7 @@ theorem irrRFamily_inner_alignedOmega_eq_zero (hG : OddOrder.BG.IsMinimalSimpleO
     {α : ClassFunction G ℂ} (hα : α ∈ (hyp.irrRFamily hG hχ hirr).imageSet)
     (i : Fin hyp.w1) (k : Fin hyp.w2) :
     ClassFunction.inner α (hyp.alignedOmegaSigmaGrid hG hG.odd i k) = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hχind : χ ∈ inducedFamily M := by
     rw [inducedFamily_eq_inducedKernelFamily_bot]; exact hχ
   refine OddOrder.Peterfalvi.S12.OrthonormalCharacterImageFamily.elt_inner_eq_zero
@@ -339,7 +339,7 @@ theorem memberRFamily_orthogonal (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : 
     (hφχ : ClassFunction.inner φ χ = 0) (hφχbar : ClassFunction.inner φ χ.conj = 0) :
     (hyp.memberRFamily hG hmu hδpm hδj hzS hz1 hzconj hφ).Orthogonal
       (hyp.memberRFamily hG hmu hδpm hδj hzS hz1 hzconj hχ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hModd : Odd (Nat.card ↥M) := hyp.card_odd_of_isMinimalSimpleOdd hG
   set K := (derivedInG M).subgroupOf M with hK
@@ -509,14 +509,14 @@ theorem sixTwo_of_hypothesis (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypo
     (Nat.card (↥((derivedInG M).subgroupOf M) ⧸
         A'.subgroupOf ((derivedInG M).subgroupOf M)) : ℝ) - 1 ≤
       2 * (C.index : ℝ) * Real.sqrt (Nat.card (↥C ⧸ D.subgroupOf C) : ℝ) := by
-  haveI := hyp.finiteG
-  haveI : Fintype ↥C := Fintype.ofFinite _
-  haveI : ((derivedInG M).subgroupOf M).Normal := by
+  have := hyp.finiteG
+  have : Fintype ↥C := Fintype.ofFinite _
+  have : ((derivedInG M).subgroupOf M).Normal := by
     rw [derivedInG, Subgroup.subgroupOf,
       Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
     infer_instance
-  haveI : IsSolvable ↥M := hG.solvable_of_lt_top M (lt_top_iff_ne_top.mpr hyp.maximal.1)
-  haveI : IsSolvable ↥((derivedInG M).subgroupOf M) := inferInstance
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_lt_top M (lt_top_iff_ne_top.mpr hyp.maximal.1)
+  have : Group.IsSolvable ↥((derivedInG M).subgroupOf M) := inferInstance
   exact OddOrder.Peterfalvi.S08.six_two_of_imageData
     (hyp.inducedFamilyImageData hG hmu hδpm hδj hzS hz1 (hyp.zeta_conj_ne hG hz1))
     (hyp.card_odd_of_isMinimalSimpleOdd hG) hyp.mderivSharp_subset_A0 hyp.one_notMem_A0
@@ -541,15 +541,15 @@ theorem sixThree_of_hypothesis (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hy
       < Nat.card (↥H ⧸ H₁.subgroupOf H)) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
       (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) N) hyp.A0) := by
-  haveI := hyp.finiteG
-  haveI : ((derivedInG M).subgroupOf M).Normal := by
+  have := hyp.finiteG
+  have : ((derivedInG M).subgroupOf M).Normal := by
     rw [derivedInG, Subgroup.subgroupOf,
       Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
     infer_instance
   -- (6.1) "`K` is a solvable normal subgroup of `L`": `M` is a proper subgroup of the
   -- minimal simple `G`, hence solvable, and `M' ≤ M`.
-  haveI : IsSolvable ↥M := hG.solvable_of_lt_top M (lt_top_iff_ne_top.mpr hyp.maximal.1)
-  haveI : IsSolvable ↥((derivedInG M).subgroupOf M) := inferInstance
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_lt_top M (lt_top_iff_ne_top.mpr hyp.maximal.1)
+  have : Group.IsSolvable ↥((derivedInG M).subgroupOf M) := inferInstance
   exact OddOrder.Peterfalvi.S08.six_three_of_imageData
     (hyp.inducedFamilyImageData hG hmu hδpm hδj hzS hz1 (hyp.zeta_conj_ne hG hz1))
     (hyp.card_odd_of_isMinimalSimpleOdd hG) hyp.mderivSharp_subset_A0 hyp.one_notMem_A0

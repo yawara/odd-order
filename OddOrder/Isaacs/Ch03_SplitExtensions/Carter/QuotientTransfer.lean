@@ -115,7 +115,7 @@ theorem exists_conj_of_map_mk'_conj {K₁ K₂ : Subgroup G} (h₁ : N ≤ K₁)
 omit [N.Normal] in
 /-- 帰納の測度: `N ≠ ⊥` なら `|G/N| < |G|` (剰余類の個数なので正規性は不要)。 -/
 theorem card_quotient_lt [Finite G] (hN : N ≠ ⊥) : Nat.card (G ⧸ N) < Nat.card G := by
-  haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN
+  have : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN
   have hlt : 1 < Nat.card ↥N := Finite.one_lt_card
   have heq : N.index * Nat.card ↥N = Nat.card G := N.index_mul_card
   have hidx : N.index = Nat.card G / Nat.card ↥N := by

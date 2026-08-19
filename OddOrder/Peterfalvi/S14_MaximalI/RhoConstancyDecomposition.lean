@@ -81,7 +81,7 @@ theorem constituentDiff_support_subset {L : Subgroup G} {hyp : Hypothesis L}
     {φ : IrreducibleCharacter ↥L} (hφ : φ ∈ data.constituents) :
     ((φ : ClassFunction ↥L ℂ) - (φ : ClassFunction ↥L ℂ).conj).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hsupp_eq : (φ : ClassFunction ↥L ℂ).conj.support = (φ : ClassFunction ↥L ℂ).support := by
     ext y
     simp only [ClassFunction.mem_support, ne_eq, ClassFunction.conj_apply, star_eq_zero]
@@ -117,9 +117,9 @@ is the "the elements of `S` vanish on `L − H`" step of the constant-on-coset c
 (12.4)/(12.5) (`ψ(xh) = β(xh) + γ(xh) = γ(x)`, the `β ∈ ℂ[S]` part vanishing off `H`). -/
 theorem Sset_vanishes_off_H {L : Subgroup G} (hyp : Hypothesis L) {χ : ClassFunction ↥L ℂ}
     (hχ : χ ∈ hyp.Sset) {x : ↥L} (hxH : (x : G) ∉ hyp.H) : χ x = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   obtain ⟨θ, _, hχ_eq⟩ := hχ
-  haveI hnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+  have hnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
     rw [hyp.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
   have hxmem : x ∉ (hyp.typeI.typeF.H).subgroupOf L :=
@@ -136,7 +136,7 @@ theorem Sset_diff_support_subset_A1 {L : Subgroup G} [Finite G] (hyp : Hypothesi
     {chi : ClassFunction ↥L ℂ} (data : CharacterDecompositionData hyp chi) :
     (chi - chi.conj).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (A1 L PeterfalviType.I) L := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   intro x hx
   rw [ClassFunction.mem_support] at hx
   rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
@@ -174,7 +174,7 @@ theorem Sset_diff_tau_support_subset_ftThickenedA1 {L : Subgroup G} [Finite G]
     (data : CharacterDecompositionData hyp chi) :
     (hyp.tau (chi - chi.conj)).support ⊆
       OddOrder.Peterfalvi.S10.ftThickenedSupport L (A1 L PeterfalviType.I) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hA₁A : A1 L PeterfalviType.I ⊆ typeIA L hyp.typeI :=
     OddOrder.Peterfalvi.S10.A1_subset_typeIA L hyp.typeI
   have hA₁norm : ∀ (l : ↥L) ⦃a : G⦄, a ∈ A1 L PeterfalviType.I →
@@ -221,7 +221,7 @@ theorem constituentDiff_tau_support_subset_ftThickenedA {L : Subgroup G} [Finite
     {φ : IrreducibleCharacter ↥L} (hφ : φ ∈ data.constituents) :
     (hyp.tau ((φ : ClassFunction ↥L ℂ) - (φ : ClassFunction ↥L ℂ).conj)).support ⊆
       OddOrder.Peterfalvi.S10.ftThickenedSupport L (typeIA L hyp.typeI) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hsupp := constituentDiff_support_subset data hφ
   have htau_eq : hyp.tau ((φ : ClassFunction ↥L ℂ) - (φ : ClassFunction ↥L ℂ).conj)
       = hyp.dadeData.dade.dadeMap (k := ℂ)
@@ -249,7 +249,7 @@ theorem nonconjugate_thickened_mixed_disjoint_or_swap {L1 L2 : Subgroup G} [Fini
         (OddOrder.Peterfalvi.S10.ftThickenedSupport L2 (A1 L2 PeterfalviType.I)) ∨
       Disjoint (OddOrder.Peterfalvi.S10.ftThickenedSupport L2 (typeIA L2 hyp2.typeI))
         (OddOrder.Peterfalvi.S10.ftThickenedSupport L1 (A1 L1 PeterfalviType.I)) := by
-  haveI := hyp1.finiteG
+  have := hyp1.finiteG
   have hncTS : ¬ OddOrder.BG.Ch4.S14.IsConjugateSubgroup L2 L1 := fun hc =>
     hnot_conj hc.symm
   rcases OddOrder.Peterfalvi.S10.ftThickenedSupport_mixed_disjoint_of_nonconjugate hG
@@ -271,7 +271,7 @@ theorem constituent_fullDiff_inner_zero_of_disjoint {L1 L2 : Subgroup G} [Finite
     ClassFunction.inner
         (hyp1.tau ((φ1 : ClassFunction ↥L1 ℂ) - (φ1 : ClassFunction ↥L1 ℂ).conj))
         (hyp2.tau (chi2 - chi2.conj)) = 0 := by
-  haveI := hyp1.finiteG
+  have := hyp1.finiteG
   exact ClassFunction.inner_eq_zero_of_disjoint_support
     (Disjoint.mono (constituentDiff_tau_support_subset_ftThickenedA hyp1 data1 hφ1)
       (Sset_diff_tau_support_subset_ftThickenedA1 hyp2 data2) hdisj)
@@ -286,7 +286,7 @@ theorem tau_conj_of_supported {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
     {f : ClassFunction ↥L ℂ}
     (hf : f.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L) :
     hyp.tau f.conj = (hyp.tau f).conj := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have h1 : f.conj = ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv f := by
     ext g
     rw [ClassFunction.conj_apply, ClassFunction.mapRingEquiv_apply]
@@ -309,7 +309,7 @@ theorem R1cdi_nu_eq_mu_conj {L : Subgroup G} [Finite G] {hyp : Hypothesis L}
     {chi : ClassFunction ↥L ℂ} (data : CharacterDecompositionData hyp chi)
     {φ : IrreducibleCharacter ↥L} (hφ : φ ∈ data.constituents) :
     (R1cdi data hφ).nuClassFunction = (R1cdi data hφ).muClassFunction.conj := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   exact OddOrder.Peterfalvi.S07.CharacterDifferenceImage.nu_eq_mu_conj _
     (tau_conj_of_supported hyp (constituentDiff_support_subset data hφ))
 
@@ -328,7 +328,7 @@ theorem constituentDiff_tau_inner_eq_zero_of_ne {L : Subgroup G} [Finite G]
     ClassFunction.inner
         (hyp.tau ((φ : ClassFunction ↥L ℂ) - (φ : ClassFunction ↥L ℂ).conj))
         (hyp.tau ((φ' : ClassFunction ↥L ℂ) - (φ' : ClassFunction ↥L ℂ).conj)) = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   -- The two differences form a supported generating family.
   have hSsupp : ∀ s ∈ ({((φ : ClassFunction ↥L ℂ) - (φ : ClassFunction ↥L ℂ).conj),
@@ -399,7 +399,7 @@ theorem constituentDiff_tau_inner_eq_zero_of_ne_across {L : Subgroup G} [Finite 
     ClassFunction.inner
         (hyp.tau ((φ : ClassFunction ↥L ℂ) - (φ : ClassFunction ↥L ℂ).conj))
         (hyp.tau ((φ' : ClassFunction ↥L ℂ) - (φ' : ClassFunction ↥L ℂ).conj)) = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hSsupp : ∀ s ∈ ({((φ : ClassFunction ↥L ℂ) - (φ : ClassFunction ↥L ℂ).conj),
       ((φ' : ClassFunction ↥L ℂ) - (φ' : ClassFunction ↥L ℂ).conj)} :
@@ -460,7 +460,7 @@ theorem constituent_diffImage_inner_zero_of_disjoint {L1 L2 : Subgroup G} [Finit
     ClassFunction.inner
         (hyp1.tau ((φ1 : ClassFunction ↥L1 ℂ) - (φ1 : ClassFunction ↥L1 ℂ).conj))
         (hyp2.tau ((φ2 : ClassFunction ↥L2 ℂ) - (φ2 : ClassFunction ↥L2 ℂ).conj)) = 0 := by
-  haveI := hyp1.finiteG
+  have := hyp1.finiteG
   classical
   set X : ClassFunction G ℂ := hyp2.tau (chi2 - chi2.conj) with hX
   -- (a) `χ₂ − χ̄₂ = ∑_{φ∈S(χ₂)} (φ − φ̄)`, hence `X = ∑ (φ−φ̄)^{τ₂}` and `X ∈ ℤ[Irr G]`.
@@ -617,7 +617,7 @@ theorem nonconjugate_diffImage_inner_zero {L1 L2 : Subgroup G} [Finite G]
     ClassFunction.inner
         (hyp1.tau ((φ1 : ClassFunction ↥L1 ℂ) - (φ1 : ClassFunction ↥L1 ℂ).conj))
         (hyp2.tau ((φ2 : ClassFunction ↥L2 ℂ) - (φ2 : ClassFunction ↥L2 ℂ).conj)) = 0 := by
-  haveI := hyp1.finiteG
+  have := hyp1.finiteG
   rcases nonconjugate_thickened_mixed_disjoint_or_swap hG hyp1 hyp2 hnot_conj with h | h
   · exact constituent_diffImage_inner_zero_of_disjoint hyp1 hyp2 h data1 hφ1 data2 hφ2
   · have hswap := constituent_diffImage_inner_zero_of_disjoint hyp2 hyp1 h data2 hφ2 data1 hφ1
@@ -709,8 +709,8 @@ theorem irreducibleCharacter_signed_difference_uniqueness [Finite G]
         = t • ((c : ClassFunction G ℂ) - (d : ClassFunction G ℂ))) :
     (a = c ∧ b = d ∧ s = t) ∨ (a = d ∧ b = c ∧ s = -t) := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Invertible (Nat.card G : ℂ) :=
+  have : Fintype G := Fintype.ofFinite G
+  have : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   have hba : b ≠ a := fun he => hab he.symm
   -- Pair the equation on the left with an arbitrary irreducible `e`; orthonormality turns each
@@ -763,7 +763,7 @@ theorem R1cdi_muNu_mem_span_Rset {L : Subgroup G} [Finite G] {hyp : Hypothesis L
     {φ : IrreducibleCharacter ↥L} (hφ : φ ∈ data.constituents) :
     (R1cdi data hφ).muClassFunction ∈ Submodule.span ℤ (Rset data) ∧
       (R1cdi data hφ).nuClassFunction ∈ Submodule.span ℤ (Rset data) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have himg : (R1 data hφ).imageSet
       = ({(R1cdi data hφ).sign • (R1cdi data hφ).muClassFunction,
@@ -807,7 +807,7 @@ theorem exists_uniform_image_of_constituents {L : Subgroup G} [Finite G] (hyp : 
         ∀ β ∈ data.constituents ∪ data.constituents.image (IrreducibleCharacter.conjPerm ↥L),
           hyp.tau ((α : ClassFunction ↥L ℂ) - (β : ClassFunction ↥L ℂ))
             = ε • ((μ α : ClassFunction G ℂ) - (μ β : ClassFunction G ℂ)) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   set T := data.constituents ∪ data.constituents.image (IrreducibleCharacter.conjPerm ↥L) with hTdef
   obtain ⟨φref, hφref⟩ := data.constituents_nonempty
@@ -846,7 +846,7 @@ theorem exists_uniform_image_of_constituents {L : Subgroup G} [Finite G] (hyp : 
   have hrefne : φref ≠ IrreducibleCharacter.conjPerm ↥L φref := fun hcon =>
     data.not_real φref hφref ((IrreducibleCharacter.conjPerm_eq_self_iff φref).mp hcon.symm)
   have hn2 : 2 ≤ n := Finset.one_lt_card.mpr ⟨φref, hφrefT, _, hconjrefT, hrefne⟩
-  haveI : NeZero n := ⟨by omega⟩
+  have : NeZero n := ⟨by omega⟩
   set fam : Fin n → IrreducibleCharacter ↥L :=
     fun i => (T.equivFin.symm i : IrreducibleCharacter ↥L)
     with hfamdef

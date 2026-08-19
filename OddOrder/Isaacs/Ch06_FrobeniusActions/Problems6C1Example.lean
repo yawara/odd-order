@@ -277,7 +277,7 @@ theorem center_eq_bot : Subgroup.center Group75 = ⊥ := by
 
 theorem not_isNilpotent_group75 : ¬ Group.IsNilpotent Group75 := by
   intro hnil
-  haveI : Nontrivial Group75 := by
+  have : Nontrivial Group75 := by
     refine Finite.one_lt_card_iff_nontrivial.mp ?_
     rw [card_group75]
     norm_num

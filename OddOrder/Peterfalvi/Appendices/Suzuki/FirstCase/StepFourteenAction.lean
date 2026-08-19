@@ -240,7 +240,7 @@ theorem card_sup_invImageF_centralizer_W_eq
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
     Nat.card ↥(fc.invImageF model
       ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) = 3 ^ 4 := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   obtain ⟨hpSig, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
   obtain ⟨-, -, -, hSig3, -⟩ :=
     fc.card_field_eq_nine_of_p_dvd_card_centralizer_W ind model hB2 hpSig
@@ -254,7 +254,7 @@ include model in
 normalizes `R` (step (11)), and it centralizes `Σ ≤ W ≤ V`. -/
 theorem distinguishedInvolution_mem_normalizerRSigma :
     fc.toHypothesis.distinguishedInvolution ∈ fc.normalizerRSigma model := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   set s : G := fc.toHypothesis.distinguishedInvolution with hs_def
   have hs2 : s * s = 1 := by
     have h := fc.toHypothesis.distinguishedInvolution_sq
@@ -304,17 +304,17 @@ theorem card_centralizer_P_eq
     (ind : Hypothesis.TheoremAInductionBelow G Ω)
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
     Nat.card ↥(Subgroup.centralizer (fc.P : Set G)) = 81 * 8 := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨hpSig, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
   obtain ⟨-, -, -, hSig3, -⟩ :=
     fc.card_field_eq_nine_of_p_dvd_card_centralizer_W ind model hB2 hpSig
   obtain ⟨e⟩ := fc.sigma_mulEquiv_centralizer_W ind
   have hPcard : Nat.card ↥fc.P = 3 := by rw [fc.card_P, hp3]
-  haveI : Finite F := Nat.finite_of_card_ne_zero (by rw [hF9]; norm_num)
+  have : Finite F := Nat.finite_of_card_ne_zero (by rw [hF9]; norm_num)
   have hQ8 : Nat.card ↥(fc.rankOneQuotient).Q = 8 := by
-    haveI := Fintype.ofFinite F
-    haveI := Classical.decEq F
+    have := Fintype.ofFinite F
+    have := Classical.decEq F
     rw [Nat.card_congr model.qEquiv.toEquiv, Nat.card_eq_fintype_card,
       Fintype.card_units, ← Nat.card_eq_fintype_card, hF9]
   have hD3 : Nat.card ↥(fc.rankOneQuotient).D = 3 := by
@@ -338,7 +338,7 @@ theorem centralizer_P_inf_centralizer_mul_t_eq_sup
           * fc.toHypothesis.t} : Set G)
       = fc.invImageF model
         ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨hpSig, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
   obtain ⟨-, -, -, hSig3, -⟩ :=
@@ -461,7 +461,7 @@ theorem zpowers_mul_mem_lineSetTwo
     (hy1 : y ≠ 1) :
     Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
       * fc.toHypothesis.t * y) ∈ fc.lineSetTwo := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨-, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
   have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
@@ -537,7 +537,7 @@ theorem mem_ker_lineSetTwoPermHom_iff
     g ∈ (fc.lineSetTwoPermHom model ind hB2).ker ↔
       (g : G) ∈ fc.invImageF model
         ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨-, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
   have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
@@ -660,9 +660,9 @@ theorem exists_orderOf_pow_three_mem_normalizerRSigma_notMem_sup
       x ∉ (fc.invImageF model
           ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G)
         ∧ ∃ j : ℕ, orderOf x = 3 ^ j := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   obtain ⟨-, -, -, -, hW, hGp⟩ := fc.step_twelve model ind hB2
   have hRScard := fc.card_sup_invImageF_centralizer_W_eq model ind hB2
   have hRp : IsPGroup 3 ↥(fc.invImageF model
@@ -702,12 +702,12 @@ theorem lineSetTwoPermHom_surjective
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
     Function.Surjective (fc.lineSetTwoPermHom model ind hB2) := by
   classical
-  haveI : Finite (Subgroup G) :=
+  have : Finite (Subgroup G) :=
     Finite.of_injective (fun H : Subgroup G => (H : Set G)) SetLike.coe_injective
-  haveI : Finite ↥fc.lineSetTwo := Subtype.finite
-  haveI := Fintype.ofFinite ↥fc.lineSetTwo
-  haveI := Classical.decEq ↥fc.lineSetTwo
-  haveI : Fact (Nat.Prime 2) := ⟨by norm_num⟩
+  have : Finite ↥fc.lineSetTwo := Subtype.finite
+  have := Fintype.ofFinite ↥fc.lineSetTwo
+  have := Classical.decEq ↥fc.lineSetTwo
+  have : Fact (Nat.Prime 2) := ⟨by norm_num⟩
   set φ := fc.lineSetTwoPermHom model ind hB2 with hφ_def
   -- `|Sym(𝒜₂)| = 3! = 6`
   have hA3 : Fintype.card ↥fc.lineSetTwo = 3 := by
@@ -776,11 +776,11 @@ theorem card_normalizerRSigma
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
     Nat.card ↥(fc.normalizerRSigma model) = 2 * 3 ^ 5 := by
   classical
-  haveI : Finite (Subgroup G) :=
+  have : Finite (Subgroup G) :=
     Finite.of_injective (fun H : Subgroup G => (H : Set G)) SetLike.coe_injective
-  haveI : Finite ↥fc.lineSetTwo := Subtype.finite
-  haveI := Fintype.ofFinite ↥fc.lineSetTwo
-  haveI := Classical.decEq ↥fc.lineSetTwo
+  have : Finite ↥fc.lineSetTwo := Subtype.finite
+  have := Fintype.ofFinite ↥fc.lineSetTwo
+  have := Classical.decEq ↥fc.lineSetTwo
   set φ := fc.lineSetTwoPermHom model ind hB2 with hφ_def
   have hRle : (fc.invImageF model
       ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G)

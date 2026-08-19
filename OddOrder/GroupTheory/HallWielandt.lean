@@ -84,7 +84,7 @@ Each factor of the transfer product is `ψ(rep q)⁻¹ · ψ g · ψ(rep (g⁻¹
 theorem transfer_comp_subtype_apply [H.FiniteIndex] (ψ : G →* A) (g : G) :
     MonoidHom.transfer (ψ.comp H.subtype) g = ψ g ^ H.index := by
   classical
-  letI := H.fintypeQuotientOfFiniteIndex
+  let := H.fintypeQuotientOfFiniteIndex
   set T : H.LeftTransversal := default with hT_def
   rw [MonoidHom.transfer_def (ψ.comp H.subtype) T g]
   unfold Subgroup.leftTransversals.diff
@@ -126,8 +126,8 @@ theorem sum_index_mackey :
     ∑ q : DoubleCoset.Quotient (K : Set G) H,
         ((conjSubgroup q.out H ⊓ K).subgroupOf K).index = H.index := by
   classical
-  letI := H.fintypeQuotientOfFiniteIndex
-  letI : ∀ q : DoubleCoset.Quotient (K : Set G) H,
+  let := H.fintypeQuotientOfFiniteIndex
+  let : ∀ q : DoubleCoset.Quotient (K : Set G) H,
       Fintype (↥K ⧸ (conjSubgroup q.out H ⊓ K).subgroupOf K) := fun q =>
     ((conjSubgroup q.out H ⊓ K).subgroupOf K).fintypeQuotientOfFiniteIndex
   have h := Fintype.card_congr (dosetFiberEquiv (K := K) (H := H))
@@ -220,7 +220,7 @@ theorem eq_top_of_transfer_ne_one [Finite R] {p : ℕ} [Fact p.Prime] (hp2 : p �
   have hp_prime : p.Prime := Fact.out
   by_contra hST
   obtain ⟨M, hM_coatom, hSM⟩ := (IsCoatomic.eq_top_or_exists_le_coatom S).resolve_left hST
-  haveI hM_normal : M.Normal := IsCoatom.normal_of_isPGroup hRp hM_coatom
+  have hM_normal : M.Normal := IsCoatom.normal_of_isPGroup hRp hM_coatom
   have hM_idx : M.index = p := by
     rw [Subgroup.index_eq_card]
     exact IsCoatom.card_quotient_of_isPGroup hRp hM_coatom
@@ -231,7 +231,7 @@ theorem eq_top_of_transfer_ne_one [Finite R] {p : ℕ} [Fact p.Prime] (hp2 : p �
   -- (24): `μ` kills `X_R(x) ∩ M`
   have h24 : ∀ z ∈ powConjSet x p, ∀ hz : z ∈ M, μ ⟨z, hz⟩ = 1 := by
     intro z hz hzM
-    letI : Fintype (Quotient (MulAction.orbitRel (Subgroup.zpowers (⟨z, hzM⟩ : ↥M))
+    let : Fintype (Quotient (MulAction.orbitRel (Subgroup.zpowers (⟨z, hzM⟩ : ↥M))
       (↥M ⧸ S.subgroupOf M))) := Fintype.ofFinite _
     rw [hμ_def, MonoidHom.transfer_eq_prod_quotient_orbitRel_zpowers_quot]
     refine Finset.prod_eq_one fun q _ => ?_
@@ -425,7 +425,7 @@ theorem sylow_le_commutator_normalizer [Finite G] (hp2 : p ≠ 2) (P : Sylow p G
     refine ⟨⟨u, hu⟩ * c * ⟨u, hu⟩⁻¹, ?_, ?_⟩
     · exact (inferInstance : (_root_.commutator ↥N).Normal).conj_mem c hc _
     · rfl
-  haveI hDnormal : D.Normal := by
+  have hDnormal : D.Normal := by
     refine ⟨fun n hn r => ?_⟩
     rw [hD_def, Subgroup.mem_subgroupOf] at hn ⊢
     have := hNc_conj (r : G) (hPN r.2) (n : G) hn
@@ -439,7 +439,7 @@ theorem sylow_le_commutator_normalizer [Finite G] (hp2 : p ≠ 2) (P : Sylow p G
     · rw [_root_.commutator_def]
       exact Subgroup.commutator_mem_commutator (Subgroup.mem_top _) (Subgroup.mem_top _)
     · rfl
-  letI : CommGroup (↥(P : Subgroup G) ⧸ D) :=
+  let : CommGroup (↥(P : Subgroup G) ⧸ D) :=
     { (inferInstance : Group (↥(P : Subgroup G) ⧸ D)) with
       mul_comm := by
         intro a b
@@ -481,8 +481,8 @@ theorem sylow_le_commutator_normalizer [Finite G] (hp2 : p ≠ 2) (P : Sylow p G
   set R : Subgroup G := A ⊔ Subgroup.zpowers x with hR_def
   have hRP : R ≤ (P : Subgroup G) := sup_le hAP (Subgroup.zpowers_le.mpr hxP)
   have hxR : x ∈ R := Subgroup.mem_sup_right (Subgroup.mem_zpowers x)
-  haveI : Finite (DoubleCoset.Quotient (R : Set G) (P : Subgroup G)) := Quotient.finite _
-  haveI : Fintype (DoubleCoset.Quotient (R : Set G) (P : Subgroup G)) := Fintype.ofFinite _
+  have : Finite (DoubleCoset.Quotient (R : Set G) (P : Subgroup G)) := Quotient.finite _
+  have : Fintype (DoubleCoset.Quotient (R : Set G) (P : Subgroup G)) := Fintype.ofFinite _
   have hkey := transfer_eq_prod_doubleCoset_mul_pow lam hRP hxR
   have hzero : MonoidHom.transfer lam x = 1 := by
     have hker : commutator G ≤ (MonoidHom.transfer lam).ker :=
@@ -501,7 +501,7 @@ theorem sylow_le_commutator_normalizer [Finite G] (hp2 : p ≠ 2) (P : Sylow p G
   set δ : ↥((conjSubgroup g (P : Subgroup G) ⊓ R).subgroupOf R) →* (↥(P : Subgroup G) ⧸ D) :=
     mackeyRes lam g / mackeyResIncl lam hRP g with hδ_def
   have hAR : A ≤ R := le_sup_left
-  haveI hA₀normal : (A.subgroupOf R).Normal := by
+  have hA₀normal : (A.subgroupOf R).Normal := by
     refine ⟨fun n hn r => ?_⟩
     rw [Subgroup.mem_subgroupOf] at hn ⊢
     have hrP := le_normalizer_of_isWeaklyClosed hAP hwc (hRP r.2)

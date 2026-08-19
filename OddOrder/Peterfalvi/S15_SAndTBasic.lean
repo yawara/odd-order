@@ -31,7 +31,7 @@ theorem coprime_card_V_card_Q_of_disjoint [Finite G]
   have hM'_le_T : derivedInG hyp.T ≤ hyp.T := Subgroup.map_subtype_le _
   have hT_le_NQ : hyp.T ≤ Subgroup.normalizer (hyp.Q : Set G) := by
     rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.T
-  haveI hQn_normal : (hyp.Q.subgroupOf (derivedInG hyp.T)).Normal :=
+  have hQn_normal : (hyp.Q.subgroupOf (derivedInG hyp.T)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQ_le).mpr (hM'_le_T.trans hT_le_NQ)
   have hQnVn_inf : (hyp.Q.subgroupOf (derivedInG hyp.T)) ⊓
       (hyp.V.subgroupOf (derivedInG hyp.T)) = ⊥ := by
@@ -127,7 +127,7 @@ theorem normalizer_W1_le_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     intro hbot
     have hq1 : hyp.q = 1 := by rw [hyp.q_eq_card_W1, hbot, Subgroup.card_bot]
     exact hyp.q_prime.one_lt.ne' hq1
-  haveI : Nontrivial ↥hyp.W1 := (Subgroup.nontrivial_iff_ne_bot _).mpr hW1ne
+  have : Nontrivial ↥hyp.W1 := (Subgroup.nontrivial_iff_ne_bot _).mpr hW1ne
   obtain ⟨x, hx1⟩ := exists_ne (1 : ↥hyp.W1)
   set a : G := (x : G) with ha
   have haW1 : a ∈ hyp.W1 := x.2
@@ -184,7 +184,7 @@ theorem centralizer_W2_inf_V_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimple
     intro hbot
     have hp1 : hyp.p = 1 := by rw [hyp.p_eq_card_W2, hbot, Subgroup.card_bot]
     exact hyp.p_prime.one_lt.ne' hp1
-  haveI : Nontrivial ↥hyp.W2 := (Subgroup.nontrivial_iff_ne_bot _).mpr hW2ne
+  have : Nontrivial ↥hyp.W2 := (Subgroup.nontrivial_iff_ne_bot _).mpr hW2ne
   obtain ⟨w0, hw0⟩ := exists_ne (1 : ↥hyp.W2)
   set w : G := (w0 : G) with hw
   have hwW2 : w ∈ hyp.W2 := w0.2
@@ -269,7 +269,7 @@ theorem isMulCommutative_V [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
   have hT_le_NQ : hyp.T ≤ Subgroup.normalizer (hyp.Q : Set G) := by
     rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.T
-  haveI hQn_normal : (hyp.Q.subgroupOf (derivedInG hyp.T)).Normal :=
+  have hQn_normal : (hyp.Q.subgroupOf (derivedInG hyp.T)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQ_le).mpr (hM'_le_T.trans hT_le_NQ)
   have hVcompl : (hyp.Q.subgroupOf (derivedInG hyp.T)).IsComplement'
       (hyp.V.subgroupOf (derivedInG hyp.T)) := by
@@ -298,10 +298,10 @@ theorem isMulCommutative_V [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact (coprime_card_V_card_Q_of_disjoint hyp tdata hdisj).symm
   have hQ_lt_top : hyp.Q < ⊤ :=
     lt_of_le_of_lt hQ_le_T (lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hyp.T_maximal).1)
-  haveI hQsolv : IsSolvable ↥hyp.Q := _hG.solvable_of_lt_top hyp.Q hQ_lt_top
-  have hsolv : IsSolvable ↥(hyp.Q.subgroupOf (derivedInG hyp.T)) ∨
-      IsSolvable (↥(derivedInG hyp.T) ⧸ hyp.Q.subgroupOf (derivedInG hyp.T)) :=
-    Or.inl (solvable_of_solvable_injective
+  have hQsolv : Group.IsSolvable ↥hyp.Q := _hG.isSolvable_of_lt_top hyp.Q hQ_lt_top
+  have hsolv : Group.IsSolvable ↥(hyp.Q.subgroupOf (derivedInG hyp.T)) ∨
+      Group.IsSolvable (↥(derivedInG hyp.T) ⧸ hyp.Q.subgroupOf (derivedInG hyp.T)) :=
+    Or.inl (Group.isSolvable_of_isSolvable_injective
       (f := (Subgroup.subgroupOfEquivOfLe hQ_le).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe hQ_le).injective)
   obtain ⟨n, _hnQ, hn⟩ :=
@@ -345,9 +345,9 @@ theorem normalizer_V_inf_W1_le_centralizer_W1 [Finite G]
         (hyp.W2.subgroupOf (hyp.V ⊔ hyp.W2)) := by
     have h := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius tpd htpdVne
     rwa [htpdV, htpdW2] at h
-  haveI hVcomm : IsMulCommutative ↥hyp.V := isMulCommutative_V hG hyp ⟨tdata⟩
+  have hVcomm : IsMulCommutative ↥hyp.V := isMulCommutative_V hG hyp ⟨tdata⟩
   -- conjugation action `φ : ↥W₂ → MulAut ↥V`.
-  letI actV : MulDistribMulAction ↥hyp.W2 ↥hyp.V :=
+  let actV : MulDistribMulAction ↥hyp.W2 ↥hyp.V :=
     MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (hyp.V : Set G))) ↥hyp.V
       (Subgroup.inclusion hyp.W2_normalizes_V)
   set φ : ↥hyp.W2 →* MulAut ↥hyp.V := MulDistribMulAction.toMulAut ↥hyp.W2 ↥hyp.V with hφ
@@ -356,7 +356,7 @@ theorem normalizer_V_inf_W1_le_centralizer_W1 [Finite G]
   -- `N := C_V(W₁)`, normal in the abelian `↥V`.
   set N : Subgroup ↥hyp.V :=
     (hyp.V ⊓ Subgroup.centralizer (hyp.W1 : Set G)).subgroupOf hyp.V with hN_def
-  haveI hNnorm : N.Normal := by
+  have hNnorm : N.Normal := by
     refine ⟨fun n _ g => ?_⟩
     have hc : g * n * g⁻¹ = n := by rw [mul_comm' g n, mul_inv_cancel_right]
     rw [hc]; assumption
@@ -400,7 +400,7 @@ theorem normalizer_V_inf_W1_le_centralizer_W1 [Finite G]
     exact conj_W2_mem_centralizer_W1 hG hyp hgNW1 a.2
   obtain ⟨c, hc_fix, m, hm, hc_eq⟩ :=
     OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient (φ := φ) hCop
-      (Or.inr (isSolvable_of_comm (fun a b => mul_comm' a b))) hN_inv hg_fix
+      (Or.inr (Group.isSolvable_of_comm (fun a b => mul_comm' a b))) hN_inv hg_fix
   -- `c` is `W₂`-fixed ⟹ `(c:G) ∈ C_V(W₂) = ⊥` ⟹ `c = 1`.
   have hc1 : c = 1 := by
     have hcmem : (c : G) ∈ hyp.V ⊓ Subgroup.centralizer (hyp.W2 : Set G) := by
@@ -461,14 +461,14 @@ theorem normalizer_V_inf_W1_eq_bot_of_data [Finite G]
         (hyp.W2.subgroupOf (hyp.V ⊔ hyp.W2)) := by
     have h := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius tpd htpdVne
     rwa [htpdV, htpdW1] at h
-  haveI hVcomm : IsMulCommutative ↥hyp.V := isMulCommutative_V hG hyp ⟨tdata⟩
+  have hVcomm : IsMulCommutative ↥hyp.V := isMulCommutative_V hG hyp ⟨tdata⟩
   set K := hyp.V ⊓ Subgroup.normalizer (hyp.W1 : Set G) with hK_def
   have hK_le_V : K ≤ hyp.V := inf_le_left
   -- crux: `K ≤ C_G(W₁)`.
   have hKC : K ≤ Subgroup.centralizer (hyp.W1 : Set G) :=
     normalizer_V_inf_W1_le_centralizer_W1 hG hyp ⟨tdata⟩
   -- `Q` abelian.
-  haveI hQcomm : IsMulCommutative ↥hyp.Q := IsMulCommutative.of_comm hQ_elemAb.comm
+  have hQcomm : IsMulCommutative ↥hyp.Q := IsMulCommutative.of_comm hQ_elemAb.comm
   -- divisibilities `|K| ∣ |V| ∣ |V⋊W₂|`, from the coprime-action datum `hcop`.
   have hVdvdVW2 : Nat.card ↥hyp.V ∣ Nat.card ↥(hyp.V ⊔ hyp.W2) := by
     rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left)).toEquiv]
@@ -498,7 +498,7 @@ theorem normalizer_V_inf_W1_eq_bot_of_data [Finite G]
   have hK_norm_Q : K ≤ Subgroup.normalizer (hyp.Q : Set G) := (hK_le_V.trans hV_le_T).trans
       hT_norm_Q
   -- `V ≤ N(K)` (`V` abelian, `K ≤ V`).
-  haveI hKnormalV : (K.subgroupOf hyp.V).Normal := by
+  have hKnormalV : (K.subgroupOf hyp.V).Normal := by
     refine ⟨fun n _ g => ?_⟩
     have hc : g * n * g⁻¹ = n := by rw [mul_comm' g n, mul_inv_cancel_right]
     rw [hc]; assumption
@@ -528,8 +528,8 @@ theorem normalizer_V_inf_W1_eq_bot_of_data [Finite G]
         hv)
       (hV_norm_K hv), fun w hw => OddOrder.BG.Ch1.S03f.mem_normalizer_commutator
       ((hW2_le_T.trans hT_norm_Q) hw) (hW2_norm_K hw)⟩
-  haveI hQKsolv : IsSolvable ↥(⁅hyp.Q, K⁆ : Subgroup G) :=
-    isSolvable_of_comm (fun a b => Subtype.ext (by
+  have hQKsolv : Group.IsSolvable ↥(⁅hyp.Q, K⁆ : Subgroup G) :=
+    Group.isSolvable_of_comm (fun a b => Subtype.ext (by
       have h := hQ_elemAb.comm (⟨(a : G), hQK_le_Q a.2⟩ : ↥hyp.Q) (⟨(b : G), hQK_le_Q b.2⟩ : ↥hyp.Q)
       have h2 := congrArg (Subgroup.subtype hyp.Q) h
       simpa using h2))
@@ -545,7 +545,7 @@ theorem normalizer_V_inf_W1_eq_bot_of_data [Finite G]
         -- `n ∈ ⁅Q,K⁆ ⊆ Q` fixed by all of `W₂` ⟹ `n ∈ tpd.W2 = W₁ ⊆ C(K) ⊓ Q` ⟹ `n = 1`.
         have hnQ : n ∈ hyp.Q := hQK_le_Q hnQK
         have hW2ne : tpd.W1 ≠ ⊥ := tpd.W1_nontrivial
-        haveI : Nontrivial ↥tpd.W1 := (Subgroup.nontrivial_iff_ne_bot _).mpr hW2ne
+        have : Nontrivial ↥tpd.W1 := (Subgroup.nontrivial_iff_ne_bot _).mpr hW2ne
         obtain ⟨x0, hx0⟩ := exists_ne (1 : ↥tpd.W1)
         have hxW2 : (x0 : G) ∈ hyp.W2 := htpdW1 ▸ x0.2
         have hxne : (x0 : G) ≠ 1 := fun h => hx0 (OneMemClass.coe_eq_one.mp h)
@@ -656,7 +656,7 @@ theorem coprime_card_Q_card_VW2 [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd
   -- `V ⋊ W₂` complements `Q` in `↥T`; hence `[T:Q] = |V ⋊ W₂|`.
   have hT_norm_Q : hyp.T ≤ Subgroup.normalizer (hyp.Q : Set G) := by
     rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.T
-  haveI hQnorm : (hyp.Q.subgroupOf hyp.T).Normal :=
+  have hQnorm : (hyp.Q.subgroupOf hyp.T).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQ_le_T).mpr hT_norm_Q
   have hcompl : Subgroup.IsComplement' ((hyp.V ⊔ hyp.W2).subgroupOf hyp.T)
       (hyp.Q.subgroupOf hyp.T) := by
@@ -718,7 +718,7 @@ theorem Q_elementaryAbelian_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       nontrivial := ⟨hUne, hW1prime, tdata.common.2.2⟩
       type_alt := Or.inl hTTypeII }
   obtain ⟨chief, _⟩ := OddOrder.Peterfalvi.S11.exists_chiefFactorData hG setupT
-  haveI := chief.N_normal
+  have := chief.N_normal
   have hHeq : (setupT.H : Subgroup G) = hyp.Q := by
     change tpd.H = hyp.Q; rw [tpd.H_eq, hyp.Q_eq_TF]
   have hqdim : setupT.q = hyp.p := by
@@ -958,14 +958,14 @@ theorem exists_conj_typeP_V_of_coprime [Finite G]
   have hV_le : hyp.V ≤ derivedInG hyp.T := by rw [hyp.T_deriv_eq_QV]; exact le_sup_right
   have htU_le : tdata.typeP.U ≤ derivedInG hyp.T := tdata.typeP.U_le
   have hM'_le_T : derivedInG hyp.T ≤ hyp.T := Subgroup.map_subtype_le _
-  haveI hTsolv : IsSolvable ↥hyp.T := hG.solvable_of_mem_maximalSubgroups hyp.T_maximal
-  haveI hM'solv : IsSolvable ↥(derivedInG hyp.T) :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective hM'_le_T)
+  have hTsolv : Group.IsSolvable ↥hyp.T := hG.isSolvable_of_mem_maximalSubgroups hyp.T_maximal
+  have hM'solv : Group.IsSolvable ↥(derivedInG hyp.T) :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective hM'_le_T)
   have hT_le_NQ : hyp.T ≤ Subgroup.normalizer (hyp.Q : Set G) := by
     rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.T
   have hM'_le_NQ : derivedInG hyp.T ≤ Subgroup.normalizer (hyp.Q : Set G) :=
     hM'_le_T.trans hT_le_NQ
-  haveI hQn_normal : (hyp.Q.subgroupOf (derivedInG hyp.T)).Normal :=
+  have hQn_normal : (hyp.Q.subgroupOf (derivedInG hyp.T)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQ_le).mpr hM'_le_NQ
   have hKcompl : (hyp.Q.subgroupOf (derivedInG hyp.T)).IsComplement'
       (tdata.typeP.U.subgroupOf (derivedInG hyp.T)) := by
@@ -995,7 +995,7 @@ theorem exists_conj_typeP_V_of_coprime [Finite G]
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe htU_le).toEquiv
     have hQpos : 0 < Nat.card ↥(hyp.Q.subgroupOf (derivedInG hyp.T)) := Nat.card_pos
     have key := Nat.eq_of_mul_eq_mul_left hQpos
-      (hVcompl.card_mul.trans hKcompl.card_mul.symm)
+      (hVcompl.card_mul_card.trans hKcompl.card_mul_card.symm)
     rw [← hVcong, ← hKcong]; exact key
   obtain ⟨x, hx⟩ := Ch03.exists_conj_le_of_isComplement'_of_coprime
     (M := hyp.Q.subgroupOf (derivedInG hyp.T))
@@ -1035,7 +1035,7 @@ theorem exists_conj_typeP_V_of_coprime [Finite G]
 the `L ~ S` branch of (8.8.b4).  Generic and reusable; the only `S`-specific input is "`U` is a
 Hall subgroup of `S`". -/
 theorem normalizer_le_of_isHall_subgroupOf_of_conj [Finite G] {V U L : Subgroup G}
-    (hVsolv : IsSolvable ↥V) (hUV : U ≤ V) {π : Set ℕ}
+    (hVsolv : Group.IsSolvable ↥V) (hUV : U ≤ V) {π : Set ℕ}
     (hUhall : Ch03.IsHallSubgroup π (U.subgroupOf V))
     {g : G} (hconj : MulAut.conj g • L = V)
     (hNUL : Subgroup.normalizer (U : Set G) ≤ L) :

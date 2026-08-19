@@ -44,11 +44,11 @@ theorem finCardEquivCharacterGroup_zero (C : Type*) [CommGroup C] [Finite C]
     Equiv.apply_symm_apply]
 
 instance instNeZeroW1 {M : Subgroup G} (hyp : Hypothesis M) : NeZero hyp.w1 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   exact ⟨Nat.card_pos.ne'⟩
 
 instance instNeZeroW2 {M : Subgroup G} (hyp : Hypothesis M) : NeZero hyp.w2 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   exact ⟨Nat.card_pos.ne'⟩
 
 open scoped FiniteInduce in
@@ -164,6 +164,7 @@ noncomputable def Hypothesis.canonicalFullDadeApp [Finite G]
   ⟨(typePData_toTICyclicHypothesis hyp.typeP hodd).toDadeHypothesis.fullDadeIsometryData⟩
 
 open scoped FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (10.5), aligned ω^σ-grid is a `χ`-family member** (the §10 analogue of the §6
 `certainTypeOmegaSigma_eq_chiFam`): `alignedOmegaSigmaGrid i j` is the `σ`-image of the irreducible
 (linear) character `η = compHom e (chiColumn χ₂ i)` of `tic.W` — `chiColumn` is `ω(omegaProdChar …)`
@@ -184,13 +185,13 @@ theorem Hypothesis.exists_alignedOmegaSigmaGrid_chiFam_family [Finite G]
         ∀ j, hyp.alignedOmegaSigmaGrid hG hodd i j
           = (typePData_toTICyclicHypothesis hyp.typeP hodd).chiFam rfl
               (hyp.canonicalFullDadeApp hG hodd) (P j) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   -- reconstruct the lets of `alignedOmegaSigmaGrid`
   let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
-  haveI : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
-  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  have : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
   have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
   have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
   have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
@@ -198,12 +199,12 @@ theorem Hypothesis.exists_alignedOmegaSigmaGrid_chiFam_family [Finite G]
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
   let χ₂ : Fin hyp.w2 → (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
     fun j => finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)
   let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
-  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
-  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
   let e : ↥tic.W ≃* ↥(h.W1 ⊔ h.W2) :=
     (Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm.trans
       (MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm)
@@ -232,6 +233,7 @@ theorem Hypothesis.exists_alignedOmegaSigmaGrid_chiFam_family [Finite G]
     rw [step1, OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_irreducibleCharacter]
 
 open scoped FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- **§10 σ-grid orthonormality** (the (3.2) isometry on the aligned `ω^σ`-grid): the `G`-level
 σ-images `alignedOmegaSigmaGrid i j` form an **orthonormal** family indexed by `Fin w₁ × Fin w₂`,
 `⟨ω_{ij}^σ, ω_{i'j'}^σ⟩ = [i = i' ∧ j = j']`.
@@ -250,14 +252,14 @@ theorem Hypothesis.alignedOmegaSigmaGrid_inner [Finite G]
     ClassFunction.inner (hyp.alignedOmegaSigmaGrid hG hodd i j)
         (hyp.alignedOmegaSigmaGrid hG hodd i' j')
       = (if i = i' ∧ j = j' then 1 else 0) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   -- reconstruct the context of `alignedOmegaSigmaGrid` /
   -- `exists_alignedOmegaSigmaGrid_chiFam_family`
   let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
-  haveI : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
-  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  have : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
   have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
   have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
   have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
@@ -265,12 +267,12 @@ theorem Hypothesis.alignedOmegaSigmaGrid_inner [Finite G]
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
   let χ₂ : Fin hyp.w2 → (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
     fun j => finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)
   let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
-  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
-  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
   let e : ↥tic.W ≃* ↥(h.W1 ⊔ h.W2) :=
     (Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm.trans
       (MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm)
@@ -302,6 +304,7 @@ theorem Hypothesis.alignedOmegaSigmaGrid_inner [Finite G]
   · rw [if_neg hij, if_neg fun he => hij (hηinj i j i' j' he)]
 
 open scoped FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- **§10 σ-grid product structure** (Peterfalvi (10.6) column-structure linchpin): the `G`-level
 σ-images factor through a *product* index, `ω_{ij}^σ = χ_{(ρ i, κ j)}`, for an injective `W₁`-row
 family `ρ` and an injective `W₂`-column family `κ`.  Crucially the `W₂`-index `κ j` depends only on
@@ -331,12 +334,12 @@ theorem Hypothesis.exists_alignedOmegaSigmaGrid_chiFam_product [Finite G]
         ∀ i j, hyp.alignedOmegaSigmaGrid hG hodd i j
           = (typePData_toTICyclicHypothesis hyp.typeP hodd).chiFam rfl
               (hyp.canonicalFullDadeApp hG hodd) (ρ i, κ j) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
-  haveI : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
-  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  have : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
   have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
   have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
   have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
@@ -344,16 +347,16 @@ theorem Hypothesis.exists_alignedOmegaSigmaGrid_chiFam_product [Finite G]
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
-  haveI : NeZero hyp.w1 := ⟨by have := h.one_lt_card_W1; rw [hcardW1] at this; omega⟩
-  haveI : NeZero hyp.w2 := ⟨by rw [← hcardW2sub]; exact Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero hyp.w1 := ⟨by have := h.one_lt_card_W1; rw [hcardW1] at this; omega⟩
+  have : NeZero hyp.w2 := ⟨by rw [← hcardW2sub]; exact Nat.card_pos.ne'⟩
   let χ₂ : Fin hyp.w2 → (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
     fun j => finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)
   let χ₁ : Fin hyp.w1 → (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
     fun i => h.w1CharEquiv (finCongr hcardW1.symm i)
   let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
-  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
-  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
   let e : ↥tic.W ≃* ↥h.sdiffTICyclicHypothesis.W := typePData_WEquiv hyp.typeP
   let app := hyp.canonicalFullDadeApp hG hodd
   -- the row/column families.
@@ -450,7 +453,7 @@ theorem Hypothesis.exists_kappa_sum_chiFam_column_eq [Finite G]
         ∀ j, ∑ p, (typePData_toTICyclicHypothesis hyp.typeP hodd).chiFam rfl
             (hyp.canonicalFullDadeApp hG hodd) (p, κ j)
           = ∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i j := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
   let app := hyp.canonicalFullDadeApp hG hodd
@@ -491,7 +494,7 @@ theorem Hypothesis.muGrid_apply_one_within_column [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) (j : Fin hyp.w2) :
     hyp.muGrid hG hodd i j 1 = hyp.muGrid hG hodd 0 j 1 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have key : ∀ (h : OddOrder.Peterfalvi.S06.Hypothesis (↥M)) [NeZero (Nat.card h.W1)]
       (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (k : Fin (Nat.card h.W1)),
@@ -506,6 +509,7 @@ theorem Hypothesis.muGrid_apply_one_within_column [Finite G]
   simp only [key]
 
 open OddOrder.Peterfalvi.S06 in
+set_option backward.isDefEq.respectTransparency false in
 /-- The `k`-th power of the row-`0` product source `ω(1, χ₂)` is the row-`0` source of the
 `k`-th power dual: `(omegaProdChar 1 χ₂)^k = omegaProdChar 1 (χ₂^k)` (on the §6
 `toTICyclicHypothesis`).
@@ -537,7 +541,7 @@ theorem columnFamily_mu_zero_apply_one_pow {L : Type*} [Group L] [Fintype L]
     (hk : k.Coprime (orderOf (h.toTICyclicHypothesis.omegaProdChar 1 χ₂))) :
     ((h.columnFamily (χ₂ ^ k)).mu 0 : ClassFunction L ℂ) 1
       = ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ) 1 := by
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   classical
   -- (3.9.b): the Galois automorphism `u` relating the row-`0` source to its `k`-th power
   obtain ⟨u, hu, -⟩ := h.toTICyclicHypothesis.exists_mapRingEquiv_sigma_omega_pow rfl
@@ -594,7 +598,7 @@ theorem columnFamily_mu_zero_sign_pow {L : Type*} [Group L] [Fintype L]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) {k : ℕ}
     (hk : k.Coprime (orderOf (h.toTICyclicHypothesis.omegaProdChar 1 χ₂))) :
     (h.columnFamily (χ₂ ^ k)).sign = (h.columnFamily χ₂).sign := by
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   classical
   obtain ⟨u, hu, -⟩ := h.toTICyclicHypothesis.exists_mapRingEquiv_sigma_omega_pow rfl
     h.toTICyclicFullDadeApplication (h.toTICyclicHypothesis.omegaProdChar 1 χ₂) hk
@@ -643,9 +647,9 @@ theorem columnFamily_mu_zero_sign_eq_of_ne_one {L : Type*} [Group L] [Fintype L]
     (hp : (Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)).Prime)
     {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1) :
     (h.columnFamily χ₂').sign = (h.columnFamily χ₂).sign := by
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   classical
-  haveI : Finite ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :=
+  have : Finite ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :=
     (Nat.card_pos_iff.mp hp.pos).2
   have hord : orderOf χ₂ = Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := by
     rcases (hp.eq_one_or_self_of_dvd _ (orderOf_dvd_natCard χ₂)) with h1 | h1
@@ -685,10 +689,10 @@ theorem columnFamily_mu_zero_apply_one_eq_of_ne_one {L : Type*} [Group L] [Finty
     {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1) :
     ((h.columnFamily χ₂').mu 0 : ClassFunction L ℂ) 1
       = ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ) 1 := by
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   classical
   -- a prime cardinality forces the dual group to be finite
-  haveI : Finite ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :=
+  have : Finite ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :=
     (Nat.card_pos_iff.mp hp.pos).2
   -- `orderOf χ₂ = |D|` (a nontrivial element of a prime-order group generates it)
   have hord : orderOf χ₂ = Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := by
@@ -735,13 +739,13 @@ theorem Hypothesis.muGrid_apply_one_cross_column [Finite G]
     (hodd : Odd (Nat.card G)) (hw2 : (hyp.w2).Prime) {j j' : Fin hyp.w2}
     (hj : j ≠ 0) (hj' : j' ≠ 0) :
     hyp.muGrid hG hodd 0 j 1 = hyp.muGrid hG hodd 0 j' 1 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   -- Reconstruct the §6 host and the instances exactly as in `Hypothesis.muGrid`.
   let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
-  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
-  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  have hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
   have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
   have hW2le : hyp.typeP.W2 ≤ M :=
     (hyp.typeP.W2_le.trans inf_le_left).trans
@@ -749,7 +753,7 @@ theorem Hypothesis.muGrid_apply_one_cross_column [Finite G]
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
   -- The `W₂`-dual group has prime cardinality `w₂` (Pontryagin count + (8.8)).
   have hp : (Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)).Prime := by
     rw [h.card_charGroup_W2,
@@ -831,19 +835,19 @@ theorem Hypothesis.muColumnSign_eq_of_ne [Finite G]
     (hodd : Odd (Nat.card G)) (hw2 : (hyp.w2).Prime) {j j' : Fin hyp.w2}
     (hj : j ≠ 0) (hj' : j' ≠ 0) :
     hyp.muColumnSign hG hodd j = hyp.muColumnSign hG hodd j' := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
-  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
-  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  have hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
   have hW2le : hyp.typeP.W2 ≤ M :=
     (hyp.typeP.W2_le.trans inf_le_left).trans
       (hyp.typeP.H_le.trans (Subgroup.map_subtype_le _))
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
   have hp : (Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)).Prime := by
     rw [h.card_charGroup_W2,
       ← (Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right : h.W2 ≤ h.W1 ⊔ h.W2)).toEquiv),
@@ -872,19 +876,19 @@ theorem Hypothesis.muColumnSign_zero [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     (hodd : Odd (Nat.card G)) :
     hyp.muColumnSign hG hodd 0 = 1 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
-  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
-  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  have hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
   have hW2le : hyp.typeP.W2 ≤ M :=
     (hyp.typeP.W2_le.trans inf_le_left).trans
       (hyp.typeP.H_le.trans (Subgroup.map_subtype_le _))
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
   have hdual0 : finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
       (finCongr hcardW2sub.symm (0 : Fin hyp.w2)) = 1 := by
     rw [show finCongr hcardW2sub.symm (0 : Fin hyp.w2) = 0 from by apply Fin.ext; simp,

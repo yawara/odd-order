@@ -74,7 +74,7 @@ theorem centralCommutator_le_commutator (hyp : SibleyDadeHypothesis G L H) :
 
 theorem centralCommutator_le (hyp : SibleyDadeHypothesis G L H) :
     hyp.centralCommutator ≤ H := by
-  haveI := hyp.H_normal
+  have := hyp.H_normal
   exact le_trans hyp.centralCommutator_le_commutator (Subgroup.commutator_le_left H H)
 
 /-- `Z = Z(H) ∩ H′` is central in `H`: its trace `Z.subgroupOf H` lies in `Z(↥H)`.  This is the
@@ -95,8 +95,8 @@ theorem centralCommutator_subgroupOf_le_center (hyp : SibleyDadeHypothesis G L H
 normal `H`, via `normal_of_characteristic_of_normal`) and `⁅H,H⁆` is normal, so their inf is. -/
 instance centralCommutator_normal (hyp : SibleyDadeHypothesis G L H) :
     hyp.centralCommutator.Normal := by
-  haveI := hyp.H_normal
-  haveI : (⁅H, H⁆ : Subgroup ↥L).Normal := Subgroup.commutator_normal H H
+  have := hyp.H_normal
+  have : (⁅H, H⁆ : Subgroup ↥L).Normal := Subgroup.commutator_normal H H
   simp only [centralCommutator]
   infer_instance
 
@@ -116,8 +116,8 @@ theorem centralCommutator_subgroupOf_eq (hyp : SibleyDadeHypothesis G L H) :
 `Z(H) ∩ H′ ≠ 1` (`isNilpotent_normal_inf_center_ne_bot` with `N = H′`). -/
 theorem centralCommutator_ne_bot (hyp : SibleyDadeHypothesis G L H)
     (hHnonab : _root_.commutator ↥H ≠ ⊥) : hyp.centralCommutator ≠ ⊥ := by
-  haveI := hyp.H_normal
-  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  have := hyp.H_normal
+  let : Group.IsNilpotent ↥H := hyp.H_nilpotent
   have hkey : Subgroup.center ↥H ⊓ _root_.commutator ↥H ≠ ⊥ := by
     rw [inf_comm]
     exact isNilpotent_normal_inf_center_ne_bot (Subgroup.commutator_normal ⊤ ⊤) hHnonab
@@ -139,8 +139,8 @@ theorem W2_subgroupOf_le_center_of_caseB (_hyp : SibleyDadeHypothesis G L H)
     (hB : Subgroup.center ↥H ⊓ cert.W2.subgroupOf H ≠ ⊥) :
     cert.W2.subgroupOf H ≤ Subgroup.center ↥H := by
   have hle : cert.W2 ≤ H := cert.W2_le_K.trans_eq hK
-  haveI : Finite ↥H := Subtype.finite
-  haveI : Finite (cert.W2.subgroupOf H) := Subtype.finite
+  have : Finite ↥H := Subtype.finite
+  have : Finite (cert.W2.subgroupOf H) := Subtype.finite
   have hcard : Nat.card (cert.W2.subgroupOf H) = Nat.card cert.W2 :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv
   have hpsub : (Nat.card (cert.W2.subgroupOf H)).Prime := by rw [hcard]; exact hprime
@@ -160,7 +160,7 @@ theorem centralizer_inf_centralCommutator_eq_bot_of_c2_caseA (hyp : SibleyDadeHy
     (hA : Subgroup.center ↥H ⊓ cert.W2.subgroupOf H = ⊥)
     {w : ↥L} (hw : w ∈ hyp.W1) (hw1 : w ≠ 1) :
     Subgroup.centralizer ({w} : Set ↥L) ⊓ hyp.centralCommutator = ⊥ := by
-  haveI := hyp.H_normal
+  have := hyp.H_normal
   have hle : cert.W2 ≤ H := cert.W2_le_K.trans_eq hK
   -- `C_L(w) ⊓ H = W₂`
   have hCW2 : Subgroup.centralizer ({w} : Set ↥L) ⊓ H = cert.W2 := by
@@ -216,7 +216,7 @@ theorem centralizer_centralCommutator_eq_c2_caseA (hyp : SibleyDadeHypothesis G 
     (hA : Subgroup.center ↥H ⊓ cert.W2.subgroupOf H = ⊥)
     {z : ↥L} (hz : z ∈ hyp.centralCommutator) (hz1 : z ≠ 1) :
     Subgroup.centralizer ({z} : Set ↥L) = H := by
-  haveI := hyp.H_normal
+  have := hyp.H_normal
   have hzH : (z : ↥L) ∈ H := hyp.centralCommutator_le hz
   have hzc : (⟨z, hzH⟩ : ↥H) ∈ Subgroup.center ↥H :=
     hyp.centralCommutator_subgroupOf_le_center (Subgroup.mem_subgroupOf.mpr hz)
@@ -300,7 +300,7 @@ theorem inf_centralizer_centralCommutator_map_c2_caseA (hyp : SibleyDadeHypothes
     (hA : Subgroup.center ↥H ⊓ cert.W2.subgroupOf H = ⊥)
     {w : ↥L} (hw : w ∈ hyp.centralCommutator) (hw1 : w ≠ 1) :
     (L : Subgroup G) ⊓ Subgroup.centralizer ({(w : G)} : Set G) = H.map L.subtype := by
-  haveI := hyp.H_normal
+  have := hyp.H_normal
   have hCH := hyp.centralizer_centralCommutator_eq_c2_caseA hK hW1 hA hw hw1
   ext g
   rw [Subgroup.mem_inf]
@@ -328,8 +328,8 @@ theorem centralCommutator_card_subgroupOf_lower (hyp : SibleyDadeHypothesis G L 
     (hHnonab : _root_.commutator ↥H ≠ ⊥) :
     2 * Nat.card hyp.W1 + 1 ≤ Nat.card ↥(hyp.centralCommutator.subgroupOf H) := by
   classical
-  letI : H.Normal := hyp.H_normal
-  letI actH : MulDistribMulAction ↥hyp.W1 ↥H :=
+  let : H.Normal := hyp.H_normal
+  let actH : MulDistribMulAction ↥hyp.W1 ↥H :=
     MulDistribMulAction.compHom H ((MulAut.conjNormal (H := H)).comp hyp.W1.subtype)
   have hFrobH : OddOrder.Isaacs.Ch06.IsFrobeniusAction ↥hyp.W1 ↥H := hF.toFrobeniusAction
   have hMeq : hyp.centralCommutator.subgroupOf H = Subgroup.center ↥H ⊓ _root_.commutator ↥H :=
@@ -347,20 +347,20 @@ theorem centralCommutator_card_subgroupOf_lower (hyp : SibleyDadeHypothesis G L 
     intro a m hm
     rw [hMeq, Subgroup.mem_inf] at hm ⊢
     exact ⟨hcprod (Subgroup.center ↥H) a m hm.1, hcprod (_root_.commutator ↥H) a m hm.2⟩
-  letI instM : MulDistribMulAction ↥hyp.W1 ↥(hyp.centralCommutator.subgroupOf H) :=
+  let instM : MulDistribMulAction ↥hyp.W1 ↥(hyp.centralCommutator.subgroupOf H) :=
     OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantSubgroupMulDistribMulAction _ hinv
   have hFrobM : @OddOrder.Isaacs.Ch06.IsFrobeniusAction ↥hyp.W1
       ↥(hyp.centralCommutator.subgroupOf H) _ _ instM := hFrobH.subgroup _ hinv
-  haveI : Fintype ↥hyp.W1 := Fintype.ofFinite _
-  haveI : Fintype ↥(hyp.centralCommutator.subgroupOf H) := Fintype.ofFinite _
+  have : Fintype ↥hyp.W1 := Fintype.ofFinite _
+  have : Fintype ↥(hyp.centralCommutator.subgroupOf H) := Fintype.ofFinite _
   have hMmod : Nat.card ↥(hyp.centralCommutator.subgroupOf H) ≡ 1 [MOD Nat.card hyp.W1] := by
     simpa only [Fintype.card_eq_nat_card] using hFrobM.card_modEq_one
   have hMne : hyp.centralCommutator.subgroupOf H ≠ ⊥ := by
     rw [hMeq, inf_comm]
-    letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+    let : Group.IsNilpotent ↥H := hyp.H_nilpotent
     exact isNilpotent_normal_inf_center_ne_bot (Subgroup.commutator_normal ⊤ ⊤) hHnonab
   have hMgt1 : 1 < Nat.card ↥(hyp.centralCommutator.subgroupOf H) := by
-    haveI : Nontrivial ↥(hyp.centralCommutator.subgroupOf H) :=
+    have : Nontrivial ↥(hyp.centralCommutator.subgroupOf H) :=
       (Subgroup.nontrivial_iff_ne_bot _).mpr hMne
     exact Finite.one_lt_card
   have hRdvd : Nat.card hyp.W1 ∣ Nat.card ↥(hyp.centralCommutator.subgroupOf H) - 1 :=
@@ -385,8 +385,8 @@ theorem centralCommutator_card_subgroupOf_lower_c2_caseA (hyp : SibleyDadeHypoth
     (hHnonab : _root_.commutator ↥H ≠ ⊥) :
     2 * Nat.card hyp.W1 + 1 ≤ Nat.card ↥(hyp.centralCommutator.subgroupOf H) := by
   classical
-  letI : H.Normal := hyp.H_normal
-  letI actH : MulDistribMulAction ↥hyp.W1 ↥H :=
+  let : H.Normal := hyp.H_normal
+  let actH : MulDistribMulAction ↥hyp.W1 ↥H :=
     MulDistribMulAction.compHom H ((MulAut.conjNormal (H := H)).comp hyp.W1.subtype)
   have hMeq : hyp.centralCommutator.subgroupOf H = Subgroup.center ↥H ⊓ _root_.commutator ↥H :=
     hyp.centralCommutator_subgroupOf_eq
@@ -403,7 +403,7 @@ theorem centralCommutator_card_subgroupOf_lower_c2_caseA (hyp : SibleyDadeHypoth
     intro a m hm
     rw [hMeq, Subgroup.mem_inf] at hm ⊢
     exact ⟨hcprod (Subgroup.center ↥H) a m hm.1, hcprod (_root_.commutator ↥H) a m hm.2⟩
-  letI instM : MulDistribMulAction ↥hyp.W1 ↥(hyp.centralCommutator.subgroupOf H) :=
+  let instM : MulDistribMulAction ↥hyp.W1 ↥(hyp.centralCommutator.subgroupOf H) :=
     OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantSubgroupMulDistribMulAction _ hinv
   -- FPF on `Zc.subgroupOf H` directly from the math-(A) FPF `C_L(w) ⊓ Zc = ⊥` (no global action).
   have hFrobM : @OddOrder.Isaacs.Ch06.IsFrobeniusAction ↥hyp.W1
@@ -432,16 +432,16 @@ theorem centralCommutator_card_subgroupOf_lower_c2_caseA (hyp : SibleyDadeHypoth
       ⟨hcomm, hmZc⟩
     rw [hbot, Subgroup.mem_bot] at hmem
     exact Subtype.ext (Subtype.ext hmem)
-  haveI : Fintype ↥hyp.W1 := Fintype.ofFinite _
-  haveI : Fintype ↥(hyp.centralCommutator.subgroupOf H) := Fintype.ofFinite _
+  have : Fintype ↥hyp.W1 := Fintype.ofFinite _
+  have : Fintype ↥(hyp.centralCommutator.subgroupOf H) := Fintype.ofFinite _
   have hMmod : Nat.card ↥(hyp.centralCommutator.subgroupOf H) ≡ 1 [MOD Nat.card hyp.W1] := by
     simpa only [Fintype.card_eq_nat_card] using hFrobM.card_modEq_one
   have hMne : hyp.centralCommutator.subgroupOf H ≠ ⊥ := by
     rw [hMeq, inf_comm]
-    letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+    let : Group.IsNilpotent ↥H := hyp.H_nilpotent
     exact isNilpotent_normal_inf_center_ne_bot (Subgroup.commutator_normal ⊤ ⊤) hHnonab
   have hMgt1 : 1 < Nat.card ↥(hyp.centralCommutator.subgroupOf H) := by
-    haveI : Nontrivial ↥(hyp.centralCommutator.subgroupOf H) :=
+    have : Nontrivial ↥(hyp.centralCommutator.subgroupOf H) :=
       (Subgroup.nontrivial_iff_ne_bot _).mpr hMne
     exact Finite.one_lt_card
   have hRdvd : Nat.card hyp.W1 ∣ Nat.card ↥(hyp.centralCommutator.subgroupOf H) - 1 :=
@@ -468,7 +468,7 @@ theorem mem_SsubFiltration (hyp : SibleyDadeHypothesis G L H) {A : Subgroup ↥L
 theorem SsubFiltration_bot (hyp : SibleyDadeHypothesis G L H) :
     hyp.SsubFiltration ⊥ = hyp.S := by
   ext φ
-  rw [hyp.mem_SsubFiltration, hyp.S_eq, Set.mem_setOf_eq]
+  rw [hyp.mem_SsubFiltration, hyp.S_eq, Set.mem_ofPred_eq]
   constructor
   · rintro ⟨θ, hθ, -, hφ⟩
     exact ⟨θ, hθ, hφ⟩
@@ -611,8 +611,8 @@ irreducible-character set. -/
 theorem S_finite (hyp : SibleyDadeHypothesis G L H) :
     hyp.S.Finite := by
   classical
-  haveI : Fintype ↥H := Fintype.ofFinite _
-  haveI : Finite (IrreducibleCharacter ↥H) :=
+  have : Fintype ↥H := Fintype.ofFinite _
+  have : Finite (IrreducibleCharacter ↥H) :=
     OddOrder.RepresentationTheory.finite_irreducibleCharacter (G := ↥H)
   refine (Set.finite_range
     (fun θ : {θ : IrreducibleCharacter ↥H //
@@ -683,7 +683,7 @@ theorem SsubFiltration_nonempty_of_commutator_quotient_ne_top
     [(A.subgroupOf H).Normal]
     (hcomm : commutator (↥H ⧸ A.subgroupOf H) ≠ ⊤) :
     (hyp.SsubFiltration A).Nonempty := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
   obtain ⟨θ, hθ_ne, hker, _hdeg⟩ :=
     exists_irreducibleCharacter_ne_trivial_subset_kernel_of_commutator_ne_top
       (K := ↥H) (A.subgroupOf H) hcomm
@@ -694,13 +694,13 @@ theorem SsubFiltration_nonempty_of_commutator_quotient_ne_top
 /-- **Peterfalvi (6.2), solvable quotient form.**  A nontrivial finite solvable quotient `H/A`
 has proper commutator subgroup, hence supplies a nontrivial degree-one source character and a
 member of `S(A)`. -/
-theorem SsubFiltration_nonempty_of_nontrivial_solvable_quotient
+theorem SsubFiltration_nonempty_of_nontrivial_isSolvable_quotient
     (hyp : SibleyDadeHypothesis G L H) (A : Subgroup ↥L)
-    [(A.subgroupOf H).Normal] [IsSolvable (↥H ⧸ A.subgroupOf H)]
+    [(A.subgroupOf H).Normal] [Group.IsSolvable (↥H ⧸ A.subgroupOf H)]
     [Nontrivial (↥H ⧸ A.subgroupOf H)] :
     (hyp.SsubFiltration A).Nonempty :=
   hyp.SsubFiltration_nonempty_of_commutator_quotient_ne_top A
-    (IsSolvable.commutator_lt_top_of_nontrivial
+    (Group.IsSolvable.commutator_lt_top_of_nontrivial
       (G := ↥H ⧸ A.subgroupOf H)).ne
 
 /-- **Peterfalvi (6.2), proper nilpotent quotient form.**  If `A` is a proper
@@ -712,15 +712,15 @@ theorem SsubFiltration_nonempty_of_subgroupOf_ne_top
     (hyp : SibleyDadeHypothesis G L H) (A : Subgroup ↥L)
     [(A.subgroupOf H).Normal] (hA : A.subgroupOf H ≠ ⊤) :
     (hyp.SsubFiltration A).Nonempty := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
-  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
-  haveI : Group.IsNilpotent (↥H ⧸ A.subgroupOf H) :=
+  have : Fintype ↥H := Fintype.ofFinite _
+  let : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  have : Group.IsNilpotent (↥H ⧸ A.subgroupOf H) :=
     Group.nilpotent_of_surjective (QuotientGroup.mk' (A.subgroupOf H))
       (QuotientGroup.mk'_surjective (A.subgroupOf H))
-  haveI : IsSolvable (↥H ⧸ A.subgroupOf H) := IsNilpotent.to_isSolvable
-  haveI : Nontrivial (↥H ⧸ A.subgroupOf H) :=
+  have : Group.IsSolvable (↥H ⧸ A.subgroupOf H) := IsNilpotent.to_isSolvable
+  have : Nontrivial (↥H ⧸ A.subgroupOf H) :=
     Subgroup.nontrivial_quotient_of_ne_top hA
-  exact hyp.SsubFiltration_nonempty_of_nontrivial_solvable_quotient A
+  exact hyp.SsubFiltration_nonempty_of_nontrivial_isSolvable_quotient A
 
 /-- A nontrivial linear source character induces to a member of `Y = S(H')`.
 
@@ -796,7 +796,7 @@ theorem exists_linearIrreducibleCharacter_eq_of_YsetSource
         exact Abelianization.ker_of ↥H] at hx
     rwa [hsubgroupOf_eq]
   obtain ⟨θbar, hθbar⟩ := exists_compHom_eq_of_subset_characterKernel hq_surj θ hker_q
-  haveI : Finite (Abelianization ↥H) := Finite.of_surjective q hq_surj
+  have : Finite (Abelianization ↥H) := Finite.of_surjective q hq_surj
   obtain ⟨χbar, hχbar⟩ :=
     θbar.isIrreducible.exists_linearIrreducibleCharacter_eq_of_isMulCommutative
   refine ⟨χbar.comp q, ?_⟩
@@ -883,7 +883,7 @@ Local to §8 because the immediate consumer is the finiteness of `Y = S(H')`; a 
 move this later if it gets reused outside the Peterfalvi assembly. -/
 theorem finite_linearCharacters_of_finite {Γ : Type*} [Group Γ] [Finite Γ] :
     Finite (Γ →* ℂˣ) := by
-  haveI : Finite (IrreducibleCharacter Γ) := finite_irreducibleCharacter (G := Γ)
+  have : Finite (IrreducibleCharacter Γ) := finite_irreducibleCharacter (G := Γ)
   exact Finite.of_injective (linearIrreducibleCharacter (H := Γ))
     linearIrreducibleCharacter_injective
 
@@ -892,7 +892,7 @@ linear source characters of `H`. -/
 theorem Yset_finite (hyp : SibleyDadeHypothesis G L H) [H.Normal] :
     hyp.Yset.Finite := by
   classical
-  haveI : Finite (↥H →* ℂˣ) := finite_linearCharacters_of_finite (Γ := ↥H)
+  have : Finite (↥H →* ℂˣ) := finite_linearCharacters_of_finite (Γ := ↥H)
   let T : Set (↥H →* ℂˣ) := {χ | χ ≠ 1}
   refine ((Set.toFinite T).image
     (fun χ => ClassFunction.induce H (linearClassFunction χ))).subset ?_
@@ -958,7 +958,7 @@ theorem inner_span_Xset_Yset_eq_zero_of_irreducible_X
     (hXirr : ∀ φ ∈ hyp.Xset ⁅H, H⁆, IsIrreducibleCharacter φ) :
     ∀ u ∈ Submodule.span ℤ (hyp.Xset ⁅H, H⁆),
       ∀ v ∈ Submodule.span ℤ hyp.Yset, ClassFunction.inner u v = 0 := by
-  letI : H.Normal := hyp.H_normal
+  let : H.Normal := hyp.H_normal
   exact inner_eq_zero_of_mem_span_of_disjoint_irreducible hXirr
     (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Yset hφ) hyp.disjoint_Xset_Yset
 
@@ -1040,7 +1040,7 @@ theorem exists_Yset_linearRepresentativeFamily
     rw [← hζrange, Set.ncard_range_of_injective hcoeinj, Nat.card_eq_fintype_card,
       Fintype.card_fin]
   have hn2 : 2 ≤ n := by omega
-  haveI : NeZero n := ⟨by omega⟩
+  have : NeZero n := ⟨by omega⟩
   exact ⟨n, inferInstance, χ, hn2, hχ_ne, hcover, hpairwise, hindRange⟩
 
 /-- `Y = S(H')` coherence from finite orbit representatives of nontrivial linear characters.
@@ -1085,10 +1085,10 @@ abelianization therefore has a nontrivial linear character, whose induced charac
 `Yset`. -/
 theorem Yset_nonempty (hyp : SibleyDadeHypothesis G L H) [H.Normal] :
     hyp.Yset.Nonempty := by
-  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
-  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  have : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
+  let : Group.IsNilpotent ↥H := hyp.H_nilpotent
   have hcomm : _root_.commutator ↥H ≠ ⊤ :=
-    (IsSolvable.commutator_lt_top_of_nontrivial (G := ↥H)).ne
+    (Group.IsSolvable.commutator_lt_top_of_nontrivial (G := ↥H)).ne
   obtain ⟨χ, hχ_ne⟩ := exists_monoidHom_units_ne_one_of_commutator_ne_top hcomm
   exact ⟨ClassFunction.induce H (linearClassFunction χ),
     by simpa [linearIrreducibleCharacter_coe] using

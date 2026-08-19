@@ -222,7 +222,7 @@ theorem orbitReprSet_covers (hr2 : hyp.structureConjugator ^ 2 ≠ 1)
       k₁ = k₂)
     {x : G} (hx : x ∈ hyp.Q) (hx1 : x ≠ 1) :
     ∃ a ∈ hyp.K, ∃ y ∈ hyp.orbitReprSet, x = a⁻¹ * y * a := by
-  letI : MulAction ↥hyp.K ↥hyp.Q := MulAction.compHom _ hyp.conjQByK
+  let : MulAction ↥hyp.K ↥hyp.Q := MulAction.compHom _ hyp.conjQByK
   have hsmul : ∀ (a : ↥hyp.K) (y : ↥hyp.Q),
       ((a • y : ↥hyp.Q) : G) = (a : G) * (y : G) * (a : G)⁻¹ := fun _ _ => rfl
   set rep : hyp.OrbitReprIndex → ↥hyp.Q :=

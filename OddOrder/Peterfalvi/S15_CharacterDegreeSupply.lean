@@ -37,11 +37,11 @@ theorem Hypothesis.indK_sub_indK_support [Finite G]
     (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ
       - ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ').support ⊆
       {z : ↥hyp.T | (z : G) ∈ hyp.Q ⊔ hyp.D ∧ z ≠ 1} := by
-  haveI := hyp.finiteG
-  letI : Fintype ↥hyp.T := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥(hyp.K.subgroupOf hyp.T) : ℂ) :=
+  have := hyp.finiteG
+  let : Fintype ↥hyp.T := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥(hyp.K.subgroupOf hyp.T) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI hKn := hyp.K_subgroupOf_T_normal hG
+  have hKn := hyp.K_subgroupOf_T_normal hG
   intro z hz
   have hzne : (ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ
       - ClassFunction.induce (hyp.K.subgroupOf hyp.T) θ') z ≠ 0 := hz
@@ -70,7 +70,7 @@ theorem Hypothesis.inner_induce_H_QD_eq_zero [Finite G]
     {β : ClassFunction ↥hyp.T ℂ}
     (hβ : β.support ⊆ {z : ↥hyp.T | (z : G) ∈ hyp.Q ⊔ hyp.D ∧ z ≠ 1}) :
     ClassFunction.inner (ClassFunction.induce hyp.S α) (ClassFunction.induce hyp.T β) = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hdisj := disjoint_conjugatesIntoSet_of_centralizer
     (A_M := {y : ↥hyp.S | (y : G) ∈ hyp.H ∧ y ≠ 1})
     (A_N := {z : ↥hyp.T | (z : G) ∈ hyp.Q ⊔ hyp.D ∧ z ≠ 1})
@@ -89,11 +89,11 @@ theorem Hypothesis.indH_sub_indH_support [Finite G]
     (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ
       - ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ').support ⊆
       {y : ↥hyp.S | (y : G) ∈ hyp.H ∧ y ≠ 1} := by
-  haveI := hyp.finiteG
-  letI : Fintype ↥hyp.S := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥(hyp.H.subgroupOf hyp.S) : ℂ) :=
+  have := hyp.finiteG
+  let : Fintype ↥hyp.S := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥(hyp.H.subgroupOf hyp.S) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI hHn : (hyp.H.subgroupOf hyp.S).Normal := H_sharp_subgroupOf_normal hyp
+  have hHn : (hyp.H.subgroupOf hyp.S).Normal := H_sharp_subgroupOf_normal hyp
   intro y hy
   have hyne : (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ
       - ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ') y ≠ 0 := hy
@@ -150,13 +150,13 @@ theorem caseA_exists_irreducible_witnessed [Finite G] {M : Subgroup G}
         (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
         (hcPsi chief θ).toClassFunction)) := by
   classical
-  haveI : Fintype ((↥data.H ⧸ chief.N) →* ℂˣ) := Fintype.ofFinite _
-  haveI : Fintype ↥(hInHu data) := Fintype.ofFinite _
-  haveI : Fintype
+  have : Fintype ((↥data.H ⧸ chief.N) →* ℂˣ) := Fintype.ofFinite _
+  have : Fintype ↥(hInHu data) := Fintype.ofFinite _
+  have : Fintype
       ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) :=
     Fintype.ofFinite _
-  letI : Fintype ↥M := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  let : Fintype ↥M := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   have hq : 0 < data.q := data.nontrivial.2.1.pos
   have hpq : chief.p ^ data.q ∣ Nat.card ↥data.H := ⟨Nat.card ↥chief.H0, chief.quotient_order⟩
@@ -216,7 +216,7 @@ theorem lambdaWitness_of_caseB_member [Finite G]
     (_hχirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter χ) :
     LambdaWitness hyp := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   -- Extract the source `ζ ∈ 𝒳(H₀C')` of the given irreducible `χ = Ind_{HU} ζ`.  Done *before*
   -- any `let`, and re-cast to `data`-form so every downstream term is uniform (a `set` here would
   -- revert/rename `ζ`; the extraction stays clean because `hχmem` names the explicit terms).
@@ -224,27 +224,27 @@ theorem lambdaWitness_of_caseB_member [Finite G]
   let data := hyp.toTypesIIIIIIVSetupS hG
   have hχmem' : χ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) := hχmem
   obtain ⟨ζ, hζxi, hχeq⟩ := mem_sOf.mp hχmem'
-  letI : Fintype ↥hyp.S := Fintype.ofFinite _
-  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
-  letI : Fintype ((↥data.H ⧸ chief.N) →* ℂˣ) := Fintype.ofFinite _
-  letI : Fintype ↥(hInHu data) := Fintype.ofFinite _
-  letI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
+  let : Fintype ↥hyp.S := Fintype.ofFinite _
+  let : Fintype ↥(huSub data) := Fintype.ofFinite _
+  let : Fintype ((↥data.H ⧸ chief.N) →* ℂˣ) := Fintype.ofFinite _
+  let : Fintype ↥(hInHu data) := Fintype.ofFinite _
+  let : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
     (huSub data)) := Fintype.ofFinite _
-  letI : Fintype ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
+  let : Fintype ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
     (huSub data)).map (huSub data).subtype) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+  let : Invertible (Nat.card ↥hyp.S : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  let : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
+  let : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+  let : Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
     hyp.S).subgroupOf (huSub data)) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+  let : Invertible (Nat.card ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
     hyp.S).subgroupOf (huSub data)).map (huSub data).subtype) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
+  have : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
     (huSub data)).Normal := hcInHu_realized_normal (data := data) chief
   -- (1) the reverse (13.3.a)-for-irr characterization: `ζ = Ind_{HC}(hcPsiPair θ̄ λ)`, `θ̄ ≠ 1`.
   obtain ⟨θbar, lam, hnt, hlamC', hζeq⟩ :=
@@ -272,9 +272,9 @@ theorem lambdaWitness_of_caseB_member [Finite G]
   · -- `P ⊄ Ker θ'`: else `P ⊆ Ker(Ind θ') = Ker(Ind_{HU} ζ)`, which (converse (1.6.a)) pushes to
     -- `P ⊆ Ker ζ`, contradicting `ζ ∈ 𝒳` (`P = H ⊄ Ker ζ`).  Mirrors `mu_j_isIndPC_not_ker`.
     intro hker
-    haveI hHUnorm : (huSub data).Normal := by
+    have hHUnorm : (huSub data).Normal := by
       rw [huSub_eq_derivedInG_subgroupOf data]; infer_instance
-    haveI hPnorm : (hyp.P.subgroupOf hyp.S).Normal := by
+    have hPnorm : (hyp.P.subgroupOf hyp.S).Normal := by
       have hPle : hyp.P ≤ hyp.S := by
         rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
       refine (Subgroup.normal_subgroupOf_iff_le_normalizer hPle).mpr ?_
@@ -319,29 +319,29 @@ theorem lambdaWitness_of_caseA [Finite G]
     (caseA : OddOrder.Peterfalvi.S11.CliffordCaseAData (hyp.mkSection11CharacterDataS hG chief)) :
     LambdaWitness hyp := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   let data := hyp.toTypesIIIIIIVSetupS hG
-  letI : Fintype ↥hyp.S := Fintype.ofFinite _
-  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
-  letI : Fintype ((↥data.H ⧸ chief.N) →* ℂˣ) := Fintype.ofFinite _
-  letI : Fintype ↥(hInHu data) := Fintype.ofFinite _
-  letI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
+  let : Fintype ↥hyp.S := Fintype.ofFinite _
+  let : Fintype ↥(huSub data) := Fintype.ofFinite _
+  let : Fintype ((↥data.H ⧸ chief.N) →* ℂˣ) := Fintype.ofFinite _
+  let : Fintype ↥(hInHu data) := Fintype.ofFinite _
+  let : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
     (huSub data)) := Fintype.ofFinite _
-  letI : Fintype ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
+  let : Fintype ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
     (huSub data)).map (huSub data).subtype) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+  let : Invertible (Nat.card ↥hyp.S : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  let : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
+  let : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+  let : Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
     hyp.S).subgroupOf (huSub data)) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+  let : Invertible (Nat.card ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
     hyp.S).subgroupOf (huSub data)).map (huSub data).subtype) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
+  have : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.S).subgroupOf
     (huSub data)).Normal := hcInHu_realized_normal (data := data) chief
   -- (1) the regular seed `θbar` with irreducible `induceHU(Ind_{HC}(hcPsi θbar))`.
   obtain ⟨θbar, hnt, hreg, hirr⟩ :=
@@ -382,9 +382,9 @@ theorem lambdaWitness_of_caseA [Finite G]
   · -- `P ⊄ Ker θ'`: else `P ⊆ Ker(Ind θ') = Ker(Ind_{HU} ζ')` pushes to `P ⊆ Ker ζ'`,
     -- contradicting `ζ' ∈ 𝒳` (`P = H ⊄ Ker ζ'`).  Mirrors `mu_j_isIndPC_not_ker`.
     intro hker
-    haveI hHUnorm : (huSub data).Normal := by
+    have hHUnorm : (huSub data).Normal := by
       rw [huSub_eq_derivedInG_subgroupOf data]; infer_instance
-    haveI hPnorm : (hyp.P.subgroupOf hyp.S).Normal := by
+    have hPnorm : (hyp.P.subgroupOf hyp.S).Normal := by
       have hPle : hyp.P ≤ hyp.S := by
         rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
       refine (Subgroup.normal_subgroupOf_iff_le_normalizer hPle).mpr ?_
@@ -432,7 +432,7 @@ theorem S_caseB_facts_no_lambda [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hnolam : ¬ LambdaWitness hyp) :
     hyp.C = ⊥ ∧ hyp.u = (hyp.p ^ hyp.q - 1) / (hyp.p - 1) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   obtain ⟨chief, -⟩ :=
     OddOrder.Peterfalvi.S11.exists_chiefFactorData hG (hyp.toTypesIIIIIIVSetupS hG)
   -- **(13.3.b) forward, the one isolated genuine gate**: an irreducible member of the `S`-instance
@@ -533,32 +533,32 @@ theorem Hypothesis.thetaWitness_of_caseB_member [Finite G]
     (_hχirr : OddOrder.RepresentationTheory.IsIrreducibleCharacter χ) :
     ThetaWitness hyp := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   rw [Section11CharacterData.SOf_eq] at hχmem
   let data := hyp.toTypesIIIIIIVSetupT hG hvd
   have hχmem' : χ ∈ sOf data (chief.H0 ⊔ cprimeSub data chief) := hχmem
   obtain ⟨ζ, hζxi, hχeq⟩ := mem_sOf.mp hχmem'
-  letI : Fintype ↥hyp.T := Fintype.ofFinite _
-  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
-  letI : Fintype ((↥data.H ⧸ chief.N) →* ℂˣ) := Fintype.ofFinite _
-  letI : Fintype ↥(hInHu data) := Fintype.ofFinite _
-  letI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.T).subgroupOf
+  let : Fintype ↥hyp.T := Fintype.ofFinite _
+  let : Fintype ↥(huSub data) := Fintype.ofFinite _
+  let : Fintype ((↥data.H ⧸ chief.N) →* ℂˣ) := Fintype.ofFinite _
+  let : Fintype ↥(hInHu data) := Fintype.ofFinite _
+  let : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.T).subgroupOf
     (huSub data)) := Fintype.ofFinite _
-  letI : Fintype ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.T).subgroupOf
+  let : Fintype ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.T).subgroupOf
     (huSub data)).map (huSub data).subtype) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥hyp.T : ℂ) :=
+  let : Invertible (Nat.card ↥hyp.T : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  let : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
+  let : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+  let : Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
     hyp.T).subgroupOf (huSub data)) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+  let : Invertible (Nat.card ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
     hyp.T).subgroupOf (huSub data)).map (huSub data).subtype) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.T).subgroupOf
+  have : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.T).subgroupOf
     (huSub data)).Normal := hcInHu_realized_normal (data := data) chief
   obtain ⟨θbar, lam, hnt, hlamC', hζeq⟩ :=
     caseB_xiOf_H0Cprime_eq_induce_hcPsiPair (data := data) (chief := chief) caseB hζxi
@@ -584,9 +584,9 @@ theorem Hypothesis.thetaWitness_of_caseB_member [Finite G]
   · -- `Q ⊄ Ker θ'`: else `Q ⊆ Ker(Ind θ') = Ker(Ind_{HU} ζ)` pushes to `Q ⊆ Ker ζ`,
     -- contradicting `ζ ∈ 𝒳` (`Q = H ⊄ Ker ζ`).
     intro hker
-    haveI hHUnorm : (huSub data).Normal := by
+    have hHUnorm : (huSub data).Normal := by
       rw [huSub_eq_derivedInG_subgroupOf data]; infer_instance
-    haveI hQnorm : (hyp.Q.subgroupOf hyp.T).Normal := by
+    have hQnorm : (hyp.Q.subgroupOf hyp.T).Normal := by
       have hQle : hyp.Q ≤ hyp.T := by
         rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
       refine (Subgroup.normal_subgroupOf_iff_le_normalizer hQle).mpr ?_
@@ -625,29 +625,29 @@ theorem Hypothesis.thetaWitness_of_caseA [Finite G]
       (hyp.mkSection11CharacterDataT hG hvd chief)) :
     ThetaWitness hyp := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   let data := hyp.toTypesIIIIIIVSetupT hG hvd
-  letI : Fintype ↥hyp.T := Fintype.ofFinite _
-  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
-  letI : Fintype ((↥data.H ⧸ chief.N) →* ℂˣ) := Fintype.ofFinite _
-  letI : Fintype ↥(hInHu data) := Fintype.ofFinite _
-  letI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.T).subgroupOf
+  let : Fintype ↥hyp.T := Fintype.ofFinite _
+  let : Fintype ↥(huSub data) := Fintype.ofFinite _
+  let : Fintype ((↥data.H ⧸ chief.N) →* ℂˣ) := Fintype.ofFinite _
+  let : Fintype ↥(hInHu data) := Fintype.ofFinite _
+  let : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.T).subgroupOf
     (huSub data)) := Fintype.ofFinite _
-  letI : Fintype ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.T).subgroupOf
+  let : Fintype ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.T).subgroupOf
     (huSub data)).map (huSub data).subtype) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥hyp.T : ℂ) :=
+  let : Invertible (Nat.card ↥hyp.T : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  let : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
+  let : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+  let : Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
     hyp.T).subgroupOf (huSub data)) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+  let : Invertible (Nat.card ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
     hyp.T).subgroupOf (huSub data)).map (huSub data).subtype) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.T).subgroupOf
+  have : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf hyp.T).subgroupOf
     (huSub data)).Normal := hcInHu_realized_normal (data := data) chief
   obtain ⟨θbar, hnt, hreg, hirr⟩ :=
     caseA_exists_irreducible_witnessed (data := data) (chief := chief) caseA hG
@@ -683,9 +683,9 @@ theorem Hypothesis.thetaWitness_of_caseA [Finite G]
       (MulEquiv.subgroupCongr hHC.symm).surjective hψirr
   · rw [hθ'def, ClassFunction.compHom_apply, map_one, hψ1]
   · intro hker
-    haveI hHUnorm : (huSub data).Normal := by
+    have hHUnorm : (huSub data).Normal := by
       rw [huSub_eq_derivedInG_subgroupOf data]; infer_instance
-    haveI hQnorm : (hyp.Q.subgroupOf hyp.T).Normal := by
+    have hQnorm : (hyp.Q.subgroupOf hyp.T).Normal := by
       have hQle : hyp.Q ≤ hyp.T := by
         rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
       refine (Subgroup.normal_subgroupOf_iff_le_normalizer hQle).mpr ?_
@@ -726,7 +726,7 @@ theorem Hypothesis.T_caseB_facts_no_theta [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hnotheta : ¬ ThetaWitness hyp) :
     hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hvd : hyp.v * hyp.d ≠ 1 := hyp.vd_ne_one hG
   obtain ⟨chief, -⟩ :=
     OddOrder.Peterfalvi.S11.exists_chiefFactorData hG (hyp.toTypesIIIIIIVSetupT hG hvd)
@@ -790,9 +790,9 @@ theorem tSide_theta_package_of_not_caseB_core [Finite G]
       (∀ (i : Fin hyp.q) (j : Fin hyp.p), ClassFunction.inner (hyp.eta i j) θG = 0) ∧
       ClassFunction.inner (core.tau1S lam.lambda) θG = 0 := by
   classical
-  haveI := hyp.finiteG
-  letI : Fintype ↥hyp.T := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥(hyp.K.subgroupOf hyp.T) : ℂ) :=
+  have := hyp.finiteG
+  let : Fintype ↥hyp.T := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥(hyp.K.subgroupOf hyp.T) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   -- ── supply: the Hypothesis-level producers
   have hnoV := OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional _hG
@@ -1108,7 +1108,7 @@ theorem lambda_forces_T_caseB_core [Finite G]
     (pins : NuGridSupplyData hyp) :
     hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ∧
       Nat.card ↥hyp.Q = hyp.q ^ hyp.p := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   by_contra hne
   -- T-side θ-package from the (13.3.b,c)-for-`T` gate.
   obtain ⟨θT, r, r', δ', θG, hδ', hβsupp, hβform, hηθ, hLamTheta⟩ :=
@@ -1126,7 +1126,7 @@ theorem lambda_forces_T_caseB_core [Finite G]
   obtain ⟨j₀, δ, θlin, -, hδ, hθlinirr, hθlin1, hθlinP, hμeq, hμtau⟩ :=
     core.mu_col_tau1_eta_col_one
   -- `α = λ − μ_{j₀}` is supported on `H^#` (`H ⊴ S`; both terms `H`-induced of equal degree).
-  haveI hKnorm : (hyp.H.subgroupOf hyp.S).Normal := H_sharp_subgroupOf_normal hyp
+  have hKnorm : (hyp.H.subgroupOf hyp.S).Normal := H_sharp_subgroupOf_normal hyp
   have hαsupp : (lam.lambda - ∑ i : Fin hyp.q, hyp.mu i j₀).support ⊆
       {y : ↥hyp.S | (y : G) ∈ hyp.H ∧ y ≠ 1} := by
     intro s hs

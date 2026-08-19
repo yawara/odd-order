@@ -41,11 +41,11 @@ theorem card_ne_onetwenty_of_subgroup_alternating {α : Type*} [Fintype α] [Dec
     (hα : Nat.card α = 6) (H : Subgroup (alternatingGroup α)) :
     Nat.card H ≠ 120 := by
   intro hH
-  haveI : Nontrivial α := Finite.one_lt_card_iff_nontrivial.mp (by omega)
+  have : Nontrivial α := Finite.one_lt_card_iff_nontrivial.mp (by omega)
   have hcard : Nat.card (alternatingGroup α) = 360 := by
     rw [nat_card_alternatingGroup, hα]
     norm_num [Nat.factorial]
-  haveI : IsSimpleGroup (alternatingGroup α) := alternatingGroup.isSimpleGroup (by omega)
+  have : IsSimpleGroup (alternatingGroup α) := alternatingGroup.isSimpleGroup (by omega)
   have hidx : H.index = 3 := by
     have h := Subgroup.card_mul_index H
     rw [hH, hcard] at h
@@ -64,8 +64,8 @@ variable {G : Type*} [Group G]
 `P = ⊤` は `|G| = 5 ^ n` を強いるが `2 ∣ 120`。よって `n₅ = 6`。 -/
 private lemma exists_normalizer_index_eq_six [IsSimpleGroup G] (hG : Nat.card G = 120) :
     ∃ N : Subgroup G, N.index = 6 := by
-  haveI : Finite G := Nat.finite_of_card_ne_zero (by omega)
-  haveI : Fact (Nat.Prime 5) := ⟨by norm_num⟩
+  have : Finite G := Nat.finite_of_card_ne_zero (by omega)
+  have : Fact (Nat.Prime 5) := ⟨by norm_num⟩
   obtain ⟨P⟩ := Sylow.nonempty (p := 5) (G := G)
   refine ⟨Subgroup.normalizer (P : Set G), ?_⟩
   -- `n₅` は `|G| = 120` を割り, `1 (mod 5)` に合同
@@ -78,7 +78,7 @@ private lemma exists_normalizer_index_eq_six [IsSimpleGroup G] (hG : Nat.card G 
   rcases hcases _ hmem hmod with h1 | h6
   · -- `n₅ = 1`: `P` は正規, 単純性から `P = ⊥` か `P = ⊤` だがどちらも矛盾
     exfalso
-    haveI hnormal : (P : Subgroup G).Normal := by
+    have hnormal : (P : Subgroup G).Normal := by
       rw [← Subgroup.normalizer_eq_top_iff]
       exact Subgroup.index_eq_one.mp (P.card_eq_index_normalizer.symm.trans h1)
     rcases hnormal.eq_bot_or_eq_top with hbot | htop
@@ -104,12 +104,12 @@ private lemma exists_normalizer_index_eq_six [IsSimpleGroup G] (hG : Nat.card G 
 theorem not_isSimpleGroup_of_card_eq_onetwenty (hG : Nat.card G = 120) :
     ¬ IsSimpleGroup G := by
   intro hsimp
-  haveI := hsimp
-  haveI : Finite G := Nat.finite_of_card_ne_zero (by omega)
+  have := hsimp
+  have : Finite G := Nat.finite_of_card_ne_zero (by omega)
   classical
   obtain ⟨N, hN⟩ := exists_normalizer_index_eq_six hG
-  haveI : Finite (G ⧸ N) := Subgroup.index_ne_zero_iff_finite.mp (by omega)
-  letI : Fintype (G ⧸ N) := Fintype.ofFinite _
+  have : Finite (G ⧸ N) := Subgroup.index_ne_zero_iff_finite.mp (by omega)
+  let : Fintype (G ⧸ N) := Fintype.ofFinite _
   -- 剰余類作用は忠実
   set f : G →* Equiv.Perm (G ⧸ N) := MulAction.toPermHom G (G ⧸ N) with hf
   have hker : f.ker = ⊥ := by

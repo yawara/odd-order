@@ -86,7 +86,7 @@ theorem exists_maximal_normal_between {Γ : Type*} [Group Γ] [Finite Γ] {M A :
     ∃ B : Subgroup Γ, B.Normal ∧ M ≤ B ∧ B < A ∧
       ∀ C : Subgroup Γ, C.Normal → B ≤ C → C < A → C = B := by
   classical
-  haveI : Finite (Subgroup Γ) := Finite.of_injective (fun H : Subgroup Γ => (H : Set Γ))
+  have : Finite (Subgroup Γ) := Finite.of_injective (fun H : Subgroup Γ => (H : Set Γ))
     (fun _ _ h => SetLike.coe_injective h)
   obtain ⟨B, hBmem, hBmax⟩ :=
     Set.Finite.exists_maximalFor (id : Subgroup Γ → Subgroup Γ)
@@ -115,8 +115,8 @@ theorem normal_central_of_maximal_normal_below {Γ : Type*} [Group Γ] [Finite �
     (A.subgroupOf H).map (QuotientGroup.mk' (B.subgroupOf H)) ≤
       Subgroup.center (↥H ⧸ B.subgroupOf H) := by
   classical
-  haveI hNnorm : (B.subgroupOf H).Normal := (‹B.Normal›).subgroupOf H
-  haveI hANnorm : (A.subgroupOf H).Normal := (‹A.Normal›).subgroupOf H
+  have hNnorm : (B.subgroupOf H).Normal := (‹B.Normal›).subgroupOf H
+  have hANnorm : (A.subgroupOf H).Normal := (‹A.Normal›).subgroupOf H
   have hBH : B ≤ H := hBA.le.trans hAH
   -- `mk' (B.subgroupOf H) a = 1 ↔ a ∈ B.subgroupOf H`
   have mk_eq_one : ∀ a : ↥H,
@@ -253,7 +253,7 @@ step data once `H` is known to be a `p`-group (Peterfalvi (6.5)/(6.6)). -/
 theorem exists_primePow_natDegree_of_isPGroup {K : Type*} [Group K] [Finite K] {p : ℕ}
     (hp : p.Prime) (hK : IsPGroup p K) (θ : IrreducibleCharacter K) :
     ∃ k : ℕ, (θ : ClassFunction K ℂ) 1 = ((p ^ k : ℕ) : ℂ) := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨n, _hpos, hval, hdvd⟩ := θ.isIrreducible.exists_natDegree_charValue_one_dvd_card
   obtain ⟨N, hN⟩ := hK.exists_card_eq
   rw [hN] at hdvd
@@ -265,7 +265,7 @@ Supplies the `3 ≤ p` field of the X-chain step data (in the (6.8) setup `|L|`,
 odd). -/
 theorem three_le_prime_of_isPGroup_of_odd {K : Type*} [Group K] [Finite K] [Nontrivial K]
     {p : ℕ} (hp : p.Prime) (hK : IsPGroup p K) (hodd : Odd (Nat.card K)) : 3 ≤ p := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨n, hn⟩ := hK.exists_card_eq
   have hcard : Nat.card K ≠ 1 := by
     simpa using (Finite.one_lt_card (α := K)).ne'
@@ -280,7 +280,7 @@ setup this gives `|H:Z| = p^k` (`H` a `p`-group), the key to `θχ(1)² ∣ |H:Z
 theorem exists_primePow_card_quotient_of_isPGroup {K : Type*} [Group K] [Finite K] {p : ℕ}
     (hp : p.Prime) (hK : IsPGroup p K) (N : Subgroup K) [N.Normal] :
     ∃ k : ℕ, Nat.card (K ⧸ N) = p ^ k := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   exact (hK.of_surjective (QuotientGroup.mk' N) (QuotientGroup.mk'_surjective N)).exists_card_eq
 
 /-- Peterfalvi (6.1): the filtration `S(A)` attached to the base character set
@@ -333,7 +333,7 @@ structure DescentHypothesis (S : Set (ClassFunction L ℂ)) (A : Set L)
   coherence : OddOrder.Peterfalvi.S07.Hypothesis (L := L) (G := G) S A
   K : Subgroup L
   K_normal : K.Normal
-  K_solvable : IsSolvable K
+  K_solvable : Group.IsSolvable K
   filtration : FiltrationData (L := L) S
 
 namespace DescentHypothesis

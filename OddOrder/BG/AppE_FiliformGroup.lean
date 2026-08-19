@@ -621,7 +621,7 @@ theorem card_zpowers_e5g : Nat.card ↥(Subgroup.zpowers e5g) = 197 := by
 /-- `|A| = 7 = q` for `A = ⟨(ofAdd 7)⟩ ≤ C₄₉`. -/
 theorem card_zpowers_ofAdd_seven :
     Nat.card ↥(Subgroup.zpowers (Multiplicative.ofAdd (7 : ZMod 49))) = 7 := by
-  haveI : Fact (Nat.Prime 7) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 7) := ⟨by norm_num⟩
   rw [Nat.card_zpowers]
   exact orderOf_eq_prime (by decide) (by decide)
 

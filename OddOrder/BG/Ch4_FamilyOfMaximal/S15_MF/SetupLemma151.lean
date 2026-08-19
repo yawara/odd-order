@@ -88,7 +88,7 @@ theorem derivedDerived_le_Msigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
   obtain ⟨E, E₁, E₂, E₃, hsetup⟩ := OddOrder.BG.Ch3.S12.exists_subgroupESetup hG hM
   obtain ⟨_, ⟨_, hE'ab⟩, _⟩ := OddOrder.BG.Ch3.S12.nilpotent_sigmaComplement_abelian hG hsetup
   set N : Subgroup ↥M := (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M with hNdef
-  haveI hNnorm : N.Normal := by rw [hNdef, OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+  have hNnorm : N.Normal := by rw [hNdef, OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
   -- `derivedInG E ≅ commutator ↥E`, so `commutator ↥E` is abelian.
   have hcommE_ab : IsMulCommutative ↥(commutator ↥E) := by
     have e : ↥(commutator ↥E) ≃* ↥(derivedInG E) :=
@@ -128,7 +128,7 @@ theorem isTypeF_of_isHall_kappa_eq_bot [Finite G] {M K : Subgroup G} (_hKM : K �
   -- `p ∈ κ(M)`, so `p` is prime with a line `P ∈ ℰ_p¹(G)`, `P ≤ M`, `M_σ ⊓ C_G(P) ≠ 1`.
   have hpp : p.Prime := hp.1
   obtain ⟨_, P, hP, hPM, _⟩ := hp.2
-  haveI : Fact p.Prime := ⟨hpp⟩
+  have : Fact p.Prime := ⟨hpp⟩
   -- `p ∣ |P|` (since `|P| = p`) and `P ≤ M`, so `p ∣ |M|`.
   have hpdvdP : p ∣ Nat.card ↥P := by
     obtain ⟨_, hPcard⟩ := hP
@@ -335,7 +335,7 @@ theorem typeP_hall_derived_eq_and_abelian [Finite G] (hG : OddOrder.BG.IsMinimal
       rw [derivedInG, Subgroup.subgroupOf,
         Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
       infer_instance
-    haveI := hM'norm
+    have := hM'norm
     -- `[M:M'] = |K|` (index of the complement factor).
     have hidx : ((derivedInG M).subgroupOf M).index = Nat.card ↥(K.subgroupOf M) :=
       hcompl.symm.index_eq_card
@@ -358,7 +358,7 @@ theorem typeP_hall_derived_eq_and_abelian [Finite G] (hG : OddOrder.BG.IsMinimal
   have hcardM' : Nat.card ↥(derivedInG M) = Nat.card ↥U * Nat.card ↥Mσ := by
     -- complement: `|M'.subgroupOf M| · |K.subgroupOf M| = |M|`.
     have hcompl_card : Nat.card ↥((derivedInG M).subgroupOf M) * Nat.card ↥(K.subgroupOf M)
-        = Nat.card ↥M := hcompl.card_mul
+        = Nat.card ↥M := hcompl.card_mul_card
     -- three-Hall partition: `|K|·|U|·|M_σ| = |M|` (subgroupOf).
     have hthree := card_mul_card_mul_card_eq_of_three_hall hG hM hK hU
     -- transport subgroupOf cards to ambient cards.
@@ -433,7 +433,7 @@ theorem typeP_centralizerGeneratedBySigma_isMulCommutative [Finite G]
       -- pick a prime divisor `p` of `orderOf e`; then `p ∈ τ₁(M) ∪ τ₃(M)`.
       have hord1 : orderOf e ≠ 1 := fun hc => hene (orderOf_eq_one_iff.mp hc)
       obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hord1
-      haveI : Fact p.Prime := ⟨hp⟩
+      have : Fact p.Prime := ⟨hp⟩
       have hpτ : p ∈ tau1 M ∪ tau3 M :=
         hprimes p (Nat.mem_primeFactors.mpr ⟨hp, hpdvd, (orderOf_pos e).ne'⟩)
       -- the prime-order power `f = e^(orderOf e / p)` and its cyclic group `A = ⟨f⟩`.
@@ -506,7 +506,7 @@ theorem isFrobeniusGroup_of_regular_le_maximal [Finite G]
       ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf (OddOrder.BG.Ch3.S10.Msigma M ⊔ U0))
       (U0.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M ⊔ U0)) := by
   have hMσne : OddOrder.BG.Ch3.S10.Msigma M ≠ ⊥ := OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM
-  haveI hMσM_normal : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
+  have hMσM_normal : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
     rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
   have hM_le_N : M ≤ Subgroup.normalizer ((OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer (OddOrder.BG.Ch3.S10.Msigma_le M)).mp hMσM_normal
@@ -521,7 +521,7 @@ theorem isFrobeniusGroup_of_regular_le_maximal [Finite G]
       ne_bot_kernel := ?_
       ne_bot_complement := ?_
       conj_frobenius := ?_ }
-  · haveI : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf
+  · have : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf
         (OddOrder.BG.Ch3.S10.Msigma M ⊔ U0)).Normal :=
       (Subgroup.normal_subgroupOf_iff_le_normalizer le_sup_left).mpr hsup_le_N
     apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ
@@ -599,7 +599,7 @@ theorem frobenius_factor_of_regular_components [Finite G]
   -- **Exponent**: `exp U₀ = exp U`.
   have hexp : Monoid.exponent ↥U0 = Monoid.exponent ↥U := by
     refine exponent_eq_of_forall_factorization_le hU0U fun r hrp => ?_
-    haveI : Fact r.Prime := ⟨hrp⟩
+    have : Fact r.Prime := ⟨hrp⟩
     by_cases hrT : r ∈ T
     · obtain ⟨g, hg⟩ := hrp.exists_orderOf_eq_pow_factorization_exponent ↥(Z r)
       have hZrU0 : Z r ≤ U0 := Finset.le_sup hrT
@@ -617,7 +617,7 @@ theorem frobenius_factor_of_regular_components [Finite G]
   have hU0ne : U0 ≠ ⊥ := by
     intro hbot
     refine hUne (Subgroup.eq_bot_iff_forall _ |>.mpr fun x hx => ?_)
-    haveI : Subsingleton ↥U :=
+    have : Subsingleton ↥U :=
       Monoid.exp_eq_one_iff.mp (by rw [← hexp, hbot]; exact Monoid.exp_eq_one_of_subsingleton)
     have hx1 : (⟨x, hx⟩ : ↥U) = 1 := Subsingleton.elim _ _
     simpa using Subtype.ext_iff.mp hx1
@@ -664,7 +664,7 @@ theorem typeP_hall_regular_component_at_prime [Finite G]
       (∀ z ∈ Z, z ≠ 1 →
         OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({z} : Set G) = ⊥) := by
   classical
-  haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+  have : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
   -- `p ∈ π(U) ⟹ p ∉ σ(M) ∪ κ(M)` (U is a `(κ∪σ)'`-Hall).
   have hpcompl : p ∈ (S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ :=
     hU.1 p (by rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv])
@@ -902,7 +902,7 @@ theorem typeP_hall_regular_component_at_prime [Finite G]
             rw [hSUGdef, Subgroup.subgroupOf,
               Subgroup.comap_map_eq_self_of_injective U.subtype_injective], SU.card_eq_multiplicity]
         refine le_trans (factorization_exponent_le_of_sylow hSUG_U hSUGsubU_card) ?_
-        haveI := hSUGab
+        have := hSUGab
         obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp (hSUGpg.to_le hZSUG)
         have hA₀NZ : A₀ ≤ Subgroup.normalizer (Z : Set G) :=
           (le_centralizer_of_le_of_le hSUGab (hA₀A.trans hASUG) hZSUG).trans
@@ -914,7 +914,7 @@ theorem typeP_hall_regular_component_at_prime [Finite G]
         -- `exp SUG < |SUG|`.
         have hSUGnotcyc : ¬ IsCyclic ↥SUG := by
           intro hcyc
-          haveI := hcyc
+          have := hcyc
           have hAcyc : IsCyclic ↥A :=
             isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe hASUG).toMonoidHom
               (Subgroup.subgroupOfEquivOfLe hASUG).surjective
@@ -1052,7 +1052,7 @@ theorem typeP_hall_frobenius_factor [Finite G] (hG : OddOrder.BG.IsMinimalSimple
       intro e heU hene hprimes
       have hord1 : orderOf e ≠ 1 := fun hc => hene (orderOf_eq_one_iff.mp hc)
       obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hord1
-      haveI : Fact p.Prime := ⟨hp⟩
+      have : Fact p.Prime := ⟨hp⟩
       have hpτ : p ∈ tau1 M ∪ tau3 M :=
         hprimes p (Nat.mem_primeFactors.mpr ⟨hp, hpdvd, (orderOf_pos e).ne'⟩)
       set f : G := e ^ (orderOf e / p) with hfdef
@@ -1253,7 +1253,7 @@ theorem typeP_auxiliary_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
         exact fun hd => hKne (hd.eq_bot_of_le hKM)
       have hP : S14.IsTypeP M := isTypeP_of_isHall_kappa_subgroupOf_ne_bot hK hKofne
       obtain ⟨_, _, _Mstar, ⟨_, _, _, _, hcyc, _, _, _⟩, _⟩ := typeP_duality hG hM hP hKM hK hKstar
-      haveI := hcyc
+      have := hcyc
       exact Subgroup.isCyclic_of_le (le_sup_left : K ≤ K ⊔ Kstar)
   -- **Conjunct 1** (`M ≤ N_G(U M_σ)`): `U M_σ = M` (`K = ⊥`) or `= M'` (`K ≠ ⊥`), both normal.
   have hconj1 : M ≤ Subgroup.normalizer ((U ⊔ Mσ : Subgroup G) : Set G) := by

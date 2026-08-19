@@ -51,8 +51,8 @@ theorem exists_eq_centralCharacterAlg_of_asAlgebraHom_eq_smul
     ∃ i : ι, c = MatrixModule.centralCharacterAlg π i hπ hlin z := by
   classical
   obtain ⟨W, hWinv, hWne, hWmin⟩ := exists_minimal_invariant ρ
-  haveI : Nontrivial W := Submodule.nontrivial_iff_ne_bot.mpr hWne
-  haveI := isSimpleModule_subrepresentation_of_minimal ρ hWinv hWne hWmin
+  have : Nontrivial W := Submodule.nontrivial_iff_ne_bot.mpr hWne
+  have := isSimpleModule_subrepresentation_of_minimal ρ hWinv hWne hWmin
   refine MatrixModule.exists_eq_centralCharacterAlg_of_forall_smul_eq (nn := nn)
     (M := (ρ.subrepresentation W hWinv).asModule) hπ hlin
     (hkerJ ▸ IsSemisimpleModule.jacobson_le_annihilator _ _) fun m => ?_

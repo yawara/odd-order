@@ -122,10 +122,10 @@ theorem exists_normOne_galoisField_conjugation_repr [Finite G]
       ∀ (c : ↥C) (x : ↥E),
         e (Additive.ofMul (conjugate hCnorm c x)) =
           ((μ c : (GaloisField r s)ˣ) : GaloisField r s) * e (Additive.ofMul x) := by
-  letI : Fact r.Prime := ⟨hr⟩
-  haveI : NeZero r := ⟨hr.ne_zero⟩
-  haveI hEcomm : IsMulCommutative ↥E := IsMulCommutative.of_comm hE.comm
-  letI hCgroup : CommGroup ↥C :=
+  let : Fact r.Prime := ⟨hr⟩
+  have : NeZero r := ⟨hr.ne_zero⟩
+  have hEcomm : IsMulCommutative ↥E := IsMulCommutative.of_comm hE.comm
+  let hCgroup : CommGroup ↥C :=
     { (inferInstance : Group ↥C) with
       mul_comm := fun a b => (isMulCommutative_iff.mp hCcomm) a b }
   have hrsmul : ∀ x : Additive ↥E, (r : ℕ) • x = 0 := by
@@ -133,7 +133,7 @@ theorem exists_normOne_galoisField_conjugation_repr [Finite G]
     apply Additive.toMul.injective
     rw [toMul_nsmul, toMul_zero]
     exact hE.pow_eq_one x.toMul
-  haveI hEmod : Module (ZMod r) (Additive ↥E) :=
+  have hEmod : Module (ZMod r) (Additive ↥E) :=
     AddCommGroup.zmodModule hrsmul
   let conjHom : ↥C →* MulAut ↥E :=
     (Subgroup.normalizerMonoidHom (H := E)).comp (Subgroup.inclusion hCnorm)
@@ -141,7 +141,7 @@ theorem exists_normOne_galoisField_conjugation_repr [Finite G]
     (OddOrder.BG.Ch1_Preliminary.mulAutToEnd ↥E r).comp conjHom
   have hρ_apply : ∀ (c : ↥C) (a : Additive ↥E),
       ρ c a = Additive.ofMul ((conjHom c) (Additive.toMul a)) := fun _ _ => rfl
-  letI hEmodAlg : Module (MonoidAlgebra (ZMod r) ↥C) (Additive ↥E) :=
+  let hEmodAlg : Module (MonoidAlgebra (ZMod r) ↥C) (Additive ↥E) :=
     Module.compHom (Additive ↥E) (ρ.asAlgebraHom).toRingHom
   have hof_smul : ∀ (c : ↥C) (a : Additive ↥E),
       MonoidAlgebra.of (ZMod r) ↥C c • a =
@@ -151,7 +151,7 @@ theorem exists_normOne_galoisField_conjugation_repr [Finite G]
       change (ρ.asAlgebraHom (MonoidAlgebra.of (ZMod r) ↥C c)) a = ρ c a
       rw [Representation.asAlgebraHom_of]
     rw [h, hρ_apply]
-  haveI hNeZero : NeZero (Nat.card ↥C : ZMod r) := by
+  have hNeZero : NeZero (Nat.card ↥C : ZMod r) := by
     refine ⟨fun h => ?_⟩
     rw [hcardC] at h
     have hdvd : r ∣ (r ^ s - 1) / (r - 1) :=

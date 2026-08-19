@@ -462,10 +462,10 @@ theorem zeta_sum_div_normSq_apply_eq_zero (H76 : Hypothesis76 G A L)
     {x : L} (hx : x ≠ 1) :
     ∑ i : Fin (H76.n + 1), H76.zeta i x / H76.zetaNormSq i = 0 := by
   classical
-  letI : Fintype ↥(H76.H.subgroupOf L) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥(H76.H.subgroupOf L) : ℂ) :=
+  let : Fintype ↥(H76.H.subgroupOf L) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥(H76.H.subgroupOf L) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : (H76.H.subgroupOf L).Normal := by
+  have : (H76.H.subgroupOf L).Normal := by
     refine ⟨fun h hmem l => ?_⟩
     rw [Subgroup.mem_subgroupOf] at hmem ⊢
     exact H76.H_normal_in_L l hmem

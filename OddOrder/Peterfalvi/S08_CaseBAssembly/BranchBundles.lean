@@ -84,7 +84,7 @@ theorem dade_H_eq {A : Set G} (hyp₁ hyp₂ : OddOrder.Peterfalvi.S04.Hypothesi
     have hmem := q.H_normalized a c⁻¹ (Subgroup.inv_mem _ hc) _ hn
     have heq : c⁻¹ * (c * n * c⁻¹) * (c⁻¹)⁻¹ = n := by group
     rwa [heq] at hmem
-  haveI : ((q.H a).subgroupOf (Subgroup.centralizer ({a.1} : Set G))).Normal :=
+  have : ((q.H a).subgroupOf (Subgroup.centralizer ({a.1} : Set G))).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hqC).mpr hCnorm
   -- `|C| = |q.H a| · |C_L(a)|`.
   have hcard : Nat.card (Subgroup.centralizer ({a.1} : Set G))
@@ -224,7 +224,7 @@ theorem inner_columnFamily_mu_Yset_eq_zero
     {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset)
     (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) (i : Fin (Nat.card h46.W1)) :
     ClassFunction.inner ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) η = 0 := by
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   have hηirr := hyp.isIrreducibleCharacter_of_mem_Yset hη
   have hne : ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) ≠ η := by
     intro heq
@@ -377,7 +377,7 @@ theorem constituentWeight_eq_apply_one
       (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ))
     {θ : IrreducibleCharacter ↥H} (hweight : 0 < constituentWeight hφ' θ) :
     (constituentWeight hφ' θ : ℂ) = (θ : ClassFunction ↥H ℂ) 1 := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
   obtain ⟨lam, hlamirr, _hlam1, hres, _⟩ :=
     θ.2.exists_central_linear_restriction (W2.subgroupOf H) hcen
   have hspec := constituentWeight_spec hφ' θ
@@ -421,7 +421,7 @@ theorem caseB_column_degree_match
       = ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) :
     (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) (1 : ↥L)
       = (constituentWeight hφ' θ : ℂ) * η₁ (1 : ↥L) := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
   rw [hcoleq, ClassFunction.induce_apply_one, hyp.index_H_eq_card_W1, hyp.Yset_apply_one hη₁,
     constituentWeight_eq_apply_one hW2H hcen hφ' hweight]
   ring
@@ -442,7 +442,7 @@ theorem caseB_induce_degree_match
     {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) :
     (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) (1 : ↥L)
       = (constituentWeight hφ' θ : ℂ) * η₁ (1 : ↥L) := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
   rw [ClassFunction.induce_apply_one, hyp.index_H_eq_card_W1, hyp.Yset_apply_one hη₁,
     constituentWeight_eq_apply_one hW2H hcen hφ' hweight]
   ring
@@ -462,7 +462,7 @@ theorem caseB_irr_sub_smul_support
     {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) :
     (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) - constituentWeight hφ' θ • η₁).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
   rw [← Nat.cast_smul_eq_nsmul ℂ]
   exact hyp.support_indW2_sub_smul_subset_sharpImage (le_refl H) _ hη₁
     (constituentWeight hφ' θ : ℂ) (caseB_induce_degree_match hyp hW2H hcen hφ' hweight hη₁)
@@ -483,7 +483,7 @@ theorem caseB_irr_htau1_mema
     {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) :
     hyp.tau (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) - constituentWeight hφ' θ • η₁)
       ∈ ZIrr G := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
   refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
     hyp.dade (caseB_irr_sub_smul_support hyp hW2H hcen hφ' hweight hη₁) ?_
   exact Submodule.sub_mem _
@@ -500,7 +500,7 @@ theorem caseB_irr_conj_diff_support
     ((ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj
         - ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
   have hsupp : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).support ⊆ (H : Set ↥L) :=
     ClassFunction.support_induce_subset_of_normal H _
   intro x hx
@@ -793,7 +793,7 @@ theorem caseB_hirrAnc
         ∧ ClassFunction.inner η₁.conj (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)) = 0
         ∧ ClassFunction.inner η₁.conj
             (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)).conj = 0 := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
   intro i hnotcol
   have hθne : (i.val : ClassFunction ↥H ℂ) ≠ trivialClassFunction ↥H := fun heq =>
     hnonlin i (by rw [heq, trivialClassFunction_apply])
@@ -957,7 +957,7 @@ theorem caseB_column_bundle
     {θ : IrreducibleCharacter ↥H} (hweight : 0 < constituentWeight hφ' θ)
     {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) :
     CaseBColBundle hyp h46 θ η₁ (constituentWeight hφ' θ) := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
   intro χ₂ hχ₂ hcoleq
   have h1 := caseB_column_degree_match hyp h46 hW2H hcen hφ' hweight hη₁ hcoleq
   exact ⟨(OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm,
@@ -992,7 +992,7 @@ theorem caseB_irr_bundle
     (hneη : ClassFunction.induce H (θ : ClassFunction ↥H ℂ) ≠ η₁)
     (hneη' : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj ≠ η₁) :
     CaseBIrrBundle hyp h46 θ η₁ (constituentWeight hφ' θ) := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
   intro hnotcol
   have h1 := caseB_irr_induce_isIrreducible h46 hHK hθne hnotcol
   exact ⟨h1, caseB_irr_nonreal hyp h1, caseB_irr_conj_diff_support hyp θ,

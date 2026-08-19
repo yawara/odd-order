@@ -66,8 +66,8 @@ theorem blockRepresentation_asAlgebraHom_smul
     (a : MonoidAlgebra k G) (v : nn i → k) :
     letI := MatrixModule.blockModule nn π i
     (blockRepresentation π i).asAlgebraHom a v = a • v := by
-  letI := MatrixModule.blockModule nn π i
-  haveI := MatrixModule.isScalarTower_blockModule (nn := nn) hlin i
+  let := MatrixModule.blockModule nn π i
+  have := MatrixModule.isScalarTower_blockModule (nn := nn) hlin i
   induction a using MonoidAlgebra.induction_linear with
   | zero => simp
   | add u w hu hw => rw [map_add, LinearMap.add_apply, hu, hw, add_smul]
@@ -85,7 +85,7 @@ theorem blockRepresentation_asAlgebraHom_center [Finite ι] [∀ i, Nonempty (nn
     (z : Subalgebra.center k (MonoidAlgebra k G)) :
     (blockRepresentation π i).asAlgebraHom (z : MonoidAlgebra k G)
       = MatrixModule.centralCharacterAlg π i hπ hlin z • LinearMap.id := by
-  letI := MatrixModule.blockModule nn π i
+  let := MatrixModule.blockModule nn π i
   refine LinearMap.ext fun v => ?_
   rw [blockRepresentation_asAlgebraHom_smul π hlin i,
     MatrixModule.centralScalar_smul π i hπ MatrixModule.mem_center_of_mem_centerSubalgebra v]

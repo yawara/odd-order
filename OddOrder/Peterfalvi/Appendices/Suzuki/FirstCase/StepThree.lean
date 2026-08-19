@@ -145,7 +145,7 @@ theorem exists_card_eq_pow_of_minimal_invariant [K.Normal]
     (hVmin : ∀ B ≤ V, IsAInvariant (φ.comp K.subtype) B → B ≠ ⊥ → B = V) :
     ∃ t : ℕ, Nat.card M = Nat.card ↥V ^ t := by
   classical
-  haveI : Finite (Subgroup M) :=
+  have : Finite (Subgroup M) :=
     Finite.of_injective _ SetLike.coe_injective
   -- the family of `K`-invariant subgroups of `|V|`-power order
   set S : Set (Subgroup M) :=
@@ -224,7 +224,7 @@ theorem exists_minimal_aInvariant_le {A : Type*} [Group A]
     ∃ V ≤ W, V ≠ ⊥ ∧ IsAInvariant ψ V ∧
       ∀ B ≤ V, IsAInvariant ψ B → B ≠ ⊥ → B = V := by
   classical
-  haveI : Finite (Subgroup M) :=
+  have : Finite (Subgroup M) :=
     Finite.of_injective _ SetLike.coe_injective
   set S : Set (Subgroup M) := {B | B ≤ W ∧ B ≠ ⊥ ∧ IsAInvariant ψ B}
   have hWS : W ∈ S := ⟨le_rfl, hWne, hWinv⟩
@@ -256,14 +256,14 @@ theorem ringAut_card_prime_pow_eq_pow {F : Type*} [Field F] [Finite F]
     {q p : ℕ} [Fact q.Prime] (hcard : Nat.card F = q ^ p) (σ : RingAut F) :
     ∃ i : ℕ, ∀ x : F, σ x = x ^ (q ^ i) := by
   classical
-  haveI : Fintype F := Fintype.ofFinite F
-  haveI : NeZero q := ⟨(Fact.out : Nat.Prime q).ne_zero⟩
+  have : Fintype F := Fintype.ofFinite F
+  have : NeZero q := ⟨(Fact.out : Nat.Prime q).ne_zero⟩
   have hFcard : Fintype.card F = q ^ p := by
     rw [← Nat.card_eq_fintype_card]; exact hcard
-  haveI hchar : CharP F q := charP_of_card_eq_prime_pow (p := q) (f := p) hFcard
-  letI algF : Algebra (ZMod q) F := ZMod.algebra F q
-  haveI : Algebra.IsAlgebraic (ZMod q) F := Algebra.IsAlgebraic.of_finite (ZMod q) F
-  haveI : IsGalois (ZMod q) F := inferInstance
+  have hchar : CharP F q := charP_of_card_eq_prime_pow (p := q) (f := p) hFcard
+  let algF : Algebra (ZMod q) F := ZMod.algebra F q
+  have : Algebra.IsAlgebraic (ZMod q) F := Algebra.IsAlgebraic.of_finite (ZMod q) F
+  have : IsGalois (ZMod q) F := inferInstance
   -- `σ` as a `ZMod q`-algebra automorphism (it fixes the prime field `𝔽_q`).
   let σ' : F ≃ₐ[ZMod q] F := AlgEquiv.ofRingEquiv (f := σ) (fun z => by
     have h := RingHom.ext_zmod (σ.toRingHom.comp (algebraMap (ZMod q) F))
@@ -312,8 +312,8 @@ theorem card_eq_card_inf_centralizer_pow {r : ℕ} (hr : r.Prime)
     Nat.card ↥M =
       Nat.card ↥(M ⊓ Subgroup.centralizer (fc.P : Set G)) ^ fc.p := by
   classical
-  haveI : Fact r.Prime := ⟨hr⟩
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Fact r.Prime := ⟨hr⟩
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
   -- `L = KP` normalizes `M`, giving the conjugation action `φ`.
   have hLnorm : fc.toHypothesis.K ⊔ fc.P ≤
       Subgroup.normalizer (M : Set G) := by
@@ -342,7 +342,7 @@ theorem card_eq_card_inf_centralizer_pow {r : ℕ} (hr : r.Prime)
   have hLD : L ≤ fc.toHypothesis.D :=
     sup_le fc.toHypothesis.K_le_D
       (fc.P_le_V.trans fc.toHypothesis.V_le_D)
-  haveI hUnormal : U.Normal := by
+  have hUnormal : U.Normal := by
     constructor
     intro n hn g
     have hn' : (n : G) ∈ fc.toHypothesis.K := hn
@@ -420,7 +420,7 @@ theorem card_eq_card_inf_centralizer_pow {r : ℕ} (hr : r.Prime)
     exact Subtype.ext hmem
   -- `r ∤ |U| = |K|`: `r ∣ |M| ∣ |Q|` and `(|Q|, |K|) = 1`.
   have hrM : r ∣ Nat.card ↥M := by
-    haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMne
+    have : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMne
     obtain ⟨x, hx1⟩ := exists_ne (1 : ↥M)
     have hxr : orderOf x = r := orderOf_eq_prime (helab.pow_eq_one x) hx1
     exact hxr ▸ orderOf_dvd_natCard x
@@ -456,8 +456,8 @@ theorem card_eq_card_inf_centralizer_pow {r : ℕ} (hr : r.Prime)
     have hxG := congrArg (fun z : ↥fc.toHypothesis.Q => (z : G)) hxone
     exact Subtype.ext hxG
   -- The kernel-FPF identity in group-cardinality form ([Is] Thm 15.16).
-  letI : CommGroup ↥M := helab.subgroupCommGroup
-  letI : Module (ZMod r) (Additive ↥M) := helab.subgroupZmodModule
+  let : CommGroup ↥M := helab.subgroupCommGroup
+  let : Module (ZMod r) (Additive ↥M) := helab.subgroupZmodModule
   have hkey := OddOrder.GroupTheory.WielandtKernelFPF.card_eq_card_fixedSubgroup_pow_of_frobenius
     hsup hcopUE hEnt hfpf hpU φ hfixU
   -- `C_M(P)` as an ambient subgroup: `fixedSubgroup φ E ≃ M ⊓ C_G(P)`.
@@ -528,16 +528,16 @@ theorem card_inf_centralizer_eq_prime {r : ℕ} (hr : r.Prime)
     (hinv : ∀ g ∈ fc.toHypothesis.K ⊔ fc.P, ∀ m ∈ M, g * m * g⁻¹ ∈ M) :
     Nat.card ↥(M ⊓ Subgroup.centralizer (fc.P : Set G)) = r := by
   classical
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
-  haveI : Fact r.Prime := ⟨hr⟩
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  have : Fact r.Prime := ⟨hr⟩
   have hMQ : M ≤ fc.toHypothesis.Q := hMQ1.trans fc.toHypothesis.Q1_le_Q
   set M₀ : Subgroup G := M ⊓ Subgroup.centralizer (fc.P : Set G) with hM₀def
   have hM₀ne : M₀ ≠ ⊥ :=
     fc.inf_centralizer_ne_bot_of_invariant hr hMQ hMne helab hinv
-  haveI : Nontrivial ↥M₀ := (Subgroup.nontrivial_iff_ne_bot M₀).mpr hM₀ne
+  have : Nontrivial ↥M₀ := (Subgroup.nontrivial_iff_ne_bot M₀).mpr hM₀ne
   -- `r` is odd: `r ∣ |M| ∣ |Q₁|` and `2 ∤ |Q₁|`.
   have hrodd : Odd r := by
-    haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMne
+    have : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMne
     obtain ⟨x, hx1⟩ := exists_ne (1 : ↥M)
     have hxr : orderOf x = r := orderOf_eq_prime (helab.pow_eq_one x) hx1
     have hrM : r ∣ Nat.card ↥M := hxr ▸ orderOf_dvd_natCard x
@@ -564,8 +564,8 @@ theorem card_inf_centralizer_eq_prime {r : ℕ} (hr : r.Prime)
       exact hval
   -- The near-field model of step (2)(b).
   obtain ⟨F, hNF, ⟨model⟩⟩ := fc.exists_affineNearFieldModel
-  letI : NearFields.NearField F := hNF
-  haveI : Finite F := by
+  let : NearFields.NearField F := hNF
+  have : Finite F := by
     have hinj : Function.Injective
         (fun x : F => model.emb (Multiplicative.ofAdd x)) :=
       fun a b hab => Multiplicative.ofAdd.injective (model.emb_injective hab)
@@ -649,10 +649,10 @@ theorem card_inf_centralizer_eq_prime {r : ℕ} (hr : r.Prime)
   -- Appendix I Lemma: the `r`-group `M₀` acting f.p.f. on `(F, +)` is cyclic.
   obtain ⟨f, hf, hEA⟩ :=
     NearFields.isElementaryAbelian_multiplicative (F := F)
-  haveI : Fact r.Prime := ⟨hr⟩
-  haveI : Nontrivial (Multiplicative F) :=
+  have : Fact r.Prime := ⟨hr⟩
+  have : Nontrivial (Multiplicative F) :=
     inferInstanceAs (Nontrivial F)
-  haveI hcyc : IsCyclic ↥M₀ :=
+  have hcyc : IsCyclic ↥M₀ :=
     Huppert.isCyclic_of_faithful_fpf_pgroup_on_elementaryAbelian
       hf helab₀.isPGroup hrodd hEA ψ hfpf
   -- an elementary abelian nontrivial cyclic group has order `r`
@@ -695,8 +695,8 @@ theorem exists_prime_order_invariant_or_irreducible {r : ℕ} (hr : r.Prime)
     (∀ B ≤ M, (∀ k ∈ fc.toHypothesis.K, ∀ m ∈ B, k * m * k⁻¹ ∈ B) →
       B ≠ ⊥ → B = M) := by
   classical
-  haveI : Fact r.Prime := ⟨hr⟩
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Fact r.Prime := ⟨hr⟩
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
   have hMQ : M ≤ fc.toHypothesis.Q := hMQ1.trans fc.toHypothesis.Q1_le_Q
   -- `|M| = r^p` from the dimension identity and `|C_M(P)| = r`.
   have hcardM : Nat.card ↥M = r ^ fc.p := by
@@ -720,7 +720,7 @@ theorem exists_prime_order_invariant_or_irreducible {r : ℕ} (hr : r.Prime)
       ((φ a m : ↥M) : G) = (a : G) * (m : G) * (a : G)⁻¹ := fun _ _ => rfl
   have hKL : fc.toHypothesis.K ≤ L := le_sup_left
   set U : Subgroup ↥L := fc.toHypothesis.K.subgroupOf L with hUdef
-  haveI hUnormal : U.Normal := by
+  have hUnormal : U.Normal := by
     constructor
     intro n hn g
     have hn' : (n : G) ∈ fc.toHypothesis.K := hn
@@ -732,8 +732,8 @@ theorem exists_prime_order_invariant_or_irreducible {r : ℕ} (hr : r.Prime)
       (⟨(n : G), hLD n.2⟩ : ↥fc.toHypothesis.D)
       (Subgroup.mem_subgroupOf.mpr hn') ⟨(g : G), hLD g.2⟩
     exact Subgroup.mem_subgroupOf.mp h
-  haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMne
-  letI : CommGroup ↥M := helab.subgroupCommGroup
+  have : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMne
+  let : CommGroup ↥M := helab.subgroupCommGroup
   -- Ambient ↔ subtype invariance bridges.
   have hbridgeK : ∀ B' : Subgroup ↥M,
       OddOrder.Isaacs.Ch03.IsAInvariant (φ.comp U.subtype) B' ↔
@@ -854,7 +854,7 @@ theorem card_K_dvd_sub_one_of_prime_order_invariant {r : ℕ} (hr : r.Prime)
     (hVinv : ∀ k ∈ fc.toHypothesis.K, ∀ v ∈ V, k * v * k⁻¹ ∈ V) :
     (2 ^ fc.p - 1) ∣ (r - 1) := by
   classical
-  haveI : Fact r.Prime := ⟨hr⟩
+  have : Fact r.Prime := ⟨hr⟩
   -- `K` normalizes `V`, giving the conjugation action.
   have hKnorm : fc.toHypothesis.K ≤ Subgroup.normalizer (V : Set G) := by
     intro k hk
@@ -874,7 +874,7 @@ theorem card_K_dvd_sub_one_of_prime_order_invariant {r : ℕ} (hr : r.Prime)
     rw [injective_iff_map_eq_one]
     intro k hk
     by_contra hkne
-    haveI : Nontrivial ↥V := (Subgroup.nontrivial_iff_ne_bot V).mpr hVne
+    have : Nontrivial ↥V := (Subgroup.nontrivial_iff_ne_bot V).mpr hVne
     obtain ⟨v, hv1⟩ := exists_ne (1 : ↥V)
     have hfix : φV k v = v := by rw [hk]; rfl
     have hvQ : ((v : ↥V) : G) ∈ fc.toHypothesis.Q := hVQ v.2
@@ -888,7 +888,7 @@ theorem card_K_dvd_sub_one_of_prime_order_invariant {r : ℕ} (hr : r.Prime)
       (fun z : ↥fc.toHypothesis.Q => (z : G)) hvone
     exact hv1 (Subtype.ext hvG)
   -- `|K| ∣ |Aut(V)| = r − 1`.
-  haveI : IsCyclic ↥V := isCyclic_of_prime_card hVcard
+  have : IsCyclic ↥V := isCyclic_of_prime_card hVcard
   have hAut : Nat.card (MulAut ↥V) = r - 1 := by
     rw [IsCyclic.card_mulAut, hVcard, Nat.totient_prime hr]
   have hKcard : Nat.card ↥fc.toHypothesis.K = 2 ^ fc.p - 1 := by
@@ -909,10 +909,10 @@ theorem exists_pow_two_fittingConjAction (a : ↥fc.P) :
       fc.toHypothesis.fittingConjAction (fc.toVbar a) t = t ^ (2 ^ i) := by
   obtain ⟨F, hFld, hFin, eQ, μ, σhom, hcardF, hσinj, hlawQ, hlawμ, hfix⟩ :=
     fc.exists_adapted_field_model
-  letI : Field F := hFld
-  letI : Finite F := hFin
+  let : Field F := hFld
+  let : Finite F := hFin
   have hcard2 : Nat.card F = 2 ^ fc.p := hcardF.trans fc.card_Q0_eq_two_pow
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨i, hi⟩ := ringAut_card_prime_pow_eq_pow (q := 2) hcard2 (σhom a)
   refine ⟨i, fun t => ?_⟩
   refine μ.injective ?_
@@ -975,13 +975,13 @@ theorem exists_pow_two_modEq_of_K_conj (a : ↥fc.P) {r : ℕ}
     (hB : ∀ k ∈ fc.toHypothesis.K, (a : G) * k * (a : G)⁻¹ = k ^ r) :
     ∃ i : ℕ, r ≡ 2 ^ i [MOD 2 ^ fc.p - 1] := by
   classical
-  haveI : Fintype ↥(fitting fc.toHypothesis.Dbar) := Fintype.ofFinite _
+  have : Fintype ↥(fitting fc.toHypothesis.Dbar) := Fintype.ofFinite _
   obtain ⟨i, hHalfA⟩ := fc.exists_pow_two_fittingConjAction a
   refine ⟨i, ?_⟩
   -- `t^(2^i) = t^r` for every `t ∈ F(D̄)` (Half A meets A2)
   have hpow : ∀ t : ↥(fitting fc.toHypothesis.Dbar), t ^ (2 ^ i) = t ^ r := fun t => by
     rw [← hHalfA t, fc.fittingConjAction_pow_of_K_conj a hB t]
-  haveI : IsCyclic ↥(fitting fc.toHypothesis.Dbar) :=
+  have : IsCyclic ↥(fitting fc.toHypothesis.Dbar) :=
     fc.toHypothesis.fitting_Dbar_cyclic_fpf_abelian.1
   obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := ↥(fitting fc.toHypothesis.Dbar))
   have hcardK : Nat.card ↥(fitting fc.toHypothesis.Dbar) = Nat.card fc.toHypothesis.K := by
@@ -1022,8 +1022,8 @@ theorem exists_K_conj_pow_of_irreducible {r : ℕ} (hr : r.Prime)
     ∃ a : ↥fc.P, ∀ k ∈ fc.toHypothesis.K,
       (a : G) * k * (a : G)⁻¹ = k ^ r := by
   classical
-  haveI : Fact r.Prime := ⟨hr⟩
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : Fact r.Prime := ⟨hr⟩
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
   have hMQ : M ≤ fc.toHypothesis.Q := hMQ1.trans fc.toHypothesis.Q1_le_Q
   have hcardM : Nat.card ↥M = r ^ fc.p := by
     rw [fc.card_eq_card_inf_centralizer_pow hr hMQ hMne helab hinv,
@@ -1044,9 +1044,9 @@ theorem exists_K_conj_pow_of_irreducible {r : ℕ} (hr : r.Prime)
     M.normalizerMonoidHom.comp (Subgroup.inclusion hLnorm) with hφdef
   have hφval : ∀ (a : ↥L) (m : ↥M),
       ((φ a m : ↥M) : G) = (a : G) * (m : G) * (a : G)⁻¹ := fun _ _ => rfl
-  haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMne
-  letI : CommGroup ↥M := helab.subgroupCommGroup
-  letI : CommGroup ↥fc.toHypothesis.K := IsCyclic.commGroup
+  have : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMne
+  let : CommGroup ↥M := helab.subgroupCommGroup
+  let : CommGroup ↥fc.toHypothesis.K := IsCyclic.commGroup
   set ψ : ↥fc.toHypothesis.K →* MulAut ↥M :=
     φ.comp (Subgroup.inclusion le_sup_left) with hψdef
   have hψval : ∀ (k : ↥fc.toHypothesis.K) (m : ↥M),
@@ -1074,10 +1074,10 @@ theorem exists_K_conj_pow_of_irreducible {r : ℕ} (hr : r.Prime)
   -- Appendix I Prop 2(a)+(b): the field `F` with the scalar realization of `K`
   obtain ⟨F, instF, instMod, instFin, -, hcardF, ⟨μ, hμ⟩, hsemi⟩ :=
     Huppert.exists_field_semilinear_with_scalar helab ψ hirrψ
-  letI : Field F := instF
-  letI : Module F (Additive ↥M) := instMod
-  letI : Finite F := instFin
-  haveI : Fintype F := Fintype.ofFinite F
+  let : Field F := instF
+  let : Module F (Additive ↥M) := instMod
+  let : Finite F := instFin
+  have : Fintype F := Fintype.ofFinite F
   have hcardF' : Nat.card F = r ^ fc.p := hcardF.trans hcardM
   have hFcard : Fintype.card F = r ^ fc.p := by
     rw [← Nat.card_eq_fintype_card]; exact hcardF'
@@ -1102,7 +1102,7 @@ theorem exists_K_conj_pow_of_irreducible {r : ℕ} (hr : r.Prime)
     have h1G := congrArg Subtype.val h1
     exact hm (Subtype.ext h1G)
   -- a generator `a₀` of `P`
-  haveI : Nontrivial ↥fc.P := by
+  have : Nontrivial ↥fc.P := by
     refine (Subgroup.nontrivial_iff_ne_bot fc.P).mpr fun hbot => ?_
     have h1 : Nat.card ↥fc.P = 1 := by rw [hbot, Subgroup.card_bot]
     rw [fc.card_P] at h1
@@ -1247,7 +1247,7 @@ theorem exists_K_conj_pow_of_irreducible {r : ℕ} (hr : r.Prime)
         _ ≤ 2 ^ fc.p := Nat.pow_le_pow_right (by norm_num) fc.p_prime.two_le
     omega
   · -- pick `m` with `j·m ≡ 1 (mod p)`; then `a := a₀^m` works
-    haveI : NeZero fc.p := ⟨fc.p_prime.ne_zero⟩
+    have : NeZero fc.p := ⟨fc.p_prime.ne_zero⟩
     set m : ℕ := ((j : ZMod fc.p)⁻¹).val with hmdef
     have hjm : (j * m) % fc.p = 1 := by
       have hcast : ((j * m : ℕ) : ZMod fc.p) = 1 := by

@@ -56,8 +56,8 @@ theorem exists_linearClassFunction_mul_of_restrict_eq_restrict [Finite K]
   obtain ⟨V₁, _, _, _, ρ₁, hρ₁, hc₁⟩ := h₁
   obtain ⟨V₂, _, _, _, ρ₂, hρ₂, hc₂⟩ := h₂
   obtain ⟨Vθ, _, _, _, ρθ, hρθ, hcθ⟩ := hirr
-  haveI := hρ₁; haveI := hρ₂; haveI := hρθ
-  haveI : Invertible (Nat.card ↥H : ℂ) :=
+  have := hρ₁; have := hρ₂; have := hρθ
+  have : Invertible (Nat.card ↥H : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   set res₁ : Representation ℂ ↥H V₁ := ρ₁.comp H.subtype with hres₁def
   set res₂ : Representation ℂ ↥H V₂ := ρ₂.comp H.subtype with hres₂def
@@ -77,7 +77,7 @@ theorem exists_linearClassFunction_mul_of_restrict_eq_restrict [Finite K]
   -- assumed), and in particular irreducible
   obtain ⟨Φ₁⟩ := nonempty_equiv_of_character_eq ρθ res₁ hchar₁
   obtain ⟨Φ₂⟩ := nonempty_equiv_of_character_eq ρθ res₂ hchar₂
-  haveI hResIrr₁ : Representation.IsIrreducible res₁ :=
+  have hResIrr₁ : Representation.IsIrreducible res₁ :=
     Representation.IsIrreducible.of_equiv Φ₁
   -- transport `ρ₂` onto `V₁` so that the restrictions agree on the nose
   set T : res₂.Equiv res₁ := Φ₂.symm.trans Φ₁ with hT
@@ -145,8 +145,8 @@ theorem exists_linearClassFunction_mul_of_restrict_eq_restrict [Finite K]
       Representation.asGroupHom_apply] using h12
   choose c hc using hSchur
   -- scalar bookkeeping: uniqueness, nonvanishing, multiplicativity, triviality on `H`
-  haveI : Nontrivial V₁ := by
-    haveI h13 : Nontrivial (Subrepresentation ρ₁) := IsSimpleOrder.toNontrivial
+  have : Nontrivial V₁ := by
+    have h13 : Nontrivial (Subrepresentation ρ₁) := IsSimpleOrder.toNontrivial
     have h14 : Nontrivial (Submodule ℂ V₁) :=
       (Subrepresentation.toSubmodule_injective (ρ := ρ₁)).nontrivial
     exact (Submodule.nontrivial_iff ℂ).mp h14
@@ -157,7 +157,7 @@ theorem exists_linearClassFunction_mul_of_restrict_eq_restrict [Finite K]
     have h15 := LinearMap.congr_fun hab v
     simp only [LinearMap.smul_apply, LinearMap.id_apply] at h15
     exact smul_left_injective ℂ hv h15
-  haveI : Nontrivial (Module.End ℂ V₁) := ⟨1, 0, fun h15 => by
+  have : Nontrivial (Module.End ℂ V₁) := ⟨1, 0, fun h15 => by
     obtain ⟨v, hv⟩ := exists_ne (0 : V₁)
     exact hv (by simpa using LinearMap.congr_fun h15 v)⟩
   have hc0 : ∀ y : K, c y ≠ 0 := by

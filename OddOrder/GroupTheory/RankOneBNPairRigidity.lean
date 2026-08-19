@@ -602,7 +602,7 @@ theorem Setup.exists_sylow_two_eq [Finite L] (hS : Setup M Q D t) (hQ : IsPGroup
     (hDodd : Odd (Nat.card ↥D)) (hQeven : Even (Nat.card ↥Q)) :
     ∃ S : Sylow 2 L, (S : Subgroup L) = Q := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨S, hQS⟩ := hQ.exists_le_sylow
   refine ⟨S, (Subgroup.eq_of_le_of_card_ge hQS ?_).symm⟩
   obtain ⟨k, hk⟩ := S.2.exists_card_eq
@@ -670,7 +670,7 @@ theorem Setup.exists_conj_eq [Finite L] {M' Q' D' : Subgroup L} {t' : L}
     ∃ c : L, Q.map (MulAut.conj c).toMonoidHom = Q' ∧
       M.map (MulAut.conj c).toMonoidHom = M' := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨S, hSQ⟩ := hS.exists_sylow_two_eq hQ hDodd hQeven
   obtain ⟨S', hSQ'⟩ := hS'.exists_sylow_two_eq hQ' hDodd' hQeven'
   obtain ⟨c, hc⟩ := MulAction.exists_smul_eq L S S'
@@ -717,8 +717,8 @@ theorem Setup.exists_conj_D_eq [Finite L] {M' Q' D' : Subgroup L} {t' : L}
     (hD₁card : Nat.card ↥D₁ = Nat.card ↥D') :
     ∃ n ∈ Q', D₁.map (MulAut.conj n).toMonoidHom = D' := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI hNorm : (Q'.subgroupOf M').Normal := ⟨fun n hn m => Subgroup.mem_subgroupOf.mpr (by
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have hNorm : (Q'.subgroupOf M').Normal := ⟨fun n hn m => Subgroup.mem_subgroupOf.mpr (by
     have hc := hS'.conj_mem_Q (M'.inv_mem m.2) (Subgroup.mem_subgroupOf.mp hn)
     simpa using hc)⟩
   have hcardN : Nat.card ↥(Q'.subgroupOf M') = Nat.card ↥Q' :=
@@ -751,9 +751,9 @@ theorem Setup.exists_conj_D_eq [Finite L] {M' Q' D' : Subgroup L} {t' : L}
     obtain ⟨k, hk⟩ := hQ'.exists_card_eq
     rw [hk]
     exact Nat.Coprime.pow_left k (Nat.coprime_two_left.mpr hDodd')
-  haveI hNp : IsPGroup 2 ↥(Q'.subgroupOf M') :=
+  have hNp : IsPGroup 2 ↥(Q'.subgroupOf M') :=
     hQ'.of_equiv (Subgroup.subgroupOfEquivOfLe hS'.QM).symm
-  haveI : Group.IsNilpotent ↥(Q'.subgroupOf M') := hNp.isNilpotent
+  have : Group.IsNilpotent ↥(Q'.subgroupOf M') := hNp.isNilpotent
   obtain ⟨n, hnN, hconj⟩ :=
     Subgroup.IsComplement'.exists_conj_of_coprime hcop (Or.inl inferInstance) hcompl hcompl'
   refine ⟨(n : L), Subgroup.mem_subgroupOf.mp hnN, ?_⟩

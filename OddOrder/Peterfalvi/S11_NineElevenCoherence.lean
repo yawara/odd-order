@@ -236,7 +236,7 @@ theorem index_realizedH0supC_eq (data : TypesIIIIIIVSetup M) (chief : ChiefFacto
     Nat.card (↥(huSub data) ⧸
       ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
       = chief.p ^ data.q * chars.u := by
-  haveI : (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal :=
+  have : (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal :=
     (chiefFactor_H0supC_subgroupOf_normal chief).subgroupOf (huSub data)
   rw [← Subgroup.index_eq_card]
   have hHC : hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)
@@ -289,9 +289,9 @@ theorem sum_xiOf_H0C_degreeSq (data : TypesIIIIIIVSetup M) (chief : ChiefFactorD
           OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction ↥(huSub data) ℂ))),
         ((χ : ClassFunction ↥(huSub data) ℂ) 1) ^ 2
       = (chief.p ^ data.q * chars.u : ℂ) - (chars.u : ℂ) := by
-  haveI : (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal :=
+  have : (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal :=
     (chiefFactor_H0supC_subgroupOf_normal chief).subgroupOf (huSub data)
-  haveI : (hInHu data).Normal := hInHu_normal data
+  have : (hInHu data).Normal := hInHu_normal data
   rw [OddOrder.RepresentationTheory.sumDegreeSq_kernelInterval
     (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) (hInHu data)]
   have hHC : hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)
@@ -489,7 +489,7 @@ theorem inertia_index_eq_q_of_induce_irreducible (data : TypesIIIIIIVSetup M)
     (θ : IrreducibleCharacter ↥(huSub data))
     (hirr : IsIrreducibleCharacter (ClassFunction.induce (huSub data) θ.toClassFunction)) :
     (IrreducibleCharacter.inertia (G := ↥M) (H := huSub data) θ).index = data.q := by
-  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  let : Fintype ↥(huSub data) := Fintype.ofFinite _
   have hone : ClassFunction.inner (ClassFunction.induce (huSub data) θ.toClassFunction)
       (ClassFunction.induce (huSub data) θ.toClassFunction) = 1 := by
     have h := irreducibleCharacter_inner_eq_ite
@@ -523,7 +523,7 @@ theorem inertia_index_eq_one_of_induce_reducible (data : TypesIIIIIIVSetup M)
     (θ : IrreducibleCharacter ↥(huSub data))
     (hred : ¬ IsIrreducibleCharacter (ClassFunction.induce (huSub data) θ.toClassFunction)) :
     (IrreducibleCharacter.inertia (G := ↥M) (H := huSub data) θ).index = 1 := by
-  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  let : Fintype ↥(huSub data) := Fintype.ofFinite _
   have hqp : (data.q).Prime := data.nontrivial.2.1
   have hle : huSub data ≤ IrreducibleCharacter.inertia (G := ↥M) (H := huSub data) θ :=
     IrreducibleCharacter.subgroup_le_inertia θ
@@ -583,12 +583,12 @@ theorem nineElevenThree_orbit_split (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           IsIrreducibleCharacter φ ∧ φ ∉ S₂}.ncard * data.q + (chief.p - 1)) * chars.u ^ 2
         + data.q * (chief.p - 1) * chars.u
       = chief.p ^ data.q * chars.u := by
-  haveI := huSub_normal data
-  letI : Fintype ↥M := Fintype.ofFinite _
-  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥M : ℂ) :=
+  have := huSub_normal data
+  let : Fintype ↥M := Fintype.ofFinite _
+  let : Fintype ↥(huSub data) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥M : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  let : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   have hqp : (data.q).Prime := data.nontrivial.2.1
   have hq0 : (data.q : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hqp.pos.ne'

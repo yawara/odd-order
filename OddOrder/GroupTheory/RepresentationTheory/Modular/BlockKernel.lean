@@ -145,7 +145,7 @@ theorem isPRegular_of_mem_blockKernel {B : Block πG hπG hlinG}
           * (wedderburnRepresentation e i).character g = 0) :
     IsPRegular p g := by
   classical
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   by_contra hreg
   -- on `Irr(B)` both character values are the degree `χ(1) = |m i|`
   have hterm : ∀ i ∈ Finset.univ.filter (fun i => blockOfIrr e hπG hlinG hnilG i = B),
@@ -182,7 +182,7 @@ theorem not_dvd_card_blockKernel (hp : p.Prime) {B : Block πG hπG hlinG}
           * (wedderburnRepresentation e i).character g = 0) :
     ¬ p ∣ Nat.card ↥(blockKernel e hπG hlinG hnilG B) := by
   intro hdvd
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' (G := ↥(blockKernel e hπG hlinG hnilG B)) p hdvd
   have hreg : IsPRegular p ((x : G)) :=
     isPRegular_of_mem_blockKernel e hπG hlinG hnilG hi₀ x.2 (hweak _ x.2)
@@ -213,7 +213,7 @@ theorem blockKernel_le_opPi (hp : p.Prime) {B : Block πG hπG hlinG}
         (wedderburnRepresentation e i).character 1
           * (wedderburnRepresentation e i).character g = 0) :
     blockKernel e hπG hlinG hnilG B ≤ Subgroup.opPi G {q | q ≠ p} := by
-  haveI := blockKernel_normal e hπG hlinG hnilG B
+  have := blockKernel_normal e hπG hlinG hnilG B
   exact Subgroup.self_le_opPi _ (isPiSubgroup_blockKernel e hπG hlinG hnilG hp hi₀ hweak)
 
 end PRegular

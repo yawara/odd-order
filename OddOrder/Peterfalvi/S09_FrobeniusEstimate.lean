@@ -112,7 +112,7 @@ theorem hzeta0nu [Fintype G] [Invertible (Nat.card G : ℂ)]
   classical
   have hoddL : Odd (Nat.card ↥(F.L i)) :=
     hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card (F.L i))
-  haveI hKnorm : ((F.H i).subgroupOf (F.L i)).Normal := hFrob.isNormal
+  have hKnorm : ((F.H i).subgroupOf (F.L i)).Normal := hFrob.isNormal
   -- Introduce `θ̄_0` **opaquely** (via `obtain`, not `let`) carrying only `↑θ̄_0 = (↑θ_0)‾`, so its
   -- coercion is not re-unfolded inside every `induce` coset sum (whnf-budget protection).
   obtain ⟨θ0', hθ0'coe⟩ :
@@ -250,7 +250,7 @@ theorem zetaNuRhoNormSq_ge [Fintype G] [Invertible (Nat.card G : ℂ)]
         (ClassFunction.inner ((F.hypothesis71 i).chiRhoCF χ)
           ((F.hypothesis71 i).chiRhoCF χ)).re := by
   classical
-  haveI hKnorm : ((F.H i).subgroupOf (F.L i)).Normal := hFrob.isNormal
+  have hKnorm : ((F.H i).subgroupOf (F.L i)).Normal := hFrob.isNormal
   set coh := F.coherence i hodd hnilp C hFrob with hcoh
   have hHL : F.H i ≤ F.L i := F.kernel_le i
   have hHnorm : ∀ (l : ↥(F.L i)) {h : G}, h ∈ F.H i →
@@ -425,8 +425,8 @@ theorem exists_chiRhoNormSq_ge [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C) :
     ∃ χ : ClassFunction G ℂ, ClassFunction.inner χ χ = 1 ∧
       (1 : ℝ) - (F.e i : ℝ) / (F.h i : ℝ) ≤ (F.familyHypothesis71).chiRhoNormSq χ i := by
-  letI : Fintype ↥(F.L i) := (F.familyHypothesis71).fintypeL i
-  letI : Invertible (Nat.card ↥(F.L i) : ℂ) := (F.familyHypothesis71).invertibleL i
+  let : Fintype ↥(F.L i) := (F.familyHypothesis71).fintypeL i
+  let : Invertible (Nat.card ↥(F.L i) : ℂ) := (F.familyHypothesis71).invertibleL i
   exact F.zetaNuRhoNormSq_ge i hodd hnilp C hFrob
 
 end FrobeniusFamily

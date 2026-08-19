@@ -162,7 +162,7 @@ instance of (B). -/
 theorem theoremC [Finite G] (hyp : S16.Hypothesis (G := G)) :
     S16.FieldNormalizerData hyp → hyp.base.p ≤ hyp.base.q := by
   intro data
-  haveI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  have : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   exact theoremC_of_hypothesisB data.toFieldNormalizerData
 
 /-- **BG Appendix C + Peterfalvi Section 16**: once Peterfalvi constructs the

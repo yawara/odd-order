@@ -123,15 +123,15 @@ theorem restrictedFrattiniLinearEquivFrattiniSquare_equivariant
     IsAInvariant.of_characteristic hSinv.restrict
   let hSquareInv : IsAInvariant Y.subtype (frattiniSquare P) :=
     (frattiniSquareNormalInvariant Y.subtype).2.2
-  letI : IsMulCommutative (frattini S) :=
+  let : IsMulCommutative (frattini S) :=
     IsMulCommutative.of_comm hFrattiniEA.comm
-  letI : CommGroup (frattini S) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini S)) :=
+  let : CommGroup (frattini S) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini S)) :=
     hFrattiniEA.zmodModule
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : CommGroup (frattiniSquare P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : CommGroup (frattiniSquare P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
   intro g v
   change restrictedFrattiniLinearEquivFrattiniSquare

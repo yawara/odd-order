@@ -241,7 +241,7 @@ theorem sOf_memberRFamily_imageSet_of_irr [Finite G] {M : Subgroup G} {A : Set G
         (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
           h46.dade0 ⟨η, hirr⟩ hr hs).imageSet := by
   classical
-  haveI := derivedInG_subgroupOf_normal M
+  have := derivedInG_subgroupOf_normal M
   have hηIKF0 := sOf_subset_inducedKernelFamily_bot hG hM data Y hη
   refine ⟨OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters
       (hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)) (⊥ : Subgroup ↥M) hηIKF0,
@@ -347,7 +347,7 @@ theorem sOf_memberRFamily_orthogonal [Finite G] {M : Subgroup G} {A : Set G}
     (sOf_memberRFamily hG hM data h46 hKeq htau hKsupp hφ).Orthogonal
       (sOf_memberRFamily hG hM data h46 hKeq htau hKsupp hξ) := by
   classical
-  haveI := derivedInG_subgroupOf_normal M
+  have := derivedInG_subgroupOf_normal M
   -- member differences are `M'`-supported (the `A₁` of the anchor), on top of being `A₀`-supported
   have hMderiv : ∀ {ζ : ClassFunction ↥M ℂ}, ζ ∈ sOf data Y →
       ((ζ.conj - ζ).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
@@ -483,7 +483,7 @@ theorem sOf_caseB_coherent [Finite G] {M : Subgroup G} {A : Set G}
       (OddOrder.Peterfalvi.S04.supportInSubgroup
         (A ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M)) := by
   classical
-  haveI := derivedInG_subgroupOf_normal M
+  have := derivedInG_subgroupOf_normal M
   have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
   have hIKF : ∀ ⦃x : ClassFunction ↥M ℂ⦄, x ∈ sOf data Y →
       x ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
@@ -576,7 +576,7 @@ theorem sOf_conj_apply_one [Finite G] {M : Subgroup G}
     {η : ClassFunction ↥M ℂ} (hη : η ∈ sOf data Y) :
     ((η : ClassFunction ↥M ℂ).conj : ↥M → ℂ) 1 = (η : ↥M → ℂ) 1 := by
   classical
-  haveI := derivedInG_subgroupOf_normal M
+  have := derivedInG_subgroupOf_normal M
   obtain ⟨θ, -, -, hη1⟩ := OddOrder.Peterfalvi.S08.inducedKernelFamily_apply_one
     (sOf_subset_inducedKernelFamily_bot hG hM data Y hη)
   obtain ⟨n, -, hn, -⟩ := θ.isIrreducible.exists_natDegree_charValue_one_dvd_card
@@ -710,7 +710,7 @@ theorem sOf_coherent_extension_eq_sum_memberRFamily [Finite G] {M : Subgroup G} 
     ∃ E ⊆ (sOf_memberRFamily hG hM data h46 hKeq htau hKsupp (hTsub hψT)).imageSet,
       c'.extension ψ = ∑ α ∈ E, α := by
   classical
-  haveI := derivedInG_subgroupOf_normal M
+  have := derivedInG_subgroupOf_normal M
   have hψsOf := hTsub hψT
   have hψcsOf := hTsub hψcT
   have hψbot := sOf_subset_inducedKernelFamily_bot hG hM data Y hψsOf
@@ -784,8 +784,8 @@ theorem sOf_coherent_extension_cross_orthogonal [Finite G] {M : Subgroup G} {A :
     (hne1 : ψ ≠ lam) (hne2 : ψ ≠ lam.conj) :
     ClassFunction.inner (c₁.extension ψ) (c₂.extension lam) = 0 := by
   classical
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
-  haveI := derivedInG_subgroupOf_normal M
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have := derivedInG_subgroupOf_normal M
   have h1 : ClassFunction.inner ψ lam = 0 :=
     OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal
       (sOf_subset_inducedKernelFamily_bot hG hM data Y (hT₁sub hψT))

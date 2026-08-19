@@ -115,7 +115,7 @@ theorem actionCommutator_restrict_self_map_subtype_eq
     {A G : Type*} [Group A] [Group G] [Finite A] [Finite G]
     {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G) :
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G) :
     (actionCommutator (IsAInvariant.actionCommutator φ).toMulAutHom).map
         (actionCommutator φ).subtype = actionCommutator φ := by
   set N : Subgroup G := actionCommutator φ with hN_def
@@ -151,7 +151,7 @@ theorem actionCommutator_restrict_self_eq_top
     {A G : Type*} [Group A] [Group G] [Finite A] [Finite G]
     {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G) :
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G) :
     actionCommutator (IsAInvariant.actionCommutator φ).toMulAutHom = ⊤ := by
   set N : Subgroup G := actionCommutator φ with hN_def
   -- map N.subtype injective + ⊤.map N.subtype = N.subtype.range = N でゴールを等式形に還元
@@ -296,6 +296,7 @@ theorem actionCommutator_conjNormal_map_subtype_eq {G : Type*} [Group G] (H R : 
       Subgroup.subset_closure ⟨⟨a, ha⟩, ⟨b, hb⟩, rfl⟩, ?_⟩
     rw [Subgroup.coe_subtype, hval]
 
+set_option backward.isDefEq.respectTransparency.types false in
 /-- **BG Prop 1.6(b), subgroup-commutator form** ⭐: `H ⊴ G`, `R ≤ G`, coprime orders, `G`
 solvable ⟹ `⁅⁅H, R⁆, R⁆ = ⁅H, R⁆`.
 
@@ -306,7 +307,7 @@ already encodes `[[N,A],A]=[N,A]` *without* needing `[H,R] ⊴ G`) plus the conj
 `actionCommutator_conjNormal_map_subtype_eq` at two nesting levels.  The restricted `R`-action on
 `N := actionCommutator φ` agrees with `φ` on `N` (`toMulAutHom_apply_val`), so its generators carry
 the same commutator values `⁅↑↑n, ↑r⁆`. -/
-theorem commutator_commutator_right_eq {G : Type*} [Group G] [Finite G] [IsSolvable G]
+theorem commutator_commutator_right_eq {G : Type*} [Group G] [Finite G] [Group.IsSolvable G]
     (H R : Subgroup G) [H.Normal] (hCop : Nat.Coprime (Nat.card ↥H) (Nat.card ↥R)) :
     ⁅⁅H, R⁆, R⁆ = ⁅H, R⁆ := by
   set φ : ↥R →* MulAut ↥H := (MulAut.conjNormal (G := G) (H := H)).comp R.subtype with hφ
@@ -320,9 +321,12 @@ theorem commutator_commutator_right_eq {G : Type*} [Group G] [Finite G] [IsSolva
       (((nN * (ψ rB) nN⁻¹ : ↥N) : ↥H) : G) = ⁅(((nN : ↥H) : G)), (rB : G)⁆ := by
     intro nN rB
     have hφr : φ rB = MulAut.conjNormal (rB : G) := by rw [hφ]; rfl
-    simp only [hψ, Subgroup.coe_mul,
-      OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom_apply_val, Subgroup.coe_inv, hφr,
-      MulAut.conjNormal_apply, commutatorElement_def]
+    have hval : ((((ψ rB) nN⁻¹ : ↥N) : ↥H) : G) = (rB : G) * ((nN : ↥H) : G)⁻¹ * (rB : G)⁻¹ := by
+      rw [hψ]
+      change ((φ rB) ((nN⁻¹ : ↥N) : ↥H) : G) = _
+      rw [hφr]
+      simp [MulAut.conjNormal_apply, mul_assoc]
+    rw [Subgroup.coe_mul, Subgroup.coe_mul, hval, commutatorElement_def]
     group
   -- nested bridge: `((actionCommutator ψ).map N.subtype).map H.subtype = ⁅⁅H,R⁆, R⁆`.
   have hnest : ((actionCommutator ψ).map N.subtype).map H.subtype = ⁅⁅H, R⁆, R⁆ := by

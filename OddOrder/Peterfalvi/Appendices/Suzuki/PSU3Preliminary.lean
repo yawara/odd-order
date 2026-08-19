@@ -220,8 +220,8 @@ theorem eq_of_conj_distinguishedInvolution_eq {a b : G} (ha : a ∈ hyp.K) (hb :
     (hab : a⁻¹ * hyp.distinguishedInvolution * a
       = b⁻¹ * hyp.distinguishedInvolution * b) : a = b := by
   classical
-  haveI : Fintype ↥hyp.K := Fintype.ofFinite _
-  haveI : Fintype ↥((hyp.Q0 : Set G) \ {1}) := Fintype.ofFinite _
+  have : Fintype ↥hyp.K := Fintype.ofFinite _
+  have : Fintype ↥((hyp.Q0 : Set G) \ {1}) := Fintype.ofFinite _
   have hmem : ∀ k : ↥hyp.K,
       (k : G)⁻¹ * hyp.distinguishedInvolution * (k : G) ∈ (hyp.Q0 : Set G) \ {1} := by
     intro k
@@ -515,8 +515,8 @@ theorem not_mem_KSet_of_f_eq_conj (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
 
 /-- Elements of `K` commute: `K` is cyclic (`Hypothesis.K_isCyclic`). -/
 theorem commute_of_mem_K {a b : G} (ha : a ∈ hyp.K) (hb : b ∈ hyp.K) : a * b = b * a := by
-  haveI := hyp.K_isCyclic
-  letI : CommGroup ↥hyp.K := IsCyclic.commGroup
+  have := hyp.K_isCyclic
+  let : CommGroup ↥hyp.K := IsCyclic.commGroup
   exact congrArg (Subtype.val (p := fun z => z ∈ hyp.K))
     (mul_comm (⟨a, ha⟩ : ↥hyp.K) ⟨b, hb⟩)
 

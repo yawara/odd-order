@@ -107,7 +107,7 @@ noncomputable def frobeniusBasis (n : ℕ) (hn : n ≠ 0) :
 
 @[simp] theorem frobeniusBasis_apply (n : ℕ) (hn : n ≠ 0) (i : Fin n) :
     frobeniusBasis n hn i = frobLin n i := by
-  haveI : NeZero n := ⟨hn⟩
+  have : NeZero n := ⟨hn⟩
   rw [frobeniusBasis, coe_basisOfLinearIndependentOfCardEqFinrank]
 
 /-- **The Frobenius-polynomial normal form (one variable).**  Every `ZMod 2`-
@@ -244,10 +244,10 @@ theorem exists_frobenius_pow_eq_of_ringAut (n : ℕ) (hn : n ≠ 0)
     ∃ r : Fin n, sigma = (frobeniusEquiv (GaloisField 2 n) 2) ^ (r : ℕ) := by
   by_contra hno
   push Not at hno
-  haveI : Finite (GaloisField 2 n →ₗ[ZMod 2] GaloisField 2 n) :=
+  have : Finite (GaloisField 2 n →ₗ[ZMod 2] GaloisField 2 n) :=
     Finite.of_injective
       (fun f => (f : GaloisField 2 n → GaloisField 2 n)) DFunLike.coe_injective
-  haveI : Module.Finite (GaloisField 2 n)
+  have : Module.Finite (GaloisField 2 n)
       (GaloisField 2 n →ₗ[ZMod 2] GaloisField 2 n) :=
     Module.Finite.of_finite
   have horder : orderOf (frobeniusEquiv (GaloisField 2 n) 2) = n :=

@@ -57,8 +57,8 @@ theorem nonempty_linearEquiv_of_isSimpleModule
     Nonempty (A ≃ₗ[E] B) := by
   obtain ⟨I, ⟨eA⟩⟩ := IsSemisimpleRing.exists_linearEquiv_ideal_of_isSimpleModule E A
   obtain ⟨J, ⟨eB⟩⟩ := IsSemisimpleRing.exists_linearEquiv_ideal_of_isSimpleModule E B
-  haveI : IsSimpleModule E I := IsSimpleModule.congr eA.symm
-  haveI : IsSimpleModule E J := IsSimpleModule.congr eB.symm
+  have : IsSimpleModule E I := IsSimpleModule.congr eA.symm
+  have : IsSimpleModule E J := IsSimpleModule.congr eB.symm
   obtain ⟨eIJ⟩ := IsSimpleRing.isIsotypic E E I J
   exact ⟨eA.trans (eIJ.symm.trans eB.symm)⟩
 
@@ -79,7 +79,7 @@ theorem algebraMap_end_bijective_of_isSimpleModule
     {M : Type*} [AddCommGroup M] [Module R M] [Module k M] [IsScalarTower k R M]
     [IsSimpleModule R M] [Module.Finite k M] :
     Function.Bijective (algebraMap k (Module.End R M)) := by
-  haveI : Nontrivial M := IsSimpleModule.nontrivial R M
+  have : Nontrivial M := IsSimpleModule.nontrivial R M
   refine ⟨(algebraMap k (Module.End R M)).injective, fun f => ?_⟩
   obtain ⟨c, hc⟩ := Module.End.exists_eigenvalue (f.restrictScalars k)
   obtain ⟨v, hv⟩ := hc.exists_hasEigenvector
@@ -122,7 +122,7 @@ theorem smul_def (θ : End k W₀ ≃ₐ[k] End k W₀) (f : End k W₀) (x : En
 `θ`-semilinear bijection, so it transports the submodule lattice (and hence `IsSimpleOrder`). -/
 theorem isSimpleModule (θ : End k W₀ ≃ₐ[k] End k W₀) [IsSimpleModule (End k W₀) W₀] :
     IsSimpleModule (End k W₀) (EndTwist θ) := by
-  haveI : RingHomSurjective (θ.toRingEquiv.toRingHom) := ⟨θ.surjective⟩
+  have : RingHomSurjective (θ.toRingEquiv.toRingHom) := ⟨θ.surjective⟩
   -- the identity, as a `θ`-semilinear bijection `EndTwist θ → W₀`
   let g : EndTwist θ →ₛₗ[θ.toRingEquiv.toRingHom] W₀ :=
     { toFun := fun x => (show W₀ from x)
@@ -140,6 +140,7 @@ section SkolemNoether
 
 variable {k W₀ : Type*} [Field k] [AddCommGroup W₀] [Module k W₀] [FiniteDimensional k W₀]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Matrix Skolem–Noether, scalar-fixed form.**  If a `k`-algebra automorphism `θ` of `End k W₀`
 (with `W₀` finite-dimensional over the field `k`) fixes *only* the scalar endomorphisms, then
 `finrank k W₀ ≤ 1`.
@@ -157,14 +158,14 @@ theorem finrank_le_one_of_aut_fixedScalar
   rcases subsingleton_or_nontrivial W₀ with _ | hnt
   · exact Module.finrank_zero_of_subsingleton.trans_le (Nat.zero_le 1)
   · -- `End k W₀` is simple Artinian (transport to a matrix ring over the field `k`).
-    haveI : NeZero (Module.finrank k W₀) := ⟨Module.finrank_pos.ne'⟩
-    haveI : Nonempty (Fin (Module.finrank k W₀)) := ⟨⟨0, Module.finrank_pos⟩⟩
-    haveI : IsSimpleRing (End k W₀) :=
+    have : NeZero (Module.finrank k W₀) := ⟨Module.finrank_pos.ne'⟩
+    have : Nonempty (Fin (Module.finrank k W₀)) := ⟨⟨0, Module.finrank_pos⟩⟩
+    have : IsSimpleRing (End k W₀) :=
       IsSimpleRing.of_ringEquiv (algEquivMatrix (Module.finBasis k W₀)).symm.toRingEquiv
         inferInstance
-    haveI : IsArtinianRing (End k W₀) := IsArtinianRing.of_finite k (End k W₀)
-    haveI : IsSimpleModule (End k W₀) W₀ := inferInstance
-    haveI : IsSimpleModule (End k W₀) (EndTwist θ) := EndTwist.isSimpleModule θ
+    have : IsArtinianRing (End k W₀) := IsArtinianRing.of_finite k (End k W₀)
+    have : IsSimpleModule (End k W₀) W₀ := inferInstance
+    have : IsSimpleModule (End k W₀) (EndTwist θ) := EndTwist.isSimpleModule θ
     -- Skolem–Noether: `W₀ ≅ EndTwist θ` as `End k W₀`-modules.
     obtain ⟨e⟩ := nonempty_linearEquiv_of_isSimpleModule
       (E := End k W₀) (A := W₀) (B := EndTwist θ)

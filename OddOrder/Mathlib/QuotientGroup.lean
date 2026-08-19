@@ -99,6 +99,7 @@ theorem quotientMapSubgroupOfOfLe_injective {A' A B' B : Subgroup G}
     (hAB : A ⊓ B' ≤ A') : Function.Injective (quotientMapSubgroupOfOfLe h' h) :=
   (quotientMapSubgroupOfOfLe_injective_iff h' h).2 hAB
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **The second isomorphism theorem as an embedding.**  For `S N : Subgroup G` with `N ⊴ G`,
 the map `↥S ⧸ N.subgroupOf S →* G ⧸ N` induced by `S.subtype` is injective.
 

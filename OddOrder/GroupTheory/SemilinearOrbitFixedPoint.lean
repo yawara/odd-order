@@ -50,6 +50,7 @@ section OrbitCount
 variable {M : Type*} [Group M] [Finite M] {K : Type*} [Group K] [Finite K]
   (ψ : K →* MulAut M)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Some non-trivial `K`-orbit is `g`-invariant.**
 
 `g` permutes the `K`-orbits (it normalizes the `K`-action through `α`) and fixes
@@ -65,8 +66,8 @@ theorem exists_mem_orbit_of_not_dvd_orbitCount [Nontrivial K]
     (hnd : ¬ p ∣ (Nat.card M - 1) / Nat.card K) :
     ∃ (ω₀ : M) (c₀ : K), ω₀ ≠ 1 ∧ g ω₀ = ψ c₀ ω₀ := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
-  letI : MulAction K M := MulAction.compHom M ψ
+  have : Fact p.Prime := ⟨hp⟩
+  let : MulAction K M := MulAction.compHom M ψ
   have hsmul : ∀ (k : K) (u : M), k • u = ψ k u := fun _ _ => rfl
   -- the identity is the unique fixed point, and `K` acts freely off it
   have hone : (1 : M) ∈ fixedPoints K M := fun k => by rw [hsmul]; exact map_one (ψ k)
@@ -138,7 +139,7 @@ theorem exists_mem_orbit_of_not_dvd_orbitCount [Nontrivial K]
     rfl
   -- the orbit space as a `⟨Φ⟩`-set
   set Γ : Subgroup (Equiv.Perm Y) := Subgroup.zpowers Φ with hΓ
-  haveI : Finite Y := Finite.of_surjective (Quotient.mk'' : M → Y) Quotient.mk''_surjective
+  have : Finite Y := Finite.of_surjective (Quotient.mk'' : M → Y) Quotient.mk''_surjective
   have hΓp : IsPGroup p Γ := by
     intro x
     refine ⟨1, ?_⟩
@@ -149,7 +150,7 @@ theorem exists_mem_orbit_of_not_dvd_orbitCount [Nontrivial K]
     rw [hval, ← hn, pow_one, ← zpow_natCast (Φ ^ n) p, ← zpow_mul, mul_comm,
       zpow_mul, zpow_natCast, hΦp, one_zpow]
     rfl
-  letI : MulAction Γ Y := MulAction.compHom Y Γ.subtype
+  let : MulAction Γ Y := MulAction.compHom Y Γ.subtype
   have hmod : Nat.card Y ≡ Nat.card (fixedPoints Γ Y) [MOD p] :=
     hΓp.card_modEq_card_fixedPoints Y
   -- if `⟦1⟧` were the only fixed orbit, `p ∣ (|M| − 1) / |K|`

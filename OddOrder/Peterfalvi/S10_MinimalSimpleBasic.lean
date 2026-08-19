@@ -387,7 +387,7 @@ exceptional part) and the §10 → §5 ω-grid bridge (S12). -/
 theorem typePData_V_ti [Finite G] {M : Subgroup G} (data : TypePData M) :
     IsTISubset (typePV M data) data.W := by
   classical
-  haveI : IsCyclic ↥data.W := data.W_cyclic
+  have : IsCyclic ↥data.W := data.W_cyclic
   have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
   have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
   have mem_norm_sing : ∀ c z : G,
@@ -472,8 +472,8 @@ theorem typePData_typePV_not_mem_derived {M : Subgroup G} (data : TypePData M)
   simp only [typePV, Set.mem_sdiff, Set.mem_union, SetLike.mem_coe, not_or] at hv
   obtain ⟨hvW, _hvnW1, hvnW2⟩ := hv
   intro hvM'
-  haveI hcyc : IsCyclic ↥data.W := data.W_cyclic
-  letI : CommGroup ↥data.W := hcyc.commGroup
+  have hcyc : IsCyclic ↥data.W := data.W_cyclic
+  let : CommGroup ↥data.W := hcyc.commGroup
   have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
   have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
   have hsup : data.W1.subgroupOf data.W ⊔ data.W2.subgroupOf data.W = ⊤ := by
@@ -868,7 +868,7 @@ theorem coprime_FT_signalizer_centralizerIn_typePV [Finite G]
     Nat.Coprime (Nat.card (OddOrder.BG.Ch4.S16.FT_signalizer a))
       (Nat.card (OddOrder.Peterfalvi.S04.centralizerIn M b)) := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   obtain ⟨v, hv, m, hmM, hmv⟩ := hb
   have hvW : v ∈ data.W := by
     have hv' := hv; simp only [typePV, Set.mem_sdiff] at hv'; exact hv'.1
@@ -876,8 +876,8 @@ theorem coprime_FT_signalizer_centralizerIn_typePV [Finite G]
     rw [data.W_eq]
     exact sup_le data.W1_le (data.W2_le.trans (inf_le_left.trans
       (data.H_le.trans (Subgroup.map_subtype_le _))))
-  haveI hcyc : IsCyclic ↥data.W := data.W_cyclic
-  letI : CommGroup ↥data.W := hcyc.commGroup
+  have hcyc : IsCyclic ↥data.W := data.W_cyclic
+  let : CommGroup ↥data.W := hcyc.commGroup
   -- `C_G(v) = W` (`≤`: `normalizer_V`; `⊇`: `W` abelian).
   have hCGv : Subgroup.centralizer ({v} : Set G) = data.W := by
     refine le_antisymm ?_ ?_
@@ -1253,7 +1253,7 @@ theorem coprime_FT_signalizer_centralizerIn_typePA0_of_isTypeP1 [Finite G]
     {b : G} (hb : b ∈ typePA0 M data) :
     Nat.Coprime (Nat.card (OddOrder.BG.Ch4.S16.FT_signalizer a))
       (Nat.card (OddOrder.Peterfalvi.S04.centralizerIn M b)) := by
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   simp only [typePA0, Set.mem_union] at hb
   rcases hb with hpb | hvb
   · rw [typePA_eq_sigmaSharp_of_isTypeP1 hG hM data hP1] at hpb

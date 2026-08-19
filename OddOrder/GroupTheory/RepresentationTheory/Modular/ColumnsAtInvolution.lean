@@ -231,7 +231,7 @@ theorem algebraMap_irreducibleBrauerCharacter_eq_sum_intBasicSetMatrix {A : ι �
           * principalBasicSet eQ (quotientPi_surjective π hπ hlin hN)
               (quotientPi_smul π hπ hlin hN) hnilQ yb j₀ j (QuotientGroup.mk w) := by
   classical
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   have hwq : IsPRegular p (QuotientGroup.mk w : ↥(centralizerOf x) ⧸ N) := by
     simpa using hw.map (QuotientGroup.mk' N)
   rw [← irreducibleBrauerCharacter_quotientPi π hπ hlin hN μ w,

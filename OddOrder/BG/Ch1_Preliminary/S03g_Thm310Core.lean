@@ -56,11 +56,11 @@ theorem prime_card_of_freeBlock_cond3
         = finrank F (Representation.invariants (ρ.comp R.subtype))) :
     ∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p := by
   classical
-  haveI : Fintype ι := Fintype.ofFinite ι
+  have : Fintype ι := Fintype.ofFinite ι
   -- Cauchy: pick `x ∈ R` of prime order `p`.
   obtain ⟨p, hp, hpdvd⟩ := (Nat.card ↥R).exists_prime_and_dvd
     (fun h1 => hRne (Subgroup.card_eq_one.mp h1))
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨x₀, hx₀⟩ := exists_prime_orderOf_dvd_card' (G := ↥R) p hpdvd
   have hxR : (x₀ : G) ∈ R := x₀.2
   have hxord : orderOf (x₀ : G) = p := by
@@ -70,12 +70,12 @@ theorem prime_card_of_freeBlock_cond3
     intro h; rw [h, orderOf_one] at hxord; exact hp.ne_one hxord.symm
   have hPR : Subgroup.zpowers (x₀ : G) ≤ R := Subgroup.zpowers_le.mpr hxR
   have hPcard : Nat.card ↥(Subgroup.zpowers (x₀ : G)) = p := by rw [Nat.card_zpowers, hxord]
-  haveI : Finite ↥(Subgroup.zpowers (x₀ : G)) :=
+  have : Finite ↥(Subgroup.zpowers (x₀ : G)) :=
     Finite.of_injective _ (Subgroup.inclusion_injective hPR)
   -- Keystone applied to `R`.
   have hR := ρ.finrank_eq_card_mul_finrank_invariants_of_freeBlock R hW hfree hperm
   -- Keystone applied to `⟨x⟩` (same blocks, restricted action).
-  letI : MulAction ↥(Subgroup.zpowers (x₀ : G)) ι := mulActionSubgroupOfLe hPR
+  let : MulAction ↥(Subgroup.zpowers (x₀ : G)) ι := mulActionSubgroupOfLe hPR
   have hfreeP : ∀ (h : ↥(Subgroup.zpowers (x₀ : G))) (i : ι), h • i = i → h = 1 := by
     intro h i hi
     have hi' : (Subgroup.inclusion hPR h) • i = i := hi

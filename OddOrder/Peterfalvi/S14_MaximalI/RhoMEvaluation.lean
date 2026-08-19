@@ -206,7 +206,7 @@ theorem sharpSubgroup_H_conj_mem [Finite G]
     ∀ (l : ↥ctr.M) ⦃a : G⦄, a ∈ sharpSubgroup hypM.typeI.typeF.H →
       (l : G) * a * (l : G)⁻¹ ∈ sharpSubgroup hypM.typeI.typeF.H := by
   intro l a ha
-  haveI hnormal : ((hypM.typeI.typeF.H).subgroupOf ctr.M).Normal := by
+  have hnormal : ((hypM.typeI.typeF.H).subgroupOf ctr.M).Normal := by
     rw [hypM.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal ctr.M
   have haH : a ∈ hypM.typeI.typeF.H := ha.1

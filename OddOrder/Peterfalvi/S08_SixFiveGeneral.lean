@@ -293,7 +293,7 @@ theorem inducedKernelFamily_apply_one_eq_index_of_isMulCommutative_quotient
     [IsMulCommutative (↥K ⧸ X.subgroupOf K)]
     {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ inducedKernelFamily K X) :
     φ (1 : ↥L) = (K.index : ℂ) := by
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
   obtain ⟨θ, -, hθker, rfl⟩ := hφ
   rw [ClassFunction.induce_apply_one,
     apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
@@ -380,7 +380,7 @@ instance `[IsMulCommutative (↥K ⧸ H₁.subgroupOf K)]`.
 `[Group.IsNilpotent ↥H]` を宣言していたのを、engine (`six_three_of_six_two_oracle`) が元から
 持っていた書籍形 `[Group.IsNilpotent (↥H ⧸ M.subgroupOf H)]` に合わせた。 -/
 theorem relIndex_le_of_not_isCoherent
-    [IsSolvable ↥K] (RD : InducedFamilyImageData A₀ K)
+    [Group.IsSolvable ↥K] (RD : InducedFamilyImageData A₀ K)
     (hodd : Odd (Nat.card ↥L))
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀) (h1A : (1 : ↥L) ∉ A₀)
     {M H₁ : Subgroup ↥L} [M.Normal] [H₁.Normal]
@@ -391,7 +391,7 @@ theorem relIndex_le_of_not_isCoherent
     (hncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent RD.tau
       (inducedKernelFamily K M) A₀)) :
     H₁.relIndex K ≤ 4 * K.index ^ 2 + 1 := by
-  haveI : (H₁.subgroupOf K).Normal := ‹H₁.Normal›.subgroupOf K
+  have : (H₁.subgroupOf K).Normal := ‹H₁.Normal›.subgroupOf K
   by_contra hcon
   push Not at hcon
   refine hncoh (six_three_of_imageData RD hodd hKsupp h1A ‹K.Normal› hMH₁ hH₁K le_rfl
@@ -406,7 +406,7 @@ The group-theoretic half (`isChiefFactor_of_relIndex_le_of_odd_dvd`) needs only 
 Frobenius divisibility `hdvd` and the index bound of `relIndex_le_of_not_isCoherent`; the whole
 character-theoretic content of (6.5)(a) is in that bound. -/
 theorem isChiefFactor_of_not_isCoherent
-    [IsSolvable ↥K] (RD : InducedFamilyImageData A₀ K)
+    [Group.IsSolvable ↥K] (RD : InducedFamilyImageData A₀ K)
     (hodd : Odd (Nat.card ↥L))
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀) (h1A : (1 : ↥L) ∉ A₀)
     {M H₁ : Subgroup ↥L} [M.Normal] [H₁.Normal]
@@ -430,11 +430,11 @@ theorem isChiefFactor_of_not_isCoherent
 
 section SixFiveBC
 
-variable [IsSolvable ↥K] [Group.IsNilpotent ↥K]
+variable [Group.IsSolvable ↥K] [Group.IsNilpotent ↥K]
 variable {H₁ : Subgroup ↥L} [H₁.Normal]
 
 omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
-  [K.Normal] [Invertible (Nat.card ↥K : ℂ)] [IsSolvable ↥K] [Group.IsNilpotent ↥K]
+  [K.Normal] [Invertible (Nat.card ↥K : ℂ)] [Group.IsSolvable ↥K] [Group.IsNilpotent ↥K]
   [H₁.Normal] in
 /-- `|K : H₁| = |Abelianization K|` when `H₁` traces out the commutator subgroup of `K` — the
 `M = 1` case of Hypothesis (6.4)(c) (`H₁/M = [K/M, K/M]`). -/
@@ -504,7 +504,7 @@ theorem not_dvd_sub_one_of_not_isCoherent
     rw [hcard]
     exact hodd.of_dvd_nat ((Subgroup.relIndex_dvd_index_of_le hH₁K.le).trans H₁.index_dvd_card)
   have hdodd : Odd K.index := hodd.of_dvd_nat K.index_dvd_card
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   -- `K ≠ 1` (its commutator subgroup is nontrivial), so `p ∣ |K|`, and `|K|` divides the odd `|L|`.
   have hKnt : Nontrivial ↥K := by
     rcases subsingleton_or_nontrivial ↥K with hs | hn
@@ -532,10 +532,10 @@ theorem not_dvd_sub_one_of_not_isCoherent
       have hle : p ^ 2 ≤ p ^ n := Nat.pow_le_pow_right hp.one_lt.le hn2
       rw [hn'] at hlt
       omega
-    haveI : IsCyclic (↥K ⧸ _root_.commutator ↥K) := by
+    have : IsCyclic (↥K ⧸ _root_.commutator ↥K) := by
       interval_cases n
       · have : Nat.card (↥K ⧸ _root_.commutator ↥K) = 1 := by simpa using hn
-        haveI : Subsingleton (↥K ⧸ _root_.commutator ↥K) :=
+        have : Subsingleton (↥K ⧸ _root_.commutator ↥K) :=
           (Nat.card_eq_one_iff_unique.mp this).1
         exact isCyclic_of_subsingleton
       · exact isCyclic_of_prime_card (p := p) (by simpa using hn)

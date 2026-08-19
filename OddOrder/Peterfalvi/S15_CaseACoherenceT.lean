@@ -96,7 +96,7 @@ theorem Hypothesis.nineElevenNormBoundT [Finite G]
           (chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupT hG hvd) chief) |
         IsIrreducibleCharacter φ ∧ φ ∉ S₂}.ncard ≤ N := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   -- ── `indT` → honest-Dade conversions for the coherence clauses (as in `nineElevenPairBoundT`)
   obtain ⟨cohS₂_indS⟩ := hS₂coh
   have hindS_dade : ∀ f : ClassFunction ↥hyp.T ℂ,
@@ -550,8 +550,8 @@ theorem Hypothesis.sSet_caseA_nineElevenRefutation_T [Finite G]
         (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T))) :
     False := by
   classical
-  letI : Fintype ↥hyp.T := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥hyp.T : ℂ) :=
+  let : Fintype ↥hyp.T := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥hyp.T : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   -- numeric positivity inputs of the (9.11.1) squeeze
   have hq : 0 < (hyp.toTypesIIIIIIVSetupT hG hvd).q :=

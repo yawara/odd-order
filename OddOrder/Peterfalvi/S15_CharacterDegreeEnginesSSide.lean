@@ -72,23 +72,23 @@ theorem Hypothesis.induce_H_mem_zSpan_sSet_irr [Finite G]
         {ψ : ClassFunction ↥hyp.S ℂ | ψ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) ∧
           OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ} := by
   classical
-  haveI := hyp.finiteG
-  letI : Fintype ↥hyp.S := Fintype.ofFinite _
-  letI : Fintype ↥((derivedInG hyp.S).subgroupOf hyp.S) := Fintype.ofFinite _
-  letI : Fintype ↥(hyp.H.subgroupOf hyp.S) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+  have := hyp.finiteG
+  let : Fintype ↥hyp.S := Fintype.ofFinite _
+  let : Fintype ↥((derivedInG hyp.S).subgroupOf hyp.S) := Fintype.ofFinite _
+  let : Fintype ↥(hyp.H.subgroupOf hyp.S) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥hyp.S : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥((derivedInG hyp.S).subgroupOf hyp.S) : ℂ) :=
+  let : Invertible (Nat.card ↥((derivedInG hyp.S).subgroupOf hyp.S) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(hyp.H.subgroupOf hyp.S) : ℂ) :=
+  let : Invertible (Nat.card ↥(hyp.H.subgroupOf hyp.S) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   set data := hyp.toTypesIIIIIIVSetupS hG with hdata
   obtain ⟨chief, -⟩ := OddOrder.Peterfalvi.S11.exists_chiefFactorData hG data
   set HU : Subgroup ↥hyp.S := OddOrder.Peterfalvi.S11.huSub data with hHU
   have hHUeq : HU = (derivedInG hyp.S).subgroupOf hyp.S :=
     OddOrder.Peterfalvi.S11.huSub_eq_derivedInG_subgroupOf data
-  letI : Fintype ↥HU := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥HU : ℂ) :=
+  let : Fintype ↥HU := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥HU : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   have hHderiv : hyp.H ≤ derivedInG hyp.S := by
     change hyp.P ⊔ hyp.C ≤ derivedInG hyp.S
@@ -96,8 +96,8 @@ theorem Hypothesis.induce_H_mem_zSpan_sSet_irr [Finite G]
     exact sup_le le_sup_left (le_trans (hyp.C_eq ▸ inf_le_left) le_sup_right)
   have hKle : hyp.H.subgroupOf hyp.S ≤ HU := by
     rw [hHUeq]; exact Subgroup.subgroupOf_mono hyp.S hHderiv
-  letI : Fintype ↥((hyp.H.subgroupOf hyp.S).subgroupOf HU) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥((hyp.H.subgroupOf hyp.S).subgroupOf HU) : ℂ) :=
+  let : Fintype ↥((hyp.H.subgroupOf hyp.S).subgroupOf HU) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥((hyp.H.subgroupOf hyp.S).subgroupOf HU) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   -- The transport `θ' = θ ∘ e` of `θ` onto `PC' = (PC).subgroupOf HU ≤ HU`.
   have hθ'irr : OddOrder.RepresentationTheory.IsIrreducibleCharacter
@@ -182,7 +182,7 @@ theorem Hypothesis.induce_H_mem_zSpan_sSet_irr [Finite G]
         ≠ ClassFunction.induce (hyp.H.subgroupOf hyp.S) θj := by
       intro h
       exact hyp.mu_colSum_not_irreducible j (by rw [hμeq, ← h]; exact hind)
-    haveI hKnorm : (hyp.H.subgroupOf hyp.S).Normal := H_sharp_subgroupOf_normal hyp
+    have hKnorm : (hyp.H.subgroupOf hyp.S).Normal := H_sharp_subgroupOf_normal hyp
     have hzmu : ClassFunction.inner (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ)
         (∑ i : Fin hyp.q, hyp.mu i j) = 0 := by
       rw [hμeq]
@@ -276,12 +276,12 @@ theorem Hypothesis.tau1S_ofHonest_zSpanIrr_inner_eta [Finite G]
       {ψ : ClassFunction ↥hyp.S ℂ | ψ ∈ sSet (hyp.toTypesIIIIIIVSetupS hG) ∧
         OddOrder.RepresentationTheory.IsIrreducibleCharacter ψ}) :
     ClassFunction.inner (hyp.tau1S_ofHonest hG hnoV chief φ) (hyp.eta i j) = 0 := by
-  haveI := hyp.finiteG
-  letI : Fintype G := Fintype.ofFinite G
-  letI : Invertible (Nat.card G : ℂ) :=
+  have := hyp.finiteG
+  let : Fintype G := Fintype.ofFinite G
+  let : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Fintype ↥hyp.S := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+  let : Fintype ↥hyp.S := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥hyp.S : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   induction hφ using Submodule.span_induction with
   | mem ζ hζ =>
@@ -323,9 +323,9 @@ theorem Hypothesis.tau1S_ofHonest_induce_inner_eta [Finite G]
     ClassFunction.inner (hyp.eta i j)
       (hyp.tau1S_ofHonest hG hnoV chief
         (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ)) = 0 := by
-  haveI := hyp.finiteG
-  letI : Fintype G := Fintype.ofFinite G
-  letI : Invertible (Nat.card G : ℂ) :=
+  have := hyp.finiteG
+  let : Fintype G := Fintype.ofFinite G
+  let : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   rw [OddOrder.RepresentationTheory.inner_conj_symm,
     hyp.tau1S_ofHonest_zSpanIrr_inner_eta hG hnoV chief i j
@@ -350,12 +350,12 @@ theorem Hypothesis.tau1S_ofHonest_zSpan_inner_eta_col_zero [Finite G]
     (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan (sSet (hyp.toTypesIIIIIIVSetupS hG))) :
     ClassFunction.inner (hyp.tau1S_ofHonest hG hnoV chief φ)
       (hyp.eta i ⟨0, hyp.p_prime.pos⟩) = 0 := by
-  haveI := hyp.finiteG
-  letI : Fintype G := Fintype.ofFinite G
-  letI : Invertible (Nat.card G : ℂ) :=
+  have := hyp.finiteG
+  let : Fintype G := Fintype.ofFinite G
+  let : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Fintype ↥hyp.S := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+  let : Fintype ↥hyp.S := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥hyp.S : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   induction hφ using Submodule.span_induction with
   | mem ζ hζ =>
@@ -422,9 +422,9 @@ theorem Hypothesis.tau1S_ofHonest_induce_inner_eta_col_zero [Finite G]
     ClassFunction.inner (hyp.eta i ⟨0, hyp.p_prime.pos⟩)
       (hyp.tau1S_ofHonest hG hnoV chief
         (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ)) = 0 := by
-  haveI := hyp.finiteG
-  letI : Fintype G := Fintype.ofFinite G
-  letI : Invertible (Nat.card G : ℂ) :=
+  have := hyp.finiteG
+  let : Fintype G := Fintype.ofFinite G
+  let : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   rw [OddOrder.RepresentationTheory.inner_conj_symm,
     hyp.tau1S_ofHonest_zSpan_inner_eta_col_zero hG hnoV chief i
@@ -453,12 +453,12 @@ theorem Hypothesis.mu_j_isIndPC_not_ker [Finite G]
             Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
           OddOrder.Peterfalvi.S03.characterKernel θ) := by
   classical
-  haveI := hyp.finiteG
-  letI : Fintype ↥hyp.S := Fintype.ofFinite _
-  letI : Fintype ↥(hyp.H.subgroupOf hyp.S) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+  have := hyp.finiteG
+  let : Fintype ↥hyp.S := Fintype.ofFinite _
+  let : Fintype ↥(hyp.H.subgroupOf hyp.S) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥hyp.S : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(hyp.H.subgroupOf hyp.S) : ℂ) :=
+  let : Invertible (Nat.card ↥(hyp.H.subgroupOf hyp.S) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   obtain ⟨θ, hθirr, hθ1, hμeq⟩ := hyp.mu_j_isIndPC hG j hj
   refine ⟨θ, hθirr, hθ1, hμeq, fun hker => ?_⟩
@@ -467,14 +467,14 @@ theorem Hypothesis.mu_j_isIndPC_not_ker [Finite G]
   -- the `S'`-level source: `μ_j = Ind_{HU}^S χ`, `χ ∈ 𝒳` (so `P ⊄ Ker χ`)
   obtain ⟨χ, hχ, hμeq'⟩ := OddOrder.Peterfalvi.S11.mem_sOf.mp
     (hyp.mu_colSum_mem_sOf_H0 hG chief j hj)
-  letI : Fintype ↥(OddOrder.Peterfalvi.S11.huSub data) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥(OddOrder.Peterfalvi.S11.huSub data) : ℂ) :=
+  let : Fintype ↥(OddOrder.Peterfalvi.S11.huSub data) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥(OddOrder.Peterfalvi.S11.huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI hHUnorm : (OddOrder.Peterfalvi.S11.huSub data).Normal := by
+  have hHUnorm : (OddOrder.Peterfalvi.S11.huSub data).Normal := by
     rw [OddOrder.Peterfalvi.S11.huSub_eq_derivedInG_subgroupOf data]
     infer_instance
   -- `P ⊴ S`, realised in `↥S`
-  haveI hPnorm : (hyp.P.subgroupOf hyp.S).Normal := by
+  have hPnorm : (hyp.P.subgroupOf hyp.S).Normal := by
     have hPle : hyp.P ≤ hyp.S := by
       rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
     refine (Subgroup.normal_subgroupOf_iff_le_normalizer hPle).mpr ?_
@@ -577,7 +577,7 @@ factor datum always exists. -/
 theorem Hypothesis.characterDegreeCore_nonempty [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     Nonempty (CharacterDegreeCore hyp) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   obtain ⟨chief, -⟩ := OddOrder.Peterfalvi.S11.exists_chiefFactorData hG
     (hyp.toTypesIIIIIIVSetupS hG)
   exact ⟨hyp.characterDegreeCore hG
@@ -598,7 +598,7 @@ theorem Hypothesis.lambdaClusterData_of_irr_witness [Finite G]
     (hind : OddOrder.RepresentationTheory.IsIrreducibleCharacter
       (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ)) :
     Nonempty (LambdaClusterData hyp) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   refine ⟨⟨ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ, hind, ?_, θ, hθ, hθ1, rfl, ?_⟩⟩
   · rw [OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, hθ1, mul_one,
       hyp.H_index_eq_uq hG]
@@ -682,7 +682,7 @@ theorem lambda_tau1_cCoeff_base [Fintype G] [Invertible (Nat.card G : ℂ)]
   set K : Subgroup ↥hyp.S := (H_sharp_hypothesis76_base hG hyp φ₀).H.subgroupOf hyp.S
     with hKdef
   have hKJ : K = hyp.H.subgroupOf hyp.S := rfl
-  haveI hKnorm : K.Normal := by rw [hKJ]; exact H_sharp_subgroupOf_normal hyp
+  have hKnorm : K.Normal := by rw [hKJ]; exact H_sharp_subgroupOf_normal hyp
   -- λ's inducing character has `P ⊄ Ker` (the pointwise witness, set-negated)
   have hθlP : ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
       Set ↥(hyp.H.subgroupOf hyp.S)) ⊆
@@ -692,7 +692,7 @@ theorem lambda_tau1_cCoeff_base [Fintype G] [Invertible (Nat.card G : ℂ)]
       rw [SetLike.mem_coe, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf]
       exact hx₀P))
   -- `K ≅ H` abelian ⟹ all family degrees are `[S:K]` ⟹ `d ≡ 1`
-  haveI hKcomm : IsMulCommutative ↥K := by
+  have hKcomm : IsMulCommutative ↥K := by
     rw [hKJ]
     have hH := hyp.H_mulCommutative hG
     have e := Subgroup.subgroupOfEquivOfLe (show hyp.H ≤ hyp.S from hyp.H_le_S)
@@ -828,7 +828,7 @@ theorem lambda_tau1_cCoeff_base [Fintype G] [Invertible (Nat.card G : ℂ)]
         OddOrder.Peterfalvi.S03.characterKernel (θi : ClassFunction ↥K ℂ)) := by
       intro hker
       apply hiP
-      haveI hPnorm : (hyp.P.subgroupOf hyp.S).Normal := by
+      have hPnorm : (hyp.P.subgroupOf hyp.S).Normal := by
         have hPle' : hyp.P ≤ hyp.S := by
           rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
         refine (Subgroup.normal_subgroupOf_iff_le_normalizer hPle').mpr ?_
@@ -880,8 +880,8 @@ theorem eta10_cCoeff_base_eq_zero [Fintype G] [Invertible (Nat.card G : ℂ)]
   set K : Subgroup ↥hyp.S := (H_sharp_hypothesis76_base hG hyp φ₀).H.subgroupOf hyp.S
     with hKdef
   have hKJ : K = hyp.H.subgroupOf hyp.S := rfl
-  haveI hKnorm : K.Normal := by rw [hKJ]; exact H_sharp_subgroupOf_normal hyp
-  haveI hKcomm : IsMulCommutative ↥K := by
+  have hKnorm : K.Normal := by rw [hKJ]; exact H_sharp_subgroupOf_normal hyp
+  have hKcomm : IsMulCommutative ↥K := by
     rw [hKJ]
     have hH := hyp.H_mulCommutative hG
     have e := Subgroup.subgroupOfEquivOfLe (show hyp.H ≤ hyp.S from hyp.H_le_S)
@@ -947,7 +947,7 @@ theorem eta10_cCoeff_base_eq_zero [Fintype G] [Invertible (Nat.card G : ℂ)]
       OddOrder.Peterfalvi.S03.characterKernel (θi : ClassFunction ↥K ℂ)) := by
     intro hker
     apply hiP
-    haveI hPnorm : (hyp.P.subgroupOf hyp.S).Normal := by
+    have hPnorm : (hyp.P.subgroupOf hyp.S).Normal := by
       have hPle' : hyp.P ≤ hyp.S := by
         rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
       refine (Subgroup.normal_subgroupOf_iff_le_normalizer hPle').mpr ?_
@@ -1002,7 +1002,7 @@ theorem lambda_tau1_apply_eq_of_not_mem_H_sat_core [Finite G]
       core.tau1S lam.lambda x
         = (δ : ℂ) * ∑ i : Fin hyp.q, hyp.eta i ⟨1, hyp.p_prime.one_lt⟩ x := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   obtain ⟨j, δ, θμ, -, hδ, hθμirr, hθμ1, hθμP, hμInd, hμτ⟩ := core.mu_col_tau1_eta_col_one
   obtain ⟨θl, hθlirr, hθl1, hlamEq, x₀, hx₀P, hx₀ker⟩ := lam.lambda_induced_from_PC_linear
   have hθlP : ¬ (((hyp.P.subgroupOf hyp.S).subgroupOf (hyp.H.subgroupOf hyp.S) :
@@ -1012,7 +1012,7 @@ theorem lambda_tau1_apply_eq_of_not_mem_H_sat_core [Finite G]
     exact hx₀ker (hsub (by
       rw [SetLike.mem_coe, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf]
       exact hx₀P))
-  haveI hKnorm : (hyp.H.subgroupOf hyp.S).Normal := H_sharp_subgroupOf_normal hyp
+  have hKnorm : (hyp.H.subgroupOf hyp.S).Normal := H_sharp_subgroupOf_normal hyp
   have hdiff : core.tau1S (∑ i : Fin hyp.q, hyp.mu i j) - core.tau1S lam.lambda
       = ClassFunction.induce hyp.S
           (ClassFunction.induce (hyp.H.subgroupOf hyp.S) θμ

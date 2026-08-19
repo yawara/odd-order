@@ -53,8 +53,8 @@ theorem wielandt_fixedPoint_frobenius {L H : Type*} [Group L] [Group H]
     [Finite L] [Finite H] (act : CoprimeFrobeniusAction L H) :
     Nat.card ↥act.fixedByUE ^ Nat.card ↥act.E * Nat.card H =
       Nat.card ↥act.fixedByE ^ Nat.card ↥act.E * Nat.card ↥act.fixedByU := by
-  haveI : IsSolvable H := act.H_solvable
-  letI : Fintype ↥act.E := Fintype.ofFinite _
+  have : Group.IsSolvable H := act.H_solvable
+  let : Fintype ↥act.E := Fintype.ofFinite _
   -- The per-chief-factor dimension identity (⋆) on each elementary-abelian chief factor — the sole
   -- remaining representation-theoretic input (the kernel-FPF fact (†), lane-f rep-theory: piece D).
   have hdim : ∀ (H' : Type _) [Group H'] [Finite H'] (φ' : L →* MulAut H') (N' : Subgroup H')
@@ -62,15 +62,15 @@ theorem wielandt_fixedPoint_frobenius {L H : Type*} [Group L] [Group H]
       (hpe' : IsElementaryAbelian p' ↥N') (hcop' : Nat.Coprime (Nat.card L) (Nat.card H')),
       PerFactorDimIdentity (U := act.U) (E := act.E) φ' hN' p' hpe' := by
     intro H' _ _ φ' N' _ hN' p' hp' hpe' hcop'
-    haveI : Fact p'.Prime := ⟨hp'⟩
-    haveI hUnorm : act.U.Normal := act.frobenius.isNormal
-    haveI : Fintype ↥act.U := Fintype.ofFinite _
+    have : Fact p'.Prime := ⟨hp'⟩
+    have hUnorm : act.U.Normal := act.frobenius.isNormal
+    have : Fintype ↥act.U := Fintype.ofFinite _
     -- The Frobenius data of `act` feeding (†).
     have hsup : act.U ⊔ act.E = ⊤ := act.frobenius.isComplement.sup_eq_top
     have hcopUE : Nat.Coprime (Nat.card ↥act.E) (Nat.card ↥act.U) :=
       (act.frobenius.coprime_card_kernel_complement).symm
     have hEnt : 1 < Nat.card ↥act.E := by
-      haveI : Nontrivial ↥act.E :=
+      have : Nontrivial ↥act.E :=
         act.E.nontrivial_iff_ne_bot.mpr act.frobenius.ne_bot_complement
       exact Finite.one_lt_card_iff_nontrivial.mpr inferInstance
     have hfpf : ∀ e ∈ act.E, e ≠ 1 → ∀ u ∈ act.U, e * u * e⁻¹ = u → u = 1 := by
@@ -78,16 +78,16 @@ theorem wielandt_fixedPoint_frobenius {L H : Type*} [Group L] [Group H]
       by_contra hune
       exact act.frobenius.conj_frobenius e he hne u hu hune heq
     -- The canonical `𝔽_{p'}`-module structure on the chief factor `↥N'`.
-    letI : CommGroup ↥N' := hpe'.subgroupCommGroup
-    letI : Module (ZMod p') (Additive ↥N') := hpe'.subgroupZmodModule
+    let : CommGroup ↥N' := hpe'.subgroupCommGroup
+    let : Module (ZMod p') (Additive ↥N') := hpe'.subgroupZmodModule
     change WielandtDimIdentity (V := ↥N') p' hN'.restrict act.U act.E
     by_cases hN1 : Nat.card ↥N' = 1
     · -- Trivial chief factor: the module is `0`-dimensional, both sides vanish.
-      haveI : Subsingleton ↥N' := (Nat.card_eq_one_iff_unique.mp hN1).1
-      haveI : Subsingleton (Additive ↥N') := inferInstanceAs (Subsingleton ↥N')
+      have : Subsingleton ↥N' := (Nat.card_eq_one_iff_unique.mp hN1).1
+      have : Subsingleton (Additive ↥N') := inferInstanceAs (Subsingleton ↥N')
       simp only [WielandtDimIdentity, Module.finrank_zero_of_subsingleton, mul_zero, add_zero]
     · -- Nontrivial chief factor: `p' ∤ |U|, |E|` (coprimality), so (†) over `𝔽_p` applies.
-      haveI : Nontrivial ↥N' := by
+      have : Nontrivial ↥N' := by
         rw [← Finite.one_lt_card_iff_nontrivial]
         have := Nat.card_pos (α := ↥N'); omega
       -- `p' ∣ |N'| ∣ |H'|`, so coprimality forces `p' ∤ |L|`, hence `p' ∤ |U|, |E|`.
@@ -103,7 +103,7 @@ theorem wielandt_fixedPoint_frobenius {L H : Type*} [Group L] [Group H]
         hp'.ne_one (Nat.dvd_one.mp (hcop' ▸ Nat.dvd_gcd h hpH))
       have hpU : ¬ p' ∣ Nat.card ↥act.U := fun h =>
         hpL (h.trans (Subgroup.card_subgroup_dvd_card act.U))
-      haveI : Invertible (Fintype.card ↥act.U : ZMod p') := invertibleOfNonzero (by
+      have : Invertible (Fintype.card ↥act.U : ZMod p') := invertibleOfNonzero (by
         rw [← Nat.card_eq_fintype_card]
         intro h; exact hpU ((ZMod.natCast_eq_zero_iff _ p').mp h))
       -- (†) over `𝔽_{p'}` ⟹ the elementary-abelian dimension identity (⋆).
@@ -184,7 +184,7 @@ theorem isFrobenius_kernel_eq_bot_of_frobenius_subgroup {G : Type*} [Group G] [F
     {Lsub N U E : Subgroup G} (hNL : N ≤ Lsub) (hUL : U ⊔ E ≤ Lsub)
     (hFrob : ∃ A : Subgroup ↥Lsub, Ch06.IsFrobeniusGroup ↥Lsub (N.subgroupOf Lsub) A)
     (hUE : Ch06.IsFrobeniusGroup ↥(U ⊔ E) (U.subgroupOf (U ⊔ E)) (E.subgroupOf (U ⊔ E)))
-    (hUN : U ⊓ N = ⊥) (hEN : E ⊓ N = ⊥) (hsolv : IsSolvable ↥N)
+    (hUN : U ⊓ N = ⊥) (hEN : E ⊓ N = ⊥) (hsolv : Group.IsSolvable ↥N)
     (hcop : Nat.Coprime (Nat.card ↥N) (Nat.card ↥(U ⊔ E))) :
     N = ⊥ := by
   classical
@@ -192,7 +192,7 @@ theorem isFrobenius_kernel_eq_bot_of_frobenius_subgroup {G : Type*} [Group G] [F
   -- `U ⊔ E ≤ Lsub ≤ N_G(N)` (the latter because `N` is normal in the Frobenius group `↥Lsub`).
   have hUEnorm : (U ⊔ E) ≤ Subgroup.normalizer (N : Set G) :=
     hUL.trans ((Subgroup.normal_subgroupOf_iff_le_normalizer hNL).mp hFrobA.isNormal)
-  letI act : MulDistribMulAction ↥(U ⊔ E) ↥N :=
+  let act : MulDistribMulAction ↥(U ⊔ E) ↥N :=
     MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (N : Set G))) ↥N
       (Subgroup.inclusion hUEnorm)
   set φ : ↥(U ⊔ E) →* MulAut ↥N := MulDistribMulAction.toMulAut ↥(U ⊔ E) ↥N with hφ
@@ -251,12 +251,12 @@ C_N(U) = N`), built through the conjugation action `U ⊔ E → MulAut N`. -/
 theorem frobenius_kernel_centralizes_of_complement_fpf {G : Type*} [Group G] [Finite G]
     {N U E : Subgroup G} (hUEnorm : U ⊔ E ≤ Subgroup.normalizer (N : Set G))
     (hUE : Ch06.IsFrobeniusGroup ↥(U ⊔ E) (U.subgroupOf (U ⊔ E)) (E.subgroupOf (U ⊔ E)))
-    (hsolv : IsSolvable ↥N)
+    (hsolv : Group.IsSolvable ↥N)
     (hcop : Nat.Coprime (Nat.card ↥N) (Nat.card ↥(U ⊔ E)))
     (hEfpf : ∀ n ∈ N, (∀ e ∈ E, e * n * e⁻¹ = n) → n = 1) :
     U ≤ Subgroup.centralizer (N : Set G) := by
   classical
-  letI act : MulDistribMulAction ↥(U ⊔ E) ↥N :=
+  let act : MulDistribMulAction ↥(U ⊔ E) ↥N :=
     MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (N : Set G))) ↥N
       (Subgroup.inclusion hUEnorm)
   set φ : ↥(U ⊔ E) →* MulAut ↥N := MulDistribMulAction.toMulAut ↥(U ⊔ E) ↥N with hφ
@@ -305,7 +305,7 @@ theorem exists_ne_one_centralized_by_complement_of_kernel_not_centralizes
     (hPH : P ≤ H) (hPne : P ≠ ⊥) (hAL : A ≤ Lsub) (hAH : A ⊓ H = ⊥) (hAne : A ≠ ⊥)
     (hAP : A ≤ Subgroup.normalizer (P : Set G))
     (hPAK : P ⊔ A ≤ Subgroup.normalizer (K : Set G))
-    (hKsolv : IsSolvable ↥K)
+    (hKsolv : Group.IsSolvable ↥K)
     (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥(P ⊔ A)))
     (hPnc : ¬ P ≤ Subgroup.centralizer (K : Set G)) :
     ∃ n ∈ K, n ≠ 1 ∧ ∀ a ∈ A, a * n * a⁻¹ = n := by
@@ -331,12 +331,12 @@ form Peterfalvi Part II, Ch. III §1 needs: with `U = [K, P]` and `E = P` acting
 theorem natCard_eq_pow_natCard_inf_centralizer_of_kernel_fpf {G : Type*} [Group G] [Finite G]
     {N U E : Subgroup G} (hUEnorm : U ⊔ E ≤ Subgroup.normalizer (N : Set G))
     (hUE : Ch06.IsFrobeniusGroup ↥(U ⊔ E) (U.subgroupOf (U ⊔ E)) (E.subgroupOf (U ⊔ E)))
-    (hsolv : IsSolvable ↥N)
+    (hsolv : Group.IsSolvable ↥N)
     (hcop : Nat.Coprime (Nat.card ↥N) (Nat.card ↥(U ⊔ E)))
     (hUfpf : ∀ n ∈ N, (∀ u ∈ U, u * n * u⁻¹ = n) → n = 1) :
     Nat.card ↥N = Nat.card ↥(N ⊓ Subgroup.centralizer (E : Set G)) ^ Nat.card ↥E := by
   classical
-  letI act : MulDistribMulAction ↥(U ⊔ E) ↥N :=
+  let act : MulDistribMulAction ↥(U ⊔ E) ↥N :=
     MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (N : Set G))) ↥N
       (Subgroup.inclusion hUEnorm)
   set φ : ↥(U ⊔ E) →* MulAut ↥N := MulDistribMulAction.toMulAut ↥(U ⊔ E) ↥N with hφ

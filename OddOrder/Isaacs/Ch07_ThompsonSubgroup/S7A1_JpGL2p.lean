@@ -408,7 +408,7 @@ theorem centralizer_oPiCore_compl_le_of_opCore_eq_bot
       OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G := by
   classical
   set π' : Set ℕ := {q | q ∉ ({p} : Set ℕ)} with hπ'_def
-  haveI hPiSepCompl : OddOrder.Isaacs.Ch03.IsPiSeparable π' G :=
+  have hPiSepCompl : OddOrder.Isaacs.Ch03.IsPiSeparable π' G :=
     OddOrder.Isaacs.Ch03.isPiSeparable_compl ({p} : Set ℕ) G inferInstance
   have hCoreCompl : OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ π'} G = ⊥ := by
     rw [show ({q | q ∉ π'} : Set ℕ) = ({p} : Set ℕ) by
@@ -551,7 +551,7 @@ private theorem pgroup_action_card_ge_prime_succ_of_moved
       _ = b⁻¹ • (y : X) := congrArg (fun z : X => b⁻¹ • z) hb
       _ = b⁻¹ • (1 : X) := by rw [hy]
       _ = 1 := by simp
-  haveI : Nontrivial (MulAction.orbit A x) := by
+  have : Nontrivial (MulAction.orbit A x) := by
     refine ⟨⟨⟨x, MulAction.mem_orbit_self x⟩, ⟨a • x, MulAction.mem_orbit x a⟩, ?_⟩⟩
     intro h
     exact hmove (Subtype.ext_iff.mp h).symm
@@ -629,12 +629,12 @@ private theorem isCyclic_pi_of_subsingleton
   by_cases hι : Nonempty ι
   · classical
     rcases hι with ⟨i⟩
-    haveI : Unique ι := uniqueOfSubsingleton i
+    have : Unique ι := uniqueOfSubsingleton i
     let e : (∀ i, M i) ≃* M default :=
       { toEquiv := Equiv.piUnique M
         map_mul' := fun _ _ => rfl }
     exact e.isCyclic.mpr inferInstance
-  · haveI : IsEmpty ι := ⟨fun i => hι ⟨i⟩⟩
+  · have : IsEmpty ι := ⟨fun i => hι ⟨i⟩⟩
     exact isCyclic_of_subsingleton
 
 private theorem isCyclic_of_comm_two_group_unique_order_two
@@ -642,7 +642,7 @@ private theorem isCyclic_of_comm_two_group_unique_order_two
     (huniq : ∀ x y : G, orderOf x = 2 → orderOf y = 2 → x = y) :
     IsCyclic G := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨ι, _, n, hn_gt, ⟨e⟩⟩ := CommGroup.equiv_prod_multiplicative_zmod_of_finite G
   let T := (i : ι) → Multiplicative (ZMod (n i))
   have hn_pow : ∀ i : ι, ∃ k, n i = 2 ^ k := by
@@ -656,7 +656,7 @@ private theorem isCyclic_of_comm_two_group_unique_order_two
     exact horder.symm.trans hk
   have hι_sub : Subsingleton ι := by
     by_contra hnot
-    haveI : Nontrivial ι := not_subsingleton_iff_nontrivial.mp hnot
+    have : Nontrivial ι := not_subsingleton_iff_nontrivial.mp hnot
     obtain ⟨i, j, hij⟩ := exists_pair_ne ι
     obtain ⟨ki, hki⟩ := hn_pow i
     obtain ⟨kj, hkj⟩ := hn_pow j
@@ -709,7 +709,7 @@ private theorem isCyclic_of_comm_two_group_unique_order_two
           simpa using hxj_order)
     exact hxi_ne_xj (by simpa using congrArg e hpre_eq)
   have htarget : IsCyclic T := by
-    haveI : Subsingleton ι := hι_sub
+    have : Subsingleton ι := hι_sub
     exact isCyclic_pi_of_subsingleton
   exact e.isCyclic.mpr htarget
 
@@ -774,8 +774,8 @@ private theorem lem73_aux
     have hCop : Nat.Coprime (Nat.card ↥P) (Nat.card ↥L) := by
       rw [hk]; exact hp_coprime_L.pow_left k
     -- ## Step 1c: P が solvable (p-群 ⇒ nilpotent ⇒ solvable)
-    haveI hP_nilpotent : Group.IsNilpotent ↥P := IsPGroup.isNilpotent hPp
-    haveI hP_solvable : IsSolvable ↥P := inferInstance
+    have hP_nilpotent : Group.IsNilpotent ↥P := IsPGroup.isNilpotent hPp
+    have hP_solvable : Group.IsSolvable ↥P := inferInstance
     -- ## Step 1d: 自明分岐 — `L ≤ C_G(P)` なら結論直結 (centralizer の対称性)
     -- Isaacs proof は「q | |L:C_L(P)| を取る」ところから始まり, 暗黙に `C_L(P) ⊊ L` を仮定.
     -- C_L(P) = L (即ち L ≤ C_G(P)) なら index = 1 で q が取れないため, 別途処理する.
@@ -811,7 +811,7 @@ private theorem lem73_aux
         omega
       obtain ⟨q, hq_prime, hq_dvd_idx⟩ :=
         Nat.exists_prime_and_dvd (Nat.ne_of_gt h_idx_gt)
-      haveI : Fact q.Prime := ⟨hq_prime⟩
+      have : Fact q.Prime := ⟨hq_prime⟩
       -- ## Step 1g: P-invariant Sylow q-subgroup Q of ↥L を `exists_aInvariant_sylow` で取得
       obtain ⟨Q, hQ_inv⟩ :=
         OddOrder.Isaacs.Ch04.exists_aInvariant_sylow (A := ↥P) (G := ↥L) (φ := φ) hCop
@@ -1033,7 +1033,7 @@ private theorem lem73_aux
           ⟨p - 1, (card_sl2_mul_units_eq_card_gl2_zmod_prime (p := p)).symm⟩
         have hq_dvd_GL : q ∣ Nat.card (Matrix.GeneralLinearGroup (Fin 2) (ZMod p)) :=
           hq_dvd_SL.trans hSL_card_dvd_GL
-        letI : MulDistribMulAction ↥P ↥L := MulDistribMulAction.compHom ↥L φ
+        let : MulDistribMulAction ↥P ↥L := MulDistribMulAction.compHom ↥L φ
         have hP_moves_L : ∃ (a : ↥P) (x : ↥L), a • x ≠ x := by
           by_contra h_no_move
           apply hL_in_C
@@ -1059,7 +1059,7 @@ private theorem lem73_aux
             simpa [hq_eq_two] using hL_qgroup
           have hL_comm : ∀ x y : ↥L, x * y = y * x :=
             hL2abelian L le_rfl hL_2group
-          letI : CommGroup ↥L := { (inferInstance : Group ↥L) with mul_comm := hL_comm }
+          let : CommGroup ↥L := { (inferInstance : Group ↥L) with mul_comm := hL_comm }
           have hzmod_two_ne_zero : (2 : ZMod p) ≠ 0 := by
             intro hzero
             have hp_dvd_two : p ∣ 2 := (ZMod.natCast_eq_zero_iff 2 p).mp hzero
@@ -1123,7 +1123,7 @@ private theorem lem73_aux
               sl2_unique_involution hzmod_two_ne_zero hsy_sq hsy_ne_one
             apply Subtype.ext
             rw [← hsx, ← hsy, hsx_eq_neg, hsy_eq_neg]
-          haveI hL_cyclic : IsCyclic ↥L :=
+          have hL_cyclic : IsCyclic ↥L :=
             isCyclic_of_comm_two_group_unique_order_two hL_2group hL_unique_order_two
           have hAut_2 : IsPGroup 2 (MulAut ↥L) :=
             cyclic_two_group_mulAut_isPGroup hL_2group

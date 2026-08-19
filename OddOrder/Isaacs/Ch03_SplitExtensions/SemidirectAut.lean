@@ -104,8 +104,8 @@ theorem horosevskii_aut_order_lt {G : Type*} [Group G] [Finite G] [Nontrivial G]
   -- Setup the semidirect product Γ = G ⋊ ⟨σ⟩.
   let A : Subgroup (MulAut G) := Subgroup.zpowers σ
   let φ : ↥A →* MulAut G := A.subtype
-  haveI : Finite ↥A := inferInstance
-  haveI : Finite (G ⋊[φ] ↥A) :=
+  have : Finite ↥A := inferInstance
+  have : Finite (G ⋊[φ] ↥A) :=
     Finite.of_equiv _ (SemidirectProduct.equivProd (φ := φ)).symm
   -- |↥A| = orderOf σ; |G ⋊[φ] ↥A| = |G| * orderOf σ.
   have hA_card : Nat.card ↥A = orderOf σ := Nat.card_zpowers σ
@@ -165,8 +165,8 @@ theorem horosevskii_aut_order_lt {G : Type*} [Group G] [Finite G] [Nontrivial G]
       ⟨g₀, hAₛ_eq_zpowers⟩
   -- Show Aₛ.normalCore = ⊥.
   -- Setup normality and disjointness.
-  haveI : Aₛ.normalCore.Normal := Subgroup.normalCore_normal _
-  haveI : Gₛ.Normal := by
+  have : Aₛ.normalCore.Normal := Subgroup.normalCore_normal _
+  have : Gₛ.Normal := by
     change ((SemidirectProduct.inl : G →* G ⋊[φ] ↥A).range).Normal
     rw [SemidirectProduct.range_inl_eq_ker_rightHom]
     infer_instance
@@ -242,8 +242,8 @@ theorem abelian_p_aut_regular_orbit {G : Type*} [Group G] [Finite G] {p : ℕ} [
     ∃ g : G, ∀ φ : P, (φ : MulAut G) g = g → φ = 1 := by
   -- Setup the semidirect product Γ = G ⋊ ↥P (action via subtype P.subtype).
   let φP : ↥P →* MulAut G := P.subtype
-  haveI : Finite ↥P := inferInstance
-  haveI : Finite (G ⋊[φP] ↥P) :=
+  have : Finite ↥P := inferInstance
+  have : Finite (G ⋊[φP] ↥P) :=
     Finite.of_equiv _ (SemidirectProduct.equivProd (φ := φP)).symm
   -- |G ⋊ ↥P| = |G| * |P|.
   have hΓ_card : Nat.card (G ⋊[φP] ↥P) = Nat.card G * Nat.card ↥P := SemidirectProduct.card
@@ -274,7 +274,7 @@ theorem abelian_p_aut_regular_orbit {G : Type*} [Group G] [Finite G] {p : ℕ} [
   have hPₛ_sylow_coe : (Pₛ_sylow : Subgroup (G ⋊[φP] ↥P)) = Pₛ :=
     IsPGroup.toSylow_coe _ _
   -- Gₛ is normal.
-  haveI hGₛ_normal : Gₛ.Normal := by
+  have hGₛ_normal : Gₛ.Normal := by
     change ((SemidirectProduct.inl : G →* G ⋊[φP] ↥P).range).Normal
     rw [SemidirectProduct.range_inl_eq_ker_rightHom]
     infer_instance
@@ -289,7 +289,7 @@ theorem abelian_p_aut_regular_orbit {G : Type*} [Group G] [Finite G] {p : ℕ} [
   have hDisj_OpG : Disjoint (OddOrder.Isaacs.Ch01.opCore p (G ⋊[φP] ↥P)) Gₛ :=
     Disjoint.mono_left hOp_le_Pₛ hDisj_GP.symm
   -- O_p(Γ) is normal.
-  haveI hOpNormal : (OddOrder.Isaacs.Ch01.opCore p (G ⋊[φP] ↥P)).Normal :=
+  have hOpNormal : (OddOrder.Isaacs.Ch01.opCore p (G ⋊[φP] ↥P)).Normal :=
     OddOrder.Isaacs.Ch01.opCore.normal p _
   -- O_p(Γ) = ⊥: elements centralize Gₛ (Lemma 2.7), but Pₛ acts faithfully.
   have hOp_bot : OddOrder.Isaacs.Ch01.opCore p (G ⋊[φP] ↥P) = ⊥ := by

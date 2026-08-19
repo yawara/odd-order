@@ -88,8 +88,8 @@ theorem exists_extension_induce_eq_sum_induce_mul
           IsIrreducibleCharacter (ClassFunction.induce T
             (χ * linearClassFunction (β.comp (QuotientGroup.mk' (H.subgroupOf T))))) := by
   classical
-  letI : Fintype ↥T := Fintype.ofFinite _
-  letI : Fintype ↥(H.subgroupOf T) := Fintype.ofFinite _
+  let : Fintype ↥T := Fintype.ofFinite _
+  let : Fintype ↥(H.subgroupOf T) := Fintype.ofFinite _
   -- the transported character `θ'` and its properties
   set θ' : ClassFunction ↥(H.subgroupOf T) ℂ :=
     ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHT).toMonoidHom θ with hθ'def
@@ -208,9 +208,9 @@ theorem exists_extension_induce_eq_sum_distinct_irreducible
         (φ : ClassFunction L ℂ) = ClassFunction.induce T
           (χ * linearClassFunction (β.comp (QuotientGroup.mk' (H.subgroupOf T))))) := by
   classical
-  haveI : Fintype ((↥T ⧸ H.subgroupOf T) →* ℂˣ) := Fintype.ofFinite _
-  letI : Fintype ↥H := Fintype.ofFinite _
-  letI : Fintype ↥T := Fintype.ofFinite _
+  have : Fintype ((↥T ⧸ H.subgroupOf T) →* ℂˣ) := Fintype.ofFinite _
+  let : Fintype ↥H := Fintype.ofFinite _
+  let : Fintype ↥T := Fintype.ofFinite _
   obtain ⟨χ, hχ, hres, hdecomp, hirr⟩ :=
     exists_extension_induce_eq_sum_induce_mul hHT hθ hinertia hab hd hcop
   refine ⟨χ, hχ, ?_⟩
@@ -230,7 +230,7 @@ theorem exists_extension_induce_eq_sum_distinct_irreducible
       rw [ClassFunction.mul_apply, hχ1, linearClassFunction_apply, map_one, Units.val_one, mul_one]
     rw [ClassFunction.induce_apply_one, hval]
   -- the quotient `T/H` is a finite abelian group, so it has `[T:H]` linear characters
-  letI : CommGroup (↥T ⧸ H.subgroupOf T) :=
+  let : CommGroup (↥T ⧸ H.subgroupOf T) :=
     { (inferInstance : Group (↥T ⧸ H.subgroupOf T)) with
       mul_comm := fun a b => by
         obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective a
@@ -240,7 +240,7 @@ theorem exists_extension_induce_eq_sum_distinct_irreducible
         have h1 : (x * y)⁻¹ * (y * x) = ⁅y⁻¹, x⁻¹⁆ := by
           rw [commutatorElement_def]; group
         rw [h1]; exact hab y⁻¹ x⁻¹ }
-  haveI : NeZero (Monoid.exponent (↥T ⧸ H.subgroupOf T)) := ⟨Monoid.exponent_ne_zero_of_finite⟩
+  have : NeZero (Monoid.exponent (↥T ⧸ H.subgroupOf T)) := ⟨Monoid.exponent_ne_zero_of_finite⟩
   have hcardHom : Fintype.card ((↥T ⧸ H.subgroupOf T) →* ℂˣ) = (H.subgroupOf T).index := by
     rw [← Nat.card_eq_fintype_card]
     exact CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity (↥T ⧸ H.subgroupOf T) ℂ
@@ -350,7 +350,7 @@ theorem coprime_index_orderOf_determinant_mul_of_coprime_index [Finite L]
     (hHall : Nat.Coprime (Nat.card ↥H) H.index)
     {θ : ClassFunction ↥H ℂ} (hθ : IsIrreducibleCharacter θ) {d : ℕ} (hd : θ 1 = (d : ℂ)) :
     Nat.Coprime (H.subgroupOf T).index (orderOf hθ.determinant * d) := by
-  haveI : Finite ↥H := inferInstance
+  have : Finite ↥H := inferInstance
   -- `d ∣ |H|` (Ito's theorem)
   obtain ⟨n, -, hn_val, hn_dvd⟩ := hθ.exists_natDegree_charValue_one_dvd_card
   have hdn : d = n := by
@@ -517,7 +517,7 @@ theorem inner_induce_conj_eq_zero_of_odd {H : Subgroup L} [H.Normal]
     (θ : IrreducibleCharacter ↥H) (hθne : θ ≠ trivialIrreducibleCharacter ↥H) :
     ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
       (ClassFunction.induce H ((θ : ClassFunction ↥H ℂ).conj)) = 0 := by
-  letI : Fintype ↥H := Fintype.ofFinite _
+  let : Fintype ↥H := Fintype.ofFinite _
   have hθne' : (θ : ClassFunction ↥H ℂ) ≠ trivialClassFunction ↥H :=
     fun heq => hθne (Subtype.ext heq)
   exact inner_induce_eq_zero_of_not_conj θ
@@ -538,7 +538,7 @@ theorem forall_mem_ne_trivial_of_induce_eq_sum
       = ∑ φ ∈ S, (φ : ClassFunction L ℂ)) :
     ∀ φ ∈ S, φ ≠ trivialIrreducibleCharacter L := by
   classical
-  letI : Fintype ↥H := Fintype.ofFinite _
+  let : Fintype ↥H := Fintype.ofFinite _
   intro φ hφ hφtriv
   have hrestrict : ClassFunction.restrict H (trivialIrreducibleCharacter L : ClassFunction L ℂ)
       = (trivialIrreducibleCharacter ↥H : ClassFunction ↥H ℂ) := by
@@ -592,7 +592,7 @@ theorem forall_mem_conj_ne_of_odd
       = ∑ φ ∈ S, (φ : ClassFunction L ℂ)) :
     ∀ φ ∈ S, ∀ φ' ∈ S, (φ : ClassFunction L ℂ).conj ≠ (φ' : ClassFunction L ℂ) := by
   classical
-  letI : Fintype ↥H := Fintype.ofFinite _
+  let : Fintype ↥H := Fintype.ofFinite _
   -- bundled complex conjugate (transparent `let` so `↑(bar ψ)` reduces to `↑ψ.conj`)
   let bar : IrreducibleCharacter L → IrreducibleCharacter L :=
     fun ψ => ⟨(ψ : ClassFunction L ℂ).conj, ψ.isIrreducible.conj⟩

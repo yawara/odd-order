@@ -259,6 +259,7 @@ lemma exists_four_subgroup_le_Q0 :
 
 
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi Part II, Ch. I §3, Lemma 4.** The group `Q₀` acts
 regularly on the generated orbit with its base point removed. -/
 noncomputable def orderThreeQ0RegularEquiv
@@ -589,7 +590,7 @@ lemma mem_subgroup_of_sq_eq_one_of_odd_index
     {A : Type*} [Group A] [Finite A] (R : Subgroup A)
     (hnormal : R.Normal) (hodd : Odd R.index)
     {z : A} (hz : z ^ 2 = 1) : z ∈ R := by
-  letI : R.Normal := hnormal
+  let : R.Normal := hnormal
   obtain ⟨j, hj⟩ := hodd
   have hzpow : z ^ R.index ∈ R := Subgroup.pow_index_mem R z
   have heq : z ^ R.index = z := by
@@ -676,9 +677,9 @@ theorem exists_orderThreeGeneratedSubgroup_mulEquiv_psl2
       (Subgroup.subgroupOfEquivOfLe hyp.orderThree_Q0_le).toEquiv
   cases result.target with
   | psl2 data =>
-      letI : Field data.F := data.fieldF
-      letI : Finite data.F := data.finiteF
-      letI : CharP data.F 2 := data.charTwoF
+      let : Field data.F := data.fieldF
+      let : Finite data.F := data.finiteF
+      let : CharP data.F 2 := data.charTwoF
       have hcardTarget : Nat.card hHyp.Q = Nat.card data.F :=
         hHyp.natCard_Q_eq_field_of_psl2Target result.L result.normal
           result.oddIndex data

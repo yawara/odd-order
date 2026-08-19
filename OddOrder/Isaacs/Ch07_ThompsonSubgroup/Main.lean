@@ -48,7 +48,7 @@ theorem sylow2_abelian_of_two_not_dvd
     {M : Type*} [Group M] [Finite M]
     (h2 : ¬ (2 : ℕ) ∣ Nat.card M) :
     ∀ S : Subgroup M, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   intro S hS x y
   -- `S` is a `2`-group; `|S| ∣ |M|`; since `2 ∤ |M|`, `|S| = 1`, so `S` is trivial.
   obtain ⟨n, hn⟩ := hS.exists_card_eq
@@ -57,7 +57,7 @@ theorem sylow2_abelian_of_two_not_dvd
     by_contra hne
     exact h2 ((hn ▸ dvd_pow_self 2 hne).trans hS_dvd)
   have hS_card_one : Nat.card ↥S = 1 := by rw [hn, hn0, pow_zero]
-  haveI : Subsingleton ↥S := Nat.card_eq_one_iff_unique.mp hS_card_one |>.1
+  have : Subsingleton ↥S := Nat.card_eq_one_iff_unique.mp hS_card_one |>.1
   exact Subsingleton.elim (x * y) (y * x)
 
 /-- **§7D Step 8 — fifth normal-J hypothesis** (Isaacs L4055-4063): for a
@@ -75,8 +75,8 @@ theorem step8_centralizer_center_eq_sylow
     {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
     [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
     {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
-    (hH_nsol : ¬ IsSolvable H)
-    (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K)
+    (hH_nsol : ¬ Group.IsSolvable H)
+    (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → Group.IsSolvable K)
     {M : Subgroup H} (hM_pType : IsPType p M)
     (S : Sylow p ↥M) :
     Subgroup.centralizer
@@ -125,7 +125,7 @@ theorem step8_centralizer_center_eq_sylow
       · exact absurd ((Nat.prime_dvd_prime_iff_eq hr_prime hq_prime).mp
           (hr_prime.dvd_of_dvd_pow h) ▸ hr_dvd_C) hq_ndvd
     -- Cauchy: an order-`q` element `y₀ ∈ C`.
-    haveI : Fact q.Prime := ⟨hq_prime⟩
+    have : Fact q.Prime := ⟨hq_prime⟩
     obtain ⟨y₀, hy₀_ord⟩ := exists_prime_orderOf_dvd_card' q hq_dvd_C
     -- `Y₀ = ⟨y₀.val⟩` is a nontrivial `q`-subgroup of `↥M`; map to `H`.
     set yM : ↥M := (y₀ : ↥M) with hyM_def
@@ -151,7 +151,7 @@ theorem step8_centralizer_center_eq_sylow
     -- Build the ambient `p`-central element `x ∈ Z(S) ⊆ M ∩ P` normalizing `YH`.
     -- (i) `M = N_H(V)` for `V = O_p(M).map subtype`.
     set K₀ : Subgroup ↥M := OddOrder.Isaacs.Ch01.opCore p ↥M with hK₀_def
-    haveI hK₀_normal : K₀.Normal := by rw [hK₀_def]; infer_instance
+    have hK₀_normal : K₀.Normal := by rw [hK₀_def]; infer_instance
     set V : Subgroup H := K₀.map M.subtype with hV_def
     have hV_ne_bot : V ≠ ⊥ := by
       intro hbot
@@ -185,7 +185,7 @@ theorem step8_centralizer_center_eq_sylow
       exact Subgroup.map_mono (hK₀_def ▸ OddOrder.Isaacs.Ch01.opCore_le S)
     have hV_le_PH : V ≤ (PH : Subgroup H) := hV_le_SH.trans hSH_le_PH
     -- (iv) Nontrivial `Z(PH)` element `x`, `p`-central.
-    haveI : Nontrivial ↥(PH : Subgroup H) :=
+    have : Nontrivial ↥(PH : Subgroup H) :=
       (PH : Subgroup H).nontrivial_iff_ne_bot.mpr hPH_ne_bot
     have hPHpg : IsPGroup p ↥(PH : Subgroup H) := PH.isPGroup'
     have hZPH_nt : Nontrivial (Subgroup.center ↥(PH : Subgroup H)) := hPHpg.center_nontrivial
@@ -284,8 +284,8 @@ theorem step8_sylow_full
     {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
     [Fact p.Prime] [Fact q.Prime] (_hpq : p ≠ q)
     {a b : ℕ} (_hH_card : Nat.card H = p ^ a * q ^ b)
-    (_hH_nsol : ¬ IsSolvable H)
-    (_hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K)
+    (_hH_nsol : ¬ Group.IsSolvable H)
+    (_hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → Group.IsSolvable K)
     {M : Subgroup H} (hM_pType : IsPType p M)
     (S : Sylow p ↥M)
     (hJ_normal : (Subgroup.thompsonJ (S : Subgroup ↥M) p).Normal) :
@@ -346,7 +346,7 @@ theorem step8_sylow_full
   have hSH_lt_PH : SH < (PH : Subgroup H) := lt_of_le_of_ne hSH_le_PH (by
     intro h; exact hPH_not_le (le_of_eq h.symm))
   -- Work inside `↥PH`: `SH.subgroupOf PH < ⊤`.
-  haveI : Group.IsNilpotent ↥(PH : Subgroup H) := PH.isPGroup'.isNilpotent
+  have : Group.IsNilpotent ↥(PH : Subgroup H) := PH.isPGroup'.isNilpotent
   have hNC : NormalizerCondition ↥(PH : Subgroup H) :=
     Group.normalizerCondition_of_isNilpotent (G := ↥(PH : Subgroup H))
   have hSH_subOf_lt_top : SH.subgroupOf (PH : Subgroup H) < ⊤ := by
@@ -410,8 +410,8 @@ theorem step8_normalJ_and_fullSylow
     {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
     [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
     {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
-    (hH_nsol : ¬ IsSolvable H)
-    (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K)
+    (hH_nsol : ¬ Group.IsSolvable H)
+    (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → Group.IsSolvable K)
     {M : Subgroup H} (hM_pType : IsPType p M)
     (S : Sylow p ↥M) :
     (Subgroup.thompsonJ (S : Subgroup ↥M) p).Normal ∧
@@ -427,12 +427,12 @@ theorem step8_normalJ_and_fullSylow
     have : Subsingleton ↥M := by rw [hMbot]; infer_instance
     exact hM_pType.2 (Subgroup.eq_bot_of_subsingleton _)
   have hM_ne_top : M ≠ ⊤ := hM_pType.1.ne_top
-  haveI hM_sol : IsSolvable ↥M := hSubgroupsSolvable M hM_ne_top
+  have hM_sol : Group.IsSolvable ↥M := hSubgroupsSolvable M hM_ne_top
   -- Step 7: both primes odd.
   obtain ⟨hp2, hq2⟩ := step7_p_ne_two_and_q_ne_two hpq hH_card hH_nsol hSubgroupsSolvable
   -- The five normal-J hypotheses on the group `↥M`.
   -- (1) `↥M` is `p`-solvable (it is solvable).
-  haveI hM_pSep : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) ↥M := inferInstance
+  have hM_pSep : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) ↥M := inferInstance
   -- (2) `p ≠ 2`.
   -- (3) Sylow-`2` subgroups abelian (trivial since `2 ∤ |M|`).
   have h2_not_dvd : ¬ (2 : ℕ) ∣ Nat.card ↥M :=
@@ -511,7 +511,7 @@ theorem exists_thompsonJ_ne
     {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
     [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
     {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
-    (hH_nsol : ¬ IsSolvable H) :
+    (hH_nsol : ¬ Group.IsSolvable H) :
     ∃ S T : Sylow p H,
       Subgroup.thompsonJ (S : Subgroup H) p ≠ Subgroup.thompsonJ (T : Subgroup H) p := by
   classical
@@ -594,7 +594,7 @@ theorem thompsonJ_eq_of_full_sylow_le_pType
   have h1 : Subgroup.thompsonJ (VM : Subgroup ↥M) p
       = Subgroup.thompsonJ ((UM : Subgroup ↥M).map (MulAut.conj g).toMonoidHom) p := by
     rw [← hg]; rfl
-  haveI := hJUM_normal
+  have := hJUM_normal
   rw [h1, Subgroup.thompsonJ_map_of_injective (MulAut.conj g).injective]
   -- goal: J(↑UM) = (J(↑UM)).map (conj g); use normality (map = smul = self).
   exact (Subgroup.Normal.conj_smul_eq_self g (Subgroup.thompsonJ (UM : Subgroup ↥M) p)).symm
@@ -603,14 +603,14 @@ theorem step9_core
     {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
     [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
     {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
-    (hH_nsol : ¬ IsSolvable H)
-    (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K)
+    (hH_nsol : ¬ Group.IsSolvable H)
+    (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → Group.IsSolvable K)
     (hgt : q ^ b < p ^ a)
     (hStep8 : ∀ {M : Subgroup H} (_ : IsPType p M) (S : Sylow p ↥M),
       (Subgroup.thompsonJ (S : Subgroup ↥M) p).Normal) :
     False := by
   classical
-  letI : Fintype (Sylow p H) := Fintype.ofFinite _
+  let : Fintype (Sylow p H) := Fintype.ofFinite _
   have hp_prime : p.Prime := Fact.out
   have hq_prime : q.Prime := Fact.out
   obtain ⟨hp_dvd, hq_dvd⟩ :=
@@ -799,8 +799,8 @@ theorem step9_contradiction
     {H : Type*} [Group H] [Finite H] [IsSimpleGroup H] {p q : ℕ}
     [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
     {a b : ℕ} (hH_card : Nat.card H = p ^ a * q ^ b)
-    (hH_nsol : ¬ IsSolvable H)
-    (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K)
+    (hH_nsol : ¬ Group.IsSolvable H)
+    (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → Group.IsSolvable K)
     (_hp2 : p ≠ 2) (_hq2 : q ≠ 2) :
     False := by
   classical
@@ -862,12 +862,12 @@ theorem noNonsolvableSimplePaQb.{u}
     {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
     (H : Type u) [Group H] [Finite H]
     (hH_simple : IsSimpleGroup H)
-    (hH_nsol : ¬ IsSolvable H)
+    (hH_nsol : ¬ Group.IsSolvable H)
     (hH_order : ∃ a b : ℕ, Nat.card H ∣ p ^ a * q ^ b)
-    (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K) :
+    (hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → Group.IsSolvable K) :
     False := by
   classical
-  haveI := hH_simple
+  have := hH_simple
   -- Upgrade |H| ∣ p^a q^b to an exact equality |H| = p^a' q^b'.
   obtain ⟨a, b, hH_dvd⟩ := hH_order
   obtain ⟨a', b', hH_card⟩ : ∃ a' b' : ℕ, Nat.card H = p ^ a' * q ^ b' :=
@@ -917,19 +917,19 @@ reduction via `isSimpleGroup_of_minCounterexample`, then invoke it.
 theorem burnside_p_pow_q_pow.{u}
     {G : Type u} [Group G] [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
     (hG_order : ∃ a b : ℕ, Nat.card G = p ^ a * q ^ b) :
-    IsSolvable G := by
+    Group.IsSolvable G := by
   rcases eq_or_ne p q with rfl | hpq
   · -- `p = q`: `|G| = p^(a+b)` is a `p`-group, hence nilpotent, hence solvable.
     obtain ⟨a, b, hab⟩ := hG_order
-    haveI hGp : IsPGroup p G := IsPGroup.of_card (n := a + b) (by rw [hab, pow_add])
-    haveI : Group.IsNilpotent G := hGp.isNilpotent
+    have hGp : IsPGroup p G := IsPGroup.of_card (n := a + b) (by rw [hab, pow_add])
+    have : Group.IsNilpotent G := hGp.isNilpotent
     infer_instance
   classical
   -- Strong induction on `Nat.card` via an explicit motive over arbitrary finite
   -- groups whose order divides `|G|`.
   let motive : ℕ → Prop := fun n =>
     ∀ (H : Type u) [Group H] [Finite H],
-      Nat.card H ∣ Nat.card G → Nat.card H = n → IsSolvable H
+      Nat.card H ∣ Nat.card G → Nat.card H = n → Group.IsSolvable H
   suffices hmain : motive (Nat.card G) by
     exact hmain G dvd_rfl rfl
   refine Nat.strong_induction_on (Nat.card G) ?_
@@ -940,7 +940,7 @@ theorem burnside_p_pow_q_pow.{u}
   have hH_pos : 0 < Nat.card H := Nat.pos_of_dvd_of_pos hH_dvd hG_pos
   -- Subgroup orders divide the ambient order; use Lagrange + IH.
   -- Every proper subgroup (not necessarily normal) is solvable.
-  have hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → IsSolvable K := by
+  have hSubgroupsSolvable : ∀ K : Subgroup H, K ≠ ⊤ → Group.IsSolvable K := by
     intro K hK_top
     have hK_dvd_H : Nat.card K ∣ Nat.card H := K.card_subgroup_dvd_card
     have hK_dvd_G : Nat.card K ∣ Nat.card G := hK_dvd_H.trans hH_dvd
@@ -952,11 +952,11 @@ theorem burnside_p_pow_q_pow.{u}
     exact ih (Nat.card K) hK_lt K hK_dvd_G rfl
   -- Restriction of the above to normal proper subgroups.
   have hN_solvable :
-      ∀ N : Subgroup H, N ≠ ⊤ → N.Normal → IsSolvable N := fun N hN _ =>
+      ∀ N : Subgroup H, N ≠ ⊤ → N.Normal → Group.IsSolvable N := fun N hN _ =>
     hSubgroupsSolvable N hN
   -- Quotient orders divide the ambient order; use index-bound + IH.
   have hQ_solvable :
-      ∀ (N : Subgroup H) [N.Normal], N ≠ ⊥ → IsSolvable (H ⧸ N) := by
+      ∀ (N : Subgroup H) [N.Normal], N ≠ ⊥ → Group.IsSolvable (H ⧸ N) := by
     intro N hN_norm hN_bot
     have hQ_dvd_H : Nat.card (H ⧸ N) ∣ Nat.card H := N.card_quotient_dvd_card
     have hQ_dvd_G : Nat.card (H ⧸ N) ∣ Nat.card G := hQ_dvd_H.trans hH_dvd
@@ -976,7 +976,7 @@ theorem burnside_p_pow_q_pow.{u}
     exact ih (Nat.card (H ⧸ N)) hQ_lt (H ⧸ N) hQ_dvd_G rfl
   -- H is nontrivial: |H| = n.  If n = 1 then H is trivial which is solvable
   -- (contradicting hH_nsol).
-  haveI hH_nontriv : Nontrivial H := by
+  have hH_nontriv : Nontrivial H := by
     by_contra h_not_nontriv
     rw [not_nontrivial_iff_subsingleton] at h_not_nontriv
     exact hH_nsol inferInstance

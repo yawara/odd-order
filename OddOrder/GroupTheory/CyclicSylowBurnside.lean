@@ -57,7 +57,7 @@ theorem exists_normal_complement_of_isCyclic_sylow (P : Sylow p G)
       Nat.card ↥K * Nat.card ↥(P : Subgroup G) = Nat.card G ∧ ¬ p ∣ Nat.card ↥K := by
   have hNC := normalizer_le_centralizer_of_coprime_totient P hP hcop
   refine ⟨(MonoidHom.transferSylow P hNC).ker, inferInstance, ?_, ?_⟩
-  · exact (MonoidHom.ker_transferSylow_isComplement' P hNC).card_mul
+  · exact (MonoidHom.ker_transferSylow_isComplement' P hNC).card_mul_card
   · exact MonoidHom.not_dvd_card_ker_transferSylow P hNC
 
 end OddOrder.GroupTheory

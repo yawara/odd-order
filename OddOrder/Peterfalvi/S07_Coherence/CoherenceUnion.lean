@@ -419,7 +419,7 @@ theorem exists_monotoneDegreeEnum {X : Set (ClassFunction L ℂ)} (hXfin : X.Fin
         (OddOrder.Peterfalvi.S03.characterDegree (e i)).re ≤
           (OddOrder.Peterfalvi.S03.characterDegree (e j)).re := by
   classical
-  letI : Fintype X := hXfin.fintype
+  let : Fintype X := hXfin.fintype
   -- `Fin n ≃ X`, where `n = X.ncard`.
   have hcard : Fintype.card X = X.ncard := by
     rw [← Nat.card_eq_fintype_card, Nat.card_coe_set_eq]

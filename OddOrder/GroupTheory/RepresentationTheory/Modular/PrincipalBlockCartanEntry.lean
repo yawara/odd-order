@@ -92,9 +92,9 @@ theorem decompositionMatrix_principalBlock_eq_card {i : ι'}
       = (Fintype.card (m i) : K) := by
   classical
   -- `φ_0` has degree one
-  haveI : Subsingleton (nn φ₀) :=
+  have : Subsingleton (nn φ₀) :=
     subsingleton_of_principalBlock_of_normalPComplement π hπ hlin hnil hNp hquot S hφ₀
-  haveI : Unique (nn φ₀) := uniqueOfSubsingleton (Classical.arbitrary (nn φ₀))
+  have : Unique (nn φ₀) := uniqueOfSubsingleton (Classical.arbitrary (nn φ₀))
   -- only the column `φ_0` survives in `χ⁰`
   have hother : ∀ φ : ι, φ ≠ φ₀ →
       decompositionMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e i φ = 0 := by
@@ -165,7 +165,7 @@ against `|N| · [G : N] = |G|` leaves `c_{φ_0 φ_0} = [G : N] = |S|`. -/
 theorem cartanMatrix_principalBlock_eq_card_sylow :
     cartanMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e φ₀ φ₀
       = Nat.card ↥(S : Subgroup G) := by
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   have hK := card_mul_cartanMatrix_principalBlock hp hω hω' hπ hlin hkerJ hnil e hNp hquot S hφ₀
   have hN : Nat.card ↥N * cartanMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e φ₀ φ₀
       = Nat.card G := by exact_mod_cast hK
@@ -187,7 +187,7 @@ theorem cartanMatrix_principalBlock_eq_card_sylow_of_hasNormalPComplement
     cartanMatrix (𝒪 := 𝒪) (nn := nn) hp hω hω' hπ hlin hkerJ e φ₀ φ₀
       = Nat.card ↥(S : Subgroup G) := by
   obtain ⟨N, hN, hc⟩ := hcomp
-  haveI := hN
+  have := hN
   exact cartanMatrix_principalBlock_eq_card_sylow hp hω hω' hπ hlin hkerJ hnil e
     (not_dvd_card_of_isComplement' S (hc S)) (isPGroup_quotient_of_isComplement' S (hc S)) S hφ₀
 

@@ -78,7 +78,7 @@ theorem card_sup_of_le_normalizer_of_coprime {G : Type*} [Group G] [Finite G]
     Nat.card ↥(N ⊔ S) = Nat.card ↥N * Nat.card ↥S := by
   have hNL : N ≤ N ⊔ S := le_sup_left
   have hSL : S ≤ N ⊔ S := le_sup_right
-  haveI hnormal : (N.subgroupOf (N ⊔ S)).Normal :=
+  have hnormal : (N.subgroupOf (N ⊔ S)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hNL).mpr (sup_le Subgroup.le_normalizer hnorm)
   have hcN : Nat.card ↥(N.subgroupOf (N ⊔ S)) = Nat.card ↥N :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNL).toEquiv

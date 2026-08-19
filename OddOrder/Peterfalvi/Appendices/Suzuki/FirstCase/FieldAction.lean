@@ -70,6 +70,7 @@ theorem toVbar_injective : Function.Injective fc.toVbar := by
   rw [fc.P_inf_W_eq_bot, Subgroup.mem_bot, inv_mul_eq_one] at hbot
   exact Subtype.ext hbot
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **The field model adapted to `P`** (Peterfalvi Part II, Ch. II, (1),
 p. 108): coordinates `eQ : Q₀ ≃ F` and `μ : K̄ ≃ Fˣ` under which `P` acts
 by field automorphisms `σhom`, together with the (B1) consequence that the
@@ -93,8 +94,8 @@ theorem exists_adapted_field_model :
   classical
   obtain ⟨F, hField, hFinite, A, hcardF, hVcyc, eQ, μ, νe,
       hT, hE, hκ, eL, hL1, hL2, hL3⟩ := fc.toHypothesis.exists_semilinear_equiv
-  letI : Field F := hField
-  letI : Finite F := hFinite
+  let : Field F := hField
+  let : Finite F := hFinite
   set σhom : ↥fc.P →* RingAut F :=
     A.subtype.comp (νe.toMonoidHom.comp fc.toVbar) with hσdef
   have hσinj : Function.Injective σhom := by
@@ -206,7 +207,7 @@ theorem exists_adapted_field_model :
       exact ha1 (hinjQ 1 a hv).symm
     have hcard3 : 3 ≤ Nat.card ↥(fc.toHypothesis.Q0 ⊓
         Subgroup.centralizer (fc.P : Set G)) := by
-      haveI : Fintype ↥(fc.toHypothesis.Q0 ⊓
+      have : Fintype ↥(fc.toHypothesis.Q0 ⊓
         Subgroup.centralizer (fc.P : Set G)) := Fintype.ofFinite _
       rw [Nat.card_eq_fintype_card, ← Finset.card_univ]
       calc 3 = ({y₀, y₁, ya} : Finset _).card := by
@@ -226,13 +227,13 @@ theorem card_Q0_eq_two_pow : Nat.card ↥fc.toHypothesis.Q0 = 2 ^ fc.p := by
   classical
   obtain ⟨F, hField, hFinite, eQ, μ, σhom, hcardF, hσinj, hbridge,
       hunits, hfixmem⟩ := fc.exists_adapted_field_model
-  letI : Field F := hField
-  letI : Finite F := hFinite
-  letI : MulSemiringAction ↥fc.P F := MulSemiringAction.compHom F σhom
-  haveI hfaith : FaithfulSMul ↥fc.P F :=
+  let : Field F := hField
+  let : Finite F := hFinite
+  let : MulSemiringAction ↥fc.P F := MulSemiringAction.compHom F σhom
+  have hfaith : FaithfulSMul ↥fc.P F :=
     ⟨fun {σ τ} h => hσinj (RingEquiv.ext fun a => h a)⟩
-  haveI : Fintype ↥fc.P := Fintype.ofFinite _
-  haveI : Fintype F := Fintype.ofFinite F
+  have : Fintype ↥fc.P := Fintype.ofFinite _
+  have : Fintype F := Fintype.ofFinite F
   set F₀ := FixedPoints.subfield ↥fc.P F with hF₀def
   have hartin : Module.finrank ↥F₀ F = Fintype.card ↥fc.P :=
     FixedPoints.finrank_eq_card ↥fc.P F

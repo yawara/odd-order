@@ -91,9 +91,9 @@ theorem caseB_column_anchored_full
       (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁).support ⊆
         OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
   classical
-  haveI : Fintype ↥H := Fintype.ofFinite _
-  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
-  haveI : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  have : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
   have hWne := caseB_column_W2_nonconstant h46 hHK hχ₂
   have hθirr : IsIrreducibleCharacter
       (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)) := by
@@ -284,10 +284,10 @@ theorem caseB_Xset_member_anchored
       X ∈ ZIrr G ∧
       (χ - a • η₁).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
   classical
-  haveI : Fintype ↥H := Fintype.ofFinite _
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
-  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
-  haveI : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  have : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
   obtain ⟨hχS, hχnotsub⟩ := hyp.mem_Xset.mp hχ
   rw [hyp.S_eq] at hχS
   obtain ⟨θ, hθne1, hχeq⟩ := hχS
@@ -424,10 +424,10 @@ theorem grid_mu_notMem_Xset
     [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) (i : Fin (Nat.card h46.W1)) :
     ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) ∉ hyp.Xset h46.W2 := by
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   intro hmem
   have hS := hyp.Xset_subset_S hmem
-  rw [hyp.S_eq, Set.mem_setOf_eq] at hS
+  rw [hyp.S_eq, Set.mem_ofPred_eq] at hS
   obtain ⟨θ, -, hμeq⟩ := hS
   obtain ⟨a, ha⟩ := h46.certainType_degree_modEq χ₂ i
   obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ

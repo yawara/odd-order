@@ -69,7 +69,7 @@ theorem not_isMulCommutative_sylow_of_dvd_card_commutator_inf_center
   have hz_ord : orderOf z₀.val = p := by
     rw [Subgroup.orderOf_coe]; exact hz₀
   -- ⟨z⟩ ⊴ G (z central)
-  haveI : (Subgroup.zpowers z₀.val).Normal := by
+  have : (Subgroup.zpowers z₀.val).Normal := by
     refine ⟨fun x hx g => ?_⟩
     obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp hx
     refine ⟨n, ?_⟩
@@ -177,7 +177,7 @@ theorem not_isCyclic_sylow_quotient_of_le_commutator_inf_center
   set P' : Sylow p (G ⧸ Z) := P.mapSurjective (QuotientGroup.mk'_surjective Z) with hP'
   -- 巡回性を Q から P' (共役) へ移送.
   obtain ⟨g, hg⟩ := MulAction.exists_smul_eq (G ⧸ Z) P' Q
-  haveI hcyc' : IsCyclic ↥(P' : Subgroup (G ⧸ Z)) := by
+  have hcyc' : IsCyclic ↥(P' : Subgroup (G ⧸ Z)) := by
     have e1 : ↥(P' : Subgroup (G ⧸ Z)) ≃* ↥((g • P' : Sylow p (G ⧸ Z)) : Subgroup (G ⧸ Z)) :=
       Sylow.equivSMul P' g
     have e2 : ↥((g • P' : Sylow p (G ⧸ Z)) : Subgroup (G ⧸ Z)) ≃*
@@ -185,7 +185,7 @@ theorem not_isCyclic_sylow_quotient_of_le_commutator_inf_center
       MulEquiv.subgroupCongr (congrArg _ hg)
     exact isCyclic_of_surjective _ (e1.trans e2).symm.surjective
   -- 制限準同型 ↥P →* ↥(P.map mk') の核 ≤ Z(P) → P 可換.
-  haveI hcyc'' : IsCyclic ↥(P.1.map (QuotientGroup.mk' Z)) := hcyc'
+  have hcyc'' : IsCyclic ↥(P.1.map (QuotientGroup.mk' Z)) := hcyc'
   have hcomm : IsMulCommutative ↥(P : Subgroup G) := by
     refine MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
       ((QuotientGroup.mk' Z).subgroupMap (P : Subgroup G)) ?_
@@ -261,7 +261,7 @@ commutators in `G`. -/
 theorem finite_commutatorSet_of_finiteIndex_center
     [Subgroup.FiniteIndex (Subgroup.center G)] : Finite (commutatorSet G) := by
   classical
-  letI := (Subgroup.center G).fintypeQuotientOfFiniteIndex
+  let := (Subgroup.center G).fintypeQuotientOfFiniteIndex
   let f : (G ⧸ Subgroup.center G) × (G ⧸ Subgroup.center G) → G := fun q =>
     ⁅q.1.out, q.2.out⁆
   have hsubset : commutatorSet G ⊆ Set.range f := by
@@ -275,7 +275,7 @@ theorem finite_commutatorSet_of_finiteIndex_center
 /-- **Isaacs Thm 5.7** (Schur): if `Z(G)` has finite index, then `G'` is finite. -/
 theorem finite_commutator_of_finiteIndex_center
     [Subgroup.FiniteIndex (Subgroup.center G)] : Finite (commutator G) := by
-  haveI : Finite (commutatorSet G) := finite_commutatorSet_of_finiteIndex_center (G := G)
+  have : Finite (commutatorSet G) := finite_commutatorSet_of_finiteIndex_center (G := G)
   infer_instance
 
 /-- **Isaacs Cor 5.9** (subgroup form): if `Z(G)` has finite index, every element of `G'`

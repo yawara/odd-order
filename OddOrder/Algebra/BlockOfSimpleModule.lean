@@ -46,8 +46,8 @@ theorem exists_eq_centralCharacterAlg_of_forall_smul_eq
     (h : ∀ m : M, (z : A) • m = (algebraMap k A c) • m) :
     ∃ i : ι, c = centralCharacterAlg π i hπ hlin z := by
   obtain ⟨i, ⟨e⟩⟩ := exists_linearEquiv_blockModule (nn := nn) hπ hker
-  letI := blockModule nn π i
-  haveI := isScalarTower_blockModule (k := k) hlin i
+  let := blockModule nn π i
+  have := isScalarTower_blockModule (k := k) hlin i
   refine ⟨i, eq_centralCharacterAlg_of_forall_smul_eq π i hπ hlin fun v => ?_⟩
   have hv := congrArg e (h (e.symm v))
   rw [map_smul, map_smul, e.apply_symm_apply] at hv

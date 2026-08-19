@@ -123,10 +123,10 @@ theorem step1_c_centralizer_oPiPrime_quotient_le_self
       OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p}
         (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) := by
   -- (1) `{p}`-separability passes to the quotient (mathlib instance).
-  haveI : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ)
+  have : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ)
       (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) := inferInstance
   -- (2) Take complement: `IsPiSeparable π G → IsPiSeparable {p | p ∉ π} G`.
-  haveI : OddOrder.Isaacs.Ch03.IsPiSeparable ({q | q ≠ p} : Set ℕ)
+  have : OddOrder.Isaacs.Ch03.IsPiSeparable ({q | q ≠ p} : Set ℕ)
       (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) := by
     have hcompl := OddOrder.Isaacs.Ch03.isPiSeparable_compl
       ({p} : Set ℕ) (G ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G) inferInstance

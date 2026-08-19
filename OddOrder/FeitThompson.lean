@@ -81,7 +81,7 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
          fun i => ((mp.certainTypeT hG).columnFamily
             (Section16CharacterData.colT hG mp tp i)).sign_eq⟩
       mu_degree_modEq_delta := fun i j => by
-        haveI : NeZero (Nat.card ↥(mp.certainTypeS hG).W1) :=
+        have : NeZero (Nat.card ↥(mp.certainTypeS hG).W1) :=
           ⟨by rw [Section16CharacterData.cardCertainTypeS_W1 hG mp tp]; exact tp.q_prime.pos.ne'⟩
         obtain ⟨a, ha⟩ := (mp.certainTypeS hG).certainType_degree_modEq
           (Section16CharacterData.chi2enum hG mp tp j) (Section16CharacterData.eqQ hG mp tp i)
@@ -91,7 +91,7 @@ noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Grou
         simp only [Section16CharacterData.muS, Section16CharacterData.deltaS, hq]
         exact ha
       delta_zero_eq_one := by
-        haveI : NeZero (Nat.card ↥(mp.certainTypeS hG).W1) :=
+        have : NeZero (Nat.card ↥(mp.certainTypeS hG).W1) :=
           ⟨by rw [Section16CharacterData.cardCertainTypeS_W1 hG mp tp]; exact tp.q_prime.pos.ne'⟩
         change Section16CharacterData.deltaS hG mp tp ⟨0, tp.p_prime.pos⟩ = 1
         rw [Section16CharacterData.deltaS, Section16CharacterData.chi2enum_zero]
@@ -502,15 +502,15 @@ odd order, then — using the induction hypothesis on its (smaller, odd-order) p
 subgroups and proper quotients — every proper subgroup is solvable and `G` is
 simple: a proper nontrivial normal subgroup `N` would make `G` an extension of the
 solvable group `N` by the solvable group `G ⧸ N`, hence solvable
-(`solvable_of_ker_le_range`). Thus `G` would be a minimal simple group of odd
+(`Group.isSolvable_of_ker_le_range`). Thus `G` would be a minimal simple group of odd
 order, contradicting the hypothesis `hno`. -/
 theorem feitThompson_of_noMinimalSimpleOdd
     (hno : ∀ (H : Type u) [Group H] [Finite H], IsMinimalSimpleOdd H → False)
     {G : Type u} [Group G] [Finite G] (hodd : Odd (Nat.card G)) :
-    IsSolvable G := by
+    Group.IsSolvable G := by
   -- Strong induction on the order, generalized over all groups in this universe.
   suffices key : ∀ (n : ℕ) (K : Type u) [Group K] [Finite K],
-      Nat.card K = n → Odd (Nat.card K) → IsSolvable K from key (Nat.card G) G rfl hodd
+      Nat.card K = n → Odd (Nat.card K) → Group.IsSolvable K from key (Nat.card G) G rfl hodd
   intro n
   induction n using Nat.strong_induction_on with
   | _ n ih =>
@@ -521,7 +521,7 @@ theorem feitThompson_of_noMinimalSimpleOdd
     have hNT : Nontrivial K := by
       by_contra hc
       rw [not_nontrivial_iff_subsingleton] at hc
-      haveI := hc
+      have := hc
       exact hns inferInstance
     -- `K` is simple: a proper nontrivial normal subgroup splits `K` as a solvable
     -- extension of a solvable group, making `K` solvable.
@@ -537,7 +537,7 @@ theorem feitThompson_of_noMinimalSimpleOdd
         have hidx : 1 < N.index := Subgroup.one_lt_index_of_ne_top hNtop
         have h := lt_mul_of_one_lt_right (Nat.card_pos (α := ↥N)) hidx
         rwa [Subgroup.card_mul_index] at h
-      haveI : IsSolvable ↥N := ih (Nat.card ↥N) hNlt ↥N rfl hN_odd
+      have : Group.IsSolvable ↥N := ih (Nat.card ↥N) hNlt ↥N rfl hN_odd
       -- `K ⧸ N` is solvable (proper quotient of odd order, induction hypothesis).
       have hQ_odd : Odd (Nat.card (K ⧸ N)) :=
         hodd'.of_dvd_nat (Subgroup.card_quotient_dvd_card N)
@@ -546,13 +546,13 @@ theorem feitThompson_of_noMinimalSimpleOdd
           Finite.one_lt_card_iff_nontrivial.mpr ((Subgroup.nontrivial_iff_ne_bot N).mpr hNbot)
         have h := lt_mul_of_one_lt_right (Nat.card_pos (α := K ⧸ N)) hN1
         rwa [← Subgroup.card_eq_card_quotient_mul_card_subgroup] at h
-      haveI : IsSolvable (K ⧸ N) := ih (Nat.card (K ⧸ N)) hQlt (K ⧸ N) rfl hQ_odd
+      have : Group.IsSolvable (K ⧸ N) := ih (Nat.card (K ⧸ N)) hQlt (K ⧸ N) rfl hQ_odd
       -- Extension of a solvable group by a solvable group is solvable.
       have hfg : (QuotientGroup.mk' N).ker ≤ (N.subtype).range :=
         le_of_eq ((QuotientGroup.ker_mk' N).trans (Subgroup.subtype_range N).symm)
-      exact hns (solvable_of_ker_le_range N.subtype (QuotientGroup.mk' N) hfg)
+      exact hns (Group.isSolvable_of_ker_le_range N.subtype (QuotientGroup.mk' N) hfg)
     -- Every proper subgroup is solvable (smaller, odd order, induction hypothesis).
-    have hproper : ∀ M : Subgroup K, M < ⊤ → IsSolvable ↥M := by
+    have hproper : ∀ M : Subgroup K, M < ⊤ → Group.IsSolvable ↥M := by
       intro M hM
       have hM_odd : Odd (Nat.card ↥M) :=
         hodd'.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
@@ -574,7 +574,7 @@ group of odd order (`noMinimalSimpleOdd`).  The complete theorem is axiom-clean:
 `#print axioms` reports only `propext`, `Classical.choice`, and `Quot.sound`. -/
 theorem feitThompson {G : Type*} [Group G] [Finite G]
     (hodd : Odd (Nat.card G)) :
-    IsSolvable G :=
+    Group.IsSolvable G :=
   feitThompson_of_noMinimalSimpleOdd (fun _ _ _ hG => noMinimalSimpleOdd hG) hodd
 
 end OddOrder

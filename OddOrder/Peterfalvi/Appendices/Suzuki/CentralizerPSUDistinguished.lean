@@ -568,7 +568,7 @@ theorem orderOf_distinguishedInvolution_mul_t_of_centralizer_psu3Target
       PSU3InductionTarget (Omega := ↥(MulAction.fixedPoints X Omega))
         result.L) :
     orderOf (hyp.distinguishedInvolution * hyp.t) = 3 := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   let qhyp := hyp.centralizerQuotientHypothesis hXV hA3
   have hquotOrder :
       orderOf (qhyp.distinguishedInvolution * qhyp.t) = 3 :=

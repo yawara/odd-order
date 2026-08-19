@@ -46,8 +46,8 @@ theorem exists_typeIII_primeTIredZero_with_inner [Finite G]
     OddOrder.Peterfalvi.S12.typePData_toS06Hypothesis td.typeP hG.odd
       (OddOrder.Peterfalvi.S12.typePData_W1_hall_coprime
         hG hyp.base.T_maximal hP td.typeP)
-  letI : NeZero (Nat.card ↥s06.W1) := ⟨Nat.card_pos.ne'⟩
-  letI : NeZero (Nat.card ↥s06.W2) := ⟨Nat.card_pos.ne'⟩
+  let : NeZero (Nat.card ↥s06.W1) := ⟨Nat.card_pos.ne'⟩
+  let : NeZero (Nat.card ↥s06.W2) := ⟨Nat.card_pos.ne'⟩
   let residue : PrimeTIResidueData ↥hyp.base.T s06.K
       (Nat.card ↥s06.W1) (Nat.card ↥s06.W2) :=
     PrimeTIResidueData.ofS06Hypothesis s06 ⊤ le_top
@@ -55,7 +55,7 @@ theorem exists_typeIII_primeTIredZero_with_inner [Finite G]
   · change (residue.primeTIred 0).conj = residue.primeTIred 0
     rw [← residue.cfInd_prTIres 0, residue.prTIres0,
       ClassFunction.induce_conj, trivialClassFunction_isReal]
-  · haveI : s06.K.Normal := s06.K_normal
+  · have : s06.K.Normal := s06.K_normal
     change (residue.primeTIred 0).support ⊆ (s06.K : Set ↥hyp.base.T)
     rw [← residue.cfInd_prTIres 0, residue.prTIres0]
     exact ClassFunction.support_induce_subset_of_normal s06.K
@@ -121,8 +121,8 @@ theorem exists_typeIII_primeTIredZero_with_projectionData_galois_and_eq_induce [
     OddOrder.Peterfalvi.S12.typePData_toS06Hypothesis td.typeP hG.odd
       (OddOrder.Peterfalvi.S12.typePData_W1_hall_coprime
         hG hyp.base.T_maximal hP td.typeP)
-  letI : NeZero (Nat.card ↥s06.W1) := ⟨Nat.card_pos.ne'⟩
-  letI : NeZero (Nat.card ↥s06.W2) := ⟨Nat.card_pos.ne'⟩
+  let : NeZero (Nat.card ↥s06.W1) := ⟨Nat.card_pos.ne'⟩
+  let : NeZero (Nat.card ↥s06.W2) := ⟨Nat.card_pos.ne'⟩
   let residue : PrimeTIResidueData ↥hyp.base.T s06.K
       (Nat.card ↥s06.W1) (Nat.card ↥s06.W2) :=
     PrimeTIResidueData.ofS06Hypothesis s06 ⊤ le_top
@@ -131,7 +131,7 @@ theorem exists_typeIII_primeTIredZero_with_projectionData_galois_and_eq_induce [
   · change (residue.primeTIred 0).conj = residue.primeTIred 0
     rw [← residue.cfInd_prTIres 0, residue.prTIres0,
       ClassFunction.induce_conj, trivialClassFunction_isReal]
-  · haveI : s06.K.Normal := s06.K_normal
+  · have : s06.K.Normal := s06.K_normal
     change (residue.primeTIred 0).support ⊆ (s06.K : Set ↥hyp.base.T)
     rw [← residue.cfInd_prTIres 0, residue.prTIres0]
     exact ClassFunction.support_induce_subset_of_normal s06.K
@@ -428,7 +428,7 @@ theorem exists_typeIII_primeTIDifference_with_anchor_inner [Finite G]
       OddOrder.Peterfalvi.S12.FiniteInduce.natCardInvC hyp.base.T :=
     Subsingleton.elim _ _
   subst invertibleT
-  letI : Invertible (Nat.card ↥hyp.base.T : ℂ) :=
+  let : Invertible (Nat.card ↥hyp.base.T : ℂ) :=
     OddOrder.Peterfalvi.S12.FiniteInduce.natCardInvC hyp.base.T
   obtain ⟨ν0, hνZ, hνR, hνsupp, hν1, hνinner⟩ :=
     exists_typeIII_primeTIredZero_with_inner hG hyp hIII
@@ -512,8 +512,8 @@ theorem typeIII_induced_source_support [Finite G]
         θ.toClassFunction).support ⊆
       ((derivedInG hyp.base.T).subgroupOf hyp.base.T :
         Set ↥hyp.base.T) := by
-  haveI : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
-  haveI : ((derivedInG hyp.base.T).subgroupOf hyp.base.T).Normal :=
+  have : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
+  have : ((derivedInG hyp.base.T).subgroupOf hyp.base.T).Normal :=
     T_derivedSubgroupOf_normal hyp
   intro x hx
   by_contra h
@@ -536,7 +536,7 @@ theorem typeIII_induced_source_degree [Finite G]
     ClassFunction.induce
       ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
         θ.toClassFunction 1 = (hyp.base.p : ℂ) := by
-  haveI : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
+  have : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
   rw [ClassFunction.induce_apply_one, T_derived_index_eq_p hyp,
     hθ1, mul_one]
 

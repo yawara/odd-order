@@ -50,6 +50,7 @@ theorem pow_apply_of_mem_eigenspace {A : Module.End F V} {ζ : F} {v : V}
       rw [pow_succ, Module.End.mul_apply, mem_eigenspace_iff.mp hv, map_smul, ih, smul_smul,
         ← pow_succ']
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **The trace of a power, from the eigenvalues of the operator.**  Both sides use the
 multiplicities of `A` itself, so the identity holds for every exponent at once. -/
 theorem trace_pow_eq_sum_finrank_smul [FiniteDimensional F V] {A : Module.End F V} {m : ℕ}
@@ -94,7 +95,7 @@ theorem character_pow_eq_sum_finrank_smul [FiniteDimensional K W] (ρ : Represen
 /-- Every `m`-th root of unity is a power of a primitive one. -/
 theorem mem_adjoin_of_mem_nthRootsFinset {m : ℕ} (hm : 0 < m) {ω : K} (hω : IsPrimitiveRoot ω m)
     {ζ : K} (hζ : ζ ∈ nthRootsFinset m (1 : K)) : ζ ∈ Algebra.adjoin ℤ ({ω} : Set K) := by
-  haveI : NeZero m := ⟨hm.ne'⟩
+  have : NeZero m := ⟨hm.ne'⟩
   obtain ⟨j, -, rfl⟩ := hω.eq_pow_of_pow_eq_one ((mem_nthRootsFinset hm _).mp hζ)
   exact Subalgebra.pow_mem _ (Algebra.self_mem_adjoin_singleton ℤ ω) j
 

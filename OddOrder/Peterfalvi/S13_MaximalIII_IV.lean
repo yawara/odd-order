@@ -78,9 +78,9 @@ column-pair adjunction): it sits inside the finite kernel filtration `S(Y)`
 theorem irrCut_finite [Finite G] {M : Subgroup G} (hyp : Hypothesis M) (Y : Subgroup G) (d : ℕ) :
     {φ : ClassFunction ↥M ℂ | φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup Y ∧
       IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))}.Finite := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
-  letI : Fintype ↥M := Fintype.ofFinite _
+  let : Fintype ↥M := Fintype.ofFinite _
   refine (OddOrder.Peterfalvi.S08.inducedKernelFamily_finite
     (K := (derivedInG M).subgroupOf M) (Y.subgroupOf M)).subset ?_
   intro φ hφ
@@ -109,7 +109,7 @@ theorem tau_apply_eq_zero_of_mem_typePV [Finite G]
     (hv : v ∈ (OddOrder.Peterfalvi.S06.ticVdiff (hyp.toHypothesis46 hG hG.odd)).V) :
     OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
       (hyp.dadeData.dade.fullDadeIsometryData) α v = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   refine OddOrder.Peterfalvi.S06.dadeICM_apply_eq_zero_of_mem_ticVdiffV
     (hyp.toHypothesis46 hG hG.odd) ?_ ?_ hv
@@ -156,7 +156,7 @@ theorem certainTypeR_imageSet_orthogonal_dadeOfDiff_typeP [Finite G]
     ∀ β ∈ (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp.dadeData.dade
       χ hrealχ hdiffsuppχ).imageSet,
       ClassFunction.inner α β = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   -- The whole argument is now the general (5.2.e) mixed-stratum theorem
   -- (`S08_CrossOrthogonality`); the only §12-specific input is the anchor: `(χ − χ̄)^τ` vanishes
@@ -407,7 +407,7 @@ theorem caseB_sOf_member_dichotomy [Finite G]
       ∃ k : Fin hyp.base.w2, k ≠ 0 ∧
         φ = OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
           (hyp.base.muColumnChar hG hG.odd k) := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   by_cases hirr : IsIrreducibleCharacter φ
   · exact Or.inl ⟨hφ, hirr, hunif φ hφ⟩
@@ -476,6 +476,7 @@ noncomputable def caseB_sOf_memberRFamily [Finite G]
     exact OddOrder.Peterfalvi.S06.columnR (hyp.base.toHypothesis46 hG hG.odd)
       (hyp.base.muColumnChar_ne_one hG hG.odd hk0) hkeq
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **`caseB_sOf_memberRFamily` reduction, irreducible case**: for an irreducible member `η`, the
 dispatched `R`-family *is* `dadeOrthonormalCharacterImageFamilyOfDiff` (imageSet form).  The
 realness and support proofs are existential (proof-irrelevant inputs to a proof-independent
@@ -497,7 +498,7 @@ theorem caseB_sOf_memberRFamily_imageSet_of_irr [Finite G]
       (caseB_sOf_memberRFamily hG hyp d hunif hη).imageSet =
         (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
           hyp.base.dadeData.dade ⟨η, hirr⟩ hr hs).imageSet := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
   have hηIKF0 : η ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
       ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) :=
@@ -510,6 +511,7 @@ theorem caseB_sOf_memberRFamily_imageSet_of_irr [Finite G]
   unfold caseB_sOf_memberRFamily
   rw [dif_pos hirr]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **`caseB_sOf_memberRFamily` reduction, column case**: for a reducible member `η`, the dispatched
 `R`-family *is* `certainTypeR` at the certain-type column `χ₂ = muColumnChar k` (imageSet form),
 for the internally-chosen column index `k` (exposed existentially together with the membership
@@ -532,7 +534,7 @@ theorem caseB_sOf_memberRFamily_imageSet_of_col [Finite G]
           (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
           (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
             (hyp.base.muColumnChar hG hG.odd k)).symm).imageSet := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   have hex := (caseB_sOf_member_dichotomy hG hyp d hunif hη).resolve_left (fun h => hcol h.2.1)
   refine ⟨hex.choose, hex.choose_spec.1, hex.choose_spec.2, ?_⟩
   unfold caseB_sOf_memberRFamily
@@ -599,7 +601,7 @@ theorem caseB_sOf_memberRFamily_orthogonal [Finite G]
     (h1 : ClassFunction.inner φ ξ = 0) (h2 : ClassFunction.inner φ ξ.conj = 0) :
     (caseB_sOf_memberRFamily hG hyp d hunif hφ).Orthogonal
       (caseB_sOf_memberRFamily hG hyp d hunif hξ) := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
   -- typePA support for an irreducible member (needed by the μ×irr cross-orthogonality)
@@ -704,7 +706,7 @@ theorem sOf_anchor_diff_support [Finite G]
     {x : ClassFunction ↥M ℂ}
     (hx : x ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) :
     ((x - χ₁ : ClassFunction ↥M ℂ)).support ⊆ hyp.base.A0 := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   have hIKF : ∀ y ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
       y ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily

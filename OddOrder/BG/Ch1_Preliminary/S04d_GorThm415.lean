@@ -104,7 +104,7 @@ private theorem lt_closure_conj_of_noncyclic (hP : IsPGroup p P) {x y : P}
     · exact ⟨y₀, Subgroup.mem_sup_left (Subgroup.mem_zpowers y₀), rfl⟩
     · exact ⟨c₀, hc₀_mem, rfl⟩
   have hzeq : Subgroup.zpowers y₀ = ⊤ := frattini_nongenerating hsup_top
-  haveI : IsCyclic Q := isCyclic_iff_exists_zpowers_eq_top.mpr ⟨y₀, hzeq⟩
+  have : IsCyclic Q := isCyclic_iff_exists_zpowers_eq_top.mpr ⟨y₀, hzeq⟩
   exact isCyclic_of_surjective (MulEquiv.subgroupCongr hQeq).toMonoidHom
     (MulEquiv.subgroupCongr hQeq).surjective
 
@@ -145,8 +145,8 @@ private theorem class_le_two_of_two_abelian_normal {M : Type*} [Group M]
     (hX : ∀ a ∈ X, ∀ b ∈ X, a * b = b * a) (hY : ∀ a ∈ Y, ∀ b ∈ Y, a * b = b * a)
     (hsup : X ⊔ Y = ⊤) :
     _root_.commutator M ≤ Subgroup.center M := by
-  haveI hXc : IsMulCommutative X := ⟨⟨fun a b => Subtype.ext (hX a a.2 b b.2)⟩⟩
-  haveI hYc : IsMulCommutative Y := ⟨⟨fun a b => Subtype.ext (hY a a.2 b b.2)⟩⟩
+  have hXc : IsMulCommutative X := ⟨⟨fun a b => Subtype.ext (hX a a.2 b b.2)⟩⟩
+  have hYc : IsMulCommutative Y := ⟨⟨fun a b => Subtype.ext (hY a a.2 b b.2)⟩⟩
   -- `⁅X, Y⁆ ≤ Z(M)`.
   have hXY_central : ⁅X, Y⁆ ≤ Subgroup.center M := by
     -- `⁅X, Y⁆ ≤ X ⊓ Y`.
@@ -313,7 +313,7 @@ private theorem omega1Map_eq_closure (M : Subgroup P) :
   rw [omega1Map, Omega, MonoidHom.map_closure]
   congr 1
   ext n
-  simp only [Set.mem_image, Set.mem_setOf_eq, Subgroup.coe_subtype, pow_one]
+  simp only [Set.mem_image, Set.mem_ofPred_eq, Subgroup.coe_subtype, pow_one]
   constructor
   · rintro ⟨m, hm, rfl⟩
     refine ⟨m.2, ?_⟩
@@ -383,7 +383,7 @@ private theorem stabilizes_of_order_p_centralizing (hp_odd : Odd p) (hP : IsPGro
     refine (mem_omega1OfAbelian).mpr ⟨(inferInstance : A.Normal).conj_mem h hh'.1 g, ?_⟩
     calc (g * h * g⁻¹) ^ p = g * h ^ p * g⁻¹ := conj_pow
       _ = 1 := by rw [hh'.2, mul_one, mul_inv_cancel]
-  haveI hH_norm_inst : H.Normal := hH_normal
+  have hH_norm_inst : H.Normal := hH_normal
   -- `↑B₁ = ↑H * ↑⟨x⟩` (as sets), so elements of `B₁` are `h·x^k`.
   have hB₁_mul : (↑B₁ : Set P) = (↑H : Set P) * (↑(Subgroup.zpowers x) : Set P) := by
     rw [hB₁_def]; exact Subgroup.normal_mul H (Subgroup.zpowers x)
@@ -434,8 +434,8 @@ private theorem stabilizes_of_order_p_centralizing (hp_odd : Odd p) (hP : IsPGro
         have hgB₁ : g ∈ B₁ := hEq ▸ hg
         exact B₁.mul_mem (B₁.mul_mem hgB₁ hb) (B₁.inv_mem hgB₁)
       · -- `B₁ < G'`: descend to a maximal `M` with `B₁ ≤ M < G'`.
-        haveI hG'pg : IsPGroup p ↥G' := hP.to_subgroup G'
-        haveI : Finite ↥G' := inferInstance
+        have hG'pg : IsPGroup p ↥G' := hP.to_subgroup G'
+        have : Finite ↥G' := inferInstance
         -- `B₁.subgroupOf G' < ⊤`.
         have hsub_lt : B₁.subgroupOf G' < ⊤ := by
           rw [lt_top_iff_ne_top, Ne, Subgroup.subgroupOf_eq_top]
@@ -455,7 +455,7 @@ private theorem stabilizes_of_order_p_centralizing (hp_odd : Odd p) (hP : IsPGro
         have hxM : x ∈ M := hB₁_le_M hxB₁
         have hM_le_G : M ≤ G := le_trans hM_le_G' hG'G
         -- `M ◁ G'` (coatom in `p`-group): element-wise.
-        haveI hM'_normal : M'.Normal := hM'_coat.normal_of_isPGroup hG'pg
+        have hM'_normal : M'.Normal := hM'_coat.normal_of_isPGroup hG'pg
         have hM_normal_in_G' : ∀ m ∈ M, ∀ g' ∈ G', g' * m * g'⁻¹ ∈ M := by
           intro m hm g' hg'
           rw [hM_def, Subgroup.mem_map] at hm ⊢
@@ -486,9 +486,9 @@ private theorem stabilizes_of_order_p_centralizing (hp_odd : Odd p) (hP : IsPGro
         -- `X = B₁.subgroupOf M`, `Y = A.subgroupOf M`: abelian normal in `↥M`, sup `= ⊤`.
         set X : Subgroup ↥M := B₁.subgroupOf M with hX_def
         set Y : Subgroup ↥M := A.subgroupOf M with hY_def
-        haveI hY_normal : Y.Normal := by
+        have hY_normal : Y.Normal := by
           rw [hY_def]; exact (inferInstance : A.Normal).comap M.subtype
-        haveI hX_normal : X.Normal := by
+        have hX_normal : X.Normal := by
           refine { conj_mem := ?_ }
           intro w hw g
           rw [hX_def, Subgroup.mem_subgroupOf] at hw ⊢
@@ -672,7 +672,7 @@ private theorem omega1_centralizer_mul_pow (hp_odd : Odd p) (hP : IsPGroup p P)
         have hncyc : ¬ IsCyclic ↥K := by
           intro hcyc
           apply hcl
-          haveI := hcyc
+          have := hcyc
           -- cyclic ⇒ abelian ⇒ `center ↥K = ⊤`, so everything is `≤ center`.
           have hcomm_K : ∀ a b : ↥K, a * b = b * a :=
             (MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
@@ -857,6 +857,7 @@ private theorem omega1_centralizer_mul_pow (hp_odd : Odd p) (hP : IsPGroup p P)
 
 /-! ## Main theorem: Gorenstein Lemma 4.14 -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Gorenstein "Finite Groups" Lemma 4.14.** Let `P` be a finite `p`-group, `p`
 odd, and let `A` be a maximal abelian normal subgroup of `P` of maximal `p`-rank
 among normal abelian subgroups (`m(A) = d_n(P)`). Then
@@ -918,8 +919,8 @@ theorem omega1_centralizer_omega1_eq_omega1_of_maximal_rank
     refine (mem_omega1OfAbelian).mpr ⟨(inferInstance : A.Normal).conj_mem h hh'.1 g, ?_⟩
     calc (g * h * g⁻¹) ^ p = g * h ^ p * g⁻¹ := conj_pow
       _ = 1 := by rw [hh'.2, mul_one, mul_inv_cancel]
-  haveI := hH_normal
-  haveI hC_normal : C.Normal := by rw [hC_def]; infer_instance
+  have := hH_normal
+  have hC_normal : C.Normal := by rw [hC_def]; infer_instance
   have hD_normal : (omega1Map C p).Normal :=
     normal_of_characteristic_subgroupOf omega1Map_le
       (by rw [omega1Map]; rw [Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective
@@ -931,9 +932,9 @@ theorem omega1_centralizer_omega1_eq_omega1_of_maximal_rank
   have hHD_lt : H < omega1Map C p := lt_of_le_of_ne hH_le_D (fun heq => hnotle (heq ▸ le_rfl))
   -- Work in `Q = P ⧸ H`.
   set q := QuotientGroup.mk' H with hq_def
-  haveI hPQ : IsPGroup p (P ⧸ H) := hP.to_quotient H
+  have hPQ : IsPGroup p (P ⧸ H) := hP.to_quotient H
   set Dbar := (omega1Map C p).map q with hDbar_def
-  haveI hDbar_normal : Dbar.Normal :=
+  have hDbar_normal : Dbar.Normal :=
     Subgroup.Normal.map hD_normal q (QuotientGroup.mk'_surjective H)
   have hDbar_ne : Dbar ≠ ⊥ := by
     obtain ⟨d, hdD, hdH⟩ := SetLike.exists_of_lt hHD_lt
@@ -948,12 +949,12 @@ theorem omega1_centralizer_omega1_eq_omega1_of_maximal_rank
   -- `E = preimage of ⟨x̄⟩`; normal, `H < E ≤ D`, `|E : H| = p`.
   have hzp_center : Subgroup.zpowers xbar ≤ Subgroup.center (P ⧸ H) :=
     Subgroup.zpowers_le.mpr hxbar_center
-  haveI hzp_normal : (Subgroup.zpowers xbar).Normal :=
+  have hzp_normal : (Subgroup.zpowers xbar).Normal :=
     { conj_mem := fun n hn g => by
         rw [Subgroup.mem_center_iff.mp (hzp_center hn) g, mul_assoc, mul_inv_cancel, mul_one]
         exact hn }
   set E := (Subgroup.zpowers xbar).comap q with hE_def
-  haveI hE_normal : E.Normal := inferInstance
+  have hE_normal : E.Normal := inferInstance
   -- `H ≤ E`, `E ≤ D`, `H < E`.
   have hH_le_E : H ≤ E := by
     intro h hh
@@ -1033,7 +1034,7 @@ theorem omega1_centralizer_omega1_eq_omega1_of_maximal_rank
     have heC : (e : P) ∈ C := hE_le_C e.2
     exact ((Subgroup.mem_centralizer_iff.mp heC) _ hh).symm
   -- `E/H` is cyclic (≅ ⟨x̄⟩).
-  haveI hEH_cyclic : IsCyclic (E ⧸ H.subgroupOf E) := by
+  have hEH_cyclic : IsCyclic (E ⧸ H.subgroupOf E) := by
     have hf_mem : ∀ e : E, q (e : P) ∈ Subgroup.zpowers xbar := fun e => e.2
     set f : E →* Subgroup.zpowers xbar :=
       (q.comp E.subtype).codRestrict (Subgroup.zpowers xbar) hf_mem with hf_def
@@ -1063,7 +1064,7 @@ theorem omega1_centralizer_omega1_eq_omega1_of_maximal_rank
           OneMemClass.coe_one]
         rw [hq_def, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]; exact he
     -- `↥E ⧸ ker f ≅ ⟨x̄⟩` cyclic; transport along `ker f = H.subgroupOf E`.
-    haveI : IsCyclic (Subgroup.zpowers xbar) := inferInstance
+    have : IsCyclic (Subgroup.zpowers xbar) := inferInstance
     have hcyc_ker : IsCyclic (E ⧸ f.ker) := isCyclic_of_surjective
       (QuotientGroup.quotientKerEquivOfSurjective f hf_surj).symm.toMonoidHom
       (QuotientGroup.quotientKerEquivOfSurjective f hf_surj).symm.surjective
@@ -1075,7 +1076,7 @@ theorem omega1_centralizer_omega1_eq_omega1_of_maximal_rank
       (QuotientGroup.mk' (H.subgroupOf E))
       (le_trans (le_of_eq (QuotientGroup.ker_mk' _)) hHsub_le_center)).is_comm.comm ⟨a, ha⟩ ⟨b, hb⟩
     exact congrArg Subtype.val this
-  haveI hE_mulcomm : IsMulCommutative ↥E := ⟨⟨fun a b => Subtype.ext (hE_comm a a.2 b b.2)⟩⟩
+  have hE_mulcomm : IsMulCommutative ↥E := ⟨⟨fun a b => Subtype.ext (hE_comm a a.2 b b.2)⟩⟩
   -- `E` is elementary abelian (`E ≤ D` exp `p`).
   have hE_elemAb : E.IsElementaryAbelian p := by
     refine ⟨fun a b => Subtype.ext (hE_comm a a.2 b b.2), fun e => ?_⟩
@@ -1149,8 +1150,8 @@ theorem pRank_le_two_of_normalAbelian_pRank_le_two
   rw [not_le] at hElog
   -- (1) maximal abelian normal `A` of maximal rank
   obtain ⟨A, hAmax, hAmaxrank⟩ := exists_maxRank_maximalAbelianNormal (G := P) p
-  haveI hAnorm : A.Normal := hAmax.isNormal
-  haveI hAcomm_inst : IsMulCommutative A := hAmax.isMulCommutative
+  have hAnorm : A.Normal := hAmax.isNormal
+  have hAcomm_inst : IsMulCommutative A := hAmax.isMulCommutative
   have hA_comm : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x :=
     fun x hx y hy => congrArg Subtype.val (mul_comm' (⟨x, hx⟩ : A) (⟨y, hy⟩ : A))
   have hA_maxAb : ∀ N : Subgroup P, N.Normal →
@@ -1169,12 +1170,12 @@ theorem pRank_le_two_of_normalAbelian_pRank_le_two
     refine (mem_omega1OfAbelian).mpr ⟨hAnorm.conj_mem h hh'.1 g, ?_⟩
     calc (g * h * g⁻¹) ^ p = g * h ^ p * g⁻¹ := conj_pow
       _ = 1 := by rw [hh'.2, mul_one, mul_inv_cancel]
-  haveI : H.Normal := hH_normal
+  have : H.Normal := hH_normal
   -- `H` elementary abelian
   have hH_ea : IsElementaryAbelian p ↥H :=
     ⟨fun x y => Subtype.ext (hA_comm x.val (hH_le_A x.2) y.val (hH_le_A y.2)),
      fun x => Subtype.ext (by simpa using pow_eq_one_of_mem_omega1OfAbelian x.2)⟩
-  haveI hHcomm : IsMulCommutative ↥H := IsMulCommutative.of_comm hH_ea.comm
+  have hHcomm : IsMulCommutative ↥H := IsMulCommutative.of_comm hH_ea.comm
   -- `|H| ≤ p²`
   have hHcard_le : Nat.card ↥H ≤ p ^ 2 := by
     have hlogle : Nat.log p (Nat.card ↥H) ≤ 2 :=

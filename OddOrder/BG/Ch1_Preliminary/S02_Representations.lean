@@ -129,7 +129,7 @@ private theorem odd_two_dim_abelian_strong_induction
       intro N hNnormal hN_ne_bot hN_ne_top
       let Gstar : Subgroup G := determinantKernelSubgroup ρ
       let ρN : Representation F N V := ρ.comp (Gstar.subtype.comp N.subtype)
-      haveI : Nontrivial N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN_ne_bot
+      have : Nontrivial N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN_ne_bot
       have hfaithfulN : Function.Injective ρN := by
         intro x y hxy
         apply Subtype.ext
@@ -222,7 +222,7 @@ theorem odd_two_dim_sylow_abelian
     (hchar : CharP F p) (P : Sylow p G) :
     Std.Commutative (· * · : P → P → P) ∧
       commutator G ≤ (P : Subgroup G) := by
-  haveI : CharP F p := hchar
+  have : CharP F p := hchar
   exact
     odd_two_dim_sylow_abelian_strong_induction
       (p := p) (F := F) (V := V) (Nat.card G)

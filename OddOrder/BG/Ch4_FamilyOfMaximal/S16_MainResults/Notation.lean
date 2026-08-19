@@ -177,7 +177,7 @@ theorem isHallSubgroup_subgroupOf_inf_of_normal_isHall [Finite G] {π : Set ℕ}
     (hAhall : Ch03.IsHallSubgroup π (A.subgroupOf N))
     (hAnorm : (A.subgroupOf N).Normal) :
     Ch03.IsHallSubgroup π ((A ⊓ H).subgroupOf H) := by
-  haveI : (A.subgroupOf N).Normal := hAnorm
+  have : (A.subgroupOf N).Normal := hAnorm
   refine ⟨fun p hp => ?_, fun p hp => ?_⟩
   · -- `π`-part: `|A ⊓ H| ∣ |A|`.
     have hcard1 : Nat.card ↥((A ⊓ H).subgroupOf H) = Nat.card ↥(A ⊓ H) :=
@@ -207,7 +207,7 @@ theorem centralizer_le_normalizer_Msigma_inf_centralizer {x : G} {N : Subgroup G
     Subgroup.centralizer ({x} : Set G) ≤ Subgroup.normalizer
       ((OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G) : Subgroup G) : Set G) :=
           by
-  haveI hMσN : ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).Normal := by
+  have hMσN : ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).Normal := by
     rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
   have hbaseN : N ≤ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma N : Set G) :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer (OddOrder.BG.Ch3.S10.Msigma_le _)).mp hMσN
@@ -295,7 +295,7 @@ theorem maximalConjugatesContaining_eq_maximalSigma [Finite G]
         (Subgroup.zpowers x) := by
       intro p hp
       rw [Nat.card_zpowers] at hp
-      haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+      have : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
       exact OddOrder.BG.Ch3.S10.sigma_conj g (S14.isPiElement_sigma_of_mem_Msigma hxMσ p hp)
     exact OddOrder.BG.Ch3.S10.sigma_subgroup_le_Msigma_of_isHall
       (OddOrder.BG.Ch3.S10.Msigma_isHall hG hNmax) (Subgroup.zpowers_le.mpr hxN) hxpi
@@ -445,7 +445,7 @@ theorem signalizer_centralizer_isComplement {M N : Subgroup G} {x : G}
       ((OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf
         (Subgroup.centralizer ({x} : Set G))) := by
   have hxN : x ∈ N := hCN (Subgroup.mem_centralizer_singleton_iff.mpr rfl)
-  haveI hKnorm : ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).Normal := by
+  have hKnorm : ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).Normal := by
     rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
   have haK : x ∈ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma N : Set G) :=
     ((Subgroup.normal_subgroupOf_iff_le_normalizer (OddOrder.BG.Ch3.S10.Msigma_le N)).mp hKnorm) hxN

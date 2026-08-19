@@ -72,7 +72,7 @@ The three lemmas here are the setup, the regular-action conclusion in the form
 /-- `F(G) = G` forces `G` nilpotent — case (i) of Theorem 1.5. -/
 theorem isNilpotent_of_fitting_eq_top [Finite G] (h : Ch01.fitting G = ⊤) :
     Group.IsNilpotent G := by
-  haveI : Group.IsNilpotent ↥(⊤ : Subgroup G) := h ▸ Ch01.fitting.isNilpotent (G := G)
+  have : Group.IsNilpotent ↥(⊤ : Subgroup G) := h ▸ Ch01.fitting.isNilpotent (G := G)
   exact Group.nilpotent_of_mulEquiv Subgroup.topEquiv
 
 /-- A Hall `π(F(G))'`-subgroup acts on `F(G)` with no nonidentity fixed points.
@@ -80,7 +80,7 @@ theorem isNilpotent_of_fitting_eq_top [Finite G] (h : Ch01.fitting G = ⊤) :
 This is `not_commute_of_coprime_orderOf_card_fitting` (Theorem 1.5, step 2) packaged in the form
 `Ch06.IsFrobeniusGroup.conj_frobenius` expects: the Hall condition makes every element of `A`
 have order prime to `|F(G)|`. -/
-theorem conj_ne_of_isHallSubgroup_fitting_pPrime [Finite G] [IsSolvable G]
+theorem conj_ne_of_isHallSubgroup_fitting_pPrime [Finite G] [Group.IsSolvable G]
     (hCN : ∀ z : G, z ≠ 1 → Group.IsNilpotent ↥(Subgroup.centralizer ({z} : Set G)))
     {A : Subgroup G}
     (hA : Ch03.IsHallSubgroup
@@ -106,7 +106,7 @@ theorem conj_ne_of_isHallSubgroup_fitting_pPrime [Finite G] [IsSolvable G]
 
 /-- **Case (ii) of Theorem 1.5**: if a Hall `π(F(G))'`-subgroup `A` complements `F(G)` in `G`,
 then `G` is a Frobenius group with kernel `F(G)` and complement `A`. -/
-theorem isFrobeniusGroup_fitting_of_isComplement [Finite G] [IsSolvable G]
+theorem isFrobeniusGroup_fitting_of_isComplement [Finite G] [Group.IsSolvable G]
     (hCN : ∀ z : G, z ≠ 1 → Group.IsNilpotent ↥(Subgroup.centralizer ({z} : Set G)))
     {A : Subgroup G}
     (hA : Ch03.IsHallSubgroup
@@ -140,7 +140,7 @@ nontrivial element of order prime to `p` commutes with a nontrivial `p`-element.
 If `x` (with `p ∤ |x|`) commuted with the `p`-element `k ≠ 1`, a power `x'` of `x` of prime
 order `r ≠ p` still would; Lemma 1.2 then makes `x'` centralize a full Sylow `p`-subgroup
 `P ⊇ F(G)`, so `x' ∈ C_G(F(G)) ≤ F(G)`, forcing `r = p` — absurd. -/
-theorem not_commute_of_not_dvd_orderOf_of_isPGroup_fitting [Finite G] [IsSolvable G]
+theorem not_commute_of_not_dvd_orderOf_of_isPGroup_fitting [Finite G] [Group.IsSolvable G]
     (hCN : ∀ z : G, z ≠ 1 → Group.IsNilpotent ↥(Subgroup.centralizer ({z} : Set G)))
     {p : ℕ} [Fact p.Prime] (hF : IsPGroup p ↥(Ch01.fitting G))
     {x k : G} (hx1 : x ≠ 1) (hxp : ¬ p ∣ orderOf x)
@@ -149,7 +149,7 @@ theorem not_commute_of_not_dvd_orderOf_of_isPGroup_fitting [Finite G] [IsSolvabl
   intro hxy
   -- A power `x'` of `x` of prime order `r ≠ p`.
   obtain ⟨r, hr, hrx⟩ := Nat.exists_prime_and_dvd (fun h => hx1 (orderOf_eq_one_iff.mp h))
-  haveI : Fact r.Prime := ⟨hr⟩
+  have : Fact r.Prime := ⟨hr⟩
   have hrp : r ≠ p := fun hc => hxp (hc ▸ hrx)
   obtain ⟨x₀, hx₀⟩ := exists_prime_orderOf_dvd_card' (G := ↥(Subgroup.zpowers x)) r
     (by rw [Nat.card_zpowers]; exact hrx)
@@ -196,7 +196,7 @@ If `mk a` commuted with the `p`-element `u ≠ 1`, the preimage `K` of `⟨u⟩`
 normalized by `a` on which `a` acts fixed-point-freely (by (†)); by descent
 (`mem_of_inv_mul_conj_mem_of_fixedPointFree`, Gorenstein Lemma 10.1.3) the fixed coset of any
 representative of `u` collapses, i.e. `u = 1`. -/
-theorem not_commute_mk_of_not_dvd_orderOf_of_isPGroup_fitting [Finite G] [IsSolvable G]
+theorem not_commute_mk_of_not_dvd_orderOf_of_isPGroup_fitting [Finite G] [Group.IsSolvable G]
     (hCN : ∀ z : G, z ≠ 1 → Group.IsNilpotent ↥(Subgroup.centralizer ({z} : Set G)))
     {p : ℕ} [Fact p.Prime] (hF : IsPGroup p ↥(Ch01.fitting G))
     {a : G} (hap : ¬ p ∣ orderOf a)
@@ -271,23 +271,23 @@ theorem isCyclic_of_cn_of_conj_frobenius_of_odd [Finite G]
     (hodd : Odd (Nat.card ↥A)) : IsCyclic ↥A := by
   classical
   rcases eq_or_ne A ⊥ with rfl | hAne
-  · haveI : Subsingleton ↥(⊥ : Subgroup G) :=
+  · have : Subsingleton ↥(⊥ : Subgroup G) :=
       (Nat.card_eq_one_iff_unique.mp Subgroup.card_bot).1
     exact isCyclic_of_subsingleton
-  haveI : Nontrivial ↥A := (Subgroup.nontrivial_iff_ne_bot A).mpr hAne
+  have : Nontrivial ↥A := (Subgroup.nontrivial_iff_ne_bot A).mpr hAne
   -- The conjugation action of `A` on `F` is a Frobenius action.
-  letI : MulDistribMulAction ↥A ↥F :=
+  let : MulDistribMulAction ↥A ↥F :=
     MulDistribMulAction.compHom ↥F ((MulAut.conjNormal (H := F)).comp A.subtype)
-  haveI : Nontrivial ↥F := (Subgroup.nontrivial_iff_ne_bot F).mpr hFne
+  have : Nontrivial ↥F := (Subgroup.nontrivial_iff_ne_bot F).mpr hFne
   have hact : Ch06.IsFrobeniusAction ↥A ↥F := by
     intro a ha n hn hfix
     have haG : (a : G) ≠ 1 := fun h => ha (Subtype.ext h)
     have hnG : (n : G) ≠ 1 := fun h => hn (Subtype.ext h)
     exact hfpf (a : G) a.2 haG (n : G) n.2 hnG (Subtype.ext_iff.mp hfix)
-  haveI hZ : IsZGroup ↥A := Ch06.isZGroup_of_isFrobeniusAction_of_odd hact hodd
+  have hZ : IsZGroup ↥A := Ch06.isZGroup_of_isFrobeniusAction_of_odd hact hodd
   -- A prime `q ∣ |A|` and a Sylow `q`-subgroup `Q₀`.
   obtain ⟨q, hq, hqA⟩ := Nat.exists_prime_and_dvd (Finite.one_lt_card (α := ↥A)).ne'
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   obtain ⟨Q₀⟩ := (inferInstance : Nonempty (Sylow q ↥A))
   -- A subgroup of prime order `r ∣ |A|` lies in every Sylow `r`-subgroup: the Sylow subgroup
   -- contains *an* order-`r` subgroup (Cauchy), and order-`r` subgroups are unique (Isaacs 6.19).
@@ -312,15 +312,15 @@ theorem isCyclic_of_cn_of_conj_frobenius_of_odd [Finite G]
   have hSylowComm : ∀ (r : ℕ), r.Prime → r ≠ q → r ∣ Nat.card ↥A → ∀ (S : Sylow r ↥A),
       (S : Subgroup ↥A) ≤ Subgroup.centralizer ((Q₀ : Subgroup ↥A) : Set ↥A) := by
     intro r hr hrq hrA S
-    haveI : Fact r.Prime := ⟨hr⟩
+    have : Fact r.Prime := ⟨hr⟩
     -- The unique order-`q` and order-`r` subgroups, generated by Cauchy elements.
     obtain ⟨aq, haq⟩ := exists_prime_orderOf_dvd_card' (G := ↥A) q hqA
     obtain ⟨ar, har⟩ := exists_prime_orderOf_dvd_card' (G := ↥A) r hrA
     have hRqcard : Nat.card ↥(Subgroup.zpowers aq) = q := by rw [Nat.card_zpowers, haq]
     have hRrcard : Nat.card ↥(Subgroup.zpowers ar) = r := by rw [Nat.card_zpowers, har]
-    haveI hRqn : (Subgroup.zpowers aq).Normal :=
+    have hRqn : (Subgroup.zpowers aq).Normal :=
       Ch06.normal_of_card_prime_of_isFrobeniusAction_of_odd hact hodd hq hRqcard
-    haveI hRrn : (Subgroup.zpowers ar).Normal :=
+    have hRrn : (Subgroup.zpowers ar).Normal :=
       Ch06.normal_of_card_prime_of_isFrobeniusAction_of_odd hact hodd hr hRrcard
     -- Normal and disjoint, so `aq` and `ar` commute.
     have hdisj : Disjoint (Subgroup.zpowers aq) (Subgroup.zpowers ar) := by
@@ -360,7 +360,7 @@ theorem isCyclic_of_cn_of_conj_frobenius_of_odd [Finite G]
   -- The centralizer of `Q₀` contains a Sylow subgroup for every prime, hence is all of `A`.
   have hC : Subgroup.centralizer ((Q₀ : Subgroup ↥A) : Set ↥A) = ⊤ := by
     refine eq_top_of_forall_exists_sylow_le (fun r hr => ?_)
-    haveI : Fact r.Prime := ⟨hr⟩
+    have : Fact r.Prime := ⟨hr⟩
     obtain ⟨S⟩ := (inferInstance : Nonempty (Sylow r ↥A))
     by_cases hrA : r ∣ Nat.card ↥A
     · rcases eq_or_ne r q with rfl | hrq
@@ -368,7 +368,7 @@ theorem isCyclic_of_cn_of_conj_frobenius_of_odd [Finite G]
         refine ⟨Q₀, fun x hx => ?_⟩
         rw [Subgroup.mem_centralizer_iff]
         intro c hc
-        letI : CommGroup ↥(Q₀ : Subgroup ↥A) := IsCyclic.commGroup
+        let : CommGroup ↥(Q₀ : Subgroup ↥A) := IsCyclic.commGroup
         exact congrArg (Subgroup.subtype _)
           (mul_comm (⟨c, hc⟩ : ↥(Q₀ : Subgroup ↥A)) ⟨x, hx⟩)
       · exact ⟨S, hSylowComm r hr hrq hrA S⟩
@@ -379,7 +379,7 @@ theorem isCyclic_of_cn_of_conj_frobenius_of_odd [Finite G]
         · exact h1
         · exact absurd (hd.trans (Subgroup.card_subgroup_dvd_card S.toSubgroup)) hrA
       have hx1 : x = 1 := by
-        haveI : Subsingleton ↥(S : Subgroup ↥A) := (Nat.card_eq_one_iff_unique.mp hcard).1
+        have : Subsingleton ↥(S : Subgroup ↥A) := (Nat.card_eq_one_iff_unique.mp hcard).1
         exact congrArg (Subgroup.subtype _)
           (Subsingleton.elim (⟨x, hx⟩ : ↥(S : Subgroup ↥A)) 1)
       rw [hx1]
@@ -403,7 +403,7 @@ theorem isCyclic_of_cn_of_conj_frobenius_of_odd [Finite G]
     have hmem : (a₀ : G) ∈ centerIn A := ⟨a₀, ha₀c, rfl⟩
     rw [hbot, Subgroup.mem_bot] at hmem
     exact ha₀1 (Subtype.ext hmem)
-  haveI := isNilpotent_of_centerIn_ne_bot hCN hcin
+  have := isNilpotent_of_centerIn_ne_bot hCN hcin
   infer_instance
 
 /-! ### Small counting helpers for the endgame
@@ -443,21 +443,21 @@ open scoped commutatorElement
 /-- A subgroup meeting the kernel of `f` trivially maps isomorphically onto its image. -/
 noncomputable def mulEquivMapOfInfKerEqBot {H : Type*} [Group H] (f : G →* H) (A : Subgroup G)
     (h : A ⊓ f.ker = ⊥) : ↥A ≃* ↥(A.map f) :=
-  (MonoidHom.ofInjective (f := f.restrict A) (by
+  (MonoidHom.ofInjective (f := f.domRestrict A) (by
     rw [← MonoidHom.ker_eq_bot_iff, eq_bot_iff]
     intro x hx
-    rw [MonoidHom.ker_restrict] at hx
+    rw [MonoidHom.ker_domRestrict] at hx
     have hxk : (x : G) ∈ A ⊓ f.ker := ⟨x.2, hx⟩
     rw [h, Subgroup.mem_bot] at hxk
     simpa [Subgroup.mem_bot] using Subtype.ext hxk)).trans
-    (MulEquiv.subgroupCongr (f.restrict_range (K := A)))
+    (MulEquiv.subgroupCongr (f.domRestrict_range (K := A)))
 
 /-- Every commutator centralizes a finite cyclic normal subgroup: conjugation is a homomorphism
 into its automorphism group, which is abelian (`IsCyclic.mulAutMulEquiv`). -/
 theorem commutatorElement_mem_centralizer_of_isCyclic_normal
     {N : Subgroup G} [N.Normal] [Finite ↥N] (hN : IsCyclic ↥N) (x y : G) :
     ⁅x, y⁆ ∈ Subgroup.centralizer (N : Set G) := by
-  haveI := hN
+  have := hN
   have hcomm : MulAut.conjNormal (H := N) x * MulAut.conjNormal (H := N) y =
       MulAut.conjNormal (H := N) y * MulAut.conjNormal (H := N) x :=
     (IsCyclic.mulAutMulEquiv ↥N).injective (by rw [map_mul, map_mul, mul_comm])
@@ -576,10 +576,10 @@ theorem exists_sylow_eq_oPiCore_of_isNilpotent_normal_of_not_dvd_index
     rw [← hmul, Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
       Finsupp.add_apply, Nat.factorization_eq_zero_of_not_dvd hidx, add_zero]
   obtain ⟨R⟩ := (inferInstance : Nonempty (Sylow p ↥N))
-  haveI hRnormal : (R : Subgroup ↥N).Normal := Ch01.Sylow.normal_of_isNilpotent R
-  haveI hRchar : (R : Subgroup ↥N).Characteristic := Sylow.characteristic_of_normal R hRnormal
+  have hRnormal : (R : Subgroup ↥N).Normal := Ch01.Sylow.normal_of_isNilpotent R
+  have hRchar : (R : Subgroup ↥N).Characteristic := Sylow.characteristic_of_normal R hRnormal
   set Rmap : Subgroup G := (R : Subgroup ↥N).map N.subtype with hRmapdef
-  haveI hRmapNormal : Rmap.Normal := normal_map_subtype_of_characteristic hRchar
+  have hRmapNormal : Rmap.Normal := normal_map_subtype_of_characteristic hRchar
   have hRpg : IsPGroup p ↥Rmap := R.isPGroup'.map N.subtype
   have hRcard : Nat.card ↥Rmap = p ^ (Nat.card G).factorization p := by
     rw [hRmapdef, Subgroup.card_map_of_injective N.subtype_injective, R.card_eq_multiplicity,
@@ -622,7 +622,7 @@ of `Ḡ` centralize the cyclic normal `N̄`
 (`commutatorElement_mem_centralizer_of_isCyclic_normal`), so `Ḡ' ≤ N̄ ≤ Ā` and `Ā = N̄ ⊴ Ḡ`.
 The three 3-step conditions then assemble with `O_p(G) = F`, `O_{p,p'}(G) = A ⊔ F`, complement
 a Sylow `p`-subgroup of `Ḡ`, and (‡) supplying both Frobenius conditions. -/
-theorem solvableCN_nilpotent_or_frobenius_or_threeStep [Finite G] [IsSolvable G]
+theorem solvableCN_nilpotent_or_frobenius_or_threeStep [Finite G] [Group.IsSolvable G]
     (hCN : ∀ z : G, z ≠ 1 → Group.IsNilpotent ↥(Subgroup.centralizer ({z} : Set G))) :
     Group.IsNilpotent G ∨
       (∃ A : Subgroup G, Ch06.IsFrobeniusGroup G (Ch01.fitting G) A) ∨
@@ -631,11 +631,11 @@ theorem solvableCN_nilpotent_or_frobenius_or_threeStep [Finite G] [IsSolvable G]
   -- Case (i): `F(G) = ⊤` (this also covers the trivial group).
   by_cases hFtop : Ch01.fitting G = ⊤
   · exact Or.inl (isNilpotent_of_fitting_eq_top hFtop)
-  haveI : Nontrivial G := by
+  have : Nontrivial G := by
     rcases subsingleton_or_nontrivial G with hs | hn
     · exact absurd (Subsingleton.elim _ _) hFtop
     · exact hn
-  have hFbot : Ch01.fitting G ≠ ⊥ := Ch01.fitting_ne_bot_of_solvable_nontrivial G
+  have hFbot : Ch01.fitting G ≠ ⊥ := Ch01.fitting_ne_bot_of_isSolvable_nontrivial G
   -- A Hall `π(F(G))'`-subgroup `A`.
   obtain ⟨A, hA⟩ := Ch03.hall_exists_of_piSeparable
     {r : ℕ | r ∉ (Nat.card ↥(Ch01.fitting G)).primeFactors} (G := G)
@@ -673,7 +673,7 @@ theorem solvableCN_nilpotent_or_frobenius_or_threeStep [Finite G] [IsSolvable G]
   have hcardF_ne : Nat.card ↥(Ch01.fitting G) ≠ 1 :=
     fun h => hFbot (Subgroup.card_eq_one.mp h)
   obtain ⟨p, hp, hpF⟩ := Nat.exists_prime_and_dvd hcardF_ne
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hsingleF : ∀ r : ℕ, r.Prime → r ∣ Nat.card ↥(Ch01.fitting G) → r = p := by
     by_contra hcon
     push Not at hcon
@@ -683,19 +683,19 @@ theorem solvableCN_nilpotent_or_frobenius_or_threeStep [Finite G] [IsSolvable G]
     have hfull : ∀ r : ℕ, r.Prime → r ∣ Nat.card ↥(Ch01.fitting G) →
         (Nat.card G).factorization r ≤ (Nat.card ↥(Ch01.fitting G)).factorization r := by
       intro r hr hrF
-      haveI : Fact r.Prime := ⟨hr⟩
+      have : Fact r.Prime := ⟨hr⟩
       obtain ⟨s, hs, hsF, hsr⟩ :
           ∃ s : ℕ, s.Prime ∧ s ∣ Nat.card ↥(Ch01.fitting G) ∧ s ≠ r := by
         rcases eq_or_ne r p with rfl | hrp
         · exact ⟨q, hq, hqF, hqp⟩
         · exact ⟨p, hp, hpF, fun h => hrp h.symm⟩
-      haveI : Fact s.Prime := ⟨hs⟩
-      haveI hSn : ((default : Sylow s ↥(Ch01.fitting G)) :
+      have : Fact s.Prime := ⟨hs⟩
+      have hSn : ((default : Sylow s ↥(Ch01.fitting G)) :
           Subgroup ↥(Ch01.fitting G)).Normal := Ch01.Sylow.normal_of_isNilpotent _
-      haveI hSc : ((default : Sylow s ↥(Ch01.fitting G)) :
+      have hSc : ((default : Sylow s ↥(Ch01.fitting G)) :
           Subgroup ↥(Ch01.fitting G)).Characteristic :=
         Sylow.characteristic_of_normal _ hSn
-      haveI hNnormal : (((default : Sylow s ↥(Ch01.fitting G)) :
+      have hNnormal : (((default : Sylow s ↥(Ch01.fitting G)) :
           Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype).Normal :=
         normal_map_subtype_of_characteristic hSc
       have hNcard : Nat.card ↥(((default : Sylow s ↥(Ch01.fitting G)) :
@@ -731,7 +731,7 @@ theorem solvableCN_nilpotent_or_frobenius_or_threeStep [Finite G] [IsSolvable G]
       obtain ⟨P, hP⟩ := exists_sylow_eq_oPiCore_of_normal_pPrime_le_fitting (p := r)
         hCN hOrne hNbot (Subgroup.map_subtype_le _) hrN
       have hOrF : Ch03.oPiCore ({r} : Set ℕ) G ≤ Ch01.fitting G := by
-        haveI : Group.IsNilpotent ↥(Ch03.oPiCore ({r} : Set ℕ) G) :=
+        have : Group.IsNilpotent ↥(Ch03.oPiCore ({r} : Set ℕ) G) :=
           (Ch04.isPGroup_of_isPiGroup_singleton
             (Ch03.oPiCore.isPiGroup ({r} : Set ℕ))).isNilpotent
         exact Ch01.nilpotent_normal_le_fitting
@@ -754,7 +754,7 @@ theorem solvableCN_nilpotent_or_frobenius_or_threeStep [Finite G] [IsSolvable G]
           intro hdvd
           have hmem := hA.2 r
             (Nat.mem_primeFactors.mpr ⟨hr, hdvd, Subgroup.index_ne_zero_of_finite⟩)
-          simp only [Set.mem_setOf_eq, not_not] at hmem
+          simp only [Set.mem_ofPred_eq, not_not] at hmem
           exact hrF (Nat.dvd_of_mem_primeFactors hmem)
         have hsplit : (Nat.card G).factorization r =
             (Nat.card ↥A).factorization r + A.index.factorization r := by
@@ -785,12 +785,12 @@ theorem solvableCN_nilpotent_or_frobenius_or_threeStep [Finite G] [IsSolvable G]
       intro r hr
       rw [Finset.mem_singleton]
       have hmem := hA.2 r (by rwa [Subgroup.index_bot])
-      simp only [Set.mem_setOf_eq, not_not] at hmem
+      simp only [Set.mem_ofPred_eq, not_not] at hmem
       exact hsingleF r (Nat.prime_of_mem_primeFactors hmem) (Nat.dvd_of_mem_primeFactors hmem)
-    haveI : Group.IsNilpotent G := hGp.isNilpotent
+    have : Group.IsNilpotent G := hGp.isNilpotent
     refine hFtop ?_
     rw [eq_top_iff]
-    haveI : Group.IsNilpotent ↥(⊤ : Subgroup G) :=
+    have : Group.IsNilpotent ↥(⊤ : Subgroup G) :=
       Group.nilpotent_of_mulEquiv Subgroup.topEquiv.symm
     exact Ch01.nilpotent_normal_le_fitting
   -- `[G : A ⊔ F(G)]` is a nontrivial `p`-power `p ^ k`.
@@ -798,7 +798,7 @@ theorem solvableCN_nilpotent_or_frobenius_or_threeStep [Finite G] [IsSolvable G]
     intro r hr
     rw [Finset.mem_singleton]
     have hmem := hA.2 r hr
-    simp only [Set.mem_setOf_eq, not_not] at hmem
+    simp only [Set.mem_ofPred_eq, not_not] at hmem
     exact hsingleF r (Nat.prime_of_mem_primeFactors hmem) (Nat.dvd_of_mem_primeFactors hmem)
   obtain ⟨k, -, hHidx⟩ := (Nat.dvd_prime_pow hp).mp
     ((eq_pow_factorization_of_primeFactors_subset Subgroup.index_ne_zero_of_finite hAidx_pf) ▸
@@ -822,7 +822,7 @@ theorem solvableCN_nilpotent_or_frobenius_or_threeStep [Finite G] [IsSolvable G]
     · exact h
     exfalso
     have h2dvd : (2 : ℕ) ∣ Nat.card ↥A := heven.two_dvd
-    haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+    have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
     obtain ⟨t, ht2⟩ := exists_prime_orderOf_dvd_card' (G := ↥A) 2 h2dvd
     have hp2 : p ≠ 2 := by
       rintro rfl
@@ -873,33 +873,33 @@ theorem solvableCN_nilpotent_or_frobenius_or_threeStep [Finite G] [IsSolvable G]
     exact not_commute_mk_of_not_dvd_orderOf_of_isPGroup_fitting hCN hF hap ha1 hu1 hup
       (hcentral u)
   -- Step 6: `A` is cyclic.
-  haveI hAcyc : IsCyclic ↥A :=
+  have hAcyc : IsCyclic ↥A :=
     isCyclic_of_cn_of_conj_frobenius_of_odd hCN hFbot hfpfA hodd
   -- Step 7 setup: in `Ḡ = G/F(G)`, `O_p(Ḡ) = 1` and `N̄ := O_{p'}(Ḡ) ⊇ F(Ḡ) ≠ 1`.
   have hOpQ : Ch03.oPiCore ({p} : Set ℕ) (G ⧸ Ch01.fitting G) = ⊥ := by
     have hmapcomap := Subgroup.map_comap_eq_self_of_surjective
       (QuotientGroup.mk'_surjective (Ch01.fitting G))
       (Ch03.oPiCore ({p} : Set ℕ) (G ⧸ Ch01.fitting G))
-    haveI : ((Ch03.oPiCore ({p} : Set ℕ) (G ⧸ Ch01.fitting G)).comap
+    have : ((Ch03.oPiCore ({p} : Set ℕ) (G ⧸ Ch01.fitting G)).comap
         (QuotientGroup.mk' (Ch01.fitting G))).Normal :=
       Subgroup.Normal.comap (Ch03.oPiCore.normal _ _) _
-    haveI : Group.IsNilpotent ↥((Ch03.oPiCore ({p} : Set ℕ) (G ⧸ Ch01.fitting G)).comap
+    have : Group.IsNilpotent ↥((Ch03.oPiCore ({p} : Set ℕ) (G ⧸ Ch01.fitting G)).comap
         (QuotientGroup.mk' (Ch01.fitting G))) :=
       ((Ch04.isPGroup_of_isPiGroup_singleton
         (Ch03.oPiCore.isPiGroup ({p} : Set ℕ))).comap_of_ker_isPGroup _
         (by rw [QuotientGroup.ker_mk']; exact hF)).isNilpotent
     rw [← hmapcomap, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
     exact Ch01.nilpotent_normal_le_fitting
-  haveI : Nontrivial (G ⧸ Ch01.fitting G) := QuotientGroup.nontrivial_iff.mpr hFtop
+  have : Nontrivial (G ⧸ Ch01.fitting G) := QuotientGroup.nontrivial_iff.mpr hFtop
   have hFQne : Ch01.fitting (G ⧸ Ch01.fitting G) ≠ ⊥ :=
-    Ch01.fitting_ne_bot_of_solvable_nontrivial (G ⧸ Ch01.fitting G)
+    Ch01.fitting_ne_bot_of_isSolvable_nontrivial (G ⧸ Ch01.fitting G)
   have hNbar_ne : Ch03.oPiCore {q : ℕ | q ≠ p} (G ⧸ Ch01.fitting G) ≠ ⊥ := by
     intro hbot
     refine hFQne (le_bot_iff.mp ?_)
     rw [← hbot]
     refine Ch03.Subgroup.IsPiGroup.le_oPiCore ?_
     intro r hr
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     intro hrp
     rw [hrp] at hr
     have hle := sylow_fitting_map_le_oPiCore
@@ -921,7 +921,7 @@ theorem solvableCN_nilpotent_or_frobenius_or_threeStep [Finite G] [IsSolvable G]
     exact hinfAF
   have hAbar_card : Nat.card ↥(A.map (QuotientGroup.mk' (Ch01.fitting G))) = Nat.card ↥A :=
     Nat.card_congr (mulEquivMapOfInfKerEqBot _ _ hkerA).symm.toEquiv
-  haveI hAbar_cyc : IsCyclic ↥(A.map (QuotientGroup.mk' (Ch01.fitting G))) :=
+  have hAbar_cyc : IsCyclic ↥(A.map (QuotientGroup.mk' (Ch01.fitting G))) :=
     isCyclic_of_surjective (mulEquivMapOfInfKerEqBot _ _ hkerA).toMonoidHom
       (mulEquivMapOfInfKerEqBot _ _ hkerA).surjective
   have hGcard : Nat.card G = Nat.card ↥(Ch01.fitting G) * (Nat.card ↥A * p ^ k) := by
@@ -944,20 +944,20 @@ theorem solvableCN_nilpotent_or_frobenius_or_threeStep [Finite G] [IsSolvable G]
     constructor
     · intro r hr
       rw [hAbar_card] at hr
-      simp only [Set.mem_setOf_eq]
+      simp only [Set.mem_ofPred_eq]
       intro hrp
       rw [hrp] at hr
       exact hpA (Nat.dvd_of_mem_primeFactors hr)
     · intro r hr
       rw [hAbar_idx] at hr
-      simp only [Set.mem_setOf_eq, not_not]
+      simp only [Set.mem_ofPred_eq, not_not]
       exact (Nat.prime_dvd_prime_iff_eq (Nat.prime_of_mem_primeFactors hr) hp).mp
         ((Nat.prime_of_mem_primeFactors hr).dvd_of_dvd_pow (Nat.dvd_of_mem_primeFactors hr))
   -- Step 7: `N̄ ≤ Ā`, `N̄` cyclic, `C_Ḡ(N̄) ≤ N̄`, commutators centralize `N̄`, and `Ā = N̄`.
   have hNbar_le : Ch03.oPiCore {q : ℕ | q ≠ p} (G ⧸ Ch01.fitting G) ≤
       A.map (QuotientGroup.mk' (Ch01.fitting G)) :=
     Ch03.Subgroup.IsPiGroup.normal_le_hall (Ch03.oPiCore.isPiGroup _) hAbar_hall
-  haveI hNbar_cyc : IsCyclic ↥(Ch03.oPiCore {q : ℕ | q ≠ p} (G ⧸ Ch01.fitting G)) :=
+  have hNbar_cyc : IsCyclic ↥(Ch03.oPiCore {q : ℕ | q ≠ p} (G ⧸ Ch01.fitting G)) :=
     isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe hNbar_le).toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hNbar_le).surjective
   have hCle : Subgroup.centralizer
@@ -990,14 +990,14 @@ theorem solvableCN_nilpotent_or_frobenius_or_threeStep [Finite G] [IsSolvable G]
       exact Subgroup.mem_centralizer_iff.mp u.2 (nbar : G ⧸ Ch01.fitting G) nbar.2
     refine Ch03.Subgroup.IsPiGroup.le_oPiCore ?_
     intro r hr
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     intro hrp
     rw [hrp] at hr
     exact hpC (Nat.dvd_of_mem_primeFactors hr)
   have hcomm_mem : ∀ x y : G ⧸ Ch01.fitting G,
       ⁅x, y⁆ ∈ Ch03.oPiCore {q : ℕ | q ≠ p} (G ⧸ Ch01.fitting G) := fun x y =>
     hCle (commutatorElement_mem_centralizer_of_isCyclic_normal hNbar_cyc x y)
-  haveI hAbar_normal : (A.map (QuotientGroup.mk' (Ch01.fitting G))).Normal := by
+  have hAbar_normal : (A.map (QuotientGroup.mk' (Ch01.fitting G))).Normal := by
     constructor
     intro a haA g
     have hmem := hNbar_le (hcomm_mem g a)
@@ -1012,7 +1012,7 @@ theorem solvableCN_nilpotent_or_frobenius_or_threeStep [Finite G] [IsSolvable G]
   -- The two cores of the 3-step conditions: `O_p(G) = F(G)` and `O_{p,p'}(G) = A ⊔ F(G)`.
   have hOpF : Ch03.oPiCore ({p} : Set ℕ) G = Ch01.fitting G := by
     refine le_antisymm ?_ (Ch04.isPiGroup_singleton_of_isPGroup hF).le_oPiCore
-    haveI : Group.IsNilpotent ↥(Ch03.oPiCore ({p} : Set ℕ) G) :=
+    have : Group.IsNilpotent ↥(Ch03.oPiCore ({p} : Set ℕ) G) :=
       (Ch04.isPGroup_of_isPiGroup_singleton (Ch03.oPiCore.isPiGroup ({p} : Set ℕ))).isNilpotent
     exact Ch01.nilpotent_normal_le_fitting
   have hkey : opPPrimeCore p G = A ⊔ Ch01.fitting G := by
@@ -1109,7 +1109,7 @@ three cases:
   is prime to `|F(G)|`, and `p` divides `|F(G)|` because `1 ≠ O_p(G) ≤ F(G)`;
 * `G` a 3-step group with respect to `q` — then `q = p`, since a 3-step group with respect to
   `q` has `O_{q'}(G) = 1` (`oPiCore_pPrime_eq_bot`) while `O_p(G) ≠ 1`. -/
-theorem oPiCore_isSylow_or_isThreeStepGroup [Finite G] {p : ℕ} [Fact p.Prime] [IsSolvable G]
+theorem oPiCore_isSylow_or_isThreeStepGroup [Finite G] {p : ℕ} [Fact p.Prime] [Group.IsSolvable G]
     (hCN : ∀ z : G, z ≠ 1 → Group.IsNilpotent ↥(Subgroup.centralizer ({z} : Set G)))
     (hne : Ch03.oPiCore ({p} : Set ℕ) G ≠ ⊥) :
     (∃ P : Sylow p G, (P : Subgroup G) = Ch03.oPiCore ({p} : Set ℕ) G) ∨
@@ -1125,7 +1125,7 @@ theorem oPiCore_isSylow_or_isThreeStepGroup [Finite G] {p : ℕ} [Fact p.Prime] 
     · exact hn ▸ dvd_pow_self p hpos.ne'
   rcases solvableCN_nilpotent_or_frobenius_or_threeStep hCN with hnil | ⟨A, hFrob⟩ | ⟨q, hq, h3⟩
   · -- (i) `G` nilpotent: take `N = ⊤`, of index `1`.
-    haveI := hnil
+    have := hnil
     exact Or.inl (exists_sylow_eq_oPiCore_of_isNilpotent_normal_of_not_dvd_index
       (N := (⊤ : Subgroup G))
       (by rw [Subgroup.index_top]; exact Nat.Prime.not_dvd_one Fact.out))
@@ -1135,7 +1135,7 @@ theorem oPiCore_isSylow_or_isThreeStepGroup [Finite G] {p : ℕ} [Fact p.Prime] 
     have hindex : (Ch01.fitting G).index = Nat.card ↥A :=
       hFrob.isComplement.symm.index_eq_card
     have hleF : Ch03.oPiCore ({p} : Set ℕ) G ≤ Ch01.fitting G := by
-      haveI : Group.IsNilpotent ↥(Ch03.oPiCore ({p} : Set ℕ) G) := hOp.isNilpotent
+      have : Group.IsNilpotent ↥(Ch03.oPiCore ({p} : Set ℕ) G) := hOp.isNilpotent
       exact Ch01.nilpotent_normal_le_fitting
     have hpF : p ∣ Nat.card ↥(Ch01.fitting G) :=
       hpdvdOp.trans (Subgroup.card_dvd_of_le hleF)
@@ -1145,7 +1145,7 @@ theorem oPiCore_isSylow_or_isThreeStepGroup [Finite G] {p : ℕ} [Fact p.Prime] 
     intro hpA
     exact (Fact.out : p.Prime).ne_one (Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hpF hpA))
   · -- (iii) `G` a 3-step group with respect to `q`: necessarily `q = p`.
-    haveI : Fact q.Prime := ⟨hq⟩
+    have : Fact q.Prime := ⟨hq⟩
     rcases eq_or_ne q p with rfl | hqp
     · exact Or.inr h3
     · exfalso

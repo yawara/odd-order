@@ -64,7 +64,7 @@ theorem affineGroup_card {p : ℕ} [Fact p.Prime] (u : (ZMod p)ˣ) :
 `G/P` が巡回, `Z(G) = 1`。 -/
 theorem exists_group_card_eq_center_trivial (p m : ℕ) [Fact p.Prime] (hm : m ∣ p - 1)
     (hm1 : 1 < m) : ∃ u : (ZMod p)ˣ, orderOf u = m := by
-  haveI := ZMod.isCyclic_units_prime (Fact.out (p := p.Prime))
+  have := ZMod.isCyclic_units_prime (Fact.out (p := p.Prime))
   obtain ⟨g, hg⟩ := IsCyclic.exists_ofOrder_eq_natCard (α := (ZMod p)ˣ)
   have hp2 := (Fact.out (p := p.Prime)).two_le
   have hcard : Nat.card (ZMod p)ˣ = p - 1 := by
@@ -182,7 +182,7 @@ abbrev affineGroupOfField (F : Type*) [Field F] :=
 theorem natCard_units_field (F : Type*) [Field F] [Finite F] :
     Nat.card Fˣ = Nat.card F - 1 := by
   classical
-  haveI := Fintype.ofFinite F
+  have := Fintype.ofFinite F
   rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card, Fintype.card_units]
 
 /-- **Isaacs Problem 3A.4** (位数). `|G| = q(q-1)`。 -/
@@ -231,7 +231,7 @@ theorem affineGroupOfField_ker_isElementaryAbelian (F : Type*) [Field F] (p : �
 theorem not_dvd_natCard_units (F : Type*) [Field F] [Finite F] (p : ℕ) [Fact p.Prime]
     [CharP F p] : ¬ (p ∣ Nat.card Fˣ) := by
   classical
-  haveI := Fintype.ofFinite F
+  have := Fintype.ofFinite F
   obtain ⟨n, -, hcard⟩ := FiniteField.card F p
   have hcard' : Nat.card F = p ^ (n : ℕ) := by rw [Nat.card_eq_fintype_card, hcard]
   have hpn : p ∣ Nat.card F := hcard' ▸ dvd_pow_self p n.2.ne'
@@ -565,7 +565,7 @@ theorem exists_klein_four_pqr {p q r : ℕ} (hp : p.Prime) (hq : q.Prime) (hr : 
       (up * up = 1 ∧ uq * uq = 1 ∧ ur * ur = 1) ∧
       (up ≠ 1 ∧ uq ≠ 1 ∧ ur ≠ 1) ∧
       (up * uq = ur ∧ uq * ur = up ∧ ur * up = uq) := by
-  haveI : NeZero (p * q * r) :=
+  have : NeZero (p * q * r) :=
     ⟨Nat.mul_ne_zero (Nat.mul_ne_zero hp.pos.ne' hq.pos.ne') hr.pos.ne'⟩
   -- 互いに素性
   have cpq : Nat.Coprime p q := (Nat.coprime_primes hp hq).mpr hpq

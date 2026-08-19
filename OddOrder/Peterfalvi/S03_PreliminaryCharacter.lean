@@ -786,7 +786,7 @@ theorem mem_characterKernel_of_mem_characterKernel_induce
     (hker : x ∈ OddOrder.Peterfalvi.S03.characterKernel (ClassFunction.induce H θ)) :
     (⟨x, hxH⟩ : ↥H) ∈ OddOrder.Peterfalvi.S03.characterKernel θ := by
   classical
-  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  have : Fintype ↥H := Fintype.ofFinite ↥H
   -- the Mackey orbit identity, applied at `⟨x,hxH⟩` and at `1`
   have hid :=
     OddOrder.RepresentationTheory.card_smul_restrict_induce_eq_inertia_smul_orbitSum
@@ -870,7 +870,7 @@ theorem subsetCharacterKernel_induce_iff {L : Type*} [Group L] [Fintype L]
     (hθ : OddOrder.RepresentationTheory.IsIrreducibleCharacter θ) :
     ((A.subgroupOf H : Set ↥H) ⊆ characterKernel θ) ↔
       SubsetCharacterKernel (A : Set L) (ClassFunction.induce H θ) := by
-  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  have : Fintype ↥H := Fintype.ofFinite ↥H
   refine ⟨subsetCharacterKernel_induce_of_subgroupOf hAH θ, fun hind y hy => ?_⟩
   -- `y : ↥H` lies in `A.subgroupOf H`, so `(y : L) ∈ A` and the induced kernel applies.
   have hyA : (y : L) ∈ A := Subgroup.mem_subgroupOf.mp hy

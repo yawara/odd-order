@@ -86,7 +86,7 @@ theorem sOf_H0Cprime_reducible_eq_columnSum
     ∃ k : Fin hyp.base.w2, k ≠ 0 ∧
       η = OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
         (hyp.base.muColumnChar hG hG.odd k) := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   have hηIKF : η ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
       ((derivedInG M).subgroupOf M) (hyp.H0Cprime.subgroupOf M) := by
@@ -132,6 +132,7 @@ noncomputable def sOf_H0Cprime_memberRFamily
     exact OddOrder.Peterfalvi.S06.columnR (hyp.base.toHypothesis46 hG hG.odd)
       (hyp.base.muColumnChar_ne_one hG hG.odd hk0) hkeq
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **`sOf_H0Cprime_memberRFamily` reduction, irreducible case** (mirror of
 `caseB_sOf_memberRFamily_imageSet_of_irr`). -/
 theorem sOf_H0Cprime_memberRFamily_imageSet_of_irr
@@ -147,7 +148,7 @@ theorem sOf_H0Cprime_memberRFamily_imageSet_of_irr
       (sOf_H0Cprime_memberRFamily hG hyp hη).imageSet =
         (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
           hyp.base.dadeData.dade ⟨η, hirr⟩ hr hs).imageSet := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
   have hηIKF0 : η ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
       ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) :=
@@ -160,6 +161,7 @@ theorem sOf_H0Cprime_memberRFamily_imageSet_of_irr
   unfold sOf_H0Cprime_memberRFamily
   rw [dif_pos hirr]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **`sOf_H0Cprime_memberRFamily` reduction, column case** (mirror of
 `caseB_sOf_memberRFamily_imageSet_of_col`). -/
 theorem sOf_H0Cprime_memberRFamily_imageSet_of_col
@@ -176,7 +178,7 @@ theorem sOf_H0Cprime_memberRFamily_imageSet_of_col
           (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
           (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
             (hyp.base.muColumnChar hG hG.odd k)).symm).imageSet := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   have hex := sOf_H0Cprime_reducible_eq_columnSum hG hyp hη hcol
   refine ⟨hex.choose, hex.choose_spec.1, hex.choose_spec.2, ?_⟩
   unfold sOf_H0Cprime_memberRFamily
@@ -199,7 +201,7 @@ theorem sOf_H0Cprime_memberRFamily_orthogonal
     (h1 : ClassFunction.inner φ ξ = 0) (h2 : ClassFunction.inner φ ξ.conj = 0) :
     (sOf_H0Cprime_memberRFamily hG hyp hφ).Orthogonal
       (sOf_H0Cprime_memberRFamily hG hyp hξ) := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   -- typePA support for an irreducible member (needed by the μ×irr cross-orthogonality)
   have hIrrPA : ∀ {ζ : ClassFunction ↥M ℂ},
@@ -312,7 +314,7 @@ theorem SOf_reducible_eq_columnSum
     ∃ k : Fin hyp.base.w2, k ≠ 0 ∧
       η = OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
         (hyp.base.muColumnChar hG hG.odd k) := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   have hηIKF : η ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
       ((derivedInG M).subgroupOf M) (N.subgroupOf M) := by
@@ -356,6 +358,7 @@ noncomputable def SOf_memberRFamily
     exact OddOrder.Peterfalvi.S06.columnR (hyp.base.toHypothesis46 hG hG.odd)
       (hyp.base.muColumnChar_ne_one hG hG.odd hk0) hkeq
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **`SOf_memberRFamily` reduction, irreducible case**. -/
 theorem SOf_memberRFamily_imageSet_of_irr
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
@@ -369,7 +372,7 @@ theorem SOf_memberRFamily_imageSet_of_irr
       (SOf_memberRFamily hG hyp hη).imageSet =
         (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
           hyp.base.dadeData.dade ⟨η, hirr⟩ hr hs).imageSet := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
   have hηIKF0 : η ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
       ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) :=
@@ -382,6 +385,7 @@ theorem SOf_memberRFamily_imageSet_of_irr
   unfold SOf_memberRFamily
   rw [dif_pos hirr]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **`SOf_memberRFamily` reduction, column case**. -/
 theorem SOf_memberRFamily_imageSet_of_col
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
@@ -396,7 +400,7 @@ theorem SOf_memberRFamily_imageSet_of_col
           (hyp.base.muColumnChar_ne_one hG hG.odd hk0)
           (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one (hyp.base.toHypothesis46 hG hG.odd)
             (hyp.base.muColumnChar hG hG.odd k)).symm).imageSet := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   have hex := SOf_reducible_eq_columnSum hG hyp hη hcol
   refine ⟨hex.choose, hex.choose_spec.1, hex.choose_spec.2, ?_⟩
   unfold SOf_memberRFamily
@@ -419,7 +423,7 @@ theorem SOf_memberRFamily_orthogonal
     (h1 : ClassFunction.inner φ ξ = 0) (h2 : ClassFunction.inner φ ξ.conj = 0) :
     (SOf_memberRFamily hG hyp hφ).Orthogonal
       (SOf_memberRFamily hG hyp hξ) := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   -- typePA support for an irreducible member (needed by the μ×irr cross-orthogonality)
   have hIrrPA : ∀ {ζ : ClassFunction ↥M ℂ} {Nz : Subgroup G},
@@ -520,7 +524,7 @@ theorem sOf_equal_degree_diff_support {M : Subgroup G} (hyp : Hypothesis M)
     (hy : y ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime)
     (hdeg : (x : ↥M → ℂ) 1 = (y : ↥M → ℂ) 1) :
     ((x - y : ClassFunction ↥M ℂ)).support ⊆ hyp.base.A0 := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   have hIKF : ∀ z ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime,
       z ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
@@ -553,7 +557,7 @@ theorem caseA_sThree_coherent
         (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u : ℕ) : ℂ)) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
       (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime \ S₂) hyp.base.A0) := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
   have hIKF : ∀ ⦃x : ClassFunction ↥M ℂ⦄,

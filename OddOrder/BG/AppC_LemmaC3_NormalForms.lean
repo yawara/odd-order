@@ -166,7 +166,6 @@ theorem step4M1_eq_sigma_inr
   rw [← data.t_inv_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow_inv
     3 a⁻¹]
   simp [map_inv]
-  group
 
 /-- The second BG `(C.5)` factor is the neutral `s^m σ(inr w) s^r` word with
 `w = (tConj^2)⁻¹ (a b⁻¹)`. -/
@@ -183,7 +182,6 @@ theorem step4M2_eq_sigma_inr
   rw [← data.t_inv_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow_inv
     2 (a * b⁻¹)]
   simp [map_mul, map_inv]
-  group
 
 /-- The third BG `(C.5)` factor is the neutral `s^m σ(inr w) s^r` word with
 `w = tConj⁻¹ b`. -/

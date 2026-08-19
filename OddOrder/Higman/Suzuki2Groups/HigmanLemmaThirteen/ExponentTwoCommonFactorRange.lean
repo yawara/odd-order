@@ -128,15 +128,15 @@ theorem restrictedFactorAmbientInclusion_range_eq_of_common_factor
         (restrictedFactorAmbientInclusion hKinv hEAK eK c dataK
           hK1K htermK hSqK hAgemoK hK0K) := by
   classical
-  letI : IsMulCommutative (frattini J) :=
+  let : IsMulCommutative (frattini J) :=
     IsMulCommutative.of_comm hEAJ.comm
-  letI : CommGroup (frattini J) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini J)) :=
+  let : CommGroup (frattini J) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini J)) :=
     hEAJ.zmodModule
-  letI : IsMulCommutative (frattini K) :=
+  let : IsMulCommutative (frattini K) :=
     IsMulCommutative.of_comm hEAK.comm
-  letI : CommGroup (frattini K) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini K)) :=
+  let : CommGroup (frattini K) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini K)) :=
     hEAK.zmodModule
   let dJ :=
     dataJ.toInclusionData hEAJ eJ
@@ -144,14 +144,14 @@ theorem restrictedFactorAmbientInclusion_range_eq_of_common_factor
   let dK :=
     dataK.toInclusionData hEAK eK
       hK1K htermK hSqK hAgemoK hK0K
-  letI := dJ.group
-  letI := dJ.normal
-  letI := dJ.quotComm
-  letI := dJ.quotModule
-  letI := dK.group
-  letI := dK.normal
-  letI := dK.quotComm
-  letI := dK.quotModule
+  let := dJ.group
+  let := dJ.normal
+  let := dJ.quotComm
+  let := dJ.quotModule
+  let := dK.group
+  let := dK.normal
+  let := dK.quotComm
+  let := dK.quotModule
   let iotaJ :=
     restrictedFactorAmbientInclusion hJinv hEAJ eJ c dataJ
       hK1J htermJ hSqJ hAgemoJ hK0J

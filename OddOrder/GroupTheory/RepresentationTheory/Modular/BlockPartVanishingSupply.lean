@@ -75,21 +75,21 @@ theorem sum_character_blockOfIrr_eq_zero_of_isPRegular_of_roots (hp : p.Prime) {
         (wedderburnRepresentation e i).character g⁻¹
           * (wedderburnRepresentation e i).character x = 0 := by
   classical
-  haveI : Fintype ↥(centralizerOf (pPart p x)) := Fintype.ofFinite _
-  haveI : NeZero (Nat.card ↥(centralizerOf (pPart p x)) : K) :=
+  have : Fintype ↥(centralizerOf (pPart p x)) := Fintype.ofFinite _
+  have : NeZero (Nat.card ↥(centralizerOf (pPart p x)) : K) :=
     ⟨Nat.cast_ne_zero.mpr Nat.card_pos.ne'⟩
   obtain ⟨nH, dH, hdH, ⟨eH⟩⟩ :=
     exists_algEquiv_pi_matrix_monoidAlgebra K ↥(centralizerOf (pPart p x))
-  haveI : ∀ i, NeZero (dH i) := hdH
-  haveI : ∀ i, Nonempty (Fin (dH i)) := fun i => ⟨0⟩
+  have : ∀ i, NeZero (dH i) := hdH
+  have : ∀ i, Nonempty (Fin (dH i)) := fun i => ⟨0⟩
   obtain ⟨ιH, hιH, nnH, hnnH, hdecH, hneH, π, hπ, hlin, hkerJ, hnilH⟩ :=
     GroupAlgebra.exists_modularDatum (ResidueField 𝒪) ↥(centralizerOf (pPart p x))
   -- `letI`, not `haveI`: `Fintype`/`DecidableEq` are data, and the target lemma's instance
   -- arguments have to stay definitionally the ones `exists_modularDatum` returned.
-  letI := hιH
-  letI := hnnH
-  letI := hdecH
-  letI := hneH
+  let := hιH
+  let := hnnH
+  let := hdecH
+  let := hneH
   obtain ⟨ω, hω⟩ := hroot (pRegularExponent p ↥(centralizerOf (pPart p x)))
     (not_dvd_pRegularExponent hp) pRegularExponent_pos.ne'
   obtain ⟨ω', hω'⟩ := hroot' (pRegularExponent p ↥(centralizerOf (pPart p x)))

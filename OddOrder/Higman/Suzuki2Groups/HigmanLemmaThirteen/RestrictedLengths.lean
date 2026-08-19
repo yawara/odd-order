@@ -324,7 +324,7 @@ theorem restricted_range_hasXiLengthThree_of_frattini_cover_exponent_four
       ∀ {K L : NormalInvariantSubgroup ract}, K ≤ L →
         low K = low L → high K = high L → K = L := by
     intro K L hKL hLowEq hHighEq
-    letI : K.1.Normal := K.2.1
+    let : K.1.Normal := K.2.1
     have hLle : L.1 ≤ K.1 ⊔ phiS := by
       change K.1 ⊔ phiS = L.1 ⊔ phiS at hHighEq
       rw [hHighEq]
@@ -515,9 +515,9 @@ theorem exists_three_xiLengthTwo_frattini_preimages_of_exponent_two
       hXZtop, hXTtop, hZTtop, _hXZ_Tinf, hXZ_Tsup⟩ :=
     exists_three_invariant_frattini_preimages_of_xiLengthFour_exponent_two
       hP hncomm hmulti hxi hlen hprime htwo
-  letI : X.Normal := hXnormal
-  letI : Z.Normal := hZnormal
-  letI : T.Normal := hTnormal
+  let : X.Normal := hXnormal
+  let : Z.Normal := hZnormal
+  let : T.Normal := hTnormal
   have left_lt_sup_of_inf_eq_frattini :
       ∀ {A B : Subgroup P}, frattini P < B →
         A ⊓ B = frattini P → A < A ⊔ B := by

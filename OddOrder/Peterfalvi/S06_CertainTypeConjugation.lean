@@ -47,7 +47,7 @@ Pointwise: `(ω(χ))(w) = χ(w)` is a root of unity (`χ(w)^{|W|} = 1`), so `‖
 theorem galoisMap_conj_omega (hyp : OddOrder.Peterfalvi.S05.TICyclicHypothesis G)
     [Finite hyp.W] (χ : hyp.W →* ℂˣ) :
     IrreducibleCharacter.galoisMap Complex.conjAe.toRingEquiv (hyp.omega χ) = hyp.omega χ⁻¹ := by
-  haveI : Fintype hyp.W := Fintype.ofFinite hyp.W
+  have : Fintype hyp.W := Fintype.ofFinite hyp.W
   apply IrreducibleCharacter.ext
   apply ClassFunction.ext
   intro w
@@ -60,6 +60,7 @@ theorem galoisMap_conj_omega (hyp : OddOrder.Peterfalvi.S05.TICyclicHypothesis G
   rw [Complex.inv_eq_conj hnorm]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Conjugation of a certain-type σ-image.**  The complex conjugate of `ω_{ij}^σ` is the σ-image
 of
 the inverse grid character `(P_{ij})⁻¹` (`P_{ij} = omegaProdCharTic h χ₂ i`).  Combines the (3.9)
@@ -164,6 +165,7 @@ it to the conjugate-index grid character, and `σ_L` intertwines the Galois acti
 
 omit [Fintype G] in
 omit [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Conjugation of a column source character.**  `χ_{ij}̄ = χ_{i'j'}` at the conjugate index
 (`ω_{ij} = chiColumn χ₂ i`): the Galois action of complex conjugation sends `ω(χ₁, χ₂)` to
 `ω(χ₁⁻¹, χ₂⁻¹) = ω(w1CharEquiv (rowInv i), χ₂⁻¹)`, i.e. `chiColumn χ₂⁻¹ (rowInv i)`. -/
@@ -171,7 +173,7 @@ theorem chiColumn_conj (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     IrreducibleCharacter.galoisMap Complex.conjAe.toRingEquiv (h.chiColumn χ₂ i)
       = h.chiColumn χ₂⁻¹ (rowInv h i) := by
-  haveI : Fintype ↥h.sdiffTICyclicHypothesis.W := Fintype.ofFinite _
+  have : Fintype ↥h.sdiffTICyclicHypothesis.W := Fintype.ofFinite _
   rw [Hypothesis.chiColumn, Hypothesis.chiColumn, galoisMap_conj_omega, omegaProdChar_inv]
   exact congrArg
     (fun c => h.sdiffTICyclicHypothesis.omega (h.sdiffTICyclicHypothesis.omegaProdChar c χ₂⁻¹))
@@ -212,7 +214,7 @@ theorem certainType_mu_conj_bridge (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)
           ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
       = (h.columnFamily χ₂⁻¹).sign •
           ((h.columnFamily χ₂⁻¹).mu (rowInv h i) : ClassFunction ↥L ℂ) := by
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   have e2 := h.sigma_chiColumn_eq_certainType χ₂⁻¹ (rowInv h i)
   have key := congrArg (ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv)
     (h.sigma_chiColumn_eq_certainType χ₂ i)
@@ -229,7 +231,7 @@ theorem certainType_mu_conj_eq (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     IrreducibleCharacter.galoisMap Complex.conjAe.toRingEquiv ((h.columnFamily χ₂).mu i)
       = (h.columnFamily χ₂⁻¹).mu (rowInv h i) := by
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   by_contra hne
   have hb := certainType_mu_conj_bridge h χ₂ i
   rw [← IrreducibleCharacter.galoisMap_apply_coe,
@@ -257,7 +259,7 @@ theorem certainType_columnSum_conj (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)
     ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
         (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ))
       = ∑ i, ((h.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ) := by
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   rw [← ClassFunction.mapRingEquivLinear_apply, map_sum]
   simp only [ClassFunction.mapRingEquivLinear_apply]
   have hterm : ∀ i, ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
@@ -278,7 +280,7 @@ theorem column_inv_ne_self (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     [Invertible (Nat.card ↥h.K : ℂ)]
     {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) :
     χ₂⁻¹ ≠ χ₂ := by
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   have hodd : Odd (Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)) := by
     rw [h.card_charGroup_W2]
     exact h.W_odd.of_dvd_nat (Subgroup.card_dvd_of_le le_sup_right)
@@ -308,7 +310,7 @@ theorem certainType_columnSum_conj_ne (h : Hypothesis46 A L) [NeZero (Nat.card h
     ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
         (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ))
       ≠ ∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) := by
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   rw [certainType_columnSum_conj]
   intro heq
   have h0 := columnFamily_mu_sum_inner h χ₂⁻¹ χ₂

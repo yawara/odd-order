@@ -61,7 +61,7 @@ variable {R}
 /-- **`n · N̂ = N̂`** for `n ∈ N`: left translation permutes `N`. -/
 theorem single_mul_subgroupSum {N : Subgroup G} {n : G} (hn : n ∈ N) :
     single n (1 : R) * subgroupSum R N = subgroupSum R N := by
-  letI := Fintype.ofFinite ↥N
+  let := Fintype.ofFinite ↥N
   change single n (1 : R) * (∑ m : ↥N, single (m : G) (1 : R))
     = ∑ m : ↥N, single (m : G) (1 : R)
   rw [Finset.mul_sum]
@@ -73,7 +73,7 @@ theorem single_mul_subgroupSum {N : Subgroup G} {n : G} (hn : n ∈ N) :
 /-- **`N̂ · n = N̂`** for `n ∈ N`. -/
 theorem subgroupSum_mul_single {N : Subgroup G} {n : G} (hn : n ∈ N) :
     subgroupSum R N * single n (1 : R) = subgroupSum R N := by
-  letI := Fintype.ofFinite ↥N
+  let := Fintype.ofFinite ↥N
   change (∑ m : ↥N, single (m : G) (1 : R)) * single n (1 : R)
     = ∑ m : ↥N, single (m : G) (1 : R)
   rw [Finset.sum_mul]
@@ -85,7 +85,7 @@ theorem subgroupSum_mul_single {N : Subgroup G} {n : G} (hn : n ∈ N) :
 /-- **`N̂` is conjugation-invariant when `N` is normal**, hence central in `R[G]`. -/
 theorem conj_smul_subgroupSum {N : Subgroup G} (hN : N.Normal) (g : G) :
     g • subgroupSum R N = subgroupSum R N := by
-  letI := Fintype.ofFinite ↥N
+  let := Fintype.ofFinite ↥N
   change g • (∑ m : ↥N, single (m : G) (1 : R)) = ∑ m : ↥N, single (m : G) (1 : R)
   rw [Finset.smul_sum]
   have hconj : ∀ m : ↥N, g * (m : G) * g⁻¹ ∈ N := fun m => hN.conj_mem _ m.2 g
@@ -102,7 +102,7 @@ theorem conj_smul_subgroupSum {N : Subgroup G} (hN : N.Normal) (g : G) :
 /-- **`N̂² = |N| · N̂`.**  Each of the `|N|` left translates of `N̂` is `N̂` again. -/
 theorem subgroupSum_mul_subgroupSum (N : Subgroup G) :
     subgroupSum R N * subgroupSum R N = (Nat.card ↥N : ℕ) • subgroupSum R N := by
-  letI := Fintype.ofFinite ↥N
+  let := Fintype.ofFinite ↥N
   have hL : subgroupSum R N * subgroupSum R N
       = (∑ n : ↥N, single (n : G) (1 : R)) * subgroupSum R N := rfl
   rw [hL, Finset.sum_mul,
@@ -114,7 +114,7 @@ open scoped Classical in
 theorem coeff_subgroupSum (N : Subgroup G) (g : G) :
     (subgroupSum R N).coeff g = if g ∈ N then 1 else 0 := by
   classical
-  letI := Fintype.ofFinite ↥N
+  let := Fintype.ofFinite ↥N
   have hL : (subgroupSum R N).coeff g
       = ∑ n : ↥N, (single (n : G) (1 : R)).coeff g := by
     change ((∑ n : ↥N, single (n : G) (1 : R)) : MonoidAlgebra R G).coeff g = _
@@ -146,7 +146,7 @@ theorem coeff_subgroupSum_mul (N : Subgroup G) (w : MonoidAlgebra R G) (g : G) :
       = letI := Fintype.ofFinite ↥N
         ∑ x : ↥N, w.coeff ((x : G)⁻¹ * g) := by
   classical
-  letI := Fintype.ofFinite ↥N
+  let := Fintype.ofFinite ↥N
   have hL : subgroupSum R N * w = ∑ x : ↥N, single (x : G) (1 : R) * w := by
     change (∑ x : ↥N, single (x : G) (1 : R)) * w = _
     rw [Finset.sum_mul]
@@ -174,7 +174,7 @@ theorem coeff_subgroupSum_mul_one (N : Subgroup G) [Fintype ↥N] (w : MonoidAlg
 /-- **`N̂` is transported by a coefficient change**: it has coefficients `0` and `1` only. -/
 theorem mapRingHom_subgroupSum {S : Type*} [Semiring S] (f : R →+* S) (N : Subgroup G) :
     MonoidAlgebra.mapRingHom G f (subgroupSum R N) = subgroupSum S N := by
-  letI := Fintype.ofFinite ↥N
+  let := Fintype.ofFinite ↥N
   change MonoidAlgebra.mapRingHom G f (∑ n : ↥N, single (n : G) (1 : R))
     = ∑ n : ↥N, single (n : G) (1 : S)
   rw [map_sum]
@@ -204,7 +204,7 @@ theorem map_subgroupSum_of_forall_map_single_eq_one
     (ρ : MonoidAlgebra R G →ₐ[R] A) {N : Subgroup G}
     (h : ∀ n ∈ N, ρ (single n (1 : R)) = 1) :
     ρ (subgroupSum R N) = (Nat.card ↥N : ℕ) • (1 : A) := by
-  letI := Fintype.ofFinite ↥N
+  let := Fintype.ofFinite ↥N
   change ρ (∑ m : ↥N, single (m : G) (1 : R)) = _
   rw [map_sum]
   rw [Finset.sum_congr rfl fun (m : ↥N) _ => h (m : G) m.2]

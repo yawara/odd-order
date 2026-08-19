@@ -133,7 +133,7 @@ theorem frattiniSquareCommutatorValue_mul_left
       frattiniSquareCommutatorValue hP hxi hPhiComm hexists z x *
     frattiniSquareCommutatorValue
           hP hxi hPhiComm hexists z' x := by
-  letI : Nontrivial P :=
+  let : Nontrivial P :=
     nontrivial_of_exists_frattini_pow_two_ne_one hexists
   apply Subtype.ext
   exact commutatorElement_mul_left_of_mem_center _ _ _
@@ -158,7 +158,7 @@ theorem frattiniSquareCommutatorValue_mul_right
       frattiniSquareCommutatorValue hP hxi hPhiComm hexists z x *
     frattiniSquareCommutatorValue
           hP hxi hPhiComm hexists z x' := by
-  letI : Nontrivial P :=
+  let : Nontrivial P :=
     nontrivial_of_exists_frattini_pow_two_ne_one hexists
   apply Subtype.ext
   exact commutatorElement_mul_right_of_mem_center _ _ _
@@ -220,7 +220,7 @@ theorem frattiniSquareCommutatorBihomRaw_ker_left
     (x : lowerCentralTerm P 0) :
     frattiniSquareCommutatorBihomRaw
         hP hxi hPhiComm hfour hexists z x = 1 := by
-  letI : Nontrivial P :=
+  let : Nontrivial P :=
     nontrivial_of_exists_frattini_pow_two_ne_one hexists
   apply Subtype.ext
   change ⁅(z : P), (x : P)⁆ = 1
@@ -360,12 +360,12 @@ theorem frattiniSquareCommutatorBihom_mk
       frattiniSquareCommutatorValue
         hP hxi hPhiComm hexists z x := by
   dsimp only
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   let hSquareEA :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
   change frattiniSquareCommutatorBihomRaw
       hP hxi hPhiComm hfour hexists z x =
@@ -440,12 +440,12 @@ theorem frattiniSquareCommutatorBilinear_mk
   dsimp only
   let hSquareEA :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
   change Additive.ofMul
       (frattiniSquareCommutatorBihom hP hxi hPhiComm hfour hexists
@@ -482,12 +482,12 @@ theorem frattiniSquareCommutatorBilinear_mk_eq_zero_iff
   dsimp only
   let hSquareEA :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
   rw [frattiniSquareCommutatorBilinear_mk]
   change frattiniSquareCommutatorValue

@@ -116,13 +116,13 @@ theorem lowerCentralCommutatorBilinearBaseChange_equivariant
       lowerCentralCommutatorBilinearBaseChange K H
         ((lowerCentralLayerRepresentation phi 0 g).baseChange K u)
         ((lowerCentralLayerRepresentation phi 0 g).baseChange K v) := by
-  letI : IsMulCommutative (lowerCentralLayer H 0) :=
+  let : IsMulCommutative (lowerCentralLayer H 0) :=
     lowerCentralLayerIsMulCommutative H 0
-  letI : IsMulCommutative (lowerCentralLayer H 1) :=
+  let : IsMulCommutative (lowerCentralLayer H 1) :=
     lowerCentralLayerIsMulCommutative H 1
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer H 0)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer H 0)) :=
     lowerCentralLayerZmodModule H 0
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
     lowerCentralLayerZmodModule H 1
   unfold lowerCentralCommutatorBilinearBaseChange
   apply LinearMap.BilinMap.baseChange_equivariant
@@ -167,13 +167,13 @@ theorem lowerCentralCommutatorBilinearBaseChange_eigenweight
     (lowerCentralLayerRepresentation phi 1 g).baseChange K
         (lowerCentralCommutatorBilinearBaseChange K H u v) =
       (a * c) • lowerCentralCommutatorBilinearBaseChange K H u v := by
-  letI : IsMulCommutative (lowerCentralLayer H 0) :=
+  let : IsMulCommutative (lowerCentralLayer H 0) :=
     lowerCentralLayerIsMulCommutative H 0
-  letI : IsMulCommutative (lowerCentralLayer H 1) :=
+  let : IsMulCommutative (lowerCentralLayer H 1) :=
     lowerCentralLayerIsMulCommutative H 1
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer H 0)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer H 0)) :=
     lowerCentralLayerZmodModule H 0
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
     lowerCentralLayerZmodModule H 1
   rw [lowerCentralCommutatorBilinearBaseChange_equivariant, hu, hv]
   simp [smul_smul, mul_comm]
@@ -210,7 +210,7 @@ theorem zmodTwo_baseChange_self_eq_zero
     (b : LinearMap.BilinMap (ZMod 2) M N)
     (hdiag : ∀ x, b x x = 0) (u : K ⊗[ZMod 2] M) :
     b.baseChange K u u = 0 := by
-  letI : CharP K 2 :=
+  let : CharP K 2 :=
     charP_of_injective_algebraMap (algebraMap (ZMod 2) K).injective 2
   have hsymm : ∀ x y, b x y = b y x :=
     zmodTwo_symmetric_of_self_eq_zero b hdiag
@@ -247,13 +247,13 @@ theorem lowerCentralCommutatorBilinearBaseChange_self
     letI : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
       lowerCentralLayerZmodModule H 1
     lowerCentralCommutatorBilinearBaseChange K H u u = 0 := by
-  letI : IsMulCommutative (lowerCentralLayer H 0) :=
+  let : IsMulCommutative (lowerCentralLayer H 0) :=
     lowerCentralLayerIsMulCommutative H 0
-  letI : IsMulCommutative (lowerCentralLayer H 1) :=
+  let : IsMulCommutative (lowerCentralLayer H 1) :=
     lowerCentralLayerIsMulCommutative H 1
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer H 0)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer H 0)) :=
     lowerCentralLayerZmodModule H 0
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
     lowerCentralLayerZmodModule H 1
   unfold lowerCentralCommutatorBilinearBaseChange
   exact LinearMap.BilinMap.zmodTwo_baseChange_self_eq_zero
@@ -343,13 +343,13 @@ theorem lowerCentralCommutatorBilinearBaseChange_span_eq_top
           (K ⊗[ZMod 2] Additive (lowerCentralLayer H 0)) ×
             (K ⊗[ZMod 2] Additive (lowerCentralLayer H 0)) =>
         lowerCentralCommutatorBilinearBaseChange K H z.1 z.2) = ⊤ := by
-  letI : IsMulCommutative (lowerCentralLayer H 0) :=
+  let : IsMulCommutative (lowerCentralLayer H 0) :=
     lowerCentralLayerIsMulCommutative H 0
-  letI : IsMulCommutative (lowerCentralLayer H 1) :=
+  let : IsMulCommutative (lowerCentralLayer H 1) :=
     lowerCentralLayerIsMulCommutative H 1
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer H 0)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer H 0)) :=
     lowerCentralLayerZmodModule H 0
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer H 1)) :=
     lowerCentralLayerZmodModule H 1
   unfold lowerCentralCommutatorBilinearBaseChange
   exact LinearMap.BilinMap.baseChange_span_eq_top

@@ -57,7 +57,7 @@ theorem higmanClassification
     IsTypeA.{uP, 0} P ∨ IsTypeB.{uP, 0} P ∨
       IsTypeC.{uP, 0} P ∨ IsTypeD.{uP, 0} P := by
   classical
-  letI : Nontrivial P := by
+  let : Nontrivial P := by
     obtain ⟨x, y, _, _, hxy⟩ := hmulti
     exact ⟨⟨x, y, hxy⟩⟩
   have hinv : (involutions P).Nonempty := by
@@ -71,7 +71,7 @@ theorem higmanClassification
   let centerTerm : NormalInvariantSubgroup B.subtype :=
     centerNormalInvariant B.subtype
   have hcenterNeBot : Subgroup.center P ≠ (⊥ : Subgroup P) := by
-    letI : Nontrivial ↥(Subgroup.center P) := hP.center_nontrivial
+    let : Nontrivial ↥(Subgroup.center P) := hP.center_nontrivial
     exact (Subgroup.nontrivial_iff_ne_bot (Subgroup.center P)).mp inferInstance
   have hcenterNeTop : Subgroup.center P ≠ (⊤ : Subgroup P) := by
     intro hcenter

@@ -33,9 +33,9 @@ theorem Hypothesis.mu_colSum_not_irreducible [Finite G] (hyp : Hypothesis (G := 
     (j : Fin hyp.p) :
     ¬ OddOrder.RepresentationTheory.IsIrreducibleCharacter (∑ i : Fin hyp.q, hyp.mu i j) := by
   classical
-  haveI := hyp.finiteG
-  letI : Fintype ↥hyp.S := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+  have := hyp.finiteG
+  let : Fintype ↥hyp.S := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥hyp.S : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   intro hirr
   set a : Fin hyp.q → OddOrder.RepresentationTheory.IrreducibleCharacter ↥hyp.S :=

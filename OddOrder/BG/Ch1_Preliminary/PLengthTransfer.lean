@@ -68,9 +68,9 @@ theorem oPiCore_quotient_eq_of_isPiGroup {G : Type*} [Group G] [Finite G] (π : 
   have hsurj : Function.Surjective q := QuotientGroup.mk'_surjective H
   refine le_antisymm ?_ (Ch03.oPiCore.map_le_of_surjective _ q hsurj)
   set Kbar : Subgroup (G ⧸ H) := Ch03.oPiCore π (G ⧸ H) with hKbar
-  haveI hKbarN : Kbar.Normal := by rw [hKbar]; infer_instance
+  have hKbarN : Kbar.Normal := by rw [hKbar]; infer_instance
   set N : Subgroup G := Kbar.comap q with hN
-  haveI hNnormal : N.Normal := by rw [hN]; infer_instance
+  have hNnormal : N.Normal := by rw [hN]; infer_instance
   have hKbar_pi : Ch03.Subgroup.IsPiGroup π Kbar := by rw [hKbar]; exact Ch03.oPiCore.isPiGroup _
   -- `|N| = |H| · |Kbar|` (the restriction `q : N → Kbar` is onto with kernel `H`).
   have hidx : N.index = Kbar.index := by
@@ -115,7 +115,7 @@ theorem hasPLengthOne_of_isPiPrime_normal_quotient [Fact p.Prime] {G : Type*} [G
   have hcorr : Ch03.oPiCore (({p} : Set ℕ)ᶜ) (G ⧸ H)
       = (Ch03.oPiCore (({p} : Set ℕ)ᶜ) G).map (QuotientGroup.mk' H) :=
     oPiCore_quotient_eq_of_isPiGroup _ (isPiGroup_compl_of_not_dvd hHp')
-  haveI hmapN : ((Ch03.oPiCore (({p} : Set ℕ)ᶜ) G).map (QuotientGroup.mk' H)).Normal :=
+  have hmapN : ((Ch03.oPiCore (({p} : Set ℕ)ᶜ) G).map (QuotientGroup.mk' H)).Normal :=
     Subgroup.Normal.map inferInstance (QuotientGroup.mk' H) (QuotientGroup.mk'_surjective H)
   -- `φ : (G/H)/O_{p'}(G/H) ≃* G/O_{p'}(G)`.
   have φ : ((G ⧸ H) ⧸ Ch03.oPiCore (({p} : Set ℕ)ᶜ) (G ⧸ H)) ≃*
@@ -197,7 +197,7 @@ theorem hasPLengthOne_of_isPGroup_normal_quotient [Fact p.Prime] {G : Type*} [Gr
   have hcorr : Ch03.oPiCore ({p} : Set ℕ) (G ⧸ H)
       = (Ch03.oPiCore ({p} : Set ℕ) G).map (QuotientGroup.mk' H) :=
     oPiCore_quotient_eq_of_isPiGroup _ hHpi
-  haveI hmapN : ((Ch03.oPiCore ({p} : Set ℕ) G).map (QuotientGroup.mk' H)).Normal :=
+  have hmapN : ((Ch03.oPiCore ({p} : Set ℕ) G).map (QuotientGroup.mk' H)).Normal :=
     Subgroup.Normal.map inferInstance (QuotientGroup.mk' H) (QuotientGroup.mk'_surjective H)
   have φ : ((G ⧸ H) ⧸ Ch03.oPiCore ({p} : Set ℕ) (G ⧸ H)) ≃*
       (G ⧸ Ch03.oPiCore ({p} : Set ℕ) G) :=
@@ -215,7 +215,7 @@ theorem le_oPiPrimePiCore_of_quotient_isPGroup [Fact p.Prime] {G : Type*} [Group
     K ≤ Ch03.oPiPrimePiCore ({p} : Set ℕ) G := by
   classical
   set Op' : Subgroup G := Ch03.oPiCore (({p} : Set ℕ)ᶜ) G with hOp'
-  haveI : (K.map (QuotientGroup.mk' Op')).Normal :=
+  have : (K.map (QuotientGroup.mk' Op')).Normal :=
     Subgroup.Normal.map inferInstance (QuotientGroup.mk' Op') (QuotientGroup.mk'_surjective Op')
   have hle : K.map (QuotientGroup.mk' Op') ≤ Ch03.oPiCore ({p} : Set ℕ) (G ⧸ Op') :=
     Ch03.Subgroup.IsPiGroup.le_oPiCore (isPiGroup_singleton_of_isPGroup hK)
@@ -242,7 +242,7 @@ theorem oPiCore_compl_subgroupOf_le [Fact p.Prime] {G : Type*} [Group G] [Finite
     {H : Subgroup G} :
     (Ch03.oPiCore (({p} : Set ℕ)ᶜ) G).subgroupOf H
       ≤ Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥H := by
-  haveI : ((Ch03.oPiCore (({p} : Set ℕ)ᶜ) G).subgroupOf H).Normal :=
+  have : ((Ch03.oPiCore (({p} : Set ℕ)ᶜ) G).subgroupOf H).Normal :=
     Subgroup.Normal.comap inferInstance H.subtype
   refine Ch03.Subgroup.IsPiGroup.le_oPiCore ?_
   intro r hr
@@ -278,7 +278,7 @@ theorem oPiPrimePiCore_subgroupOf_le [Fact p.Prime] {G : Type*} [Group G] [Finit
     (Ch03.oPiPrimePiCore ({p} : Set ℕ) G).subgroupOf H
       ≤ Ch03.oPiPrimePiCore ({p} : Set ℕ) ↥H := by
   classical
-  haveI hKnorm : ((Ch03.oPiPrimePiCore ({p} : Set ℕ) G).subgroupOf H).Normal :=
+  have hKnorm : ((Ch03.oPiPrimePiCore ({p} : Set ℕ) G).subgroupOf H).Normal :=
     Subgroup.Normal.comap inferInstance H.subtype
   apply le_oPiPrimePiCore_of_quotient_isPGroup
   set A : Subgroup G := Ch03.oPiPrimePiCore ({p} : Set ℕ) G ⊓ H with hAdef
@@ -342,12 +342,12 @@ theorem oPiCore_prod {A B : Type*} [Group A] [Group B] [Finite A] [Finite B] (π
   refine le_antisymm ?_ ?_
   · rw [Subgroup.le_prod_iff]
     refine ⟨?_, ?_⟩
-    · haveI : ((Ch03.oPiCore π (A × B)).map (MonoidHom.fst A B)).Normal :=
+    · have : ((Ch03.oPiCore π (A × B)).map (MonoidHom.fst A B)).Normal :=
         Subgroup.Normal.map inferInstance (MonoidHom.fst A B) hfst
       refine Ch03.Subgroup.IsPiGroup.le_oPiCore (fun r hr => ?_)
       exact Ch03.oPiCore.isPiGroup π r
         (Nat.primeFactors_mono (Subgroup.card_map_dvd _ _) Nat.card_pos.ne' hr)
-    · haveI : ((Ch03.oPiCore π (A × B)).map (MonoidHom.snd A B)).Normal :=
+    · have : ((Ch03.oPiCore π (A × B)).map (MonoidHom.snd A B)).Normal :=
         Subgroup.Normal.map inferInstance (MonoidHom.snd A B) hsnd
       refine Ch03.Subgroup.IsPiGroup.le_oPiCore (fun r hr => ?_)
       exact Ch03.oPiCore.isPiGroup π r
@@ -450,13 +450,13 @@ theorem hasPLengthOne_of_normal_pPrime_quotient [Fact p.Prime] {Γ : Type*} [Gro
   set Op'Γ : Subgroup Γ := Ch03.oPiCore (({p} : Set ℕ)ᶜ) Γ with hOp'Γ
   set W : Subgroup ↥N := Ch03.oPiPrimePiCore ({p} : Set ℕ) ↥N with hW
   -- `W` is characteristic in `↥N`, so `K = W.map N.subtype ⊴ Γ`.
-  haveI hWchar : W.Characteristic :=
+  have hWchar : W.Characteristic :=
     Subgroup.Characteristic.comap_quotient_mk (Ch03.oPiCore.characteristic _ _)
   set K : Subgroup Γ := W.map N.subtype with hK
   -- Induced quotient map `ρ : ↥N/O_{p'}(↥N) → Γ/O_{p'}(Γ)`.
   have hOp'_le : Op'N ≤ Op'Γ.comap N.subtype := by
     rw [← Subgroup.map_le_iff_le_comap]
-    haveI : (Op'N.map N.subtype).Normal := by rw [hOp'N]; infer_instance
+    have : (Op'N.map N.subtype).Normal := by rw [hOp'N]; infer_instance
     refine Ch03.Subgroup.IsPiGroup.le_oPiCore ?_
     intro r hr
     have hcard : Nat.card ↥(Op'N.map N.subtype) = Nat.card ↥Op'N :=

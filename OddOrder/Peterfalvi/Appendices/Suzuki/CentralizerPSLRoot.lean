@@ -78,9 +78,9 @@ theorem q_isElementaryAbelian_of_psl2Target (hyp : Hypothesis G Omega)
     (L : Subgroup G) (hLnormal : L.Normal) (hLodd : Odd L.index)
     (data : PSL2InductionTarget (Omega := Omega) L) :
     IsElementaryAbelian 2 hyp.Q := by
-  letI : Field data.F := data.fieldF
-  letI : Finite data.F := data.finiteF
-  letI : CharP data.F 2 := data.charTwoF
+  let : Field data.F := data.fieldF
+  let : Finite data.F := data.finiteF
+  let : CharP data.F 2 := data.charTwoF
   exact IsElementaryAbelian.of_mulEquiv
     (hyp.qMulEquivPSLRoot L hLnormal hLodd data).symm
       (rootSubgroup_isElementaryAbelian (F := data.F))
@@ -90,9 +90,9 @@ theorem natCard_Q_eq_field_of_psl2Target (hyp : Hypothesis G Omega)
     (L : Subgroup G) (hLnormal : L.Normal) (hLodd : Odd L.index)
     (data : PSL2InductionTarget (Omega := Omega) L) :
     Nat.card hyp.Q = Nat.card data.F := by
-  letI : Field data.F := data.fieldF
-  letI : Finite data.F := data.finiteF
-  letI : CharP data.F 2 := data.charTwoF
+  let : Field data.F := data.fieldF
+  let : Finite data.F := data.finiteF
+  let : CharP data.F 2 := data.charTwoF
   calc
     Nat.card hyp.Q = Nat.card (rootSubgroup (F := data.F)) :=
       Nat.card_congr (hyp.qMulEquivPSLRoot L hLnormal hLodd data).toEquiv
@@ -143,7 +143,7 @@ theorem centralizerQuotientQ_isElementaryAbelian_of_psl2Target
     letI := hyp.centralizerQuotientMulAction hXV
     let qhyp := hyp.centralizerQuotientHypothesis hXV hA3
     IsElementaryAbelian 2 qhyp.Q := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   let qhyp := hyp.centralizerQuotientHypothesis hXV hA3
   exact qhyp.q_isElementaryAbelian_of_psl2Target result.L result.normal
     result.oddIndex data
@@ -164,7 +164,7 @@ theorem natCard_centralizerQuotientQ_eq_field_of_psl2Target
     letI := hyp.centralizerQuotientMulAction hXV
     let qhyp := hyp.centralizerQuotientHypothesis hXV hA3
     Nat.card qhyp.Q = Nat.card data.F := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   let qhyp := hyp.centralizerQuotientHypothesis hXV hA3
   exact qhyp.natCard_Q_eq_field_of_psl2Target result.L result.normal
     result.oddIndex data
@@ -231,10 +231,10 @@ theorem centralizerCQ_isElementaryAbelian_of_psl2Target
       PSL2InductionTarget (Omega := ↥(MulAction.fixedPoints X Omega)) result.L) :
     IsElementaryAbelian 2
       ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))) := by
-  letI := hyp.centralizerQuotientMulAction hXV
-  letI : Field data.F := data.fieldF
-  letI : Finite data.F := data.finiteF
-  letI : CharP data.F 2 := data.charTwoF
+  let := hyp.centralizerQuotientMulAction hXV
+  let : Field data.F := data.fieldF
+  let : Finite data.F := data.finiteF
+  let : CharP data.F 2 := data.charTwoF
   exact IsElementaryAbelian.of_mulEquiv
     (hyp.centralizerCQMulEquivPSLRoot hXV hA3 result data).symm
       (rootSubgroup_isElementaryAbelian (F := data.F))
@@ -255,10 +255,10 @@ theorem natCard_centralizerCQ_eq_field_of_psl2Target
     letI := hyp.centralizerQuotientMulAction hXV
     Nat.card ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))) =
       Nat.card data.F := by
-  letI := hyp.centralizerQuotientMulAction hXV
-  letI : Field data.F := data.fieldF
-  letI : Finite data.F := data.finiteF
-  letI : CharP data.F 2 := data.charTwoF
+  let := hyp.centralizerQuotientMulAction hXV
+  let : Field data.F := data.fieldF
+  let : Finite data.F := data.finiteF
+  let : CharP data.F 2 := data.charTwoF
   calc
     Nat.card ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))) =
         Nat.card (rootSubgroup (F := data.F)) :=
@@ -283,7 +283,7 @@ theorem natCard_centralizerQ0_eq_field_of_psl2Target
     letI := hyp.centralizerQuotientMulAction hXV
     Nat.card ↥(hyp.Q0.subgroupOf (Subgroup.centralizer (X : Set G))) =
       Nat.card data.F := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   rw [hyp.centralizerQ0_subgroupOf_eq_Q_subgroupOf_of_elementaryAbelian
     (hyp.centralizerCQ_isElementaryAbelian_of_psl2Target hXV hA3 result data)]
   exact hyp.natCard_centralizerCQ_eq_field_of_psl2Target

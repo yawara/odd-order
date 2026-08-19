@@ -173,6 +173,7 @@ noncomputable def inducedR [NeZero (Nat.card h.W1)]
       (hχθ.trans (exists_ne_one_induce_eq_columnSum h hθ (hχθ ▸ hirr)).choose_spec.2)
 
 open scoped Classical in
+set_option backward.isDefEq.respectTransparency false in
 /-- The **irreducible branch** of `inducedR`: `R(χ)` is the two-element (5.3)(a) Dade image, which
 depends on the member `χ` only. -/
 theorem inducedR_imageSet_of_irreducible [NeZero (Nat.card h.W1)]
@@ -193,6 +194,7 @@ theorem inducedR_imageSet_of_irreducible [NeZero (Nat.card h.W1)]
   rw [inducedR, dif_pos hirr]
 
 open scoped Classical in
+set_option backward.isDefEq.respectTransparency false in
 /-- The **reducible branch** of `inducedR`: `R(χ) = R(μ_j)` is the (4.9) column family.  Stated
 for an *arbitrary* presentation `χ = columnSum χ₂`, unique by `columnSum_injective`. -/
 theorem inducedR_imageSet_of_not_irreducible [NeZero (Nat.card h.W1)]
@@ -465,7 +467,7 @@ theorem inducedNonKernelFamily_apply_eq_zero_of_not_mem
     {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ inducedNonKernelFamily h)
     {z : ↥L} (hz : z ∉ h.K) : φ z = 0 := by
   obtain ⟨θ, -, rfl⟩ := hφ
-  haveI := h.K_normal
+  have := h.K_normal
   exact ClassFunction.induce_apply_eq_zero_of_not_mem_normal h.K _ hz
 
 /-- **Peterfalvi (4.7), difference form**: for a member `φ` of the book's family the conjugate

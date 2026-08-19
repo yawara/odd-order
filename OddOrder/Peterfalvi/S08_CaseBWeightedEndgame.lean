@@ -61,7 +61,7 @@ theorem sum_re_div_normSq_Xset_eq (hyp : SibleyDadeHypothesis G L H) {Z : Subgro
           (fun θ => ClassFunction.induce H θ.toClassFunction)),
         ((χ 1).re) ^ 2 / (ClassFunction.inner χ χ).re
       = (H.index : ℝ) * ((Nat.card ↥H : ℝ) - (Nat.card (↥H ⧸ Z.subgroupOf H) : ℝ)) := by
-  letI : H.Normal := hyp.H_normal
+  let : H.Normal := hyp.H_normal
   have hbotker : ∀ θ : IrreducibleCharacter ↥H,
       (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆
         OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥H ℂ) := by
@@ -158,7 +158,7 @@ case-(B) discharge of the `hXne` obligation of `nonempty_coherent_S_caseB_of_c2`
 theorem Xset_nonempty_of_subgroupOf_ne_bot_weighted (hyp : SibleyDadeHypothesis G L H)
     {Z : Subgroup ↥L} [Z.Normal] (hZbot : Z.subgroupOf H ≠ ⊥) :
     (hyp.Xset Z).Nonempty := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
   have hXsum := sum_re_div_normSq_Xset_eq hyp (Z := Z)
   set Xdiff := (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
           (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
@@ -241,8 +241,8 @@ theorem xSum_le_two_psi_caseB
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
     (H.index : ℝ) * ((Nat.card ↥H : ℝ) - (Nat.card (↥H ⧸ W2.subgroupOf H) : ℝ))
       ≤ 2 * (ψ 1).re * (η 1).re := by
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
-  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
   classical
   obtain ⟨k, χmem, mc, hinj, hrange, hmemS1, hmcpos, hmcnorm, hfambound⟩ :=
     sMember_degreeSqNormReBound_of_not_coherent hyp h46 hHK hW1 hS₁sub hS₁conj hS₁fin hS₁coh hηY
@@ -317,7 +317,7 @@ theorem xSum_le_two_psi_caseB_columnBreak
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
     (H.index : ℝ) * ((Nat.card ↥H : ℝ) - (Nat.card (↥H ⧸ W2.subgroupOf H) : ℝ))
       ≤ 2 * (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b 1).re * (η 1).re := by
-  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  have : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
   classical
   obtain ⟨k, χmem, mc, hinj, hrange, hmemS1, hmcpos, hmcnorm, hfambound⟩ :=
     sMember_degreeSqNormReBound_of_not_coherent_columnBreak hyp h46 hHK hW1 hS₁sub hS₁conj hS₁fin
@@ -372,10 +372,10 @@ theorem S_hasNoRealCharacters_caseB
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
     [Finite ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)] :
     OddOrder.Peterfalvi.S03.HasNoRealCharacters hyp.S := by
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   classical
   intro χ hχS
-  rw [hyp.S_eq, Set.mem_setOf_eq] at hχS
+  rw [hyp.S_eq, Set.mem_ofPred_eq] at hχS
   obtain ⟨θ, hθne, rfl⟩ := hχS
   have hθne' : (θ : ClassFunction ↥H ℂ) ≠ trivialClassFunction ↥H := fun heq =>
     hθne (Subtype.ext (heq.trans (IrreducibleCharacter.coe_trivialIrreducibleCharacter).symm))
@@ -425,8 +425,8 @@ theorem false_of_coherentXunionYset_caseB_of_not_coherentS
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)))
     (hncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) : False := by
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
-  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
   classical
   -- break pair on `Sa = X(h46.W2) ∪ Y`, `Sb = S`.
   have hSaSb : hyp.Xset h46.W2 ∪ hyp.Yset ⊆ hyp.S := by
@@ -457,7 +457,7 @@ theorem false_of_coherentXunionYset_caseB_of_not_coherentS
       exact hXsub (hyp.mem_Xset.mpr ⟨hyp.columnSum_mem_S h46 hHK hχ₂,
         hyp.columnSum_notMem_SsubFiltration h46 hHK hχ₂⟩)
     · exact hirr
-  rw [hyp.S_eq, Set.mem_setOf_eq] at hψS
+  rw [hyp.S_eq, Set.mem_ofPred_eq] at hψS
   obtain ⟨θ, hθne, hψeq⟩ := hψS
   obtain ⟨d, hdpos, hθd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
   have hdsq : d ^ 2 ≤ Nat.card (↥H ⧸ h46.W2.subgroupOf H) := by

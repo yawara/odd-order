@@ -156,7 +156,7 @@ theorem exists_blockOfIrr_eq_principalBlock_character_eq_one :
       ∧ ∀ g : G, (wedderburnRepresentation e i).character g = 1 := by
   classical
   obtain ⟨i, hsub, htriv⟩ := exists_trivial_wedderburn_index e
-  haveI := hsub
+  have := hsub
   exact ⟨i, blockOfIrr_eq_principalBlock_of_trivial e hπG hlinG hnilG i htriv,
     fun g => character_eq_one_of_trivial e i htriv g⟩
 

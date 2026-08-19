@@ -121,7 +121,7 @@ theorem frattiniMiddleCommutatorBilinearBaseChange_support_of_ne_zero
         ∃ k : Fin (Module.finrank (ZMod 2) (GaloisField 2 n)),
           (k.val : ZMod n) = (i.val : ZMod n) + 1 := by
   classical
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   intro i j u v hu hv hne
@@ -206,7 +206,7 @@ theorem frattiniMiddleCommutatorBilinearBaseChange_eq_zero_of_ne
     frattiniMiddleCommutatorBilinearBaseChange (GaloisField 2 n)
         hP hxi hPhiComm hexists u v = 0 := by
   classical
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   by_contra hne

@@ -193,7 +193,7 @@ theorem isCompleteGroup_autTowerType_one_of_normal_range.{u} {G : Type u} [Group
     (hZ : Subgroup.center G = ⊥) (hnormal : ((autTowerEmb G 0 2).range).Normal) :
     IsCompleteGroup (autTowerType G 1) := by
   refine ⟨center_autTowerType_eq_bot hZ 1, ?_⟩
-  haveI := hnormal
+  have := hnormal
   -- `B` = `G₂` の像 = `Inn(G₂)`。
   have hCB : Subgroup.centralizer (((autTowerStep G 1).range : Subgroup (autTowerType G 2)) :
       Set (autTowerType G 2)) = ⊥ := by
@@ -214,7 +214,7 @@ theorem isCompleteGroup_autTowerType_one_of_normal_range.{u} {G : Type u} [Group
       (autTowerStep_injective hZ 1) hbase
     rw [hA, MonoidHom.range_eq_map]
     exact hpush
-  haveI hBnorm : ((autTowerStep G 1).range : Subgroup (autTowerType G 2)).Normal := by
+  have hBnorm : ((autTowerStep G 1).range : Subgroup (autTowerType G 2)).Normal := by
     rw [range_autTowerStep]
     exact innAut.normal
   have hCA : Subgroup.centralizer (((autTowerEmb G 0 2).range :
@@ -287,7 +287,7 @@ theorem innAut_le_layer_mulAut [Finite G] (hss : IsSemisimpleGroup G) :
   rw [hIm, (Subgroup.gc_map_comap (MulAut.conj : G →* MulAut G)).l_sSup]
   refine iSup₂_le fun S hS => ?_
   obtain ⟨hSnorm, hSsimple, hSnab⟩ := h𝒳 S hS
-  haveI := hSnorm
+  have := hSnorm
   have hle : S.map (MulAut.conj : G →* MulAut G) ≤ innAut G := Subgroup.map_le_range _ _
   have e : ↥S ≃* ↥(S.map (MulAut.conj : G →* MulAut G)) :=
     Subgroup.equivMapOfInjective S _ (conj_injective hZ)
@@ -295,7 +295,7 @@ theorem innAut_le_layer_mulAut [Finite G] (hss : IsSemisimpleGroup G) :
   · refine Subgroup.IsSubnormal.trans hle ?_ (innAut.normal (G := G)).isSubnormal
     exact Subgroup.Normal.isSubnormal
       ((Subgroup.normal_subgroupOf_iff_le_normalizer hle).mpr innAut_le_normalizer_map_conj)
-  · haveI := hSsimple
+  · have := hSsimple
     refine isQuasisimple_of_isSimpleGroup_not_isMulCommutative e.symm.isSimpleGroup ?_
     exact fun _ => hSnab (isMulCommutative_of_surjective e.symm.toMonoidHom e.symm.surjective)
 
@@ -338,20 +338,20 @@ theorem nilpotentResidual_top_eq_sup_of_normal [Finite G] {A B : Subgroup G}
   rw [nilpotentResidual_le_iff_isNilpotent_map,
     Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective N)]
   -- `A`, `B` の像は正規冪零。
-  haveI hAnil : Group.IsNilpotent ↥(A.map (QuotientGroup.mk' N)) :=
+  have hAnil : Group.IsNilpotent ↥(A.map (QuotientGroup.mk' N)) :=
     nilpotentResidual_le_iff_isNilpotent_map.mp le_sup_left
-  haveI hBnil : Group.IsNilpotent ↥(B.map (QuotientGroup.mk' N)) :=
+  have hBnil : Group.IsNilpotent ↥(B.map (QuotientGroup.mk' N)) :=
     nilpotentResidual_le_iff_isNilpotent_map.mp le_sup_right
-  haveI : (A.map (QuotientGroup.mk' N)).Normal :=
+  have : (A.map (QuotientGroup.mk' N)).Normal :=
     Subgroup.Normal.map inferInstance _ (QuotientGroup.mk'_surjective N)
-  haveI : (B.map (QuotientGroup.mk' N)).Normal :=
+  have : (B.map (QuotientGroup.mk' N)).Normal :=
     Subgroup.Normal.map inferInstance _ (QuotientGroup.mk'_surjective N)
   -- 両方 `F(G/N)` に入り, 生成するので `F(G/N) = ⊤`。
   have htop : (⊤ : Subgroup (G ⧸ N)) ≤ Ch01.fitting (G ⧸ N) := by
     rw [← Subgroup.map_top_of_surjective (QuotientGroup.mk' N)
         (QuotientGroup.mk'_surjective N), ← hAB, Subgroup.map_sup]
     exact sup_le Ch01.nilpotent_normal_le_fitting Ch01.nilpotent_normal_le_fitting
-  haveI := Ch01.fitting.isNilpotent (G := G ⧸ N)
+  have := Ch01.fitting.isNilpotent (G := G ⧸ N)
   exact Group.nilpotent_of_mulEquiv (MulEquiv.subgroupCongr (top_le_iff.mp htop))
 
 /-- 9B.5 の帰納核: `Nat.card G ≤ n` の有限群で `A, B ◁◁ G`, `G = AB` ⟹
@@ -372,8 +372,8 @@ private theorem nilpotentResidual_sup_aux.{u} (n : ℕ) :
     · exact le_sup_of_le_left (nilpotentResidual_mono le_top)
     rcases hB.lt_normal with rfl | ⟨B₁, hB₁norm, hBB₁, hB₁lt⟩
     · exact le_sup_of_le_right (nilpotentResidual_mono le_top)
-    haveI := hA₁norm
-    haveI := hB₁norm
+    have := hA₁norm
+    have := hB₁norm
     have hA₁B₁ : A₁ ⊔ B₁ = ⊤ := by
       refine top_le_iff.mp ?_
       rw [← hjoin]

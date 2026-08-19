@@ -320,7 +320,7 @@ theorem Hypothesis.nu_rowSum_ne_of_inner_zero [Finite G] (hyp : Hypothesis (G :=
       (∑ j : Fin hyp.p, hyp.nu b j) = 0) :
     a ≠ b := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   rintro rfl
   have hself : ClassFunction.inner (∑ j : Fin hyp.p, hyp.nu a j)
       (∑ j : Fin hyp.p, hyp.nu a j) = (hyp.p : ℂ) := by
@@ -363,8 +363,8 @@ theorem Hypothesis.sSet_irr_memberRFamily_eta_inner_T [Finite G]
     (i : Fin hyp.q) (j : Fin hyp.p) :
     ClassFunction.inner (hyp.eta i j) α = 0 := by
   classical
-  haveI := hyp.finiteG
-  letI : Fintype G := Fintype.ofFinite G
+  have := hyp.finiteG
+  let : Fintype G := Fintype.ofFinite G
   obtain ⟨cd, hcd⟩ :
       ∃ cd : OddOrder.Peterfalvi.S07.CharacterDifferenceImage (G := G)
         (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.dadeHypT hG hTP)
@@ -716,7 +716,7 @@ theorem Hypothesis.sSetIrrDegT_member_support_subset [Finite G]
     {φ : ClassFunction ↥hyp.T ℂ} (hφ : φ ∈ hyp.sSetIrrDegT hG hvd d) :
     φ.support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T ∪ {1} := by
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   obtain ⟨hφsSet, _⟩ := hφ
   obtain ⟨hξ, hφeq⟩ := hφsSet.choose_spec
   rw [hφeq]
@@ -732,7 +732,7 @@ theorem Hypothesis.sSetIrrDegT_member_diff_supported [Finite G]
     {y : ClassFunction ↥hyp.T ℂ} (hy : y ∈ hyp.sSetIrrDegT hG hvd d) :
     (x - y).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T := by
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   intro z hz
   have hz0 : (x - y) z ≠ 0 := hz
   have hdeg : (x : ↥hyp.T → ℂ) 1 = (y : ↥hyp.T → ℂ) 1 := by rw [hx.2.2, hy.2.2]

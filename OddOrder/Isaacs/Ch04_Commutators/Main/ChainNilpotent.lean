@@ -353,7 +353,7 @@ private theorem commutator_actionCommutatorInfty_actionCommutator_eq_bot
   have hd_gamma : ⁅GA_inl, YinfA⁆ = ⊥ :=
     commutator_inl_GA_inr_Ainf_eq_bot_of_centralized h
   -- GA_inl is normal in Γ (it = ⁅XG, YA⁆ with XG ⊔ inr(A) = ⊤).
-  haveI hGA_norm : GA_inl.Normal := by
+  have hGA_norm : GA_inl.Normal := by
     rw [hGA_inl_eq]
     exact commutator_normal_of_sup_eq_top
       SemidirectProduct.inl_range_sup_inr_range_eq_top
@@ -543,7 +543,7 @@ private lemma actionCommutatorInfty_fix_normal_of_centralized
     (actionCommutatorInfty_fix φ).Normal := by
   rw [← Subgroup.commutator_top_right_le_iff]
   refine le_inf ?_ (commutator_actionCommutatorInfty_fix_top_le_fixedPoints φ h)
-  haveI : (actionCommutatorInfty φ).Normal := actionCommutatorInfty_normal φ
+  have : (actionCommutatorInfty φ).Normal := actionCommutatorInfty_normal φ
   calc ⁅actionCommutatorInfty_fix φ, (⊤ : Subgroup G)⁆
       ≤ ⁅actionCommutatorInfty φ, (⊤ : Subgroup G)⁆ :=
         Subgroup.commutator_mono inf_le_left le_rfl
@@ -644,7 +644,7 @@ private lemma actionCommutatorInfty_fix_ne_bot_of_ne_bot
     rw [← this]
     exact hfk1_bot
   -- f k ≤ XG (induction). XG is normal in Γ, so iter preserves XG-containment.
-  haveI hXG_normal : XG.Normal := by
+  have hXG_normal : XG.Normal := by
     simp only [hXG_def]
     infer_instance
   have hXG_comm_YA_le : ⁅XG, YA⁆ ≤ XG := Subgroup.commutator_le_left XG YA
@@ -929,12 +929,12 @@ private theorem actionCommutatorInfty_eq_bot_of_iter_eq_bot_aux :
       intro A G _ _ _ _ φ m hm h_iter h_le
       by_cases hG_nontriv : Nontrivial G
       swap
-      · haveI : Subsingleton G := not_nontrivial_iff_subsingleton.mp hG_nontriv
+      · have : Subsingleton G := not_nontrivial_iff_subsingleton.mp hG_nontriv
         change actionCommutator (phiInfty φ) = ⊥
         rw [actionCommutator_eq_bot_iff_acts_trivially]
         intro a g
         exact Subsingleton.elim _ _
-      haveI : Nontrivial G := hG_nontriv
+      have : Nontrivial G := hG_nontriv
       set H : Subgroup G := actionCommutator φ with hH_def
       have hH_ne_top : H ≠ ⊤ := by
         intro htop
@@ -972,7 +972,7 @@ private theorem actionCommutatorInfty_eq_bot_of_iter_eq_bot_aux :
       let C : Subgroup G := actionCommutatorInfty_fix φ
       have hC_normal : C.Normal := by
         simpa [C] using actionCommutatorInfty_fix_normal_of_centralized φ hGA_fixed_by_Ainf
-      haveI : C.Normal := hC_normal
+      have : C.Normal := hC_normal
       have hC_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ C := by
         simpa [C] using actionCommutatorInfty_fix_isAInvariant φ
       have hC_ne_bot : C ≠ ⊥ := by

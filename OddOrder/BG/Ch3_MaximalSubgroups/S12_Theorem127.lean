@@ -80,6 +80,7 @@ theorem map_sylow_E_maximal_in_M [Finite G]
   rw [hcardP, hk]
   exact Nat.pow_le_pow_right (Fact.out : p.Prime).pos hk_le
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For `q ∈ τ₂(M)` (q prime) there is a rank-two elementary abelian `q`-subgroup
 inside `E`: realize one inside `M` from `r_q(M) = 2` and conjugate it into a Sylow
 `q`-subgroup of `M` coming from `E`. -/
@@ -169,7 +170,7 @@ theorem tau2_prime_eq_of_nonabelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
     (hnonab : ∃ S : Sylow p G, ¬ IsMulCommutative (S : Subgroup G))
     {q : ℕ} (hq_prime : q.Prime) (hq : q ∈ tau2 M) : q = p := by
   classical
-  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have : Fact q.Prime := ⟨hq_prime⟩
   by_contra hqp
   have hAM : A ≤ M := hAE.trans h.E_le
   -- `B ∈ ℰ_q²(E)`, normal in `E` together with `A`, hence centralized by `A`.
@@ -314,6 +315,7 @@ theorem map_sylow_E_isMulCommutative [Finite G] (hG : IsMinimalSimpleOdd G)
   exact S11.isMulCommutative_of_mulEquiv
     (Subgroup.subgroupOfEquivOfLe hPmap_le_M) h125b
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **BG Theorem 12.7(b)(c), core block**: the canonical line
 `A₀ = A ⊓ C_G(M_σ)` of order `p`, with `M_σ ≤ C_G(A₀)` and the dichotomy (c): every
 other line `X ∈ ℰ_p¹(E)` has `C_{M_σ}(X) = 1` and `C_G(X) ⊄ M` (mmd L3220-3236).
@@ -722,7 +724,7 @@ theorem exists_canonical_line_of_nonabelianSylow [Finite G] (hG : IsMinimalSimpl
     intro x hx
     have hxP : x ∈ P := hWP hx
     have hxC : x ∈ Subgroup.centralizer (S10.Msigma M : Set G) := hWC hx
-    haveI hA₀P_norm : (A₀.subgroupOf P).Normal := by
+    have hA₀P_norm : (A₀.subgroupOf P).Normal := by
       constructor
       intro n hn g
       rw [Subgroup.mem_subgroupOf] at hn ⊢
@@ -837,11 +839,11 @@ theorem fitting_eq_sup_of_canonical_line [Finite G] (hG : IsMinimalSimpleOdd G)
       exact Subgroup.card_dvd_of_le inf_le_left
   -- `M_σ ⊔ A₀ ≤ F(M)`.
   have hMσ_le_F : S10.Msigma M ≤ Ch2.S08.fittingInG M := by
-    haveI h1 : ((S10.Msigma M).subgroupOf M).Normal := by
+    have h1 : ((S10.Msigma M).subgroupOf M).Normal := by
       rw [S10.Msigma_subgroupOf]; infer_instance
-    haveI h2 : Group.IsNilpotent ↥(S10.Msigma M) :=
+    have h2 : Group.IsNilpotent ↥(S10.Msigma M) :=
       (Msigma_nilpotent_of_tau2 hG h.mem_maximal hp hA hAM).1
-    haveI h3 : Group.IsNilpotent ↥((S10.Msigma M).subgroupOf M) :=
+    have h3 : Group.IsNilpotent ↥((S10.Msigma M).subgroupOf M) :=
       Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (S10.Msigma_le M)).symm
     have h4 : (S10.Msigma M).subgroupOf M ≤ Ch01.fitting ↥M :=
       Ch01.nilpotent_normal_le_fitting
@@ -856,14 +858,14 @@ theorem fitting_eq_sup_of_canonical_line [Finite G] (hG : IsMinimalSimpleOdd G)
       (Subgroup.isPiSubgroup_of_isPGroup_of_mem hA₀pg rfl)
   have hJ_le_F : S10.Msigma M ⊔ A₀ ≤ Ch2.S08.fittingInG M := sup_le hMσ_le_F hA₀_le_F
   -- `|F(M)| ∣ |M_σ ⊔ A₀|`: per-prime analysis of the nilpotent `F(M)`.
-  haveI : Group.IsNilpotent ↥(Ch2.S08.fittingInG M) := Ch2.S08.fittingInG_isNilpotent M
+  have : Group.IsNilpotent ↥(Ch2.S08.fittingInG M) := Ch2.S08.fittingInG_isNilpotent M
   have hM_norm_F : M ≤ Subgroup.normalizer ((Ch2.S08.fittingInG M : Subgroup G) : Set G) :=
     fun m hm => Ch2.S08.mem_normalizer_fittingInG_of_mem hm
   have hkey : ∀ q : ℕ, q.Prime →
       (Nat.card ↥(Ch2.S08.fittingInG M)).factorization q ≤
         (Nat.card ↥(S10.Msigma M ⊔ A₀ : Subgroup G)).factorization q := by
     intro q hq_prime
-    haveI : Fact q.Prime := ⟨hq_prime⟩
+    have : Fact q.Prime := ⟨hq_prime⟩
     by_cases hqF : q ∣ Nat.card ↥(Ch2.S08.fittingInG M)
     case neg =>
       rw [Nat.factorization_eq_zero_of_not_dvd hqF]
@@ -976,7 +978,7 @@ theorem primeFactors_centralizer_le_tau1_of_disjoint [Finite G] (hG : IsMinimalS
   classical
   intro r hr
   have hr_prime : r.Prime := Nat.prime_of_mem_primeFactors hr
-  haveI : Fact r.Prime := ⟨hr_prime⟩
+  have : Fact r.Prime := ⟨hr_prime⟩
   -- Cauchy: an element `y` of order `r` in `E₀ ⊓ C_G(x)`.
   obtain ⟨y', hy'ord⟩ := exists_prime_orderOf_dvd_card' r (Nat.mem_primeFactors.mp hr).2.1
   set y : G := ((y' : ↥(E₀ ⊓ Subgroup.centralizer ({x} : Set G) : Subgroup G)) : G)
@@ -1035,7 +1037,7 @@ theorem primeFactors_centralizer_le_tau1_of_disjoint [Finite G] (hG : IsMinimalS
       have hzpE : Subgroup.zpowers y ≤ E := by
         rw [Subgroup.zpowers_le]
         exact hyE
-      haveI hE₃norm : (E₃.subgroupOf E).Normal :=
+      have hE₃norm : (E₃.subgroupOf E).Normal :=
         (Subgroup.normal_subgroupOf_iff_le_normalizer h.E₃_le).mpr (h.E3_normal hG)
       have hzp_pi : Ch03.Subgroup.IsPiGroup (tau3 M)
           ((Subgroup.zpowers y).subgroupOf E) := by

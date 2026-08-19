@@ -300,7 +300,7 @@ private theorem cosetConjImage_subset_coset :
   have hgxg : g * (x : G) * g⁻¹ ∈ H := hnorm _ x.2
   have key : (x : G)⁻¹ * ((c : G) * g) * (x : G) * g⁻¹
       = ((x : G)⁻¹ * (c : G)) * (g * (x : G) * g⁻¹) := by group
-  rw [Set.mem_setOf_eq, key]
+  rw [Set.mem_ofPred_eq, key]
   exact H.mul_mem (H.mul_mem (H.inv_mem x.2) hcH) hgxg
 
 /-- **Cardinality of the conjugate image** (Peterfalvi (2.1)).  The set
@@ -316,7 +316,7 @@ private theorem card_cosetConjImage
     [Finite G] (hcop : Nat.Coprime (orderOf g) (Nat.card H)) :
     Nat.card (cosetConjImage g H) = Nat.card H := by
   classical
-  letI : Fintype G := Fintype.ofFinite G
+  let : Fintype G := Fintype.ofFinite G
   set C : Subgroup G := H ⊓ Subgroup.centralizer ({g} : Set G) with hC
   -- The conjugation map and the target finset `T = K`.
   set Φ : ↥C × ↥H → G := fun p => (p.2 : G)⁻¹ * ((p.1 : G) * g) * (p.2 : G) with hΦ
@@ -441,7 +441,7 @@ theorem coset_eq_cosetConjImage [Finite G]
     refine Nat.card_congr (Equiv.symm ?_)
     refine
       { toFun := fun h => ⟨(h : G) * g, by
-          rw [Set.mem_setOf_eq, mul_assoc, mul_inv_cancel, mul_one]; exact h.2⟩
+          rw [Set.mem_ofPred_eq, mul_assoc, mul_inv_cancel, mul_one]; exact h.2⟩
         invFun := fun w => ⟨(w : G) * g⁻¹, w.2⟩
         left_inv := fun h => by apply Subtype.ext; group
         right_inv := fun w => by apply Subtype.ext; group }

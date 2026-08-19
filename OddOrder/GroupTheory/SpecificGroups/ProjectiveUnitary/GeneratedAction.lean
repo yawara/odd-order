@@ -257,7 +257,7 @@ theorem standardPermGroup_infinityStabilizer_isPretransitive (n : ℕ) :
 generated unitary permutation group is doubly transitive. -/
 theorem standardPermGroup_isMultiplyPretransitive (n : ℕ) :
     IsMultiplyPretransitive (standardPermGroup n) (Unital n) 2 := by
-  letI : IsPretransitive (standardPermGroup n) (Unital n) :=
+  let : IsPretransitive (standardPermGroup n) (Unital n) :=
     standardPermGroup_isPretransitive n
   rw [show (2 : ℕ) = Nat.succ 1 by rfl,
     SubMulAction.ofStabilizer.isMultiplyPretransitive (a := Unital.infinity n),

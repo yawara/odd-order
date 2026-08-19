@@ -123,7 +123,7 @@ the module leaves are `card_eq_pow_card_invariants_of_elemAbelian_general` and
 condition, and the fixed-point-free conjugation `hFrob` are supplied in group/`fixedSubgroup` form
 and translated to the leaves' pointwise form. -/
 theorem bgThm310_elemAbelian_group [Fact p.Prime]
-    [Finite H] [IsSolvable H] [Finite M] [Nontrivial M] [Module (ZMod p) (Additive M)]
+    [Finite H] [Group.IsSolvable H] [Finite M] [Nontrivial M] [Module (ZMod p) (Additive M)]
     [MulDistribMulAction H M] {K R : Subgroup H} [K.Normal]
     (hIsFrob : IsFrobeniusGroup H K R) (hRne : R ≠ ⊥) (hKne : K ≠ ⊥)
     (hpH : ¬ p ∣ Nat.card H) (hcop : Nat.Coprime (Nat.card ↥R) (Nat.card ↥K))
@@ -173,7 +173,7 @@ theorem bgThm310_elemAbelian_group [Fact p.Prime]
     have hfinrank : finrank (ZMod p) (Representation.invariants
         ((Representation.ofDistribMulAction (ZMod p) H (Additive M)).comp R.subtype)) ≤ 1 := by
       -- Every element of `C_M(R) ≤ M` satisfies `x ^ p = 1`, so its exponent divides `p`.
-      haveI := hcyc
+      have := hcyc
       have hexp : Monoid.exponent ↥(fixedSubgroup (MulDistribMulAction.toMulAut H M) R) ∣ p := by
         apply Monoid.exponent_dvd_of_forall_pow_eq_one
         intro g
@@ -184,7 +184,7 @@ theorem bgThm310_elemAbelian_group [Fact p.Prime]
       have hcardFix : Nat.card ↥(fixedSubgroup (MulDistribMulAction.toMulAut H M) R) ∣ p := by
         rw [← IsCyclic.exponent_eq_card]; exact hexp
       -- `|invariants| = p ^ finrank` and `|invariants| = |C_M(R)|`, so `p ^ finrank ∣ p`.
-      haveI : Fintype ↥(Representation.invariants
+      have : Fintype ↥(Representation.invariants
           ((Representation.ofDistribMulAction (ZMod p) H (Additive M)).comp R.subtype)) :=
         Fintype.ofFinite _
       have hInvcard : Nat.card ↥(Representation.invariants

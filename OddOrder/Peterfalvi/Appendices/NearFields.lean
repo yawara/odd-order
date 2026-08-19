@@ -97,7 +97,7 @@ theorem card_group_dvd_card_of_free {G β : Type*} [Group G] [MulAction G β]
     [Finite G] [Finite β] (hfree : ∀ b : β, MulAction.stabilizer G b = ⊥) :
     Nat.card G ∣ Nat.card β := by
   classical
-  haveI : Fintype (MulAction.orbitRel.Quotient G β) := Fintype.ofFinite _
+  have : Fintype (MulAction.orbitRel.Quotient G β) := Fintype.ofFinite _
   rw [Nat.card_congr (MulAction.selfEquivSigmaOrbits G β), Nat.card_sigma]
   refine Finset.dvd_sum fun ω _ => ?_
   have hc : Nat.card (MulAction.orbit G ω.out) = Nat.card G := by
@@ -220,7 +220,7 @@ consecutive integers are coprime.  This is the coprimality hypothesis needed for
 when splitting an `A`-invariant subgroup of `(F, +)`. -/
 theorem card_coprime (A : Subgroup Fˣ) [Finite F] :
     Nat.Coprime (Nat.card A) (Nat.card F) := by
-  haveI : Nonempty F := ⟨0⟩
+  have : Nonempty F := ⟨0⟩
   have h1 : Nat.card A ∣ Nat.card Fˣ := Subgroup.card_subgroup_dvd_card A
   rw [Nat.card_units] at h1
   have hcop : ∀ n : ℕ, 0 < n → Nat.Coprime (n - 1) n := by
@@ -234,7 +234,7 @@ theorem card_coprime (A : Subgroup Fˣ) [Finite F] :
 cardinality identity behind the `(|A|+1)² > 2|A|+1` contradiction proving `A` acts irreducibly. -/
 theorem card_eq_of_index_two (A : Subgroup Fˣ) [Finite F] (hidx : A.index = 2) :
     Nat.card F = 2 * Nat.card A + 1 := by
-  haveI : Nonempty F := ⟨0⟩
+  have : Nonempty F := ⟨0⟩
   have h := Subgroup.card_mul_index A
   rw [hidx, Nat.card_units] at h
   have hpos : 0 < Nat.card F := Nat.card_pos
@@ -253,7 +253,7 @@ theorem add_one_le_card_of_aInvariant_ne_bot {F : Type*} [NearField F] [Finite F
     (hUinv : OddOrder.Isaacs.Ch03.IsAInvariant (rightMulAction A hcomm) U) (hU : U ≠ ⊥) :
     Nat.card A + 1 ≤ Nat.card U := by
   classical
-  letI : MulDistribMulAction A (Multiplicative F) :=
+  let : MulDistribMulAction A (Multiplicative F) :=
     MulDistribMulAction.compHom _ (rightMulAction A hcomm)
   -- the `A`-stable set `U ∖ {1}` as a `SubMulAction`.
   let sma : SubMulAction A (Multiplicative F) :=
@@ -284,7 +284,7 @@ theorem add_one_le_card_of_aInvariant_ne_bot {F : Type*} [NearField F] [Finite F
   -- `|U ∖ {1}| > 0` since `U ≠ ⊥`.
   have hpos : 0 < Nat.card sma := by
     obtain ⟨a, ha⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hU
-    haveI : Nonempty sma := ⟨⟨a.1, a.2, fun h => ha (Subtype.ext h)⟩⟩
+    have : Nonempty sma := ⟨⟨a.1, a.2, fun h => ha (Subtype.ext h)⟩⟩
     exact Nat.card_pos
   have hle : Nat.card A ≤ Nat.card sma := Nat.le_of_dvd hpos hdvd
   omega
@@ -307,15 +307,15 @@ theorem exists_aInvariant_complement_of_elementaryAbelian
     {U : Subgroup E} (hUinv : OddOrder.Isaacs.Ch03.IsAInvariant φ U) :
     ∃ W : Subgroup E, OddOrder.Isaacs.Ch03.IsAInvariant φ W ∧ IsCompl U W := by
   classical
-  haveI hEcomm : IsMulCommutative E := ⟨⟨mul_comm⟩⟩
+  have hEcomm : IsMulCommutative E := ⟨⟨mul_comm⟩⟩
   -- `Additive E` is a `ZMod p`-module.
   have hpsmul : ∀ x : Additive E, (p : ℕ) • x = 0 := by
     intro x
     apply Additive.toMul.injective
     rw [toMul_nsmul, toMul_zero]
     exact hE.pow_eq_one x.toMul
-  haveI : Module (ZMod p) (Additive E) := AddCommGroup.zmodModule hpsmul
-  haveI : NeZero ((Nat.card A : ZMod p)) :=
+  have : Module (ZMod p) (Additive E) := AddCommGroup.zmodModule hpsmul
+  have : NeZero ((Nat.card A : ZMod p)) :=
     OddOrder.BG.Ch1_Preliminary.neZero_natCast_zmod_of_coprime hcop hpE
   -- the `F_p[A]`-representation carried by `φ`.
   set ρ : Representation (ZMod p) A (Additive E) :=
@@ -393,8 +393,8 @@ theorem nearField_field_structure.{u} {F : Type u} [NearField F] [Finite F]
     ∃ (K : Type u) (_ : Field K) (_ : Module K F) (_ : Finite K),
       Module.finrank K F = 1 ∧ Nat.card K = Nat.card F := by
   obtain ⟨f, hf, hE⟩ := isElementaryAbelian_multiplicative (F := F)
-  haveI : Fact f.Prime := ⟨hf⟩
-  letI : CommGroup A := { (inferInstance : Group A) with
+  have : Fact f.Prime := ⟨hf⟩
+  let : CommGroup A := { (inferInstance : Group A) with
     mul_comm := fun u v => Subtype.ext (by simpa [Subgroup.coe_mul] using hcomm u v) }
   obtain ⟨K, hK, hMod, hKfin, hrank, hcard, _⟩ :=
     OddOrder.Peterfalvi.Appendices.Huppert.exists_field_semilinear (E := Multiplicative F) hE
@@ -415,10 +415,10 @@ theorem rightMulAction_irreducible_of_index_two {F : Type*} [NearField F] [Finit
   by_contra hcon
   push Not at hcon
   obtain ⟨hU_ne_bot, hU_ne_top⟩ := hcon
-  haveI : Nontrivial (Multiplicative F) := inferInstanceAs (Nontrivial F)
+  have : Nontrivial (Multiplicative F) := inferInstanceAs (Nontrivial F)
   -- elementary abelian data + coprimality of `|A|` with `|F|`, plus `f ∣ |F|`.
   obtain ⟨f, hf, hE⟩ := isElementaryAbelian_multiplicative (F := F)
-  haveI : Fact f.Prime := ⟨hf⟩
+  have : Fact f.Prime := ⟨hf⟩
   have hMF : Nat.card (Multiplicative F) = Nat.card F := rfl
   have hcop : Nat.Coprime (Nat.card A) (Nat.card (Multiplicative F)) := by
     rw [hMF]; exact card_coprime A
@@ -443,7 +443,7 @@ theorem rightMulAction_irreducible_of_index_two {F : Type*} [NearField F] [Finit
   have hcompl' : Subgroup.IsComplement' U W :=
     Subgroup.isComplement'_of_disjoint_and_mul_eq_univ hUW.disjoint
       (by rw [← Subgroup.mul_normal, hUW.sup_eq_top, Subgroup.coe_top])
-  have hprod : Nat.card U * Nat.card W = Nat.card F := by rw [← hMF]; exact hcompl'.card_mul
+  have hprod : Nat.card U * Nat.card W = Nat.card F := by rw [← hMF]; exact hcompl'.card_mul_card
   -- `(|A|+1)² ≤ |U|·|W| = |F| = 2|A|+1` with `|A| ≥ 1` is contradictory.
   have hFcard : Nat.card F = 2 * Nat.card A + 1 := card_eq_of_index_two A hidx
   have hApos : 0 < Nat.card A := Nat.card_pos
@@ -653,21 +653,21 @@ theorem card_eq_sq_of_orderTwo_ringAut {K : Type*} [Field K] [Finite K]
     ∃ (r p n : ℕ), p.Prime ∧ 0 < n ∧ r = p ^ n ∧ Nat.card K = r ^ 2 ∧
       r = Nat.card (FixedPoints.subfield (Subgroup.zpowers σ) K) := by
   classical
-  haveI : Fintype K := Fintype.ofFinite K
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI : Finite (RingAut K) :=
+  have : Fintype K := Fintype.ofFinite K
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Finite (RingAut K) :=
     Finite.of_injective (DFunLike.coe : RingAut K → (K → K)) DFunLike.coe_injective
   -- `⟨σ⟩ ≤ RingAut K` acts on `K`, has order `2`, and acts faithfully.
   set G := Subgroup.zpowers σ with hG
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   have hcardG : Fintype.card G = 2 := by
     rw [← Nat.card_eq_fintype_card, Nat.card_zpowers, orderOf_eq_prime hσ2 hσ1]
-  haveI : FaithfulSMul G K :=
+  have : FaithfulSMul G K :=
     ⟨fun {a b} h => Subtype.ext (RingEquiv.ext fun x => h x)⟩
   -- Artin: `[K : K^G] = |G| = 2`, hence `|K| = |K^G|²`.
   have hfr : Module.finrank (FixedPoints.subfield G K) K = 2 := by
     rw [FixedPoints.finrank_eq_card G K, hcardG]
-  haveI : Fintype (FixedPoints.subfield G K) := Fintype.ofFinite _
+  have : Fintype (FixedPoints.subfield G K) := Fintype.ofFinite _
   have hcardK : Fintype.card K = Fintype.card (FixedPoints.subfield G K) ^ 2 := by
     rw [← hfr]; exact Module.card_eq_pow_finrank
   -- `|K^G| = p^n` is a prime power with `n ≥ 1`.
@@ -688,7 +688,7 @@ theorem exists_field_structure_of_cyclic_index_two.{u} {F : Type u} [NearField F
     ∃ (K : Type u) (_ : Field K) (_ : Module K F) (_ : Finite K),
       Module.finrank K F = 1 ∧ Nat.card K = Nat.card F := by
   have hcomm : ∀ u v : ↥A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ) := by
-    letI : CommGroup ↥A := hcyc.commGroup
+    let : CommGroup ↥A := hcyc.commGroup
     intro u v
     simpa using congrArg Subtype.val (mul_comm u v)
   exact nearField_field_structure_of_index_two A hcomm hidx
@@ -714,7 +714,7 @@ theorem twMul_central_iff {K : Type*} [Field K] [Finite K]
     rw [hBindex, Nat.card_units, hcardKr] at hm
     have : 0 < r ^ 2 := by rw [← hcardKr]; exact Nat.card_pos
     omega
-  haveI : NeZero d2 := ⟨Nat.card_pos.ne'⟩
+  have : NeZero d2 := ⟨Nat.card_pos.ne'⟩
   have hBpow : ∀ u : Kˣ, u ∈ B → u ^ d2 = 1 := fun u hu => by
     have h : (⟨u, hu⟩ : ↥B) ^ d2 = 1 := by rw [hd2def]; exact pow_card_eq_one'
     simpa using congrArg (fun x : ↥B => (x : Kˣ)) h
@@ -787,6 +787,7 @@ theorem twMul_central_iff {K : Type*} [Field K] [Finite K]
       · rw [htwB a c hc hcB, htwB c a ha haB]; exact mul_comm a c
       · rw [htwNB a c hc hcB, htwB c a ha haB, hσa]; exact mul_comm a c
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi Appendix II, Proposition 2** (pp. 137--138).  Let `F` be a finite near-field whose
 multiplicative group `F^*` has a **cyclic** subgroup `A` of index `2`.  Then either `F` is a field
 (equivalently, by `NearField.mul_add_of_mul_comm`, its multiplication is commutative), or there is
@@ -815,19 +816,19 @@ theorem cyclic_index_two_nearField_classification.{u} {F : Type u} [NearField F]
   classical
   -- `A` is commutative (cyclic) and acts irreducibly on `(F,+) = Multiplicative F` by right mult.
   have hcomm : ∀ u v : ↥A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ) := by
-    letI : CommGroup ↥A := hcyc.commGroup
+    let : CommGroup ↥A := hcyc.commGroup
     intro u v
     simpa using congrArg Subtype.val (mul_comm u v)
-  letI : CommGroup ↥A := hcyc.commGroup
+  let : CommGroup ↥A := hcyc.commGroup
   have hirr := rightMulAction_irreducible_of_index_two A hcomm hidx
   obtain ⟨f, hf, hE⟩ := isElementaryAbelian_multiplicative (F := F)
-  haveI : Fact f.Prime := ⟨hf⟩
-  haveI : Nontrivial (Multiplicative F) := inferInstanceAs (Nontrivial F)
+  have : Fact f.Prime := ⟨hf⟩
+  have : Nontrivial (Multiplicative F) := inferInstanceAs (Nontrivial F)
   -- the semilinear field `K` with the scalar realization `μ` of the `A`-action
   obtain ⟨K, hKfield, hKmod, hKfin, hrank, hcardKE, ⟨μ, hμ⟩, hσfam⟩ :=
     OddOrder.Peterfalvi.Appendices.Huppert.exists_field_semilinear_with_scalar
       (E := Multiplicative F) hE (rightMulAction A hcomm) hirr
-  letI : Module K F := hKmod
+  let : Module K F := hKmod
   -- scalar clause in near-field terms: `(μ a) • x = x * (a : F)` for `a ∈ A`, `x ∈ F`
   have hμ' : ∀ (a : ↥A) (x : F), (μ a : K) • x = x * ((a : Fˣ) : F) := fun a x => hμ a x
   -- the `K`-linear iso `Θ : K ≃ₗ[K] F`, `a ↦ a • 1`; `Θ 1 = 1` normalizes the unit.
@@ -854,7 +855,7 @@ theorem cyclic_index_two_nearField_classification.{u} {F : Type u} [NearField F]
   have hR : ∀ (u : ↥A) (x : F), (rightMulAction A hcomm u) x = x * ((u : Fˣ) : F) :=
     fun _ _ => rfl
   -- `A` is normal (index 2); choose `y₀ ∉ A` and the right-multiplication automorphism `g₀`.
-  haveI hAnormal : A.Normal := Subgroup.normal_of_index_eq_two hidx
+  have hAnormal : A.Normal := Subgroup.normal_of_index_eq_two hidx
   have hAne : A ≠ ⊤ := fun h => by
     rw [h, Subgroup.index_top] at hidx; exact absurd hidx (by norm_num)
   obtain ⟨y₀, hy₀⟩ : ∃ y₀ : Fˣ, y₀ ∉ A := by
@@ -898,7 +899,7 @@ theorem cyclic_index_two_nearField_classification.{u} {F : Type u} [NearField F]
     · exact absurd h hw
   -- `y₀² ∈ A` (index 2), so right multiplication by `y₀²` is a scalar.
   have hy₀sq : (y₀ * y₀ : Fˣ) ∈ A := by
-    haveI : Fintype (Fˣ ⧸ A) := Fintype.ofFinite _
+    have : Fintype (Fˣ ⧸ A) := Fintype.ofFinite _
     have hcard : Fintype.card (Fˣ ⧸ A) = 2 := by rw [← Nat.card_eq_fintype_card]; exact hidx
     have hmk : (QuotientGroup.mk (y₀ * y₀) : Fˣ ⧸ A) = 1 := by
       rw [QuotientGroup.mk_mul, ← sq, ← hcard]; exact pow_card_eq_one
@@ -970,7 +971,7 @@ theorem cyclic_index_two_nearField_classification.{u} {F : Type u} [NearField F]
     rw [hxy x y hy, hxy y x hx, mul_comm (Θ.symm x) (Θ.symm y)]
   · -- **Twisted case** (`σ ≠ 1`): `F ≅ F_{r²,2}`.
     right
-    haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+    have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
     obtain ⟨r, p, n, hp, hn, hrpn, hcardKr, hrFix⟩ := card_eq_sq_of_orderTwo_ringAut σ hσ2 hσne
     have hKF : Nat.card K = Nat.card F := hcardKE
     have hFodd : Odd (Nat.card F) := by
@@ -993,7 +994,7 @@ theorem cyclic_index_two_nearField_classification.{u} {F : Type u} [NearField F]
       have h := Subgroup.card_mul_index B
       rw [hBcard, hKxcard, mul_comm 2 (Nat.card ↥A)] at h
       exact Nat.eq_of_mul_eq_mul_left Nat.card_pos h
-    haveI : B.Normal := Subgroup.normal_of_index_eq_two hBindex
+    have : B.Normal := Subgroup.normal_of_index_eq_two hBindex
     -- `χ : Kˣ →* Multiplicative (ZMod 2)` via the order-2 quotient `Kˣ ⧸ B`.
     have hQcard : Nat.card (Kˣ ⧸ B) = 2 := hBindex
     have hM2card : Nat.card (Multiplicative (ZMod 2)) = 2 := by

@@ -234,7 +234,7 @@ theorem exists_normal_lt_top_of_mem_lattice {H : Subgroup G}
   classical
   by_contra hcon
   push Not at hcon
-  haveI : Fintype (Subgroup G) := Fintype.ofFinite _
+  have : Fintype (Subgroup G) := Fintype.ofFinite _
   -- `H` を含む `L(G)` の真の部分群のうち位数最大のもの
   obtain ⟨K, hKmem, hKmax⟩ :=
     (Finset.univ.filter (fun X : Subgroup G =>
@@ -308,7 +308,7 @@ theorem eq_bot_or_eq_top_of_chermakDelgadoMeasure_eq_card [IsSimpleGroup G] {H :
     (h : H.chermakDelgadoMeasure = Nat.card G) : H = ⊥ ∨ H = ⊤ := by
   by_cases hab : IsMulCommutative G
   · -- 可換なら全部分群が正規
-    haveI : H.Normal := ⟨fun n hn g => by
+    have : H.Normal := ⟨fun n hn g => by
       rw [show g * n * g⁻¹ = n from by
         rw [isMulCommutative_iff.mp hab g n]; group]
       exact hn⟩
@@ -398,7 +398,7 @@ theorem exists_normal_isMulCommutative_index_lt {A : Subgroup G} [hA : IsMulComm
   have hno : ∀ N : Subgroup G, N.Normal → IsMulCommutative N → ¬ N.index < A.index ^ 2 :=
     fun N h1 h2 h3 => hcon ⟨N, h1, h2, h3⟩
   obtain ⟨hCA, hAL, -⟩ := eq_centralizer_and_mem_lattice_of_no_smaller_characteristic
-    (A := A) (fun N hchar hab => hno N (by haveI := hchar; infer_instance) hab)
+    (A := A) (fun N hchar hab => hno N (by have := hchar; infer_instance) hab)
   -- `G` 非可換なので `A < ⊤`
   have hAlt : A < ⊤ := by
     refine lt_of_le_of_ne le_top fun hc => hG (isMulCommutative_iff.mpr fun x y => ?_)
@@ -454,7 +454,7 @@ theorem exists_normal_isMulCommutative_index_lt {A : Subgroup G} [hA : IsMulComm
     · exact absurd (Subgroup.eq_top_of_card_eq _ h) hne
   -- `N` は可換かつ正規
   have hNA : N ≤ A := sInf_le hAS
-  haveI hNcomm : IsMulCommutative N := isMulCommutative_iff.mpr fun x y => by
+  have hNcomm : IsMulCommutative N := isMulCommutative_iff.mpr fun x y => by
     have h := isMulCommutative_iff.mp hA ⟨(x : G), hNA x.2⟩ ⟨(y : G), hNA y.2⟩
     have h' : (x : G) * (y : G) = (y : G) * (x : G) := congrArg Subtype.val h
     exact Subtype.ext h'

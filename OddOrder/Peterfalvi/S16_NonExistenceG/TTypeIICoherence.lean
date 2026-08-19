@@ -316,8 +316,8 @@ theorem T_typeIII_calT1_coherent [Finite G] (hyp : Hypothesis (G := G))
       ((a - b : ClassFunction ↥hyp.base.T ℂ)).support ⊆ A)
     (hcard2 : 2 ≤ calT1_set.ncard) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp07.tau calT1_set A) := by
-  haveI : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
-  haveI := hyp.base.finiteG
+  have : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
+  have := hyp.base.finiteG
   -- `calT1_set` is finite (image of a `Finset`).
   have hSfin : calT1_set.Finite := by rw [hcalT1]; exact (Finset.finite_toSet _)
   -- The `[T:QV] = p` index (degree factor) and its positivity.
@@ -397,8 +397,8 @@ theorem T_typeIII_calT1_isCoherent [Finite G] (hyp : Hypothesis (G := G))
         (OddOrder.Peterfalvi.S04.supportInSubgroup
           (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T)) := by
   classical
-  haveI := hyp.base.finiteG
-  haveI : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
+  have := hyp.base.finiteG
+  have : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
   -- Support identity `sigmaSharp T = (derivedInG T)^#` and the sharp-membership form.
   have hAK : OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T = (derivedInG hyp.base.T : Set G) \ {1} :=
     T_typeIII_sigmaSharp_eq hG hyp hIII
@@ -408,7 +408,7 @@ theorem T_typeIII_calT1_isCoherent [Finite G] (hyp : Hypothesis (G := G))
         (x ∈ (derivedInG hyp.base.T).subgroupOf hyp.base.T ∧ x ≠ 1) := fun x =>
     OddOrder.Peterfalvi.S09.Cert.mem_supportInSubgroup_sharp_subgroupOf_iff
       (derivedInG hyp.base.T) hAK x
-  haveI hKnormal : ((derivedInG hyp.base.T).subgroupOf hyp.base.T).Normal :=
+  have hKnormal : ((derivedInG hyp.base.T).subgroupOf hyp.base.T).Normal :=
     T_derivedSubgroupOf_normal hyp
   have hmem_form : ∀ a ∈ calT1_set, ∃ θ ∈ 𝒯,
       a = ClassFunction.induce ((derivedInG hyp.base.T).subgroupOf hyp.base.T)
@@ -491,9 +491,9 @@ theorem T_typeIII_calT1_difference_support [Finite G] (hyp : Hypothesis (G := G)
       (a - b).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
         (OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T) hyp.base.T := by
   classical
-  haveI := hyp.base.finiteG
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
+  have := hyp.base.finiteG
+  have : Fintype G := Fintype.ofFinite G
+  have : Fintype ↥((derivedInG hyp.base.T).subgroupOf hyp.base.T) := Fintype.ofFinite _
   have hAK : OddOrder.BG.Ch4.S14.sigmaSharp hyp.base.T =
       (derivedInG hyp.base.T : Set G) \ {1} :=
     T_typeIII_sigmaSharp_eq hG hyp hIII
@@ -503,7 +503,7 @@ theorem T_typeIII_calT1_difference_support [Finite G] (hyp : Hypothesis (G := G)
         (x ∈ (derivedInG hyp.base.T).subgroupOf hyp.base.T ∧ x ≠ 1) := fun x =>
     OddOrder.Peterfalvi.S09.Cert.mem_supportInSubgroup_sharp_subgroupOf_iff
       (derivedInG hyp.base.T) hAK x
-  haveI : ((derivedInG hyp.base.T).subgroupOf hyp.base.T).Normal :=
+  have : ((derivedInG hyp.base.T).subgroupOf hyp.base.T).Normal :=
     T_derivedSubgroupOf_normal hyp
   intro a ha b hb
   rw [hcalT1, Finset.mem_coe, Finset.mem_image] at ha hb
@@ -563,7 +563,7 @@ theorem T_typeIII_coherent_image_inner_eta_eq_zero [Finite G]
   have hinvertible : invertibleG =
       OddOrder.Peterfalvi.S12.FiniteInduce.natCardInvCG := Subsingleton.elim _ _
   subst invertibleG
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   let dataT := (OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp.base).choose
   have hdata := (OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp.base).choose_spec

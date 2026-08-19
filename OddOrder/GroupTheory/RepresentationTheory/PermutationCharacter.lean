@@ -82,8 +82,8 @@ theorem card_orbits_prod_eq_two [Nontrivial Ω]
     (h2 : IsMultiplyPretransitive G Ω 2) :
     Nat.card (orbitRel.Quotient G (Ω × Ω)) = 2 := by
   classical
-  haveI : IsMultiplyPretransitive G Ω 2 := h2
-  haveI : IsPretransitive G Ω := isPretransitive_of_is_two_pretransitive
+  have : IsMultiplyPretransitive G Ω 2 := h2
+  have : IsPretransitive G Ω := isPretransitive_of_is_two_pretransitive
   obtain ⟨a, b, hab⟩ := exists_pair_ne Ω
   rw [Nat.card_eq_two_iff]
   refine ⟨⟦(a, a)⟧, ⟦(a, b)⟧, fun h => ?_, ?_⟩
@@ -128,7 +128,7 @@ theorem induce_trivial_stabilizer_apply (ω₀ : Ω) [IsPretransitive G Ω]
     induce (stabilizer G ω₀) (trivialClassFunction ↥(stabilizer G ω₀)) g
       = (Nat.card (fixedBy Ω g) : ℂ) := by
   classical
-  letI : Fintype Ω := Fintype.ofFinite Ω
+  let : Fintype Ω := Fintype.ofFinite Ω
   rw [induce_apply]
   have hterm : ∀ x : G,
       induceTerm (stabilizer G ω₀) (trivialClassFunction ↥(stabilizer G ω₀)) x g
@@ -187,8 +187,8 @@ theorem inner_induce_trivial_stabilizer (ω₀ : Ω) [IsPretransitive G Ω]
   rw [Finset.sum_congr rfl fun g _ => happ g, ← Nat.cast_sum]
   have hburn : (∑ g : G, Nat.card (fixedBy (Ω × Ω) g))
       = Nat.card (orbitRel.Quotient G (Ω × Ω)) * Nat.card G := by
-    letI : ∀ a : G, Fintype (fixedBy (Ω × Ω) a) := fun a => Fintype.ofFinite _
-    letI : Fintype (orbitRel.Quotient G (Ω × Ω)) := Fintype.ofFinite _
+    let : ∀ a : G, Fintype (fixedBy (Ω × Ω) a) := fun a => Fintype.ofFinite _
+    let : Fintype (orbitRel.Quotient G (Ω × Ω)) := Fintype.ofFinite _
     simp_rw [Nat.card_eq_fintype_card]
     exact MulAction.sum_card_fixedBy_eq_card_orbits_mul_card_group G (Ω × Ω)
   rw [hburn]
@@ -207,8 +207,8 @@ theorem inner_induce_trivial_stabilizer_of_two_pretransitive (ω₀ : Ω)
         (induce (stabilizer G ω₀) (trivialClassFunction ↥(stabilizer G ω₀)))
         (induce (stabilizer G ω₀) (trivialClassFunction ↥(stabilizer G ω₀)))
       = 2 := by
-  haveI : IsMultiplyPretransitive G Ω 2 := h2
-  haveI : IsPretransitive G Ω := isPretransitive_of_is_two_pretransitive
+  have : IsMultiplyPretransitive G Ω 2 := h2
+  have : IsPretransitive G Ω := isPretransitive_of_is_two_pretransitive
   rw [inner_induce_trivial_stabilizer ω₀,
     OddOrder.GroupTheory.card_orbits_prod_eq_two h2]
   norm_num

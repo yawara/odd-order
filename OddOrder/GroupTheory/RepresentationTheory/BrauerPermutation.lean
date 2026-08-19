@@ -196,7 +196,7 @@ theorem subsingleton_realClasses_of_odd_card [Finite G] (hodd : Odd (Nat.card G)
 the identity class. -/
 theorem card_realClasses_eq_one_of_odd_card [Finite G] (hodd : Odd (Nat.card G)) :
     Nat.card (RealClass G) = 1 := by
-  letI := subsingleton_realClasses_of_odd_card (G := G) hodd
+  let := subsingleton_realClasses_of_odd_card (G := G) hodd
   exact Nat.card_of_subsingleton ⟨1, isReal_one⟩
 
 end ConjClasses
@@ -344,11 +344,11 @@ theorem brauer_permutation_lemma {G : Type*} [Group G] [Finite G]
     (h_compat : ∀ (χ : IrreducibleCharacter G) (C : ConjClasses G),
       characterTableEntry (σ χ) C = characterTableEntry χ (ConjClasses.inv C)) :
     Nat.card (RealIrreducibleCharacter G) = Nat.card (ConjClasses.RealClass G) := by
-  letI := idx.irrFintype
-  letI := idx.classFintype
-  letI := Classical.decEq (IrreducibleCharacter G)
-  letI := Classical.decEq (ConjClasses G)
-  letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+  let := idx.irrFintype
+  let := idx.classFintype
+  let := Classical.decEq (IrreducibleCharacter G)
+  let := Classical.decEq (ConjClasses G)
+  let := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
   -- Class-inversion permutation, pulled back to IrreducibleCharacter G via rowColumnEquiv.
   set τ : Equiv.Perm (IrreducibleCharacter G) := classInvPerm idx with hτ_def
   have hτ_symm : τ.symm = τ := classInvPerm_symm idx
@@ -471,11 +471,11 @@ theorem brauer_permutation_lemma_general {G : Type*} [Group G] [Finite G]
     (h_compat : ∀ (χ : IrreducibleCharacter G) (C : ConjClasses G),
       characterTableEntry (σ χ) C = characterTableEntry χ (π C)) :
     Nat.card (Function.fixedPoints σ) = Nat.card (Function.fixedPoints π) := by
-  letI := idx.irrFintype
-  letI := idx.classFintype
-  letI := Classical.decEq (IrreducibleCharacter G)
-  letI := Classical.decEq (ConjClasses G)
-  letI := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
+  let := idx.irrFintype
+  let := idx.classFintype
+  let := Classical.decEq (IrreducibleCharacter G)
+  let := Classical.decEq (ConjClasses G)
+  let := characterTableSquareMatrixInvertibleOfWeightedRowOrthogonality (G := G) idx hrow
   set τ : Equiv.Perm (IrreducibleCharacter G) := (classPerm idx π).symm with hτ_def
   -- `τ.symm = classPerm idx π`, so the columns of `A * τ.permMatrix` match `h_compat`.
   have hτ_symm : τ.symm = classPerm idx π := by
@@ -514,8 +514,8 @@ theorem brauer_permutation_lemma_general' {G : Type*} [Group G] [Finite G]
     (h_compat : ∀ (χ : IrreducibleCharacter G) (C : ConjClasses G),
       characterTableEntry (σ χ) C = characterTableEntry χ (π C)) :
     Nat.card (Function.fixedPoints σ) = Nat.card (Function.fixedPoints π) := by
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Invertible (Nat.card G : ℂ) :=
+  have : Fintype G := Fintype.ofFinite G
+  have : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   exact brauer_permutation_lemma_general (instCharacterTableIndexingOfFinite (G := G))
     (CharacterTableWeightedRowOrthogonality.ofRowOrthogonality

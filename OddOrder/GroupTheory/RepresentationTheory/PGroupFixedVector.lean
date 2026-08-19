@@ -126,7 +126,7 @@ theorem exists_pow_sub_one_eq_zero
     [Nontrivial V]
     (hG : IsPGroup p G) (ρ : Representation F G V) (g : G) :
     ∃ k : ℕ, ((ρ g : Module.End F V) - 1) ^ (p ^ k) = 0 := by
-  haveI : CharP (Module.End F V) p := charP_End_of_field
+  have : CharP (Module.End F V) p := charP_End_of_field
   obtain ⟨k, hk⟩ := exists_map_pow_prime_pow_eq_one hG ρ g
   refine ⟨k, ?_⟩
   rw [sub_pow_char_pow_of_commute _ _ (Commute.one_right _), hk, one_pow, sub_self]
@@ -209,16 +209,16 @@ theorem invariants_ne_bot
   intro n ih G _ _ hcard F _ _ V _ _ _ hG ρ hV
   by_cases hNontriv : Nontrivial G
   · -- Step: Nontrivial G
-    haveI := hNontriv
-    haveI := hG.center_nontrivial
-    haveI : Nontrivial V := by
+    have := hNontriv
+    have := hG.center_nontrivial
+    have : Nontrivial V := by
       obtain ⟨v, _, hv⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hV
       exact ⟨v, 0, hv⟩
     -- 非自明 z ∈ Z(G) を取得
     obtain ⟨z, hz_ne⟩ := exists_ne (1 : Subgroup.center G)
     let Z : Subgroup G := Subgroup.zpowers (z : G)
     have hz_ne_coe : (z : G) ≠ 1 := fun hz => hz_ne (Subtype.ext hz)
-    haveI hZ_normal : Z.Normal := zpowers_normal_of_mem_center z.2
+    have hZ_normal : Z.Normal := zpowers_normal_of_mem_center z.2
     have hZ_ne_bot : Z ≠ ⊥ := Subgroup.zpowers_ne_bot.mpr hz_ne_coe
     have _hZ_card_lt : Nat.card (G ⧸ Z) < Nat.card G :=
       Subgroup.card_quotient_lt_of_ne_bot hZ_ne_bot
@@ -272,7 +272,7 @@ theorem invariants_ne_bot
     ext
     simpa using hw_bot
   · -- Base: G subsingleton ⇒ ρ g = 1 for all g ⇒ invariants = ⊤
-    haveI : Subsingleton G := not_nontrivial_iff_subsingleton.mp hNontriv
+    have : Subsingleton G := not_nontrivial_iff_subsingleton.mp hNontriv
     have h_eq_top : ρ.invariants = ⊤ := by
       rw [eq_top_iff]
       intro v _ g

@@ -53,8 +53,8 @@ theorem exists_irreducibleBrauerCharacter_eq (ρ : Representation (ResidueField 
           = (algebraMap (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) G) c) • m) →
         c = MatrixModule.centralCharacterAlg π i hπ hlin z := by
   obtain ⟨i, ⟨e⟩⟩ := MatrixModule.exists_linearEquiv_blockModule (nn := nn) hπ hker
-  letI := MatrixModule.blockModule nn π i
-  haveI := MatrixModule.isScalarTower_blockModule (nn := nn) hlin i
+  let := MatrixModule.blockModule nn π i
+  have := MatrixModule.isScalarTower_blockModule (nn := nn) hlin i
   -- the `kG`-linear isomorphism, restricted to the scalars, is an intertwiner
   refine ⟨i, fun g => ?_, fun {z c} hzc => ?_⟩
   · set f : V ≃ₗ[ResidueField 𝒪] (nn i → ResidueField 𝒪) :=

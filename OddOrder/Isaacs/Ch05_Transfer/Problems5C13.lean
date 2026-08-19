@@ -96,7 +96,7 @@ theorem hasNormalPComplement_of_commutator_normalHall_in_normal
     exact ⟨k, Subtype.ext (by simpa using congrArg Subtype.val hk)⟩
   obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hLp
   set M : Subgroup ↥K := L.subgroupOf K with hMdef
-  haveI := hMnorm
+  have := hMnorm
   have hMcard : Nat.card ↥M = Nat.card ↥L :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hLK).toEquiv
   have hcop : Nat.Coprime (Nat.card ↥M) M.index := by
@@ -118,9 +118,9 @@ theorem hasNormalPComplement_of_commutator_normalHall_in_normal
       rw [Subgroup.relIndex, hXsub, hX'.index_eq_card, hMcard]
     rw [← e, e2]
   -- Frattini 論法: `G = L · N_G(X)`
-  haveI hLnil : Group.IsNilpotent ↥L := hLp.isNilpotent
-  haveI hMsolv : IsSolvable ↥M :=
-    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hLK).symm.toMonoidHom)
+  have hLnil : Group.IsNilpotent ↥L := hLp.isNilpotent
+  have hMsolv : Group.IsSolvable ↥M :=
+    Group.isSolvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hLK).symm.toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe hLK).symm.surjective
   have hsmulcard : ∀ Y : Subgroup G, ∀ c : G,
       Nat.card ↥(MulAut.conj c • Y) = Nat.card ↥Y := fun Y c =>
@@ -161,7 +161,7 @@ theorem hasNormalPComplement_of_commutator_normalHall_in_normal
       rw [map_mul, map_inv, mul_smul, hy, ← mul_smul, inv_mul_cancel, one_smul]
     exact Subgroup.mem_normalizer_iff_map_conj_eq.mpr key
   -- Dedekind + Frattini 部分群の非生成性: `P ≤ N_G(X)`
-  haveI : Group.IsNilpotent ↥(P : Subgroup G) := P.isPGroup'.isNilpotent
+  have : Group.IsNilpotent ↥(P : Subgroup G) := P.isPGroup'.isNilpotent
   have hLsub : L.subgroupOf (P : Subgroup G) = _root_.commutator ↥(P : Subgroup G) := by
     rw [hLdef, ← Subgroup.map_subtype_commutator, Subgroup.subgroupOf,
       Subgroup.comap_map_eq_self_of_injective (Subgroup.subtype_injective _)]
@@ -189,7 +189,7 @@ theorem hasNormalPComplement_of_commutator_normalHall_in_normal
     obtain ⟨y, hyL, w, hw, hz⟩ := hdecomp g
     rw [hz]
     exact Subgroup.mul_mem _ (hPX (hLP hyL)) hw
-  haveI : X.Normal := Subgroup.normalizer_eq_top_iff.mp hXtop
+  have : X.Normal := Subgroup.normalizer_eq_top_iff.mp hXtop
   refine hasNormalPComplement_of_normal_of_index_eq_pow (a := n + a) hpX ?_
   rw [hXidx, hn, hKidx, pow_add]
 
@@ -203,7 +203,7 @@ theorem hasNormalPComplement_of_selfNormalizing_sylow_of_commutator_normal
     HasNormalPComplement p G := by
   classical
   set L : Subgroup G := ⁅(P : Subgroup G), (P : Subgroup G)⁆ with hLdef
-  haveI := hLnorm
+  have := hLnorm
   have hLP : L ≤ (P : Subgroup G) := by
     rw [hLdef, ← Subgroup.map_subtype_commutator]
     exact Subgroup.map_subtype_le _
@@ -260,14 +260,14 @@ theorem hasNormalPComplement_of_selfNormalizing_sylow_of_commutator_normal
     intro y hy
     exact congrArg Subtype.val (hPbarComm ⟨y, hy⟩ ⟨x, hx'⟩)
   obtain ⟨Kbar, hKbarN, hKbarC⟩ := hburn
-  haveI := hKbarN
+  have := hKbarN
   have hpKbar : ¬ p ∣ Nat.card ↥Kbar :=
     not_dvd_card_of_isComplement'_sylow Pbar (hKbarC Pbar)
   have hKbaridx : Kbar.index = Nat.card ↥(Pbar : Subgroup (G ⧸ L)) :=
     (hKbarC Pbar).symm.index_eq_card
   -- (2) `K := π⁻¹(K̄)`
   set K : Subgroup G := Subgroup.comap π Kbar with hKdef
-  haveI : K.Normal := hKbarN.comap π
+  have : K.Normal := hKbarN.comap π
   have hLK : L ≤ K := by
     rw [hKdef, hπ]
     exact QuotientGroup.le_comap_mk' L Kbar
@@ -298,6 +298,7 @@ theorem hasNormalPComplement_of_selfNormalizing_sylow_of_commutator_normal
     (Subgroup.Normal.subgroupOf inferInstance K) (fun h => hpKbar (hMidx ▸ h)) (a := m) ?_
   rw [hKidx, hKbaridx, hm]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Isaacs Problem 5C.13 (Navarro)** (p. 164) ⭐: `P` が `G` の Sylow `p`-部分群で
 `P = N_G(P)` なら, `N_G(P')` (`P' = ⁅P,P⁆`) は正規 `p`-補群をもつ。 -/
 theorem hasNormalPComplement_normalizer_commutator_of_selfNormalizing_sylow
@@ -332,7 +333,7 @@ theorem hasNormalPComplement_normalizer_commutator_of_selfNormalizing_sylow
     refine Subgroup.map_injective (Subgroup.subtype_injective H) ?_
     rw [Subgroup.map_commutator, Sylow.coe_subtype, Subgroup.subgroupOf_map_subtype,
       Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hPH, inf_eq_left.mpr hLH, hLdef]
-  haveI hnormH : (⁅((P.subtype hPH : Sylow p ↥H) : Subgroup ↥H),
+  have hnormH : (⁅((P.subtype hPH : Sylow p ↥H) : Subgroup ↥H),
       ((P.subtype hPH : Sylow p ↥H) : Subgroup ↥H)⁆ : Subgroup ↥H).Normal := by
     rw [hcommH]
     exact Subgroup.normal_subgroupOf_of_le_normalizer (le_of_eq hHdef)

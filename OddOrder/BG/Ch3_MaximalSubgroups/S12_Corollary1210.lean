@@ -99,18 +99,18 @@ theorem sylow_isMulCommutative_of_sigma_compl [Finite G] (hG : IsMinimalSimpleOd
   rcases SubgroupESetup.mem_tau_union_of_mem_primeFactors hG h hrE with (hr1 | hr2) | hr3
   · -- `r ∈ τ₁`: rank 1, cyclic Sylow.
     have hodd : Odd r := hG.odd.of_dvd_nat (hr_dvd.trans (Subgroup.card_subgroup_dvd_card M))
-    haveI : IsCyclic ↥(S : Subgroup ↥M) :=
+    have : IsCyclic ↥(S : Subgroup ↥M) :=
       S10.isCyclic_of_pRank_le_one S.isPGroup' hodd (le_of_eq ((pRank_sylow_eq S).trans hr1.2.2))
-    letI : CommGroup ↥(S : Subgroup ↥M) := IsCyclic.commGroup
+    let : CommGroup ↥(S : Subgroup ↥M) := IsCyclic.commGroup
     exact ⟨⟨mul_comm⟩⟩
   · -- `r ∈ τ₂`: Theorem 12.5(b).
     obtain ⟨A, hA, hAE⟩ := exists_elemAb_rank_two_le_E_of_tau2 hG h hr2
     exact (Msigma_nilpotent_of_tau2 hG h.mem_maximal hr2 hA (hAE.trans h.E_le)).2.1.1 S
   · -- `r ∈ τ₃`: rank 1, cyclic Sylow.
     have hodd : Odd r := hG.odd.of_dvd_nat (hr_dvd.trans (Subgroup.card_subgroup_dvd_card M))
-    haveI : IsCyclic ↥(S : Subgroup ↥M) :=
+    have : IsCyclic ↥(S : Subgroup ↥M) :=
       S10.isCyclic_of_pRank_le_one S.isPGroup' hodd (le_of_eq ((pRank_sylow_eq S).trans hr3.2.2))
-    letI : CommGroup ↥(S : Subgroup ↥M) := IsCyclic.commGroup
+    let : CommGroup ↥(S : Subgroup ↥M) := IsCyclic.commGroup
     exact ⟨⟨mul_comm⟩⟩
 
 /-! ## Corollary 12.10 -/
@@ -178,10 +178,10 @@ theorem nilpotent_sigmaComplement_abelian [Finite G] (hG : IsMinimalSimpleOdd G)
     intro N hNM hNpi hNnil
     refine isMulCommutative_of_isNilpotent_of_forall_sylow hNnil ?_
     intro q hq_prime S
-    haveI : Fact q.Prime := ⟨hq_prime⟩
+    have : Fact q.Prime := ⟨hq_prime⟩
     by_cases hSbot : (S : Subgroup ↥N) = ⊥
     · refine ⟨⟨fun a b => ?_⟩⟩
-      haveI : Subsingleton ↥(S : Subgroup ↥N) := by
+      have : Subsingleton ↥(S : Subgroup ↥N) := by
         rw [hSbot]
         exact ⟨fun a b => Subtype.ext (by
           rw [Subgroup.mem_bot.mp a.2, Subgroup.mem_bot.mp b.2])⟩
@@ -213,7 +213,7 @@ theorem nilpotent_sigmaComplement_abelian [Finite G] (hG : IsMinimalSimpleOdd G)
   have hbE₂ : IsMulCommutative ↥E₂ := by
     by_cases hτ₂ : ∃ p' : ℕ, p'.Prime ∧ p' ∈ tau2 M
     · obtain ⟨p', hp'_prime, hp'⟩ := hτ₂
-      haveI : Fact p'.Prime := ⟨hp'_prime⟩
+      have : Fact p'.Prime := ⟨hp'_prime⟩
       obtain ⟨A', hA', hA'E⟩ := exists_elemAb_rank_two_le_E_of_tau2 hG h hp'
       by_cases hnonab : ∃ S : Sylow p' G, ¬ IsMulCommutative ↥(S : Subgroup G)
       · exact E2_isMulCommutative_of_prime_eq hG h hp' hA' (hA'E.trans h.E_le)
@@ -230,7 +230,7 @@ theorem nilpotent_sigmaComplement_abelian [Finite G] (hG : IsMinimalSimpleOdd G)
         exact hτ₂ ⟨r, hr_prime, h.E₂_hall.1 r
           (Nat.mem_primeFactors.mpr ⟨hr_prime, hr_dvd', Nat.card_pos.ne'⟩)⟩
       refine ⟨⟨fun a b => ?_⟩⟩
-      haveI : Subsingleton ↥E₂ := Nat.card_eq_one_iff_unique.mp hcard |>.1
+      have : Subsingleton ↥E₂ := Nat.card_eq_one_iff_unique.mp hcard |>.1
       exact Subsingleton.elim _ _
   -- (b) `E'` abelian: nilpotent (12.1(a)) + (a).
   have hbE' : IsMulCommutative ↥(derivedInG E) := by
@@ -245,9 +245,9 @@ theorem nilpotent_sigmaComplement_abelian [Finite G] (hG : IsMinimalSimpleOdd G)
   have hA_le_E₂_gen : ∀ (p : ℕ), p.Prime → p ∈ tau2 M →
       ∀ A ∈ elemAbelianOfRank G p 2, A ≤ E → A ≤ E₂ := by
     intro p hp_prime hp A hA hAE
-    haveI : Fact p.Prime := ⟨hp_prime⟩
+    have : Fact p.Prime := ⟨hp_prime⟩
     obtain ⟨⟨hE_norm_A, -⟩, -, -, -, -, -⟩ := elemAb_normal_in_E_of_tau2 hG h hp hA hAE
-    haveI hnormal : (A.subgroupOf E).Normal :=
+    have hnormal : (A.subgroupOf E).Normal :=
       (Subgroup.normal_subgroupOf_iff_le_normalizer hAE).mpr hE_norm_A
     have hpi : Ch03.Subgroup.IsPiGroup (tau2 M) (A.subgroupOf E) := by
       intro r hr
@@ -264,7 +264,7 @@ theorem nilpotent_sigmaComplement_abelian [Finite G] (hG : IsMinimalSimpleOdd G)
   refine ⟨ha, ⟨hbE₂, hbE'⟩, ?_, ?_, ?_⟩
   · -- (c)
     intro p hp_prime hp A hA hAE
-    haveI : Fact p.Prime := ⟨hp_prime⟩
+    have : Fact p.Prime := ⟨hp_prime⟩
     obtain ⟨⟨hE_norm_A, -⟩, -, -, -, -, -⟩ := elemAb_normal_in_E_of_tau2 hG h hp hA hAE
     have hA_le_E₂ : A ≤ E₂ := hA_le_E₂_gen p hp_prime hp A hA hAE
     have hE₂_le_CA : E₂ ≤ Subgroup.centralizer (A : Set G) :=
@@ -343,7 +343,7 @@ theorem nilpotent_sigmaComplement_abelian [Finite G] (hG : IsMinimalSimpleOdd G)
           Subgroup.index_ne_zero_of_finite⟩) h3
   · -- (d)
     intro p hpσ P hPM hPp hPnc
-    haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hpσ.1⟩
+    have : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hpσ.1⟩
     have hodd : Odd p := hG.odd.of_dvd_nat
       ((Nat.mem_primeFactors.mp hpσ.1).2.1.trans (Subgroup.card_subgroup_dvd_card M))
     have hPne : P ≠ ⊥ := by
@@ -367,7 +367,7 @@ theorem nilpotent_sigmaComplement_abelian [Finite G] (hG : IsMinimalSimpleOdd G)
     exact Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hA_le_P) hc
   · -- (e)
     intro x hxM hx1 hxτ₂ hCMσx
-    haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+    have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
     -- `M ≤ N_G(M_σ)`.
     have hM_norm_Mσ : M ≤ Subgroup.normalizer ((S10.Msigma M) : Set G) := by
       rw [S10.Msigma, OddOrder.GroupTheory.opiCoreInG]
@@ -465,7 +465,7 @@ theorem nilpotent_sigmaComplement_abelian [Finite G] (hG : IsMinimalSimpleOdd G)
     -- Choose the `ℰ_p²(E)`-witness for a prime of `orderOf y`.
     obtain ⟨p, hp_prime, hp_dvd⟩ := Nat.exists_prime_and_dvd
       (fun h1 => hy1 (orderOf_eq_one_iff.mp h1))
-    haveI : Fact p.Prime := ⟨hp_prime⟩
+    have : Fact p.Prime := ⟨hp_prime⟩
     have hpτ₂ : p ∈ tau2 M := by
       refine hxτ₂ p (Nat.mem_primeFactors.mpr ⟨hp_prime, ?_, (orderOf_pos x).ne'⟩)
       rwa [← hy_ord]
@@ -512,7 +512,7 @@ theorem nilpotent_sigmaComplement_abelian [Finite G] (hG : IsMinimalSimpleOdd G)
               have ha : a ∈ Subgroup.center G := by
                 rw [ht]; exact Subgroup.mem_top a
               exact (Subgroup.mem_center_iff.mp ha b).symm
-            letI : CommGroup G :=
+            let : CommGroup G :=
               { (inferInstance : Group G) with mul_comm := hcomm }
             infer_instance
         rw [hZbot, Subgroup.mem_bot] at hyZ

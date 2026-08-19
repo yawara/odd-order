@@ -123,15 +123,15 @@ theorem exists_factorCoordinates_on_actual_pairwiseJoin_of_exponent_two
   let hJoinEA : IsElementaryAbelian 2 (frattini J) :=
     IsElementaryAbelian.of_mulEquiv
       (pairwiseJoinFrattiniEquivAmbientFrattini hMap).symm hPhiEA
-  letI : IsMulCommutative (frattini P) :=
+  let : IsMulCommutative (frattini P) :=
     IsMulCommutative.of_comm hPhiEA.comm
-  letI : CommGroup (frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini P)) :=
+  let : CommGroup (frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini P)) :=
     hPhiEA.zmodModule
-  letI : IsMulCommutative (frattini J) :=
+  let : IsMulCommutative (frattini J) :=
     IsMulCommutative.of_comm hJoinEA.comm
-  letI : CommGroup (frattini J) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini J)) :=
+  let : CommGroup (frattini J) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini J)) :=
     hJoinEA.zmodModule
   intro factors hleft hright n c ePhi nu hnTwo hcgen
     hnuPrimitive hconj
@@ -383,15 +383,15 @@ theorem exists_normalizedFactorPairRelation_with_witnesses_on_actualPairwiseJoin
   let hJoinEA : IsElementaryAbelian 2 (frattini J) :=
     IsElementaryAbelian.of_mulEquiv
       (pairwiseJoinFrattiniEquivAmbientFrattini hMap).symm hPhiEA
-  letI : IsMulCommutative (frattini P) :=
+  let : IsMulCommutative (frattini P) :=
     IsMulCommutative.of_comm hPhiEA.comm
-  letI : CommGroup (frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini P)) :=
+  let : CommGroup (frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini P)) :=
     hPhiEA.zmodModule
-  letI : IsMulCommutative (frattini J) :=
+  let : IsMulCommutative (frattini J) :=
     IsMulCommutative.of_comm hJoinEA.comm
-  letI : CommGroup (frattini J) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini J)) :=
+  let : CommGroup (frattini J) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini J)) :=
     hJoinEA.zmodModule
   intro n c ePhi nu hnTwo hcgen hnuPrimitive hconj
   have hRJoin : R < J := by
@@ -555,15 +555,15 @@ theorem exists_normalizedFactorPairRelation_on_actualPairwiseJoin_of_exponent_tw
   let hJoinEA : IsElementaryAbelian 2 (frattini J) :=
     IsElementaryAbelian.of_mulEquiv
       (pairwiseJoinFrattiniEquivAmbientFrattini hMap).symm hPhiEA
-  letI : IsMulCommutative (frattini P) :=
+  let : IsMulCommutative (frattini P) :=
     IsMulCommutative.of_comm hPhiEA.comm
-  letI : CommGroup (frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini P)) :=
+  let : CommGroup (frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini P)) :=
     hPhiEA.zmodModule
-  letI : IsMulCommutative (frattini J) :=
+  let : IsMulCommutative (frattini J) :=
     IsMulCommutative.of_comm hJoinEA.comm
-  letI : CommGroup (frattini J) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini J)) :=
+  let : CommGroup (frattini J) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini J)) :=
     hJoinEA.zmodModule
   intro n c ePhi nu hnTwo hcgen hnuPrimitive hconj
   obtain ⟨factors, left', right', hleft, hright,

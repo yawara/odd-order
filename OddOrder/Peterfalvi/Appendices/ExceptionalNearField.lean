@@ -125,7 +125,7 @@ noncomputable def halfFrobenius : RingAut K :=
   (iterateFrobeniusEquiv K p n : K ≃+* K)
 
 theorem halfFrobenius_apply (x : K) : halfFrobenius K p n x = x ^ p ^ n := by
-  haveI : ExpChar K p := ExpChar.prime Fact.out
+  have : ExpChar K p := ExpChar.prime Fact.out
   change iterateFrobeniusEquiv K p n x = x ^ p ^ n
   rw [show ⇑(iterateFrobeniusEquiv K p n) = ⇑(iterateFrobenius K p n) from rfl,
     iterateFrobenius_def]

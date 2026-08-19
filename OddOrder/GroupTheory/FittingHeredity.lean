@@ -71,7 +71,7 @@ Noether's third isomorphism theorem presents `X/F(X)` as the quotient
 theorem isNilpotent_quotient_fitting_of_isNilpotent_quotient [Finite X] (K : Subgroup X)
     [K.Normal] [Group.IsNilpotent K] (h : Group.IsNilpotent (X ⧸ K)) :
     Group.IsNilpotent (X ⧸ Ch01.fitting X) := by
-  haveI := h
+  have := h
   exact Group.nilpotent_of_mulEquiv
     (QuotientGroup.quotientQuotientEquivQuotient K (Ch01.fitting X)
       Ch01.nilpotent_normal_le_fitting)
@@ -86,9 +86,9 @@ Take `K := ker ((X → X/F(X)) ∘ f) = f⁻¹(F(X))`.  Its image `f(K) ≤ F(X)
 theorem isNilpotent_quotient_fitting_of_injective [Finite X] (f : Y →* X)
     (hf : Function.Injective f) (h : Group.IsNilpotent (X ⧸ Ch01.fitting X)) :
     Group.IsNilpotent (Y ⧸ Ch01.fitting Y) := by
-  haveI : Finite Y := Finite.of_injective f hf
-  haveI := h
-  haveI : Group.IsNilpotent ↥(Ch01.fitting X) := Ch01.fitting.isNilpotent
+  have : Finite Y := Finite.of_injective f hf
+  have := h
+  have : Group.IsNilpotent ↥(Ch01.fitting X) := Ch01.fitting.isNilpotent
   obtain ⟨φ, hφ⟩ :
       ∃ φ : Y →* X ⧸ Ch01.fitting X, φ = (QuotientGroup.mk' (Ch01.fitting X)).comp f :=
     ⟨_, rfl⟩
@@ -97,9 +97,9 @@ theorem isNilpotent_quotient_fitting_of_injective [Finite X] (f : Y →* X)
   have hmap : (φ.ker).map f ≤ Ch01.fitting X := by
     rw [hker]
     exact Subgroup.map_comap_le _ _
-  haveI : Group.IsNilpotent ↥((φ.ker).map f) :=
+  have : Group.IsNilpotent ↥((φ.ker).map f) :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hmap)
-  haveI : Group.IsNilpotent ↥φ.ker :=
+  have : Group.IsNilpotent ↥φ.ker :=
     Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective φ.ker f hf).symm
   have hquot : Group.IsNilpotent (Y ⧸ φ.ker) :=
     Group.nilpotent_of_mulEquiv (QuotientGroup.quotientKerEquivRange φ).symm
@@ -115,11 +115,11 @@ nilpotent (image of the nilpotent `F(X)`), and `Y/K` is a quotient of `X/F(X)` s
 theorem isNilpotent_quotient_fitting_of_surjective [Finite X] (f : X →* Y)
     (hf : Function.Surjective f) (h : Group.IsNilpotent (X ⧸ Ch01.fitting X)) :
     Group.IsNilpotent (Y ⧸ Ch01.fitting Y) := by
-  haveI : Finite Y := Finite.of_surjective f hf
-  haveI := h
-  haveI : Group.IsNilpotent ↥(Ch01.fitting X) := Ch01.fitting.isNilpotent
-  haveI : ((Ch01.fitting X).map f).Normal := (Ch01.fitting.normal X).map f hf
-  haveI : Group.IsNilpotent ↥((Ch01.fitting X).map f) :=
+  have : Finite Y := Finite.of_surjective f hf
+  have := h
+  have : Group.IsNilpotent ↥(Ch01.fitting X) := Ch01.fitting.isNilpotent
+  have : ((Ch01.fitting X).map f).Normal := (Ch01.fitting.normal X).map f hf
+  have : Group.IsNilpotent ↥((Ch01.fitting X).map f) :=
     Group.nilpotent_of_surjective (f.subgroupMap (Ch01.fitting X))
       (MonoidHom.subgroupMap_surjective f _)
   have hle : Ch01.fitting X ≤

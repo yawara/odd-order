@@ -107,12 +107,12 @@ theorem frattiniSquareCommutatorBilinearBaseChange_tmul
   dsimp only
   let hSquareEA :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
   exact LinearMap.baseChange₂_tmul
     (frattiniSquareCommutatorBilinear
@@ -160,12 +160,12 @@ theorem frattiniSquareCommutatorBilinearBaseChange_equivariant
     (frattiniSquareNormalInvariant Y.subtype).2.2
   let hSquareEA :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
   intro c u v
   exact LinearMap.baseChange₂_equivariant
@@ -216,13 +216,13 @@ theorem frattiniSquareCommutatorBilinearBaseChange_one_tmul_ne_zero
   dsimp only
   let hSquareEA :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : CommGroup (frattiniSquare P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : CommGroup (frattiniSquare P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
   rw [frattiniSquareCommutatorBilinearBaseChange_tmul, one_mul]
   exact one_tmul_ne_zero_of_ne_zero eSquare huv
@@ -292,13 +292,13 @@ theorem exists_frattiniSquareFrobeniusWeight_of_ne_zero
     (frattiniSquareNormalInvariant Y.subtype).2.2
   let hSquareEA :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : CommGroup (frattiniSquare P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : CommGroup (frattiniSquare P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
   intro u v a b hu hv hne
   have hSquareCompat : ∀ q,

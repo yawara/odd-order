@@ -286,15 +286,15 @@ theorem minimal_le_centralLiftIn [Finite G] (W : Subgroup G)
         (∀ h ∈ hyp.H, ∀ x ∈ Q₂', h * x * h⁻¹ ∈ Q₂') → Q₂' = Q₂) :
     Q₂ ≤ hyp.centralLiftIn W Q₃ hinv := by
   classical
-  haveI := hnilW
-  haveI : (Q₃.subgroupOf W).Normal := subgroupOf_normal_of_conj_mem hinv
-  haveI : (Q₂.subgroupOf W).Normal :=
+  have := hnilW
+  have : (Q₃.subgroupOf W).Normal := subgroupOf_normal_of_conj_mem hinv
+  have : (Q₂.subgroupOf W).Normal :=
     subgroupOf_normal_of_conj_mem fun q hq x hx => hQ₂H q (hWle hq) x hx
   -- the image of `Q₂` in `W⧸Q₃` is a nontrivial normal subgroup
   set π := QuotientGroup.mk' (Q₃.subgroupOf W) with hπ_def
   set Qbar : Subgroup (↥W ⧸ Q₃.subgroupOf W) :=
     (Q₂.subgroupOf W).map π with hQbar_def
-  haveI : Qbar.Normal :=
+  have : Qbar.Normal :=
     Subgroup.Normal.map ‹(Q₂.subgroupOf W).Normal› π
       (QuotientGroup.mk'_surjective _)
   have hQbar_ne : Qbar ≠ ⊥ := by
@@ -355,7 +355,7 @@ theorem prime_dvd_card_quotient_of_le_commutator {K : Type*} [Group K] [Finite K
   by_contra hnd
   obtain ⟨N, hNnormal, hNC⟩ :=
     OddOrder.Isaacs.Ch05.hasNormalPComplement_of_isNilpotent (H := K) (p := p)
-  haveI := hNnormal
+  have := hNnormal
   set P : Sylow p K := default with hP_def
   have hC := hNC P
   -- the image of `P` in `K⧸R` is a `p`-group of order dividing the
@@ -432,7 +432,7 @@ def primaryLiftIn (W Q₃ : Subgroup G)
     rintro a b ⟨haZ, ka, hka⟩ ⟨hbZ, kb, hkb⟩
     refine ⟨(hyp.centralLiftIn W Q₃ hinv).mul_mem haZ hbZ, ka + kb, ?_⟩
     -- pass to `W⧸Q₃`, where the two factors commute and are torsion
-    haveI : (Q₃.subgroupOf W).Normal := subgroupOf_normal_of_conj_mem hinv
+    have : (Q₃.subgroupOf W).Normal := subgroupOf_normal_of_conj_mem hinv
     set π := QuotientGroup.mk' (Q₃.subgroupOf W) with hπ_def
     have hmk : ∀ (w : ↥W) (n : ℕ), (w : G) ^ n ∈ Q₃ → (π w) ^ n = 1 := by
       intro w n hw
@@ -499,10 +499,10 @@ theorem not_centralLift_le_minimal [Finite G] (hnil : Group.IsNilpotent ↥hyp.Q
     ¬ hyp.centralLiftIn hyp.Q1 Q₃ hinv ≤ Q₂ := by
   classical
   intro hZle
-  haveI := hnil
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : Fact r.Prime := ⟨hr⟩
-  haveI : (Q₃.subgroupOf hyp.Q1).Normal := subgroupOf_normal_of_conj_mem hinv
+  have := hnil
+  have : Fact p.Prime := ⟨hp⟩
+  have : Fact r.Prime := ⟨hr⟩
+  have : (Q₃.subgroupOf hyp.Q1).Normal := subgroupOf_normal_of_conj_mem hinv
   have hQ₃der : Q₃ ≤ ⁅hyp.Q1, hyp.Q1⁆ := hQ₃Q₂.le.trans hQ₂der
   -- central elements of `p`- resp. `r`-power order in `Q₁⧸Q₃`
   obtain ⟨xp, hxpC, hxp1, kp, hkp⟩ := exists_center_pow_prime_eq_one_of_dvd
@@ -574,7 +574,7 @@ theorem not_centralLift_le_minimal [Finite G] (hnil : Group.IsNilpotent ↥hyp.Q
 theorem nontrivial_Q1 : Nontrivial ↥hyp.Q1 := by
   by_contra hcon
   apply hyp.Q1_not_two_group
-  haveI : Subsingleton ↥hyp.Q1 := not_nontrivial_iff_subsingleton.mp hcon
+  have : Subsingleton ↥hyp.Q1 := not_nontrivial_iff_subsingleton.mp hcon
   exact fun g => ⟨0, by rw [pow_zero, pow_one]; exact Subsingleton.elim g 1⟩
 
 /-- **The anchor properness `S·Q' < Q`** for nilpotent `Q₁`: nontrivial
@@ -582,11 +582,11 @@ nilpotent groups are not perfect, so `[Q₁,Q₁] ≠ Q₁`, and
 `Q₁ ⊓ S·[Q₁,Q₁] = [Q₁,Q₁]` forces the join to miss `Q₁`. -/
 theorem sup_S_Qder_lt_Q [Finite G] (hnil : Group.IsNilpotent ↥hyp.Q1) :
     hyp.S ⊔ hyp.Qder < hyp.Q := by
-  haveI := hnil
-  haveI : Nontrivial ↥hyp.Q1 := hyp.nontrivial_Q1
+  have := hnil
+  have : Nontrivial ↥hyp.Q1 := hyp.nontrivial_Q1
   have hder_ne : ⁅hyp.Q1, hyp.Q1⁆ ≠ hyp.Q1 := by
     intro heq
-    apply (IsSolvable.commutator_lt_top_of_nontrivial ↥hyp.Q1).ne
+    apply (Group.IsSolvable.commutator_lt_top_of_nontrivial ↥hyp.Q1).ne
     rw [eq_top_iff]
     intro x _
     have hx : (x : G) ∈ Subgroup.map hyp.Q1.subtype (commutator ↥hyp.Q1) := by
@@ -628,7 +628,7 @@ theorem ssetOf_sup_sder_coherent_of_conjInvariant
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
       (hyp.SsetOf (hyp.Sder ⊔ Q₃)) hyp.A) := by
   classical
-  haveI := hnil
+  have := hnil
   have hlt : hyp.S ⊔ hyp.Qder < hyp.Q := hyp.sup_S_Qder_lt_Q hnil
   -- the base of the induction: the Remark at `Q' = S'·[Q₁,Q₁]`
   have hbase : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
@@ -682,22 +682,22 @@ theorem ssetOf_sup_sder_coherent_of_conjInvariant
         hyp.not_centralLift_le_minimal hnil hp hr hpr hpd hrd hQ₃Q₂ hQ₂le
           hinvQ1 hinvH hmin
       -- the relativised `Normal` instances
-      haveI : ((hyp.Sder ⊔ Q₂).subgroupOf hyp.H).Normal :=
+      have : ((hyp.Sder ⊔ Q₂).subgroupOf hyp.H).Normal :=
         hyp.subgroupOf_H_normal_of_conj_mem fun h hh x hx =>
           conj_mem_sup (fun y hy => hyp.Sder_conj_mem_of_mem_H hh hy)
             (fun y hy => hQ₂H h hh y hy) hx
-      haveI : ((hyp.Sder ⊔ Q₃').subgroupOf hyp.H).Normal :=
+      have : ((hyp.Sder ⊔ Q₃').subgroupOf hyp.H).Normal :=
         hyp.subgroupOf_H_normal_of_conj_mem fun h hh x hx =>
           conj_mem_sup (fun y hy => hyp.Sder_conj_mem_of_mem_H hh hy)
             (fun y hy => hinvH h hh y hy) hx
-      haveI : (hyp.Q1.subgroupOf hyp.H).Normal :=
+      have : (hyp.Q1.subgroupOf hyp.H).Normal :=
         hyp.subgroupOf_H_normal_of_conj_mem fun h hh x hx => hyp.Q1_normal_in_H hh hx
-      haveI : (((hyp.Sder ⊔ Q₃').subgroupOf hyp.H).subgroupOf
+      have : (((hyp.Sder ⊔ Q₃').subgroupOf hyp.H).subgroupOf
           (hyp.Q.subgroupOf hyp.H)).Normal :=
         hyp.subgroupOf_Q_normal_of_conj_mem fun q hq x hx =>
           conj_mem_sup (fun y hy => hyp.Sder_conj_mem_of_mem_H (hyp.Q_le_H hq) hy)
             (fun y hy => hinvH q (hyp.Q_le_H hq) y hy) hx
-      haveI : ((hyp.S ⊔ hyp.centralLiftIn hyp.Q1 Q₃' hinvQ1).subgroupOf hyp.H).Normal :=
+      have : ((hyp.S ⊔ hyp.centralLiftIn hyp.Q1 Q₃' hinvQ1).subgroupOf hyp.H).Normal :=
         hyp.subgroupOf_H_normal_of_conj_mem fun h hh x hx =>
           conj_mem_sup (fun y hy => hyp.S_normal_in_H hh hy)
             (fun y hy =>

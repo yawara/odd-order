@@ -73,6 +73,7 @@ def noncommFactorInclusion
     data.eQuot
 
 omit [Finite P] in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Factor square identity, noncommutative branch.**  The ambient square map
 of the factor inclusion equals the factor's type-A quadratic form `α · θ(α)`. -/
 theorem noncomm_ambientSquare_eq
@@ -104,9 +105,9 @@ theorem noncomm_ambientSquare_eq
         (lowerCentralSquareMapAdditive P hSqamb
           (noncommFactorInclusion data hK0 α)) =
       α * data.theta α := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   -- Represent `α` through the factor quotient.
   obtain ⟨g, hg⟩ :=
     QuotientGroup.mk'_surjective (lowerCentralLayerKernel (↥S) 0)
@@ -185,10 +186,10 @@ theorem commFactorInclusion_eQuot_mk
     commFactorInclusion data hK0
         (data.eQuot (Additive.ofMul (QuotientGroup.mk g))) =
       layerZeroClass (ambientTermZeroHom S.subtype g) := by
-  letI : CommGroup ↥S :=
+  let : CommGroup ↥S :=
     { (inferInstance : Group ↥S) with mul_comm := data.hcomm.is_comm.comm }
-  letI : IsMulCommutative (↥S ⧸ Agemo (↥S) 2 1) := IsMulCommutative.of_comm mul_comm
-  letI : Module (ZMod 2) (Additive (↥S ⧸ Agemo (↥S) 2 1)) :=
+  let : IsMulCommutative (↥S ⧸ Agemo (↥S) 2 1) := IsMulCommutative.of_comm mul_comm
+  let : Module (ZMod 2) (Additive (↥S ⧸ Agemo (↥S) 2 1)) :=
     AddCommGroup.zmodModule (fun q => by
       apply Additive.toMul.injective
       change (Additive.toMul q) ^ 2 = 1
@@ -229,9 +230,9 @@ theorem comm_ambientSquare_eq
         (lowerCentralSquareMapAdditive P hSqamb
           (commFactorInclusion data hK0 α)) =
       α * α := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   obtain ⟨g, hg⟩ :=
     QuotientGroup.mk_surjective (Additive.toMul (data.eQuot.symm α))
   have hαrep : α = data.eQuot (Additive.ofMul (QuotientGroup.mk g)) := by
@@ -248,7 +249,7 @@ theorem comm_ambientSquare_eq
       (ambientTermZeroHom S.subtype g) hmem
   -- Factor side: `α² = ePhi (⟨(S.subtype g)², _⟩)`.
   have hfactor : α * α = ePhi (Additive.ofMul ⟨(S.subtype g) ^ 2, hmem⟩) := by
-    haveI := data.fintypeIndex
+    have := data.fintypeIndex
     have hsn := data.square_normal α
     have heq : data.eQuot.symm α =
         Additive.ofMul (QuotientGroup.mk g) := by
@@ -490,9 +491,9 @@ theorem FactorCoordinateData.toInclusionData_theta
     letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
     (data.toInclusionData hEA ePhi hK1amb htermamb hSqamb hAgemoamb hK0).theta =
       data.theta := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   cases data with
   | commutative d => rfl
   | noncommutative _ d => rfl
@@ -641,9 +642,9 @@ theorem ambientProductSquare_eq
       α * left.theta α + β * right.theta β +
         ambientCenterCoordinate hEA hK1amb htermamb ePhi
           (lowerCentralCommutatorBilinear P (left.incl α) (right.incl β)) := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   rw [ambientProductEquivOfFactors_apply,
     centerSquareMap_add hSqamb (ambientCenterCoordinate hEA hK1amb htermamb ePhi)
       (left.incl α) (right.incl β),
@@ -718,9 +719,9 @@ theorem ambientProductExtension_hsq_of_coordinate
     x ^ 2 = (ambientProductExtension hK0 e ePhi).inl
       (Multiplicative.ofAdd
         (q ((ambientProductExtension hK0 e ePhi).rightHom x).toAdd)) := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   have hxrepP : (((lowerCentralTermZeroEquivAmbient P).symm x :
       lowerCentralTerm P 0) : P) = x := rfl
   have hmem : (((lowerCentralTermZeroEquivAmbient P).symm x :
@@ -780,9 +781,9 @@ theorem ambientProductExtension_hsq_actual
           ((ambientProductExtension hK0
               (ambientProductEquivOfFactors left right hRnormal hinf hsup hΦR)
               ePhi).rightHom x).toAdd)) := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   refine ambientProductExtension_hsq_of_coordinate hEA hK1amb htermamb hSqamb
     hAgemoamb hK0 ePhi
     (ambientProductEquivOfFactors left right hRnormal hinf hsup hΦR)
@@ -864,9 +865,9 @@ theorem mixedTerm_rep_equivariance
             (lowerCentralLayerAction Y.subtype 0 c (Additive.toMul v)))) =
       nu * ambientCenterCoordinate hEA hK1 hterm ePhi
         (lowerCentralCommutatorBilinear P u v) := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   rw [← lowerCentralCommutatorBilinear_equivariant Y.subtype c u v]
   exact ambientCenterCoordinate_compat hEA hK1 hterm ePhi c nu hconj _
 
@@ -908,9 +909,9 @@ theorem mixedTerm_lambda_equivariance
         (lowerCentralCommutatorBilinear P (fL (lam • α)) (fR (mu • β))) =
       nu * ambientCenterCoordinate hEA hK1 hterm ePhi
         (lowerCentralCommutatorBilinear P (fL α) (fR β)) := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   rw [← hL α, ← hR β]
   exact mixedTerm_rep_equivariance hEA hK1 hterm ePhi c nu hconj (fL α) (fR β)
 
@@ -953,13 +954,13 @@ theorem commFactorInclusionData_incl_representation
           hAgemoamb hK0).incl α) =
       (commFactorInclusionData hEA ePhi data hK1amb htermamb hSqamb
         hAgemoamb hK0).incl (data.lambda • α) := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
-  letI : CommGroup ↥S :=
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : CommGroup ↥S :=
     { (inferInstance : Group ↥S) with mul_comm := data.hcomm.is_comm.comm }
-  letI : IsMulCommutative (↥S ⧸ Agemo (↥S) 2 1) := IsMulCommutative.of_comm mul_comm
-  letI : Module (ZMod 2) (Additive (↥S ⧸ Agemo (↥S) 2 1)) :=
+  let : IsMulCommutative (↥S ⧸ Agemo (↥S) 2 1) := IsMulCommutative.of_comm mul_comm
+  let : Module (ZMod 2) (Additive (↥S ⧸ Agemo (↥S) 2 1)) :=
     AddCommGroup.zmodModule (fun q => by
       apply Additive.toMul.injective
       change (Additive.toMul q) ^ 2 = 1
@@ -1040,9 +1041,9 @@ theorem noncommFactorInclusionData_incl_representation
           hAgemoamb hK0).incl α) =
       (noncommFactorInclusionData hEA ePhi data hK1amb htermamb hSqamb
         hAgemoamb hK0).incl (data.lambda • α) := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   have hfmem : ∀ g ∈ lowerCentralLayerKernel (↥S) 0,
       (S.subtype.comp (lowerCentralTerm (↥S) 0).subtype) g ∈ frattini P :=
     fun g hg => by
@@ -1121,9 +1122,9 @@ theorem FactorCoordinateData.toInclusionData_incl_representation
           hK0).incl α) =
       (data.toInclusionData hEA ePhi hK1amb htermamb hSqamb hAgemoamb
         hK0).incl (data.lambda • α) := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   cases data with
   | commutative d =>
       exact commFactorInclusionData_incl_representation hEA ePhi d hK1amb
@@ -1167,9 +1168,9 @@ theorem ambientProductSquare_ne_zero
         (lowerCentralSquareMapAdditive P hSqamb
           (ambientProductEquivOfFactors left right hRnormal hinf hsup hΦR
             (α, β))) ≠ 0 := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   intro hzero
   apply hne
   have hsqzero : lowerCentralSquareMapAdditive P hSqamb
@@ -1215,9 +1216,9 @@ theorem ambientProductSquare_decomposed_ne_zero
       ambientCenterCoordinate hEA hK1amb htermamb ePhi
         (lowerCentralCommutatorBilinear P (left.incl a) (right.incl b))
       ≠ 0 := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   intro hzero
   refine ambientProductSquare_ne_zero left right hRnormal hinf hsup hΦR hinv
     (α := a) (β := b) (fun hcontra => ha hcontra.1) ?_
@@ -1334,9 +1335,9 @@ theorem mixedTermBilinear_lambda_equivariance
         (dataL.toInclusionData hEA ePhi hK1amb htermamb hSqamb hAgemoamb hK0)
         (dataR.toInclusionData hEA ePhi hK1amb htermamb hSqamb hAgemoamb hK0)
         α β := by
-  letI : IsMulCommutative ↑(frattini P) :=
+  let : IsMulCommutative ↑(frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
+  let : Module (ZMod 2) (Additive ↑(frattini P)) := hEA.zmodModule
   have key := mixedTerm_lambda_equivariance (Y := Y) hEA hK1amb htermamb ePhi
     c nu hconj
     (dataL.toInclusionData hEA ePhi hK1amb htermamb hSqamb hAgemoamb hK0).incl
@@ -1368,10 +1369,10 @@ theorem FactorInclusionData.exists_incl_eq
     (d : FactorInclusionData S hEA ePhi hK1amb htermamb hSqamb hK0)
     (x : lowerCentralTerm P 0) (hx : (x : P) ∈ S) :
     ∃ α : GaloisField 2 n, d.incl α = layerZeroClass x := by
-  letI := d.group
-  letI := d.normal
-  letI := d.quotComm
-  letI := d.quotModule
+  let := d.group
+  let := d.normal
+  let := d.quotComm
+  let := d.quotModule
   have hx' : (x : P) ∈ d.f.range := by rw [d.range_eq]; exact hx
   obtain ⟨g, hg⟩ := hx'
   refine ⟨d.eQuot (Additive.ofMul (QuotientGroup.mk' d.N g)), ?_⟩

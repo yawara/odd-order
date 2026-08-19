@@ -39,7 +39,7 @@ theorem sup_Msigma_inf_E_eq_of_le [Finite G]
   have hMσM : S10.Msigma M ≤ M := S10.Msigma_le M
   have hAM : A ≤ M := hAE.trans h.E_le
   have hxM : x ∈ M := h.E_le hxE
-  haveI : ((S10.Msigma M).subgroupOf M).Normal := by
+  have : ((S10.Msigma M).subgroupOf M).Normal := by
     rw [S10.Msigma_subgroupOf]; infer_instance
   have hsub : (⟨x, hxM⟩ : ↥M) ∈ (S10.Msigma M).subgroupOf M ⊔ A.subgroupOf M := by
     rw [← Subgroup.subgroupOf_sup hMσM hAM]
@@ -101,7 +101,7 @@ theorem line_le_of_le_E_of_tau2 [Finite G] (hG : IsMinimalSimpleOdd G)
   classical
   have hAM : A ≤ M := hAE.trans h.E_le
   -- `X ⊔ A` is a `p`-group: `A.subgroupOf E` is normal in `↥E` by part 1.
-  haveI : (A.subgroupOf E).Normal := by
+  have : (A.subgroupOf E).Normal := by
     constructor
     intro a ha g
     rw [Subgroup.mem_subgroupOf] at ha ⊢
@@ -168,7 +168,7 @@ theorem centralizer_le_E_of_tau2 [Finite G] (hG : IsMinimalSimpleOdd G)
     refine le_antisymm ?_
       (le_inf h.E_le (E_le_normalizer_of_tau2 hG h hp hA hAE))
     rintro x ⟨hxM, hxN⟩
-    haveI : ((S10.Msigma M).subgroupOf M).Normal := by
+    have : ((S10.Msigma M).subgroupOf M).Normal := by
       rw [S10.Msigma_subgroupOf]; infer_instance
     have hMσM : S10.Msigma M ≤ M := S10.Msigma_le M
     have hsub : (⟨x, hxM⟩ : ↥M) ∈ (S10.Msigma M).subgroupOf M ⊔ E.subgroupOf M := by
@@ -306,7 +306,7 @@ theorem Msigma_inf_centralizer_eq_bot_of_le_centralizer [Finite G]
   have hordne : orderOf x ≠ 1 := fun h1 => hx1 (orderOf_eq_one_iff.mp h1)
   set r : ℕ := (orderOf x).minFac with hrdef
   have hr_prime : r.Prime := Nat.minFac_prime hordne
-  haveI : Fact r.Prime := ⟨hr_prime⟩
+  have : Fact r.Prime := ⟨hr_prime⟩
   have hr_dvd : r ∣ orderOf x := Nat.minFac_dvd _
   set y : G := x ^ (orderOf x / r) with hydef
   have hord_pos : 0 < orderOf x := by

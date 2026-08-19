@@ -162,15 +162,15 @@ private theorem
   let hJoinEA : IsElementaryAbelian 2 (frattini ↥(R ⊔ S)) :=
     IsElementaryAbelian.of_mulEquiv
       (pairwiseJoinFrattiniEquivAmbientFrattini hMap).symm hPhiEA
-  letI : IsMulCommutative (frattini P) :=
+  let : IsMulCommutative (frattini P) :=
     IsMulCommutative.of_comm hPhiEA.comm
-  letI : CommGroup (frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini P)) :=
+  let : CommGroup (frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini P)) :=
     hPhiEA.zmodModule
-  letI : IsMulCommutative (frattini ↥(R ⊔ S)) :=
+  let : IsMulCommutative (frattini ↥(R ⊔ S)) :=
     IsMulCommutative.of_comm hJoinEA.comm
-  letI : CommGroup (frattini ↥(R ⊔ S)) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini ↥(R ⊔ S))) :=
+  let : CommGroup (frattini ↥(R ⊔ S)) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini ↥(R ⊔ S))) :=
     hJoinEA.zmodModule
   intro n c ePhi nu hn hcgen hnuPrimitive hconj
   obtain ⟨factors, left, right, hleft, hright,
@@ -303,9 +303,9 @@ theorem false_of_alignedParameterBranches_exponent_two
       False := by
   classical
   dsimp only
-  letI : X.Normal := hXnormal
-  letI : Z.Normal := hZnormal
-  letI : T.Normal := hTnormal
+  let : X.Normal := hXnormal
+  let : Z.Normal := hZnormal
+  let : T.Normal := hTnormal
   let hPhiEA : IsElementaryAbelian 2 (frattini P) :=
     frattini_isElementaryAbelian_of_exponent_two htwo
   let hMapXZ : (frattini ↥(X ⊔ Z)).map (X ⊔ Z).subtype =
@@ -329,25 +329,25 @@ theorem false_of_alignedParameterBranches_exponent_two
   let hZTEA : IsElementaryAbelian 2 (frattini ↥(Z ⊔ T)) :=
     IsElementaryAbelian.of_mulEquiv
       (pairwiseJoinFrattiniEquivAmbientFrattini hMapZT).symm hPhiEA
-  letI : IsMulCommutative (frattini P) :=
+  let : IsMulCommutative (frattini P) :=
     IsMulCommutative.of_comm hPhiEA.comm
-  letI : CommGroup (frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini P)) :=
+  let : CommGroup (frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini P)) :=
     hPhiEA.zmodModule
-  letI : IsMulCommutative (frattini ↥(X ⊔ Z)) :=
+  let : IsMulCommutative (frattini ↥(X ⊔ Z)) :=
     IsMulCommutative.of_comm hXZEA.comm
-  letI : CommGroup (frattini ↥(X ⊔ Z)) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini ↥(X ⊔ Z))) :=
+  let : CommGroup (frattini ↥(X ⊔ Z)) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini ↥(X ⊔ Z))) :=
     hXZEA.zmodModule
-  letI : IsMulCommutative (frattini ↥(X ⊔ T)) :=
+  let : IsMulCommutative (frattini ↥(X ⊔ T)) :=
     IsMulCommutative.of_comm hXTEA.comm
-  letI : CommGroup (frattini ↥(X ⊔ T)) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini ↥(X ⊔ T))) :=
+  let : CommGroup (frattini ↥(X ⊔ T)) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini ↥(X ⊔ T))) :=
     hXTEA.zmodModule
-  letI : IsMulCommutative (frattini ↥(Z ⊔ T)) :=
+  let : IsMulCommutative (frattini ↥(Z ⊔ T)) :=
     IsMulCommutative.of_comm hZTEA.comm
-  letI : CommGroup (frattini ↥(Z ⊔ T)) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini ↥(Z ⊔ T))) :=
+  let : CommGroup (frattini ↥(Z ⊔ T)) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini ↥(Z ⊔ T))) :=
     hZTEA.zmodModule
   intro n hn c ePhi nu hcgen hnuPrimitive hconj xz xt zt haligned
   obtain ⟨hXT_Z, hZT_X⟩ :=
@@ -386,20 +386,20 @@ theorem false_of_alignedParameterBranches_exponent_two
   let hTXEA : IsElementaryAbelian 2 (frattini ↥(T ⊔ X)) :=
     IsElementaryAbelian.of_mulEquiv
       (pairwiseJoinFrattiniEquivAmbientFrattini hMapTX).symm hPhiEA
-  letI : IsMulCommutative (frattini ↥(T ⊔ Z)) :=
+  let : IsMulCommutative (frattini ↥(T ⊔ Z)) :=
     IsMulCommutative.of_comm hTZEA.comm
-  letI : CommGroup (frattini ↥(T ⊔ Z)) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini ↥(T ⊔ Z))) :=
+  let : CommGroup (frattini ↥(T ⊔ Z)) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini ↥(T ⊔ Z))) :=
     hTZEA.zmodModule
-  letI : IsMulCommutative (frattini ↥(Z ⊔ X)) :=
+  let : IsMulCommutative (frattini ↥(Z ⊔ X)) :=
     IsMulCommutative.of_comm hZXEA.comm
-  letI : CommGroup (frattini ↥(Z ⊔ X)) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini ↥(Z ⊔ X))) :=
+  let : CommGroup (frattini ↥(Z ⊔ X)) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini ↥(Z ⊔ X))) :=
     hZXEA.zmodModule
-  letI : IsMulCommutative (frattini ↥(T ⊔ X)) :=
+  let : IsMulCommutative (frattini ↥(T ⊔ X)) :=
     IsMulCommutative.of_comm hTXEA.comm
-  letI : CommGroup (frattini ↥(T ⊔ X)) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini ↥(T ⊔ X))) :=
+  let : CommGroup (frattini ↥(T ⊔ X)) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini ↥(T ⊔ X))) :=
     hTXEA.zmodModule
   obtain ⟨tz⟩ :=
     exists_normalizedActualFactorPairCoordinates_of_exponent_two

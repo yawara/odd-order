@@ -190,7 +190,7 @@ theorem isComplement'_Q_D :
 
 /-- `|Q| · |D| = |H|` (from `isComplement'_Q_D`). -/
 theorem card_Q_mul_card_D : Nat.card ↥hyp.Q * Nat.card ↥hyp.D = Nat.card ↥hyp.H := by
-  have h := hyp.isComplement'_Q_D.card_mul
+  have h := hyp.isComplement'_Q_D.card_mul_card
   rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Q_le_H).toEquiv,
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.D_le_H).toEquiv] at h
 
@@ -234,19 +234,19 @@ theorem forall_eq_one_of_leKer [Finite G] (R : Subgroup G) (hRQ : R ≤ hyp.Q)
   have hHT : R.subgroupOf hyp.H ≤ hyp.Q.subgroupOf hyp.H := fun x hx =>
     Subgroup.mem_subgroupOf.mpr (hRQ (Subgroup.mem_subgroupOf.mp hx))
   -- finiteness / invertibility bookkeeping
-  letI : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
-  letI : Fintype ↥(R.subgroupOf hyp.H) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥(R.subgroupOf hyp.H) : ℂ) :=
+  let : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
+  let : Fintype ↥(R.subgroupOf hyp.H) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥(R.subgroupOf hyp.H) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Fintype ↥((R.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) :=
+  let : Fintype ↥((R.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) :=
     Fintype.ofFinite _
-  letI : Invertible
+  let : Invertible
       ((Nat.card ↥((R.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : Finite (IrreducibleCharacter
+  have : Finite (IrreducibleCharacter
       ↥((R.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))) :=
     finite_irreducibleCharacter
-  letI : Fintype (IrreducibleCharacter
+  let : Fintype (IrreducibleCharacter
       ↥((R.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H))) := Fintype.ofFinite _
   by_contra hcon
   -- a nontrivial constituent `θ'' ∈ Irr(Q'-in-Q)` of `Res φ`
@@ -320,8 +320,8 @@ subgroup containing `[Q,Q]` is abelian, so `φ(1) = 1`
 theorem apply_one_eq_d_of_mem_SsetOf_Qder [Finite G] {χ : ClassFunction ↥hyp.H ℂ}
     (hχ : χ ∈ hyp.SsetOf hyp.Qder) : χ (1 : ↥hyp.H) = (hyp.d : ℂ) := by
   classical
-  letI : Fintype ↥hyp.H := Fintype.ofFinite _
-  letI : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
+  let : Fintype ↥hyp.H := Fintype.ofFinite _
+  let : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
   obtain ⟨hχS, hkerQ'⟩ := hχ
   have hχS' := hχS
   rw [Sset_eq_induced_of_Q hyp] at hχS'
@@ -341,12 +341,12 @@ theorem apply_one_eq_d_of_mem_SsetOf_Qder [Finite G] {χ : ClassFunction ↥hyp.
     rw [hcoe]
     exact Subgroup.commutator_mem_commutator
       (Subgroup.mem_subgroupOf.mp a.2) (Subgroup.mem_subgroupOf.mp b.2)
-  haveI hNnorm : ((hyp.Qder.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal := by
+  have hNnorm : ((hyp.Qder.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal := by
     constructor
     intro n hn g
     rw [show g * n * g⁻¹ = n * ⁅n⁻¹, g⁆ by rw [commutatorElement_def]; group]
     exact Subgroup.mul_mem _ hn (hcommN n⁻¹ g)
-  haveI : IsMulCommutative (↥(hyp.Q.subgroupOf hyp.H) ⧸
+  have : IsMulCommutative (↥(hyp.Q.subgroupOf hyp.H) ⧸
       (hyp.Qder.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)) := by
     constructor
     constructor
@@ -375,9 +375,9 @@ omit [Fintype G] [Fintype ↥hyp.H] in
 type `Irr(Q)` under `φ ↦ Ind_Q^H φ`. -/
 theorem Sset_finite [Finite G] : hyp.Sset.Finite := by
   classical
-  letI : Fintype ↥hyp.H := Fintype.ofFinite _
-  letI : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
-  haveI : Finite (IrreducibleCharacter ↥(hyp.Q.subgroupOf hyp.H)) :=
+  let : Fintype ↥hyp.H := Fintype.ofFinite _
+  let : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
+  have : Finite (IrreducibleCharacter ↥(hyp.Q.subgroupOf hyp.H)) :=
     finite_irreducibleCharacter
   rw [Sset_eq_induced_of_Q hyp]
   apply Set.Finite.image
@@ -437,7 +437,7 @@ theorem diff_support_subset_A_of_mem_SsetOf_Qder [Finite G]
     {a b : ClassFunction ↥hyp.H ℂ} (ha : a ∈ hyp.SsetOf hyp.Qder)
     (hb : b ∈ hyp.SsetOf hyp.Qder) :
     ((a - b : ClassFunction ↥hyp.H ℂ)).support ⊆ hyp.A := by
-  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  let : Fintype ↥hyp.H := Fintype.ofFinite _
   intro x hx
   rw [ClassFunction.mem_support] at hx
   by_contra hxA
@@ -704,8 +704,8 @@ At the Theorem's call site `Q₁` is a nontrivial `p`-group, whence
 theorem ssetOf_Qder_nonempty [Finite G] (hlt : hyp.S ⊔ hyp.Qder < hyp.Q) :
     (hyp.SsetOf hyp.Qder).Nonempty := by
   classical
-  letI : Fintype ↥hyp.H := Fintype.ofFinite _
-  letI : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
+  let : Fintype ↥hyp.H := Fintype.ofFinite _
+  let : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
   -- the normal subgroup `N = (S ⊔ Q')` viewed inside `K = ↥(Q.subgroupOf H)`
   set N : Subgroup ↥(hyp.Q.subgroupOf hyp.H) :=
     ((hyp.S ⊔ hyp.Qder).subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H) with hN
@@ -713,7 +713,7 @@ theorem ssetOf_Qder_nonempty [Finite G] (hlt : hyp.S ⊔ hyp.Qder < hyp.Q) :
       x ∈ N ↔ (((x : ↥hyp.H)) : G) ∈ hyp.S ⊔ hyp.Qder := by
     intro x
     rw [hN, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf]
-  haveI hNnorm : N.Normal := by
+  have hNnorm : N.Normal := by
     constructor
     intro n hn g
     rw [hmemN] at hn ⊢
@@ -724,21 +724,21 @@ theorem ssetOf_Qder_nonempty [Finite G] (hlt : hyp.S ⊔ hyp.Qder < hyp.Q) :
   obtain ⟨q0, hq0Q, hq0N⟩ := SetLike.exists_of_lt hlt
   set k0 : ↥(hyp.Q.subgroupOf hyp.H) :=
     ⟨⟨q0, hyp.Q_le_H hq0Q⟩, Subgroup.mem_subgroupOf.mpr hq0Q⟩ with hk0
-  haveI : Nontrivial (↥(hyp.Q.subgroupOf hyp.H) ⧸ N) := by
+  have : Nontrivial (↥(hyp.Q.subgroupOf hyp.H) ⧸ N) := by
     refine ⟨QuotientGroup.mk k0, 1, fun h => hq0N ?_⟩
     rw [QuotientGroup.eq_one_iff, hmemN] at h
     exact h
   -- a nontrivial irreducible character of the quotient, inflated to `K`
-  haveI : Finite (↥(hyp.Q.subgroupOf hyp.H) ⧸ N) := Quotient.finite _
-  letI : Fintype (↥(hyp.Q.subgroupOf hyp.H) ⧸ N) := Fintype.ofFinite _
-  letI : Invertible ((Nat.card (↥(hyp.Q.subgroupOf hyp.H) ⧸ N)) : ℂ) :=
+  have : Finite (↥(hyp.Q.subgroupOf hyp.H) ⧸ N) := Quotient.finite _
+  let : Fintype (↥(hyp.Q.subgroupOf hyp.H) ⧸ N) := Fintype.ofFinite _
+  let : Invertible ((Nat.card (↥(hyp.Q.subgroupOf hyp.H) ⧸ N)) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : Nontrivial (ConjClasses (↥(hyp.Q.subgroupOf hyp.H) ⧸ N)) := by
+  have : Nontrivial (ConjClasses (↥(hyp.Q.subgroupOf hyp.H) ⧸ N)) := by
     obtain ⟨b, hb⟩ := exists_ne (1 : ↥(hyp.Q.subgroupOf hyp.H) ⧸ N)
     exact ⟨ConjClasses.mk b, ConjClasses.mk 1,
       fun h => hb (isConj_one_right.mp (ConjClasses.mk_eq_mk_iff_isConj.mp h).symm)⟩
-  haveI := finite_irreducibleCharacter (G := ↥(hyp.Q.subgroupOf hyp.H) ⧸ N)
-  haveI : Nontrivial (IrreducibleCharacter (↥(hyp.Q.subgroupOf hyp.H) ⧸ N)) :=
+  have := finite_irreducibleCharacter (G := ↥(hyp.Q.subgroupOf hyp.H) ⧸ N)
+  have : Nontrivial (IrreducibleCharacter (↥(hyp.Q.subgroupOf hyp.H) ⧸ N)) :=
     Finite.one_lt_card_iff_nontrivial.mp
       (by rw [card_irreducibleCharacter_eq]
           exact Finite.one_lt_card_iff_nontrivial.mpr inferInstance)
@@ -859,8 +859,8 @@ theorem exists_deg_sq_le_of_mem_SsetOf [Finite G]
     ∃ a : ℕ, ψ (1 : ↥hyp.H) = (hyp.d : ℂ) * (a : ℂ) ∧
       a ^ 2 ≤ (((D₀.subgroupOf hyp.H)).subgroupOf (hyp.Q.subgroupOf hyp.H)).index := by
   classical
-  letI : Fintype ↥hyp.H := Fintype.ofFinite _
-  letI : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
+  let : Fintype ↥hyp.H := Fintype.ofFinite _
+  let : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
   obtain ⟨hψS, hkerR⟩ := hψ
   have hψS' := hψS
   rw [Sset_eq_induced_of_Q hyp] at hψS'

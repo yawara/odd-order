@@ -28,7 +28,7 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.Conjugacy
 
 namespace OddOrder.Isaacs.Ch03
 
-open Subgroup Pointwise
+open _root_.OddOrder.Isaacs.Ch03.Subgroup Pointwise
 
 section /- 3C.7(c): 冪零商 -/
 
@@ -40,7 +40,7 @@ variable {G : Type*} [Group G]
 Carter 部分群 (`IsCarterSubgroup.subgroupOf`)。3C.7(b) を `↥K` に適用して
 `y ∈ K` で `C^y = C^g` を得ると `C^(g⁻¹y) = C`, つまり `g⁻¹y ∈ N_G(C) = C ≤ K`,
 `y ∈ K` と合わせて `g ∈ K`。 -/
-theorem normalizer_eq_self_of_isCarterSubgroup_le [Finite G] [IsSolvable G]
+theorem normalizer_eq_self_of_isCarterSubgroup_le [Finite G] [Group.IsSolvable G]
     {C K : Subgroup G} (hC : IsCarterSubgroup C) (hCK : C ≤ K) :
     Subgroup.normalizer (K : Set G) = K := by
   refine le_antisymm (fun g hg => ?_) Subgroup.le_normalizer
@@ -64,10 +64,10 @@ theorem normalizer_eq_self_of_isCarterSubgroup_le [Finite G] [IsSolvable G]
 `K := NC` は `C` を含むので自己正規化 (`normalizer_eq_self_of_isCarterSubgroup_le`)。
 `N ≤ K` なので対応定理 (`normalizer_eq_iff_map_mk'`) で `K/N` も `G/N` で自己正規化,
 `G/N` は冪零なので `K/N = ⊤`, `N ≤ K` から `K = ⊤`。 -/
-theorem sup_eq_top_of_isNilpotent_quotient [Finite G] [IsSolvable G] {C N : Subgroup G}
+theorem sup_eq_top_of_isNilpotent_quotient [Finite G] [Group.IsSolvable G] {C N : Subgroup G}
     [N.Normal] (hC : IsCarterSubgroup C) (hnil : Group.IsNilpotent (G ⧸ N)) :
     N ⊔ C = ⊤ := by
-  haveI := hnil
+  have := hnil
   have hNK : N ≤ N ⊔ C := le_sup_left
   have hbar : Subgroup.normalizer
       (((N ⊔ C).map (QuotientGroup.mk' N) : Subgroup (G ⧸ N)) : Set (G ⧸ N))

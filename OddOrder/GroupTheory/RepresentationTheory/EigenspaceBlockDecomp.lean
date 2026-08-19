@@ -90,9 +90,9 @@ theorem isInternal_cyclicHomBlockFin {epsilon : F} {g : Module.End F V} {h : ℕ
     rw [finrank_directSum]
     simp_rw [finrank_cyclicHomBlockFin hV]
     rw [Fintype.sum_prod_type, ← Finset.sum_mul_sum, hsumV, Module.finrank_linearMap]
-  haveI : ∀ p : Fin h × Fin h, FiniteDimensional F (cyclicHomBlockFin epsilon g p.1 p.2) :=
+  have : ∀ p : Fin h × Fin h, FiniteDimensional F (cyclicHomBlockFin epsilon g p.1 p.2) :=
     fun _ => inferInstance
-  haveI : FiniteDimensional F (DirectSum (Fin h × Fin h)
+  have : FiniteDimensional F (DirectSum (Fin h × Fin h)
       (fun p => cyclicHomBlockFin epsilon g p.1 p.2)) :=
     Module.Finite.equiv (DirectSum.linearEquivFunOnFintype F (Fin h × Fin h)
       (fun p => cyclicHomBlockFin epsilon g p.1 p.2)).symm

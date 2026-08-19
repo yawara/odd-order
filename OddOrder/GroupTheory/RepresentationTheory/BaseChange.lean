@@ -335,7 +335,7 @@ theorem invariants_baseChangeRepresentation_eq_bot
     (ρ : Representation F G V) (h : Representation.invariants ρ = ⊥) :
     Representation.invariants (baseChangeRepresentation K ρ) = ⊥ := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   set ρ' := baseChangeRepresentation K ρ with hρ'
   -- `ρ`'s obstruction map is injective (its kernel is the invariants, which vanish).
   have hinj : Function.Injective (invariantsObstruction ρ) := by
@@ -386,7 +386,7 @@ theorem finrank_invariants_baseChangeRepresentation
     Module.finrank K (Representation.invariants (baseChangeRepresentation K ρ))
       = Module.finrank F (Representation.invariants ρ) := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   set f := invariantsObstruction ρ with hf
   set e := TensorProduct.piRight F K K (fun _ : G => V) with he
   -- the `K`-linear obstruction map of `baseChange ρ` factors as `e ∘ (K ⊗ f)`.
@@ -482,10 +482,10 @@ theorem exists_equiv_of_injective_intertwiner_to_baseChange
     (hf : Function.Injective f)
     (hinter : ∀ c v, f (rhoV c v) = (rhoW c).baseChange K (f v)) :
     ∃ e : V ≃ₗ[F] W, ∀ c v, e (rhoV c v) = rhoW c (e v) := by
-  letI : Representation.IsIrreducible rhoV := hirrV
-  letI : Representation.IsIrreducible rhoW := hirrW
-  haveI : Nontrivial V := by
-    haveI : Nontrivial (Subrepresentation rhoV) := IsSimpleOrder.toNontrivial
+  let : Representation.IsIrreducible rhoV := hirrV
+  let : Representation.IsIrreducible rhoW := hirrW
+  have : Nontrivial V := by
+    have : Nontrivial (Subrepresentation rhoV) := IsSimpleOrder.toNontrivial
     have hsub : Nontrivial (Submodule F V) :=
       (Subrepresentation.toSubmodule_injective (ρ := rhoV)).nontrivial
     exact (Submodule.nontrivial_iff F).mp hsub

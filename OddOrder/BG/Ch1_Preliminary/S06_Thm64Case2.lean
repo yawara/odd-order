@@ -115,7 +115,7 @@ theorem eq_bot_of_commutator_eq_self {Q : Type*} [Group Q] [hQ : Group.IsNilpote
 
 ⚠ `OddOrder.BG.Ch3.S13.commutator_commutator_right_eq_of_le_normalizer` と同内容。
 Ch.3 は本ファイルの下流ゆえ import できず再導出している (共通化先は `GroupTheory/`)。 -/
-theorem commutator_commutator_right_eq_of_le_normalizer [Finite G] [IsSolvable G]
+theorem commutator_commutator_right_eq_of_le_normalizer [Finite G] [Group.IsSolvable G]
     {D Q : Subgroup G} (hQD : Q ≤ Subgroup.normalizer (D : Set G))
     (hcop : Nat.Coprime (Nat.card ↥D) (Nat.card ↥Q)) :
     ⁅⁅D, Q⁆, Q⁆ = ⁅D, Q⁆ := by
@@ -123,7 +123,7 @@ theorem commutator_commutator_right_eq_of_le_normalizer [Finite G] [IsSolvable G
   have hQ_le : Q ≤ D ⊔ Q := le_sup_right
   have hDQnorm : (D ⊔ Q : Subgroup G) ≤ Subgroup.normalizer (D : Set G) :=
     sup_le Subgroup.le_normalizer hQD
-  haveI : (D.subgroupOf (D ⊔ Q)).Normal := Subgroup.normal_subgroupOf_of_le_normalizer hDQnorm
+  have : (D.subgroupOf (D ⊔ Q)).Normal := Subgroup.normal_subgroupOf_of_le_normalizer hDQnorm
   have hcop' : Nat.Coprime (Nat.card ↥(D.subgroupOf (D ⊔ Q)))
       (Nat.card ↥(Q.subgroupOf (D ⊔ Q))) := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hD_le).toEquiv,
@@ -261,14 +261,14 @@ theorem inf_ne_bot_of_prime_dvd_card [Finite G] {M H : Subgroup G} [M.Normal]
 
 ⚠ 原文は 4 を `O_π(F) ⊆ O_π(G) = 1` と書くが, 使っているのは「`F(G)` が `π'`-群」
 だけなので, ここでは `O_π` を経由せず直接示す (弱化ではなく短絡)。 -/
-theorem inf_le_centralizer_of_isPiSubgroup {X : Type*} [Group X] [Finite X] [IsSolvable X]
+theorem inf_le_centralizer_of_isPiSubgroup {X : Type*} [Group X] [Finite X] [Group.IsSolvable X]
     {π : Set ℕ} {M H J : Subgroup X} [M.Normal]
     (hMnil : Group.IsNilpotent (↥M ⧸ Ch01.fitting ↥M))
     (hFpi : Subgroup.IsPiSubgroup πᶜ (Ch01.fitting X))
     (hH : Subgroup.IsPiSubgroup πᶜ H) (hJ : Subgroup.IsPiSubgroup π J)
     (hJnorm : H ≤ Subgroup.normalizer (J : Set X)) :
     (M ⊓ H : Subgroup X) ≤ Subgroup.centralizer (J : Set X) := by
-  haveI := hMnil
+  have := hMnil
   have hBM : (M ⊓ H : Subgroup X) ≤ M := inf_le_left
   have hBH : (M ⊓ H : Subgroup X) ≤ H := inf_le_right
   have hBpi : Subgroup.IsPiSubgroup πᶜ (M ⊓ H : Subgroup X) := isPiSubgroup_of_le hBH hH
@@ -354,17 +354,17 @@ theorem thm64_case_fitting_primes_subset {X : Type u} [Group X] [Finite X] (π :
     rw [hbotall ((MulAut.conj (1 : X) • J₁) ⊔ J₂)]
     exact Subgroup.IsPiSubgroup.bot
   -- ## 2. `G` は可解
-  haveI hXsolv : IsSolvable X :=
+  have hXsolv : Group.IsSolvable X :=
     isSolvable_of_isNilpotent_quotient_fitting_of_normal G₀ hG₀nil hQnil
   -- 場合 2 の仮定: `F(G)` は `π'`-部分群
   have hFpi : Subgroup.IsPiSubgroup πᶜ (Ch01.fitting X) := fun q hq => hH q (hsub hq)
   -- ## 3. (6.1)
   obtain ⟨M, hMnormal, hMne, hMhall, hMnil⟩ :=
     exists_normalHall_isNilpotent_quotient_fitting G₀ hG₀hall hG₀nil hQnil
-  haveI : M.Normal := hMnormal
-  haveI hMnt : Nontrivial ↥M := (M.bot_or_nontrivial).resolve_left hMne
+  have : M.Normal := hMnormal
+  have hMnt : Nontrivial ↥M := (M.bot_or_nontrivial).resolve_left hMne
   -- ## 4. `B = M ⊓ H ≠ ⊥`
-  have hFMne : Ch01.fitting ↥M ≠ ⊥ := Ch01.fitting_ne_bot_of_solvable_nontrivial ↥M
+  have hFMne : Ch01.fitting ↥M ≠ ⊥ := Ch01.fitting_ne_bot_of_isSolvable_nontrivial ↥M
   obtain ⟨q, hqprime, hqdvd⟩ :=
     Nat.exists_prime_and_dvd (n := Nat.card ↥(Ch01.fitting ↥M))
       (fun hc => hFMne (Subgroup.eq_bot_of_card_eq _ hc))
@@ -381,7 +381,7 @@ theorem thm64_case_fitting_primes_subset {X : Type u} [Group X] [Finite X] (π :
   have hBne : (M ⊓ H : Subgroup X) ≠ ⊥ :=
     inf_ne_bot_of_prime_dvd_card hMhall hqprime hqM hqH
   -- ## 5. Schur–Zassenhaus: `H*`
-  haveI hBhnormal : (M.subgroupOf H).Normal :=
+  have hBhnormal : (M.subgroupOf H).Normal :=
     (OddOrder.GroupTheory.normal_coprime_card_index_subgroupOf hMhall H).1
   have hBhhall : Nat.Coprime (Nat.card ↥(M.subgroupOf H)) (M.subgroupOf H).index :=
     (OddOrder.GroupTheory.normal_coprime_card_index_subgroupOf hMhall H).2
@@ -401,7 +401,7 @@ theorem thm64_case_fitting_primes_subset {X : Type u} [Group X] [Finite X] (π :
   have hHstarlt : Nat.card ↥(Kc.map H.subtype) < Nat.card ↥H := by
     have hcardHstar : Nat.card ↥(Kc.map H.subtype) = Nat.card ↥Kc :=
       Subgroup.card_map_of_injective H.subtype_injective
-    have hcardmul : Nat.card ↥(M.subgroupOf H) * Nat.card ↥Kc = Nat.card ↥H := hKc.card_mul
+    have hcardmul : Nat.card ↥(M.subgroupOf H) * Nat.card ↥Kc = Nat.card ↥H := hKc.card_mul_card
     have hBpos : 0 < Nat.card ↥(M.subgroupOf H) := Nat.card_pos
     have hKpos : 0 < Nat.card ↥Kc := Nat.card_pos
     have h2 : 2 ≤ Nat.card ↥(M.subgroupOf H) := by omega

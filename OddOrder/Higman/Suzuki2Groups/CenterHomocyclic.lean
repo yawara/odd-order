@@ -56,7 +56,7 @@ theorem exists_center_homocyclic_and_invariant_eq_agemo
             ∃ s ≤ e, U = Agemo ↥(Subgroup.center P) 2 s := by
   rcases hP with ⟨hP2, _, _, K, hKcyc, hreg⟩
   refine ⟨K, hKcyc, hreg, ?_⟩
-  letI : CommGroup ↥(Subgroup.center P) :=
+  let : CommGroup ↥(Subgroup.center P) :=
     { (inferInstance : Group ↥(Subgroup.center P)) with
       mul_comm := fun x y =>
         Subtype.ext ((Subgroup.mem_center_iff.mp x.2 y).symm) }
@@ -88,7 +88,7 @@ theorem involutionSubgroup_subgroupOf_center_eq_lastAgemoLayer
       (ι → Multiplicative (ZMod (2 ^ e)))) (he : 0 < e) :
     (involutionSubgroup P).subgroupOf (Subgroup.center P) =
       Agemo ↥(Subgroup.center P) 2 (e - 1) := by
-  letI : CommGroup ↥(Subgroup.center P) :=
+  let : CommGroup ↥(Subgroup.center P) :=
     { (inferInstance : Group ↥(Subgroup.center P)) with
       mul_comm :=
         (inferInstance : IsMulCommutative ↥(Subgroup.center P)).is_comm.comm }

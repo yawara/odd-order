@@ -56,7 +56,7 @@ a solvable group admitting a Frobenius action by a group of prime order is nilpo
 Realized inside the semidirect product `N ⋊ A` via BG Thm 3.7
 (`isNilpotent_of_normalizing_primeOrder_fixedPointFree`). -/
 theorem isNilpotent_of_isFrobeniusAction_of_isSolvable
-    {A N : Type*} [Group A] [Finite A] [Group N] [Finite N] [Nontrivial N] [IsSolvable N]
+    {A N : Type*} [Group A] [Finite A] [Group N] [Finite N] [Nontrivial N] [Group.IsSolvable N]
     [MulDistribMulAction A N] (hFrob : IsFrobeniusAction A N)
     (hA : ∃ p : ℕ, p.Prime ∧ Nat.card A = p) :
     Group.IsNilpotent N := by
@@ -64,23 +64,23 @@ theorem isNilpotent_of_isFrobeniusAction_of_isSolvable
   obtain ⟨p, hp, hcardA⟩ := hA
   set φ : A →* MulAut N := MulDistribMulAction.toMulAut A N with hφ
   -- ambient semidirect product
-  haveI hAsolv : IsSolvable A := by
-    haveI : Fact p.Prime := ⟨hp⟩
-    haveI hAcyc : IsCyclic A := isCyclic_of_prime_card hcardA
-    exact isSolvable_of_comm fun a b => by
-      letI := hAcyc.commGroup
+  have hAsolv : Group.IsSolvable A := by
+    have : Fact p.Prime := ⟨hp⟩
+    have hAcyc : IsCyclic A := isCyclic_of_prime_card hcardA
+    exact Group.isSolvable_of_comm fun a b => by
+      let := hAcyc.commGroup
       exact mul_comm a b
-  haveI hΓsolv : IsSolvable (N ⋊[φ] A) :=
-    solvable_of_ker_le_range SemidirectProduct.inl SemidirectProduct.rightHom
+  have hΓsolv : Group.IsSolvable (N ⋊[φ] A) :=
+    Group.isSolvable_of_ker_le_range SemidirectProduct.inl SemidirectProduct.rightHom
       (le_of_eq SemidirectProduct.range_inl_eq_ker_rightHom.symm)
   set NΓ : Subgroup (N ⋊[φ] A) := (SemidirectProduct.inl : N →* N ⋊[φ] A).range with hNΓ
   set RΓ : Subgroup (N ⋊[φ] A) := (SemidirectProduct.inr : A →* N ⋊[φ] A).range with hRΓ
-  haveI : IsSolvable ↥(NΓ ⊔ RΓ) := by
+  have : Group.IsSolvable ↥(NΓ ⊔ RΓ) := by
     have htop : NΓ ⊔ RΓ = ⊤ := SemidirectProduct.inl_range_sup_inr_range_eq_top
     rw [htop]
-    exact solvable_of_solvable_injective
+    exact Group.isSolvable_of_isSolvable_injective
       (f := (Subgroup.topEquiv (G := N ⋊[φ] A)).toMonoidHom) Subgroup.topEquiv.injective
-  haveI hNΓnorm : NΓ.Normal := by
+  have hNΓnorm : NΓ.Normal := by
     rw [hNΓ, SemidirectProduct.range_inl_eq_ker_rightHom]; infer_instance
   have hnilpNΓ : Group.IsNilpotent ↥NΓ := by
     refine OddOrder.BG.Ch1.S03c.isNilpotent_of_normalizing_primeOrder_fixedPointFree
@@ -102,7 +102,7 @@ theorem isNilpotent_of_isFrobeniusAction_of_isSolvable
         rw [map_one]
         exact hbot _ ⟨n₀, rfl⟩))
     · -- `RΓ ≠ ⊥`
-      haveI : Nontrivial A := by
+      have : Nontrivial A := by
         have : 1 < Nat.card A := by rw [hcardA]; exact hp.one_lt
         exact Finite.one_lt_card_iff_nontrivial.mp this
       obtain ⟨a₀, ha₀⟩ := exists_ne (1 : A)
@@ -128,7 +128,7 @@ theorem isNilpotent_of_isFrobeniusAction_of_isSolvable
       have : (φ b) m = m := SemidirectProduct.inl_injective hconj
       exact hFrob b hb1 m hm1 this
   -- transport nilpotency back to `N`
-  haveI : Group.IsNilpotent ↥NΓ := hnilpNΓ
+  have : Group.IsNilpotent ↥NΓ := hnilpNΓ
   exact Group.nilpotent_of_mulEquiv
     (MonoidHom.ofInjective (SemidirectProduct.inl_injective (φ := φ))).symm
 
@@ -186,10 +186,10 @@ private theorem isNilpotent_of_isFrobeniusAction_of_prime_card_aux
     by_cases hM : ∃ M : Subgroup N, M.Normal ∧ IsAInvariant φ M ∧ M ≠ ⊥ ∧ M ≠ ⊤
     · -- Case 1: a proper nontrivial `A`-invariant normal subgroup exists.
       obtain ⟨M, hMn, hMinv, hMbot, hMtop⟩ := hM
-      haveI := hMn
+      have := hMn
       have hMsmul : ∀ a : A, ∀ m ∈ M, a • m ∈ M := fun a m hm => hMinv.smul_mem a hm
       -- `M` is nilpotent by induction
-      letI : MulDistribMulAction A ↥M :=
+      let : MulDistribMulAction A ↥M :=
         IsFrobeniusAction.invariantSubgroupMulDistribMulAction M hMsmul
       have hFM := hFrob.subgroup M hMsmul
       have hltM : Nat.card ↥M ≤ k := by
@@ -200,7 +200,7 @@ private theorem isNilpotent_of_isFrobeniusAction_of_prime_card_aux
         omega
       have hnilpM : Group.IsNilpotent ↥M := IH ↥M hltM hFM
       -- `N/M` is nilpotent by induction (Cor 6.2)
-      letI : MulDistribMulAction A (N ⧸ M) :=
+      let : MulDistribMulAction A (N ⧸ M) :=
         IsFrobeniusAction.invariantQuotientMulDistribMulAction M hMsmul
       have hFQ := hFrob.quotient M hMsmul
       have hltQ : Nat.card (N ⧸ M) ≤ k := by
@@ -213,16 +213,16 @@ private theorem isNilpotent_of_isFrobeniusAction_of_prime_card_aux
         omega
       have hnilpQ : Group.IsNilpotent (N ⧸ M) := IH (N ⧸ M) hltQ hFQ
       -- hence `N` is solvable, and the solvable case applies
-      haveI := hnilpM
-      haveI := hnilpQ
-      haveI : IsSolvable N :=
-        solvable_of_ker_le_range M.subtype (QuotientGroup.mk' M)
+      have := hnilpM
+      have := hnilpQ
+      have : Group.IsSolvable N :=
+        Group.isSolvable_of_ker_le_range M.subtype (QuotientGroup.mk' M)
           (le_of_eq (by rw [QuotientGroup.ker_mk', Subgroup.range_subtype]))
       exact isNilpotent_of_isFrobeniusAction_of_isSolvable hFrob ⟨p, hp, hcardA⟩
     · -- Case 2: no proper nontrivial `A`-invariant normal subgroup.
       by_cases hpg : ∃ r : ℕ, r.Prime ∧ IsPGroup r N
       · obtain ⟨r, hr, hrN⟩ := hpg
-        haveI : Fact r.Prime := ⟨hr⟩
+        have : Fact r.Prime := ⟨hr⟩
         exact hrN.isNilpotent
       exfalso
       -- choose an odd prime `r ∣ |N|`
@@ -232,19 +232,19 @@ private theorem isNilpotent_of_isFrobeniusAction_of_prime_card_aux
         exact hpg ⟨2, Nat.prime_two, IsPGroup.of_card
           (Nat.eq_prime_pow_of_unique_prime_dvd Nat.card_pos.ne'
             fun {d} hd hdd => hcon d hd hdd)⟩
-      haveI : Fact r.Prime := ⟨hr⟩
+      have : Fact r.Prime := ⟨hr⟩
       -- coprime action, `A`-invariant Sylow `r`-subgroup
       have hCop : Nat.Coprime (Nat.card A) (Nat.card N) := by
-        haveI : Fintype A := Fintype.ofFinite A
-        haveI : Fintype N := Fintype.ofFinite N
+        have : Fintype A := Fintype.ofFinite A
+        have : Fintype N := Fintype.ofFinite N
         have := hFrob.coprime_card
         rw [← Nat.card_eq_fintype_card, ← Nat.card_eq_fintype_card] at this
         exact this.symm
-      haveI hAsolv : IsSolvable A := by
-        haveI : Fact p.Prime := ⟨hp⟩
-        haveI hAcyc : IsCyclic A := isCyclic_of_prime_card hcardA
-        exact isSolvable_of_comm fun a b => by
-          letI := hAcyc.commGroup
+      have hAsolv : Group.IsSolvable A := by
+        have : Fact p.Prime := ⟨hp⟩
+        have hAcyc : IsCyclic A := isCyclic_of_prime_card hcardA
+        exact Group.isSolvable_of_comm fun a b => by
+          let := hAcyc.commGroup
           exact mul_comm a b
       obtain ⟨R, hRinv⟩ :=
         OddOrder.Isaacs.Ch04.exists_aInvariant_sylow (φ := φ) hCop (Or.inl hAsolv) r
@@ -261,7 +261,7 @@ private theorem isNilpotent_of_isFrobeniusAction_of_prime_card_aux
         have hpgR := R.isPGroup'
         rw [htop] at hpgR
         exact hpgR.of_equiv Subgroup.topEquiv
-      haveI : Nontrivial ↥(R : Subgroup N) :=
+      have : Nontrivial ↥(R : Subgroup N) :=
         (Subgroup.nontrivial_iff_ne_bot _).mpr hR_ne_bot
       -- the center image `Z(R)` and the Thompson subgroup `J(R)`
       set ZI : Subgroup N :=
@@ -281,7 +281,7 @@ private theorem isNilpotent_of_isFrobeniusAction_of_prime_card_aux
           ← Subgroup.thompsonJ_map_of_injective (f := (φ a).toMonoidHom) (φ a).injective,
           hRmap]
       have hZ_ne_bot : ZI ≠ ⊥ := by
-        haveI : Nontrivial (Subgroup.center ↥(R : Subgroup N)) :=
+        have : Nontrivial (Subgroup.center ↥(R : Subgroup N)) :=
           R.isPGroup'.center_nontrivial
         obtain ⟨z, hz⟩ := exists_ne (1 : Subgroup.center ↥(R : Subgroup N))
         intro hbot
@@ -303,7 +303,7 @@ private theorem isNilpotent_of_isFrobeniusAction_of_prime_card_aux
           OddOrder.Isaacs.Ch05.HasNormalPComplement r ↥L := by
         intro L hLinv hLtop
         have hLsmul : ∀ a : A, ∀ m ∈ L, a • m ∈ L := fun a m hm => hLinv.smul_mem a hm
-        letI : MulDistribMulAction A ↥L :=
+        let : MulDistribMulAction A ↥L :=
           IsFrobeniusAction.invariantSubgroupMulDistribMulAction L hLsmul
         have hFL := hFrob.subgroup L hLsmul
         have hltL : Nat.card ↥L ≤ k := by
@@ -312,7 +312,7 @@ private theorem isNilpotent_of_isFrobeniusAction_of_prime_card_aux
           have hne : Nat.card ↥L ≠ Nat.card N :=
             fun h => hLtop (Subgroup.eq_top_of_card_eq _ h)
           omega
-        haveI : Group.IsNilpotent ↥L := IH ↥L hltL hFL
+        have : Group.IsNilpotent ↥L := IH ↥L hltL hFL
         exact OddOrder.Isaacs.Ch05.hasNormalPComplement_of_isNilpotent
       -- the two local subgroups of Thm 7.1 are proper
       have hCZ_ne_top : Subgroup.centralizer (ZI : Set N) ≠ ⊤ := by
@@ -333,7 +333,7 @@ private theorem isNilpotent_of_isFrobeniusAction_of_prime_card_aux
         OddOrder.Isaacs.Ch07.thompson_normal_p_complement_of_local_hypotheses R hr2
           (hlocal _ hZinv.centralizer hCZ_ne_top)
           (hlocal _ hJinv.normalizer hNJ_ne_top)
-      haveI := hKn
+      have := hKn
       -- `K` is `A`-invariant, nontrivial, and proper: contradiction
       have hKinv : IsAInvariant φ K := by
         refine OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem.mpr fun a m hm => ?_
@@ -369,7 +369,7 @@ theorem isNilpotent_of_isFrobeniusAction
   classical
   have h1 : Nat.card A ≠ 1 := (Finite.one_lt_card_iff_nontrivial.mpr ‹_›).ne'
   have hp : (Nat.card A).minFac.Prime := Nat.minFac_prime h1
-  haveI : Fact (Nat.card A).minFac.Prime := ⟨hp⟩
+  have : Fact (Nat.card A).minFac.Prime := ⟨hp⟩
   obtain ⟨x, hx⟩ :=
     exists_prime_orderOf_dvd_card' (G := A) (Nat.card A).minFac (Nat.minFac_dvd _)
   have hcard : Nat.card ↥(Subgroup.zpowers x) = (Nat.card A).minFac := by
@@ -382,11 +382,11 @@ group is nilpotent (Thompson). -/
 theorem IsFrobeniusGroup.isNilpotent_kernel
     {G : Type*} [Group G] [Finite G] {N A : Subgroup G}
     (h : IsFrobeniusGroup G N A) : Group.IsNilpotent ↥N := by
-  letI : N.Normal := h.isNormal
-  letI : MulDistribMulAction ↥A ↥N :=
+  let : N.Normal := h.isNormal
+  let : MulDistribMulAction ↥A ↥N :=
     MulDistribMulAction.compHom ↥N ((MulAut.conjNormal (H := N)).comp A.subtype)
-  haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr h.ne_bot_kernel
-  haveI : Nontrivial ↥A := (Subgroup.nontrivial_iff_ne_bot A).mpr h.ne_bot_complement
+  have : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr h.ne_bot_kernel
+  have : Nontrivial ↥A := (Subgroup.nontrivial_iff_ne_bot A).mpr h.ne_bot_complement
   exact isNilpotent_of_isFrobeniusAction h.toFrobeniusAction
 
 end

@@ -174,7 +174,7 @@ theorem HasXiLengthTwo.eq_of_ne_bot_of_ne_top
     apply hBbot
     apply Subtype.ext
     exact hBval
-  letI : Nontrivial A.1 :=
+  let : Nontrivial A.1 :=
     (Subgroup.nontrivial_iff_ne_bot A.1).mpr hAval_ne
   have hA2 : IsPGroup 2 A.1 := hP.to_subgroup A.1
   have hcard_ne : Nat.card A.1 ≠ 1 :=
@@ -255,9 +255,9 @@ theorem commutator_eq_frattini_and_frattini_eq_center
       frattini P = Subgroup.center P := by
   have hcomm_ne : _root_.commutator P ≠ (⊥ : Subgroup P) :=
     fun h => hncomm ((commutator_eq_bot_iff P).mp h)
-  letI : Nontrivial (_root_.commutator P) :=
+  let : Nontrivial (_root_.commutator P) :=
     (Subgroup.nontrivial_iff_ne_bot (_root_.commutator P)).mpr hcomm_ne
-  letI : Nontrivial P :=
+  let : Nontrivial P :=
     (_root_.commutator P).subtype_injective.nontrivial
   have hPhi_ne_top : frattini P ≠ (⊤ : Subgroup P) :=
     frattini_ne_top_of_nontrivial
@@ -273,7 +273,7 @@ theorem commutator_eq_frattini_and_frattini_eq_center
     apply le_antisymm le_top
     rw [← hcomm]
     exact hcomm_le_Phi
-  letI : Nontrivial ↥(Subgroup.center P) := hP.center_nontrivial
+  let : Nontrivial ↥(Subgroup.center P) := hP.center_nontrivial
   have hcenter_ne : Subgroup.center P ≠ (⊥ : Subgroup P) :=
     (Subgroup.nontrivial_iff_ne_bot (Subgroup.center P)).mp inferInstance
   have hcenter_ne_top : Subgroup.center P ≠ (⊤ : Subgroup P) := by
@@ -366,18 +366,18 @@ theorem frattini_agemo_one_map_eq_bot
     hP hncomm hxi hlen
   have hcomm_ne : _root_.commutator P ≠ (⊥ : Subgroup P) :=
     fun h => hncomm ((commutator_eq_bot_iff P).mp h)
-  letI : Nontrivial (_root_.commutator P) :=
+  let : Nontrivial (_root_.commutator P) :=
     (Subgroup.nontrivial_iff_ne_bot (_root_.commutator P)).mpr hcomm_ne
-  letI : Nontrivial P :=
+  let : Nontrivial P :=
     (_root_.commutator P).subtype_injective.nontrivial
   have hPhi_ne : frattini P ≠ (⊥ : Subgroup P) := by
     rw [← heq.1]
     exact hcomm_ne
-  letI : Nontrivial ↥(frattini P) :=
+  let : Nontrivial ↥(frattini P) :=
     (Subgroup.nontrivial_iff_ne_bot (frattini P)).mpr hPhi_ne
   have hPhi_ne_top : frattini P ≠ (⊤ : Subgroup P) :=
     frattini_ne_top_of_nontrivial
-  letI : CommGroup ↥(frattini P) :=
+  let : CommGroup ↥(frattini P) :=
     { (inferInstance : Group ↥(frattini P)) with
       mul_comm := fun x y => by
         apply Subtype.ext

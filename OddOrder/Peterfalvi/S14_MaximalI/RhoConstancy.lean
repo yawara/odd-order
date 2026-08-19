@@ -31,7 +31,7 @@ theorem constituent_diff_tau_mem_span {L : Subgroup G} [Finite G] (hyp : Hypothe
     {φ₁ φ₂ : IrreducibleCharacter ↥L} (h₁ : φ₁ ∈ dχ.constituents) (h₂ : φ₂ ∈ dχ.constituents) :
     hyp.tau ((φ₁ : ClassFunction ↥L ℂ) - (φ₂ : ClassFunction ↥L ℂ)) ∈
       Submodule.span ℤ (Rset dχ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   obtain ⟨ε, μ, hε, hμinj, hμrel⟩ := exists_uniform_image_of_constituents hyp dχ
   set T := dχ.constituents ∪ dχ.constituents.image (IrreducibleCharacter.conjPerm ↥L) with hTdef
@@ -302,7 +302,7 @@ theorem chiRhoCF_inner_eq_of_equal_degree {L : Subgroup G} [Finite G] (hyp : Hyp
     (horth2 : ClassFunction.inner ψ (coh.extension χ₂) = 0) :
     ClassFunction.inner χ₁ (hyp.toHypothesis71.chiRhoCF ψ)
       = ClassFunction.inner χ₂ (hyp.toHypothesis71.chiRhoCF ψ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hsupp := Sset_diff_support_subset_ambientA hyp hχ₁ hχ₂ hdeg hAH
   set α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ (typeIA L hyp.typeI) L :=
     ⟨χ₁ - χ₂, (ClassFunction.mem_supportedSubmodule).mpr hsupp⟩ with hα
@@ -341,7 +341,7 @@ theorem chiRhoCF_restrict_inner_eq_of_equal_degree {L : Subgroup G} [Finite G] (
         (hyp.toHypothesis71.chiRhoCF ψ))
       = ClassFunction.inner θ₂ (ClassFunction.restrict ((hyp.typeI.typeF.H).subgroupOf L)
         (hyp.toHypothesis71.chiRhoCF ψ)) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hfact := chiRhoCF_inner_eq_of_equal_degree hyp coh hχ₁ hχ₂ hdeg hAH horth1 horth2
   rw [hθ₁, hθ₂, ClassFunction.inner_induce_eq_inner_restrict,
     ClassFunction.inner_induce_eq_inner_restrict] at hfact
@@ -366,7 +366,7 @@ theorem induce_apply_eq_self_of_mem_tiSubset {A : Set G} {L : Subgroup G}
     {a : G} (ha : a ∈ A) :
     ClassFunction.induce L α a = α ⟨a, hAL ha⟩ := by
   classical
-  haveI : Fintype ↥L := Fintype.ofFinite _
+  have : Fintype ↥L := Fintype.ofFinite _
   have haL : a ∈ L := hAL ha
   have hterm : ∀ x : G, ClassFunction.induceTerm L α x a
       = if x ∈ L then α ⟨a, haL⟩ else 0 := by
@@ -466,7 +466,7 @@ theorem typeI_tau_eq_induce_of_supported_trivial_H {L : Subgroup G} [Finite G] (
     {f : ClassFunction ↥L ℂ}
     (hf : f.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A₁ L) :
     hyp.tau f = ClassFunction.induce L f := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hfA : f.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L :=
     hf.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono hA₁A)
   have h1 : hyp.tau f = hyp.dadeData.dade.dadeMap (k := ℂ)
@@ -490,7 +490,7 @@ private theorem escaping_conj_mem_iff {M : Subgroup G} {X : Set G} {g x : G}
     conv_lhs => rw [← (conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hg) :
       MulAut.conj g • M = M)]
     exact Subgroup.pointwise_smul_le_pointwise_smul_iff
-  simp only [escapingCentralizerSet, Set.mem_setOf_eq, hmem, hcent]
+  simp only [escapingCentralizerSet, Set.mem_ofPred_eq, hmem, hcent]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Constituents of `χ = Ind_K^L θ` (`K = (L_F).subgroupOf L ⊴ L`) have equal restriction to `K`**
@@ -507,9 +507,9 @@ theorem restrict_eq_of_mem_constituents {L : Subgroup G} [Finite G] (hyp : Hypot
     {φ₁ φ₂ : IrreducibleCharacter ↥L} (h₁ : φ₁ ∈ dχ.constituents) (h₂ : φ₂ ∈ dχ.constituents) :
     ClassFunction.restrict ((hyp.typeI.typeF.H).subgroupOf L) (φ₁ : ClassFunction ↥L ℂ)
       = ClassFunction.restrict ((hyp.typeI.typeF.H).subgroupOf L) (φ₂ : ClassFunction ↥L ℂ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
-  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+  have hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
     rw [hyp.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
   set K := (hyp.typeI.typeF.H).subgroupOf L with hKdef
@@ -576,7 +576,7 @@ theorem constituent_diff_support_subset_nonescaping [Finite G] {L : Subgroup G}
     ((φ₁ : ClassFunction ↥L ℂ) - (φ₂ : ClassFunction ↥L ℂ)).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup
         (hyp.ambientA \ escapingCentralizerSet L hyp.ambientA) L := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hres := restrict_eq_of_mem_constituents hyp dχ h₁ h₂
   intro x hx
@@ -615,6 +615,7 @@ theorem constituent_diff_support_subset_nonescaping [Finite G] {L : Subgroup G}
   rw [ClassFunction.sub_apply, hev, sub_self]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (12.4), pin (b)** ([Is] 7.7 + (8.12.c) + [Is] 6.2): for constituents
 `φ₁, φ₂ ∈ S(χ)`,
 the Dade isometry acts as induction on the difference, `(φ₁ − φ₂)^τ = Ind_L^G(φ₁ − φ₂)`.
@@ -668,7 +669,7 @@ theorem Sset_coeff_equal {L : Subgroup G} [Finite G]
     {φ₁ φ₂ : IrreducibleCharacter ↥L} (h₁ : φ₁ ∈ dχ.constituents) (h₂ : φ₂ ∈ dχ.constituents) :
     ClassFunction.inner (ClassFunction.restrict L psi) (φ₁ : ClassFunction ↥L ℂ)
       = ClassFunction.inner (ClassFunction.restrict L psi) (φ₂ : ClassFunction ↥L ℂ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   set f : ClassFunction ↥L ℂ :=
     (φ₁ : ClassFunction ↥L ℂ) - (φ₂ : ClassFunction ↥L ℂ) with hf
   -- `⟨ψ, τ f⟩ = 0`: `τ f ∈ ℤ[R(χ)]` (pin a) and `ψ ⊥ R(χ)`.
@@ -704,7 +705,7 @@ constant `= φ(1)` on `H` (`= φ(1)·1_H`), so by Frobenius
 theorem constituents_not_inHKernel {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
     {chi : ClassFunction ↥L ℂ} (hχ : chi ∈ hyp.Sset) (dχ : CharacterDecompositionData hyp chi)
     {φ : IrreducibleCharacter ↥L} (hφ : φ ∈ dχ.constituents) : ¬ InHKernel hyp φ := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   obtain ⟨θ, hθ_ne, hchi_eq⟩ := hχ
   intro hker
@@ -747,7 +748,7 @@ theorem not_inHKernel_imp_mem_constituents {L : Subgroup G} [Finite G] (hyp : Hy
     (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ)
     {φ : IrreducibleCharacter ↥L} (hφ : ¬ InHKernel hyp φ) :
     ∃ (χ : ClassFunction ↥L ℂ) (hχ : χ ∈ hyp.Sset), φ ∈ (data χ hχ).constituents := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   obtain ⟨θ, hlo, hθker⟩ :=
     exists_constituent_not_subset_characterKernel
@@ -811,9 +812,9 @@ theorem constituents_eq_of_mem {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
     (dχ : CharacterDecompositionData hyp χ) (dχ' : CharacterDecompositionData hyp χ')
     {φ : IrreducibleCharacter ↥L} (hmem : φ ∈ dχ.constituents) (hmem' : φ ∈ dχ'.constituents) :
     χ = χ' := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
-  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+  have hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
     rw [hyp.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
   obtain ⟨θ, hθ_ne, rfl⟩ := hχ
@@ -862,14 +863,14 @@ theorem exists_offKernel_constituent_partition {L : Subgroup G} [Finite G] (hyp 
         parts.biUnion (fun χ => (data χ.1 χ.2).constituents) ∧
       (↑parts : Set {χ : ClassFunction ↥L ℂ // χ ∈ hyp.Sset}).PairwiseDisjoint
         (fun χ => (data χ.1 χ.2).constituents) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   by_cases hne : (Finset.univ.filter (fun φ => ¬ InHKernel hyp φ)).Nonempty
   · -- The off-kernel filter is nonempty, so `S` is nonempty; build the capturing map.
     obtain ⟨φ0, hφ0⟩ := hne
     rw [Finset.mem_filter] at hφ0
     obtain ⟨χ0, hχ0, -⟩ := not_inHKernel_imp_mem_constituents hyp data hφ0.2
-    haveI : Nonempty {χ : ClassFunction ↥L ℂ // χ ∈ hyp.Sset} := ⟨⟨χ0, hχ0⟩⟩
+    have : Nonempty {χ : ClassFunction ↥L ℂ // χ ∈ hyp.Sset} := ⟨⟨χ0, hχ0⟩⟩
     let cap : IrreducibleCharacter ↥L → {χ : ClassFunction ↥L ℂ // χ ∈ hyp.Sset} :=
       fun φ => if h : ¬ InHKernel hyp φ then
         ⟨(not_inHKernel_imp_mem_constituents hyp data h).choose,
@@ -950,7 +951,7 @@ theorem orthogonal_character_constant_on_coset {L : Subgroup G} [Finite G]
     (horth : ∀ χ (hχ : χ ∈ hyp.Sset), ∀ α ∈ Rset (data χ hχ), ClassFunction.inner psi α = 0)
     {x : G} (hxL : x ∈ L) (hxH : x ∉ hyp.H) :
     ∀ h : G, h ∈ hyp.H → psi (x * h) = psi x := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   intro h hh
   have hhL : h ∈ L := hyp.typeI.typeF.H_le hh
@@ -1042,15 +1043,15 @@ theorem chiRhoCF_restrict_constant_off_derived {L : Subgroup G} [Finite G]
         (hyp.toHypothesis71.chiRhoCF ψ) x
       = ClassFunction.restrict ((hyp.typeI.typeF.H).subgroupOf L)
         (hyp.toHypothesis71.chiRhoCF ψ) y := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   set Hc := ((hyp.typeI.typeF.H).subgroupOf L) with hHc
   set g : ClassFunction ↥Hc ℂ :=
     ClassFunction.restrict Hc (hyp.toHypothesis71.chiRhoCF ψ) with hg
-  haveI : Fintype ↥(commutator ↥Hc) := Fintype.ofFinite _
-  haveI : Invertible (Nat.card ↥(commutator ↥Hc) : ℂ) :=
+  have : Fintype ↥(commutator ↥Hc) := Fintype.ofFinite _
+  have : Invertible (Nat.card ↥(commutator ↥Hc) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : Fintype (IrreducibleCharacter ↥Hc) := Fintype.ofFinite _
+  have : Fintype (IrreducibleCharacter ↥Hc) := Fintype.ofFinite _
   refine OddOrder.RepresentationTheory.constant_off_normal_of_inner_block_const g
     (fun θ₁ θ₂ ρ hθ₁t hθ₂t hlo₁ hlo₂ => ?_) (fun θ₁ θ₂ ρ hlo₁ hlo₂ => ?_) hx hy
   · -- Block-constant coefficients on the non-trivial constituents.

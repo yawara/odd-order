@@ -43,7 +43,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Chapter 3
 ## 方針
 
 mathlib `SemidirectProduct` (Chris Hughes), `SchurZassenhaus`, `Complement`,
-`IsSolvable` を全面利用. Thm 3.1 (uniqueness), 3.2 (existence) は mathlib の
+`Group.IsSolvable` を全面利用. Thm 3.1 (uniqueness), 3.2 (existence) は mathlib の
 construction を Isaacs 流に再述するラッパー.
 
 Thm 3.3 Horosevskii は Ch.2 Thm 2.20 Lucchini に依存 (PDF p.71 で証明確認済).
@@ -78,13 +78,13 @@ CLAUDE.md mathlib ラッパー方針に従い, 純粋なリネームは書かな
 - Thm 3.8 (Schur-Zassenhaus 一般)
   - mathlib: `Subgroup.exists_right_complement'_of_coprime`
 - Thm 3.9 (G solvable ⇔ G^(m) = 1)
-  - mathlib: `isSolvable_def` (`@[mk_iff]` on `class IsSolvable`,
+  - mathlib: `Group.isSolvable_def` (`@[mk_iff]` on `class Group.IsSolvable`,
     `Mathlib/GroupTheory/Solvable.lean:106`)
 - Thm 3.10 (solvable 基本)
-  - mathlib: `IsSolvable` instance による subgroup/quotient/extension 各種
+  - mathlib: `Group.IsSolvable` instance による subgroup/quotient/extension 各種
 - Thm 3.11 (solvable min normal は elem abelian p-group)
-  - **本ファイル `solvable_minimal_normal_isElementaryAbelian` (:194)** で実装済.
-    可換性だけの前半は `solvable_minimal_normal_isAbelian` (:172, 有限性不要).
+  - **本ファイル `minimal_normal_isElementaryAbelian_of_isSolvable` (:194)** で実装済.
+    可換性だけの前半は `minimal_normal_isAbelian_of_isSolvable` (:172, 有限性不要).
 - Thm 3.12 (complement conjugacy in solvable)
   - **`OddOrder/Mathlib/SchurZassenhausConj.lean:1292`
     `Subgroup.IsComplement'.exists_conj_of_coprime`** — 書籍どおり
@@ -105,9 +105,9 @@ theorem normal_le_of_complement_prime_of_inf_eq_bot
     (hcompl : Subgroup.IsComplement' K R) (hp : (Nat.card R).Prime)
     (hcop : Nat.Coprime (Nat.card K) (Nat.card R)) (hNR : N ⊓ R = ⊥) :
     N ≤ K := by
-  haveI : Fact (Nat.card R).Prime := ⟨hp⟩
+  have : Fact (Nat.card R).Prime := ⟨hp⟩
   have hpK : ¬ (Nat.card R) ∣ Nat.card K := (hp.coprime_iff_not_dvd).mp hcop.symm
-  have hcard_mul : Nat.card K * Nat.card R = Nat.card G := hcompl.card_mul
+  have hcard_mul : Nat.card K * Nat.card R = Nat.card G := hcompl.card_mul_card
   have hquot : Nat.card (G ⧸ K) = Nat.card R := by
     have h1 : Nat.card G = Nat.card (G ⧸ K) * Nat.card K :=
       Subgroup.card_eq_card_quotient_mul_card_subgroup K
@@ -168,19 +168,19 @@ open scoped commutatorElement in
 
 ⚠ 環境 `G` の可解性も有限性も**不要** — 書籍どおり `M` の可解性のみを仮定する
 (書籍の infinite clause もこの形で入る). 環境が可解な場合は
-mathlib instance `subgroup_solvable_of_solvable` が `IsSolvable ↥M` を供給するので,
-`[IsSolvable G]` 側の呼び出しはそのまま通る.
+mathlib の instance (部分群への可解性の遺伝) が `Group.IsSolvable ↥M` を供給するので,
+`[Group.IsSolvable G]` 側の呼び出しはそのまま通る.
 
 証明: `M ≠ ⊥` (minimal normal) と `M` 可解で `⁅M, M⁆ < M`
 (`Ch04.commutator_lt_self_of_isSolvable_subtype`). `⁅M, M⁆ ⊴ G` (commutator of normals).
 M の minimality で `⁅M, M⁆ = ⊥`, よって M abelian. -/
-theorem solvable_minimal_normal_isAbelian {G : Type*} [Group G]
-    {M : Subgroup G} [IsSolvable ↥M] (hM : OddOrder.Isaacs.Ch02.IsMinimalNormal M) :
+theorem minimal_normal_isAbelian_of_isSolvable {G : Type*} [Group G]
+    {M : Subgroup G} [Group.IsSolvable ↥M] (hM : OddOrder.Isaacs.Ch02.IsMinimalNormal M) :
     ∀ x ∈ M, ∀ y ∈ M, x * y = y * x := by
-  haveI hMnormal : M.Normal := hM.1
+  have hMnormal : M.Normal := hM.1
   have hM_ne_bot : M ≠ ⊥ := hM.2.1
   -- ⁅M, M⁆ < M (M solvable, M ≠ ⊥).
-  haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
+  have : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
   have hcomm_lt : ⁅M, M⁆ < M :=
     OddOrder.Isaacs.Ch04.commutator_lt_self_of_isSolvable_subtype M
   -- ⁅M, M⁆ ⊴ G (commutator of normals: mathlib auto-instance).
@@ -202,31 +202,31 @@ theorem solvable_minimal_normal_isAbelian {G : Type*} [Group G]
 ⚠ **仮定は書籍と同一** — 環境 `G` には可解性も有限性も課さない. 書籍が
 「`M` が**有限なら** elementary abelian」と述べるとおり, 有限性は **`M` にのみ**要る
 (`[Finite ↥M]`; `G` は無限でよい). 書籍の infinite clause = abelian までは
-`solvable_minimal_normal_isAbelian` が有限性なしで与える.
-環境が可解な場合は mathlib instance `subgroup_solvable_of_solvable` が
-`IsSolvable ↥M` を供給し, `[Finite G]` からは `Finite ↥M` が instance 解決で出るので,
-`[Finite G] [IsSolvable G]` 側の呼び出しはそのまま通る.
+`minimal_normal_isAbelian_of_isSolvable` が有限性なしで与える.
+環境が可解な場合は mathlib の instance (部分群への可解性の遺伝) が
+`Group.IsSolvable ↥M` を供給し, `[Finite G]` からは `Finite ↥M` が instance 解決で出るので,
+`[Finite G] [Group.IsSolvable G]` 側の呼び出しはそのまま通る.
 
 証明: M abelian (前補題). `p ∣ |M|` を取り, `T = {x ∈ M | x^p = 1}` を M の部分群とする
 (M abelian で閉性 OK). T は M で characteristic (自己同型は p-冪を保つ).
 Cauchy で T ≠ ⊥. T.map M.subtype は characteristic-in-normal で G 正規 + ≤ M.
 M minimality で T.map M.subtype ∈ {⊥, M}. T ≠ ⊥ より T.map M.subtype = M, よって T = ⊤,
 即ち全 x ∈ M で x^p = 1. -/
-theorem solvable_minimal_normal_isElementaryAbelian
-    {M : Subgroup G} [Finite ↥M] [IsSolvable ↥M]
+theorem minimal_normal_isElementaryAbelian_of_isSolvable
+    {M : Subgroup G} [Finite ↥M] [Group.IsSolvable ↥M]
     (hM : OddOrder.Isaacs.Ch02.IsMinimalNormal M) :
     ∃ p : ℕ, p.Prime ∧ M.IsElementaryAbelian p := by
-  haveI hMnormal : M.Normal := hM.1
+  have hMnormal : M.Normal := hM.1
   have hM_ne_bot : M ≠ ⊥ := hM.2.1
-  have habel := solvable_minimal_normal_isAbelian hM
-  haveI hMcomm : IsMulCommutative ↥M :=
+  have habel := minimal_normal_isAbelian_of_isSolvable hM
+  have hMcomm : IsMulCommutative ↥M :=
     ⟨⟨fun a b => Subtype.ext (habel a a.2 b b.2)⟩⟩
-  haveI hMnt : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
+  have hMnt : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
   have hM_card_pos : 1 < Nat.card ↥M := Finite.one_lt_card
   obtain ⟨p, hp_prime, hp_dvd⟩ :=
     Nat.exists_prime_and_dvd hM_card_pos.ne'
   refine ⟨p, hp_prime, ?_⟩
-  haveI hpFact : Fact p.Prime := ⟨hp_prime⟩
+  have hpFact : Fact p.Prime := ⟨hp_prime⟩
   -- T = {x : ↥M | x^p = 1} as a Subgroup of ↥M.
   let T : Subgroup ↥M :=
     { carrier := {x | x ^ p = 1}
@@ -245,7 +245,7 @@ theorem solvable_minimal_normal_isElementaryAbelian
         change a ^ p = 1 at ha
         rw [inv_pow, ha, inv_one] }
   -- T characteristic in ↥M.
-  haveI hT_char : T.Characteristic := by
+  have hT_char : T.Characteristic := by
     rw [Subgroup.characteristic_iff_le_comap]
     intro φ x hx
     rw [Subgroup.mem_comap]
@@ -266,7 +266,7 @@ theorem solvable_minimal_normal_isElementaryAbelian
     rw [hbot, Subgroup.mem_bot] at hx_T
     exact hx_ne_one hx_T
   -- T.map M.subtype ⊴ G (characteristic-in-normal).
-  haveI hTM_normal : (T.map M.subtype).Normal := inferInstance
+  have hTM_normal : (T.map M.subtype).Normal := inferInstance
   have hTM_le_M : T.map M.subtype ≤ M := by
     rintro _ ⟨y, _, rfl⟩
     exact y.2
@@ -462,7 +462,7 @@ theorem IsHallSubgroup.bot_of_card_eq_one (π : Set ℕ) (h : Nat.card G = 1) :
 **実装状態** ⭐ sorry-free (2026-05-23 完成). AxiomsCheck flagship 入り
 (`OddOrder.Isaacs.Ch03.hall_E_exists`). -/
 private theorem hall_E_strong_aux : ∀ n : ℕ,
-    ∀ (G : Type*) [Group G] [Finite G] [IsSolvable G],
+    ∀ (G : Type*) [Group G] [Finite G] [Group.IsSolvable G],
       Nat.card G ≤ n → ∀ (π : Set ℕ),
       ∃ H : Subgroup G, IsHallSubgroup π H := by
   intro n
@@ -477,18 +477,18 @@ private theorem hall_E_strong_aux : ∀ n : ℕ,
     · by_cases hG_one : Nat.card G = 1
       · exact ⟨⊥, IsHallSubgroup.bot_of_card_eq_one π hG_one⟩
       · -- |G| > 1. G nontrivial.
-        haveI hG_nontrivial : Nontrivial G :=
+        have hG_nontrivial : Nontrivial G :=
           Finite.one_lt_card_iff_nontrivial.mp
             (Nat.one_lt_iff_ne_zero_and_ne_one.mpr ⟨Nat.card_pos.ne', hG_one⟩)
         -- Get minimal normal M ≤ ⊤.
         obtain ⟨M, hM, _⟩ :=
           OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) top_ne_bot
-        haveI hMnormal : M.Normal := hM.1
+        have hMnormal : M.Normal := hM.1
         have hM_ne_bot : M ≠ ⊥ := hM.2.1
         -- M elementary abelian p-group via Thm 3.11.
-        obtain ⟨_p, _hp_prime, _hp_elem⟩ := solvable_minimal_normal_isElementaryAbelian hM
+        obtain ⟨_p, _hp_prime, _hp_elem⟩ := minimal_normal_isElementaryAbelian_of_isSolvable hM
         -- |M| ≥ 2 since M is nontrivial.
-        haveI hM_nontrivial : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
+        have hM_nontrivial : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
         have hM_card_ge_two : 2 ≤ Nat.card ↥M := Finite.one_lt_card
         -- |G/M| · |M| = |G|. So |G/M| ≤ |G|/2 ≤ n (since |G| ≤ n+1).
         have hquot_card : Nat.card (G ⧸ M) ≤ n := by
@@ -500,7 +500,7 @@ private theorem hall_E_strong_aux : ∀ n : ℕ,
             rw [key]
             exact Nat.mul_le_mul_left _ hM_card_ge_two
           omega
-        haveI hQuot_sol : IsSolvable (G ⧸ M) := inferInstance
+        have hQuot_sol : Group.IsSolvable (G ⧸ M) := inferInstance
         -- IH on G/M.
         obtain ⟨Hbar, hHbar⟩ := ih (G ⧸ M) hquot_card π
         -- Pull back: H = comap (mk' M) Hbar.
@@ -527,7 +527,7 @@ private theorem hall_E_strong_aux : ∀ n : ℕ,
           exact Nat.mul_right_cancel hHbar_idx_pos h_eq
         -- |M| is a p-power (M is elementary abelian p-group ⇒ IsPGroup).
         have hM_pPower : ∃ k, Nat.card ↥M = _p ^ k := by
-          haveI : Fact _p.Prime := ⟨_hp_prime⟩
+          have : Fact _p.Prime := ⟨_hp_prime⟩
           have hPG : IsPGroup _p ↥M := fun x => ⟨1, by
             rw [pow_one]
             exact _hp_elem.2 x⟩
@@ -586,12 +586,12 @@ private theorem hall_E_strong_aux : ∀ n : ℕ,
           -- Schur-Zassenhaus.
           have h_coprime_MH : Nat.Coprime (Nat.card ↥(M.subgroupOf H)) (M.subgroupOf H).index := by
             rw [h_card_MH, h_idx_MH]; exact h_coprime_M_Hbar
-          haveI : (M.subgroupOf H).Normal := hMnormal.subgroupOf H
+          have : (M.subgroupOf H).Normal := hMnormal.subgroupOf H
           obtain ⟨K, hK⟩ := Subgroup.exists_right_complement'_of_coprime h_coprime_MH
           -- K.index in H = |M.subgroupOf H|, |K| = |Hbar|.
           have hK_index : K.index = Nat.card ↥(M.subgroupOf H) := hK.index_eq_card
           have hK_card : Nat.card ↥K = Nat.card Hbar := by
-            have := hK.card_mul
+            have := hK.card_mul_card
             -- this : Nat.card (M.subgroupOf H) * Nat.card K = Nat.card H
             rw [h_card_MH, hH_card_eq] at this
             -- |M| * |K| = |Hbar| * |M|
@@ -639,7 +639,7 @@ private theorem hall_E_strong_aux : ∀ n : ℕ,
   - **Case 2** `p ∉ π`: IH を `G/M` に. π-Hall `L/M`. `M` 位数と `L/M` 位数 coprime
     (`p ∉ π` で `L/M` 内に `p` 因子なし). Schur-Zassenhaus で `L = M ⋊ H`, `H` が
     `G` の π-Hall. -/
-theorem hall_E_exists [Finite G] [IsSolvable G] (π : Set ℕ) :
+theorem hall_E_exists [Finite G] [Group.IsSolvable G] (π : Set ℕ) :
     ∃ H : Subgroup G, IsHallSubgroup π H :=
   hall_E_strong_aux (Nat.card G) G le_rfl π
 
@@ -660,7 +660,7 @@ theorem hall_E_exists [Finite G] [IsSolvable G] (π : Set ℕ) :
      complement in `HM`. Phase 1 `IsComplement'.exists_conj_of_coprime`
      (M solvable since abelian p-group) で `∃ m ∈ M, H^g.map (conj m) = K`. -/
 private theorem hall_C_strong_aux : ∀ n : ℕ,
-    ∀ (G : Type*) [Group G] [Finite G] [IsSolvable G],
+    ∀ (G : Type*) [Group G] [Finite G] [Group.IsSolvable G],
       Nat.card G ≤ n → ∀ {π : Set ℕ} {H K : Subgroup G},
       IsHallSubgroup π H → IsHallSubgroup π K →
       ∃ g : G, H.map (MulAut.conj g).toMonoidHom = K := by
@@ -675,7 +675,7 @@ private theorem hall_C_strong_aux : ∀ n : ℕ,
     · exact ih G hsmall hH hK
     by_cases hG_one : Nat.card G = 1
     · -- |G| = 1 ⇒ G subsingleton ⇒ H = K = ⊥. Take g = 1.
-      haveI : Subsingleton G := Nat.card_eq_one_iff_unique.mp hG_one |>.1
+      have : Subsingleton G := Nat.card_eq_one_iff_unique.mp hG_one |>.1
       refine ⟨1, ?_⟩
       apply Subgroup.ext
       intro x
@@ -683,18 +683,18 @@ private theorem hall_C_strong_aux : ∀ n : ℕ,
       subst hx
       simp
     -- |G| > 1: G nontrivial.
-    haveI hG_nontrivial : Nontrivial G :=
+    have hG_nontrivial : Nontrivial G :=
       Finite.one_lt_card_iff_nontrivial.mp
         (Nat.one_lt_iff_ne_zero_and_ne_one.mpr ⟨Nat.card_pos.ne', hG_one⟩)
     -- Minimal normal M ⊆ G.
     obtain ⟨M, hM, _⟩ :=
       OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) top_ne_bot
-    haveI hMnormal : M.Normal := hM.1
+    have hMnormal : M.Normal := hM.1
     have hM_ne_bot : M ≠ ⊥ := hM.2.1
     -- M elementary abelian p-group via Thm 3.11.
-    obtain ⟨p, hp_prime, hp_elem⟩ := solvable_minimal_normal_isElementaryAbelian hM
-    haveI hp_fact : Fact p.Prime := ⟨hp_prime⟩
-    haveI hM_nontrivial : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
+    obtain ⟨p, hp_prime, hp_elem⟩ := minimal_normal_isElementaryAbelian_of_isSolvable hM
+    have hp_fact : Fact p.Prime := ⟨hp_prime⟩
+    have hM_nontrivial : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
     have hM_card_ge_two : 2 ≤ Nat.card ↥M := Finite.one_lt_card
     -- |G/M| ≤ n.
     have hquot_card : Nat.card (G ⧸ M) ≤ n := by
@@ -734,7 +734,7 @@ private theorem hall_C_strong_aux : ∀ n : ℕ,
     have h_Hbar_hall := hbar_hall hH
     have h_Kbar_hall := hbar_hall hK
     -- Step 2: IH on G/M.
-    haveI : IsSolvable (G ⧸ M) := inferInstance
+    have : Group.IsSolvable (G ⧸ M) := inferInstance
     obtain ⟨gbar, h_gbar⟩ := ih (G ⧸ M) hquot_card h_Hbar_hall h_Kbar_hall
     -- Step 3: Lift gbar to g.
     obtain ⟨g, hg_mk⟩ : ∃ g : G, (QuotientGroup.mk g : G ⧸ M) = gbar :=
@@ -874,8 +874,8 @@ private theorem hall_C_strong_aux : ∀ n : ℕ,
       have hHg_le_HM : Hg ≤ HM := le_sup_left
       have hK_le_HM : K ≤ HM := h_supeq.symm ▸ (le_sup_left : K ≤ K ⊔ M)
       -- Setup in ↥HM: N' := M.subgroupOf HM.
-      haveI hHM_finite : Finite ↥HM := inferInstance
-      haveI hM_subgroupOf_normal : (M.subgroupOf HM).Normal :=
+      have hHM_finite : Finite ↥HM := inferInstance
+      have hM_subgroupOf_normal : (M.subgroupOf HM).Normal :=
         Subgroup.normal_subgroupOf
       -- N' ≃ M (since M ≤ HM).
       have h_M_card_eq : Nat.card ↥(M.subgroupOf HM) = Nat.card ↥M :=
@@ -938,9 +938,9 @@ private theorem hall_C_strong_aux : ∀ n : ℕ,
             rw [← h_eq]
             group
       -- M.subgroupOf HM has solvable structure (M abelian / p-group).
-      haveI hM_solv : IsSolvable ↥(M.subgroupOf HM) := by
+      have hM_solv : Group.IsSolvable ↥(M.subgroupOf HM) := by
         have h_iso := Subgroup.subgroupOfEquivOfLe hM_le_HM
-        exact solvable_of_solvable_injective (f := h_iso.toMonoidHom) h_iso.injective
+        exact Group.isSolvable_of_isSolvable_injective (f := h_iso.toMonoidHom) h_iso.injective
       -- Coprime: |M.subgroupOf HM| coprime its index.
       have h_HM_card : Nat.card ↥HM = Nat.card ↥Hg * Nat.card ↥M := by
         have h_hk := Subgroup.card_HK_mul_card_inf_eq_card_mul_card Hg M
@@ -1012,13 +1012,13 @@ Phase 2 (2026-05-23) で完成. Phase 1 (Isaacs Thm 3.12 SZ 共役性) を前提
 
 主結果: `∃ g : G, H.map (MulAut.conj g).toMonoidHom = K` (即ち `H^g = K`).
 共役元 `g` は一般に `G` 全体 (`N` の部分集合とは限らない). -/
-theorem hall_C [Finite G] [IsSolvable G] {π : Set ℕ} {H K : Subgroup G}
+theorem hall_C [Finite G] [Group.IsSolvable G] {π : Set ℕ} {H K : Subgroup G}
     (hH : IsHallSubgroup π H) (hK : IsHallSubgroup π K) :
     ∃ g : G, H.map (MulAut.conj g).toMonoidHom = K :=
   hall_C_strong_aux (Nat.card G) G le_rfl hH hK
 
 /-- The conjugation action on Hall `π`-subgroups of a finite solvable group is transitive. -/
-theorem HallSubgroups.conjAction_pretransitive [Finite G] [IsSolvable G] (π : Set ℕ) :
+theorem HallSubgroups.conjAction_pretransitive [Finite G] [Group.IsSolvable G] (π : Set ℕ) :
     MulAction.IsPretransitive G (HallSubgroups π G) := by
   constructor
   intro H K
@@ -1035,9 +1035,9 @@ theorem HallSubgroups.conjAction_pretransitive [Finite G] [IsSolvable G] (π : S
 /-- A normal `π`-Hall subgroup of a finite solvable group is the unique `π`-Hall subgroup.
 This is the standard immediate consequence of Hall conjugacy: every other `π`-Hall subgroup is a
 conjugate of the normal one, hence is equal to it. -/
-theorem IsHallSubgroup.eq_of_normal [Finite G] [IsSolvable G] {π : Set ℕ} {H K : Subgroup G}
+theorem IsHallSubgroup.eq_of_normal [Finite G] [Group.IsSolvable G] {π : Set ℕ} {H K : Subgroup G}
     (hH : IsHallSubgroup π H) (hK : IsHallSubgroup π K) (hN : H.Normal) : H = K := by
-  haveI := hN
+  have := hN
   obtain ⟨g, hg⟩ := hall_C hH hK
   rw [← hg]
   exact (Subgroup.Normal.conj_smul_eq_self g H).symm
@@ -1050,14 +1050,14 @@ Hall D-定理 (`hall_D`) のエンジン. 証明: `P := U ⊔ M` の中で `U` �
 Schur-Zassenhaus 共役性 (`IsComplement'.exists_conj_of_coprime`) を `P` 内で適用すると,
 `P ⊓ K` の (`M` の元による) 共役が `U` に一致するので, `U = (P ⊓ K)ᵐ ≤ Kᵐ`. -/
 theorem exists_conj_le_of_isComplement'_of_coprime' [Finite G] {M K U : Subgroup G} [M.Normal]
-    (hsolv : IsSolvable ↥M ∨ IsSolvable ↥U) (hK : M.IsComplement' K)
+    (hsolv : Group.IsSolvable ↥M ∨ Group.IsSolvable ↥U) (hK : M.IsComplement' K)
     (hcop : Nat.Coprime (Nat.card ↥U) (Nat.card ↥M)) :
     ∃ x ∈ M, U ≤ K.map (MulAut.conj x).toMonoidHom := by
   set P : Subgroup G := U ⊔ M with hP_def
   have hM_le_P : M ≤ P := le_sup_right
   have hU_le_P : U ≤ P := le_sup_left
   have hMnorm : M.Normal := inferInstance
-  haveI hMP_normal : (M.subgroupOf P).Normal := Subgroup.normal_subgroupOf
+  have hMP_normal : (M.subgroupOf P).Normal := Subgroup.normal_subgroupOf
   have hU_inf_M : (U ⊓ M : Subgroup G) = ⊥ :=
     (Subgroup.disjoint_of_coprime_natCard hcop).eq_bot
   have hM_inf_K : (M ⊓ K : Subgroup G) = ⊥ := hK.disjoint.eq_bot
@@ -1112,17 +1112,17 @@ theorem exists_conj_le_of_isComplement'_of_coprime' [Finite G] {M K U : Subgroup
     rw [h_card_MP, h_idx_MP]; exact hcop.symm
   -- Schur-Zassenhaus 共役性が要求する「`M` 側か商側のどちらかが可解」を供給する.
   -- `M` 可解ならそのまま; `U` 可解なら商 `P / M.subgroupOf P ≃* U.subgroupOf P` が可解.
-  have hsolv_P : IsSolvable ↥(M.subgroupOf P) ∨ IsSolvable (↥P ⧸ M.subgroupOf P) := by
+  have hsolv_P : Group.IsSolvable ↥(M.subgroupOf P) ∨ Group.IsSolvable (↥P ⧸ M.subgroupOf P) := by
     rcases hsolv with hMsolv | hUsolv
     · left
       have h_iso := Subgroup.subgroupOfEquivOfLe hM_le_P
-      exact solvable_of_solvable_injective (f := h_iso.toMonoidHom) h_iso.injective
+      exact Group.isSolvable_of_isSolvable_injective (f := h_iso.toMonoidHom) h_iso.injective
     · right
-      haveI : IsSolvable ↥(U.subgroupOf P) := by
+      have : Group.IsSolvable ↥(U.subgroupOf P) := by
         have h_iso := Subgroup.subgroupOfEquivOfLe hU_le_P
-        exact solvable_of_solvable_injective (f := h_iso.toMonoidHom) h_iso.injective
+        exact Group.isSolvable_of_isSolvable_injective (f := h_iso.toMonoidHom) h_iso.injective
       have h_iso := h_compl_U.symm.QuotientMulEquiv
-      exact solvable_of_solvable_injective (f := h_iso.toMonoidHom) h_iso.injective
+      exact Group.isSolvable_of_isSolvable_injective (f := h_iso.toMonoidHom) h_iso.injective
   -- SZ conjugacy in `P`: conjugate `K.subgroupOf P` to `U.subgroupOf P` by `n ∈ M.subgroupOf P`.
   obtain ⟨n, hn_mem, hn_eq⟩ :=
     Subgroup.IsComplement'.exists_conj_of_coprime h_cop_MP hsolv_P h_compl_K h_compl_U
@@ -1148,7 +1148,7 @@ theorem exists_conj_le_of_isComplement'_of_coprime' [Finite G] {M K U : Subgroup
 /-- **Schur-Zassenhaus D-part (`M` 可解版)**: `exists_conj_le_of_isComplement'_of_coprime'` の
 `M` 可解への特殊化. Hall D-定理や BG/Peterfalvi の呼び出し側はこの形を使う. -/
 theorem exists_conj_le_of_isComplement'_of_coprime [Finite G] {M K : Subgroup G} [M.Normal]
-    (hMsolv : IsSolvable ↥M) (hK : M.IsComplement' K) {U : Subgroup G}
+    (hMsolv : Group.IsSolvable ↥M) (hK : M.IsComplement' K) {U : Subgroup G}
     (hcop : Nat.Coprime (Nat.card ↥U) (Nat.card ↥M)) :
     ∃ x : G, U ≤ K.map (MulAut.conj x).toMonoidHom :=
   let ⟨x, _, hx⟩ := exists_conj_le_of_isComplement'_of_coprime' (Or.inl hMsolv) hK hcop
@@ -1159,7 +1159,7 @@ theorem exists_conj_le_of_isComplement'_of_coprime [Finite G] {M K : Subgroup G}
 +「`p ∉ π` では補群を `U` を含むものに取り替える (`exists_conj_le_of_isComplement'_of_coprime`)」
 の 2 点を加えたもの. -/
 private theorem hall_D_strong_aux : ∀ n : ℕ,
-    ∀ (G : Type*) [Group G] [Finite G] [IsSolvable G],
+    ∀ (G : Type*) [Group G] [Finite G] [Group.IsSolvable G],
       Nat.card G ≤ n → ∀ {π : Set ℕ} {U : Subgroup G},
       (∀ q ∈ (Nat.card ↥U).primeFactors, q ∈ π) →
       ∃ H : Subgroup G, IsHallSubgroup π H ∧ U ≤ H := by
@@ -1174,19 +1174,19 @@ private theorem hall_D_strong_aux : ∀ n : ℕ,
     · exact ih G hsmall hU
     by_cases hG_one : Nat.card G = 1
     · -- |G| = 1: G subsingleton, so U ≤ ⊥; take H = ⊥.
-      haveI : Subsingleton G := Nat.card_eq_one_iff_unique.mp hG_one |>.1
+      have : Subsingleton G := Nat.card_eq_one_iff_unique.mp hG_one |>.1
       refine ⟨⊥, IsHallSubgroup.bot_of_card_eq_one π hG_one, ?_⟩
       intro x _
       rw [Subgroup.mem_bot]; exact Subsingleton.elim x 1
-    haveI hG_nontrivial : Nontrivial G :=
+    have hG_nontrivial : Nontrivial G :=
       Finite.one_lt_card_iff_nontrivial.mp
         (Nat.one_lt_iff_ne_zero_and_ne_one.mpr ⟨Nat.card_pos.ne', hG_one⟩)
     obtain ⟨M, hM, _⟩ :=
       OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) top_ne_bot
-    haveI hMnormal : M.Normal := hM.1
+    have hMnormal : M.Normal := hM.1
     have hM_ne_bot : M ≠ ⊥ := hM.2.1
-    obtain ⟨p, hp_prime, hp_elem⟩ := solvable_minimal_normal_isElementaryAbelian hM
-    haveI hM_nontrivial : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
+    obtain ⟨p, hp_prime, hp_elem⟩ := minimal_normal_isElementaryAbelian_of_isSolvable hM
+    have hM_nontrivial : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
     have hM_card_ge_two : 2 ≤ Nat.card ↥M := Finite.one_lt_card
     have hquot_card : Nat.card (G ⧸ M) ≤ n := by
       have key : Nat.card G = Nat.card (G ⧸ M) * Nat.card ↥M :=
@@ -1196,7 +1196,7 @@ private theorem hall_D_strong_aux : ∀ n : ℕ,
       omega
     -- |M| is a p-power; its prime factors are {p}.
     have hM_pPower : ∃ k, Nat.card ↥M = p ^ k := by
-      haveI : Fact p.Prime := ⟨hp_prime⟩
+      have : Fact p.Prime := ⟨hp_prime⟩
       have hPG : IsPGroup p ↥M := fun x => ⟨1, by rw [pow_one]; exact hp_elem.2 x⟩
       exact IsPGroup.iff_card.mp hPG
     have hM_primes : ∀ q ∈ (Nat.card ↥M).primeFactors, q = p := by
@@ -1270,10 +1270,10 @@ private theorem hall_D_strong_aux : ∀ n : ℕ,
         exact Nat.mul_left_cancel hM_pos this
       have h_cop_MH : Nat.Coprime (Nat.card ↥(M.subgroupOf H)) (M.subgroupOf H).index := by
         rw [hMH_card, h_idx_MH]; exact h_coprime_M_Hbar
-      haveI hMH_normal : (M.subgroupOf H).Normal := hMnormal.subgroupOf H
-      haveI hMH_solv : IsSolvable ↥(M.subgroupOf H) := by
+      have hMH_normal : (M.subgroupOf H).Normal := hMnormal.subgroupOf H
+      have hMH_solv : Group.IsSolvable ↥(M.subgroupOf H) := by
         have h_iso := Subgroup.subgroupOfEquivOfLe hM_le_H
-        exact solvable_of_solvable_injective (f := h_iso.toMonoidHom) h_iso.injective
+        exact Group.isSolvable_of_isSolvable_injective (f := h_iso.toMonoidHom) h_iso.injective
       obtain ⟨K, hK⟩ := Subgroup.exists_right_complement'_of_coprime h_cop_MH
       -- `U.subgroupOf H` is a π-subgroup with order coprime to `|M.subgroupOf H|`.
       have hUH_card : Nat.card ↥(U.subgroupOf H) = Nat.card ↥U :=
@@ -1297,7 +1297,7 @@ private theorem hall_D_strong_aux : ∀ n : ℕ,
       have hK'_index : K'.index = K.index := Subgroup.index_map_equiv K (MulAut.conj x)
       have hK_index : K.index = Nat.card ↥(M.subgroupOf H) := hK.index_eq_card
       have hK_card : Nat.card ↥K = Nat.card ↥Hbar := by
-        have hcm := hK.card_mul
+        have hcm := hK.card_mul_card
         rw [hMH_card, hH_card_eq] at hcm
         have hM_pos : 0 < Nat.card ↥M := Nat.card_pos
         have h_eq : Nat.card ↥M * Nat.card ↥K = Nat.card ↥M * Nat.card ↥Hbar := by
@@ -1331,7 +1331,7 @@ private theorem hall_D_strong_aux : ∀ n : ℕ,
 `U` を `π`-部分群 (`|U|` の全素因子が `π` に属す) とすると, `U ≤ H` なる `π`-Hall `H` が存在.
 Hall E (`hall_E_exists`) / Hall C (`hall_C`) と合わせて Hall E-C-D を完備化する.
 証明は `hall_E_strong_aux` と同型の `|G|`-強誘導 (`hall_D_strong_aux`). -/
-theorem hall_D [Finite G] [IsSolvable G] {π : Set ℕ} {U : Subgroup G}
+theorem hall_D [Finite G] [Group.IsSolvable G] {π : Set ℕ} {U : Subgroup G}
     (hU : ∀ q ∈ (Nat.card ↥U).primeFactors, q ∈ π) :
     ∃ H : Subgroup G, IsHallSubgroup π H ∧ U ≤ H :=
   hall_D_strong_aux (Nat.card G) G le_rfl hU

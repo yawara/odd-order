@@ -48,7 +48,7 @@ theorem eigenvalue_eq_of_basis_repr_ne_zero
     (k : L) (hk : b.repr x k ≠ 0) :
     a = weight k := by
   classical
-  letI : Fintype L := Fintype.ofFinite L
+  let : Fintype L := Fintype.ofFinite L
   have hcoord : b.repr (T x) k = weight k * b.repr x k := by
     rw [← b.sum_repr x, map_sum]
     simp [hb, smul_smul, mul_comm]

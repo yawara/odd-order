@@ -201,7 +201,7 @@ theorem cyclic_extension_exists.{u} {N : Type u} [Group N] {m : ℕ} (_hm : 0 < 
       Nat.card (G ⧸ N₀) = m ∧
       g ^ m = (ι a : G) ∧
       ∀ x : N, g * (ι x : G) * g⁻¹ = (ι (σ x) : G) := by
-  haveI hK_norm : (cyclicExtKSubgroup m a σ).Normal :=
+  have hK_norm : (cyclicExtKSubgroup m a σ).Normal :=
     cyclicExtKSubgroup_normal m a σ hσa hσm
   -- G := preG ⧸ K with the natural Group instance.
   let G := CyclicExtPreG N σ ⧸ cyclicExtKSubgroup m a σ
@@ -251,7 +251,7 @@ theorem cyclic_extension_exists.{u} {N : Type u} [Group N] {m : ℕ} (_hm : 0 < 
     exact SemidirectProduct.inl_injective this
   -- N₀ := range of inl_to_G.
   let N₀ : Subgroup G := inl_to_G.range
-  haveI hN₀_norm : N₀.Normal := by
+  have hN₀_norm : N₀.Normal := by
     have h_range_eq : (inl_to_G.range : Subgroup G) =
         (SemidirectProduct.inl : N →* CyclicExtPreG N σ).range.map
           (QuotientGroup.mk' (cyclicExtKSubgroup m a σ)) :=
@@ -710,10 +710,10 @@ theorem cyclic_quotient_extension_iso_exists
     rw [hmatch_conj x, MulAut.conjNormal_apply]
   have hνa : ν ⟨g ^ m, hgm⟩ = ⟨g₀ ^ m, hg₀m⟩ := Subtype.ext hmatch_pow
   -- normality of the two model relator subgroups (via Thm 3.36 infrastructure)
-  haveI : (cyclicExtKSubgroup m (⟨g ^ m, hgm⟩ : ↥N) (MulAut.conjNormal g)).Normal :=
+  have : (cyclicExtKSubgroup m (⟨g ^ m, hgm⟩ : ↥N) (MulAut.conjNormal g)).Normal :=
     cyclicExtKSubgroup_normal _ _ _ (conjNormal_fixes_self_pow g hgm)
       (conjNormal_pow_eq_conj g hgm)
-  haveI : (cyclicExtKSubgroup m (⟨g₀ ^ m, hg₀m⟩ : ↥N₀) (MulAut.conjNormal g₀)).Normal :=
+  have : (cyclicExtKSubgroup m (⟨g₀ ^ m, hg₀m⟩ : ↥N₀) (MulAut.conjNormal g₀)).Normal :=
     cyclicExtKSubgroup_normal _ _ _ (conjNormal_fixes_self_pow g₀ hg₀m)
       (conjNormal_pow_eq_conj g₀ hg₀m)
   -- the ν-transport respects the relator subgroups

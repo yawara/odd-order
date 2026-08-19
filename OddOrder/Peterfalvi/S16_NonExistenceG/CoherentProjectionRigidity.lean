@@ -136,7 +136,7 @@ theorem etaGrid_projection_residual_bound [Finite G]
             etaGridProjection hyp m)).re
       ≤ ((data.h78 hG).complementIndex : ℝ) := by
   classical
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   set BD := data.betaDecomp hG with hBD
   set phi : ClassFunction G ℂ :=
     OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + BD.Gamma with hphi
@@ -309,7 +309,7 @@ theorem etaGrid_projection_sub_beta_norm_one [Finite G]
         (etaGridProjection hyp m - (data.h78 hG).beta)
         (etaGridProjection hyp m - (data.h78 hG).beta) = 1 := by
   classical
-  haveI := data.kernelIn_normal
+  have := data.kernelIn_normal
   set H78 := data.h78 hG with hH78
   set X : ClassFunction G ℂ := etaGridProjection hyp m with hX
   set S : ℤ := ∑ i : Fin hyp.q, ∑ j : Fin hyp.p, (m i j) ^ 2 with hS
@@ -371,6 +371,7 @@ theorem etaGrid_projection_sub_beta_norm_one [Finite G]
   ring
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (14.11.2), classification of the removed unit-norm character.**
 Let `X` be an integral `eta`-grid sum and `chi = X - beta`.  If every coherent family image is
 orthogonal to the grid and `chi` has norm one, then `chi` is the distinguished coherent image or
@@ -394,7 +395,7 @@ theorem etaGrid_projection_sub_beta_classification [Finite G]
     χ = -((data.h78 hG).nu
       ((data.h78 hG).hyp76.zeta (data.h78 hG).zetaDistinct).conj) := by
   classical
-  letI := data.kernelIn_normal
+  let := data.kernelIn_normal
   let H78 := data.h78 hG
   let A : ClassFunction G ℂ := H78.nu (H78.hyp76.zeta H78.zetaDistinct)
   obtain ⟨j₁, hj₁ne, hj₁⟩ := data.exists_conjIndex hG

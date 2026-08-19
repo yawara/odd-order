@@ -399,7 +399,7 @@ theorem isComplement'_quotient_sylow [Finite G] [Fact p.Prime] (h : IsThreeStepG
   have hker : mk.ker = Ch03.oPiCore ({p} : Set ℕ) G := QuotientGroup.ker_mk' _
   have hkerS : mk.ker ≤ (S : Subgroup G) := by rw [hker]; exact oPiCore_le_sylow S
   have hkerK : mk.ker ≤ opPPrimeCore p G := by rw [hker]; exact oPiCore_le_opPPrimeCore p G
-  haveI hKnormal : ((opPPrimeCore p G).map mk).Normal := by
+  have hKnormal : ((opPPrimeCore p G).map mk).Normal := by
     rw [hmk, opPPrimeCore_map_mk_eq]; infer_instance
   have hdisj : Disjoint ((opPPrimeCore p G).map mk) ((S : Subgroup G).map mk) := by
     rw [disjoint_iff]
@@ -511,29 +511,30 @@ theorem isPGroup_oPiCore_subgroupOf [Finite G] [Fact p.Prime] :
 
 `O_{p,p'}(G)` is an extension of the `p`-group `O_p(G)` by the cyclic complement `A`, hence
 solvable; and `G/O_{p,p'}(G)` is a `p`-group by `isPGroup_quotient`, hence solvable. -/
-theorem isSolvable [Finite G] [Fact p.Prime] (h : IsThreeStepGroup G p) : IsSolvable G := by
+theorem isSolvable [Finite G] [Fact p.Prime] (h : IsThreeStepGroup G p) : Group.IsSolvable G := by
   set L := opPPrimeCore p G with hL
   set N : Subgroup ↥L := (Ch03.oPiCore ({p} : Set ℕ) G).subgroupOf L with hN
   obtain ⟨Acompl, hFrob, hAcyc, -⟩ := h.frobenius_opPPrimeCore
   -- `N` is a `p`-group, hence nilpotent, hence solvable.
-  haveI : N.Normal := hFrob.isNormal
-  haveI hNnil : Group.IsNilpotent ↥N := (isPGroup_oPiCore_subgroupOf (G := G) (p := p)).isNilpotent
-  haveI hNsolv : IsSolvable ↥N := inferInstance
+  have : N.Normal := hFrob.isNormal
+  have hNnil : Group.IsNilpotent ↥N := (isPGroup_oPiCore_subgroupOf (G := G) (p := p)).isNilpotent
+  have hNsolv : Group.IsSolvable ↥N := inferInstance
   -- The quotient `L/N` is isomorphic to the cyclic complement `Acompl`, hence solvable.
-  haveI hAcyc' : IsCyclic ↥Acompl := hAcyc
-  haveI hAcomm : IsSolvable ↥Acompl :=
-    isSolvable_of_comm (fun a b => (IsCyclic.commGroup (α := ↥Acompl)).mul_comm a b)
-  haveI hQsolv : IsSolvable (↥L ⧸ N) :=
-    solvable_of_surjective (f := (hFrob.isComplement.symm.QuotientMulEquiv).symm.toMonoidHom)
+  have hAcyc' : IsCyclic ↥Acompl := hAcyc
+  have hAcomm : Group.IsSolvable ↥Acompl :=
+    Group.isSolvable_of_comm (fun a b => (IsCyclic.commGroup (α := ↥Acompl)).mul_comm a b)
+  have hQsolv : Group.IsSolvable (↥L ⧸ N) :=
+    Group.isSolvable_of_surjective (f :=
+      (hFrob.isComplement.symm.QuotientMulEquiv).symm.toMonoidHom)
       (MulEquiv.surjective _)
   -- Hence `L = O_{p,p'}(G)` is solvable.
-  haveI hLsolv : IsSolvable ↥L :=
-    solvable_of_ker_le_range N.subtype (QuotientGroup.mk' N)
+  have hLsolv : Group.IsSolvable ↥L :=
+    Group.isSolvable_of_ker_le_range N.subtype (QuotientGroup.mk' N)
       (by rw [QuotientGroup.ker_mk', Subgroup.subtype_range])
   -- `G/L` is a `p`-group, hence solvable; conclude by the same extension argument.
-  haveI hGQnil : Group.IsNilpotent (G ⧸ L) := (h.isPGroup_quotient).isNilpotent
-  haveI hGQ : IsSolvable (G ⧸ L) := inferInstance
-  exact solvable_of_ker_le_range L.subtype (QuotientGroup.mk' L)
+  have hGQnil : Group.IsNilpotent (G ⧸ L) := (h.isPGroup_quotient).isNilpotent
+  have hGQ : Group.IsSolvable (G ⧸ L) := inferInstance
+  exact Group.isSolvable_of_ker_le_range L.subtype (QuotientGroup.mk' L)
     (by rw [QuotientGroup.ker_mk', Subgroup.subtype_range])
 
 end IsThreeStepGroup

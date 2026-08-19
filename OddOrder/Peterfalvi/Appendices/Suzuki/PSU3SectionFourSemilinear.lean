@@ -340,7 +340,7 @@ theorem exists_frobFixed_repr (M : hyp.QuotientFieldModel m) (hm : m ≠ 0) {z :
     ∃ a ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m,
       ∃ b ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m, x = a + b * z := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   set F := OddOrder.FiniteField.frobFixedSubfield M.E 2 m with hFdef
   have hFcard : Nat.card ↥F = 2 ^ m :=
     OddOrder.FiniteField.natCard_frobFixedSubfield M.card hm
@@ -378,7 +378,7 @@ theorem coordConjD_mul_mul_eq (s : hyp.LemmaFiveSetup m) (M : hyp.QuotientFieldM
     hyp.coordConjD M ⟨d, hd⟩ (x * y) * hyp.coordConjD M ⟨d, hd⟩ 1
       = hyp.coordConjD M ⟨d, hd⟩ x * hyp.coordConjD M ⟨d, hd⟩ y := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   set Ψ := hyp.coordConjD M ⟨d, hd⟩ with hΨ
   set z : M.E := ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E) with hzdef
   have h1 : Ψ 1 ≠ 0 := fun hc =>

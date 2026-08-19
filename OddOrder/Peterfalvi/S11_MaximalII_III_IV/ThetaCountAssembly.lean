@@ -76,7 +76,7 @@ theorem exists_hcuSeedHom_eq_of_realizedH0_ker [Finite G] {M : Subgroup G}
         Set ↥(hInHu data))
       ⊆ (fH.ker : Set ↥(hInHu data))) :
     ∃ θ : (↥data.H ⧸ chief.N) →* ℂˣ, hcuSeedHom (chief := chief) θ = fH := by
-  haveI := chief.N_normal
+  have := chief.N_normal
   -- transport fH to H →* ℂˣ via hInHuEquivH.symm, trivial on N.
   set fH' : ↥data.H →* ℂˣ := fH.comp (hInHuEquivH data).symm.toMonoidHom with hfH'
   have hNker : chief.N ≤ fH'.ker := by
@@ -174,7 +174,7 @@ theorem hcuSeedHom_hinv_of_wComplement_triv [Finite G] {M : Subgroup G}
           ⟨(c : ↥(huSub data)) * (h : ↥(huSub data)) * (c : ↥(huSub data))⁻¹,
             (hInHu_normal data).conj_mem _ h.2 (c : ↥(huSub data))⟩
         = hcuSeedHom (chief := chief) θ h := by
-  haveI : Fintype ↥((data.typeP.W1).subgroupOf (data.typeP.U ⊔ data.typeP.W1)) :=
+  have : Fintype ↥((data.typeP.W1).subgroupOf (data.typeP.U ⊔ data.typeP.W1)) :=
     Fintype.ofFinite _
   have htriv : ∀ w ∈ caseA_wComplement caseA,
       (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) w
@@ -192,7 +192,7 @@ hInHuEquivH iso). -/
 theorem hcuSeedHom_injective [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
     Function.Injective (hcuSeedHom (chief := chief) (data := data)) := by
-  haveI := chief.N_normal
+  have := chief.N_normal
   intro θ₁ θ₂ h12
   have hsurj : Function.Surjective ((QuotientGroup.mk' chief.N).comp (hInHuEquivH
       data).toMonoidHom) :=
@@ -325,6 +325,7 @@ theorem exists_hcuPsiPair_eq_of_linear_realizedH0_ker [Finite G] {M : Subgroup G
   congr 1
   exact hpair.symm
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (9.8.d)** (count substrate).  Generic hom-count through a normal quotient: homs
 `f : K →* ℂˣ` with `N ≤ Ker f` biject with homs of `K/N` (`QuotientGroup.lift`).  The group-agnostic
 form of `card_hom_triv_W_eq_card_quotient`, for the `λ`-numerator over `cuInHu/U'`. -/
@@ -400,13 +401,13 @@ theorem card_lambda_triv_uprime [Finite G] {M : Subgroup G}
     rw [Subgroup.subgroupOf, ← Subgroup.map_le_iff_le_comap]
     refine le_trans (le_of_eq (Subgroup.map_subtype_commutator _)) ?_
     exact commutator_cuInHu_le_uprimeRealized caseA
-  haveI hNnorm : N.Normal := Subgroup.Normal.of_commutator_le (h := hcomm)
-  haveI hcommM : IsMulCommutative (↥(cuInHu caseA) ⧸ N) :=
+  have hNnorm : N.Normal := Subgroup.Normal.of_commutator_le (h := hcomm)
+  have hcommM : IsMulCommutative (↥(cuInHu caseA) ⧸ N) :=
     (Subgroup.Normal.quotient_commutative_iff_commutator_le).mpr hcomm
-  letI : CommGroup (↥(cuInHu caseA) ⧸ N) :=
+  let : CommGroup (↥(cuInHu caseA) ⧸ N) :=
     { (inferInstance : Group (↥(cuInHu caseA) ⧸ N)) with
       mul_comm := isMulCommutative_iff.mp hcommM }
-  haveI : NeZero (Monoid.exponent (↥(cuInHu caseA) ⧸ N)) := ⟨Monoid.exponent_ne_zero_of_finite⟩
+  have : NeZero (Monoid.exponent (↥(cuInHu caseA) ⧸ N)) := ⟨Monoid.exponent_ne_zero_of_finite⟩
   rw [card_hom_triv_N_eq_card_quotient_general N,
     CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity (↥(cuInHu caseA) ⧸ N) ℂ,
     ← Subgroup.index_eq_card]
@@ -439,10 +440,10 @@ theorem hcuPsiPair_family_inertia_eq [Finite G] {M : Subgroup G}
         (hcuSeedHom_hinv_of_wComplement_triv caseA θ hθW) lam : ClassFunction
         ↥(hInHu data ⊔ cuInHu caseA) ℂ)
       = hInHu data ⊔ cuInHu caseA := by
-  haveI : Fintype ↥((data.typeP.W1).subgroupOf (data.typeP.U ⊔ data.typeP.W1)) :=
+  have : Fintype ↥((data.typeP.W1).subgroupOf (data.typeP.U ⊔ data.typeP.W1)) :=
     Fintype.ofFinite _
-  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
-  haveI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
+  have : Fintype ↥(huSub data) := Fintype.ofFinite _
+  have : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
   have htriv : ∀ w ∈ caseA_wComplement caseA,
       (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) w
         = (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1 := by
@@ -498,7 +499,7 @@ theorem caseA_hcuZetaPair_realizedS0_not_subset_ker [Finite G] {M : Subgroup G}
         (ClassFunction.induce (hInHu data ⊔ cuInHu caseA)
           (hcuPsiPair caseA θ hinv lam) : ClassFunction ↥(huSub data) ℂ) := by
   classical
-  haveI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
+  have : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
   set ζ : IrreducibleCharacter ↥(huSub data) :=
     ⟨ClassFunction.induce (hInHu data ⊔ cuInHu caseA) (hcuPsiPair caseA θ hinv lam),
       hcuZetaPair_irreducible caseA θ hinv lam hθ₀⟩ with hζdef
@@ -572,8 +573,8 @@ theorem caseA_member_induceHU_irreducible [Finite G] {M : Subgroup G}
         = hInHu data ⊔ cuInHu caseA) :
     IsIrreducibleCharacter (induceHU data (ClassFunction.induce (hInHu data ⊔ cuInHu caseA)
       (hcuPsiPair caseA θ hinv lam) : ClassFunction ↥(huSub data) ℂ)) := by
-  haveI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
-  haveI : Fintype ↥(hInHu data) := Fintype.ofFinite _
+  have : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
+  have : Fintype ↥(hInHu data) := Fintype.ofFinite _
   refine hcuZetaPair_induceHU_irreducible caseA θ hinv lam hθ₀ ?_
   intro hMfix
   have hlo := hcuZetaPair_liesOver_hInHu caseA θ hinv lam hθ₀
@@ -775,38 +776,38 @@ theorem caseA_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     ⟨caseA_reducible_induceHU_apply_one_eq_qu caseA hG φ hφ hred,
       reducible_mem_sOf_H0C hG chars φ hφ hred⟩, ?_, ?_⟩
   · -- (c) 9.8.c: an irreducible `𝒮(H₀C)`-member of degree `qu` (parity dichotomy on `Xθ`/`Xmu`).
-    letI : Fintype ((↥data.H ⧸ chief.N) →* ℂˣ) := Fintype.ofFinite _
-    letI : Fintype ↥(hInHu data) := Fintype.ofFinite _
-    letI : Fintype ↥(huSub data) := Fintype.ofFinite _
-    letI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    let : Fintype ((↥data.H ⧸ chief.N) →* ℂˣ) := Fintype.ofFinite _
+    let : Fintype ↥(hInHu data) := Fintype.ofFinite _
+    let : Fintype ↥(huSub data) := Fintype.ofFinite _
+    let : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
       (huSub data)) := Fintype.ofFinite _
-    letI : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
+    let : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
       invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-    letI : Invertible
+    let : Invertible
         (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
           (huSub data)) : ℂ) := invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-    haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    have : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
       (huSub data)).Normal := hcInHu_realized_normal chief
     exact caseA_exists_irreducible_sOf_H0C caseA hG
   · -- (d) 9.8.d: `𝒮(H₀U')` has `≥ ((p-1)/a)·[C_U(S₀):U']` irreducibles of degree `qa`.
     classical
-    haveI : (hInHu data ⊔ cuInHu caseA).Normal := hcuInHu_normal caseA
-    letI : Fintype ↥(huSub data) := Fintype.ofFinite _
-    letI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
-    letI : Fintype ↥(hInHu data) := Fintype.ofFinite _
-    letI : Fintype ((↥data.H ⧸ chief.N) →* ℂˣ) := Fintype.ofFinite _
-    letI : Fintype (↥(cuInHu caseA) →* ℂˣ) := Fintype.ofFinite _
-    letI : Fintype ↥M := Fintype.ofFinite _
-    letI : Fintype ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) := Fintype.ofFinite _
-    letI : Fintype (IrreducibleCharacter ↥(huSub data)) := Fintype.ofFinite _
-    letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    have : (hInHu data ⊔ cuInHu caseA).Normal := hcuInHu_normal caseA
+    let : Fintype ↥(huSub data) := Fintype.ofFinite _
+    let : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
+    let : Fintype ↥(hInHu data) := Fintype.ofFinite _
+    let : Fintype ((↥data.H ⧸ chief.N) →* ℂˣ) := Fintype.ofFinite _
+    let : Fintype (↥(cuInHu caseA) →* ℂˣ) := Fintype.ofFinite _
+    let : Fintype ↥M := Fintype.ofFinite _
+    let : Fintype ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) := Fintype.ofFinite _
+    let : Fintype (IrreducibleCharacter ↥(huSub data)) := Fintype.ofFinite _
+    let : Invertible (Nat.card ↥(huSub data) : ℂ) :=
       invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-    letI : Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ) :=
+    let : Invertible (Nat.card ↥(hInHu data ⊔ cuInHu caseA) : ℂ) :=
       invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-    letI : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
+    let : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
       invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-    letI : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
-    haveI hWnorm : (caseA_wComplement caseA).Normal := Subgroup.normal_of_isMulCommutative _
+    let : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+    have hWnorm : (caseA_wComplement caseA).Normal := Subgroup.normal_of_isMulCommutative _
     have ha_pos : 0 < caseA.a := by
       rw [← index_hcuInHu_eq_caseA_a caseA]
       exact Nat.pos_of_ne_zero fun h0 => by
@@ -985,7 +986,7 @@ them — the bridge from the type-`F` complement witness to the type-`P` complem
 theorem _root_.OddOrder.Isaacs.Ch06.IsFrobeniusGroup.conj_complement {G' : Type*} [Group G']
     {N A : Subgroup G'} (h : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G' N A) (n : G') :
     OddOrder.Isaacs.Ch06.IsFrobeniusGroup G' N (A.map (MulAut.conj n).toMonoidHom) := by
-  haveI := h.isNormal
+  have := h.isNormal
   refine ⟨h.isNormal, Subgroup.SchurZassenhausConj.isComplement'_conj h.isComplement n,
     h.ne_bot_kernel, ?_, ?_⟩
   · intro hbot
@@ -1055,11 +1056,11 @@ theorem exceptional_case_frobenius_realization [Finite G]
         (data.typeP.U ⊔ data.typeP.W1).subtype = ⊥ := hCbot
     rwa [Subgroup.map_eq_bot_iff_of_injective _ (Subgroup.subtype_injective _),
       Subgroup.map_eq_bot_iff_of_injective _ (Subgroup.subtype_injective _)] at h1
-  haveI hUcyc : IsCyclic ↥data.typeP.U := by
-    haveI hUbar := caseB.Ubar_cyclic
+  have hUcyc : IsCyclic ↥data.typeP.U := by
+    have hUbar := caseB.Ubar_cyclic
     have hinj : Function.Injective (uActionHom data chief) :=
       (uActionHom data chief).ker_eq_bot_iff.mp hker
-    haveI : IsCyclic ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) :=
+    have : IsCyclic ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) :=
       isCyclic_of_surjective (MonoidHom.ofInjective hinj).symm.toMonoidHom
         (MonoidHom.ofInjective hinj).symm.surjective
     exact isCyclic_of_surjective
@@ -1084,7 +1085,7 @@ theorem exceptional_case_frobenius_realization [Finite G]
     rw [tf.H_eq, td.derived_fitting_eq, td.typeP.H_eq, ← data.typeP.H_eq]
   -- Schur–Zassenhaus: the type-F complement `tf.U` and the type-`P` complement `U` of `H` in `M'`
   -- are conjugate.
-  haveI hHnormal : ((data.typeP.H).subgroupOf (derivedInG M)).Normal := by
+  have hHnormal : ((data.typeP.H).subgroupOf (derivedInG M)).Normal := by
     refine (Subgroup.normal_subgroupOf_iff_le_normalizer data.typeP.H_le).mpr ?_
     have hn := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M
     rw [← data.typeP.H_eq] at hn
@@ -1098,27 +1099,27 @@ theorem exceptional_case_frobenius_realization [Finite G]
   have hCopHU : Nat.Coprime (Nat.card ↥data.typeP.H) (Nat.card ↥data.typeP.U) :=
     (typeP_coprime_H_uW1 data.typeP data.nontrivial.1).coprime_dvd_right
       (Subgroup.card_dvd_of_le le_sup_left)
-  have hHsolv : IsSolvable ↥((data.typeP.H).subgroupOf (derivedInG M)) := by
-    haveI : Group.IsNilpotent ↥data.typeP.H := by
+  have hHsolv : Group.IsSolvable ↥((data.typeP.H).subgroupOf (derivedInG M)) := by
+    have : Group.IsNilpotent ↥data.typeP.H := by
       rw [data.typeP.H_eq]
       exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent M
-    haveI : IsSolvable ↥data.typeP.H := IsNilpotent.to_isSolvable
-    exact solvable_of_surjective
+    have : Group.IsSolvable ↥data.typeP.H := IsNilpotent.to_isSolvable
+    exact Group.isSolvable_of_surjective
       (f := (Subgroup.subgroupOfEquivOfLe data.typeP.H_le).symm.toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe data.typeP.H_le).symm.surjective
   obtain ⟨nn, _hnnH, hnnconj⟩ := Subgroup.IsComplement'.exists_conj_of_coprime
     (by rw [hNcard, hNidx]; exact hCopHU) (Or.inl hHsolv)
     (htfH ▸ tf.complement) data.typeP.derived_complement
   -- `tf.U` is cyclic (conjugate to the cyclic `U`), so `|tf.U| = exp tf.U`.
-  haveI htfUsubCyc : IsCyclic ↥((tf.U).subgroupOf (derivedInG M)) := by
+  have htfUsubCyc : IsCyclic ↥((tf.U).subgroupOf (derivedInG M)) := by
     have e := Subgroup.equivMapOfInjective ((tf.U).subgroupOf (derivedInG M))
       (MulAut.conj nn).toMonoidHom (MulAut.conj nn).injective
     rw [hnnconj] at e
-    haveI : IsCyclic ↥((data.typeP.U).subgroupOf (derivedInG M)) :=
+    have : IsCyclic ↥((data.typeP.U).subgroupOf (derivedInG M)) :=
       isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe data.typeP.U_le).symm.toMonoidHom
         (Subgroup.subgroupOfEquivOfLe data.typeP.U_le).symm.surjective
     exact isCyclic_of_surjective e.symm.toMonoidHom e.symm.surjective
-  haveI htfUcyc : IsCyclic ↥tf.U :=
+  have htfUcyc : IsCyclic ↥tf.U :=
     isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe tf.U_le).toMonoidHom
       (Subgroup.subgroupOfEquivOfLe tf.U_le).surjective
   -- Collapse the type-F Frobenius to the full complement and transport to `U`.
@@ -1237,8 +1238,8 @@ theorem sOf_closedUnderConjugate [Finite G] {M : Subgroup G}
     (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup M) (Y : Subgroup G) :
     OddOrder.Peterfalvi.S03.ClosedUnderConjugate (OddOrder.Peterfalvi.S11.sOf data Y) := by
   classical
-  letI : Fintype ↥M := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥(OddOrder.Peterfalvi.S11.huSub data) : ℂ) :=
+  let : Fintype ↥M := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥(OddOrder.Peterfalvi.S11.huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   intro φ hφ
   obtain ⟨χ, hχ, rfl⟩ := hφ
@@ -1253,7 +1254,7 @@ theorem sOf_closedUnderConjugate [Finite G] {M : Subgroup G}
   refine ⟨χc, ⟨?_, ?_⟩, ?_⟩
   · -- `χc ∈ xiSet`: `H ⊄ Ker χc = Ker χ`
     have h1 := hχ.1
-    simp only [OddOrder.Peterfalvi.S11.xiSet, Set.mem_setOf_eq] at h1 ⊢
+    simp only [OddOrder.Peterfalvi.S11.xiSet, Set.mem_ofPred_eq] at h1 ⊢
     rwa [hk]
   · -- `Y ⊆ Ker χc = Ker χ`
     rw [hk]; exact hχ.2

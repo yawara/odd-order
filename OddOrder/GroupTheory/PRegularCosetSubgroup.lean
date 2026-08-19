@@ -81,7 +81,7 @@ theorem card_pRegularProd (hp : p.Prime) (hu : IsPRegular p u) (hPp : IsPGroup p
     (hcomm : ∀ v ∈ P, Commute u v) :
     Nat.card ↥(pRegularProd u P hcomm) = orderOf u * Nat.card ↥P := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hupos : 0 < orderOf u := orderOf_pos u
   -- the `p'`-part pins down the `u`-exponent
   have huniq : ∀ (a b : ℕ) (v w : G), v ∈ P → w ∈ P → u ^ a * v = u ^ b * w →

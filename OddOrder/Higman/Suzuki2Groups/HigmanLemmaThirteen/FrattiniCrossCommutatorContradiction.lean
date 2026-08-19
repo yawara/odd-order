@@ -103,7 +103,7 @@ private theorem frattiniSquare_quotient_isElementaryAbelian_of_two_factor_cover
   have hQcomm : ∀ a b : P ⧸ frattiniSquare P, a * b = b * a :=
     (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr
       hcomm).is_comm.comm
-  letI : CommGroup (P ⧸ frattiniSquare P) :=
+  let : CommGroup (P ⧸ frattiniSquare P) :=
     { (inferInstance : Group (P ⧸ frattiniSquare P)) with
       mul_comm := hQcomm }
   let q := QuotientGroup.mk' (frattiniSquare P)
@@ -150,7 +150,7 @@ private theorem false_of_frattiniSquare_two_factor_cover
     (hXpow : ∀ x : P, x ∈ X → x ^ 2 ∈ frattiniSquare P)
     (hZpow : ∀ z : P, z ∈ Z → z ^ 2 ∈ frattiniSquare P) :
     False := by
-  letI : (frattiniSquare P).Normal :=
+  let : (frattiniSquare P).Normal :=
     (frattiniSquareNormalInvariant
       (MonoidHom.id (MulAut P))).2.1
   have hEA : IsElementaryAbelian 2 (P ⧸ frattiniSquare P) :=

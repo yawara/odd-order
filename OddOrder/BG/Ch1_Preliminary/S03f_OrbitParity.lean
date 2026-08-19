@@ -78,11 +78,11 @@ theorem orbit_parity_contradiction
     (h324 : (⁅KG, (P.map H.subtype : Subgroup G)⁆ : Subgroup G) = KG)
     (hKRs_index : ((⁅KG, R₀⁆ : Subgroup G).subgroupOf KG).index = q) :
     False := by
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have : Fact p.Prime := ⟨hp⟩
+  have : Fact q.Prime := ⟨hq_prime⟩
   have hVG_le_H : VG ≤ H := hVG ▸ Subgroup.map_subtype_le V
   classical
-  haveI hVGcommM : IsMulCommutative ↥VG := ⟨⟨hVGelem.1⟩⟩
+  have hVGcommM : IsMulCommutative ↥VG := ⟨⟨hVGelem.1⟩⟩
   have hVG_ne_bot : VG ≠ ⊥ := by
     intro hbot
     apply hV_ne_bot
@@ -230,7 +230,7 @@ theorem orbit_parity_contradiction
       _ = (b * x * b⁻¹) * (b * s * b⁻¹) := by group
       _ = (b * x * b⁻¹) * ((s * b) * b⁻¹) := by rw [← hsb]
       _ = (b * x * b⁻¹) * s := by group
-  haveI instSubFT : ∀ X : Subgroup G, Fintype ↥X := fun _ => Fintype.ofFinite _
+  have instSubFT : ∀ X : Subgroup G, Fintype ↥X := fun _ => Fintype.ofFinite _
   set efam : {Ki : Subgroup G // Pfam Ki} → (↥VG →* ↥VG) := fun i =>
     avgConj (i : Subgroup G) VG with hefamdef
   have hefam_cent : ∀ (i : {Ki : Subgroup G // Pfam Ki}) (v : ↥VG),
@@ -261,7 +261,7 @@ theorem orbit_parity_contradiction
     rw [← hKi_card i]
     exact avgConj_apply_of_mem_centralizer _ _ (Subgroup.mem_inf.mp hv).2
   -- ----- Spanning: `⨆ᵢ Vᵢ = V_G` (**Prop 1.16(2)**, mmd L501) -----
-  haveI hKGcommF : IsMulCommutative ↥KG := ⟨⟨hKcomm⟩⟩
+  have hKGcommF : IsMulCommutative ↥KG := ⟨⟨hKcomm⟩⟩
   have hKG_le_NVG : KG ≤ Subgroup.normalizer (VG : Set G) := by
     rw [Subgroup.normalizer_eq_top]
     exact le_top
@@ -294,7 +294,7 @@ theorem orbit_parity_contradiction
     change Subgroup.closure _ ≤ _
     rw [Subgroup.closure_le]
     rintro v ⟨Y, ⟨a, hYa⟩, hYfix⟩
-    haveI hYnorm : Y.Normal := ⟨fun y hy g => by
+    have hYnorm : Y.Normal := ⟨fun y hy g => by
       have h5 : g * y * g⁻¹ = y := by
         rw [hKcomm g y]
         group
@@ -378,11 +378,11 @@ theorem orbit_parity_contradiction
             ⟨YG, hPYG⟩
         exact h11 h10
   -- ----- The conjugation action of `A = P_G·R₀` on `{K₁, …, Kₙ}`, and `PR`-transitivity -----
-  haveI hι_fin : Finite {Ki : Subgroup G // Pfam Ki} := by
-    haveI : Finite (Subgroup G) :=
+  have hι_fin : Finite {Ki : Subgroup G // Pfam Ki} := by
+    have : Finite (Subgroup G) :=
       Finite.of_injective (fun X => (X : Set G)) SetLike.coe_injective
     exact Subtype.finite
-  haveI := Fintype.ofFinite {Ki : Subgroup G // Pfam Ki}
+  have := Fintype.ofFinite {Ki : Subgroup G // Pfam Ki}
   have hVGcommG : ∀ a ∈ VG, ∀ b ∈ VG, a * b = b * a := by
     intro a ha b hb
     exact congrArg Subtype.val (hVGelem.1 ⟨a, ha⟩ ⟨b, hb⟩)
@@ -410,7 +410,7 @@ theorem orbit_parity_contradiction
         rw [Subgroup.map_bot, ← hbot,
           Subgroup.map_inf _ _ _ (MulEquiv.injective _), hVG_conj_fix a]
       exact Subgroup.map_injective (MulEquiv.injective _) h7
-  letI actF : MulAction ↥A {Ki : Subgroup G // Pfam Ki} :=
+  let actF : MulAction ↥A {Ki : Subgroup G // Pfam Ki} :=
     conjSubtypeMulAction A Pfam hPfam_conj
   have hsmul_val : ∀ (a : ↥A) (i : {Ki : Subgroup G // Pfam Ki}),
       ((a • i : {Ki : Subgroup G // Pfam Ki}) : Subgroup G)
@@ -534,8 +534,8 @@ theorem orbit_parity_contradiction
     obtain ⟨i₀, j₀, hj₀⟩ := hcon
     set S₁ : Subgroup G := ⨆ j ∈ MulAction.orbit (↥A) i₀, Vfam j with hS₁def
     set S₂ : Subgroup G := ⨆ j ∈ MulAction.orbit (↥A) j₀, Vfam j with hS₂def
-    haveI hS₁norm : S₁.Normal := Subgroup.normalizer_eq_top_iff.mp (horbitSup_normal i₀)
-    haveI hS₂norm : S₂.Normal := Subgroup.normalizer_eq_top_iff.mp (horbitSup_normal j₀)
+    have hS₁norm : S₁.Normal := Subgroup.normalizer_eq_top_iff.mp (horbitSup_normal i₀)
+    have hS₂norm : S₂.Normal := Subgroup.normalizer_eq_top_iff.mp (horbitSup_normal j₀)
     -- the two orbits are disjoint
     have horb_disj : ∀ j, j ∈ MulAction.orbit (↥A) i₀ → j ∉ MulAction.orbit (↥A) j₀ := by
       intro j hj1 hj2
@@ -612,7 +612,7 @@ theorem orbit_parity_contradiction
       exact le_iSup₂ (f := fun j' (_ : j' ∈ MulAction.orbit (↥A) j₀) => Vfam j') j₀
         (MulAction.mem_orbit_self j₀)
   -- ----- A generator `x` of `R₀`, and the fact that it moves some `Kᵢ` -----
-  haveI hR₀_nontriv : Nontrivial ↥R₀ := by
+  have hR₀_nontriv : Nontrivial ↥R₀ := by
     rw [← Finite.one_lt_card_iff_nontrivial, hr_card]
     exact hr_prime.one_lt
   obtain ⟨x₀, hx₀_ne⟩ := exists_ne (1 : ↥R₀)
@@ -669,7 +669,7 @@ theorem orbit_parity_contradiction
   -- so each `Vᵢ` is normal; (3.11) then gives `n = 1`, contradicting `C_V(K) = 1`, `|K| > q²`
   have hnotallfix : ¬ ∀ i : {Ki : Subgroup G // Pfam Ki}, xA • i = i := by
     intro hallfix
-    haveI hDnorm : (permF.ker).Normal := MonoidHom.normal_ker permF
+    have hDnorm : (permF.ker).Normal := MonoidHom.normal_ker permF
     -- `R₀` (inside `A`) lies in the kernel
     have hR₀'_le_D : R₀.subgroupOf A ≤ permF.ker := by
       intro z hz
@@ -749,11 +749,11 @@ theorem orbit_parity_contradiction
       · intro g hg
         exact hApart g (hR₀_le_A' hg)
     -- (3.11): the family is then a singleton `{K₁}` with `V₁ = V_G`
-    haveI hsub : Subsingleton {Ki : Subgroup G // Pfam Ki} := by
+    have hsub : Subsingleton {Ki : Subgroup G // Pfam Ki} := by
       refine ⟨fun i j => ?_⟩
       by_contra hij
-      haveI := Subgroup.normalizer_eq_top_iff.mp (hVi_normal i)
-      haveI := Subgroup.normalizer_eq_top_iff.mp (hVi_normal j)
+      have := Subgroup.normalizer_eq_top_iff.mp (hVi_normal i)
+      have := Subgroup.normalizer_eq_top_iff.mp (hVi_normal j)
       rcases h311 (Vfam i) (Vfam j) ((hVfam_le i).trans hVG_le_H)
         ((hVfam_le j).trans hVG_le_H) (hVfam_disj i j hij) with h7 | h7
       · exact hVfam_ne i h7
@@ -938,8 +938,8 @@ theorem orbit_parity_contradiction
   have hfix_eq : ∀ j : {Ki : Subgroup G // Pfam Ki}, xA • j = j →
       (j : Subgroup G) = (⁅KG, R₀⁆ : Subgroup G) := by
     intro j hjfix
-    haveI : Fact p.Prime := ⟨hp⟩
-    haveI hVj_cyc : IsCyclic ↥(Vfam j) := isCyclic_of_prime_card (hVfam_card j)
+    have : Fact p.Prime := ⟨hp⟩
+    have hVj_cyc : IsCyclic ↥(Vfam j) := isCyclic_of_prime_card (hVfam_card j)
     have hKG_le_Nj : KG ≤ Subgroup.normalizer ((Vfam j : Subgroup G) : Set G) := fun k hk =>
       mem_normalizer_of_map_conj_eq (hVfam_conj_eq j k hk)
     have hR₀_le_Nj : R₀ ≤ Subgroup.normalizer ((Vfam j : Subgroup G) : Set G) := by
@@ -1183,7 +1183,7 @@ theorem orbit_parity_contradiction
       (hPp.map H.subtype).of_equiv (Subgroup.subgroupOfEquivOfLe hPG_le_A').symm
     obtain ⟨jP, hjP⟩ := hPG'_p.nonempty_fixed_point_of_prime_not_dvd_card
       {Ki : Subgroup G // Pfam Ki} hp_ndvd_n
-    haveI hVjP_cyc : IsCyclic ↥(Vfam jP) := isCyclic_of_prime_card (hVfam_card jP)
+    have hVjP_cyc : IsCyclic ↥(Vfam jP) := isCyclic_of_prime_card (hVfam_card jP)
     have hKG_le_NjP : KG ≤ Subgroup.normalizer ((Vfam jP : Subgroup G) : Set G) :=
       fun k hk => mem_normalizer_of_map_conj_eq (hVfam_conj_eq jP k hk)
     have hPG_le_NjP : (P.map H.subtype : Subgroup G)

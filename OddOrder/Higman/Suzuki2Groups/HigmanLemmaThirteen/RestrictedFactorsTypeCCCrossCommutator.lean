@@ -193,28 +193,28 @@ theorem commutator_le_frattiniSquare_of_restricted_typeC_factors
   classical
   let hSquareEA :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : CommGroup (frattiniSquare P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : CommGroup (frattiniSquare P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
-  letI : IsMulCommutative (frattini X) :=
+  let : IsMulCommutative (frattini X) :=
     IsMulCommutative.of_comm hEAX.comm
-  letI : CommGroup (frattini X) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini X)) := hEAX.zmodModule
-  letI : IsMulCommutative (frattini Z) :=
+  let : CommGroup (frattini X) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini X)) := hEAX.zmodModule
+  let : IsMulCommutative (frattini Z) :=
     IsMulCommutative.of_comm hEAZ.comm
-  letI : CommGroup (frattini Z) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini Z)) := hEAZ.zmodModule
-  letI : IsMulCommutative (lowerCentralLayer P 0) :=
+  let : CommGroup (frattini Z) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini Z)) := hEAZ.zmodModule
+  let : IsMulCommutative (lowerCentralLayer P 0) :=
     lowerCentralLayerIsMulCommutative P 0
-  letI : CommGroup (lowerCentralLayer P 0) :=
+  let : CommGroup (lowerCentralLayer P 0) :=
     { (inferInstance : Group (lowerCentralLayer P 0)) with
       mul_comm := (lowerCentralLayer_isElementaryAbelian P 0).comm }
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer P 0)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer P 0)) :=
     lowerCentralLayerZmodModule P 0
   let hXneBot : X ≠ (⊥ : Subgroup P) :=
     ne_of_gt (lt_of_le_of_lt bot_le hPhiX.lt)

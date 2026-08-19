@@ -172,7 +172,7 @@ theorem frattini_isElementaryAbelian_of_xiLengthThree
       p ∣ (involutions P).ncard) :
     OddOrder.GroupTheory.IsElementaryAbelian 2 ↥(frattini P) := by
   classical
-  letI : Nontrivial P := by
+  let : Nontrivial P := by
     obtain ⟨x, y, _, _, hxy⟩ := hmulti
     exact ⟨⟨x, y, hxy⟩⟩
   have hinv : (involutions P).Nonempty := by
@@ -198,8 +198,8 @@ theorem frattini_isElementaryAbelian_of_xiLengthThree
         bot_lt_top.ne
     exact fun htop => hM.1
       (le_antisymm le_top (htop ▸ frattini_le_coatom hM))
-  letI : (frattini P).Normal := inferInstance
-  letI : Nontrivial ↥(frattini P) :=
+  let : (frattini P).Normal := inferInstance
+  let : Nontrivial ↥(frattini P) :=
     (Subgroup.nontrivial_iff_ne_bot (frattini P)).mpr hPhiNeBot
   have hPhiInv : IsAInvariant Y.subtype (frattini P) :=
     IsAInvariant.of_characteristic Y.subtype
@@ -210,13 +210,13 @@ theorem frattini_isElementaryAbelian_of_xiLengthThree
       intro x hx y hy
       obtain ⟨g, hg⟩ := hxi.transitive x hx y hy
       exact ⟨g, hg⟩)
-  letI : CommGroup ↥(frattini P) :=
+  let : CommGroup ↥(frattini P) :=
     { (inferInstance : Group ↥(frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   obtain ⟨ι, hι, _e, _he, _hε, classifyFull⟩ :=
     exists_homocyclic_and_invariant_eq_agemo
       (hP.to_subgroup (frattini P)) hPhiInv.restrict htransPhi
-  letI : Fintype ι := hι
+  let : Fintype ι := hι
   have classify : ∀ U : Subgroup ↥(frattini P),
       IsAInvariant hPhiInv.restrict U →
         ∃ s : ℕ, U = Agemo ↥(frattini P) 2 s := by

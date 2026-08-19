@@ -207,6 +207,7 @@ variable {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
 variable [Fintype G] [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)]
 
 omit [DecidableEq (ConjClasses G)] in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Regrouping a class function by conjugacy class.** For `F : G → ℂ` constant on conjugacy
 classes, the sum over `G` regroups as a sum over classes, each contributing `|C| · F(C.out)`. -/
 theorem sum_eq_sum_conjClasses_of_isClassFun {F : G → ℂ}
@@ -232,6 +233,7 @@ theorem sum_eq_sum_conjClasses_of_isClassFun {F : G → ℂ}
   congr 2
   rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **First orthogonality in class-sum form.** For an irreducible representation `ρ`, summing the
 class-sum central-character values weighted by `χ_ρ((C.out)⁻¹)` and rescaling by `χ_ρ(1)` recovers
 `|G|`:
@@ -244,11 +246,11 @@ theorem sum_centralCharacter_mul_character_inv_mul_character_one (ρ : Represent
         centralCharacterOfRep ρ ⟨classSum C, classSum_mem_center C⟩ * ρ.character (C.out)⁻¹)
         * ρ.character 1 = (Nat.card G : ℂ) := by
   classical
-  haveI := nontrivial_of_isIrreducible ρ
+  have := nontrivial_of_isIrreducible ρ
   have hd : ρ.character 1 ≠ 0 := by
     rw [ρ.char_one]; exact Nat.cast_ne_zero.mpr Module.finrank_pos.ne'
   -- First orthogonality `∑_g χ(g) χ(g⁻¹) = |G|` from `char_orthonormal` with `ρ ≅ ρ`.
-  haveI : Invertible (Nat.card G : ℂ) :=
+  have : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   have hNℂ : (Nat.card G : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
   have horth := Representation.char_orthonormal ρ ρ
@@ -287,6 +289,7 @@ section CharacterDegreeDvdMain
 
 variable {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] [Finite G]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **`χ_ρ(1) ∣ |G|`** (Isaacs, *Character Theory of Finite Groups*, Thm 3.11; the classical
 divisibility of the degree).  For an irreducible complex representation `ρ` of a finite group `G`,
 the degree `χ_ρ(1) = dim V` divides the order of the group.
@@ -300,10 +303,10 @@ hence itself an algebraic integer.  Being a rational algebraic integer it is an 
 theorem finrank_dvd_card (ρ : Representation ℂ G V) [IsIrreducible ρ] :
     finrank ℂ V ∣ Nat.card G := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Finite (ConjClasses G) := Finite.of_surjective _ ConjClasses.mk_surjective
-  haveI : Fintype (ConjClasses G) := Fintype.ofFinite _
-  haveI := nontrivial_of_isIrreducible ρ
+  have : Fintype G := Fintype.ofFinite G
+  have : Finite (ConjClasses G) := Finite.of_surjective _ ConjClasses.mk_surjective
+  have : Fintype (ConjClasses G) := Fintype.ofFinite _
+  have := nontrivial_of_isIrreducible ρ
   set d : ℕ := finrank ℂ V with hd_def
   have hdpos : 0 < d := Module.finrank_pos
   have hdℂ : (d : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hdpos.ne'

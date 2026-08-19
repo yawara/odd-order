@@ -84,7 +84,7 @@ theorem trace_blockIdempotent_mul_eq_zero {p : ℕ} (hp : p.Prime) (H : Subgroup
     (hρB : ρ fB = 0) :
     LinearMap.trace K M (ρ (inclusionHom H fb) * ρ (single (h : G) (1 : 𝒪))) = 0 := by
   classical
-  haveI : NeZero p := ⟨hp.ne_zero⟩
+  have : NeZero p := ⟨hp.ne_zero⟩
   set e : MonoidAlgebra 𝒪 G := inclusionHom H fb with hedef
   have he : e * e = e := by rw [hedef, ← map_mul, hfb]
   -- `H` centralises `e`, in particular `h` does

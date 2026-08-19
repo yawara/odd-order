@@ -34,7 +34,7 @@ theorem three_dvd_card_of_isSimpleGroup_of_not_dvd_eight [Finite G] [IsSimpleGro
     (hnonab : ¬ IsMulCommutative G) (h2 : 2 ∣ Nat.card G) (h8 : ¬ (8 : ℕ) ∣ Nat.card G) :
     3 ∣ Nat.card G := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   by_contra h3
   obtain ⟨P⟩ := (inferInstance : Nonempty (Sylow 2 G))
   obtain ⟨n, hn⟩ := P.2.exists_card_eq
@@ -54,9 +54,9 @@ theorem three_dvd_card_of_isSimpleGroup_of_not_dvd_eight [Finite G] [IsSimpleGro
       exact hmul
     exact P.not_dvd_index (hidx ▸ h2)
   -- `P` は可換 (位数 2 か 4)
-  haveI hPab : IsMulCommutative ↥(P : Subgroup G) := by
+  have hPab : IsMulCommutative ↥(P : Subgroup G) := by
     interval_cases n
-    · haveI : IsCyclic ↥(P : Subgroup G) :=
+    · have : IsCyclic ↥(P : Subgroup G) :=
         isCyclic_of_prime_card (p := 2) (by simpa using hn)
       infer_instance
     · exact IsPGroup.isMulCommutative_of_card_eq_prime_sq (p := 2) hn
@@ -97,7 +97,7 @@ theorem three_dvd_card_of_isSimpleGroup_of_not_dvd_eight [Finite G] [IsSimpleGro
   -- Burnside による正規 2-補群と単純性
   obtain ⟨K, hKnormal, hKcompl⟩ :=
     hasNormalPComplement_of_sylow_normalizer_le_centralizer P hNC
-  have hcard := (hKcompl P).card_mul
+  have hcard := (hKcompl P).card_mul_card
   rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal K hKnormal with hbot | htop
   · -- `K = ⊥` ⇒ `P = ⊤` ⇒ `G` 可換 (非可換性に矛盾)
     rw [hbot, Subgroup.card_bot, one_mul] at hcard

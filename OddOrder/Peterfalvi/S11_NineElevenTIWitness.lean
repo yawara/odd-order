@@ -60,6 +60,7 @@ section ConjugationDictionary
 variable [Finite G] {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
   {chars : Section11CharacterData data chief}
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Membership from summand-fixing**: a `U`-element `g` whose chief-factor action fixes the
 Clifford summand `H_k` pointwise lies in the realized single-factor centralizer
 `C_U(H_k) = cuSubOf caseA k`.  Builds the abstract kernel witness of `cuSubOf`'s
@@ -166,7 +167,7 @@ absorbed by the `U`-invariance of `S₀` (`S0_aInvariant`). -/
 theorem exists_w1_rep_Hpart (caseA : CliffordCaseAData chars) (k : Fin data.q) :
     ∃ w : ↥(data.typeP.U ⊔ data.typeP.W1), (w : G) ∈ data.typeP.W1 ∧
       caseA.Hpart k = quotientMulAutHom chief.N_aInvariant w • caseA.S0 := by
-  haveI hUnorm : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal :=
+  have hUnorm : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer le_sup_left).mpr
       (sup_le Subgroup.le_normalizer data.typeP.W1_normalizes_U)
   have htop : data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)

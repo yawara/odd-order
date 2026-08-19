@@ -59,7 +59,7 @@ theorem pow_index_eq_one_of_le_commutator_le_center [Finite G] {A : Subgroup G}
     (hAK : A ≤ _root_.commutator G) (hAc : A ≤ Subgroup.center G) (g : G) :
     g ^ A.index = 1 := by
   classical
-  haveI : IsMulCommutative ↥A :=
+  have : IsMulCommutative ↥A :=
     ⟨⟨fun a b => Subtype.ext (Subgroup.mem_center_iff.mp (hAc b.2) a.1)⟩⟩
   -- conjugates of `g ^ k` landing in the central subgroup `A` are fixed
   have key : ∀ (k : ℕ) (g₀ : G), g₀⁻¹ * g ^ k * g₀ ∈ A → g₀⁻¹ * g ^ k * g₀ = g ^ k := by

@@ -34,6 +34,7 @@ theorem ringEquivOfAddEquivMul_apply {F : Type*} [Field F] (a : F ≃+ F)
     (hmul : ∀ x y : F, a (x * y) = a x * a y) (x : F) :
     ringEquivOfAddEquivMul a hmul x = a x := rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Fixed field = fixed units + `0`** (step (8), p. 110): the fixed set of a
 ring automorphism `σ` of a finite field has one more element than the fixed
 units — the extra element is `0`. -/
@@ -42,7 +43,7 @@ theorem card_fixedSet_eq_card_fixedUnits_add_one {F : Type*} [Field F] [Finite F
     Nat.card {x : F // σ x = x} =
       Nat.card {u : Fˣ // σ (u : F) = (u : F)} + 1 := by
   classical
-  haveI : Fintype F := Fintype.ofFinite F
+  have : Fintype F := Fintype.ofFinite F
   let e : {x : F // σ x = x} ≃ Option {u : Fˣ // σ (u : F) = (u : F)} :=
     { toFun := fun x => if hx : (x : F) = 0 then none
         else some ⟨Units.mk0 (x : F) hx, x.2⟩
@@ -58,7 +59,7 @@ theorem card_fixedSet_eq_card_fixedUnits_add_one {F : Type*} [Field F] [Finite F
           have hu : ((u : Fˣ) : F) ≠ 0 := (u : Fˣ).ne_zero
           simp only [Option.elim, dif_neg hu]
           exact congrArg some (Subtype.ext (Units.ext (by simp))) }
-  haveI : Fintype {u : Fˣ // σ (u : F) = (u : F)} := Fintype.ofFinite _
+  have : Fintype {u : Fˣ // σ (u : F) = (u : F)} := Fintype.ofFinite _
   rw [Nat.card_congr e, Nat.card_eq_fintype_card, Fintype.card_option,
     ← Nat.card_eq_fintype_card]
 
@@ -190,8 +191,8 @@ theorem exists_card_fixedSet_eq_char_pow {F : Type*} [Field F] [Finite F]
     {f : ℕ} (hf : f.Prime) [CharP F f] (σ : F ≃+* F) :
     ∃ a : ℕ, Nat.card {x : F // σ x = x} = f ^ a := by
   classical
-  haveI : Fintype F := Fintype.ofFinite F
-  haveI : Fact f.Prime := ⟨hf⟩
+  have : Fintype F := Fintype.ofFinite F
+  have : Fact f.Prime := ⟨hf⟩
   let A : AddSubgroup F :=
     { carrier := {x | σ x = x}
       add_mem' := fun {a b} ha hb => by
@@ -256,18 +257,18 @@ theorem card_eq_card_fixedPoints_pow_orderOf {F : Type*} [Field F] [Finite F]
     (σ : F ≃+* F) :
     Nat.card F = Nat.card {x : F // σ x = x} ^ orderOf σ := by
   classical
-  haveI : Fintype F := Fintype.ofFinite F
-  haveI : Finite (RingAut F) :=
+  have : Fintype F := Fintype.ofFinite F
+  have : Finite (RingAut F) :=
     Finite.of_injective (fun e : RingAut F => (e : F → F)) DFunLike.coe_injective
   set G : Subgroup (RingAut F) := Subgroup.zpowers σ with hG
-  haveI : Fintype ↥G := Fintype.ofFinite _
-  haveI : FaithfulSMul ↥G F :=
+  have : Fintype ↥G := Fintype.ofFinite _
+  have : FaithfulSMul ↥G F :=
     ⟨fun {g₁ g₂} h => Subtype.ext (FaithfulSMul.eq_of_smul_eq_smul (α := F) (fun x => h x))⟩
   have hfr : finrank (FixedPoints.subfield G F) F = Fintype.card ↥G :=
     FixedPoints.finrank_eq_card G F
   have hGcard : Fintype.card ↥G = orderOf σ := by
     rw [← Nat.card_eq_fintype_card, hG, Nat.card_zpowers]
-  haveI : Fintype (FixedPoints.subfield G F) := Fintype.ofFinite _
+  have : Fintype (FixedPoints.subfield G F) := Fintype.ofFinite _
   have hcard : Fintype.card F = Fintype.card (FixedPoints.subfield G F) ^
       finrank (FixedPoints.subfield G F) F := Module.card_eq_pow_finrank
   have hset : Nat.card (FixedPoints.subfield G F) = Nat.card {x : F // σ x = x} := by
@@ -293,8 +294,8 @@ A ring automorphism of `F` fixes the prime field `𝔽_q = ZMod q`, so it is a
 is an injective homomorphism into the cyclic Galois group. -/
 theorem isCyclic_ringAut_of_charP {F : Type*} [Field F] [Finite F] {q : ℕ}
     [Fact q.Prime] [CharP F q] : IsCyclic (RingAut F) := by
-  letI : Algebra (ZMod q) F := ZMod.algebra F q
-  haveI : IsCyclic (F ≃ₐ[ZMod q] F) := inferInstance
+  let : Algebra (ZMod q) F := ZMod.algebra F q
+  have : IsCyclic (F ≃ₐ[ZMod q] F) := inferInstance
   let φ : RingAut F →* (F ≃ₐ[ZMod q] F) :=
     { toFun := fun σ => AlgEquiv.ofRingEquiv (f := σ) (fun z => by
         have h := RingHom.ext_zmod (σ.toRingHom.comp (algebraMap (ZMod q) F))
@@ -359,7 +360,7 @@ theorem comm_of_Q1_ne_bot :
     ∀ {F : Type uG} [NearFields.NearField F]
       (_model : NearFields.AffineNearFieldModel fc.rankOneQuotient F),
       fc.toHypothesis.Q1 ≠ ⊥ → ∀ x y : F, x * y = y * x := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   intro F instF _model hQ1 x y
   rcases fc.card_nearField_eq_nine_and_Q1_eq_bot _model with hcomm | ⟨_, _, hbot⟩
   · exact hcomm x y
@@ -432,7 +433,7 @@ theorem exists_qbarEquiv {F : Type uG} [NearFields.NearField F]
             (fc.toHypothesis.H.subgroupOf
               (Subgroup.centralizer (fc.P : Set G))).normalCore) =
           QuotientGroup.mk' _ ⟨(m : G), m.2.2⟩ := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
   set N : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hNdef
@@ -471,7 +472,7 @@ theorem exists_qbarEquiv {F : Type uG} [NearFields.NearField F]
   have hcard : Nat.card ↥M₀ = Nat.card ↥fc.rankOneQuotient.Q := by
     obtain ⟨e5⟩ := fc.centralizer_inf_mulEquiv_units model
     rw [Nat.card_congr e5.toEquiv, Nat.card_congr model.qEquiv.toEquiv]
-  haveI : Finite ↥M₀ := inferInstance
+  have : Finite ↥M₀ := inferInstance
   have hpiQbij : Function.Bijective piQ :=
     (Nat.bijective_iff_injective_and_card piQ).mpr ⟨hpiQinj, hcard⟩
   refine ⟨MulEquiv.ofBijective piQ hpiQbij, ?_⟩
@@ -499,7 +500,7 @@ theorem cardFixedConj_eq_cardFixedM0 {F : Type uG} [NearFields.NearField F]
           (qb : _)} =
       Nat.card {m : ↥(fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)) //
         w * (m : G) * w⁻¹ = (m : G)} := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
   set N : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hNdef
@@ -565,7 +566,7 @@ theorem exists_card_fixedM0_eq_two_pow
     ∃ b : ℕ, Nat.card {m : ↥(fc.toHypothesis.Q ⊓
       Subgroup.centralizer (fc.P : Set G)) // w * (m : G) * w⁻¹ = (m : G)} = 2 ^ b := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   set K : Subgroup G :=
     Subgroup.centralizer ((Subgroup.zpowers w : Subgroup G) : Set G) with hK
   set M₀ : Subgroup G := fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G) with hM₀
@@ -622,13 +623,13 @@ theorem cardFixedField_char_or_nine
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     Nat.card {x : F // model.dAut (fc.sigmaElt hwW hwP) x = x} = model.char ∨
     Nat.card {x : F // model.dAut (fc.sigmaElt hwW hwP) x = x} = 9 := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   -- `F` is a field (`Q₁ ≠ 1` ⟹ commutative)
   have hcomm := fc.comm_of_Q1_ne_bot model hQ1
-  letI : Field F := NearFields.fieldOfComm hcomm
-  haveI : Finite F := by
+  let : Field F := NearFields.fieldOfComm hcomm
+  have : Finite F := by
     have hinj : Function.Injective (fun x : F => model.emb (Multiplicative.ofAdd x)) :=
       fun a b hab => Multiplicative.ofAdd.injective (model.emb_injective hab)
     exact Finite.of_injective _ hinj
@@ -642,7 +643,7 @@ theorem cardFixedField_char_or_nine
     · exact Or.inl (hchar.symm.trans h)
     · exact Or.inr (hchar.symm.trans h)
   -- `CharP F (model.char)` (from `char_spec` + `char_prime`)
-  haveI : CharP F model.char := by
+  have : CharP F model.char := by
     have hchar0 : (model.char : F) = 0 := by
       have h := model.char_spec 1
       rwa [nsmul_eq_mul, mul_one] at h
@@ -650,7 +651,7 @@ theorem cardFixedField_char_or_nine
       have hdvd : ringChar F ∣ model.char := ringChar.dvd hchar0
       rcases Nat.Prime.eq_one_or_self_of_dvd model.char_prime _ hdvd with h1 | h
       · exfalso
-        haveI : CharP F 1 := h1 ▸ ringChar.charP F
+        have : CharP F 1 := h1 ▸ ringChar.charP F
         have h10 : (1 : F) = 0 := by
           have hc := (CharP.cast_eq_zero_iff F 1 1).mpr (dvd_refl 1)
           rwa [Nat.cast_one] at hc
@@ -717,16 +718,16 @@ theorem card_prime_and_card_field_of_Q1_ne_bot
           5 ^ Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) ∨
         Nat.card F =
           9 ^ Nat.card ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   have hcomm := fc.comm_of_Q1_ne_bot model hQ1
-  letI : Field F := NearFields.fieldOfComm hcomm
-  haveI : Finite F := by
+  let : Field F := NearFields.fieldOfComm hcomm
+  have : Finite F := by
     have hinj : Function.Injective (fun x : F => model.emb (Multiplicative.ofAdd x)) :=
       fun a b hab => Multiplicative.ofAdd.injective (model.emb_injective hab)
     exact Finite.of_injective _ hinj
   -- `CharP F (model.char)` and `Fact`
-  haveI hchP : CharP F model.char := by
+  have hchP : CharP F model.char := by
     have hchar0 : (model.char : F) = 0 := by
       have h := model.char_spec 1
       rwa [nsmul_eq_mul, mul_one] at h
@@ -734,14 +735,14 @@ theorem card_prime_and_card_field_of_Q1_ne_bot
       have hdvd : ringChar F ∣ model.char := ringChar.dvd hchar0
       rcases Nat.Prime.eq_one_or_self_of_dvd model.char_prime _ hdvd with h1 | h
       · exfalso
-        haveI : CharP F 1 := h1 ▸ ringChar.charP F
+        have : CharP F 1 := h1 ▸ ringChar.charP F
         have h10 : (1 : F) = 0 := by
           have hc := (CharP.cast_eq_zero_iff F 1 1).mpr (dvd_refl 1)
           rwa [Nat.cast_one] at hc
         exact one_ne_zero h10
       · exact h
     rw [← hrc]; exact ringChar.charP F
-  haveI : Fact (model.char.Prime) := ⟨model.char_prime⟩
+  have : Fact (model.char.Prime) := ⟨model.char_prime⟩
   set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
   set N : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hNdef
   set CW : Subgroup G := fc.toHypothesis.W ⊓ L with hCWdef
@@ -779,13 +780,13 @@ theorem card_prime_and_card_field_of_Q1_ne_bot
   set ψ : ↥CW →* RingAut F := (fc.dAutHom hcomm model).comp f with hψdef
   have hψinj : Function.Injective ψ := hdauinj.comp hfinj
   -- `C_W(P)` is cyclic (subgroup of the cyclic `RingAut F`)
-  haveI : IsCyclic (RingAut F) := isCyclic_ringAut_of_charP (q := model.char)
-  haveI : IsCyclic ↥CW := isCyclic_of_injective ψ hψinj
-  haveI : Fintype ↥CW := Fintype.ofFinite _
+  have : IsCyclic (RingAut F) := isCyclic_ringAut_of_charP (q := model.char)
+  have : IsCyclic ↥CW := isCyclic_of_injective ψ hψinj
+  have : Fintype ↥CW := Fintype.ofFinite _
   -- a generator `g` of `C_W(P)`, of order `ℓ`
   obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := ↥CW)
   have hℓpos : 1 < Nat.card ↥CW := by
-    haveI : Nonempty ↥CW := ⟨1⟩
+    have : Nonempty ↥CW := ⟨1⟩
     have := Nat.card_pos (α := ↥CW)
     omega
   have hgord : orderOf g = Nat.card ↥CW := orderOf_eq_card_of_forall_mem_zpowers hg

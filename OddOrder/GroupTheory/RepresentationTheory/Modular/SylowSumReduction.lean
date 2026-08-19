@@ -214,7 +214,7 @@ theorem sum_block_character_mul_finrank_invariants [Fact p.Prime] (S : Sylow p G
         * (∑ i ∈ Finset.univ.filter (fun i => blockOfIrr e hπG hlinG hnilG i = B),
             ordinaryIdempotent e i).coeff y := by
   classical
-  letI := Fintype.ofFinite ↥(S : Subgroup G)
+  let := Fintype.ofFinite ↥(S : Subgroup G)
   have hcard : Fintype.card ↥(S : Subgroup G) = ordProj[p] (Nat.card G) := by
     rw [← Nat.card_eq_fintype_card]; exact S.card_eq_multiplicity
   have hne : ((ordProj[p] (Nat.card G) : ℕ) : K) ≠ 0 :=

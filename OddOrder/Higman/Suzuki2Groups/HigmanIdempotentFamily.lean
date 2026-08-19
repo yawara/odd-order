@@ -196,6 +196,7 @@ theorem actualModTwoEnd_eq_add_of_one_sub_two_mul
       _ = k x - (2 • (νu * νv) : AddMonoid.End (Additive A)) x := hpoint]
   exact hsub
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Higman Lemma 3** (p. 84): the chosen quotient family is additive on
 products whenever its inverse-conjugation family reverses products. -/
 theorem HigmanEndomorphismFamily.modTwo_mul

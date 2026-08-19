@@ -246,7 +246,7 @@ theorem restrict_H_certainType_eq
     (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) (i : Fin (Nat.card h46.W1)) :
     ClassFunction.restrict H ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
       = ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ) := by
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
   refine ClassFunction.ext (fun g => ?_)
   have hgK : (g : ↥L) ∈ h46.K := hHK.ge g.2
   have hval := congrArg (fun f : ClassFunction ↥h46.K ℂ => f ⟨(g : ↥L), hgK⟩)
@@ -519,7 +519,7 @@ theorem SibleyDadeHypothesis.columnSum_notMem_SsubFiltration
     {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) :
     OddOrder.Peterfalvi.S06.columnSum h46 χ₂ ∉ hyp.SsubFiltration h46.W2 := by
   classical
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
   set ψ : ClassFunction ↥H ℂ :=
     ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ) with hψdef
   have hψirr : IsIrreducibleCharacter ψ := by
@@ -711,7 +711,7 @@ theorem inner_central_restrict_eq_apply_one [Finite ↥H]
     ClassFunction.inner φ
         (ClassFunction.restrict (W2.subgroupOf H) (θ : ClassFunction ↥H ℂ))
       = (θ : ClassFunction ↥H ℂ) 1 := by
-  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  have : Fintype ↥H := Fintype.ofFinite ↥H
   have hφφ : ClassFunction.inner φ φ = 1 := by
     have h := irreducibleCharacter_inner_eq_ite
       (⟨φ, hφ⟩ : IrreducibleCharacter ↥(W2.subgroupOf H))

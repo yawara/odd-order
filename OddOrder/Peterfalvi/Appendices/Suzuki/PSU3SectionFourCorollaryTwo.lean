@@ -194,7 +194,7 @@ theorem inf_centralizer_le_residual
           (Subgroup.centralizer (X : Set G))).map
         (Subgroup.centralizer (X : Set G)).subtype := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨S, hS⟩ := hCQ.exists_le_sylow
   intro x hx
   obtain ⟨hxQ, hxC⟩ := Subgroup.mem_inf.mp hx
@@ -213,7 +213,7 @@ theorem sq_eq_one_mem_residual {y : G} (hy2 : y ^ 2 = 1)
         (Subgroup.centralizer (X : Set G))).map
       (Subgroup.centralizer (X : Set G)).subtype := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   set tC : ↥(Subgroup.centralizer (X : Set G)) := ⟨y, hyX⟩ with htCdef
   have htsq : tC ^ 2 = 1 := Subtype.ext (by simpa [htCdef] using hy2)
   have hT : IsPGroup 2 ↥(Subgroup.zpowers tC) := by
@@ -436,7 +436,7 @@ theorem isStandardModel_residualQuotient (hXV : X ≤ hyp.V) (hX : X ≠ ⊥)
       (M : (hyp.residualQuotientHypothesis details).QuotientFieldModel data.n)
       (x₀ : ↥(Subgroup.center (hyp.residualQuotientHypothesis details).Q)), x₀ ≠ 1 →
       (hyp.residualQuotientHypothesis details).IsStandardModel sfive M x₀ := by
-  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+  let := MulAction.compHom (ULift.{v} (Unital data.n))
     details.residualQuotientEquiv.toMonoidHom
   have ihq : TheoremAInductionBelow
       (↥(residual (G := G) X) ⧸ Subgroup.center ↥(residual (G := G) X))
@@ -474,7 +474,7 @@ theorem corollaryTwo_residualQuotient (hXV : X ≤ hyp.V) (hX : X ≠ ⊥)
           ∃ ω ∈ (hyp.residualQuotientHypothesis details).Q,
             ω ∉ (hyp.residualQuotientHypothesis details).Q0 ∧
               f₁ ω = ζ⁻¹ * ω⁻¹ * ζ ∧ h₁ ω = ζ ^ 3 := by
-  letI := MulAction.compHom (ULift.{v} (Unital data.n))
+  let := MulAction.compHom (ULift.{v} (Unital data.n))
     details.residualQuotientEquiv.toMonoidHom
   have ihq : TheoremAInductionBelow
       (↥(residual (G := G) X) ⧸ Subgroup.center ↥(residual (G := G) X))
@@ -496,7 +496,7 @@ theorem corollaryTwo_residualQuotient (hXV : X ≤ hyp.V) (hX : X ≠ ⊥)
       (hyp.isSuzuki2Group_residualQuotientHypothesis_Q details) hm hQ0card hcardQ ihq
   obtain ⟨w, hwW, hw1⟩ := hyp.exists_ne_one_mem_residualQuotientHypothesis_W details
   have hW1 : 1 < Nat.card ↥(hyp.residualQuotientHypothesis details).W := by
-    haveI : Nontrivial ↥(hyp.residualQuotientHypothesis details).W :=
+    have : Nontrivial ↥(hyp.residualQuotientHypothesis details).W :=
       ⟨⟨⟨w, hwW⟩, 1, fun hc => hw1 (congrArg Subtype.val hc)⟩⟩
     exact Finite.one_lt_card
   have hcard : 3 ≤ Nat.card ↥(OddOrder.FiniteField.frobFixedSubfield M.E 2 data.n) := by

@@ -182,8 +182,8 @@ theorem not_exists_characteristic_isElementaryAbelian_card_prime_sq_of_normal_ab
       IsElementaryAbelian p K ∧ Nat.card K = p ^ 2 := by
   rintro ⟨K, hK_char, hK_elem, hK_card⟩
   let B : Subgroup P := K.map T.subtype
-  haveI : T.Normal := hT_normal
-  haveI : K.Characteristic := hK_char
+  have : T.Normal := hT_normal
+  have : K.Characteristic := hK_char
   have hB_normal : B.Normal := by
     dsimp [B]
     infer_instance
@@ -602,7 +602,7 @@ theorem quotient_involution_comap_card_ne_eight_of_card_ne_four
     ∀ q : P ⧸ C, q ≠ 1 → q ^ 2 = 1 →
       Nat.card ((Subgroup.zpowers q).comap (QuotientGroup.mk' C)) ≠ 8 := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   intro q hq_ne hq_sq
   let Q : Subgroup (P ⧸ C) := Subgroup.zpowers q
   let T : Subgroup P := Q.comap (QuotientGroup.mk' C)
@@ -643,7 +643,7 @@ theorem quotient_involution_conj_square_eq_inv_of_zpowers
     {a : P} (haq : QuotientGroup.mk' C a = q) :
     a * c ^ 2 * a⁻¹ = (c ^ 2)⁻¹ := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   let Q : Subgroup (P ⧸ C) := Subgroup.zpowers q
   let T : Subgroup P := Q.comap (QuotientGroup.mk' C)
   have hC_le_T : C ≤ T := QuotientGroup.le_comap_mk' C Q
@@ -757,7 +757,7 @@ theorem quotient_isCyclic_of_involutions_invert_zpowers_square
         Nat.card ((Subgroup.zpowers q).comap (QuotientGroup.mk' C)) ≠ 8) :
     IsCyclic (P ⧸ C) := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hC_cyclic : IsCyclic C := by
     rw [hC_eq]
     exact Subgroup.isCyclic_zpowers c
@@ -788,7 +788,7 @@ theorem quotient_isCyclic_of_involutions_invert_zpowers_square
     rw [MonoidHom.mem_ker]
     ext x
     have hcomm : g * (x : P) = (x : P) * g := by
-      haveI : IsCyclic C := hC_cyclic
+      have : IsCyclic C := hC_cyclic
       have hmul : (⟨g, hg⟩ : C) * x = x * ⟨g, hg⟩ :=
         (inferInstance : IsMulCommutative C).is_comm.comm _ _
       exact congrArg Subtype.val hmul
@@ -798,7 +798,7 @@ theorem quotient_isCyclic_of_involutions_invert_zpowers_square
       _ = (x : P) := by simp [mul_assoc]
       _ = (((1 : MulAut C) x : C) : P) := by rfl
   let ψ : P ⧸ C →* MulAut C := QuotientGroup.lift C φ hC_le_ker
-  letI : MulDistribMulAction (P ⧸ C) C := MulDistribMulAction.compHom C ψ
+  let : MulDistribMulAction (P ⧸ C) C := MulDistribMulAction.compHom C ψ
   have hinv : ∀ q : P ⧸ C, q ≠ 1 → q ^ 2 = 1 → q • n = n⁻¹ := by
     intro q hq_ne hq_sq
     obtain ⟨a, haq⟩ := QuotientGroup.mk'_surjective C q
@@ -923,7 +923,7 @@ theorem index_eq_two_of_cyclic_quotient_of_two_adic_conj_cases
     rw [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
     exact ha_sq_mem
   have hQ : IsPGroup 2 (P ⧸ C) := hP.to_quotient C
-  haveI : IsCyclic (P ⧸ C) := hquot_cyclic
+  have : IsCyclic (P ⧸ C) := hquot_cyclic
   obtain ⟨r, hr_sq⟩ :=
     exists_sq_eq_of_isCyclic_two_group_involution_of_card_ne_two
       (Q := P ⧸ C) hQ hq_ne hq_sq hcard_ne_two
@@ -1110,7 +1110,7 @@ theorem dihedralOrQuaternionOrSemiDihedral_of_maximal_normal_zpowers_lt_top
     rw [hC_eq]
     exact Subgroup.isCyclic_zpowers c
   have hC_comm : IsMulCommutative C := by
-    haveI : IsCyclic C := hC_cyclic
+    have : IsCyclic C := hC_cyclic
     infer_instance
   have hCent : Subgroup.centralizer (C : Set P) = C :=
     centralizer_eq_of_maximal_normal_isMulCommutative hP hC_comm hC_max
@@ -1152,7 +1152,7 @@ theorem dihedralOrQuaternionOrSemiDihedral_of_maximal_normal_zpowers_lt_top_card
     rw [hC_eq]
     exact Subgroup.isCyclic_zpowers c
   have hC_comm : IsMulCommutative C := by
-    haveI : IsCyclic C := hC_cyclic
+    have : IsCyclic C := hC_cyclic
     infer_instance
   have hCent : Subgroup.centralizer (C : Set P) = C :=
     centralizer_eq_of_maximal_normal_isMulCommutative hP hC_comm hC_max
@@ -1210,7 +1210,7 @@ theorem isCyclic_or_two_dihedralOrQuaternionOrSemiDihedral_of_normal_abelian_cyc
       exact hnone ⟨x, y, hxy⟩⟩⟩
   obtain ⟨C, hC_normal, hC_comm, hC_max⟩ :=
     exists_maximal_normal_isMulCommutative (P := P)
-  haveI hC_normal_inst : C.Normal := hC_normal
+  have hC_normal_inst : C.Normal := hC_normal
   have hC_cyclic : IsCyclic C := hcyc C hC_normal hC_comm
   have hC_ne_top : C ≠ ⊤ := by
     intro hC_top
@@ -1261,7 +1261,7 @@ theorem isCyclic_of_subgroups_card_prime_unique_of_prime_ne_two
     IsCyclic P := by
   have hcyc : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → IsCyclic B := by
     intro B _hB_normal hB_comm
-    haveI : IsMulCommutative B := hB_comm
+    have : IsMulCommutative B := hB_comm
     exact hP.isCyclic_subgroup_of_subgroups_card_prime_unique hUnique B
   rcases isCyclic_or_two_dihedralOrQuaternionOrSemiDihedral_of_normal_abelian_cyclic
       hP hcyc with hP_cyclic | htwo
@@ -1296,7 +1296,7 @@ theorem isCyclic_or_two_quaternion_of_subgroups_card_prime_unique
   · exact Or.inl hP_cyclic
   have hcyc : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → IsCyclic B := by
     intro B _hB_normal hB_comm
-    haveI : IsMulCommutative B := hB_comm
+    have : IsMulCommutative B := hB_comm
     exact hP.isCyclic_subgroup_of_subgroups_card_prime_unique hUnique B
   rcases isCyclic_or_two_dihedralOrQuaternionOrSemiDihedral_of_normal_abelian_cyclic
       hP hcyc with hP_cyclic' | htwo

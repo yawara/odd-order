@@ -48,7 +48,7 @@ noncomputable def rankOneHypothesisOfCardEqMulPred (hp : p.Prime) (hp2 : p ≠ 2
       · exact absurd rfl hp2
     · exact h
   have hbex : ∃ b : Ω, b ≠ a := by
-    haveI : Nontrivial Ω := Finite.one_lt_card_iff_nontrivial.mp (by omega)
+    have : Nontrivial Ω := Finite.one_lt_card_iff_nontrivial.mp (by omega)
     exact exists_ne a
   set b := Classical.choose hbex with hbdef
   have hab : b ≠ a := Classical.choose_spec hbex

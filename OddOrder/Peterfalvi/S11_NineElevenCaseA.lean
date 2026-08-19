@@ -177,7 +177,7 @@ theorem caseA_refuter_of_equality_refutation [Finite G]
         (∀ χ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime \ S₂,
           ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
             (S₂ ∪ {χ, χ.conj}) hyp.base.A0)) → False := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   intro S₂ hS₁sub hS₂sub hS₂conj hS₂coh hS₃ne hpairs
   -- numeric positivity inputs of the squeeze
@@ -328,7 +328,7 @@ theorem caseA_two_summand_inertia_inputs [Finite G]
     ∃ K₁ K₂ : Subgroup G,
       K₁.relIndex hyp.s11Setup.U = caseA.a ∧ K₂.relIndex hyp.s11Setup.U = caseA.a ∧
       (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).C = K₁ ⊓ K₂ := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   refine OddOrder.Peterfalvi.S11.nineElevenTwo_two_summand_inertia caseA ?_
   intro φ hφ
   -- `𝒮(H₀C) ⊆ 𝒮(H₀C′)` along `H₀C′ ≤ H₀C` (`C′ = [C,C] ≤ C`, `C = cSub` by `C_eq_cSub`)
@@ -414,7 +414,7 @@ theorem caseA_nineElevenThree_count_inputs [Finite G]
         * (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u
       = hyp.chief.p ^ hyp.s11Setup.q
         * (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   -- `H₀C′ ≤ H₀U′` (`C′ = [C,C] ≤ [U,U] = U′`), as in `caseA_refuter_of_equality_refutation`
   have hCUle : hyp.C ≤ hyp.s11Setup.U := by
@@ -458,7 +458,7 @@ theorem sOf_mem_Snorm_pos [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
     {Y : Subgroup G} {χ : ClassFunction ↥M ℂ}
     (hχ : χ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup Y) :
     0 < OddOrder.Peterfalvi.S07.Snorm χ := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   have hIKF : χ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily
       ((derivedInG M).subgroupOf M) (Y.subgroupOf M) := by
@@ -510,7 +510,7 @@ theorem caseA_sTwo_subset_degreeQaCut [Finite G]
     S₂ ⊆ {χ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup
         (hyp.chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub hyp.s11Setup) |
       IsIrreducibleCharacter χ ∧ χ 1 = ((hyp.s11Setup.q * caseA.a : ℕ) : ℂ)} := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   intro χ hχS₂
   by_contra hnot
@@ -600,7 +600,7 @@ theorem caseA_nineElevenTwo_tiWitness [Finite G]
       hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0))
     (htype : IsTypeIII M ∨ IsTypeIV M) :
     OddOrder.Peterfalvi.S11.NineElevenTwoTIWitness caseA := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   refine OddOrder.Peterfalvi.S11.nineElevenTwoTIWitness_of_degree_dichotomy caseA ?_
   intro φ hφ
   -- `𝒮(H₀C) ⊆ 𝒮(H₀C′)` along `H₀C′ ≤ H₀C` (`C′ = [C,C] ≤ C`, `C = cSub` by `C_eq_cSub`)

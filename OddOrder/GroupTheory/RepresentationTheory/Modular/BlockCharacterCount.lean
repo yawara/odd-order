@@ -32,7 +32,7 @@ The block-diagonal shape of `J` is the second main theorem in the form
 
 namespace OddOrder.RepresentationTheory.Modular
 
-open IsLocalRing Matrix MonoidAlgebra OddOrder.GroupTheory OddOrder.MatrixModule
+open IsLocalRing _root_.OddOrder.Matrix MonoidAlgebra OddOrder.GroupTheory OddOrder.MatrixModule
 open OddOrder.RepresentationTheory
 
 variable {p : ℕ} {𝒪 K : Type*} [CommRing 𝒪] [IsDomain 𝒪] [ValuationRing 𝒪]
@@ -104,8 +104,8 @@ theorem card_blockOfIrr_eq_card_inducedBlockOfCentralizer (B : Block πG hπG hl
       = Nat.card {c : (Σ D : PElementClass p G, ι D) //
           inducedBlockOfColumn hp hπ hlin hπG hlinG hnilG c = B} := by
   classical
-  haveI : Fintype κ := Fintype.ofFinite κ
-  haveI : Fintype (PElementClass p G) := Fintype.ofFinite _
+  have : Fintype κ := Fintype.ofFinite κ
+  have : Fintype (PElementClass p G) := Fintype.ofFinite _
   have hdet : ((generalizedDecompositionMatrix hp hω' hπ hlin hkerJ eG).submatrix id
       (sectionColumnEquiv hp hπ hlin hkerJ eG).symm).det ≠ 0 :=
     (isUnit_det_generalizedDecompositionMatrix hp hω' hπ hlin hkerJ eG).ne_zero

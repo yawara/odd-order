@@ -39,9 +39,9 @@ theorem complement_inf_Q_eq_W1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   -- `E` is a Z-group (odd Frobenius complement), and `Em ≅ E`.
   have hodd : Odd (Nat.card ↥frob.complement) := hG.odd.of_dvd_nat
     ((Subgroup.card_subgroup_dvd_card _).trans (Subgroup.card_subgroup_dvd_card L))
-  haveI hZE : _root_.IsZGroup ↥frob.complement :=
+  have hZE : _root_.IsZGroup ↥frob.complement :=
     OddOrder.Isaacs.Ch06.isZGroup_complement_of_isFrobeniusGroup_of_odd frob.frobenius hodd
-  haveI hZEm : _root_.IsZGroup ↥Em := _root_.IsZGroup.of_injective
+  have hZEm : _root_.IsZGroup ↥Em := _root_.IsZGroup.of_injective
     (f := ((Subgroup.equivMapOfInjective frob.complement L.subtype
       Subtype.coe_injective).symm : ↥Em ≃* ↥frob.complement).toMonoidHom)
     (MulEquiv.injective _)
@@ -58,8 +58,8 @@ theorem complement_inf_Q_eq_W1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     push_cast
     exact hg1
   have hpg : IsPGroup hyp.q ↥R := fun x => ⟨1, by rw [pow_one]; exact hexp x⟩
-  haveI hFq : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
-  haveI hcyc : IsCyclic ↥R := hpg.isCyclic_of_isZGroup
+  have hFq : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
+  have hcyc : IsCyclic ↥R := hpg.isCyclic_of_isZGroup
   -- cyclic of exponent `q` ⟹ `|E ⊓ Q| ∣ q`
   obtain ⟨g, hgen⟩ := hcyc.exists_generator
   have hgq : g ^ hyp.q = 1 := hexp g
@@ -123,11 +123,11 @@ theorem exists_typeIFrobeniusData_W1_le [Finite G] (_hG : OddOrder.BG.IsMinimalS
       hyp.W1 ≤ frob.complement.map L.subtype := by
   obtain ⟨frob₀, hker₀⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius _hG hnoV hLmax hLtypeI
   have hW1L : hyp.W1 ≤ L := hyp.W1_normalizes_U.trans hNUL
-  haveI : (frob₀.typeI.typeF.H.subgroupOf L).Normal := frob₀.frobenius.isNormal
+  have : (frob₀.typeI.typeF.H.subgroupOf L).Normal := frob₀.frobenius.isNormal
   -- `L` (maximal) is solvable, hence so is the kernel.
-  haveI hLsolv : IsSolvable ↥L :=
-    _hG.solvable_of_lt_top L (lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hLmax).1)
-  haveI : IsSolvable ↥(frob₀.typeI.typeF.H.subgroupOf L) := inferInstance
+  have hLsolv : Group.IsSolvable ↥L :=
+    _hG.isSolvable_of_lt_top L (lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hLmax).1)
+  have : Group.IsSolvable ↥(frob₀.typeI.typeF.H.subgroupOf L) := inferInstance
   -- coprimality `|W₁| = q` to `|L_F|`.
   have hcop : Nat.Coprime (Nat.card ↥(hyp.W1.subgroupOf L))
       (Nat.card ↥(frob₀.typeI.typeF.H.subgroupOf L)) := by
@@ -180,10 +180,10 @@ theorem exists_typeIFrobeniusData_W2_le [Finite G] (_hG : OddOrder.BG.IsMinimalS
       hyp.W2 ≤ frob.complement.map L.subtype := by
   obtain ⟨frob₀, hker₀⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius _hG hnoV hLmax hLtypeI
   have hW2L : hyp.W2 ≤ L := hyp.W2_normalizes_V.trans hNVL
-  haveI : (frob₀.typeI.typeF.H.subgroupOf L).Normal := frob₀.frobenius.isNormal
-  haveI hLsolv : IsSolvable ↥L :=
-    _hG.solvable_of_lt_top L (lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hLmax).1)
-  haveI : IsSolvable ↥(frob₀.typeI.typeF.H.subgroupOf L) := inferInstance
+  have : (frob₀.typeI.typeF.H.subgroupOf L).Normal := frob₀.frobenius.isNormal
+  have hLsolv : Group.IsSolvable ↥L :=
+    _hG.isSolvable_of_lt_top L (lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hLmax).1)
+  have : Group.IsSolvable ↥(frob₀.typeI.typeF.H.subgroupOf L) := inferInstance
   have hcop : Nat.Coprime (Nat.card ↥(hyp.W2.subgroupOf L))
       (Nat.card ↥(frob₀.typeI.typeF.H.subgroupOf L)) := by
     have hW2card : Nat.card ↥(hyp.W2.subgroupOf L) = hyp.p := by
@@ -227,9 +227,9 @@ theorem complement_inf_P_structure_dichotomy [Finite G]
     have hW2le : hyp.W2 ≤ Em ⊓ hyp.P := le_inf hW2E (W2_le_P _hG hyp)
     have hodd : Odd (Nat.card ↥frob.complement) := _hG.odd.of_dvd_nat
       ((Subgroup.card_subgroup_dvd_card _).trans (Subgroup.card_subgroup_dvd_card L))
-    haveI hZE : _root_.IsZGroup ↥frob.complement :=
+    have hZE : _root_.IsZGroup ↥frob.complement :=
       OddOrder.Isaacs.Ch06.isZGroup_complement_of_isFrobeniusGroup_of_odd frob.frobenius hodd
-    haveI hZEm : _root_.IsZGroup ↥Em := _root_.IsZGroup.of_injective
+    have hZEm : _root_.IsZGroup ↥Em := _root_.IsZGroup.of_injective
       (f := ((Subgroup.equivMapOfInjective frob.complement L.subtype
         Subtype.coe_injective).symm : ↥Em ≃* ↥frob.complement).toMonoidHom)
       (MulEquiv.injective _)
@@ -245,8 +245,8 @@ theorem complement_inf_P_structure_dichotomy [Finite G]
       push_cast
       exact hg1
     have hpg : IsPGroup hyp.p ↥R := fun x => ⟨1, by rw [pow_one]; exact hexp x⟩
-    haveI hFp : Fact hyp.p.Prime := ⟨hyp.p_prime⟩
-    haveI hcyc : IsCyclic ↥R := hpg.isCyclic_of_isZGroup
+    have hFp : Fact hyp.p.Prime := ⟨hyp.p_prime⟩
+    have hcyc : IsCyclic ↥R := hpg.isCyclic_of_isZGroup
     obtain ⟨g, hgen⟩ := hcyc.exists_generator
     have hcard_dvd : Nat.card ↥R ∣ hyp.p := by
       rw [← orderOf_eq_card_of_forall_mem_zpowers hgen]
@@ -300,7 +300,7 @@ theorem complement_le_PW1_of_c_eq_one [Finite G]
     (Subgroup.card_subgroup_dvd_card E).trans (Subgroup.card_subgroup_dvd_card L)
   have hodd : Odd (Nat.card ↥E) := _hG.odd.of_dvd_nat hEdvd
   -- Huppert V.8.18 b): `W₂` is normal in `E`, so `E` normalizes `W₂` in `↥L`.
-  haveI hRnormal : R.Normal :=
+  have hRnormal : R.Normal :=
     OddOrder.Isaacs.Ch06.normal_of_card_prime_of_isFrobeniusGroup_of_odd
       frob.frobenius hodd hyp.p_prime hRcard
   have hEnorm := (Subgroup.normal_subgroupOf_iff_le_normalizer hW2L_le_E).mp hRnormal
@@ -393,7 +393,7 @@ theorem complement_card_eq_pq_V_of_structure_of_c_eq_one [Finite G]
   obtain ⟨hWnorm, hdisj, _⟩ := P_W1_structure _hG hyp
   have hPleH : hyp.P ≤ Hg := le_sup_left
   have hInfCard : Nat.card ↥(Em ⊓ hyp.P) = hyp.p := by rw [hInf]; exact hyp.p_eq_card_W2.symm
-  haveI hPnorm : (hyp.P.subgroupOf Hg).Normal :=
+  have hPnorm : (hyp.P.subgroupOf Hg).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hPleH).mpr (sup_le Subgroup.le_normalizer hWnorm)
   have hHcard : Nat.card ↥Hg = Nat.card ↥hyp.P * hyp.q := by
     have h := OddOrder.BG.Ch3.S12.card_sup_eq_mul_of_le_normalizer_of_disjoint hWnorm

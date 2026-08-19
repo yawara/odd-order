@@ -185,7 +185,7 @@ theorem of_card_eq_prime_cube [Finite G] [Fact p.Prime]
     IsExtraspecial p G := by
   have hp : p.Prime := Fact.out
   have hpg : IsPGroup p G := IsPGroup.of_card hcard
-  haveI : Nontrivial G := by
+  have : Nontrivial G := by
     rcases subsingleton_or_nontrivial G with hs | hn
     · exact absurd (fun a b => Subsingleton.elim _ _) hnonab
     · exact hn
@@ -210,7 +210,7 @@ theorem of_card_eq_prime_cube [Finite G] [Fact p.Prime]
         rw [hcard, hk] at heq
         have hmul : Nat.card (G ⧸ Subgroup.center G) * p ^ 2 = p * p ^ 2 := by rw [← heq]; ring
         exact Nat.eq_of_mul_eq_mul_right (pow_pos hp.pos 2) hmul
-      haveI : IsCyclic (G ⧸ Subgroup.center G) := isCyclic_of_prime_card hcardQ
+      have : IsCyclic (G ⧸ Subgroup.center G) := isCyclic_of_prime_card hcardQ
       exact hnonab ((MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
         (QuotientGroup.mk' (Subgroup.center G)) (QuotientGroup.ker_mk' _).le).is_comm.comm)
     have hk1 : k = 1 := by omega
@@ -275,8 +275,8 @@ theorem of_card_eq_prime_cube [Finite G] [Fact p.Prime]
         rw [hcard, hj, h] at heq
         have hmul : Nat.card (G ⧸ frattini G) * p ^ 2 = p * p ^ 2 := by rw [← heq]; ring
         exact Nat.eq_of_mul_eq_mul_right (pow_pos hp.pos 2) hmul
-      haveI : IsCyclic (G ⧸ frattini G) := isCyclic_of_prime_card hcardQF
-      haveI : IsCyclic G := OddOrder.GroupTheory.isCyclic_of_isCyclic_quotient_frattini ‹_›
+      have : IsCyclic (G ⧸ frattini G) := isCyclic_of_prime_card hcardQF
+      have : IsCyclic G := OddOrder.GroupTheory.isCyclic_of_isCyclic_quotient_frattini ‹_›
       obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := G)
       refine hnonab fun a b => ?_
       obtain ⟨m, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hg a)
@@ -303,12 +303,12 @@ theorem of_isSpecial_of_isCyclic_center [Finite G] [Fact p.Prime]
   rcases hdisj with helem | ⟨hcomm, hfrat, hZelem⟩
   · exact absurd helem hnonab
   -- Nonabelian branch: `Z(G) = [G,G] = Φ(G)` elementary abelian.  `G` (hence `Z(G)`) is nontrivial.
-  haveI : Nontrivial G := by
+  have : Nontrivial G := by
     by_contra hcon
     rw [not_nontrivial_iff_subsingleton] at hcon
     exact hnonab ⟨fun x y => Subsingleton.elim _ _, fun x => Subsingleton.elim _ _⟩
-  haveI hZnt : Nontrivial (Subgroup.center G) := hpg.center_nontrivial
-  haveI : IsCyclic (Subgroup.center G) := hcyc
+  have hZnt : Nontrivial (Subgroup.center G) := hpg.center_nontrivial
+  have : IsCyclic (Subgroup.center G) := hcyc
   refine ⟨hpg, hcomm, hfrat, ?_⟩
   -- `Z(G)` cyclic + elementary abelian ⟹ `exponent = card` divides `p`; nontrivial ⟹ `card = p`.
   have hZea : IsElementaryAbelian p (Subgroup.center G) := hZelem

@@ -144,7 +144,7 @@ theorem uW1_isComplement_P [Finite G] (hyp : Hypothesis (G := G)) :
     rwa [hdisj, Subgroup.mem_bot] at hxPU
   have hS_norm_P : hyp.S ≤ Subgroup.normalizer (hyp.P : Set G) := by
     rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
-  haveI hPnorm : (hyp.P.subgroupOf hyp.S).Normal :=
+  have hPnorm : (hyp.P.subgroupOf hyp.S).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hP_le_S).mpr hS_norm_P
   apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ
   · rw [disjoint_iff, eq_bot_iff]
@@ -282,7 +282,7 @@ private theorem indPW1_inner_self_aux [Finite G] (_hG : OddOrder.BG.IsMinimalSim
   have hPW1_le_S : hyp.P ⊔ hyp.W1 ≤ hyp.S := sup_le hP_le_S hW1_le_S
   have hS_norm_P : hyp.S ≤ Subgroup.normalizer (hyp.P : Set G) := by
     rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
-  haveI hPnorm : (hyp.P.subgroupOf hyp.S).Normal :=
+  have hPnorm : (hyp.P.subgroupOf hyp.S).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hP_le_S).mpr hS_norm_P
   have hNA : hyp.P.subgroupOf hyp.S ≤ (hyp.P ⊔ hyp.W1).subgroupOf hyp.S :=
     Subgroup.comap_mono hP_le_PW1
@@ -425,7 +425,7 @@ theorem indPW1_apply_eq_one_of_mem_W1_sharp [Finite G]
   have hPW1_le_S : hyp.P ⊔ hyp.W1 ≤ hyp.S := sup_le hP_le_S hW1_le_S
   have hS_norm_P : hyp.S ≤ Subgroup.normalizer (hyp.P : Set G) := by
     rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
-  haveI hPnorm : (hyp.P.subgroupOf hyp.S).Normal :=
+  have hPnorm : (hyp.P.subgroupOf hyp.S).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hP_le_S).mpr hS_norm_P
   have hNA : hyp.P.subgroupOf hyp.S ≤ (hyp.P ⊔ hyp.W1).subgroupOf hyp.S :=
     Subgroup.comap_mono hP_le_PW1
@@ -527,7 +527,7 @@ theorem indPW1_apply_eq_zero_of_mem_derived_not_mem_P [Finite G]
   have hW1_le_S : hyp.W1 ≤ hyp.S := hyp.Sdata_W1_eq ▸ hyp.Sdata.W1_le
   have hS_norm_P : hyp.S ≤ Subgroup.normalizer (hyp.P : Set G) := by
     rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
-  haveI hPnorm : (hyp.P.subgroupOf hyp.S).Normal :=
+  have hPnorm : (hyp.P.subgroupOf hyp.S).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hP_le_S).mpr hS_norm_P
   -- `W₁ ⊓ S′ = ⊥` (the `M_complement` disjointness, `uW1_isComplement_P` pattern).
   have hM'W1 : derivedInG hyp.S ⊓ hyp.W1 = ⊥ := by

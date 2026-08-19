@@ -180,7 +180,7 @@ theorem finite_eigenspace_of_separated {A : Module.End R M} {s : Finset R}
   classical
   have he := LinearEquiv.ofBijective (DirectSum.coeLinearMap
     (fun ζ : s => A.eigenspace (ζ : R))) (isInternal_eigenspace_of_separated hs hA)
-  haveI := Module.Finite.equiv he.symm
+  have := Module.Finite.equiv he.symm
   exact Module.Finite.of_surjective
     (DirectSum.component R s (fun ζ : s => A.eigenspace (ζ : R)) ζ) fun x =>
     ⟨DirectSum.lof R s (fun ζ : s => A.eigenspace (ζ : R)) ζ x, by simp⟩
@@ -194,7 +194,7 @@ so it is not Noetherian. -/
 theorem free_eigenspace_of_separated {A : Module.End R M} {s : Finset R}
     (hs : SeparatedNodes s) (hA : aeval A (∏ η ∈ s, (X - C η)) = 0) (ζ : s) :
     Module.Free R (A.eigenspace (ζ : R)) := by
-  haveI := finite_eigenspace_of_separated hs hA ζ
+  have := finite_eigenspace_of_separated hs hA ζ
   exact free_of_isTorsionFree
 
 /-- The ranks of the eigen-submodules add up to the rank of the module. -/
@@ -202,13 +202,14 @@ theorem sum_finrank_eigenspace_of_separated {A : Module.End R M} {s : Finset R}
     (hs : SeparatedNodes s) (hA : aeval A (∏ η ∈ s, (X - C η)) = 0) :
     ∑ ζ ∈ s, Module.finrank R (A.eigenspace ζ) = Module.finrank R M := by
   classical
-  haveI := fun ζ : s => finite_eigenspace_of_separated hs hA ζ
-  haveI := fun ζ : s => free_eigenspace_of_separated hs hA ζ
+  have := fun ζ : s => finite_eigenspace_of_separated hs hA ζ
+  have := fun ζ : s => free_eigenspace_of_separated hs hA ζ
   have he := LinearEquiv.ofBijective (DirectSum.coeLinearMap
     (fun ζ : s => A.eigenspace (ζ : R))) (isInternal_eigenspace_of_separated hs hA)
   rw [← he.finrank_eq, Module.finrank_directSum, Finset.univ_eq_attach]
   exact (Finset.sum_attach s (fun ζ => Module.finrank R (A.eigenspace ζ))).symm
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **The trace is the sum of the eigenvalues weighted by the ranks of the eigen-submodules.**
 Over the coefficient ring of a `p`-modular system this is the statement that the trace of a
 lattice endomorphism of order prime to `p` is literally the Brauer-character expression. -/
@@ -216,8 +217,8 @@ theorem trace_eq_sum_finrank_smul [Module.Free R M] {A : Module.End R M} {s : Fi
     (hs : SeparatedNodes s) (hA : aeval A (∏ η ∈ s, (X - C η)) = 0) :
     LinearMap.trace R M A = ∑ ζ ∈ s, Module.finrank R (A.eigenspace ζ) • ζ := by
   classical
-  haveI := fun ζ : s => finite_eigenspace_of_separated hs hA ζ
-  haveI := fun ζ : s => free_eigenspace_of_separated hs hA ζ
+  have := fun ζ : s => finite_eigenspace_of_separated hs hA ζ
+  have := fun ζ : s => free_eigenspace_of_separated hs hA ζ
   have hmaps : ∀ ζ : s, Set.MapsTo A (A.eigenspace (ζ : R)) (A.eigenspace (ζ : R)) := by
     intro ζ v hv
     rw [SetLike.mem_coe, mem_eigenspace_iff] at hv ⊢

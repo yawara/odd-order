@@ -98,11 +98,11 @@ chief factor。 -/
 private theorem isChiefFactor_map_mk' {W U V : Subgroup G} [W.Normal]
     (hChief : IsChiefFactor U V) (hUW : U ⊓ W ≤ V) :
     IsChiefFactor (U.map (QuotientGroup.mk' W)) (V.map (QuotientGroup.mk' W)) := by
-  haveI hU : U.Normal := hChief.normal_top
-  haveI hVn : V.Normal := hChief.normal_bot
-  haveI hUbn : (U.map (QuotientGroup.mk' W)).Normal :=
+  have hU : U.Normal := hChief.normal_top
+  have hVn : V.Normal := hChief.normal_bot
+  have hUbn : (U.map (QuotientGroup.mk' W)).Normal :=
     hU.map _ (QuotientGroup.mk'_surjective W)
-  haveI hVbn : (V.map (QuotientGroup.mk' W)).Normal :=
+  have hVbn : (V.map (QuotientGroup.mk' W)).Normal :=
     hVn.map _ (QuotientGroup.mk'_surjective W)
   have hVU : V ≤ U := hChief.le
   refine ⟨hUbn, hVbn, ?_, ?_⟩
@@ -116,8 +116,8 @@ private theorem isChiefFactor_map_mk' {W U V : Subgroup G} [W.Normal]
       inf_sup_le_of_inf_le hVU hUW (Subgroup.mem_inf.mpr ⟨hu, hU_le hu⟩)
     exact absurd (le_antisymm hU_le_V hVU) hChief.lt.ne'
   · intro N hN hVN hNU
-    haveI hNn : N.Normal := hN
-    haveI hN'norm : (N.comap (QuotientGroup.mk' W)).Normal := hN.comap _
+    have hNn : N.Normal := hN
+    have hN'norm : (N.comap (QuotientGroup.mk' W)).Normal := hN.comap _
     have hWN' : W ≤ N.comap (QuotientGroup.mk' W) := by
       intro x hx
       rw [Subgroup.mem_comap,
@@ -132,7 +132,7 @@ private theorem isChiefFactor_map_mk' {W U V : Subgroup G} [W.Normal]
       rwa [Subgroup.comap_map_eq, QuotientGroup.ker_mk'] at hc
     have hN_eq : N = (N.comap (QuotientGroup.mk' W)).map (QuotientGroup.mk' W) :=
       (Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective W) N).symm
-    haveI hInf_norm : ((N.comap (QuotientGroup.mk' W)) ⊓ U).Normal := inferInstance
+    have hInf_norm : ((N.comap (QuotientGroup.mk' W)) ⊓ U).Normal := inferInstance
     rcases hChief.eq_or_eq_of_normal (W := (N.comap (QuotientGroup.mk' W)) ⊓ U) hInf_norm
       (le_inf hVN' hChief.le) inf_le_right with hcase | hcase
     · left
@@ -183,7 +183,7 @@ private theorem isPGroup_map_mk'_map_mk' {p : ℕ} {W U V : Subgroup G} [W.Norma
     (hUbar : IsPGroup p ↥(U.map (QuotientGroup.mk' V))) :
     IsPGroup p ↥((U.map (QuotientGroup.mk' W)).map
       (QuotientGroup.mk' (V.map (QuotientGroup.mk' W)))) := by
-  haveI hVbn : (V.map (QuotientGroup.mk' W)).Normal :=
+  have hVbn : (V.map (QuotientGroup.mk' W)).Normal :=
     (inferInstance : V.Normal).map _ (QuotientGroup.mk'_surjective W)
   have hcond : V ≤ (V.map (QuotientGroup.mk' W)).comap (QuotientGroup.mk' W) :=
     Subgroup.le_comap_map _ _
@@ -207,7 +207,7 @@ private theorem isPGroup_map_mk'_map_mk' {p : ℕ} {W U V : Subgroup G} [W.Norma
 reduced endpoint `commutator_le_chiefFactorCentralizer_of_pRank_le_two_of_le_sup`
 (normal `p`-subgroup rank ≤ 2, `U ⊆ R ⊔ V` 版) に帰着させる。 -/
 theorem commutator_le_chiefFactorCentralizer_of_rank_le_two_of_le_normal
-    [Finite G] [IsSolvable G] (hodd : Odd (Nat.card G))
+    [Finite G] [Group.IsSolvable G] (hodd : Odd (Nat.card G))
     {p : ℕ} [Fact p.Prime] (hp_odd : Odd p)
     {Gstar U V : Subgroup G} [Gstar.Normal] [V.Normal]
     [(U.map (QuotientGroup.mk' V)).Normal]
@@ -215,21 +215,21 @@ theorem commutator_le_chiefFactorCentralizer_of_rank_le_two_of_le_normal
     (hrank : pRank ↥Gstar p ≤ 2) (hU_le : U ≤ Gstar) :
     _root_.commutator G ≤ chiefFactorCentralizer U V := by
   classical
-  haveI hU_normal : U.Normal := hChief.normal_top
+  have hU_normal : U.Normal := hChief.normal_top
   have hVU : V ≤ U := hChief.le
   have hV_le : V ≤ Gstar := hVU.trans hU_le
   -- `W = O_{p'}(G*)`, `T = O_{p',p}(G*)` pushed to `G` (literal cores in `↥Gstar`)
-  haveI hWsub_char : (Ch03.oPiCore {q : ℕ | q ∉ ({p} : Set ℕ)} ↥Gstar).Characteristic :=
+  have hWsub_char : (Ch03.oPiCore {q : ℕ | q ∉ ({p} : Set ℕ)} ↥Gstar).Characteristic :=
     Ch03.oPiCore.characteristic _ _
-  haveI hTsub_char : (Ch03.oPiPrimePiCore {p} ↥Gstar).Characteristic := by
+  have hTsub_char : (Ch03.oPiPrimePiCore {p} ↥Gstar).Characteristic := by
     rw [Ch03.oPiPrimePiCore]
     exact Subgroup.Characteristic.comap_quotient_mk (Ch03.oPiCore.characteristic _ _)
   set W : Subgroup G := (Ch03.oPiCore {q : ℕ | q ∉ ({p} : Set ℕ)} ↥Gstar).map Gstar.subtype
     with hW
   set T : Subgroup G := (Ch03.oPiPrimePiCore {p} ↥Gstar).map Gstar.subtype with hT
-  haveI hW_normal : W.Normal := by
+  have hW_normal : W.Normal := by
     rw [hW]; exact OddOrder.GroupTheory.normal_map_subtype_of_characteristic hWsub_char
-  haveI hT_normal : T.Normal := by
+  have hT_normal : T.Normal := by
     rw [hT]; exact OddOrder.GroupTheory.normal_map_subtype_of_characteristic hTsub_char
   have hW_le_T : W ≤ T := by
     rw [hW, hT]; exact Subgroup.map_mono (Ch03.oPiCore_compl_le_oPiPrimePiCore _ _)
@@ -309,11 +309,11 @@ theorem commutator_le_chiefFactorCentralizer_of_rank_le_two_of_le_normal
     rw [sup_comm] at hmapped
     exact hmapped
   -- assemble in `Ḡ = G/W`
-  haveI hVbar_normal : (V.map (QuotientGroup.mk' W)).Normal :=
+  have hVbar_normal : (V.map (QuotientGroup.mk' W)).Normal :=
     (inferInstance : V.Normal).map _ (QuotientGroup.mk'_surjective W)
-  haveI hRbar_normal : (T.map (QuotientGroup.mk' W)).Normal :=
+  have hRbar_normal : (T.map (QuotientGroup.mk' W)).Normal :=
     (inferInstance : T.Normal).map _ (QuotientGroup.mk'_surjective W)
-  haveI hUbarmap_normal :
+  have hUbarmap_normal :
       ((U.map (QuotientGroup.mk' W)).map
         (QuotientGroup.mk' (V.map (QuotientGroup.mk' W)))).Normal :=
     ((inferInstance : U.Normal).map _ (QuotientGroup.mk'_surjective W)).map _

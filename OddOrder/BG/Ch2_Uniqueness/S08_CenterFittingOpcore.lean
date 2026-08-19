@@ -65,7 +65,7 @@ This is the ambient form of the BG §8 step `O_{σ'}(H)=1`, where `σ=π(F(H))`.
 If the core were nontrivial, the Fitting subgroup of that normal solvable subgroup would
 map to a nontrivial subgroup of both `F(H)` and the `σ`-complement core. -/
 theorem opiCoreInG_primesOf_fittingInG_compl_eq_bot [Finite G]
-    {H : Subgroup G} [IsSolvable ↥H] :
+    {H : Subgroup G} [Group.IsSolvable ↥H] :
     opiCoreInG (OddOrder.BG.Ch2.S07.primesOf (fittingInG H))ᶜ H = ⊥ := by
   classical
   let σ : Set ℕ := OddOrder.BG.Ch2.S07.primesOf (fittingInG H)
@@ -76,7 +76,7 @@ theorem opiCoreInG_primesOf_fittingInG_compl_eq_bot [Finite G]
     dsimp [N]
     exact opiCoreInG_le σᶜ H
   let NH : Subgroup H := N.subgroupOf H
-  haveI hNH_normal : NH.Normal := by
+  have hNH_normal : NH.Normal := by
     dsimp [NH]
     exact (Subgroup.normal_subgroupOf_iff_le_normalizer hNH).mpr (by
       dsimp [N]
@@ -88,10 +88,10 @@ theorem opiCoreInG_primesOf_fittingInG_compl_eq_bot [Finite G]
       dsimp [NH]
       exact Subgroup.map_subgroupOf_eq_of_le hNH
     rw [← hmap, hbot, Subgroup.map_bot]
-  haveI hNH_nontrivial : Nontrivial ↥NH :=
+  have hNH_nontrivial : Nontrivial ↥NH :=
     (Subgroup.nontrivial_iff_ne_bot NH).mpr hNH_ne_bot
   have hFNH_ne_bot : Ch01.fitting ↥NH ≠ ⊥ :=
-    Ch01.fitting_ne_bot_of_solvable_nontrivial ↥NH
+    Ch01.fitting_ne_bot_of_isSolvable_nontrivial ↥NH
   let FNH : Subgroup H := (Ch01.fitting ↥NH).map NH.subtype
   have hFNH_ne_bot : FNH ≠ ⊥ := by
     intro hbot
@@ -191,14 +191,14 @@ theorem le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent [Finite G]
     (hKnilp : Group.IsNilpotent ↥K)
     (hPK : P ≤ K) (hPp : IsPGroup p ↥P) :
     P ≤ opiCoreInG ({p} : Set ℕ) K := by
-  haveI : Group.IsNilpotent ↥K := hKnilp
+  have : Group.IsNilpotent ↥K := hKnilp
   have hPsub_p : IsPGroup p ↥(P.subgroupOf K) := by
     obtain ⟨n, hn⟩ := hPp.exists_card_eq
     exact IsPGroup.of_card (by
       rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPK).toEquiv]
       exact hn)
   obtain ⟨S, hPS⟩ := hPsub_p.exists_le_sylow
-  haveI hSnormal : (S : Subgroup ↥K).Normal := Ch01.Sylow.normal_of_isNilpotent S
+  have hSnormal : (S : Subgroup ↥K).Normal := Ch01.Sylow.normal_of_isNilpotent S
   have hSpi : Ch03.Subgroup.IsPiGroup ({p} : Set ℕ) (S : Subgroup ↥K) := by
     intro r hr
     exact (isPiSubgroup_singleton_of_isPGroup (G := ↥K) S.isPGroup') r hr
@@ -217,7 +217,7 @@ theorem le_of_sylow_le_of_nilpotent [Finite G] {K X : Subgroup G}
     (hSyl : ∀ r : (Nat.card ↥K).primeFactors,
       ((default : Sylow (r : ℕ) ↥K) : Subgroup ↥K).map K.subtype ≤ X) :
     K ≤ X := by
-  haveI : Group.IsNilpotent ↥K := hKnilp
+  have : Group.IsNilpotent ↥K := hKnilp
   have htop_map : (⊤ : Subgroup ↥K).map K.subtype = K := by
     rw [← MonoidHom.range_eq_map, Subgroup.range_subtype]
   rw [← htop_map, ← Ch01.iSup_default_sylow_eq_top_of_nilpotent ↥K, Subgroup.map_iSup]
@@ -296,7 +296,7 @@ theorem zpowers_acts_trivially_on_fittingInG_of_centralizer_self [Finite G]
           (fittingInG M)) :
     ∀ a : ↥(Subgroup.zpowers x), ∀ f : ↥(fittingInG M),
       (conjActionOnFittingInG hxM a) f = f := by
-  haveI : Group.IsNilpotent ↥(fittingInG M) := fittingInG_isNilpotent M
+  have : Group.IsNilpotent ↥(fittingInG M) := fittingInG_isNilpotent M
   have hCC_fixed : Subgroup.centralizer
       (Subgroup.fixedPointsOfMulAut (conjActionOnFittingInG hxM) : Set ↥(fittingInG M))
       ≤ Subgroup.fixedPointsOfMulAut (conjActionOnFittingInG hxM) := by
@@ -342,7 +342,7 @@ theorem mem_centralizer_fittingInG_of_centralizer_self_zpowers [Finite G]
 /-- With solvability of `M`, the same Prop 1.10 bridge places the generator inside
 `F(M)` by the ambient self-centralizer of the Fitting subgroup. -/
 theorem mem_fittingInG_of_centralizer_self_zpowers [Finite G]
-    {M : Subgroup G} [IsSolvable ↥M] {x : G} (hxM : x ∈ M)
+    {M : Subgroup G} [Group.IsSolvable ↥M] {x : G} (hxM : x ∈ M)
     (hcop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers x)) (Nat.card ↥(fittingInG M)))
     (hCC :
       Subgroup.centralizer
@@ -368,7 +368,7 @@ theorem coprime_card_zpowers_fittingInG_of_isPiSubgroup_primesOf_compl [Finite G
 /-- BG (8.3) endpoint for a cyclic pi-complement element: under the Prop 1.10
 self-centralizer condition, such an element is trivial. -/
 theorem eq_one_of_centralizer_self_zpowers_of_isPiSubgroup_primesOf_compl [Finite G]
-    {M : Subgroup G} [IsSolvable ↥M] {x : G} (hxM : x ∈ M)
+    {M : Subgroup G} [Group.IsSolvable ↥M] {x : G} (hxM : x ∈ M)
     (hCC :
       Subgroup.centralizer
         ((Subgroup.centralizer (Subgroup.zpowers x : Set G) ⊓ fittingInG M).subgroupOf
@@ -386,7 +386,7 @@ theorem eq_one_of_centralizer_self_zpowers_of_isPiSubgroup_primesOf_compl [Finit
 satisfies the Prop 1.10 self-centralizer hypothesis, then the centralizer is a
 `π(F(M))`-subgroup. -/
 theorem centralizer_cFitting_isPiSubgroup_of_zpowers_centralizer_self [Finite G]
-    {M A0 : Subgroup G} [IsSolvable ↥M]
+    {M A0 : Subgroup G} [Group.IsSolvable ↥M]
     (hCentM : Subgroup.centralizer (cFittingInG M A0 : Set G) ≤ M)
     (hCC : ∀ {x : G}, x ∈ Subgroup.centralizer (cFittingInG M A0 : Set G) →
       Subgroup.IsPiSubgroup (OddOrder.BG.Ch2.S07.primesOf (fittingInG M))ᶜ
@@ -441,7 +441,7 @@ theorem mem_primeFactors_centerFittingInG_of_mem_primeFactors_fittingInG [Finite
     {q : ℕ} [Fact q.Prime] {M : Subgroup G}
     (hq : q ∈ (Nat.card ↥(fittingInG M)).primeFactors) :
     q ∈ (Nat.card ↥(centerFittingInG M)).primeFactors := by
-  haveI : Group.IsNilpotent ↥(fittingInG M) := fittingInG_isNilpotent M
+  have : Group.IsNilpotent ↥(fittingInG M) := fittingInG_isNilpotent M
   rw [centerFittingInG, Subgroup.card_map_of_injective (fittingInG M).subtype_injective]
   exact Ch01.mem_primeFactors_center_of_isNilpotent hq
 
@@ -542,7 +542,7 @@ theorem centerFittingOpCoreInG_ne_bot_of_mem_primeFactors_center [Finite G]
     intro hN_bot
     exact hP_ne ((Subgroup.map_eq_bot_iff_of_injective (P : Subgroup ↥Z)
       Z.subtype_injective).mp hN_bot)
-  haveI hZ_comm : IsMulCommutative ↥Z := by
+  have hZ_comm : IsMulCommutative ↥Z := by
     dsimp [Z]
     exact centerFittingInG_isMulCommutative M
   have hNZ : N ≤ Z := by
@@ -596,7 +596,7 @@ theorem mem_primeFactors_cFitting_iff_mem_primeFactors_fittingInG [Finite G]
         (inf_le_right : Subgroup.centralizer (A₀ : Set G) ⊓ fittingInG M ≤ fittingInG M))
       Nat.card_pos.ne' hq
   · intro hqF
-    haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hqF⟩
+    have : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hqF⟩
     have hqZ : q ∈ (Nat.card ↥(centerFittingInG M)).primeFactors :=
       mem_primeFactors_centerFittingInG_of_mem_primeFactors_fittingInG hqF
     exact Nat.primeFactors_mono
@@ -736,7 +736,7 @@ theorem centralizer_zpowers_inf_fittingInG_self_of_mem_centralizer_cFitting
 `A = C_F(M)(A0)`: once the ambient centralizer is known to lie in `M`, it is a
 `π(F(M))`-subgroup. -/
 theorem centralizer_cFitting_isPiSubgroup_primesOf_fittingInG_of_le_maximal [Finite G]
-    {p : ℕ} {M A0 : Subgroup G} [IsSolvable ↥M]
+    {p : ℕ} {M A0 : Subgroup G} [Group.IsSolvable ↥M]
     (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
     (hCentM : Subgroup.centralizer (cFittingInG M A0 : Set G) ≤ M) :
     Subgroup.IsPiSubgroup (OddOrder.BG.Ch2.S07.primesOf (fittingInG M))
@@ -843,7 +843,7 @@ theorem normalizer_eq_of_normal_of_mem_maximal [Finite G] (hG : IsMinimalSimpleO
     {M L : Subgroup G} (hM : M ∈ maximalSubgroups G) (hLM : (L.subgroupOf M).Normal)
     (hLne : L ≠ ⊥) (hLleM : L ≤ M) :
     Subgroup.normalizer (L : Set G) = M := by
-  haveI : IsSimpleGroup G := hG.simple
+  have : IsSimpleGroup G := hG.simple
   have hMco : IsCoatom M := mem_maximalSubgroups.mp hM
   have hMleN : M ≤ Subgroup.normalizer (L : Set G) :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hLleM).mp hLM
@@ -883,7 +883,7 @@ theorem le_maximal_of_le_normalizer_of_ne_bot_isPiSubgroup_singleton [Finite G]
     refine eq_top_iff.mpr ?_
     rw [← hMQtop]
     exact hsup_le_NQ
-  haveI : Q.Normal := Subgroup.normalizer_eq_top_iff.mp hNQtop
+  have : Q.Normal := Subgroup.normalizer_eq_top_iff.mp hNQtop
   rcases hG.simple.eq_bot_or_eq_top_of_normal Q inferInstance with hQbot | hQtop
   · exact hQne hQbot
   · have hQp : IsPGroup q ↥Q :=
@@ -892,7 +892,7 @@ theorem le_maximal_of_le_normalizer_of_ne_bot_isPiSubgroup_singleton [Finite G]
       (hQtop ▸ hQp : IsPGroup q ↥(⊤ : Subgroup G)).of_surjective
         (Subgroup.topEquiv : (⊤ : Subgroup G) ≃* G).toMonoidHom
         Subgroup.topEquiv.surjective
-    haveI : Group.IsNilpotent G := hGp.isNilpotent
+    have : Group.IsNilpotent G := hGp.isNilpotent
     exact hG.notSolvable inferInstance
 
 /-- **BG (8.2) normalizer localization**: if `O_q(Z(F(M)))` is nontrivial, then its
@@ -998,7 +998,7 @@ theorem centralizer_cFitting_le_maximal_of_not_isPGroup [Finite G]
     Subgroup.centralizer ((Subgroup.centralizer (A0 : Set G) ⊓ fittingInG M : Subgroup G) : Set G)
       ≤ M := by
   obtain ⟨q, hqF, _⟩ := exists_primeFactor_ne_of_not_isPGroup hFnp
-  haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hqF⟩
+  have : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hqF⟩
   exact centralizer_cFitting_le_maximal_of_fitting_primeFactor hG hM hA0F hqF
 
 /-- BG (8.3) under the hypotheses used in Theorem 8.1(a): in the non-`p`-group case,
@@ -1010,7 +1010,7 @@ theorem centralizer_cFitting_isPiSubgroup_of_not_pGroup [Finite G]
     (hFnp : ¬ IsPGroup p ↥(fittingInG M)) :
     Subgroup.IsPiSubgroup (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))
       (Subgroup.centralizer (cFittingInG M A0 : Set G)) := by
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hA0F : A0 ≤ fittingInG M := isMaxElemAbelianIn_le hA0
   have hPrimes :
       OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0) =
@@ -1155,7 +1155,7 @@ theorem centralizer_centerFittingOpCoreInG_inf_hInvariant_eq_bot_of_not_pGroup
 acts coprimely on it, and has no nontrivial fixed point in `Y`, then
 `Y <= ⁅B, Y⁆`. This is the subgroup version of BG Prop. 1.6(a) used in BG (8.4). -/
 theorem le_commutator_of_coprime_inf_centralizer_eq_bot [Finite G]
-    {B Y : Subgroup G} [IsSolvable ↥B] (hBY : B ≤ Subgroup.normalizer Y)
+    {B Y : Subgroup G} [Group.IsSolvable ↥B] (hBY : B ≤ Subgroup.normalizer Y)
     (hcop : Nat.Coprime (Nat.card ↥B) (Nat.card ↥Y))
     (hfixed : Y ⊓ Subgroup.centralizer (B : Set G) = ⊥) :
     Y ≤ ⁅B, Y⁆ := by
@@ -1195,9 +1195,9 @@ theorem le_commutator_of_coprime_inf_centralizer_eq_bot [Finite G]
 
 /-- The central q-core `O_q(Z(F(M)))` is solvable, since it lies in the center of `F(M)`. -/
 theorem centerFittingOpCoreInG_isSolvable (q : ℕ) (M : Subgroup G) :
-    IsSolvable ↥(centerFittingOpCoreInG q M) := by
-  haveI : IsMulCommutative ↥(centerFittingInG M) := centerFittingInG_isMulCommutative M
-  exact isSolvable_of_comm fun a b => by
+    Group.IsSolvable ↥(centerFittingOpCoreInG q M) := by
+  have : IsMulCommutative ↥(centerFittingInG M) := centerFittingInG_isMulCommutative M
+  exact Group.isSolvable_of_comm fun a b => by
     apply Subtype.ext
     exact setLike_mul_comm
       (centerFittingOpCoreInG_le_centerFittingInG q M a.2)
@@ -1266,7 +1266,7 @@ theorem centralizer_opiCoreInG_cFittingInG_singleton_compl_le_maximal_of_ne
     (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
     (hr : r ∈ (Nat.card ↥(fittingInG M)).primeFactors) (hqr : q ≠ r) :
     Subgroup.centralizer (opiCoreInG ({q} : Set ℕ)ᶜ (cFittingInG M A0) : Set G) ≤ M := by
-  haveI : Fact r.Prime := ⟨Nat.prime_of_mem_primeFactors hr⟩
+  have : Fact r.Prime := ⟨Nat.prime_of_mem_primeFactors hr⟩
   exact centralizer_le_maximal_of_centerFittingOpCoreInG_le hG hM
     (centerFittingOpCoreInG_ne_bot_of_mem_primeFactors_fittingInG hr)
     (centerFittingOpCoreInG_le_opiCoreInG_cFittingInG_singleton_compl_of_ne hA0 hqr)

@@ -221,7 +221,7 @@ theorem centralizer_trichotomy_of_induction (hyp : Hypothesis G Omega)
     (inductionHypothesis : TheoremAInductionBelow G Omega) :
     letI := hyp.centralizerQuotientMulAction hXV
     Nonempty (CentralizerTrichotomyData hyp X) := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   let C : Subgroup G := Subgroup.centralizer (X : Set G)
   let C_Q : Subgroup C := hyp.Q.subgroupOf C
   let qhyp := hyp.centralizerQuotientHypothesis hXV hA3
@@ -255,9 +255,9 @@ theorem centralizer_trichotomy_of_induction (hyp : Hypothesis G Omega)
         (hyp.centralizerActionQuotient X) := hresultCore.2.2.1
   cases htarget : result.target with
   | psl2 data =>
-      letI : Field data.F := data.fieldF
-      letI : Finite data.F := data.finiteF
-      letI : CharP data.F 2 := data.charTwoF
+      let : Field data.F := data.fieldF
+      let : Finite data.F := data.finiteF
+      let : CharP data.F 2 := data.charTwoF
       have eTarget :
           Subgroup.primeComplementResidual 2
               (hyp.centralizerActionQuotient X) ≃*

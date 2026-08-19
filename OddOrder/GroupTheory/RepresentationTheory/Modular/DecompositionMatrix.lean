@@ -55,7 +55,7 @@ theorem exists_decomposition_trace (hp : p.Prime)
         {c : ResidueField 𝒪}, d i ≠ 0 →
         (reduction ρ).asAlgebraHom (z : MonoidAlgebra (ResidueField 𝒪) G) = c • LinearMap.id →
         c = MatrixModule.centralCharacterAlg π i hπ hlin z := by
-  haveI : Module.Finite (ResidueField 𝒪) (ResidueField 𝒪 ⊗[𝒪] L) :=
+  have : Module.Finite (ResidueField 𝒪) (ResidueField 𝒪 ⊗[𝒪] L) :=
     Module.Finite.of_basis
       (Module.Basis.baseChange (S := ResidueField 𝒪) (Module.Free.chooseBasis 𝒪 L))
   obtain ⟨d, hd, hdc⟩ := exists_decomposition (nn := nn) hp hω' hπ hlin hkerJ (reduction ρ)

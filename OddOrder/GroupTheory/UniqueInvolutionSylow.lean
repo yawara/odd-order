@@ -38,7 +38,7 @@ variable {G : Type*} [Group G] [Finite G]
 some Sylow `2`-subgroup `P`, and all of them are conjugate. -/
 theorem exists_conj_subgroupLe_sylow (T : Sylow 2 G) {K : Subgroup G} (hK : IsPGroup 2 K) :
     ∃ c : G, ∀ w ∈ K, c * w * c⁻¹ ∈ (T : Subgroup G) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨P, hKP⟩ := hK.exists_le_sylow
   obtain ⟨c, hc⟩ := MulAction.exists_smul_eq G P T
   refine ⟨c, fun w hw => ?_⟩

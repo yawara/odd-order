@@ -438,7 +438,7 @@ theorem IsCoherent.extension_constant_on_sharp_of_prime
     hτ.extension η (y : G) = hτ.extension η (x : G) := by
   classical
   set w₂ : ℕ := Nat.card ↥Z with hw₂
-  haveI : Finite ↥Z := Subtype.finite
+  have : Finite ↥Z := Subtype.finite
   -- `x` has order `w₂` and generates `Z`
   have hordx' : orderOf (⟨x, hx⟩ : ↥Z) = w₂ := by
     rcases (Nat.dvd_prime hZp).mp (orderOf_dvd_natCard (⟨x, hx⟩ : ↥Z)) with h | h

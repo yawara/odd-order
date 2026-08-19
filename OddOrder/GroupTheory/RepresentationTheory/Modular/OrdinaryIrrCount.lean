@@ -55,7 +55,7 @@ include e in
 count a basis of `Z(K[G])`. -/
 theorem card_eq_card_conjClasses : Fintype.card ι' = Fintype.card (ConjClasses G) := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   have h1 : finrank K (Subalgebra.center K (MonoidAlgebra K G)) = Fintype.card ι' := by
     rw [(centerAlgEquivPi e).toLinearEquiv.finrank_eq, Module.finrank_pi]
   have h2 : finrank K (Subalgebra.center K (MonoidAlgebra K G))

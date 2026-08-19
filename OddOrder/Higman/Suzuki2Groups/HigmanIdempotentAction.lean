@@ -61,7 +61,7 @@ theorem exists_addEnd_eq_one_sub_two_and_four_nsmul_of_frattini_map_eq
       (MulAut.conjNormal (H := A) u⁻¹).toMonoidHom.toAdditive =
           (1 : AddMonoid.End (Additive A)) - 2 • ν ∧
         4 • (ν * ν - ν) = 0 := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   have hu2map :=
@@ -265,6 +265,7 @@ noncomputable def actualModTwoEnd
   rw [← QuotientGroup.mk_mul]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp] theorem actualModTwoEnd_mul
     {A : Type*} [CommGroup A]
     (ν μ : AddMonoid.End (Additive A)) :

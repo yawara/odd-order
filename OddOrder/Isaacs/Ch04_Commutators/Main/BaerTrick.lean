@@ -25,7 +25,7 @@ Thm 4.36 induction の `[G, A] < G` ケースで使用 (IH ⇒ A trivial on [G, 
 theorem actionCommutator_eq_bot_of_acts_trivially_on_self_of_coprime
     {A G : Type*} [Group A] [Group G] [Finite A] [Finite G]
     {φ : A →* MulAut G} (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G)
     (h_triv : ∀ a : A, ∀ h ∈ actionCommutator φ, (φ a) h = h) :
     actionCommutator φ = ⊥ := by
   rw [actionCommutator_eq_bot_iff_acts_trivially]
@@ -56,8 +56,8 @@ theorem actionCommutator_eq_bot_of_pgroup_class_le_two_fixes_order_p
   have hOdd_p : Odd p := hp.out.odd_of_ne_two hp_odd
   obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := p) (G := G)).mp hG
   have hOdd_card : Odd (Nat.card G) := by rw [hk]; exact hOdd_p.pow
-  haveI : Fact (Odd (Nat.card G)) := ⟨hOdd_card⟩
-  haveI : Fact (_root_.commutator G ≤ Subgroup.center G) := ⟨hC⟩
+  have : Fact (Odd (Nat.card G)) := ⟨hOdd_card⟩
+  have : Fact (_root_.commutator G ≤ Subgroup.center G) := ⟨hC⟩
   -- φ' : A →* MulAut (BaerMul G)
   set φ' : A →* MulAut (BaerMul G) := MonoidHom.toBaerMulLift φ with hφ'
   -- IsPGroup p (BaerMul G)
@@ -112,7 +112,7 @@ private theorem isaacs_thm_4_36_aux {A : Type*} [Group A] [Finite A]
     -- Subcase: G trivial
     by_cases hG_triv : Nontrivial G
     swap
-    · haveI : Subsingleton G := not_nontrivial_iff_subsingleton.mp hG_triv
+    · have : Subsingleton G := not_nontrivial_iff_subsingleton.mp hG_triv
       rw [actionCommutator_eq_bot_iff_acts_trivially]
       intro a g
       exact Subsingleton.elim _ _
@@ -122,9 +122,9 @@ private theorem isaacs_thm_4_36_aux {A : Type*} [Group A] [Finite A]
       rw [hk]
       exact (Nat.Coprime.pow_right k (Nat.coprime_comm.mp
         (Nat.Prime.coprime_iff_not_dvd hp.out |>.mpr hA_p')))
-    haveI hG_nilp : Group.IsNilpotent G := hG.isNilpotent
-    have hG_solv : IsSolvable G := IsNilpotent.to_isSolvable
-    have hSolv : IsSolvable A ∨ IsSolvable G := Or.inr hG_solv
+    have hG_nilp : Group.IsNilpotent G := hG.isNilpotent
+    have hG_solv : Group.IsSolvable G := IsNilpotent.to_isSolvable
+    have hSolv : Group.IsSolvable A ∨ Group.IsSolvable G := Or.inr hG_solv
     -- 補助: H ≠ ⊤ + Finite G ⇒ Nat.card ↥H < Nat.card G
     have card_lt_of_ne_top : ∀ {H : Subgroup G}, H ≠ ⊤ → Nat.card ↥H < Nat.card G := by
       intro H h_ne
@@ -165,7 +165,7 @@ private theorem isaacs_thm_4_36_aux {A : Type*} [Group A] [Finite A]
     set G' : Subgroup G := commutator G with hG'_def
     have hG'_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ G' :=
       OddOrder.Isaacs.Ch03.IsAInvariant.derivedSeries φ 1
-    have h_G'_lt_top : G' < ⊤ := IsSolvable.commutator_lt_top_of_nontrivial G
+    have h_G'_lt_top : G' < ⊤ := Group.IsSolvable.commutator_lt_top_of_nontrivial G
     have h_G'_card_lt : Nat.card ↥G' < Nat.card G := card_lt_of_ne_top h_G'_lt_top.ne
     let φ_G' : A →* MulAut ↥G' :=
       OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hG'_inv
@@ -281,7 +281,7 @@ theorem fixedPoints_ne_bot_of_pgroup_action_pgroup
     {p : ℕ} [Fact p.Prime] (hG : IsPGroup p G) (hP : IsPGroup p P)
     (φ : P →* MulAut G) :
     Subgroup.fixedPointsOfMulAut φ ≠ ⊥ := by
-  letI : MulAction P G := MulAction.compHom G φ
+  let : MulAction P G := MulAction.compHom G φ
   -- 1 ∈ fixedPoints (φ p is a group hom, so (φ p) 1 = 1)
   have h1_fix : (1 : G) ∈ MulAction.fixedPoints P G := fun p => by
     change (φ p) 1 = 1
@@ -318,9 +318,9 @@ theorem commutator_inl_inr_lt_inl_of_pgroup_action
     ⁅(SemidirectProduct.inl : G →* G ⋊[φ] P).range,
       (SemidirectProduct.inr : P →* G ⋊[φ] P).range⁆ <
         (SemidirectProduct.inl : G →* G ⋊[φ] P).range := by
-  haveI : Group.IsNilpotent (G ⋊[φ] P) :=
+  have : Group.IsNilpotent (G ⋊[φ] P) :=
     Group.IsNilpotent.semidirectProduct_of_pGroup hG hP
-  haveI : (SemidirectProduct.inl : G →* G ⋊[φ] P).range.Normal :=
+  have : (SemidirectProduct.inl : G →* G ⋊[φ] P).range.Normal :=
     OddOrder.Isaacs.Ch03.inl_range_normal φ
   apply commutator_lt_self_of_isNilpotent_ambient
   -- inl.range ≠ ⊥: inl injective + G nontrivial
@@ -456,8 +456,8 @@ theorem actionCommutator_eq_bot_of_abelian_pgroup_of_subgroup_fixedPoints
   by_contra h_ne_bot
   have h_ne_bot' : actionCommutator φQ ≠ ⊥ := by
     simpa [φQ] using h_ne_bot
-  haveI hH_pgrp : IsPGroup p (actionCommutator φQ) := hG.to_subgroup _
-  haveI : Nontrivial (actionCommutator φQ) := by
+  have hH_pgrp : IsPGroup p (actionCommutator φQ) := hG.to_subgroup _
+  have : Nontrivial (actionCommutator φQ) := by
     rw [Subgroup.ne_bot_iff_exists_ne_one] at h_ne_bot'
     obtain ⟨h, hh_ne⟩ := h_ne_bot'
     exact ⟨h, 1, hh_ne⟩
@@ -584,8 +584,8 @@ theorem actionCommutator_prodRight_eq_bot_of_prodRight_fixes_actionCommutator_pr
     obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := p) (G := G)).mp hG
     rw [hk]
     exact (((Nat.Prime.coprime_iff_not_dvd hp.out).mpr hQ_p').symm).pow_right k
-  haveI : Group.IsNilpotent G := hG.isNilpotent
-  have hSolv : IsSolvable Q ∨ IsSolvable G := Or.inr IsNilpotent.to_isSolvable
+  have : Group.IsNilpotent G := hG.isNilpotent
+  have hSolv : Group.IsSolvable Q ∨ Group.IsSolvable G := Or.inr IsNilpotent.to_isSolvable
   exact actionCommutator_eq_bot_of_acts_trivially_on_self_of_coprime
     (A := Q) (G := G) (φ := φQ) hCop hSolv h_triv
 
@@ -622,11 +622,11 @@ private theorem isaacs_thm_4_31_external_aux
     have h_card_G : Nat.card G = m + 1 := le_antisymm h_le h_ge
     by_cases hG_nontriv : Nontrivial G
     swap
-    · haveI : Subsingleton G := not_nontrivial_iff_subsingleton.mp hG_nontriv
+    · have : Subsingleton G := not_nontrivial_iff_subsingleton.mp hG_nontriv
       rw [actionCommutator_eq_bot_iff_acts_trivially]
       intro q g
       exact Subsingleton.elim _ _
-    letI : Nontrivial G := hG_nontriv
+    let : Nontrivial G := hG_nontriv
     let φP : P →* MulAut G := φ.comp (prodLeftHom P Q)
     set H : Subgroup G := actionCommutator φP with hH_def
     have h_lt_comm : ⁅(SemidirectProduct.inl : G →* G ⋊[φP] P).range,
@@ -710,13 +710,13 @@ theorem oPiCore_compl_normalizer_le_centralizer_opCore
   have hP_le_H : P ≤ H := by
     rw [hH_def]
     exact Subgroup.le_normalizer
-  haveI hPH_normal : PH.Normal := by
+  have hPH_normal : PH.Normal := by
     rw [hPH_def, hH_def]
     exact Subgroup.normal_in_normalizer
-  haveI hQ_normal : Q.Normal := by
+  have hQ_normal : Q.Normal := by
     rw [hQ_def]
     infer_instance
-  haveI hU_normal : U.Normal := by
+  have hU_normal : U.Normal := by
     rw [hU_def]
     infer_instance
   have hPH_p : IsPGroup p PH := by
@@ -770,7 +770,7 @@ theorem oPiCore_compl_normalizer_le_centralizer_opCore
       exact centralizer_le_normalizer_subgroup P hu_cent
     let uH : H := ⟨u, huH⟩
     set UH : Subgroup H := U.subgroupOf H with hUH_def
-    haveI hUH_normal : UH.Normal := by
+    have hUH_normal : UH.Normal := by
       rw [hUH_def]
       exact (show U.Normal from inferInstance).subgroupOf H
     let incUH_U : UH →* U := {
@@ -917,10 +917,10 @@ theorem oPiCore_compl_le_oPiCore_compl_of_isPLocal
       (G := G ⧸ N) (p := p) hOpi'_Gbar_bot Pbar hPbar_p
   let fH : H →* Hbar := f.subgroupMap H
   have hfH_surj : Function.Surjective fH := f.subgroupMap_surjective H
-  haveI hQ_normal : Q.Normal := by
+  have hQ_normal : Q.Normal := by
     rw [hQ_def]
     infer_instance
-  haveI hQbar_normal : (Q.map fH).Normal := hQ_normal.map fH hfH_surj
+  have hQbar_normal : (Q.map fH).Normal := hQ_normal.map fH hfH_surj
   have hQ_pi' : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π' Q := by
     rw [hQ_def]
     exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup π'
@@ -965,19 +965,19 @@ private theorem isaacs_thm_4_38_aux
     · exact IH φ hG h_fix (Nat.le_of_lt_succ h_lt)
     by_cases hG_nontriv : Nontrivial G
     swap
-    · haveI : Subsingleton G := not_nontrivial_iff_subsingleton.mp hG_nontriv
+    · have : Subsingleton G := not_nontrivial_iff_subsingleton.mp hG_nontriv
       rw [actionCommutator_eq_bot_iff_acts_trivially]
       intro q g
       exact Subsingleton.elim _ _
-    letI : Nontrivial G := hG_nontriv
+    let : Nontrivial G := hG_nontriv
     let φQ : Q →* MulAut G := φ.comp Q.subtype
     have hCop : Nat.Coprime (Nat.card Q) (Nat.card G) := by
       obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := p) (G := G)).mp hG
       rw [hk]
       exact (((Nat.Prime.coprime_iff_not_dvd hp.out).mpr hQ_p').symm).pow_right k
-    haveI hG_nilp : Group.IsNilpotent G := hG.isNilpotent
-    have hG_solv : IsSolvable G := IsNilpotent.to_isSolvable
-    have hSolv : IsSolvable Q ∨ IsSolvable G := Or.inr hG_solv
+    have hG_nilp : Group.IsNilpotent G := hG.isNilpotent
+    have hG_solv : Group.IsSolvable G := IsNilpotent.to_isSolvable
+    have hSolv : Group.IsSolvable Q ∨ Group.IsSolvable G := Or.inr hG_solv
     by_cases h_AC_top : actionCommutator φQ = ⊤
     swap
     · set H : Subgroup G := actionCommutator φQ with hH_def
@@ -1010,7 +1010,7 @@ private theorem isaacs_thm_4_38_aux
     set G' : Subgroup G := commutator G with hG'_def
     have hG'_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ G' :=
       OddOrder.Isaacs.Ch03.IsAInvariant.derivedSeries φ 1
-    have h_G'_lt_top : G' < ⊤ := IsSolvable.commutator_lt_top_of_nontrivial G
+    have h_G'_lt_top : G' < ⊤ := Group.IsSolvable.commutator_lt_top_of_nontrivial G
     have h_G'_card_lt : Nat.card G' < Nat.card G :=
       subgroup_card_lt_of_ne_top h_G'_lt_top.ne
     let φG' : A →* MulAut G' :=
@@ -1090,8 +1090,8 @@ private theorem isaacs_thm_4_38_aux
     have hOdd_card : Odd (Nat.card G) := by
       rw [hk]
       exact hOdd_p.pow
-    haveI : Fact (Odd (Nat.card G)) := ⟨hOdd_card⟩
-    haveI : Fact (_root_.commutator G ≤ Subgroup.center G) := ⟨h_class_le_2⟩
+    have : Fact (Odd (Nat.card G)) := ⟨hOdd_card⟩
+    have : Fact (_root_.commutator G ≤ Subgroup.center G) := ⟨h_class_le_2⟩
     set φ' : A →* MulAut (BaerMul G) := MonoidHom.toBaerMulLift φ with hφ'
     have hG_baer : IsPGroup p (BaerMul G) := (BaerMul.isPGroup_iff p).mpr hG
     have h_fix_baer :

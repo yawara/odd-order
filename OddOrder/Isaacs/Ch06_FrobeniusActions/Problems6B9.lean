@@ -107,7 +107,7 @@ theorem isFrobeniusGroup_sup_zpowers_of_prime_orderOf {G : Type*} [Group G] [Fin
   have hcompl : Subgroup.IsComplement' (M.subgroupOf H) (Y.subgroupOf H) :=
     Subgroup.isComplement'_of_card_mul_and_disjoint
       (by rw [hcardMsub, hcardYsub, hcardH]) hdisj
-  haveI hMnormal : (M.subgroupOf H).Normal := by
+  have hMnormal : (M.subgroupOf H).Normal := by
     refine ⟨fun n hn g => ?_⟩
     have hgH : ((g : ↥H) : G) ∈ Subgroup.normalizer M :=
       (sup_le Subgroup.le_normalizer hYnorm : H ≤ Subgroup.normalizer M) g.2
@@ -128,7 +128,7 @@ theorem isFrobeniusGroup_sup_zpowers_of_prime_orderOf {G : Type*} [Group G] [Fin
 /-- **Isaacs Problem 6B.9** (p. 196) ⭐: 可解群 `G` の全ての元が素数冪位数をもつなら
 `|G|` の素因数は高々 2 個。 -/
 theorem card_primeFactors_le_two_of_forall_prime_pow_orderOf {G : Type*} [Group G] [Finite G]
-    [IsSolvable G] (hEPPO : ∀ g : G, ∃ t : ℕ, t.Prime ∧ ∃ k : ℕ, orderOf g = t ^ k) :
+    [Group.IsSolvable G] (hEPPO : ∀ g : G, ∃ t : ℕ, t.Prime ∧ ∃ k : ℕ, orderOf g = t ^ k) :
     (Nat.card G).primeFactors.card ≤ 2 := by
   classical
   by_contra hcon
@@ -143,11 +143,12 @@ theorem card_primeFactors_le_two_of_forall_prime_pow_orderOf {G : Type*} [Group 
     simp at h3
   obtain ⟨U, hUmin, -⟩ :=
     OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) hGne
-  haveI hUnormal : U.Normal := hUmin.1
+  have hUnormal : U.Normal := hUmin.1
   have hUne : U ≠ ⊥ := hUmin.2.1
-  haveI hUnt : Nontrivial ↥U := (Subgroup.nontrivial_iff_ne_bot U).mpr hUne
-  obtain ⟨p, hp, hUea⟩ := OddOrder.Isaacs.Ch03.solvable_minimal_normal_isElementaryAbelian hUmin
-  haveI : Fact p.Prime := ⟨hp⟩
+  have hUnt : Nontrivial ↥U := (Subgroup.nontrivial_iff_ne_bot U).mpr hUne
+  obtain ⟨p, hp, hUea⟩ :=
+    OddOrder.Isaacs.Ch03.minimal_normal_isElementaryAbelian_of_isSolvable hUmin
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨kU, hUcard⟩ := hUea.isPGroup.exists_card_eq
   -- (2) `p` 以外の 2 素数 `q ≠ r` と Hall `{p}ᶜ`-部分群 `K`
   have h2 : 1 < ((Nat.card G).primeFactors.erase p).card :=
@@ -175,7 +176,7 @@ theorem card_primeFactors_le_two_of_forall_prime_pow_orderOf {G : Type*} [Group 
   have hqK : q ∣ Nat.card ↥K := hdvdK q hqfac.1 hqp hqfac.2.1
   have hrK : r ∣ Nat.card ↥K := hdvdK r hrfac.1 hrp hrfac.2.1
   -- (3) `K` の共役作用は `U` 上 Frobenius
-  letI actK : MulDistribMulAction ↥K ↥U :=
+  let actK : MulDistribMulAction ↥K ↥U :=
     MulDistribMulAction.compHom ↥U ((MulAut.conjNormal (H := U)).comp K.subtype)
   have hFrobAct : IsFrobeniusAction ↥K ↥U := by
     intro a ha n hn hfix
@@ -201,18 +202,19 @@ theorem card_primeFactors_le_two_of_forall_prime_pow_orderOf {G : Type*} [Group 
     exact hqfac.1.one_lt.ne' (Nat.dvd_one.mp hqK)
   obtain ⟨M, hMmin, -⟩ :=
     OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup ↥K) hKne
-  haveI hMnormal : M.Normal := hMmin.1
+  have hMnormal : M.Normal := hMmin.1
   have hMne : M ≠ ⊥ := hMmin.2.1
-  obtain ⟨s, hs, hMea⟩ := OddOrder.Isaacs.Ch03.solvable_minimal_normal_isElementaryAbelian hMmin
-  haveI : Fact s.Prime := ⟨hs⟩
+  obtain ⟨s, hs, hMea⟩ :=
+    OddOrder.Isaacs.Ch03.minimal_normal_isElementaryAbelian_of_isSolvable hMmin
+  have : Fact s.Prime := ⟨hs⟩
   obtain ⟨kM, hMcard⟩ := hMea.isPGroup.exists_card_eq
   -- `{q, r}` のうち `s` と異なるものを `t` に取る
   obtain ⟨t, ht, htK, hts⟩ : ∃ t : ℕ, t.Prime ∧ t ∣ Nat.card ↥K ∧ t ≠ s := by
     rcases eq_or_ne q s with hqs | hqs
     · exact ⟨r, hrfac.1, hrK, fun h => hqr (hqs.trans h.symm)⟩
     · exact ⟨q, hqfac.1, hqK, hqs⟩
-  haveI : Fact t.Prime := ⟨ht⟩
-  haveI : Fintype ↥K := Fintype.ofFinite _
+  have : Fact t.Prime := ⟨ht⟩
+  have : Fintype ↥K := Fintype.ofFinite _
   obtain ⟨y, hyord⟩ := exists_prime_orderOf_dvd_card (G := ↥K) t
     (by rwa [← Nat.card_eq_fintype_card])
   -- `M⟨y⟩` は Frobenius 群
@@ -242,8 +244,8 @@ theorem card_primeFactors_le_two_of_forall_prime_pow_orderOf {G : Type*} [Group 
   have hFrobB :=
     isFrobeniusGroup_sup_zpowers_of_prime_orderOf hMne ht hyord hynorm hcopM hfree
   -- (5) Frobenius 補群は Frobenius 群を含めない (Thm 6.9 可解分岐)
-  haveI : IsSolvable ↥(M ⊔ Subgroup.zpowers y) :=
-    solvable_of_solvable_injective (f := (M ⊔ Subgroup.zpowers y).subtype)
+  have : Group.IsSolvable ↥(M ⊔ Subgroup.zpowers y) :=
+    Group.isSolvable_of_isSolvable_injective (f := (M ⊔ Subgroup.zpowers y).subtype)
       (Subgroup.subtype_injective _)
   exact false_of_frobeniusAction_actorSubgroup_isSolvable_isFrobeniusGroup hFrobAct
     (M ⊔ Subgroup.zpowers y) hFrobB

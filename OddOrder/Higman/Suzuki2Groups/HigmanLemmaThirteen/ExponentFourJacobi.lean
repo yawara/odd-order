@@ -95,7 +95,7 @@ theorem lowerCentralLayerKernel_two_eq_bot_of_exponent_four
     (hfour : ∀ z : frattini P, z ^ 4 = 1)
     (hexists : ∃ z : frattini P, z ^ 2 ≠ 1) :
     lowerCentralLayerKernel P 2 = ⊥ := by
-  letI : Nontrivial P := by
+  let : Nontrivial P := by
     obtain ⟨z, hz⟩ := hexists
     refine ⟨⟨(z : P), 1, ?_⟩⟩
     intro h
@@ -158,7 +158,7 @@ theorem tripleCommutator_swap_last_of_mem_restricted_lengthThree_factor_exponent
     (hncommS : ¬ IsMulCommutative S)
     {x x' y : P} (hx : x ∈ S) (hx' : x' ∈ S) :
     ⁅⁅y, x⁆, x'⁆ = ⁅⁅y, x'⁆, x⁆ := by
-  letI : Nontrivial P := by
+  let : Nontrivial P := by
     obtain ⟨z, hz⟩ := hexists
     refine ⟨⟨(z : P), 1, ?_⟩⟩
     intro h

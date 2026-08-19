@@ -76,7 +76,7 @@ theorem exists_maximal_counterexample_image [Finite (Subgroup G)] {H M : Subgrou
       K ∈ maximalSubgroups G ∧ H ≤ K ∧ K ≠ M ∧
         ∀ L : Subgroup G, L ∈ maximalSubgroups G → H ≤ L → L ≠ M → w L ≤ w K := by
   classical
-  letI := Fintype.ofFinite (Subgroup G)
+  let := Fintype.ofFinite (Subgroup G)
   let family : Finset (Subgroup G) :=
     Finset.univ.filter (fun K => K ∈ maximalSubgroups G ∧ H ≤ K ∧ K ≠ M)
   have hfamily_ne : family.Nonempty := by

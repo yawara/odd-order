@@ -218,12 +218,12 @@ theorem exists_Sset_apply_one_eq_index [Finite G]
     have h := frob₀.frobenius
     rwa [hHeq] at h
   -- the kernel is a nontrivial solvable group, so it has a nontrivial linear character
-  haveI : IsSolvable ↥L := hG.solvable_of_lt_top L
+  have : Group.IsSolvable ↥L := hG.isSolvable_of_lt_top L
     (lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp typeISetup.maximal).1)
-  haveI : Nontrivial ↥((typeISetup.typeI.typeF.H).subgroupOf L) :=
+  have : Nontrivial ↥((typeISetup.typeI.typeF.H).subgroupOf L) :=
     (Subgroup.nontrivial_iff_ne_bot _).mpr hfrob.ne_bot_kernel
   have hcomm : commutator ↥((typeISetup.typeI.typeF.H).subgroupOf L) ≠ ⊤ :=
-    ne_of_lt (IsSolvable.commutator_lt_top_of_nontrivial
+    ne_of_lt (Group.IsSolvable.commutator_lt_top_of_nontrivial
       (G := ↥((typeISetup.typeI.typeF.H).subgroupOf L)))
   obtain ⟨θ, hθ_ne, hθ1⟩ :=
       OddOrder.Peterfalvi.S08.exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top
@@ -612,7 +612,7 @@ theorem exists_zeta_index_of_mem_Sset [Finite G]
     (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L)
     {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ dataL.typeIHyp.Sset) :
     ∃ k : Fin (dataL.n + 1), k ≠ dataL.ind1H ∧ dataL.zeta k = φ := by
-  haveI := dataL.kernelIn_normal
+  have := dataL.kernelIn_normal
   obtain ⟨θ', hθ'ne, hφeq⟩ := hφ
   obtain ⟨k, hk⟩ := dataL.cover θ'
   have hk' : ClassFunction.induce dataL.kernelIn (dataL.θ k : ClassFunction _ ℂ)
@@ -664,6 +664,7 @@ theorem exists_zeta_index_of_mem_Sset [Finite G]
   exact not_isReal_of_ne_trivial_of_odd_card' hodd_L hne_triv hreal
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (13.19.b)**: `𝓛^{τ₁}` is orthogonal to the whole `η`-grid, for the honest
 coherent extension `τ₁ = dataL.coh.extension`.  For `ψ ∈ 𝓛` (an enumerated `ζ_k`,
 `exists_zeta_index_of_mem_Sset`), the conjugate partner `ζ_{k'} = ζ̄_k` is again a family

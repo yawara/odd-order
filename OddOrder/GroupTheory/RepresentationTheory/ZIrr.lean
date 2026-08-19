@@ -216,8 +216,8 @@ theorem IsIrreducibleCharacter.exists_finrank_charValue_one
     ∃ (V : Type) (_ : AddCommGroup V) (_ : Module ℂ V) (_ : FiniteDimensional ℂ V),
       Nonempty V ∧ φ 1 = (finrank ℂ V : ℂ) := by
   obtain ⟨V, _, _, _, ρ, hirr, hchar⟩ := hφ
-  haveI : Representation.IsIrreducible ρ := hirr
-  haveI := nontrivial_of_isIrreducible ρ
+  have : Representation.IsIrreducible ρ := hirr
+  have := nontrivial_of_isIrreducible ρ
   refine ⟨V, inferInstance, inferInstance, inferInstance, ⟨0⟩, ?_⟩
   have hone : (φ : G → ℂ) 1 = ρ.character 1 := by rw [hchar]
   rw [show φ 1 = (φ : G → ℂ) 1 from rfl, hone, ρ.char_one]
@@ -235,8 +235,8 @@ theorem IsIrreducibleCharacter.exists_natDegree_charValue_one_dvd_card [Finite G
     {φ : ClassFunction G ℂ} (hφ : IsIrreducibleCharacter φ) :
     ∃ n : ℕ, 0 < n ∧ φ 1 = (n : ℂ) ∧ n ∣ Nat.card G := by
   obtain ⟨V, _, _, _, ρ, hirr, hchar⟩ := hφ
-  haveI : Representation.IsIrreducible ρ := hirr
-  haveI := nontrivial_of_isIrreducible ρ
+  have : Representation.IsIrreducible ρ := hirr
+  have := nontrivial_of_isIrreducible ρ
   refine ⟨finrank ℂ V, Module.finrank_pos, ?_, finrank_dvd_card ρ⟩
   have hone : (φ : G → ℂ) 1 = ρ.character 1 := by rw [hchar]
   rw [show φ 1 = (φ : G → ℂ) 1 from rfl, hone, ρ.char_one]
@@ -256,8 +256,8 @@ theorem IsIrreducibleCharacter.exists_charValue_one_eq_prime_pow_of_isPGroup [Fi
     {φ : ClassFunction G ℂ} (hφ : IsIrreducibleCharacter φ) :
     ∃ k : ℕ, φ 1 = (p ^ k : ℂ) := by
   obtain ⟨V, _, _, _, ρ, hirr, hchar⟩ := hφ
-  haveI : Representation.IsIrreducible ρ := hirr
-  haveI := nontrivial_of_isIrreducible ρ
+  have : Representation.IsIrreducible ρ := hirr
+  have := nontrivial_of_isIrreducible ρ
   obtain ⟨k, hk⟩ := exists_finrank_eq_prime_pow_of_isPGroup hp ρ
   refine ⟨k, ?_⟩
   have hone : (φ : G → ℂ) 1 = ρ.character 1 := by rw [hchar]

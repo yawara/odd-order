@@ -108,10 +108,10 @@ theorem APrime_lt_top_of_isNilpotent_of_prime_dvd_card
     have hP_card : 1 < Nat.card ↥(P : Subgroup H) := by
       rw [P.card_eq_multiplicity]
       exact Nat.one_lt_pow (hp.out.factorization_pos_of_dvd hcard_ne hpH).ne' hp.out.one_lt
-    haveI : Nontrivial ↥(P : Subgroup H) := Finite.one_lt_card_iff_nontrivial.mp hP_card
-    haveI : Group.IsNilpotent ↥(P : Subgroup H) := P.isPGroup'.isNilpotent
+    have : Nontrivial ↥(P : Subgroup H) := Finite.one_lt_card_iff_nontrivial.mp hP_card
+    have : Group.IsNilpotent ↥(P : Subgroup H) := P.isPGroup'.isNilpotent
     have hcomm_lt : commutator ↥(P : Subgroup H) < ⊤ :=
-      IsSolvable.commutator_lt_top_of_nontrivial _
+      Group.IsSolvable.commutator_lt_top_of_nontrivial _
     intro hcard1
     have hidx : (commutator ↥(P : Subgroup H)).index = 1 := hcard1
     exact hcomm_lt.ne (Subgroup.index_eq_one.mp hidx)
@@ -143,7 +143,7 @@ theorem exists_sylow_coe_eq_of_normalizer_le
     rw [lt_top_iff_ne_top]
     intro htop
     exact hlt.not_ge (Subgroup.subgroupOf_eq_top.mp htop)
-  haveI : Group.IsNilpotent ↥(S : Subgroup G) := S.isPGroup'.isNilpotent
+  have : Group.IsNilpotent ↥(S : Subgroup G) := S.isPGroup'.isNilpotent
   obtain ⟨x, hx_norm, hx_not⟩ :=
     SetLike.exists_of_lt (Ch01.lt_normalizer_of_isNilpotent_of_lt_top hlt_top)
   -- `x` normalizes `P` in `G`
@@ -183,7 +183,7 @@ private lemma sylowSetup (hSimp : IsSimpleGroup G) {H : Subgroup G}
     {r : ℕ} [hr : Fact r.Prime] (hrH : r ∣ Nat.card ↥H) (P₀ : Sylow r ↥H) :
     ∃ S : Sylow r G, (S : Subgroup G) = (P₀ : Subgroup ↥H).map H.subtype ∧
       H = Subgroup.normalizer (((P₀ : Subgroup ↥H).map H.subtype : Subgroup G) : Set G) := by
-  haveI := hnilp
+  have := hnilp
   set P' : Subgroup G := (P₀ : Subgroup ↥H).map H.subtype with hP'_def
   have hP'_le_H : P' ≤ H := Subgroup.map_subtype_le _
   have hP'_pgroup : IsPGroup r P' := P₀.isPGroup'.map H.subtype
@@ -196,7 +196,7 @@ private lemma sylowSetup (hSimp : IsSimpleGroup G) {H : Subgroup G}
     have hpos := hr.out.factorization_pos_of_dvd Nat.card_pos.ne' hrH
     exact absurd hcard.symm (Nat.one_lt_pow hpos.ne' hr.out.one_lt).ne'
   -- (2) `H ≤ N_G(P')` (the Sylow subgroup of the nilpotent `H` is normal in `H`)
-  haveI hP₀_norm : (P₀ : Subgroup ↥H).Normal := inferInstance
+  have hP₀_norm : (P₀ : Subgroup ↥H).Normal := inferInstance
   have hH_le_N : H ≤ Subgroup.normalizer (P' : Set G) := by
     intro h hh
     rw [Subgroup.mem_normalizer_iff]
@@ -251,13 +251,13 @@ theorem exists_isPGroup_of_isCoatom_of_isNilpotent
     (hmax : IsCoatom H) (hnilp : Group.IsNilpotent ↥H) :
     ∃ p : ℕ, p.Prime ∧ IsPGroup p ↥H := by
   classical
-  haveI := hnilp
+  have := hnilp
   -- key step: two primes dividing `|H|` must coincide
   have hkey : ∀ p q : ℕ, p.Prime → q.Prime → p ∣ Nat.card ↥H → q ∣ Nat.card ↥H → p = q := by
     intro p q hp hq hpH hqH
     by_contra hpq
-    haveI : Fact p.Prime := ⟨hp⟩
-    haveI : Fact q.Prime := ⟨hq⟩
+    have : Fact p.Prime := ⟨hp⟩
+    have : Fact q.Prime := ⟨hq⟩
     obtain ⟨S, hS, hHP⟩ := sylowSetup hSimp hmax hnilp hpH (default : Sylow p ↥H)
     obtain ⟨T, hT, hHQ⟩ := sylowSetup hSimp hmax hnilp hqH (default : Sylow q ↥H)
     set P₀ : Sylow p ↥H := default

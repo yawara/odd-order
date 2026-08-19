@@ -230,7 +230,7 @@ theorem exists_smul_eq_zero_and_sub_card_mem (U : Ideal R)
       induction x using DirectSum.induction_on with
       | zero => exact ⟨0, AddSubgroup.zero_mem _, by rw [map_zero]; simp⟩
       | of i c =>
-        haveI : NeZero (n i) := ⟨by have := hn1 i; omega⟩
+        have : NeZero (n i) := ⟨by have := hn1 i; omega⟩
         have hmem : a i ∈ Set.range g := ⟨Sum.inl i, by simp [hg]⟩
         refine ⟨c.val • a i, nsmul_mem
           (AddSubgroup.subset_closure hmem) _, ?_⟩

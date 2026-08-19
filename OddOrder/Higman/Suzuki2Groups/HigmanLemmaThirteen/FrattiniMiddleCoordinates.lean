@@ -102,7 +102,7 @@ theorem frattiniSquarePowerHom_ker_eq_agemo
     (hexists : ∃ z : frattini P, z ^ 2 ≠ 1) :
     (frattiniSquarePowerHom hPhiComm).ker =
       Agemo (frattini P) 2 1 := by
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   ext z
@@ -144,7 +144,7 @@ theorem frattiniSquarePowerHom_surjective
     {P : Type uP} [Group P]
     (hPhiComm : IsMulCommutative (frattini P)) :
     Function.Surjective (frattiniSquarePowerHom hPhiComm) := by
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   intro x
@@ -332,7 +332,7 @@ theorem frattiniMiddleSquareEquiv_equivariant
     IsAInvariant.of_characteristic Y.subtype
   let hSquareInv : IsAInvariant Y.subtype (frattiniSquare P) :=
     (frattiniSquareNormalInvariant Y.subtype).2.2
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   intro c q
@@ -399,13 +399,13 @@ theorem frattiniMiddleCoordinate_generator_compatible
     (frattiniSquareNormalInvariant Y.subtype).2.2
   let hSquareEA :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : CommGroup (frattiniSquare P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : CommGroup (frattiniSquare P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
   intro q
   change (frobeniusEquiv (GaloisField 2 n) 2).symm

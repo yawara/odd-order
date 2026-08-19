@@ -142,7 +142,7 @@ theorem pi_truncClassSum_eq_centralizerTrunc {p : ℕ} [Fact p.Prime] [CharP k p
   -- `P`, viewed inside `H`, is a normal `p`-subgroup.
   set Q : Subgroup ↥H := P.subgroupOf H with hQ
   have hmemQ : ∀ y : ↥H, y ∈ Q ↔ (y : G) ∈ P := fun _ => Iff.rfl
-  haveI hQnormal : Q.Normal := by
+  have hQnormal : Q.Normal := by
     refine ⟨fun n hn g => ?_⟩
     rw [hmemQ] at hn ⊢
     have hcoe : ((g * n * g⁻¹ : ↥H) : G) = (g : G) * (n : G) * (g : G)⁻¹ := by push_cast; rfl

@@ -78,7 +78,7 @@ section /- 9B: Lemma 9.19 (p. 282) -/
 theorem isNilpotent_of_frattini_le_of_quotient_nilpotent [Finite G] {N : Subgroup G}
     [hN : N.Normal] (hle : N ≤ frattini G) (hquot : Group.IsNilpotent (G ⧸ N)) :
     Group.IsNilpotent G := by
-  haveI := hquot
+  have := hquot
   have hnc : NormalizerCondition (G ⧸ N) := Group.normalizerCondition_of_isNilpotent
   refine ((Group.isNilpotent_of_finite_tfae (G := G)).out 2 0).mp ?_
   intro M hM
@@ -86,7 +86,7 @@ theorem isNilpotent_of_frattini_le_of_quotient_nilpotent [Finite G] {N : Subgrou
   have hcoatom : IsCoatom (M.map (QuotientGroup.mk' N)) :=
     isCoatom_map_of_ker_le (QuotientGroup.mk'_surjective N) hM
       (by rw [QuotientGroup.ker_mk']; exact hNM)
-  haveI hmapnormal : (M.map (QuotientGroup.mk' N)).Normal :=
+  have hmapnormal : (M.map (QuotientGroup.mk' N)).Normal :=
     Subgroup.NormalizerCondition.normal_of_coatom _ hnc hcoatom
   have hMeq : M = Subgroup.comap (QuotientGroup.mk' N) (M.map (QuotientGroup.mk' N)) := by
     rw [Subgroup.comap_map_eq, QuotientGroup.ker_mk', sup_eq_left.mpr hNM]
@@ -111,7 +111,7 @@ theorem exists_nilpotent_sup_eq_top [Finite G] {N : Subgroup G} [hN : N.Normal]
   obtain ⟨E, hEmin⟩ :=
     exists_minimal_of_wellFoundedLT (fun H : Subgroup G => N ⊔ H = ⊤) ⟨⊤, by simp⟩
   refine ⟨E, ?_, hEmin.1⟩
-  haveI hN'normal : (N.subgroupOf E).Normal := hN.subgroupOf E
+  have hN'normal : (N.subgroupOf E).Normal := hN.subgroupOf E
   -- `↥E ⧸ N'` は G/N の部分群と同型 ⇒ nilpotent
   have hquotE : Group.IsNilpotent (↥E ⧸ N.subgroupOf E) := by
     set φ := (QuotientGroup.mk' N).comp E.subtype with hφ
@@ -120,11 +120,11 @@ theorem exists_nilpotent_sup_eq_top [Finite G] {N : Subgroup G} [hN : N.Normal]
     have e : (↥E ⧸ N.subgroupOf E) ≃* ↥φ.range :=
       (QuotientGroup.quotientMulEquivOfEq hker).symm.trans
         (QuotientGroup.quotientKerEquivRange φ)
-    haveI := hquot
+    have := hquot
     exact Group.nilpotent_of_mulEquiv e.symm
   -- `N' ≤ Φ(↥E)`
   have hNfrat : N.subgroupOf E ≤ frattini (↥E) := by
-    simp only [frattini, Order.radical, le_iInf_iff, Set.mem_setOf_eq]
+    simp only [frattini, Order.radical, le_iInf_iff, Set.mem_ofPred_eq]
     intro M' hM'
     by_contra hnle
     -- `N' ⊔ M' = ⊤` (M' coatom, N' ⊄ M')
@@ -206,9 +206,9 @@ theorem centralizer_nilpotentResidual_le_of_center_eq_bot [Finite G]
       ≤ nilpotentResidual (⊤ : Subgroup G) := by
   set R := nilpotentResidual (⊤ : Subgroup G) with hR
   set C := Subgroup.centralizer (R : Set G) with hC
-  haveI hRnormal : R.Normal := by rw [hR]; infer_instance
-  haveI hCnormal : C.Normal := by rw [hC]; infer_instance
-  haveI hCRnormal : (C ⊓ R).Normal := inferInstance
+  have hRnormal : R.Normal := by rw [hR]; infer_instance
+  have hCnormal : C.Normal := by rw [hC]; infer_instance
+  have hCRnormal : (C ⊓ R).Normal := inferInstance
   -- G/R nilpotent
   have hGRnil : Group.IsNilpotent (G ⧸ R) := by
     have h := (nilpotentResidual_le_iff_isNilpotent_map (S := (⊤ : Subgroup G)) (N := R)).mp
@@ -218,9 +218,9 @@ theorem centralizer_nilpotentResidual_le_of_center_eq_bot [Finite G]
   -- Claim 1: nilpotent `H` で `R ⊔ H = ⊤` なら `C ⊓ H = ⊥`
   have hclaim1 : ∀ H : Subgroup G, Group.IsNilpotent ↥H → R ⊔ H = ⊤ → C ⊓ H = ⊥ := by
     intro H hHnil hHsup
-    haveI := hHnil
+    have := hHnil
     by_contra hne
-    haveI hKn : (C.subgroupOf H).Normal := hCnormal.subgroupOf H
+    have hKn : (C.subgroupOf H).Normal := hCnormal.subgroupOf H
     have hKne : C.subgroupOf H ≠ ⊥ := by
       intro hbot
       refine hne ?_
@@ -272,7 +272,7 @@ theorem centralizer_nilpotentResidual_le_of_center_eq_bot [Finite G]
     rw [hmap]
     exact isNilpotent_map _ hKnil
   have hTCR : nilpotentResidual T ≤ C ⊓ R := le_inf hTC hTR
-  haveI hN2normal : ((C ⊓ R).subgroupOf T).Normal := hCRnormal.subgroupOf T
+  have hN2normal : ((C ⊓ R).subgroupOf T).Normal := hCRnormal.subgroupOf T
   -- `↥T ⧸ N₂` nilpotent
   have hN2nil : Group.IsNilpotent (↥T ⧸ (C ⊓ R).subgroupOf T) := by
     have hle : nilpotentResidual (⊤ : Subgroup ↥T) ≤ (C ⊓ R).subgroupOf T := by
@@ -284,8 +284,8 @@ theorem centralizer_nilpotentResidual_le_of_center_eq_bot [Finite G]
       Group.isNilpotent_top] at h
   -- 9.20 を `↥T` で適用
   obtain ⟨H', hH'nil, hH'sup⟩ := exists_nilpotent_sup_eq_top hN2nil
-  haveI := hH'nil
-  haveI hHnil : Group.IsNilpotent ↥(H'.map T.subtype) :=
+  have := hH'nil
+  have hHnil : Group.IsNilpotent ↥(H'.map T.subtype) :=
     Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective H' T.subtype T.subtype_injective)
   -- `(C ⊓ R) ⊔ H = T`
   have hCRH_T : (C ⊓ R) ⊔ H'.map T.subtype = T := by
@@ -412,9 +412,9 @@ private theorem schenkman_aux (n : ℕ) :
       exact Subgroup.mem_map_of_mem _ hxRS
     by_cases hSC : S ⊔ C = ⊤
     · -- SC = G の場合. ここでは `S ⊔ C = ⊤` なので `R`, `C` は `G` に normal になる.
-      haveI hRnormal : R.Normal :=
+      have hRnormal : R.Normal :=
         Subgroup.normalizer_eq_top_iff.mp (top_le_iff.mp (by rw [← hSC]; exact hSCnormR))
-      haveI hCnormal : C.Normal := by rw [hC]; infer_instance
+      have hCnormal : C.Normal := by rw [hC]; infer_instance
       -- 中間部分群がない: `S ≤ H → H = S ∨ H = ⊤`
       have hinterval : ∀ H : Subgroup G, S ≤ H → H = S ∨ H = ⊤ := by
         intro H hSH
@@ -443,7 +443,7 @@ private theorem schenkman_aux (n : ℕ) :
           exact sup_eq_left.mpr (hHC.trans hRS)
       -- **書籍 p. 283 の核心ステップ**: 中間部分群が無く `S ◁◁ G` ゆえ `S ◁ G`.
       -- (proper subnormal は proper normal に含まれる — `hinterval` でそれが `S` に潰れる.)
-      haveI hSnormal : S.Normal := by
+      have hSnormal : S.Normal := by
         rcases eq_or_ne S ⊤ with rfl | hSne
         · infer_instance
         · obtain ⟨K, hKnormal, hSK, hKlt⟩ := hSsub.exists_normal_and_le_and_lt_top_of_ne hSne
@@ -451,7 +451,7 @@ private theorem schenkman_aux (n : ℕ) :
           · exact h ▸ hKnormal
           · exact absurd h hKlt.ne
       -- `G/S` cyclic
-      haveI hcyc : IsCyclic (G ⧸ S) := by
+      have hcyc : IsCyclic (G ⧸ S) := by
         have hsub : ∀ B : Subgroup (G ⧸ S), B = ⊥ ∨ B = ⊤ := by
           intro B
           rcases hinterval _ (QuotientGroup.le_comap_mk' S B) with h | h
@@ -473,7 +473,7 @@ private theorem schenkman_aux (n : ℕ) :
           · exact absurd (Subgroup.zpowers_eq_bot.mp h0) hg
           · exact htop.ge (Subgroup.mem_top x)
       -- `C` は可換
-      haveI hCcomm : IsMulCommutative ↥C := by
+      have hCcomm : IsMulCommutative ↥C := by
         have hker : ((QuotientGroup.mk' S).comp C.subtype).ker ≤ Subgroup.center ↥C := by
           intro z hz
           simp only [MonoidHom.mem_ker, MonoidHom.comp_apply, Subgroup.coe_subtype,

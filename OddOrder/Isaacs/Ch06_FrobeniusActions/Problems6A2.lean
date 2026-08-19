@@ -503,12 +503,12 @@ instance fact_prime_43 : Fact (Nat.Prime 43) := ⟨by norm_num⟩
 
 /-- `𝔽₄₃` の乗法群に位数 7 の元がある (`-2 = 41`; `(-2)⁷ = -128 = 1 - 3·43`)。 -/
 theorem exists_orderOf_eq_seven_zmod_fortyThree : ∃ α : ZMod 43, orderOf α = 7 := by
-  haveI : Fact (Nat.Prime 7) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 7) := ⟨by norm_num⟩
   exact ⟨41, orderOf_eq_prime (by decide) (by decide)⟩
 
 /-- `𝔽₄₃` の乗法群に位数 3 の元がある (`6`; `6³ = 216 = 1 + 5·43`)。 -/
 theorem exists_orderOf_eq_three_zmod_fortyThree : ∃ ε : ZMod 43, orderOf ε = 3 := by
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   exact ⟨6, orderOf_eq_prime (by decide) (by decide)⟩
 
 /-- ベクトル空間 `V = 𝔽₄₃³` の位数は `43³` (書籍の「位数 `43³` のベクトル空間」)。 -/

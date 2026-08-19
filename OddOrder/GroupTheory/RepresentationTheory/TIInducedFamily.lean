@@ -57,7 +57,7 @@ theorem induce_difference_pair_structure_of_isTISubset
       ∀ i, ClassFunction.induce H (irreducibleCharacterDifference χ i)
         = data.signedDifference i := by
   classical
-  letI : Fintype ↥H := Fintype.ofFinite ↥H
+  let : Fintype ↥H := Fintype.ofFinite ↥H
   -- `Ind_H^G` as a `ℤ`-linear map.
   let τ : ClassFunction ↥H ℂ →ₗ[ℤ] ClassFunction G ℂ :=
     { toFun := ClassFunction.induce H

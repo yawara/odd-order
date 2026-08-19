@@ -198,7 +198,7 @@ private theorem quotientCenter_isElementaryAbelian (hS : IsExtraspecial p (↥S)
     IsElementaryAbelian p (↥S ⧸ Subgroup.center (↥S)) := by
   have hfrat : frattini (↥S) = Subgroup.center (↥S) := hS.frattini_eq_center
   have hEA := IsPGroup.quotient_frattini_isElementaryAbelian (p := p) (R := ↥S) hS.isPGroup
-  haveI : (frattini (↥S)).Normal := inferInstance
+  have : (frattini (↥S)).Normal := inferInstance
   exact IsElementaryAbelian.of_mulEquiv (QuotientGroup.quotientMulEquivOfEq hfrat) hEA
 
 omit [Finite R] in
@@ -265,10 +265,10 @@ private theorem card_quotient_centralizer_le [S.Normal] (hS : IsExtraspecial p (
   set Z := Subgroup.center (↥S) with hZ
   have hQ_EA : IsElementaryAbelian p Q := quotientCenter_isElementaryAbelian hS
   have hZ_EA : IsElementaryAbelian p Z := centerS_isElementaryAbelian hS
-  haveI : IsMulCommutative Q := ⟨⟨hQ_EA.comm⟩⟩
-  haveI : IsMulCommutative Z := ⟨⟨hZ_EA.comm⟩⟩
-  haveI : Module (ZMod p) (Additive Q) := AddCommGroup.zmodModule (additive_nsmul_eq_zero hQ_EA)
-  haveI : Module (ZMod p) (Additive Z) := AddCommGroup.zmodModule (additive_nsmul_eq_zero hZ_EA)
+  have : IsMulCommutative Q := ⟨⟨hQ_EA.comm⟩⟩
+  have : IsMulCommutative Z := ⟨⟨hZ_EA.comm⟩⟩
+  have : Module (ZMod p) (Additive Q) := AddCommGroup.zmodModule (additive_nsmul_eq_zero hQ_EA)
+  have : Module (ZMod p) (Additive Z) := AddCommGroup.zmodModule (additive_nsmul_eq_zero hZ_EA)
   -- A chosen `𝔽_p`-basis of `Additive Q`.
   let ι := Module.Free.ChooseBasisIndex (ZMod p) (Additive Q)
   let b : Module.Basis ι (ZMod p) (Additive Q) := Module.Free.chooseBasis (ZMod p) (Additive Q)
@@ -357,7 +357,7 @@ private theorem card_quotient_centralizer_le [S.Normal] (hS : IsExtraspecial p (
     exact QuotientGroup.eq.mpr ((hconj_iff_mem g g').mp hconj)
   -- Cardinality bookkeeping: `|ι → Z| = |Z|^|ι| = p^{finrank} = |Q|`.
   have hcardZ : Nat.card Z = p := hS.center_card
-  haveI : Finite (Additive Q) := inferInstanceAs (Finite Q)
+  have : Finite (Additive Q) := inferInstanceAs (Finite Q)
   have hι_card : Nat.card ι = Module.finrank (ZMod p) (Additive Q) := by
     rw [Module.finrank_eq_card_chooseBasisIndex, Nat.card_eq_fintype_card]
   have hQ_pow : Nat.card Q = p ^ Module.finrank (ZMod p) (Additive Q) := by
@@ -435,7 +435,7 @@ theorem mul_centralizer_eq_top_of_isExtraspecial
     S ⊔ Subgroup.centralizer (S : Set R) = ⊤ := by
   classical
   -- `S` is normal in `R`.
-  haveI : S.Normal := extraspecial_normal_of_commutator_le (commutator_le_self_of_hSR hSR)
+  have : S.Normal := extraspecial_normal_of_commutator_le (commutator_le_self_of_hSR hSR)
   -- The two bounds force `|S/Z(S)| = |R/C_R(S)|`.
   have hle1 := card_quotient_centralizer_le hS hSR
   have hle2 := card_quotient_center_le_card_quotient_centralizer (S := S)
@@ -462,10 +462,10 @@ theorem mul_centralizer_eq_top_of_isExtraspecial
       rw [← mem_centralizer_iff_mem_center]; simpa using hmem
     simpa using hmemS
   have hψ_surj : Function.Surjective ψ := by
-    haveI : Finite (↥S ⧸ Subgroup.center (↥S)) := Nat.finite_of_card_ne_zero (by
+    have : Finite (↥S ⧸ Subgroup.center (↥S)) := Nat.finite_of_card_ne_zero (by
       rw [hcard_eq]; exact Nat.card_pos.ne')
-    haveI := Fintype.ofFinite (↥S ⧸ Subgroup.center (↥S))
-    haveI := Fintype.ofFinite (R ⧸ Subgroup.centralizer (S : Set R))
+    have := Fintype.ofFinite (↥S ⧸ Subgroup.center (↥S))
+    have := Fintype.ofFinite (R ⧸ Subgroup.centralizer (S : Set R))
     have hcardF : Fintype.card (↥S ⧸ Subgroup.center (↥S)) =
         Fintype.card (R ⧸ Subgroup.centralizer (S : Set R)) := by
       rw [← Nat.card_eq_fintype_card, ← Nat.card_eq_fintype_card, hcard_eq]

@@ -71,35 +71,35 @@ This proof avoids the still-missing chief-factor intersection API of Prop. 1.2. 
 `K ∩ F(G)` is central in `K`, and `K/(K ∩ F(G))` is abelian; hence `K` is nilpotent,
 contradicting maximality of `F(G)`. -/
 theorem centralizer_fitting_le_fitting
-    {G : Type*} [Group G] [Finite G] [IsSolvable G] :
+    {G : Type*} [Group G] [Finite G] [Group.IsSolvable G] :
     Subgroup.centralizer ((OddOrder.Isaacs.Ch01.fitting G : Subgroup G) : Set G) ≤
       OddOrder.Isaacs.Ch01.fitting G := by
   classical
   set F : Subgroup G := OddOrder.Isaacs.Ch01.fitting G with hF_def
   set C : Subgroup G := Subgroup.centralizer (F : Set G) with hC_def
-  haveI hF_normal : F.Normal := by
+  have hF_normal : F.Normal := by
     dsimp [F]
     infer_instance
-  haveI hC_normal : C.Normal := by
+  have hC_normal : C.Normal := by
     dsimp [C]
     exact Subgroup.normal_centralizer
   by_contra hC_not_le_F
   obtain ⟨K, hK_normal, hK_le_C, hK_not_le_F, hK_min⟩ :=
     exists_minimal_normal_le_not_le (C := C) (F := F) hC_not_le_F
-  haveI hK_normal_inst : K.Normal := hK_normal
+  have hK_normal_inst : K.Normal := hK_normal
   have hK_ne_bot : K ≠ ⊥ := by
     intro hK_bot
     apply hK_not_le_F
     rw [hK_bot]
     exact bot_le
-  have hcomm_lt : ⁅K, K⁆ < K := IsSolvable.commutator_lt_of_ne_bot hK_ne_bot
+  have hcomm_lt : ⁅K, K⁆ < K := Group.IsSolvable.commutator_lt_of_ne_bot hK_ne_bot
   have hcomm_le_F : ⁅K, K⁆ ≤ F := by
     by_contra hcomm_not_le_F
     have hK_le_comm : K ≤ ⁅K, K⁆ :=
       hK_min ⁅K, K⁆ inferInstance (Subgroup.commutator_le_left K K) hcomm_not_le_F
     exact hcomm_lt.not_ge hK_le_comm
   let N : Subgroup K := (K ⊓ F).subgroupOf K
-  haveI hN_normal : N.Normal := by
+  have hN_normal : N.Normal := by
     dsimp [N]
     infer_instance
   have hN_le_center : N ≤ Subgroup.center K := by
@@ -112,7 +112,7 @@ theorem centralizer_fitting_le_fitting
     exact ⟨x.2, hcomm_le_F hx_map⟩
   have hquot_mul_comm : ∀ x y : K ⧸ N, x * y = y * x :=
     (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr hcomm_K_le_N).is_comm.comm
-  haveI hquot_nilpotent : Group.IsNilpotent (K ⧸ N) := by
+  have hquot_nilpotent : Group.IsNilpotent (K ⧸ N) := by
     rw [Subgroup.nilpotent_iff_lowerCentralSeries]
     refine ⟨1, ?_⟩
     rw [Subgroup.top_lowerCentralSeries_one, commutator_eq_bot_iff_center_eq_top, eq_top_iff]
@@ -123,7 +123,7 @@ theorem centralizer_fitting_le_fitting
   have hker_le_center : (QuotientGroup.mk' N).ker ≤ Subgroup.center K := by
     rw [QuotientGroup.ker_mk']
     exact hN_le_center
-  haveI hK_nilpotent : Group.IsNilpotent K :=
+  have hK_nilpotent : Group.IsNilpotent K :=
     Subgroup.isNilpotent_of_ker_le_center (QuotientGroup.mk' N) hker_le_center
   have hK_le_fitting : K ≤ OddOrder.Isaacs.Ch01.fitting G :=
     OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting

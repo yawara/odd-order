@@ -68,7 +68,7 @@ theorem oPiCore_isComplement_of_hasNormalPComplement {p : ℕ} [Fact p.Prime]
     (hG : Ch05.HasNormalPComplement p G) (P : Sylow p G) :
     Subgroup.IsComplement' (Ch03.oPiCore {r : ℕ | r ≠ p} G) (P : Subgroup G) := by
   rcases hG with ⟨K, hK_normal, hK_compl⟩
-  haveI : K.Normal := hK_normal
+  have : K.Normal := hK_normal
   have hK_eq : K = Ch03.oPiCore {r : ℕ | r ≠ p} G :=
     normalPComplement_eq_oPiCore_compl (K := K) hK_compl
   rw [← hK_eq]
@@ -145,8 +145,8 @@ theorem hasNormalPComplement_of_characteristic_subgroup_quotient_isPGroup {p : �
     (hquot : IsPGroup p (G ⧸ K.map H.subtype)) :
     Ch05.HasNormalPComplement p G := by
   classical
-  haveI : K.Characteristic := hK_char
-  haveI : (K.map H.subtype).Normal := inferInstance
+  have : K.Characteristic := hK_char
+  have : (K.map H.subtype).Normal := inferInstance
   refine hasNormalPComplement_of_normal_pPrime_of_quotient_isPGroup
     (N := K.map H.subtype) ?_ hquot
   rw [Subgroup.card_map_of_injective H.subtype_injective]
@@ -186,8 +186,8 @@ theorem hasNormalPComplement_of_characteristic_subgroup_quotient_and_outer_quoti
     (hHK : IsPGroup p (↥H ⧸ K)) (hGH : IsPGroup p (G ⧸ H)) :
     Ch05.HasNormalPComplement p G := by
   classical
-  haveI : K.Characteristic := hK_char
-  haveI : (K.map H.subtype).Normal := inferInstance
+  have : K.Characteristic := hK_char
+  have : (K.map H.subtype).Normal := inferInstance
   exact hasNormalPComplement_of_characteristic_subgroup_quotient_isPGroup
     (H := H) (K := K) hK_char hKpPrime
     (isPGroup_quotient_map_subtype_of_isPGroup_quotient_of_isPGroup_quotient
@@ -226,7 +226,7 @@ theorem factorization_card_oPiCore_eq_factorization_card_of_hasNormalPComplement
   have hcomp : Subgroup.IsComplement' (Ch03.oPiCore {r : ℕ | r ≠ p} G)
       (P : Subgroup G) := oPiCore_isComplement_of_hasNormalPComplement hG P
   have hmul : Nat.card ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G) *
-      Nat.card ↥(P : Subgroup G) = Nat.card G := hcomp.card_mul
+      Nat.card ↥(P : Subgroup G) = Nat.card G := hcomp.card_mul_card
   have hP_q_zero : (Nat.card ↥(P : Subgroup G)).factorization q = 0 := by
     rw [P.card_eq_multiplicity]
     refine Nat.factorization_eq_zero_of_not_dvd ?_
@@ -445,8 +445,8 @@ theorem characteristic_quotient_layer_lift_of_hasNormalPComplement_ne
           Nat.card ↥((default : Sylow q G) : Subgroup G) := by
   classical
   let O : Subgroup G := Ch03.oPiCore {r : ℕ | r ≠ p} G
-  haveI : B.Characteristic := hB_char
-  haveI : ((B.subgroupOf A) : Subgroup A).Normal :=
+  have : B.Characteristic := hB_char
+  have : ((B.subgroupOf A) : Subgroup A).Normal :=
     (inferInstance : B.Normal).subgroupOf A
   refine ⟨?_, ?_, ?_⟩
   · exact OddOrder.GroupTheory.characteristic_map_subtype_of_characteristic
@@ -552,7 +552,7 @@ noncomputable def top_of_hasNormalPComplement
 /-- Apply BG Theorem 4.18(b) inside a normal subgroup and attach the resulting
 normal `p`-complement as the ambient top Sylow layer. -/
 noncomputable def top_of_normal_subgroup_pRank_le_two
-    {p : ℕ} [Fact p.Prime] {H : Subgroup G} [H.Normal] [IsSolvable ↥H]
+    {p : ℕ} [Fact p.Prime] {H : Subgroup G} [H.Normal] [Group.IsSolvable ↥H]
     (hoddH : Odd (Nat.card ↥H)) (hpH : p ∣ Nat.card ↥H)
     (hpCaseH : p = 3 ∨ ∀ q ∈ (Nat.card ↥H).primeFactors, p ≤ q)
     (hrH : pRank ↥H p ≤ 2) (houter : IsPGroup p (G ⧸ H)) :
@@ -568,7 +568,7 @@ noncomputable def top_of_normal_subgroup_pRank_le_two
 `p`-subgroup of the normal subgroup lies in its Fitting subgroup and that Fitting
 subgroup has rank at most two, then the same ambient top layer is available. -/
 noncomputable def top_of_normal_subgroup_sylow_le_fitting
-    {p : ℕ} [Fact p.Prime] {H : Subgroup G} [H.Normal] [IsSolvable ↥H]
+    {p : ℕ} [Fact p.Prime] {H : Subgroup G} [H.Normal] [Group.IsSolvable ↥H]
     (hoddH : Odd (Nat.card ↥H)) (hpH : p ∣ Nat.card ↥H)
     (hpCaseH : p = 3 ∨ ∀ q ∈ (Nat.card ↥H).primeFactors, p ≤ q)
     (P : Sylow p ↥H) (hPfit : (P : Subgroup ↥H) ≤ Ch01.fitting ↥H)
@@ -633,7 +633,7 @@ def ofLayer {q : ℕ} [Fact q.Prime] (L : CharacteristicSylowLayer G q) :
 subgroup for its label. -/
 theorem exists_normal_sylow_of_lower_eq_bot (S : CharacteristicSylowStep G)
     (hlower : S.lower = ⊥) : ∃ Q : Sylow S.q G, (Q : Subgroup G).Normal := by
-  haveI : Fact S.q.Prime := S.q_prime
+  have : Fact S.q.Prime := S.q_prime
   exact CharacteristicSylowLayer.exists_normal_sylow_of_lower_eq_bot S.layer
     (by simpa [lower] using hlower)
 
@@ -697,7 +697,7 @@ noncomputable def lift_oPiCore_of_hasNormalPComplement_ne
     (hpq : S.q ≠ p) :
     (S.lift_oPiCore_of_hasNormalPComplement_ne (G := G) hG hpq).upper =
       S.upper.map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype := by
-  haveI : Fact S.q.Prime := S.q_prime
+  have : Fact S.q.Prime := S.q_prime
   unfold lift_oPiCore_of_hasNormalPComplement_ne upper
   unfold CharacteristicSylowLayer.lift_oPiCore_of_hasNormalPComplement_ne
   rcases characteristic_quotient_layer_lift_of_hasNormalPComplement_ne
@@ -712,7 +712,7 @@ noncomputable def lift_oPiCore_of_hasNormalPComplement_ne
     (hpq : S.q ≠ p) :
     (S.lift_oPiCore_of_hasNormalPComplement_ne (G := G) hG hpq).lower =
       S.lower.map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype := by
-  haveI : Fact S.q.Prime := S.q_prime
+  have : Fact S.q.Prime := S.q_prime
   unfold lift_oPiCore_of_hasNormalPComplement_ne lower
   unfold CharacteristicSylowLayer.lift_oPiCore_of_hasNormalPComplement_ne
   rcases characteristic_quotient_layer_lift_of_hasNormalPComplement_ne
@@ -940,10 +940,10 @@ theorem isPGroup_quotient_oPiCore_of_comm {B : Type*} [Group B] [Finite B] {p : 
   have huniq : ∀ q : ℕ, q.Prime → q ∣ Nat.card C → q = p := by
     intro q hq hqdvd
     by_contra hqp
-    haveI : Fact q.Prime := ⟨hq⟩
+    have : Fact q.Prime := ⟨hq⟩
     obtain ⟨x, hx⟩ := Ch01.cauchy (G := C) hqdvd
     -- `⟨x⟩` is a normal `{r ≠ p}`-subgroup, hence trivial — contradicting `|⟨x⟩| = q > 1`.
-    haveI hnorm : (Subgroup.zpowers x).Normal :=
+    have hnorm : (Subgroup.zpowers x).Normal :=
       { conj_mem := fun n hn g => by
           have hgn : g * n * g⁻¹ = n := by
             rw [hcommC g n, mul_assoc, mul_inv_cancel, mul_one]

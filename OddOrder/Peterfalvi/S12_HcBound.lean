@@ -254,6 +254,7 @@ theorem reducible_mem_sOf_H0_apply_one_eq_qu [Finite G]
 
 open scoped FiniteInduce in
 open OddOrder.Peterfalvi.S11 in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (11.8.1), the μ-columns are the reducible `𝒮(H₀)`-members** (Coq `PFsection11`
 `memSred`): for `k ≠ 0`, the §10 column sum `μ_k = ∑_i μ_{ik}` lies in the §9 family `𝒮(H₀)` and is
 reducible.
@@ -275,15 +276,15 @@ theorem Hypothesis.muGrid_column_sum_mem_sOf_H0_and_reducible [Finite G]
     (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i k)
         ∈ sOf (hyp.toTypesIIIIIIVSetup htype hnt) chief.H0 ∧
       ¬ IsIrreducibleCharacter (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i k) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   let h := (hyp.toCertainTypeHypothesis hG hG.odd).toHypothesis
-  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
-  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
-  letI : Fintype ↥M := Fintype.ofFinite _
-  letI : Fintype ↥h.K := Fintype.ofFinite _
-  letI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  have hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  let : Fintype ↥M := Fintype.ofFinite _
+  let : Fintype ↥h.K := Fintype.ofFinite _
+  let : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
   have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
   have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
@@ -291,7 +292,7 @@ theorem Hypothesis.muGrid_column_sum_mem_sOf_H0_and_reducible [Finite G]
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
   -- (4.5.a): the column sum at `j` is the induction of the column character `χ_j`
   have hFk : ∀ j : Fin hyp.w2, (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j)
       = ClassFunction.induce h.K
@@ -383,7 +384,7 @@ theorem Hypothesis.muGrid_column_sum_mem_sOf_H0_and_reducible [Finite G]
       rw [hx1, hone]
     -- identify the column index `k' ≠ 0` and conclude `φ = μ_{k'}`
     refine ⟨finCongr hcardW2sub ((finCardEquivCharacterGroup _).symm χ₂'), ?_, ?_⟩
-    · simp only [Set.mem_setOf_eq]
+    · simp only [Set.mem_ofPred_eq]
       intro h0
       apply hχ₂'ne
       have hs0 : (finCardEquivCharacterGroup
@@ -416,6 +417,7 @@ theorem Hypothesis.muGrid_column_sum_mem_sOf_H0_and_reducible [Finite G]
 
 open scoped FiniteInduce in
 open OddOrder.Peterfalvi.S11 in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (9.8.a-b), reducible-member classification**: every *reducible* member of
 `𝒮(H₀)` is a nonzero μ-grid column sum `μ_k = ∑_i μ_{ik}` (`k ≠ 0`).
 
@@ -431,15 +433,15 @@ theorem Hypothesis.reducible_mem_sOf_H0_eq_muGrid_columnSum [Finite G]
     (hφS : φ ∈ sOf (hyp.toTypesIIIIIIVSetup htype hnt) chief.H0)
     (hφred : ¬ IsIrreducibleCharacter φ) :
     ∃ k : Fin hyp.w2, k ≠ 0 ∧ φ = ∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i k := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   let h := (hyp.toCertainTypeHypothesis hG hG.odd).toHypothesis
-  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
-  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
-  letI : Fintype ↥M := Fintype.ofFinite _
-  letI : Fintype ↥h.K := Fintype.ofFinite _
-  letI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  have hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  let : Fintype ↥M := Fintype.ofFinite _
+  let : Fintype ↥h.K := Fintype.ofFinite _
+  let : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
   have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
   have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
@@ -447,7 +449,7 @@ theorem Hypothesis.reducible_mem_sOf_H0_eq_muGrid_columnSum [Finite G]
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
   have hFk : ∀ j : Fin hyp.w2, (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j)
       = ClassFunction.induce h.K
           ((h.chiRestrict (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)))
@@ -523,7 +525,7 @@ theorem reducible_count_sOf_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
     (chief : ChiefFactorData data) :
     {φ ∈ sOf data (⊥ : Subgroup G) | ¬ IsIrreducibleCharacter φ}.ncard = chief.p - 1 := by
   classical
-  haveI : ((⊥ : Subgroup G).subgroupOf M).Normal := by
+  have : ((⊥ : Subgroup G).subgroupOf M).Normal := by
     rw [Subgroup.bot_subgroupOf]; infer_instance
   have hW2leM : data.W2 ≤ M := (data.typeP.W2_le.trans inf_le_left).trans (H_le_M data)
   have hcardW2tr : Nat.card ↥(data.W2.subgroupOf M) = chief.p := by
@@ -591,16 +593,16 @@ theorem Hypothesis.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum [Finite
       ((derivedInG M).subgroupOf M) B)
     (hred : ¬ IsIrreducibleCharacter ψ) :
     ∃ k : Fin hyp.w2, k ≠ 0 ∧ ψ = ∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i k := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   obtain ⟨θ, hθne, hθker, rfl⟩ := hψ
   let h := (hyp.toCertainTypeHypothesis hG hG.odd).toHypothesis
-  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
-  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
-  letI : Fintype ↥M := Fintype.ofFinite _
-  letI : Fintype ↥h.K := Fintype.ofFinite _
-  letI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  have hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  let : Fintype ↥M := Fintype.ofFinite _
+  let : Fintype ↥h.K := Fintype.ofFinite _
+  let : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
   have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
   have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
@@ -608,7 +610,7 @@ theorem Hypothesis.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum [Finite
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
   have hFk : ∀ j : Fin hyp.w2, (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j)
       = ClassFunction.induce h.K
           ((h.chiRestrict (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)))
@@ -659,7 +661,7 @@ theorem Hypothesis.charParam_d_eq_u [Finite G] (hG : OddOrder.BG.IsMinimalSimple
     (hnt : TypePNontrivialCore M hyp.typeP)
     (chief : OddOrder.Peterfalvi.S11.ChiefFactorData (hyp.toTypesIIIIIIVSetup htype hnt)) :
     params.d = (hyp.mkSection11CharacterData (hyp.toTypesIIIIIIVSetup htype hnt) chief).u := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   -- the nonzero column `k = 1` (`w₂ ≥ 3`: `w₂` is an odd prime)
   have hw2odd : Odd hyp.w2 := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.W2)
@@ -715,7 +717,7 @@ theorem Hypothesis.charParam_d_modEq_one [Finite G] (hG : OddOrder.BG.IsMinimalS
     {M : Subgroup G} (hyp : Hypothesis M) (htype : IsTypeIII M ∨ IsTypeIV M)
     (params : CharacterParameters hyp) (hmu : params.mu = hyp.muGrid hG hG.odd) :
     params.d ≡ 1 [MOD hyp.w1] := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hnt : TypePNontrivialCore M hyp.typeP :=
     typePNontrivialCore_of_isTypeIIIorIV htype hyp.typeP
@@ -823,7 +825,7 @@ theorem Hypothesis.muGrid_inner_irr_member_eq_zero [Finite G]
     (hχirr : IsIrreducibleCharacter χ)
     (i : Fin hyp.w1) {k : Fin hyp.w2} (hk0 : k ≠ 0) :
     ClassFunction.inner (hyp.muGrid hG hG.odd i k) χ = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   refine hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hG.odd i k hχirr ?_
   obtain ⟨θ, -, -, hχ1⟩ := OddOrder.Peterfalvi.S08.inducedKernelFamily_apply_one hχ
   have hd : hyp.muGrid hG hG.odd i k 1 = (params.d : ℂ) := by

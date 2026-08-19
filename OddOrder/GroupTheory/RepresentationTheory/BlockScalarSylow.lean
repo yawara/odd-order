@@ -36,9 +36,9 @@ theorem sylow_not_isCyclic_of_card_eq_sq_of_injective_pi
     (hcard : Nat.card U = n ^ 2) (hr : r.Prime) (hrn : r ∣ n)
     (R : Sylow r U) :
     ¬ IsCyclic ↥(R : Subgroup U) := by
-  letI : Fact r.Prime := ⟨hr⟩
+  let : Fact r.Prime := ⟨hr⟩
   intro hRcyclic
-  letI : IsCyclic ↥(R : Subgroup U) := hRcyclic
+  let : IsCyclic ↥(R : Subgroup U) := hRcyclic
   obtain ⟨g, hg⟩ := IsCyclic.exists_ofOrder_eq_natCard (α := ↥(R : Subgroup U))
   have hgpowU : ((g : U) ^ n) = 1 := by
     apply hψ
@@ -87,7 +87,7 @@ theorem sylow_not_isCyclic_of_odd_blockScalarEmbedding
     {r : ℕ} (hr : r.Prime) (hrhalf : r ∣ (p - 1) / 2)
     (R : Sylow r U) :
     ¬ IsCyclic ↥(R : Subgroup U) := by
-  letI : Fact p.Prime := ⟨hp⟩
+  let : Fact p.Prime := ⟨hp⟩
   have heven : 2 ∣ p - 1 := even_iff_two_dvd.mp (hp.even_sub_one hp2)
   have hsplit : p - 1 = 2 * ((p - 1) / 2) :=
     (Nat.mul_div_cancel' heven).symm

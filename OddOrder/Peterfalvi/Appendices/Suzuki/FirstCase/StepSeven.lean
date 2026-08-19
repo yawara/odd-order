@@ -183,7 +183,7 @@ theorem orderOf_st_eq_char :
       (model : NearFields.AffineNearFieldModel fc.rankOneQuotient F),
       orderOf (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t) =
         model.char := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   intro F instF model
   classical
   set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
@@ -309,7 +309,7 @@ theorem mk_distinguishedInvolution_mul_t_mem_range_emb
         (Subgroup.centralizer (fc.P : Set G))).normalCore)
         ⟨fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t, hst⟩
       ∈ MonoidHom.range model.emb := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
   set N : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hNdef
@@ -424,10 +424,10 @@ theorem cQ_card_cases_of_Q1_eq_bot :
           model.char - 1 ∨
       (Nat.card ↥(fc.toHypothesis.Q ⊓ Subgroup.centralizer (fc.P : Set G)) = 8 ∧
           model.char = 3) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   intro F instF model hQ1
   classical
-  haveI : Finite F := by
+  have : Finite F := by
     have hinj : Function.Injective
         (fun x : F => model.emb (Multiplicative.ofAdd x)) :=
       fun a b hab => Multiplicative.ofAdd.injective (model.emb_injective hab)
@@ -491,7 +491,7 @@ theorem cQ_card_and_pGroup_of_trichotomy {X : Subgroup G} (hXV : X ≤ hyp.V)
      (Nat.card ↥(hyp.Q.subgroupOf (Subgroup.centralizer (X : Set G))) =
         Nat.card ↥(hyp.Q0.subgroupOf (Subgroup.centralizer (X : Set G))) ^ 3 ∧
         orderOf (hyp.distinguishedInvolution * hyp.t) = 3)) := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   obtain ⟨tdata⟩ := hyp.centralizer_trichotomy_of_induction hXV hX hA3 ind
   refine ⟨tdata.common.cQ_isPGroup, ?_⟩
   rcases tdata.branch with ⟨data, teq, details⟩ | ⟨data, teq, details⟩ |
@@ -647,7 +647,7 @@ theorem kernelN_inf_W_eq_bot (ind : Hypothesis.TheoremAInductionBelow G Ω) :
     rw [fc.card_Q_eq_card_inf_centralizer_pow, hm, ← pow_mul]
   have hQ1 : fc.toHypothesis.Q1 = ⊥ := fc.Q1_eq_bot_of_card_two_pow hQcard
   -- the model and `f = char`
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   obtain ⟨F, instF, ⟨model⟩⟩ := fc.exists_affineNearFieldModel
   have hstchar : orderOf (fc.toHypothesis.distinguishedInvolution *
       fc.toHypothesis.t) = model.char := fc.orderOf_st_eq_char model
@@ -709,7 +709,7 @@ theorem sigma_mulEquiv_centralizer_W
     letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
     Nonempty (↥fc.rankOneQuotient.D ≃*
       ↥(fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   set L : Subgroup G := Subgroup.centralizer (fc.P : Set G) with hLdef
   set N : Subgroup ↥L := (fc.toHypothesis.H.subgroupOf L).normalCore with hNdef

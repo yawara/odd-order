@@ -83,7 +83,7 @@ theorem opPi_mono {π₁ π₂ : Set ℕ} (h : π₁ ⊆ π₂) [Finite G] :
     opPi G π₁ ≤ opPi G π₂ := by
   refine iSup_le ?_
   rintro ⟨N, hN_normal, hN_pi⟩
-  haveI := hN_normal
+  have := hN_normal
   exact self_le_opPi π₂ (hN_pi.mono h)
 
 /-- The bottom subgroup is in the indexing family for `opPi`. -/

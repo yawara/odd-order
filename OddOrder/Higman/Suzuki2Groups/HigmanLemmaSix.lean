@@ -89,7 +89,7 @@ theorem lowerCentralLayerZero_action_eq_one_of_second_third_action_eq_one
       simp only [LinearMap.sub_apply, LinearMap.id_apply, map_sub]
       rw [hcomm])
   let S : Subrepresentation rho₀ := dInter.range
-  letI : Representation.IsIrreducible rho₀ := hirr
+  let : Representation.IsIrreducible rho₀ := hirr
   rcases eq_bot_or_eq_top S with hS | hS
   · have hdRange : LinearMap.range d = ⊥ := by
       have h := congrArg Subrepresentation.toSubmodule hS
@@ -181,7 +181,7 @@ theorem lowerCentralLayerOneRepresentation_injective_of_equivariant_linearEquiv
   change Function.Injective rho₀ at hfaith
   change ∀ c v, e (rho₁ c v) = rho₂ c (e v) at hequiv
   change Function.Injective rho₁
-  letI : Nontrivial (Additive (lowerCentralLayer H 2)) :=
+  let : Nontrivial (Additive (lowerCentralLayer H 2)) :=
     e.symm.toEquiv.nontrivial
   rw [← MonoidHom.ker_eq_bot_iff, Subgroup.eq_bot_iff_forall]
   intro c hc
@@ -293,7 +293,7 @@ theorem lowerCentralTerm_succ_squares_le_of_squares_le
     · simp
     · intro a b ha hb haSq hbSq
       let N := lowerCentralTerm H (i + 2)
-      letI : N.Normal := by
+      let : N.Normal := by
         dsimp [N, lowerCentralTerm]
         infer_instance
       let q : H →* H ⧸ N := QuotientGroup.mk' N
@@ -483,7 +483,7 @@ theorem classThreeQuotient_nilpotencyClass_eq_three
     (H : Type uH) [Group H]
     [Nontrivial (lowerCentralLayer H 2)] :
     Group.nilpotencyClass (H ⧸ lowerCentralTerm H 3) = 3 := by
-  letI : Group.IsNilpotent (H ⧸ lowerCentralTerm H 3) :=
+  let : Group.IsNilpotent (H ⧸ lowerCentralTerm H 3) :=
     Subgroup.nilpotent_iff_lowerCentralSeries.mpr
       ⟨3, classThreeQuotient_lowerCentralSeries_three_eq_bot H⟩
   have hle : Group.nilpotencyClass (H ⧸ lowerCentralTerm H 3) ≤ 3 :=
@@ -705,9 +705,9 @@ theorem lowerCentralLayerOne_finrank_odd_of_equivariant_linearEquiv
       (Additive (lowerCentralLayer H 1))) := by
   apply Nat.not_even_iff_odd.mp
   intro heven
-  letI : Nontrivial (Additive (lowerCentralLayer H 2)) :=
+  let : Nontrivial (Additive (lowerCentralLayer H 2)) :=
     e.symm.toEquiv.nontrivial
-  letI : Nontrivial (lowerCentralLayer H 2) :=
+  let : Nontrivial (lowerCentralLayer H 2) :=
     (show Function.Injective
         (fun x : Additive (lowerCentralLayer H 2) => x.toMul) from
       fun _ _ h => h).nontrivial

@@ -125,7 +125,7 @@ theorem exists_mem_center_of_normal_ne_bot {P : Type*} [Group P] [Finite P] {p :
     [Fact p.Prime] (hP : IsPGroup p P) {K : Subgroup P} [K.Normal] (hK : K ≠ ⊥) :
     ∃ z : P, z ∈ K ∧ z ≠ 1 ∧ z ∈ Subgroup.center P := by
   classical
-  letI : MulAction P ↥K := MulAction.compHom ↥K (MulAut.conjNormal (H := K))
+  let : MulAction P ↥K := MulAction.compHom ↥K (MulAut.conjNormal (H := K))
   have hsmul : ∀ (g : P) (k : ↥K), ((g • k : ↥K) : P) = g * (k : P) * g⁻¹ := by
     intro g k
     exact MulAut.conjNormal_apply g k
@@ -198,7 +198,7 @@ theorem card_wreathThree :
 /-- `C₃ ≀ C₃` is a finite `3`-group, hence nilpotent. -/
 theorem isNilpotent_wreathThree :
     Group.IsNilpotent (Multiplicative (ZMod 3) ≀ᵣ Multiplicative (ZMod 3)) := by
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   exact (IsPGroup.of_card card_wreathThree).isNilpotent
 
 /-- **No `C₃ ≀ C₃` quotient from a subgroup of class `≤ 2` that supplements the kernel.**
@@ -208,7 +208,7 @@ theorem false_of_wreathThree_quotient
     (f : A →* (Multiplicative (ZMod 3) ≀ᵣ Multiplicative (ZMod 3)))
     (hf : Function.Surjective f) {X : Subgroup A} (hX : X ⊔ f.ker = ⊤)
     (h : Subgroup.lowerCentralSeries X 2 ≤ f.ker) : False := by
-  haveI := isNilpotent_wreathThree
+  have := isNilpotent_wreathThree
   have hbot := lowerCentralSeries_eq_bot_of_subgroup_le_ker f
     (map_eq_top_of_sup_ker_eq_top f hf hX) h
   have hcls := Subgroup.lowerCentralSeries_eq_bot_iff_nilpotencyClass_le.mp hbot
@@ -220,8 +220,8 @@ is cyclic of prime order, hence abelian). -/
 theorem commutator_le_of_index_prime [Finite A] {H : Subgroup A} [H.Normal] {p : ℕ}
     [Fact p.Prime] (hH : H.index = p) : commutator A ≤ H := by
   have hQcard : Nat.card (A ⧸ H) = p := by rw [← Subgroup.index_eq_card, hH]
-  haveI : IsCyclic (A ⧸ H) := isCyclic_of_prime_card hQcard
-  letI : CommGroup (A ⧸ H) := IsCyclic.commGroup
+  have : IsCyclic (A ⧸ H) := isCyclic_of_prime_card hQcard
+  let : CommGroup (A ⧸ H) := IsCyclic.commGroup
   have hker := Abelianization.commutator_subset_ker (QuotientGroup.mk' H)
   rwa [QuotientGroup.ker_mk'] at hker
 
@@ -236,8 +236,8 @@ theorem false_of_two_abelian_of_index_three
     (hkX : f.ker ≤ X) (hkY : f.ker ≤ Y)
     (hX : ⁅X, X⁆ ≤ f.ker) (hY : ⁅Y, Y⁆ ≤ f.ker) : False := by
   classical
-  haveI := isNilpotent_wreathThree
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have := isNilpotent_wreathThree
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   -- the images are abelian
   have habel : ∀ {Z : Subgroup A}, ⁅Z, Z⁆ ≤ f.ker →
       ∀ a ∈ Z.map f, ∀ b ∈ Z.map f, a * b = b * a := by
@@ -254,9 +254,9 @@ theorem false_of_two_abelian_of_index_three
   have hmin : (Nat.card (Multiplicative (ZMod 3) ≀ᵣ Multiplicative (ZMod 3))).minFac = 3 := by
     rw [card_wreathThree]
     norm_num
-  haveI : (X.map f).Normal :=
+  have : (X.map f).Normal :=
     Subgroup.normal_of_index_eq_minFac_card (by rw [hidxX, hmin])
-  haveI : (Y.map f).Normal :=
+  have : (Y.map f).Normal :=
     Subgroup.normal_of_index_eq_minFac_card (by rw [hidxY, hmin])
   have hcommX := commutator_le_of_index_prime (H := X.map f) hidxX
   have hcommY := commutator_le_of_index_prime (H := Y.map f) hidxY
@@ -349,9 +349,9 @@ theorem not_three_dvd_card_abelianization_normalizer_sylow
         (Multiplicative (ZMod 3) ≀ᵣ Multiplicative (ZMod 3)), ¬ Function.Surjective φ) :
     ¬ (3 : ℕ) ∣ Nat.card (Abelianization
       ↥(Subgroup.normalizer (((S : Subgroup G)) : Set G))) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
   have hB2' : ¬ (3 : ℕ) ∣ Nat.card (Abelianization G) := by rwa [hp3] at hB2
   set s : G := fc.toHypothesis.distinguishedInvolution with hs_def
@@ -411,7 +411,7 @@ theorem not_three_dvd_card_abelianization_normalizer_sylow
     have h := H.card_mul_index
     rw [hHcard, hNcard] at h
     exact Nat.eq_of_mul_eq_mul_left hScard_pos h
-  haveI : H.FiniteIndex := ⟨by rw [hidx]; norm_num⟩
+  have : H.FiniteIndex := ⟨by rw [hidx]; norm_num⟩
   -- membership bookkeeping
   have hmemH : ∀ x : ↥N, x ∈ H ↔ ((x : G) ∈ (S : Subgroup G)) := fun x => Subgroup.mem_subgroupOf
   set σ : ↥N := ⟨s, hsN⟩ with hσ_def
@@ -500,7 +500,7 @@ theorem commutatorElement_mem_sigma_of_mem_W_of_mem_P
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) {w q : G}
     (hw : w ∈ fc.toHypothesis.W) (hq : q ∈ fc.P) :
     ⁅w, q⁆ ∈ fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨-, -, -, hWcyc, hWcard, -⟩ := fc.step_twelve model ind hB2
   have hnorm : ∀ y ∈ fc.toHypothesis.W, q * y * q⁻¹ ∈ fc.toHypothesis.W := by
@@ -553,12 +553,12 @@ theorem commutator_sup_nonsplitTorus_V_le
     ⁅fc.nonsplitTorus ⊔ fc.toHypothesis.V, fc.nonsplitTorus ⊔ fc.toHypothesis.V⁆
       ≤ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t)
         ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨-, -, -, hWcyc, -, -⟩ := fc.step_twelve model ind hB2
   have hLcyc := (fc.isCyclic_and_card_nonsplitTorus model ind hB2).1
-  haveI : Fact (Nat.Prime fc.p) := ⟨fc.p_prime⟩
-  haveI hPcyc : IsCyclic ↥fc.P := isCyclic_of_prime_card fc.card_P
+  have : Fact (Nat.Prime fc.p) := ⟨fc.p_prime⟩
+  have hPcyc : IsCyclic ↥fc.P := isCyclic_of_prime_card fc.card_P
   have hZLV := fc.inf_centralizer_sup_nonsplitTorus_V_eq model ind hB2
   refine commutator_le_of_generators (T := ((fc.nonsplitTorus : Set G)
     ∪ (fc.toHypothesis.W : Set G)) ∪ (fc.P : Set G)) ?_ ?_ ?_
@@ -635,7 +635,7 @@ theorem lowerCentralSeries_sup_nonsplitTorus_V_eq_bot
     (ind : Hypothesis.TheoremAInductionBelow G Ω)
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
     Subgroup.lowerCentralSeries (fc.nonsplitTorus ⊔ fc.toHypothesis.V) 2 = ⊥ := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   have hZLV := fc.inf_centralizer_sup_nonsplitTorus_V_eq model ind hB2
   rw [Subgroup.lowerCentralSeries_succ, Subgroup.lowerCentralSeries_succ,
     Subgroup.lowerCentralSeries_zero, eq_bot_iff]
@@ -671,9 +671,9 @@ theorem not_surjective_wreath_of_card_W_eq_three
     (φ : ↥(S : Subgroup G) →*
       (Multiplicative (ZMod 3) ≀ᵣ Multiplicative (ZMod 3))) :
     ¬ Function.Surjective φ := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   intro hφ
   obtain ⟨-, hp3, -, -, -, hGp⟩ := fc.step_twelve model ind hB2
   set R₁ : Subgroup G := fc.sylowThreeNormalizerRSigma model with hR₁_def
@@ -691,7 +691,7 @@ theorem not_surjective_wreath_of_card_W_eq_three
       rw [Nat.card_congr Multiplicative.toAdd, Nat.card_zmod]
     rw [h1]
     norm_num
-  haveI : Group.IsNilpotent (Multiplicative (ZMod 3) ≀ᵣ Multiplicative (ZMod 3)) :=
+  have : Group.IsNilpotent (Multiplicative (ZMod 3) ≀ᵣ Multiplicative (ZMod 3)) :=
     (IsPGroup.of_card hcardW).isNilpotent
   -- the kernel has order `3`
   have hkercard : Nat.card ↥(φ.ker) = 3 := by
@@ -780,9 +780,9 @@ theorem zpowers_le_map_of_normal_ne_bot
     {K : Subgroup ↥(S : Subgroup G)} [K.Normal] (hK : K ≠ ⊥) :
     Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t)
       ≤ K.map (S : Subgroup G).subtype := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
   have hstord : orderOf (fc.toHypothesis.distinguishedInvolution
       * fc.toHypothesis.t) = 3 := by
@@ -824,9 +824,9 @@ theorem map_ker_le_inf_of_card_W_eq_nine
     (φ.ker).map (S : Subgroup G).subtype
       ≤ fc.sylowThreeNormalizerRSigma model
         ⊓ (fc.nonsplitTorus ⊔ fc.toHypothesis.V) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   obtain ⟨-, -, -, -, -, hGp⟩ := fc.step_twelve model ind hB2
   have hR₁card : Nat.card ↥(fc.sylowThreeNormalizerRSigma model) = 3 ^ 5 :=
     fc.card_sylowThreeNormalizerRSigma model ind hB2
@@ -906,9 +906,9 @@ theorem not_and_commutator_le_map_ker_of_card_W_eq_nine
         ≤ (φ.ker).map (S : Subgroup G).subtype
       ∧ ⁅fc.nonsplitTorus ⊔ fc.toHypothesis.V, fc.nonsplitTorus ⊔ fc.toHypothesis.V⁆
         ≤ (φ.ker).map (S : Subgroup G).subtype) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   rintro ⟨hcommR₁, hcommLV⟩
   obtain ⟨-, -, -, -, -, hGp⟩ := fc.step_twelve model ind hB2
   have hR₁card : Nat.card ↥(fc.sylowThreeNormalizerRSigma model) = 3 ^ 5 :=
@@ -971,7 +971,7 @@ theorem false_of_no_wreath_quotient
     (hwreath : ∀ φ : ↥(S : Subgroup G) →*
         (Multiplicative (ZMod 3) ≀ᵣ Multiplicative (ZMod 3)), ¬ Function.Surjective φ) :
     False := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   refine fc.false_of_transfer_control model ind hB2 S hR₁S ?_ ?_
   · -- `N_G(Z₁ΣP) = N_G(Z₁) = R₂⟨s⟩ = N_G(R₂)`
     have hNeq : Subgroup.normalizer ((((Subgroup.zpowers
@@ -1019,9 +1019,9 @@ theorem false_of_isWeaklyClosed_zpowers
       (Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution * fc.toHypothesis.t))
       (S : Subgroup G)) :
     False := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   obtain ⟨-, hp3, -, -, hW, -⟩ := fc.step_twelve model ind hB2
   have hB2' : ¬ (3 : ℕ) ∣ Nat.card (Abelianization G) := by rwa [hp3] at hB2
   have hZeq := fc.inf_centralizer_sylow_eq_zpowers model ind hB2 S hR₁S
@@ -1055,9 +1055,9 @@ theorem false_of_step_seventeen
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) (S : Sylow 3 G)
     (hR₁S : fc.sylowThreeNormalizerRSigma model ≤ (S : Subgroup G)) :
     False := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   obtain ⟨-, hp3, hF9, -, hW, -⟩ := fc.step_twelve model ind hB2
   have hB2' : ¬ (3 : ℕ) ∣ Nat.card (Abelianization G) := by rwa [hp3] at hB2
   have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num

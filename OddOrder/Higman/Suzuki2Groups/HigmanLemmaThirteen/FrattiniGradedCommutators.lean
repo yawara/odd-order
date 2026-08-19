@@ -216,7 +216,7 @@ theorem frattiniMiddleCommutatorBilinear_mk
         (QuotientGroup.mk' (Agemo (frattini P) 2 1)
           (lowerCentralTermOneInFrattini hP
             (lowerCentralCommutator P x y))) := by
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   change lowerCentralLayerOneToFrattiniMiddleLinear
@@ -248,7 +248,7 @@ theorem frattiniMiddleCommutatorBilinear_mk_eq_zero_iff
         (Additive.ofMul
           (QuotientGroup.mk' (lowerCentralLayerKernel P 0) y)) = 0 ↔
       ⁅(x : P), (y : P)⁆ ∈ frattiniSquare P := by
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   rw [frattiniMiddleCommutatorBilinear_mk]
@@ -287,7 +287,7 @@ theorem frattiniMiddleCommutatorBilinear_eq_zero_of_mem_restricted_factor
           (QuotientGroup.mk' (lowerCentralLayerKernel P 0) x))
         (Additive.ofMul
           (QuotientGroup.mk' (lowerCentralLayerKernel P 0) y)) = 0 := by
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   apply (frattiniMiddleCommutatorBilinear_mk_eq_zero_iff

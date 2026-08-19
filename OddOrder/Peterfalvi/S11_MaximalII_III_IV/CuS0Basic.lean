@@ -182,7 +182,7 @@ theorem chiefFactor_caseA_S0_complement [Finite G] {M : Subgroup G}
     ∃ W : Subgroup (↥data.H ⧸ chief.N),
       OddOrder.Isaacs.Ch03.IsAInvariant (uActionHom data chief) W ∧
         caseA.S0 ⊓ W = ⊥ ∧ caseA.S0 ⊔ W = ⊤ := by
-  haveI := Fact.mk chief.p_prime
+  have := Fact.mk chief.p_prime
   have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
   have hpdvd : chief.p ∣ Nat.card (↥data.H ⧸ chief.N) := by
     rw [chiefFactor_quotient_card chief]
@@ -216,7 +216,7 @@ theorem caseA_exists_index_S0_not_le_biSup_compl [Finite G] {M : Subgroup G}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) :
     ∃ j₀ : Fin data.q, ¬ caseA.S0 ≤ ⨆ (j) (_ : j ≠ j₀), caseA.Hpart j := by
   classical
-  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+  have : IsMulCommutative (↥data.H ⧸ chief.N) :=
     ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
   have hcomm : Pairwise fun i j : Fin data.q =>
       ∀ x y : (↥data.H ⧸ chief.N), x ∈ caseA.Hpart i → y ∈ caseA.Hpart j → Commute x y :=
@@ -289,12 +289,12 @@ theorem caseA_exists_summand_join_complement_S0 [Finite G] {M : Subgroup G}
         caseA.S0 ⊓ W = ⊥ ∧ caseA.S0 ⊔ W = ⊤ ∧
         ∃ j₁ : Fin data.q, caseA.Hpart j₁ ≤ W := by
   classical
-  letI : Fintype (↥data.H ⧸ chief.N) := Fintype.ofFinite _
-  letI : CommGroup (↥data.H ⧸ chief.N) :=
+  let : Fintype (↥data.H ⧸ chief.N) := Fintype.ofFinite _
+  let : CommGroup (↥data.H ⧸ chief.N) :=
     { (inferInstance : Group (↥data.H ⧸ chief.N)) with
       mul_comm := chief.quotient_elementaryAbelian.comm }
   obtain ⟨j₀, hj₀⟩ := caseA_exists_index_S0_not_le_biSup_compl caseA
-  haveI hWnorm : (⨆ (j) (_ : j ≠ j₀), caseA.Hpart j).Normal :=
+  have hWnorm : (⨆ (j) (_ : j ≠ j₀), caseA.Hpart j).Normal :=
     Subgroup.normal_of_isMulCommutative _
   -- `|S₀| = p`.
   have hS0card : Nat.card ↥caseA.S0 = chief.p := by
@@ -373,7 +373,7 @@ theorem cuInHu_le_inertia_of_complement_triv [Finite G] {M : Subgroup G}
         (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
           (ClassFunction.compHom (QuotientGroup.mk' chief.N)
             (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ))) := by
-  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+  have : IsMulCommutative (↥data.H ⧸ chief.N) :=
     IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
   intro c hc
   rw [ClassFunction.mem_inertia]
@@ -503,14 +503,14 @@ theorem exists_source_char_caseA [Finite G] {M : Subgroup G}
         ≠ (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1) ∧
       (∀ w ∈ W, (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) w
         = (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1) := by
-  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+  have : IsMulCommutative (↥data.H ⧸ chief.N) :=
     IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
-  letI : CommGroup (↥data.H ⧸ chief.N) :=
+  let : CommGroup (↥data.H ⧸ chief.N) :=
     { (inferInstance : Group (↥data.H ⧸ chief.N)) with
       mul_comm := isMulCommutative_iff.mp inferInstance }
-  haveI := Fact.mk chief.p_prime
-  haveI : W.Normal := Subgroup.normal_of_isMulCommutative W
-  letI : CommGroup ((↥data.H ⧸ chief.N) ⧸ W) := inferInstance
+  have := Fact.mk chief.p_prime
+  have : W.Normal := Subgroup.normal_of_isMulCommutative W
+  let : CommGroup ((↥data.H ⧸ chief.N) ⧸ W) := inferInstance
   -- `|H̄/W| = p`: `S₀` complements `W`, so `[H̄ : W] = |S₀| = p`.
   have hcompl : Subgroup.IsComplement' caseA.S0 W :=
     Subgroup.isComplement'_of_disjoint_and_mul_eq_univ (disjoint_iff.mpr hinf)
@@ -604,8 +604,8 @@ theorem hInHu_isComplement'_cuInHu_in_hcuInHu [Finite G] {M : Subgroup G}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) :
     ((hInHu data).subgroupOf (hInHu data ⊔ cuInHu caseA)).IsComplement'
       ((cuInHu caseA).subgroupOf (hInHu data ⊔ cuInHu caseA)) := by
-  haveI := hInHu_normal data
-  haveI : ((hInHu data).subgroupOf (hInHu data ⊔ cuInHu caseA)).Normal :=
+  have := hInHu_normal data
+  have : ((hInHu data).subgroupOf (hInHu data ⊔ cuInHu caseA)).Normal :=
     (hInHu_normal data).subgroupOf _
   refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
   · rw [disjoint_iff]

@@ -50,9 +50,9 @@ section /- Problem 8C.5 -/
 theorem not_isSimpleGroup_of_card_eq_twentytwo {H : Type*} [Group H] (h : Nat.card H = 22) :
     ¬ IsSimpleGroup H := by
   intro hsimp
-  haveI := hsimp
-  haveI : Finite H := Nat.finite_of_card_ne_zero (by omega)
-  haveI : Fact (Nat.Prime 11) := ⟨by norm_num⟩
+  have := hsimp
+  have : Finite H := Nat.finite_of_card_ne_zero (by omega)
+  have : Fact (Nat.Prime 11) := ⟨by norm_num⟩
   obtain ⟨P⟩ := Sylow.nonempty (p := 11) (G := H)
   have hPcard : Nat.card (P : Subgroup H) = 11 :=
     card_sylow_eq_prime_of_not_dvd_sq P (by rw [h]; norm_num) (by rw [h]; norm_num)
@@ -68,8 +68,8 @@ theorem not_isSimpleGroup_of_card_eq_twentytwo {H : Type*} [Group H] (h : Nat.ca
     · exact h1
     · rw [h1] at hmod
       omega
-  haveI : Subsingleton (Sylow 11 H) := (Nat.card_eq_one_iff_unique.mp hn).1
-  haveI : (P : Subgroup H).Normal := Sylow.normal_of_subsingleton P
+  have : Subsingleton (Sylow 11 H) := (Nat.card_eq_one_iff_unique.mp hn).1
+  have : (P : Subgroup H).Normal := Sylow.normal_of_subsingleton P
   rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal (P : Subgroup H) inferInstance with hb | ht
   · rw [hb] at hPcard
     simp at hPcard
@@ -97,29 +97,29 @@ theorem isSimpleGroup_of_five_transitive_degree_twentyfour
     (h3 : IsSimpleGroup ↥(stabilizer ↥(stabilizer ↥(stabilizer G α) β) γ)) :
     IsSimpleGroup ↥(stabilizer ↥(stabilizer G α) β) ∧
       IsSimpleGroup ↥(stabilizer G α) ∧ IsSimpleGroup G := by
-  haveI : Finite Ω := Nat.finite_of_card_ne_zero (by omega)
+  have : Finite Ω := Nat.finite_of_card_ne_zero (by omega)
   -- 段 0: `G` は `Ω` (24 点) に 5-transitive
-  haveI : IsPretransitive G Ω :=
+  have : IsPretransitive G Ω :=
     is_one_pretransitive_iff.mp
       (isMultiplyPretransitive_of_le (n := 5) (by norm_num) (by rw [hΩ]; norm_num))
   -- 段 1: `G_α` は `Ω ∖ {α}` (23 点) に 4-transitive
-  haveI h4 : IsMultiplyPretransitive ↥(stabilizer G α) ↥(SubMulAction.ofStabilizer G α) 4 :=
+  have h4 : IsMultiplyPretransitive ↥(stabilizer G α) ↥(SubMulAction.ofStabilizer G α) 4 :=
     (SubMulAction.ofStabilizer.isMultiplyPretransitive (n := 4) (a := α)).mp h5
-  haveI : FaithfulSMul ↥(stabilizer G α) ↥(SubMulAction.ofStabilizer G α) :=
+  have : FaithfulSMul ↥(stabilizer G α) ↥(SubMulAction.ofStabilizer G α) :=
     faithfulSMul_ofStabilizer α
   have hc1 : Nat.card ↥(SubMulAction.ofStabilizer G α) = 23 := by rw [card_ofStabilizer, hΩ]
-  haveI : IsPretransitive ↥(stabilizer G α) ↥(SubMulAction.ofStabilizer G α) :=
+  have : IsPretransitive ↥(stabilizer G α) ↥(SubMulAction.ofStabilizer G α) :=
     is_one_pretransitive_iff.mp
       (isMultiplyPretransitive_of_le (n := 4) (by norm_num) (by rw [hc1]; norm_num))
   -- 段 2: `G_αβ` は `Ω ∖ {α, β}` (22 点) に 3-transitive
-  haveI h3t : IsMultiplyPretransitive ↥(stabilizer ↥(stabilizer G α) β)
+  have h3t : IsMultiplyPretransitive ↥(stabilizer ↥(stabilizer G α) β)
       ↥(SubMulAction.ofStabilizer ↥(stabilizer G α) β) 3 :=
     (SubMulAction.ofStabilizer.isMultiplyPretransitive (n := 3) (a := β)).mp h4
-  haveI : FaithfulSMul ↥(stabilizer ↥(stabilizer G α) β)
+  have : FaithfulSMul ↥(stabilizer ↥(stabilizer G α) β)
       ↥(SubMulAction.ofStabilizer ↥(stabilizer G α) β) := faithfulSMul_ofStabilizer β
   have hc2 : Nat.card ↥(SubMulAction.ofStabilizer ↥(stabilizer G α) β) = 22 := by
     rw [card_ofStabilizer, hc1]
-  haveI : IsPretransitive ↥(stabilizer ↥(stabilizer G α) β)
+  have : IsPretransitive ↥(stabilizer ↥(stabilizer G α) β)
       ↥(SubMulAction.ofStabilizer ↥(stabilizer G α) β) :=
     is_one_pretransitive_iff.mp
       (isMultiplyPretransitive_of_le (n := 3) (by norm_num) (by rw [hc2]; norm_num))

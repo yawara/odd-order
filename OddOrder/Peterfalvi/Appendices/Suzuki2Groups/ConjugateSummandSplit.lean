@@ -218,11 +218,11 @@ theorem map_quotientCongr_ne_of_fixedPoints_le
     change (c : MulAut P) x₀ = x₀ * z
     rw [← hm]
     exact hz
-  haveI : IsSolvable ↥C :=
-    isSolvable_of_comm fun c d => mul_comm' c d
+  have : Group.IsSolvable ↥C :=
+    Group.isSolvable_of_comm fun c d => mul_comm' c d
   obtain ⟨x, hxfix, z, hzZ, hx⟩ :=
     OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal
-      (φ := psi) hcop (Or.inl (inferInstance : IsSolvable ↥C)) hZpsi hcosetC
+      (φ := psi) hcop (Or.inl (inferInstance : Group.IsSolvable ↥C)) hZpsi hcosetC
   have hωx : ω x = x := by
     have := hxfix ⟨ω, Subgroup.mem_zpowers ω⟩
     simpa [psi] using this
@@ -303,7 +303,7 @@ theorem nonempty_isomorphicOrderQModuleSplit_of_commuting_automorphism
       hfree csplit.leftInvariant
       (by rw [csplit.leftCard]; exact hcardK)
   -- the ambient product formula
-  haveI hLnormal : Xbar.Normal :=
+  have hLnormal : Xbar.Normal :=
     normal_of_mul_comm csplit.quotientEA.comm _
   have hmul : Nat.card ↥Xbar * Nat.card ↥Ybar = Nat.card (P ⧸ Z) := by
     calc Nat.card ↥Xbar * Nat.card ↥Ybar

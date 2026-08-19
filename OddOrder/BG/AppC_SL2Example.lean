@@ -284,7 +284,7 @@ noncomputable def sqrtHom : (GaloisField 2 q)ˣ →* (GaloisField 2 q)ˣ :=
 /-- `√u` really is a square root of `u`. -/
 theorem sqrtHom_sq (hq : q ≠ 0) (u : (GaloisField 2 q)ˣ) :
     sqrtHom q u * sqrtHom q u = u := by
-  haveI : Fintype (GaloisField 2 q) := Fintype.ofFinite _
+  have : Fintype (GaloisField 2 q) := Fintype.ofFinite _
   have hcard : Fintype.card (GaloisField 2 q) = 2 ^ q := by
     rw [← Nat.card_eq_fintype_card]
     exact GaloisField.card 2 q hq
@@ -468,6 +468,7 @@ theorem elemW_mem_normalizer_complement (q : ℕ) (hq : q ≠ 0) :
   refine ⟨SemidirectProduct.inr u⁻¹, ⟨u⁻¹, rfl⟩, ?_⟩
   rw [sigmaSL2_inr, sigmaSL2_inr, SL2.elemW_conj_torus, Subgroup.coe_inv, map_inv]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **BG Appendix C, Remark (II)** (T. Peterfalvi).  For every `q ≠ 0` the group `SL(2, 2^q)`
 satisfies hypothesis (B) of Theorem C with `p = 2`.
 

@@ -45,8 +45,8 @@ same submodules. -/
 theorem isSimpleModule_compHom (f : A →+* B) (hf : Function.Surjective f) [IsSimpleModule B N] :
     letI := Module.compHom N f
     IsSimpleModule A N := by
-  letI := Module.compHom N f
-  haveI : RingHomSurjective f := ⟨hf⟩
+  let := Module.compHom N f
+  have : RingHomSurjective f := ⟨hf⟩
   let l : N →ₛₗ[f] N := { toFun := id, map_add' := fun _ _ => rfl, map_smul' := fun _ _ => rfl }
   exact (l.isSimpleModule_iff_of_bijective Function.bijective_id).mpr inferInstance
 
@@ -71,7 +71,7 @@ theorem moduleOfSurjective_smul (f : A →+* B) (hf : Function.Surjective f)
     (h : RingHom.ker f ≤ Module.annihilator A M) (a : A) (m : M) :
     letI := moduleOfSurjective f hf h
     f a • m = a • m := by
-  letI := moduleOfSurjective f hf h
+  let := moduleOfSurjective f hf h
   change (f.liftOfRightInverse (Function.surjInv hf) (Function.rightInverse_surjInv hf)
     ⟨Module.toAddMonoidEnd A M, h⟩ (f a)) m = a • m
   rw [RingHom.liftOfRightInverse_comp_apply]
@@ -82,8 +82,8 @@ theorem isSimpleModule_of_surjective (f : A →+* B) (hf : Function.Surjective f
     (h : RingHom.ker f ≤ Module.annihilator A M) [IsSimpleModule A M] :
     letI := moduleOfSurjective f hf h
     IsSimpleModule B M := by
-  letI := moduleOfSurjective f hf h
-  haveI : RingHomSurjective f := ⟨hf⟩
+  let := moduleOfSurjective f hf h
+  have : RingHomSurjective f := ⟨hf⟩
   let l : M →ₛₗ[f] M :=
     { toFun := id
       map_add' := fun _ _ => rfl

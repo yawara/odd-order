@@ -93,8 +93,8 @@ theorem algebraMap_sum_projectiveIndecomposableCharacter_mul_inv (x : G) {y : G}
         * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π ψ y⁻¹)
       = if IsConj y x then (Nat.card (Subgroup.centralizer ({y} : Set G)) : K) else 0 := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  have : Fintype G := Fintype.ofFinite G
+  have : Fintype (ConjClasses G) := Fintype.ofFinite _
   rw [sum_projectiveIndecomposableCharacter_mul hp hω hω' hπ hlin hkerJ e x hy.inv, map_sum,
     show (∑ i : ι', algebraMap 𝒪 K
         (ordinaryCharacter (𝒪 := 𝒪) e i y⁻¹ * ordinaryCharacter (𝒪 := 𝒪) e i x))
@@ -109,8 +109,8 @@ theorem algebraMap_sum_projectiveIndecomposableCharacter_mul_inv (x : G) {y : G}
 theorem projectiveIndecomposableCharacter_eq_zero (φ : ι) {x : G} (hx : ¬ IsPRegular p x) :
     projectiveIndecomposableCharacter hp hω hω' hπ hlin hkerJ e φ x = 0 := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  have : Fintype G := Fintype.ofFinite G
+  have : Fintype (ConjClasses G) := Fintype.ofFinite _
   have hinj : Function.Injective (algebraMap 𝒪 K) := IsFractionRing.injective 𝒪 K
   have hrel : ∀ g : G, IsPRegular p g →
       ∑ ψ, projectiveIndecomposableCharacter hp hω hω' hπ hlin hkerJ e ψ x

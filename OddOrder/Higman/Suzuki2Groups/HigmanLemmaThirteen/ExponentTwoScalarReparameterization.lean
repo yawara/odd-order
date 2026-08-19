@@ -84,10 +84,10 @@ theorem exists_scalar_reparameterization_of_equal_range
     have hpowTwo : 2 ^ 1 ≤ 2 ^ n :=
       Nat.pow_le_pow_right (by norm_num) hnpos
     omega
-  letI : NeZero (2 ^ n - 1) := ⟨hNpos.ne'⟩
+  let : NeZero (2 ^ n - 1) := ⟨hNpos.ne'⟩
   have hcard : Nat.card (GaloisField 2 n) = 2 ^ n :=
     GaloisField.card 2 n hn
-  letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+  let : Fintype (GaloisField 2 n) := Fintype.ofFinite _
   have hscalar : ∀ (c alpha : GaloisField 2 n),
       tau (c * alpha) = c * tau alpha := by
     intro c alpha

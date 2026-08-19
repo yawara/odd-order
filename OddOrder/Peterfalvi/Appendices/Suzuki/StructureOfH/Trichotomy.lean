@@ -99,7 +99,7 @@ theorem centralizer_le_Q0_and_orderOf_st_of_commute
   classical
   set C : Subgroup G := Subgroup.centralizer (P : Set G) with hCdef
   -- `C_Q(P)` inherits commutativity from `Q`
-  haveI habel : IsMulCommutative ↥(sc.toHypothesis.Q.subgroupOf C) :=
+  have habel : IsMulCommutative ↥(sc.toHypothesis.Q.subgroupOf C) :=
     ⟨⟨fun a b => Subtype.ext (Subtype.ext
       (hcomm _ (Subgroup.mem_subgroupOf.mp a.2) _
         (Subgroup.mem_subgroupOf.mp b.2)))⟩⟩
@@ -108,7 +108,7 @@ theorem centralizer_le_Q0_and_orderOf_st_of_commute
     intro h
     rw [h, Subgroup.card_bot] at hPcard
     exact hp.one_lt.ne hPcard
-  letI := sc.toHypothesis.centralizerQuotientMulAction hPV
+  let := sc.toHypothesis.centralizerQuotientMulAction hPV
   obtain ⟨data⟩ := sc.toHypothesis.centralizer_trichotomy_of_induction hPV hPne
     (sc.twoRank_centralizer_ge_two P hPV p hp hPcard) ind
   -- the `C_Q(P) ≤ Q₀` half, given the two matching cardinalities
@@ -199,7 +199,7 @@ theorem isSuzuki2Group_centralizer_of_card_sq
     intro h
     rw [h, Subgroup.card_bot] at hPcard
     exact hp.one_lt.ne hPcard
-  letI := sc.toHypothesis.centralizerQuotientMulAction hPV
+  let := sc.toHypothesis.centralizerQuotientMulAction hPV
   obtain ⟨data⟩ := sc.toHypothesis.centralizer_trichotomy_of_induction hPV hPne
     (sc.twoRank_centralizer_ge_two P hPV p hp hPcard) ind
   rcases data.branch with ⟨d, -, det⟩ | ⟨d, -, det⟩ | ⟨d, -, det⟩
@@ -253,7 +253,7 @@ theorem orderOf_st_eq_five_of_isSuzuki2Group
     intro h
     rw [h, Subgroup.card_bot] at hPcard
     exact hp.one_lt.ne hPcard
-  letI := sc.toHypothesis.centralizerQuotientMulAction hPV
+  let := sc.toHypothesis.centralizerQuotientMulAction hPV
   obtain ⟨data⟩ := sc.toHypothesis.centralizer_trichotomy_of_induction hPV hPne
     (sc.twoRank_centralizer_ge_two P hPV p hp hPcard) ind
   have hconv : ∀ H : Subgroup G,
@@ -446,7 +446,7 @@ theorem orderOf_st_eq_three_of_two_kSubgroups
     intro h
     rw [h, Subgroup.card_bot] at hPcard
     exact hp.one_lt.ne hPcard
-  letI := sc.toHypothesis.centralizerQuotientMulAction hPV
+  let := sc.toHypothesis.centralizerQuotientMulAction hPV
   obtain ⟨data⟩ := sc.toHypothesis.centralizer_trichotomy_of_induction hPV hPne
     (sc.twoRank_centralizer_ge_two P hPV p hp hPcard) ind
   rcases data.branch with ⟨d, -, det⟩ | ⟨d, -, det⟩ | ⟨d, -, det⟩
@@ -509,7 +509,7 @@ theorem orderOf_st_eq_three_of_card_cube
     intro h
     rw [h, Subgroup.card_bot] at hPcard
     exact hp.one_lt.ne hPcard
-  letI := sc.toHypothesis.centralizerQuotientMulAction hPV
+  let := sc.toHypothesis.centralizerQuotientMulAction hPV
   obtain ⟨data⟩ := sc.toHypothesis.centralizer_trichotomy_of_induction hPV hPne
     (sc.twoRank_centralizer_ge_two P hPV p hp hPcard) ind
   rcases data.branch with ⟨d, -, det⟩ | ⟨d, -, det⟩ | ⟨d, -, det⟩

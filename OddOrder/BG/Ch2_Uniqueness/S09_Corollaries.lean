@@ -39,7 +39,7 @@ theorem isUniquelyMaximal_of_le_centralizer_of_two_le_rank [Finite G] (hG : IsMi
   classical
   obtain ⟨p, hp, A, hAea, hAK, hAnc⟩ :=
     exists_isElementaryAbelian_not_isCyclic_le_of_two_le_rank K hr
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   let M : Subgroup G := hL.uniqueMaximalSubgroup
   have hKleM : K ≤ M := by
     intro k hk
@@ -105,7 +105,7 @@ private theorem exists_normal_isElementaryAbelian_card_prime_sq_of_three_le_pRan
   obtain ⟨A, hA⟩ := OddOrder.BG.Ch1.S05.scn3_nonempty_of_three_le_pRank hp hR h3
   obtain ⟨B, hB_normal, hB_elem, hBcard⟩ :=
     OddOrder.BG.Ch1.S05.exists_normal_isElementaryAbelian_card_prime_cube_of_scn3 hR hA
-  haveI : B.Normal := hB_normal
+  have : B.Normal := hB_normal
   have hB_dvd : p ^ 2 ∣ Nat.card B := by
     rw [hBcard]
     exact pow_dvd_pow p (by norm_num : 2 ≤ 3)
@@ -282,7 +282,7 @@ private theorem two_le_rank_inf_centralizer_of_normal_in_overgroup_card_prime_sq
   classical
   let DP : Subgroup P := D.subgroupOf P
   let BP : Subgroup P := Bstar.subgroupOf P
-  haveI : DP.Normal := by
+  have : DP.Normal := by
     simpa [DP] using hDnormP
   have hDP_ea : DP.IsElementaryAbelian p := by
     dsimp [DP]
@@ -462,7 +462,7 @@ private theorem exists_conj_le_sylow_of_isPGroup [Finite G]
     ∃ g : G, ((MulAut.conj g) • Q : Subgroup G) ≤ (P : Subgroup G) := by
   classical
   obtain ⟨Q', hQQ'⟩ := hQ.exists_le_sylow
-  haveI : MulAction.IsPretransitive G (Sylow p G) := Sylow.isPretransitive_of_finite
+  have : MulAction.IsPretransitive G (Sylow p G) := Sylow.isPretransitive_of_finite
   obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G Q' P
   refine ⟨g, ?_⟩
   have hle : ((MulAut.conj g) • Q : Subgroup G) ≤
@@ -577,7 +577,7 @@ private theorem isUniquelyMaximal_of_conj_overgroup_rank_three_witness [Finite G
     rw [hBconj_eq] at hcyc
     let e : ↥B ≃* ↥(B.map (φ : G →* G)) :=
       Subgroup.equivMapOfInjective B (φ : G →* G) φ.injective
-    letI : IsCyclic ↥(B.map (φ : G →* G)) := hcyc
+    let : IsCyclic ↥(B.map (φ : G →* G)) := hcyc
     exact isCyclic_of_surjective e.symm.toMonoidHom e.symm.surjective
   have hBstarconj_ea : Bstarconj.IsElementaryAbelian p := by
     rw [hBstarconj_eq]
@@ -696,11 +696,11 @@ theorem abelian_rank_three_isUniquelyMaximal_of_fitting [Finite G] (hG : IsMinim
           hG hM hpF hA₀max hA₀rank P hFp).2 A_M hA_MP hA_M_scn
       let U : Subgroup G := A_M.map M.subtype
       have hA_Mab : IsMulCommutative A_M := by
-        haveI : IsMulCommutative Asc := hAsc_scn.isSCN.isMulCommutative
+        have : IsMulCommutative Asc := hAsc_scn.isSCN.isMulCommutative
         change IsMulCommutative (Asc.map (P : Subgroup ↥M).subtype)
         exact Subgroup.map_isMulCommutative Asc (P : Subgroup ↥M).subtype
       have hUab : IsMulCommutative U := by
-        haveI : IsMulCommutative A_M := hA_Mab
+        have : IsMulCommutative A_M := hA_Mab
         change IsMulCommutative (A_M.map M.subtype)
         exact Subgroup.map_isMulCommutative A_M M.subtype
       have hA_Mp : IsPGroup p A_M := by
@@ -803,7 +803,7 @@ theorem centralizer_lt_top_of_mem_scn3Global [Finite G]
   have hZbot : Subgroup.center G = ⊥ := by
     rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
     · exact h
-    · exact absurd (isSolvable_of_comm fun a b =>
+    · exact absurd (Group.isSolvable_of_comm fun a b =>
         (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm) hG.notSolvable
   have hArank : 2 ≤ rank ↥A := (by omega : (2 : ℕ) ≤ 3).trans
     (three_le_rank_of_mem_scn3Global hA)
@@ -812,7 +812,7 @@ theorem centralizer_lt_top_of_mem_scn3Global [Finite G]
       exists_isElementaryAbelian_not_isCyclic_le_of_two_le_rank A hArank
     intro hAbot
     have hEbot : E = ⊥ := le_bot_iff.mp (hEA.trans (le_of_eq hAbot))
-    haveI : Nontrivial ↥E := Nontrivial.of_not_isCyclic hEnc
+    have : Nontrivial ↥E := Nontrivial.of_not_isCyclic hEnc
     exact ((Subgroup.nontrivial_iff_ne_bot E).mp inferInstance) hEbot
   rw [lt_top_iff_ne_top]
   intro hCtop
@@ -859,7 +859,7 @@ theorem primesOf_eq_singleton_of_mem_scn3Global [Finite G]
     rw [pow_zero] at hn
     exact hAne (Subgroup.card_eq_one.mp hn)
   ext q
-  simp only [S07.primesOf, Set.mem_setOf_eq, Set.mem_singleton_iff]
+  simp only [S07.primesOf, Set.mem_ofPred_eq, Set.mem_singleton_iff]
   rw [hn, Nat.primeFactors_prime_pow hn0 (Fact.out : p.Prime), Finset.mem_singleton]
 
 /-- A global `SCN₃(p)` subgroup forces `p ∣ |G|`. -/
@@ -879,7 +879,7 @@ theorem prime_dvd_card_of_mem_scn3Global [Finite G]
 theorem subgroupOf_isSubnormal_of_isPGroup [Finite G]
     {p : ℕ} [Fact p.Prime] {A R : Subgroup G} (hRp : IsPGroup p R) :
     (A.subgroupOf R).IsSubnormal := by
-  haveI : Group.IsNilpotent ↥R := hRp.isNilpotent
+  have : Group.IsNilpotent ↥R := hRp.isNilpotent
   exact OddOrder.Isaacs.Ch02.isSubnormal_of_isNilpotent_finite (A.subgroupOf R)
 
 

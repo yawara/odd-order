@@ -92,8 +92,8 @@ theorem supported_le_span_omega_sub_sndPart (hyp : TICyclicHypothesis G) [Finite
     ClassFunction.supportedSubmodule {w : hyp.W | w ∉ hyp.W2.subgroupOf hyp.W} ≤
       Submodule.span ℂ (Set.range (fun χ : hyp.W →* ℂˣ =>
         (hyp.omega χ : ClassFunction hyp.W ℂ) - hyp.omega (hyp.sndPart χ))) := by
-  haveI : Fintype hyp.W := Fintype.ofFinite hyp.W
-  haveI : Fintype (hyp.W →* ℂˣ) := Fintype.ofFinite (hyp.W →* ℂˣ)
+  have : Fintype hyp.W := Fintype.ofFinite hyp.W
+  have : Fintype (hyp.W →* ℂˣ) := Fintype.ofFinite (hyp.W →* ℂˣ)
   intro f hf
   have hf0 : ∀ w : hyp.W, w ∈ hyp.W2.subgroupOf hyp.W → f w = 0 := by
     intro w hw

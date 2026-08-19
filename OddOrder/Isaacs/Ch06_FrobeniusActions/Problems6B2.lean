@@ -37,20 +37,20 @@ theorem isCyclic_of_faithful_of_forall_invariant_eq_bot_or_top
     IsCyclic A := by
   classical
   by_cases hN : Nontrivial N
-  · haveI := hN
+  · have := hN
     -- 各 `1 ≠ a` の固定部分群は `A`-不変ゆえ `⊥` (`⊤` は忠実性に反する) — つまり Frobenius 作用
     have hFrob : IsFrobeniusAction A N := by
       intro a ha n hn hfix
       set Fa : Subgroup N :=
         { carrier := {m : N | a • m = m}
           mul_mem' := fun {x y} hx hy => by
-            simp only [Set.mem_setOf_eq] at hx hy ⊢
+            simp only [Set.mem_ofPred_eq] at hx hy ⊢
             rw [smul_mul', hx, hy]
           one_mem' := by
-            simp only [Set.mem_setOf_eq]
+            simp only [Set.mem_ofPred_eq]
             exact smul_one a
           inv_mem' := fun {x} hx => by
-            simp only [Set.mem_setOf_eq] at hx ⊢
+            simp only [Set.mem_ofPred_eq] at hx ⊢
             rw [smul_inv', hx] } with hFadef
       have hFainv : ∀ b : A, ∀ m ∈ Fa, b • m ∈ Fa := by
         intro b m hm
@@ -66,8 +66,8 @@ theorem isCyclic_of_faithful_of_forall_invariant_eq_bot_or_top
         have hx' : a • x = x := hx
         rw [hx', one_smul]
     have hcop : Nat.Coprime (Nat.card A) (Nat.card N) := by
-      haveI : Fintype A := Fintype.ofFinite A
-      haveI : Fintype N := Fintype.ofFinite N
+      have : Fintype A := Fintype.ofFinite A
+      have : Fintype N := Fintype.ofFinite N
       simpa only [Nat.card_eq_fintype_card] using
         (IsFrobeniusAction.coprime_card (A := A) (N := N) hFrob).symm
     refine isCyclic_of_faithful_trivial_on_proper_invariant hcop ?_
@@ -77,8 +77,8 @@ theorem isCyclic_of_faithful_of_forall_invariant_eq_bot_or_top
       rw [hn, smul_one]
     · exact absurd h hMne
   · -- `N` が自明なら忠実性から `A` も自明
-    haveI : Subsingleton N := not_nontrivial_iff_subsingleton.mp hN
-    haveI : Subsingleton A :=
+    have : Subsingleton N := not_nontrivial_iff_subsingleton.mp hN
+    have : Subsingleton A :=
       ⟨fun a b => eq_of_smul_eq_smul (m₁ := a) (m₂ := b)
         fun x : N => Subsingleton.elim (a • x) (b • x)⟩
     exact isCyclic_of_subsingleton

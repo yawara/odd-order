@@ -134,17 +134,17 @@ theorem restrictedFactorAmbientInclusion_injective_of_frattini_map_eq
     Function.Injective
       (restrictedFactorAmbientInclusion hSinv hEAS eS c data
         hK1S htermS hSqS hAgemoS hK0S) := by
-  letI : IsMulCommutative (frattini S) :=
+  let : IsMulCommutative (frattini S) :=
     IsMulCommutative.of_comm hEAS.comm
-  letI : CommGroup (frattini S) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini S)) :=
+  let : CommGroup (frattini S) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini S)) :=
     hEAS.zmodModule
   let d :=
     data.toInclusionData hEAS eS hK1S htermS hSqS hAgemoS hK0S
-  letI := d.group
-  letI := d.normal
-  letI := d.quotComm
-  letI := d.quotModule
+  let := d.group
+  let := d.normal
+  let := d.quotComm
+  let := d.quotModule
   have hd : Function.Injective d.incl := by
     exact factorInclusion_injective
       d.f hK0S d.hf d.eQuot d.hfexact

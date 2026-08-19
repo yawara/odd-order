@@ -137,14 +137,14 @@ theorem exists_field_realization_K
         Nat.card F = Nat.card ↥hyp.Q0 ∧
         ∀ k : ↥hyp.K, ((μ (α k) : Fˣ) : F) = σ ((μ k : Fˣ) : F) := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI := hyp.K_isCyclic
-  letI : CommGroup ↥hyp.K := IsCyclic.commGroup
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have := hyp.K_isCyclic
+  let : CommGroup ↥hyp.K := IsCyclic.commGroup
   have hQ0two : 2 ≤ Nat.card ↥hyp.Q0 := hyp.two_le_card_Q0
-  haveI : Nontrivial ↥hyp.Q0 :=
+  have : Nontrivial ↥hyp.Q0 :=
     (Subgroup.nontrivial_iff_ne_bot _).mpr fun hbot => by
       rw [hbot, Subgroup.card_bot] at hQ0two; omega
-  letI : CommGroup ↥hyp.Q0 :=
+  let : CommGroup ↥hyp.Q0 :=
     { (inferInstance : Group ↥hyp.Q0) with mul_comm := hyp.isElementaryAbelian_Q0.comm }
   have hxD : x ∈ hyp.D := hyp.V_le_D hxV
   -- the conjugation action of `K` on `Q₀`
@@ -162,9 +162,9 @@ theorem exists_field_realization_K
   -- Appendix I, Proposition 2
   obtain ⟨F, instF, instMod, instFin, -, hcardF, ⟨μ₀, hμ₀⟩, hsemi⟩ :=
     Huppert.exists_field_semilinear_with_scalar hyp.isElementaryAbelian_Q0 ψ hirr
-  letI : Field F := instF
-  letI : Module F (Additive ↥hyp.Q0) := instMod
-  letI : Finite F := instFin
+  let : Field F := instF
+  let : Module F (Additive ↥hyp.Q0) := instMod
+  let : Finite F := instFin
   have hμ₀' : ∀ (k : ↥hyp.K) (y : ↥hyp.Q0), ((μ₀ k : Fˣ) : F) • (Additive.ofMul y)
       = Additive.ofMul (ψ k y) := fun k y => hμ₀ k (Additive.ofMul y)
   -- `μ₀` is injective, hence bijective
@@ -175,8 +175,8 @@ theorem exists_field_realization_K
     have h := hμ₀' k y
     rw [hk1, Units.val_one, one_smul] at h
     exact (Additive.ofMul.injective h).symm
-  haveI : Fintype F := Fintype.ofFinite F
-  haveI : Fintype ↥hyp.K := Fintype.ofFinite _
+  have : Fintype F := Fintype.ofFinite F
+  have : Fintype ↥hyp.K := Fintype.ofFinite _
   have hunits : Nat.card Fˣ = Nat.card ↥hyp.Q0 - 1 := by
     rw [Nat.card_eq_fintype_card, Fintype.card_units, ← Nat.card_eq_fintype_card, hcardF]
   have hμbij : Function.Bijective μ₀ := by
@@ -268,14 +268,14 @@ theorem exists_Q0_field_coordinate :
             (hyp.conjQ0 (Subgroup.inclusion hyp.K_le_D k) y))
           = ((γ k : Fˣ) : F) * α (Additive.ofMul y) := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI := hyp.K_isCyclic
-  letI : CommGroup ↥hyp.K := IsCyclic.commGroup
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have := hyp.K_isCyclic
+  let : CommGroup ↥hyp.K := IsCyclic.commGroup
   have hQ0two : 2 ≤ Nat.card ↥hyp.Q0 := hyp.two_le_card_Q0
-  haveI : Nontrivial ↥hyp.Q0 :=
+  have : Nontrivial ↥hyp.Q0 :=
     (Subgroup.nontrivial_iff_ne_bot _).mpr fun hbot => by
       rw [hbot, Subgroup.card_bot] at hQ0two; omega
-  letI : CommGroup ↥hyp.Q0 :=
+  let : CommGroup ↥hyp.Q0 :=
     { (inferInstance : Group ↥hyp.Q0) with
       mul_comm := hyp.isElementaryAbelian_Q0.comm }
   set ψ : ↥hyp.K →* MulAut ↥hyp.Q0 :=

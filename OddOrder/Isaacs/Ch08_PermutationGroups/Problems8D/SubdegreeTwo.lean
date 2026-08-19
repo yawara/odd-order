@@ -64,7 +64,7 @@ theorem isBlock_stabilizer_eq (α : Ω) :
     IsBlock G {δ : Ω | stabilizer G δ = stabilizer G α} := by
   rw [isBlock_iff_smul_eq_of_mem]
   intro g a ha hga
-  simp only [Set.mem_setOf_eq] at ha hga
+  simp only [Set.mem_ofPred_eq] at ha hga
   have hstab : ∀ x : G, x ∈ stabilizer G α ↔ g⁻¹ * x * g ∈ stabilizer G α := by
     intro x
     calc x ∈ stabilizer G α ↔ x ∈ stabilizer G (g • a) := by rw [hga]
@@ -72,7 +72,7 @@ theorem isBlock_stabilizer_eq (α : Ω) :
       _ ↔ g⁻¹ * x * g ∈ stabilizer G α := by rw [ha]
   ext ε
   rw [Set.mem_smul_set_iff_inv_smul_mem]
-  simp only [Set.mem_setOf_eq]
+  simp only [Set.mem_ofPred_eq]
   constructor
   · intro h
     ext x
@@ -141,7 +141,7 @@ theorem card_stabilizer_eq_two_of_subdegree_eq_two [Nontrivial Ω] [IsPreprimiti
       exact absurd hidxα (by norm_num)
     · exact hcoat.2 _ hlt
   -- したがって `D ◁ G`, 忠実性から `D = ⊥`
-  haveI : D.Normal := by
+  have : D.Normal := by
     rw [← Subgroup.normalizer_eq_top_iff, eq_top_iff, ← hsup]
     exact sup_le hnormα hnormβ
   have hbot : D = ⊥ := eq_bot_of_normal_of_le_stabilizer hDα
@@ -169,12 +169,12 @@ theorem stabilizer_eq_bot_of_ncard_orbit_eq_one [Nontrivial Ω] [IsPreprimitive 
     Subgroup.eq_of_le_of_card_ge hle (le_of_eq (card_stabilizer_eq γ α))
   rcases IsPreprimitive.isTrivialBlock_of_isBlock (isBlock_stabilizer_eq (G := G) α) with
     hsub | huniv
-  · exact absurd (hsub (Set.mem_setOf_eq ▸ heq.symm) rfl) hγ
+  · exact absurd (hsub (Set.mem_ofPred_eq ▸ heq.symm) rfl) hγ
   · have hall : ∀ δ : Ω, stabilizer G δ = stabilizer G α := by
       intro δ
       have hmem : δ ∈ {δ : Ω | stabilizer G δ = stabilizer G α} := huniv ▸ Set.mem_univ δ
       exact hmem
-    haveI : (stabilizer G α).Normal := by
+    have : (stabilizer G α).Normal := by
       refine ⟨fun x hx g => ?_⟩
       have h2 : g * x * g⁻¹ ∈ stabilizer G (g • α) := by
         rw [mem_stabilizer_smul_iff]

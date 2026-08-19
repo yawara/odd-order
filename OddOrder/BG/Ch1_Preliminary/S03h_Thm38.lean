@@ -52,7 +52,7 @@ Proof: present the action as a representation `ρ : Representation (ZMod s) G (A
 `S03c.kernel_acts_trivially_of_coprime_fixedPointFree` with the Frobenius input replaced by the
 `(KR, R prime)` Theorem 3.4 hypotheses. -/
 theorem commutator_acts_trivially_via_thm34 {s : ℕ} [Fact s.Prime]
-    {G M : Type*} [Finite G] [Group G] [IsSolvable G] [CommGroup M] [Finite M]
+    {G M : Type*} [Finite G] [Group G] [Group.IsSolvable G] [CommGroup M] [Finite M]
     [MulDistribMulAction G M] [Module (ZMod s) (Additive M)]
     {K R : Subgroup G} [K.Normal]
     (hcompl : K.IsComplement' R)
@@ -68,7 +68,7 @@ theorem commutator_acts_trivially_via_thm34 {s : ℕ} [Fact s.Prime]
     intro g a; rw [hρ]; rfl
   have hchar' : (Nat.card G : ZMod s) ≠ 0 :=
     fun h => hchar ((ZMod.natCast_eq_zero_iff _ _).1 h)
-  haveI : FiniteDimensional (ZMod s) (Additive M) := Module.Finite.of_finite
+  have : FiniteDimensional (ZMod s) (Additive M) := Module.Finite.of_finite
   -- `C_M(R) = 1` ⟹ the representation's `R`-invariants are `0`.
   have hCR : ∀ v : Additive M, (∀ r : R, ρ (r : G) v = v) → v = 0 := by
     intro v hv
@@ -98,7 +98,7 @@ centralizes `X/Y` (i.e. `⁅R, K⁆ ≤ chiefFactorCentralizer X Y`).  The `q �
 3.4 (`commutator_acts_trivially_via_thm34`).  Note the conclusion is on `⁅R, K⁆` (not `K`):
 Theorem 3.4 only controls the commutator. -/
 theorem commutator_le_chiefFactorCentralizer_via_thm34
-    {G : Type*} [Group G] [Finite G] [IsSolvable G] {K R X Y : Subgroup G}
+    {G : Type*} [Group G] [Finite G] [Group.IsSolvable G] {K R X Y : Subgroup G}
     [K.Normal] [X.Normal] [Y.Normal] {s : ℕ} [Fact s.Prime]
     (hVelem : IsElementaryAbelian s (↥X ⧸ Y.subgroupOf X))
     {L : Subgroup G} [L.Normal] (hLcent : L ≤ chiefFactorCentralizer X Y)
@@ -111,18 +111,19 @@ theorem commutator_le_chiefFactorCentralizer_via_thm34
     (hFPF : letI := S03c.chiefFactorConjAction X Y
             ∀ v : ↥X ⧸ Y.subgroupOf X, (∀ r : R, (r : G) • v = v) → v = 1) :
     ⁅R, K⁆ ≤ chiefFactorCentralizer X Y := by
-  haveI : NeZero s := ⟨(Fact.out : s.Prime).ne_zero⟩
-  haveI : IsSolvable (G ⧸ L) := solvable_of_surjective (QuotientGroup.mk'_surjective L)
-  haveI : (K.map (QuotientGroup.mk' L)).Normal :=
+  have : NeZero s := ⟨(Fact.out : s.Prime).ne_zero⟩
+  have : Group.IsSolvable (G ⧸ L) :=
+    Group.isSolvable_of_surjective (QuotientGroup.mk'_surjective L)
+  have : (K.map (QuotientGroup.mk' L)).Normal :=
     (inferInstance : K.Normal).map (QuotientGroup.mk' L) (QuotientGroup.mk'_surjective L)
-  letI : CommGroup (↥X ⧸ Y.subgroupOf X) :=
+  let : CommGroup (↥X ⧸ Y.subgroupOf X) :=
     { (inferInstance : Group (↥X ⧸ Y.subgroupOf X)) with mul_comm := hVelem.comm }
-  letI := hVelem.zmodModule
-  letI := S03c.chiefFactorConjAction X Y
+  let := hVelem.zmodModule
+  let := S03c.chiefFactorConjAction X Y
   have hL : ∀ l : G, l ∈ L → ∀ v : ↥X ⧸ Y.subgroupOf X, l • v = v := by
     intro l hl v
     exact (S03c.chiefFactorConjAction_smul_eq_self_iff_mem l).mpr (hLcent hl) v
-  letI := mulDistribMulActionQuotientOfTrivial L hL
+  let := mulDistribMulActionQuotientOfTrivial L hL
   have hFPF' : ∀ v : ↥X ⧸ Y.subgroupOf X,
       (∀ r : R.map (QuotientGroup.mk' L), (r : G ⧸ L) • v = v) → v = 1 := by
     intro v hv
@@ -151,7 +152,7 @@ action, `coprime_fixedPoints_quotient_of_coprime_normal`) to an `R`-fixed `c ∈
 trivial.  `F(K)` is written `(fitting ↥K).map K.subtype` (its `Ch2.S08.fittingInG` form would import
 downstream into `Ch1`). -/
 theorem chiefFactor_fixedPointFree_of_centralizer_fitting_eq_bot
-    {G : Type*} [Group G] [Finite G] [IsSolvable G] {K R X Y : Subgroup G}
+    {G : Type*} [Group G] [Finite G] [Group.IsSolvable G] {K R X Y : Subgroup G}
     [X.Normal] [Y.Normal]
     (hXF : X ≤ (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype)
     (hXK : X ≤ K) (hcop : Nat.Coprime (Nat.card ↥R) (Nat.card ↥K))
@@ -159,7 +160,7 @@ theorem chiefFactor_fixedPointFree_of_centralizer_fitting_eq_bot
       (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype = ⊥) :
     letI := S03c.chiefFactorConjAction X Y
     ∀ v : ↥X ⧸ Y.subgroupOf X, (∀ r : R, (r : G) • v = v) → v = 1 := by
-  letI := S03c.chiefFactorConjAction X Y
+  let := S03c.chiefFactorConjAction X Y
   set ψ : ↥R →* MulAut G := MulAut.conj.comp R.subtype with hψ
   have hXinv : OddOrder.Isaacs.Ch03.IsAInvariant ψ X :=
     fun a => Subgroup.Normal.conj_smul_eq_self (a : G) X
@@ -171,7 +172,7 @@ theorem chiefFactor_fixedPointFree_of_centralizer_fitting_eq_bot
     hcop.coprime_dvd_right (Subgroup.card_dvd_of_le hXK)
   have hCop : Nat.Coprime (Nat.card ↥R) (Nat.card ↥(Y.subgroupOf X)) :=
     hcopX.coprime_dvd_right (Subgroup.card_subgroup_dvd_card (Y.subgroupOf X))
-  have hSolv : IsSolvable ↥R ∨ IsSolvable ↥(Y.subgroupOf X) := Or.inr inferInstance
+  have hSolv : Group.IsSolvable ↥R ∨ Group.IsSolvable ↥(Y.subgroupOf X) := Or.inr inferInstance
   have hrestrict : ∀ (a : ↥R) (x : ↥X),
       (hXinv.restrict a) x = ConjAct.toConjAct (a : G) • x := fun _ _ => rfl
   intro v hv
@@ -219,7 +220,7 @@ centralizes `X/Y`.
   `K ≤ chiefFactorCentralizer`, hence `⁅R, K⁆ ≤ K ≤ chiefFactorCentralizer`.
 * `s ≠ q`: `commutator_le_chiefFactorCentralizer_via_thm34` (leaf B). -/
 theorem commutator_le_chiefFactorCentralizer_dichotomy_thm38
-    {G : Type*} [Group G] [Finite G] [IsSolvable G] {K R X Y : Subgroup G}
+    {G : Type*} [Group G] [Finite G] [Group.IsSolvable G] {K R X Y : Subgroup G}
     [K.Normal] [X.Normal] [Y.Normal] {s q : ℕ} [Fact s.Prime] [Fact q.Prime]
     (hChief : IsChiefFactor X Y)
     (hVelem : IsElementaryAbelian s (↥X ⧸ Y.subgroupOf X))
@@ -260,7 +261,7 @@ is normal in `G` and contains `⁅K, R⁆`, so `N ⊆ chiefFactorCentralizer U V
 reverse (`S01.chiefFactorCentralizer_subset_le_fitting_of_isSolvable`) then gives `N ⊆ F(K)`, whence
 `⁅K, R⁆ ⊆ N ⊆ F(K)`.  `F(K) = (fitting ↥K).map K.subtype`. -/
 theorem commutator_le_fitting_of_reduced
-    {G : Type*} [Group G] [Finite G] [IsSolvable G] {K R : Subgroup G} [K.Normal]
+    {G : Type*} [Group G] [Finite G] [Group.IsSolvable G] {K R : Subgroup G} [K.Normal]
     (hodd : Odd (Nat.card G))
     (hcompl : K.IsComplement' R)
     (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥R))
@@ -272,7 +273,7 @@ theorem commutator_le_fitting_of_reduced
       (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype = ⊥) :
     ⁅K, R⁆ ≤ (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype := by
   set L : Subgroup G := (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype with hLdef
-  haveI hLnorm : L.Normal := ConjAct.normal_of_characteristic_of_normal
+  have hLnorm : L.Normal := ConjAct.normal_of_characteristic_of_normal
   have hLK : L ≤ K := by rw [hLdef]; exact Subgroup.map_subtype_le _
   have hRL_disj : Disjoint (R : Subgroup G) L :=
     hcompl.isCompl.disjoint.symm.mono_right hLK
@@ -310,7 +311,7 @@ theorem commutator_le_fitting_of_reduced
     OddOrder.Isaacs.Ch01.fitting_map_subtype_le_fitting
   -- `N = ⟨⁅K, R⁆⟩^G`: normal, `≤ K`.
   set N : Subgroup G := Subgroup.normalClosure ((⁅K, R⁆ : Subgroup G) : Set G) with hNdef
-  haveI hNnorm : N.Normal := Subgroup.normalClosure_normal
+  have hNnorm : N.Normal := Subgroup.normalClosure_normal
   have hKR_le_K : (⁅K, R⁆ : Subgroup G) ≤ K := by
     rw [Subgroup.commutator_comm, Subgroup.commutator_le]
     intro r _ k hk
@@ -322,12 +323,12 @@ theorem commutator_le_fitting_of_reduced
   have hNF : N ≤ L := by
     refine OddOrder.BG.Ch1.S01.chiefFactorCentralizer_subset_le_fitting_of_isSolvable hNK ?_
     intro U V hVnorm hChief hUF
-    haveI := hChief.normal_top
-    haveI := hChief.normal_bot
+    have := hChief.normal_top
+    have := hChief.normal_bot
     apply Subgroup.normalClosure_le_normal
     intro x hx
     obtain ⟨s, hs, hVelem⟩ := S03c.chiefFactor_isElementaryAbelian hChief
-    haveI : Fact s.Prime := ⟨hs⟩
+    have : Fact s.Prime := ⟨hs⟩
     have hUK : U ≤ K := hUF.trans hLK
     have hLcent : L ≤ OddOrder.GroupTheory.chiefFactorCentralizer U V :=
       hLfitG.trans (OddOrder.BG.Ch1.S01.fitting_le_chiefFactorCentralizer hChief)
@@ -337,7 +338,7 @@ theorem commutator_le_fitting_of_reduced
       intro hsp
       -- `|G/L| = |K/L| · |R/L|`, with `|K/L| = p^n` and `|R/L| = r` prime.
       have hGL : Nat.card (G ⧸ L) = Nat.card ↥(K.map (QuotientGroup.mk' L)) *
-          Nat.card ↥(R.map (QuotientGroup.mk' L)) := hcompl'.card_mul.symm
+          Nat.card ↥(R.map (QuotientGroup.mk' L)) := hcompl'.card_mul_card.symm
       -- `s ∤ |K/L|` (a `p`-power, `s ≠ p`).
       obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := p)).mp hKbar
       have hsK : ¬ s ∣ Nat.card ↥(K.map (QuotientGroup.mk' L)) := by
@@ -384,7 +385,7 @@ By `actionCommutator_quotient_eq_map` this is the image of `actionCommutator φ`
 `actionCommutator φ ≤ F(K)`; finally `actionCommutator_conj_map_subtype` identifies its image under
 `K.subtype` with `⁅K, R⁆`. -/
 theorem commutator_le_fitting_of_centralizes_fittingQuotient
-    {G : Type*} [Group G] [Finite G] [IsSolvable G] {K R : Subgroup G} [K.Normal]
+    {G : Type*} [Group G] [Finite G] [Group.IsSolvable G] {K R : Subgroup G} [K.Normal]
     (hRK : R ≤ Subgroup.normalizer (K : Set G))
     (hcop : Nat.Coprime (Nat.card ↥R) (Nat.card ↥K))
     (hcent : OddOrder.Isaacs.Ch01.fitting (↥K ⧸ OddOrder.Isaacs.Ch01.fitting ↥K) ≤
@@ -417,7 +418,7 @@ open OddOrder.Isaacs.Ch03.IsAInvariant
 direction is the lifting in `coprime_fixedPoints_quotient` (Proposition 1.5(d), element form). -/
 theorem fixedPointsOfMulAut_quotientMulAutHom_eq_map
     {G A : Type*} [Group G] [Finite G] [Group A] [Finite A] {φ : A →* MulAut G}
-    (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) (hSolv : IsSolvable A ∨ IsSolvable G)
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G)
     {N : Subgroup G} [N.Normal] (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N) :
     Subgroup.fixedPointsOfMulAut (quotientMulAutHom hN) =
       (Subgroup.fixedPointsOfMulAut φ).map (QuotientGroup.mk' N) := by
@@ -495,7 +496,7 @@ condition (2) (`fixedPointsOfMulAut_conj_map_subtype` + injectivity of `K.subtyp
 `R₀`- and `R`-fixed points on `K`, transporting `⊤` to the `R`-quotient; finally step 1
 (`commutator_le_fitting_of_centralizes_fittingQuotient`, with `F(K̄) ≤ ⊤` trivial) concludes. -/
 theorem commutator_le_fitting_of_sameFixedPoints
-    {G : Type*} [Group G] [Finite G] [IsSolvable G] {K R R₀ : Subgroup G} [K.Normal]
+    {G : Type*} [Group G] [Finite G] [Group.IsSolvable G] {K R R₀ : Subgroup G} [K.Normal]
     (hRK : R ≤ Subgroup.normalizer (K : Set G))
     (hR₀K : R₀ ≤ Subgroup.normalizer (K : Set G))
     (hcop : Nat.Coprime (Nat.card ↥R) (Nat.card ↥K))
@@ -503,7 +504,7 @@ theorem commutator_le_fitting_of_sameFixedPoints
     (hCeq : Subgroup.centralizer (R₀ : Set G) ⊓ K = Subgroup.centralizer (R : Set G) ⊓ K)
     (hcent0 : ⁅K, R₀⁆ ≤ (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype) :
     ⁅K, R⁆ ≤ (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype := by
-  have hsolvK : IsSolvable ↥K := inferInstance
+  have hsolvK : Group.IsSolvable ↥K := inferInstance
   -- `R₀` fixes all of `K̄` (converse of step 1).
   have htop0 := fixedPoints_quotient_eq_top_of_commutator_le_fitting hR₀K hcent0
   -- Proposition 1.5(d) for both `R₀` and `R`: quotient fixed points are push-forwards.
@@ -537,7 +538,7 @@ theorem centralizer_inf_eq_of_le_of_cond2
     (hcond2 : ∀ x ∈ (R : Set G), x ≠ 1 →
       Subgroup.centralizer ({x} : Set G) ⊓ K = Subgroup.centralizer (R : Set G) ⊓ K) :
     Subgroup.centralizer (R₀ : Set G) ⊓ K = Subgroup.centralizer (R : Set G) ⊓ K := by
-  haveI : Nontrivial ↥R₀ := (Subgroup.nontrivial_iff_ne_bot R₀).mpr hR₀
+  have : Nontrivial ↥R₀ := (Subgroup.nontrivial_iff_ne_bot R₀).mpr hR₀
   obtain ⟨y, hy⟩ := exists_ne (1 : ↥R₀)
   refine le_antisymm ?_ ?_
   · calc Subgroup.centralizer (R₀ : Set G) ⊓ K
@@ -557,9 +558,9 @@ theorem fitting_map_eq_of_normal_of_fitting_le
     (hFP : OddOrder.Isaacs.Ch01.fitting H ≤ P) :
     (OddOrder.Isaacs.Ch01.fitting ↥P).map P.subtype = OddOrder.Isaacs.Ch01.fitting H := by
   refine le_antisymm OddOrder.Isaacs.Ch01.fitting_map_subtype_le_fitting ?_
-  haveI : Group.IsNilpotent ↥(OddOrder.Isaacs.Ch01.fitting H) :=
+  have : Group.IsNilpotent ↥(OddOrder.Isaacs.Ch01.fitting H) :=
     OddOrder.Isaacs.Ch01.fitting.isNilpotent
-  haveI : Group.IsNilpotent ↥((OddOrder.Isaacs.Ch01.fitting H).subgroupOf P) :=
+  have : Group.IsNilpotent ↥((OddOrder.Isaacs.Ch01.fitting H).subgroupOf P) :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hFP).symm
   have hle : (OddOrder.Isaacs.Ch01.fitting H).subgroupOf P ≤ OddOrder.Isaacs.Ch01.fitting ↥P :=
     OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
@@ -609,11 +610,11 @@ theorem exists_opCore_not_le_of_fitting_not_le
 theorem fitting_map_mulEquiv_le {A B : Type*} [Group A] [Group B] [Finite A] [Finite B]
     (e : A ≃* B) :
     (OddOrder.Isaacs.Ch01.fitting A).map e.toMonoidHom ≤ OddOrder.Isaacs.Ch01.fitting B := by
-  haveI : Group.IsNilpotent (OddOrder.Isaacs.Ch01.fitting A) :=
+  have : Group.IsNilpotent (OddOrder.Isaacs.Ch01.fitting A) :=
     OddOrder.Isaacs.Ch01.fitting.isNilpotent
-  haveI : Group.IsNilpotent ↥((OddOrder.Isaacs.Ch01.fitting A).map e.toMonoidHom) :=
+  have : Group.IsNilpotent ↥((OddOrder.Isaacs.Ch01.fitting A).map e.toMonoidHom) :=
     Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ e.toMonoidHom e.injective)
-  haveI : ((OddOrder.Isaacs.Ch01.fitting A).map e.toMonoidHom).Normal :=
+  have : ((OddOrder.Isaacs.Ch01.fitting A).map e.toMonoidHom).Normal :=
     (OddOrder.Isaacs.Ch01.fitting.normal A).map e.toMonoidHom e.surjective
   exact OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
 
@@ -623,7 +624,7 @@ theorem fitting_map_mulEquiv_le {A B : Type*} [Group A] [Group B] [Finite A] [Fi
 sub-configuration `K'.subgroupOf S` with that of `K'`. -/
 theorem fitting_map_mulEquiv {A B : Type*} [Group A] [Group B] [Finite A] (e : A ≃* B) :
     (OddOrder.Isaacs.Ch01.fitting A).map e.toMonoidHom = OddOrder.Isaacs.Ch01.fitting B := by
-  haveI : Finite B := Finite.of_equiv A e.toEquiv
+  have : Finite B := Finite.of_equiv A e.toEquiv
   refine le_antisymm (fitting_map_mulEquiv_le e) (fun y hy => ?_)
   have hsy : e.symm y ∈ OddOrder.Isaacs.Ch01.fitting A :=
     fitting_map_mulEquiv_le e.symm (by simpa using Subgroup.mem_map_of_mem e.symm.toMonoidHom hy)
@@ -741,7 +742,7 @@ The induction is on `n = |G|`.  `by_cases` on whether `R` centralizes `F(K̄)` (
   then step 3 (`R₀ ≤ R` of prime order; if `R₀ ≠ R`, IH on `KR₀` + `commutator_le_fitting_of_…`
   reductions give the result — hence `R` is prime) then step 4
   (`commutator_le_fitting_of_reduced`). -/
-private theorem thm38_aux : ∀ (n : ℕ) {G : Type*} [Group G] [Finite G] [IsSolvable G]
+private theorem thm38_aux : ∀ (n : ℕ) {G : Type*} [Group G] [Finite G] [Group.IsSolvable G]
     (K R : Subgroup G), K.Normal → Odd (Nat.card G) → K.IsComplement' R →
     Nat.Coprime (Nat.card ↥R) (Nat.card ↥K) →
     (∀ x ∈ (R : Set G), x ≠ 1 →
@@ -754,7 +755,7 @@ private theorem thm38_aux : ∀ (n : ℕ) {G : Type*} [Group G] [Finite G] [IsSo
   induction n using Nat.strong_induction_on with
   | _ n IH =>
     intro G _ _ _ K R hKnorm hodd hcompl hcop hcond2 hC3 hn
-    haveI := hKnorm
+    have := hKnorm
     have hRK : R ≤ Subgroup.normalizer (K : Set G) := by
       rw [Subgroup.normalizer_eq_top_iff.mpr hKnorm]; exact le_top
     by_cases hcent : OddOrder.Isaacs.Ch01.fitting (↥K ⧸ OddOrder.Isaacs.Ch01.fitting ↥K) ≤
@@ -767,21 +768,21 @@ private theorem thm38_aux : ∀ (n : ℕ) {G : Type*} [Group G] [Finite G] [IsSo
       set L : Subgroup G := (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype with hLdef
       -- (A) a `p`-core `O_p(K̄)` of `K̄` not centralized by `R` (mmd L1233).
       obtain ⟨p, hp_not⟩ := exists_opCore_not_le_of_fitting_not_le hcent
-      haveI : Fact ((p : ℕ).Prime) := ⟨p.2⟩
+      have : Fact ((p : ℕ).Prime) := ⟨p.2⟩
       -- (B) `P` = preimage of `O_p(K̄)` in `↥K`: characteristic, with `F(K) ≤ P_G ⊴ G`, `P_G ≤ K`.
       set P : Subgroup ↥K :=
         (OddOrder.Isaacs.Ch01.opCore (p : ℕ) (↥K ⧸ OddOrder.Isaacs.Ch01.fitting ↥K)).comap
           (QuotientGroup.mk' (OddOrder.Isaacs.Ch01.fitting ↥K)) with hPdef
-      haveI hPchar : P.Characteristic :=
+      have hPchar : P.Characteristic :=
         Subgroup.Characteristic.comap_quotient_mk (OddOrder.Isaacs.Ch01.opCore.characteristic _ _)
       set PG : Subgroup G := P.map K.subtype with hPGdef
-      haveI hPGnorm : PG.Normal := ConjAct.normal_of_characteristic_of_normal
+      have hPGnorm : PG.Normal := ConjAct.normal_of_characteristic_of_normal
       have hPGK : PG ≤ K := Subgroup.map_subtype_le _
       -- (1) `K̄` is a `p`-group (mmd L1235): otherwise IH on `PR` contradicts the choice of `P`.
       have hKbar : IsPGroup p (K.map (QuotientGroup.mk' L)) := by
         by_cases hPGeqK : PG = K
         · -- `P_G = K` ⟹ `P = ⊤` ⟹ `O_p(K̄) = ⊤` ⟹ `K̄` is a `p`-group.
-          haveI : ((OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype).Normal :=
+          have : ((OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype).Normal :=
             ConjAct.normal_of_characteristic_of_normal
           have hPtop : P = ⊤ := by
             apply Subgroup.map_injective K.subtype_injective
@@ -805,7 +806,7 @@ private theorem thm38_aux : ∀ (n : ℕ) {G : Type*} [Group G] [Finite G] [IsSo
             (N := OddOrder.Isaacs.Ch01.fitting ↥K) hKbar_pg
         · -- `P_G ≠ K` ⟹ IH on `PR` gives `⁅P_G, R⁆ ⊆ F(P_G) = F(K)`, so `R` centralizes `O_p(K̄)`.
           exfalso
-          haveI hPnorm : P.Normal := inferInstance
+          have hPnorm : P.Normal := inferInstance
           -- `F(K) ≤ P` (since `O_p(K̄) ∋ 1` pulls back the kernel `F(K)`).
           have hFP : OddOrder.Isaacs.Ch01.fitting ↥K ≤ P := by
             rw [hPdef]; intro z hz; rw [Subgroup.mem_comap]
@@ -831,10 +832,10 @@ private theorem thm38_aux : ∀ (n : ℕ) {G : Type*} [Group G] [Finite G] [IsSo
                   (fun heq => hPGeqK ?_)
                 exact Subgroup.eq_of_le_of_card_ge hPGK heq.ge
               have hScard : Nat.card ↥(PG ⊔ R) = Nat.card ↥PG * Nat.card ↥R := by
-                rw [← (isComplement'_subgroupOf_sup_of_normal hdisjPG).card_mul,
+                rw [← (isComplement'_subgroupOf_sup_of_normal hdisjPG).card_mul_card,
                   Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left : PG ≤ PG ⊔ R)).toEquiv,
                   Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right : R ≤ PG ⊔ R)).toEquiv]
-              rw [← hn, hScard, ← hcompl.card_mul]
+              rw [← hn, hScard, ← hcompl.card_mul_card]
               exact mul_lt_mul_of_pos_right hcardlt Nat.card_pos
             · -- coprime `(|R'|, |P_G'|)`.
               rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right : R ≤ PG ⊔ R)).toEquiv,
@@ -909,7 +910,7 @@ private theorem thm38_aux : ∀ (n : ℕ) {G : Type*} [Group G] [Finite G] [IsSo
         -- `R ≠ ⊥` (else the trivial action fixes all of `K̄`, contradicting `hp_not`).
         have hRne_bot : R ≠ ⊥ := by
           intro hR0
-          haveI : Subsingleton ↥R := by rw [hR0]; infer_instance
+          have : Subsingleton ↥R := by rw [hR0]; infer_instance
           refine hp_not (le_trans le_top ?_)
           rw [top_le_iff, Subgroup.eq_top_iff']
           intro x
@@ -919,8 +920,8 @@ private theorem thm38_aux : ∀ (n : ℕ) {G : Type*} [Group G] [Finite G] [IsSo
           rw [map_one]; rfl
         have hRne1 : Nat.card ↥R ≠ 1 := fun h => hRne_bot (Subgroup.card_eq_one.mp h)
         obtain ⟨r, hr, hrdvd⟩ := Nat.exists_prime_and_dvd hRne1
-        haveI : Fact r.Prime := ⟨hr⟩
-        haveI : Fintype ↥R := Fintype.ofFinite _
+        have : Fact r.Prime := ⟨hr⟩
+        have : Fintype ↥R := Fintype.ofFinite _
         obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card (G := ↥R) r
           (by rwa [Nat.card_eq_fintype_card] at hrdvd)
         refine ⟨(Subgroup.zpowers g).map R.subtype, Subgroup.map_subtype_le _, r, hr, ?_⟩
@@ -951,10 +952,10 @@ private theorem thm38_aux : ∀ (n : ℕ) {G : Type*} [Group G] [Finite G] [IsSo
                 (fun heq => hR₀eq ?_)
               exact Subgroup.eq_of_le_of_card_ge hR₀R heq.ge
             have hScard : Nat.card ↥(K ⊔ R₀) = Nat.card ↥K * Nat.card ↥R₀ := by
-              rw [← (isComplement'_subgroupOf_sup_of_normal hdisj).card_mul,
+              rw [← (isComplement'_subgroupOf_sup_of_normal hdisj).card_mul_card,
                 Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left : K ≤ K ⊔ R₀)).toEquiv,
                 Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right : R₀ ≤ K ⊔ R₀)).toEquiv]
-            rw [← hn, hScard, ← hcompl.card_mul]
+            rw [← hn, hScard, ← hcompl.card_mul_card]
             exact mul_lt_mul_of_pos_left hcardlt Nat.card_pos
           · -- coprime `(|R₀'|, |K'|)`.
             rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right : R₀ ≤ K ⊔ R₀)).toEquiv,
@@ -1013,7 +1014,8 @@ Then `⁅K, R⁆ ⊆ F(K)`.
 The proof is `thm38_aux` specialised to `n = |G|`.  (Internally: induction on `|RK| = |G|`, reducing
 — via the Fitting quotient `K̄ = K/F(K)` — to `K̄` a `p`-group and `R` of prime order, then a
 chief-factor analysis split by `Theorem 3.4` and `G`-Lemma 2.6.3.) -/
-theorem thm38 {G : Type*} [Group G] [Finite G] [IsSolvable G] {K R : Subgroup G} [hKnorm : K.Normal]
+theorem thm38 {G : Type*} [Group G] [Finite G] [Group.IsSolvable G] {K R : Subgroup G}
+    [hKnorm : K.Normal]
     (hodd : Odd (Nat.card G)) (hcompl : K.IsComplement' R)
     (hcop : Nat.Coprime (Nat.card ↥R) (Nat.card ↥K))
     (hcond2 : ∀ x ∈ (R : Set G), x ≠ 1 →

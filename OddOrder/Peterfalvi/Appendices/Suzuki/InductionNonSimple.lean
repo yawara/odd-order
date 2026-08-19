@@ -77,7 +77,7 @@ theorem involutionClosure_eq_normalClosure (G : Type u) [Group G] :
     involutionClosure G =
       Subgroup.normalClosure (involutionSet G) := by
   apply le_antisymm Subgroup.closure_le_normalClosure
-  letI : (involutionClosure G).Normal := involutionClosure_normal G
+  let : (involutionClosure G).Normal := involutionClosure_normal G
   exact Subgroup.normalClosure_le_normal
     (s := involutionSet G)
     (N := involutionClosure G) Subgroup.subset_closure
@@ -183,7 +183,7 @@ theorem even_card_of_normal_ne_bot (M : Subgroup G) (hMnormal : M.Normal)
     (hMbot : M ≠ ⊥) : Even (Nat.card M) := by
   by_contra hMeven
   have hModd : Odd (Nat.card M) := Nat.not_even_iff_odd.mp hMeven
-  letI : M.Normal := hMnormal
+  let : M.Normal := hMnormal
   have hMpi : Ch03.Subgroup.IsPiGroup ({2}ᶜ : Set ℕ) M := by
     intro p hp
     simp only [Set.mem_compl_iff, Set.mem_singleton_iff]
@@ -585,7 +585,7 @@ odd. -/
 theorem odd_index_of_sup_D_eq_top
     (L : Subgroup G) (hLnormal : L.Normal)
     (hsup : L ⊔ hyp.D = ⊤) : Odd L.index := by
-  letI : L.Normal := hLnormal
+  let : L.Normal := hLnormal
   have hindex : L.index = L.relIndex hyp.D := by
     rw [← Subgroup.relIndex_top_right, ← hsup, Subgroup.relIndex_sup_left]
   rw [hindex]
@@ -647,7 +647,7 @@ theorem theoremAConclusion_of_not_simple (hG : ¬ IsSimpleGroup G)
   have hsmall : Nat.card L < Nat.card G :=
     Subgroup.card_lt_card_of_ne_top hLproper
   obtain ⟨result⟩ := inductionHypothesis hsmall hHypL
-  letI : result.L.Normal := result.normal
+  let : result.L.Normal := result.normal
   have hresultLtop : result.L = ⊤ := by
     apply top_unique
     intro l _

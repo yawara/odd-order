@@ -59,7 +59,7 @@ theorem witness_dade_psi_rho_norm_ge [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
       ((hyp.typeI.typeF.H).subgroupOf data.L) frob.complement := by
     rw [hHfrob]; exact frob.frobenius
   have hHL : hyp.typeI.typeF.H ≤ data.L := hyp.typeI.typeF.H_le
-  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf data.L).Normal := by
+  have hKnormal : ((hyp.typeI.typeF.H).subgroupOf data.L).Normal := by
     rw [hyp.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal data.L
   have hAH : typeIA data.L hyp.typeI = (hyp.typeI.typeF.H : Set G) \ {1} :=
@@ -177,9 +177,9 @@ theorem witness_dade_psi_rho_norm_ge [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
   have hKcard : Nat.card ↥((hyp.typeI.typeF.H).subgroupOf data.L) = Nat.card hyp.typeI.typeF.H :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHL).toEquiv
   have hKnt : ((hyp.typeI.typeF.H).subgroupOf data.L) ≠ ⊥ := by
-    haveI : Nontrivial ↥hyp.typeI.typeF.H :=
+    have : Nontrivial ↥hyp.typeI.typeF.H :=
       (Subgroup.nontrivial_iff_ne_bot _).mpr hyp.typeI.typeF.H_nontrivial
-    haveI : Nontrivial ↥((hyp.typeI.typeF.H).subgroupOf data.L) :=
+    have : Nontrivial ↥((hyp.typeI.typeF.H).subgroupOf data.L) :=
       (Subgroup.subgroupOfEquivOfLe hHL).toEquiv.nontrivial
     exact (Subgroup.nontrivial_iff_ne_bot _).mp inferInstance
   have hcompl : Nat.card ↥((hyp.typeI.typeF.H).subgroupOf data.L) * Nat.card ↥frob.complement
@@ -268,7 +268,7 @@ theorem witness_dade_psi_rhoM_rho_normSq_lt_one [Finite G]
   have hC : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥data.L
       ((hyp.typeI.typeF.H).subgroupOf data.L) frob.complement := by
     rw [hHfrob]; exact frob.frobenius
-  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf data.L).Normal := by
+  have hKnormal : ((hyp.typeI.typeF.H).subgroupOf data.L).Normal := by
     rw [hyp.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal data.L
   obtain ⟨θlin, hθlin_ne, hχ_eq⟩ := dade.chi_mem
@@ -494,7 +494,7 @@ theorem witness_value_norm_package [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
       normRhoM + normRho < 1 := by
   classical
   subst hLeq
-  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  have : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
   -- The type-I (12.1) Hypothesis for `M`.
   obtain ⟨hypM⟩ := exists_typeI_hypothesis hG ctr.M_maximal ctr.M_typeI
   -- The Frobenius witness for `L` (for the `S`-irreducibility of `dade.chi`).
@@ -571,7 +571,7 @@ theorem exists_counterexample_dade_data [Finite G]
     (hg_comm : Commute witness.x g) (hgK : g ∈ ctr.K) (hgK' : g ∉ ctr.Kprime) :
     Nonempty (CounterexampleDadeData witness g) := by
   classical
-  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  have : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
   -- The witness (12.13) Dade calculation with its proven (12.14) evaluation `ψ(x) = χ(x)`.
   obtain ⟨hyp, coh, dade, hψeq, he_eq, hψZ, hχZ, hψx_eq⟩ :=
     witness_dade_psi_apply_x_eq_chi hG hnoV witness

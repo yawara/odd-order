@@ -55,7 +55,7 @@ theorem isCoatom_map_mk'_of_isCoatom {G : Type*} [Group G] {N M : Subgroup G} [N
 /-- Problem 3B.1 の帰納本体 (`Nat.card G ≤ n` に関する強帰納法; 群の型自体が帰納で変わるので
 `n` を外側に取って型を全称化する)。 -/
 theorem index_isPrimePow_of_isCoatom_aux (n : ℕ) :
-    ∀ {G : Type u} [Group G] [Finite G] [IsSolvable G] (M : Subgroup G),
+    ∀ {G : Type u} [Group G] [Finite G] [Group.IsSolvable G] (M : Subgroup G),
       Nat.card G ≤ n → IsCoatom M → IsPrimePow M.index := by
   induction n with
   | zero =>
@@ -65,7 +65,7 @@ theorem index_isPrimePow_of_isCoatom_aux (n : ℕ) :
   | succ n ih =>
     intro G _ _ _ M hcard hM
     -- `M ≠ ⊤` から `G` は非自明.
-    haveI hnt : Nontrivial G := by
+    have hnt : Nontrivial G := by
       rcases subsingleton_or_nontrivial G with hs | hn
       · exact absurd (by ext x; simp [Subsingleton.elim x (1 : G)] : M = ⊤) hM.1
       · exact hn
@@ -73,16 +73,16 @@ theorem index_isPrimePow_of_isCoatom_aux (n : ℕ) :
     -- minimal normal subgroup `N` を取る (Thm 3.11 で elementary abelian `p`-group).
     obtain ⟨N, hNmin, -⟩ :=
       Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) top_ne_bot
-    haveI hNnormal : N.Normal := hNmin.1
-    obtain ⟨p, hp, hEA⟩ := solvable_minimal_normal_isElementaryAbelian hNmin
-    haveI : Fact p.Prime := ⟨hp⟩
+    have hNnormal : N.Normal := hNmin.1
+    obtain ⟨p, hp, hEA⟩ := minimal_normal_isElementaryAbelian_of_isSolvable hNmin
+    have : Fact p.Prime := ⟨hp⟩
     obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hEA.isPGroup
     by_cases hNM : N ≤ M
     · -- `N ≤ M`: 商 `G ⧸ N` に落とす. 指数は不変, 位数は真に小さい.
       have hindex : (M.map (QuotientGroup.mk' N)).index = M.index :=
         Subgroup.index_map_eq _ (QuotientGroup.mk'_surjective N)
           (by rw [QuotientGroup.ker_mk']; exact hNM)
-      haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNmin.2.1
+      have : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNmin.2.1
       have hNcard : 1 < Nat.card ↥N := Finite.one_lt_card
       have hprod : Nat.card ↥N * N.index = Nat.card G := Subgroup.card_mul_index N
       have hquot : Nat.card (G ⧸ N) ≤ n := by
@@ -108,7 +108,7 @@ theorem index_isPrimePow_of_isCoatom_aux (n : ℕ) :
 /-- **Isaacs Problem 3B.1** (書籍 p. 84): 有限**可解**群の極大部分群の指数は**素数冪**.
 
 証明は教科書の hint どおり `|G|` に関する帰納法 + minimal normal subgroup `N`
-(Thm 3.11 = `solvable_minimal_normal_isElementaryAbelian` で `N` は elementary abelian
+(Thm 3.11 = `minimal_normal_isElementaryAbelian_of_isSolvable` で `N` は elementary abelian
 `p`-group). `N ≤ M` なら対応定理で `G ⧸ N` の極大部分群 `M/N` に落ち, 指数が保たれる
 (`Subgroup.index_map_eq`) ので帰納法の仮定が使える. `N ≰ M` なら `M` の極大性から
 `M ⊔ N = ⊤` で, `|G : M| · |N ⊓ M| = |N|` (Problem 2D の
@@ -116,7 +116,7 @@ theorem index_isPrimePow_of_isCoatom_aux (n : ℕ) :
 
 ⚠ 可解性は本質的 (例: `A₅` の極大部分群 `A₄` は指数 5 だが `A₅` は非可解 — この場合たまたま
 素数冪だが, 一般の非可解群では指数 6 の極大部分群などが現れる). -/
-theorem index_isPrimePow_of_isCoatom {G : Type u} [Group G] [Finite G] [IsSolvable G]
+theorem index_isPrimePow_of_isCoatom {G : Type u} [Group G] [Finite G] [Group.IsSolvable G]
     {M : Subgroup G} (hM : IsCoatom M) : IsPrimePow M.index :=
   index_isPrimePow_of_isCoatom_aux (Nat.card G) M le_rfl hM
 
@@ -157,7 +157,7 @@ theorem quotient_isMulCommutative_of_commutator_le {G : Type*} [Group G] {H K : 
     (h : ⁅H, H⁆ ≤ K) :
     letI := normal_subgroupOf_of_commutator_le h
     IsMulCommutative (↥H ⧸ K.subgroupOf H) := by
-  letI := normal_subgroupOf_of_commutator_le h
+  let := normal_subgroupOf_of_commutator_le h
   refine Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr ?_
   intro z hz
   refine Subgroup.commutator_le.mpr (fun a _ b _ => ?_) hz
@@ -171,10 +171,10 @@ theorem quotient_isMulCommutative_of_commutator_le {G : Type*} [Group G] {H K : 
 証明は導来列 `G⁽ᵏ⁾ ≤ N_{r-k}` を `k` の帰納法で示すだけ: `G⁽⁰⁾ = ⊤ = Nᵣ` で,
 `G⁽ᵏ⁺¹⁾ = ⁅G⁽ᵏ⁾, G⁽ᵏ⁾⁆ ≤ ⁅N_{r-k}, N_{r-k}⁆ ≤ N_{r-k-1}`. `k = r` で `G⁽ʳ⁾ ≤ N₀ = ⊥`.
 
-有限性は不要 (mathlib の `IsSolvable` は導来列が有限段で `⊥` になること). -/
+有限性は不要 (mathlib の `Group.IsSolvable` は導来列が有限段で `⊥` になること). -/
 theorem isSolvable_of_commutator_series {G : Type*} [Group G] {r : ℕ} (N : ℕ → Subgroup G)
     (h0 : N 0 = ⊥) (hr : N r = ⊤) (hstep : ∀ i < r, ⁅N (i + 1), N (i + 1)⁆ ≤ N i) :
-    IsSolvable G := by
+    Group.IsSolvable G := by
   have key : ∀ k ≤ r, derivedSeries G k ≤ N (r - k) := by
     intro k
     induction k with
@@ -212,19 +212,19 @@ theorem isSolvable_iff_forall_prime_card_of_simple_factors {G : Type u} [Group G
     (f : ∀ i, ↥(N (i + 1)) →* Q i) (hsurj : ∀ i < r, Function.Surjective (f i))
     (hker : ∀ i < r, (f i).ker = (N i).subgroupOf (N (i + 1)))
     (hsimple : ∀ i < r, IsSimpleGroup (Q i)) (h0 : N 0 = ⊥) (hr : N r = ⊤) :
-    IsSolvable G ↔ ∀ i < r, (Nat.card (Q i)).Prime := by
+    Group.IsSolvable G ↔ ∀ i < r, (Nat.card (Q i)).Prime := by
   constructor
   · intro hsol i hi
-    haveI := hsimple i hi
-    haveI : IsSolvable (Q i) := solvable_of_surjective (hsurj i hi)
+    have := hsimple i hi
+    have : Group.IsSolvable (Q i) := Group.isSolvable_of_surjective (hsurj i hi)
     have hcomm : ∀ a b : Q i, a * b = b * a :=
       IsSimpleGroup.comm_iff_isSolvable.mpr inferInstance
-    letI : CommGroup (Q i) := { (inferInstance : Group (Q i)) with mul_comm := hcomm }
+    let : CommGroup (Q i) := { (inferInstance : Group (Q i)) with mul_comm := hcomm }
     exact IsSimpleGroup.prime_card
   · intro hprime
     refine isSolvable_of_commutator_series N h0 hr fun i hi => ?_
-    haveI : Fact (Nat.card (Q i)).Prime := ⟨hprime i hi⟩
-    haveI : IsCyclic (Q i) := isCyclic_of_prime_card (p := Nat.card (Q i)) rfl
+    have : Fact (Nat.card (Q i)).Prime := ⟨hprime i hi⟩
+    have : IsCyclic (Q i) := isCyclic_of_prime_card (p := Nat.card (Q i)) rfl
     have hcomm : ∀ a b : Q i, a * b = b * a := (IsCyclic.commGroup (α := Q i)).mul_comm
     rw [Subgroup.commutator_le]
     intro x hx y hy

@@ -17,7 +17,7 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.Problems6A8
 **証明** (`|G|` に関する強帰納法):
 
 * `A = 1` なら `X = G` で `⊤` が答え。
-* 以下 `A ≠ 1`。`A` 可解ゆえ **`A' < A`** (`IsSolvable.commutator_lt_top_of_nontrivial`)。
+* 以下 `A ≠ 1`。`A` 可解ゆえ **`A' < A`** (`Group.IsSolvable.commutator_lt_top_of_nontrivial`)。
   6A.10(b) (`inf_commutator_eq_commutator_self_of_TI`) より **`G' ⊓ A = A'`**。
 * **`A` が非可換のとき** (`A' ≠ 1`): `A ⊓ G' = A' ≠ 1` なので 6A.7(a) から `AG' = G`。
   また `G' = G` なら `A = A ⊓ G' = A'` で `A' < A` に反するので **`G' < G`**。
@@ -39,9 +39,9 @@ section /- 6A.10(c): `A` 可解なら `X` は部分群 (p. 186) -/
 variable {G : Type*} [Group G]
 
 /-- **Isaacs Problem 6A.10(c)** の帰納版 (`|G| = n` に関する強帰納法)。 -/
-theorem exists_subgroup_coe_eq_notConjugateSet_of_solvable_aux (n : ℕ) :
+theorem exists_subgroup_coe_eq_notConjugateSet_of_isSolvable_aux (n : ℕ) :
     ∀ {G : Type*} [Group G] [Finite G] (A : Subgroup G),
-      Nat.card G = n → (∀ x : G, x ∉ A → A ⊓ (MulAut.conj x • A) = ⊥) → IsSolvable ↥A →
+      Nat.card G = n → (∀ x : G, x ∉ A → A ⊓ (MulAut.conj x • A) = ⊥) → Group.IsSolvable ↥A →
       ∃ K : Subgroup G, (K : Set G) = notConjugateSet A := by
   induction n using Nat.strong_induction_on with
   | _ n ih =>
@@ -54,13 +54,13 @@ theorem exists_subgroup_coe_eq_notConjugateSet_of_solvable_aux (n : ℕ) :
     simp only [Subgroup.coe_top, Set.mem_univ, true_iff]
     intro a ha hane _
     exact hane (Subgroup.mem_bot.mp ha)
-  haveI hAnt : Nontrivial ↥A := (Subgroup.nontrivial_iff_ne_bot A).mpr hAne
-  haveI := hsol
+  have hAnt : Nontrivial ↥A := (Subgroup.nontrivial_iff_ne_bot A).mpr hAne
+  have := hsol
   -- `A` 可解 + `A ≠ 1` ⟹ `A' < A`
   have hAlt : ⁅A, A⁆ < A := by
     rw [← A.range_subtype, MonoidHom.range_eq_map, ← Subgroup.map_commutator,
       Subgroup.map_subtype_lt_map_subtype]
-    exact IsSolvable.commutator_lt_top_of_nontrivial ↥A
+    exact Group.IsSolvable.commutator_lt_top_of_nontrivial ↥A
   -- 6A.10(b)
   have hb : commutator G ⊓ A = ⁅A, A⁆ := inf_commutator_eq_commutator_self_of_TI hATI
   rcases eq_or_ne (⁅A, A⁆ : Subgroup G) ⊥ with habel | hnonab
@@ -73,7 +73,7 @@ theorem exists_subgroup_coe_eq_notConjugateSet_of_solvable_aux (n : ℕ) :
       exact ⟨a, haA, fun h => ha1 (Subtype.ext h)⟩
     -- `AG' = G`
     have hsup : A ⊔ commutator G = ⊤ := by
-      haveI hMn : (A ⊔ commutator G).Normal := normal_of_commutator_le le_sup_right
+      have hMn : (A ⊔ commutator G).Normal := normal_of_commutator_le le_sup_right
       rcases subset_notConjugateSet_or_subset_of_normal (A := A) (M := A ⊔ commutator G)
         hATI with h1 | h2
       · exact absurd (h1 ((le_sup_left : A ≤ A ⊔ commutator G) ha₀A) a₀ ha₀A ha₀ne
@@ -81,7 +81,7 @@ theorem exists_subgroup_coe_eq_notConjugateSet_of_solvable_aux (n : ℕ) :
       · refine le_antisymm le_top fun g _ => ?_
         by_cases hgX : g ∈ notConjugateSet A
         · exact h2 hgX
-        · simp only [notConjugateSet, Set.mem_setOf_eq, not_forall, not_not] at hgX
+        · simp only [notConjugateSet, Set.mem_ofPred_eq, not_forall, not_not] at hgX
           obtain ⟨a, haA, hane, hconj⟩ := hgX
           obtain ⟨c, hc⟩ := isConj_iff.mp hconj
           rw [← hc]
@@ -112,8 +112,8 @@ theorem exists_subgroup_coe_eq_notConjugateSet_of_solvable_aux (n : ℕ) :
             (Nat.lt_mul_iff_one_lt_right hpos).mpr (by omega)
         _ = Nat.card G := hmul
     have hTIsub := TI_subgroupOf_normal (A := A) (M := commutator G) hATI
-    have hsolsub : IsSolvable ↥(A.subgroupOf (commutator G)) :=
-      solvable_of_solvable_injective
+    have hsolsub : Group.IsSolvable ↥(A.subgroupOf (commutator G)) :=
+      Group.isSolvable_of_isSolvable_injective
         (f := { toFun := fun z : ↥(A.subgroupOf (commutator G)) =>
                   (⟨((z : ↥(commutator G)) : G), z.2⟩ : ↥A)
                 map_one' := rfl
@@ -130,10 +130,10 @@ theorem exists_subgroup_coe_eq_notConjugateSet_of_solvable_aux (n : ℕ) :
 
 `A` が `G` の Frobenius 補群のとき `X ∪ {1}` が Frobenius 核にあたる。一般の `A` に対する
 主張は Thm 7.2 (指標理論) を要するが, ここでは `A` の可解性から群論だけで導ける。 -/
-theorem exists_subgroup_coe_eq_notConjugateSet_of_solvable [Finite G] (A : Subgroup G)
-    (hATI : ∀ x : G, x ∉ A → A ⊓ (MulAut.conj x • A) = ⊥) (hsol : IsSolvable ↥A) :
+theorem exists_subgroup_coe_eq_notConjugateSet_of_isSolvable [Finite G] (A : Subgroup G)
+    (hATI : ∀ x : G, x ∉ A → A ⊓ (MulAut.conj x • A) = ⊥) (hsol : Group.IsSolvable ↥A) :
     ∃ K : Subgroup G, (K : Set G) = notConjugateSet A :=
-  exists_subgroup_coe_eq_notConjugateSet_of_solvable_aux (Nat.card G) A rfl hATI hsol
+  exists_subgroup_coe_eq_notConjugateSet_of_isSolvable_aux (Nat.card G) A rfl hATI hsol
 
 end
 

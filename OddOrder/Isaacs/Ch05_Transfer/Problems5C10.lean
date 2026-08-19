@@ -40,7 +40,7 @@ theorem seven_dvd_card_of_isSimpleGroup_of_card_sylow_two_eq_eight
     (hcard : Nat.card ↥(P : Subgroup G) = 8) :
     7 ∣ Nat.card G := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   by_contra h7
   have hPdvd : Nat.card ↥(P : Subgroup G) ∣ Nat.card G := Subgroup.card_subgroup_dvd_card _
   have h8G : (8 : ℕ) ∣ Nat.card G := hcard ▸ hPdvd
@@ -56,7 +56,7 @@ theorem seven_dvd_card_of_isSimpleGroup_of_card_sylow_two_eq_eight
           exact Subgroup.commutator_mem_commutator (Subgroup.mem_top x) (Subgroup.mem_top y)
         rw [hbot, Subgroup.mem_bot] at hmem
         exact commutatorElement_eq_one_iff_mul_comm.mp hmem
-      letI : CommGroup G := { (inferInstance : Group G) with mul_comm := hab }
+      let : CommGroup G := { (inferInstance : Group G) with mul_comm := hab }
       have hprime : (Nat.card G).Prime := IsSimpleGroup.prime_card
       rcases (Nat.Prime.eq_one_or_self_of_dvd hprime 8 h8G) with h | h
       · omega

@@ -54,7 +54,7 @@ theorem card_lt_card_of_ne_top {H : Subgroup G} (h : H ≠ ⊤) : Nat.card ↥H 
 theorem card_quotient_lt_card {N : Subgroup G} [N.Normal] (h : N ≠ ⊥) :
     Nat.card (G ⧸ N) < Nat.card G := by
   have hmul := Subgroup.card_mul_index N
-  haveI : Nontrivial ↥N := N.nontrivial_iff_ne_bot.mpr h
+  have : Nontrivial ↥N := N.nontrivial_iff_ne_bot.mpr h
   have hcard : 1 < Nat.card ↥N := Finite.one_lt_card_iff_nontrivial.mpr inferInstance
   have hpos : 0 < N.index := Nat.card_pos
   have : N.index = Nat.card (G ⧸ N) := rfl
@@ -166,7 +166,7 @@ skeleton 3 の subnormal 鎖から `S ∩ N ≤ M < N` (`M` は `N`-不変) が�
 `G = NS` (skeleton 2) と `(S∩N)^s = S∩N` (`s ∈ S`) から `G`-共役はすべて `M` に入るので
 `(S∩N)^G ≤ M < N`. -/
 theorem inf_eq_bot {N : Subgroup G} (hN : Ch02.IsMinimalNormal N) (hNtop : N ≠ ⊤) : S ⊓ N = ⊥ := by
-  haveI : N.Normal := hN.1
+  have : N.Normal := hN.1
   have hRle : Subgroup.normalClosure ((S ⊓ N : Subgroup G) : Set G) ≤ N :=
     Subgroup.normalClosure_le_normal (fun x hx => hx.2)
   rcases hN.2.2 _ Subgroup.normalClosure_normal hRle with hbot | htop
@@ -349,7 +349,7 @@ theorem inf_le_centralizer_of_fitting_inf_eq_bot (hK : KegelHypothesis S) (hinf 
     (P : Subgroup G) ⊓ S ≤ Subgroup.centralizer (N : Set G) := by
   obtain ⟨R, hPSR, hRP, hRN⟩ := exists_pgroup_normalizedBy hK hinf hsup P
   -- `A := N ⊓ R` は `N` に正規
-  haveI hAnormal : ((N ⊓ R).subgroupOf N).Normal := by
+  have hAnormal : ((N ⊓ R).subgroupOf N).Normal := by
     refine (Subgroup.normal_subgroupOf_iff_le_normalizer inf_le_left).mpr ?_
     intro n hn
     rw [Subgroup.mem_normalizer_iff]
@@ -471,7 +471,7 @@ theorem isSubnormal_of_pow_eq_one (hK : KegelHypothesis S) (hinf : S ⊓ N = ⊥
   have hqidx : ∀ {d : ℕ}, d.Prime → d ∣ S.normalCore.index → d = p := by
     intro q hq hdvd
     by_contra hqp
-    haveI : Fact q.Prime := ⟨hq⟩
+    have : Fact q.Prime := ⟨hq⟩
     obtain ⟨Q⟩ := Sylow.nonempty (p := q) (G := G)
     have hQK : (Q : Subgroup G) ≤ S.normalCore := by
       intro x hx b
@@ -485,7 +485,7 @@ theorem isSubnormal_of_pow_eq_one (hK : KegelHypothesis S) (hinf : S ⊓ N = ⊥
   have hppow : S.normalCore.index = p ^ S.normalCore.index.primeFactorsList.length :=
     Nat.eq_prime_pow_of_unique_prime_dvd hidx0 hqidx
   have hpg : IsPGroup p (G ⧸ S.normalCore) := (IsPGroup.iff_card).mpr ⟨_, hppow⟩
-  haveI : Group.IsNilpotent (G ⧸ S.normalCore) := hpg.isNilpotent
+  have : Group.IsNilpotent (G ⧸ S.normalCore) := hpg.isNilpotent
   have h1 : (S.map (QuotientGroup.mk' S.normalCore)).IsSubnormal :=
     Ch02.isSubnormal_of_isNilpotent_finite _
   have h2 := h1.comap (QuotientGroup.mk' S.normalCore)
@@ -503,7 +503,7 @@ theorem le_centralizer_of_fitting_inf_eq_bot (hK : KegelHypothesis S) (hinf : S 
     by_contra hne
     have hpp : (((Subgroup.centralizer (N : Set G) ⊓ S).subgroupOf S).index).minFac.Prime :=
       Nat.minFac_prime hne
-    haveI : Fact (((Subgroup.centralizer (N : Set G) ⊓ S).subgroupOf S).index).minFac.Prime :=
+    have : Fact (((Subgroup.centralizer (N : Set G) ⊓ S).subgroupOf S).index).minFac.Prime :=
       ⟨hpp⟩
     obtain ⟨P⟩ := (Sylow.nonempty (p := (((Subgroup.centralizer (N : Set G) ⊓ S).subgroupOf
       S).index).minFac) (G := G))
@@ -542,8 +542,8 @@ theorem normal_of_le_centralizer (hsup : S ⊔ N = ⊤)
 theorem KegelHypothesis.normalInSubgroup {T : Subgroup G} (hKS : KegelHypothesis S)
     (hTS : T ≤ S) (hTnormal : (T.subgroupOf S).Normal) : KegelHypothesis T := by
   intro p hp P
-  haveI := hp
-  haveI := hTnormal
+  have := hp
+  have := hTnormal
   have hPS_pg : IsPGroup p ↥(((P : Subgroup G) ⊓ S).subgroupOf S) :=
     (P.isPGroup'.of_injective (Subgroup.inclusion inf_le_left)
       (Subgroup.inclusion_injective _)).comap_subtype
@@ -572,8 +572,8 @@ omit [Finite G] in
 theorem mul_comm_of_isMinimalNormal_of_isNilpotent {N : Subgroup G}
     (hN : Ch02.IsMinimalNormal N) (hnil : Group.IsNilpotent ↥N) :
     ∀ x ∈ N, ∀ y ∈ N, x * y = y * x := by
-  haveI : N.Normal := hN.1
-  haveI : Nontrivial ↥N := N.nontrivial_iff_ne_bot.mpr hN.2.1
+  have : N.Normal := hN.1
+  have : Nontrivial ↥N := N.nontrivial_iff_ne_bot.mpr hN.2.1
   rcases hN.2.2 (Subgroup.centralizer (N : Set G) ⊓ N) inferInstance inf_le_right with hbot | htop
   · exfalso
     refine Group.IsNilpotent.center_ne_bot (G := ↥N) (le_bot_iff.mp ?_)
@@ -595,12 +595,12 @@ theorem mul_comm_of_isMinimalNormal_of_isNilpotent {N : Subgroup G}
 theorem exists_prime_pow_eq_one_of_isMinimalNormal {N : Subgroup G}
     (hN : Ch02.IsMinimalNormal N) (hab : ∀ x ∈ N, ∀ y ∈ N, x * y = y * x) :
     ∃ p : ℕ, p.Prime ∧ ∀ x ∈ N, x ^ p = 1 := by
-  haveI : N.Normal := hN.1
-  haveI : Nontrivial ↥N := N.nontrivial_iff_ne_bot.mpr hN.2.1
+  have : N.Normal := hN.1
+  have : Nontrivial ↥N := N.nontrivial_iff_ne_bot.mpr hN.2.1
   set p := (Nat.card ↥N).minFac with hpdef
   have hcard : 1 < Nat.card ↥N := Finite.one_lt_card_iff_nontrivial.mpr inferInstance
   have hp : p.Prime := Nat.minFac_prime (by omega)
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   refine ⟨p, hp, ?_⟩
   -- `Np := {x ^ p | x ∈ N}` は `G`-正規部分群
   set Np : Subgroup G :=
@@ -612,7 +612,7 @@ theorem exists_prime_pow_eq_one_of_isMinimalNormal {N : Subgroup G}
       inv_mem' := by
         rintro a ⟨x, hx, rfl⟩
         exact ⟨x⁻¹, N.inv_mem hx, by rw [inv_pow]⟩ } with hNp
-  haveI : Np.Normal := by
+  have : Np.Normal := by
     refine ⟨fun a ha g => ?_⟩
     obtain ⟨x, hx, rfl⟩ := ha
     exact ⟨g * x * g⁻¹, ‹N.Normal›.conj_mem x hx g, by rw [conj_pow]⟩
@@ -625,7 +625,7 @@ theorem exists_prime_pow_eq_one_of_isMinimalNormal {N : Subgroup G}
   · exfalso
     -- `p` 乗写像が `↥N` 上全射 ⟹ 単射 ⟹ 位数 `p` の元なし
     obtain ⟨z, hz⟩ : ∃ z : ↥N, orderOf z = p := by
-      haveI := Fintype.ofFinite ↥N
+      have := Fintype.ofFinite ↥N
       exact exists_prime_orderOf_dvd_card p
         (by rw [← Nat.card_eq_fintype_card]; exact Nat.minFac_dvd _)
     have hsurj : Function.Surjective (fun w : ↥N => w ^ p) := by
@@ -655,13 +655,13 @@ include hmc
 (`normal_of_le_centralizer`) となり, `S` が subnormal でないことに矛盾. -/
 theorem le_fitting_of_isMinimalNormal {N : Subgroup G} (hN : Ch02.IsMinimalNormal N)
     (hNtop : N ≠ ⊤) : N ≤ Ch01.fitting G := by
-  haveI : N.Normal := hN.1
+  have : N.Normal := hN.1
   have hinf := hmc.inf_eq_bot hN hNtop
   have hsup := hmc.sup_eq_top (N := N) hN.2.1
   rcases hN.2.2 (Ch01.fitting G ⊓ N) inferInstance inf_le_right with hbot | htop
   · exfalso
     have hSC := le_centralizer_of_fitting_inf_eq_bot hmc.kegel hinf hsup hbot
-    haveI := normal_of_le_centralizer hsup hSC
+    have := normal_of_le_centralizer hsup hSC
     exact hmc.not_isSubnormal (Subgroup.Normal.isSubnormal inferInstance)
   · exact htop ▸ inf_le_left
 
@@ -674,16 +674,16 @@ theorem le_fitting_of_isMinimalNormal {N : Subgroup G} (hN : Ch02.IsMinimalNorma
 (`exists_prime_pow_eq_one_of_isMinimalNormal`), すると `isSubnormal_of_pow_eq_one` が
 `S ◁◁ G` を与えて反例であることに矛盾. -/
 theorem isSimpleGroup_of_isKegelMinimalCounterexample : IsSimpleGroup G := by
-  haveI : Nontrivial G := by
+  have : Nontrivial G := by
     obtain ⟨⟨x, _⟩, ⟨y, _⟩, hxy⟩ := (S.nontrivial_iff_ne_bot).mpr hmc.ne_bot
     exact ⟨x, y, fun h => hxy (Subtype.ext h)⟩
   refine { eq_bot_or_eq_top_of_normal := fun M hM => ?_ }
   by_contra hcon
-  haveI : M.Normal := hM
+  have : M.Normal := hM
   have hMbot : M ≠ ⊥ := fun h => hcon (Or.inl h)
   have hMtop : M ≠ ⊤ := fun h => hcon (Or.inr h)
   obtain ⟨N, hN, hNM⟩ := Ch02.exists_isMinimalNormal_le_of_normal M hMbot
-  haveI : N.Normal := hN.1
+  have : N.Normal := hN.1
   have hNtop : N ≠ ⊤ := fun h => hMtop (top_le_iff.mp (h ▸ hNM))
   have hnil : Group.IsNilpotent ↥N :=
     ((Ch02.le_fitting_iff_isNilpotent_and_isSubnormal N).mp
@@ -691,7 +691,7 @@ theorem isSimpleGroup_of_isKegelMinimalCounterexample : IsSimpleGroup G := by
   obtain ⟨p, hp, hpN⟩ :=
     exists_prime_pow_eq_one_of_isMinimalNormal hN
       (mul_comm_of_isMinimalNormal_of_isNilpotent hN hnil)
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   exact hmc.not_isSubnormal
     (isSubnormal_of_pow_eq_one hmc.kegel (hmc.inf_eq_bot hN hNtop)
       (hmc.sup_eq_top (N := N) hN.2.1) hpN)
@@ -702,8 +702,8 @@ theorem isSimpleGroup_of_isKegelMinimalCounterexample : IsSimpleGroup G := by
 `|T| < |S|` から極小性で `T ◁◁ G`. `G` は単純なので `T = ⊥` か `⊤`; `T ≤ S ≠ ⊤` より
 `T = ⊥`. -/
 theorem isSimpleGroup_subgroup_of_isKegelMinimalCounterexample : IsSimpleGroup ↥S := by
-  haveI : IsSimpleGroup G := isSimpleGroup_of_isKegelMinimalCounterexample hmc
-  haveI : Nontrivial ↥S := S.nontrivial_iff_ne_bot.mpr hmc.ne_bot
+  have : IsSimpleGroup G := isSimpleGroup_of_isKegelMinimalCounterexample hmc
+  have : Nontrivial ↥S := S.nontrivial_iff_ne_bot.mpr hmc.ne_bot
   refine { eq_bot_or_eq_top_of_normal := fun T' hT' => ?_ }
   by_contra hcon
   have hT'top : T' ≠ ⊤ := fun h => hcon (Or.inr h)
@@ -711,7 +711,7 @@ theorem isSimpleGroup_subgroup_of_isKegelMinimalCounterexample : IsSimpleGroup �
   have hTS : T'.map S.subtype ≤ S := Subgroup.map_subtype_le T'
   have hTsub : (T'.map S.subtype).subgroupOf S = T' := by
     rw [Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective S.subtype_injective]
-  haveI : ((T'.map S.subtype).subgroupOf S).Normal := by rw [hTsub]; exact hT'
+  have : ((T'.map S.subtype).subgroupOf S).Normal := by rw [hTsub]; exact hT'
   have hcardT : Nat.card ↥(T'.map S.subtype) = Nat.card ↥T' :=
     (Nat.card_congr (Subgroup.equivMapOfInjective T' S.subtype S.subtype_injective).toEquiv).symm
   have hlt : Nat.card ↥T' < Nat.card ↥S := card_lt_card_of_ne_top hT'top
@@ -726,8 +726,8 @@ theorem isSimpleGroup_subgroup_of_isKegelMinimalCounterexample : IsSimpleGroup �
 /-- 極小反例の `G` は非可換 (可換なら `S ◁ G` で単純性に反する). -/
 theorem not_isMulCommutative_of_isKegelMinimalCounterexample : ¬ IsMulCommutative G := by
   intro hcomm
-  haveI : IsSimpleGroup G := isSimpleGroup_of_isKegelMinimalCounterexample hmc
-  haveI : S.Normal := Subgroup.normal_of_isMulCommutative S
+  have : IsSimpleGroup G := isSimpleGroup_of_isKegelMinimalCounterexample hmc
+  have : S.Normal := Subgroup.normal_of_isMulCommutative S
   rcases ‹IsSimpleGroup G›.eq_bot_or_eq_top_of_normal S inferInstance with h | h
   · exact hmc.ne_bot h
   · exact hmc.ne_top h
@@ -742,11 +742,11 @@ theorem not_isMulCommutative_of_isKegelMinimalCounterexample : ¬ IsMulCommutati
 theorem not_isMulCommutative_subgroup_of_isKegelMinimalCounterexample :
     ¬ IsMulCommutative ↥S := by
   intro hcomm
-  haveI := hcomm
-  haveI : IsSimpleGroup G := isSimpleGroup_of_isKegelMinimalCounterexample hmc
-  haveI : IsSimpleGroup ↥S := isSimpleGroup_subgroup_of_isKegelMinimalCounterexample hmc
+  have := hcomm
+  have : IsSimpleGroup G := isSimpleGroup_of_isKegelMinimalCounterexample hmc
+  have : IsSimpleGroup ↥S := isSimpleGroup_subgroup_of_isKegelMinimalCounterexample hmc
   have hq : (Nat.card ↥S).Prime := Group.is_simple_iff_prime_card.mp inferInstance
-  haveI : Fact (Nat.card ↥S).Prime := ⟨hq⟩
+  have : Fact (Nat.card ↥S).Prime := ⟨hq⟩
   -- どの Sylow にも `S` が入る
   have hSP : ∀ P : Sylow (Nat.card ↥S) G, S ≤ (P : Subgroup G) := by
     intro P
@@ -783,10 +783,10 @@ theorem not_isMulCommutative_subgroup_of_isKegelMinimalCounterexample :
     intro g
     obtain ⟨k, hk⟩ := P.isPGroup' ⟨g, hPtop.ge (Subgroup.mem_top g)⟩
     exact ⟨k, by simpa using congrArg Subtype.val hk⟩
-  haveI : Group.IsNilpotent G := hGq.isNilpotent
+  have : Group.IsNilpotent G := hGq.isNilpotent
   have hGcomm : ∀ a b : G, a * b = b * a :=
     IsSimpleGroup.comm_iff_isSolvable.mpr inferInstance
-  haveI : S.Normal := ⟨fun n hn g => by
+  have : S.Normal := ⟨fun n hn g => by
     rw [hGcomm g n, mul_assoc, mul_inv_cancel, mul_one]; exact hn⟩
   rcases ‹IsSimpleGroup G›.eq_bot_or_eq_top_of_normal S inferInstance with h | h
   · exact hmc.ne_bot h

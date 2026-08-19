@@ -119,8 +119,8 @@ theorem natCast_cartanMatrix_quotientPi (μ θ : ι) :
           (quotientPi_surjective π hπ hlin hN) (quotientPi_smul π hπ hlin hN)
           (ker_quotientPi π hπ hlin hN hkerJ) e' μ θ : ℕ) : K) := by
   classical
-  letI : Fintype G := Fintype.ofFinite G
-  letI : Fintype (G ⧸ N) := Fintype.ofFinite _
+  let : Fintype G := Fintype.ofFinite G
+  let : Fintype (G ⧸ N) := Fintype.ofFinite _
   refine congrFun (congrFun (eq_of_sum_mul_eq_ite
     (fun a b : ι => pairingZero (𝒪 := 𝒪) p K
       (irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π a)
@@ -169,7 +169,7 @@ theorem cartanMatrix_quotientPi (μ θ : ι) :
       = Nat.card ↥N * cartanMatrix hpF.out hϖ hϖ'
           (quotientPi_surjective π hπ hlin hN) (quotientPi_smul π hπ hlin hN)
           (ker_quotientPi π hπ hlin hN hkerJ) e' μ θ := by
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   refine Nat.cast_injective (R := K) ?_
   rw [Nat.cast_mul]
   exact natCast_cartanMatrix_quotientPi hω hω' hϖ hϖ' hπ hlin hkerJ e e' hN hcent μ θ

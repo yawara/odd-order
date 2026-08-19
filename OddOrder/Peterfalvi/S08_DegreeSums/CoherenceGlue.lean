@@ -220,8 +220,8 @@ nontrivial irreducible of the kernel `H` to the Frobenius group `L` gives an irr
 theorem isIrreducibleCharacter_of_mem_S_of_frobenius (hyp : SibleyDadeHypothesis G L H)
     (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
     {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ hyp.S) : IsIrreducibleCharacter φ := by
-  letI : H.Normal := hyp.H_normal
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  let : H.Normal := hyp.H_normal
+  have : Fintype ↥H := Fintype.ofFinite _
   rw [hyp.S_eq] at hφ
   obtain ⟨θ, hθ_ne, rfl⟩ := hφ
   exact isIrreducibleCharacter_induce_of_frobeniusGroup hF θ hθ_ne
@@ -246,8 +246,8 @@ it is not the trivial irreducible character; odd order of `L` then gives non-rea
 theorem S_hasNoRealCharacters (hyp : SibleyDadeHypothesis G L H)
     (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1) :
     OddOrder.Peterfalvi.S03.HasNoRealCharacters hyp.S := by
-  letI : H.Normal := hyp.H_normal
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  let : H.Normal := hyp.H_normal
+  have : Fintype ↥H := Fintype.ofFinite _
   intro φ hφ hreal
   have hirr : IsIrreducibleCharacter φ := hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF hφ
   let η : IrreducibleCharacter ↥L := ⟨φ, hirr⟩
@@ -314,8 +314,8 @@ theorem sMember_characterFacts (hyp : SibleyDadeHypothesis G L H)
 theorem sMember_diffSupport (hyp : SibleyDadeHypothesis G L H)
     {χ : ClassFunction ↥L ℂ} (hχS : χ ∈ hyp.S) (hirr : IsIrreducibleCharacter χ) :
     (χ.conj - χ).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
-  letI : H.Normal := hyp.H_normal
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  let : H.Normal := hyp.H_normal
+  have : Fintype ↥H := Fintype.ofFinite _
   rw [hyp.S_eq] at hχS
   obtain ⟨θ, -, hχeq⟩ := hχS
   obtain ⟨n, -, hn1, -⟩ := hirr.exists_natDegree_charValue_one_dvd_card
@@ -445,8 +445,8 @@ theorem isIrreducibleCharacter_of_mem_Xset_caseA (hyp : SibleyDadeHypothesis G L
     {χ : ClassFunction ↥L ℂ} (hχX : χ ∈ hyp.Xset Z) :
     letI : H.Normal := hyp.H_normal
     IsIrreducibleCharacter χ := by
-  letI : H.Normal := hyp.H_normal
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  let : H.Normal := hyp.H_normal
+  have : Fintype ↥H := Fintype.ofFinite _
   obtain ⟨hχS, hχnotZ⟩ := hχX
   rw [hyp.S_eq] at hχS
   obtain ⟨θ, hθne, hχeq⟩ := hχS
@@ -471,7 +471,7 @@ theorem isIrreducibleCharacter_of_mem_Xset_c2_caseA (hyp : SibleyDadeHypothesis 
     {χ : ClassFunction ↥L ℂ} (hχX : χ ∈ hyp.Xset hyp.centralCommutator) :
     letI : H.Normal := hyp.H_normal
     IsIrreducibleCharacter χ := by
-  haveI := hyp.H_normal
+  have := hyp.H_normal
   exact hyp.isIrreducibleCharacter_of_mem_Xset_caseA hyp.centralCommutator_le
     hyp.centralCommutator_subgroupOf_le_center
     (fun w _ => by
@@ -509,7 +509,7 @@ theorem Xset_eq_irreducible_not_subset_characterKernel (hyp : SibleyDadeHypothes
     (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ) :
     hyp.Xset Z = {χ : ClassFunction ↥L ℂ | IsIrreducibleCharacter χ ∧
       ¬ ((Z : Set ↥L) ⊆ OddOrder.Peterfalvi.S03.characterKernel χ)} := by
-  letI : H.Normal := hyp.H_normal
+  let : H.Normal := hyp.H_normal
   rw [hyp.Xset_eq_inducedKernelFamily_sdiff Z] at hX ⊢
   exact inducedKernelFamily_sdiff_eq_irreducible_not_subset_characterKernel hZH hX
 
@@ -533,7 +533,7 @@ theorem xMember_characterFacts_of_irreducible_X (hyp : SibleyDadeHypothesis G L 
       ClassFunction.inner χ.conj χ.conj = 1 ∧
       ClassFunction.inner χ.conj χ = 0 ∧
       ClassFunction.inner χ χ.conj = 0 := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
   have hirr : IsIrreducibleCharacter χ := hX χ hχX
   have hconjirr : IsIrreducibleCharacter χ.conj := hirr.conj
   -- `Z ⊄ Ker χ` from the (6.6) characterization, hence `χ ≠ 1`.
@@ -589,8 +589,8 @@ theorem xMember_diffSupport_of_irreducible_X (hyp : SibleyDadeHypothesis G L H)
     {Z : Subgroup ↥L} (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ)
     {χ : ClassFunction ↥L ℂ} (hχX : χ ∈ hyp.Xset Z) :
     (χ.conj - χ).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
-  letI : H.Normal := hyp.H_normal
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  let : H.Normal := hyp.H_normal
+  have : Fintype ↥H := Fintype.ofFinite _
   have hirr : IsIrreducibleCharacter χ := hX χ hχX
   have hχS : χ ∈ hyp.S := (hyp.mem_Xset.mp hχX).1
   rw [hyp.S_eq] at hχS

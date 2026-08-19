@@ -696,6 +696,7 @@ theorem ticWEquivSdiffW_mem_W1 [Fintype G] [Fintype ↥L]
   exact hy
 
 open scoped Classical in
+set_option backward.isDefEq.respectTransparency false in
 /-- **The `σ`-grid index of `ω_{χ₂,i}` has `W₂`-component independent of the row `i`**: the
 second component of `omegaProdEquiv.symm (omegaProdCharTic h χ₂ i)` — the restriction of the
 transported product character to the `W₂`-part — sees only the `χ₂`-factor
@@ -725,6 +726,7 @@ theorem omegaProdCharTic_symm_snd_eq [Fintype G] [Fintype ↥L]
     OddOrder.Peterfalvi.S06.chiColumn_apply_of_mem_W2 h χ₂ i' hmem]
 
 open scoped Classical in
+set_option backward.isDefEq.respectTransparency false in
 /-- **The `σ`-grid index of `ω_{χ₂,i}` has `W₁`-component independent of the column `χ₂`**:
 the first component sees only the row factor (`chiColumn_apply_of_mem_W1`). -/
 theorem omegaProdCharTic_symm_fst_eq [Fintype G] [Fintype ↥L]
@@ -772,6 +774,7 @@ theorem omegaProdCharTic_symm_snd_ne [Fintype G] [Fintype ↥L]
 set_option maxHeartbeats 1600000 in
 -- raised heartbeat budget for the heavy elaboration below
 open scoped Classical in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (5.8), the `μ`-column dichotomy at Hypothesis (4.6) generality.**
 
 Let `ψ` be a sum over a sub-family `E ⊆ R(μ_j)` of the (4.9) column image family, with
@@ -830,7 +833,7 @@ theorem certainTypeR_subsum_dichotomy [Fintype G] [Fintype ↥L]
                 h46).omegaProdEquiv.symm
               (OddOrder.Peterfalvi.S06.omegaProdCharTic
                 h46 χ₂⁻¹ i₀)).2) := by
-  haveI : Fintype (↥((OddOrder.Peterfalvi.S06.ticVdiff h46).W2.subgroupOf
+  have : Fintype (↥((OddOrder.Peterfalvi.S06.ticVdiff h46).W2.subgroupOf
       (OddOrder.Peterfalvi.S06.ticVdiff h46).W) →* ℂˣ) := Fintype.ofFinite _
   classical
   -- shorthands (plain `have`-free abbreviations via local notation would not fold; spell out)

@@ -55,7 +55,7 @@ theorem sylow_isCoatom_of_minimal_counterexample.{u}
   have hP_ne_top : (P : Subgroup G) ≠ ⊤ := by
     intro hP_top
     exact hG (hasNormalPComplement_of_sylow_eq_top P hP_top)
-  letI h_pSolvable : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G :=
+  let h_pSolvable : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) G :=
     isPiSeparable_of_normalPSubgroup_quotient_hasNormalPComplement
       (OddOrder.Isaacs.Ch01.opCore_isPGroup p G) hQuotient
   have hOp' : OddOrder.Isaacs.Ch03.oPiCore {q | q ≠ p} G = ⊥ :=
@@ -90,7 +90,7 @@ theorem sylow_isCoatom_of_minimal_counterexample.{u}
   have hH_card : Nat.card ↥H < Nat.card G :=
     Subgroup.card_lt_card_of_ne_top hH_ne_top
   obtain ⟨K, hK_normal, hK_complement⟩ := ih ↥H hH_card hH_hyp
-  letI : K.Normal := hK_normal
+  let : K.Normal := hK_normal
   have hK_card : Nat.card K = (S : Subgroup ↥H).index :=
     ((hK_complement S).index_eq_card).symm
   have hK_pi' :

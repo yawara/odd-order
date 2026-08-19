@@ -234,8 +234,8 @@ private lemma diff_mackeySection (ϕ : ↥H →* A)
             ⟨Set.range (s q), isComplement_range_left (hs q)⟩
             ⟨Set.range (s' q), isComplement_range_left (hs' q)⟩ := by
   classical
-  letI := H.fintypeQuotientOfFiniteIndex
-  letI : ∀ q : DoubleCoset.Quotient (K : Set G) H,
+  let := H.fintypeQuotientOfFiniteIndex
+  let : ∀ q : DoubleCoset.Quotient (K : Set G) H,
       Fintype (↥K ⧸ (conjSubgroup q.out H ⊓ K).subgroupOf K) := fun q =>
     ((conjSubgroup q.out H ⊓ K).subgroupOf K).fintypeQuotientOfFiniteIndex
   set γ := mackeySection (K := K) s with hγ_def
@@ -305,7 +305,7 @@ theorem transfer_eq_prod_doubleCoset (ϕ : ↥H →* A)
       = ∏ q : DoubleCoset.Quotient (K : Set G) H,
           MonoidHom.transfer (mackeyRes ϕ q.out) ⟨k, hk⟩ := by
   classical
-  letI : ∀ q : DoubleCoset.Quotient (K : Set G) H,
+  let : ∀ q : DoubleCoset.Quotient (K : Set G) H,
       Fintype (↥K ⧸ (conjSubgroup q.out H ⊓ K).subgroupOf K) := fun q =>
     ((conjSubgroup q.out H ⊓ K).subgroupOf K).fintypeQuotientOfFiniteIndex
   set khat : ↥K := ⟨k, hk⟩ with hkhat_def

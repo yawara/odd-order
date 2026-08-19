@@ -74,8 +74,8 @@ theorem existsUnique_blockCharacter_eq
     (lam : Subalgebra.center k A →ₐ[k] k) :
     ∃! c : Block π hπ hlin, blockCharacter π hπ hlin c = lam := by
   classical
-  haveI : Finite (Block π hπ hlin) := Quotient.finite _
-  haveI : Fintype (Block π hπ hlin) := Fintype.ofFinite _
+  have : Finite (Block π hπ hlin) := Quotient.finite _
+  have : Fintype (Block π hπ hlin) := Fintype.ofFinite _
   obtain ⟨ee, hee, hval⟩ := exists_completeOrthogonalIdempotents_block π hπ hlin hnil
   obtain ⟨c₀, hc₀, hc₀uniq⟩ := existsUnique_blockIdempotent_map_eq_one π hπ hlin hee lam
   have hzero : ∀ c, c ≠ c₀ → lam (ee c) = 0 := fun c hc => by

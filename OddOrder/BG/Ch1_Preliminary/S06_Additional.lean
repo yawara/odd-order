@@ -59,7 +59,8 @@ case** で `J(P) ⊴ G` を与える。本ファイルでは、その awkward �
 自動充足する 2 つ** を discharge する:
 
 - `h2abelian` (Sylow-2 が可換) — 奇数位数では 2-部分群が自明 (`comm_of_isPGroup_two_of_odd`)。
-- `h_pSolvable` (p-separable) — `[IsSolvable G]` から `isPiSeparable_of_solvable` instance で自動。
+- `h_pSolvable` (p-separable) — `[Group.IsSolvable G]` から
+  `isPiSeparable_of_isSolvable` instance で自動。
 
 残る `O_{p'}(G) = ⊥` と `P = C_G(Z(P))` は reduced case の条件。BG Thm 6.2 の一般形
 (`Z(J(S))·O_{p'}(G) ⊴ G`, 任意 S) は `O_{p'}(G)` で商を取り reduced case に簡約する
@@ -94,7 +95,7 @@ private theorem inf_eq_bot_of_coprime_card {H K : Subgroup G}
 omit [Finite G] in
 /-- **BG Lemma 6.5(a)** (mmd L2054): `G` 可解, `K ⊴ G`, `G = KU`, `H ≤ U`,
 `(|H|, |K|) = 1` のとき `H ∩ G' = H ∩ U'`。 -/
-theorem inf_commutator_eq_of_coprime [IsSolvable G] {K U H : Subgroup G} [K.Normal]
+theorem inf_commutator_eq_of_coprime [Group.IsSolvable G] {K U H : Subgroup G} [K.Normal]
     (hKU : K ⊔ U = ⊤) (hHU : H ≤ U)
     (hcop : Nat.Coprime (Nat.card H) (Nat.card K)) :
     H ⊓ commutator G = H ⊓ ⁅U, U⁆ := by
@@ -143,11 +144,11 @@ theorem inf_commutator_eq_of_coprime [IsSolvable G] {K U H : Subgroup G} [K.Norm
 `w H₁ w⁻¹ = H₂` (pointwise 共役)。Isaacs Thm 3.21 (`Ch03.hall_C`, 可解群の π-Hall 共役性) を
 `↥V → G` の `subtype` 像で `G` レベルへ持ち上げたもの。§7 Thm 7.4(d) と §6 Lem 6.5(c) の両方で使用。 -/
 theorem exists_conj_eq_of_isHall_subgroupOf {V : Subgroup G}
-    (hVsolv : IsSolvable ↥V) {π : Set ℕ} {H₁ H₂ : Subgroup G} (hH₁V : H₁ ≤ V) (hH₂V : H₂ ≤ V)
+    (hVsolv : Group.IsSolvable ↥V) {π : Set ℕ} {H₁ H₂ : Subgroup G} (hH₁V : H₁ ≤ V) (hH₂V : H₂ ≤ V)
     (hH₁ : Ch03.IsHallSubgroup π (H₁.subgroupOf V))
     (hH₂ : Ch03.IsHallSubgroup π (H₂.subgroupOf V)) :
     ∃ w ∈ V, MulAut.conj w • H₁ = H₂ := by
-  haveI := hVsolv
+  have := hVsolv
   obtain ⟨w, hw⟩ := Ch03.hall_C hH₁ hH₂
   refine ⟨(w : G), w.2, ?_⟩
   have hcomp : V.subtype.comp (MulAut.conj w).toMonoidHom
@@ -263,7 +264,7 @@ private theorem isHall_subgroupOf_of_card_eq {K U H W : Subgroup G} [K.Normal]
     -- `p ∣ |K|`
     have hpK : p ∣ Nat.card K := hp.2.1.trans hdvd
     -- `p ∣ |H|` from `p ∈ π`
-    simp only [Set.mem_setOf_eq, Nat.mem_primeFactors] at hpπ
+    simp only [Set.mem_ofPred_eq, Nat.mem_primeFactors] at hpπ
     have hpH : p ∣ Nat.card H := hpπ.2.1
     -- contradiction with coprimality
     have : p ∣ Nat.gcd (Nat.card H) (Nat.card K) := Nat.dvd_gcd hpH hpK
@@ -273,7 +274,7 @@ private theorem isHall_subgroupOf_of_card_eq {K U H W : Subgroup G} [K.Normal]
 /-- **BG Lemma 6.5(c)** (mmd L2056): 上記仮定で, `g ∈ G` が `H^g = g⁻¹Hg ≤ U` を満たすなら
 `g = c·u` (`c ∈ C_K(H)`, `u ∈ U`) と分解できる。`H^g` は BG 規約 `g⁻¹Hg`
 (= `H.comap (MulAut.conj g)`)。 -/
-theorem exists_mem_centralizerK_mul_of_conj_le [IsSolvable G] {K U H : Subgroup G} [K.Normal]
+theorem exists_mem_centralizerK_mul_of_conj_le [Group.IsSolvable G] {K U H : Subgroup G} [K.Normal]
     (hKU : K ⊔ U = ⊤) (hHU : H ≤ U)
     (hcop : Nat.Coprime (Nat.card H) (Nat.card K))
     {g : G} (hg : H.comap (MulAut.conj g).toMonoidHom ≤ U) :
@@ -328,7 +329,8 @@ theorem exists_mem_centralizerK_mul_of_conj_le [IsSolvable G] {K U H : Subgroup 
     isHall_subgroupOf_of_card_eq hHKbot hcop hHkV hcardHk
   -- Step 6: apply the conjugacy engine inside the solvable subgroup `↥V`.
   obtain ⟨w₀, hw₀V, hconj⟩ :=
-    exists_conj_eq_of_isHall_subgroupOf (inferInstance : IsSolvable ↥V) hHV hHkV hHallH hHallHk
+    exists_conj_eq_of_isHall_subgroupOf (inferInstance : Group.IsSolvable ↥V) hHV hHkV hHallH
+      hHallHk
   -- `hconj : MulAut.conj w₀ • H = Hk`, i.e. in comap form `H.comap (conj w₀⁻¹) = Hk`.
   rw [conj_smul_eq_comap_conj_inv] at hconj
   -- so with `w := w₀⁻¹ ∈ V`: `H.comap (conj w) = Hk`.
@@ -434,7 +436,7 @@ private theorem centralizer_set_le_normalizer (H : Subgroup G) :
 /-- **BG Lemma 6.5(b)** (mmd L2055): 上記仮定で `N_G(H) = C_K(H)·N_U(H)` (集合等式)。
 原文どおり (c) から従う: `n ∈ N_G(H)` は `n⁻¹Hn = H ≤ U` で (c) を満たし `n = cu`,
 `u = c⁻¹n ∈ N_G(H) ⊓ U = N_U(H)`。逆は両因子が `N_G(H)` 内ゆえ自明。 -/
-theorem normalizer_eq_centralizerK_mul_normalizerU [IsSolvable G] {K U H : Subgroup G}
+theorem normalizer_eq_centralizerK_mul_normalizerU [Group.IsSolvable G] {K U H : Subgroup G}
     [K.Normal] (hKU : K ⊔ U = ⊤) (hHU : H ≤ U)
     (hcop : Nat.Coprime (Nat.card H) (Nat.card K)) :
     SetLike.coe (Subgroup.normalizer H)
@@ -486,9 +488,9 @@ open scoped Pointwise
 
 open OddOrder.BG.Ch1 (hasPLengthOne)
 
-variable [Finite G] [IsSolvable G] {p : ℕ} [Fact p.Prime]
+variable [Finite G] [Group.IsSolvable G] {p : ℕ} [Fact p.Prime]
 
-omit [IsSolvable G] in
+omit [Group.IsSolvable G] in
 /-- `M := O_{p'}(G)` は `p'`-群: `|M|` は `p` と互いに素 (`oPiCore.isPiGroup` で
 全素因子が `≠ p`)。`inf_eq_bot_of_pGroup_coprime` 等への入力。 -/
 private theorem card_oPiPrimeCore_coprime_prime :
@@ -502,7 +504,7 @@ private theorem card_oPiPrimeCore_coprime_prime :
     exact (hpi p hmem) rfl
   exact (Nat.coprime_comm.mp ((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr hndvd))
 
-omit [IsSolvable G] in
+omit [Group.IsSolvable G] in
 /-- `S ∈ Syl_p` と `M = O_{p'}(G)` の位数は互いに素 (`p`-群 vs `p'`-群)。 -/
 private theorem sylow_card_coprime_oPiPrimeCore (S : Sylow p G) :
     Nat.Coprime (Nat.card (S : Subgroup G))
@@ -511,13 +513,13 @@ private theorem sylow_card_coprime_oPiPrimeCore (S : Sylow p G) :
   rw [hn]
   exact (card_oPiPrimeCore_coprime_prime (p := p) (G := G)).symm.pow_left n
 
-omit [IsSolvable G] in
+omit [Group.IsSolvable G] in
 /-- `S ∈ Syl_p` と `M = O_{p'}(G)` は交わらない (`S` は `p`-群, `M` は `p'`-群)。 -/
 private theorem sylow_inf_oPiPrimeCore_eq_bot (S : Sylow p G) :
     (S : Subgroup G) ⊓ Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G = ⊥ :=
   inf_eq_bot_of_coprime_card (sylow_card_coprime_oPiPrimeCore S)
 
-omit [Finite G] [IsSolvable G] in
+omit [Finite G] [Group.IsSolvable G] in
 /-- 商写像 `mk' M` による像の位数は不変, ただし `T ⊓ M = ⊥` のとき: `|T.map (mk' M)| = |T|`。
 `relIndex_ker` (`ker (mk' M) = M`) で `|T.map q| = M.relIndex T = (M.subgroupOf T).index`,
 `T ⊓ M = ⊥ ⟹ M.subgroupOf T = ⊥` ゆえ index = `|T|`。 -/
@@ -533,7 +535,7 @@ private theorem card_map_mk'_eq_of_inf_bot {M T : Subgroup G} [M.Normal]
   change (M.subgroupOf T).index = Nat.card T
   rw [hbot', Subgroup.index_bot]
 
-omit [IsSolvable G] in
+omit [Group.IsSolvable G] in
 /-- `p`-length 1 のもとで, 任意の `p`-部分群は `N = O_{p',p}(G)` に含まれる。
 `Q` の `G/N` への像は `p`-群かつ `|G/N|` (= `p` と互いに素, by `hpl1`) を割るので自明 ⟹
 `Q ≤ ker (mk' N) = N`。`S ≤ N` (foundation/Frattini) と `Q ≤ N` (Lem 6.6(4)) で共有。 -/
@@ -556,7 +558,7 @@ private theorem pGroup_le_oPiPrimePiCore {Q : Subgroup G} (hQ : IsPGroup p Q)
   have hle : Q ≤ q.ker := (Subgroup.map_eq_bot_iff Q).mp hmapbot
   rwa [hq, QuotientGroup.ker_mk'] at hle
 
-omit [IsSolvable G] in
+omit [Group.IsSolvable G] in
 /-- **BG Lemma 6.6 (foundation)**: `p`-length 1 のもとで `O_{p',p}(G) = O_{p'}(G) · S`
 (= `O_{p'}(G) ⊔ S`)。
 
@@ -639,7 +641,7 @@ theorem oPiPrimePiCore_eq_oPiPrimeCore_sup_sylow (S : Sylow p G)
     rw [hM, hN]
     exact Ch03.oPiCore_compl_le_oPiPrimePiCore {p} G
 
-omit [IsSolvable G] in
+omit [Group.IsSolvable G] in
 /-- **BG Lemma 6.6(1b)** (mmd L2092): `p`-length 1 で `G = O_{p'}(G) · N_G(S)`.
 
 Frattini を `N = O_{p',p}(G)` の中の Sylow `S` に適用すると `N_G(S) · N = G`。foundation で
@@ -730,7 +732,7 @@ theorem exists_mem_centralizer_mul_normalizer_of_conj_subset_sylow (S : Sylow p 
     rwa [hH, Subgroup.centralizer_closure] at hc1
   exact ⟨c, hcCent, u, hu, hxcu.symm⟩
 
-omit [IsSolvable G] in
+omit [Group.IsSolvable G] in
 /-- `p`-length 1 のもとで, `p`-部分群 `Q` の `S`-共役: ある `g ∈ N = O_{p',p}(G)` で
 `g Q g⁻¹ ≤ S` (`MulAut.conj g • Q ≤ S`)。`Q ≤ N` (`pGroup_le_oPiPrimePiCore`), `S` は `↥N` の
 Sylow `p`, `Q.subgroupOf N` を含む Sylow へ Sylow II 共役 (`MulAction.exists_smul_eq`), 戻して
@@ -774,7 +776,7 @@ private theorem exists_mem_oPiPrimePiCore_conj_le_sylow (S : Sylow p G)
   rw [inf_of_le_left hconjQN, inf_of_le_left hSN] at hmapped
   exact hmapped
 
-omit [IsSolvable G] in
+omit [Group.IsSolvable G] in
 /-- **BG Lemma 6.6(4)** (mmd L2103): `p`-length 1 で, `p`-部分群 `Q` に対し
 `∃ x ∈ C_G(Q ⊓ S)`, `Q^x ⊆ S` (`Q.comap (conj x) ≤ S`, = `x⁻¹Qx ⊆ S`)。
 
@@ -833,7 +835,7 @@ theorem exists_mem_centralizer_inf_conj_le_sylow (S : Sylow p G)
       (S : Subgroup G).mul_mem hmzm_S ((S : Subgroup G).inv_mem hzS)
     -- `m z m⁻¹ z⁻¹ ∈ M` (m ∈ M normal).
     have hd_M : m * z * m⁻¹ * z⁻¹ ∈ M := by
-      haveI : M.Normal := Ch03.oPiCore.normal _ _
+      have : M.Normal := Ch03.oPiCore.normal _ _
       have hconjM : z * m⁻¹ * z⁻¹ ∈ M := by
         have := ‹M.Normal›.conj_mem m⁻¹ (M.inv_mem hmM) z
         simpa [mul_assoc] using this
@@ -876,9 +878,9 @@ open OddOrder.GroupTheory
 open OddOrder.BG.Ch1.S01 (corollary_1_12 hall_higman_solvable_specialization
   inf_eq_bot_of_pGroup_coprime)
 
-variable [Finite G] [IsSolvable G] {p : ℕ} [Fact p.Prime]
+variable [Finite G] [Group.IsSolvable G] {p : ℕ} [Fact p.Prime]
 
-omit [IsSolvable G] in
+omit [Group.IsSolvable G] in
 /-- `O_p(G) ≤ O_{p',p}(G)`: the `p`-radical sits inside the `O_{p',p}` layer.
 (`Ch03.oPiCore {p} G = Ch01.opCore p G` and `Ch01.opCore p G ≤ O_{p',p}(G)`.) -/
 private theorem oPiCore_singleton_le_oPiPrimePiCore :
@@ -886,12 +888,12 @@ private theorem oPiCore_singleton_le_oPiPrimePiCore :
   rw [Ch04.oPiCore_singleton_eq_opCore]
   exact opCore_le_oPiPrimePiCore p
 
-omit [IsSolvable G] [Finite G] in
+omit [Group.IsSolvable G] [Finite G] in
 omit [Fact (Nat.Prime p)] in
 /-- `⟨x⟩` is `p`-elementary abelian when `x ^ p = 1`. -/
 private theorem zpowers_isElementaryAbelian_of_pow_eq_one {x : G} (hxp : x ^ p = 1) :
     (Subgroup.zpowers x).IsElementaryAbelian p := by
-  letI : IsMulCommutative (Subgroup.zpowers x) := Subgroup.zpowers_isMulCommutative x
+  let : IsMulCommutative (Subgroup.zpowers x) := Subgroup.zpowers_isMulCommutative x
   refine ⟨?_, ?_⟩
   · intro a b
     exact Subtype.ext (congrArg Subtype.val (mul_comm a b))
@@ -902,7 +904,7 @@ private theorem zpowers_isElementaryAbelian_of_pow_eq_one {x : G} (hxp : x ^ p =
     rw [← hi, ← zpow_natCast (x ^ i) p, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast,
       hxp, one_zpow]
 
-omit [IsSolvable G] in
+omit [Group.IsSolvable G] in
 omit [Finite G] in
 omit [Fact (Nat.Prime p)] in
 /-- **E*(S) characterization (membership form)**: if `E` is a maximal elementary abelian
@@ -925,7 +927,7 @@ private theorem mem_of_mem_centralizer_pow_eq_one
     exact this.eq
   exact (hE.le_of_le_centralizer hX hEcent) (Subgroup.mem_zpowers x)
 
-omit [Finite G] [IsSolvable G] [Fact (Nat.Prime p)] in
+omit [Finite G] [Group.IsSolvable G] [Fact (Nat.Prime p)] in
 /-- **O_{p'}(G) = ⊥ ⟹ O_{p',p}(G) = O_p(G)**: if the lower `p'`-layer is trivial, the
 `O_{p',p}` layer collapses to the `p`-radical. (`oPiPrimePiCore π G = comap (mk' M) (oPiCore π
 (G/M))` with `M = ⊥`; `mk' ⊥` is the inverse of `quotientBot`, and `oPiCore` transports.) -/
@@ -958,7 +960,7 @@ private theorem thm67_reduced (hp_odd : p ≠ 2)
   have hN : Ch03.oPiPrimePiCore {p} G = (S : Subgroup G) := by
     rw [oPiPrimePiCore_eq_oPiPrimeCore_sup_sylow S hpl1, hK, bot_sup_eq]
   -- Step 3: `S ⊴ G`.
-  haveI hSnorm : (S : Subgroup G).Normal := hN ▸ Ch03.oPiPrimePiCore.normal {p} G
+  have hSnorm : (S : Subgroup G).Normal := hN ▸ Ch03.oPiPrimePiCore.normal {p} G
   -- Step 4: `S = O_p(G)`.
   have hS_eq_Op : (S : Subgroup G) = Ch03.oPiCore ({p} : Set ℕ) G := by
     refine le_antisymm ?_ ?_
@@ -1050,7 +1052,7 @@ private theorem thm67_reduced (hp_odd : p ≠ 2)
   rw [hLSbot, le_bot_iff] at this
   exact this
 
-omit [IsSolvable G] in
+omit [Group.IsSolvable G] in
 /-- **(B2) lift**: the image of a maximal elementary abelian `p`-subgroup under a quotient by
 a normal `p'`-subgroup `K` is again maximal elementary abelian. The maximality is the crux:
 a larger elementary abelian `Fbar` lifts to `F = Fbar.comap (mk' K)`, whose Sylow-`p`
@@ -1204,7 +1206,7 @@ theorem le_oPiPrimeCore_of_normalized_by_maximalElementaryAbelian (hp_odd : p �
     L ≤ Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G := by
   classical
   set K : Subgroup G := Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G with hKdef
-  haveI : K.Normal := Ch03.oPiCore.normal _ G
+  have : K.Normal := Ch03.oPiCore.normal _ G
   set q : G →* G ⧸ K := QuotientGroup.mk' K with hqdef
   have hqsurj : Function.Surjective q := QuotientGroup.mk'_surjective K
   have hKp' : (Nat.card K).Coprime p := card_oPiPrimeCore_coprime_prime

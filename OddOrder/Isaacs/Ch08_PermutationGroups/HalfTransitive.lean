@@ -193,7 +193,7 @@ private lemma card_dvd_card_invariant [Finite N] {r : ℕ}
     {S : Set N} (hSinv : ∀ a : A, ∀ n ∈ S, a • n ∈ S) (hS1 : (1 : N) ∉ S) :
     r ∣ Nat.card S := by
   classical
-  haveI := Fintype.ofFinite N
+  have := Fintype.ofFinite N
   have horbsub : ∀ v ∈ S, orbit A v ⊆ S := by
     rintro v hv _ ⟨a, rfl⟩
     exact hSinv a v hv
@@ -232,7 +232,7 @@ private lemma smul_eq_of_fiber_eq [Finite N] {r : ℕ}
     (hne1 : ∀ v ∈ orbit A x, f 1 ≠ f v)
     {a : A} (hfa : f (a • x) = f x) : a • x = x := by
   classical
-  haveI := Fintype.ofFinite N
+  have := Fintype.ofFinite N
   set U : Set N := {w : N | ∃ v ∈ orbit A x, f w = f v} with hUdef
   -- fibers within `U` have size `c`
   have hfibU : ∀ w ∈ U.toFinset, {w' ∈ U.toFinset | f w' = f w}.card = c := by
@@ -389,7 +389,7 @@ private lemma smul_eq_of_rightCoset [Finite N] {r : ℕ}
       exact hv
     · intro h
       ext u
-      simp only [Set.mem_setOf_eq]
+      simp only [Set.mem_ofPred_eq]
       constructor
       · intro hu
         simpa [mul_assoc] using H.mul_mem hu h
@@ -462,19 +462,19 @@ theorem isFrobeniusAction_or_isElementaryAbelian_of_half_transitive
       ∃ a : A, a ≠ 1 ∧ ∃ n : N, n ≠ 1 ∧ a • n = n := by
     by_contra hc
     exact hfrob fun a ha n hn hsmul => hc ⟨a, ha, n, hn, hsmul⟩
-  haveI : Nontrivial N := ⟨n₀, 1, hn₀1⟩
+  have : Nontrivial N := ⟨n₀, 1, hn₀1⟩
   set r := Nat.card (orbit A n₀) with hrdef
   have hr : ∀ x : N, x ≠ 1 → Nat.card (orbit A x) = r :=
     fun x hx => hhalf x n₀ hx hn₀1
   have hrpos : 0 < r := by
-    haveI : Nonempty (orbit A n₀) := ⟨⟨n₀, mem_orbit_self n₀⟩⟩
+    have : Nonempty (orbit A n₀) := ⟨⟨n₀, mem_orbit_self n₀⟩⟩
     exact hrdef ▸ Nat.card_pos
   -- `r` divides `|N| - 1`, hence is coprime to `|N|`
   have hrdvd : r ∣ Nat.card N - 1 := by
     have h := card_dvd_card_invariant hr (S := {n : N | n ≠ 1})
       (fun a n hn h1 => hn (by simpa using congrArg (a⁻¹ • ·) h1))
       (by simp)
-    haveI := Fintype.ofFinite N
+    have := Fintype.ofFinite N
     rwa [Nat.card_eq_fintype_card, Set.card_ne_eq, ← Nat.card_eq_fintype_card]
       at h
   have hrcop : Nat.Coprime r (Nat.card N) := by
@@ -503,7 +503,7 @@ theorem isFrobeniusAction_or_isElementaryAbelian_of_half_transitive
       rw [hstabcard x hx]
       exact Finite.one_lt_card_iff_nontrivial.mpr
         ⟨⟨a₀, mem_stabilizer_iff.mpr hfix₀⟩, 1, fun h => ha₀1 (congrArg Subtype.val h)⟩
-    haveI := Finite.one_lt_card_iff_nontrivial.mp h1
+    have := Finite.one_lt_card_iff_nontrivial.mp h1
     obtain ⟨s, hs⟩ := exists_ne (1 : stabilizer A x)
     exact ⟨s.1, fun h => hs (Subtype.ext h), s.2⟩
   -- basic properties of `C x := stabFixed A x`

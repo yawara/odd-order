@@ -50,7 +50,7 @@ theorem SibleyDadeHypothesis.inner_self_tau_indW2_sub_smul
         (hyp.tau (ClassFunction.induce W2 φ - c • η₁))
       = ClassFunction.inner (ClassFunction.induce W2 φ - c • η₁)
         (ClassFunction.induce W2 φ - c • η₁) := by
-  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have : Fintype ↥W2 := Fintype.ofFinite _
   have hsupp : (ClassFunction.induce W2 φ - c • η₁).support
       ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
     hyp.support_indW2_sub_smul_subset_sharpImage hW2H φ hη₁ c h1
@@ -74,7 +74,7 @@ theorem SibleyDadeHypothesis.inner_induce_W2_Yset_diff_eq_zero
     (φ : ClassFunction ↥W2 ℂ) {η η' : ClassFunction ↥L ℂ}
     (hη : η ∈ hyp.Yset) (hη' : η' ∈ hyp.Yset) :
     ClassFunction.inner (ClassFunction.induce W2 φ) (η' - η) = 0 := by
-  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have : Fintype ↥W2 := Fintype.ofFinite _
   have hRes : ClassFunction.restrict W2 η' = ClassFunction.restrict W2 η := by
     ext w
     have hmem : (↑w : ↥L) ∈ ⁅H, H⁆ := hW2comm (SetLike.coe_mem w)
@@ -107,7 +107,7 @@ theorem SibleyDadeHypothesis.inner_tau_indW2_sub_smul_tau_Yset_diff
     (h1 : ClassFunction.induce W2 φ (1 : ↥L) = c * η₁ (1 : ↥L)) :
     ClassFunction.inner (hyp.tau (ClassFunction.induce W2 φ - c • η₁))
         (hyp.tau (η' - η₁)) = c := by
-  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have : Fintype ↥W2 := Fintype.ofFinite _
   classical
   have hYirr : ∀ ψ ∈ hyp.Yset, IsIrreducibleCharacter ψ :=
     fun ψ h => hyp.isIrreducibleCharacter_of_mem_Yset h
@@ -196,7 +196,7 @@ theorem inner_self_induce_eq_index_of_le_center
     (φ : IrreducibleCharacter ↥W2) :
     ClassFunction.inner (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ))
         (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)) = (W2.index : ℂ) := by
-  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have : Fintype ↥W2 := Fintype.ofFinite _
   have hcard := card_mul_inner_self_induce_eq_card_inertia φ
   rw [inertia_eq_top_of_le_center hW2cen (φ : ClassFunction ↥W2 ℂ), Subgroup.card_top] at hcard
   have hLeq : (Nat.card ↥L : ℂ) = (Nat.card ↥W2 : ℂ) * (W2.index : ℂ) := by
@@ -222,7 +222,7 @@ theorem SibleyDadeHypothesis.inner_induce_W2_Yset_eq_zero
     (φ : IrreducibleCharacter ↥W2) (hφ : φ ≠ trivialIrreducibleCharacter ↥W2)
     {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset) :
     ClassFunction.inner (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)) η = 0 := by
-  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have : Fintype ↥W2 := Fintype.ofFinite _
   rw [ClassFunction.inner_induce_eq_inner_restrict,
     ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum]
   have hconst : ∀ w : ↥W2, ClassFunction.restrict W2 η w = (Nat.card hyp.W1 : ℂ) := by
@@ -300,7 +300,7 @@ theorem SibleyDadeHypothesis.coeff_eq_neg_or_edge_caseB
       ∨ (hyp.Yset.ncard = 2 ∧
         ClassFunction.inner (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
           - ((W2.subgroupOf H).index : ℂ) • η₁)) (hyp.coherentYset.extension η₁) = 0) := by
-  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have : Fintype ↥W2 := Fintype.ofFinite _
   have hW2H : W2 ≤ H := by
     have hle : ⁅H, H⁆ ≤ H := by
       rw [Subgroup.commutator_le]; intro a ha b hb; rw [commutatorElement_def]
@@ -468,7 +468,7 @@ theorem SibleyDadeHypothesis.orthogonal_tau_indW2_add_extension_caseB
       ∧ hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
           - ((W2.subgroupOf H).index : ℂ) • η₁)
           + ((W2.subgroupOf H).index : ℂ) • hyp.coherentYset.extension η₁ ∈ ZIrr G := by
-  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have : Fintype ↥W2 := Fintype.ofFinite _
   classical
   have hYon : ∀ η η', η ∈ hyp.Yset → η' ∈ hyp.Yset →
       ClassFunction.inner (hyp.coherentYset.extension η) (hyp.coherentYset.extension η')
@@ -571,7 +571,7 @@ theorem SibleyDadeHypothesis.exists_Ycoherence_hgood_caseB
       ClassFunction.inner (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
         - ((W2.subgroupOf H).index : ℂ) • η₁)) (cY.extension η₁)
         = -((W2.subgroupOf H).index : ℂ) := by
-  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have : Fintype ↥W2 := Fintype.ofFinite _
   classical
   have hW2H : W2 ≤ H := by
     have hle : ⁅H, H⁆ ≤ H := by
@@ -657,7 +657,7 @@ theorem SibleyDadeHypothesis.inner_tau_alpha_extension_phiIndep
         - ((W2.subgroupOf H).index : ℂ) • η₁)) (hyp.coherentYset.extension η')
       = ClassFunction.inner (hyp.tau (ClassFunction.induce W2 (φ' : ClassFunction ↥W2 ℂ)
         - ((W2.subgroupOf H).index : ℂ) • η₁)) (hyp.coherentYset.extension η') := by
-  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have : Fintype ↥W2 := Fintype.ofFinite _
   classical
   have hW2H : W2 ≤ H := by
     have hle : ⁅H, H⁆ ≤ H := by
@@ -677,7 +677,7 @@ theorem SibleyDadeHypothesis.inner_tau_alpha_extension_phiIndep
         ((W2.subgroupOf H).index : ℂ) (hdeg _ hφ'1) (hyp.coherentYset.extension η')]
   set f := ClassFunction.restrict W2 (ClassFunction.restrict L (hyp.coherentYset.extension η'))
     with hf
-  haveI : Nontrivial ↥W2 := Finite.one_lt_card_iff_nontrivial.mp hprime.one_lt
+  have : Nontrivial ↥W2 := Finite.one_lt_card_iff_nontrivial.mp hprime.one_lt
   obtain ⟨z₀, hz₀1⟩ := exists_ne (1 : ↥W2)
   have hfconst : ∀ a : ↥W2, a ≠ 1 → f a = f z₀ := by
     intro a ha
@@ -726,7 +726,7 @@ theorem SibleyDadeHypothesis.exists_Ycoherence_hgood_uniform_caseB
         ClassFunction.inner (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
           - ((W2.subgroupOf H).index : ℂ) • η₁)) (cY.extension η₁)
           = -((W2.subgroupOf H).index : ℂ) := by
-  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have : Fintype ↥W2 := Fintype.ofFinite _
   classical
   by_cases hYc : hyp.Yset.ncard = 2
   · -- `|Y| = 2` edge: pick the branch with one `φ₀`, propagate by `φ`-independence.

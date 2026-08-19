@@ -57,7 +57,7 @@ theorem iSup_sylow_eq_top (K : Type*) [Group K] [Finite K] :
   rcases Nat.eq_zero_or_pos k with rfl | hkpos
   · simp
   have hrp : r.Prime := hr
-  haveI : Fact r.Prime := ⟨hrp⟩
+  have : Fact r.Prime := ⟨hrp⟩
   have hrdvd : r ∣ Nat.card K := (dvd_pow_self r hkpos.ne').trans hrk
   have hrmem : r ∈ (Nat.card K).primeFactors :=
     Nat.mem_primeFactors.mpr ⟨hrp, hrdvd, Nat.card_pos.ne'⟩
@@ -151,7 +151,7 @@ private theorem le_centralizer_aux [Finite G] {H : Subgroup G}
               Subgroup.iInf_normalizer_le_normalizer_iSup _
           _ = Subgroup.normalizer (H : Set G) := by rw [hsup]
       obtain ⟨⟨q, hqmem⟩, Q⟩ := i
-      haveI : Fact (q : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors hqmem⟩
+      have : Fact (q : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors hqmem⟩
       -- `Qsub` は `G` の Sylow `q`-部分群
       obtain ⟨QS, hQS⟩ := exists_sylow_coe_eq_map_subtype hHall
         (Nat.dvd_of_mem_primeFactors hqmem) Q

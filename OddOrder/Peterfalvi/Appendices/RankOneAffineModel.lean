@@ -83,7 +83,7 @@ theorem RankOneHypothesis.sylow_two_isCyclic_or_quaternion
     (hyp : RankOneHypothesis G Ω) (S : Sylow 2 G) :
     IsCyclic ↥(S : Subgroup G) ∨
       ∃ n : ℕ, Nonempty (↥(S : Subgroup G) ≃* QuaternionGroup n) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hUnique : ∀ K L : Subgroup ↥(S : Subgroup G),
       Nat.card K = 2 → Nat.card L = 2 → K = L := by
     intro K L hK hL
@@ -217,14 +217,14 @@ theorem RankOneHypothesis.exists_regular_normal {G Ω : Type*} [Group G] [MulAct
     ∃ (p : ℕ) (F : Subgroup G), p.Prime ∧ F.Normal ∧ IsMulCommutative ↥F ∧
       (∀ x ∈ F, x ^ p = 1) ∧ MulAction.IsPretransitive ↥F Ω ∧
       Subgroup.IsComplement' F hyp.H ∧ Odd (Nat.card ↥F) := by
-  haveI := hyp.faithful
+  have := hyp.faithful
   -- `O_{2'}(G)` is a nontrivial solvable normal subgroup (odd order → Feit–Thompson).
   have hNne : OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G ≠ ⊥ := hyp.oddCore_ne_bot hbs
   have hNodd : Odd (Nat.card ↥(OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G)) :=
     Nat.not_even_iff_odd.mp (mt Even.two_dvd (fun h2 =>
       (OddOrder.Isaacs.Ch03.oPiCore.isPiGroup {p | p ≠ 2}) 2
         (Nat.mem_primeFactors.mpr ⟨Nat.prime_two, h2, Nat.card_pos.ne'⟩) rfl))
-  haveI hNsolv : IsSolvable ↥(OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G) := feitThompson hNodd
+  have hNsolv : Group.IsSolvable ↥(OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G) := feitThompson hNodd
   obtain ⟨p, F, _hp, hFnormal, hFle, _hFne, hcomm, hexp, _hpgroup, htrans, hfree⟩ :=
     OddOrder.GroupTheory.exists_elementaryAbelian_regular_normal_of_isMultiplyPretransitive
       hyp.doubly_transitive hNne hNsolv
@@ -266,7 +266,7 @@ private theorem quaternionGroup_xa_zero_conj_a_one (n : ℕ) :
 open QuaternionGroup in
 private theorem quaternionGroup_closure_pair (n : ℕ) [NeZero n] :
     Subgroup.closure {(a 1 : QuaternionGroup n), xa 0} = ⊤ := by
-  haveI : NeZero (2 * n) := ⟨Nat.mul_ne_zero two_ne_zero (NeZero.ne n)⟩
+  have : NeZero (2 * n) := ⟨Nat.mul_ne_zero two_ne_zero (NeZero.ne n)⟩
   rw [eq_top_iff]
   rintro w -
   have ha_mem : ∀ j : ZMod (2 * n),
@@ -323,7 +323,7 @@ theorem RankOneHypothesis.brauerSuzuki {G Ω : Type*} [Group G] [MulAction G Ω]
     (hyp : RankOneHypothesis G Ω) :
     OddOrder.Isaacs.Ch03.oPiCore {p | p ≠ 2} G ⊔ Subgroup.centralizer {hyp.t} = ⊤ := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   -- the Sylow `2`-subgroup containing `t`
   have htP : IsPGroup 2 ↥(Subgroup.zpowers hyp.t) := by
     refine IsPGroup.of_card (n := 1) ?_
@@ -338,13 +338,13 @@ theorem RankOneHypothesis.brauerSuzuki {G Ω : Type*} [Group G] [MulAction G Ω]
   obtain ⟨k, hk⟩ := T.isPGroup'.exists_card_eq
   have hn0 : n ≠ 0 := by
     rintro rfl
-    haveI : Infinite (ZMod (2 * 0)) := ZMod.infinite
-    haveI : Infinite (QuaternionGroup 0) :=
+    have : Infinite (ZMod (2 * 0)) := ZMod.infinite
+    have : Infinite (QuaternionGroup 0) :=
       Infinite.of_injective (QuaternionGroup.a (n := 0)) fun i j h => by injection h
     have h0 := Nat.card_congr e.toEquiv
     rw [hk, Nat.card_eq_zero_of_infinite] at h0
     exact absurd h0 (by positivity)
-  haveI : NeZero n := ⟨hn0⟩
+  have : NeZero n := ⟨hn0⟩
   have hn1 : 1 ≤ n := Nat.pos_of_ne_zero hn0
   have hcards : 2 ^ k = 4 * n := by
     rw [← hk]
@@ -362,7 +362,7 @@ theorem RankOneHypothesis.brauerSuzuki {G Ω : Type*} [Group G] [MulAction G Ω]
   · -- `|T| = 4`: `QuaternionGroup 1 = C₄` is cyclic
     have hn1' : n = 1 := by rw [← hk2'] at hcards; norm_num at hcards; omega
     subst hn1'
-    haveI := QuaternionGroup.quaternionGroup_one_isCyclic
+    have := QuaternionGroup.quaternionGroup_one_isCyclic
     have hcyc : IsCyclic ↥(T : Subgroup G) :=
       isCyclic_of_surjective e.symm.toMonoidHom e.symm.surjective
     exact OddOrder.GroupTheory.brauerSuzuki_of_isCyclic_sylowTwo T hcyc hyp.t hyp.t_sq
@@ -459,8 +459,8 @@ theorem RankOneHypothesis.q_regular_on_complement {G Ω : Type*} [Group G] [MulA
     [Finite G] (hyp : RankOneHypothesis G Ω) (ω'' : Ω) (hω'' : ω'' ≠ hyp.basept) :
     ∃! q : ↥hyp.Q, (q : G) • (hyp.t • hyp.basept) = ω'' := by
   classical
-  haveI h2 := hyp.doubly_transitive
-  haveI hpre : IsPretransitive G Ω := isPretransitive_of_is_two_pretransitive
+  have h2 := hyp.doubly_transitive
+  have hpre : IsPretransitive G Ω := isPretransitive_of_is_two_pretransitive
   set ω' := hyp.t • hyp.basept with hω'_def
   have hω'_ne : ω' ≠ hyp.basept := fun h =>
     hyp.t_not_mem_H (hyp.H_def ▸ mem_stabilizer_iff.mpr h)
@@ -468,7 +468,7 @@ theorem RankOneHypothesis.q_regular_on_complement {G Ω : Type*} [Group G] [MulA
   have hD_eq : hyp.D = stabilizer G hyp.basept ⊓ stabilizer G ω' := by
     rw [hyp.D_def, hyp.H_def, ← stabilizer_smul_eq_stabilizer_map_conj]
   -- `H = G_basept` is transitive on `Ω ∖ {basept}`.
-  haveI h1 : IsPretransitive (stabilizer G hyp.basept) (ofStabilizer G hyp.basept) :=
+  have h1 : IsPretransitive (stabilizer G hyp.basept) (ofStabilizer G hyp.basept) :=
     is_one_pretransitive_iff.mp
       ((SubMulAction.ofStabilizer.isMultiplyPretransitive (n := 1) (a := hyp.basept)).mp h2)
   have hH_trans : ∀ a b : Ω, a ≠ hyp.basept → b ≠ hyp.basept →
@@ -574,10 +574,10 @@ theorem RankOneHypothesis.model_involution_data {G Ω : Type*} [Group G] [MulAct
       (∀ u v : G, u ^ 2 = 1 → u ≠ 1 → v ^ 2 = 1 → v ≠ 1 → u ≠ v →
         u * v ∈ Fsub ∧ orderOf (u * v) = p) := by
   classical
-  haveI := hyp.faithful
-  haveI h2t := hyp.doubly_transitive
-  haveI hpre : MulAction.IsPretransitive G Ω := MulAction.isPretransitive_of_is_two_pretransitive
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have := hyp.faithful
+  have h2t := hyp.doubly_transitive
+  have hpre : MulAction.IsPretransitive G Ω := MulAction.isPretransitive_of_is_two_pretransitive
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hdisj : Disjoint Fsub hyp.H := hcompl.disjoint
   -- `Fsub` acts freely at `basept`.
   have hfreeF : ∀ a b : G, a ∈ Fsub → b ∈ Fsub → a • hyp.basept = b • hyp.basept → a = b := by
@@ -592,7 +592,7 @@ theorem RankOneHypothesis.model_involution_data {G Ω : Type*} [Group G] [MulAct
     refine ⟨fun a b hab => Subtype.ext (hfreeF a b a.2 b.2 hab), fun ω => ?_⟩
     obtain ⟨f, hf⟩ := htrans.exists_smul_eq hyp.basept ω
     exact ⟨f, hf⟩
-  haveI : Finite Ω := Finite.of_surjective _ hbij.surjective
+  have : Finite Ω := Finite.of_surjective _ hbij.surjective
   have hΩodd : Odd (Nat.card Ω) := by
     rw [← Nat.card_eq_of_bijective _ hbij]; exact hFodd
   -- An element of `H` centralizing `Fsub` is trivial (fixes all of `Ω`).
@@ -626,7 +626,7 @@ theorem RankOneHypothesis.model_involution_data {G Ω : Type*} [Group G] [MulAct
   -- `D = G_basept ⊓ G_{t·basept}` inside `H` (which is transitive on `Ω ∖ {basept}`).
   have hHtrans : ∀ a b : Ω, a ≠ hyp.basept → b ≠ hyp.basept → ∃ h : G, h ∈ hyp.H ∧ h • a = b := by
     intro a b ha hb
-    haveI h1 : MulAction.IsPretransitive (MulAction.stabilizer G hyp.basept)
+    have h1 : MulAction.IsPretransitive (MulAction.stabilizer G hyp.basept)
         (SubMulAction.ofStabilizer G hyp.basept) :=
       MulAction.is_one_pretransitive_iff.mp
         ((SubMulAction.ofStabilizer.isMultiplyPretransitive (n := 1)
@@ -713,7 +713,7 @@ theorem RankOneHypothesis.model_involution_data {G Ω : Type*} [Group G] [MulAct
   -- Every involution of `G` has a fixed point on `Ω` (odd degree).
   have hfix_exists : ∀ u : G, u ^ 2 = 1 → u ≠ 1 → ∃ ω : Ω, u • ω = ω := by
     intro u hu2 hu1
-    haveI hP2 : IsPGroup 2 ↥(Subgroup.zpowers u) := by
+    have hP2 : IsPGroup 2 ↥(Subgroup.zpowers u) := by
       refine IsPGroup.of_card (n := 1) ?_
       rw [Nat.card_zpowers, orderOf_eq_prime hu2 hu1, pow_one]
     have hmod := hP2.card_modEq_card_fixedPoints Ω
@@ -828,20 +828,20 @@ theorem rankOne_affine_nearField.{u} {G : Type u} {Ω : Type*} [Group G] [MulAct
     (hyp : RankOneHypothesis G Ω) :
     ∃ (F : Type u) (_ : NearField F), Nonempty (AffineNearFieldModel hyp F) := by
   classical
-  haveI := hyp.faithful
+  have := hyp.faithful
   -- Brauer–Suzuki (ii) discharges the odd-core hypothesis (`Q₈` case sorried inside).
   have hbs := hyp.brauerSuzuki
   -- Regular normal elementary abelian `F ⊴ G` with `G = F ⋊ H`.
   obtain ⟨p, Fsub, hp, hFnormal, hcomm, hexp, htrans, hcompl, hFodd⟩ :=
     hyp.exists_regular_normal hbs
-  haveI : Fsub.Normal := hFnormal
-  haveI : IsMulCommutative ↥Fsub := hcomm
+  have : Fsub.Normal := hFnormal
+  have : IsMulCommutative ↥Fsub := hcomm
   have hdisj : Disjoint Fsub hyp.H := hcompl.disjoint
   -- Conjugation-regular datum: identity `e` and the regular `Q`-action on `F ∖ {1}`.
   obtain ⟨e, heF, he_smul, hreg⟩ := hyp.exists_conj_regular htrans hdisj
   -- Conjugation actions of `Q` and `D` on the additive group `A = Additive ↥Fsub`.
-  letI actQ : DistribMulAction ↥hyp.Q (Additive ↥Fsub) := conjAdditiveAction Fsub hyp.Q
-  letI actD : DistribMulAction ↥hyp.D (Additive ↥Fsub) := conjAdditiveAction Fsub hyp.D
+  let actQ : DistribMulAction ↥hyp.Q (Additive ↥Fsub) := conjAdditiveAction Fsub hyp.Q
+  let actD : DistribMulAction ↥hyp.D (Additive ↥Fsub) := conjAdditiveAction Fsub hyp.D
   set eA : Additive ↥Fsub := Additive.ofMul ⟨e, heF⟩ with heA_def
   -- `.toMul`-then-embed is injective on `A`.
   have htoMul_inj : ∀ a b : Additive ↥Fsub,
@@ -882,7 +882,7 @@ theorem rankOne_affine_nearField.{u} {G : Type u} {Ω : Type*} [Group G] [MulAct
           rw [← ofMul_toMul y, h2]; rfl
         obtain ⟨q, hq, huniq⟩ := hreg _ (Additive.toMul y).2 hf1
         exact ⟨q, (hEq q y).mpr hq, fun q' hq' => huniq q' ((hEq q' y).mp hq')⟩ }
-  letI hNF : NearField (Additive ↥Fsub) := data.nearField
+  let hNF : NearField (Additive ↥Fsub) := data.nearField
   -- The embedding `Multiplicative (Additive ↥Fsub) →* G` (= `Fsub ↪ G` under type tags).
   let emb : Multiplicative (Additive ↥Fsub) →* G :=
     { toFun := fun x => ((Additive.toMul (Multiplicative.toAdd x) : ↥Fsub) : G)

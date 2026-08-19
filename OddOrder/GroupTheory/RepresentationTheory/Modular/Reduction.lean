@@ -175,8 +175,8 @@ theorem finrank_eigenspace_baseChange {ζ : 𝒪} (hζ : ζ ∈ nthRootsFinset n
   have hbc_le : ∀ η ∈ s, Module.finrank k ((Module.End.eigenspace A η).baseChange k)
       ≤ Module.finrank 𝒪 (Module.End.eigenspace A η) := by
     intro η hη
-    haveI := free_eigenspace_of_pow (p := p) hn hn0 hω hA hη
-    haveI := finite_eigenspace_of_pow (p := p) hn hn0 hω hA hη
+    have := free_eigenspace_of_pow (p := p) hn hn0 hω hA hη
+    have := finite_eigenspace_of_pow (p := p) hn hn0 hω hA hη
     rw [Submodule.baseChange, ← Module.finrank_baseChange (R := k) (S := 𝒪)
       (M' := Module.End.eigenspace A η)]
     exact LinearMap.finrank_range_le _
@@ -297,11 +297,11 @@ theorem asAlgebraHom_trivial {R M H : Type*} [CommRing R] [Group H] [AddCommGrou
     (Representation.trivial R H M).asAlgebraHom a
       = OddOrder.Algebra.augmentation R H a • LinearMap.id := by
   induction a using MonoidAlgebra.induction_on with
-  | hM g =>
+  | of g =>
     rw [OddOrder.Algebra.augmentation_of, one_smul, MonoidAlgebra.of_apply,
       Representation.asAlgebraHom_single, one_smul]
     rfl
-  | hadd x y hx hy => rw [map_add, hx, hy, map_add, add_smul]
-  | hsmul r x hx => rw [map_smul, hx, map_smul, smul_smul, smul_eq_mul]
+  | add x y hx hy => rw [map_add, hx, hy, map_add, add_smul]
+  | smul r x hx => rw [map_smul, hx, map_smul, smul_smul, smul_eq_mul]
 
 end OddOrder.RepresentationTheory.Modular

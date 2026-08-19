@@ -62,8 +62,8 @@ theorem center_eq_bot_of_isSimpleGroup_not_isMulCommutative (G : Type*) [Group G
 theorem disjoint_of_isMinimalNormal_of_ne {M N : Subgroup G}
     (hM : Ch02.IsMinimalNormal M) (hN : Ch02.IsMinimalNormal N) (hne : M ≠ N) :
     Disjoint M N := by
-  haveI := hM.1
-  haveI := hN.1
+  have := hM.1
+  have := hN.1
   rw [disjoint_iff]
   rcases hM.2.2 (M ⊓ N) (Subgroup.normal_inf_normal M N) inf_le_left with h | h
   · exact h
@@ -118,7 +118,7 @@ theorem iSupIndep_of_semisimpleFamily
     rw [Subgroup.mem_center_iff]
     intro w
     exact Subtype.ext (Subgroup.mem_centralizer_iff.mp (hle hx.2) w w.2)
-  haveI := (h𝒳 S S.2).2.1
+  have := (h𝒳 S S.2).2.1
   rw [center_eq_bot_of_isSimpleGroup_not_isMulCommutative _ (h𝒳 S S.2).2.2,
     Subgroup.mem_bot] at hxc
   exact Subgroup.mem_bot.mpr (congrArg Subtype.val hxc)
@@ -168,13 +168,13 @@ theorem center_eq_bot_of_semisimpleFamily [Finite G]
     (h𝒳 : ∀ S ∈ 𝒳, S.Normal ∧ IsSimpleGroup ↥S ∧ ¬IsMulCommutative ↥S)
     (hsup : sSup 𝒳 = ⊤) : center G = ⊥ := by
   classical
-  haveI : Finite (Subgroup G) :=
+  have : Finite (Subgroup G) :=
     Finite.of_injective (fun H : Subgroup G => (H : Set G)) SetLike.coe_injective
-  haveI : Fintype ↥𝒳 := Fintype.ofFinite _
+  have : Fintype ↥𝒳 := Fintype.ofFinite _
   have e := piEquivOfSemisimpleFamily h𝒳 hsup
   have hpi : center ((S : ↥𝒳) → ↥(S : Subgroup G)) = ⊥ :=
     center_pi_eq_bot fun S => by
-      haveI := (h𝒳 S S.2).2.1
+      have := (h𝒳 S S.2).2.1
       exact center_eq_bot_of_isSimpleGroup_not_isMulCommutative _ (h𝒳 S S.2).2.2
   have hmap := map_center_mulEquiv e
   rw [hpi, Subgroup.map_bot] at hmap
@@ -209,7 +209,7 @@ theorem IsSemisimpleGroup.of_mulEquiv {H : Type*} [Group H] (e : G ≃* H)
     have ee : ↥S ≃* ↥(S.map e.toMonoidHom) :=
       Subgroup.equivMapOfInjective S e.toMonoidHom e.injective
     refine ⟨hnormal.map _ e.surjective, ?_, fun _ => hnab ?_⟩
-    · haveI := hsimple
+    · have := hsimple
       exact ee.symm.isSimpleGroup
     · exact isMulCommutative_of_surjective ee.symm.toMonoidHom ee.symm.surjective
   · rw [sSup_image, ← (Subgroup.gc_map_comap (e.toMonoidHom)).l_sSup, hsup,
@@ -234,18 +234,18 @@ theorem IsSemisimpleGroup.isSimpleGroup_of_isMinimalNormal [Finite G]
 (非自明なら中の minimal normal が nonabelian simple かつ solvable となり矛盾.) -/
 theorem IsSemisimpleGroup.eq_bot_of_normal_of_isSolvable [Finite G]
     (h : IsSemisimpleGroup G) {W : Subgroup G} (hW : W.Normal)
-    (hsolv : IsSolvable ↥W) : W = ⊥ := by
+    (hsolv : Group.IsSolvable ↥W) : W = ⊥ := by
   by_contra hne
-  haveI := hW
+  have := hW
   obtain ⟨M, hMmin, hMle⟩ := Ch02.exists_isMinimalNormal_le_of_normal W hne
   obtain ⟨hsimp, hncomm⟩ := h.isSimpleGroup_of_isMinimalNormal hMmin
   -- `M ≤ W` solvable ⇒ `↥M` solvable
-  haveI : IsSolvable ↥M :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective hMle)
-  haveI := hsimp
-  haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMmin.2.1
+  have : Group.IsSolvable ↥M :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective hMle)
+  have := hsimp
+  have : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMmin.2.1
   -- solvable ⇒ commutator proper ⇒ (simple) commutator = ⊥ ⇒ abelian, 矛盾
-  have hlt : commutator ↥M < ⊤ := IsSolvable.commutator_lt_top_of_nontrivial ↥M
+  have hlt : commutator ↥M < ⊤ := Group.IsSolvable.commutator_lt_top_of_nontrivial ↥M
   have hnorm : (commutator ↥M).Normal := by
     rw [_root_.commutator_def]
     exact Subgroup.commutator_normal ⊤ ⊤
@@ -284,8 +284,8 @@ abelian なら `F(N)`, `Z(N)` の押し出しが `G`-normal (issue 9109 の
 theorem isMulCommutative_or_isSemisimpleGroup_of_isMinimalNormal [Finite G]
     {N : Subgroup G} (hN : Ch02.IsMinimalNormal N) :
     IsMulCommutative ↥N ∨ IsSemisimpleGroup ↥N := by
-  haveI := hN.1
-  haveI hNnt : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN.2.1
+  have := hN.1
+  have hNnt : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN.2.1
   have htop_ne : (⊤ : Subgroup ↥N) ≠ ⊥ := by
     intro h
     obtain ⟨x, hx⟩ := exists_ne (1 : ↥N)
@@ -304,12 +304,12 @@ theorem isMulCommutative_or_isSemisimpleGroup_of_isMinimalNormal [Finite G]
   by_cases habel : IsMulCommutative ↥S₀
   · -- abelian 枝: `N` は可換
     left
-    haveI : IsMulCommutative ↥(S₀.subgroupOf N) := by
-      haveI := habel
+    have : IsMulCommutative ↥(S₀.subgroupOf N) := by
+      have := habel
       exact isMulCommutative_of_surjective
         (Subgroup.subgroupOfEquivOfLe hS₀le).symm.toMonoidHom
         (Subgroup.subgroupOfEquivOfLe hS₀le).symm.surjective
-    haveI := hS₀normalN
+    have := hS₀normalN
     have hfit : S₀.subgroupOf N ≤ Ch01.fitting ↥N := Ch01.nilpotent_normal_le_fitting
     have hFnormal : ((Ch01.fitting ↥N).map N.subtype).Normal :=
       normal_map_subtype_of_char (Ch01.fitting.characteristic ↥N)
@@ -322,8 +322,8 @@ theorem isMulCommutative_or_isSemisimpleGroup_of_isMinimalNormal [Finite G]
     have hfit_top : Ch01.fitting ↥N = ⊤ := by
       apply Subgroup.map_injective N.subtype_injective
       rw [h, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
-    haveI : Group.IsNilpotent ↥N := by
-      haveI h1 : Group.IsNilpotent ↥(⊤ : Subgroup ↥N) :=
+    have : Group.IsNilpotent ↥N := by
+      have h1 : Group.IsNilpotent ↥(⊤ : Subgroup ↥N) :=
         hfit_top ▸ Ch01.fitting.isNilpotent (G := ↥N)
       exact Group.nilpotent_of_mulEquiv Subgroup.topEquiv
     have hZnormal : ((center ↥N).map N.subtype).Normal :=
@@ -430,13 +430,13 @@ theorem isMulCommutative_or_isSemisimpleGroup_of_isMinimalNormal [Finite G]
     refine ⟨Set.range (fun g : G =>
       (S₀.map (MulAut.conj g).toMonoidHom).subgroupOf N), ?_, ?_⟩
     · rintro P ⟨g, rfl⟩
-      haveI := hS₀simple
+      have := hS₀simple
       have e : ↥((S₀.map (MulAut.conj g).toMonoidHom).subgroupOf N) ≃* ↥S₀ :=
         (Subgroup.subgroupOfEquivOfLe (hconj_le g)).trans
           (Subgroup.equivMapOfInjective S₀ (MulAut.conj g).toMonoidHom
             (MulAut.conj g).injective).symm
       refine ⟨hnorm_conj g, e.isSimpleGroup, fun hcomm => habel ?_⟩
-      haveI := hcomm
+      have := hcomm
       exact isMulCommutative_of_surjective e.toMonoidHom e.surjective
     · apply Subgroup.map_injective N.subtype_injective
       rw [sSup_range, Subgroup.map_iSup, ← MonoidHom.range_eq_map, Subgroup.range_subtype]

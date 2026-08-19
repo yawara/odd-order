@@ -67,8 +67,8 @@ noncomputable instance : Fintype (IrreducibleCharacter G) :=
 unconditionally for a finite group from `characterTableRowOrthogonality_holds`. -/
 private theorem weightedRowOrthogonality_ofFinite :
     CharacterTableWeightedRowOrthogonality (instCharacterTableIndexingOfFinite (G := G)) := by
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Invertible (Nat.card G : ℂ) :=
+  have : Fintype G := Fintype.ofFinite G
+  have : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   exact CharacterTableWeightedRowOrthogonality.ofRowOrthogonality
     (instCharacterTableIndexingOfFinite (G := G)) (characterTableRowOrthogonality_holds (G := G))

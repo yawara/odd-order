@@ -64,7 +64,7 @@ theorem exists_finite_normal_iff (x : G) :
       IsOfFinOrder x ∧ (conjugatesOf x).Finite := by
   constructor
   · rintro ⟨N, hNnormal, hNfin, hxN⟩
-    haveI := hNfin
+    have := hNfin
     refine ⟨?_, ?_⟩
     · exact isOfFinOrder_iff_pow_eq_one.mpr ⟨Nat.card N, Nat.card_pos,
         congrArg Subtype.val (pow_card_eq_one' (G := ↥N) (x := ⟨x, hxN⟩))⟩
@@ -120,7 +120,7 @@ theorem exists_notMem_conj_mem_of_mem_commutator [Finite G] {p : ℕ} [Fact p.Pr
     exact hcon ⟨t, htP, ht⟩
   set Q : Subgroup G := (P : Subgroup G) with hQ
   set ϕ : ↥Q →* Abelianization ↥Q := Abelianization.of with hϕ
-  haveI : Fintype (MulAction.orbitRel.Quotient (Subgroup.zpowers g) (G ⧸ Q)) :=
+  have : Fintype (MulAction.orbitRel.Quotient (Subgroup.zpowers g) (G ⧸ Q)) :=
     Fintype.ofFinite _
   -- `g ∈ G' ≤ ker (transfer ϕ)`
   have hker : MonoidHom.transfer ϕ g = 1 := by
@@ -469,7 +469,7 @@ theorem card_closure_range_le {G : Type*} [Group G] {m : ℕ} (xs : Fin m → G)
     intro κ κ' h
     refine Subtype.ext (Sort5B2.eq_of_count_eq κ.2.1 κ'.2.1 fun i => ?_)
     exact congrArg Fin.val (congrFun h i)
-  haveI : Finite {κ : List (Fin m) // κ.IsChain (· ≤ ·) ∧ ∀ i, κ.count i < n} :=
+  have : Finite {κ : List (Fin m) // κ.IsChain (· ≤ ·) ∧ ∀ i, κ.count i < n} :=
     Finite.of_injective _ hinj
   have hcardT : Nat.card {κ : List (Fin m) // κ.IsChain (· ≤ ·) ∧ ∀ i, κ.count i < n} ≤ n ^ m := by
     calc Nat.card {κ : List (Fin m) // κ.IsChain (· ≤ ·) ∧ ∀ i, κ.count i < n}

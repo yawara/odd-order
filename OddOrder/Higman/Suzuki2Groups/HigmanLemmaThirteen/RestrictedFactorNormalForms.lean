@@ -138,15 +138,15 @@ theorem
       (hP.to_subgroup S) hncommS hmultiS hxiS hlenS hprimeS
   let hSquareEA : IsElementaryAbelian 2 (frattiniSquare P) :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : IsMulCommutative (frattini S) :=
+  let : IsMulCommutative (frattini S) :=
     IsMulCommutative.of_comm hEAS.comm
-  letI : CommGroup (frattini S) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini S)) :=
+  let : CommGroup (frattini S) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini S)) :=
     hEAS.zmodModule
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : CommGroup (frattiniSquare P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : CommGroup (frattiniSquare P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
   intro n c eSquare nu hnTwo hcgen hnuPrimitive hconj
   obtain ⟨factors, left, right, hleft, hleftTheta, hleftSource,

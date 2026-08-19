@@ -212,8 +212,8 @@ theorem isCyclic_quotient_of_conjugation_fpf [Finite G]
       (S : Subgroup G) ⊓ Subgroup.centralizer ({x} : Set G) = ⊥) :
     IsCyclic (↥Q ⧸ (conjActionHom hQN).ker) := by
   classical
-  haveI : Nontrivial ↥S := (Subgroup.nontrivial_iff_ne_bot S).mpr hSne
-  haveI hRq : IsPGroup q (↥Q ⧸ (conjActionHom hQN).ker) := hQq.to_quotient _
+  have : Nontrivial ↥S := (Subgroup.nontrivial_iff_ne_bot S).mpr hSne
+  have hRq : IsPGroup q (↥Q ⧸ (conjActionHom hQN).ker) := hQq.to_quotient _
   -- coprimality of `|Q/ker|` (a `q`-power) and `|S|` (a `p`-power), `p ≠ q`.
   obtain ⟨m, hm⟩ := (IsPGroup.iff_card (p := q)).mp hRq
   obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := p)).mp hSp
@@ -273,7 +273,7 @@ theorem isCyclic_of_inf_eq_bot_of_pRank_le_two {T : Type*} [CommGroup T] [Finite
     exact Nat.card_congr
       (Subgroup.equivMapOfInjective B₀ T₀.subtype T₀.subtype_injective).symm.toEquiv
   -- an order-`p` element `y ∈ T₁`.
-  haveI : Nontrivial ↥T₁ := (Subgroup.nontrivial_iff_ne_bot T₁).mpr hT₁
+  have : Nontrivial ↥T₁ := (Subgroup.nontrivial_iff_ne_bot T₁).mpr hT₁
   have hp_dvd : p ∣ Nat.card ↥T₁ := by
     obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := p)).mp (hTp.to_subgroup T₁)
     have h1lt : 1 < Nat.card ↥T₁ := Finite.one_lt_card
@@ -385,7 +385,7 @@ theorem inf_centralizer_eq_bot_of_invariant_cyclic [Finite G] (hG : IsMinimalSim
   have hodd : Odd p := hG.odd.of_dvd_nat
     (dvd_trans (hA.2 ▸ dvd_pow_self p (two_ne_zero)) (Subgroup.card_subgroup_dvd_card A))
   have hZp : IsPGroup p ↥Z := S.isPGroup'.to_le hZS
-  haveI : Nontrivial ↥Z := (Subgroup.nontrivial_iff_ne_bot Z).mpr hZne
+  have : Nontrivial ↥Z := (Subgroup.nontrivial_iff_ne_bot Z).mpr hZne
   -- `↥Z` is abelian (cyclic), so class `≤ 2`.
   have hcl : _root_.commutator ↥Z ≤ Subgroup.center ↥Z := by rw [commutator_eq_bot]; exact bot_le
   -- a `p`-torsion element makes `Ω₁(↥Z)` nontrivial.
@@ -399,7 +399,7 @@ theorem inf_centralizer_eq_bot_of_invariant_cyclic [Finite G] (hG : IsMinimalSim
     intro hx1; rw [hx1, orderOf_one] at hx; exact absurd hx.symm (Fact.out : p.Prime).ne_one
   have hxO : x ∈ Omega ↥Z p 1 :=
     Omega.mem_of_pow_eq_one (by rw [pow_one]; exact hx ▸ pow_orderOf_eq_one x)
-  haveI hOnt : Nontrivial ↥(Omega ↥Z p 1) := by
+  have hOnt : Nontrivial ↥(Omega ↥Z p 1) := by
     rw [Subgroup.nontrivial_iff_ne_bot]
     intro hbot; rw [hbot, Subgroup.mem_bot] at hxO; exact hxne hxO
   have hOcard : Nat.card ↥(Omega ↥Z p 1) = p := by
@@ -440,7 +440,7 @@ theorem exists_invariant_cyclic_sameExponent_regular [Finite G] (hG : IsMinimalS
       Monoid.exponent ↥Z = Monoid.exponent ↥(S : Subgroup G) ∧
       ∀ z ∈ Z, z ≠ 1 → S10.Msigma M ⊓ Subgroup.centralizer ({z} : Set G) = ⊥ := by
   classical
-  haveI := hSab
+  have := hSab
   have hodd : Odd p := hG.odd.of_dvd_nat
     (dvd_trans (hA.2 ▸ dvd_pow_self p (two_ne_zero)) (Subgroup.card_subgroup_dvd_card A))
   have hSp : IsPGroup p ↥(S : Subgroup G) := S.isPGroup'
@@ -472,12 +472,12 @@ theorem exists_invariant_cyclic_sameExponent_regular [Finite G] (hG : IsMinimalS
   have hS₁inv : Subgroup.normalizer ((S : Subgroup G) : Set G) ≤ Subgroup.normalizer (S₁ : Set G) :=
     h128f1
   -- exponent divisibility from the `p`-power orders.
-  haveI := hS₀cyc; haveI := hS₁cyc
+  have := hS₀cyc; have := hS₁cyc
   have hexpdvd : ∀ {T₀ T₁ : Subgroup G}, IsCyclic ↥T₀ → IsCyclic ↥T₁ → T₀ ≤ (S : Subgroup G) →
       T₁ ≤ (S : Subgroup G) → Nat.card ↥T₁ ≤ Nat.card ↥T₀ →
       Monoid.exponent ↥T₁ ∣ Monoid.exponent ↥T₀ := by
     intro T₀ T₁ hc0 hc1 h0 h1 hle
-    haveI := hc0; haveI := hc1
+    have := hc0; have := hc1
     rw [IsCyclic.exponent_eq_card, IsCyclic.exponent_eq_card]
     obtain ⟨a, ha⟩ := (IsPGroup.iff_card (p := p)).mp (hSp.to_le h0)
     obtain ⟨b, hb⟩ := (IsPGroup.iff_card (p := p)).mp (hSp.to_le h1)
@@ -508,12 +508,12 @@ theorem E_le_normalizer_sylow_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOd
   classical
   have hchain := sylow_chain_of_abelianSylow hG h hp hA hAE hAS hSab
   have hSFE : (S : Subgroup G) ≤ Ch2.S08.fittingInG E := hchain.1.trans hchain.2.1
-  haveI : Group.IsNilpotent ↥(Ch2.S08.fittingInG E) := Ch2.S08.fittingInG_isNilpotent E
+  have : Group.IsNilpotent ↥(Ch2.S08.fittingInG E) := Ch2.S08.fittingInG_isNilpotent E
   set SF : Sylow p ↥(Ch2.S08.fittingInG E) := S.subtype hSFE with hSFdef
   have hSF_norm : (SF : Subgroup ↥(Ch2.S08.fittingInG E)).Normal := by
     have htfae := (Group.isNilpotent_of_finite_tfae (G := ↥(Ch2.S08.fittingInG E))).out 0 3
     exact htfae.mp inferInstance p ⟨Fact.out⟩ SF
-  haveI : (SF : Subgroup ↥(Ch2.S08.fittingInG E)).Characteristic :=
+  have : (SF : Subgroup ↥(Ch2.S08.fittingInG E)).Characteristic :=
     Sylow.characteristic_of_normal SF hSF_norm
   have hmap : (SF : Subgroup ↥(Ch2.S08.fittingInG E)).map (Ch2.S08.fittingInG E).subtype
       = (S : Subgroup G) := by
@@ -546,7 +546,7 @@ theorem centralizer_le_of_omega1_le_centralizer [Finite G] {S Q : Subgroup G} {p
   have hcomm_le_S : (⁅(S : Subgroup G), Q⁆ : Subgroup G) ≤ S := le_sup_right.trans (le_of_eq hsup)
   have hcomm_bot : (⁅(S : Subgroup G), Q⁆ : Subgroup G) = ⊥ := by
     by_contra hne
-    haveI : Nontrivial ↥(⁅(S : Subgroup G), Q⁆ : Subgroup G) :=
+    have : Nontrivial ↥(⁅(S : Subgroup G), Q⁆ : Subgroup G) :=
       (Subgroup.nontrivial_iff_ne_bot _).mpr hne
     have hcomm_pg : IsPGroup p ↥(⁅(S : Subgroup G), Q⁆ : Subgroup G) := hSp.to_le hcomm_le_S
     -- a nonidentity order-`p` element of `[S, Q]`
@@ -589,11 +589,11 @@ theorem omega_le_of_ne_bot_in_cyclic {C : Type*} [Group C] [Finite C] [IsCyclic 
     [Fact q.Prime] (hCq : IsPGroup q C) (hodd : Odd q) {H : Subgroup C} (hH : H ≠ ⊥) :
     Omega C q 1 ≤ H := by
   classical
-  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hH
+  have : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hH
   obtain ⟨h, hhne⟩ := exists_ne (1 : ↥H)
   have hhH : (h : C) ∈ H := h.2
   have hh1 : (h : C) ≠ 1 := fun hc => hhne (Subtype.ext hc)
-  haveI : Nontrivial C := ⟨(h : C), 1, hh1⟩
+  have : Nontrivial C := ⟨(h : C), 1, hh1⟩
   have hcl : _root_.commutator C ≤ Subgroup.center C := by rw [commutator_eq_bot]; exact bot_le
   have hqC : q ∣ Nat.card C := by
     obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := q)).mp hCq
@@ -605,7 +605,7 @@ theorem omega_le_of_ne_bot_in_cyclic {C : Type*} [Group C] [Finite C] [IsCyclic 
     intro hx1; rw [hx1, orderOf_one] at hx; exact absurd hx.symm (Fact.out : q.Prime).ne_one
   have hxO : x ∈ Omega C q 1 :=
     Omega.mem_of_pow_eq_one (by rw [pow_one]; exact hx ▸ pow_orderOf_eq_one x)
-  haveI : Nontrivial ↥(Omega C q 1) := by
+  have : Nontrivial ↥(Omega C q 1) := by
     rw [Subgroup.nontrivial_iff_ne_bot]
     intro hbot; rw [hbot, Subgroup.mem_bot] at hxO; exact hxne hxO
   have hOcard : Nat.card ↥(Omega C q 1) = q := by
@@ -627,7 +627,7 @@ theorem pRank_le_one_of_cyclic_quotient {Q : Type*} [Group Q] [Finite Q] {q : �
   have hOmegaQ₁ : Omega Q q 1 ≤ Q₁ := by
     rw [Omega, Subgroup.closure_le]
     intro g hg
-    have hgq : g ^ q = 1 := by simpa only [Set.mem_setOf_eq, pow_one] using hg
+    have hgq : g ^ q = 1 := by simpa only [Set.mem_ofPred_eq, pow_one] using hg
     have hmapne : Q₁.map f ≠ ⊥ := by
       intro hbot
       rw [Subgroup.map_eq_bot_iff, hf, QuotientGroup.ker_mk'] at hbot
@@ -647,7 +647,7 @@ theorem pRank_le_one_of_cyclic_quotient {Q : Type*} [Group Q] [Finite Q] {q : �
     have h1 := congrArg (Subtype.val : ↥B → Q) (hB.pow_eq_one ⟨b, hb⟩)
     simpa using h1)
   have hBQ₁ : B ≤ Q₁ := hBOmega.trans hOmegaQ₁
-  haveI : IsCyclic ↥B := Subgroup.isCyclic_of_le hBQ₁
+  have : IsCyclic ↥B := Subgroup.isCyclic_of_le hBQ₁
   have hBexp : Monoid.exponent ↥B ∣ q := by
     rw [Monoid.exponent_dvd]; intro b; exact orderOf_dvd_of_pow_eq_one (hB.pow_eq_one b)
   have hBle : Nat.card ↥B ≤ q :=
@@ -669,7 +669,7 @@ theorem sylow_eq_of_le_normalizer {p : ℕ} [Fact p.Prime] [Finite G]
   classical
   have hPN : (P : Subgroup G) ≤ Subgroup.normalizer ((P : Subgroup G) : Set G) :=
     Subgroup.le_normalizer
-  haveI : Unique (Sylow p ↥(Subgroup.normalizer ((P : Subgroup G) : Set G))) :=
+  have : Unique (Sylow p ↥(Subgroup.normalizer ((P : Subgroup G) : Set G))) :=
     Sylow.unique_of_normal (P.subtype hPN) (by
       rw [Sylow.coe_subtype]; exact Subgroup.normal_in_normalizer)
   have heq : S.subtype hSle = P.subtype hPN := Subsingleton.elim _ _
@@ -789,14 +789,14 @@ theorem exists_sylow_tau1_cyclic_notCentralizing [Finite G] (hG : IsMinimalSimpl
   have hCEAnorm : E ≤ Subgroup.normalizer ((E ⊓ Subgroup.centralizer (A : Set G) : Subgroup G) : Set
       G) :=
     ((nilpotent_sigmaComplement_abelian hG h).2.2.1 p (Fact.out : p.Prime) hp A hA hAE).2.1
-  haveI hCEA_norm : ((E ⊓ Subgroup.centralizer (A : Set G)).subgroupOf E).Normal :=
+  have hCEA_norm : ((E ⊓ Subgroup.centralizer (A : Set G)).subgroupOf E).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer inf_le_left).mpr hCEAnorm
   -- choose `q ∈ π(E/C_E(S))` and a Sylow `q`-subgroup `Q₁` of `E`.
   have hHne : (Subgroup.centralizer ((S : Subgroup G) : Set G) ⊓ E).subgroupOf E ≠ ⊤ := by
     rw [ne_eq, Subgroup.subgroupOf_eq_top]; intro hle; exact hCES (le_antisymm inf_le_right hle)
   obtain ⟨q, hq_prime, hq_dvd⟩ := Nat.exists_prime_and_dvd
     (fun hi => hHne (Subgroup.index_eq_one.mp hi))
-  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have : Fact q.Prime := ⟨hq_prime⟩
   obtain ⟨Q₁'⟩ : Nonempty (Sylow q ↥E) := inferInstance
   set Q₁ : Subgroup G := (Q₁' : Subgroup ↥E).map E.subtype with hQ₁def
   have hQ₁E : Q₁ ≤ E := by rw [hQ₁def]; exact Subgroup.map_subtype_le _
@@ -916,7 +916,7 @@ theorem exists_partial_centralizer_of_abelianSylow [Finite G] (hG : IsMinimalSim
   classical
   obtain ⟨q, Q₁, hq_prime, hqp, hQ₁pg, hQ₁E, hQ₁maxE, hQ₁cyc, hQ₁ncS, hqi, hqc⟩ :=
     exists_sylow_tau1_cyclic_notCentralizing hG h hp hA hAE hAS hSM hSab hreg hCES
-  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have : Fact q.Prime := ⟨hq_prime⟩
   have hpG : p ∣ Nat.card G :=
     (hA.2 ▸ dvd_pow_self p two_ne_zero).trans (Subgroup.card_subgroup_dvd_card A)
   have hqodd : Odd q := hG.odd.of_dvd_nat
@@ -1006,7 +1006,7 @@ theorem exists_partial_centralizer_of_abelianSylow [Finite G] (hG : IsMinimalSim
 /-- A subgroup of order `p` is generated by any of its nonidentity elements. -/
 theorem exists_generator_of_card_prime [Finite G] {p : ℕ} [Fact p.Prime] {L : Subgroup G}
     (hLp : Nat.card ↥L = p) : ∃ w : G, orderOf w = p ∧ Subgroup.zpowers w = L := by
-  haveI : Nontrivial ↥L := (Subgroup.nontrivial_iff_ne_bot L).mpr (by
+  have : Nontrivial ↥L := (Subgroup.nontrivial_iff_ne_bot L).mpr (by
     intro hbot; rw [hbot, Subgroup.card_bot] at hLp; exact (Fact.out : p.Prime).ne_one hLp.symm)
   obtain ⟨w, hw⟩ := exists_ne (1 : ↥L)
   have hwL : (w : G) ∈ L := w.2
@@ -1042,7 +1042,7 @@ theorem exists_cyclic_Enormal_regular_of_CES_eq [Finite G] (hG : IsMinimalSimple
       Monoid.exponent ↥Z = Monoid.exponent ↥(S : Subgroup G) ∧
       ∀ z ∈ Z, z ≠ 1 → S10.Msigma M ⊓ Subgroup.centralizer ({z} : Set G) = ⊥ := by
   classical
-  haveI := hSab
+  have := hSab
   have hAM : A ≤ M := hAE.trans h.E_le
   have hEC : E ≤ Subgroup.centralizer ((S : Subgroup G) : Set G) := by
     rw [← hCES]; exact inf_le_left
@@ -1057,7 +1057,7 @@ theorem exists_cyclic_Enormal_regular_of_CES_eq [Finite G] (hG : IsMinimalSimple
   have hpG : p ∣ Nat.card G :=
     (hA.2 ▸ dvd_pow_self p two_ne_zero).trans (Subgroup.card_subgroup_dvd_card A)
   have hSne : (S : Subgroup G) ≠ ⊥ := Sylow.ne_bot_of_dvd_card S hpG
-  haveI : Nontrivial ↥(S : Subgroup G) := (Subgroup.nontrivial_iff_ne_bot _).mpr hSne
+  have : Nontrivial ↥(S : Subgroup G) := (Subgroup.nontrivial_iff_ne_bot _).mpr hSne
   have ha1 : 1 ≤ a := by
     rcases Nat.eq_zero_or_pos a with rfl | hpos
     · exfalso
@@ -1189,7 +1189,7 @@ theorem exists_regular_cyclic_in_abelianSylow_tau2 [Finite G] (hG : IsMinimalSim
       Monoid.exponent ↥Z = Monoid.exponent ↥(S : Subgroup G) ∧
       ∀ z ∈ Z, z ≠ 1 → S10.Msigma M ⊓ Subgroup.centralizer ({z} : Set G) = ⊥ := by
   classical
-  haveI := hSab
+  have := hSab
   have hAM : A ≤ M := hAE.trans h.E_le
   have hAom : A = (Omega ↥(S : Subgroup G) p 1).map (S : Subgroup G).subtype :=
     (omega1_eq_of_tau2 hG h.mem_maximal hp hA hAM S.isPGroup' hAS hSM
@@ -1202,7 +1202,7 @@ theorem exists_regular_cyclic_in_abelianSylow_tau2 [Finite G] (hG : IsMinimalSim
   have hpG : p ∣ Nat.card G :=
     (hA.2 ▸ dvd_pow_self p two_ne_zero).trans (Subgroup.card_subgroup_dvd_card A)
   have hSne : (S : Subgroup G) ≠ ⊥ := Sylow.ne_bot_of_dvd_card S hpG
-  haveI : Nontrivial ↥(S : Subgroup G) := (Subgroup.nontrivial_iff_ne_bot _).mpr hSne
+  have : Nontrivial ↥(S : Subgroup G) := (Subgroup.nontrivial_iff_ne_bot _).mpr hSne
   have ha1 : 1 ≤ a := by
     rcases Nat.eq_zero_or_pos a with rfl | hpos
     · exfalso

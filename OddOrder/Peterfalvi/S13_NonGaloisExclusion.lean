@@ -60,16 +60,16 @@ character (`finCardEquivCharacterGroup_zero`); companion of `muColumnChar_ne_one
 theorem Hypothesis.muColumnChar_zero [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) :
     hyp.muColumnChar hG hodd (0 : Fin hyp.w2) = 1 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   set h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis with hhdef
-  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
   have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
   have hchar : hyp.muColumnChar hG hodd (0 : Fin hyp.w2)
       = finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm (0 : Fin hyp.w2)) := by
     unfold Hypothesis.muColumnChar
@@ -91,19 +91,19 @@ theorem Hypothesis.exists_muColumnChar_inv [Finite G] (hG : OddOrder.BG.IsMinima
     {j : Fin hyp.w2} (hj : j ≠ 0) :
     ∃ j' : Fin hyp.w2, j' ≠ 0 ∧
       hyp.muColumnChar hG hodd j' = (hyp.muColumnChar hG hodd j)⁻¹ := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   -- the surjectivity core, with the reindex-equivalence instances confined to this block
   obtain ⟨j', hj'⟩ : ∃ j' : Fin hyp.w2,
       hyp.muColumnChar hG hodd j' = (hyp.muColumnChar hG hodd j)⁻¹ := by
     set h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis with hhdef
-    haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-    letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+    have : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+    let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
     have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
     have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
       rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
       exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-    haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+    have : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
     -- the whole reindex `Fin w₂ ≃ Ŵ₂`
     set e : Fin hyp.w2 ≃ ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :=
       (finCongr hcardW2sub.symm).trans (finCardEquivCharacterGroup _) with hedef
@@ -176,7 +176,7 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
           - ∑ r : Fin hyp.base.w1, hyp.base.alignedOmegaSigmaGrid hG hG.odd r 0)
         (hyp.base.alignedOmegaSigmaGrid hG hG.odd i j) = 0) :
     (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u = caseA.a := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   by_contra hne
   -- ### 0. arithmetic frame: `u = a·m`, `m ≥ 2`
@@ -842,12 +842,12 @@ theorem U_isCyclic_of_hypothesis [Finite G]
     IsCyclic ↥hyp.base.typeP.U := by
   classical
   rw [← hyp.setup_typeP_eq]
-  haveI hnil : Group.IsNilpotent ↥hyp.s11Setup.typeP.U := hyp.s11Setup.typeP.U_nilpotent
+  have hnil : Group.IsNilpotent ↥hyp.s11Setup.typeP.U := hyp.s11Setup.typeP.U_nilpotent
   rcases OddOrder.Peterfalvi.S11.clifford_dichotomy hG
       (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief) with hA | hB
   · exact absurd hA (not_cliffordCaseA_of_hypothesis hG hyp)
   obtain ⟨caseB⟩ := hB
-  haveI hcyc : IsCyclic ↥(OddOrder.Peterfalvi.S11.uActionHom hyp.s11Setup hyp.chief).range :=
+  have hcyc : IsCyclic ↥(OddOrder.Peterfalvi.S11.uActionHom hyp.s11Setup hyp.chief).range :=
     caseB.Ubar_cyclic
   -- the restriction `↥U →* Ū`, kernel inside `U'`
   set e : ↥hyp.s11Setup.typeP.U
@@ -907,7 +907,7 @@ theorem isMulCommutative_typePData_U_of_typePData_U [Finite G]
   have hM_le_NH : M ≤ Subgroup.normalizer (d₁.H : Set G) := by
     rw [d₁.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M
-  haveI hHnormal : (d₁.H.subgroupOf (derivedInG M)).Normal :=
+  have hHnormal : (d₁.H.subgroupOf (derivedInG M)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hH_le).mpr (hM'_le_M.trans hM_le_NH)
   have hcompl₁ : (d₁.H.subgroupOf (derivedInG M)).IsComplement'
       (d₁.U.subgroupOf (derivedInG M)) := d₁.derived_complement
@@ -935,10 +935,10 @@ theorem isMulCommutative_typePData_U_of_typePData_U [Finite G]
   -- `H = M_F` is solvable (a proper subgroup of the minimal simple `G`)
   have hH_lt_top : d₁.H < ⊤ :=
     lt_of_le_of_lt hH_le_M (lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hM).1)
-  haveI hHsolv : IsSolvable ↥d₁.H := hG.solvable_of_lt_top d₁.H hH_lt_top
-  have hsolv : IsSolvable ↥(d₁.H.subgroupOf (derivedInG M))
-      ∨ IsSolvable (↥(derivedInG M) ⧸ d₁.H.subgroupOf (derivedInG M)) :=
-    Or.inl (solvable_of_solvable_injective
+  have hHsolv : Group.IsSolvable ↥d₁.H := hG.isSolvable_of_lt_top d₁.H hH_lt_top
+  have hsolv : Group.IsSolvable ↥(d₁.H.subgroupOf (derivedInG M))
+      ∨ Group.IsSolvable (↥(derivedInG M) ⧸ d₁.H.subgroupOf (derivedInG M)) :=
+    Or.inl (Group.isSolvable_of_isSolvable_injective
       (f := (Subgroup.subgroupOfEquivOfLe hH_le).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe hH_le).injective)
   -- Schur–Zassenhaus conjugacy, then push the commutativity across
@@ -1011,7 +1011,7 @@ theorem not_isTypeIV_of_mem_maximalSubgroups {G : Type*} [Group G] [Finite G]
   obtain ⟨hyp12⟩ := OddOrder.Peterfalvi.S12.exists_hypothesis_of_typeIIIorIVorV hG hM
     (Or.inr (Or.inl hMIV))
   obtain ⟨s13, -⟩ := exists_hypothesis_of_isTypeIIIorIV hG hyp12 (Or.inr hMIV)
-  haveI : NeZero (Nat.card (s13.base.toHypothesis46 hG hG.odd).W1) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card (s13.base.toHypothesis46 hG hG.odd).W1) := ⟨Nat.card_pos.ne'⟩
   exact not_isTypeIV_of_hypothesis hG s13 hMIV
 
 /-- **Peterfalvi (11.9.c), the universal Type-IV exclusion** (companion of

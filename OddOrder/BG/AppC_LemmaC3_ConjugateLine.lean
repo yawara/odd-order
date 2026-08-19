@@ -800,7 +800,7 @@ BG Appendix C Remark (B)/(X) used in Lemma C.3 Step 4 when rewriting (C.3) to
 theorem Q_mul_comm (data : FieldNormalizerData p q G)
     {x y : G} (hx : x ∈ data.Q) (hy : y ∈ data.Q) :
     x * y = y * x := by
-  haveI := data.Q_commutative
+  have := data.Q_commutative
   exact setLike_mul_comm (s := data.Q) hx hy
 
 /-- In `W₂Q`, the `Q` factor is normalized by both `W₂` and `Q`. -/
@@ -821,7 +821,7 @@ modulo `Q`. -/
 theorem W2_pow_p_eq_one (data : FieldNormalizerData p q G)
     {x : G} (hx : x ∈ data.W2) :
     x ^ p = 1 := by
-  haveI : Finite data.W2 := Nat.finite_of_card_ne_zero (by
+  have : Finite data.W2 := Nat.finite_of_card_ne_zero (by
     rw [data.card_W2]
     exact (Fact.out : Nat.Prime p).ne_zero)
   have hxpow := pow_card_eq_one' (G := data.W2) (x := (⟨x, hx⟩ : data.W2))
@@ -848,7 +848,7 @@ theorem P_inf_W2_sup_Q_eq_W2 (data : FieldNormalizerData p q G) :
   · intro x hx
     have hxP : x ∈ data.P := hx.1
     have hxH : x ∈ H := hx.2
-    haveI : (data.Q.subgroupOf H).Normal := data.Q_subgroupOf_W2_sup_Q_normal
+    have : (data.Q.subgroupOf H).Normal := data.Q_subgroupOf_W2_sup_Q_normal
     have hmem : (⟨x, hxH⟩ : H) ∈
         data.W2.subgroupOf H ⊔ data.Q.subgroupOf H := by
       rw [← Subgroup.subgroupOf_sup (le_sup_left : data.W2 ≤ H)
@@ -938,7 +938,7 @@ theorem P1_eq_W2_of_le_normalizer_W2
     exact IsPGroup.to_sup_of_normal_left' data.W2_isPGroup data.P1_isPGroup hP1W2
   have hW2_le_R : data.W2 ≤ R := le_sup_left
   have hR_le_H : R ≤ H := sup_le le_sup_left data.P1_le_W2_sup_Q
-  haveI : Finite ↥R := (data.setFinite_W2_sup_Q.subset hR_le_H).to_subtype
+  have : Finite ↥R := (data.setFinite_W2_sup_Q.subset hR_le_H).to_subtype
   obtain ⟨k, hR_card⟩ := (IsPGroup.iff_card (p := p) (G := R)).mp hR_p
   have hW2_card_le_R : Nat.card ↥data.W2 ≤ Nat.card ↥R :=
     Subgroup.card_le_of_le hW2_le_R
@@ -1002,8 +1002,8 @@ theorem w2ConjQAut_fixedPoints_inf_actionCommutator_eq_bot
     (data : FieldNormalizerData p q G) :
     Subgroup.fixedPointsOfMulAut data.w2ConjQAut ⊓
       OddOrder.Isaacs.Ch04.actionCommutator data.w2ConjQAut = ⊥ := by
-  haveI := data.Q_commutative
-  letI : CommGroup ↥data.Q :=
+  have := data.Q_commutative
+  let : CommGroup ↥data.Q :=
     { (inferInstance : Group ↥data.Q) with
       mul_comm := fun a b => Subtype.ext (setLike_mul_comm (s := data.Q) a.2 b.2) }
   exact OddOrder.Isaacs.Ch04.fixedPoints_inf_actionCommutator_eq_bot_of_abelian
@@ -1040,8 +1040,8 @@ theorem exists_yD_mem_actionCommutator_conj_s_eq_t
     ∃ yD : ↥data.Q,
       yD ∈ OddOrder.Isaacs.Ch04.actionCommutator data.w2ConjQAut ∧
         MulAut.conj (yD : G) data.s = data.t := by
-  haveI := data.Q_commutative
-  letI : CommGroup ↥data.Q :=
+  have := data.Q_commutative
+  let : CommGroup ↥data.Q :=
     { (inferInstance : Group ↥data.Q) with
       mul_comm := fun a b => Subtype.ext (setLike_mul_comm (s := data.Q) a.2 b.2) }
   have hsup : OddOrder.Isaacs.Ch04.actionCommutator data.w2ConjQAut ⊔

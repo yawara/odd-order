@@ -580,7 +580,7 @@ theorem frobeniusTensorCoordinatesAlong_frobeniusScalarBaseChange
     frobeniusTensorCoordinatesAlong K L iota
         (frobeniusScalarBaseChange L z) (frobeniusCoordinateSucc K i) =
       (frobeniusTensorCoordinatesAlong K L iota z i) ^ 2 := by
-  letI : CharP L 2 :=
+  let : CharP L 2 :=
     charP_of_injective_algebraMap (algebraMap (ZMod 2) L).injective 2
   induction z using TensorProduct.induction_on with
   | zero => simp
@@ -599,7 +599,7 @@ theorem frobeniusScalarBaseChange_conjugateTensorBasisAlong
       conjugateTensorBasisAlong K L iota (frobeniusCoordinateSucc K i) := by
   let n := finrank (ZMod 2) K
   have hn : n ≠ 0 := finrank_pos.ne'
-  letI : NeZero n := ⟨hn⟩
+  let : NeZero n := ⟨hn⟩
   have hsucc (j : Fin n) :
       frobeniusCoordinateSucc K j = j + (1 : Fin n) := by
     apply Fin.ext
@@ -687,7 +687,7 @@ theorem trace_frobenius_coordinate_sum
       z ^ (2 ^ i.val) • v ⟨i.val % n, Nat.mod_lt _ hn⟩) =
       ∑ s : Fin n,
         (algebraMap K L (Algebra.trace K L z)) ^ (2 ^ s.val) • v s := by
-  letI : Algebra (ZMod 2) L := ZMod.algebra L 2
+  let : Algebra (ZMod 2) L := ZMod.algebra L 2
   have htrace :
       algebraMap K L (Algebra.trace K L z) =
         ∑ t : Fin d, z ^ (2 ^ (n * t.val)) := by
@@ -758,9 +758,9 @@ theorem exists_galoisFieldLinearModel_of_faithful_irreducible
       ∀ (c : C) (v : V),
         e (rho c v) = (mu c : GaloisField 2 n) * e v := by
   classical
-  haveI : Fintype V := Fintype.ofFinite V
-  haveI : Module.Finite (ZMod 2) V := Module.Finite.of_finite
-  letI : Module (MonoidAlgebra (ZMod 2) C) V :=
+  have : Fintype V := Fintype.ofFinite V
+  have : Module.Finite (ZMod 2) V := Module.Finite.of_finite
+  let : Module (MonoidAlgebra (ZMod 2) C) V :=
     Module.compHom V (rho.asAlgebraHom).toRingHom
   have hsmul : ∀ (g : C) (v : V),
       MonoidAlgebra.of (ZMod 2) C g • v = rho g v := by
@@ -768,7 +768,7 @@ theorem exists_galoisFieldLinearModel_of_faithful_irreducible
     change rho.asAlgebraHom
       (MonoidAlgebra.of (ZMod 2) C g) v = rho g v
     rw [Representation.asAlgebraHom_of]
-  haveI : IsSimpleModule (MonoidAlgebra (ZMod 2) C) V :=
+  have : IsSimpleModule (MonoidAlgebra (ZMod 2) C) V :=
     (Representation.irreducible_iff_isSimpleModule_asModule rho).mp hirr
   have hfaith' : ∀ g : C,
       (∀ v : V,
@@ -836,7 +836,7 @@ theorem adjoin_generator_eq_top_of_irreducible_linearModel
     have : (1 : GaloisField 2 m) = 0 := by
       rw [← e.apply_symm_apply (1 : GaloisField 2 m), hzero, map_zero]
     exact one_ne_zero this
-  letI : Representation.IsIrreducible rho := hirr
+  let : Representation.IsIrreducible rho := hirr
   have hWtop : W = ⊤ := (eq_bot_or_eq_top W).resolve_left hWne
   rw [eq_top_iff]
   intro x _
@@ -917,7 +917,7 @@ theorem representation_fixedVector_eq_zero_of_faithful_irreducible
                 rw [← Module.End.mul_apply, ← Module.End.mul_apply,
                   ← map_mul, ← map_mul, mul_comm]
           _ = 0 := by rw [← map_sub, hv, map_zero] }
-  letI : Representation.IsIrreducible rho := hirr
+  let : Representation.IsIrreducible rho := hirr
   intro v hv
   have hvW : v ∈ W := by
     change v ∈ LinearMap.ker d
@@ -978,8 +978,8 @@ theorem natCard_actor_eq_natCard_sub_one_of_faithful_transitive_nonzero
     (htrans : ∀ v w : V, v ≠ 0 → w ≠ 0 → ∃ c : C, rho c v = w) :
     Nat.card C = Nat.card V - 1 := by
   classical
-  letI : Fintype C := Fintype.ofFinite C
-  letI : Fintype V := Fintype.ofFinite V
+  let : Fintype C := Fintype.ofFinite C
+  let : Fintype V := Fintype.ofFinite V
   obtain ⟨v, hv⟩ : ∃ v : V, v ≠ 0 := exists_ne 0
   let orbit : C → {w : V // w ≠ 0} := fun c ↦
     ⟨rho c v, fun hzero ↦ hv (by
@@ -1082,9 +1082,9 @@ theorem representationImage_generator_orderOf_eq_pow_sub_one
   let D := representationImageActor rho
   let rhoD : Representation (ZMod 2) D V := representationImage rho
   let d : D := ⟨rho.asGroupHom c, ⟨c, rfl⟩⟩
-  letI : Finite D := Finite.of_surjective rho.asGroupHom.rangeRestrict
+  let : Finite D := Finite.of_surjective rho.asGroupHom.rangeRestrict
     rho.asGroupHom.rangeRestrict_surjective
-  letI : CommGroup D :=
+  let : CommGroup D :=
     { (inferInstance : Group D) with
       mul_comm := representationImage_mul_comm rho }
   have hdgen : ∀ z : D, z ∈ Subgroup.zpowers d := by
@@ -1135,7 +1135,7 @@ theorem exists_ne_one_orderOf_eq_three_of_even_faithful_transitive_nonzero
   have hdvd : 3 ∣ Nat.card C := by
     rw [hcardC]
     exact three_dvd_two_pow_sub_one_of_even hn
-  letI : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
+  let : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
   obtain ⟨a, ha⟩ := exists_prime_orderOf_dvd_card' 3 hdvd
   refine ⟨a, ?_, ha⟩
   intro haOne
@@ -1332,7 +1332,7 @@ theorem galoisField_degree_dvd_and_odd_quotient_of_primeFactors_dvd
     simp at horder
     omega
   have hperiod : N ∣ 2 ^ m - 1 := by
-    haveI : Fintype L := Fintype.ofFinite L
+    have : Fintype L := Fintype.ofFinite L
     have hcard : Fintype.card L = 2 ^ m := by
       rw [← Nat.card_eq_fintype_card, GaloisField.card 2 m hm.ne']
     have hpow : lambda ^ (2 ^ m - 1) = 1 := by
@@ -1387,8 +1387,8 @@ theorem finrank_eq_of_faithful_irreducible_and_faithful_transitive_nonzero
     (htrans₂ : ∀ v w : V₂, v ≠ 0 → w ≠ 0 → ∃ c : C, rho₂ c v = w) :
     Module.finrank (ZMod 2) V₁ = Module.finrank (ZMod 2) V₂ := by
   classical
-  letI : Representation.IsIrreducible rho₁ := hirr₁
-  letI : Nontrivial V₁ := by
+  let : Representation.IsIrreducible rho₁ := hirr₁
+  let : Nontrivial V₁ := by
     by_contra h
     rw [not_nontrivial_iff_subsingleton] at h
     exact bot_ne_top (α := Subrepresentation rho₁)
@@ -1476,7 +1476,7 @@ theorem finrank_eq_of_faithful_irreducible_and_faithful_transitive_nonzero
     exact h
   have hlambdaCardPow : lambda ^ (2 ^ m - 1) = 1 := by
     have hlambdaNe : lambda ≠ 0 := Units.ne_zero (mu c)
-    haveI : Fintype K := Fintype.ofFinite K
+    have : Fintype K := Fintype.ofFinite K
     have hcardK : Fintype.card K = 2 ^ m := by
       rw [← Nat.card_eq_fintype_card, GaloisField.card 2 m hm]
     rw [← hcardK]

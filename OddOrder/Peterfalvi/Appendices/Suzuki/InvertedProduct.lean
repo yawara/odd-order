@@ -455,7 +455,7 @@ theorem exists_orderOf_eq_prime_of_dvd_ncard_invertedBy
     (hdvd : r ∣ (invertedBy X t).ncard) :
     ∃ x ∈ invertedBy X t, orderOf x = r := by
   classical
-  haveI : Fact r.Prime := ⟨hr⟩
+  have : Fact r.Prime := ⟨hr⟩
   set ψ : MulAut ↥X := conjInvolution ht hnorm with hψ_def
   have hψ2 : ψ * ψ = 1 := conjInvolution_sq ht hnorm
   -- the `2`-group `⟨ψ⟩` acts on the Sylow `r`-subgroups of `X`

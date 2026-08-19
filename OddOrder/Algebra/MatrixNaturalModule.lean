@@ -68,7 +68,7 @@ noncomputable def toEndSemilinear :
 /-- **The column vectors are a simple `M_n(k)`-module.** -/
 scoped instance isSimpleModule_matrix [Nonempty n] :
     IsSimpleModule (Matrix n n k) (n → k) := by
-  haveI : RingHomSurjective (toEndRingHom k n) :=
+  have : RingHomSurjective (toEndRingHom k n) :=
     ⟨(Matrix.toLinAlgEquiv' (R := k) (n := n)).surjective⟩
   exact (toEndSemilinear.isSimpleModule_iff_of_bijective Function.bijective_id).mpr
     inferInstance
@@ -82,9 +82,9 @@ theorem linearEquiv_of_isSimpleRing (R : Type*) [Ring R] [IsSimpleRing R] [IsArt
     (M N : Type*) [AddCommGroup M] [Module R M] [IsSimpleModule R M]
     [AddCommGroup N] [Module R N] [IsSimpleModule R N] :
     Nonempty (M ≃ₗ[R] N) := by
-  haveI : IsSimpleModule R (Submodule.fst R M N) :=
+  have : IsSimpleModule R (Submodule.fst R M N) :=
     IsSimpleModule.congr (Submodule.fstEquiv R M N)
-  haveI : IsSimpleModule R (Submodule.snd R M N) :=
+  have : IsSimpleModule R (Submodule.snd R M N) :=
     IsSimpleModule.congr (Submodule.sndEquiv R M N)
   obtain ⟨e⟩ := IsSimpleRing.isIsotypic R (M × N) (Submodule.snd R M N) (Submodule.fst R M N)
   exact ⟨(Submodule.fstEquiv R M N).symm.trans (e.trans (Submodule.sndEquiv R M N))⟩
@@ -94,7 +94,7 @@ half of Artin–Wedderburn for a single matrix block. -/
 theorem linearEquiv_natural_of_isSimpleModule [Nonempty n] (M : Type*) [AddCommGroup M]
     [Module (Matrix n n k) M] [IsSimpleModule (Matrix n n k) M] :
     Nonempty (M ≃ₗ[Matrix n n k] (n → k)) := by
-  haveI : IsArtinianRing (Matrix n n k) := isArtinian_of_tower k inferInstance
+  have : IsArtinianRing (Matrix n n k) := isArtinian_of_tower k inferInstance
   exact linearEquiv_of_isSimpleRing _ _ _
 
 end OddOrder.MatrixModule

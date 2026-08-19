@@ -212,7 +212,7 @@ theorem character_eq_add_add_basicDecompositionNumber {A : ι → κ → ℤ}
                 (fun _ _ h => character_eq_of_isConj _ h))
               (fun μ l => ((intBasicSetMatrix eQ A yb j₀ μ l : ℤ) : K)) ψ₂ := by
   classical
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   have key := basicDecompositionNumber_add_add_eq_character (𝒪 := 𝒪) (nn := nn) hp hω' hπ hlin
     hkerJ (fun μ l => ((intBasicSetMatrix eQ A yb j₀ μ l : ℤ) : K))
     (fun φ w => principalBasicSet eQ (quotientPi_surjective π hπ hlin hN)
@@ -370,7 +370,7 @@ theorem basicDecompositionNumber_trivial_eq_ite {A : ι → κ → ℤ}
         (fun μ l => ((intBasicSetMatrix eQ A yb j₀ μ l : ℤ) : K)) j
       = if j = l₀ then 1 else 0 := by
   classical
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   refine eq_ite_of_sum_principalBasicSet_eq_one (hp := hp) (hx := hyb) (hω := hωC) (e := eC)
     (eG := eQ) (hπG := quotientPi_surjective π hπ hlin hN)
     (hlinG := quotientPi_smul π hπ hlin hN) (hπ := hπC) (hlin := hlinC) (hkerJ := hkerJC)
@@ -499,7 +499,7 @@ theorem exists_intColumns_basicDecompositionNumber {A : ι → κ → ℤ}
       (∀ k, ¬ (blockOfIrr eG hπG hlinG hnilG k = principalBlock πG hπG hlinG hnilG) →
         b k = 0 ∧ c k = 0 ∧ d k = 0) := by
   classical
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   -- the columns are integral: an integral `IBr`-column against an integral `U`
   have hint : ∀ k : J, ∃ n : ι → ℤ, ∀ μ : ι,
       generalizedDecompositionNumber (𝒪 := 𝒪) (nn := nn) x hp hω' hπ hlin hkerJ

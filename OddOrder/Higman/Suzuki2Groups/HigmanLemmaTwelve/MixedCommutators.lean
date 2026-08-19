@@ -68,10 +68,10 @@ theorem squareWitness_sq_eq_squareInvolution
     {P : Type uP} [Group P]
     (data : XiLengthTwoTypeAData.{uP, uF} P) :
     data.squareWitness ^ 2 = data.squareInvolution := by
-  letI : Field data.F := data.fieldF
-  letI : Finite data.F := data.finiteF
-  letI : CharP data.F 2 := data.charTwoF
-  letI : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
+  let : Field data.F := data.fieldF
+  let : Finite data.F := data.finiteF
+  let : CharP data.F 2 := data.charTwoF
+  let : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
   apply data.equivModel.injective
   rw [map_pow]
   simp only [squareWitness, squareInvolution, MulEquiv.apply_symm_apply]
@@ -84,11 +84,11 @@ theorem squareInvolution_ne_one
     {P : Type uP} [Group P]
     (data : XiLengthTwoTypeAData.{uP, uF} P) :
     data.squareInvolution ≠ 1 := by
-  letI : Field data.F := data.fieldF
-  letI : Finite data.F := data.finiteF
-  letI : CharP data.F 2 := data.charTwoF
+  let : Field data.F := data.fieldF
+  let : Finite data.F := data.finiteF
+  let : CharP data.F 2 := data.charTwoF
   intro h
-  letI : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
+  let : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
   have hm : (⟨0, 1⟩ : TypeAModel data.phi) = 1 := by
     simpa only [squareInvolution, MulEquiv.apply_symm_apply, map_one] using
       congrArg data.equivModel h
@@ -100,10 +100,10 @@ theorem squareInvolution_sq_eq_one
     {P : Type uP} [Group P]
     (data : XiLengthTwoTypeAData.{uP, uF} P) :
     data.squareInvolution ^ 2 = 1 := by
-  letI : Field data.F := data.fieldF
-  letI : Finite data.F := data.finiteF
-  letI : CharP data.F 2 := data.charTwoF
-  letI : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
+  let : Field data.F := data.fieldF
+  let : Finite data.F := data.finiteF
+  let : CharP data.F 2 := data.charTwoF
+  let : Algebra (ZMod 2) data.F := ZMod.algebra data.F 2
   apply data.equivModel.injective
   rw [map_pow, map_one]
   simp only [squareInvolution, MulEquiv.apply_symm_apply]

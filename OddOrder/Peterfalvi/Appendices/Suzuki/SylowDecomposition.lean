@@ -38,8 +38,8 @@ private theorem exists_normalTwoComplement_Q :
     ∃ N : Subgroup ↥hyp.Q, N.Normal ∧
       ∀ S : Sylow 2 ↥hyp.Q,
         Subgroup.IsComplement' N (S : Subgroup ↥hyp.Q) := by
-  letI : Group.IsNilpotent ↥hyp.Q := hyp.isNilpotent_Q
-  letI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  let : Group.IsNilpotent ↥hyp.Q := hyp.isNilpotent_Q
+  let : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   exact OddOrder.Isaacs.Ch05.hasNormalPComplement_of_isNilpotent
 
 /-- Peterfalvi's `Q₁`, first in its intrinsic form as the unique normal
@@ -73,14 +73,14 @@ theorem sylowTwo_isComplement'_Q1Subgroup (S : Sylow 2 ↥hyp.Q) :
 instance Q1Subgroup_characteristic : hyp.Q1Subgroup.Characteristic := by
   rw [Subgroup.characteristic_iff_map_eq]
   intro ψ
-  letI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  let : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   exact OddOrder.Isaacs.Ch05.map_mulAut_of_normal_pcomplement
     (hyp.Q1Subgroup_isComplement'_sylowTwo (default : Sylow 2 ↥hyp.Q)) ψ
 
 /-- `Q₁` has odd order, in the exact `2'` form used later in §3
 Proposition 1(c). -/
 theorem two_not_dvd_card_Q1Subgroup : ¬ 2 ∣ Nat.card hyp.Q1Subgroup := by
-  letI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  let : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   exact OddOrder.Isaacs.Ch05.not_dvd_card_of_isComplement'_sylow
     (default : Sylow 2 ↥hyp.Q)
     (hyp.Q1Subgroup_isComplement'_sylowTwo (default : Sylow 2 ↥hyp.Q))
@@ -113,7 +113,7 @@ theorem sylowTwo_sup_Q1Subgroup_eq_top (S : Sylow 2 ↥hyp.Q) :
 theorem sylowTwo_commute_Q1Subgroup (S : Sylow 2 ↥hyp.Q)
     (s : ↥(S : Subgroup ↥hyp.Q)) (q₁ : ↥hyp.Q1Subgroup) :
     Commute (s : ↥hyp.Q) (q₁ : ↥hyp.Q) := by
-  letI : Group.IsNilpotent ↥hyp.Q := hyp.isNilpotent_Q
+  let : Group.IsNilpotent ↥hyp.Q := hyp.isNilpotent_Q
   have hSnormal : (S : Subgroup ↥hyp.Q).Normal := inferInstance
   exact Subgroup.commute_of_normal_of_disjoint
     (S : Subgroup ↥hyp.Q) hyp.Q1Subgroup hSnormal inferInstance

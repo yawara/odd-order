@@ -89,7 +89,7 @@ theorem twice_gap_ne_zero_of_odd_degree
       omega
     · rw [if_neg hwrap] at hval
       omega
-  letI : Fintype L := Fintype.ofFinite L
+  let : Fintype L := Fintype.ofFinite L
   have hcard : Fintype.card L = 2 ^ m := by
     rw [← Nat.card_eq_fintype_card,
       Module.natCard_eq_pow_finrank (K := ZMod 2), hfin]
@@ -834,7 +834,7 @@ theorem exists_shiftedSecondLinearEquiv_expansion_with_shift
         (1 : L) ⊗ₜ[ZMod 2] eTwoShift.symm z =
           ∑ s : Fin n,
             (algebraMap K L z) ^ (2 ^ s.val) • bTwo (s₀ + s) := by
-  letI : Algebra K L := iota.toRingHom.toAlgebra
+  let : Algebra K L := iota.toRingHom.toAlgebra
   let n := finrank (ZMod 2) K
   let bTwo := conjugateTensorBasisAlongOfLinearEquiv K L iota eTwo
   let sigma : K ≃ₐ[ZMod 2] K :=

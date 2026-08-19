@@ -33,7 +33,7 @@ import OddOrder.Isaacs.Ch03_SplitExtensions.Carter.NilpotentQuotient
 
 namespace OddOrder.Isaacs.Ch03
 
-open Subgroup Pointwise
+open _root_.OddOrder.Isaacs.Ch03.Subgroup Pointwise
 
 section /- 3C.7(a): 存在 -/
 
@@ -48,7 +48,7 @@ variable {G : Type*} [Group G]
 よって `M < N_G(M)`, 極大性から `N_G(M) = ⊤` すなわち `M ⊴ G`。 -/
 theorem normal_of_isCoatom_of_le_of_isNilpotent_quotient {N M : Subgroup G} [N.Normal]
     (hnil : Group.IsNilpotent (G ⧸ N)) (hM : IsCoatom M) (hNM : N ≤ M) : M.Normal := by
-  haveI := hnil
+  have := hnil
   have hne : Subgroup.normalizer (M : Set G) ≠ M := by
     intro h
     have hbar := (normalizer_eq_iff_map_mk' M hNM).mpr h
@@ -73,13 +73,13 @@ theorem isCarterSubgroup_of_isCoatom_not_normal {N M : Subgroup G} [N.Normal]
     (hN : Ch02.IsMinimalNormal N) (hnil : Group.IsNilpotent (G ⧸ N))
     (habel : ∀ x ∈ N, ∀ y ∈ N, x * y = y * x)
     (hM : IsCoatom M) (hMnn : ¬ M.Normal) : IsCarterSubgroup M := by
-  haveI := hnil
+  have := hnil
   have hNM : ¬ N ≤ M := fun h =>
     hMnn (normal_of_isCoatom_of_le_of_isNilpotent_quotient hnil hM h)
   have hMN : M ⊔ N = ⊤ :=
     hM.2 _ (lt_of_le_of_ne le_sup_left fun h => hNM (le_sup_right.trans h.ge))
   have hMiN : M ⊓ N = ⊥ := by
-    haveI := normal_inf_of_comm_of_sup_eq_top (C := M) habel hMN
+    have := normal_inf_of_comm_of_sup_eq_top (C := M) habel hMN
     rcases hN.2.2 (M ⊓ N) inferInstance inf_le_right with h | h
     · exact h
     · exact absurd (h ▸ (inf_le_left : M ⊓ N ≤ M)) hNM
@@ -110,9 +110,10 @@ theorem isCarterSubgroup_of_isCoatom_not_normal {N M : Subgroup G} [N.Normal]
     · exact h.symm
     · exact absurd (Subgroup.normalizer_eq_top_iff.mp (hM.2 _ h)) hMnn
 
+set_option backward.isDefEq.respectTransparency false in
 /-- 3C.7(a) の `|G|` 強帰納本体。 -/
 private theorem exists_isCarterSubgroup_aux : ∀ (n : ℕ) {G : Type u} [Group G] [Finite G]
-    [IsSolvable G], Nat.card G ≤ n → ∃ C : Subgroup G, IsCarterSubgroup C := by
+    [Group.IsSolvable G], Nat.card G ≤ n → ∃ C : Subgroup G, IsCarterSubgroup C := by
   intro n
   induction n with
   | zero =>
@@ -121,17 +122,17 @@ private theorem exists_isCarterSubgroup_aux : ∀ (n : ℕ) {G : Type u} [Group 
   | succ n ih =>
     intro G _ _ _ hcard
     by_cases hnil : Group.IsNilpotent G
-    · haveI := hnil
+    · have := hnil
       exact ⟨⊤, isCarterSubgroup_top_of_isNilpotent⟩
     -- 冪零でないので `G` は非自明。
     have hGtriv : (⊤ : Subgroup G) ≠ ⊥ := by
       intro h
       have hone : ∀ x : G, x = 1 := fun x =>
         Subgroup.mem_bot.mp (h ▸ (Subgroup.mem_top x))
-      haveI : Subsingleton G := ⟨fun a b => by rw [hone a, hone b]⟩
+      have : Subsingleton G := ⟨fun a b => by rw [hone a, hone b]⟩
       exact hnil inferInstance
     obtain ⟨N, hN, -⟩ := Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) hGtriv
-    haveI := hN.1
+    have := hN.1
     obtain ⟨Kbar, hKbar⟩ := ih (G := G ⧸ N)
       (Nat.lt_succ_iff.mp (lt_of_lt_of_le (card_quotient_lt hN.2.1) hcard))
     have hNK : N ≤ Kbar.comap (QuotientGroup.mk' N) := by
@@ -144,7 +145,7 @@ private theorem exists_isCarterSubgroup_aux : ∀ (n : ℕ) {G : Type u} [Group 
       have hKbartop : Kbar = ⊤ := by
         rw [← hKmap, hKtop, Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective N)]
       have hquotnil : Group.IsNilpotent (G ⧸ N) := by
-        haveI : Group.IsNilpotent ↥(⊤ : Subgroup (G ⧸ N)) := hKbartop ▸ hKbar.1
+        have : Group.IsNilpotent ↥(⊤ : Subgroup (G ⧸ N)) := hKbartop ▸ hKbar.1
         exact Group.nilpotent_of_mulEquiv Subgroup.topEquiv
       obtain ⟨M, hMcoatom, hMnn⟩ : ∃ M : Subgroup G, IsCoatom M ∧ ¬ M.Normal := by
         by_contra hcon
@@ -153,7 +154,7 @@ private theorem exists_isCarterSubgroup_aux : ∀ (n : ℕ) {G : Type u} [Group 
         by_contra hHn
         exact hcon ⟨H, hH, hHn⟩
       exact ⟨M, isCarterSubgroup_of_isCoatom_not_normal hN hquotnil
-        (solvable_minimal_normal_isAbelian hN) hMcoatom hMnn⟩
+        (minimal_normal_isAbelian_of_isSolvable hN) hMcoatom hMnn⟩
     · -- `K < ⊤`: `↥K` の Carter 部分群がそのまま `G` の Carter 部分群。
       set K : Subgroup G := Kbar.comap (QuotientGroup.mk' N) with hKdef
       have hKlt : Nat.card ↥K < Nat.card G := by
@@ -162,10 +163,10 @@ private theorem exists_isCarterSubgroup_aux : ∀ (n : ℕ) {G : Type u} [Group 
           simpa [Subgroup.eq_top_iff'] using hKtop
         exact Finite.card_subtype_lt (x := x) hx
       obtain ⟨C', hC'⟩ := ih (G := ↥K) (Nat.lt_succ_iff.mp (lt_of_lt_of_le hKlt hcard))
-      haveI : (N.subgroupOf K).Normal := Subgroup.normal_subgroupOf
+      have : (N.subgroupOf K).Normal := Subgroup.normal_subgroupOf
       -- `↥K ⧸ (N ∩ K) ≅ K̄` は冪零。
       have hquotK : Group.IsNilpotent (↥K ⧸ (N.subgroupOf K)) := by
-        haveI := hKbar.1
+        have := hKbar.1
         have hsurj : Function.Surjective
             (((QuotientGroup.mk' N).comp K.subtype).codRestrict Kbar fun x => x.2) := by
           rintro ⟨y, hy⟩
@@ -210,7 +211,7 @@ private theorem exists_isCarterSubgroup_aux : ∀ (n : ℕ) {G : Type u} [Group 
 (冪零かつ自己正規化な部分群) を持つ。
 
 書籍は証明を与えない (challenge problem)。証明は `|G|` の強帰納 (ファイル冒頭の骨格)。 -/
-theorem exists_isCarterSubgroup {G : Type u} [Group G] [Finite G] [IsSolvable G] :
+theorem exists_isCarterSubgroup {G : Type u} [Group G] [Finite G] [Group.IsSolvable G] :
     ∃ C : Subgroup G, IsCarterSubgroup C :=
   exists_isCarterSubgroup_aux (Nat.card G) le_rfl
 

@@ -80,7 +80,7 @@ needs; the classification of those groups is not required. -/
 private theorem commutator_le_center_of_card_le_prime_cube {G : Type*} [Group G] [Finite G]
     {p : ℕ} [Fact p.Prime] (hG : IsPGroup p G) (hcard : Nat.card G ≤ p ^ 3) :
     _root_.commutator G ≤ Subgroup.center G := by
-  haveI : Group.IsNilpotent G := hG.isNilpotent
+  have : Group.IsNilpotent G := hG.isNilpotent
   have hcl : Group.nilpotencyClass G ≤ 2 :=
     OddOrder.BG.Ch1.S04.nilpotencyClass_le_of_card_le_pow hG (by norm_num)
       (by simpa using hcard)
@@ -133,8 +133,8 @@ theorem RegularOperatorSetup.card_eq_prime_mul_card_commutator [Finite R]
     (hHne : H ≠ ⊥)
     (hHT : H ≤ Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) :
     Nat.card ↥H = p * Nat.card ↥⁅hyp.R₀.subgroupOf S, H⁆ := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
-  haveI : Group.IsNilpotent ↥S := (hyp.R_pGroup.to_subgroup S).isNilpotent
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Group.IsNilpotent ↥S := (hyp.R_pGroup.to_subgroup S).isNilpotent
   set R₀' : Subgroup ↥S := hyp.R₀.subgroupOf S with hR₀'def
   set K : Subgroup ↥S := ⁅R₀', H⁆ with hKdef
   -- `⁅R₀, H⁆ = ⁅H, R₀⁆ < H` by nilpotency.
@@ -164,8 +164,8 @@ theorem RegularOperatorSetup.commutator_R₀_eq_commutator_top [Finite R]
     (hHne : H ≠ ⊥)
     (hHT : H ≤ Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) :
     ⁅hyp.R₀.subgroupOf S, H⁆ = ⁅(⊤ : Subgroup ↥S), H⁆ := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
-  haveI : Group.IsNilpotent ↥S := (hyp.R_pGroup.to_subgroup S).isNilpotent
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Group.IsNilpotent ↥S := (hyp.R_pGroup.to_subgroup S).isNilpotent
   have hmono : ⁅hyp.R₀.subgroupOf S, H⁆ ≤ ⁅(⊤ : Subgroup ↥S), H⁆ :=
     Subgroup.commutator_mono le_top le_rfl
   refine Subgroup.eq_of_le_of_card_ge hmono ?_
@@ -191,7 +191,7 @@ theorem RegularOperatorSetup.sup_centralizer_eq_top [Finite R]
     (hS : 3 ≤ pRank ↥S p) :
     hyp.R₀.subgroupOf S ⊔
       Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) = ⊤ := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   set R₀' : Subgroup ↥S := hyp.R₀.subgroupOf S with hR₀'def
   set T : Subgroup ↥S :=
     Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hTdef
@@ -221,14 +221,14 @@ private theorem normal_iterCommutator {G : Type*} [Group G] {T : Subgroup G} [T.
     ∀ n, (OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) n).Normal
   | 0 => ‹T.Normal›
   | n + 1 => by
-      haveI := normal_iterCommutator (T := T) n
+      have := normal_iterCommutator (T := T) n
       exact Subgroup.commutator_normal _ _
 
 /-- `iterCommutator T ⊤` descends: `⁅H, ⊤⁆ ≤ H` for normal `H`. -/
 theorem iterCommutator_antitone {G : Type*} [Group G] {T : Subgroup G} [T.Normal] :
     ∀ n, OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) (n + 1) ≤
       OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) n := fun n => by
-  haveI := normal_iterCommutator (T := T) n
+  have := normal_iterCommutator (T := T) n
   exact Subgroup.commutator_le_left _ _
 
 /-- `iterCommutator T ⊤ n ≤ T` for every `n`.
@@ -252,7 +252,7 @@ instance characteristic_iterCommutator {G : Type*} [Group G] (T : Subgroup G)
   induction n with
   | zero => exact ‹T.Characteristic›
   | succ n ih =>
-      haveI := ih
+      have := ih
       change (⁅OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup G) n,
         (⊤ : Subgroup G)⁆).Characteristic
       infer_instance
@@ -323,7 +323,7 @@ theorem RegularOperatorSetup.isAInvariant_iterCommutator
     IsAInvariant hSinv.restrict
       (OddOrder.Isaacs.Ch04.iterCommutator
         (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i) := by
-  haveI := characteristic_iterCommutator
+  have := characteristic_iterCommutator
     (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) i
   exact IsAInvariant.of_characteristic _
 
@@ -342,7 +342,7 @@ theorem RegularOperatorSetup.card_iterCommutator_eq [Finite R]
     (hne : OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i ≠ ⊥) :
     Nat.card ↥(OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i) =
       p * Nat.card ↥(OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) (i + 1)) := by
-  haveI := normal_iterCommutator (T := T) i
+  have := normal_iterCommutator (T := T) i
   have hHT : OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i ≤
       Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) :=
     (iterCommutator_le_start i).trans hT
@@ -388,11 +388,11 @@ theorem RegularOperatorSetup.commutator_eq_and_card_quotient [Finite R]
         (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) 1
       = _root_.commutator ↥S ∧
     Nat.card (↥S ⧸ _root_.commutator ↥S) = p ^ 2 := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   set T : Subgroup ↥S :=
     Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hTdef
   set H₁ : Subgroup ↥S := OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) 1 with hH₁def
-  haveI : H₁.Normal := normal_iterCommutator (T := T) 1
+  have : H₁.Normal := normal_iterCommutator (T := T) 1
   have hTindex : T.index = p := (hyp.card_omega1Center_and_index_centralizer hR₀S hS).2
   have hScard : Nat.card ↥T * p = Nat.card ↥S := by
     rw [← hTindex]; exact T.card_mul_index
@@ -424,7 +424,7 @@ theorem RegularOperatorSetup.commutator_eq_and_card_quotient [Finite R]
     exact Nat.eq_of_mul_eq_mul_left (Nat.card_pos (α := ↥H₁)) hmul
   -- `S/H₁` has order `p²`, hence is abelian, so `S' ≤ H₁`; and `H₁ = ⁅T,S⁆ ≤ S'`.
   have hquot : Nat.card (↥S ⧸ H₁) = p ^ 2 := hH₁index
-  haveI : IsMulCommutative (↥S ⧸ H₁) :=
+  have : IsMulCommutative (↥S ⧸ H₁) :=
     IsPGroup.isMulCommutative_of_card_eq_prime_sq (p := p) hquot
   have hSle : _root_.commutator ↥S ≤ H₁ := by
     rw [commutator_def, Subgroup.commutator_le]
@@ -457,7 +457,7 @@ theorem RegularOperatorSetup.card_quotient_commutator_of_card_le_prime_cube [Fin
     (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ < S)
     (hexp : ∀ x : ↥S, x ^ p = 1) (hcard : Nat.card ↥S ≤ p ^ 3) :
     Nat.card (↥S ⧸ _root_.commutator ↥S) = p ^ 2 := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   have hSpg : IsPGroup p ↥S := hyp.R_pGroup.to_subgroup S
   -- `R₀ < S` gives `p² ≤ |S|`.
   have hR₀lt : hyp.R₀.subgroupOf S < (⊤ : Subgroup ↥S) :=
@@ -485,7 +485,7 @@ theorem RegularOperatorSetup.card_quotient_commutator_of_card_le_prime_cube [Fin
       rw [hk, Nat.log_pow hyp.p_prime.one_lt] at hlog
       rw [hk]
       exact Nat.pow_le_pow_right hyp.p_prime.pos (hlog.trans hrank)
-    haveI := habel
+    have := habel
     have hcomm : _root_.commutator ↥S = ⊥ := commutator_eq_bot ↥S
     rw [hcomm]
     change (⊥ : Subgroup ↥S).index = p ^ 2
@@ -517,7 +517,7 @@ theorem RegularOperatorSetup.card_quotient_commutator_of_card_le_prime_cube [Fin
           Nat.card ↥S := (Subgroup.center ↥S).index_mul_card
       have hidxle : (Subgroup.center ↥S).index ≤ p := by
         nlinarith [hidx, hcard, hZp2, hyp.p_prime.pos, sq_nonneg p]
-      haveI : IsCyclic (↥S ⧸ Subgroup.center ↥S) := by
+      have : IsCyclic (↥S ⧸ Subgroup.center ↥S) := by
         refine isCyclic_of_card_dvd_prime (p := p) ?_
         obtain ⟨m, hm⟩ := (hSpg.to_quotient (Subgroup.center ↥S)).exists_card_eq
         have hqidx : Nat.card (↥S ⧸ Subgroup.center ↥S) = (Subgroup.center ↥S).index := rfl
@@ -589,7 +589,7 @@ theorem RegularOperatorSetup.not_le_derivedInG_of_derived_central [Finite R]
   intro hle
   have hSC : S ≤ Subgroup.centralizer (hyp.R₀ : Set R) :=
     hcent.trans (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hle))
-  haveI : IsMulCommutative ↥S := IsMulCommutative.of_comm fun x y => by
+  have : IsMulCommutative ↥S := IsMulCommutative.of_comm fun x y => by
     have hxy := hyp.isMulCommutative_centralizer_R₀.is_comm.comm
       (⟨(x : R), hSC x.2⟩ : ↥(Subgroup.centralizer (hyp.R₀ : Set R)))
       ⟨(y : R), hSC y.2⟩
@@ -611,7 +611,7 @@ that is exactly `S' ≤ Z(S)`, which transported to the ambient group reads
 theorem RegularOperatorSetup.derived_central_of_card_le_prime_cube [Finite R]
     (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hcard : Nat.card ↥S ≤ p ^ 3) :
     S ≤ Subgroup.centralizer (derivedInG S : Set R) := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   have hcentre := commutator_le_center_of_card_le_prime_cube
     (hyp.R_pGroup.to_subgroup S) hcard
   -- transport to the ambient group
@@ -638,7 +638,7 @@ theorem RegularOperatorSetup.not_le_derivedInG [Finite R]
     (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ ≤ S)
     (hexp : ∀ x : ↥S, x ^ p = 1) :
     ¬ hyp.R₀ ≤ derivedInG S := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   rcases le_or_gt (Nat.card ↥S) (p ^ 3) with hle | hgt
   · exact hyp.not_le_derivedInG_of_derived_central
       (hyp.derived_central_of_card_le_prime_cube hle)
@@ -663,9 +663,9 @@ uses go through the same lemma, and with an **integer** exponent, as BG does. -/
 theorem exists_zpow_eq_of_card_eq_prime {C : Type*} [Group C] {p q : ℕ} (hp : p.Prime)
     (hC : Nat.card C = p) (φ : MulAut C) (hφ : φ ^ q = 1) :
     ∃ r : ℤ, (∀ x : C, φ x = x ^ r) ∧ ((r : ZMod p) ^ q = 1) := by
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : Finite C := Nat.finite_of_card_ne_zero (by rw [hC]; exact hp.pos.ne')
-  haveI : IsCyclic C := isCyclic_of_prime_card hC
+  have : Fact p.Prime := ⟨hp⟩
+  have : Finite C := Nat.finite_of_card_ne_zero (by rw [hC]; exact hp.pos.ne')
+  have : IsCyclic C := isCyclic_of_prime_card hC
   obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := C)
   obtain ⟨k, hk⟩ := hg (φ g)
   have hord : orderOf g = p := by
@@ -700,7 +700,7 @@ theorem exists_zpow_eq_of_card_eq_prime {C : Type*} [Group C] {p q : ℕ} (hp : 
 theorem RegularOperatorSetup.exists_zpow_eq_act_of_mem_A [Finite R]
     (hyp : RegularOperatorSetup R B p q) {a : B} (ha : a ∈ hyp.A) :
     ∃ r : ℤ, (∀ v ∈ hyp.R₀, hyp.act a v = v ^ r) ∧ ((r : ZMod p) ^ q = 1) := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   set ψ : ↥hyp.A →* MulAut ↥hyp.R₀ :=
     OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hyp.isAInvariant_R₀ with hψ
   have haq : (⟨a, ha⟩ : ↥hyp.A) ^ q = 1 := by
@@ -721,7 +721,7 @@ theorem RegularOperatorSetup.zpow_exponent_ne_one [Finite R]
     (hyp : RegularOperatorSetup R B p q) {a : B} (ha : a ∈ hyp.A) (hane : a ≠ 1)
     {r : ℤ} (hr : ∀ v ∈ hyp.R₀, hyp.act a v = v ^ r) :
     (r : ZMod p) ≠ 1 := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   intro h1
   -- `p ∣ r - 1`, so the `r`-th power map is the identity on `R₀`.
   have hdvd : (p : ℤ) ∣ r - 1 := by
@@ -787,7 +787,7 @@ theorem RegularOperatorSetup.index_subgroupOf_chain [Finite R]
       (OddOrder.Isaacs.Ch04.iterCommutator
         (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S))
         (⊤ : Subgroup ↥S) i)).index = p := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   set T : Subgroup ↥S := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hT
   set Hi := OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i with hHi
   set Hj := OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) (i + 1) with hHj
@@ -839,7 +839,7 @@ theorem RegularOperatorSetup.exists_zpow_eq_on_chain_section [Finite R]
     ∃ r : ℤ,
       (∀ x, (quotientMulAutHom (hyp.isAInvariant_subgroupOf_chain hSinv i)) ⟨a, ha⟩ x = x ^ r) ∧
       ((r : ZMod p) ^ q = 1) := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   have haq : (⟨a, ha⟩ : ↥hyp.A) ^ q = 1 := by
     have h := pow_card_eq_one' (G := ↥hyp.A) (x := ⟨a, ha⟩)
     rwa [hyp.A_card] at h
@@ -873,7 +873,7 @@ theorem RegularOperatorSetup.quotient_action_ne_one [Finite R]
         (Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S)) (⊤ : Subgroup ↥S) i)
     {a : B} (ha : a ∈ hyp.A) (hane : a ≠ 1) :
     (quotientMulAutHom (hyp.isAInvariant_subgroupOf_chain hSinv i)) ⟨a, ha⟩ ≠ 1 := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   set T : Subgroup ↥S := Subgroup.centralizer (omega1UpperCentralTwo ↥S p : Set ↥S) with hT
   set Hi := OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) i with hHi
   set Hj := OddOrder.Isaacs.Ch04.iterCommutator T (⊤ : Subgroup ↥S) (i + 1) with hHj
@@ -902,11 +902,11 @@ theorem RegularOperatorSetup.quotient_action_ne_one [Finite R]
     rw [hZtriv b, MulAut.one_apply] at h1
     exact (QuotientGroup.eq (s := N)).mp h1
   -- Prop 1.5(d), element form
-  haveI hNpg : IsPGroup p ↥N :=
+  have hNpg : IsPGroup p ↥N :=
     ((hyp.R_pGroup.to_subgroup S).to_subgroup Hi).to_subgroup N
-  haveI : Group.IsNilpotent ↥N := hNpg.isNilpotent
-  haveI : IsSolvable ↥N := inferInstance
-  haveI : Finite ↥hyp.A :=
+  have : Group.IsNilpotent ↥N := hNpg.isNilpotent
+  have : Group.IsSolvable ↥N := inferInstance
+  have : Finite ↥hyp.A :=
     Nat.finite_of_card_ne_zero (by rw [hyp.A_card]; exact hyp.q_prime.pos.ne')
   have hCop : Nat.Coprime (Nat.card ↥Z) (Nat.card ↥N) := by
     obtain ⟨k, hk⟩ := hNpg.exists_card_eq
@@ -919,7 +919,7 @@ theorem RegularOperatorSetup.quotient_action_ne_one [Finite R]
   have hNinv' : IsAInvariant (φ.comp Z.subtype) N := fun b => hNinv (Z.subtype b)
   obtain ⟨c, hcfix, n, hnN, hcn⟩ :=
     OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal
-      (φ := φ.comp Z.subtype) hCop (Or.inr ‹IsSolvable ↥N›) hNinv' hgfix
+      (φ := φ.comp Z.subtype) hCop (Or.inr ‹Group.IsSolvable ↥N›) hNinv' hgfix
   -- `c` is `a`-fixed and nontrivial: contradiction with regularity
   have hcN : c ∉ N := by
     rw [hcn]
@@ -944,7 +944,7 @@ theorem RegularOperatorSetup.card_quotient_commutator [Finite R]
     (hyp : RegularOperatorSetup R B p q) {S : Subgroup R} (hR₀S : hyp.R₀ < S)
     (hexp : ∀ x : ↥S, x ^ p = 1) :
     Nat.card (↥S ⧸ _root_.commutator ↥S) = p ^ 2 := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   rcases le_or_gt (Nat.card ↥S) (p ^ 3) with hle | hgt
   · exact hyp.card_quotient_commutator_of_card_le_prime_cube hR₀S hexp hle
   · exact (hyp.commutator_eq_and_card_quotient hR₀S.le hexp
@@ -961,7 +961,7 @@ Step 2 went through without it, but E.3(b)'s third clause is *false* for `S = R�
 theorem RegularOperatorSetup.exists_mem_R₁_pow_eq_one [Finite R]
     (hyp : RegularOperatorSetup R B p q) :
     ∃ z ∈ hyp.R₁, z ∉ hyp.R₀ ∧ z ^ p = 1 := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   obtain ⟨k, hk⟩ := (hyp.R_pGroup.to_subgroup hyp.R₁).exists_card_eq
   have hkpos : 0 < k := by
     rcases Nat.eq_zero_or_pos k with rfl | h

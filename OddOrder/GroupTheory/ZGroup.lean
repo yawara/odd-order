@@ -73,9 +73,9 @@ theorem card_eq_prime_of_le_isZGroup {G : Type*} [Group G] [Finite G] {Z : Subgr
     (hZ : IsZGroup ↥Z) {A : Subgroup G} (hAZ : A ≤ Z) {p : ℕ} (hp : p.Prime)
     (hexp : ∀ a ∈ A, a ^ p = 1) (hA : A ≠ ⊥) :
     Nat.card ↥A = p := by
-  haveI : _root_.IsZGroup ↥Z := isZGroup_iff_mathlib.mp hZ
-  haveI : _root_.IsZGroup ↥A := IsZGroup.of_injective (Subgroup.inclusion_injective hAZ)
-  haveI : Nontrivial ↥A := (Subgroup.nontrivial_iff_ne_bot A).mpr hA
+  have : _root_.IsZGroup ↥Z := isZGroup_iff_mathlib.mp hZ
+  have : _root_.IsZGroup ↥A := IsZGroup.of_injective (Subgroup.inclusion_injective hAZ)
+  have : Nontrivial ↥A := (Subgroup.nontrivial_iff_ne_bot A).mpr hA
   have hexp' : ∀ a : ↥A, a ^ p = 1 := fun a =>
     Subtype.ext (by rw [Subgroup.coe_pow, Subgroup.coe_one]; exact hexp (a : G) a.2)
   exact card_eq_prime_of_isZGroup_exponent_dvd hp hexp'

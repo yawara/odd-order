@@ -110,7 +110,7 @@ theorem generalizedDecompositionNumber_eq_zero_of_inducedBlock (hp : p.Prime) {x
         (fun g => LinearMap.trace K V (σ g))
         (fun _ _ hgh => character_eq_of_isConj σ hgh) j = 0 := by
   classical
-  haveI : Fintype (ConjClasses ↥(centralizerOf x)) := Fintype.ofFinite _
+  have : Fintype (ConjClasses ↥(centralizerOf x)) := Fintype.ofFinite _
   obtain ⟨w, hwa, hwb, hwc, hwd⟩ := exists_inducedBlock_witness (centralizerOf x) (residue 𝒪)
     πG hπG hlinG π hπ hlin residue_surjective (ker_residue) hnilH hfB hfBc hfb hfbc hbG
   refine generalizedDecompositionNumber_eq_zero hp hx e hπ hlin hkerJ hω hω' hζ hζk hζK σ

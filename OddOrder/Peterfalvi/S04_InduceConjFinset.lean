@@ -40,7 +40,7 @@ theorem induce_alphaB_conjFinset (hyp : Hypothesis G A L)
     ClassFunction.induce (mBSubgroup hyp (hyp.conjFinset l B) (hyp.conjFinset_nonempty hB))
         (alphaB hyp (hyp.conjFinset_nonempty hB) α)
       = ClassFunction.induce (mBSubgroup hyp B hB) (alphaB hyp hB α) := by
-  haveI : Invertible (Nat.card ((mBSubgroup hyp B hB).map
+  have : Invertible (Nat.card ((mBSubgroup hyp B hB).map
       (MulAut.conj (l : G) : G →* G)) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   -- Step 1: rewrite the source subgroup to `M(B)^l` and identify the class functions.
@@ -87,7 +87,7 @@ theorem stabilizer_conjFinsetAction (hyp : Hypothesis G A L)
     (B : Finset {a : G // a ∈ A}) :
     (letI := hyp.conjFinsetAction; MulAction.stabilizer L B) = setLStabilizer hyp B := by
   classical
-  letI := hyp.conjFinsetAction
+  let := hyp.conjFinsetAction
   ext l
   rw [MulAction.mem_stabilizer_iff, mem_setLStabilizer]
   change hyp.conjFinset l B = B ↔ ∀ a ∈ B, hyp.conjA l a ∈ B
@@ -113,8 +113,8 @@ noncomputable def conjClassQuotient (hyp : Hypothesis G A L) : Type _ :=
 instance (hyp : Hypothesis G A L) : Finite hyp.conjClassQuotient := by
   classical
   unfold Hypothesis.conjClassQuotient
-  letI := hyp.conjFinsetAction
-  letI : Finite (Finset {a : G // a ∈ A}) := Finite.of_fintype _
+  let := hyp.conjFinsetAction
+  let : Finite (Finset {a : G // a ∈ A}) := Finite.of_fintype _
   infer_instance
 
 /-- A chosen representative subset of an `L`-conjugacy class (`Quotient.out`).  This is one element
@@ -124,13 +124,14 @@ noncomputable def transversalRep (hyp : Hypothesis G A L)
   letI := hyp.conjFinsetAction
   Quotient.out (s := MulAction.orbitRel L (Finset {a : G // a ∈ A})) C
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The chosen representative of the class of `B` is `L`-conjugate to `B`: there is some `l ∈ L`
 with `transversalRep ⟦B⟧ = B^l`.  This is the well-definedness bridge from `ℬ` back to arbitrary
 subsets, dual to `induce_alphaB_conjFinset` (2.10.1). -/
 theorem transversalRep_conj (hyp : Hypothesis G A L) (B : Finset {a : G // a ∈ A}) :
     letI := hyp.conjFinsetAction
     ∃ l : L, hyp.transversalRep (Quotient.mk'' B) = hyp.conjFinset l B := by
-  letI := hyp.conjFinsetAction
+  let := hyp.conjFinsetAction
   have hout : (Quotient.mk'' (hyp.transversalRep (Quotient.mk'' B)) :
       MulAction.orbitRel.Quotient L (Finset {a : G // a ∈ A})) = Quotient.mk'' B := by
     rw [transversalRep]
@@ -151,10 +152,10 @@ theorem card_orbit_mul_card_setLStabilizer (hyp : Hypothesis G A L)
     Nat.card (MulAction.orbit L B) * Nat.card (setLStabilizer hyp B)
       = Nat.card L := by
   classical
-  letI := hyp.conjFinsetAction
-  letI : Fintype L := Fintype.ofFinite L
-  letI : Fintype (MulAction.orbit L B) := Fintype.ofFinite _
-  letI : Fintype (MulAction.stabilizer L B) := Fintype.ofFinite _
+  let := hyp.conjFinsetAction
+  let : Fintype L := Fintype.ofFinite L
+  let : Fintype (MulAction.orbit L B) := Fintype.ofFinite _
+  let : Fintype (MulAction.stabilizer L B) := Fintype.ofFinite _
   rw [Nat.card_eq_fintype_card, ← hyp.stabilizer_conjFinsetAction B, Nat.card_eq_fintype_card,
     Nat.card_eq_fintype_card]
   exact MulAction.card_orbit_mul_card_stabilizer_eq_card_group L B
@@ -367,7 +368,7 @@ theorem dadeQuotientHom_mem_nLStabilizerIn (hyp : Hypothesis G A L)
     {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty)
     (m : mBSubgroup hyp B hB) :
     ((hyp.dadeQuotientHom hB m : L) : G) ∈ nLStabilizerIn hyp B := by
-  haveI : ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)).Normal :=
+  have : ((hIntersection hyp B hB).subgroupOf (mBSubgroup hyp B hB)).Normal :=
     hyp.hIntersection_subgroupOf_normal hB
   -- `dadeQuotientHom m = inclusion(N_L(B) ≤ L) z` for `z = …`
   set z : nLStabilizerIn hyp B :=
@@ -518,7 +519,7 @@ theorem induce_alphaB_mem_ZIrr (hyp : Hypothesis G A L)
     {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) {α : ClassFunction L ℂ}
     (hα : α ∈ ZIrr L) [Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ)] :
     ClassFunction.induce (mBSubgroup hyp B hB) (alphaB hyp hB α) ∈ ZIrr G := by
-  haveI : Fintype (mBSubgroup hyp B hB) := Fintype.ofFinite _
+  have : Fintype (mBSubgroup hyp B hB) := Fintype.ofFinite _
   exact ClassFunction.induce_mem_ZIrr (mBSubgroup hyp B hB)
     (hyp.alphaB_mem_ZIrr hB hα)
 
@@ -548,10 +549,10 @@ theorem induceAlphaBTerm_conjFinset (hyp : Hypothesis G A L)
     (α : ClassFunction L ℂ) (l : L) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
     hyp.induceAlphaBTerm α ⟨hyp.conjFinset l B, hyp.conjFinset_nonempty hB⟩
       = hyp.induceAlphaBTerm α ⟨B, hB⟩ := by
-  letI : Invertible (Nat.card (mBSubgroup hyp (hyp.conjFinset l B)
+  let : Invertible (Nat.card (mBSubgroup hyp (hyp.conjFinset l B)
       (hyp.conjFinset_nonempty hB)) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ) :=
+  let : Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   simp only [induceAlphaBTerm]
   exact hyp.induce_alphaB_conjFinset l hB α
@@ -563,7 +564,7 @@ theorem induceAlphaBTerm_mem_ZIrr (hyp : Hypothesis G A L)
     [Invertible (Nat.card G : ℂ)] {α : ClassFunction L ℂ} (hα : α ∈ ZIrr L)
     (p : {B : Finset {a : G // a ∈ A} // B.Nonempty}) :
     hyp.induceAlphaBTerm α p ∈ ZIrr G := by
-  letI : Invertible (Nat.card (mBSubgroup hyp p.1 p.2) : ℂ) :=
+  let : Invertible (Nat.card (mBSubgroup hyp p.1 p.2) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   exact hyp.induce_alphaB_mem_ZIrr p.2 hα
 
@@ -962,8 +963,8 @@ theorem card_conjFiber_coset_mul_card_centralizerInf {K : Subgroup G} {a : G}
         * Nat.card ↥K := by
   classical
   set C : Subgroup G := K ⊓ Subgroup.centralizer ({a} : Set G) with hC
-  letI : Fintype ↥C := Fintype.ofFinite _
-  letI : Fintype ↥K := Fintype.ofFinite _
+  let : Fintype ↥C := Fintype.ofFinite _
+  let : Fintype ↥K := Fintype.ofFinite _
   -- The bridge set `S`.
   set S : Finset (G × ↥C × ↥K) := (Finset.univ : Finset (G × ↥C × ↥K)).filter
     (fun p => p.1⁻¹ * g * p.1 = (p.2.2 : G)⁻¹ * ((p.2.1 : G) * a) * (p.2.2 : G)) with hS
@@ -1144,7 +1145,7 @@ noncomputable def mobiusIndex (a : {a : G // a ∈ A}) :
 theorem mem_mobiusIndex {a : {a : G // a ∈ A}} {B : Finset {a : G // a ∈ A}} :
     B ∈ hyp.mobiusIndex a ↔ B.Nonempty ∧ (a : G) ∈ nLStabilizerIn hyp B := by
   classical
-  letI : Fintype {a : G // a ∈ A} := Fintype.ofFinite _
+  let : Fintype {a : G // a ∈ A} := Fintype.ofFinite _
   simp only [mobiusIndex, Finset.mem_filter, Finset.mem_powerset, Finset.subset_univ, true_and]
 
 /-- The Möbius summand `(-1)^{|B|}/|H(B)| · |𝒜(g, H(B)·a)|` (as a complex number). -/

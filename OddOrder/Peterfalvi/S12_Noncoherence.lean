@@ -200,7 +200,7 @@ theorem induce_linear_isIrreducible [Finite G]
   let h : OddOrder.Peterfalvi.S06.Hypothesis ↥M :=
     typePData_toS06Hypothesis hyp.typeP hG.odd
       (typePData_W1_hall_coprime hG hyp.maximal (hyp.bgTypeP hG) hyp.typeP)
-  haveI hNeZ : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  have hNeZ : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
   have hKeq : h.K = (derivedInG M).subgroupOf M := rfl
   have hKcomm : h.K = commutator ↥M := by
     rw [hKeq, derivedInG, Subgroup.subgroupOf,
@@ -248,7 +248,7 @@ theorem inducedKernelFamily_commutator_eq_SHCSet [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
     OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M)
         (⁅(derivedInG M).subgroupOf M, (derivedInG M).subgroupOf M⁆) = hyp.SHCSet := by
-  haveI : IsMulCommutative (↥((derivedInG M).subgroupOf M)
+  have : IsMulCommutative (↥((derivedInG M).subgroupOf M)
       ⧸ commutator ↥((derivedInG M).subgroupOf M)) :=
     (Subgroup.Normal.quotient_commutative_iff_commutator_le).mpr le_rfl
   have hw1pos : (hyp.w1 : ℂ) ≠ 0 := by
@@ -334,13 +334,13 @@ theorem typeV_sixFiveA_bound [Finite G]
   obtain ⟨dV⟩ := hV
   obtain ⟨params, hmu, -, hζS, hζ1, hζne, hδpm, hδj⟩ := hyp.exists_charParameters_full hG
   -- instances on `K = M' = (derivedInG M).subgroupOf M`
-  haveI hKnorm : ((derivedInG M).subgroupOf M).Normal := by
+  have hKnorm : ((derivedInG M).subgroupOf M).Normal := by
     rw [derivedInG, Subgroup.subgroupOf,
       Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
     infer_instance
-  haveI hKnil : Group.IsNilpotent ↥((derivedInG M).subgroupOf M) :=
+  have hKnil : Group.IsNilpotent ↥((derivedInG M).subgroupOf M) :=
     TypeVData.isNilpotent_derivedInG_subgroupOf dV
-  haveI hKsolv : IsSolvable ↥((derivedInG M).subgroupOf M) := IsNilpotent.to_isSolvable
+  have hKsolv : Group.IsSolvable ↥((derivedInG M).subgroupOf M) := IsNilpotent.to_isSolvable
   -- `𝒮 = SOf ⊥`
   have hSset : hyp.Sset = OddOrder.Peterfalvi.S08.inducedKernelFamily
       ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) := by
@@ -354,7 +354,7 @@ theorem typeV_sixFiveA_bound [Finite G]
     intro heq
     have hcomm_top : commutator ↥((derivedInG M).subgroupOf M) = ⊤ := by
       rw [← OddOrder.Peterfalvi.S08.commutator_subgroupOf_self, heq, Subgroup.subgroupOf_self]
-    haveI : Subsingleton (Abelianization ↥((derivedInG M).subgroupOf M)) := by
+    have : Subsingleton (Abelianization ↥((derivedInG M).subgroupOf M)) := by
       change Subsingleton (↥((derivedInG M).subgroupOf M)
         ⧸ commutator ↥((derivedInG M).subgroupOf M))
       rw [hcomm_top]
@@ -390,10 +390,10 @@ theorem typeV_sixFiveA_bound [Finite G]
       ?_ hcoh hbound
     -- the (5.6) break-member oracle `h56` = the generalized §11/§13 dichotomy producer
     intro A B hAnorm hBnorm hBA hAH₁ _hcentral hAcoh hBncoh
-    haveI := hAnorm
-    haveI := hBnorm
-    haveI : (A.subgroupOf ((derivedInG M).subgroupOf M)).Normal := hAnorm.subgroupOf _
-    haveI : (B.subgroupOf ((derivedInG M).subgroupOf M)).Normal := hBnorm.subgroupOf _
+    have := hAnorm
+    have := hBnorm
+    have : (A.subgroupOf ((derivedInG M).subgroupOf M)).Normal := hAnorm.subgroupOf _
+    have : (B.subgroupOf ((derivedInG M).subgroupOf M)).Normal := hBnorm.subgroupOf _
     have hAne : A.subgroupOf ((derivedInG M).subgroupOf M) ≠ ⊤ := by
       intro htop
       exact absurd ((Subgroup.subgroupOf_eq_top.mp htop).trans hAH₁) (not_le_of_gt hH₁H)
@@ -441,11 +441,11 @@ theorem typeV_sixFiveB_pGroup [Finite G]
   classical
   obtain ⟨dV⟩ := hV
   have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
-  haveI hKnorm : ((derivedInG M).subgroupOf M).Normal := by
+  have hKnorm : ((derivedInG M).subgroupOf M).Normal := by
     rw [derivedInG, Subgroup.subgroupOf,
       Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
     infer_instance
-  haveI hKnil : Group.IsNilpotent ↥((derivedInG M).subgroupOf M) :=
+  have hKnil : Group.IsNilpotent ↥((derivedInG M).subgroupOf M) :=
     TypeVData.isNilpotent_derivedInG_subgroupOf dV
   -- `⁅M′,M′⁆.map subtype = M″`
   have hmapcomm : Subgroup.map M.subtype
@@ -458,7 +458,7 @@ theorem typeV_sixFiveB_pGroup [Finite G]
   have hnonab : ¬ IsMulCommutative ↥(derivedInG M) := by
     intro habel
     apply hnc
-    haveI hKcomm : IsMulCommutative ↥((derivedInG M).subgroupOf M) :=
+    have hKcomm : IsMulCommutative ↥((derivedInG M).subgroupOf M) :=
       ⟨⟨fun a b => (Subgroup.subgroupOfEquivOfLe hM'le).injective
         (by rw [map_mul, map_mul]; exact habel.is_comm.comm _ _)⟩⟩
     have hcommbot : (⁅(derivedInG M).subgroupOf M, (derivedInG M).subgroupOf M⁆ :
@@ -478,7 +478,7 @@ theorem typeV_sixFiveB_pGroup [Finite G]
     exact ⟨hyp.SHC_isCoherent hG⟩
   refine ⟨?_, hnonab⟩
   -- ★ p-group: fixed-point-free `W₁`-action on `Ab(M′)` + the (6.5.a) bound
-  letI actH : MulDistribMulAction ↥(hyp.W1.subgroupOf M) ↥((derivedInG M).subgroupOf M) :=
+  let actH : MulDistribMulAction ↥(hyp.W1.subgroupOf M) ↥((derivedInG M).subgroupOf M) :=
     MulDistribMulAction.compHom ((derivedInG M).subgroupOf M)
       ((MulAut.conjNormal (H := (derivedInG M).subgroupOf M)).comp (hyp.W1.subgroupOf M).subtype)
   have hsmul : ∀ (a : ↥(hyp.W1.subgroupOf M)) (x : ↥((derivedInG M).subgroupOf M)),
@@ -538,7 +538,7 @@ theorem typeV_sixFiveB_pGroup [Finite G]
   obtain ⟨p, hp, hHp⟩ :=
       OddOrder.Peterfalvi.S08.isPGroup_of_isNilpotent_of_coprime_fixedPoints_le_commutator
     hcop hfix hHodd hWodd hbound'
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hHp' : IsPGroup p ↥(derivedInG M) := hHp.of_equiv (Subgroup.subgroupOfEquivOfLe hM'le)
   have hw2prime : hyp.w2.Prime := hyp.w2_prime hG
   have hW2der : hyp.W2 ≤ derivedInG M :=
@@ -631,7 +631,7 @@ theorem typeV_forces_coherence_v2 [Finite G]
   obtain ⟨hpgrp, hnonab⟩ := typeV_sixFiveB_pGroup hG hyp ⟨dV⟩ hnc
   have hnd := typeV_sixFiveC_not_dvd hG hyp ⟨dV⟩ hnc
   have hw2prime : hyp.w2.Prime := hyp.w2_prime hG
-  haveI : Fact hyp.w2.Prime := ⟨hw2prime⟩
+  have : Fact hyp.w2.Prime := ⟨hw2prime⟩
   obtain ⟨m, hm⟩ := hpgrp.exists_card_eq
   rcases hbc with ⟨p', hp', hp'mem, hw1dvd, -⟩ | ⟨p, hp, hpmem, hOp, hdvdp1, -⟩
   · -- case (b) refuted: `p′ ∣ |M′| = w₂^m` gives `p′ = w₂`, so `w₁ ∣ w₂ − 1` — against (6.5.c)
@@ -644,7 +644,7 @@ theorem typeV_forces_coherence_v2 [Finite G]
     rw [hp'w2, ← hw1eq] at hw1dvd
     exact absurd hw1dvd hnd
   · -- case (c): `|M′| = p³`, `w₁ ∣ p + 1` — the (10.10.1)–(10.10.4) engine
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
     -- `p = w₂` (a prime divisor of the `w₂`-group `M′`)
     have hpw2 : p = hyp.w2 := by
@@ -754,7 +754,7 @@ legacy `no_typeV_maximal` (whose `typeV_forces_coherence` was a bare `sorry`).  
 `card_kappaHall_lt_of_isTypeIIIorIV` spine (issue 1025). -/
 theorem isTypeIIIorIV_unconditional [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) : IsTypeIII M ∨ IsTypeIV M := by
-  haveI : Fintype G := Fintype.ofFinite _
+  have : Fintype G := Fintype.ofFinite _
   rcases hyp.type_alt with h | h | h
   · exact Or.inl h
   · exact Or.inr h

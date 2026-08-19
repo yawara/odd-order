@@ -287,11 +287,11 @@ private theorem centralizer_sylow_decomp_of_rank_le_two [Finite G]
       (fun x hx y hy => congrArg Subtype.val (hAea.1 ⟨x, hx⟩ ⟨y, hy⟩))
       (fun x hx y hy => ?_)
       (fun x hx y hy => hP₁P₂comm x (hA_le_P₁ hx) y hy)
-    haveI := hP₂cyc
-    letI : CommGroup ↥P₂ := IsCyclic.commGroup
+    have := hP₂cyc
+    let : CommGroup ↥P₂ := IsCyclic.commGroup
     exact congrArg Subtype.val (mul_comm (⟨x, hx⟩ : ↥P₂) ⟨y, hy⟩)
   -- `Z₀ = Ω₁(Z(P))`: contained in `A`, nontrivial, proper in `A`, of order `p`.
-  haveI hPnt : Nontrivial ↥P := by
+  have hPnt : Nontrivial ↥P := by
     rcases subsingleton_or_nontrivial ↥P with hs | hn
     · exact absurd ⟨⟨fun a b => Subsingleton.elim _ _⟩⟩ hPnonab
     · exact hn
@@ -320,7 +320,7 @@ private theorem centralizer_sylow_decomp_of_rank_le_two [Finite G]
     obtain ⟨k, hk2, hkeq⟩ := (Nat.dvd_prime_pow Fact.out).mp hdvd
     interval_cases k
     · exfalso
-      haveI hsub : Subsingleton ↥(omega1CenterInG P p) :=
+      have hsub : Subsingleton ↥(omega1CenterInG P p) :=
         (Nat.card_eq_one_iff_unique.mp (by rw [hkeq, pow_zero])).1
       have h1 := Subsingleton.elim (⟨(z : G), hzZ₀⟩ : ↥(omega1CenterInG P p))
         ⟨1, Subgroup.one_mem _⟩
@@ -491,7 +491,7 @@ private theorem centralizer_sylow_decomp_of_three_le_rank [Finite G]
     obtain ⟨z', hz', rfl⟩ := Subgroup.mem_map.mp hz
     exact (congrArg Subtype.val (Subgroup.mem_center_iff.mp
       (mem_omega1OfAbelian.mp hz').1 ⟨s, hs⟩)).symm
-  haveI hSnt : Nontrivial ↥(S : Subgroup G) := by
+  have hSnt : Nontrivial ↥(S : Subgroup G) := by
     rw [← Finite.one_lt_card_iff_nontrivial]
     calc 1 < p ^ 2 := Nat.one_lt_pow two_ne_zero (Fact.out : p.Prime).one_lt
       _ = Nat.card ↥A := hAcard.symm
@@ -520,7 +520,7 @@ private theorem centralizer_sylow_decomp_of_three_le_rank [Finite G]
     obtain ⟨k, hk2, hkeq⟩ := (Nat.dvd_prime_pow Fact.out).mp hdvd
     interval_cases k
     · exfalso
-      haveI hsub : Subsingleton ↥(omega1CenterInG (S : Subgroup G) p) :=
+      have hsub : Subsingleton ↥(omega1CenterInG (S : Subgroup G) p) :=
         (Nat.card_eq_one_iff_unique.mp (by rw [hkeq, pow_zero])).1
       have h1 := Subsingleton.elim
         (⟨(zS : G), hzSZ₁⟩ : ↥(omega1CenterInG (S : Subgroup G) p)) ⟨1, Subgroup.one_mem _⟩
@@ -578,7 +578,7 @@ private theorem centralizer_sylow_decomp_of_three_le_rank [Finite G]
           Set ↥(S : Subgroup G))).map (S : Subgroup G).subtype,
       Subgroup.map_subtype_le _, ?_, ?_, ?_, ?_, ?_⟩
     · -- cyclic
-      haveI := hYcyc
+      have := hYcyc
       exact isCyclic_of_surjective _
         (Subgroup.equivMapOfInjective _ _ (S : Subgroup G).subtype_injective).surjective
     · -- `Z₁ ≤ Y`
@@ -649,11 +649,11 @@ private theorem centralizer_sylow_decomp_of_three_le_rank [Finite G]
     · obtain ⟨i, rfl⟩ := Subgroup.mem_zpowers_iff.mp hx
       obtain ⟨j, rfl⟩ := Subgroup.mem_zpowers_iff.mp hy
       exact Commute.zpow_zpow_self L₀g i j
-    · haveI := hY₀cyc
-      letI : CommGroup ↥Y₀ := IsCyclic.commGroup
+    · have := hY₀cyc
+      let : CommGroup ↥Y₀ := IsCyclic.commGroup
       exact congrArg Subtype.val (mul_comm (⟨x, hx⟩ : ↥Y₀) ⟨y, hy⟩)
   -- (10.5): `A ≠ Z₀`, hence `|Z₀| = p` and `Z₀ = Z₁`.
-  haveI hPnt : Nontrivial ↥P := by
+  have hPnt : Nontrivial ↥P := by
     rcases subsingleton_or_nontrivial ↥P with hs | hn
     · exact absurd ⟨⟨fun a b => Subsingleton.elim _ _⟩⟩ hPnonab
     · exact hn
@@ -682,7 +682,7 @@ private theorem centralizer_sylow_decomp_of_three_le_rank [Finite G]
     obtain ⟨k, hk2, hkeq⟩ := (Nat.dvd_prime_pow Fact.out).mp hdvd
     interval_cases k
     · exfalso
-      haveI hsub : Subsingleton ↥(omega1CenterInG P p) :=
+      have hsub : Subsingleton ↥(omega1CenterInG P p) :=
         (Nat.card_eq_one_iff_unique.mp (by rw [hkeq, pow_zero])).1
       have h1 := Subsingleton.elim (⟨(zP : G), hzPZ₀⟩ : ↥(omega1CenterInG P p))
         ⟨1, Subgroup.one_mem _⟩
@@ -710,8 +710,8 @@ private theorem centralizer_sylow_decomp_of_three_le_rank [Finite G]
   rw [hCY]
   refine comm_sup_of_comm_of_comm (fun x hx y hy => ?_) (fun x hx y hy => ?_) hA₀Ycomm
   · exact congrArg Subtype.val (hAea.1 ⟨x, hA₀A hx⟩ ⟨y, hA₀A hy⟩)
-  · haveI := hYcyc
-    letI : CommGroup ↥Y := IsCyclic.commGroup
+  · have := hYcyc
+    let : CommGroup ↥Y := IsCyclic.commGroup
     exact congrArg Subtype.val (mul_comm (⟨x, hx⟩ : ↥Y) ⟨y, hy⟩)
 
 /-- Generator of a subgroup of prime order. -/
@@ -719,7 +719,7 @@ private theorem exists_zpowers_eq_of_card_prime [Finite G] {p : ℕ} [Fact p.Pri
     {X : Subgroup G} (hX : Nat.card ↥X = p) :
     ∃ a : G, a ∈ X ∧ orderOf a = p ∧ Subgroup.zpowers a = X := by
   have h1 : 1 < Nat.card ↥X := by rw [hX]; exact (Fact.out : p.Prime).one_lt
-  haveI : Nontrivial ↥X := Finite.one_lt_card_iff_nontrivial.mp h1
+  have : Nontrivial ↥X := Finite.one_lt_card_iff_nontrivial.mp h1
   obtain ⟨a, ha1⟩ := exists_ne (1 : ↥X)
   have hane : (a : G) ≠ 1 := fun h => ha1 (Subtype.ext h)
   have hord_dvd : orderOf (a : G) ∣ p := by
@@ -913,7 +913,7 @@ private theorem exists_conj_pow_eq_of_fixes_line [Finite G] {p : ℕ} [Fact p.Pr
     exact Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr hbZ)
       (by rw [hZ₀card, Nat.card_zpowers, hbord])
   -- solve `k j₀ m ≡ s (mod p)` in the field `ZMod p`
-  haveI : NeZero p := ⟨(Fact.out : p.Prime).ne_zero⟩
+  have : NeZero p := ⟨(Fact.out : p.Prime).ne_zero⟩
   set u : ZMod p := (j₀ : ZMod p) * (m : ZMod p) with hu
   have hu0 : u ≠ 0 := by
     rw [hu]
@@ -1006,7 +1006,7 @@ theorem nonabelian_pSubgroup_rankTwo_elemAbelian_structure [Finite G]
         hAP hPS hA₀A hA₀card hA₀ne ?_
       rw [rank_le_iff]
       intro q hq
-      haveI : Fact q.Prime := ⟨hq⟩
+      have : Fact q.Prime := ⟨hq⟩
       rcases eq_or_ne q p with rfl | hqp
       · omega
       · rw [pRank_le_iff]
@@ -1067,7 +1067,7 @@ theorem nonabelian_pSubgroup_rankTwo_elemAbelian_structure [Finite G]
     rw [pow_one]
     exact hZ₀card
   · -- (b) cyclicity of `Z = Y ⊓ P`
-    haveI := hYcyc
+    have := hYcyc
     exact Subgroup.isCyclic_of_le inf_le_left
   · -- (b) `A₀ ⊓ Z = ⊥`
     rw [eq_bot_iff, ← hA₀Y]
@@ -1084,7 +1084,7 @@ theorem nonabelian_pSubgroup_rankTwo_elemAbelian_structure [Finite G]
     have hPle : P ≤ Subgroup.centralizer (A : Set G) ⊓ P :=
       Subgroup.subgroupOf_eq_top.mp htop
     exact hPnonab ⟨⟨fun a b => Subtype.ext (hCPab _ (hPle a.2) _ (hPle b.2))⟩⟩
-  haveI : Group.IsNilpotent ↥P := hPp.isNilpotent
+  have : Group.IsNilpotent ↥P := hPp.isNilpotent
   have hgrow := Group.normalizerCondition_of_isNilpotent (G := ↥P)
     ((Subgroup.centralizer (A : Set G) ⊓ P).subgroupOf P) hCPlt
   obtain ⟨w, hwN, hwC⟩ := SetLike.exists_of_lt hgrow

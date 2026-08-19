@@ -103,7 +103,7 @@ theorem even_card_of_sq_eq_one_mem {G : Type*} [Group G] [Finite G]
 theorem exists_sq_eq_one_of_even_card {G : Type*} [Group G] [Finite G]
     {K : Subgroup G} (heven : Even (Nat.card K)) :
     ∃ v : G, v ∈ K ∧ v ^ 2 = 1 ∧ v ≠ 1 := by
-  haveI : Fintype K := Fintype.ofFinite _
+  have : Fintype K := Fintype.ofFinite _
   obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card (G := K) 2
     (by rw [← Nat.card_eq_fintype_card]; exact heven.two_dvd)
   have hord : orderOf (x : G) = 2 :=
@@ -786,7 +786,7 @@ theorem oPiCore_two_compl_eq_normalCore :
       (Nat.card (Ch03.oPiCore ({2}ᶜ : Set ℕ) G)) := by
     rw [hX4, (by norm_num : (4 : ℕ) = 2 ^ 2)]
     exact Nat.Coprime.pow_left _ (Nat.coprime_two_left.mpr hOodd)
-  haveI := hXcomm
+  have := hXcomm
   have htop := OddOrder.BG.Ch1.S01.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic'
     hO_inv.restrict hcop hXnc
   have hle2 : nontrivialActionFixedByClosure hO_inv.restrict ≤

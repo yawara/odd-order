@@ -56,7 +56,7 @@ open Module (finrank)
 /-! ## A public prime-index normal subgroup lemma
 
 **⚠ Duplication flag.** This re-proves (as a *public* declaration) the *private*
-`OddOrder.BG.Ch2.S07.exists_normal_index_prime_of_solvable`
+`OddOrder.BG.Ch2.S07.exists_normal_index_prime_of_isSolvable`
 (`OddOrder/BG/Ch2_Uniqueness/S07_Hypothesis75.lean:50`).  A private lemma cannot be imported, so
 the ~30-line proof is copied here.  The two should be unified into a single shared public leaf
 (e.g. in `OddOrder/GroupTheory`) once the BG side is refactored. -/
@@ -69,14 +69,14 @@ version bounding `Nat.card G` by `n`; `finrank_dvd_card_of_isAlgClosed_of_irredu
 `n = Nat.card G`.  The subgroup `↥H` and the constituent's carrier stay in the same universes, so
 the induction hypothesis (at a strictly smaller group) applies. -/
 private theorem finrank_dvd_card_aux {k : Type*} [Field k] [IsAlgClosed k] (n : ℕ) :
-    ∀ {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    ∀ {G : Type*} [Group G] [Finite G] [Group.IsSolvable G]
       {V : Type*} [AddCommGroup V] [Module k V]
       (ρ : Representation k G V) [ρ.IsIrreducible] [FiniteDimensional k V],
       Nat.card G ≤ n → Module.finrank k V ∣ Nat.card G := by
   induction n with
   | zero =>
       intro G _ _ _ V _ _ ρ _ _ hcard
-      haveI : Nonempty G := ⟨1⟩
+      have : Nonempty G := ⟨1⟩
       have : 0 < Nat.card G := Nat.card_pos
       omega
   | succ n ih =>
@@ -84,12 +84,12 @@ private theorem finrank_dvd_card_aux {k : Type*} [Field k] [IsAlgClosed k] (n : 
       by_cases hntG : Nontrivial G
       · -- `G` nontrivial: reduce to a prime-index normal subgroup `H`.
         obtain ⟨H, hHnorm, hHprime⟩ :=
-          GroupTheory.exists_normal_index_prime_of_solvable (Q := G) hntG
-        haveI := hHnorm
+          GroupTheory.exists_normal_index_prime_of_isSolvable (Q := G) hntG
+        have := hHnorm
         -- `|H| · [G:H] = |G|`, `[G:H]` prime, so `|H| < |G| ≤ n+1`, giving `|H| ≤ n`.
         have hcardH : Nat.card ↥H * H.index = Nat.card G := Subgroup.card_mul_index H
-        haveI : Nonempty G := ⟨1⟩
-        haveI : Nonempty ↥H := ⟨1⟩
+        have : Nonempty G := ⟨1⟩
+        have : Nonempty ↥H := ⟨1⟩
         have hHpos : 0 < Nat.card ↥H := Nat.card_pos
         have hGpos : 0 < Nat.card G := Nat.card_pos
         have hHdvdG : Nat.card ↥H ∣ Nat.card G := Subgroup.card_subgroup_dvd_card H
@@ -122,21 +122,21 @@ private theorem finrank_dvd_card_aux {k : Type*} [Field k] [IsAlgClosed k] (n : 
               exact Nat.eq_of_mul_eq_mul_right hHprime.pos (by rw [one_mul]; exact hmul)
             exact hxH (Subgroup.relIndex_eq_one.mp hrel1 hxK)
         -- The restriction is semisimple; extract a nonzero simple constituent `W`.
-        haveI : Nontrivial V := nontrivial_of_isIrreducible ρ
-        haveI : Module.Finite k V := inferInstance
-        haveI : Module.Finite k (resRep ρ H).asModule := inferInstance
-        haveI : IsSemisimpleModule k[↥H] (resRep ρ H).asModule :=
+        have : Nontrivial V := nontrivial_of_isIrreducible ρ
+        have : Module.Finite k V := inferInstance
+        have : Module.Finite k (resRep ρ H).asModule := inferInstance
+        have : IsSemisimpleModule k[↥H] (resRep ρ H).asModule :=
           isSemisimpleModule_resRep_of_isIrreducible ρ
-        haveI : Nontrivial (resRep ρ H).asModule := ‹Nontrivial V›
+        have : Nontrivial (resRep ρ H).asModule := ‹Nontrivial V›
         obtain ⟨W, hWs⟩ := IsSemisimpleModule.exists_simple_submodule k[↥H] (resRep ρ H).asModule
-        haveI := hWs
+        have := hWs
         have hWne : W ≠ ⊥ := by
           rintro rfl
-          haveI : Nontrivial ↥(⊥ : Submodule k[↥H] (resRep ρ H).asModule) :=
+          have : Nontrivial ↥(⊥ : Submodule k[↥H] (resRep ρ H).asModule) :=
             IsSimpleModule.nontrivial k[↥H] _
           exact false_of_nontrivial_of_subsingleton ↥(⊥ : Submodule k[↥H] (resRep ρ H).asModule)
         -- Induction: `dim W ∣ |H|` (via the constituent as an `↥H`-representation).
-        haveI hσirr := subRep_isIrreducible (resRep ρ H) W
+        have hσirr := subRep_isIrreducible (resRep ρ H) W
         have hih : Module.finrank k (Subrepresentation.ofSubmodule' W).toRepresentation.asModule
             ∣ Nat.card ↥H :=
           @ih _ _ _ _ _ _ _ (Subrepresentation.ofSubmodule' W).toRepresentation hσirr _ hHn
@@ -153,7 +153,7 @@ private theorem finrank_dvd_card_aux {k : Type*} [Field k] [IsAlgClosed k] (n : 
           have hconj : ∀ g : G,
               Nonempty (↥W ≃ₗ[k[↥H]] ↥(W.map (conjSemilinearEnd (H := H) ρ g))) := fun g =>
             (mem_conjStab_iff ρ W g).mp (by rw [hStabTop]; exact Subgroup.mem_top g)
-          haveI : IsSimpleModule k[↥H] (resRep ρ H).asModule :=
+          have : IsSimpleModule k[↥H] (resRep ρ H).asModule :=
             restriction_isSimpleModule ρ x hgen W hWne hconj
           have hWtop : W = ⊤ := (IsSimpleOrder.eq_bot_or_eq_top W).resolve_left hWne
           have e0 : ↥W ≃ₗ[k[↥H]] (resRep ρ H).asModule :=
@@ -172,8 +172,8 @@ private theorem finrank_dvd_card_aux {k : Type*} [Field k] [IsAlgClosed k] (n : 
             mul_dvd_mul_left H.index hWdvdH
           rwa [show H.index * Nat.card ↥H = Nat.card G by rw [mul_comm]; exact hcardH] at hstep
       · -- `G` trivial: irreducibility over an algebraically closed field forces `dim V = 1`.
-        haveI : Subsingleton G := not_nontrivial_iff_subsingleton.mp hntG
-        haveI : Nontrivial V := nontrivial_of_isIrreducible ρ
+        have : Subsingleton G := not_nontrivial_iff_subsingleton.mp hntG
+        have : Nontrivial V := nontrivial_of_isIrreducible ρ
         obtain ⟨v, hv⟩ := exists_ne (0 : V)
         let Wρ : Subrepresentation ρ :=
           { toSubmodule := Submodule.span k {v}
@@ -200,7 +200,7 @@ over `k`, the dimension of `V` divides `|G|`.
 
 Proved by strong induction on `|G|` via `finrank_dvd_card_aux`. -/
 theorem finrank_dvd_card_of_isAlgClosed_of_irreducible
-    {k : Type*} [Field k] [IsAlgClosed k] {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    {k : Type*} [Field k] [IsAlgClosed k] {G : Type*} [Group G] [Finite G] [Group.IsSolvable G]
     {V : Type*} [AddCommGroup V] [Module k V]
     (ρ : Representation k G V) [ρ.IsIrreducible] [FiniteDimensional k V] :
     Module.finrank k V ∣ Nat.card G :=
@@ -217,12 +217,12 @@ irreducible (`IsAbsolutelyIrreducible.baseChangeRepresentation_isIrreducible`), 
 algebraically-closed core applies to `K ⊗[F] V`; and `finrank K (K ⊗[F] V) = finrank F V`
 (`Module.finrank_baseChange`). -/
 theorem finrank_dvd_card_of_isAbsolutelyIrreducible
-    {F : Type*} [Field F] {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    {F : Type*} [Field F] {G : Type*} [Group G] [Finite G] [Group.IsSolvable G]
     {V : Type*} [AddCommGroup V] [Module F V]
     (ρ : Representation F G V) [ρ.IsIrreducible] [FiniteDimensional F V]
     (habs : IsAbsolutelyIrreducible ρ) :
     Module.finrank F V ∣ Nat.card G := by
-  haveI : (baseChangeRepresentation (AlgebraicClosure F) ρ).IsIrreducible :=
+  have : (baseChangeRepresentation (AlgebraicClosure F) ρ).IsIrreducible :=
     habs.baseChangeRepresentation_isIrreducible (AlgebraicClosure F)
   have hdvd := finrank_dvd_card_of_isAlgClosed_of_irreducible
     (baseChangeRepresentation (AlgebraicClosure F) ρ)

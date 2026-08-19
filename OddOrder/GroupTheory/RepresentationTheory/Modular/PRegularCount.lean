@@ -67,14 +67,14 @@ theorem mkQ_mem_span_range_pRegular (x : MonoidAlgebra k G) :
         (OddOrder.commutatorRadical (k := k) hp hchar).mkQ
           (single (C : ConjClasses G).out 1)) := by
   induction x using MonoidAlgebra.induction_on with
-  | hM a =>
+  | of a =>
     rw [MonoidAlgebra.of_apply, mkQ_single_eq_mkQ_single_pRegular hp hchar a]
     refine Submodule.subset_span ⟨⟨ConjClasses.mk (pRegularPart p a), ?_⟩, rfl⟩
     exact isPRegularClass_mk.mpr (isPRegular_pRegularPart hp (isOfFinOrder_of_finite a))
-  | hadd x y hx hy =>
+  | add x y hx hy =>
     rw [map_add]
     exact Submodule.add_mem _ hx hy
-  | hsmul c x hx =>
+  | smul c x hx =>
     rw [map_smul]
     exact Submodule.smul_mem _ _ hx
 
@@ -143,14 +143,14 @@ theorem iterate_frobQuotient_mem_pRegularClassSpan {m : ℕ}
     (OddOrder.frobQuotient hp hchar)^[m] u ∈ pRegularClassSpan (k := k) (G := G) p := by
   obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ u
   induction x using MonoidAlgebra.induction_on with
-  | hM a =>
+  | of a =>
     rw [MonoidAlgebra.of_apply, iterate_frobQuotient_mk_single hp hchar hm]
     exact mk_single_mem_pRegularClassSpan
       (isPRegular_pRegularPart hp (isOfFinOrder_of_finite a))
-  | hadd x y hx hy =>
+  | add x y hx hy =>
     rw [Submodule.Quotient.mk_add, OddOrder.iterate_frobQuotient_add]
     exact Submodule.add_mem _ hx hy
-  | hsmul c x hx =>
+  | smul c x hx =>
     rw [Submodule.Quotient.mk_smul, OddOrder.iterate_frobQuotient_smul]
     exact Submodule.smul_mem _ _ hx
 
@@ -195,7 +195,7 @@ theorem eq_zero_of_sum_smul_mem_commutatorRadical
     (hmem : ∑ D, c D • single (D : ConjClasses G).out (1 : k)
       ∈ OddOrder.commutatorRadical (k := k) hp hchar) (C) : c C = 0 := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   obtain ⟨m, hmpos, hm⟩ := exists_uniform_pow_prime_pow_eq_pRegularPart (G := G) hp
   obtain ⟨j, hj⟩ := (OddOrder.mem_commutatorRadical_iff hp hchar).mp hmem
   -- the class of the combination in `kG ⧸ [kG, kG]`
@@ -243,7 +243,7 @@ theorem linearIndependent_mkQ_pRegular :
       (OddOrder.commutatorRadical (k := k) hp hchar).mkQ
         (single (C : ConjClasses G).out (1 : k)) := by
   classical
-  haveI : Fintype {C : ConjClasses G // IsPRegularClass p C} := Fintype.ofFinite _
+  have : Fintype {C : ConjClasses G // IsPRegularClass p C} := Fintype.ofFinite _
   refine Fintype.linearIndependent_iff.mpr fun c hc C => ?_
   refine eq_zero_of_sum_smul_mem_commutatorRadical hp hchar c ?_ C
   have hmk : (OddOrder.commutatorRadical (k := k) hp hchar).mkQ
@@ -267,7 +267,7 @@ theorem finrank_quotient_commutatorRadical :
     Module.finrank k (MonoidAlgebra k G ⧸ OddOrder.commutatorRadical (k := k) hp hchar)
       = Nat.card {C : ConjClasses G // IsPRegularClass p C} := by
   classical
-  haveI : Fintype {C : ConjClasses G // IsPRegularClass p C} := Fintype.ofFinite _
+  have : Fintype {C : ConjClasses G // IsPRegularClass p C} := Fintype.ofFinite _
   rw [Module.finrank_eq_card_basis (basisPRegularQuotient hp hchar), Nat.card_eq_fintype_card]
 
 end OddOrder.RepresentationTheory.Modular

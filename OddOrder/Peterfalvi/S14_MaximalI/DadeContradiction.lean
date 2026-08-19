@@ -69,15 +69,15 @@ theorem exists_distinguished_char {L : Subgroup G} [Finite G] (hyp : Hypothesis 
   have hHL : hyp.typeI.typeF.H ≤ L := hyp.typeI.typeF.H_le
   have e : ↥((hyp.typeI.typeF.H).subgroupOf L) ≃* ↥(hyp.typeI.typeF.H) :=
     Subgroup.subgroupOfEquivOfLe hHL
-  haveI : Nontrivial ↥(hyp.typeI.typeF.H) :=
+  have : Nontrivial ↥(hyp.typeI.typeF.H) :=
     (Subgroup.nontrivial_iff_ne_bot _).mpr hyp.typeI.typeF.H_nontrivial
-  haveI : Group.IsNilpotent ↥(hyp.typeI.typeF.H) :=
+  have : Group.IsNilpotent ↥(hyp.typeI.typeF.H) :=
     hyp.typeI.typeF.H_eq ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent L
-  haveI : Nontrivial ↥((hyp.typeI.typeF.H).subgroupOf L) := e.toEquiv.nontrivial
-  haveI : IsSolvable ↥((hyp.typeI.typeF.H).subgroupOf L) :=
-    solvable_of_solvable_injective (f := e.toMonoidHom) e.injective
+  have : Nontrivial ↥((hyp.typeI.typeF.H).subgroupOf L) := e.toEquiv.nontrivial
+  have : Group.IsSolvable ↥((hyp.typeI.typeF.H).subgroupOf L) :=
+    Group.isSolvable_of_isSolvable_injective (f := e.toMonoidHom) e.injective
   have hcomm : commutator ↥((hyp.typeI.typeF.H).subgroupOf L) ≠ ⊤ :=
-    (IsSolvable.commutator_lt_top_of_nontrivial _).ne
+    (Group.IsSolvable.commutator_lt_top_of_nontrivial _).ne
   obtain ⟨θ, hθ_ne, hθ_deg⟩ :=
     OddOrder.Peterfalvi.S08.exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top
       hcomm
@@ -109,7 +109,7 @@ theorem exists_witness_placed_family {L : Subgroup G} [Finite G] (hyp : Hypothes
         ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (φ : ClassFunction _ ℂ) ∈
           Set.range (fun i => ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
             (θ i : ClassFunction _ ℂ)) := by
-  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+  have hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
     rw [hyp.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
   obtain ⟨χ, hχ, hdeg⟩ := exists_distinguished_char hyp
@@ -135,7 +135,7 @@ theorem three_le_index {L : Subgroup G} [Finite G] (hG : OddOrder.BG.IsMinimalSi
     rw [hyp.typeI.typeF.complement.symm.index_eq_card,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUle).toEquiv]
   -- `|U| > 1` (nontrivial) and `|U|` odd (divides `|G|` odd), so `|U| ≥ 3`.
-  haveI : Nontrivial ↥(hyp.typeI.typeF.U) :=
+  have : Nontrivial ↥(hyp.typeI.typeF.U) :=
     (Subgroup.nontrivial_iff_ne_bot _).mpr hyp.typeI.typeF.U_nontrivial
   have hgt1 : 1 < ((hyp.typeI.typeF.H).subgroupOf L).index := by
     rw [hidx_eq]; exact Finite.one_lt_card
@@ -243,7 +243,7 @@ theorem psi_constant_on_xK [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hxK : witness.x ∉ hypM.H := by
     rw [hHK]
     intro hxmem
-    haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+    have : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
     have hord : orderOf witness.x = ctr.p :=
       orderOf_eq_prime witness.x_mem_omega1 witness.x_ne_one
     -- `p = orderOf x ∣ |K|`.
@@ -414,7 +414,7 @@ theorem witness_L_not_conj_M [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
     ¬ ∃ g : G, MulAut.conj g • data.L = ctr.M := by
   rintro ⟨g, hg⟩
-  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  have : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
   -- `p ∣ |P₀| ∣ |L_σ|`.
   have hLtypeI : IsTypeI data.L := witness_L_isTypeI hG hnoV data
   have hLF_eq : maxNilpotentNormalHall data.L = OddOrder.BG.Ch3.S10.Msigma data.L :=
@@ -422,7 +422,7 @@ theorem witness_L_not_conj_M [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (Or.inl hLtypeI)
   have hP0le : ctr.P0 ≤ OddOrder.BG.Ch3.S10.Msigma data.L :=
     hLF_eq ▸ witness_P0_le_kernel hG hnoV data
-  haveI : Nontrivial ↥ctr.P0 := by
+  have : Nontrivial ↥ctr.P0 := by
     by_contra h
     rw [not_nontrivial_iff_subsingleton] at h
     exact ctr.P0_noncyclic isCyclic_of_subsingleton
@@ -466,7 +466,7 @@ theorem witness_p_sq_le_card_kernel [Finite G] (hG : OddOrder.BG.IsMinimalSimple
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
     (hyp : Hypothesis data.L) :
     ctr.p ^ 2 ≤ Nat.card ↥(hyp.typeI.typeF.H) := by
-  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  have : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
   obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp ctr.P0_pGroup
   -- Noncyclic forces `n ≥ 2` (order `1` and order `p` groups are cyclic).
   have hn2 : 2 ≤ n := by
@@ -474,7 +474,7 @@ theorem witness_p_sq_le_card_kernel [Finite G] (hG : OddOrder.BG.IsMinimalSimple
     push Not at h
     interval_cases n
     · rw [pow_zero] at hn
-      haveI : Subsingleton ↥ctr.P0 := Nat.card_eq_one_iff_unique.mp hn |>.1
+      have : Subsingleton ↥ctr.P0 := Nat.card_eq_one_iff_unique.mp hn |>.1
       exact ctr.P0_noncyclic isCyclic_of_subsingleton
     · rw [pow_one] at hn
       exact ctr.P0_noncyclic (isCyclic_of_prime_card hn)
@@ -526,7 +526,7 @@ theorem witness_L_hzeta0nu [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           (θ0 : ClassFunction _ ℂ))) (Hypothesis71.constOne G) = 0 := by
   classical
   have hodd : Odd (Nat.card ↥L) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card L)
-  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+  have hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
     rw [hyp.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
   -- The complex conjugate character `θ̄_0` is again nontrivial irreducible.  Introduce it
@@ -648,10 +648,10 @@ theorem witness_dade_psi_apply_x_eq_chi [Finite G] (hG : OddOrder.BG.IsMinimalSi
     · exact frobenius_typeI_coherent_of_abelianKernel hG hyp ⟨C, hC⟩ hab
     · exact frobenius_typeI_coherent_of_cyclicQuotient hG hyp ⟨C, hC⟩ hexp
   have hHL : hyp.typeI.typeF.H ≤ data.L := hyp.typeI.typeF.H_le
-  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf data.L).Normal := by
+  have hKnormal : ((hyp.typeI.typeF.H).subgroupOf data.L).Normal := by
     rw [hyp.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal data.L
-  haveI : (hyp.H.subgroupOf data.L).Normal := hKnormal
+  have : (hyp.H.subgroupOf data.L).Normal := hKnormal
   have hAH : typeIA data.L hyp.typeI = (hyp.typeI.typeF.H : Set G) \ {1} :=
     witness_typeIA_eq_sharp hG hnoV data hyp
   have hHnorm : ∀ (l : ↥data.L) {h : G}, h ∈ hyp.typeI.typeF.H →
@@ -867,11 +867,11 @@ theorem rhoM_integer_values [Finite G]
   intro g hgK hgK'
   -- `K′ = [K, K] ≤ K`.
   have hK'K : ctr.Kprime ≤ ctr.K := ctr.Kprime_eq ▸ Subgroup.map_subtype_le _
-  haveI : Fintype ↥ctr.K := Fintype.ofFinite _
-  haveI : Fintype ↥ctr.Kprime := Fintype.ofFinite _
-  haveI : Invertible (Nat.card ↥ctr.K : ℂ) :=
+  have : Fintype ↥ctr.K := Fintype.ofFinite _
+  have : Fintype ↥ctr.Kprime := Fintype.ofFinite _
+  have : Invertible (Nat.card ↥ctr.K : ℂ) :=
     invertibleOfNonzero (by exact_mod_cast (Nat.card_pos (α := ↥ctr.K)).ne')
-  haveI : Invertible (Nat.card ↥ctr.Kprime : ℂ) :=
+  have : Invertible (Nat.card ↥ctr.Kprime : ℂ) :=
     invertibleOfNonzero (by exact_mod_cast (Nat.card_pos (α := ↥ctr.Kprime)).ne')
   -- The restrictions are virtual characters; `1` is a virtual character.
   have hResK : ClassFunction.restrict ctr.K ψ ∈ ZIrr ↥ctr.K :=
@@ -1155,7 +1155,7 @@ theorem witness_L_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   obtain ⟨hyp, ⟨coh⟩⟩ := witness_L_coherent hG hnoV data
   refine ⟨hyp, ?_⟩
   have hHL : hyp.typeI.typeF.H ≤ data.L := hyp.typeI.typeF.H_le
-  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf data.L).Normal := by
+  have hKnormal : ((hyp.typeI.typeF.H).subgroupOf data.L).Normal := by
     rw [hyp.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal data.L
   -- (12.1): the type-I support `A(L)` is `H#`.
@@ -1246,7 +1246,7 @@ theorem frobenius_two_mul_card_complement_add_one_le_card_kernel {Γ : Type*} [G
     {N A : Subgroup Γ} (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup Γ N A)
     (hNodd : Odd (Nat.card ↥N)) (hAodd : Odd (Nat.card ↥A)) (hNnt : N ≠ ⊥) :
     2 * Nat.card ↥A + 1 ≤ Nat.card ↥N := by
-  haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNnt
+  have : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNnt
   have hN1 : 1 < Nat.card ↥N := Finite.one_lt_card
   -- `|A| ∣ |N| - 1` from `|N| ≡ 1 [MOD |A|]` (Isaacs 6.1).
   obtain ⟨m, hm⟩ : Nat.card ↥A ∣ Nat.card ↥N - 1 :=
@@ -1294,11 +1294,11 @@ theorem witness_L_zeta_bound [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     · exact frobenius_typeI_coherent_of_abelianKernel hG hyp ⟨C, hC⟩ hab
     · exact frobenius_typeI_coherent_of_cyclicQuotient hG hyp ⟨C, hC⟩ hexp
   have hHL : hyp.typeI.typeF.H ≤ data.L := hyp.typeI.typeF.H_le
-  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf data.L).Normal := by
+  have hKnormal : ((hyp.typeI.typeF.H).subgroupOf data.L).Normal := by
     rw [hyp.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal data.L
   -- `hC`'s kernel is written with the `hyp.H` accessor; register the normality in that form too.
-  haveI : (hyp.H.subgroupOf data.L).Normal := hKnormal
+  have : (hyp.H.subgroupOf data.L).Normal := hKnormal
   have hAH : typeIA data.L hyp.typeI = (hyp.typeI.typeF.H : Set G) \ {1} :=
     witness_typeIA_eq_sharp hG hnoV data hyp
   have hHnorm : ∀ (l : ↥data.L) {h : G}, h ∈ hyp.typeI.typeF.H →
@@ -1402,9 +1402,9 @@ theorem witness_L_zeta_bound [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hKcard : Nat.card ↥((hyp.typeI.typeF.H).subgroupOf data.L) = Nat.card hyp.typeI.typeF.H :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHL).toEquiv
   have hKnt : ((hyp.typeI.typeF.H).subgroupOf data.L) ≠ ⊥ := by
-    haveI : Nontrivial ↥hyp.typeI.typeF.H :=
+    have : Nontrivial ↥hyp.typeI.typeF.H :=
       (Subgroup.nontrivial_iff_ne_bot _).mpr hyp.typeI.typeF.H_nontrivial
-    haveI : Nontrivial ↥((hyp.typeI.typeF.H).subgroupOf data.L) :=
+    have : Nontrivial ↥((hyp.typeI.typeF.H).subgroupOf data.L) :=
       (Subgroup.subgroupOfEquivOfLe hHL).toEquiv.nontrivial
     exact (Subgroup.nontrivial_iff_ne_bot _).mp inferInstance
   have hcompl : Nat.card ↥((hyp.typeI.typeF.H).subgroupOf data.L) * Nat.card ↥C

@@ -134,8 +134,8 @@ quotient map and the isomorphism `hcQuotientEquivHbar`.  Used to make `θ ↦ hc
 theorem hcHom_surjective [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
     Function.Surjective (hcHom chief) := by
-  haveI := realizedH0supC_normal_huSub chief
-  haveI : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+  have := realizedH0supC_normal_huSub chief
+  have : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
       (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))).Normal :=
     (realizedH0supC_normal_huSub chief).subgroupOf _
   intro y
@@ -165,8 +165,8 @@ theorem hcHom_eq_one_of_mem_realizedH0supC [Finite G] {M : Subgroup G}
     (hx : x ∈ (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
       (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))) :
     hcHom chief x = 1 := by
-  haveI hN := realizedH0supC_normal_huSub chief
-  haveI : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+  have hN := realizedH0supC_normal_huSub chief
+  have : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
       (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))).Normal :=
     hN.subgroupOf _
   simp only [hcHom, MonoidHom.comp_apply, QuotientGroup.mk'_apply]
@@ -189,11 +189,11 @@ theorem hcHom_inclusion [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) (h : ↥(hInHu data)) :
     hcHom chief (Subgroup.inclusion le_sup_left h)
       = QuotientGroup.mk' chief.N (hInHuEquivH data h) := by
-  haveI hN := realizedH0supC_normal_huSub chief
-  haveI hNsub := hN.subgroupOf
+  have hN := realizedH0supC_normal_huSub chief
+  have hNsub := hN.subgroupOf
     (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
-  haveI := chief.N_normal
-  haveI hNh : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+  have := chief.N_normal
+  have hNh : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
       (hInHu data)).Normal := hN.subgroupOf (hInHu data)
   have hfwd : (QuotientGroup.quotientInfEquivProdNormalQuotient (hInHu data)
         (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)))
@@ -250,7 +250,7 @@ theorem hcPsi_inertia_le [Finite G] {M : Subgroup G}
       ≤ ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
           (ClassFunction.compHom (QuotientGroup.mk' chief.N)
             (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ))) := by
-  haveI := hInHu_normal data
+  have := hInHu_normal data
   intro g hg
   rw [ClassFunction.mem_inertia] at hg ⊢
   ext h
@@ -389,7 +389,7 @@ theorem hcLambdaHom_eq_one_of_mem_hInHu {M : Subgroup G}
     (hx : x ∈ (hInHu data).subgroupOf
       (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))) :
     hcLambdaHom chief lam x = 1 := by
-  letI : ((hInHu data).subgroupOf (cInHu data chief ⊔ hInHu data)).Normal :=
+  let : ((hInHu data).subgroupOf (cInHu data chief ⊔ hInHu data)).Normal :=
     (hInHu_normal data).subgroupOf _
   simp only [hcLambdaHom, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom,
     QuotientGroup.mk'_apply]
@@ -405,7 +405,7 @@ theorem hcLambdaHom_inclusion {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
     (lam : ↥(cInHu data chief) →* ℂˣ) (c : ↥(cInHu data chief)) :
     hcLambdaHom chief lam (Subgroup.inclusion (cInHu_le_hcRealized chief) c) = lam c := by
-  letI : ((hInHu data).subgroupOf (cInHu data chief ⊔ hInHu data)).Normal :=
+  let : ((hInHu data).subgroupOf (cInHu data chief ⊔ hInHu data)).Normal :=
     (hInHu_normal data).subgroupOf _
   have hfwd : (QuotientGroup.quotientInfEquivProdNormalQuotient (cInHu data chief)
         (hInHu data))
@@ -479,7 +479,7 @@ theorem hcPsiPair_inertia_le [Finite G] {M : Subgroup G}
       ≤ ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
           (ClassFunction.compHom (QuotientGroup.mk' chief.N)
             (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ))) := by
-  haveI := hInHu_normal data
+  have := hInHu_normal data
   intro g hg
   rw [ClassFunction.mem_inertia] at hg ⊢
   ext h
@@ -565,7 +565,7 @@ theorem hcPairHom_eq_one_of_mem_realizedH0supCprime [Finite G] {M : Subgroup G}
       ∈ ((chief.H0 ⊔ cprimeSub data chief).subgroupOf M).subgroupOf (huSub data) :=
     Subgroup.mem_subgroupOf.mp hx
   rw [realizedH0supCprime_eq_realizedH0_sup_cprimeInHu] at hval
-  haveI hH0n : ((chief.H0.subgroupOf M).subgroupOf (huSub data)).Normal :=
+  have hH0n : ((chief.H0.subgroupOf M).subgroupOf (huSub data)).Normal :=
     ((Subgroup.normal_subgroupOf_iff_le_normalizer
         (chief.H0_lt_H.le.trans (H_le_M data))).mpr
       chief.H0_normalized_by_M).subgroupOf (huSub data)
@@ -643,10 +643,10 @@ theorem hcZetaPair_H0supCprime_subset_ker [Finite G] {M : Subgroup G}
       OddOrder.Peterfalvi.S03.characterKernel (ClassFunction.induce
         (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
         (hcPsiPair chief θ lam)) := by
-  haveI : Fintype
+  have : Fintype
       ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) :=
     Fintype.ofFinite _
-  haveI := realizedH0supCprime_normal_huSub chief
+  have := realizedH0supCprime_normal_huSub chief
   exact OddOrder.Peterfalvi.S03.subsetCharacterKernel_induce_of_subgroupOf
     (A := ((chief.H0 ⊔ cprimeSub data chief).subgroupOf M).subgroupOf (huSub data))
     (H := hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
@@ -677,7 +677,7 @@ theorem hcZetaPair_mem_xiSet [Finite G] {M : Subgroup G}
         (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
         (hcPsiPair chief θ lam), hcZetaPair_irreducible chief θ lam hθ₀⟩ :
         IrreducibleCharacter ↥(huSub data)) ∈ xiSet data := by
-  haveI : Fintype
+  have : Fintype
       ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) :=
     Fintype.ofFinite _
   classical
@@ -694,7 +694,7 @@ theorem hcZetaPair_mem_xiSet [Finite G] {M : Subgroup G}
         (hcPsiPair chief θ lam) := by rw [hζdef]
     rw [← hcoe, OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite ζ ζ, if_pos rfl]
     exact one_ne_zero
-  rw [xiSet, Set.mem_setOf_eq]
+  rw [xiSet, Set.mem_ofPred_eq]
   intro hsub
   apply hθnt
   have hfsurj : Function.Surjective
@@ -749,7 +749,7 @@ theorem hcZetaPair_mem_xiOf [Finite G] {M : Subgroup G}
         (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
         (hcPsiPair chief θ lam), hcZetaPair_irreducible chief θ lam hθ₀⟩ :
         IrreducibleCharacter ↥(huSub data)) ∈ xiOf data (chief.H0 ⊔ cprimeSub data chief) := by
-  haveI : Fintype
+  have : Fintype
       ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) :=
     Fintype.ofFinite _
   rw [mem_xiOf]
@@ -783,6 +783,7 @@ theorem hcuSeedHom_eq_one_of_mem_realizedH0 [Finite G] {M : Subgroup G}
   rw [hcuSeedHom, MonoidHom.comp_apply, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom,
     QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff _).mpr hN, map_one]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **`hcuThetaHom` kills the complement `C_U(S₀)`**: on the inclusion of `c ∈ cuInHu` into
 `H·C_U(S₀)`, the `θ₀`-extension returns `1` (its complement-part hom in the `SemidirectProduct.lift`
 is `1`).  Via `SemidirectProduct.lift_inr` after `(mulEquivSubgroup).symm (inclusion c) = inr c`. -/
@@ -798,8 +799,8 @@ theorem hcuThetaHom_inclusion_cuInHu [Finite G] {M : Subgroup G}
     (c : ↥(cuInHu caseA)) :
     hcuThetaHom caseA θ hinv (Subgroup.inclusion
         (le_sup_right : cuInHu caseA ≤ hInHu data ⊔ cuInHu caseA) c) = 1 := by
-  haveI := hInHu_normal data
-  haveI : ((hInHu data).subgroupOf (hInHu data ⊔ cuInHu caseA)).Normal :=
+  have := hInHu_normal data
+  have : ((hInHu data).subgroupOf (hInHu data ⊔ cuInHu caseA)).Normal :=
     (hInHu_normal data).subgroupOf _
   have hsymm : (SemidirectProduct.mulEquivSubgroup
       (hInHu_isComplement'_cuInHu_in_hcuInHu caseA)).symm
@@ -852,12 +853,12 @@ theorem hcuPairHom_eq_one_of_mem_realizedH0supUprime [Finite G] {M : Subgroup G}
     (hx : x ∈ (((chief.H0 ⊔ uprimeSub data).subgroupOf M).subgroupOf (huSub data)).subgroupOf
       (hInHu data ⊔ cuInHu caseA)) :
     hcuPairHom caseA θ hinv lam x = 1 := by
-  haveI := hInHu_normal data
+  have := hInHu_normal data
   have hval : (x : ↥(huSub data))
       ∈ ((chief.H0 ⊔ uprimeSub data).subgroupOf M).subgroupOf (huSub data) :=
     Subgroup.mem_subgroupOf.mp hx
   rw [realizedH0supUprime_eq_realizedH0_sup_uprimeInHu] at hval
-  haveI hH0n : ((chief.H0.subgroupOf M).subgroupOf (huSub data)).Normal :=
+  have hH0n : ((chief.H0.subgroupOf M).subgroupOf (huSub data)).Normal :=
     ((Subgroup.normal_subgroupOf_iff_le_normalizer
         (chief.H0_lt_H.le.trans (H_le_M data))).mpr
       chief.H0_normalized_by_M).subgroupOf (huSub data)
@@ -948,8 +949,8 @@ theorem hcuZetaPair_H0supUprime_subset_ker [Finite G] {M : Subgroup G}
         Set ↥(huSub data))) ⊆
       OddOrder.Peterfalvi.S03.characterKernel (ClassFunction.induce
         (hInHu data ⊔ cuInHu caseA) (hcuPsiPair caseA θ hinv lam)) := by
-  haveI : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
-  haveI := realizedH0supUprime_normal_huSub chief
+  have : Fintype ↥(hInHu data ⊔ cuInHu caseA) := Fintype.ofFinite _
+  have := realizedH0supUprime_normal_huSub chief
   exact OddOrder.Peterfalvi.S03.subsetCharacterKernel_induce_of_subgroupOf
     (A := ((chief.H0 ⊔ uprimeSub data).subgroupOf M).subgroupOf (huSub data))
     (H := hInHu data ⊔ cuInHu caseA)

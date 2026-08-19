@@ -612,7 +612,7 @@ theorem classSumCoeff_normOneClassAt_self_two_mul_eq_normOneUnits_card_mul_normS
 /-- In the odd-characteristic finite fields used by Appendix C, `2` is nonzero. -/
 lemma two_ne_zero_galoisField [Fact p.Prime] (hpodd : Odd p) :
     (2 : GaloisField p q) ≠ 0 := by
-  haveI : CharP (GaloisField p q) p := by
+  have : CharP (GaloisField p q) p := by
     rw [← Algebra.charP_iff (ZMod p) (GaloisField p q) p]
     exact ZMod.charP p
   intro hzero
@@ -647,7 +647,7 @@ theorem normOneFrobenius_classSumCoeff_one_mul_pow_eq_character_sum
           (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
             (normOneClassAt p q (2 : GaloisField p q)).out⁻¹ := by
   classical
-  letI : Fintype (ConjClasses (normOneFrobeniusGroup p q)) := Fintype.ofFinite _
+  let : Fintype (ConjClasses (normOneFrobeniusGroup p q)) := Fintype.ofFinite _
   have hcard1 :
       Nat.card { x : normOneFrobeniusGroup p q //
           ConjClasses.mk x = normOneClassAt p q (1 : GaloisField p q) } =
@@ -809,7 +809,7 @@ theorem normOneFrobenius_nonKernelCharacter_apply_one_eq_normOneUnits_card
         (1 : normOneFrobeniusGroup p q) =
       (Nat.card (normOneUnits p q) : ℂ) := by
   let K : Subgroup (normOneFrobeniusGroup p q) := normOneFrobeniusKernel p q
-  haveI : K.Normal := normOneFrobeniusKernel_normal p q
+  have : K.Normal := normOneFrobeniusKernel_normal p q
   obtain ⟨θ, hθinner⟩ := OddOrder.Peterfalvi.S03.exists_inner_induce_ne_zero
     (H := K) χ
   have hθ_ne : θ ≠ trivialIrreducibleCharacter K := by
@@ -934,6 +934,7 @@ theorem normOneFrobenius_classSumCoeff_one_mul_pow_eq_kernelContribution_add_non
 
 
 open scoped Classical in
+set_option backward.isDefEq.respectTransparency false in
 /-- Real norm-square form of the non-kernel column-orthogonality contribution at
 an additive-kernel element.  This is the form used for the Cauchy estimate in
 BG Lemma C.2. -/

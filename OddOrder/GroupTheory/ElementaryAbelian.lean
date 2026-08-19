@@ -91,7 +91,7 @@ theorem of_card_prime_sq_of_not_isCyclic
     [Finite G] (hp : p.Prime) (hCard : Nat.card G = p ^ 2)
     (hNotCyclic : ¬ IsCyclic G) :
     IsElementaryAbelian p G := by
-  letI : Fact p.Prime := ⟨hp⟩
+  let : Fact p.Prime := ⟨hp⟩
   have hExp : Monoid.exponent G = p :=
     (not_isCyclic_iff_exponent_eq_prime hp hCard).mp hNotCyclic
   refine ⟨isMulCommutative_iff.mp
@@ -105,7 +105,7 @@ theorem not_isCyclic_of_card_prime_sq
     (hCard : Nat.card G = p ^ 2) :
     ¬ IsCyclic G := by
   intro hcyc
-  haveI : IsCyclic G := hcyc
+  have : IsCyclic G := hcyc
   have hExp_eq : Monoid.exponent G = Nat.card G := IsCyclic.exponent_eq_card
   have hExp_dvd_p : Monoid.exponent G ∣ p := by
     rw [Monoid.exponent_dvd_iff_forall_pow_eq_one]
@@ -124,12 +124,12 @@ theorem exists_distinct_subgroups_card_prime_of_card_prime_sq
     [Finite G] (hp : p.Prime) (h : IsElementaryAbelian p G)
     (hCard : Nat.card G = p ^ 2) :
     ∃ H K : Subgroup G, Nat.card H = p ∧ Nat.card K = p ∧ H ≠ K := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hNotCyclic : ¬ IsCyclic G := h.not_isCyclic_of_card_prime_sq hp hCard
   have hCard_gt_one : 1 < Nat.card G := by
     rw [hCard]
     exact one_lt_pow₀ hp.one_lt two_ne_zero
-  haveI : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp hCard_gt_one
+  have : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp hCard_gt_one
   obtain ⟨x, hx_ne⟩ := exists_ne (1 : G)
   let H : Subgroup G := Subgroup.zpowers x
   have hx_order : orderOf x = p := orderOf_eq_prime (h.pow_eq_one x) hx_ne
@@ -203,12 +203,12 @@ private theorem isCyclic_pi_of_subsingleton
   by_cases hι : Nonempty ι
   · classical
     rcases hι with ⟨i⟩
-    haveI : Unique ι := uniqueOfSubsingleton i
+    have : Unique ι := uniqueOfSubsingleton i
     let e : (∀ i, M i) ≃* M default :=
       { toEquiv := Equiv.piUnique M
         map_mul' := fun _ _ => rfl }
     exact e.isCyclic.mpr inferInstance
-  · haveI : IsEmpty ι := ⟨fun i => hι ⟨i⟩⟩
+  · have : IsEmpty ι := ⟨fun i => hι ⟨i⟩⟩
     exact isCyclic_of_subsingleton
 
 /-- A finite commutative `p`-group with at most one subgroup of order `p` is cyclic.
@@ -233,7 +233,7 @@ theorem isCyclic_of_subgroups_card_prime_unique
     exact horder.symm.trans hk
   have hι_sub : Subsingleton ι := by
     by_contra hnot
-    haveI : Nontrivial ι := not_subsingleton_iff_nontrivial.mp hnot
+    have : Nontrivial ι := not_subsingleton_iff_nontrivial.mp hnot
     obtain ⟨i, j, hij⟩ := exists_pair_ne ι
     obtain ⟨ki, hki⟩ := hn_pow i
     obtain ⟨kj, hkj⟩ := hn_pow j
@@ -305,7 +305,7 @@ theorem isCyclic_of_subgroups_card_prime_unique
       _ = (xj ^ m) i := hcoord
       _ = 1 := hpow_i
   have htarget : IsCyclic T := by
-    haveI : Subsingleton ι := hι_sub
+    have : Subsingleton ι := hι_sub
     exact isCyclic_pi_of_subsingleton
   exact e.isCyclic.mpr htarget
 
@@ -385,7 +385,7 @@ private theorem subgroup_normal_of_le_center {H : Subgroup G} (hH : H ≤ Subgro
 theorem exists_subgroup_le_center_card_prime
     [Finite G] [Fact p.Prime] (hG : IsPGroup p G) [Nontrivial G] :
     ∃ Z : Subgroup G, Z ≤ Subgroup.center G ∧ Nat.card Z = p := by
-  haveI hCenter_nontrivial : Nontrivial (Subgroup.center G) := hG.center_nontrivial
+  have hCenter_nontrivial : Nontrivial (Subgroup.center G) := hG.center_nontrivial
   have hCenter_card_gt : 1 < Nat.card (Subgroup.center G) :=
     Finite.one_lt_card_iff_nontrivial.mpr hCenter_nontrivial
   have hCenter_pgroup : IsPGroup p (Subgroup.center G) := hG.to_subgroup _
@@ -416,12 +416,12 @@ theorem exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_ne
     (hKL_ne : K ≠ L) :
     ∃ E : Subgroup G, OddOrder.GroupTheory.IsElementaryAbelian p E ∧ Nat.card E = p ^ 2 := by
   classical
-  haveI : Nontrivial K := by
+  have : Nontrivial K := by
     apply Finite.one_lt_card_iff_nontrivial.mp
     rw [hK_card]
     exact (Fact.out : p.Prime).one_lt
   obtain ⟨k, hk_ne⟩ := exists_ne (1 : K)
-  haveI : Nontrivial G := ⟨⟨(k : G), 1, fun hk => hk_ne (Subtype.ext hk)⟩⟩
+  have : Nontrivial G := ⟨⟨(k : G), 1, fun hk => hk_ne (Subtype.ext hk)⟩⟩
   obtain ⟨Z, hZ_le_center, hZ_card⟩ := hG.exists_subgroup_le_center_card_prime
   let U : Subgroup G := if Z = K then L else K
   have hU_card : Nat.card U = p := by
@@ -444,7 +444,7 @@ theorem exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_ne
       have hInf_eq_U : Z ⊓ U = U :=
         Subgroup.eq_of_le_of_card_ge inf_le_right (by rw [hInf_card, hU_card])
       exact hZU_ne (hInf_eq_Z.symm.trans hInf_eq_U)
-  haveI hZ_normal : Z.Normal := subgroup_normal_of_le_center hZ_le_center
+  have hZ_normal : Z.Normal := subgroup_normal_of_le_center hZ_le_center
   let E : Subgroup G := Z ⊔ U
   have hE_card : Nat.card E = p ^ 2 := by
     have hcard := Subgroup.card_HK_mul_card_inf_eq_card_mul_card Z U
@@ -466,8 +466,8 @@ theorem exists_isElementaryAbelian_card_prime_sq_of_subgroups_card_prime_ne
     intro z hz g
     exact (Subgroup.mem_center_iff.mp (hZ_le_center hz) g).symm
   have hU_comm : ∀ u₁ ∈ U, ∀ u₂ ∈ U, u₁ * u₂ = u₂ * u₁ := by
-    haveI : IsCyclic U := isCyclic_of_prime_card hU_card
-    letI : CommGroup U := IsCyclic.commGroup
+    have : IsCyclic U := isCyclic_of_prime_card hU_card
+    let : CommGroup U := IsCyclic.commGroup
     intro u₁ hu₁ u₂ hu₂
     have hcomm : (⟨u₁, hu₁⟩ : U) * ⟨u₂, hu₂⟩ = ⟨u₂, hu₂⟩ * ⟨u₁, hu₁⟩ :=
       mul_comm _ _
@@ -566,8 +566,8 @@ theorem IsElementaryAbelian.of_card_prime {p : ℕ} [Fact p.Prime] {H : Subgroup
     H.IsElementaryAbelian p := by
   have hHcyc : IsCyclic H := isCyclic_of_prime_card hH
   constructor
-  · haveI : IsCyclic H := hHcyc
-    letI : CommGroup H := IsCyclic.commGroup
+  · have : IsCyclic H := hHcyc
+    let : CommGroup H := IsCyclic.commGroup
     intro x y
     exact mul_comm x y
   · intro x
@@ -603,7 +603,7 @@ theorem IsElementaryAbelian.sup_of_le_centralizer {p : ℕ} {H K : Subgroup G}
     have hy : (y : G) ∈ Subgroup.closure S := by
       rw [← hsup_closure]
       exact y.2
-    letI : IsMulCommutative (Subgroup.closure S) := hclosure_comm
+    let : IsMulCommutative (Subgroup.closure S) := hclosure_comm
     apply Subtype.ext
     change (x : G) * (y : G) = (y : G) * (x : G)
     simpa using congrArg (fun z : Subgroup.closure S => (z : G))
@@ -621,7 +621,7 @@ theorem IsElementaryAbelian.sup_of_le_centralizer {p : ℕ} {H K : Subgroup G}
       · exact congrArg Subtype.val (hK.pow_eq_one ⟨g, hgK⟩)
     · simp
     · intro a b ha hb hap hbp
-      letI : IsMulCommutative (Subgroup.closure S) := hclosure_comm
+      let : IsMulCommutative (Subgroup.closure S) := hclosure_comm
       have hab_eq : a * b = b * a := by
         exact congrArg Subtype.val
           (mul_comm (⟨a, ha⟩ : Subgroup.closure S) ⟨b, hb⟩)
@@ -660,7 +660,7 @@ theorem exists_distinct_subgroups_card_prime_of_exists_isElementaryAbelian_card_
     (hExists : ∃ H : Subgroup G, H.IsElementaryAbelian p ∧ Nat.card H = p ^ 2) :
     ∃ K L : Subgroup G, Nat.card K = p ∧ Nat.card L = p ∧ K ≠ L := by
   obtain ⟨H, hH_elem, hH_card⟩ := hExists
-  haveI : Finite H := Nat.finite_of_card_ne_zero (by
+  have : Finite H := Nat.finite_of_card_ne_zero (by
     rw [hH_card]
     exact pow_ne_zero 2 hp.ne_zero)
   obtain ⟨K, L, _hK_le, _hL_le, hK_card, hL_card, hKL_ne⟩ :=

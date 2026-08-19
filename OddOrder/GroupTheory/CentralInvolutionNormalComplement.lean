@@ -50,7 +50,7 @@ theorem eq_or_eq_or_eq_or_eq_of_card_four {P : Subgroup H} (hcard : Nat.card ↥
     (hav : a ≠ v) {u : H} (hu : u ∈ P) :
     u = 1 ∨ u = v ∨ u = a ∨ u = v * a := by
   classical
-  haveI : Fintype ↥P := Fintype.ofFinite _
+  have : Fintype ↥P := Fintype.ofFinite _
   have h4 : Fintype.card ↥P = 4 := by rw [← Nat.card_eq_fintype_card, hcard]
   have hvinv : v⁻¹ = v := inv_eq_of_mul_eq_one_left hv2
   -- the four listed elements are distinct
@@ -97,8 +97,8 @@ theorem normalizer_le_centralizer_of_card_four_of_central_involution
     Subgroup.normalizer ((V : Subgroup H) : Set H)
       ≤ Subgroup.centralizer ((V : Subgroup H) : Set H) := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI : Fintype ↥(V : Subgroup H) := Fintype.ofFinite _
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fintype ↥(V : Subgroup H) := Fintype.ofFinite _
   -- an element of `V` outside `{1, v}`
   obtain ⟨a, haV, ha1, hav⟩ : ∃ a ∈ (V : Subgroup H), a ≠ 1 ∧ a ≠ v := by
     by_contra hc
@@ -205,7 +205,7 @@ theorem normalizer_le_centralizer_of_card_four_of_central_involution
       rw [hback, hstep]
       exact hu
   set D : Subgroup ↥NN := CC.subgroupOf NN with hD
-  haveI hDnorm : D.Normal := by
+  have hDnorm : D.Normal := by
     constructor
     intro d hd n
     rw [hD, Subgroup.mem_subgroupOf] at hd ⊢
@@ -236,7 +236,7 @@ theorem normalizer_le_centralizer_of_card_four_of_central_involution
   -- an element of odd order squaring to `1` is trivial
   intro n hn
   have hnD : (⟨n, hn⟩ : ↥NN) ∈ D := by
-    haveI : Finite ↥NN := Subtype.finite
+    have : Finite ↥NN := Subtype.finite
     set q : ↥NN ⧸ D := QuotientGroup.mk ⟨n, hn⟩ with hq
     have hq2 : q ^ 2 = 1 := by
       rw [hq, ← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff, hD, Subgroup.mem_subgroupOf]
@@ -265,7 +265,7 @@ theorem hasNormalPComplement_of_card_four_of_central_involution
     {v : H} (hvV : v ∈ (V : Subgroup H)) (hv1 : v ≠ 1) (hv2 : v * v = 1)
     (hvZ : ∀ h : H, h * v = v * h) :
     HasNormalPComplement 2 H := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   exact hasNormalPComplement_of_sylow_normalizer_le_centralizer V
     (normalizer_le_centralizer_of_card_four_of_central_involution V hcard hvV hv1 hv2 hvZ)
 
@@ -281,7 +281,7 @@ theorem card_sylow_centralizer_of_card_sylow_four {Q : Type*} [Group Q] [Finite 
     (V : Sylow 2 ↥(Subgroup.centralizer ({y} : Set Q))) :
     Nat.card ↥(V : Subgroup ↥(Subgroup.centralizer ({y} : Set Q))) = 4 := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hord : orderOf y = 2 := orderOf_eq_prime (by rw [pow_two]; exact hy2) hy1
   have hyp : IsPGroup 2 ↥(Subgroup.zpowers y) :=
     IsPGroup.of_card (by rw [Nat.card_zpowers, hord, pow_one])
@@ -317,7 +317,7 @@ theorem hasNormalPComplement_centralizer_of_card_sylow_four {Q : Type*} [Group Q
     {y : Q} (hy1 : y ≠ 1) (hy2 : y * y = 1) :
     HasNormalPComplement 2 ↥(Subgroup.centralizer ({y} : Set Q)) := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hyC : y ∈ Subgroup.centralizer ({y} : Set Q) :=
     Subgroup.mem_centralizer_iff.mpr fun w hw => by
       rw [Set.mem_singleton_iff] at hw; subst hw; rfl

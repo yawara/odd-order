@@ -74,7 +74,7 @@ private theorem frobeniusCoordinateShift_injective (s : Nat) :
       (fun i : Fin (Module.finrank (ZMod 2) K) =>
         frobeniusCoordinateShift (K := K) i s) := by
   let m := Module.finrank (ZMod 2) K
-  letI : NeZero m := ⟨Module.finrank_pos.ne'⟩
+  let : NeZero m := ⟨Module.finrank_pos.ne'⟩
   let sFin : Fin m := ⟨s % m, Nat.mod_lt _ Module.finrank_pos⟩
   have hshift (i : Fin m) :
       frobeniusCoordinateShift (K := K) i s = i + sFin := by
@@ -334,24 +334,24 @@ theorem exists_restrictedFactorTypeCSquareEigenCommutator
   dsimp only
   let hSquareEA :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : CommGroup (frattiniSquare P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : CommGroup (frattiniSquare P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
-  letI : IsMulCommutative (frattini S) :=
+  let : IsMulCommutative (frattini S) :=
     IsMulCommutative.of_comm hEAS.comm
-  letI : CommGroup (frattini S) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini S)) := hEAS.zmodModule
-  letI : IsMulCommutative (lowerCentralLayer P 0) :=
+  let : CommGroup (frattini S) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini S)) := hEAS.zmodModule
+  let : IsMulCommutative (lowerCentralLayer P 0) :=
     lowerCentralLayerIsMulCommutative P 0
-  letI : CommGroup (lowerCentralLayer P 0) :=
+  let : CommGroup (lowerCentralLayer P 0) :=
     { (inferInstance : Group (lowerCentralLayer P 0)) with
       mul_comm := (lowerCentralLayer_isElementaryAbelian P 0).comm }
-  letI : Module (ZMod 2) (Additive (lowerCentralLayer P 0)) :=
+  let : Module (ZMod 2) (Additive (lowerCentralLayer P 0)) :=
     lowerCentralLayerZmodModule P 0
   let eMiddle :=
     frattiniMiddleCoordinate hP hxi hPhiComm hfour hexists eSquare

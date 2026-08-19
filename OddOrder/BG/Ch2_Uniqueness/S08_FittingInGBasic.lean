@@ -79,7 +79,7 @@ theorem fittingInG_subgroupOf_eq (M : Subgroup G) :
 /-- Ambient form of BG Proposition 1.3 for a subgroup M: elements of M centralizing
 F(M) lie in F(M). -/
 theorem mem_fittingInG_of_mem_centralizer_fittingInG [Finite G] {M : Subgroup G}
-    [IsSolvable ↥M] {x : G} (hxM : x ∈ M)
+    [Group.IsSolvable ↥M] {x : G} (hxM : x ∈ M)
     (hxC : x ∈ Subgroup.centralizer (fittingInG M : Set G)) :
     x ∈ fittingInG M := by
   have hxC_M : (⟨x, hxM⟩ : ↥M) ∈
@@ -100,7 +100,7 @@ theorem mem_fittingInG_of_mem_centralizer_fittingInG [Finite G] {M : Subgroup G}
 
 /-- Subgroup form of the ambient self-centralizing property for F(M). -/
 theorem centralizer_fittingInG_inf_le_fittingInG [Finite G] {M : Subgroup G}
-    [IsSolvable ↥M] :
+    [Group.IsSolvable ↥M] :
     Subgroup.centralizer (fittingInG M : Set G) ⊓ M ≤ fittingInG M := by
   intro x hx
   exact mem_fittingInG_of_mem_centralizer_fittingInG hx.2 hx.1
@@ -186,7 +186,7 @@ theorem fixedPoints_conjActionOnFittingInG_eq {M : Subgroup G} {x : G} (hxM : x 
 /-- Ambient form of BG Proposition 1.4: if a coprime subgroup `B` normalizes a
 finite solvable subgroup `N` and centralizes `F(N)`, then `B` centralizes `N`. -/
 theorem le_centralizer_of_coprime_normalizes_of_le_centralizer_fittingInG
-    [Finite G] {B N : Subgroup G} [IsSolvable ↥N]
+    [Finite G] {B N : Subgroup G} [Group.IsSolvable ↥N]
     (hBN : B ≤ Subgroup.normalizer (N : Set G))
     (hCop : Nat.Coprime (Nat.card ↥B) (Nat.card ↥N))
     (hBF : B ≤ Subgroup.centralizer (fittingInG N : Set G)) :
@@ -227,7 +227,7 @@ theorem le_centralizer_of_coprime_normalizes_of_le_centralizer_fittingInG
 theorem fittingInG_isNilpotent [Finite G] (M : Subgroup G) :
     Group.IsNilpotent ↥(fittingInG M) := by
   rw [fittingInG]
-  haveI : Group.IsNilpotent ↥(Ch01.fitting ↥M) := Ch01.fitting.isNilpotent
+  have : Group.IsNilpotent ↥(Ch01.fitting ↥M) := Ch01.fitting.isNilpotent
   exact Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective (Ch01.fitting ↥M)
     M.subtype M.subtype_injective)
 
@@ -275,11 +275,11 @@ theorem fittingInG_le_fittingInG_of_le_normalizer [Finite G] {N H : Subgroup G}
     intro x hx
     exact mem_normalizer_fittingInG_of_mem_normalizer (hHN hx)
   have hFN_nilp_H : Group.IsNilpotent ↥((fittingInG N).subgroupOf H) := by
-    haveI : Group.IsNilpotent ↥(fittingInG N) := fittingInG_isNilpotent N
+    have : Group.IsNilpotent ↥(fittingInG N) := fittingInG_isNilpotent N
     exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hFN_H).symm
   have hSub_le_fitH : (fittingInG N).subgroupOf H ≤ Ch01.fitting ↥H := by
-    haveI : ((fittingInG N).subgroupOf H).Normal := hFN_norm_H
-    haveI : Group.IsNilpotent ↥((fittingInG N).subgroupOf H) := hFN_nilp_H
+    have : ((fittingInG N).subgroupOf H).Normal := hFN_norm_H
+    have : Group.IsNilpotent ↥((fittingInG N).subgroupOf H) := hFN_nilp_H
     exact Ch01.nilpotent_normal_le_fitting
   calc fittingInG N = ((fittingInG N).subgroupOf H).map H.subtype :=
         (Subgroup.map_subgroupOf_eq_of_le hFN_H).symm

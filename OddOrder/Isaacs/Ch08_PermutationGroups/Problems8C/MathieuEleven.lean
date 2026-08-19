@@ -109,27 +109,27 @@ variable {G Ω : Type*} [Group G] [MulAction G Ω] [FaithfulSMul G Ω]
 **Note** (Isaacs)。実際にはそのような `G` は Mathieu 群 `M₁₁` に同型。 -/
 theorem isSimpleGroup_of_card_eq_7920 (hΩ : Nat.card Ω = 11) (hG : Nat.card G = 7920) :
     IsSimpleGroup G := by
-  haveI : Finite G := Nat.finite_of_card_ne_zero (by omega)
-  haveI : Fact (Nat.Prime 11) := ⟨by norm_num⟩
-  haveI : Finite Ω := Nat.finite_of_card_ne_zero (by omega)
-  haveI hne : Nonempty Ω := (Nat.card_pos_iff.mp (by omega)).1
+  have : Finite G := Nat.finite_of_card_ne_zero (by omega)
+  have : Fact (Nat.Prime 11) := ⟨by norm_num⟩
+  have : Finite Ω := Nat.finite_of_card_ne_zero (by omega)
+  have hne : Nonempty Ω := (Nat.card_pos_iff.mp (by omega)).1
   -- (1) 各 Sylow 11-部分群の位数は 11
   have hQcard : ∀ Q : Sylow 11 G, Nat.card (Q : Subgroup G) = 11 := fun Q =>
     card_sylow_eq_prime_of_not_dvd_sq Q (by rw [hG]; norm_num) (by rw [hG]; norm_num)
   obtain ⟨P⟩ := Sylow.nonempty (p := 11) (G := G)
-  haveI : IsPretransitive ↥(P : Subgroup G) Ω :=
+  have : IsPretransitive ↥(P : Subgroup G) Ω :=
     isPretransitive_of_card_eq_prime (by norm_num) hΩ _ (hQcard P)
-  haveI : IsPretransitive G Ω := by
+  have : IsPretransitive G Ω := by
     refine ⟨fun a b => ?_⟩
     obtain ⟨q, hq⟩ := exists_smul_eq ↥(P : Subgroup G) a b
     exact ⟨q, hq⟩
-  haveI : IsPreprimitive G Ω := IsPreprimitive.of_prime_card (G := G) (X := Ω)
+  have : IsPreprimitive G Ω := IsPreprimitive.of_prime_card (G := G) (X := Ω)
     (by rw [hΩ]; norm_num)
   -- 原始群の自明でない正規部分群は推移的なので 11 で割れる (Problem 8B.3)
   have h11dvd : ∀ L : Subgroup G, L.Normal → L ≠ ⊥ → (11 : ℕ) ∣ Nat.card ↥L := by
     intro L hL hLbot
-    haveI := hL
-    haveI := isPretransitive_of_normal_of_isPreprimitive (Ω := Ω) L hLbot
+    have := hL
+    have := isPretransitive_of_normal_of_isPreprimitive (Ω := Ω) L hLbot
     obtain ⟨ω⟩ := hne
     have h := index_stabilizer_of_transitive (G := ↥L) (x := ω)
     rw [hΩ] at h
@@ -139,12 +139,12 @@ theorem isSimpleGroup_of_card_eq_7920 (hΩ : Nat.card Ω = 11) (hG : Nat.card G 
       Nat.card ↥(Subgroup.normalizer ((Q : Subgroup G) : Set G)) = 55 := fun Q =>
     card_normalizer_sylow_eleven_eq_55 hΩ hG Q
   -- (3) 単純性
-  haveI : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp (by omega)
+  have : Nontrivial G := Finite.one_lt_card_iff_nontrivial.mp (by omega)
   refine ⟨fun N hN => ?_⟩
   by_contra hcon
   push Not at hcon
   obtain ⟨hNbot, hNtop⟩ := hcon
-  haveI := hN
+  have := hN
   -- `N` は Sylow 11-部分群 `Q` を含む
   obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' (G := ↥N) 11 (h11dvd N hN hNbot)
   have hy : orderOf ((x : G)) = 11 := by rw [Subgroup.orderOf_coe, hx]
@@ -208,12 +208,12 @@ theorem isSimpleGroup_of_card_eq_7920 (hΩ : Nat.card Ω = 11) (hG : Nat.card G 
     rw [hSQ', hnorm]
     exact le_centralizer_of_card_eq_prime (by norm_num) Q' hQ'card
   obtain ⟨K, hKn, hKc⟩ := Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer S hburn
-  haveI := hKn
+  have := hKn
   have hKcard : Nat.card ↥K = 144 := by
-    have h := (hKc S).card_mul
+    have h := (hKc S).card_mul_card
     rw [hScard, hNcard1584] at h
     omega
-  haveI hKchar : K.Characteristic :=
+  have hKchar : K.Characteristic :=
     (Subgroup.characteristic_iff_map_eq).mpr fun ψ =>
       Ch05.map_mulAut_of_normal_pcomplement (hKc S) ψ
   -- `K` を `G` の部分群として見ると正規, しかし `11 ∤ 144`

@@ -299,7 +299,7 @@ theorem exists_inflate_eq_of_subset_characterKernel (χ : IrreducibleCharacter G
   -- Unpack a witnessing irreducible representation `ρ` of `G` with `χ = χ_ρ`.
   obtain ⟨V, _, _, _, ρ, hρ, hχ⟩ := χ.isIrreducible
   -- The keystone makes `ρ` trivial on `N`: `n ∈ N ⟹ χ_ρ(n) = χ_ρ(1) ⟹ ρ n = id`.
-  haveI htriv : Representation.IsTrivial (ρ.comp N.subtype) := by
+  have htriv : Representation.IsTrivial (ρ.comp N.subtype) := by
     refine ⟨fun n => ?_⟩
     have hval : ρ.character (n : G) = ρ.character 1 := by
       have hn := hker n.2
@@ -365,8 +365,8 @@ theorem degree_sq_le_index_of_central_quotient
     ∃ d : ℕ, (φ : ClassFunction G ℂ) 1 = (d : ℂ) ∧ d ^ 2 ≤ D.index := by
   classical
   obtain ⟨φbar, hφbar⟩ := exists_inflate_eq_of_subset_characterKernel (N := N) φ hker
-  haveI : Fintype (G ⧸ N) := Fintype.ofFinite _
-  haveI : Invertible ((Nat.card (G ⧸ N) : ℂ)) :=
+  have : Fintype (G ⧸ N) := Fintype.ofFinite _
+  have : Invertible ((Nat.card (G ⧸ N) : ℂ)) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   obtain ⟨d, hd1, hd2⟩ := φbar.isIrreducible.exists_degree_sq_le_index
     (D.map (QuotientGroup.mk' N)) hcentral
@@ -678,7 +678,7 @@ theorem exists_constituent_not_subset_characterKernel
       ¬ ((A.subgroupOf B : Set ↥B) ⊆
         OddOrder.Peterfalvi.S03.characterKernel (ψ : ClassFunction ↥B ℂ)) := by
   classical
-  haveI : Fintype (IrreducibleCharacter ↥B) := Fintype.ofFinite _
+  have : Fintype (IrreducibleCharacter ↥B) := Fintype.ofFinite _
   by_contra hcon
   push Not at hcon
   apply hAχ

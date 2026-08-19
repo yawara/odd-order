@@ -150,11 +150,11 @@ def cyclicFourSub : Subgroup (Equiv.Perm (ZMod 4)) where
   one_mem' := Or.inl rfl
   mul_mem' := by
     intro a b ha hb
-    simp only [Set.mem_setOf_eq] at ha hb ⊢
+    simp only [Set.mem_ofPred_eq] at ha hb ⊢
     rcases ha with rfl | rfl | rfl | rfl <;> rcases hb with rfl | rfl | rfl | rfl <;> decide
   inv_mem' := by
     intro a ha
-    simp only [Set.mem_setOf_eq] at ha ⊢
+    simp only [Set.mem_ofPred_eq] at ha ⊢
     rcases ha with rfl | rfl | rfl | rfl <;> decide
 
 /-- `V = {1, t², s, s t²} ≅ Z₂ × Z₂` — Klein 四元群。 -/
@@ -163,11 +163,11 @@ def kleinFourSub : Subgroup (Equiv.Perm (ZMod 4)) where
   one_mem' := Or.inl rfl
   mul_mem' := by
     intro a b ha hb
-    simp only [Set.mem_setOf_eq] at ha hb ⊢
+    simp only [Set.mem_ofPred_eq] at ha hb ⊢
     rcases ha with rfl | rfl | rfl | rfl <;> rcases hb with rfl | rfl | rfl | rfl <;> decide
   inv_mem' := by
     intro a ha
-    simp only [Set.mem_setOf_eq] at ha ⊢
+    simp only [Set.mem_ofPred_eq] at ha ⊢
     rcases ha with rfl | rfl | rfl | rfl <;> decide
 
 lemma mem_cyclicFourSub {p : Equiv.Perm (ZMod 4)} :
@@ -180,6 +180,7 @@ lemma mem_kleinFourSub {p : Equiv.Perm (ZMod 4)} :
       p = 1 ∨ p = transZFour ^ 2 ∨ p = flipZFour ∨ p = flipZFour * transZFour ^ 2 :=
   ⟨fun h => h, fun h => h⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- `T` は `ZMod 4` に regular に作用する。 -/
 lemma bijective_smulBase_cyclicFourSub :
     Function.Bijective (smulBase cyclicFourSub (0 : ZMod 4)) := by
@@ -196,6 +197,7 @@ lemma bijective_smulBase_cyclicFourSub :
     · exact ⟨⟨transZFour ^ 2, Or.inr (Or.inr (Or.inl rfl))⟩, by decide⟩
     · exact ⟨⟨transZFour ^ 3, Or.inr (Or.inr (Or.inr rfl))⟩, by decide⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- `V` も `ZMod 4` に regular に作用する (軌道は `0 ↦ 0, 2, 1, 3`)。 -/
 lemma bijective_smulBase_kleinFourSub :
     Function.Bijective (smulBase kleinFourSub (0 : ZMod 4)) := by
@@ -298,7 +300,7 @@ theorem centralizer_inf_stabilizer_eq_bot [FaithfulSMul G Ω] {H : Subgroup G}
 theorem bijective_smulBase_top_of_comm [FaithfulSMul G Ω] [IsPretransitive G Ω]
     (hcomm : ∀ x y : G, x * y = y * x) (α : Ω) :
     Function.Bijective (smulBase (⊤ : Subgroup G) α) := by
-  haveI : IsPretransitive (⊤ : Subgroup G) Ω := by
+  have : IsPretransitive (⊤ : Subgroup G) Ω := by
     refine ⟨fun x y => ?_⟩
     obtain ⟨g, hg⟩ := exists_smul_eq G x y
     exact ⟨⟨g, Subgroup.mem_top g⟩, hg⟩
@@ -420,8 +422,8 @@ theorem centralizer_eq_of_regular_of_inf_eq_bot [FaithfulSMul G Ω] [U.Normal] [
     {α : Ω} (hU : Function.Bijective (smulBase U α)) (hV : Function.Bijective (smulBase V α))
     (h : U ⊓ V = ⊥) :
     Subgroup.centralizer (U : Set G) = V := by
-  haveI : IsPretransitive U Ω := (surjective_smulBase_iff U α).mp hU.2
-  haveI : IsPretransitive V Ω := (surjective_smulBase_iff V α).mp hV.2
+  have : IsPretransitive U Ω := (surjective_smulBase_iff U α).mp hU.2
+  have : IsPretransitive V Ω := (surjective_smulBase_iff V α).mp hV.2
   refine le_antisymm (fun c hc => ?_) (le_centralizer_of_normal_of_inf_eq_bot h)
   obtain ⟨v, hv⟩ := exists_smul_eq V α (c • α)
   rw [subgroup_smul_def] at hv

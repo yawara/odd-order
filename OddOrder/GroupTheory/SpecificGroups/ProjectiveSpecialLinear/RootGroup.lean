@@ -118,6 +118,7 @@ noncomputable def canonicalT : Matrix.ProjectiveSpecialLinearGroup (Fin 2) F :=
 noncomputable def canonicalS : Matrix.ProjectiveSpecialLinearGroup (Fin 2) F :=
   rootHom (F := F) (Multiplicative.ofAdd 1)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The standard distinguished product is nonidentity. -/
 theorem canonicalS_mul_T_ne_one :
     canonicalS (F := F) * canonicalT (F := F) ≠ 1 := by
@@ -138,6 +139,7 @@ section CharacteristicTwoPair
 
 variable [CharP F 2]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The standard Weyl element has square one in characteristic two. -/
 theorem canonicalT_sq : canonicalT (F := F) ^ 2 = 1 := by
   have hw : weylSL (F := F) ^ 2 = 1 := by
@@ -152,6 +154,7 @@ theorem canonicalS_sq : canonicalS (F := F) ^ 2 = 1 := by
   simpa [canonicalS] using (rootSubgroup_isElementaryAbelian (F := F)).pow_eq_one
     (⟨canonicalS (F := F), ⟨Multiplicative.ofAdd 1, rfl⟩⟩ : rootSubgroup (F := F))
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The standard distinguished product has cube one. -/
 theorem canonicalS_mul_T_cubed :
     (canonicalS (F := F) * canonicalT (F := F)) ^ 3 = 1 := by

@@ -37,7 +37,7 @@ theorem commutator_eq_commutator_of_mul_eq_top {G : Type*} [Group G] {A B : Subg
     [hA : IsMulCommutative A] [hB : IsMulCommutative B] (hsup : A ⊔ B = ⊤)
     (hprod : ∀ g : G, ∃ a ∈ A, ∃ b ∈ B, a * b = g) :
     commutator G = ⁅A, B⁆ := by
-  haveI hnormal : (⁅A, B⁆ : Subgroup G).Normal := commutator_normal_of_sup_eq_top hsup
+  have hnormal : (⁅A, B⁆ : Subgroup G).Normal := commutator_normal_of_sup_eq_top hsup
   refine le_antisymm ?_ (Subgroup.commutator_mono le_top le_top)
   refine Subgroup.Normal.quotient_commutative_iff_commutator_le.mp ⟨⟨fun x y => ?_⟩⟩
   obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective x
@@ -185,7 +185,7 @@ private lemma card_alternatingGroup_five : Nat.card (alternatingGroup (Fin 5)) =
 
 set_option maxRecDepth 8000 in
 private lemma orderOf_commutatorElement_rot5A_invol2A : orderOf ⁅rot5A, invol2A⁆ = 5 := by
-  haveI : Fact (Nat.Prime 5) := ⟨by decide⟩
+  have : Fact (Nat.Prime 5) := ⟨by decide⟩
   refine orderOf_eq_prime (Subtype.ext ?_) fun h => absurd (congrArg Subtype.val h) ?_
   · change ⁅rot5, invol2⁆ ^ 5 = 1
     decide
@@ -194,7 +194,7 @@ private lemma orderOf_commutatorElement_rot5A_invol2A : orderOf ⁅rot5A, invol2
 
 set_option maxRecDepth 8000 in
 private lemma orderOf_commutatorElement_rot5A_sq_invol2A : orderOf ⁅rot5A ^ 2, invol2A⁆ = 3 := by
-  haveI : Fact (Nat.Prime 3) := ⟨by decide⟩
+  have : Fact (Nat.Prime 3) := ⟨by decide⟩
   refine orderOf_eq_prime (Subtype.ext ?_) fun h => absurd (congrArg Subtype.val h) ?_
   · change ⁅rot5 ^ 2, invol2⁆ ^ 3 = 1
     decide
@@ -204,7 +204,7 @@ private lemma orderOf_commutatorElement_rot5A_sq_invol2A : orderOf ⁅rot5A ^ 2,
 set_option maxRecDepth 8000 in
 private lemma orderOf_commutatorElement_mul :
     orderOf (⁅rot5A, invol2A⁆ * ⁅rot5A ^ 2, invol2A⁆) = 2 := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   refine orderOf_eq_prime (Subtype.ext ?_) fun h => absurd (congrArg Subtype.val h) ?_
   · change (⁅rot5, invol2⁆ * ⁅rot5 ^ 2, invol2⁆) ^ 2 = 1
     decide
@@ -252,11 +252,11 @@ private lemma commutator_zpowers_rot5A_invol2A_eq_top :
         have hmul := Subgroup.index_mul_card N
         rw [hcard30, card_alternatingGroup_five] at hmul
         omega
-      haveI : N.Normal := by
+      have : N.Normal := by
         refine Subgroup.normal_of_index_eq_minFac_card ?_
         rw [hindex, card_alternatingGroup_five]
         decide
-      haveI : IsSimpleGroup (alternatingGroup (Fin 5)) := alternatingGroup.isSimpleGroup (by simp)
+      have : IsSimpleGroup (alternatingGroup (Fin 5)) := alternatingGroup.isSimpleGroup (by simp)
       rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal N inferInstance with hbot | htop
       · rw [hbot, Subgroup.card_bot] at hcard30; omega
       · rw [htop, Subgroup.card_top, card_alternatingGroup_five] at hcard30; omega
@@ -277,7 +277,7 @@ theorem exists_card_two_subgroups_commutator_triple_eq_top :
     ∃ H K L : Subgroup (alternatingGroup (Fin 5)),
       Nat.card H = 2 ∧ Nat.card K = 2 ∧ Nat.card L = 2 ∧ ⁅⁅H, K⁆, L⁆ = ⊤ ∧
       Subgroup.closure {g | ∃ x ∈ H, ∃ y ∈ K, ∃ w ∈ L, ⁅⁅x, y⁆, w⁆ = g} ≠ ⊤ := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hcard : ∀ a : alternatingGroup (Fin 5), a ^ 2 = 1 → a ≠ 1 →
       Nat.card (Subgroup.zpowers a) = 2 := by
     intro a ha ha1
@@ -364,12 +364,12 @@ theorem eq_bot_of_isQuasiquaternion_quotient {G : Type*} [Group G] [Finite G]
     (Z : Subgroup G) [Z.Normal] (hZcomm : Z ≤ commutator G)
     (hZcent : Z ≤ Subgroup.center G) (hQ : IsQuasiquaternion (G ⧸ Z)) : Z = ⊥ := by
   obtain ⟨C, U, hCnorm, hCcyc, hUcyc, hprod, hinf⟩ := hQ
-  haveI := hCnorm
+  have := hCnorm
   set φ := QuotientGroup.mk' Z with hφ
   have hsurj : Function.Surjective φ := QuotientGroup.mk'_surjective Z
   set A := C.comap φ with hA
   set B := U.comap φ with hB
-  haveI hAnorm : A.Normal := hCnorm.comap φ
+  have hAnorm : A.Normal := hCnorm.comap φ
   -- `Z` は `A`, `B` に含まれる (ker φ ≤ 引き戻し)
   have hZA : Z ≤ A := fun z hz => by
     simp only [hA, Subgroup.mem_comap]
@@ -536,7 +536,7 @@ theorem isElementaryAbelian_quotient_center_of_commutator_eq_center {p : ℕ}
   have hle : commutator P ≤ Subgroup.center P := le_of_eq hcomm
   refine ⟨fun x y => ?_, fun x => ?_⟩
   · -- abelian: `P' ≤ Z(P)`.
-    haveI : IsMulCommutative (P ⧸ Subgroup.center P) :=
+    have : IsMulCommutative (P ⧸ Subgroup.center P) :=
       Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr hle
     exact (IsMulCommutative.is_comm (M := P ⧸ Subgroup.center P)).comm x y
   · -- 指数 `p`: `x^p ∈ Z(P)`.

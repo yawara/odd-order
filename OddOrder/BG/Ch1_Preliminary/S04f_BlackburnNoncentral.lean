@@ -136,7 +136,7 @@ theorem blackburn_noncentral_exists_centralizer_quotient_complement
   let C : Subgroup R := Subgroup.centralizer (S : Set R)
   let D : Subgroup R := Subgroup.centralizer (T : Set R)
   have hCD_norms := blackburn_noncentral_centralizer_normalities (R := R) (p := p)
-  haveI hCD_normal : (C.subgroupOf D).Normal := hCD_norms.2.2
+  have hCD_normal : (C.subgroupOf D).Normal := hCD_norms.2.2
   have hInv := blackburn_noncentral_operator_invariances (p := p) (φ := φ)
   have hT_inv : IsAInvariant φ T := hInv.2.1
   have hC_inv : IsAInvariant φ C := hInv.2.2.1
@@ -182,7 +182,7 @@ private theorem blackburn_noncentral_commutator_map_centralizer_card_and_omega
   let T : Subgroup R := ⁅S, (⊤ : Subgroup R)⁆
   let C : Subgroup R := Subgroup.centralizer (S : Set R)
   let Z : Subgroup R := (Subgroup.center S).map S.subtype
-  haveI hS_normal : S.Normal := by dsimp [S]; infer_instance
+  have hS_normal : S.Normal := by dsimp [S]; infer_instance
   have hrelations := blackburn_noncentral_centralizer_relations hT_facts hT_elem
   have hTC_eq_Z : T ⊓ C = Z := hrelations.2.2
   have hCsubT_eq_ZsubT : C.subgroupOf T = Z.subgroupOf T := by

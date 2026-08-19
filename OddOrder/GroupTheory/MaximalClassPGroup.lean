@@ -65,7 +65,7 @@ theorem commutator_iterCommutator_le_of_two_step [T.Normal]
   induction b generalizing a with
   | zero => simpa using hdc a
   | succ b ih =>
-    haveI : (iterCommutator T (⊤ : Subgroup G) (a + b + 3)).Normal :=
+    have : (iterCommutator T (⊤ : Subgroup G) (a + b + 3)).Normal :=
       iterCommutator_normal _
     -- three-subgroups mod `H (a+b+3)` で回した形: `⁅⁅H b, ⊤⁆, H a⁆ ≤ H (a+b+3)`.
     have key : ⁅⁅iterCommutator T (⊤ : Subgroup G) b, (⊤ : Subgroup G)⁆,

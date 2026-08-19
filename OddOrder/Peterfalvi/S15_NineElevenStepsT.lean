@@ -75,7 +75,7 @@ theorem Hypothesis.sSet_mem_Snorm_pos_T [Finite G]
     {χ : ClassFunction ↥hyp.T ℂ}
     (hχ : χ ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd)) :
     0 < OddOrder.Peterfalvi.S07.Snorm χ := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hpos := OddOrder.Peterfalvi.S08.inducedKernelFamily_inner_self_real_pos
     (hyp.sSet_subset_inducedKernelFamily_T hG hvd hχ)
@@ -132,7 +132,7 @@ theorem Hypothesis.nineElevenSTwoExtractionT [Finite G]
         (chief.H0 ⊔ OddOrder.Peterfalvi.S11.uprimeSub (hyp.toTypesIIIIIIVSetupT hG hvd)) |
       IsIrreducibleCharacter χ ∧
         χ 1 = (((hyp.toTypesIIIIIIVSetupT hG hvd).q * caseA.a : ℕ) : ℂ)} := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   intro χ hχS₂
   by_contra hnot
@@ -221,7 +221,7 @@ theorem Hypothesis.sSet_sThree_coherent_dade_T [Finite G]
       (sSet (hyp.toTypesIIIIIIVSetupT hG hvd) \ S₂)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T)) := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   obtain ⟨χ₀, hχ₀⟩ := hS₃ne
   -- `𝒮₃` is conjugation-closed
   have hconj : ∀ a ∈ sSet (hyp.toTypesIIIIIIVSetupT hG hvd) \ S₂,
@@ -334,7 +334,7 @@ theorem Hypothesis.mem_typePACore_of_mem_H_sup_cuSubOf_T [Finite G]
     have hyπ' : OddOrder.GroupTheory.IsPiElement ((OddOrder.BG.Ch3.S10.sigma hyp.T)ᶜ) y :=
       OddOrder.BG.Ch4.S14.isPiElement_compl_of_piPart_eq_one hone
     set Kg : Subgroup G := (hyp.toTypesIIIIIIVSetupT hG hvd).H ⊔ cuSubOf caseA i with hKgdef
-    haveI hKsolv : IsSolvable ↥Kg := hG.solvable_of_lt_top Kg
+    have hKsolv : Group.IsSolvable ↥Kg := hG.isSolvable_of_lt_top Kg
       (lt_of_le_of_lt hKS ((show IsCoatom hyp.T from hyp.T_maximal).1.lt_top))
     have hnorm : cuSubOf caseA i ≤ Subgroup.normalizer
         (((hyp.toTypesIIIIIIVSetupT hG hvd).H : Set G)) :=
@@ -365,7 +365,7 @@ theorem Hypothesis.mem_typePACore_of_mem_H_sup_cuSubOf_T [Finite G]
     -- both `σ`-sided.  (General type `P`: `U₁` itself need not be `σ`-free — for type III/IV
     -- the `σ`-part of `V` is nontrivial — but its `σ`-elements are caught by the `piPart`
     -- branch, and the `σ′`-conjugation only needs *some* Hall-`σ′` inside `U₁`.)
-    haveI hU₁solv : IsSolvable ↥((cuSubOf caseA i).subgroupOf Kg) := inferInstance
+    have hU₁solv : Group.IsSolvable ↥((cuSubOf caseA i).subgroupOf Kg) := inferInstance
     obtain ⟨P₁, hP₁Hall, -⟩ := OddOrder.Isaacs.Ch03.hall_D
       (G := ↥((cuSubOf caseA i).subgroupOf Kg))
       (U := ⊥) (fun p hp => by
@@ -491,8 +491,8 @@ theorem Hypothesis.nineElevenAlphaSupportT [Finite G]
       - ψ₁).support
       ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T := by
   classical
-  haveI := hyp.finiteG
-  haveI : Fintype G := Fintype.ofFinite G
+  have := hyp.finiteG
+  have : Fintype G := Fintype.ofFinite G
   -- `γ(1) = q·a = ψ₁(1)`: the difference vanishes at the identity
   have hγ1 : ClassFunction.induce
       ((hyp.toTypesIIIIIIVSetupT hG hvd).H.subgroupOf hyp.T
@@ -587,7 +587,7 @@ theorem Hypothesis.nineElevenFourNormInputsT [Finite G]
         α.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T ∧
         ClassFunction.inner α α = (N : ℂ) := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hq0 : 0 < (hyp.toTypesIIIIIIVSetupT hG hvd).q :=
     (hyp.toTypesIIIIIIVSetupT hG hvd).nontrivial.2.1.pos
   -- the explicit TI-witness `U₁ = cuSubOf caseA 0` and its (9.11.2) facts

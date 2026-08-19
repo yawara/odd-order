@@ -135,7 +135,7 @@ theorem sectionFour_lambda (M : hyp.QuotientFieldModel m) (s : hyp.LemmaFiveSetu
         = ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E)⁻¹
           + ((M.mu (1, ⟨ζ, hζ⟩) : M.Eˣ) : M.E) := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   set F := OddOrder.FiniteField.frobFixedSubfield M.E 2 m with hFdef
   set σ := hyp.coordFieldAut s M hm hQ0card hηD hζ hznot with hσdef
   set C := ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E) with hCdef
@@ -298,7 +298,7 @@ theorem coordFieldAut_eq_id_of_fixes_frobFixed (M : hyp.QuotientFieldModel m)
     (hfix : ∀ x ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m,
       hyp.coordFieldAut s M hm hQ0card hd hζ hznot x = x) (x : M.E) :
     hyp.coordFieldAut s M hm hQ0card hd hζ hznot x = x := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   set σ := hyp.coordFieldAut s M hm hQ0card hd hζ hznot with hσdef
   have hfix' : ∀ y : M.E, y ^ 2 ^ m = y → σ y = y := fun y hy =>
     hfix y (OddOrder.FiniteField.mem_frobFixedSubfield.mpr hy)
@@ -343,7 +343,7 @@ theorem exists_mem_K_coordFieldAut_sq_inv_eq (M : hyp.QuotientFieldModel m)
       (hyp.coordFieldAut s M hm hQ0card hd hζ hznot
         ((M.mu (hyp.kActor (pow_mem haK 2), 1) : M.Eˣ) : M.E))⁻¹ = X := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hmaps : ∀ {y : M.E}, y ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m →
       hyp.coordFieldAut s M hm hQ0card hd hζ hznot y
         ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m := fun hy =>
@@ -398,7 +398,7 @@ theorem coordFieldAut_sq_eq_id_of_ten (M : hyp.QuotientFieldModel m)
     {x : M.E} (hx : x ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m) :
     hyp.coordFieldAut s M hm hQ0card hd hζ hznot
         (hyp.coordFieldAut s M hm hQ0card hd hζ hznot x) = x := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hmaps : ∀ {y : M.E}, y ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m →
       hyp.coordFieldAut s M hm hQ0card hd hζ hznot y
         ∈ OddOrder.FiniteField.frobFixedSubfield M.E 2 m := fun hy =>
@@ -602,9 +602,9 @@ theorem coordFieldAut_sq_eq_id_on_frobFixed {f g k : G → G}
     hyp.coordFieldAut s M hm hQ0card hηD hζ hznot
         (hyp.coordFieldAut s M hm hQ0card hηD hζ hznot x) = x := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   set F := OddOrder.FiniteField.frobFixedSubfield M.E 2 m with hFdef
-  haveI : Fintype ↥F := Fintype.ofFinite _
+  have : Fintype ↥F := Fintype.ofFinite _
   set σ := hyp.coordFieldAut s M hm hQ0card hηD hζ hznot with hσdef
   set s₀ := ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E)⁻¹
     + ((M.mu (1, (⟨ζ, hζ⟩ : ↥hyp.W)) : M.Eˣ) : M.E) with hs₀def

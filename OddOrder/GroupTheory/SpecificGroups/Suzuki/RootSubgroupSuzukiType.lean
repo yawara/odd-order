@@ -116,7 +116,7 @@ noncomputable def standardRootTorus (m : ℕ) :
 /-- The standard root torus is cyclic. -/
 theorem standardRootTorus_isCyclic (m : ℕ) :
     IsCyclic ↥(standardRootTorus m) := by
-  letI : IsCyclic (TorusParameter m) := inferInstance
+  let : IsCyclic (TorusParameter m) := inferInstance
   exact isCyclic_of_surjective (torusScaleHom m).rangeRestrict
     (torusScaleHom m).rangeRestrict_surjective
 
@@ -332,7 +332,7 @@ private theorem exists_two_rootGroup_involutions (m : ℕ) (hm : 0 < m) :
       Nat.pow_le_pow_right (by omega) (by omega)
     norm_num at hpow ⊢
     omega
-  letI : Nontrivial (TorusParameter m) :=
+  let : Nontrivial (TorusParameter m) :=
     Finite.one_lt_card_iff_nontrivial.mp hcard
   obtain ⟨c, hc⟩ := exists_ne (1 : TorusParameter m)
   let x : RootGroup m := RootGroup.mk 0 1

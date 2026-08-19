@@ -53,7 +53,7 @@ theorem hasEnoughRootsOfUnity_card_sub_one (F : Type*) [Field F] [Fintype F] :
     HasEnoughRootsOfUnity F (Fintype.card F - 1) := by
   classical
   have h2 : 2 ≤ Fintype.card F := Fintype.one_lt_card
-  haveI : NeZero (Fintype.card F - 1) := ⟨by omega⟩
+  have : NeZero (Fintype.card F - 1) := ⟨by omega⟩
   refine HasEnoughRootsOfUnity.of_card_le ?_
   have htop : rootsOfUnity (Fintype.card F - 1) F = ⊤ := by
     ext u
@@ -66,8 +66,8 @@ theorem hasEnoughRootsOfUnity_card_sub_one (F : Type*) [Field F] [Fintype F] :
 theorem hasEnoughRootsOfUnity_of_dvd_card_sub_one (F : Type*) [Field F] [Fintype F] {n : ℕ}
     (hn : n ∣ Fintype.card F - 1) : HasEnoughRootsOfUnity F n := by
   have h2 : 2 ≤ Fintype.card F := Fintype.one_lt_card
-  haveI : NeZero (Fintype.card F - 1) := ⟨by omega⟩
-  haveI := hasEnoughRootsOfUnity_card_sub_one F
+  have : NeZero (Fintype.card F - 1) := ⟨by omega⟩
+  have := hasEnoughRootsOfUnity_card_sub_one F
   exact HasEnoughRootsOfUnity.of_dvd F hn
 
 /-- **Euler**: `n ∣ p ^ φ(n) - 1` whenever the prime `p` does not divide `n`.  This is what
@@ -115,7 +115,7 @@ noncomputable def splittingSystemResidueFieldEquiv :
 /-- `GF(p ^ φ(n))` contains all `n`-th roots of unity when `p ∤ n`. -/
 theorem hasEnoughRootsOfUnity_galoisField (hp : ¬ p ∣ n) (hn : n ≠ 0) :
     HasEnoughRootsOfUnity (GaloisField p n.totient) n := by
-  haveI : Fintype (GaloisField p n.totient) := Fintype.ofFinite _
+  have : Fintype (GaloisField p n.totient) := Fintype.ofFinite _
   have hcard : Fintype.card (GaloisField p n.totient) = p ^ n.totient := by
     rw [← Nat.card_eq_fintype_card]
     exact GaloisField.card p _ (Nat.totient_pos.mpr (Nat.pos_of_ne_zero hn)).ne'
@@ -126,30 +126,30 @@ theorem hasEnoughRootsOfUnity_galoisField (hp : ¬ p ∣ n) (hn : n ≠ 0) :
 /-- The residue field of the standard splitting system contains all `n`-th roots of unity. -/
 theorem hasEnoughRootsOfUnity_residueField_splittingSystem (hp : ¬ p ∣ n) (hn : n ≠ 0) :
     HasEnoughRootsOfUnity (ResidueField (SplittingSystem p n)) n := by
-  haveI : NeZero n := ⟨hn⟩
-  haveI := hasEnoughRootsOfUnity_galoisField p n hp hn
+  have : NeZero n := ⟨hn⟩
+  have := hasEnoughRootsOfUnity_galoisField p n hp hn
   exact hasEnoughRootsOfUnity_of_ringHom (splittingSystemResidueFieldEquiv p n).symm.toRingHom
 
 /-- **The standard splitting system itself contains all `n`-th roots of unity** — they lift
 from the residue field through the Henselian ring. -/
 theorem hasEnoughRootsOfUnity_splittingSystem (hp : ¬ p ∣ n) (hn : n ≠ 0) :
     HasEnoughRootsOfUnity (SplittingSystem p n) n := by
-  haveI : NeZero n := ⟨hn⟩
-  haveI := hasEnoughRootsOfUnity_residueField_splittingSystem p n hp hn
+  have : NeZero n := ⟨hn⟩
+  have := hasEnoughRootsOfUnity_residueField_splittingSystem p n hp hn
   exact hasEnoughRootsOfUnity_of_residueField (p := p) hp
 
 /-- `μ_n` of the standard splitting system has exactly `n` elements. -/
 theorem natCard_rootsOfUnity_splittingSystem (hp : ¬ p ∣ n) (hn : n ≠ 0) :
     Nat.card (rootsOfUnity n (SplittingSystem p n)) = n := by
-  haveI : NeZero n := ⟨hn⟩
-  haveI := hasEnoughRootsOfUnity_splittingSystem p n hp hn
+  have : NeZero n := ⟨hn⟩
+  have := hasEnoughRootsOfUnity_splittingSystem p n hp hn
   exact HasEnoughRootsOfUnity.natCard_rootsOfUnity _ n
 
 /-- A primitive `n`-th root of unity exists in the standard splitting system. -/
 theorem exists_isPrimitiveRoot_splittingSystem (hp : ¬ p ∣ n) (hn : n ≠ 0) :
     ∃ ζ : SplittingSystem p n, IsPrimitiveRoot ζ n := by
-  haveI : NeZero n := ⟨hn⟩
-  haveI := hasEnoughRootsOfUnity_splittingSystem p n hp hn
+  have : NeZero n := ⟨hn⟩
+  have := hasEnoughRootsOfUnity_splittingSystem p n hp hn
   exact HasEnoughRootsOfUnity.exists_primitiveRoot _ n
 
 /-! ### Algebraically closed residue fields
@@ -165,10 +165,10 @@ field of characteristic `p` contains the finite field `GF(p ^ φ(n))`, which alr
 `p ∤ n`: they already live in the finite subfield `GF(p ^ φ(n))`. -/
 theorem hasEnoughRootsOfUnity_of_isAlgClosed (K : Type*) [Field K] [IsAlgClosed K] [CharP K p]
     (hp : ¬ p ∣ n) (hn : n ≠ 0) : HasEnoughRootsOfUnity K n := by
-  haveI : NeZero n := ⟨hn⟩
-  haveI := hasEnoughRootsOfUnity_galoisField p n hp hn
-  letI : Algebra (ZMod p) K := ZMod.algebra K p
-  haveI : Algebra.IsAlgebraic (ZMod p) (GaloisField p n.totient) :=
+  have : NeZero n := ⟨hn⟩
+  have := hasEnoughRootsOfUnity_galoisField p n hp hn
+  let : Algebra (ZMod p) K := ZMod.algebra K p
+  have : Algebra.IsAlgebraic (ZMod p) (GaloisField p n.totient) :=
     Algebra.IsAlgebraic.of_finite _ _
   have f : GaloisField p n.totient →ₐ[ZMod p] K := IsAlgClosed.lift
   exact hasEnoughRootsOfUnity_of_ringHom f.toRingHom

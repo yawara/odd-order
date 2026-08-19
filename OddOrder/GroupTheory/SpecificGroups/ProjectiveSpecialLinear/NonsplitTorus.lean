@@ -51,16 +51,16 @@ theorem mem_normOneUnits_iff {u : Eˣ} :
 
 /-- The norm-one units form a cyclic group (a subgroup of the cyclic group `Eˣ`). -/
 theorem isCyclic_normOneUnits : IsCyclic ↥(normOneUnits F E) := by
-  haveI : Fact (Nat.card Eˣ ≠ 0) := ⟨Nat.card_pos.ne'⟩
+  have : Fact (Nat.card Eˣ ≠ 0) := ⟨Nat.card_pos.ne'⟩
   infer_instance
 
 /-- **`|E¹| = q + 1` for a quadratic extension of a finite field**: the norm is
 surjective on units, so `|E¹| = (q² - 1)/(q - 1) = q + 1`. -/
 theorem card_normOneUnits (h2 : Module.finrank F E = 2) :
     Nat.card ↥(normOneUnits F E) = Nat.card F + 1 := by
-  haveI : Finite F := Finite.of_injective _ (algebraMap F E).injective
-  haveI := Fintype.ofFinite F
-  haveI := Fintype.ofFinite E
+  have : Finite F := Finite.of_injective _ (algebraMap F E).injective
+  have := Fintype.ofFinite F
+  have := Fintype.ofFinite E
   have hq : 1 < Nat.card F := Finite.one_lt_card
   -- `|E| = q²`
   have hE : Nat.card E = Nat.card F ^ 2 := by
@@ -91,6 +91,7 @@ section Embedding
 
 variable (F E : Type*) [Field F] [Field E] [Algebra F E] [Finite E]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **The nonsplit torus embedding**: multiplication by a norm-one unit of a quadratic
 extension `E / F` is an `F`-linear endomorphism of `E` of determinant `1`, i.e. an
 element of `SL(2, F)` once a basis is chosen. -/
@@ -114,9 +115,9 @@ has a quadratic extension `E`, then `SL(2, F)` contains a cyclic subgroup of ord
 theorem exists_isCyclic_card_eq_card_add_one (h2 : Module.finrank F E = 2) :
     ∃ C : Subgroup (Matrix.SpecialLinearGroup (Fin 2) F),
       IsCyclic ↥C ∧ Nat.card ↥C = Nat.card F + 1 := by
-  haveI : Finite F := Finite.of_injective _ (algebraMap F E).injective
-  haveI : Module.Finite F E := Module.Finite.of_finite
-  haveI := isCyclic_normOneUnits F E
+  have : Finite F := Finite.of_injective _ (algebraMap F E).injective
+  have : Module.Finite F E := Module.Finite.of_finite
+  have := isCyclic_normOneUnits F E
   set b : Basis (Fin 2) F E := Module.finBasisOfFinrankEq F E h2 with hb
   refine ⟨(normOneToSL F E b).range, ?_, ?_⟩
   · exact isCyclic_of_surjective _ (normOneToSL F E b).rangeRestrict_surjective
@@ -137,8 +138,8 @@ theorem exists_isCyclic_card_specialLinearGroup_eq_card_add_one
     ∃ C : Subgroup (Matrix.SpecialLinearGroup (Fin 2) F),
       IsCyclic ↥C ∧ Nat.card ↥C = Nat.card F + 1 := by
   obtain ⟨p, hp⟩ := CharP.exists F
-  haveI := hp
-  haveI : Fact p.Prime := ⟨CharP.char_is_prime F p⟩
+  have := hp
+  have : Fact p.Prime := ⟨CharP.char_is_prime F p⟩
   exact exists_isCyclic_card_eq_card_add_one F (FiniteField.Extension F p 2)
     (FiniteField.finrank_extension F p 2)
 
@@ -151,7 +152,7 @@ variable {G : Type*} [Group G] [Finite G]
 /-- In a group of order `504 = 2³·3²·7` every Sylow `3`-subgroup has order `9`. -/
 theorem card_sylow_three_eq_nine (hG : Nat.card G = 504) (T : Sylow 3 G) :
     Nat.card ↥(T : Subgroup G) = 9 := by
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp T.isPGroup'
   have hmul := (T : Subgroup G).card_mul_index
   rw [hk, hG] at hmul
@@ -177,7 +178,7 @@ omit [Finite G] in
 /-- A `3`-subgroup whose order divides `504 = 2³·3²·7` has order dividing `9`. -/
 theorem card_dvd_nine_of_isPGroup_three {H : Subgroup G} [Finite ↥H]
     (hH : IsPGroup 3 ↥H) (hdvd : Nat.card ↥H ∣ 504) : Nat.card ↥H ∣ 9 := by
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp hH
   rw [hk] at hdvd ⊢
   refine (Nat.Coprime.pow_left k
@@ -192,7 +193,7 @@ theorem exists_isCyclic_card_nine_mem (hG : Nat.card G = 504)
     (hC : ∃ C : Subgroup G, IsCyclic ↥C ∧ Nat.card ↥C = 9)
     {x : G} (hx : orderOf x = 3) :
     ∃ S : Subgroup G, x ∈ S ∧ IsCyclic ↥S ∧ Nat.card ↥S = 9 := by
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   obtain ⟨C, hCcyc, hCcard⟩ := hC
   have hCp : IsPGroup 3 ↥C := IsPGroup.of_card (n := 2) (by rw [hCcard]; norm_num)
   obtain ⟨Q, hCQ⟩ := hCp.exists_le_sylow

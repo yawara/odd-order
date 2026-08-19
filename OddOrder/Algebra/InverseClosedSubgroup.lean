@@ -176,7 +176,7 @@ variable [Fintype F] {p q : ℕ} [Fact p.Prime] [CharP F p]
 theorem subfield_eq_bot_or_top (hq : q.Prime) (hcard : Fintype.card F = p ^ q) (K : Subfield F) :
     K = ⊥ ∨ K = ⊤ := by
   classical
-  letI : Fintype K := Fintype.ofFinite K
+  let : Fintype K := Fintype.ofFinite K
   have hpp : p.Prime := Fact.out
   obtain ⟨d, -, hdcard⟩ := FiniteField.card K p
   have hpow : Fintype.card F = Fintype.card K ^ Module.finrank K F := Module.card_eq_pow_finrank

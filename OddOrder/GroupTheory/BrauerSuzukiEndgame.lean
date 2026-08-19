@@ -55,7 +55,7 @@ unique involution, so conjugation fixes it. -/
 theorem eq_of_sq_eq_one_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCyclic C]
     {a b : C} (ha : a ^ 2 = 1) (ha1 : a ≠ 1) (hb : b ^ 2 = 1) (hb1 : b ≠ 1) : a = b := by
   classical
-  letI := Fintype.ofFinite C
+  let := Fintype.ofFinite C
   by_contra hab
   have hcard : ({1, a, b} : Finset C).card = 3 := by
     rw [Finset.card_insert_of_notMem (by
@@ -85,7 +85,7 @@ theorem exists_oddComplement_of_isCyclic_sylowTwo {H : Type*} [Group H] [Finite 
     (P : Sylow 2 H) (hcyc : IsCyclic (P : Subgroup H)) (hev : 2 ∣ Nat.card H) :
     ∃ L : Subgroup H, L.Normal ∧ ¬ 2 ∣ Nat.card L ∧ (∀ h : H, h ∈ L ↔ Odd (orderOf h)) ∧
       L ⊔ (P : Subgroup H) = ⊤ := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hH1 : Nat.card H ≠ 1 := fun h => by rw [h] at hev; norm_num at hev
   have hmin : (Nat.card H).minFac = 2 :=
     le_antisymm (Nat.minFac_le_of_dvd le_rfl hev) (Nat.minFac_prime hH1).two_le
@@ -129,7 +129,7 @@ separately. -/
 /-- **An involution is never in the odd core.**  `O_{2'}(G)` has odd order. -/
 theorem notMem_oPiCore_of_orderOf_eq_two [Finite G] {z : G} (hz : orderOf z = 2) :
     z ∉ oPiCore {p | p ≠ 2} G := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   intro hmem
   have hz2 : orderOf (⟨z, hmem⟩ : ↥(oPiCore {p | p ≠ 2} G)) = 2 := by
     rw [Subgroup.orderOf_mk]; exact hz
@@ -149,7 +149,7 @@ theorem oPiCore_sup_centralizer_eq_top_of_mk_mem_center [Finite G] {z : G} (hz :
     (hcentral : QuotientGroup.mk' (oPiCore {p | p ≠ 2} G) z
       ∈ Subgroup.center (G ⧸ oPiCore {p | p ≠ 2} G)) :
     oPiCore {p | p ≠ 2} G ⊔ Subgroup.centralizer {z} = ⊤ := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hz_sq : z ^ 2 = 1 := by rw [← hz]; exact pow_orderOf_eq_one z
   have hz_ne_one : z ≠ 1 := fun h => by simp [h] at hz
   set K := oPiCore {p | p ≠ 2} G with hKdef
@@ -169,11 +169,11 @@ theorem oPiCore_sup_centralizer_eq_top_of_mk_mem_center [Finite G] {z : G} (hz :
   have hNeq : (Subgroup.zpowers zbar).comap (QuotientGroup.mk' K) = N := by
     rw [hzpm, Subgroup.comap_map_eq, QuotientGroup.ker_mk', hNdef]
   -- `N ⊴ G` since `⟨z̄⟩ ≤ center` is normal.
-  haveI hzbarZp_normal : (Subgroup.zpowers zbar).Normal := by
+  have hzbarZp_normal : (Subgroup.zpowers zbar).Normal := by
     refine ⟨fun n hn g => ?_⟩
     have hcomm := Subgroup.mem_center_iff.mp (Subgroup.zpowers_le.mpr hcentral hn) g
     rw [hcomm, mul_inv_cancel_right]; exact hn
-  haveI hNnorm : N.Normal := by rw [← hNeq]; exact hzbarZp_normal.comap _
+  have hNnorm : N.Normal := by rw [← hNeq]; exact hzbarZp_normal.comap _
   have hzpN : Subgroup.zpowers z ≤ N := le_sup_left
   -- `|N| = 2·|K|`, so `⟨z⟩` (order 2) is a Sylow 2-subgroup of `N`.
   have hzbarNcard : Nat.card ↥(Subgroup.zpowers zbar) = 2 := by rw [Nat.card_zpowers, hzbar_ord]
@@ -280,11 +280,11 @@ abelian, `apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotien
 theorem not_isMulCommutative_SM_quotient_M :
     ¬ IsMulCommutative (↥Q.SM ⧸ (involutionClosure G).subgroupOf Q.SM) := by
   intro habelian
-  haveI : Invertible (Nat.card ↥Q.SM : ℂ) :=
+  have : Invertible (Nat.card ↥Q.SM : ℂ) :=
     invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
-  haveI : Invertible (Nat.card ↥Q.smSetup.N : ℂ) :=
+  have : Invertible (Nat.card ↥Q.smSetup.N : ℂ) :=
     invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
-  haveI : Invertible (Nat.card ↥(Q.smSetup.C.subgroupOf Q.smSetup.N) : ℂ) :=
+  have : Invertible (Nat.card ↥(Q.smSetup.C.subgroupOf Q.smSetup.N) : ℂ) :=
     invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
   obtain ⟨φ, ⟨d, hd2, hφd⟩, hφinv⟩ := Q.smSetup.lem_1_9
   have hφchar : IsCharacter (φ : ClassFunction ↥Q.SM ℂ) := φ.2.isCharacter
@@ -304,7 +304,7 @@ theorem not_isMulCommutative_SM_quotient_M :
   have hMker : ((involutionClosure G).subgroupOf Q.SM : Set ↥Q.SM) ⊆
       OddOrder.Peterfalvi.S03.characterKernel (φ : ClassFunction ↥Q.SM ℂ) :=
     fun _ hg => (OddOrder.Peterfalvi.S13.mem_characterKernelSubgroup hφchar).mp (hsub hg)
-  haveI := habelian
+  have := habelian
   have h1 := apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
     ((involutionClosure G).subgroupOf Q.SM) φ hMker
   rw [hφd] at h1
@@ -323,7 +323,7 @@ theorem SinfM_isCyclic :
   -- `Q ⊄ X`, so `Q` contains an element `xᵏ·y` of the coset `X·y`.
   have hnotle : ¬ ((Q.S : Subgroup G) ⊓ involutionClosure G ≤ Q.X) := by
     intro hle
-    haveI : IsCyclic ↥Q.X := Subgroup.isCyclic_zpowers Q.x
+    have : IsCyclic ↥Q.X := Subgroup.isCyclic_zpowers Q.x
     exact hnc (Subgroup.isCyclic_of_le hle)
   obtain ⟨q, hqQ, hqX⟩ := SetLike.not_le_iff_exists.mp hnotle
   obtain ⟨hqS, hqM⟩ := Subgroup.mem_inf.mp hqQ
@@ -347,7 +347,7 @@ theorem SinfM_isCyclic :
     have hTM : Q.T ≤ involutionClosure G :=
       (le_trans (by rw [QuaternionSylowSetup.T, Subgroup.zpowers_le]; exact hx2) inf_le_right)
     -- `commutator ↥S ≤ M.subgroupOf S` since `S' = T ≤ M`, so `S/Q` is abelian.
-    haveI hab : IsMulCommutative
+    have hab : IsMulCommutative
         (↥(Q.S : Subgroup G) ⧸ (involutionClosure G).subgroupOf (Q.S : Subgroup G)) := by
       rw [Subgroup.Normal.quotient_commutative_iff_commutator_le, commutator_eq_closure,
         Subgroup.closure_le]
@@ -377,8 +377,8 @@ theorem z_mem_SinfM : Q.z ∈ (Q.S : Subgroup G) ⊓ involutionClosure G :=
 theorem sylowTwoM_map_le_conj_SinfM (PM : Sylow 2 ↥(involutionClosure G)) :
     ∃ g : G, ((PM : Subgroup ↥(involutionClosure G)).map (involutionClosure G).subtype)
       ≤ MulAut.conj g • ((Q.S : Subgroup G) ⊓ involutionClosure G) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI : (involutionClosure G).Normal := involutionClosure_normal
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : (involutionClosure G).Normal := involutionClosure_normal
   have hRpg : IsPGroup 2
       ((PM : Subgroup ↥(involutionClosure G)).map (involutionClosure G).subtype) :=
     PM.isPGroup'.map (involutionClosure G).subtype
@@ -397,11 +397,11 @@ include Q in
 theorem sylowTwoM_isCyclic (PM : Sylow 2 ↥(involutionClosure G)) :
     IsCyclic (PM : Subgroup ↥(involutionClosure G)) := by
   obtain ⟨g, hle⟩ := Q.sylowTwoM_map_le_conj_SinfM PM
-  haveI hconjcyc : IsCyclic ↥(MulAut.conj g • ((Q.S : Subgroup G) ⊓ involutionClosure G)) := by
-    haveI := Q.SinfM_isCyclic
+  have hconjcyc : IsCyclic ↥(MulAut.conj g • ((Q.S : Subgroup G) ⊓ involutionClosure G)) := by
+    have := Q.SinfM_isCyclic
     exact isCyclic_of_surjective (Subgroup.equivSMul (MulAut.conj g)
       ((Q.S : Subgroup G) ⊓ involutionClosure G)).toMonoidHom (Subgroup.equivSMul _ _).surjective
-  haveI hRcyc : IsCyclic
+  have hRcyc : IsCyclic
       ↥((PM : Subgroup ↥(involutionClosure G)).map (involutionClosure G).subtype) :=
     Subgroup.isCyclic_of_le hle
   refine isCyclic_of_surjective (Subgroup.equivMapOfInjective (PM : Subgroup ↥(involutionClosure G))
@@ -419,10 +419,10 @@ include Q in
 theorem image_M_isCyclic_and_isPGroup :
     IsCyclic ↥((involutionClosure G).map (QuotientGroup.mk' (oPiCore {p | p ≠ 2} G))) ∧
       IsPGroup 2 ((involutionClosure G).map (QuotientGroup.mk' (oPiCore {p | p ≠ 2} G))) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI : (involutionClosure G).Normal := involutionClosure_normal
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : (involutionClosure G).Normal := involutionClosure_normal
   obtain ⟨PM⟩ := (inferInstance : Nonempty (Sylow 2 ↥(involutionClosure G)))
-  haveI hPMcyc : IsCyclic (PM : Subgroup ↥(involutionClosure G)) := Q.sylowTwoM_isCyclic PM
+  have hPMcyc : IsCyclic (PM : Subgroup ↥(involutionClosure G)) := Q.sylowTwoM_isCyclic PM
   have hev : 2 ∣ Nat.card ↥(involutionClosure G) := by
     have hz : Q.z ∈ involutionClosure G := mem_involutionClosure_of_orderOf_eq_two Q.orderOf_z
     have hz2 : orderOf (⟨Q.z, hz⟩ : ↥(involutionClosure G)) = 2 := by
@@ -448,7 +448,7 @@ theorem image_M_isCyclic_and_isPGroup :
       refine ⟨⟨w, hw⟩, (hLmem ⟨w, hw⟩).mpr ?_, rfl⟩
       rw [Subgroup.orderOf_mk]; exact hodd
   -- `LG ⊴ G` (odd-order elements are conjugation-invariant)
-  haveI hLGnorm : LG.Normal := by
+  have hLGnorm : LG.Normal := by
     refine ⟨fun n hn g => ?_⟩
     rw [hLGmem] at hn ⊢
     refine ⟨involutionClosure_normal.conj_mem n hn.1 g, ?_⟩
@@ -471,7 +471,7 @@ theorem image_M_isCyclic_and_isPGroup :
       show LG.map (QuotientGroup.mk' (oPiCore {p | p ≠ 2} G)) = ⊥ from by
         rw [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']; exact hLGle, bot_sup_eq]
   rw [hMbar]
-  haveI hRcyc : IsCyclic ↥R := by
+  have hRcyc : IsCyclic ↥R := by
     rw [hR]
     exact isCyclic_of_surjective (Subgroup.equivMapOfInjective _ (involutionClosure G).subtype
       Subtype.coe_injective).toMonoidHom (Subgroup.equivMapOfInjective _ _ _).surjective
@@ -489,10 +489,10 @@ theorem zbar_central :
       Subgroup.center (G ⧸ oPiCore {p | p ≠ 2} G) := by
   set K := oPiCore {p | p ≠ 2} G with hKdef
   set zbar := QuotientGroup.mk' K Q.z with hzbar
-  haveI : (involutionClosure G).Normal := involutionClosure_normal
+  have : (involutionClosure G).Normal := involutionClosure_normal
   obtain ⟨hMcyc, _⟩ := Q.image_M_isCyclic_and_isPGroup
-  haveI := hMcyc
-  haveI hMbarNormal : ((involutionClosure G).map (QuotientGroup.mk' K)).Normal :=
+  have := hMcyc
+  have hMbarNormal : ((involutionClosure G).map (QuotientGroup.mk' K)).Normal :=
     involutionClosure_normal.map (QuotientGroup.mk' K) (QuotientGroup.mk'_surjective K)
   have hzM : Q.z ∈ involutionClosure G := mem_involutionClosure_of_orderOf_eq_two Q.orderOf_z
   have hzbarM : zbar ∈ (involutionClosure G).map (QuotientGroup.mk' K) :=

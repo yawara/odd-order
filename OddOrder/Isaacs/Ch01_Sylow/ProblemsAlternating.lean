@@ -139,7 +139,7 @@ theorem two_mul_card_normalizer_sylow_alternating {p : ℕ} [Fact p.Prime] (hp3 
       = p * (p - 1) := by
   have hp : p.Prime := Fact.out
   have hodd : Odd p := hp.odd_of_ne_two (by omega)
-  haveI : Nontrivial (Fin (p + 1)) :=
+  have : Nontrivial (Fin (p + 1)) :=
     ⟨⟨0, by omega⟩, ⟨1, by omega⟩, by simp [Fin.ext_iff]⟩
   -- 2|A| = (p+1)!
   have hA2 : 2 * Nat.card ↥(alternatingGroup (Fin (p + 1))) = (p + 1)! := by

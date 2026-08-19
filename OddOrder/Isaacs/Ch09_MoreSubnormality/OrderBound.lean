@@ -87,7 +87,7 @@ theorem card_normalizer_nilpotentResidual_le [Finite G] {S : Subgroup G}
     refine Subgroup.map_injective N.subtype_injective ?_
     rw [map_subtype_nilpotentResidual_subgroupOf hSN, Subgroup.subgroupOf_map_subtype,
       inf_eq_left.mpr (by rw [hN]; exact Subgroup.le_normalizer)]
-  haveI hresN : (nilpotentResidual (S.subgroupOf N)).Normal := by
+  have hresN : (nilpotentResidual (S.subgroupOf N)).Normal := by
     rw [hres]
     exact (Subgroup.normal_subgroupOf_iff_le_normalizer
       (by rw [hN]; exact Subgroup.le_normalizer)).mpr le_rfl

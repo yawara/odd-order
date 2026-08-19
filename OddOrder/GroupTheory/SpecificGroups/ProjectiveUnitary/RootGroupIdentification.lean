@@ -94,8 +94,8 @@ theorem nonempty_mulEquiv_rootGroup_of_anisotropic {E : Type*} [_root_.Field E] 
     (haniso : ∀ x : E, x ≠ 0 → φ x x ≠ 0) :
     Nonempty (BilinearTwistedProduct φ ≃* RootGroup n) := by
   classical
-  haveI : Fintype E := Fintype.ofFinite E
-  haveI : Fintype (Field n) := Fintype.ofFinite (Field n)
+  have : Fintype E := Fintype.ofFinite E
+  have : Fintype (Field n) := Fintype.ofFinite (Field n)
   -- the change of variable making the diagonal the Hermitian norm
   obtain ⟨f₀, -, hf₀⟩ :=
     exists_addEquiv_norm_of_anisotropic n hn.ne' hcard φ hsemi haniso

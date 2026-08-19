@@ -60,7 +60,7 @@ theorem frattini_map_eq_consequences
     (hΦ : (frattini C).map C.subtype = (frattini A).map A.subtype) :
     ⁅C, A⁆ ≤ (Agemo A 2 1).map A.subtype ∧
       (Agemo C 2 1).map C.subtype ≤ (Agemo A 2 1).map A.subtype := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   have hΦA : frattini A = Agemo A 2 1 :=

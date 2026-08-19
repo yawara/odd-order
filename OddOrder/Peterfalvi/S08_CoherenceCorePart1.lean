@@ -244,7 +244,7 @@ theorem isPGroup_of_isNilpotent_of_isPGroup_abelianization {p : ℕ} [Fact p.Pri
     (h : IsPGroup p (Abelianization Γ)) : IsPGroup p Γ := by
   classical
   obtain ⟨P⟩ : Nonempty (Sylow p Γ) := inferInstance
-  haveI hPnormal : (↑P : Subgroup Γ).Normal := by
+  have hPnormal : (↑P : Subgroup Γ).Normal := by
     have htfae := (Group.isNilpotent_of_finite_tfae (G := Γ)).out 0 3
     exact htfae.mp ‹_› p ‹_› P
   -- `Abelianization Q` is a `p`-group (image of `Abelianization Γ`).
@@ -254,17 +254,17 @@ theorem isPGroup_of_isNilpotent_of_isPGroup_abelianization {p : ℕ} [Fact p.Pri
   have hofsurj : Function.Surjective (Abelianization.of :
       (Γ ⧸ (↑P : Subgroup Γ)) →* Abelianization (Γ ⧸ (↑P : Subgroup Γ))) :=
     fun y => QuotientGroup.induction_on y fun a => ⟨a, rfl⟩
-  haveI hQab_triv : Subsingleton (Abelianization (Γ ⧸ (↑P : Subgroup Γ))) :=
+  have hQab_triv : Subsingleton (Abelianization (Γ ⧸ (↑P : Subgroup Γ))) :=
     subsingleton_of_isPGroup_of_not_dvd hQab_p
       (fun hp => P.not_dvd_index (hp.trans (Subgroup.card_dvd_of_surjective _ hofsurj)))
   -- `Abelianization Q` trivial ⟹ `commutator Q = ⊤` ⟹ (nilpotent ⟹ solvable) `Q` trivial.
-  haveI hQ_triv : Subsingleton (Γ ⧸ (↑P : Subgroup Γ)) := by
+  have hQ_triv : Subsingleton (Γ ⧸ (↑P : Subgroup Γ)) := by
     rcases subsingleton_or_nontrivial (Γ ⧸ (↑P : Subgroup Γ)) with hs | hns
     · exact hs
     · exfalso
-      haveI := hns
+      have := hns
       have hlt : commutator (Γ ⧸ (↑P : Subgroup Γ)) < ⊤ :=
-        IsSolvable.commutator_lt_top_of_nontrivial (G := Γ ⧸ (↑P : Subgroup Γ))
+        Group.IsSolvable.commutator_lt_top_of_nontrivial (G := Γ ⧸ (↑P : Subgroup Γ))
       refine absurd ?_ hlt.ne
       rw [← Subgroup.index_eq_one]
       exact @Nat.card_of_subsingleton (Abelianization (Γ ⧸ (↑P : Subgroup Γ))) 1 hQab_triv
@@ -300,16 +300,16 @@ theorem isPGroup_of_card_le_of_isFrobeniusAction {A R : Type*} [CommGroup A] [Fi
     (hbound : Nat.card A ≤ 4 * Nat.card R ^ 2 + 1) :
     ∃ p : ℕ, Nat.Prime p ∧ IsPGroup p A := by
   classical
-  haveI : Fintype A := Fintype.ofFinite A
-  haveI : Fintype R := Fintype.ofFinite R
+  have : Fintype A := Fintype.ofFinite A
+  have : Fintype R := Fintype.ofFinite R
   by_contra hcon
   -- `A` is nontrivial: a trivial group is a `p`-group for every prime.
   rcases eq_or_ne (Nat.card A) 1 with hA1 | hA1
-  · haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  · have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
     exact hcon ⟨2, Nat.prime_two, IsPGroup.iff_card.mpr ⟨0, by rw [pow_zero, hA1]⟩⟩
   -- Otherwise take a prime divisor `p` of `|A|` and its Sylow `p`-subgroup `P`.
   obtain ⟨p, hp, hpdvd⟩ := (Nat.card A).exists_prime_and_dvd hA1
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨P⟩ : Nonempty (Sylow p A) := inferInstance
   -- `|P| > 1` because `p ∣ |P|`.
   have hpP : p ∣ Nat.card (P : Subgroup A) := P.dvd_card_of_dvd_card hpdvd
@@ -346,10 +346,10 @@ theorem isPGroup_of_card_le_of_isFrobeniusAction {A R : Type*} [CommGroup A] [Fi
     obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp P.isPGroup'
     exact hcon ⟨p, hp, IsPGroup.iff_card.mpr ⟨n, by rw [← hcardeq, hn]⟩⟩
   -- Frobenius `card ≡ 1 (mod |R|)` for the whole action and the restricted action on `P`.
-  haveI : Fintype (P : Subgroup A) := Fintype.ofFinite _
+  have : Fintype (P : Subgroup A) := Fintype.ofFinite _
   have hAmod : Nat.card A ≡ 1 [MOD Nat.card R] := by
     simpa only [Fintype.card_eq_nat_card] using hFrob.card_modEq_one
-  letI instP : MulDistribMulAction R (P : Subgroup A) :=
+  let instP : MulDistribMulAction R (P : Subgroup A) :=
     OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantSubgroupMulDistribMulAction
       (P : Subgroup A) hinv
   have hFrobP : @OddOrder.Isaacs.Ch06.IsFrobeniusAction R (P : Subgroup A) _ _ instP :=
@@ -402,7 +402,7 @@ theorem isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization
     ∃ p : ℕ, Nat.Prime p ∧ IsPGroup p H := by
   obtain ⟨p, hp, hPab⟩ :=
     isPGroup_of_card_le_of_isFrobeniusAction hFrob hHodd hRodd hbound
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   exact ⟨p, hp, isPGroup_of_isNilpotent_of_isPGroup_abelianization hPab⟩
 
 /-- **Peterfalvi (6.5)(b) reduction in the Frobenius case (6.8)(c1): the kernel is a `p`-group.**
@@ -422,8 +422,8 @@ theorem isPGroup_of_isFrobeniusGroup_of_card_le {G : Type*} [Group G] [Finite G]
     (hHodd : Odd (Nat.card (Abelianization ↥N))) (hAodd : Odd (Nat.card ↥A))
     (hbound : Nat.card (Abelianization ↥N) ≤ 4 * Nat.card ↥A ^ 2 + 1) :
     ∃ p : ℕ, Nat.Prime p ∧ IsPGroup p ↥N := by
-  letI : N.Normal := h.isNormal
-  letI actN : MulDistribMulAction ↥A ↥N :=
+  let : N.Normal := h.isNormal
+  let actN : MulDistribMulAction ↥A ↥N :=
     MulDistribMulAction.compHom N ((MulAut.conjNormal (H := N)).comp A.subtype)
   have hFrobN : OddOrder.Isaacs.Ch06.IsFrobeniusAction ↥A ↥N := h.toFrobeniusAction
   -- `⁅N,N⁆` is characteristic in `N`, hence preserved by the automorphism `A`-action.
@@ -435,7 +435,7 @@ theorem isPGroup_of_isFrobeniusGroup_of_card_le {G : Type*} [Group G] [Finite G]
       rw [← hmap]; exact Subgroup.mem_map_of_mem _ hm
     simpa using hmem
   -- The fixed-point-free action descends to the abelianization quotient.
-  letI actAb : MulDistribMulAction ↥A (Abelianization ↥N) :=
+  let actAb : MulDistribMulAction ↥A (Abelianization ↥N) :=
     OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantQuotientMulDistribMulAction (commutator ↥N) hM
   have hFrobAb : OddOrder.Isaacs.Ch06.IsFrobeniusAction ↥A (Abelianization ↥N) :=
     hFrobN.quotient (commutator ↥N) hM
@@ -469,14 +469,14 @@ theorem isPGroup_of_isNilpotent_of_coprime_fixedPoints_le_commutator {H W : Type
     have hmem : (MulDistribMulAction.toMulAut W H a).toMonoidHom m ∈ commutator H := by
       rw [← hmap]; exact Subgroup.mem_map_of_mem _ hm
     simpa using hmem
-  letI actAb : MulDistribMulAction W (Abelianization H) :=
+  let actAb : MulDistribMulAction W (Abelianization H) :=
     OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantQuotientMulDistribMulAction (commutator H) hMinv
   have hFrobAb : OddOrder.Isaacs.Ch06.IsFrobeniusAction W (Abelianization H) :=
     OddOrder.Isaacs.Ch06.IsFrobeniusAction.quotient_of_fixedPoints_le hCop (commutator H) hMinv hfix
   exact isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization hFrobAb hHodd hWodd hbound
 
 /-- A finite group with non-trivial abelianization carries a non-trivial linear character
-`Γ →* ℂˣ`. Equivalently (via `IsSolvable.commutator_lt_top_of_nontrivial`) every non-trivial
+`Γ →* ℂˣ`. Equivalently (via `Group.IsSolvable.commutator_lt_top_of_nontrivial`) every non-trivial
 finite solvable group has one.
 
 This is the existence ingredient feeding **Peterfalvi (6.2)**: the section `K/A` (solvable and
@@ -488,7 +488,7 @@ separably closed of characteristic zero, hence has enough roots of unity
 theorem exists_monoidHom_units_ne_one_of_commutator_ne_top {Γ : Type*} [Group Γ] [Finite Γ]
     (h : commutator Γ ≠ ⊤) : ∃ χ : Γ →* ℂˣ, χ ≠ 1 := by
   -- `Abelianization Γ = Γ ⧸ ⁅Γ,Γ⁆` is non-trivial precisely because `⁅Γ,Γ⁆ ≠ ⊤`.
-  haveI : Nontrivial (Abelianization Γ) := by
+  have : Nontrivial (Abelianization Γ) := by
     by_contra hns
     rw [not_nontrivial_iff_subsingleton] at hns
     exact h (by
@@ -496,7 +496,7 @@ theorem exists_monoidHom_units_ne_one_of_commutator_ne_top {Γ : Type*} [Group �
       exact @Nat.card_of_subsingleton (Abelianization Γ) 1 hns)
   obtain ⟨a, ha⟩ := exists_ne (1 : Abelianization Γ)
   -- `ℂ` separably closed + characteristic zero ⟹ enough roots of unity at `n = exponent`.
-  haveI : NeZero ((Monoid.exponent (Abelianization Γ) : ℂ)) :=
+  have : NeZero ((Monoid.exponent (Abelianization Γ) : ℂ)) :=
     ⟨Nat.cast_ne_zero.mpr Monoid.exponent_ne_zero_of_finite⟩
   obtain ⟨φ, hφ⟩ :=
     CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity (Abelianization Γ) ℂ ha
@@ -796,7 +796,7 @@ theorem exists_finEnum_general {Γ : Type*} [Group Γ] {S : Set (ClassFunction �
     ∃ (k : ℕ) (f : Fin k → ClassFunction Γ ℂ),
       Function.Injective f ∧ Set.range f = S := by
   classical
-  haveI : Fintype S := hSfin.fintype
+  have : Fintype S := hSfin.fintype
   refine ⟨Fintype.card S, fun j => ((Fintype.equivFin S).symm j : ClassFunction Γ ℂ), ?_, ?_⟩
   · intro i j hij
     exact (Fintype.equivFin S).symm.injective (Subtype.ext hij)

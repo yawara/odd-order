@@ -51,7 +51,7 @@ theorem irreducibleCharacter_inner [Fintype G] [Invertible (Nat.card G : ℂ)]
   · -- Diagonal: extract one irreducible representation and apply `char_orthonormal ρ ρ`.
     subst hχψ
     obtain ⟨V, _, _, _, ρ, hρ, hcoe⟩ := χ.isIrreducible
-    haveI : Representation.IsIrreducible ρ := hρ
+    have : Representation.IsIrreducible ρ := hρ
     rw [if_pos rfl, ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum,
       invOf_eq_inv]
     have hsum : ∀ g : G,
@@ -64,8 +64,8 @@ theorem irreducibleCharacter_inner [Fintype G] [Invertible (Nat.card G : ℂ)]
   · -- Off-diagonal: distinct characters ⇒ non-isomorphic representations ⇒ the `0` branch.
     obtain ⟨Vχ, _, _, _, ρχ, hρχ, hcoeχ⟩ := χ.isIrreducible
     obtain ⟨Vψ, _, _, _, ρψ, hρψ, hcoeψ⟩ := ψ.isIrreducible
-    haveI : Representation.IsIrreducible ρχ := hρχ
-    haveI : Representation.IsIrreducible ρψ := hρψ
+    have : Representation.IsIrreducible ρχ := hρχ
+    have : Representation.IsIrreducible ρψ := hρψ
     rw [if_neg hχψ, ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum,
       invOf_eq_inv]
     have hsum : ∀ g : G,

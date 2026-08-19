@@ -195,18 +195,18 @@ theorem false_of_typeC_typeB_sharpRestrictedFactorPairs_of_exponent_four
       hP hmulti hxi hprime hPhiComm hexists hZinv hPhiZ hlenZ hncommZ
   let hSquareEA : IsElementaryAbelian 2 (frattiniSquare P) :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : IsMulCommutative (frattini X) :=
+  let : IsMulCommutative (frattini X) :=
     IsMulCommutative.of_comm hEAX.comm
-  letI : CommGroup (frattini X) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini X)) := hEAX.zmodModule
-  letI : IsMulCommutative (frattini Z) :=
+  let : CommGroup (frattini X) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini X)) := hEAX.zmodModule
+  let : IsMulCommutative (frattini Z) :=
     IsMulCommutative.of_comm hEAZ.comm
-  letI : CommGroup (frattini Z) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini Z)) := hEAZ.zmodModule
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : CommGroup (frattini Z) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini Z)) := hEAZ.zmodModule
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : CommGroup (frattiniSquare P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : CommGroup (frattiniSquare P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
   let eX := (restrictedFrattiniLinearEquivFrattiniSquare
     hEAX hSquareEA hMapX).trans eSquare

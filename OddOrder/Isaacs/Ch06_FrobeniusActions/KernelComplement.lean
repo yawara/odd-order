@@ -45,7 +45,7 @@ theorem exists_isComplement'_of_centralizer_le [Finite G] {N : Subgroup G} [N.No
   have hcop : Nat.Coprime (Nat.card N) N.index := by
     by_contra hncop
     obtain ⟨p, hp, hpN, hpI⟩ := Nat.Prime.not_coprime_iff_dvd.mp hncop
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     -- Cauchy: an element `x ∈ N` of order `p`.
     obtain ⟨x₀, hx₀⟩ := exists_prime_orderOf_dvd_card' (G := ↥N) p hpN
     set x : G := (x₀ : G) with hx_def
@@ -61,10 +61,10 @@ theorem exists_isComplement'_of_centralizer_le [Finite G] {N : Subgroup G} [N.No
       rw [Nat.card_zpowers, hx_ord, pow_one]
     obtain ⟨S, hzS⟩ := hzp.exists_le_sylow
     have hxS : x ∈ (S : Subgroup G) := hzS (Subgroup.mem_zpowers x)
-    haveI hS_nontrivial : Nontrivial ↥(S : Subgroup G) :=
+    have hS_nontrivial : Nontrivial ↥(S : Subgroup G) :=
       ⟨⟨⟨x, hxS⟩, 1, fun h => hx_ne (congrArg Subtype.val h)⟩⟩
     -- the center of `S` is a nontrivial subgroup of `C_G(x) ≤ N`
-    haveI : Nontrivial (Subgroup.center ↥(S : Subgroup G)) :=
+    have : Nontrivial (Subgroup.center ↥(S : Subgroup G)) :=
       S.isPGroup'.center_nontrivial
     obtain ⟨z₀, hz₀_ne⟩ := exists_ne (1 : Subgroup.center ↥(S : Subgroup G))
     set z : G := ((z₀ : ↥(S : Subgroup G)) : G) with hz_def

@@ -351,15 +351,15 @@ omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype ↥L] [Invertible (Nat
 both the (6.2) degree-`|L:K|` anchor (`exists_inducedKernelFamily_member_degree_index`) and the
 `S(X) ≠ ∅` witness (`inducedKernelFamily_nonempty_of_commutator_ne_top`).  Peterfalvi's
 "Since `K` is solvable, `K/A` has a non-trivial irreducible character of degree 1" (p. 30). -/
-theorem commutator_quotient_ne_top_of_lt [IsSolvable ↥K] {X : Subgroup ↥L} [X.Normal]
+theorem commutator_quotient_ne_top_of_lt [Group.IsSolvable ↥K] {X : Subgroup ↥L} [X.Normal]
     (hXK : X < K) :
     _root_.commutator (↥K ⧸ X.subgroupOf K) ≠ ⊤ := by
-  haveI : (X.subgroupOf K).Normal := (‹X.Normal›).subgroupOf K
-  haveI : Nontrivial (↥K ⧸ X.subgroupOf K) := by
+  have : (X.subgroupOf K).Normal := (‹X.Normal›).subgroupOf K
+  have : Nontrivial (↥K ⧸ X.subgroupOf K) := by
     rw [QuotientGroup.nontrivial_iff]
     intro htop
     exact hXK.ne' (le_antisymm (Subgroup.subgroupOf_eq_top.mp htop) hXK.le)
-  exact (IsSolvable.commutator_lt_top_of_nontrivial (↥K ⧸ X.subgroupOf K)).ne
+  exact (Group.IsSolvable.commutator_lt_top_of_nontrivial (↥K ⧸ X.subgroupOf K)).ne
 
 /-- **The (6.2) break-member bound `|K:A'| − 1 ≤ 2ψ(1)` from Hypothesis (5.2) data alone** — the
 `h56` of `six_two_general`/`six_three_of_six_two_oracle`, now a *theorem*.
@@ -372,7 +372,7 @@ norm-weighted contrapositive then bounds the `S(A')` degree-square sum, and the 
 `χ₁ ∈ S(A')` of degree `|L:K|` and the nonemptiness of `S(B)` both come from solvability of `K`
 via `commutator_quotient_ne_top_of_lt`. -/
 theorem exists_source_index_le_two_psi_of_imageData
-    [IsSolvable ↥K] (RD : InducedFamilyImageData A₀ K)
+    [Group.IsSolvable ↥K] (RD : InducedFamilyImageData A₀ K)
     (hodd : Odd (Nat.card ↥L))
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀)
     (h1A : (1 : ↥L) ∉ A₀)
@@ -386,8 +386,8 @@ theorem exists_source_index_le_two_psi_of_imageData
           (θ : ClassFunction ↥K ℂ) ∧
       (Nat.card (↥K ⧸ A'.subgroupOf K) : ℝ) - 1 ≤
         2 * (ClassFunction.induce K (θ : ClassFunction ↥K ℂ) 1).re := by
-  haveI : (A'.subgroupOf K).Normal := (‹A'.Normal›).subgroupOf K
-  haveI : (B.subgroupOf K).Normal := (‹B.Normal›).subgroupOf K
+  have : (A'.subgroupOf K).Normal := (‹A'.Normal›).subgroupOf K
+  have : (B.subgroupOf K).Normal := (‹B.Normal›).subgroupOf K
   exact exists_source_index_le_two_psi_of_break_general RD.tau RD.tau_isometry RD.tau_mem_ZIrr
     hodd hKsupp h1A
     (exists_inducedKernelFamily_member_degree_index (commutator_quotient_ne_top_of_lt hA'K))
@@ -421,7 +421,7 @@ Weaker than the book where nothing depends on it: only `A` and `B` are asked to 
 (`C`, `D` are not), and `D` enters only through `D ⊓ C` (`D.subgroupOf C`), so `D ⊆ C` may be
 dropped. -/
 theorem six_two_of_imageData
-    [IsSolvable ↥K] (RD : InducedFamilyImageData A₀ K)
+    [Group.IsSolvable ↥K] (RD : InducedFamilyImageData A₀ K)
     (hodd : Odd (Nat.card ↥L))
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀)
     (h1A : (1 : ↥L) ∉ A₀)
@@ -454,7 +454,7 @@ Everything is discharged: the minimal-`A` descent and maximal-`B` step (`six_thr
 (`exists_source_index_le_two_psi_of_imageData`).  The per-section `A' < K`, `B < K` needed by the
 anchor come from `A' ≤ H₁ < H ≤ K`. -/
 theorem six_three_of_imageData
-    [IsSolvable ↥K] (RD : InducedFamilyImageData A₀ K)
+    [Group.IsSolvable ↥K] (RD : InducedFamilyImageData A₀ K)
     (hodd : Odd (Nat.card ↥L))
     (hKsupp : ∀ x : ↥L, x ∈ K → x ≠ 1 → x ∈ A₀)
     (h1A : (1 : ↥L) ∉ A₀)

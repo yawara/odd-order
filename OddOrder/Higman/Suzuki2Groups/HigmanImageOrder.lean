@@ -89,7 +89,7 @@ theorem HigmanEndomorphismFamily.modTwoHom_range_natCard_eq_two
       { (inferInstance : Group A) with
         mul_comm := hAcomm.is_comm.comm }
     Nat.card ↥(F.modTwoHom ε he subgroupConjInv_mul).range = 2 := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   let f := F.modTwoHom ε he subgroupConjInv_mul
@@ -138,7 +138,7 @@ theorem HigmanEndomorphismFamily.modTwoHom_quotient_natCard_eq_two
         mul_comm := hAcomm.is_comm.comm }
       (F.modTwoHom ε he subgroupConjInv_mul).ker = A.subgroupOf C) :
     Nat.card (↥C ⧸ A.subgroupOf C) = 2 := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   let f := F.modTwoHom ε he subgroupConjInv_mul
@@ -179,7 +179,7 @@ theorem actualHigmanFamily_quotient_natCard_eq_two
       HigmanEndomorphismFamily
         (fun u : C ↦ MulAut.conjNormal (H := A) (u : P)⁻¹)) :
     Nat.card (↥C ⧸ A.subgroupOf C) = 2 := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   have hzeroOne : ∀ u : C, F.modTwo u = 0 ∨ F.modTwo u = 1 :=

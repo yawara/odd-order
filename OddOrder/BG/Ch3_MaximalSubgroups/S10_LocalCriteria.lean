@@ -70,7 +70,7 @@ so `AppB.normalizer_le_normalizer_map_of_characteristic` applies. Replicates the
 theorem normalizer_le_normalizer_omega1CenterInG (P : Subgroup G) (p : ℕ) :
     Subgroup.normalizer (P : Set G) ≤
       Subgroup.normalizer ((omega1CenterInG P p : Subgroup G) : Set G) := by
-  haveI hchar : (omega1OfAbelian ↥P (Subgroup.center ↥P) p
+  have hchar : (omega1OfAbelian ↥P (Subgroup.center ↥P) p
       (fun _ hx y _ => (Subgroup.mem_center_iff.mp hx y).symm)).Characteristic := by
     rw [Subgroup.characteristic_iff_comap_eq]
     intro φ
@@ -115,14 +115,14 @@ theorem centralizer_isUniquelyMaximal_of_two_le_rank [Finite G] (hG : IsMinimalS
     (hr : 2 ≤ rank ↥(Subgroup.centralizer (X : Set G) ⊓ Malpha M)) :
     IsUniquelyMaximal (Subgroup.centralizer (X : Set G) ⊓ M) := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hMlt : M < ⊤ := lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hM).1
   have hCMX_lt : Subgroup.centralizer (X : Set G) ⊓ M < ⊤ := lt_of_le_of_lt inf_le_right hMlt
   -- (1) some prime `p` realises `r_p(C_{M_α}(X)) ≥ 2`.
   obtain ⟨p, hp, hpr⟩ :=
     exists_pRank_ge_of_pos_le_rank (G := ↥(Subgroup.centralizer (X : Set G) ⊓ Malpha M))
       (n := 2) (by norm_num) hr
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   -- (2) an elementary abelian `B ≤ C_{M_α}(X)` of `p`-rank ≥ 2.
   obtain ⟨B, hB_le, hBea, hBlog⟩ :
       ∃ B : Subgroup G, B ≤ Subgroup.centralizer (X : Set G) ⊓ Malpha M ∧
@@ -149,8 +149,8 @@ theorem centralizer_isUniquelyMaximal_of_two_le_rank [Finite G] (hG : IsMinimalS
   obtain ⟨P, hP_le_Ma, hP_pgrp, hX_norm_P, hB_le_P, hP_rank3⟩ :
       ∃ P : Subgroup G, P ≤ Malpha M ∧ IsPGroup p ↥P ∧
         X ≤ Subgroup.normalizer (P : Set G) ∧ B ≤ P ∧ 3 ≤ rank ↥P := by
-    haveI : IsSolvable ↥(Malpha M) :=
-      solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe (Malpha_le M)).toMonoidHom)
+    have : Group.IsSolvable ↥(Malpha M) :=
+      Group.isSolvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe (Malpha_le M)).toMonoidHom)
         (Subgroup.subgroupOfEquivOfLe (Malpha_le M)).surjective
     have hX_norm_Ma : X ≤ Subgroup.normalizer (Malpha M : Set G) :=
       hXM.trans (le_normalizer_opiCoreInG (alpha M) M)
@@ -158,7 +158,7 @@ theorem centralizer_isUniquelyMaximal_of_two_le_rank [Finite G] (hG : IsMinimalS
       Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl (π := (alpha M)ᶜ)
         Nat.card_pos.ne' Nat.card_pos.ne' hXpi
         (fun q hq hqc => hqc (Malpha_isPiGroup M q hq))
-    letI act : MulDistribMulAction ↥X ↥(Malpha M) :=
+    let act : MulDistribMulAction ↥X ↥(Malpha M) :=
       MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (Malpha M : Set G))) ↥(Malpha M)
         (Subgroup.inclusion hX_norm_Ma)
     set φ : ↥X →* MulAut ↥(Malpha M) := MulDistribMulAction.toMulAut ↥X ↥(Malpha M) with hφ
@@ -318,7 +318,7 @@ theorem centralizer_isUniquelyMaximal_of_two_le_rank [Finite G] (hG : IsMinimalS
     have hp_ne2 : p ≠ 2 := by rintro rfl; exact (Nat.not_odd_iff_even.mpr even_two) hpodd
     have hX_p' : ¬ p ∣ Nat.card ↥X := fun hdvd =>
       (hXpi p (Nat.mem_primeFactors.mpr ⟨hp, hdvd, Nat.card_pos.ne'⟩)) hpα
-    letI act : MulDistribMulAction ↥X ↥P :=
+    let act : MulDistribMulAction ↥X ↥P :=
       MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (P : Set G))) ↥P
         (Subgroup.inclusion hX_norm_P)
     set ψ : ↥X →* MulAut ↥P := MulDistribMulAction.toMulAut ↥X ↥P with hψ
@@ -376,14 +376,14 @@ theorem alpha_criterion [Finite G] (hG : IsMinimalSimpleOdd G)
         IsMaximalElementaryAbelian p A) := by
   refine ⟨fun p hp hdvd hpσ => ?_, fun p hp hpσ hr2 => ?_⟩
   · -- (a) `p ∣ |M/M'|` and `p ∈ σ(M)` are contradictory: a Sylow `p` of `M` lies in `M'`.
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     obtain ⟨P, -⟩ := hpσ.2
     have hPder : (P : Subgroup ↥M) ≤ commutator ↥M := by
       have h := sylow_le_derived_of_mem_sigma hG hM hpσ P
       rwa [derivedInG, Subgroup.map_le_map_iff_of_injective M.subtype_injective] at h
     exact P.not_dvd_index (dvd_trans hdvd (Subgroup.index_dvd_of_le hPder))
   · -- (c)
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     -- ∀-part: a rank-`2` elementary abelian `A ≤ M` is `G`-maximal
     -- (else `A ∈ 𝒰` forces `p ∈ σ(M)`).
     have hmax : ∀ A : Subgroup G, A ≤ M → A ∈ elemAbelianOfRank G p 2 →
@@ -404,11 +404,11 @@ theorem alpha_criterion [Finite G] (hG : IsMinimalSimpleOdd G)
         have hPGnormal : (PG : Subgroup G).Normal := Subgroup.normalizer_eq_top_iff.mp htop
         rcases hG.simple.eq_bot_or_eq_top_of_normal _ hPGnormal with hbot | htop'
         · exact hPGne hbot
-        · have hsolv : IsSolvable ↥(PG : Subgroup G) := by
-            haveI := (PG.isPGroup').isNilpotent; infer_instance
+        · have hsolv : Group.IsSolvable ↥(PG : Subgroup G) := by
+            have := (PG.isPGroup').isNilpotent; infer_instance
           rw [htop'] at hsolv
-          haveI := hsolv
-          exact hG.notSolvable (solvable_of_surjective
+          have := hsolv
+          exact hG.notSolvable (Group.isSolvable_of_surjective
             (f := (Subgroup.topEquiv (G := G)).toMonoidHom) (Subgroup.topEquiv (G := G)).surjective)
       have hAN : A ≤ Subgroup.normalizer ((PG : Subgroup G) : Set G) :=
         hAPG.trans Subgroup.le_normalizer
@@ -477,12 +477,12 @@ private theorem two_le_rank_of_not_isZGroup {H : Type*} [Group H] [Finite H]
   rw [isZGroup_iff] at hZ
   push Not at hZ
   obtain ⟨r, hr, R, hRnc⟩ := hZ
-  haveI : Fact r.Prime := ⟨hr⟩
+  have : Fact r.Prime := ⟨hr⟩
   obtain ⟨k, hk⟩ := R.isPGroup'.exists_card_eq
   have hk1 : k ≠ 0 := by
     intro h0
     apply hRnc
-    haveI : Subsingleton ↥(R : Subgroup H) := by
+    have : Subsingleton ↥(R : Subgroup H) := by
       have h1 : Nat.card ↥(R : Subgroup H) = 1 := by rw [hk, h0, pow_zero]
       exact (Nat.card_eq_one_iff_unique.mp h1).1
     infer_instance
@@ -572,7 +572,7 @@ theorem exists_mem_omega1_center_zgroupCentralizer [Finite G] (hG : IsMinimalSim
     · exact absurd h P.not_dvd_index
   have hPG_pg : IsPGroup p ↥PG :=
     P.isPGroup'.of_equiv (Subgroup.equivMapOfInjective _ M.subtype M.subtype_injective)
-  haveI : Nontrivial ↥PG := by
+  have : Nontrivial ↥PG := by
     rw [← Finite.one_lt_card_iff_nontrivial]
     calc 1 < p := (Fact.out : p.Prime).one_lt
       _ ≤ Nat.card ↥(P : Subgroup ↥M) := Nat.le_of_dvd Nat.card_pos hp_dvd_P
@@ -598,7 +598,7 @@ theorem exists_mem_omega1_center_zgroupCentralizer [Finite G] (hG : IsMinimalSim
     rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
     · exact h
     · exfalso
-      refine hG.notSolvable (isSolvable_of_comm fun a b => ?_)
+      refine hG.notSolvable (Group.isSolvable_of_comm fun a b => ?_)
       exact (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm
   have hCy'_lt : Subgroup.centralizer
       (↑(Subgroup.zpowers (u * (z : G) * u⁻¹)) : Set G) < ⊤ := by

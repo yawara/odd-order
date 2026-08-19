@@ -45,10 +45,10 @@ theorem card_group_dvd_card_of_freeAction {G α : Type*} [Group G] [Finite G] [F
     [MulAction G α] (hfree : ∀ (s : G) (a : α), s • a = a → s = 1) :
     Nat.card G ∣ Nat.card α := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Fintype α := Fintype.ofFinite α
-  haveI : ∀ s : G, Fintype (MulAction.fixedBy α s) := fun _ => Fintype.ofFinite _
-  haveI : Fintype (MulAction.orbitRel.Quotient G α) := Fintype.ofFinite _
+  have : Fintype G := Fintype.ofFinite G
+  have : Fintype α := Fintype.ofFinite α
+  have : ∀ s : G, Fintype (MulAction.fixedBy α s) := fun _ => Fintype.ofFinite _
+  have : Fintype (MulAction.orbitRel.Quotient G α) := Fintype.ofFinite _
   have key := MulAction.sum_card_fixedBy_eq_card_orbits_mul_card_group G α
   have h0 : ∀ s ∈ (Finset.univ : Finset G), s ≠ 1 →
       Fintype.card (MulAction.fixedBy α s) = 0 := by
@@ -397,8 +397,8 @@ centralizes all of `K`, so the representative `a ∈ C` lies in `C_K(g) = W₂` 
 theorem conjClass_meets_W2 [Finite L] (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) (C : ConjClasses ↥h.K)
     (hC : ConjClasses.conjByPerm (G := L) (H := h.K) g C = C) :
     ∃ c : ↥h.K, c ∈ C.carrier ∧ (c : L) ∈ h.W2 := by
-  haveI := h.K_normal
-  haveI : Finite ↥h.K := Fintype.ofFinite _ |>.finite
+  have := h.K_normal
+  have : Finite ↥h.K := Fintype.ofFinite _ |>.finite
   classical
   obtain ⟨a, ha⟩ := C.exists_rep
   -- membership in the class ⟺ conjugacy with the representative `a`
@@ -424,7 +424,7 @@ theorem conjClass_meets_W2 [Finite L] (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) 
   have hψa : ∀ ψ ∈ Subgroup.zpowers φ, IsConj (ψ a) a := by
     let S : Subgroup (MulAut ↥h.K) :=
       { carrier := {ψ | IsConj (ψ a) a}
-        one_mem' := by simpa only [Set.mem_setOf_eq, MulAut.one_apply] using IsConj.refl a
+        one_mem' := by simpa only [Set.mem_ofPred_eq, MulAut.one_apply] using IsConj.refl a
         mul_mem' := fun {ψ₁ ψ₂} h₁ h₂ => by
           change IsConj ((ψ₁ * ψ₂) a) a
           rw [MulAut.mul_apply]
@@ -441,7 +441,7 @@ theorem conjClass_meets_W2 [Finite L] (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) 
       smul_mem' := fun c {x} hx => by
         rw [hmem_iff] at hx ⊢
         exact ((hmapconj _ hx).trans (hψa _ c.2) : IsConj ((c : MulAut ↥h.K) x) a) }
-  haveI : Finite (MulAut ↥h.K) := inferInstance
+  have : Finite (MulAut ↥h.K) := inferInstance
   -- free action: under `hno`, no nontrivial power of `φ` fixes a point of `C`
   have hfree : ∀ (s : ↥(Subgroup.zpowers φ)) (y : ↥sma), s • y = y → s = 1 := by
     intro s y hsy
@@ -516,8 +516,8 @@ a `W₂`-representative injects the `g`-stable classes into `W₂`. -/
 theorem card_fixed_conjClasses_le_W2 [Finite L] (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) :
     Nat.card (Function.fixedPoints (ConjClasses.conjByPerm (G := L) (H := h.K) g))
       ≤ Nat.card ↥h.W2 := by
-  haveI := h.K_normal
-  haveI : Finite ↥h.K := Fintype.ofFinite _ |>.finite
+  have := h.K_normal
+  have : Finite ↥h.K := Fintype.ofFinite _ |>.finite
   classical
   -- a `W₂`-representative of each `g`-stable class
   let wit : Function.fixedPoints (ConjClasses.conjByPerm (G := L) (H := h.K) g) → ↥h.K :=
@@ -544,8 +544,8 @@ which is `≤ w₂` by `card_fixed_conjClasses_le_W2`. -/
 theorem card_fixed_irr_le_W2 [Finite L] (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) :
     Nat.card (Function.fixedPoints (IrreducibleCharacter.conjByPerm (G := L) (H := h.K) g))
       ≤ Nat.card ↥h.W2 := by
-  haveI := h.K_normal
-  haveI : Finite ↥h.K := Fintype.ofFinite _ |>.finite
+  have := h.K_normal
+  have : Finite ↥h.K := Fintype.ofFinite _ |>.finite
   rw [card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm]
   exact h.card_fixed_conjClasses_le_W2 g hg hg1
 
@@ -574,7 +574,7 @@ theorem induce_chiColumnDiff_eq_zero_of_mem_K [NeZero (Nat.card h.W1)]
   · -- the difference is supported on `W − W₂`: it vanishes on `W₂`
     intro w hw
     rw [ClassFunction.mem_support] at hw
-    rw [Set.mem_setOf_eq]
+    rw [Set.mem_ofPred_eq]
     intro hwmem
     apply hw
     have hwW2 : w ∈ h.W2.subgroupOf h.sdiffTICyclicHypothesis.W := by
@@ -584,7 +584,7 @@ theorem induce_chiColumnDiff_eq_zero_of_mem_K [NeZero (Nat.card h.W1)]
       (h.w1CharEquiv i) (h.w1CharEquiv 0) χ₂ hwW2
   · -- `k` is not conjugate into `W − W₂`
     rintro ⟨x, hx, hxA⟩
-    rw [Set.mem_setOf_eq] at hxA
+    rw [Set.mem_ofPred_eq] at hxA
     apply hxA
     have hconjK : x⁻¹ * k * x ∈ h.K := by
       simpa using h.K_normal.conj_mem k hk x⁻¹
@@ -600,7 +600,7 @@ theorem columnFamily_difference_vanishes_on_K [NeZero (Nat.card h.W1)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
     {k : L} (hk : k ∈ h.K) :
     (h.columnFamily χ₂).difference i k = 0 := by
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   have hsd : (h.columnFamily χ₂).signedDifference i k = 0 := by
     rw [← h.columnFamily_spec χ₂ i, isometryDifferenceImage_induceZ]
     exact h.induce_chiColumnDiff_eq_zero_of_mem_K χ₂ i hk
@@ -618,7 +618,7 @@ theorem restrict_certainType_eq [NeZero (Nat.card h.W1)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     ClassFunction.restrict h.K ((h.columnFamily χ₂).mu i : ClassFunction L ℂ)
       = ClassFunction.restrict h.K ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ) := by
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   ext k
   rw [ClassFunction.restrict_apply, ClassFunction.restrict_apply, ← sub_eq_zero]
   have hdiff := h.columnFamily_difference_vanishes_on_K χ₂ i k.2
@@ -659,8 +659,8 @@ theorem exists_irreducible_restrict_certainType [NeZero (Nat.card h.W1)]
       ClassFunction.induce h.K (θ : ClassFunction ↥h.K ℂ)
           = ∑ i, ((h.columnFamily χ₂).mu i : ClassFunction L ℂ) := by
   classical
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
-  haveI : Fintype ↥h.K := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Fintype ↥h.K := Fintype.ofFinite _
   -- `χ_j = Res^L_K μ_{0j}` is a genuine character
   have hχj_char : IsCharacter
       (ClassFunction.restrict h.K ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ)) :=
@@ -786,7 +786,7 @@ lies in the inertia group of `θ` iff `θ` is fixed by the conjugation permutati
 theorem mem_inertia_iff_isFixedPt_conjByPerm (g : L) (θ : IrreducibleCharacter ↥h.K) :
     g ∈ IrreducibleCharacter.inertia (G := L) (H := h.K) θ ↔
       Function.IsFixedPt (IrreducibleCharacter.conjByPerm (G := L) (H := h.K) g) θ := by
-  haveI := h.K_normal
+  have := h.K_normal
   rw [IrreducibleCharacter.mem_inertia]
   exact Iff.rfl
 
@@ -812,7 +812,7 @@ theorem chiRestrict_isFixedPt [NeZero (Nat.card h.W1)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (g : L) :
     Function.IsFixedPt (IrreducibleCharacter.conjByPerm (G := L) (H := h.K) g)
       (h.chiRestrict χ₂) := by
-  haveI := h.K_normal
+  have := h.K_normal
   apply IrreducibleCharacter.ext
   simp only [IrreducibleCharacter.conjByPerm_apply, IrreducibleCharacter.coe_conjBy,
     coe_chiRestrict]
@@ -864,7 +864,7 @@ omit [Fintype L] in
 `χ_j ∈ Irr(K)`, matching the `card_fixed_irr_le_W2` bound. -/
 theorem card_charGroup_W2 [Finite L] :
     Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) = Nat.card h.W2 := by
-  haveI : Fintype L := Fintype.ofFinite L
+  have : Fintype L := Fintype.ofFinite L
   exact h.sdiffTICyclicHypothesis.card_charGroup_subgroupOf h.sdiffTICyclicHypothesis.W2_le_W
 
 omit [Fintype ↥(h.W1 ⊔ h.W2)] in
@@ -876,8 +876,8 @@ theorem exists_eq_chiRestrict_of_isFixedPt [NeZero (Nat.card h.W1)]
     (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) {χ : IrreducibleCharacter ↥h.K}
     (hfix : Function.IsFixedPt (IrreducibleCharacter.conjByPerm (G := L) (H := h.K) g) χ) :
     ∃ χ₂, h.chiRestrict χ₂ = χ := by
-  haveI := h.K_normal
-  haveI : Finite ↥h.K := Fintype.ofFinite _ |>.finite
+  have := h.K_normal
+  have : Finite ↥h.K := Fintype.ofFinite _ |>.finite
   classical
   -- `F : Ŵ₂ → Fix(g)`, `χ₂ ↦ χ_j`, is injective into the `g`-fixed set
   let F : ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) →
@@ -894,8 +894,8 @@ theorem exists_eq_chiRestrict_of_isFixedPt [NeZero (Nat.card h.W1)]
       = Nat.card (Function.fixedPoints (IrreducibleCharacter.conjByPerm (G := L) (H := h.K) g)) :=
     le_antisymm hle1 (hle2.trans (le_of_eq h.card_charGroup_W2.symm))
   -- injective + equal finite cardinality ⟹ bijective ⟹ surjective
-  haveI : Fintype ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := Fintype.ofFinite _
-  haveI : Fintype (Function.fixedPoints
+  have : Fintype ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := Fintype.ofFinite _
+  have : Fintype (Function.fixedPoints
       (IrreducibleCharacter.conjByPerm (G := L) (H := h.K) g)) := Fintype.ofFinite _
   have hbij : Function.Bijective F := by
     rw [Fintype.bijective_iff_injective_and_card]
@@ -917,7 +917,7 @@ reducible count: `induce` is injective on the reducible-inducing columns
 theorem chiRestrict_conjBy_eq [NeZero (Nat.card h.W1)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (g : L) :
     IrreducibleCharacter.conjBy g (h.chiRestrict χ₂) = h.chiRestrict χ₂ := by
-  haveI := h.K_normal
+  have := h.K_normal
   apply IrreducibleCharacter.ext
   ext x
   rw [IrreducibleCharacter.coe_conjBy, ClassFunction.conjBy_apply, coe_chiRestrict,
@@ -935,7 +935,7 @@ count to the §9 family `{φ ∈ 𝒮(H₀) | ¬ irr φ}`. -/
 theorem induce_chiRestrict_injective [NeZero (Nat.card h.W1)] [Finite ↥h.K] :
     Function.Injective (fun χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ =>
       ClassFunction.induce h.K (h.chiRestrict χ₂ : ClassFunction ↥h.K ℂ)) := by
-  haveI : Fintype ↥h.K := Fintype.ofFinite _
+  have : Fintype ↥h.K := Fintype.ofFinite _
   intro χ₂ χ₂' heq
   exact (h.chiRestrict_injective
     (induce_injective_of_inertia_stable (h.chiRestrict_conjBy_eq χ₂) heq)).symm
@@ -949,7 +949,7 @@ inertia group `I_L(χ) = K`.  Write `ℓ ∈ I_L(χ)` as `ℓ = k·w` (`k ∈ K`
 theorem inertia_eq_K_of_forall_chiRestrict_ne [NeZero (Nat.card h.W1)]
     {χ : IrreducibleCharacter ↥h.K} (hχ : ∀ χ₂, h.chiRestrict χ₂ ≠ χ) :
     IrreducibleCharacter.inertia (G := L) (H := h.K) χ = h.K := by
-  haveI := h.K_normal
+  have := h.K_normal
   refine le_antisymm ?_ (IrreducibleCharacter.subgroup_le_inertia χ)
   intro ℓ hℓ
   obtain ⟨⟨⟨kk, hk⟩, ⟨u, hu⟩⟩, hku, -⟩ := Subgroup.IsComplement.existsUnique h.isComplement ℓ
@@ -974,8 +974,8 @@ character `Ind^L_K χ` is irreducible.  Immediate from `I_L(χ) = K`
 theorem induce_isIrreducible_of_forall_chiRestrict_ne [NeZero (Nat.card h.W1)]
     {χ : IrreducibleCharacter ↥h.K} (hχ : ∀ χ₂, h.chiRestrict χ₂ ≠ χ) :
     IsIrreducibleCharacter (ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ)) := by
-  haveI := h.K_normal
-  haveI : Fintype ↥h.K := Fintype.ofFinite _
+  have := h.K_normal
+  have : Fintype ↥h.K := Fintype.ofFinite _
   exact isIrreducibleCharacter_induce_of_inertia_eq χ
     (h.inertia_eq_K_of_forall_chiRestrict_ne hχ)
 
@@ -989,8 +989,8 @@ theorem induce_ne_certainType_of_forall_chiRestrict_ne [NeZero (Nat.card h.W1)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ)
       ≠ ((h.columnFamily χ₂).mu i : ClassFunction L ℂ) := by
-  haveI := h.K_normal
-  haveI : Fintype ↥h.K := Fintype.ofFinite _
+  have := h.K_normal
+  have : Fintype ↥h.K := Fintype.ofFinite _
   intro heq
   have hinner : ClassFunction.inner (ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ))
       ((h.columnFamily χ₂).mu i : ClassFunction L ℂ) = 0 := by
@@ -1014,8 +1014,8 @@ theorem exists_eq_certainType_or_induce [NeZero (Nat.card h.W1)] (μ : Irreducib
     (∃ χ₂ i, (h.columnFamily χ₂).mu i = μ) ∨
       (∃ χ : IrreducibleCharacter ↥h.K, (∀ χ₂, h.chiRestrict χ₂ ≠ χ) ∧
         ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ) = (μ : ClassFunction L ℂ)) := by
-  haveI := h.K_normal
-  haveI : Fintype ↥h.K := Fintype.ofFinite _
+  have := h.K_normal
+  have : Fintype ↥h.K := Fintype.ofFinite _
   classical
   -- an irreducible constituent `θ` of `Res^L_K μ`, hence `μ` is a constituent of `Ind^L_K θ`
   obtain ⟨θ, hθ⟩ := IrreducibleCharacter.exists_liesOver (H := h.K) μ
@@ -1062,8 +1062,8 @@ theorem induce_chiRestrict_not_isIrreducible [NeZero (Nat.card h.W1)]
     ¬ IsIrreducibleCharacter
       (ClassFunction.induce h.K (h.chiRestrict χ₂ : ClassFunction ↥h.K ℂ)) := by
   classical
-  haveI := h.K_normal
-  haveI : Fintype ↥h.K := Fintype.ofFinite _
+  have := h.K_normal
+  have : Fintype ↥h.K := Fintype.ofFinite _
   intro hirr
   -- `Ind^L_K χ_j = ∑_i μ_{ij}`
   have hsum : ClassFunction.induce h.K (h.chiRestrict χ₂ : ClassFunction ↥h.K ℂ)

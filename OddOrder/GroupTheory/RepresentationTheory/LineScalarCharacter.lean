@@ -91,7 +91,7 @@ theorem lineScalarChar_eq_one_iff (ρ : Representation (ZMod p) U V)
   · intro h x
     rw [lineScalarChar_smul ρ hdim u x, h, Units.val_one, one_smul]
   · intro h
-    haveI : Nontrivial V := Module.nontrivial_of_finrank_eq_succ hdim
+    have : Nontrivial V := Module.nontrivial_of_finrank_eq_succ hdim
     obtain ⟨x, hx⟩ := exists_ne (0 : V)
     have hsx : ((lineScalarChar ρ hdim u : ZMod p) - 1) • x = 0 := by
       rw [sub_smul, one_smul, ← lineScalarChar_smul ρ hdim u x, h x, sub_self]
@@ -114,7 +114,7 @@ theorem lineScalarChar_comp_of_equivariant {W : Type*} [AddCommGroup W] [Module 
     (e : V ≃ₗ[ZMod p] W) (σ : U →* U)
     (he : ∀ (u : U) (x : V), e (ρ u x) = ρ' (σ u) (e x)) (u : U) :
     lineScalarChar ρ hdim u = lineScalarChar ρ' hdim' (σ u) := by
-  haveI : Nontrivial V := Module.nontrivial_of_finrank_eq_succ hdim
+  have : Nontrivial V := Module.nontrivial_of_finrank_eq_succ hdim
   obtain ⟨x, hx⟩ := exists_ne (0 : V)
   have hex : e x ≠ 0 := fun h => hx (e.injective (by simpa using h))
   have h1 : ρ' (σ u) (e x) = (lineScalarChar ρ hdim u : ZMod p) • e x := by
@@ -177,8 +177,8 @@ has, to the `finrank = 1` hypothesis of `lineScalarChar`. -/
 theorem finrank_eq_one_of_card_eq_prime {p : ℕ} [Fact p.Prime] {V : Type*}
     [AddCommGroup V] [Module (ZMod p) V] [Finite V] (hcard : Nat.card V = p) :
     Module.finrank (ZMod p) V = 1 := by
-  haveI : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
-  haveI : Module.Finite (ZMod p) V := Module.Finite.of_finite
+  have : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
+  have : Module.Finite (ZMod p) V := Module.Finite.of_finite
   have hcardZ : Nat.card (ZMod p) = p := by rw [Nat.card_eq_fintype_card, ZMod.card]
   have hpow : Nat.card V = Nat.card (ZMod p) ^ Module.finrank (ZMod p) V :=
     Module.natCard_eq_pow_finrank

@@ -154,6 +154,7 @@ built by the caller from the `(9.7.b)` `C`-equivariance of the field iso) and th
 `E ⊓ C = ⊥`, the embedding `σ` is injective and carries the additive kernel onto `E` and the
 complement onto `C`.  Generic version of the `fieldNormalizerData_of_repr` assembly. -/
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Lift compatibility from textbook equivariance.**  The `SemidirectProduct.lift` compatibility
 `hcompatLift` demanded by `fieldModelEmbedding`, derived from the textbook `C`-conjugation
 equivariance of the field iso — `e (ofMul (v x v⁻¹)) = μ v • e (ofMul x)` for `v ∈ C`, `x ∈ E`

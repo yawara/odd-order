@@ -224,7 +224,7 @@ theorem hypothesis76_restrict_zeta_eq_orbitSum [Fintype G]
                 (θ : ClassFunction ↥(H76.H.subgroupOf L) ℂ)), ψ) := by
   classical
   set K : Subgroup ↥L := H76.H.subgroupOf L with hKdef
-  haveI hKnorm : K.Normal :=
+  have hKnorm : K.Normal :=
     OddOrder.Peterfalvi.S09.Cert.subgroupOf_normal_of_conj H76.H_normal_in_L
   obtain ⟨θ₀, hθ₀⟩ := H76.zeta_induced j
   have hθ : H76.zeta j = ClassFunction.induce K (θ₀ : ClassFunction ↥K ℂ) := by
@@ -270,7 +270,7 @@ theorem hypothesis76_inv_normSq_restrict_zeta_mem_ZIrr [Fintype G]
       ∈ ZIrr ↥(H76.H.subgroupOf L) := by
   classical
   set K : Subgroup ↥L := H76.H.subgroupOf L with hKdef
-  haveI hKnorm : K.Normal :=
+  have hKnorm : K.Normal :=
     OddOrder.Peterfalvi.S09.Cert.subgroupOf_normal_of_conj H76.H_normal_in_L
   obtain ⟨θ₀, hθ₀⟩ := H76.zeta_induced i
   have hθ : H76.zeta i = ClassFunction.induce K (θ₀ : ClassFunction ↥K ℂ) := by
@@ -342,7 +342,7 @@ theorem hypothesis76_zeta_inner_alphaFun_eq_zero [Fintype G] [Invertible (Nat.ca
       OddOrder.Peterfalvi.S03.characterKernel (H76.zeta i₁))) :
     ∑ x : ↥L, H76.zeta i₁ x * (starRingEnd ℂ) (hypothesis76AlphaFun H76 P' χ x) = 0 := by
   classical
-  haveI hKn : (H76.H.subgroupOf L).Normal :=
+  have hKn : (H76.H.subgroupOf L).Normal :=
     OddOrder.Peterfalvi.S09.Cert.subgroupOf_normal_of_conj H76.H_normal_in_L
   -- The sum is `|L|·⟨ζ_{i₁}, alphaCF⟩` with `alphaCF` the class-function form of the tail.
   set alphaCF : ClassFunction ↥L ℂ :=
@@ -635,7 +635,7 @@ theorem H_sharp_restrict_zeta_eq_orbitSum [Fintype G] [Invertible (Nat.card G : 
                 (θ : ClassFunction ↥((H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S) ℂ)), ψ) := by
   classical
   set K : Subgroup ↥hyp.S := (H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S with hKdef
-  haveI hKnorm : K.Normal := H_sharp_subgroupOf_normal hyp
+  have hKnorm : K.Normal := H_sharp_subgroupOf_normal hyp
   obtain ⟨θ₀, hθ₀⟩ := (H_sharp_hypothesis76 hG hyp).zeta_induced j
   have hθ : (H_sharp_hypothesis76 hG hyp).zeta j
       = ClassFunction.induce K (θ₀ : ClassFunction ↥K ℂ) := by
@@ -706,7 +706,7 @@ theorem H_sharp_inv_normSq_restrict_zeta_mem_ZIrr [Fintype G] [Invertible (Nat.c
       ∈ ZIrr ↥((H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S) := by
   classical
   set K : Subgroup ↥hyp.S := (H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S with hKdef
-  haveI hKnorm : K.Normal := H_sharp_subgroupOf_normal hyp
+  have hKnorm : K.Normal := H_sharp_subgroupOf_normal hyp
   obtain ⟨θ₀, hθ₀⟩ := (H_sharp_hypothesis76 hG hyp).zeta_induced i
   -- Re-type across the definitional equality `(H_sharp_hypothesis76 hG hyp).H = hyp.H`, and
   -- bridge the canonical `Fintype`/`Invertible` instances (both subsingleton classes).
@@ -918,22 +918,22 @@ theorem Hypothesis.mu_j_isIndPC [Finite G]
         (∑ i : Fin hyp.q, hyp.mu i j)
           = ClassFunction.induce (hyp.H.subgroupOf hyp.S) θ := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   set data := hyp.toTypesIIIIIIVSetupS hG with hdata
   obtain ⟨chief, -⟩ := OddOrder.Peterfalvi.S11.exists_chiefFactorData hG data
-  letI : Fintype ↥(OddOrder.Peterfalvi.S11.huSub data) := Fintype.ofFinite _
-  letI : Fintype ↥(OddOrder.Peterfalvi.S11.hInHu data ⊔
+  let : Fintype ↥(OddOrder.Peterfalvi.S11.huSub data) := Fintype.ofFinite _
+  let : Fintype ↥(OddOrder.Peterfalvi.S11.hInHu data ⊔
       ((chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub data chief).subgroupOf hyp.S).subgroupOf
         (OddOrder.Peterfalvi.S11.huSub data)) := Fintype.ofFinite _
-  letI : Fintype ↥((OddOrder.Peterfalvi.S11.hInHu data ⊔
+  let : Fintype ↥((OddOrder.Peterfalvi.S11.hInHu data ⊔
       ((chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub data chief).subgroupOf hyp.S).subgroupOf
         (OddOrder.Peterfalvi.S11.huSub data)).map
       (OddOrder.Peterfalvi.S11.huSub data).subtype) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥(OddOrder.Peterfalvi.S11.hInHu data ⊔
+  let : Invertible (Nat.card ↥(OddOrder.Peterfalvi.S11.hInHu data ⊔
       ((chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub data chief).subgroupOf hyp.S).subgroupOf
         (OddOrder.Peterfalvi.S11.huSub data)) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥((OddOrder.Peterfalvi.S11.hInHu data ⊔
+  let : Invertible (Nat.card ↥((OddOrder.Peterfalvi.S11.hInHu data ⊔
       ((chief.H0 ⊔ OddOrder.Peterfalvi.S11.cSub data chief).subgroupOf hyp.S).subgroupOf
         (OddOrder.Peterfalvi.S11.huSub data)).map
       (OddOrder.Peterfalvi.S11.huSub data).subtype) : ℂ) :=
@@ -1025,7 +1025,7 @@ theorem Hypothesis.eta10_apply_sub_one_integral [Finite G] (hyp : Hypothesis (G 
   have hW2W : hyp.W2 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_right
   -- pick `x ∈ W₁^#`
   obtain ⟨x, hxW1, hx1⟩ : ∃ x : G, x ∈ hyp.W1 ∧ x ≠ 1 := by
-    haveI : Nontrivial ↥hyp.W1 := Finite.one_lt_card_iff_nontrivial.mp
+    have : Nontrivial ↥hyp.W1 := Finite.one_lt_card_iff_nontrivial.mp
       (by rw [← hyp.q_eq_card_W1]; exact hyp.q_prime.one_lt)
     obtain ⟨x', hx'⟩ := exists_ne (1 : ↥hyp.W1)
     exact ⟨x', x'.2, fun h => hx' (Subtype.ext h)⟩
@@ -1054,7 +1054,7 @@ theorem Hypothesis.eta10_apply_sub_one_integral [Finite G] (hyp : Hypothesis (G 
   -- `ω₁₀(x)` is a `q`-th root of unity: `= ε^k`
   have hpow : hyp.omega ⟨1, hyp.q_prime.one_lt⟩ ⟨0, hyp.p_prime.pos⟩ ⟨x, hW1W hxW1⟩ ^ hyp.q
       = 1 := hyp.omega_pow_q_of_mem_W1 _ _ ⟨x, hW1W hxW1⟩ hxW1
-  haveI : NeZero hyp.q := ⟨hyp.q_prime.pos.ne'⟩
+  have : NeZero hyp.q := ⟨hyp.q_prime.pos.ne'⟩
   obtain ⟨k, -, hk⟩ := hε.eq_pow_of_pow_eq_one hpow
   -- `ε^k − 1 = (1 − ε)·z₂` with `z₂` integral (geometric sum)
   have hε_mem : ε ∈ integralClosure ℤ ℂ := hε.isIntegral hyp.q_prime.pos

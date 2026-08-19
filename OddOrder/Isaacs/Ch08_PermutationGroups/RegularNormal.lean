@@ -236,6 +236,7 @@ variable (A H : Type*) [Group A] [Group H] [MulDistribMulAction A H]
 
 local notation "G₀" => H ⋊[MulDistribMulAction.toMulAut A H] A
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Isaacs Cor 8.6** — let a group `A` act by automorphisms on a group `H`,
 `k`-transitively on the nonidentity elements of `H`.  Then the semidirect
 product `H ⋊ A` acts `(k+1)`-transitively on the cosets of `A`. -/

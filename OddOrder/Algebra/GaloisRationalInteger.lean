@@ -74,12 +74,12 @@ theorem exists_int_of_isIntegral_of_forall_complexRingEquiv_fixed {α : ℂ}
   have hp0 : p ≠ 0 := minpoly.ne_zero hαℚ
   have hsplits : (p.map (algebraMap ℚ ℂ)).Splits := IsAlgClosed.splits _
   set K : IntermediateField ℚ ℂ := IntermediateField.adjoin ℚ (p.rootSet ℂ) with hK
-  haveI hSF : IsSplittingField ℚ K p := IntermediateField.adjoin_rootSet_isSplittingField hsplits
-  haveI : Normal ℚ K := Normal.of_isSplittingField p
-  haveI : FiniteDimensional ℚ K := IsSplittingField.finiteDimensional K p
-  haveI : Algebra.IsAlgebraic ℚ K := Algebra.IsAlgebraic.of_finite ℚ K
-  haveI : Algebra.IsSeparable ℚ K := inferInstance
-  haveI : IsGalois ℚ K := ⟨⟩
+  have hSF : IsSplittingField ℚ K p := IntermediateField.adjoin_rootSet_isSplittingField hsplits
+  have : Normal ℚ K := Normal.of_isSplittingField p
+  have : FiniteDimensional ℚ K := IsSplittingField.finiteDimensional K p
+  have : Algebra.IsAlgebraic ℚ K := Algebra.IsAlgebraic.of_finite ℚ K
+  have : Algebra.IsSeparable ℚ K := inferInstance
+  have : IsGalois ℚ K := ⟨⟩
   -- `α` lies in `K` (it is a root of its own minimal polynomial).
   have hαmem : α ∈ K := by
     apply IntermediateField.subset_adjoin
@@ -112,7 +112,7 @@ The exponent is well defined because `σ` sends a fixed primitive root `μ` to a
 `μ ^ k`, and every `n`-th root is a power of `μ`. -/
 theorem exists_pow_of_complexRingEquiv (σ : ℂ ≃+* ℂ) {n : ℕ} (hn : n ≠ 0) :
     ∃ k : ℕ, k.Coprime n ∧ ∀ ζ : ℂ, ζ ^ n = 1 → σ ζ = ζ ^ k := by
-  haveI : NeZero n := ⟨hn⟩
+  have : NeZero n := ⟨hn⟩
   have hnpos : 0 < n := Nat.pos_of_ne_zero hn
   obtain ⟨μ, hμ⟩ : ∃ μ : ℂ, IsPrimitiveRoot μ n := ⟨_, Complex.isPrimitiveRoot_exp n hn⟩
   have hσμ : IsPrimitiveRoot (σ μ) n := hμ.map_of_injective σ.injective

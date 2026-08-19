@@ -144,18 +144,18 @@ theorem restrictedFactorMixedTerm_eq_frattiniSquareCommutator
   dsimp only
   let hSquareEA :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : CommGroup (frattiniSquare P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : CommGroup (frattiniSquare P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
-  letI : IsMulCommutative (frattini S) :=
+  let : IsMulCommutative (frattini S) :=
     IsMulCommutative.of_comm hEAS.comm
-  letI : CommGroup (frattini S) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini S)) := hEAS.zmodModule
+  let : CommGroup (frattini S) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini S)) := hEAS.zmodModule
   have heS' : eS =
       (restrictedFrattiniLinearEquivFrattiniSquare
         hEAS hSquareEA hMap).trans eSquare := heS
@@ -178,7 +178,7 @@ theorem restrictedFactorMixedTerm_eq_frattiniSquareCommutator
   cases left with
   | noncommutative hncomm d => exact (hncomm hleftComm).elim
   | commutative d =>
-      haveI := d.fintypeIndex
+      have := d.fintypeIndex
       obtain ⟨gL, hgL⟩ :=
         QuotientGroup.mk_surjective (d.eQuot.symm alpha).toMul
       have halpha : alpha =
@@ -218,10 +218,10 @@ theorem restrictedFactorMixedTerm_eq_frattiniSquareCommutator
         change commFactorInclusion d hK0S alpha = layerZeroClass xS
         rw [halpha]
         exact commFactorInclusion_eQuot_mk d hK0S gL
-      letI := R.group
-      letI := R.normal
-      letI := R.quotComm
-      letI := R.quotModule
+      let := R.group
+      let := R.normal
+      let := R.quotComm
+      let := R.quotModule
       obtain ⟨gR, hgR⟩ :=
         QuotientGroup.mk'_surjective R.N (R.eQuot.symm beta).toMul
       have hbeta : beta =

@@ -55,7 +55,7 @@ theorem msigma_quotient_isNilpotent_of_inputs [Finite G]
   -- `K₁ ≤ K` of prime order (Cauchy in `↥K`).
   have hKcard1 : Nat.card ↥K ≠ 1 := fun hc => hKne (Subgroup.card_eq_one.mp hc)
   obtain ⟨r, hr_prime, hr_dvd⟩ := Nat.exists_prime_and_dvd hKcard1
-  haveI : Fact r.Prime := ⟨hr_prime⟩
+  have : Fact r.Prime := ⟨hr_prime⟩
   obtain ⟨c, hc_ord⟩ := exists_prime_orderOf_dvd_card' (G := ↥K) r hr_dvd
   set K1 : Subgroup G := Subgroup.zpowers (c : G) with hK1
   have hcK : (c : G) ∈ K := c.2
@@ -66,9 +66,9 @@ theorem msigma_quotient_isNilpotent_of_inputs [Finite G]
   have hK1prime : ∃ p : ℕ, p.Prime ∧ Nat.card ↥K1 = p := ⟨r, hr_prime, hcardK1⟩
   -- structural facts for `isNilpotent_quotient_of_regular_general` (`N = M_σ`, `Q₀ = Q`, `K₁`).
   have hQltMσ : Q < Mσ := lt_of_le_of_ne hQMσ hQneMσ
-  have hMσK1solv : IsSolvable ↥(Mσ ⊔ K1) := by
-    haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-    exact solvable_of_solvable_injective (Subgroup.inclusion_injective (sup_le hMσM hK1M))
+  have hMσK1solv : Group.IsSolvable ↥(Mσ ⊔ K1) := by
+    have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
+    exact Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective (sup_le hMσM hK1M))
   have hMσK1normQ : Mσ ⊔ K1 ≤ Subgroup.normalizer (Q : Set G) := sup_le (hMσM.trans hMnormQ)
     (hK1M.trans hMnormQ)
   have hK1normMσ : K1 ≤ Subgroup.normalizer (Mσ : Set G) := hK1M.trans hMnormMσ
@@ -88,9 +88,9 @@ theorem msigma_quotient_isNilpotent_of_inputs [Finite G]
     have hk_normMσ : k ∈ Subgroup.normalizer (Mσ : Set G) := hMnormMσ hkM
     have hk_normQ : k ∈ Subgroup.normalizer (Q : Set G) := hMnormQ hkM
     have hMσnormQ : Mσ ≤ Subgroup.normalizer (Q : Set G) := hMσM.trans hMnormQ
-    haveI : IsSolvable ↥Mσ :=
-      have : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-      solvable_of_solvable_injective (Subgroup.inclusion_injective hMσM)
+    have : Group.IsSolvable ↥Mσ :=
+      have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
+      Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective hMσM)
     exact fpf_of_centralizer_inf_le_general (k := k) hk_normMσ hk_normQ hMσnormQ hQMσ hcopk
       (Or.inr inferInstance) hCk x hxMσ hpre
   exact isNilpotent_quotient_of_regular_general hMσK1solv hMσK1normQ hK1normMσ hK1prime
@@ -135,7 +135,7 @@ theorem q_not_dvd_index_of_msigma_quotient_isNilpotent [Finite G]
     (hNil : Group.IsNilpotent (↥Mσ ⧸ Q.subgroupOf Mσ)) :
     ¬ q ∣ (Q.subgroupOf Mσ).index := by
   classical
-  haveI := hNil
+  have := hNil
   set Cq : Subgroup (↥Mσ ⧸ Q.subgroupOf Mσ) := OddOrder.Isaacs.Ch01.opCore q (↥Mσ ⧸ Q.subgroupOf Mσ)
     with hCq
   -- It suffices to show `Cq = ⊥` (then `q ∤ |Mσ/Q| = [Mσ:Q]`).
@@ -202,7 +202,7 @@ theorem q_not_dvd_index_of_msigma_quotient_isNilpotent [Finite G]
     exact ⟨a + b, by rw [hcard, ha, hb, ← pow_add]⟩
   have hRG_pg : IsPGroup q ↥RG := hR_pg.map Mσ.subtype
   -- `RG ⊴ M`: the `q`-core `Cq` of `M_σ/Q` is characteristic, so preserved by `M`-conjugation.
-  haveI hCq_char : Cq.Characteristic := by rw [hCq]; infer_instance
+  have hCq_char : Cq.Characteristic := by rw [hCq]; infer_instance
   have hRG_normM : (RG.subgroupOf M).Normal := by
     rw [Subgroup.normal_subgroupOf_iff_le_normalizer hRG_le_M]
     intro m hm
@@ -324,10 +324,11 @@ theorem exists_kInvariant_qComplement [Finite G]
   have hMσM : Mσ ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
   have hMnormMσ : M ≤ Subgroup.normalizer (Mσ : Set G) :=
     OddOrder.GroupTheory.le_normalizer_opiCoreInG _ M
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-  haveI : IsSolvable ↥Mσ := solvable_of_solvable_injective (Subgroup.inclusion_injective hMσM)
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥Mσ :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective hMσM)
   have hQpg : IsPGroup q ↥Q := by rw [hQ]; exact isPGroup_opiCoreInG_singleton M
-  haveI hQnMσ : (Q.subgroupOf Mσ).Normal :=
+  have hQnMσ : (Q.subgroupOf Mσ).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQMσ).mpr (hMσM.trans hMnormQ)
   -- `M_σ/Q` nilpotent (step (c)(d)) and `q ∤ [M_σ:Q]` (step (c), `Q` is the Sylow `q`).
   have hNil : Group.IsNilpotent (↥Mσ ⧸ Q.subgroupOf Mσ) :=
@@ -396,7 +397,7 @@ theorem exists_kInvariant_qComplement [Finite G]
     have hprime := actsPrimeManner_of_typeP hG hM hP hKM hK hKstar
     have hKcard1 : Nat.card ↥K ≠ 1 := fun hc => hKne (Subgroup.card_eq_one.mp hc)
     obtain ⟨r, hr_prime, hr_dvd⟩ := Nat.exists_prime_and_dvd hKcard1
-    haveI : Fact r.Prime := ⟨hr_prime⟩
+    have : Fact r.Prime := ⟨hr_prime⟩
     obtain ⟨c, hc_ord⟩ := exists_prime_orderOf_dvd_card' (G := ↥K) r hr_dvd
     set K1 : Subgroup G := Subgroup.zpowers (c : G) with hK1
     have hcK : (c : G) ∈ K := c.2
@@ -462,7 +463,7 @@ theorem centralizes_Q_of_centralizes_quotient [Finite G]
     (hdQ0 : d ∈ Subgroup.normalizer (Q0 : Set G))
     (_hQ0Q : Q0 ≤ Q) (hQ0d : Q0 ≤ Subgroup.centralizer ({d} : Set G))
     (hcop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers d)) (Nat.card ↥Q))
-    (hSolv : IsSolvable ↥Q)
+    (hSolv : Group.IsSolvable ↥Q)
     (hfix : ∀ y ∈ Q, ⁅d, y⁆ ∈ Q0) :
     Q ≤ Subgroup.centralizer ({d} : Set G) := by
   classical
@@ -555,14 +556,15 @@ theorem centralizer_msigma_quotient_le_fittingInAmbient [Finite G]
     ∀ x ∈ OddOrder.BG.Ch3.S10.Msigma M,
       (∀ y ∈ Q, ⁅x, y⁆ ∈ Q0) → x ∈ fittingInAmbient M := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   set Mσ : Subgroup G := OddOrder.BG.Ch3.S10.Msigma M with hMσ
   have hMσM : Mσ ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
   have hMnormMσ : M ≤ Subgroup.normalizer (Mσ : Set G) :=
     OddOrder.GroupTheory.le_normalizer_opiCoreInG _ M
   have hQM : Q ≤ M := hQMσ.trans hMσM
   have hDM : D ≤ M := hDMσ.trans hMσM
-  haveI : IsSolvable ↥Q := solvable_of_solvable_injective (Subgroup.inclusion_injective hQM)
+  have : Group.IsSolvable ↥Q :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective hQM)
   -- The section centralizer `S = C_{M_σ}(Q̄)`, realized as a subgroup of `G`.
   -- (Membership in `M_σ` already gives `x ∈ N(Q₀)` since `M_σ ≤ M ≤ N(Q₀)`.)
   have hMσnormQ0 : Mσ ≤ Subgroup.normalizer (Q0 : Set G) := hMσM.trans hMnormQ0
@@ -603,7 +605,8 @@ theorem centralizer_msigma_quotient_le_fittingInAmbient [Finite G]
       exact Subgroup.centralizer_le (Set.singleton_subset_iff.mpr hdD)
     have hQN0 : Q ≤ Subgroup.normalizer (Q0 : Set G) := hQMσ.trans hMσnormQ0
     have hQleCd : Q ≤ Subgroup.centralizer ({d} : Set G) :=
-      centralizes_Q_of_centralizes_quotient hdN hQN0 hdN0 hQ0Q hQ0d hcopd ‹IsSolvable ↥Q› hdS.2
+      centralizes_Q_of_centralizes_quotient hdN hQN0 hdN0 hQ0Q hQ0d hcopd ‹Group.IsSolvable ↥Q›
+          hdS.2
     rw [Subgroup.mem_centralizer_iff]
     intro g hg
     exact (Subgroup.mem_centralizer_iff.mp (hQleCd hg) d (Set.mem_singleton d)).symm
@@ -621,15 +624,15 @@ theorem centralizer_msigma_quotient_le_fittingInAmbient [Finite G]
     exact Subgroup.mul_mem _ (Subgroup.mem_sup_left haQ)
       (Subgroup.mem_sup_right (Subgroup.mem_inf.mpr ⟨hbD, hbS⟩))
   -- `S` is nilpotent: `Q ⊔ (D ⊓ S)` with `⁅Q, D ⊓ S⁆ = ⊥` (`D ⊓ S` centralizes `Q`).
-  haveI : Group.IsNilpotent ↥Q := hQpg.isNilpotent
-  haveI hDSnil : Group.IsNilpotent ↥((D ⊓ S : Subgroup G).subgroupOf D) := inferInstance
-  haveI : Group.IsNilpotent ↥(D ⊓ S : Subgroup G) :=
+  have : Group.IsNilpotent ↥Q := hQpg.isNilpotent
+  have hDSnil : Group.IsNilpotent ↥((D ⊓ S : Subgroup G).subgroupOf D) := inferInstance
+  have : Group.IsNilpotent ↥(D ⊓ S : Subgroup G) :=
     Group.nilpotent_of_mulEquiv
       (Subgroup.subgroupOfEquivOfLe (inf_le_left : (D ⊓ S : Subgroup G) ≤ D))
   have hcommbot : ⁅Q, (D ⊓ S : Subgroup G)⁆ = ⊥ := by
     rw [Subgroup.commutator_comm]
     exact Subgroup.commutator_eq_bot_iff_le_centralizer.mpr hDScent
-  haveI : Group.IsNilpotent ↥S := by
+  have : Group.IsNilpotent ↥S := by
     rw [hSdecomp]; exact isNilpotent_sup_of_commutator_eq_bot hcommbot
   -- `S ◁ M`: `M` normalizes `Q`, `Q₀`, and `M_σ`, hence the section centralizer.  Single direction
   -- `m·S·m⁻¹ ⊆ S` for `m ∈ M`, applied to `m` and `m⁻¹` gives normality.
@@ -656,9 +659,9 @@ theorem centralizer_msigma_quotient_le_fittingInAmbient [Finite G]
       have := hpreserve m⁻¹ (M.inv_mem hm) (m * z * m⁻¹) hz
       rwa [show m⁻¹ * (m * z * m⁻¹) * m⁻¹⁻¹ = z by group] at this
   -- `S` nilpotent + normal in `M` ⟹ `S ⊆ F(M)`.
-  haveI hSnormM : (S.subgroupOf M).Normal :=
+  have hSnormM : (S.subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer (hSMσ.trans hMσM)).mpr hMnormS
-  haveI : Group.IsNilpotent ↥(S.subgroupOf M) :=
+  have : Group.IsNilpotent ↥(S.subgroupOf M) :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (hSMσ.trans hMσM)).symm
   have hSF : S ≤ fittingInAmbient M := by
     calc S = (S.subgroupOf M).map M.subtype := (Subgroup.map_subgroupOf_eq_of_le (hSMσ.trans
@@ -675,8 +678,8 @@ once `|C_{Q̄}(K)| = q` is known. -/
 theorem finrank_le_one_of_card_eq {q : ℕ} [Fact q.Prime] {Mod : Type*}
     [AddCommGroup Mod] [Module (ZMod q) Mod] [Finite Mod] (h : Nat.card Mod = q) :
     Module.finrank (ZMod q) Mod ≤ 1 := by
-  haveI : NeZero q := ⟨(Fact.out : q.Prime).ne_zero⟩
-  haveI : Fintype Mod := Fintype.ofFinite Mod
+  have : NeZero q := ⟨(Fact.out : q.Prime).ne_zero⟩
+  have : Fintype Mod := Fintype.ofFinite Mod
   have hpow : Fintype.card Mod = q ^ Module.finrank (ZMod q) Mod := by
     rw [Module.card_eq_pow_finrank (K := ZMod q), ZMod.card]
   rw [Nat.card_eq_fintype_card, hpow] at h
@@ -741,7 +744,7 @@ theorem chiefFactor_card_and_commutator_of_inputs [Finite G]
     (hDQ : D ≤ Subgroup.normalizer (Q : Set G)) (hKQ : K ≤ Subgroup.normalizer (Q : Set G))
     (hDQ0 : D ≤ Subgroup.normalizer (Q0 : Set G)) (hKQ0 : K ≤ Subgroup.normalizer (Q0 : Set G))
     (hQQ0 : Q ≤ Subgroup.normalizer (Q0 : Set G))
-    (hsolv : IsSolvable ↥(D ⊔ K))
+    (hsolv : Group.IsSolvable ↥(D ⊔ K))
     (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(D ⊔ K)
       (D.subgroupOf (D ⊔ K)) (K.subgroupOf (D ⊔ K)))
     (hcop : Nat.Coprime (Nat.card ↥(D ⊔ K)) (Nat.card ↥Q))
@@ -758,8 +761,8 @@ theorem chiefFactor_card_and_commutator_of_inputs [Finite G]
   have hKH : K ≤ H := le_sup_right
   have hHQ : H ≤ Subgroup.normalizer (Q : Set G) := sup_le hDQ hKQ
   have hHQ0 : H ≤ Subgroup.normalizer (Q0 : Set G) := sup_le hDQ0 hKQ0
-  haveI : Finite ↥H := inferInstance
-  haveI hHsolv : IsSolvable ↥H := hsolv
+  have : Finite ↥H := inferInstance
+  have hHsolv : Group.IsSolvable ↥H := hsolv
   -- conjugation hom of `H = D ⊔ K` on `↥Q`, descended to the chief factor `Q̄ = Q/Q₀`.
   set φ : ↥H →* MulAut ↥Q :=
     (Subgroup.normalizerMonoidHom Q).comp (Subgroup.inclusion hHQ) with hφ
@@ -769,13 +772,13 @@ theorem chiefFactor_card_and_commutator_of_inputs [Finite G]
     rw [Subgroup.mem_subgroupOf] at hy ⊢
     change (a : G) * (y : G) * (a : G)⁻¹ ∈ Q0
     exact (Subgroup.mem_normalizer_iff.mp (hHQ0 a.2) (y : G)).mp hy
-  haveI : NeZero q := ⟨(Fact.out : q.Prime).ne_zero⟩
-  letI act : MulDistribMulAction ↥H (↥Q ⧸ Q0.subgroupOf Q) :=
+  have : NeZero q := ⟨(Fact.out : q.Prime).ne_zero⟩
+  let act : MulDistribMulAction ↥H (↥Q ⧸ Q0.subgroupOf Q) :=
     MulDistribMulAction.compHom _ (quotientMulAutHom hMinv)
-  haveI hcomm : IsMulCommutative (↥Q ⧸ Q0.subgroupOf Q) :=
+  have hcomm : IsMulCommutative (↥Q ⧸ Q0.subgroupOf Q) :=
     (isMulCommutative_iff).mpr (fun a b => hEA.comm a b)
-  letI : CommGroup (↥Q ⧸ Q0.subgroupOf Q) := inferInstance
-  letI : Module (ZMod q) (Additive (↥Q ⧸ Q0.subgroupOf Q)) := hEA.zmodModule
+  let : CommGroup (↥Q ⧸ Q0.subgroupOf Q) := inferInstance
+  let : Module (ZMod q) (Additive (↥Q ⧸ Q0.subgroupOf Q)) := hEA.zmodModule
   -- the conjugation-fixed-class characterization: `a • [x] = [x] ↔ ⁅a, x⁆ ∈ Q₀`.
   have hsmul_iff : ∀ (a : ↥H) (x : ↥Q),
       ((a • (QuotientGroup.mk x : ↥Q ⧸ Q0.subgroupOf Q)) = QuotientGroup.mk x)
@@ -798,7 +801,7 @@ theorem chiefFactor_card_and_commutator_of_inputs [Finite G]
     rw [htransfer, Subgroup.inv_mem_iff]
   -- **BG Theorem 3.10(b)** applied to `Q̄`, kernel `K_thm = D̄`, complement `R_thm = K̄`.
   have hRne : K.subgroupOf H ≠ ⊥ := hfrob.ne_bot_complement
-  haveI hKnormal : (D.subgroupOf H).Normal := hfrob.isNormal
+  have hKnormal : (D.subgroupOf H).Normal := hfrob.isNormal
   have hKne : D.subgroupOf H ≠ ⊥ := by
     rw [Ne, Subgroup.subgroupOf_eq_bot, disjoint_iff, inf_eq_left.mpr hDH]; exact hDne
   -- `q ∣ |Q|`, hence `¬ q ∣ |H|` by coprimality.
@@ -953,7 +956,7 @@ theorem centralizes_quotient_iff_mem_kstar_sup [Finite G]
     (hQQ0 : Q ≤ Subgroup.normalizer (Q0 : Set G))
     (hKQ0 : K ≤ Subgroup.normalizer (Q0 : Set G))
     (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥Q))
-    (hSolv : IsSolvable ↥K ∨ IsSolvable ↥Q) :
+    (hSolv : Group.IsSolvable ↥K ∨ Group.IsSolvable ↥Q) :
     ∀ x ∈ Q, ((∀ k ∈ K, ⁅k, x⁆ ∈ Q0) ↔ x ∈ Kstar ⊔ Q0) := by
   classical
   set φ : ↥K →* MulAut ↥Q :=
@@ -1052,7 +1055,7 @@ theorem card_centralizer_quotient_eq_of_kstar [Finite G]
     (hKQ0 : K ≤ Subgroup.normalizer (Q0 : Set G))
     (hKstarQ0norm : Kstar ≤ Subgroup.normalizer (Q0 : Set G))
     (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥Q))
-    (hSolv : IsSolvable ↥K ∨ IsSolvable ↥Q) :
+    (hSolv : Group.IsSolvable ↥K ∨ Group.IsSolvable ↥Q) :
     ∃ C : Subgroup G, Q0 ≤ C ∧ C ≤ Q ∧
       (∀ x ∈ Q, ((∀ k ∈ K, ⁅k, x⁆ ∈ Q0) ↔ x ∈ C)) ∧
       (Q0.subgroupOf C).index = q := by
@@ -1060,7 +1063,7 @@ theorem card_centralizer_quotient_eq_of_kstar [Finite G]
   refine ⟨Kstar ⊔ Q0, le_sup_right, sup_le hKstarQ hQ0Q,
     centralizes_quotient_iff_mem_kstar_sup hKstar hQMσ hKstarQ hQ0Q hKQ hQQ0 hKQ0 hcop hSolv, ?_⟩
   · -- `hCcard`: `[K* ⊔ Q₀ : Q₀] = |K*| = q` via `|K* ⊔ Q₀| = |K*|·|Q₀|` and `card_mul_index`.
-    haveI hprime : Fact (Nat.card ↥Kstar).Prime := ⟨hKstar_prime ▸ Fact.out⟩
+    have hprime : Fact (Nat.card ↥Kstar).Prime := ⟨hKstar_prime ▸ Fact.out⟩
     -- `K* ⊓ Q₀ = ⊥`: `Q₀ ↾ K*` is `⊥` or `⊤`; `⊤` forces `K* ≤ Q₀`, against `hKstarQ0`.
     have hdisj : Kstar ⊓ Q0 = ⊥ := by
       rcases (Q0.subgroupOf Kstar).eq_bot_or_eq_top_of_prime_card with hbot | htop
@@ -1104,7 +1107,7 @@ theorem actsPrimeManner_quotient_of_inputs [Finite G]
     (hQQ0 : Q ≤ Subgroup.normalizer (Q0 : Set G))
     (hKQ0 : K ≤ Subgroup.normalizer (Q0 : Set G))
     (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥Q))
-    (hSolv : IsSolvable ↥K ∨ IsSolvable ↥Q) :
+    (hSolv : Group.IsSolvable ↥K ∨ Group.IsSolvable ↥Q) :
     ∀ x ∈ K, x ≠ 1 → ∀ y ∈ Q, (⁅x, y⁆ ∈ Q0 ↔ ∀ s ∈ K, ⁅s, y⁆ ∈ Q0) := by
   classical
   have hCfixK := centralizes_quotient_iff_mem_kstar_sup hKstar hQMσ hKstarQ hQ0Q hKQ hQQ0 hKQ0
@@ -1124,7 +1127,7 @@ theorem actsPrimeManner_quotient_of_inputs [Finite G]
       exact (Commute.zpow_left (hg x (Set.mem_singleton x)) n)
   have hKstarX : Kstar = Mσ ⊓ Subgroup.centralizer ((Subgroup.zpowers x : Subgroup G) : Set G) := by
     rw [hcentEq, inf_comm]; exact (hprime x hxK hx1).symm
-  haveI : IsSolvable ↥(Subgroup.zpowers x) := inferInstance
+  have : Group.IsSolvable ↥(Subgroup.zpowers x) := inferInstance
   have hCfixX := centralizes_quotient_iff_mem_kstar_sup hKstarX hQMσ hKstarQ hQ0Q
     (hxzK.trans hKQ) hQQ0 (hxzK.trans hKQ0)
     (hcop.coprime_dvd_left (Subgroup.card_dvd_of_le hxzK)) (Or.inl inferInstance)
@@ -1158,7 +1161,7 @@ situation-specific `C_M(Q) ⊆ F(M)` (`D` nilpotent, `M_σ` not), deferred to th
 theorem fittingInAmbient_le_opiCore_sup_centralizer_inf [Finite G] {M : Subgroup G} (π : Set ℕ) :
     fittingInAmbient M ≤ opiCoreInG π (fittingInAmbient M) ⊔
       (Subgroup.centralizer ((opiCoreInG π (fittingInAmbient M) : Subgroup G) : Set G) ⊓ M) := by
-  haveI : Group.IsNilpotent ↥(fittingInAmbient M) := OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
+  have : Group.IsNilpotent ↥(fittingInAmbient M) := OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
   have hsplit : opiCoreInG π (fittingInAmbient M) ⊔ opiCoreInG πᶜ (fittingInAmbient M) =
       fittingInAmbient M := opiCoreInG_sup_compl_eq_of_isNilpotent π
   have hcomm : ⁅opiCoreInG π (fittingInAmbient M), opiCoreInG πᶜ (fittingInAmbient M)⁆ = ⊥ :=
@@ -1268,7 +1271,7 @@ theorem exists_conj_smul_le_isHall_kappa [Finite G]
     (hXpi : Ch03.Subgroup.IsPiGroup (S14.kappa M) (X.subgroupOf M)) :
     ∃ w ∈ M, MulAut.conj w • X ≤ K := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   -- Embed `X.subgroupOf M` in a `κ`-Hall subgroup `H` of `↥M` (trivial `Unit`-action).
   obtain ⟨H, hH_hall, -, hX_le_H⟩ :=
     OddOrder.BG.Ch1.S01.aInvariant_piSubgroup_le_aInvariant_hall
@@ -1326,7 +1329,7 @@ theorem centralizer_le_Msigma_of_primeManner [Finite G]
   intro r hr
   by_contra hrσ
   have hr_prime : r.Prime := (Nat.mem_primeFactors.mp hr).1
-  haveI : Fact r.Prime := ⟨hr_prime⟩
+  have : Fact r.Prime := ⟨hr_prime⟩
   -- `r ∈ π(M)` (since `r ∣ |C|` and `C ≤ M`), and `r ∉ σ(M)`, so `r ∈ κ(M)` (type-`P₁`).
   have hrπ : r ∈ S14.piSet M := by
     refine Nat.mem_primeFactors.mpr ⟨hr_prime, ?_, Nat.card_pos.ne'⟩

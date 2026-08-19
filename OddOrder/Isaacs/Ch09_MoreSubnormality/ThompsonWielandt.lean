@@ -73,7 +73,7 @@ theorem le_relCore_iff {H D P : Subgroup G} (hPH : P ≤ H) :
 `N ≤ core_H(D)`. -/
 theorem le_relCore {H D N : Subgroup G} (hND : N ≤ D) (hNH : N ≤ H)
     (hNnorm : H ≤ Subgroup.normalizer (N : Set G)) : N ≤ relCore H D := by
-  haveI : (N.subgroupOf H).Normal :=
+  have : (N.subgroupOf H).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hNH).mpr hNnorm
   have h1 : N.subgroupOf H ≤ (D.subgroupOf H).normalCore :=
     Subgroup.normal_le_normalCore.mpr (Subgroup.comap_mono hND)
@@ -362,7 +362,7 @@ theorem layerInG_le_normalizer_nilpotentResidual_of_subnormal_two [Finite G]
     (hSn : T ≤ Subgroup.normalizer (S : Set G)) :
     layerInG H ≤ Subgroup.normalizer (nilpotentResidual S : Set G) := by
   have hSH : S ≤ H := hST.trans hTH
-  haveI hT' : (T.subgroupOf H).Normal :=
+  have hT' : (T.subgroupOf H).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hTH).mpr hTn
   have hnorm : ((S.subgroupOf H).subgroupOf (T.subgroupOf H)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer (Subgroup.comap_mono hST)).mpr
@@ -382,8 +382,8 @@ theorem nilpotentResidual_ne_bot_of_fitting_eq_bot [Finite G] {H U : Subgroup G}
     (hUn : H ≤ Subgroup.normalizer (U : Set G)) (hU : U ≠ ⊥) :
     nilpotentResidual U ≠ ⊥ := by
   intro hres
-  haveI : (U.subgroupOf H).Normal := (Subgroup.normal_subgroupOf_iff_le_normalizer hUH).mpr hUn
-  haveI : Group.IsNilpotent ↥U := nilpotentResidual_eq_bot_iff.mp hres
+  have : (U.subgroupOf H).Normal := (Subgroup.normal_subgroupOf_iff_le_normalizer hUH).mpr hUn
+  have : Group.IsNilpotent ↥U := nilpotentResidual_eq_bot_iff.mp hres
   have hnil : Group.IsNilpotent ↥(U.subgroupOf H) :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hUH).symm
   have hle : U.subgroupOf H ≤ Ch01.fitting ↥H :=
@@ -458,7 +458,7 @@ theorem relCore_eq_bot_or_of_fitting_eq_bot [Finite G]
     layerInG_eq_of_fitting_eq_bot hFK inf_le_right hEK
   have hEeq : layerInG H = layerInG K := hDH.symm.trans hDK
   -- `E(H) ≠ 1`
-  haveI : Nontrivial ↥H := by
+  have : Nontrivial ↥H := by
     rw [Subgroup.nontrivial_iff_ne_bot]
     intro hHbot
     exact hU (le_bot_iff.mp ((relCore_le_left H _).trans hHbot.le))
@@ -612,7 +612,7 @@ theorem normalizer_eq_self_of_corefree_maximal {H : Subgroup G}
   by_contra hne
   have hlt : H < Subgroup.normalizer (H : Set G) :=
     lt_of_le_of_ne Subgroup.le_normalizer (Ne.symm hne)
-  haveI : H.Normal := Subgroup.normalizer_eq_top_iff.mp (hmax.2 _ hlt)
+  have : H.Normal := Subgroup.normalizer_eq_top_iff.mp (hmax.2 _ hlt)
   exact hHne (le_bot_iff.mp (hcore ▸ Subgroup.normal_le_normalCore.mpr le_rfl))
 
 /-- **Thm 9.23 の setup**: `H` が corefree な極大部分群 (`H ≠ 1`) で `g ∉ H` のとき,
@@ -635,7 +635,7 @@ theorem noNormalInSupergroup_of_corefree_maximal {H : Subgroup G}
     · exact (isCoatom_map_conj hmax g).2 _ h
   subst hLtop
   -- `N ◁ G` かつ `N ≤ H` ゆえ `N ≤ core_G(H) = 1`
-  haveI : N.Normal := Subgroup.normalizer_eq_top_iff.mp (top_le_iff.mp hLnorm)
+  have : N.Normal := Subgroup.normalizer_eq_top_iff.mp (top_le_iff.mp hLnorm)
   exact hN (le_bot_iff.mp
     (hcore ▸ Subgroup.normal_le_normalCore.mpr (hND.trans inf_le_left)))
 
@@ -665,7 +665,7 @@ theorem exists_prime_opiCoreInG_ne_bot [Finite G] {H : Subgroup G}
   refine hF ?_
   rw [Ch01.fitting_eq_iSup_primeFactors]
   refine iSup_eq_bot.mpr fun p => ?_
-  haveI : Fact (p : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors p.2⟩
+  have : Fact (p : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors p.2⟩
   have h := hcon' (p : ℕ) (Nat.prime_of_mem_primeFactors p.2)
   rw [GroupTheory.opiCoreInG, Subgroup.map_eq_bot_iff_of_injective _ H.subtype_injective] at h
   rwa [← Ch04.oPiCore_singleton_eq_opCore]
@@ -696,7 +696,7 @@ theorem thompsonWielandt [Finite G] (hHK : H ≠ K)
       · exact Or.inr (by rw [h]; exact IsPGroup.of_bot)
     · -- Case 2 (`F(K) > 1`): `H`, `K` を入れ替えて適用
       obtain ⟨p, hp, hPK⟩ := exists_prime_opiCoreInG_ne_bot hFK
-      haveI : Fact p.Prime := ⟨hp⟩
+      have : Fact p.Prime := ⟨hp⟩
       have hyp' : NoNormalInSupergroup K H (K ⊓ H) := by rw [inf_comm]; exact hyp.symm
       rcases pResidualOf_relCore_eq_bot_or K H (Ne.symm hHK) hyp' hPK with h | h
       · exact ⟨p, hp, Or.inr (by
@@ -705,7 +705,7 @@ theorem thompsonWielandt [Finite G] (hHK : H ≠ K)
           rw [thompsonWielandtCore_comm H K]; exact (pResidualOf_eq_bot_iff_isPGroup _).mp h)⟩
   · -- Case 2 (`F(H) > 1`)
     obtain ⟨p, hp, hPH⟩ := exists_prime_opiCoreInG_ne_bot hFH
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     rcases pResidualOf_relCore_eq_bot_or H K hHK hyp hPH with h | h
     · exact ⟨p, hp, Or.inl ((pResidualOf_eq_bot_iff_isPGroup _).mp h)⟩
     · exact ⟨p, hp, Or.inr ((pResidualOf_eq_bot_iff_isPGroup _).mp h)⟩
@@ -767,7 +767,7 @@ theorem thompsonCorefreeBound [Finite G] {H : Subgroup G} (hmax : IsCoatom H)
   have hyp : NoNormalInSupergroup H K (H ⊓ K) :=
     noNormalInSupergroup_of_corefree_maximal hmax hcore g
   obtain ⟨p, hp, hUV⟩ := thompsonWielandt H K hHK hyp
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   refine ⟨p, hp, ?_⟩
   -- `a = b`: `|H| = |K|` (共役) ゆえ `|H:D| = |K:D|`.
   -- `D.relIndex H * |G:H| = |G:D| = D.relIndex K * |G:K|` と `|G:K| = |G:H|` から.

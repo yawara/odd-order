@@ -26,7 +26,7 @@ theorem opiCoreInG_singleton_compl_le_maximal_of_cFittingInG_le_of_primes_eq
     {M A0 H : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
     (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
-    (hHsolv : IsSolvable ↥H)
+    (hHsolv : Group.IsSolvable ↥H)
     (hAH : cFittingInG M A0 ≤ H)
     (hPrimes : OddOrder.BG.Ch2.S07.primesOf (fittingInG H) =
       OddOrder.BG.Ch2.S07.primesOf (fittingInG M)) :
@@ -60,7 +60,7 @@ theorem opiCoreInG_fittingInG_singleton_le_maximal_of_cFittingInG_le_of_not_pGro
     (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
     (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
     (hFnp : ¬ IsPGroup p ↥(fittingInG M))
-    (hHsolv : IsSolvable ↥H)
+    (hHsolv : Group.IsSolvable ↥H)
     (hAH : cFittingInG M A0 ≤ H)
     (hq : q ∈ (Nat.card ↥(fittingInG M)).primeFactors) :
     opiCoreInG ({q} : Set ℕ) (fittingInG H) ≤ M := by
@@ -76,7 +76,7 @@ theorem hInvariant_le_opiCoreInG_singleton_compl_of_mem_primeFactors_not_pGroup
     [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
     {M A0 X Y : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
-    (hXsolv : IsSolvable ↥X)
+    (hXsolv : Group.IsSolvable ↥X)
     (hAX : cFittingInG M A0 ≤ X)
     (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
     (hFnp : ¬ IsPGroup p ↥(fittingInG M))
@@ -87,7 +87,7 @@ theorem hInvariant_le_opiCoreInG_singleton_compl_of_mem_primeFactors_not_pGroup
   obtain ⟨r, hr, hrq⟩ :=
     exists_primeFactor_ne_of_mem_primeFactor_not_isPGroup
       (H := ↥(fittingInG M)) hp hFnp q
-  haveI : Fact r.Prime := ⟨(Nat.mem_primeFactors.mp hr).1⟩
+  have : Fact r.Prime := ⟨(Nat.mem_primeFactors.mp hr).1⟩
   let Br : Subgroup G := centerFittingOpCoreInG r M
   have hY_comm : Y ≤ ⁅Br, Y⁆ := by
     dsimp [Br]
@@ -164,7 +164,7 @@ theorem primesOf_fittingInG_subset_of_opiCoreInG_compl_eq_bot
     [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
     {M A0 X : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
-    (hXsolv : IsSolvable ↥X)
+    (hXsolv : Group.IsSolvable ↥X)
     (hAX : cFittingInG M A0 ≤ X)
     {σ : Set ℕ}
     (hσπ : σ ⊆ OddOrder.BG.Ch2.S07.primesOf (fittingInG M))
@@ -174,7 +174,7 @@ theorem primesOf_fittingInG_subset_of_opiCoreInG_compl_eq_bot
   by_contra hrσ
   have hrF : r ∈ (Nat.card ↥(fittingInG M)).primeFactors := by
     simpa [OddOrder.BG.Ch2.S07.primesOf] using hrπ
-  haveI : Fact r.Prime := ⟨(Nat.mem_primeFactors.mp hrF).1⟩
+  have : Fact r.Prime := ⟨(Nat.mem_primeFactors.mp hrF).1⟩
   have hBrX : centerFittingOpCoreInG r M ≤ X :=
     (centerFittingOpCoreInG_le_cFittingInG (q := r) hA0).trans hAX
   have hBr_core : centerFittingOpCoreInG r M ≤ opiCoreInG σᶜ X := by
@@ -183,7 +183,7 @@ theorem primesOf_fittingInG_subset_of_opiCoreInG_compl_eq_bot
     have hqπ : q ∈ OddOrder.BG.Ch2.S07.primesOf (fittingInG M) := hσπ hqσ
     have hqF : q ∈ (Nat.card ↥(fittingInG M)).primeFactors := by
       simpa [OddOrder.BG.Ch2.S07.primesOf] using hqπ
-    haveI : Fact q.Prime := ⟨(Nat.mem_primeFactors.mp hqF).1⟩
+    have : Fact q.Prime := ⟨(Nat.mem_primeFactors.mp hqF).1⟩
     have hqr : q ≠ r := by
       intro hqr
       exact hrσ (by simpa [hqr] using hqσ)
@@ -201,7 +201,7 @@ theorem hInvariant_le_opiCoreInG_primesOf_cFittingInG_compl_of_not_pGroup
     [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
     {M A0 X Y : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
-    (hXsolv : IsSolvable ↥X)
+    (hXsolv : Group.IsSolvable ↥X)
     (hAX : cFittingInG M A0 ≤ X)
     (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
     (hFnp : ¬ IsPGroup p ↥(fittingInG M))
@@ -220,7 +220,7 @@ theorem hInvariant_le_opiCoreInG_primesOf_cFittingInG_compl_of_not_pGroup
     simpa [hPrimes] using hqA
   have hqF : q ∈ (Nat.card ↥(fittingInG M)).primeFactors := by
     simpa [OddOrder.BG.Ch2.S07.primesOf] using hqF_primes
-  haveI : Fact q.Prime := ⟨(Nat.mem_primeFactors.mp hqF).1⟩
+  have : Fact q.Prime := ⟨(Nat.mem_primeFactors.mp hqF).1⟩
   exact hInvariant_le_opiCoreInG_singleton_compl_of_mem_primeFactors_not_pGroup
     hG hM hA0 hXsolv hAX hp hFnp hqF hY
 
@@ -240,7 +240,7 @@ theorem hypothesis71_cFittingInG_of_not_pGroup
     refine OddOrder.BG.Ch2.S07.generated_eq_of_forall_le_opiCoreInG hAX ?_
     intro Y hY
     exact hInvariant_le_opiCoreInG_primesOf_cFittingInG_compl_of_not_pGroup
-      hG hM hA0 (hG.solvable_of_lt_top X hXlt) hAX hp hFnp hY
+      hG hM hA0 (hG.isSolvable_of_lt_top X hXlt) hAX hp hFnp hY
 
 /-- Theorem 7.2 specialized to `A = C_F(M)(A0)`: once Hypothesis 7.1 is verified,
 `K = O_{π(A)^c}(C_G(A))` acts transitively on `ℋ_G*(A;q)`. -/
@@ -260,7 +260,7 @@ theorem transitive_cFittingInG_of_hypothesis71 [Finite G]
 /-- The subgroup `C_F(M)(A0)` is subnormal inside `F(M)`, because `F(M)` is nilpotent. -/
 theorem cFittingInG_subgroupOf_fittingInG_isSubnormal [Finite G] {M A0 : Subgroup G} :
     ((cFittingInG M A0).subgroupOf (fittingInG M)).IsSubnormal := by
-  haveI : Group.IsNilpotent ↥(fittingInG M) := fittingInG_isNilpotent M
+  have : Group.IsNilpotent ↥(fittingInG M) := fittingInG_isNilpotent M
   exact OddOrder.Isaacs.Ch02.isSubnormal_of_isNilpotent_finite _
 
 /-- Theorem 7.4 specialized to the propagation step in BG (8.6), with
@@ -617,7 +617,7 @@ theorem opiCoreInG_fittingInG_singleton_le_centralizer_opiCoreInG_singleton_comp
     {M A0 H : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
     (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
-    (hHsolv : IsSolvable ↥H)
+    (hHsolv : Group.IsSolvable ↥H)
     (hAH : cFittingInG M A0 ≤ H)
     (hDpM : opiCoreInG ({p} : Set ℕ) (fittingInG H) ≤ M) :
     opiCoreInG ({p} : Set ℕ) (fittingInG H) ≤
@@ -655,9 +655,9 @@ theorem opiCoreInG_fittingInG_singleton_le_centralizer_opiCoreInG_singleton_comp
     exact isPiSubgroup_opiCoreInG ({p} : Set ℕ)ᶜ M
   have hCop : Nat.Coprime (Nat.card ↥Dp) (Nat.card ↥N) :=
     coprime_card_of_isPiSubgroup_of_isPiSubgroup_compl hDp_pi hN_pi
-  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-  haveI hNsolv : IsSolvable ↥N :=
-    solvable_of_solvable_injective (f := Subgroup.inclusion hN_M)
+  have hMsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
+  have hNsolv : Group.IsSolvable ↥N :=
+    Group.isSolvable_of_isSolvable_injective (f := Subgroup.inclusion hN_M)
       (Subgroup.inclusion_injective hN_M)
   have hFN_le_OFM : fittingInG N ≤ opiCoreInG ({p} : Set ℕ)ᶜ (fittingInG M) := by
     dsimp [N]
@@ -678,7 +678,7 @@ theorem opiCoreInG_singleton_compl_maximal_le_of_fittingInG_singleton_le_maximal
     (hpM : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
     (hpH : p ∈ (Nat.card ↥(fittingInG H)).primeFactors)
     (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
-    (hHsolv : IsSolvable ↥H)
+    (hHsolv : Group.IsSolvable ↥H)
     (hAH : cFittingInG M A0 ≤ H)
     (hDpM : opiCoreInG ({p} : Set ℕ) (fittingInG H) ≤ M) :
     opiCoreInG ({p} : Set ℕ)ᶜ M ≤ H := by
@@ -715,7 +715,7 @@ theorem opiCoreInG_singleton_compl_maximal_le_opiCoreInG_singleton_compl_of_le_m
     {M A0 H : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
     (hA0 : isMaxElemAbelianIn p A0 (fittingInG M))
-    (hHsolv : IsSolvable ↥H)
+    (hHsolv : Group.IsSolvable ↥H)
     (hAH : cFittingInG M A0 ≤ H)
     (hOMH : opiCoreInG ({p} : Set ℕ)ᶜ M ≤ H) :
     opiCoreInG ({p} : Set ℕ)ᶜ M ≤ opiCoreInG ({p} : Set ℕ)ᶜ H := by
@@ -821,7 +821,7 @@ theorem opiCoreInG_singleton_compl_le_opiCoreInG_singleton_compl_of_fittingInG_l
   have hONM_le_OCM : opiCoreInG ({p} : Set ℕ)ᶜ NM ≤ opiCoreInG ({p} : Set ℕ)ᶜ CM := by
     dsimp [NM, CM]
     exact opiCoreInG_singleton_compl_normalizer_inf_le_centralizer_inf hDp_M hDp_pi
-  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hMsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hDp_p : IsPGroup p ↥Dp := by
     dsimp [Dp]
     exact isPGroup_opiCoreInG_singleton (fittingInG H)
@@ -846,7 +846,7 @@ theorem primesOf_fittingInG_subset_primesOf_cFittingInG_of_cFittingInG_le_of_not
   intro q hqF
   have hqF_mem : q ∈ (Nat.card ↥(fittingInG H)).primeFactors := by
     simpa [OddOrder.BG.Ch2.S07.primesOf] using hqF
-  haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hqF_mem⟩
+  have : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hqF_mem⟩
   by_contra hqA
   have hqcomp : q ∈ (OddOrder.BG.Ch2.S07.primesOf (cFittingInG M A0))ᶜ := hqA
   have hObot : opiCoreInG ({q} : Set ℕ) H = ⊥ :=
@@ -956,7 +956,7 @@ theorem cFitting_isUniquelyMaximal_of_not_pGroup [Finite G] (hG : IsMinimalSimpl
       OddOrder.BG.Ch2.S07.primesOf (fittingInG M) := by
     intro q hq
     exact hFittingH_pi q (by simpa [OddOrder.BG.Ch2.S07.primesOf] using hq)
-  haveI hH_solvable : IsSolvable ↥H := hG.solvable_of_lt_top H hHco.lt_top
+  have hH_solvable : Group.IsSolvable ↥H := hG.isSolvable_of_lt_top H hHco.lt_top
   have hO_sigma_compl_bot :
       opiCoreInG (OddOrder.BG.Ch2.S07.primesOf (fittingInG H))ᶜ H = ⊥ :=
     opiCoreInG_primesOf_fittingInG_compl_eq_bot
@@ -981,7 +981,7 @@ theorem cFitting_isUniquelyMaximal_of_not_pGroup [Finite G] (hG : IsMinimalSimpl
     have hFH_nilp : Group.IsNilpotent ↥(fittingInG H) := fittingInG_isNilpotent H
     refine le_of_sylow_le_of_nilpotent hFH_nilp ?_
     intro r
-    haveI : Fact (r : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors r.2⟩
+    have : Fact (r : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors r.2⟩
     let S : Subgroup G := ((default : Sylow (r : ℕ) ↥(fittingInG H)) :
       Subgroup ↥(fittingInG H)).map (fittingInG H).subtype
     have hS_le_core : S ≤ opiCoreInG ({(r : ℕ)} : Set ℕ) (fittingInG H) := by
@@ -1025,13 +1025,13 @@ theorem cFitting_isUniquelyMaximal_of_not_pGroup [Finite G] (hG : IsMinimalSimpl
   obtain ⟨r, hrFM, hrp⟩ :=
     exists_primeFactor_ne_of_mem_primeFactor_not_isPGroup
       (H := ↥(fittingInG M)) hp hFnp p
-  haveI hRprime : Fact r.Prime := ⟨Nat.prime_of_mem_primeFactors hrFM⟩
+  have hRprime : Fact r.Prime := ⟨Nat.prime_of_mem_primeFactors hrFM⟩
   have hBr_ne : centerFittingOpCoreInG r M ≠ ⊥ :=
     centerFittingOpCoreInG_ne_bot_of_mem_primeFactors_fittingInG hrFM
   have hBr_le_OpComplM : centerFittingOpCoreInG r M ≤
       opiCoreInG ({p} : Set ℕ)ᶜ M :=
     centerFittingOpCoreInG_le_opiCoreInG_singleton_compl_of_ne
-      hG hM hA₀ (hG.solvable_of_mem_maximalSubgroups hM) (by
+      hG hM hA₀ (hG.isSolvable_of_mem_maximalSubgroups hM) (by
         dsimp [cFittingInG]
         exact inf_le_right.trans (fittingInG_le M)) hp hrFM (fun hpr => hrp hpr.symm)
   have hOpComplM_ne : opiCoreInG ({p} : Set ℕ)ᶜ M ≠ ⊥ := by
@@ -1083,14 +1083,14 @@ theorem primesOf_fittingInG_eq_singleton_of_isPGroup [Finite G] {p : ℕ} [Fact 
     apply hF_ne_bot
     rw [Subgroup.eq_bot_iff_card, hn, hn_zero, pow_zero]
   ext q
-  simp only [OddOrder.BG.Ch2.S07.primesOf, Set.mem_setOf_eq, Set.mem_singleton_iff]
+  simp only [OddOrder.BG.Ch2.S07.primesOf, Set.mem_ofPred_eq, Set.mem_singleton_iff]
   rw [hn, Nat.primeFactors_prime_pow hn0 (Fact.out : p.Prime), Finset.mem_singleton]
 
 /-- BG 8.1(b), first p-group bridge: if `F(M)` is a `p`-group, then
 `O_{p'}(M)=1`. This is the formal version of
 `F(O_{p'}(M)) ≤ O_{p'}(F(M)) = 1`. -/
 theorem opiCoreInG_singleton_compl_eq_bot_of_fittingInG_isPGroup [Finite G]
-    {p : ℕ} [Fact p.Prime] {M : Subgroup G} [IsSolvable ↥M]
+    {p : ℕ} [Fact p.Prime] {M : Subgroup G} [Group.IsSolvable ↥M]
     (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
     (hFp : IsPGroup p ↥(fittingInG M)) :
     opiCoreInG ({p} : Set ℕ)ᶜ M = ⊥ := by
@@ -1134,7 +1134,7 @@ theorem oPiPrimePiCore_singleton_eq_oPiCore_singleton_of_compl_bot
 /-- BG 8.1(b), third p-group bridge: when `F(M)` is a `p`-group, `O_{p',p}(M)`,
 viewed in `G`, lies in `F(M)`. -/
 theorem oPiPrimePiCore_singleton_map_le_fittingInG_of_fittingInG_isPGroup [Finite G]
-    {p : ℕ} [Fact p.Prime] {M : Subgroup G} [IsSolvable ↥M]
+    {p : ℕ} [Fact p.Prime] {M : Subgroup G} [Group.IsSolvable ↥M]
     (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
     (hFp : IsPGroup p ↥(fittingInG M)) :
     (Ch03.oPiPrimePiCore ({p} : Set ℕ) ↥M).map M.subtype ≤ fittingInG M := by

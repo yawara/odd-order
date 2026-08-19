@@ -1058,7 +1058,7 @@ theorem irreducibleCharacterFamily_eq_of_difference_eq
     (hdiff : ∀ i, (ν i : ClassFunction G ℂ) - (ν 0 : ClassFunction G ℂ)
       = (ν' i : ClassFunction G ℂ) - (ν' 0 : ClassFunction G ℂ)) :
     ∀ i, ν i = ν' i := by
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   classical
   have hanchor : ν 0 = ν' 0 := by
     by_contra h0

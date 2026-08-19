@@ -195,7 +195,7 @@ theorem typeP_uW1_frobenius (data : TypePData M) (hU : data.U ≠ ⊥) :
     rw [← Subgroup.subgroupOf_sup le_sup_left le_sup_right, Subgroup.subgroupOf_self]
   refine ⟨hUnorm, ?_, ?_, ?_, ?_⟩
   · refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ hdisj ?_
-    haveI := hUnorm
+    have := hUnorm
     rw [← Subgroup.normal_mul, hsup, Subgroup.coe_top]
   · rw [Ne, Subgroup.subgroupOf_eq_bot]
     exact fun hd => hU (hd.eq_bot_of_le le_sup_left)
@@ -249,7 +249,7 @@ theorem typeP_coprime_H_uW1 [Finite G] (data : TypePData M) (hU : data.U ≠ ⊥
   rw [hUidx, hW1idx] at htower
   -- `|U W₁| = |U| · |W₁|` from the Frobenius complement.
   have hcard : Nat.card ↥(data.U ⊔ data.W1) = Nat.card ↥data.U * Nat.card ↥data.W1 := by
-    rw [← (typeP_uW1_frobenius data hU).isComplement.card_mul,
+    rw [← (typeP_uW1_frobenius data hU).isComplement.card_mul_card,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv]
   -- `H` is Hall in `M`: `|H| ⟂ [M : H] = |U| · |W₁| = |U W₁|`.
@@ -269,7 +269,7 @@ noncomputable def typeP_coprimeAction [Finite G] (data : TypePData M) (hU : data
   frobenius := typeP_uW1_frobenius data hU
   H_solvable := by
     rw [data.H_eq]
-    haveI := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent M
+    have := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent M
     exact IsNilpotent.to_isSolvable
   φ := typeP_conjAction data
   coprime_order := typeP_coprime_H_uW1 data hU
@@ -407,9 +407,9 @@ theorem typeP_U_not_centralizes_H [Finite G] (data : TypePData M) (hU : data.U �
   have hFit : (OddOrder.Isaacs.Ch01.fitting ↥M).map M.subtype = derivedInG M := by
     rw [data.fitting_eq, inf_eq_left.mpr hUC, hM'eq]
   -- `M'` is nilpotent (image of `F(↥M)`).
-  haveI : Group.IsNilpotent ↥(OddOrder.Isaacs.Ch01.fitting (↥M : Type _)) :=
+  have : Group.IsNilpotent ↥(OddOrder.Isaacs.Ch01.fitting (↥M : Type _)) :=
     OddOrder.Isaacs.Ch01.fitting.isNilpotent
-  haveI hM'nil : Group.IsNilpotent ↥(derivedInG M) := by
+  have hM'nil : Group.IsNilpotent ↥(derivedInG M) := by
     rw [← hFit]
     exact Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective (OddOrder.Isaacs.Ch01.fitting
         ↥M)
@@ -418,7 +418,7 @@ theorem typeP_U_not_centralizes_H [Finite G] (data : TypePData M) (hU : data.U �
   have hM'sub : (derivedInG M).subgroupOf M = commutator ↥M :=
     Subgroup.comap_map_eq_self_of_injective M.subtype_injective (commutator ↥M)
   have hM'norm : ((derivedInG M).subgroupOf M).Normal := by rw [hM'sub]; infer_instance
-  haveI : Group.IsNilpotent ↥((derivedInG M).subgroupOf M) :=
+  have : Group.IsNilpotent ↥((derivedInG M).subgroupOf M) :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hM'M).symm
   -- `M'` is a normal Hall subgroup of `M`, so `M' ≤ M_F = H`.
   have hidxM' : ((derivedInG M).subgroupOf M).index = Nat.card ↥data.W1 := by
@@ -426,7 +426,7 @@ theorem typeP_U_not_centralizes_H [Finite G] (data : TypePData M) (hU : data.U �
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.W1_le).toEquiv]
   have hcop : Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1) := by
     rw [show Nat.card ↥(derivedInG M) = Nat.card ↥data.H * Nat.card ↥data.U by
-      rw [← data.derived_complement.card_mul,
+      rw [← data.derived_complement.card_mul_card,
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.H_le).toEquiv,
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.U_le).toEquiv]]
     exact (Nat.Coprime.mul_right (typeP_coprime_H_W1 data).symm

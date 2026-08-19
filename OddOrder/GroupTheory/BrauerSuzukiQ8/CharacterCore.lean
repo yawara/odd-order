@@ -52,15 +52,15 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
     {z : G} (hzT : z ∈ (T : Subgroup G)) (hz : orderOf z = 2) :
     ∃ N : Subgroup G, N.Normal ∧ N ≠ ⊤ ∧ z ∈ N := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fintype G := Fintype.ofFinite G
   -- the datum of `G` over `𝓞_ℂ_[2]`
   obtain ⟨ι'G, _, mG, _, _, _, eG, ιG, _, nnG, _, _, _, πG, hπG, hlinG, ωG, ω'G,
     hkerJG, hnilG, hωG, hω'G⟩ :=
     exists_datum_padicComplex 2 G
   -- the centraliser of the involution, and its datum
   set C : Subgroup G := Subgroup.centralizer ({z} : Set G) with hC
-  haveI : Finite ↥C := Subtype.finite
+  have : Finite ↥C := Subtype.finite
   obtain ⟨ι'C, _, mC, _, _, _, eC, ιC, _, nnC, _, _, _, πC, hπC, hlinC, ωC, ω'C,
     hkerJC, hnilC, hωC, hω'C⟩ :=
     exists_datum_padicComplex 2 ↥C
@@ -68,13 +68,13 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
   have hzC : z ∈ C := Subgroup.mem_centralizer_iff.mpr fun w hw => by
     rw [Set.mem_singleton_iff] at hw; subst hw; rfl
   set Nz : Subgroup ↥C := Subgroup.zpowers (⟨z, hzC⟩ : ↥C) with hNz
-  haveI : Nz.Normal := zpowers_self_normal_centralizer z hzC
+  have : Nz.Normal := zpowers_self_normal_centralizer z hzC
   have hNzcard : Nat.card ↥Nz = 2 := by
     rw [hNz, Nat.card_zpowers,
       ← orderOf_injective C.subtype (Subgroup.subtype_injective _) (⟨z, hzC⟩ : ↥C)]
     exact hz
   have hNzP : IsPGroup 2 ↥Nz := IsPGroup.of_card (n := 1) (by rw [hNzcard, pow_one])
-  haveI : Finite (↥C ⧸ Nz) := Quotient.finite _
+  have : Finite (↥C ⧸ Nz) := Quotient.finite _
   -- the ordinary splitting of `Q`; its *modular* splitting must be `quotientPi` of that of `C`,
   -- so that `IBr(Q)` and `IBr(C)` share their index type (Navarro (7.6))
   obtain ⟨ι'Q, _, mQ, _, _, _, eQ, -, -, -, -, -, -, -, -, -, -, -, -, -, -, -⟩ :=
@@ -96,7 +96,7 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
   obtain ⟨SQ⟩ : Nonempty (Sylow 2 (↥C ⧸ Nz)) := Sylow.nonempty
   have hSQ4 : Nat.card ↥(SQ : Subgroup (↥C ⧸ Nz)) = 4 :=
     card_sylow_quotient_centralizer T e hzT hz2 hz1 hzC SQ
-  haveI : Fintype ↥(SQ : Subgroup (↥C ⧸ Nz)) := Fintype.ofFinite _
+  have : Fintype ↥(SQ : Subgroup (↥C ⧸ Nz)) := Fintype.ofFinite _
   obtain ⟨u, hu⟩ : ∃ u : ↥(SQ : Subgroup (↥C ⧸ Nz)), orderOf u = 2 := by
     refine exists_prime_orderOf_dvd_card 2 ?_
     rw [← Nat.card_eq_fintype_card, hSQ4]
@@ -119,7 +119,7 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
   have hSylC4 : Nat.card ↥(SylC : Subgroup ↥(Subgroup.centralizer ({yb} : Set (↥C ⧸ Nz)))) = 4 :=
     card_sylow_centralizer_of_card_sylow_four SQ hSQ4 hyb1 hyb2 SylC
   -- the datum of `C_Q(ȳ)`, and the index of its principal block
-  haveI : Finite ↥(Subgroup.centralizer ({yb} : Set (↥C ⧸ Nz))) := Subtype.finite
+  have : Finite ↥(Subgroup.centralizer ({yb} : Set (↥C ⧸ Nz))) := Subtype.finite
   obtain ⟨ι'Y, _, mY, _, _, _, eY, ιY, _, nnY, _, _, _, πY, hπY, hlinY, ωY, ω'Y,
     hkerJY, hnilY, hωY, hω'Y⟩ :=
     exists_datum_padicComplex 2
@@ -127,7 +127,7 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
   obtain ⟨φ₀, hφ₀⟩ := Quotient.exists_rep
     (principalBlock πY hπY hlinY hnilY)
   -- Navarro (6.13): the Cartan invariant of the principal block of `C_Q(ȳ)` is `|Sylow| = 4`
-  haveI : Fintype ↥(Subgroup.centralizer ({yb} : Set (↥C ⧸ Nz))) := Fintype.ofFinite _
+  have : Fintype ↥(Subgroup.centralizer ({yb} : Set (↥C ⧸ Nz))) := Fintype.ofFinite _
   have hcart : cartanMatrix
       (𝒪 := 𝓞_ℂ_[2]) (nn := nnY) Nat.prime_two hωY hω'Y hπY hlinY hkerJY eY φ₀ φ₀ = 4 := by
     rw [cartanMatrix_principalBlock_eq_card_sylow_of_hasNormalPComplement Nat.prime_two hωY hω'Y
@@ -145,8 +145,8 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
   have hroot' : ∀ n : ℕ, ¬ 2 ∣ n → n ≠ 0 →
       ∃ ζ' : IsLocalRing.ResidueField 𝓞_ℂ_[2], IsPrimitiveRoot ζ' n :=
     fun n hn hn0 => exists_isPrimitiveRoot_residueField_padicComplexInt 2 hn hn0
-  haveI : DecidableEq (ConjClasses G) := Classical.decEq _
-  haveI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  have : DecidableEq (ConjClasses G) := Classical.decEq _
+  have : Fintype (ConjClasses G) := Fintype.ofFinite _
   have hconvG := fun b hind =>
     eq_principalBlock_of_inducedBlockOfCentralizer_eq_of_roots (K := ℂ_[2]) Nat.prime_two hzP
       hroot hroot' hζ hζk hζK eG eC hπG hlinG hnilG hkerJG hπC hlinC hnilC hkerJC b hind
@@ -154,9 +154,9 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
   have hcent : ∀ w : ↥C, IsPRegular 2 w → ∀ v ∈ Nz, Commute w v := fun w _ v hv =>
     Subgroup.mem_center_iff.mp (zpowers_self_le_center_centralizer z hzC hv) w
   -- the same converse, for the pair `(Q, C_Q(ȳ))`
-  haveI : Fintype (↥C ⧸ Nz) := Fintype.ofFinite _
-  haveI : DecidableEq (ConjClasses (↥C ⧸ Nz)) := Classical.decEq _
-  haveI : Fintype (ConjClasses (↥C ⧸ Nz)) := Fintype.ofFinite _
+  have : Fintype (↥C ⧸ Nz) := Fintype.ofFinite _
+  have : DecidableEq (ConjClasses (↥C ⧸ Nz)) := Classical.decEq _
+  have : Fintype (ConjClasses (↥C ⧸ Nz)) := Fintype.ofFinite _
   have hconvC := fun b hind =>
     eq_principalBlock_of_inducedBlockOfCentralizer_eq_of_roots (K := ℂ_[2]) Nat.prime_two hybP
       hroot hroot' hζ hζk hζK eQ eY (quotientPi_surjective πC hπC hlinC hNzP)
@@ -177,7 +177,7 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
     exact isConj_of_sq_eq_one_quotient_centralizer hO T e hTG hzT hz2 hz1 hzC hyb1
       (by rw [pow_two]; exact hyb2) hv1 hvsq
   -- Navarro (7.2): `|Irr(B_0(Q))| = 4` and `χ(ȳ) = ±1` there
-  haveI := hMnorm
+  have := hMnorm
   have hquotM : IsPGroup 2 (↥(Subgroup.centralizer ({yb} : Set (↥C ⧸ Nz))) ⧸ M) :=
     IsPGroup.of_card (n := nM) (by rw [← Subgroup.index_eq_card, hMindex])
   have hweak := sum_character_mul_character_involution_eq_zero (𝒪 := 𝓞_ℂ_[2]) (nn := nnY)
@@ -224,7 +224,7 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
       = (wedderburnRepresentation eG k).character 1 := fun k =>
     (character_one_eq_card eG k).symm
   -- the two odd basic-set degrees `ψ₁(1)`, `ψ₂(1)` (段 371)
-  haveI : Fintype ↥((SQ : Subgroup (↥C ⧸ Nz))) := Fintype.ofFinite _
+  have : Fintype ↥((SQ : Subgroup (↥C ⧸ Nz))) := Fintype.ofFinite _
   have hSQsing : ∀ h : ↥((SQ : Subgroup (↥C ⧸ Nz))), (h : ↥C ⧸ Nz) ≠ 1 →
       ¬ IsPRegular 2 (h : ↥C ⧸ Nz) := by
     intro h h1 hreg
@@ -297,13 +297,13 @@ theorem q8_exists_proper_normal (hO : oPiCore {p | p ≠ 2} G = ⊥) (T : Sylow 
   have hyC : (w : G) ∈ Subgroup.centralizer ({(w : G)} : Set G) :=
     Subgroup.mem_centralizer_iff.mpr fun m hm => by
       rw [Set.mem_singleton_iff] at hm; subst hm; rfl
-  haveI : Finite ↥(Subgroup.centralizer ({(w : G)} : Set G)) := Subtype.finite
+  have : Finite ↥(Subgroup.centralizer ({(w : G)} : Set G)) := Subtype.finite
   obtain ⟨ι'W, _, mW, _, _, _, eW, ιW, _, nnW, _, _, _, πW, hπW, hlinW, ωW, ω'W,
     hkerJW, hnilW, hωW, hω'W⟩ :=
     exists_datum_padicComplex 2 ↥(Subgroup.centralizer ({(w : G)} : Set G))
   have hcomplW := hasNormalPComplement_centralizer_orderFour T e w.2 hw2
   obtain ⟨MW, hMWnorm, hMWp, nMW, hMWindex⟩ := exists_normal_of_hasNormalPComplement hcomplW
-  haveI := hMWnorm
+  have := hMWnorm
   have hquotMW : IsPGroup 2 (↥(Subgroup.centralizer ({(w : G)} : Set G)) ⧸ MW) :=
     IsPGroup.of_card (n := nMW) (by rw [← Subgroup.index_eq_card, hMWindex])
   obtain ⟨SylW⟩ : Nonempty (Sylow 2 ↥(Subgroup.centralizer ({(w : G)} : Set G))) := Sylow.nonempty

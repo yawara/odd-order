@@ -61,7 +61,7 @@ theorem pi_classSum_subgroup_eq_zero_of_notMem_centralizer {p : ℕ} [Fact p.Pri
   classical
   set Q : Subgroup ↥H := P.subgroupOf H with hQ
   have hmemQ : ∀ y : ↥H, y ∈ Q ↔ (y : G) ∈ P := fun _ => Iff.rfl
-  haveI hQnormal : Q.Normal := by
+  have hQnormal : Q.Normal := by
     refine ⟨fun n hn g => ?_⟩
     rw [hmemQ] at hn ⊢
     have hcoe : ((g * n * g⁻¹ : ↥H) : G) = (g : G) * (n : G) * (g : G)⁻¹ := by push_cast; rfl
@@ -83,6 +83,7 @@ omit [Fintype G] [Finite ι] in
 set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
 open scoped Classical in
+set_option backward.isDefEq.respectTransparency false in
 /-- **A block character of `H` is determined by the coefficients on `C_G(P)`.**
 
 The difference of two central elements agreeing on `C_G(P)` expands over the `H`-classes, and in

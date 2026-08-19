@@ -450,9 +450,9 @@ makes `C_C(W₁) = {1}`.  This is the Coq `dv_2q_c1` ingredient (`q ∣ c − 1`
 theorem Hypothesis.c_modEq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) : hyp.c ≡ 1 [MOD hyp.q] := by
   classical
-  haveI : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
+  have : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
   have hfpf := hyp.W1_fpf_C hG
-  letI : MulAction ↥hyp.W1 ↥hyp.C :=
+  let : MulAction ↥hyp.W1 ↥hyp.C :=
     MulAction.compHom ↥hyp.C (Subgroup.inclusion hyp.W1_le_normalizer_C)
   have hsmul : ∀ (w : ↥hyp.W1) (x : ↥hyp.C), ((w • x : ↥hyp.C) : G) = (w : G) * (x : G) * (w :
       G)⁻¹ :=
@@ -464,7 +464,7 @@ theorem Hypothesis.c_modEq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   have hW1ne : hyp.W1 ≠ ⊥ := by
     intro h; have h3 := hyp.three_le_q
     rw [hyp.q_eq_card_W1, h, Subgroup.card_bot] at h3; omega
-  haveI : Nontrivial ↥hyp.W1 := (Subgroup.nontrivial_iff_ne_bot _).mpr hW1ne
+  have : Nontrivial ↥hyp.W1 := (Subgroup.nontrivial_iff_ne_bot _).mpr hW1ne
   obtain ⟨⟨w₀, hw₀W1⟩, hw₀ne⟩ := exists_ne (1 : ↥hyp.W1)
   have hw₀ne' : w₀ ≠ 1 := by rintro rfl; exact hw₀ne rfl
   -- `C_C(W₁) = {1}`.
@@ -714,7 +714,7 @@ theorem pc_le_maxNilpotentNormalHall [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     (hyp : Hypothesis (G := G)) (hp5 : hyp.p = 5) (hq3 : hyp.q = 3) (hc7 : hyp.c = 7) :
     hyp.P ⊔ hyp.C ≤ maxNilpotentNormalHall hyp.S :=
   by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   change hyp.H ≤ maxNilpotentNormalHall hyp.S
   -- The (9.7) dichotomy: case (a) is impossible for `p - 1 = 4`; case (b) gives `u ∣ 31`.
   have hu_dvd_31 : hyp.u ∣ 31 := by
@@ -778,7 +778,7 @@ theorem pc_le_maxNilpotentNormalHall [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     exact Nat.Coprime.mul_right hcop_u hcop_three
   have hHhall := OddOrder.BG.Ch4.S15.isHallSubgroup_primeFactors_of_coprime_index
     hyp.H_le_S hHcop
-  haveI hHcomm : IsMulCommutative ↥(hyp.H.subgroupOf hyp.S) :=
+  have hHcomm : IsMulCommutative ↥(hyp.H.subgroupOf hyp.S) :=
     OddOrder.GroupTheory.isMulCommutative_of_mulEquiv
       (Subgroup.subgroupOfEquivOfLe hyp.H_le_S).symm (hyp.H_mulCommutative hG)
   have hHnil : Group.IsNilpotent ↥(hyp.H.subgroupOf hyp.S) := inferInstance
@@ -970,13 +970,13 @@ theorem caseA_sylow_U_not_isCyclic_of_parameters [Finite G]
     MulEquiv.subgroupCongr hyp.Sdata_U_eq.symm
   let f : ↥hyp.U →* ↥(hyp.toTypesIIIIIIVSetupS hG).U := e.toMonoidHom
   have hf : Function.Surjective f := e.surjective
-  letI : Fact r.Prime := ⟨hr⟩
+  let : Fact r.Prime := ⟨hr⟩
   let Rsetup : Sylow r ↥(hyp.toTypesIIIIIIVSetupS hG).U :=
     R.mapSurjective hf
   have hRsetup := OddOrder.Peterfalvi.S11.caseA_sylow_U_not_isCyclic_of_sharp_order
     hG (hyp.mkSection11CharacterDataS hG chief) caseA hqSharp huSharp hr hrhalf' Rsetup
   intro hR
-  letI : IsCyclic ↥(R : Subgroup ↥hyp.U) := hR
+  let : IsCyclic ↥(R : Subgroup ↥hyp.U) := hR
   rw [show (Rsetup : Subgroup ↥(hyp.toTypesIIIIIIVSetupS hG).U) =
     (R : Subgroup ↥hyp.U).map f by rfl] at hRsetup
   exact hRsetup <| isCyclic_of_surjective _
@@ -1002,7 +1002,7 @@ theorem exists_sylow_mem_inf_centralizer_ne_bot_of_not_isCyclic [Finite G]
     intro hBcyc
     exact hRnc ((Subgroup.equivMapOfInjective (R : Subgroup ↥hyp.U) hyp.U.subtype
       hyp.U.subtype_injective).isCyclic.mpr (by simpa only [B] using hBcyc))
-  letI : IsMulCommutative ↥B := IsMulCommutative.of_comm fun a b => by
+  let : IsMulCommutative ↥B := IsMulCommutative.of_comm fun a b => by
     apply Subtype.ext
     change (a : G) * (b : G) = (b : G) * (a : G)
     exact congrArg (fun z : ↥hyp.U => (z : G)) (hyp.S_U_commutative.is_comm.comm
@@ -1019,8 +1019,8 @@ theorem exists_sylow_mem_inf_centralizer_ne_bot_of_not_isCyclic [Finite G]
     have hrle : r ≤ (hyp.p - 1) / 2 := Nat.le_of_dvd hhalfpos hrhalf
     omega
   have hrne : r ≠ hyp.p := ne_of_lt hrltp
-  letI : Fact r.Prime := ⟨hr⟩
-  letI : Fact hyp.p.Prime := ⟨hyp.p_prime⟩
+  let : Fact r.Prime := ⟨hr⟩
+  let : Fact hyp.p.Prime := ⟨hyp.p_prime⟩
   have hBr : IsPGroup r B := by
     simpa only [B] using R.isPGroup'.map hyp.U.subtype
   have hPp : IsPGroup hyp.p hyp.P :=
@@ -1126,7 +1126,7 @@ cyclotomic quotient in **Peterfalvi (13.14)**. -/
 theorem cyclotomic_quotient_not_dvd_self_of_not_modEq_one {p q : ℕ}
     (hp : p.Prime) (hq : q.Prime) (hpq : ¬ p ≡ 1 [MOD q]) :
     ¬ q ∣ (p ^ q - 1) / (p - 1) := by
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   intro hdiv
   rw [← Nat.geomSum_eq hp.two_le q] at hdiv
   have hsum_zero_nat : ((∑ k ∈ Finset.range q, p ^ k : ℕ) : ZMod q) = 0 :=
@@ -1151,8 +1151,8 @@ theorem cyclotomic_quotient_prime_dvd_modEq_one_of_not_modEq_one {p q r : ℕ}
     (hp : p.Prime) (hq : q.Prime) (hpq : ¬ p ≡ 1 [MOD q])
     (hr : r.Prime) (hrdvd : r ∣ (p ^ q - 1) / (p - 1)) :
     r ≡ 1 [MOD q] := by
-  haveI : Fact r.Prime := ⟨hr⟩
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact r.Prime := ⟨hr⟩
+  have : Fact q.Prime := ⟨hq⟩
   have hr_ne_q : r ≠ q := by
     intro h
     exact cyclotomic_quotient_not_dvd_self_of_not_modEq_one hp hq hpq
@@ -1162,7 +1162,7 @@ theorem cyclotomic_quotient_prime_dvd_modEq_one_of_not_modEq_one {p q r : ℕ}
     rcases (Nat.dvd_prime hq).mp hdiv with hr_eq_one | hr_eq_q
     · exact hr.ne_one hr_eq_one
     · exact hr_ne_q hr_eq_q
-  haveI : NeZero (q : ZMod r) :=
+  have : NeZero (q : ZMod r) :=
     NeZero.of_not_dvd (ZMod r) hr_not_dvd_q
   have hrdvd_sum : r ∣ ∑ k ∈ Finset.range q, p ^ k := by
     simpa [Nat.geomSum_eq hp.two_le q] using hrdvd
@@ -1300,13 +1300,13 @@ theorem Hypothesis.mu_colSum_support_subset_P_of_c_eq_one [Finite G]
       hyp.H.subgroupOf hyp.S := by
   classical
   obtain ⟨θ, _hθirr, _hθ1, hθeq⟩ := hyp.mu_j_isIndPC hG j hj
-  haveI hPnorm : (hyp.H.subgroupOf hyp.S).Normal := by
+  have hPnorm : (hyp.H.subgroupOf hyp.S).Normal := by
     rw [hyp.H_eq_P_of_c_eq_one hc1]
     refine (Subgroup.normal_subgroupOf_iff_le_normalizer ?_).mpr ?_
     · rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
     · rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
-  letI : Fintype ↥(hyp.H.subgroupOf hyp.S) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥(hyp.H.subgroupOf hyp.S) : ℂ) :=
+  let : Fintype ↥(hyp.H.subgroupOf hyp.S) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥(hyp.H.subgroupOf hyp.S) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   rw [hθeq]
   exact ClassFunction.support_induce_subset_of_normal _ θ
@@ -1343,8 +1343,8 @@ theorem Hypothesis.mu_row0_apply_eq_zero_of_mem_derived_not_mem_P_of_c_eq_one [F
       exact ⟨x⁻¹ * z' * x, by
         simpa using Subgroup.Normal.conj_mem inferInstance z' hz' x⁻¹, by
         rw [hz'eq]; rfl⟩
-    haveI := hyp.W_cyclic
-    letI : CommGroup ↥hyp.W := IsCyclic.commGroup
+    have := hyp.W_cyclic
+    let : CommGroup ↥hyp.W := IsCyclic.commGroup
     have hW1le : hyp.W1 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_left
     have hW2le : hyp.W2 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_right
     have htop : (hyp.W1.subgroupOf hyp.W) ⊔ (hyp.W2.subgroupOf hyp.W) = ⊤ := by

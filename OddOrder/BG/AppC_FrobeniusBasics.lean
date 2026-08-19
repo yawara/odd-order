@@ -86,6 +86,7 @@ theorem primeLineGenerator_ne_one (p q : ℕ) [Fact p.Prime] :
     ofAdd_eq_one.mp (SemidirectProduct.inl_inj.mp h)
   exact one_ne_zero hfield
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Conjugation by a norm-one unit is multiplication in the field.**  For `u ∈ U` and
 `a ∈ P = 𝔽_{p^q}`,
 
@@ -117,7 +118,7 @@ theorem inr_inv_mul_primeLineGenerator_mul_inr (p q : ℕ) [Fact p.Prime]
 /-- The distinguished generator of `P₀` has order dividing `p`. -/
 theorem primeLineGenerator_pow_p (p q : ℕ) [Fact p.Prime] :
     (primeLineGenerator p q) ^ p = 1 := by
-  haveI : CharP (GaloisField p q) p := by
+  have : CharP (GaloisField p q) p := by
     rw [← Algebra.charP_iff (ZMod p) (GaloisField p q)
       p]
     exact ZMod.charP p
@@ -133,7 +134,7 @@ theorem primeLineGenerator_pow_p (p q : ℕ) [Fact p.Prime] :
 /-- There is a nonidentity norm-one unit, provided `q > 1`. -/
 theorem exists_normOneUnit_ne_one (p q : ℕ) [Fact p.Prime] (hq : 1 < q) :
     ∃ u : NormSet.normOneUnits p q, u ≠ 1 := by
-  haveI : Nontrivial (NormSet.normOneUnits p q) :=
+  have : Nontrivial (NormSet.normOneUnits p q) :=
     Finite.one_lt_card_iff_nontrivial.mp (NormSet.normOneUnits_card_gt_one p q hq)
   exact exists_ne 1
 
@@ -160,7 +161,7 @@ theorem normOneUnits_card_coprime_p (p q : ℕ) [Fact p.Prime] (hq : q ≠ 0) :
 theorem normOneFrobeniusKernel_pow_p_eq_one (p q : ℕ) [Fact p.Prime]
     {x : NormSet.normOneFrobeniusGroup p q} (hx : x ∈ NormSet.normOneFrobeniusKernel p q) :
     x ^ p = 1 := by
-  haveI : CharP (GaloisField p q) p := by
+  have : CharP (GaloisField p q) p := by
     rw [← Algebra.charP_iff (ZMod p) (GaloisField p q) p]
     exact ZMod.charP p
   rcases hx with ⟨a, rfl⟩

@@ -66,11 +66,11 @@ theorem sylow_eq_of_nontrivial_inter (hyp : MinimalSimpleCNHypothesis G) (P Q : 
   -- `W = N'·O_{p,p'}(N)`, realized in `G`.
   set W : Subgroup G := (commutator ↥N ⊔ opPPrimeCore p ↥N).map N.subtype with hW
   -- `N'K ≠ N`, since `N/K` is a nontrivial `p`-group.
-  haveI hntq : Nontrivial (↥N ⧸ opPPrimeCore p ↥N) := h3.nontrivial_quotient
-  haveI hnilq : Group.IsNilpotent (↥N ⧸ opPPrimeCore p ↥N) := h3.isPGroup_quotient.isNilpotent
+  have hntq : Nontrivial (↥N ⧸ opPPrimeCore p ↥N) := h3.nontrivial_quotient
+  have hnilq : Group.IsNilpotent (↥N ⧸ opPPrimeCore p ↥N) := h3.isPGroup_quotient.isNilpotent
   have hne_top : commutator ↥N ⊔ opPPrimeCore p ↥N ≠ ⊤ := by
     intro heq
-    refine (IsSolvable.commutator_lt_top_of_nontrivial (↥N ⧸ opPPrimeCore p ↥N)).ne ?_
+    refine (Group.IsSolvable.commutator_lt_top_of_nontrivial (↥N ⧸ opPPrimeCore p ↥N)).ne ?_
     have hmapK : (opPPrimeCore p ↥N).map (QuotientGroup.mk' (opPPrimeCore p ↥N)) = ⊥ := by
       rw [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
     have hpush := congrArg (Subgroup.map (QuotientGroup.mk' (opPPrimeCore p ↥N))) heq

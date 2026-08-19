@@ -97,7 +97,7 @@ private theorem exists_torusParameter_ne_one (hm : 0 < m) :
       Nat.pow_le_pow_right (by omega) (by omega)
     norm_num at hpow ⊢
     omega
-  letI : Nontrivial (TorusParameter m) :=
+  let : Nontrivial (TorusParameter m) :=
     Finite.one_lt_card_iff_nontrivial.mp hcard
   exact exists_ne 1
 
@@ -188,27 +188,27 @@ theorem weylElement_mem_commutator (hm : 0 < m) :
 
 /-- **Peterfalvi Part II, Ch. I, §3 Lemma 1 (Suzuki target).**
 The standard root group is solvable because it is a finite `2`-group. -/
-private theorem rootGroup_isSolvable (m : ℕ) : IsSolvable (RootGroup m) := by
-  letI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  letI : Group.IsNilpotent (RootGroup m) :=
+private theorem rootGroup_isSolvable (m : ℕ) : Group.IsSolvable (RootGroup m) := by
+  let : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  let : Group.IsNilpotent (RootGroup m) :=
     IsPGroup.isNilpotent (p := 2) (RootGroup.isPGroup m)
   infer_instance
 
 /-- **Peterfalvi Part II, Ch. I, §3 Lemma 1 (Suzuki target).**
 The root--torus semidirect-product model is solvable. -/
-private theorem borelModel_isSolvable (m : ℕ) : IsSolvable (BorelModel m) := by
-  letI : IsSolvable (RootGroup m) := rootGroup_isSolvable m
-  exact solvable_of_ker_le_range
+private theorem borelModel_isSolvable (m : ℕ) : Group.IsSolvable (BorelModel m) := by
+  let : Group.IsSolvable (RootGroup m) := rootGroup_isSolvable m
+  exact Group.isSolvable_of_ker_le_range
     (SemidirectProduct.inl : RootGroup m →* BorelModel m)
     (SemidirectProduct.rightHom : BorelModel m →* TorusParameter m)
     (by rw [← SemidirectProduct.range_inl_eq_ker_rightHom])
 
 /-- **Peterfalvi Part II, Ch. I, §3 Lemma 1 (Suzuki target).**
 The standard Borel subgroup is solvable. -/
-theorem standardBorel_isSolvable (m : ℕ) : IsSolvable (standardBorel m) := by
-  letI : IsSolvable (BorelModel m) := borelModel_isSolvable m
-  change IsSolvable (borelHom m).range
-  exact solvable_of_surjective (borelHom m).rangeRestrict_surjective
+theorem standardBorel_isSolvable (m : ℕ) : Group.IsSolvable (standardBorel m) := by
+  let : Group.IsSolvable (BorelModel m) := borelModel_isSolvable m
+  change Group.IsSolvable (borelHom m).range
+  exact Group.isSolvable_of_surjective (borelHom m).rangeRestrict_surjective
 
 /-- **Peterfalvi Part II, Ch. I, §3 Lemma 1 (Suzuki target).**
 For `0 < m`, the standard Suzuki permutation group is perfect. -/
@@ -256,14 +256,14 @@ For every positive `m`, the concrete standard Suzuki permutation group is simple
 The hypothesis excludes the degenerate `m = 0` group of order `20`. -/
 theorem standardPermGroup_isSimpleGroup (hm : 0 < m) :
     IsSimpleGroup (standardPermGroup m) := by
-  letI : Nontrivial (standardPermGroup m) :=
+  let : Nontrivial (standardPermGroup m) :=
     standardPermGroup_nontrivial m
-  letI : MulAction.IsPreprimitive (standardPermGroup m) (Ovoid m) :=
+  let : MulAction.IsPreprimitive (standardPermGroup m) (Ovoid m) :=
     MulAction.isPreprimitive_of_is_two_pretransitive
       (standardPermGroup_isMultiplyPretransitive m)
-  letI : Group.IsPerfect (standardPermGroup m) :=
+  let : Group.IsPerfect (standardPermGroup m) :=
     ⟨commutator_standardPermGroup_eq_top hm⟩
-  letI : IsSolvable
+  let : Group.IsSolvable
       (MulAction.stabilizer (standardPermGroup m) (Ovoid.infinity m)) := by
     rw [← standardBorel_eq_infinityStabilizer]
     exact standardBorel_isSolvable m

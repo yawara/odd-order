@@ -48,9 +48,9 @@ theorem a0_minus_a_subset_conj_zTilde [Finite G] (hG : OddOrder.BG.IsMinimalSimp
     ∀ a ∈ A0Set M K \ ASet M U,
       ∃ m ∈ M, ∃ t ∈ S14.zTilde K Kstar, a = m * t * m⁻¹ := by
   classical
-  haveI hsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hsolv : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hKne : K ≠ ⊥ := fun h => card_kappaHall_ne_one hP hKM hK (by rw [h, Subgroup.card_bot])
-  haveI hKcyc : IsCyclic ↥K := (typeP_auxiliary_structure hG hM hKM hUM hK hKstar hU).2.1
+  have hKcyc : IsCyclic ↥K := (typeP_auxiliary_structure hG hM hKM hUM hK hKstar hU).2.1
   have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
   have hM'M : (U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) ≤ M := sup_le hUM hMσM
   have hKstarMσ : Kstar ≤ OddOrder.BG.Ch3.S10.Msigma M := by rw [hKstar]; exact inf_le_left
@@ -65,7 +65,7 @@ theorem a0_minus_a_subset_conj_zTilde [Finite G] (hG : OddOrder.BG.IsMinimalSimp
       x ∈ (U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) := by
     intro x hxM hxπ'
     rw [← hM'eq]
-    haveI hNnorm : ((derivedInG M).subgroupOf M).Normal :=
+    have hNnorm : ((derivedInG M).subgroupOf M).Normal :=
       Subgroup.normal_subgroupOf_of_le_normalizer (OddOrder.BG.Ch3.S10.le_normalizer_derivedInG M)
     set N := (derivedInG M).subgroupOf M with hNdef
     set x' : ↥M := ⟨x, hxM⟩ with hx'def
@@ -105,7 +105,7 @@ theorem a0_minus_a_subset_conj_zTilde [Finite G] (hG : OddOrder.BG.IsMinimalSimp
     have hKstarC : Kstar ≤ Subgroup.centralizer (K : Set G) := by rw [hKstar]; exact inf_le_right
     have hKnorm : (K ⊔ Kstar : Subgroup G) ≤ Subgroup.normalizer (K : Set G) :=
       sup_le Subgroup.le_normalizer (hKstarC.trans (Subgroup.centralizer_le_normalizer _))
-    haveI : (K.subgroupOf (K ⊔ Kstar)).Normal :=
+    have : (K.subgroupOf (K ⊔ Kstar)).Normal :=
       Subgroup.normal_subgroupOf_of_le_normalizer hKnorm
     have hsuptop : (K.subgroupOf (K ⊔ Kstar)) ⊔ (Kstar.subgroupOf (K ⊔ Kstar)) = ⊤ := by
       rw [← Subgroup.subgroupOf_sup le_sup_left le_sup_right, Subgroup.subgroupOf_self]
@@ -237,7 +237,7 @@ witness `z ∈ M_σ ⊓ C_G(a)` conjugates to a nonidentity `m z m⁻¹ ∈ M_σ
 theorem hatMsigma_conj_mem {M : Subgroup G} {m a : G} (hm : m ∈ M) (ha : a ∈ hatMsigma M) :
     m * a * m⁻¹ ∈ hatMsigma M := by
   obtain ⟨haM, haC⟩ := ha
-  haveI hMσN : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
+  have hMσN : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
     rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
   have hmN : m ∈ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma M) :=
     ((Subgroup.normal_subgroupOf_iff_le_normalizer (OddOrder.BG.Ch3.S10.Msigma_le M)).mp hMσN) hm
@@ -319,7 +319,7 @@ theorem zTilde_subset_a0_minus_a [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
   -- decompose `t = k · k*` (`K ◁ K ⊔ K*` since `K*` centralizes `K`).
   have hKnorm : (K ⊔ Kstar : Subgroup G) ≤ Subgroup.normalizer (K : Set G) :=
     sup_le Subgroup.le_normalizer (hKstarC.trans (Subgroup.centralizer_le_normalizer _))
-  haveI : (K.subgroupOf (K ⊔ Kstar)).Normal :=
+  have : (K.subgroupOf (K ⊔ Kstar)).Normal :=
     Subgroup.normal_subgroupOf_of_le_normalizer hKnorm
   have hsuptop : (K.subgroupOf (K ⊔ Kstar)) ⊔ (Kstar.subgroupOf (K ⊔ Kstar)) = ⊤ := by
     rw [← Subgroup.subgroupOf_sup le_sup_left le_sup_right, Subgroup.subgroupOf_self]
@@ -705,8 +705,9 @@ theorem theoremC_paired_structure [Finite G]
       have hP2 : S14.IsTypeP2 M := isTypeP2_of_hall_subgroupOf_ne_bot hP hU hUne'
       obtain ⟨K₀, U₀, hK₀M, hU₀M, hU₀ne, hK₀, hU₀, hU₀ab, hK₀NU₀⟩ :=
         typeP2_exists_matched_kappa_hall_pair hG hM hP2
-      haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-      haveI : IsSolvable ↥U₀ := solvable_of_solvable_injective (Subgroup.inclusion_injective hU₀M)
+      have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
+      have : Group.IsSolvable ↥U₀ :=
+        Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective hU₀M)
       -- a prime `r ∣ |U₀|` and a Sylow (= Hall `{r}`) subgroup `R₀ ≤ U₀`.
       have hU₀card : Nat.card ↥U₀ ≠ 1 := fun h => hU₀ne (Subgroup.card_eq_one.mp h)
       obtain ⟨r, hr⟩ : (Nat.card ↥U₀).primeFactors.Nonempty :=
@@ -1014,7 +1015,7 @@ theorem sigma_reps_prime_cover [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   constructor
   · -- `p ∣ |G|` ⟹ `p ∈ σ(M)` for some maximal `M` ⟹ `p ∈ σ(Mᵢ)` for its representative.
     intro hp
-    haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+    have : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
     obtain ⟨M, hMmax, hpM⟩ :=
       S14.exists_mem_sigma_of_prime_dvd_card hG (Nat.dvd_of_mem_primeFactors hp)
     obtain ⟨Mi, ⟨hMirep, g, hg⟩, _⟩ := hreps M hMmax
@@ -1156,7 +1157,7 @@ theorem sharpSubgroup_top_cover_reps_dichotomy [Finite G]
         Set.notMem_empty M' (hempty ▸ (⟨hM'max, hP⟩ : M' ∈ S14.maximalTypePFamily G))
     rw [S14.sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF hG htypeF]
     ext g
-    simp only [Set.mem_iUnion₂, Set.mem_setOf_eq, exists_prop]
+    simp only [Set.mem_iUnion₂, Set.mem_ofPred_eq, exists_prop]
     exact mem_conjClassSet_Mtilde_maximals_iff_reps hG hreps_max hreps g
   · -- `𝓜_P ≠ ∅`, `M` type-`P`: fixed-`W` cover, convert the M̃ branch to `reps`.
     apply Set.Subset.antisymm

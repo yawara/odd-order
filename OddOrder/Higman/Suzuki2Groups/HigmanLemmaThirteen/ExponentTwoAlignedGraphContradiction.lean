@@ -211,24 +211,24 @@ theorem false_of_alignedGraph_commonFactor_branch_exponent_two
   let hEAK : IsElementaryAbelian 2 (frattini K) :=
     IsElementaryAbelian.of_mulEquiv
       (pairwiseJoinFrattiniEquivAmbientFrattini hMapK).symm hPhiEA
-  letI : IsMulCommutative (frattini P) :=
+  let : IsMulCommutative (frattini P) :=
     IsMulCommutative.of_comm hPhiEA.comm
-  letI : CommGroup (frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini P)) :=
+  let : CommGroup (frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini P)) :=
     hPhiEA.zmodModule
-  letI : IsMulCommutative (frattini J) :=
+  let : IsMulCommutative (frattini J) :=
     IsMulCommutative.of_comm hEAJ.comm
-  letI : CommGroup (frattini J) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini J)) :=
+  let : CommGroup (frattini J) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini J)) :=
     hEAJ.zmodModule
-  letI : IsMulCommutative (frattini K) :=
+  let : IsMulCommutative (frattini K) :=
     IsMulCommutative.of_comm hEAK.comm
-  letI : CommGroup (frattini K) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini K)) :=
+  let : CommGroup (frattini K) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini K)) :=
     hEAK.zmodModule
-  letI : CommGroup (P ⧸ frattini P) :=
+  let : CommGroup (P ⧸ frattini P) :=
     frattiniQuotientCommGroup P hP
-  letI : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
+  let : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
     frattiniQuotientZModTwoModule P hP
   let eJ :=
     (pairwiseJoinFrattiniLinearEquivAmbientFrattini

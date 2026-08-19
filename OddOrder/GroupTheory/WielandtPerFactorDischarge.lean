@@ -115,9 +115,9 @@ theorem wielandtPerFactor_of_dim.{u} [Fintype E]
     WielandtPerFactor.{_, u} L U E := by
   intro H _ _ φ N _ hcop hN_inv helab
   obtain ⟨p, hp, hpe⟩ := helab
-  haveI : Fact p.Prime := ⟨hp⟩
-  letI : CommGroup ↥N := hpe.subgroupCommGroup
-  letI : Module (ZMod p) (Additive ↥N) := hpe.subgroupZmodModule
+  have : Fact p.Prime := ⟨hp⟩
+  let : CommGroup ↥N := hpe.subgroupCommGroup
+  let : Module (ZMod p) (Additive ↥N) := hpe.subgroupZmodModule
   -- The per-factor dimension identity, unfolded to the abstract `WielandtDimIdentity` form.
   have hd : WielandtDimIdentity (V := ↥N) p hN_inv.restrict U E := hdim H φ N hN_inv p hp hpe hcop
   -- The cardinality identity on the elementary-abelian chief factor `↥N` (restricted action).

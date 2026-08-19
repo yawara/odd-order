@@ -53,7 +53,7 @@ theorem isSimpleModule_subrepresentation_of_minimal {W : Submodule k V}
     (hWinv : ∀ g : G, W ≤ W.comap (ρ g)) (hWne : W ≠ ⊥)
     (hmin : ∀ U : Submodule k V, (∀ g : G, U ≤ U.comap (ρ g)) → U ≤ W → U = ⊥ ∨ U = W) :
     IsSimpleModule (MonoidAlgebra k G) (ρ.subrepresentation W hWinv).asModule := by
-  haveI : Nontrivial W := Submodule.nontrivial_iff_ne_bot.mpr hWne
+  have : Nontrivial W := Submodule.nontrivial_iff_ne_bot.mpr hWne
   refine isSimpleModule_asModule _ fun U' hU' => ?_
   set U : Submodule k V := U'.map W.subtype with hU
   have hUle : U ≤ W := by

@@ -60,7 +60,7 @@ theorem Hypothesis.tau_muColumnZero_sub_zeta_dichotomy_of_orthogonal [Finite G] 
         hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ)
           = (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
             + (hyp.SHC_isCoherent hG).extension ζ.conj) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have h3 : (3 : ℕ) ≤ hyp.w1 := (typePData_toTICyclicHypothesis hyp.typeP hodd).three_le_card_W1
   -- generic unit-norm integral-lattice toolkit: the Cauchy–Schwarz bound `m² ≤ 1` and the
@@ -523,7 +523,7 @@ theorem Hypothesis.SHC_swap_h114 [Finite G] {M : Subgroup G}
     hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ)
         = (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
           - (hyp.SHC_swap hG hodd hζS hζirr hζ1 htwo).extension ζ := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hswapζ : (hyp.SHC_swap hG hodd hζS hζirr hζ1 htwo).extension ζ
       = -((hyp.SHC_isCoherent hG).extension ζ.conj) := by
@@ -550,7 +550,7 @@ theorem Hypothesis.SHC_swap_conj [Finite G] {M : Subgroup G}
     (hχ1 : χ 1 = (hyp.w1 : ℂ)) :
     ((hyp.SHC_swap hG hodd hζS hζirr hζ1 htwo).extension χ).conj
       = (hyp.SHC_swap hG hodd hζS hζirr hζ1 htwo).extension χ.conj := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hχcS : χ.conj ∈ inducedFamily M := inducedFamily_closedUnderConjugate M hχS
   have hχcirr : IsIrreducibleCharacter χ.conj := hχirr.conj

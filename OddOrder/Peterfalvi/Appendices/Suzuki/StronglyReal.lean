@@ -182,8 +182,8 @@ lemma fixedPoints_ne_of_mul_sq_ne_one {a b : G}
     alpha ≠ beta := by
   intro hab
   subst beta
-  letI : IsMultiplyPretransitive G Ω 2 := hyp.doubly_transitive
-  letI : IsPretransitive G Ω :=
+  let : IsMultiplyPretransitive G Ω 2 := hyp.doubly_transitive
+  let : IsPretransitive G Ω :=
     isPretransitive_of_is_two_pretransitive
   obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G alpha hyp.basept
   have haH : g * a * g⁻¹ ∈ hyp.H := by

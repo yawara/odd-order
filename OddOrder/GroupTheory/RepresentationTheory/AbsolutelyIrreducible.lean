@@ -79,11 +79,11 @@ theorem toModuleEnd_surjective_of_algebraMap_end_surjective
     Function.Surjective (Module.toModuleEnd F M (S := A)) := by
   classical
   -- `F` commutes with `A` on `M` (both act through the central image of `F`).
-  haveI : SMulCommClass A F M := ⟨fun a c m => by
+  have : SMulCommClass A F M := ⟨fun a c m => by
     rw [← IsScalarTower.algebraMap_smul A c m, ← IsScalarTower.algebraMap_smul A c (a • m),
         smul_smul, smul_smul, Algebra.commutes]⟩
   -- `M` is finite over the (bigger) endomorphism ring `D := End_A M`.
-  haveI : Module.Finite (Module.End A M) M :=
+  have : Module.Finite (Module.End A M) M :=
     Module.Finite.of_restrictScalars_finite F (Module.End A M) M
   -- The scalar action of `D` on `M` agrees with the `F`-action.
   have key : ∀ (c : F) (x : M), (algebraMap F (Module.End A M) c) • x = c • x := by
@@ -182,9 +182,9 @@ theorem span_range_representation_eq_top_of_algebraMap_intertwiningMap_surjectiv
   rintro e -
   obtain ⟨r, rfl⟩ := asAlgebraHom_surjective_of_algebraMap_intertwiningMap_surjective ρ hEnd e
   induction r using MonoidAlgebra.induction_on with
-  | hM g => rw [Representation.asAlgebraHom_of]; exact Submodule.subset_span ⟨g, rfl⟩
-  | hadd x y hx hy => rw [map_add]; exact Submodule.add_mem _ hx hy
-  | hsmul c x hx => rw [map_smul]; exact Submodule.smul_mem _ c hx
+  | of g => rw [Representation.asAlgebraHom_of]; exact Submodule.subset_span ⟨g, rfl⟩
+  | add x y hx hy => rw [map_add]; exact Submodule.add_mem _ hx hy
+  | smul c x hx => rw [map_smul]; exact Submodule.smul_mem _ c hx
 
 /-- **Burnside, span form** (BG Prop 2.1): for a finite-dimensional irreducible representation `ρ`
 over an algebraically closed field, the images `{ρ g : g ∈ G}` span `End_F V`. (Equivalent to
@@ -313,7 +313,7 @@ theorem nontrivial_of_isIrreducible (ρ : Representation F G V) [ρ.IsIrreducibl
     (Subrepresentation.toSubmodule_injective (Subsingleton.elim _ _))
 
 instance [ρ.IsIrreducible] : Nontrivial (IntertwiningMap ρ ρ) := by
-  haveI : Nontrivial V := nontrivial_of_isIrreducible ρ
+  have : Nontrivial V := nontrivial_of_isIrreducible ρ
   obtain ⟨v, hv⟩ := exists_ne (0 : V)
   exact ⟨1, 0, fun h10 => hv (by simpa using DFunLike.congr_fun h10 v)⟩
 
@@ -357,7 +357,7 @@ is finite.  Combined with the division-ring instance above, **Wedderburn's littl
 (the mathlib instance `littleWedderburn`) then makes `Hom_FG(V, V)` of an irreducible `ρ` a
 **finite field** — the first half of BG Prop 2.1(c). -/
 instance [Finite F] [FiniteDimensional F V] : Finite (IntertwiningMap ρ ρ) := by
-  haveI : Finite V := Module.finite_of_finite F
+  have : Finite V := Module.finite_of_finite F
   exact Finite.of_injective (fun f : IntertwiningMap ρ ρ => (f : V → V)) DFunLike.coe_injective
 
 noncomputable example [Finite F] [FiniteDimensional F V] [ρ.IsIrreducible] :
@@ -406,8 +406,8 @@ variable [Finite F] [FiniteDimensional F V]
 /-- A representation stays irreducible when regarded over its self-intertwiner field:
 a `K`-subrepresentation is in particular an `F`-subrepresentation. -/
 instance [ρ.IsIrreducible] : (overEnd ρ).IsIrreducible := by
-  haveI : Nontrivial V := nontrivial_of_isIrreducible ρ
-  haveI : Nontrivial (Subrepresentation (overEnd ρ)) := by
+  have : Nontrivial V := nontrivial_of_isIrreducible ρ
+  have : Nontrivial (Subrepresentation (overEnd ρ)) := by
     obtain ⟨v, hv⟩ := exists_ne (0 : V)
     refine ⟨⊥, ⊤, fun h => hv ?_⟩
     have htop : v ∈ (⊤ : Subrepresentation (overEnd ρ)) :=
@@ -494,13 +494,13 @@ theorem isIrreducible_baseChangeRepresentation_of_algebraMap_surjective
     (K : Type*) [Field K] [Algebra F K] :
     (baseChangeRepresentation K ρ).IsIrreducible := by
   classical
-  haveI : Nontrivial V := nontrivial_of_isIrreducible ρ
+  have : Nontrivial V := nontrivial_of_isIrreducible ρ
   -- an `F`-basis of `V` and its lift to a `K`-basis of `K ⊗ V`
   set b : Basis (Fin (Module.finrank F V)) F V := Module.finBasis F V with hb
   set bK : Basis (Fin (Module.finrank F V)) K (K ⊗[F] V) := b.baseChange K with hbK
   have hn : 0 < Module.finrank F V := Module.finrank_pos
-  haveI : Nontrivial (K ⊗[F] V) := nontrivial_of_ne (bK ⟨0, hn⟩) 0 (bK.ne_zero ⟨0, hn⟩)
-  haveI : Nontrivial (Subrepresentation (baseChangeRepresentation K ρ)) := by
+  have : Nontrivial (K ⊗[F] V) := nontrivial_of_ne (bK ⟨0, hn⟩) 0 (bK.ne_zero ⟨0, hn⟩)
+  have : Nontrivial (Subrepresentation (baseChangeRepresentation K ρ)) := by
     refine ⟨⊥, ⊤, fun h => bK.ne_zero ⟨0, hn⟩ ?_⟩
     have htop : bK ⟨0, hn⟩ ∈ (⊤ : Subrepresentation (baseChangeRepresentation K ρ)) :=
       Submodule.mem_top (R := K) (M := K ⊗[F] V)
@@ -587,11 +587,11 @@ theorem algebraMap_surjective_of_isIrreducible_baseChangeRepresentation
     Function.Surjective (algebraMap F (IntertwiningMap ρ ρ)) := by
   classical
   set K := AlgebraicClosure F with hK
-  haveI : Nontrivial (K ⊗[F] V) := nontrivial_of_isIrreducible (baseChangeRepresentation K ρ)
-  haveI : Nontrivial V := by
+  have : Nontrivial (K ⊗[F] V) := nontrivial_of_isIrreducible (baseChangeRepresentation K ρ)
+  have : Nontrivial V := by
     by_contra hV
     rw [not_nontrivial_iff_subsingleton] at hV
-    haveI : Subsingleton (K ⊗[F] V) := by
+    have : Subsingleton (K ⊗[F] V) := by
       refine ⟨fun x y => ?_⟩
       have hzero : ∀ z : K ⊗[F] V, z = 0 := by
         intro z
@@ -674,8 +674,8 @@ theorem isAbsolutelyIrreducible_iff_bijective_algebraMap
     IsAbsolutelyIrreducible ρ ↔ Function.Bijective (algebraMap F (IntertwiningMap ρ ρ)) := by
   constructor
   · intro h
-    haveI : Nontrivial V := nontrivial_of_isIrreducible ρ
-    haveI : Nontrivial (IntertwiningMap ρ ρ) := by
+    have : Nontrivial V := nontrivial_of_isIrreducible ρ
+    have : Nontrivial (IntertwiningMap ρ ρ) := by
       obtain ⟨v, hv⟩ := exists_ne (0 : V)
       exact ⟨1, 0, fun h10 => hv (by simpa using DFunLike.congr_fun h10 v)⟩
     exact ⟨(algebraMap F (IntertwiningMap ρ ρ)).injective,
@@ -700,7 +700,7 @@ through the `DivisionRing`/`Finite` instances above), and `M`, regarded as a `KG
 `overEnd`, is *absolutely* irreducible. -/
 theorem isAbsolutelyIrreducible_overEnd [Finite F] [ρ.IsIrreducible] [FiniteDimensional F V] :
     IsAbsolutelyIrreducible (overEnd ρ) := by
-  haveI : FiniteDimensional (IntertwiningMap ρ ρ) V :=
+  have : FiniteDimensional (IntertwiningMap ρ ρ) V :=
     Module.Finite.of_restrictScalars_finite F (IntertwiningMap ρ ρ) V
   rw [isAbsolutelyIrreducible_iff_bijective_algebraMap]
   exact ⟨(algebraMap (IntertwiningMap ρ ρ)

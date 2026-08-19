@@ -186,11 +186,11 @@ theorem hasPLengthOne_iff_pElementsSubgroup_le :
 theorem pElementsSubgroup_le_iff_hasNormalPComplement :
     pElementsSubgroup p G ≤ Ch03.oPiPrimePiCore ({p} : Set ℕ) G ↔
       Ch05.HasNormalPComplement p ↥(pElementsSubgroup p G) := by
-  haveI hU_normal : (pElementsSubgroup p G).Normal := pElementsSubgroup_normal p G
+  have hU_normal : (pElementsSubgroup p G).Normal := pElementsSubgroup_normal p G
   constructor
   · -- `N := O_{p'}(G) ⊓ U` is a normal Hall `p'`-subgroup of `↥U`.
     intro hU_le
-    haveI hN_normal :
+    have hN_normal :
         ((Ch03.oPiCore (({p} : Set ℕ)ᶜ) G).subgroupOf (pElementsSubgroup p G)).Normal :=
       Subgroup.Normal.comap inferInstance (pElementsSubgroup p G).subtype
     refine hasNormalPComplement_of_normal_pPrime_index
@@ -221,7 +221,7 @@ theorem pElementsSubgroup_le_iff_hasNormalPComplement :
   · -- A normal `p`-complement forces `O_{p'}(↥U) ≤ N`, so `[↥U : N]` is a `p`-power.
     intro hNPC
     obtain ⟨K, hKn, hKcompl⟩ := hNPC
-    haveI : K.Normal := hKn
+    have : K.Normal := hKn
     obtain ⟨P⟩ := (inferInstance : Nonempty (Sylow p ↥(pElementsSubgroup p G)))
     have hKp' : ¬ p ∣ Nat.card ↥K := by
       rw [← (hKcompl P).index_eq_card]; exact P.not_dvd_index
@@ -237,9 +237,9 @@ theorem pElementsSubgroup_le_iff_hasNormalPComplement :
     have hK_idx_pow : ∃ m, K.index = p ^ m :=
       ⟨_, by rw [((hKcompl P).symm).index_eq_card]; exact P.card_eq_multiplicity⟩
     -- `W := O_{p'}(↥U)` is characteristic, so `W.map U.subtype ⊴ G`, `p'`, hence `≤ O_{p'}(G)`.
-    haveI hWchar : (Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥(pElementsSubgroup p G)).Characteristic :=
+    have hWchar : (Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥(pElementsSubgroup p G)).Characteristic :=
       Ch03.oPiCore.characteristic _ _
-    haveI hWG_normal : ((Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥(pElementsSubgroup p G)).map
+    have hWG_normal : ((Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥(pElementsSubgroup p G)).map
         (pElementsSubgroup p G).subtype).Normal := normal_map_subtype_of_char hWchar
     have hWG_pi : Ch03.Subgroup.IsPiGroup (({p} : Set ℕ)ᶜ)
         ((Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥(pElementsSubgroup p G)).map

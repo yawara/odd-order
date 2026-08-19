@@ -83,6 +83,7 @@ theorem sum_class_coeff_sylowSum_mul (S : Sylow p G) [Fintype ↥(S : Subgroup G
     Finset.card_univ, ← Nat.card_eq_fintype_card, nsmul_eq_mul]
 
 open scoped Classical in
+set_option backward.isDefEq.respectTransparency false in
 /-- **The coefficients of a central element are constant on a class**, so summing over the class
 multiplies by its size. -/
 theorem sum_class_coeff_of_mem_center {w : MonoidAlgebra k G}

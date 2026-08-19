@@ -113,12 +113,12 @@ theorem caseA_sylow_U_not_isCyclic_of_sharp_order [Finite G]
     (uActionHom data chief).rangeRestrict.comp e.toMonoidHom
   have hf : Function.Surjective f :=
     (uActionHom data chief).rangeRestrict_surjective.comp e.surjective
-  letI : Fact r.Prime := ⟨hr⟩
+  let : Fact r.Prime := ⟨hr⟩
   let Rbar : Sylow r ↥(MonoidHom.range (uActionHom data chief)) := R.mapSurjective hf
   have hRbar := caseA_sylow_not_isCyclic_of_sharp_order hG chars caseA hq hu
     hr hrhalf Rbar
   intro hR
-  letI : IsCyclic ↥(R : Subgroup ↥data.U) := hR
+  let : IsCyclic ↥(R : Subgroup ↥data.U) := hR
   rw [show (Rbar : Subgroup ↥(MonoidHom.range (uActionHom data chief))) =
     (R : Subgroup ↥data.U).map f by rfl] at hRbar
   exact hRbar <|

@@ -64,7 +64,7 @@ theorem sylowThreeNormalizerRSigma_eq_map
         (fc.normalizerRSigma model).subtype
       ∧ Nat.card ↥(S : Subgroup ↥(fc.normalizerRSigma model)) = 3 ^ 5 := by
   classical
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   have hNcard := fc.card_normalizerRSigma model ind hB2
   obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp S.isPGroup'
   have hmul := (S : Subgroup ↥(fc.normalizerRSigma model)).card_mul_index
@@ -88,9 +88,9 @@ theorem sylowThreeNormalizerRSigma_eq_map
     rw [hkeq] at hmul
     exact Nat.eq_of_mul_eq_mul_left (by norm_num : (0 : ℕ) < 3 ^ 5)
       (by rw [hmul]; ring)
-  haveI hSn : (S : Subgroup ↥(fc.normalizerRSigma model)).Normal :=
+  have hSn : (S : Subgroup ↥(fc.normalizerRSigma model)).Normal :=
     Subgroup.normal_of_index_eq_two hSidx
-  letI := Sylow.unique_of_normal S hSn
+  let := Sylow.unique_of_normal S hSn
   refine ⟨le_antisymm ?_ ?_, hScard⟩
   · rw [fc.sylowThreeNormalizerRSigma_def model, Subgroup.closure_le]
     rintro g ⟨hgN, j, hj⟩
@@ -118,7 +118,7 @@ theorem card_sylowThreeNormalizerRSigma
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
     Nat.card ↥(fc.sylowThreeNormalizerRSigma model) = 3 ^ 5 := by
   classical
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   obtain ⟨S⟩ : Nonempty (Sylow 3 ↥(fc.normalizerRSigma model)) := inferInstance
   obtain ⟨hEq, hScard⟩ := fc.sylowThreeNormalizerRSigma_eq_map model ind hB2 S
   rw [hEq, Subgroup.card_map_of_injective (Subgroup.subtype_injective _)]
@@ -206,7 +206,7 @@ theorem inf_centralizer_P_eq_of_isPGroup
       = fc.invImageF model
         ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) := by
   classical
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   have hRSC : (fc.invImageF model
       ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) : Subgroup G)
       ≤ Subgroup.centralizer (fc.P : Set G) := by
@@ -261,9 +261,9 @@ theorem inf_centralizer_sylowThree_eq_zpowers
           ((fc.sylowThreeNormalizerRSigma model : Subgroup G) : Set G)
       = Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
         * fc.toHypothesis.t) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   obtain ⟨-, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
   have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
   have hstord : orderOf (fc.toHypothesis.distinguishedInvolution
@@ -373,7 +373,7 @@ theorem distinguishedInvolution_notMem_sylowThree
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
     fc.toHypothesis.distinguishedInvolution
       ∉ fc.sylowThreeNormalizerRSigma model := by
-  haveI : Fact (Nat.Prime 2) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 2) := ⟨by norm_num⟩
   intro hmem
   have hord : orderOf fc.toHypothesis.distinguishedInvolution = 2 :=
     orderOf_eq_prime fc.toHypothesis.distinguishedInvolution_sq
@@ -394,7 +394,7 @@ theorem sylowThree_sup_zpowers_distinguishedInvolution
       = fc.normalizerRSigma model
     ∧ fc.sylowThreeNormalizerRSigma model
         ⊓ Subgroup.zpowers fc.toHypothesis.distinguishedInvolution = ⊥ := by
-  haveI : Fact (Nat.Prime 2) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 2) := ⟨by norm_num⟩
   have hord : orderOf fc.toHypothesis.distinguishedInvolution = 2 :=
     orderOf_eq_prime fc.toHypothesis.distinguishedInvolution_sq
       fc.toHypothesis.distinguishedInvolution_ne_one
@@ -440,7 +440,7 @@ theorem card_sylow_eq
     (ind : Hypothesis.TheoremAInductionBelow G Ω)
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) (S : Sylow 3 G) :
     Nat.card ↥(S : Subgroup G) = 3 ^ 5 ∨ Nat.card ↥(S : Subgroup G) = 3 ^ 6 := by
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   obtain ⟨-, -, -, -, hW, hGp⟩ := fc.step_twelve model ind hB2
   have hXcard : Nat.card ↥(S : Subgroup G) = 3 ^ 4 * Nat.card ↥fc.toHypothesis.W := by
     rw [Sylow.card_eq_multiplicity]
@@ -462,9 +462,9 @@ theorem inf_centralizer_sylow_eq_zpowers
     (S : Subgroup G) ⊓ Subgroup.centralizer (((S : Subgroup G)) : Set G)
       = Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
         * fc.toHypothesis.t) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
   have hstord : orderOf (fc.toHypothesis.distinguishedInvolution
       * fc.toHypothesis.t) = 3 := by
@@ -497,7 +497,7 @@ theorem inf_centralizer_sylow_eq_zpowers
   have hSbig : 3 ^ 5 ≤ Nat.card ↥(S : Subgroup G) := by
     rw [← fc.card_sylowThreeNormalizerRSigma model ind hB2]
     exact Nat.le_of_dvd Nat.card_pos (Subgroup.card_dvd_of_le hR₁S)
-  haveI : Nontrivial ↥(S : Subgroup G) := by
+  have : Nontrivial ↥(S : Subgroup G) := by
     rw [← Finite.one_lt_card_iff_nontrivial]
     have h243 : (3 : ℕ) ^ 5 = 243 := by norm_num
     omega
@@ -506,7 +506,7 @@ theorem inf_centralizer_sylow_eq_zpowers
         (((S : Subgroup G)) : Set G)) := by
     rw [center_eq_inf_centralizer_subgroupOf]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe inf_le_left).toEquiv
-  haveI := S.isPGroup'.center_nontrivial
+  have := S.isPGroup'.center_nontrivial
   have hne : Nat.card ↥((S : Subgroup G) ⊓ Subgroup.centralizer
       (((S : Subgroup G)) : Set G)) ≠ 1 := by
     rw [← hcentre]

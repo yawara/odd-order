@@ -117,14 +117,14 @@ theorem classSum_mul_apply_conj (Ci Cj : ConjClasses G) (h w : G) :
   refine Finset.card_nbij' (fun p => (h⁻¹ * p.1 * h, h⁻¹ * p.2 * h))
     (fun p => (h * p.1 * h⁻¹, h * p.2 * h⁻¹)) ?_ ?_ ?_ ?_
   · rintro ⟨u, v⟩ hp
-    simp only [Finset.coe_filter, Set.mem_setOf_eq, Finset.mem_univ, true_and] at hp ⊢
+    simp only [Finset.coe_filter, Set.mem_ofPred_eq, Finset.mem_univ, true_and] at hp ⊢
     obtain ⟨hi, hj, huv⟩ := hp
     refine ⟨?_, ?_, ?_⟩
     · rw [show h⁻¹ * u * h = h⁻¹ * u * h⁻¹⁻¹ by group, mk_conj_eq, hi]
     · rw [show h⁻¹ * v * h = h⁻¹ * v * h⁻¹⁻¹ by group, mk_conj_eq, hj]
     · rw [show h⁻¹ * u * h * (h⁻¹ * v * h) = h⁻¹ * (u * v) * h by group, huv]; group
   · rintro ⟨u, v⟩ hp
-    simp only [Finset.coe_filter, Set.mem_setOf_eq, Finset.mem_univ, true_and] at hp ⊢
+    simp only [Finset.coe_filter, Set.mem_ofPred_eq, Finset.mem_univ, true_and] at hp ⊢
     obtain ⟨hi, hj, huv⟩ := hp
     refine ⟨?_, ?_, ?_⟩
     · rw [mk_conj_eq, hi]
@@ -134,6 +134,7 @@ theorem classSum_mul_apply_conj (Ci Cj : ConjClasses G) (h w : G) :
   · rintro ⟨u, v⟩ _; simp only [Prod.mk.injEq]; constructor <;> group
 
 omit [DecidableEq G] in
+set_option backward.isDefEq.respectTransparency false in
 /-- The per-element product coefficient equals the count taken at the chosen class representative
 `(ConjClasses.mk w).out`. -/
 theorem classSum_mul_apply_out (Ci Cj : ConjClasses G) (w : G) :
@@ -226,14 +227,14 @@ theorem classSumCoeff_one_eq_card (Ci Cj : ConjClasses G)
   -- `{u : mk u = Ci}` via `u ↦ (u, u⁻¹)`, inverse `(u,v) ↦ u`.
   refine Finset.card_nbij' (fun p => p.1) (fun u => (u, u⁻¹)) ?_ ?_ ?_ ?_
   · rintro ⟨u, v⟩ hp
-    simp only [Finset.coe_filter, Set.mem_setOf_eq, Finset.mem_univ, true_and] at hp ⊢
+    simp only [Finset.coe_filter, Set.mem_ofPred_eq, Finset.mem_univ, true_and] at hp ⊢
     exact hp.1
   · intro u hu
-    simp only [Finset.coe_filter, Set.mem_setOf_eq, Finset.mem_univ, true_and] at hu ⊢
+    simp only [Finset.coe_filter, Set.mem_ofPred_eq, Finset.mem_univ, true_and] at hu ⊢
     refine ⟨hu, hinv u hu, ?_⟩
     rw [mul_inv_cancel, mk_eq_one_iff_eq_one]
   · rintro ⟨u, v⟩ hp
-    simp only [Finset.coe_filter, Set.mem_setOf_eq, Finset.mem_univ, true_and] at hp
+    simp only [Finset.coe_filter, Set.mem_ofPred_eq, Finset.mem_univ, true_and] at hp
     obtain ⟨-, -, hs⟩ := hp
     -- `mk (u·v) = 1` ⟹ `u·v = 1` ⟹ `v = u⁻¹`, so `(u, u⁻¹) = (u, v)`.
     rw [mk_eq_one_iff_eq_one] at hs
@@ -312,6 +313,7 @@ instance classPairMulAction (P : Subgroup G) (Ci Cj Cs : ConjClasses G) :
     constructor <;> group
 
 omit [DecidableEq G] in
+set_option backward.isDefEq.respectTransparency false in
 /-- The cardinality of the pair set `Ω` equals the structure coefficient `a_{ijs}|C_s| =
 `classSumCoeff Ci Cj Cs` (Peterfalvi's `a_{ijs}|{\cal C}_s|`). -/
 theorem card_classPair (Ci Cj Cs : ConjClasses G) :

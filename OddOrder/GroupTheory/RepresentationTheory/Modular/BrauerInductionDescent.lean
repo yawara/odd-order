@@ -82,6 +82,7 @@ theorem exists_intCast_sum_pow {x : K} (hx : x ∈ Algebra.adjoin ℤ ({ω} : Se
   rw [map_zsmul, zsmul_eq_mul, coe_adjoin_powerBasis_basis hω]
 
 include hω in
+set_option backward.isDefEq.respectTransparency false in
 /-- **`1, ω, …, ω ^ (n-1)` are `ℤ`-linearly independent.** -/
 theorem eq_zero_of_sum_intCast_pow_eq_zero {c : Fin (minpoly ℤ ω).natDegree → ℤ}
     (h : ∑ i, (c i : K) * ω ^ (i : ℕ) = 0) (i : Fin (minpoly ℤ ω).natDegree) : c i = 0 := by

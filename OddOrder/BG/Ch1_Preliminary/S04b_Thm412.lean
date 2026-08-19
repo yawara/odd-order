@@ -80,20 +80,20 @@ theorem isMulCommutative_of_metacyclic_actionCommutator_eq_top
   -- `R` non-cyclic (a cyclic group is abelian, contradicting `commutator R ≠ ⊥`).
   have hRcyc : ¬ IsCyclic R := by
     intro hcyc
-    letI := hcyc.commGroup
+    let := hcyc.commGroup
     exact hab (commutator_eq_bot R)
   -- ## Step 1 — construct the maximal cyclic `A`-invariant `S ⊇ R'`.
   have hcyc : IsCyclic ↥(commutator R) := hmeta.isCyclic_commutator
   obtain ⟨S, hS_inv, hS_cyc, hRprime_le, hS_max⟩ :=
     exists_maximal_isCyclic_isAInvariant_commutator_le φ hcyc
-  haveI : IsCyclic ↥S := hS_cyc
+  have : IsCyclic ↥S := hS_cyc
   have hS_norm : S.Normal := OddOrder.Isaacs.Ch06.normal_of_commutator_le hRprime_le
-  haveI := hS_norm
+  have := hS_norm
   -- `S ≠ ⊥` since it contains the nontrivial `commutator R`.
   have hSne : S ≠ ⊥ := fun h => hab (le_bot_iff.mp (h ▸ hRprime_le))
-  haveI hS_nt : Nontrivial ↥S := S.nontrivial_iff_ne_bot.mpr hSne
+  have hS_nt : Nontrivial ↥S := S.nontrivial_iff_ne_bot.mpr hSne
   -- `R` itself is nontrivial (it has the nontrivial subgroup `S`).
-  haveI hR_nt : Nontrivial R := by
+  have hR_nt : Nontrivial R := by
     obtain ⟨x, y, hxy⟩ := hS_nt
     exact ⟨x, y, fun h => hxy (Subtype.ext h)⟩
   -- ## Step 2 — `S ⊆ Z(R)` (output of the cyclic-centralizer lemma, not an input).
@@ -237,7 +237,7 @@ theorem isMulCommutative_of_metacyclic_actionCommutator_eq_top
     isCyclic_of_card_omega1_le_prime (hR.to_quotient S) hp_odd hΩRS_le
   -- ## Step 4 — `R/Z(R)` cyclic ⇒ `R` abelian (Lemma 4.1).
   -- `R/Z(R)` is a quotient of the cyclic `R/S` (since `S ≤ Z(R)`), hence cyclic.
-  haveI : IsCyclic (R ⧸ S) := hRS_cyc
+  have : IsCyclic (R ⧸ S) := hRS_cyc
   have hSZ' : S ≤ (Subgroup.center R).comap (MonoidHom.id R) := by
     rw [Subgroup.comap_id]; exact hSZ
   -- the induced surjection `R/S →* R/Z(R)`.
@@ -248,7 +248,7 @@ theorem isMulCommutative_of_metacyclic_actionCommutator_eq_top
     exact ⟨QuotientGroup.mk r, by rw [QuotientGroup.map_mk]; rfl⟩
   have hRZ_cyc : IsCyclic (R ⧸ Subgroup.center R) :=
     isCyclic_of_surjective _ hmap_surj
-  letI : IsCyclic (R ⧸ Subgroup.center R) := hRZ_cyc
+  let : IsCyclic (R ⧸ Subgroup.center R) := hRZ_cyc
   exact MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
     (QuotientGroup.mk' (Subgroup.center R))
     (le_of_eq (QuotientGroup.ker_mk' (Subgroup.center R)))
@@ -282,10 +282,10 @@ e.g. for `p = 3`, `R = (ℤ/3)²`, and `A = ℤ/2` acting by inversion, `[R, A] 
 cyclic, so `IsCyclic [R, A]` fails even though `hp_odd, hR, hmeta, hcop` all hold. The
 faithful (c) additionally requires `actionCommutator φ ≠ ⊥` and `actionCommutator φ ≠ ⊤`.
 
-**Note (2026-07-18).** The former `IsSolvable A` hypothesis is removed (BG states 4.12 with no
+**Note (2026-07-18).** The former `Group.IsSolvable A` hypothesis is removed (BG states 4.12 with no
 solvability assumption on the operator group `A`): `R` is a `p`-group, hence nilpotent, hence
 solvable, so the underlying coprime-action facts (Prop 1.6(a)(b), which need only
-`IsSolvable A ∨ IsSolvable R`) apply via `Or.inr`. -/
+`Group.IsSolvable A ∨ Group.IsSolvable R`) apply via `Or.inr`. -/
 theorem actionCommutator_inf_fixedPoints_eq_bot
     {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime] (hp_odd : Odd p)
     (hR : IsPGroup p R) (hmeta : OddOrder.GroupTheory.IsMetacyclic R)
@@ -294,8 +294,8 @@ theorem actionCommutator_inf_fixedPoints_eq_bot
     OddOrder.Isaacs.Ch04.actionCommutator φ ⊓ Subgroup.fixedPointsOfMulAut φ = ⊥ := by
   classical
   -- `R` is a `p`-group, hence nilpotent, hence solvable — so no hypothesis on `A` is needed
-  -- (the underlying Prop 1.6(a)(b) only require `IsSolvable A ∨ IsSolvable G`).
-  haveI : Group.IsNilpotent R := hR.isNilpotent
+  -- (the underlying Prop 1.6(a)(b) only require `Group.IsSolvable A ∨ Group.IsSolvable G`).
+  have : Group.IsNilpotent R := hR.isNilpotent
   -- `T := [R, A]`, with its restricted operator action `ψT`.
   set T : Subgroup R := OddOrder.Isaacs.Ch04.actionCommutator φ with hT_def
   set ψT : A →* MulAut ↥T := (IsAInvariant.actionCommutator φ).toMulAutHom with hψT_def
@@ -310,7 +310,7 @@ theorem actionCommutator_inf_fixedPoints_eq_bot
   -- Part (a) applied to `T` ⇒ `T` abelian.
   have hTab : IsMulCommutative ↥T :=
     isMulCommutative_of_metacyclic_actionCommutator_eq_top hp_odd hT_pg hT_meta hcopT hψT_top
-  letI : CommGroup ↥T := { (inferInstance : Group ↥T) with mul_comm := hTab.is_comm.comm }
+  let : CommGroup ↥T := { (inferInstance : Group ↥T) with mul_comm := hTab.is_comm.comm }
   -- Prop 1.6(d) for the abelian `T`: `C_T(A) ∩ [T, A] = ⊥`; with `[T, A] = T`, `C_T(A) = ⊥`.
   have hCT_bot :
       Subgroup.fixedPointsOfMulAut ψT ⊓ OddOrder.Isaacs.Ch04.actionCommutator ψT = ⊥ :=
@@ -389,7 +389,7 @@ which generates an order-`p` subgroup of `Ω₁(H)`. -/
 private theorem prime_le_card_omega1 {H : Type*} [Group H] [Finite H] {p : ℕ} [Fact p.Prime]
     (hH : IsPGroup p H) (hne : Nontrivial H) : p ≤ Nat.card (Omega H p 1) := by
   classical
-  haveI : Fintype H := Fintype.ofFinite H
+  have : Fintype H := Fintype.ofFinite H
   have hpH : p ∣ Nat.card H := by
     rcases hH.card_eq_or_dvd with h1 | hd
     · exact absurd h1 (by simpa using (Finite.one_lt_card (α := H)).ne')
@@ -444,10 +444,10 @@ theorem actionCommutator_isCyclic_and_fixedPoints_isCyclic_and_commutator_le
     commutator R ≤ OddOrder.Isaacs.Ch04.actionCommutator φ := by
   classical
   -- `R` is a `p`-group, hence nilpotent, hence solvable — no hypothesis on `A` is needed.
-  haveI : Group.IsNilpotent R := hR.isNilpotent
+  have : Group.IsNilpotent R := hR.isNilpotent
   set T : Subgroup R := OddOrder.Isaacs.Ch04.actionCommutator φ with hT_def
   set C : Subgroup R := Subgroup.fixedPointsOfMulAut φ with hC_def
-  haveI : T.Normal := OddOrder.Isaacs.Ch04.actionCommutator.normal φ
+  have : T.Normal := OddOrder.Isaacs.Ch04.actionCommutator.normal φ
   -- `T ⊓ C = ⊥` (part (b)).
   have hb : T ⊓ C = ⊥ :=
     actionCommutator_inf_fixedPoints_eq_bot hp_odd hR hmeta hcop
@@ -461,10 +461,10 @@ theorem actionCommutator_isCyclic_and_fixedPoints_isCyclic_and_commutator_le
   -- We first dispose of the cyclic case, then prove `C` cyclic in the generic case.
   by_cases hRcyc : IsCyclic R
   · -- `R` cyclic ⇒ every subgroup is cyclic, `R′ = ⊥`.
-    haveI : IsCyclic R := hRcyc
-    haveI : IsCyclic ↥T := Subgroup.isCyclic T
-    haveI : IsCyclic ↥C := Subgroup.isCyclic C
-    letI : CommGroup R := IsCyclic.commGroup
+    have : IsCyclic R := hRcyc
+    have : IsCyclic ↥T := Subgroup.isCyclic T
+    have : IsCyclic ↥C := Subgroup.isCyclic C
+    let : CommGroup R := IsCyclic.commGroup
     refine ⟨inferInstance, inferInstance, ?_⟩
     rw [commutator_eq_bot R]; exact bot_le
   · -- `R` non-cyclic: the squeeze argument.
@@ -473,8 +473,8 @@ theorem actionCommutator_isCyclic_and_fixedPoints_isCyclic_and_commutator_le
       intro hC0
       rw [hC0, bot_sup_eq] at hsup
       exact hT_ne_top hsup
-    haveI hT_nt : Nontrivial ↥T := T.nontrivial_iff_ne_bot.mpr hT_ne_bot
-    haveI hC_nt : Nontrivial ↥C := C.nontrivial_iff_ne_bot.mpr hC_ne_bot
+    have hT_nt : Nontrivial ↥T := T.nontrivial_iff_ne_bot.mpr hT_ne_bot
+    have hC_nt : Nontrivial ↥C := C.nontrivial_iff_ne_bot.mpr hC_ne_bot
     -- `|Ω₁(R)| = p²` (Lemma 4.10).
     obtain ⟨_hΩR_ea, hΩR_card⟩ :=
       isElementaryAbelian_omega1_of_isMetacyclic hR hp_odd hmeta hRcyc
@@ -512,7 +512,7 @@ theorem actionCommutator_isCyclic_and_fixedPoints_isCyclic_and_commutator_le
     have hCcyc : IsCyclic ↥C := isCyclic_of_card_omega1_le_prime hC_pg hp_odd (le_of_eq hΩC_p)
     -- `R′ ⊆ T`: `C` cyclic (abelian) and `R = C ⊔ T`, `T ⊴ R` ⇒ `R/T` abelian.
     refine ⟨hTcyc, hCcyc, ?_⟩
-    letI : CommGroup ↥C := hCcyc.commGroup
+    let : CommGroup ↥C := hCcyc.commGroup
     rw [← Subgroup.Normal.quotient_commutative_iff_commutator_le]
     have hsurj : Function.Surjective ((QuotientGroup.mk' T).comp C.subtype) := by
       rw [← MonoidHom.range_eq_top, MonoidHom.range_comp, Subgroup.range_subtype]
@@ -544,7 +544,7 @@ theorem isMulCommutative_actionCommutator
     {A : Type*} [Group A] [Finite A] {φ : A →* MulAut R}
     (hcop : Nat.Coprime (Nat.card A) (Nat.card R)) :
     IsMulCommutative ↥(OddOrder.Isaacs.Ch04.actionCommutator φ) := by
-  haveI : Group.IsNilpotent R := hR.isNilpotent
+  have : Group.IsNilpotent R := hR.isNilpotent
   set T : Subgroup R := OddOrder.Isaacs.Ch04.actionCommutator φ with hT_def
   set ψT : A →* MulAut ↥T := (IsAInvariant.actionCommutator φ).toMulAutHom with hψT_def
   have hψT_top : OddOrder.Isaacs.Ch04.actionCommutator ψT = ⊤ :=
@@ -585,7 +585,7 @@ theorem bgThm412
       IsCyclic ↥(OddOrder.Isaacs.Ch04.actionCommutator φ) ∧
       IsCyclic ↥(Subgroup.fixedPointsOfMulAut φ) ∧
       commutator R ≤ OddOrder.Isaacs.Ch04.actionCommutator φ) := by
-  haveI : Group.IsNilpotent R := hR.isNilpotent
+  have : Group.IsNilpotent R := hR.isNilpotent
   set T : Subgroup R := OddOrder.Isaacs.Ch04.actionCommutator φ with hT_def
   set C : Subgroup R := Subgroup.fixedPointsOfMulAut φ with hC_def
   -- (a).

@@ -223,8 +223,8 @@ theorem isUnit_det_generalizedDecompositionMatrix :
     IsUnit ((generalizedDecompositionMatrix hp hω' hπ hlin hkerJ eG).submatrix id
       (sectionColumnEquiv hp hπ hlin hkerJ eG).symm).det := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Fintype (PElementClass p G) := Fintype.ofFinite _
+  have : Fintype G := Fintype.ofFinite G
+  have : Fintype (PElementClass p G) := Fintype.ofFinite _
   have hE : IsUnit (characterMatrix eG).det :=
     Matrix.isUnit_det_of_right_inverse (characterMatrix_mul_characterMatrixInv eG)
   rw [← sectionCharacterMatrix_submatrix hp hπ hlin hkerJ eG,

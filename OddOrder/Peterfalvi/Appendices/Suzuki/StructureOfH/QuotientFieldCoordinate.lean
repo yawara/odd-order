@@ -67,7 +67,7 @@ theorem exists_quotient_field_coordinate
       (∀ (a : ↥hyp.K) (y : G), y ∈ hyp.Q →
         β ((a : G)⁻¹ * y * (a : G)) = (γ a : F) * β y) := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   set M := ↥hyp.Q ⧸ Subgroup.center ↥hyp.Q with hMdef
   set π : ↥hyp.Q →* M := QuotientGroup.mk' (Subgroup.center ↥hyp.Q) with hπ
   -- the center of `Q` is `Q₀`
@@ -96,11 +96,11 @@ theorem exists_quotient_field_coordinate
     have h := Subgroup.card_eq_card_quotient_mul_card_subgroup (Subgroup.center ↥hyp.Q)
     rw [hZcard, hQcard, sq] at h
     exact (Nat.eq_of_mul_eq_mul_right hQ0pos h.symm)
-  haveI : Nontrivial M := Finite.one_lt_card_iff_nontrivial.mp (by rw [hMcard]; omega)
-  letI : CommGroup M := { (inferInstance : Group M) with mul_comm := hQEA.comm }
+  have : Nontrivial M := Finite.one_lt_card_iff_nontrivial.mp (by rw [hMcard]; omega)
+  let : CommGroup M := { (inferInstance : Group M) with mul_comm := hQEA.comm }
   -- the action of `K` on the central quotient
-  haveI := hyp.K_isCyclic
-  letI : CommGroup ↥hyp.K := IsCyclic.commGroup
+  have := hyp.K_isCyclic
+  let : CommGroup ↥hyp.K := IsCyclic.commGroup
   set ψ : ↥hyp.K →* MulAut M := hyp.conjQuotientBy hKH with hψ
   -- `K` acts freely off the identity
   have hfree : ∀ (k : ↥hyp.K) (u : M), u ≠ 1 → ψ k u = u → k = 1 := by
@@ -133,7 +133,7 @@ theorem exists_quotient_field_coordinate
     rw [hMcard, hyp.card_K_eq_card_Q0_sub_one]
   obtain ⟨F, instF, instFinF, μ, α, hFcard, hμ⟩ :=
     Huppert.exists_field_coordinate_realization hQEA ψ hfree hcard
-  letI : Field F := instF
+  let : Field F := instF
   -- the coordinate map, extended by zero off `Q`
   set β : G → F := fun y => if hy : y ∈ hyp.Q then α (Additive.ofMul (π ⟨y, hy⟩)) else 0
     with hβ

@@ -58,14 +58,14 @@ theorem zmod_two_eq_zero_or_one (x : ZMod 2) : x = 0 ∨ x = 1 := by revert x; d
 theorem isSimpleGroup_mulAut_of_elementaryAbelian_two {A : Type*} [CommGroup A] [Finite A]
     (hexp : ∀ x : A, x ^ 2 = 1) (hcard : 8 ≤ Nat.card A) : IsSimpleGroup (MulAut A) := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  letI : Module (ZMod 2) (Additive A) := zmodModule_of_pow_eq_one (n := 2) hexp
-  haveI : Finite (Additive A) := inferInstanceAs (Finite A)
-  haveI : Module.Finite (ZMod 2) (Additive A) := Module.Finite.of_finite
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  let : Module (ZMod 2) (Additive A) := zmodModule_of_pow_eq_one (n := 2) hexp
+  have : Finite (Additive A) := inferInstanceAs (Finite A)
+  have : Module.Finite (ZMod 2) (Additive A) := Module.Finite.of_finite
   have hK : ∀ x : ZMod 2, x = 0 ∨ x = 1 := zmod_two_eq_zero_or_one
   -- `|A| = 2 ^ dim`, so `dim ≥ 3`
   have hcardAdd : Nat.card (Additive A) = 2 ^ Module.finrank (ZMod 2) (Additive A) := by
-    haveI := Fintype.ofFinite (Additive A)
+    have := Fintype.ofFinite (Additive A)
     rw [Nat.card_eq_fintype_card, Module.card_eq_pow_finrank (K := ZMod 2) (V := Additive A),
       ZMod.card]
   have hcardEq : Nat.card (Additive A) = Nat.card A :=
@@ -75,7 +75,7 @@ theorem isSimpleGroup_mulAut_of_elementaryAbelian_two {A : Type*} [CommGroup A] 
     have hle : (2 : ℕ) ^ Module.finrank (ZMod 2) (Additive A) ≤ 2 ^ 2 :=
       Nat.pow_le_pow_right (by norm_num) (by omega)
     omega
-  haveI := isSimpleGroup_linearEquiv (K := ZMod 2) (V := Additive A) hK h3
+  have := isSimpleGroup_linearEquiv (K := ZMod 2) (V := Additive A) hK h3
   exact (mulAutEquivLinearEquiv (n := 2) (E := A)).isSimpleGroup
 
 
@@ -102,7 +102,7 @@ theorem exists_isSimpleGroup_mulAut_not_card_three_not_elementaryAbelian :
       IsSimpleGroup (MulAut A) ∧ Nat.card A ≠ 3 ∧ ∃ x : A, x ^ 2 ≠ 1 := by
   classical
   refine ⟨Multiplicative (ZMod 4), inferInstance, inferInstance, ?_, ?_, ?_⟩
-  · haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  · have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
     refine isSimpleGroup_of_prime_card (p := 2) ?_
     rw [IsCyclic.card_mulAut]
     have hcard : Nat.card (Multiplicative (ZMod 4)) = 4 := by
@@ -131,7 +131,7 @@ theorem exists_isSimpleGroup_mulAut_not_card_three_not_elementaryAbelian :
 theorem card_linearEquiv_eq_six {V : Type*} [AddCommGroup V] [Module (ZMod 2) V]
     [Module.Finite (ZMod 2) V] (h : Module.finrank (ZMod 2) V = 2) :
     Nat.card (V ≃ₗ[ZMod 2] V) = 6 := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   let b : Module.Basis (Fin 2) (ZMod 2) V := Module.finBasisOfFinrankEq (ZMod 2) V h
   have e : (V ≃ₗ[ZMod 2] V) ≃* Matrix.GeneralLinearGroup (Fin 2) (ZMod 2) :=
     (LinearMap.GeneralLinearGroup.generalLinearEquiv (ZMod 2) V).symm.trans
@@ -148,13 +148,13 @@ theorem not_isSimpleGroup_mulAut_of_elementaryAbelian_two_of_card_lt_eight {A : 
     [CommGroup A] [Finite A] (hexp : ∀ x : A, x ^ 2 = 1) (hcard : Nat.card A < 8) :
     ¬ IsSimpleGroup (MulAut A) := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  letI : Module (ZMod 2) (Additive A) := zmodModule_of_pow_eq_one (n := 2) hexp
-  haveI : Finite (Additive A) := inferInstanceAs (Finite A)
-  haveI : Module.Finite (ZMod 2) (Additive A) := Module.Finite.of_finite
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  let : Module (ZMod 2) (Additive A) := zmodModule_of_pow_eq_one (n := 2) hexp
+  have : Finite (Additive A) := inferInstanceAs (Finite A)
+  have : Module.Finite (ZMod 2) (Additive A) := Module.Finite.of_finite
   intro hs
   have hcardAdd : Nat.card (Additive A) = 2 ^ Module.finrank (ZMod 2) (Additive A) := by
-    haveI := Fintype.ofFinite (Additive A)
+    have := Fintype.ofFinite (Additive A)
     rw [Nat.card_eq_fintype_card, Module.card_eq_pow_finrank (K := ZMod 2) (V := Additive A),
       ZMod.card]
   have hcardEq : Nat.card (Additive A) = Nat.card A :=
@@ -169,8 +169,8 @@ theorem not_isSimpleGroup_mulAut_of_elementaryAbelian_two_of_card_lt_eight {A : 
       have hpow : (2 : ℕ) ^ Module.finrank (ZMod 2) (Additive A) ≤ 2 ^ 1 :=
         Nat.pow_le_pow_right (by norm_num) (by omega)
       omega
-    haveI := subsingleton_mulAut_of_card_le_two hA2
-    haveI := hs.toNontrivial
+    have := subsingleton_mulAut_of_card_le_two hA2
+    have := hs.toNontrivial
     exact false_of_nontrivial_of_subsingleton (MulAut A)
   · have hfr : Module.finrank (ZMod 2) (Additive A) = 2 := le_antisymm hd hge
     refine not_isSimpleGroup_of_card_eq_six ?_ hs
@@ -183,7 +183,7 @@ theorem not_isSimpleGroup_mulAut_of_elementaryAbelian_two_of_card_lt_eight {A : 
 (`φ(3) = φ(4) = φ(6) = 2`). -/
 theorem isSimpleGroup_mulAut_of_isCyclic_card {A : Type*} [CommGroup A] [Finite A] [IsCyclic A]
     (h : Nat.card A = 3 ∨ Nat.card A = 4 ∨ Nat.card A = 6) : IsSimpleGroup (MulAut A) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   refine isSimpleGroup_of_prime_card (p := 2) ?_
   rw [IsCyclic.card_mulAut]
   rcases h with h | h | h <;> rw [h] <;> decide

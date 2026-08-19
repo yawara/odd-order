@@ -87,7 +87,7 @@ theorem ne_bot (h : IsMaximalNormalInvariantAbelian act A)
       x ∈ involutions P ∧ y ∈ involutions P ∧ x ≠ y) :
     A ≠ ⊥ := by
   obtain ⟨x, y, _hx, _hy, hxy⟩ := hmulti
-  letI : Nontrivial P := ⟨⟨x, y, hxy⟩⟩
+  let : Nontrivial P := ⟨⟨x, y, hxy⟩⟩
   intro hAbot
   have hZA : Subgroup.center P = A := h.maximal (Subgroup.center P)
     ⟨inferInstance, IsAInvariant.of_characteristic act⟩ inferInstance
@@ -144,8 +144,8 @@ theorem commutator_map_eq_left_or_le_agemo_one
     (_root_.commutator C).map C.subtype = A ∨
       (_root_.commutator C).map C.subtype ≤
         (Agemo A 2 1).map A.subtype := by
-  letI : A.Normal := h.left.1
-  letI : C.Normal := h.right.1
+  let : A.Normal := h.left.1
+  let : C.Normal := h.right.1
   let D : Subgroup P := (_root_.commutator C).map C.subtype
   have hDle : D ≤ A := by
     rw [← hPhi]
@@ -223,7 +223,7 @@ private theorem exists_frattini_cover_with_witness
       C ≤ A ⊔ frattini P ∧
       b ∈ C ∧ b ∈ frattini P ∧ b ∉ A ∧
       C = A ⊔ (C ⊓ frattini P) := by
-  letI : A.Normal := hA.1
+  let : A.Normal := hA.1
   let a : NormalInvariantSubgroup act := ⟨A, hA⟩
   let u : NormalInvariantSubgroup act :=
     ⟨A ⊔ frattini P,
@@ -302,7 +302,7 @@ private theorem exists_special_cover_ambientFrattini_eq_left
       b ∈ C ∧ b ∈ frattini P ∧ b ∉ A ∧
       b ^ 2 ∉ (Agemo A 2 1).map A.subtype ∧
       NormalInvariantCover.ambientFrattini C = A := by
-  letI : A.Normal := hA.1
+  let : A.Normal := hA.1
   obtain ⟨C, b, hcover, hCle, hbC, hbPhi, hbA, _hdecomp⟩ :=
     exists_frattini_cover_with_witness hA hnot
   have hb2not : b ^ 2 ∉ (Agemo A 2 1).map A.subtype :=
@@ -313,7 +313,7 @@ private theorem exists_special_cover_ambientFrattini_eq_left
     let c : C := ⟨b, hbC⟩
     refine ⟨c ^ 2, IsPGroup.pow_mem_frattini (hP.to_subgroup C) c, ?_⟩
     rfl
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   have hPhiC : NormalInvariantCover.ambientFrattini C = A := by
@@ -350,7 +350,7 @@ theorem higmanLemmaNine_pow_four_eq_one_of_transitive
     (A : Subgroup P)
     (hAmax : IsMaximalNormalInvariantAbelian X.subtype A) :
     ∀ a : A, a ^ 4 = 1 := by
-  letI : A.Normal := hAmax.isNormalInvariant.1
+  let : A.Normal := hAmax.isNormalInvariant.1
   have htransA : ∀ x ∈ involutions A, ∀ y ∈ involutions A,
       ∃ g : X, hAmax.isNormalInvariant.2.restrict g x = y :=
     restricted_involutions_transitive X.subtype
@@ -358,13 +358,13 @@ theorem higmanLemmaNine_pow_four_eq_one_of_transitive
         intro x hx y hy
         obtain ⟨g, hg⟩ := htrans x hx y hy
         exact ⟨g, hg⟩)
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAmax.isMulCommutative.is_comm.comm }
   obtain ⟨ι, hι, e, _he, _hε, classifyFull⟩ :=
     exists_homocyclic_and_invariant_eq_agemo
       (hP.to_subgroup A) hAmax.isNormalInvariant.2.restrict htransA
-  letI : Fintype ι := hι
+  let : Fintype ι := hι
   have classify : ∀ U : Subgroup A,
       IsAInvariant hAmax.isNormalInvariant.2.restrict U →
         ∃ s : ℕ, U = Agemo A 2 s := by
@@ -452,8 +452,8 @@ private theorem IsMaximalNormalInvariantAbelian.frattini_le_of_pow_two_eq_one
     (hAmax : IsMaximalNormalInvariantAbelian X.subtype A)
     (hAexp : ∀ a : A, a ^ 2 = 1) :
     frattini P ≤ A := by
-  letI : A.Normal := hAmax.isNormalInvariant.1
-  letI : Nontrivial P := by
+  let : A.Normal := hAmax.isNormalInvariant.1
+  let : Nontrivial P := by
     obtain ⟨x, y, _, _, hxy⟩ := hmulti
     exact ⟨⟨x, y, hxy⟩⟩
   have hAcenter : A ≤ Subgroup.center P := by
@@ -467,7 +467,7 @@ private theorem IsMaximalNormalInvariantAbelian.frattini_le_of_pow_two_eq_one
   have hcenterEq : Subgroup.center P = A :=
     hAmax.maximal (Subgroup.center P)
       ⟨inferInstance, IsAInvariant.center X.subtype⟩ inferInstance hAcenter
-  letI : Group.IsNilpotent P := hP.isNilpotent
+  let : Group.IsNilpotent P := hP.isNilpotent
   have hclass : Group.nilpotencyClass P ≤ 2 := by
     by_contra hnot
     have hc : 3 ≤ Group.nilpotencyClass P := by omega
@@ -502,7 +502,7 @@ private theorem IsMaximalNormalInvariantAbelian.frattini_le_of_pow_two_eq_one
     have hLnorm : L.Normal := by
       dsimp [L]
       infer_instance
-    letI : L.Normal := hLnorm
+    let : L.Normal := hLnorm
     have hsupNI : IsNormalInvariant X.subtype (A ⊔ L) :=
       ⟨inferInstance, hAmax.isNormalInvariant.2.sup hLinv⟩
     have hsupComm : IsMulCommutative ↥(A ⊔ L) :=
@@ -572,7 +572,7 @@ theorem higmanLemmaNine_of_transitive
   refine ⟨higmanLemmaNine_pow_four_eq_one_of_transitive
     hP X hXcyc htrans hXodd hmulti hncomm A hAmax, ?_⟩
   by_contra hnot
-  letI : A.Normal := hAmax.isNormalInvariant.1
+  let : A.Normal := hAmax.isNormalInvariant.1
   have htransA : ∀ x ∈ involutions A, ∀ y ∈ involutions A,
       ∃ g : X, hAmax.isNormalInvariant.2.restrict g x = y :=
     restricted_involutions_transitive X.subtype
@@ -580,13 +580,13 @@ theorem higmanLemmaNine_of_transitive
         intro x hx y hy
         obtain ⟨g, hg⟩ := htrans x hx y hy
         exact ⟨g, hg⟩)
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAmax.isMulCommutative.is_comm.comm }
   obtain ⟨ι, hι, e, _he, _hε, classifyFull⟩ :=
     exists_homocyclic_and_invariant_eq_agemo
       (hP.to_subgroup A) hAmax.isNormalInvariant.2.restrict htransA
-  letI : Fintype ι := hι
+  let : Fintype ι := hι
   have classify : ∀ U : Subgroup A,
       IsAInvariant hAmax.isNormalInvariant.2.restrict U →
         ∃ s : ℕ, U = Agemo A 2 s := by
@@ -594,7 +594,7 @@ theorem higmanLemmaNine_of_transitive
     obtain ⟨s, _hs, hsU⟩ := classifyFull U hU
     exact ⟨s, hsU⟩
   have hAne : A ≠ ⊥ := hAmax.ne_bot hP hmulti
-  letI : Group.IsNilpotent P := hP.isNilpotent
+  let : Group.IsNilpotent P := hP.isNilpotent
   let D : Subgroup P := ⁅(⊤ : Subgroup P), A⁆
   have hDlt : D < A := by
     dsimp [D]

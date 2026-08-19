@@ -76,7 +76,7 @@ noncomputable def ticVdiff (h : Hypothesis46 A L) :
   V_subset_W := fun _ hv => hv.1
   W_normalizes_V := by
     intro w v hv
-    haveI := h.tic.isMulCommutative_W
+    have := h.tic.isMulCommutative_W
     have h1 : (⟨v, hv.1⟩ : ↥h.tic.W) * w = w * ⟨v, hv.1⟩ := mul_comm _ _
     have h2 : (w : G) * v = v * (w : G) := (Subtype.ext_iff.mp h1).symm
     have h3 : (w : G) * v * (w : G)⁻¹ = v := by rw [h2]; exact mul_inv_cancel_right v w
@@ -106,6 +106,7 @@ noncomputable def ticWEquivSdiffW (h : Hypothesis46 A L) :
   (MulEquiv.subgroupCongr (tic_W_eq_map h)).trans
     (Subgroup.equivMapOfInjective (h.W1 ⊔ h.W2) L.subtype L.subtype_injective).symm
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Carrier coherence for the bridge: the underlying `G`-element of `g : tic.W` equals the image of
 its `sdiff.W` partner under `L ↪ G`. -/
 theorem coe_ticWEquivSdiffW (h : Hypothesis46 A L) (g : h.tic.W) :
@@ -146,6 +147,7 @@ noncomputable def certainTypeOmegaSigma (h : Hypothesis46 A L) [NeZero (Nat.card
   (ticVdiff h).sigma rfl (ticVdiffFullDadeApplication h)
     ((ticVdiff h).omega (omegaProdCharTic h χ₂ i))
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The `σ_G`-image on `V = W − (W₁ ∪ W₂)`: `ω_{ij}^σ(v) = ω_{ij}(v) = chiColumn χ₂ i (e v)`
 (`sigma_apply_of_mem_V` (3.2.c) + `omega_apply` + `omegaProdCharTic_apply`). -/
 theorem certainTypeOmegaSigma_apply_of_mem_V (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
@@ -184,7 +186,7 @@ theorem certainType_sign_eq_of_degree_eq (h : Hypothesis46Core A L)
     (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
           = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
     (h.columnFamily χ₂).sign = (h.columnFamily χ₂').sign := by
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   obtain ⟨a, ha⟩ := h.certainType_degree_modEq χ₂ i
   obtain ⟨b, hb⟩ := h.certainType_degree_modEq χ₂' i
   have hw3 : 3 ≤ Nat.card h.W1 := h.sdiffTICyclicHypothesis.three_le_card_W1
@@ -248,7 +250,7 @@ theorem certainType_apply_eq_of_mem_W1 (h : Hypothesis46Core A L)
     {w : ↥L} (hw : w ∈ h.W1) :
     ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) w
       = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) w := by
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   by_cases hw1 : w = 1
   · rw [hw1]; exact hdeg
   · -- `w ∈ W₁^# ⊆ sdiff.V = W − W₂`
@@ -290,7 +292,7 @@ theorem certainType_diff_supp_subset_A0 (h : Hypothesis46Core A L)
     (hz : (((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
           - ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ)) z ≠ 0) :
     L.subtype z ∈ (A ∪ OddOrder.GroupTheory.conjClassSetIn L h.tic.V : Set G) := by
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   rw [ClassFunction.sub_apply, sub_ne_zero] at hz
   by_cases hz1 : z = 1
   · exact absurd (by rw [hz1]; exact hdeg) hz
@@ -464,6 +466,7 @@ theorem certainType_diff_dade_inner_self (h : Hypothesis46 A L)
     if_neg (h.columnFamily_mu_ne hχ i i), if_neg (h.columnFamily_mu_ne hχ i i).symm]
   ring
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (4.8), step (6) input** (`NC(φ) ≤ 2`).  The Dade image `φ = (μ_{ij} − μ_{ik})^τ`,
 of squared norm `2`, has at most two nonzero `σ`-image coefficients. By
 `mem_ZIrr_inner_self_eq_sum_sq`
@@ -538,7 +541,7 @@ theorem sigmaCoeff_psi_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
               0)
             - (if (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂' i) = pq
                 then (1 : ℂ) else 0)) := by
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   simp only [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff]
   rw [certainTypeOmegaSigma_eq_chiFam, certainTypeOmegaSigma_eq_chiFam,
     ClassFunction.inner_sub_left, ← Int.cast_smul_eq_zsmul ℂ (h.columnFamily χ₂).sign,
@@ -667,10 +670,10 @@ theorem certainType_diff_dade_eq (h : Hypothesis46 A L)
       = (h.columnFamily χ₂).sign
         • (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) := by
   classical
-  haveI : Finite G := Finite.of_fintype G
-  haveI : Fintype ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) := Fintype.ofFinite _
-  haveI : Fintype ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ) := Fintype.ofFinite _
-  haveI : Finite (((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
+  have : Finite G := Finite.of_fintype G
+  have : Fintype ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) := Fintype.ofFinite _
+  have : Fintype ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ) := Fintype.ofFinite _
+  have : Finite (((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
     ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ)) := Finite.of_fintype _
   apply certainType_diff_dade_eq_of_all_sigmaCoeff_zero h hχ hχ₂ hχ₂' i hdeg
   set φ := h.tau.toDadeMap (certainTypeDiffSupported h.toCore hχ₂ hχ₂' i hdeg) with hφ
@@ -708,7 +711,7 @@ theorem certainType_diff_dade_eq (h : Hypothesis46 A L)
     have hsub : {x | a x ≠ 0} ⊆ {x | G x ≠ 0} ∪ {Pij, Pik} := by
       intro x hx
       by_contra hcon
-      simp only [Set.mem_union, Set.mem_setOf_eq, Set.mem_insert_iff, Set.mem_singleton_iff,
+      simp only [Set.mem_union, Set.mem_ofPred_eq, Set.mem_insert_iff, Set.mem_singleton_iff,
         not_or, not_not] at hcon
       exact hx (by rw [hae x, hcon.1, if_neg (Ne.symm hcon.2.1), if_neg (Ne.symm hcon.2.2)]; ring)
     have hbpair : ({Pij, Pik} : Set _).ncard ≤ 2 :=
@@ -835,7 +838,7 @@ theorem columnFamily_mu_apply_one_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
       = ((h.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ) 1 := by
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   have h0 := h.columnFamily_difference_apply_one χ₂ i
   simp only [SignedIrreducibleDifferenceFamily.difference_apply_one,
     SignedIrreducibleDifferenceFamily.classFunction_apply] at h0
@@ -853,7 +856,7 @@ theorem forall_columnFamily_mu_apply_one_eq_of_sum_eq (h : Hypothesis46 A L)
           = ∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
     ∀ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
         = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1 := by
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   have ej : ∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
       = (Nat.card h.W1 : ℂ) * ((h.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ) 1 := by
     rw [Finset.sum_congr rfl (fun i _ => columnFamily_mu_apply_one_eq h χ₂ i),
@@ -918,6 +921,7 @@ theorem omegaProdCharTic_eq_iff (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
   · rintro ⟨rfl, rfl⟩; rfl
 
 open scoped Classical in
+set_option backward.isDefEq.respectTransparency false in
 /-- **`σ`-image orthonormality (per element).**  `⟨ω_{ij}^σ, ω_{i'j'}^σ⟩ = δ_{(i,j),(i',j')}`.
 The `σ`-images are `σ(ω(P_{ij}))` with `P_{ij} = omegaProdCharTic h χ₂ i`; `σ` is an isometry
 (`sigma_inner`) and the `ω`-family is orthonormal (`omega_inner_self`/`omega_inner_ne`), so the
@@ -972,7 +976,7 @@ theorem columnFamily_mu_sum_inner (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)
     ClassFunction.inner (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ))
         (∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ))
       = if χ₂ = χ₂' then (Nat.card h.W1 : ℂ) else 0 := by
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   rw [inner_sum_left]
   simp_rw [inner_sum_right, irreducibleCharacter_inner_eq_ite]
   by_cases hc : χ₂ = χ₂'
@@ -1004,7 +1008,7 @@ theorem certainType_omega_sum_isometry (h : Hypothesis46 A L) [NeZero (Nat.card 
     ClassFunction.inner (∑ i, certainTypeOmegaSigma h χ₂ i) (∑ i, certainTypeOmegaSigma h χ₂' i)
       = ClassFunction.inner (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ))
           (∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ)) := by
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   rw [certainTypeOmegaSigma_sum_inner, columnFamily_mu_sum_inner]
 
 end OddOrder.Peterfalvi.S06

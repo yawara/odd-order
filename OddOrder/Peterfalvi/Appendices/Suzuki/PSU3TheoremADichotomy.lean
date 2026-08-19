@@ -164,7 +164,7 @@ theorem exists_prime_order_le_classStabilizer_of_not_freeD
   -- a prime dividing the order of `c⁻¹` divides the order of the stabilizer
   obtain ⟨p, hp, hpdvd⟩ :=
     Nat.exists_prime_and_dvd (n := orderOf c⁻¹) fun h => hcinv1 (orderOf_eq_one_iff.mp h)
-  haveI := Fact.mk hp
+  have := Fact.mk hp
   have hdvd : orderOf c⁻¹ ∣ Nat.card ↥(hyp.classStabilizer ω) :=
     Subgroup.orderOf_dvd_natCard _ hcS
   obtain ⟨x, hx⟩ :=
@@ -189,7 +189,7 @@ cannot lie in `Q₀`) followed by `three_le_ncard_fixedPoints_of_mem_centralizer
 `eq_one_of_conj_eq_mul_Q0_of_mem_W` (`W` is fixed-point-free with no `V = W` in sight). -/
 theorem exists_sectionFourSetup_of_not_freeD {m : ℕ} (M : hyp.QuotientFieldModel m)
     (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
-    (hmu : Function.Injective M.mu) (hQ2 : IsPGroup 2 ↥hyp.Q) (hSolv : IsSolvable ↥hyp.Q)
+    (hmu : Function.Injective M.mu) (hQ2 : IsPGroup 2 ↥hyp.Q) (hSolv : Group.IsSolvable ↥hyp.Q)
     (hfree : ¬ hyp.FreeD) :
     Nonempty hyp.SectionFourSetup := by
   classical
@@ -290,14 +290,14 @@ theorem SectionFourSetup.two_lt_natCard_inf_centralizer_Q0 (s4 : hyp.SectionFour
     (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
     (hQsuz : IsSuzuki2Group ↥hyp.Q)
     (hCop : Nat.Coprime (Nat.card ↥(s4.P.subgroupOf hyp.D)) (Nat.card ↥hyp.Q))
-    (hSolv : IsSolvable ↥hyp.Q) (hP : s4.P ≠ ⊥)
+    (hSolv : Group.IsSolvable ↥hyp.Q) (hP : s4.P ≠ ⊥)
     (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer ((s4.P : Set G))),
       Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
     (hord : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
     (ih : TheoremAInductionBelow G Ω) :
     2 < Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer ((s4.P : Set G))) := by
   classical
-  letI := hyp.centralizerQuotientMulAction s4.P_le_V
+  let := hyp.centralizerQuotientMulAction s4.P_le_V
   obtain ⟨result, data, -⟩ :=
     hyp.nonempty_psu3Data_sectionFour s4 hZ hQsuz hCop hSolv hP hA3 hord ih
   have hbridge : Nat.card ↥(hyp.Q0.subgroupOf (Subgroup.centralizer ((s4.P : Set G))))
@@ -373,9 +373,9 @@ theorem nonempty_theoremAConclusion_of_caseC
   classical
   have hm : m ≠ 0 := (Nat.zero_lt_one.trans hn).ne'
   have hQ2 : IsPGroup 2 ↥sc.toHypothesis.Q := sc.isPGroup_two_Q ih
-  haveI : Fact (Nat.Prime 2) := Fact.mk Nat.prime_two
-  haveI : Group.IsNilpotent ↥sc.toHypothesis.Q := hQ2.isNilpotent
-  have hSolv : IsSolvable ↥sc.toHypothesis.Q := inferInstance
+  have : Fact (Nat.Prime 2) := Fact.mk Nat.prime_two
+  have : Group.IsNilpotent ↥sc.toHypothesis.Q := hQ2.isNilpotent
+  have hSolv : Group.IsSolvable ↥sc.toHypothesis.Q := inferInstance
   by_cases hfree : sc.toHypothesis.FreeD
   · -- §2's Proposition holds, and Corollary 1 of §3 reads it off
     obtain ⟨f, g, h, H₁, hfQ⟩ := sc.toHypothesis.exists_fgh_mapsTo

@@ -53,7 +53,7 @@ one used by the classification of the blocks. -/
 theorem isSimpleModule_asModule [Nontrivial V]
     (h : ∀ W : Submodule k V, (∀ g : G, W ≤ W.comap (ρ g)) → W = ⊥ ∨ W = ⊤) :
     IsSimpleModule (MonoidAlgebra k G) ρ.asModule := by
-  haveI : Nontrivial ρ.asModule := ρ.asModuleEquiv.toEquiv.nontrivial
+  have : Nontrivial ρ.asModule := ρ.asModuleEquiv.toEquiv.nontrivial
   refine { eq_bot_or_eq_top := fun N => ?_ }
   rcases h _ (invariant_toInvariantSubspace ρ N) with hbot | htop
   · left

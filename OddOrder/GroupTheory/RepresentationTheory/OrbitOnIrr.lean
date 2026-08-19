@@ -60,7 +60,7 @@ theorem card_image_induce_mul_index_eq
     (hinertia : ∀ θ ∈ T, IrreducibleCharacter.inertia (G := G) (H := H) θ = H) :
     (T.image (fun θ => induce H θ.toClassFunction)).card * H.index = T.card := by
   classical
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
   -- `|T| = ∑_{χ ∈ image} |fibre over χ|`, each fibre `= [G:H]`.
   rw [Finset.card_eq_sum_card_image (fun θ => induce H θ.toClassFunction) T]
   rw [Finset.sum_congr rfl (fun χ hχ => ?_), Finset.sum_const, smul_eq_mul, mul_comm]
@@ -82,7 +82,7 @@ theorem card_image_induce_eq_div
     (hT : ∀ θ ∈ T, ∀ g : G, IrreducibleCharacter.conjBy (G := G) (H := H) g θ ∈ T)
     (hinertia : ∀ θ ∈ T, IrreducibleCharacter.inertia (G := G) (H := H) θ = H) :
     (T.image (fun θ => induce H θ.toClassFunction)).card = T.card / H.index := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
   have hidx : 0 < H.index := Nat.pos_of_ne_zero fun h0 => by
     have hmc := H.index_mul_card
     rw [h0, zero_mul] at hmc
@@ -106,7 +106,7 @@ theorem card_image_induce_ge_div
     (hinertia : ∀ θ ∈ T, IrreducibleCharacter.inertia (G := G) (H := H) θ = H) :
     T.card / H.index ≤ (T.image (fun θ => induce H θ.toClassFunction)).card := by
   classical
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
   have hidx : 0 < H.index := Nat.pos_of_ne_zero fun h0 => by
     have hmc := H.index_mul_card
     rw [h0, zero_mul] at hmc

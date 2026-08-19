@@ -67,8 +67,8 @@ theorem exists_unit_mul_eq_of_le_center {K : Type*} [Group K] [Finite K]
       ∀ x : K, χ (z * x) = (χ z / χ 1) * χ x := by
     intro z hz
     obtain ⟨W, _, _, _, ρ, hirr, hchar⟩ := hχ
-    haveI : Representation.IsIrreducible ρ := hirr
-    haveI := nontrivial_of_isIrreducible ρ
+    have : Representation.IsIrreducible ρ := hirr
+    have := nontrivial_of_isIrreducible ρ
     obtain ⟨c, hc⟩ := exists_central_scalar ρ (hZ hz)
     -- the product rule `χ(z·x) = c·χ(x)` by taking traces
     have hval : ∀ x : K, χ (z * x) = c * χ x := by
@@ -153,15 +153,15 @@ theorem isIrreducibleCharacter_restrict_of_isComplement' {K : Type*} [Group K]
     (hmul : ∀ a ∈ A, ∀ x : K, χ (a * x) = ω a * χ x) :
     IsIrreducibleCharacter (ClassFunction.restrict B χ) := by
   classical
-  letI : Fintype K := Fintype.ofFinite _
-  letI : Fintype ↥B := Fintype.ofFinite _
-  letI : Fintype ↥(A : Set K) := Fintype.ofFinite _
-  letI : Fintype ↥(B : Set K) := Fintype.ofFinite _
-  letI : Invertible ((Nat.card K : ℕ) : ℂ) :=
+  let : Fintype K := Fintype.ofFinite _
+  let : Fintype ↥B := Fintype.ofFinite _
+  let : Fintype ↥(A : Set K) := Fintype.ofFinite _
+  let : Fintype ↥(B : Set K) := Fintype.ofFinite _
+  let : Invertible ((Nat.card K : ℕ) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible ((Nat.card ↥B : ℕ) : ℂ) :=
+  let : Invertible ((Nat.card ↥B : ℕ) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : Nonempty ↥(A : Set K) := ⟨⟨1, A.one_mem⟩⟩
+  have : Nonempty ↥(A : Set K) := ⟨⟨1, A.one_mem⟩⟩
   set e := hAB.equiv with he_def
   have hcardA : Nat.card ↥(A : Set K) = Nat.card ↥A :=
     Nat.card_congr (Equiv.subtypeEquivRight fun x => SetLike.mem_coe)
@@ -207,7 +207,7 @@ theorem isIrreducibleCharacter_restrict_of_isComplement' {K : Type*} [Group K]
         = ((Nat.card ↥A : ℕ) : ℂ) * (((Nat.card ↥B : ℕ) : ℂ)
             * ClassFunction.inner (ClassFunction.restrict B χ)
                 (ClassFunction.restrict B χ)) := by
-      rw [← hB, ← hfold, ← hK, ← Nat.cast_mul, hAB.card_mul]
+      rw [← hB, ← hfold, ← hK, ← Nat.cast_mul, hAB.card_mul_card]
     have h2 := mul_left_cancel₀ hA0 hmain
     nth_rewrite 1 [← mul_one ((Nat.card ↥B : ℕ) : ℂ)] at h2
     exact (mul_left_cancel₀ hB0 h2).symm
@@ -306,8 +306,8 @@ theorem exists_apply_one_eq_d_mul_pow [Fintype G] [Invertible (Nat.card G : ℂ)
     {χ : ClassFunction ↥hyp.H ℂ} (hχ : χ ∈ hyp.SsetOf hyp.Sder) :
     ∃ k : ℕ, χ (1 : ↥hyp.H) = (hyp.d : ℂ) * ((p ^ k : ℕ) : ℂ) := by
   classical
-  haveI : Finite G := Finite.of_fintype G
-  letI : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
+  have : Finite G := Finite.of_fintype G
+  let : Fintype ↥(hyp.Q.subgroupOf hyp.H) := Fintype.ofFinite _
   obtain ⟨hχS, hkerS'⟩ := hχ
   have hχS' := hχS
   rw [Sset_eq_induced_of_Q hyp] at hχS'
@@ -316,7 +316,7 @@ theorem exists_apply_one_eq_d_mul_pow [Fintype G] [Invertible (Nat.card G : ℂ)
       (ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ) := hχS.1
   -- `φ` is constant on `S'`, doubly relativised
   have hconst := hyp.forall_eq_one_of_leKer hyp.Sder hyp.Sder_le_Q hφirr hindirr hkerS'
-  haveI : ((hyp.Sder.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal :=
+  have : ((hyp.Sder.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal :=
     hyp.Sder_subgroupOf_Q_normal
   -- the image of `S` in `Q⧸S'` is central
   have hcentral := hyp.map_mk_le_center_of_commutator_mem (R := hyp.Sder)
@@ -329,7 +329,7 @@ theorem exists_apply_one_eq_d_mul_pow [Fintype G] [Invertible (Nat.card G : ℂ)
   have hres := isIrreducibleCharacter_restrict_of_isComplement'
     hyp.isComplement'_S_Q1_subgroupOf hφirr hωunit hωmul
   -- the degree of `Res_{Q₁} φ` is a `p`-power
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨k, hk⟩ := hres.exists_charValue_one_eq_prime_pow_of_isPGroup
     (hyp.isPGroup_Q1_subgroupOf_subgroupOf hQ1p)
   have hdeg := hk
@@ -362,11 +362,11 @@ theorem XsetOf_subset_Sset (R Z : Subgroup G) : hyp.XsetOf R Z ⊆ hyp.Sset :=
   fun _ h => h.1.1
 
 theorem XsetOf_finite [Finite G] (R Z : Subgroup G) : (hyp.XsetOf R Z).Finite := by
-  letI : Invertible ((Nat.card G : ℕ) : ℂ) :=
+  let : Invertible ((Nat.card G : ℕ) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible ((Nat.card ↥hyp.H : ℕ) : ℂ) :=
+  let : Invertible ((Nat.card ↥hyp.H : ℕ) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible ((Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℕ) : ℂ) :=
+  let : Invertible ((Nat.card ↥(hyp.Q.subgroupOf hyp.H) : ℕ) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   exact hyp.Sset_finite.subset (hyp.XsetOf_subset_Sset R Z)
 
@@ -399,7 +399,7 @@ the `hQ1odd` hypothesis of the no-real-characters lemma (2(c)) in the
 `p`-group context of steps (3)–(8). -/
 theorem odd_card_Q1_of_isPGroup [Finite G] {p : ℕ} (hp : p.Prime)
     (hQ1p : IsPGroup p ↥hyp.Q1) : Odd (Nat.card ↥hyp.Q1) := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨n, hn⟩ := hQ1p.exists_card_eq
   have hp2 : p ≠ 2 := fun h2 => hyp.Q1_not_two_group (by rwa [h2] at hQ1p)
   rw [hn]
@@ -421,7 +421,7 @@ theorem sum_degreeSq_XsetOf [Finite G] [Invertible (Nat.card ↥hyp.H : ℂ)]
       = (Nat.card (↥hyp.H ⧸ R.subgroupOf hyp.H) : ℂ)
         - (Nat.card (↥hyp.H ⧸ ((R.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H))) : ℂ) := by
   classical
-  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  let : Fintype ↥hyp.H := Fintype.ofFinite _
   have hcongr : ∀ χb : IrreducibleCharacter ↥hyp.H,
       ((χb : ClassFunction ↥hyp.H ℂ) ∈ hyp.XsetOf R Z)
       ↔ (((R.subgroupOf hyp.H : Subgroup ↥hyp.H) : Set ↥hyp.H)
@@ -450,7 +450,7 @@ theorem sum_degreeSq_XsetOf_toFinset [Finite G]
       = (Nat.card (↥hyp.H ⧸ R.subgroupOf hyp.H) : ℂ)
         - (Nat.card (↥hyp.H ⧸ ((R.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H))) : ℂ) := by
   classical
-  letI : Fintype ↥hyp.H := Fintype.ofFinite _
+  let : Fintype ↥hyp.H := Fintype.ofFinite _
   rw [← hyp.sum_degreeSq_XsetOf hZQ1]
   refine Finset.sum_bij'
     (fun x hx => (⟨x, ((hfin.mem_toFinset.mp hx).1.1.1 :)⟩ : IrreducibleCharacter ↥hyp.H))
@@ -496,7 +496,7 @@ theorem card_quot_sup_Z_subgroupOf_eq [Finite G] {A' Z : Subgroup G}
       = (A'.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H) :=
     Subgroup.subgroupOf_sup (hA'.trans (hyp.S_le_Q.trans hyp.Q_le_H))
       (hZQ1.trans (hyp.Q1_le_Q.trans hyp.Q_le_H))
-  haveI : ((A' ⊔ Z).subgroupOf hyp.H).Normal := hsub ▸
+  have : ((A' ⊔ Z).subgroupOf hyp.H).Normal := hsub ▸
     ‹((A'.subgroupOf hyp.H) ⊔ (Z.subgroupOf hyp.H)).Normal›
   have hi := hyp.card_quot_eq_card_quot_Q1_mul (R := A' ⊔ Z)
     (hyp.Q1_inf_sup_eq hA' hZQ1)
@@ -624,7 +624,7 @@ count divides `|Q₁| = p^n`). -/
 theorem exists_card_quot_Q1_eq_pow [Finite G] {p : ℕ} (hp : p.Prime)
     (hQ1p : IsPGroup p ↥hyp.Q1) (Z : Subgroup G) :
     ∃ j, Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) = p ^ j := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨n, hn⟩ := hQ1p.exists_card_eq
   have hdvd : Nat.card (↥hyp.Q1 ⧸ Z.subgroupOf hyp.Q1) ∣ p ^ n := by
     rw [← hn, ← Subgroup.index_eq_card]
@@ -636,12 +636,12 @@ theorem exists_card_quot_Q1_eq_pow [Finite G] {p : ℕ} (hp : p.Prime)
 nontrivial) and `(|Q|, |D|) = 1`. -/
 theorem coprime_d_of_isPGroup [Finite G] {p : ℕ} (hp : p.Prime)
     (hQ1p : IsPGroup p ↥hyp.Q1) : Nat.Coprime p hyp.d := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨n, hn⟩ := hQ1p.exists_card_eq
   have hn0 : n ≠ 0 := by
     intro h0
     rw [h0, pow_zero] at hn
-    haveI := hyp.nontrivial_Q1
+    have := hyp.nontrivial_Q1
     have := Finite.one_lt_card (α := ↥hyp.Q1)
     omega
   have hpQ1 : p ∣ Nat.card ↥hyp.Q1 := hn ▸ dvd_pow_self p hn0
@@ -742,7 +742,7 @@ theorem coherent_of_subset_constant_degree (hd : Odd hyp.d)
     (hconst : ∀ a ∈ B, ∀ b ∈ B, a (1 : ↥hyp.H) = b (1 : ↥hyp.H)) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau B hyp.A) := by
   classical
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   have hself : ∀ ⦃ζ : ClassFunction ↥hyp.H ℂ⦄, ζ ∈ hyp.Sset →
       ClassFunction.inner ζ ζ = 1 := by
     intro ζ hζ
@@ -806,8 +806,8 @@ theorem xsetOf_sder_coherent (hd : Odd hyp.d) {p : ℕ} (hp : p.Prime)
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
       (hyp.XsetOf hyp.Sder Z) hyp.A) := by
   classical
-  haveI : Finite G := Finite.of_fintype G
-  haveI : ((hyp.Sder.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal :=
+  have : Finite G := Finite.of_fintype G
+  have : ((hyp.Sder.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal :=
     hyp.Sder_subgroupOf_Q_normal
   have hQ1odd := hyp.odd_card_Q1_of_isPGroup hp hQ1p
   have hp2 : p ≠ 2 := fun h2 => hyp.Q1_not_two_group (by rwa [h2] at hQ1p)

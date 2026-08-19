@@ -72,7 +72,7 @@ Sylow `p`-部分群、ゆえに `S = R` で `R` は narrow of rank ≥ 3。Hall�
 `C := C_G(R) ≤ R`; **Thm 5.5(a)** で `(G/C)/O_p(G/C)` が abelian、すなわち `(G/C)'` が
 `p`-群 (Thm 4.18 core での Lemma 4.17 の代替) → `G' ≤ O_p(G)`; **Thm 5.5(b)** で
 `q ≠ p` 素因子は `q ∣ p - 1 < p` (Lemma 4.13 の代替)。組み立ては `core418` と同型。 -/
-private theorem core56 {p : ℕ} [Fact p.Prime] [IsSolvable G]
+private theorem core56 {p : ℕ} [Fact p.Prime] [Group.IsSolvable G]
     (hp : Odd p) (hodd : Odd (Nat.card G)) (S : Sylow p G)
     (hSnarrow : IsNarrow p ↥S) (h3 : 3 ≤ pRank ↥(S : Subgroup G) p)
     (hredu : Ch03.oPiCore {r : ℕ | r ≠ p} G = ⊥)
@@ -82,7 +82,7 @@ private theorem core56 {p : ℕ} [Fact p.Prime] [IsSolvable G]
   classical
   have hprime : p.Prime := Fact.out
   set R : Subgroup G := Ch03.oPiCore ({p} : Set ℕ) G with hR_def
-  haveI hR_normal : R.Normal := by rw [hR_def]; infer_instance
+  have hR_normal : R.Normal := by rw [hR_def]; infer_instance
   have hR_pg : IsPGroup p ↥R :=
     S04.isPGroup_of_isPiGroup_singleton (Ch03.oPiCore.isPiGroup ({p} : Set ℕ))
   -- `R` is a normal Sylow `p`-subgroup (`p ∤ |G/R|`), hence the unique one: `S = R`
@@ -92,7 +92,7 @@ private theorem core56 {p : ℕ} [Fact p.Prime] [IsSolvable G]
     have hnorm : ((hR_pg.toSylow hR_idx) : Subgroup G).Normal := by
       rw [hR_pg.toSylow_coe hR_idx]
       exact hR_normal
-    haveI := Sylow.unique_of_normal (hR_pg.toSylow hR_idx) hnorm
+    have := Sylow.unique_of_normal (hR_pg.toSylow hR_idx) hnorm
     have h1 : S = hR_pg.toSylow hR_idx := Subsingleton.elim _ _
     rw [h1]
     exact hR_pg.toSylow_coe hR_idx
@@ -145,7 +145,7 @@ private theorem core56 {p : ℕ} [Fact p.Prime] [IsSolvable G]
       refine IsPGroup.comap_of_ker_isPGroup hA' _ ?_
       rw [QuotientGroup.ker_mk']
       exact hker_pg
-    haveI hW_norm :
+    have hW_norm :
         ((_root_.commutator (G ⧸ ψ.ker)).comap (QuotientGroup.mk' ψ.ker)).Normal :=
       Subgroup.Normal.comap inferInstance _
     have hW_le_R :
@@ -176,7 +176,7 @@ private theorem core56 {p : ℕ} [Fact p.Prime] [IsSolvable G]
         exact hq_ne ((Nat.prime_dvd_prime_iff_eq hq_prime hprime).mp
           (hq_prime.dvd_of_dvd_pow h))
       · exact h
-    haveI : Fact q.Prime := ⟨hq_prime⟩
+    have : Fact q.Prime := ⟨hq_prime⟩
     obtain ⟨α, hα⟩ := exists_prime_orderOf_dvd_card' q hq_dvd_quot
     have hα_cop : Nat.Coprime (orderOf α) p := by
       rw [hα]
@@ -202,7 +202,7 @@ end Thm56
 * (e) `G/O_{p',p}(G)` は abelian `p'`-群 (`p'` 部は `hasPLengthOne p G`)。
 
 mmd L1945-1953。`r(S)≤2` で Thm 4.18, `r(S)≥3` で Thm 5.5 + Thm 4.18 の方法。 -/
-theorem narrow_sylow_solvable_structure {G : Type*} [Group G] [Finite G] [IsSolvable G]
+theorem narrow_sylow_solvable_structure {G : Type*} [Group G] [Finite G] [Group.IsSolvable G]
     (hodd : Odd (Nat.card G)) {p : ℕ} [Fact p.Prime] (hp_mem : p ∣ Nat.card G)
     (S : Sylow p G) (hSnarrow : IsNarrow p ↥S)
     (hpl : 3 ≤ pRank ↥S p → hasPLengthOne p G) :
@@ -228,7 +228,7 @@ theorem narrow_sylow_solvable_structure {G : Type*} [Group G] [Finite G] [IsSolv
         omega
       · exact ho
     set N : Subgroup G := Ch03.oPiCore {q : ℕ | q ∉ ({p} : Set ℕ)} G with hN_def
-    haveI hN_norm : N.Normal := by rw [hN_def]; infer_instance
+    have hN_norm : N.Normal := by rw [hN_def]; infer_instance
     have hN_p' : ¬ p ∣ Nat.card ↥N := S04.not_dvd_card_oPiCore (by simp)
     have hquot_dvd_G : Nat.card (G ⧸ N) ∣ Nat.card G := by
       have := Subgroup.index_dvd_card N
@@ -305,9 +305,9 @@ private theorem fitting_top_map_subtype_eq :
         Ch01.fitting G := Subgroup.map_subgroupOf_eq_of_le le_top
     rw [← h1]
     apply Subgroup.map_mono
-    haveI : ((Ch01.fitting G).subgroupOf (⊤ : Subgroup G)).Normal :=
+    have : ((Ch01.fitting G).subgroupOf (⊤ : Subgroup G)).Normal :=
       (Ch01.fitting.normal G).subgroupOf _
-    haveI : Group.IsNilpotent ↥((Ch01.fitting G).subgroupOf (⊤ : Subgroup G)) :=
+    have : Group.IsNilpotent ↥((Ch01.fitting G).subgroupOf (⊤ : Subgroup G)) :=
       Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe le_top).symm
     exact Ch01.nilpotent_normal_le_fitting
 
@@ -325,9 +325,9 @@ private theorem le_opCore_of_isPGroup_of_le_fitting {q : ℕ} [Fact q.Prime]
       (Subgroup.subgroupOfEquivOfLe hWF).injective
   obtain ⟨P, hWP⟩ := hW'_pg.exists_le_sylow
   have hPnorm : P.Normal := Ch01.Sylow.normal_of_isNilpotent P
-  haveI : (P : Subgroup ↥(Ch01.fitting G)).Characteristic :=
+  have : (P : Subgroup ↥(Ch01.fitting G)).Characteristic :=
     Sylow.characteristic_of_normal P hPnorm
-  haveI : ((P : Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype).Normal :=
+  have : ((P : Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype).Normal :=
     inferInstance
   have hPmap_pg :
       IsPGroup q ↥((P : Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype) :=
@@ -347,7 +347,7 @@ mmd L1955-1967。Prop 1.2 (chief factor 還元, `S01`) + 各 chief factor `U/V �
 `EZ ∈ ℰ²(R) ∩ ℰ*(R)` を構成して Thm 5.3) ⇒ Thm 5.5(a) で `G'` が `U/V` に `q`-群の
 自己同型を誘導 ⇒ 固定点論法 (Isaacs Lem 4.32) + `U/V` の `G`-既約性で `G' ⊆ C_G(U/V)`。 -/
 theorem derived_le_fitting_of_centralizer_rank_le_two
-    [IsSolvable G] (hodd : Odd (Nat.card G)) {p : ℕ} [Fact p.Prime]
+    [Group.IsSolvable G] (hodd : Odd (Nat.card G)) {p : ℕ} [Fact p.Prime]
     (E : Subgroup G) (hE : E.IsElementaryAbelian p) (hEF : E ≤ Ch01.fitting G)
     (hrank : OddOrder.GroupTheory.rank
       ↥(Subgroup.centralizer (E : Set G) ⊓ Ch01.fitting G) ≤ 2) :
@@ -357,7 +357,7 @@ theorem derived_le_fitting_of_centralizer_rank_le_two
   rw [← fitting_top_map_subtype_eq]
   refine S01.chiefFactorCentralizer_subset_le_fitting_of_isSolvable le_top ?_
   intro U V hVn hChief hU_le
-  haveI := hVn
+  have := hVn
   rw [fitting_top_map_subtype_eq] at hU_le
   -- ## Setup: `Ū ≤ Ĝ = G/V` is a minimal normal elementary abelian `q`-group
   set Ubar : Subgroup (G ⧸ V) := U.map (QuotientGroup.mk' V) with hUbar_def
@@ -365,8 +365,8 @@ theorem derived_le_fitting_of_centralizer_rank_le_two
     S01.isMinimalNormal_map_quotient_of_isChiefFactor hChief
   obtain ⟨-, -, q, hq_prime, hUbar_elem⟩ :=
     S01.isMinimalNormal_le_fitting_and_isElementaryAbelian hMin
-  haveI : Fact q.Prime := ⟨hq_prime⟩
-  haveI hUbar_norm : Ubar.Normal := hMin.1
+  have : Fact q.Prime := ⟨hq_prime⟩
+  have hUbar_norm : Ubar.Normal := hMin.1
   have hUbar_ne : Ubar ≠ ⊥ := hMin.2.1
   have hUbar_pg : IsPGroup q ↥Ubar := hUbar_elem.isPGroup
   -- `q` is odd (it divides `|G|`)
@@ -391,7 +391,7 @@ theorem derived_le_fitting_of_centralizer_rank_le_two
     · exact ho
   -- `R := O_q(G)`
   set R : Subgroup G := Ch01.opCore q G with hR_def
-  haveI hR_norm : R.Normal := Ch01.opCore.normal q G
+  have hR_norm : R.Normal := Ch01.opCore.normal q G
   have hR_pg : IsPGroup q ↥R := Ch01.opCore_isPGroup q G
   have hR_le_F : R ≤ Ch01.fitting G := Ch01.opCore_le_fitting ⟨q, hq_prime⟩ G
   -- ## `Ū` is covered by `U ⊓ R` (BG "we may assume `U ⊆ O_q(G)`"): a Sylow `q`-subgroup
@@ -426,7 +426,7 @@ theorem derived_le_fitting_of_centralizer_rank_le_two
   have hsq : ∀ (r : ℕ), r.Prime → ∀ X : Subgroup G,
       X ≤ Subgroup.centralizer (E : Set G) ⊓ Ch01.fitting G → pRank ↥X r ≤ 2 := by
     intro r hr X hX
-    haveI : Fact r.Prime := ⟨hr⟩
+    have : Fact r.Prime := ⟨hr⟩
     calc pRank ↥X r
         ≤ pRank ↥(Subgroup.centralizer (E : Set G) ⊓ Ch01.fitting G) r :=
           pRank_le_of_injective (f := Subgroup.inclusion hX) (Subgroup.inclusion_injective hX)
@@ -474,13 +474,13 @@ theorem derived_le_fitting_of_centralizer_rank_le_two
     subst hq_eq_p
     -- `E ≤ R = O_q(G)` and the interior of `R`: `Z = Ω₁(Z(R))`, `E' = E`-in-`R`
     have hE_R : E ≤ R := le_opCore_of_isPGroup_of_le_fitting hE.isPGroup hEF
-    haveI hR_nontriv : Nontrivial ↥R := by
+    have hR_nontriv : Nontrivial ↥R := by
       rcases subsingleton_or_nontrivial ↥R with hsub | h
       · exfalso
         have hle2 : pRank ↥R q ≤ 2 := by
           rw [pRank_le_iff]
           intro A hA
-          haveI : Subsingleton ↥A := ⟨fun a b => Subtype.ext (Subsingleton.elim _ _)⟩
+          have : Subsingleton ↥A := ⟨fun a b => Subtype.ext (Subsingleton.elim _ _)⟩
           have hcard1 : Nat.card ↥A = 1 := Nat.card_eq_one_iff_unique.mpr ⟨‹_›, ⟨1⟩⟩
           rw [hcard1]
           simp
@@ -489,7 +489,7 @@ theorem derived_le_fitting_of_centralizer_rank_le_two
     set Z : Subgroup ↥R := omega1Center ↥R q with hZ_def
     have hZ_elem : Z.IsElementaryAbelian q := omega1Center_isElementaryAbelian
     have hZ_ne : Z ≠ ⊥ := by
-      haveI := hR_pg.center_nontrivial
+      have := hR_pg.center_nontrivial
       have hdvd : q ∣ Nat.card ↥(Subgroup.center ↥R) := by
         obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp (hR_pg.to_subgroup (Subgroup.center ↥R))
         rcases Nat.eq_zero_or_pos k with h0 | hpos
@@ -676,13 +676,13 @@ theorem derived_le_fitting_of_centralizer_rank_le_two
     rw [h1, h2]
     exact hA'.map β'
   -- ## fixed points of the `q`-group action on `Ū`: nontrivial, `Ĝ`-normal, hence all of `Ū`
-  haveI hUbar_nontriv : Nontrivial ↥Ubar := by
+  have hUbar_nontriv : Nontrivial ↥Ubar := by
     rcases Subgroup.bot_or_nontrivial Ubar with h | h
     · exact absurd h hUbar_ne
     · exact h
   have hfix_ne : Subgroup.fixedPointsOfMulAut (D.map α).subtype ≠ ⊥ :=
     Ch04.fixedPoints_ne_bot_of_pgroup_action_pgroup hUbar_pg hD_pg _
-  haveI hD_norm : D.Normal := by
+  have hD_norm : D.Normal := by
     rw [hD_def, _root_.commutator]
     infer_instance
   set W' : Subgroup (G ⧸ V) :=
@@ -760,15 +760,15 @@ elementary abelian `p`-subgroup `E ≤ F(G)` — which exists since `F(G) ≠ 1`
 centralizer-rank hypothesis `r(C_G(E) ⊓ F(G)) ≤ 2` follows from `C_G(E) ⊓ F(G) ≤ F(G)`. (BG proves
 4.20(a) via Corollary 4.19 + Proposition 1.2; the repository uses the stronger 5.7, hence the
 placement here, downstream of §5.) -/
-theorem derived_le_fitting_of_rank_fitting_le_two [IsSolvable G] [Nontrivial G]
+theorem derived_le_fitting_of_rank_fitting_le_two [Group.IsSolvable G] [Nontrivial G]
     (hodd : Odd (Nat.card G)) (hrank : rank ↥(Ch01.fitting G) ≤ 2) :
     commutator G ≤ Ch01.fitting G := by
   classical
-  have hF_ne : Ch01.fitting G ≠ ⊥ := Ch01.fitting_ne_bot_of_solvable_nontrivial G
-  haveI : Nontrivial ↥(Ch01.fitting G) := (Subgroup.nontrivial_iff_ne_bot _).mpr hF_ne
+  have hF_ne : Ch01.fitting G ≠ ⊥ := Ch01.fitting_ne_bot_of_isSolvable_nontrivial G
+  have : Nontrivial ↥(Ch01.fitting G) := (Subgroup.nontrivial_iff_ne_bot _).mpr hF_ne
   have hcard_ne : Nat.card ↥(Ch01.fitting G) ≠ 1 := (Finite.one_lt_card).ne'
   obtain ⟨p, hp_prime, hp_dvd⟩ := Nat.exists_prime_and_dvd hcard_ne
-  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have : Fact p.Prime := ⟨hp_prime⟩
   obtain ⟨x, hx⟩ := Ch01.cauchy (G := ↥(Ch01.fitting G)) hp_dvd
   -- `E = ⟨x⟩ ≤ F(G)` is elementary abelian of order `p`.
   set g : G := (Ch01.fitting G).subtype x with hg
@@ -800,14 +800,14 @@ side condition) gives a normal `p`-complement of `H`, which combines with the `p
 into one for `G`.  Exposed standalone (2026-06-11) so that Hall-radical arguments downstream
 (BG Theorem 11.7 via `S05b_Thm420Hall`) can iterate it without rebuilding the series. -/
 theorem hasNormalPComplement_minFac_of_rank_fitting_le_two
-    [IsSolvable G] [Nontrivial G] (hodd : Odd (Nat.card G))
+    [Group.IsSolvable G] [Nontrivial G] (hodd : Odd (Nat.card G))
     (hrank : rank ↥(Ch01.fitting G) ≤ 2) :
     Ch05.HasNormalPComplement (Nat.minFac (Nat.card G)) G := by
   classical
   have hcard_ne1 : Nat.card G ≠ 1 := (Finite.one_lt_card).ne'
   have hp_prime : (Nat.minFac (Nat.card G)).Prime := Nat.minFac_prime hcard_ne1
   set p := Nat.minFac (Nat.card G) with hpdef
-  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have : Fact p.Prime := ⟨hp_prime⟩
   have hp_min : ∀ q ∈ (Nat.card G).primeFactors, p ≤ q := fun q hq =>
     Nat.minFac_le_of_dvd (Nat.prime_of_mem_primeFactors hq).two_le
       (Nat.dvd_of_mem_primeFactors hq)
@@ -822,7 +822,7 @@ theorem hasNormalPComplement_minFac_of_rank_fitting_le_two
     Ch03.oPiCore {r : ℕ | r ≠ p} (G ⧸ Ch01.fitting G) with hNbar
   set Hsub : Subgroup G :=
     Subgroup.comap (QuotientGroup.mk' (Ch01.fitting G)) Nbar with hHsub
-  haveI hHnorm : Hsub.Normal := by rw [hHsub]; infer_instance
+  have hHnorm : Hsub.Normal := by rw [hHsub]; infer_instance
   have hF_le_H : Ch01.fitting G ≤ Hsub := by
     rw [hHsub]
     intro y hy
@@ -848,9 +848,9 @@ theorem hasNormalPComplement_minFac_of_rank_fitting_le_two
     have hpCaseH : p = 3 ∨ ∀ q ∈ (Nat.card ↥Hsub).primeFactors, p ≤ q :=
       Or.inr fun q hq => hp_min q (Nat.primeFactors_mono
         (Subgroup.card_subgroup_dvd_card Hsub) Nat.card_pos.ne' hq)
-    haveI : ((Ch01.fitting G).subgroupOf Hsub).Normal :=
+    have : ((Ch01.fitting G).subgroupOf Hsub).Normal :=
       Subgroup.Normal.subgroupOf inferInstance Hsub
-    haveI : Group.IsNilpotent ↥((Ch01.fitting G).subgroupOf Hsub) :=
+    have : Group.IsNilpotent ↥((Ch01.fitting G).subgroupOf Hsub) :=
       Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hF_le_H).symm
     -- `p ∤ [H:F]` because `H/F ≅ O_{p'}(G/F)` is a `p'`-group
     have hidx : ¬ p ∣ ((Ch01.fitting G).subgroupOf Hsub).index := by
@@ -899,11 +899,11 @@ normal `p`-complement of `H`, which combines with the `p`-group `G/H` into
 The induction carries the extra invariant that every step label is a prime divisor of `|G|`,
 needed because the lift requires the recursive series to have no `p`-labels (`p ∤ |K|`). -/
 theorem exists_characteristicSylowSeriesPackage_of_rank_fitting_le_two
-    [IsSolvable G] [Nontrivial G] (hodd : Odd (Nat.card G))
+    [Group.IsSolvable G] [Nontrivial G] (hodd : Odd (Nat.card G))
     (hrank : rank ↥(Ch01.fitting G) ≤ 2) :
     Nonempty (CharacteristicSylowSeriesPackage G) := by
   classical
-  suffices H : ∀ n : ℕ, ∀ (G : Type _) [Group G] [Finite G] [IsSolvable G] [Nontrivial G],
+  suffices H : ∀ n : ℕ, ∀ (G : Type _) [Group G] [Finite G] [Group.IsSolvable G] [Nontrivial G],
       Nat.card G = n → Odd (Nat.card G) → rank ↥(Ch01.fitting G) ≤ 2 →
       ∃ S : CharacteristicSylowSeries G, 0 < S.length ∧
         ∀ i : Fin S.length, (S.step i).q ∈ (Nat.card G).primeFactors by
@@ -917,7 +917,7 @@ theorem exists_characteristicSylowSeriesPackage_of_rank_fitting_le_two
     have hcard_ne1 : Nat.card G ≠ 1 := (Finite.one_lt_card).ne'
     have hp_prime : (Nat.minFac (Nat.card G)).Prime := Nat.minFac_prime hcard_ne1
     set p := Nat.minFac (Nat.card G) with hpdef
-    haveI : Fact p.Prime := ⟨hp_prime⟩
+    have : Fact p.Prime := ⟨hp_prime⟩
     have hp_dvd : p ∣ Nat.card G := Nat.minFac_dvd _
     have hp_in_piG : p ∈ (Nat.card G).primeFactors :=
       Nat.mem_primeFactors.mpr ⟨hp_prime, hp_dvd, Nat.card_pos.ne'⟩
@@ -926,17 +926,17 @@ theorem exists_characteristicSylowSeriesPackage_of_rank_fitting_le_two
       hasNormalPComplement_minFac_of_rank_fitting_le_two hodd' hrank'
     -- recurse (or stop) on the complement `K = O_{p'}(G)`
     set K : Subgroup G := Ch03.oPiCore {r : ℕ | r ≠ p} G with hKdef
-    haveI hKnorm : K.Normal := by rw [hKdef]; infer_instance
+    have hKnorm : K.Normal := by rw [hKdef]; infer_instance
     obtain ⟨S, hS_all⟩ :
         ∃ S : CharacteristicSylowSeries ↥K, ∀ j : Fin S.length,
           (S.step j).q ∈ (Nat.card ↥K).primeFactors := by
       by_cases hKbot : K = ⊥
-      · haveI hsub : Subsingleton ↥K := by rw [hKbot]; infer_instance
+      · have hsub : Subsingleton ↥K := by rw [hKbot]; infer_instance
         have hbotK : (⊤ : Subgroup ↥K) = ⊥ :=
           eq_bot_iff.mpr fun x _ => Subgroup.mem_bot.mpr (Subsingleton.elim x 1)
         refine ⟨⟨0, fun _ => ⊤, rfl, hbotK, Fin.elim0, fun i => i.elim0, fun i => i.elim0⟩,
           fun j => j.elim0⟩
-      · haveI : Nontrivial ↥K := (Subgroup.nontrivial_iff_ne_bot K).mpr hKbot
+      · have : Nontrivial ↥K := (Subgroup.nontrivial_iff_ne_bot K).mpr hKbot
         have hKodd : Odd (Nat.card ↥K) := by
           rcases Nat.even_or_odd (Nat.card ↥K) with he | ho
           · exfalso

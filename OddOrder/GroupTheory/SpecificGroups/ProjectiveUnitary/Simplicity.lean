@@ -86,7 +86,7 @@ theorem exists_psuTorus_weight_ne_one (hn : 1 < n) :
       norm_num at this ⊢
       exact this
     omega
-  letI : Nontrivial ((BaseField n)ˣ) :=
+  let : Nontrivial ((BaseField n)ˣ) :=
     Finite.one_lt_card_iff_nontrivial.mp hUnits
   obtain ⟨d, hd⟩ : ∃ d : (BaseField n)ˣ, d ≠ 1 := exists_ne 1
   let b : Field n := algebraMap (BaseField n) (Field n) (d : BaseField n)
@@ -326,17 +326,17 @@ section /- Part II, Ch. I §3 Lemma 1: solvable stabilizer -/
 
 /-- The Hermitian root group is solvable because it is a finite `2`-group. -/
 private theorem rootGroup_isSolvable (n : ℕ) (hn : 0 < n) :
-    IsSolvable (RootGroup n) := by
-  letI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  letI : Group.IsNilpotent (RootGroup n) :=
+    Group.IsSolvable (RootGroup n) := by
+  let : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  let : Group.IsNilpotent (RootGroup n) :=
     IsPGroup.isNilpotent (p := 2) (RootGroup.isPGroup n hn)
   infer_instance
 
 /-- The root--determinant-one-torus semidirect-product model is solvable. -/
 private theorem borelModel_isSolvable (n : ℕ) (hn : 0 < n) :
-    IsSolvable (BorelModel n) := by
-  letI : IsSolvable (RootGroup n) := rootGroup_isSolvable n hn
-  exact solvable_of_ker_le_range
+    Group.IsSolvable (BorelModel n) := by
+  let : Group.IsSolvable (RootGroup n) := rootGroup_isSolvable n hn
+  exact Group.isSolvable_of_ker_le_range
     (SemidirectProduct.inl : RootGroup n →* BorelModel n)
     (SemidirectProduct.rightHom : BorelModel n →* PSUTorusParameter n)
     (by rw [← SemidirectProduct.range_inl_eq_ker_rightHom])
@@ -344,10 +344,10 @@ private theorem borelModel_isSolvable (n : ℕ) (hn : 0 < n) :
 /-- **Peterfalvi Part II, Ch. I §3 Lemma 1 (unitary target).**
 The standard determinant-one Borel subgroup is solvable. -/
 theorem standardBorel_isSolvable (n : ℕ) (hn : 0 < n) :
-    IsSolvable (standardBorel n) := by
-  letI : IsSolvable (BorelModel n) := borelModel_isSolvable n hn
-  change IsSolvable (borelHom n).range
-  exact solvable_of_surjective (borelHom n).rangeRestrict_surjective
+    Group.IsSolvable (standardBorel n) := by
+  let : Group.IsSolvable (BorelModel n) := borelModel_isSolvable n hn
+  change Group.IsSolvable (borelHom n).range
+  exact Group.isSolvable_of_surjective (borelHom n).rangeRestrict_surjective
 
 end
 
@@ -370,14 +370,14 @@ is simple. -/
 theorem standardPermGroup_isSimpleGroup (hn : 1 < n) :
     IsSimpleGroup (standardPermGroup n) := by
   have hn0 : 0 < n := by omega
-  letI : Nontrivial (standardPermGroup n) :=
+  let : Nontrivial (standardPermGroup n) :=
     standardPermGroup_nontrivial n
-  letI : MulAction.IsPreprimitive (standardPermGroup n) (Unital n) :=
+  let : MulAction.IsPreprimitive (standardPermGroup n) (Unital n) :=
     MulAction.isPreprimitive_of_is_two_pretransitive
       (standardPermGroup_isMultiplyPretransitive n)
-  letI : Group.IsPerfect (standardPermGroup n) :=
+  let : Group.IsPerfect (standardPermGroup n) :=
     ⟨commutator_standardPermGroup_eq_top hn⟩
-  letI : IsSolvable
+  let : Group.IsSolvable
       (MulAction.stabilizer (standardPermGroup n) (Unital.infinity n)) := by
     rw [← standardBorel_eq_infinityStabilizer n hn0]
     exact standardBorel_isSolvable n hn0

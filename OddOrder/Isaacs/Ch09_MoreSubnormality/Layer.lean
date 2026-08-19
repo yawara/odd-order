@@ -134,7 +134,7 @@ theorem commutator_layer_eq_layer [Finite G] :
   refine le_antisymm (Subgroup.commutator_le_right _ _) ?_
   refine sSup_le fun H hH => ?_
   -- 各 component `H` は perfect: `H = ⁅H,H⁆ ≤ ⁅layer,layer⁆`
-  haveI := hH.isQuasisimple.isPerfect
+  have := hH.isQuasisimple.isPerfect
   calc H = ⁅H, H⁆ := (Subgroup.commutator_eq_self (H := H)).symm
     _ ≤ ⁅layer G, layer G⁆ := Subgroup.commutator_mono hH.le_layer hH.le_layer
 
@@ -239,9 +239,9 @@ theorem componentImageFamily_spec [Finite G] :
       (QuotientGroup.mk' (center ↥(layer G)))).Normal :=
     Subgroup.Normal.map H.2.normal_subgroupOf_layer _ (QuotientGroup.mk'_surjective _)
   have e := componentImageEquiv H.2
-  haveI := H.2.isQuasisimple.isSimpleGroup_quotient
+  have := H.2.isQuasisimple.isSimpleGroup_quotient
   refine ⟨hnormal, e.isSimpleGroup, fun hcomm => ?_⟩
-  haveI := hcomm
+  have := hcomm
   exact not_isMulCommutative_of_isSimpleGroup_quotient_center
     H.2.isQuasisimple.isSimpleGroup_quotient
     (isMulCommutative_of_surjective e.toMonoidHom e.surjective)
@@ -280,24 +280,25 @@ section /- 9A: Theorem 9.7 (c) (p. 274) -/
 すなわち `M ⊓ E ⊆ Z(E)`. ゆえに `[M,E] ≤ M ⊓ E ⊆ C_G(E)`, three subgroups lemma と
 `E` perfect で `[E,M] = 1`. -/
 theorem commutator_layer_eq_bot_of_normal_isSolvable [Finite G] {M : Subgroup G}
-    [M.Normal] (hM : IsSolvable ↥M) : ⁅layer G, M⁆ = ⊥ := by
+    [M.Normal] (hM : Group.IsSolvable ↥M) : ⁅layer G, M⁆ = ⊥ := by
   set E := layer G with hE
   set π := QuotientGroup.mk' (center ↥E) with hπ
   -- Step 1: M ⊓ E ⊆ C_G(E)
   have hcentME : (M ⊓ E : Subgroup G) ≤ Subgroup.centralizer (E : Set G) := by
     set N : Subgroup ↥E := (M ⊓ E).subgroupOf E with hN
-    haveI hNnormal : N.Normal := Subgroup.Normal.subgroupOf inferInstance E
-    haveI hMEsolv : IsSolvable ↥(M ⊓ E) :=
-      solvable_of_solvable_injective (Subgroup.inclusion_injective (inf_le_left : M ⊓ E ≤ M))
-    haveI hNsolv : IsSolvable ↥N :=
-      solvable_of_solvable_injective
+    have hNnormal : N.Normal := Subgroup.Normal.subgroupOf inferInstance E
+    have hMEsolv : Group.IsSolvable ↥(M ⊓ E) :=
+      Group.isSolvable_of_isSolvable_injective
+        (Subgroup.inclusion_injective (inf_le_left : M ⊓ E ≤ M))
+    have hNsolv : Group.IsSolvable ↥N :=
+      Group.isSolvable_of_isSolvable_injective
         (f := (Subgroup.subgroupOfEquivOfLe (inf_le_right : M ⊓ E ≤ E)).toMonoidHom)
         (Subgroup.subgroupOfEquivOfLe (inf_le_right : M ⊓ E ≤ E)).injective
     have hrange : (π.comp N.subtype).range = N.map π := by
       rw [MonoidHom.range_comp, Subgroup.range_subtype]
-    haveI : IsSolvable ↥((π.comp N.subtype).range) :=
-      solvable_of_surjective (π.comp N.subtype).rangeRestrict_surjective
-    haveI hImgSolv : IsSolvable ↥(N.map π) := hrange ▸ this
+    have : Group.IsSolvable ↥((π.comp N.subtype).range) :=
+      Group.isSolvable_of_surjective (π.comp N.subtype).rangeRestrict_surjective
+    have hImgSolv : Group.IsSolvable ↥(N.map π) := hrange ▸ this
     have himg : N.map π = ⊥ :=
       isSemisimpleGroup_layer_quotient_center.eq_bot_of_normal_of_isSolvable
         (Subgroup.Normal.map hNnormal π (QuotientGroup.mk'_surjective _)) hImgSolv

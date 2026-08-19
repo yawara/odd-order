@@ -62,7 +62,7 @@ theorem piSet_mf_inf_beta_disjoint_of_not_fittingIsTI [Finite G]
   -- The `≥ 3` side (proved): `r ∈ π(M_F) ∩ β(M) ⟹ r_r(M_F) ≥ 3`.
   have h3 : 3 ≤ pRank ↥(MF M) r := three_le_pRank_mf_of_mem_beta hG hM hrπ hrβ
   have hrp : r.Prime := Nat.prime_of_mem_primeFactors hrπ
-  haveI : Fact r.Prime := ⟨hrp⟩
+  have : Fact r.Prime := ⟨hrp⟩
   refine absurd h3 (not_le.mpr ?_)
   -- Setup: `g ∉ M`, `X = F(M) ⊓ F(M)^g ≠ ⊥`.
   obtain ⟨g, hgM, hXne⟩ := exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI hnotTI
@@ -70,7 +70,7 @@ theorem piSet_mf_inf_beta_disjoint_of_not_fittingIsTI [Finite G]
   have hXcard : Nat.card ↥(fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M) ≠ 1 :=
     fun h => hXne (Subgroup.card_eq_one.mp h)
   obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hXcard
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M :=
     mem_sigma_of_prime_dvd_card_inf_conj_fitting hG hM hgM hp hpdvd
   -- An order-`p` subgroup `X₁ ≤ X`.
@@ -140,7 +140,7 @@ theorem piSet_mf_inf_beta_disjoint_of_not_fittingIsTI [Finite G]
   -- Step 8: `r`-elements of `M_F` centralize `X₁` (coprime, `F(M)` nilpotent), so the `r`-Sylow of
   -- `M_F` lies in `C_{M_F}(X₁)`; hence `r ∤ [M_F : C_{M_F}(X₁)]` and
   -- `r_r(M_F) = r_r(C_{M_F}(X₁)) < 3`.
-  haveI : Group.IsNilpotent ↥(fittingInAmbient M) := OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
+  have : Group.IsNilpotent ↥(fittingInAmbient M) := OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
   have hcentr : ∀ A : Subgroup G, A ≤ MF M → IsPGroup r ↥A →
       A ≤ Subgroup.centralizer (X₁ : Set G) := by
     intro A hAMF hAr a ha
@@ -217,7 +217,7 @@ theorem derivedInG_le_fittingInAmbient_of_not_fittingIsTI [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hnotTI : ¬ FittingIsTI M) : derivedInG M ≤ fittingInAmbient M := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hMFMσ : MF M = OddOrder.BG.Ch3.S10.Msigma M := mf_eq_msigma_of_not_fittingIsTI hG hM hnotTI
   -- `M_β ≤ M_σ`: `M_β` is a normal `σ(M)`-subgroup (`β ⊆ α ⊆ σ`).
   have hMβσ : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma M)
@@ -243,16 +243,16 @@ theorem derivedInG_le_fittingInAmbient_of_not_fittingIsTI [Finite G]
   -- `M'` nilpotent: `M'/M_β ≅ M'` (`M_β = ⊥`), and `M'/M_β` is nilpotent (Corollary 10.7).
   have heq : (OddOrder.BG.Ch3.S10.Mbeta M).subgroupOf (derivedInG M) = ⊥ := by
     rw [hMβbot, Subgroup.bot_subgroupOf]
-  haveI hnorm2 : ((OddOrder.BG.Ch3.S10.Mbeta M).subgroupOf (derivedInG M)).Normal := by
+  have hnorm2 : ((OddOrder.BG.Ch3.S10.Mbeta M).subgroupOf (derivedInG M)).Normal := by
     rw [heq]; infer_instance
-  haveI := OddOrder.BG.Ch3.S10.derivedQuotientMbeta_isNilpotent hG hM
-  haveI hM'nil : Group.IsNilpotent ↥(derivedInG M) :=
+  have := OddOrder.BG.Ch3.S10.derivedQuotientMbeta_isNilpotent hG hM
+  have hM'nil : Group.IsNilpotent ↥(derivedInG M) :=
     Group.nilpotent_of_mulEquiv ((QuotientGroup.quotientMulEquivOfEq heq).trans
         QuotientGroup.quotientBot)
   -- `M'` normal in `M` + nilpotent ⟹ `M' ≤ F(M)`.
   have hid : (derivedInG M).subgroupOf M = commutator ↥M :=
     Subgroup.comap_map_eq_self_of_injective M.subtype_injective (commutator ↥M)
-  haveI hM'norm : ((derivedInG M).subgroupOf M).Normal := by rw [hid]; infer_instance
+  have hM'norm : ((derivedInG M).subgroupOf M).Normal := by rw [hid]; infer_instance
   exact le_fittingInAmbient_of_subgroupOf_normal_of_isNilpotent (Subgroup.map_subtype_le _) hM'norm
 
 /-- **BG Theorem 15.7(d), `E₃ = 1`** (Coq `nonTI_Fitting_structure` `E3_1`):
@@ -317,7 +317,7 @@ theorem sigmaComplement_structure_of_not_fittingIsTI [Finite G]
     omega
   have hdisj : E₁ ⊓ E₂ = ⊥ := (Subgroup.disjoint_of_coprime_natCard hcop).eq_bot
   -- `E₁` complements the normal `E₂` inside `↥E`.
-  haveI hnorm : (E₂.subgroupOf E).Normal :=
+  have hnorm : (E₂.subgroupOf E).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hsetup.E₂_le).mpr hE₂norm
   have hcompl : Subgroup.IsComplement' (E₁.subgroupOf E) (E₂.subgroupOf E) := by
     refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
@@ -366,7 +366,7 @@ theorem fittingIsTI_of_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
     FittingIsTI M := by
   classical
   by_contra hnotTI
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   -- Hall `κ(M)`- and `(κ ∪ σ)ᶜ`-subgroups `K`, `U` of `M`, as Proposition 14.2 needs.
   obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
   set K : Subgroup G := K'.map M.subtype with hKdef
@@ -489,7 +489,7 @@ theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     -- and `E' ≤ C_G(M_σ) ⊓ M ≤ F(M)` (`fitting_decomposition`: `F(M) = (C_M(M_F) ⊓ M) ⊔ M_F`),
     -- whence
     -- `M' = M_σ ⊔ E' ≤ F(M)`.
-    haveI : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
+    have : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
     obtain ⟨E, E₁, E₂, E₃, hsetup⟩ := exists_subgroupESetup hG hM
     -- `M' = M_σ ⊔ E'`.
     rw [derivedInG_eq_Msigma_sup_derivedInG_complement hG hsetup]

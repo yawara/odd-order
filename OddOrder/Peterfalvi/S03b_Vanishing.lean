@@ -102,7 +102,7 @@ theorem irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot
     {g : G} (hCH : centralizerInSubgroup H g = ⊥) :
     (χ : ClassFunction G ℂ) g = 0 := by
   classical
-  haveI : Finite (G ⧸ H) :=
+  have : Finite (G ⧸ H) :=
     Finite.of_surjective (QuotientGroup.mk' H) (QuotientGroup.mk'_surjective H)
   -- real-valued summand `f ψ = |ψ(g)|²`
   set f : IrreducibleCharacter G → ℝ :=

@@ -71,9 +71,9 @@ theorem irreducibleBrauerCharacter_principalBlock_eq_one (hp : p.Prime)
     {y : G} (hy : IsPRegular p y) :
     irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π φ₀ y = 1 := by
   classical
-  haveI : Subsingleton (nn φ₀) :=
+  have : Subsingleton (nn φ₀) :=
     subsingleton_of_principalBlock_of_normalPComplement π hπ hlin hnil hNp hquot S hφ₀
-  haveI : Unique (nn φ₀) := uniqueOfSubsingleton (Classical.arbitrary (nn φ₀))
+  have : Unique (nn φ₀) := uniqueOfSubsingleton (Classical.arbitrary (nn φ₀))
   have hrep : blockRepresentation π φ₀ y = 1 := by
     change Matrix.mulVecLin (π (single y (1 : ResidueField 𝒪)) φ₀) = 1
     rw [pi_single_eq_one_principalBlock_of_normalPComplement π hπ hlin hnil hNp hquot S hφ₀ y,
@@ -337,7 +337,7 @@ theorem generalizedDecompositionNumber_ne_zero_of_blockOfIrr_principal
         ((wedderburnRepresentation eG i).character)
         (fun _ _ hgh => character_eq_of_isConj _ hgh) φ₀ ≠ 0 := by
   classical
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   intro hzero
   refine not_dvd_card_of_character_eq_zero_of_pSingular eG hπG hlinG hnilG i hi
     (fun u hu => by

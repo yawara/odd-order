@@ -99,8 +99,8 @@ theorem caseB_exists_sSide_galoisField_repr_of_c_eq_one [Finite G]
           = ((μ v : (GaloisField hyp.p hyp.q)ˣ) : GaloisField hyp.p hyp.q) *
             e (Additive.ofMul x) := by
   classical
-  letI : Fact hyp.p.Prime := ⟨hyp.p_prime⟩
-  letI : Fact chief.p.Prime := ⟨chief.p_prime⟩
+  let : Fact hyp.p.Prime := ⟨hyp.p_prime⟩
+  let : Fact chief.p.Prime := ⟨chief.p_prime⟩
   have hN : chief.N = ⊥ := hyp.toTypesIIIIIIVSetupS_chief_N_eq_bot hG chief
   have hC :
       OddOrder.Peterfalvi.S11.cSub (hyp.toTypesIIIIIIVSetupS hG) chief = ⊥ := by
@@ -199,7 +199,7 @@ theorem sSide_galoisField_repr_of_c_eq_one_and_caseA_parameters
           = ((μ v : (GaloisField hyp.p hyp.q)ˣ) : GaloisField hyp.p hyp.q) *
             e (Additive.ofMul x) := by
   classical
-  letI : Fact hyp.p.Prime := ⟨hyp.p_prime⟩
+  let : Fact hyp.p.Prime := ⟨hyp.p_prime⟩
   obtain ⟨chief, -⟩ :=
     OddOrder.Peterfalvi.S11.exists_chiefFactorData hG
       (hyp.toTypesIIIIIIVSetupS hG)

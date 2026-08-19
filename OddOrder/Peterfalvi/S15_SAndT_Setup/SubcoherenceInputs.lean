@@ -838,7 +838,7 @@ theorem Hypothesis.isTISubset_typePACore [Finite G]
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     (hyp : Hypothesis (G := G)) :
     OddOrder.GroupTheory.IsTISubset (S10.typePACore hyp.S) hyp.S := by
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   exact (hyp.isTISubset_typePACore_iff_forall_dadeHypS_H_eq_bot hG).mpr
     (hyp.forall_dadeHypS_H_eq_bot hG hnoV)
 
@@ -1010,7 +1010,7 @@ theorem Hypothesis.sSet_member_support_subset_A [Finite G]
       ((w : ↥hyp.S) : G) ∈ S10.typePACore hyp.S := by
     intro w hwval hwne
     -- (1.2) contrapositive: `C_{hInHu}(w) ≠ ⊥`.
-    haveI := hInHu_normal (hyp.toTypesIIIIIIVSetupS hG)
+    have := hInHu_normal (hyp.toTypesIIIIIIVSetupS hG)
     have hCne : OddOrder.Peterfalvi.S03.centralizerInSubgroup
         (hInHu (hyp.toTypesIIIIIIVSetupS hG)) w ≠ ⊥ := fun hbot =>
       hwval

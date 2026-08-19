@@ -55,11 +55,11 @@ theorem commutator_le_of_eq_sup_zpowers {G : Type*} [Group G] {A B : Subgroup G}
 
 /-- 超可解 ⟹ 可解 (各因子は巡回, 特に abelian なので Problem 3B.2 が使える). -/
 theorem IsSupersolvable.isSolvable {G : Type*} [Group G] (h : IsSupersolvable G) :
-    IsSolvable G := by
+    Group.IsSolvable G := by
   obtain ⟨r, N, hnorm, h0, hr, hstep⟩ := h
   refine isSolvable_of_commutator_series N h0 hr fun i hi => ?_
   obtain ⟨x, -, hx⟩ := hstep i hi
-  haveI := hnorm i
+  have := hnorm i
   exact commutator_le_of_eq_sup_zpowers hx
 
 /-- 超可解群の**全射像**も超可解 (超可解列を押し出すだけ). -/
@@ -90,8 +90,8 @@ theorem card_prime_of_isMinimalNormal_of_isSupersolvable {G : Type u} [Group G] 
     (hG : IsSupersolvable G) {M : Subgroup G} (hM : Ch02.IsMinimalNormal M) :
     (Nat.card ↥M).Prime := by
   classical
-  haveI hMnormal : M.Normal := hM.1
-  haveI : IsSolvable G := hG.isSolvable
+  have hMnormal : M.Normal := hM.1
+  have : Group.IsSolvable G := hG.isSolvable
   obtain ⟨r, N, hnorm, h0, hr, hstep⟩ := hG
   -- `M ⊓ N j ≠ ⊥` となる最小の `j`.
   have hexr : M ⊓ N r ≠ ⊥ := by rw [hr, inf_top_eq]; exact hM.2.1
@@ -108,8 +108,8 @@ theorem card_prime_of_isMinimalNormal_of_isSupersolvable {G : Type u} [Group G] 
     not_not.mp (Nat.find_min hex (show i < Nat.find hex by omega))
   rw [hij] at hjspec
   -- `M ⊓ N (i+1)` は正規で `≤ M`, 極小性から `= M`.
-  haveI : (N (i + 1)).Normal := hnorm (i + 1)
-  haveI : (N i).Normal := hnorm i
+  have : (N (i + 1)).Normal := hnorm (i + 1)
+  have : (N i).Normal := hnorm i
   have hMle : M ≤ N (i + 1) := by
     rcases hM.2.2 (M ⊓ N (i + 1)) inferInstance inf_le_left with hbot | heq
     · exact absurd hbot hjspec
@@ -135,21 +135,21 @@ theorem card_prime_of_isMinimalNormal_of_isSupersolvable {G : Type u} [Group G] 
     rwa [Subgroup.map_sup, MonoidHom.map_zpowers, hφ_def, QuotientGroup.map_mk'_self,
       bot_sup_eq] at hmapped
   -- 巡回性を `M` に移す.
-  haveI : IsCyclic ↥(ψ.range.subgroupOf (Subgroup.zpowers (φ x))) := inferInstance
-  haveI : IsCyclic ↥ψ.range :=
+  have : IsCyclic ↥(ψ.range.subgroupOf (Subgroup.zpowers (φ x))) := inferInstance
+  have : IsCyclic ↥ψ.range :=
     isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe hrange).toMonoidHom
       (Subgroup.subgroupOfEquivOfLe hrange).surjective
-  haveI : IsCyclic ↥M :=
+  have : IsCyclic ↥M :=
     isCyclic_of_surjective (MonoidHom.ofInjective hinj).symm.toMonoidHom
       (MonoidHom.ofInjective hinj).symm.surjective
   -- Thm 3.11: `M` は elementary abelian `p`-群. 巡回なので `|M| = p`.
-  obtain ⟨p, hp, hEA⟩ := solvable_minimal_normal_isElementaryAbelian hM
+  obtain ⟨p, hp, hEA⟩ := minimal_normal_isElementaryAbelian_of_isSolvable hM
   obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := ↥M)
   have hord : orderOf g = Nat.card ↥M := orderOf_eq_card_of_forall_mem_zpowers hg
   have hdvd : Nat.card ↥M ∣ p := by
     rw [← hord]
     exact orderOf_dvd_of_pow_eq_one (hEA.pow_eq_one g)
-  haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM.2.1
+  have : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM.2.1
   have hne1 : Nat.card ↥M ≠ 1 := (Finite.one_lt_card (α := ↥M)).ne'
   rcases (Nat.dvd_prime hp).mp hdvd with h1 | hpeq
   · exact absurd h1 hne1
@@ -169,21 +169,21 @@ theorem index_prime_of_isCoatom_of_isSupersolvable_aux (n : ℕ) :
     omega
   | succ n ih =>
     intro G _ _ M hG hcard hM
-    haveI hnt : Nontrivial G := by
+    have hnt : Nontrivial G := by
       rcases subsingleton_or_nontrivial G with hs | hn
       · exact absurd (by ext x; simp [Subsingleton.elim x (1 : G)] : M = ⊤) hM.1
       · exact hn
     have hMone : M.index ≠ 1 := fun h => hM.1 (Subgroup.index_eq_one.mp h)
     obtain ⟨N, hNmin, -⟩ :=
       Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) top_ne_bot
-    haveI hNnormal : N.Normal := hNmin.1
+    have hNnormal : N.Normal := hNmin.1
     have hNprime : (Nat.card ↥N).Prime := card_prime_of_isMinimalNormal_of_isSupersolvable hG hNmin
     by_cases hNM : N ≤ M
     · -- `G ⧸ N` に落として帰納法 (指数は不変).
       have hindex : (M.map (QuotientGroup.mk' N)).index = M.index :=
         Subgroup.index_map_eq _ (QuotientGroup.mk'_surjective N)
           (by rw [QuotientGroup.ker_mk']; exact hNM)
-      haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNmin.2.1
+      have : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNmin.2.1
       have hNcard : 1 < Nat.card ↥N := Finite.one_lt_card
       have hprod : Nat.card ↥N * N.index = Nat.card G := Subgroup.card_mul_index N
       have hquot : Nat.card (G ⧸ N) ≤ n := by
@@ -237,7 +237,7 @@ theorem exists_subgroup_card_eq_of_isSupersolvable_aux (m : ℕ) :
     · -- 極小正規部分群 `N` の位数は素数 `q` (3B.7(a)).
       obtain ⟨N, hNmin, -⟩ :=
         Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) top_ne_bot
-      haveI hNnormal : N.Normal := hNmin.1
+      have hNnormal : N.Normal := hNmin.1
       have hqprime : (Nat.card ↥N).Prime :=
         card_prime_of_isMinimalNormal_of_isSupersolvable hG hNmin
       set q := Nat.card ↥N with hq_def
@@ -300,7 +300,7 @@ theorem exists_subgroup_card_eq_of_isSupersolvable_aux (m : ℕ) :
           refine Nat.eq_of_mul_eq_mul_right hKidxpos ?_
           rw [h1, mul_assoc, h2, hquotcard, hprod]
         -- `↥K` の中で `N.subgroupOf K` は位数 `q`, 指数 `n` の正規部分群.
-        haveI : (N.subgroupOf K).Normal := Subgroup.normal_subgroupOf
+        have : (N.subgroupOf K).Normal := Subgroup.normal_subgroupOf
         have hcardNK : Nat.card ↥(N.subgroupOf K) = q :=
           Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNK).toEquiv
         have hidxNK : (N.subgroupOf K).index = n := by

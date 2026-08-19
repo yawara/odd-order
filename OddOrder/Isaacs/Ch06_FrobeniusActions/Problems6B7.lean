@@ -45,7 +45,7 @@ theorem conj_eq_four_cases_of_index_two {P : Type*} [Group P] [Finite P]
     a * c * a⁻¹ = c ∨ a * c * a⁻¹ = c⁻¹ ∨
       a * c * a⁻¹ = c ^ (2 ^ (m - 1)) * c ∨ a * c * a⁻¹ = c ^ (2 ^ (m - 1)) * c⁻¹ := by
   classical
-  haveI hnorm : (Subgroup.zpowers c).Normal := Subgroup.normal_of_index_eq_two h_idx
+  have hnorm : (Subgroup.zpowers c).Normal := Subgroup.normal_of_index_eq_two h_idx
   obtain ⟨j, hj⟩ : ∃ j : ℤ, c ^ j = a * c * a⁻¹ :=
     Subgroup.mem_zpowers_iff.mp (hnorm.conj_mem c (Subgroup.mem_zpowers c) a)
   have hconj : ∀ k : ℤ, a * c ^ k * a⁻¹ = (a * c * a⁻¹) ^ k := fun k => by

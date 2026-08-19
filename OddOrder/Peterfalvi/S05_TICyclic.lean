@@ -123,7 +123,7 @@ noncomputable def mapOfInjective {H G : Type*} [Group H] [Group G] [Fintype H] [
   W_card_odd := by
     rw [Subgroup.card_map_of_injective hφ]; exact hyp.W_card_odd
   W_cyclic := by
-    haveI := hyp.W_cyclic
+    have := hyp.W_cyclic
     exact isCyclic_of_surjective (hyp.W.equivMapOfInjective φ hφ).toMonoidHom
       (hyp.W.equivMapOfInjective φ hφ).surjective
   V := φ '' hyp.V
@@ -254,6 +254,7 @@ section SupportedDimension
 open scoped IsMulCommutative
 open Module (finrank)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- For a finite **commutative** group `H`, the class functions supported on `A ⊆ H` form a space
 of dimension `|A|`.  For commutative `H` conjugation is trivial, so every function on `H` is a class
 function; restriction to `A` and extension-by-zero then give a linear isomorphism
@@ -263,8 +264,8 @@ theorem finrank_supportedSubmodule_eq_card {H : Type*} [Group H] [Finite H] [IsM
     (A : Set H) :
     finrank ℂ (ClassFunction.supportedSubmodule (G := H) (k := ℂ) A) = Nat.card A := by
   classical
-  haveI : Fintype H := Fintype.ofFinite _
-  haveI : Fintype A := Fintype.ofFinite _
+  have : Fintype H := Fintype.ofFinite _
+  have : Fintype A := Fintype.ofFinite _
   let restr : ClassFunction.supportedSubmodule (G := H) (k := ℂ) A →ₗ[ℂ] (A → ℂ) :=
     { toFun := fun φ a => (φ : ClassFunction H ℂ) (a : H)
       map_add' := fun φ ψ => by funext a; rfl
@@ -343,7 +344,7 @@ theorem omega_injective (hyp : TICyclicHypothesis G) :
 
 theorem omega_surjective (hyp : TICyclicHypothesis G) :
     Function.Surjective hyp.omega := by
-  haveI := hyp.isMulCommutative_W
+  have := hyp.isMulCommutative_W
   intro χ
   obtain ⟨h, hh⟩ := χ.2.exists_linearIrreducibleCharacter_eq_of_isMulCommutative
   exact ⟨h, Subtype.ext hh⟩
@@ -414,7 +415,7 @@ noncomputable def wProdEquiv (hyp : TICyclicHypothesis G) :
 @[simp] theorem wProdEquiv_apply (hyp : TICyclicHypothesis G)
     (p : (hyp.W1.subgroupOf hyp.W) × (hyp.W2.subgroupOf hyp.W)) :
     (hyp.wProdEquiv p : hyp.W) = (p.1 : hyp.W) * (p.2 : hyp.W) := by
-  haveI := hyp.isMulCommutative_W
+  have := hyp.isMulCommutative_W
   rfl
 
 end
@@ -544,7 +545,7 @@ noncomputable def alphaCF (hyp : TICyclicHypothesis G)
     (χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
     ClassFunction hyp.W ℂ :=
   ⟨fun w => (1 - (χ₁ (hyp.wFst w) : ℂ)) * (1 - (χ₂ (hyp.wSnd w) : ℂ)), by
-    haveI := hyp.isMulCommutative_W
+    have := hyp.isMulCommutative_W
     intro g h
     have hg : (h * g * h⁻¹ : hyp.W) = g := by rw [mul_comm h g, mul_inv_cancel_right]
     rw [hg]⟩
@@ -687,9 +688,9 @@ theorem card_supportInSubgroup_Vdiff (hyp : TICyclicHypothesis G) :
     Nat.card ↥(OddOrder.Peterfalvi.S04.supportInSubgroup hyp.Vdiff hyp.W)
       = (Nat.card hyp.W1 - 1) * (Nat.card hyp.W2 - 1) := by
   classical
-  haveI : Finite G := Finite.of_fintype G
-  haveI : Fintype ↥(hyp.W1.subgroupOf hyp.W) := Fintype.ofFinite _
-  haveI : Fintype ↥(hyp.W2.subgroupOf hyp.W) := Fintype.ofFinite _
+  have : Finite G := Finite.of_fintype G
+  have : Fintype ↥(hyp.W1.subgroupOf hyp.W) := Fintype.ofFinite _
+  have : Fintype ↥(hyp.W2.subgroupOf hyp.W) := Fintype.ofFinite _
   rw [Nat.card_congr hyp.supportInVdiffEquiv, Nat.card_prod]
   have h1 : Nat.card {a : (hyp.W1.subgroupOf hyp.W) // a ≠ 1} = Nat.card hyp.W1 - 1 := by
     rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.W1_le_W).toEquiv,
@@ -706,9 +707,9 @@ theorem card_supportInSubgroup_Vdiff (hyp : TICyclicHypothesis G) :
 that the family `(α_{ij})` (`1 ≤ i < w₁`, `1 ≤ j < w₂`) is a basis of `CF(W, V)`. -/
 theorem finrank_supportedOnV (hyp : TICyclicHypothesis G) (hVeq : hyp.V = hyp.Vdiff) :
     Module.finrank ℂ (SupportedOnV ℂ hyp) = (Nat.card hyp.W1 - 1) * (Nat.card hyp.W2 - 1) := by
-  haveI : Finite G := Finite.of_fintype G
-  haveI : Fintype ↥hyp.W := Fintype.ofFinite _
-  haveI : IsMulCommutative ↥hyp.W := hyp.isMulCommutative_W
+  have : Finite G := Finite.of_fintype G
+  have : Fintype ↥hyp.W := Fintype.ofFinite _
+  have : IsMulCommutative ↥hyp.W := hyp.isMulCommutative_W
   change Module.finrank ℂ
       ↥(ClassFunction.supportedSubmodule (G := ↥hyp.W)
         (OddOrder.Peterfalvi.S04.supportInSubgroup hyp.V hyp.W))
@@ -937,11 +938,11 @@ finite commutative group, and `ℂ` (being algebraically closed) has enough root
 theorem card_charGroup_subgroupOf (hyp : TICyclicHypothesis G) {H : Subgroup G}
     (hHW : H ≤ hyp.W) :
     Nat.card ((H.subgroupOf hyp.W) →* ℂˣ) = Nat.card H := by
-  haveI := hyp.W_cyclic
-  haveI : Finite G := Finite.of_fintype G
+  have := hyp.W_cyclic
+  have : Finite G := Finite.of_fintype G
   have key : Nat.card ((H.subgroupOf hyp.W) →* ℂˣ) = Nat.card (H.subgroupOf hyp.W) := by
-    letI : CommGroup ↥(H.subgroupOf hyp.W) := IsCyclic.commGroup
-    haveI : NeZero ((Monoid.exponent ↥(H.subgroupOf hyp.W) : ℂ)) :=
+    let : CommGroup ↥(H.subgroupOf hyp.W) := IsCyclic.commGroup
+    have : NeZero ((Monoid.exponent ↥(H.subgroupOf hyp.W) : ℂ)) :=
       ⟨Nat.cast_ne_zero.2 (NeZero.ne _)⟩
     exact CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity ↥(H.subgroupOf hyp.W) ℂ
   rw [key, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHW).toEquiv]
@@ -955,10 +956,10 @@ under which index negation is character inversion ((3.9.a)). -/
 theorem isCyclic_charGroup_subgroupOf (hyp : TICyclicHypothesis G) {H : Subgroup G}
     (_hHW : H ≤ hyp.W) :
     IsCyclic ((H.subgroupOf hyp.W) →* ℂˣ) := by
-  haveI := hyp.W_cyclic
-  haveI : Finite G := Finite.of_fintype G
-  letI : CommGroup ↥(H.subgroupOf hyp.W) := IsCyclic.commGroup
-  haveI : NeZero ((Monoid.exponent ↥(H.subgroupOf hyp.W) : ℂ)) :=
+  have := hyp.W_cyclic
+  have : Finite G := Finite.of_fintype G
+  let : CommGroup ↥(H.subgroupOf hyp.W) := IsCyclic.commGroup
+  have : NeZero ((Monoid.exponent ↥(H.subgroupOf hyp.W) : ℂ)) :=
     ⟨Nat.cast_ne_zero.2 (NeZero.ne _)⟩
   obtain ⟨e⟩ :=
     CommGroup.monoidHom_mulEquiv_of_hasEnoughRootsOfUnity ↥(H.subgroupOf hyp.W) ℂ
@@ -974,7 +975,7 @@ theorem alphaLinearIndependent (hyp : TICyclicHypothesis G) [Finite hyp.W]
       (fun p : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} ×
           {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} =>
         hyp.alpha hVeq p.1.1 p.2.1) := by
-  haveI : Fintype hyp.W := Fintype.ofFinite _
+  have : Fintype hyp.W := Fintype.ofFinite _
   refine LinearIndependent.of_pairwise_dual_eq_zero_one _
     (fun p => (innerDual (hyp.omega (hyp.omegaProdChar p.1.1 p.2.1))).comp
       (Submodule.subtype _)) (fun p q hpq => ?_) (fun p => ?_)
@@ -988,13 +989,13 @@ theorem alphaLinearIndependent (hyp : TICyclicHypothesis G) [Finite hyp.W]
 having the same cardinality `> 1`).  Gives `Nonempty` of the index set of nontrivial characters. -/
 theorem nonempty_charNeOne (hyp : TICyclicHypothesis G) {H : Subgroup G} (hHW : H ≤ hyp.W)
     (hH : H ≠ ⊥) : Nonempty {χ : (H.subgroupOf hyp.W) →* ℂˣ // χ ≠ 1} := by
-  haveI : Finite G := Finite.of_fintype G
-  haveI : Fintype ((H.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
-  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hH
+  have : Finite G := Finite.of_fintype G
+  have : Fintype ((H.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hH
   have hcard : 1 < Fintype.card ((H.subgroupOf hyp.W) →* ℂˣ) := by
     rw [← Nat.card_eq_fintype_card, hyp.card_charGroup_subgroupOf hHW]
     exact Finite.one_lt_card
-  haveI : Nontrivial ((H.subgroupOf hyp.W) →* ℂˣ) :=
+  have : Nontrivial ((H.subgroupOf hyp.W) →* ℂˣ) :=
     Fintype.one_lt_card_iff_nontrivial.mp hcard
   obtain ⟨χ, hχ⟩ := exists_ne (1 : (H.subgroupOf hyp.W) →* ℂˣ)
   exact ⟨⟨χ, hχ⟩⟩

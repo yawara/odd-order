@@ -106,7 +106,7 @@ private lemma eq_two_three_of_prime_succ {p : ℕ} (hp : p.Prime) (hp1 : (p + 1)
 theorem card_sylow_eq_one_of_card_eq_sq_mul_sq {G : Type*} [Group G] [Finite G] {p q : ℕ}
     (hp : p.Prime) (hq : q.Prime) (hpq : p < q) (hG : Nat.card G = p ^ 2 * q ^ 2)
     (h36 : Nat.card G ≠ 36) : Nat.card (Sylow q G) = 1 := by
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   obtain ⟨Q⟩ : Nonempty (Sylow q G) := Sylow.nonempty
   have hpq' : ¬ q ∣ p ^ 2 := by
     intro hdvd
@@ -173,7 +173,7 @@ private lemma eq_of_dvd_prime_mul_prime {p q n : ℕ} (hp : p.Prime) (hq : q.Pri
 theorem card_sylow_eq_one_of_card_eq_prime_mul_prime {H : Type*} [Group H] [Finite H]
     {q r : ℕ} (hq : q.Prime) (hr : r.Prime) (hqr : q < r) (hH : Nat.card H = q * r) :
     Nat.card (Sylow r H) = 1 := by
-  haveI : Fact r.Prime := ⟨hr⟩
+  have : Fact r.Prime := ⟨hr⟩
   obtain ⟨R⟩ : Nonempty (Sylow r H) := Sylow.nonempty
   have hnd : ¬ r ∣ q := fun hd => by have := Nat.le_of_dvd hq.pos hd; omega
   obtain ⟨-, hindex⟩ := sylow_card_and_index_of_card_eq_mul (q := r) (m := q) (k := 1)
@@ -204,9 +204,9 @@ theorem card_sylow_eq_one_of_card_eq_prime_mul_prime {H : Type*} [Group H] [Fini
 theorem card_sylow_eq_one_of_card_eq_mul_mul {G : Type*} [Group G] [Finite G] {p q r : ℕ}
     (hp : p.Prime) (hq : q.Prime) (hr : r.Prime) (hpq : p < q) (hqr : q < r)
     (hG : Nat.card G = p * q * r) : Nat.card (Sylow r G) = 1 := by
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : Fact q.Prime := ⟨hq⟩
-  haveI : Fact r.Prime := ⟨hr⟩
+  have : Fact p.Prime := ⟨hp⟩
+  have : Fact q.Prime := ⟨hq⟩
+  have : Fact r.Prime := ⟨hr⟩
   have hp2 := hp.two_le
   -- Sylow `q`, `r` の位数はちょうど `q`, `r`, 指数は `pr`, `pq`。
   have hqnd : ¬ q ∣ p * r := by
@@ -271,8 +271,8 @@ theorem card_sylow_eq_one_of_card_eq_mul_mul {G : Type*} [Group G] [Finite G] {p
     have hE : p * (u + 1) * (v + 1) = p * (u + 1) * v + p * (u + 1) := by ring
     omega
   -- `Q ⊴ G` かつ `M := Q ⊔ R` は位数 `qr`, その中で `R` は正規
-  haveI : Subsingleton (Sylow q G) := Nat.card_eq_one_iff_unique.mp hnq |>.1
-  haveI hQnorm : (Q : Subgroup G).Normal := Sylow.normal_of_subsingleton Q
+  have : Subsingleton (Sylow q G) := Nat.card_eq_one_iff_unique.mp hnq |>.1
+  have hQnorm : (Q : Subgroup G).Normal := Sylow.normal_of_subsingleton Q
   have hcop : Nat.Coprime (Nat.card ↥(Q : Subgroup G)) (Nat.card ↥(R : Subgroup G)) := by
     rw [(hqdec Q).1, (hrdec R).1]
     exact (Nat.coprime_primes hq hr).mpr (by omega)
@@ -282,7 +282,7 @@ theorem card_sylow_eq_one_of_card_eq_mul_mul {G : Type*} [Group G] [Finite G] {p
   have hRM : (R : Subgroup G) ≤ M := le_sup_right
   have hMsyl : Nat.card (Sylow r ↥M) = 1 :=
     card_sylow_eq_one_of_card_eq_prime_mul_prime hq hr hqr hMcard
-  haveI : Subsingleton (Sylow r ↥M) := Nat.card_eq_one_iff_unique.mp hMsyl |>.1
+  have : Subsingleton (Sylow r ↥M) := Nat.card_eq_one_iff_unique.mp hMsyl |>.1
   have hRnorm : ((R.subtype hRM : Sylow r ↥M) : Subgroup ↥M).Normal :=
     Sylow.normal_of_subsingleton _
   rw [Sylow.coe_subtype] at hRnorm
@@ -356,7 +356,7 @@ theorem card_sylow_ne_one_of_simple {G : Type*} [Group G] [Finite G] [IsSimpleGr
     {q : ℕ} [Fact q.Prime] (P : Sylow q G) (h1 : Nat.card ↥(P : Subgroup G) ≠ 1)
     (h2 : Nat.card ↥(P : Subgroup G) ≠ Nat.card G) : Nat.card (Sylow q G) ≠ 1 := by
   intro hone
-  haveI : Subsingleton (Sylow q G) := (Nat.card_eq_one_iff_unique.mp hone).1
+  have : Subsingleton (Sylow q G) := (Nat.card_eq_one_iff_unique.mp hone).1
   rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal _ (Sylow.normal_of_subsingleton P) with h | h
   · rw [h, Subgroup.card_bot] at h1; exact h1 rfl
   · rw [h, Subgroup.card_top] at h2; exact h2 rfl
@@ -368,8 +368,8 @@ theorem exists_max_inter_sylow_pair {G : Type*} [Group G] [Finite G] {q : ℕ} [
       Nat.card ((S' : Subgroup G) ⊓ (T' : Subgroup G) : Subgroup G) ≤
       Nat.card ((S : Subgroup G) ⊓ (T : Subgroup G) : Subgroup G) := by
   classical
-  haveI : Fintype (Sylow q G) := Fintype.ofFinite _
-  haveI : Nontrivial (Sylow q G) := by
+  have : Fintype (Sylow q G) := Fintype.ofFinite _
+  have : Nontrivial (Sylow q G) := by
     apply Fintype.one_lt_card_iff_nontrivial.mp
     rwa [← Nat.card_eq_fintype_card]
   obtain ⟨S₁, T₁, hST₁⟩ := exists_pair_ne (Sylow q G)
@@ -398,9 +398,9 @@ theorem not_isSimpleGroup_of_card_eq_threeonefive {G : Type*} [Group G] [Finite 
     (hG : Nat.card G = 315) : ¬ IsSimpleGroup G := by
   intro hsimple
   classical
-  haveI := hsimple
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
-  haveI : Fintype (Sylow 3 G) := Fintype.ofFinite _
+  have := hsimple
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Fintype (Sylow 3 G) := Fintype.ofFinite _
   have hdec : ∀ P : Sylow 3 G,
       Nat.card ↥(P : Subgroup G) = 9 ∧ (P : Subgroup G).index = 35 := fun P => by
     have h := sylow_card_and_index_of_card_eq_mul (q := 3) (m := 35) (k := 2)
@@ -472,7 +472,7 @@ theorem not_isSimpleGroup_of_card_eq_threeonefive {G : Type*} [Group G] [Finite 
   · -- `|N| = 45`: 位数 45 の群の Sylow `3` は一意
     rw [h] at he
     norm_num at he
-    haveI : Subsingleton (Sylow 3 ↥N) :=
+    have : Subsingleton (Sylow 3 ↥N) :=
       (Nat.card_eq_one_iff_unique.mp (card_sylow_eq_one_of_card_eq_prime_mul_pow
         (q := 3) (ℓ := 5) (k := 2) (by norm_num) (by rw [he]; norm_num) (by norm_num)
         (by norm_num))).1
@@ -517,8 +517,8 @@ theorem not_isSimpleGroup_of_card_eq_onefourfour {G : Type*} [Group G] [Finite G
     (hG : Nat.card G = 144) : ¬ IsSimpleGroup G := by
   intro hsimple
   classical
-  haveI := hsimple
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have := hsimple
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   have hdec : ∀ P : Sylow 3 G,
       Nat.card ↥(P : Subgroup G) = 9 ∧ (P : Subgroup G).index = 16 := fun P => by
     have h := sylow_card_and_index_of_card_eq_mul (q := 3) (m := 16) (k := 2)
@@ -609,7 +609,7 @@ theorem not_isSimpleGroup_of_card_eq_onefourfour {G : Type*} [Group G] [Finite G
     exact hST (Sylow.ext ((Subgroup.eq_of_le_of_card_ge hS_le (he ▸ ((hdec S).1).ge)).trans
       (Subgroup.eq_of_le_of_card_ge hT_le (he ▸ ((hdec T).1).ge)).symm))
   · -- `|N| = 18`: 位数 18 の群の Sylow `3` は一意
-    haveI : Subsingleton (Sylow 3 ↥N) :=
+    have : Subsingleton (Sylow 3 ↥N) :=
       (Nat.card_eq_one_iff_unique.mp (card_sylow_eq_one_of_card_eq_prime_mul_pow
         (q := 3) (ℓ := 2) (k := 2) (by norm_num) (by rw [he]; norm_num) (by norm_num)
         (by norm_num))).1
@@ -640,8 +640,8 @@ theorem exists_injective_hom_alternating_of_simple {G : Type*} [Group G] [Finite
     (hG : 2 < Nat.card G) :
     ∃ f : G →* ↥(alternatingGroup (Fin n)), Function.Injective f := by
   classical
-  haveI : Finite (G ⧸ H) := Subgroup.index_ne_zero_iff_finite.mp (by omega)
-  haveI : Fintype (G ⧸ H) := Fintype.ofFinite _
+  have : Finite (G ⧸ H) := Subgroup.index_ne_zero_iff_finite.mp (by omega)
+  have : Fintype (G ⧸ H) := Fintype.ofFinite _
   have hcard : Fintype.card (G ⧸ H) = n := by
     rw [← Nat.card_eq_fintype_card, ← Subgroup.index_eq_card]; exact hidx
   set e : (G ⧸ H) ≃ Fin n := Fintype.equivFinOfCardEq hcard
@@ -704,8 +704,8 @@ theorem not_isSimpleGroup_of_card_eq_threethreesix {G : Type*} [Group G] [Finite
     (hG : Nat.card G = 336) : ¬ IsSimpleGroup G := by
   intro hsimple
   classical
-  haveI := hsimple
-  haveI : Fact (Nat.Prime 7) := ⟨by norm_num⟩
+  have := hsimple
+  have : Fact (Nat.Prime 7) := ⟨by norm_num⟩
   obtain ⟨P⟩ : Nonempty (Sylow 7 G) := Sylow.nonempty
   obtain ⟨hPcard, hPindex⟩ := sylow_card_and_index_of_card_eq_mul (q := 7) (m := 48) (k := 1)
     (by rw [hG]; norm_num) (by norm_num) P
@@ -791,7 +791,7 @@ theorem two_mul_card_ne_card_alternating_of_simple {G : Type*} [Group G] [Finite
   intro heq
   obtain ⟨f, hfinj⟩ :=
     exists_injective_hom_alternating_of_simple hidx (by omega) hG
-  haveI : IsSimpleGroup ↥(alternatingGroup (Fin n)) :=
+  have : IsSimpleGroup ↥(alternatingGroup (Fin n)) :=
     alternatingGroup.isSimpleGroup (by simpa using hn)
   have hrange : Nat.card ↥f.range = Nat.card G := by
     rw [MonoidHom.range_eq_map, Subgroup.card_map_of_injective hfinj, Subgroup.card_top]
@@ -801,7 +801,7 @@ theorem two_mul_card_ne_card_alternating_of_simple {G : Type*} [Group G] [Finite
     have hpos : 0 < Nat.card G := by omega
     have h2 : Nat.card G * f.range.index = Nat.card G * 2 := by rw [hmul, ← heq]; ring
     exact Nat.eq_of_mul_eq_mul_left hpos h2
-  haveI : f.range.Normal := Subgroup.normal_of_index_eq_two hidx2
+  have : f.range.Normal := Subgroup.normal_of_index_eq_two hidx2
   rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal f.range inferInstance with h | h
   · rw [h, Subgroup.card_bot] at hrange; omega
   · rw [h, Subgroup.index_top] at hidx2; omega
@@ -817,8 +817,8 @@ theorem exists_finset_of_sylow_inter_trivial {G : Type*} [Group G] [Finite G] {q
     ∃ U : Finset G, U.card = Nat.card (Sylow q G) * (m - 1) ∧
       ∀ x ∈ U, x ≠ 1 ∧ orderOf x ∣ m := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Fintype (Sylow q G) := Fintype.ofFinite _
+  have : Fintype G := Fintype.ofFinite G
+  have : Fintype (Sylow q G) := Fintype.ofFinite _
   set A : Sylow q G → Finset G := fun S => ((S : Subgroup G) : Set G).toFinset.erase 1 with hA
   have hcardA : ∀ S : Sylow q G, (A S).card = m - 1 := by
     intro S

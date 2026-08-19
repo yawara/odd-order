@@ -116,18 +116,19 @@ theorem normalizer_eq_self_of_subgroupOf_normal_of_ne_bot [Finite G]
 
 /-- **The Fitting subgroup of a maximal subgroup is self-normalizing**: `N_G(F(M)) = M` for a
 maximal `M` of a minimal simple group of odd order.  `F(M)` is normal in `M`
-(`fittingInG_subgroupOf_normal`) and nontrivial (`fitting_ne_bot_of_solvable_nontrivial`, as `M` is
+(`fittingInG_subgroupOf_normal`) and nontrivial
+    (`fitting_ne_bot_of_isSolvable_nontrivial`, as `M` is
 a nontrivial — `M_σ ≠ ⊥` — solvable proper subgroup); apply the self-normalizing helper. -/
 theorem normalizer_fittingInAmbient_eq_self [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
     Subgroup.normalizer (S15.fittingInAmbient M : Set G) = M := by
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hMne : M ≠ ⊥ := fun h =>
     OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM (le_bot_iff.mp (h ▸ OddOrder.BG.Ch3.S10.Msigma_le M))
-  haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMne
+  have : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMne
   have hFne : S15.fittingInAmbient M ≠ ⊥ := by
     intro hbot
-    refine OddOrder.Isaacs.Ch01.fitting_ne_bot_of_solvable_nontrivial ↥M ?_
+    refine OddOrder.Isaacs.Ch01.fitting_ne_bot_of_isSolvable_nontrivial ↥M ?_
     have hmap : (OddOrder.Isaacs.Ch01.fitting ↥M).map M.subtype
         = (⊥ : Subgroup ↥M).map M.subtype := by
       rw [Subgroup.map_bot]; exact hbot
@@ -213,7 +214,7 @@ theorem isTypeP1_derivedInG_eq_Msigma [Finite G] (hG : OddOrder.BG.IsMinimalSimp
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP1 : S14.IsTypeP1 M) :
     derivedInG M = OddOrder.BG.Ch3.S10.Msigma M := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   -- A Hall `κ(M)`-subgroup `K` and a Hall `(κ ∪ σ)'`-subgroup `U` of `M`.
   obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
   set K : Subgroup G := K'.map M.subtype with hKdef
@@ -261,13 +262,13 @@ theorem exists_typeP1_mf_complement [Finite G] (hG : OddOrder.BG.IsMinimalSimple
       K ≤ Subgroup.normalizer (U : Set G) ∧
       maxNilpotentNormalHall M ⊓ U = ⊥ := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   set M' := derivedInG M with hM'def
   set N := maxNilpotentNormalHall M with hNdef
   have hM'_le_M : M' ≤ M := Subgroup.map_subtype_le _
   have hM'σ : M' = OddOrder.BG.Ch3.S10.Msigma M := isTypeP1_derivedInG_eq_Msigma hG hM hP1
-  haveI : IsSolvable ↥M' :=
-    solvable_of_solvable_injective (f := (Subgroup.inclusion hM'_le_M))
+  have : Group.IsSolvable ↥M' :=
+    Group.isSolvable_of_isSolvable_injective (f := (Subgroup.inclusion hM'_le_M))
       (Subgroup.inclusion_injective hM'_le_M)
   -- `N = M_F ≤ M' = M_σ`.
   have hN_le : N ≤ M' := by rw [hM'σ]; exact maxNilpotentNormalHall_le_Msigma hG hM
@@ -323,7 +324,7 @@ theorem isNilpotent_complement_of_isTypeP1_mf_ne_msigma [Finite G]
     (hinf : maxNilpotentNormalHall M ⊓ U = ⊥) :
     Group.IsNilpotent ↥U := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   set Mσ := OddOrder.BG.Ch3.S10.Msigma M with hMσ
   have hM'σ : derivedInG M = Mσ := isTypeP1_derivedInG_eq_Msigma hG hM hP1
   rw [hM'σ] at hsup
@@ -332,7 +333,7 @@ theorem isNilpotent_complement_of_isTypeP1_mf_ne_msigma [Finite G]
   -- `M̄F = M_F.subgroupOf Mσ` is normal in `↥Mσ`.
   have hMFnormMσ : Mσ ≤ Subgroup.normalizer (maxNilpotentNormalHall M : Set G) :=
     (OddOrder.BG.Ch3.S10.Msigma_le M).trans (S15.maxNilpotentNormalHall_le_normalizer M)
-  haveI hMFbarNorm : ((maxNilpotentNormalHall M).subgroupOf Mσ).Normal :=
+  have hMFbarNorm : ((maxNilpotentNormalHall M).subgroupOf Mσ).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hMFMσ).mpr hMFnormMσ
   -- Theorem 15.2: `Q ⋊ D = M_σ`, `Q ≤ M_F`, `D` nilpotent.
   obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
@@ -347,14 +348,14 @@ theorem isNilpotent_complement_of_isTypeP1_mf_ne_msigma [Finite G]
   have hMFDbarTop : (maxNilpotentNormalHall M).subgroupOf Mσ ⊔ D.subgroupOf Mσ = ⊤ :=
     top_le_iff.mp (hQDcompl.sup_eq_top ▸ sup_le_sup_right (Subgroup.subgroupOf_mono Mσ hQMF) _)
   -- `D̄ = D.subgroupOf Mσ` is nilpotent (`≅ D ⊓ Mσ ≤ D`).
-  haveI hDnilI : Group.IsNilpotent ↥D := hDnil
-  haveI hDbarNil : Group.IsNilpotent ↥(D.subgroupOf Mσ) := by
+  have hDnilI : Group.IsNilpotent ↥D := hDnil
+  have hDbarNil : Group.IsNilpotent ↥(D.subgroupOf Mσ) := by
     rw [← Subgroup.inf_subgroupOf_right]
     exact Group.nilpotent_of_mulEquiv
       ((Subgroup.subgroupOfEquivOfLe (inf_le_left : D ⊓ Mσ ≤ D)).trans
         (Subgroup.subgroupOfEquivOfLe (inf_le_right : D ⊓ Mσ ≤ Mσ)).symm)
   -- `M_σ/M_F` is nilpotent: the quotient map restricts to a surjection `D̄ ↠ M_σ/M_F`.
-  haveI hquotNil : Group.IsNilpotent (↥Mσ ⧸ (maxNilpotentNormalHall M).subgroupOf Mσ) := by
+  have hquotNil : Group.IsNilpotent (↥Mσ ⧸ (maxNilpotentNormalHall M).subgroupOf Mσ) := by
     have hsurj : Function.Surjective
         (((QuotientGroup.mk' ((maxNilpotentNormalHall M).subgroupOf Mσ)).comp
           (D.subgroupOf Mσ).subtype)) := by
@@ -401,7 +402,7 @@ theorem isNilpotent_complement_of_isTypeP1_mf_ne_msigma [Finite G]
     refine ⟨⟨u, hu⟩, ?_⟩
     change QuotientGroup.mk (u : ↥Mσ) = QuotientGroup.mk z
     rw [← hum, QuotientGroup.mk_mul, (QuotientGroup.eq_one_iff _).mpr hm, mul_one]
-  haveI : Group.IsNilpotent ↥(U.subgroupOf Mσ) :=
+  have : Group.IsNilpotent ↥(U.subgroupOf Mσ) :=
     Group.nilpotent_of_mulEquiv (MulEquiv.ofBijective g ⟨hginj, hgsurj⟩).symm
   exact Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hUMσ)
 
@@ -430,7 +431,7 @@ theorem isComplement'_mf_complement_of_sup_inf [Finite G] {M U : Subgroup G}
   have hM'M : M' ≤ M := Subgroup.map_subtype_le _
   have hNnormM' : M' ≤ Subgroup.normalizer (N : Set G) :=
     hM'M.trans (maxNilpotentNormalHall_le_normalizer M)
-  haveI hN'norm : (N.subgroupOf M').Normal :=
+  have hN'norm : (N.subgroupOf M').Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hNle).mpr hNnormM'
   -- Disjointness and codisjointness in `↥M'`.
   have hdisj : Disjoint (N.subgroupOf M') (U.subgroupOf M') := by
@@ -487,7 +488,7 @@ theorem isNilpotent_complement_of_isTypeF [Finite G]
   have hUle : U ≤ M' := hsup ▸ le_sup_right
   -- `N.subgroupOf M'` is normal in `↥M'` (`M' ≤ M ≤ N_G(M_F)`).
   have hM'M : M' ≤ M := Subgroup.map_subtype_le _
-  haveI hNnorm : (N.subgroupOf M').Normal :=
+  have hNnorm : (N.subgroupOf M').Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hNle).mpr
       (hM'M.trans (maxNilpotentNormalHall_le_normalizer M))
   -- **`M'' ⊆ M_σ = M_F`** (BG Lemma 15.1(a) / Corollary 12.10(b)), recast as
@@ -499,9 +500,9 @@ theorem isNilpotent_complement_of_isTypeF [Finite G]
     rw [Subgroup.mem_subgroupOf]
     exact h2 (Subgroup.mem_map_of_mem _ hx)
   -- `M'/M_F` is abelian, a fortiori nilpotent.
-  haveI hQcomm : IsMulCommutative (↥M' ⧸ N.subgroupOf M') :=
+  have hQcomm : IsMulCommutative (↥M' ⧸ N.subgroupOf M') :=
     Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr hcomm
-  haveI hQnil : Group.IsNilpotent (↥M' ⧸ N.subgroupOf M') := CommGroup.isNilpotent
+  have hQnil : Group.IsNilpotent (↥M' ⧸ N.subgroupOf M') := CommGroup.isNilpotent
   -- `U ≅ M'/M_F` via the complement iso, transferring nilpotency.
   have hcompl : (U.subgroupOf M').IsComplement' (N.subgroupOf M') :=
     (isComplement'_mf_complement_of_sup_inf hsup hinf).symm
@@ -566,7 +567,7 @@ theorem fittingInAmbient_eq_mf_sup_inf_of_isTypeP1_mf_ne_msigma [Finite G]
       maxNilpotentNormalHall M ⊔
         (U ⊓ Subgroup.centralizer (maxNilpotentNormalHall M : Set G)) := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   set N := maxNilpotentNormalHall M with hNdef
   set M' := derivedInG M with hM'def
   set F := S15.fittingInAmbient M with hFdef
@@ -603,7 +604,7 @@ theorem fittingInAmbient_eq_mf_sup_inf_of_isTypeP1_mf_ne_msigma [Finite G]
   -- `F = N ⊔ (U ⊓ F)` (Dedekind modular law, via `M' = N ⋊ U` and `N ≤ F ≤ M'`).
   have hNnormM' : M' ≤ Subgroup.normalizer (N : Set G) :=
     hM'M.trans (maxNilpotentNormalHall_le_normalizer M)
-  haveI hNnorm' : (N.subgroupOf M').Normal :=
+  have hNnorm' : (N.subgroupOf M').Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer (hNF.trans hFleM')).mpr hNnormM'
   have hmod : F = N ⊔ (U ⊓ F) := by
     apply le_antisymm
@@ -629,7 +630,7 @@ theorem fittingInAmbient_eq_mf_sup_inf_of_isTypeP1_mf_ne_msigma [Finite G]
     rw [Subgroup.mem_inf] at hx
     obtain ⟨hxU, hxF⟩ := hx
     have hxM : x ∈ M := hFM hxF
-    haveI hNnorm : (N.subgroupOf M).Normal := maxNilpotentNormalHall_subgroupOf_normal M
+    have hNnorm : (N.subgroupOf M).Normal := maxNilpotentNormalHall_subgroupOf_normal M
     have hxFM : (⟨x, hxM⟩ : ↥M) ∈
         (Subgroup.centralizer (N : Set G) ⊓ M).subgroupOf M ⊔ N.subgroupOf M := by
       rw [← Subgroup.subgroupOf_sup inf_le_right hNM, Subgroup.mem_subgroupOf]
@@ -732,7 +733,7 @@ theorem typeFData_of_kappa_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     obtain ⟨E₁, E₂, E₃, hsetup⟩ :=
       subgroupESetup_of_isHall_kappa_eq_bot hG hM hKM hUM hK hKbot hU
     rw [hMFMσ]
-    haveI hMσnorm : ((Mσ).subgroupOf M).Normal :=
+    have hMσnorm : ((Mσ).subgroupOf M).Normal :=
       (Subgroup.normal_subgroupOf_iff_le_normalizer (OddOrder.BG.Ch3.S10.Msigma_le M)).mpr
         (le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M)
     refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
@@ -765,7 +766,7 @@ theorem isTypeF_groupTheory_of_isTypeF [Finite G] (hG : OddOrder.BG.IsMinimalSim
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hF : S14.IsTypeF M) :
     OddOrder.GroupTheory.IsTypeF M := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hκ : S14.kappa M = ∅ := hF
   -- `K = ⊥` is a `κ(M)`-Hall subgroup (`κ(M) = ∅`).
   have hKhall : Ch03.IsHallSubgroup (S14.kappa M) ((⊥ : Subgroup G).subgroupOf M) := by
@@ -814,7 +815,7 @@ theorem typeF_exponent_dvd_sub_one_of_invariant_card [Finite G] {M : Subgroup G}
       (fun h => hz1 (by simpa using Subtype.ext_iff.mp h)) ?_
     exact Subtype.ext (by simpa using hconj)
   -- Conjugation action of `U0` on `Z` (`U0 ≤ N_G(Z)`).
-  letI : MulDistribMulAction ↥td.U0 ↥Z :=
+  let : MulDistribMulAction ↥td.U0 ↥Z :=
     MulDistribMulAction.compHom ↥Z (Z.normalizerMonoidHom.comp (Subgroup.inclusion hU0NZ))
   have hFA : OddOrder.Isaacs.Ch06.IsFrobeniusAction ↥td.U0 ↥Z := by
     intro u hu z hz hfix
@@ -869,7 +870,7 @@ theorem isTypeI_of_isTypeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     -- `rank (M_F ⊓ C_G(X₁)) < 3`.
     obtain ⟨g, p, X₁, hgM, hp, _hpσ, hX₁card, hX₁Mσ, hX₁cMσ, _hCGnotM, hrank3, -⟩ :=
       exists_inf_conj_fitting_orderP_witness hG hM hTI
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     have hMFeq : MF M = OddOrder.BG.Ch3.S10.Msigma M := mf_eq_msigma_of_not_fittingIsTI hG hM hTI
     -- `X₁ ≤ M_F` and `X₁ ≤ M_F^g` (using `M_F = M_σ`).
     have hX₁MF : X₁ ≤ MF M := le_trans hX₁Mσ (le_of_eq hMFeq.symm)
@@ -918,8 +919,8 @@ theorem normalizer_eq_sup_of_isTISubset_of_isCyclic {W1 W2 : Subgroup G}
     (hXV : X ⊆ (↑(W1 ⊔ W2) : Set G) \ ((W1 : Set G) ∪ (W2 : Set G))) :
     Subgroup.normalizer X = W1 ⊔ W2 := by
   classical
-  haveI : IsCyclic ↥(W1 ⊔ W2) := hWcyc
-  letI : CommGroup ↥(W1 ⊔ W2) := IsCyclic.commGroup
+  have : IsCyclic ↥(W1 ⊔ W2) := hWcyc
+  let : CommGroup ↥(W1 ⊔ W2) := IsCyclic.commGroup
   -- elements of the cyclic `W = W₁ ⊔ W₂` commute in `G`.
   have hcomm : ∀ a b : G, a ∈ W1 ⊔ W2 → b ∈ W1 ⊔ W2 → a * b = b * a := fun a b ha hb =>
     congrArg Subtype.val (mul_comm (⟨a, ha⟩ : ↥(W1 ⊔ W2)) ⟨b, hb⟩)
@@ -1033,12 +1034,12 @@ theorem typeP_derivedInG_inf_centralizer_kappaElement_eq [Finite G]
     ∀ x ∈ K, x ≠ 1 →
       derivedInG M ⊓ Subgroup.centralizer ({x} : Set G) = Kstar := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   -- Theorem 14.7(h): `M = M' ⋊ K` complement (coprime orders), `K ⊔ K*` cyclic ⟹ `K` cyclic.
   obtain ⟨_hMcompl, hcop, _, ⟨_, _, _, _, hWcyc, _, _, _⟩, _⟩ :=
     typeP_duality hG hM hP hKM hK hKstar
-  haveI : IsCyclic ↥(K ⊔ Kstar) := hWcyc
-  haveI : IsCyclic ↥K := Subgroup.isCyclic_of_le (le_sup_left : K ≤ K ⊔ Kstar)
+  have : IsCyclic ↥(K ⊔ Kstar) := hWcyc
+  have : IsCyclic ↥K := Subgroup.isCyclic_of_le (le_sup_left : K ≤ K ⊔ Kstar)
   -- A Hall `(κ ∪ σ)ᶜ`-subgroup `U` of `M` (for the Theorem A(5) citation).
   obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥M)
     ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
@@ -1217,7 +1218,7 @@ noncomputable def typePData_of_isTypeP1_mf_eq_msigma [Finite G]
     (hmf : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M) :
     TypePData M := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  haveI : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   -- A Hall `κ(M)`-subgroup `K` (the cyclic `W₁ = K`).  The goal `TypePData M` is `Type`-valued,
   -- so we extract via `Exists.choose` (not `obtain`, which cannot eliminate a `Prop` into `Type`).
   have hKex := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
@@ -1271,7 +1272,7 @@ noncomputable def typePData_of_isTypeP1_mf_ne_msigma [Finite G]
     (hne : S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M) :
     TypePData M := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  haveI : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   -- A Hall `κ(M)`-subgroup `K` (`Type`-valued goal: extract via `Exists.choose`).
   have hKex := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
   set K : Subgroup G := hKex.choose.map M.subtype with hKdef
@@ -1366,7 +1367,7 @@ theorem isTypeII_of_isTypeP2_of_derived_typeF [Finite G]
   have hKne : K ≠ ⊥ := fun h => card_kappaHall_ne_one hP hKM hK (by rw [h, Subgroup.card_bot])
   have hM'eq := (typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hU).1
   have hUle : U ≤ derivedInG M := by rw [hM'eq]; exact le_sup_left
-  haveI := hUcomm
+  have := hUcomm
   have hUnilp : Group.IsNilpotent ↥U := inferInstance
   have hdec := typeP2_mf_internal_fitting_decomposition hG hM hP2 hKM hUM hKne hK hU
   -- Proposition 14.2(g): `|K| = q` prime and `M_σ#` is `TI` (the `M_F#`-`TI` since `M_F = M_σ`).

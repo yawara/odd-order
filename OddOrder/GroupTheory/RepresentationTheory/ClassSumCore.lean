@@ -141,6 +141,7 @@ theorem mk_inv_of_mk_eq {a b : G} (h : ConjClasses.mk a = ConjClasses.mk b) :
   exact isConj_iff.mpr ⟨c, by rw [← hc]; group⟩
 
 open scoped Classical in
+set_option backward.isDefEq.respectTransparency false in
 /-- **`(K̂' · w)(1) = ∑_{u ∈ K} w(u)`** where `K'` is the class of the inverses.  The reindexing
 `v ↦ v⁻¹` matches the two classes. -/
 theorem coeff_classSum_inv_mul_one (C : ConjClasses G) (w : MonoidAlgebra k G) :

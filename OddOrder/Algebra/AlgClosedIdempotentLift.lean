@@ -81,8 +81,8 @@ theorem isUnit_one_add_of_mem_map_maximalIdeal [Module.Finite A B] {w : B}
   rw [← Ideal.span_singleton_eq_top]
   by_contra hne
   set I : Ideal B := Ideal.span {1 + w} with hI
-  haveI : Nontrivial (B ⧸ I) := Ideal.Quotient.nontrivial_iff.mpr hne
-  haveI : Module.Finite A (B ⧸ I) :=
+  have : Nontrivial (B ⧸ I) := Ideal.Quotient.nontrivial_iff.mpr hne
+  have : Module.Finite A (B ⧸ I) :=
     Module.Finite.of_surjective (Ideal.Quotient.mkₐ A I).toLinearMap Ideal.Quotient.mk_surjective
   refine Submodule.top_ne_ideal_smul_of_le_jacobson_annihilator (M := B ⧸ I)
     (IsLocalRing.maximalIdeal_le_jacobson (Module.annihilator A (B ⧸ I))) ?_

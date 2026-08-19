@@ -58,10 +58,10 @@ theorem le_piFittingSeries_of_ladder [Finite G] (π : Set ℕ) {K : ℕ → Subg
   | zero => rw [hbot, piFittingSeries_zero]
   | succ i ih =>
     set Fi : Subgroup G := piFittingSeries π G i with hFi
-    haveI := hnorm (i + 1)
+    have := hnorm (i + 1)
     -- 商での像 K̄ とその位数評価.
     set Kbar : Subgroup (G ⧸ Fi) := (K (i + 1)).map (QuotientGroup.mk' Fi) with hKbar
-    haveI hKbarN : Kbar.Normal :=
+    have hKbarN : Kbar.Normal :=
       (hnorm (i + 1)).map (QuotientGroup.mk' Fi) (QuotientGroup.mk'_surjective Fi)
     have hcard_dvd : Nat.card ↥Kbar ∣ (K i).relIndex (K (i + 1)) := by
       have h1 : Nat.card ↥Kbar =
@@ -244,7 +244,7 @@ theorem isPiSeparable_of_isPiGroup_normal_of_quotient [Finite G] {π : Set ℕ}
     (hA : Subgroup.IsPiGroup π A ∨ Subgroup.IsPiGroup {p | p ∉ π} A)
     (hquot : IsPiSeparable π (G ⧸ A)) :
     IsPiSeparable π G := by
-  haveI := hquot
+  have := hquot
   obtain ⟨S, r, hSnorm, hSmono, hSbot, hStop, hSfac⟩ :=
     exists_normal_ladder_of_isPiSeparable (G := G ⧸ A) π
   have hbase : Subgroup.comap (QuotientGroup.mk' A) (S 0) = A := by
@@ -258,7 +258,7 @@ theorem isPiSeparable_of_isPiGroup_normal_of_quotient [Finite G] {π : Set ℕ}
     match i with
     | 0 => infer_instance
     | i + 1 =>
-      haveI := hSnorm i
+      have := hSnorm i
       exact Subgroup.Normal.comap inferInstance _
   · change Subgroup.comap (QuotientGroup.mk' A) (S r) = ⊤
     rw [hStop]
@@ -295,13 +295,13 @@ theorem isPiSeparable_of_isPiGroup_normal_of_quotient [Finite G] {π : Set ℕ}
 theorem isPiSeparable_of_mulEquiv {H : Type*} [Group H] [Finite G] [Finite H]
     (e : G ≃* H) {π : Set ℕ} (hG : IsPiSeparable π G) :
     IsPiSeparable π H := by
-  haveI := hG
+  have := hG
   obtain ⟨K, r, hnorm, hmono, hbot, htop, hfac⟩ :=
     exists_normal_ladder_of_isPiSeparable (G := G) π
   refine isPiSeparable_of_normal_ladder π
     (K := fun i => (K i).map e.toMonoidHom) (r := r) ?_ ?_ ?_ ?_
   · intro i
-    haveI := hnorm i
+    have := hnorm i
     exact (hnorm i).map e.toMonoidHom e.surjective
   · rw [hbot]
     exact Subgroup.map_bot e.toMonoidHom
@@ -443,8 +443,8 @@ theorem isPiSeparable_of_normal_of_quotient.{u} {G : Type u} [Group G] [Finite G
   by_cases hbot : N = ⊥
   · subst hbot
     exact isPiSeparable_of_mulEquiv (QuotientGroup.quotientBot (G := G')) hQ
-  · haveI := hN
-    haveI hNnt : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hbot
+  · have := hN
+    have hNnt : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hbot
     have hsup := oPiCore_sup_ne_bot_of_isPiSeparable (G := ↥N) π
     -- 非自明な characteristic π-群 or π'-群 `A ≤ N` を選ぶ.
     obtain ⟨A, hA_pi, hA_ne, hA_char⟩ :
@@ -456,8 +456,8 @@ theorem isPiSeparable_of_normal_of_quotient.{u} {G : Type u} [Group G] [Finite G
         intro h2
         exact hsup (by rw [h1, h2, sup_idem])
       · exact ⟨oPiCore π ↥N, Or.inl (oPiCore.isPiGroup _), h1, inferInstance⟩
-    haveI := hA_char
-    haveI hA'_normal : (A.map N.subtype).Normal :=
+    have := hA_char
+    have hA'_normal : (A.map N.subtype).Normal :=
       ConjAct.normal_of_characteristic_of_normal
     have hA'_ne : A.map N.subtype ≠ ⊥ := by
       rw [Ne, Subgroup.map_eq_bot_iff, Subgroup.ker_subtype, le_bot_iff]
@@ -478,25 +478,25 @@ theorem isPiSeparable_of_normal_of_quotient.{u} {G : Type u} [Group G] [Finite G
       exact Subgroup.comap_map_eq_self_of_injective N.subtype_injective A
     have hrange : f₀.range = N.map (QuotientGroup.mk' (A.map N.subtype)) := by
       rw [hf₀, MonoidHom.range_comp, Subgroup.range_subtype]
-    haveI hNsub_sep : IsPiSeparable π (↥N ⧸ f₀.ker) :=
+    have hNsub_sep : IsPiSeparable π (↥N ⧸ f₀.ker) :=
       isPiSeparable_of_mulEquiv
         (QuotientGroup.quotientMulEquivOfEq hker.symm)
         (quotient_isPiSeparable π ↥N A)
-    haveI hN'_normal : (N.map (QuotientGroup.mk' (A.map N.subtype))).Normal :=
+    have hN'_normal : (N.map (QuotientGroup.mk' (A.map N.subtype))).Normal :=
       Subgroup.Normal.map ‹N.Normal› _ (QuotientGroup.mk'_surjective _)
-    haveI hN'_sep : IsPiSeparable π ↥(N.map (QuotientGroup.mk' (A.map N.subtype))) :=
+    have hN'_sep : IsPiSeparable π ↥(N.map (QuotientGroup.mk' (A.map N.subtype))) :=
       isPiSeparable_of_mulEquiv
         ((QuotientGroup.quotientKerEquivRange f₀).trans
           (MulEquiv.subgroupCongr hrange)) hNsub_sep
     -- `(G/A')/(N/A') ≅ G/N` は π-separable (第 3 同型).
-    haveI hQQ_sep : IsPiSeparable π
+    have hQQ_sep : IsPiSeparable π
         ((G' ⧸ A.map N.subtype) ⧸ N.map (QuotientGroup.mk' (A.map N.subtype))) :=
       isPiSeparable_of_mulEquiv
         (QuotientGroup.quotientQuotientEquivQuotient (A.map N.subtype) N
           (Subgroup.map_subtype_le A)).symm hQ
     -- 帰納法で `G/A'` が π-separable → 原子拡大で締める.
     have hlt : Nat.card (G' ⧸ A.map N.subtype) < n := by
-      haveI : Nontrivial ↥(A.map N.subtype) :=
+      have : Nontrivial ↥(A.map N.subtype) :=
         (Subgroup.nontrivial_iff_ne_bot _).mpr hA'_ne
       calc Nat.card (G' ⧸ A.map N.subtype)
           < Nat.card (G' ⧸ A.map N.subtype) * Nat.card ↥(A.map N.subtype) :=
@@ -544,7 +544,7 @@ theorem isPiSeparable_of_subnormal_ladder.{u} {G : Type u} [Group G] [Finite G]
     intro G' _ _ K hmono hnorm hbot htop hfac
     have hchain : Monotone K := monotone_nat_of_le_succ hmono
     -- `N := K r` は `G'` で正規 (`K (r+1) = ⊤`).
-    haveI hN_normal : (K r).Normal := by
+    have hN_normal : (K r).Normal := by
       have hnr := hnorm r
       constructor
       intro n hn g
@@ -574,7 +574,7 @@ theorem isPiSeparable_of_subnormal_ladder.{u} {G : Type u} [Group G] [Finite G]
             ext x
             exact Iff.rfl
           rw [hset]
-          haveI := hnorm i
+          have := hnorm i
           exact Subgroup.Normal.comap inferInstance _
         · -- i ≥ r: 両項一致 (⊤) で自明.
           have h1 : min i r = r := by omega

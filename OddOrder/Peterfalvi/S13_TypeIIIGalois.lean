@@ -103,7 +103,7 @@ theorem Hypothesis.tau_zeta_sub_mapRingEquiv_inner_alignedOmegaSigma_eq_zero [Fi
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (i : Fin hyp.w1) (j : Fin hyp.w2) :
     ClassFunction.inner (hyp.tau (ζ - ClassFunction.mapRingEquiv u ζ))
       (hyp.alignedOmegaSigmaGrid hG hodd i j) = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   obtain ⟨hζuS, hζuirr, hζu1⟩ := hyp.mapRingEquiv_mem_SHC_stratum u hζS hζirr hζ1
   have hoddM : Odd (Nat.card ↥M) := hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
   have hζne : ζ.conj ≠ ζ := fun h =>
@@ -145,7 +145,7 @@ theorem Hypothesis.mapRingEquiv_tau_muColumnZero_sub_zeta [Finite G]
         (hyp.tau ((∑ r : Fin hyp.w1, hyp.muGrid hG hodd r 0) - ζ))
       = hyp.tau ((∑ r : Fin hyp.w1, hyp.muGrid hG hodd r 0) - ζ)
         + hyp.tau (ζ - ClassFunction.mapRingEquiv u ζ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hsupp : ((∑ r : Fin hyp.w1, hyp.muGrid hG hodd r 0) - ζ).support ⊆ hyp.A0 :=
     hyp.muColumnZero_sub_zeta_support hG hodd hζS hζ1
   rw [← hyp.tau_mapRingEquiv_comm u hsupp, ← map_add]
@@ -171,7 +171,7 @@ theorem Hypothesis.inner_tau_muColumnZero_sub_zeta_columnZero_const [Finite G]
         (hyp.alignedOmegaSigmaGrid hG hG.odd i' 0)
       = ClassFunction.inner (hyp.tau ((∑ r : Fin hyp.w1, hyp.muGrid hG hG.odd r 0) - ζ))
         (hyp.alignedOmegaSigmaGrid hG hG.odd i 0) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hodd : Odd (Nat.card G) := hG.odd
   obtain ⟨ρ, κ, hρinj, hκinj, hprod⟩ := hyp.exists_alignedOmegaSigmaGrid_chiFam_product hG hodd
@@ -239,7 +239,7 @@ theorem Hypothesis.inner_tau_muColumnZero_sub_zeta_rowZero_const [Finite G]
         (hyp.alignedOmegaSigmaGrid hG hG.odd 0 j')
       = ClassFunction.inner (hyp.tau ((∑ r : Fin hyp.w1, hyp.muGrid hG hG.odd r 0) - ζ))
         (hyp.alignedOmegaSigmaGrid hG hG.odd 0 j) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hodd : Odd (Nat.card G) := hG.odd
   obtain ⟨ρ, κ, hρinj, hκinj, hprod⟩ := hyp.exists_alignedOmegaSigmaGrid_chiFam_product hG hodd
@@ -294,7 +294,7 @@ theorem Hypothesis.alignedOmegaSigmaGrid_columnZero_sum_inner [Finite G]
     (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) (j : Fin hyp.w2) :
     ClassFunction.inner (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
       (hyp.alignedOmegaSigmaGrid hG hodd i j) = (if j = 0 then (1 : ℂ) else 0) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   rw [inner_sum_left, Finset.sum_eq_single i]
   · rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i i 0 j]
@@ -332,14 +332,14 @@ theorem Hypothesis.inner_tau_muColumnZero_sub_zeta_rowZero_of_residual_not_ortho
     ∀ (i : Fin hyp.w1) (j : Fin hyp.w2),
       ClassFunction.inner (hyp.tau ((∑ r : Fin hyp.w1, hyp.muGrid hG hG.odd r 0) - ζ))
         (hyp.alignedOmegaSigmaGrid hG hG.odd i j) = (if i = 0 then (1 : ℂ) else 0) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hodd : Odd (Nat.card G) := hG.odd
   let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
-  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
-  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
-  haveI : Fintype ((tic.W1.subgroupOf tic.W) →* ℂˣ) := Fintype.ofFinite _
-  haveI : Fintype ((tic.W2.subgroupOf tic.W) →* ℂˣ) := Fintype.ofFinite _
+  have : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  have : Fintype ((tic.W1.subgroupOf tic.W) →* ℂˣ) := Fintype.ofFinite _
+  have : Fintype ((tic.W2.subgroupOf tic.W) →* ℂˣ) := Fintype.ofFinite _
   let app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication tic :=
     hyp.canonicalFullDadeApp hG hodd
   have hVeq : tic.V = tic.Vdiff := rfl
@@ -386,7 +386,7 @@ theorem Hypothesis.inner_tau_muColumnZero_sub_zeta_rowZero_of_residual_not_ortho
     have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
       rw [derivedInG, Subgroup.subgroupOf,
         Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
-    haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
+    have hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
     have hnotmem : (⟨v, hvM⟩ : ↥M) ∉ (derivedInG M).subgroupOf M := by
       rw [Subgroup.mem_subgroupOf]
       exact OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived hyp.typeP hv

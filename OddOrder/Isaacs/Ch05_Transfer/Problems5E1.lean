@@ -99,8 +99,8 @@ theorem exists_normal_index_eq_prime_of_index_eq_pow [Finite G] {p : ℕ} [Fact 
     ∃ M : Subgroup G, M.Normal ∧ M.index = p := by
   classical
   have hcard : Nat.card (G ⧸ K) = p ^ a := by rw [← Subgroup.index_eq_card]; exact hidx
-  haveI hpq : IsPGroup p (G ⧸ K) := IsPGroup.of_card hcard
-  haveI : Group.IsNilpotent (G ⧸ K) := hpq.isNilpotent
+  have hpq : IsPGroup p (G ⧸ K) := IsPGroup.of_card hcard
+  have : Group.IsNilpotent (G ⧸ K) := hpq.isNilpotent
   have hne : (⊥ : Subgroup (G ⧸ K)) ≠ ⊤ := by
     intro h
     have h1 : Nat.card (G ⧸ K) = 1 := by
@@ -110,7 +110,7 @@ theorem exists_normal_index_eq_prime_of_index_eq_pow [Finite G] {p : ℕ} [Fact 
     omega
   obtain ⟨Mbar, hMco, _⟩ :=
     (IsCoatomic.eq_top_or_exists_le_coatom (⊥ : Subgroup (G ⧸ K))).resolve_left hne
-  haveI : Mbar.Normal :=
+  have : Mbar.Normal :=
     Subgroup.NormalizerCondition.normal_of_coatom Mbar
       (Group.normalizerCondition_of_isNilpotent (G := G ⧸ K)) hMco
   have hMprime : Mbar.index.Prime := (Ch01.isCoatom_iff_index_prime Mbar).mp hMco
@@ -125,14 +125,14 @@ theorem hasNormalPComplement_of_surjective {A B : Type*} [Group A] [Group B] [Fi
     {p : ℕ} [Fact p.Prime] {f : A →* B} (hf : Function.Surjective f)
     (hA : HasNormalPComplement p A) : HasNormalPComplement p B := by
   classical
-  haveI : Finite B := Finite.of_surjective f hf
+  have : Finite B := Finite.of_surjective f hf
   obtain ⟨N, hNnormal, hNcompl⟩ := hA
-  haveI := hNnormal
+  have := hNnormal
   obtain ⟨Q⟩ := (inferInstance : Nonempty (Sylow p A))
   have hpN : ¬ p ∣ Nat.card ↥N := not_dvd_card_of_isComplement'_sylow Q (hNcompl Q)
   obtain ⟨a, ha⟩ := IsPGroup.iff_card.mp Q.isPGroup'
   have hNidx : N.index = p ^ a := by rw [(hNcompl Q).symm.index_eq_card, ha]
-  haveI : (N.map f).Normal := hNnormal.map _ hf
+  have : (N.map f).Normal := hNnormal.map _ hf
   have hidxdvd : (N.map f).index ∣ p ^ a := hNidx ▸ N.index_map_dvd hf
   obtain ⟨b, _, hb⟩ := (Nat.dvd_prime_pow Fact.out).mp hidxdvd
   refine hasNormalPComplement_of_normal_of_index_eq_pow (X := N.map f) (a := b) ?_ hb
@@ -153,7 +153,7 @@ theorem opCore_ne_bot_of_minimal_non_pNilpotent [Finite G] {p : ℕ} [Fact p.Pri
   refine isPGroup_normalizerQuotientCentralizer_of_forall_hasNormalPComplement ?_
   intro X hXbot hXp
   by_cases htop : Subgroup.normalizer (X : Set G) = ⊤
-  · haveI : X.Normal := Subgroup.normalizer_eq_top_iff.mp htop
+  · have : X.Normal := Subgroup.normalizer_eq_top_iff.mp htop
     exact absurd (le_bot_iff.mp (hbot ▸ Ch01.normal_pgroup_le_opCore hXp)) hXbot
   · exact hproper _ htop
 
@@ -167,19 +167,19 @@ theorem not_exists_normal_index_eq_prime_of_minimal_non_pNilpotent [Finite G] {p
     ¬ ∃ M : Subgroup G, M.Normal ∧ M.index = p := by
   classical
   rintro ⟨M, hMnormal, hMidx⟩
-  haveI := hMnormal
+  have := hMnormal
   have hMtop : M ≠ ⊤ := by
     intro htop
     rw [htop, Subgroup.index_top] at hMidx
     exact (Fact.out : p.Prime).one_lt.ne hMidx
   obtain ⟨C', hC'normal, hC'compl⟩ := hproper M hMtop
-  haveI := hC'normal
+  have := hC'normal
   obtain ⟨S⟩ := (inferInstance : Nonempty (Sylow p ↥M))
-  haveI : C'.Characteristic := by
+  have : C'.Characteristic := by
     rw [Subgroup.characteristic_iff_map_eq]
     intro ψ
     exact map_mulAut_of_normal_pcomplement (hC'compl S) ψ
-  haveI hCnormal : (C'.map M.subtype).Normal := Ch01.characteristic_map_subtype_normal C'
+  have hCnormal : (C'.map M.subtype).Normal := Ch01.characteristic_map_subtype_normal C'
   have hpC : ¬ p ∣ Nat.card ↥(C'.map M.subtype) := by
     rw [Subgroup.card_map_of_injective (Subgroup.subtype_injective M)]
     exact not_dvd_card_of_isComplement'_sylow S (hC'compl S)
@@ -215,7 +215,7 @@ theorem hasNormalPComplement_quotient_opCore_of_forall_proper [Finite G] {p : �
       rw [← Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective O) L,
         htop, Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective O)]
     refine hasNormalPComplement_of_surjective
-      (f := ((QuotientGroup.mk' O).restrict (Subgroup.comap (QuotientGroup.mk' O) L)).codRestrict
+      (f := ((QuotientGroup.mk' O).domRestrict (Subgroup.comap (QuotientGroup.mk' O) L)).codRestrict
         L (fun x => x.2)) ?_ (hproper _ hcomap)
     rintro ⟨y, hy⟩
     obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective O y
@@ -223,7 +223,7 @@ theorem hasNormalPComplement_quotient_opCore_of_forall_proper [Finite G] {p : �
   have hne := opCore_ne_bot_of_minimal_non_pNilpotent hproperQ hQ
   -- `O_p(G ⧸ O)` の引き戻しは正規 `p`-部分群 ⟹ `O` に含まれる ⟹ 像は `⊥`
   set M : Subgroup G := (Ch01.opCore p (G ⧸ O)).comap (QuotientGroup.mk' O) with hMdef
-  haveI : M.Normal := (Ch01.opCore.normal p (G ⧸ O)).comap _
+  have : M.Normal := (Ch01.opCore.normal p (G ⧸ O)).comap _
   have hMp : IsPGroup p ↥M :=
     isPGroup_comap_mk'_of_isPGroup (Ch01.opCore_isPGroup p G) (Ch01.opCore_isPGroup p (G ⧸ O))
   have hMle : M ≤ O := Ch01.normal_pgroup_le_opCore hMp
@@ -250,14 +250,14 @@ theorem sylow_eq_opCore_of_minimal_non_pNilpotent [Finite G] {p : ℕ} [Fact p.P
   set O : Subgroup G := Ch01.opCore p G with hOdef
   obtain ⟨Kbar, hKbarN, hKbarC⟩ :=
     hasNormalPComplement_quotient_opCore_of_forall_proper hproper
-  haveI := hKbarN
+  have := hKbarN
   obtain ⟨Qbar⟩ := (inferInstance : Nonempty (Sylow p (G ⧸ O)))
   obtain ⟨a, ha⟩ := IsPGroup.iff_card.mp Qbar.isPGroup'
   have hKidx : Kbar.index = p ^ a := by rw [(hKbarC Qbar).symm.index_eq_card, ha]
   -- `a ≠ 0` なら指数 `p` の正規部分群ができて補題 2 に矛盾
   have ha0 : a = 0 := by
     by_contra hane
-    haveI : (Kbar.comap (QuotientGroup.mk' O)).Normal := hKbarN.comap _
+    have : (Kbar.comap (QuotientGroup.mk' O)).Normal := hKbarN.comap _
     have hKGidx : (Kbar.comap (QuotientGroup.mk' O)).index = p ^ a := by
       rw [Subgroup.index_comap_of_surjective _ (QuotientGroup.mk'_surjective O), hKidx]
     exact not_exists_normal_index_eq_prime_of_minimal_non_pNilpotent hproper hG
@@ -351,7 +351,7 @@ theorem card_primeFactors_erase_eq_one_of_minimal_non_pNilpotent [Finite G] {p :
         ((S : Subgroup ↥H).map H.subtype) ≤ Subgroup.centralizer (O : Set G) := by
       intro q hq S
       have hqprime : q.Prime := Nat.prime_of_mem_primeFactors hq
-      haveI : Fact q.Prime := ⟨hqprime⟩
+      have : Fact q.Prime := ⟨hqprime⟩
       set T : Subgroup G := (S : Subgroup ↥H).map H.subtype with hTdef
       have hTle : T ≤ H := Subgroup.map_subtype_le _
       have hTcard : Nat.card ↥T = Nat.card ↥(S : Subgroup ↥H) := by
@@ -385,7 +385,7 @@ theorem card_primeFactors_erase_eq_one_of_minimal_non_pNilpotent [Finite G] {p :
         rw [← hsupmap, h2, Subgroup.card_top, ← Subgroup.index_eq_card, hHcard] at h3
         exact hTne h3.symm
       obtain ⟨C, hCN, hCC⟩ := hproper (O ⊔ T) hOTne
-      haveI := hCN
+      have := hCN
       -- `|O ⊔ T| = |O| · |T|`
       have hKcard : Nat.card ↥(O ⊔ T) = Nat.card ↥O * Nat.card ↥T := by
         have hcomapK :
@@ -477,7 +477,7 @@ theorem card_primeFactors_erase_eq_one_of_minimal_non_pNilpotent [Finite G] {p :
         have heq : h * x⁻¹ = (x * h * x⁻¹) * x⁻¹ := by rw [← hcm]; group
         rw [mul_right_cancel heq]
         exact hh
-    haveI := hHnormal
+    have := hHnormal
     exact hG (hasNormalPComplement_of_normal_of_index_eq_pow (X := H) (a := m) hpH
       (by rw [hOH.index_eq_card, hOcard]))
   -- `|H|` の素因数はちょうど 1 個、そして `primeFactors |G| = {p} ∪ primeFactors |H|`

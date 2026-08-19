@@ -67,7 +67,7 @@ theorem pow_dvd_finrank_of_mem_relTraceIdeal (hp : p.Prime)
     (hf : f ∈ GAlgebra.relTraceIdeal D ⊤) (hψ : ψ f = 1) :
     p ^ ((Nat.card G).factorization p - (Nat.card ↥D).factorization p)
       ∣ Module.finrank 𝒪 L := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   -- `[G : D]` carries the `p`-part `p ^ (a - d)` by Lagrange
   have hcard : Nat.card ↥D * D.index = Nat.card G := D.card_mul_index
   have hDne : Nat.card ↥D ≠ 0 := Nat.card_pos.ne'

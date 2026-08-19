@@ -110,10 +110,10 @@ theorem grid_eq_zero_of_ncard_support_lt {ι κ : Type*} [Finite ι] [Finite κ]
     (hlt : {x | a x ≠ 0}.ncard < min (Nat.card ι) (Nat.card κ))
     (x : ι × κ) : a x = 0 := by
   classical
-  haveI : Fintype ι := Fintype.ofFinite _
-  haveI : Fintype κ := Fintype.ofFinite _
-  haveI : Fintype ↥{x : ι × κ | a x ≠ 0} := Fintype.ofFinite _
-  rw [Set.ncard_eq_toFinset_card', Set.toFinset_setOf, Nat.card_eq_fintype_card,
+  have : Fintype ι := Fintype.ofFinite _
+  have : Fintype κ := Fintype.ofFinite _
+  have : Fintype ↥{x : ι × κ | a x ≠ 0} := Fintype.ofFinite _
+  rw [Set.ncard_eq_toFinset_card', Set.toFinset_ofPred, Nat.card_eq_fintype_card,
     Nat.card_eq_fintype_card] at hlt
   by_contra hx
   set S := Finset.univ.filter (fun x => a x ≠ 0) with hS
@@ -345,7 +345,7 @@ both `≤ 4`, each would equal `3` (the only odd number in `(1, 4]`), contradict
 (`gcd 3 3 = 3 ≠ 1`).  Peterfalvi then assumes `w₁ ≥ 5` by the `W₁ ↔ W₂` symmetry. -/
 theorem sup_card_ge_five (hyp : TICyclicHypothesis G) :
     5 ≤ Nat.card hyp.W1 ∨ 5 ≤ Nat.card hyp.W2 := by
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   have h1odd : Odd (Nat.card hyp.W1) :=
     hyp.W_card_odd.of_dvd_nat (Subgroup.card_dvd_of_le hyp.W1_le_W)
   have h2odd : Odd (Nat.card hyp.W2) :=
@@ -449,8 +449,8 @@ theorem Afam_existsUnique_common (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     ∃! z, ∀ χ₁ : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1},
       z ∈ hyp.Afam hVeq app χ₁ χ₂₀ := by
   classical
-  haveI : Finite G := Finite.of_fintype G
-  haveI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have : Finite G := Finite.of_fintype G
+  have : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
   have hcard : 4 ≤ Fintype.card {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} := by
     have h1 : Fintype.card {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1}
         = Nat.card hyp.W1 - 1 := by
@@ -471,9 +471,9 @@ theorem exists_colCommon (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     ∃ z : {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} → ClassFunction G ℂ,
       ∀ q p, z q ∈ hyp.Afam hVeq app p q := by
   classical
-  haveI : Finite G := Finite.of_fintype G
-  haveI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
-  haveI : Nontrivial {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} := by
+  have : Finite G := Finite.of_fintype G
+  have : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have : Nontrivial {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} := by
     rw [← Fintype.one_lt_card_iff_nontrivial, Fintype.card_subtype_compl, Fintype.card_subtype_eq,
       ← Nat.card_eq_fintype_card, hyp.card_charGroup_subgroupOf hyp.W2_le_W]
     have hodd : Odd (Nat.card hyp.W2) :=
@@ -499,10 +499,10 @@ theorem exists_rowCommon (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     ∃ w : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} → ClassFunction G ℂ,
       ∀ p q, w p ∈ hyp.Afam hVeq app p q := by
   classical
-  haveI : Finite G := Finite.of_fintype G
-  haveI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
-  haveI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
-  haveI : Nontrivial {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} := by
+  have : Finite G := Finite.of_fintype G
+  have : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have : Nontrivial {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} := by
     rw [← Fintype.one_lt_card_iff_nontrivial, Fintype.card_subtype_compl, Fintype.card_subtype_eq,
       ← Nat.card_eq_fintype_card, hyp.card_charGroup_subgroupOf hyp.W1_le_W]
     have hodd : Odd (Nat.card hyp.W1) :=
@@ -550,16 +550,16 @@ theorem exists_chiFamily_of_decomposition (hyp : TICyclicHypothesis G) [Fintype 
         p ≠ 1 → q ≠ 1 → app.tau.toDadeMap (hyp.alpha hVeq p q)
           = trivialClassFunction G - χ (p, 1) - χ (1, q) + χ (p, q) := by
   classical
-  haveI : Finite G := Finite.of_fintype G
-  haveI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
-  haveI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
-  haveI : Nonempty {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} := by
+  have : Finite G := Finite.of_fintype G
+  have : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have : Nonempty {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} := by
     rw [← Fintype.card_pos_iff, Fintype.card_subtype_compl, Fintype.card_subtype_eq,
       ← Nat.card_eq_fintype_card, hyp.card_charGroup_subgroupOf hyp.W1_le_W]
     have hgt : 1 < Nat.card hyp.W1 := Finite.one_lt_card_iff_nontrivial.mpr
       ((Subgroup.nontrivial_iff_ne_bot _).mpr hyp.W1_nontrivial)
     omega
-  haveI : Nonempty {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} := by
+  have : Nonempty {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} := by
     rw [← Fintype.card_pos_iff, Fintype.card_subtype_compl, Fintype.card_subtype_eq,
       ← Nat.card_eq_fintype_card, hyp.card_charGroup_subgroupOf hyp.W2_le_W]
     have hgt : 1 < Nat.card hyp.W2 := Finite.one_lt_card_iff_nontrivial.mpr
@@ -713,9 +713,9 @@ theorem exists_chiFamily_symm (hyp : TICyclicHypothesis G) [Fintype hyp.W]
         p ≠ 1 → q ≠ 1 → app.tau.toDadeMap (hyp.alpha hVeq p q)
           = trivialClassFunction G - χ (p, 1) - χ (1, q) + χ (p, q) := by
   classical
-  haveI : Finite G := Finite.of_fintype G
-  haveI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
-  haveI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have : Finite G := Finite.of_fintype G
+  have : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
   obtain ⟨z, hz⟩ := hyp.exists_colCommon hVeq app hw1
   obtain ⟨w, hw⟩ := hyp.exists_rowCommon hVeq app hw2
   have hι : 4 ≤ Fintype.card {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} := by
@@ -752,9 +752,9 @@ theorem exists_chiFamily_two_col (hyp : TICyclicHypothesis G) [Fintype hyp.W]
         p ≠ 1 → q ≠ 1 → app.tau.toDadeMap (hyp.alpha hVeq p q)
           = trivialClassFunction G - χ (p, 1) - χ (1, q) + χ (p, q) := by
   classical
-  haveI : Finite G := Finite.of_fintype G
-  haveI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
-  haveI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have : Finite G := Finite.of_fintype G
+  have : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
   obtain ⟨z, hz⟩ := hyp.exists_colCommon hVeq app hw1
   have hι : 4 ≤ Fintype.card {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} := by
     rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq, ← Nat.card_eq_fintype_card,
@@ -792,9 +792,9 @@ theorem exists_chiFamily_transpose (hyp : TICyclicHypothesis G) [Fintype hyp.W]
         p ≠ 1 → q ≠ 1 → app.tau.toDadeMap (hyp.alpha hVeq p q)
           = trivialClassFunction G - χ (p, 1) - χ (1, q) + χ (p, q) := by
   classical
-  haveI : Finite G := Finite.of_fintype G
-  haveI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
-  haveI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have : Finite G := Finite.of_fintype G
+  have : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
   obtain ⟨wRow, hwRow⟩ := hyp.exists_rowCommon hVeq app hw2
   have hκT : 4 ≤ Fintype.card {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} := by
     rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq, ← Nat.card_eq_fintype_card,
@@ -864,7 +864,7 @@ theorem exists_chiFamily (hyp : TICyclicHypothesis G) [Fintype hyp.W]
       ∀ (p : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q : (hyp.W2.subgroupOf hyp.W) →* ℂˣ),
         p ≠ 1 → q ≠ 1 → app.tau.toDadeMap (hyp.alpha hVeq p q)
           = trivialClassFunction G - χ (p, 1) - χ (1, q) + χ (p, q) := by
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   have hodd1 : Odd (Nat.card hyp.W1) :=
     hyp.W_card_odd.of_dvd_nat (Subgroup.card_dvd_of_le hyp.W1_le_W)
   have hodd2 : Odd (Nat.card hyp.W2) :=

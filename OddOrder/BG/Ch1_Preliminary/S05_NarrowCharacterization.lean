@@ -45,8 +45,8 @@ theorem isElementaryAbelian_of_card_prime [Finite R] {p : ℕ} [Fact p.Prime]
     {S : Subgroup R} (hS : Nat.card S = p) : S.IsElementaryAbelian p := by
   have hScyc : IsCyclic S := isCyclic_of_prime_card hS
   constructor
-  · haveI : IsCyclic S := hScyc
-    letI : CommGroup S := IsCyclic.commGroup
+  · have : IsCyclic S := hScyc
+    let : CommGroup S := IsCyclic.commGroup
     intro x y
     exact mul_comm x y
   · intro x
@@ -83,8 +83,8 @@ private theorem sup_eq_of_card_prime_ne_of_le_isElementaryAbelian_card_prime_sq
       have hInf_eq_K : H' ⊓ K' = K' :=
         Subgroup.eq_of_le_of_card_ge inf_le_right (by rw [hInf_card, hK'card])
       exact hH'K'ne (hInf_eq_H.symm.trans hInf_eq_K)
-  letI : IsMulCommutative E := IsMulCommutative.of_comm hE.comm
-  haveI : H'.Normal := by infer_instance
+  let : IsMulCommutative E := IsMulCommutative.of_comm hE.comm
+  have : H'.Normal := by infer_instance
   have hsup_card : Nat.card ↥(H' ⊔ K') = p ^ 2 := by
     have hcard := Subgroup.card_HK_mul_card_inf_eq_card_mul_card H' K'
     rw [← Subgroup.normal_mul H' K', hInf_bot, Subgroup.card_bot, hH'card, hK'card,
@@ -170,7 +170,7 @@ private theorem exists_elementaryAbelian_card_prime_sq_le_centralizer_of_card_pr
   obtain ⟨A, hA⟩ := scn3_nonempty_of_three_le_pRank hp hpg h3
   obtain ⟨B, hB_normal, hB_elem, hBcard⟩ :=
     exists_normal_isElementaryAbelian_card_prime_cube_of_scn3 hpg hA
-  haveI : B.Normal := hB_normal
+  have : B.Normal := hB_normal
   let C : Subgroup R := Subgroup.centralizer (S : Set R)
   have hS_elem : S.IsElementaryAbelian p := isElementaryAbelian_of_card_prime hScard
   have hB_ne_bot : B ≠ ⊥ := by
@@ -234,7 +234,7 @@ private theorem exists_elementaryAbelian_card_prime_sq_le_centralizer_of_card_pr
   have hE0_elem : E0.IsElementaryAbelian p := by
     simpa [E0] using
       Subgroup.IsElementaryAbelian.sup_of_le_centralizer hS_elem hU_elem hS_le_cent_U
-  haveI hU_normal : U.Normal := by
+  have hU_normal : U.Normal := by
     refine { conj_mem := fun x hx g => ?_ }
     have hx_center : x ∈ Subgroup.center R := hU_le_center hx
     have hconj : g * x * g⁻¹ = x := by
@@ -310,7 +310,7 @@ theorem le_of_inf_ne_bot_of_card_prime
     (hScard : Nat.card S = p) (hInf_ne : S ⊓ H ≠ ⊥) : S ≤ H := by
   classical
   let L : Subgroup S := (S ⊓ H).subgroupOf S
-  haveI : Fact (Nat.card S).Prime := ⟨by rw [hScard]; exact (Fact.out : p.Prime)⟩
+  have : Fact (Nat.card S).Prime := ⟨by rw [hScard]; exact (Fact.out : p.Prime)⟩
   rcases Subgroup.eq_bot_or_eq_top_of_prime_card L with hLbot | hLtop
   · exfalso
     apply hInf_ne
@@ -358,7 +358,7 @@ private theorem sup_omega1Center_maximalElementaryAbelian_of_centralizer_pRank_l
     simpa [Z] using
       inf_omega1Center_eq_bot_of_card_prime_centralizer_pRank_le_two
         h3 hScard hSrank
-  haveI hZ_normal : Z.Normal := by
+  have hZ_normal : Z.Normal := by
     refine { conj_mem := fun x hx g => ?_ }
     have hx_center : x ∈ Subgroup.center R := omega1Center_le_center hx
     have hconj : g * x * g⁻¹ = x := by
@@ -446,7 +446,7 @@ private theorem centralizer_eq_sup_inf_of_card_prime_inf_bot_index_prime
     intro c
     apply Subtype.ext
     exact (Subgroup.mem_centralizer_iff.mp c.2 (s : R) hs).symm
-  haveI hSsub_normal : Ssub.Normal := by
+  have hSsub_normal : Ssub.Normal := by
     refine { conj_mem := fun x hx g => ?_ }
     have hx_center : x ∈ Subgroup.center C := hSsub_le_center hx
     have hconj : g * x * g⁻¹ = x := by
@@ -633,8 +633,8 @@ theorem isCyclic_of_le_centralizer_of_inf_eq_bot_of_pRank_le_two
     change (x : R) = 1
     have hxR : (x : R) ∈ S ⊓ E := ⟨hx.1, hx.2⟩
     rwa [hSE_inf, Subgroup.mem_bot] at hxR
-  letI : IsMulCommutative F := IsMulCommutative.of_comm hF_elem.comm
-  haveI : Ssub.Normal := by infer_instance
+  let : IsMulCommutative F := IsMulCommutative.of_comm hF_elem.comm
+  have : Ssub.Normal := by infer_instance
   have hsup_card : Nat.card ↥(Ssub ⊔ Esub) = p * p ^ 2 := by
     have hcard := Subgroup.card_HK_mul_card_inf_eq_card_mul_card Ssub Esub
     rw [← Subgroup.normal_mul Ssub Esub, hsub_inf, Subgroup.card_bot, hSsub_card,

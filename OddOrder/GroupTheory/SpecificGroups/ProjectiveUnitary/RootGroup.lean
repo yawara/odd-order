@@ -147,7 +147,7 @@ def equivSigma (n : ℕ) :
 /-- The Hermitian root group has exact order `q³ = 2 ^ (3 * n)`. -/
 theorem natCard (n : ℕ) (hn : 0 < n) :
     Nat.card (RootGroup n) = 2 ^ (3 * n) := by
-  letI := Fintype.ofFinite (Field n)
+  let := Fintype.ofFinite (Field n)
   rw [Nat.card_congr (equivSigma n), Nat.card_sigma]
   simp_rw [natCard_add_star_eq_mul_star n hn]
   rw [Finset.sum_const, Finset.card_univ, ← Nat.card_eq_fintype_card,

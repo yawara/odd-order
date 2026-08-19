@@ -54,7 +54,7 @@ theorem sum_pSubgroup_coeff_classSum_mul (P : Subgroup G) [Fintype ↥P] (C D : 
             * (Module.finrank K (Representation.invariants
                 ((wedderburnRepresentation e i).comp P.subtype)) : K) := by
   classical
-  haveI : Invertible (Fintype.card ↥P : K) :=
+  have : Invertible (Fintype.card ↥P : K) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Fintype.card_ne_zero)
   -- Burnside, summed over `P`
   have hburn : ∀ x : ↥P, (Nat.card G : K)

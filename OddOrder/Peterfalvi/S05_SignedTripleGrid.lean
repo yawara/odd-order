@@ -35,7 +35,7 @@ theorem neg_not_mem_self (hG : IsSignedTripleGrid A) {i : ι} {j : κ} {x : Clas
 theorem common_unique [Fintype ι] (hG : IsSignedTripleGrid A) (hι : 2 ≤ Fintype.card ι) {j₀ : κ}
     {z z' : ClassFunction G ℂ} (hz : ∀ i, z ∈ A i j₀) (hz' : ∀ i, z' ∈ A i j₀) : z = z' := by
   classical
-  haveI : Nontrivial ι := Fintype.one_lt_card_iff_nontrivial.mp (by omega)
+  have : Nontrivial ι := Fintype.one_lt_card_iff_nontrivial.mp (by omega)
   obtain ⟨i₁, i₂, h12⟩ := exists_pair_ne ι
   have hcard : (A i₁ j₀ ∩ A i₂ j₀).card = 1 := hG.inter_L i₁ i₂ j₀ j₀ (Or.inr ⟨h12, rfl⟩)
   have hle := Finset.card_le_one.mp (le_of_eq hcard)
@@ -51,7 +51,7 @@ theorem exists_triangle_of_not_exists_common [Fintype ι] (hG : IsSignedTripleGr
     ∃ i₁ i₂ i₃ : ι, i₁ ≠ i₂ ∧ i₁ ≠ i₃ ∧ i₂ ≠ i₃ ∧
       ¬ ∃ w, w ∈ A i₁ j₀ ∧ w ∈ A i₂ j₀ ∧ w ∈ A i₃ j₀ := by
   classical
-  haveI : Nontrivial ι := Fintype.one_lt_card_iff_nontrivial.mp (by omega)
+  have : Nontrivial ι := Fintype.one_lt_card_iff_nontrivial.mp (by omega)
   obtain ⟨i₁, i₂, h12⟩ := exists_pair_ne ι
   have hcard : (A i₁ j₀ ∩ A i₂ j₀).card = 1 := hG.inter_L i₁ i₂ j₀ j₀ (Or.inr ⟨h12, rfl⟩)
   obtain ⟨z, hz⟩ := Finset.card_eq_one.mp hcard
@@ -1013,7 +1013,7 @@ theorem symm_cell_decomposition [Fintype ι] [Fintype κ] (hG : IsSignedTripleGr
     ∃ φ : ClassFunction G ℂ, A i j = {zc, wr, φ} ∧ zc ≠ wr ∧ zc ≠ φ ∧ wr ≠ φ := by
   classical
   obtain ⟨j', hj'⟩ : ∃ j' : κ, j ≠ j' := by
-    haveI : Nontrivial κ := Fintype.one_lt_card_iff_nontrivial.mp (by omega)
+    have : Nontrivial κ := Fintype.one_lt_card_iff_nontrivial.mp (by omega)
     obtain ⟨a, b, hab⟩ := exists_pair_ne κ
     rcases eq_or_ne j a with rfl | ha
     · exact ⟨b, hab⟩
@@ -1142,8 +1142,8 @@ theorem symm_orthonormal_family [Fintype ι] [Fintype κ] (hG : IsSignedTripleGr
       ∀ a b, ClassFunction.inner (gridFamily z w φ a) (gridFamily z w φ b)
         = if a = b then 1 else 0 := by
   classical
-  haveI : Nonempty ι := Fintype.card_pos_iff.mp (by omega)
-  haveI : Nonempty κ := Fintype.card_pos_iff.mp (by omega)
+  have : Nonempty ι := Fintype.card_pos_iff.mp (by omega)
+  have : Nonempty κ := Fintype.card_pos_iff.mp (by omega)
   have hcell : ∀ i j, ∃ φ, A i j = {z j, w i, φ} ∧ z j ≠ w i ∧ z j ≠ φ ∧ w i ≠ φ := fun i j =>
     hG.symm_cell_decomposition hι (by omega) (fun i' => hz j i') (fun j' => hw i j')
   choose φ hφcell hd1 hd2 hd3 using hcell
@@ -1211,7 +1211,7 @@ theorem two_col_orthonormal_family [Fintype ι] (hG : IsSignedTripleGrid A)
       ∀ a b, ClassFunction.inner (gridFamily z m φ a) (gridFamily z m φ b)
         = if a = b then 1 else 0 := by
   classical
-  haveI : Nonempty ι := Fintype.card_pos_iff.mp (by omega)
+  have : Nonempty ι := Fintype.card_pos_iff.mp (by omega)
   have hjft : j false ≠ j true := hj.ne (by decide)
   -- per-row decomposition: row-meet `m i` (in both reference cells) and thirds `φ i b`
   have hdec : ∀ i, ∃ (mi : ClassFunction G ℂ) (φi : Bool → ClassFunction G ℂ),

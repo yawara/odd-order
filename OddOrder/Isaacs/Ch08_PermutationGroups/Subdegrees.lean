@@ -141,7 +141,7 @@ theorem subdegree_gap_le [IsPreprimitive G Ω] (α : Ω)
       rw [mem_orbitalAt_iff]
       exact smul_pair_mem_orbit ((h : G)) hγβ
     -- cardinality bookkeeping
-    haveI := Fintype.ofFinite Ω
+    have := Fintype.ofFinite Ω
     have hU2 : Set.ncard (⋃ c ∈ orbit (stabilizer G α) γ,
         orbitalAt (orbit G q) c) ≤
         Set.ncard (orbit (stabilizer G α) γ) * M := by

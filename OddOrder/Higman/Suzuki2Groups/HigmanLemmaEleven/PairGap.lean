@@ -296,7 +296,7 @@ theorem higmanLemmaEleven_pairGap_of_pairWeight_eq_frobeniusShift
     have hnuOne : nu ^ (2 ^ n - 1) = 1 := hprimNu.pow_eq_one
     rw [hnuZero, zero_pow hqpos.ne'] at hnuOne
     exact zero_ne_one hnuOne
-  haveI : Fintype L := Fintype.ofFinite L
+  have : Fintype L := Fintype.ofFinite L
   have hcard : Fintype.card L = 2 ^ m := by
     rw [← Nat.card_eq_fintype_card,
       Module.natCard_eq_pow_finrank (K := ZMod 2), hfin]

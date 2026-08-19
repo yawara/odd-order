@@ -202,14 +202,14 @@ theorem distinguishedNuAt_chiRhoNormSq_ge (i : Fin k) :
       (F.familyHypothesis71).chiRhoNormSq
         (F.distinguishedNuAt hodd hnilp C hFrob i) i := by
   classical
-  letI : Fintype ↥(F.L i) := (F.familyHypothesis71).fintypeL i
-  letI : Invertible (Nat.card ↥(F.L i) : ℂ) :=
+  let : Fintype ↥(F.L i) := (F.familyHypothesis71).fintypeL i
+  let : Invertible (Nat.card ↥(F.L i) : ℂ) :=
     (F.familyHypothesis71).invertibleL i
-  letI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
-  letI : Invertible
+  let : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
+  let : Invertible
       (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : ((F.H i).subgroupOf (F.L i)).Normal := (hFrob i).isNormal
+  let : ((F.H i).subgroupOf (F.L i)).Normal := (hFrob i).isNormal
   let H78 := F.hypothesis78 i hodd (hnilp i) (C i) (hFrob i)
   have hbound := F.hypothesis78_zetaNuRhoNormSq_ge_at
     i hodd (hnilp i) (C i) (hFrob i)

@@ -86,6 +86,7 @@ theorem inner_sum_left {ι : Type*} (s : Finset ι) (f : ι → ClassFunction G 
       rw [Finset.sum_insert ha, Finset.sum_insert ha, ClassFunction.inner_add_left, ih]
 
 open scoped Classical in
+set_option backward.isDefEq.respectTransparency false in
 /-- Orthonormality at the level of irreducible class functions (not the subtype index):
 for `a, b` in `irreducibleCharacters G`, `⟨a, b⟩ = δ_{a,b}`. -/
 theorem irr_cf_inner {a b : ClassFunction G ℂ}
@@ -571,8 +572,8 @@ omit [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)] in
 theorem finrank_pos_of_isIrreducible {V : Type} [AddCommGroup V] [Module ℂ V]
     [FiniteDimensional ℂ V] (ρ : Representation ℂ G V) (hρ : Representation.IsIrreducible ρ) :
     0 < Module.finrank ℂ V := by
-  haveI := hρ
-  haveI : Nontrivial V :=
+  have := hρ
+  have : Nontrivial V :=
     IsSimpleModule.nontrivial (R := MonoidAlgebra ℂ G) (M := ρ.asModule)
   exact Module.finrank_pos
 
@@ -585,6 +586,7 @@ theorem irreducibleCharacter_apply_one_eq_pos_natCast (χ : IrreducibleCharacter
   exact ⟨Module.finrank ℂ V, finrank_pos_of_isIrreducible ρ hρ, by
     rw [congrFun hχ 1, ρ.char_one]⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Norm-2 virtual character is a difference of two distinct irreducible characters.**
 If `φ ∈ ZIrr G` has squared norm `2` and vanishes at `1`, then `φ = α - β` for distinct
 irreducible characters `α, β`.  This is the layer-2 → layer-3 bridge for Peterfalvi §3

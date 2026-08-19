@@ -86,7 +86,7 @@ theorem derivedInG_le_sup_of_normal {H K N : Subgroup G} (hKH : K ≤ H) (hNH : 
     (hsup : K ⊔ N = H) (hKnorm : (K.subgroupOf H).Normal) :
     derivedInG H ≤ K ⊔ derivedInG N := by
   classical
-  haveI : (K.subgroupOf H).Normal := hKnorm
+  have : (K.subgroupOf H).Normal := hKnorm
   have hsupTop : K.subgroupOf H ⊔ N.subgroupOf H = ⊤ := by
     apply Subgroup.map_injective H.subtype_injective
     rw [Subgroup.map_sup, Subgroup.subgroupOf_map_subtype, Subgroup.subgroupOf_map_subtype,
@@ -128,7 +128,7 @@ theorem card_normal_sup_mul_card_inf {H K L : Subgroup G} (hKH : K ≤ H) (hLH :
     (hKnorm : (K.subgroupOf H).Normal) :
     Nat.card ↥(K ⊔ L) * Nat.card ↥(K ⊓ L) = Nat.card ↥K * Nat.card ↥L := by
   classical
-  haveI : (K.subgroupOf H).Normal := hKnorm
+  have : (K.subgroupOf H).Normal := hKnorm
   have hsupSub : K.subgroupOf H ⊔ L.subgroupOf H = (K ⊔ L).subgroupOf H := by
     apply Subgroup.map_injective H.subtype_injective
     rw [Subgroup.map_sup, Subgroup.subgroupOf_map_subtype, Subgroup.subgroupOf_map_subtype,
@@ -153,7 +153,7 @@ theorem card_normal_sup_mul_card_inf {H K L : Subgroup G} (hKH : K ≤ H) (hLH :
 theorem Msigma_commutator_M_le (M : Subgroup G) :
     ⁅S10.Msigma M, M⁆ ≤ S10.Msigma M := by
   classical
-  haveI : ((S10.Msigma M).subgroupOf M).Normal := by rw [S10.Msigma_subgroupOf]; infer_instance
+  have : ((S10.Msigma M).subgroupOf M).Normal := by rw [S10.Msigma_subgroupOf]; infer_instance
   have h1 : ⁅(S10.Msigma M).subgroupOf M, (⊤ : Subgroup ↥M)⁆ ≤ (S10.Msigma M).subgroupOf M :=
     Subgroup.commutator_le_left _ _
   have h2 := Subgroup.map_mono (f := M.subtype) h1
@@ -230,7 +230,7 @@ theorem exists_sylow_frattini_decomp [Finite G] (hG : IsMinimalSimpleOdd G)
     omega
   -- `M*_β ≤ D`, normal in `↥D`, and a `q′`-group.
   have hMβD : S10.Mbeta Mstar ≤ D := Mbeta_le_derived hG hMstar
-  haveI hMβnorm : ((S10.Mbeta Mstar).subgroupOf D).Normal :=
+  have hMβnorm : ((S10.Mbeta Mstar).subgroupOf D).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hMβD).mpr
       (hDM.trans (le_normalizer_opiCoreInG (S10.beta Mstar) Mstar))
   have hNq' : ¬ q ∣ Nat.card ↥((S10.Mbeta Mstar).subgroupOf D) := by
@@ -239,7 +239,7 @@ theorem exists_sylow_frattini_decomp [Finite G] (hG : IsMinimalSimpleOdd G)
     exact hqβ (isPiSubgroup_opiCoreInG (S10.beta Mstar) Mstar q
       (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩))
   -- `M*_β ⊔ Q ◁ D` (nilpotent quotient `D/M*_β`).
-  haveI hMβQnorm : ((S10.Mbeta Mstar).subgroupOf D ⊔ (Q : Subgroup ↥D)).Normal :=
+  have hMβQnorm : ((S10.Mbeta Mstar).subgroupOf D ⊔ (Q : Subgroup ↥D)).Normal :=
     S10.normal_sup_sylow_of_quotient_nilpotent
       (S10.derivedQuotientMbeta_isNilpotent hG hMstar) hNq' Q
   set K : Subgroup G := opiCoreInG (S10.beta Mstar ∪ {q}) D with hKdef
@@ -281,7 +281,7 @@ theorem exists_sylow_frattini_decomp [Finite G] (hG : IsMinimalSimpleOdd G)
     have hdvd : q ^ (Nat.card ↥D).factorization q ∣ Nat.card ↥K :=
       hYcard ▸ Subgroup.card_dvd_of_le hY_le_K
     exact (Nat.Prime.pow_dvd_iff_le_factorization Fact.out Nat.card_pos.ne').mp hdvd
-  haveI hKnorm : (K.subgroupOf Mstar).Normal :=
+  have hKnorm : (K.subgroupOf Mstar).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer (hKD.trans hDM)).mpr
       (le_normalizer_opiCoreInG_of_le_normalizer (S10.beta Mstar ∪ {q})
         (S10.le_normalizer_derivedInG Mstar))
@@ -329,7 +329,7 @@ theorem not_mem_tau2_of_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
   intro hpτ2
   -- step 1: a prime `q ∈ σ(M) ∩ π(M*')`.
   obtain ⟨q, hqp, hqσ, hqπ⟩ := exists_sigma_prime_dvd_derived_Mstar hcomm
-  haveI : Fact q.Prime := ⟨hqp⟩
+  have : Fact q.Prime := ⟨hqp⟩
   -- conjugacy is symmetric (inlined `not_conj_symm`).
   have hnc' : ¬ ∃ g : G, MulAut.conj g • Mstar = M := by
     rintro ⟨g, hg⟩
@@ -349,7 +349,7 @@ theorem not_mem_tau2_of_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
   have hKM : K ≤ Mstar := hKD.trans hDM
   have hNM : N ≤ Mstar := inf_le_left
   -- `K ⊴ M*` (characteristic in `M*' ⊴ M*`).
-  haveI hKnorm : (K.subgroupOf Mstar).Normal :=
+  have hKnorm : (K.subgroupOf Mstar).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hKM).mpr
       (le_normalizer_opiCoreInG_of_le_normalizer (S10.beta Mstar ∪ {q})
         (S10.le_normalizer_derivedInG Mstar))
@@ -505,7 +505,7 @@ theorem mem_idealPrime_of_tau1_of_interaction [Finite G] (hG : IsMinimalSimpleOd
   by_contra hnotideal
   -- shared setup (cf. step (b)); `p ∉ β(M*)` here comes from `¬idealPrime`.
   obtain ⟨q, hqp, hqσ, hqπ⟩ := exists_sigma_prime_dvd_derived_Mstar hcomm
-  haveI : Fact q.Prime := ⟨hqp⟩
+  have : Fact q.Prime := ⟨hqp⟩
   have hnc' : ¬ ∃ g : G, MulAut.conj g • Mstar = M := by
     rintro ⟨g, hg⟩
     exact hnc ⟨g⁻¹, by rw [← hg, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]⟩
@@ -521,7 +521,7 @@ theorem mem_idealPrime_of_tau1_of_interaction [Finite G] (hG : IsMinimalSimpleOd
   have hKD : K ≤ derivedInG Mstar := Subgroup.map_subtype_le _
   have hKM : K ≤ Mstar := hKD.trans hDM
   have hNM : N ≤ Mstar := inf_le_left
-  haveI hKnorm : (K.subgroupOf Mstar).Normal :=
+  have hKnorm : (K.subgroupOf Mstar).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hKM).mpr
       (le_normalizer_opiCoreInG_of_le_normalizer (S10.beta Mstar ∪ {q})
         (S10.le_normalizer_derivedInG Mstar))
@@ -575,14 +575,14 @@ theorem derivedQuotientMalpha_isNilpotent [Finite G] (hG : IsMinimalSimpleOdd G)
   classical
   have hMβD : S10.Mbeta M ≤ derivedInG M := Mbeta_le_derived hG hM
   have hMle : derivedInG M ≤ M := Subgroup.map_subtype_le _
-  haveI hMβnorm : ((S10.Mbeta M).subgroupOf (derivedInG M)).Normal :=
+  have hMβnorm : ((S10.Mbeta M).subgroupOf (derivedInG M)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hMβD).mpr
       (hMle.trans (le_normalizer_opiCoreInG (S10.beta M) M))
-  haveI := S10.derivedQuotientMbeta_isNilpotent hG hM
+  have := S10.derivedQuotientMbeta_isNilpotent hG hM
   have hsub : (S10.Mbeta M).subgroupOf (derivedInG M) ≤
       (S10.Malpha M).subgroupOf (derivedInG M) :=
     Subgroup.subgroupOf_mono _ (Subgroup.map_mono (Ch03.oPiCore_mono (S10.beta_subset_alpha M) ↥M))
-  haveI : Group.IsNilpotent
+  have : Group.IsNilpotent
       ((↥(derivedInG M) ⧸ (S10.Mbeta M).subgroupOf (derivedInG M)) ⧸
         ((S10.Malpha M).subgroupOf (derivedInG M)).map
           (QuotientGroup.mk' ((S10.Mbeta M).subgroupOf (derivedInG M)))) :=
@@ -653,7 +653,7 @@ theorem sylow_le_opiCoreInG_alpha_p [Finite G] (hG : IsMinimalSimpleOdd G)
   have hDM : D ≤ Mstar := Subgroup.map_subtype_le _
   have hMαD : S10.Malpha Mstar ≤ D :=
     (S10.Malpha_le_Msigma hG hMstar).trans (S10.Msigma_le_derived hG hMstar)
-  haveI hMαnorm : ((S10.Malpha Mstar).subgroupOf D).Normal :=
+  have hMαnorm : ((S10.Malpha Mstar).subgroupOf D).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hMαD).mpr
       (hDM.trans (le_normalizer_opiCoreInG (S10.alpha Mstar) Mstar))
   by_cases hpα : p ∈ S10.alpha Mstar
@@ -689,13 +689,13 @@ theorem sylow_le_opiCoreInG_alpha_p [Finite G] (hG : IsMinimalSimpleOdd G)
       rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMαD).toEquiv]
       exact fun hdvd => hpα (S10.Malpha_isPiGroup Mstar p
         (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩))
-    haveI hSupNorm : ((S10.Malpha Mstar).subgroupOf D ⊔ (Q : Subgroup ↥D)).Normal :=
+    have hSupNorm : ((S10.Malpha Mstar).subgroupOf D ⊔ (Q : Subgroup ↥D)).Normal :=
       S10.normal_sup_sylow_of_quotient_nilpotent
         (derivedQuotientMalpha_isNilpotent hG hMstar) hNp' Q
     set MaS : Subgroup G :=
       ((S10.Malpha Mstar).subgroupOf D ⊔ (Q : Subgroup ↥D)).map D.subtype with hMaSdef
     have hMaS_le_D : MaS ≤ D := Subgroup.map_subtype_le _
-    haveI hMaS_norm : (MaS.subgroupOf D).Normal := by
+    have hMaS_norm : (MaS.subgroupOf D).Normal := by
       rw [hMaSdef, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective D.subtype_injective]
       exact hSupNorm
     have hMaS_pi : Subgroup.IsPiSubgroup (S10.alpha Mstar ∪ {p}) MaS := by
@@ -751,7 +751,7 @@ theorem pSubgroup_centralizes_Msigma_inf [Finite G] (hG : IsMinimalSimpleOdd G)
   have hDM : derivedInG Mstar ≤ Mstar := Subgroup.map_subtype_le _
   set Ka : Subgroup G := opiCoreInG (S10.alpha Mstar ∪ {p}) (derivedInG Mstar) with hKadef
   have hKaM : Ka ≤ Mstar := (Subgroup.map_subtype_le _).trans hDM
-  haveI hKa_norm : (Ka.subgroupOf Mstar).Normal :=
+  have hKa_norm : (Ka.subgroupOf Mstar).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hKaM).mpr
       (le_normalizer_opiCoreInG_of_le_normalizer (S10.alpha Mstar ∪ {p})
         (S10.le_normalizer_derivedInG Mstar))

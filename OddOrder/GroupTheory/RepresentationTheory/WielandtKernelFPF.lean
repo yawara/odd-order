@@ -65,12 +65,12 @@ theorem exists_fixed_simple_free_of_fpf
       (∀ γ : Γ, simplesAction φ (ψ γ) i₀ = i₀) ∧
       (∀ (i : Fin N) (γ : Γ), i ≠ i₀ → simplesAction φ (ψ γ) i = i → γ = 1) := by
   classical
-  haveI : Fintype G := Fintype.ofFinite _
-  haveI : Finite (ConjClasses G) := Finite.of_surjective _ ConjClasses.mk_surjective
-  haveI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  have : Fintype G := Fintype.ofFinite _
+  have : Finite (ConjClasses G) := Finite.of_surjective _ ConjClasses.mk_surjective
+  have : Fintype (ConjClasses G) := Fintype.ofFinite _
   -- The canonical induced `Γ`-actions, through which 3d.3c applies (`hcl`/`hsi` are then `rfl`).
-  letI mulCl : MulAction Γ (ConjClasses G) := MulAction.compHom (ConjClasses G) ψ
-  letI mulSi : MulAction Γ (Fin N) := MulAction.compHom (Fin N) ((simplesAction φ).comp ψ)
+  let mulCl : MulAction Γ (ConjClasses G) := MulAction.compHom (ConjClasses G) ψ
+  let mulSi : MulAction Γ (Fin N) := MulAction.compHom (Fin N) ((simplesAction φ).comp ψ)
   have hcl : ∀ (γ : Γ) (C : ConjClasses G), γ • C = ψ γ • C := fun _ _ => rfl
   have hsi : ∀ (γ : Γ) (i : Fin N), γ • i = simplesAction φ (ψ γ) i := fun _ _ => rfl
   obtain ⟨i₀, hi₀fix, hi₀uniq, hi₀free⟩ :=
@@ -318,9 +318,9 @@ theorem finrank_eq_card_mul_finrank_invariants_kernelFPF
     Module.finrank k W
       = Fintype.card ↥E * Module.finrank k ↥(invariants (ρ.comp E.subtype)) := by
   classical
-  haveI : Finite ↥U := Subtype.finite
-  haveI : Fintype ↥U := Fintype.ofFinite _
-  haveI : Invertible (Fintype.card ↥U : k) :=
+  have : Finite ↥U := Subtype.finite
+  have : Fintype ↥U := Fintype.ofFinite _
+  have : Invertible (Fintype.card ↥U : k) :=
     invertibleOfNonzero (by rw [Nat.card_eq_fintype_card] at *; exact NeZero.ne _)
   -- The `U`-representation and a splitting of `Z(k[U])`.
   set ρU : Representation k ↥U W := ρ.comp U.subtype with hρU
@@ -353,11 +353,11 @@ theorem finrank_eq_card_mul_finrank_invariants_kernelFPF
   obtain ⟨i₁, hi₁fix, hi₁free⟩ := exists_fixed_simple_free_of_fpf φ ψ hEnt hψcop hψfpf
   have hi₁eq : i₁ = i₀ := by
     by_contra hne
-    haveI : Nontrivial ↥E := Finite.one_lt_card_iff_nontrivial.mp hEnt
+    have : Nontrivial ↥E := Finite.one_lt_card_iff_nontrivial.mp hEnt
     obtain ⟨γ, hγ1⟩ := exists_ne (1 : ↥E)
     exact hγ1 (hi₁free i₀ γ (Ne.symm hne) (hi₀fix (ψ γ)))
   -- The `E`-action on the nontrivial-simple index set `{i ≠ i₀}`.
-  letI mulE : MulAction ↥E {i : Fin N // i ≠ i₀} :=
+  let mulE : MulAction ↥E {i : Fin N // i ≠ i₀} :=
     { smul := fun e i => ⟨simplesAction φ (ψ e) i.val, fun hc => i.2
         ((simplesAction φ (ψ e)).injective (hc.trans (hi₀fix (ψ e)).symm))⟩
       one_smul := fun i => Subtype.ext (show simplesAction φ (ψ 1) i.val = i.val by
@@ -373,7 +373,7 @@ theorem finrank_eq_card_mul_finrank_invariants_kernelFPF
       (A i.val).map ((ρ.comp E.subtype) e) = A (e • i).val := by
     intro e i
     -- `τ = ρ (e:L)` as a linear automorphism of `W`.
-    let τ : W ≃ₗ[k] W := LinearEquiv.ofLinear (ρ (e : L)) (ρ ((e : L)⁻¹))
+    let τ : W ≃ₗ[k] W := LinearEquiv.ofLinearMap (ρ (e : L)) (ρ ((e : L)⁻¹))
       (by rw [← Module.End.mul_eq_comp, ← map_mul, mul_inv_cancel, map_one]; rfl)
       (by rw [← Module.End.mul_eq_comp, ← map_mul, inv_mul_cancel, map_one]; rfl)
     have hτcoe : (τ : W →ₗ[k] W) = ρ (e : L) := rfl

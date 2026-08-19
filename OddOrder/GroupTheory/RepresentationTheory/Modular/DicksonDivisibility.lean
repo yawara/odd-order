@@ -78,9 +78,9 @@ theorem exists_card_sylow_mul_projectiveIndecomposableCharacter [Fact p.Prime] (
     ∃ n : ℕ, projectiveIndecomposableCharacter hp hω hω' hπ hlin hkerJ e φ 1
       = (Nat.card ↥(P : Subgroup G) : 𝒪) * (n : 𝒪) := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Fintype ↥(P : Subgroup G) := Fintype.ofFinite _
-  haveI : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
+  have : Fintype G := Fintype.ofFinite G
+  have : Fintype ↥(P : Subgroup G) := Fintype.ofFinite _
+  have : CharZero K := charZero_of_injective_algebraMap (IsFractionRing.injective 𝒪 K)
   choose n hn using fun i : ι' =>
     exists_sum_character_subgroup (wedderburnRepresentation e i) (P : Subgroup G)
   refine ⟨∑ i : ι', decompositionMatrix hp hω hω' hπ hlin hkerJ e i φ * n i, ?_⟩

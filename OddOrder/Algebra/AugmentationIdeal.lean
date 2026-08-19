@@ -486,7 +486,6 @@ theorem lift_augmentationQuotientRetraction (q : AugmentationQuotient G) :
     have hsplit : (⟨c • x, ha⟩ : ↥(augmentationIdeal G)) = c • ⟨x, hxm⟩ := rfl
     rw [hsplit, Submodule.Quotient.mk_smul, map_smul, toMul_zsmul, map_zpow,
       toAdd_zpow, ihx hxm]
-    with_unfolding_all rfl
 
 /-- **Isaacs Theorem 10.20**: `G/G' ≅ Δ(G)/Δ(G)²` via `G'g ↦ (g - 1) + Δ(G)²`
 (the additive quotient is written multiplicatively through `Multiplicative`). -/
@@ -1151,7 +1150,6 @@ theorem lift_augmentationQuotientOfRetraction (q : AugmentationQuotientOf G K) :
         = c • ⟨x, hx⟩ := rfl
     rw [hsplit, Submodule.Quotient.mk_smul, map_smul, toMul_zsmul, map_zpow,
       toAdd_zpow, ihx hx]
-    with_unfolding_all rfl
 
 /-- **Isaacs Corollary 10.23**: `Δ(K)‾ ≅ K/K'` via `(k-1)‾ ↦ K'k`, where
 `Δ(K)‾ = Δ(K)/(Δ(K)Δ(G) ∩ Δ(K))` is (the second-isomorphism-theorem model

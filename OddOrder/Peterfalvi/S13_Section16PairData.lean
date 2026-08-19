@@ -171,9 +171,9 @@ theorem card_mul_eq_of_disjoint_sup_le_isCyclic {G : Type*} [Group G] [Finite G]
     {W A B : Subgroup G} (hWcyc : IsCyclic ↥W) (hAW : A ≤ W) (hBW : B ≤ W)
     (hsup : A ⊔ B = W) (hinf : A ⊓ B = ⊥) :
     Nat.card ↥A * Nat.card ↥B = Nat.card ↥W := by
-  haveI := hWcyc
-  letI : CommGroup ↥W := IsCyclic.commGroup
-  haveI : (A.subgroupOf W).Normal := inferInstance
+  have := hWcyc
+  let : CommGroup ↥W := IsCyclic.commGroup
+  have : (A.subgroupOf W).Normal := inferInstance
   have hinf' : (A.subgroupOf W) ⊓ (B.subgroupOf W) = ⊥ := by
     rw [eq_bot_iff]; intro x hx
     obtain ⟨hxA, hxB⟩ := Subgroup.mem_inf.mp hx

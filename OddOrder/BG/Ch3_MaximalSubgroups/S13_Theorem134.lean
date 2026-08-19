@@ -83,7 +83,7 @@ theorem uniform_exclusion [Finite G] (hG : IsMinimalSimpleOdd G)
     (hTinv : (A₀ ⊔ B₀) ≤ Subgroup.normalizer (T : Set G)) (hYne : ⁅T, B₀⁆ ≠ ⊥) :
     s ∉ S10.alpha M := by
   classical
-  haveI : Fact s.Prime := ⟨hs⟩
+  have : Fact s.Prime := ⟨hs⟩
   obtain ⟨hA₀ea, hA₀card⟩ := mem_elemAbelianOfRank.mp hA₀
   obtain ⟨hB₀ea, hB₀card⟩ := mem_elemAbelianOfRank.mp hB₀
   have hA₀M : A₀ ≤ M := hA₀E.trans h.E_le
@@ -100,7 +100,7 @@ theorem uniform_exclusion [Finite G] (hG : IsMinimalSimpleOdd G)
   -- `M† ∈ ℳ(N_G(A₀))`.
   have hNA₀ne : Subgroup.normalizer (A₀ : Set G) ≠ ⊤ := by
     intro htop
-    haveI : A₀.Normal := Subgroup.normalizer_eq_top_iff.mp htop
+    have : A₀.Normal := Subgroup.normalizer_eq_top_iff.mp htop
     rcases hG.simple.eq_bot_or_eq_top_of_normal A₀ inferInstance with hbot | ht
     · exact hA₀ne hbot
     · exact (mem_maximalSubgroups.mp h.mem_maximal).1 (top_le_iff.mp (ht ▸ hA₀M))
@@ -268,14 +268,14 @@ theorem alpha_fixed_le_fixed [Finite G] (hG : IsMinimalSimpleOdd G)
         (Nat.mem_primeFactors.mpr ⟨(Nat.mem_primeFactors.mp hq).1,
           (Nat.mem_primeFactors.mp hq).2.1.trans (Subgroup.card_dvd_of_le hNMσ), Nat.card_pos.ne'⟩))
   have hNM : N ≤ M := hNMα.trans (S10.Malpha_le M)
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
-  haveI hNsolv : IsSolvable ↥N :=
-    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hNM).toMonoidHom)
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups h.mem_maximal
+  have hNsolv : Group.IsSolvable ↥N :=
+    Group.isSolvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hNM).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe hNM).surjective
   -- order argument: every prime `ℓ` admits a `B₀`-invariant Sylow `ℓ` of `N` inside `N ⊓ C_G(B₀)`.
   have hkey : N ⊓ Subgroup.centralizer (B₀ : Set G) = N := by
     refine eq_of_le_of_forall_full_prime_pow inf_le_left (fun ℓ hℓ => ?_)
-    haveI : Fact ℓ.Prime := ⟨hℓ⟩
+    have : Fact ℓ.Prime := ⟨hℓ⟩
     obtain ⟨S, hSN, hSpg, hSinv, hScard⟩ :=
       exists_aInvariant_sylow_subgroup hAN hcop (Or.inr hNsolv) ℓ
     refine ⟨S, le_inf hSN ?_, hScard⟩
@@ -306,7 +306,7 @@ theorem per_q_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
     (hSinv : (P ⊔ R) ≤ Subgroup.normalizer (S : Set G)) :
     S ≤ Subgroup.centralizer (R : Set G) := by
   classical
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   rw [← Subgroup.commutator_eq_bot_iff_le_centralizer]
   by_contra hQne
   -- `P`, `R` basics.
@@ -326,7 +326,7 @@ theorem per_q_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
   -- `M* ∈ ℳ(N_G(P))`: `N_G(P) ≠ ⊤` (else `P ⊴ G`), so a coatom lies above it.
   have hNPne : Subgroup.normalizer (P : Set G) ≠ ⊤ := by
     intro htop
-    haveI : P.Normal := Subgroup.normalizer_eq_top_iff.mp htop
+    have : P.Normal := Subgroup.normalizer_eq_top_iff.mp htop
     rcases hG.simple.eq_bot_or_eq_top_of_normal P inferInstance with hb | ht
     · exact hPne hb
     · exact (mem_maximalSubgroups.mp h.mem_maximal).1 (top_le_iff.mp (ht ▸ hPM))

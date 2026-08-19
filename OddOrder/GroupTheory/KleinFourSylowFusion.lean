@@ -47,7 +47,7 @@ variable {G : Type*} [Group G] [Finite G]
 `exists_conj_mem_sylow`. -/
 theorem exists_conj_mem_sylow_of_mul_self_eq_one (P : Sylow 2 G) {u : G} (hu : u ≠ 1)
     (hu2 : u * u = 1) : ∃ c : G, c * u * c⁻¹ ∈ (P : Subgroup G) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hord : orderOf u = 2 :=
     ((Nat.dvd_prime Nat.prime_two).mp
         (orderOf_dvd_of_pow_eq_one (by rw [pow_two]; exact hu2))).resolve_left
@@ -142,7 +142,7 @@ theorem exists_odd_not_centralizes (P : Sylow 2 G) (hexp : ∀ x : ↥(P : Subgr
     (hgnc : ∃ x ∈ (P : Subgroup G), g * x * g⁻¹ ≠ x) :
     ∃ h ∈ Subgroup.normalizer ((P : Subgroup G) : Set G), Odd (orderOf h) ∧
       ∃ x ∈ (P : Subgroup G), h * x * h⁻¹ ≠ x := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hfin : IsOfFinOrder g := isOfFinOrder_of_finite g
   set g₂ : G := pPart 2 g with hg₂
   set g' : G := pRegularPart 2 g with hg'
@@ -204,8 +204,8 @@ theorem hasNormalPComplement_of_klein_sylow_of_mem_center (P : Sylow 2 G)
     {t : G} (htP : t ∈ (P : Subgroup G)) (ht1 : t ≠ 1) (htZ : t ∈ Subgroup.center G) :
     OddOrder.Isaacs.Ch05.HasNormalPComplement 2 G := by
   classical
-  letI : Fintype ↥(P : Subgroup G) := Fintype.ofFinite _
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  let : Fintype ↥(P : Subgroup G) := Fintype.ofFinite _
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   -- `P` has an involution other than the central `t`
   obtain ⟨u, huP, hu1, hut⟩ : ∃ u ∈ (P : Subgroup G), u ≠ 1 ∧ u ≠ t := by
     have hex : ∃ y : ↥(P : Subgroup G), y ∉ ({1, ⟨t, htP⟩} : Finset ↥(P : Subgroup G)) := by

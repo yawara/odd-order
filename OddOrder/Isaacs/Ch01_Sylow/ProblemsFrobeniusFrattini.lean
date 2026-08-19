@@ -50,16 +50,16 @@ theorem isCoatom_iff_index_prime {G : Type*} [Group G] [Finite G] [Group.IsNilpo
     (H : Subgroup G) : IsCoatom H ↔ (H.index).Prime := by
   refine ⟨fun hco => ?_, fun hp => ?_⟩
   · -- 極大 ⟹ 素数指数
-    haveI hN : H.Normal :=
+    have hN : H.Normal :=
       Subgroup.normalizer_eq_top_iff.mp
         (hco.2 _ (Group.normalizerCondition_of_isNilpotent H (lt_top_iff_ne_top.mpr hco.1)))
-    haveI hnt : Nontrivial (G ⧸ H) := by
+    have hnt : Nontrivial (G ⧸ H) := by
       apply Finite.one_lt_card_iff_nontrivial.mp
       rw [← Subgroup.index_eq_card]
       have h1 : H.index ≠ 1 := fun h => hco.1 (Subgroup.index_eq_one.mp h)
       have h0 : H.index ≠ 0 := Subgroup.index_ne_zero_of_finite
       omega
-    haveI hsimple : IsSimpleGroup (G ⧸ H) := by
+    have hsimple : IsSimpleGroup (G ⧸ H) := by
       refine ⟨fun N _ => ?_⟩
       have hle : H ≤ N.comap (QuotientGroup.mk' H) := by
         have h := Subgroup.ker_le_comap (QuotientGroup.mk' H) N
@@ -141,7 +141,7 @@ theorem mem_frattini_iff_forall_closure {G : Type*} [Group G] [Finite G] {g : G}
       by_contra hall
       apply hg
       rw [frattini, Order.radical]
-      simp only [Subgroup.mem_iInf, Set.mem_setOf_eq]
+      simp only [Subgroup.mem_iInf, Set.mem_ofPred_eq]
       intro M hM
       by_contra hgM
       exact hall ⟨M, hM, hgM⟩
@@ -179,7 +179,7 @@ theorem not_dvd_card_and_index_of_centralizer_le {p : ℕ} [Fact p.Prime] {G : T
   have hpP : p ∣ Nat.card ↥P := by
     rw [hPcard]
     exact dvd_pow_self p (Nat.Prime.factorization_pos_of_dvd Fact.out (Nat.card_pos).ne' hpH).ne'
-  haveI : Nontrivial ↥P :=
+  have : Nontrivial ↥P :=
     Finite.one_lt_card_iff_nontrivial.mp
       (lt_of_lt_of_le (Fact.out : p.Prime).one_lt (Nat.le_of_dvd Nat.card_pos hpP))
   -- |P| < |Q|
@@ -195,7 +195,7 @@ theorem not_dvd_card_and_index_of_centralizer_le {p : ℕ} [Fact p.Prime] {G : T
   have hPltQ : P < (Q : Subgroup G) :=
     lt_of_le_of_ne hPQ (fun h => hlt.ne (by rw [h]))
   -- g ∈ N_G(P) ∩ Q, g ∉ P
-  haveI : Group.IsNilpotent ↥(Q : Subgroup G) := Q.isPGroup'.isNilpotent
+  have : Group.IsNilpotent ↥(Q : Subgroup G) := Q.isPGroup'.isNilpotent
   have hlt2 : P.subgroupOf (Q : Subgroup G) < ⊤ := by
     rw [lt_top_iff_ne_top, Ne, Subgroup.subgroupOf_eq_top]
     exact fun h => hPltQ.ne (le_antisymm hPQ h)
@@ -213,7 +213,7 @@ theorem not_dvd_card_and_index_of_centralizer_le {p : ℕ} [Fact p.Prime] {G : T
     obtain ⟨k, -, hk⟩ := (Nat.dvd_prime_pow Fact.out).mp
       (hn ▸ Subgroup.orderOf_dvd_natCard (Q : Subgroup G) hgQ)
     exact IsPGroup.of_card (by rw [Nat.card_zpowers, hk])
-  letI : MulAction ↥(Subgroup.zpowers g) ↥P :=
+  let : MulAction ↥(Subgroup.zpowers g) ↥P :=
     { smul := fun k y => ⟨(k : G) * (y : G) * (k : G)⁻¹,
         (Subgroup.mem_normalizer_iff.mp (hzpN k.2) (y : G)).mp y.2⟩
       one_smul := fun y => by
@@ -303,7 +303,7 @@ theorem coprime_card_index_of_disjoint_conj {G : Type*} [Group G] [Finite G] {H 
   obtain ⟨p, hp, hpg⟩ := Nat.exists_prime_and_dvd hnc
   have hpH : p ∣ Nat.card H := hpg.trans (Nat.gcd_dvd_left _ _)
   have hpI : p ∣ H.index := hpg.trans (Nat.gcd_dvd_right _ _)
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨Q, hPcard⟩ := exists_sylow_inf_card_eq (p := p) H
   set P : Subgroup G := (Q : Subgroup G) ⊓ H with hPdef
   have hpP : p ∣ Nat.card ↥P := by
@@ -316,7 +316,7 @@ theorem coprime_card_index_of_disjoint_conj {G : Type*} [Group G] [Finite G] {H 
   have hPQeq : P = (Q : Subgroup G) := by
     by_contra hne
     have hPltQ : P < (Q : Subgroup G) := lt_of_le_of_ne inf_le_left hne
-    haveI : Group.IsNilpotent ↥(Q : Subgroup G) := Q.isPGroup'.isNilpotent
+    have : Group.IsNilpotent ↥(Q : Subgroup G) := Q.isPGroup'.isNilpotent
     have hlt2 : P.subgroupOf (Q : Subgroup G) < ⊤ := by
       rw [lt_top_iff_ne_top, Ne, Subgroup.subgroupOf_eq_top]
       exact fun h => hPltQ.ne (le_antisymm inf_le_left h)
@@ -425,13 +425,13 @@ Frattini を `G` へ押し出したもの)。
 theorem frattini_map_subtype_le_frattini {G : Type*} [Group G] [Finite G] {N : Subgroup G}
     [N.Normal] : (frattini ↥N).map N.subtype ≤ frattini G := by
   set ΦN := (frattini ↥N).map N.subtype with hΦN
-  haveI hΦnorm : ΦN.Normal := characteristic_map_subtype_normal (frattini ↥N)
+  have hΦnorm : ΦN.Normal := characteristic_map_subtype_normal (frattini ↥N)
   have hΦNle : ΦN ≤ N := Subgroup.map_subtype_le _
   have hround : ΦN.subgroupOf N = frattini ↥N :=
     Subgroup.comap_map_eq_self_of_injective (Subgroup.subtype_injective N) _
   rw [frattini, Order.radical]
   refine le_iInf fun M => le_iInf fun hM => ?_
-  simp only [Set.mem_setOf_eq] at hM
+  simp only [Set.mem_ofPred_eq] at hM
   by_contra hnle
   have htop : M ⊔ ΦN = ⊤ :=
     hM.2 _ (lt_of_le_of_ne le_sup_left (fun h => hnle (le_sup_right.trans_eq h.symm)))
@@ -458,12 +458,12 @@ theorem commutator_le_frattini {G : Type*} [Group G] [Finite G] [Group.IsNilpote
     commutator G ≤ frattini G := by
   rw [frattini, Order.radical]
   refine le_iInf fun M => le_iInf fun hM => ?_
-  simp only [Set.mem_setOf_eq] at hM
-  haveI hMnorm : M.Normal :=
+  simp only [Set.mem_ofPred_eq] at hM
+  have hMnorm : M.Normal :=
     Subgroup.normalizer_eq_top_iff.mp
       (hM.2 _ (Group.normalizerCondition_of_isNilpotent M (lt_top_iff_ne_top.mpr hM.1)))
-  haveI : Fact (M.index).Prime := ⟨(isCoatom_iff_index_prime M).mp hM⟩
-  haveI hcyc : IsCyclic (G ⧸ M) := isCyclic_of_prime_card (p := M.index)
+  have : Fact (M.index).Prime := ⟨(isCoatom_iff_index_prime M).mp hM⟩
+  have hcyc : IsCyclic (G ⧸ M) := isCyclic_of_prime_card (p := M.index)
     (Subgroup.index_eq_card (H := M) ▸ rfl)
   have hcomm : IsMulCommutative (G ⧸ M) :=
     (MonoidHom.id (G ⧸ M)).isMulCommutative_of_isCyclic_of_ker_le_center (by simp)
@@ -483,7 +483,7 @@ theorem isNilpotent_of_quotient_frattini_isNilpotent {G : Type*} [Group G] [Fini
     [Group.IsNilpotent (G ⧸ frattini G)] : Group.IsNilpotent G := by
   refine (Group.isNilpotent_of_finite_tfae.out 3 0 rfl rfl).mp ?_
   intro p hp P
-  haveI := hp
+  have := hp
   -- `θ(P)` は `G/Φ(G)` の Sylow `p`-部分群 `Q`
   obtain ⟨Q, hQ⟩ := exists_sylow_coe_eq_of_isHallSubgroup_singleton
     (IsHallSubgroup.map_of_surjective (QuotientGroup.mk'_surjective (frattini G))
@@ -491,7 +491,7 @@ theorem isNilpotent_of_quotient_frattini_isNilpotent {G : Type*} [Group G] [Fini
   -- `G/Φ(G)` 冪零ゆえ `θ(P) = ↑Q` は正規、逆像 `P ⊔ Φ(G)` も正規
   have hmapnorm : ((P : Subgroup G).map (QuotientGroup.mk' (frattini G))).Normal :=
     hQ ▸ (inferInstance : (Q : Subgroup (G ⧸ frattini G)).Normal)
-  haveI hPΦnorm : ((P : Subgroup G) ⊔ frattini G).Normal := by
+  have hPΦnorm : ((P : Subgroup G) ⊔ frattini G).Normal := by
     have h := hmapnorm.comap (QuotientGroup.mk' (frattini G))
     rwa [Subgroup.comap_map_eq, QuotientGroup.ker_mk'] at h
   -- Frattini 論法 + 非生成性で `N_G(P) = ⊤`、すなわち `P ◁ G`
@@ -519,7 +519,7 @@ theorem isNilpotent_of_quotient_commutator_isNilpotent {G : Type*} [Group G] [Fi
     exact (Subgroup.map_mono commutator_le_frattini).trans frattini_map_subtype_le_frattini
   have hcomap : ⁅N, N⁆ ≤ (frattini G).comap (MonoidHom.id G) := by rwa [Subgroup.comap_id]
   -- 全射 `G / N' ↠ G / Φ(G)` で `G / Φ(G)` が冪零
-  haveI : Group.IsNilpotent (G ⧸ frattini G) :=
+  have : Group.IsNilpotent (G ⧸ frattini G) :=
     Group.nilpotent_of_surjective _
       (QuotientGroup.map_surjective_of_surjective ⁅N, N⁆ (frattini G) (MonoidHom.id G)
         (by simpa using QuotientGroup.mk_surjective) hcomap)
@@ -532,13 +532,13 @@ theorem isNilpotent_of_quotient_commutator_isNilpotent {G : Type*} [Group G] [Fi
 theorem sylow_normalizer_sup_eq_top_of_quotient_nilpotent {K : Type*} [Group K] [Finite K]
     {M : Subgroup K} [M.Normal] (hquot : Group.IsNilpotent (K ⧸ M)) {p : ℕ} [Fact p.Prime]
     (P : Sylow p K) : Subgroup.normalizer ↑P ⊔ M = ⊤ := by
-  haveI := hquot
+  have := hquot
   obtain ⟨Q, hQ⟩ := exists_sylow_coe_eq_of_isHallSubgroup_singleton
     (IsHallSubgroup.map_of_surjective (QuotientGroup.mk'_surjective M)
       (sylow_isHallSubgroup_singleton P))
   have hmapnorm : ((↑P : Subgroup K).map (QuotientGroup.mk' M)).Normal :=
     hQ ▸ (inferInstance : (Q : Subgroup (K ⧸ M)).Normal)
-  haveI hPMnorm : ((↑P : Subgroup K) ⊔ M).Normal := by
+  have hPMnorm : ((↑P : Subgroup K) ⊔ M).Normal := by
     have h := hmapnorm.comap (QuotientGroup.mk' M)
     rwa [Subgroup.comap_map_eq, QuotientGroup.ker_mk'] at h
   have hfr := Sylow.normalizer_sup_eq_top' (N := (↑P : Subgroup K) ⊔ M) P le_sup_left
@@ -559,7 +559,7 @@ theorem isNilpotent_of_frattini_le_of_quotient_isNilpotent {G : Type*} [Group G]
     Group.IsNilpotent ↥N := by
   refine (Group.isNilpotent_of_finite_tfae.out 3 0 rfl rfl).mp ?_
   intro p hp P
-  haveI := hp
+  have := hp
   have hinner := sylow_normalizer_sup_eq_top_of_quotient_nilpotent hquot P
   have houter := Sylow.normalizer_sup_eq_top P
   -- `hinner` を `N.subtype` で `G` に押し出す
@@ -588,11 +588,11 @@ theorem isNilpotent_of_frattini_le_of_quotient_isNilpotent {G : Type*} [Group G]
 `g ^ p ∈ Φ(P)`。これが `P / Φ(P)` の指数 `p` 性 (基本アーベルの exponent 部分) を与える。 -/
 theorem pow_mem_frattini_of_isPGroup {P : Type*} [Group P] [Finite P] {p : ℕ} [Fact p.Prime]
     (hP : IsPGroup p P) (g : P) : g ^ p ∈ frattini P := by
-  haveI := hP.isNilpotent
+  have := hP.isNilpotent
   rw [frattini, Order.radical]
   refine Subgroup.mem_iInf.mpr fun M => Subgroup.mem_iInf.mpr fun hM => ?_
-  simp only [Set.mem_setOf_eq] at hM
-  haveI : M.Normal := Subgroup.normalizer_eq_top_iff.mp
+  simp only [Set.mem_ofPred_eq] at hM
+  have : M.Normal := Subgroup.normalizer_eq_top_iff.mp
     (hM.2 _ (Group.normalizerCondition_of_isNilpotent M (lt_top_iff_ne_top.mpr hM.1)))
   have hidx : M.index = p := by
     have hp : M.index.Prime := (isCoatom_iff_index_prime M).mp hM
@@ -644,7 +644,7 @@ theorem sq_le_card_frattiniQuotient_of_isPGroup_of_not_isCyclic {P : Type*} [Gro
   rw [not_le] at hlt
   interval_cases n
   · rw [pow_zero] at hn
-    haveI : Subsingleton (P ⧸ frattini P) := (Nat.card_eq_one_iff_unique.mp hn).1
+    have : Subsingleton (P ⧸ frattini P) := (Nat.card_eq_one_iff_unique.mp hn).1
     refine hncq ⟨⟨1, fun y => Subgroup.mem_zpowers_iff.mpr ⟨0, ?_⟩⟩⟩
     rw [zpow_zero]
     exact Subsingleton.elim _ _
@@ -658,8 +658,8 @@ theorem sq_le_card_frattiniQuotient_of_isPGroup_of_not_isCyclic {P : Type*} [Gro
 theorem isCyclic_or_elementaryAbelian_of_card_eq_prime_sq {P : Type*} [Group P] [Finite P]
     {p : ℕ} [Fact p.Prime] (hcard : Nat.card P = p ^ 2) :
     IsCyclic P ∨ (IsMulCommutative P ∧ ∀ g : P, g ^ p = 1) := by
-  haveI hP : IsPGroup p P := IsPGroup.iff_card.mpr ⟨2, hcard⟩
-  haveI := hP.isNilpotent
+  have hP : IsPGroup p P := IsPGroup.iff_card.mpr ⟨2, hcard⟩
+  have := hP.isNilpotent
   rcases em (IsCyclic P) with hc | hnc
   · exact Or.inl hc
   refine Or.inr ?_
@@ -690,7 +690,7 @@ theorem centralizer_eq_self_of_maximal_abelian_normal {P : Type*} [Group P] [Fin
     Subgroup.centralizer (A : Set P) = A := by
   refine le_antisymm ?_ (Subgroup.le_centralizer A)
   by_contra hnle
-  haveI : (Subgroup.centralizer (A : Set P)).Normal := Subgroup.normal_centralizer
+  have : (Subgroup.centralizer (A : Set P)).Normal := Subgroup.normal_centralizer
   have hlt : A < Subgroup.centralizer (A : Set P) :=
     lt_of_le_of_ne (Subgroup.le_centralizer A) (fun heq => hnle heq.ge)
   obtain ⟨L, hLnorm, hAL, hLC, hidx⟩ := IsPGroup.exists_normal_index_eq_prime hP hlt
@@ -703,9 +703,9 @@ theorem centralizer_eq_self_of_maximal_abelian_normal {P : Type*} [Group P] [Fin
     rw [Subgroup.coe_mul, Subgroup.coe_mul]
     exact ((Subgroup.mem_centralizer_iff.mp (hLC l.2)) _ (Subgroup.mem_subgroupOf.mp hx)).symm
   -- `L/A` 位数 `p` で巡回 ⟹ `L` 可換
-  haveI hcyc : IsCyclic (↥L ⧸ A.subgroupOf L) :=
+  have hcyc : IsCyclic (↥L ⧸ A.subgroupOf L) :=
     isCyclic_of_prime_card (p := p) (by rw [← Subgroup.index_eq_card]; exact hidx)
-  haveI hLab : IsMulCommutative ↥L :=
+  have hLab : IsMulCommutative ↥L :=
     (QuotientGroup.mk' (A.subgroupOf L)).isMulCommutative_of_isCyclic_of_ker_le_center
       (by rw [QuotientGroup.ker_mk']; exact hAcenterL)
   exact absurd (hmax L hLnorm hLab hAL.le) hAL.ne'
@@ -721,7 +721,7 @@ theorem index_dvd_factorial_of_maximal_abelian_normal {P : Type*} [Group P] [Fin
   have hCA : Subgroup.centralizer (A : Set P) = A :=
     centralizer_eq_self_of_maximal_abelian_normal hP A hmax
   -- `P` は共役で `A ∖ {1}` に作用する
-  letI act : MulAction P {a : ↥A // a ≠ 1} :=
+  let act : MulAction P {a : ↥A // a ≠ 1} :=
     { smul := fun g x => ⟨MulAut.conjNormal g x.1,
         fun hc => x.2 ((MulAut.conjNormal g).injective (hc.trans (map_one _).symm))⟩
       one_smul := fun x => Subtype.ext (by
@@ -796,18 +796,18 @@ theorem card_dvd_factorial_of_abelian_bound {G : Type*} [Group G] [Finite G] {n 
     Nat.card G ∣ n.factorial := by
   rw [Nat.dvd_iff_prime_pow_dvd_dvd]
   intro p k hp hpk
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨P⟩ : Nonempty (Sylow p G) := inferInstance
   have hPdvd : Nat.card ↥P ∣ n.factorial := by
     obtain ⟨A, hAn, hAa, hAmax⟩ := exists_maximal_abelian_normal ↥P
-    haveI := hAn
-    haveI := hAa
-    haveI hPp : IsPGroup p ↥P := P.isPGroup'
+    have := hAn
+    have := hAa
+    have hPp : IsPGroup p ↥P := P.isPGroup'
     have hidx : A.index ∣ (Nat.card ↥A - 1).factorial :=
       index_dvd_factorial_of_maximal_abelian_normal hPp A hAmax
     have hAle : Nat.card ↥A ≤ n := by
       have hfinj := (P : Subgroup G).subtype_injective
-      haveI : IsMulCommutative ↥(A.map (P : Subgroup G).subtype) := by
+      have : IsMulCommutative ↥(A.map (P : Subgroup G).subtype) := by
         refine ⟨⟨fun x y => ?_⟩⟩
         obtain ⟨a, rfl⟩ :=
           (Subgroup.equivMapOfInjective A (P : Subgroup G).subtype hfinj).surjective x
@@ -835,8 +835,8 @@ open Equiv.Perm in
 theorem card_pow_eq_one_modEq_zero {G : Type*} [Group G] [Finite G] {p : ℕ}
     [hp : Fact p.Prime] (hdvd : p ∣ Nat.card G) :
     Nat.card {x : G // x ^ p = 1} ≡ 0 [MOD p] := by
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : NeZero p := ⟨hp.out.ne_zero⟩
+  have : Fintype G := Fintype.ofFinite G
+  have : NeZero p := ⟨hp.out.ne_zero⟩
   have hpos : 0 < p := hp.out.pos
   -- `rotate` の `p`-周期性
   have hp1 : ∀ (w : vectorsProdEqOne G p) (s : ℕ),
@@ -853,7 +853,7 @@ theorem card_pow_eq_one_modEq_zero {G : Type*} [Group G] [Finite G] {p : ℕ}
     conv_lhs => rw [← Nat.div_add_mod m p]
     exact hper2 w (m / p) (m % p)
   -- `Multiplicative (ZMod p)` の巡回シフト作用
-  letI act : MulAction (Multiplicative (ZMod p)) (vectorsProdEqOne G p) :=
+  let act : MulAction (Multiplicative (ZMod p)) (vectorsProdEqOne G p) :=
     { smul := fun k v => VectorsProdEqOne.rotate v (Multiplicative.toAdd k).val
       one_smul := fun v => by
         change VectorsProdEqOne.rotate v
@@ -867,7 +867,7 @@ theorem card_pow_eq_one_modEq_zero {G : Type*} [Group G] [Finite G] {p : ℕ}
           hper v ((Multiplicative.toAdd b).val + (Multiplicative.toAdd a).val)]
         congr 1
         rw [toAdd_mul, ZMod.val_add, Nat.mod_mod, Nat.add_comm (Multiplicative.toAdd b).val] }
-  haveI hPG : IsPGroup p (Multiplicative (ZMod p)) :=
+  have hPG : IsPGroup p (Multiplicative (ZMod p)) :=
     IsPGroup.of_card (n := 1) (by
       rw [pow_one, Nat.card_eq_fintype_card, Fintype.card_multiplicative, ZMod.card])
   -- 固定点 (= 定数ベクトル) は `{x // x ^ p = 1}` と一対一
@@ -928,6 +928,7 @@ theorem card_pow_eq_one_modEq_zero {G : Type*} [Group G] [Finite G] {p : ℕ}
     exact dvd_pow (by rwa [Nat.card_eq_fintype_card] at hdvd) (by have := hp.out.two_le; omega)
   exact hmod.symm.trans hV0
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Isaacs Problem 1D.12**. 素数 `p ∣ |G|` のとき、位数 `p` の元の個数は `p` を法として `-1`
 (個数 `+ 1` が `p` の倍数)。`x ^ p = 1 ⟺ orderOf x ∈ {1, p}` なので位数 `p` の元数は `#{x^p=1} - 1`、
 McKay (`card_pow_eq_one_modEq_zero`) で `#{x^p=1} ≡ 0`、単位元 1 個を引いて `≡ -1`。 -/
@@ -938,7 +939,7 @@ theorem card_orderOf_eq_prime_add_one_modEq_zero {G : Type*} [Group G] [Finite G
   have hmck := card_pow_eq_one_modEq_zero (G := G) hdvd
   -- `{x // x^p=1} ≃ Option {x // orderOf x = p}` (単位元 1 ↔ none)
   have hpart : Nat.card {x : G // x ^ p = 1} = Nat.card {x : G // orderOf x = p} + 1 := by
-    haveI : Fintype G := Fintype.ofFinite G
+    have : Fintype G := Fintype.ofFinite G
     rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card, ← Fintype.card_option]
     refine Fintype.card_congr
       { toFun := fun x => if h : x.1 = 1 then none else some ⟨x.1, orderOf_eq_prime x.2 h⟩
@@ -985,7 +986,7 @@ theorem disjoint_conj_of_forall_normalizer_le {G : Type*} [Group G] [Finite G] {
   -- 素数 q ∣ |D| と Q ∈ Syl_q(D)
   have hDcard : Nat.card D ≠ 1 := fun h => hD (Subgroup.card_eq_one.mp h)
   obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd hDcard
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   obtain ⟨Q₀⟩ := (Sylow.nonempty : Nonempty (Sylow q ↥D))
   set Q : Subgroup G := (Q₀ : Subgroup ↥D).map D.subtype with hQdef
   have hQD : Q ≤ D := Subgroup.map_subtype_le _
@@ -1059,7 +1060,7 @@ theorem disjoint_conj_of_forall_normalizer_le {G : Type*} [Group G] [Finite G] {
   have hQ₁_eq_S : Q₁ = ↑S := by
     by_contra hne
     have hlt : Q₁ < ↑S := lt_of_le_of_ne hQ₁S hne
-    haveI : Group.IsNilpotent ↥(S : Subgroup ↥H) := S.isPGroup'.isNilpotent
+    have : Group.IsNilpotent ↥(S : Subgroup ↥H) := S.isPGroup'.isNilpotent
     have hlt_top : Q₁.subgroupOf ↑S < ⊤ := by
       rw [lt_top_iff_ne_top, Ne, Subgroup.subgroupOf_eq_top]
       exact fun hle => hlt.ne (le_antisymm hlt.le hle)
@@ -1128,7 +1129,7 @@ theorem fitting_quotient_center {G : Type*} [Group G] [Finite G] :
   · -- `N := F(G/Z)` の逆像は冪零.
     set N : Subgroup G := (fitting (G ⧸ Subgroup.center G)).comap
       (QuotientGroup.mk' (Subgroup.center G)) with hN
-    haveI hNnormal : N.Normal := (fitting.normal (G ⧸ Subgroup.center G)).comap _
+    have hNnormal : N.Normal := (fitting.normal (G ⧸ Subgroup.center G)).comap _
     have hmapN : N.map (QuotientGroup.mk' (Subgroup.center G))
         = fitting (G ⧸ Subgroup.center G) :=
       Subgroup.map_comap_eq_self_of_surjective
@@ -1140,9 +1141,9 @@ theorem fitting_quotient_center {G : Type*} [Group G] [Finite G] :
       simp [hφ, MonoidHom.mem_ker, Subgroup.mem_subgroupOf, QuotientGroup.eq_one_iff]
     have hrange : φ.range = fitting (G ⧸ Subgroup.center G) := by
       rw [hφ, MonoidHom.range_comp, Subgroup.range_subtype, hmapN]
-    haveI hnilrange : Group.IsNilpotent ↥φ.range := by
+    have hnilrange : Group.IsNilpotent ↥φ.range := by
       rw [hrange]; exact fitting.isNilpotent
-    haveI hquotnil : Group.IsNilpotent (↥N ⧸ φ.ker) :=
+    have hquotnil : Group.IsNilpotent (↥N ⧸ φ.ker) :=
       Group.nilpotent_of_mulEquiv (QuotientGroup.quotientKerEquivRange φ).symm
     have hcen : φ.ker ≤ Subgroup.center ↥N := by
       rw [hker]
@@ -1151,26 +1152,26 @@ theorem fitting_quotient_center {G : Type*} [Group G] [Finite G] :
       intro y
       have hxZ : (x : G) ∈ Subgroup.center G := Subgroup.mem_subgroupOf.mp hx
       exact Subtype.ext (Subgroup.mem_center_iff.mp hxZ (y : G))
-    haveI hcennil : Group.IsNilpotent (↥N ⧸ Subgroup.center ↥N) := by
+    have hcennil : Group.IsNilpotent (↥N ⧸ Subgroup.center ↥N) := by
       refine Group.nilpotent_of_surjective
         (QuotientGroup.map φ.ker (Subgroup.center ↥N) (MonoidHom.id ↥N)
           (by simpa using hcen)) ?_
       intro x
       obtain ⟨y, rfl⟩ := QuotientGroup.mk_surjective x
       exact ⟨QuotientGroup.mk y, by simp⟩
-    haveI : Group.IsNilpotent ↥N := Group.of_quotient_center_nilpotent inferInstance
+    have : Group.IsNilpotent ↥N := Group.of_quotient_center_nilpotent inferInstance
     calc fitting (G ⧸ Subgroup.center G)
         = N.map (QuotientGroup.mk' (Subgroup.center G)) := hmapN.symm
       _ ≤ (fitting G).map (QuotientGroup.mk' (Subgroup.center G)) :=
           Subgroup.map_mono nilpotent_normal_le_fitting
   · -- `F(G)` の像は正規冪零.
-    haveI : Group.IsNilpotent ↥(fitting G) := fitting.isNilpotent
-    haveI : Group.IsNilpotent
+    have : Group.IsNilpotent ↥(fitting G) := fitting.isNilpotent
+    have : Group.IsNilpotent
         ↥((fitting G).map (QuotientGroup.mk' (Subgroup.center G))) :=
       Group.nilpotent_of_surjective
         ((QuotientGroup.mk' (Subgroup.center G)).subgroupMap (fitting G))
         (MonoidHom.subgroupMap_surjective _ _)
-    haveI : ((fitting G).map (QuotientGroup.mk' (Subgroup.center G))).Normal :=
+    have : ((fitting G).map (QuotientGroup.mk' (Subgroup.center G))).Normal :=
       (fitting.normal G).map _ (QuotientGroup.mk'_surjective _)
     exact nilpotent_normal_le_fitting
 
@@ -1219,7 +1220,7 @@ theorem le_fitting_subgroupOf_of_commutator_le {G : Type*} [Group G] [Finite G]
     {C : Subgroup G} (hC : C = Subgroup.centralizer ((fitting G : Subgroup G) : Set G))
     {A : Subgroup ↥C} [A.Normal] (hcomm : ⁅A, A⁆ ≤ (fitting G).subgroupOf C) :
     A ≤ (fitting G).subgroupOf C := by
-  haveI hCnormal : C.Normal := hC ▸ Subgroup.normal_centralizer
+  have hCnormal : C.Normal := hC ▸ Subgroup.normal_centralizer
   have hFcen : (fitting G).subgroupOf C ≤ Subgroup.center ↥C :=
     fitting_subgroupOf_le_center_of_eq_centralizer hC
   -- `A` の交換子は `Z(↥A)` に入るので `A` は冪零 (類 ≤ 2).
@@ -1233,14 +1234,14 @@ theorem le_fitting_subgroupOf_of_commutator_le {G : Type*} [Group G] [Finite G]
     refine Subtype.ext ?_
     have hy := Subgroup.mem_center_iff.mp hcen (y : ↥C)
     simpa [commutatorElement_def, mul_assoc] using hy
-  haveI hAcomm : IsMulCommutative (↥A ⧸ Subgroup.center ↥A) := by
+  have hAcomm : IsMulCommutative (↥A ⧸ Subgroup.center ↥A) := by
     refine Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr ?_
     rw [commutator_def, Subgroup.commutator_le]
     intro a _ b _
     exact hcomm_center a b
-  haveI : Group.IsNilpotent ↥A := by
+  have : Group.IsNilpotent ↥A := by
     refine Group.of_quotient_center_nilpotent ?_
-    letI : CommGroup (↥A ⧸ Subgroup.center ↥A) :=
+    let : CommGroup (↥A ⧸ Subgroup.center ↥A) :=
       { (inferInstance : Group (↥A ⧸ Subgroup.center ↥A)) with
         mul_comm := fun a b => (IsMulCommutative.is_comm
           (M := ↥A ⧸ Subgroup.center ↥A)).comm a b }

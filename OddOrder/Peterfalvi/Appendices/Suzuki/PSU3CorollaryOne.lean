@@ -90,8 +90,8 @@ theorem exists_mulEquiv_intertwining_f (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
           = f' ((εQ x : ↥(standardHypothesis m hn).Q) : ↥(standardPermGroup m)) := by
   classical
   have hm : 0 < m := Nat.zero_lt_one.trans hn
-  haveI : Fintype M.E := Fintype.ofFinite _
-  haveI : Fintype (Field m) := Fintype.ofFinite _
+  have : Fintype M.E := Fintype.ofFinite _
+  have : Fintype (Field m) := Fintype.ofFinite _
   have hcards : Fintype.card M.E = Fintype.card (Field m) := by
     rw [← Nat.card_eq_fintype_card, ← Nat.card_eq_fintype_card, M.card,
       natCard_field m hm, ← pow_mul]
@@ -123,7 +123,7 @@ theorem closure_conj_standardRootSubgroup_eq_top {m : ℕ} (hn : 1 < m) :
         ((fun q => y⁻¹ * q * y) '' ((standardRootSubgroup m : Subgroup ↥(standardPermGroup m))
           : Set ↥(standardPermGroup m))))
       = ⊤ := by
-  haveI := standardPermGroup_isSimpleGroup hn
+  have := standardPermGroup_isSimpleGroup hn
   rw [closure_iUnion_conj_eq_normalClosure]
   have hnorm : (Subgroup.normalClosure
       ((standardRootSubgroup m : Subgroup ↥(standardPermGroup m)) :
@@ -199,7 +199,7 @@ theorem nonempty_psu3InductionTarget (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     Nonempty (PSU3InductionTarget (Omega := Ω)
       (Subgroup.primeComplementResidual 2 G)) := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨S, hSQ⟩ := hyp.rankOneSetup.exists_sylow_two_eq hQ2 hyp.D_odd hyp.Q_even
   have hLeq : Subgroup.closure (⋃ y : G, ((fun q => y⁻¹ * q * y) '' (hyp.Q : Set G)))
       = Subgroup.primeComplementResidual 2 G := by
@@ -234,7 +234,7 @@ theorem nonempty_theoremAConclusion_psu3 (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g 
           = (Suzuki2Groups.unitaryCoord m u (Ψ ⟨ρ, hρQ⟩))⁻¹)
     (hQ2 : IsPGroup 2 ↥hyp.Q) :
     Nonempty (TheoremAConclusion G Ω) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨data⟩ := hyp.nonempty_psu3InductionTarget H hn M hu Ψ hfQ hform hQ2
   refine ⟨{ L := Subgroup.primeComplementResidual 2 G
             normal := inferInstance

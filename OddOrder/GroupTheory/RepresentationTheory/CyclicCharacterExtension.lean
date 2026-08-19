@@ -79,8 +79,8 @@ theorem nonempty_equiv_conjRep_of_character_eq [Finite ↥H] [Invertible (Nat.ca
     (ρ : Representation ℂ ↥H V) [Representation.IsIrreducible ρ] (g : K)
     (hinv : (conjRep ρ g).character = ρ.character) :
     Nonempty (ρ.Equiv (conjRep ρ g)) := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
-  haveI := isIrreducible_conjRep ρ g
+  have : Fintype ↥H := Fintype.ofFinite _
+  have := isIrreducible_conjRep ρ g
   have h1 : (Nat.card ↥H : ℂ)⁻¹ * ∑ h : ↥H, ρ.character h * ρ.character h⁻¹ = 1 := by
     rw [Representation.char_orthonormal, if_pos ⟨Representation.Equiv.refl _⟩]
   have key := Representation.char_orthonormal (conjRep ρ g) ρ
@@ -124,7 +124,7 @@ theorem exists_normalized_conjugation_unit [Finite K]
       (∀ h : ↥H, P * ρ.asGroupHom h
         = ρ.asGroupHom (ClassFunction.conjByMulEquiv (G := K) (H := H) g h) * P) ∧
       ∀ (t : ℤ) (ht : g ^ t ∈ H), P ^ t = ρ.asGroupHom ⟨g ^ t, ht⟩ := by
-  haveI : Invertible (Nat.card ↥H : ℂ) :=
+  have : Invertible (Nat.card ↥H : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   exact exists_normalized_conjugation_unit_of_nonempty_equiv ρ g
     (nonempty_equiv_conjRep_of_character_eq ρ g hinv)
@@ -155,7 +155,7 @@ theorem IsIrreducibleCharacter.exists_extension_of_conjBy_eq [Finite K]
     ∃ χ : ClassFunction K ℂ, IsIrreducibleCharacter χ ∧
       ClassFunction.restrict H χ = θ := by
   obtain ⟨V, _, _, _, ρ, hρirr, hchar⟩ := hθ
-  haveI := hρirr
+  have := hρirr
   -- the conjugate representation has the same character, by invariance of `θ`
   have hinv' : (conjRep ρ g).character = ρ.character := by
     funext h

@@ -85,7 +85,7 @@ common-index `p`-power degree shape (`idx = |L:H|`) of every X-chain member. -/
 theorem exists_index_primePow_degree_of_mem_S (hyp : SibleyDadeHypothesis G L H)
     {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H) {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.S) :
     ∃ k : ℕ, χ 1 = ((H.index * p ^ k : ℕ) : ℂ) := by
-  rw [hyp.S_eq, Set.mem_setOf_eq] at hχ
+  rw [hyp.S_eq, Set.mem_ofPred_eq] at hχ
   obtain ⟨θ, _hθ, rfl⟩ := hχ
   obtain ⟨k, hk⟩ := exists_primePow_natDegree_of_isPGroup hp hHp θ
   refine ⟨k, ?_⟩
@@ -120,9 +120,9 @@ theorem exists_source_primePow_centralBound_of_mem_Xset (hyp : SibleyDadeHypothe
     {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Xset Z) :
     ∃ k : ℕ, χ 1 = ((H.index * p ^ k : ℕ) : ℂ)
       ∧ (p ^ k) ^ 2 ≤ Nat.card (↥H ⧸ Z.subgroupOf H) := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
   have hχS : χ ∈ hyp.S := hyp.Xset_subset_S hχ
-  rw [hyp.S_eq, Set.mem_setOf_eq] at hχS
+  rw [hyp.S_eq, Set.mem_ofPred_eq] at hχS
   obtain ⟨θ, _hθne, rfl⟩ := hχS
   obtain ⟨k, hk⟩ := exists_primePow_natDegree_of_isPGroup hp hHp θ
   refine ⟨k, ?_, ?_⟩
@@ -269,7 +269,7 @@ theorem Xset_nonempty_of_subgroupOf_ne_bot (hyp : SibleyDadeHypothesis G L H)
     (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
     {Z : Subgroup ↥L} [Z.Normal] (hZbot : Z.subgroupOf H ≠ ⊥) :
     (hyp.Xset Z).Nonempty := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
   have hXsum := hyp.sum_re_sq_Xset_eq hF (Z := Z)
   set Xdiff := (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
           (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
@@ -339,7 +339,7 @@ theorem Xset_nonempty_of_subgroupOf_ne_bot_of_irreducible_X (hyp : SibleyDadeHyp
           (fun θ => ClassFunction.induce H θ.toClassFunction)),
         IsIrreducibleCharacter χ) :
     (hyp.Xset Z).Nonempty := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
   have hXsum := hyp.sum_re_sq_Xset_eq_of_irreducible_X (Z := Z) hX
   set Xdiff := (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
           (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
@@ -393,7 +393,7 @@ theorem Xset_centralCommutator_nonempty (hyp : SibleyDadeHypothesis G L H)
     (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
     (hHnonab : _root_.commutator ↥H ≠ ⊥) :
     (hyp.Xset hyp.centralCommutator).Nonempty := by
-  haveI := hyp.centralCommutator_normal
+  have := hyp.centralCommutator_normal
   refine hyp.Xset_nonempty_of_subgroupOf_ne_bot hF ?_
   intro hbot
   apply hyp.centralCommutator_ne_bot hHnonab
@@ -424,10 +424,10 @@ theorem false_of_coherentXunionYset_of_not_coherentS (hyp : SibleyDadeHypothesis
     (hncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) : False := by
   classical
-  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
-  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  have : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
+  let : Group.IsNilpotent ↥H := hyp.H_nilpotent
   have hcommlt : (⁅H, H⁆ : Subgroup ↥L) < H := by
-    have h1 : _root_.commutator ↥H < ⊤ := IsSolvable.commutator_lt_top_of_nontrivial ↥H
+    have h1 : _root_.commutator ↥H < ⊤ := Group.IsSolvable.commutator_lt_top_of_nontrivial ↥H
     rw [← commutator_subgroupOf_self] at h1
     refine lt_of_le_of_ne (Subgroup.commutator_le_left H H) (fun heq => ?_)
     rw [heq, Subgroup.subgroupOf_self] at h1
@@ -458,7 +458,7 @@ theorem false_of_coherentXunionYset_of_not_coherentS (hyp : SibleyDadeHypothesis
   -- `ψ ∈ S` irreducible, `ψ = Ind θ`
   have hψS : ψ ∈ hyp.S := hψSb
   have hψirr : IsIrreducibleCharacter ψ := hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF hψS
-  rw [hyp.S_eq, Set.mem_setOf_eq] at hψS
+  rw [hyp.S_eq, Set.mem_ofPred_eq] at hψS
   obtain ⟨θ, hθne, hψeq⟩ := hψS
   obtain ⟨d, hdpos, hθd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
   have hdsq : d ^ 2 ≤ Nat.card (↥H ⧸ hyp.centralCommutator.subgroupOf H) := by
@@ -529,9 +529,9 @@ theorem psi_degree_le_of_source (_hyp : SibleyDadeHypothesis G L H)
     (hcentral : D.map (QuotientGroup.mk' N) ≤ Subgroup.center (↥C ⧸ N)) :
     (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re ≤
       (H.index : ℝ) * (C.index : ℝ) * Real.sqrt (D.index : ℝ) := by
-  haveI : Fintype ↥C := Fintype.ofFinite ↥C
-  letI : H.Normal := _hyp.H_normal
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥C := Fintype.ofFinite ↥C
+  let : H.Normal := _hyp.H_normal
+  have : Fintype ↥H := Fintype.ofFinite _
   have hind : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re
       = (H.index : ℝ) * ((θ : ClassFunction ↥H ℂ) 1).re := by
     rw [ClassFunction.induce_apply_one, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
@@ -565,7 +565,7 @@ theorem six_two_index_bound (hyp : SibleyDadeHypothesis G L H)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
     ∃ ψ, ψ ∈ hyp.SsubFiltration B ∧
       (Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1 ≤ 2 * (ψ 1).re := by
-  letI : H.Normal := hyp.H_normal
+  let : H.Normal := hyp.H_normal
   obtain ⟨S₁, ψ, hS₁conj, hAS₁, hS₁B, hψB, hψnotS1, hψcnotS1, hS₁coh, hncoh⟩ :=
     exists_coherentBreakPair hyp.tau hAB (hyp.SsubFiltration_finite B)
       (hyp.SsubFiltration_closedUnderConjugate B) (hyp.SsubFiltration_hasNoRealCharacters hF B)
@@ -605,7 +605,7 @@ theorem six_two (hyp : SibleyDadeHypothesis G L H)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
     (Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1 ≤
       2 * (H.index : ℝ) * (C.index : ℝ) * Real.sqrt (D.index : ℝ) := by
-  letI : H.Normal := hyp.H_normal
+  let : H.Normal := hyp.H_normal
   obtain ⟨ψ, hψB, hψbound⟩ := hyp.six_two_index_bound hF hAB hAcomm hSAcoh hSBncoh
   rw [hyp.mem_SsubFiltration] at hψB
   obtain ⟨θ, _hθne, hθkerB, hψeq⟩ := hψB
@@ -629,8 +629,8 @@ theorem psi_degree_le_of_source_central (_hyp : SibleyDadeHypothesis G L H)
     (hcentral : D.map (QuotientGroup.mk' N) ≤ Subgroup.center (↥H ⧸ N)) :
     (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re ≤
       (H.index : ℝ) * Real.sqrt (D.index : ℝ) := by
-  letI : H.Normal := _hyp.H_normal
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  let : H.Normal := _hyp.H_normal
+  have : Fintype ↥H := Fintype.ofFinite _
   obtain ⟨d, hd1, hd2⟩ :=
     degree_sq_le_index_of_central_quotient N θ D hND hθN hcentral
   have hind : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re
@@ -660,7 +660,7 @@ theorem six_two_central (hyp : SibleyDadeHypothesis G L H)
     (hSBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration B)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
     (Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1 ≤ 2 * (H.index : ℝ) * Real.sqrt (D.index : ℝ) := by
-  letI : H.Normal := hyp.H_normal
+  let : H.Normal := hyp.H_normal
   obtain ⟨ψ, hψB, hψbound⟩ := hyp.six_two_index_bound hF hAB hAcomm hSAcoh hSBncoh
   rw [hyp.mem_SsubFiltration] at hψB
   obtain ⟨θ, _hθne, hθkerB, hψeq⟩ := hψB
@@ -688,7 +688,7 @@ theorem six_three_index_bound (hyp : SibleyDadeHypothesis G L H)
     (hSBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration B)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
     Nat.card (↥H ⧸ H₁.subgroupOf H) ≤ 4 * H.index ^ 2 + 1 := by
-  letI : H.Normal := hyp.H_normal
+  let : H.Normal := hyp.H_normal
   have hsixtwo := hyp.six_two_central hF (hyp.SsubFiltration_antitone hBA) hAcomm
     (A.subgroupOf H) (Subgroup.subgroupOf_mono H hBA) hcentral hSAcoh hSBncoh
   have hHH1le : Nat.card (↥H ⧸ H₁.subgroupOf H) ≤ Nat.card (↥H ⧸ A.subgroupOf H) :=
@@ -706,15 +706,15 @@ degree-`|W₁|` anchor in `S(A)`). -/
 theorem commutator_subgroupOf_quotient_ne_top (hyp : SibleyDadeHypothesis G L H)
     {A : Subgroup ↥L} [A.Normal] (hAH : A < H) :
     _root_.commutator (↥H ⧸ A.subgroupOf H) ≠ ⊤ := by
-  letI : H.Normal := hyp.H_normal
-  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
-  haveI : (A.subgroupOf H).Normal := (‹A.Normal›).subgroupOf H
-  haveI : Nontrivial (↥H ⧸ A.subgroupOf H) := by
+  let : H.Normal := hyp.H_normal
+  let : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  have : (A.subgroupOf H).Normal := (‹A.Normal›).subgroupOf H
+  have : Nontrivial (↥H ⧸ A.subgroupOf H) := by
     rw [QuotientGroup.nontrivial_iff]
     intro htop
     rw [Subgroup.subgroupOf_eq_top] at htop
     exact hAH.ne (le_antisymm hAH.le htop)
-  exact (IsSolvable.commutator_lt_top_of_nontrivial (G := ↥H ⧸ A.subgroupOf H)).ne
+  exact (Group.IsSolvable.commutator_lt_top_of_nontrivial (G := ↥H ⧸ A.subgroupOf H)).ne
 
 /-- **Peterfalvi (6.3)** (Frobenius case `K = H`).
 
@@ -737,25 +737,25 @@ theorem six_three (hyp : SibleyDadeHypothesis G L H)
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration M)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
   classical
-  letI : H.Normal := hyp.H_normal
-  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
-  haveI : Finite (Subgroup ↥L) := Finite.of_injective (fun K : Subgroup ↥L => (K : Set ↥L))
+  let : H.Normal := hyp.H_normal
+  let : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  have : Finite (Subgroup ↥L) := Finite.of_injective (fun K : Subgroup ↥L => (K : Set ↥L))
     (fun _ _ h => SetLike.coe_injective h)
   set s : Set (Subgroup ↥L) := {A | A.Normal ∧ M ≤ A ∧ A ≤ H₁ ∧
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration A)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))} with hs_def
   have hH₁s : H₁ ∈ s := by
-    simp only [hs_def, Set.mem_setOf_eq]; exact ⟨‹H₁.Normal›, hMH₁, le_refl _, hcoh⟩
+    simp only [hs_def, Set.mem_ofPred_eq]; exact ⟨‹H₁.Normal›, hMH₁, le_refl _, hcoh⟩
   obtain ⟨A, hAmem, hAmin⟩ :=
     Set.Finite.exists_minimalFor (id : Subgroup ↥L → Subgroup ↥L) s (Set.toFinite _) ⟨H₁, hH₁s⟩
-  simp only [hs_def, Set.mem_setOf_eq] at hAmem
+  simp only [hs_def, Set.mem_ofPred_eq] at hAmem
   obtain ⟨hAnorm, hMA, hAH₁, hAcoh⟩ := hAmem
-  haveI : A.Normal := hAnorm
+  have : A.Normal := hAnorm
   have hAeqM : A = M := by
     by_contra hne
     have hMltA : M < A := lt_of_le_of_ne hMA (Ne.symm hne)
     obtain ⟨B, hBnorm, hMB, hBltA, hBmaxl⟩ := exists_maximal_normal_between hMltA
-    haveI : B.Normal := hBnorm
+    have : B.Normal := hBnorm
     have hAltH : A < H := lt_of_le_of_lt hAH₁ hH₁H
     have hAcomm := hyp.commutator_subgroupOf_quotient_ne_top hAltH
     have hcentral := normal_central_of_maximal_normal_below (H := H) (A := A) (B := B)
@@ -764,7 +764,7 @@ theorem six_three (hyp : SibleyDadeHypothesis G L H)
         (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
       intro hBcoh
       have hBs : B ∈ s := by
-        simp only [hs_def, Set.mem_setOf_eq]
+        simp only [hs_def, Set.mem_ofPred_eq]
         exact ⟨hBnorm, hMB, hBltA.le.trans hAH₁, hBcoh⟩
       exact lt_irrefl _ (hBltA.trans_le (hAmin hBs hBltA.le))
     have hbnd := hyp.six_three_index_bound hF hBltA.le hAH₁ hAcomm hcentral hAcoh hSBncoh
@@ -787,12 +787,12 @@ theorem isPGroup_of_not_coherent (hyp : SibleyDadeHypothesis G L H)
     (hSncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
     ∃ p : ℕ, p.Prime ∧ IsPGroup p ↥H := by
-  letI : H.Normal := hyp.H_normal
-  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
-  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
+  let : H.Normal := hyp.H_normal
+  let : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  have : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
   -- `⁅H,H⁆ ⊊ H` from nilpotency (nontrivial nilpotent is not perfect)
   have hcommlt : (⁅H, H⁆ : Subgroup ↥L) < H := by
-    have h1 : _root_.commutator ↥H < ⊤ := IsSolvable.commutator_lt_top_of_nontrivial ↥H
+    have h1 : _root_.commutator ↥H < ⊤ := Group.IsSolvable.commutator_lt_top_of_nontrivial ↥H
     rw [← commutator_subgroupOf_self] at h1
     refine lt_of_le_of_ne (Subgroup.commutator_le_left H H) (fun heq => ?_)
     rw [heq, Subgroup.subgroupOf_self] at h1

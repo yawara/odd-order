@@ -246,9 +246,9 @@ theorem orderOf_distinguishedInvolution_mul_t_of_psl2Target
     (L : Subgroup G) (hLnormal : L.Normal) (hLodd : Odd L.index)
     (data : PSL2InductionTarget (Omega := Omega) L) :
     orderOf (hyp.distinguishedInvolution * hyp.t) = 3 := by
-  letI : Field data.F := data.fieldF
-  letI : Finite data.F := data.finiteF
-  letI : CharP data.F 2 := data.charTwoF
+  let : Field data.F := data.fieldF
+  let : Finite data.F := data.finiteF
+  let : CharP data.F 2 := data.charTwoF
   have hcore := hyp.Q_and_residual_of_psl2_target L hLnormal hLodd
     data.cardF_gt_two data.groupEquiv data.actionEquiv
       data.actionEquiv_bijective
@@ -375,7 +375,7 @@ theorem orderOf_distinguishedInvolution_mul_t_of_centralizer_psl2Target
       letI := hyp.centralizerQuotientMulAction hXV
       PSL2InductionTarget (Omega := ↥(MulAction.fixedPoints X Omega)) result.L) :
     orderOf (hyp.distinguishedInvolution * hyp.t) = 3 := by
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   let qhyp := hyp.centralizerQuotientHypothesis hXV hA3
   have hquotOrder :
       orderOf (qhyp.distinguishedInvolution * qhyp.t) = 3 :=

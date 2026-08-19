@@ -340,7 +340,7 @@ theorem natCard_standardPermGroup (n : ℕ) (hn : 0 < n) :
     Nat.card (standardPermGroup n) =
       2 ^ (3 * n) * (2 ^ (3 * n) + 1) *
         ((2 ^ (2 * n) - 1) / (2 ^ n + 1).gcd 3) := by
-  letI : MulAction.IsPretransitive (standardPermGroup n) (Unital n) :=
+  let : MulAction.IsPretransitive (standardPermGroup n) (Unital n) :=
     standardPermGroup_isPretransitive n
   have hindex := MulAction.index_stabilizer_of_transitive
     (standardPermGroup n) (Unital.infinity n)

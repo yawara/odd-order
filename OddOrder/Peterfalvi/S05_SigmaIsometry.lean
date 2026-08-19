@@ -88,9 +88,9 @@ theorem sigma_inner (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     ClassFunction.inner (hyp.sigma hVeq app x) (hyp.sigma hVeq app y)
       = ClassFunction.inner x y := by
   classical
-  haveI : Finite hyp.W := Finite.of_fintype _
-  haveI : Finite (IrreducibleCharacter hyp.W) := finite_irreducibleCharacter
-  haveI : Fintype (IrreducibleCharacter hyp.W) := Fintype.ofFinite _
+  have : Finite hyp.W := Finite.of_fintype _
+  have : Finite (IrreducibleCharacter hyp.W) := finite_irreducibleCharacter
+  have : Fintype (IrreducibleCharacter hyp.W) := Fintype.ofFinite _
   set b := irreducibleCharacterBasis (G := hyp.W) with hb
   have hbω : ∀ ω, b ω = (ω : ClassFunction hyp.W ℂ) := fun ω => by
     rw [hb]; exact irreducibleCharacterBasis_apply ω
@@ -191,13 +191,13 @@ theorem alphaBasis_apply (hyp : TICyclicHypothesis G) [Fintype hyp.W]
         {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}) :
     hyp.alphaBasis hVeq pq = hyp.alpha hVeq pq.1.1 pq.2.1 := by
   classical
-  haveI : Finite G := Finite.of_fintype G
-  letI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
-  letI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
-  letI : Fintype {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} := Fintype.ofFinite _
-  letI : Fintype {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} := Fintype.ofFinite _
-  haveI := hyp.nonempty_charNeOne hyp.W1_le_W hyp.W1_nontrivial
-  haveI := hyp.nonempty_charNeOne hyp.W2_le_W hyp.W2_nontrivial
+  have : Finite G := Finite.of_fintype G
+  let : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  let : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  let : Fintype {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} := Fintype.ofFinite _
+  let : Fintype {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} := Fintype.ofFinite _
+  have := hyp.nonempty_charNeOne hyp.W1_le_W hyp.W1_nontrivial
+  have := hyp.nonempty_charNeOne hyp.W2_le_W hyp.W2_nontrivial
   have h : ⇑(hyp.alphaBasis hVeq) = fun p => hyp.alpha hVeq p.1.1 p.2.1 := by
     unfold TICyclicHypothesis.alphaBasis
     exact coe_basisOfLinearIndependentOfCardEqFinrank _ _
@@ -272,7 +272,7 @@ theorem vanishOnV_of_inner_alphaCF (hyp : TICyclicHypothesis G) [Fintype hyp.W]
       p ≠ 1 → q ≠ 1 → ClassFunction.inner (hyp.alphaCF p q) f = 0)
     {v : G} (hv : v ∈ hyp.V) : f ⟨v, hyp.V_subset_W hv⟩ = 0 := by
   classical
-  haveI : IsMulCommutative ↥hyp.W := hyp.isMulCommutative_W
+  have : IsMulCommutative ↥hyp.W := hyp.isMulCommutative_W
   -- `⟨·, f⟩` is zero on `CF(W, V)`: zero on the basis `α_{ij}` (so on the whole submodule)
   have hL0 : (innerLeftFunctional f).comp (Submodule.subtype
       (ClassFunction.supportedSubmodule (G := ↥hyp.W)
@@ -330,9 +330,9 @@ theorem sigma_apply_of_mem_V (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     (α : ClassFunction hyp.W ℂ) {v : G} (hv : v ∈ hyp.V) :
     hyp.sigma hVeq app α v = α ⟨v, hyp.V_subset_W hv⟩ := by
   classical
-  haveI : Finite hyp.W := Finite.of_fintype _
-  haveI : Finite (IrreducibleCharacter hyp.W) := finite_irreducibleCharacter
-  haveI : Fintype (IrreducibleCharacter hyp.W) := Fintype.ofFinite _
+  have : Finite hyp.W := Finite.of_fintype _
+  have : Finite (IrreducibleCharacter hyp.W) := finite_irreducibleCharacter
+  have : Fintype (IrreducibleCharacter hyp.W) := Fintype.ofFinite _
   -- the linear functional `D α = α^σ(v) - α(v)` vanishes on the basis `Irr(W)`, hence is `0`
   let D : ClassFunction hyp.W ℂ →ₗ[ℂ] ℂ :=
     { toFun := fun α => hyp.sigma hVeq app α v - α ⟨v, hyp.V_subset_W hv⟩
@@ -567,7 +567,7 @@ theorem sigmaCoeff_eq_zero_of_sigmaNC_lt (hyp : TICyclicHypothesis G) [Fintype h
     (hNC : hyp.sigmaNC hVeq app ψ < min (Nat.card hyp.W1) (Nat.card hyp.W2))
     (pq : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)) :
     hyp.sigmaCoeff hVeq app ψ pq = 0 := by
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   refine grid_eq_zero_of_ncard_support_lt (fun pq => hyp.sigmaCoeff hVeq app ψ pq)
     (fun p p' q q' => hyp.sigmaCoeff_add_eq hVeq app hψ p p' q q') ?_ pq
   rw [hyp.card_charGroup_subgroupOf hyp.W1_le_W, hyp.card_charGroup_subgroupOf hyp.W2_le_W]
@@ -577,7 +577,7 @@ theorem sigmaCoeff_eq_zero_of_sigmaNC_lt (hyp : TICyclicHypothesis G) [Fintype h
 
 /-- `w₁ = |W₁| ≥ 3`: `|W₁|` is odd (it divides the odd `|W|`) and `> 1` (`W₁` is nontrivial). -/
 theorem three_le_card_W1 (hyp : TICyclicHypothesis G) : 3 ≤ Nat.card hyp.W1 := by
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   have hodd : Odd (Nat.card hyp.W1) :=
     hyp.W_card_odd.of_dvd_nat (Subgroup.card_dvd_of_le hyp.W1_le_W)
   have hgt : 1 < Nat.card hyp.W1 :=
@@ -588,7 +588,7 @@ theorem three_le_card_W1 (hyp : TICyclicHypothesis G) : 3 ≤ Nat.card hyp.W1 :=
 
 /-- `w₂ = |W₂| ≥ 3`: `|W₂|` is odd (it divides the odd `|W|`) and `> 1` (`W₂` is nontrivial). -/
 theorem three_le_card_W2 (hyp : TICyclicHypothesis G) : 3 ≤ Nat.card hyp.W2 := by
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   have hodd : Odd (Nat.card hyp.W2) :=
     hyp.W_card_odd.of_dvd_nat (Subgroup.card_dvd_of_le hyp.W2_le_W)
   have hgt : 1 < Nat.card hyp.W2 :=
@@ -608,7 +608,7 @@ theorem ncard_inner_chiFam_ne_zero_le_one (hyp : TICyclicHypothesis G) [Fintype 
     {pq : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) |
       ClassFunction.inner χ (hyp.chiFam hVeq app pq) ≠ 0}.ncard ≤ 1 := by
   classical
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   obtain ⟨ε, μ, hε, hχrepr⟩ := exists_zsmul_irreducibleCharacter_of_inner_self_one hχ hχ1
   -- any index in the support has `χ_{pq} = ±μ`
   have hkey : ∀ pq, ClassFunction.inner χ (hyp.chiFam hVeq app pq) ≠ 0 →
@@ -667,7 +667,7 @@ theorem ncard_sigmaCoeff_ne_zero_le_two (hyp : TICyclicHypothesis G) [Fintype hy
     {pq : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) |
       hyp.sigmaCoeff hVeq app χ pq ≠ 0}.ncard ≤ 2 := by
   classical
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hχ
   have hsum : ∑ a ∈ c.support, c a ^ 2 = 2 := by exact_mod_cast hsq.symm.trans hχ2
   obtain ⟨α, β, hαβ, hs, -, -⟩ := exists_pair_of_sum_sq_eq_two
@@ -689,8 +689,8 @@ theorem ncard_sigmaCoeff_ne_zero_le_two (hyp : TICyclicHypothesis G) [Fintype hy
     {pq | ClassFunction.inner β (hyp.chiFam hVeq app pq) ≠ 0})
     ?_ (Set.toFinite _)) (le_trans (Set.ncard_union_le _ _) ?_)
   · intro pq hpq
-    simp only [sigmaCoeff, Set.mem_setOf_eq] at hpq
-    rw [Set.mem_union, Set.mem_setOf_eq, Set.mem_setOf_eq]
+    simp only [sigmaCoeff, Set.mem_ofPred_eq] at hpq
+    rw [Set.mem_union, Set.mem_ofPred_eq, Set.mem_ofPred_eq]
     by_contra hcon
     push Not at hcon
     exact hpq (by rw [hχαβ, ClassFunction.inner_add_left, ClassFunction.inner_smul_left,
@@ -714,9 +714,9 @@ theorem ncard_sigmaCoeff_ne_zero_le_of_inner_self_natCast (hyp : TICyclicHypothe
     {χ : ClassFunction G ℂ} {N : ℕ} (hχ : χ ∈ ZIrr G)
     (hχN : ClassFunction.inner χ χ = (N : ℂ)) :
     hyp.sigmaNC hVeq app χ ≤ N := by
-  haveI : Finite G := Finite.of_fintype G
-  haveI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
-  haveI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have : Finite G := Finite.of_fintype G
+  have : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
   obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hχ
   -- `∑_a c_a² = N` as integers.
   have hsumZ : ∑ a ∈ c.support, c a ^ 2 = (N : ℤ) := by
@@ -728,7 +728,7 @@ theorem ncard_sigmaCoeff_ne_zero_le_of_inner_self_natCast (hyp : TICyclicHypothe
         hyp.sigmaCoeff hVeq app χ pq ≠ 0}
       = ↑(Finset.univ.filter (fun pq => hyp.sigmaCoeff hVeq app χ pq ≠ 0)) by
         ext pq
-        simp only [Set.mem_setOf_eq, Finset.mem_coe, Finset.mem_filter, Finset.mem_univ, true_and],
+        simp only [Set.mem_ofPred_eq, Finset.mem_coe, Finset.mem_filter, Finset.mem_univ, true_and],
     Set.ncard_coe_finset]
   calc (Finset.univ.filter (fun pq => hyp.sigmaCoeff hVeq app χ pq ≠ 0)).card
       ≤ (c.support.biUnion (fun a => Finset.univ.filter
@@ -764,7 +764,7 @@ theorem ncard_sigmaCoeff_ne_zero_le_of_inner_self_natCast (hyp : TICyclicHypothe
           = ↑(Finset.univ.filter (fun pq => ClassFunction.inner a (hyp.chiFam hVeq app pq) ≠ 0))
           by
             ext pq
-            simp only [Set.mem_setOf_eq, Finset.mem_coe, Finset.mem_filter, Finset.mem_univ,
+            simp only [Set.mem_ofPred_eq, Finset.mem_coe, Finset.mem_filter, Finset.mem_univ,
               true_and], Set.ncard_coe_finset] at hle
     _ = c.support.card := by rw [Finset.sum_const, smul_eq_mul, mul_one]
     _ ≤ N := by
@@ -791,7 +791,7 @@ theorem sigmaCoeff_eq_zero_or_one_of_inner_self_two (hyp : TICyclicHypothesis G)
     hyp.sigmaCoeff hVeq app χ pq = 0 ∨ hyp.sigmaCoeff hVeq app χ pq = 1 ∨
       hyp.sigmaCoeff hVeq app χ pq = -1 := by
   classical
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hχ
   have hsum : ∑ a ∈ c.support, c a ^ 2 = 2 := by exact_mod_cast hsq.symm.trans hχ2
   obtain ⟨α, β, hαβ, hs, hcα, hcβ⟩ := exists_pair_of_sum_sq_eq_two
@@ -841,7 +841,7 @@ theorem eq_sigma_of_apply_eq_on_V (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     (hres : ∀ v (hv : v ∈ hyp.V), χ v = (ω : ClassFunction hyp.W ℂ) ⟨v, hyp.V_subset_W hv⟩) :
     χ = hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ) := by
   classical
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   -- the difference `φ = ω^σ − χ` vanishes on `V` ((3.2)(c) + the hypothesis)
   have hφV : ∀ v ∈ hyp.V,
       (hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ) - χ) v = 0 := by
@@ -859,11 +859,11 @@ theorem eq_sigma_of_apply_eq_on_V (hyp : TICyclicHypothesis G) [Fintype hyp.W]
         ⊆ insert (hyp.omegaIrrEquiv.symm ω)
             {pq | ClassFunction.inner χ (hyp.chiFam hVeq app pq) ≠ 0} := by
       intro pq hpq
-      simp only [Set.mem_setOf_eq, sigmaCoeff] at hpq
+      simp only [Set.mem_ofPred_eq, sigmaCoeff] at hpq
       by_cases h0 : pq = hyp.omegaIrrEquiv.symm ω
       · exact Set.mem_insert_iff.mpr (Or.inl h0)
       · refine Set.mem_insert_iff.mpr (Or.inr ?_)
-        simp only [Set.mem_setOf_eq]
+        simp only [Set.mem_ofPred_eq]
         intro hc
         apply hpq
         rw [ClassFunction.inner_sub_left, hc, hσωeq, (hyp.chiFam_spec hVeq app).2.2.1,
@@ -913,7 +913,7 @@ theorem sigma_mapRingEquiv_comm (hyp : TICyclicHypothesis G) [Fintype hyp.W]
           ((IrreducibleCharacter.galoisMap u ω : IrreducibleCharacter hyp.W) :
             ClassFunction hyp.W ℂ) := by
   classical
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   have hσZ : hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ) ∈ ZIrr G :=
     hyp.sigma_mem_ZIrr hVeq app (IsIrreducibleCharacter.mem_ZIrr ω.2)
   have hσ1 : ClassFunction.inner (hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ))
@@ -939,7 +939,7 @@ theorem sigma_mapRingEquiv_comm (hyp : TICyclicHypothesis G) [Fintype hyp.W]
 `ξ ^ |W| = 1` pointwise. -/
 theorem orderOf_char_ne_zero (hyp : TICyclicHypothesis G) [Finite hyp.W]
     (ξ : hyp.W →* ℂˣ) : orderOf ξ ≠ 0 := by
-  haveI : Fintype hyp.W := Fintype.ofFinite _
+  have : Fintype hyp.W := Fintype.ofFinite _
   have hξpow : ξ ^ Fintype.card hyp.W = 1 := by
     ext w
     rw [MonoidHom.pow_apply, MonoidHom.one_apply, ← map_pow, pow_card_eq_one, map_one]
@@ -968,7 +968,7 @@ theorem exists_mapRingEquiv_sigma_omega_pow (hyp : TICyclicHypothesis G) [Fintyp
         hyp.sigma hVeq app (hyp.omega (ξ ^ k) : ClassFunction hyp.W ℂ) g
           = hyp.sigma hVeq app (hyp.omega ξ : ClassFunction hyp.W ℂ) g := by
   classical
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   have ha : orderOf ξ ≠ 0 := hyp.orderOf_char_ne_zero ξ
   -- `B` = product of the divisors of `|G|` coprime to `a`: coprime to `a`, and any
   -- `orderOf g` coprime to `a` divides it
@@ -1038,7 +1038,7 @@ theorem exists_mapRingEquiv_chiFam_left_move (hyp : TICyclicHypothesis G) [Finty
       hyp.chiFam hVeq app (p', 1)
         = ClassFunction.mapRingEquiv u (hyp.chiFam hVeq app (p, 1)) := by
   classical
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   -- the character group has prime order `|W₁|`, so the nontrivial `p` generates
   have hcard : Nat.card ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) = Nat.card hyp.W1 :=
     hyp.card_charGroup_subgroupOf hyp.W1_le_W
@@ -1110,7 +1110,7 @@ theorem exists_mapRingEquiv_chiFam_right_move (hyp : TICyclicHypothesis G) [Fint
       hyp.chiFam hVeq app (1, q')
         = ClassFunction.mapRingEquiv u (hyp.chiFam hVeq app (1, q)) := by
   classical
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   have hcard : Nat.card ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) = Nat.card hyp.W2 :=
     hyp.card_charGroup_subgroupOf hyp.W2_le_W
   have hord : orderOf q = Nat.card hyp.W2 := by
@@ -1197,7 +1197,7 @@ coprime to `a`: the image of a primitive root `ζ₀` is again a primitive root,
 with `i` coprime to `a`, and every `a`-th root is a power of `ζ₀`. -/
 theorem exists_pow_forall_rootsOfUnity (u : ℂ ≃+* ℂ) {a : ℕ} (ha : a ≠ 0) :
     ∃ i : ℕ, i.Coprime a ∧ ∀ ζ : ℂ, ζ ^ a = 1 → u ζ = ζ ^ i := by
-  haveI : NeZero a := ⟨ha⟩
+  have : NeZero a := ⟨ha⟩
   have hζ₀ := Complex.isPrimitiveRoot_exp a ha
   have hupow : u (Complex.exp (2 * Real.pi * Complex.I / a)) ^ a = 1 := by
     rw [← map_pow, hζ₀.pow_eq_one, map_one]
@@ -1221,10 +1221,10 @@ theorem exists_ratCast_of_forall_complexRingEquiv_eq {x : ℂ} (hint : IsIntegra
     (hfix : ∀ u : ℂ ≃+* ℂ, u x = x) : ∃ q : ℚ, x = (q : ℂ) := by
   classical
   have hsplits : ((minpoly ℚ x).map (algebraMap ℚ ℂ)).Splits := IsAlgClosed.splits _
-  haveI : (minpoly ℚ x).IsSplittingField ℚ
+  have : (minpoly ℚ x).IsSplittingField ℚ
       (IntermediateField.adjoin ℚ ((minpoly ℚ x).rootSet ℂ)) :=
     IntermediateField.adjoin_rootSet_isSplittingField hsplits
-  haveI : Normal ℚ (IntermediateField.adjoin ℚ ((minpoly ℚ x).rootSet ℂ)) :=
+  have : Normal ℚ (IntermediateField.adjoin ℚ ((minpoly ℚ x).rootSet ℂ)) :=
     Normal.of_isSplittingField (minpoly ℚ x)
   have hxroot : x ∈ (minpoly ℚ x).rootSet ℂ := by
     rw [Polynomial.mem_rootSet]
@@ -1282,7 +1282,7 @@ theorem exists_intCast_sigma_omega_apply (hyp : TICyclicHypothesis G) [Fintype h
     (ξ : hyp.W →* ℂˣ) {g : G} (hg : (orderOf g).Coprime (orderOf ξ)) :
     ∃ n : ℤ, hyp.sigma hVeq app (hyp.omega ξ : ClassFunction hyp.W ℂ) g = (n : ℂ) := by
   classical
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   have ha : orderOf ξ ≠ 0 := hyp.orderOf_char_ne_zero ξ
   have hσZ : hyp.sigma hVeq app (hyp.omega ξ : ClassFunction hyp.W ℂ) ∈ ZIrr G :=
     hyp.sigma_mem_ZIrr hVeq app (IsIrreducibleCharacter.mem_ZIrr (hyp.omega ξ).2)

@@ -363,7 +363,7 @@ theorem pow_mem_center_of_cyclic_index_prime
     x ^ p ∈ Subgroup.center R := by
   set H : Subgroup R := Subgroup.zpowers x with hH_def
   -- `H ⊴ R` (index `p` = `minFac` in a `p`-group).
-  haveI hH_normal : H.Normal := by
+  have hH_normal : H.Normal := by
     have hp_prime : p.Prime := Fact.out
     obtain ⟨m, hm⟩ := IsPGroup.iff_card.mp hR
     have hm_ne : m ≠ 0 := by
@@ -432,7 +432,7 @@ theorem commutator_le_center_of_cyclic_index_prime
   set N : Subgroup R := Subgroup.zpowers (x ^ p) with hN_def
   have hN_le_center : N ≤ Subgroup.center R := by
     rw [hN_def, Subgroup.zpowers_le]; exact hxp_center
-  haveI hN_normal : N.Normal := by
+  have hN_normal : N.Normal := by
     refine ⟨fun n hn g => ?_⟩
     have hgn : g * n = n * g := Subgroup.mem_center_iff.mp (hN_le_center hn) g
     simpa [mul_assoc, hgn] using hn
@@ -446,7 +446,7 @@ theorem commutator_le_center_of_cyclic_index_prime
     have hcardR : Nat.card R = p := by
       have hidx : (⊥ : Subgroup R).index = Nat.card R := Subgroup.index_bot
       rw [← hHbot, hHidx] at hidx; exact hidx.symm
-    haveI : IsCyclic R := isCyclic_of_prime_card hcardR
+    have : IsCyclic R := isCyclic_of_prime_card hcardR
     exact (commutator_eq_bot R).le.trans bot_le
   -- Main case `e ≥ 1`. `|R| = p · orderOf x = p^(e+1)`.
   have hcardR : Nat.card R = p ^ (e + 1) := by
@@ -499,7 +499,7 @@ theorem card_omega1_le_prime_sq_of_cyclic_index_prime
   set Ω : Subgroup R := Omega R p 1 with hΩ_def
   have hp_prime : p.Prime := Fact.out
   -- `H ⊴ R`.
-  haveI hH_normal : H.Normal := by
+  have hH_normal : H.Normal := by
     obtain ⟨m, hm⟩ := IsPGroup.iff_card.mp hR
     have hm_ne : m ≠ 0 := by
       rintro rfl
@@ -518,11 +518,11 @@ theorem card_omega1_le_prime_sq_of_cyclic_index_prime
   set K : Subgroup R := Ω ⊓ H with hK_def
   have hK_card_dvd : Nat.card K ∣ p := by
     -- `K` is a subgroup of cyclic `H`, hence cyclic; its exponent divides `p`.
-    haveI hHcyc : IsCyclic H := by rw [hH_def]; exact Subgroup.isCyclic_zpowers x
-    haveI hK_cyc : IsCyclic K := by
+    have hHcyc : IsCyclic H := by rw [hH_def]; exact Subgroup.isCyclic_zpowers x
+    have hK_cyc : IsCyclic K := by
       -- `K.subgroupOf H` is a subgroup of the cyclic `H`, hence cyclic; transport to `K`.
       have hKH : K ≤ H := inf_le_right
-      haveI : IsCyclic (K.subgroupOf H) := Subgroup.isCyclic _
+      have : IsCyclic (K.subgroupOf H) := Subgroup.isCyclic _
       exact isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe hKH).surjective
     -- exponent of `K` divides `p`.
     have hexp_dvd : Monoid.exponent K ∣ p := by
@@ -595,7 +595,7 @@ theorem isElementaryAbelian_omega1_of_cyclic_index_prime
     have hKΩ : Ksub ≤ Ω := mem_omega_of_card_p Ksub hK
     have hLΩ : Lsub ≤ Ω := mem_omega_of_card_p Lsub hL
     intro hcyc
-    haveI : IsCyclic Ω := hcyc
+    have : IsCyclic Ω := hcyc
     -- `Ω` has exponent dividing `p` (class ≤ 2 + odd), and cyclic ⇒ `|Ω| = exponent ∣ p`.
     have hcl : _root_.commutator R ≤ Subgroup.center R :=
       commutator_le_center_of_cyclic_index_prime hR hp_odd hHidx
@@ -679,11 +679,11 @@ theorem card_omega1_eq_prime_of_isCyclic
     Nat.card (Omega Q p 1) = p := by
   have hp_prime : p.Prime := Fact.out
   -- `Q` is commutative; use it for the `powMonoidHom` kernel cardinality lemma.
-  letI : CommGroup Q := IsCyclic.commGroup
+  let : CommGroup Q := IsCyclic.commGroup
   -- `Ω₁(Q) = (powMonoidHom p).ker`: the generating set `{g | g^(p^1)=1}` *is* the kernel.
   have hset : {g : Q | g ^ (p ^ 1) = 1} = ((powMonoidHom p : Q →* Q).ker : Set Q) := by
     ext g
-    simp only [Set.mem_setOf_eq, pow_one, SetLike.mem_coe, MonoidHom.mem_ker, powMonoidHom_apply]
+    simp only [Set.mem_ofPred_eq, pow_one, SetLike.mem_coe, MonoidHom.mem_ker, powMonoidHom_apply]
   have hΩ_ker : Omega Q p 1 = (powMonoidHom p : Q →* Q).ker := by
     rw [Omega, hset, Subgroup.closure_eq]
   -- `|Q| = p^k` with `k ≥ 1` (nontrivial `p`-group).
@@ -708,7 +708,7 @@ private theorem subgroup_card_prime_unique_of_isCyclic
     {C : Type*} [Group C] [Finite C] [IsCyclic C] {K L : Subgroup C}
     (hK : Nat.card K = p) (hL : Nat.card L = p) : K = L := by
   have hp_prime : p.Prime := Fact.out
-  letI : CommGroup C := IsCyclic.commGroup
+  let : CommGroup C := IsCyclic.commGroup
   -- Each order-`p` subgroup equals the unique order-`p` kernel `(powMonoidHom p).ker`.
   have key : ∀ {M : Subgroup C}, Nat.card M = p → M = (powMonoidHom p : C →* C).ker := by
     intro M hM
@@ -739,10 +739,10 @@ theorem isElementaryAbelian_omega1_of_isMetacyclic
   classical
   -- Unpack the metacyclic structure.
   obtain ⟨S, hS_norm, hS_cyc, hQ_cyc⟩ := hmeta
-  haveI := hS_norm
-  haveI : IsCyclic (R ⧸ S) := hQ_cyc
+  have := hS_norm
+  have : IsCyclic (R ⧸ S) := hQ_cyc
   -- `R/S` is nontrivial: else `S = ⊤` and `R ≅ ↥S` is cyclic, contradicting `hnc`.
-  haveI hQ_nontriv : Nontrivial (R ⧸ S) := by
+  have hQ_nontriv : Nontrivial (R ⧸ S) := by
     rcases subsingleton_or_nontrivial (R ⧸ S) with hsub | hnt
     · exfalso
       -- `R⧸S` subsingleton ⇒ `S.index = 1` ⇒ `S = ⊤`; then `↥(⊤) ≅ R` is cyclic.
@@ -931,12 +931,12 @@ theorem exists_normal_isElementaryAbelian_card_prime_sq_of_not_isCyclic
   have hp : p.Prime := Fact.out
   have hp2 : p ≠ 2 := by rintro rfl; exact (by decide : ¬ Odd 2) hp_odd
   -- a maximal abelian normal subgroup `A` (self-centralizing).
-  haveI hbotcomm : IsMulCommutative (⊥ : Subgroup R) :=
+  have hbotcomm : IsMulCommutative (⊥ : Subgroup R) :=
     IsMulCommutative.of_comm (fun a b => Subsingleton.elim _ _)
   obtain ⟨A, -, hAmax⟩ :=
     exists_maximalAbelianNormal_ge (B := (⊥ : Subgroup R)) inferInstance hbotcomm
-  haveI hAn : A.Normal := hAmax.isNormal
-  haveI hAcomm_inst : IsMulCommutative A := hAmax.isMulCommutative
+  have hAn : A.Normal := hAmax.isNormal
+  have hAcomm_inst : IsMulCommutative A := hAmax.isMulCommutative
   have hA_comm : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x := fun x hx y hy =>
     congrArg Subtype.val (mul_comm' (⟨x, hx⟩ : A) ⟨y, hy⟩)
   have hself : Subgroup.centralizer (A : Set R) = A := (hAmax.isSCN hR).selfCentralizing
@@ -944,10 +944,10 @@ theorem exists_normal_isElementaryAbelian_card_prime_sq_of_not_isCyclic
   · -- `A` cyclic ⟹ `R` metacyclic ⟹ `Ω₁(R)` is type `(p,p)`.
     have hmeta := isMetacyclic_of_isCyclic_selfCentralizing_normal hR hp2 hAcyc hself
     obtain ⟨hOea, hOcard⟩ := isElementaryAbelian_omega1_of_isMetacyclic hR hp_odd hmeta hnc
-    haveI : (Omega R p 1).Characteristic := Omega.characteristic
+    have : (Omega R p 1).Characteristic := Omega.characteristic
     exact ⟨Omega R p 1, inferInstance, hOea, hOcard⟩
   · -- `A` noncyclic ⟹ `Ω₁(A)` is a noncyclic normal elementary abelian subgroup.
-    haveI hApg : IsPGroup p A := hR.to_subgroup A
+    have hApg : IsPGroup p A := hR.to_subgroup A
     obtain ⟨E, hE_ea, hE_card⟩ :=
       exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic hApg hp_odd hAcyc
     have h2 : (2 : ℕ) ≤ pRank A p := by
@@ -958,7 +958,7 @@ theorem exists_normal_isElementaryAbelian_card_prime_sq_of_not_isCyclic
     have hVcard : p ^ 2 ≤ Nat.card (omega1OfAbelian R A p hA_comm) :=
       Nat.le_of_dvd Nat.card_pos
         (pow_dvd_card_omega1OfAbelian_of_pos_le_pRank (by norm_num) h2)
-    haveI hV_normal : (omega1OfAbelian R A p hA_comm).Normal := by
+    have hV_normal : (omega1OfAbelian R A p hA_comm).Normal := by
       refine ⟨fun v hv g => ?_⟩
       rw [mem_omega1OfAbelian] at hv ⊢
       exact ⟨hAn.conj_mem v hv.1 g, by rw [conj_pow, hv.2, mul_one, mul_inv_cancel]⟩

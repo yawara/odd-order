@@ -47,8 +47,8 @@ theorem mem_normalCore_of_orderOf_eq_prime_pow (hp : p.Prime) {X : Subgroup Y}
     (hX : X.index = p) {g : Y} (hg : g ∈ X) {k : ℕ} (hord : orderOf g = p ^ k) :
     g ∈ X.normalCore := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : Finite (Y ⧸ X) := Subgroup.index_ne_zero_iff_finite.mp (by rw [hX]; exact hp.pos.ne')
+  have : Fact p.Prime := ⟨hp⟩
+  have : Finite (Y ⧸ X) := Subgroup.index_ne_zero_iff_finite.mp (by rw [hX]; exact hp.pos.ne')
   have hcard : Nat.card (Y ⧸ X) = p := hX
   -- `⟨g⟩` は `p`-群
   have hpg : IsPGroup p ↥(Subgroup.zpowers g) :=

@@ -55,7 +55,7 @@ section /- 9B: Lemma 9.17 (p. 281) -/
 theorem isQuasisimple_of_isSimpleGroup_not_isMulCommutative
     (hs : IsSimpleGroup G) (hnc : ¬IsMulCommutative G) : IsQuasisimple G where
   isPerfect := by
-    haveI := hs
+    have := hs
     have hnorm : (commutator G).Normal := inferInstance
     refine ⟨hnorm.eq_bot_or_eq_top.resolve_left fun hbot => hnc ?_⟩
     have hcent : (⊤ : Subgroup G) ≤ Subgroup.centralizer ((⊤ : Subgroup G) : Set G) :=
@@ -64,7 +64,7 @@ theorem isQuasisimple_of_isSimpleGroup_not_isMulCommutative
       (Subgroup.mem_centralizer_iff.mp (hcent (Subgroup.mem_top x)) y
         (Subgroup.mem_top y)).symm
   isSimpleGroup_quotient := by
-    haveI := hs
+    have := hs
     have hz : center G = ⊥ :=
       center_eq_bot_of_isSimpleGroup_not_isMulCommutative G hnc
     exact ((QuotientGroup.quotientMulEquivOfEq hz).trans
@@ -75,7 +75,7 @@ closure `S^G` は `G` の minimal normal subgroup. -/
 theorem isMinimalNormal_normalClosure_of_isSubnormal [Finite G] {S : Subgroup G}
     (hS : S.IsSubnormal) (hsimp : IsSimpleGroup ↥S) (hnc : ¬IsMulCommutative ↥S) :
     Ch02.IsMinimalNormal (normalClosure (S : Set G)) := by
-  haveI := hsimp
+  have := hsimp
   set W := normalClosure (S : Set G) with hW
   have hScomp : IsComponent S :=
     ⟨hS, isQuasisimple_of_isSimpleGroup_not_isMulCommutative hsimp hnc⟩
@@ -107,7 +107,7 @@ theorem isMinimalNormal_normalClosure_of_isSubnormal [Finite G] {S : Subgroup G}
           (MulAut.conj g).injective).symm
     refine ⟨(Subgroup.normal_subgroupOf_iff_le_normalizer (hle g)).mpr (hWnorm g),
       e.isSimpleGroup, fun hcomm => hnc ?_⟩
-    haveI := hcomm
+    have := hcomm
     exact isMulCommutative_of_surjective e.toMonoidHom e.surjective
   have hsup : sSup (Set.range fun g : G =>
       (S.map (MulAut.conj g).toMonoidHom).subgroupOf W) = ⊤ := by
@@ -131,7 +131,7 @@ theorem isMinimalNormal_normalClosure_of_isSubnormal [Finite G] {S : Subgroup G}
     rcases eq_or_ne N ⊥ with rfl | hNbot
     · exact Or.inl rfl
     refine Or.inr ?_
-    haveI := hNnormal
+    have := hNnormal
     have hN'ne : N.subgroupOf W ≠ ⊥ := by
       intro hbot
       apply hNbot
@@ -141,7 +141,7 @@ theorem isMinimalNormal_normalClosure_of_isSubnormal [Finite G] {S : Subgroup G}
         Subgroup.mem_subgroupOf.mpr hx
       rw [hbot, Subgroup.mem_bot] at hmem
       simpa [Subgroup.mem_bot] using congrArg Subtype.val hmem
-    haveI : (N.subgroupOf W).Normal := hNnormal.comap W.subtype
+    have : (N.subgroupOf W).Normal := hNnormal.comap W.subtype
     obtain ⟨M', hM'min, hM'le⟩ :=
       Ch02.exists_isMinimalNormal_le_of_normal (N.subgroupOf W) hN'ne
     obtain ⟨g, hg⟩ := mem_semisimpleFamily_of_isMinimalNormal h𝒳 hsup hM'min
@@ -233,14 +233,14 @@ noncomputable def componentMapQuotientEquiv [Finite G] {H : Subgroup G} (hH : Is
 /-- component の像 `H̄ ≤ Ḡ` は simple (`H̄ ≅ ↥H ⧸ Z(↥H)`, `H` quasisimple). -/
 theorem isSimpleGroup_map_component [Finite G] {H : Subgroup G} (hH : IsComponent H) :
     IsSimpleGroup ↥(H.map (QuotientGroup.mk' (layerCenter G))) := by
-  haveI := hH.isQuasisimple.isSimpleGroup_quotient
+  have := hH.isQuasisimple.isSimpleGroup_quotient
   exact (componentMapQuotientEquiv hH).isSimpleGroup
 
 /-- component の像 `H̄ ≤ Ḡ` は非可換 (Lemma 9.1). -/
 theorem not_isMulCommutative_map_component [Finite G] {H : Subgroup G} (hH : IsComponent H) :
     ¬IsMulCommutative ↥(H.map (QuotientGroup.mk' (layerCenter G))) := by
   intro hcomm
-  haveI := hcomm
+  have := hcomm
   exact not_isMulCommutative_of_isSimpleGroup_quotient_center
     hH.isQuasisimple.isSimpleGroup_quotient
     (isMulCommutative_of_surjective (componentMapQuotientEquiv hH).toMonoidHom

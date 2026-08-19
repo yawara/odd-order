@@ -35,14 +35,14 @@ order dividing `q`, forcing `H = H ⊔ K = K`.) Used for BG Cor 13.11(d). -/
 theorem eq_of_card_eq_prime_of_isCyclic {A : Type*} [Group A] [Finite A] [IsCyclic A]
     {q : ℕ} (hq : q.Prime) {H K : Subgroup A}
     (hH : Nat.card ↥H = q) (hK : Nat.card ↥K = q) : H = K := by
-  haveI : Fact q.Prime := ⟨hq⟩
-  letI : CommGroup A := IsCyclic.commGroup
+  have : Fact q.Prime := ⟨hq⟩
+  let : CommGroup A := IsCyclic.commGroup
   have hHel : H.IsElementaryAbelian q := Subgroup.IsElementaryAbelian.of_card_prime hH
   have hKel : K.IsElementaryAbelian q := Subgroup.IsElementaryAbelian.of_card_prime hK
   have hcent : H ≤ Subgroup.centralizer (K : Set A) := fun x _ =>
     Subgroup.mem_centralizer_iff.mpr (fun y _ => mul_comm y x)
   have hsupel : (H ⊔ K).IsElementaryAbelian q := hHel.sup_of_le_centralizer hKel hcent
-  haveI : IsCyclic ↥(H ⊔ K) := inferInstance
+  have : IsCyclic ↥(H ⊔ K) := inferInstance
   have hexp : Monoid.exponent ↥(H ⊔ K) ∣ q :=
     Monoid.exponent_dvd_of_forall_pow_eq_one (fun x => hsupel.2 x)
   have hcarddvd : Nat.card ↥(H ⊔ K) ∣ q := by rwa [IsCyclic.exponent_eq_card] at hexp
@@ -56,7 +56,7 @@ contained in a cyclic subgroup `A` coincide. -/
 theorem eq_of_card_eq_prime_of_le_isCyclic {A : Subgroup G} [Finite ↥A] (hAcyc : IsCyclic ↥A)
     {q : ℕ} (hq : q.Prime) {H K : Subgroup G} (hHA : H ≤ A) (hKA : K ≤ A)
     (hH : Nat.card ↥H = q) (hK : Nat.card ↥K = q) : H = K := by
-  haveI := hAcyc
+  have := hAcyc
   have hH' : Nat.card ↥(H.subgroupOf A) = q := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHA).toEquiv]; exact hH
   have hK' : Nat.card ↥(K.subgroupOf A) = q := by
@@ -87,7 +87,7 @@ theorem E3_not_regular_consequences [Finite G] (hG : IsMinimalSimpleOdd G)
     by_contra hE2ne
     obtain ⟨pp, hpp, hppdvd⟩ :=
       (Nat.card ↥E₂).exists_prime_and_dvd (fun hc => hE2ne (Subgroup.card_eq_one.mp hc))
-    haveI : Fact pp.Prime := ⟨hpp⟩
+    have : Fact pp.Prime := ⟨hpp⟩
     have hc2 : Nat.card ↥(E₂.subgroupOf E) = Nat.card ↥E₂ :=
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₂_le).toEquiv
     have hppτ2 : pp ∈ tau2 M :=
@@ -107,7 +107,7 @@ theorem E3_not_regular_consequences [Finite G] (hG : IsMinimalSimpleOdd G)
   have hE1nreg : ¬ ActsRegularlyOn E₃ E₁ := by
     obtain ⟨pp, hpp, hppdvd⟩ :=
       (Nat.card ↥E₁).exists_prime_and_dvd (fun hc => hE1ne (Subgroup.card_eq_one.mp hc))
-    haveI : Fact pp.Prime := ⟨hpp⟩
+    have : Fact pp.Prime := ⟨hpp⟩
     obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' pp hppdvd
     have hPcard : Nat.card ↥(Subgroup.zpowers (g : G)) = pp := by
       rw [Nat.card_zpowers]; exact (orderOf_injective E₁.subtype E₁.subtype_injective g).trans hg
@@ -132,7 +132,7 @@ theorem E3_not_regular_consequences [Finite G] (hG : IsMinimalSimpleOdd G)
   refine ⟨hE1ne, hEsup, hEprime, ?_⟩
   -- (d) every prime-order `X ≤ E` is normal in `E`.
   intro q hqp X hXmem hXE
-  haveI : Fact q.Prime := ⟨hqp⟩
+  have : Fact q.Prime := ⟨hqp⟩
   have hXcard : Nat.card ↥X = q := by simpa using hXmem.2
   have hEN3 : E ≤ Subgroup.normalizer ((E₃ : Subgroup G) : Set G) := h.E3_normal hG
   -- `|E₁|`, `|E₃|` are coprime (`τ₁ ∩ τ₃ = ∅`).
@@ -157,8 +157,8 @@ theorem E3_not_regular_consequences [Finite G] (hG : IsMinimalSimpleOdd G)
         (by rw [sup_comm, ← hEsup]; exact hXE) hcopXE1
     exact E_le_normalizer_of_le_E3 hG h hXE3
   · -- τ₁ case: `q ∣ |E₁|`; `X` equals the unique order-`q` subgroup of `E₁` modulo `E₃`.
-    haveI : IsCyclic ↥E₁ := h.E1_isCyclic hG
-    haveI : IsCyclic ↥E₃ := h.E3_isCyclic hG
+    have : IsCyclic ↥E₁ := h.E1_isCyclic hG
+    have : IsCyclic ↥E₃ := h.E3_isCyclic hG
     have hE1NE3 : E₁ ≤ Subgroup.normalizer (E₃ : Set G) := h.E₁_le.trans (h.E3_normal hG)
     -- `|E| = |E₁| * |E₃|`, so from `q ∣ |X| ∣ |E|` and `q ∤ |E₃|` we get `q ∣ |E₁|`.
     have hcardE : Nat.card ↥E = Nat.card ↥E₁ * Nat.card ↥E₃ := by
@@ -183,7 +183,7 @@ theorem E3_not_regular_consequences [Finite G] (hG : IsMinimalSimpleOdd G)
     have hP₀E : P₀ ≤ E := hP₀E1.trans h.E₁_le
     -- `E` normalizes `P₀`: `E₁` does (char in cyclic `E₁`), and `E₃` does (centralizes it).
     have hE1NP₀ : E₁ ≤ Subgroup.normalizer (P₀ : Set G) := by
-      haveI : (P₀.subgroupOf E₁).Characteristic := Ch04.characteristic_of_subgroup_of_isCyclic _
+      have : (P₀.subgroupOf E₁).Characteristic := Ch04.characteristic_of_subgroup_of_isCyclic _
       intro e he
       have hmem := OddOrder.BG.Ch1.S03f.mem_normalizer_map_subtype_of_characteristic (W := E₁)
         (C := P₀.subgroupOf E₁) (Subgroup.le_normalizer he)
@@ -206,7 +206,7 @@ theorem E3_not_regular_consequences [Finite G] (hG : IsMinimalSimpleOdd G)
       intro m n
       change (m : G) * (n : G) = (n : G) * (m : G)
       exact (Subgroup.mem_centralizer_iff.mp (hP₀cent m.2) (n : G) n.2).symm
-    haveI : IsCyclic ↥D := by
+    have : IsCyclic ↥D := by
       have hinj : Function.Injective (MonoidHom.noncommCoprod P₀.subtype E₃.subtype hcomm) :=
         (MonoidHom.noncommCoprod_injective _ _ hcomm).mpr
           ⟨P₀.subtype_injective, E₃.subtype_injective, by
@@ -220,11 +220,11 @@ theorem E3_not_regular_consequences [Finite G] (hG : IsMinimalSimpleOdd G)
     -- `E` normalizes `D` (normalizes both `P₀` and `E₃`).
     have hEND : E ≤ Subgroup.normalizer (D : Set G) := le_normalizer_sup hENP₀ hEN3
     -- `X ⊔ E₃ = P₀ ⊔ E₃ = D`, via the unique order-`q` subgroup of the cyclic quotient `E/E₃`.
-    haveI hE₃subN : (E₃.subgroupOf E).Normal :=
+    have hE₃subN : (E₃.subgroupOf E).Normal :=
       (Subgroup.normal_subgroupOf_iff_le_normalizer h.E₃_le).mpr hEN3
     set mk : ↥E →* (↥E ⧸ E₃.subgroupOf E) := QuotientGroup.mk' (E₃.subgroupOf E) with hmkdef
     -- the quotient `↥E ⧸ E₃.subgroupOf E` is cyclic (surjective image of cyclic `↥E₁`).
-    haveI hQcyc : IsCyclic (↥E ⧸ E₃.subgroupOf E) := by
+    have hQcyc : IsCyclic (↥E ⧸ E₃.subgroupOf E) := by
       refine isCyclic_of_surjective (mk.comp (Subgroup.inclusion h.E₁_le)) ?_
       intro y
       induction y using QuotientGroup.induction_on with
@@ -286,7 +286,7 @@ theorem E3_not_regular_consequences [Finite G] (hG : IsMinimalSimpleOdd G)
         Subgroup.map_subgroupOf_eq_of_le (sup_le hP₀E h.E₃_le), ← hDdef] at this
     -- `X ≤ D`, `X` characteristic in cyclic `D`, `E ≤ N(D)` ⟹ `E ≤ N(X)`.
     have hXD : X ≤ D := hXsupE3 ▸ le_sup_left
-    haveI : (X.subgroupOf D).Characteristic := Ch04.characteristic_of_subgroup_of_isCyclic _
+    have : (X.subgroupOf D).Characteristic := Ch04.characteristic_of_subgroup_of_isCyclic _
     intro e he
     have hmem := OddOrder.BG.Ch1.S03f.mem_normalizer_map_subtype_of_characteristic (W := D)
       (C := X.subgroupOf D) (hEND he)
@@ -308,8 +308,9 @@ private theorem exists_conj_le_tau1_piece [Finite G] (hG : IsMinimalSimpleOdd G)
     (hp : p ∈ tau1 M) {P : Subgroup G} (hPp : IsPGroup p ↥P) (hPE : P ≤ E) :
     ∃ c ∈ E, MulAut.conj c • P ≤ E₁ := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
-  haveI : IsSolvable ↥E := solvable_of_solvable_injective (Subgroup.inclusion_injective h.E_le)
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups h.mem_maximal
+  have : Group.IsSolvable ↥E :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective h.E_le)
   have hPEpi : Ch03.Subgroup.IsPiGroup (tau1 M) (P.subgroupOf E) := by
     intro s hs
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPE).toEquiv] at hs
@@ -372,8 +373,9 @@ theorem Msigma_centralizer_eq_bot_of_tau1_tau2 [Finite G] (hG : IsMinimalSimpleO
   have hPne : P ≠ ⊥ := ne_bot_of_mem_elemAbelianOfRank_one hP
   have hAcard : Nat.card ↥A = q ^ 2 := hA.2
   have hAcomm : IsMulCommutative ↥A := ⟨⟨hA.1.comm⟩⟩
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
-  haveI : IsSolvable ↥E := solvable_of_solvable_injective (Subgroup.inclusion_injective h.E_le)
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups h.mem_maximal
+  have : Group.IsSolvable ↥E :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective h.E_le)
   -- `M_σ ⊴ M`, used to conjugate `C_{M_σ}(·)` by elements of `M`.
   have hMnormMσ : M ≤ Subgroup.normalizer ((S10.Msigma M : Subgroup G) : Set G) :=
     le_normalizer_opiCoreInG _ _
@@ -524,7 +526,7 @@ theorem Msigma_centralizer_eq_bot_of_tau1_tau2 [Finite G] (hG : IsMinimalSimpleO
   have hENcA : E ≤
       Subgroup.normalizer ((E ⊓ Subgroup.centralizer (A : Set G) : Subgroup G) : Set G) :=
     le_normalizer_inf Subgroup.le_normalizer (hENA.trans (normalizer_le_normalizer_centralizer A))
-  haveI hCEAnorm : ((E ⊓ Subgroup.centralizer (A : Set G)).subgroupOf E).Normal :=
+  have hCEAnorm : ((E ⊓ Subgroup.centralizer (A : Set G)).subgroupOf E).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer inf_le_left).mpr hENcA
   -- `P.subgroupOf E` is a `p`-group; take a Sylow `p`-subgroup `Sp ⊇ P` of `↥E`.
   have hPEpgroup : IsPGroup p ↥(P.subgroupOf E) :=
@@ -673,8 +675,9 @@ theorem mem_sigma_of_tau1_tau3_centralize [Finite G] (hG : IsMinimalSimpleOdd G)
     rcases hp with h1 | h3
     · exact tau1_pRank_eq_one h1
     · exact tau3_pRank_eq_one h3
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
-  haveI : IsSolvable ↥E := solvable_of_solvable_injective (Subgroup.inclusion_injective h.E_le)
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups h.mem_maximal
+  have : Group.IsSolvable ↥E :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective h.E_le)
   -- `P ≤ N_G(P) ≤ M*`.
   have hPMstar : P ≤ Mstar := Subgroup.le_normalizer.trans hNPMstar
   -- (0) `M*` is not conjugate to `M` (Lemma 12.2(b), τ₁∪τ₃ form).
@@ -693,7 +696,7 @@ theorem mem_sigma_of_tau1_tau3_centralize [Finite G] (hG : IsMinimalSimpleOdd G)
   set C : Subgroup G := S10.Msigma M ⊓ Subgroup.centralizer (P : Set G) with hCdef
   obtain ⟨q, hqp, hqdvd⟩ :=
     (Nat.card ↥C).exists_prime_and_dvd (fun hc => hCP (Subgroup.card_eq_one.mp hc))
-  haveI : Fact q.Prime := ⟨hqp⟩
+  have : Fact q.Prime := ⟨hqp⟩
   obtain ⟨a, ha⟩ := exists_prime_orderOf_dvd_card' (G := ↥C) q hqdvd
   set Q : Subgroup G := Subgroup.zpowers (a : G) with hQdef
   have hQcard : Nat.card ↥Q = q := by
@@ -777,7 +780,7 @@ theorem mem_sigma_of_tau1_tau3_centralize [Finite G] (hG : IsMinimalSimpleOdd G)
       -- `P ≤ E₃`: `P.subgroupOf E` is a `τ₃`-group, `E₃.subgroupOf E` a normal Hall `τ₃`-subgroup.
       have hPE3 : P ≤ E₃ := by
         have hEN3 : E ≤ Subgroup.normalizer ((E₃ : Subgroup G) : Set G) := h.E3_normal hG
-        haveI hE3subN : (E₃.subgroupOf E).Normal :=
+        have hE3subN : (E₃.subgroupOf E).Normal :=
           (Subgroup.normal_subgroupOf_iff_le_normalizer h.E₃_le).mpr hEN3
         have hPEpi : Ch03.Subgroup.IsPiGroup (tau3 M) (P.subgroupOf E) := by
           intro s hs
@@ -824,7 +827,7 @@ theorem mem_sigma_of_tau1_tau3_centralize [Finite G] (hG : IsMinimalSimpleOdd G)
       -- Pick a prime-order subgroup `P' ∈ ℰ_r¹(E₁)`.
       obtain ⟨r, hrp, hrdvd⟩ :=
         (Nat.card ↥E₁).exists_prime_and_dvd (fun hc => hE1ne (Subgroup.card_eq_one.mp hc))
-      haveI : Fact r.Prime := ⟨hrp⟩
+      have : Fact r.Prime := ⟨hrp⟩
       obtain ⟨b, hb⟩ := exists_prime_orderOf_dvd_card' (G := ↥E₁) r hrdvd
       set P' : Subgroup G := Subgroup.zpowers (b : G) with hP'def
       have hP'card : Nat.card ↥P' = r := by

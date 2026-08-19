@@ -264,12 +264,12 @@ theorem exists_finite_group_derivedSeries_ne_bot (n : ℕ) :
       exact mul_comm y x
   | succ n ih =>
     obtain ⟨A, instA, instFA, hne, hbot⟩ := ih
-    letI := instA
-    letI := instFA
+    let := instA
+    let := instFA
     -- `|A^{(n)}|` を割らない素数 `p`
     obtain ⟨p, hple, hp⟩ := Nat.exists_infinite_primes (Nat.card ↥(derivedSeries A n) + 1)
-    haveI : Fact p.Prime := ⟨hp⟩
-    haveI : Fact (1 < p) := ⟨hp.one_lt⟩
+    have : Fact p.Prime := ⟨hp⟩
+    have : Fact (1 < p) := ⟨hp.one_lt⟩
     have hpnd : ¬ p ∣ Nat.card ↥(derivedSeries A n) := by
       intro hdvd
       have hpos : 0 < Nat.card ↥(derivedSeries A n) := Nat.card_pos

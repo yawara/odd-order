@@ -42,6 +42,7 @@ producer's `φ`.  The pieces: the bridge `β_L^τ = (dataL.h78 hG).beta`, the pa
 `⟨β_S^τ, ζ_0^{τ₁}⟩ + ⟨β_L^τ, η_{01}⟩ ≡ 1 (mod 2)`, and the two case bounds. -/
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Bridge**: `β_L^τ = τ₁(Ind_H^L 1_H − ζ_0)` at the distinguished member `ζ_0 = dataL.zeta 0` is
 literally the §7.8 `beta` of the bundle (`(dataL.h78 hG).beta = τ(Ind_H^L 1_H − ζ_0)`).  Both are
 the Dade image of `Ind_H^L 1_H − ζ_0`; the §9 `Hypothesis71.τ` and the §7 `tau` agree on supported
@@ -50,7 +51,7 @@ theorem typeIBetaL_zeta0_eq_h78_beta [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G}
     (dataL : OddOrder.Peterfalvi.S16.TypeICoherent78Data L) :
     typeIBetaL dataL.typeIHyp (dataL.zeta 0) = (dataL.h78 hG).beta := by
-  haveI := dataL.kernelIn_normal
+  have := dataL.kernelIn_normal
   rw [OddOrder.Peterfalvi.S09.Hypothesis78.beta_def]
   change dataL.typeIHyp.tau _ = dataL.typeIHyp.toHypothesis71.τ _
   rw [dataL.typeIHyp.toHypothesis71_tau_apply]
@@ -213,6 +214,7 @@ theorem typeI_caseC_parity_of_c_eq_one [Finite G]
   exact ⟨k, by omega⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- **(13.19.c) case (c2) bound**: if `bLeta = ⟨β_L^τ, η_{01}⟩ ≠ 0` (the `η`-parity is odd),
 then `p ≤ e`.  The §7.8 residual `Γ_L = betaDecomp.Gamma` has `⟨Γ_L, η_{0j}⟩ = bLeta` for every
 `j ≠ 0` (from `beta_eq`, row constancy (13.19.c), and `1/ζ_0^{τ₁}/W_L ⊥ η`), so the Bessel
@@ -228,7 +230,7 @@ theorem typeI_caseC_bound_c2_of_c_eq_one [Finite G]
     (hnL0 : nL ≠ 0) :
     hyp.p ≤ ((maxNilpotentNormalHall L).subgroupOf L).index := by
   classical
-  haveI := dataL.kernelIn_normal
+  have := dataL.kernelIn_normal
   have hp0 : (0 : ℕ) < hyp.p := hyp.p_prime.pos
   -- `e = [L:H]` in the two forms.
   have he_eq : (dataL.h78 hG).complementIndex = ((maxNilpotentNormalHall L).subgroupOf L).index :=
@@ -366,7 +368,7 @@ theorem coh_extension_sub_zeta0_eq_typeIBetaL_sub [Finite G]
     dataL.coh.extension φ - dataL.coh.extension (dataL.zeta 0)
       = typeIBetaL dataL.typeIHyp (dataL.zeta 0) - typeIBetaL dataL.typeIHyp φ := by
   classical
-  haveI := dataL.kernelIn_normal
+  have := dataL.kernelIn_normal
   obtain ⟨k, hk_ne, hkφ⟩ := exists_zeta_index_of_mem_Sset hG dataL hφ
   -- `ζ_0(1) = e`, hence `d_k = 1` (equal degree).
   have hζ01 : dataL.zeta 0 (1 : ↥L) = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ) := by
@@ -422,7 +424,7 @@ theorem tauSbetaGrid_inner_coh_extension_eq_zeta0_of_c_eq_one [Finite G]
     ClassFunction.inner (tauSbetaGrid hG hyp) (dataL.coh.extension φ)
       = ClassFunction.inner (tauSbetaGrid hG hyp) (dataL.coh.extension (dataL.zeta 0)) := by
   classical
-  haveI := dataL.kernelIn_normal
+  have := dataL.kernelIn_normal
   have hζ01 : dataL.zeta 0 (1 : ↥L) = (((maxNilpotentNormalHall L).subgroupOf L).index : ℂ) := by
     rw [show dataL.zeta 0 (1 : ↥L)
         = ClassFunction.induce dataL.kernelIn (dataL.θ 0 : ClassFunction _ ℂ) (1 : ↥L) from rfl,
@@ -485,7 +487,7 @@ theorem inner_tauSbetaGrid_coh_ext_zeta_eq_of_c_eq_one [Finite G]
     ClassFunction.inner (tauSbetaGrid hG hyp) (dataL.coh.extension (dataL.zeta i))
       = dataL.d i * (nS : ℂ) := by
   classical
-  haveI := dataL.kernelIn_normal
+  have := dataL.kernelIn_normal
   by_cases hi0 : i = 0
   · subst hi0
     rw [dataL.d_zero_eq_one, one_mul]; exact hnS
@@ -571,7 +573,7 @@ theorem typeI_caseC_bound_c1_of_c_eq_one [Finite G]
         / (((maxNilpotentNormalHall L).subgroupOf L).index : ℚ) ≤
       ((hyp.u - 1 : ℕ) : ℚ) / (hyp.q : ℚ)) := by
   classical
-  haveI := dataL.kernelIn_normal
+  have := dataL.kernelIn_normal
   -- index/card bridges to `kernelIn`.
   have he_eq : (dataL.kernelIn).index = ((maxNilpotentNormalHall L).subgroupOf L).index := by
     change ((dataL.typeIHyp.typeI.typeF.H).subgroupOf L).index = _
@@ -1076,7 +1078,7 @@ theorem complement_card_eq_pq_of_c_eq_one_and_d_eq_one [Finite G]
   -- `|E ∩ Q| = |W₁| = q`.
   have hInfCard : Nat.card ↥(Em ⊓ hyp.Q) = hyp.q := by rw [hInf]; exact hyp.q_eq_card_W1.symm
   -- `Q ◁ Q W₂` (as `Q W₂ ≤ N_G(Q)`).
-  haveI hQnorm : (hyp.Q.subgroupOf Hg).Normal :=
+  have hQnorm : (hyp.Q.subgroupOf Hg).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQleH).mpr (sup_le Subgroup.le_normalizer hWnorm)
   -- `|Q W₂| = |Q| · p`.
   have hHcard : Nat.card ↥Hg = Nat.card ↥hyp.Q * hyp.p := by
@@ -1143,11 +1145,11 @@ theorem typeI_overNormalizer_complement_of_c_eq_one_and_d_eq_one [Finite G]
     Subgroup.card_eq_one.mp (by rw [← hyp.d_eq_card_D]; exact hd1)
   have hEQW2 := complement_le_QW2_of_D_eq_bot _hG hyp hTTypeII hDbot frob hW1E
   -- `Q` is solvable: `Q = T_F ≤ T < ⊤`.
-  haveI hQsolv : IsSolvable ↥hyp.Q := by
+  have hQsolv : Group.IsSolvable ↥hyp.Q := by
     have hQT : hyp.Q ≤ hyp.T := by
       rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
     have hTlt : hyp.T < ⊤ := lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hyp.T_maximal).1
-    exact _hG.solvable_of_lt_top hyp.Q (lt_of_le_of_lt hQT hTlt)
+    exact _hG.isSolvable_of_lt_top hyp.Q (lt_of_le_of_lt hQT hTlt)
   -- `p ∣ |E.map| = |E| = p q`.
   have hpE : hyp.p ∣ Nat.card ↥(frob.complement.map L.subtype) := by
     rw [Nat.card_congr (Subgroup.equivMapOfInjective frob.complement L.subtype

@@ -753,7 +753,7 @@ theorem coherent_of_constant_degree_general
     have hn2 : 2 ≤ n := by
       have hne : n = S.ncard := by rw [hndef]; exact (Set.ncard_eq_toFinset_card S hSfin).symm
       omega
-    haveI : NeZero n := ⟨by omega⟩
+    have : NeZero n := ⟨by omega⟩
     have hrange : Set.range χ = S := by
       apply Set.eq_of_subset_of_subset
       · rintro _ ⟨i, rfl⟩; exact hmem i

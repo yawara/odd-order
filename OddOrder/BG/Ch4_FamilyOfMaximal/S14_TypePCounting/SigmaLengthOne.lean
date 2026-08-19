@@ -43,7 +43,7 @@ theorem ncard_conjugates_eq_index_of_normalizer_eq_self [Finite G] {M : Subgroup
     (hNGM : Subgroup.normalizer M = M) :
     (Set.range (fun g : G => MulAut.conj g • M)).ncard = M.index := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   set conjs : Set (Subgroup G) := Set.range (fun g : G => MulAut.conj g • M) with hconjs_def
   let f : G → conjs := fun g => ⟨MulAut.conj g • M, ⟨g, rfl⟩⟩
   have hf_lift : ∀ g₁ g₂ : G, (QuotientGroup.leftRel M) g₁ g₂ → f g₁ = f g₂ := by
@@ -104,7 +104,7 @@ theorem exists_conj_smul_le_of_isHall [Finite G]
     (hXpi : Ch03.Subgroup.IsPiGroup π (X.subgroupOf M)) :
     ∃ w ∈ M, MulAut.conj w • X ≤ K := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   obtain ⟨H, hH_hall, -, hX_le_H⟩ :=
     OddOrder.BG.Ch1.S01.aInvariant_piSubgroup_le_aInvariant_hall
       (A := Unit) (φ := (1 : Unit →* MulAut ↥M))
@@ -135,7 +135,7 @@ theorem mem_Msigma_of_isPiElement_sigma_of_mem [Finite G]
     x ∈ OddOrder.BG.Ch3.S10.Msigma M := by
   classical
   set Ms : Subgroup ↥M := (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M with hMs
-  haveI hNorm : Ms.Normal := by rw [hMs, OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+  have hNorm : Ms.Normal := by rw [hMs, OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
   have hHall : Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M) Ms :=
     OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hM
   set xM : ↥M := ⟨x, hxM⟩ with hxMdef
@@ -363,7 +363,8 @@ theorem sigma_decomposition_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimp
   have hclosne : Subgroup.closure ({x} : Set G) ≠ ⊥ := fun h =>
     hx1 (Subgroup.mem_bot.mp (h ▸ Subgroup.subset_closure (Set.mem_singleton x)))
   have hclt : Subgroup.closure ({x} : Set G) < ⊤ := by
-    refine lt_top_iff_ne_top.mpr (fun htop => hG.notSolvable (isSolvable_of_comm fun a b => ?_))
+    refine lt_top_iff_ne_top.mpr (fun htop => hG.notSolvable
+        (Group.isSolvable_of_comm fun a b => ?_))
     have hmem : ∀ y : G, y ∈ Subgroup.zpowers x := fun y => by
       rw [Subgroup.zpowers_eq_closure, htop]; exact Subgroup.mem_top y
     obtain ⟨m, rfl⟩ := hmem a; obtain ⟨n, rfl⟩ := hmem b
@@ -640,7 +641,7 @@ theorem saturation_inter_Msigma_eq_sharp [Finite G] {M L : Subgroup G}
     {x | x ∈ sigmaConjugacySaturation M ∧ x ∈ OddOrder.BG.Ch3.S10.Msigma L}
       = sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma L) := by
   ext x
-  rw [sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe, Set.mem_setOf_eq]
+  rw [sharpSubgroup, Set.mem_sdiff, Set.mem_singleton_iff, SetLike.mem_coe, Set.mem_ofPred_eq]
   refine ⟨fun hx => ⟨hx.2, ne_one_of_mem_sigmaConjugacySaturation hx.1⟩, fun hx => ⟨?_, hx.1⟩⟩
   obtain ⟨a, rfl⟩ := hconj
   rw [sigmaConjugacySaturation, sigmaSharp, mem_conjClassSet]
@@ -674,7 +675,7 @@ theorem sigmaSaturation_Rsub_count [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
         = maximalSigmaSubgroupsOfElement x := by
       rw [maximalSigma_eq_conj_of_mem_saturation hG D hM hxS]
       ext L
-      simp only [Finset.mem_coe, Finset.mem_filter, hCf, Set.Finite.mem_toFinset, Set.mem_setOf_eq]
+      simp only [Finset.mem_coe, Finset.mem_filter, hCf, Set.Finite.mem_toFinset, Set.mem_ofPred_eq]
     rw [Rsub_ncard_eq hG D hlen, ← hcoe, Set.ncard_coe_finset, Finset.card_filter]
   rw [Finset.sum_congr rfl step1, Finset.sum_comm]
   -- Step 3: each `L`-fibre is `|L_σ^#| = |M_σ^#|`, over the `[G:M]` conjugates of `M`.
@@ -688,7 +689,7 @@ theorem sigmaSaturation_Rsub_count [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
         = sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma L) := by
       rw [← saturation_inter_Msigma_eq_sharp hLconj]
       ext y
-      simp only [Finset.mem_coe, Finset.mem_filter, hSf, Set.Finite.mem_toFinset, Set.mem_setOf_eq]
+      simp only [Finset.mem_coe, Finset.mem_filter, hSf, Set.Finite.mem_toFinset, Set.mem_ofPred_eq]
     rw [← Finset.card_filter, ← Set.ncard_coe_finset, hcoe,
       sharpSubgroup_Msigma_ncard_of_isConjugate hLconj]
   rw [Finset.sum_congr rfl step3, Finset.sum_const, smul_eq_mul]
@@ -802,7 +803,7 @@ private theorem smul_coe_eq_coset (x : G) (R : Subgroup G) :
     x • (R : Set G) = {g : G | ∃ r ∈ R, g = x * r} := by
   ext g
   rw [Set.mem_smul_set]
-  simp only [SetLike.mem_coe, Set.mem_setOf_eq, smul_eq_mul]
+  simp only [SetLike.mem_coe, Set.mem_ofPred_eq, smul_eq_mul]
   constructor
   · rintro ⟨r, hr, h⟩; exact ⟨r, hr, h.symm⟩
   · rintro ⟨r, hr, h⟩; exact ⟨r, hr, h.symm⟩
@@ -950,7 +951,7 @@ theorem not_type1_of_type2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hgeq : x * x' = y * y' := hgxx'.symm.trans hgyy'
   have hpiSet : ∀ z : G, ∀ {q : ℕ}, q ∈ (orderOf z).primeFactors →
       q ∈ piSet (Subgroup.closure ({z} : Set G)) := fun z {q} hq => by
-    rw [piSet, Set.mem_setOf_eq, ← Subgroup.zpowers_eq_closure, Nat.card_zpowers]; exact hq
+    rw [piSet, Set.mem_ofPred_eq, ← Subgroup.zpowers_eq_closure, Nat.card_zpowers]; exact hq
   obtain ⟨M_x, hMxmax, hxMx⟩ := ((D.length_one_iff x).mp hlx).2
   have hxPi : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M_x) x := fun p hp =>
     OddOrder.BG.Ch3.S10.Msigma_isPiGroup M_x p (Nat.mem_primeFactors.mpr
@@ -1009,7 +1010,7 @@ theorem not_type1_of_type2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         exact ⟨hyMσ, hy1⟩
       rcases sigma_diagnostic hG D hM hyσsharp hy'M hy'1 hy'C
         (fun p hp => hy'Pi p (by
-          rw [piSet, Set.mem_setOf_eq, ← Subgroup.zpowers_eq_closure, Nat.card_zpowers] at hp
+          rw [piSet, Set.mem_ofPred_eq, ← Subgroup.zpowers_eq_closure, Nat.card_zpowers] at hp
           exact hp)) with ⟨_, hsub⟩ | ⟨hτ2, _, _⟩
       · exact hsub
       · exfalso
@@ -1111,7 +1112,7 @@ theorem ncard_conjClassSet_of_isTISubset [Finite G] {A : Set G} {L : Subgroup G}
     (hstab : ∀ l ∈ L, MulAut.conj l • A = A) :
     (conjClassSet A).ncard = A.ncard * L.index := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   have hwd : ∀ g₁ g₂ : G, QuotientGroup.leftRel L g₁ g₂ →
       MulAut.conj g₁ • A = MulAut.conj g₂ • A := by
     intro g₁ g₂ hrel

@@ -223,7 +223,7 @@ theorem standardPermGroup_infinityStabilizer_isPretransitive (m : ℕ) :
 transitive. -/
 theorem standardPermGroup_isMultiplyPretransitive (m : ℕ) :
     IsMultiplyPretransitive (standardPermGroup m) (Ovoid m) 2 := by
-  letI : IsPretransitive (standardPermGroup m) (Ovoid m) :=
+  let : IsPretransitive (standardPermGroup m) (Ovoid m) :=
     standardPermGroup_isPretransitive m
   rw [show (2 : ℕ) = Nat.succ 1 by rfl,
     SubMulAction.ofStabilizer.isMultiplyPretransitive (a := Ovoid.infinity m),

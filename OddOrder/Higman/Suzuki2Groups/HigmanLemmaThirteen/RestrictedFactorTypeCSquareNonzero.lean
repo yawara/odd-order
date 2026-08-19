@@ -161,18 +161,18 @@ theorem exists_restrictedFactorTypeCSquareCommutator_monomial
   dsimp only
   let hSquareEA :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : CommGroup (frattiniSquare P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : CommGroup (frattiniSquare P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
-  letI : IsMulCommutative (frattini S) :=
+  let : IsMulCommutative (frattini S) :=
     IsMulCommutative.of_comm hEAS.comm
-  letI : CommGroup (frattini S) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini S)) := hEAS.zmodModule
+  let : CommGroup (frattini S) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini S)) := hEAS.zmodModule
   let L := left.toInclusionData hEAS eS hK1S htermS hSqS hAgemoS hK0S
   let R := right.toInclusionData hEAS eS hK1S htermS hSqS hAgemoS hK0S
   have hequivRL : ∀ alpha beta : GaloisField 2 n,
@@ -227,11 +227,11 @@ theorem exists_restrictedFactorTypeCSquareCommutator_monomial
     rw [hzero, zero_pow (by norm_num)] at hleftSquare
     exact hnuNe hleftSquare.symm
   have hrightFieldPower : right.lambda ^ (2 ^ n - 1) = 1 := by
-    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    let : Fintype (GaloisField 2 n) := Fintype.ofFinite _
     have h := FiniteField.pow_card_sub_one_eq_one right.lambda hrightNe
     rwa [← Nat.card_eq_fintype_card, hcard] at h
   have hleftFieldPower : left.lambda ^ (2 ^ n - 1) = 1 := by
-    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    let : Fintype (GaloisField 2 n) := Fintype.ofFinite _
     have h := FiniteField.pow_card_sub_one_eq_one left.lambda hleftNe
     rwa [← Nat.card_eq_fintype_card, hcard] at h
   obtain ⟨hordRight, -⟩ :=

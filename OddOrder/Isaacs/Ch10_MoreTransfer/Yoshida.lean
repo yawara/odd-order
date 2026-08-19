@@ -61,7 +61,7 @@ lemma exists_minimal_orderOf_notMem {N₀ : Type*} [Group N₀] [Finite N₀]
     {M : Subgroup N₀} (hM : M ≠ ⊤) :
     ∃ n : N₀, n ∉ M ∧ ∀ m : N₀, m ∉ M → orderOf n ≤ orderOf m := by
   classical
-  letI : Fintype N₀ := Fintype.ofFinite N₀
+  let : Fintype N₀ := Fintype.ofFinite N₀
   have hne : (Finset.univ.filter (fun n : N₀ => n ∉ M)).Nonempty := by
     obtain ⟨n, -, hn⟩ := SetLike.exists_of_lt (lt_top_iff_ne_top.mpr hM)
     exact ⟨n, by simp [hn]⟩
@@ -156,7 +156,7 @@ lemma mem_normalizer_of_sylow_le_conj (P : Sylow p G) {x : G}
   -- Sylow P and use maximality
   have hP_le_N : (P : Subgroup G) ≤ N := Subgroup.le_normalizer
   set P₀ : Sylow p ↥N := P.subtype hP_le_N with hP₀_def
-  haveI : (P₀ : Subgroup ↥N).Normal := by
+  have : (P₀ : Subgroup ↥N).Normal := by
     rw [hP₀_def]
     change ((P : Subgroup G).subgroupOf N).Normal
     infer_instance
@@ -403,8 +403,8 @@ theorem exists_surjective_wreath_of_transfer_range_lt (P : Sylow p G)
   have hcomm_le : _root_.commutator ↥N ≤ M := by
     have hQcard : Nat.card (↥N ⧸ M) = p := by
       rw [← Subgroup.index_eq_card, hM_idx]
-    haveI : IsCyclic (↥N ⧸ M) := isCyclic_of_prime_card hQcard
-    letI : CommGroup (↥N ⧸ M) := IsCyclic.commGroup
+    have : IsCyclic (↥N ⧸ M) := isCyclic_of_prime_card hQcard
+    let : CommGroup (↥N ⧸ M) := IsCyclic.commGroup
     exact Subgroup.Normal.quotient_commutative_iff_commutator_le.mp ⟨⟨mul_comm⟩⟩
   have hker_le : (Abelianization.of (G := ↥N)).ker ≤ M := by
     intro z hz
@@ -431,7 +431,7 @@ theorem exists_surjective_wreath_of_transfer_range_lt (P : Sylow p G)
   obtain ⟨n, hnM, hn_min⟩ := exists_minimal_orderOf_notMem hM_ne_top
   obtain ⟨a, ha⟩ := orderOf_eq_prime_pow_of_minimal_notMem hM_idx hnM hn_min
   set P₀ : Sylow p ↥N := P.subtype hPN with hP₀_def
-  haveI : (P₀ : Subgroup ↥N).Normal := by
+  have : (P₀ : Subgroup ↥N).Normal := by
     rw [hP₀_def]
     change (Pg.subgroupOf N).Normal
     rw [hN_def, hPg_def]
@@ -439,8 +439,8 @@ theorem exists_surjective_wreath_of_transfer_range_lt (P : Sylow p G)
   have hnP₀ : n ∈ (P₀ : Subgroup ↥N) := mem_sylow_of_orderOf_prime_pow P₀ ha
   have hnPg : ((n : ↥N) : G) ∈ Pg := hnP₀
   -- Step 3: expand the transfer at n by the Mackey formula
-  haveI : Finite (DoubleCoset.Quotient (Pg : Set G) N) := Quotient.finite _
-  letI : Fintype (DoubleCoset.Quotient (Pg : Set G) N) := Fintype.ofFinite _
+  have : Finite (DoubleCoset.Quotient (Pg : Set G) N) := Quotient.finite _
+  let : Fintype (DoubleCoset.Quotient (Pg : Set G) N) := Fintype.ofFinite _
   have htotal := hVM ((n : ↥N) : G)
   rw [transfer_eq_prod_doubleCoset (H := N) (K := Pg)
     (Abelianization.of (G := ↥N)) hnPg] at htotal
@@ -530,7 +530,7 @@ theorem transfer_range_eq_of_nilpotencyClass_lt (P : Sylow p G)
     exact OddOrder.GroupTheory.transfer_range_le _
   have hlt := lt_of_le_of_ne hle hne
   obtain ⟨φ, hφ⟩ := exists_surjective_wreath_of_transfer_range_lt P hlt
-  haveI : Group.IsNilpotent ↥(P : Subgroup G) := P.2.isNilpotent
+  have : Group.IsNilpotent ↥(P : Subgroup G) := P.2.isNilpotent
   have hbound := Group.nilpotencyClass_le_of_surjective φ hφ
   rw [nilpotencyClass_wreath p] at hbound
   omega

@@ -46,7 +46,7 @@ theorem exists_sylow_coe_eq_of_isCoatom_of_isPGroup [Finite G] [IsSimpleGroup G]
   by_contra hne
   have hlt : P < (S : Subgroup G) := lt_of_le_of_ne hPS (Ne.symm hne)
   -- `p`-群の正規化群成長で `P < N_G(P)`
-  haveI : Group.IsNilpotent ↥(S : Subgroup G) := S.isPGroup'.isNilpotent
+  have : Group.IsNilpotent ↥(S : Subgroup G) := S.isPGroup'.isNilpotent
   have hlt_top : P.subgroupOf (S : Subgroup G) < ⊤ := by
     rw [lt_top_iff_ne_top, Ne, Subgroup.subgroupOf_eq_top]
     exact fun hle => hlt.ne (le_antisymm hlt.le hle)
@@ -57,7 +57,7 @@ theorem exists_sylow_coe_eq_of_isCoatom_of_isPGroup [Finite G] [IsSimpleGroup G]
   have hyP' : (y : G) ∉ P := fun h => hyP (Subgroup.mem_subgroupOf.mpr h)
   have hPltN : P < Subgroup.normalizer (P : Set G) :=
     lt_of_le_of_ne Subgroup.le_normalizer fun heq => hyP' (heq ▸ hyN')
-  haveI hPnormal : P.Normal :=
+  have hPnormal : P.Normal :=
     Subgroup.normalizer_eq_top_iff.mp (hmax.2 _ hPltN)
   rcases IsSimpleGroup.eq_bot_or_eq_top_of_normal P hPnormal with hbot | htop
   · -- `P = ⊥` ⟹ `S = ⊤` ⟹ `G` は `p`-群 ⟹ 単純性で可換 ⟹ 矛盾

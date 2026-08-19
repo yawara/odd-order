@@ -82,7 +82,7 @@ private theorem card_sup_eq_mul_of_le_normalizer_of_disjoint'
     Nat.card ↥(A ⊔ B) = Nat.card ↥A * Nat.card ↥B := by
   have hAle : A ≤ A ⊔ B := le_sup_left
   have hBle : B ≤ A ⊔ B := le_sup_right
-  haveI hBn : (B.subgroupOf (A ⊔ B)).Normal :=
+  have hBn : (B.subgroupOf (A ⊔ B)).Normal :=
     Subgroup.normal_subgroupOf_sup_of_le_normalizer hAB
   have hdisj' : A.subgroupOf (A ⊔ B) ⊓ B.subgroupOf (A ⊔ B) = ⊥ := by
     rw [eq_bot_iff]; intro x hx
@@ -106,14 +106,14 @@ order dividing `q`, forcing `H = H ⊔ K = K`.)  Local copy for use below `OddOr
 theorem eq_of_card_eq_prime_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCyclic C]
     {q : ℕ} (hq : q.Prime) {H K : Subgroup C}
     (hH : Nat.card ↥H = q) (hK : Nat.card ↥K = q) : H = K := by
-  haveI : Fact q.Prime := ⟨hq⟩
-  letI : CommGroup C := IsCyclic.commGroup
+  have : Fact q.Prime := ⟨hq⟩
+  let : CommGroup C := IsCyclic.commGroup
   have hHel : H.IsElementaryAbelian q := Subgroup.IsElementaryAbelian.of_card_prime hH
   have hKel : K.IsElementaryAbelian q := Subgroup.IsElementaryAbelian.of_card_prime hK
   have hcent : H ≤ Subgroup.centralizer (K : Set C) := fun x _ =>
     Subgroup.mem_centralizer_iff.mpr (fun y _ => mul_comm y x)
   have hsupel : (H ⊔ K).IsElementaryAbelian q := hHel.sup_of_le_centralizer hKel hcent
-  haveI : IsCyclic ↥(H ⊔ K) := inferInstance
+  have : IsCyclic ↥(H ⊔ K) := inferInstance
   have hexp : Monoid.exponent ↥(H ⊔ K) ∣ q :=
     Monoid.exponent_dvd_of_forall_pow_eq_one (fun x => hsupel.2 x)
   have hcarddvd : Nat.card ↥(H ⊔ K) ∣ q := by rwa [IsCyclic.exponent_eq_card] at hexp
@@ -133,7 +133,7 @@ theorem isZGroup_of_isFrobeniusAction_of_odd
     (hFrob : IsFrobeniusAction A U) (hodd : Odd (Nat.card A)) :
     IsZGroup A := by
   refine ⟨fun p hp P => ?_⟩
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   by_cases hpA : p ∣ Nat.card A
   · -- `p` is an odd prime dividing `|A|`; the Sylow `p`-subgroup is cyclic.
     have hp_ne_two : p ≠ 2 := by
@@ -149,7 +149,7 @@ theorem isZGroup_of_isFrobeniusAction_of_odd
       rcases P.isPGroup'.card_eq_or_dvd with h1 | hd
       · exact h1
       · exact absurd (hd.trans (Subgroup.card_subgroup_dvd_card P.toSubgroup)) hpA
-    haveI : Subsingleton P := (Nat.card_eq_one_iff_unique.mp hcard).1
+    have : Subsingleton P := (Nat.card_eq_one_iff_unique.mp hcard).1
     exact isCyclic_of_subsingleton
 
 /-- **Isaacs Cor 6.18** (p. 187): a Frobenius complement `A` of odd order has `A'` and `A/A'`
@@ -167,7 +167,7 @@ theorem isCyclic_commutator_abelianization_coprime_of_isFrobeniusAction_of_odd
     (hFrob : IsFrobeniusAction A U) (hodd : Odd (Nat.card A)) :
     IsCyclic (commutator A) ∧ IsCyclic (Abelianization A) ∧
       (Nat.card (commutator A)).Coprime (commutator A).index := by
-  haveI : IsZGroup A := isZGroup_of_isFrobeniusAction_of_odd hFrob hodd
+  have : IsZGroup A := isZGroup_of_isFrobeniusAction_of_odd hFrob hodd
   exact ⟨IsZGroup.isCyclic_commutator A, IsZGroup.isCyclic_abelianization,
     IsZGroup.coprime_commutator_index A⟩
 
@@ -184,10 +184,10 @@ theorem centralizes_commutator_of_card_prime_coprime
     {R : Subgroup A} {r : ℕ} (hr : r.Prime) (hRcard : Nat.card ↥R = r)
     (hrN : ¬ r ∣ Nat.card ↥(commutator A)) :
     R ≤ Subgroup.centralizer ((commutator A : Subgroup A) : Set A) := by
-  haveI hZ : IsZGroup A := isZGroup_of_isFrobeniusAction_of_odd hFrob hodd
-  haveI hNcyc : IsCyclic ↥(commutator A) := IsZGroup.isCyclic_commutator (G := A)
-  haveI hNnorm : (commutator A).Normal := inferInstance
-  letI : CommGroup ↥(commutator A) := IsCyclic.commGroup
+  have hZ : IsZGroup A := isZGroup_of_isFrobeniusAction_of_odd hFrob hodd
+  have hNcyc : IsCyclic ↥(commutator A) := IsZGroup.isCyclic_commutator (G := A)
+  have hNnorm : (commutator A).Normal := inferInstance
+  let : CommGroup ↥(commutator A) := IsCyclic.commGroup
   -- conjugation action of `R` on the cyclic normal commutator subgroup
   set φ : ↥R →* MulAut ↥(commutator A) :=
     (MulAut.conjNormal (H := commutator A)).comp R.subtype with hφ
@@ -211,8 +211,8 @@ theorem centralizes_commutator_of_card_prime_coprime
   have hcard_ne : Nat.card ↥(actionCommutator φ) ≠ 1 := fun h1 =>
     hbot (Subgroup.card_eq_one.mp h1)
   obtain ⟨s, hs, hsdvd⟩ := Nat.exists_prime_and_dvd hcard_ne
-  haveI : Fact s.Prime := ⟨hs⟩
-  haveI : Fintype ↥(actionCommutator φ) := Fintype.ofFinite _
+  have : Fact s.Prime := ⟨hs⟩
+  have : Fintype ↥(actionCommutator φ) := Fintype.ofFinite _
   obtain ⟨y, hy_ord⟩ := exists_prime_orderOf_dvd_card (G := ↥(actionCommutator φ)) s
     (by rwa [Nat.card_eq_fintype_card] at hsdvd)
   -- the order-`s` subgroup `S ≤ commutator A` inside `[A', R]`
@@ -274,7 +274,7 @@ theorem centralizes_commutator_of_card_prime_coprime
   -- `B` is not cyclic: cyclicity forces `R` to centralize `S`, but `C_S(R) = ⊥`
   have hBnc : ¬ IsCyclic ↥B := by
     intro hcyc
-    letI : CommGroup ↥B := IsCyclic.commGroup
+    let : CommGroup ↥B := IsCyclic.commGroup
     have hSfix : S ≤ Subgroup.fixedPointsOfMulAut φ := by
       intro n hnS
       rw [Subgroup.mem_fixedPointsOfMulAut]
@@ -292,7 +292,7 @@ theorem centralizes_commutator_of_card_prime_coprime
     rw [le_bot_iff] at hSbot
     rw [hSbot, Subgroup.card_bot] at hScard
     exact hs.one_lt.ne' hScard.symm
-  haveI : Fact r.Prime := ⟨hr⟩
+  have : Fact r.Prime := ⟨hr⟩
   exact false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime hFrob B hBcard hBnc
 
 /-- **Huppert, *Endliche Gruppen I*, Kapitel V, Satz 8.18 b):** in a Frobenius complement of
@@ -312,9 +312,9 @@ theorem normal_of_card_prime_of_isFrobeniusAction_of_odd
     (hFrob : IsFrobeniusAction A U) (hodd : Odd (Nat.card A))
     {R : Subgroup A} {r : ℕ} (hr : r.Prime) (hRcard : Nat.card ↥R = r) :
     R.Normal := by
-  haveI hZ : IsZGroup A := isZGroup_of_isFrobeniusAction_of_odd hFrob hodd
-  haveI hNcyc : IsCyclic ↥(commutator A) := IsZGroup.isCyclic_commutator (G := A)
-  haveI hNnorm : (commutator A).Normal := inferInstance
+  have hZ : IsZGroup A := isZGroup_of_isFrobeniusAction_of_odd hFrob hodd
+  have hNcyc : IsCyclic ↥(commutator A) := IsZGroup.isCyclic_commutator (G := A)
+  have hNnorm : (commutator A).Normal := inferInstance
   refine ⟨fun n hn g => ?_⟩
   -- it suffices to show the conjugate `R^g` is contained in `R`
   suffices hle : R.map (MulAut.conj g).toMonoidHom ≤ R by
@@ -412,7 +412,7 @@ theorem eq_of_card_prime_of_isFrobeniusAction_of_odd
     (hRcard : Nat.card ↥R = r) (hR'card : Nat.card ↥R' = r) :
     R = R' := by
   by_contra hne
-  haveI : Fact r.Prime := ⟨hr⟩
+  have : Fact r.Prime := ⟨hr⟩
   have hRn : R.Normal := normal_of_card_prime_of_isFrobeniusAction_of_odd hFrob hodd hr hRcard
   have hR'n : R'.Normal :=
     normal_of_card_prime_of_isFrobeniusAction_of_odd hFrob hodd hr hR'card
@@ -449,7 +449,7 @@ theorem existsUnique_card_prime_of_isFrobeniusAction_of_odd
     (hFrob : IsFrobeniusAction A U) (hodd : Odd (Nat.card A))
     {r : ℕ} (hr : r.Prime) (hdvd : r ∣ Nat.card A) :
     ∃! R : Subgroup A, Nat.card ↥R = r := by
-  haveI : Fact r.Prime := ⟨hr⟩
+  have : Fact r.Prime := ⟨hr⟩
   obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' (G := A) r hdvd
   exact ⟨Subgroup.zpowers x,
     by change Nat.card ↥(Subgroup.zpowers x) = r; rw [Nat.card_zpowers, hx],
@@ -466,10 +466,10 @@ theorem isZGroup_complement_of_isFrobeniusGroup_of_odd
     {G : Type*} [Group G] [Finite G] {N A : Subgroup G}
     (hFrob : IsFrobeniusGroup G N A) (hodd : Odd (Nat.card ↥A)) :
     IsZGroup ↥A := by
-  letI : N.Normal := hFrob.isNormal
-  letI : MulDistribMulAction ↥A ↥N :=
+  let : N.Normal := hFrob.isNormal
+  let : MulDistribMulAction ↥A ↥N :=
     MulDistribMulAction.compHom ↥N ((MulAut.conjNormal (H := N)).comp A.subtype)
-  haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hFrob.ne_bot_kernel
+  have : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hFrob.ne_bot_kernel
   exact isZGroup_of_isFrobeniusAction_of_odd hFrob.toFrobeniusAction hodd
 
 /-- **Huppert V.8.18 b), subgroup-pair form.**  In a finite Frobenius group `G = N ⋊ A` whose
@@ -479,10 +479,10 @@ theorem normal_of_card_prime_of_isFrobeniusGroup_of_odd
     (hFrob : IsFrobeniusGroup G N A) (hodd : Odd (Nat.card ↥A))
     {R : Subgroup ↥A} {r : ℕ} (hr : r.Prime) (hRcard : Nat.card ↥R = r) :
     R.Normal := by
-  letI : N.Normal := hFrob.isNormal
-  letI : MulDistribMulAction ↥A ↥N :=
+  let : N.Normal := hFrob.isNormal
+  let : MulDistribMulAction ↥A ↥N :=
     MulDistribMulAction.compHom ↥N ((MulAut.conjNormal (H := N)).comp A.subtype)
-  haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hFrob.ne_bot_kernel
+  have : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hFrob.ne_bot_kernel
   exact normal_of_card_prime_of_isFrobeniusAction_of_odd hFrob.toFrobeniusAction hodd hr hRcard
 
 /-- **Isaacs Thm 6.19, subgroup-pair form**: in a finite Frobenius group `G = N ⋊ A` whose
@@ -493,10 +493,10 @@ theorem existsUnique_card_prime_of_isFrobeniusGroup_of_odd
     (hFrob : IsFrobeniusGroup G N A) (hodd : Odd (Nat.card ↥A))
     {r : ℕ} (hr : r.Prime) (hdvd : r ∣ Nat.card ↥A) :
     ∃! R : Subgroup ↥A, Nat.card ↥R = r := by
-  letI : N.Normal := hFrob.isNormal
-  letI : MulDistribMulAction ↥A ↥N :=
+  let : N.Normal := hFrob.isNormal
+  let : MulDistribMulAction ↥A ↥N :=
     MulDistribMulAction.compHom ↥N ((MulAut.conjNormal (H := N)).comp A.subtype)
-  haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hFrob.ne_bot_kernel
+  have : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hFrob.ne_bot_kernel
   exact existsUnique_card_prime_of_isFrobeniusAction_of_odd hFrob.toFrobeniusAction hodd hr hdvd
 
 /-- A conjugate `A^g` of the complement of a Frobenius group `G = N ⋊ A` is again a Frobenius
@@ -505,7 +505,7 @@ containing a prescribed kernel-disjoint subgroup. -/
 theorem IsFrobeniusGroup.conjComplement {G : Type*} [Group G] [Finite G] {N A : Subgroup G}
     (h : IsFrobeniusGroup G N A) (g : G) :
     IsFrobeniusGroup G N (A.map (MulAut.conj g).toMonoidHom) := by
-  haveI := h.isNormal
+  have := h.isNormal
   have hAg_card : Nat.card ↥(A.map (MulAut.conj g).toMonoidHom) = Nat.card ↥A :=
     Nat.card_congr (Subgroup.equivMapOfInjective A (MulAut.conj g).toMonoidHom
       (MulAut.conj g).injective).toEquiv.symm
@@ -523,7 +523,7 @@ theorem IsFrobeniusGroup.conjComplement {G : Type*} [Group G] [Finite G] {N A : 
   refine ⟨h.isNormal, ?_, h.ne_bot_kernel, ?_, ?_⟩
   · -- `IsComplement' N A^g` via card and disjointness.
     rw [Subgroup.isComplement'_iff_card_mul_and_disjoint]
-    refine ⟨by rw [hAg_card]; exact h.isComplement.card_mul, ?_⟩
+    refine ⟨by rw [hAg_card]; exact h.isComplement.card_mul_card, ?_⟩
     rw [Subgroup.disjoint_def]
     intro x hxN hxAg
     rw [hmem] at hxAg
@@ -563,7 +563,7 @@ theorem IsFrobeniusGroup.two_mul_card_complement_add_one_le_card_kernel {G : Typ
     [Finite G] {N A : Subgroup G} (hFrob : IsFrobeniusGroup G N A)
     (hNodd : Odd (Nat.card ↥N)) (hAodd : Odd (Nat.card ↥A)) (hNnt : N ≠ ⊥) :
     2 * Nat.card ↥A + 1 ≤ Nat.card ↥N := by
-  haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNnt
+  have : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNnt
   have hN1 : 1 < Nat.card ↥N := Finite.one_lt_card
   -- `|A| ∣ |N| - 1` from `|N| ≡ 1 [MOD |A|]` (Isaacs 6.1).
   obtain ⟨m, hm⟩ : Nat.card ↥A ∣ Nat.card ↥N - 1 :=

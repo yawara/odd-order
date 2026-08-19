@@ -97,7 +97,7 @@ theorem card_dvd_factorial_of_simple_subgroup_index [IsSimpleGroup G] [Finite G]
     (H : Subgroup G) (hn1 : 1 < H.index) :
     Nat.card G ∣ Nat.factorial H.index := by
   have hn : H.index ≠ 0 := by omega
-  haveI : Finite (G ⧸ H) := Subgroup.index_ne_zero_iff_finite.mp hn
+  have : Finite (G ⧸ H) := Subgroup.index_ne_zero_iff_finite.mp hn
   obtain ⟨_, hNH, hdvd⟩ := normalCore_index_dvd_factorial H
   rcases Subgroup.Normal.eq_bot_or_eq_top (inferInstance : H.normalCore.Normal)
       with hN | hN
@@ -143,7 +143,7 @@ theorem sylow_choice_iSup_eq_top [Finite G]
   have h_pow_dvd : ∀ p ∈ (Nat.card G).primeFactors,
       p ^ (Nat.card G).factorization p ∣ Nat.card sup := by
     intro p hp
-    haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+    have : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
     have hP_le : ((P ⟨p, hp⟩ : Subgroup G)) ≤ sup :=
       le_iSup (fun q : (Nat.card G).primeFactors => (P q : Subgroup G)) ⟨p, hp⟩
     have h_dvd := Subgroup.card_dvd_of_le hP_le
@@ -314,10 +314,10 @@ theorem card_sylow_modEq_one_of_max_inter
   -- 実装: orbitRel.Quotient 上の和に分割.
   -- 軌道 Quotient ⟦Q⟧ をパラメータとして, 各 ω 毎に Q := ω.out をとり
   -- Nat.card (MulAction.orbit Ssub Q) を加算.
-  letI : Fintype (Sylow p G) := Fintype.ofFinite _
-  letI : Fintype (MulAction.orbitRel.Quotient Ssub (Sylow p G)) := Fintype.ofFinite _
+  let : Fintype (Sylow p G) := Fintype.ofFinite _
+  let : Fintype (MulAction.orbitRel.Quotient Ssub (Sylow p G)) := Fintype.ofFinite _
   -- 各点 P に対し  Fintype (orbit Ssub P)
-  haveI : ∀ P : Sylow p G, Fintype (MulAction.orbit Ssub P) := fun P => Fintype.ofFinite _
+  have : ∀ P : Sylow p G, Fintype (MulAction.orbit Ssub P) := fun P => Fintype.ofFinite _
   -- 全体 |Sylow p G| = Σ orbit
   have hsum : Nat.card (Sylow p G) =
       ∑ ω : MulAction.orbitRel.Quotient Ssub (Sylow p G),
@@ -414,7 +414,7 @@ theorem IsPGroup.normal_inf_center_nontrivial {P : Type*} [Group P] [Finite P]
     {N : Subgroup P} [N.Normal] (hN : Nontrivial N) :
     Nontrivial ((N ⊓ Subgroup.center P : Subgroup P)) := by
   -- ConjAct P acts on N (since N is normal), IsPGroup p (ConjAct P).
-  haveI hCA : IsPGroup p (ConjAct P) := hP.of_equiv ConjAct.toConjAct
+  have hCA : IsPGroup p (ConjAct P) := hP.of_equiv ConjAct.toConjAct
   -- p divides |N| since N is a nontrivial p-group.
   have hpN : p ∣ Nat.card N := by
     obtain ⟨n, hn0, hn⟩ := (hP.to_subgroup N).nontrivial_iff_card.mp hN
@@ -483,10 +483,10 @@ theorem IsPGroup.exists_normal_index_eq_prime {P : Type*} [Group P] [Finite P]
     {N M : Subgroup P} [N.Normal] [M.Normal] (hNM : N < M) :
     ∃ L : Subgroup P, L.Normal ∧ N < L ∧ L ≤ M ∧ N.relIndex L = p := by
   -- P/N も p-群
-  haveI hQuot_pgroup : IsPGroup p (P ⧸ N) := hP.to_quotient N
+  have hQuot_pgroup : IsPGroup p (P ⧸ N) := hP.to_quotient N
   -- M.map (mk' N) ⊴ P/N
   let M' : Subgroup (P ⧸ N) := M.map (QuotientGroup.mk' N)
-  haveI : M'.Normal := inferInstance
+  have : M'.Normal := inferInstance
   -- M' は非自明 (N < M)
   have hM'_nontriv : Nontrivial M' := by
     rw [Subgroup.nontrivial_iff_ne_bot]
@@ -497,7 +497,7 @@ theorem IsPGroup.exists_normal_index_eq_prime {P : Type*} [Group P] [Finite P]
     rw [hbot, Subgroup.mem_bot] at hm_in
     exact (QuotientGroup.eq_one_iff m).mp hm_in
   -- Thm 1.19 で M' ⊓ Z(P/N) も非自明.  Quotient is finite.
-  haveI : Finite (P ⧸ N) := Quotient.finite _
+  have : Finite (P ⧸ N) := Quotient.finite _
   have hinf_nontriv : Nontrivial ((M' ⊓ Subgroup.center (P ⧸ N) : Subgroup (P ⧸ N))) :=
     IsPGroup.normal_inf_center_nontrivial hQuot_pgroup hM'_nontriv
   -- Cauchy: 位数 p の元を取る
@@ -517,7 +517,7 @@ theorem IsPGroup.exists_normal_index_eq_prime {P : Type*} [Group P] [Finite P]
   -- ⟨y⟩ ≤ Z(P/N), 正規
   have hzpowers_le_center : Subgroup.zpowers y ≤ Subgroup.center (P ⧸ N) :=
     Subgroup.zpowers_le.mpr hy_Z
-  haveI hzpowers_normal : (Subgroup.zpowers y).Normal := by
+  have hzpowers_normal : (Subgroup.zpowers y).Normal := by
     refine ⟨fun n hn g => ?_⟩
     have hn_center := hzpowers_le_center hn
     rw [Subgroup.mem_center_iff] at hn_center
@@ -569,7 +569,7 @@ theorem IsPGroup.exists_normal_index_eq_prime {P : Type*} [Group P] [Finite P]
     have hN_index : N.index = Nat.card (P ⧸ N) := rfl
     have h_N_eq : N.index = p * L.index := by rw [hN_index, ← hLag1, hzy_card, hLidx]
     have h_eq : N.relIndex L * L.index = p * L.index := by rw [hLag2, h_N_eq]
-    haveI : Finite (P ⧸ L) := Quotient.finite _
+    have : Finite (P ⧸ L) := Quotient.finite _
     have hL_index_ne_zero : L.index ≠ 0 := Nat.card_pos.ne'
     exact Nat.eq_of_mul_eq_mul_right (Nat.pos_of_ne_zero hL_index_ne_zero) h_eq
 
@@ -592,7 +592,7 @@ theorem IsPGroup.exists_normal_card_eq_pow {P : Type*} [Group P] [Finite P]
   | succ b ih =>
     intro hb
     obtain ⟨N, hNnorm, hNcard⟩ := ih (Nat.le_of_succ_le hb)
-    haveI := hNnorm
+    have := hNnorm
     -- `|N| = p^b < p^a = |P|`, so `N` is proper.
     have hplt : 1 < p := (Fact.out : p.Prime).one_lt
     have hNlt : N < ⊤ := by
@@ -714,7 +714,7 @@ theorem normal_pgroup_le_opCore {p : ℕ} [Fact p.Prime] {G : Type*} [Group G]
 theorem Sylow.eq_opCore_of_normal {p : ℕ} [Fact p.Prime] [Finite (Sylow p G)]
     (P : Sylow p G) (hP : (P : Subgroup G).Normal) :
     (P : Subgroup G) = opCore p G := by
-  haveI : (P : Subgroup G).Normal := hP
+  have : (P : Subgroup G).Normal := hP
   exact le_antisymm (normal_pgroup_le_opCore P.isPGroup') (opCore_le P)
 
 /-- A characteristic subgroup with the order of a Sylow `p`-subgroup supplies a normal
@@ -724,7 +724,7 @@ theorem exists_normal_sylow_of_characteristic_card_eq [Finite G]
     (hKcard : Nat.card K = p ^ (Nat.card G).factorization p) :
     ∃ P : Sylow p G, (P : Subgroup G).Normal := by
   classical
-  haveI : K.Characteristic := hKchar
+  have : K.Characteristic := hKchar
   let P : Sylow p G := Sylow.ofCard K hKcard
   refine ⟨P, ?_⟩
   have hP : (P : Subgroup G) = K := by
@@ -784,7 +784,7 @@ theorem iSupIndep_of_coprime_card_of_normal {ι : Type*} [Finite ι]
       inferInstance inferInstance (hdisj i j hij) x y hx hy
   -- Step 3: Apply mathlib's independent_of_coprime_order.
   classical
-  haveI : ∀ i, Fintype (H i) := fun i => Fintype.ofFinite _
+  have : ∀ i, Fintype (H i) := fun i => Fintype.ofFinite _
   have hcoprime' : Pairwise fun i j =>
       Nat.Coprime (Fintype.card (H i)) (Fintype.card (H j)) := by
     intro i j hij
@@ -868,8 +868,8 @@ theorem iSup_default_sylow_eq_top_of_nilpotent
   have hcomm : Pairwise fun p₁ p₂ : ps =>
       ∀ x y : N, x ∈ (P p₁ : Subgroup N) → y ∈ (P p₂ : Subgroup N) → Commute x y := by
     rintro ⟨p₁, hp₁⟩ ⟨p₂, hp₂⟩ hne
-    haveI hp₁' := Fact.mk (Nat.prime_of_mem_primeFactors hp₁)
-    haveI hp₂' := Fact.mk (Nat.prime_of_mem_primeFactors hp₂)
+    have hp₁' := Fact.mk (Nat.prime_of_mem_primeFactors hp₁)
+    have hp₂' := Fact.mk (Nat.prime_of_mem_primeFactors hp₂)
     have hne' : p₁ ≠ p₂ := by simpa using hne
     apply Subgroup.commute_of_normal_of_disjoint _ _ (hnormal (P p₁)) (hnormal (P p₂))
     exact IsPGroup.disjoint_of_ne p₁ p₂ hne' _ _ (P p₁).isPGroup' (P p₂).isPGroup'
@@ -881,8 +881,8 @@ theorem iSup_default_sylow_eq_top_of_nilpotent
     apply Subgroup.injective_noncommPiCoprod_of_iSupIndep
     apply Subgroup.independent_of_coprime_order hcomm
     rintro ⟨p₁, hp₁⟩ ⟨p₂, hp₂⟩ hne
-    haveI hp₁' := Fact.mk (Nat.prime_of_mem_primeFactors hp₁)
-    haveI hp₂' := Fact.mk (Nat.prime_of_mem_primeFactors hp₂)
+    have hp₁' := Fact.mk (Nat.prime_of_mem_primeFactors hp₁)
+    have hp₂' := Fact.mk (Nat.prime_of_mem_primeFactors hp₂)
     have hne' : p₁ ≠ p₂ := by simpa using hne
     simp only [← Nat.card_eq_fintype_card]
     exact IsPGroup.coprime_card_of_ne p₁ p₂ hne' _ _ (P p₁).isPGroup' (P p₂).isPGroup'
@@ -933,11 +933,11 @@ theorem center_sylow_le_center_of_isNilpotent [Finite G] [Group.IsNilpotent G]
     exact trivial
   refine Subgroup.iSup_induction _ (C := fun x => x * z = z * x) hg_sup ?mem ?one ?mul
   · rintro ⟨r, hr⟩ x hx
-    haveI hrprime : Fact r.Prime := ⟨Nat.prime_of_mem_primeFactors hr⟩
+    have hrprime : Fact r.Prime := ⟨Nat.prime_of_mem_primeFactors hr⟩
     by_cases hrp : r = p
     · subst p
       have hP_normal : P.Normal := Sylow.normal_of_isNilpotent P
-      haveI : Unique (Sylow r G) := Sylow.unique_of_normal P hP_normal
+      have : Unique (Sylow r G) := Sylow.unique_of_normal P hP_normal
       have hxP : x ∈ (P : Subgroup G) := by
         simpa [Subsingleton.elim (default : Sylow r G) P] using hx
       have hcomm := congrArg Subtype.val
@@ -972,7 +972,7 @@ theorem mem_primeFactors_center_of_isNilpotent [Finite G] [Group.IsNilpotent G]
     intro hbot
     have hcenter_bot : Subgroup.center ↥(P : Subgroup G) = ⊥ :=
       (Subgroup.map_eq_bot_iff_of_injective _ (P : Subgroup G).subtype_injective).mp hbot
-    haveI : Nontrivial ↥(P : Subgroup G) := (P : Subgroup G).nontrivial_iff_ne_bot.mpr hP_ne
+    have : Nontrivial ↥(P : Subgroup G) := (P : Subgroup G).nontrivial_iff_ne_bot.mpr hP_ne
     exact (Subgroup.center _).nontrivial_iff_ne_bot.mp P.isPGroup'.center_nontrivial hcenter_bot
   have hZP_le_center : ZP ≤ Subgroup.center G := by
     dsimp [ZP]
@@ -1009,14 +1009,14 @@ theorem nilpotent_normal_le_fitting [Finite G] {N : Subgroup G} [N.Normal]
   rw [← hsup, ← iSup_default_sylow_eq_top_of_nilpotent N, Subgroup.map_iSup]
   refine iSup_le ?_
   rintro ⟨p, hp⟩
-  haveI hp' : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+  have hp' : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
   -- default : Sylow p N is normal in N
   have hPN : (default : Sylow p N).Normal := Sylow.normal_of_isNilpotent _
   -- default Sylow is characteristic in N (unique Sylow ⇒ characteristic)
-  haveI : ((default : Sylow p N) : Subgroup N).Characteristic :=
+  have : ((default : Sylow p N) : Subgroup N).Characteristic :=
     Sylow.characteristic_of_normal _ hPN
   -- so its image in G is normal (mathlib instance: characteristic in normal ⇒ normal)
-  haveI : (((default : Sylow p N) : Subgroup N).map N.subtype).Normal :=
+  have : (((default : Sylow p N) : Subgroup N).map N.subtype).Normal :=
     inferInstance
   -- it's a p-subgroup of G
   have hpGroup : IsPGroup p (((default : Sylow p N) : Subgroup N).map N.subtype) :=
@@ -1030,11 +1030,11 @@ theorem nilpotent_normal_le_fitting [Finite G] {N : Subgroup G} [N.Normal]
 
 Take the last nontrivial derived-series term. It is abelian, hence nilpotent, and normal;
 therefore it lies in the Fitting subgroup by maximality. -/
-theorem fitting_ne_bot_of_solvable_nontrivial
-    (M : Type*) [Group M] [Finite M] [Nontrivial M] [IsSolvable M] :
+theorem fitting_ne_bot_of_isSolvable_nontrivial
+    (M : Type*) [Group M] [Finite M] [Nontrivial M] [Group.IsSolvable M] :
     fitting M ≠ ⊥ := by
   classical
-  obtain ⟨N, hN⟩ := (isSolvable_def M).mp inferInstance
+  obtain ⟨N, hN⟩ := (Group.isSolvable_def M).mp inferInstance
   have hex : ∃ n, derivedSeries M n = ⊥ := ⟨N, hN⟩
   set n := Nat.find hex with hn_def
   have hn_bot : derivedSeries M n = ⊥ := Nat.find_spec hex
@@ -1053,17 +1053,17 @@ theorem fitting_ne_bot_of_solvable_nontrivial
     exact Nat.find_min hex (by omega)
   have hLL_bot : ⁅L, L⁆ = ⊥ := by
     rw [hL_def, ← derivedSeries_succ, hm_succ, hn_bot]
-  haveI hL_comm : IsMulCommutative L := by
+  have hL_comm : IsMulCommutative L := by
     rw [Subgroup.commutator_eq_bot_iff_le_centralizer] at hLL_bot
     refine ⟨⟨fun a b => ?_⟩⟩
     have ha_cent : (a : M) ∈ Subgroup.centralizer (L : Set M) := hLL_bot a.property
     rw [Subgroup.mem_centralizer_iff] at ha_cent
     apply Subtype.ext
     exact (ha_cent b.val b.property).symm
-  haveI hL_normal : L.Normal := by
+  have hL_normal : L.Normal := by
     rw [hL_def]
     exact derivedSeries_normal M m
-  haveI hL_nilp : Group.IsNilpotent ↥L := inferInstance
+  have hL_nilp : Group.IsNilpotent ↥L := inferInstance
   have hL_le_fitting : L ≤ fitting M := nilpotent_normal_le_fitting
   intro hF_bot
   rw [hF_bot, le_bot_iff] at hL_le_fitting
@@ -1120,7 +1120,7 @@ theorem fitting_eq_iSup_primeFactors [Finite G] :
   apply le_antisymm
   · -- fitting = ⨆ p : Primes ≤ ⨆ p : pf
     refine iSup_le (fun p => ?_)
-    haveI : Fact (p : ℕ).Prime := ⟨p.2⟩
+    have : Fact (p : ℕ).Prime := ⟨p.2⟩
     by_cases hmem : (p : ℕ) ∈ (Nat.card G).primeFactors
     · -- p is in primeFactors, contribute via the indexed sup
       exact le_iSup (fun q : (Nat.card G).primeFactors => opCore (q : ℕ) G) ⟨p, hmem⟩
@@ -1154,8 +1154,8 @@ instance fitting.isNilpotent [Finite G] : Group.IsNilpotent (fitting G) := by
   have hcomm : Pairwise fun p₁ p₂ : ps =>
       ∀ x y : G, x ∈ opCore (p₁ : ℕ) G → y ∈ opCore (p₂ : ℕ) G → Commute x y := by
     rintro ⟨p₁, hp₁⟩ ⟨p₂, hp₂⟩ hne
-    haveI hp₁' : Fact (p₁ : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors hp₁⟩
-    haveI hp₂' : Fact (p₂ : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors hp₂⟩
+    have hp₁' : Fact (p₁ : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors hp₁⟩
+    have hp₂' : Fact (p₂ : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors hp₂⟩
     have hne' : p₁ ≠ p₂ := by simpa using hne
     apply Subgroup.commute_of_normal_of_disjoint _ _ (opCore.normal p₁ G)
       (opCore.normal p₂ G)
@@ -1168,8 +1168,8 @@ instance fitting.isNilpotent [Finite G] : Group.IsNilpotent (fitting G) := by
     apply Subgroup.injective_noncommPiCoprod_of_iSupIndep
     apply Subgroup.independent_of_coprime_order hcomm
     rintro ⟨p₁, hp₁⟩ ⟨p₂, hp₂⟩ hne
-    haveI hp₁' : Fact (p₁ : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors hp₁⟩
-    haveI hp₂' : Fact (p₂ : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors hp₂⟩
+    have hp₁' : Fact (p₁ : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors hp₁⟩
+    have hp₂' : Fact (p₂ : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors hp₂⟩
     have hne' : p₁ ≠ p₂ := by simpa using hne
     simp only [← Nat.card_eq_fintype_card]
     exact IsPGroup.coprime_card_of_ne p₁ p₂ hne' _ _
@@ -1183,11 +1183,11 @@ instance fitting.isNilpotent [Finite G] : Group.IsNilpotent (fitting G) := by
   -- Each opCore p G (as a group) is finite + p-group ⇒ nilpotent
   have hnilp : ∀ p : ps, Group.IsNilpotent (opCore (p : ℕ) G) := by
     rintro ⟨p, hp⟩
-    haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+    have : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
     exact (opCore_isPGroup p G).isNilpotent
   -- Finite product of nilpotent is nilpotent
-  haveI : ∀ p : ps, Group.IsNilpotent (opCore (p : ℕ) G) := hnilp
-  haveI : Group.IsNilpotent (∀ p : ps, opCore (p : ℕ) G) := Group.isNilpotent_pi
+  have : ∀ p : ps, Group.IsNilpotent (opCore (p : ℕ) G) := hnilp
+  have : Group.IsNilpotent (∀ p : ps, opCore (p : ℕ) G) := Group.isNilpotent_pi
   -- Transport across the MulEquiv
   exact Group.nilpotent_of_mulEquiv e
 
@@ -1218,9 +1218,9 @@ instance sup_isNilpotent_of_normal_nilpotent [Finite G]
 `nilpotent_normal_le_fitting` を適用して結論. -/
 theorem fitting_map_subtype_le_fitting [Finite G] {M : Subgroup G} [M.Normal] :
     (fitting ↥M).map M.subtype ≤ fitting G := by
-  haveI : Finite ↥M := inferInstance
-  haveI : Group.IsNilpotent ↥(fitting (↥M : Type _)) := fitting.isNilpotent
-  haveI hNilp : Group.IsNilpotent ↥((fitting ↥M).map M.subtype) :=
+  have : Finite ↥M := inferInstance
+  have : Group.IsNilpotent ↥(fitting (↥M : Type _)) := fitting.isNilpotent
+  have hNilp : Group.IsNilpotent ↥((fitting ↥M).map M.subtype) :=
     Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective (fitting ↥M) M.subtype
       M.subtype_injective)
   exact nilpotent_normal_le_fitting
@@ -1231,8 +1231,8 @@ theorem fitting_map_eq_of_normal_of_fitting_le [Finite G] {M : Subgroup G} [M.No
     (hFM : fitting G ≤ M) :
     (fitting ↥M).map M.subtype = fitting G := by
   refine le_antisymm fitting_map_subtype_le_fitting ?_
-  haveI : Group.IsNilpotent ↥(fitting G) := fitting.isNilpotent
-  haveI : Group.IsNilpotent ↥((fitting G).subgroupOf M) :=
+  have : Group.IsNilpotent ↥(fitting G) := fitting.isNilpotent
+  have : Group.IsNilpotent ↥((fitting G).subgroupOf M) :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hFM).symm
   have hle : (fitting G).subgroupOf M ≤ fitting ↥M :=
     nilpotent_normal_le_fitting
@@ -1247,17 +1247,17 @@ subgroup of the codomain. -/
 theorem fitting_map_mulEquiv_le {A B : Type*} [Group A] [Group B] [Finite A] [Finite B]
     (e : A ≃* B) :
     (fitting A).map e.toMonoidHom ≤ fitting B := by
-  haveI : Group.IsNilpotent (fitting A) := fitting.isNilpotent
-  haveI : Group.IsNilpotent ↥((fitting A).map e.toMonoidHom) :=
+  have : Group.IsNilpotent (fitting A) := fitting.isNilpotent
+  have : Group.IsNilpotent ↥((fitting A).map e.toMonoidHom) :=
     Group.nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ e.toMonoidHom e.injective)
-  haveI : ((fitting A).map e.toMonoidHom).Normal :=
+  have : ((fitting A).map e.toMonoidHom).Normal :=
     (fitting.normal A).map e.toMonoidHom e.surjective
   exact nilpotent_normal_le_fitting
 
 /-- The Fitting subgroup is preserved by group isomorphisms. -/
 theorem fitting_map_mulEquiv {A B : Type*} [Group A] [Group B] [Finite A] (e : A ≃* B) :
     (fitting A).map e.toMonoidHom = fitting B := by
-  haveI : Finite B := Finite.of_equiv A e.toEquiv
+  have : Finite B := Finite.of_equiv A e.toEquiv
   refine le_antisymm (fitting_map_mulEquiv_le e) (fun y hy => ?_)
   have hpre : e.symm y ∈ fitting A :=
     fitting_map_mulEquiv_le e.symm (by simpa using Subgroup.mem_map_of_mem e.symm.toMonoidHom hy)
@@ -1305,7 +1305,7 @@ theorem sylow_p_subsingleton_of_card_eq_mul_prime_lt
     [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
     (hqp : q < p) (hcard : Nat.card G = p * q) :
     Subsingleton (Sylow p G) := by
-  haveI : Finite (Sylow p G) := inferInstance
+  have : Finite (Sylow p G) := inferInstance
   obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
   have hPcard : Nat.card P = p := by
     have hmul := P.card_eq_multiplicity (G := G)
@@ -1340,7 +1340,7 @@ theorem sylow_normal_of_card_eq_mul_prime_lt
     [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
     (hqp : q < p) (hcard : Nat.card G = p * q) (P : Sylow p G) :
     (P : Subgroup G).Normal := by
-  haveI : Subsingleton (Sylow p G) :=
+  have : Subsingleton (Sylow p G) :=
     sylow_p_subsingleton_of_card_eq_mul_prime_lt hqp hcard
   exact Sylow.normal_of_subsingleton P
 
@@ -1358,8 +1358,8 @@ theorem isCyclic_of_card_eq_mul_prime_lt_of_not_dvd
     (hqp : q < p) (hcard : Nat.card G = p * q) (hndvd : ¬ q ∣ p - 1) :
     IsCyclic G := by
   classical
-  haveI : Finite (Sylow p G) := inferInstance
-  haveI : Finite (Sylow q G) := inferInstance
+  have : Finite (Sylow p G) := inferInstance
+  have : Finite (Sylow q G) := inferInstance
   have hpq_ne : p ≠ q := fun h => (Nat.lt_irrefl _ (h ▸ hqp))
   obtain ⟨Q⟩ := Sylow.nonempty (p := q) (G := G)
   obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
@@ -1395,12 +1395,12 @@ theorem isCyclic_of_card_eq_mul_prime_lt_of_not_dvd
       have : p ≡ 1 [MOD q] := hp_eq ▸ hnq_mod
       have hp_ge : 1 ≤ p := hp.out.one_lt.le
       exact (Nat.modEq_iff_dvd' hp_ge).mp this.symm
-  haveI hQsub : Subsingleton (Sylow q G) := by
+  have hQsub : Subsingleton (Sylow q G) := by
     rw [Nat.card_eq_one_iff_unique] at hnq_eq
     exact hnq_eq.1
-  haveI hPnormal : (↑P : Subgroup G).Normal :=
+  have hPnormal : (↑P : Subgroup G).Normal :=
     sylow_normal_of_card_eq_mul_prime_lt hqp hcard P
-  haveI hQnormal : (↑Q : Subgroup G).Normal := Sylow.normal_of_subsingleton Q
+  have hQnormal : (↑Q : Subgroup G).Normal := Sylow.normal_of_subsingleton Q
   -- Cauchy で各 Sylow から位数 p / q の元
   have hPdvd : p ∣ Nat.card (↑P : Subgroup G) := by rw [hPcard]
   have hQdvd : q ∣ Nat.card (↑Q : Subgroup G) := by rw [hQcard]

@@ -136,7 +136,7 @@ step (10), p. 116).  The image of `x` in `H/Q` has order dividing both `|Q|`
 and `[H : Q] = d`, which are coprime. -/
 theorem mem_Q_of_orderOf_dvd_card_Q [Finite G] {x : G} (hx : x ∈ hyp.H)
     (hord : orderOf x ∣ Nat.card ↥hyp.Q) : x ∈ hyp.Q := by
-  haveI : (hyp.Q.subgroupOf hyp.H).Normal := hyp.Q_subgroupOf_H_normal
+  have : (hyp.Q.subgroupOf hyp.H).Normal := hyp.Q_subgroupOf_H_normal
   have h1 : orderOf (QuotientGroup.mk' (hyp.Q.subgroupOf hyp.H) ⟨x, hx⟩)
       ∣ Nat.card ↥hyp.Q :=
     dvd_trans (orderOf_map_dvd _ _) (by rw [Subgroup.orderOf_mk]; exact hord)
@@ -510,7 +510,7 @@ theorem mul_card_sub_le_of_inner_restrict [Finite G]
     b * (Nat.card ↥hyp.H - Nat.card (↥hyp.H ⧸ hyp.Q1.subgroupOf hyp.H))
       ≤ n * hyp.d := by
   classical
-  haveI : (hyp.Q1.subgroupOf hyp.H).Normal := hyp.Q1_subgroupOf_H_normal
+  have : (hyp.Q1.subgroupOf hyp.H).Normal := hyp.Q1_subgroupOf_H_normal
   -- the anchor ratio for each member
   have haOf : ∀ χ ∈ hyp.Sset, ∃ a : ℕ, 0 < a ∧
       χ (1 : ↥hyp.H) = (a : ℂ) * χ₁ (1 : ↥hyp.H) := by
@@ -533,9 +533,9 @@ theorem mul_card_sub_le_of_inner_restrict [Finite G]
     intro χ
     rw [Set.Finite.mem_toFinset, hbot]
   -- the member degree-square sum
-  haveI hn1 : ((⊥ : Subgroup G).subgroupOf hyp.H).Normal := by
+  have hn1 : ((⊥ : Subgroup G).subgroupOf hyp.H).Normal := by
     rw [Subgroup.bot_subgroupOf]; infer_instance
-  haveI hn2 : (((⊥ : Subgroup G).subgroupOf hyp.H)
+  have hn2 : (((⊥ : Subgroup G).subgroupOf hyp.H)
       ⊔ (hyp.Q1.subgroupOf hyp.H)).Normal := by
     rw [Subgroup.bot_subgroupOf, bot_sup_eq]
     exact hyp.Q1_subgroupOf_H_normal

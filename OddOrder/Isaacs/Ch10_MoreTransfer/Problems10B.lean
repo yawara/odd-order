@@ -46,15 +46,15 @@ variable {p n : ℕ}
 /-- 還元写像 `(ZMod (p^n))ˣ → (ZMod p)ˣ` の核の位数は `p^{n-1}`. -/
 theorem card_ker_unitsMap (hp : p.Prime) (hn : 0 < n) :
     Nat.card ↥(ZMod.unitsMap (dvd_pow_self p hn.ne' : p ∣ p ^ n)).ker = p ^ (n - 1) := by
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
+  have : Fact p.Prime := ⟨hp⟩
+  have : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
   have hsurj := ZMod.unitsMap_surjective (m := p ^ n) (n := p) (dvd_pow_self p hn.ne')
   have hcard : Nat.card ((ZMod (p ^ n))ˣ) = p ^ (n - 1) * (p - 1) := by
-    haveI : Fintype (ZMod (p ^ n)) := ZMod.fintype _
+    have : Fintype (ZMod (p ^ n)) := ZMod.fintype _
     rw [Nat.card_eq_fintype_card, ZMod.card_units_eq_totient,
       Nat.totient_prime_pow hp hn]
   have hcardp : Nat.card ((ZMod p)ˣ) = p - 1 := by
-    haveI : Fintype (ZMod p) := ZMod.fintype _
+    have : Fintype (ZMod p) := ZMod.fintype _
     rw [Nat.card_eq_fintype_card, ZMod.card_units_eq_totient, Nat.totient_prime hp]
   have hquot : Nat.card ((ZMod (p ^ n))ˣ ⧸
       (ZMod.unitsMap (dvd_pow_self p hn.ne' : p ∣ p ^ n)).ker) = p - 1 := by
@@ -95,7 +95,7 @@ theorem orderOf_one_add_prime_dvd (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p ^ n)
 theorem prime_dvd_of_castHom_eq_zero (hp : p.Prime) (hn : 0 < n) {z : ZMod (p ^ n)}
     (h : ZMod.castHom (dvd_pow_self p hn.ne' : p ∣ p ^ n) (ZMod p) z = 0) :
     (p : ZMod (p ^ n)) ∣ z := by
-  haveI : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
+  have : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
   rw [ZMod.castHom_apply] at h
   have hval : ((z.val : ℕ) : ZMod p) = 0 := by
     rw [ZMod.natCast_val]
@@ -111,7 +111,7 @@ theorem prime_dvd_of_castHom_eq_zero (hp : p.Prime) (hn : 0 < n) {z : ZMod (p ^ 
 theorem prime_dvd_one_sub_zpow (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p ^ n))ˣ}
     (hu : ZMod.unitsMap (dvd_pow_self p hn.ne' : p ∣ p ^ n) u = 1) (j : ℤ) :
     (p : ZMod (p ^ n)) ∣ (1 - ((u ^ j : (ZMod (p ^ n))ˣ) : ZMod (p ^ n))) := by
-  haveI : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
+  have : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
   refine prime_dvd_of_castHom_eq_zero hp hn ?_
   have hj : ZMod.unitsMap (dvd_pow_self p hn.ne' : p ∣ p ^ n) (u ^ j) = 1 := by
     rw [map_zpow, hu, one_zpow]
@@ -159,7 +159,7 @@ theorem orderOf_unitAutHom (m : ℕ) [NeZero m] (u : (ZMod m)ˣ) :
 theorem orderOf_unitAutHom_one_add_prime (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p ^ n))ˣ}
     (hu : (u : ZMod (p ^ n)) = 1 + (p : ZMod (p ^ n))) :
     orderOf (unitAutHom (p ^ n) u) ∣ p ^ (n - 1) := by
-  haveI : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
+  have : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
   rw [orderOf_unitAutHom]
   exact orderOf_one_add_prime_dvd hp hn hu
 
@@ -209,7 +209,7 @@ theorem isMetacyclic_problem10B1 (m : ℕ) (u : (ZMod m)ˣ) :
 theorem isPGroup_problem10B1 (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p ^ n))ˣ}
     (hu : (u : ZMod (p ^ n)) = 1 + (p : ZMod (p ^ n))) :
     IsPGroup p (problem10B1Group (p ^ n) u) := by
-  haveI : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
+  have : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
   obtain ⟨k, _, hk⟩ := (Nat.dvd_prime_pow hp).mp (orderOf_unitAutHom_one_add_prime hp hn hu)
   refine IsPGroup.of_card (n := n + k) ?_
   rw [SemidirectProduct.card, Nat.card_zpowers, hk, pow_add]
@@ -308,7 +308,7 @@ theorem commutator_inl_mem_map_zpowers (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p
     ⁅(SemidirectProduct.inl y : problem10B1Group (p ^ n) u), g⁆
       ∈ (Subgroup.zpowers (Multiplicative.ofAdd ((p : ZMod (p ^ n)) ^ (k + 1)))).map
         SemidirectProduct.inl := by
-  haveI : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
+  have : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
   obtain ⟨j, hj⟩ := Subgroup.mem_zpowers_iff.mp (SemidirectProduct.rightHom g).2
   obtain ⟨d, hd⟩ := prime_dvd_one_sub_zpow hp hn hu j
   rw [commutatorElement_inl_left]
@@ -351,7 +351,7 @@ theorem conj_inl {N A : Type*} [CommGroup N] [Group A] {φ : A →* MulAut N}
 theorem normal_map_zpowers (hp : p.Prime) {u : (ZMod (p ^ n))ˣ} (k : ℕ) :
     ((Subgroup.zpowers (Multiplicative.ofAdd ((p : ZMod (p ^ n)) ^ k))).map
       (SemidirectProduct.inl : _ →* problem10B1Group (p ^ n) u)).Normal := by
-  haveI : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
+  have : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
   refine ⟨fun w hw g => ?_⟩
   obtain ⟨v, hv, rfl⟩ := Subgroup.mem_map.mp hw
   obtain ⟨i, hi⟩ := Subgroup.mem_zpowers_iff.mp hv
@@ -380,10 +380,10 @@ theorem commutator_top_le_map_zpowers (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p 
         (⊤ : Subgroup (problem10B1Group (p ^ n) u))⁆
       ≤ (Subgroup.zpowers (Multiplicative.ofAdd ((p : ZMod (p ^ n)) ^ (0 + 1)))).map
         (SemidirectProduct.inl : _ →* problem10B1Group (p ^ n) u) := by
-  haveI : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
+  have : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
   set K := (Subgroup.zpowers (Multiplicative.ofAdd ((p : ZMod (p ^ n)) ^ (0 + 1)))).map
     (SemidirectProduct.inl : _ →* problem10B1Group (p ^ n) u) with hK
-  haveI : K.Normal := by
+  have : K.Normal := by
     rw [hK]
     exact normal_map_zpowers hp _
   have hkey : ∀ (y : Multiplicative (ZMod (p ^ n))) (w : problem10B1Group (p ^ n) u),
@@ -443,12 +443,12 @@ theorem lowerCentralSeries_le_map_zpowers (hp : p.Prime) (hn : 0 < n) {u : (ZMod
 theorem nilpotencyClass_problem10B1 (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p ^ n))ˣ}
     (hu : (u : ZMod (p ^ n)) = 1 + (p : ZMod (p ^ n))) :
     Group.nilpotencyClass (problem10B1Group (p ^ n) u) = n := by
-  haveI : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : Finite (problem10B1Group (p ^ n) u) :=
+  have : NeZero (p ^ n) := ⟨pow_ne_zero n hp.ne_zero⟩
+  have : Fact p.Prime := ⟨hp⟩
+  have : Finite (problem10B1Group (p ^ n) u) :=
     Finite.of_equiv _ (SemidirectProduct.equivProd (φ :=
       Subgroup.subtype (Subgroup.zpowers (unitAutHom (p ^ n) u)))).symm
-  haveI : Group.IsNilpotent (problem10B1Group (p ^ n) u) :=
+  have : Group.IsNilpotent (problem10B1Group (p ^ n) u) :=
     (isPGroup_problem10B1 hp hn hu).isNilpotent
   have hu' := unitsMap_one_add_prime hn hu
   obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 := ⟨n - 1, by omega⟩
@@ -461,8 +461,8 @@ theorem nilpotencyClass_problem10B1 (hp : p.Prime) (hn : 0 < n) {u : (ZMod (p ^ 
     rw [hzero]
     simp
   -- 下から: `γ_m ≠ ⊥`
-  haveI : Fact (1 < p ^ (m + 1)) := ⟨Nat.one_lt_pow (by omega) hp.one_lt⟩
-  haveI : Nontrivial (problem10B1Group (p ^ (m + 1)) u) :=
+  have : Fact (1 < p ^ (m + 1)) := ⟨Nat.one_lt_pow (by omega) hp.one_lt⟩
+  have : Nontrivial (problem10B1Group (p ^ (m + 1)) u) :=
     (SemidirectProduct.inl_injective (N := Multiplicative (ZMod (p ^ (m + 1))))
       (φ := Subgroup.subtype (Subgroup.zpowers (unitAutHom (p ^ (m + 1)) u)))).nontrivial
   have hne : (⊤ : Subgroup (problem10B1Group (p ^ (m + 1)) u)).lowerCentralSeries m ≠ ⊥ := by
@@ -504,7 +504,7 @@ theorem le_socle_of_module_of_not_dvd_index {G : Type*} [Group G] [Finite G]
     (hidx : ¬ p ∣ (Subgroup.centralizer (E : Set G)).index) :
     E ≤ Ch02.socle G := by
   classical
-  haveI : NeZero ((Nat.card (G ⧸ Subgroup.centralizer (E : Set G)) : ZMod p)) :=
+  have : NeZero ((Nat.card (G ⧸ Subgroup.centralizer (E : Set G)) : ZMod p)) :=
     ⟨fun h => hidx ((ZMod.natCast_eq_zero_iff _ _).mp h)⟩
   set S : Subgroup ↥E := (Ch02.socle G ⊓ E).subgroupOf E with hS
   have hWinv : ∀ q : G ⧸ Subgroup.centralizer (E : Set G), ∀ ⦃v : Additive ↥E⦄,
@@ -549,7 +549,7 @@ theorem le_socle_of_isElementaryAbelian_of_not_dvd_index {G : Type*} [Group G] [
     (hexp : ∀ x : ↥E, x ^ p = 1)
     (hidx : ¬ p ∣ (Subgroup.centralizer (E : Set G)).index) :
     E ≤ Ch02.socle G := by
-  letI : Module (ZMod p) (Additive ↥E) := zmodModule_of_pow_eq_one (n := p) hexp
+  let : Module (ZMod p) (Additive ↥E) := zmodModule_of_pow_eq_one (n := p) hexp
   exact le_socle_of_module_of_not_dvd_index hidx
 
 end

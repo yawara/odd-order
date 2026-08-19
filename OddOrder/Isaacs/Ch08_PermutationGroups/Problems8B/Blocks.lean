@@ -24,7 +24,7 @@ import OddOrder.Isaacs.Ch08_PermutationGroups.Problems8A.RegularRepresentations
 - `isPretransitive_of_normal_of_isPreprimitive`,
   `regular_centralizer_mulEquiv_of_two_isMinimalNormal` — **8B.3**: 原始置換群の相異なる
   2 つの極小正規部分群は regular で互いに中心化し合い, 同型。
-- `prime_pow_card_and_unique_isMinimalNormal_of_solvable` — **8B.4**: 可解原始置換群の
+- `prime_pow_card_and_unique_isMinimalNormal_of_isSolvable` — **8B.4**: 可解原始置換群の
   次数は素数冪で, 極小正規部分群はただ一つ。
 -/
 
@@ -56,7 +56,7 @@ lemma smul_blockCore (h : G) (α : Ω) (X : Set Ω) :
 lemma mem_smul_blockCore_iff (h : G) (α : Ω) (X : Set Ω) :
     α ∈ h • blockCore G α X ↔ ∀ g : G, α ∈ g • X → α ∈ (h * g) • X := by
   rw [smul_blockCore]
-  simp only [Set.mem_iInter, Set.mem_setOf_eq]
+  simp only [Set.mem_iInter, Set.mem_ofPred_eq]
 
 /-- **8B.1 の核心**: `α ∈ h • Δ` なら `h • Δ = Δ`。
 
@@ -71,11 +71,11 @@ lemma smul_blockCore_eq_of_mem [Finite G] {h : G} {α : Ω} {X : Set Ω}
       fun _ _ _ _ hab => mul_left_cancel hab
   rw [smul_blockCore]
   refine Set.Subset.antisymm (fun x hx => ?_) (fun x hx => ?_)
-  · simp only [blockCore, Set.mem_iInter, Set.mem_setOf_eq] at hx ⊢
+  · simp only [blockCore, Set.mem_iInter, Set.mem_ofPred_eq] at hx ⊢
     intro g' hg'
     obtain ⟨g, hg, rfl⟩ := hbij.surjOn (show g' ∈ {g : G | α ∈ g • X} from hg')
     exact hx g hg
-  · simp only [blockCore, Set.mem_iInter, Set.mem_setOf_eq] at hx ⊢
+  · simp only [blockCore, Set.mem_iInter, Set.mem_ofPred_eq] at hx ⊢
     exact fun g hg => hx (h * g) (hmaps hg)
 
 /-- **Isaacs Problem 8B.1** (p. 248) 🎉: `G` が `Ω` に推移的なとき, `α` を含む `X` の
@@ -127,7 +127,7 @@ theorem exists_smul_mem_and_smul_notMem [Finite G] [IsPreprimitive G Ω]
   push Not at hcon
   -- `hcon : ∀ g, g • α ∈ X → g • β ∈ X` から `β ∈ Δ`。
   have hβ : β ∈ blockCore G α X := by
-    simp only [blockCore, Set.mem_iInter, Set.mem_setOf_eq]
+    simp only [blockCore, Set.mem_iInter, Set.mem_ofPred_eq]
     intro g hg
     rw [Set.mem_smul_set_iff_inv_smul_mem] at hg ⊢
     exact hcon g⁻¹ hg
@@ -175,8 +175,8 @@ theorem isPretransitive_of_normal_of_isPreprimitive [FaithfulSMul G Ω] [IsPrepr
 lemma inf_eq_bot_of_isMinimalNormal_of_ne {M N : Subgroup G}
     (hM : Ch02.IsMinimalNormal M) (hN : Ch02.IsMinimalNormal N) (hMN : M ≠ N) :
     M ⊓ N = ⊥ := by
-  haveI : M.Normal := hM.1
-  haveI : N.Normal := hN.1
+  have : M.Normal := hM.1
+  have : N.Normal := hN.1
   rcases hM.2.2 (M ⊓ N) inferInstance inf_le_left with h | h
   · exact h
   · exact absurd ((hN.2.2 M inferInstance (h ▸ inf_le_right)).resolve_left hM.2.1) hMN
@@ -209,12 +209,12 @@ theorem regular_centralizer_mulEquiv_of_two_isMinimalNormal [FaithfulSMul G Ω]
     Function.Bijective (smulBase M α) ∧ Function.Bijective (smulBase N α) ∧
       Subgroup.centralizer (M : Set G) = N ∧ Subgroup.centralizer (N : Set G) = M ∧
       Nonempty (↥M ≃* ↥N) := by
-  haveI : M.Normal := hM.1
-  haveI : N.Normal := hN.1
+  have : M.Normal := hM.1
+  have : N.Normal := hN.1
   have hinf : M ⊓ N = ⊥ := inf_eq_bot_of_isMinimalNormal_of_ne hM hN hMN
   have hinf' : N ⊓ M = ⊥ := by rw [inf_comm]; exact hinf
-  haveI : IsPretransitive ↥M Ω := isPretransitive_of_normal_of_isPreprimitive M hM.2.1
-  haveI : IsPretransitive ↥N Ω := isPretransitive_of_normal_of_isPreprimitive N hN.2.1
+  have : IsPretransitive ↥M Ω := isPretransitive_of_normal_of_isPreprimitive M hM.2.1
+  have : IsPretransitive ↥N Ω := isPretransitive_of_normal_of_isPreprimitive N hN.2.1
   -- 半正則性: `M ≤ C_G(N)` と 8A.2。
   have hMreg : Function.Bijective (smulBase M α) :=
     (bijective_smulBase_iff M α).mpr ⟨inferInstance,
@@ -239,6 +239,7 @@ lemma bijective_smulBase_of_normal_of_comm [FaithfulSMul G Ω] {N : Subgroup G} 
           Subgroup.mem_centralizer_iff.mpr fun y hy => hcomm y hy x hx
     _ = ⊥ := centralizer_inf_stabilizer_eq_bot (H := N) α
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Isaacs Problem 8B.4** (p. 248) 🎉: **可解**な原始置換群 `G` について,
 次数 `|Ω|` は**素数冪**であり, `G` の極小正規部分群は**ただ一つ**。
 
@@ -246,16 +247,16 @@ lemma bijective_smulBase_of_normal_of_comm [FaithfulSMul G Ω] {N : Subgroup G} 
 `N ≤ C_G(N)` となり 8A.2 から半正則, したがって **regular** で `|Ω| = |N| = p^n`。
 一意性: もう一つ極小正規 `M ≠ N` があると 8B.3 より `C_G(N) = M` だが, `N` は可換なので
 `N ≤ C_G(N) = M`, 一方 `M ⊓ N = ⊥` だから `N = ⊥` となり極小性に反する。 -/
-theorem prime_pow_card_and_unique_isMinimalNormal_of_solvable [Finite G] [FaithfulSMul G Ω]
-    [IsPreprimitive G Ω] [IsSolvable G] [Nontrivial G] :
+theorem prime_pow_card_and_unique_isMinimalNormal_of_isSolvable [Finite G] [FaithfulSMul G Ω]
+    [IsPreprimitive G Ω] [Group.IsSolvable G] [Nontrivial G] :
     (∃ p n : ℕ, p.Prime ∧ Nat.card Ω = p ^ n) ∧
       ∃! N : Subgroup G, Ch02.IsMinimalNormal N := by
   obtain ⟨N, hN, -⟩ := Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) top_ne_bot
-  haveI : N.Normal := hN.1
-  haveI : IsPretransitive ↥N Ω := isPretransitive_of_normal_of_isPreprimitive N hN.2.1
-  have habel := Ch03.solvable_minimal_normal_isAbelian hN
-  obtain ⟨p, hp, helem⟩ := Ch03.solvable_minimal_normal_isElementaryAbelian hN
-  haveI : Nonempty Ω := by
+  have : N.Normal := hN.1
+  have : IsPretransitive ↥N Ω := isPretransitive_of_normal_of_isPreprimitive N hN.2.1
+  have habel := Ch03.minimal_normal_isAbelian_of_isSolvable hN
+  obtain ⟨p, hp, helem⟩ := Ch03.minimal_normal_isElementaryAbelian_of_isSolvable hN
+  have : Nonempty Ω := by
     by_contra hc
     rw [not_nonempty_iff] at hc
     obtain ⟨g, hg⟩ := exists_ne (1 : G)
@@ -263,7 +264,7 @@ theorem prime_pow_card_and_unique_isMinimalNormal_of_solvable [Finite G] [Faithf
   obtain ⟨α⟩ := ‹Nonempty Ω›
   have hcard : Nat.card Ω = Nat.card ↥N :=
     (Nat.card_eq_of_bijective _ (bijective_smulBase_of_normal_of_comm habel α)).symm
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨n, hn⟩ := helem.isPGroup.exists_card_eq
   refine ⟨⟨p, n, hp, by rw [hcard, hn]⟩, N, hN, fun M hM => ?_⟩
   by_contra hMN

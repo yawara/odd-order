@@ -84,7 +84,7 @@ theorem exists_three_complementary_invariant_summands_of_xiLengthThree
         U ⊓ V = ⊥ ∧ U ⊓ W = ⊥ ∧ V ⊓ W = ⊥ ∧
         U ⊔ V ≠ ⊤ ∧ U ⊔ W ≠ ⊤ ∧ V ⊔ W ≠ ⊤ ∧
           (U ⊔ V) ⊓ W = ⊥ ∧ U ⊔ V ⊔ W = ⊤ := by
-  letI : CommGroup E :=
+  let : CommGroup E :=
     { (inferInstance : Group E) with mul_comm := hEA.comm }
   obtain ⟨U, B, hbotU, hUB, hBtop⟩ := hlen.exists_chain
   have hUbot' : (⊥ : Subgroup E) < U.1 := hbotU
@@ -192,7 +192,7 @@ theorem exists_two_invariant_quotient_summands_of_xiLengthFour_exponent_four
             IsAInvariant Y.subtype (frattini P)).quotientMulAutHom W ∧
         U ≠ ⊥ ∧ U ≠ ⊤ ∧ W ≠ ⊥ ∧ W ≠ ⊤ ∧
           U ⊓ W = ⊥ ∧ U ⊔ W = ⊤ := by
-  letI : Nontrivial P := by
+  let : Nontrivial P := by
     obtain ⟨x, y, _, _, hxy⟩ := hmulti
     exact ⟨⟨x, y, hxy⟩⟩
   let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
@@ -203,7 +203,7 @@ theorem exists_two_invariant_quotient_summands_of_xiLengthFour_exponent_four
       hP hncomm hmulti hxi hlen hprime hPhiComm hfour hexists
   have hPhiNeTop : frattini P ≠ (⊤ : Subgroup P) :=
     frattini_ne_top_of_nontrivial
-  letI : Nontrivial (P ⧸ frattini P) :=
+  let : Nontrivial (P ⧸ frattini P) :=
     Subgroup.nontrivial_quotient_of_ne_top hPhiNeTop
   have hinv : (involutions P).Nonempty := by
     obtain ⟨x, _, hx, _, _⟩ := hmulti
@@ -254,7 +254,7 @@ theorem exists_three_invariant_quotient_summands_of_xiLengthFour_exponent_two
         U ⊓ V = ⊥ ∧ U ⊓ W = ⊥ ∧ V ⊓ W = ⊥ ∧
         U ⊔ V ≠ ⊤ ∧ U ⊔ W ≠ ⊤ ∧ V ⊔ W ≠ ⊤ ∧
           (U ⊔ V) ⊓ W = ⊥ ∧ U ⊔ V ⊔ W = ⊤ := by
-  letI : Nontrivial P := by
+  let : Nontrivial P := by
     obtain ⟨x, y, _, _, hxy⟩ := hmulti
     exact ⟨⟨x, y, hxy⟩⟩
   let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
@@ -265,7 +265,7 @@ theorem exists_three_invariant_quotient_summands_of_xiLengthFour_exponent_two
       hP hncomm hxi hlen htwo
   have hPhiNeTop : frattini P ≠ (⊤ : Subgroup P) :=
     frattini_ne_top_of_nontrivial
-  letI : Nontrivial (P ⧸ frattini P) :=
+  let : Nontrivial (P ⧸ frattini P) :=
     Subgroup.nontrivial_quotient_of_ne_top hPhiNeTop
   have hinv : (involutions P).Nonempty := by
     obtain ⟨x, _, hx, _, _⟩ := hmulti

@@ -183,7 +183,7 @@ theorem mulFwdDiffList_pow_mul_pow_mem (a b : G) (hs : List ℕ) (n : ℕ) :
         rw [hred, mulFwdDiffList_cons_pow_mul_pow]
         have hlen : ((h :: hs') ++ [h₁]).length - 1 = (h :: hs').length := by simp
         rw [hlen]
-        haveI hN : ((⊤ : Subgroup G).lowerCentralSeries (h :: hs').length).Normal :=
+        have hN : ((⊤ : Subgroup G).lowerCentralSeries (h :: hs').length).Normal :=
           inferInstance
         simpa [mul_assoc] using
           hN.conj_mem _ (powCommWord_mem a b (h :: hs') h₁) (a ^ (n + h₁))

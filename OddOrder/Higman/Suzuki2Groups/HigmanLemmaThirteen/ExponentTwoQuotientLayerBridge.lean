@@ -122,9 +122,9 @@ theorem layerZeroToFrattiniQuotientLinear_apply
         (layerZeroToQuotient (frattini P)
           (lowerCentralLayerKernel_zero_eq_frattini_subgroupOf P hP)
           v.toMul) := by
-  letI : CommGroup (P ⧸ frattini P) :=
+  let : CommGroup (P ⧸ frattini P) :=
     frattiniQuotientCommGroup P hP
-  letI : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
+  let : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
     frattiniQuotientZModTwoModule P hP
   rfl
 
@@ -136,9 +136,9 @@ theorem layerZeroToFrattiniQuotientLinear_injective
     letI : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
       frattiniQuotientZModTwoModule P hP
     Function.Injective (layerZeroToFrattiniQuotientLinear P hP) := by
-  letI : CommGroup (P ⧸ frattini P) :=
+  let : CommGroup (P ⧸ frattini P) :=
     frattiniQuotientCommGroup P hP
-  letI : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
+  let : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
     frattiniQuotientZModTwoModule P hP
   intro x y hxy
   apply Additive.toMul.injective
@@ -164,9 +164,9 @@ theorem layerZeroToFrattiniQuotientLinear_equivariant
           (IsAInvariant.of_characteristic phi :
             IsAInvariant phi (frattini P))
           a (layerZeroToFrattiniQuotientLinear P hP v).toMul) := by
-  letI : CommGroup (P ⧸ frattini P) :=
+  let : CommGroup (P ⧸ frattini P) :=
     frattiniQuotientCommGroup P hP
-  letI : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
+  let : Module (ZMod 2) (Additive (P ⧸ frattini P)) :=
     frattiniQuotientZModTwoModule P hP
   rw [show v = Additive.ofMul v.toMul by rfl,
     lowerCentralLayerRepresentation_apply,

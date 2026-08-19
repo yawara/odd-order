@@ -59,7 +59,7 @@ theorem transfer_eq_mul_conj_of_index_two [H.FiniteIndex] (ϕ : ↥H →* A) (hi
     {x : G} (hx : x ∈ H) (hconj : ∀ g : G, g⁻¹ * x * g ∈ H) {s : G} (hs : s ∉ H) :
     MonoidHom.transfer ϕ x = ϕ ⟨x, hx⟩ * ϕ ⟨s⁻¹ * x * s, hconj s⟩ := by
   classical
-  letI := H.fintypeQuotientOfFiniteIndex
+  let := H.fintypeQuotientOfFiniteIndex
   set S : H.LeftTransversal := default with hS_def
   set rep : G ⧸ H → G := fun q => (S.2.leftQuotientEquiv q : G) with hrep_def
   -- The chosen representative of `q` lies in `q`.

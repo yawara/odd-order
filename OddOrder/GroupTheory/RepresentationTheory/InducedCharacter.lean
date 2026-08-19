@@ -232,6 +232,7 @@ theorem induceSum_apply_eq_sum_filter (H : Subgroup G) (θ : ClassFunction ↥H 
   ext g
   simp [induceSum]
 
+set_option backward.isDefEq.respectTransparency false in
 theorem induceSum_add (H : Subgroup G) (θ ψ : ClassFunction ↥H k) :
     induceSum H (θ + ψ) = induceSum H θ + induceSum H ψ := by
   ext g
@@ -701,7 +702,7 @@ theorem induce_apply_coe_of_isTISubset (H : Subgroup G)
     {a : ↥H} (ha : (a : G) ∈ A) :
     induce H θ (a : G) = θ a := by
   classical
-  letI : Fintype ↥H := Fintype.ofFinite ↥H
+  let : Fintype ↥H := Fintype.ofFinite ↥H
   rw [induce_apply]
   set s : Finset G := Finset.univ.filter (fun x : G => x ∈ H) with hs
   have hmem_iff : ∀ x : G, x ∈ s ↔ x ∈ H := fun x => by simp [hs]
@@ -823,7 +824,7 @@ theorem restrict_induce_trivial (H : Subgroup G) [Finite ↥H] [H.Normal]
     [Invertible (Nat.card ↥H : ℂ)] :
     ClassFunction.restrict H (induce H (trivialClassFunction ↥H))
       = (H.index : ℂ) • trivialClassFunction ↥H := by
-  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  have : Fintype ↥H := Fintype.ofFinite ↥H
   ext h
   rw [ClassFunction.restrict_apply, ClassFunction.smul_apply, trivialClassFunction_apply, mul_one,
     induce_apply_of_mem_normal_of_const (le_refl H) (trivialClassFunction ↥H)
@@ -839,7 +840,7 @@ theorem induce_trivial_inner_self (H : Subgroup G) [Finite ↥H] [H.Normal]
     [Invertible (Nat.card ↥H : ℂ)] :
     ClassFunction.inner (induce H (trivialClassFunction ↥H))
         (induce H (trivialClassFunction ↥H)) = (H.index : ℂ) := by
-  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  have : Fintype ↥H := Fintype.ofFinite ↥H
   rw [inner_induce_eq_inner_restrict, restrict_induce_trivial, inner_smul_right, star_natCast,
     OddOrder.RepresentationTheory.irr_cf_inner trivialClassFunction_isIrreducible
       trivialClassFunction_isIrreducible, if_pos rfl, mul_one]
@@ -860,7 +861,7 @@ theorem induce_inner_induce_trivial_eq_zero_of_irreducible (H : Subgroup G) [Fin
     [Invertible (Nat.card ↥H : ℂ)] {φ : ClassFunction ↥H ℂ} (hφ : IsIrreducibleCharacter φ)
     (hφ1 : φ ≠ trivialClassFunction ↥H) :
     ClassFunction.inner (induce H φ) (induce H (trivialClassFunction ↥H)) = 0 := by
-  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  have : Fintype ↥H := Fintype.ofFinite ↥H
   rw [induce_inner_induce_trivial,
     OddOrder.RepresentationTheory.irr_cf_inner hφ trivialClassFunction_isIrreducible, if_neg hφ1,
     mul_zero]
@@ -913,7 +914,7 @@ the character of a finite-dimensional irreducible representation `ρ` — uses t
 representation `ρ.comp H.subtype` of `H`, which lies in `ℤ[Irr H]` by `character_mem_ZIrr`. -/
 theorem restrict_mem_ZIrr (H : Subgroup G) {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G) :
     restrict H φ ∈ ZIrr H := by
-  haveI : Finite H := Subtype.finite
+  have : Finite H := Subtype.finite
   induction hφ using Submodule.span_induction with
   | mem x hx =>
       obtain ⟨V, _, _, _, ρ, _, hρeq⟩ := hx
@@ -1062,10 +1063,10 @@ cases follow from `induce_add` / `induce_smul`.  The base case `θ ∈ Irr(H)`:
 theorem induce_mem_ZIrr (H : Subgroup G) [Fintype H] [Invertible (Nat.card H : ℂ)]
     {θ : ClassFunction ↥H ℂ} (hθ : θ ∈ ZIrr H) :
     induce H θ ∈ ZIrr G := by
-  haveI : Finite G := Finite.of_fintype G
-  haveI : Finite H := Subtype.finite
-  haveI := finite_irreducibleCharacter (G := G)
-  haveI : Fintype (IrreducibleCharacter G) := Fintype.ofFinite _
+  have : Finite G := Finite.of_fintype G
+  have : Finite H := Subtype.finite
+  have := finite_irreducibleCharacter (G := G)
+  have : Fintype (IrreducibleCharacter G) := Fintype.ofFinite _
   classical
   induction hθ using Submodule.span_induction with
   | mem x hx =>

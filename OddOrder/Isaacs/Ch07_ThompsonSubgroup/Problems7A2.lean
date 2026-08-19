@@ -145,8 +145,8 @@ theorem mem_centerZ_iff {x : SL23} : x ∈ centerZ ↔ x = 1 ∨ x = negOneSL23 
 生成する位数 `3` の部分群が一致してしまい, `b ∈ ⟨a⟩ · Z` (6 通り) がすべて偽なので矛盾。 -/
 theorem card_sylow_three_quotient : Nat.card (Sylow 3 (SL23 ⧸ centerZ)) = 4 := by
   classical
-  haveI : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   set Q := SL23 ⧸ centerZ with hQdef
   have hQcard : Nat.card Q = 2 ^ 2 * 3 := by
     rw [hQdef, natCard_quotient_centerZ]; norm_num
@@ -173,7 +173,7 @@ theorem card_sylow_three_quotient : Nat.card (Sylow 3 (SL23 ⧸ centerZ)) = 4 :=
   · exact h4
   -- `n_3 = 1` を排除する
   exfalso
-  haveI hsub : Subsingleton (Sylow 3 Q) := Nat.card_eq_one_iff_unique.mp h1 |>.1
+  have hsub : Subsingleton (Sylow 3 Q) := Nat.card_eq_one_iff_unique.mp h1 |>.1
   -- `a`, `b` の像は位数 `3`
   have hnotmem : ∀ x : SL23, x ≠ 1 → x ≠ negOneSL23 → (QuotientGroup.mk x : Q) ≠ 1 := by
     intro x hx1 hx2 hcon
@@ -246,13 +246,13 @@ theorem card_sylow_three_quotient : Nat.card (Sylow 3 (SL23 ⧸ centerZ)) = 4 :=
 theorem exists_normal_card_eight_sl23 :
     ∃ N : Subgroup SL23, N.Normal ∧ Nat.card ↥N = 8 := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   obtain ⟨P, hPnormal⟩ := OddOrder.Isaacs.Ch01.sylow_two_normal_of_card_twelve_of_four_sylow_three
     natCard_quotient_centerZ card_sylow_three_quotient
   refine ⟨(P : Subgroup (SL23 ⧸ centerZ)).comap (QuotientGroup.mk' centerZ), ?_, ?_⟩
   · exact Subgroup.Normal.comap hPnormal _
   · -- 指数が保たれるので `|N| = 24 / 3 = 8`
-    haveI : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
+    have : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
     have hQcard : Nat.card (SL23 ⧸ centerZ) = 2 ^ 2 * 3 := by
       rw [natCard_quotient_centerZ]; norm_num
     have hPcard : Nat.card (P : Subgroup (SL23 ⧸ centerZ)) = 4 :=

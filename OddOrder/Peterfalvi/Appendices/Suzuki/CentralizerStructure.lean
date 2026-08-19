@@ -111,7 +111,7 @@ theorem orbit_distinguishedInvolution_eq
   have hs2 : s ^ 2 = 1 := hyp.distinguishedInvolution_sq
   have hs1 : s ≠ 1 := hyp.distinguishedInvolution_ne_one
   ext w
-  simp only [MulAction.mem_orbit_iff, Set.mem_setOf_eq]
+  simp only [MulAction.mem_orbit_iff, Set.mem_ofPred_eq]
   constructor
   · rintro ⟨d, rfl⟩
     have hdH : (↑d : G) ∈ hyp.H := hyp.D_le_H d.2
@@ -147,7 +147,7 @@ theorem V_eq_centralizer_distinguishedInvolution :
   have hsH : s ∈ hyp.H := hyp.distinguishedInvolution_mem_H
   have hs2 : s ^ 2 = 1 := hyp.distinguishedInvolution_sq
   -- the D-conjugation action
-  letI act : MulAction (↥hyp.D) G :=
+  let act : MulAction (↥hyp.D) G :=
     MulAction.compHom G (ConjAct.toConjAct.toMonoidHom.comp hyp.D.subtype)
   have hsmul : ∀ d : ↥hyp.D, d • s = (↑d : G) * s * (↑d : G)⁻¹ :=
     fun d => ConjAct.toConjAct_smul _ _

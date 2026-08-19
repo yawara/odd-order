@@ -147,6 +147,7 @@ theorem isNilpotent_or_exists_mul_eq {e : R} (he : IsIdempotentElem e)
       _ = 0 := by rw [h0, mul_zero]
   · exact Or.inr ⟨y ^ m * b, by rw [mul_comm (y ^ m) b, mul_assoc, ← pow_succ, mul_comm b, h1]⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **The powers of an element of an Artinian ring stabilise**: `y ^ n = y ^ (2 n) * b` for some
 `n ≥ 1` and some `b`.  This is the input Fitting's dichotomy needs. -/
 theorem exists_pow_eq_pow_mul [IsArtinianRing R] (y : R) :

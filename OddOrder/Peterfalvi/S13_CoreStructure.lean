@@ -53,13 +53,13 @@ theorem U_centralizes_H0_of_W1_fpf [Finite G] {M : Subgroup G} (hyp : Hypothesis
     sup_le (hUM.trans hyp.chief.H0_normalized_by_M)
       (hyp.base.typeP.W1_le.trans hyp.chief.H0_normalized_by_M)
   -- `H_0` is solvable (subgroup of the nilpotent Fitting-type Hall `M_F`).
-  haveI : Group.IsNilpotent ↥hyp.base.typeP.H := by
+  have : Group.IsNilpotent ↥hyp.base.typeP.H := by
     rw [hyp.base.typeP.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent M
-  haveI : IsSolvable ↥hyp.base.typeP.H := IsNilpotent.to_isSolvable
-  haveI : IsSolvable ↥(hyp.chief.H0.subgroupOf hyp.base.typeP.H) := inferInstance
-  haveI hsolv : IsSolvable ↥hyp.chief.H0 :=
-    solvable_of_solvable_injective
+  have : Group.IsSolvable ↥hyp.base.typeP.H := IsNilpotent.to_isSolvable
+  have : Group.IsSolvable ↥(hyp.chief.H0.subgroupOf hyp.base.typeP.H) := inferInstance
+  have hsolv : Group.IsSolvable ↥hyp.chief.H0 :=
+    Group.isSolvable_of_isSolvable_injective
       (f := (Subgroup.subgroupOfEquivOfLe hH0le).symm.toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe hH0le).symm.injective
   -- coprimality of `|H_0|` (dividing `|M_F|`) to `|U W_1|`.
@@ -125,7 +125,8 @@ theorem chief_W2_inf_H0_eq_bot [Finite G] {M : Subgroup G} (hyp : Hypothesis M) 
       (Nat.card ↥(data.W1.subgroupOf (data.U ⊔ data.W1))) (Nat.card ↥data.H) :=
     (OddOrder.Peterfalvi.S11.typeP_coprime_H_uW1 data hU).symm.coprime_dvd_left
       (Subgroup.card_subgroup_dvd_card _)
-  haveI : IsSolvable ↥data.H := (OddOrder.Peterfalvi.S11.typeP_coprimeAction data hU).H_solvable
+  have : Group.IsSolvable ↥data.H :=
+    (OddOrder.Peterfalvi.S11.typeP_coprimeAction data hU).H_solvable
   have hmap : F.map (QuotientGroup.mk' hyp.chief.N) = act.fixedByE :=
     map_fixedSubgroup_eq_fixedSubgroup_quotient hyp.chief.N_aInvariant hcopHW1 (Or.inr
         inferInstance)
@@ -667,7 +668,7 @@ theorem columnSum_muColumnChar_mem_sOf_H0C_of_noncoherent [Finite G]
     OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
         (hyp.base.muColumnChar hG hG.odd k)
       ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0C := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   have hnt : OddOrder.GroupTheory.TypePNontrivialCore M hyp.base.typeP :=
     OddOrder.GroupTheory.typePNontrivialCore_of_isTypeIIIorIV hyp.type_alt hyp.base.typeP
@@ -729,7 +730,7 @@ theorem caseB_forall_mem_sOf_H0Cprime_apply_one_eq_qu [Finite G]
       (φ : ClassFunction ↥M ℂ) 1 =
         ((hyp.s11Setup.q *
           (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u : ℕ) : ℂ) := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   intro φ hφ
   refine OddOrder.Peterfalvi.S11.caseB_degree_qu hG _ caseB φ ?_
   change φ ∈ OddOrder.Peterfalvi.S11.sOf hyp.s11Setup
@@ -767,7 +768,7 @@ theorem caseB_coherent_sOf_H0Cprime [Finite G]
     (htype : IsTypeIII M ∨ IsTypeIV M) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
       (OddOrder.Peterfalvi.S11.sOf hyp.s11Setup hyp.H0Cprime) hyp.base.A0) := by
-  haveI := hyp.base.finiteG
+  have := hyp.base.finiteG
   classical
   have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
   set d := hyp.s11Setup.q * (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief).u with hd

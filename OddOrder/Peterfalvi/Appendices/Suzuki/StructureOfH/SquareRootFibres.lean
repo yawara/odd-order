@@ -107,7 +107,7 @@ theorem exists_mem_centralizer_of_conj_invariant {G : Type uG} [Group G] [Finite
     (hnotdvd : ¬ p ∣ Nat.card ↥T) :
     ∃ y ∈ T, y ∈ Subgroup.centralizer (P : Set G) := by
   classical
-  letI actP : MulAction ↥P ↥T :=
+  let actP : MulAction ↥P ↥T :=
     { smul := fun g y => ⟨(g : G) * (y : G) * (g : G)⁻¹, hTinv g g.2 y y.2⟩
       one_smul := fun y => Subtype.ext (by
         change ((1 : ↥P) : G) * (y : G) * ((1 : ↥P) : G)⁻¹ = (y : G)
@@ -117,8 +117,8 @@ theorem exists_mem_centralizer_of_conj_invariant {G : Type uG} [Group G] [Finite
             = (g : G) * ((h : G) * (y : G) * (h : G)⁻¹) * (g : G)⁻¹
         push_cast
         group) }
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI hPp : IsPGroup p ↥P := IsPGroup.of_card (n := 1) (by rw [hPcard, pow_one])
+  have : Fact p.Prime := ⟨hp⟩
+  have hPp : IsPGroup p ↥P := IsPGroup.of_card (n := 1) (by rw [hPcard, pow_one])
   obtain ⟨y, hy⟩ := hPp.nonempty_fixed_point_of_prime_not_dvd_card ↥T hnotdvd
   refine ⟨(y : G), y.2, Subgroup.mem_centralizer_iff.mpr ?_⟩
   intro g hg
@@ -374,7 +374,7 @@ theorem card_sqFibreIn_eq_card_Q0_of_kInvariant
     (hcard : Nat.card ↥X = Nat.card ↥hyp.Q0 ^ 2) :
     Nat.card ↥(hyp.sqFibreIn X) = Nat.card ↥hyp.Q0 := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   -- exponent `4`: squares land in `Q₀`
   have hsq : ∀ y ∈ X, y ^ 2 ∈ hyp.Q0 := fun _ hy =>
     hyp.sq_mem_Q0_of_isSuzuki2Group hQsuz (hXQ hy)
@@ -824,7 +824,7 @@ theorem natCard_inf_centralizer_le_sq
     Nat.card ↥(hyp.Q ⊓ Subgroup.centralizer (P : Set G)) ≤
       Nat.card ↥(hyp.Q0 ⊓ Subgroup.centralizer (P : Set G)) ^ 2 := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   set C : Subgroup G := Subgroup.centralizer (P : Set G) with hC
   set A : Finset G := ((hyp.Q ⊓ C : Subgroup G) : Set G).toFinset with hA
   set B : Finset G := ((hyp.Q0 ⊓ C : Subgroup G) : Set G).toFinset with hB

@@ -39,7 +39,7 @@ theorem involutions_subset_of_nontrivial_invariant
     {A : Subgroup P} (hAinv : IsAInvariant X.subtype A)
     (hAne : A ≠ ⊥) :
     involutions P ⊆ A := by
-  letI : Nontrivial A := (Subgroup.nontrivial_iff_ne_bot A).mpr hAne
+  let : Nontrivial A := (Subgroup.nontrivial_iff_ne_bot A).mpr hAne
   have hA2 : IsPGroup 2 A := hP.to_subgroup A
   have hcard_ne : Nat.card A ≠ 1 :=
     ne_of_gt (Finite.one_lt_card_iff_nontrivial.mpr inferInstance)
@@ -79,7 +79,7 @@ theorem no_sq_mem_agemo_one_and_commutator_le_agemo_two
     ¬ (u ^ 2 ∈ (Agemo A 2 1).map A.subtype ∧
       ⁅Subgroup.zpowers u, A⁆ ≤ (Agemo A 2 2).map A.subtype) := by
   rintro ⟨hu2, hcomm⟩
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with
       mul_comm := hAcomm.is_comm.comm }
   have hA2 : IsPGroup 2 A := hP.to_subgroup A

@@ -83,7 +83,7 @@ theorem frattiniMiddleCommutatorBilinearBaseChange_tmul
       (a * b) ⊗ₜ[ZMod 2]
         frattiniMiddleCommutatorBilinear
           hP hxi hPhiComm hexists u v := by
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   exact LinearMap.baseChange₂_tmul
@@ -115,7 +115,7 @@ theorem frattiniMiddleCommutatorBilinearBaseChange_equivariant
   dsimp only
   let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
     IsAInvariant.of_characteristic Y.subtype
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   intro c u v
@@ -157,13 +157,13 @@ theorem frattiniMiddleCommutatorBilinearBaseChange_one_tmul_ne_zero
         ((1 : GaloisField 2 n) ⊗ₜ[ZMod 2] v) ≠ 0 := by
   let hSquareEA :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : CommGroup (frattiniSquare P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : CommGroup (frattiniSquare P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
   rw [frattiniMiddleCommutatorBilinearBaseChange_tmul, one_mul]
   exact one_tmul_ne_zero_of_ne_zero
@@ -224,13 +224,13 @@ theorem exists_frattiniMiddleFrobeniusWeight_of_ne_zero
     IsAInvariant.of_characteristic Y.subtype
   let hSquareEA :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : CommGroup (frattiniSquare P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : CommGroup (frattiniSquare P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
   let eMiddle :=
     frattiniMiddleCoordinate hP hxi hPhiComm hfour hexists eSquare

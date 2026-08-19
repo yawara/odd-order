@@ -130,15 +130,15 @@ theorem exists_scalar_reparameterization_of_common_factor
             hK1J htermJ hSqJ hAgemoJ hK0J alpha =
           restrictedFactorAmbientInclusion hKinv hEAK eK c dataK
             hK1K htermK hSqK hAgemoK hK0K (a * alpha) := by
-  letI : IsMulCommutative (frattini J) :=
+  let : IsMulCommutative (frattini J) :=
     IsMulCommutative.of_comm hEAJ.comm
-  letI : CommGroup (frattini J) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini J)) :=
+  let : CommGroup (frattini J) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini J)) :=
     hEAJ.zmodModule
-  letI : IsMulCommutative (frattini K) :=
+  let : IsMulCommutative (frattini K) :=
     IsMulCommutative.of_comm hEAK.comm
-  letI : CommGroup (frattini K) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini K)) :=
+  let : CommGroup (frattini K) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini K)) :=
     hEAK.zmodModule
   intro hlambda hprim
   let iotaJ :=

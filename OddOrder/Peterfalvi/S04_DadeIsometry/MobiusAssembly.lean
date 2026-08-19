@@ -41,11 +41,12 @@ finite; `Nat.card (orbit B) > 0`. -/
 theorem card_orbit_pos (B : Finset {a : G // a ∈ A}) :
     letI := hyp.conjFinsetAction
     0 < Nat.card (MulAction.orbit L B) := by
-  letI := hyp.conjFinsetAction
-  letI : Finite (MulAction.orbit L B) := Set.finite_coe_iff.mpr (Set.toFinite _)
-  letI : Nonempty (MulAction.orbit L B) := ⟨⟨B, MulAction.mem_orbit_self B⟩⟩
+  let := hyp.conjFinsetAction
+  let : Finite (MulAction.orbit L B) := Set.finite_coe_iff.mpr (Set.toFinite _)
+  let : Nonempty (MulAction.orbit L B) := ⟨⟨B, MulAction.mem_orbit_self B⟩⟩
   exact Nat.card_pos
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (2.10), orbit-averaging.**  For any `ℂ`-valued `h` constant on `L`-conjugacy orbits
 of subsets (`h (B^l) = h B`), the transversal sum equals the powerset sum weighted by inverse orbit
 size:
@@ -67,9 +68,9 @@ theorem sum_transversalRep_eq_sum_div_orbit
       = ∑ B : Finset {a : G // a ∈ A},
           h B / (Nat.card (MulAction.orbit L B) : ℂ) := by
   classical
-  letI := hyp.conjFinsetAction
-  letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
-  letI : Fintype (Finset {a : G // a ∈ A}) := Fintype.ofFinite _
+  let := hyp.conjFinsetAction
+  let : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+  let : Fintype (Finset {a : G // a ∈ A}) := Fintype.ofFinite _
   -- `h` and `Nat.card (orbit ·)` are constant along orbits.
   have horbit_const : ∀ B : Finset {a : G // a ∈ A}, ∀ B' ∈ MulAction.orbit L B,
       h B' = h B := by
@@ -299,7 +300,7 @@ theorem mobiusSummand_orbit_weighted
               ((conjFiber g ((↑(hIntersection hyp B hB) : Set G)
                 * ({(b : G)} : Set G))).card : ℂ) := by
   classical
-  letI := hyp.conjFinsetAction
+  let := hyp.conjFinsetAction
   rw [hyp.induceAlphaBTerm_apply _ hB g,
     hyp.induce_alphaB_apply_eq_alpha_mul_sum_conjL hB α hh hga]
   -- abbreviations
@@ -390,7 +391,7 @@ noncomputable def aOrbitFinset (a : {a : G // a ∈ A}) : Finset {a : G // a ∈
 theorem mem_aOrbitFinset {a b : {a : G // a ∈ A}} :
     b ∈ hyp.aOrbitFinset a ↔ ∃ l : L, hyp.conjA l a = b := by
   classical
-  letI : Fintype {a : G // a ∈ A} := Fintype.ofFinite _
+  let : Fintype {a : G // a ∈ A} := Fintype.ofFinite _
   simp only [aOrbitFinset, Finset.mem_filter, Finset.mem_univ, true_and]
 
 open scoped Classical in
@@ -415,8 +416,8 @@ theorem mobiusTermCF_div_orbit_eq
           * ∑ b' ∈ hyp.aOrbitFinset a,
             (if (b' : G) ∈ nLStabilizerIn hyp B then hyp.mobiusSummand b' g B else 0) := by
   classical
-  letI := hyp.conjFinsetAction
-  letI : Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ) :=
+  let := hyp.conjFinsetAction
+  let : Invertible (Nat.card (mBSubgroup hyp B hB) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   -- start from the orbit-weight identity, which sums over `b : N_L(B)` with `b ∈ a^L`.
   rw [hyp.mobiusTermCF_of_nonempty _ g hB, mul_div_right_comm,
@@ -500,10 +501,10 @@ theorem sum_mobiusTermCF_transversalRep_eq_neg
         (hyp.transversalRep C)
       = -((α : ClassFunction L ℂ) ⟨a.1, hyp.mem_L a.2⟩) := by
   classical
-  letI := hyp.conjFinsetAction
-  letI : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
-  letI : Fintype {a : G // a ∈ A} := Fintype.ofFinite _
-  letI : Fintype (Finset {a : G // a ∈ A}) := Fintype.ofFinite _
+  let := hyp.conjFinsetAction
+  let : Fintype hyp.conjClassQuotient := Fintype.ofFinite _
+  let : Fintype {a : G // a ∈ A} := Fintype.ofFinite _
+  let : Fintype (Finset {a : G // a ∈ A}) := Fintype.ofFinite _
   set αa : ℂ := (α : ClassFunction L ℂ) ⟨a.1, hyp.mem_L a.2⟩ with hαa
   -- (1) orbit-average the transversal sum to the powerset.
   rw [hyp.sum_transversalRep_eq_sum_div_orbit

@@ -54,16 +54,19 @@ def mapRingEquiv (σ : ℂ ≃+* ℂ) (φ : ClassFunction G ℂ) : ClassFunction
   ext g
   simp [mapRingEquiv]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp] theorem mapRingEquiv_add (σ : ℂ ≃+* ℂ) (φ ψ : ClassFunction G ℂ) :
     mapRingEquiv σ (φ + ψ) = mapRingEquiv σ φ + mapRingEquiv σ ψ := by
   ext g
   simp [mapRingEquiv]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp] theorem mapRingEquiv_neg (σ : ℂ ≃+* ℂ) (φ : ClassFunction G ℂ) :
     mapRingEquiv σ (-φ) = -mapRingEquiv σ φ := by
   ext g
   simp [mapRingEquiv]
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp] theorem mapRingEquiv_sub (σ : ℂ ≃+* ℂ) (φ ψ : ClassFunction G ℂ) :
     mapRingEquiv σ (φ - ψ) = mapRingEquiv σ φ - mapRingEquiv σ ψ := by
   ext g
@@ -72,6 +75,7 @@ def mapRingEquiv (σ : ℂ ≃+* ℂ) (φ : ClassFunction G ℂ) : ClassFunction
 @[simp] theorem zsmul_apply (n : ℤ) (φ : ClassFunction G ℂ) (g : G) :
     (n • φ) g = n • φ g := rfl
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp] theorem mapRingEquiv_zsmul (σ : ℂ ≃+* ℂ) (n : ℤ) (φ : ClassFunction G ℂ) :
     mapRingEquiv σ (n • φ) = n • mapRingEquiv σ φ := by
   ext g
@@ -278,8 +282,8 @@ intertwines the two actions and twists scalars by the bijection `σ`) yields a
 subrepresentation of `ρ`. -/
 theorem isIrreducible_galoisTwist (σ : ℂ ≃+* ℂ) {ρ : Representation ℂ G V}
     (b : Basis ι ℂ V) (hρ : ρ.IsIrreducible) : (galoisTwist σ ρ b).IsIrreducible := by
-  haveI := hρ
-  haveI : Nontrivial V := by
+  have := hρ
+  have : Nontrivial V := by
     by_contra hV
     rw [not_nontrivial_iff_subsingleton] at hV
     have hbt : (⊥ : Submodule ℂ V) = ⊤ := by

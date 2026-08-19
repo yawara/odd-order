@@ -116,7 +116,7 @@ theorem CharacterDegreeCore.exists_eta01_column_data [Finite G]
       (∀ c : Fin hyp.p, c ≠ ⟨0, hyp.p_prime.pos⟩ → c ≠ j₀ →
         ClassFunction.inner
           (core.tau1S (∑ i : Fin hyp.q, hyp.mu i c)) hyp.eta01 = 0) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hp1 : (⟨1, hyp.p_prime.one_lt⟩ : Fin hyp.p) ≠ ⟨0, hyp.p_prime.pos⟩ := by
     intro h; exact absurd (congrArg Fin.val h) one_ne_zero
   have h2lt : 2 < hyp.p := by have := hyp.three_le_p; omega
@@ -208,19 +208,19 @@ theorem Hypothesis.exists_muS_index_eta01_core [Finite G]
       (H_sharp_hypothesis76_base hG hyp φ₀).zetaNormSq i₁ = (hyp.q : ℂ) ∧
       (H_sharp_hypothesis76_base hG hyp φ₀).zeta i₁ 1 = ((hyp.u * hyp.q : ℕ) : ℂ) := by
   classical
-  haveI := hyp.finiteG
-  letI : Fintype G := Fintype.ofFinite G
-  letI : Invertible (Nat.card G : ℂ) :=
+  have := hyp.finiteG
+  let : Fintype G := Fintype.ofFinite G
+  let : Invertible (Nat.card G : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Fintype ↥hyp.S := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥hyp.S : ℂ) :=
+  let : Fintype ↥hyp.S := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥hyp.S : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   set data := hyp.toTypesIIIIIIVSetupS hG with hdata
   set HU : Subgroup ↥hyp.S := huSub data with hHU
   have hHUeq : HU = (derivedInG hyp.S).subgroupOf hyp.S :=
     huSub_eq_derivedInG_subgroupOf data
-  letI : Fintype ↥HU := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥HU : ℂ) :=
+  let : Fintype ↥HU := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥HU : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   -- `PC = H.subgroupOf S ≤ S' = HU`
   have hHderiv : hyp.H ≤ derivedInG hyp.S := by
@@ -229,11 +229,11 @@ theorem Hypothesis.exists_muS_index_eta01_core [Finite G]
     exact sup_le le_sup_left (le_trans (hyp.C_eq ▸ inf_le_left) le_sup_right)
   have hKle : hyp.H.subgroupOf hyp.S ≤ HU := by
     rw [hHUeq]; exact Subgroup.subgroupOf_mono hyp.S hHderiv
-  letI : Fintype ↥((hyp.H.subgroupOf hyp.S).subgroupOf HU) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥((hyp.H.subgroupOf hyp.S).subgroupOf HU) : ℂ) :=
+  let : Fintype ↥((hyp.H.subgroupOf hyp.S).subgroupOf HU) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥((hyp.H.subgroupOf hyp.S).subgroupOf HU) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   set K : Subgroup ↥hyp.S := hyp.H.subgroupOf hyp.S with hKdef
-  haveI hKnorm : K.Normal := H_sharp_subgroupOf_normal hyp
+  have hKnorm : K.Normal := H_sharp_subgroupOf_normal hyp
   set core := hyp.characterDegreeCore hG hnoV chief with hcore
   set τ₁ := hyp.tau1S_ofHonest hG hnoV chief with hτ₁
   -- the (13.5)-for-`η₀₁` input data: distinguished column, sign, chosen base
@@ -246,7 +246,7 @@ theorem Hypothesis.exists_muS_index_eta01_core [Finite G]
   -- (13.3.a): the distinguished column source `θr` (`μ_{j₀} = Ind_{PC}^S θr`)
   obtain ⟨θr, hθrirr, hθr1, hμeq, hθrP⟩ := hyp.mu_j_isIndPC_not_ker hG j₀ hj₀0
   -- degree-one values on `Irr K` (`K ≅ H = PC` abelian)
-  haveI hKcomm : IsMulCommutative ↥K := by
+  have hKcomm : IsMulCommutative ↥K := by
     have hH := hyp.H_mulCommutative hG
     have e := Subgroup.subgroupOfEquivOfLe (show hyp.H ≤ hyp.S from hyp.H_le_S)
     exact ⟨⟨fun a b => e.injective (by
@@ -549,7 +549,7 @@ theorem Hypothesis.exists_muS_index_eta01_core [Finite G]
         (H_sharp_hypothesis76_base hG hyp φ₀).zeta i = ClassFunction.induce K θiQ :=
       ⟨θi0.val, θi0.2, by rw [hθi0]; congr!⟩
     -- `P`-nonkernel witness at the `K`-level
-    haveI hPnorm : (hyp.P.subgroupOf hyp.S).Normal := by
+    have hPnorm : (hyp.P.subgroupOf hyp.S).Normal := by
       have hPle' : hyp.P ≤ hyp.S := by
         rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
       refine (Subgroup.normal_subgroupOf_iff_le_normalizer hPle').mpr ?_
@@ -618,7 +618,7 @@ theorem Hypothesis.exists_etaS_alphaFun_one_int_core [Finite G]
       ↥(hyp.H.subgroupOf hyp.S)) :
     ∃ α1 : ℤ, hypothesis76AlphaFun (H_sharp_hypothesis76_base hG hyp φ₀)
       (hyp.P.subgroupOf hyp.S) hyp.eta01 1 = (α1 : ℂ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   exact hypothesis76AlphaFun_one_int (H_sharp_hypothesis76_base hG hyp φ₀)
     (hyp.P.subgroupOf hyp.S) hyp.eta01
     (H_sharp_hypothesis76_base_cCoeff_int hG hyp φ₀ hyp.eta01_mem_ZIrr)
@@ -649,7 +649,7 @@ theorem Hypothesis.exists_caseB_data_eta01_S_core [Finite G]
       ((hyp.p ^ hyp.q - 1 : ℕ) : ℝ) * ((α1 : ℤ) : ℝ) ^ 2
         ≤ ∑ x ∈ (Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S)).erase 1, ‖α x‖ ^ 2 := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hnoV := OddOrder.Peterfalvi.S12.no_typeV_maximal_unconditional hG
   obtain ⟨chief, -⟩ := OddOrder.Peterfalvi.S11.exists_chiefFactorData hG
     (hyp.toTypesIIIIIIVSetupS hG)
@@ -792,7 +792,7 @@ theorem Hypothesis.eta01_Hsharp_norm_lower_core [Finite G]
     (Nat.card ↥(derivedInG hyp.S) : ℝ) - (hyp.u : ℝ) ^ 2
       ≤ ∑ x ∈ (Set.toFinite (sharpSubgroup hyp.H)).toFinset, ‖hyp.eta01 x‖ ^ 2 := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   obtain ⟨ζ, α, α1, δ, hvanish, hinner, hχ, hfirstTerm, hcross, hδ, hinfl⟩ :=
     hyp.exists_caseB_data_eta01_S_core hG
   have hHS : hyp.H ≤ hyp.S := hyp.H_le_S

@@ -198,7 +198,7 @@ private theorem tau2_conj_smul' [Finite G] (g : G) (M : Subgroup G) :
       (MulAut.conj g).injective).trans
       (MulEquiv.subgroupCongr (mulAut_smul_eq_map' (MulAut.conj g) M).symm)
   ext p
-  simp only [OddOrder.BG.Ch3.S12.tau2, Set.mem_setOf_eq,
+  simp only [OddOrder.BG.Ch3.S12.tau2, Set.mem_ofPred_eq,
     OddOrder.BG.Ch4.S14.sigma_conj_smul_eq]
   rw [OddOrder.BG.Ch3.S13.pRank_eq_of_mulEquiv (p := p) e.symm]
 
@@ -249,7 +249,7 @@ theorem escaping_sigmaSharp_disjoint_centralizer_of_witness [Finite G]
   obtain ⟨xw, hxwMσ, hxw1, hxwc⟩ := hwit
   have hwMσ : w ∈ OddOrder.BG.Ch3.S10.Msigma S := hker hwS hxwMσ hxw1 hxwc
   -- a Cauchy `p`-element of `C_S(w)` lies in `S_σ` (absorption), so `p ∈ σ(S)`.
-  haveI : Fact p.Prime := ⟨hpp⟩
+  have : Fact p.Prime := ⟨hpp⟩
   obtain ⟨c, hc_ord⟩ := exists_prime_orderOf_dvd_card' p hpC
   have hcS : (c : G) ∈ S := (Subgroup.mem_inf.mp c.2).1
   have hcC : Commute (c : G) w := by

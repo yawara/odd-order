@@ -166,7 +166,7 @@ theorem card_dvd_three_of_odd_mulAutQuaternion
   classical
   -- `|Abelianization Q₈| = 4`: `|Q₈| = 8`, commutator subgroup of order `2`
   have hcard_comm : Nat.card (commutator Q₈) = 2 := by
-    haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+    have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
     rw [commutator_quaternionTwo_eq, Nat.card_zpowers]
     exact orderOf_eq_prime (by decide) (by decide)
   have hcard_Q8 : Nat.card Q₈ = 8 := by
@@ -177,13 +177,13 @@ theorem card_dvd_three_of_odd_mulAutQuaternion
     have hA : Nat.card A₈ = Nat.card (Q₈ ⧸ commutator Q₈) := rfl
     omega
   -- the target permutation group has order `3! = 6`
-  haveI : Finite A₈ := Quotient.finite _
+  have : Finite A₈ := Quotient.finite _
   have hcard_ne : Nat.card {x : A₈ // x ≠ 1} = 3 := by
     have h := Nat.card_congr (Equiv.optionSubtypeNe (1 : A₈))
     rw [Finite.card_option, hcard_A] at h
     omega
   have hcard_perm : Nat.card (Equiv.Perm {x : A₈ // x ≠ 1}) = 6 := by
-    letI : Fintype {x : A₈ // x ≠ 1} := Fintype.ofFinite _
+    let : Fintype {x : A₈ // x ≠ 1} := Fintype.ofFinite _
     have h3 : Fintype.card {x : A₈ // x ≠ 1} = 3 := by
       rw [← Nat.card_eq_fintype_card]
       exact hcard_ne

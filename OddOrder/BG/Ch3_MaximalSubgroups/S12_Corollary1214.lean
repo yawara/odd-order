@@ -92,7 +92,7 @@ private theorem pRank_eq_zero_of_isPGroup_of_ne_prime {H : Type*} [Group H] [Fin
     {p q : ℕ} [Fact p.Prime] (hq : q.Prime) (hqp : q ≠ p) (hH : IsPGroup p H) :
     pRank H q = 0 := by
   classical
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   apply le_antisymm ?_ (Nat.zero_le _)
   rw [pRank_le_iff]
   intro E hE
@@ -144,7 +144,7 @@ theorem maximalContaining_centralizer_and_someSylow_eq_singleton [Finite G]
     rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
     · exact h
     · exfalso
-      refine hG.notSolvable (isSolvable_of_comm fun a b => ?_)
+      refine hG.notSolvable (Group.isSolvable_of_comm fun a b => ?_)
       exact (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm
   have hClt : Subgroup.centralizer (X : Set G) < ⊤ := by
     rw [lt_top_iff_ne_top]
@@ -229,7 +229,7 @@ theorem maximalContaining_centralizer_and_someSylow_eq_singleton [Finite G]
     have hXP' : X ≤ derivedInG (S : Subgroup G) := by
       obtain ⟨K, hKnormal, hKcompl⟩ :=
         (S10.derived_msigma_hasNormalPComplement_of_not_mem_beta hG hM hpπ hpβ).2
-      haveI : K.Normal := hKnormal
+      have : K.Normal := hKnormal
       obtain ⟨S'', hS''eq⟩ := S10.exists_sylow_subgroupOf_of_le S hSMσ
       set Ssub : Subgroup ↥(S10.Msigma M) := (S'' : Subgroup ↥(S10.Msigma M)) with hSsubdef
       have hcompl := hKcompl S''
@@ -362,7 +362,7 @@ theorem maximalContaining_centralizer_and_someSylow_eq_singleton [Finite G]
               = (↑(P₁ : Subgroup G) : Set G) * ↑(P₂ : Subgroup G) := by
             rw [hcp.sup_eq]; exact Subgroup.coe_mul_of_left_le_normalizer_right _ _ hP₁norm
           -- `P₂` centralizes `S` (`P₂` commutes with `P₁` and is abelian).
-          letI := hP₂cyc.commGroup
+          let := hP₂cyc.commGroup
           have hP₂cS : ∀ c ∈ (P₂ : Subgroup G), ∀ s ∈ (S : Subgroup G), c * s = s * c := by
             intro c hc s hs
             rw [← SetLike.mem_coe, hScoe] at hs

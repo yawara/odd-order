@@ -159,8 +159,8 @@ theorem nonempty_mulEquiv_dihedralGroup_of_card_stabilizer_eq_two [Finite G] [Fi
     Nonempty (G ≃* DihedralGroup (Nat.card Ω)) := by
   classical
   have hp : (Nat.card Ω).Prime := prime_card_of_card_stabilizer_eq_two hcard
-  haveI : Fact (Nat.card Ω).Prime := ⟨hp⟩
-  haveI : NeZero (Nat.card Ω) := ⟨hp.pos.ne'⟩
+  have : Fact (Nat.card Ω).Prime := ⟨hp⟩
+  have : NeZero (Nat.card Ω) := ⟨hp.pos.ne'⟩
   obtain ⟨K, t, hKnormal, hKΩ, -, hsup, hzt, htord, hinvK⟩ :=
     exists_inverting_involution_of_card_stabilizer_eq_two hcard
   -- `K` は素数位数なので位数 `|Ω|` の元 `y` で生成される。

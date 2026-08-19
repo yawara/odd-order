@@ -37,6 +37,7 @@ variable {G : Type*} [Group G]
 open Subgroup
 open scoped commutatorElement
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **The lower central series step under a cyclic abelianization**: if `G/G'` is cyclic then
 `G' ≤ γ₃ = ⁅G', ⊤⁆`.  In `K = G/γ₃` the image of `G'` is central (its commutators with everything
 land in `γ₃`), and `K` modulo that central image is the cyclic `G/G'`, so `K` is abelian
@@ -46,7 +47,7 @@ theorem commutator_le_lowerCentralSeries_of_isCyclic_quotient
     (hcyc : IsCyclic (G ⧸ commutator G)) :
     commutator G ≤ (⊤ : Subgroup G).lowerCentralSeries 2 := by
   set γ₃ : Subgroup G := (⊤ : Subgroup G).lowerCentralSeries 2 with hγ₃def
-  haveI hnorm : γ₃.Normal := by rw [hγ₃def]; infer_instance
+  have hnorm : γ₃.Normal := by rw [hγ₃def]; infer_instance
   have hγ₃le : γ₃ ≤ commutator G := by
     rw [hγ₃def, ← Subgroup.top_lowerCentralSeries_one]
     exact (⊤ : Subgroup G).lowerCentralSeries_antitone one_le_two
@@ -74,7 +75,7 @@ theorem commutator_le_lowerCentralSeries_of_isCyclic_quotient
         QuotientGroup.eq_one_iff]
       exact hcomm
     exact (commutatorElement_eq_one_iff_commute.mp h1).symm.eq
-  haveI hab : IsMulCommutative (G ⧸ γ₃) :=
+  have hab : IsMulCommutative (G ⧸ γ₃) :=
     f.isMulCommutative_of_isCyclic_of_ker_le_center hker
   -- evaluate on the commutator generators
   rw [_root_.commutator_def, Subgroup.commutator_le]
@@ -133,14 +134,15 @@ theorem isCyclic_of_isNilpotent_of_isCyclic_quotient
     (QuotientGroup.quotientMulEquivOfEq hbot).trans (QuotientGroup.quotientBot (G := G))
   exact isCyclic_of_surjective e.toMonoidHom e.surjective
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Application form**: a nilpotent group admitting a hom to a cyclic group with kernel inside
 the commutator subgroup is cyclic.  `G/G'` is an image of `G/ker f ≃* range f ≤ C`, hence
 cyclic, and `isCyclic_of_isNilpotent_of_isCyclic_quotient` applies. -/
 theorem isCyclic_of_isNilpotent_of_ker_le_commutator {C : Type*} [Group C] [IsCyclic C]
     [Group.IsNilpotent G] (f : G →* C) (hker : f.ker ≤ commutator G) : IsCyclic G := by
-  haveI hrange : IsCyclic ↥f.range :=
+  have hrange : IsCyclic ↥f.range :=
     isCyclic_of_injective f.range.subtype f.range.subtype_injective
-  haveI hqker : IsCyclic (G ⧸ f.ker) :=
+  have hqker : IsCyclic (G ⧸ f.ker) :=
     isCyclic_of_surjective (QuotientGroup.quotientKerEquivRange f).symm.toMonoidHom
       (QuotientGroup.quotientKerEquivRange f).symm.surjective
   have hsurj : Function.Surjective
@@ -154,7 +156,7 @@ theorem isCyclic_of_isNilpotent_of_ker_le_commutator {C : Type*} [Group C] [IsCy
 /-- A cyclic group is commutative, in `IsMulCommutative` form — the shape the type-III/IV
 discriminator (`TypeIIIData.U_commutative`) consumes. -/
 theorem isMulCommutative_of_isCyclic (h : IsCyclic G) : IsMulCommutative G := by
-  letI : CommGroup G := IsCyclic.commGroup
+  let : CommGroup G := IsCyclic.commGroup
   exact ⟨⟨mul_comm⟩⟩
 
 end OddOrder.GroupTheory

@@ -61,9 +61,9 @@ def conjQByK : ↥hyp.K →* MulAut ↥hyp.Q where
 theorem sylowTwo_isMulCommutative_or_isSuzuki2Group (S : Sylow 2 ↥hyp.Q) :
     IsMulCommutative ↥(S : Subgroup ↥hyp.Q) ∨
       OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥(S : Subgroup ↥hyp.Q) := by
-  letI : Group.IsNilpotent ↥hyp.Q := hyp.isNilpotent_Q
-  letI hSnorm : (S : Subgroup ↥hyp.Q).Normal := inferInstance
-  letI : (S : Subgroup ↥hyp.Q).Characteristic :=
+  let : Group.IsNilpotent ↥hyp.Q := hyp.isNilpotent_Q
+  let hSnorm : (S : Subgroup ↥hyp.Q).Normal := inferInstance
+  let : (S : Subgroup ↥hyp.Q).Characteristic :=
     Sylow.characteristic_of_normal S hSnorm
   have involution_mem_S {x : ↥hyp.Q} (hx2 : x ^ 2 = 1) (hx1 : x ≠ 1) :
       x ∈ (S : Subgroup ↥hyp.Q) := by
@@ -71,7 +71,7 @@ theorem sylowTwo_isMulCommutative_or_isSuzuki2Group (S : Sylow 2 ↥hyp.Q) :
       IsPGroup.of_card (by
         rw [Nat.card_zpowers, orderOf_eq_prime hx2 hx1, pow_one])
     obtain ⟨T, hle⟩ := hzp.exists_le_sylow
-    haveI : Unique (Sylow 2 ↥hyp.Q) := Sylow.unique_of_normal S hSnorm
+    have : Unique (Sylow 2 ↥hyp.Q) := Sylow.unique_of_normal S hSnorm
     have hTS : T = S := Subsingleton.elim _ _
     rw [← hTS]
     exact hle (Subgroup.mem_zpowers x)

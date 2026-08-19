@@ -161,6 +161,7 @@ theorem psi_degree_eq_e [Finite G] {hyp : Hypothesis (G := G)}
 @[simp] theorem betaM_eq [Finite G] {hyp : Hypothesis (G := G)} (Mdata : MHypothesis hyp) :
     Mdata.betaM = Mdata.h78.beta := rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The canonical `β_M` is the Dade image of `Ind_K^M 1_K - ψ`. -/
 theorem betaM_eq_tau_induce_sub_psi [Finite G] {hyp : Hypothesis (G := G)}
     (Mdata : MHypothesis hyp) :
@@ -505,13 +506,13 @@ theorem card_modEq_one_of_prime_normalizing_fpf {G : Type*} [Group G] [Finite G]
     (hA_norm : A ≤ Subgroup.normalizer (U : Set G))
     (hfpf : ∀ a ∈ A, a ≠ 1 → ∀ u ∈ U, u ≠ 1 → (a : G) * u * (a : G)⁻¹ ≠ u) :
     Nat.card ↥U ≡ 1 [MOD p] := by
-  letI : MulAction ↥A ↥U := MulAction.compHom ↥U (Subgroup.inclusion hA_norm)
+  let : MulAction ↥A ↥U := MulAction.compHom ↥U (Subgroup.inclusion hA_norm)
   have hpg : IsPGroup p ↥A := IsPGroup.of_card (by rw [hA_card, pow_one])
   -- the conjugation `smul` is `a • u = a u a⁻¹`
   have hsmul : ∀ (a : ↥A) (u : ↥U), ((a • u : ↥U) : G) = (a : G) * (u : G) * (a : G)⁻¹ := by
     intro a u; rfl
   -- the only fixed point is `1`
-  haveI : Nontrivial ↥A :=
+  have : Nontrivial ↥A :=
     Finite.one_lt_card_iff_nontrivial.mp (by rw [hA_card]; exact hp.one_lt)
   obtain ⟨a0, ha0⟩ := exists_ne (1 : ↥A)
   have ha0G : (a0 : G) ≠ 1 := fun h => ha0 (Subtype.ext h)
@@ -533,9 +534,9 @@ theorem card_modEq_one_of_prime_normalizing_fpf {G : Type*} [Group G] [Finite G]
       simp
   have hfix_card : Nat.card (MulAction.fixedPoints ↥A ↥U) = 1 := by
     rw [hfix_eq]
-    haveI := Set.uniqueSingleton (1 : ↥U)
+    have := Set.uniqueSingleton (1 : ↥U)
     exact Nat.card_unique
-  haveI : Fact (Nat.Prime p) := ⟨hp⟩
+  have : Fact (Nat.Prime p) := ⟨hp⟩
   have hcong := hpg.card_modEq_card_fixedPoints (α := ↥U)
   rwa [hfix_card] at hcong
 
@@ -1010,6 +1011,7 @@ structure BetaMExpansionData [Finite G]
       ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (signs i j : ℂ) • hyp.base.eta i j
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Faithful conditional support-coherence producer for (14.11.2).**  Under `K ≠ V`, the
 coefficient projection and norm-tightness argument derives `e = p q`, vanishing of the orthogonal
 residual, the signed `η`-grid expansion, and the classification of `χ`.  The bridge lemma

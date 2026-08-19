@@ -121,15 +121,15 @@ theorem pairwiseJoinMixedTerm_eq_ambientFrattiniCommutator
   let hJoinEA : IsElementaryAbelian 2 (frattini J) :=
     IsElementaryAbelian.of_mulEquiv
       (pairwiseJoinFrattiniEquivAmbientFrattini hMap).symm hPhiEA
-  letI : IsMulCommutative (frattini P) :=
+  let : IsMulCommutative (frattini P) :=
     IsMulCommutative.of_comm hPhiEA.comm
-  letI : CommGroup (frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini P)) :=
+  let : CommGroup (frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini P)) :=
     hPhiEA.zmodModule
-  letI : IsMulCommutative (frattini J) :=
+  let : IsMulCommutative (frattini J) :=
     IsMulCommutative.of_comm hJoinEA.comm
-  letI : CommGroup (frattini J) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini J)) :=
+  let : CommGroup (frattini J) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini J)) :=
     hJoinEA.zmodModule
   intro hK1J htermJ hSqJ hK0J Sl Sr L R alpha beta x y hL hR
   rw [mixedTermBilinear_apply, hL, hR]
@@ -205,25 +205,25 @@ theorem exists_pairwiseJoinRepresentatives_mixedTerm_eq_ambientFrattiniCommutato
   let hJoinEA : IsElementaryAbelian 2 (frattini J) :=
     IsElementaryAbelian.of_mulEquiv
       (pairwiseJoinFrattiniEquivAmbientFrattini hMap).symm hPhiEA
-  letI : IsMulCommutative (frattini P) :=
+  let : IsMulCommutative (frattini P) :=
     IsMulCommutative.of_comm hPhiEA.comm
-  letI : CommGroup (frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini P)) :=
+  let : CommGroup (frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini P)) :=
     hPhiEA.zmodModule
-  letI : IsMulCommutative (frattini J) :=
+  let : IsMulCommutative (frattini J) :=
     IsMulCommutative.of_comm hJoinEA.comm
-  letI : CommGroup (frattini J) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini J)) :=
+  let : CommGroup (frattini J) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini J)) :=
     hJoinEA.zmodModule
   intro hK1J htermJ hSqJ hK0J Sl Sr L R alpha beta
-  letI := L.group
-  letI := L.normal
-  letI := L.quotComm
-  letI := L.quotModule
-  letI := R.group
-  letI := R.normal
-  letI := R.quotComm
-  letI := R.quotModule
+  let := L.group
+  let := L.normal
+  let := L.quotComm
+  let := L.quotModule
+  let := R.group
+  let := R.normal
+  let := R.quotComm
+  let := R.quotModule
   have hAlphaRange : L.incl alpha ∈
       LinearMap.range (factorInclusion L.f hK0J L.hf L.eQuot) :=
     ⟨alpha, rfl⟩

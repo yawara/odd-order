@@ -604,7 +604,7 @@ theorem agemo_one_eq_frattini_subgroupOf_of_homocyclic_four
     (hinvPhi : involutions P ⊆ frattini P)
     (hEA : IsElementaryAbelian 2 ↑(frattini P)) :
     Agemo S 2 1 = (frattini P).subgroupOf S := by
-  letI : CommGroup S :=
+  let : CommGroup S :=
     { (inferInstance : Group S) with mul_comm := hcommS.is_comm.comm }
   ext z
   change z ∈ Agemo S 2 1 ↔ (z : P) ∈ frattini P
@@ -708,7 +708,7 @@ theorem restricted_range_isXiActor
     (hSinv : IsAInvariant Y.subtype S) :
     IsXiActor hSinv.restrict.range := by
   refine ⟨?_, ?_⟩
-  · letI : IsCyclic Y := hxi.cyclic
+  · let : IsCyclic Y := hxi.cyclic
     exact isCyclic_of_surjective hSinv.restrict.rangeRestrict
       hSinv.restrict.rangeRestrict_surjective
   · intro x hx y hy
@@ -874,9 +874,9 @@ theorem exists_homocyclic_four_of_commutative_xiLengthTwo
       have := hxtwo
       rw [hbot] at this
       exact hx.2 (Subgroup.mem_bot.mp this)
-    letI : Nontrivial (Agemo A 2 1) :=
+    let : Nontrivial (Agemo A 2 1) :=
       (Subgroup.nontrivial_iff_ne_bot (Agemo A 2 1)).mpr hOneNeBot
-    letI : Nontrivial A :=
+    let : Nontrivial A :=
       (Agemo A 2 1).subtype_injective.nontrivial
     have hPhiNeTop : frattini A ≠ (⊤ : Subgroup A) := by
       obtain ⟨N, hN, _⟩ :=
@@ -917,7 +917,7 @@ theorem exists_homocyclic_four_of_commutative_xiLengthTwo
     have hOneTwo : Agemo A 2 1 = Agemo A 2 2 :=
       congrArg Subtype.val hUV
     let B := Agemo A 2 1
-    letI : Nontrivial B :=
+    let : Nontrivial B :=
       (Subgroup.nontrivial_iff_ne_bot B).mpr hOneNeBot
     have hBFratNeTop : frattini B ≠ (⊤ : Subgroup B) := by
       obtain ⟨N, hN, _⟩ :=
@@ -1018,11 +1018,11 @@ theorem isXiLengthTwoTypeA_invariant_subgroup_of_xiLengthThree_of_commutative
     (hStop : S < (⊤ : Subgroup P))
     (hcommS : IsMulCommutative S) :
     IsXiLengthTwoTypeA.{uP, 0} S := by
-  letI : CommGroup S :=
+  let : CommGroup S :=
     { (inferInstance : Group S) with mul_comm := hcommS.is_comm.comm }
   have hSneBot : S ≠ (⊥ : Subgroup P) :=
     ne_of_gt (lt_of_le_of_lt bot_le hPhiS)
-  letI : Nontrivial S :=
+  let : Nontrivial S :=
     (Subgroup.nontrivial_iff_ne_bot S).mpr hSneBot
   have hinvS : involutions P ⊆ S :=
     involutions_subset_of_nontrivial_invariant
@@ -1171,7 +1171,7 @@ theorem typeAModel_involutions_ncard_eq
     (phi : RingAut F) :
     (involutions (TypeAModel phi)).ncard = Nat.card F - 1 := by
   classical
-  letI := Fintype.ofFinite F
+  let := Fintype.ofFinite F
   calc
     (involutions (TypeAModel phi)).ncard =
         Nat.card ↑(involutions (TypeAModel phi)) :=
@@ -1193,9 +1193,9 @@ theorem involutions_ncard_eq
     {P : Type uP} [Group P]
     (data : XiLengthTwoTypeAData.{uP, uF} P) :
     (involutions P).ncard = 2 ^ data.parameter - 1 := by
-  letI : Field data.F := data.fieldF
-  letI : Finite data.F := data.finiteF
-  letI : CharP data.F 2 := data.charTwoF
+  let : Field data.F := data.fieldF
+  let : Finite data.F := data.finiteF
+  let : CharP data.F 2 := data.charTwoF
   calc
     (involutions P).ncard = Nat.card ↑(involutions P) :=
       (Nat.card_coe_set_eq _).symm

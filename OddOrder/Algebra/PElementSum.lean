@@ -200,8 +200,8 @@ omit [Fact p.Prime] in
 theorem conj_smul_subgroupSum_pointwise (g : G) (N : Subgroup G) :
     (g • subgroupSum R N : MonoidAlgebra R G) = subgroupSum R ((MulAut.conj g) • N) := by
   classical
-  letI := Fintype.ofFinite ↥N
-  letI := Fintype.ofFinite ↥((MulAut.conj g) • N)
+  let := Fintype.ofFinite ↥N
+  let := Fintype.ofFinite ↥((MulAut.conj g) • N)
   change g • (∑ n : ↥N, single (n : G) (1 : R))
     = ∑ n : ↥((MulAut.conj g) • N), single (n : G) (1 : R)
   rw [Finset.smul_sum]

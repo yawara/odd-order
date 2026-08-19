@@ -375,8 +375,8 @@ theorem chermakDelgadoLattice_centralizer_centralizer_eq [Finite G] {H : Subgrou
 /-- L(G) is nonempty (max measure exists for finite G). -/
 theorem chermakDelgadoLattice_nonempty [Finite G] :
     (chermakDelgadoLattice G).Nonempty := by
-  haveI : Nonempty (Subgroup G) := ⟨⊥⟩
-  haveI : Finite (Subgroup G) :=
+  have : Nonempty (Subgroup G) := ⟨⊥⟩
+  have : Finite (Subgroup G) :=
     Finite.of_injective (fun H : Subgroup G => (H : Set G)) SetLike.coe_injective
   obtain ⟨H_max, h_max⟩ :=
     Finite.exists_max (fun H : Subgroup G => H.chermakDelgadoMeasure)
@@ -385,7 +385,7 @@ theorem chermakDelgadoLattice_nonempty [Finite G] :
 /-- L(G) is finite. -/
 theorem chermakDelgadoLattice_finite [Finite G] :
     (chermakDelgadoLattice G).Finite := by
-  haveI : Finite (Subgroup G) :=
+  have : Finite (Subgroup G) :=
     Finite.of_injective (fun H : Subgroup G => (H : Set G)) SetLike.coe_injective
   exact Set.toFinite _
 
@@ -532,7 +532,7 @@ theorem chermakDelgado [Finite G] :
   intro A hA
   set M := chermakDelgadoSubgroup G with hM_def
   -- Step 1: |A| ≤ |C_G(A)| (since A ≤ C_G(A) for abelian A)
-  haveI : IsMulCommutative A := hA
+  have : IsMulCommutative A := hA
   have hA_le_CA : Nat.card A ≤ Nat.card (centralizer (A : Set G) : Subgroup G) :=
     Nat.card_le_card_of_injective
       (Subgroup.inclusion A.le_centralizer) (Subgroup.inclusion_injective _)
@@ -597,12 +597,12 @@ theorem not_isSimpleGroup_and_nonabelian_of_chermakDelgadoMeasure_gt [Finite G]
     rw [h_eq, h_bot_measure] at h_M_gt
     exact (lt_irrefl _) h_M_gt
   -- M is normal (characteristic ⟹ normal)
-  haveI : M.Normal := inferInstance
+  have : M.Normal := inferInstance
   -- G simple ⟹ M = ⊥ or M = ⊤. M ≠ ⊥ ⟹ M = ⊤
   have h_M_top : M = ⊤ :=
     (h_simple.eq_bot_or_eq_top_of_normal M ‹M.Normal›).resolve_left h_M_ne_bot
   -- M abelian
-  haveI hM_comm : IsMulCommutative M := inferInstance
+  have hM_comm : IsMulCommutative M := inferInstance
   -- IsMulCommutative G derivation
   apply h_nonab
   refine ⟨⟨fun a b => ?_⟩⟩

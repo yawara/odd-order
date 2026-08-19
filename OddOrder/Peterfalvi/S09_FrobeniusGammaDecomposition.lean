@@ -45,7 +45,7 @@ omit [Fintype ↥((F.H i).subgroupOf (F.L i))] in
 /-- The zeroth degree ratio in the concrete Frobenius family is one. -/
 theorem hypothesis78_d_zero_eq_one :
     (localH78 F i hodd hnilp C hFrob).hyp76.d 0 = 1 := by
-  haveI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
+  have : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
   let H78 := localH78 F i hodd hnilp C hFrob
   let pf := F.sibleyPlacedFamily i hodd hnilp C hFrob
   have hz0 : H78.hyp76.zeta 0 (1 : ↥(F.L i)) ≠ 0 := by
@@ -61,7 +61,7 @@ theorem hypothesis78_star_d_at
     (r : Fin ((localH78 F i hodd hnilp C hFrob).hyp76.n + 1)) :
     star ((localH78 F i hodd hnilp C hFrob).hyp76.d r) =
       (localH78 F i hodd hnilp C hFrob).hyp76.d r := by
-  haveI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
+  have : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
   let H78 := localH78 F i hodd hnilp C hFrob
   let pf := F.sibleyPlacedFamily i hodd hnilp C hFrob
   have hzeta : ∀ s, H78.hyp76.zeta s =
@@ -93,7 +93,7 @@ theorem hypothesis78_weightedNuSum_inner_nu_zeta_eq_d_at
         ((localH78 F i hodd hnilp C hFrob).nu
           ((localH78 F i hodd hnilp C hFrob).hyp76.zeta r)) =
       (localH78 F i hodd hnilp C hFrob).hyp76.d r := by
-  haveI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
+  have : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
   let H78 := localH78 F i hodd hnilp C hFrob
   let pf := F.sibleyPlacedFamily i hodd hnilp C hFrob
   have hzeta : ∀ s, H78.hyp76.zeta s =
@@ -140,7 +140,7 @@ theorem hypothesis78_coherence_agreement_at
         (localH78 F i hodd hnilp C hFrob).hyp76.d r •
           (localH78 F i hodd hnilp C hFrob).nu
             ((localH78 F i hodd hnilp C hFrob).hyp76.zeta 0) := by
-  haveI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
+  have : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
   classical
   let H78 := localH78 F i hodd hnilp C hFrob
   let pf := F.sibleyPlacedFamily i hodd hnilp C hFrob
@@ -201,7 +201,7 @@ theorem hypothesis78_nu_zeta_sub_d_smul_support_at
           (localH78 F i hodd hnilp C hFrob).nu
             ((localH78 F i hodd hnilp C hFrob).hyp76.zeta 0)).support
       ⊆ (localH78 F i hodd hnilp C hFrob).hyp76.hyp71.hyp.dadeSupport := by
-  haveI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
+  have : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
   let H78 := localH78 F i hodd hnilp C hFrob
   rw [← F.hypothesis78_coherence_agreement_at i hodd hnilp C hFrob hr]
   intro g hg
@@ -311,8 +311,8 @@ theorem hypothesis79_gamma_inner_nu_zeta_eq_d_mul
           (F.hypothesis78 i hodd hnilp_i C_i hFrob_i).beta
           ((F.hypothesis78 j hodd hnilp_j C_j hFrob_j).nu
             ((F.hypothesis78 j hodd hnilp_j C_j hFrob_j).hyp76.zeta 0)) := by
-  haveI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
-  haveI : Fintype ↥((F.H j).subgroupOf (F.L j)) := Fintype.ofFinite _
+  have : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
+  have : Fintype ↥((F.H j).subgroupOf (F.L j)) := Fintype.ofFinite _
   let H78i := F.hypothesis78 i hodd hnilp_i C_i hFrob_i
   let H78j := F.hypothesis78 j hodd hnilp_j C_j hFrob_j
   let H79 :=
@@ -386,8 +386,8 @@ theorem hypothesis79_gamma_inner_weightedNuSum_eq_mul_self
       (x : ℂ) * ClassFunction.inner
         (F.hypothesis78 j hodd hnilp_j C_j hFrob_j).weightedNuSum
         (F.hypothesis78 j hodd hnilp_j C_j hFrob_j).weightedNuSum := by
-  haveI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
-  haveI : Fintype ↥((F.H j).subgroupOf (F.L j)) := Fintype.ofFinite _
+  have : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
+  have : Fintype ↥((F.H j).subgroupOf (F.L j)) := Fintype.ofFinite _
   classical
   let H78j := F.hypothesis78 j hodd hnilp_j C_j hFrob_j
   let coeff : Fin (H78j.hyp76.n + 1) → ℂ := fun r =>
@@ -480,8 +480,8 @@ theorem hypothesis79_gamma_inner_weightedNuSum_eq_mul_BsumWeight
     ClassFunction.inner hBD_i.Gamma
         (F.hypothesis78 j hodd hnilp_j C_j hFrob_j).weightedNuSum =
       (x : ℂ) * (F.BsumWeight j : ℂ) := by
-  haveI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
-  haveI : Fintype ↥((F.H j).subgroupOf (F.L j)) := Fintype.ofFinite _
+  have : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
+  have : Fintype ↥((F.H j).subgroupOf (F.L j)) := Fintype.ofFinite _
   calc
     ClassFunction.inner hBD_i.Gamma
         (F.hypothesis78 j hodd hnilp_j C_j hFrob_j).weightedNuSum =
@@ -664,24 +664,24 @@ theorem exists_weightedGammaDecomposition
         (F.betaAt hodd hnilp C hFrob i)
         (F.distinguishedNuAt hodd hnilp C hFrob j) = (x : ℂ) := by
     intro j
-    letI : Fintype ↥(F.L i) := Fintype.ofFinite _
-    letI : Invertible (Nat.card ↥(F.L i) : ℂ) :=
+    let : Fintype ↥(F.L i) := Fintype.ofFinite _
+    let : Invertible (Nat.card ↥(F.L i) : ℂ) :=
       invertibleOfNonzero
         (Nat.cast_ne_zero.mpr (Nat.card_pos (α := F.L i)).ne')
-    letI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
-    letI : Invertible
+    let : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
+    let : Invertible
         (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ) :=
       invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-    letI : ((F.H i).subgroupOf (F.L i)).Normal := (hFrob i).isNormal
-    letI : Fintype ↥(F.L j) := Fintype.ofFinite _
-    letI : Invertible (Nat.card ↥(F.L j) : ℂ) :=
+    let : ((F.H i).subgroupOf (F.L i)).Normal := (hFrob i).isNormal
+    let : Fintype ↥(F.L j) := Fintype.ofFinite _
+    let : Invertible (Nat.card ↥(F.L j) : ℂ) :=
       invertibleOfNonzero
         (Nat.cast_ne_zero.mpr (Nat.card_pos (α := F.L j)).ne')
-    letI : Fintype ↥((F.H j).subgroupOf (F.L j)) := Fintype.ofFinite _
-    letI : Invertible
+    let : Fintype ↥((F.H j).subgroupOf (F.L j)) := Fintype.ofFinite _
+    let : Invertible
         (Nat.card ↥((F.H j).subgroupOf (F.L j)) : ℂ) :=
       invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-    letI : ((F.H j).subgroupOf (F.L j)).Normal := (hFrob j).isNormal
+    let : ((F.H j).subgroupOf (F.L j)).Normal := (hFrob j).isNormal
     simpa [betaAt, distinguishedNuAt] using
       (F.hypothesis79_exists_integral_beta_zeta_coefficient
         (i := i) (j := j) hodd
@@ -696,37 +696,37 @@ theorem exists_weightedGammaDecomposition
     by_cases hjl : j = l
     · subst l
       rw [if_pos rfl]
-      letI : Fintype ↥(F.L j) := Fintype.ofFinite _
-      letI : Invertible (Nat.card ↥(F.L j) : ℂ) :=
+      let : Fintype ↥(F.L j) := Fintype.ofFinite _
+      let : Invertible (Nat.card ↥(F.L j) : ℂ) :=
         invertibleOfNonzero
           (Nat.cast_ne_zero.mpr (Nat.card_pos (α := F.L j)).ne')
-      letI : Fintype ↥((F.H j).subgroupOf (F.L j)) := Fintype.ofFinite _
-      letI : Invertible
+      let : Fintype ↥((F.H j).subgroupOf (F.L j)) := Fintype.ofFinite _
+      let : Invertible
           (Nat.card ↥((F.H j).subgroupOf (F.L j)) : ℂ) :=
         invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-      letI : ((F.H j).subgroupOf (F.L j)).Normal := (hFrob j).isNormal
+      let : ((F.H j).subgroupOf (F.L j)).Normal := (hFrob j).isNormal
       simpa [weightedNuSumAt] using
         (F.hypothesis78_weightedNuSum_inner_self_eq_BsumWeight
           j hodd (hnilp j) (C j) (hFrob j))
     · rw [if_neg hjl]
-      letI : Fintype ↥(F.L j) := Fintype.ofFinite _
-      letI : Invertible (Nat.card ↥(F.L j) : ℂ) :=
+      let : Fintype ↥(F.L j) := Fintype.ofFinite _
+      let : Invertible (Nat.card ↥(F.L j) : ℂ) :=
         invertibleOfNonzero
           (Nat.cast_ne_zero.mpr (Nat.card_pos (α := F.L j)).ne')
-      letI : Fintype ↥((F.H j).subgroupOf (F.L j)) := Fintype.ofFinite _
-      letI : Invertible
+      let : Fintype ↥((F.H j).subgroupOf (F.L j)) := Fintype.ofFinite _
+      let : Invertible
           (Nat.card ↥((F.H j).subgroupOf (F.L j)) : ℂ) :=
         invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-      letI : ((F.H j).subgroupOf (F.L j)).Normal := (hFrob j).isNormal
-      letI : Fintype ↥(F.L l) := Fintype.ofFinite _
-      letI : Invertible (Nat.card ↥(F.L l) : ℂ) :=
+      let : ((F.H j).subgroupOf (F.L j)).Normal := (hFrob j).isNormal
+      let : Fintype ↥(F.L l) := Fintype.ofFinite _
+      let : Invertible (Nat.card ↥(F.L l) : ℂ) :=
         invertibleOfNonzero
           (Nat.cast_ne_zero.mpr (Nat.card_pos (α := F.L l)).ne')
-      letI : Fintype ↥((F.H l).subgroupOf (F.L l)) := Fintype.ofFinite _
-      letI : Invertible
+      let : Fintype ↥((F.H l).subgroupOf (F.L l)) := Fintype.ofFinite _
+      let : Invertible
           (Nat.card ↥((F.H l).subgroupOf (F.L l)) : ℂ) :=
         invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-      letI : ((F.H l).subgroupOf (F.L l)).Normal := (hFrob l).isNormal
+      let : ((F.H l).subgroupOf (F.L l)).Normal := (hFrob l).isNormal
       simpa [weightedNuSumAt] using
         (F.hypothesis79_weightedNuSum_cross_eq_zero
           (i := j) (j := l) hodd
@@ -737,24 +737,24 @@ theorem exists_weightedGammaDecomposition
         (F.weightedNuSumAt hodd hnilp C hFrob j) =
           (((x j : ℝ) : ℂ)) * (F.BsumWeight j : ℂ) := by
     intro j hj
-    letI : Fintype ↥(F.L i) := Fintype.ofFinite _
-    letI : Invertible (Nat.card ↥(F.L i) : ℂ) :=
+    let : Fintype ↥(F.L i) := Fintype.ofFinite _
+    let : Invertible (Nat.card ↥(F.L i) : ℂ) :=
       invertibleOfNonzero
         (Nat.cast_ne_zero.mpr (Nat.card_pos (α := F.L i)).ne')
-    letI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
-    letI : Invertible
+    let : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
+    let : Invertible
         (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ) :=
       invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-    letI : ((F.H i).subgroupOf (F.L i)).Normal := (hFrob i).isNormal
-    letI : Fintype ↥(F.L j) := Fintype.ofFinite _
-    letI : Invertible (Nat.card ↥(F.L j) : ℂ) :=
+    let : ((F.H i).subgroupOf (F.L i)).Normal := (hFrob i).isNormal
+    let : Fintype ↥(F.L j) := Fintype.ofFinite _
+    let : Invertible (Nat.card ↥(F.L j) : ℂ) :=
       invertibleOfNonzero
         (Nat.cast_ne_zero.mpr (Nat.card_pos (α := F.L j)).ne')
-    letI : Fintype ↥((F.H j).subgroupOf (F.L j)) := Fintype.ofFinite _
-    letI : Invertible
+    let : Fintype ↥((F.H j).subgroupOf (F.L j)) := Fintype.ofFinite _
+    let : Invertible
         (Nat.card ↥((F.H j).subgroupOf (F.L j)) : ℂ) :=
       invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-    letI : ((F.H j).subgroupOf (F.L j)).Normal := (hFrob j).isNormal
+    let : ((F.H j).subgroupOf (F.L j)).Normal := (hFrob j).isNormal
     have hxj :
         ClassFunction.inner
           (F.hypothesis78 i hodd (hnilp i) (C i) (hFrob i)).beta
@@ -812,24 +812,24 @@ theorem exists_weightedGammaDecomposition_of_reverse_eq_zero
     F.exists_weightedGammaDecomposition hodd hnilp C hFrob i B hB
   refine ⟨x, Γ₁, hx, horth, hdecomp, hΓ₁, ?_⟩
   intro j hj
-  letI : Fintype ↥(F.L i) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥(F.L i) : ℂ) :=
+  let : Fintype ↥(F.L i) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥(F.L i) : ℂ) :=
     invertibleOfNonzero
       (Nat.cast_ne_zero.mpr (Nat.card_pos (α := F.L i)).ne')
-  letI : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
-  letI : Invertible
+  let : Fintype ↥((F.H i).subgroupOf (F.L i)) := Fintype.ofFinite _
+  let : Invertible
       (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : ((F.H i).subgroupOf (F.L i)).Normal := (hFrob i).isNormal
-  letI : Fintype ↥(F.L j) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥(F.L j) : ℂ) :=
+  let : ((F.H i).subgroupOf (F.L i)).Normal := (hFrob i).isNormal
+  let : Fintype ↥(F.L j) := Fintype.ofFinite _
+  let : Invertible (Nat.card ↥(F.L j) : ℂ) :=
     invertibleOfNonzero
       (Nat.cast_ne_zero.mpr (Nat.card_pos (α := F.L j)).ne')
-  letI : Fintype ↥((F.H j).subgroupOf (F.L j)) := Fintype.ofFinite _
-  letI : Invertible
+  let : Fintype ↥((F.H j).subgroupOf (F.L j)) := Fintype.ofFinite _
+  let : Invertible
       (Nat.card ↥((F.H j).subgroupOf (F.L j)) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : ((F.H j).subgroupOf (F.L j)).Normal := (hFrob j).isNormal
+  let : ((F.H j).subgroupOf (F.L j)).Normal := (hFrob j).isNormal
   have hc :=
     F.hypothesis79_conclusion i j (hB j hj) hodd
       (hnilp i) (C i) (hFrob i) (hnilp j) (C j) (hFrob j)

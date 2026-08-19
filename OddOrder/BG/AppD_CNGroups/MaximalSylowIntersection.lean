@@ -88,7 +88,7 @@ theorem exists_maximal_oPiCore_ne_bot {D : Subgroup G} (hDp : IsPGroup p ↥D) (
       le_opiCoreInG_of_normal_of_isPiSubgroup (Subgroup.le_normalizer)
         Subgroup.normal_in_normalizer (isPiSubgroup_singleton_of_isPGroup hDp)
     exact fun hbot => hD (le_bot_iff.mp (hbot ▸ hle))
-  haveI : Finite (Subgroup G) := Finite.of_injective (fun H : Subgroup G => (H : Set G))
+  have : Finite (Subgroup G) := Finite.of_injective (fun H : Subgroup G => (H : Set G))
     (fun _ _ h => SetLike.coe_injective h)
   obtain ⟨M, hMs, hMmax⟩ :=
     Set.Finite.exists_maximalFor (id : Subgroup G → Subgroup G) s (Set.toFinite s) ⟨_, hmem⟩
@@ -222,8 +222,8 @@ the choice of `M`, and it is *not* Sylow in `M`: were it Sylow, every Sylow `p`-
 would coincide with it, forcing `Q ∩ M ≤ P ∩ M ≤ P` and hence `N_Q(D) ≤ D`. -/
 theorem isThreeStepGroup_of_maximal : IsThreeStepGroup ↥M p := by
   classical
-  haveI : IsSolvable ↥M :=
-    hyp.minimalSimpleOdd.solvable_of_lt_top M (lt_top_of_oPiCore_ne_bot hyp hM_core)
+  have : Group.IsSolvable ↥M :=
+    hyp.minimalSimpleOdd.isSolvable_of_lt_top M (lt_top_of_oPiCore_ne_bot hyp hM_core)
   have hcore : Ch03.oPiCore ({p} : Set ℕ) ↥M ≠ ⊥ := fun h =>
     hM_core (by rw [opiCoreInG, h, Subgroup.map_bot])
   rcases oPiCore_isSylow_or_isThreeStepGroup (G := ↥M) (hyp.cn.to_subgroup M) hcore with
@@ -265,8 +265,8 @@ theorem sylow_le_and_eq_normalizer :
   classical
   obtain ⟨P₁, hP₁⟩ := exists_sylow_eq_inf_subgroupOf hQP hmax hM_ge
   have h3 := isThreeStepGroup_of_maximal hyp hQP hmax hM_ge hM_core
-  haveI hsolv : IsSolvable ↥M :=
-    hyp.minimalSimpleOdd.solvable_of_lt_top M (lt_top_of_oPiCore_ne_bot hyp hM_core)
+  have hsolv : Group.IsSolvable ↥M :=
+    hyp.minimalSimpleOdd.isSolvable_of_lt_top M (lt_top_of_oPiCore_ne_bot hyp hM_core)
   have hoddM : Odd (Nat.card ↥M) :=
     hyp.minimalSimpleOdd.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
   have hp_odd : p ≠ 2 := prime_ne_two_of_inf_ne_bot hyp.minimalSimpleOdd.odd hne

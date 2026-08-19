@@ -56,7 +56,7 @@ section Trace
 those conjugates, and `Tr y` lies in the prime field where `x ↦ x^p` is the identity. -/
 theorem trace_pow_char (y : F) :
     Algebra.trace (ZMod p) F (y ^ p) = Algebra.trace (ZMod p) F y := by
-  haveI : CharP F p := charP_of_injective_algebraMap (algebraMap (ZMod p) F).injective p
+  have : CharP F p := charP_of_injective_algebraMap (algebraMap (ZMod p) F).injective p
   have hcard : Nat.card (ZMod p) = p := by simp
   have hsum : ∀ (n : ℕ) (f : ℕ → F), (∑ i ∈ Finset.range n, f i) ^ p
       = ∑ i ∈ Finset.range n, f i ^ p := by
@@ -81,7 +81,7 @@ theorem trace_pow_char (y : F) :
 noncomputable def frobLin : F →ₗ[ZMod p] F where
   toFun x := x ^ p
   map_add' x y := by
-    haveI : CharP F p := charP_of_injective_algebraMap (algebraMap (ZMod p) F).injective p
+    have : CharP F p := charP_of_injective_algebraMap (algebraMap (ZMod p) F).injective p
     rw [add_pow_char]
   map_smul' a x := by
     simp only [Algebra.smul_def, RingHom.id_apply, mul_pow, ← map_pow, ZMod.pow_card]
@@ -110,8 +110,8 @@ theorem ker_eq_ker_trace_of_frobenius_stable [Fintype F] (hp : p = 3)
     LinearMap.ker ℓ = LinearMap.ker (Algebra.trace (ZMod p) F) := by
   classical
   subst hp
-  haveI : CharP F 3 := charP_of_injective_algebraMap (algebraMap (ZMod 3) F).injective 3
-  haveI : Module.Finite (ZMod 3) F := Module.Finite.of_finite
+  have : CharP F 3 := charP_of_injective_algebraMap (algebraMap (ZMod 3) F).injective 3
+  have : Module.Finite (ZMod 3) F := Module.Finite.of_finite
   -- trace duality: `ℓ = Tr(c ·)` with `c ≠ 0`
   obtain ⟨c, hc⟩ := OddOrder.RelationLattice.exists_trace_repr (K := ZMod 3) ℓ
   have hc0 : c ≠ 0 := by

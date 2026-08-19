@@ -63,7 +63,7 @@ theorem pi_sum_ite_single_eq_zero {p : ℕ} [Fact p.Prime] [CharP k p]
   classical
   funext i
   -- `N` acts on `G` by conjugation; its fixed points are the centraliser.
-  letI : MulAction ↥N G :=
+  let : MulAction ↥N G :=
     MulAction.compHom G ((ConjAct.toConjAct : G ≃* ConjAct G).toMonoidHom.comp N.subtype)
   have hsmul : ∀ (u : ↥N) (a : G), u • a = (u : G) * a * (u : G)⁻¹ := fun _ _ => rfl
   set D : Finset G := Finset.univ.filter fun g => g ∈ Subgroup.centralizer (N : Set G) with hD

@@ -100,7 +100,7 @@ theorem card_orbit_eq_card_mul_card_orbitalAt [Finite Ω]
     Nat.card (orbit G p) =
       Nat.card Ω * Nat.card (orbitalAt (orbit G p) α) := by
   classical
-  haveI := Fintype.ofFinite Ω
+  have := Fintype.ofFinite Ω
   set Δ : Set (Ω × Ω) := orbit G p with hΔ
   have hfiber : ∀ a : Ω,
       (Δ.toFinset.filter fun x => x.1 = a).card =

@@ -57,7 +57,7 @@ theorem Hypothesis.tau_muColumnZero_sub_zeta_dichotomy_of_grid_orthogonal [Finit
         hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ) =
           (∑ r : Fin hyp.w1, grid r 0) +
             (hyp.SHC_isCoherent hG).extension ζ.conj) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have h3 : (3 : ℕ) ≤ hyp.w1 := (typePData_toTICyclicHypothesis hyp.typeP hodd).three_le_card_W1
   -- generic unit-norm integral-lattice toolkit: the Cauchy–Schwarz bound `m² ≤ 1` and the
@@ -369,7 +369,7 @@ theorem Hypothesis.SHC_swap_grid_h114 [Finite G] {M : Subgroup G}
     hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ) =
       (∑ r : Fin hyp.w1, grid r 0) -
         (hyp.SHC_swap hG hodd hζS hζirr hζ1 htwo).extension ζ := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hswapζ :
       (hyp.SHC_swap hG hodd hζS hζirr hζ1 htwo).extension ζ =
@@ -678,6 +678,7 @@ noncomputable def Hypothesis.alignedOmegaSourceCharacter [Finite G]
     (h.w1CharEquiv (finCongr hcardW1.symm i)) χ₂).comp e.toMonoidHom
 
 open scoped FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- On the type-P regular set, an aligned sigma-grid entry restores its
 underlying multiplicative character.  This is the source-side counterpart of
 S15's `tau3_apply_of_regular`. -/
@@ -689,13 +690,13 @@ theorem Hypothesis.alignedOmegaSigmaGrid_apply_eq_sourceCharacter [Finite G]
     hyp.alignedOmegaSigmaGrid hG hodd i j v =
       ((hyp.alignedOmegaSourceCharacter hG hodd i j
         ⟨v, hv.1⟩ : ℂˣ) : ℂ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
-  haveI : NeZero (Nat.card h.W1) :=
+  have : NeZero (Nat.card h.W1) :=
     ⟨by have := h.one_lt_card_W1; omega⟩
-  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
   have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
   have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
   have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
@@ -703,13 +704,13 @@ theorem Hypothesis.alignedOmegaSigmaGrid_apply_eq_sourceCharacter [Finite G]
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) :=
+  have : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) :=
     ⟨Nat.card_pos.ne'⟩
   let χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
     finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)
   let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
-  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
-  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
   let app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication tic :=
     ⟨tic.toDadeHypothesis.fullDadeIsometryData⟩
   let e : ↥tic.W ≃* ↥(h.W1 ⊔ h.W2) :=
@@ -894,8 +895,8 @@ theorem monoidHom_eq_of_eq_on_W1_W2 [Finite G]
     (hW1 : ∀ x : ↥(base.W1.subgroupOf base.W), f x = g x)
     (hW2 : ∀ y : ↥(base.W2.subgroupOf base.W), f y = g y) :
     f = g := by
-  letI := base.W_cyclic
-  letI : CommGroup ↥base.W := IsCyclic.commGroup
+  let := base.W_cyclic
+  let : CommGroup ↥base.W := IsCyclic.commGroup
   have hW1le : base.W1 ≤ base.W := by
     rw [base.W_eq_join]
     exact le_sup_left
@@ -952,12 +953,12 @@ theorem omegaMonoidHom_bijective [Finite G]
     rw [if_neg hcond] at h1
     rw [if_pos (⟨rfl, rfl⟩ : k = k ∧ l = l)] at h2
     exact zero_ne_one (h1.symm.trans h2)
-  haveI : Fintype (↥base.W →* ℂˣ) := Fintype.ofFinite _
-  haveI : IsCyclic ↥base.W := base.W_cyclic
-  letI : CommGroup ↥base.W := IsCyclic.commGroup
-  haveI : NeZero (Monoid.exponent ↥base.W) :=
+  have : Fintype (↥base.W →* ℂˣ) := Fintype.ofFinite _
+  have : IsCyclic ↥base.W := base.W_cyclic
+  let : CommGroup ↥base.W := IsCyclic.commGroup
+  have : NeZero (Monoid.exponent ↥base.W) :=
     ⟨Monoid.exponent_ne_zero_of_finite⟩
-  haveI : NeZero ((Monoid.exponent ↥base.W : ℂ)) :=
+  have : NeZero ((Monoid.exponent ↥base.W : ℂ)) :=
     ⟨Nat.cast_ne_zero.2 (NeZero.ne _)⟩
   have hcardHomNat : Nat.card (↥base.W →* ℂˣ) = base.q * base.p := by
     rw [CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity ↥base.W ℂ,
@@ -1027,12 +1028,12 @@ theorem omegaW1Restriction_bijective [Finite G]
   have hW1le : base.W1 ≤ base.W := by
     rw [base.W_eq_join]
     exact le_sup_left
-  haveI : IsCyclic ↥base.W := base.W_cyclic
-  letI : CommGroup ↥base.W := IsCyclic.commGroup
-  haveI : Fintype (↥(base.W1.subgroupOf base.W) →* ℂˣ) := Fintype.ofFinite _
-  haveI : NeZero (Monoid.exponent ↥(base.W1.subgroupOf base.W)) :=
+  have : IsCyclic ↥base.W := base.W_cyclic
+  let : CommGroup ↥base.W := IsCyclic.commGroup
+  have : Fintype (↥(base.W1.subgroupOf base.W) →* ℂˣ) := Fintype.ofFinite _
+  have : NeZero (Monoid.exponent ↥(base.W1.subgroupOf base.W)) :=
     ⟨Monoid.exponent_ne_zero_of_finite⟩
-  haveI : NeZero ((Monoid.exponent ↥(base.W1.subgroupOf base.W) : ℂ)) :=
+  have : NeZero ((Monoid.exponent ↥(base.W1.subgroupOf base.W) : ℂ)) :=
     ⟨Nat.cast_ne_zero.2 (NeZero.ne _)⟩
   have hcardHomNat :
       Nat.card (↥(base.W1.subgroupOf base.W) →* ℂˣ) = base.q := by
@@ -1060,12 +1061,12 @@ theorem omegaW2Restriction_bijective [Finite G]
   have hW2le : base.W2 ≤ base.W := by
     rw [base.W_eq_join]
     exact le_sup_right
-  haveI : IsCyclic ↥base.W := base.W_cyclic
-  letI : CommGroup ↥base.W := IsCyclic.commGroup
-  haveI : Fintype (↥(base.W2.subgroupOf base.W) →* ℂˣ) := Fintype.ofFinite _
-  haveI : NeZero (Monoid.exponent ↥(base.W2.subgroupOf base.W)) :=
+  have : IsCyclic ↥base.W := base.W_cyclic
+  let : CommGroup ↥base.W := IsCyclic.commGroup
+  have : Fintype (↥(base.W2.subgroupOf base.W) →* ℂˣ) := Fintype.ofFinite _
+  have : NeZero (Monoid.exponent ↥(base.W2.subgroupOf base.W)) :=
     ⟨Monoid.exponent_ne_zero_of_finite⟩
-  haveI : NeZero ((Monoid.exponent ↥(base.W2.subgroupOf base.W) : ℂ)) :=
+  have : NeZero ((Monoid.exponent ↥(base.W2.subgroupOf base.W) : ℂ)) :=
     ⟨Nat.cast_ne_zero.2 (NeZero.ne _)⟩
   have hcardHomNat :
       Nat.card (↥(base.W2.subgroupOf base.W) →* ℂˣ) = base.p := by

@@ -700,7 +700,7 @@ theorem braid_of_orderThree
 /-- **`1 < |W|`** — the `hW1` of §3, from a single non-trivial element. -/
 theorem one_lt_natCard_W (hW : ∃ x ∈ hyp.W, x ≠ 1) : 1 < Nat.card ↥hyp.W := by
   obtain ⟨x, hxW, hx1⟩ := hW
-  haveI : Nontrivial ↥hyp.W :=
+  have : Nontrivial ↥hyp.W :=
     ⟨⟨⟨x, hxW⟩, 1, fun hc => hx1 (congrArg Subtype.val hc)⟩⟩
   exact Finite.one_lt_card
 

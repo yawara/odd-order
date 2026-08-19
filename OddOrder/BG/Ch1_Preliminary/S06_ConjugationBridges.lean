@@ -37,14 +37,14 @@ discharge するためのヘルパ。`IsPGroup 2 S` なら `|S| = 2^n` が奇数
 private theorem comm_of_isPGroup_two_of_odd [Finite G]
     (hodd : Odd (Nat.card G)) :
     ∀ S : Subgroup G, IsPGroup 2 S → ∀ x y : ↥S, x * y = y * x := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   intro S hS x y
   obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := 2)).mp hS
   have hdvd : Nat.card ↥S ∣ Nat.card G := S.card_subgroup_dvd_card
   rcases Nat.eq_zero_or_pos n with hn0 | hnpos
   · subst hn0
     have hcard : Nat.card ↥S = 1 := by rw [hn, pow_zero]
-    haveI : Subsingleton ↥S := (Nat.card_eq_one_iff_unique.mp hcard).1
+    have : Subsingleton ↥S := (Nat.card_eq_one_iff_unique.mp hcard).1
     exact Subsingleton.elim _ _
   · exfalso
     have h2dvd : (2 : ℕ) ∣ Nat.card G :=
@@ -62,7 +62,7 @@ theorem opCore_le_oPiPrimePiCore [Finite G] (p : ℕ) [Fact p.Prime] :
   have hmap_le : (Ch01.opCore p G).map
       (QuotientGroup.mk' (Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G)) ≤
       Ch03.oPiCore {p} (G ⧸ Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G) := by
-    haveI : ((Ch01.opCore p G).map
+    have : ((Ch01.opCore p G).map
         (QuotientGroup.mk' (Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G))).Normal :=
       (Ch01.opCore.normal p G).map _ (QuotientGroup.mk'_surjective _)
     apply Ch03.Subgroup.IsPiGroup.le_oPiCore
@@ -86,7 +86,7 @@ theorem opCore_le_oPiPrimePiCore [Finite G] (p : ℕ) [Fact p.Prime] :
 `O_{p'}(G) = ⊥` の下では `O_{p',p}(G) = O_p(G)` なので、これは BG Thm 6.1
 (`O_{p',p}(G) ⊇` S の abelian normal 部分群) の `J(P)` インスタンス (reduced case)。 -/
 theorem thompsonJ_le_opCore_of_odd [Finite G]
-    (hodd : Odd (Nat.card G)) [IsSolvable G]
+    (hodd : Odd (Nat.card G)) [Group.IsSolvable G]
     {p : ℕ} [Fact p.Prime] (P : Sylow p G) (hp2 : p ≠ 2)
     (h_oPiPrime_trivial : Ch03.oPiCore {q | q ≠ p} G = ⊥)
     (h_centralizer_center :
@@ -118,7 +118,7 @@ ZJ) への引用で済ませており、math-comp も ZJ を形式化せず Puig
 (book の Remark が推奨する代替)。literal `J(S)` 一般形は Gorenstein Ch.8 §2 の移植待ち。
 詳細と規模見積は `S06_Thm62JS.lean` の docstring と issue 3017 を参照。 -/
 theorem normalJ_normal_of_odd [Finite G]
-    (hodd : Odd (Nat.card G)) [IsSolvable G]
+    (hodd : Odd (Nat.card G)) [Group.IsSolvable G]
     {p : ℕ} [Fact p.Prime] (P : Sylow p G) (hp2 : p ≠ 2)
     (h_oPiPrime_trivial : Ch03.oPiCore {q | q ≠ p} G = ⊥)
     (h_centralizer_center :
@@ -141,7 +141,7 @@ theorem normalJ_normal_of_odd [Finite G]
 Theorem 6.1」)。§6 側の入口は `S06_Thm61.le_oPiPrimePiCore_of_abelian_normal_in_sylow`
 (`thmA4b` の `p ≠ 2` を任意素数へ外したもの)。本定理はその `J(P)`-instance にすぎない。 -/
 theorem thompsonJ_le_oPiPrimePiCore_of_odd [Finite G]
-    (hodd : Odd (Nat.card G)) [IsSolvable G]
+    (hodd : Odd (Nat.card G)) [Group.IsSolvable G]
     {p : ℕ} [Fact p.Prime] (P : Sylow p G) (hp2 : p ≠ 2)
     (h_oPiPrime_trivial : Ch03.oPiCore {q | q ≠ p} G = ⊥)
     (h_centralizer_center :
@@ -295,16 +295,16 @@ Proof (BG): `N = ⁅H,K⁆ ⊴ G` (`N ≤ H`). In `Ḡ = G/N` the images `H̄, K
 (`⁅H̄,K̄⁆ = 1`) and complement each other, so `K̄ ⊴ Ḡ`. From `H ⊆ G'` we get `H̄ ⊆ Ḡ'`, and
 `Ḡ' ≤ K̄ ⊔ ⁅H̄,H̄⁆` (`commutator_le_sup_commutator`); the modular law plus `H̄ ⊓ K̄ = 1` gives
 `H̄ ≤ ⁅H̄,H̄⁆`, i.e. `H̄` is perfect, hence trivial (`G/N` solvable). Thus `H ≤ N = ⁅H,K⁆`. -/
-theorem commutator_eq_self_of_isComplement'_le_commutator [IsSolvable G]
+theorem commutator_eq_self_of_isComplement'_le_commutator [Group.IsSolvable G]
     {H K : Subgroup G} [H.Normal] (hHK : H.IsComplement' K) (hH : H ≤ commutator G) :
     ⁅H, K⁆ = H := by
   have hsup : H ⊔ K = ⊤ := hHK.isCompl.sup_eq_top
   have hdisj : Disjoint H K := hHK.isCompl.disjoint
-  haveI hN : (⁅H, K⁆ : Subgroup G).Normal := commutator_normal_of_normal_sup_eq_top hsup
+  have hN : (⁅H, K⁆ : Subgroup G).Normal := commutator_normal_of_normal_sup_eq_top hsup
   refine le_antisymm (Subgroup.commutator_le_left H K) ?_
   set q : G →* G ⧸ ⁅H, K⁆ := QuotientGroup.mk' ⁅H, K⁆ with hq
   have hqsurj : Function.Surjective q := QuotientGroup.mk'_surjective _
-  haveI hGsolv : IsSolvable (G ⧸ ⁅H, K⁆) := solvable_of_surjective hqsurj
+  have hGsolv : Group.IsSolvable (G ⧸ ⁅H, K⁆) := Group.isSolvable_of_surjective hqsurj
   set Hbar : Subgroup (G ⧸ ⁅H, K⁆) := H.map q with hHbar
   set Kbar : Subgroup (G ⧸ ⁅H, K⁆) := K.map q with hKbar
   -- `⁅H̄,K̄⁆ = ⊥` (`⁅H,K⁆ = ker q`)
@@ -315,7 +315,7 @@ theorem commutator_eq_self_of_isComplement'_le_commutator [IsSolvable G]
   have hsupbar : Hbar ⊔ Kbar = ⊤ := by
     rw [hHbar, hKbar, ← Subgroup.map_sup, hsup, Subgroup.map_top_of_surjective q hqsurj]
   -- `K̄ ⊴ Ḡ` (正規化群 `⊇ H̄ ⊔ K̄ = ⊤`; `H̄` は中心化ゆえ正規化)
-  haveI hKbarN : Kbar.Normal := by
+  have hKbarN : Kbar.Normal := by
     rw [← Subgroup.normalizer_eq_top_iff, eq_top_iff, ← hsupbar, sup_le_iff]
     refine ⟨le_trans ?_ (Subgroup.centralizer_le_normalizer _), Subgroup.le_normalizer⟩
     rw [← Subgroup.commutator_eq_bot_iff_le_centralizer]; exact hcomm_bot
@@ -368,7 +368,7 @@ theorem commutator_eq_self_of_isComplement'_le_commutator [IsSolvable G]
   -- 可解 ⟹ `H̄ = ⊥` ⟹ `H ≤ ⁅H,K⁆`
   have hHbar_bot : Hbar = ⊥ := by
     by_contra hne
-    exact absurd (lt_of_le_of_lt hHbar_perfect (IsSolvable.commutator_lt_of_ne_bot hne))
+    exact absurd (lt_of_le_of_lt hHbar_perfect (Group.IsSolvable.commutator_lt_of_ne_bot hne))
       (lt_irrefl _)
   have hmap_bot : H.map q = ⊥ := hHbar ▸ hHbar_bot
   rwa [Subgroup.map_eq_bot_iff, hq, QuotientGroup.ker_mk'] at hmap_bot
@@ -382,7 +382,7 @@ conjugation. The action commutator is `⁅H̄, K̄⁆ = (⁅H,K⁆)‾ = H̄` (f
 whole of `H̄`; Prop 1.6(d) (`fixedPoints_isComplement_actionCommutator_of_abelian`) then makes
 the fixed points `C_Ḡ(K̄) ⊓ H̄` trivial. Any `x ∈ C_H(K)` maps into these fixed points, so
 `x̄ = 1`, i.e. `x ∈ H'`. -/
-theorem centralizer_inf_le_derivedInG_of_isComplement' [Finite G] [IsSolvable G]
+theorem centralizer_inf_le_derivedInG_of_isComplement' [Finite G] [Group.IsSolvable G]
     {H K : Subgroup G} [H.Normal] (hHK : H.IsComplement' K) (hH : H ≤ commutator G)
     (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card ↥K)) :
     Subgroup.centralizer (K : Set G) ⊓ H ≤ derivedInG H := by
@@ -390,18 +390,18 @@ theorem centralizer_inf_le_derivedInG_of_isComplement' [Finite G] [IsSolvable G]
   have hNeq : derivedInG H = ⁅H, H⁆ := Subgroup.map_subtype_commutator H
   rw [hNeq]
   set N : Subgroup G := ⁅H, H⁆ with hNdef
-  haveI hNnorm : N.Normal := by rw [hNdef]; infer_instance
+  have hNnorm : N.Normal := by rw [hNdef]; infer_instance
   set q : G →* G ⧸ N := QuotientGroup.mk' N with hq
   have hqsurj : Function.Surjective q := QuotientGroup.mk'_surjective _
   have hkerq : (q : G →* G ⧸ N).ker = N := QuotientGroup.ker_mk' N
   set Hbar : Subgroup (G ⧸ N) := H.map q with hHbar
   set Kbar : Subgroup (G ⧸ N) := K.map q with hKbar
-  haveI hHbarN : Hbar.Normal := by
+  have hHbarN : Hbar.Normal := by
     rw [hHbar]; exact (inferInstance : H.Normal).map q hqsurj
   -- `H̄` is abelian: `⁅H̄, H̄⁆ = (⁅H,H⁆)‾ = N‾ = ⊥`.
   have hHbar_comm : ⁅Hbar, Hbar⁆ = ⊥ := by
     rw [hHbar, ← Subgroup.map_commutator, ← hNdef, Subgroup.map_eq_bot_iff, hkerq]
-  letI : CommGroup ↥Hbar :=
+  let : CommGroup ↥Hbar :=
     { (inferInstance : Group ↥Hbar) with
       mul_comm := fun a b => Subtype.ext (by
         have hmem : ⁅(a : G ⧸ N), (b : G ⧸ N)⁆ = 1 := by
@@ -459,7 +459,7 @@ two conclusions of part (b) the same way.
 ⚠ The first conclusion `commutator_eq_self_of_isComplement'_le_commutator` is **stronger than
 this clause**: it needs neither finiteness nor coprimality.  Cite it directly when the Hall
 hypothesis is unavailable. -/
-theorem lemma63a [Finite G] [IsSolvable G]
+theorem lemma63a [Finite G] [Group.IsSolvable G]
     {H K : Subgroup G} [H.Normal] (hHK : H.IsComplement' K) (hH : H ≤ commutator G)
     (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card ↥K)) :
     ⁅H, K⁆ = H ∧ Subgroup.centralizer (K : Set G) ⊓ H ≤ derivedInG H :=

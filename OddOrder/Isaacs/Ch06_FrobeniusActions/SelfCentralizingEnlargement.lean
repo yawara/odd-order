@@ -41,12 +41,12 @@ theorem exists_normal_isMulCommutative_relIndex_prime_of_lt_centralizer
     (hC_lt_cent : C < Subgroup.centralizer (C : Set P)) :
     ∃ B : Subgroup P, B.Normal ∧ C < B ∧ B ≤ Subgroup.centralizer (C : Set P) ∧
       C.relIndex B = p ∧ IsMulCommutative B := by
-  haveI hCent_normal : (Subgroup.centralizer (C : Set P)).Normal :=
+  have hCent_normal : (Subgroup.centralizer (C : Set P)).Normal :=
     Subgroup.normal_centralizer
   obtain ⟨B, hB_normal, hC_lt_B, hB_le_cent, hC_rel⟩ :=
     OddOrder.Isaacs.Ch01.IsPGroup.exists_normal_index_eq_prime
       hP (N := C) (M := Subgroup.centralizer (C : Set P)) hC_lt_cent
-  haveI hC_sub_normal : (C.subgroupOf B).Normal := inferInstance
+  have hC_sub_normal : (C.subgroupOf B).Normal := inferInstance
   have hC_sub_le_center : C.subgroupOf B ≤ Subgroup.center B := by
     intro c hc
     rw [Subgroup.mem_center_iff]
@@ -66,7 +66,7 @@ theorem exists_normal_isMulCommutative_relIndex_prime_of_lt_centralizer
   have h_cyclic_quot : IsCyclic (B ⧸ C.subgroupOf B) :=
     isCyclic_of_prime_card h_card_quot
   have hB_comm : ∀ x y : B, x * y = y * x := by
-    haveI : IsCyclic (B ⧸ C.subgroupOf B) := h_cyclic_quot
+    have : IsCyclic (B ⧸ C.subgroupOf B) := h_cyclic_quot
     exact (MonoidHom.isMulCommutative_of_isCyclic_of_ker_le_center
       (QuotientGroup.mk' (C.subgroupOf B)) (by
         rw [QuotientGroup.ker_mk']
@@ -106,7 +106,7 @@ theorem centralizer_eq_of_maximal_normal_isMulCommutative
     (hC_max : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → C < B → False) :
     Subgroup.centralizer (C : Set P) = C := by
   have hC_le_cent : C ≤ Subgroup.centralizer (C : Set P) := by
-    haveI : IsMulCommutative C := hC_comm
+    have : IsMulCommutative C := hC_comm
     exact Subgroup.le_centralizer (H := C)
   have hcent_le_C : Subgroup.centralizer (C : Set P) ≤ C := by
     by_contra hnot
@@ -197,10 +197,10 @@ theorem quotient_commutative_of_isCyclic_of_self_centralizing
     dsimp [ψ]
     rw [QuotientGroup.ker_lift, hker]
     simp
-  haveI : IsCyclic C := hC_cyclic
+  have : IsCyclic C := hC_cyclic
   let e := IsCyclic.mulAutMulEquiv C
-  letI : CommGroup (MulAut C) := e.toMonoidHom.commGroupOfInjective e.injective
-  letI : CommGroup (P ⧸ C) := ψ.commGroupOfInjective hψ_inj
+  let : CommGroup (MulAut C) := e.toMonoidHom.commGroupOfInjective e.injective
+  let : CommGroup (P ⧸ C) := ψ.commGroupOfInjective hψ_inj
   exact mul_comm
 
 /-- **Isaacs Thm 6.12 setup**: a maximal normal cyclic subgroup `C` makes `P/C`
@@ -216,7 +216,7 @@ theorem quotient_commutative_of_maximal_normal_isCyclic
     (hC_max : ∀ B : Subgroup P, B.Normal → IsMulCommutative B → C < B → False) :
     ∀ x y : P ⧸ C, x * y = y * x := by
   have hC_comm : IsMulCommutative C := by
-    haveI : IsCyclic C := hC_cyclic
+    have : IsCyclic C := hC_cyclic
     infer_instance
   have hCent : Subgroup.centralizer (C : Set P) = C :=
     centralizer_eq_of_maximal_normal_isMulCommutative hP hC_comm hC_max
@@ -325,11 +325,11 @@ theorem center_lt_subgroupOf_of_self_centralizing_of_relIndex_prime_of_not_isMul
     simpa [hCent] using hz_cent
   have hne : Subgroup.center T ≠ C.subgroupOf T := by
     intro hEq
-    haveI hCsub_normal : (C.subgroupOf T).Normal := inferInstance
+    have hCsub_normal : (C.subgroupOf T).Normal := inferInstance
     have h_card_quot : Nat.card (T ⧸ C.subgroupOf T) = p := by
       rw [← Subgroup.index_eq_card]
       simpa [Subgroup.relIndex] using hC_rel
-    haveI : IsCyclic (T ⧸ C.subgroupOf T) := isCyclic_of_prime_card h_card_quot
+    have : IsCyclic (T ⧸ C.subgroupOf T) := isCyclic_of_prime_card h_card_quot
     have hker_le : (QuotientGroup.mk' (C.subgroupOf T)).ker ≤ Subgroup.center T := by
       rw [QuotientGroup.ker_mk']
       exact le_of_eq hEq.symm
@@ -383,7 +383,7 @@ theorem center_relIndex_zpowers_eq_prime_of_pow_mem_center
     have hz_center : ((z : C) : T) ∈ Subgroup.center T := by
       simpa [ZC, Subgroup.mem_subgroupOf] using hz
     exact Subgroup.mem_center_iff.mp hz_center ((x : C) : T)
-  haveI hZC_normal : ZC.Normal := by
+  have hZC_normal : ZC.Normal := by
     refine ⟨fun n hn g => ?_⟩
     have hn_center : n ∈ Subgroup.center C := hZC_le_center hn
     have hgn : g * n = n * g := Subgroup.mem_center_iff.mp hn_center g
@@ -393,8 +393,8 @@ theorem center_relIndex_zpowers_eq_prime_of_pow_mem_center
         _ = n := by simp
     rwa [hconj]
   let Q := C ⧸ ZC
-  haveI hC_cyclic : IsCyclic C := Subgroup.isCyclic_zpowers c
-  haveI hQ_cyclic : IsCyclic Q :=
+  have hC_cyclic : IsCyclic C := Subgroup.isCyclic_zpowers c
+  have hQ_cyclic : IsCyclic Q :=
     isCyclic_of_surjective (QuotientGroup.mk' ZC) (QuotientGroup.mk'_surjective ZC)
   have hQ_exp_dvd : Monoid.exponent Q ∣ p := by
     rw [Monoid.exponent_dvd_iff_forall_pow_eq_one]

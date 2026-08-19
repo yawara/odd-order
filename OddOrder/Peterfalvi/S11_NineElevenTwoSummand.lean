@@ -102,8 +102,8 @@ disjointness, `H ⊔ K` is the whole ambient by construction.  The complement in
 theorem hInHu_isComplement'_cuInHuPair (caseA : CliffordCaseAData chars) (i j : Fin data.q) :
     ((hInHu data).subgroupOf (hInHu data ⊔ cuInHuPair caseA i j)).IsComplement'
       ((cuInHuPair caseA i j).subgroupOf (hInHu data ⊔ cuInHuPair caseA i j)) := by
-  haveI := hInHu_normal data
-  haveI : ((hInHu data).subgroupOf (hInHu data ⊔ cuInHuPair caseA i j)).Normal :=
+  have := hInHu_normal data
+  have : ((hInHu data).subgroupOf (hInHu data ⊔ cuInHuPair caseA i j)).Normal :=
     (hInHu_normal data).subgroupOf _
   refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
   · rw [disjoint_iff]
@@ -129,7 +129,7 @@ theorem hcuSeedHom_two_summand_invariance (caseA : CliffordCaseAData chars) {i j
           ⟨(c : ↥(huSub data)) * (h : ↥(huSub data)) * (c : ↥(huSub data))⁻¹,
             (hInHu_normal data).conj_mem _ h.2 (c : ↥(huSub data))⟩
         = hcuSeedHom (chief := chief) θ h := by
-  haveI := hInHu_normal data
+  have := hInHu_normal data
   have hle := cuInHuPair_le_inertia caseA θ hsupp
   intro c h
   have hconj : ClassFunction.conjBy (c : ↥(huSub data))
@@ -196,6 +196,7 @@ noncomputable def nineElevenTwoThetaHom (caseA : CliffordCaseAData chars) {i j :
     (SemidirectProduct.mulEquivSubgroup
       (hInHu_isComplement'_cuInHuPair caseA i j)).symm.toMonoidHom
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **`nineElevenTwoThetaHom` restricts to `θ₀` on `H`**: on the inclusion of `h ∈ H` into `H·K`,
 the extension returns the seed value `hcuSeedHom θ h`.  Via `SemidirectProduct.lift_inl` after
 `(mulEquivSubgroup).symm (inclusion h) = inl h`.  Mirror of `hcuThetaHom_inclusion_hInHu`. -/
@@ -210,8 +211,8 @@ theorem nineElevenTwoThetaHom_inclusion_hInHu (caseA : CliffordCaseAData chars)
     nineElevenTwoThetaHom caseA θ hinv (Subgroup.inclusion
         (le_sup_left : hInHu data ≤ hInHu data ⊔ cuInHuPair caseA i j) h)
       = hcuSeedHom (chief := chief) θ h := by
-  haveI := hInHu_normal data
-  haveI : ((hInHu data).subgroupOf (hInHu data ⊔ cuInHuPair caseA i j)).Normal :=
+  have := hInHu_normal data
+  have : ((hInHu data).subgroupOf (hInHu data ⊔ cuInHuPair caseA i j)).Normal :=
     (hInHu_normal data).subgroupOf _
   have hsymm : (SemidirectProduct.mulEquivSubgroup
       (hInHu_isComplement'_cuInHuPair caseA i j)).symm
@@ -228,6 +229,7 @@ theorem nineElevenTwoThetaHom_inclusion_hInHu (caseA : CliffordCaseAData chars)
     SemidirectProduct.lift_inl]
   congr 1
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **`nineElevenTwoThetaHom` kills the complement `K = C_U(H_i) ⊓ C_U(H_j)`**: on the inclusion
 of `c ∈ cuInHuPair` into `H·K`, the extension returns `1` (its complement-part hom in the
 `SemidirectProduct.lift` is `1`).  Via `SemidirectProduct.lift_inr`.  Mirror of
@@ -243,8 +245,8 @@ theorem nineElevenTwoThetaHom_inclusion_cuInHuPair (caseA : CliffordCaseAData ch
     (c : ↥(cuInHuPair caseA i j)) :
     nineElevenTwoThetaHom caseA θ hinv (Subgroup.inclusion
         (le_sup_right : cuInHuPair caseA i j ≤ hInHu data ⊔ cuInHuPair caseA i j) c) = 1 := by
-  haveI := hInHu_normal data
-  haveI : ((hInHu data).subgroupOf (hInHu data ⊔ cuInHuPair caseA i j)).Normal :=
+  have := hInHu_normal data
+  have : ((hInHu data).subgroupOf (hInHu data ⊔ cuInHuPair caseA i j)).Normal :=
     (hInHu_normal data).subgroupOf _
   have hsymm : (SemidirectProduct.mulEquivSubgroup
       (hInHu_isComplement'_cuInHuPair caseA i j)).symm
@@ -312,7 +314,7 @@ theorem nineElevenTwoPsi_inertia_le (caseA : CliffordCaseAData chars) {i j : Fin
       ≤ ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
           (ClassFunction.compHom (QuotientGroup.mk' chief.N)
             (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ))) := by
-  haveI := hInHu_normal data
+  have := hInHu_normal data
   intro g hg
   rw [ClassFunction.mem_inertia] at hg ⊢
   ext h
@@ -374,7 +376,7 @@ theorem nineElevenTwoZeta_irreducible (caseA : CliffordCaseAData chars) {i j : F
     IsIrreducibleCharacter (ClassFunction.induce (hInHu data ⊔ cuInHuPair caseA i j)
       (nineElevenTwoPsi caseA θ hinv : ClassFunction
         ↥(hInHu data ⊔ cuInHuPair caseA i j) ℂ)) := by
-  haveI : Fintype ↥(hInHu data ⊔ cuInHuPair caseA i j) := Fintype.ofFinite _
+  have : Fintype ↥(hInHu data ⊔ cuInHuPair caseA i j) := Fintype.ofFinite _
   exact OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_inertia_eq
     (nineElevenTwoPsi caseA θ hinv)
     (nineElevenTwoPsi_inertia_eq caseA θ hinv hθ₀)
@@ -457,12 +459,12 @@ theorem nineElevenTwoThetaHom_eq_one_of_mem_realizedH0supC (caseA : CliffordCase
     (hx : x ∈ (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
       (hInHu data ⊔ cuInHuPair caseA i j)) :
     nineElevenTwoThetaHom caseA θ hinv x = 1 := by
-  haveI := hInHu_normal data
+  have := hInHu_normal data
   have hval : (x : ↥(huSub data))
       ∈ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data) :=
     Subgroup.mem_subgroupOf.mp hx
   rw [realizedH0supC_eq_realizedH0_sup_cInHu] at hval
-  haveI hH0n : ((chief.H0.subgroupOf M).subgroupOf (huSub data)).Normal :=
+  have hH0n : ((chief.H0.subgroupOf M).subgroupOf (huSub data)).Normal :=
     ((Subgroup.normal_subgroupOf_iff_le_normalizer
         (chief.H0_lt_H.le.trans (H_le_M data))).mpr
       chief.H0_normalized_by_M).subgroupOf (huSub data)
@@ -529,8 +531,8 @@ theorem nineElevenTwoZeta_H0supC_subset_ker (caseA : CliffordCaseAData chars)
         (hInHu data ⊔ cuInHuPair caseA i j)
         (nineElevenTwoPsi caseA θ hinv : ClassFunction
           ↥(hInHu data ⊔ cuInHuPair caseA i j) ℂ)) := by
-  haveI : Fintype ↥(hInHu data ⊔ cuInHuPair caseA i j) := Fintype.ofFinite _
-  haveI := realizedH0supC_normal_huSub chief
+  have : Fintype ↥(hInHu data ⊔ cuInHuPair caseA i j) := Fintype.ofFinite _
+  have := realizedH0supC_normal_huSub chief
   exact OddOrder.Peterfalvi.S03.subsetCharacterKernel_induce_of_subgroupOf
     (A := ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
     (H := hInHu data ⊔ cuInHuPair caseA i j)
@@ -565,7 +567,7 @@ theorem nineElevenTwoZeta_mem_xiSet (caseA : CliffordCaseAData chars)
         nineElevenTwoZeta_irreducible caseA θ hinv hθ₀⟩ :
         IrreducibleCharacter ↥(huSub data)) ∈ xiSet data := by
   classical
-  haveI : Fintype ↥(hInHu data ⊔ cuInHuPair caseA i j) := Fintype.ofFinite _
+  have : Fintype ↥(hInHu data ⊔ cuInHuPair caseA i j) := Fintype.ofFinite _
   set ζ : IrreducibleCharacter ↥(huSub data) :=
     ⟨ClassFunction.induce (hInHu data ⊔ cuInHuPair caseA i j)
       (nineElevenTwoPsi caseA θ hinv : ClassFunction
@@ -580,7 +582,7 @@ theorem nineElevenTwoZeta_mem_xiSet (caseA : CliffordCaseAData chars)
           ↥(hInHu data ⊔ cuInHuPair caseA i j) ℂ) := by rw [hζdef]
     rw [← hcoe, OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite ζ ζ, if_pos rfl]
     exact one_ne_zero
-  rw [xiSet, Set.mem_setOf_eq]
+  rw [xiSet, Set.mem_ofPred_eq]
   intro hsub
   apply hθnt
   have hfsurj : Function.Surjective
@@ -722,14 +724,14 @@ theorem nineElevenTwo_relIndex_dichotomy (caseA : CliffordCaseAData chars)
     (cuSubOf caseA i ⊓ cuSubOf caseA j).relIndex data.U = chars.u ∨
       (cuSubOf caseA i ⊓ cuSubOf caseA j).relIndex data.U = caseA.a := by
   classical
-  haveI : Fintype ↥M := Fintype.ofFinite _
-  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
-  haveI : Fintype ↥(hInHu data ⊔ cuInHuPair caseA i j) := Fintype.ofFinite _
-  haveI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  have : Fintype ↥M := Fintype.ofFinite _
+  have : Fintype ↥(huSub data) := Fintype.ofFinite _
+  have : Fintype ↥(hInHu data ⊔ cuInHuPair caseA i j) := Fintype.ofFinite _
+  have : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : Invertible (Nat.card ↥(hInHu data ⊔ cuInHuPair caseA i j) : ℂ) :=
+  have : Invertible (Nat.card ↥(hInHu data ⊔ cuInHuPair caseA i j) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : (hInHu data ⊔ cuInHuPair caseA i j).Normal := hcuInHuPair_normal caseA i j
+  have : (hInHu data ⊔ cuInHuPair caseA i j).Normal := hcuInHuPair_normal caseA i j
   -- the two-summand character and its regularity/support data
   obtain ⟨θ, hθi, hθj, hθtriv⟩ := exists_caseA_two_summand_char caseA hij
   have hθne : θ ≠ 1 := by

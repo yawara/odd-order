@@ -331,7 +331,7 @@ theorem linearIndependent_algAut_toLinearMap [Finite F] :
 theorem finrank_linearMap_self_eq_finrank [Finite F] :
     Module.finrank F (F →ₗ[ZMod p] F) = Module.finrank (ZMod p) F := by
   classical
-  letI : Fintype F := Fintype.ofFinite F
+  let : Fintype F := Fintype.ofFinite F
   let b := Module.finBasis (ZMod p) F
   rw [← (b.constr F : _ ≃ₗ[F] (F →ₗ[ZMod p] F)).finrank_eq]
   simp
@@ -414,7 +414,7 @@ theorem finrank_bilinMap_self_eq [Finite F] :
     Module.finrank F (F →ₗ[ZMod p] F →ₗ[ZMod p] F) =
       Module.finrank (ZMod p) F * Module.finrank (ZMod p) F := by
   classical
-  letI : Fintype F := Fintype.ofFinite F
+  let : Fintype F := Fintype.ofFinite F
   let b := Module.finBasis (ZMod p) F
   have he := LinearEquiv.finrank_eq
     (b.constr (M' := F →ₗ[ZMod p] F) F)
@@ -560,8 +560,8 @@ theorem autMulQuadratic_coeff_symm [Finite F]
     (σ τ : F ≃ₐ[ZMod 2] F) :
     c (σ, τ) = c (τ, σ) := by
   classical
-  letI : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
-  haveI : CharP F 2 :=
+  let : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
+  have : CharP F 2 :=
     charP_of_injective_algebraMap (algebraMap (ZMod 2) F).injective 2
   -- function-level vanishing at every point
   have happ : ∀ z : F,
@@ -569,7 +569,7 @@ theorem autMulQuadratic_coeff_symm [Finite F]
         c στ * (στ.1 z * στ.2 z)) = 0 := by
     intro z
     have h1 := congrArg (fun q => q z) hc
-    simpa [QuadraticMap.sum_apply, QuadraticMap.smul_apply, smul_eq_mul]
+    simpa [sum_apply, smul_apply, smul_eq_mul]
       using h1
   -- polarize: the cross terms carry the 2(b) family
   have hpolar : ∀ x y : F,
@@ -654,8 +654,8 @@ theorem autMulQuadratic_diag_eq_zero [Finite F]
     (σ₀ : F ≃ₐ[ZMod 2] F) :
     c (σ₀, σ₀) = 0 := by
   classical
-  letI : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
-  haveI : CharP F 2 :=
+  let : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
+  have : CharP F 2 :=
     charP_of_injective_algebraMap (algebraMap (ZMod 2) F).injective 2
   have hsymm := autMulQuadratic_coeff_symm F c hc
   have happ : ∀ z : F,
@@ -663,7 +663,7 @@ theorem autMulQuadratic_diag_eq_zero [Finite F]
         c στ * (στ.1 z * στ.2 z)) = 0 := by
     intro z
     have h1 := congrArg (fun q => q z) hc
-    simpa [QuadraticMap.sum_apply, QuadraticMap.smul_apply, smul_eq_mul]
+    simpa [sum_apply, smul_apply, smul_eq_mul]
       using h1
   -- split off the diagonal; the off-diagonal cancels by the swap involution
   have hdiag : ∀ z : F,
@@ -753,8 +753,8 @@ theorem exists_smul_algAut_of_norm_intertwiner [Finite F]
     ∃ (lam : F) (σ : F ≃ₐ[ZMod 2] F),
       lam ≠ 0 ∧ κ * σ * κ = σ ∧ ∀ x : F, f x = lam * σ x := by
   classical
-  letI : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
-  haveI : CharP F 2 :=
+  let : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
+  have : CharP F 2 :=
     charP_of_injective_algebraMap (algebraMap (ZMod 2) F).injective 2
   -- expand `f` over the automorphism basis (Lemma 2(a))
   obtain ⟨lam, hfx⟩ : ∃ lam : (F ≃ₐ[ZMod 2] F) → F,
@@ -771,8 +771,8 @@ theorem exists_smul_algAut_of_norm_intertwiner [Finite F]
         if στ.2 = στ.1 * κ then μ στ.1 else 0) •
         autMulQuadraticMap F στ.1 στ.2) = 0 := by
     refine QuadraticMap.ext fun z => ?_
-    simp only [QuadraticMap.sum_apply, QuadraticMap.smul_apply,
-      autMulQuadraticMap_apply, smul_eq_mul, QuadraticMap.zero_apply]
+    simp only [sum_apply, smul_apply,
+      autMulQuadraticMap_apply, smul_eq_mul, zero_apply]
     have hterm : ∀ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F),
         (lam στ.1 * κ (lam (κ * στ.2)) +
           if στ.2 = στ.1 * κ then μ στ.1 else 0) * (στ.1 z * στ.2 z) =
@@ -877,9 +877,9 @@ theorem span_autMulQuadraticMap_eq_top [Finite F] :
       (Set.range fun στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) =>
         autMulQuadraticMap F στ.1 στ.2) = ⊤ := by
   classical
-  letI : Fintype F := Fintype.ofFinite F
-  letI : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
-  haveI : SMulCommClass F (ZMod 2) F := SMulCommClass.symm _ _ _
+  let : Fintype F := Fintype.ofFinite F
+  let : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
+  have : SMulCommClass F (ZMod 2) F := SMulCommClass.symm _ _ _
   -- an enumeration of `Aut F` by `Fin n`, `n` the degree
   have hcard : Fintype.card (F ≃ₐ[ZMod 2] F) =
       Module.finrank (ZMod 2) F := by
@@ -964,7 +964,7 @@ theorem span_autMulQuadraticMap_eq_top [Finite F] :
         (S := F) (W := F) (Module.finBasis (ZMod 2) F)),
       Module.finrank_pi]
   -- independent family of full size spans; the wedge range is a subrange
-  haveI : Nonempty {q : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) //
+  have : Nonempty {q : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) //
       eqv q.1 ≤ eqv q.2} := ⟨⟨(1, 1), le_refl _⟩⟩
   have hspan := hwedge.span_eq_top_of_card_eq_finrank hcardeq
   refine le_antisymm le_top ?_
@@ -988,8 +988,8 @@ theorem sum_autMulQuadratic_eq_zero_of_symm [Finite F]
     haveI : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
     (∑ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F), c στ * (στ.1 x * στ.2 x)) = 0 := by
   classical
-  letI : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
-  haveI : CharP F 2 :=
+  let : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
+  have : CharP F 2 :=
     charP_of_injective_algebraMap (algebraMap (ZMod 2) F).injective 2
   refine Finset.sum_involution (fun στ _ => (στ.2, στ.1)) (fun στ _ => ?_)
     (fun στ _ hne => ?_) (fun στ _ => Finset.mem_univ _) (fun στ _ => rfl)
@@ -1028,8 +1028,8 @@ theorem exists_scaling_pinned_expansion [Finite F] (χ : QuadraticMap (ZMod 2) F
       ∀ a b : F, (∀ x : F, χ (a * x) = b * χ x) →
         ∀ στ : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F), c στ ≠ 0 → στ.1 a * στ.2 a = b := by
   classical
-  letI : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
-  haveI : CharP F 2 :=
+  let : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
+  have : CharP F 2 :=
     charP_of_injective_algebraMap (algebraMap (ZMod 2) F).injective 2
   -- an arbitrary enumeration of `Aut F`, used to pick a representative per pair
   set eqv := Fintype.equivFin (F ≃ₐ[ZMod 2] F) with heqv
@@ -1043,7 +1043,7 @@ theorem exists_scaling_pinned_expansion [Finite F] (χ : QuadraticMap (ZMod 2) F
         c₀ στ * (στ.1 y * στ.2 y) := by
     intro y
     have h := congrArg (fun q : QuadraticMap (ZMod 2) F F => q y) hc₀
-    simpa [QuadraticMap.sum_apply, QuadraticMap.smul_apply, autMulQuadraticMap_apply,
+    simpa [sum_apply, smul_apply, autMulQuadraticMap_apply,
       smul_eq_mul] using h.symm
   -- fold each unordered pair onto its `eqv`-smaller representative
   set c : (F ≃ₐ[ZMod 2] F) × (F ≃ₐ[ZMod 2] F) → F := fun στ =>
@@ -1100,8 +1100,8 @@ theorem exists_scaling_pinned_expansion [Finite F] (χ : QuadraticMap (ZMod 2) F
       refine Finset.sum_congr rfl fun στ _ => ?_
       simp only [map_mul]
       ring
-    simp only [QuadraticMap.sum_apply, QuadraticMap.smul_apply,
-      autMulQuadraticMap_apply, smul_eq_mul, QuadraticMap.zero_apply]
+    simp only [sum_apply, smul_apply,
+      autMulQuadraticMap_apply, smul_eq_mul, zero_apply]
     rw [hsum, hscale x, CharTwo.add_self_eq_zero]
   -- on the diagonal the coefficient itself vanishes; off it, the swapped one is `0`
   rcases eq_or_ne στ.1 στ.2 with hdiagpair | hoff
@@ -1151,8 +1151,8 @@ theorem exists_algAut_pair_scaling_of_ne_zero [Finite F]
     ∃ σ τ : F ≃ₐ[ZMod 2] F, ∀ a b : F,
       (∀ x : F, χ (a * x) = b * χ x) → σ a * τ a = b := by
   classical
-  letI : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
-  haveI : CharP F 2 :=
+  let : Fintype (F ≃ₐ[ZMod 2] F) := Fintype.ofFinite _
+  have : CharP F 2 :=
     charP_of_injective_algebraMap (algebraMap (ZMod 2) F).injective 2
   -- expand `χ` over the quadratic family (Lemma 2(c), spanning side)
   obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun F).mp
@@ -1164,7 +1164,7 @@ theorem exists_algAut_pair_scaling_of_ne_zero [Finite F]
         c στ * (στ.1 y * στ.2 y) := by
     intro y
     have h := congrArg (fun q : QuadraticMap (ZMod 2) F F => q y) hc
-    simpa [QuadraticMap.sum_apply, QuadraticMap.smul_apply, autMulQuadraticMap_apply,
+    simpa [sum_apply, smul_apply, autMulQuadraticMap_apply,
       smul_eq_mul] using h.symm
   -- what one scaling relation gives
   have key : ∀ a b : F, (∀ x : F, χ (a * x) = b * χ x) →
@@ -1183,8 +1183,8 @@ theorem exists_algAut_pair_scaling_of_ne_zero [Finite F]
         refine Finset.sum_congr rfl fun στ _ => ?_
         simp only [map_mul]
         ring
-      simp only [QuadraticMap.sum_apply, QuadraticMap.smul_apply,
-        autMulQuadraticMap_apply, smul_eq_mul, QuadraticMap.zero_apply]
+      simp only [sum_apply, smul_apply,
+        autMulQuadraticMap_apply, smul_eq_mul, zero_apply]
       rw [hsum, hscale x, CharTwo.add_self_eq_zero]
     refine ⟨fun σ => ?_, fun σ τ => ?_⟩
     · have h : c (σ, σ) * (σ a * σ a) + b * c (σ, σ) = 0 :=
@@ -1201,7 +1201,7 @@ theorem exists_algAut_pair_scaling_of_ne_zero [Finite F]
   have hzeroOfSym : (∀ σ : F ≃ₐ[ZMod 2] F, c (σ, σ) = 0) →
       (∀ σ τ : F ≃ₐ[ZMod 2] F, c (σ, τ) = c (τ, σ)) → χ = 0 := fun hd hs =>
     QuadraticMap.ext fun x => by
-      rw [happ x, QuadraticMap.zero_apply]
+      rw [happ x, zero_apply]
       exact sum_autMulQuadratic_eq_zero_of_symm F c hd hs x
   -- pick the pair once and for all
   by_cases hd : ∀ σ : F ≃ₐ[ZMod 2] F, c (σ, σ) = 0
@@ -1251,8 +1251,8 @@ theorem exists_algAut_expansion_algebraMap_comp (g : K →ₗ[ZMod p] K) :
       ∀ w : K, algebraMap K E (g w) =
         ∑ ρ : E ≃ₐ[ZMod p] E, μ ρ * ρ (algebraMap K E w) := by
   classical
-  letI : Fintype (K ≃ₐ[ZMod p] K) := Fintype.ofFinite _
-  letI : Fintype (E ≃ₐ[ZMod p] E) := Fintype.ofFinite _
+  let : Fintype (K ≃ₐ[ZMod p] K) := Fintype.ofFinite _
+  let : Fintype (E ≃ₐ[ZMod p] E) := Fintype.ofFinite _
   -- Lemma 2(a) expansion of `g` over `Aut(K)`
   obtain ⟨m, hg⟩ : ∃ m : (K ≃ₐ[ZMod p] K) → K,
       ∀ w : K, g w = ∑ ρ' : K ≃ₐ[ZMod p] K, m ρ' * ρ' w := by

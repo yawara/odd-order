@@ -694,11 +694,11 @@ theorem card_connectedComponent_commonDivisorGraph_le_three :
   have hfin : Finite Γ.ConnectedComponent := by
     rcases finite_or_infinite Γ.ConnectedComponent with h | h
     · exact h
-    · haveI := h
+    · have := h
       rw [Nat.card_eq_zero_of_infinite] at hlt
       omega
-  haveI := hfin
-  haveI := Fintype.ofFinite Γ.ConnectedComponent
+  have := hfin
+  have := Fintype.ofFinite Γ.ConnectedComponent
   have hcard : 3 < (Finset.univ : Finset Γ.ConnectedComponent).card := by
     rwa [Finset.card_univ, ← Nat.card_eq_fintype_card]
   obtain ⟨c₁, -⟩ := Finset.card_pos.mp (by omega : 0 < (Finset.univ :
@@ -1007,7 +1007,7 @@ class sizes of an arbitrary finite group.) -/
 theorem card_connectedComponent_commonDivisorGraph_autOrbitSizes_le_three :
     Nat.card
       (commonDivisorGraph (autOrbitSizes A M)).ConnectedComponent ≤ 3 := by
-  haveI : Finite (sdGroup A M) :=
+  have : Finite (sdGroup A M) :=
     Finite.of_equiv (M × A)
       ⟨fun p => ⟨p.1, p.2⟩, fun s => (s.left, s.right),
         fun _p => rfl, fun _s => rfl⟩
@@ -1037,7 +1037,7 @@ theorem lt_forall_and_not_coprime_of_max_mem_autOrbitSizes
       (commonDivisorGraph (autOrbitSizes A M)).connectedComponentMk u = cB →
       (commonDivisorGraph (autOrbitSizes A M)).connectedComponentMk v = cB →
       u ≠ v → ¬ Nat.Coprime (u : ℕ) (v : ℕ)) := by
-  haveI : Finite (sdGroup A M) :=
+  have : Finite (sdGroup A M) :=
     Finite.of_equiv (M × A)
       ⟨fun p => ⟨p.1, p.2⟩, fun s => (s.left, s.right),
         fun _p => rfl, fun _s => rfl⟩

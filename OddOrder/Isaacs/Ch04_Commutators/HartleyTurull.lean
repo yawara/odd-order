@@ -22,13 +22,13 @@ import OddOrder.Isaacs.Ch04_Commutators.Main.ThreeSubgroups
 | Isaacs # | Lean | 状態 |
 |---|---|---|
 | Thm 3.31 | `exists_abelian_fixedPoint_replacement` | ✅ |
-| Thm 3.31 step 1 | `exists_solvable_fixedPoint_replacement` | ✅ |
+| Thm 3.31 step 1 | `exists_fixedPoint_replacement_of_isSolvable` | ✅ |
 | Lem 3.33 | `exists_equivariant_equiv_of_card_fixedPoints_eq` | ✅ |
 | Thm 3.34 | `exists_orbit_card_mul_of_coprime_orbit_card` | ✅ |
 
 ## Thm 3.31 の証明構造 (Isaacs pp. 105-107)
 
-2 段構成. **Step 1** (`exists_solvable_fixedPoint_replacement`): `|G|` の各素因子 `p` に
+2 段構成. **Step 1** (`exists_fixedPoint_replacement_of_isSolvable`): `|G|` の各素因子 `p` に
 A-不変 Sylow `P_p` を選び (Thm 3.23(a)), `N := Π_p P_p` に成分ごとの `A`-作用を入れる.
 Lemma 3.32 を各 `B ≤ A` の制限作用に適用すると `|C_{P_p}(B)| = |P_p ∩ C_G(B)|` は
 `|C_G(B)|` の full `p`-part であり, 全素因子にわたる積で `|C_N(B)| = |C_G(B)|`.
@@ -96,7 +96,7 @@ theorem eq_stabilizer_of_le_of_orbit_card_min {Ω : Type*} [Finite Ω] [MulActio
     exact (Nat.card_congr (MulAction.orbitEquivQuotientStabilizer A x)).symm
   have hpos : ∀ x : Ω, 0 < Nat.card (MulAction.orbit A x) := by
     intro x
-    haveI : Nonempty (MulAction.orbit A x) := ⟨⟨x, MulAction.mem_orbit_self x⟩⟩
+    have : Nonempty (MulAction.orbit A x) := ⟨⟨x, MulAction.mem_orbit_self x⟩⟩
     exact Nat.card_pos
   have h1 : (MulAction.stabilizer A ω).index ∣ H.index := Subgroup.index_dvd_of_le hHle
   have h2 : H.index ∣ (MulAction.stabilizer A μ).index := Subgroup.index_dvd_of_le hle
@@ -163,7 +163,7 @@ private theorem exists_equivariant_equiv_aux (n : ℕ) :
     cases isEmpty_or_nonempty Ω with
     | inl hΩempty =>
       -- Base case: Ω = ∅. Comparing fixed points of ⊥ gives |Λ| = |Ω| = 0.
-      haveI := hΩempty
+      have := hΩempty
       have hΛ0 : Nat.card Λ = 0 := by
         have h1 : Nat.card {ω : Ω // ∀ b ∈ (⊥ : Subgroup A), b • ω = ω} = Nat.card Ω :=
           Nat.card_congr (Equiv.subtypeUnivEquiv fun ω b hb => by
@@ -174,14 +174,14 @@ private theorem exists_equivariant_equiv_aux (n : ℕ) :
         have h3 := hcount ⊥
         have h4 : Nat.card Ω = 0 := Nat.card_eq_zero.mpr (Or.inl hΩempty)
         omega
-      haveI hΛempty : IsEmpty Λ := by
+      have hΛempty : IsEmpty Λ := by
         by_contra hne
-        haveI := not_isEmpty_iff.mp hne
+        have := not_isEmpty_iff.mp hne
         have := Nat.card_pos (α := Λ)
         omega
       exact ⟨Equiv.equivOfIsEmpty Ω Λ, fun a ω => isEmptyElim ω⟩
     | inr hΩne =>
-      haveI := hΩne
+      have := hΩne
       -- Step 2: pick μ with orbit of minimal size; S := stabilizer A μ.
       obtain ⟨μ, hmin⟩ := Finite.exists_min fun ω : Ω => Nat.card (MulAction.orbit A ω)
       have hμfix : ∀ b ∈ MulAction.stabilizer A μ, b • μ = μ := fun b hb =>
@@ -189,7 +189,7 @@ private theorem exists_equivariant_equiv_aux (n : ℕ) :
       -- Step 3: obtain an S-fixed point ν ∈ Λ, and show stabilizer A ν = stabilizer A μ.
       obtain ⟨⟨ν, hν⟩⟩ : Nonempty {l : Λ // ∀ b ∈ MulAction.stabilizer A μ, b • l = l} := by
         have hSpos : 0 < Nat.card {ω' : Ω // ∀ b ∈ MulAction.stabilizer A μ, b • ω' = ω'} := by
-          haveI : Nonempty {ω' : Ω // ∀ b ∈ MulAction.stabilizer A μ, b • ω' = ω'} :=
+          have : Nonempty {ω' : Ω // ∀ b ∈ MulAction.stabilizer A μ, b • ω' = ω'} :=
             ⟨⟨μ, hμfix⟩⟩
           exact Nat.card_pos
         rw [hcount (MulAction.stabilizer A μ)] at hSpos
@@ -199,7 +199,7 @@ private theorem exists_equivariant_equiv_aux (n : ℕ) :
       obtain ⟨⟨ω₀, hω₀⟩⟩ :
           Nonempty {ω' : Ω // ∀ b ∈ MulAction.stabilizer A ν, b • ω' = ω'} := by
         have hTpos : 0 < Nat.card {l : Λ // ∀ b ∈ MulAction.stabilizer A ν, b • l = l} := by
-          haveI : Nonempty {l : Λ // ∀ b ∈ MulAction.stabilizer A ν, b • l = l} :=
+          have : Nonempty {l : Λ // ∀ b ∈ MulAction.stabilizer A ν, b • l = l} :=
             ⟨⟨ν, fun b hb => MulAction.mem_stabilizer_iff.mp hb⟩⟩
           exact Nat.card_pos
         rw [← hcount (MulAction.stabilizer A ν)] at hTpos
@@ -216,11 +216,11 @@ private theorem exists_equivariant_equiv_aux (n : ℕ) :
           l ∉ MulAction.orbit A ν → a • l ∉ MulAction.orbit A ν := by
         intro a l hl hmem
         exact hl (by simpa using MulAction.mem_orbit_of_mem_orbit a⁻¹ hmem)
-      letI actΩ' : MulAction A {ω' : Ω // ω' ∉ MulAction.orbit A μ} :=
+      let actΩ' : MulAction A {ω' : Ω // ω' ∉ MulAction.orbit A μ} :=
         { smul := fun a x => ⟨a • x.1, hUinv a x.1 x.2⟩
           one_smul := fun x => Subtype.ext (one_smul A x.1)
           mul_smul := fun a b x => Subtype.ext (mul_smul a b x.1) }
-      letI actΛ' : MulAction A {l : Λ // l ∉ MulAction.orbit A ν} :=
+      let actΛ' : MulAction A {l : Λ // l ∉ MulAction.orbit A ν} :=
         { smul := fun a x => ⟨a • x.1, hVinv a x.1 x.2⟩
           one_smul := fun x => Subtype.ext (one_smul A x.1)
           mul_smul := fun a b x => Subtype.ext (mul_smul a b x.1) }
@@ -292,7 +292,7 @@ private theorem exists_equivariant_equiv_aux (n : ℕ) :
         rw [← Nat.card_sum]
         exact (Nat.card_congr (Equiv.sumCompl fun ω' : Ω => ω' ∈ MulAction.orbit A μ)).symm
       have hUpos : 0 < Nat.card {ω' : Ω // ω' ∈ MulAction.orbit A μ} := by
-        haveI : Nonempty {ω' : Ω // ω' ∈ MulAction.orbit A μ} :=
+        have : Nonempty {ω' : Ω // ω' ∈ MulAction.orbit A μ} :=
           ⟨⟨μ, MulAction.mem_orbit_self μ⟩⟩
         exact Nat.card_pos
       have hlt : Nat.card {ω' : Ω // ω' ∉ MulAction.orbit A μ} < n := by omega
@@ -485,27 +485,27 @@ private theorem prod_primeFactors_pow_factorization_eq {n : ℕ} (hn : n ≠ 0) 
 `H := Π_p P_p` に成分ごとの作用を入れる. Lemma 3.32 より各 `B` で
 `|C_{P_p}(B)| = |P_p ∩ C_G(B)|` は `|C_G(B)|` の full `p`-part なので, 積は
 `|C_G(B)|` に一致する. -/
-theorem exists_solvable_fixedPoint_replacement [Finite A]
+theorem exists_fixedPoint_replacement_of_isSolvable [Finite A]
     {G : Type u} [Group G] [Finite G] (φ : A →* MulAut G)
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G) :
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G) :
     ∃ (H : Type u) (_ : Group H) (_ : Finite H) (ψ : A →* MulAut H),
-      IsSolvable H ∧ Nat.card H = Nat.card G ∧
+      Group.IsSolvable H ∧ Nat.card H = Nat.card G ∧
       ∀ B : Subgroup A,
         Nat.card ↥(fixedSubgroup φ B) = Nat.card ↥(fixedSubgroup ψ B) := by
   classical
   have hPP : ∀ p : (Nat.card G).primeFactors,
       ∃ P : Sylow (p : ℕ) G, IsAInvariant φ (P : Subgroup G) := fun p => by
-    haveI : Fact (p : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors p.2⟩
+    have : Fact (p : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors p.2⟩
     exact exists_aInvariant_sylow hCop hSolv p
   choose P hP using hPP
   refine ⟨∀ p : (Nat.card G).primeFactors, ↥(P p : Subgroup G), inferInstance, inferInstance,
     piMulAutHom fun p => (hP p).restrict, ?_, ?_, ?_⟩
   · -- solvability: each factor is a p-group, hence nilpotent; a finite product of
     -- nilpotent groups is nilpotent, hence solvable.
-    haveI : ∀ p : (Nat.card G).primeFactors, Group.IsNilpotent ↥(P p : Subgroup G) := by
+    have : ∀ p : (Nat.card G).primeFactors, Group.IsNilpotent ↥(P p : Subgroup G) := by
       intro p
-      haveI : Fact (p : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors p.2⟩
+      have : Fact (p : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors p.2⟩
       exact (P p).isPGroup'.isNilpotent
     infer_instance
   · -- cardinality: ∏_p |P_p| = ∏_p p-part of |G| = |G|.
@@ -513,7 +513,7 @@ theorem exists_solvable_fixedPoint_replacement [Finite A]
         = ∏ p : (Nat.card G).primeFactors, Nat.card ↥(P p : Subgroup G) := Nat.card_pi
       _ = ∏ p : (Nat.card G).primeFactors, (p : ℕ) ^ (Nat.card G).factorization (p : ℕ) := by
           refine Finset.prod_congr rfl fun p _ => ?_
-          haveI : Fact (p : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors p.2⟩
+          have : Fact (p : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors p.2⟩
           exact (P p).card_eq_multiplicity
       _ = ∏ p ∈ (Nat.card G).primeFactors, p ^ (Nat.card G).factorization p :=
           Finset.prod_finset_coe (fun p => p ^ (Nat.card G).factorization p) _
@@ -522,9 +522,9 @@ theorem exists_solvable_fixedPoint_replacement [Finite A]
     intro B
     have hCopB : Nat.Coprime (Nat.card ↥B) (Nat.card G) :=
       hCop.coprime_dvd_left (Subgroup.card_subgroup_dvd_card B)
-    have hSolvB : IsSolvable ↥B ∨ IsSolvable G := by
+    have hSolvB : Group.IsSolvable ↥B ∨ Group.IsSolvable G := by
       rcases hSolv with hA | hG
-      · exact Or.inl (by haveI := hA; infer_instance)
+      · exact Or.inl (by have := hA; infer_instance)
       · exact Or.inr hG
     have hdvdC : Nat.card ↥(fixedSubgroup φ B) ∣ Nat.card G :=
       Subgroup.card_subgroup_dvd_card _
@@ -539,7 +539,7 @@ theorem exists_solvable_fixedPoint_replacement [Finite A]
       _ = ∏ p : (Nat.card G).primeFactors,
             Nat.card ↥(fixedSubgroup ((hP p).restrict) B) := by
           refine Finset.prod_congr rfl fun p _ => ?_
-          haveI : Fact (p : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors p.2⟩
+          have : Fact (p : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors p.2⟩
           have h332 := card_inf_fixedSubgroup_of_aInvariant_sylow
             (φ := φ.comp B.subtype) hCopB hSolvB (isAInvariant_comp_subtype (hP p) B)
           rw [fixedSubgroup_comp_subtype_top] at h332
@@ -557,7 +557,7 @@ Cor 3.28 = `coprime_fixedPoints_quotient` の `B`-制限作用への適用) で�
 theorem card_fixedSubgroup_eq_mul_of_normal [Finite A]
     {G : Type u} [Group G] [Finite G] {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G)
     {N : Subgroup G} [N.Normal] (hN : IsAInvariant φ N) (B : Subgroup A) :
     Nat.card ↥(fixedSubgroup φ B) =
       Nat.card ↥(N ⊓ fixedSubgroup φ B) *
@@ -565,9 +565,9 @@ theorem card_fixedSubgroup_eq_mul_of_normal [Finite A]
   classical
   have hCopB : Nat.Coprime (Nat.card ↥B) (Nat.card G) :=
     hCop.coprime_dvd_left (Subgroup.card_subgroup_dvd_card B)
-  have hSolvB : IsSolvable ↥B ∨ IsSolvable G := by
+  have hSolvB : Group.IsSolvable ↥B ∨ Group.IsSolvable G := by
     rcases hSolv with hA | hG
-    · exact Or.inl (by haveI := hA; infer_instance)
+    · exact Or.inl (by have := hA; infer_instance)
     · exact Or.inr hG
   let f : ↥(fixedSubgroup φ B) →* G ⧸ N :=
     (QuotientGroup.mk' N).comp (fixedSubgroup φ B).subtype
@@ -623,7 +623,7 @@ theorem card_fixedSubgroup_eq_mul_of_normal [Finite A]
 をもつ. 非可換なら `G' × (G/G')` (成分位数はいずれも真に減る) に帰着し, 固定点数は
 `card_fixedSubgroup_eq_mul_of_normal` で分解する. -/
 private theorem exists_abelian_replacement_aux [Finite A] (n : ℕ) :
-    ∀ (G : Type u) [Group G] [Finite G] [IsSolvable G] (φ : A →* MulAut G),
+    ∀ (G : Type u) [Group G] [Finite G] [Group.IsSolvable G] (φ : A →* MulAut G),
       Nat.card G = n →
       Nat.Coprime (Nat.card A) (Nat.card G) →
       ∃ (H : Type u) (_ : CommGroup H) (_ : Finite H) (ψ : A →* MulAut H),
@@ -655,7 +655,7 @@ private theorem exists_abelian_replacement_aux [Finite A] (n : ℕ) :
           induction k with
           | zero => exact derivedSeries_zero G
           | succ k ihk => rw [derivedSeries_succ, ihk]; exact htop
-        obtain ⟨k, hk⟩ := IsSolvable.solvable (G := G)
+        obtain ⟨k, hk⟩ := Group.IsSolvable.solvable (G := G)
         rw [hall k] at hk
         exact habel (le_bot_iff.mp (hk ▸ le_top))
       -- both components have strictly smaller order.
@@ -684,17 +684,17 @@ private theorem exists_abelian_replacement_aux [Finite A] (n : ℕ) :
       obtain ⟨H₂, instF₂', instF₂, ψ₂, hcard₂, hfix₂⟩ :=
         ih (Nat.card (G ⧸ commutator G)) hlt₂ (G ⧸ commutator G)
           hN_inv.quotientMulAutHom rfl hCop_quot
-      letI := instH₁
-      letI := instF₁
-      letI := instF₂'
-      letI := instF₂
+      let := instH₁
+      let := instF₁
+      let := instF₂'
+      let := instF₂
       refine ⟨H₁ × H₂, inferInstance, inferInstance, prodMulAutHom ψ₁ ψ₂, ?_, ?_⟩
       · rw [Nat.card_prod, hcard₁, hcard₂, mul_comm]
         exact (Subgroup.card_eq_card_quotient_mul_card_subgroup (commutator G)).symm
       · intro B
         rw [card_fixedSubgroup_prodMulAutHom ψ₁ ψ₂ B, ← hfix₁ B, ← hfix₂ B,
           card_fixedSubgroup_restrict hN_inv B]
-        exact card_fixedSubgroup_eq_mul_of_normal hCop (Or.inr ‹IsSolvable G›) hN_inv B
+        exact card_fixedSubgroup_eq_mul_of_normal hCop (Or.inr ‹Group.IsSolvable G›) hN_inv B
 
 /-- **Isaacs Thm 3.31** (Hartley–Turull, pp. 105-107): `A` が有限群 `G` に coprime に
 自己同型作用し (`(|A|, |G|) = 1`), `A` か `G` の一方が solvable なら, **abelian** な
@@ -705,7 +705,7 @@ private theorem exists_abelian_replacement_aux [Finite A] (n : ℕ) :
 
 を満たすものが存在する.
 
-**証明** (Isaacs pp. 106-107): 2 段. Step 1 (`exists_solvable_fixedPoint_replacement`)
+**証明** (Isaacs pp. 106-107): 2 段. Step 1 (`exists_fixedPoint_replacement_of_isSolvable`)
 で `G` を A-不変 Sylow の直積 (nilpotent, 特に solvable) に置換し (Lemma 3.32 で
 固定点数保存), Step 2 (`exists_abelian_replacement_aux`) で solvable 群を位数の
 強帰納法により `G' × (G/G')` を経て abelian 群に置換する (Cor 3.28 由来の積公式
@@ -713,16 +713,16 @@ private theorem exists_abelian_replacement_aux [Finite A] (n : ℕ) :
 theorem exists_abelian_fixedPoint_replacement [Finite A]
     {G : Type u} [Group G] [Finite G] {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G) :
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G) :
     ∃ (H : Type u) (_ : CommGroup H) (_ : Finite H) (ψ : A →* MulAut H),
       Nat.card H = Nat.card G ∧
       ∀ B : Subgroup A,
         Nat.card ↥(fixedSubgroup φ B) = Nat.card ↥(fixedSubgroup ψ B) := by
   obtain ⟨N, instN, instNF, ψN, hsolvN, hcardN, hfixN⟩ :=
-    exists_solvable_fixedPoint_replacement φ hCop hSolv
-  letI := instN
-  letI := instNF
-  haveI := hsolvN
+    exists_fixedPoint_replacement_of_isSolvable φ hCop hSolv
+  let := instN
+  let := instNF
+  have := hsolvN
   obtain ⟨H, instH, instHF, ψH, hcardH, hfixH⟩ :=
     exists_abelian_replacement_aux (Nat.card N) N ψN rfl (by rw [hcardN]; exact hCop)
   exact ⟨H, instH, instHF, ψH, by rw [hcardH, hcardN],
@@ -860,9 +860,9 @@ private theorem apply_snd_eq_self_of_apply_mul_eq_self [Finite A] {H : Type*} [C
     (hdec : ∀ a : A, ∃ t s : A, ψ t y = y ∧ ψ s x = x ∧ a = t * s)
     {a : A} (ha : ψ a (x * y) = x * y) : ψ a y = y := by
   classical
-  letI : MulDistribMulAction A H := MulDistribMulAction.compHom H ψ
-  letI : Fintype A := Fintype.ofFinite A
-  letI : Fintype H := Fintype.ofFinite H
+  let : MulDistribMulAction A H := MulDistribMulAction.compHom H ψ
+  let : Fintype A := Fintype.ofFinite A
+  let : Fintype H := Fintype.ofFinite H
   -- orbits are A-invariant sets
   have hinv : ∀ (w : H) (b : A) (v : H),
       v ∈ MulAction.orbit A w → ψ b v ∈ MulAction.orbit A w := by
@@ -1045,7 +1045,7 @@ private theorem exists_orbit_card_mul_abelian [Finite A] {H : Type u} [CommGroup
     (hy : Nat.card ↥(Set.range fun a : A => (ψ a) y) = n) :
     ∃ z : H, Nat.card ↥(Set.range fun a : A => (ψ a) z) = m * n := by
   classical
-  letI : MulDistribMulAction A H := MulDistribMulAction.compHom H ψ
+  let : MulDistribMulAction A H := MulDistribMulAction.compHom H ψ
   have hidx : ∀ w : H, (MulAction.stabilizer A w).index =
       Nat.card ↥(Set.range fun a : A => (ψ a) w) := by
     intro w
@@ -1126,7 +1126,7 @@ Lem 3.33 の equivariant 全単射で軌道サイズの集合が `G` と `H` で
 theorem exists_orbit_card_mul_of_coprime_orbit_card [Finite A]
     {G : Type u} [Group G] [Finite G] {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G) {m n : ℕ} (hmn : Nat.Coprime m n)
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G) {m n : ℕ} (hmn : Nat.Coprime m n)
     (hm : ∃ x : G, Nat.card ↥(Set.range fun a : A => (φ a) x) = m)
     (hn : ∃ y : G, Nat.card ↥(Set.range fun a : A => (φ a) y) = n) :
     ∃ z : G, Nat.card ↥(Set.range fun a : A => (φ a) z) = m * n := by
@@ -1136,10 +1136,10 @@ theorem exists_orbit_card_mul_of_coprime_orbit_card [Finite A]
   -- Step 0: replace G by an abelian H via Thm 3.31.
   obtain ⟨H, instH, instHF, ψ, hcardH, hfix⟩ :=
     exists_abelian_fixedPoint_replacement hCop hSolv
-  letI := instH
-  letI := instHF
-  letI actG : MulDistribMulAction A G := MulDistribMulAction.compHom G φ
-  letI actH : MulDistribMulAction A H := MulDistribMulAction.compHom H ψ
+  let := instH
+  let := instHF
+  let actG : MulDistribMulAction A G := MulDistribMulAction.compHom G φ
+  let actH : MulDistribMulAction A H := MulDistribMulAction.compHom H ψ
   -- fixed-point counts agree, in the MulAction.fixedPoints form required by Lem 3.33.
   have hcount : ∀ B : Subgroup A,
       Nat.card (MulAction.fixedPoints B G) = Nat.card (MulAction.fixedPoints B H) := by

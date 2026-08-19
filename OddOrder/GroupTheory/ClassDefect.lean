@@ -36,6 +36,7 @@ variable {G : Type*} [Group G] [Finite G] {p : ℕ}
 noncomputable def classDefect (p : ℕ) (C : ConjClasses G) : ℕ :=
   (Nat.card (Subgroup.centralizer ({C.out} : Set G))).factorization p
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **`d(K) + ν_p(|K|) = ν_p(|G|)`.**  Immediate from `|K| · |C_G(x_K)| = |G|`. -/
 theorem classDefect_add_factorization_conjugacyClassSize (C : ConjClasses G) :
     classDefect p C + (conjugacyClassSize C).factorization p
@@ -48,7 +49,7 @@ theorem classDefect_add_factorization_conjugacyClassSize (C : ConjClasses G) :
     rwa [hmk] at h
   have hsize : conjugacyClassSize C ≠ 0 := by
     rw [conjugacyClassSize]
-    haveI : Nonempty ↥C.carrier := ⟨⟨C.out, ConjClasses.mem_carrier_iff_mk_eq.mpr hmk⟩⟩
+    have : Nonempty ↥C.carrier := ⟨⟨C.out, ConjClasses.mem_carrier_iff_mk_eq.mpr hmk⟩⟩
     exact Nat.card_ne_zero.mpr ⟨inferInstance, Set.Finite.to_subtype (Set.toFinite _)⟩
   have hcent : Nat.card (Subgroup.centralizer ({C.out} : Set G)) ≠ 0 := Nat.card_pos.ne'
   rw [classDefect, ← hmul, Nat.factorization_mul hsize hcent]

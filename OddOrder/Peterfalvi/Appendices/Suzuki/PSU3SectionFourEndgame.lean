@@ -168,7 +168,7 @@ theorem mem_residualImage_of_orderOf_eq_two_pow {X : Subgroup G} {x : G}
     (hxC : x ∈ Subgroup.centralizer ((X : Set G))) {n : ℕ} (hord : orderOf x = 2 ^ n) :
     x ∈ residualImage (G := G) X := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   set xC : ↥(Subgroup.centralizer ((X : Set G))) := ⟨x, hxC⟩ with hxCdef
   have hordC : orderOf xC = 2 ^ n := by
     rw [← hord]
@@ -208,7 +208,7 @@ theorem nonempty_psu3Data_sectionFour (s4 : hyp.SectionFourSetup)
     (hZ : Subgroup.center hyp.Q = hyp.Q0.subgroupOf hyp.Q)
     (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥hyp.Q)
     (hCop : Nat.Coprime (Nat.card ↥(s4.P.subgroupOf hyp.D)) (Nat.card ↥hyp.Q))
-    (hSolv : IsSolvable ↥hyp.Q) (hP : s4.P ≠ ⊥)
+    (hSolv : Group.IsSolvable ↥hyp.Q) (hP : s4.P ≠ ⊥)
     (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer ((s4.P : Set G))),
       Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
     (hord : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
@@ -218,7 +218,7 @@ theorem nonempty_psu3Data_sectionFour (s4 : hyp.SectionFourSetup)
         ↥(MulAction.fixedPoints s4.P Ω))
       (data : PSU3InductionTarget (Omega := ↥(MulAction.fixedPoints s4.P Ω)) result.L),
       Nonempty (CentralizerPSUData hyp s4.P result data) := by
-  letI := hyp.centralizerQuotientMulAction s4.P_le_V
+  let := hyp.centralizerQuotientMulAction s4.P_le_V
   have hnea := s4.not_isElementaryAbelian_cQ hQsuz hZ hCop hSolv
   obtain ⟨tri⟩ := hyp.centralizer_trichotomy_of_induction s4.P_le_V hP hA3 ih
   obtain ⟨data, -, details⟩ :=
@@ -322,8 +322,8 @@ theorem SectionFourSetup.exists_refined_zeta (s4 : hyp.SectionFourSetup)
     {ζ₁ : G} (hζ₁V : ζ₁ ∈ hyp.V) (hζ₁U : ζ₁ ∈ residualImage (G := G) s4.P) :
     ∃ p ∈ s4.P, ∃ ζ ∈ hyp.W,
       ζ ∈ Subgroup.centralizer ((s4.P : Set G)) ∧ ζ₁ = p * ζ := by
-  haveI : Fact (Nat.Prime s4.cardP) := ⟨s4.prime_cardP⟩
-  haveI : IsCyclic ↥s4.P := isCyclic_of_prime_card s4.card_P
+  have : Fact (Nat.Prime s4.cardP) := ⟨s4.prime_cardP⟩
+  have : IsCyclic ↥s4.P := isCyclic_of_prime_card s4.card_P
   have hPW : ζ₁ ∈ s4.P ⊔ hyp.W :=
     s4.inf_le_sup_W_of_centralizes hcent ⟨hζ₁V, hζ₁U⟩
   obtain ⟨p, hp, ζ, hζ, hpζ⟩ := SectionFourSetup.exists_mem_P_mem_W_mul hyp s4 hPW
@@ -331,7 +331,7 @@ theorem SectionFourSetup.exists_refined_zeta (s4 : hyp.SectionFourSetup)
   have hPC : s4.P ≤ Subgroup.centralizer ((s4.P : Set G)) := by
     intro a ha
     refine Subgroup.mem_centralizer_iff.mpr fun b hb => ?_
-    letI := IsCyclic.commGroup (α := ↥s4.P)
+    let := IsCyclic.commGroup (α := ↥s4.P)
     exact congrArg (Subtype.val (p := fun z => z ∈ s4.P))
       (mul_comm (⟨b, hb⟩ : ↥s4.P) (⟨a, ha⟩ : ↥s4.P))
   have hζ₁C : ζ₁ ∈ Subgroup.centralizer ((s4.P : Set G)) :=
@@ -451,8 +451,8 @@ theorem SectionFourSetup.mem_W_of_stepThree (s4 : hyp.SectionFourSetup) {f g k :
     (hηP : η ∈ s4.P) (hkx : k x = ζ₁ ^ 3 * η) :
     ∃ ζ ∈ hyp.W, ζ ≠ 1 ∧ f x = ζ⁻¹ * x⁻¹ * ζ ∧ k x ∈ hyp.W := by
   classical
-  haveI : Fact (Nat.Prime s4.cardP) := ⟨s4.prime_cardP⟩
-  haveI : IsCyclic ↥s4.P := isCyclic_of_prime_card s4.card_P
+  have : Fact (Nat.Prime s4.cardP) := ⟨s4.prime_cardP⟩
+  have : IsCyclic ↥s4.P := isCyclic_of_prime_card s4.card_P
   obtain ⟨p, hp, ζ, hζW, hζC, hζ₁eq⟩ :=
     SectionFourSetup.exists_refined_zeta hyp s4 hcent hζ₁V hζ₁U
   -- `ζ ≠ 1`, else `ζ₁ = p ∈ P`
@@ -603,7 +603,7 @@ theorem SectionFourSetup.exists_stepThree_data (s4 : hyp.SectionFourSetup) {f g 
     (hQ2 : IsPGroup 2 ↥hyp.Q)
     (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥hyp.Q)
     (hCop : Nat.Coprime (Nat.card ↥(s4.P.subgroupOf hyp.D)) (Nat.card ↥hyp.Q))
-    (hSolv : IsSolvable ↥hyp.Q) (hP : s4.P ≠ ⊥)
+    (hSolv : Group.IsSolvable ↥hyp.Q) (hP : s4.P ≠ ⊥)
     (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer ((s4.P : Set G))),
       Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
     (hord : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
@@ -617,7 +617,7 @@ theorem SectionFourSetup.exists_stepThree_data (s4 : hyp.SectionFourSetup) {f g 
             ∈ Subgroup.center ↥(residualImage (G := G) s4.P) ∧
           k x = ζ₁ ^ 3 * η := by
   classical
-  letI := hyp.centralizerQuotientMulAction s4.P_le_V
+  let := hyp.centralizerQuotientMulAction s4.P_le_V
   obtain ⟨ω, hωQ, hωQ0, hωfix⟩ := s4.exists_fixed_not_mem_Q0 hZ hCop hSolv
   have hZD := SectionFourSetup.center_residualImage_le_D hyp s4 hQ2 hωQ hωQ0 hωfix
   obtain ⟨result, data, ⟨details⟩⟩ :=
@@ -712,6 +712,7 @@ theorem mem_W_intrinsicResidualQuotient_of_mem_V
   exact Subtype.ext hζ₁t
 
 include hyp in
+set_option backward.isDefEq.respectTransparency false in
 /-- **🎯 `V ∩ U` centralizes `C_{Q₀}(X)`** (Peterfalvi Part II, Ch. IV §4, step (2),
 p. 133: "By the structure of `PSU(3, ℓ)`, `(V ∩ U)/(P ∩ U)` centralizes `C_{Q₀}(P)`").
 
@@ -887,7 +888,7 @@ theorem SectionFourSetup.exists_mem_W (s4 : hyp.SectionFourSetup) {f g k : G →
     (hmu : Function.Injective M.mu) (hQ2 : IsPGroup 2 ↥hyp.Q)
     (hQsuz : OddOrder.GroupTheory.Suzuki2Group.IsSuzuki2Group ↥hyp.Q)
     (hCop : Nat.Coprime (Nat.card ↥(s4.P.subgroupOf hyp.D)) (Nat.card ↥hyp.Q))
-    (hSolv : IsSolvable ↥hyp.Q) (hP : s4.P ≠ ⊥)
+    (hSolv : Group.IsSolvable ↥hyp.Q) (hP : s4.P ≠ ⊥)
     (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer ((s4.P : Set G))),
       Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
     (hord : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)
@@ -897,7 +898,7 @@ theorem SectionFourSetup.exists_mem_W (s4 : hyp.SectionFourSetup) {f g k : G →
     ∃ x ∈ hyp.Q, x ∉ hyp.Q0 ∧
       ∃ ζ ∈ hyp.W, ζ ≠ 1 ∧ f x = ζ⁻¹ * x⁻¹ * ζ ∧ k x ∈ hyp.W := by
   classical
-  letI := hyp.centralizerQuotientMulAction s4.P_le_V
+  let := hyp.centralizerQuotientMulAction s4.P_le_V
   obtain ⟨ω, hωQ, hωQ0, hωfix⟩ := s4.exists_fixed_not_mem_Q0 hZ hCop hSolv
   have hZD := SectionFourSetup.center_residualImage_le_D hyp s4 hQ2 hωQ hωQ0 hωfix
   obtain ⟨result, data, ⟨details⟩⟩ :=

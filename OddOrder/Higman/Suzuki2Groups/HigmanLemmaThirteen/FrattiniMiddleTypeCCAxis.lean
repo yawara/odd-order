@@ -148,20 +148,20 @@ theorem exists_ne_zero_smul_frattiniMiddleConjugateBasis_of_typeCC_bracket
       frattiniMiddleCommutatorBilinearBaseChange (GaloisField 2 n)
           hP hxi hPhiComm hexists u v = epsilon • middleBasis k := by
   classical
-  letI : NeZero n := ⟨by omega⟩
-  letI : Fact (1 < n) := ⟨by omega⟩
+  let : NeZero n := ⟨by omega⟩
+  let : Fact (1 < n) := ⟨by omega⟩
   dsimp only
   let hPhiInv : IsAInvariant Y.subtype (frattini P) :=
     IsAInvariant.of_characteristic Y.subtype
   let hSquareEA :=
     frattiniSquare_isElementaryAbelian_of_exponent_four hPhiComm hfour
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
-  letI : IsMulCommutative (frattiniSquare P) :=
+  let : IsMulCommutative (frattiniSquare P) :=
     IsMulCommutative.of_comm hSquareEA.comm
-  letI : CommGroup (frattiniSquare P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattiniSquare P)) :=
+  let : CommGroup (frattiniSquare P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattiniSquare P)) :=
     hSquareEA.zmodModule
   let eMiddle :=
     frattiniMiddleCoordinate hP hxi hPhiComm hfour hexists eSquare
@@ -252,11 +252,11 @@ theorem exists_ne_zero_smul_frattiniMiddleConjugateBasis_of_typeCC_bracket
   have hcard : Nat.card (GaloisField 2 n) = 2 ^ n := by
     simpa [Nat.card_eq_fintype_card] using GaloisField.card 2 n hn0
   have hlambdaPow : lambda ^ (2 ^ n - 1) = 1 := by
-    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    let : Fintype (GaloisField 2 n) := Fintype.ofFinite _
     have h := FiniteField.pow_card_sub_one_eq_one lambda hlambdaNe
     rwa [← Nat.card_eq_fintype_card, hcard] at h
   have hrhoPow : rho ^ (2 ^ n - 1) = 1 := by
-    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    let : Fintype (GaloisField 2 n) := Fintype.ofFinite _
     have h := FiniteField.pow_card_sub_one_eq_one rho hrhoNe
     rwa [← Nat.card_eq_fintype_card, hcard] at h
   have hrhoLambda : rho = lambda :=
@@ -272,7 +272,7 @@ theorem exists_ne_zero_smul_frattiniMiddleConjugateBasis_of_typeCC_bracket
     rw [hzero, zero_pow (by norm_num)] at hmiddleSquare
     exact hnuNe hmiddleSquare.symm
   have hmiddlePow : middleWeight ^ (2 ^ n - 1) = 1 := by
-    letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+    let : Fintype (GaloisField 2 n) := Fintype.ofFinite _
     have h := FiniteField.pow_card_sub_one_eq_one middleWeight hmiddleNe
     rwa [← Nat.card_eq_fintype_card, hcard] at h
   have hfinrank :

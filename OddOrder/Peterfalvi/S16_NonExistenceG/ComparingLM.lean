@@ -757,7 +757,7 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   obtain ⟨coh⟩ := OddOrder.Peterfalvi.S14.frobenius_typeI_coherent hG typeIHyp hfrob
   -- Mirror `witness_L_hypothesis78`'s `hypothesis78OfDade` assembly (generic in the hypothesis).
   have hHL : typeIHyp.typeI.typeF.H ≤ M := typeIHyp.typeI.typeF.H_le
-  haveI hKnormal : ((typeIHyp.typeI.typeF.H).subgroupOf M).Normal := by
+  have hKnormal : ((typeIHyp.typeI.typeF.H).subgroupOf M).Normal := by
     rw [typeIHyp.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal M
   have hAH : OddOrder.GroupTheory.typeIA M typeIHyp.typeI

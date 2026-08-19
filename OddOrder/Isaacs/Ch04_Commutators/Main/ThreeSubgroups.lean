@@ -270,7 +270,7 @@ theorem derivedSeries_le_lowerCentralSeries_two_pow_sub_one (r : ℕ) :
 /-- **Cor 4.13 系** (G nilpotent ⇒ derived series 量的境界):
 `lowerCentralSeries G m = ⊥` ⇒ `derivedSeries G (Nat.log 2 m + 1) = ⊥`.
 
-形式的には `lcs m = ⊥ ⇒ derived (⌊log₂ m⌋ + 1) = ⊥`. mathlib 既存 `IsNilpotent → IsSolvable`
+形式的には `lcs m = ⊥ ⇒ derived (⌊log₂ m⌋ + 1) = ⊥`. mathlib 既存 `IsNilpotent → Group.IsSolvable`
 は qualitative only (具体的 derived length 不明), 本補題は **Cor 4.13** から得られる
 **explicit upper bound** を与える.
 
@@ -417,9 +417,9 @@ theorem isPiGroup_compl_top_of_isMulCommutative_opCore_eq_bot
   have hp_dvd : p ∣ Nat.card G := by simpa using hp_dvd_top
   let P : Sylow p G := default
   -- rc2: `CommGroup.ofIsMulCommutative` removed; build CommGroup from the IsMulCommutative.
-  letI : CommGroup G :=
+  let : CommGroup G :=
     { (inferInstance : Group G) with mul_comm := ‹IsMulCommutative G›.is_comm.comm }
-  haveI : (P : Subgroup G).Normal := Subgroup.normal_of_isMulCommutative _
+  have : (P : Subgroup G).Normal := Subgroup.normal_of_isMulCommutative _
   have hP_le : (P : Subgroup G) ≤ OddOrder.Isaacs.Ch01.opCore p G :=
     OddOrder.Isaacs.Ch01.normal_pgroup_le_opCore P.isPGroup'
   have hP_bot : (P : Subgroup G) = ⊥ := by
@@ -436,7 +436,7 @@ lemma opCore_quotient_opCore_eq_bot {G : Type*} [Group G] [Finite G]
   have hf_ker : f.ker = N := QuotientGroup.ker_mk' N
   set Kbar : Subgroup (G ⧸ N) := OddOrder.Isaacs.Ch01.opCore p (G ⧸ N) with hKbar_def
   set K : Subgroup G := Kbar.comap f with hK_def
-  haveI hK_normal : K.Normal := Kbar.normal_comap f
+  have hK_normal : K.Normal := Kbar.normal_comap f
   have hKbar_pgroup : IsPGroup p Kbar := OddOrder.Isaacs.Ch01.opCore_isPGroup p (G ⧸ N)
   have hN_pgroup : IsPGroup p N := OddOrder.Isaacs.Ch01.opCore_isPGroup p G
   have hN_le_K : N ≤ K := by
@@ -513,7 +513,7 @@ lemma iSup_sylow_eq_top {M : Type*} [Group M] [Finite M] :
   have h_pow_dvd : ∀ p ∈ (Nat.card M).primeFactors,
       p ^ (Nat.card M).factorization p ∣ Nat.card sup := by
     intro p hp
-    haveI hp_prime : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+    have hp_prime : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
     have hP_le : ((default : Sylow p M) : Subgroup M) ≤ sup := by
       rw [hsup_def]
       refine le_trans ?_ (le_iSup (fun q : (Nat.card M).primeFactors =>
@@ -934,7 +934,7 @@ action `φ : A → MulAut G` and an `A`-invariant normal subgroup `N`, the fixed
 the induced action on `G/N` are exactly the image of the fixed points in `G`. -/
 theorem fixedPointsOfMulAut_quotientMulAutHom_eq_map
     {G A : Type*} [Group G] [Finite G] [Group A] [Finite A] {φ : A →* MulAut G}
-    (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) (hSolv : IsSolvable A ∨ IsSolvable G)
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G)
     {N : Subgroup G} [N.Normal] (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N) :
     Subgroup.fixedPointsOfMulAut (_root_.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN) =
       (Subgroup.fixedPointsOfMulAut φ).map (QuotientGroup.mk' N) := by
@@ -1139,7 +1139,7 @@ theorem actionCommutator_commutator_eq_bot_of_acts_trivially
   have h_HΓ_eq : (actionCommutator φ).map SemidirectProduct.inl = H_Γ :=
     actionCommutator_map_inl φ
   -- H_Γ is Normal in Γ (Lem 4.1 系 via inl ⊔ inr = ⊤)
-  haveI h_HΓ_normal : H_Γ.Normal := commutator_normal_of_sup_eq_top
+  have h_HΓ_normal : H_Γ.Normal := commutator_normal_of_sup_eq_top
     SemidirectProduct.inl_range_sup_inr_range_eq_top
   -- Step 1: ⁅H_Γ, YA⁆ = ⊥ in Γ (from hypothesis, via generator computation)
   have h_step1 : ⁅H_Γ, YA⁆ = ⊥ := by

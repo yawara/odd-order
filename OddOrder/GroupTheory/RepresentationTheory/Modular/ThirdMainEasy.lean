@@ -74,7 +74,7 @@ theorem card_filter_centralizer_eq [Finite G] (hCH : Subgroup.centralizer (P : S
         ConjClasses.mk (h : G) = C ∧ (h : G) ∈ Subgroup.centralizer (P : Set G)).card
       = Nat.card {g : G // ConjClasses.mk g = C ∧ g ∈ Subgroup.centralizer (P : Set G)} := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   rw [Nat.card_eq_fintype_card, Fintype.card_subtype, Finset.card_bij
     (i := fun (h : ↥H) _ => (h : G)) ?_ ?_ ?_]
   · intro h hh

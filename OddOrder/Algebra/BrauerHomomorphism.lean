@@ -199,9 +199,9 @@ theorem brauerProj_mul_of_invariant [Finite G] (hp : p.Prime) (hchar : (p : k) =
     (hy : ∀ g ∈ P, g • y = y) :
     brauerProj P (x * y) = brauerProj P x * brauerProj P y := by
   classical
-  letI := Fintype.ofFinite G
+  let := Fintype.ofFinite G
   -- `P` acts on `G` by conjugation.
-  letI : MulAction ↥P G :=
+  let : MulAction ↥P G :=
     MulAction.compHom G ((ConjAct.toConjAct : G ≃* ConjAct G).toMonoidHom.comp P.subtype)
   have hsmul : ∀ (u : ↥P) (a : G), u • a = (u : G) * a * (u : G)⁻¹ := fun _ _ => rfl
   -- The fixed points of that action are the centraliser.

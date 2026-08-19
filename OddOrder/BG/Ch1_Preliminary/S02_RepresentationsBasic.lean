@@ -675,13 +675,13 @@ private theorem finrank_eq_one_of_irreducible_representation_of_commutative_grou
     {M : Type*} [AddCommGroup M] [Module F M] [Module.Finite F M]
     (σ : Representation F K M) [Representation.IsIrreducible σ] :
     Module.finrank F M = 1 := by
-  haveI : IsMulCommutative K := ⟨hKcomm⟩
-  letI : AddCommGroup σ.asModule := Representation.instAddCommGroupAsModule σ
-  letI : Module F σ.asModule := Representation.instModuleAsModule σ
-  letI : Module (MonoidAlgebra F K) σ.asModule :=
+  have : IsMulCommutative K := ⟨hKcomm⟩
+  let : AddCommGroup σ.asModule := Representation.instAddCommGroupAsModule σ
+  let : Module F σ.asModule := Representation.instModuleAsModule σ
+  let : Module (MonoidAlgebra F K) σ.asModule :=
     Representation.instModuleMonoidAlgebraAsModule σ
   have hfinite : Module.Finite F σ.asModule := inferInstance
-  haveI : IsMulCommutative (MonoidAlgebra F K) := inferInstance
+  have : IsMulCommutative (MonoidAlgebra F K) := inferInstance
   have hmodule :
       Module.finrank F σ.asModule = 1 :=
     @IsSimpleModule.finrank_eq_one_of_isMulCommutative
@@ -726,12 +726,12 @@ private theorem neZero_nat_card_cast_of_forall_prime_not_char
     (hchar : ∀ q : ℕ, q.Prime → q ∣ Nat.card K → ¬ CharP F q) :
     NeZero (Nat.card K : F) := by
   rcases CharP.exists' F with hzero | hpos
-  · haveI : CharZero F := hzero
+  · have : CharZero F := hzero
     refine ⟨?_⟩
     intro hcast
     exact (Nat.card_pos (α := K)).ne' (Nat.cast_eq_zero.mp hcast)
   · rcases hpos with ⟨p, hp_prime, hp_char⟩
-    haveI : CharP F p := hp_char
+    have : CharP F p := hp_char
     refine NeZero.of_not_dvd (R := F) (p := p) (n := Nat.card K) ?_
     intro hp_dvd
     exact (hchar p hp_prime.out hp_dvd) hp_char
@@ -764,11 +764,11 @@ private theorem exists_simple_submodule_of_neZero_card
     (σ : Representation F K V) :
     ∃ N : Submodule (MonoidAlgebra F K) σ.asModule,
       IsSimpleModule (MonoidAlgebra F K) N := by
-  letI : AddCommGroup σ.asModule := Representation.instAddCommGroupAsModule σ
-  letI : Module F σ.asModule := Representation.instModuleAsModule σ
-  letI : Module (MonoidAlgebra F K) σ.asModule :=
+  let : AddCommGroup σ.asModule := Representation.instAddCommGroupAsModule σ
+  let : Module F σ.asModule := Representation.instModuleAsModule σ
+  let : Module (MonoidAlgebra F K) σ.asModule :=
     Representation.instModuleMonoidAlgebraAsModule σ
-  letI : IsScalarTower F (MonoidAlgebra F K) σ.asModule := inferInstance
+  let : IsScalarTower F (MonoidAlgebra F K) σ.asModule := inferInstance
   have hnontriv : Nontrivial σ.asModule := by
     change Nontrivial V
     infer_instance
@@ -797,7 +797,7 @@ private theorem exists_simple_submodule_of_isPGroup_ne_char
     (σ : Representation F K V) :
     ∃ N : Submodule (MonoidAlgebra F K) σ.asModule,
       IsSimpleModule (MonoidAlgebra F K) N := by
-  haveI : NeZero (Nat.card K : F) :=
+  have : NeZero (Nat.card K : F) :=
     neZero_nat_card_cast_of_isPGroup_ne_char (F := F) (K := K) hKq hq_ne_p
   exact exists_simple_submodule_of_neZero_card (K := K) σ
 
@@ -816,13 +816,13 @@ private theorem finrank_eq_one_of_simple_submodule_of_commutative_group
     (N : Submodule (MonoidAlgebra F K) σ.asModule)
     (hNsimple : IsSimpleModule (MonoidAlgebra F K) N) :
     Module.finrank F (Subrepresentation.ofSubmodule' N).toSubmodule = 1 := by
-  haveI : IsSimpleModule (MonoidAlgebra F K) N := hNsimple
-  letI : Module F N :=
+  have : IsSimpleModule (MonoidAlgebra F K) N := hNsimple
+  let : Module F N :=
     @Submodule.module' F (MonoidAlgebra F K) σ.asModule
       inferInstance inferInstance
       (Representation.instModuleMonoidAlgebraAsModule σ)
       N inferInstance inferInstance (Representation.instModuleAsModule σ) inferInstance
-  letI : IsScalarTower F (MonoidAlgebra F K) N :=
+  let : IsScalarTower F (MonoidAlgebra F K) N :=
     @Submodule.isScalarTower F (MonoidAlgebra F K) σ.asModule
       inferInstance inferInstance (Representation.instModuleMonoidAlgebraAsModule σ)
       N inferInstance inferInstance inferInstance
@@ -843,8 +843,8 @@ private theorem finrank_eq_one_of_simple_submodule_of_commutative_group
         NF ⊤ hfiniteTop le_top
     exact hfiniteNF.equiv
       ((Submodule.restrictScalarsEquiv F (MonoidAlgebra F K) σ.asModule N).restrictScalars F)
-  haveI : IsMulCommutative K := ⟨hKcomm⟩
-  haveI : IsMulCommutative (MonoidAlgebra F K) := inferInstance
+  have : IsMulCommutative K := ⟨hKcomm⟩
+  have : IsMulCommutative (MonoidAlgebra F K) := inferInstance
   have hNdim : Module.finrank F N = 1 :=
     @IsSimpleModule.finrank_eq_one_of_isMulCommutative
       (MonoidAlgebra F K) N F
@@ -878,7 +878,7 @@ private theorem exists_rank_one_subrepresentation_of_simple_submodule_of_commuta
     (hNsimple : IsSimpleModule (MonoidAlgebra F K) N) :
     ∃ W : Subrepresentation σ, W ≠ ⊥ ∧ Module.finrank F W.toSubmodule = 1 := by
   let W : Subrepresentation σ := Subrepresentation.ofSubmodule' N
-  haveI : IsSimpleModule (MonoidAlgebra F K) N := hNsimple
+  have : IsSimpleModule (MonoidAlgebra F K) N := hNsimple
   have hWdim :
       Module.finrank F W.toSubmodule = 1 :=
     finrank_eq_one_of_simple_submodule_of_commutative_group hKcomm σ N hNsimple
@@ -930,11 +930,11 @@ private theorem exists_rank_one_complement_subrepresentations_of_commutative_of_
       W ≠ ⊥ ∧ IsCompl W.toSubmodule U.toSubmodule ∧
         Module.finrank F W.toSubmodule = 1 ∧
         Module.finrank F (V ⧸ W.toSubmodule) = 1 := by
-  letI : AddCommGroup σ.asModule := Representation.instAddCommGroupAsModule σ
-  letI : Module F σ.asModule := Representation.instModuleAsModule σ
-  letI : Module (MonoidAlgebra F K) σ.asModule :=
+  let : AddCommGroup σ.asModule := Representation.instAddCommGroupAsModule σ
+  let : Module F σ.asModule := Representation.instModuleAsModule σ
+  let : Module (MonoidAlgebra F K) σ.asModule :=
     Representation.instModuleMonoidAlgebraAsModule σ
-  letI : IsScalarTower F (MonoidAlgebra F K) σ.asModule := inferInstance
+  let : IsScalarTower F (MonoidAlgebra F K) σ.asModule := inferInstance
   rcases exists_simple_submodule_of_neZero_card (K := K) σ with
     ⟨N, hNsimple⟩
   rcases (@MonoidAlgebra.Submodule.exists_isCompl F inferInstance K inferInstance
@@ -956,7 +956,7 @@ private theorem exists_rank_one_complement_subrepresentations_of_commutative_of_
     · have h := congrArg Subrepresentation.toSubmodule hsubrep_compl.sup_eq_top
       rw [Subrepresentation.toSubmodule_sup] at h
       exact h
-  haveI : IsSimpleModule (MonoidAlgebra F K) N := hNsimple
+  have : IsSimpleModule (MonoidAlgebra F K) N := hNsimple
   have hW_ne_bot_sub : W.toSubmodule ≠ ⊥ := by
     have hN_nontrivial : Nontrivial N :=
       IsSimpleModule.nontrivial (MonoidAlgebra F K) N
@@ -1001,7 +1001,7 @@ private theorem exists_rank_one_complement_subrepresentations_of_commutative_isP
       W ≠ ⊥ ∧ IsCompl W.toSubmodule U.toSubmodule ∧
         Module.finrank F W.toSubmodule = 1 ∧
         Module.finrank F (V ⧸ W.toSubmodule) = 1 := by
-  haveI : NeZero (Nat.card K : F) :=
+  have : NeZero (Nat.card K : F) :=
     neZero_nat_card_cast_of_isPGroup_ne_char (F := F) (K := K) hKq hq_ne_p
   exact
     exists_rank_one_complement_subrepresentations_of_commutative_of_neZero_card
@@ -1036,7 +1036,7 @@ theorem exists_rank_one_KSubmodule_data_of_commutative_of_neZero_card
   have hVpos : 0 < Module.finrank F V := by
     rw [hdim]
     norm_num
-  haveI : Nontrivial V := Module.nontrivial_of_finrank_pos (R := F) (M := V) hVpos
+  have : Nontrivial V := Module.nontrivial_of_finrank_pos (R := F) (M := V) hVpos
   rcases exists_rank_one_complement_subrepresentations_of_commutative_of_neZero_card
       (F := F) (K := K) hKcomm (ρ.comp K.subtype) hdim with
     ⟨W, U, _hW_ne_bot, hcompl, hdimW, hdimQW⟩
@@ -1075,7 +1075,7 @@ theorem exists_rank_one_KSubmodule_data_of_commutative_isPGroup_ne_char
       Module.finrank F U.toSubmodule = 1 ∧
       Module.finrank F (V ⧸ W.toSubmodule) = 1 ∧
       Module.finrank F (V ⧸ U.toSubmodule) = 1 := by
-  haveI : NeZero (Nat.card K : F) :=
+  have : NeZero (Nat.card K : F) :=
     neZero_nat_card_cast_of_isPGroup_ne_char (F := F) (K := K) hKq hq_ne_p
   exact exists_rank_one_KSubmodule_data_of_commutative_of_neZero_card
     ρ hdim K hKcomm

@@ -106,8 +106,8 @@ theorem typePV_orderOf_not_dvd_card_derived [Finite G] {M : Subgroup G} (data : 
   simp only [typePV, Set.mem_sdiff, Set.mem_union, SetLike.mem_coe, not_or] at hv
   obtain ⟨hvW, -, hvnW2⟩ := hv
   -- decompose `v = a·b` along `W = W₁ ⊔ W₂` (the cyclic `W` is abelian)
-  haveI hcyc : IsCyclic ↥data.W := data.W_cyclic
-  letI : CommGroup ↥data.W := hcyc.commGroup
+  have hcyc : IsCyclic ↥data.W := data.W_cyclic
+  let : CommGroup ↥data.W := hcyc.commGroup
   have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
   have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
   have hsup : data.W1.subgroupOf data.W ⊔ data.W2.subgroupOf data.W = ⊤ := by
@@ -358,8 +358,8 @@ theorem typeII_reducible_inducedKernelFamily_eq_columnSum [Finite G]
   obtain ⟨θ, hθne, -, rfl⟩ := hψ
   set h : OddOrder.Peterfalvi.S06.Hypothesis ↥S :=
     (typeIIHypothesis46 hG hSmax hSII data).toHypothesis with hh
-  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
   -- the reducible source is a §6 column `χ_j`
   obtain ⟨χ₂', hχ₂'⟩ := (h.induce_not_isIrreducible_iff θ).mp hred
   have hχ₂'ne : χ₂' ≠ 1 := by
@@ -660,6 +660,7 @@ noncomputable def typeII_T2_memberRFamily [Finite G]
       (typeIIHypothesis46 hG hSmax hSII data.typeP) hχ₂ne hkeq
 
 open scoped Classical FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- **`typeII_T2_memberRFamily` reduction, irreducible case**: for an irreducible `T2`-member
 `η`, the dispatched `R`-family *is* `dadeOrthonormalCharacterImageFamilyOfDiff` (imageSet
 form).  The realness and support proofs are existential (proof-irrelevant inputs to a
@@ -704,6 +705,7 @@ theorem typeII_T2_memberRFamily_imageSet_of_irr [Finite G]
     rw [dif_pos hirr]
 
 open scoped Classical FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- **`typeII_T2_memberRFamily` reduction, column case**: for a reducible `T2`-member `η`,
 the dispatched `R`-family *is* `certainTypeR` at the classified column `χ₂` (imageSet form),
 exposed existentially together with the membership equation `η = columnSum χ₂` (which
@@ -1062,9 +1064,9 @@ theorem TypeIICrossIsometryData.elim [Finite G]
     (hδpm : params.delta = 1 ∨ params.delta = -1)
     (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta) :
     False := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
-  haveI : NeZero hyp.w2 := ⟨params.w2_prime.pos.ne'⟩
+  have : NeZero hyp.w2 := ⟨params.w2_prime.pos.ne'⟩
   -- the nontrivial-column degree fact `μ_{0j}(1) = d ≠ 1` feeding the pin.
   have hd1 : ∀ jj : Fin hyp.w2, jj ≠ 0 → hyp.muGrid hG hG.odd 0 jj 1 ≠ 1 := by
     intro jj hjj h1

@@ -34,7 +34,7 @@ variable {G Ω : Type*} [Group G] [MulAction G Ω] [Finite G]
 has odd order).  In particular `H ∩ I = Q ∩ I`. -/
 lemma mem_Q_of_sq_eq_one_of_mem_H {s : G} (hsH : s ∈ hyp.H) (hs2 : s ^ 2 = 1) :
     s ∈ hyp.Q := by
-  haveI hnorm : (hyp.Q.subgroupOf hyp.H).Normal := by
+  have hnorm : (hyp.Q.subgroupOf hyp.H).Normal := by
     refine ⟨fun n hn h => ?_⟩
     rw [Subgroup.mem_subgroupOf] at hn ⊢
     push_cast
@@ -122,7 +122,7 @@ lemma odd_orderOf_mul_involution {s u : G} (hsH : s ∈ hyp.H) (hs2 : s ^ 2 = 1)
 /-- `Q` contains an involution (`|Q|` is even; Cauchy). -/
 lemma exists_involution_mem_Q :
     ∃ x : G, x ∈ hyp.Q ∧ x ^ 2 = 1 ∧ x ≠ 1 := by
-  haveI : Fintype hyp.Q := Fintype.ofFinite _
+  have : Fintype hyp.Q := Fintype.ofFinite _
   obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card (G := hyp.Q) 2
     (by rw [← Nat.card_eq_fintype_card]; exact hyp.Q_even.two_dvd)
   have hord : orderOf (x : G) = 2 :=

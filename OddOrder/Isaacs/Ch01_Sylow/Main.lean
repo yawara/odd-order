@@ -37,9 +37,9 @@ private lemma sylow_q_normal_of_card_eq_pa_q_of_sylow_p_disjoint
       (S : Subgroup G) ⊓ (T : Subgroup G) = ⊥) :
     ∃ Q : Sylow q G, (Q : Subgroup G).Normal := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Fintype (Sylow p G) := Fintype.ofFinite _
-  haveI : Fintype (Sylow q G) := Fintype.ofFinite _
+  have : Fintype G := Fintype.ofFinite G
+  have : Fintype (Sylow p G) := Fintype.ofFinite _
+  have : Fintype (Sylow q G) := Fintype.ofFinite _
   have hpprime := Fact.out (p := p.Prime)
   have hqprime := Fact.out (p := q.Prime)
   have hp_pos := hpprime.pos
@@ -172,7 +172,7 @@ private lemma sylow_q_normal_of_card_eq_pa_q_of_sylow_p_disjoint
     have : 2 * (q - 1) ≤ Fintype.card (Sylow q G) * (q - 1) :=
       Nat.mul_le_mul_right _ h2le
     omega
-  haveI : Subsingleton (Sylow q G) :=
+  have : Subsingleton (Sylow q G) :=
     Fintype.card_le_one_iff_subsingleton.mp (by omega)
   obtain ⟨Q⟩ := Sylow.nonempty (p := q) (G := G)
   exact ⟨Q, Sylow.normal_of_subsingleton Q⟩
@@ -202,8 +202,8 @@ private lemma opCore_ne_bot_of_card_eq_pa_q_of_max_inter_ne_bot
     (hD_ne : ((S : Subgroup G) ⊓ (T : Subgroup G) : Subgroup G) ≠ ⊥) :
     opCore p G ≠ ⊥ := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Fintype (Sylow p G) := Fintype.ofFinite _
+  have : Fintype G := Fintype.ofFinite G
+  have : Fintype (Sylow p G) := Fintype.ofFinite _
   have hpprime := Fact.out (p := p.Prime)
   have hqprime := Fact.out (p := q.Prime)
   have hp_pos := hpprime.pos
@@ -238,10 +238,10 @@ private lemma opCore_ne_bot_of_card_eq_pa_q_of_max_inter_ne_bot
   have hD_lt_S : D < Ssub := lt_of_le_of_ne hD_le_S hD_ne_S
   have hD_lt_T : D < Tsub := lt_of_le_of_ne hD_le_T hD_ne_T
   -- S, T are nilpotent (p-groups).
-  haveI hS_nilp : Group.IsNilpotent Ssub := IsPGroup.isNilpotent S.2
-  haveI hT_nilp : Group.IsNilpotent Tsub := IsPGroup.isNilpotent T.2
-  haveI : Finite Ssub := inferInstance
-  haveI : Finite Tsub := inferInstance
+  have hS_nilp : Group.IsNilpotent Ssub := IsPGroup.isNilpotent S.2
+  have hT_nilp : Group.IsNilpotent Tsub := IsPGroup.isNilpotent T.2
+  have : Finite Ssub := inferInstance
+  have : Finite Tsub := inferInstance
   -- D.subgroupOf S < ⊤ in S.
   have hDS_lt_top : D.subgroupOf Ssub < ⊤ := by
     rw [lt_top_iff_ne_top]
@@ -472,7 +472,7 @@ theorem exists_normal_ne_bot_ne_top_of_card_eq_pow_mul_prime
   · -- `p = q`: `|G| = p^(a+1)` with `a + 1 ≥ 2`, so `G` is a `p`-group of order `≥ p²`.
     have hp1 : 1 < p := (Fact.out (p := p.Prime)).one_lt
     have hcard' : Nat.card G = p ^ (a + 1) := by rw [hcard, pow_succ]
-    haveI : Nontrivial G := by
+    have : Nontrivial G := by
       rcases subsingleton_or_nontrivial G with hs | hn
       · exact absurd ((Nat.card_eq_one_iff_unique.mpr ⟨hs, ⟨1⟩⟩).symm.trans hcard')
           (Nat.one_lt_pow (by omega) hp1).ne
@@ -482,7 +482,7 @@ theorem exists_normal_ne_bot_ne_top_of_card_eq_pow_mul_prime
     · -- `G` is abelian: a subgroup of order `p` is normal, nontrivial and proper.
       obtain ⟨H, hH⟩ := Sylow.exists_subgroup_card_pow_prime (G := G) p
         (n := 1) (by rw [hcard']; exact pow_dvd_pow p (by omega))
-      haveI : H.Normal := Subgroup.normalizer_eq_top_iff.mp
+      have : H.Normal := Subgroup.normalizer_eq_top_iff.mp
         (top_le_iff.mp (hctop ▸ Subgroup.center_le_normalizer (H : Set G)))
       refine ⟨H, inferInstance, ?_, ?_⟩
       · intro hbot
@@ -495,9 +495,9 @@ theorem exists_normal_ne_bot_ne_top_of_card_eq_pow_mul_prime
     · -- the centre is a proper nontrivial normal subgroup.
       exact ⟨Subgroup.center G, inferInstance,
         (Subgroup.nontrivial_iff_ne_bot _).mp hGp.center_nontrivial, hcne⟩
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Fintype (Sylow p G) := Fintype.ofFinite _
-  haveI : Fintype (Sylow q G) := Fintype.ofFinite _
+  have : Fintype G := Fintype.ofFinite G
+  have : Fintype (Sylow p G) := Fintype.ofFinite _
+  have : Fintype (Sylow q G) := Fintype.ofFinite _
   have hpprime := Fact.out (p := p.Prime)
   have hqprime := Fact.out (p := q.Prime)
   have hp_pos := hpprime.pos
@@ -566,7 +566,7 @@ theorem exists_normal_ne_bot_ne_top_of_card_eq_pow_mul_prime
     (Nat.dvd_prime hqprime).mp hnp_dvd
   rcases hnp_eq_one_or_q with hnp_eq_one | hnp_eq_q
   · -- (i) np = 1: Sylow p is normal and proper.
-    haveI : Subsingleton (Sylow p G) :=
+    have : Subsingleton (Sylow p G) :=
       Fintype.card_le_one_iff_subsingleton.mp (by
         rw [← Nat.card_eq_fintype_card]; omega)
     obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
@@ -677,7 +677,7 @@ theorem not_isSimpleGroup_of_card_eq_pow_mul_prime
   intro h_simple
   obtain ⟨N, hN_normal, hN_ne_bot, hN_ne_top⟩ :=
     exists_normal_ne_bot_ne_top_of_card_eq_pow_mul_prime ha hcard
-  haveI : IsSimpleGroup G := h_simple
+  have : IsSimpleGroup G := h_simple
   rcases hN_normal.eq_bot_or_eq_top with hbot | htop
   · exact hN_ne_bot hbot
   · exact hN_ne_top htop
@@ -720,7 +720,7 @@ theorem normalSubgroup_index_two_of_card_two_mul_odd
     (hn : Odd n) (hcard : Fintype.card G = 2 * n) :
     ∃ H : Subgroup G, H.Normal ∧ H.index = 2 := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hdvd : 2 ∣ Nat.card G := by
     rw [Nat.card_eq_fintype_card, hcard]; exact ⟨n, rfl⟩
   obtain ⟨t, ht⟩ := cauchy (G := G) hdvd
@@ -810,7 +810,7 @@ theorem opCore_eq_inf_of_minimal_sylow_inter
   -- Step 2: Sylow D in N.
   obtain ⟨Q, hPNQ⟩ := hPN_pgroup.exists_le_sylow
   -- Step 3: Sylow C in N: n • S.subtype hSN = Q.
-  haveI : Finite (Sylow p N) := inferInstance
+  have : Finite (Sylow p N) := inferInstance
   obtain ⟨n, hnSQ⟩ := MulAction.exists_smul_eq N (S.subtype hSN) Q
   -- Step 4: pull back: P ⊓ N ≤ MulAut.conj (n : G) • ↑S.
   have hPN_in_nS : (P : Subgroup G) ⊓ N ≤ MulAut.conj (n : G) • (S : Subgroup G) := by
@@ -932,7 +932,7 @@ theorem exists_pair_inf_eq_opCore_of_abelian
       Commute x y) :
     ∃ S T : Sylow p G, (S : Subgroup G) ⊓ (T : Subgroup G) = opCore p G := by
   classical
-  haveI := Fintype.ofFinite (Sylow p G)
+  have := Fintype.ofFinite (Sylow p G)
   obtain ⟨ST, _, hmin⟩ :=
     (Finset.univ : Finset (Sylow p G × Sylow p G)).exists_min_image
       (fun ST => Nat.card ((ST.1 : Subgroup G) ⊓ (ST.2 : Subgroup G) : Subgroup G))
@@ -1070,7 +1070,7 @@ theorem not_isSimpleGroup_of_card_sylow_sq_gt
     (hne : Nat.card G ≠ p) :
     ¬ IsSimpleGroup G := by
   intro hsimple
-  haveI := hsimple
+  have := hsimple
   have hOp : opCore p G ≠ ⊥ := opCore_ne_bot_of_card_sylow_sq_gt hAbel P hcard
   -- 単純性から `O_p(G) = ⊤`
   have hOptop : opCore p G = ⊤ :=
@@ -1081,13 +1081,13 @@ theorem not_isSimpleGroup_of_card_sylow_sq_gt
     rw [hOptop] at h
     exact h.of_equiv (Subgroup.topEquiv (G := G))
   -- 非自明な `p`-群は中心が非自明。単純性から `Z(G) = ⊤`, つまり `G` は可換。
-  haveI : Nontrivial G := hsimple.toNontrivial
+  have : Nontrivial G := hsimple.toNontrivial
   have hZ : Subgroup.center G ≠ ⊥ := by
     have := hPG.center_nontrivial (G := G)
     exact (Subgroup.nontrivial_iff_ne_bot _).mp this
   have hZtop : Subgroup.center G = ⊤ :=
     (hsimple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance).resolve_left hZ
-  letI : CommGroup G := Group.commGroupOfCenterEqTop hZtop
+  let : CommGroup G := Group.commGroupOfCenterEqTop hZtop
   -- 可換単純群の位数は素数。`p`-群なので `p` 冪 ⟹ 指数は `1` ⟹ `|G| = p`。
   have hprime : (Nat.card G).Prime := IsSimpleGroup.prime_card
   obtain ⟨n, hn0, hn⟩ := hPG.nontrivial_iff_card.mp inferInstance

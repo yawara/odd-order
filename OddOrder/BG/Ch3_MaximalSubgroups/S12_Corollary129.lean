@@ -88,7 +88,7 @@ private theorem exists_conj_le_sylow_of_isPGroup {G : Type*} [Group G] [Finite G
     ∃ g : G, ((MulAut.conj g) • Q : Subgroup G) ≤ (P : Subgroup G) := by
   classical
   obtain ⟨Q', hQQ'⟩ := hQ.exists_le_sylow
-  haveI : MulAction.IsPretransitive G (Sylow p G) := Sylow.isPretransitive_of_finite
+  have : MulAction.IsPretransitive G (Sylow p G) := Sylow.isPretransitive_of_finite
   obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G Q' P
   refine ⟨g, ?_⟩
   have hle : ((MulAut.conj g) • Q : Subgroup G) ≤
@@ -147,7 +147,7 @@ theorem commutator_decomp_of_tau1_action [Finite G] (hG : IsMinimalSimpleOdd G)
     S10.sigma_complement_commutator_cyclic_normal hG hM hA_le_M hA_pi hq.1 hQ
       (le_inf (hQE.trans hE_norm_A) hQ_le_M) hCQ hA_comm hA_q'
   -- Coprime decomposition `A = (A ⊓ C_G(Q)) × [A,Q]`.
-  haveI := hA_comm
+  have := hA_comm
   have hcop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥Q) := by
     rw [hA.2, hQcard]
     exact Nat.Coprime.pow_left _ ((Nat.coprime_primes Fact.out Fact.out).mpr hp_ne_q)
@@ -274,7 +274,7 @@ theorem commutator_decomp_of_tau1_action [Finite G] (hG : IsMinimalSimpleOdd G)
         pRank_le_of_injective (f := Subgroup.inclusion hSylG_le_M)
           (Subgroup.inclusion_injective _)
       rwa [hq.2.2] at h1
-    haveI : IsCyclic ↥SylG := S10.isCyclic_of_pRank_le_one hSylG_pg hodd_q hSylG_rank
+    have : IsCyclic ↥SylG := S10.isCyclic_of_pRank_le_one hSylG_pg hodd_q hSylG_rank
     -- Uniqueness of order-`q` subgroups in the cyclic `SylG`: `Q = conj m • Q'`.
     have hkey : Q.subgroupOf SylG = (MulAut.conj ((m : G)) • Q').subgroupOf SylG := by
       apply OddOrder.GroupTheory.cyclic_subgroup_eq_of_card_eq
@@ -314,9 +314,9 @@ theorem commutator_decomp_of_tau1_action [Finite G] (hG : IsMinimalSimpleOdd G)
     · -- Abelian Sylow `p`: Lemma 12.8(e) forces `[A,Q] = 1`, contradiction.
       push Not at hnonab
       exfalso
-      haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-      haveI : IsSolvable ↥E :=
-        solvable_of_solvable_injective (Subgroup.inclusion_injective h.E_le)
+      have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
+      have : Group.IsSolvable ↥E :=
+        Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective h.E_le)
       -- `M ≤ N_G(M_σ)`.
       have hM_norm_Mσ : M ≤ Subgroup.normalizer ((S10.Msigma M) : Set G) := by
         rw [S10.Msigma, OddOrder.GroupTheory.opiCoreInG]

@@ -64,7 +64,7 @@ Nat.card ↥R` (`IsComplement'.index_eq_card`), prime-order packaging, `Fact.out
 and the repo↔mathlib `IsZGroup` bridge `isZGroup_iff_mathlib`. -/
 theorem pLengthOne_commutator_of_zgroupCentralizer
     {Γ : Type*} [Group Γ] [Finite Γ]
-    (hsolv : IsSolvable Γ) (hodd : Odd (Nat.card Γ))
+    (hsolv : Group.IsSolvable Γ) (hodd : Odd (Nat.card Γ))
     {H R : Subgroup Γ} (hHnormal : H.Normal)
     (hHall : Nat.Coprime (Nat.card ↥H) H.index)
     (hcompl : H.IsComplement' R)
@@ -72,8 +72,8 @@ theorem pLengthOne_commutator_of_zgroupCentralizer
     (hZ : _root_.IsZGroup ↥(Subgroup.centralizer (R₀ : Set Γ) ⊓ H))
     (p : ℕ) [Fact p.Prime] :
     Ch1.hasPLengthOne p ↥⁅H, R⁆ := by
-  haveI := hsolv
-  haveI := hHnormal
+  have := hsolv
+  have := hHnormal
   rw [hcompl.symm.index_eq_card] at hHall
   exact Ch1.S03f.thm36 hodd hcompl hHall hR₀ ⟨_, hR₀prime, rfl⟩
     (by rw [inf_comm]; exact isZGroup_iff_mathlib.mpr hZ) Fact.out
@@ -109,7 +109,7 @@ theorem exists_prime_orderOf_zgroupCentralizer_of_complement
       _root_.IsZGroup ↥(Subgroup.centralizer (↑(Subgroup.zpowers x) : Set ↥M) ⊓
         (Malpha M).subgroupOf M) := by
   classical
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   -- (1) `q ∣ |M/M'|`: the projection `↥M ↠ ↥M ⧸ M_α ≃* K` identifies the two
   -- abelianization indices, using `M_α ≤ M'` (Theorem 10.2).
   have hder_eq : (derivedInG M).subgroupOf M = commutator ↥M := by
@@ -202,7 +202,7 @@ theorem exists_prime_orderOf_zgroupCentralizer_of_complement
       exact hx1 (by rw [h, OneMemClass.coe_one])
   · -- Z-group transfer along `C_{↥M}(⟨x⟩) ⊓ M_α = (C_G(⟨↑x⟩) ⊓ M_α).subgroupOf M`.
     rw [centralizer_zpowers_inf_subgroupOf_eq M x]
-    haveI : _root_.IsZGroup
+    have : _root_.IsZGroup
         ↥(Subgroup.centralizer (↑(Subgroup.zpowers (x : G)) : Set G) ⊓ Malpha M) := hxZ
     exact IsZGroup.of_injective
       (f := (Subgroup.subgroupOfEquivOfLe

@@ -90,14 +90,14 @@ theorem map_layer_eq_layer_of_genFitting_le [Finite G] {H : Subgroup G}
   have hEH : layer G ≤ H := layer_le_genFitting.trans hle
   -- `F(G)` を `↥H` の部分群として見たもの: solvable normal。
   set M : Subgroup ↥H := (Ch01.fitting G).subgroupOf H with hMdef
-  haveI : M.Normal := Subgroup.Normal.subgroupOf inferInstance H
-  haveI : IsSolvable ↥M := by
-    haveI := Ch01.fitting.isNilpotent (G := G)
-    haveI : IsSolvable ↥(Ch01.fitting G) := IsNilpotent.to_isSolvable
+  have : M.Normal := Subgroup.Normal.subgroupOf inferInstance H
+  have : Group.IsSolvable ↥M := by
+    have := Ch01.fitting.isNilpotent (G := G)
+    have : Group.IsSolvable ↥(Ch01.fitting G) := IsNilpotent.to_isSolvable
     have hinj : Function.Injective
         ((Subgroup.subgroupOfEquivOfLe hFH).toMonoidHom : ↥M →* ↥(Ch01.fitting G)) :=
       (Subgroup.subgroupOfEquivOfLe hFH).injective
-    exact solvable_of_solvable_injective hinj
+    exact Group.isSolvable_of_isSolvable_injective hinj
   have hMmap : M.map H.subtype = Ch01.fitting G := by
     rw [hMdef, Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hFH]
   -- **Thm 9.7(c) を `↥H` で**: `⁅E(H), F(G)⁆ = 1`。
@@ -140,7 +140,7 @@ theorem map_layer_eq_layer_of_genFitting_le [Finite G] {H : Subgroup G}
       have hVle : V.map H.subtype ≤ genFitting G :=
         (Subgroup.le_centralizer_iff.mp hcent).trans centralizer_genFitting_le_genFitting
       -- (4) `V` は自身を中心化する = 可換, しかし perfect なので `V = 1`。
-      haveI := hV.isQuasisimple.isPerfect
+      have := hV.isQuasisimple.isPerfect
       have hVperf : ⁅V.map H.subtype, V.map H.subtype⁆ = V.map H.subtype := by
         rw [← Subgroup.map_commutator, Subgroup.commutator_eq_self]
       have hVbot : V.map H.subtype = ⊥ := by
@@ -227,7 +227,7 @@ theorem isMulCommutative_abelianSocle : IsMulCommutative ↥(abelianSocle G) := 
   rw [Subgroup.le_centralizer_iff]
   refine iSup_le fun N => ?_
   by_cases hMN : (M : Subgroup G) = (N : Subgroup G)
-  · haveI : IsMulCommutative ↥(N : Subgroup G) := N.2.2
+  · have : IsMulCommutative ↥(N : Subgroup G) := N.2.2
     rw [hMN]
     exact Subgroup.le_centralizer (H := (N : Subgroup G))
   · exact isMinimalNormal_le_centralizer_of_ne M.2.1 N.2.1 hMN
@@ -253,7 +253,7 @@ structure IsSimpleFactorOf (N T : Subgroup G) : Prop where
   not_isMulCommutative : ¬IsMulCommutative ↥T
 
 theorem IsSimpleFactorOf.ne_bot {N T : Subgroup G} (h : IsSimpleFactorOf N T) : T ≠ ⊥ := by
-  haveI := h.isSimpleGroup
+  have := h.isSimpleGroup
   exact (Subgroup.nontrivial_iff_ne_bot T).mp inferInstance
 
 /-- 非可換な極小正規部分群 `M` を, `M` で正規な非可換単純部分群たちの join に分解する
@@ -261,7 +261,7 @@ theorem IsSimpleFactorOf.ne_bot {N T : Subgroup G} (h : IsSimpleFactorOf N T) : 
 theorem exists_simpleFamily_of_isMinimalNormal [Finite G] {M : Subgroup G}
     (hM : Ch02.IsMinimalNormal M) (hnab : ¬IsMulCommutative ↥M) :
     ∃ 𝒵 : Set (Subgroup G), (∀ T ∈ 𝒵, IsSimpleFactorOf M T) ∧ sSup 𝒵 = M := by
-  haveI := hM.1
+  have := hM.1
   obtain ⟨𝒳, h𝒳, hsup⟩ :=
     (isMulCommutative_or_isSemisimpleGroup_of_isMinimalNormal hM).resolve_left hnab
   refine ⟨(fun T : Subgroup ↥M => T.map M.subtype) '' 𝒳, ?_, ?_⟩
@@ -285,7 +285,7 @@ theorem exists_simpleFamily_of_isMinimalNormal [Finite G] {M : Subgroup G}
         · simp only [Subgroup.coe_mul, Subgroup.coe_inv, Subgroup.coe_subtype] at hyeq ⊢
           rw [hyeq]
           group
-    · haveI := hTsimple
+    · have := hTsimple
       exact he.symm.isSimpleGroup
     · exact fun hcomm => hTnab (isMulCommutative_of_surjective he.symm.toMonoidHom
         he.symm.surjective)
@@ -324,7 +324,7 @@ theorem isSemisimpleGroup_semisimpleSocle [Finite G] :
     have he : ↥(T.subgroupOf (semisimpleSocle G)) ≃* ↥T := Subgroup.subgroupOfEquivOfLe hTS
     have hmem : T.subgroupOf (semisimpleSocle G) ∈ 𝒴 := by
       refine ⟨(Subgroup.normal_subgroupOf_iff_le_normalizer hTS).mpr hSnorm, ?_, ?_⟩
-      · haveI := hTsimple
+      · have := hTsimple
         exact he.isSimpleGroup
       · exact fun _ => hTnab (isMulCommutative_of_surjective he.toMonoidHom he.surjective)
     calc T = (T.subgroupOf (semisimpleSocle G)).map (semisimpleSocle G).subtype := by
@@ -404,7 +404,7 @@ theorem inf_centralizer_eq_bot_of_isSemisimpleGroup [Finite G] (hss : IsSemisimp
   have hMab : M ≤ Subgroup.centralizer (M : Set G) :=
     (hMle.trans inf_le_right).trans
       (Subgroup.centralizer_le (by exact_mod_cast hMle.trans inf_le_left))
-  haveI := Subgroup.le_centralizer_iff_isMulCommutative.mp hMab
+  have := Subgroup.le_centralizer_iff_isMulCommutative.mp hMab
   exact (hss.isSimpleGroup_of_isMinimalNormal hMmin).2 inferInstance
 
 /-- `N` に**含まれない**極小正規部分群の join (9A.3 の `V`; 書籍の hint の `G = U × V`)。 -/
@@ -412,7 +412,7 @@ private def minimalNormalNotLe (N : Subgroup G) : Subgroup G :=
   ⨆ M : {M : Subgroup G // Ch02.IsMinimalNormal M ∧ ¬(M ≤ N)}, (M : Subgroup G)
 
 private theorem minimalNormalNotLe_normal (N : Subgroup G) : (minimalNormalNotLe N).Normal := by
-  haveI : ∀ M : {M : Subgroup G // Ch02.IsMinimalNormal M ∧ ¬(M ≤ N)},
+  have : ∀ M : {M : Subgroup G // Ch02.IsMinimalNormal M ∧ ¬(M ≤ N)},
       ((M : Subgroup G)).Normal := fun M => M.2.1.1
   exact Subgroup.iSup_normal _
 
@@ -421,7 +421,7 @@ private theorem minimalNormalNotLe_normal (N : Subgroup G) : (minimalNormalNotLe
 private theorem minimalNormalNotLe_le_centralizer (N : Subgroup G) [N.Normal] :
     minimalNormalNotLe N ≤ Subgroup.centralizer (N : Set G) := by
   refine iSup_le fun M => ?_
-  haveI := M.2.1.1
+  have := M.2.1.1
   have hdisj : Disjoint (M : Subgroup G) N := by
     rcases M.2.1.2.2 ((M : Subgroup G) ⊓ N) inferInstance inf_le_left with h | h
     · rw [disjoint_iff]; exact h
@@ -442,7 +442,7 @@ private theorem minimalNormalNotLe_le_centralizer (N : Subgroup G) [N.Normal] :
 theorem eq_iSup_isMinimalNormal_le_of_isSemisimpleGroup [Finite G] (hss : IsSemisimpleGroup G)
     (N : Subgroup G) [N.Normal] :
     N = ⨆ M : {M : Subgroup G // Ch02.IsMinimalNormal M ∧ M ≤ N}, (M : Subgroup G) := by
-  haveI := minimalNormalNotLe_normal (G := G) N
+  have := minimalNormalNotLe_normal (G := G) N
   have hUN : (⨆ M : {M : Subgroup G // Ch02.IsMinimalNormal M ∧ M ≤ N}, (M : Subgroup G)) ≤ N :=
     iSup_le fun M => M.2.2
   -- 極小正規全体が `G` を生成するので `U ⊔ V = ⊤`。
@@ -532,7 +532,7 @@ theorem eq_iSup_component_sup_inf_center [Finite G] (N : Subgroup ↥(layer G)) 
   have hMN : M ≤ N := iSup_le fun C => C.2.2
   refine le_antisymm ?_ (sup_le hMN inf_le_left)
   -- `π(N) ≤ π(M)`
-  haveI : (N.map π).Normal := Subgroup.Normal.map inferInstance π (QuotientGroup.mk'_surjective _)
+  have : (N.map π).Normal := Subgroup.Normal.map inferInstance π (QuotientGroup.mk'_surjective _)
   have hNM : N.map π ≤ M.map π := by
     rw [eq_iSup_isMinimalNormal_le_of_isSemisimpleGroup isSemisimpleGroup_layer_quotient_center
       (N.map π)]
@@ -543,8 +543,8 @@ theorem eq_iSup_component_sup_inf_center [Finite G] (N : Subgroup ↥(layer G)) 
       have h1 : (C.subgroupOf (layer G)).map π ≤ N.map π := hCeq ▸ K.2.2
       have h2 := Subgroup.map_le_iff_le_comap.mp h1
       rwa [Subgroup.comap_map_eq, hπ, QuotientGroup.ker_mk'] at h2
-    haveI := hCcomp.isQuasisimple.isPerfect
-    haveI : Group.IsPerfect ↥(C.subgroupOf (layer G)) :=
+    have := hCcomp.isQuasisimple.isPerfect
+    have : Group.IsPerfect ↥(C.subgroupOf (layer G)) :=
       Group.IsPerfect.ofSurjective
         (f := (Subgroup.subgroupOfEquivOfLe hCcomp.le_layer).symm.toMonoidHom)
         (Subgroup.subgroupOfEquivOfLe hCcomp.le_layer).symm.surjective
@@ -587,7 +587,7 @@ theorem map_center_le_centralizer (K : Subgroup G) :
 `E = E(G)` の誤植 (`E(H) ≤ H` なら `H ∩ E(H) = E(H)` で `H ∩` が無意味)。 -/
 theorem commutator_inf_layer_isComponent_eq_bot [Finite G] {H C : Subgroup G} [H.Normal]
     (hC : IsComponent C) (hCH : ¬C ≤ H) : ⁅H ⊓ layer G, C⁆ = ⊥ := by
-  haveI : (H.subgroupOf (layer G)).Normal := Subgroup.Normal.subgroupOf inferInstance _
+  have : (H.subgroupOf (layer G)).Normal := Subgroup.Normal.subgroupOf inferInstance _
   rw [Subgroup.commutator_eq_bot_iff_le_centralizer,
     ← Subgroup.subgroupOf_map_subtype H (layer G),
     eq_iSup_component_sup_inf_center (H.subgroupOf (layer G)), Subgroup.map_sup]
@@ -626,7 +626,7 @@ theorem commutator_eq_bot_of_isComponent_notLe [Finite G] {H C : Subgroup G} [H.
     refine le_bot_iff.mp ?_
     rw [← commutator_inf_layer_isComponent_eq_bot hC hCH]
     exact Subgroup.commutator_mono hHC le_rfl
-  haveI := hC.isQuasisimple.isPerfect
+  have := hC.isQuasisimple.isPerfect
   have h4 : ⁅⁅C, C⁆, H⁆ = ⊥ :=
     Subgroup.commutator_commutator_eq_bot_of_rotate
       (by rw [Subgroup.commutator_comm C H]; exact h3) h3
@@ -712,7 +712,7 @@ theorem IsSimpleFactorOf.conj {N T : Subgroup G} [hN : N.Normal] (h : IsSimpleFa
           Subgroup.map_mono h.le_normalizer
       _ = Subgroup.normalizer ((T.map (MulAut.conj g).toMonoidHom : Subgroup G) : Set G) :=
           Subgroup.map_equiv_normalizer_eq T (MulAut.conj g)
-  · haveI := h.isSimpleGroup
+  · have := h.isSimpleGroup
     exact he.symm.isSimpleGroup
   · exact fun _ => h.not_isMulCommutative
       (isMulCommutative_of_surjective he.symm.toMonoidHom he.symm.surjective)
@@ -741,7 +741,7 @@ theorem exists_conj_map_eq_of_isSimpleFactorOf [Finite G] {N : Subgroup G}
     (hN : Ch02.IsMinimalNormal N) (hnab : ¬IsMulCommutative ↥N)
     {S T : Subgroup G} (hS : IsSimpleFactorOf N S) (hT : IsSimpleFactorOf N T) :
     ∃ g : G, S.map (MulAut.conj g).toMonoidHom = T := by
-  haveI := hN.1
+  have := hN.1
   by_contra hcon0
   have hcon : ∀ g : G, S.map (MulAut.conj g).toMonoidHom ≠ T := fun g h => hcon0 ⟨g, h⟩
   -- 各共役 `S^g` は `T` を中心化する。
@@ -805,7 +805,7 @@ open OddOrder.GroupTheory
 theorem isMinimalNormal_range_inl_of_isCharacteristicallySimple
     (h : IsCharacteristicallySimple G) :
     Ch02.IsMinimalNormal ((SemidirectProduct.inl : G →* Holomorph G)).range := by
-  haveI := h.1
+  have := h.1
   exact ⟨Holomorph.normal_range_inl, Holomorph.range_inl_ne_bot,
     fun _ hKnormal hKle => Holomorph.eq_bot_or_eq_range_inl_of_normal h hKnormal hKle⟩
 
@@ -821,7 +821,7 @@ theorem isMulCommutative_or_isSemisimpleGroup_of_isCharacteristicallySimple [Fin
   have e : G ≃* ↥((SemidirectProduct.inl : G →* Holomorph G)).range :=
     MonoidHom.ofInjective SemidirectProduct.inl_injective
   rcases isMulCommutative_or_isSemisimpleGroup_of_isMinimalNormal hmin with hab | hss
-  · haveI := hab
+  · have := hab
     exact Or.inl (isMulCommutative_of_surjective e.symm.toMonoidHom e.symm.surjective)
   · exact Or.inr (hss.of_mulEquiv e.symm)
 
@@ -853,7 +853,7 @@ theorem isSimpleFactorOf_map_inl {T : Subgroup G} [T.Normal] (hsimple : IsSimple
         Holomorph G →* Holomorph G) = (MulAut.conj
           (SemidirectProduct.inl a : Holomorph G)).toMonoidHom from rfl, hcomp,
       ← Subgroup.map_map, map_conj_eq_self_of_normal]
-  · haveI := hsimple
+  · have := hsimple
     exact ee.symm.isSimpleGroup
   · exact fun _ => hnab (isMulCommutative_of_surjective ee.symm.toMonoidHom ee.symm.surjective)
 
@@ -868,7 +868,7 @@ theorem exists_simpleFamily_of_isSemisimpleGroup_of_isCharacteristicallySimple [
       (∀ T ∈ 𝒵, T.Normal ∧ IsSimpleGroup ↥T) ∧
       (∀ T ∈ 𝒵, ∀ U ∈ 𝒵, Nonempty (↥T ≃* ↥U)) ∧
       iSupIndep (fun T : ↥𝒵 => (T : Subgroup G)) ∧ sSup 𝒵 = ⊤ := by
-  haveI := h.1
+  have := h.1
   obtain ⟨𝒳, h𝒳, hsup⟩ := hss
   -- 族は空でない (空なら `sSup ∅ = ⊥ = ⊤`)。
   have hne : 𝒳.Nonempty := by
@@ -882,7 +882,7 @@ theorem exists_simpleFamily_of_isSemisimpleGroup_of_isCharacteristicallySimple [
   obtain ⟨S₀, hS₀⟩ := hne
   have hnabG : ¬IsMulCommutative G := by
     intro hc
-    haveI := hc
+    have := hc
     exact (h𝒳 S₀ hS₀).2.2 (Subgroup.le_centralizer_iff_isMulCommutative.mp
       fun x _ => Subgroup.mem_centralizer_iff.mpr fun y _ => mul_comm' y x)
   have e : G ≃* ↥((SemidirectProduct.inl : G →* Holomorph G)).range :=
@@ -891,8 +891,8 @@ theorem exists_simpleFamily_of_isSemisimpleGroup_of_isCharacteristicallySimple [
     fun hc => hnabG (isMulCommutative_of_surjective e.symm.toMonoidHom e.symm.surjective)
   have hmin := isMinimalNormal_range_inl_of_isCharacteristicallySimple h
   intro T hT U hU
-  haveI := (h𝒳 T hT).1
-  haveI := (h𝒳 U hU).1
+  have := (h𝒳 T hT).1
+  have := (h𝒳 U hU).1
   obtain ⟨γ, hγ⟩ := exists_conj_map_eq_of_isSimpleFactorOf hmin hnabN
     (isSimpleFactorOf_map_inl (h𝒳 T hT).2.1 (h𝒳 T hT).2.2)
     (isSimpleFactorOf_map_inl (h𝒳 U hU).2.1 (h𝒳 U hU).2.2)
@@ -910,12 +910,12 @@ elementary abelian。
 theorem exists_isElementaryAbelian_of_isCharacteristicallySimple [Finite G]
     (h : IsCharacteristicallySimple G) (hcomm : IsMulCommutative G) :
     ∃ p : ℕ, p.Prime ∧ IsElementaryAbelian p G := by
-  haveI := h.1
-  haveI := hcomm
+  have := h.1
+  have := hcomm
   have hcard : Nat.card G ≠ 1 := fun hc =>
     (not_subsingleton G) (Nat.card_eq_one_iff_unique.mp hc).1
   obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hcard
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   refine ⟨p, hp, fun x y => mul_comm' x y, ?_⟩
   -- `K = {x | x ^ p = 1}` は characteristic な部分群。
   let K : Subgroup G :=
@@ -983,12 +983,12 @@ theorem exists_simpleFamily_of_isElementaryAbelian.{u} {G : Type u} [Group G] [F
       (∀ i, (T i).Normal ∧ IsSimpleGroup ↥(T i)) ∧
       (∀ i j, Nonempty (↥(T i) ≃* ↥(T j))) ∧
       iSupIndep T ∧ ⨆ i, T i = ⊤ := by
-  haveI : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
-  letI : IsMulCommutative G := IsMulCommutative.of_comm h.comm
-  letI : CommGroup G := inferInstance
-  letI := IsElementaryAbelian.zmodModule (p := p) (G := G) h
-  haveI : Finite (Additive G) := Finite.of_equiv G Additive.ofMul
-  haveI : Nontrivial (Additive G) := Additive.ofMul.symm.injective.nontrivial
+  have : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
+  let : IsMulCommutative G := IsMulCommutative.of_comm h.comm
+  let : CommGroup G := inferInstance
+  let := IsElementaryAbelian.zmodModule (p := p) (G := G) h
+  have : Finite (Additive G) := Finite.of_equiv G Additive.ofMul
+  have : Nontrivial (Additive G) := Additive.ofMul.symm.injective.nontrivial
   obtain ⟨ι, hι, N, hcardN, hindep, hsupN⟩ :=
     exists_addSubgroup_basis_family (p := p) (M := Additive G)
   have hcardT : ∀ i, Nat.card ↥(Subgroup.toAddSubgroup.symm (N i)) = p := fun i => by
@@ -1018,10 +1018,10 @@ theorem exists_simpleFamily_of_isCharacteristicallySimple.{u} {G : Type u} [Grou
       (∀ i, (T i).Normal ∧ IsSimpleGroup ↥(T i)) ∧
       (∀ i j, Nonempty (↥(T i) ≃* ↥(T j))) ∧
       iSupIndep T ∧ ⨆ i, T i = ⊤ := by
-  haveI := h.1
+  have := h.1
   rcases isMulCommutative_or_isSemisimpleGroup_of_isCharacteristicallySimple h with hab | hss
   · obtain ⟨p, hp, hea⟩ := exists_isElementaryAbelian_of_isCharacteristicallySimple h hab
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     exact exists_simpleFamily_of_isElementaryAbelian hea
   · obtain ⟨𝒵, hne, hsimple, hiso, hindep, hsup⟩ :=
       exists_simpleFamily_of_isSemisimpleGroup_of_isCharacteristicallySimple h hss

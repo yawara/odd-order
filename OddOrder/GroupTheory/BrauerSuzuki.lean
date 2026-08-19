@@ -52,7 +52,7 @@ containing `u` is cyclic hence abelian, so `S' ≤ C_G(u)` and
 theorem brauerSuzuki_of_isCyclic_sylowTwo (S : Sylow 2 G)
     (hcyc : IsCyclic (S : Subgroup G)) (u : G) (hu2 : u ^ 2 = 1) (hu1 : u ≠ 1) :
     oPiCore {p | p ≠ 2} G ⊔ centralizer {u} = ⊤ := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   -- `|G|` is even with smallest prime factor `2`.
   have hord : orderOf u = 2 := orderOf_eq_prime hu2 hu1
   have h2dvd : 2 ∣ Nat.card G := hord ▸ orderOf_dvd_natCard u
@@ -81,7 +81,7 @@ theorem brauerSuzuki_of_isCyclic_sylowTwo (S : Sylow 2 G)
   obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G S S'
   have hcoe : MulAut.conj g • (S : Subgroup G) = (S' : Subgroup G) := by
     rw [← Sylow.coe_subgroup_smul, hg]
-  haveI hS'cyc : IsCyclic (S' : Subgroup G) := by
+  have hS'cyc : IsCyclic (S' : Subgroup G) := by
     rw [← hcoe]
     exact isCyclic_of_surjective
       (Subgroup.equivSMul (MulAut.conj g) (S : Subgroup G)).toMonoidHom
@@ -93,7 +93,7 @@ theorem brauerSuzuki_of_isCyclic_sylowTwo (S : Sylow 2 G)
     intro x hx
     rw [Set.mem_singleton_iff] at hx
     rw [hx]
-    letI := hS'cyc.commGroup
+    let := hS'cyc.commGroup
     have hcomm := mul_comm (⟨u, huS'⟩ : (S' : Subgroup G)) ⟨s, hs⟩
     simpa using congrArg Subtype.val hcomm
   -- `G = K ⊔ S'` (coprime cardinalities multiply to `|G|`).
@@ -101,7 +101,7 @@ theorem brauerSuzuki_of_isCyclic_sylowTwo (S : Sylow 2 G)
     rw [← hcoe]
     exact (Nat.card_congr (Subgroup.equivSMul (MulAut.conj g) (S : Subgroup G)).toEquiv).symm
   have hcardmul : Nat.card K * Nat.card (S' : Subgroup G) = Nat.card G := by
-    rw [hcardS']; exact hcompl.card_mul
+    rw [hcardS']; exact hcompl.card_mul_card
   have hcop : Nat.Coprime (Nat.card K) (Nat.card (S' : Subgroup G)) := by
     obtain ⟨m, hm⟩ := S'.isPGroup'.exists_card_eq
     rw [hm]

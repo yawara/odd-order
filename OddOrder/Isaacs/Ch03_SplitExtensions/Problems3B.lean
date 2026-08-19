@@ -72,7 +72,7 @@ D-part (`exists_conj_le_of_isComplement'_of_coprime'`; 「`N` か `U` の一方�
 で `U ≤ K^x` を与える `x` を選ぶ. `N` は正規なので `K^x` も補群 (`isComplement'_conj`). -/
 theorem exists_isComplement'_le_of_coprime {G : Type u} [Group G] [Finite G] {N U : Subgroup G}
     [N.Normal] (hcop : Nat.Coprime (Nat.card ↥N) N.index) (hU : Nat.card ↥U ∣ N.index)
-    (hsolv : IsSolvable ↥N ∨ IsSolvable ↥U) :
+    (hsolv : Group.IsSolvable ↥N ∨ Group.IsSolvable ↥U) :
     ∃ H : Subgroup G, N.IsComplement' H ∧ U ≤ H := by
   obtain ⟨K, hK⟩ := Subgroup.exists_right_complement'_of_coprime hcop
   have hcopU : Nat.Coprime (Nat.card ↥U) (Nat.card ↥N) :=
@@ -98,7 +98,7 @@ theorem exists_subgroup_orderOf_not_dvd_isComplement' {G : Type u} [Group G] [Fi
     ∃ X : Subgroup G, (↑X : Set G) = {g : G | ¬ p ∣ orderOf g} ∧ X.Normal ∧
       (P : Subgroup G).IsComplement' X := by
   -- `P ≤ Z(G)` なので `P ⊴ G`.
-  haveI hPnormal : (P : Subgroup G).Normal := by
+  have hPnormal : (P : Subgroup G).Normal := by
     constructor
     intro n hn g
     have hc : g * n = n * g := Subgroup.mem_center_iff.mp (hPZ hn) g
@@ -128,7 +128,7 @@ theorem exists_subgroup_orderOf_not_dvd_isComplement' {G : Type u} [Group G] [Fi
   refine ⟨X, ?_, ⟨?_⟩, hX⟩
   · -- `↑X = { g | p ∤ o(g) }`
     ext g
-    simp only [SetLike.mem_coe, Set.mem_setOf_eq]
+    simp only [SetLike.mem_coe, Set.mem_ofPred_eq]
     refine ⟨hXp' g, fun hnd => ?_⟩
     obtain ⟨x, hxX, u, huP, rfl⟩ := hdecomp g
     -- `x` と `u` は可換で位数が互いに素なので `o(x*u) = o(x)*o(u)`.
@@ -178,8 +178,9 @@ theorem exists_mem_coset_primeFactors_orderOf_dvd {G : Type u} [Group G] [Finite
   set m := orderOf (↑g : G ⧸ N) with hm_def
   have hn0 : orderOf g ≠ 0 := (orderOf_pos g).ne'
   -- `⟨g⟩` は可換ゆえ可解. Hall E で π-Hall 部分群 `C` を取る (π = `m` の約数の集合).
-  haveI : IsSolvable ↥(Subgroup.zpowers g) :=
-    isSolvable_of_comm fun a b => (IsMulCommutative.is_comm (M := ↥(Subgroup.zpowers g))).comm a b
+  have : Group.IsSolvable ↥(Subgroup.zpowers g) :=
+    Group.isSolvable_of_comm fun a b => (IsMulCommutative.is_comm (M :=
+      ↥(Subgroup.zpowers g))).comm a b
   obtain ⟨C, hC⟩ := hall_E_exists (G := ↥(Subgroup.zpowers g)) {q : ℕ | q ∣ m}
   have hks : Nat.card ↥C * C.index = orderOf g := by
     rw [Subgroup.card_mul_index, Nat.card_zpowers]
@@ -319,7 +320,7 @@ theorem isConj_inv_of_quotient_isConj_inv {G : Type u} [Group G] [Finite G] {N :
   have hKH : K ≤ H := le_sup_right
   have hNH : N ≤ H := le_sup_left
   -- `H` の中で `K` は `N` の補群.
-  haveI : (N.subgroupOf H).Normal := Subgroup.normal_subgroupOf
+  have : (N.subgroupOf H).Normal := Subgroup.normal_subgroupOf
   have hcompl : (N.subgroupOf H).IsComplement' (K.subgroupOf H) :=
     isComplement'_subgroupOf_of_coprime rfl hcop'
   -- `o(h₂) = o(h)` なので `U := K₂.subgroupOf H` の位数は `|N|` と互いに素.
@@ -334,10 +335,10 @@ theorem isConj_inv_of_quotient_isConj_inv {G : Type u} [Group G] [Finite G] {N :
   have hcopU : Nat.Coprime (Nat.card ↥(K₂.subgroupOf H)) (Nat.card ↥(N.subgroupOf H)) := by
     rw [hcardU, hcardM]; exact hcop.symm
   -- `U` は巡回群 `K₂` と同型ゆえ可解.
-  have hsolvU : IsSolvable ↥(K₂.subgroupOf H) := by
-    haveI : IsSolvable ↥K₂ :=
-      isSolvable_of_comm fun a b => (IsMulCommutative.is_comm (M := ↥K₂)).comm a b
-    exact solvable_of_solvable_injective
+  have hsolvU : Group.IsSolvable ↥(K₂.subgroupOf H) := by
+    have : Group.IsSolvable ↥K₂ :=
+      Group.isSolvable_of_comm fun a b => (IsMulCommutative.is_comm (M := ↥K₂)).comm a b
+    exact Group.isSolvable_of_isSolvable_injective
       (f := (Subgroup.subgroupOfEquivOfLe hK₂H).toMonoidHom)
       (Subgroup.subgroupOfEquivOfLe hK₂H).injective
   -- Schur-Zassenhaus D-part: `U ≤ (K.subgroupOf H)^y` なる `y ∈ N.subgroupOf H`.
@@ -457,7 +458,7 @@ theorem forall_isCoatom_index_prime_quotient {G : Type*} [Group G] {N : Subgroup
 /-- Problem 3B.8 前半の `|G|`-強帰納法本体. -/
 theorem isSolvable_of_forall_isCoatom_index_prime_aux (n : ℕ) :
     ∀ {G : Type u} [Group G] [Finite G],
-      (∀ M : Subgroup G, IsCoatom M → M.index.Prime) → Nat.card G ≤ n → IsSolvable G := by
+      (∀ M : Subgroup G, IsCoatom M → M.index.Prime) → Nat.card G ≤ n → Group.IsSolvable G := by
   induction n with
   | zero =>
     intro G _ _ _ hcard
@@ -472,18 +473,18 @@ theorem isSolvable_of_forall_isCoatom_index_prime_aux (n : ℕ) :
       have hne : (Nat.card G).primeFactors.Nonempty := Nat.nonempty_primeFactors.mpr hcard1
       set p := (Nat.card G).primeFactors.max' hne with hp_def
       have hpmem : p ∈ (Nat.card G).primeFactors := Finset.max'_mem _ _
-      haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hpmem⟩
+      have : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hpmem⟩
       have hpdvd : p ∣ Nat.card G := Nat.dvd_of_mem_primeFactors hpmem
       have hlarge : ∀ r ∈ (Nat.card G).primeFactors, r ≤ p := fun r hr => Finset.le_max' _ r hr
       obtain ⟨P⟩ : Nonempty (Sylow p G) := inferInstance
-      haveI hPnormal : (P : Subgroup G).Normal :=
+      have hPnormal : (P : Subgroup G).Normal :=
         sylow_normal_of_forall_isCoatom_index_prime hmax hlarge P
-      haveI hPsolv : IsSolvable ↥(P : Subgroup G) := by
-        haveI := P.isPGroup'.isNilpotent
+      have hPsolv : Group.IsSolvable ↥(P : Subgroup G) := by
+        have := P.isPGroup'.isNilpotent
         infer_instance
       -- 商 `G ⧸ P` は真に小さく, 同じ仮説を満たす.
       have hPne : (P : Subgroup G) ≠ ⊥ := sylow_ne_bot hpdvd P
-      haveI : Nontrivial ↥(P : Subgroup G) :=
+      have : Nontrivial ↥(P : Subgroup G) :=
         (Subgroup.nontrivial_iff_ne_bot _).mpr hPne
       have hPcard : 1 < Nat.card ↥(P : Subgroup G) := Finite.one_lt_card
       have hprod : Nat.card ↥(P : Subgroup G) * (P : Subgroup G).index = Nat.card G :=
@@ -494,9 +495,9 @@ theorem isSolvable_of_forall_isCoatom_index_prime_aux (n : ℕ) :
           Nat.mul_le_mul_right _ hPcard
         rw [← Subgroup.index_eq_card]
         omega
-      haveI : IsSolvable (G ⧸ (P : Subgroup G)) :=
+      have : Group.IsSolvable (G ⧸ (P : Subgroup G)) :=
         ih (forall_isCoatom_index_prime_quotient hmax) hquot
-      exact solvable_of_ker_le_range ((P : Subgroup G).subtype)
+      exact Group.isSolvable_of_ker_le_range ((P : Subgroup G).subtype)
         (QuotientGroup.mk' (P : Subgroup G))
         (by rw [QuotientGroup.ker_mk', Subgroup.range_subtype])
 
@@ -506,7 +507,7 @@ theorem isSolvable_of_forall_isCoatom_index_prime_aux (n : ℕ) :
 最大素因数 `p` の Sylow `p`-部分群 `P` は正規 (`sylow_normal_of_forall_isCoatom_index_prime`)
 で, 商 `G ⧸ P` も同じ仮説を満たすから帰納法で可解. `P` は `p`-群ゆえ冪零・可解なので `G` も可解. -/
 theorem isSolvable_of_forall_isCoatom_index_prime {G : Type u} [Group G] [Finite G]
-    (hmax : ∀ M : Subgroup G, IsCoatom M → M.index.Prime) : IsSolvable G :=
+    (hmax : ∀ M : Subgroup G, IsCoatom M → M.index.Prime) : Group.IsSolvable G :=
   isSolvable_of_forall_isCoatom_index_prime_aux (Nat.card G) hmax le_rfl
 
 /-- Problem 3B.8 後半の `|G|`-強帰納法本体 (正規 `q`-補群の構成). -/
@@ -522,7 +523,7 @@ theorem exists_normal_qComplement_aux (n : ℕ) :
     omega
   | succ n ih =>
     intro G _ _ q hq hmax hsmall hcard
-    haveI : Fact q.Prime := ⟨hq⟩
+    have : Fact q.Prime := ⟨hq⟩
     by_cases hall : ∀ d : ℕ, d.Prime → d ∣ Nat.card G → d = q
     · -- `|G|` が `q`-冪: `H = ⊥` が正規 `q`-補群.
       refine ⟨⊥, inferInstance, ?_, ?_⟩
@@ -543,7 +544,7 @@ theorem exists_normal_qComplement_aux (n : ℕ) :
       have hne : (Nat.card G).primeFactors.Nonempty := Nat.nonempty_primeFactors.mpr hcard1
       set p := (Nat.card G).primeFactors.max' hne with hp_def
       have hpmem : p ∈ (Nat.card G).primeFactors := Finset.max'_mem _ _
-      haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hpmem⟩
+      have : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hpmem⟩
       have hpdvd : p ∣ Nat.card G := Nat.dvd_of_mem_primeFactors hpmem
       have hlarge : ∀ r ∈ (Nat.card G).primeFactors, r ≤ p := fun r hr => Finset.le_max' _ r hr
       have hdmem : d ∈ (Nat.card G).primeFactors :=
@@ -552,10 +553,10 @@ theorem exists_normal_qComplement_aux (n : ℕ) :
       have hdp : d ≤ p := Finset.le_max' _ d hdmem
       have hpq : p ≠ q := by omega
       obtain ⟨P⟩ : Nonempty (Sylow p G) := inferInstance
-      haveI hPnormal : (P : Subgroup G).Normal :=
+      have hPnormal : (P : Subgroup G).Normal :=
         sylow_normal_of_forall_isCoatom_index_prime hmax hlarge P
       have hPne : (P : Subgroup G) ≠ ⊥ := sylow_ne_bot hpdvd P
-      haveI : Nontrivial ↥(P : Subgroup G) := (Subgroup.nontrivial_iff_ne_bot _).mpr hPne
+      have : Nontrivial ↥(P : Subgroup G) := (Subgroup.nontrivial_iff_ne_bot _).mpr hPne
       have hPcard : 1 < Nat.card ↥(P : Subgroup G) := Finite.one_lt_card
       have hprod : Nat.card ↥(P : Subgroup G) * (P : Subgroup G).index = Nat.card G :=
         Subgroup.card_mul_index _
@@ -574,7 +575,7 @@ theorem exists_normal_qComplement_aux (n : ℕ) :
         exact Subgroup.index_dvd_card _
       obtain ⟨Hbar, hHbarNormal, hHbarcard, hHbarP⟩ :=
         ih hq (forall_isCoatom_index_prime_quotient hmax) hsmall' hquot
-      haveI := hHbarNormal
+      have := hHbarNormal
       refine ⟨Hbar.comap (QuotientGroup.mk' (P : Subgroup G)), hHbarNormal.comap _, ?_, ?_⟩
       · -- `q ∣ |H|` なら Cauchy で位数 `q` の元 `y` が取れ, その像で矛盾.
         intro hdvdH
@@ -635,7 +636,7 @@ Schur-Zassenhaus で補群 `H` を取ると `H ⊔ Φ(G) = ⊤` ゆえ `H = ⊤`
 `p ∣ |Φ(G)|` に矛盾する. -/
 theorem prime_dvd_index_frattini_of_dvd_card_frattini {G : Type u} [Group G] [Finite G] {p : ℕ}
     (hp : p.Prime) (hdvd : p ∣ Nat.card ↥(frattini G)) : p ∣ (frattini G).index := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   by_contra hnd
   obtain ⟨Q⟩ : Nonempty (Sylow p ↥(frattini G)) := inferInstance
   set R : Subgroup G := (Q : Subgroup ↥(frattini G)).map (frattini G).subtype with hR_def
@@ -644,7 +645,7 @@ theorem prime_dvd_index_frattini_of_dvd_card_frattini {G : Type u} [Group G] [Fi
     Sylow.normalizer_sup_eq_top Q
   have hnormtop : Subgroup.normalizer ((R : Subgroup G) : Set G) = ⊤ :=
     frattini_nongenerating htop
-  haveI hRnormal : R.Normal := Subgroup.normalizer_eq_top_iff.mp hnormtop
+  have hRnormal : R.Normal := Subgroup.normalizer_eq_top_iff.mp hnormtop
   have hRle : R ≤ frattini G := Subgroup.map_subtype_le _
   -- `[G : R] = [Φ : Q] · [G : Φ]` はどちらの因子も `p` と素.
   have hrel : R.subgroupOf (frattini G) = (Q : Subgroup ↥(frattini G)) := by
@@ -698,15 +699,15 @@ theorem prime_dvd_index_frattini_of_dvd_card_frattini {G : Type u} [Group G] [Fi
 `M` にも正規化されるから `G = NM` で正規, 極小性と `N ≰ M` より `N ⊓ M = ⊥`. よって
 `|G| = |N||M|`, `|N ⊔ H| = |N||H|` となり `[G : N ⊔ H] = |M|/|H| = [M : H]`. -/
 theorem index_sup_eq_relIndex_of_isMinimalNormal_of_not_le {G : Type u} [Group G] [Finite G]
-    [IsSolvable G] {M N H : Subgroup G} (hM : IsCoatom M) (hN : Ch02.IsMinimalNormal N)
+    [Group.IsSolvable G] {M N H : Subgroup G} (hM : IsCoatom M) (hN : Ch02.IsMinimalNormal N)
     (hNM : ¬ N ≤ M) (hHM : H ≤ M) : (N ⊔ H).index = H.relIndex M := by
-  haveI hNnormal : N.Normal := hN.1
+  have hNnormal : N.Normal := hN.1
   -- `N ⊔ M = ⊤` かつ `N ⊓ M = ⊥`.
   have hsup : N ⊔ M = ⊤ := by
     rw [sup_comm]
     refine hM.2 _ (lt_of_le_of_ne le_sup_left fun h => hNM ?_)
     exact h ▸ le_sup_right
-  have habel : ∀ x ∈ N, ∀ y ∈ N, x * y = y * x := solvable_minimal_normal_isAbelian hN
+  have habel : ∀ x ∈ N, ∀ y ∈ N, x * y = y * x := minimal_normal_isAbelian_of_isSolvable hN
   have hinf_normal : (N ⊓ M).Normal := by
     constructor
     intro x hx g
@@ -761,13 +762,13 @@ theorem index_sup_eq_relIndex_of_isMinimalNormal_of_not_le {G : Type u} [Group G
 
 /-- 正規かつ可解な 2 つの部分群の結びも可解 (第二同型定理 + 拡大の可解性). -/
 theorem isSolvable_sup_of_normal {G : Type*} [Group G] [Finite G] (R N : Subgroup G) [R.Normal]
-    [N.Normal] [IsSolvable ↥R] [IsSolvable ↥N] : IsSolvable ↥(R ⊔ N) := by
-  haveI : IsSolvable (↥R ⧸ N.subgroupOf R) := inferInstance
-  haveI : IsSolvable (↥(R ⊔ N) ⧸ N.subgroupOf (R ⊔ N)) :=
-    solvable_of_solvable_injective
+    [N.Normal] [Group.IsSolvable ↥R] [Group.IsSolvable ↥N] : Group.IsSolvable ↥(R ⊔ N) := by
+  have : Group.IsSolvable (↥R ⧸ N.subgroupOf R) := inferInstance
+  have : Group.IsSolvable (↥(R ⊔ N) ⧸ N.subgroupOf (R ⊔ N)) :=
+    Group.isSolvable_of_isSolvable_injective
       (f := (QuotientGroup.quotientInfEquivProdNormalQuotient R N).symm.toMonoidHom)
       (QuotientGroup.quotientInfEquivProdNormalQuotient R N).symm.injective
-  exact solvable_of_ker_le_range (N.subgroupOf (R ⊔ N)).subtype
+  exact Group.isSolvable_of_ker_le_range (N.subgroupOf (R ⊔ N)).subtype
     (QuotientGroup.mk' (N.subgroupOf (R ⊔ N)))
     (by rw [QuotientGroup.ker_mk', Subgroup.range_subtype])
 
@@ -777,20 +778,20 @@ theorem isSolvable_sup_of_normal {G : Type*} [Group G] [Finite G] (R N : Subgrou
 位数最大の可解正規部分群 `R` を取る. 任意の可解正規部分群 `N` に対し `R ⊔ N` も可解正規
 (`isSolvable_sup_of_normal`) なので位数の最大性から `R ⊔ N = R`, すなわち `N ≤ R`. -/
 theorem exists_greatest_isSolvable_normal {G : Type u} [Group G] [Finite G] :
-    ∃ R : Subgroup G, R.Normal ∧ IsSolvable ↥R ∧
-      ∀ N : Subgroup G, N.Normal → IsSolvable ↥N → N ≤ R := by
+    ∃ R : Subgroup G, R.Normal ∧ Group.IsSolvable ↥R ∧
+      ∀ N : Subgroup G, N.Normal → Group.IsSolvable ↥N → N ≤ R := by
   classical
   obtain ⟨R, hRmem, hRmax⟩ :=
-    Set.exists_max_image {K : Subgroup G | K.Normal ∧ IsSolvable ↥K}
+    Set.exists_max_image {K : Subgroup G | K.Normal ∧ Group.IsSolvable ↥K}
       (fun K : Subgroup G => Nat.card ↥K) (Set.toFinite _)
       ⟨⊥, inferInstance, inferInstance⟩
   obtain ⟨hRnorm, hRsolv⟩ := hRmem
   refine ⟨R, hRnorm, hRsolv, fun N hN hNsolv => ?_⟩
-  haveI := hRnorm
-  haveI := hN
-  haveI := hRsolv
-  haveI := hNsolv
-  have hsolv : IsSolvable ↥(R ⊔ N) := isSolvable_sup_of_normal R N
+  have := hRnorm
+  have := hN
+  have := hRsolv
+  have := hNsolv
+  have hsolv : Group.IsSolvable ↥(R ⊔ N) := isSolvable_sup_of_normal R N
   have hle : Nat.card ↥(R ⊔ N) ≤ Nat.card ↥R := hRmax _ ⟨inferInstance, hsolv⟩
   have heq : R = R ⊔ N := Subgroup.eq_of_le_of_card_ge le_sup_left hle
   exact heq ▸ le_sup_right
@@ -802,7 +803,7 @@ theorem exists_greatest_isSolvable_normal {G : Type u} [Group G] [Finite G] :
 (`Ch01.le_fitting_subgroupOf_of_commutator_le`) を使う. -/
 theorem isSolvable_normal_le_fitting_subgroupOf_aux {G : Type u} [Group G] [Finite G]
     {C : Subgroup G} (hC : C = Subgroup.centralizer ((Ch01.fitting G : Subgroup G) : Set G))
-    (n : ℕ) : ∀ S : Subgroup ↥C, S.Normal → IsSolvable ↥S → Nat.card ↥S ≤ n →
+    (n : ℕ) : ∀ S : Subgroup ↥C, S.Normal → Group.IsSolvable ↥S → Nat.card ↥S ≤ n →
       S ≤ (Ch01.fitting G).subgroupOf C := by
   induction n with
   | zero =>
@@ -811,18 +812,18 @@ theorem isSolvable_normal_le_fitting_subgroupOf_aux {G : Type u} [Group G] [Fini
     omega
   | succ n ih =>
     intro S hSnorm hSsolv hcard
-    haveI := hSnorm
-    haveI := hSsolv
+    have := hSnorm
+    have := hSsolv
     rcases eq_or_ne S ⊥ with rfl | hSne
     · exact bot_le
-    · haveI : Nontrivial ↥S := (Subgroup.nontrivial_iff_ne_bot S).mpr hSne
+    · have : Nontrivial ↥S := (Subgroup.nontrivial_iff_ne_bot S).mpr hSne
       have hlt : ⁅S, S⁆ < S := by
         rw [← S.range_subtype, MonoidHom.range_eq_map, ← Subgroup.map_commutator,
           Subgroup.map_subtype_lt_map_subtype]
-        exact IsSolvable.commutator_lt_top_of_nontrivial ↥S
-      haveI hcomm_normal : (⁅S, S⁆ : Subgroup ↥C).Normal := Subgroup.commutator_normal S S
-      haveI hcomm_solv : IsSolvable ↥(⁅S, S⁆ : Subgroup ↥C) :=
-        solvable_of_solvable_injective (f := Subgroup.inclusion hlt.le)
+        exact Group.IsSolvable.commutator_lt_top_of_nontrivial ↥S
+      have hcomm_normal : (⁅S, S⁆ : Subgroup ↥C).Normal := Subgroup.commutator_normal S S
+      have hcomm_solv : Group.IsSolvable ↥(⁅S, S⁆ : Subgroup ↥C) :=
+        Group.isSolvable_of_isSolvable_injective (f := Subgroup.inclusion hlt.le)
           (Subgroup.inclusion_injective hlt.le)
       have hcard' : Nat.card ↥(⁅S, S⁆ : Subgroup ↥C) ≤ n := by
         have hne : (⁅S, S⁆ : Subgroup ↥C).subgroupOf S ≠ ⊤ := by
@@ -850,14 +851,14 @@ theorem isSolvable_normal_le_fitting_subgroupOf_aux {G : Type u} [Group G] [Fini
 theorem center_fitting_greatest_isSolvable_normal_centralizer {G : Type u} [Group G] [Finite G]
     {C : Subgroup G} (hC : C = Subgroup.centralizer ((Ch01.fitting G : Subgroup G) : Set G)) :
     ((Ch01.fitting G).subgroupOf C).Normal ∧
-      IsSolvable ↥((Ch01.fitting G).subgroupOf C) ∧
-      ∀ S : Subgroup ↥C, S.Normal → IsSolvable ↥S → S ≤ (Ch01.fitting G).subgroupOf C := by
-  haveI hCnormal : C.Normal := hC ▸ Subgroup.normal_centralizer
+      Group.IsSolvable ↥((Ch01.fitting G).subgroupOf C) ∧
+      ∀ S : Subgroup ↥C, S.Normal → Group.IsSolvable ↥S → S ≤ (Ch01.fitting G).subgroupOf C := by
+  have hCnormal : C.Normal := hC ▸ Subgroup.normal_centralizer
   refine ⟨Subgroup.normal_subgroupOf, ?_, fun S hS hSsolv =>
     isSolvable_normal_le_fitting_subgroupOf_aux hC (Nat.card ↥S) S hS hSsolv le_rfl⟩
   -- `F ⊓ C ≤ Z(↥C)` なので abelian, 特に可解.
   have hle := Ch01.fitting_subgroupOf_le_center_of_eq_centralizer hC
-  refine isSolvable_of_comm fun a b => ?_
+  refine Group.isSolvable_of_comm fun a b => ?_
   have ha : (a : ↥C) ∈ Subgroup.center ↥C := hle a.2
   exact Subtype.ext (Subgroup.mem_center_iff.mp ha (b : ↥C)).symm
 
@@ -865,7 +866,7 @@ theorem center_fitting_greatest_isSolvable_normal_centralizer {G : Type u} [Grou
 
 /-- Problem 3B.15 の `|G|`-強帰納法本体. -/
 theorem normal_of_index_minimal_aux (n : ℕ) :
-    ∀ {G : Type u} [Group G] [Finite G] [IsSolvable G] (H : Subgroup G),
+    ∀ {G : Type u} [Group G] [Finite G] [Group.IsSolvable G] (H : Subgroup G),
       Nat.card G ≤ n → H ≠ ⊤ → (∀ K : Subgroup G, K ≠ ⊤ → H.index ≤ K.index) → H.Normal := by
   induction n with
   | zero =>
@@ -894,13 +895,13 @@ theorem normal_of_index_minimal_aux (n : ℕ) :
       have hKpos : 0 < K.index := Nat.pos_of_ne_zero (Subgroup.index_ne_zero_of_finite)
       have := hmin K hKne
       omega
-    haveI hnt : Nontrivial G := by
+    have hnt : Nontrivial G := by
       rcases subsingleton_or_nontrivial G with hs | h
       · exact absurd (by ext x; simp [Subsingleton.elim x (1 : G)] : H = ⊤) hHne
       · exact h
     obtain ⟨N, hNmin, -⟩ :=
       Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) top_ne_bot
-    haveI hNnormal : N.Normal := hNmin.1
+    have hNnormal : N.Normal := hNmin.1
     by_cases hNH : N ≤ H
     · -- `N ≤ H`: `G ⧸ N` に落として帰納法.
       have hHmap_ne : H.map (QuotientGroup.mk' N) ≠ ⊤ := by
@@ -920,14 +921,14 @@ theorem normal_of_index_minimal_aux (n : ℕ) :
         refine hmin _ fun htop => hK ?_
         rw [← Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective N) K, htop,
           Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective N)]
-      haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNmin.2.1
+      have : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNmin.2.1
       have hNcard : 1 < Nat.card ↥N := Finite.one_lt_card
       have hprod : Nat.card ↥N * N.index = Nat.card G := Subgroup.card_mul_index N
       have hcardquot : Nat.card (G ⧸ N) ≤ n := by
         have h2 : 2 * N.index ≤ Nat.card ↥N * N.index := Nat.mul_le_mul_right _ hNcard
         rw [← Subgroup.index_eq_card]
         omega
-      haveI hHmapnormal : (H.map (QuotientGroup.mk' N)).Normal :=
+      have hHmapnormal : (H.map (QuotientGroup.mk' N)).Normal :=
         ih _ hcardquot hHmap_ne hmin'
       have hHeq : H = (H.map (QuotientGroup.mk' N)).comap (QuotientGroup.mk' N) := by
         rw [Subgroup.comap_map_eq, QuotientGroup.ker_mk', sup_eq_left.mpr hNH]
@@ -938,7 +939,7 @@ theorem normal_of_index_minimal_aux (n : ℕ) :
         rw [sup_comm]
         refine hcoatom.2 _ (lt_of_le_of_ne le_sup_left fun h => hNH ?_)
         exact h ▸ le_sup_right
-      have habel : ∀ x ∈ N, ∀ y ∈ N, x * y = y * x := solvable_minimal_normal_isAbelian hNmin
+      have habel : ∀ x ∈ N, ∀ y ∈ N, x * y = y * x := minimal_normal_isAbelian_of_isSolvable hNmin
       have hinf : N ⊓ H = ⊥ := by
         have hinf_normal : (N ⊓ H).Normal := by
           constructor
@@ -991,7 +992,7 @@ theorem normal_of_index_minimal_aux (n : ℕ) :
           have hmem : v ∈ N ⊓ Subgroup.centralizer (H : Set G) := ⟨hvN, hc⟩
           rw [hZbot, Subgroup.mem_bot] at hmem
           exact hv1 hmem
-        letI : MulAction ↥H G :=
+        let : MulAction ↥H G :=
           MulAction.compHom G ((MulAut.conj : G →* MulAut G).comp H.subtype)
         have hsmul : ∀ (h : ↥H) (x : G), h • x = (h : G) * x * (h : G)⁻¹ := fun _ _ => rfl
         -- 安定化群は真の部分群.
@@ -1083,7 +1084,7 @@ theorem normal_of_index_minimal_aux (n : ℕ) :
 `C_N(H) = N` なら `N` が `H` を正規化するので `H ⊴ G`. `C_N(H) = 1` の場合は
 `v ∈ N \ {1}` の安定化群 `H_v < H` を取ると `N ⊔ H_v` は真部分群で,
 その指数は軌道の大きさ `≤ |N| - 1 < |N| = [G : H]` となり `H` の最小性に矛盾する. -/
-theorem normal_of_index_minimal {G : Type u} [Group G] [Finite G] [IsSolvable G]
+theorem normal_of_index_minimal {G : Type u} [Group G] [Finite G] [Group.IsSolvable G]
     {H : Subgroup G} (hHne : H ≠ ⊤)
     (hmin : ∀ K : Subgroup G, K ≠ ⊤ → H.index ≤ K.index) : H.Normal :=
   normal_of_index_minimal_aux (Nat.card G) H le_rfl hHne hmin

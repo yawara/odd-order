@@ -95,9 +95,9 @@ private theorem le_opCore_of_isPGroup_of_le_fitting {p : ℕ} [Fact p.Prime]
       (Subgroup.subgroupOfEquivOfLe hWF).injective
   obtain ⟨P, hWP⟩ := hW'_pg.exists_le_sylow
   have hPnorm : P.Normal := Ch01.Sylow.normal_of_isNilpotent P
-  haveI : (P : Subgroup ↥(Ch01.fitting G)).Characteristic :=
+  have : (P : Subgroup ↥(Ch01.fitting G)).Characteristic :=
     Sylow.characteristic_of_normal P hPnorm
-  haveI : ((P : Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype).Normal :=
+  have : ((P : Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype).Normal :=
     inferInstance
   have hPmap_pg :
       IsPGroup p ↥((P : Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype) :=
@@ -112,14 +112,14 @@ private theorem le_opCore_of_isPGroup_of_le_fitting {p : ℕ} [Fact p.Prime]
 `r(F(G)) ≤ 2`.  If `T` is a characteristic subgroup of a Sylow `p`-subgroup `S` of `G` with
 `T ⊆ S' = ⁅S, S⁆`, then the image of `T` in `G` is normal in `G`. -/
 theorem characteristic_le_derived_normal_of_rank_fitting_le_two
-    [IsSolvable G] (hodd : Odd (Nat.card G))
+    [Group.IsSolvable G] (hodd : Odd (Nat.card G))
     (hrank : rank ↥(Ch01.fitting G) ≤ 2)
     {p : ℕ} [Fact p.Prime] (S : Sylow p G)
     {T : Subgroup ↥(S : Subgroup G)} (hTchar : T.Characteristic)
     (hTderiv : T.map (S : Subgroup G).subtype ≤ ⁅(S : Subgroup G), (S : Subgroup G)⁆) :
     (T.map (S : Subgroup G).subtype).Normal := by
   classical
-  haveI := hTchar
+  have := hTchar
   -- Trivial group: every subgroup is normal.
   rcases subsingleton_or_nontrivial G with hsub | hnt
   · exact ⟨fun n hn g => by rwa [Subsingleton.elim (g * n * g⁻¹) n]⟩
@@ -138,7 +138,7 @@ theorem characteristic_le_derived_normal_of_rank_fitting_le_two
   have hS_le_NT : (S : Subgroup G) ≤ Subgroup.normalizer (TG : Set G) :=
     le_trans Subgroup.le_normalizer hStep4
   -- Step 3: Frattini. `F ⊔ S ⊴ G` (contains `G'`), so `N_G(S) ⊔ F = ⊤`.
-  haveI hHnorm : (Ch01.fitting G ⊔ (S : Subgroup G)).Normal := by
+  have hHnorm : (Ch01.fitting G ⊔ (S : Subgroup G)).Normal := by
     refine ⟨fun n hn g => ?_⟩
     have hc : ⁅g, n⁆ ∈ commutator G :=
       Subgroup.commutator_mem_commutator (Subgroup.mem_top g) (Subgroup.mem_top n)
@@ -159,7 +159,7 @@ theorem characteristic_le_derived_normal_of_rank_fitting_le_two
   have hStep5 : Ch01.fitting G ≤ Subgroup.normalizer (TG : Set G) := by
     have hbound : ∀ q : Nat.Primes, Ch01.opCore (q : ℕ) G ≤ Subgroup.normalizer (TG : Set G) := by
       intro q
-      haveI hqfact : Fact (q : ℕ).Prime := ⟨q.2⟩
+      have hqfact : Fact (q : ℕ).Prime := ⟨q.2⟩
       by_cases hq : (q : ℕ) = p
       · -- `O_p(G) ≤ S ≤ N_G(TG)`.
         rw [hq]; exact le_trans (Ch01.opCore_le S) hS_le_NT

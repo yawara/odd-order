@@ -47,11 +47,11 @@ variable {G Ω : Type*} [Group G] [MulAction G Ω] [FaithfulSMul G Ω]
 theorem isSimpleGroup_of_card_eq_95040 [IsPretransitive G Ω]
     (hΩ : Nat.card Ω = 12) (hG : Nat.card G = 95040) :
     IsSimpleGroup G := by
-  haveI : Finite G := Nat.finite_of_card_ne_zero (by omega)
-  haveI : Finite Ω := Nat.finite_of_card_ne_zero (by omega)
-  haveI : Fact (Nat.Prime 11) := ⟨by norm_num⟩
-  haveI : Fact (Nat.Prime 2) := ⟨by norm_num⟩
-  haveI : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have : Finite G := Nat.finite_of_card_ne_zero (by omega)
+  have : Finite Ω := Nat.finite_of_card_ne_zero (by omega)
+  have : Fact (Nat.Prime 11) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 2) := ⟨by norm_num⟩
+  have : Fact (Nat.Prime 3) := ⟨by norm_num⟩
   -- (1) 点安定化群は位数 7920
   have hstabcard : ∀ α : Ω, Nat.card ↥(stabilizer G α) = 7920 := by
     intro α
@@ -67,23 +67,23 @@ theorem isSimpleGroup_of_card_eq_95040 [IsPretransitive G Ω]
   have htrans : ∀ α : Ω,
       IsPretransitive ↥(stabilizer G α) ↥(SubMulAction.ofStabilizer G α) := by
     intro α
-    haveI := faithfulSMul_ofStabilizer (G := G) α
+    have := faithfulSMul_ofStabilizer (G := G) α
     obtain ⟨S⟩ := Sylow.nonempty (p := 11) (G := ↥(stabilizer G α))
     have hS : Nat.card (S : Subgroup ↥(stabilizer G α)) = 11 :=
       card_sylow_eq_prime_of_not_dvd_sq S (by rw [hstabcard α]; norm_num)
         (by rw [hstabcard α]; norm_num)
-    haveI := isPretransitive_of_card_eq_prime (by norm_num) (hcard11 α) _ hS
+    have := isPretransitive_of_card_eq_prime (by norm_num) (hcard11 α) _ hS
     refine ⟨fun a b => ?_⟩
     obtain ⟨s, hs⟩ := exists_smul_eq ↥(S : Subgroup ↥(stabilizer G α)) a b
     exact ⟨s, hs⟩
   have hsimple : ∀ α : Ω, IsSimpleGroup ↥(stabilizer G α) := by
     intro α
-    haveI := faithfulSMul_ofStabilizer (G := G) α
+    have := faithfulSMul_ofStabilizer (G := G) α
     exact isSimpleGroup_of_card_eq_7920 (hcard11 α) (hstabcard α)
   -- (2) `G` は 2-transitive (Problem 8A.9 が要求する形)
   have h2 : ∀ α β γ : Ω, β ≠ α → γ ≠ α → ∃ g : G, g • α = α ∧ g • β = γ := by
     intro α β γ hβ hγ
-    haveI := htrans α
+    have := htrans α
     obtain ⟨g, hg⟩ := exists_smul_eq ↥(stabilizer G α)
       (⟨β, (SubMulAction.mem_ofStabilizer_iff G α).mpr hβ⟩ :
         ↥(SubMulAction.ofStabilizer G α))

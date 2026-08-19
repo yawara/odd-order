@@ -256,7 +256,7 @@ theorem isIsotypicOfType_of_conjugates [ρ.IsIrreducible]
     (hconj : ∀ g : G, Nonempty (W ≃ₗ[k[↥H]] (W.map (conjSemilinearEnd (H := H) ρ g)))) :
     IsIsotypicOfType k[↥H] (resRep ρ H).asModule W := by
   intro m _
-  haveI : ∀ S : (Set.range fun g : G => W.map (conjSemilinearEnd (H := H) ρ g)),
+  have : ∀ S : (Set.range fun g : G => W.map (conjSemilinearEnd (H := H) ρ g)),
       IsSimpleModule k[↥H] (S : Submodule k[↥H] (resRep ρ H).asModule) := by
     rintro ⟨_, g, rfl⟩
     exact isSimpleModule_map_conjSemilinearEnd ρ g W
@@ -276,15 +276,15 @@ theorem).  This is the classical Clifford argument: a simple `k[H]`-submodule ex
 theorem isSemisimpleModule_resRep_of_isIrreducible [ρ.IsIrreducible] [Module.Finite k V]
     [Nontrivial V] :
     IsSemisimpleModule k[↥H] (resRep ρ H).asModule := by
-  haveI : Nontrivial (resRep ρ H).asModule := ‹Nontrivial V›
+  have : Nontrivial (resRep ρ H).asModule := ‹Nontrivial V›
   -- the submodule lattice is atomic (finite dimension over `k` bounds `k[H]`-chains)
-  haveI : IsArtinian k (resRep ρ H).asModule := inferInstance
-  haveI : IsArtinian k[↥H] (resRep ρ H).asModule := isArtinian_of_tower k inferInstance
+  have : IsArtinian k (resRep ρ H).asModule := inferInstance
+  have : IsArtinian k[↥H] (resRep ρ H).asModule := isArtinian_of_tower k inferInstance
   -- a simple (= atomic) `k[H]`-submodule `W₀` exists
   obtain ⟨W₀, hW₀atom, -⟩ :=
     (IsAtomic.eq_bot_or_exists_atom_le (⊤ : Submodule k[↥H] (resRep ρ H).asModule)).resolve_left
       (by simp)
-  haveI : IsSimpleModule k[↥H] W₀ := isSimpleModule_iff_isAtom.mpr hW₀atom
+  have : IsSimpleModule k[↥H] W₀ := isSimpleModule_iff_isAtom.mpr hW₀atom
   -- its conjugates are simple and span `⊤`
   refine IsSemisimpleModule.of_sSup_simples_eq_top ?_
   rw [eq_top_iff, ← iSup_map_conjSemilinearEnd_eq_top ρ W₀ hW₀atom.1]

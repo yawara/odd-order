@@ -126,7 +126,7 @@ needed for this fixed-point bound. -/
 lemma three_le_ncard_fixedPoints_of_le_V (hXV : X ≤ hyp.V) :
     3 ≤ (fixedPoints X Ω).ncard := by
   classical
-  letI : Finite Ω := hyp.finite_Omega
+  let : Finite Ω := hyp.finite_Omega
   let s : G := hyp.distinguishedInvolution
   have hsH : s ∈ hyp.H := hyp.distinguishedInvolution_mem_H
   have hs2 : s ^ 2 = 1 := hyp.distinguishedInvolution_sq
@@ -302,7 +302,7 @@ theorem normalCore_cH_eq_restrictedAction_ker (hXV : X ≤ hyp.V) :
     three_le_ncard_fixedPoints_of_le_V hyp hXV
   change (hyp.H.subgroupOf C).normalCore =
     (MulAction.toPermHom C ↥(fixedPoints X Ω)).ker
-  letI : IsMultiplyPretransitive C ↥(fixedPoints X Ω) 2 :=
+  let : IsMultiplyPretransitive C ↥(fixedPoints X Ω) 2 :=
     centralizer_isMultiplyPretransitive_two hyp hXV
   have hpre : IsPretransitive C ↥(fixedPoints X Ω) :=
     isPretransitive_of_is_two_pretransitive

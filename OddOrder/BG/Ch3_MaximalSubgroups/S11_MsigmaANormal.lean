@@ -140,7 +140,7 @@ private theorem mem_zpowers_of_pow_prime_eq_one {Q : Type*} [Group Q] [Finite Q]
     [IsCyclic Q] {q : ℕ} (hq : q.Prime) {y : Q} (hy : orderOf y = q)
     {g : Q} (hg : g ^ q = 1) : g ∈ Subgroup.zpowers y := by
   classical
-  haveI := Fintype.ofFinite Q
+  have := Fintype.ofFinite Q
   have hsub : ((Subgroup.zpowers y : Subgroup Q) : Set Q).toFinset ⊆
       ({a : Q | a ^ q = 1} : Finset Q) := by
     intro a ha
@@ -166,6 +166,7 @@ private theorem mem_zpowers_of_pow_prime_eq_one {Q : Type*} [Group Q] [Finite Q]
   rw [← heq, Set.mem_toFinset] at hg_mem
   exact hg_mem
 
+set_option backward.isDefEq.respectTransparency false in
 /-- `Hypothesis111` の Sylow 取替え: `A` を含む別の Sylow `p`-部分群 `P'` でも
 Hypothesis 11.1 が成立する。`P, P'` は `M` 内共役なので `N_G(P') ⊆ M ⟺ N_G(P) ⊆ M`。 -/
 theorem Hypothesis111.of_sylow [Finite G] {M : Subgroup G} {p : ℕ} {A₀ A P : Subgroup G}
@@ -173,7 +174,7 @@ theorem Hypothesis111.of_sylow [Finite G] {M : Subgroup G} {p : ℕ} {A₀ A P :
     (hAP' : A ≤ P') (hP'M : P' ≤ M)
     (hP'syl : ∀ R : Subgroup G, P' ≤ R → R ≤ M → IsPGroup p ↥R → R = P') :
     Hypothesis111 M p A₀ A P' := by
-  haveI : Fact p.Prime := ⟨h.prime⟩
+  have : Fact p.Prime := ⟨h.prime⟩
   refine ⟨h.mem_maximal, h.prime, h.notMem_sigma, h.A₀_mem, h.A₀_le, h.normalizer_A₀_le,
     h.A_mem, h.A_le, h.A₀_le_A, hP'pg, hAP', hP'M, hP'syl, ?_, h.A_maximal⟩
   -- realize `P` and `P'` as Sylow subgroups of `↥M`, conjugate by some `m ∈ M`.
@@ -221,9 +222,9 @@ theorem MsigmaA_normal [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} {p : ℕ} {A₀ A P : Subgroup G} (h : Hypothesis111 M p A₀ A P) :
     M ≤ Subgroup.normalizer ((S10.Msigma M ⊔ A : Subgroup G) : Set G) := by
   classical
-  haveI : Fact p.Prime := ⟨h.prime⟩
+  have : Fact p.Prime := ⟨h.prime⟩
   have hM := h.mem_maximal
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   -- `M` normalises `M_σ`.
   have hM_norm_Mσ : M ≤ Subgroup.normalizer ((S10.Msigma M) : Set G) := by
     rw [S10.Msigma, OddOrder.GroupTheory.opiCoreInG]
@@ -231,7 +232,7 @@ theorem MsigmaA_normal [Finite G] (hG : IsMinimalSimpleOdd G)
     rwa [Subgroup.normalizer_eq_top, ← MonoidHom.range_eq_map, Subgroup.range_subtype] at hle
   -- ## the complement `E` to `M_σ` in `M` containing `A`
   set N : Subgroup ↥M := (S10.Msigma M).subgroupOf M with hNdef
-  haveI hN_normal : N.Normal := by
+  have hN_normal : N.Normal := by
     constructor
     intro n hn g
     rw [hNdef, Subgroup.mem_subgroupOf] at hn ⊢
@@ -259,7 +260,7 @@ theorem MsigmaA_normal [Finite G] (hG : IsMinimalSimpleOdd G)
       rw [hE₁def, Subgroup.card_map_of_injective (MulAut.conj x).injective]
     refine Subgroup.isComplement'_of_coprime ?_ ?_
     · rw [hcard₀]
-      exact hE₀.card_mul
+      exact hE₀.card_mul_card
     · rw [hcard₀, (hE₀.symm.index_eq_card).symm]
       exact hN_cop
   set Esub : Subgroup G := E₁.map M.subtype with hEdef
@@ -285,14 +286,14 @@ theorem MsigmaA_normal [Finite G] (hG : IsMinimalSimpleOdd G)
     rw [← hEdef] at h2
     exact h2
   -- solvability, oddness, rank of `E`.
-  haveI hE_solv : IsSolvable ↥Esub := by
+  have hE_solv : Group.IsSolvable ↥Esub := by
     have e : ↥E₁ ≃* ↥Esub := Subgroup.equivMapOfInjective E₁ M.subtype M.subtype_injective
-    exact solvable_of_surjective (f := e.toMonoidHom) e.surjective
+    exact Group.isSolvable_of_surjective (f := e.toMonoidHom) e.surjective
   have hE_odd : Odd (Nat.card ↥Esub) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card Esub)
   have hE_rank : rank ↥Esub ≤ 2 := by
     rw [rank_le_iff]
     intro r hr_prime
-    haveI : Fact r.Prime := ⟨hr_prime⟩
+    have : Fact r.Prime := ⟨hr_prime⟩
     by_cases hr_dvd : r ∣ Nat.card ↥Esub
     · have hrM : pRank ↥Esub r ≤ pRank ↥M r :=
         pRank_le_of_injective (f := Subgroup.inclusion hE_le_M)
@@ -385,7 +386,7 @@ theorem MsigmaA_normal [Finite G] (hG : IsMinimalSimpleOdd G)
     -- `A ≤ W` (a `p`-subgroup lies in the normal Hall `τ∪{p}`-subgroup).
     have hA_le_W : A ≤ W_g := by
       have hA_sub : A.subgroupOf Esub ≤ Ch03.oPiCore {q : ℕ | p ≤ q} ↥Esub := by
-        haveI : (Ch03.oPiCore {q : ℕ | p ≤ q} ↥Esub).Normal := inferInstance
+        have : (Ch03.oPiCore {q : ℕ | p ≤ q} ↥Esub).Normal := inferInstance
         refine S10.le_of_coprime_card_index ?_
         have hcardA : Nat.card ↥(A.subgroupOf Esub) = p ^ 2 := by
           rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hA_le_E).toEquiv, h.A_mem.2]
@@ -405,7 +406,7 @@ theorem MsigmaA_normal [Finite G] (hG : IsMinimalSimpleOdd G)
         (Ch03.oPiCore_mono (fun r (hr : p < r) => le_of_lt hr) ↥Esub)
     have hW_norm_Kg : W_g ≤ Subgroup.normalizer (K_g : Set G) := hWg_le_E.trans hE_norm_Kg
     set K' : Subgroup ↥W_g := K_g.subgroupOf W_g with hK'def
-    haveI hK'_normal : K'.Normal := by
+    have hK'_normal : K'.Normal := by
       constructor
       intro n hn g
       rw [hK'def, Subgroup.mem_subgroupOf] at hn ⊢
@@ -560,7 +561,7 @@ theorem MsigmaA_normal [Finite G] (hG : IsMinimalSimpleOdd G)
     set Op : Subgroup ↥W_g := Ch03.oPiCore {p} ↥W_g with hOpdef
     set Op_g : Subgroup G := Op.map W_g.subtype with hOpgdef
     have hA_le_Opg : A ≤ Op_g := by
-      haveI hA_sub_norm : (A.subgroupOf W_g).Normal := by
+      have hA_sub_norm : (A.subgroupOf W_g).Normal := by
         constructor
         intro n hn g
         rw [Subgroup.mem_subgroupOf] at hn ⊢
@@ -600,7 +601,7 @@ theorem MsigmaA_normal [Finite G] (hG : IsMinimalSimpleOdd G)
         rwa [SubmonoidClass.coe_pow, OneMemClass.coe_one] at h1
       · rw [Subgroup.map_le_iff_le_comap, Omega, Subgroup.closure_le]
         intro z hz
-        rw [Set.mem_setOf_eq, pow_one] at hz
+        rw [Set.mem_ofPred_eq, pow_one] at hz
         rw [SetLike.mem_coe, Subgroup.mem_comap]
         refine htrap (Op_g.subtype z) (hOpg_le_PW z.2) ?_
         rw [← map_pow, hz, map_one]
@@ -653,7 +654,7 @@ theorem MsigmaA_normal [Finite G] (hG : IsMinimalSimpleOdd G)
       intro h1
       exact hcent (le_trans (Subgroup.relIndex_eq_one.mp h1) inf_le_right)
     obtain ⟨q, hq_prime, hq_dvd_rel⟩ := Nat.exists_prime_and_dvd hrel_ne_one
-    haveI : Fact q.Prime := ⟨hq_prime⟩
+    have : Fact q.Prime := ⟨hq_prime⟩
     have hq_dvd_Kg : q ∣ Nat.card ↥K_g :=
       hq_dvd_rel.trans (Subgroup.index_dvd_card
         ((K_g ⊓ Subgroup.centralizer (A : Set G)).subgroupOf K_g))
@@ -715,7 +716,7 @@ theorem MsigmaA_normal [Finite G] (hG : IsMinimalSimpleOdd G)
           exact (orderOf_injective Q.subtype (Subgroup.subtype_injective Q) y).symm.trans
             (orderOf_injective _ (Subgroup.subtype_injective _) y₀)
         -- conjugation action of `↥A` on `↥Q`.
-        letI act : MulDistribMulAction ↥A ↥Q :=
+        let act : MulDistribMulAction ↥A ↥Q :=
           MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (Q : Set G))) ↥Q
             (Subgroup.inclusion hQ_syl.A_le_normalizer)
         set φ : ↥A →* MulAut ↥Q := MulDistribMulAction.toMulAut ↥A ↥Q with hφ_def
@@ -821,7 +822,7 @@ theorem MsigmaA_normal [Finite G] (hG : IsMinimalSimpleOdd G)
       apply hQ_ncent
       rw [hbot]
       exact bot_le
-    haveI hQ_nontriv : Nontrivial ↥Q := (Subgroup.nontrivial_iff_ne_bot Q).mpr hQ_ne_bot
+    have hQ_nontriv : Nontrivial ↥Q := (Subgroup.nontrivial_iff_ne_bot Q).mpr hQ_ne_bot
     set Q₀ : Subgroup G := (Subgroup.center ↥Q).map Q.subtype with hQ₀def
     have hQ₀_le_Q : Q₀ ≤ Q := by rw [hQ₀def]; exact Subgroup.map_subtype_le _
     have hQ₀_pg : IsPGroup q ↥Q₀ := hQ_syl.isPGroup.to_le hQ₀_le_Q
@@ -836,7 +837,7 @@ theorem MsigmaA_normal [Finite G] (hG : IsMinimalSimpleOdd G)
     have hQ₀_comm : IsMulCommutative ↥Q₀ :=
       isMulCommutative_of_mulEquiv
         (Subgroup.equivMapOfInjective _ _ Q.subtype_injective) inferInstance
-    haveI := hQ₀_comm
+    have := hQ₀_comm
     -- `Z(Q)` is characteristic in `Q`, so `N_G(Q) ≤ N_G(Q₀)`; in particular `A ≤ N_G(Q₀)`.
     have hN_le : Subgroup.normalizer (Q : Set G) ≤ Subgroup.normalizer (Q₀ : Set G) := by
       rw [hQ₀def]

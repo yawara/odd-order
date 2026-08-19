@@ -121,9 +121,9 @@ theorem lowerCentralLayerZeroRepresentation_isIrreducible_of_xiLengthTwo
   classical
   have hcomm_ne : _root_.commutator P ≠ (⊥ : Subgroup P) :=
     fun h => hncomm ((commutator_eq_bot_iff P).mp h)
-  letI : Nontrivial (_root_.commutator P) :=
+  let : Nontrivial (_root_.commutator P) :=
     (Subgroup.nontrivial_iff_ne_bot (_root_.commutator P)).mpr hcomm_ne
-  letI : Nontrivial P :=
+  let : Nontrivial P :=
     (_root_.commutator P).subtype_injective.nontrivial
   have hPhi_ne_bot : frattini P ≠ (⊥ : Subgroup P) := by
     rw [← (commutator_eq_frattini_and_frattini_eq_center
@@ -142,7 +142,7 @@ theorem lowerCentralLayerZeroRepresentation_isIrreducible_of_xiLengthTwo
     rw [show q0.ker = frattini P from
       layerZeroQuotientHom_ker_eq_frattini hP] at hxker
     exact hxker
-  letI : Nontrivial (lowerCentralLayer P 0) := ⟨q0 x0, 1, hqx0⟩
+  let : Nontrivial (lowerCentralLayer P 0) := ⟨q0 x0, 1, hqx0⟩
   have hPhi_bot :
       frattiniNormalInvariant Y.subtype ≠ normalInvariantBot Y.subtype := by
     intro h
@@ -156,7 +156,7 @@ theorem lowerCentralLayerZeroRepresentation_isIrreducible_of_xiLengthTwo
   have hbot_ne_top : (⊥ : Subrepresentation rho) ≠ ⊤ := by
     exact fun hEq => bot_ne_top
       (congrArg Subrepresentation.toSubmodule hEq)
-  letI : Nontrivial (Subrepresentation rho) :=
+  let : Nontrivial (Subrepresentation rho) :=
     ⟨⊥, ⊤, hbot_ne_top⟩
   refine IsSimpleOrder.of_forall_eq_top fun S hSne => ?_
   let Phi : Submodule (ZMod 2) (Additive (lowerCentralLayer P 0)) ≃o
@@ -192,8 +192,8 @@ theorem lowerCentralLayerZeroRepresentation_isIrreducible_of_xiLengthTwo
       rfl
     rw [heq]
     exact hacted
-  haveI : J.Normal := inferInstance
-  haveI : A.Normal := Subgroup.Normal.comap inferInstance q
+  have : J.Normal := inferInstance
+  have : A.Normal := Subgroup.Normal.comap inferInstance q
   let Ani : NormalInvariantSubgroup Y.subtype := ⟨A, inferInstance, hAinv⟩
   have hPhi_le_A : frattiniNormalInvariant Y.subtype ≤ Ani := by
     intro x hx
@@ -329,9 +329,9 @@ theorem involutions_ncard_eq_pow_finrank_lowerCentralLayer_one_sub_one
   classical
   have hcomm_ne : _root_.commutator P ≠ (⊥ : Subgroup P) :=
     fun h => hncomm ((commutator_eq_bot_iff P).mp h)
-  letI : Nontrivial (_root_.commutator P) :=
+  let : Nontrivial (_root_.commutator P) :=
     (Subgroup.nontrivial_iff_ne_bot (_root_.commutator P)).mpr hcomm_ne
-  letI : Nontrivial P :=
+  let : Nontrivial P :=
     (_root_.commutator P).subtype_injective.nontrivial
   have heq := commutator_eq_frattini_and_frattini_eq_center
     hP hncomm hxi hlen
@@ -395,9 +395,9 @@ theorem actor_card_odd_of_primeSupport_xiLengthTwo
     (hsupp : ∀ p : Nat, p.Prime → p ∣ Nat.card Y →
       p ∣ (involutions P).ncard) :
     Odd (Nat.card Y) := by
-  letI : Nontrivial (lowerCentralLayer P 1) :=
+  let : Nontrivial (lowerCentralLayer P 1) :=
     lowerCentralLayer_one_nontrivial_of_not_isMulCommutative hP hncomm
-  letI : Nontrivial (Additive (lowerCentralLayer P 1)) := inferInstance
+  let : Nontrivial (Additive (lowerCentralLayer P 1)) := inferInstance
   have hnpos : 0 < Module.finrank (ZMod 2)
       (Additive (lowerCentralLayer P 1)) := Module.finrank_pos
   have hcard :=
@@ -425,9 +425,9 @@ theorem lowerCentralLayer_zero_nontrivial_of_xiLengthTwo
     Nontrivial (lowerCentralLayer P 0) := by
   have hcomm_ne : _root_.commutator P ≠ (⊥ : Subgroup P) :=
     fun h => hncomm ((commutator_eq_bot_iff P).mp h)
-  letI : Nontrivial (_root_.commutator P) :=
+  let : Nontrivial (_root_.commutator P) :=
     (Subgroup.nontrivial_iff_ne_bot (_root_.commutator P)).mpr hcomm_ne
-  letI : Nontrivial P :=
+  let : Nontrivial P :=
     (_root_.commutator P).subtype_injective.nontrivial
   have hPhi_ne_top : frattini P ≠ (⊤ : Subgroup P) :=
     frattini_ne_top_of_nontrivial
@@ -488,15 +488,15 @@ theorem exists_originalXiActor_degree_dvd_and_odd_quotient_of_generator
     (Additive (lowerCentralLayer P 0))
   let n := Module.finrank (ZMod 2)
     (Additive (lowerCentralLayer P 1))
-  letI : IsCyclic Y := hxi.cyclic
-  letI : CommGroup Y := IsCyclic.commGroup
-  letI : Nontrivial (lowerCentralLayer P 0) :=
+  let : IsCyclic Y := hxi.cyclic
+  let : CommGroup Y := IsCyclic.commGroup
+  let : Nontrivial (lowerCentralLayer P 0) :=
     lowerCentralLayer_zero_nontrivial_of_xiLengthTwo
       hP hncomm hxi hlen
-  letI : Nontrivial (Additive (lowerCentralLayer P 0)) := inferInstance
-  letI : Nontrivial (lowerCentralLayer P 1) :=
+  let : Nontrivial (Additive (lowerCentralLayer P 0)) := inferInstance
+  let : Nontrivial (lowerCentralLayer P 1) :=
     lowerCentralLayer_one_nontrivial_of_not_isMulCommutative hP hncomm
-  letI : Nontrivial (Additive (lowerCentralLayer P 1)) := inferInstance
+  let : Nontrivial (Additive (lowerCentralLayer P 1)) := inferInstance
   have hm : 0 < m := Module.finrank_pos
   have hn : 0 < n := Module.finrank_pos
   have hcard : (involutions P).ncard = 2 ^ n - 1 :=
@@ -582,8 +582,8 @@ theorem exists_originalXiActor_degree_dvd_and_odd_quotient
         ({(mu c : GaloisField 2 m)} : Set (GaloisField 2 m)) = ⊤ ∧
       n ∣ m ∧ Odd (m / n) := by
   dsimp only
-  letI : IsCyclic Y := hxi.cyclic
-  letI : CommGroup Y := IsCyclic.commGroup
+  let : IsCyclic Y := hxi.cyclic
+  let : CommGroup Y := IsCyclic.commGroup
   obtain ⟨c, hcgen⟩ := IsCyclic.exists_generator (α := Y)
   obtain ⟨e, mu, hmu, hcompat, hlambdaOrder, hgen, hnm, hodd⟩ :=
     exists_originalXiActor_degree_dvd_and_odd_quotient_of_generator
@@ -865,9 +865,9 @@ theorem lowerCentralSquareMapAdditive_ne_zero_of_xiLengthTwo
           (agemo_one_eq_lowerCentralTerm_one hP hncomm hxi hlen)) u ≠ 0 := by
   have hcomm_ne : _root_.commutator P ≠ (⊥ : Subgroup P) :=
     fun h ↦ hncomm ((commutator_eq_bot_iff P).mp h)
-  letI : Nontrivial (_root_.commutator P) :=
+  let : Nontrivial (_root_.commutator P) :=
     (Subgroup.nontrivial_iff_ne_bot (_root_.commutator P)).mpr hcomm_ne
-  letI : Nontrivial P :=
+  let : Nontrivial P :=
     (_root_.commutator P).subtype_injective.nontrivial
   let hSq := lowerCentralSquaresLieInSecond_of_agemo_eq P
     (agemo_one_eq_lowerCentralTerm_one hP hncomm hxi hlen)

@@ -41,9 +41,9 @@ theorem card_Q0_inf_centralizer_eq_two :
     fc.toHypothesis.conjQ0.comp
       (Subgroup.inclusion (fc.P_le_V.trans fc.toHypothesis.V_le_D))
     with hactdef
-  letI : MulAction ↥fc.P ↥fc.toHypothesis.Q0 := MulAction.compHom _ actP
-  haveI : Fintype ↥fc.toHypothesis.Q0 := Fintype.ofFinite _
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  let : MulAction ↥fc.P ↥fc.toHypothesis.Q0 := MulAction.compHom _ actP
+  have : Fintype ↥fc.toHypothesis.Q0 := Fintype.ofFinite _
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
   have hP : IsPGroup fc.p ↥fc.P :=
     IsPGroup.of_card (by rw [fc.card_P, pow_one])
   have hmod := hP.card_modEq_card_fixedPoints ↥fc.toHypothesis.Q0
@@ -116,8 +116,8 @@ theorem fitting_eq_one_of_conjAction_fixed
     t = 1 := by
   obtain ⟨F, hField, hFinite, eQ, μ, σhom, hcardF, hσinj, hbridge,
       hunits, hfixmem⟩ := fc.exists_adapted_field_model
-  letI : Field F := hField
-  letI : Finite F := hFinite
+  let : Field F := hField
+  let : Finite F := hFinite
   have hμfix : ∀ g : ↥fc.P,
       σhom g ((μ t : Fˣ) : F) = ((μ t : Fˣ) : F) := by
     intro g
@@ -189,17 +189,17 @@ theorem exists_decomp_of_mem_V {v : G} (hv : v ∈ fc.toHypothesis.V) :
   -- the semilinear model bounds `|V̄|` by `|Aut F| = p`
   obtain ⟨F, hField, hFinite, A, hcardF, hVcyc, eQ, μ, νe,
       hT, hE, hκ, eL, hL1, hL2, hL3⟩ := fc.toHypothesis.exists_semilinear_equiv
-  letI : Field F := hField
-  letI : Finite F := hFinite
-  haveI : Fintype F := Fintype.ofFinite F
-  haveI : Finite (RingAut F) :=
+  let : Field F := hField
+  let : Finite F := hFinite
+  have : Fintype F := Fintype.ofFinite F
+  have : Finite (RingAut F) :=
     Finite.of_injective (DFunLike.coe : RingAut F → (F → F))
       DFunLike.coe_injective
   -- `F` has characteristic 2
   have hcardF2p : Fintype.card F = 2 ^ fc.p := by
     rw [← Nat.card_eq_fintype_card, hcardF, fc.card_Q0_eq_two_pow]
   set q := ringChar F with hqdef
-  haveI hqchar : CharP F q := ringChar.charP F
+  have hqchar : CharP F q := ringChar.charP F
   have hqprime : q.Prime := CharP.char_is_prime F q
   have hq2 : q = 2 := by
     obtain ⟨n, -, hn⟩ := FiniteField.card F q
@@ -208,9 +208,9 @@ theorem exists_decomp_of_mem_V {v : G} (hv : v ∈ fc.toHypothesis.V) :
       exact dvd_pow_self q (by exact_mod_cast n.ne_zero)
     exact (Nat.prime_dvd_prime_iff_eq hqprime Nat.prime_two).mp
       (hqprime.dvd_of_dvd_pow hdvd)
-  haveI : CharP F 2 := hq2 ▸ hqchar
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  letI : Algebra (ZMod 2) F := ZMod.algebra F 2
+  have : CharP F 2 := hq2 ▸ hqchar
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  let : Algebra (ZMod 2) F := ZMod.algebra F 2
   -- `|Aut F| = p`
   have hfinrank : Module.finrank (ZMod 2) F = fc.p := by
     have hpow : (2 : ℕ) ^ Module.finrank (ZMod 2) F = 2 ^ fc.p := by
@@ -293,9 +293,9 @@ theorem P_le_centralizer : fc.P ≤ Subgroup.centralizer (fc.P : Set G) := by
   intro g hg
   rw [Subgroup.mem_centralizer_iff]
   intro x hx
-  haveI : Fact fc.p.Prime := ⟨fc.p_prime⟩
-  haveI : IsCyclic ↥fc.P := isCyclic_of_prime_card fc.card_P
-  letI : CommGroup ↥fc.P := IsCyclic.commGroup
+  have : Fact fc.p.Prime := ⟨fc.p_prime⟩
+  have : IsCyclic ↥fc.P := isCyclic_of_prime_card fc.card_P
+  let : CommGroup ↥fc.P := IsCyclic.commGroup
   have hcomm : (⟨x, hx⟩ : ↥fc.P) * ⟨g, hg⟩ = ⟨g, hg⟩ * ⟨x, hx⟩ :=
     mul_comm _ _
   exact congrArg Subtype.val hcomm

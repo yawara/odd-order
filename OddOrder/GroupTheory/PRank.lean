@@ -108,8 +108,8 @@ theorem IsElementaryAbelian.card_eq_pow_finrank [Fact p.Prime] [Finite G]
     letI : IsMulCommutative G := IsMulCommutative.of_comm h.comm
     letI := h.zmodModule
     Nat.card G = p ^ Module.finrank (ZMod p) (Additive G) := by
-  letI : IsMulCommutative G := IsMulCommutative.of_comm h.comm
-  letI := h.zmodModule
+  let : IsMulCommutative G := IsMulCommutative.of_comm h.comm
+  let := h.zmodModule
   have hcard : Nat.card (Additive G) = Nat.card G := Nat.card_congr Additive.toMul
   have := FiniteField.pow_finrank_eq_natCard p (Additive G)
   rw [hcard] at this
@@ -125,8 +125,8 @@ theorem IsElementaryAbelian.log_card_eq_finrank [Fact p.Prime] [Finite G]
     letI : IsMulCommutative G := IsMulCommutative.of_comm h.comm
     letI := h.zmodModule
     Nat.log p (Nat.card G) = Module.finrank (ZMod p) (Additive G) := by
-  letI : IsMulCommutative G := IsMulCommutative.of_comm h.comm
-  letI := h.zmodModule
+  let : IsMulCommutative G := IsMulCommutative.of_comm h.comm
+  let := h.zmodModule
   rw [h.card_eq_pow_finrank, Nat.log_pow (Fact.out : p.Prime).one_lt]
 
 /-- Every additive subgroup of a `ZMod p`-module (`p` prime) has a lattice
@@ -155,9 +155,9 @@ elementary abelian normal subgroup needs to be decomposed. -/
 theorem IsElementaryAbelian.exists_isComplement' [Fact p.Prime]
     (hG : IsElementaryAbelian p G) (H : Subgroup G) :
     ∃ K : Subgroup G, H.IsComplement' K := by
-  letI : IsMulCommutative G := IsMulCommutative.of_comm hG.comm
-  letI : CommGroup G := inferInstance
-  letI := hG.zmodModule
+  let : IsMulCommutative G := IsMulCommutative.of_comm hG.comm
+  let : CommGroup G := inferInstance
+  let := hG.zmodModule
   obtain ⟨K', hsup', hinf'⟩ :=
     exists_addSubgroup_sup_top_inf_bot (p := p) (Subgroup.toAddSubgroup H)
   refine ⟨Subgroup.toAddSubgroup.symm K', ?_⟩
@@ -261,9 +261,9 @@ theorem IsElementaryAbelian.card_mulAut
     Nat.card (MulAut E) =
       ∏ i : Fin (Module.finrank (ZMod p) (Additive E)),
         (p ^ Module.finrank (ZMod p) (Additive E) - p ^ (i : ℕ)) := by
-  haveI : NeZero p := ⟨(Fact.out : p.Prime).ne_zero⟩
-  letI : IsMulCommutative E := IsMulCommutative.of_comm hE.comm
-  letI := hE.zmodModule
+  have : NeZero p := ⟨(Fact.out : p.Prime).ne_zero⟩
+  let : IsMulCommutative E := IsMulCommutative.of_comm hE.comm
+  let := hE.zmodModule
   rw [Nat.card_congr (hE.mulAutEquivGeneralLinearGroup).toEquiv,
       Matrix.card_GL_field, ZMod.card]
 
@@ -356,8 +356,8 @@ theorem prime_dvd_prime_sq_sub_one_of_orderOf_mulAut {p q : ℕ} [Fact p.Prime] 
     (hcard : Nat.card E ≤ p ^ 2) {σ : MulAut E} (hσ : orderOf σ = q) :
     q ∣ p ^ 2 - 1 := by
   have hp := (Fact.out : p.Prime)
-  letI : IsMulCommutative E := IsMulCommutative.of_comm hE.comm
-  letI := hE.zmodModule
+  let : IsMulCommutative E := IsMulCommutative.of_comm hE.comm
+  let := hE.zmodModule
   -- `q = |σ| ∣ |MulAut E| = ∏_{i<n}(pⁿ - pⁱ)`, `n = m(E) ≤ 2`.
   set n := Module.finrank (ZMod p) (Additive E) with hn
   have hcardE : Nat.card E = p ^ n := hE.card_eq_pow_finrank
@@ -481,7 +481,7 @@ This is the workhorse characterisation used throughout BG §4: bounding the `p`-
 equivalent to bounding `log_p` of the order of every elementary abelian `p`-subgroup. -/
 theorem pRank_le_iff [Finite G] {n : ℕ} :
     pRank G p ≤ n ↔ ∀ A : Subgroup G, A.IsElementaryAbelian p → Nat.log p (Nat.card A) ≤ n := by
-  haveI := pRank_index_nonempty (G := G) (p := p)
+  have := pRank_index_nonempty (G := G) (p := p)
   rw [pRank, ciSup_le_iff pRank_bddAbove]
   constructor
   · intro h A hA
@@ -523,7 +523,7 @@ theorem not_isCyclic_of_isElementaryAbelian_of_two_le_log_card [Finite G] {p : �
     · simp at hlog
   have hcard_ge : p ^ 2 ≤ Nat.card A :=
     (Nat.le_log_iff_pow_le hp_gt_one Nat.card_pos.ne').mp hlog
-  haveI : IsCyclic ↥A := hcyc
+  have : IsCyclic ↥A := hcyc
   have hExp_eq : Monoid.exponent ↥A = Nat.card ↥A := IsCyclic.exponent_eq_card
   have hExp_dvd_p : Monoid.exponent ↥A ∣ p := by
     rw [Monoid.exponent_dvd_iff_forall_pow_eq_one]
@@ -575,7 +575,7 @@ bound (`|G| = p^{log_p|G|} ≤ p^{pRank}`). -/
 theorem IsElementaryAbelian.log_card_le_pRank [Finite G] [Fact p.Prime]
     (hG : IsElementaryAbelian p G) :
     Nat.log p (Nat.card G) ≤ pRank G p := by
-  haveI : IsMulCommutative G := IsMulCommutative.of_comm hG.comm
+  have : IsMulCommutative G := IsMulCommutative.of_comm hG.comm
   have htop : (⊤ : Subgroup G).IsElementaryAbelian p :=
     IsElementaryAbelian.of_mulEquiv Subgroup.topEquiv.symm hG
   refine pow_le_card_of_le_pRank ⊤ htop ?_
@@ -684,10 +684,10 @@ cyclic has `p`-rank at most `2`. -/
 theorem card_le_prime_sq_of_isCyclic_of_index_le_prime [Finite G] [Fact p.Prime]
     {K : Subgroup G} (hK : IsCyclic ↥K) (hidx : K.index ≤ p)
     {E : Subgroup G} (hE : E.IsElementaryAbelian p) : Nat.card ↥E ≤ p ^ 2 := by
-  haveI := hK
+  have := hK
   -- `E ⊓ K` is cyclic of exponent dividing `p`, hence of order at most `p`.
   have hinf : Nat.card ↥(E ⊓ K) ≤ p := by
-    haveI : IsCyclic ↥(E ⊓ K) :=
+    have : IsCyclic ↥(E ⊓ K) :=
       (Subgroup.subgroupOfEquivOfLe (inf_le_right : E ⊓ K ≤ K)).isCyclic.mp inferInstance
     obtain ⟨g, hg⟩ := IsCyclic.exists_ofOrder_eq_natCard (α := ↥(E ⊓ K))
     have hgp : g ^ p = 1 := by
@@ -761,7 +761,7 @@ theorem pRank_le_rank [Finite G] (p : ℕ) [Fact p.Prime] : pRank G p ≤ rank G
 `rank G ≤ n ⟺ ∀ p` prime, `pRank G p ≤ n`. -/
 theorem rank_le_iff [Finite G] {n : ℕ} :
     rank G ≤ n ↔ ∀ p : ℕ, p.Prime → pRank G p ≤ n := by
-  haveI : Nonempty {p : ℕ // p.Prime} := ⟨⟨2, Nat.prime_two⟩⟩
+  have : Nonempty {p : ℕ // p.Prime} := ⟨⟨2, Nat.prime_two⟩⟩
   rw [rank, ciSup_le_iff rank_bddAbove]
   constructor
   · intro h p hp
@@ -776,7 +776,7 @@ theorem rank_le_of_injective [Finite G] {H : Type*} [Group H] [Finite H]
     rank H ≤ rank G := by
   rw [rank_le_iff]
   intro p hp
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   exact (pRank_le_of_injective hf).trans (pRank_le_rank (G := G) p)
 
 /-- **A nontrivial elementary abelian subgroup of a rank-≤-2 subgroup has order `p` or `p²`**

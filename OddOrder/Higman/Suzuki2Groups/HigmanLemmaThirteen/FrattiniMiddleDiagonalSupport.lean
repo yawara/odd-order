@@ -130,7 +130,7 @@ theorem
           frattiniMiddleCommutatorBilinearBaseChange (GaloisField 2 n)
             hP hxi hPhiComm hexists (f i) (g i)) := by
   classical
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   let beta := frattiniMiddleCommutatorBilinearBaseChange

@@ -87,12 +87,12 @@ theorem not_hasXiLengthAtLeastFour_of_isMulCommutative_of_pow_four
     (hcomm : IsMulCommutative A)
     (hfour : ∀ a : A, a ^ 4 = 1) :
     ¬ HasXiLengthAtLeastFour Y.subtype := by
-  letI : CommGroup A :=
+  let : CommGroup A :=
     { (inferInstance : Group A) with mul_comm := hcomm.is_comm.comm }
   intro hlen
   obtain ⟨ι, hι, e, _he, _hε, classify⟩ :=
     exists_homocyclic_and_invariant_eq_agemo hA Y.subtype htrans
-  letI : Fintype ι := hι
+  let : Fintype ι := hι
   have hAgemoTwo : Agemo A 2 2 = ⊥ := by
     rw [eq_bot_iff]
     intro x hx

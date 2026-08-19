@@ -154,7 +154,7 @@ theorem iterCommutator_normal {E F : Subgroup G} [E.Normal] [F.Normal] (n : ℕ)
   induction n with
   | zero => exact ‹E.Normal›
   | succ n ih =>
-    haveI := ih
+    have := ih
     rw [iterCommutator_succ]
     infer_instance
 
@@ -165,7 +165,7 @@ theorem iterCommutator_normal {E F : Subgroup G} [E.Normal] [F.Normal] (n : ℕ)
 `⁅iter, F⁆ ≤ iter`.) -/
 theorem iterCommutator_succ_le_self {E F : Subgroup G} [E.Normal] [F.Normal] (n : ℕ) :
     iterCommutator E F (n + 1) ≤ iterCommutator E F n := by
-  haveI : (iterCommutator E F n).Normal := iterCommutator_normal n
+  have : (iterCommutator E F n).Normal := iterCommutator_normal n
   rw [iterCommutator_succ]
   exact Subgroup.commutator_le_left (iterCommutator E F n) F
 
@@ -206,7 +206,7 @@ theorem le_centralizer_of_isMinimalNormal {E F : Subgroup G}
     [F.Normal] [Group.IsNilpotent ↥F] :
     E ≤ Subgroup.centralizer (F : Set G) := by
   classical
-  haveI hE_norm : E.Normal := hMin.1
+  have hE_norm : E.Normal := hMin.1
   rw [← Subgroup.commutator_eq_bot_iff_le_centralizer]
   -- Find smallest k with iter E F k = ⊥.
   have hExists : ∃ k, iterCommutator E F k = ⊥ :=
@@ -223,7 +223,7 @@ theorem le_centralizer_of_isMinimalNormal {E F : Subgroup G}
   have hIter_j_ne : iterCommutator E F j ≠ ⊥ := fun h => by
     have hjk : j < k := hj ▸ Nat.lt_succ_self j
     exact absurd (Nat.find_min' hExists h) (not_le.mpr hjk)
-  haveI : (iterCommutator E F j).Normal := iterCommutator_normal j
+  have : (iterCommutator E F j).Normal := iterCommutator_normal j
   have hIter_j_le : iterCommutator E F j ≤ E := iterCommutator_le_self j
   rcases hMin.2.2 _ inferInstance hIter_j_le with h_bot | h_eq_E
   · exact absurd h_bot hIter_j_ne
@@ -234,32 +234,32 @@ theorem le_centralizer_of_isMinimalNormal {E F : Subgroup G}
 
 /-- **Helper**: 部分群 `E` で `↥E` 可解 + 非自明 ⇒ `⁅E, E⁆ < E`.
 
-mathlib `IsSolvable.commutator_lt_of_ne_bot` は**環境** `[IsSolvable G]` を要求するが,
+mathlib `Group.IsSolvable.commutator_lt_of_ne_bot` は**環境** `[Group.IsSolvable G]` を要求するが,
 証明が実際に使うのは `↥E` の可解性だけ (`↥E` 内で `commutator_lt_top_of_nontrivial` を
 当てて `E.subtype` で押す). ambient の可解性を仮定しない Isaacs 3.11 で要る形.
 
-冪零の場合は mathlib instance `IsNilpotent.to_isSolvable` が `IsSolvable ↥E` を供給する
+冪零の場合は mathlib instance `IsNilpotent.to_isSolvable` が `Group.IsSolvable ↥E` を供給する
 ので, 呼び出し側は `[Group.IsNilpotent ↥E]` のままでよい. -/
 theorem commutator_lt_self_of_isSolvable_subtype
     {G : Type*} [Group G]
-    (E : Subgroup G) [IsSolvable ↥E] [Nontrivial ↥E] :
+    (E : Subgroup G) [Group.IsSolvable ↥E] [Nontrivial ↥E] :
     ⁅E, E⁆ < E := by
   rw [← E.range_subtype, MonoidHom.range_eq_map, ← Subgroup.map_commutator,
       Subgroup.map_subtype_lt_map_subtype]
-  exact IsSolvable.commutator_lt_top_of_nontrivial ↥E
+  exact Group.IsSolvable.commutator_lt_top_of_nontrivial ↥E
 
 /-- **Variant of Thm 3.11 part 1** (minimal normal nilpotent ⇒ abelian):
 `E ⊴ G` minimal normal + `↥E` 冪零 ⇒ `E` abelian.
 
-`solvable_minimal_normal_isAbelian` の `[IsSolvable G]` 仮定を `[Group.IsNilpotent ↥E]`
+`minimal_normal_isAbelian_of_isSolvable` の `[Group.IsSolvable G]` 仮定を `[Group.IsNilpotent ↥E]`
 に弱めた版. Lucchini K=⊥ で E ≤ F(G) (G は solvable と限らない) の場合に有用. -/
 theorem isCommutative_of_isMinimalNormal_of_isNilpotent_subtype
     {G : Type*} [Group G] [Finite G]
     {E : Subgroup G} (hMin : OddOrder.Isaacs.Ch02.IsMinimalNormal E)
     [Group.IsNilpotent ↥E] :
     ∀ x ∈ E, ∀ y ∈ E, x * y = y * x := by
-  haveI hEnormal : E.Normal := hMin.1
-  haveI hE_NT : Nontrivial ↥E := (Subgroup.nontrivial_iff_ne_bot E).mpr hMin.2.1
+  have hEnormal : E.Normal := hMin.1
+  have hE_NT : Nontrivial ↥E := (Subgroup.nontrivial_iff_ne_bot E).mpr hMin.2.1
   have hcomm_lt : ⁅E, E⁆ < E := commutator_lt_self_of_isSolvable_subtype E
   have hCommNormal : (⁅E, E⁆ : Subgroup G).Normal := inferInstance
   have hcomm_eq_bot : ⁅E, E⁆ = ⊥ := by
@@ -274,7 +274,7 @@ theorem isCommutative_of_isMinimalNormal_of_isNilpotent_subtype
 /-- **Variant of Thm 3.11**: minimal normal subgroup of finite group with `↥E` nilpotent
 ⇒ E is elementary abelian p-group for some prime p.
 
-`solvable_minimal_normal_isElementaryAbelian` の `[IsSolvable G]` 仮定を
+`minimal_normal_isElementaryAbelian_of_isSolvable` の `[Group.IsSolvable G]` 仮定を
 `[Group.IsNilpotent ↥E]` に弱めた版. 証明は Ch.3 既存版とほぼ同じだが abelianness 取得を
 `isCommutative_of_isMinimalNormal_of_isNilpotent_subtype` に置換.
 
@@ -285,16 +285,16 @@ theorem isElementaryAbelian_of_isMinimalNormal_of_isNilpotent_subtype
     {E : Subgroup G} (hMin : OddOrder.Isaacs.Ch02.IsMinimalNormal E)
     [Group.IsNilpotent ↥E] :
     ∃ p : ℕ, p.Prime ∧ E.IsElementaryAbelian p := by
-  haveI hEnormal : E.Normal := hMin.1
+  have hEnormal : E.Normal := hMin.1
   have hE_ne_bot : E ≠ ⊥ := hMin.2.1
   have habel := isCommutative_of_isMinimalNormal_of_isNilpotent_subtype hMin
-  haveI hEcomm : IsMulCommutative ↥E :=
+  have hEcomm : IsMulCommutative ↥E :=
     ⟨⟨fun a b => Subtype.ext (habel a a.2 b b.2)⟩⟩
-  haveI hEnt : Nontrivial ↥E := (Subgroup.nontrivial_iff_ne_bot E).mpr hE_ne_bot
+  have hEnt : Nontrivial ↥E := (Subgroup.nontrivial_iff_ne_bot E).mpr hE_ne_bot
   have hE_card_pos : 1 < Nat.card ↥E := Finite.one_lt_card
   obtain ⟨p, hp_prime, hp_dvd⟩ := Nat.exists_prime_and_dvd hE_card_pos.ne'
   refine ⟨p, hp_prime, ?_⟩
-  haveI hpFact : Fact p.Prime := ⟨hp_prime⟩
+  have hpFact : Fact p.Prime := ⟨hp_prime⟩
   -- T = {x : ↥E | x^p = 1} as Subgroup ↥E.
   let T : Subgroup ↥E :=
     { carrier := {x | x ^ p = 1}
@@ -312,7 +312,7 @@ theorem isElementaryAbelian_of_isMinimalNormal_of_isNilpotent_subtype
         change a⁻¹ ^ p = 1
         change a ^ p = 1 at ha
         rw [inv_pow, ha, inv_one] }
-  haveI hT_char : T.Characteristic := by
+  have hT_char : T.Characteristic := by
     rw [Subgroup.characteristic_iff_le_comap]
     intro φ x hx
     rw [Subgroup.mem_comap]
@@ -331,7 +331,7 @@ theorem isElementaryAbelian_of_isMinimalNormal_of_isNilpotent_subtype
     have hx_T : x ∈ T := hx_pow
     rw [hbot, Subgroup.mem_bot] at hx_T
     exact hx_ne_one hx_T
-  haveI hTE_normal : (T.map E.subtype).Normal := inferInstance
+  have hTE_normal : (T.map E.subtype).Normal := inferInstance
   have hTE_le_E : T.map E.subtype ≤ E := by
     rintro _ ⟨y, _, rfl⟩
     exact y.2
@@ -384,9 +384,9 @@ theorem exists_isMinimalNormal_le_fitting_le_centralizer_fitting
   obtain ⟨E, hMin, hEle⟩ :=
     OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal _ hFne
   -- ↥E nilpotent via E ≤ F(G) + subgroupOfEquivOfLe.
-  haveI hFNilp : Group.IsNilpotent ↥(OddOrder.Isaacs.Ch01.fitting G) :=
+  have hFNilp : Group.IsNilpotent ↥(OddOrder.Isaacs.Ch01.fitting G) :=
     OddOrder.Isaacs.Ch01.fitting.isNilpotent
-  haveI hENilp : Group.IsNilpotent ↥E :=
+  have hENilp : Group.IsNilpotent ↥E :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hEle)
   -- E elem abelian p-group.
   obtain ⟨p, hp_prime, hElem⟩ :=
@@ -484,7 +484,7 @@ private theorem lucchini_aux : ∀ n : ℕ,
     · exact ih hsmall hAprop hAab hAcyc
     -- |G| = n+1 exactly.
     set K := A.normalCore with hKdef
-    haveI hKnormal : K.Normal := A.normalCore_normal
+    have hKnormal : K.Normal := A.normalCore_normal
     have hK_le_A : K ≤ A := Subgroup.normalCore_le A
     by_cases hK_bot : K = ⊥
     · -- K = ⊥ case: inline Step 1-6 proof.
@@ -498,10 +498,10 @@ private theorem lucchini_aux : ∀ n : ℕ,
       push Not at hNotLt
       -- hNotLt : A.index ≤ Nat.card ↥A.
       -- G nontrivial: A < ⊤ より.
-      haveI hGnontrivial : Nontrivial G := by
+      have hGnontrivial : Nontrivial G := by
         by_contra hcon
         rw [not_nontrivial_iff_subsingleton] at hcon
-        haveI := hcon
+        have := hcon
         have hAtop : A = ⊤ := by
           ext x
           refine ⟨fun _ => Subgroup.mem_top _, fun _ => ?_⟩
@@ -511,11 +511,11 @@ private theorem lucchini_aux : ∀ n : ℕ,
       -- Step 1-2: Get minimal normal E ≤ F(G), E ≤ Z(F(G)), E elem abelian p-group.
       obtain ⟨E, p, hp_prime, hMinE, hE_le_fit, hE_le_cent_fit, hE_elemAb⟩ :=
         exists_isMinimalNormal_le_fitting_le_centralizer_fitting hAab hNotLt
-      haveI hEnormal : E.Normal := hMinE.1
+      have hEnormal : E.Normal := hMinE.1
       have hE_ne_bot : E ≠ ⊥ := hMinE.2.1
-      haveI hEnontrivial : Nontrivial ↥E := (Subgroup.nontrivial_iff_ne_bot E).mpr hE_ne_bot
+      have hEnontrivial : Nontrivial ↥E := (Subgroup.nontrivial_iff_ne_bot E).mpr hE_ne_bot
       have hp_pos : 0 < p := hp_prime.pos
-      haveI hp_fact : Fact p.Prime := ⟨hp_prime⟩
+      have hp_fact : Fact p.Prime := ⟨hp_prime⟩
       -- A ∩ F(G) ≠ ⊥ via Cor 2.19.
       have hAcapF_ne : A ⊓ OddOrder.Isaacs.Ch01.fitting G ≠ ⊥ :=
         OddOrder.Isaacs.Ch02.inf_fitting_ne_bot_of_abelian_card_ge_index hAab hNotLt
@@ -618,8 +618,8 @@ private theorem lucchini_aux : ∀ n : ℕ,
       -- Define M = comap (mk' E) (Ā.normalCore).
       set Mbar := Ā.normalCore with hMbar_def
       set M : Subgroup G := Subgroup.comap f Mbar with hM_def
-      haveI hMbar_norm : Mbar.Normal := Subgroup.normalCore_normal Ā
-      haveI hM_norm : M.Normal := hMbar_norm.comap f
+      have hMbar_norm : Mbar.Normal := Subgroup.normalCore_normal Ā
+      have hM_norm : M.Normal := hMbar_norm.comap f
       -- E ≤ M.
       have hE_le_M : E ≤ M := by
         intro x hxE
@@ -644,11 +644,11 @@ private theorem lucchini_aux : ∀ n : ℕ,
       -- B ≤ A.
       have hB_le_A : B ≤ A := inf_le_left
       have hB_le_M : B ≤ M := inf_le_right
-      haveI hA_cyclic_subtype : IsCyclic A := by
+      have hA_cyclic_subtype : IsCyclic A := by
         obtain ⟨g, hg⟩ := hAcyc
         rw [hg]
         infer_instance
-      haveI hB_cyclic : IsCyclic B := Subgroup.isCyclic_of_le hB_le_A
+      have hB_cyclic : IsCyclic B := Subgroup.isCyclic_of_le hB_le_A
       have hM_le_EA : M ≤ E ⊔ A := by
         simpa [sup_comm] using hM_le_AE
       -- Dedekind: `M ≤ E ⊔ A` and `E ≤ M` give `M = E ⊔ (M ⊓ A) = E ⊔ B`.
@@ -657,9 +657,9 @@ private theorem lucchini_aux : ∀ n : ℕ,
         simpa [inf_comm] using
           Subgroup.eq_sup_inf_of_le_sup_of_normal_of_le
             (E := E) (A := A) (M := M) hE_le_M hM_le_EA
-      haveI hE_subM_normal : (E.subgroupOf M).Normal := hEnormal.subgroupOf M
+      have hE_subM_normal : (E.subgroupOf M).Normal := hEnormal.subgroupOf M
       let qM : M →* M ⧸ E.subgroupOf M := QuotientGroup.mk' (E.subgroupOf M)
-      haveI hB_subM_cyclic : IsCyclic (B.subgroupOf M) := by
+      have hB_subM_cyclic : IsCyclic (B.subgroupOf M) := by
         rw [(Subgroup.subgroupOfEquivOfLe hB_le_M).isCyclic]
         infer_instance
       have hqB_surj : Function.Surjective (qM.comp (B.subgroupOf M).subtype) := by
@@ -676,7 +676,7 @@ private theorem lucchini_aux : ∀ n : ℕ,
         change ((b⁻¹ * (m : G)) ∈ E)
         rw [← hmb]
         simpa [mul_assoc] using hEnormal.conj_mem' e he b
-      haveI hM_mod_E_cyclic : IsCyclic (M ⧸ E.subgroupOf M) :=
+      have hM_mod_E_cyclic : IsCyclic (M ⧸ E.subgroupOf M) :=
         isCyclic_of_surjective (qM.comp (B.subgroupOf M).subtype) hqB_surj
       have hM_comm_of_E_central
           (hE_cent : E.subgroupOf M ≤ Subgroup.center M) :
@@ -807,14 +807,14 @@ private theorem lucchini_aux : ∀ n : ℕ,
       -- Step 6: M abelian / nonabelian split.
       by_cases hM_ab : ∀ x y : M, x * y = y * x
       · -- Abelian case: the `p`-power image is normal in `G` and lies in `A`, hence is trivial.
-        letI : CommGroup M := { (inferInstance : Group M) with
+        let : CommGroup M := { (inferInstance : Group M) with
           mul_comm := hM_ab }
         let φ : M →* M := powMonoidHom p
         let R : Subgroup M := φ.range
-        haveI hR_char : R.Characteristic := by
+        have hR_char : R.Characteristic := by
           dsimp [R, φ]
           infer_instance
-        haveI hR_map_normal : (R.map M.subtype).Normal := inferInstance
+        have hR_map_normal : (R.map M.subtype).Normal := inferInstance
         have hR_map_le_A : R.map M.subtype ≤ A := by
           rintro x ⟨m, hmR, rfl⟩
           obtain ⟨m0, hm0⟩ := hmR
@@ -858,7 +858,7 @@ private theorem lucchini_aux : ∀ n : ℕ,
           have h_ord_le : orderOf b0 ≤ p := Nat.le_of_dvd hp_pos h_ord_dvd
           rw [← orderOf_eq_card_of_zpowers_eq_top hb0]
           exact h_ord_le
-        haveI hB_subM_normal : (B.subgroupOf M).Normal := inferInstance
+        have hB_subM_normal : (B.subgroupOf M).Normal := inferInstance
         let qB : M →* M ⧸ B.subgroupOf M := QuotientGroup.mk' (B.subgroupOf M)
         have hE_pgroup : IsPGroup p E := by
           intro e
@@ -915,8 +915,8 @@ private theorem lucchini_aux : ∀ n : ℕ,
         have hEinfZ_bot : E.subgroupOf M ⊓ ZM = ⊥ := by
           let ZG : Subgroup G := ZM.map M.subtype
           let C : Subgroup G := E ⊓ ZG
-          haveI hZG_normal : ZG.Normal := inferInstance
-          haveI hC_normal : C.Normal := inferInstance
+          have hZG_normal : ZG.Normal := inferInstance
+          have hC_normal : C.Normal := inferInstance
           have hC_le_E : C ≤ E := inf_le_left
           rcases hMinE.2.2 C hC_normal hC_le_E with hC_bot | hC_eq_E
           · apply le_bot_iff.mp
@@ -952,11 +952,11 @@ private theorem lucchini_aux : ∀ n : ℕ,
           have hzInf : (z : M) ∈ E.subgroupOf M ⊓ ZM := ⟨hzE, z.property⟩
           rw [hEinfZ_bot, Subgroup.mem_bot] at hzInf
           exact Subgroup.mem_bot.mpr (Subtype.ext hzInf)
-        haveI hZM_cyclic : IsCyclic ZM := isCyclic_of_injective qZ hqZ_inj
+        have hZM_cyclic : IsCyclic ZM := isCyclic_of_injective qZ hqZ_inj
         have hM_ne_bot : M ≠ ⊥ := by
           intro hM_bot
           exact hE_ne_bot (le_bot_iff.mp (hE_le_M.trans (le_of_eq hM_bot)))
-        haveI hM_nontrivial : Nontrivial M :=
+        have hM_nontrivial : Nontrivial M :=
           (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
         let H : Subgroup M := B.subgroupOf M ⊓ OddOrder.Isaacs.Ch01.fitting M
         have hBsubM_ab : ∀ a ∈ B.subgroupOf M, ∀ b ∈ B.subgroupOf M, a * b = b * a := by
@@ -1002,9 +1002,9 @@ private theorem lucchini_aux : ∀ n : ℕ,
             _ = (e * (x : G)) * b := by group
             _ = ((x : G) * e) * b := by rw [he_comm_x]
             _ = (x : G) * (e * b) := by group
-        haveI hH_char : H.Characteristic :=
+        have hH_char : H.Characteristic :=
           characteristic_of_le_center_of_isCyclic_center hH_le_center
-        haveI hH_map_normal : (H.map M.subtype).Normal := inferInstance
+        have hH_map_normal : (H.map M.subtype).Normal := inferInstance
         have hH_map_le_A : H.map M.subtype ≤ A := by
           rintro x ⟨y, hy, rfl⟩
           exact hB_le_A (Subgroup.mem_subgroupOf.mp hy.1)
@@ -1042,7 +1042,7 @@ private theorem lucchini_aux : ∀ n : ℕ,
         rw [← hfa, ← hfb, ← map_mul, ← map_mul, hAab a haA b hbA]
       -- |G/K| ≤ n.
       have hKnonbot_card : 2 ≤ Nat.card ↥K := by
-        haveI : Nontrivial ↥K := (Subgroup.nontrivial_iff_ne_bot K).mpr hK_bot
+        have : Nontrivial ↥K := (Subgroup.nontrivial_iff_ne_bot K).mpr hK_bot
         exact Finite.one_lt_card
       have hquot_card : Nat.card (G ⧸ K) ≤ n := by
         have heq : Nat.card G = Nat.card (G ⧸ K) * Nat.card ↥K :=

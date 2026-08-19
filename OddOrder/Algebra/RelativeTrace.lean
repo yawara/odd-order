@@ -100,7 +100,7 @@ theorem sum_smul_eq_relTrace {K H : Subgroup G} {a : A} (ha : ∀ g ∈ K, g •
     (hbij : Function.Bijective fun i =>
       (QuotientGroup.mk ⟨f i, hf i⟩ : ↥H ⧸ K.subgroupOf H)) :
     ∑ i, f i • a = relTrace K H a := by
-  letI := Fintype.ofFinite (↥H ⧸ K.subgroupOf H)
+  let := Fintype.ofFinite (↥H ⧸ K.subgroupOf H)
   change ∑ i, f i • a = ∑ x : ↥H ⧸ K.subgroupOf H, ((x.out : ↥H) : G) • a
   refine Fintype.sum_bijective _ hbij _ (fun x => ((x.out : ↥H) : G) • a) fun i => ?_
   exact smul_eq_smul_of_mk_eq (u := ⟨f i, hf i⟩) ha (QuotientGroup.out_eq' _).symm
@@ -134,7 +134,7 @@ representation is such a `χ` on `𝒪[G]` under conjugation, so writing a block
 theorem map_relTrace {M : Type*} [AddCommMonoid M] (χ : A →+ M)
     (hχ : ∀ (g : G) (a : A), χ (g • a) = χ a) (K H : Subgroup G) (a : A) :
     χ (relTrace K H a) = (K.relIndex H) • χ a := by
-  letI := Fintype.ofFinite (↥H ⧸ K.subgroupOf H)
+  let := Fintype.ofFinite (↥H ⧸ K.subgroupOf H)
   simp only [relTrace, map_sum, hχ, Finset.sum_const, Finset.card_univ]
   rw [← Nat.card_eq_fintype_card]
   rfl
@@ -142,7 +142,7 @@ theorem map_relTrace {M : Type*} [AddCommMonoid M] (χ : A →+ M)
 /-- `Tr^H_K(a)` is fixed by `H` whenever `a` is fixed by `K`. -/
 theorem smul_relTrace {K H : Subgroup G} {a : A} (ha : ∀ g ∈ K, g • a = a) {g : G} (hg : g ∈ H) :
     g • relTrace K H a = relTrace K H a := by
-  letI := Fintype.ofFinite (↥H ⧸ K.subgroupOf H)
+  let := Fintype.ofFinite (↥H ⧸ K.subgroupOf H)
   have hf : ∀ x : ↥H ⧸ K.subgroupOf H, g * ((x.out : ↥H) : G) ∈ H :=
     fun x => H.mul_mem hg (x.out).2
   have hrw : ∀ x : ↥H ⧸ K.subgroupOf H,
@@ -197,9 +197,9 @@ of ideals of `A^H` that *decreases* as `K` shrinks. -/
 theorem relTrace_trans {L K H : Subgroup G} (hLK : L ≤ K) (hKH : K ≤ H) {a : A}
     (ha : ∀ g ∈ L, g • a = a) :
     relTrace K H (relTrace L K a) = relTrace L H a := by
-  letI := Fintype.ofFinite (↥H ⧸ K.subgroupOf H)
-  letI := Fintype.ofFinite (↥K ⧸ L.subgroupOf K)
-  letI := Fintype.ofFinite (↥H ⧸ L.subgroupOf H)
+  let := Fintype.ofFinite (↥H ⧸ K.subgroupOf H)
+  let := Fintype.ofFinite (↥K ⧸ L.subgroupOf K)
+  let := Fintype.ofFinite (↥H ⧸ L.subgroupOf H)
   set f : (↥H ⧸ K.subgroupOf H) × (↥K ⧸ L.subgroupOf K) → G :=
     fun i => ((i.1.out : ↥H) : G) * ((i.2.out : ↥K) : G) with hfdef
   have hf : ∀ i, f i ∈ H := fun i => H.mul_mem (i.1.out).2 (hKH (i.2.out).2)
@@ -262,7 +262,7 @@ This is what makes the family of ideals `A^H_K` behave under conjugation, and he
 defect groups a single conjugacy class. -/
 theorem relTrace_conj (c : G) {K H : Subgroup G} {a : A} (ha : ∀ g ∈ K, g • a = a) :
     relTrace (MulAut.conj c • K) (MulAut.conj c • H) (c • a) = c • relTrace K H a := by
-  letI := Fintype.ofFinite (↥H ⧸ K.subgroupOf H)
+  let := Fintype.ofFinite (↥H ⧸ K.subgroupOf H)
   have hconj : ∀ x : G, (MulAut.conj c) • x = c * x * c⁻¹ := fun _ => rfl
   have hmemK : ∀ x : G, c * x * c⁻¹ ∈ MulAut.conj c • K ↔ x ∈ K := fun x => by
     rw [← hconj]; exact Subgroup.smul_mem_pointwise_smul_iff
@@ -311,7 +311,7 @@ variable [Semiring A] [MulSemiringAction G A]
 
 /-- `Tr^H_K(1) = [H : K] · 1`. -/
 theorem relTrace_one (K H : Subgroup G) : relTrace K H (1 : A) = (K.relIndex H) • (1 : A) := by
-  letI := Fintype.ofFinite (↥H ⧸ K.subgroupOf H)
+  let := Fintype.ofFinite (↥H ⧸ K.subgroupOf H)
   simp only [relTrace, smul_one, Finset.sum_const, Finset.card_univ]
   rw [← Nat.card_eq_fintype_card]
   rfl
@@ -319,14 +319,14 @@ theorem relTrace_one (K H : Subgroup G) : relTrace K H (1 : A) = (K.relIndex H) 
 /-- **Projection formula** (right version): `Tr^H_K` is right `A^H`-linear. -/
 theorem relTrace_mul_of_fixed {K H : Subgroup G} {b : A} (hb : ∀ g ∈ H, g • b = b) (a : A) :
     relTrace K H (a * b) = relTrace K H a * b := by
-  letI := Fintype.ofFinite (↥H ⧸ K.subgroupOf H)
+  let := Fintype.ofFinite (↥H ⧸ K.subgroupOf H)
   simp only [relTrace, Finset.sum_mul, smul_mul']
   exact Finset.sum_congr rfl fun x _ => by rw [hb _ (x.out).2]
 
 /-- **Projection formula** (left version): `Tr^H_K` is left `A^H`-linear. -/
 theorem mul_relTrace_of_fixed {K H : Subgroup G} {b : A} (hb : ∀ g ∈ H, g • b = b) (a : A) :
     relTrace K H (b * a) = b * relTrace K H a := by
-  letI := Fintype.ofFinite (↥H ⧸ K.subgroupOf H)
+  let := Fintype.ofFinite (↥H ⧸ K.subgroupOf H)
   simp only [relTrace, Finset.mul_sum, smul_mul']
   exact Finset.sum_congr rfl fun x _ => by rw [hb _ (x.out).2]
 

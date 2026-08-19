@@ -261,8 +261,8 @@ theorem skewPair_edge_weight_ne_zero {e : ℕ}
 theorem not_isSquare_neg_one_galois (hp : p = 3) (hq0 : q ≠ 0) (hqodd : Odd q) :
     ¬IsSquare (-1 : GaloisField p q) := by
   subst hp
-  letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
-  haveI : CharP (GaloisField 3 q) 3 := by
+  let : Fintype (GaloisField 3 q) := Fintype.ofFinite _
+  have : CharP (GaloisField 3 q) 3 := by
     rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
     exact ZMod.charP 3
   have hchar2 : ringChar (GaloisField 3 q) ≠ 2 := by
@@ -281,8 +281,8 @@ theorem not_isSquare_neg_one_galois (hp : p = 3) (hq0 : q ≠ 0) (hqodd : Odd q)
 theorem isSquare_or_isSquare_neg_galois (hp : p = 3) (hq0 : q ≠ 0) (hqodd : Odd q)
     {a : GaloisField p q} (ha : a ≠ 0) : IsSquare a ∨ IsSquare (-a) := by
   subst hp
-  letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
-  haveI : CharP (GaloisField 3 q) 3 := by
+  let : Fintype (GaloisField 3 q) := Fintype.ofFinite _
+  have : CharP (GaloisField 3 q) 3 := by
     rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
     exact ZMod.charP 3
   have hchar2 : ringChar (GaloisField 3 q) ≠ 2 := by

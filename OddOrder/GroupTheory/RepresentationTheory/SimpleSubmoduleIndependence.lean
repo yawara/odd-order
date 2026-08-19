@@ -55,7 +55,7 @@ theorem iSupIndep_of_pairwise_not_linearEquiv_of_isSimpleModule
   have hsimple_s : ∀ m : s, IsSimpleModule R (m : Submodule R M) := by
     rintro ⟨_, j, _, rfl⟩
     exact hsimple j
-  haveI : IsSimpleModule R (W i) := hsimple i
+  have : IsSimpleModule R (W i) := hsimple i
   -- `W i` is an atom of `Submodule R M`, so any submodule below it is `⊥` or all of `W i`.
   have hatom : IsAtom (W i) := isSimpleModule_iff_isAtom.mp (hsimple i)
   rcases hatom.le_iff.mp (inf_le_left : W i ⊓ sSup s ≤ W i) with h | h

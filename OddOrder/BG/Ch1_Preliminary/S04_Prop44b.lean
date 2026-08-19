@@ -78,7 +78,7 @@ theorem centralizer_eq_dprod_of_isSCN_of_sylow {p : ℕ} [Fact p.Prime] {G : Typ
         = Subgroup.centralizer (A'.map (R : Subgroup G).subtype : Set G) ∧
       ∀ a ∈ A'.map (R : Subgroup G).subtype, ∀ h ∈ H, a * h = h * a := by
   classical
-  haveI hA'comm : IsMulCommutative A' := hA'.isMulCommutative
+  have hA'comm : IsMulCommutative A' := hA'.isMulCommutative
   set A : Subgroup G := A'.map (R : Subgroup G).subtype with hAdef
   set C : Subgroup G := Subgroup.centralizer (A : Set G) with hCdef
   set M : Subgroup G := Subgroup.normalizer (A : Set G) with hMdef
@@ -133,7 +133,7 @@ theorem centralizer_eq_dprod_of_isSCN_of_sylow {p : ℕ} [Fact p.Prime] {G : Typ
   -- `C ≤ M`.
   have hCM : C ≤ M := Subgroup.centralizer_le_normalizer _
   -- `C ⊴ M` (as `C_G(A) ⊴ N_G(A)`).
-  haveI hN₀M : (C.subgroupOf M).Normal :=
+  have hN₀M : (C.subgroupOf M).Normal :=
     Subgroup.normal_subgroupOf_centralizer_normalizer _
   -- Apply the Sylow-in-normal fact to `R` (Sylow of `M`) and `C ⊴ M`.
   have hnotdvd : ¬ p ∣ ((R : Subgroup G).subgroupOf M).relIndex (C.subgroupOf M) := by
@@ -159,7 +159,7 @@ theorem centralizer_eq_dprod_of_isSCN_of_sylow {p : ℕ} [Fact p.Prime] {G : Typ
   have hcop' : Nat.Coprime (Nat.card ↥(A.subgroupOf C)) (A.subgroupOf C).index := by
     rw [hcardN₀]; exact hcop
   -- `A.subgroupOf C ⊴ C` (indeed `A` central in `C`).
-  haveI hN₀C : (A.subgroupOf C).Normal := by
+  have hN₀C : (A.subgroupOf C).Normal := by
     constructor
     intro n hn c
     rw [Subgroup.mem_subgroupOf] at hn ⊢

@@ -47,7 +47,7 @@ theorem card_abelianization_eq_prime_sq_of_card_eq_prime_cube {K : Type*} [Group
     {p : ℕ} (hp : p.Prime) (hcard : Nat.card K = p ^ 3)
     (hnonab : ¬ IsMulCommutative K) :
     Nat.card (Abelianization K) = p ^ 2 := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hext : IsExtraspecial p K :=
     IsExtraspecial.of_card_eq_prime_cube hcard fun hcomm => hnonab ⟨⟨hcomm⟩⟩
   have hcomm_card : Nat.card ↥(commutator K) = p := hext.commutator_card
@@ -75,7 +75,7 @@ theorem Hypothesis.w1_mul_SHCcount_add_one_eq_of_card_eq_prime_cube [Finite G] {
     hyp.w1 * (Finset.univ.filter fun χ : IrreducibleCharacter ↥M =>
       (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
         (χ : ClassFunction ↥M ℂ) 1 = (hyp.w1 : ℂ)).card + 1 = p ^ 2 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have horbit := hyp.card_abelianization_derived_eq_w1_mul_card_SHCSet_add_one hG
   rw [card_abelianization_eq_prime_sq_of_card_eq_prime_cube hp hcard hnonab] at horbit
@@ -94,7 +94,7 @@ theorem Hypothesis.SHCcount_eq_of_card_eq_prime_cube [Finite G] {M : Subgroup G}
     ((Finset.univ.filter fun χ : IrreducibleCharacter ↥M =>
       (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
         (χ : ClassFunction ↥M ℂ) 1 = (hyp.w1 : ℂ)).card : ℤ) = 4 * (hyp.w1 : ℤ) - 4 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hZ : (p : ℤ) ^ 2 = (hyp.w1 : ℤ)
       * ((Finset.univ.filter fun χ : IrreducibleCharacter ↥M =>
@@ -121,7 +121,7 @@ theorem Hypothesis.eight_le_SHCcount_of_card_eq_prime_cube [Finite G] {M : Subgr
     8 ≤ (Finset.univ.filter fun χ : IrreducibleCharacter ↥M =>
       (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
         (χ : ClassFunction ↥M ℂ) 1 = (hyp.w1 : ℂ)).card := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hcardeq := hyp.SHCcount_eq_of_card_eq_prime_cube hG hp hcard hnonab hp2w1 hw13
   have hw13' : (3 : ℤ) ≤ (hyp.w1 : ℤ) := by exact_mod_cast hw13
@@ -141,8 +141,8 @@ theorem Hypothesis.W2_eq_secondDerivedInAmbient_of_card_eq_prime_cube [Finite G]
     (hcard : Nat.card ↥((derivedInG M).subgroupOf M) = p ^ 3)
     (hnonab : ¬ IsMulCommutative ↥((derivedInG M).subgroupOf M)) :
     hyp.typeP.W2 = secondDerivedInAmbient M := by
-  haveI := hyp.finiteG
-  haveI : Fact p.Prime := ⟨hp⟩
+  have := hyp.finiteG
+  have : Fact p.Prime := ⟨hp⟩
   have hext : IsExtraspecial p ↥((derivedInG M).subgroupOf M) :=
     IsExtraspecial.of_card_eq_prime_cube hcard fun hcomm => hnonab ⟨⟨hcomm⟩⟩
   have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
@@ -198,16 +198,16 @@ theorem Hypothesis.linear_of_induce_isIrreducible_of_card_eq_prime_cube [Finite 
     (hirr : IsIrreducibleCharacter (ClassFunction.induce ((derivedInG M).subgroupOf M)
       (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ))) :
     (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1 := by
-  haveI := hyp.finiteG
-  haveI : Fact p.Prime := ⟨hp⟩
+  have := hyp.finiteG
+  have : Fact p.Prime := ⟨hp⟩
   classical
   -- the §6 certain-type hypothesis and its instances (as in
   -- `reducible_mem_inducedKernelFamily_eq_muGrid_columnSum`)
   let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
-  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
-  letI : Fintype ↥M := Fintype.ofFinite _
-  letI : Fintype ↥h.K := Fintype.ofFinite _
-  letI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  let : Fintype ↥M := Fintype.ofFinite _
+  let : Fintype ↥h.K := Fintype.ofFinite _
+  let : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
   -- natural degrees `dg` on `Irr M′`
   choose dg dgpos hdgeq using fun χ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
     irreducibleCharacter_apply_one_eq_pos_natCast χ
@@ -389,7 +389,7 @@ theorem Hypothesis.mem_SHCSet_or_eq_muGrid_columnSum_of_card_eq_prime_cube [Fini
     (hnonab : ¬ IsMulCommutative ↥((derivedInG M).subgroupOf M)) :
     ∀ φ ∈ hyp.Sset, φ ∈ hyp.SHCSet ∨
       ∃ j : Fin hyp.w2, j ≠ 0 ∧ φ = ∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   intro φ hφS
   have hφmem : φ ∈ inducedFamily M := hφS
@@ -409,12 +409,12 @@ theorem Hypothesis.mem_SHCSet_or_eq_muGrid_columnSum_of_card_eq_prime_cube [Fini
     -- `reducible_mem_inducedKernelFamily_eq_muGrid_columnSum`)
     right
     let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
-    haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
-    haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-    letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
-    letI : Fintype ↥M := Fintype.ofFinite _
-    letI : Fintype ↥h.K := Fintype.ofFinite _
-    letI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+    have hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+    have hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+    let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+    let : Fintype ↥M := Fintype.ofFinite _
+    let : Fintype ↥h.K := Fintype.ofFinite _
+    let : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
     have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
     have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
     have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
@@ -422,7 +422,7 @@ theorem Hypothesis.mem_SHCSet_or_eq_muGrid_columnSum_of_card_eq_prime_cube [Fini
     have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
       rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
       exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-    haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+    have hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
     have hFk : ∀ j : Fin hyp.w2, (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j)
         = ClassFunction.induce h.K
             ((h.chiRestrict (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)))
@@ -479,8 +479,8 @@ theorem Hypothesis.muGrid_degree_eq_prime_of_card_eq_prime_cube [Finite G] {M : 
     (hdeg : ∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 →
       hyp.muGrid hG hodd i j 1 = (d : ℂ)) :
     d = p := by
-  haveI := hyp.finiteG
-  haveI : Fact p.Prime := ⟨hp⟩
+  have := hyp.finiteG
+  have : Fact p.Prime := ⟨hp⟩
   classical
   have hw2ge : 2 ≤ hyp.w2 := (hyp.w2_prime hG).two_le
   have hj : (⟨1, by omega⟩ : Fin hyp.w2) ≠ 0 := Fin.ne_of_val_ne (by simp)

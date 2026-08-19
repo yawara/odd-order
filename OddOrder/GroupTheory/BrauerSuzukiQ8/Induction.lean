@@ -39,7 +39,7 @@ private theorem q8_mem_center_aux (n : ℕ) : ∀ {H : Type u} [Group H] [Finite
     omega
   | succ n ih =>
     intro H _ _ hcard hO T hq z hzT hz
-    haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+    have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
     obtain ⟨e⟩ := hq
     have hz2 : z ^ 2 = 1 := by
       have h := pow_orderOf_eq_one z
@@ -51,7 +51,7 @@ private theorem q8_mem_center_aux (n : ℕ) : ∀ {H : Type u} [Group H] [Finite
         (Subgroup.topEquiv.symm.trans ((MulEquiv.subgroupCongr hTop).symm.trans e)) hz2 hz1
     -- otherwise the character theory gives a proper normal subgroup containing `z`
     obtain ⟨N, hNnorm, hNtop, hzN⟩ := q8_exists_proper_normal hO T e hTop hzT hz
-    haveI := hNnorm
+    have := hNnorm
     by_cases hTN : (T : Subgroup H) ≤ N
     · -- `P ≤ N`: induct on `N`
       have hidx : 1 < N.index := Subgroup.one_lt_index_of_ne_top hNtop
@@ -110,7 +110,7 @@ theorem q8_mk_mem_center (T : Sylow 2 G)
     {z : G} (hzT : z ∈ (T : Subgroup G)) (hz : orderOf z = 2) :
     QuotientGroup.mk' (oPiCore {p | p ≠ 2} G) z
       ∈ Subgroup.center (G ⧸ oPiCore {p | p ≠ 2} G) := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   set K := oPiCore {p | p ≠ 2} G with hK
   set q := QuotientGroup.mk' K with hq'
   -- `T → Ḡ` is injective, since `T ⊓ K = ⊥`

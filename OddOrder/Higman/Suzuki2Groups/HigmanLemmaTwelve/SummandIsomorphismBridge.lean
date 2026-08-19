@@ -160,14 +160,14 @@ theorem exists_frobenius_conjugate_of_summandEquiv
     (e : KEquivariantMulEquiv hVL.restrict hVR.restrict) :
     ∃ i : Fin n, lamR = lamL ^ 2 ^ (i : ℕ) := by
   classical
-  letI := L.group
-  letI := L.normal
-  letI := L.quotComm
-  letI := L.quotModule
-  letI := R.group
-  letI := R.normal
-  letI := R.quotComm
-  letI := R.quotModule
+  let := L.group
+  let := L.normal
+  let := L.quotComm
+  let := L.quotModule
+  let := R.group
+  let := R.normal
+  let := R.quotComm
+  let := R.quotModule
   have hK0Z : lowerCentralLayerKernel P 0 =
       Z.subgroupOf (lowerCentralTerm P 0) := by rw [hZPhi]; exact hK0
   -- the raw summand coordinates
@@ -181,10 +181,10 @@ theorem exists_frobenius_conjugate_of_summandEquiv
       layerZeroToQuotient Z hK0Z (D.incl α).toMul ∈
         S.map (QuotientGroup.mk' Z) := by
     intro S D α
-    letI := D.group
-    letI := D.normal
-    letI := D.quotComm
-    letI := D.quotModule
+    let := D.group
+    let := D.normal
+    let := D.quotComm
+    let := D.quotModule
     have hr : D.incl α ∈
         LinearMap.range (factorInclusion D.f hK0 D.hf D.eQuot) := ⟨α, rfl⟩
     obtain ⟨x, hxrange, hlayer⟩ :=
@@ -202,10 +202,10 @@ theorem exists_frobenius_conjugate_of_summandEquiv
       Function.Injective
         (fun α => layerZeroToQuotient Z hK0Z (D.incl α).toMul) := by
     intro S D
-    letI := D.group
-    letI := D.normal
-    letI := D.quotComm
-    letI := D.quotModule
+    let := D.group
+    let := D.normal
+    let := D.quotComm
+    let := D.quotModule
     intro a b hab
     have h1 : (D.incl a).toMul = (D.incl b).toMul :=
       layerZeroToQuotient_injective Z hK0Z hab
@@ -217,10 +217,10 @@ theorem exists_frobenius_conjugate_of_summandEquiv
       (v : ↥(S.map (QuotientGroup.mk' Z))),
       ∃ α, layerZeroToQuotient Z hK0Z (D.incl α).toMul = (v : P ⧸ Z) := by
     intro S D v
-    letI := D.group
-    letI := D.normal
-    letI := D.quotComm
-    letI := D.quotModule
+    let := D.group
+    let := D.normal
+    let := D.quotComm
+    let := D.quotModule
     obtain ⟨s, hs, hval⟩ := v.property
     have hs' : s ∈ D.f.range := by rw [D.range_eq]; exact hs
     obtain ⟨g, rfl⟩ := hs'

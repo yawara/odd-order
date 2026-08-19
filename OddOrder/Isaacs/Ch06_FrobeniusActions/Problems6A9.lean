@@ -188,7 +188,7 @@ theorem card_inverted_notMem_ge [Finite G] {A : Subgroup G}
     {t : G} (htA : t ∈ A) (ht2 : t * t = 1) (htne : t ≠ 1) :
     A.index - 1 ≤ {x : G | t * x * t = x⁻¹ ∧ x ∉ A}.ncard := by
   classical
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   have htinv : t⁻¹ = t := inv_eq_of_mul_eq_one_right ht2
   set f : G → G := fun g => (g * t * g⁻¹) * t with hfdef
   set sA : Finset G := Finset.univ.filter (fun g : G => ¬ g ∈ A) with hsAdef
@@ -437,7 +437,7 @@ theorem setOf_conj_eq_inv_eq [Finite G] {A : Subgroup G} (hAtop : A ≠ ⊤)
     {t : G} (htA : t ∈ A) (ht2 : t * t = 1) (htne : t ≠ 1) :
     {x : G | t * x * t = x⁻¹} = notConjugateSet A ∪ {t} := by
   ext x
-  simp only [Set.mem_setOf_eq, Set.mem_union, Set.mem_singleton_iff]
+  simp only [Set.mem_ofPred_eq, Set.mem_union, Set.mem_singleton_iff]
   constructor
   · intro hinv
     by_cases hxA : x ∈ A
@@ -532,11 +532,11 @@ theorem mul_mem_notConjugateSet [Finite G] {A : Subgroup G} (hAtop : A ≠ ⊤)
   have hsX : x * t ∉ notConjugateSet A := by
     intro hmem
     have hodd := odd_orderOf_of_mem_notConjugateSet hATI htA ht2 htne hmem
-    haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+    have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
     rw [orderOf_eq_prime (by rw [pow_two]; exact hs2) hsne] at hodd
     exact (by decide : ¬ Odd 2) hodd
   -- `s` はある共役 `A^g` の非単位元
-  simp only [notConjugateSet, Set.mem_setOf_eq, not_forall, not_not] at hsX
+  simp only [notConjugateSet, Set.mem_ofPred_eq, not_forall, not_not] at hsX
   obtain ⟨a, haA, hane, hconj⟩ := hsX
   obtain ⟨g, hg⟩ := isConj_iff.mp hconj
   have hsAg : x * t ∈ (MulAut.conj g • A : Subgroup G) := by

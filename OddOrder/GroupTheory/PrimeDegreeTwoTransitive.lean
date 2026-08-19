@@ -104,7 +104,7 @@ and `⟨σ⟩` has full Sylow `p`-order. -/
 theorem zpowers_normal_of_orderOf_eq (hp : p.Prime)
     (hG : Nat.card G = p * (p - 1)) {σ : G} (hσ : orderOf σ = p) :
     (Subgroup.zpowers σ).Normal := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   set N : Subgroup G := Subgroup.zpowers σ with hNdef
   have hcardN : Nat.card N = p := by rw [hNdef, Nat.card_zpowers, hσ]
   have hfact : (Nat.card G).factorization p = 1 := by
@@ -129,7 +129,7 @@ theorem zpowers_normal_of_orderOf_eq (hp : p.Prime)
     have h5 : Nat.card (Sylow p G) % p = Nat.card (Sylow p G) :=
       Nat.mod_eq_of_lt (by have := hp.one_lt; omega)
     omega
-  haveI : Subsingleton (Sylow p G) :=
+  have : Subsingleton (Sylow p G) :=
     (Nat.card_eq_one_iff_unique.mp hone).1
   exact Sylow.normal_of_subsingleton S
 
@@ -141,8 +141,8 @@ Appendix II, Prop. 1's regular normal subgroup `R₁/R` of `N_G(R)/R`.) -/
 theorem exists_orderOf_eq_prime_zpowers_normal (hp : p.Prime)
     (hG : Nat.card G = p * (p - 1)) :
     ∃ σ : G, orderOf σ = p ∧ (Subgroup.zpowers σ).Normal := by
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI := Fintype.ofFinite G
+  have : Fact p.Prime := ⟨hp⟩
+  have := Fintype.ofFinite G
   obtain ⟨σ, hσ⟩ := exists_prime_orderOf_dvd_card (G := G) p
     (by rw [← Nat.card_eq_fintype_card, hG]; exact ⟨p - 1, rfl⟩)
   exact ⟨σ, hσ, zpowers_normal_of_orderOf_eq hp hG hσ⟩
@@ -154,7 +154,7 @@ theorem surjective_zpow_smul (hp : p.Prime) (hΩ : Nat.card Ω = p) {σ : G}
     (hσ : orderOf σ = p) (hnorm : (Subgroup.zpowers σ).Normal)
     [IsPretransitive G Ω] [Finite G] (a : Ω) :
     Function.Surjective (fun i : ZMod p => σ ^ (i.val) • a) := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hfree : ∀ (τ : G), τ ∈ Subgroup.zpowers σ → τ ≠ 1 → ∀ y : Ω, τ • y ≠ y :=
     fun τ hτ hτ1 y => not_smul_eq_of_orderOf_eq_prime hp hσ hnorm hτ hτ1 y
   have hinj : Function.Injective (fun i : ZMod p => σ ^ (i.val) • a) := by
@@ -191,7 +191,7 @@ private theorem exists_normal_regular (hp : p.Prime) (hΩ : Nat.card Ω = p)
     ∃ σ : G, orderOf σ = p ∧ (Subgroup.zpowers σ).Normal ∧
       (∀ τ ∈ Subgroup.zpowers σ, τ ≠ 1 → ∀ y : Ω, τ • y ≠ y) ∧
       ∀ a : Ω, Function.Surjective (fun i : ZMod p => σ ^ (i.val) • a) := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨σ, hσ, hnorm⟩ := exists_orderOf_eq_prime_zpowers_normal hp hG
   exact ⟨σ, hσ, hnorm,
     fun τ hτ hτ1 y => not_smul_eq_of_orderOf_eq_prime hp hσ hnorm hτ hτ1 y,
@@ -204,7 +204,7 @@ power sending the first point to the second), hence fixes all of `Ω`. -/
 theorem eq_one_of_smul_eq_of_smul_eq (hp : p.Prime) (hΩ : Nat.card Ω = p)
     (hG : Nat.card G = p * (p - 1)) {g : G} {a b : Ω} (hab : a ≠ b)
     (hga : g • a = a) (hgb : g • b = b) : g = 1 := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨σ, hσ, hnorm, hfree, hsurjAll⟩ := exists_normal_regular hp hΩ hG
   set N : Subgroup G := Subgroup.zpowers σ with hNdef
   have hcardN : Nat.card N = p := by rw [hNdef, Nat.card_zpowers, hσ]
@@ -325,7 +325,7 @@ theorem conj_eq_inv_of_sq_eq_one (hp : p.Prime) (hp2 : p ≠ 2)
     (hσ : orderOf σ = p) (hnorm : (Subgroup.zpowers σ).Normal)
     (hu2 : u ^ 2 = 1) (hu1 : u ≠ 1) :
     u * σ * u⁻¹ = σ⁻¹ := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨a⟩ : Nonempty Ω :=
     (Nat.card_ne_zero.mp (by rw [hΩ]; exact hp.pos.ne')).1
   have hsurjAll : ∀ y : Ω, Function.Surjective (fun i : ZMod p => σ ^ (i.val) • y) :=
@@ -400,7 +400,7 @@ and dies the same way. -/
 theorem not_exists_elementaryAbelian_four (hp : p.Prime) (hp2 : p ≠ 2)
     (hΩ : Nat.card Ω = p) (hG : Nat.card G = p * (p - 1)) :
     ¬ ∃ E : Subgroup G, Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1 := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   rintro ⟨E, hEcard, hEsq⟩
   obtain ⟨σ, hσ, hnorm, hfree, hsurjAll⟩ := exists_normal_regular hp hΩ hG
   obtain ⟨a⟩ : Nonempty Ω :=
@@ -419,8 +419,8 @@ theorem not_exists_elementaryAbelian_four (hp : p.Prime) (hp2 : p ≠ 2)
   have hinv : ∀ u ∈ E, u ≠ 1 → u * σ * u⁻¹ = σ⁻¹ := fun u hu hu1 =>
     conj_eq_inv_of_sq_eq_one hp hp2 hΩ hσ hnorm (hEsq u hu) hu1
   -- two distinct nonidentity elements of `E`.
-  haveI : Finite ↥E := Nat.finite_of_card_ne_zero (by rw [hEcard]; norm_num)
-  haveI : Nontrivial ↥E := Finite.one_lt_card_iff_nontrivial.mp
+  have : Finite ↥E := Nat.finite_of_card_ne_zero (by rw [hEcard]; norm_num)
+  have : Nontrivial ↥E := Finite.one_lt_card_iff_nontrivial.mp
     (by rw [hEcard]; norm_num)
   obtain ⟨u', hu'⟩ := exists_ne (1 : ↥E)
   obtain ⟨v', hv'1, hv'u⟩ : ∃ v' : ↥E, v' ≠ 1 ∧ v' ≠ u' := by
@@ -562,7 +562,7 @@ two-transitive** (indeed sharply so): two-point stabilizers are trivial, so the
 theorem isMultiplyPretransitive_of_card_eq_mul_pred (hp : p.Prime)
     (hΩ : Nat.card Ω = p) (hG : Nat.card G = p * (p - 1)) :
     IsMultiplyPretransitive G Ω 2 := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   rw [is_two_pretransitive_iff]
   intro a b c d hab hcd
   classical
@@ -570,7 +570,7 @@ theorem isMultiplyPretransitive_of_card_eq_mul_pred (hp : p.Prime)
   have horb : MulAction.orbit G (a, b) = {q : Ω × Ω | q.1 ≠ q.2} := by
     apply Set.eq_of_subset_of_ncard_le
     · rintro q ⟨g, rfl⟩
-      simp only [Set.mem_setOf_eq]
+      simp only [Set.mem_ofPred_eq]
       intro h
       exact hab (smul_left_cancel g h)
     · -- `|orbit| = |G| / |stab| = p(p-1) = |distinct pairs|`.

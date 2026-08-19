@@ -257,28 +257,28 @@ theorem derivedInG_normalizer_elemAb_le_fittingInG [Finite G] (hG : IsMinimalSim
     rw [hbot, Subgroup.card_bot] at h1
     exact (Nat.one_lt_pow two_ne_zero (Fact.out : q.Prime).one_lt).ne' h1.symm
   have hNlt : N < ⊤ := normalizer_lt_top_of_le_of_ne_bot hG h.mem_maximal hBM hBne
-  haveI hNsolv : IsSolvable ↥N := hG.solvable_of_lt_top N hNlt
+  have hNsolv : Group.IsSolvable ↥N := hG.isSolvable_of_lt_top N hNlt
   have hBN : B ≤ N := Subgroup.le_normalizer
-  haveI hNnontriv : Nontrivial ↥N := by
+  have hNnontriv : Nontrivial ↥N := by
     rw [Subgroup.nontrivial_iff_ne_bot]
     intro hbot
     exact hBne (le_bot_iff.mp (hbot ▸ hBN))
   have hodd : Odd (Nat.card ↥N) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card N)
   -- `B ≤ F(N)`.
-  haveI hBnormal : (B.subgroupOf N).Normal :=
+  have hBnormal : (B.subgroupOf N).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hBN).mpr le_rfl
   have hB_le_FN : B ≤ Ch2.S08.fittingInG N :=
     Ch2.S08.le_fittingInG_of_normal_isPiSubgroup_singleton hBN hBnormal
       (Subgroup.isPiSubgroup_of_isPGroup_of_mem hB.1.isPGroup rfl)
   set FN : Subgroup G := Ch2.S08.fittingInG N with hFNdef
-  haveI hFNnilp : Group.IsNilpotent ↥FN := Ch2.S08.fittingInG_isNilpotent N
+  have hFNnilp : Group.IsNilpotent ↥FN := Ch2.S08.fittingInG_isNilpotent N
   have hFN_le_N : FN ≤ N := Ch2.S08.fittingInG_le N
   -- `F(N) ≤ C_G(B)` via the `O_q × O_q'` decomposition.
   have hFN_le_C : FN ≤ Subgroup.centralizer (B : Set G) := by
     set O1 : Subgroup ↥FN := Ch03.oPiCore ({q} : Set ℕ) ↥FN with hO1def
     set O2 : Subgroup ↥FN := Ch03.oPiCore (({q} : Set ℕ))ᶜ ↥FN with hO2def
     have hBFN : B ≤ FN := hB_le_FN
-    haveI hB_FN_normal : (B.subgroupOf FN).Normal :=
+    have hB_FN_normal : (B.subgroupOf FN).Normal :=
       (Subgroup.normal_subgroupOf_iff_le_normalizer hBFN).mpr (hFN_le_N.trans le_rfl)
     have hB_pi : Ch03.Subgroup.IsPiGroup ({q} : Set ℕ) (B.subgroupOf FN) := by
       intro r hr
@@ -310,7 +310,7 @@ theorem derivedInG_normalizer_elemAb_le_fittingInG [Finite G] (hG : IsMinimalSim
         rw [← le_bot_iff]
         calc ⁅O2, B.subgroupOf FN⁆
             ≤ O2 ⊓ B.subgroupOf FN := by
-              haveI : O2.Normal := Ch03.oPiCore.normal _ _
+              have : O2.Normal := Ch03.oPiCore.normal _ _
               exact le_inf (Subgroup.commutator_le_left _ _)
                 (Subgroup.commutator_le_right _ _)
           _ ≤ ⊥ := by
@@ -344,11 +344,11 @@ theorem derivedInG_normalizer_elemAb_le_fittingInG [Finite G] (hG : IsMinimalSim
   have hFN_le_E : FN ≤ E := hFN_le_C.trans (centralizer_le_E_of_tau2 hG h hq hB hBE).1
   have hE_le_N : E ≤ N := (elemAb_normal_in_E_of_tau2 hG h hq hB hBE).1.1
   have hFN_le_FE : FN ≤ Ch2.S08.fittingInG E := by
-    haveI h1 : (FN.subgroupOf E).Normal := by
+    have h1 : (FN.subgroupOf E).Normal := by
       refine (Subgroup.normal_subgroupOf_iff_le_normalizer hFN_le_E).mpr ?_
       intro e he
       exact Ch2.S08.mem_normalizer_fittingInG_of_mem (hE_le_N he)
-    haveI h3 : Group.IsNilpotent ↥(FN.subgroupOf E) :=
+    have h3 : Group.IsNilpotent ↥(FN.subgroupOf E) :=
       Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hFN_le_E).symm
     calc FN = (FN.subgroupOf E).map E.subtype :=
           (Subgroup.map_subgroupOf_eq_of_le hFN_le_E).symm
@@ -383,7 +383,7 @@ theorem pGroup_le_opiCoreInG_fittingInG [Finite G]
     T ≤ opiCoreInG ({q} : Set ℕ) (Ch2.S08.fittingInG E) := by
   classical
   set FE : Subgroup G := Ch2.S08.fittingInG E with hFEdef
-  haveI : Group.IsNilpotent ↥FE := Ch2.S08.fittingInG_isNilpotent E
+  have : Group.IsNilpotent ↥FE := Ch2.S08.fittingInG_isNilpotent E
   have hHall := S10.oPiCore_isHall_of_isNilpotent (K := ↥FE) ({q} : Set ℕ)
   have hTpi : Ch03.Subgroup.IsPiGroup ({q} : Set ℕ) (T.subgroupOf FE) := by
     intro r hr
@@ -415,7 +415,7 @@ theorem sylow_eq_opiCore_fittingInG_of_tau2 [Finite G] (hG : IsMinimalSimpleOdd 
     Ch2.S08.fittingInG E ≤ Subgroup.centralizer ((Sq : Subgroup G) : Set G) := by
   classical
   set FE : Subgroup G := Ch2.S08.fittingInG E with hFEdef
-  haveI : Group.IsNilpotent ↥FE := Ch2.S08.fittingInG_isNilpotent E
+  have : Group.IsNilpotent ↥FE := Ch2.S08.fittingInG_isNilpotent E
   have hSqM : (Sq : Subgroup G) ≤ M := hSqE.trans h.E_le
   -- `Sq ≤ F(E)` via Corollary 10.7(a) and the Fitting chain through `N_G(B)`.
   have hSq_le_FE : (Sq : Subgroup G) ≤ FE := by
@@ -461,8 +461,8 @@ theorem sylow_eq_opiCore_fittingInG_of_tau2 [Finite G] (hG : IsMinimalSimpleOdd 
     have hcomm : ⁅O2, O1⁆ = ⊥ := by
       rw [← le_bot_iff]
       calc ⁅O2, O1⁆ ≤ O2 ⊓ O1 := by
-            haveI : O2.Normal := Ch03.oPiCore.normal _ _
-            haveI : O1.Normal := Ch03.oPiCore.normal _ _
+            have : O2.Normal := Ch03.oPiCore.normal _ _
+            have : O1.Normal := Ch03.oPiCore.normal _ _
             exact le_inf (Subgroup.commutator_le_left _ _)
               (Subgroup.commutator_le_right _ _)
         _ ≤ ⊥ := by
@@ -508,7 +508,7 @@ theorem piGroup_le_opiCoreInG_fittingInG [Finite G]
     T ≤ opiCoreInG π (Ch2.S08.fittingInG E) := by
   classical
   set FE : Subgroup G := Ch2.S08.fittingInG E with hFEdef
-  haveI : Group.IsNilpotent ↥FE := Ch2.S08.fittingInG_isNilpotent E
+  have : Group.IsNilpotent ↥FE := Ch2.S08.fittingInG_isNilpotent E
   have hHall := S10.oPiCore_isHall_of_isNilpotent (K := ↥FE) π
   have hTpi : Ch03.Subgroup.IsPiGroup π (T.subgroupOf FE) := by
     intro r hr
@@ -543,7 +543,7 @@ theorem E2_abelian_normal_hall_of_abelianSylow [Finite G] (hG : IsMinimalSimpleO
     E₂ = opiCoreInG (tau2 M) (Ch2.S08.fittingInG E) := by
   classical
   set FE : Subgroup G := Ch2.S08.fittingInG E with hFEdef
-  haveI : Group.IsNilpotent ↥FE := Ch2.S08.fittingInG_isNilpotent E
+  have : Group.IsNilpotent ↥FE := Ch2.S08.fittingInG_isNilpotent E
   set W : Subgroup G := opiCoreInG (tau2 M) FE with hWdef
   have hW_le_FE : W ≤ FE := Subgroup.map_subtype_le _
   have hW_le_E : W ≤ E := hW_le_FE.trans (Ch2.S08.fittingInG_le E)
@@ -558,7 +558,7 @@ theorem E2_abelian_normal_hall_of_abelianSylow [Finite G] (hG : IsMinimalSimpleO
   have hSr_le_W : ∀ (r : ℕ), Fact r.Prime → r ∈ tau2 M →
       ∃ Sr : Sylow r G, (Sr : Subgroup G) ≤ W := by
     intro r hrfact hr
-    haveI := hrfact
+    have := hrfact
     obtain ⟨B, hB, hBE, Sr, hBSr, hSrE⟩ :=
       exists_sylow_le_E_of_tau2 hG h hp hA hAE hSab hr
     have hallab : ∀ T : Subgroup G, IsPGroup r ↥T → IsMulCommutative ↥T := by
@@ -582,7 +582,7 @@ theorem E2_abelian_normal_hall_of_abelianSylow [Finite G] (hG : IsMinimalSimpleO
   have hW_full : ∀ (r : ℕ), r.Prime → r ∈ tau2 M →
       (Nat.card ↥W).factorization r = (Nat.card ↥E).factorization r := by
     intro r hr hr2
-    haveI : Fact r.Prime := ⟨hr⟩
+    have : Fact r.Prime := ⟨hr⟩
     refine le_antisymm ?_ ?_
     · exact (Nat.factorization_le_iff_dvd Nat.card_pos.ne' Nat.card_pos.ne').mpr
         (Subgroup.card_dvd_of_le hW_le_E) r
@@ -618,7 +618,7 @@ theorem E2_abelian_normal_hall_of_abelianSylow [Finite G] (hG : IsMinimalSimpleO
         Nat.Prime.factorization_pos_of_dvd hr_prime Subgroup.index_ne_zero_of_finite
           (Nat.dvd_of_mem_primeFactors hr)
       omega
-  haveI hW_normal : (W.subgroupOf E).Normal :=
+  have hW_normal : (W.subgroupOf E).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hW_le_E).mpr hE_norm_W
   have hE₂_le_W : E₂ ≤ W := by
     have hE₂pi : Ch03.Subgroup.IsPiGroup (tau2 M) (E₂.subgroupOf E) := by
@@ -673,12 +673,12 @@ theorem E2_abelian_normal_hall_of_abelianSylow [Finite G] (hG : IsMinimalSimpleO
   -- abelian: each Sylow `r`-subgroup of `E₂` equals `O_r(F(E))`, which `F(E) ⊇ E₂`
   -- centralizes.
   have hE₂_le_FE : E₂ ≤ FE := hE₂_eq_W ▸ hW_le_FE
-  haveI hE₂nilp : Group.IsNilpotent ↥E₂ :=
+  have hE₂nilp : Group.IsNilpotent ↥E₂ :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hE₂_le_FE)
   have hE₂_le_C : E₂ ≤ Subgroup.centralizer ((E₂ : Subgroup G) : Set G) := by
     refine Ch2.S08.le_of_sylow_le_of_nilpotent hE₂nilp ?_
     intro r
-    haveI : Fact (r : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors r.2⟩
+    have : Fact (r : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors r.2⟩
     set R : Subgroup G := ((default : Sylow (r : ℕ) ↥E₂) : Subgroup ↥E₂).map E₂.subtype
       with hRdef
     change R ≤ Subgroup.centralizer ((E₂ : Subgroup G) : Set G)
@@ -716,7 +716,7 @@ theorem E2_abelian_normal_hall_of_abelianSylow [Finite G] (hG : IsMinimalSimpleO
     · intro r hr hr2
       exfalso
       have hr_prime := Nat.prime_of_mem_primeFactors hr
-      haveI : Fact r.Prime := ⟨hr_prime⟩
+      have : Fact r.Prime := ⟨hr_prime⟩
       -- `ν_r(E₂) = ν_r(E) = ν_r(G)`, so `r` cannot divide the index.
       have hsum : (Nat.card ↥E₂).factorization r + (E₂.index).factorization r
           = (Nat.card G).factorization r := by

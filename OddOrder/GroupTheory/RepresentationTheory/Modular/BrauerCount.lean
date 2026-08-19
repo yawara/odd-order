@@ -89,8 +89,8 @@ theorem exists_wedderburn_pi_matrix_card_eq [IsAlgClosed k] (hp : p.Prime) (hk :
         ≃ₐ[k] ∀ i, Matrix (Fin (d i)) (Fin (d i)) k) ∧
       n = Nat.card {C : ConjClasses G // IsPRegularClass p C} := by
   classical
-  haveI : IsArtinianRing (MonoidAlgebra k G) := isArtinian_of_tower k inferInstance
-  haveI : Module.Finite k (MonoidAlgebra k G ⧸ Ring.jacobson (MonoidAlgebra k G)) :=
+  have : IsArtinianRing (MonoidAlgebra k G) := isArtinian_of_tower k inferInstance
+  have : Module.Finite k (MonoidAlgebra k G ⧸ Ring.jacobson (MonoidAlgebra k G)) :=
     Module.Finite.of_surjective (Ideal.Quotient.mkₐ k _).toLinearMap
       (Ideal.Quotient.mkₐ_surjective k _)
   obtain ⟨n, d, hd, ⟨e'⟩⟩ :=
@@ -107,7 +107,7 @@ theorem exists_wedderburn_pi_matrix_card_eq [IsAlgClosed k] (hp : p.Prime) (hk :
     have hpow := Ideal.pow_mem_pow hyJ N
     rw [hN] at hpow
     simpa using hpow
-  haveI : ∀ i, Nonempty (Fin (d i)) := fun i => ⟨⟨0, Nat.pos_of_ne_zero (hd i).out⟩⟩
+  have : ∀ i, Nonempty (Fin (d i)) := fun i => ⟨⟨0, Nat.pos_of_ne_zero (hd i).out⟩⟩
   have hcount := card_split_blocks_eq_card_pRegularClass (k := k) (G := G) hp hk
     (Ideal.Quotient.mkₐ k _) (Ideal.Quotient.mkₐ_surjective k _) hker e'
   simpa using hcount
@@ -131,10 +131,10 @@ theorem exists_splitting_datum [IsAlgClosed k] (hp : p.Prime) (hk : (p : k) = 0)
       ∀ z : Subalgebra.center k (MonoidAlgebra k G),
         OddOrder.MatrixModule.blockCharacterPi π hπ hlin z = 0 → IsNilpotent z := by
   classical
-  haveI : IsArtinianRing (MonoidAlgebra k G) := isArtinian_of_tower k inferInstance
+  have : IsArtinianRing (MonoidAlgebra k G) := isArtinian_of_tower k inferInstance
   obtain ⟨n, d, hd, ⟨e⟩, hn⟩ := exists_wedderburn_pi_matrix_card_eq (k := k) (G := G) hp hk
-  haveI : ∀ i, NeZero (d i) := hd
-  haveI : ∀ i, Nonempty (Fin (d i)) := fun i => ⟨⟨0, Nat.pos_of_ne_zero (hd i).out⟩⟩
+  have : ∀ i, NeZero (d i) := hd
+  have : ∀ i, Nonempty (Fin (d i)) := fun i => ⟨⟨0, Nat.pos_of_ne_zero (hd i).out⟩⟩
   set π : MonoidAlgebra k G →+* ∀ i, Matrix (Fin (d i)) (Fin (d i)) k :=
     e.toRingEquiv.toRingHom.comp (Ideal.Quotient.mk (Ring.jacobson (MonoidAlgebra k G)))
     with hπdef

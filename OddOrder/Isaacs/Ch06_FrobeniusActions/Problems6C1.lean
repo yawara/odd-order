@@ -32,11 +32,11 @@ theorem isNilpotent_of_prime_orderOf_mulAut_of_fixedFree {G : Type*} [Group G] [
   classical
   set A : Subgroup (MulAut G) := Subgroup.zpowers α with hAdef
   have hcardA : Nat.card ↥A = p := by rw [hAdef, Nat.card_zpowers, hord]
-  haveI hAnt : Nontrivial ↥A := by
+  have hAnt : Nontrivial ↥A := by
     refine Finite.one_lt_card_iff_nontrivial.mp ?_
     rw [hcardA]
     exact hp.one_lt
-  letI actA : MulDistribMulAction ↥A G := MulDistribMulAction.compHom G A.subtype
+  let actA : MulDistribMulAction ↥A G := MulDistribMulAction.compHom G A.subtype
   refine isNilpotent_of_isFrobeniusAction (A := ↥A) (N := G) ?_
   intro a ha n hn hfixn
   -- `a ≠ 1` と `|A| = p` 素数から `⟨a⟩ = A`, したがって `α` は `a` の冪

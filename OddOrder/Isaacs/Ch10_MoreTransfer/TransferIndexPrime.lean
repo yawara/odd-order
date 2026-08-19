@@ -103,7 +103,7 @@ theorem transfer_eq_prod_conj_of_mem {M : Subgroup G} [M.Normal] [Fintype (G ⧸
     haveI : M.FiniteIndex := M.finiteIndex_of_finite_quotient
     MonoidHom.transfer ϕ x
       = ∏ q : G ⧸ M, ϕ ⟨(f q)⁻¹ * x * f q, ‹M.Normal›.conj_mem' x hx (f q)⟩ := by
-  haveI : M.FiniteIndex := M.finiteIndex_of_finite_quotient
+  have : M.FiniteIndex := M.finiteIndex_of_finite_quotient
   classical
   -- powers of x act trivially on G ⧸ M (x ∈ M, M normal)
   have htriv : ∀ (k : ℤ) (q : G ⧸ M), (x ^ k : G) • q = q := by
@@ -171,7 +171,7 @@ theorem transfer_eq_pow_of_notMem {M : Subgroup G} [M.Normal] [M.FiniteIndex]
     MonoidHom.transfer ϕ x = ϕ ⟨x ^ p, hidx ▸ M.pow_index_mem x⟩ := by
   classical
   have hp_prime : p.Prime := hp.out
-  haveI : Fintype (G ⧸ M) := Fintype.ofFinite _
+  have : Fintype (G ⧸ M) := Fintype.ofFinite _
   have hQcard : Nat.card (G ⧸ M) = p := by rw [← Subgroup.index_eq_card, hidx]
   -- x̄ has order p and generates G ⧸ M
   have hxbar_ne : ((x : G) : G ⧸ M) ≠ 1 := by
@@ -217,7 +217,7 @@ theorem transfer_eq_pow_of_notMem {M : Subgroup G} [M.Normal] [M.FiniteIndex]
         exact mul_right_cancel h2)
     · exact h
   -- there is a single orbit
-  haveI hsub : Subsingleton (Quotient (orbitRel (zpowers x) (G ⧸ M))) := by
+  have hsub : Subsingleton (Quotient (orbitRel (zpowers x) (G ⧸ M))) := by
     constructor
     intro a b
     induction a using Quotient.inductionOn with | h c =>
@@ -306,7 +306,7 @@ theorem transfer_eq_prod_pow_conj_of_mem {M : Subgroup G} [M.Normal] [M.FiniteIn
       = ∏ i ∈ Finset.range p, ϕ ⟨u ^ i * x * (u ^ i)⁻¹, ‹M.Normal›.conj_mem x hx _⟩ := by
   classical
   have hp_prime : p.Prime := hp.out
-  haveI : Fintype (G ⧸ M) := Fintype.ofFinite _
+  have : Fintype (G ⧸ M) := Fintype.ofFinite _
   have hQcard : Nat.card (G ⧸ M) = p := by rw [← Subgroup.index_eq_card, hidx]
   have hcardF : Fintype.card (G ⧸ M) = p := by
     rw [← Nat.card_eq_fintype_card, hQcard]
@@ -412,7 +412,7 @@ theorem exists_surjective_wreath_of_transfer_notMem_frattini
   have hM_pgroup : IsPGroup p ↥M := hP.to_subgroup M
   -- N := Φ(M) as a (normal) subgroup of P
   set N : Subgroup P := (frattini ↥M).map M.subtype with hN_def
-  haveI hN_normal : N.Normal := normal_map_subtype_of_char inferInstance
+  have hN_normal : N.Normal := normal_map_subtype_of_char inferInstance
   have hNM : N ≤ M := Subgroup.map_subtype_le _
   set π : P →* P ⧸ N := QuotientGroup.mk' N with hπ_def
   have hπsurj : Function.Surjective π := QuotientGroup.mk'_surjective N
@@ -456,7 +456,7 @@ theorem exists_surjective_wreath_of_transfer_notMem_frattini
     exact Subgroup.mem_map_of_mem _ h2
   have hπL : π L ≠ 1 := fun h1 => hLN (by rw [← hkerπ]; exact π.mem_ker.mpr h1)
   -- quotient-level data for Cor 10.5
-  haveI : (M.map π).Normal := Subgroup.Normal.map ‹M.Normal› π hπsurj
+  have : (M.map π).Normal := Subgroup.Normal.map ‹M.Normal› π hπsurj
   have hidx' : (M.map π).index = p := by
     rw [M.index_map_eq hπsurj (by rw [hkerπ]; exact hNM), hidx]
   have hEA' : (M.map π).IsElementaryAbelian p := by
@@ -561,7 +561,7 @@ theorem exists_surjective_wreath_of_transfer_notMem_orderClosure_sup_frattini
   -- a maximal subgroup M ⊇ S; it is normal of index p
   obtain ⟨M, hM_coatom, hSM⟩ :=
     (IsCoatomic.eq_top_or_exists_le_coatom S).resolve_left hS
-  haveI hM_normal : M.Normal := hM_coatom.normal_of_isPGroup hP
+  have hM_normal : M.Normal := hM_coatom.normal_of_isPGroup hP
   have hM_idx : M.index = p := by
     rw [Subgroup.index_eq_card]
     exact hM_coatom.card_quotient_of_isPGroup hP
@@ -591,7 +591,7 @@ theorem exists_surjective_wreath_of_transfer_notMem_orderClosure_sup_frattini
     -- the image of Φ(M) in M^{ab} consists of p-th powers
     have hrev : frattini ↥M ≤ _root_.commutator ↥M
         ⊔ Subgroup.normalClosure (Set.range (fun y : ↥M => y ^ p)) := by
-      haveI hnc : (Subgroup.normalClosure
+      have hnc : (Subgroup.normalClosure
           (Set.range (fun y : ↥M => y ^ p))).Normal := Subgroup.normalClosure_normal
       apply OddOrder.Isaacs.Ch04.frattini_le_of_isElementaryAbelian_quotient_of_pgroup
         hM_pgroup
@@ -687,7 +687,7 @@ theorem exists_surjective_wreath_of_transfer_notMem_orderClosure_sup_frattini
               Nat.le_of_dvd (orderOf_pos _) (orderOf_pow_dvd n)
           _ < orderOf x := hxp_lt
       rw [hVW, hVx_pow, hW₀_def]
-      letI := Fintype.ofFinite
+      let := Fintype.ofFinite
         (Quotient (MulAction.orbitRel (Subgroup.zpowers
           (⟨x ^ p, hM_idx ▸ M.pow_index_mem x⟩ : ↥M)) (↥M ⧸ S.subgroupOf M)))
       rw [MonoidHom.transfer_eq_prod_quotient_orbitRel_zpowers_quot]
@@ -730,7 +730,7 @@ theorem exists_normal_index_prime_transfer_mem
     MonoidHom.transfer (transferRes hPN ϕP) with hw'_def
   set v : G →* Abelianization ↥P := MonoidHom.transfer ϕP with hv_def
   -- the image w(N) is a finite p-group
-  haveI : Finite (Abelianization ↥P) := Quotient.finite _
+  have : Finite (Abelianization ↥P) := Quotient.finite _
   have hAbP : IsPGroup p (Abelianization ↥P) := hP.to_quotient _
   have hW : IsPGroup p ↥(w'.range) := hAbP.to_subgroup _
   -- v(G) sits inside w(N) properly; take a coatom L₀ above it
@@ -740,15 +740,15 @@ theorem exists_normal_index_prime_transfer_mem
     exact hlt.not_ge htop
   obtain ⟨L₀, hL₀_coatom, hL₀_ge⟩ :=
     (IsCoatomic.eq_top_or_exists_le_coatom _).resolve_left hproper
-  haveI hL₀_normal : L₀.Normal := hL₀_coatom.normal_of_isPGroup hW
+  have hL₀_normal : L₀.Normal := hL₀_coatom.normal_of_isPGroup hW
   have hL₀_idx : L₀.index = p := by
     rw [Subgroup.index_eq_card]
     exact hL₀_coatom.card_quotient_of_isPGroup hW
   -- pull the coatom back to N
   set L : Subgroup (Abelianization ↥P) := L₀.map w'.range.subtype with hL_def
   set M : Subgroup ↥N := L.comap w' with hM_def
-  haveI hL_normal : L.Normal := Subgroup.normal_of_isMulCommutative L
-  haveI hM_normal : M.Normal := Subgroup.Normal.comap hL_normal w'
+  have hL_normal : L.Normal := Subgroup.normal_of_isMulCommutative L
+  have hM_normal : M.Normal := Subgroup.Normal.comap hL_normal w'
   have hM_idx : M.index = p := by
     rw [hM_def, Subgroup.index_comap]
     have h1 : L.subgroupOf w'.range = L₀ := by

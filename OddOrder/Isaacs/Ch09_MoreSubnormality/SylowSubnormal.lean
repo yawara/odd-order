@@ -107,7 +107,7 @@ theorem not_dvd_relIndex_inf_of_isSubnormal [Finite G] {p : ℕ} [Fact p.Prime]
     have hQ_coe : (Q : Subgroup ↥K) = ((P : Subgroup G) ⊓ K).subgroupOf K :=
       hQ_pg.toSylow_coe hQ_idx
     -- Apply the normal step inside ↥K to the normal subgroup `H.subgroupOf K`.
-    haveI : (H.subgroupOf K).Normal := hHnorm
+    have : (H.subgroupOf K).Normal := hHnorm
     have hnormal := not_dvd_relIndex_inf_of_normal (H.subgroupOf K) Q
     rw [hQ_coe] at hnormal
     -- Identify `(P ⊓ K).subgroupOf K ⊓ H.subgroupOf K` with `(P ⊓ H).subgroupOf K`.

@@ -52,7 +52,7 @@ private theorem rank_pi_fin_two_le_two_of_isCyclic
         Subgroup.coe_subtype] using hx0.trans hy0.symm
     · simpa only [π1, MonoidHom.comp_apply, Pi.evalMonoidHom_apply,
         Subgroup.coe_subtype, Fin.succ_zero_eq_one] using hxy
-  letI : IsCyclic ↥π0.ker := isCyclic_of_injective π1 hπ1
+  let : IsCyclic ↥π0.ker := isCyclic_of_injective π1 hπ1
   have hker_dvd : Nat.card ↥π0.ker ∣ r := by
     rw [← IsCyclic.exponent_eq_card (α := ↥π0.ker)]
     apply Monoid.exponent_dvd_of_forall_pow_eq_one
@@ -60,7 +60,7 @@ private theorem rank_pi_fin_two_le_two_of_isCyclic
     apply Subtype.ext
     exact hA.pow_eq_one (x : ↥A)
   have hker_le : Nat.card ↥π0.ker ≤ r := Nat.le_of_dvd hr.pos hker_dvd
-  letI : IsCyclic ↥π0.range := Subgroup.isCyclic π0.range
+  let : IsCyclic ↥π0.range := Subgroup.isCyclic π0.range
   have hrange_dvd : Nat.card ↥π0.range ∣ r := by
     rw [← IsCyclic.exponent_eq_card (α := ↥π0.range)]
     apply Monoid.exponent_dvd_of_forall_pow_eq_one
@@ -101,7 +101,7 @@ theorem caseA_rank_U_le_two_of_c_eq_one_q_eq_three [Finite G]
   classical
   let data := hyp.toTypesIIIIIIVSetupS hG
   let action := OddOrder.Peterfalvi.S11.uActionHom data chief
-  haveI : Fact chief.p.Prime := ⟨chief.p_prime⟩
+  have : Fact chief.p.Prime := ⟨chief.p_prime⟩
   obtain ⟨ψ, hψ⟩ :=
     OddOrder.Peterfalvi.S11.caseA_exists_blockScalarRatioEmbedding
       (hyp.mkSection11CharacterDataS hG chief) caseA
@@ -166,7 +166,7 @@ theorem omega1Center_card_eq_prime_or_sq_of_rank_U_le_two [Finite G]
       Nat.card ↥(OddOrder.BG.Ch3.S10.omega1CenterInG
         ((R : Subgroup ↥K).map K.subtype) r) = r ^ 2 := by
   classical
-  letI : Fact r.Prime := ⟨hr⟩
+  let : Fact r.Prime := ⟨hr⟩
   let Rg : Subgroup G := (R : Subgroup ↥K).map K.subtype
   let R₀g : Subgroup G := (R₀ : Subgroup ↥U).map U.subtype
   let Z : Subgroup G := OddOrder.BG.Ch3.S10.omega1CenterInG Rg r
@@ -199,7 +199,7 @@ theorem omega1Center_card_eq_prime_or_sq_of_rank_U_le_two [Finite G]
       hR₀gRg (Subgroup.mem_map_of_mem U.subtype a.2)
     have haG : (a : G) = 1 := Subgroup.mem_bot.mp (hbot ▸ haRg)
     exact ha1 (Subtype.ext (Subtype.ext haG))
-  haveI : Nontrivial ↥Rg := (Subgroup.nontrivial_iff_ne_bot Rg).mpr hRg_ne
+  have : Nontrivial ↥Rg := (Subgroup.nontrivial_iff_ne_bot Rg).mpr hRg_ne
   have hRgpg : IsPGroup r Rg := by
     simpa only [Rg] using R.isPGroup'.map K.subtype
   obtain ⟨z, -, hzcenter, hz1, hzpow⟩ :=

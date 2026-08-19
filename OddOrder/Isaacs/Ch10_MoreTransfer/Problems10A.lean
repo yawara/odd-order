@@ -118,16 +118,16 @@ private theorem commutator_sq_eq_one_of_quotient_commutative {P : Type*} [Group 
     (hp : IsPGroup 2 P) (hquot : ∀ N : Subgroup P, N.Normal → N ≠ ⊥ → commutator P ≤ N)
     (hncomm : commutator P ≠ ⊥) :
     ∀ c ∈ commutator P, c ^ 2 = 1 ∧ c ∈ Subgroup.center P := by
-  haveI : Group.IsNilpotent P := hp.isNilpotent
+  have : Group.IsNilpotent P := hp.isNilpotent
   -- `P' ⊓ Z(P) ≠ 1` から中心的な `z ≠ 1` を取る
   have hcz := Ch09.inf_center_ne_bot_of_normal_of_isNilpotent (K := commutator P) hncomm
-  haveI : Nontrivial ↥(commutator P ⊓ Subgroup.center P) :=
+  have : Nontrivial ↥(commutator P ⊓ Subgroup.center P) :=
     (Subgroup.nontrivial_iff_ne_bot _).mpr hcz
   obtain ⟨w, hwne⟩ := exists_ne (1 : ↥(commutator P ⊓ Subgroup.center P))
   obtain ⟨z, hzmem⟩ := w
   have hz1 : z ≠ 1 := fun h => hwne (Subtype.ext h)
   have hzc : z ∈ Subgroup.center P := hzmem.2
-  haveI : (Subgroup.zpowers z).Normal := normal_of_le_center (Subgroup.zpowers_le.mpr hzc)
+  have : (Subgroup.zpowers z).Normal := normal_of_le_center (Subgroup.zpowers_le.mpr hzc)
   have hPz : commutator P ≤ Subgroup.zpowers z := by
     refine hquot _ inferInstance fun h => hz1 ?_
     have hm := Subgroup.mem_zpowers z
@@ -136,7 +136,7 @@ private theorem commutator_sq_eq_one_of_quotient_commutative {P : Type*} [Group 
   -- `z ^ 2 = 1`
   have hz2 : z ^ 2 = 1 := by
     by_contra hne
-    haveI : (Subgroup.zpowers (z ^ 2)).Normal :=
+    have : (Subgroup.zpowers (z ^ 2)).Normal :=
       normal_of_le_center (Subgroup.zpowers_le.mpr (pow_mem hzc 2))
     have hz2le : commutator P ≤ Subgroup.zpowers (z ^ 2) := by
       refine hquot _ inferInstance fun h => hne ?_
@@ -180,7 +180,7 @@ private theorem commute_of_isRegularPGroup_two_aux.{u} (n : ℕ) :
     -- 真の商はすべて可換 ⟹ `P' ≤ N`
     have hquot : ∀ N : Subgroup P, N.Normal → N ≠ ⊥ → commutator P ≤ N := by
       intro N hN hNbot
-      haveI := hN
+      have := hN
       refine Subgroup.Normal.quotient_commutative_iff_commutator_le.mp ⟨⟨fun a b => ?_⟩⟩
       have hsmall : Nat.card (P ⧸ N) ≤ n := by
         have hmul := Subgroup.card_mul_index N
@@ -380,7 +380,7 @@ private theorem pow_mul_eq_one_of_isRegularPGroup_aux.{u} (p : ℕ) [Fact p.Prim
            ⟨mul_mem hu.1 hv.1, hsub (commutator P) hcommne u v hu.1 hv.1 hu.2 hv.2⟩
          inv_mem' := fun {u} hu => ⟨inv_mem hu.1, by rw [inv_pow, hu.2, inv_one]⟩ },
        fun _ => Iff.rfl⟩
-    haveI hΩnorm : Ω.Normal := by
+    have hΩnorm : Ω.Normal := by
       refine ⟨fun m hm gg => (hΩ _).mpr ⟨?_, ?_⟩⟩
       · exact (inferInstance : (commutator P).Normal).conj_mem m ((hΩ m).mp hm).1 gg
       · rw [conj_pow, ((hΩ m).mp hm).2]; group
@@ -426,7 +426,7 @@ def omegaOneOfIsRegularPGroup [Finite P] {p : ℕ} [Fact p.Prime] (hp : IsPGroup
   one_mem' := one_pow p
   mul_mem' hu hv := pow_mul_eq_one_of_isRegularPGroup hp hreg hu hv
   inv_mem' {u} hu := by
-    simp only [Set.mem_setOf_eq] at hu ⊢
+    simp only [Set.mem_ofPred_eq] at hu ⊢
     rw [inv_pow, hu, inv_one]
 
 end -- 10A.2
@@ -853,7 +853,7 @@ theorem pow_eq_one_of_center_isComplement [Finite P] {p : ℕ} [Fact p.Prime]
     have h1 := hp.one_lt
     have h2 : p = 1 := Nat.eq_one_of_dvd_one (Dvd.intro_left _ hmul)
     omega
-  haveI : A.Normal := by
+  have : A.Normal := by
     refine Subgroup.normal_of_index_eq_minFac_card ?_
     rw [hidx, hn, hp.pow_minFac hn0]
   -- `A^p` は `P` の正規部分群
@@ -866,7 +866,7 @@ theorem pow_eq_one_of_center_isComplement [Finite P] {p : ℕ} [Fact p.Prime]
       inv_mem' := by
         rintro _ ⟨x, hx, rfl⟩
         exact ⟨x⁻¹, A.inv_mem hx, by rw [inv_pow]⟩ } with hApdef
-  haveI : Ap.Normal := by
+  have : Ap.Normal := by
     refine ⟨fun y hy g => ?_⟩
     obtain ⟨x, hx, rfl⟩ := hy
     exact ⟨g * x * g⁻¹, ‹A.Normal›.conj_mem x hx g, by rw [conj_pow]⟩
@@ -892,9 +892,9 @@ theorem pow_eq_one_of_center_isComplement [Finite P] {p : ℕ} [Fact p.Prime]
     exact congrArg Subtype.val (Subgroup.mem_bot.mp (hK.disjoint.le_bot ⟨h2, h1⟩))
   -- `A^p = 1`
   by_contra hcon
-  haveI : Nontrivial ↥Ap :=
+  have : Nontrivial ↥Ap :=
     ⟨⟨1, ⟨a ^ p, ⟨a, ha, rfl⟩⟩, fun h => hcon (congrArg Subtype.val h).symm⟩⟩
-  haveI := Ch01.IsPGroup.normal_inf_center_nontrivial (P := P) hP (N := Ap) inferInstance
+  have := Ch01.IsPGroup.normal_inf_center_nontrivial (P := P) hP (N := Ap) inferInstance
   obtain ⟨⟨z, hz⟩, ⟨w, hw⟩, hzw⟩ :=
     exists_pair_ne ↥((Ap ⊓ Subgroup.center P : Subgroup P))
   exact hzw (Subtype.ext ((hkey z hz).trans (hkey w hw).symm))
@@ -921,7 +921,7 @@ theorem exists_injective_hom_regularWreath_of_center_isComplement [Finite P] {p 
     have hcardZA : Nat.card ((Subgroup.center P).subgroupOf A) = p := by
       rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hZle).toEquiv, hZ]
     have hmulA : p * Nat.card K = Nat.card ↥A := by
-      have h := hK.card_mul
+      have h := hK.card_mul_card
       rwa [hcardZA] at h
     have hQK : Nat.card ↥(K.map A.subtype) = Nat.card K :=
       (Nat.card_congr (Subgroup.equivMapOfInjective K A.subtype A.subtype_injective).toEquiv).symm
@@ -1122,7 +1122,7 @@ theorem le_socle_of_exists_normal_complement {G : Type*} [Group G] [Finite G] {E
       (Ch02.socle G ⊓ E) ⊓ M = ⊥ ∧ (Ch02.socle G ⊓ E) ⊔ M = E) :
     E ≤ Ch02.socle G := by
   obtain ⟨M, hMnorm, hME, hinf, hsup⟩ := hcompl
-  haveI := hMnorm
+  have := hMnorm
   have hMbot : M = ⊥ := by
     by_contra hne
     obtain ⟨M₀, hM₀min, hM₀M⟩ := Ch02.exists_isMinimalNormal_le_of_normal M hne
@@ -1149,7 +1149,7 @@ theorem transfer_range_eq_of_quaternionProd {G : Type*} [Group G] [Finite G] (P 
     (MonoidHom.transfer (Abelianization.of (G := ↥(P : Subgroup G)))).range
       = (MonoidHom.transfer (OddOrder.GroupTheory.transferRes Subgroup.le_normalizer
           (Abelianization.of (G := ↥(P : Subgroup G))))).range := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   by_contra hne
   have hle : (MonoidHom.transfer
         (Abelianization.of (G := ↥(P : Subgroup G)))).range
@@ -1260,7 +1260,7 @@ Yoshida (Thm 10.1) と「`C₂ ≀ C₂` は `Q₈ × C₂` の準同型像で�
 theorem commutator_lt_top_of_sylow_quaternionProd {G : Type*} [Group G] [Finite G]
     (P : Sylow 2 G) (e : ↥(P : Subgroup G) ≃* (QuaternionGroup 2 × Multiplicative (ZMod 2))) :
     commutator G < ⊤ := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   set t : ↥(P : Subgroup G) := e.symm (1, Multiplicative.ofAdd 1) with htdef
   have ht : e t = (1, Multiplicative.ofAdd 1) := by rw [htdef, MulEquiv.apply_symm_apply]
   have hxN : (t : G) ∈ Subgroup.normalizer ((P : Subgroup G) : Set G) :=

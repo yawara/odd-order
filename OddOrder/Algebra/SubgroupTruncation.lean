@@ -64,7 +64,7 @@ theorem coeff_inclusionHom_of_mem {n : G} (hn : n ∈ H) (a : MonoidAlgebra R �
 
 theorem coeff_inclusionHom_of_notMem {n : G} (hn : n ∉ H) (a : MonoidAlgebra R ↥H) :
     (inclusionHom H a).coeff n = 0 :=
-  Finsupp.mapDomain_notin_range a.coeff n (by rintro ⟨y, rfl⟩; exact hn y.2)
+  Finsupp.mapDomain_of_notMem_range a.coeff n (by rintro ⟨y, rfl⟩; exact hn y.2)
 
 @[simp]
 theorem inclusionHom_single (h : ↥H) (r : R) :

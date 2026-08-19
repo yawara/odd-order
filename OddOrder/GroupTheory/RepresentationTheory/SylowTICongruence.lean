@@ -68,18 +68,18 @@ theorem exists_int_character_of_constant_on_nonidentity [Finite G] (ρ : Represe
     (hconst : ∀ ⦃w : G⦄, w ∈ Z → w ≠ 1 → ρ.character w = ρ.character z) :
     ∃ n : ℤ, ρ.character z = (n : ℂ) := by
   classical
-  haveI : Fintype ↥Z := Fintype.ofFinite _
+  have : Fintype ↥Z := Fintype.ofFinite _
   let ρZ : Representation ℂ ↥Z V := ρ.comp Z.subtype
   set N : ℕ := Fintype.card ↥Z with hNdef
   -- `Z` contains the two distinct elements `1` and `z`, so `N ≥ 2`.
   have hzne : (⟨z, hzZ⟩ : ↥Z) ≠ 1 := by simpa [Subtype.ext_iff] using hz1
-  haveI : Nontrivial ↥Z := ⟨⟨⟨z, hzZ⟩, 1, hzne⟩⟩
+  have : Nontrivial ↥Z := ⟨⟨⟨z, hzZ⟩, 1, hzne⟩⟩
   have hN2 : 2 ≤ N := Fintype.one_lt_card
   have hNne : ((N : ℂ) - 1) ≠ 0 := by
     refine sub_ne_zero.mpr ?_
     have : N ≠ 1 := by omega
     simpa using (Nat.cast_injective (R := ℂ)).ne this
-  haveI : Invertible ((Fintype.card ↥Z : ℂ)) :=
+  have : Invertible ((Fintype.card ↥Z : ℂ)) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr (by omega : Fintype.card ↥Z ≠ 0))
   -- `∑_{w ∈ Z} ψ(w) = |Z| · dim V^Z`.
   have hsum := sum_character_eq_card_mul_finrank_invariants ρZ
@@ -137,7 +137,7 @@ theorem nonidentityZClassCoeffSum_cong_of_isTISubset [Finite G]
         [ALGMOD (Nat.card (P : Subgroup G) : ℤ)] := by
   classical
   set ρ₀ : Representation ℂ G ℂ := Representation.trivial ℂ G ℂ with hρ₀
-  haveI : ρ₀.IsIrreducible := isIrreducible_complex_rep ρ₀
+  have : ρ₀.IsIrreducible := isIrreducible_complex_rep ρ₀
   have hchar0 : ∀ g : G, ρ₀.character g = 1 := by
     intro g
     simp [hρ₀, Representation.character]

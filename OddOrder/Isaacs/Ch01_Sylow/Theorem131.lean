@@ -95,9 +95,9 @@ theorem sylow_normal_of_card_eq_sq_mul_prime_lt
     [Finite G] {p q : ℕ} [hp : Fact p.Prime] [hq : Fact q.Prime]
     (hqp : q < p) (hcard : Nat.card G = p ^ 2 * q) :
     ∃ P : Sylow p G, (P : Subgroup G).Normal := by
-  haveI : Finite (Sylow p G) := by
+  have : Finite (Sylow p G) := by
     have hG_pos : 0 < Nat.card G := Nat.card_pos
-    haveI : Fintype G := Fintype.ofFinite G
+    have : Fintype G := Fintype.ofFinite G
     infer_instance
   have hpq : p ≠ q := (ne_of_lt hqp).symm
   -- n_p | q
@@ -111,7 +111,7 @@ theorem sylow_normal_of_card_eq_sq_mul_prime_lt
   rcases (Nat.dvd_prime hq.out).mp hdvd with h1 | hq_eq
   · -- n_p = 1
     refine ⟨P, ?_⟩
-    haveI : Subsingleton (Sylow p G) := (Nat.card_eq_one_iff_unique.mp h1).1
+    have : Subsingleton (Sylow p G) := (Nat.card_eq_one_iff_unique.mp h1).1
     exact Sylow.normal_of_subsingleton P
   · -- n_p = q.  Then p ∣ q − 1.  But q < p and q ≥ 1, so q − 1 < p, contradiction.
     exfalso
@@ -142,9 +142,9 @@ theorem sylow_two_normal_of_card_twelve_of_four_sylow_three
     [Finite G] (hcard : Nat.card G = 12)
     (hn3 : Nat.card (Sylow 3 G) = 4) :
     ∃ P : Sylow 2 G, (P : Subgroup G).Normal := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
+  have : Fintype G := Fintype.ofFinite G
   classical
   have hpq : (2 : ℕ) ≠ 3 := by norm_num
   have h12 : (12 : ℕ) = 2 ^ 2 * 3 := by norm_num
@@ -346,7 +346,7 @@ theorem sylow_two_normal_of_card_twelve_of_four_sylow_three
       rw [← h_carriers] at this
       exact hP_iff.mp this
   -- Hence all Sylow 2-subgroups equal as Sylows.
-  haveI : Subsingleton (Sylow 2 G) := by
+  have : Subsingleton (Sylow 2 G) := by
     refine ⟨fun P Q => Sylow.ext ?_⟩
     exact h_S2_eq P Q
   obtain ⟨P⟩ := Sylow.nonempty (p := 2) (G := G)
@@ -365,10 +365,10 @@ theorem sylow_normal_of_card_eq_sq_mul_prime_gt
     (hpq_lt : p < q) (hcard : Nat.card G = p ^ 2 * q) :
     (∃ P : Sylow p G, (P : Subgroup G).Normal) ∨
     (∃ Q : Sylow q G, (Q : Subgroup G).Normal) := by
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   classical
-  haveI : Finite (Sylow q G) := inferInstance
-  haveI : Finite (Sylow p G) := inferInstance
+  have : Finite (Sylow q G) := inferInstance
+  have : Finite (Sylow p G) := inferInstance
   have hpq : p ≠ q := ne_of_lt hpq_lt
   -- n_q ∣ p² and n_q ≡ 1 (mod q)
   obtain ⟨Q⟩ := Sylow.nonempty (p := q) (G := G)
@@ -384,7 +384,7 @@ theorem sylow_normal_of_card_eq_sq_mul_prime_gt
     right
     rw [pow_zero] at hk_eq
     refine ⟨Q, ?_⟩
-    haveI : Subsingleton (Sylow q G) := (Nat.card_eq_one_iff_unique.mp hk_eq).1
+    have : Subsingleton (Sylow q G) := (Nat.card_eq_one_iff_unique.mp hk_eq).1
     exact Sylow.normal_of_subsingleton Q
   · -- n_q = p.  Then p ≡ 1 (mod q), so q ∣ p - 1, but p < q ⇒ p - 1 < q ⇒ contradiction.
     exfalso
@@ -498,7 +498,7 @@ theorem normal_of_card_eq_prime_of_card_eq_sq_mul_prime
     [Finite G] {p q : ℕ} [hp : Fact p.Prime] [hq : Fact q.Prime]
     (hpq : p ≠ q) (hndvd : ¬ q ∣ p ^ 2 - 1) (hcard : Nat.card G = p ^ 2 * q)
     (K : Subgroup G) (hK : Nat.card K = q) : K.Normal := by
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fintype G := Fintype.ofFinite G
   classical
   -- n_q ∣ p² and n_q ≡ 1 (mod q) force n_q = 1 under `¬ q ∣ p² − 1`.
   obtain ⟨Q⟩ := Sylow.nonempty (p := q) (G := G)
@@ -526,7 +526,7 @@ theorem normal_of_card_eq_prime_of_card_eq_sq_mul_prime
           exact Dvd.intro _ rfl
         · exact dvd_rfl
       exact hndvd (hq_dvd.trans hdvd2)
-  haveI : Subsingleton (Sylow q G) := (Nat.card_eq_one_iff_unique.mp hone).1
+  have : Subsingleton (Sylow q G) := (Nat.card_eq_one_iff_unique.mp hone).1
   -- K is a q-group of full multiplicity, hence equals THE (unique, normal) Sylow q.
   have hKp : IsPGroup q K := IsPGroup.of_card (n := 1) (by rw [hK, pow_one])
   obtain ⟨Q', hKQ'⟩ := hKp.exists_le_sylow
@@ -625,9 +625,9 @@ private lemma sylow_p_normal_of_card_eq_cube_mul_prime_of_nq_eq_pcube
     (hpq : p ≠ q) (hcard : Nat.card G = p ^ 3 * q)
     (hnq : Nat.card (Sylow q G) = p ^ 3) :
     ∃ P : Sylow p G, (P : Subgroup G).Normal := by
-  haveI : Fintype G := Fintype.ofFinite G
-  haveI : Fintype (Sylow q G) := Fintype.ofFinite _
-  haveI : Fintype (Sylow p G) := Fintype.ofFinite _
+  have : Fintype G := Fintype.ofFinite G
+  have : Fintype (Sylow q G) := Fintype.ofFinite _
+  have : Fintype (Sylow p G) := Fintype.ofFinite _
   classical
   have hpprime := Fact.out (p := p.Prime)
   have hqprime := Fact.out (p := q.Prime)
@@ -802,7 +802,7 @@ private lemma sylow_p_normal_of_card_eq_cube_mul_prime_of_nq_eq_pcube
       have : x ∈ ((Q : Subgroup G).carrier.toFinset : Finset G) := hQ_iff.mpr hxQ
       rw [← h_carriers] at this
       exact hP_iff.mp this
-  haveI : Subsingleton (Sylow p G) := ⟨fun P Q => Sylow.ext (h_Sp_eq P Q)⟩
+  have : Subsingleton (Sylow p G) := ⟨fun P Q => Sylow.ext (h_Sp_eq P Q)⟩
   obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
   exact ⟨P, Sylow.normal_of_subsingleton P⟩
 
@@ -836,8 +836,8 @@ theorem sylow_normal_of_card_eq_cube_mul_prime
     rw [htop]
     infer_instance
   classical
-  haveI : Finite (Sylow p G) := inferInstance
-  haveI : Finite (Sylow q G) := inferInstance
+  have : Finite (Sylow p G) := inferInstance
+  have : Finite (Sylow q G) := inferInstance
   obtain ⟨P⟩ := Sylow.nonempty (p := p) (G := G)
   obtain ⟨Q⟩ := Sylow.nonempty (p := q) (G := G)
   have hPindex : (P : Subgroup G).index = q :=
@@ -849,7 +849,7 @@ theorem sylow_normal_of_card_eq_cube_mul_prime
   have hnq_dvd : Nat.card (Sylow q G) ∣ p ^ 3 := hQindex ▸ Q.card_dvd_index
   have hnq_mod : Nat.card (Sylow q G) ≡ 1 [MOD q] := card_sylow_modEq_one q G
   rcases (Nat.dvd_prime (Fact.out (p := q.Prime))).mp hnp_dvd with hnp1 | hnpq
-  · haveI : Subsingleton (Sylow p G) := (Nat.card_eq_one_iff_unique.mp hnp1).1
+  · have : Subsingleton (Sylow p G) := (Nat.card_eq_one_iff_unique.mp hnp1).1
     exact Or.inl ⟨P, Sylow.normal_of_subsingleton P⟩
   · have hp_dvd_q_sub_1 : p ∣ q - 1 := by
       rw [hnpq] at hnp_mod
@@ -866,7 +866,7 @@ theorem sylow_normal_of_card_eq_cube_mul_prime
     · -- k = 0: n_q = 1, Sylow q normal.
       have hk_eq_one : Nat.card (Sylow q G) = 1 := by
         simpa using hk_eq
-      haveI : Subsingleton (Sylow q G) := (Nat.card_eq_one_iff_unique.mp hk_eq_one).1
+      have : Subsingleton (Sylow q G) := (Nat.card_eq_one_iff_unique.mp hk_eq_one).1
       exact Or.inr (Or.inl ⟨Q, Sylow.normal_of_subsingleton Q⟩)
     · -- k = 1: n_q = p. By Sylow III: p ≡ 1 (mod q), so q ∣ p - 1. But p < q ⇒ contradiction.
       exfalso
@@ -965,7 +965,7 @@ private lemma factorization_six_three : (6 : ℕ).factorization 3 = 1 := by
 private lemma card_sylow_three_of_card_twenty_four
     [Finite G] (hG : Nat.card G = 24) (P : Sylow 3 G) :
     Nat.card (P : Subgroup G) = 3 := by
-  haveI : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
+  have : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
   have hmul := P.card_eq_multiplicity (G := G)
   rw [hG, factorization_twenty_four_three] at hmul
   simpa using hmul
@@ -974,7 +974,7 @@ private lemma card_sylow_three_of_card_twenty_four
 private lemma card_sylow_two_of_card_twenty_four
     [Finite G] (hG : Nat.card G = 24) (P : Sylow 2 G) :
     Nat.card (P : Subgroup G) = 8 := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hmul := P.card_eq_multiplicity (G := G)
   rw [hG, factorization_twenty_four_two] at hmul
   simpa using hmul
@@ -983,7 +983,7 @@ private lemma card_sylow_two_of_card_twenty_four
 private lemma card_sylow_two_of_card_twelve
     {H : Type*} [Group H] [Finite H] (hH : Nat.card H = 12) (Q : Sylow 2 H) :
     Nat.card (Q : Subgroup H) = 4 := by
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   have hmul := Q.card_eq_multiplicity (G := H)
   rw [hH, factorization_twelve_two] at hmul
   simpa using hmul
@@ -992,7 +992,7 @@ private lemma card_sylow_two_of_card_twelve
 private lemma card_sylow_three_of_card_twelve
     {H : Type*} [Group H] [Finite H] (hH : Nat.card H = 12) (Q : Sylow 3 H) :
     Nat.card (Q : Subgroup H) = 3 := by
-  haveI : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
+  have : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
   have hmul := Q.card_eq_multiplicity (G := H)
   rw [hH, factorization_twelve_three] at hmul
   simpa using hmul
@@ -1001,7 +1001,7 @@ private lemma card_sylow_three_of_card_twelve
 private lemma card_sylow_three_of_card_six
     {H : Type*} [Group H] [Finite H] (hH : Nat.card H = 6) (Q : Sylow 3 H) :
     Nat.card (Q : Subgroup H) = 3 := by
-  haveI : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
+  have : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
   have hmul := Q.card_eq_multiplicity (G := H)
   rw [hH, factorization_six_three] at hmul
   simpa using hmul
@@ -1010,7 +1010,7 @@ private lemma card_sylow_three_of_card_six
 private lemma subsingleton_sylow_three_of_card_six
     {H : Type*} [Group H] [Finite H] (hH : Nat.card H = 6) :
     Subsingleton (Sylow 3 H) := by
-  haveI : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
+  have : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
   obtain ⟨Q⟩ := Sylow.nonempty (p := 3) (G := H)
   have hQ_card : Nat.card (Q : Subgroup H) = 3 := card_sylow_three_of_card_six hH Q
   have hQ_index : (Q : Subgroup H).index = 2 := by
@@ -1032,7 +1032,7 @@ private lemma subsingleton_sylow_three_of_card_six
 private lemma card_sylow_three_of_card_eq_twenty_four
     [Finite G] (hcard : Nat.card G = 24) (hn3 : 1 < Nat.card (Sylow 3 G)) :
     Nat.card (Sylow 3 G) = 4 := by
-  haveI : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
+  have : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
   obtain ⟨P⟩ := Sylow.nonempty (p := 3) (G := G)
   have hPcard : Nat.card (P : Subgroup G) = 3 :=
     card_sylow_three_of_card_twenty_four hcard P
@@ -1052,7 +1052,7 @@ private lemma card_normalizer_sylow_three_of_card_eq_twenty_four
     [Finite G] (hcard : Nat.card G = 24) (hn3 : 1 < Nat.card (Sylow 3 G))
     (P : Sylow 3 G) :
     Nat.card (Subgroup.normalizer (P : Set G)) = 6 := by
-  haveI : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
+  have : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
   have hn3_eq : Nat.card (Sylow 3 G) = 4 :=
     card_sylow_three_of_card_eq_twenty_four hcard hn3
   have hidx : (Subgroup.normalizer (P : Set G)).index = 4 := by
@@ -1085,9 +1085,9 @@ theorem mulEquiv_perm_fin_four_of_card_twenty_four
     (hn3 : 1 < Nat.card (Sylow 3 G)) :
     Nonempty (G ≃* Equiv.Perm (Fin 4)) := by
   classical
-  haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
-  haveI : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
-  haveI : Fintype G := Fintype.ofFinite G
+  have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+  have : Fact (Nat.Prime 3) := ⟨Nat.prime_three⟩
+  have : Fintype G := Fintype.ofFinite G
   -- Phase 1: n_3 = 4, |N| = 6.
   obtain ⟨P⟩ := Sylow.nonempty (p := 3) (G := G)
   have hPcard : Nat.card (P : Subgroup G) = 3 :=
@@ -1099,7 +1099,7 @@ theorem mulEquiv_perm_fin_four_of_card_twenty_four
     have h1 : Nat.card N * N.index = Nat.card G := Subgroup.card_mul_index _
     rw [hcard, hN_card] at h1; omega
   have hP_le_N : (P : Subgroup G) ≤ N := Subgroup.le_normalizer
-  haveI hN_sub3 : Subsingleton (Sylow 3 N) :=
+  have hN_sub3 : Subsingleton (Sylow 3 N) :=
     subsingleton_sylow_three_of_card_six hN_card
   let PN : Sylow 3 N := P.subtype hP_le_N
   have hPN_card : Nat.card (PN : Subgroup N) = 3 := by
@@ -1111,15 +1111,15 @@ theorem mulEquiv_perm_fin_four_of_card_twenty_four
   have hPN_map_eq_P : (PN : Subgroup N).map N.subtype = (P : Subgroup G) := by
     change ((P : Subgroup G).subgroupOf N).map N.subtype = (P : Subgroup G)
     exact Subgroup.map_subgroupOf_eq_of_le hP_le_N
-  haveI hPN_normal : (PN : Subgroup N).Normal := PN.normal_of_subsingleton
-  haveI hPN_char : (PN : Subgroup N).Characteristic :=
+  have hPN_normal : (PN : Subgroup N).Normal := PN.normal_of_subsingleton
+  have hPN_char : (PN : Subgroup N).Characteristic :=
     Sylow.characteristic_of_normal PN hPN_normal
   -- Phase 2: define f : G →* Equiv.Perm (G ⧸ N), K = N.normalCore = f.ker.
   let f : G →* Equiv.Perm (G ⧸ N) := MulAction.toPermHom G (G ⧸ N)
   have hKer_eq : N.normalCore = f.ker := N.normalCore_eq_ker
   set K : Subgroup G := N.normalCore with hK_def
   have hK_le_N : K ≤ N := N.normalCore_le
-  haveI hK_normal : K.Normal := N.normalCore_normal
+  have hK_normal : K.Normal := N.normalCore_normal
   -- Phase 3: K = ⊥.
   have hK_dvd : Nat.card K ∣ 6 := by
     rw [← hN_card]; exact Subgroup.card_dvd_of_le hK_le_N
@@ -1143,7 +1143,7 @@ theorem mulEquiv_perm_fin_four_of_card_twenty_four
         ⟨S2_quot, hS2_quot_normal⟩ | ⟨S3_quot, hS3_quot_normal⟩
       · set S2 : Subgroup G := Subgroup.comap (QuotientGroup.mk' K) (S2_quot : Subgroup (G ⧸ K))
           with hS2_def
-        haveI hS2_normal : S2.Normal := hS2_quot_normal.comap _
+        have hS2_normal : S2.Normal := hS2_quot_normal.comap _
         have hS2_quot_card : Nat.card (S2_quot : Subgroup (G ⧸ K)) = 4 :=
           card_sylow_two_of_card_twelve hquot_card S2_quot
         have hS2_card : Nat.card S2 = 8 := by
@@ -1166,14 +1166,14 @@ theorem mulEquiv_perm_fin_four_of_card_twenty_four
           card_sylow_two_of_card_twenty_four hcard S2_syl
         have hS2_eq : S2 = (S2_syl : Subgroup G) :=
           Subgroup.eq_of_le_of_card_ge hS2_le_syl (by rw [hS2_card, hS2_card_syl])
-        haveI hS2_syl_normal : (S2_syl : Subgroup G).Normal := hS2_eq ▸ hS2_normal
-        haveI : Unique (Sylow 2 G) := Sylow.unique_of_normal S2_syl hS2_syl_normal
+        have hS2_syl_normal : (S2_syl : Subgroup G).Normal := hS2_eq ▸ hS2_normal
+        have : Unique (Sylow 2 G) := Sylow.unique_of_normal S2_syl hS2_syl_normal
         have hn2_eq : Nat.card (Sylow 2 G) = 1 :=
           Nat.card_eq_one_iff_unique.mpr ⟨inferInstance, ⟨S2_syl⟩⟩
         omega
       · set S3 : Subgroup G := Subgroup.comap (QuotientGroup.mk' K) (S3_quot : Subgroup (G ⧸ K))
           with hS3_def
-        haveI hS3_normal : S3.Normal := hS3_quot_normal.comap _
+        have hS3_normal : S3.Normal := hS3_quot_normal.comap _
         have hS3_quot_card : Nat.card (S3_quot : Subgroup (G ⧸ K)) = 3 :=
           card_sylow_three_of_card_twelve hquot_card S3_quot
         have hS3_card : Nat.card S3 = 6 := by
@@ -1188,14 +1188,14 @@ theorem mulEquiv_perm_fin_four_of_card_twenty_four
           have hS3_index : S3.index = 4 := hindex_eq.trans hS3_quot_index
           have h1 : Nat.card S3 * S3.index = Nat.card G := Subgroup.card_mul_index _
           rw [hcard, hS3_index] at h1; omega
-        haveI : Subsingleton (Sylow 3 S3) := subsingleton_sylow_three_of_card_six hS3_card
+        have : Subsingleton (Sylow 3 S3) := subsingleton_sylow_three_of_card_six hS3_card
         obtain ⟨P3⟩ := Sylow.nonempty (p := 3) (G := S3)
         have hP3_card : Nat.card (P3 : Subgroup S3) = 3 :=
           card_sylow_three_of_card_six hS3_card P3
-        haveI hP3_normal : (P3 : Subgroup S3).Normal := P3.normal_of_subsingleton
-        haveI hP3_char : (P3 : Subgroup S3).Characteristic :=
+        have hP3_normal : (P3 : Subgroup S3).Normal := P3.normal_of_subsingleton
+        have hP3_char : (P3 : Subgroup S3).Characteristic :=
           Sylow.characteristic_of_normal P3 hP3_normal
-        haveI hP3_normal_in_G : ((P3 : Subgroup S3).map S3.subtype).Normal :=
+        have hP3_normal_in_G : ((P3 : Subgroup S3).map S3.subtype).Normal :=
           inferInstance
         have hP3_map_card : Nat.card ((P3 : Subgroup S3).map S3.subtype) = 3 := by
           rw [Subgroup.card_map_of_injective Subtype.coe_injective]
@@ -1208,8 +1208,8 @@ theorem mulEquiv_perm_fin_four_of_card_twenty_four
           card_sylow_three_of_card_twenty_four hcard P3_syl
         have hP3_map_eq_syl : (P3 : Subgroup S3).map S3.subtype = (P3_syl : Subgroup G) :=
           Subgroup.eq_of_le_of_card_ge hP3_le_syl (by rw [hP3_map_card, hP3_card_syl])
-        haveI hP3_syl_normal : (P3_syl : Subgroup G).Normal := hP3_map_eq_syl ▸ hP3_normal_in_G
-        haveI : Unique (Sylow 3 G) := Sylow.unique_of_normal P3_syl hP3_syl_normal
+        have hP3_syl_normal : (P3_syl : Subgroup G).Normal := hP3_map_eq_syl ▸ hP3_normal_in_G
+        have : Unique (Sylow 3 G) := Sylow.unique_of_normal P3_syl hP3_syl_normal
         have hn3_eq : Nat.card (Sylow 3 G) = 1 :=
           Nat.card_eq_one_iff_unique.mpr ⟨inferInstance, ⟨P3_syl⟩⟩
         omega
@@ -1232,17 +1232,17 @@ theorem mulEquiv_perm_fin_four_of_card_twenty_four
               (Subgroup.map_subgroupOf_eq_of_le hK_le_N).symm,
             hKsub_eq_QN, hQN_eq_PN, hPN_map_eq_P]
       have hP_normal : (P : Subgroup G).Normal := hK_eq_P ▸ hK_normal
-      haveI : Unique (Sylow 3 G) := Sylow.unique_of_normal P hP_normal
+      have : Unique (Sylow 3 G) := Sylow.unique_of_normal P hP_normal
       have hn3_eq : Nat.card (Sylow 3 G) = 1 :=
         Nat.card_eq_one_iff_unique.mpr ⟨inferInstance, ⟨P⟩⟩
       omega
     · -- |K| = 6.
       exfalso
       have hK_eq_N : K = N := Subgroup.eq_of_le_of_card_ge hK_le_N (by rw [hKK, hN_card])
-      haveI hN_normal : N.Normal := hK_eq_N ▸ hK_normal
-      haveI hPN_map_normal : ((PN : Subgroup N).map N.subtype).Normal := inferInstance
+      have hN_normal : N.Normal := hK_eq_N ▸ hK_normal
+      have hPN_map_normal : ((PN : Subgroup N).map N.subtype).Normal := inferInstance
       have hP_normal : (P : Subgroup G).Normal := hPN_map_eq_P ▸ hPN_map_normal
-      haveI : Unique (Sylow 3 G) := Sylow.unique_of_normal P hP_normal
+      have : Unique (Sylow 3 G) := Sylow.unique_of_normal P hP_normal
       have hn3_eq : Nat.card (Sylow 3 G) = 1 :=
         Nat.card_eq_one_iff_unique.mpr ⟨inferInstance, ⟨P⟩⟩
       omega
@@ -1250,8 +1250,8 @@ theorem mulEquiv_perm_fin_four_of_card_twenty_four
   have hf_ker : f.ker = ⊥ := by rw [← hKer_eq]; exact hK_eq_bot
   have hf_inj : Function.Injective f := (MonoidHom.ker_eq_bot_iff f).mp hf_ker
   have hquotN_card : Nat.card (G ⧸ N) = 4 := by rw [← N.index_eq_card]; exact hN_index
-  haveI : Finite (G ⧸ N) := Nat.finite_of_card_ne_zero (by rw [hquotN_card]; norm_num)
-  haveI : Fintype (G ⧸ N) := Fintype.ofFinite _
+  have : Finite (G ⧸ N) := Nat.finite_of_card_ne_zero (by rw [hquotN_card]; norm_num)
+  have : Fintype (G ⧸ N) := Fintype.ofFinite _
   have hfintype_card : Fintype.card (G ⧸ N) = 4 := by
     rw [← Nat.card_eq_fintype_card]; exact hquotN_card
   let e : G ⧸ N ≃ Fin 4 := Fintype.equivFinOfCardEq hfintype_card
@@ -1260,8 +1260,8 @@ theorem mulEquiv_perm_fin_four_of_card_twenty_four
   have hf'_inj : Function.Injective f' := φ.injective.comp hf_inj
   have hperm_card : Nat.card (Equiv.Perm (Fin 4)) = 24 := by
     rw [Nat.card_perm, Nat.card_fin]; decide
-  haveI : Finite (Equiv.Perm (Fin 4)) := inferInstance
-  haveI : Fintype (Equiv.Perm (Fin 4)) := Fintype.ofFinite _
+  have : Finite (Equiv.Perm (Fin 4)) := inferInstance
+  have : Fintype (Equiv.Perm (Fin 4)) := Fintype.ofFinite _
   have hfin_perm_card : Fintype.card (Equiv.Perm (Fin 4)) = 24 := by
     rw [← Nat.card_eq_fintype_card]; exact hperm_card
   have hfin_G_card : Fintype.card G = 24 := by

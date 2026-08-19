@@ -79,7 +79,7 @@ theorem IsAInvariant.map_coe_eq {A G : Type*} [Group A] [Group G] {φ : A →* M
 theorem isUnit_intCast_of_mulAut_zpow {E : Type*} [Group E] {p : ℕ} (hp : p.Prime)
     {g : E} (hgne : g ≠ 1) (hgp : g ^ p = 1) (f : MulAut E) {t : ℤ} (ht : f g = g ^ t) :
     IsUnit (t : ZMod p) := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   rw [isUnit_iff_ne_zero]
   intro h0
   obtain ⟨c, rfl⟩ : (p : ℤ) ∣ t := (ZMod.intCast_zmod_eq_zero_iff_dvd t p).mp h0
@@ -130,7 +130,7 @@ theorem RegularOperatorSetup.centralizer_upperCentralSeries_abelian_index_p
       (Subgroup.centralizer
           ((Subgroup.upperCentralSeries ↥(Omega R p 1) 2 : Subgroup ↥(Omega R p 1)) :
             Set ↥(Omega R p 1))).index = p := by
-  haveI : Fact p.Prime := ⟨hyp.p_prime⟩
+  have : Fact p.Prime := ⟨hyp.p_prime⟩
   have hTeq := centralizer_upperCentralSeries_eq_centralizer_omega1 (p := p)
     hyp.omega_pow_eq_one'
   rw [hTeq] at hdc ⊢
@@ -142,10 +142,10 @@ theorem RegularOperatorSetup.centralizer_upperCentralSeries_abelian_index_p
   set T : Subgroup ↥(Omega R p 1) :=
     Subgroup.centralizer
       (omega1UpperCentralTwo ↥(Omega R p 1) p : Set ↥(Omega R p 1)) with hTdef
-  haveI : S'.Normal := by rw [hS'def]; infer_instance
-  haveI : S'.Characteristic := by rw [hS'def]; infer_instance
+  have : S'.Normal := by rw [hS'def]; infer_instance
+  have : S'.Characteristic := by rw [hS'def]; infer_instance
   -- Invariances: `S`, `S'`, `T` are all characteristic.
-  haveI : (Omega R p 1).Characteristic := Omega.characteristic
+  have : (Omega R p 1).Characteristic := Omega.characteristic
   have hSinvB : IsAInvariant hyp.act (Omega R p 1) := IsAInvariant.of_characteristic hyp.act
   have hSinvA : IsAInvariant (hyp.act.comp hyp.A.subtype) (Omega R p 1) :=
     IsAInvariant.of_characteristic _
@@ -157,7 +157,7 @@ theorem RegularOperatorSetup.centralizer_upperCentralSeries_abelian_index_p
   have hS'T : S' ≤ T := hyp.commutator_le_centralizer hcard
   -- BG's `α ∈ A^#`.
   obtain ⟨a, ha, hane⟩ : ∃ a, ∃ h : a ∈ hyp.A, (⟨a, h⟩ : ↥hyp.A) ≠ 1 := by
-    haveI : Nontrivial ↥hyp.A := by
+    have : Nontrivial ↥hyp.A := by
       have hcardA := hyp.A_card
       rw [Subgroup.nontrivial_iff_ne_bot]
       intro h
@@ -253,7 +253,7 @@ theorem RegularOperatorSetup.centralizer_upperCentralSeries_abelian_index_p
     have hlt : p ^ 1 < p ^ 2 := Nat.pow_lt_pow_right hyp.p_prime.one_lt (by omega)
     rw [pow_one] at hlt
     omega
-  haveI hTbarNormal : Tbar.Normal := ⟨fun n hn g => by
+  have hTbarNormal : Tbar.Normal := ⟨fun n hn g => by
     rw [hEA.comm g n, mul_assoc, mul_inv_cancel, mul_one]
     exact hn⟩
   have hTbarIdx : Tbar.index = p := by
@@ -281,8 +281,8 @@ theorem RegularOperatorSetup.centralizer_upperCentralSeries_abelian_index_p
     rcases hyp.p_prime.eq_one_or_self_of_dvd _ hdvd with h1 | h1
     · exact absurd (Subgroup.card_eq_one.mp h1) hWne
     · exact h1
-  haveI : IsCyclic ↥W := isCyclic_of_prime_card hcardW
-  haveI : IsCyclic ↥Tbar := isCyclic_of_prime_card hcardTbar
+  have : IsCyclic ↥W := isCyclic_of_prime_card hcardW
+  have : IsCyclic ↥Tbar := isCyclic_of_prime_card hcardTbar
   -- `(E.19)`: the eigenvalues `t`, `t₀` of `β` on `Q/S'` and `T/S'`.
   have hTbarInv : IsAInvariant hNinv.quotientMulAutHom Tbar :=
     OddOrder.BG.Ch1_Preliminary.isAInvariant_map_mk' hNinv hTinvB
@@ -299,12 +299,12 @@ theorem RegularOperatorSetup.centralizer_upperCentralSeries_abelian_index_p
     have h0 : ((t - t₀ : ℤ) : ZMod p) = 0 := by push_cast; rw [h, sub_self]
     exact (ZMod.intCast_zmod_eq_zero_iff_dvd _ p).mp h0
   -- The eigenvalues are units mod `p`.
-  haveI : Nontrivial ↥W := (Subgroup.nontrivial_iff_ne_bot W).mpr hWne
+  have : Nontrivial ↥W := (Subgroup.nontrivial_iff_ne_bot W).mpr hWne
   obtain ⟨xW, hxWne⟩ := exists_ne (1 : ↥W)
   have htu : IsUnit (t : ZMod p) :=
     isUnit_intCast_of_mulAut_zpow hyp.p_prime (fun h => hxWne (Subtype.ext h))
       (hEA.pow_eq_one _) (hNinv.quotientMulAutHom b) (htW _ xW.2)
-  haveI : Nontrivial ↥Tbar := (Subgroup.nontrivial_iff_ne_bot Tbar).mpr fun hb => by
+  have : Nontrivial ↥Tbar := (Subgroup.nontrivial_iff_ne_bot Tbar).mpr fun hb => by
     rw [hb, Subgroup.card_bot] at hcardTbar
     exact hyp.p_prime.one_lt.ne hcardTbar
   obtain ⟨yT, hyTne⟩ := exists_ne (1 : ↥Tbar)

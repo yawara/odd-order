@@ -80,8 +80,8 @@ theorem induce_induce_subgroupOf {M : Type*} [Group M] [Fintype M] [Invertible (
     ClassFunction.induce H (ClassFunction.induce (K.subgroupOf H)
         (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKH).toMonoidHom ψ))
       = ClassFunction.induce K ψ := by
-  haveI : Fintype ↥K := Fintype.ofFinite _
-  haveI : Fintype ↥(K.subgroupOf H) := Fintype.ofFinite _
+  have : Fintype ↥K := Fintype.ofFinite _
+  have : Fintype ↥(K.subgroupOf H) := Fintype.ofFinite _
   set e := Subgroup.subgroupOfEquivOfLe hKH with he
   have hres : ∀ χ : IrreducibleCharacter M,
       ClassFunction.restrict (K.subgroupOf H)

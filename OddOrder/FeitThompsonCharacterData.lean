@@ -85,8 +85,8 @@ noncomputable def tiCyclicW : OddOrder.Peterfalvi.S05.TICyclicHypothesis G :=
     W_normalizes_V := by
       intro w v hv
       have hvW : v ∈ tp.W := hv.1
-      haveI := tp.W_cyclic
-      letI : CommGroup ↥tp.W := IsCyclic.commGroup
+      have := tp.W_cyclic
+      let : CommGroup ↥tp.W := IsCyclic.commGroup
       have hcg : (w : G) * v = v * (w : G) := by
         have h := mul_comm w (⟨v, hvW⟩ : ↥tp.W)
         have := congrArg (Subgroup.subtype tp.W) h
@@ -309,7 +309,7 @@ theorem muS_diff_support (i : Fin tp.q) {j k : Fin tp.p}
       OddOrder.Peterfalvi.S04.supportInSubgroup
         (OddOrder.Peterfalvi.S10.typePACore0 mp.S tp.Sdata) mp.S := by
   classical
-  haveI : NeZero (Nat.card ↥(hyp46SmpCore hG mp tp).W1) :=
+  have : NeZero (Nat.card ↥(hyp46SmpCore hG mp tp).W1) :=
     inferInstanceAs (NeZero (Nat.card ↥(mp.certainTypeS hG).W1))
   have hχj : chi2enum hG mp tp j ≠ 1 := by
     intro hc
@@ -358,6 +358,7 @@ theorem omegaS_mul (i : Fin tp.q) (j : Fin tp.p) (w w' : ↥tp.W) :
     map_mul, Units.val_mul]
 
 omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (3.3), column-`0` normalization** (issue 2033): the column-`0` grid characters
 `ω_{i0}` are trivial on `W₂` (`chi2enum 0 = 1` is the trivial `W₂`-dual).  Discharges the
 `omega_col_zero_apply_of_mem_W2` field of `Peterfalvi.S15.Hypothesis`. -/
@@ -370,6 +371,7 @@ theorem omegaS_col_zero_apply_of_mem_W2 (i : Fin tp.q) (w : ↥tp.W) (hw : (w : 
   exact Units.val_one
 
 omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (3.3), row-`0` normalization** (issue 2033): the row-`0` grid characters
 `ω_{0j}` are trivial on `W₁` (`w1CharEquiv 0 = 1` is the trivial `W₁`-dual).  Discharges the
 `omega_row_zero_apply_of_mem_W1` field of `Peterfalvi.S15.Hypothesis`. -/
@@ -383,6 +385,7 @@ theorem omegaS_row_zero_apply_of_mem_W1 (j : Fin tp.p) (w : ↥tp.W) (hw : (w : 
   exact Units.val_one
 
 omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (3.3), `W₁`-value order** (issue 2033): on `W₁` the grid values are `q`-th
 roots of unity — the `W₂`-factor is trivial there and the `W₁`-factor character has order
 dividing `|W₁| = q`.  Discharges the `omega_pow_q_of_mem_W1` field of
@@ -407,6 +410,7 @@ theorem omegaS_pow_q_of_mem_W1 (i : Fin tp.q) (j : Fin tp.p) (w : ↥tp.W)
     hx, map_one, Units.val_one]
 
 omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (3.3), `W₂`-value order** (issue 2033): on `W₂` the grid values are `p`-th
 roots of unity — the `W₁`-factor is trivial there and the `W₂`-factor character has order
 dividing `|W₂| = p`.  Discharges the `omega_pow_p_of_mem_W2` field of
@@ -456,6 +460,7 @@ theorem omegaS_eq_omega_omegaSChar (i : Fin tp.q) (j : Fin tp.p) :
   rfl
 
 omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+set_option backward.isDefEq.respectTransparency false in
 /-- The row-axis underlying character is the corresponding power of the first
 nonprincipal row character. -/
 theorem omegaSChar_row_eq_pow (i : Fin tp.q) :
@@ -509,6 +514,7 @@ theorem omegaSChar_column_eq_pow (j : Fin tp.p) :
         (gridEquivE hG mp tp).toMonoidHom) (j : ℕ) w).symm
 
 omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+set_option backward.isDefEq.respectTransparency false in
 /-- The concrete Dade-grid member is the S05 sigma image of its underlying
 linear character. -/
 theorem tau3W_omegaS_eq_sigma_omegaSChar (i : Fin tp.q) (j : Fin tp.p) :
@@ -568,14 +574,14 @@ theorem exists_omegaS_eq_omega (ξ : ↥tp.W →* ℂˣ) :
     ∃ (i : Fin tp.q) (j : Fin tp.p),
       omegaS hG mp tp i j = ((tiCyclicW hG mp tp).omega ξ).toClassFunction := by
   classical
-  haveI : Fintype (↥tp.W →* ℂˣ) := Fintype.ofFinite _
+  have : Fintype (↥tp.W →* ℂˣ) := Fintype.ofFinite _
   have hinj := omegaSChar_injective hG mp tp
   -- cardinalities agree: `|Fin q × Fin p| = pq = |W| = |Ŵ|`
   have hcardW : Nat.card ↥tp.W = tp.q * tp.p := cardTPW mp tp
   have hcardHom : Fintype.card (↥tp.W →* ℂˣ) = tp.q * tp.p := by
-    haveI := tp.W_cyclic
-    letI : CommGroup ↥tp.W := IsCyclic.commGroup
-    haveI : NeZero ((Monoid.exponent ↥tp.W : ℂ)) := ⟨Nat.cast_ne_zero.2 (NeZero.ne _)⟩
+    have := tp.W_cyclic
+    let : CommGroup ↥tp.W := IsCyclic.commGroup
+    have : NeZero ((Monoid.exponent ↥tp.W : ℂ)) := ⟨Nat.cast_ne_zero.2 (NeZero.ne _)⟩
     rw [← Nat.card_eq_fintype_card,
       CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity ↥tp.W ℂ]
     exact hcardW
@@ -591,6 +597,7 @@ theorem exists_omegaS_eq_omega (ξ : ↥tp.W →* ℂˣ) :
   exact congrArg _ (congrArg _ hij)
 
 omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (3.9.c) for the S-side `η`-grid** (issue-3002 supply): the grid value
 `η_{ij}(g) = (τ₃ω)_{ij}(g)` is a rational integer on elements `g` of order prime to `pq`.
 
@@ -603,7 +610,7 @@ theorem tau3W_omegaS_intCast_of_coprime (i : Fin tp.q) (j : Fin tp.p) {g : G}
     (hg : Nat.Coprime (orderOf g) (tp.p * tp.q)) :
     ∃ n : ℤ, tau3W hG mp tp (omegaS hG mp tp i j) g = (n : ℂ) := by
   classical
-  haveI : Fintype ↥tp.W := Fintype.ofFinite _
+  have : Fintype ↥tp.W := Fintype.ofFinite _
   -- `orderOf (omegaSChar i j) ∣ pq`: the hom `ξ` satisfies `ξ ^ |W| = 1` and `|W| = pq`.
   have hdvd : orderOf (omegaSChar hG mp tp i j) ∣ tp.p * tp.q := by
     set ξ := omegaSChar hG mp tp i j with hξ
@@ -625,6 +632,7 @@ theorem tau3W_omegaS_intCast_of_coprime (i : Fin tp.q) (j : Fin tp.p) {g : G}
   exact hn
 
 omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
+set_option backward.isDefEq.respectTransparency false in
 /-- The principal grid character `omegaS ⟨0⟩ ⟨0⟩` is the trivial character of `↥tp.W`:
 its underlying hom is `omegaProdChar (w1CharEquiv 0) (chi2enum 0) = omegaProdChar 1 1 = 1`
 (`w1CharEquiv_zero`, `chi2enum_zero`), and `omega 1 = trivialClassFunction`. -/
@@ -703,6 +711,7 @@ theorem eqQ_finNeg_eq_rowInv (i : Fin tp.q) :
     OddOrder.Peterfalvi.S06.w1CharEquiv_rowInv]
 
 omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
+set_option backward.isDefEq.respectTransparency false in
 /-- **CF-level conjugation pairs the `ω`-grid at the negated index** (Peterfalvi (3.9.a),
 character half): `ω̄_{ij} = ω_{−i,−j}` — complex conjugation inverts the linear grid character
 (`galoisMap_conj_omega`), and index negation is character inversion (`omegaSChar_finNeg`). -/
@@ -762,6 +771,7 @@ theorem tau3W_omegaS_conj (i : Fin tp.q) (j : Fin tp.p) :
   exact hcomm
 
 omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (3.9.a) conjugate-pair symmetry on generic elements** (issue-3002 supply):
 for `g` of order prime to `pq`, the `η`-grid pairs under the index negation `(i,j) ↦ (−i,−j)`
 (`S15.finNeg`), `(τ₃ω)_{−i,−j}(g) = (τ₃ω)_{ij}(g)`.
@@ -778,7 +788,7 @@ theorem tau3W_omegaS_pair_of_coprime (i : Fin tp.q) (j : Fin tp.p) {g : G}
         (OddOrder.Peterfalvi.S15.finNeg tp.p_prime.pos j)) g
       = tau3W hG mp tp (omegaS hG mp tp i j) g := by
   classical
-  haveI : Fintype ↥tp.W := Fintype.ofFinite _
+  have : Fintype ↥tp.W := Fintype.ofFinite _
   -- (3.9.c): the σ-value at the base index is a rational integer.
   have hdvd : orderOf (omegaSChar hG mp tp i j) ∣ tp.p * tp.q := by
     set ξ := omegaSChar hG mp tp i j with hξ
@@ -812,6 +822,7 @@ theorem tau3W_omegaS_pair_of_coprime (i : Fin tp.q) (j : Fin tp.p) {g : G}
   exact map_intCast _ n
 
 omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (3.2.d), `η`-grid form** (issue-2034 supply): a class function of `G`
 orthogonal to the whole grid `tau3W (omegaS i j)` vanishes on the regular set
 `Ŵ = W ∖ (W₁ ∪ W₂)`.  Transfer of the S05 completeness
@@ -846,6 +857,7 @@ theorem tau3W_omegaS_complete_vanish (χ : ClassFunction G ℂ)
 `1 − η_{i0}(x) − η_{0j}(x) + η_{ij}(x) = 0` there. -/
 
 omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+set_option backward.isDefEq.respectTransparency false in
 /-- Column-independence of the `omegaS`-values on `W₁` (the row character alone survives). -/
 theorem omegaS_apply_of_mem_W1_col_eq (i : Fin tp.q) (j j' : Fin tp.p) (w : ↥tp.W)
     (hw : (w : G) ∈ tp.W1) :
@@ -859,6 +871,7 @@ theorem omegaS_apply_of_mem_W1_col_eq (i : Fin tp.q) (j j' : Fin tp.p) (w : ↥t
     omegaProdCharS_apply_mem_K hG mp tp _ _ w hwK]
 
 omit [NeZero (Nat.card ↥(mp.certainTypeT hG).W1)] in
+set_option backward.isDefEq.respectTransparency false in
 /-- Row-independence of the `omegaS`-values on `W₂` (the column character alone survives). -/
 theorem omegaS_apply_of_mem_W2_row_eq (i i' : Fin tp.q) (j : Fin tp.p) (w : ↥tp.W)
     (hw : (w : G) ∈ tp.W2) :
@@ -967,6 +980,7 @@ theorem omegaSChar_col_align (i : Fin tp.q) (j : Fin tp.p) :
     rw [hfst, map_one, map_one]
 
 omit [NeZero (Nat.card ↥(Section16MaximalPair.certainTypeT hG mp).W1)] in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (3.4)/(3.5), the four-corner vanishing** (issue-2036 supply): off the
 conjugacy saturation of the regular set `V = W ∖ (W₁ ∪ W₂)`,
 `1 − η_{i0}(x) − η_{0j}(x) + η_{ij}(x) = 0` for nonzero row and column indices — the `(3.5)`

@@ -50,7 +50,7 @@ theorem isTypeII_of_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hKne : K ≠ ⊥ := fun h => card_kappaHall_ne_one hP hKM hK (by rw [h, Subgroup.card_bot])
   -- `K` cyclic (Theorem A(2) / Lemma 15.1(b), `typeP_auxiliary_structure` conjunct 2).
   obtain ⟨_, hKcyc, _⟩ := typeP_auxiliary_structure hG hM hKM hUM hK rfl hU
-  haveI := hKcyc
+  have := hKcyc
   -- `hderfit`: `(M')_F = M_F` (both `= M_σ`).
   have hMFMσ : maxNilpotentNormalHall M = OddOrder.BG.Ch3.S10.Msigma M :=
     (maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hM).mpr
@@ -136,7 +136,7 @@ theorem kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot [Finite G]
     (hKNZ : K ≤ Subgroup.normalizer (Z : Set G)) (hZK : Z ⊓ Kstar = ⊥) :
     Nat.card ↥K ∣ p - 1 := by
   classical
-  letI : MulDistribMulAction ↥K ↥Z :=
+  let : MulDistribMulAction ↥K ↥Z :=
     MulDistribMulAction.compHom ↥Z (Z.normalizerMonoidHom.comp (Subgroup.inclusion hKNZ))
   have hFA : OddOrder.Isaacs.Ch06.IsFrobeniusAction ↥K ↥Z := by
     intro u hu z hz hfix
@@ -180,7 +180,7 @@ theorem kappaHall_inf_centralizer_opiCore_eq_bot [Finite G]
     (hZKstar : Z ≤ Kstar) (hZcard : Nat.card ↥Z = p) (hX₁notZ : ¬ X₁ ≤ Z) :
     K ⊓ Subgroup.centralizer (↑(opiCoreInG ({p} : Set ℕ) (S15.MF M)) : Set G) = ⊥ := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (S15.MF M) with hPdef
   -- `K* = Z`: `|K*|` prime, `Z ≤ K*`, `|Z| = p`.
   have hKstarPrime : (Nat.card ↥Kstar).Prime :=
@@ -190,7 +190,7 @@ theorem kappaHall_inf_centralizer_opiCore_eq_bot [Finite G]
     have hcard : Nat.card ↥Kstar = p := ((Nat.prime_dvd_prime_iff_eq hp hKstarPrime).mp hdvd).symm
     exact (Subgroup.eq_of_le_of_card_ge hZKstar (le_of_eq (hcard.trans hZcard.symm))).symm
   -- `X₁ ≤ P` (`p`-subgroup of the nilpotent `M_F`).
-  haveI hMFnil : Group.IsNilpotent ↥(S15.MF M) := S15.maxNilpotentNormalHall_isNilpotent M
+  have hMFnil : Group.IsNilpotent ↥(S15.MF M) := S15.maxNilpotentNormalHall_isNilpotent M
   have hX₁pg : IsPGroup p ↥X₁ := IsPGroup.of_card (n := 1) (by rw [hX₁card, pow_one])
   have hX₁P : X₁ ≤ P :=
     OddOrder.BG.Ch2.S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent hMFnil hX₁MF hX₁pg

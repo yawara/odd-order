@@ -100,7 +100,7 @@ theorem le_centralizer_of_isPGroup_conjNormal_image_minimalNormal
   have hD_pgPrime : IsPGroup p ↥(D.map α) := by
     rw [hα_def]
     exact hD_pg
-  haveI hN_nontriv : Nontrivial ↥N := by
+  have hN_nontriv : Nontrivial ↥N := by
     rcases Subgroup.bot_or_nontrivial N with h | h
     · exact absurd h hMin.2.1
     · exact h
@@ -140,7 +140,7 @@ theorem le_centralizer_of_isPGroup_conjNormal_image_minimalNormal
     apply hfix_ne
     rw [hW_def, Subgroup.map_eq_bot_iff, Subgroup.ker_subtype, le_bot_iff] at h
     exact h
-  haveI hW_norm : W.Normal := by
+  have hW_norm : W.Normal := by
     constructor
     intro n hn g
     obtain ⟨hnN, hnfix⟩ := (hW_mem n).mp hn
@@ -172,7 +172,7 @@ theorem le_chiefFactorCentralizer_of_isPGroup_conjNormal_image_chiefFactor
       ↥((D.map (QuotientGroup.mk' V)).map
         (MulAut.conjNormal (H := U.map (QuotientGroup.mk' V))))) :
     D ≤ chiefFactorCentralizer U V := by
-  haveI hDbar_normal : (D.map (QuotientGroup.mk' V)).Normal :=
+  have hDbar_normal : (D.map (QuotientGroup.mk' V)).Normal :=
     (inferInstance : D.Normal).map _ (QuotientGroup.mk'_surjective V)
   have hMin : Ch02.IsMinimalNormal (U.map (QuotientGroup.mk' V)) :=
     hChief.isMinimalNormal_map_quotient
@@ -440,7 +440,7 @@ theorem pRank_quotient_le_of_coprime {p : ℕ} [Fact p.Prime]
 `R = O_p(G)`, `C = C_G(R)`: Hall–Higman 1.2.3 (= **G** Thm 6.3.2) で `C ≤ R`;
 Lemma 4.17 で `(G/C)'` は `p`-群; `C` も `p`-群なので `G'` の引き戻しが normal
 `p`-部分群となり `O_p(G)` に入る。素因子評価は Lemma 4.13。 -/
-private theorem core418 {p : ℕ} [Fact p.Prime] [IsSolvable G]
+private theorem core418 {p : ℕ} [Fact p.Prime] [Group.IsSolvable G]
     (hp : Odd p) (hodd : Odd (Nat.card G)) (hrank : pRank G p ≤ 2)
     (hredu : Ch03.oPiCore {r : ℕ | r ≠ p} G = ⊥) :
     _root_.commutator G ≤ Ch03.oPiCore ({p} : Set ℕ) G ∧
@@ -449,7 +449,7 @@ private theorem core418 {p : ℕ} [Fact p.Prime] [IsSolvable G]
   classical
   have hprime : p.Prime := Fact.out
   set R : Subgroup G := Ch03.oPiCore ({p} : Set ℕ) G with hR_def
-  haveI hR_normal : R.Normal := by rw [hR_def]; infer_instance
+  have hR_normal : R.Normal := by rw [hR_def]; infer_instance
   -- `R` is a `p`-group of rank ≤ 2
   have hR_pg : IsPGroup p ↥R :=
     isPGroup_of_isPiGroup_singleton (Ch03.oPiCore.isPiGroup ({p} : Set ℕ))
@@ -491,7 +491,7 @@ private theorem core418 {p : ℕ} [Fact p.Prime] [IsSolvable G]
       refine IsPGroup.comap_of_ker_isPGroup hA' _ ?_
       rw [QuotientGroup.ker_mk']
       exact hker_pg
-    haveI hW_norm :
+    have hW_norm :
         ((_root_.commutator (G ⧸ ψ.ker)).comap (QuotientGroup.mk' ψ.ker)).Normal :=
       Subgroup.Normal.comap inferInstance _
     have hW_le_R :
@@ -557,7 +557,7 @@ private theorem core418 {p : ℕ} [Fact p.Prime] [IsSolvable G]
     have hS_pg : IsPGroup p (Subgroup.zpowers x) := by
       apply IsPGroup.of_card (n := 1)
       rw [Nat.card_zpowers, hx_ord, pow_one]
-    haveI hS_norm : (Subgroup.zpowers x).Normal := by
+    have hS_norm : (Subgroup.zpowers x).Normal := by
       refine ⟨fun n hn g => ?_⟩
       have hgn : g * n * g⁻¹ = n := by
         rw [hcomm_quot g n]
@@ -568,7 +568,7 @@ private theorem core418 {p : ℕ} [Fact p.Prime] [IsSolvable G]
       refine IsPGroup.comap_of_ker_isPGroup hS_pg _ ?_
       rw [QuotientGroup.ker_mk']
       exact hR_pg
-    haveI hP_norm :
+    have hP_norm :
         ((Subgroup.zpowers x).comap (QuotientGroup.mk' R)).Normal :=
       Subgroup.Normal.comap hS_norm _
     have hP_le : (Subgroup.zpowers x).comap (QuotientGroup.mk' R) ≤ R :=
@@ -593,11 +593,11 @@ theorem card_quotient_oPiPrimePiCore {p : ℕ} :
         Ch03.oPiCore ({p} : Set ℕ) (G ⧸ Ch03.oPiCore {q : ℕ | q ∉ ({p} : Set ℕ)} G)) := by
   classical
   set N : Subgroup G := Ch03.oPiCore {q : ℕ | q ∉ ({p} : Set ℕ)} G with hN_def
-  haveI hN_norm : N.Normal := by rw [hN_def]; infer_instance
+  have hN_norm : N.Normal := by rw [hN_def]; infer_instance
   have hOpp : Ch03.oPiPrimePiCore {p} G =
       (Ch03.oPiCore ({p} : Set ℕ) (G ⧸ N)).comap (QuotientGroup.mk' N) := by
     rw [Ch03.oPiPrimePiCore]
-  haveI hOpp_norm : (Ch03.oPiPrimePiCore {p} G).Normal := inferInstance
+  have hOpp_norm : (Ch03.oPiPrimePiCore {p} G).Normal := inferInstance
   have hN_le_Opp : N ≤ Ch03.oPiPrimePiCore {p} G := by
     rw [hOpp]
     intro x hx
@@ -609,7 +609,7 @@ theorem card_quotient_oPiPrimePiCore {p : ℕ} :
       Ch03.oPiCore ({p} : Set ℕ) (G ⧸ N) := by
     rw [hOpp]
     exact Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective N) _
-  haveI : ((Ch03.oPiPrimePiCore {p} G).map (QuotientGroup.mk' N)).Normal := by
+  have : ((Ch03.oPiPrimePiCore {p} G).map (QuotientGroup.mk' N)).Normal := by
     rw [hmap_Opp]
     infer_instance
   have e := QuotientGroup.quotientQuotientEquivQuotient N
@@ -640,7 +640,7 @@ theorem structure_of_quotient_commutator_le_opCore
   have hprime : p.Prime := Fact.out
   -- the `p'`-residual quotient `Ḡ = G ⧸ N` (`oPiPrimePiCore` の内部表現の集合形を使う)
   set N : Subgroup G := Ch03.oPiCore {q : ℕ | q ∉ ({p} : Set ℕ)} G with hN_def
-  haveI hN_norm : N.Normal := by rw [hN_def]; infer_instance
+  have hN_norm : N.Normal := by rw [hN_def]; infer_instance
   have hN_p' : ¬ p ∣ Nat.card ↥N :=
     not_dvd_card_oPiCore (by simp)
   -- the two forms of `O_{p'}(G)` agree
@@ -653,7 +653,7 @@ theorem structure_of_quotient_commutator_le_opCore
   have hOpp : Ch03.oPiPrimePiCore {p} G =
       (Ch03.oPiCore ({p} : Set ℕ) (G ⧸ N)).comap (QuotientGroup.mk' N) := by
     rw [Ch03.oPiPrimePiCore]
-  haveI hOpp_norm : (Ch03.oPiPrimePiCore {p} G).Normal := inferInstance
+  have hOpp_norm : (Ch03.oPiPrimePiCore {p} G).Normal := inferInstance
   -- `G' ≤ O_{p',p}(G)`
   have hmap_comm : (_root_.commutator G).map (QuotientGroup.mk' N) =
       _root_.commutator (G ⧸ N) := by
@@ -691,7 +691,7 @@ theorem structure_of_quotient_commutator_le_opCore
   -- (c): the normal `p`-complement `N'' = N ∩ G'` of `G'`
   set N'' : Subgroup ↥(_root_.commutator G) :=
     N.subgroupOf (_root_.commutator G) with hN''_def
-  haveI hN''_norm : N''.Normal := by
+  have hN''_norm : N''.Normal := by
     rw [hN''_def]
     exact hN_norm.subgroupOf _
   have hN''_card_dvd : Nat.card ↥N'' ∣ Nat.card ↥N := by
@@ -848,7 +848,7 @@ theorem structure_of_quotient_commutator_le_opCore
 結論の語彙は §5 Thm 5.6 (`narrow_sylow_solvable_structure`) と一致させている。
 証明 = `core418` (`O_{p'} = 1` の場合; Hall–Higman + Lemma 4.17 + Lemma 4.13) を
 商 `Ḡ = G/O_{p'}(G)` に適用し、`structure_of_quotient_commutator_le_opCore` で引き戻す。 -/
-theorem solvable_structure_of_pRank_le_two [IsSolvable G]
+theorem solvable_structure_of_pRank_le_two [Group.IsSolvable G]
     (hodd : Odd (Nat.card G)) {p : ℕ} [Fact p.Prime] (hp_mem : p ∣ Nat.card G)
     (hrank : pRank G p ≤ 2) :
     (∀ q ∈ (Nat.card (G ⧸ Ch03.oPiCore {r | r ≠ p} G)).primeFactors, q ≤ p) ∧
@@ -868,7 +868,7 @@ theorem solvable_structure_of_pRank_le_two [IsSolvable G]
     · exact ho
   -- the `p'`-residual quotient `Ḡ = G ⧸ N`
   set N : Subgroup G := Ch03.oPiCore {q : ℕ | q ∉ ({p} : Set ℕ)} G with hN_def
-  haveI hN_norm : N.Normal := by rw [hN_def]; infer_instance
+  have hN_norm : N.Normal := by rw [hN_def]; infer_instance
   have hN_p' : ¬ p ∣ Nat.card ↥N :=
     not_dvd_card_oPiCore (by simp)
   have hquot_dvd_G : Nat.card (G ⧸ N) ∣ Nat.card G := by

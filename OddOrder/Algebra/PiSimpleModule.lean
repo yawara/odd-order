@@ -93,7 +93,7 @@ acts as the identity** (and the others act as zero).  This is the general statem
 theorem exists_unique_idem_smul_eq_self [Finite ι] [IsSimpleModule (∀ j, R j) M] :
     ∃! i : ι, ∀ s : M, idem R i • s = s := by
   classical
-  haveI : Fintype ι := Fintype.ofFinite ι
+  have : Fintype ι := Fintype.ofFinite ι
   exact OddOrder.exists_unique_smul_eq_self_of_completeOrthogonal
     (CompleteOrthogonalIdempotents.single R)
     (fun i => Semigroup.mem_center_iff.mpr fun r => (commute_idem i r).symm)
@@ -125,7 +125,7 @@ theorem isSimpleModule_factor {i : ι} [Module (R i) M] [IsSimpleModule (∀ j, 
     (hi : ∀ s : M, idem R i • s = s)
     (hcompat : ∀ (a : R i) (s : M), a • s = (Pi.single i a : ∀ j, R j) • s) :
     IsSimpleModule (R i) M := by
-  haveI : RingHomSurjective (Pi.evalRingHom R i) := ⟨surjective_evalRingHom i⟩
+  have : RingHomSurjective (Pi.evalRingHom R i) := ⟨surjective_evalRingHom i⟩
   let l : M →ₛₗ[Pi.evalRingHom R i] M :=
     { toFun := id
       map_add' := fun _ _ => rfl

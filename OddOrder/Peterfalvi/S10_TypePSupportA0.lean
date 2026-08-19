@@ -64,8 +64,8 @@ theorem typePV_subset_hatMsigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
   intro v hv
   simp only [typePV, Set.mem_sdiff, Set.mem_union, SetLike.mem_coe, not_or] at hv
   obtain ⟨hvW, hvnW1, _hvnW2⟩ := hv
-  haveI hcyc : IsCyclic ↥data.W := data.W_cyclic
-  letI : CommGroup ↥data.W := hcyc.commGroup
+  have hcyc : IsCyclic ↥data.W := data.W_cyclic
+  let : CommGroup ↥data.W := hcyc.commGroup
   have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
   have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
   have hWM : (data.W : Subgroup G) ≤ M := by
@@ -231,8 +231,8 @@ theorem exists_sigma_prime_dvd_orderOf_typePV [Finite G]
       p ∈ OddOrder.BG.Ch3.S10.sigma M ∧ p ∣ Nat.card ↥data.W2 := by
   simp only [typePV, Set.mem_sdiff, Set.mem_union, SetLike.mem_coe, not_or] at hv
   obtain ⟨hvW, hvnW1, _hvnW2⟩ := hv
-  haveI hcyc : IsCyclic ↥data.W := data.W_cyclic
-  letI : CommGroup ↥data.W := hcyc.commGroup
+  have hcyc : IsCyclic ↥data.W := data.W_cyclic
+  let : CommGroup ↥data.W := hcyc.commGroup
   have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
   have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
   have hsup : data.W1.subgroupOf data.W ⊔ data.W2.subgroupOf data.W = ⊤ := by
@@ -297,13 +297,13 @@ theorem conjClassSetIn_typePV_subset_A0Set [Finite G]
   have hM_le_NMσ : M ≤ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma M : Set G) := by
     rw [OddOrder.BG.Ch3.S10.Msigma]
     exact le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M
-  haveI hMσ_norm : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal :=
+  have hMσ_norm : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer
       (OddOrder.BG.Ch3.S10.Msigma_le M)).mpr hM_le_NMσ
   rintro _ ⟨v, hv, m, hmM, rfl⟩
   have hvhat : v ∈ OddOrder.BG.Ch4.S16.hatMsigma M := typePV_subset_hatMsigma hG hM data hv
   simp only [OddOrder.BG.Ch4.S16.A0Set, Set.mem_sdiff, OddOrder.BG.Ch4.S16.hatMsigma,
-    Set.mem_setOf_eq]
+    Set.mem_ofPred_eq]
   refine ⟨⟨M.mul_mem (M.mul_mem hmM hvhat.1) (M.inv_mem hmM), ?_⟩, ?_⟩
   · -- `M_σ ⊓ C_G(m·v·m⁻¹) ≠ ⊥`: conjugate the `M_σ`-centralizing witness of `v`.
     obtain ⟨w, hw1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hvhat.2
@@ -406,7 +406,7 @@ theorem not_isConj_typePACore_typePV [Finite G]
   -- `M' ⊴ M`.  (In the file this was extracted from, the instance came in transitively through the
   -- §13 import closure; here it is derived on the spot — `M'.subgroupOf M` is the comap of a
   -- `map` along the injective `M.subtype`.)
-  haveI : ((derivedInG M).subgroupOf M).Normal := by
+  have : ((derivedInG M).subgroupOf M).Normal := by
     rw [derivedInG, Subgroup.subgroupOf,
       Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
     infer_instance

@@ -363,7 +363,7 @@ theorem normSetE_eq_inv_of_p_eq_three [Fact (Nat.Prime 3)] (hq : 0 < q) :
     normSetE 3 q = (normSetE 3 q)⁻¹ := by
   apply normSetE_eq_inv_of_forall_normN_two_mul_sub_one (p := 3) (q := q) hq
   intro a ha
-  haveI : CharP (GaloisField 3 q) 3 := by
+  have : CharP (GaloisField 3 q) 3 := by
     rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
     exact ZMod.charP 3
   have hthree : (3 : GaloisField 3 q) = 0 := by
@@ -544,7 +544,7 @@ theorem lemmaC1 [Fact p.Prime] (hq : q.Prime)
   -- Start from `a ∈ E^#`.
   obtain ⟨a, ha, hane⟩ := exists_mem_normSetE_ne_one p q hcard
   have h1a : (1 : GaloisField p q) - a ≠ 0 := sub_ne_zero.mpr (Ne.symm hane)
-  haveI : CharP (GaloisField p q) p := by
+  have : CharP (GaloisField p q) p := by
     rw [← Algebra.charP_iff (ZMod p) (GaloisField p q) p]; exact ZMod.charP p
   -- The norm polynomial `P(X) = ∏_{i<q} ((1-a)^{p^i} X + 1) - 1`.
   set P : (GaloisField p q)[X] :=
@@ -620,7 +620,7 @@ lemma exists_rootFree_cubic [Fact p.Prime] (hpodd : Odd p) :
   have h3 : 3 ≤ p := by
     have h2 := (Fact.out : p.Prime).two_le
     rcases hpodd with ⟨k, hk⟩; omega
-  haveI : NeZero p := ⟨by omega⟩
+  have : NeZero p := ⟨by omega⟩
   have h02 : (0 : ZMod p) ≠ 2 := by
     intro h
     have h2cast : ((2 : ℕ) : ZMod p) = 0 := by exact_mod_cast h.symm
@@ -701,13 +701,13 @@ lemma fCubic_irreducible [Fact p.Prime] (c : ZMod p)
 (its root field has cardinality `p^3`, hence is isomorphic to `GaloisField p 3`). -/
 lemma exists_root_fCubic [Fact p.Prime] (c : ZMod p) (hirr : Irreducible (fCubic p c)) :
     ∃ a : GaloisField p 3, (Polynomial.aeval a) (fCubic p c) = 0 := by
-  haveI : Fact (Irreducible (fCubic p c)) := ⟨hirr⟩
-  haveI : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
+  have : Fact (Irreducible (fCubic p c)) := ⟨hirr⟩
+  have : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
   have hne : fCubic p c ≠ 0 := hirr.ne_zero
-  haveI : FiniteDimensional (ZMod p) (AdjoinRoot (fCubic p c)) :=
+  have : FiniteDimensional (ZMod p) (AdjoinRoot (fCubic p c)) :=
     (AdjoinRoot.powerBasis hne).basis.finiteDimensional_of_finite
-  haveI : Finite (AdjoinRoot (fCubic p c)) := Module.finite_of_finite (ZMod p)
-  haveI : Fintype (AdjoinRoot (fCubic p c)) := Fintype.ofFinite _
+  have : Finite (AdjoinRoot (fCubic p c)) := Module.finite_of_finite (ZMod p)
+  have : Fintype (AdjoinRoot (fCubic p c)) := Fintype.ofFinite _
   have hfr : Module.finrank (ZMod p) (AdjoinRoot (fCubic p c)) = 3 := by
     rw [(AdjoinRoot.powerBasis hne).finrank, AdjoinRoot.powerBasis_dim, fCubic_natDegree]
   have hcard : Nat.card (AdjoinRoot (fCubic p c)) = p ^ 3 := by
@@ -724,7 +724,7 @@ lemma exists_root_fCubic [Fact p.Prime] (c : ZMod p) (hirr : Irreducible (fCubic
 `f(a)^p = f(a^p)` (the `p`-power map fixes the `𝔽_p`-coefficients of `f`). -/
 lemma aeval_pow_p [Fact p.Prime] (a : GaloisField p q) (f : (ZMod p)[X]) :
     (Polynomial.aeval a f) ^ p = Polynomial.aeval (a ^ p) f := by
-  haveI : CharP (GaloisField p q) p := by
+  have : CharP (GaloisField p q) p := by
     rw [← Algebra.charP_iff (ZMod p) (GaloisField p q) p]; exact ZMod.charP p
   have key : (frobenius (GaloisField p q) p).comp (Polynomial.aeval (R := ZMod p) a).toRingHom
       = (Polynomial.aeval (R := ZMod p) (a ^ p)).toRingHom := by
@@ -756,7 +756,7 @@ lemma root_not_mem_range [Fact p.Prime] {c : ZMod p} {a : GaloisField p 3}
 lemma mem_range_of_pow_p_eq_self [Fact p.Prime] {x : GaloisField p q} (hx : x ^ p = x) :
     x ∈ Set.range (algebraMap (ZMod p) (GaloisField p q)) := by
   classical
-  haveI : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
+  have : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
   set f : (GaloisField p q)[X] := X ^ p - X with hf
   have hfne : f ≠ 0 := FiniteField.X_pow_card_sub_X_ne_zero _ (Fact.out : p.Prime).one_lt
   have hfdeg : f.natDegree = p :=
@@ -801,8 +801,8 @@ lemma exists_mem_normSetE_three [Fact p.Prime] (hpodd : Odd p) :
   have hirr := fCubic_irreducible p c hrf
   obtain ⟨a, hroot⟩ := exists_root_fCubic p c hirr
   have ha_notmem := root_not_mem_range p hroot hrf
-  haveI : Fintype (GaloisField p 3) := Fintype.ofFinite _
-  haveI : CharP (GaloisField p 3) p := by
+  have : Fintype (GaloisField p 3) := Fintype.ofFinite _
+  have : CharP (GaloisField p 3) p := by
     rw [← Algebra.charP_iff (ZMod p) (GaloisField p 3) p]; exact ZMod.charP p
   have hp0 : p ≠ 0 := (Fact.out : p.Prime).pos.ne'
   -- `a^{p^3} = a` and the Frobenius orbit relations.

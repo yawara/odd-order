@@ -344,7 +344,7 @@ theorem case_two_commute {B A : Subgroup G} [B.Normal]
     (hodd : ∀ g : G, g ^ 2 = 1 → g = 1)
     {x u v : G} (hx : x ∈ B) (hu : u ∈ A) (hv : v ∈ A) :
     Commute ⁅x, u⁆ ⁅x, v⁆ := by
-  haveI := hAcomm
+  have := hAcomm
   have hBc : ∀ g ∈ (⁅B, B⁆ : Subgroup G), ∀ w : G, g * w = w * g := fun g hg w =>
     (Subgroup.mem_center_iff.mp (hB' hg) w).symm
   have hmemB : ∀ b ∈ B, ∀ y : G, ⁅b, y⁆ ∈ B := by
@@ -362,7 +362,7 @@ theorem case_two_commute {B A : Subgroup G} [B.Normal]
       commutator_mem_commutator (commutator_mem_commutator hx hv') hu'
     exact ((mem_centralizer_iff.mp (hK2cent hk2) u' hu').symm)
   -- 商 Q = G/B' での対称性
-  haveI hBcN : (⁅B, B⁆ : Subgroup G).Normal := normal_of_le_center' hB'
+  have hBcN : (⁅B, B⁆ : Subgroup G).Normal := normal_of_le_center' hB'
   set π := QuotientGroup.mk' (⁅B, B⁆ : Subgroup G) with hπdef
   have hQB : ∀ b₁ ∈ B, ∀ b₂ ∈ B, Commute (π b₁) (π b₂) := by
     intro b₁ hb₁ b₂ hb₂
@@ -560,8 +560,8 @@ theorem glauberman_replacement [Finite G] {p : ℕ} [Fact p.Prime] (hp2 : p ≠ 
   -- ↥Q の instance 群
   have hpQ : IsPGroup p ↥Q :=
     (hP.to_subgroup (Q.subgroupOf P)).of_equiv (Subgroup.subgroupOfEquivOfLe hQP)
-  haveI : Group.IsNilpotent ↥Q := hpQ.isNilpotent
-  haveI hBinN : (B.subgroupOf Q).Normal :=
+  have : Group.IsNilpotent ↥Q := hpQ.isNilpotent
+  have hBinN : (B.subgroupOf Q).Normal :=
     Subgroup.normal_subgroupOf_of_le_normalizer (hQP.trans hPnB)
   have hodd : ∀ g : ↥Q, g ^ 2 = 1 → g = 1 := by
     intro g hg

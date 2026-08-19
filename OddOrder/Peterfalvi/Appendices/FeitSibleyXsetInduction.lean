@@ -347,7 +347,7 @@ theorem xsetOf_S_coherent_step [Finite G]
       (hyp.XsetOf S₂ Z) hyp.A) := by
   classical
   by_contra hfail
-  haveI : ((hyp.Sder.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal :=
+  have : ((hyp.Sder.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal :=
     hyp.Sder_subgroupOf_Q_normal
   have hS₁S : S₁ ≤ hyp.S := hS₁der.trans hyp.Sder_le_S
   -- the families `B₀ = 𝒳(S',Z) ⊆ B = 𝒳(S₁,Z) ⊆ Y = 𝒳(S₂,Z)`
@@ -436,7 +436,7 @@ theorem xsetOf_S_coherent_step [Finite G]
       have h2 : s⁻¹ * (1 : G) ∈ S₁ := hmem
       rw [mul_one] at h2
       simpa using S₁.inv_mem h2
-    haveI : Nontrivial (↥hyp.S ⧸ S₁.subgroupOf hyp.S) := ⟨_, _, hne⟩
+    have : Nontrivial (↥hyp.S ⧸ S₁.subgroupOf hyp.S) := ⟨_, _, hne⟩
     exact Finite.one_lt_card
   exact false_of_xset_induction_bounds hyp.d_pos Nat.card_pos h1 h2 h3 h4 h5
 
@@ -505,11 +505,11 @@ theorem xsetOf_coherent_of_le_sder [Finite G]
           intro hbot
           rw [hbot] at hS₃S₁
           exact not_lt_bot hS₃S₁
-        haveI : Nontrivial ↥hyp.S := (Subgroup.nontrivial_iff_ne_bot hyp.S).mpr
+        have : Nontrivial ↥hyp.S := (Subgroup.nontrivial_iff_ne_bot hyp.S).mpr
           (fun hbot => hS₁ne (eq_bot_iff.mpr
             ((hS₁le.trans hyp.Sder_le_S).trans (le_of_eq hbot))))
-        haveI := hyp.S_nilpotent
-        apply (IsSolvable.commutator_lt_top_of_nontrivial ↥hyp.S).ne
+        have := hyp.S_nilpotent
+        apply (Group.IsSolvable.commutator_lt_top_of_nontrivial ↥hyp.S).ne
         rw [eq_top_iff]
         intro x _
         have hx : (x : G) ∈ Subgroup.map hyp.S.subtype (commutator ↥hyp.S) := by
@@ -520,22 +520,22 @@ theorem xsetOf_coherent_of_le_sder [Finite G]
         obtain ⟨y, hy, hyx⟩ := hx
         rwa [show y = x from Subtype.ext hyx] at hy
       -- relativised `Normal` instances (mirror of reduction (2), plus the `Z`-joins)
-      haveI : (S₁.subgroupOf hyp.H).Normal :=
+      have : (S₁.subgroupOf hyp.H).Normal :=
         hyp.subgroupOf_H_normal_of_conj_mem hS₁H
       -- the `((S₁ ⊔ Z)`-in-`H)` join uses the sup-of-`subgroupOf` form (counting):
       -- provide the `Z` component and let the sup-of-normals instance build it
-      haveI : (Z.subgroupOf hyp.H).Normal :=
+      have : (Z.subgroupOf hyp.H).Normal :=
         hyp.subgroupOf_H_normal_of_conj_mem hZH
-      haveI : ((S₃'.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal :=
+      have : ((S₃'.subgroupOf hyp.H).subgroupOf (hyp.Q.subgroupOf hyp.H)).Normal :=
         hyp.subgroupOf_Q_normal_of_conj_mem fun q hq x hx =>
           hinvH q (hyp.Q_le_H hq) x hx
       have hZSH : ∀ h' ∈ hyp.H, ∀ x ∈ hyp.centralLiftIn hyp.S S₃' hinvS,
           h' * x * h'⁻¹ ∈ hyp.centralLiftIn hyp.S S₃' hinvS := fun h' hh' x hx =>
         hyp.centralLiftIn_conj_mem_of_mem_H hyp.S hinvS hinvH
           (fun h'' hh'' y hy => hyp.S_normal_in_H hh'' hy) hh' hx
-      haveI : ((hyp.centralLiftIn hyp.S S₃' hinvS).subgroupOf hyp.H).Normal :=
+      have : ((hyp.centralLiftIn hyp.S S₃' hinvS).subgroupOf hyp.H).Normal :=
         hyp.subgroupOf_H_normal_of_conj_mem hZSH
-      haveI : (((hyp.centralLiftIn hyp.S S₃' hinvS) ⊔ Z).subgroupOf hyp.H).Normal :=
+      have : (((hyp.centralLiftIn hyp.S S₃' hinvS) ⊔ Z).subgroupOf hyp.H).Normal :=
         hyp.subgroupOf_H_normal_of_conj_mem fun h' hh' x hx =>
           conj_mem_sup (fun y hy => hZSH h' hh' y hy)
             (fun y hy => hZH h' hh' y hy) hx

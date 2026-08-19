@@ -46,7 +46,7 @@ theorem Msigma_inf_conj_isBetaCompl [Finite G] (hG : IsMinimalSimpleOdd G)
   classical
   intro p hp
   have hp_prime : p.Prime := Nat.prime_of_mem_primeFactors hp
-  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have : Fact p.Prime := ⟨hp_prime⟩
   have hpdvd : p ∣ Nat.card ↥(S10.Msigma M ⊓ MulAut.conj g • M) :=
     (Nat.mem_primeFactors.mp hp).2.1
   -- Cauchy: an element `w` of order `p` in `M_σ ∩ M^g`; `X := ⟨w⟩` is rank-one of order `p`.
@@ -158,7 +158,7 @@ theorem Msigma_inf_conj_inf_derived_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G
   obtain ⟨p, hp_prime, hpdvd⟩ :=
     (Nat.card ↥K).exists_prime_and_dvd (by
       have := Finite.one_lt_card_iff_nontrivial.mpr hKnt; omega)
-  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have : Fact p.Prime := ⟨hp_prime⟩
   obtain ⟨w, hw⟩ := exists_prime_orderOf_dvd_card' p hpdvd
   have hXcard : Nat.card ↥(Subgroup.zpowers (w : G)) = p := by
     rw [Nat.card_zpowers]

@@ -24,6 +24,7 @@ variable {M : Subgroup G}
 
 set_option maxHeartbeats 1000000 in
 -- raised heartbeat budget for the heavy elaboration below
+set_option backward.isDefEq.respectTransparency false in
 /-- **Case-(b) exhaustion of `𝒳(H₀C)` by `hcPsi`-inductions** (Clifford correspondence, the
 surjectivity half of the case-(b) `oXtheta`): every `χ ∈ 𝒳(H₀C)` equals
 `Ind_{HC}^{HU}(hcPsi θbar)` for some nontrivial seed `θbar : H̄ →* ℂˣ`.
@@ -53,16 +54,16 @@ theorem caseB_xiOf_H0C_eq_induce_hcPsi [Finite G] {M : Subgroup G}
             (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
             (hcPsi chief θbar).toClassFunction := by
   classical
-  haveI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+  have : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
     (huSub data)) := Fintype.ofFinite _
-  letI : Fintype (IrreducibleCharacter ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+  let : Fintype (IrreducibleCharacter ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
     M).subgroupOf (huSub data))) := Fintype.ofFinite _
   obtain ⟨hχX, hχK⟩ := hχ
   obtain ⟨ψ, hψover⟩ := OddOrder.RepresentationTheory.IrreducibleCharacter.exists_liesOver
     (H := hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) χ
-  haveI hN := realizedH0supCprime_normal_huSub chief
-  haveI hNC := realizedH0supC_normal_huSub chief
-  haveI hNsub : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+  have hN := realizedH0supCprime_normal_huSub chief
+  have hNC := realizedH0supC_normal_huSub chief
+  have hNsub : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
       (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))).Normal :=
     hNC.subgroupOf _
   -- `ψ` kills `ker hcHom ⊆ H₀C ⊆ Ker χ`-inherited
@@ -90,7 +91,7 @@ theorem caseB_xiOf_H0C_eq_induce_hcPsi [Finite G] {M : Subgroup G}
   obtain ⟨ψbar, hψbar⟩ :=
     OddOrder.RepresentationTheory.exists_compHom_eq_of_subset_characterKernel
       (hcHom_surjective chief) ψ hker
-  haveI : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+  have : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
   obtain ⟨θbar, hθbar⟩ :=
     ψbar.isIrreducible.exists_linearIrreducibleCharacter_eq_of_isMulCommutative
   have hψeq : (ψ : ClassFunction
@@ -196,12 +197,12 @@ theorem caseB_xiOf_H0Cprime_eq_induce_hcPsiPair [Finite G] {M : Subgroup G}
             (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
             (hcPsiPair chief θbar lam).toClassFunction := by
   classical
-  haveI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+  have : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
     (huSub data)) := Fintype.ofFinite _
-  letI : Fintype (IrreducibleCharacter ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+  let : Fintype (IrreducibleCharacter ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
     M).subgroupOf (huSub data))) := Fintype.ofFinite _
-  haveI hNC := realizedH0supC_normal_huSub chief
-  haveI : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+  have hNC := realizedH0supC_normal_huSub chief
+  have : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
       (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))).Normal :=
     hNC.subgroupOf _
   obtain ⟨hζX, hζK⟩ := hζ
@@ -223,7 +224,7 @@ theorem caseB_xiOf_H0Cprime_eq_induce_hcPsiPair [Finite G] {M : Subgroup G}
   -- (3) `ψ` is linear: `[HC,HC] ⊆ H₀C' ⊆ Ker ζ ⊆ Ker ψ`.
   have hψ1 : (ψ : ClassFunction ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
         M).subgroupOf (huSub data)) ℂ) 1 = 1 := by
-    haveI : IsMulCommutative (↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+    have : IsMulCommutative (↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
         M).subgroupOf (huSub data)) ⧸ commutator ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data
         chief).subgroupOf M).subgroupOf (huSub data))) :=
       inferInstanceAs (IsMulCommutative (Abelianization _))
@@ -339,7 +340,7 @@ theorem caseB_xiOf_H0Cprime_eq_induce_hcPsiPair [Finite G] {M : Subgroup G}
   obtain ⟨θbarChar, hθbarChar⟩ :=
     OddOrder.RepresentationTheory.exists_compHom_eq_of_subset_characterKernel
       (hcHom_surjective chief) (linearIrreducibleCharacter φ) hkerφ
-  haveI : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+  have : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
   obtain ⟨θbar, hθbar⟩ :=
     θbarChar.isIrreducible.exists_linearIrreducibleCharacter_eq_of_isMulCommutative
   -- `θbar ∘ hcHom = φ`.
@@ -414,20 +415,20 @@ theorem isIndHC_of_source_eq_induce_hcPsi [Finite G] {M : Subgroup G}
         ((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
           (huSub data)).map (huSub data).subtype) ψ := by
   classical
-  letI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+  let : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
     (huSub data)) := Fintype.ofFinite _
-  letI : Fintype ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+  let : Fintype ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
     (huSub data)).map (huSub data).subtype) := Fintype.ofFinite _
-  letI : Fintype ↥(((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+  let : Fintype ↥(((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
     (huSub data)).map (huSub data).subtype).subgroupOf (huSub data)) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥M : ℂ) :=
+  let : Invertible (Nat.card ↥M : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  let : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+  let : Invertible (Nat.card ↥(((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
     M).subgroupOf (huSub data)).map (huSub data).subtype).subgroupOf (huSub data)) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+  have : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
     (huSub data)).Normal := hcInHu_realized_normal chief
   have hKle : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
       (huSub data)).map (huSub data).subtype ≤ huSub data :=
@@ -528,20 +529,20 @@ theorem isIndHC_of_source_eq_induce_hcPsiPair [Finite G] {M : Subgroup G}
         ((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
           (huSub data)).map (huSub data).subtype) ψ := by
   classical
-  letI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+  let : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
     (huSub data)) := Fintype.ofFinite _
-  letI : Fintype ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+  let : Fintype ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
     (huSub data)).map (huSub data).subtype) := Fintype.ofFinite _
-  letI : Fintype ↥(((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+  let : Fintype ↥(((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
     (huSub data)).map (huSub data).subtype).subgroupOf (huSub data)) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥M : ℂ) :=
+  let : Invertible (Nat.card ↥M : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  let : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+  let : Invertible (Nat.card ↥(((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
     M).subgroupOf (huSub data)).map (huSub data).subtype).subgroupOf (huSub data)) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+  have : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
     (huSub data)).Normal := hcInHu_realized_normal chief
   have hKle : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
       (huSub data)).map (huSub data).subtype ≤ huSub data :=
@@ -640,24 +641,24 @@ theorem caseB_reducible_sOf_H0_isIndHC [Finite G] (hG : OddOrder.BG.IsMinimalSim
         ((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
           (huSub data)).map (huSub data).subtype) ψ := by
   classical
-  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
-  letI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+  let : Fintype ↥(huSub data) := Fintype.ofFinite _
+  let : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
     (huSub data)) := Fintype.ofFinite _
-  letI : Fintype ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+  let : Fintype ↥((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
     (huSub data)).map (huSub data).subtype) := Fintype.ofFinite _
-  letI : Fintype ↥(((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+  let : Fintype ↥(((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
     (huSub data)).map (huSub data).subtype).subgroupOf (huSub data)) := Fintype.ofFinite _
-  letI : Invertible (Nat.card ↥M : ℂ) :=
+  let : Invertible (Nat.card ↥M : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  let : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+  let : Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
     M).subgroupOf (huSub data)) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
+  let : Invertible (Nat.card ↥(((hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf
     M).subgroupOf (huSub data)).map (huSub data).subtype).subgroupOf (huSub data)) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+  have : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
     (huSub data)).Normal := hcInHu_realized_normal chief
   -- (9.9.b) membership + exhaustion
   have hφC := reducible_mem_sOf_H0C hG chars φ hφ hred

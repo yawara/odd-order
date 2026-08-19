@@ -76,7 +76,7 @@ theorem SectionFourSetup.nonempty_theoremAConclusion (s4 : hyp.SectionFourSetup)
     (hmu : Function.Injective M.mu) (hQ2 : IsPGroup 2 ↥hyp.Q)
     (hQsuz : IsSuzuki2Group ↥hyp.Q)
     (hCop : Nat.Coprime (Nat.card ↥(s4.P.subgroupOf hyp.D)) (Nat.card ↥hyp.Q))
-    (hSolv : IsSolvable ↥hyp.Q) (hP : s4.P ≠ ⊥)
+    (hSolv : Group.IsSolvable ↥hyp.Q) (hP : s4.P ≠ ⊥)
     (hA3 : ∃ E : Subgroup ↥(Subgroup.centralizer ((s4.P : Set G))),
       Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1)
     (hord : orderOf (hyp.distinguishedInvolution * hyp.t) = 3)

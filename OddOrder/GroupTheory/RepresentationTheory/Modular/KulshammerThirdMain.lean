@@ -196,6 +196,7 @@ set_option maxHeartbeats 1600000 in
 -- Same instance chains as (6.14); the extra work here is only the transport along `mk g`.
 set_option linter.unusedFintypeInType false in
 open scoped Classical in
+set_option backward.isDefEq.respectTransparency false in
 /-- **Külshammer's formula in counting form**, at an arbitrary `g` (not just a class
 representative):
 
@@ -333,7 +334,7 @@ theorem coeff_principalBlock_eq_centralizer (hp : p.Prime) (hQ : IsPGroup p ↥Q
       = ((FC' (principalBlock πC hπC hlinC hnilC) :
           MonoidAlgebra (ResidueField 𝒪) ↥(Subgroup.centralizer (Q : Set G)))).coeff g := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   exact eq_of_card_pRegular_mul_eq (k := ResidueField 𝒪) hp hQ g
     (card_pRegular_mul_coeff_principalBlock e hπG hlinG hnilG SG (g : G)
       hidem hf hB hweak hvanish)
@@ -413,8 +414,8 @@ theorem coeff_principalBlock_eq_centralizer_forall (hp : p.Prime) (hQ : IsPGroup
         = ((FC' (principalBlock πC hπC hlinC hnilC) :
             MonoidAlgebra (ResidueField 𝒪) ↥(Subgroup.centralizer (Q : Set G)))).coeff g := by
   classical
-  haveI : Fintype ιG := Fintype.ofFinite ιG
-  haveI : Fintype ιC := Fintype.ofFinite ιC
+  have : Fintype ιG := Fintype.ofFinite ιG
+  have : Fintype ιC := Fintype.ofFinite ιC
   intro g
   by_cases hg : IsPRegular p (g : G)
   · exact coeff_principalBlock_eq_centralizer e hπG hlinG hnilG eC hπC hlinC hnilC hp hQ SG SC g
@@ -582,8 +583,8 @@ theorem coeff_principalBlock_eq_centralizer_intermediate_of_not_isPRegular [Fact
     ((F'H : MonoidAlgebra (ResidueField 𝒪) ↥H)).coeff (⟨(g : G), hCH g.2⟩ : ↥H)
       = ((FC' : MonoidAlgebra (ResidueField 𝒪) ↥(Subgroup.centralizer (Q : Set G)))).coeff g := by
   classical
-  haveI : Fintype ιH := Fintype.ofFinite ιH
-  haveI : Fintype ιC := Fintype.ofFinite ιC
+  have : Fintype ιH := Fintype.ofFinite ιH
+  have : Fintype ιC := Fintype.ofFinite ιC
   have hgH : ¬ IsPRegular p (⟨(g : G), hCH g.2⟩ : ↥H) := fun h =>
     hg (isPRegular_coe_iff (H := H) (y := (⟨(g : G), hCH g.2⟩ : ↥H)) |>.mpr h)
   have hgC : ¬ IsPRegular p g := fun h =>

@@ -60,7 +60,7 @@ theorem sum_inner_restrict_smul_induce_eq_induce {M : Type*} [Group M] [Fintype 
             (ClassFunction.restrict (K.subgroupOf H) (θ : ClassFunction ↥H ℂ))
           • ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
       = ClassFunction.induce K φ := by
-  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  have : Fintype ↥H := Fintype.ofFinite ↥H
   rw [← induce_finset_sum_smul, ← induce_eq_sum_inner_restrict_smul]
   exact induce_induce_subgroupOf hKH φ
 
@@ -96,7 +96,7 @@ theorem sum_inner_restrict_sq_eq_index {M : Type*} [Group M] [Finite M]
         ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ))
           * ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ))
       = (N.index : ℂ) := by
-  haveI : Fintype M := Fintype.ofFinite M
+  have : Fintype M := Fintype.ofFinite M
   have hreal : ∀ θ : IrreducibleCharacter M,
       ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ))
         = star (ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ))) := by
@@ -588,7 +588,7 @@ theorem sigmaNC_le_two_of_inner_chiFam
         ClassFunction.inner ξ' (hyp.chiFam hVeq app pq) ≠ 0) :
     hyp.sigmaNC hVeq app ψ ≤ 2 := by
   classical
-  haveI : Finite G := Finite.of_fintype G
+  have : Finite G := Finite.of_fintype G
   have hsub : {pq | hyp.sigmaCoeff hVeq app ψ pq ≠ 0} ⊆
       {pq | ClassFunction.inner ξ (hyp.chiFam hVeq app pq) ≠ 0} ∪
         {pq | ClassFunction.inner ξ' (hyp.chiFam hVeq app pq) ≠ 0} :=

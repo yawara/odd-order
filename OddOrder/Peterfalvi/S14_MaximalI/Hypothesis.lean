@@ -96,7 +96,7 @@ noncomputable def SsubFiltration {L : Subgroup G} (hyp : Hypothesis L) (A : Subg
 theorem SsubFiltration_bot {L : Subgroup G} (hyp : Hypothesis L) :
     hyp.SsubFiltration ⊥ = hyp.Sset := by
   ext φ
-  simp only [SsubFiltration, Sset, Set.mem_setOf_eq]
+  simp only [SsubFiltration, Sset, Set.mem_ofPred_eq]
   constructor
   · rintro ⟨θ, hθ, -, hφ⟩; exact ⟨θ, hθ, hφ⟩
   · rintro ⟨θ, hθ, hφ⟩
@@ -110,9 +110,9 @@ theorem SsubFiltration_bot {L : Subgroup G} (hyp : Hypothesis L) :
 theorem SsubFiltration_subset_Sset {L : Subgroup G} (hyp : Hypothesis L) {A : Subgroup ↥L} :
     hyp.SsubFiltration A ⊆ hyp.Sset := by
   intro φ hφ
-  simp only [SsubFiltration, Set.mem_setOf_eq] at hφ
+  simp only [SsubFiltration, Set.mem_ofPred_eq] at hφ
   obtain ⟨θ, hθ, -, hφeq⟩ := hφ
-  simp only [Sset, Set.mem_setOf_eq]
+  simp only [Sset, Set.mem_ofPred_eq]
   exact ⟨θ, hθ, hφeq⟩
 
 /-- The filtration is **antitone**: a larger kernel-constraint subgroup gives fewer members,
@@ -120,7 +120,7 @@ theorem SsubFiltration_subset_Sset {L : Subgroup G} (hyp : Hypothesis L) {A : Su
 theorem SsubFiltration_antitone {L : Subgroup G} (hyp : Hypothesis L) {A B : Subgroup ↥L}
     (hAB : A ≤ B) : hyp.SsubFiltration B ⊆ hyp.SsubFiltration A := by
   intro φ hφ
-  simp only [SsubFiltration, Set.mem_setOf_eq] at hφ ⊢
+  simp only [SsubFiltration, Set.mem_ofPred_eq] at hφ ⊢
   obtain ⟨θ, hθ, hker, hφeq⟩ := hφ
   refine ⟨θ, hθ, ?_, hφeq⟩
   intro x hxA
@@ -161,7 +161,7 @@ Both unfold to the underlying §4 Dade map `dadeData.dade.dadeMap` — via
 theorem toHypothesis71_tau_apply {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
     (α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ (typeIA L hyp.typeI) L) :
     hyp.toHypothesis71.τ α = hyp.tau (α : ClassFunction ↥L ℂ) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hsupp : (α : ClassFunction ↥L ℂ).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (typeIA L hyp.typeI) L :=
     (ClassFunction.mem_supportedSubmodule).mp α.2
@@ -234,7 +234,7 @@ theorem Sset_closedUnderConjugate [Finite G] {L : Subgroup G} (hyp : Hypothesis 
     OddOrder.Peterfalvi.S03.ClosedUnderConjugate hyp.Sset := by
   classical
   intro φ hφ
-  simp only [Hypothesis.Sset, Set.mem_setOf_eq] at hφ ⊢
+  simp only [Hypothesis.Sset, Set.mem_ofPred_eq] at hφ ⊢
   obtain ⟨θ, hθ_ne, hφeq⟩ := hφ
   refine ⟨⟨(θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ).conj,
     θ.isIrreducible.conj⟩, ?_, ?_⟩
@@ -432,11 +432,11 @@ theorem typeI_induced_char_constituents [Finite G]
         (φ : ClassFunction ↥L ℂ).conj ≠ (φ' : ClassFunction ↥L ℂ)) ∧
       (∀ φ ∈ S, (φ : ClassFunction ↥L ℂ).support ⊆
         OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L ∪ {1}) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   obtain ⟨θ, hθ_ne, hchi_eq⟩ := hchi
   -- `H = (L_F).subgroupOf L`, kept as a raw term so `θ`'s type matches (no `set`).
-  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+  have hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
     rw [hyp.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
   have hodd : Odd (Nat.card ↥L) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card L)
@@ -444,7 +444,7 @@ theorem typeI_induced_char_constituents [Finite G]
   have hθirr := θ.isIrreducible
   have hHT : (hyp.typeI.typeF.H).subgroupOf L ≤ ClassFunction.inertia θ.toClassFunction :=
     ClassFunction.subgroup_le_inertia _
-  haveI : (((hyp.typeI.typeF.H).subgroupOf L).subgroupOf
+  have : (((hyp.typeI.typeF.H).subgroupOf L).subgroupOf
       (ClassFunction.inertia θ.toClassFunction)).Normal := hKnormal.comap _
   have hHU : (hyp.typeI.typeF.H).subgroupOf L ⊔ (hyp.typeI.typeF.U).subgroupOf L = ⊤ :=
     hyp.typeI.typeF.complement.sup_eq_top
@@ -484,7 +484,7 @@ theorem typeI_induced_char_constituents [Finite G]
       (orderOf hθirr.determinant * d) :=
     OddOrder.RepresentationTheory.coprime_index_orderOf_determinant_mul_of_coprime_index
       hHT hHall hθirr hd
-  haveI : Fintype ((ClassFunction.inertia θ.toClassFunction ⧸
+  have : Fintype ((ClassFunction.inertia θ.toClassFunction ⧸
       ((hyp.typeI.typeF.H).subgroupOf L).subgroupOf (ClassFunction.inertia θ.toClassFunction))
         →* ℂˣ) := Fintype.ofFinite _
   obtain ⟨_χ, _hχirr, S, hSne, _hScard, hSdecomp, hSdeg, _hSform⟩ :=
@@ -561,7 +561,7 @@ theorem frobenius_induce_char_singleton {Γ : Type*} [Group Γ] [Fintype Γ]
       (ξ : ClassFunction Γ ℂ) = ClassFunction.induce H (θ : ClassFunction ↥H ℂ) ∧
       ¬ ClassFunction.IsReal (ξ : ClassFunction Γ ℂ) ∧
       (ξ : ClassFunction Γ ℂ).support ⊆ (H : Set Γ) := by
-  haveI : Fintype ↥H := Fintype.ofFinite _
+  have : Fintype ↥H := Fintype.ofFinite _
   have hirr := isIrreducibleCharacter_induce_of_frobeniusGroup hF θ hθ
   have hne_triv : (⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), hirr⟩ :
       IrreducibleCharacter Γ) ≠ trivialIrreducibleCharacter Γ := by
@@ -626,7 +626,7 @@ theorem frobenius_typeI_induced_char_constituents [Finite G]
   classical
   obtain ⟨θ, hθ_ne, rfl⟩ := hchi
   have hodd : Odd (Nat.card ↥L) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card L)
-  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+  have hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
     rw [hyp.typeI.typeF.H_eq]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
   obtain ⟨ξ, hξcoe, hξreal, hξsupp⟩ :=
@@ -699,7 +699,7 @@ theorem R1_diffsupp {L : Subgroup G} {hyp : Hypothesis L} {chi : ClassFunction �
     (hφ : φ ∈ data.constituents) :
     ((φ : ClassFunction ↥L ℂ).conj - (φ : ClassFunction ↥L ℂ)).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   have hsupp_eq : (φ : ClassFunction ↥L ℂ).conj.support = (φ : ClassFunction ↥L ℂ).support := by
     ext y
     simp only [ClassFunction.mem_support, ne_eq, ClassFunction.conj_apply, star_eq_zero]

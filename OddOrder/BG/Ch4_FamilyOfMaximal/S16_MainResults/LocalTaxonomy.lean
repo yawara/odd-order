@@ -127,7 +127,7 @@ type-`F` maximal subgroup `M` (`κ(M) = ∅`) has **no** `(κ ∪ σ)'`-Hall `U`
 For type-`F`, `M = U M_σ` for *every* such `U` (`typeP_maximal_eq_kappaHall_sup_U_sup_Msigma` with
 `K = ⊥`: the `⊥`-`κ`-Hall witness exists since `κ(M) = ∅`), so `M' = U M_σ` would force `M' = M`,
 contradicting the proper derived subgroup `M' < M` of the nontrivial solvable `M`
-(`IsSolvable.commutator_lt_top_of_nontrivial`).  This is the `M ∈ ℳ_𝓕 ⟹ M' ⊊ M = U M_σ` half
+(`Group.IsSolvable.commutator_lt_top_of_nontrivial`).  This is the `M ∈ ℳ_𝓕 ⟹ M' ⊊ M = U M_σ` half
 powering Proposition 16.1 clause (e) (`M' = U M_σ ⟺ ¬ Type I`). -/
 theorem typeF_not_exists_hall_derived_eq [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
@@ -137,7 +137,7 @@ theorem typeF_not_exists_hall_derived_eq [Finite G]
       derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M := by
   rintro ⟨U, hUhall, hM'eq⟩
   have hkappa : S14.kappa M = ∅ := hF
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   -- `U ≤ M' ≤ M`.
   have hUM : U ≤ M := by
     have h : U ≤ derivedInG M := by rw [hM'eq]; exact le_sup_left
@@ -155,12 +155,12 @@ theorem typeF_not_exists_hall_derived_eq [Finite G]
   have hMne : M ≠ ⊥ := fun h =>
     OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM
       (le_bot_iff.mp (h ▸ OddOrder.BG.Ch3.S10.Msigma_le M))
-  haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMne
+  have : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMne
   have hlt : derivedInG M < M := by
     rw [derivedInG]
     conv_rhs => rw [← Subgroup.range_subtype M, MonoidHom.range_eq_map]
     rw [Subgroup.map_lt_map_iff_of_injective M.subtype_injective]
-    exact IsSolvable.commutator_lt_top_of_nontrivial (G := ↥M)
+    exact Group.IsSolvable.commutator_lt_top_of_nontrivial (G := ↥M)
   exact (ne_of_lt hlt) (hM'eq.trans hMeq.symm)
 
 /-- **Proposition 16.1 input `hP_derived` / BG Theorem C(3)** (mmd L4307): a type-`P` maximal
@@ -177,7 +177,7 @@ theorem typeP_exists_hall_derived_eq [Finite G]
       Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M) ∧
       derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   -- A `κ(M)`-Hall subgroup `K` of `M` (Hall's theorem in the solvable `M`).
   obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
   set K : Subgroup G := K'.map M.subtype with hKdef
@@ -272,9 +272,9 @@ theorem typeFData_exists_kappaElement_le_kappaHall [Finite G]
     ∃ X K : Subgroup G, X ≤ td.U0 ∧ X ≠ ⊥ ∧ X ≤ K ∧ K ≤ M ∧
       Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   obtain ⟨hp_prime, hp_tau, P, hP_elem, hP_le, hP_centr⟩ := hp
-  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have : Fact p.Prime := ⟨hp_prime⟩
   -- `p ∈ π(M)`: `|P| = p` and `P ≤ M`.
   obtain ⟨_, hPcard⟩ := mem_elemAbelianOfRank.mp hP_elem
   rw [pow_one] at hPcard
@@ -291,20 +291,20 @@ theorem typeFData_exists_kappaElement_le_kappaHall [Finite G]
         Nat.card_pos.ne'⟩))
   -- `p ∣ |U|`: `|M_F| · |U| = |M|`.
   have hcard : Nat.card ↥td.H * Nat.card ↥td.U = Nat.card ↥M := by
-    have h := td.complement.card_mul
+    have h := td.complement.card_mul_card
     rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe td.H_le).toEquiv,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe td.U_le).toEquiv] at h
   have hp_dvd_U : p ∣ Nat.card ↥td.U :=
     (hp_prime.dvd_mul.mp (hcard ▸ hp_dvd_M)).resolve_left hp_not_dvd_MF
   -- `p ∣ |U₀|`: a `p`-element of `U` gives `p ∣ exponent U = exponent U₀ ∣ |U₀|`.
   have hp_dvd_U0 : p ∣ Nat.card ↥td.U0 := by
-    haveI : Fintype ↥td.U := Fintype.ofFinite _
+    have : Fintype ↥td.U := Fintype.ofFinite _
     obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card (G := ↥td.U) p
       (by rwa [Nat.card_eq_fintype_card] at hp_dvd_U)
     exact (td.exponent_eq ▸ (hg ▸ Monoid.order_dvd_exponent g : p ∣ Monoid.exponent ↥td.U)).trans
       Group.exponent_dvd_nat_card
   -- A `p`-element `g ∈ U₀` generates a nontrivial `p`-subgroup `X = ⟨g⟩ ≤ U₀`.
-  haveI : Fintype ↥td.U0 := Fintype.ofFinite _
+  have : Fintype ↥td.U0 := Fintype.ofFinite _
   obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card (G := ↥td.U0) p
     (by rwa [Nat.card_eq_fintype_card] at hp_dvd_U0)
   have hXMle : (Subgroup.zpowers g).map td.U0.subtype ≤ M :=
@@ -354,7 +354,7 @@ theorem isTypeF_of_isTypeI [Finite G]
   rw [S14.isTypeF_iff_not_isTypeP]
   intro hP
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   obtain ⟨td⟩ := hI
   obtain ⟨p, hp⟩ := hP
   -- A nontrivial `p`-subgroup `X ≤ U₀` and a `κ(M)`-Hall `K ⊇ X`.
@@ -608,7 +608,7 @@ theorem typeF_frobenius_of_esetup [Finite G]
       simpa using h)
     have hordne : orderOf (a : G) ≠ 1 := fun h => haG1 (orderOf_eq_one_iff.mp h)
     obtain ⟨r, hr_prime, hr_dvd⟩ := (orderOf (a : G)).exists_prime_and_dvd hordne
-    haveI : Fact r.Prime := ⟨hr_prime⟩
+    have : Fact r.Prime := ⟨hr_prime⟩
     have hrcard : r ∣ Nat.card ↥(Subgroup.zpowers (a : G)) := by
       rwa [Nat.card_zpowers]
     obtain ⟨c, hc_ord⟩ := exists_prime_orderOf_dvd_card' (G := ↥(Subgroup.zpowers (a : G))) r
@@ -750,7 +750,7 @@ theorem centralizer_escape_final_local [Finite G]
   have hclosne : Nat.card ↥(Subgroup.closure ({x} : Set G)) ≠ 1 := by
     rw [hcard_eq]; exact fun h => hx1 (orderOf_eq_one_iff.mp h)
   obtain ⟨r, hrp, hrdvd⟩ := Nat.exists_prime_and_dvd hclosne
-  haveI : Fact r.Prime := ⟨hrp⟩
+  have : Fact r.Prime := ⟨hrp⟩
   have hr_pi : r ∈ S14.piSet (Subgroup.closure ({x} : Set G)) :=
     Nat.mem_primeFactors.mpr ⟨hrp, hrdvd, Nat.card_pos.ne'⟩
   have hrτ2 : r ∈ tau2 N := hxtau2' r hr_pi
@@ -781,9 +781,10 @@ theorem centralizer_escape_final_local [Finite G]
     refine Nat.mem_primeFactors.mpr ⟨hrp, ?_, Nat.card_pos.ne'⟩
     rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hU0N).toEquiv] at hrsub
   -- `R := O_r(U₀)`, a Sylow `r`-subgroup of `U₀`: `≤ M`, an `r`-group, noncyclic (`pRank = 2`).
-  haveI := hU₀ab
-  haveI : IsSolvable ↥N := hG.solvable_of_mem_maximalSubgroups hN
-  haveI : IsSolvable ↥U₀ := solvable_of_solvable_injective (Subgroup.inclusion_injective hU0N)
+  have := hU₀ab
+  have : Group.IsSolvable ↥N := hG.isSolvable_of_mem_maximalSubgroups hN
+  have : Group.IsSolvable ↥U₀ :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective hU0N)
   obtain ⟨R', hR'⟩ := Ch03.hall_E_exists (G := ↥U₀) ({r} : Set ℕ)
   set R : Subgroup G := R'.map U₀.subtype with hRdef
   have hRU₀ : R ≤ U₀ := Subgroup.map_subtype_le _
@@ -805,7 +806,7 @@ theorem centralizer_escape_final_local [Finite G]
   have hRnc : ¬ IsCyclic ↥R := by
     obtain ⟨A, -, hAnc⟩ :=
       exists_isElementaryAbelian_not_isCyclic_of_two_le_pRank (G := ↥R) (p := r) hpR2.ge
-    exact fun hRcyc => hAnc (by haveI := hRcyc; infer_instance)
+    exact fun hRcyc => hAnc (by have := hRcyc; infer_instance)
   have hNRM : Subgroup.normalizer (R : Set G) ≤ M :=
     norm_noncyclic_sigma hG hM hrσM hRpg hRM hRnc
   have hHmem : M ∈ maximalSubgroupsContaining (Subgroup.normalizer (R : Set G)) :=
@@ -818,7 +819,7 @@ theorem centralizer_escape_final_local [Finite G]
       hrU₀ hRU₀ hRhall hK₀NU₀ hHmem).1
   -- `¬FittingIsTI M`: `x ∈ M_σ^# ⊆ F(M)^#` (type-`F` ⟹ `M_σ = M_F` nilpotent normal `⊆ F(M)`).
   have hnotTI : ¬ FittingIsTI M := by
-    haveI : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+    have : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
       (maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hM).mp
         (maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2 hG hM (Or.inl hFM))
     have hMσF : OddOrder.BG.Ch3.S10.Msigma M ≤ fittingInAmbient M :=
@@ -833,7 +834,7 @@ theorem centralizer_escape_final_local [Finite G]
     S14.card_kappaHall_ne_one hP2N.1 hE1N hK₀ (by rw [h, Subgroup.card_bot])
   obtain ⟨Mstar, hMstarmem⟩ :
       (maximalSubgroupsContaining (Subgroup.centralizer (E₁ : Set G))).Nonempty := by
-    haveI : Nontrivial ↥E₁ := (Subgroup.nontrivial_iff_ne_bot E₁).mpr hE1ne
+    have : Nontrivial ↥E₁ := (Subgroup.nontrivial_iff_ne_bot E₁).mpr hE1ne
     obtain ⟨⟨e, he⟩, heNe⟩ := exists_ne (1 : ↥E₁)
     have heNe1 : e ≠ 1 := fun h => heNe (by apply Subtype.ext; simpa using h)
     have hlt : Subgroup.centralizer (E₁ : Set G) < ⊤ :=
@@ -853,7 +854,7 @@ theorem centralizer_escape_final_local [Finite G]
   have hEM2 : EM₂ = ⊥ := S15.E2_eq_bot_of_tau2_eq_empty hsetupM htau2M
   have hEM3 : EM₃ = ⊥ := S15.E3_eq_bot_of_not_fittingIsTI hG hM hnotTI hsetupM
   have hEMeq : EM = EM₁ := by rw [hsetupM.eq_sup hG, hEM2, hEM3, sup_bot_eq, sup_bot_eq]
-  haveI hEMcyc : IsCyclic ↥EM := by rw [hEMeq]; exact hsetupM.E1_isCyclic hG
+  have hEMcyc : IsCyclic ↥EM := by rw [hEMeq]; exact hsetupM.E1_isCyclic hG
   have hEMne : EM.subgroupOf M ≠ ⊥ := fun hbot =>
     OddOrder.BG.Ch3.S12.SubgroupESetup.E_ne_bot hG hsetupM
       (by rw [← inf_of_le_left hsetupM.E_le]
@@ -925,7 +926,7 @@ theorem escaping_mem_derived_of_typeP [Finite G] (hG : OddOrder.BG.IsMinimalSimp
     S14.card_kappaHall_ne_one hP hKN hK (by rw [h, Subgroup.card_bot])
   have hM'eq : derivedInG N = U ⊔ OddOrder.BG.Ch3.S10.Msigma N :=
     (S15.typeP_hall_derived_eq_and_abelian hG hNmax hKN hUN hKne hK hU).1
-  haveI hnorm : ((U ⊔ OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).Normal := by
+  have hnorm : ((U ⊔ OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).Normal := by
     rw [← hM'eq]
     exact Subgroup.normal_subgroupOf_of_le_normalizer
       (OddOrder.BG.Ch3.S10.le_normalizer_derivedInG N)

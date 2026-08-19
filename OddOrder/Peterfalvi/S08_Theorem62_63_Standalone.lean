@@ -117,7 +117,7 @@ proved here, mirroring `S08.six_three` but with `K` and `H` separated:
 This is the producer cited by `S13.coherent_S_of_coherent_SH0C` (Peterfalvi (11.3), `(6.3)` applied
 with `(L,K,M,H,H₁) = (M, M', 1, HC, H₀C)`). -/
 theorem six_three_descent
-    {K H M H₁ : Subgroup ↥L} [IsSolvable ↥K]
+    {K H M H₁ : Subgroup ↥L} [Group.IsSolvable ↥K]
     [M.Normal] [H₁.Normal]
     [Group.IsNilpotent (↥H ⧸ M.subgroupOf H)] (hHnorm : H.Normal)
     (hMH₁ : M ≤ H₁) (hH₁H : H₁ < H) (hHK : H ≤ K)
@@ -134,35 +134,35 @@ theorem six_three_descent
     (hbound : 4 * K.index ^ 2 + 1 < Nat.card (↥H ⧸ H₁.subgroupOf H)) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ (SOf M) A0) := by
   classical
-  haveI : Finite (Subgroup ↥L) := Finite.of_injective (fun K : Subgroup ↥L => (K : Set ↥L))
+  have : Finite (Subgroup ↥L) := Finite.of_injective (fun K : Subgroup ↥L => (K : Set ↥L))
     (fun _ _ h => SetLike.coe_injective h)
   set s : Set (Subgroup ↥L) := {A | A.Normal ∧ M ≤ A ∧ A ≤ H₁ ∧
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ (SOf A) A0)} with hs_def
   have hH₁s : H₁ ∈ s := by
-    simp only [hs_def, Set.mem_setOf_eq]; exact ⟨‹H₁.Normal›, hMH₁, le_refl _, hcoh⟩
+    simp only [hs_def, Set.mem_ofPred_eq]; exact ⟨‹H₁.Normal›, hMH₁, le_refl _, hcoh⟩
   obtain ⟨A, hAmem, hAmin⟩ :=
     Set.Finite.exists_minimalFor (id : Subgroup ↥L → Subgroup ↥L) s (Set.toFinite _) ⟨H₁, hH₁s⟩
-  simp only [hs_def, Set.mem_setOf_eq] at hAmem
+  simp only [hs_def, Set.mem_ofPred_eq] at hAmem
   obtain ⟨hAnorm, hMA, hAH₁, hAcoh⟩ := hAmem
-  haveI : A.Normal := hAnorm
+  have : A.Normal := hAnorm
   have hAeqM : A = M := by
     by_contra hne
     have hMltA : M < A := lt_of_le_of_ne hMA (Ne.symm hne)
     obtain ⟨B, hBnorm, hMB, hBltA, hBmaxl⟩ := exists_maximal_normal_between hMltA
-    haveI : B.Normal := hBnorm
+    have : B.Normal := hBnorm
     have hAltH : A < H := lt_of_le_of_lt hAH₁ hH₁H
     have hAltK : A < K := lt_of_lt_of_le hAltH hHK
     -- `[K/A, K/A] ≠ ⊤`: `K` solvable, `K/A` nontrivial (`A < K`).
     have hAcomm : _root_.commutator (↥K ⧸ A.subgroupOf K) ≠ ⊤ := by
-      haveI : (A.subgroupOf K).Normal := (‹A.Normal›).subgroupOf K
-      haveI : Nontrivial (↥K ⧸ A.subgroupOf K) := by
+      have : (A.subgroupOf K).Normal := (‹A.Normal›).subgroupOf K
+      have : Nontrivial (↥K ⧸ A.subgroupOf K) := by
         rw [QuotientGroup.nontrivial_iff]
         intro htop
         exact hAltK.ne' (le_antisymm (Subgroup.subgroupOf_eq_top.mp htop) hAltK.le)
-      exact (IsSolvable.commutator_lt_top_of_nontrivial (↥K ⧸ A.subgroupOf K)).ne
+      exact (Group.IsSolvable.commutator_lt_top_of_nontrivial (↥K ⧸ A.subgroupOf K)).ne
     -- `A/B ⊆ Z(H/B)`: `H/B` nilpotent (a quotient of the nilpotent `H/M`, as `M ≤ B`), and
     -- `B` is maximal below `A`.
-    haveI hnilB : Group.IsNilpotent (↥H ⧸ B.subgroupOf H) :=
+    have hnilB : Group.IsNilpotent (↥H ⧸ B.subgroupOf H) :=
       Group.nilpotent_of_surjective
         (QuotientGroup.map (M.subgroupOf H) (B.subgroupOf H) (MonoidHom.id ↥H)
           (by simpa using Subgroup.subgroupOf_mono H hMB))
@@ -176,7 +176,7 @@ theorem six_three_descent
     have hSBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ (SOf B) A0) := by
       intro hBcoh
       have hBs : B ∈ s := by
-        simp only [hs_def, Set.mem_setOf_eq]
+        simp only [hs_def, Set.mem_ofPred_eq]
         exact ⟨hBnorm, hMB, hBltA.le.trans hAH₁, hBcoh⟩
       exact lt_irrefl _ (hBltA.trans_le (hAmin hBs hBltA.le))
     have hbnd := h62 A B hBltA.le hAH₁ hAcomm hcentral hAcoh hSBncoh
@@ -293,16 +293,16 @@ theorem inducedMember_re_le_general
         Subgroup.center (↥C ⧸ B.subgroupOf C)) :
     (ClassFunction.induce K (θ : ClassFunction ↥K ℂ) 1).re ≤
       (C.index : ℝ) * Real.sqrt (Nat.card (↥C ⧸ D.subgroupOf C) : ℝ) := by
-  haveI : Fintype ↥K := Fintype.ofFinite _
-  haveI : (B.subgroupOf C).Normal := (‹B.Normal›).subgroupOf C
+  have : Fintype ↥K := Fintype.ofFinite _
+  have : (B.subgroupOf C).Normal := (‹B.Normal›).subgroupOf C
   set CK : Subgroup ↥K := C.subgroupOf K with hCK_def
-  haveI : Fintype ↥CK := Fintype.ofFinite _
-  haveI : Invertible (Nat.card ↥CK : ℂ) :=
+  have : Fintype ↥CK := Fintype.ofFinite _
+  have : Invertible (Nat.card ↥CK : ℂ) :=
     invertibleOfNonzero (by exact_mod_cast (Nat.card_pos (α := ↥CK)).ne')
-  haveI : (B.subgroupOf K).Normal := (‹B.Normal›).subgroupOf K
+  have : (B.subgroupOf K).Normal := (‹B.Normal›).subgroupOf K
   set NB : Subgroup ↥CK := (B.subgroupOf K).subgroupOf CK with hNB
   set DK : Subgroup ↥CK := (D.subgroupOf K).subgroupOf CK with hDK
-  haveI : NB.Normal := (‹(B.subgroupOf K).Normal›).subgroupOf CK
+  have : NB.Normal := (‹(B.subgroupOf K).Normal›).subgroupOf CK
   have hNBDK : NB ≤ DK := Subgroup.subgroupOf_mono CK (Subgroup.subgroupOf_mono K hBD)
   -- the kernel hypothesis: `θ` trivial on `B` ⟹ `Res_{C∩K} θ` trivial on `NB`.
   have hθNB : (↑NB : Set ↥CK) ⊆ OddOrder.Peterfalvi.S03.characterKernel
@@ -398,7 +398,7 @@ descent, nilpotency-forces-centrality, the θ-degree bound, and the `√`-arithm
 here.  This is the theorem `S13.coherent_S_of_coherent_SH0C` (Peterfalvi (11.3)) cites, applied
 with `(L,K,M,H,H₁) = (M, M', 1, HC, H₀C)`. -/
 theorem six_three_of_six_two_oracle
-    {K H M H₁ : Subgroup ↥L} [IsSolvable ↥K]
+    {K H M H₁ : Subgroup ↥L} [Group.IsSolvable ↥K]
     [Invertible (Nat.card ↥K : ℂ)]
     [M.Normal] [H₁.Normal]
     [Group.IsNilpotent (↥H ⧸ M.subgroupOf H)] (hHnorm : H.Normal)

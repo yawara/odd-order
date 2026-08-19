@@ -63,7 +63,7 @@ theorem representation_isIrreducible_of_transitive_nonzero
     Representation.IsIrreducible rho := by
   have hbot_ne_top : (⊥ : Subrepresentation rho) ≠ ⊤ := fun h =>
     bot_ne_top (congrArg Subrepresentation.toSubmodule h)
-  letI : Nontrivial (Subrepresentation rho) := ⟨⊥, ⊤, hbot_ne_top⟩
+  let : Nontrivial (Subrepresentation rho) := ⟨⊥, ⊤, hbot_ne_top⟩
   apply IsSimpleOrder.of_forall_eq_top
   intro W hWbot
   apply Subrepresentation.toSubmodule_injective
@@ -104,16 +104,16 @@ theorem exists_singerEigenmodel_of_faithful_irreducible
       Algebra.adjoin (ZMod 2) ({lambda} : Set (GaloisField 2 n)) = ⊤ := by
   classical
   have hn0 : n ≠ 0 := by omega
-  haveI : Fintype V := Fintype.ofFinite V
-  haveI : Module.Finite (ZMod 2) V := Module.Finite.of_finite
-  letI : Module (MonoidAlgebra (ZMod 2) C) V :=
+  have : Fintype V := Fintype.ofFinite V
+  have : Module.Finite (ZMod 2) V := Module.Finite.of_finite
+  let : Module (MonoidAlgebra (ZMod 2) C) V :=
     Module.compHom V (rho.asAlgebraHom).toRingHom
   have hsmul : ∀ (g : C) (v : V),
       MonoidAlgebra.of (ZMod 2) C g • v = rho g v := by
     intro g v
     change rho.asAlgebraHom (MonoidAlgebra.of (ZMod 2) C g) v = rho g v
     rw [Representation.asAlgebraHom_of]
-  haveI : IsSimpleModule (MonoidAlgebra (ZMod 2) C) V :=
+  have : IsSimpleModule (MonoidAlgebra (ZMod 2) C) V :=
     (Representation.irreducible_iff_isSimpleModule_asModule rho).mp hirr
   have hfaith' : ∀ g : C,
       (∀ v : V, MonoidAlgebra.of (ZMod 2) C g • v = v) → g = 1 := by
@@ -144,9 +144,9 @@ theorem exists_singerEigenmodel_of_faithful_irreducible
     rw [← hsmul c (e.symm x), hcompat]
     rw [show e0 (e.symm x) = x from e.apply_symm_apply x]
   have hN : 2 ^ n - 1 ≠ 0 := Nat.sub_ne_zero_of_lt (Nat.one_lt_pow hn0 (by omega))
-  letI : NeZero (2 ^ n - 1) := ⟨hN⟩
+  let : NeZero (2 ^ n - 1) := ⟨hN⟩
   have hcardK : Nat.card (GaloisField 2 n) = 2 ^ n := GaloisField.card 2 n hn0
-  letI : Fintype (GaloisField 2 n) := Fintype.ofFinite _
+  let : Fintype (GaloisField 2 n) := Fintype.ofFinite _
   have hcardKf : Fintype.card (GaloisField 2 n) = 2 ^ n := by
     rw [← Nat.card_eq_fintype_card, hcardK]
   have hgen : Algebra.adjoin (ZMod 2) ({lambda} : Set (GaloisField 2 n)) = ⊤ := by
@@ -208,13 +208,13 @@ theorem exists_singerFrobeniusEigenbasis_of_transitive_generator
       Algebra.adjoin (ZMod 2) ({nu} : Set (GaloisField 2 n)) = ⊤ ∧
       ∀ i, (rho c).baseChange (GaloisField 2 n) (b i) =
         nu ^ (2 ^ i.val) • b i := by
-  letI : Nontrivial V := Module.nontrivial_of_finrank_pos (by rw [hfin]; omega)
+  let : Nontrivial V := Module.nontrivial_of_finrank_pos (by rw [hfin]; omega)
   let D := representationImageActor rho
   let rhoD : Representation (ZMod 2) D V := representationImage rho
   let d : D := ⟨rho.asGroupHom c, ⟨c, rfl⟩⟩
-  letI : Finite D := Finite.of_surjective rho.asGroupHom.rangeRestrict
+  let : Finite D := Finite.of_surjective rho.asGroupHom.rangeRestrict
     rho.asGroupHom.rangeRestrict_surjective
-  letI : CommGroup D :=
+  let : CommGroup D :=
     { (inferInstance : Group D) with mul_comm := representationImage_mul_comm rho }
   have hirrD : Representation.IsIrreducible rhoD :=
     representation_isIrreducible_of_transitive_nonzero rhoD
@@ -915,7 +915,7 @@ theorem not_exists_equivariant_linearEquiv_of_higman_bracket
   rintro ⟨e, he⟩
   have hfin₁ : Module.finrank (ZMod 2) V₁ = n :=
     e.finrank_eq.trans hfin₂
-  letI : Nontrivial V₂ :=
+  let : Nontrivial V₂ :=
     Module.nontrivial_of_finrank_pos (by rw [hfin₂]; omega)
   have hfaith₂ : Function.Injective rho₂ :=
     representation_faithful_of_equivariant_linearEquiv
@@ -994,7 +994,7 @@ theorem not_exists_injective_intertwiner_to_baseChange_of_higman_bracket
     ¬ ∃ f : V₁ →ₗ[ZMod 2] K ⊗[ZMod 2] V₂,
       Function.Injective f ∧
       ∀ c v, f (rho₁ c v) = (rho₂ c).baseChange K (f v) := by
-  letI : Nontrivial V₂ :=
+  let : Nontrivial V₂ :=
     Module.nontrivial_of_finrank_pos (by rw [hfin₂]; omega)
   have hirr₂ : Representation.IsIrreducible rho₂ :=
     representation_isIrreducible_of_transitive_nonzero rho₂ htrans₂

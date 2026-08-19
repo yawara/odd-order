@@ -40,7 +40,7 @@ theorem titsTwist_apply (m : ℕ) (x : Field m) :
 /-- One full Frobenius period acts trivially on the defining field. -/
 theorem iterateFrobeniusEquiv_period (m : ℕ) (x : Field m) :
     iterateFrobeniusEquiv (Field m) 2 (2 * m + 1) x = x := by
-  letI := Fintype.ofFinite (Field m)
+  let := Fintype.ofFinite (Field m)
   rw [iterateFrobeniusEquiv_def, ← natCard_field m]
   simpa [Nat.card_eq_fintype_card] using FiniteField.pow_card x
 

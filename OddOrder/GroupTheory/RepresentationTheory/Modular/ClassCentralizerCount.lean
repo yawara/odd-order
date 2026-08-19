@@ -75,7 +75,7 @@ theorem card_conjClass_modEq_card_centralizer [Finite G] {p : ℕ} (hp : p.Prime
     Nat.card (ConjClassCarrier C)
       ≡ Nat.card {g : G // ConjClasses.mk g = C ∧ g ∈ Subgroup.centralizer (P : Set G)}
         [MOD p] := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hcard : Nat.card (fixedPoints ↥P (ConjClassCarrier C))
       = Nat.card {g : G // ConjClasses.mk g = C ∧ g ∈ Subgroup.centralizer (P : Set G)} :=
     Nat.card_congr

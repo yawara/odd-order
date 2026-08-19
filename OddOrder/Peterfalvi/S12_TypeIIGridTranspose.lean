@@ -151,7 +151,7 @@ theorem section16_partner_typePData_W2_eq [Finite G]
   have hKstarne : mp.Kstar ≠ ⊥ := fun hbot =>
     OddOrder.BG.Ch4.S14.card_kappaHall_ne_one mp.T_typeP mp.Kstar_le_T mp.Kstar_hall
       (Subgroup.card_eq_one.mpr hbot)
-  haveI := (Subgroup.nontrivial_iff_ne_bot mp.Kstar).mpr hKstarne
+  have := (Subgroup.nontrivial_iff_ne_bot mp.Kstar).mpr hKstarne
   obtain ⟨⟨x, hxK⟩, hxne⟩ := exists_ne (1 : ↥mp.Kstar)
   have hxne' : x ≠ 1 := fun h => hxne (Subtype.ext h)
   have hcen := dataT.centralizer_W1 x (hTW1.symm ▸ hxK) hxne'
@@ -186,24 +186,24 @@ theorem exists_section16_partner_typePData [Finite G]
   classical
   -- an arbitrary type-`P` datum on `T` (from `T_nonI`)
   obtain ⟨data₀⟩ := typePData_of_isTypeNonI mp.T_nonI
-  haveI : IsCyclic ↥mp.Kstar := mp.isCyclic_Kstar
+  have : IsCyclic ↥mp.Kstar := mp.isCyclic_Kstar
   -- `K*` complements `T'` in `T` (the κ-Hall complement, ungated for type `P`)
   have hKcompl := OddOrder.BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall hG
     mp.T_maximal mp.T_typeP mp.Kstar_le_T mp.Kstar_hall
   -- `T'.subgroupOf T` is normal (it is the commutator subgroup of `↥T`)
   have hT'sub : (derivedInG mp.T).subgroupOf mp.T = commutator ↥mp.T :=
     Subgroup.comap_map_eq_self_of_injective mp.T.subtype_injective _
-  haveI : ((derivedInG mp.T).subgroupOf mp.T).Normal := by rw [hT'sub]; infer_instance
+  have : ((derivedInG mp.T).subgroupOf mp.T).Normal := by rw [hT'sub]; infer_instance
   -- `(|T'|, [T : T']) = 1`: the κ-Hall complement has coprime order
   have hN : Nat.Coprime (Nat.card ↥((derivedInG mp.T).subgroupOf mp.T))
       ((derivedInG mp.T).subgroupOf mp.T).index := by
     rw [hKcompl.symm.index_eq_card]
     exact OddOrder.BG.Ch4.S14.coprime_card_derived_kappaHall_of_isComplement'
       mp.Kstar_hall hKcompl
-  haveI hTsolv : IsSolvable ↥mp.T := hG.solvable_of_mem_maximalSubgroups mp.T_maximal
-  have hSolv : IsSolvable ↥((derivedInG mp.T).subgroupOf mp.T) ∨
-      IsSolvable (↥mp.T ⧸ (derivedInG mp.T).subgroupOf mp.T) :=
-    Or.inl (solvable_of_solvable_injective
+  have hTsolv : Group.IsSolvable ↥mp.T := hG.isSolvable_of_mem_maximalSubgroups mp.T_maximal
+  have hSolv : Group.IsSolvable ↥((derivedInG mp.T).subgroupOf mp.T) ∨
+      Group.IsSolvable (↥mp.T ⧸ (derivedInG mp.T).subgroupOf mp.T) :=
+    Or.inl (Group.isSolvable_of_isSolvable_injective
       (Subgroup.subtype_injective ((derivedInG mp.T).subgroupOf mp.T)))
   -- Schur–Zassenhaus: the two complements `data₀.W1`, `K*` of `T'` are `T`-conjugate
   obtain ⟨n, -, hn⟩ := Subgroup.IsComplement'.exists_conj_of_coprime hN hSolv
@@ -246,7 +246,7 @@ theorem section16_S_typePData_W2_eq [Finite G]
   have hKne : mp.K ≠ ⊥ := fun hbot =>
     OddOrder.BG.Ch4.S14.card_kappaHall_ne_one mp.S_typeP mp.K_le_S mp.K_hall
       (Subgroup.card_eq_one.mpr hbot)
-  haveI := (Subgroup.nontrivial_iff_ne_bot mp.K).mpr hKne
+  have := (Subgroup.nontrivial_iff_ne_bot mp.K).mpr hKne
   obtain ⟨⟨x, hxK⟩, hxne⟩ := exists_ne (1 : ↥mp.K)
   have hxne' : x ≠ 1 := fun h => hxne (Subtype.ext h)
   have hcen := dataS.centralizer_W1 x (hSW1.symm ▸ hxK) hxne'
@@ -506,7 +506,7 @@ theorem typePData_W1_isHallSubgroup_kappa [Finite G]
     OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M)
       (data.W1.subgroupOf M) := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   obtain ⟨K, hKM, hK, -⟩ :=
     OddOrder.BG.Ch4.S14.exists_isHallSubgroup_kappa_ge hG hM (X := ⊥) bot_le (by simp)
   -- `K` is cyclic by BG Theorem A (mirror of `typePData_W1_hall_coprime`)
@@ -518,7 +518,7 @@ theorem typePData_W1_isHallSubgroup_kappa [Finite G]
   have hU : OddOrder.Isaacs.Ch03.IsHallSubgroup
       ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
       ((U'.map M.subtype).subgroupOf M) := by rw [hUeq]; exact hU'hall
-  haveI : IsCyclic ↥K :=
+  have : IsCyclic ↥K :=
     (OddOrder.BG.Ch4.S15.typeP_auxiliary_structure hG hM hKM (Subgroup.map_subtype_le U')
       hK rfl hU).2.1
   have hKW1 : Nat.card ↥K = Nat.card ↥data.W1 := by
@@ -668,6 +668,7 @@ theorem exists_section16MaximalPairCore_around [Finite G]
 /- The `M`-side conversion: an aligned-grid row is a full `chiFam` fiber (issue 9079 item 4) -/
 
 open scoped Classical FiniteInduce in
+set_option backward.isDefEq.respectTransparency false in
 /-- **The §10 aligned σ-grid row is a full `χ`-family fiber sum** (the `M`-side half of the
 (10.7) grid transpose): for every `W₁`-index character `r'char` of the §10 → §5 bridge
 there is a row `r'` of `alignedOmegaSigmaGrid` whose sum over the full row equals the
@@ -695,13 +696,13 @@ theorem Hypothesis.exists_alignedOmegaSigmaGrid_row_sum_eq_chiFam_fiber [Finite 
         (typePData_toTICyclicHypothesis hyp.typeP hodd).chiFam rfl
           (hyp.canonicalFullDadeApp hG hodd) (r'char, q)
         = ∑ j : Fin hyp.w2, hyp.alignedOmegaSigmaGrid hG hodd r' j := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   -- context of `alignedOmegaSigmaGrid` (mirror of `exists_alignedOmegaSigmaGrid_chiFam_family`)
   let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
-  haveI : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
-  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  have : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
   have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
   have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
   have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
@@ -709,17 +710,17 @@ theorem Hypothesis.exists_alignedOmegaSigmaGrid_row_sum_eq_chiFam_fiber [Finite 
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
   let χ₂ : Fin hyp.w2 → (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
     fun j => finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)
   let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
-  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
-  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
   let e : ↥tic.W ≃* ↥(h.W1 ⊔ h.W2) :=
     (Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm.trans
       (MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm)
   let h46 := hyp.toHypothesis46 hG hodd
-  haveI : NeZero (Nat.card h46.W1) := ⟨by have := h46.one_lt_card_W1; omega⟩
+  have : NeZero (Nat.card h46.W1) := ⟨by have := h46.one_lt_card_W1; omega⟩
   -- the internal bridge `e` is `ticWEquivSdiffW h46` pointwise (both fix the `G`-element)
   have hew : ∀ x : ↥tic.W,
       e x = OddOrder.Peterfalvi.S06.ticWEquivSdiffW h46 x := fun x => by
@@ -1031,21 +1032,21 @@ theorem exists_reconciled_conj_typePData_S [Finite G]
   have hd₁H : data₁.H = MulAut.conj g₀ • dataP.H := hcastH hgS _
   have hd₁U : data₁.U = MulAut.conj g₀ • dataP.U := hcastU hgS _
   -- Schur–Zassenhaus: realign `data₁.W1` onto the κ-Hall `mp.K` inside `mp.S`
-  haveI : IsCyclic ↥mp.K := mp.isCyclic_K
+  have : IsCyclic ↥mp.K := mp.isCyclic_K
   have hKcompl := OddOrder.BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall hG
     mp.S_maximal mp.S_typeP mp.K_le_S mp.K_hall
   have hS'sub : (derivedInG mp.S).subgroupOf mp.S = commutator ↥mp.S :=
     Subgroup.comap_map_eq_self_of_injective mp.S.subtype_injective _
-  haveI : ((derivedInG mp.S).subgroupOf mp.S).Normal := by rw [hS'sub]; infer_instance
+  have : ((derivedInG mp.S).subgroupOf mp.S).Normal := by rw [hS'sub]; infer_instance
   have hN : Nat.Coprime (Nat.card ↥((derivedInG mp.S).subgroupOf mp.S))
       ((derivedInG mp.S).subgroupOf mp.S).index := by
     rw [hKcompl.symm.index_eq_card]
     exact OddOrder.BG.Ch4.S14.coprime_card_derived_kappaHall_of_isComplement'
       mp.K_hall hKcompl
-  haveI hSsolv : IsSolvable ↥mp.S := hG.solvable_of_mem_maximalSubgroups mp.S_maximal
-  have hSolv : IsSolvable ↥((derivedInG mp.S).subgroupOf mp.S) ∨
-      IsSolvable (↥mp.S ⧸ (derivedInG mp.S).subgroupOf mp.S) :=
-    Or.inl (solvable_of_solvable_injective
+  have hSsolv : Group.IsSolvable ↥mp.S := hG.isSolvable_of_mem_maximalSubgroups mp.S_maximal
+  have hSolv : Group.IsSolvable ↥((derivedInG mp.S).subgroupOf mp.S) ∨
+      Group.IsSolvable (↥mp.S ⧸ (derivedInG mp.S).subgroupOf mp.S) :=
+    Or.inl (Group.isSolvable_of_isSolvable_injective
       (Subgroup.subtype_injective ((derivedInG mp.S).subgroupOf mp.S)))
   obtain ⟨n, -, hn⟩ := Subgroup.IsComplement'.exists_conj_of_coprime hN hSolv
     data₁.M_complement hKcompl

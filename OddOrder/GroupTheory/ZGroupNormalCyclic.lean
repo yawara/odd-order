@@ -50,7 +50,7 @@ group has only one subgroup of each order (`cyclic_subgroup_eq_of_card_eq`). -/
 theorem normal_of_le_of_isCyclic_normal {W : Subgroup D} [hWn : W.Normal]
     (hWcyc : IsCyclic ↥W) {U : Subgroup D} (hUW : U ≤ W) : U.Normal := by
   classical
-  haveI := hWcyc
+  have := hWcyc
   refine ⟨fun n hn d => ?_⟩
   set U' : Subgroup D := U.map (MulAut.conj d).toMonoidHom with hU'def
   have hU'W : U' ≤ W := by
@@ -81,8 +81,8 @@ theorem mem_of_isPGroup_of_orderOf_dvd {W : Subgroup D} [W.Normal] (hWcyc : IsCy
     (hap : IsPGroup p ↥(Subgroup.zpowers a)) (hdvd : orderOf a ∣ Nat.card ↥W) :
     a ∈ W := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI := hWcyc
+  have : Fact p.Prime := ⟨hp⟩
+  have := hWcyc
   -- `W_p ≤ W` of order `|W|_p`
   obtain ⟨V, hVcard⟩ := exists_subgroup_card_eq_of_isCyclic (C := ↥W)
     (Nat.ordProj_dvd (Nat.card ↥W) p)
@@ -91,12 +91,12 @@ theorem mem_of_isPGroup_of_orderOf_dvd {W : Subgroup D} [W.Normal] (hWcyc : IsCy
   have hWpcard : Nat.card ↥Wp = p ^ (Nat.card ↥W).factorization p :=
     (Nat.card_congr (Subgroup.equivMapOfInjective V W.subtype
       Subtype.val_injective).toEquiv).symm.trans hVcard
-  haveI : Wp.Normal := normal_of_le_of_isCyclic_normal hWcyc hWpW
+  have : Wp.Normal := normal_of_le_of_isCyclic_normal hWcyc hWpW
   have hWppg : IsPGroup p ↥Wp := IsPGroup.of_card hWpcard
   -- a Sylow `p`-subgroup of `D` containing `a`; `W_p` lies in it too, being normal
   obtain ⟨P, haP⟩ := hap.exists_le_sylow
   have hWpP : Wp ≤ (P : Subgroup D) := hWppg.le_sylow_of_normal P
-  haveI : IsCyclic ↥(P : Subgroup D) := hZ.isZGroup p hp P
+  have : IsCyclic ↥(P : Subgroup D) := hZ.isZGroup p hp P
   -- `|⟨a⟩| = p^k` divides `|W| `, hence divides `|W_p| = |W|_p`
   obtain ⟨k, hk⟩ := hap.exists_card_eq
   rw [Nat.card_zpowers] at hk

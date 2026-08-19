@@ -255,7 +255,7 @@ theorem irrCut_two_le_ncard [Finite G] {M : Subgroup G}
     2 ≤ {φ : ClassFunction ↥M ℂ | φ ∈ sOf data Y ∧
       IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (d : ℂ))}.ncard := by
   classical
-  haveI := derivedInG_subgroupOf_normal M
+  have := derivedInG_subgroupOf_normal M
   obtain ⟨φ, hφ⟩ := hne
   have hφc := irrCut_conjClosed data Y d hφ
   have hne' : φ ≠ φ.conj := fun h =>
@@ -293,7 +293,7 @@ theorem sOf_anchor_diff_support [Finite G] {M : Subgroup G} {A0 : Set ↥M}
     {χ₁ x : ClassFunction ↥M ℂ}
     (hχ₁mem : χ₁ ∈ sOf data Y) (hx : x ∈ sOf data Y) :
     ((x - χ₁ : ClassFunction ↥M ℂ)).support ⊆ A0 := by
-  haveI := derivedInG_subgroupOf_normal M
+  have := derivedInG_subgroupOf_normal M
   have h := OddOrder.Peterfalvi.S08.inducedKernelFamily_scaledDiff_support hKsupp
     (sOf_subset_inducedKernelFamily_bot hG hM data Y hx)
     (sOf_subset_inducedKernelFamily_bot hG hM data Y hχ₁mem) (d := 1)

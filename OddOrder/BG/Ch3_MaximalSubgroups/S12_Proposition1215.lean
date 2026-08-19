@@ -46,7 +46,7 @@ be `⊤`. -/
 private theorem eq_of_isPGroup_of_normalizer_inf_eq [Finite G] {q : ℕ} [Fact q.Prime]
     {S T' : Subgroup G} (hT'q : IsPGroup q ↥T') (hST' : S ≤ T')
     (hS_eq : S = T' ⊓ Subgroup.normalizer (S : Set G)) : S = T' := by
-  haveI : Group.IsNilpotent ↥T' := hT'q.isNilpotent
+  have : Group.IsNilpotent ↥T' := hT'q.isNilpotent
   have hfix :
       Subgroup.normalizer ((S.subgroupOf T' : Subgroup ↥T') : Set ↥T') = S.subgroupOf T' := by
     rw [← Subgroup.subgroupOf_normalizer_eq hST']
@@ -159,11 +159,12 @@ theorem subgroupESetup_of_complement [Finite G] (hG : IsMinimalSimpleOdd G)
     (hcompl_inf : S10.Msigma M ⊓ E = ⊥) (hcompl_sup : S10.Msigma M ⊔ E = M) :
     ∃ E₁ E₂ E₃ : Subgroup G, SubgroupESetup M E E₁ E₂ E₃ := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-  haveI : IsSolvable ↥E := solvable_of_solvable_injective (Subgroup.inclusion_injective hE_le)
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥E :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective hE_le)
   obtain ⟨K₀, hK₀⟩ := Ch03.hall_E_exists (G := ↥E) (tau1 M ∪ tau2 M)
-  haveI : IsSolvable ↥K₀ :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective (le_top (a := K₀)))
+  have : Group.IsSolvable ↥K₀ :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective (le_top (a := K₀)))
   obtain ⟨H₁, hH₁⟩ := Ch03.hall_E_exists (G := ↥K₀) (tau1 M)
   obtain ⟨H₂, hH₂⟩ := Ch03.hall_E_exists (G := ↥K₀) (tau2 M)
   obtain ⟨H₃, hH₃⟩ := Ch03.hall_E_exists (G := ↥E) (tau3 M)
@@ -249,7 +250,7 @@ theorem exists_subgroupESetup_with_le [Finite G] (hG : IsMinimalSimpleOdd G)
     ∃ E E₁ E₂ E₃ : Subgroup G,
       SubgroupESetup M E E₁ E₂ E₃ ∧ A ≤ E ∧ Subgroup.IsPiSubgroup ((S10.sigma M)ᶜ) E := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   -- `A.subgroupOf M` is a `σ(M)'`-subgroup of `↥M`.
   have hU : ∀ q ∈ (Nat.card ↥(A.subgroupOf M)).primeFactors, q ∈ (S10.sigma M)ᶜ := by
     intro q hq
@@ -352,9 +353,9 @@ theorem sigma_subgroup_maximal_interaction [Finite G] (hG : IsMinimalSimpleOdd G
   have hb : Subgroup.normalizer (S : Set G) ≤ M := by
     by_cases hScyc : IsCyclic ↥S
     · -- `S` cyclic (BG L3425).
-      haveI hScyc' : IsCyclic ↥S := hScyc
+      have hScyc' : IsCyclic ↥S := hScyc
       -- Step (1): `X` char `S` (cyclic ⟹ unique subgroup per order) ⟹ `N_G(S) ≤ N_G(X) ≤ M*`.
-      haveI hXcharS : (X.subgroupOf S).Characteristic := by
+      have hXcharS : (X.subgroupOf S).Characteristic := by
         rw [Subgroup.characteristic_iff_map_eq]
         intro φ
         exact cyclic_subgroup_eq_of_card_eq
@@ -436,7 +437,7 @@ theorem sigma_subgroup_maximal_interaction [Finite G] (hG : IsMinimalSimpleOdd G
     -- so we restrict to the BG-faithful prime case where the Sylow argument applies).
     intro r hr_prime hr_mem
     obtain ⟨hr_σMs, hr_πMs, hr_pRankMs⟩ := hr_mem
-    haveI : Fact r.Prime := ⟨hr_prime⟩
+    have : Fact r.Prime := ⟨hr_prime⟩
     by_cases hrα : r ∈ S10.alpha M
     · exact Or.inr hrα
     · -- `r ∉ α(M) = β(M)`, so `r ∤ |M_β|`.
@@ -448,7 +449,7 @@ theorem sigma_subgroup_maximal_interaction [Finite G] (hG : IsMinimalSimpleOdd G
         have hr_prime : r.Prime := Nat.prime_of_mem_primeFactors hr_mem
         set A' := (M ⊓ Mstar).subgroupOf M with hA'def
         set N' := (S10.Mbeta M).subgroupOf M with hN'def
-        haveI hN'norm : N'.Normal := by
+        have hN'norm : N'.Normal := by
           rw [hN'def, S10.Mbeta_subgroupOf]; infer_instance
         have hsup_eq : M ⊓ Mstar ⊔ S10.Mbeta M = M := by rw [inf_comm]; exact h109_M.1.symm
         have hAN_top : A' ⊔ N' = ⊤ := by
@@ -502,7 +503,7 @@ theorem sigma_subgroup_maximal_interaction [Finite G] (hG : IsMinimalSimpleOdd G
         intro hr_σM
         obtain ⟨hr_πM, P, _⟩ := (S10.mem_sigma_iff M r).mp hr_σM
         have hr_prime : r.Prime := Nat.prime_of_mem_primeFactors hr_πM
-        haveI : Fact r.Prime := ⟨hr_prime⟩
+        have : Fact r.Prime := ⟨hr_prime⟩
         -- `P.map` is an `r`-group `≤ M`, hence a `σ(M)`-subgroup; so `P.map ≤ M_σ`.
         have hP_pi : Ch03.Subgroup.IsPiGroup (S10.sigma M) ((P : Subgroup ↥M).map M.subtype) := by
           intro s hs
@@ -531,7 +532,7 @@ theorem sigma_subgroup_maximal_interaction [Finite G] (hG : IsMinimalSimpleOdd G
         have := ((S10.mem_alpha_iff Mstar r).mp h).2; omega
       have hr_βMs : r ∉ S10.beta Mstar := h109_star.2 ▸ hr_αMs
       have hidxM : ¬ r ∣ ((M ⊓ Mstar).subgroupOf M).index := by
-        haveI : ((S10.Mbeta M).subgroupOf M).Normal := by rw [S10.Mbeta_subgroupOf]; infer_instance
+        have : ((S10.Mbeta M).subgroupOf M).Normal := by rw [S10.Mbeta_subgroupOf]; infer_instance
         refine not_dvd_index_of_sup_top_normal (N := (S10.Mbeta M).subgroupOf M) ?_ ?_
         · rw [← Subgroup.subgroupOf_sup inf_le_left (S10.Mbeta_le M),
             (by rw [inf_comm]; exact h109_M.1.symm : M ⊓ Mstar ⊔ S10.Mbeta M = M),
@@ -540,7 +541,7 @@ theorem sigma_subgroup_maximal_interaction [Finite G] (hG : IsMinimalSimpleOdd G
           exact fun h => hr_βM (S10.Mbeta_isPiGroup M r
             (Nat.mem_primeFactors.mpr ⟨hr_prime, h, Nat.card_pos.ne'⟩))
       have hidxMs : ¬ r ∣ ((M ⊓ Mstar).subgroupOf Mstar).index := by
-        haveI : ((S10.Mbeta Mstar).subgroupOf Mstar).Normal := by
+        have : ((S10.Mbeta Mstar).subgroupOf Mstar).Normal := by
           rw [S10.Mbeta_subgroupOf]; infer_instance
         refine not_dvd_index_of_sup_top_normal (N := (S10.Mbeta Mstar).subgroupOf Mstar) ?_ ?_
         · rw [← Subgroup.subgroupOf_sup inf_le_right (S10.Mbeta_le Mstar),
@@ -615,7 +616,7 @@ theorem sigma_subgroup_maximal_interaction [Finite G] (hG : IsMinimalSimpleOdd G
     have hMM : M ⊓ Mstar = Es := by
       refine le_antisymm (fun x hx => ?_) (le_inf hEsM hsetupS.E_le)
       obtain ⟨hxM, hxMstar⟩ := Subgroup.mem_inf.mp hx
-      haveI : ((S10.Msigma Mstar).subgroupOf Mstar).Normal := by
+      have : ((S10.Msigma Mstar).subgroupOf Mstar).Normal := by
         rw [S10.Msigma_subgroupOf]; infer_instance
       have hsub : (⟨x, hxMstar⟩ : ↥Mstar) ∈
           (S10.Msigma Mstar).subgroupOf Mstar ⊔ Es.subgroupOf Mstar := by
@@ -653,7 +654,7 @@ theorem sigma_subgroup_maximal_interaction [Finite G] (hG : IsMinimalSimpleOdd G
       -- 矛盾。
       intro r hr_piM hr_sigmaMstar
       by_contra hr_notbeta
-      haveI : Fact r.Prime := ⟨Nat.prime_of_mem_primeFactors hr_piM⟩
+      have : Fact r.Prime := ⟨Nat.prime_of_mem_primeFactors hr_piM⟩
       have hr_ne_q : r ≠ q := fun h => hqns (h ▸ hr_sigmaMstar)
       -- `r ∉ σ(M)` (σ(M) disjoint σ(M*) by 12.6(f), via `elemAb_normal_in_E_of_tau2` last
       -- conjunct).

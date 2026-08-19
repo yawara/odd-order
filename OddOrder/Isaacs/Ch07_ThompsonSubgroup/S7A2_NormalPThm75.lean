@@ -302,7 +302,7 @@ theorem sylow_normal_of_elementaryAbelian_card_prime_sq_of_faithful
   have hOp : OddOrder.Isaacs.Ch01.opCore p G = ⊥ :=
     opCore_eq_bot_of_sylow_card_le_prime_of_not_normal P hP_card_le hP_not_normal
   set L : Subgroup G := OddOrder.Isaacs.Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} G with hL_def
-  haveI hLnormal : L.Normal := by
+  have hLnormal : L.Normal := by
     dsimp [L]
     infer_instance
   have hPnorm :
@@ -357,8 +357,8 @@ theorem subgroup_normal_of_injective_mulAut_of_isCyclic
     {φ : A →* MulAut V} (hφ : Function.Injective φ) (P : Subgroup A) :
     P.Normal := by
   let e := IsCyclic.mulAutMulEquiv V
-  letI : CommGroup (MulAut V) := e.toMonoidHom.commGroupOfInjective e.injective
-  letI : CommGroup A := φ.commGroupOfInjective hφ
+  let : CommGroup (MulAut V) := e.toMonoidHom.commGroupOfInjective e.injective
+  let : CommGroup A := φ.commGroupOfInjective hφ
   infer_instance
 
 /-- A faithful action by automorphisms embeds the acting group into `MulAut V`. -/
@@ -382,7 +382,7 @@ theorem normal_of_isPGroup_index_le_prime
     {V : Type*} [Group V] [Finite V] {p : ℕ} [Fact p.Prime]
     (hV : IsPGroup p V) {H : Subgroup V} (hH : H.index ≤ p) :
     H.Normal := by
-  haveI : H.FiniteIndex := inferInstance
+  have : H.FiniteIndex := inferInstance
   obtain ⟨n, hn⟩ := hV.index H
   rcases n with _ | n
   · exact Subgroup.normal_of_index_eq_one (by simpa using hn)
@@ -571,8 +571,8 @@ theorem actionCentralizer_inf_normal_of_index_le_prime
     normal_of_isPGroup_index_le_prime hV hP
   have hQN : (actionCentralizer φ Q).Normal :=
     normal_of_isPGroup_index_le_prime hV hQ
-  letI : (actionCentralizer φ P).Normal := hPN
-  letI : (actionCentralizer φ Q).Normal := hQN
+  let : (actionCentralizer φ P).Normal := hPN
+  let : (actionCentralizer φ Q).Normal := hQN
   infer_instance
 
 /-- Quotient-cardinality form of the Theorem 7.5 index estimate:
@@ -976,7 +976,7 @@ theorem quotient_sylow_images_ne_of_ne_of_normal_isPGroup
     P.mapSurjective (QuotientGroup.mk'_surjective K) ≠
       Q.mapSurjective (QuotientGroup.mk'_surjective K) := by
   intro hmap
-  haveI : Finite (Sylow p G) := P.finite_of_finiteIndex
+  have : Finite (Sylow p G) := P.finite_of_finiteIndex
   have hsub_ne :
       (P : Subgroup G).map (QuotientGroup.mk' K) ≠
         (Q : Subgroup G).map (QuotientGroup.mk' K) :=
@@ -997,7 +997,7 @@ theorem quotient_sylow_image_not_normal_of_not_normal_of_normal_isPGroup
     ¬ (((P.mapSurjective (QuotientGroup.mk'_surjective K) :
           Sylow p (G ⧸ K)) : Subgroup (G ⧸ K)).Normal) := by
   intro hPbar
-  haveI : Finite (Sylow p G) := P.finite_of_finiteIndex
+  have : Finite (Sylow p G) := P.finite_of_finiteIndex
   exact hP_not_normal
     (sylow_normal_of_quotient_image_normal_of_normal_isPGroup
       (G := G) (p := p) P (K := K) hK (by simpa using hPbar))
@@ -1091,7 +1091,7 @@ theorem quotient_sylow_normal_of_elementaryAbelian_card_prime_sq_of_actionKernel
     (((P.mapSurjective (QuotientGroup.mk'_surjective (quotientActionKernel φ hU)) :
           Sylow p (G ⧸ quotientActionKernel φ hU)) : Subgroup
           (G ⧸ quotientActionKernel φ hU))).Normal := by
-  haveI hSepQuot :
+  have hSepQuot :
       OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ)
         (G ⧸ quotientActionKernel φ hU) :=
     OddOrder.Isaacs.Ch03.quotient_isPiSeparable
@@ -1244,7 +1244,7 @@ theorem sylow_normal_of_elementary_normal_P_theorem
     intro hSub
     exact hP_not_normal (Sylow.normal_of_subsingleton P)
   -- Pick Q ≠ P.
-  haveI : Nontrivial (Sylow p G) := not_subsingleton_iff_nontrivial.mp hNotSub
+  have : Nontrivial (Sylow p G) := not_subsingleton_iff_nontrivial.mp hNotSub
   obtain ⟨Q, hQP⟩ := exists_ne P
   -- We have Q ≠ P; consider H := ⟨P, Q⟩ = P ⊔ Q.
   set H : Subgroup G := (P : Subgroup G) ⊔ (Q : Subgroup G) with hH_def
@@ -1255,7 +1255,7 @@ theorem sylow_normal_of_elementary_normal_P_theorem
       h_centralizer_index P
     have hQidx : (actionCentralizer φ (Q : Subgroup G)).index ≤ p :=
       h_centralizer_index Q
-    haveI hU_normal :
+    have hU_normal :
         (actionCentralizer φ (P : Subgroup G) ⊓
             actionCentralizer φ (Q : Subgroup G)).Normal :=
       actionCentralizer_inf_normal_of_index_le_prime hV hPidx hQidx
@@ -1278,7 +1278,7 @@ theorem sylow_normal_of_elementary_normal_P_theorem
         IsCyclic (V ⧸ (actionCentralizer φ (P : Subgroup G) ⊓
           actionCentralizer φ (Q : Subgroup G)))
     · -- Cyclic branch.
-      haveI := hVU_cyclic
+      have := hVU_cyclic
       exact
         false_of_quotient_isCyclic_of_sylow_not_normal
           (φ := φ) hU_invariant hK_p P hP_not_normal
@@ -1305,7 +1305,7 @@ theorem sylow_normal_of_elementary_normal_P_theorem
     -- View P as a Sylow of H.
     let P' : Sylow p H := P.subtype hP_le_H
     -- Descend hypothesis (i): IsPiSeparable on H.
-    haveI : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) H :=
+    have : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) H :=
       OddOrder.Isaacs.Ch03.Subgroup.isPiSeparable_of_isPiSeparable ({p} : Set ℕ) H
     -- Descend hypothesis (iii): 2-subgroup abelian.
     have h2abelian' :
@@ -1346,7 +1346,7 @@ theorem sylow_normal_of_elementary_normal_P_theorem
         h_centralizer_index' Q' rfl
     -- In `H`, both `P'` and `Q'` are normal Sylow p-subgroups, hence equal.
     have hPQ_eq : P' = Q' := by
-      haveI := Sylow.unique_of_normal P' hP'_normal
+      have := Sylow.unique_of_normal P' hP'_normal
       exact Subsingleton.elim P' Q'
     have hPQsubgroup_eq : (P : Subgroup G) = (Q : Subgroup G) := by
       have h := congrArg (fun R : Sylow p H => (R : Subgroup H)) hPQ_eq

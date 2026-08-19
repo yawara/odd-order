@@ -68,7 +68,7 @@ theorem actsRegularlyOn_E3_E1_of_kappa_inf_tau3_empty [Finite G]
   have hxzpM : Subgroup.zpowers x ≤ E₃ := Subgroup.zpowers_le.mpr hxE3
   obtain ⟨r, hr, hrdvd⟩ :=
     (orderOf x).exists_prime_and_dvd (by rwa [Ne, orderOf_eq_one_iff])
-  haveI : Fact r.Prime := ⟨hr⟩
+  have : Fact r.Prime := ⟨hr⟩
   obtain ⟨z, hz⟩ := exists_prime_orderOf_dvd_card' (G := ↥(Subgroup.zpowers x)) r
     (by rw [Nat.card_zpowers]; exact hrdvd)
   -- `R = ⟨z⟩`, with `z ∈ ⟨x⟩ ≤ E₃`, of order `r`.
@@ -209,7 +209,7 @@ theorem actsRegularlyOn_E2_E1_of_actsPrime [Finite G]
   -- `g₀ ∈ ⟨g⟩` of prime order `p ∈ τ₁(M)`, `P = ⟨g₀⟩`.
   obtain ⟨p, hp, hpdvd⟩ :=
     (orderOf g).exists_prime_and_dvd (by rwa [Ne, orderOf_eq_one_iff])
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨g₀, hg₀⟩ := exists_prime_orderOf_dvd_card' (G := ↥(Subgroup.zpowers g)) p
     (by rw [Nat.card_zpowers]; exact hpdvd)
   have hg₀g : (g₀ : G) ∈ Subgroup.zpowers g := g₀.2
@@ -239,7 +239,7 @@ theorem actsRegularlyOn_E2_E1_of_actsPrime [Finite G]
   -- `y' ∈ ⟨y⟩` of prime order `q ∈ τ₂(M)`.
   obtain ⟨q, hq, hqdvd⟩ :=
     (orderOf y).exists_prime_and_dvd (by rwa [Ne, orderOf_eq_one_iff])
-  haveI : Fact q.Prime := ⟨hq⟩
+  have : Fact q.Prime := ⟨hq⟩
   obtain ⟨y', hy'⟩ := exists_prime_orderOf_dvd_card' (G := ↥(Subgroup.zpowers y)) q
     (by rw [Nat.card_zpowers]; exact hqdvd)
   have hy'y : (y' : G) ∈ Subgroup.zpowers y := y'.2
@@ -317,7 +317,7 @@ theorem actsRegularlyOn_E23_E1_of_caseTau1 [Finite G]
     have hd2 : Nat.card ↥(E₂ ⊓ E₃) ∣ Nat.card ↥E₃ := Subgroup.card_dvd_of_le inf_le_right
     have hc1 : Nat.card ↥(E₂ ⊓ E₃) = 1 := Nat.dvd_one.mp (hcop23 ▸ Nat.dvd_gcd hd1 hd2)
     exact Subgroup.card_eq_one.mp hc1
-  haveI hE3normSub : (E₃.subgroupOf E).Normal :=
+  have hE3normSub : (E₃.subgroupOf E).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer h.E₃_le).mpr hEnormE3
   intro g hgE1 hg1
   rw [fixedByElement_def]
@@ -401,7 +401,7 @@ theorem normalizer_inf_E_le_E1_of_caseTau1 [Finite G]
   have hE23norm : E ≤ Subgroup.normalizer ((E₂ ⊔ E₃ : Subgroup G) : Set G) :=
     (subgroupE_basic hG h).2.2.2.2.1.2.1
   have hEsup : E = E₁ ⊔ E₂ ⊔ E₃ := (subgroupE_basic hG h).2.2.2.2.1.1
-  letI : CommGroup ↥E₁ := hE1cyc.commGroup
+  let : CommGroup ↥E₁ := hE1cyc.commGroup
   -- generator `g` of `X`.
   obtain ⟨⟨g, hgX⟩, hg1⟩ :=
     Subgroup.ne_bot_iff_exists_ne_one.mp (ne_bot_of_mem_elemAbelianOfRank_one hX)
@@ -454,7 +454,7 @@ theorem normalizer_inf_E_le_E1_of_caseTau1 [Finite G]
   rw [Subgroup.mem_inf] at he
   obtain ⟨heN, heE⟩ := he
   -- decompose `e = u * k`, `u ∈ E₂⊔E₃` (normal), `k ∈ E₁`.
-  haveI hUnorm : ((E₂ ⊔ E₃).subgroupOf E).Normal :=
+  have hUnorm : ((E₂ ⊔ E₃).subgroupOf E).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer (sup_le h.E₂_le h.E₃_le)).mpr hE23norm
   have hsuptop : ((E₂ ⊔ E₃).subgroupOf E) ⊔ (E₁.subgroupOf E) = ⊤ := by
     rw [← Subgroup.subgroupOf_sup (sup_le h.E₂_le h.E₃_le) h.E₁_le, Subgroup.subgroupOf_eq_top,
@@ -532,7 +532,7 @@ theorem isFrobeniusGroup_E_of_caseTau1 [Finite G]
     exact Subgroup.mem_inf.mpr ⟨hgU, Subgroup.mem_centralizer_iff.mpr
       (fun y hy => by rw [Set.mem_singleton_iff.mp hy])⟩
   -- normality of the kernel.
-  haveI hKnorm : ((E₂ ⊔ E₃).subgroupOf E).Normal :=
+  have hKnorm : ((E₂ ⊔ E₃).subgroupOf E).Normal :=
     Subgroup.normal_subgroupOf_of_le_normalizer hE23norm
   refine ⟨hKnorm, ?_, ?_, ?_, ?_⟩
   · -- complement: disjoint + product covers `↥E`.
@@ -540,7 +540,7 @@ theorem isFrobeniusGroup_E_of_caseTau1 [Finite G]
     · rw [disjoint_iff]
       have hi : (E₂ ⊔ E₃).subgroupOf E ⊓ E₁.subgroupOf E = ((E₂ ⊔ E₃) ⊓ E₁).subgroupOf E := rfl
       rw [hi, inf_comm, hdisj, Subgroup.bot_subgroupOf]
-    · haveI := hKnorm
+    · have := hKnorm
       have hsupG : (E₂ ⊔ E₃) ⊔ E₁ = E := by rw [h.eq_sup hG]; ac_rfl
       have hsup : (E₂ ⊔ E₃).subgroupOf E ⊔ E₁.subgroupOf E = ⊤ := by
         rw [← Subgroup.subgroupOf_sup hE23le hE1le, hsupG, Subgroup.subgroupOf_self]
@@ -585,7 +585,7 @@ def maximalTypeFFamily (G : Type*) [Group G] : Set (Subgroup G) :=
 theorem maximalTypePFamily_eq_union :
     maximalTypePFamily G = maximalTypeP1Family G ∪ maximalTypeP2Family G := by
   ext M
-  simp only [maximalTypePFamily, maximalTypeP1Family, maximalTypeP2Family, Set.mem_setOf_eq,
+  simp only [maximalTypePFamily, maximalTypeP1Family, maximalTypeP2Family, Set.mem_ofPred_eq,
     Set.mem_union]
   constructor
   · rintro ⟨hM, hP⟩
@@ -607,7 +607,7 @@ theorem maximalTypeP1Family_disjoint_typeP2Family :
 theorem maximalTypeFFamily_eq_diff :
     maximalTypeFFamily G = maximalSubgroups G \ maximalTypePFamily G := by
   ext M
-  simp only [maximalTypeFFamily, maximalTypePFamily, Set.mem_setOf_eq, Set.mem_sdiff, not_and]
+  simp only [maximalTypeFFamily, maximalTypePFamily, Set.mem_ofPred_eq, Set.mem_sdiff, not_and]
   constructor
   · rintro ⟨hM, hF⟩
     exact ⟨hM, fun _ => isTypeF_iff_not_isTypeP.mp hF⟩
@@ -838,7 +838,7 @@ theorem sigmaLength_conj [Finite G] (h x : G) :
     rw [Set.image_sdiff hinj]
     congr 1
     · ext y
-      simp only [Set.mem_setOf_eq, Set.mem_image]
+      simp only [Set.mem_ofPred_eq, Set.mem_image]
       constructor
       · rintro ⟨M, hMmax, rfl⟩
         exact ⟨sigmaPart M x, ⟨M, hMmax, rfl⟩, (sigmaPart_conj M h x).symm⟩
@@ -957,7 +957,7 @@ theorem mem_U_sup_Msigma_iff_isPiElement_kappa_compl [Finite G]
     (hnorm : ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal)
     {x : G} (hxM : x ∈ M) :
     x ∈ U ⊔ OddOrder.BG.Ch3.S10.Msigma M ↔ IsPiElement (kappa M)ᶜ x := by
-  haveI := hnorm
+  have := hnorm
   have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
   refine ⟨fun hx p hp => ?_, fun hpi => ?_⟩
   · -- forward: `x ∈ U⊔M_σ ⟹` `p ∈ π(orderOf x) ⟹ p ∉ κ`.
@@ -970,7 +970,7 @@ theorem mem_U_sup_Msigma_iff_isPiElement_kappa_compl [Finite G]
       rw [heq]; exact orderOf_dvd_natCard _
     have h2 : Nat.card ↥(U ⊔ OddOrder.BG.Ch3.S10.Msigma M) ∣
         Nat.card ↥U * Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) := by
-      haveI : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
+      have : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
         rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
       have hdvd := card_sup_dvd_mul_of_normal (H := U.subgroupOf M)
         (N := (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
@@ -1013,7 +1013,7 @@ theorem sigmaPart_eq_self_or_one_of_isPiElement_sigma [Finite G]
   by_cases hconj : ∃ g : G, MulAut.conj g • M = L
   · obtain ⟨g, rfl⟩ := hconj
     exact Or.inl (piPart_self_of_isPiElement (fun p hp => by
-      haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+      have : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
       exact OddOrder.BG.Ch3.S10.sigma_conj g (hx p hp)))
   · refine Or.inr (piPart_eq_one_of_isPiElement_compl (fun p hp hpL => ?_))
     exact Set.disjoint_left.mp (sigma_disjoint_of_nonconjugate hG hM hL hconj) (hx p hp) hpL
@@ -1026,7 +1026,7 @@ theorem sigmaPart_eq_self_of_conj [Finite G] {M : Subgroup G} {x : G}
   simp only [sigmaPart]
   obtain ⟨g, rfl⟩ := hconj
   exact piPart_self_of_isPiElement (fun p hp => by
-    haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+    have : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
     exact OddOrder.BG.Ch3.S10.sigma_conj g (hx p hp))
 
 /-- **Directed `sigmaPart`, non-conjugate case**: a `σ(M)`-element has trivial `σ(L)`-part when `L`
@@ -1063,7 +1063,7 @@ theorem sigma_cover_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
       sigmaPart L (x * x') = sigmaPart L x * sigmaPart L x' := fun L => by
     simp only [sigmaPart]; exact piPart_mul_of_commute hcomm
   ext y
-  simp only [sigmaDecomposition, Set.mem_sdiff, Set.mem_setOf_eq, Set.mem_singleton_iff,
+  simp only [sigmaDecomposition, Set.mem_sdiff, Set.mem_ofPred_eq, Set.mem_singleton_iff,
     Set.mem_insert_iff]
   constructor
   · rintro ⟨⟨L, hL, rfl⟩, hne⟩
@@ -1106,7 +1106,7 @@ theorem not_conj_of_mem_Msigma_of_tau2 [Finite G] {M N : Subgroup G}
   rintro ⟨g, hg⟩
   obtain ⟨q, hqp, hqdvd⟩ :=
     (orderOf x).exists_prime_and_dvd (fun h => hx1 (orderOf_eq_one_iff.mp h))
-  haveI : Fact q.Prime := ⟨hqp⟩
+  have : Fact q.Prime := ⟨hqp⟩
   have hqσM : q ∈ OddOrder.BG.Ch3.S10.sigma M :=
     isPiElement_sigma_of_mem_Msigma hxM q
       (Nat.mem_primeFactors.mpr ⟨hqp, hqdvd, (orderOf_pos x).ne'⟩)
@@ -1114,7 +1114,7 @@ theorem not_conj_of_mem_Msigma_of_tau2 [Finite G] {M N : Subgroup G}
   have hcardx : Nat.card ↥(Subgroup.closure ({x} : Set G)) = orderOf x := by
     rw [← Subgroup.zpowers_eq_closure, Nat.card_zpowers]
   have hqπ : q ∈ piSet (Subgroup.closure ({x} : Set G)) := by
-    rw [piSet, Set.mem_setOf_eq, hcardx]
+    rw [piSet, Set.mem_ofPred_eq, hcardx]
     exact Nat.mem_primeFactors.mpr ⟨hqp, hqdvd, (orderOf_pos x).ne'⟩
   exact tau2_subset_sigma_compl N (hxτ2 q hqπ) hqσN
 

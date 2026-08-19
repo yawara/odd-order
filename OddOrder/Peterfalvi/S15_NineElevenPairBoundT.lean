@@ -127,7 +127,7 @@ theorem Hypothesis.sSet_subset_inducedKernelFamily_T [Finite G]
     sSet (hyp.toTypesIIIIIIVSetupT hG hvd) ⊆
       OddOrder.Peterfalvi.S08.inducedKernelFamily
         ((derivedInG hyp.T).subgroupOf hyp.T) (⊥ : Subgroup ↥hyp.T) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   rintro η ⟨ξ, hξ, rfl⟩
   have hξne : ξ ≠ trivialIrreducibleCharacter
       ↥(huSub (hyp.toTypesIIIIIIVSetupT hG hvd)) := by
@@ -169,8 +169,8 @@ theorem Hypothesis.sSet_scaledDiff_support_T [Finite G]
     (hdeg : (φ : ↥hyp.T → ℂ) 1 = (c : ℂ) * (ψ : ↥hyp.T → ℂ) 1) :
     (φ - c • ψ).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (S10.typePACore hyp.T) hyp.T := by
-  haveI := hyp.finiteG
-  letI : Fintype G := Fintype.ofFinite G
+  have := hyp.finiteG
+  let : Fintype G := Fintype.ofFinite G
   have hnsmul : ∀ y : ↥hyp.T, (c • ψ : ClassFunction ↥hyp.T ℂ) y = (c : ℂ) * ψ y := fun y => by
     rw [← Nat.cast_smul_eq_nsmul ℂ c ψ, ClassFunction.smul_apply]
   have hzero : (φ - c • ψ) (1 : ↥hyp.T) = 0 := by
@@ -354,7 +354,7 @@ theorem Hypothesis.nineElevenPairBoundT [Finite G]
         OddOrder.Peterfalvi.S07.sumnS F
           ≤ 2 * ((hyp.toTypesIIIIIIVSetupT hG hvd).q : ℝ) ^ 2 * (caseA.a : ℝ) * (d : ℝ) := by
   classical
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   obtain ⟨hχS, hχnotS₂⟩ := hχ
   obtain ⟨cohS₂_indT⟩ := hS₂coh
   -- (1) Dade-side coherence via `congrMap`: `indT = Ind_T^G = τ` on `A(T)`-supported class

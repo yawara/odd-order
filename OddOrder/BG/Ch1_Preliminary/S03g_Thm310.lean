@@ -85,7 +85,7 @@ subgroup `M₀` needs only that `M` is a nonidentity `E`-invariant subgroup with
 inside the solvable `M ⊔ E`.  The nilpotence hypothesis was therefore dropped (it was already
 inert, carried as `_hMnilp`). -/
 theorem prime_card_complement_of_frobenius_conj {G : Type*} [Group G] [Finite G]
-    {E U K M : Subgroup G} (hsolv : IsSolvable ↥(M ⊔ E))
+    {E U K M : Subgroup G} (hsolv : Group.IsSolvable ↥(M ⊔ E))
     (hUE : U ≤ E) (hKE : K ≤ E)
     (hUK_frob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥E (U.subgroupOf E) (K.subgroupOf E))
     (hUab : ∀ a b : ↥U, (a : G) * (b : G) = (b : G) * (a : G))
@@ -101,12 +101,12 @@ theorem prime_card_complement_of_frobenius_conj {G : Type*} [Group G] [Finite G]
   set L : Subgroup G := M ⊔ E with hL_def
   have hML : M ≤ L := le_sup_left
   have hEL : E ≤ L := le_sup_right
-  haveI : Finite ↥L := inferInstance
-  haveI : IsSolvable ↥L := hsolv
+  have : Finite ↥L := inferInstance
+  have : Group.IsSolvable ↥L := hsolv
   -- STEP A: `M ⊴ L`.
   have hL_norm_M : L ≤ Subgroup.normalizer M :=
     sup_le (Subgroup.le_normalizer) hEM
-  haveI hMsubL_normal : (M.subgroupOf L).Normal :=
+  have hMsubL_normal : (M.subgroupOf L).Normal :=
     Subgroup.normal_subgroupOf_of_le_normalizer hL_norm_M
   have hMsubL_ne : M.subgroupOf L ≠ ⊥ := by
     rw [Ne, Subgroup.subgroupOf_eq_bot, disjoint_iff, inf_eq_left.mpr hML]
@@ -115,8 +115,8 @@ theorem prime_card_complement_of_frobenius_conj {G : Type*} [Group G] [Finite G]
   obtain ⟨M₀L, hM₀L_min, hM₀L_le⟩ :=
     OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal (M.subgroupOf L) hMsubL_ne
   obtain ⟨p, hp, hM₀L_ea⟩ :=
-    OddOrder.Isaacs.Ch03.solvable_minimal_normal_isElementaryAbelian hM₀L_min
-  haveI : Fact p.Prime := ⟨hp⟩
+    OddOrder.Isaacs.Ch03.minimal_normal_isElementaryAbelian_of_isSolvable hM₀L_min
+  have : Fact p.Prime := ⟨hp⟩
   -- `M₀L` is elementary abelian (TYPE form on `↥M₀L`); record its commutativity.
   have hM₀L_ea_type : OddOrder.GroupTheory.IsElementaryAbelian p ↥M₀L := hM₀L_ea
   -- STEP C: push down to `M₀ : Subgroup G`.
@@ -135,15 +135,15 @@ theorem prime_card_complement_of_frobenius_conj {G : Type*} [Group G] [Finite G]
   have eM₀ : ↥M₀ ≃* ↥M₀L :=
     (Subgroup.equivMapOfInjective M₀L L.subtype hL_subtype_inj).symm
   -- Transport `Finite`, `Nontrivial`, `CommGroup`, EA to `↥M₀`.
-  haveI : Finite ↥M₀ := Finite.of_equiv _ eM₀.symm.toEquiv
-  haveI : Nontrivial ↥M₀L := (M₀L.nontrivial_iff_ne_bot).mpr hM₀L_min.2.1
-  haveI : Nontrivial ↥M₀ := eM₀.symm.injective.nontrivial
+  have : Finite ↥M₀ := Finite.of_equiv _ eM₀.symm.toEquiv
+  have : Nontrivial ↥M₀L := (M₀L.nontrivial_iff_ne_bot).mpr hM₀L_min.2.1
+  have : Nontrivial ↥M₀ := eM₀.symm.injective.nontrivial
   have hM₀_ea : OddOrder.GroupTheory.IsElementaryAbelian p ↥M₀ :=
     OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv eM₀.symm hM₀L_ea_type
-  haveI : IsMulCommutative ↥M₀ :=
+  have : IsMulCommutative ↥M₀ :=
     (isMulCommutative_iff).mpr (fun a b => hM₀_ea.comm a b)
   -- `↥M₀` is a `CommGroup` (scoped instance from `IsMulCommutative`).
-  letI : CommGroup ↥M₀ := inferInstance
+  let : CommGroup ↥M₀ := inferInstance
   -- `E ≤ N_G(M₀)`.
   have hM₀L_normal : M₀L.Normal := hM₀L_min.1
   have hEM₀ : E ≤ Subgroup.normalizer M₀ := by
@@ -172,12 +172,12 @@ theorem prime_card_complement_of_frobenius_conj {G : Type*} [Group G] [Finite G]
       rw [Subgroup.coe_mul, Subgroup.coe_mul, Subgroup.coe_inv, hε_coe, hy₀_eq]
       group
   -- STEP D: the conjugation action of `↥E` on `↥M₀`.
-  letI : MulDistribMulAction ↥E ↥M₀ :=
+  let : MulDistribMulAction ↥E ↥M₀ :=
     OddOrder.Isaacs.Ch07.conjActionOfNormalizes E M₀ hEM₀
   have hact : ∀ (a : ↥E) (n : ↥M₀), ((a • n : ↥M₀) : G) = (a : G) * (n : G) * (a : G)⁻¹ :=
     fun _ _ => rfl
   -- STEP E: apply the module-level theorem with `K := U.subgroupOf E`, `R := K.subgroupOf E`.
-  haveI hUsubE_normal : (U.subgroupOf E).Normal := hUK_frob.isNormal
+  have hUsubE_normal : (U.subgroupOf E).Normal := hUK_frob.isNormal
   -- `hpK : ¬ p ∣ Nat.card ↥(U.subgroupOf E)`.
   have hpdvdM₀ : p ∣ Nat.card ↥M₀ := by
     obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := p) (G := ↥M₀)).mp hM₀_ea.isPGroup

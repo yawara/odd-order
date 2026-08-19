@@ -95,14 +95,14 @@ theorem xiOf_H0Cprime_source_apply_one_le_u {data : TypesIIIIIIVSetup M}
     (hχ : χ ∈ xiOf data (chief.H0 ⊔ chars.Cprime)) :
     ((χ : ClassFunction ↥(huSub data) ℂ) : ↥(huSub data) → ℂ) 1 ≤ (chars.u : ℂ) := by
   classical
-  haveI : Fintype ↥M := Fintype.ofFinite _
-  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
-  haveI : Fintype ↥(hInHu data ⊔ cInHu data chief) := Fintype.ofFinite _
-  haveI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  have : Fintype ↥M := Fintype.ofFinite _
+  have : Fintype ↥(huSub data) := Fintype.ofFinite _
+  have : Fintype ↥(hInHu data ⊔ cInHu data chief) := Fintype.ofFinite _
+  have : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : Invertible (Nat.card ↥(hInHu data ⊔ cInHu data chief) : ℂ) :=
+  have : Invertible (Nat.card ↥(hInHu data ⊔ cInHu data chief) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : Fintype (IrreducibleCharacter ↥(huSub data)) :=
+  have : Fintype (IrreducibleCharacter ↥(huSub data)) :=
     Fintype.ofFinite _
   -- A constituent `ψ ∈ Irr(HC)` that `χ` lies over.
   obtain ⟨ψ, hψover⟩ :=
@@ -112,7 +112,7 @@ theorem xiOf_H0Cprime_source_apply_one_le_u {data : TypesIIIIIIVSetup M}
   -- abelianization (the (9.9.a) obligation-3 block of `caseB_degree_qu`, verbatim).
   have hψdeg : (ψ : ClassFunction ↥(hInHu data ⊔ cInHu data chief) ℂ)
       (1 : ↥(hInHu data ⊔ cInHu data chief)) = 1 := by
-    haveI : IsMulCommutative (↥(hInHu data ⊔ cInHu data chief) ⧸
+    have : IsMulCommutative (↥(hInHu data ⊔ cInHu data chief) ⧸
         commutator ↥(hInHu data ⊔ cInHu data chief)) :=
       inferInstanceAs (IsMulCommutative (Abelianization ↥(hInHu data ⊔ cInHu data chief)))
     refine apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
@@ -202,7 +202,7 @@ theorem inertia_le_hcuInHu [Finite ↥(hInHu data)] (caseA : CliffordCaseAData c
           (ClassFunction.compHom (QuotientGroup.mk' chief.N)
             (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
       ≤ hInHu data ⊔ cuInHu caseA := by
-  haveI : Fintype ↥(hInHu data) := Fintype.ofFinite _
+  have : Fintype ↥(hInHu data) := Fintype.ofFinite _
   set θ₀ := ClassFunction.compHom (hInHuEquivH data).toMonoidHom
     (ClassFunction.compHom (QuotientGroup.mk' chief.N)
       (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)) with hθ₀
@@ -243,11 +243,11 @@ theorem caseA_source_degree_dvd_a_of_S0_witness
     {d : ℕ} (hd : (χ : ClassFunction ↥(huSub data) ℂ) (1 : ↥(huSub data)) = (d : ℂ)) :
     caseA.a ∣ d := by
   classical
-  haveI : Fintype ↥M := Fintype.ofFinite _
-  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
-  haveI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  have : Fintype ↥M := Fintype.ofFinite _
+  have : Fintype ↥(huSub data) := Fintype.ofFinite _
+  have : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : Fintype (IrreducibleCharacter ↥(hInHu data)) := Fintype.ofFinite _
+  have : Fintype (IrreducibleCharacter ↥(hInHu data)) := Fintype.ofFinite _
   -- The realized constituent `θ₀ = linear(θ̄ ∘ mk'N ∘ equiv)` and its inflated `compHom` form.
   set θ₀ : IrreducibleCharacter ↥(hInHu data) :=
     linearIrreducibleCharacter (θbar.comp ((QuotientGroup.mk' chief.N).comp
@@ -337,12 +337,12 @@ theorem caseA_source_degree_dvd_a (caseA : CliffordCaseAData chars)
     {d : ℕ} (hd : (χ : ClassFunction ↥(huSub data) ℂ) (1 : ↥(huSub data)) = (d : ℂ)) :
     caseA.a ∣ d := by
   classical
-  haveI : Fintype ↥M := Fintype.ofFinite _
-  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
-  haveI : Fintype ↥(hInHu data) := Fintype.ofFinite _
-  haveI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  have : Fintype ↥M := Fintype.ofFinite _
+  have : Fintype ↥(huSub data) := Fintype.ofFinite _
+  have : Fintype ↥(hInHu data) := Fintype.ofFinite _
+  have : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
+  have : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   -- Extraction: a nontrivial linear seed `θ̄` with `χ` over its inflation.
   obtain ⟨θbar, hθbarne, hover⟩ := exists_hom_constituent_of_mem_xiSet_H0 hχX hχH0
@@ -362,7 +362,7 @@ theorem caseA_source_degree_dvd_a (caseA : CliffordCaseAData chars)
   have hUW1M : data.typeP.U ⊔ data.typeP.W1 ≤ M := sup_le (U_le_M data) data.typeP.W1_le
   set m : ↥M := ⟨(caseA.orbitRep w : G), hUW1M (caseA.orbitRep w).2⟩ with hm
   have hmb : ((m : ↥M) : G) = ((caseA.orbitRep w : ↥(data.typeP.U ⊔ data.typeP.W1)) : G) := rfl
-  haveI := huSub_normal data
+  have := huSub_normal data
   set χ' : IrreducibleCharacter ↥(huSub data) :=
     ⟨ClassFunction.conjBy (G := ↥M) (H := huSub data) m (χ : ClassFunction ↥(huSub data) ℂ),
       ClassFunction.IsIrreducibleCharacter.conjBy (H := huSub data) χ.isIrreducible m⟩
@@ -811,7 +811,7 @@ theorem exists_two_summand_char {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
     ∃ θ : Hbar →* ℂˣ, (∃ x ∈ S i, θ x ≠ 1) ∧ (∃ x ∈ S j, θ x ≠ 1) ∧
       ∀ k, k ≠ i → k ≠ j → ∀ x ∈ S k, θ x = 1 := by
   classical
-  haveI : Fintype ι := Fintype.ofFinite _
+  have : Fintype ι := Fintype.ofFinite _
   have hcomm : Pairwise fun a b : ι => ∀ x y : Hbar, x ∈ S a → y ∈ S b → Commute x y :=
     fun a b _ x y _ _ => mul_comm x y
   have hbij : Function.Bijective (Subgroup.noncommPiCoprod hcomm) :=
@@ -857,6 +857,7 @@ open OddOrder.Isaacs.Ch03 (IsAInvariant isAInvariant_iff_smul_mem)
 
 variable [Finite G] {M : Subgroup G}
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Per-summand char-inertia (generic summand).**  For *any* order-`p` `U`-invariant summand `S`
 of
 the chief factor `H̄` and an irreducible `θ` nontrivial on `S`, a `U`-element `g` fixing `θ` acts
@@ -878,7 +879,7 @@ theorem caseA_char_inertia_of_summand {data : TypesIIIIIIVSetup M} {chief : Chie
     (hinv : ∀ x, (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) ((uActionHom data chief) g x)
         = (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x) :
     aInvariantRestrictAut hSinv g = 1 := by
-  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+  have : IsMulCommutative (↥data.H ⧸ chief.N) :=
     IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
   have hid : ∀ x ∈ S, (uActionHom data chief) g x = x :=
     mulAut_eq_id_on_of_fixes_ne_one_on_prime ((uActionHom data chief) g) S
@@ -975,7 +976,7 @@ theorem exists_caseA_two_summand_char {data : TypesIIIIIIVSetup M} {chief : Chie
     ∃ θ : (↥data.H ⧸ chief.N) →* ℂˣ, (∃ x ∈ caseA.Hpart i, θ x ≠ 1) ∧
       (∃ x ∈ caseA.Hpart j, θ x ≠ 1) ∧
       ∀ k, k ≠ i → k ≠ j → ∀ x ∈ caseA.Hpart k, θ x = 1 := by
-  haveI : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+  have : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
   exact exists_two_summand_char caseA.Hpart caseA.Hpart_iSupIndep caseA.Hpart_iSup
     (fun k => by rw [caseA.Hpart_order k]; exact chief.p_prime) hij
 
@@ -1016,6 +1017,7 @@ theorem caseA_inertia_iff_centralizes_two_summands {data : TypesIIIIIIVSetup M}
     rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one, Units.val_one]
     exact fun h => hxne (Units.val_eq_one.mp h)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **`C ⊆ C_U(H_k)` (action level): centralizing all of `H̄` centralizes each summand.**  A
 `U`-element `g` acting trivially on the whole chief factor (`uActionHom g = 1`, i.e. `g` realizing
 an

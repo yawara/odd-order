@@ -38,15 +38,15 @@ theorem reducible_count_sOf_K [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       = chief.p) :
     {φ ∈ sOf data K | ¬ IsIrreducibleCharacter φ}.ncard = chief.p - 1 := by
   classical
-  haveI hN : (K.subgroupOf M).Normal := hKnorm
-  letI : Fintype ↥M := Fintype.ofFinite _
+  have hN : (K.subgroupOf M).Normal := hKnorm
+  let : Fintype ↥M := Fintype.ofFinite _
   have hKhu : K.subgroupOf M ≤ huSub data := by
     rw [huSub_eq_derivedInG_subgroupOf]; exact hN'le
   have hodd : Odd (Nat.card G) := hG.odd
   have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
   have hHall : Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1) := by
     rw [show Nat.card ↥(derivedInG M) = Nat.card ↥data.typeP.H * Nat.card ↥data.typeP.U by
-      rw [← data.typeP.derived_complement.card_mul,
+      rw [← data.typeP.derived_complement.card_mul_card,
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.typeP.H_le).toEquiv,
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.typeP.U_le).toEquiv]]
     exact (Nat.Coprime.mul_right (typeP_coprime_H_W1 data.typeP).symm
@@ -71,18 +71,18 @@ theorem reducible_count_sOf_K [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       map_eq_one_iff _ (MulEquiv.subgroupCongr hKeq.symm).injective]
     rw [← MonoidHom.mem_ker, hsmker]
   -- instances for the §6 count, the commute, and `induceHU` (one shared scope, no diamonds)
-  haveI : Invertible (Nat.card (↥M ⧸ (K.subgroupOf M)) : ℂ) :=
+  have : Invertible (Nat.card (↥M ⧸ (K.subgroupOf M)) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : NeZero (Nat.card ↥h.W1) := ⟨Nat.card_pos.ne'⟩
-  haveI : Fintype ↥h.K := Fintype.ofFinite _
-  haveI : Invertible (Nat.card ↥h.K : ℂ) :=
+  have : NeZero (Nat.card ↥h.W1) := ⟨Nat.card_pos.ne'⟩
+  have : Fintype ↥h.K := Fintype.ofFinite _
+  have : Invertible (Nat.card ↥h.K : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
-  haveI : Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ) :=
+  have : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  have : Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  let : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible
+  let : Invertible
       (Nat.card ↥((huSub data).map (QuotientGroup.mk' (K.subgroupOf M))) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   -- the commute / Φ-identity: `induceHU (compHom g χ̄) = compHom (mk' N) (induce h.K χ̄)`
@@ -130,7 +130,7 @@ theorem reducible_count_sOf_K [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       = (fun χbar : IrreducibleCharacter ↥h.K =>
           induceHU data (ClassFunction.compHom g (χbar : ClassFunction ↥h.K ℂ))) '' B' := by
     ext φ
-    simp only [Set.mem_image, hB'_def, Set.mem_setOf_eq]
+    simp only [Set.mem_image, hB'_def, Set.mem_ofPred_eq]
     constructor
     · rintro ⟨hφS, hred⟩
       rw [mem_sOf] at hφS
@@ -175,7 +175,7 @@ theorem reducible_count_sOf_K [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     intro χbar hχbar χbar' _ heq
     simp only at heq
     rw [hPhi χbar, hPhi χbar'] at heq
-    rw [hB'_def, Set.mem_setOf_eq] at hχbar
+    rw [hB'_def, Set.mem_ofPred_eq] at hχbar
     exact h.induce_injective_on_reducible hχbar.1
       (ClassFunction.compHom_injective_of_surjective
         (QuotientGroup.mk'_surjective (K.subgroupOf M)) heq)
@@ -188,7 +188,7 @@ theorem reducible_count_sOf_K [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 theorem reducible_count_sOf_H0 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
     {φ ∈ sOf data chief.H0 | ¬ IsIrreducibleCharacter φ}.ncard = chief.p - 1 := by
-  haveI := chiefFactor_H0_subgroupOf_normal chief
+  have := chiefFactor_H0_subgroupOf_normal chief
   refine reducible_count_sOf_K hG chief chief.H0
     (Subgroup.comap_mono (chief.H0_lt_H.le.trans data.typeP.H_le))
     (chiefFactor_W1_inf_H0_subgroupOf_eq_bot chief) ?_ (chiefFactor_card_W2bar chief)
@@ -210,7 +210,7 @@ theorem exists_regular_irr_caseA [Finite G] {M : Subgroup G}
     ∃ θbar : IrreducibleCharacter (↥data.H ⧸ chief.N), ∀ i, ∃ x ∈ caseA.Hpart i,
       (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
         ≠ (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1 := by
-  letI : CommGroup (↥data.H ⧸ chief.N) :=
+  let : CommGroup (↥data.H ⧸ chief.N) :=
     { (inferInstance : Group (↥data.H ⧸ chief.N)) with
       mul_comm := chief.quotient_elementaryAbelian.comm }
   obtain ⟨θ, hθ⟩ := exists_regular_char caseA.Hpart caseA.Hpart_iSupIndep caseA.Hpart_iSup
@@ -295,7 +295,7 @@ A structural input of the (9.9.a) `⁅HC,HC⁆ ⊆ 𝒮(H₀C')`-kernel linearit
 theorem derivedInG_H_le_H0 {M : Subgroup G} (data : TypesIIIIIIVSetup M)
     (chief : ChiefFactorData data) :
     derivedInG data.H ≤ chief.H0 := by
-  haveI : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+  have : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
   rw [derivedInG, chief.H0_eq]
   apply Subgroup.map_mono
   rw [← QuotientGroup.ker_mk' chief.N]
@@ -307,7 +307,7 @@ input of the (9.9.a) `⁅HC,HC⁆ ⊆ 𝒮(H₀C')`-kernel linearity. -/
 theorem commutator_cSub_H_le_H0 [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
     (chief : ChiefFactorData data) :
     ⁅cSub data chief, data.H⁆ ≤ chief.H0 := by
-  haveI := chief.N_normal
+  have := chief.N_normal
   rw [Subgroup.commutator_le]
   intro c hc h hh
   -- `c` is the `G`-image of a kernel element `z ∈ U W₁` (`uActionHom z = 1`).
@@ -414,8 +414,8 @@ theorem reducible_count_sOf_H0supC [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
     {φ ∈ sOf data (chief.H0 ⊔ cSub data chief) | ¬ IsIrreducibleCharacter φ}.ncard
       = chief.p - 1 := by
-  haveI := chiefFactor_H0_subgroupOf_normal chief
-  haveI := chiefFactor_H0supC_subgroupOf_normal chief
+  have := chiefFactor_H0_subgroupOf_normal chief
+  have := chiefFactor_H0supC_subgroupOf_normal chief
   exact reducible_count_sOf_K hG chief (chief.H0 ⊔ cSub data chief)
     (Subgroup.comap_mono (chiefFactor_H0supC_le_derived chief))
     (chiefFactor_W1_inf_H0supC_subgroupOf_eq_bot chief)
@@ -439,7 +439,7 @@ theorem HsupC_le_normalizer_K [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSe
     (chief : ChiefFactorData data) :
     data.H ⊔ cSub data chief
       ≤ Subgroup.normalizer ((chief.H0 ⊔ cprimeSub data chief : Subgroup G) : Set G) := by
-  haveI := chief.N_normal
+  have := chief.N_normal
   set K := chief.H0 ⊔ cprimeSub data chief with hKdef
   have hHH : ⁅data.H, data.H⁆ ≤ K :=
     le_trans ((derivedInG_eq_commutator data.H).symm.trans_le (derivedInG_H_le_H0 data chief))
@@ -501,7 +501,7 @@ theorem commutator_HsupC_le_H0Cprime [Finite G] {M : Subgroup G} (data : TypesII
     (chief : ChiefFactorData data) :
     ⁅data.H ⊔ cSub data chief, data.H ⊔ cSub data chief⁆
       ≤ chief.H0 ⊔ cprimeSub data chief := by
-  haveI := chief.N_normal
+  have := chief.N_normal
   set HC := data.H ⊔ cSub data chief with hHCdef
   set K := chief.H0 ⊔ cprimeSub data chief with hKdef
   have hHH : ⁅data.H, data.H⁆ ≤ K :=
@@ -515,7 +515,7 @@ theorem commutator_HsupC_le_H0Cprime [Finite G] {M : Subgroup G} (data : TypesII
   have hKle : K ≤ HC :=
     sup_le (le_trans chief.H0_lt_H.le le_sup_left)
       (le_trans (cprimeSub_le_C data chief) le_sup_right)
-  haveI hK'normal : (K.subgroupOf HC).Normal :=
+  have hK'normal : (K.subgroupOf HC).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hKle).mpr (HsupC_le_normalizer_K data chief)
   -- `commutator ↥HC ≤ K.subgroupOf HC` via the quotient `HC/K` being abelian.
   have hcomm : commutator ↥HC ≤ K.subgroupOf HC := by
@@ -574,6 +574,7 @@ theorem commutator_hcInHu_le_realized [Finite G] {M : Subgroup G} (data : TypesI
   rw [hreal, ← Subgroup.map_le_iff_le_comap, Subgroup.map_commutator]
   exact le_trans (Subgroup.commutator_mono hmaple hmaple) (commutator_HsupC_le_H0Cprime data chief)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **`U W₁ ≤ N(C')`**: the normalizer of `C` normalizes its commutator subgroup
 `C' = ⁅C,C⁆` — conjugation maps `C` onto itself (`cSub_normalized_by_uW1`), hence maps
 `⁅C,C⁆` onto itself (`Subgroup.map_commutator`). -/
@@ -589,6 +590,7 @@ theorem cprimeSub_normalized_by_uW1 [Finite G] {M : Subgroup G} (data : TypesIII
       derivedInG_eq_commutator _,
     Subgroup.pointwise_smul_def, Subgroup.map_commutator, ← Subgroup.pointwise_smul_def, hgC]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **`U W₁ ≤ N_G(U')`** (the `U W₁`-half of `H₀U' ◁ M`, Peterfalvi (9.8.d)): `U W₁` normalizes
 `U' = [U,U]`.  `U ⊔ W₁ ≤ N(U)` (`U ≤ N(U)` and `W₁ ≤ N(U)` by `W1_normalizes_U`), and normalizing
 `U` normalizes its derived subgroup `[U,U]`.  Mirror of `cprimeSub_normalized_by_uW1`. -/
@@ -806,7 +808,7 @@ theorem liesOver_mem_characterKernel {Γ : Type*} [Group Γ] [Finite Γ]
     (hlo : IrreducibleCharacter.LiesOver K χ θ) {g : ↥K}
     (hg : ((g : Γ)) ∈ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction Γ ℂ)) :
     g ∈ OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥K ℂ) := by
-  haveI : Fintype Γ := Fintype.ofFinite Γ
+  have : Fintype Γ := Fintype.ofFinite Γ
   refine OddOrder.Peterfalvi.S08.characterKernel_subset_of_isCharacter_of_inner_ne_zero
     (ψ := ClassFunction.restrict K (χ : ClassFunction Γ ℂ))
     (OddOrder.Peterfalvi.S08.isCharacter_restrict χ.isIrreducible.isCharacter K)
@@ -822,6 +824,7 @@ theorem liesOver_mem_characterKernel {Γ : Type*} [Group Γ] [Finite Γ]
       rw [ClassFunction.restrict_apply]; rfl
     rw [h1]; exact hg
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Peterfalvi (9.9.a), the chief-factor constituent of `χ ∈ 𝒳(H₀)`.**
 
 In Clifford case (b) (`U` acts irreducibly on `H̄ = H/H_0`), any `χ ∈ Irr(HU)` with `H ⊄ Ker χ`
@@ -845,10 +848,10 @@ theorem caseB_exists_chiefFactorConstituent [Finite G]
         = hInHu data ⊔ cInHu data chief ∧
       (θ₀ : ClassFunction ↥(hInHu data) ℂ) (1 : ↥(hInHu data)) = 1 := by
   classical
-  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
-  haveI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  have : Fintype ↥(huSub data) := Fintype.ofFinite _
+  have : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : Fintype (IrreducibleCharacter ↥(hInHu data)) := Fintype.ofFinite _
+  have : Fintype (IrreducibleCharacter ↥(hInHu data)) := Fintype.ofFinite _
   -- A nontrivial constituent `θ` of `Res^{HU}_H χ` (`H ⊄ Ker χ`).
   obtain ⟨θ, hθlo, hθnt⟩ :=
     OddOrder.RepresentationTheory.exists_constituent_not_subset_characterKernel
@@ -893,7 +896,7 @@ theorem caseB_exists_chiefFactorConstituent [Finite G]
     rw [OddOrder.Peterfalvi.S03.mem_characterKernel, OddOrder.Peterfalvi.S03.characterDegree_def,
       hθeq, h0]
     simp [ClassFunction.compHom_apply, trivialClassFunction]
-  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+  have : IsMulCommutative (↥data.H ⧸ chief.N) :=
     ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
   refine ⟨θ, hθlo, ?_, ?_⟩
   · change ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
@@ -930,10 +933,10 @@ theorem exists_hom_constituent_of_mem_xiSet_H0 [Finite G]
         (linearIrreducibleCharacter (θbar.comp ((QuotientGroup.mk' chief.N).comp
           (hInHuEquivH data).toMonoidHom))) := by
   classical
-  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
-  haveI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  have : Fintype ↥(huSub data) := Fintype.ofFinite _
+  have : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : Fintype (IrreducibleCharacter ↥(hInHu data)) := Fintype.ofFinite _
+  have : Fintype (IrreducibleCharacter ↥(hInHu data)) := Fintype.ofFinite _
   -- A nontrivial constituent `θ` of `Res^{HU}_H χ` (`H ⊄ Ker χ`).
   obtain ⟨θ, hθlo, hθnt⟩ :=
     OddOrder.RepresentationTheory.exists_constituent_not_subset_characterKernel
@@ -965,7 +968,7 @@ theorem exists_hom_constituent_of_mem_xiSet_H0 [Finite G]
   obtain ⟨θbar_irr, hθbar⟩ :=
     OddOrder.RepresentationTheory.exists_compHom_eq_of_subset_characterKernel hfsurj θ hfker
   -- `H̄` abelian, so `θbar_irr` is a linear character `θbar : H̄ →* ℂˣ`.
-  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+  have : IsMulCommutative (↥data.H ⧸ chief.N) :=
     ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
   obtain ⟨θbar, hθbarval⟩ :=
     exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative θbar_irr.isIrreducible
@@ -1004,14 +1007,14 @@ theorem caseB_degree_qu [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars) :
     ∀ φ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime), φ 1 = ((data.q * chars.u : ℕ) : ℂ) := by
   classical
-  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
-  haveI : Fintype ↥(hInHu data) := Fintype.ofFinite _
-  haveI : Fintype ↥(hInHu data ⊔ cInHu data chief) := Fintype.ofFinite _
-  haveI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  have : Fintype ↥(huSub data) := Fintype.ofFinite _
+  have : Fintype ↥(hInHu data) := Fintype.ofFinite _
+  have : Fintype ↥(hInHu data ⊔ cInHu data chief) := Fintype.ofFinite _
+  have : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
+  have : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : Invertible (Nat.card ↥(hInHu data ⊔ cInHu data chief) : ℂ) :=
+  have : Invertible (Nat.card ↥(hInHu data ⊔ cInHu data chief) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   intro φ hφ
   rw [Section11CharacterData.SOf_eq, mem_sOf] at hφ
@@ -1034,7 +1037,7 @@ theorem caseB_degree_qu [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (1 : ↥(hInHu data ⊔ cInHu data chief)) = 1 := by
     -- `ψ` is linear: `⁅HC,HC⁆ ⊆ ker χ`, so the constituent `ψ` factors through the abelian
     -- `HC/⁅HC,HC⁆`.
-    haveI : IsMulCommutative (↥(hInHu data ⊔ cInHu data chief) ⧸
+    have : IsMulCommutative (↥(hInHu data ⊔ cInHu data chief) ⧸
         commutator ↥(hInHu data ⊔ cInHu data chief)) :=
       inferInstanceAs (IsMulCommutative (Abelianization ↥(hInHu data ⊔ cInHu data chief)))
     refine apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
@@ -1073,13 +1076,13 @@ theorem caseB_xi_H0_degree_dvd_u [Finite G]
     ∀ χ ∈ chars.XOf chief.H0, ∀ d : ℕ,
       (χ : ClassFunction ↥(huSub data) ℂ) (1 : ↥(huSub data)) = (d : ℂ) → chars.u ∣ d := by
   classical
-  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
-  haveI : Fintype ↥(hInHu data) := Fintype.ofFinite _
-  haveI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  have : Fintype ↥(huSub data) := Fintype.ofFinite _
+  have : Fintype ↥(hInHu data) := Fintype.ofFinite _
+  have : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
+  have : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  haveI : Fintype (IrreducibleCharacter ↥(hInHu data)) := Fintype.ofFinite _
+  have : Fintype (IrreducibleCharacter ↥(hInHu data)) := Fintype.ofFinite _
   intro χ hχ d hd
   rw [Section11CharacterData.XOf_eq] at hχ
   obtain ⟨hχX, hχH0⟩ := hχ
@@ -1137,8 +1140,8 @@ theorem reducible_count_sOf_H0C [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief) :
     {φ ∈ sOf data (chief.H0 ⊔ chars.C) | ¬ IsIrreducibleCharacter φ}.ncard = chief.p - 1 := by
-  haveI := chiefFactor_H0_subgroupOf_normal chief
-  haveI := chiefFactor_H0supC_subgroupOf_normal chief
+  have := chiefFactor_H0_subgroupOf_normal chief
+  have := chiefFactor_H0supC_subgroupOf_normal chief
   rw [show chars.C = cSub data chief from rfl]
   exact reducible_count_sOf_K hG chief (chief.H0 ⊔ cSub data chief)
     (Subgroup.comap_mono (chiefFactor_H0supC_le_derived chief))

@@ -42,7 +42,7 @@ theorem isFrobeniusGroup_DK_of_primeManner
   have hKL : K ≤ D ⊔ K := le_sup_right
   -- `D ◁ D⊔K` from `D ≤ N(D)` and `K ≤ N(D)`.
   have hDnormD : (D : Subgroup G) ≤ Subgroup.normalizer (D : Set G) := Subgroup.le_normalizer
-  haveI hDLnormal : (D.subgroupOf (D ⊔ K)).Normal :=
+  have hDLnormal : (D.subgroupOf (D ⊔ K)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hDL).mpr (sup_le hDnormD hKnormD)
   refine
     { isNormal := hDLnormal
@@ -132,7 +132,7 @@ theorem chiefFactor_engine_of_inputs [Finite G]
   have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
   have hQM : Q ≤ M := hQMσ.trans hMσM
   have hDM : D ≤ M := hDMσ.trans hMσM
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hQpg : IsPGroup q ↥Q := by rw [hQ]; exact isPGroup_opiCoreInG_singleton M
   have hQ0Q : Q0 ≤ Q := hQ0ltQ.le
   have hKQ : K ≤ Subgroup.normalizer (Q : Set G) := hKM.trans hMnormQ
@@ -141,9 +141,10 @@ theorem chiefFactor_engine_of_inputs [Finite G]
   have hKQ0 : K ≤ Subgroup.normalizer (Q0 : Set G) := hKM.trans hMNQ0
   have hDNQ0 : D ≤ Subgroup.normalizer (Q0 : Set G) := hDM.trans hMNQ0
   have hKstarN : Kstar ≤ Subgroup.normalizer (Q0 : Set G) := hKstarQ.trans hQQ0
-  have hSolvQ : IsSolvable ↥Q := solvable_of_solvable_injective (Subgroup.inclusion_injective hQM)
-  have hsolvDK : IsSolvable ↥(D ⊔ K) :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective (sup_le hDM hKM))
+  have hSolvQ : Group.IsSolvable ↥Q :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective hQM)
+  have hsolvDK : Group.IsSolvable ↥(D ⊔ K) :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective (sup_le hDM hKM))
   have hKstarP : (Nat.card ↥Kstar).Prime := kstar_card_prime_of_inputs hG hM hP1 hKM hK hKstar
   have hKstarEqQ : Nat.card ↥Kstar = q := by
     obtain ⟨n, hn⟩ := hQpg.exists_card_eq
@@ -201,18 +202,18 @@ theorem centralizer_inf_le_fittingInAmbient_of_le_Msigma [Finite G]
       Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M))]
     (hCle : Subgroup.centralizer (Q : Set G) ⊓ M ≤ OddOrder.BG.Ch3.S10.Msigma M) :
     Subgroup.centralizer (Q : Set G) ⊓ M ≤ fittingInAmbient M := by
-  haveI : IsSolvable ↥M := _hG.solvable_of_mem_maximalSubgroups _hM
+  have : Group.IsSolvable ↥M := _hG.isSolvable_of_mem_maximalSubgroups _hM
   -- `C_M(Q)` is nilpotent (central extension over the nilpotent `M_σ/Q`).
-  haveI : Group.IsNilpotent ↥(Subgroup.centralizer (Q : Set G) ⊓ M) :=
+  have : Group.IsNilpotent ↥(Subgroup.centralizer (Q : Set G) ⊓ M) :=
     isNilpotent_of_centralizes_normal_of_quotient_isNilpotent hCle inf_le_left
   -- `C_M(Q) ◁ M` (`M` normalizes `Q`, hence `C_G(Q)`, hence `C_G(Q) ⊓ M`).
   have hMnormC : M ≤ Subgroup.normalizer
       ((Subgroup.centralizer (Q : Set G) ⊓ M : Subgroup G) : Set G) :=
     le_normalizer_inf (hMnormQ.trans (normalizer_le_normalizer_centralizer Q))
       Subgroup.le_normalizer
-  haveI : ((Subgroup.centralizer (Q : Set G) ⊓ M).subgroupOf M).Normal :=
+  have : ((Subgroup.centralizer (Q : Set G) ⊓ M).subgroupOf M).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer inf_le_right).mpr hMnormC
-  haveI : Group.IsNilpotent ↥((Subgroup.centralizer (Q : Set G) ⊓ M).subgroupOf M) :=
+  have : Group.IsNilpotent ↥((Subgroup.centralizer (Q : Set G) ⊓ M).subgroupOf M) :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (inf_le_right :
       Subgroup.centralizer (Q : Set G) ⊓ M ≤ M)).symm
   -- Nilpotent normal subgroup of `M` lands in `F(M)`.
@@ -255,7 +256,7 @@ theorem commutator_eq_self_of_frobenius_DK [Finite G] {D K : Subgroup G}
     (hFrobFPF : ∀ a ∈ K, a ≠ 1 → ∀ n ∈ D, n ≠ 1 → a * n * a⁻¹ ≠ n)
     (hKnormD : K ≤ Subgroup.normalizer (D : Set G))
     (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥D))
-    (hSolv : IsSolvable ↥K ∨ IsSolvable ↥D) :
+    (hSolv : Group.IsSolvable ↥K ∨ Group.IsSolvable ↥D) :
     ⁅D, K⁆ = D := by
   -- `C_G(K) ⊓ D = ⊥`: a nontrivial common element contradicts the Frobenius condition.
   have hCDK : (Subgroup.centralizer (K : Set G) ⊓ D : Subgroup G) = ⊥ := by
@@ -266,7 +267,7 @@ theorem commutator_eq_self_of_frobenius_DK [Finite G] {D K : Subgroup G}
     by_contra hdne
     rw [Subgroup.mem_bot] at hdne
     -- Pick a nontrivial `k ∈ K`.
-    haveI : Nontrivial ↥K := (Subgroup.nontrivial_iff_ne_bot K).mpr hKne
+    have : Nontrivial ↥K := (Subgroup.nontrivial_iff_ne_bot K).mpr hKne
     obtain ⟨k, hkK, hkne⟩ := (Subgroup.nontrivial_iff_exists_ne_one K).mp inferInstance
     -- `k` and `d` commute (from `d ∈ C_G(K)`), so `k * d * k⁻¹ = d`, contradicting Frobenius.
     have hcomm : k * d = d * k := (Subgroup.mem_centralizer_iff.mp hdcent) k hkK
@@ -300,7 +301,7 @@ theorem D_centralizes_Q_of_narrow [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     (hFrobFPF : ∀ a ∈ K, a ≠ 1 → ∀ n ∈ D, n ≠ 1 → a * n * a⁻¹ ≠ n)
     (hKnormD : K ≤ Subgroup.normalizer (D : Set G))
     (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥D))
-    (hKsolv : IsSolvable ↥K)
+    (hKsolv : Group.IsSolvable ↥K)
     (hDKN : D ⊔ K ≤ Subgroup.normalizer (Q : Set G))
     (hqD : ¬ q ∣ Nat.card ↥D) :
     D ≤ Subgroup.centralizer (Q : Set G) := by
@@ -316,9 +317,9 @@ theorem D_centralizes_Q_of_narrow [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     · exact hQne h
     · have hGpg : IsPGroup q G := (h ▸ hQpg : IsPGroup q ↥(⊤ : Subgroup G)).of_surjective
         (Subgroup.topEquiv : (⊤ : Subgroup G) ≃* G).toMonoidHom Subgroup.topEquiv.surjective
-      haveI : Group.IsNilpotent G := hGpg.isNilpotent
+      have : Group.IsNilpotent G := hGpg.isNilpotent
       exact hG.notSolvable inferInstance
-  haveI hNsolv : IsSolvable ↥N := hG.solvable_of_lt_top N hNlt
+  have hNsolv : Group.IsSolvable ↥N := hG.isSolvable_of_lt_top N hNlt
   -- The conjugation action `ψ : N → Aut Q` with kernel `C_G(Q) ∩ N`.
   set ψ : ↥N →* MulAut ↥Q := Q.normalizerMonoidHom with hψ_def
   have hψker : ψ.ker = (Subgroup.centralizer (Q : Set G)).subgroupOf N :=
@@ -405,7 +406,7 @@ theorem D_centralizes_Q_of_not_mem_beta [Finite G] (hG : OddOrder.BG.IsMinimalSi
     (hFrobFPF : ∀ a ∈ K, a ≠ 1 → ∀ n ∈ D, n ≠ 1 → a * n * a⁻¹ ≠ n)
     (hKnormD : K ≤ Subgroup.normalizer (D : Set G))
     (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥D))
-    (hKsolv : IsSolvable ↥K)
+    (hKsolv : Group.IsSolvable ↥K)
     (hDKN : D ⊔ K ≤ Subgroup.normalizer (Q : Set G))
     (hqD : ¬ q ∣ Nat.card ↥D) :
     q ∉ OddOrder.BG.Ch3.S10.beta M → D ≤ Subgroup.centralizer (Q : Set G) := by
@@ -446,8 +447,8 @@ theorem not_isCyclic_MF_of_inputs {M Q Q0 : Subgroup G} [(Q0.subgroupOf Q).Norma
     (hQMF : Q ≤ MF M) (hQbar : ¬ IsCyclic (↥Q ⧸ Q0.subgroupOf Q)) :
     ¬ IsCyclic ↥(MF M) := by
   intro hcyc
-  haveI := hcyc
-  haveI : IsCyclic ↥Q := Subgroup.isCyclic_of_le hQMF
+  have := hcyc
+  have : IsCyclic ↥Q := Subgroup.isCyclic_of_le hQMF
   exact hQbar (isCyclic_of_surjective (QuotientGroup.mk' (Q0.subgroupOf Q))
     (QuotientGroup.mk'_surjective _))
 
@@ -576,15 +577,15 @@ theorem opiCoreInG_sigma_fittingInAmbient_eq_fittingInAmbient_Msigma [Finite G]
     have hNnorm_Mσ : (N.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)).Normal :=
       (Subgroup.normal_subgroupOf_iff_le_normalizer hN_Mσ).mpr (hMσ_le_M.trans hM_norm_N)
     -- `N` is nilpotent (subgroup of the nilpotent `F(M)`).
-    haveI : Group.IsNilpotent ↥N := by
-      haveI : Group.IsNilpotent ↥(fittingInAmbient M) :=
+    have : Group.IsNilpotent ↥N := by
+      have : Group.IsNilpotent ↥(fittingInAmbient M) :=
         OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
       exact Group.nilpotent_of_mulEquiv
         (Subgroup.subgroupOfEquivOfLe (OddOrder.GroupTheory.opiCoreInG_le σ (fittingInAmbient M)))
     -- Nilpotent normal subgroup of `M_σ` lands in `F(M_σ)`.
-    haveI : Group.IsNilpotent ↥(N.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)) :=
+    have : Group.IsNilpotent ↥(N.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)) :=
       Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hN_Mσ).symm
-    haveI := hNnorm_Mσ
+    have := hNnorm_Mσ
     calc N = (N.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)).map
               (OddOrder.BG.Ch3.S10.Msigma M).subtype :=
           (Subgroup.map_subgroupOf_eq_of_le hN_Mσ).symm
@@ -628,8 +629,8 @@ so it lies in `fitting ↥M` (`nilpotent_normal_le_fitting`); mapping back gives
 theorem le_fittingInAmbient_of_subgroupOf_normal_of_isNilpotent [Finite G] {M N : Subgroup G}
     (hNM : N ≤ M) (hNnorm : (N.subgroupOf M).Normal) [Group.IsNilpotent ↥N] :
     N ≤ fittingInAmbient M := by
-  haveI := hNnorm
-  haveI : Group.IsNilpotent ↥(N.subgroupOf M) :=
+  have := hNnorm
+  have : Group.IsNilpotent ↥(N.subgroupOf M) :=
     Group.nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hNM).symm
   calc N = (N.subgroupOf M).map M.subtype := (Subgroup.map_subgroupOf_eq_of_le hNM).symm
     _ ≤ (OddOrder.Isaacs.Ch01.fitting ↥M).map M.subtype :=
@@ -678,14 +679,14 @@ theorem mf_ne_msigma_typeP1_structure [Finite G]
   have hP1 : S14.IsTypeP1 M := isTypeP1_of_mf_ne_msigma hG hM hne
   have hP : S14.IsTypeP M := hP1.1
   have hq_prime : q.Prime := kstar_card_prime_of_inputs hG hM hP1 hKM hK hKstar
-  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have : Fact q.Prime := ⟨hq_prime⟩
   have hMσderived : OddOrder.BG.Ch3.S10.Msigma M = derivedInG M :=
     typeP1_msigma_eq_derivedInG hG hM hP1 hKM hK hKstar
   obtain ⟨hcomplDer, _, _⟩ := S14.typeP_duality hG hM hP hKM hK hKstar
   have hcomplMσ : Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
       (K.subgroupOf M) := by rw [hMσderived]; exact hcomplDer
   have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   have hMσnotnil : ¬ Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) := fun hnil =>
     hne ((maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hM).mpr hnil)
   have hKstarMσ : Kstar ≤ OddOrder.BG.Ch3.S10.Msigma M := by rw [hKstar]; exact inf_le_left
@@ -745,15 +746,15 @@ theorem mf_ne_msigma_typeP1_structure [Finite G]
       hQneMσ hKne hKMσdisj hcopKMσ hMσnotnil hDq' hDMσ hKnormD hQDdisj hcomplD hDnil hDne
   set Q0 : Subgroup G := Q ⊓ Subgroup.centralizer (D : Set G) with hQ0def
   have hQ0Q : Q0 ≤ Q := hQ0ltQ.le
-  haveI hQ0nQ : (Q0.subgroupOf Q).Normal :=
+  have hQ0nQ : (Q0.subgroupOf Q).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQ0Q).mpr (hQM.trans hMNQ0)
   obtain ⟨hKprime, hindex, hDcomm, hEA⟩ :=
     chiefFactor_engine_of_inputs hG hM hP1 hKM hK hKstar hQdef hQMσ hMnormQ hKstarQ hKne hKMσdisj
       hcopKMσ hDq' hDMσ hKnormD hQDdisj hDne hQ0def hMNQ0 hKstarNotQ0 hQ0ltQ hmin
   -- **Fitting subgroup (Theorem 15.2(g)).**
-  haveI hQnMσ : (Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)).Normal :=
+  have hQnMσ : (Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQMσ).mpr (hMσM.trans hMnormQ)
-  haveI hNilMσQ : Group.IsNilpotent (↥(OddOrder.BG.Ch3.S10.Msigma M) ⧸
+  have hNilMσQ : Group.IsNilpotent (↥(OddOrder.BG.Ch3.S10.Msigma M) ⧸
       Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)) :=
     msigma_quotient_isNilpotent_of_inputs hG hM hP hKM hK hKstar hQMσ hMnormQ hKstarQ hQneMσ hKne
       hKMσdisj hcopKMσ
@@ -834,19 +835,19 @@ theorem mf_ne_msigma_typeP1_structure [Finite G]
     sup_le (hDMσ.trans (hMσM.trans hMnormQ)) (hKM.trans hMnormQ)
   have hqD : ¬ q ∣ Nat.card ↥D := fun hd =>
     hDq' (Nat.mem_primeFactors.mpr ⟨Fact.out, hd, Nat.card_pos.ne'⟩)
-  haveI hKsolv : IsSolvable ↥K :=
-    solvable_of_solvable_injective (Subgroup.inclusion_injective hKM)
+  have hKsolv : Group.IsSolvable ↥K :=
+    Group.isSolvable_of_isSolvable_injective (Subgroup.inclusion_injective hKM)
   have hqK : ¬ q ∣ Nat.card ↥K := fun hd =>
     hq_prime.one_lt.ne' (Nat.eq_one_of_dvd_coprimes hcopKMσ hd hqMσ)
   -- Sylow witness `P : Sylow q ↥M` with `Q = P.map M.subtype`.
   have hidx_M : ¬ q ∣ (Q.subgroupOf M).index := by
     have hMcard : Nat.card ↥M = Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) * Nat.card ↥K := by
-      have h := hcomplMσ.card_mul
+      have h := hcomplMσ.card_mul_card
       rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσM).toEquiv,
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv] at h
       exact h.symm
     have hMσcard : Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) = Nat.card ↥Q * Nat.card ↥D := by
-      have h := hcomplD.card_mul
+      have h := hcomplD.card_mul_card
       rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQMσ).toEquiv,
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe hDMσ).toEquiv] at h
       exact h.symm
@@ -884,13 +885,13 @@ theorem mf_ne_msigma_typeP1_structure [Finite G]
       rw [hn, Nat.primeFactors_prime_pow hn0 hq_prime, Finset.coe_singleton]
     rw [hpf]
     exact isHallSubgroup_subgroupOf_of_pgroup_of_not_dvd_index hQM hQpg hidx_M
-  haveI hQnilM : Group.IsNilpotent ↥(Q.subgroupOf M) :=
+  have hQnilM : Group.IsNilpotent ↥(Q.subgroupOf M) :=
     (hQpg.comap_subtype).isNilpotent
   have cC8 : Q ≤ MF M := le_maxNilpotentNormalHall hQM
     ((Subgroup.normal_subgroupOf_iff_le_normalizer hQM).mpr hMnormQ) hQnilM hQhall
   have cC7 : Kstar ≤ MF M := hKstarQ.trans cC8
   have cC5 : q ∈ S14.piSet (MF M) := by
-    rw [S14.piSet, Set.mem_setOf_eq]
+    rw [S14.piSet, Set.mem_ofPred_eq]
     refine Nat.mem_primeFactors.mpr ⟨hq_prime, ?_, Nat.card_pos.ne'⟩
     rw [hqdef]; exact Subgroup.card_dvd_of_le cC7
   -- **`¬ IsCyclic M_F` (conjunct 19).**
@@ -940,14 +941,14 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       -- `M_σ` is nilpotent so `F(M_σ) = M_σ = M_F`; otherwise `M_F` is non-cyclic, vacuous).
       (IsCyclic ↥(MF M) → IsCyclic ↥(fittingInAmbient M)) := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   set σ := OddOrder.BG.Ch3.S10.sigma M with hσ
   set Mσ := OddOrder.BG.Ch3.S10.Msigma M with hMσ
   set F := fittingInAmbient M with hF
   set FMσ := fittingInAmbient Mσ with hFMσ
   -- `Y := O_{σ'}(F(M))`, the `σ'`-Hall part of the Fitting subgroup.
   set Y : Subgroup G := opiCoreInG σᶜ F with hY
-  haveI hFnil : Group.IsNilpotent ↥F := OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
+  have hFnil : Group.IsNilpotent ↥F := OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
   -- ## Case-independent facts.
   -- Lemma 1: `O_σ(F(M)) = F(M_σ)`.
   have hL1 : opiCoreInG σ F = FMσ :=
@@ -1000,7 +1001,7 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- ## Case split on whether `M_σ` is nilpotent (`M_F = M_σ`).
   by_cases hcase : MF M = Mσ
   · -- ### Case I: `M_σ` nilpotent, `M_F = M_σ`, `F(M_σ) = M_σ`.
-    haveI hMσnil : Group.IsNilpotent ↥Mσ :=
+    have hMσnil : Group.IsNilpotent ↥Mσ :=
       (maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hM).mp hcase
     have hFMσ_eq : FMσ = Mσ := fittingInAmbient_eq_self_of_isNilpotent
     -- `M_σ ≤ F(M)` (nilpotent normal subgroup of `M`).
@@ -1027,7 +1028,7 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         inf_le_left.trans Subgroup.le_normalizer
       have h2 : C ≤ Subgroup.normalizer (Mσ : Set G) := inf_le_right.trans hM_norm_Mσ
       exact (le_inf h1 h2).trans Subgroup.inf_normalizer_le_normalizer_inf
-    haveI hA_normal : (A.subgroupOf C).Normal :=
+    have hA_normal : (A.subgroupOf C).Normal :=
       (Subgroup.normal_subgroupOf_iff_le_normalizer_inf).mpr
         (by rw [inf_eq_left.mpr hA_C]; exact hC_norm_A)
     -- `A ≤ M_σ` is a `σ`-group; `Y` is a `σ'`-group; hence `|A|` and `|Y|` are coprime.
@@ -1059,10 +1060,10 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       have hmem : (Y.subgroupOf C).subtype y ∈ Y.subgroupOf C ⊓ A.subgroupOf C := ⟨y.2, hy⟩
       rw [hYc_inf_a, Subgroup.mem_bot] at hmem
       rw [Subgroup.mem_bot]; exact Subtype.ext hmem
-    haveI hxcyc : IsCyclic ↥(X.subgroupOf C) := by
-      haveI : IsCyclic ↥X := hXcyc
+    have hxcyc : IsCyclic ↥(X.subgroupOf C) := by
+      have : IsCyclic ↥X := hXcyc
       exact isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe hX_C).symm.surjective
-    haveI hquot_cyc : IsCyclic (↥C ⧸ A.subgroupOf C) := by
+    have hquot_cyc : IsCyclic (↥C ⧸ A.subgroupOf C) := by
       have hsurj : Function.Surjective
           ((QuotientGroup.mk' (A.subgroupOf C)).comp (X.subgroupOf C).subtype) := by
         rw [← MonoidHom.range_eq_top, MonoidHom.range_comp, Subgroup.range_subtype]
@@ -1075,7 +1076,7 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         rw [h1]
       exact isCyclic_of_surjective _ hsurj
     -- Conjunct 1: `Y` is cyclic (`Y ≅ Y.subgroupOf C ↪ C/A` cyclic).
-    haveI hYcyc' : IsCyclic ↥(Y.subgroupOf C) :=
+    have hYcyc' : IsCyclic ↥(Y.subgroupOf C) :=
       isCyclic_of_surjective _ (MonoidHom.ofInjective hinj).symm.surjective
     have hYcyc : IsCyclic ↥Y :=
       isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe hY_C).surjective
@@ -1110,7 +1111,7 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       -- `C := C_G(M_σ) ⊓ M ⊴ M`.
       have hC_norm : M ≤ Subgroup.normalizer (C : Set G) :=
         (le_inf hM_norm_CMσ Subgroup.le_normalizer).trans Subgroup.inf_normalizer_le_normalizer_inf
-      haveI hC_normal : (C.subgroupOf M).Normal :=
+      have hC_normal : (C.subgroupOf M).Normal :=
         (Subgroup.normal_subgroupOf_iff_le_normalizer inf_le_right).mpr hC_norm
       refine le_antisymm ?_ ?_
       · -- `F ⊆ (C_G(M_σ) ⊓ M) ⊔ M_σ`: `F = M_σ ⊔ Y`, `M_σ ≤ M_σ`, `Y ≤ C`.
@@ -1131,12 +1132,12 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         have hXcent : ⁅X, Mσ⁆ = ⊥ := by
           have hXle : X ≤ Subgroup.centralizer (Mσ : Set G) := hX_C.trans inf_le_left
           exact Subgroup.commutator_eq_bot_iff_le_centralizer.mpr hXle
-        haveI hXcyc' : IsCyclic ↥X := hXcyc
-        letI : CommGroup ↥X := IsCyclic.commGroup
-        haveI : Group.IsNilpotent ↥X := CommGroup.isNilpotent
-        haveI hCMσ_nil : Group.IsNilpotent ↥(C ⊔ Mσ) := by
+        have hXcyc' : IsCyclic ↥X := hXcyc
+        let : CommGroup ↥X := IsCyclic.commGroup
+        have : Group.IsNilpotent ↥X := CommGroup.isNilpotent
+        have hCMσ_nil : Group.IsNilpotent ↥(C ⊔ Mσ) := by
           rw [hCMσ_eq]; exact isNilpotent_sup_of_commutator_eq_bot hXcent
-        haveI := hCMσ_norm
+        have := hCMσ_norm
         have hCMσ_le_F : C ⊔ Mσ ≤ F :=
           le_fittingInAmbient_of_subgroupOf_normal_of_isNilpotent hCMσ_le_M hCMσ_norm
         exact le_sup_left.trans hCMσ_le_F
@@ -1150,7 +1151,7 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       have hKne : K ≠ ⊥ := by
         obtain ⟨p, hpκ⟩ := hP
         obtain ⟨hpprime, -, P, hPmem, hPM, -⟩ := id hpκ
-        haveI : Fact p.Prime := ⟨hpprime⟩
+        have : Fact p.Prime := ⟨hpprime⟩
         -- `p ∣ |M|` (a rank-one elementary abelian `p`-subgroup `P ≤ M`).
         have hpcardP : Nat.card ↥P = p := by
           have := (OddOrder.GroupTheory.mem_elemAbelianOfRank.mp hPmem).2
@@ -1173,7 +1174,7 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         set D : Subgroup ↥M := (derivedInG M).subgroupOf M with hDdef
         have hDcomm : D = commutator ↥M :=
           Subgroup.comap_map_eq_self_of_injective M.subtype_injective (commutator ↥M)
-        haveI hDnorm : D.Normal := by rw [hDcomm]; infer_instance
+        have hDnorm : D.Normal := by rw [hDcomm]; infer_instance
         -- `[M : M'] = |K|` (complement), a `κ`-number.
         have hDindex : D.index = Nat.card ↥(K.subgroupOf M) := hcompl.symm.index_eq_card
         -- `Coprime |Y| [M:M']` (`π(Y) ⊆ τ₂`, `π(K) ⊆ κ`, `τ₂ ∩ κ = ∅`).
@@ -1197,7 +1198,7 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
             have hr2 : pRank ↥M r = 2 := ((mem_tau2_iff M r).mp hrτ₂).2
             rw [hr1] at hr2; exact absurd hr2 (by norm_num)
         -- `Y.subgroupOf M ≤ commutator ↥M`: image in the abelianization is trivial.
-        haveI hHnorm : Hsub.Normal :=
+        have hHnorm : Hsub.Normal :=
           (Subgroup.normal_subgroupOf_iff_le_normalizer hYM).mpr hM_norm_Y
         have hcard_img_dvd_Y : Nat.card ↥(Hsub.map (QuotientGroup.mk' D)) ∣ Nat.card ↥Hsub :=
           Subgroup.card_map_dvd Hsub (QuotientGroup.mk' D)
@@ -1220,8 +1221,8 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     -- Conjunct 11: `M_F` cyclic → `F(M)` cyclic (`F = M_F × Y`, both cyclic coprime).
     have h11 : IsCyclic ↥(MF M) → IsCyclic ↥F := by
       intro hMFcyc
-      haveI := hMFcyc
-      haveI := hYcyc
+      have := hMFcyc
+      have := hYcyc
       -- `F = M_F ⊔ Y` with `M_F ⊓ Y = ⊥`, `[M_F, Y] = ⊥`, coprime orders.
       have hMFY_inf : MF M ⊓ Y = ⊥ := by rw [hcase, ← hFMσ_eq]; exact h7
       have hMFY_comm : ⁅(MF M : Subgroup G), Y⁆ = ⊥ := by rw [hcase, ← hFMσ_eq]; exact h8
@@ -1332,7 +1333,7 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       have hOπ_le_F : OddOrder.GroupTheory.opiCoreInG π F ≤ F :=
         OddOrder.GroupTheory.opiCoreInG_le π F
       have hOπ_le_M : OddOrder.GroupTheory.opiCoreInG π F ≤ M := hOπ_le_F.trans hF_le_M
-      haveI hObar_norm : ((OddOrder.GroupTheory.opiCoreInG π F).subgroupOf M).Normal :=
+      have hObar_norm : ((OddOrder.GroupTheory.opiCoreInG π F).subgroupOf M).Normal :=
         (Subgroup.normal_subgroupOf_iff_le_normalizer hOπ_le_M).mpr
           (OddOrder.GroupTheory.le_normalizer_opiCoreInG_of_le_normalizer π hM_norm_F)
       have hObar_pi :
@@ -1411,8 +1412,8 @@ theorem typeP_kstar_in_mf_of_inputs [Finite G] (hG : OddOrder.BG.IsMinimalSimple
     (hFcyc : IsCyclic ↥(MF M) → IsCyclic ↥(fittingInAmbient M)) :
     Kstar ≠ ⊥ ∧ IsCyclic ↥Kstar ∧ Kstar ≤ MF M ∧
       Kstar ≤ derivedInG (derivedInG M) ∧ ¬ IsCyclic ↥(MF M) := by
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-  haveI := hcyc
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
+  have := hcyc
   -- `K* ⊆ M''`:  the §14-independent conjunct-4 engine.
   have hKsubdd : Kstar ≤ derivedInG (derivedInG M) := by
     rw [hKstar]
@@ -1435,7 +1436,7 @@ theorem typeP_kstar_in_mf [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     Kstar ≠ ⊥ ∧ IsCyclic ↥Kstar ∧ Kstar ≤ MF M ∧
       Kstar ≤ derivedInG (derivedInG M) ∧ ¬ IsCyclic ↥(MF M) := by
   classical
-  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have : Group.IsSolvable ↥M := hG.isSolvable_of_mem_maximalSubgroups hM
   -- A Hall `(κ ∪ σ)ᶜ`-subgroup `U` of `M` exists by solvability (Hall's theorem); this is the
   -- `U`-factor of the type-`P` decomposition `M = K U M_σ` needed to invoke Proposition 14.2.
   obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥M)

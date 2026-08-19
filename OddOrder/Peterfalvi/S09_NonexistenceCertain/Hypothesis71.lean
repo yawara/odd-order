@@ -950,8 +950,8 @@ theorem family_inequality {G : Type*} [Group G] [Fintype G]
         ∑ g ∈ Finset.univ.filter (fun x : G => x ∈ AT i),
           ‖(χ : G → ℂ) g‖^2 := by
     intro i
-    letI : Fintype (F.L i) := F.fintypeL i
-    letI : Invertible (Nat.card (F.L i) : ℂ) := F.invertibleL i
+    let : Fintype (F.L i) := F.fintypeL i
+    let : Invertible (Nat.card (F.L i) : ℂ) := F.invertibleL i
     have h73 := (F.hyp71 i).chiRho_integral_inequality (F.isDadeIsometry i) χ
     have h_re : (((Nat.card G : ℂ)⁻¹ *
         ∑ g ∈ Finset.univ.filter (fun x : G => x ∈ (F.hyp71 i).hyp.dadeSupport),
@@ -1025,8 +1025,8 @@ theorem family_inequality {G : Type*} [Group G] [Fintype G]
       (Nat.card (F.A i) : ℝ) / (Nat.card (F.L i) : ℝ) =
         (Nat.card (AT i) : ℝ) / (Nat.card G : ℝ) := by
     intro i
-    letI : Fintype (F.L i) := F.fintypeL i
-    letI : Invertible (Nat.card (F.L i) : ℂ) := F.invertibleL i
+    let : Fintype (F.L i) := F.fintypeL i
+    let : Invertible (Nat.card (F.L i) : ℂ) := F.invertibleL i
     exact ((F.hyp71 i).card_dadeSupport_div_card_G_eq_card_A_div_card_L
       (F.isDadeIsometry i)).symm
   -- (IX) `|G| = |G0| + Σ_i |AT i|` (G partition cardinality, in ℝ).
@@ -1175,8 +1175,8 @@ theorem reduced_inequality_of_estimates {G : Type*} [Group G] [Fintype G]
       _ = g0term := rfl
   have hnorm_nonneg : ∀ j : Fin k, 0 ≤ F.chiRhoNormSq χ j := by
     intro j
-    letI : Fintype (F.L j) := F.fintypeL j
-    letI : Invertible (Nat.card (F.L j) : ℂ) := F.invertibleL j
+    let : Fintype (F.L j) := F.fintypeL j
+    let : Invertible (Nat.card (F.L j) : ℂ) := F.invertibleL j
     simpa [FamilyHypothesis71.chiRhoNormSq] using
       Hypothesis71.ClassFunction.inner_self_re_nonneg ((F.hyp71 j).chiRhoCF χ)
   have hterm_i : c - ratio i ≤ term i := by

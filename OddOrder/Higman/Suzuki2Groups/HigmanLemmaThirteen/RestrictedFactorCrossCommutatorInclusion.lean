@@ -75,7 +75,7 @@ theorem commutator_le_frattiniSquare_of_map₂_eq_bot
           (Submodule.span F (Set.range f))
           (Submodule.span F (Set.range g)) = ⊥) :
     ⁅X, Z⁆ ≤ frattiniSquare P := by
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   rw [Subgroup.commutator_le]
@@ -171,7 +171,7 @@ theorem commutator_le_frattiniSquare_of_diagonal_eq_zero
             frattiniMiddleCommutatorBilinearBaseChange F
               hP hxi hPhiComm hexists (f i) (g i))) :
     ⁅X, Z⁆ ≤ frattiniSquare P := by
-  letI : CommGroup (frattini P) :=
+  let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
   have hmap : Submodule.map₂

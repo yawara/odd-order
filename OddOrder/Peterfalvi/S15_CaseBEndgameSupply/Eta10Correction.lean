@@ -98,7 +98,7 @@ theorem Hypothesis.exists_qSharpBase_orthogonal_eta10_core [Finite G]
   have hQT : hyp.Q ≤ hyp.T := by
     rw [hyp.Q_eq_TF]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
-  haveI hQnorm : (hyp.Q.subgroupOf hyp.T).Normal :=
+  have hQnorm : (hyp.Q.subgroupOf hyp.T).Normal :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer hQT).mpr (by
       rw [hyp.Q_eq_TF]
       exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.T)

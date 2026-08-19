@@ -37,16 +37,16 @@ section /- 6B.1: 可解 Frobenius 部分群 (p. 195) -/
 とればよい。 -/
 theorem exists_isSolvable_isFrobeniusGroup_of_isFrobeniusGroup
     {G : Type*} [Group G] [Finite G] {N A : Subgroup G} (hF : IsFrobeniusGroup G N A) :
-    ∃ (H : Subgroup G) (K L : Subgroup ↥H), IsSolvable ↥H ∧ IsFrobeniusGroup ↥H K L := by
+    ∃ (H : Subgroup G) (K L : Subgroup ↥H), Group.IsSolvable ↥H ∧ IsFrobeniusGroup ↥H K L := by
   classical
-  haveI hNormN : N.Normal := hF.isNormal
-  haveI hAnt : Nontrivial ↥A := (Subgroup.nontrivial_iff_ne_bot A).mpr hF.ne_bot_complement
-  haveI hNnt : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hF.ne_bot_kernel
+  have hNormN : N.Normal := hF.isNormal
+  have hAnt : Nontrivial ↥A := (Subgroup.nontrivial_iff_ne_bot A).mpr hF.ne_bot_complement
+  have hNnt : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hF.ne_bot_kernel
   -- (1) 補群から素数位数の元 `y` を取る (Cauchy)
   obtain ⟨p, hp, hpdvd⟩ :=
     Nat.exists_prime_and_dvd (Finite.one_lt_card_iff_nontrivial.mpr hAnt).ne'
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : Fintype ↥A := Fintype.ofFinite _
+  have : Fact p.Prime := ⟨hp⟩
+  have : Fintype ↥A := Fintype.ofFinite _
   obtain ⟨y, hy⟩ := exists_prime_orderOf_dvd_card (G := ↥A) p
     (by rwa [← Nat.card_eq_fintype_card])
   have hyne : y ≠ 1 := by
@@ -54,21 +54,21 @@ theorem exists_isSolvable_isFrobeniusGroup_of_isFrobeniusGroup
     rw [h, orderOf_one] at hy
     exact hp.one_lt.ne hy
   -- (2) `B := ⟨y⟩` は可解
-  haveI : IsSolvable ↥(Subgroup.zpowers y) := by
-    refine isSolvable_of_comm fun a b => ?_
+  have : Group.IsSolvable ↥(Subgroup.zpowers y) := by
+    refine Group.isSolvable_of_comm fun a b => ?_
     obtain ⟨m, hm⟩ := Subgroup.mem_zpowers_iff.mp a.2
     obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp b.2
     refine Subtype.ext ?_
     rw [Subgroup.coe_mul, Subgroup.coe_mul, ← hm, ← hk, ← zpow_add, ← zpow_add, add_comm]
   -- (3) `⟨y⟩` 不変な非自明可換部分群 `M ≤ N`
-  letI : MulDistribMulAction ↥A ↥N :=
+  let : MulDistribMulAction ↥A ↥N :=
     MulDistribMulAction.compHom ↥N ((MulAut.conjNormal (H := N)).comp A.subtype)
   have hact : IsFrobeniusAction ↥A ↥N := hF.toFrobeniusAction
   obtain ⟨M, hMnt, hMcomm, hMinv⟩ :=
-    exists_actorSubgroup_invariant_nontrivial_abelian_subgroup_of_solvable hact
+    exists_actorSubgroup_invariant_nontrivial_abelian_subgroup_of_isSolvable hact
       (Subgroup.zpowers y)
-  haveI := hMnt
-  haveI := hMcomm
+  have := hMnt
+  have := hMcomm
   -- (4) `G` の中へ移す
   set M' : Subgroup G := M.map N.subtype with hM'def
   set Y : Subgroup G := Subgroup.zpowers ((y : ↥A) : G) with hYdef
@@ -79,7 +79,7 @@ theorem exists_isSolvable_isFrobeniusGroup_of_isFrobeniusGroup
   have hM'card : Nat.card ↥M' = Nat.card ↥M :=
     Nat.card_congr
       (Subgroup.equivMapOfInjective M N.subtype (Subgroup.subtype_injective N)).symm.toEquiv
-  haveI hM'nt : Nontrivial ↥M' := by
+  have hM'nt : Nontrivial ↥M' := by
     refine Finite.one_lt_card_iff_nontrivial.mp ?_
     rw [hM'card]
     exact Finite.one_lt_card_iff_nontrivial.mpr hMnt
@@ -121,7 +121,7 @@ theorem exists_isSolvable_isFrobeniusGroup_of_isFrobeniusGroup
   have hcompl : Subgroup.IsComplement' (M'.subgroupOf H) (Y.subgroupOf H) :=
     Subgroup.isComplement'_of_card_mul_and_disjoint
       (by rw [hcardM'sub, hcardYsub, hcardH]) hdisj
-  haveI hMnormal : (M'.subgroupOf H).Normal := by
+  have hMnormal : (M'.subgroupOf H).Normal := by
     refine ⟨fun n hn g => ?_⟩
     have hgH : (g : G) ∈ Subgroup.normalizer M' := by
       exact (sup_le Subgroup.le_normalizer hYnorm : H ≤ Subgroup.normalizer M') g.2
@@ -134,11 +134,12 @@ theorem exists_isSolvable_isFrobeniusGroup_of_isFrobeniusGroup
       refine Subtype.ext ?_
       have h := congrArg (fun z : ↥M => ((z : ↥N) : G)) (hMcomm.is_comm.comm ⟨u, hu⟩ ⟨v, hv⟩)
       simpa using h
-    haveI : IsSolvable ↥M' := isSolvable_of_comm hM'commutes
-    haveI : IsSolvable ↥(M'.subgroupOf H) :=
-      solvable_of_solvable_injective (f := (Subgroup.subgroupOfEquivOfLe hM'H).toMonoidHom)
+    have : Group.IsSolvable ↥M' := Group.isSolvable_of_comm hM'commutes
+    have : Group.IsSolvable ↥(M'.subgroupOf H) :=
+      Group.isSolvable_of_isSolvable_injective (f :=
+        (Subgroup.subgroupOfEquivOfLe hM'H).toMonoidHom)
         (Subgroup.subgroupOfEquivOfLe hM'H).injective
-    haveI : IsCyclic (↥H ⧸ M'.subgroupOf H) := by
+    have : IsCyclic (↥H ⧸ M'.subgroupOf H) := by
       refine isCyclic_of_prime_card (p := p) ?_
       have hmul := Subgroup.card_mul_index (M'.subgroupOf H)
       rw [hcardM'sub] at hmul
@@ -147,13 +148,13 @@ theorem exists_isSolvable_isFrobeniusGroup_of_isFrobeniusGroup
       have hidx := Nat.eq_of_mul_eq_mul_left Nat.card_pos heq
       change (M'.subgroupOf H).index = p
       rw [hidx, hYcard]
-    haveI : IsSolvable (↥H ⧸ M'.subgroupOf H) := by
-      refine isSolvable_of_comm fun a b => ?_
+    have : Group.IsSolvable (↥H ⧸ M'.subgroupOf H) := by
+      refine Group.isSolvable_of_comm fun a b => ?_
       obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := ↥H ⧸ M'.subgroupOf H)
       obtain ⟨m, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hg a)
       obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hg b)
       rw [← zpow_add, ← zpow_add, add_comm]
-    exact solvable_of_ker_le_range (M'.subgroupOf H).subtype
+    exact Group.isSolvable_of_ker_le_range (M'.subgroupOf H).subtype
       (QuotientGroup.mk' (M'.subgroupOf H)) (by rw [QuotientGroup.ker_mk']; simp)
   · refine isFrobeniusGroup_of_prime_complement_fixedFree hcompl ?_ ?_ ?_
     · rw [hcardYsub, hYcard]; exact hp
@@ -183,9 +184,9 @@ theorem false_of_frobeniusAction_actorSubgroup_isFrobeniusGroup
   obtain ⟨H, K, L, hHsol, hHF⟩ := exists_isSolvable_isFrobeniusGroup_of_isFrobeniusGroup hGroup
   have e : ↥H ≃* ↥(H.map B.subtype) :=
     Subgroup.equivMapOfInjective H B.subtype (Subgroup.subtype_injective B)
-  haveI := hHsol
-  haveI : IsSolvable ↥(H.map B.subtype) :=
-    solvable_of_solvable_injective (f := e.symm.toMonoidHom) e.symm.injective
+  have := hHsol
+  have : Group.IsSolvable ↥(H.map B.subtype) :=
+    Group.isSolvable_of_isSolvable_injective (f := e.symm.toMonoidHom) e.symm.injective
   exact false_of_frobeniusAction_actorSubgroup_isSolvable_isFrobeniusGroup hFrob
     (H.map B.subtype) (hHF.mapEquiv e)
 

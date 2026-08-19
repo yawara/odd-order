@@ -28,6 +28,7 @@ instance {M : Subgroup G} : ((derivedInG M).subgroupOf M).Normal := by
     Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
   infer_instance
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Nonidentity `↥K`-elements commuting with a nonidentity `W₁`-element lie in
 `commutator ↥K`** — the `hfix` translation of Peterfalvi (8.4.d): such an element lands in
 `M' ⊓ C_G(w) = W₂` (`TypePData.centralizer_W1`) and `W₂ ≤ M''` (`W2_le`), and `M''` pulls back
@@ -91,7 +92,7 @@ theorem Hypothesis.inertia_eq_derived_of_linear [Finite G]
     ClassFunction.inertia (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ)
       = (derivedInG M).subgroupOf M := by
   classical
-  haveI : Fintype G := Fintype.ofFinite _
+  have : Fintype G := Fintype.ofFinite _
   refine le_antisymm ?_ (ClassFunction.subgroup_le_inertia _)
   intro w hw
   by_contra hwK
@@ -117,7 +118,7 @@ theorem Hypothesis.inertia_eq_derived_of_linear [Finite G]
   -- rebind the complement component as a subgroup-subtype element for the action.
   have hvW1s : (v : ↥M) ∈ hyp.W1.subgroupOf M := v.2
   -- the `W₁`-conjugation action on `↥M'` and its fixed-point-free quotient action mod `M''`.
-  letI act : MulDistribMulAction ↥(hyp.W1.subgroupOf M) ↥((derivedInG M).subgroupOf M) :=
+  let act : MulDistribMulAction ↥(hyp.W1.subgroupOf M) ↥((derivedInG M).subgroupOf M) :=
     MulDistribMulAction.compHom _
       ((MulAut.conjNormal (H := (derivedInG M).subgroupOf M)).comp
         (hyp.W1.subgroupOf M).subtype)
@@ -159,7 +160,7 @@ theorem Hypothesis.inertia_eq_derived_of_linear [Finite G]
     exact (typePData_W1_hall_coprime hG hyp.maximal (hyp.bgTypeP hG) hyp.typeP).symm
   have hFrob := OddOrder.Isaacs.Ch06.IsFrobeniusAction.quotient_of_fixedPoints_le
     hCop (commutator ↥((derivedInG M).subgroupOf M)) hMinv hfixle
-  letI actQ := OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantQuotientMulDistribMulAction
+  let actQ := OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantQuotientMulDistribMulAction
     (N := ↥((derivedInG M).subgroupOf M)) (commutator ↥((derivedInG M).subgroupOf M)) hMinv
   -- `x ↦ (v•x)·x⁻¹` is injective mod `M''` (fixed-point-freeness), hence surjective.
   set v' : ↥(hyp.W1.subgroupOf M) := ⟨(v : ↥M), hvW1s⟩ with hv'
@@ -380,7 +381,7 @@ theorem Hypothesis.card_filter_linear_eq_w1_mul_card_SHCSet_filter [Finite G]
       = hyp.w1 * (Finset.univ.filter fun χ : IrreducibleCharacter ↥M =>
           (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
             ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ)).card := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   have hidx : ((derivedInG M).subgroupOf M).index = hyp.w1 :=
     hyp.typeP.card_W1_eq_derived_index.symm
@@ -492,7 +493,7 @@ theorem Hypothesis.card_abelianization_derived_eq_w1_mul_card_SHCSet_add_one [Fi
       = hyp.w1 * (Finset.univ.filter fun χ : IrreducibleCharacter ↥M =>
           (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
             ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ)).card + 1 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   rw [← card_filter_degree_one_eq_card_abelianization,
     ← hyp.card_filter_linear_eq_w1_mul_card_SHCSet_filter hG]
@@ -528,7 +529,7 @@ theorem Hypothesis.card_SHCSet_filter_eq_charParam_n_of_card_abelianization_eq [
     (Finset.univ.filter (fun χ : IrreducibleCharacter ↥M =>
       (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
         ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ))).card = params.n := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   -- `d = w₁·|S(HC)| + 1`
   have horbit := hyp.card_abelianization_derived_eq_w1_mul_card_SHCSet_add_one hG
@@ -586,11 +587,11 @@ theorem typePData_card_derived_mul_card_C_eq [Finite G] {M : Subgroup G} (data :
       _ = ⊥ := hHUbot
   -- `|M'| = |H|·|U|`
   have hHU : Nat.card ↥data.H * Nat.card ↥data.U = Nat.card ↥(derivedInG M) := by
-    have h := data.derived_complement.card_mul
+    have h := data.derived_complement.card_mul_card
     rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.H_le).toEquiv,
       Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.U_le).toEquiv] at h
   -- `H ⊴ M'`
-  haveI hHn : (data.H.subgroupOf (derivedInG M)).Normal := by
+  have hHn : (data.H.subgroupOf (derivedInG M)).Normal := by
     refine (Subgroup.normal_subgroupOf_iff_le_normalizer data.H_le).mpr ?_
     have hnM : M ≤ Subgroup.normalizer (data.H : Set G) := by
       rw [data.H_eq]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M
@@ -741,7 +742,7 @@ theorem Hypothesis.card_SHCSet_filter_eq_charParam_n [Finite G]
     (Finset.univ.filter (fun χ : IrreducibleCharacter ↥M =>
       (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
         ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ))).card = params.n := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   refine hyp.card_SHCSet_filter_eq_charParam_n_of_card_abelianization_eq hG params
     (hyp.charParam_delta_eq_one hG htype params hmu hδpm) ?_
@@ -755,7 +756,7 @@ theorem Hypothesis.card_SHCSet_filter_eq_charParam_n [Finite G]
     (hyp.toTypesIIIIIIVSetup htype hnt)
   -- `chief.N = ⊥`: `|H/N| = chief.p ^ q = |W₂|^q = |H|`, so `|N| = 1`.
   have hN : chief.N = ⊥ := by
-    haveI := chief.N_normal
+    have := chief.N_normal
     -- `chief.p = |W₂| = w₂` for type III/IV.
     have hpW2 : chief.p = hyp.w2 := (chief.typeIII_IV_p_eq_W2 htype).symm
     -- `data.H = H` and `data.q = w₁` hold by `rfl` through the `TypesIIIIIIVSetup` projections.
@@ -841,17 +842,17 @@ theorem Hypothesis.muColumnChar_ne_one [Finite G] (hG : OddOrder.BG.IsMinimalSim
     {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
     {j : Fin hyp.w2} (hj : j ≠ 0) :
     hyp.muColumnChar hG hodd j ≠ 1 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   -- rebuild the `muColumnChar` definition chain (instance-defeq trap §5)
   set h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis with hhdef
-  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
   have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
   set χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
     finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j) with hχ₂def
   have hchar : hyp.muColumnChar hG hodd j = χ₂ := by
@@ -885,14 +886,14 @@ theorem Hypothesis.muGrid_columnSum_eq_columnSum [Finite G]
     (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j)
       = OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hodd)
           (hyp.muColumnChar hG hodd j) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   -- rebuild the very `let`/`have` chain of the `muGrid`/`muColumnChar` definitions, so the
   -- entrywise `unfold …; rfl` identifications fire against syntactically matching variables
   set h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis with hhdef
-  haveI : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
-  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
-  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  have : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  let : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
   have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
   have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
   have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
@@ -900,7 +901,7 @@ theorem Hypothesis.muGrid_columnSum_eq_columnSum [Finite G]
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
   set χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
     finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j) with hχ₂def
   -- entrywise: `muGrid i j = (h.columnFamily χ₂).mu (finCongr … i)`
@@ -933,7 +934,7 @@ theorem Hypothesis.muColumnChar_columnSum_apply_one_eq [Finite G]
         : ClassFunction ↥M ℂ) 1)
       = (∑ i, (((hyp.toHypothesis46 hG hodd).columnFamily (hyp.muColumnChar hG hodd k)).mu i
         : ClassFunction ↥M ℂ) 1) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   rw [← OddOrder.Peterfalvi.S06.columnSum_apply_one, ← OddOrder.Peterfalvi.S06.columnSum_apply_one,
     ← hyp.muGrid_columnSum_eq_columnSum hG hodd j, ← hyp.muGrid_columnSum_eq_columnSum hG hodd k]
@@ -968,7 +969,7 @@ theorem Hypothesis.reducible_mem_inducedKernelFamily_mem_certainTypeSet [Finite 
     (hred : ¬ IsIrreducibleCharacter ψ) :
     ψ ∈ OddOrder.Peterfalvi.S06.certainTypeSet (hyp.toHypothesis46 hG hG.odd)
       (hyp.muColumnChar hG hG.odd kref) := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   obtain ⟨k, hk0, rfl⟩ :=
     hyp.reducible_mem_inducedKernelFamily_eq_muGrid_columnSum hG hψ hred
@@ -988,20 +989,20 @@ theorem Hypothesis.exists_muColumnChar_eq [Finite G] (hG : OddOrder.BG.IsMinimal
       ((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2)) →* ℂˣ}
     (hχ₂ : χ₂ ≠ 1) :
     ∃ k : Fin hyp.w2, k ≠ 0 ∧ hyp.muColumnChar hG hG.odd k = χ₂ := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   -- instances and the card identification, phrased at the `toHypothesis46` spelling (the type
   -- of `χ₂`), definitionally the `toCertainTypeHypothesis` chain of the `muColumnChar` body
-  haveI : IsCyclic ↥((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2) :=
+  have : IsCyclic ↥((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2) :=
     (hyp.toCertainTypeHypothesis hG hG.odd).toHypothesis.isCyclic_sup
-  letI : CommGroup ↥((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2) :=
+  let : CommGroup ↥((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2) :=
     IsCyclic.commGroup
   have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
   have hcardW2sub : Nat.card ↥((hyp.toHypothesis46 hG hG.odd).W2.subgroupOf
       ((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2)) = hyp.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
-  haveI : NeZero (Nat.card ↥((hyp.toHypothesis46 hG hG.odd).W2.subgroupOf
+  have : NeZero (Nat.card ↥((hyp.toHypothesis46 hG hG.odd).W2.subgroupOf
       ((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2))) :=
     ⟨Nat.card_pos.ne'⟩
   refine ⟨finCongr hcardW2sub ((finCardEquivCharacterGroup _).symm χ₂), ?_, ?_⟩
@@ -1051,7 +1052,7 @@ theorem Hypothesis.columnSum_inner_irr_member_eq_zero [Finite G]
     (hxirr : IsIrreducibleCharacter x) :
     ClassFunction.inner
       (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂) x = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   obtain ⟨k, hk0, hkeq⟩ := hyp.exists_muColumnChar_eq hG hχ₂
   rw [← hkeq, ← hyp.muGrid_columnSum_eq_columnSum hG hG.odd k, inner_sum_left]
@@ -1130,7 +1131,7 @@ theorem Hypothesis.columnSum_mem_ZIrr [Finite G] (hG : OddOrder.BG.IsMinimalSimp
     (χ₂ : ((hyp.toHypothesis46 hG hG.odd).W2.subgroupOf
       ((hyp.toHypothesis46 hG hG.odd).W1 ⊔ (hyp.toHypothesis46 hG hG.odd).W2)) →* ℂˣ) :
     OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂ ∈ ZIrr ↥M := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   rw [OddOrder.Peterfalvi.S06.columnSum_def]
   exact Submodule.sum_mem _
@@ -1149,7 +1150,7 @@ theorem Hypothesis.columnSum_inner_columnSum_eq_zero [Finite G]
     ClassFunction.inner
       (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂)
       (OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂') = 0 := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   rw [OddOrder.Peterfalvi.S06.columnSum_def, OddOrder.Peterfalvi.S06.columnSum_def,
     OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner]
@@ -1169,7 +1170,7 @@ theorem Hypothesis.columnSum_muColumnChar_mem_inducedFamily [Finite G]
     {k : Fin hyp.w2} (hk0 : k ≠ 0) :
     OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd)
       (hyp.muColumnChar hG hG.odd k) ∈ inducedFamily M := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   rw [← hyp.muGrid_columnSum_eq_columnSum hG hG.odd k]
   refine hyp.muGrid_column_sum_mem_inducedFamily hG hG.odd k ?_
@@ -1193,7 +1194,7 @@ theorem Hypothesis.columnSum_injective [Finite G]
     (heq : OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂
       = OddOrder.Peterfalvi.S06.columnSum (hyp.toHypothesis46 hG hG.odd) χ₂') :
     χ₂ = χ₂' := by
-  haveI := hyp.finiteG
+  have := hyp.finiteG
   classical
   exact OddOrder.Peterfalvi.S06.columnSum_injective _ heq
 

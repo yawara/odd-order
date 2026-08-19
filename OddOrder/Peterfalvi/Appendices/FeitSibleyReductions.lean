@@ -85,7 +85,7 @@ theorem mem_of_inv_mul_conj_mem_of_ne_one [Finite G] {N : Subgroup G}
   have hord1 : orderOf δ ≠ 1 := fun h => hδ1 (orderOf_eq_one_iff.mp h)
   set p := (orderOf δ).minFac with hp_def
   have hp : p.Prime := Nat.minFac_prime hord1
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hordpos : 0 < orderOf δ := orderOf_pos δ
   set δ' := δ ^ (orderOf δ / p) with hδ'_def
   have hδ'ord : orderOf δ' = p := by
@@ -112,12 +112,12 @@ theorem mem_of_inv_mul_conj_mem_of_ne_one [Finite G] {N : Subgroup G}
       group
     rw [hkey]
     exact N.mul_mem hgw (hNinv g hgD _ hx)
-  haveI : Finite ↥C := Set.Finite.to_subtype (Set.toFinite C)
-  letI : SMul ↥(Subgroup.zpowers δ') ↥C :=
+  have : Finite ↥C := Set.Finite.to_subtype (Set.toFinite C)
+  let : SMul ↥(Subgroup.zpowers δ') ↥C :=
     ⟨fun g x => ⟨(g : G) * x * (g : G)⁻¹, hclosure g g.2 x x.2⟩⟩
   have hsmul_def : ∀ (g : ↥(Subgroup.zpowers δ')) (x : ↥C),
       ((g • x : ↥C) : G) = (g : G) * x * (g : G)⁻¹ := fun _ _ => rfl
-  letI : MulAction ↥(Subgroup.zpowers δ') ↥C :=
+  let : MulAction ↥(Subgroup.zpowers δ') ↥C :=
     { one_smul := fun x => Subtype.ext (by rw [hsmul_def]; simp)
       mul_smul := fun g₁ g₂ x => Subtype.ext (by
         rw [hsmul_def, hsmul_def, hsmul_def]
@@ -184,7 +184,7 @@ theorem d_dvd_card_quotient_sub_one_of_le_Q1 [Finite G] {N W : Subgroup G}
   by_cases hd1 : hyp.d = 1
   · rw [hd1]; exact one_dvd _
   -- the conjugation action of `D` on the coset space `W ⧸ (N ∩ W)`
-  letI : SMul ↥hyp.D (↥W ⧸ N.subgroupOf W) :=
+  let : SMul ↥hyp.D (↥W ⧸ N.subgroupOf W) :=
     ⟨fun δ => Quotient.map'
       (fun w => (⟨(δ : G) * w * (δ : G)⁻¹, hWinv δ δ.2 w w.2⟩ : ↥W))
       (fun a b hab => by
@@ -200,7 +200,7 @@ theorem d_dvd_card_quotient_sub_one_of_le_Q1 [Finite G] {N W : Subgroup G}
       δ • (Quotient.mk'' w : ↥W ⧸ N.subgroupOf W)
         = Quotient.mk'' (⟨(δ : G) * w * (δ : G)⁻¹, hWinv δ δ.2 w w.2⟩ : ↥W) :=
     fun _ _ => rfl
-  letI : MulAction ↥hyp.D (↥W ⧸ N.subgroupOf W) :=
+  let : MulAction ↥hyp.D (↥W ⧸ N.subgroupOf W) :=
     { one_smul := fun x => by
         induction x using Quotient.inductionOn' with
         | h w =>
@@ -253,7 +253,7 @@ theorem d_dvd_card_quotient_sub_one_of_le_Q1 [Finite G] {N W : Subgroup G}
       x ∈ MulAction.fixedPoints ↥hyp.D (↥W ⧸ N.subgroupOf W) →
       x = Quotient.mk'' (1 : ↥W) := by
     intro x hx
-    haveI : Nontrivial ↥hyp.D := by
+    have : Nontrivial ↥hyp.D := by
       apply Finite.one_lt_card_iff_nontrivial.mp
       have hpos : 0 < Nat.card ↥hyp.D := Nat.card_pos
       have hne : Nat.card ↥hyp.D ≠ 1 := hd1
@@ -309,7 +309,7 @@ theorem d_add_one_le_card_quotient_of_le_Q1 [Finite G] {N W : Subgroup G}
       have h2 : w⁻¹ * (1 : G) ∈ N := hmem
       rw [mul_one] at h2
       simpa using N.inv_mem h2
-    haveI : Nontrivial (↥W ⧸ N.subgroupOf W) := ⟨_, _, hne⟩
+    have : Nontrivial (↥W ⧸ N.subgroupOf W) := ⟨_, _, hne⟩
     exact Finite.one_lt_card
   obtain ⟨k, hk⟩ := hdvd
   have hkpos : 0 < k := by
@@ -729,7 +729,7 @@ theorem sylow_le_of_isComplement'_sylow_of_ne {K : Type*} [Group K] [Finite K]
 /-- **`[K,K]·N_p` is proper** for the normal `p`-complement `N` of a finite
 group with `p ∣ |K|`: otherwise the nontrivial `p`-group `K⧸N` would equal its
 own commutator subgroup, contradicting solvability
-(`IsSolvable.commutator_lt_top_of_nontrivial`). -/
+(`Group.IsSolvable.commutator_lt_top_of_nontrivial`). -/
 theorem commutator_sup_normal_pcomplement_ne_top {K : Type*} [Group K] [Finite K]
     {p : ℕ} [hp : Fact p.Prime] (hpK : p ∣ Nat.card K)
     {N : Subgroup K} [N.Normal] {P : Sylow p K}
@@ -737,21 +737,21 @@ theorem commutator_sup_normal_pcomplement_ne_top {K : Type*} [Group K] [Finite K
     commutator K ⊔ N ≠ ⊤ := by
   intro hsup
   have hq : IsPGroup p (K ⧸ N) := isPGroup_quotient_of_isComplement'_sylow hC
-  haveI : Group.IsNilpotent (K ⧸ N) := hq.isNilpotent
+  have : Group.IsNilpotent (K ⧸ N) := hq.isNilpotent
   have hpP : p ∣ Nat.card ↥(P : Subgroup K) := by
     have hpK' := hpK
-    rw [← hC.card_mul] at hpK'
+    rw [← hC.card_mul_card] at hpK'
     rcases (Nat.Prime.dvd_mul hp.out).mp hpK' with h | h
     · exact absurd h (OddOrder.Isaacs.Ch05.not_dvd_card_of_isComplement'_sylow P hC)
     · exact h
-  haveI : Nontrivial (K ⧸ N) := by
+  have : Nontrivial (K ⧸ N) := by
     apply Finite.one_lt_card_iff_nontrivial.mp
     have hidx : Nat.card (K ⧸ N) = Nat.card ↥(P : Subgroup K) := by
       rw [← Subgroup.index_eq_card]
       exact hC.symm.index_eq_card
     rw [hidx]
     exact lt_of_lt_of_le hp.out.one_lt (Nat.le_of_dvd Nat.card_pos hpP)
-  have hlt := IsSolvable.commutator_lt_top_of_nontrivial (K ⧸ N)
+  have hlt := Group.IsSolvable.commutator_lt_top_of_nontrivial (K ⧸ N)
   have hmap : Subgroup.map (QuotientGroup.mk' N) (commutator K ⊔ N) = ⊤ := by
     rw [hsup]
     exact Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective N)
@@ -782,13 +782,13 @@ theorem d_add_one_sq_le_card_quot_of_two_primes [Finite G]
     (hQ₂inv : ∀ δ ∈ hyp.D, ∀ z ∈ Q₂, δ * z * δ⁻¹ ∈ Q₂) :
     (hyp.d + 1) ^ 2 ≤ Nat.card (↥hyp.Q1 ⧸ Q₂.subgroupOf hyp.Q1) := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
-  haveI : Fact r.Prime := ⟨hr⟩
-  haveI := hnil
+  have : Fact p.Prime := ⟨hp⟩
+  have : Fact r.Prime := ⟨hr⟩
+  have := hnil
   -- the normal `p`-complement and the abstract intermediate `M₀ = [Q₁,Q₁]·N`
   obtain ⟨N, hNnormal, hNC⟩ :=
     OddOrder.Isaacs.Ch05.hasNormalPComplement_of_isNilpotent (H := ↥hyp.Q1) (p := p)
-  haveI := hNnormal
+  have := hNnormal
   set P : Sylow p ↥hyp.Q1 := default with hP_def
   have hC := hNC P
   set M₀ : Subgroup ↥hyp.Q1 := commutator ↥hyp.Q1 ⊔ N with hM₀_def
@@ -799,7 +799,7 @@ theorem d_add_one_sq_le_card_quot_of_two_primes [Finite G]
     intro hle
     obtain ⟨Nr, hNrnormal, hNrC⟩ :=
       OddOrder.Isaacs.Ch05.hasNormalPComplement_of_isNilpotent (H := ↥hyp.Q1) (p := r)
-    haveI := hNrnormal
+    have := hNrnormal
     set R : Sylow r ↥hyp.Q1 := default with hR_def
     have hCr := hNrC R
     have hRN : (R : Subgroup ↥hyp.Q1) ≤ N :=

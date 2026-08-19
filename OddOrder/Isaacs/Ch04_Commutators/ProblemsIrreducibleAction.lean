@@ -86,7 +86,7 @@ structure IsIrreducibleCoprimeAction {A G : Type*} [Group A] [Group G]
   /-- `(|A|, |G|) = 1`. -/
   coprime : Nat.Coprime (Nat.card A) (Nat.card G)
   /-- `A` か `G` の一方は可解 (Glauberman の補題を使うため). -/
-  solvable : IsSolvable A ∨ IsSolvable G
+  solvable : Group.IsSolvable A ∨ Group.IsSolvable G
   /-- 真の `A`-不変部分群には自明に作用する. -/
   trivial_on_proper : ∀ H : Subgroup G, Ch03.IsAInvariant φ H → H ≠ ⊤ →
     ∀ a : A, ∀ h ∈ H, (φ a) h = h
@@ -112,7 +112,7 @@ theorem fixedPoints_ne_top (h : IsIrreducibleCoprimeAction φ) :
 /-- `G` は非自明 (自明なら作用も自明). -/
 theorem nontrivial_group (h : IsIrreducibleCoprimeAction φ) : Nontrivial G := by
   by_contra hcon
-  haveI : Subsingleton G := not_nontrivial_iff_subsingleton.mp hcon
+  have : Subsingleton G := not_nontrivial_iff_subsingleton.mp hcon
   exact h.nontrivial ((actionCommutator_eq_bot_iff_acts_trivially φ).mpr fun _ _ =>
     Subsingleton.elim _ _)
 
@@ -139,7 +139,7 @@ theorem exists_isPGroup (h : IsIrreducibleCoprimeAction φ) :
   set F : Subgroup G := Subgroup.fixedPointsOfMulAut φ with hF
   have hpow : ∀ p : ℕ, p.Prime → p ^ (Nat.card G).factorization p ∣ Nat.card ↥F := by
     intro p hp
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     obtain ⟨P, hPinv⟩ := exists_aInvariant_sylow (φ := φ) h.coprime h.solvable p
     have hPne : (P : Subgroup G) ≠ ⊤ := by
       intro htop
@@ -162,14 +162,14 @@ theorem exists_isPGroup (h : IsIrreducibleCoprimeAction φ) :
 /-- `G` は冪零 ((a) より `p`-群). -/
 theorem isNilpotent_group (h : IsIrreducibleCoprimeAction φ) : Group.IsNilpotent G := by
   obtain ⟨p, hp, hpG⟩ := h.exists_isPGroup
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   exact hpG.isNilpotent
 
 /-- `G' ≠ G` (非自明な冪零群だから). -/
 theorem commutator_ne_top (h : IsIrreducibleCoprimeAction φ) :
     _root_.commutator G ≠ ⊤ := by
-  haveI := h.nontrivial_group
-  haveI := h.isNilpotent_group
+  have := h.nontrivial_group
+  have := h.isNilpotent_group
   intro htop
   obtain ⟨n, hn⟩ := Subgroup.nilpotent_iff_lowerCentralSeries.mp ‹Group.IsNilpotent G›
   have hall : ∀ m : ℕ, (⊤ : Subgroup G).lowerCentralSeries m = ⊤ := by
@@ -217,7 +217,7 @@ theorem fixedPoints_eq_commutator (h : IsIrreducibleCoprimeAction φ) :
     Subgroup.fixedPointsOfMulAut φ = _root_.commutator G := by
   have hinv := h.isAInvariant_commutator
   refine le_antisymm ?_ (h.le_fixedPoints_of_ne_top hinv h.commutator_ne_top)
-  letI : CommGroup (G ⧸ _root_.commutator G) :=
+  let : CommGroup (G ⧸ _root_.commutator G) :=
     { (inferInstance : Group (G ⧸ _root_.commutator G)) with
       mul_comm := (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr
         (le_refl (_root_.commutator G))).is_comm.comm }
@@ -249,7 +249,7 @@ theorem eq_commutator_or_eq_top_of_isAInvariant (h : IsIrreducibleCoprimeAction 
 /-- `Φ(G) = G'` (この状況では Frattini 部分群と導来部分群が一致する). -/
 theorem frattini_eq_commutator (h : IsIrreducibleCoprimeAction φ) :
     frattini G = _root_.commutator G := by
-  haveI := h.nontrivial_group
+  have := h.nontrivial_group
   have hfrne : frattini G ≠ ⊤ := by
     intro htop
     exact absurd (frattini_nongenerating (K := (⊥ : Subgroup G)) (by rw [htop, bot_sup_eq]))
@@ -265,7 +265,7 @@ theorem frattini_eq_commutator (h : IsIrreducibleCoprimeAction φ) :
 `Φ(G) = G'` (`frattini_eq_commutator`) から。 -/
 theorem pow_mem_commutator (h : IsIrreducibleCoprimeAction φ) {p : ℕ} (hp : p.Prime)
     (hpG : IsPGroup p G) (x : G) : x ^ p ∈ _root_.commutator G := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   rw [← h.frattini_eq_commutator]
   exact Ch01.pow_mem_frattini_of_isPGroup hpG x
 
@@ -408,7 +408,7 @@ theorem actionCommutator_eq_bot_of_isPGroup_two_of_fixes_pow_four
       · exact congrArg Subtype.val
           ((actionCommutator_eq_bot_iff_acts_trivially _).mp hbot a ⟨x, hx⟩)
       · have hHp : IsPGroup 2 ↥H := hG.to_subgroup H
-        haveI : Group.IsNilpotent ↥H := hHp.isNilpotent
+        have : Group.IsNilpotent ↥H := hHp.isNilpotent
         have hcop : Nat.Coprime (Nat.card A) (Nat.card ↥H) := by
           obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := 2) (G := ↥H)).mp hHp
           rw [hk]

@@ -64,7 +64,7 @@ theorem card_sup_eq_mul_of_commute {A B : Subgroup G'}
     exact ⟨a, ha, b, hb, rfl⟩
   have hbot : B ⊓ A = ⊥ := by rw [inf_comm]; exact hinf
   have hcompl := (Subgroup.isComplement'_subgroupOf_of_disjoint_mul_eq_univ
-    (le_sup_right : B ≤ A ⊔ B) (le_sup_left : A ≤ A ⊔ B) hbot hmul).card_mul
+    (le_sup_right : B ≤ A ⊔ B) (le_sup_left : A ≤ A ⊔ B) hbot hmul).card_mul_card
   have hAc : Nat.card ↥(A.subgroupOf (A ⊔ B)) = Nat.card ↥A :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv
   have hBc : Nat.card ↥(B.subgroupOf (A ⊔ B)) = Nat.card ↥B :=
@@ -98,7 +98,7 @@ theorem inf_centralizer_eq_of_index_sq_of_not_comm {K Z : Subgroup G'} {p : ℕ}
     (hnc : ¬ ∀ x ∈ K, ∀ y ∈ K, x * y = y * x) :
     K ⊓ Subgroup.centralizer (K : Set G') = Z := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   set C : Subgroup G' := K ⊓ Subgroup.centralizer (K : Set G') with hC_def
   have hCK : C ≤ K := inf_le_left
   obtain ⟨a, ha⟩ := Subgroup.card_dvd_of_le hZ
@@ -127,7 +127,7 @@ theorem inf_centralizer_eq_of_index_sq_of_not_comm {K Z : Subgroup G'} {p : ℕ}
   have hb1 : b ≠ 1 := by
     intro h
     apply hnotcyc
-    haveI : Subsingleton (↥K ⧸ Subgroup.center ↥K) := by
+    have : Subsingleton (↥K ⧸ Subgroup.center ↥K) := by
       have h0 : Nat.card (↥K ⧸ Subgroup.center ↥K) = 1 := by rw [hcardq, h]
       exact (Nat.card_eq_one_iff_unique.mp h0).1
     exact isCyclic_of_subsingleton
@@ -158,9 +158,9 @@ theorem commutator_le_of_card_eq_prime_sq_mul {K N : Subgroup G'} {p : ℕ}
     (hcard : Nat.card ↥K = p ^ 2 * Nat.card ↥N) :
     ⁅K, K⁆ ≤ N := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   set Ns : Subgroup ↥K := N.subgroupOf K with hNs_def
-  haveI hNsn : Ns.Normal := by
+  have hNsn : Ns.Normal := by
     constructor
     intro n hn g
     rw [hNs_def, Subgroup.mem_subgroupOf] at hn ⊢
@@ -174,7 +174,7 @@ theorem commutator_le_of_card_eq_prime_sq_mul {K N : Subgroup G'} {p : ℕ}
     have h2 : Nat.card ↥N * Nat.card (↥K ⧸ Ns) = Nat.card ↥N * p ^ 2 := by
       rw [h1]; ring
     exact Nat.eq_of_mul_eq_mul_left hpos h2
-  haveI : IsMulCommutative (↥K ⧸ Ns) :=
+  have : IsMulCommutative (↥K ⧸ Ns) :=
     IsPGroup.isMulCommutative_of_card_eq_prime_sq (p := p) hidx
   have hcomm : _root_.commutator ↥K ≤ Ns :=
     Subgroup.Normal.quotient_commutative_iff_commutator_le.mp inferInstance
@@ -191,7 +191,7 @@ theorem finset_card_prime_subgroups_le {E : Subgroup G'} {p : ℕ} (hp : p.Prime
     (hmem : ∀ A ∈ 𝒮, A ≤ E ∧ Nat.card ↥A = p) :
     𝒮.card ≤ p + 1 := by
   classical
-  haveI := Fintype.ofFinite G'
+  have := Fintype.ofFinite G'
   have hpairinf : ∀ A ∈ 𝒮, ∀ B ∈ 𝒮, A ≠ B → A ⊓ B = ⊥ := by
     intro A hA B hB hne
     obtain ⟨-, hAc⟩ := hmem A hA
@@ -293,7 +293,7 @@ theorem card_eq_of_forall_zpowers_mem {E : Subgroup G'} {p : ℕ} (hp : p.Prime)
     (hall : ∀ x ∈ E, x ≠ 1 → Subgroup.zpowers x ∈ 𝒮) :
     𝒮.card = p + 1 := by
   classical
-  haveI := Fintype.ofFinite G'
+  have := Fintype.ofFinite G'
   have hpairinf : ∀ A ∈ 𝒮, ∀ B ∈ 𝒮, A ≠ B → A ⊓ B = ⊥ := by
     intro A hA B hB hne
     obtain ⟨-, hAc⟩ := hmem A hA
@@ -394,7 +394,7 @@ theorem ncard_prime_subgroups_eq {E : Subgroup G'} {p : ℕ} (hp : p.Prime)
     (hE : Nat.card ↥E = p ^ 2) (hord : ∀ x ∈ E, x ≠ 1 → orderOf x = p) :
     {A : Subgroup G' | A ≤ E ∧ Nat.card ↥A = p}.ncard = p + 1 := by
   classical
-  haveI := Fintype.ofFinite G'
+  have := Fintype.ofFinite G'
   set 𝒮 : Finset (Subgroup G') :=
     ((E : Set G').toFinset \ {1}).image (fun x => Subgroup.zpowers x) with h𝒮_def
   have hmem : ∀ A ∈ 𝒮, A ≤ E ∧ Nat.card ↥A = p := by
@@ -416,7 +416,7 @@ theorem ncard_prime_subgroups_eq {E : Subgroup G'} {p : ℕ} (hp : p.Prime)
   have hset : (𝒮 : Set (Subgroup G'))
       = {A : Subgroup G' | A ≤ E ∧ Nat.card ↥A = p} := by
     ext A
-    simp only [Finset.mem_coe, Set.mem_setOf_eq]
+    simp only [Finset.mem_coe, Set.mem_ofPred_eq]
     refine ⟨fun hA => hmem A hA, fun hA => ?_⟩
     exact mem_of_card_eq_of_prime_subgroups hp hE 𝒮 hmem hcard hA.1 hA.2
   rw [← hset, Set.ncard_coe_finset, hcard]
@@ -430,7 +430,7 @@ theorem ncard_prime_subgroups_ne_eq {E Z : Subgroup G'} {p : ℕ} (hp : p.Prime)
   have hsplit : {A : Subgroup G' | A ≤ E ∧ Nat.card ↥A = p ∧ A ≠ Z}
       = {A : Subgroup G' | A ≤ E ∧ Nat.card ↥A = p} \ {Z} := by
     ext A
-    simp only [Set.mem_setOf_eq, Set.mem_sdiff, Set.mem_singleton_iff]
+    simp only [Set.mem_ofPred_eq, Set.mem_sdiff, Set.mem_singleton_iff]
     tauto
   have hZmem : Z ∈ {A : Subgroup G' | A ≤ E ∧ Nat.card ↥A = p} := ⟨hZE, hZc⟩
   rw [hsplit, Set.ncard_sdiff_singleton_of_mem hZmem,
@@ -512,7 +512,7 @@ theorem zpowers_mul_t_sup_P_le_center_sup
           (((fc.invImageF model
             ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)))
               : Subgroup G) : Set G) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   set R : Subgroup G := fc.invImageF model with hR_def
   set Sg : Subgroup G :=
@@ -568,7 +568,7 @@ theorem card_zpowers_sup_P_eq_nine
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
     Nat.card ↥(Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
         * fc.toHypothesis.t) ⊔ fc.P) = 9 := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨-, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
   have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
@@ -602,7 +602,7 @@ theorem orderOf_eq_three_of_mem_zpowers_sup_P
     (hx : x ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
         * fc.toHypothesis.t) ⊔ fc.P) (hx1 : x ≠ 1) :
     orderOf x = 3 := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨-, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
   have hm : Nat.card F = fc.p ^ 2 := by rw [hF9, hp3]; norm_num
@@ -640,7 +640,7 @@ theorem ncard_lineSetTwo
     (ind : Hypothesis.TheoremAInductionBelow G Ω)
     (hB2 : ¬ fc.p ∣ Nat.card (Abelianization G)) :
     fc.lineSetTwo.ncard = 3 := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨-, hp3, -, -, -, -⟩ := fc.step_twelve model ind hB2
   have hstord : orderOf (fc.toHypothesis.distinguishedInvolution
@@ -678,7 +678,7 @@ theorem inf_centralizer_sup_eq_zpowers_sup_P
               : Subgroup G) : Set G)
       = Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
           * fc.toHypothesis.t) ⊔ fc.P := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   -- case (10.2) numerics
   obtain ⟨hpSig, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
@@ -742,7 +742,7 @@ theorem commutator_sup_eq_zpowers
           ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G))⁆
       = Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
           * fc.toHypothesis.t) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   obtain ⟨hpSig, hp3, hF9, -, -, -⟩ := fc.step_twelve model ind hB2
   obtain ⟨-, -, -, hSig3, -⟩ :=
@@ -892,7 +892,7 @@ theorem conj_mem_zpowers_of_mem_normalizer_sup
       * fc.toHypothesis.t)) :
     g * x * g⁻¹ ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
       * fc.toHypothesis.t) := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   set K : Subgroup G := fc.invImageF model
     ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) with hK_def
@@ -932,7 +932,7 @@ theorem conj_mem_zpowers_sup_P_of_mem_normalizer_sup
         * fc.toHypothesis.t) ⊔ fc.P) :
     g * x * g⁻¹ ∈ Subgroup.zpowers (fc.toHypothesis.distinguishedInvolution
       * fc.toHypothesis.t) ⊔ fc.P := by
-  letI := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
+  let := fc.toHypothesis.centralizerQuotientMulAction fc.P_le_V
   classical
   set K : Subgroup G := fc.invImageF model
     ⊔ (fc.toHypothesis.W ⊓ Subgroup.centralizer (fc.P : Set G)) with hK_def

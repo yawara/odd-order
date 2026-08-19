@@ -60,9 +60,9 @@ theorem false_of_coherentXunionYset_caseA_of_not_coherentS
     (hncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) : False := by
   classical
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
-  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
-  haveI := hyp.centralCommutator_normal
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  have := hyp.centralCommutator_normal
   -- break pair on `Sa = X(Zc) ∪ Y`, `Sb = S`.
   have hSaSb : hyp.Xset hyp.centralCommutator ∪ hyp.Yset ⊆ hyp.S := by
     rintro φ (hX | hY)
@@ -87,7 +87,7 @@ theorem false_of_coherentXunionYset_caseA_of_not_coherentS
   -- `Zc ≤ Z(H)`).
   have hψS : ψ ∈ hyp.S := hψSb
   have hψSeq := hψS
-  rw [hyp.S_eq, Set.mem_setOf_eq] at hψSeq
+  rw [hyp.S_eq, Set.mem_ofPred_eq] at hψSeq
   obtain ⟨θ, hθne, hψeq⟩ := hψSeq
   obtain ⟨d, hdpos, hθd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
   have hdsq : d ^ 2 ≤ Nat.card (↥H ⧸ hyp.centralCommutator.subgroupOf H) := by
@@ -160,8 +160,8 @@ theorem nonempty_coherent_S_caseA_of_c2
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
   classical
-  haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
-  haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+  have : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+  have : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
   by_contra hncoh
   set cert := h46.toCertainTypeHypothesis with hcertdef
   have hXirr : ∀ φ ∈ hyp.Xset hyp.centralCommutator, IsIrreducibleCharacter φ :=
@@ -248,10 +248,10 @@ theorem nonempty_coherent_S_caseA_of_c2
     omega
   -- `2 ≤ |H:Zc|` from `Zc ≤ H′ ⊊ H`.
   have hZ2 : 2 ≤ Nat.card (↥H ⧸ hyp.centralCommutator.subgroupOf H) := by
-    haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
-    letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+    have : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
+    let : Group.IsNilpotent ↥H := hyp.H_nilpotent
     have hcommlt : (⁅H, H⁆ : Subgroup ↥L) < H := by
-      have h1 : _root_.commutator ↥H < ⊤ := IsSolvable.commutator_lt_top_of_nontrivial ↥H
+      have h1 : _root_.commutator ↥H < ⊤ := Group.IsSolvable.commutator_lt_top_of_nontrivial ↥H
       rw [← commutator_subgroupOf_self] at h1
       refine lt_of_le_of_ne (Subgroup.commutator_le_left H H) (fun heq => ?_)
       rw [heq, Subgroup.subgroupOf_self] at h1

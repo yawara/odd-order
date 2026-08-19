@@ -93,7 +93,7 @@ theorem Q_inf_centralizer_singleton_eq_Q0_of_orderThree
         Nat.card E = 4 ∧ ∀ x ∈ E, x ^ 2 = 1 := by
     simpa only [X] using
       hyp.exists_four_subgroup_centralizer_zpowers_of_mem_W hw
-  letI := hyp.centralizerQuotientMulAction hXV
+  let := hyp.centralizerQuotientMulAction hXV
   obtain ⟨tri⟩ :=
     hyp.centralizer_trichotomy_of_induction hXV hX hA3 inductionHypothesis
   let C : Subgroup G := Subgroup.centralizer (X : Set G)

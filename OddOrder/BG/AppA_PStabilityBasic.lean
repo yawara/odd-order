@@ -118,13 +118,13 @@ theorem thmA1
   obtain ⟨_hP_comm, hG'_le_P⟩ :=
     OddOrder.BG.Ch1.S02.odd_two_dim_sylow_abelian hodd hdim ρ hfaithful hp_dvd ‹CharP F p› P
   -- 3. P normal in G (commutator G ≤ P)
-  haveI hP_normal : (P : Subgroup G).Normal := by
+  have hP_normal : (P : Subgroup G).Normal := by
     apply Subgroup.Normal.of_commutator_le (H := (P : Subgroup G))
     exact hG'_le_P
   -- 4. P is a p-group
   have hP_pgroup : IsPGroup p (↥(P : Subgroup G)) := P.isPGroup'
   -- 5. V is nontrivial (dim = 2)
-  haveI hV_nontriv : Nontrivial V :=
+  have hV_nontriv : Nontrivial V :=
     Module.nontrivial_of_finrank_pos (R := F) (M := V) (by rw [hdim]; norm_num)
   -- 6. ⊤ ≠ ⊥ in Submodule F V
   have hV_ne_bot : (⊤ : Submodule F V) ≠ ⊥ := by
@@ -302,8 +302,8 @@ theorem quadratic_two_generated_irreducible_finrank_eq_two
     intro v _
     change Ty (Tx v) ∈ V_2
     exact hW2_le_V2 ⟨Tx v, rfl⟩
-  haveI hV2_fd : FiniteDimensional F V_2 := inferInstance
-  haveI hV2_nontriv : Nontrivial (V_2 : Submodule F V) :=
+  have hV2_fd : FiniteDimensional F V_2 := inferInstance
+  have hV2_nontriv : Nontrivial (V_2 : Submodule F V) :=
     Submodule.nontrivial_iff_ne_bot.mpr hV2_ne_bot
   let T : V_2 →ₗ[F] V_2 := (Ty * Tx : Module.End F V).restrict hT_maps
   -- T has eigenvalue μ
@@ -384,7 +384,7 @@ theorem quadratic_two_generated_irreducible_finrank_eq_two
   have hv_in_U : v ∈ U := Submodule.subset_span (Set.mem_insert _ _)
   have hTxv_in_U : Tx v ∈ U := Submodule.subset_span (by simp)
   -- "g preserves U" forms a subgroup; contains x, y; ⟨x, y⟩ = ⊤ ⇒ all g preserve U
-  haveI hU_fd : FiniteDimensional F U := inferInstance
+  have hU_fd : FiniteDimensional F U := inferInstance
   -- Build the "stabilizer" subgroup
   let stab : Subgroup G :=
     { carrier := { g | ∀ u ∈ U, ρ g u ∈ U }
@@ -525,7 +525,7 @@ theorem thmA2
     quadratic_two_generated_irreducible_finrank_eq_two ρ hfaithful hirr
       x y hgen hx hxne hy hyne
   -- Step 2: (ρ x)^p = 1 via Frobenius
-  haveI : CharP (Module.End F V) p := IsPGroup.charP_End_of_field
+  have : CharP (Module.End F V) p := IsPGroup.charP_End_of_field
   have hp_prime : p.Prime := Fact.out
   -- (ρ x - 1)^p = (ρ x - 1)^(p-2) * (ρ x - 1)^2 = (ρ x - 1)^(p-2) * 0 = 0
   have hN_p_zero : ((ρ x : Module.End F V) - 1) ^ p = 0 := by
@@ -774,17 +774,17 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
       fun a b hab => Subtype.ext (hfaithful hab)
     -- Well-foundedness for `Subrepresentation ρ_H` via toSubmodule embedding.
     -- `Submodule F V` has WF (both directions) for finite-dim V.
-    haveI hwf_LT : WellFoundedLT (Subrepresentation ρ_H) := by
+    have hwf_LT : WellFoundedLT (Subrepresentation ρ_H) := by
       apply StrictMono.wellFoundedLT (f := Subrepresentation.toSubmodule)
       intros a b hab
       exact lt_of_le_of_ne hab.le
         (fun h => hab.ne (Subrepresentation.toSubmodule_injective h))
-    haveI hwf_GT : WellFoundedGT (Subrepresentation ρ_H) := by
+    have hwf_GT : WellFoundedGT (Subrepresentation ρ_H) := by
       apply StrictMono.wellFoundedGT (f := Subrepresentation.toSubmodule)
       intros a b hab
       exact lt_of_le_of_ne hab.le
         (fun h => hab.ne (Subrepresentation.toSubmodule_injective h))
-    haveI : Nonempty (Subrepresentation ρ_H) := ⟨⊥⟩
+    have : Nonempty (Subrepresentation ρ_H) := ⟨⊥⟩
     -- Get covBy chain in `Subrepresentation ρ_H`
     obtain ⟨a, h_min, n, h_max, h_cov⟩ :=
       exists_covBy_seq_of_wellFoundedLT_wellFoundedGT (Subrepresentation ρ_H)
@@ -818,7 +818,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
         rw [← List.prod_replicate, ← List.eq_replicate_of_mem hall,
           Nat.prod_primeFactorsList hH_card_ne_zero]
       -- A.2: Cauchy で q ∈ ↥H, orderOf q = r
-      haveI : Fact r.Prime := ⟨hr_prime⟩
+      have : Fact r.Prime := ⟨hr_prime⟩
       obtain ⟨q, hq_order⟩ : ∃ q : ↥H, orderOf q = r :=
         exists_prime_orderOf_dvd_card' r hr_dvd
       -- q ≠ 1
@@ -837,7 +837,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
       have hQ_card : Nat.card ↥Q = r := by
         rw [Nat.card_zpowers]; exact hq_order
       -- (Nat.card ↥Q : F) ≠ 0 since r ≠ p = char F
-      haveI hQ_nezero : NeZero ((Nat.card ↥Q : F)) := by
+      have hQ_nezero : NeZero ((Nat.card ↥Q : F)) := by
         constructor
         intro h_zero
         rw [hQ_card] at h_zero
@@ -847,7 +847,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
         rcases hr_prime.eq_one_or_self_of_dvd p hp_dvd_r with h1 | h2
         · exact hp_prime.one_lt.ne' h1
         · exact hr_ne_p h2.symm
-      haveI : Finite ↥Q := inferInstance
+      have : Finite ↥Q := inferInstance
       -- A.4: Apply coprime_action_trivial_chain to ρ_Q
       have h_Q_triv : ∀ (g : ↥Q) (v : V), ρ_Q g v = v := by
         apply OddOrder.GroupTheory.RepresentationTheory.coprime_action_trivial_chain
@@ -963,10 +963,10 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
         intro w hw
         have hw_subt : (⟨w, hw⟩ : ↥aip1_top) ∈ ai_in_aip1 := by rw [h_eq]; trivial
         exact hw_subt
-      haveI hV_quot_nontriv : Nontrivial (↥aip1_top ⧸ ai_in_aip1) := by
+      have hV_quot_nontriv : Nontrivial (↥aip1_top ⧸ ai_in_aip1) := by
         rw [Submodule.Quotient.nontrivial_iff]
         exact h_ai_in_aip1_ne_top
-      haveI hV_quot_finite : Module.Finite F (↥aip1_top ⧸ ai_in_aip1) :=
+      have hV_quot_finite : Module.Finite F (↥aip1_top ⧸ ai_in_aip1) :=
         Module.Finite.of_surjective ai_in_aip1.mkQ ai_in_aip1.mkQ_surjective
       -- Step 7e: ρ_quot : Representation F ↥H (↥aip1_top ⧸ ai_in_aip1)
       have h_inv_aip1 : ∀ g : ↥H,
@@ -978,7 +978,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
       let ρ_quot : Representation F ↥H (↥aip1_top ⧸ ai_in_aip1) :=
         Representation.quotient (a (i + 1)).toRepresentation ai_in_aip1 h_inv_aip1
       -- Step 7f: N_i acts trivially on V_quot (= IsTrivial ρ_quot.comp N_i.subtype)
-      haveI hN_i_triv :
+      have hN_i_triv :
           Representation.IsTrivial (ρ_quot.comp N_i.subtype) := by
         constructor
         intro n
@@ -992,7 +992,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
         change ρ_H (N_i.subtype n) w.val - w.val ∈ (a i).toSubmodule
         exact n.property w.val w.property
       -- Step 7g: ρ_bar : Representation F (↥H ⧸ N_i) (V_quot)
-      haveI := hN_i_normal
+      have := hN_i_normal
       let ρ_bar : Representation F (↥H ⧸ N_i) (↥aip1_top ⧸ ai_in_aip1) :=
         Representation.ofQuotient ρ_quot N_i
       -- Step 7h: ρ_bar faithful
@@ -1267,7 +1267,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
             rw [this, one_zpow]
           exact h_pow_g
         -- ρ_bar.invariants ≠ ⊥
-        haveI hHN_finite : Finite (↥H ⧸ N_i) := inferInstance
+        have hHN_finite : Finite (↥H ⧸ N_i) := inferInstance
         have h_VQ_top_ne_bot : (⊤ : Submodule F (↥aip1_top ⧸ ai_in_aip1)) ≠ ⊥ := by
           intro h_bot
           obtain ⟨v, hv⟩ := exists_ne (0 : ↥aip1_top ⧸ ai_in_aip1)
@@ -1335,7 +1335,7 @@ theorem thmA3 [Finite G] (_hp_odd : p ≠ 2)
           · subst hz; rw [hy_bar_one]; exact one_mem _
         exact h_HN_not_pgroup_via x x_subt rfl hxp h_zpow_x
       -- Step 8: Apply thmA2 + Lagrange
-      haveI : Finite (↥H ⧸ N_i) := inferInstance
+      have : Finite (↥H ⧸ N_i) := inferInstance
       have h_HN_even : ¬ Odd (Nat.card (↥H ⧸ N_i)) :=
         thmA2 _hp_odd ρ_bar hρ_bar_faithful hρ_bar_irr x_bar y_bar h_gen_bar
           hx_bar_sq hx_bar_ne hy_bar_sq hy_bar_ne

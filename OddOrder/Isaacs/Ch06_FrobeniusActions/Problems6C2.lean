@@ -102,7 +102,7 @@ theorem exists_family_subgroups_card_prime {A : Type*} [Group A] [Finite A] {p :
     ∃ B : Fin (p + 1) → Subgroup A, (∀ i, Nat.card ↥(B i) = p) ∧
       (∀ i j, i ≠ j → B i ⊔ B j = ⊤) := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   -- 位数 `p` の元 `x`, および `⟨x⟩` の外の元 `y`
   have horder : ∀ u : A, u ≠ 1 → orderOf u = p := by
     intro u hu
@@ -295,7 +295,7 @@ theorem exists_family_nilpotent_subgroups_of_card_prime_sq
       (∀ i j, i ≠ j → K i ⊓ K j = ⊥) := by
   classical
   obtain ⟨B, hBcard, hBsup⟩ := exists_family_subgroups_card_prime hp hA hcomm hcard
-  haveI hBnt : ∀ i, Nontrivial ↥(B i) := by
+  have hBnt : ∀ i, Nontrivial ↥(B i) := by
     intro i
     refine Finite.one_lt_card_iff_nontrivial.mp ?_
     rw [hBcard i]
@@ -335,7 +335,7 @@ theorem exists_family_nilpotent_subgroups_of_card_prime_sq
       rcases eq_or_ne i ⟨0, by omega⟩ with rfl | hne
       · exact ⟨⟨1, by omega⟩, by simp [Fin.ext_iff]⟩
       · exact ⟨⟨0, by omega⟩, hne⟩
-    letI actKi : MulDistribMulAction A ↥(fixedSubgroup (B i) : Subgroup N) :=
+    let actKi : MulDistribMulAction A ↥(fixedSubgroup (B i) : Subgroup N) :=
       IsFrobeniusAction.invariantSubgroupMulDistribMulAction _ (hinv i)
     have hFrob : IsFrobeniusAction ↥(B j) ↥(fixedSubgroup (B i) : Subgroup N) := by
       intro b hb m hm hsmul
@@ -366,7 +366,7 @@ theorem not_dvd_card_of_fixedFree_of_isPGroup {A N : Type*} [Group A] [Finite A]
     [Finite N] [MulDistribMulAction A N] {p : ℕ} (hp : p.Prime) (hA : IsPGroup p A)
     (hfixA : ∀ n : N, (∀ a : A, a • n = n) → n = 1) : ¬ p ∣ Nat.card N := by
   classical
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   intro hdvd
   -- `A`-不変 Sylow `p`-部分群を取る
   obtain ⟨P, hPfix⟩ : ∃ P : Sylow p N, ∀ a : A, a • P = P := by
@@ -391,7 +391,7 @@ theorem not_dvd_card_of_fixedFree_of_isPGroup {A N : Type*} [Group A] [Finite A]
     exact Subgroup.smul_mem_pointwise_smul m a _ hm
   -- `P` は非自明な `p`-群
   have hPbot : (P : Subgroup N) ≠ ⊥ := P.ne_bot_of_dvd_card hdvd
-  haveI hPnt : Nontrivial ↥(P : Subgroup N) := (Subgroup.nontrivial_iff_ne_bot _).mpr hPbot
+  have hPnt : Nontrivial ↥(P : Subgroup N) := (Subgroup.nontrivial_iff_ne_bot _).mpr hPbot
   have hPcard : p ∣ Nat.card ↥(P : Subgroup N) := by
     obtain ⟨k, hk⟩ := P.2.exists_card_eq
     rcases Nat.eq_zero_or_pos k with rfl | hk1
@@ -400,7 +400,7 @@ theorem not_dvd_card_of_fixedFree_of_isPGroup {A N : Type*} [Group A] [Finite A]
     · rw [hk]
       exact dvd_pow_self p (by omega)
   -- `A` の `↥P` への作用 (不変部分群への制限)
-  letI actP : MulDistribMulAction A ↥(P : Subgroup N) :=
+  let actP : MulDistribMulAction A ↥(P : Subgroup N) :=
     IsFrobeniusAction.invariantSubgroupMulDistribMulAction _ hPinv
   have hmod : Nat.card ↥(P : Subgroup N)
       ≡ Nat.card (MulAction.fixedPoints A ↥(P : Subgroup N)) [MOD p] :=
@@ -419,7 +419,7 @@ theorem not_dvd_card_of_fixedFree_of_isPGroup {A N : Type*} [Group A] [Finite A]
     · rw [mul_zero] at ht
       omega
     · exact le_trans h2 (by rw [ht]; exact Nat.le_mul_of_pos_right p htpos)
-  haveI : Nontrivial ↥(MulAction.fixedPoints A ↥(P : Subgroup N)) :=
+  have : Nontrivial ↥(MulAction.fixedPoints A ↥(P : Subgroup N)) :=
     Finite.one_lt_card_iff_nontrivial.mp (by omega)
   obtain ⟨u, v, huv⟩ := ‹Nontrivial ↥(MulAction.fixedPoints A ↥(P : Subgroup N))›
   -- `u`, `v` のどちらかは単位元でない
@@ -442,12 +442,12 @@ theorem exists_max_qSubgroup_le_of_isNilpotent {N : Type*} [Group N] [Finite N]
     ∃ Q : Subgroup N, Q ≤ K ∧ IsPGroup q ↥Q ∧
       ∀ R : Subgroup N, R ≤ K → IsPGroup q ↥R → R ≤ Q := by
   classical
-  haveI : Fact q.Prime := ⟨hq⟩
-  haveI := hK
+  have : Fact q.Prime := ⟨hq⟩
+  have := hK
   obtain ⟨S⟩ : Nonempty (Sylow q ↥K) := inferInstance
   have hSnormal : ((S : Subgroup ↥K)).Normal :=
     Sylow.normal_of_normalizerCondition Group.normalizerCondition_of_isNilpotent S
-  haveI hU : Unique (Sylow q ↥K) := Sylow.unique_of_normal S hSnormal
+  have hU : Unique (Sylow q ↥K) := Sylow.unique_of_normal S hSnormal
   refine ⟨(S : Subgroup ↥K).map K.subtype, ?_, ?_, ?_⟩
   · rintro _ ⟨u, _, rfl⟩
     exact u.2
@@ -484,6 +484,7 @@ theorem smul_mem_of_max_qSubgroup {A N : Type*} [Group A] [Group N] [Finite N]
 /-! ### `MulDistribMulAction` と Ch.3/Ch.4 の `IsAInvariant` の橋渡し -/
 
 open Pointwise in
+set_option backward.isDefEq.respectTransparency false in
 /-- 元ごとの不変性から `IsAInvariant` (Ch.3/Ch.4 の A-不変性) へ。 -/
 theorem isAInvariant_of_smul_mem {A N : Type*} [Group A] [Group N]
     [MulDistribMulAction A N] {H : Subgroup N} (h : ∀ a : A, ∀ m ∈ H, a • m ∈ H) :
@@ -501,6 +502,7 @@ theorem isAInvariant_of_smul_mem {A N : Type*} [Group A] [Group N]
   rw [smul_smul, mul_inv_cancel, one_smul]
 
 open Pointwise in
+set_option backward.isDefEq.respectTransparency false in
 /-- `IsAInvariant` から元ごとの不変性へ。 -/
 theorem smul_mem_of_isAInvariant {A N : Type*} [Group A] [Group N]
     [MulDistribMulAction A N] {H : Subgroup N}
@@ -516,14 +518,14 @@ theorem smul_mem_of_isAInvariant {A N : Type*} [Group A] [Group N]
 /-- **`C_N(A) = 1` なら `A`-不変 Sylow `q`-部分群は一意**: Isaacs Thm 3.23(b) の共役元は
 `C_N(A)` に入るので自明。 -/
 theorem aInvariant_sylow_unique {A N : Type*} [Group A] [Finite A] [Group N] [Finite N]
-    [MulDistribMulAction A N] [IsSolvable A] {q : ℕ} [Fact q.Prime]
+    [MulDistribMulAction A N] [Group.IsSolvable A] {q : ℕ} [Fact q.Prime]
     (hCop : Nat.Coprime (Nat.card A) (Nat.card N))
     (hfixA : ∀ n : N, (∀ a : A, a • n = n) → n = 1) {S T : Sylow q N}
     (hS : ∀ a : A, ∀ m ∈ (S : Subgroup N), a • m ∈ (S : Subgroup N))
     (hT : ∀ a : A, ∀ m ∈ (T : Subgroup N), a • m ∈ (T : Subgroup N)) :
     (S : Subgroup N) = (T : Subgroup N) := by
   obtain ⟨c, hcfix, hconj⟩ :=
-    OddOrder.Isaacs.Ch04.aInvariant_sylow_conj hCop (Or.inl ‹IsSolvable A›)
+    OddOrder.Isaacs.Ch04.aInvariant_sylow_conj hCop (Or.inl ‹Group.IsSolvable A›)
       (isAInvariant_of_smul_mem hS) (isAInvariant_of_smul_mem hT)
   have hc1 : c = 1 := hfixA c fun a => hcfix a
   rw [hc1] at hconj
@@ -532,7 +534,7 @@ theorem aInvariant_sylow_unique {A N : Type*} [Group A] [Finite A] [Group N] [Fi
 /-- **`A`-不変 `q`-部分群は (唯一の) `A`-不変 Sylow `q`-部分群に含まれる**:
 Cor 3.25 で `A`-不変 Sylow に入れ, 一意性で目的の `S` に一致させる。 -/
 theorem le_sylow_of_aInvariant_qSubgroup {A N : Type*} [Group A] [Finite A] [Group N] [Finite N]
-    [MulDistribMulAction A N] [IsSolvable A] {q : ℕ} [Fact q.Prime]
+    [MulDistribMulAction A N] [Group.IsSolvable A] {q : ℕ} [Fact q.Prime]
     (hCop : Nat.Coprime (Nat.card A) (Nat.card N))
     (hfixA : ∀ n : N, (∀ a : A, a • n = n) → n = 1) {S : Sylow q N}
     (hS : ∀ a : A, ∀ m ∈ (S : Subgroup N), a • m ∈ (S : Subgroup N))
@@ -540,7 +542,7 @@ theorem le_sylow_of_aInvariant_qSubgroup {A N : Type*} [Group A] [Finite A] [Gro
     R ≤ (S : Subgroup N) := by
   obtain ⟨T, hTinv, hRT⟩ :=
     OddOrder.Isaacs.Ch04.aInvariant_pSubgroup_le_aInvariant_sylow hCop
-      (Or.inl ‹IsSolvable A›) hRq (isAInvariant_of_smul_mem hRinv)
+      (Or.inl ‹Group.IsSolvable A›) hRq (isAInvariant_of_smul_mem hRinv)
   rw [← aInvariant_sylow_unique hCop hfixA (smul_mem_of_isAInvariant hTinv) hS]
   exact hRT
 
@@ -598,9 +600,9 @@ theorem exists_sylow_eq_iSup_maxQSubgroup {A N : Type*} [Group A] [Finite A] [Gr
     ∃ S : Sylow q N,
       (S : Subgroup N) = ⨆ D : {D : Subgroup A // Nat.card ↥D = p}, Qf (D : Subgroup A) := by
   classical
-  haveI : Fact q.Prime := ⟨hq⟩
-  haveI hsolvA : IsSolvable A := isSolvable_of_comm hcomm
-  haveI hcommA : IsMulCommutative A := ⟨⟨hcomm⟩⟩
+  have : Fact q.Prime := ⟨hq⟩
+  have hsolvA : Group.IsSolvable A := Group.isSolvable_of_comm hcomm
+  have hcommA : IsMulCommutative A := ⟨⟨hcomm⟩⟩
   have hCop := coprime_card_of_fixedFree hp hcardA hfixA
   have hnc := not_isCyclic_of_card_prime_sq hp hA hcardA
   obtain ⟨S, hSinvA⟩ :=
@@ -610,7 +612,7 @@ theorem exists_sylow_eq_iSup_maxQSubgroup {A N : Type*} [Group A] [Finite A] [Gr
     smul_mem_of_isAInvariant hSinvA
   refine ⟨S, le_antisymm ?_ ?_⟩
   · -- `S ≤ X` (Thm 6.21)
-    letI actS : MulDistribMulAction A ↥(S : Subgroup N) :=
+    let actS : MulDistribMulAction A ↥(S : Subgroup N) :=
       IsFrobeniusAction.invariantSubgroupMulDistribMulAction _ hS
     have hCopS : Nat.Coprime (Nat.card A) (Nat.card ↥(S : Subgroup N)) :=
       hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card _)
@@ -682,11 +684,11 @@ theorem isNilpotent_fixedSubgroup_of_card_prime {A N : Type*} [Group A] [Finite 
     intro h
     exact hy (h ▸ Subgroup.mem_zpowers y)
   have hsup : D ⊔ Subgroup.zpowers y = ⊤ := sup_eq_top_of_card_prime hp hcardA hD hEcard hDE
-  haveI hEnt : Nontrivial ↥(Subgroup.zpowers y) := by
+  have hEnt : Nontrivial ↥(Subgroup.zpowers y) := by
     refine Finite.one_lt_card_iff_nontrivial.mp ?_
     rw [hEcard]
     exact hp.one_lt
-  letI actK : MulDistribMulAction A ↥(fixedSubgroup D : Subgroup N) :=
+  let actK : MulDistribMulAction A ↥(fixedSubgroup D : Subgroup N) :=
     IsFrobeniusAction.invariantSubgroupMulDistribMulAction _ (smul_mem_fixedSubgroup hcomm D)
   have hFrob : IsFrobeniusAction ↥(Subgroup.zpowers y) ↥(fixedSubgroup D : Subgroup N) := by
     intro b hb m hm hsmul

@@ -50,7 +50,7 @@ omit [Finite A] in
 theorem exists_ne_one_fixed_of_isPGroup_of_dvd {p : ℕ} [Fact p.Prime] (hA : IsPGroup p A)
     (φ : A →* MulAut G) (hdvd : p ∣ Nat.card G) :
     ∃ g : G, g ≠ 1 ∧ ∀ a : A, (φ a) g = g := by
-  letI : MulDistribMulAction A G := MulDistribMulAction.compHom G φ
+  let : MulDistribMulAction A G := MulDistribMulAction.compHom G φ
   have hmod := hA.card_modEq_card_fixedPoints (α := G)
   have hdvdF : p ∣ Nat.card (MulAction.fixedPoints A G) := by
     have h0 : Nat.card G ≡ 0 [MOD p] := (Nat.modEq_zero_iff_dvd).mpr hdvd
@@ -60,7 +60,7 @@ theorem exists_ne_one_fixed_of_isPGroup_of_dvd {p : ℕ} [Fact p.Prime] (hA : Is
     Nat.card_pos_iff.mpr ⟨⟨⟨1, h1⟩⟩, inferInstance⟩
   have hlt : 1 < Nat.card (MulAction.fixedPoints A G) :=
     lt_of_lt_of_le (Fact.out : p.Prime).one_lt (Nat.le_of_dvd hpos hdvdF)
-  haveI : Nontrivial (MulAction.fixedPoints A G) := Finite.one_lt_card_iff_nontrivial.mp hlt
+  have : Nontrivial (MulAction.fixedPoints A G) := Finite.one_lt_card_iff_nontrivial.mp hlt
   obtain ⟨y, hy⟩ := exists_ne (⟨1, h1⟩ : MulAction.fixedPoints A G)
   refine ⟨(y : G), fun hy1 => hy (Subtype.ext hy1), fun a => ?_⟩
   exact y.2 a
@@ -121,13 +121,13 @@ omit [Finite A] in
 導来列の最後の非自明な項 `K` は可換で `A`-不変 (`IsAInvariant.derivedSeries`)。
 `p ∣ |K|` を取ると `K` の Sylow `p`-部分群 (`nilPiPart K {p}`) は一意なので
 `A`-不変 (`nilPiPart_map_mulAut`)。⚠ 半直積 `G ⋊ A` を作る必要はない。 -/
-theorem exists_isAInvariant_isPGroup_of_isSolvable [IsSolvable G] [Nontrivial G]
+theorem exists_isAInvariant_isPGroup_of_isSolvable [Group.IsSolvable G] [Nontrivial G]
     (φ : A →* MulAut G) :
     ∃ (p : ℕ) (H : Subgroup G), p.Prime ∧ H ≠ ⊥ ∧ IsPGroup p ↥H ∧
       OddOrder.Isaacs.Ch03.IsAInvariant φ H := by
   classical
   -- 導来列の最後の非自明な項 `K`
-  have hex : ∃ n, derivedSeries G n = ⊥ := IsSolvable.solvable
+  have hex : ∃ n, derivedSeries G n = ⊥ := Group.IsSolvable.solvable
   have hn : derivedSeries G (Nat.find hex) = ⊥ := Nat.find_spec hex
   have hn0 : Nat.find hex ≠ 0 := by
     intro h0
@@ -146,7 +146,7 @@ theorem exists_isAInvariant_isPGroup_of_isSolvable [IsSolvable G] [Nontrivial G]
     have hle := Subgroup.commutator_eq_bot_iff_le_centralizer.mp hbot
     intro x hx y hy
     exact (Subgroup.mem_centralizer_iff.mp (hle hy) x hx)
-  haveI hKnil : Group.IsNilpotent ↥K := by
+  have hKnil : Group.IsNilpotent ↥K := by
     refine ⟨⟨1, ?_⟩⟩
     rw [Subgroup.upperCentralSeries_one, eq_top_iff]
     intro a _
@@ -154,10 +154,10 @@ theorem exists_isAInvariant_isPGroup_of_isSolvable [IsSolvable G] [Nontrivial G]
     exact Subtype.ext (hKcomm b b.2 a a.2)
   -- `p ∣ |K|`
   have hKcard : 1 < Nat.card ↥K := by
-    haveI : Nontrivial ↥K := (Subgroup.nontrivial_iff_ne_bot K).mpr hKne
+    have : Nontrivial ↥K := (Subgroup.nontrivial_iff_ne_bot K).mpr hKne
     exact Finite.one_lt_card
   obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hKcard.ne'
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   have hpart := OddOrder.Isaacs.Ch03.isHallPart_nilPiPart (N := K) ({p} : Set ℕ) hKnil
   refine ⟨p, OddOrder.Isaacs.Ch03.nilPiPart K ({p} : Set ℕ), hp, ?_, ?_, ?_⟩
   · -- 非自明
@@ -193,7 +193,7 @@ Thm 3.23(a) で `B`-不変 Sylow `S` を取る。`a ∈ A` について `(φ a) 
 theorem exists_isAInvariant_sylow_of_normal_of_trivial_fixed (φ : A →* MulAut G)
     {B : Subgroup A} [B.Normal]
     (hcop : Nat.Coprime (Nat.card ↥B) (Nat.card G))
-    (hsolv : IsSolvable ↥B ∨ IsSolvable G)
+    (hsolv : Group.IsSolvable ↥B ∨ Group.IsSolvable G)
     (hfix : ∀ g : G, (∀ b : ↥B, (φ (b : A)) g = g) → g = 1)
     (q : ℕ) [Fact q.Prime] :
     ∃ S : Sylow q G, OddOrder.Isaacs.Ch03.IsAInvariant φ (S : Subgroup G) := by
@@ -248,7 +248,7 @@ universe u
 /-- 3E.1 (`A` 可解の場合) の帰納本体 (`|G|` に関する帰納)。 -/
 private theorem exists_isAInvariant_isPGroup_solvableA_aux :
     ∀ (n : ℕ) {G : Type u} [Group G] [Finite G] [Nontrivial G]
-      {A : Type*} [Group A] [Finite A] [IsSolvable A] (φ : A →* MulAut G),
+      {A : Type*} [Group A] [Finite A] [Group.IsSolvable A] (φ : A →* MulAut G),
       Nat.card G ≤ n →
       ∃ (p : ℕ) (H : Subgroup G), p.Prime ∧ H ≠ ⊥ ∧ IsPGroup p ↥H ∧
         OddOrder.Isaacs.Ch03.IsAInvariant φ H := by
@@ -272,7 +272,7 @@ private theorem exists_isAInvariant_isPGroup_solvableA_aux :
   by_cases hAtriv : Subsingleton Abar
   · -- 作用は自明: 任意の Sylow でよい
     obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd hGcard.ne'
-    haveI : Fact q.Prime := ⟨hq⟩
+    have : Fact q.Prime := ⟨hq⟩
     obtain ⟨S⟩ : Nonempty (Sylow q G) := inferInstance
     refine ⟨q, (S : Subgroup G), hq, ?_, S.isPGroup', ?_⟩
     · intro hbot
@@ -288,7 +288,7 @@ private theorem exists_isAInvariant_isPGroup_solvableA_aux :
       rw [Subsingleton.elim a 1, map_one]
       exact one_smul _ _
   · -- `Ā` は非自明: 極小正規部分群 `B` を取る
-    haveI : Nontrivial Abar := not_subsingleton_iff_nontrivial.mp hAtriv
+    have : Nontrivial Abar := not_subsingleton_iff_nontrivial.mp hAtriv
     have hBtop : (⊤ : Subgroup Abar) ≠ ⊥ := by
       intro h
       obtain ⟨x, hx⟩ := exists_ne (1 : Abar)
@@ -297,9 +297,10 @@ private theorem exists_isAInvariant_isPGroup_solvableA_aux :
       exact hx hxt
     obtain ⟨B, hB, -⟩ := OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal
       (⊤ : Subgroup Abar) hBtop
-    haveI hBnormal : B.Normal := hB.1
-    obtain ⟨p₀, hp₀, hBel⟩ := OddOrder.Isaacs.Ch03.solvable_minimal_normal_isElementaryAbelian hB
-    haveI : Fact p₀.Prime := ⟨hp₀⟩
+    have hBnormal : B.Normal := hB.1
+    obtain ⟨p₀, hp₀, hBel⟩ :=
+      OddOrder.Isaacs.Ch03.minimal_normal_isElementaryAbelian_of_isSolvable hB
+    have : Fact p₀.Prime := ⟨hp₀⟩
     have hBp : IsPGroup p₀ ↥B := fun g => ⟨1, by simpa using hBel.2 g⟩
     set C : Subgroup G := OddOrder.GroupTheory.fixedSubgroup ψ B with hC
     have hCinv : OddOrder.Isaacs.Ch03.IsAInvariant ψ C :=
@@ -307,7 +308,7 @@ private theorem exists_isAInvariant_isPGroup_solvableA_aux :
     -- `C ≠ ⊤` (`ψ` 単射 + `B ≠ ⊥`)
     have hCne : C ≠ ⊤ := by
       intro htop
-      haveI : Nontrivial ↥B := (Subgroup.nontrivial_iff_ne_bot B).mpr hB.2.1
+      have : Nontrivial ↥B := (Subgroup.nontrivial_iff_ne_bot B).mpr hB.2.1
       obtain ⟨b, hb⟩ := exists_ne (1 : ↥B)
       refine hb ?_
       have hfix : ∀ g : G, (ψ (b : Abar)) g = g := by
@@ -331,7 +332,7 @@ private theorem exists_isAInvariant_isPGroup_solvableA_aux :
         rw [hk]
         exact Nat.Coprime.pow_left _ ((Nat.Prime.coprime_iff_not_dvd hp₀).mpr hnotdvd)
       obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd hGcard.ne'
-      haveI : Fact q.Prime := ⟨hq⟩
+      have : Fact q.Prime := ⟨hq⟩
       obtain ⟨S, hS⟩ := exists_isAInvariant_sylow_of_normal_of_trivial_fixed ψ hcop
         (Or.inl inferInstance) (fun g hg => by
           have hgC : g ∈ C := fun l hl => hg ⟨l, hl⟩
@@ -347,7 +348,7 @@ private theorem exists_isAInvariant_isPGroup_solvableA_aux :
       have hlt : 1 < q ^ (Nat.card G).factorization q := Nat.one_lt_pow hfac.ne' hq.one_lt
       omega
     · -- case (ii): `↥C` に降りる
-      haveI : Nontrivial ↥C := (Subgroup.nontrivial_iff_ne_bot C).mpr hCbot
+      have : Nontrivial ↥C := (Subgroup.nontrivial_iff_ne_bot C).mpr hCbot
       have hClt : Nat.card ↥C < Nat.card G := by
         obtain ⟨x, hx⟩ : ∃ x : G, x ∉ C := by
           simpa [Subgroup.eq_top_iff'] using hCne
@@ -370,7 +371,7 @@ private theorem exists_isAInvariant_isPGroup_solvableA_aux :
 
 /-- **Isaacs Problem 3E.1** (`A` が可解な場合, 書籍 p. 106)。 -/
 theorem exists_isAInvariant_isPGroup_of_isSolvable_aut {G : Type u} [Group G] [Finite G]
-    [Nontrivial G] {A : Type*} [Group A] [Finite A] [IsSolvable A] (φ : A →* MulAut G) :
+    [Nontrivial G] {A : Type*} [Group A] [Finite A] [Group.IsSolvable A] (φ : A →* MulAut G) :
     ∃ (p : ℕ) (H : Subgroup G), p.Prime ∧ H ≠ ⊥ ∧ IsPGroup p ↥H ∧
       OddOrder.Isaacs.Ch03.IsAInvariant φ H :=
   exists_isAInvariant_isPGroup_solvableA_aux (Nat.card G) φ le_rfl
@@ -383,7 +384,7 @@ Thm 3.27 (`aInvariant_coset_mem_centralizer`) により `A`-固定点 `c'` を�
 `c'` は `C ∩ H` に入り `c'⁻¹c ∈ C ∩ K`。 -/
 theorem fixedSubgroup_top_eq_mul (φ : A →* MulAut G)
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G)
     {H K : Subgroup G} (hH : OddOrder.Isaacs.Ch03.IsAInvariant φ H)
     (hK : OddOrder.Isaacs.Ch03.IsAInvariant φ K)
     (hHK : ∀ g : G, ∃ h ∈ H, ∃ k ∈ K, g = h * k) :
@@ -467,7 +468,7 @@ theorem fixedSubgroup_toMulAutHom_top {φ : A →* MulAut G} {H : Subgroup G}
 `|P ⊓ C_G(A)|` は `|H ⊓ C_G(A)|` の `p`-部分になる (Lemma 3.32 を `↥H` に適用)。 -/
 theorem exists_aInvariant_sylow_card_inf {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G)
     {H : Subgroup G} (hH : OddOrder.Isaacs.Ch03.IsAInvariant φ H) {p : ℕ} [Fact p.Prime] :
     ∃ P : Subgroup G, P ≤ H ∧ OddOrder.Isaacs.Ch03.IsAInvariant φ P ∧
       Nat.card ↥P = p ^ (Nat.card ↥H).factorization p ∧
@@ -477,10 +478,10 @@ theorem exists_aInvariant_sylow_card_inf {φ : A →* MulAut G}
   set ρ := OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom hH with hρ
   have hCopH : Nat.Coprime (Nat.card A) (Nat.card ↥H) :=
     hCop.coprime_dvd_right (Subgroup.card_subgroup_dvd_card H)
-  have hSolvH : IsSolvable A ∨ IsSolvable ↥H := by
+  have hSolvH : Group.IsSolvable A ∨ Group.IsSolvable ↥H := by
     rcases hSolv with h | h
     · exact Or.inl h
-    · haveI := h; exact Or.inr inferInstance
+    · have := h; exact Or.inr inferInstance
   obtain ⟨P', hP'inv⟩ := exists_aInvariant_sylow (φ := ρ) hCopH hSolvH p
   have h32 := card_inf_fixedSubgroup_of_aInvariant_sylow (φ := ρ) hCopH hSolvH hP'inv
   rw [fixedSubgroup_toMulAutHom_top hH] at h32
@@ -519,7 +520,7 @@ theorem exists_aInvariant_sylow_card_inf {φ : A →* MulAut G}
 `|H|_p + |C|_p ≤ |G|_p + |H ⊓ C|_p` を与える。 -/
 theorem relIndex_dvd_index_of_aInvariant {φ : A →* MulAut G}
     (hCop : Nat.Coprime (Nat.card A) (Nat.card G))
-    (hSolv : IsSolvable A ∨ IsSolvable G)
+    (hSolv : Group.IsSolvable A ∨ Group.IsSolvable G)
     {H : Subgroup G} (hH : OddOrder.Isaacs.Ch03.IsAInvariant φ H) :
     (H ⊓ OddOrder.GroupTheory.fixedSubgroup φ (⊤ : Subgroup A)).relIndex H
         ∣ (OddOrder.GroupTheory.fixedSubgroup φ (⊤ : Subgroup A)).index ∧
@@ -531,7 +532,7 @@ theorem relIndex_dvd_index_of_aInvariant {φ : A →* MulAut G}
       (Nat.card ↥H).factorization p + (Nat.card ↥C).factorization p
         ≤ (Nat.card G).factorization p + (Nat.card ↥(H ⊓ C)).factorization p := by
     intro p hp
-    haveI : Fact p.Prime := ⟨hp⟩
+    have : Fact p.Prime := ⟨hp⟩
     obtain ⟨P, hPH, hPinv, hPcard, hPCcard⟩ :=
       exists_aInvariant_sylow_card_inf hCop hSolv hH (p := p)
     have hPp : IsPGroup p ↥P := IsPGroup.of_card hPcard
@@ -666,7 +667,7 @@ theorem mem_centralizer_of_mem_frattiniQuotientKernel {G : Type*} [Group G] [Fin
     x ∈ Subgroup.centralizer (P : Set G) := by
   classical
   set Z : Subgroup G := Subgroup.zpowers x with hZ
-  letI : MulDistribMulAction ↥Z ↥P :=
+  let : MulDistribMulAction ↥Z ↥P :=
     MulDistribMulAction.compHom ↥P ((MulAut.conjNormal (H := P)).comp Z.subtype)
   have hZK : Z ≤ frattiniQuotientKernel P := Subgroup.zpowers_le.mpr hx
   have hcop : Nat.Coprime (Nat.card ↥Z) (Nat.card ↥(frattini ↥P)) := by
@@ -720,14 +721,14 @@ theorem frattiniQuotientKernel_oPiCore_eq {p : ℕ} [Fact p.Prime]
     OddOrder.Isaacs.Ch03.Subgroup.isPiGroup_singleton_iff_isPGroup.mp
       (OddOrder.Isaacs.Ch03.oPiCore.isPiGroup _)
   refine le_antisymm ?_ (le_frattiniQuotientKernel hPp)
-  haveI hKnormal : (frattiniQuotientKernel P).Normal :=
+  have hKnormal : (frattiniQuotientKernel P).Normal :=
     (Subgroup.normal_centralizer).comap _
   refine OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.le_oPiCore ?_
   intro q hq
   rw [Set.mem_singleton_iff]
   by_contra hqp
   obtain ⟨hqprime, hqdvd, -⟩ := Nat.mem_primeFactors.mp hq
-  haveI : Fact q.Prime := ⟨hqprime⟩
+  have : Fact q.Prime := ⟨hqprime⟩
   obtain ⟨z, hz⟩ := exists_prime_orderOf_dvd_card' (G := ↥(frattiniQuotientKernel P)) q hqdvd
   have hzord : orderOf ((z : G)) = q := by rw [Subgroup.orderOf_coe]; exact hz
   have hnotdvd : ¬ p ∣ orderOf ((z : G)) := by

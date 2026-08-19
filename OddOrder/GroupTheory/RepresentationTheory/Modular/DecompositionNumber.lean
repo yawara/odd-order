@@ -47,7 +47,7 @@ theorem exists_pow_eq_zero_of_ker_eq_jacobson
     {π : MonoidAlgebra (ResidueField 𝒪) G →+* ∀ j, Matrix (nn j) (nn j) (ResidueField 𝒪)}
     (hkerJ : RingHom.ker π = Ring.jacobson (MonoidAlgebra (ResidueField 𝒪) G)) :
     ∃ N : ℕ, ∀ y : MonoidAlgebra (ResidueField 𝒪) G, π y = 0 → y ^ N = 0 := by
-  haveI : IsArtinianRing (MonoidAlgebra (ResidueField 𝒪) G) :=
+  have : IsArtinianRing (MonoidAlgebra (ResidueField 𝒪) G) :=
     isArtinian_of_tower (ResidueField 𝒪) inferInstance
   obtain ⟨N, hN⟩ := IsSemiprimaryRing.isNilpotent (R := MonoidAlgebra (ResidueField 𝒪) G)
   refine ⟨N, fun y hy => ?_⟩

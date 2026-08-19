@@ -816,7 +816,7 @@ variable {p q : ℕ} [Fact p.Prime] {G : Type*} [Group G]
 /-- The image `σ(P)` of the additive kernel is abelian. -/
 theorem P_mul_comm (data : FieldNormalizerData p q G) {a b : G} (ha : a ∈ data.P)
     (hb : b ∈ data.P) : a * b = b * a := by
-  haveI : IsMulCommutative (NormSet.normOneFrobeniusKernel p q) := by
+  have : IsMulCommutative (NormSet.normOneFrobeniusKernel p q) := by
     unfold NormSet.normOneFrobeniusKernel
     infer_instance
   rw [← data.sigma_P_eq_P] at ha hb
@@ -954,8 +954,8 @@ This is what turns the `σ(U)`-orbit of `x` (`mem_orbitS_iff`) into the set of s
 theorem mem_normOneUnits_iff_isSquare (hp : p = 3) (hq : q ≠ 0) (u : (GaloisField p q)ˣ) :
     u ∈ NormSet.normOneUnits p q ↔ IsSquare ((u : GaloisField p q)) := by
   subst hp
-  letI : Fintype (GaloisField 3 q) := Fintype.ofFinite _
-  haveI : CharP (GaloisField 3 q) 3 := by
+  let : Fintype (GaloisField 3 q) := Fintype.ofFinite _
+  have : CharP (GaloisField 3 q) 3 := by
     rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
     exact ZMod.charP 3
   have hcard : Fintype.card (GaloisField 3 q) = 3 ^ q := by
@@ -987,7 +987,7 @@ numerical inputs of that lemma: `q ∤ p - 1 = 2` makes `q` odd, hence `|F| = 3^
 theorem le_closure_orbitS (data : FieldNormalizerData p q G) (hp : p = 3) :
     data.P ≤ Subgroup.closure {s | s ∈ orbitS data ∧ s * data.s ∈ orbitS data} := by
   classical
-  letI : Fintype (GaloisField p q) := Fintype.ofFinite _
+  let : Fintype (GaloisField p q) := Fintype.ofFinite _
   have hq0 : q ≠ 0 := data.q_prime.pos.ne'
   have hcard : Fintype.card (GaloisField p q) = p ^ q := by
     rw [← Nat.card_eq_fintype_card]
@@ -1003,7 +1003,7 @@ theorem le_closure_orbitS (data : FieldNormalizerData p q G) (hp : p = 3) :
     have h2 : 2 ≤ q := data.q_prime.two_le
     rcases hqodd with ⟨k, hk⟩
     omega
-  haveI : CharP (GaloisField p q) p := by
+  have : CharP (GaloisField p q) p := by
     rw [← Algebra.charP_iff (ZMod p) (GaloisField p q) p]
     exact ZMod.charP p
   have h3 : ringChar (GaloisField p q) = 3 := by
@@ -1042,10 +1042,10 @@ theorem le_closure_orbitS (data : FieldNormalizerData p q G) (hp : p = 3) :
     { carrier := {a | fieldHom data (Multiplicative.ofAdd a) ∈ K}
       zero_mem' := by simp
       add_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_setOf_eq, ofAdd_add, map_mul] at *
+        simp only [Set.mem_ofPred_eq, ofAdd_add, map_mul] at *
         exact K.mul_mem ha hb
       neg_mem' := fun {a} ha => by
-        simp only [Set.mem_setOf_eq, ofAdd_neg, map_inv] at *
+        simp only [Set.mem_ofPred_eq, ofAdd_neg, map_inv] at *
         exact K.inv_mem ha }
   have hAtop : A = ⊤ := by
     rw [eq_top_iff, ← Paley.addClosure_paleySet_eq_top (F := GaloisField p q) h3 h4 h9,

@@ -163,10 +163,10 @@ theorem FactorInclusionData.ambientCenterCoordinate_selfBracket_eq
         (lowerCentralCommutatorBilinear P
           (data.incl alpha) (data.incl beta)) =
       alpha * data.theta beta + data.theta alpha * beta := by
-  letI : IsMulCommutative (frattini P) :=
+  let : IsMulCommutative (frattini P) :=
     IsMulCommutative.of_comm hEA.comm
-  letI : CommGroup (frattini P) := inferInstance
-  letI : Module (ZMod 2) (Additive (frattini P)) :=
+  let : CommGroup (frattini P) := inferInstance
+  let : Module (ZMod 2) (Additive (frattini P)) :=
     hEA.zmodModule
   let center :=
     ambientCenterCoordinate hEA hK1 hterm ePhi
