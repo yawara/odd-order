@@ -236,8 +236,9 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
 
 ## ツールチェイン
 
-- Lean: [`lean-toolchain`](lean-toolchain) (現状 `leanprover/lean4:v4.32.2`、2026-08-04 に v4.32.0-rc1 から bump; 手順と API 変更一覧 [`notes/meta/mathlib_v4322_migration.md`](notes/meta/mathlib_v4322_migration.md) — **`MonoidAlgebra` の structure 化**が最大の破壊的変更。過去の bump 記録: v4.30.0-rc2 → v4.32.0-rc1 (2026-07-09) は [`notes/meta/mathlib_v432_migration.md`](notes/meta/mathlib_v432_migration.md)、v4.29.1 → v4.30.0-rc2 (2026-05-27) は [`notes/meta/mathlib_rc2_migration.md`](notes/meta/mathlib_rc2_migration.md))
-  - **v4.33 へは未着手**: 実測で v4.33.0-rc2 は commit 数が v4.32 系の 6 割なのに repo の import 面 379 module 中 **239 (63%)** を触り (v4.32 系は 114 = 30%)、deprecated alias を 788 件削除する。**v4.33.0 final を待って上げる**方針 (rc に当てない)。判断根拠は上記 v4322 note。
+- Lean: [`lean-toolchain`](lean-toolchain) (現状 `leanprover/lean4:v4.33.0`、2026-08-20 に v4.32.2 から bump; 手順と API 変更一覧 [`notes/meta/mathlib_v433_migration.md`](notes/meta/mathlib_v433_migration.md) — **Lean 4.33 の `isDefEq` が transparency を尊重するようになった**のが最大の破壊的変更で、mathlib と同じ per-declaration 互換フラグ `set_option backward.isDefEq.respectTransparency false in` で追従 (269 箇所)。過去の bump 記録: v4.32.0-rc1 → v4.32.2 (2026-08-04, `MonoidAlgebra` structure 化) は [`notes/meta/mathlib_v4322_migration.md`](notes/meta/mathlib_v4322_migration.md)、v4.30.0-rc2 → v4.32.0-rc1 (2026-07-09) は [`notes/meta/mathlib_v432_migration.md`](notes/meta/mathlib_v432_migration.md)、v4.29.1 → v4.30.0-rc2 (2026-05-27) は [`notes/meta/mathlib_rc2_migration.md`](notes/meta/mathlib_rc2_migration.md))
+  - **rc には当てない (v4.33 で実践)**: v4.33.0-rc2 の時点で「import 面 407 module 中 260 (64%) を触る」と実測できていたので final (2026-08-10) を待ち、2026-08-20 に一気に上げた。移行の実務で効いた知見は v433 note の「⚙ 必要箇所の特定手順」(逐次ビルドでは 1 ラウンド 1 module しか進まないので、一時グローバルフラグ → 全 file 個別 elaborate → per-declaration 化)。
+  - ⚠ **新 linter の有無は `mathlibStandardSet` の所属だけで判断しない** — `linter.style.haveILetI` はセット外だが `defValue := true` で既定 ON だったため、12,169 箇所の `haveI`/`letI` 置換が必要になった。
 - mathlib: [`lakefile.toml`](lakefile.toml) の `[[require]]` 参照
 - ビルド: `lake build OddOrder`
 - mathlib キャッシュ: `lake exe cache get` (mathlib 更新時に再取得)
