@@ -49,6 +49,59 @@ namespace OddOrder.RepresentationTheory.Modular
 open IsLocalRing Matrix MonoidAlgebra OddOrder.GroupTheory OddOrder.MatrixModule
 open OddOrder.RepresentationTheory
 
+/-! ### Supplying the hypothesis: Navarro (6.10)–(6.12)
+
+`v ∈ O_{p'}(H)` makes every irreducible Brauer character of the principal block of `H` take the
+same value at `v` as at `1`.  Only the normality of a `p'`-subgroup is used: (6.10) says
+`O_{p'}(H) = ker(b_0)`, and `pi_single_eq_one_principalBlock` is exactly the statement that the
+block representation is trivial on such a subgroup. -/
+
+section PrincipalBlockKernelValues
+
+variable {p : ℕ} [Fact p.Prime] {𝒪 : Type*} [CommRing 𝒪] [IsDomain 𝒪] [HenselianLocalRing 𝒪]
+  [IsPModularSystem p 𝒪] [CharP (ResidueField 𝒪) p]
+variable {H ι : Type*} [Group H] [Finite H] {nn : ι → Type*}
+  [∀ i, Fintype (nn i)] [∀ i, DecidableEq (nn i)] [Finite ι] [∀ i, Nonempty (nn i)]
+variable {π : MonoidAlgebra (ResidueField 𝒪) H →+* ∀ j, Matrix (nn j) (nn j) (ResidueField 𝒪)}
+  (hπ : Function.Surjective π)
+  (hlin : ∀ (c : ResidueField 𝒪) (a : MonoidAlgebra (ResidueField 𝒪) H), π (c • a) = c • π a)
+  (hnil : ∀ z : Subalgebra.center (ResidueField 𝒪) (MonoidAlgebra (ResidueField 𝒪) H),
+    blockCharacterPi π hπ hlin z = 0 → IsNilpotent z)
+
+omit [Fact p.Prime] in
+include hπ hlin hnil in
+/-- **Navarro (6.10)–(6.12) in the form (7.7) consumes them.**  If `N ⊴ H` has order prime to
+`p` and `μ` is an irreducible Brauer character of the principal block of `H`, then `μ` takes the
+same value at every `v ∈ N` as at `1`.
+
+`pi_single_eq_one_principalBlock` gives that the block representation is the identity on `N`
+(its central character sends `N̂` to `|N|`, a unit); (6.11)
+(`rep_eq_one_iff_brauerCharacter_eq`) turns that into the equality of Brauer character values. -/
+theorem irreducibleBrauerCharacter_eq_one_of_mem_normal_of_not_dvd (hp : p.Prime)
+    {ω : ResidueField 𝒪} (hω : IsPrimitiveRoot ω (pRegularExponent p H))
+    {N : Subgroup H} (hN : N.Normal) (hNp : ¬ p ∣ Nat.card ↥N)
+    {μ : ι} (hμ : Quotient.mk (blockSetoid π hπ hlin) μ = principalBlock π hπ hlin hnil)
+    {v : H} (hv : v ∈ N) :
+    irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π μ v
+      = irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π μ 1 := by
+  -- `v` is `p`-regular: its order divides `|N|`, which is prime to `p`
+  have hvreg : IsPRegular p v := by
+    have hdvd : orderOf v ∣ Nat.card ↥N := by
+      have h := orderOf_dvd_natCard (⟨v, hv⟩ : ↥N)
+      rwa [Subgroup.orderOf_mk] at h
+    exact fun hp' => hNp (hp'.trans hdvd)
+  -- the block representation is trivial on `N`
+  have hNk : ((Nat.card ↥N : ℕ) : ResidueField 𝒪) ≠ 0 := fun h =>
+    hNp ((CharP.cast_eq_zero_iff (ResidueField 𝒪) p _).mp h)
+  have hrep : blockRepresentation π μ v = 1 := by
+    have h1 : π (MonoidAlgebra.single v (1 : ResidueField 𝒪)) μ = 1 :=
+      pi_single_eq_one_principalBlock π hπ hlin hnil hN hNk hμ hv
+    change Matrix.toLinAlgEquiv' (π (MonoidAlgebra.single v (1 : ResidueField 𝒪)) μ) = 1
+    rw [h1, map_one]
+  exact (rep_eq_one_iff_brauerCharacter_eq (blockRepresentation π μ) hp hω hvreg).mp hrep
+
+end PrincipalBlockKernelValues
+
 section SeventySeven
 
 variable {p : ℕ} {𝒪 K : Type*} [CommRing 𝒪] [IsDomain 𝒪] [ValuationRing 𝒪]
@@ -158,6 +211,32 @@ theorem character_mul_eq_character_of_brauerCharacter_eq {i : κ}
   · rw [hval μ hμ]
   · rw [generalizedDecompositionNumber_eq_zero_of_ne_principalBlock hp hx hω e eG hπG hlinG hπ
       hlin hkerJ hnil hnilG hω' hζ hζk hζK hconv hi hμ, zero_mul, zero_mul]
+
+
+-- as in the expansion above, `Fintype ι` indexes a sum that only the proof runs over
+set_option linter.unusedFintypeInType false in
+omit [Finite κ] [Fact p.Prime] in
+include hp hx hω e hπG hlinG hkerJ hnil hζ hζk hζK hω' hconv in
+/-- **Navarro (7.7)**, in the shape the `Z*`-theorem uses it: `χ(x v) = χ(x)` for
+`χ ∈ Irr(B_0(G))` and `v` in any normal subgroup of `C_G(x)` of order prime to `p`.
+
+Navarro states this for `v ∈ O_{p'}(C_G(x))`; that is the instance where the normal `p'`-subgroup
+is the largest one, and nothing else about it is used. -/
+theorem character_mul_eq_character_of_mem_normal_of_not_dvd {i : κ}
+    (hi : blockOfIrr eG hπG hlinG hnilG i = principalBlock πG hπG hlinG hnilG)
+    {N : Subgroup ↥(centralizerOf x)} (hN : N.Normal) (hNp : ¬ p ∣ Nat.card ↥N)
+    {v : ↥(centralizerOf x)} (hv : v ∈ N) :
+    (wedderburnRepresentation eG i).character (x * (v : G))
+      = (wedderburnRepresentation eG i).character x := by
+  have hvreg : IsPRegular p v := by
+    have hdvd : orderOf v ∣ Nat.card ↥N := by
+      have h := orderOf_dvd_natCard (⟨v, hv⟩ : ↥N)
+      rwa [Subgroup.orderOf_mk] at h
+    exact fun hp' => hNp (hp'.trans hdvd)
+  exact character_mul_eq_character_of_brauerCharacter_eq hp hx hω e eG hπG hlinG hπ hlin hkerJ
+    hnil hnilG hω' hζ hζk hζK hconv hi hvreg
+    (fun μ hμ => irreducibleBrauerCharacter_eq_one_of_mem_normal_of_not_dvd hπ hlin hnil hp hω'
+      hN hNp hμ hv)
 
 end SeventySeven
 
