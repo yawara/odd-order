@@ -59,15 +59,39 @@ theorem brauer_suzuki {G : Type*} [Group G] [Finite G]
 - [x] (4.5) **import 衛生** — `characterKernelSubgroup` を §13 → §3 に hoist (commit `64cba93b3`)。
       Endgame が定義 2 本のために §11–§13 spine を丸ごと import していたため、
       **import 閉包 775 module / 402k 行 → 362 module / 115k 行 (−71%)**
-- [ ] (5) self-contained workspace — `odd-order-submission/brauer_suzuki/` に eval scaffold を
-      配置し `scripts/extract_feit_thompson.py` で 362 module を抽出済。lean-eval の
-      mathlib rev (`6f1ef4e5…`) でビルド検証中
+- [x] (5) self-contained workspace — `odd-order-submission/brauer_suzuki/` (commit `c3019b4`)。
+      eval scaffold (`generated/brauer_suzuki` @ `7699436`) + `scripts/extract_feit_thompson.py`
+      で 362 module を抽出。**lean-eval 自身の mathlib rev (`6f1ef4e5…`) で
+      `lake build Submission Solution Challenge` が green (9,076 jobs / 4m25s)、抽出 source の
+      改変ゼロ**。`Submission.brauer_suzuki` / challenge 側 `brauer_suzuki` とも
+      `[propext, Classical.choice, Quot.sound]` のみ (= `config.json` の `permitted_axioms`)。
+      付随整備: `check_source_lock.py` を lock 記載の `entry_module`/`submission_directory` で
+      駆動して multi-submission 対応 / 上流 HEAD の module 数を固定値で assert していた
+      stale test を構造検査に置換 (32 tests pass) / README (en/ja) を submission 一覧構成へ /
+      `tools/BrauerSuzukiAxiomsCheck.lean`
 - [x] (6) 0050 / `lean_eval_submission.md` の stale 記述 (Q₈ 待ち) を更新 (commit `7ba074f30`)
 
 ## 完了条件
 
 eval の `brauer_suzuki` を repo 由来の証明で埋めた `Submission.lean` が
 self-contained workspace でビルド green、かつ `#print axioms` が標準 3 公理のみ。
+**→ 2026-08-20 達成**。
+
+## 残: 提出そのもの (ユーザー判断待ち)
+
+技術的な準備は完了。**外向きの操作なのでユーザーの承認前には実行しない**:
+
+- [ ] `odd-order-submission` を push (public リポジトリ)
+- [ ] `leanprover/lean-eval-submissions` に "Submit benchmark solution" issue を立てる
+      (前例: `feit_thompson` #828 / `baer_suzuki` #118)。model 表記は使用モデル列挙 +
+      human-in-the-loop で正直に (正本 note §1.2)
+
+任意の追加検証 (提出の必須要件ではない、`feit_thompson` ではやった):
+
+- [ ] comparator + nanoda kernel replay のローカル実行。⚠ `lean4export` は **v4.32.0-rc1 用**
+      しか入っておらず (`/home/ywr/.local/bin/`)、`nanoda_bin` は未 install。
+      v4.33.0 用の再ビルドが要る
+- [ ] theorem-only slice v2 (`generate_seed_slice.py`) の適用。現状は full import closure
 
 ## 参照
 
