@@ -5,6 +5,12 @@
 > 担当レーンは未割当（着手時に hub/ユーザーが指定）。
 > ⚠ **経路訂正（2026-08-04 原文実測、§2''）**: 必要 slice は **Ch.1–6 + Ch.7 前半**で、
 > **Z\*-定理は不要**（BS は Z\* の系ではなく前提）。
+> ✅ **本プロジェクトは 2026-08-06 に完了**（Q₈ BS = `q8_exists_proper_normal`、issue 0147/9506）。
+> ⚠ **その後 Z\*-定理は別スコープとして 2026-08-20 に完成**（ユーザー裁定で Ch.7 の残り
+> (7.7)–(7.9) を対象化、issue 0186 closed）。`glauberman_zStar` /
+> `glauberman_zStar_oddCore` / `glauberman_zStar_sup_centralizer_eq_top` が axiom-clean。
+> したがって上の「Z\*-定理は不要」は **Q₈ BS を閉じるための経路としては不要**という意味で、
+> 「repo に Z\* が無い」ではない — 再開時に取り違えないこと。
 > 本 note は本プロジェクトの **project spec**（目的・書籍選定・infra 内訳・pickup 手順）。
 > （旧状態: FROZEN、ユーザー裁定 2026-07-23 — §1 の凍結根拠は経緯の記録として保持。）
 
