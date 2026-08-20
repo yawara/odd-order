@@ -300,30 +300,30 @@ theorem Q1_eq_bot (ind : Hypothesis.TheoremAInductionBelow G Ω) :
           hf₂.isCharacter (hzero f₂ hforth₂ (by rw [hb₂, hb0]; norm_num)) hx⟩
   obtain ⟨f, hf, hft, hfker⟩ := hmain
   -- step (13): the kernel is a proper nontrivial normal subgroup
-  have hN_normal : (OddOrder.Peterfalvi.S13.characterKernelSubgroup
+  have hN_normal : (OddOrder.Peterfalvi.S03.characterKernelSubgroup
       hf.isCharacter).Normal := by
     constructor
     intro x hx g
-    rw [OddOrder.Peterfalvi.S13.mem_characterKernelSubgroup,
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernelSubgroup,
       OddOrder.Peterfalvi.S03.mem_characterKernel] at hx ⊢
     rw [← hx]
     exact f.conj_eq x g
-  have hN_ne_bot : OddOrder.Peterfalvi.S13.characterKernelSubgroup
+  have hN_ne_bot : OddOrder.Peterfalvi.S03.characterKernelSubgroup
       hf.isCharacter ≠ ⊥ := by
     intro h
     refine hQ1 (le_bot_iff.mp fun x hx => ?_)
     rw [← h]
     exact hfker x hx
-  have hN_ne_top : OddOrder.Peterfalvi.S13.characterKernelSubgroup
+  have hN_ne_top : OddOrder.Peterfalvi.S03.characterKernelSubgroup
       hf.isCharacter ≠ ⊤ := by
     intro h
     apply hft
     obtain ⟨n, hnpos, hn⟩ := hf.exists_apply_one_eq_pos_natCast
     have hconst : ∀ g : G, f g = (n : ℂ) := by
       intro g
-      have hg : g ∈ OddOrder.Peterfalvi.S13.characterKernelSubgroup
+      have hg : g ∈ OddOrder.Peterfalvi.S03.characterKernelSubgroup
           hf.isCharacter := h ▸ Subgroup.mem_top g
-      rw [OddOrder.Peterfalvi.S13.mem_characterKernelSubgroup,
+      rw [OddOrder.Peterfalvi.S03.mem_characterKernelSubgroup,
         OddOrder.Peterfalvi.S03.mem_characterKernel,
         OddOrder.Peterfalvi.S03.characterDegree_def] at hg
       rw [hg]

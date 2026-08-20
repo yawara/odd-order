@@ -61,14 +61,14 @@ theorem sum_degreeSq_ker_subset_not_subset
       ↔ (((N ⊔ M : Subgroup K) : Set K)
           ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction K ℂ)) := by
     intro χ
-    have hKSset := OddOrder.Peterfalvi.S13.coe_characterKernelSubgroup
+    have hKSset := OddOrder.Peterfalvi.S03.coe_characterKernelSubgroup
       χ.isIrreducible.isCharacter
     constructor
     · rintro ⟨h1, h2⟩
       rw [← hKSset] at h1 h2 ⊢
-      have hN : N ≤ OddOrder.Peterfalvi.S13.characterKernelSubgroup
+      have hN : N ≤ OddOrder.Peterfalvi.S03.characterKernelSubgroup
           χ.isIrreducible.isCharacter := fun x hx => h1 hx
-      have hM : M ≤ OddOrder.Peterfalvi.S13.characterKernelSubgroup
+      have hM : M ≤ OddOrder.Peterfalvi.S03.characterKernelSubgroup
           χ.isIrreducible.isCharacter := fun x hx => h2 hx
       exact fun x hx => (sup_le hN hM) hx
     · intro h

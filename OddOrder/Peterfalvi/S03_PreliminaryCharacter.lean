@@ -360,6 +360,74 @@ def characterKernel (χ : ClassFunction G ℂ) : Set G :=
   change star (χ g) = star (χ 1) ↔ χ g = χ 1
   exact star_inj
 
+/-! ## The character kernel as a subgroup
+
+The character kernel `ker φ = {g | φ(g) = φ(1)}` of a **genuine** character `φ` is a subgroup:
+if `φ = χ_ρ` for a representation `ρ`, the keystone `rep_eq_id_of_character_eq_one` makes
+`ρ g = id` exactly on `ker φ`, and `{g | ρ g = id}` is closed under the group operations.
+
+Hoisted here from `S13_MaximalIII_IVBasic` (2026-08-20, issue 0184): the fact is general finite
+group theory with nothing of §13 in it, and by now it has consumers in §13's (11.8.6)
+world-bridge decomposition, the Feit–Sibley appendix, the Suzuki appendix, and the
+Brauer–Suzuki endgame.  Keeping it in §13 forced `GroupTheory/BrauerSuzukiEndgame` to import the
+whole §11–§13 spine (413 extra modules in its import closure). -/
+section CharacterKernelSubgroup
+
+variable {Γ : Type*} [Group Γ] [Finite Γ]
+
+/-- **`ker φ` is closed under multiplication for a genuine character `φ`.**  Writing `φ = χ_ρ`,
+`rep_eq_id_of_character_eq_one` turns `x, y ∈ ker φ` into `ρ x = ρ y = id`, so `ρ (xy) = id` and
+`φ(xy) = tr(id) = φ(1)`. -/
+theorem characterKernel_mul_mem {φ : ClassFunction Γ ℂ} (hφ : IsCharacter φ)
+    {x y : Γ} (hx : x ∈ characterKernel φ) (hy : y ∈ characterKernel φ) :
+    x * y ∈ characterKernel φ := by
+  classical
+  obtain ⟨V, _, _, _, ρ, hchar⟩ := hφ
+  have hval : ∀ g : Γ, φ g = ρ.character g := fun g => congrFun hchar g
+  rw [mem_characterKernel, characterDegree_def] at hx hy
+  have hidx : ρ x = LinearMap.id :=
+    rep_eq_id_of_character_eq_one ρ (by simp only [← hval]; exact hx)
+  have hidy : ρ y = LinearMap.id :=
+    rep_eq_id_of_character_eq_one ρ (by simp only [← hval]; exact hy)
+  have hidxy : ρ (x * y) = LinearMap.id := by
+    rw [map_mul, hidx, hidy]; ext v; simp
+  rw [mem_characterKernel, characterDegree_def, hval (x * y), hval 1,
+    show ρ.character (x * y) = LinearMap.trace ℂ V (ρ (x * y)) from rfl, hidxy,
+    Representation.char_one, LinearMap.trace_id]
+
+/-- **`ker φ` is closed under inversion for a genuine character `φ`.**  From `ρ x = id`,
+`ρ x⁻¹ = (ρ x)⁻¹ = id` (via `ρ x⁻¹ · ρ x = ρ 1 = 1`). -/
+theorem characterKernel_inv_mem {φ : ClassFunction Γ ℂ} (hφ : IsCharacter φ)
+    {x : Γ} (hx : x ∈ characterKernel φ) : x⁻¹ ∈ characterKernel φ := by
+  classical
+  obtain ⟨V, _, _, _, ρ, hchar⟩ := hφ
+  have hval : ∀ g : Γ, φ g = ρ.character g := fun g => congrFun hchar g
+  rw [mem_characterKernel, characterDegree_def] at hx
+  have hidx : ρ x = LinearMap.id :=
+    rep_eq_id_of_character_eq_one ρ (by simp only [← hval]; exact hx)
+  have hidinv : ρ x⁻¹ = LinearMap.id := by
+    have h1 : ρ x⁻¹ * ρ x = 1 := by rw [← map_mul, inv_mul_cancel, map_one]
+    rw [hidx, show (LinearMap.id : V →ₗ[ℂ] V) = 1 from rfl, mul_one] at h1
+    rw [h1]; rfl
+  rw [mem_characterKernel, characterDegree_def, hval x⁻¹, hval 1,
+    show ρ.character x⁻¹ = LinearMap.trace ℂ V (ρ x⁻¹) from rfl, hidinv,
+    Representation.char_one, LinearMap.trace_id]
+
+/-- **The character kernel of a genuine character, packaged as a subgroup.** -/
+def characterKernelSubgroup {φ : ClassFunction Γ ℂ} (hφ : IsCharacter φ) : Subgroup Γ where
+  carrier := characterKernel φ
+  one_mem' := one_mem_characterKernel φ
+  mul_mem' hx hy := characterKernel_mul_mem hφ hx hy
+  inv_mem' hx := characterKernel_inv_mem hφ hx
+
+@[simp] theorem mem_characterKernelSubgroup {φ : ClassFunction Γ ℂ} (hφ : IsCharacter φ)
+    {g : Γ} : g ∈ characterKernelSubgroup hφ ↔ g ∈ characterKernel φ := Iff.rfl
+
+theorem coe_characterKernelSubgroup {φ : ClassFunction Γ ℂ} (hφ : IsCharacter φ) :
+    (characterKernelSubgroup hφ : Set Γ) = characterKernel φ := rfl
+
+end CharacterKernelSubgroup
+
 /-- A subset is contained in the character kernel.  This is the set-level shape
 used in Peterfalvi (1.6). -/
 def SubsetCharacterKernel (A : Set G) (χ : ClassFunction G ℂ) : Prop :=

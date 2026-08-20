@@ -44,73 +44,6 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce
 
 variable {G : Type*} [Group G]
 
-/-! ## Character-kernel subgroup (general helper)
-
-The character kernel `ker φ = {g | φ(g) = φ(1)}` of a **genuine** character `φ` is a subgroup:
-if `φ = χ_ρ` for a representation `ρ`, the keystone `rep_eq_id_of_character_eq_one` makes
-`ρ g = id` exactly on `ker φ`, and `{g | ρ g = id}` is closed under the group operations.  This
-is the general fact used by the (11.8.6) world-bridge decomposition below (to push a join
-`H ⊔ C` into a single kernel condition).  It is stated for a general finite group and is a
-candidate for hoisting to `S03_PreliminaryCharacter` once a second consumer appears. -/
-section CharacterKernelSubgroup
-
-open OddOrder.Peterfalvi.S03
-
-variable {Γ : Type*} [Group Γ] [Finite Γ]
-
-/-- **`ker φ` is closed under multiplication for a genuine character `φ`.**  Writing `φ = χ_ρ`,
-`rep_eq_id_of_character_eq_one` turns `x, y ∈ ker φ` into `ρ x = ρ y = id`, so `ρ (xy) = id` and
-`φ(xy) = tr(id) = φ(1)`. -/
-theorem characterKernel_mul_mem {φ : ClassFunction Γ ℂ} (hφ : IsCharacter φ)
-    {x y : Γ} (hx : x ∈ characterKernel φ) (hy : y ∈ characterKernel φ) :
-    x * y ∈ characterKernel φ := by
-  classical
-  obtain ⟨V, _, _, _, ρ, hchar⟩ := hφ
-  have hval : ∀ g : Γ, φ g = ρ.character g := fun g => congrFun hchar g
-  rw [mem_characterKernel, characterDegree_def] at hx hy
-  have hidx : ρ x = LinearMap.id :=
-    rep_eq_id_of_character_eq_one ρ (by simp only [← hval]; exact hx)
-  have hidy : ρ y = LinearMap.id :=
-    rep_eq_id_of_character_eq_one ρ (by simp only [← hval]; exact hy)
-  have hidxy : ρ (x * y) = LinearMap.id := by
-    rw [map_mul, hidx, hidy]; ext v; simp
-  rw [mem_characterKernel, characterDegree_def, hval (x * y), hval 1,
-    show ρ.character (x * y) = LinearMap.trace ℂ V (ρ (x * y)) from rfl, hidxy,
-    Representation.char_one, LinearMap.trace_id]
-
-/-- **`ker φ` is closed under inversion for a genuine character `φ`.**  From `ρ x = id`,
-`ρ x⁻¹ = (ρ x)⁻¹ = id` (via `ρ x⁻¹ · ρ x = ρ 1 = 1`). -/
-theorem characterKernel_inv_mem {φ : ClassFunction Γ ℂ} (hφ : IsCharacter φ)
-    {x : Γ} (hx : x ∈ characterKernel φ) : x⁻¹ ∈ characterKernel φ := by
-  classical
-  obtain ⟨V, _, _, _, ρ, hchar⟩ := hφ
-  have hval : ∀ g : Γ, φ g = ρ.character g := fun g => congrFun hchar g
-  rw [mem_characterKernel, characterDegree_def] at hx
-  have hidx : ρ x = LinearMap.id :=
-    rep_eq_id_of_character_eq_one ρ (by simp only [← hval]; exact hx)
-  have hidinv : ρ x⁻¹ = LinearMap.id := by
-    have h1 : ρ x⁻¹ * ρ x = 1 := by rw [← map_mul, inv_mul_cancel, map_one]
-    rw [hidx, show (LinearMap.id : V →ₗ[ℂ] V) = 1 from rfl, mul_one] at h1
-    rw [h1]; rfl
-  rw [mem_characterKernel, characterDegree_def, hval x⁻¹, hval 1,
-    show ρ.character x⁻¹ = LinearMap.trace ℂ V (ρ x⁻¹) from rfl, hidinv,
-    Representation.char_one, LinearMap.trace_id]
-
-/-- **The character kernel of a genuine character, packaged as a subgroup.** -/
-def characterKernelSubgroup {φ : ClassFunction Γ ℂ} (hφ : IsCharacter φ) : Subgroup Γ where
-  carrier := characterKernel φ
-  one_mem' := one_mem_characterKernel φ
-  mul_mem' hx hy := characterKernel_mul_mem hφ hx hy
-  inv_mem' hx := characterKernel_inv_mem hφ hx
-
-@[simp] theorem mem_characterKernelSubgroup {φ : ClassFunction Γ ℂ} (hφ : IsCharacter φ)
-    {g : Γ} : g ∈ characterKernelSubgroup hφ ↔ g ∈ characterKernel φ := Iff.rfl
-
-theorem coe_characterKernelSubgroup {φ : ClassFunction Γ ℂ} (hφ : IsCharacter φ) :
-    (characterKernelSubgroup hφ : Set Γ) = characterKernel φ := rfl
-
-end CharacterKernelSubgroup
-
 /-! ## (11.1): the auxiliary prime inequality -/
 
 /-- For `n >= 5`, the elementary estimate used in **Peterfalvi (11.1)**. -/
@@ -419,7 +352,8 @@ theorem SOf_H0C_eq_SOf_HC_union_sOf [Finite G] {M : Subgroup G} (hyp : Hypothesi
       left
       rw [hyp.SOf_eq, ← hHU, OddOrder.Peterfalvi.S08.mem_inducedKernelFamily]
       refine ⟨θ, hθne, ?_, rfl⟩
-      rw [← coe_characterKernelSubgroup θ.isIrreducible.isCharacter, SetLike.coe_subset_coe]
+      rw [← OddOrder.Peterfalvi.S03.coe_characterKernelSubgroup θ.isIrreducible.isCharacter,
+        SetLike.coe_subset_coe]
       have hHCeq :
           (hyp.HC.subgroupOf M).subgroupOf (OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)
             = (hyp.H.subgroupOf M).subgroupOf (OddOrder.Peterfalvi.S11.huSub hyp.s11Setup)

@@ -766,13 +766,13 @@ theorem ssetOf_Qder_nonempty [Finite G] (hlt : hyp.S ⊔ hyp.Qder < hyp.Q) :
       (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) x
         = (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) 1 := by
     intro hall
-    set KS := OddOrder.Peterfalvi.S13.characterKernelSubgroup
+    set KS := OddOrder.Peterfalvi.S03.characterKernelSubgroup
       φ.isIrreducible.isCharacter with hKS
     have hmemKS : ∀ x : ↥(hyp.Q.subgroupOf hyp.H),
         (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) x
           = (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) 1 → x ∈ KS := by
       intro x hx
-      rw [hKS, OddOrder.Peterfalvi.S13.mem_characterKernelSubgroup,
+      rw [hKS, OddOrder.Peterfalvi.S03.mem_characterKernelSubgroup,
         OddOrder.Peterfalvi.S03.mem_characterKernel]
       simpa using hx
     -- every `k ∈ K` factors as an `S`-part (in `N ⊆ KS`) times a `Q₁`-part (in `KS`)
@@ -801,7 +801,7 @@ theorem ssetOf_Qder_nonempty [Finite G] (hlt : hyp.S ⊔ hyp.Qder < hyp.Q) :
           = (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ) 1 := by
       intro k
       have := hK k
-      rw [hKS, OddOrder.Peterfalvi.S13.mem_characterKernelSubgroup,
+      rw [hKS, OddOrder.Peterfalvi.S03.mem_characterKernelSubgroup,
         OddOrder.Peterfalvi.S03.mem_characterKernel] at this
       simpa using this
     have hφeq : (φ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ)

@@ -5,7 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.BrauerSuzukiCounting
 import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
-import OddOrder.Peterfalvi.S13_MaximalIII_IVBasic
+import OddOrder.Peterfalvi.S03_PreliminaryCharacter
 import OddOrder.Isaacs.Ch03_SplitExtensions.Theorem315
 
 /-!
@@ -291,19 +291,19 @@ theorem not_isMulCommutative_SM_quotient_M :
   have hInvLeSM : involutionClosure G ≤ Q.SM := le_sup_right
   -- every element of `M.subgroupOf SM` lies in the character kernel of `φ`
   have hsub : (involutionClosure G).subgroupOf Q.SM ≤
-      OddOrder.Peterfalvi.S13.characterKernelSubgroup hφchar := by
+      OddOrder.Peterfalvi.S03.characterKernelSubgroup hφchar := by
     rw [← Subgroup.map_le_map_iff_of_injective (f := Q.SM.subtype) Subtype.coe_injective,
       Subgroup.subgroupOf_map_subtype, inf_of_le_left hInvLeSM, involutionClosure,
       Subgroup.closure_le]
     rintro u (hu : orderOf u = 2)
     have huSM : u ∈ Q.SM := hInvLeSM (mem_involutionClosure_of_orderOf_eq_two hu)
     refine ⟨⟨u, huSM⟩, ?_, rfl⟩
-    rw [SetLike.mem_coe, OddOrder.Peterfalvi.S13.mem_characterKernelSubgroup,
+    rw [SetLike.mem_coe, OddOrder.Peterfalvi.S03.mem_characterKernelSubgroup,
       OddOrder.Peterfalvi.S03.mem_characterKernel]
     exact hφinv ⟨u, huSM⟩ (by rw [Subgroup.orderOf_mk]; exact hu)
   have hMker : ((involutionClosure G).subgroupOf Q.SM : Set ↥Q.SM) ⊆
       OddOrder.Peterfalvi.S03.characterKernel (φ : ClassFunction ↥Q.SM ℂ) :=
-    fun _ hg => (OddOrder.Peterfalvi.S13.mem_characterKernelSubgroup hφchar).mp (hsub hg)
+    fun _ hg => (OddOrder.Peterfalvi.S03.mem_characterKernelSubgroup hφchar).mp (hsub hg)
   have := habelian
   have h1 := apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
     ((involutionClosure G).subgroupOf Q.SM) φ hMker
