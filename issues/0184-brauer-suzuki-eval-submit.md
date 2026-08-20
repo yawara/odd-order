@@ -45,13 +45,24 @@ theorem brauer_suzuki {G : Type*} [Group G] [Finite G]
 
 ## やること
 
-- [ ] (1) 一般 statement を `OddOrder/GroupTheory/BrauerSuzukiGeneral.lean` に括り出し
+- [x] (1) 一般 statement を `OddOrder/GroupTheory/BrauerSuzukiGeneral.lean` に括り出し
       (`brauerSuzuki_of_quaternionSylowTwo`)、`RankOneHypothesis.brauerSuzuki` を呼び出しに縮める
-- [ ] (2) 逆向き橋 `mk_mem_center_of_oPiCore_sup_centralizer_eq_top` + center 形の一般 statement
-- [ ] (3) `AxiomsCheck` 登録 + `OddOrder.lean` 配線
-- [ ] (4) `oddCore` ↔ `oPiCore {p | p ≠ 2}` の対応を submission 側で用意
-- [ ] (5) self-contained workspace (§1.2) — 閉包 vendoring の規模を実測してから方針決定
-- [ ] (6) 0050 / `lean_eval_submission.md` の stale 記述 (Q₈ 待ち) を更新
+      (commit `26c6c935c`; RankOneAffineModel 1075 → 889 行、消費者の消えた薄いラッパー
+      `brauerSuzuki_quaternionSylow_q8` は削除)
+- [x] (2) 逆向き橋 — `mk_mem_center_of_sup_centralizer_eq_top` (**任意の正規部分群**へ一般化した方が
+      商の型を跨ぐ transport が要らず綺麗だったのでそちらに) + `brauerSuzuki_mk_mem_center`
+- [x] (3) `AxiomsCheck` 登録 (7 本) + `OddOrder.lean` 配線 + フルビルド green
+- [x] (4) `oddCore` ↔ `oPiCore {p | p ≠ 2}` — `isPiGroup_ne_two_iff_odd` /
+      `oPiCore_ne_two_eq_sSup_normal_odd` / `brauerSuzuki_mk_mem_center_oddCore` (commit `fba43b094`)。
+      **eval statement を逐語コピーして 1 行で証明できることを確認済** (`lake env lean` で
+      `depends on axioms: [propext, Classical.choice, Quot.sound]`)
+- [x] (4.5) **import 衛生** — `characterKernelSubgroup` を §13 → §3 に hoist (commit `64cba93b3`)。
+      Endgame が定義 2 本のために §11–§13 spine を丸ごと import していたため、
+      **import 閉包 775 module / 402k 行 → 362 module / 115k 行 (−71%)**
+- [ ] (5) self-contained workspace — `odd-order-submission/brauer_suzuki/` に eval scaffold を
+      配置し `scripts/extract_feit_thompson.py` で 362 module を抽出済。lean-eval の
+      mathlib rev (`6f1ef4e5…`) でビルド検証中
+- [x] (6) 0050 / `lean_eval_submission.md` の stale 記述 (Q₈ 待ち) を更新 (commit `7ba074f30`)
 
 ## 完了条件
 
