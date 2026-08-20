@@ -108,6 +108,7 @@ import OddOrder.GroupTheory.BrauerSuzukiGeneral
 import OddOrder.GroupTheory.IsolatedInvolution
 import OddOrder.GroupTheory.GlaubermanZStar.Basic
 import OddOrder.GroupTheory.GlaubermanZStar.Reduction
+import OddOrder.GroupTheory.GlaubermanZStar.SecondInvolution
 import OddOrder.GroupTheory.CentralCommutatorPower
 import OddOrder.GroupTheory.CentralElementaryExtension
 import OddOrder.GroupTheory.CentralExtensionAutomorphisms
