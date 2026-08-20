@@ -44,9 +44,11 @@ backtrace:
 
 - [x] `exists_eq_of_columns` の証明本体を二分して、PANIC を出す tactic を特定する
 - [x] 回避できるなら書き換える
-- [ ] (繰延) gate に「PANIC を検出したら赤」を足すか検討 —
-      `bin/check-warnings` は warning しか見ないので、同種の再発は今も素通りする。
-      別 issue にするほどの規模でもないが、次に build gate を触るときに拾う
+- [x] gate に「PANIC を検出したら赤」を追加 — `bin/check-warnings` が `PANIC at <fn>` を
+      拾い、直前の `info: <path>:L:C:` から file を帰属させて集計。gate / `--strict` では
+      **1 件でも exit 1** (baseline は持たない = 常にゼロ要求)。CI の
+      `bin/check-warnings --strict` がそのまま拾う。
+      検証 = 直した `simpa` を一時的に戻すと `PANIC: 180 件 / 2 箇所` を検出して exit 1
 
 ## 消化記録 (2026-08-20)
 
