@@ -281,6 +281,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetTriple
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerFromOrdinary
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockPPrimeCore
 import OddOrder.Algebra.SumSquaresFour
 import OddOrder.Algebra.ThreeNormColumn
 import OddOrder.Algebra.HalfSumColumns

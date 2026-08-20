@@ -329,6 +329,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Modular.BasicSetDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Modular.BrauerFromOrdinary
 import OddOrder.GroupTheory.RepresentationTheory.Modular.GeneralizedDecompositionInvolution
 import OddOrder.GroupTheory.RepresentationTheory.Modular.SecondMainPrincipalBlock
+import OddOrder.GroupTheory.RepresentationTheory.Modular.PrincipalBlockPPrimeCore
 import OddOrder.Algebra.SumSquaresFour
 import OddOrder.Algebra.ThreeNormColumn
 import OddOrder.Algebra.HalfSumColumns
@@ -18418,6 +18419,19 @@ Klein 四元群 Sylow-2 を持つ群は単一類になれない ((7.2) が `C = 
 
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.Modular.character_mul_eq_generalizedDecompositionNumber
+
+/-! 🎯 **Navarro (7.7)** (`Modular/PrincipalBlockPPrimeCore`, issue 0186) — `Z*`-定理が要る
+最後のモジュラー表現論。`u` が `p`-元、`v ∈ O_{p'}(C_G(u))`、`χ ∈ Irr(B₀)` なら `χ(uv) = χ(u)`。
+
+展開 `χ(u w) = ∑_μ d^u_{χ μ} μ(w)` を `w = v` と `w = 1` で比べる。主ブロックの外は
+第二主定理 + 第三主定理の逆 (`hconv`) で `d^u_{χ μ} = 0`、中は (6.10)(6.11)(6.12) で
+`μ(v) = μ(1)`。⚠ 上の `character_mul_eq_generalizedDecompositionNumber` は
+**`C_G(u)` が正規 `p`-補群をもつ**への特殊化 (和が単項 `φ₀` に潰れる形) で、BS はその形しか
+要らなかった。ここでは和は和のまま。 -/
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.generalizedDecompositionNumber_eq_zero_of_ne_principalBlock
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.Modular.character_mul_eq_character_of_brauerCharacter_eq
 
 /-! 🎯 **第三主定理の易しい向きの `p`-元版 + `Irr(B₀)` の外での消滅**
 (`Modular/SecondMainPrincipalBlock`)。`inducedBlockOfCentralizer_principalBlock` は既存の
