@@ -71,14 +71,40 @@ issue 0147 / 9506 で完成し、そのとき **`Z*` 用の (7.7)–(7.9) は明
       `|w| = 2^a·m` (`m` 奇)、`c = w^m`、`k = (m+1)/2` として `w^k v (w^k)⁻¹ = c·u`。
       `u` と `G`-共役 `c·u` が 2-群 `⟨c⟩ ⊔ ⟨u⟩` に同居 ⟹ `c = 1` で `|c| = 2^a > 1` に矛盾。
       副産物 `conj_eq_of_mem_pGroup` (= 教科書 Step 5) は (7.9) でもそのまま使う
-- [ ] **(7.9)** — `|G|` 帰納法 + 9 step + 最終矛盾。step の骨子は原文どおり:
+- [~] **(7.9)** — `|G|` 帰納法 + 9 step + 最終矛盾。**Step 1–9 は全て landing 済 (sorry-free)、
+      残りは「最終矛盾の組み立て」と「帰納法本体の組み立て」の 2 つ**。
+      🚧 中断時の状態 (2026-08-20):
+      * 完了: `GlaubermanZStar/{Basic,Reduction,SecondInvolution,Fusion,CharacterIdentity,`
+        `CharacterCore,FinalContradiction}.lean` — Step 1/2/3/4/5/6/7/8/9 が全て証明済。
+      * **残 (a) `false_of_exists_involution`**: ブロック直交 (5.11) を 2 回当てて
+        `Σ_{χ∈Irr(B₀)} χ(v)(χ(u)+χ(1)) = 0` を出し、Step 9 で各項を潰し、
+        `χ(u) = χ(1)` の項だけが `2χ(1)²` として残る (Step 3 で `ker χ = ⊤` ⟹ `χ` は定数)
+        ことから `0 = 正の自然数` を導く。**書きかけの draft を
+        `scratchpad/FinalContradiction.wip.lean` に退避**
+        (`obtain` の分解パターンが datum の arity と合わず後続の識別子が全部壊れた状態。
+        `exists_datum_padicComplex` の返り値は 21 要素で、
+        `CharacterCore.lean` の同じ `obtain` を写せば直る)。
+      * **残 (b) `Main.lean`**: `ZStarUpTo n` の帰納法を回して
+        `MinimalConfig` を組み立て、(a) と矛盾させる。
+        分岐は「`O_{2'}(G) ≠ ⊥` → Step 1」「`P = ⊤` → 仮説から直接中心的」
+        「それ以外 → `MinimalConfig` を作って (a)」。
+      step の骨子は原文どおり:
       1 (`N ⊴ G`, `u ∉ N` ⟹ `uN ∈ Z*(G/N)`; ⟹ `O_{2'}(G) = 1` と仮定してよい) /
       2 (`u ∈ H < G` ⟹ `u ∈ Z*(H)`) / 3 (`u` は真の正規部分群に入らない) /
       4 (`Z(G) = 1`) / 5 (`u` を含む任意の 2-部分群の中心に `u` がある) /
       6–7 (`v^g u` の 2-部分 `z` と `2'`-部分 `x` の解析、`z` と `vu` が共役) /
       8 (`χ(v^g u h) = χ(vu)`、(7.7) を使う) / 9 (`a(u)a(v) = a(uv)` と `a(u)² = 1`) /
       最終矛盾 (ブロック直交 (5.11) を 2 回)
-- [ ] `AxiomsCheck` 登録 + `OddOrder.lean` 配線 + `CLAUDE.md`/`ROADMAP.md` の scope 記述更新
+- [ ] `AxiomsCheck` 登録 + `CLAUDE.md`/`ROADMAP.md` の scope 記述更新
+      (`OddOrder.lean` 配線は済)
+
+## ⚠ 教科書との差分 (再開時に読むこと)
+
+repo 版は**二面体群の構造論を一切使わない**。すべて
+`conj_zpow_eq_of_odd_orderOf_mul` (「積が奇位数の 2 つの対合は共役、共役元は積の明示的な冪」)
+1 本に置き換わっている — (7.8) / Step 6 / Step 7 の 3 箇所。
+また Step 3/4 は `Z(H)` が 2-群であることを経由せず「可換な対合 2 つの積」で済ませ、
+Step 4 の `O_{2'}(G/Z(G)) = 1` は Isaacs Problem 3D.2 (`oPiCore_quotient_center_eq_map`) で出る。
 
 ## 完了条件
 
