@@ -56,15 +56,22 @@ proposal (issue 1054/2053 完成時)。Tier C は 3 冊の外側で、別途 mod
   `manifests/problems/<id>.toml`)。外部コントリビュータの追加 PR は merge 実績あり。
   → 詳細 §7.2。
 
-### §1.2 self-contained 原則 (最重要・0042 で確定、以後不変)
+### §1.2 self-contained 原則 (最重要)
 
-**`import OddOrder` で直接 submit しない。** 依存閉包解決時に、進行中の FT/3 冊形式化の
-未公開シンボル名・補助補題・章割り構成が comparator 側へ露出するため (機密性)。
+**`import OddOrder` で直接 submit しない** — **generated workspace の `lakefile.toml` は
+trusted で編集不可**、`[[require]]` は mathlib 1 本だけなので、そもそも外部ライブラリを
+依存に足す手段が無い。証明に要るものは全部 `Submission.lean` + `Submission/**` に入れる。
 
-- 別 workspace を切り、**必要最小コードを `Submission.lean` + `Submission/*.lean` に
-  rebrand コピー**する。**公開されるのはこの 2 箇所だけ** = 逆に言えばここに入れたものは全部公開。
-- 移植コードは命名・コメントを提出側 namespace (`Submission.Helpers` 等) に rebrand。
-  `OddOrder.Isaacs.Ch0X` 等の章割り情報は持ち出さない。出典 (Isaacs FGT § 等) のみ記載可。
+- 別 workspace (`odd-order-submission`) を切り、`scripts/extract_feit_thompson.py` で
+  **local import 閉包をミラー**する。書き換えるのは **import token だけ**
+  (`import OddOrder.Foo` → `import Submission.OddOrder.Foo`)。
+- ⚠ **rebrand はしない (2026-07-16 `feit_thompson` で確定、旧方針の撤回)**。
+  0042 (2026-05-29) 当時の「章割り情報を持ち出さない・namespace を rebrand する」は
+  **機密性を理由にしていたが、`yawara/odd-order` は public リポジトリなので前提が無い**
+  (2026-08-20 実測: `private: false`)。実際 `feit_thompson` 提出は
+  「logical name は `OddOrder.*` のまま、出典表記も残し、物理 module path だけ re-root」
+  と README に明記して出した。**閉包を最小化する動機は「提出物のサイズと再現性」であって
+  秘匿ではない** — 効くのは repo 側の import 衛生 (issue 0184 で 775 → 362 module)。
 - model 表記は使用モデル列挙 + human-in-the-loop で正直に (`feit_thompson` 前例:
   Codex 5.5/5.6 + Claude Code Opus 4.7/4.8/Fable 5)。
 
