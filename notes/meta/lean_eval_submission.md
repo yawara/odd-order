@@ -27,8 +27,7 @@
 | | 件数 | 内容 |
 |---|---|---|
 | **済** | 2 | `feit_thompson` (2026-07-16, #828)、`baer_suzuki` (2026-05-29, #118) |
-| **今すぐ可** | 2 | Burnside p^aq^b (`finite_group_isSolvable_of_card_eq_prime_pow_mul_prime_pow`)、`brauer_character_in_cyclotomic` — 他者 solved 済みだが per-account sticky ゆえ候補 (§2.5) |
-| **Q₈ 完成待ち** | 1 | `brauer_suzuki` (未解決・solver 0)。blocker = Q₈ case のみ (issue 0147、2026-07-25 解凍・Navarro spine で進行) |
+| **今すぐ可** | 3 | 🎯 **`brauer_suzuki` (未解決・solver 0)** — Q₈ blocker は 2026-08-07 に消滅、2026-08-20 に eval statement を repo から逐語で証明済 (issue 0184)。あと Burnside p^aq^b (`finite_group_isSolvable_of_card_eq_prime_pow_mul_prime_pow`)、`brauer_character_in_cyclotomic` — 後 2 者は他者 solved 済みだが per-account sticky ゆえ候補 (§2.5) |
 | **経路外** | 残り全部 | Tier C (§5) + repo に証明の無い problem 群 (§2.5 の判定表) |
 
 **problem proposal (新規 problem の提案 PR — submit とは呼ばない)**:
@@ -39,7 +38,7 @@
 | **Tier B: frontier 完成で proposal 可** | 2 | Feit–Sibley (issue 1054) / Suzuki 分類 (issue 2053) (§4) |
 
 **「3 冊が順調に完成すると自然に届く」経路**: (i) Tier A の proposal 群 (今〜)、
-(ii) `brauer_suzuki` の proof submit (issue 0147 完成時; 2026-07-25 解凍済)、(iii) Feit–Sibley・Suzuki 分類の
+(ii) `brauer_suzuki` の proof submit (**2026-08-07 に前提が消滅、issue 0184 で進行中**)、(iii) Feit–Sibley・Suzuki 分類の
 proposal (issue 1054/2053 完成時)。Tier C は 3 冊の外側で、別途 modular 表現論等を立てない限り来ない。
 
 ⚠ lean-eval 作業は 3 冊 frontier に対し**オプショナル・トラック** (0042 scope 注記)。
@@ -127,13 +126,22 @@ problem 追加は 2026-06-23 が最新 (解析系 3 件) で、群論系の新�
 | `finite_group_isSolvable_of_card_eq_prime_pow_mul_prime_pow` (Burnside p^aq^b) | 済 | `Isaacs.Ch07.burnside_p_pow_q_pow` (Ch07_ThompsonSubgroup/Main.lean:917、AxiomsCheck:1687 登録済)。eval より一般 (`p ≠ q` 不要、`Nat.card` + ∃ 形) | statement 橋渡しは数行 (`Fintype.card`→`Nat.card`、`Fact` instance 化)。主作業 = self-contained 化 (§1.2): Ch.7 9-step + normal-J の閉包 vendoring で規模大 (feit_thompson 前例の縮小版) |
 | `brauer_character_in_cyclotomic` | 済 (10 名) | **数学は完全に既済** — `RepresentationTheory.character_mem_adjoin` (`CharacterEigenvalues.lean:103`, AxiomsCheck 登録済): `ω` が原始 `m` 乗根で `g^m = 1` なら `χ_ρ(g) ∈ ℤ[ω]`。任意体上・**`ℤ` 係数**なので `ℚ(ζ)` 版より強い。付随して `character_pow_eq_sum_finrank_smul` (固有値の重複度つき和) もある | `CyclotomicField (Monoid.exponent G) ℚ →+* ℂ` embedding の構成と `φ.range` 所属への packaging **のみ** (中規模 glue、10 名 solved の易問側)。⚠ 2026-08-11 に「数学が無い」と誤読して同内容の leaf を書きかけた — repo 側に新規実装は不要 |
 
-### Q₈ 完成待ち (1) — issue 0147 は 2026-07-25 解凍済
+### 🎯 `brauer_suzuki` — 数学は完了、残りは self-contained 化のみ (issue 0184)
 
 `brauer_suzuki` (**未解決・solver 0**、2026-07-24 公開面で実測): eval statement は `n ≥ 3` の
-一般化四元数 (`QuaternionGroup (2^(n-2))`、**n=3 = Q₈ を含む**)。repo は cyclic / |T|=4 /
-|T|≥16 が sorry-free 完成済で、唯一の blocker = `brauerSuzuki_quaternionSylow_q8`
-(RankOneAffineModel.lean:294、issue 0147 = 2026-07-25 解凍・Navarro spine の repo 唯一の実 sorry)。結論形の差
-(eval: `t̄ ∈ Z(G/O(G))` / repo: `O_{2'}(G) ⊔ C_G(z) = ⊤`) の橋渡しは routine。
+一般化四元数 (`QuaternionGroup (2^(n-2))`、**n=3 = Q₈ を含む**)。
+
+**2026-08-07** に issue 0147 (Q₈ = 旧唯一の blocker) が閉じ、**2026-08-20** (issue 0184) に
+
+* 3 ケース組立を `brauerSuzuki_of_quaternionSylowTwo` へ一般化 (旧: `RankOneHypothesis` に特殊化)、
+* 結論形の橋 `mk_mem_center_of_sup_centralizer_eq_top` (積形 → 商形、任意の正規部分群で成立)、
+* `oPiCore_ne_two_eq_sSup_normal_odd` (`O_{2'}(G)` = eval の `oddCore`)
+
+を整備し、**eval statement を逐語コピーして 1 行で証明できることを実測**
+(`brauerSuzuki_mk_mem_center_oddCore` の適用、`depends on axioms: [propext, Classical.choice,
+Quot.sound]`)。eval の `3 ≤ n` は repo 版が全ての `m` を覆うので不要。
+
+残作業 = self-contained workspace 化 (§1.2 / `odd-order-submission`) **のみ**。
 
 ### repo に証明が無く候補外 (solved/unsolved を問わず判定理由を記録)
 
@@ -385,7 +393,8 @@ per_page 付き 2 ページで (1 回の要約 fetch は後半を捏造する事
 4. ZJ 定理を proposal PR に (登録済ゆえ最有力)。
 5. Tier A proposal PR: Jordan / Chermak–Delgado / Furtwängler / Thompson-FPF + 🆕 B.H.Neumann 位数 3
    + 一般 Hall–Petresco (#16 差替)。proposal merge 後、solver は他者開放 (feit_thompson 前例)。
-6. 🎯 issue 0147 Q₈ 完成 (2026-07-25 解凍済、Navarro spine) → `brauer_suzuki` proof submit (唯一の既存未解決落とし)。
+6. ✅ **(2026-08-07 / 08-20)** issue 0147 Q₈ 完成 → `brauer_suzuki` の数学は完了 (issue 0184)。
+   残るは self-contained workspace 化のみ = **唯一の既存未解決 problem を落とせる状態**。
 7. ✅ **(2026-08-11 完了) stale docstring 掃除** — 「未形式化」「TODO」「gated」の陳腐化記述
    12 件と誤引用 1 件を修正 (commit `613559800`、詳細は issue 0050 の該当項目)。特に
    `brauer_permutation_lemma` の「[Isaacs] Thm 6.32」は本リポの `[Isaacs]` = *Finite Group

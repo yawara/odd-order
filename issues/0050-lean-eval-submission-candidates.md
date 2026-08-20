@@ -37,8 +37,10 @@ self-contained / 証明が難しく mathlib 未収録。詳細と全候補は正
       主作業 = self-contained workspace 化 (正本 note §2.5)
 - [ ] **🆕 (proof submit) `brauer_character_in_cyclotomic`** — 数学は既済 (trace = 1 の冪根の和、
       `ClassSumCongruence.lean`)。`CyclotomicField (exponent G) ℚ →+* ℂ` packaging のみ (§2.5)
-- [ ] **🎯 (proof submit・凍結解除待ち) `brauer_suzuki`** — 9318 は |T|≥16 完成で closed (2026-07-23)。
-      残 blocker = Q₈ case (issue 0147; 2026-07-25 解凍・Navarro spine) のみ。eval statement は n=3 (Q₈) を含むため完成が前提
+- [ ] **🎯 (proof submit) `brauer_suzuki`** — **前提条件は解消済** (Q₈ = issue 0147 が 2026-08-07 close)。
+      2026-08-20 に eval statement を repo から逐語で証明できることを実測 (issue **0184**、
+      `brauerSuzuki_mk_mem_center_oddCore` の 1 行適用、axiom-clean)。残作業 = self-contained 化のみ。
+      **eval GroupTheory で唯一 repo が落とせる未解決 problem (solver 0)**
 - [ ] **🆕 (proposal) Glauberman ZJ 定理** — 2026-07-22 完成・AxiomsCheck 登録済
       (`Subgroup.oPiCorePrime_sup_normalizer_zCenter_thompsonJAbelian`、伝説級・mathlib/eval 双方に無い)
 - [ ] **🆕 (proposal) B.H.Neumann 位数 3** (`lowerCentralSeries_two_eq_bot_of_fixedPointFree_orderOf_eq_three`、
