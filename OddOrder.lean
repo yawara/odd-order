@@ -110,6 +110,7 @@ import OddOrder.GroupTheory.GlaubermanZStar.Basic
 import OddOrder.GroupTheory.GlaubermanZStar.Reduction
 import OddOrder.GroupTheory.GlaubermanZStar.SecondInvolution
 import OddOrder.GroupTheory.GlaubermanZStar.Fusion
+import OddOrder.GroupTheory.GlaubermanZStar.CharacterIdentity
 import OddOrder.GroupTheory.CentralCommutatorPower
 import OddOrder.GroupTheory.CentralElementaryExtension
 import OddOrder.GroupTheory.CentralExtensionAutomorphisms
