@@ -33,6 +33,9 @@ form the theorem actually has, and that proof now just applies it.
   `z̄ ∈ Z(G/O_{2'}(G))`, which is how Brauer and Suzuki state it
 * `OddOrder.GroupTheory.mk_mem_center_of_sup_centralizer_eq_top` — the converse of
   `oPiCore_sup_centralizer_eq_top_of_mk_mem_center`, so the two forms are interchangeable
+* `OddOrder.GroupTheory.oPiCore_ne_two_eq_sSup_normal_odd` — `O_{2'}(G)` is the classical odd
+  core `O(G)`, the supremum of the normal subgroups of odd order
+* `OddOrder.GroupTheory.brauerSuzuki_mk_mem_center_oddCore` — the theorem in that notation
 -/
 
 open OddOrder.Isaacs.Ch03
@@ -249,8 +252,7 @@ order whose 2-Sylow group is a quaternion group*, Proc. Nat. Acad. Sci. U.S.A. *
 
 This is the historically standard phrasing — `z` is an *isolated* involution in the sense of
 Glauberman's later `Z*`-theorem, of which this is the prototype.  It is equivalent to the product
-form `brauerSuzuki_of_quaternionSylowTwo` via
-`mk_mem_center_of_oPiCore_sup_centralizer_eq_top` and
+form `brauerSuzuki_of_quaternionSylowTwo` via `mk_mem_center_of_sup_centralizer_eq_top` and
 `oPiCore_sup_centralizer_eq_top_of_mk_mem_center`. -/
 theorem brauerSuzuki_mk_mem_center {m : ℕ} (T : Sylow 2 G)
     (he : Nonempty (↥(T : Subgroup G) ≃* QuaternionGroup m))
