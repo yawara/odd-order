@@ -291,7 +291,7 @@ so they are conjugate by an element `s` of `⟨u, t u t⁻¹⟩ ≤ C_G(v)`.  Th
 and carries `z u` to `v`, hence carries `z = (z u) u` to `v u`. -/
 theorem isConj_pPart_of_isConj {v : G} (hv : v ∈ (cfg.P : Subgroup G)) (hw2 : w * w = 1)
     (hzu : IsConj v (pPart 2 (w * cfg.u) * cfg.u)) :
-    IsConj (pPart 2 (w * cfg.u) * cfg.u * cfg.u) (v * cfg.u) := by
+    IsConj (pPart 2 (w * cfg.u)) (v * cfg.u) := by
   obtain ⟨hfix, hzz⟩ := cfg.commute_pPart hw2
   set z : G := pPart 2 (w * cfg.u) with hz
   have hcomm : cfg.u * z = z * cfg.u := by
@@ -357,8 +357,12 @@ theorem isConj_pPart_of_isConj {v : G} (hv : v ∈ (cfg.P : Subgroup G)) (hw2 : 
           calc s⁻¹ * v * s = s⁻¹ * (v * s) := by group
             _ = s⁻¹ * (s * v) := by rw [← hsv]
             _ = v := by group
-  calc (s⁻¹ * t) * (z * cfg.u * cfg.u) * (s⁻¹ * t)⁻¹
-      = ((s⁻¹ * t) * (z * cfg.u) * (s⁻¹ * t)⁻¹) * ((s⁻¹ * t) * cfg.u * (s⁻¹ * t)⁻¹) := by group
+  have hzuu : z * cfg.u * cfg.u = z := by
+    calc z * cfg.u * cfg.u = z * (cfg.u * cfg.u) := by group
+      _ = z := by rw [cfg.mul_self, mul_one]
+  calc (s⁻¹ * t) * z * (s⁻¹ * t)⁻¹
+      = (s⁻¹ * t) * (z * cfg.u * cfg.u) * (s⁻¹ * t)⁻¹ := by rw [hzuu]
+    _ = ((s⁻¹ * t) * (z * cfg.u) * (s⁻¹ * t)⁻¹) * ((s⁻¹ * t) * cfg.u * (s⁻¹ * t)⁻¹) := by group
     _ = v * cfg.u := by rw [hrzu, hru]
 
 set_option maxHeartbeats 1000000 in

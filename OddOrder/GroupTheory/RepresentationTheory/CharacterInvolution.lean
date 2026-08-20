@@ -85,6 +85,50 @@ theorem exists_intCast_character_of_mul_self_eq_one (σ : Representation K G V) 
   push_cast
   exact character_eq_of_mul_self_eq_one σ h2 ht
 
+/-- **An involution with `χ(t) = χ(1)` acts trivially.**  From `χ(t) = 2 dim V₊ − dim V` and
+`χ(1) = dim V` one gets `dim V₊ = dim V` (the cast is injective in characteristic zero), so the
+projection `(1 + ρ t)/2` is the identity and `ρ t = 1`.
+
+Over `ℂ` this is `rep_eq_id_of_character_eq_one`, proved by the equality case of the triangle
+inequality; for an involution the eigenvalues are just `±1`, so no archimedean input is needed and
+the statement holds over any field of characteristic zero. -/
+theorem rep_eq_one_of_character_eq_of_mul_self_eq_one [CharZero K] (σ : Representation K G V)
+    {t : G} (ht : t * t = 1) (h : σ.character t = σ.character 1) : σ t = 1 := by
+  have h2 : (2 : K) ≠ 0 := two_ne_zero
+  have hchar := character_eq_of_mul_self_eq_one σ h2 ht
+  rw [Representation.char_one] at h
+  rw [h] at hchar
+  -- `2 r = 2 d` in `K`, hence `r = d` in `ℕ`
+  have hcast : ((Module.finrank K (LinearMap.range (involutionProj σ t)) : ℕ) : K)
+      = ((Module.finrank K V : ℕ) : K) := by
+    have h2' : (2 : K) * (Module.finrank K (LinearMap.range (involutionProj σ t)) : K)
+        = (2 : K) * (Module.finrank K V : K) := by linear_combination (-1 : K) * hchar
+    exact mul_left_cancel₀ h2 h2'
+  have hrank : Module.finrank K (LinearMap.range (involutionProj σ t)) = Module.finrank K V :=
+    Nat.cast_injective hcast
+  -- a subspace of full dimension is everything, so the idempotent is the identity
+  have htop : LinearMap.range (involutionProj σ t) = ⊤ :=
+    Submodule.eq_top_of_finrank_eq hrank
+  have hid : involutionProj σ t = 1 := by
+    refine LinearMap.ext fun x => ?_
+    have hx : x ∈ LinearMap.range (involutionProj σ t) := by rw [htop]; trivial
+    obtain ⟨y, hy⟩ := hx
+    have hidem := isIdempotentElem_involutionProj σ h2 ht
+    calc involutionProj σ t x = involutionProj σ t (involutionProj σ t y) := by rw [hy]
+      _ = involutionProj σ t y := by
+          have hy2 := congrArg (fun f : Module.End K V => f y) hidem
+          simpa [Module.End.mul_apply] using hy2
+      _ = x := hy
+      _ = (1 : Module.End K V) x := rfl
+  -- unwind `(1 + ρ t)/2 = 1`
+  have : (1 : Module.End K V) + σ t = (2 : K) • (1 : Module.End K V) := by
+    have := congrArg (fun f : Module.End K V => (2 : K) • f) hid
+    rwa [involutionProj, smul_smul, mul_inv_cancel₀ h2, one_smul] at this
+  have h2smul : (2 : K) • (1 : Module.End K V) = 1 + 1 := by
+    rw [two_smul]
+  rw [h2smul] at this
+  exact add_left_cancel this
+
 /-! ### Inserting a commuting element: `χ(t y) = 2 χ_{V₊}(y) − χ(y)` -/
 
 /-- **The trace of `P f` is the trace of `f` on the image of `P`**, for an idempotent `P` and an
