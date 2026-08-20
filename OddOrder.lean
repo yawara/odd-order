@@ -105,6 +105,7 @@ import OddOrder.GroupTheory.BrauerSuzukiQ8.CharacterCore
 import OddOrder.GroupTheory.BrauerSuzukiQ8.Induction
 import OddOrder.GroupTheory.BrauerSuzukiQ8.Reduction
 import OddOrder.GroupTheory.BrauerSuzukiGeneral
+import OddOrder.GroupTheory.IsolatedInvolution
 import OddOrder.GroupTheory.CentralCommutatorPower
 import OddOrder.GroupTheory.CentralElementaryExtension
 import OddOrder.GroupTheory.CentralExtensionAutomorphisms

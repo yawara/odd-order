@@ -61,6 +61,7 @@ import OddOrder.GroupTheory.BrauerSuzukiInvolutions
 import OddOrder.GroupTheory.BrauerSuzukiCounting
 import OddOrder.GroupTheory.BrauerSuzukiEndgame
 import OddOrder.GroupTheory.BrauerSuzukiGeneral
+import OddOrder.GroupTheory.IsolatedInvolution
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.Mathlib.QuotientGroup
@@ -13941,6 +13942,22 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 #assert_only_allowed_axioms OddOrder.GroupTheory.isPiGroup_ne_two_iff_odd
 #assert_only_allowed_axioms OddOrder.GroupTheory.oPiCore_ne_two_eq_sSup_normal_odd
 #assert_only_allowed_axioms OddOrder.GroupTheory.brauerSuzuki_mk_mem_center_oddCore
+
+/-! 🎯 **Navarro (7.8)** (`GroupTheory/IsolatedInvolution`, issue 0186) — `Z*`-定理の仮説の
+2 つの形が同値: 対合 `u ∈ P ∈ Syl₂(G)` について
+「`P` の中で `u` は自分自身の唯一の `G`-共役」⟺「任意の `g` で `⁅u, g⁆` の位数が奇」。
+
+⚠ 教科書 (p.146) は `D = ⟨u, u^g⟩` の二面体構造を使い `⟨uv⟩ = D'` を同定して
+`2 ∤ |D'|` を出すが、repo 版は**二面体の構造論を一切使わない**: `w = u·u^g` の位数が偶なら
+`|w| = 2^a·m` (`m` 奇) と書いて `c = w^m` を取り、`k = (m+1)/2` で `v` を `w^k` で共役すると
+ちょうど `c·u` になる (`v` が `w` を反転するので)。すると `u` と その `G`-共役 `c·u` が
+2-群 `⟨c⟩ ⊔ ⟨u⟩` に同居するので仮説から `c·u = u`、つまり `c = 1` で `|c| = 2^a > 1` に矛盾。
+`conj_eq_of_mem_pGroup` は「`P` での仮説は任意の 2-部分群で成り立つ」= 教科書 Step 5。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.conj_eq_of_mem_pGroup
+#assert_only_allowed_axioms OddOrder.GroupTheory.odd_orderOf_commutator_of_forall_conj_eq
+#assert_only_allowed_axioms OddOrder.GroupTheory.forall_conj_eq_of_odd_orderOf_commutator
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.forall_conj_eq_iff_forall_odd_orderOf_commutator
 
 /-! 🎯 **BS の `Q₈` 分枝の 2 つの reduction** (`GroupTheory/BrauerSuzukiQ8`, 2026-08-06)。
 `sylowTwo_inf_oPiCore_eq_bot` (奇核は Sylow-2 と自明に交わる) で `T → Ḡ = G/O_{2'}(G)` が
