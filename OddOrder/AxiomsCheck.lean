@@ -60,6 +60,7 @@ import OddOrder.GroupTheory.UniqueInvolutionSylow
 import OddOrder.GroupTheory.BrauerSuzukiInvolutions
 import OddOrder.GroupTheory.BrauerSuzukiCounting
 import OddOrder.GroupTheory.BrauerSuzukiEndgame
+import OddOrder.GroupTheory.BrauerSuzukiGeneral
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.Mathlib.QuotientGroup
@@ -642,7 +643,7 @@ Ch.4-Ch.10, BG, Peterfalvi の flagship が完成した順に追記する.
 -/
 
 -- 機械列挙ファイル (flagship axioms check) のため分割・行長規約の対象外 — CLAUDE.md の明示例外
-set_option linter.style.longFile 21300
+set_option linter.style.longFile 21500
 set_option linter.style.longLine false
 
 open Lean Elab Command
@@ -13918,6 +13919,22 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.QuaternionSylowSetup.brauerSuzuki_of_quaternionSylow
 
+/-! 🎯 **Brauer–Suzuki の一般形** (`GroupTheory/BrauerSuzukiGeneral`, issue 0184, 2026-08-20).
+3 ケース (cyclic / `Q₈` / `|T| ≥ 16`) の組立は従来 `RankOneHypothesis.brauerSuzuki` の**中**に
+あり Peterfalvi App. II の仮説に特殊化されていた。仮説を落とした形へ括り出したもの:
+
+* `brauerSuzuki_of_quaternionSylowTwo` — Sylow `2`-部分群が `QuaternionGroup m` と同型
+  (`m` に条件なし; `m = 1` は `C₄`) なら任意の対合 `z ∈ T` について `G = O_{2'}(G)·C_G(z)`。
+  `|T| = 4m = 2ᵏ` から `m = 2ᵏ⁻²` が決まり、`k = 2 / 3 / ≥ 4` が 3 ケースに対応する。
+* `mk_mem_center_of_oPiCore_sup_centralizer_eq_top` —
+  `oPiCore_sup_centralizer_eq_top_of_mk_mem_center` の**逆**。これで積形と商形が可換に行き来できる。
+* `brauerSuzuki_mk_mem_center` — Brauer–Suzuki 1959 原論文の形
+  `z̄ ∈ Z(G/O_{2'}(G))` (`z` は Glauberman `Z*` の意味で isolated な対合)。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.brauerSuzuki_of_quaternionSylowTwo
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.mk_mem_center_of_oPiCore_sup_centralizer_eq_top
+#assert_only_allowed_axioms OddOrder.GroupTheory.brauerSuzuki_mk_mem_center
+
 /-! 🎯 **BS の `Q₈` 分枝の 2 つの reduction** (`GroupTheory/BrauerSuzukiQ8`, 2026-08-06)。
 `sylowTwo_inf_oPiCore_eq_bot` (奇核は Sylow-2 と自明に交わる) で `T → Ḡ = G/O_{2'}(G)` が
 単射になり、`Sylow.mapSurjective` の像が `Ḡ` の Sylow-2 で `T` と同型 ⟹
@@ -20720,24 +20737,27 @@ Part II の逐条監査で見つかった**特殊化債務**の解消。書籍�
 
 /-! ## Q₈ Brauer–Suzuki の下流 — 2026-08-07 に一斉解凍
 
-`q8_exists_proper_normal` が閉じたことで、`brauerSuzuki_quaternionSylow_q8` を経由していた
-Peterfalvi 補章の鎖が全て axiom-clean になった。従来この 4 本は「Q₈ の `sorry` を継承する」
-ことを理由に**意図的に未登録**だった (`TheoremANonTrivialV` の module docstring 参照)。
+`q8_exists_proper_normal` が閉じたことで、`|S| = 8` を経由していた Peterfalvi 補章の鎖が
+全て axiom-clean になった。従来この 4 本は「Q₈ の `sorry` を継承する」ことを理由に
+**意図的に未登録**だった (`TheoremANonTrivialV` の module docstring 参照)。
 
 ```
 q8_exists_proper_normal            (issue 9506, Navarro pp.139-146)
-  → brauerSuzuki_quaternionSylow_q8   (App. II Prop 1 の前提 (ii)、|S| = 8)
-  → RankOneHypothesis.brauerSuzuki    (|S| ≥ 16 の ordinary route と合流)
+  → brauerSuzuki_q8                   (|S| = 8; GroupTheory/BrauerSuzukiQ8)
+  → brauerSuzuki_of_quaternionSylowTwo (3 ケース組立、issue 0184; |S| ≥ 16 の ordinary route と合流)
+  → RankOneHypothesis.brauerSuzuki    (App. II Prop 1 の前提 (ii))
   → rankOne_affine_nearField          (App. II Prop 1 = 階数 1 の affine near-field model)
   → FirstCaseHypothesis.theoremB      (Pf II Ch.II、issue 2053)
   → nonempty_theoremAConclusion_of_V_ne_bot (Pf II Ch.II-IV = `V ≠ 1` の半分)
   → theoremA                          (Pf II Ch.I §3 の `|G|` 帰納法; `ZassenhausClassification`
                                        は axiom でなく明示引数)
 ```
--/
 
-#assert_only_allowed_axioms
-  OddOrder.Peterfalvi.Appendices.NearFields.brauerSuzuki_quaternionSylow_q8
+⚠ 2026-08-20 (issue 0184) までは中間に薄いラッパー
+`NearFields.brauerSuzuki_quaternionSylow_q8` (`orderOf z = 2` を `z² = 1 ∧ z ≠ 1` に開いた
+だけの convention 適応) が挟まっていたが、3 ケース組立の一般化で消費者が無くなったので削除した。 -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.brauerSuzuki_q8
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.NearFields.RankOneHypothesis.brauerSuzuki
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.NearFields.rankOne_affine_nearField

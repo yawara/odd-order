@@ -67,7 +67,8 @@ Per-result status:
 | `exists_field_structure_of_cyclic_index_two` (Prop 2, first half) | **proved, sorry-free** (new) |
 | App. C Prop 1 prereq (i) (`sylow_two_isCyclic_or_quaternion`) | proved, axiom-clean |
 | BS (ii) quaternion `|S|≥16` + cyclic (`brauerSuzuki_of_quaternionSylow`) | proved, axiom-clean |
-| BS (ii) quaternion `|S| = 8` (`brauerSuzuki_quaternionSylow_q8`) | proved, axiom-clean |
+| BS (ii) quaternion `|S| = 8` (`GroupTheory.brauerSuzuki_q8`) | proved, axiom-clean |
+| BS (ii) all cases assembled (`brauerSuzuki_of_quaternionSylowTwo`) | proved, axiom-clean |
 | App. C Prop 1 (`rankOne_affine_nearField`) | proved, axiom-clean |
 | Prop 1 involution clauses (`model_involution_data`) | proved, axiom-clean |
 | App. C Prop 2 (`cyclic_index_two_nearField_classification`) | proved, axiom-clean |

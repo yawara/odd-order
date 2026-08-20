@@ -42,7 +42,7 @@ classification of Zassenhaus groups ([HB], Ch. XI, Thm 11.16) rather than provin
 `nonempty_theoremAConclusion_of_V_ne_bot` is axiom-clean and registered in `AxiomsCheck`
 (2026-08-07).  It had long been excluded deliberately: Chapter II's
 `FirstCaseHypothesis.theoremB` goes through `NearFields.rankOne_affine_nearField` →
-`RankOneHypothesis.brauerSuzuki` → `brauerSuzuki_quaternionSylow_q8`, the `Q₈` case of
+`RankOneHypothesis.brauerSuzuki` → `GroupTheory.brauerSuzuki_q8`, the `Q₈` case of
 Brauer–Suzuki, which was the library's last `sorry` until the modular character theory it
 needs was built (issues 0147 / 9506, Navarro 1998 Ch. 1–7).  The Chapter III–IV half
 (`SecondCaseHypothesis.nonempty_theoremAConclusion`) was axiom-clean throughout.

@@ -41,8 +41,8 @@ predicate `ZassenhausClassification` rather than as an axiom or a `sorry`.
 
 `theoremA` is axiom-clean and registered in `AxiomsCheck` (2026-08-07); the cited
 classification enters as the explicit `ZassenhausClassification` argument, not as an axiom.
-The last `sorry` on this chain, `brauerSuzuki_quaternionSylow_q8` in Chapter II, was closed
-with the modular character theory of issues 0147 / 9506.  See `TheoremANonTrivialV`.
+The last `sorry` on this chain, the `Q₈` case of Brauer–Suzuki reached from Chapter II, was
+closed with the modular character theory of issues 0147 / 9506.  See `TheoremANonTrivialV`.
 -/
 
 set_option autoImplicit false
