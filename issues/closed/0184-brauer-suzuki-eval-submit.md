@@ -7,6 +7,9 @@ created: 2026-08-20
 
 # lean-eval proof submit: `brauer_suzuki`
 
+> **状態: CLOSED (2026-08-20)** — repo 側の数学・整備は完遂。提出操作はユーザー裁定で行わない
+> (末尾参照)。
+
 親 tracker = [0050](0050-lean-eval-submission-candidates.md) の checklist 項目
 「🎯 (proof submit・凍結解除待ち) `brauer_suzuki`」。**2026-08-07 に issue 0147 (Q₈) が閉じた
 ことで前提条件が消滅**し、着手可能になった (0050 / `notes/meta/lean_eval_submission.md` §0・§2.5
@@ -77,21 +80,20 @@ eval の `brauer_suzuki` を repo 由来の証明で埋めた `Submission.lean` 
 self-contained workspace でビルド green、かつ `#print axioms` が標準 3 公理のみ。
 **→ 2026-08-20 達成**。
 
-## 残: 提出そのもの (ユーザー判断待ち)
+## ✅ CLOSED (2026-08-20) — 提出はしない (ユーザー裁定)
 
-技術的な準備は完了。**外向きの操作なのでユーザーの承認前には実行しない**:
+> **「submission系は記録に過ぎないから、今後も触らないで」** (ユーザー 2026-08-20)
 
-- [ ] `odd-order-submission` を push (public リポジトリ)
-- [ ] `leanprover/lean-eval-submissions` に "Submit benchmark solution" issue を立てる
-      (前例: `feit_thompson` #828 / `baer_suzuki` #118)。model 表記は使用モデル列挙 +
-      human-in-the-loop で正直に (正本 note §1.2)
+`odd-order-submission` リポジトリと lean-eval への提出操作は**今後の作業対象から外す**。
+以下は**やらない**:
 
-任意の追加検証 (提出の必須要件ではない、`feit_thompson` ではやった):
+- ~~`odd-order-submission` を push~~ — ローカルに commit `1a048d1` が 1 本残るが未 push のまま放置
+- ~~`leanprover/lean-eval-submissions` に issue を立てる~~
+- ~~comparator + nanoda replay~~ / ~~theorem-only slice v2~~
 
-- [ ] comparator + nanoda kernel replay のローカル実行。⚠ `lean4export` は **v4.32.0-rc1 用**
-      しか入っておらず (`/home/ywr/.local/bin/`)、`nanoda_bin` は未 install。
-      v4.33.0 用の再ビルドが要る
-- [ ] theorem-only slice v2 (`generate_seed_slice.py`) の適用。現状は full import closure
+**⚠ 本 issue の価値は提出物ではなく repo 側の成果**であり、そちらは全て main に入っている
+(一般化 / 商形の橋 / `O(G)` 対応 / import 衛生 −71%)。提出可能な状態まで検証済という事実だけ
+記録として残す。将来この判断が覆るまで、submission workspace の再生成・検証はしない。
 
 ## 参照
 

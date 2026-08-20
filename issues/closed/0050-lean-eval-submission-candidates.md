@@ -102,3 +102,23 @@ lean-eval への proof submit / proposal 活動はユーザー裁定でいった
 2026-07-24 の凍結を解除。正本 (`notes/meta/lean_eval_submission.md` — playbook・候補全表
 §2.5・reject 記録) はそのまま使える。⚠ 再開時の注意 = **用語** (submit = proof submit のみ、
 新規問題は proposal) と **「他者 solved 済みは候補外」ではない** (per-account sticky) の 2 点。
+
+
+---
+
+## 🛑 2026-08-20 CLOSED (ユーザー裁定) — lean-eval 関連は今後触らない
+
+> **「submission系は記録に過ぎないから、今後も触らないで」** (ユーザー 2026-08-20)
+
+lean-eval への **proof submit も proposal も今後の作業対象から外す**。
+`odd-order-submission` リポジトリも同様 (未 push のローカル commit `1a048d1` はそのまま放置)。
+
+- 本 tracker の未チェック項目 (Burnside p^aq^b / `brauer_character_in_cyclotomic` /
+  ZJ・Neumann・Hall–Petresco・Jordan・Chermak–Delgado 等の proposal) は**着手しない**。
+- 直前に完遂した [`brauer_suzuki`](closed/0184-brauer-suzuki-eval-submit.md) は、
+  **repo 側の成果 (一般化・商形の橋・`O(G)` 対応・import 衛生) が本体**であり、
+  それらは全て main に入っている。提出可能な状態まで検証したという事実のみ記録に残す。
+- 正本 note [`lean_eval_submission.md`](../notes/meta/lean_eval_submission.md) は
+  **調査記録として保持**する (再調査を防ぐため)。判断が覆るまで更新しない。
+
+⚠ 将来のセッションへ: **この issue を「未消化の backlog」として拾い直さないこと**。
