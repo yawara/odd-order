@@ -234,4 +234,60 @@ theorem forall_conj_eq_iff_forall_odd_orderOf_commutator (hu : u ∈ (P : Subgro
 
 end Isolated
 
+section ConjOfOddProduct
+
+omit [Finite G] in
+/-- **Two involutions whose product has odd order are conjugate**, by an explicit power of that
+product: with `c = b·a` of odd order `m` and `k = (m+1)/2`, one has `c^k a c^{-k} = b`.
+
+`a` inverts `c` (`a c a⁻¹ = a b a a⁻¹ = a b = c⁻¹`), so `c^k a c^{-k} = c^{2k} a = c^{m+1} a = c a
+= b`.  Keeping the conjugator inside `⟨c⟩` matters: Navarro's (7.9) needs it to lie in a
+prescribed subgroup, and `⟨c⟩ ≤ ⟨a, b⟩`.
+
+This is the positive counterpart of `odd_orderOf_commutator_of_forall_conj_eq`, which rules out
+*even* order by the same computation. -/
+theorem conj_zpow_eq_of_odd_orderOf_mul {a b : G} (ha : a * a = 1) (hb : b * b = 1)
+    (hodd : Odd (orderOf (b * a))) :
+    ((b * a) ^ ((orderOf (b * a) + 1) / 2)) * a * ((b * a) ^ ((orderOf (b * a) + 1) / 2))⁻¹
+      = b := by
+  set c : G := b * a with hc
+  set m : ℕ := orderOf c with hm
+  set k : ℕ := (m + 1) / 2 with hk
+  have h2k : 2 * k = m + 1 := by
+    obtain ⟨j, hj⟩ := hodd
+    rw [hk, hj]; omega
+  have hainv : a⁻¹ = a := inv_eq_of_mul_eq_one_right ha
+  have hbinv : b⁻¹ = b := inv_eq_of_mul_eq_one_right hb
+  have hcinv : a * c * a⁻¹ = c⁻¹ := by
+    rw [hc, mul_inv_rev, hainv, hbinv]
+    calc a * (b * a) * a = a * b * (a * a) := by group
+      _ = a * b := by rw [ha, mul_one]
+  -- `a` inverts every power of `c`
+  have hpow : a * c ^ k * a⁻¹ = (c ^ k)⁻¹ := by
+    have h := map_pow (MulAut.conj a) c k
+    simpa [MulAut.conj_apply, hcinv, inv_pow] using h
+  have hstep : a * (c ^ k)⁻¹ = c ^ k * a := by
+    have h2 := congrArg (fun w : G => w⁻¹) hpow
+    simp only [mul_inv_rev, inv_inv] at h2
+    have hinv : a * (c ^ k)⁻¹ * a⁻¹ = c ^ k := by
+      calc a * (c ^ k)⁻¹ * a⁻¹ = a * ((c ^ k)⁻¹ * a⁻¹) := by group
+        _ = c ^ k := h2
+    calc a * (c ^ k)⁻¹ = (a * (c ^ k)⁻¹ * a⁻¹) * a := by group
+      _ = c ^ k * a := by rw [hinv]
+  calc c ^ k * a * (c ^ k)⁻¹ = c ^ k * (a * (c ^ k)⁻¹) := by group
+    _ = c ^ k * (c ^ k * a) := by rw [hstep]
+    _ = c ^ (2 * k) * a := by rw [two_mul, pow_add]; group
+    _ = c ^ m * (c * a) := by rw [h2k, pow_succ]; group
+    _ = c * a := by rw [pow_orderOf_eq_one, one_mul]
+    _ = b := by rw [hc]; calc b * a * a = b * (a * a) := by group
+                  _ = b := by rw [ha, mul_one]
+
+omit [Finite G] in
+/-- The conjugator of `conj_zpow_eq_of_odd_orderOf_mul` lies in `⟨b·a⟩`. -/
+theorem conj_zpow_mem_zpowers {a b : G} :
+    ((b * a) ^ ((orderOf (b * a) + 1) / 2)) ∈ Subgroup.zpowers (b * a) :=
+  pow_mem (Subgroup.mem_zpowers _) _
+
+end ConjOfOddProduct
+
 end OddOrder.GroupTheory
