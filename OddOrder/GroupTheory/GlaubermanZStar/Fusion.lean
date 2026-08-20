@@ -276,6 +276,30 @@ theorem isConj_mul_pPart (hw2 : w * w = 1) (hwne : w ≠ 1) (hwconj : ¬ IsConj 
     exact (isConj_iff.mpr ⟨_, hconj⟩).symm
   · exact isConj_iff.mpr ⟨_, conj_zpow_eq_of_odd_orderOf_mul hw2 hzu2 hxodd⟩
 
+/-- **Navarro (7.9), Step 3**, read off the configuration: `u` lies in no proper normal
+subgroup.  If it did, Step 2 (`zStar_proper`) plus `O_{2'}(H) = 1` would make `u` central in `H`,
+hence commuting with each of its conjugates — and `⁅u, g⁆`, a product of two commuting
+involutions of odd order, would be trivial, putting `u` in `Z(G) = 1`. -/
+theorem notMem_of_normal_ne_top {H : Subgroup G} [H.Normal] (hHtop : H ≠ ⊤) : cfg.u ∉ H := by
+  intro huH
+  have hOH : oPiCore {q | q ≠ 2} ↥H = ⊥ := oPiCore_subgroup_eq_bot cfg.oPiCore_eq_bot
+  have hcen : ∀ h : ↥H, ⁅(⟨cfg.u, huH⟩ : ↥H), h⁆ = 1 := fun h => by
+    have hmem := cfg.zStar_proper H hHtop huH h
+    rwa [hOH, Subgroup.mem_bot] at hmem
+  have hone : ∀ g : G, ⁅cfg.u, g⁆ = 1 := by
+    intro g
+    have hvH : g * cfg.u * g⁻¹ ∈ H := ‹H.Normal›.conj_mem cfg.u huH g
+    have hcomm : cfg.u * (g * cfg.u * g⁻¹) = (g * cfg.u * g⁻¹) * cfg.u :=
+      congrArg Subtype.val
+        (commutatorElement_eq_one_iff_commute.mp (hcen ⟨g * cfg.u * g⁻¹, hvH⟩))
+    exact eq_one_of_mul_self_eq_one_of_odd
+      (mul_self_commutator_eq_one_of_commute cfg.mul_self hcomm) (cfg.odd_commutator g)
+  have hz : cfg.u ∈ Subgroup.center G :=
+    Subgroup.mem_center_iff.mpr fun g =>
+      (commutatorElement_eq_one_iff_commute.mp (hone g)).symm
+  rw [cfg.center_eq_bot, Subgroup.mem_bot] at hz
+  exact cfg.ne_one hz
+
 /-- `u` commutes with every element of `P` (Step 5 applied to `P` itself). -/
 theorem conj_eq_of_mem_sylow {a : G} (ha : a ∈ (cfg.P : Subgroup G)) :
     a * cfg.u * a⁻¹ = cfg.u :=
