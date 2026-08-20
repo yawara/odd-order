@@ -62,6 +62,7 @@ import OddOrder.GroupTheory.BrauerSuzukiCounting
 import OddOrder.GroupTheory.BrauerSuzukiEndgame
 import OddOrder.GroupTheory.BrauerSuzukiGeneral
 import OddOrder.GroupTheory.IsolatedInvolution
+import OddOrder.GroupTheory.GlaubermanZStar.Main
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.Mathlib.QuotientGroup
@@ -13958,6 +13959,56 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 #assert_only_allowed_axioms OddOrder.GroupTheory.forall_conj_eq_of_odd_orderOf_commutator
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.forall_conj_eq_iff_forall_odd_orderOf_commutator
+
+/-! 🎯 **Glauberman の `Z*`-定理** (Navarro (7.9)、`GroupTheory/GlaubermanZStar`、issue 0186)。
+`u` が `P ∈ Syl₂(G)` の対合で「`P` の中で `u` は自分自身の唯一の `G`-共役」なら
+`u ∈ Z*(G)`、すなわち `ū ∈ Z(G/O_{2'}(G))`。Brauer–Suzuki はここでは**逆向き**に、
+Step 5 の 2 分枝の一方 (Sylow-2 が一般四元数) として消費される。
+
+`|G|` の帰納法 (`ZStarUpTo` = 「位数 `n` 以下の全群で成立」) が骨格:
+
+* Step 1 `commutator_mem_of_quotient` — 仮説は `G ⧸ N` へ遺伝する ((7.8) の奇位数形を経由)。
+  `N = O_{2'}(G)` と取り `oPiCore_quotient_self_eq_bot` を当てると `O_{2'}(G) = 1` に帰着。
+* Step 2 `commutator_mem_of_subgroup` — 仮説は `u` を含む部分群へ遺伝、よって真部分群では結論可。
+* Step 3 `commutator_eq_one_of_mem_normal` — `u` は真の正規部分群に入らない。
+* Step 4 `commutator_eq_one_of_center_ne_bot` — よって `Z(G) = 1` としてよい
+  (`O_{2'}(G/Z(G))` は Isaacs Problem 3D.2 `oPiCore_quotient_center_eq_map` で潰れる)。
+* Step 5 `exists_involution_ne_of_notMem_center` — `P` の対合が `u` 一つだけなら `P` は
+  巡回か一般四元数 (Isaacs Thm 6.11) で、どちらの分枝も Brauer–Suzuki が `u ∈ Z(G)` を出す。
+  よって `v ∈ P`、`v ≠ u` なる対合が取れる。
+* Step 6/7 `MinimalConfig.isConj_mul_pPart` / `isConj_pPart_of_isConj` — `v^g u = z x` の 2-部分 `z` は `v u` に共役、
+  `x ∈ O_{2'}(C_G(z))`。⚠ 教科書の二面体構造論は使わず
+  `conj_zpow_eq_of_odd_orderOf_mul` 1 本に置換。
+* Step 8 `MinimalConfig.character_const_on_class_product` — `χ ∈ Irr(B₀)` は `cl(v)·cl(u)` 上で
+  定数 (Navarro (7.7) を `C_G(z)` の 2-モジュラー datum に当てる)。
+* Step 9 `MinimalConfig.character_sq_eq_of_character_ne_zero` — `χ(v)·χ(u)² = χ(v)·χ(1)²`。
+* 最終矛盾 `MinimalConfig.false_of_exists_involution` — ブロック直交 (5.11) を
+  `(v, u)` と `(v, 1)` の 2 組に当てて `∑_{χ ∈ Irr(B₀)} χ(v)(χ(u) + χ(1)) = 0`。
+  Step 9 で `χ(u) ≠ χ(1)` の項は消え、`χ(u) = χ(1)` の項は Step 3 (`ker χ ⊴ G`) から
+  `χ` が定数 `χ(1)` になって `2χ(1)²`。自明指標がその一つゆえ和は正の自然数で矛盾。 -/
+#assert_only_allowed_axioms OddOrder.GroupTheory.commutator_mem_of_quotient
+#assert_only_allowed_axioms OddOrder.GroupTheory.commutator_mem_of_subgroup
+#assert_only_allowed_axioms OddOrder.GroupTheory.commutator_eq_one_of_mem_normal
+#assert_only_allowed_axioms OddOrder.GroupTheory.commutator_eq_one_of_center_ne_bot
+#assert_only_allowed_axioms OddOrder.GroupTheory.mem_center_of_isPGroup
+#assert_only_allowed_axioms OddOrder.GroupTheory.exists_involution_ne_of_notMem_center
+#assert_only_allowed_axioms OddOrder.GroupTheory.MinimalConfig.isConj_mul_pPart
+#assert_only_allowed_axioms OddOrder.GroupTheory.MinimalConfig.isConj_pPart_of_isConj
+#assert_only_allowed_axioms OddOrder.GroupTheory.MinimalConfig.notMem_of_normal_ne_top
+#assert_only_allowed_axioms OddOrder.GroupTheory.MinimalConfig.conj_eq_of_mem_sylow
+#assert_only_allowed_axioms OddOrder.GroupTheory.MinimalConfig.pRegularPart_mem_oPiCore
+#assert_only_allowed_axioms OddOrder.GroupTheory.MinimalConfig.character_conj_mul_eq
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.MinimalConfig.character_const_on_class_product
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.MinimalConfig.character_sq_eq_of_character_ne_zero
+#assert_only_allowed_axioms OddOrder.GroupTheory.MinimalConfig.false_of_exists_involution
+#assert_only_allowed_axioms OddOrder.GroupTheory.zStarUpTo_all
+#assert_only_allowed_axioms OddOrder.GroupTheory.commutator_mem_oPiCore_of_isolated
+#assert_only_allowed_axioms OddOrder.GroupTheory.glauberman_zStar
+#assert_only_allowed_axioms OddOrder.GroupTheory.glauberman_zStar_sup_centralizer_eq_top
+#assert_only_allowed_axioms OddOrder.GroupTheory.glauberman_zStar_oddCore
+#assert_only_allowed_axioms OddOrder.GroupTheory.glauberman_zStar_of_odd_commutator
 
 /-! 🎯 **BS の `Q₈` 分枝の 2 つの reduction** (`GroupTheory/BrauerSuzukiQ8`, 2026-08-06)。
 `sylowTwo_inf_oPiCore_eq_bot` (奇核は Sylow-2 と自明に交わる) で `T → Ḡ = G/O_{2'}(G)` が

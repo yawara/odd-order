@@ -39,7 +39,10 @@ Step 2 (`zStar_proper`) puts that in `O_{2'}(C_G(z))`; `x` of odd order is a pow
 ## Main results
 
 * `OddOrder.GroupTheory.MinimalConfig` — the configuration Steps 1–5 leave behind
-* `OddOrder.GroupTheory.MinimalConfig.fusion` — Steps 6 and 7
+* `OddOrder.GroupTheory.MinimalConfig.isConj_mul_pPart` — Step 6
+* `OddOrder.GroupTheory.MinimalConfig.isConj_pPart_of_isConj` — Step 7
+* `OddOrder.GroupTheory.MinimalConfig.pRegularPart_mem_oPiCore` — the `2'`-part lands in
+  `O_{2'}(C_G(z))`
 -/
 
 open OddOrder.Isaacs.Ch03
