@@ -31,7 +31,7 @@ form the theorem actually has, and that proof now just applies it.
 * `OddOrder.GroupTheory.brauerSuzuki_of_quaternionSylowTwo` — `G = O_{2'}(G)·C_G(z)`
 * `OddOrder.GroupTheory.brauerSuzuki_mk_mem_center` — the same in the quotient form
   `z̄ ∈ Z(G/O_{2'}(G))`, which is how Brauer and Suzuki state it
-* `OddOrder.GroupTheory.mk_mem_center_of_oPiCore_sup_centralizer_eq_top` — the converse of
+* `OddOrder.GroupTheory.mk_mem_center_of_sup_centralizer_eq_top` — the converse of
   `oPiCore_sup_centralizer_eq_top_of_mk_mem_center`, so the two forms are interchangeable
 -/
 
@@ -217,23 +217,21 @@ theorem brauerSuzuki_of_quaternionSylowTwo {m : ℕ} (T : Sylow 2 G)
       exact hbs
 
 omit [Finite G] in
-/-- **Converse of `oPiCore_sup_centralizer_eq_top_of_mk_mem_center`**: if `G = K·C_G(z)` with
-`K = O_{2'}(G)`, then `z̄` is central in `G/K`.
+/-- **Converse of `oPiCore_sup_centralizer_eq_top_of_mk_mem_center`**, for an arbitrary normal
+subgroup: if `G = K·C_G(z)` with `K ⊴ G`, then `z̄` is central in `G/K`.
 
 Elementary: writing `g = k·c` with `k ∈ K` and `c ∈ C_G(z)` (legitimate since `K` is normal, so
 the join is the product set), `ḡ = c̄` commutes with `z̄`. -/
-theorem mk_mem_center_of_oPiCore_sup_centralizer_eq_top {z : G}
-    (h : oPiCore {p | p ≠ 2} G ⊔ Subgroup.centralizer {z} = ⊤) :
-    QuotientGroup.mk' (oPiCore {p | p ≠ 2} G) z
-      ∈ Subgroup.center (G ⧸ oPiCore {p | p ≠ 2} G) := by
-  set K := oPiCore {p | p ≠ 2} G with hK
+theorem mk_mem_center_of_sup_centralizer_eq_top {K : Subgroup G} [K.Normal] {z : G}
+    (h : K ⊔ Subgroup.centralizer {z} = ⊤) :
+    QuotientGroup.mk' K z ∈ Subgroup.center (G ⧸ K) := by
   rw [Subgroup.mem_center_iff]
   intro gg
   induction gg using QuotientGroup.induction_on with
   | H g =>
     -- `g ∈ ⊤ = K ⊔ C_G(z) = K·C_G(z)`
     have hg : g ∈ (↑(K ⊔ Subgroup.centralizer {z}) : Set G) := by
-      rw [hK] at h ⊢; rw [h]; trivial
+      rw [h]; trivial
     rw [Subgroup.normal_mul] at hg
     obtain ⟨u, hu, c, hc, rfl⟩ := hg
     have hcz : c * z = z * c := Subgroup.mem_centralizer_singleton_iff.mp hc
@@ -259,7 +257,55 @@ theorem brauerSuzuki_mk_mem_center {m : ℕ} (T : Sylow 2 G)
     {z : G} (hzT : z ∈ (T : Subgroup G)) (hz : orderOf z = 2) :
     QuotientGroup.mk' (oPiCore {p | p ≠ 2} G) z
       ∈ Subgroup.center (G ⧸ oPiCore {p | p ≠ 2} G) :=
-  mk_mem_center_of_oPiCore_sup_centralizer_eq_top
+  mk_mem_center_of_sup_centralizer_eq_top
     (brauerSuzuki_of_quaternionSylowTwo T he hzT hz)
+
+section OddCore
+
+/-! ### The classical odd core `O(G)`
+
+Brauer and Suzuki state the theorem with `O(G)`, the largest normal subgroup of odd order,
+defined directly as the supremum of the normal subgroups of odd order.  For a finite group this
+is `oPiCore {p | p ≠ 2} G`: a subgroup has odd order exactly when every prime dividing its order
+is `≠ 2`. -/
+
+/-- A subgroup of a finite group is a `{p | p ≠ 2}`-group exactly when its order is odd. -/
+theorem isPiGroup_ne_two_iff_odd (N : Subgroup G) :
+    Subgroup.IsPiGroup {p | p ≠ 2} N ↔ Odd (Nat.card N) := by
+  rw [Nat.odd_iff, ← Nat.two_dvd_ne_zero]
+  constructor
+  · exact fun h h2 =>
+      h 2 (Nat.mem_primeFactors.mpr ⟨Nat.prime_two, h2, Nat.card_pos.ne'⟩) rfl
+  · intro h p hp
+    rintro rfl
+    exact h (Nat.dvd_of_mem_primeFactors hp)
+
+/-- **`O_{2'}(G)` is the odd core `O(G)`**: for a finite group, the largest normal
+`{p | p ≠ 2}`-subgroup is the supremum of all normal subgroups of odd order. -/
+theorem oPiCore_ne_two_eq_sSup_normal_odd (G : Type*) [Group G] [Finite G] :
+    oPiCore {p | p ≠ 2} G = sSup {N : Subgroup G | N.Normal ∧ Odd (Nat.card N)} := by
+  refine le_antisymm (iSup_le fun H => le_sSup ⟨H.2.1, (isPiGroup_ne_two_iff_odd _).mp H.2.2⟩)
+    (sSup_le fun N hN => ?_)
+  have : N.Normal := hN.1
+  exact Subgroup.IsPiGroup.le_oPiCore ((isPiGroup_ne_two_iff_odd N).mpr hN.2)
+
+/-- The odd core is normal — the instance that makes `G ⧸ O(G)` a group. -/
+instance sSupNormalOdd.normal (G : Type*) [Group G] [Finite G] :
+    (sSup {N : Subgroup G | N.Normal ∧ Odd (Nat.card N)}).Normal :=
+  oPiCore_ne_two_eq_sSup_normal_odd G ▸ oPiCore.normal {p | p ≠ 2} G
+
+/-- **Brauer–Suzuki theorem in the classical `O(G)` notation**: if a Sylow `2`-subgroup of the
+finite group `G` is generalized quaternion, the image of an involution of it in `G/O(G)` is
+central, where `O(G)` is the largest normal subgroup of odd order. -/
+theorem brauerSuzuki_mk_mem_center_oddCore {m : ℕ} (T : Sylow 2 G)
+    (he : Nonempty (↥(T : Subgroup G) ≃* QuaternionGroup m))
+    {z : G} (hzT : z ∈ (T : Subgroup G)) (hz : orderOf z = 2) :
+    (QuotientGroup.mk z : G ⧸ sSup {N : Subgroup G | N.Normal ∧ Odd (Nat.card N)})
+      ∈ Subgroup.center (G ⧸ sSup {N : Subgroup G | N.Normal ∧ Odd (Nat.card N)}) := by
+  refine mk_mem_center_of_sup_centralizer_eq_top ?_
+  rw [← oPiCore_ne_two_eq_sSup_normal_odd G]
+  exact brauerSuzuki_of_quaternionSylowTwo T he hzT hz
+
+end OddCore
 
 end OddOrder.GroupTheory

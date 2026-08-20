@@ -13926,14 +13926,20 @@ supported on elements conjugate into `A`, whose orders are divisible by `4`; hen
 * `brauerSuzuki_of_quaternionSylowTwo` — Sylow `2`-部分群が `QuaternionGroup m` と同型
   (`m` に条件なし; `m = 1` は `C₄`) なら任意の対合 `z ∈ T` について `G = O_{2'}(G)·C_G(z)`。
   `|T| = 4m = 2ᵏ` から `m = 2ᵏ⁻²` が決まり、`k = 2 / 3 / ≥ 4` が 3 ケースに対応する。
-* `mk_mem_center_of_oPiCore_sup_centralizer_eq_top` —
-  `oPiCore_sup_centralizer_eq_top_of_mk_mem_center` の**逆**。これで積形と商形が可換に行き来できる。
+* `mk_mem_center_of_sup_centralizer_eq_top` —
+  `oPiCore_sup_centralizer_eq_top_of_mk_mem_center` の**逆** (任意の正規部分群 `K` で成立)。
+  これで積形と商形が可換に行き来できる。
 * `brauerSuzuki_mk_mem_center` — Brauer–Suzuki 1959 原論文の形
-  `z̄ ∈ Z(G/O_{2'}(G))` (`z` は Glauberman `Z*` の意味で isolated な対合)。 -/
+  `z̄ ∈ Z(G/O_{2'}(G))` (`z` は Glauberman `Z*` の意味で isolated な対合)。
+* `isPiGroup_ne_two_iff_odd` / `oPiCore_ne_two_eq_sSup_normal_odd` — 古典記法 `O(G)` との橋。
+  有限群では `O_{2'}(G)` = 奇位数正規部分群の sup。
+* `brauerSuzuki_mk_mem_center_oddCore` — 上の 2 本を合わせた `O(G)` 版 statement。 -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.brauerSuzuki_of_quaternionSylowTwo
-#assert_only_allowed_axioms
-  OddOrder.GroupTheory.mk_mem_center_of_oPiCore_sup_centralizer_eq_top
+#assert_only_allowed_axioms OddOrder.GroupTheory.mk_mem_center_of_sup_centralizer_eq_top
 #assert_only_allowed_axioms OddOrder.GroupTheory.brauerSuzuki_mk_mem_center
+#assert_only_allowed_axioms OddOrder.GroupTheory.isPiGroup_ne_two_iff_odd
+#assert_only_allowed_axioms OddOrder.GroupTheory.oPiCore_ne_two_eq_sSup_normal_odd
+#assert_only_allowed_axioms OddOrder.GroupTheory.brauerSuzuki_mk_mem_center_oddCore
 
 /-! 🎯 **BS の `Q₈` 分枝の 2 つの reduction** (`GroupTheory/BrauerSuzukiQ8`, 2026-08-06)。
 `sylowTwo_inf_oPiCore_eq_bot` (奇核は Sylow-2 と自明に交わる) で `T → Ḡ = G/O_{2'}(G)` が
