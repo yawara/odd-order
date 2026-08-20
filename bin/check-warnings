@@ -16,6 +16,9 @@
 
 仕様:
   - `lake build` を実行 (追加引数は素通し)。build 自体が失敗したらその exit code。
+  - 出力の `PANIC at ...` 行も拾う。Lean 内部の非致命 panic は `info:` レベルで出るため
+    warning gate を素通りするが、1 宣言で 180 件出てログを埋めた実績がある (issue 0185)。
+    **gate / --strict では 1 件でも exit 1**。
   - 出力の `warning:` 行を (相対パス, linter カテゴリ) に分類。
     `declaration uses 'sorry'` (v4.32 実文言はバッククォート) は statement-first
     spine 戦略の正常系ゆえ**常に無視**。
@@ -40,6 +43,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASELINE = os.path.join(ROOT, 'bin', 'lint-baseline.tsv')
 
 SORRY = re.compile(r"declaration uses .sorry.")
+# Lean 内部の非致命 PANIC。`info:` レベルで出るので warning gate を素通りするが、
+# 1 宣言で 180 件出た実績があり (issue 0185) 本物の異常をログに埋もれさせる。
+PANIC = re.compile(r"PANIC at (?P<fn>\S+)")
 WARN_START = re.compile(r"^(?:⚠\s*)?warning:\s*(.*)$")
 BLOCK_END = re.compile(r"^(?:⚠\s*)?(warning|error|info):|^(Build completed|Some builds|\[|trace:)")
 # 警告ブロック先頭の `warning: <path>:L:C: <first msg line>` から path を取る
@@ -88,6 +94,16 @@ def collect_current(extra_args):
     log = proc.stdout
     lines = log.splitlines()
     counts = Counter()
+    panics = Counter()
+    site = '<unattributed>'
+    for line in lines:
+        mp = PANIC.search(line)
+        if not mp:
+            continue
+        mpath = PATH_AT.search(line)
+        if mpath:
+            site = mpath.group('p')
+        panics[(site, mp.group('fn'))] += 1
     i, n = 0, len(lines)
     while i < n:
         mw = WARN_START.match(lines[i])
@@ -110,7 +126,7 @@ def collect_current(extra_args):
         path = mp.group('p') if mp else '?'
         path = re.sub(r'^\./', '', path)
         counts[(path, cat)] += 1
-    return counts, proc.returncode, log
+    return counts, panics, proc.returncode, log
 
 
 def load_baseline():
@@ -156,6 +172,14 @@ def print_census(counts):
         print(f'{n:4d}  {path}')
 
 
+def print_panics(panics):
+    total = sum(panics.values())
+    print(f'\n=== Lean 内部 PANIC: {total} 件 / {len(panics)} 箇所 ===')
+    for (path, fn), n in panics.most_common():
+        print(f'{n:4d}  {path}  [{fn}]')
+    print('回避例 = issue 0185 (大きな文脈での simpa を simp 非経由の形に置換)')
+
+
 def main():
     args = sys.argv[1:]
     mode = 'gate'
@@ -175,7 +199,7 @@ def main():
         else:
             extra.append(a)
 
-    counts, status, log = collect_current(extra)
+    counts, panics, status, log = collect_current(extra)
     if status != 0:
         print('\n'.join(log.splitlines()[-3:]))
         for l in log.splitlines():
@@ -186,17 +210,26 @@ def main():
 
     if mode == 'report':
         print_census(counts)
+        if panics:
+            print_panics(panics)
         return
     if mode == 'update':
         write_baseline(counts)
         print(f'✓ baseline 更新: {sum(counts.values())} 件 / {len(counts)} 組 → {BASELINE}')
         return
     if mode == 'strict':
+        bad = False
         if counts:
             print_census(counts)
             print(f'\n❌ 非 sorry 警告が {sum(counts.values())} 件あります (--strict ゼロ gate)')
+            bad = True
+        if panics:
+            print_panics(panics)
+            print(f'\n❌ Lean 内部 PANIC が {sum(panics.values())} 件あります')
+            bad = True
+        if bad:
             sys.exit(1)
-        print('✓ warnings clean (--strict): 非 sorry 警告ゼロ')
+        print('✓ warnings clean (--strict): 非 sorry 警告ゼロ / PANIC ゼロ')
         return
 
     base = load_baseline()
@@ -226,6 +259,11 @@ def main():
         return
 
     # gate mode
+    if panics:
+        print_panics(panics)
+        print(f'\n❌ Lean 内部 PANIC が {sum(panics.values())} 件あります'
+              ' (baseline を持たない — 常にゼロが要求です)')
+        sys.exit(1)
     if regressions:
         print('❌ baseline を超える lint 警告が増えました (その commit で直すか baseline を'
               ' 意図的に更新してください):')
@@ -234,7 +272,8 @@ def main():
         print(f'\n合計 {len(regressions)} 組で増加。'
               f' 意図的な追加なら `bin/check-warnings --update-baseline` で承認。')
         sys.exit(1)
-    msg = f'✓ ratchet OK: 非 sorry 警告 {sum(counts.values())} 件 (baseline {sum(base.values())} 以下)'
+    msg = (f'✓ ratchet OK: 非 sorry 警告 {sum(counts.values())} 件'
+           f' (baseline {sum(base.values())} 以下) / PANIC ゼロ')
     if improvements:
         msg += f' — うち {len(improvements)} 組が改善'
     print(msg)
