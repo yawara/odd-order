@@ -28,6 +28,24 @@
 | **BG** | H. Bender & G. Glauberman, *Local Analysis for the Odd Order Theorem* (LMS LNS 188, 1994) | Feit-Thompson 1963 原論文 Ch.IV (局所解析) + Ch.VI (最終矛盾; App.C は Peterfalvi 1984 paper の改訂版) |
 | **Peterfalvi** | T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000) | Feit-Thompson 1963 原論文 Ch.V (指標理論) |
 
+### 補助原典から派生した成果 — Navarro 1998 (2026-08-20 現在)
+
+宣言スコープは上の 3 冊のままだが、**Navarro, *Characters and Blocks of Finite Groups*
+(LMS LNS 250, 1998) の Ch.1–7 は事実上フル形式化された**。経緯は「Peterfalvi App.C Prop 1 に
+残る唯一の `sorry` = Q₈ Brauer–Suzuki」を閉じるために modular 表現論 (Brauer 指標・block・
+分解行列・defect group) を一から立てる必要があった (mathlib に皆無) こと。
+
+| Navarro | 内容 | repo |
+|---|---|---|
+| Ch.1–6 | Algebras / Brauer 指標 / Blocks / 第一・第二・第三主定理 | `OddOrder/GroupTheory/RepresentationTheory/Modular/**` (150+ leaf) |
+| Ch.7 前半 (pp.131–146) | Brauer–Suzuki (Q₈ ケース本証明) | `OddOrder/GroupTheory/BrauerSuzuki*`, issue 0147 / 9506 (2026-08-07 完了) |
+| Ch.7 後半 (7.7)–(7.9) | **Glauberman `Z*`-定理** (本の掲げる objective) | `OddOrder/GroupTheory/GlaubermanZStar/**`, issue 0186 (2026-08-20 完了) |
+| **Ch.8–11** (pp.150–272) | Brauer 指標の指標性 / 正規部分群と block / `p`-可解群 / 位数 `p` の Sylow | **未着手・スコープ外** (着手はユーザー裁定待ち) |
+
+⚠ `notes/meta/q8_modular_char_theory_frozen_project.md` §2'' の「`Z*`-定理は不要」は
+**Q₈ BS を閉じる経路としては不要**の意味で、repo に `Z*` が無いという意味ではない。
+
+
 ## 方針
 
 - **すべてローカルに書く** (mathlib への PR は将来課題、当面はこのリポジトリ内)
