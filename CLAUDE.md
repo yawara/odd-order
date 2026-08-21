@@ -122,7 +122,7 @@ backlog 230 件は 2026-07-22〜24 の wave で**完済** (issue 0138 closed、0
 ### doc 衛生 gate ([`bin/check-links`](bin/check-links) / [`bin/check-doc-names`](bin/check-doc-names))
 
 lint と同じ理由 (放置すると溜まる) で、**docstring と markdown リンクの drift も機械 gate**にした
-([issue 0187](issues/0187-corpus-doc-hygiene-audit.md), 2026-08-21 に 230 broken link + 24 実在しない
+([issue 0187](issues/closed/0187-corpus-doc-hygiene-audit.md), 2026-08-21 に 230 broken link + 24 実在しない
 宣言名 + 30 陳腐化 doneness 主張を一掃)。**両方とも現在ゼロ**なので、赤くなったらそれは新規 drift。
 
 - **`bin/check-links`** — 追跡下の全 `*.md` (802 件) の相対リンクを解決。fenced code block と

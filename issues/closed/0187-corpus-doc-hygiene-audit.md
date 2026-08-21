@@ -9,7 +9,7 @@ created: 2026-08-20
 
 ## 背景
 
-FT 本体 + 3 冊 + Navarro Ch.1–7 (Z\*-定理, [0186](closed/0186-glauberman-zstar-theorem.md)) が
+FT 本体 + 3 冊 + Navarro Ch.1–7 (Z\*-定理, [0186](0186-glauberman-zstar-theorem.md)) が
 揃い、コーパスは 1,709 leaf / 818k 行になった。この規模になると **docstring が実体から drift
 する**のが実害になる:
 
@@ -51,7 +51,7 @@ FT 本体 + 3 冊 + Navarro Ch.1–7 (Z\*-定理, [0186](closed/0186-glauberman-
 |---|---|
 | orphan leaf (`OddOrder.lean` から到達不能) | **0** / 1,717 module |
 | 同一ファイル内の重複 import 行 | **0** |
-| `import Mathlib.Tactic` (丸 import) | **0** ([0136](closed/0136-lint-deferred-import-and-generalization.md) で完済済) |
+| `import Mathlib.Tactic` (丸 import) | **0** ([0136](0136-lint-deferred-import-and-generalization.md) で完済済) |
 | leaf からの `import OddOrder` (root 自己 import) | **0** |
 
 ### 実在しない宣言名 — 24 件を訂正
@@ -102,7 +102,7 @@ Quot.sound]`)。主なもの:
 |---|---|---|
 | `S7B2_NormalJClose.lean`: 「残りを 3 つの focused **axiom** に分割、後続セッションが discharge」 | ファイル内 `axiom` **0 件**、`normal_J` は sorry-free + axiom-clean | 3 名の実名へ訂正 + 「axiom」表現を全廃 |
 | `S15_Gate3.lean` (13.17.a/b): 「Skeleton status (Phase 2) … **4 つの gate が残る**」 | `exists_typeI_maximal_overNormalizer_U` は `[propext, Classical.choice, Quot.sound]` | 「全 gate 解消済」へ訂正、各 gate の解消元を明記 |
-| `FongSwan.lean`: 「**⚠ Duplication flag** — private な BG 側と ~30 行の証明が重複」 | 定義は `GroupTheory/SolvablePrimeIndex.lean` の 1 本のみ ([9111](closed/9111-dedup-prime-index-solvable.md) で統合済)、両者とも呼ぶだけ | 統合済の記述へ差し替え |
+| `FongSwan.lean`: 「**⚠ Duplication flag** — private な BG 側と ~30 行の証明が重複」 | 定義は `GroupTheory/SolvablePrimeIndex.lean` の 1 本のみ ([9111](9111-dedup-prime-index-solvable.md) で統合済)、両者とも呼ぶだけ | 統合済の記述へ差し替え |
 | `Theorem152Helpers.lean`: 「(sorried, general) `mf_hall_centralizer_control`」 | axiom-clean | 「then-sorried … since proved」 |
 | `S10_StructureSetup.lean`: 「(sorried, lane-f W1) `proposition_type_classification`」 | axiom-clean | 同上 |
 | `reconciled_typePData_T` を「sorried」と呼ぶ 6 箇所 (S15/S16) | axiom-clean | 「then-sorried」(経路の履歴としては正しいので保持) |
@@ -111,13 +111,13 @@ Quot.sound]`)。主なもの:
 | `S06_Thm64.lean`: 「場合 2 は**未証明**」「現状 `step` は未証明」 | `thm64_case_fitting_primes_subset` / `thm64_step` とも実在・axiom-clean (`S06_Thm64Case2.lean` が `step` を供給) | 証明済へ訂正 |
 | `S13_Orthogonality.lean`: 「The sole sorried-cite is the caseA refuter」 | 同ファイル L176 が既に「re-measured 2026-07-27、caseA は no longer gated」と自己訂正済 | 冒頭を実体に合わせた |
 | `S12_Noncoherence.lean`: 「three gate lemmas **sorried pending issue 2022**」 | issue 2022 は closed、file は sorry-free | 「since proved」へ |
-| `RankOneAffineModel.lean`: 「`Q₈` case sorried inside」 | Q₈ は Z\*-定理 ([0186](closed/0186-glauberman-zstar-theorem.md)) で landing 済 | 過去形へ |
+| `RankOneAffineModel.lean`: 「`Q₈` case sorried inside」 | Q₈ は Z\*-定理 ([0186](0186-glauberman-zstar-theorem.md)) で landing 済 | 過去形へ |
 | `S14_MaximalI/*` (4 箇所): 「pinned **sorried** §8/§9 obligation」 | 上流は全て証明済。「pinned」= 仮説パラメータ化という設計自体は現存 | 「explicit hypothesis として pinned (上流は証明済)」へ。`WitnessSylowCyclic` には「リポジトリが sorry-free になったので pinning は discharge 可能かもしれない」と事実として付記 |
 | `S15_Gate3.lean` L26 / `PairStructure.lean` / `KeyInequality.lean` / `SubgroupL.lean` / `S15_CaseACoherence.lean` / `S15_CharacterDegreeSupply.lean` / `S15_SAndTBasic.lean` (2) | いずれも axiom-clean | 「then-sorried」「since proved」へ |
 
 **訂正しなかったもの (実測して正しいと確認)**: Isaacs Ch.5/Ch.10 の「`M(G)` の universal object
 は未実装」「pretransfer の合成 (5A.3 c/d) は未実装」「Maschke の `ZMod p`-加群化は未実装」は
-**現在も真** (環境ダンプに該当定数なし; [9206](closed/9206-schur-multiplier-infrastructure.md) は
+**現在も真** (環境ダンプに該当定数なし; [9206](9206-schur-multiplier-infrastructure.md) は
 「universal object はどの演習にも不要だった」で close)。`S10_ForwardFromKeystone.lean` の
 「de-axiomatized」、`S7B2` の「nothing is axiomatized」等は自己否定形なので正しい。
 `S14_TypePCounting` の「mis-encoded sorried surface … was deleted」は履歴として正しい。
@@ -144,5 +144,5 @@ Quot.sound]`)。主なもの:
 ## 参照
 
 - CLAUDE.md「陳腐化 docstring は見つけたら直す」(2026-07-21) / [[feedback-fix-stale-docstrings-on-sight]]
-- CLAUDE.md「新 leaf は同じ commit で `OddOrder.lean` に配線」(2026-07-20, [0135](closed/0135-orphan-leaf-build-gate.md))
-- 直前の tracker: [0186](closed/0186-glauberman-zstar-theorem.md) (Glauberman Z\*-定理)
+- CLAUDE.md「新 leaf は同じ commit で `OddOrder.lean` に配線」(2026-07-20, [0135](0135-orphan-leaf-build-gate.md))
+- 直前の tracker: [0186](0186-glauberman-zstar-theorem.md) (Glauberman Z\*-定理)
