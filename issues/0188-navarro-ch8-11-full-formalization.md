@@ -73,18 +73,43 @@ Ch.8 が直接乗るもの:
       well-definedness (`induceTerm_mul_mem`)・類関数性・正規化ブリッジ
       (`card_filter_mk_eq` / `card_smul_induceCoset` / `induceCoset_eq_induce`) まで完了。
       ⟹ **(8.1) 完了**。
-- [~] (8.2) Brauer–Nesbitt / (8.3) Cor — **誘導表現 `indRep` を構成済**
-      (`InducedRepresentation.lean`)。mathlib の `Representation.ind` は coinvariants
-      `(k[H] ⊗ A)_G` で固有値計算に不向きなので、coinduced の具体形
-      `{f : G → W | f(hx) = ρ(h) f(x)}` に右移動作用 `(g·f)(x) = f(xg)` を入れたモデルを採用
-      (選択を含まないので `Representation` 構造が clean)。
-      **残**: (a) 右 transversal 座標での `≃ₗ[k] (H \ G) → W` (finrank 用)、
-      (b) `⟨g⟩` の軌道分解、(c) 軌道長 `ℓ > 1` の寄与が 0 になること
-      (`ℓ` 乗根の総和 = 0)、(d) 組み立て。
+- [~] (8.2) Brauer–Nesbitt / (8.3) Cor — 誘導表現まわりの土台が landing 済。
+      mathlib の `Representation.ind` は coinvariants `(k[H] ⊗ A)_G` で固有値計算に
+      不向きなので、coinduced の具体形 `{f : G → W | f(hx) = ρ(h) f(x)}` に右移動作用
+      `(g·f)(x) = f(xg)` を入れたモデルを採用 (選択を含まないので `Representation`
+      構造が clean)。
+
+      **完了分** (`InducedRepresentation.lean`):
+      - `indSubmodule` / `indRep` — 誘導表現の構成
+      - `indCoordEquiv` — 座標同型 `≃ₗ[k] (H \ G) → W` (`coordShift` = 右剰余類代表に
+        対する `H`-成分)。これで `Module.finrank` が届く
+      - `finrank_indSubmodule` — 次数公式 `[G : H] * finrank W`
+        (書籍の `θ^G(1) = [G:H]·θ(1)` の加群レベルの出所)
+      - `cosetRightMul` / `cosetRightMul_mk_eq_iff` — 右剰余類への `g` の右移動と、
+        固定判定 `⟦xg⟧ = ⟦x⟧ ↔ x g x⁻¹ ∈ H` (`induceCoset` の項を切り出す条件)
+      - `indSupport` / `indSupport_invariant` — `g`-安定な余類集合が切り出す `⟨g⟩`-部分加群
+      - `indRep_apply_of_conj_mem` — **固定余類の寄与** `(g·f)(x) = ρ(x g x⁻¹) (f x)`
+
+      **完了分** (`OddOrder/Algebra/EigenvalueScaling.lean`) — 消滅側の線形代数核:
+      可逆な `S` が `S (T v) = ω • T (S v)` で `T` を絡めるなら、`S` は `ζ`-固有空間を
+      `ω⁻¹ζ`-固有空間の上へ同型に写す (`map_eigenspace_of_intertwine`)、よって重複度が
+      `ω` 倍で不変 (`finrank_eigenspace_eq_of_intertwine`)。体上の任意の作用素についての
+      主張で、この応用に固有の仮定は無い。
+
+      **残 (次の着手点、この順)**:
+      1. `rootLift` の乗法性 `rootLift n (ω*ζ) = rootLift n ω * rootLift n ζ`
+         (現状 `rootLift_mul` は無い。`rootsOfUnityEquivResidue` の逆写像なので成立するはず)
+      2. **消滅補題**: 重複度が `ω` 倍で不変 (`ω ∈ μ_n`, `ω ≠ 1`) なら
+         `brauerCharacter n ρ g = 0`。1 と `finrank_eigenspace_eq_of_intertwine` から
+         `ω̂ · b = b` を経由し、`𝒪` が整域・`ω̂ ≠ 1` で結論
+      3. 長さ `ℓ` の軌道に対する**ブロック傾斜作用素** `S` の構成 (第 `i` ブロックを
+         `ω^i` 倍) と、`indRep g` を `ω` 倍に絡めることの検証
+      4. 軌道分解 (`indSupport` の内部直和) + `brauerCharacter_quotient_add_subrepresentation`
+         の加法性で組み立て、`induceCoset` と一致させる
+
       証明の骨格: `g` を `p`-正則とし `Ind ↓⟨g⟩` を `⟨g⟩` の `H \ G` 上の軌道で分解。
-      固定余類 `t` (`t g t⁻¹ ∈ H`) は `α(t g t⁻¹)` を寄与し、長さ `ℓ > 1` の軌道は
-      固有値が `ℓ` 乗根の完全な組になるので 0。既存の
-      `brauerCharacter_quotient_add_subrepresentation` (短完全列での加法性) に載せる。
+      固定余類 `x` (`x g x⁻¹ ∈ H`) は `α(x g x⁻¹)` を寄与し、長さ `ℓ > 1` の軌道は
+      重複度が `ω` 倍で不変になるので 0。
 - [ ] (8.4) Nakayama / (8.5) Clifford / (8.6) / (8.7) (8.8) Cor
 - [ ] (8.9) Clifford 対応 / (8.10)
 - [ ] (8.11) Green / (8.12) 巡回商 / (8.13) Dade (coprime 拡張)
