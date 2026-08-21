@@ -1,0 +1,208 @@
+#!/usr/bin/env python3
+"""Check that backticked identifiers in Lean doc comments name real constants.
+
+Ground truth is the elaborated environment, not a source grep: the script runs
+`lake env lean` on a throwaway file that imports `OddOrder` and dumps every
+constant name, then matches doc-comment tokens against it.  Three passes, in
+increasing looseness:
+
+  1. fully-qualified `OddOrder.…` references
+  2. `## Main results` / `## Main definitions` bullet entries
+  3. declaration-shaped snake_case tokens (two or more underscores)
+
+Names that legitimately resolve to no constant are filtered out:
+
+  * Lean *module* paths and `scoped[…]` / `namespace` names;
+  * `private` declarations and hypothesis / `have` binders — neither reaches the
+    environment dump, so both are collected from the sources instead;
+  * Coq identifiers quoted from `coq/`;
+  * single-subscript book notation (`B_0`, `Br_P`, `d_i`);
+  * `_of_bar` shorthand, when a sibling token on the same or previous line
+    completes it into a real name (`zPerm_apply_of_lt` / `_of_mem`);
+  * references carrying a nearby "retired / migrated / former / then-sorried"
+    marker, i.e. deliberately historical mentions of something since removed.
+
+Usage:  bin/check-doc-names [--names <cache>] [--pass 1|2|3]
+Exit code 1 if any unresolved reference is found.
+"""
+import argparse, os, re, subprocess, sys, tempfile
+
+ROOT = subprocess.run(["git", "rev-parse", "--show-toplevel"],
+                      capture_output=True, text=True, check=True).stdout.strip()
+TICK = re.compile(r"`([^`\n]{1,160})`")
+IDENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_'!?]*(?:\.[A-Za-z0-9_'!?]+)*$")
+SNAKE = re.compile(r"^[a-z][A-Za-z0-9']*(?:_[A-Za-z0-9'!?]+){2,}$")
+HDR = re.compile(r"^\s*#+\s*(.*)$")
+MAIN = ("main result", "main definition", "main statement", "main theorem", "main declaration")
+
+
+def dump_names(cache):
+    if cache and os.path.exists(cache):
+        return open(cache, encoding="utf-8").read().split("\n")
+    out = cache or os.path.join(tempfile.mkdtemp(), "allnames.txt")
+    with tempfile.NamedTemporaryFile("w", suffix=".lean", delete=False) as fh:
+        fh.write("import OddOrder\n\nopen Lean in\nrun_cmd do\n"
+                 "  let env ← Lean.getEnv\n  let mut out : Array String := #[]\n"
+                 "  for (n, _) in env.constants.toList do\n"
+                 "    if !n.isInternal then out := out.push n.toString\n"
+                 f"  IO.FS.writeFile {out!r} (String.intercalate \"\\n\" out.toList)\n")
+        script = fh.name
+    subprocess.run(["lake", "env", "lean", script], cwd=ROOT, check=True,
+                   stdout=subprocess.DEVNULL)
+    os.unlink(script)
+    return open(out, encoding="utf-8").read().split("\n")
+
+
+def doc_segments(lines):
+    """Yield (lineno, text) for every doc-comment line, joining wrapped names."""
+    in_doc = False
+    for i, line in enumerate(lines, 1):
+        if not in_doc:
+            m = re.search(r"/-[!-]", line)
+            if not m:
+                continue
+            in_doc, seg = True, line[m.end():]
+        else:
+            seg = line
+        if "-/" in seg:
+            seg, in_doc = seg.split("-/")[0], False
+        yield i, seg
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--names", help="cache file for the constant-name dump")
+    ap.add_argument("--pass", dest="passes", type=int, choices=[1, 2, 3], action="append")
+    args = ap.parse_args()
+    passes = set(args.passes or [1, 2, 3])
+
+    names = set(dump_names(args.names))
+    nsprefix, suffixes = set(), set()
+    for n in names:
+        p = n.split(".")
+        for k in range(1, len(p)):
+            nsprefix.add(".".join(p[:k]))
+        for k in range(len(p)):
+            suffixes.add(".".join(p[k:]))
+
+    files = subprocess.run(["git", "ls-files", "OddOrder/*.lean", "OddOrder.lean"],
+                           cwd=ROOT, capture_output=True, text=True).stdout.split()
+    mods, basenames = set(), set()
+    for f in files:
+        p = f[:-5].replace("/", ".").split(".")
+        for k in range(1, len(p) + 1):
+            mods.add(".".join(p[:k]))
+        basenames.add(p[-1])
+    for r, _, fs in os.walk(os.path.join(ROOT, ".lake/packages/mathlib/Mathlib")):
+        for fn in fs:
+            if fn.endswith(".lean"):
+                m = os.path.relpath(os.path.join(r, fn),
+                                    os.path.join(ROOT, ".lake/packages/mathlib"))[:-5]
+                p = m.replace("/", ".").split(".")
+                for k in range(1, len(p) + 1):
+                    mods.add(".".join(p[:k]))
+
+    # `namespace X` / `scoped[X]` names are valid prefixes even with no constant at X
+    for f in files:
+        for line in open(os.path.join(ROOT, f), encoding="utf-8"):
+            m = re.match(r"\s*(?:namespace\s+|scoped\[)([\w.]+)", line)
+            if m:
+                nsprefix.add(m.group(1))
+
+    # `private` declarations never reach the environment dump, and hypothesis /
+    # `have` binders are not constants at all — collect both from the sources so a
+    # doc comment may legitimately name them.
+    source_syms = set()
+    DECL = re.compile(r"^\s*(?:@\[[^\]]*\]\s*)*(?:private\s+|protected\s+|noncomputable\s+|"
+                      r"partial\s+|unsafe\s+|nonrec\s+|scoped\s+|local\s+)*"
+                      r"(?:theorem|lemma|def|abbrev|structure|inductive|class|instance)\s+"
+                      r"([A-Za-z_][\w.'!?]*)")
+    BINDER = re.compile(r"[({\[]\s*([A-Za-z_][\w'!?]*(?:\s+[A-Za-z_][\w'!?]*)*)\s*:[^=]|"
+                        r"\bhave\s+([A-Za-z_][\w'!?]*)\s*:")
+    for f in files:
+        for line in open(os.path.join(ROOT, f), encoding="utf-8"):
+            m = DECL.match(line)
+            if m:
+                source_syms.add(m.group(1).split(".")[-1])
+                source_syms.add(m.group(1))
+            for bm in BINDER.finditer(line):
+                for grp in bm.groups():
+                    if grp:
+                        source_syms.update(grp.split())
+
+    coq = os.path.join(ROOT, "coq")
+    coq_cache = {}
+    def is_coq(tok):
+        if tok not in coq_cache:
+            coq_cache[tok] = os.path.isdir(coq) and subprocess.run(
+                ["grep", "-rqw", "--", tok, coq], capture_output=True).returncode == 0
+        return coq_cache[tok]
+
+    # `B_0`, `Br_P`, `d_i`: a short stem with a single one-character subscript is
+    # the book's notation, never a declaration name.
+    SUBSCRIPT = re.compile(r"^[A-Za-z][A-Za-z]?_[0-9A-Za-z]$")
+    HISTORICAL = re.compile(
+        r"(retired|migrated|prefix-split|deleted|removed|former|no longer|"
+        r"then-sorried|was an axiom|used to|since proved|かつて|旧|削除|移設|統合)", re.I)
+
+    bad = []
+    for f in files:
+        lines = open(os.path.join(ROOT, f), encoding="utf-8").read().split("\n")
+        body = set(re.findall(r"[A-Za-z_][A-Za-z0-9_'!?]*", "\n".join(
+            l for l in lines if not l.lstrip().startswith(("--", "*", "/-", "-/")))))
+        in_main = False
+        for i, seg in doc_segments(lines):
+            h = HDR.match(seg)
+            if h:
+                in_main = any(k in h.group(1).lower() for k in MAIN)
+                continue
+            bullet = bool(re.match(r"^\s*[*\-]\s", seg))
+            neighbours = [t.strip() for t in TICK.findall(seg)]
+            if i >= 2:
+                neighbours += [t.strip() for t in TICK.findall(lines[i - 2])]
+            context = seg + "".join(lines[max(0, i - 4):i - 1])
+            for raw_tok in TICK.findall(seg):
+                tok = raw_tok.strip()
+                # `foo_apply` / `_of_bar` shorthand: accept when some sibling token
+                # on this line (or the one above) completes it into a real name.
+                if tok.startswith("_") and any(
+                        (nb.rsplit("_", k)[0] + tok) in suffixes
+                        for nb in neighbours if not nb.startswith("_")
+                        for k in range(1, nb.count("_") + 1)):
+                    continue
+                if not IDENT.match(tok) or tok in mods or tok in basenames:
+                    continue
+                if SUBSCRIPT.match(tok):
+                    continue
+                if HISTORICAL.search(context):
+                    continue
+                if tok in source_syms or tok.split(".")[-1] in source_syms:
+                    continue
+                joined = None
+                if i < len(lines):
+                    nxt = TICK.findall(lines[i])
+                    if nxt and nxt[0].strip().startswith("."):
+                        joined = tok + nxt[0].strip()
+                if joined and (joined in names or joined in nsprefix or joined in mods):
+                    continue
+                qualified = tok.startswith("OddOrder.")
+                if qualified and 1 in passes:
+                    if tok not in names and tok not in nsprefix:
+                        bad.append((f, i, tok, "qualified"))
+                    continue
+                if tok in suffixes:
+                    continue
+                if in_main and bullet and 2 in passes and "_" in tok:
+                    if not is_coq(tok):
+                        bad.append((f, i, tok, "main-results"))
+                elif SNAKE.match(tok) and 3 in passes and tok not in body and not is_coq(tok):
+                    bad.append((f, i, tok, "snake"))
+
+    for f, i, tok, kind in bad:
+        print(f"{f}:{i}\t{tok}\t({kind})")
+    print(f"--- {len(bad)} unresolved doc references / {len(files)} Lean files", file=sys.stderr)
+    return 1 if bad else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

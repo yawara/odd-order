@@ -46,7 +46,7 @@ PDF と `pdftotext -layout` 抽出 text は `references/` 配下 (**submodule** 
 - **leanblueprint は forward driver として使わない — ただし Lean からの逆生成は推奨** (2026-07-23 ユーザー方針)。
   - **不可 (forward)**: TeX 依存グラフを**人手で書いて形式化を駆動する**方式。教科書 (PDF/mmd) → Lean を直接書く。「(TeX) blueprint を立てよう」「TeX で証明概略を先に…」等、**手書き TeX を source of truth にする**提案は不可。禁じているのは `\uses{}`/`\proves{}` を人手保守する forward workflow であって、blueprint という成果物そのものではない。
   - **推奨 (reverse, Lean → blueprint)**: 完成済みの検証済み Lean から blueprint 相当の成果物 (依存 DAG・教科書番号対応表・proved/sorry 色分け) を**抽出**するのは OK で、**むしろ積極的に採る方針**。依存 edge を人手の `\uses{}` でなく**証明項 (`getUsedConstants` / `CollectAxioms`) から取る**ので kernel が保証する ground truth になり、「doneness は sorry 数でなく構成可能性・`#print axioms` で検証」という本リポの哲学と同じ側。開発を駆動せず、完成物の view にすぎない (素材は既に在る: 教科書ラベル docstring 4400+ / section ラベルの page 対応 / AxiomsCheck)。
-  - **守る線は一つ**: 逆生成物は**常に Lean から再生成**し、**手編集して第二の source of truth にしない** (手編集して育て始めた瞬間、forward TeX 方式の失敗モード = 実体との drift に戻る)。詳細と実装計画は [issue 0143](issues/0143-blueprint-reverse-gen-from-lean.md)。
+  - **守る線は一つ**: 逆生成物は**常に Lean から再生成**し、**手編集して第二の source of truth にしない** (手編集して育て始めた瞬間、forward TeX 方式の失敗モード = 実体との drift に戻る)。詳細と実装計画は [issue 0143](issues/closed/0143-blueprint-reverse-gen-from-lean.md)。
 - **mathlib 本体への PR は当面しない** — 汎用補題 (Fitting, Hall, Frobenius 群, ZJ 等) も `OddOrder` namespace 配下に書く。理由は速度優先で手元で完結させたいから。将来の upstream は視野に入れるので、mathlib 互換のスタイル・命名は常に維持する。
 - **Gorenstein 1968 _Finite Groups_ は形式化対象ではない**(2026-05-28 refinement)— 「使わない」のではなく「**全形式化はしない**」。形式化対象は上記 3 冊(Isaacs / BG / Peterfalvi)に限定し、Gorenstein は **BG の行間を埋めるためにのみ原文参照する**(`references/gorenstein/finite-groups.{pdf,mmd}`)。具体的には BG が "**G**, Thm X.Y.Z" として証明本体を省略する箇所(典型: BG App.A の A.2/A.3/A.4 が "follow the proof of **G** Thm 3.8.1 / §6.5" と書く部分)で Gorenstein 原文を読み Lean に書き起こす。**Gorenstein 本体の章節を独立に形式化することはしない**。BG 中の "**G**, Thm X.Y.Z" 引用は、まず Isaacs に対応定理があれば Isaacs に読み替え、Isaacs が欠く場合(典型: ZJ / p-stability 周り = **G** Ch.3 §8 / Ch.6 §5 / Ch.8 §2)のみ Gorenstein を参照。なお同名タイトルの Gorenstein "Classification of Finite Simple Groups I" (BAMS 1979) は教科書ではなくサーベイ論文で、別物・対象外。
 
@@ -118,6 +118,27 @@ backlog 230 件は 2026-07-22〜24 の wave で**完済** (issue 0138 closed、0
   長すぎる宣言名の命名リファクタ =
   [0132](issues/closed/0132-naming-pairunion-stepdata-too-long.md) (2026-07-25 close:
   `AnchoredPairUnionStepData`/`PairUnionStepData` へ rename)。
+
+### doc 衛生 gate ([`bin/check-links`](bin/check-links) / [`bin/check-doc-names`](bin/check-doc-names))
+
+lint と同じ理由 (放置すると溜まる) で、**docstring と markdown リンクの drift も機械 gate**にした
+([issue 0187](issues/0187-corpus-doc-hygiene-audit.md), 2026-08-21 に 230 broken link + 24 実在しない
+宣言名 + 30 陳腐化 doneness 主張を一掃)。**両方とも現在ゼロ**なので、赤くなったらそれは新規 drift。
+
+- **`bin/check-links`** — 追跡下の全 `*.md` (802 件) の相対リンクを解決。fenced code block と
+  inline code span は無視し、`Foo.lean:123` の行番号サフィックスは剥がしてから存在確認する。
+  ⚠ **issue を `git mv` で `issues/closed/` へ動かしたら、その issue 内の相対リンクは 1 階層
+  深くなる** (`../OddOrder/…` → `../../OddOrder/…`)。close する turn でこれを回す。
+- **`bin/check-doc-names`** — doc comment 内のバッククォート識別子が実在の定数を指すか照合。
+  正本は grep でなく **`lake env lean` で `OddOrder` 環境から書き出した全定数名**
+  (キャッシュは `--names <file>`; 無指定なら毎回ダンプ ≈ 16s)。module 名・`scoped[…]`・
+  `private` 宣言・仮説 binder・Coq 名 (`coq/` に実在)・`B_0` 型の添字記法・`_of_mem` 型の
+  略記 (兄弟トークンで補完できるもの) は正当として除外する。
+- **陳腐化した doneness 主張は `#print axioms` で実測してから直す** — 「X は sorried」「gate が
+  N 件残る」「axiom で残っている」は書かれた時点の事実であって現在の事実ではない。`sorryAx` が
+  無ければその記述は嘘になっている ([[grep-sorry-docstring-contamination]] と同じ罠の docstring 版)。
+  履歴として残したいときは「then-sorried」「former」「retired」等と**過去形で明示**する
+  (checker もこの marker を見て historical 参照を除外する)。
 
 ### トレーサビリティ (3 層)
 
@@ -224,11 +245,11 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
 | `coq/` (submodule) | [math-comp/odd-order](https://github.com/math-comp/odd-order) — Coq/mathcomp FT 形式化。`.v` コメントで教科書の行間を併読 ([`notes/meta/coq_odd_order_reference.md`](notes/meta/coq_odd_order_reference.md)) |
 | `notes/` | ミニロードマップ・調査メモ |
 | `issues/` | ファイルベース issue (open は直下, `pending/` `closed/` で状態管理) |
-| `bin/` | 雑用スクリプト (`new-issue` 等) |
+| `bin/` | 雑用スクリプト (`new-issue` / `count-sorry` / `check-warnings` / `check-links` / `check-doc-names`) |
 | `references/` (submodule) | PDF + `pdftotext -layout` 抽出 text — private リポ [`odd-order-references`](https://github.com/yawara/odd-order-references)。取得 = `git submodule update --init references` (CI は fetch しない) |
 | `references/{isaacs,bg,gorenstein}/*.pdf`, `*.pdftotext.txt` | 原典/補助原典と検索用 text (フラット) |
 | `references/navarro/characters-and-blocks.{pdf,pdftotext.txt}` | Navarro 1998 *Characters and Blocks of Finite Groups* (LMS LNS 250)。**Q₈ Brauer–Suzuki (Ch.1–7 前半, issue 0147) と Glauberman `Z*`-定理 (Ch.7 (7.7)–(7.9), issue 0186) の補助原典** (Gorenstein と同じ「行間参照のみ・独立の形式化対象ではない」posture)。⚠ **PDF ページ = 書籍ページ + 10**、数式は OCR 崩れ大 |
-| `references/peterfalvi/pdf/*.pdf`, `references/peterfalvi/pdftotext/*.txt` | Peterfalvi だけ章別 PDF/text を各ディレクトリに集約 (text は `bin/pdf-glyph-join.py` で再構成) |
+| `references/peterfalvi/pdf/*.pdf`, `references/peterfalvi/pdftotext/*.txt` | Peterfalvi だけ章別 PDF/text を各ディレクトリに集約 (text は `references/bin/pdf-glyph-join.py` で再構成) |
 | `references/<book>/pages/*.png` | 切り出したページ画像 (捨てずに残す規約, 2026-07-26) |
 | `references/bin/pdf-glyph-join.py` | グリフ bbox から本文を組み直すツール (Peterfalvi 専用) |
 | `references/erdos90/` (nested submodule) | [plby/Erdos90](https://github.com/plby/Erdos90) — 外部 Lean 4 形式化。**Hall–Petresco (BG Thm E.1) を含む**。⚠ LICENSE 無し ⟹ **参照可・コピペ不可**、ビルドしない。取得 = `git submodule update --init --recursive references` |
