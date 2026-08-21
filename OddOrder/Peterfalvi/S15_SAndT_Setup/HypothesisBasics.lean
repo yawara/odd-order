@@ -1048,7 +1048,8 @@ exponent `p`.  Assembled from the §11 chief-factor data of `S` (`exists_chiefFa
 `toTypesIIIIIIVSetupS`): the chief kernel `N = ⊥` (`toTypesIIIIIIVSetupS_chief_N_eq_bot`), so
 `P/⊥ ≅ P` *is* the chief factor and carries `ChiefFactorData.quotient_elementaryAbelian` at the
 chief prime `chief.p = p` (forced by `|P| = p^q`).  **Ungated** — the `S`-instance `H₀ = ⊥` is
-proven (`P` itself is the chief factor), unlike the generic sorried `chief_H0_eq_bot`.  Discharges
+proven (`P` itself is the chief factor), unlike the generic `chief_H0_eq_bot_of_noncoherent`
+(then sorried, since proved).  Discharges
 `basic_structure_gated.P_elementaryAbelian`. -/
 theorem Hypothesis.P_elementaryAbelian [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :

@@ -642,8 +642,9 @@ theorem witness_complement_dvd_p_sub_or_add_one [Finite G]
     hTelem hEnorm hodd hp_ndvd hTcard hfpf hnonscalar
   rwa [hEcard] at hdvd
 
-/-- **Peterfalvi (12.12), structural input from (12.9)/(12.10)/(12.11)** (pinned sorried §8/§9
-obligation, hub 9003 Cluster A).  For the (12.9) witness `L` (type-I Frobenius, kernel `H = L_F`),
+/-- **Peterfalvi (12.12), structural input from (12.9)/(12.10)/(12.11)** (§8/§9 obligation pinned
+as an explicit hypothesis, hub 9003 Cluster A; the upstream has since been proved).  For the
+(12.9) witness `L` (type-I Frobenius, kernel `H = L_F`),
 with `E := frob.complement.map L.subtype` the Frobenius complement realized in `G`, there is a
 subgroup `T ≤ G` — Peterfalvi's `T = Ω₁Z(O_p(H))` — that is
 * **elementary abelian** of order `p` or `p²` (`P₀` is abelian of rank `2` by (12.9), so `Ω₁Z(P)`

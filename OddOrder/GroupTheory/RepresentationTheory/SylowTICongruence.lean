@@ -31,7 +31,7 @@ discharges them and assembles the odd-order form `peterfalvi_67_of_odd`:
 The conclusion is the `[ALGMOD |P|]` congruence of character values; consumers upgrade to a
 `ℤ`-congruence where they separately know `ψ(z) ∈ ℤ` (in (6.8.2.2) the integrality comes
 from the decomposition `Res_Z ψ = a·ρ_Z + b·1_Z`), using that a rational algebraic integer
-is an integer (`OddOrder.AlgInt.isIntegral_rat_imp_int`).
+is an integer (`OddOrder.RepresentationTheory.isIntegral_rat_imp_int`).
 -/
 
 namespace OddOrder.RepresentationTheory

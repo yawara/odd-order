@@ -67,7 +67,7 @@ theorem coprime_card_V_card_Q_of_disjoint [Finite G]
 /- `Q ⊓ V = ⊥` is now the honest `Hypothesis.Q_inf_V_eq_bot` field (threaded from the §16
 constructor
 via `exists_kappaHall_invariant_complement_to_MF`, ungated by (14.9)); the former
-`Q_inf_V_eq_bot_of_reconciled` — which derived it circularly from the sorried
+`Q_inf_V_eq_bot_of_reconciled` — which derived it circularly from the then-sorried
 `reconciled_typePData_T`
 — is retired.  V-side helpers use `hyp.Q_inf_V_eq_bot` directly. -/
 
@@ -259,7 +259,7 @@ theorem isMulCommutative_V [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   obtain ⟨tdata⟩ := hTTypeII
   -- `Q ⊓ V = ⊥` is now the honest `Hypothesis` field `Q_inf_V_eq_bot` (threaded from the §16
   -- constructor's `exists_kappaHall_invariant_complement_to_MF`, ungated by (14.9)), replacing the
-  -- former circular route through the sorried `reconciled_typePData_T`.
+  -- former circular route through the then-sorried `reconciled_typePData_T`.
   have hdisj : hyp.Q ⊓ hyp.V = ⊥ := hyp.Q_inf_V_eq_bot
   have hQH : hyp.Q = tdata.typeP.H := by rw [hyp.Q_eq_TF, tdata.typeP.H_eq]
   have hQ_le : hyp.Q ≤ derivedInG hyp.T := by rw [hyp.T_deriv_eq_QV]; exact le_sup_left
@@ -597,14 +597,14 @@ reads off `Q ⊓ (V ⊔ W₂) = ⊥` and `Q ⊔ (V ⊔ W₂) = T`, so `[T:Q] = |
 ungated** — both complements come from the §16 constructor
 (`typeP_derivedInG_isComplement_kappaHall`
 / `exists_kappaHall_invariant_complement_to_MF`, via `T_nonI`, not (14.9)); no dependence on the
-sorried `reconciled_typePData_T`. -/
+then-sorried `reconciled_typePData_T`. -/
 theorem coprime_card_Q_card_VW2 [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     Nat.Coprime (Nat.card ↥hyp.Q) (Nat.card ↥(hyp.V ⊔ hyp.W2)) := by
   -- Fully honest (ungated): built from the `Hypothesis` fields `Q_inf_V_eq_bot` (`Q ⊓ V = ⊥`) and
   -- `W2_isComplement_T_deriv` (`T = T' ⋊ W₂`), both threaded from the §16 constructor's
   -- `exists_kappaHall_invariant_complement_to_MF` / `typeP_derivedInG_isComplement_kappaHall`
-  -- (ungated by (14.9)).  No longer routed through the sorried `reconciled_typePData_T`.
+  -- (ungated by (14.9)).  No longer routed through the then-sorried `reconciled_typePData_T`.
   have hM'_le_T : derivedInG hyp.T ≤ hyp.T := Subgroup.map_subtype_le _
   have hQ_le_M' : hyp.Q ≤ derivedInG hyp.T := by rw [hyp.T_deriv_eq_QV]; exact le_sup_left
   have hV_le_M' : hyp.V ≤ derivedInG hyp.T := by rw [hyp.T_deriv_eq_QV]; exact le_sup_right
@@ -874,7 +874,7 @@ three atomic facts carrying the content of (13.16), **assembled** for the (14.9)
 * `W₁ ≤ Q` (`W1_le_Q`, proven) — the `T`-side dual of `W₂ ≤ P`, placing the cyclic `q`-factor `W₁`
   inside the `T`-Fitting kernel `Q = T_F`;
 * `Q` abelian — from `Q_elementaryAbelian_T` (the one deep §14 σ-residual, dual of the `S`-side
-  `P_elementaryAbelian`, itself sorried);
+  `P_elementaryAbelian`, itself once sorried and since proved);
 * `N_G(W₁) ≤ Q ⊔ W₂` (`normalizer_W1_le_QW2_of_D_eq_bot`, proven) — the TI reduction
   `normalizer_W1_le_T` + the Maschke/Wielandt core `normalizer_W1_within_T_of_D_eq_bot`.
 

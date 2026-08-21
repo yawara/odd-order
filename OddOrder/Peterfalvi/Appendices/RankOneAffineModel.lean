@@ -663,7 +663,8 @@ theorem rankOne_affine_nearField.{u} {G : Type u} {Ω : Type*} [Group G] [MulAct
     ∃ (F : Type u) (_ : NearField F), Nonempty (AffineNearFieldModel hyp F) := by
   classical
   have := hyp.faithful
-  -- Brauer–Suzuki (ii) discharges the odd-core hypothesis (`Q₈` case sorried inside).
+  -- Brauer–Suzuki (ii) discharges the odd-core hypothesis (the `Q₈` case, once sorried
+  -- here, landed with the Glauberman `Z*`-theorem, issue 0186).
   have hbs := hyp.brauerSuzuki
   -- Regular normal elementary abelian `F ⊴ G` with `G = F ⋊ H`.
   obtain ⟨p, Fsub, hp, hFnormal, hcomm, hexp, htrans, hcompl, hFodd⟩ :=

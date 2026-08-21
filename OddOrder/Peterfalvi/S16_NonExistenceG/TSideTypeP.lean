@@ -259,7 +259,8 @@ theorem inertia_inflate_eq_of_frobeniusQuotient {Γ : Type*} [Group Γ] [Finite 
 *intrinsic* datum `td = hIII.some : TypeIIIData T`; its `td.typeP.U ⋊ td.typeP.W₁` is a Frobenius
 group (Peterfalvi Def (8.4), `S11.typeP_uW1_frobenius` fed the non-triviality `td.common.1`).
 
-Crucially this **avoids** the sorried T-side reconciliation `S15.reconciled_typePData_T` (which is
+Crucially this **avoids** the T-side reconciliation `S15.reconciled_typePData_T` (then sorried,
+which is
 what gated the abstract-`V`/`W₂` route): the datum `td` comes straight from `IsTypeIII T` with no
 reconciliation to the abstract Hypothesis fields `V`/`W₂`.  It is the ungated source of the quotient
 Frobenius `T/Q` needed for `inertia_inflate_eq_of_frobeniusQuotient`.  (Coq `frobVW2`.) -/
@@ -525,7 +526,7 @@ There *exists* a family `𝒯 ⊆ Irr(QV)` (`QV = T' = derivedInG T`) — namely
 corestriction `q : ↥QV →* ↥(QV/Q)` of the non-principal `Irr(QV/Q)` — whose `Ind_{QV}^T`-image
 `calT1` has `|calT1| = (|V| − 1)/p`.  All three inputs of the orbit-count engine
 `calT1_image_induce_card_eq` are discharged from the **intrinsic** type-III datum `td` (no abstract
-`V`/`W₂`, no sorried `reconciled_typePData_T`):
+`V`/`W₂`, no then-sorried `reconciled_typePData_T`):
 
 * **inertia** `I_T(inflate θ̄) = QV`: `inertia_inflate_eq_of_frobeniusQuotient` fed the quotient
   Frobenius `T/Q`, transported (`isFrobeniusGroup_map_equiv`) from the intrinsic `U ⋊ W₁` Frobenius

@@ -23,17 +23,18 @@ import OddOrder.Mathlib.SchurZassenhausConj
 * `OddOrder.GroupTheory.CoprimeFrobeniusAction`: the carrier for Wielandt's
   fixed-point formula used in Peterfalvi (9.1).
 
-## Main results (future)
+## Main results
 
-* `OddOrder.GroupTheory.glaubermanFixedPoint`: **Isaacs Lemma 3.24(a) — Glauberman's Lemma**.
-  互素作用 + G transitive + compatibility + (A or G) solvable ⇒ A-fixed 点存在.
-  実装は別 commit で. 本 commit は setup のみ.
+* 本 module が供給するのは上記 setup までで、**Glauberman's Lemma 本体は別 file**:
+  `OddOrder.Isaacs.Ch04.glauberman_fixed_point_exists` (**Isaacs Lemma 3.24(a)**、
+  `Isaacs/Ch04_Commutators/ForwardFromCh03.lean`) — 互素作用 + G transitive +
+  compatibility + (A or G) solvable ⇒ A-fixed 点存在。
 
 ## 構造
 
 Isaacs PDF p.98 (mmd L1880-1906) の Γ = G ⋊ A 構成を Lean 4 で実装. 主な依存:
 mathlib `SemidirectProduct` + `MulAction.stabilizer` + SZ existence + SZ conjugacy
-(`OddOrder.Mathlib.SchurZassenhausConj` axiom).
+(`OddOrder.Mathlib.SchurZassenhausConj` — `axiom` 宣言ではなく証明済 module).
 -/
 
 namespace OddOrder.GroupTheory

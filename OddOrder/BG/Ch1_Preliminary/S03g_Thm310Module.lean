@@ -307,7 +307,7 @@ theorem prime_card_and_finrank_of_elemAbelian {p : ℕ} [Fact p.Prime]
     OddOrder.RepresentationTheory.finrank_invariants_baseChangeRepresentation] at hfr'
   exact hfr'
 
-/-- (a)-only projection of `prime_card_and_finrank_of_elemAbelian_aux`, dropping the rank conjunct
+/-- (a)-only projection of `prime_card_and_finrank_of_elemAbelian`, dropping the rank conjunct
 (b).  This is the form consumed by `prime_card_of_elemAbelian_mulDistrib` (and thus the conjugation
 form / Prop 14.2(g)); the (a)+(b) form feeds the conclusion-(b) ladder of BG Theorem 3.10. -/
 private theorem prime_card_of_elemAbelian_aux {p : ℕ} [Fact p.Prime]

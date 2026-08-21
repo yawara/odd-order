@@ -38,8 +38,10 @@ Chapter I §6 (p. 50), mmd `references/bg/local-analysis.mmd` L2011–L2038.
 * `card_lt_card_of_lt` / `card_quotient_add_card_map_mk'_lt` /
   `card_subgroup_add_card_subgroupOf_lt` — その 3 通りの降下で測度が減ることの証明。
 * `thm64_of_ih` — 「`Thm64IH` のもとで主張が言えれば全体が言える」。
-  残る数学的内容はこの `step` の側 = BG の場合 1 (`π(F(G)) ⊄ π(H)`, **証明済**) と
-  場合 2 (`π(F(G)) ⊆ π(H)`, **未証明**)。
+  数学的内容はこの `step` の側 = BG の場合 1 (`π(F(G)) ⊄ π(H)`) と
+  場合 2 (`π(F(G)) ⊆ π(H)`) で、**いずれも証明済**
+  (`thm64_case_fitting_primes_not_subset` / `thm64_case_fitting_primes_subset`、
+  `step` 自体は `S06_Thm64Case2.lean` の `thm64_step`)。
 
 ## 場合 1 (`π(F(G)) ⊄ π(H)`) — 証明済
 
@@ -493,8 +495,9 @@ def Thm64IH (X : Type u) [Group X] [Finite X] (H : Subgroup X) : Prop :=
 
 `card_add_card_strongInduction` を motive
 `fun G _ _ H => ∀ π G₀ J₁ J₂, Thm64Statement π H G₀ J₁ J₂` に適用しただけ。
-**数学的内容はすべて `step` の側にある** — 現状 `step` は未証明で, BG の
-場合 1 (`π(F(G)) ⊄ π(H)`) と場合 2 (`π(F(G)) ⊆ π(H)`) がそれぞれ残っている。 -/
+**数学的内容はすべて `step` の側にある** — BG の場合 1 (`π(F(G)) ⊄ π(H)`) と
+場合 2 (`π(F(G)) ⊆ π(H)`) で、`step` は `S06_Thm64Case2.lean` の `thm64_step` が供給する
+(両場合とも証明済)。 -/
 theorem thm64_of_ih
     (step : ∀ (X : Type u) [Group X] [Finite X] (H : Subgroup X), Thm64IH X H →
       ∀ (π : Set ℕ) (G₀ : Subgroup X) [G₀.Normal] (J₁ J₂ : Subgroup X),

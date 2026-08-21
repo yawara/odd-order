@@ -30,11 +30,11 @@ Main definitions and results:
   support `A(L) = typeIA L`.
 * `TypeICoherent78Data.h78_hyp_eq` — its (7.1) layer is the (8.15) Dade data of
   the bundle (definitional).
-* `TypeICoherent78Data.exists_conjIndex` /`zeta_ne_conj`/`nu_zeta_sub_conj_support`
+* `TypeICoherent78Data.exists_conjIndex` /`h78_zeta_ne_conj`/`nu_zeta_sub_conj_support`
   — the conjugate-index inputs of the (7.9) cross-orthogonality
   (`zetaImage_cross_eq_zero_of_conjIndex`), non-family forms of the
   `S09_FrobeniusConjIndex` lemmas.
-* `hypothesis79_of_nonconjugate` — the two-subgroup `S09.Hypothesis79`, with
+* `hypothesis79OfNonconjugate` — the two-subgroup `S09.Hypothesis79`, with
   Dade-support disjointness supplied by Peterfalvi (8.17.c)
   (`ftThickenedSupport_A1_disjoint_of_nonconjugate`) through the faithful-support
   bridge `dadeSupport_eq_ftThickenedSupport`.

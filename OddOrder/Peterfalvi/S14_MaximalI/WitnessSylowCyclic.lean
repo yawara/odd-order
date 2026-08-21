@@ -318,8 +318,9 @@ theorem exists_rankTwoWitness [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
            CKx_not_le_Kprime := hCKx, normalizer_closure_x_le_M := hNx,
            centralizer_x_not_le_L := hCx }⟩
 
-/-- **Peterfalvi (10.10)+(11.9.c)+(11.6)+(9.7.b) kernel reduction, Type III/IV** (pinned sorried
-§9–§11 obligation, hub 9003 Cluster A): for a maximal subgroup `L` of Type III or IV, a noncyclic
+/-- **Peterfalvi (10.10)+(11.9.c)+(11.6)+(9.7.b) kernel reduction, Type III/IV** (§9–§11
+obligation pinned as an explicit hypothesis, hub 9003 Cluster A; the upstream has since been
+proved): for a maximal subgroup `L` of Type III or IV, a noncyclic
 `p`-group `P₀ ⊆ L_s` lies in the Fitting kernel `L_F`.
 
 This is the second paragraph of (12.10) up to its final (8.6.a) step: by Theorem (10.10)
@@ -488,10 +489,11 @@ theorem typeIIIorIV_centralizer_le_of_mem_noncyclic_mainSubgroup [Finite G]
   `C_G(x) ⊆ L` for `x ∈ L_F^#` (`typeIIIorIV_centralizer_le_of_mem_noncyclic_mainSubgroup`),
   contradiction.
 
-The two §8–§11 centralizer-containment facts are pinned sorried above (genuinely missing as usable
-containments — the upstream (8.16)/(8.6.a)/(11.9.c) results are themselves sorried or overstated);
-the case analysis, the Type-V exclusion (hypothesised, honest), and the contradiction assembly
-here are honest. -/
+The two §8–§11 centralizer-containment facts are pinned above as explicit hypotheses (when this
+was written they were genuinely missing as usable containments — the upstream
+(8.16)/(8.6.a)/(11.9.c) results were themselves sorried or overstated; the repository is now
+sorry-free, so the pinning may be dischargeable).  The case analysis, the Type-V exclusion
+(hypothesised, honest), and the contradiction assembly here are honest. -/
 theorem witness_L_isTypeI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :

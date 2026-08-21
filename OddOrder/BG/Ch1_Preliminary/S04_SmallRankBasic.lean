@@ -80,8 +80,8 @@ Lemma 4.17 の本体は `S04_PGroupsSmallRank`、Cor 4.19 は `S04g_Cor419` に�
 - BG Thm 2.6 (2 次元 faithful 表現): `OddOrder.BG.Ch1.S02.odd_two_dim_abelian`,
   `OddOrder.BG.Ch1.S02.odd_two_dim_sylow_abelian`
   (`OddOrder/BG/Ch1_Preliminary/S02_Representations.lean`).
-- BG Thm 1.13 (Thompson critical): `OddOrder.BG.Ch1.thompson_critical_omega`.
-- BG Thm 1.8 (Burnside operator): `OddOrder.BG.Ch1.burnside_operator`.
+- BG Thm 1.13 (Thompson critical): `OddOrder.BG.Ch1.S01.thompson_critical_omega`.
+- BG Thm 1.8 (Burnside operator): `OddOrder.BG.Ch1.S01.burnside_operator`.
 -/
 
 
@@ -101,7 +101,7 @@ We supply the pieces that the repo infrastructure proves cleanly and rigorously:
   `p`-group has *some* elementary abelian `E_{p²}` (not yet normal). This is the
   contrapositive of Isaacs Thm 6.11 (`isCyclic_of_subgroups_card_prime_unique_of_odd`)
   followed by the order-`p²` construction in `ElementaryAbelian.lean`.
-* `exists_normal_isElementaryAbelian_card_prime_sq_of_omega1_center_not_isCyclic`:
+* `exists_normal_isElementaryAbelian_card_prime_sq_of_prime_sq_dvd_card_omega1Center`:
   if moreover `Ω₁(Z(R))` is noncyclic, the `E_{p²}` can be taken central, hence
   **normal**. This is the (clean) abelian-center case of 4.5(a).
 

@@ -326,7 +326,7 @@ The skeleton below defines the statements and the `main_aux` assembly, with the 
 filled in. -/
 
 omit [Finite G] in
-/-- Conjugation `mk'_comp_conj`: in `G ⧸ L`, conjugation by `mk' g` agrees with `mk'` applied
+/-- Conjugation `mk'_comp_conj_eq`: in `G ⧸ L`, conjugation by `mk' g` agrees with `mk'` applied
 to conjugation by `g`. Used in the lift-back step of `step_factor`. -/
 private theorem mk'_comp_conj_eq {L : Subgroup G} [L.Normal] (g : G) :
     (QuotientGroup.mk' L).comp (MulAut.conj g).toMonoidHom =

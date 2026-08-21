@@ -27,7 +27,7 @@ The book states this under condition (A), but its own `Note` after the statement
 proof "requires only that `p` and `q` be odd primes that satisfy (A)", and in fact neither
 branch of the proof below uses (A) at all — so the hypothesis is dropped (it used to sit here
 as an unused argument).  This matters for
-`OddOrder.BG.AppC.GlaubermanNorton`: Glauberman–Norton's Lemma 5 needs `|E| ≥ 2` under the
+`OddOrder.BG.AppC_GlaubermanNorton`: Glauberman–Norton's Lemma 5 needs `|E| ≥ 2` under the
 weaker hypothesis `q ≠ 2 ∨ p = 2`, where (A) is not available. -/
 theorem lemmaC2 [Fact p.Prime] (hpodd : Odd p) (hq : q.Prime) (hqodd : Odd q) :
     2 ≤ (normSetE p q).ncard := by

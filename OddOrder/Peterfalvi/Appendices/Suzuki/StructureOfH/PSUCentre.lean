@@ -29,7 +29,7 @@ This is what lets the Ch. III §1 Proposition lift a statement about
 ## Main results
 
 * `CentralizerPSUData.odd_natCard_center_residual` — `|Z(F)|` is odd.
-* `CentralizerPSUData.commute_of_mem_Q0_of_mem_centralizer` — the lift step: a
+* `CentralizerPSUData.exists_mem_residual_commute_Q0` — the lift step: a
   preimage in `F` of the torus element centralizes `C_{Q₀}(X)` outright.
 -/
 

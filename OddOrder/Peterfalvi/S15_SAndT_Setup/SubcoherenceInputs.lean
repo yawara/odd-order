@@ -115,7 +115,7 @@ structure Hypothesis where
   Threading it exposes the T-side linchpin used by every V-side coprimality/complement argument
   (`isMulCommutative_V`, `coprime_card_V_card_Q_of_disjoint`, …), previously routed circularly
   through
-  the sorried `reconciled_typePData_T` (`Q_inf_V_eq_bot_of_reconciled`). -/
+  the then-sorried `reconciled_typePData_T` (`Q_inf_V_eq_bot_of_reconciled`). -/
   Q_inf_V_eq_bot : Q ⊓ V = ⊥
   /-- **Peterfalvi (13.1.b), T-side semidirect complement `T = T' ⋊ W₂`**: the cyclic factor `W₂`
   complements the derived subgroup `T'` in `T`.  Available ungated at the §16 construction from

@@ -18,12 +18,12 @@ H. Bender and G. Glauberman, *Local Analysis for the Odd Order Theorem*
 
 Both are proved by the Focal Subgroup Theorem (BG Thm 1.17, `commutator_inf_eq_focalSubgroup`
 in mathlib) together with `G' = G`, which holds because `G` is simple and nonsolvable.  For D.1
-the local analysis of `OddOrder.BG.AppD.MaximalSylowIntersection` supplies the key input: with
-`N = N_G(Z(L(P)))`, every Sylow `p`-subgroup `R ≠ P` satisfies `P ∩ R ≤ O_p(N)`, and `N` is a
-3-step group with respect to `p`.
+the local analysis of `OddOrder.BG.AppD_CNGroups.MaximalSylowIntersection` supplies the key
+input: with `N = N_G(Z(L(P)))`, every Sylow `p`-subgroup `R ≠ P` satisfies `P ∩ R ≤ O_p(N)`,
+and `N` is a 3-step group with respect to `p`.
 
 ⚠ Minimal simplicity is essential in both: see the module docstring of
-`OddOrder.BG.AppD.Basic` for the two counterexamples among general odd CN-groups.
+`OddOrder.BG.AppD_CNGroups.Basic` for the two counterexamples among general odd CN-groups.
 -/
 
 namespace OddOrder.BG.AppD
@@ -38,7 +38,7 @@ variable {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
 `p`-subgroups form a TI family — two Sylow `p`-subgroups meeting nontrivially are equal.
 
 ⚠ Minimal simplicity is essential: for general odd CN-groups this is **false**
-(`F_{3⁶} ⋊ (C₇ ⋊ C₃)`; see `OddOrder.BG.AppD.Basic`).
+(`F_{3⁶} ⋊ (C₇ ⋊ C₃)`; see `OddOrder.BG.AppD_CNGroups.Basic`).
 
 Proof (BG, following **G**).  Suppose not, and put `N = N_G(Z(L(P)))`.  The local analysis shows
 `N` is a 3-step group for `p` containing `P` as a Sylow `p`-subgroup, and that `P ∩ R ≤ O_p(N)`
@@ -150,7 +150,7 @@ theorem sylow_eq_of_nontrivial_inter (hyp : MinimalSimpleCNHypothesis G) (P Q : 
 odd order, the focal subgroup argument places `P` inside the derived subgroup of its normalizer.
 
 ⚠ Minimal simplicity is essential: for general odd CN-groups this is **false** (`G = C₃`; see
-`OddOrder.BG.AppD.Basic`).
+`OddOrder.BG.AppD_CNGroups.Basic`).
 
 Proof (BG): if `x, y ∈ P` are conjugate in `G`, say `y = x^t`, and both are nontrivial, then
 `P ∩ P^t ≠ 1`, so `P = P^t` by Lemma D.1 and `t ∈ N_G(P)`; hence `x⁻¹y = ⁅x, t⁆ ∈ N_G(P)'`.  The

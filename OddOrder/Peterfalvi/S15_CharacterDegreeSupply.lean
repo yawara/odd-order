@@ -418,7 +418,8 @@ theorem lambdaWitness_of_caseA [Finite G]
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
 /-- **The no-λ (Galois) branch of the `S`-side (13.3.b) facts** (issue 9094 RULING §2, faithful
-sorried bridging): if `𝒮` contains no `uq`-degree `PC`-induced irreducible (`¬ LambdaWitness`),
+bridging — introduced sorried, since proved): if `𝒮` contains no `uq`-degree `PC`-induced
+irreducible (`¬ LambdaWitness`),
 then by Pf (13.3.b) `M = S` is in case (9.7.b) with `C = ⊥` and `u = (p^q−1)/(p−1)` — the Galois
 case.
 

@@ -174,9 +174,10 @@ case (c) of Definition (8.7) holds, `|H| = p³` and `w₁` divides `p + 1`."
 
 Case (a) is the landed `S13.typeV_caseA_coherence` ((6.8) route, sorry-free); the not-(a)
 reduction consumes the (6.5) consequences of Hypothesis (6.4) for `(L, K, M) := (M, M′, 1)`,
-stated below as three explicit gate lemmas **sorried pending issue 2022** (general `six_two`
-→ (6.3)-general → (6.5); the (6.4) carrier and the general (6.5) assembly are the lane-b
-chain), which kill case (b) outright and pin case (c) to `|M′| = w₂³`, `p = w₂ = 2w₁ − 1`,
+stated below as three explicit gate lemmas — introduced sorried pending issue 2022 (general
+`six_two` → (6.3)-general → (6.5); the (6.4) carrier and the general (6.5) assembly were the
+lane-b chain) and **since proved**, issue 2022 closed — which kill case (b) outright and pin
+case (c) to `|M′| = w₂³`, `p = w₂ = 2w₁ − 1`,
 `δ = −1`, `n = 2` — where the sorry-free (10.10.2)–(10.10.4) package
 (`typeV_caseC_coherence_engine` + P1–P4, S12_TypeVCaseC) produces the coherence. -/
 

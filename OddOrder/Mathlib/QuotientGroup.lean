@@ -37,7 +37,7 @@ proved directly from `QuotientGroup.map`, whose kernel here is *definitionally*
 
 ## Consumers
 
-`OddOrder.GroupTheory.FittingHeredity.isNilpotent_quotient_fitting_quotient_subgroupOf`, and
+`OddOrder.GroupTheory.isNilpotent_quotient_fitting_quotient_subgroupOf`, and
 through it the induction of Bender–Glauberman Theorem 6.4 (see issue 3026), which must carry
 the hypothesis "`(G/G₀)/F(G/G₀)` is nilpotent" from `G` to a subgroup `S ≤ G`.
 -/

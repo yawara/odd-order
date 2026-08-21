@@ -17,19 +17,19 @@ order at most `n` in a fixed universe.
 * **Step 1** (`commutator_mem_of_quotient`): the hypothesis passes to `G ⧸ N`, so the theorem for
   `G ⧸ N` gives `⁅u, g⁆ N ∈ O_{2'}(G/N)`.  With `N = O_{2'}(G)` this *is* the theorem for `G`,
   which is why one may assume `O_{2'}(G) = 1`.
-* **Step 2** (`mem_center_of_subgroup`): the hypothesis restricts to any subgroup containing `u`,
-  so a proper subgroup `H ∋ u` has `u ∈ Z*(H) = Z(H)` (using `O_{2'}(H) = 1`).
-* **Step 3** (`notMem_of_isProper_normal`): with `O_{2'}(G) = 1` and `u ∉ Z(G)`, the involution
-  `u` lies in no proper normal subgroup.
-* **Step 4** (`center_eq_bot`): consequently `Z(G) = 1`.
+* **Step 2** (`commutator_mem_of_subgroup`): the hypothesis restricts to any subgroup containing
+  `u`, so a proper subgroup `H ∋ u` has `u ∈ Z*(H) = Z(H)` (using `O_{2'}(H) = 1`).
+* **Step 3** (`commutator_eq_one_of_mem_normal`): with `O_{2'}(G) = 1` and `u ∉ Z(G)`, the
+  involution `u` lies in no proper normal subgroup.
+* **Step 4** (`commutator_eq_one_of_center_ne_bot`): consequently `Z(G) = 1`.
 
 ## Main results
 
 * `OddOrder.GroupTheory.ZStarUpTo`
 * `OddOrder.GroupTheory.commutator_mem_of_quotient`
-* `OddOrder.GroupTheory.mem_center_of_subgroup`
-* `OddOrder.GroupTheory.notMem_of_isProper_normal`
-* `OddOrder.GroupTheory.center_eq_bot`
+* `OddOrder.GroupTheory.commutator_mem_of_subgroup`
+* `OddOrder.GroupTheory.commutator_eq_one_of_mem_normal`
+* `OddOrder.GroupTheory.commutator_eq_one_of_center_ne_bot`
 -/
 
 open OddOrder.Isaacs.Ch03

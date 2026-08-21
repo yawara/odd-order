@@ -635,7 +635,8 @@ theorem fieldNormalizerData_of_repr (hyp : Hypothesis (G := G))
 /-! ### (14.7) standing structural inputs (proved by citing the §13 Frobenius data)
 
 These discharge the *structural* hypotheses of `fieldNormalizerData_of_repr` from the
-standing Section-15 data — they cite the (sorried) §13 producers `basic_structure`/`c_eq_one`
+standing Section-15 data — they cite the §13 producers `basic_structure`/`c_eq_one` (then
+sorried, since proved)
 the same way `u_modEq_one_mod_q` does, so they are proven (their own bodies are `sorry`-free).
 The remaining genuine work for (14.7) is the *numeric* input `|U| = (p^q-1)/(p-1)` and the
 `𝔽_p[U]`-module construction feeding `exists_galoisField_repr`. -/

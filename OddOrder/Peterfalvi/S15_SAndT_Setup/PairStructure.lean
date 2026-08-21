@@ -773,7 +773,8 @@ type dictionary `proposition_type_classification` — `IsTypeII M ↔ IsTypeP2 M
 for
 the reconciliation itself, so this stays a clean §13 obligation.)  It lives **off the FT spine**:
 the `V`-side helpers cite this obligation, keeping `section16TypePStructure_of_isMinimalSimpleOdd`
-sorry-free.  Gated on §13; declared sorried.  (Relocated from `S15_SAndT` for the (13.9)/(13.10)
+sorry-free.  Gated on §13; introduced sorried and since proved.  (Relocated from `S15_SAndT`
+for the (13.9)/(13.10)
 counting layer — the type-V exclusion of `Q_sharp_isTISubset` and the `|T|` decomposition read
 it.) -/
 theorem reconciled_typePData_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)

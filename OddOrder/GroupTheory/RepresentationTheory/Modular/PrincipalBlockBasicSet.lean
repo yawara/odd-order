@@ -45,7 +45,7 @@ Navarro (7.3) — expressing `IBr(B_0)` in `𝓑` — is written down from the c
 * `OddOrder.RepresentationTheory.Modular.sum_signRelationRow_mul` — `c_i = ∑_j (D_𝓑)_{ij} ε_j c_j`
 * `OddOrder.RepresentationTheory.Modular.sum_signRelationRow_mul_signRelationRow` — `C_𝓑 = 1 + δ`
 * `OddOrder.RepresentationTheory.Modular.character_eq_sum_signRelationRow_mul_principalBasicSet`
-* `OddOrder.RepresentationTheory.Modular.sum_principalBasicSetMatrix_mul_principalBasicSet` —
+* `OddOrder.RepresentationTheory.Modular.sum_basicSetMatrixOf_mul_principalBasicSet` —
   `φ_μ = ∑_j u_{μj} η_j`
 * `OddOrder.RepresentationTheory.Modular.sum_decompositionMatrix_mul_principalBasicSetMatrix` —
   `D_𝓑 = D_B U`

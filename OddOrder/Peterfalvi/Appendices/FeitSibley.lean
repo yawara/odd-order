@@ -34,7 +34,7 @@ file.
   (`Hypothesis.Sset`, `Hypothesis.A`, `Hypothesis.tau`, `Hypothesis.d`), and the
   semidirect decomposition, trivial intersections, `Q = S × Q₁` and
   fixed-point-freeness are actual subgroup statements.
-* `coherence_adjoin_or_equal_degree` concluded
+* The former `coherence_adjoin_or_equal_degree` concluded
   `∃ adjoinCriterion equalDegreeCriterion : Prop, adjoinCriterion ∧
   equalDegreeCriterion`, which is provable by `⟨True, True, trivial, trivial⟩`;
   its `sorry` hid nothing.  Lemma 1 is now stated as the two actual coherence

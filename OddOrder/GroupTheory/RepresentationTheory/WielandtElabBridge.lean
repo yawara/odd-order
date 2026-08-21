@@ -12,7 +12,7 @@ import Mathlib.FieldTheory.Finiteness
 # Peterfalvi (9.1): the elementary-abelian chief-factor bridge
 
 For the chief-series assembly of Wielandt's fixed-point formula (Peterfalvi (9.1), assembled in
-`OddOrder.GroupTheory.CoprimeFrobeniusAction.wielandt_fixedPoint_frobenius`), each
+`OddOrder.GroupTheory.wielandt_fixedPoint_frobenius`), each
 elementary-abelian chief factor `V` of the solvable group `H` is viewed as a `ZMod p`-linear
 representation of `L = U ⋊ E` through an action `φ : L →* MulAut V`.  The module-level
 elementary-abelian identity (⋆) `WielandtCounting.finrank_elab_identity` lives in *dimensions*,

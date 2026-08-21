@@ -23,7 +23,7 @@ theorems bounding its nilpotence class.
 * **Theorem 4.15** (p. 128): `commutator_mannSubgroup_four_eq_bot_of_centralizer_eq_self`
   (γ₄-form), with `Group.IsNilpotent` / `Group.nilpotencyClass ≤ 3` corollaries.
 * **Lemma 4.16** (p. 126), generalized from the `p`-group case
-  (`OddOrder.GroupTheory.CriticalSubgroup.centralizer_eq_self_of_maximal_abelian_normal`)
+  (`OddOrder.GroupTheory.centralizer_eq_self_of_maximal_abelian_normal`)
   to nilpotent groups: `centralizer_eq_self_of_maximal_abelian_normal_of_isNilpotent`
   (finiteness is not needed), plus the existence corollary
   `exists_normal_abelian_centralizer_eq_self` for finite nilpotent groups.
@@ -568,7 +568,7 @@ section /- 4B: Lemma 4.16 — maximal abelian normal subgroups of nilpotent grou
 
 /-- A nontrivial normal subgroup of a nilpotent group meets the center nontrivially.
 Nilpotent analogue of the `p`-group fact
-`OddOrder.GroupTheory.CriticalSubgroup.exists_mem_center_of_normal_ne_bot`;
+`OddOrder.GroupTheory.exists_mem_center_of_normal_ne_bot`;
 no finiteness is required.
 
 Proof: the iterated commutators `⁅…⁅N, G⁆, …, G⁆` descend inside the lower central
@@ -626,7 +626,7 @@ set_option backward.isDefEq.respectTransparency false in
 is self-centralizing: `C_G(A) = A`.
 
 Generalizes the `p`-group case
-`OddOrder.GroupTheory.CriticalSubgroup.centralizer_eq_self_of_maximal_abelian_normal`
+`OddOrder.GroupTheory.centralizer_eq_self_of_maximal_abelian_normal`
 (Gorenstein 5.3.12), whose proof is mirrored: if `A < C := C_G(A)`, pick a nonidentity
 central element `x̄` of the nontrivial normal subgroup `C/A ⊴ G/A` (using
 `exists_mem_center_of_normal_ne_bot_of_isNilpotent` on the nilpotent quotient `G/A`);

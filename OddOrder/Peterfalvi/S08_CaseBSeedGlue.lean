@@ -16,7 +16,7 @@ This leaf assembles the case-(B) **seed** `IsCoherent hyp.tau (X(W₂) ∪ Y)` f
 extension) and the `Y`-coherence `coherentYset`, via the §7 diagonal-aware glue engine.  It is the
 full-`X(W₂)` analogue of the single-class `coherentCertainTypeSet_union_Yset_caseB`.
 
-* `caseBXimg_seam_all_Yset` — the all-`Y` seam `⟨caseBXimg χ, η^{τ₁}⟩ = 0` for a *general*
+* `caseB_member_seam_all_Yset` — the all-`Y` seam `⟨caseBXimg χ, η^{τ₁}⟩ = 0` for a *general*
   `X`-member `χ ∈ X(W₂)` (column or irreducible), generalizing the column-only
   `caseB_anchoredImage_seam_all_Yset`.
 * `exists_glue_nu_Xset_Yset_via_map` — the full-source glue map: glues an arbitrary `X`-target map

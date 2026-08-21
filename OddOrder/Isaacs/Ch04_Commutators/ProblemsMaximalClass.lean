@@ -22,7 +22,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 4A.6 (書籍 p. 124)�
   非可換 `p`-群では `p² ∣ |P : P'|`
 * この 2 つで maximal class なら `|L_i| = p^{n - 1 - i}` (`i ≥ 1`) が確定する
   (`card_lowerCentralSeries_of_maximalClass`)
-* `|G| = p^k` (`k ≥ 2`) の `p`-群は類 `≤ k - 1` (`nilpotencyClass_le_of_card_eq_pow`) なので
+* `|G| = p^k` (`k ≥ 2`) の `p`-群は類 `≤ k - 1` (`nilpotencyClass_le_of_card_eq_prime_pow`) なので
   `L_{k-1}(P) ≤ N`, 位数を比べて `N = L_{k-1}(P)`
 
 ⚠ mathlib の添字は古典的な `γ_i` から 1 ずれる (`lowerCentralSeries ⊤ 0 = P`,

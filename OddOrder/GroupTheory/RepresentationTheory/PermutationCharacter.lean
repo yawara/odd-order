@@ -27,7 +27,7 @@ transitive Zassenhaus configuration (p. 115).
   `(Ind_H^G 1_H)(g) = |Fix_Ω(g)|`.
 * `ClassFunction.inner_induce_trivial_stabilizer` — the norm of the
   permutation character counts the orbits of `G` on `Ω × Ω`.
-* `MulAction.card_orbits_prod_eq_two` — a doubly transitive action has exactly
+* `OddOrder.GroupTheory.card_orbits_prod_eq_two` — a doubly transitive action has exactly
   two orbits on `Ω × Ω` (the diagonal and its complement).
 * `ClassFunction.inner_induce_trivial_stabilizer_of_two_pretransitive` — the
   norm is `2` in the doubly transitive case.

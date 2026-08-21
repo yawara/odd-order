@@ -55,7 +55,7 @@ Isaacs L3727 の **Aschbacher/Isaacs 版** (max **order**) を採用. Thompson �
 `J(P) ≤ Q ≤ P` のとき `J(Q) = J(P)`. 系として **`J(P)` は `Q` 内 characteristic**
 (`J(Q)` の Q 内 characteristic 性と組み合わせて従う).
 
-証明は [`OddOrder.GroupTheory.Subgroup.thompsonJ_eq_of_le_of_le`](
+証明は [`Subgroup.thompsonJ_eq_of_le_of_le`](
 ../../GroupTheory/ThompsonSubgroup.lean) に集約. -/
 theorem thompsonJ_eq_of_le [Finite G] {P Q : Subgroup G} {p : ℕ}
     (hJQ : Subgroup.thompsonJ P p ≤ Q) (hQP : Q ≤ P) :

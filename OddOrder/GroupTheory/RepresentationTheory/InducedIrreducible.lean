@@ -29,7 +29,7 @@ constituents live in `Irr G`, and that every constituent has the common degree `
   to avoid choosing coset representatives): `|H| • Res_H (Ind_H^G θ) = ∑_{x ∈ G} θ^{x⁻¹}`.
   Here `θ^{x⁻¹} = ClassFunction.conjBy x⁻¹ θ`. This is the heaviest analytic brick; the rest
   are consequences via Frobenius reciprocity.
-* (degree) `OddOrder.RepresentationTheory.induce_apply_one` (already proved in
+* (degree) `OddOrder.RepresentationTheory.ClassFunction.induce_apply_one` (already proved in
   `InducedCharacter`): `Ind_H^G θ (1) = [G : H] · θ(1)`.
 
 ## References

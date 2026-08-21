@@ -41,7 +41,7 @@ hand.  Let `U ≤ S/Q₀` be `KW`-invariant.
   (the two actions commute because `W = C_V(K)`).
 * `Hypothesis.isAInvariant_quotientKW_eq_bot_or_top` — irreducibility of that
   action.
-* `Hypothesis.exists_field_quotient_of_orderThree` — the field `E` with
+* `Hypothesis.nonempty_quotientFieldModel_of_orderThree` — the field `E` with
   `|E| = q²` over which `Q ⧸ Z(Q)` is a line, together with the scalar
   realization `μ : K × W →* Eˣ` of the action.
 -/

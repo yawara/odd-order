@@ -55,11 +55,11 @@ open Module (finrank)
 
 /-! ## A public prime-index normal subgroup lemma
 
-**⚠ Duplication flag.** This re-proves (as a *public* declaration) the *private*
-`OddOrder.BG.Ch2.S07.exists_normal_index_prime_of_isSolvable`
-(`OddOrder/BG/Ch2_Uniqueness/S07_Hypothesis75.lean:50`).  A private lemma cannot be imported, so
-the ~30-line proof is copied here.  The two should be unified into a single shared public leaf
-(e.g. in `OddOrder/GroupTheory`) once the BG side is refactored. -/
+The prime-index normal subgroup lemma used below is
+`OddOrder.GroupTheory.exists_normal_index_prime_of_isSolvable`
+(`OddOrder/GroupTheory/SolvablePrimeIndex.lean`).  It used to be re-proved here and, privately,
+in `OddOrder/BG/Ch2_Uniqueness/S07_Hypothesis75.lean`; issue 9111 collapsed both copies into that
+shared public leaf, which both sides now call. -/
 
 
 /-! ## The algebraically-closed core -/

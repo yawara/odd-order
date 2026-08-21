@@ -21,7 +21,7 @@ Isaacs, *Finite Group Theory* (AMS GSM 92, 2008), Problem 3A.6 (書籍 p. 78)。
 * `Y := inr(P)` は `Γ` の Sylow `p`-部分群 (`sylowInrRange`) — `|Γ : Y| = |G|` は `p` と互いに素。
 * `Y ∩ Y^{inl g} = inr(P_g)` (**Sylow 交叉 = 点安定化群**): `(inl g)⁻¹ · inr u · inl g
   = inl (g⁻¹ · (φ u) g) · inr u` なので `P` に入るのは `(φ u) g = g` のときだけ。
-* `O_p(Γ) = 1` (`opCore_eq_bot_of_injective`): `O_p(Γ)` は全 Sylow に含まれるので `Y` に入り,
+* `O_p(Γ) = 1` (`opCore_semidirectProduct_eq_bot`): `O_p(Γ)` は全 Sylow に含まれるので `Y` に入り,
   `X := inl(G)` とは位数が互いに素で交わらず `⁅O_p(Γ), X⁆ = 1`, すなわち
   `O_p(Γ) ≤ Y ⊓ C_Γ(X) = 1` (忠実性)。
 * 軌道 `Δ_g` の各点固定部分群 `N = core_P(P_g)` は `P` **と `P^g` の両方**で正規なので,

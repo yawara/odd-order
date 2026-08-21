@@ -23,13 +23,13 @@ mathlib v4.29.1 に `Omega1` / `Omega` / `omega1` / `omegaSubgroup` 不在を確
 
 ## Main definitions
 
-* `OddOrder.GroupTheory.Omega p n G`: 部分群 `⟨g ∈ G : g^(p^n) = 1⟩` (i.e. `Subgroup.closure
+* `OddOrder.GroupTheory.Omega G p n`: 部分群 `⟨g ∈ G : g^(p^n) = 1⟩` (i.e. `Subgroup.closure
   {g : G | g^(p^n) = 1}`). For abelian p-group it agrees with the set `{g : g^(p^n) = 1}`.
 
 ## Main results (本 module で提供, 最小)
 
-* `Omega.subset_closure_of_pow_eq_one`: `g^(p^n) = 1 ⇒ g ∈ Omega p n G`.
-* `Omega.mono`: `m ≤ n ⇒ Omega p m G ≤ Omega p n G`.
+* `Omega.mem_of_pow_eq_one`: `g^(p^n) = 1 ⇒ g ∈ Omega G p n`.
+* `Omega.mono`: `m ≤ n ⇒ Omega G p m ≤ Omega G p n`.
 
 ## Design notes
 

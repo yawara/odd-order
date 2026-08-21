@@ -29,7 +29,7 @@ the §9-level (9.11) chain needs them without importing this file's §11/§13 cl
   `∑_{α ∈ E} α` of its dispatched `R`-family — the `CharacterPsiDecomposition.ofProjection` +
   `eq_sum_of_psi_eq_zero` machinery at `ψ = 0`.
 
-* **Cross-orthogonality of coherent images** (`coherent_extension_cross_orthogonal`, Coq
+* **Cross-orthogonality of coherent images** (`SOf_coherent_extension_cross_orthogonal`, Coq
   `coherent_ortho`): for members of two coherent subfamilies with `⟨ψ, λ⟩ = ⟨ψ, λ̄⟩ = 0`, the
   images are orthogonal — (5.5) on both sides plus the (5.2.e) `R`-family cross-orthogonality
   `sOf_H0Cprime_memberRFamily_orthogonal`.

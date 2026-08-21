@@ -14084,7 +14084,7 @@ characteristic ⟹ 既存の `normal_map_subtype_of_characteristic` で `G` で�
 #assert_only_allowed_axioms OddOrder.GroupTheory.quaternionTwo_exists_conj_eq_inv
 #assert_only_allowed_axioms OddOrder.GroupTheory.exists_conj_eq_inv_of_quaternionTwo
 #assert_only_allowed_axioms OddOrder.GroupTheory.conj_eq_iff_of_quaternionTwo
-/-! `orbit_eq_univ_of_odd_of_card_eq_three` = **`Aut(Q₈) = Sym(4)` の代替**の核。
+/-! `orbit_eq_of_odd_of_subset_card_three` = **`Aut(Q₈) = Sym(4)` の代替**の核。
 軌道の位数 = 安定化群の指数 (orbit-stabilizer)。それが奇数で軌道が 3 元 Finset に含まれるなら
 1 か 3 で、固定点でなければその Finset 全体。⚠ 仮説を「群位数が奇」でなく
 「**安定化群の指数が奇**」にしてあるのが要点 — 実際に作用する `N_G(T)` は偶位数だが、

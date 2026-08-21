@@ -24,7 +24,7 @@ open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
-/-! ### Step 4-5-8 closing axioms (mmd L3870-3896)
+/-! ### Step 4-5-8 closing lemmas (mmd L3870-3896)
 
 The Goldschmidt-style closing argument combines:
 
@@ -40,18 +40,19 @@ The Goldschmidt-style closing argument combines:
   to get `P̄ ⊴ Ḡ`, then pulls back to `P ⊴ G` and `A ⊆ P ⊆ U`, contradicting
   `A ⊄ U`.
 
-We split the remaining work into three focused axioms (each tracking a single
-textbook step), so future sessions can discharge them independently:
+The work was split into three focused lemmas (each tracking a single textbook step) so
+that they could be discharged independently; all three are now proved:
 
-* `step4_5_LA_eq_top_and_Abar_card_eq_p`: Steps 4 + 5 combined (they share the
+* `step4_5_normal_J_hypotheses`: Steps 4 + 5 combined (they share the
   same induction-hypothesis usage via Step 3).  Produces `P = UA ∧ Nat.card Ā = p`.
-* `step8_normal_via_thm75`: Step 8's Thm 7.5 application (Ḡ ↷ V faithful with
+* `step8a_PBar_normal_GBar`: Step 8's Thm 7.5 application (Ḡ ↷ V faithful with
   the |V : C_V(P̄)| ≤ p bound to `P̄ ⊴ Ḡ`).
-* `step8_pullback`: pulling back `P̄ ⊴ Ḡ` to `P ⊴ G` and concluding `A ⊆ U`.
+* `step8b_pullback_normal_P`: pulling back `P̄ ⊴ Ḡ` to `P ⊴ G` and concluding `A ⊆ U`.
 
-The glue between them is proved as actual theorem code.
+The glue between them is proved as actual theorem code; nothing here is axiomatized.
 
-Tracking issue: [`issues/0036-stuck-7-6-step-7.md`](../../../issues/0036-stuck-7-6-step-7.md). -/
+Tracking issue:
+[`issues/closed/0036-stuck-7-6-step-7.md`](../../../issues/closed/0036-stuck-7-6-step-7.md). -/
 
 /-- **Isaacs Thm 7.6 Step 1(b)** (mmd L3843): if `U = O_p(G) ≤ H ≤ G` then
 `O_{p'}(H) = 1`.
@@ -859,10 +860,10 @@ Together Steps 4-5 produce `P = UA ∧ A.relIndex U = p` given:
 * A chosen `A ∈ E(P)` with `A ⊄ U` (Step 2 extraction).
 
 **Step 4** (`P = UA`) is proved here as actual theorem code, using the focused
-Step 3 axiom (`step3_Abar_centralizes_inter_LBar`).  **Step 5** (`|Ā| = p`)
-is delegated to the focused `step5_Abar_card_eq_p` axiom.
+Step 3 lemma (`step3_Abar_centralizes_inter_LBar`).  **Step 5** (`|Ā| = p`)
+is delegated to the focused `step5_Abar_card_eq_p` lemma.
 
-Step 3 is **internal to this axiom**: both Step 4 and Step 5 use Step 3 by
+Step 3 is **internal to this lemma**: both Step 4 and Step 5 use Step 3 by
 applying the IH to proper subgroups (`H = LA` for Step 4, `H = MA` for any
 Ā-invariant proper `M̄ < L̄` for Step 5).
 
@@ -1362,13 +1363,13 @@ theorem thompsonJ_le_opCore_of_normal_J_hypotheses
       ih (Nat.card H') hH'_lt_n H' h2abelian'' h_oPiPrime_trivial'' Q' h_centralizer_center'' rfl
     exact normal_thompsonJ_of_le_opCore Q' h_le_op'
   -- Now prove `J(Q) ≤ U` on the running group `H` of order `n` using Step 2 extraction
-  -- + the Steps 4-5 axiom + Step 6 (landed) + Step 7 (landed) + Step 8 closure axiom.
+  -- + the Steps 4-5 lemma + Step 6 (landed) + Step 7 (landed) + Step 8 closure lemma.
   have h_pSolvable_in_H : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) H :=
     inferInstance
   rw [thompsonJ_le_iff]
   intro A hA_mem
   by_contra hA_not_le
-  -- Package the induction hypothesis for use by the Step 4-5 axiom.
+  -- Package the induction hypothesis for use by the Step 4-5 lemma.
   have ih_for_axioms :
       ∀ (H' : Type _) [Group H'] [Finite H']
         [OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) H'],

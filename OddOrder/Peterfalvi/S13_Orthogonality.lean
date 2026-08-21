@@ -24,10 +24,10 @@ union glue `S07.coherentUnion_of_glued_of_bridge` (Coq `bridge_coherent`, no gen
 — which replaces the deprecated wide-`Sset \ SHCSet` uniform-degree route and the caseA-false
 generation engine (both false for non-Galois type III/IV, issue 1019).
 
-The sole sorried-cite is the caseA **refuter** (the (9.11.2) pair-adjoining non-coherence, lane-b's
-active `S11_NineElevenCoherence` work); everything else — the caseB coherence, the (11.7)
-`H₀C′ ≤ H₀C`
-transfer, the Clifford dispatch, and the reducible-μ-column witness — is landed.
+Everything here is landed and sorry-free: the caseB coherence, the (11.7) `H₀C′ ≤ H₀C`
+transfer, the Clifford dispatch, the reducible-μ-column witness, and — since the
+(9.11.1)–(9.11.8) squeeze completed — the caseA branch too, whose endpoint
+`S11.nineEleven_coherent_A0` takes no refuter hypothesis (see the re-measurement note below).
 -/
 
 namespace OddOrder.Peterfalvi.S13
@@ -197,8 +197,8 @@ theorem coherent_sOf_H0C [Finite G]
   classical
   rcases OddOrder.Peterfalvi.S11.clifford_dichotomy hG
       (hyp.base.mkSection11CharacterData hyp.s11Setup hyp.chief) with hA | hB
-  · -- **caseA**: (9.11) case-a coherence via the refuter (lane-b (9.11.2) active work,
-    -- sorried-cite), then the (11.7) `H₀C′ ≤ H₀C` transfer with the reducible-μ-column witness.
+  · -- **caseA**: (9.11) case-a coherence (the (9.11.2) squeeze, since landed and ungated),
+    -- then the (11.7) `H₀C′ ≤ H₀C` transfer with the reducible-μ-column witness.
     have caseA := hA.some
     have hw2 : 1 < hyp.base.w2 := hyp.params.w2_prime.one_lt
     have hk1 : (⟨1, hw2⟩ : Fin hyp.base.w2) ≠ 0 := by

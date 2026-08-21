@@ -496,8 +496,8 @@ theorem mf_hall_centralizer_control_of_inputs [Finite G]
 `C_M(M_σ)` decomposes as `(C_G(M_σ) ⊓ M_σ) ⊔ X` with `X` a cyclic `τ₂(M)`-subgroup.
 
 This is exactly the `ha` input that `fitting_decomposition` (Corollary 15.5) consumes at
-`H = M_σ`; using it in place of the (sorried, general) `mf_hall_centralizer_control` makes the
-A(8) `FittingIsTI` chain axiom-clean (issue 8016).
+`H = M_σ`; using it in place of the then-sorried general `mf_hall_centralizer_control` made the
+A(8) `FittingIsTI` chain axiom-clean (issue 8016; the general lemma has since been proved too).
 
 Proof (BG L4209).  `C := C_M(M_σ)` is a `κ(M)'`-group
 (`centralizer_msigma_isPiSubgroup_kappa_compl`, = Prop 14.2(b1)(e)).  Its normal Hall

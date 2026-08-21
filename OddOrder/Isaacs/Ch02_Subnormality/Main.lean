@@ -27,7 +27,7 @@ variable {G : Type*} [Group G]
 
 主要補助補題:
 * `opCore_quotient_opCore_eq_bot` — `O_p(G/O_p(G)) = ⊥` (汎用, Ch.1 拡張的補助).
-* `normal_sylow_image_under_surjective` — surjective hom で `Subgroup` レベル正規 Sylow の
+* `normal_sylow_image_of_surjective` — surjective hom で `Subgroup` レベル正規 Sylow の
   像も正規 Sylow.
 -/
 

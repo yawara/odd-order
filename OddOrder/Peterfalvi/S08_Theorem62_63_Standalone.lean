@@ -12,9 +12,9 @@ import OddOrder.Peterfalvi.S08_CoherenceCorePart1
 
 The repo already proves Peterfalvi's coherence theorems (6.2)/(6.3) — but only over the Sibley–Dade
 capstone setup `SibleyDadeHypothesis G L H`, where the induced-character kernel `K` *equals* the
-nilpotent Frobenius complement `H` (`OddOrder.Peterfalvi.S08.six_two` / `six_three` in
-`S08_CoherenceCorePart2`).  The §11/§13 maximal-subgroup analysis (Peterfalvi §11, repo
-`S13_MaximalIII_IV`) needs them in their **general Hypothesis (6.1) form**, where the
+nilpotent Frobenius complement `H` (`OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.six_two` /
+`six_three` in `S08_CoherenceCorePart2`).  The §11/§13 maximal-subgroup analysis (Peterfalvi
+§11, repo `S13_MaximalIII_IV`) needs them in their **general Hypothesis (6.1) form**, where the
 induced-family kernel `K = M'` (the derived subgroup, *solvable*) is strictly larger than the
 nilpotent middle group `H = HC`.  Concretely (6.3) is applied there with
 `(L, K, M, H, H₁) = (M, M', 1, HC, H₀C)` and (6.2) with `(A, B, C, D) = (H₁, H₀C, HC, HC)`, so

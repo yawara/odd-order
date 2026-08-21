@@ -820,7 +820,7 @@ open scoped Classical FiniteInduce in
 under Hypothesis (10.4) for `M`, the `(K, K*)`-reconciled Types-II/III/IV setup on the
 pair's type-II member `mp.S` has `[S,S] = S_F ⋊ U` Frobenius with kernel `S_F`.
 
-The dichotomy assembly of `typeII_HU_frobenius_of_coherent_aux`, with the sorried gate
+The dichotomy assembly of the retired `typeII_HU_frobenius_of_coherent_aux`, with its sorried gate
 replaced by the **honest pair-witness producer** (`exists_typeIICrossIsometryData_at_pair`,
 axiom-clean): the §9 Clifford dichotomy's contradiction branches (Case A and the
 non-exceptional Case B) produce an equal-degree irreducible/reducible pair in `𝒮(H₀)`,

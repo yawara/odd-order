@@ -374,8 +374,8 @@ relations (`S11.typeIIIorIV_W2_prime`) and the (10.3) prime computation (`S12.Hy
 nonconjugate partner `M*` with `K*` its κ-Hall and `Z = K ⊔ K*` cyclic, and the disjunction
 `IsTypeP2 M ∨ IsTypeP2 M*`; `M` type `P₁` excludes the left disjunct, so `M*` is `P₂` = Type II.
 Then `[M* : (M*)'] = |K*|` (`card_kappaHall_eq_derived_index` for `M*`, `K*` cyclic) and
-`|K*| = |W₂|` (`card_Msigma_inf_centralizer_eq_card_W2`).  Cites the (sorried, lane-f W1)
-`proposition_type_classification`; the group-theoretic core is axiom-clean. -/
+`|K*| = |W₂|` (`card_Msigma_inf_centralizer_eq_card_W2`).  Cites
+`proposition_type_classification` (lane-f W1, since proved); axiom-clean. -/
 theorem exists_typeII_maximal_with_w2_of_typeP [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (data : TypePData M)
     (hM : M ∈ maximalSubgroups G) (hType : IsTypeIII M ∨ IsTypeIV M ∨ IsTypeV M) :

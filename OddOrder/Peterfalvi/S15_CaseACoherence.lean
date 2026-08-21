@@ -873,8 +873,8 @@ invariant across inhabitants, so it cannot be recovered from a bare `.some`; iss
 
 **This no longer routes through `coherent_H0C_commutator`/`sibleyTarget_H0C`** (the unsound (6.8)
 shortcut whose target `IsCoherent Ind_S^G 𝒮 (C′)^# = IsCoherent Ind_S^G 𝒮 ∅` is uninhabited).  The
-remaining gap is the honest (9.11) pair-adjoining assembly inside `sSet_coherent_indS_{caseA,caseB}`
-(base coherences landed, the mixed-family lift sorried-cite), not a soundness defect. -/
+last piece was the honest (9.11) pair-adjoining assembly inside `sSet_coherent_indS_{caseA,caseB}`
+(base coherences and the mixed-family lift both since landed), never a soundness defect. -/
 noncomputable def Hypothesis.coherent_H0Cprime_S [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)

@@ -22,12 +22,13 @@ variable {G : Type*} [Group G]
 /-! ### (13.17) gate 3/4 structural inputs (issue 2013)
 
 The two structural facts that the type-II rule-out of (13.17.a/b) reads off the `§13`/`§14`
-machinery but that the bare `Hypothesis` does not pin.  Both are declared here as faithful
-sorried producers (the gate-2 pattern of `coprime_card_U_card_P_of_disjoint`): their proofs are
-gated on the genuine §13 counting (`card_Q_eq`, B1) and on BG Theorem E
-(`card_LF_coprime_pq`, B2), but their *statements* let the structural cores of the `L ~ T` and
-type-`I` branches of `exists_typeI_maximal_overNormalizer_U` be discharged sorry-free.  See
-issue 2013 / `notes/peterfalvi/s13_17_structural_program.md`. -/
+machinery but that the bare `Hypothesis` does not pin.  They were introduced here as faithful
+*sorried* producers (the then-current gate pattern of `coprime_card_U_card_P_of_disjoint`), so
+that the structural cores of the `L ~ T` and type-`I` branches of
+`exists_typeI_maximal_overNormalizer_U` could be discharged ahead of them; both are now proved
+outright — the §13 counting (`card_Q_eq`, B1) from the reconciled type-`P` datum of `T`, and BG
+Theorem E (`card_LF_coprime_pq`, B2) — and this file is sorry-free throughout.  See issue 2013 /
+`notes/peterfalvi/s13_17_structural_program.md`. -/
 
 /-- **Peterfalvi (13.17.a) T-side Fitting order (B1)**: `|Q| = |T_F| = q^p`.
 
@@ -465,13 +466,14 @@ gives `|L_F|` prime to `q`, so `W₁ ∩ L_F = 1`; were `U ∩ L_F = 1`, `U W₁
 fixed-point-freely on `L_F`, forcing `L_F = 1` by (9.1).  The genuine §13 structural obligation
 feeding (13.17); see issue 2009.
 
-*Skeleton status (Phase 2):* the assembly is proven — `U ≠ ⊥` (from `fitting_lt_derived`),
-`N_G(U) ≠ ⊤`
+*Status:* fully proved and axiom-clean.  The assembly is `U ≠ ⊥` (issue 7008: `U` is
+`S`-conjugate to `tdata.typeP.U`, nontrivial by `TypePNontrivialCore`), `N_G(U) ≠ ⊤`
 (simplicity), the maximal `L ⊇ N_G(U)`, and the (8.8.b4) trichotomy dispatch, with the type-II
 property `N_G(U) ⊄ S` wired in through `not_normalizer_U_le_S ∘ exists_conj_typeP_U_of_coprime ∘
-coprime_card_U_card_P_of_disjoint`.  Four documented gates remain: `hdisj` (Phase 0(b) carrier
-faithfulness, F-ask `P ⊓ U = ⊥`); the L~S Hall-conjugacy derivation of `N_G(U) ⊆ S`; the L~T
-`|L_F| = q^p` exclusion; and `U ⊆ L_F` ((8.17.a)+(9.1)). -/
+coprime_card_U_card_P_of_disjoint`.  The four former gates are all discharged: `hdisj`
+(`P ⊓ U = ⊥`) from the §16 carrier `hyp.Sdata.derived_complement`; the L~S Hall-conjugacy
+derivation of `N_G(U) ⊆ S`; the L~T `|L_F| = q^p` exclusion (`tConjugate_fitting_data`); and
+`U ⊆ L_F` ((8.17.a)+(9.1)). -/
 theorem exists_typeI_maximal_overNormalizer_U [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hnoV : ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsTypeV M)

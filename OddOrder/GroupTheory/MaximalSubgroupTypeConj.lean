@@ -22,8 +22,9 @@ were `S`, then `S` would be type `I` (`isTypeI_pointwise_smul`), contradicting
 
 ## Main results
 
-* `isTypeF_pointwise_smul`, `isTypeI_pointwise_smul`, ... — each type predicate transfers
-  along `φ : MulAut G`.
+* `isTypeI_pointwise_smul`, `isTypeII_pointwise_smul`, `isTypeIII_pointwise_smul`,
+  `isTypeIV_pointwise_smul`, `isTypeV_pointwise_smul` — each type predicate transfers
+  along `φ : MulAut G`; `typePNontrivialCore_conj` is the type-P counterpart.
 * A reusable equivariance toolkit (`card_pointwise_smul`, `isFrobeniusGroup_map_of_mulEquiv`,
   `isTISubset_pointwise_smul`, `rank_map_of_mulEquiv`, ...) phrased for the general
   pointwise `MulAut G` action; reusable across the §16 conjugacy arguments.

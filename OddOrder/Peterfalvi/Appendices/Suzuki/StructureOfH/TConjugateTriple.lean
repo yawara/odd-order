@@ -36,7 +36,7 @@ Conjugating by `a ∈ K` — which `t` inverts — turns the decomposition of
   triple.
 * `Hypothesis.tConjLeft` / `tConjMiddle` / `tConjRight` — the maps `g`, `h`,
   `f` of the book.
-* `Hypothesis.tConj_conj_mem_KSet` — the identity (1).
+* `Hypothesis.tConjTriple_conj` — the identity (1).
 -/
 
 set_option autoImplicit false

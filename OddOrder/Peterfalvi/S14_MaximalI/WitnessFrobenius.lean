@@ -24,8 +24,9 @@ variable {G : Type*} [Group G]
 
 
 
-/-- **Peterfalvi (12.10) obligation B, minimality core** (pinned sorried §8/(12.8) obligation, hub
-9003 Cluster A): for the type-I witness `L` of (12.9), every Sylow `q`-subgroup of `L` at a prime
+/-- **Peterfalvi (12.10) obligation B, minimality core** (§8/(12.8) obligation pinned as an
+explicit hypothesis, hub 9003 Cluster A; the upstream has since been proved): for the type-I
+witness `L` of (12.9), every Sylow `q`-subgroup of `L` at a prime
 `q` dividing `|U|` (`U =` the complement of `H = L_F`) is **cyclic**.
 
 Peterfalvi's argument: a prime `q ∣ |L/H|` has `q < p` — in case (8.3.c) `q ∣ p−1`; in case

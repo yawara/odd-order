@@ -39,7 +39,8 @@ fixed-point-free action of `W₂^y` on `U` supplies in (14.7).  In that branch
 `q · u = (p^q-1)/(p-1) ≡ 1 mod p` (geometric sum), so `q ≡ q·u ≡ 1 mod p` (using
 `u ≡ 1 mod p`), forcing `p ∣ q - 1` against `q < p`.  Hence `u` takes its full cyclotomic
 value and `q ∤ (p-1)` (i.e. `¬ p ≡ 1 mod q`).  Reduces the (14.7) value argument to the single
-fixed-point-free congruence `u ≡ 1 mod p`; cites the (sorried) case-(b) data `CaseBForSData`. -/
+fixed-point-free congruence `u ≡ 1 mod p`; takes the case-(b) data `CaseBForSData` as a
+hypothesis. -/
 theorem u_eq_full_of_caseB_of_u_modEq_one_mod_p {hyp : Hypothesis (G := G)}
     (Sdata : CaseBForSData hyp) (hu_mod_p : hyp.base.u ≡ 1 [MOD hyp.base.p]) :
     hyp.base.u = (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) ∧
