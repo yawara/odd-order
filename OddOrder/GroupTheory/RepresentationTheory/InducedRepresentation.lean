@@ -225,4 +225,98 @@ theorem finrank_indSubmodule [StrongRankCondition k] [Finite G]
 
 end Coordinates
 
+/-! ## Right translation on cosets, and support submodules
+
+Toward the Brauer character of `Ind_H^G W` at an element `g`: restricted to `⟨g⟩`, the induced
+module splits along the orbits of `g` on the right cosets `H \\ G`.  A `g`-stable set of cosets
+cuts out a `⟨g⟩`-submodule, namely the functions supported there.  Summing the Brauer character
+over the orbits then reduces (8.2) to two cases — a fixed coset, which contributes
+`α (x g x⁻¹)`, and an orbit of length `> 1`, which contributes `0`. -/
+
+section Support
+
+/-- Right translation of right cosets: `H x ↦ H x g`.  Well defined because right
+multiplication commutes with the left `H`-action defining the cosets. -/
+def cosetRightMul (H : Subgroup G) (g : G) :
+    Quotient (QuotientGroup.rightRel H) → Quotient (QuotientGroup.rightRel H) :=
+  fun c => Quotient.liftOn' c (fun x => Quotient.mk (QuotientGroup.rightRel H) (x * g)) <| by
+    rintro a b hab
+    refine Quotient.sound (QuotientGroup.rightRel_apply.mpr ?_)
+    have hmem : b * a⁻¹ ∈ H := QuotientGroup.rightRel_apply.mp hab
+    have hrw : (b * g) * (a * g)⁻¹ = b * a⁻¹ := by group
+    rw [hrw]; exact hmem
+
+@[simp] theorem cosetRightMul_mk (H : Subgroup G) (g x : G) :
+    cosetRightMul H g (Quotient.mk (QuotientGroup.rightRel H) x)
+      = Quotient.mk (QuotientGroup.rightRel H) (x * g) :=
+  rfl
+
+variable {H} (ρ : Representation k ↥H W)
+
+/-- The functions in the induced space supported on a given set `S` of right cosets. -/
+def indSupport (S : Set (Quotient (QuotientGroup.rightRel H))) :
+    Submodule k ↥(indSubmodule H ρ) where
+  carrier := { f | ∀ x : G, Quotient.mk (QuotientGroup.rightRel H) x ∉ S → (f : G → W) x = 0 }
+  add_mem' {f₁ f₂} hf₁ hf₂ x hx := by
+    change (f₁ : G → W) x + (f₂ : G → W) x = 0
+    rw [hf₁ x hx, hf₂ x hx, add_zero]
+  zero_mem' _ _ := rfl
+  smul_mem' c f hf x hx := by
+    change c • (f : G → W) x = 0
+    rw [hf x hx, smul_zero]
+
+@[simp] theorem mem_indSupport_iff (S : Set (Quotient (QuotientGroup.rightRel H)))
+    (f : ↥(indSubmodule H ρ)) :
+    f ∈ indSupport ρ S ↔
+      ∀ x : G, Quotient.mk (QuotientGroup.rightRel H) x ∉ S → (f : G → W) x = 0 :=
+  Iff.rfl
+
+/-- **A `g`-stable set of cosets cuts out a `⟨g⟩`-submodule.**  This is the decomposition step
+of the Brauer–Nesbitt computation: the induced module restricted to `⟨g⟩` is the direct sum of
+the pieces supported on the `⟨g⟩`-orbits of cosets. -/
+theorem indSupport_invariant {S : Set (Quotient (QuotientGroup.rightRel H))} {g : G}
+    (hS : ∀ c, c ∈ S ↔ cosetRightMul H g c ∈ S) (f : ↥(indSubmodule H ρ))
+    (hf : f ∈ indSupport ρ S) :
+    indRep H ρ g f ∈ indSupport ρ S := by
+  intro x hx
+  have hxg : Quotient.mk (QuotientGroup.rightRel H) (x * g) ∉ S := by
+    intro hcon
+    exact hx ((hS (Quotient.mk (QuotientGroup.rightRel H) x)).mpr (by
+      rw [cosetRightMul_mk]; exact hcon))
+  exact hf (x * g) hxg
+
+/-- A right coset is fixed by right translation by `g` exactly when `g` conjugates into `H`.
+This is the membership condition `x g x⁻¹ ∈ H` cutting out the terms of `induceCoset`. -/
+theorem cosetRightMul_mk_eq_iff (H : Subgroup G) (g x : G) :
+    cosetRightMul H g (Quotient.mk (QuotientGroup.rightRel H) x)
+        = Quotient.mk (QuotientGroup.rightRel H) x
+      ↔ x * g * x⁻¹ ∈ H := by
+  rw [cosetRightMul_mk]
+  constructor
+  · intro hq
+    have hrel : x * (x * g)⁻¹ ∈ H := QuotientGroup.rightRel_apply.mp (Quotient.exact hq)
+    have hrw : (x * (x * g)⁻¹)⁻¹ = x * g * x⁻¹ := by group
+    rw [← hrw]; exact H.inv_mem hrel
+  · intro hmem
+    refine Quotient.sound (QuotientGroup.rightRel_apply.mpr ?_)
+    have hrw : x * (x * g)⁻¹ = (x * g * x⁻¹)⁻¹ := by group
+    rw [hrw]; exact H.inv_mem hmem
+
+/-- **The fixed-coset contribution.**  If right translation by `g` fixes the coset `H x` — that
+is, `x g x⁻¹ ∈ H` — then on the value at `x` the induced action is exactly `ρ (x g x⁻¹)`.
+
+Summing this over the fixed cosets is precisely the sum defining `induceCoset`, and it is why
+the Brauer–Nesbitt formula picks out the terms with `x g x⁻¹ ∈ H`. -/
+theorem indRep_apply_of_conj_mem {g x : G} (hx : x * g * x⁻¹ ∈ H)
+    (f : ↥(indSubmodule H ρ)) :
+    ((indRep H ρ g f : G → W)) x = ρ ⟨x * g * x⁻¹, hx⟩ ((f : G → W) x) := by
+  have key := indSubmodule_apply_mul f ⟨x * g * x⁻¹, hx⟩ x
+  have hxg : ((⟨x * g * x⁻¹, hx⟩ : ↥H) : G) * x = x * g := by
+    change (x * g * x⁻¹) * x = x * g
+    group
+  rw [hxg] at key
+  exact key
+
+end Support
+
 end OddOrder.RepresentationTheory
