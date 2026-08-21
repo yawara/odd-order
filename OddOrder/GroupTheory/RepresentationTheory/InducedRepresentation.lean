@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 import Mathlib.RepresentationTheory.Basic
 import Mathlib.Algebra.Group.Subgroup.Basic
 import Mathlib.Tactic.Group
+import Mathlib.GroupTheory.Index
+import Mathlib.LinearAlgebra.Dimension.Constructions
 
 /-!
 # The induced representation, as `H`-equivariant functions
@@ -199,6 +201,27 @@ noncomputable def indCoordEquiv (ρ : Representation k ↥H W) :
         rw [hout]; group
       rw [hout, hshift, map_one]
       rfl }
+
+/-! ### The degree of an induced representation -/
+
+/-- The right cosets `H \\ G` are in bijection with the left cosets `G ⧸ H`, so there are
+`H.index` of them. -/
+theorem card_quotient_rightRel (H : Subgroup G) :
+    Nat.card (Quotient (QuotientGroup.rightRel H)) = H.index :=
+  Nat.card_congr (QuotientGroup.quotientRightRelEquivQuotientLeftRel H)
+
+/-- **The degree of an induced representation** is `[G : H]` times the degree of the original:
+the induced space has one coordinate copy of `W` for each right coset (`indCoordEquiv`).
+
+This is the module-level source of the character identity `θ^G(1) = [G : H] · θ(1)`, and in
+particular of `induceCoset`'s value at `1`. -/
+theorem finrank_indSubmodule [StrongRankCondition k] [Finite G]
+    [Module.Free k W] [Module.Finite k W] (ρ : Representation k ↥H W) :
+    Module.finrank k ↥(indSubmodule H ρ) = H.index * Module.finrank k W := by
+  classical
+  have : Fintype (Quotient (QuotientGroup.rightRel H)) := Fintype.ofFinite _
+  rw [(indCoordEquiv ρ).finrank_eq, Module.finrank_pi_fintype, Finset.sum_const,
+    Finset.card_univ, smul_eq_mul, ← Nat.card_eq_fintype_card, card_quotient_rightRel]
 
 end Coordinates
 
