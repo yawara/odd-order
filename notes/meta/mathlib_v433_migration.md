@@ -1,6 +1,6 @@
 # mathlib v4.32.2 → v4.33.0 移行記録
 
-2026-08-20 実施 (branch `mathlib-v433`、issue [0183](../../issues/0183-mathlib-v433-bump.md))。
+2026-08-20 実施 (branch `mathlib-v433`、issue [0183](../../issues/closed/0183-mathlib-v433-bump.md))。
 
 ## pin
 

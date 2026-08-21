@@ -17,7 +17,7 @@ created: 2026-05-28
 > 実際に proof が使うのは `R: V₁ ≅ V₂` 同型(より正確には `T := (x₂-1)∘(x₁-1): V₂ → V₂` 同型)の
 > **eigenvector 1 個**だけで、Jordan form 全体は不要。mathlib `Module.End.exists_eigenvalue`
 > (alg-closed + finite-dim + nontrivial)で直接。Step 4 自前実装見積もり ~200 行 → **~30-50 行**。
-> 詳細: 下記「★ Step 4 の精密化」節 + [`notes/bg/appA_pstability.md`](../notes/bg/appA_pstability.md)
+> 詳細: 下記「★ Step 4 の精密化」節 + [`notes/bg/appA_pstability.md`](../../notes/bg/appA_pstability.md)
 > 「★ 2026-05-28 (late PM) 追補」節。
 
 ## 背景 — なぜこれが要るか
@@ -29,7 +29,7 @@ _Local Analysis for the Odd Order Theorem_) の局所解析パートを形式化
 
 問題: **Isaacs FGT は Glauberman Z(J)-定理を明示的に省く**(Isaacs p.217)。⇒ Thm 6.2 は
 Isaacs へ「読み替え」不能。解決ルートとして **BG App.A (p-Stability) + App.B (Puig L(S))** を採る
-(設計決定: [`notes/meta/log/bg_s6_appAB_route_2026_05_28.md`](../notes/meta/log/bg_s6_appAB_route_2026_05_28.md))。
+(設計決定: [`notes/meta/log/bg_s6_appAB_route_2026_05_28.md`](../../notes/meta/log/bg_s6_appAB_route_2026_05_28.md))。
 
 2026-05-28 の kernel-connection spike で、そのルートの **唯一の実質的な数学的欠落** が
 本 issue の対象だと判明した(同ノート **§0**)。依存連鎖:
@@ -193,7 +193,7 @@ U := span(u₁, u₂)
 
 | 部品 | 名前 / 場所 | 用途 |
 |---|---|---|
-| **BG Thm 2.6** (体一般, 2-dim faithful) | `OddOrder.BG.Ch1.S02.odd_two_dim_sylow_abelian` / `odd_two_dim_abelian`([S02_Representations.lean](../OddOrder/BG/Ch1_Preliminary/S02_Representations.lean) L4627/L4680) | **A.1 の主部品**。`Odd |G|`, `finrank F V = 2`, faithful `ρ`, `p ∣ |G|`, `CharP F p` ⇒ Sylow-`p` abelian ∧ `G' ≤ P` |
+| **BG Thm 2.6** (体一般, 2-dim faithful) | `OddOrder.BG.Ch1.S02.odd_two_dim_sylow_abelian` / `odd_two_dim_abelian`([S02_Representations.lean](../../OddOrder/BG/Ch1_Preliminary/S02_Representations.lean) L4627/L4680) | **A.1 の主部品**。`Odd |G|`, `finrank F V = 2`, faithful `ρ`, `p ∣ |G|`, `CharP F p` ⇒ Sylow-`p` abelian ∧ `G' ≤ P` |
 | p-group fixed vector | `OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector.{exists_fixed_vector_ne_zero, invariants_ne_bot}` (L289/L197) | **A.1**: char-`p` で `p`-群の固定ベクトル `≠ 0` |
 | mathlib | `Representation` / `Module.End` / `Module.End.eigenspace` / `LinearMap.range` / `LinearMap.ker` / `Module.finrank` / `Module.Basis` / `IsSimpleModule` / `Polynomial.splits` / Jordan/eigenspace API | 線形代数の基盤 |
 
@@ -251,12 +251,12 @@ A.1: `V` 2-dim over `F` (odd char `p`), `G ≤ GL(V)` 有限既約, `|G|` 奇 �
 - できれば A.1・A.2 も sorry-free で配線(A.2 = 本ルートの真のゲート)。
 - docstring に `**BG Thm A.2** (= Gorenstein 3.8.1 weakening, mmd L2204+)` のトレーサビリティ。
 - 完了後 `notes/meta/log/bg_s6_appAB_route_2026_05_28.md` §0 と per-section
-  [`notes/bg/appA_pstability.md`](../notes/bg/appA_pstability.md) の状態を更新。
+  [`notes/bg/appA_pstability.md`](../../notes/bg/appA_pstability.md) の状態を更新。
 
 ## 参照
 
-- **設計・依存閉包・リスクモデル(必読)**: [`notes/meta/log/bg_s6_appAB_route_2026_05_28.md`](../notes/meta/log/bg_s6_appAB_route_2026_05_28.md) **§0 + §0.1**(spike 訂正 + Gorenstein 追加後の再評価)
-- per-section: [`notes/bg/appA_pstability.md`](../notes/bg/appA_pstability.md) / [`notes/bg/s06_additional.md`](../notes/bg/s06_additional.md)
+- **設計・依存閉包・リスクモデル(必読)**: [`notes/meta/log/bg_s6_appAB_route_2026_05_28.md`](../../notes/meta/log/bg_s6_appAB_route_2026_05_28.md) **§0 + §0.1**(spike 訂正 + Gorenstein 追加後の再評価)
+- per-section: [`notes/bg/appA_pstability.md`](../../notes/bg/appA_pstability.md) / [`notes/bg/s06_additional.md`](../../notes/bg/s06_additional.md)
 - **Gorenstein 1968 原文**(本 issue の primary source、`references/gorenstein/finite-groups.mmd`):
   Ch.3 §8 Thm 8.1 **statement L2204 / proof L2210–L2240**(本 issue の翻訳対象)。
   関連: Ch.3 §8 Thm 8.2/8.3/8.4(BG A.3 の materials)、Ch.2 §8 Thm 8.4(Dickson、BG A.2 では不要)。

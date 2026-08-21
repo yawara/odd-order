@@ -1,6 +1,6 @@
 # modular 表現論 — アーキテクチャ地図 (2026-08-03)
 
-issue [9506](../../issues/9506-modular-p-modular-system.md) の作業ログは**時系列**なので、ここには
+issue [9506](../../issues/closed/9506-modular-p-modular-system.md) の作業ログは**時系列**なので、ここには
 **層構造**を置く。0147 (Q₈ Brauer–Suzuki, Navarro 1998 spine) の bottom-up 第 1 段として
 2026-08-03 に一気に積んだ 30 弱の leaf がどう積み重なっているか。
 

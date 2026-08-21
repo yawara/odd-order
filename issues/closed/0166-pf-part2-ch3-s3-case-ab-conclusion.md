@@ -9,7 +9,7 @@ created: 2026-07-29
 
 ## 背景
 
-[issue 0165](closed/0165-pf-part2-ch3-s2-order-five.md) で Ch. III §2 の Proposition
+[issue 0165](0165-pf-part2-ch3-s2-order-five.md) で Ch. III §2 の Proposition
 (`case (b) ⟹ (SK) ∪ (SKtS) ≤ G`, repo = `Hypothesis.typeASubgroup`) が landing した。
 文書順で次は **Ch. III §3 (pp. 119–121)**。その冒頭段落が §2 の成果を消費する:
 
@@ -88,7 +88,7 @@ theorem theoremAConclusion_of_orderFiveCarrier_subgroup
 ## 参照
 
 * pp. 119–121 = `references/peterfalvi/pages/peterfalvi-p{119,120,121}.png`
-* 上流 = [0165](closed/0165-pf-part2-ch3-s2-order-five.md)
+* 上流 = [0165](0165-pf-part2-ch3-s2-order-five.md)
 * 下流 = §3 本体 (`S₁ ⋊ K₁W₁` モデル, pp. 119–121) → Ch. IV (PSU(3,q) の特徴付け)
 
 ## 進捗 (2026-07-29)

@@ -9,7 +9,7 @@ created: 2026-07-29
 
 ## 背景
 
-[issue 0163](closed/0163-pf-part2-ch3-s1-trichotomy.md) / [0164](closed/0164-psu3-sylow-normalizer-centralizer.md)
+[issue 0163](0163-pf-part2-ch3-s1-trichotomy.md) / [0164](0164-psu3-sylow-normalizer-centralizer.md)
 で Ch. III §1 の Proposition が**仮説ゼロ**で landing した (`SecondCaseHypothesis.trichotomy`)。
 文書順で次は **Ch. III §2 (p. 118–119)**。
 
@@ -126,7 +126,7 @@ Ch. I §1 Prop 4(a) (canonical form, repo = `existsUnique_canonicalForm`) から
 ## 参照
 
 * p. 118–119 = `references/peterfalvi/pages/peterfalvi-p{118,119}.png`
-* 上流 = [0163](closed/0163-pf-part2-ch3-s1-trichotomy.md) / [0164](closed/0164-psu3-sylow-normalizer-centralizer.md)
+* 上流 = [0163](0163-pf-part2-ch3-s1-trichotomy.md) / [0164](0164-psu3-sylow-normalizer-centralizer.md)
 * 下流 = Ch. III §3 (p. 119–121, `KW` の `S` への作用) — case (a)/(b) が
   片付くと (C2) が残り、そこから PSU(3,q) の特徴付け (Ch. IV) へ
 

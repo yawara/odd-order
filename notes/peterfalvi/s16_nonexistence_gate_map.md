@@ -5,7 +5,7 @@
 2026-07-08 の「`exists_MHypothesis.betaGrid` gate」という分類は **superseded**。
 原文 (14.10) には `e=pq` / signs / grid expansion は無く、これらを無条件 fieldにした旧
 `MHypothesis` は (14.11.1–2) 自身を循環させていた。Hub ruling
-(`issues/3004-mhypothesis-conditional-grid.md`) に従い次へ修正:
+(`issues/closed/3004-mhypothesis-conditional-grid.md`) に従い次へ修正:
 
 ```text
 (14.10) MHypothesis

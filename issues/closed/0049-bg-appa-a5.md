@@ -9,7 +9,7 @@ created: 2026-05-29
 
 ## 背景
 
-issue [#0047](closed/0047-bg-appa-a4.md) で A.4(a/b/c) を完成 (sorry-free, axiom-clean)。
+issue [#0047](0047-bg-appa-a4.md) で A.4(a/b/c) を完成 (sorry-free, axiom-clean)。
 App.A 連鎖の次ゲート = **A.5**。`Thm 6.2 ⟸ App.B B.4 ⟸ A.5 ⟸ A.4(c) ✅` の本線で、
 App.B (Puig L(S)) の唯一の実質依存 (route note `bg_s6_appAB_route_2026_05_28.md`)。
 
@@ -98,7 +98,7 @@ self-contained な sup 仮説に留める。)
 ## 参照
 
 - BG mmd L4488-4513 (A.5 statement + proof), L4517-4757 (App.B: L(S) 定義 + B.1-B.4)
-- closed [#0047](closed/0047-bg-appa-a4.md) (A.4 a/b/c), workflow run wf_612ed4a4-224 (調査プラン)
-- notes: [`bg_s6_appAB_route_2026_05_28.md`](../notes/meta/log/bg_s6_appAB_route_2026_05_28.md),
-  [`appA_pstability.md`](../notes/bg/appA_pstability.md), [`appB_puig.md`](../notes/bg/appB_puig.md)
+- closed [#0047](0047-bg-appa-a4.md) (A.4 a/b/c), workflow run wf_612ed4a4-224 (調査プラン)
+- notes: [`bg_s6_appAB_route_2026_05_28.md`](../../notes/meta/log/bg_s6_appAB_route_2026_05_28.md),
+  [`appA_pstability.md`](../../notes/bg/appA_pstability.md), [`appB_puig.md`](../../notes/bg/appB_puig.md)
 - repo: `AppA_PStability.lean` (thmA4c/stabilityLiftAux), `S01_Solvable.lean` (Prop 1.10/Hall-Higman)

@@ -7,7 +7,7 @@ created: 2026-05-30
 
 # lean-eval への proof 提出 (tracker)
 
-> **正本 = [`notes/meta/lean_eval_submission.md`](../notes/meta/lean_eval_submission.md)** (単一ドキュメント)。
+> **正本 = [`notes/meta/lean_eval_submission.md`](../../notes/meta/lean_eval_submission.md)** (単一ドキュメント)。
 > playbook・候補全表 (proof submit 監査 §2.5 / proposal Tier A/B/C)・reject 記録・eval 側仕様は**全てそこ**。
 > 本 issue は actionable checklist のみを持つ tracker。個別作業は per-problem sub-issue (0042 型) を切る。
 >
@@ -68,7 +68,7 @@ self-contained / 証明が難しく mathlib 未収録。詳細と全候補は正
 
 ## 参照
 
-- **正本**: [`notes/meta/lean_eval_submission.md`](../notes/meta/lean_eval_submission.md)
+- **正本**: [`notes/meta/lean_eval_submission.md`](../../notes/meta/lean_eval_submission.md)
 - lean-eval: https://github.com/leanprover/lean-eval / 提出先 https://github.com/leanprover/lean-eval-submissions / 公開面 https://lean-lang.org/eval/
 - 先行 issue: 0042 (Baer–Suzuki, closed), 0120 (feit_thompson leanOptions parity, closed)
 - 文献: 100 定理未形式化は幾何/解析中心で群論の低い果実は無い
@@ -80,7 +80,7 @@ self-contained / 証明が難しく mathlib 未収録。詳細と全候補は正
 - 2026-07-02 hub レビューで「off-FT-path につき park」→ **2026-07-16 に FT 本体 axiom-clean 完成 →
   全 3 冊フェーズ移行**で park 前提失効、再び active。
 - 2026-07-19 候補表を実測で全面差し替え。
-- 2026-07-22 lean-eval 関連 3 note を [`lean_eval_submission.md`](../notes/meta/lean_eval_submission.md)
+- 2026-07-22 lean-eval 関連 3 note を [`lean_eval_submission.md`](../../notes/meta/lean_eval_submission.md)
   に統合、本 issue を tracker 化。ZJ 定理の reject を撤回 (完成確認)。
 - 2026-07-24 **用語統一** (submit = proof submit のみ、新規問題は proposal) + **proof submit 全数監査**
   (全 219 problem)。「他者 solved 済み = 候補外」の暗黙の絞りが誤り (per-account sticky) と
@@ -115,10 +115,10 @@ lean-eval への **proof submit も proposal も今後の作業対象から外�
 
 - 本 tracker の未チェック項目 (Burnside p^aq^b / `brauer_character_in_cyclotomic` /
   ZJ・Neumann・Hall–Petresco・Jordan・Chermak–Delgado 等の proposal) は**着手しない**。
-- 直前に完遂した [`brauer_suzuki`](closed/0184-brauer-suzuki-eval-submit.md) は、
+- 直前に完遂した [`brauer_suzuki`](0184-brauer-suzuki-eval-submit.md) は、
   **repo 側の成果 (一般化・商形の橋・`O(G)` 対応・import 衛生) が本体**であり、
   それらは全て main に入っている。提出可能な状態まで検証したという事実のみ記録に残す。
-- 正本 note [`lean_eval_submission.md`](../notes/meta/lean_eval_submission.md) は
+- 正本 note [`lean_eval_submission.md`](../../notes/meta/lean_eval_submission.md) は
   **調査記録として保持**する (再調査を防ぐため)。判断が覆るまで更新しない。
 
 ⚠ 将来のセッションへ: **この issue を「未消化の backlog」として拾い直さないこと**。

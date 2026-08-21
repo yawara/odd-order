@@ -127,5 +127,5 @@ Step 4 の `O_{2'}(G/Z(G)) = 1` は Isaacs Problem 3D.2 (`oPiCore_quotient_cente
 ## 参照
 
 - 原文ページ画像: `references/navarro/pages/navarro-p145.png` … `navarro-p149.png`
-- BS 側: [0147](closed/0147-q8-modular-char-theory-frozen.md) / [9506](closed/9506-modular-p-modular-system.md) / [0184](closed/0184-brauer-suzuki-eval-submit.md)
+- BS 側: [0147](0147-q8-modular-char-theory-frozen.md) / [9506](9506-modular-p-modular-system.md) / [0184](0184-brauer-suzuki-eval-submit.md)
 - project spec: `notes/meta/q8_modular_char_theory_frozen_project.md`

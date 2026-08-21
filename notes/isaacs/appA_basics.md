@@ -19,7 +19,7 @@ Appendix は本書を読むための **基礎群論の高速復習**: 群定義,
 - **|HK| 式 (X.2)** → `Subgroup.card_mul_eq_card_mul_card_inter` 系
 - **Dedekind (X.3)** → 短い格子計算 (`inf_sup_assoc_of_le` または直証)
 
-→ wrapper policy ([feedback_no_mathlib_wrapper](file:///Users/ywr/odd-order/notes/meta/lean_formalization_tips.md)) に従い
+→ wrapper policy ([feedback_no_mathlib_wrapper](../meta/lean_formalization_tips.md)) に従い
 **`OddOrder/Isaacs/AppA_Basics.lean` は作成しない** が推奨. 本書他章で Appendix の X.N を citation
 した場面で初めて、その箇所の section docstring に mathlib 名を併記すれば足りる.
 
@@ -166,7 +166,7 @@ BG / Peterfalvi の引用も同様: 一切無し. Appendix の内容は完全に
 
 理由:
 1. **全 23 結果が mathlib 既収載**. wrapper policy
-   ([feedback_no_mathlib_wrapper](file:///Users/ywr/odd-order/notes/meta/lean_formalization_tips.md))
+   ([feedback_no_mathlib_wrapper](../meta/lean_formalization_tips.md))
    に従えば 純粋リネームの薄いラッパーは書かない. Appendix の Lean 化はそれ以外の何物でも
    ないため、章ファイル自体が wrapper 集合になり policy 違反.
 2. **下流被引用ゼロ** (mathlib 名で直接使えば良い). 各章 Lean ファイルで `Subgroup.card_subgroup_dvd_card`
@@ -177,7 +177,7 @@ BG / Peterfalvi の引用も同様: 一切無し. Appendix の内容は完全に
 ROADMAP の Phase 1 チェックリストでは Appendix 項目を:
 
 > [x] Appendix: The Basics — **mathlib 完全カバー** につき Lean ファイル作成不要.
-> 教科書名 ↔ mathlib 名対応表は [notes/isaacs/appA_basics.md](notes/isaacs/appA_basics.md).
+> 教科書名 ↔ mathlib 名対応表は [notes/isaacs/appA_basics.md](appA_basics.md).
 
 の形でクローズするのが妥当 (実装作業 0 で完了マークが付く特殊ケース).
 

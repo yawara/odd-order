@@ -39,6 +39,6 @@ BG §2 Thm 2.6 is the odd-order 2-dimensional faithful representation result.
 ## 参照
 
 - 実装: [`OddOrder/BG/Ch1_Preliminary/S02_Representations.lean`](../../OddOrder/BG/Ch1_Preliminary/S02_Representations.lean) L4627 / L4680
-- 後継: [issue #0041](../0041-bg-appa-a2-dim-reduction.md)(App.A A.2 次元縮約 — Thm 2.6 を A.1 で使う)
+- 後継: [issue #0041](../closed/0041-bg-appa-a2-dim-reduction.md)(App.A A.2 次元縮約 — Thm 2.6 を A.1 で使う)
 - `notes/bg/s02_representations.md`
 - 関連: #34 (Thm 2.5 ExtraspecialFaithful — これも skeleton 状態、別途)

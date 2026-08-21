@@ -2024,7 +2024,7 @@ Ch. III §3 は像の一致 (Zassenhaus 段) しか言わないので:
 
 ## 背景
 
-[0167](closed/0167-pf-part2-ch3-s3-model.md) で Ch. III §3 の Proposition
+[0167](0167-pf-part2-ch3-s3-model.md) で Ch. III §3 の Proposition
 (`exists_standardModel`) が完成し、`S ⋊ KW ≅ S₁ ⋊ K₁W₁` の標準モデルが手に入った。
 Ch. IV はそれを土台に **Theorem A の証明を締める**章:
 
@@ -2103,7 +2103,7 @@ Ch. I §1 Prop 4 と同じ論法)。
 ## 参照
 
 * pp. 122-134 = `references/peterfalvi/pdftotext/05.6_pp_122_134_Characterization_of_PSU3_q.txt`
-* 上流 = [0167](closed/0167-pf-part2-ch3-s3-model.md) (Ch. III §3)
+* 上流 = [0167](0167-pf-part2-ch3-s3-model.md) (Ch. III §3)
 * Coq 併読 = `coq/theories/PFsection*.v` の該当箇所 (対応表 = `notes/meta/coq_odd_order_reference.md`)
 
 ## 2026-08-01 (17): unitary model を `congrEquiv` 化、共役をユニタリ座標へ、(4) の `(∗∗)` 完成
@@ -9121,9 +9121,9 @@ Ch. IV (pp. 122–134) の全節が形式化され、その先の組立ても通
 | §3 Corollary 2 | `PSU3CorollaryTwo.lean` |
 | §2 の閉じ Proposition | `exists_f_eq_conj_inv` (`FreeD` のみ、`V = W` 不要) |
 | §4 全体 | `SectionFourSetup.exists_mem_W` → `SectionFourSetup.nonempty_theoremAConclusion` |
-| **§4 冒頭の二分法** | `exists_sectionFourSetup_of_not_freeD` ([issue 0169](closed/0169-psu3-section-two-free-d.md)) |
+| **§4 冒頭の二分法** | `exists_sectionFourSetup_of_not_freeD` ([issue 0169](0169-psu3-section-two-free-d.md)) |
 | **case (c) 全体** | `SecondCaseHypothesis.nonempty_theoremAConclusion` (仮説ゼロ・axiom-clean) |
-| **(C1) の場合分け** | `nonempty_theoremAConclusion_of_V_ne_bot` ([issue 0170](closed/0170-psu3-c1-first-or-second-case.md)) |
+| **(C1) の場合分け** | `nonempty_theoremAConclusion_of_V_ne_bot` ([issue 0170](0170-psu3-c1-first-or-second-case.md)) |
 | **Theorem A** | `theoremA` (`|G|` の強帰納法) |
 
 Ch. IV に起因する未形式化はゼロ。Suzuki Theorem A 全体に残るのは Ch. IV 外の 2 点のみ:
@@ -9133,7 +9133,7 @@ Ch. IV に起因する未形式化はゼロ。Suzuki Theorem A 全体に残る�
 2. **[issue 0147](0147-q8-modular-char-theory-frozen.md)** — Ch. II が持つ唯一の `sorry`
    (Brauer–Suzuki の `Q₈`)。PDF 確保待ちで blocked。
 
-到達状態の要約 note = [`notes/peterfalvi/partII_ch4_section4_state.md`](../notes/peterfalvi/partII_ch4_section4_state.md)。
+到達状態の要約 note = [`notes/peterfalvi/partII_ch4_section4_state.md`](../../notes/peterfalvi/partII_ch4_section4_state.md)。
 
 ### 副産物の一般化 (Ch. IV 由来で他所でも使えるもの)
 

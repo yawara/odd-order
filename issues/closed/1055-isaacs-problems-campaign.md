@@ -6165,7 +6165,7 @@ repo/mathlib に「有限冪零群の Sylow と Hall `p'` が元ごとに可換�
 (`quaternionIsoOfInverting` + 巡回群の involution 一意性
 `eq_pow_half_orderOf_of_mem_zpowers_sq_eq_one`)。Ch.3 → Ch.6 の import は逆向きなので、
 **純粋に一般の群論であるこの 2 つだけを新 leaf
-[`OddOrder/GroupTheory/QuaternionRecognition.lean`](../OddOrder/GroupTheory/QuaternionRecognition.lean)
+[`OddOrder/GroupTheory/QuaternionRecognition.lean`](../../OddOrder/GroupTheory/QuaternionRecognition.lean)
 へ移して public 化**した (`private` をファイル跨ぎで使わない方針にも合致)。
 `DQSDRecognition.lean` は新 leaf を import して自前の private 版を削除
 (同ファイルは既に `open OddOrder.GroupTheory` していたので呼び出し側は無変更)。

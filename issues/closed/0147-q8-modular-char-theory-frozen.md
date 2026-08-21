@@ -52,7 +52,7 @@ BS 証明が直接引くのは Cor (6.13) / Cor (5.8) + 第三主定理 / Lemma 
 Peterfalvi App C Prop 1（`rankOne_affine_nearField`）の残り唯一の `sorry` = **Brauer–Suzuki の
 Q₈（`|S|=8`）ケース**を閉じるための **modular character theory 整備**プロジェクト。
 
-**project spec 正本 = [`notes/meta/q8_modular_char_theory_frozen_project.md`](../notes/meta/q8_modular_char_theory_frozen_project.md)**
+**project spec 正本 = [`notes/meta/q8_modular_char_theory_frozen_project.md`](../../notes/meta/q8_modular_char_theory_frozen_project.md)**
 （目的・凍結根拠・書籍選定候補と基準・整備 infra の内訳・既存 repo 資産・pickup 手順を収録）。
 
 ## 凍結の経緯（2026-07-23 の根拠、記録）

@@ -9,9 +9,9 @@ created: 2026-08-08
 
 ## 位置づけ
 
-3 冊逐条監査 (issue [0172](closed/0172-peterfalvi-full-formalization.md) /
-[0176](closed/0176-isaacs-full-formalization.md) /
-[0177](closed/0177-bg-full-formalization.md)、775 件) の完了後に**残っている着手可能な唯一の項目**。
+3 冊逐条監査 (issue [0172](0172-peterfalvi-full-formalization.md) /
+[0176](0176-isaacs-full-formalization.md) /
+[0177](0177-bg-full-formalization.md)、775 件) の完了後に**残っている着手可能な唯一の項目**。
 
 CLAUDE.md の裁定 (2026-07-16): 文献引用のみで本文に証明が無い結果は「恒久対象外にせず
 **低優先繰延**」。ユーザー指示 (2026-08-08) で解凍 — **Rem (IV) → Problem 1 の順**に進める

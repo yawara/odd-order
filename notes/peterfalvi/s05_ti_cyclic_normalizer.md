@@ -7,7 +7,7 @@ ROADMAP 上の位置: **Phase 2b 第 2 波** (§4 Dade 完成必須).
 
 ## Audit log (2026-05-23 audit 訂正)
 
-統合 doc: [`notes/meta/log/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
+統合 doc: [`notes/meta/log/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/log/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
 
 - **L3, L12 "5 結果 (3.1)-(3.5)"** → **重大誤認: 実際 9 結果 (3.1)-(3.9)**. 既存表で (3.6) Hypothesis, (3.7) index identity, **(3.8) NC trichotomy**, (3.9) Galois rationality package が完全欠落.
 - **(3.8) NC trichotomy が下流 8 cite で最多 hub** (§6×多, §7, §12×2, §15×2). 既存「side material」評価は逆.

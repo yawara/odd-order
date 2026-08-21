@@ -24,8 +24,8 @@ created: 2026-07-29
 
 ## 背景
 
-[0165](closed/0165-pf-part2-ch3-s2-order-five.md) で §2 の Proposition、
-[0166](closed/0166-pf-part2-ch3-s3-case-ab-conclusion.md) で §3 冒頭
+[0165](0165-pf-part2-ch3-s2-order-five.md) で §2 の Proposition、
+[0166](0166-pf-part2-ch3-s3-case-ab-conclusion.md) で §3 冒頭
 (`SecondCaseHypothesis.theoremAConclusion_or_caseC2`) が landing した。
 以後は **(C2)** だけを仮定してよい:
 
@@ -132,7 +132,7 @@ Appendix III Definition 3 により `S` は中心拡大
 ## 参照
 
 * pp. 119–121 = `references/peterfalvi/pages/peterfalvi-p{119,120,121}.png`
-* 上流 = [0165](closed/0165-pf-part2-ch3-s2-order-five.md) / [0166](closed/0166-pf-part2-ch3-s3-case-ab-conclusion.md)
+* 上流 = [0165](0165-pf-part2-ch3-s2-order-five.md) / [0166](0166-pf-part2-ch3-s3-case-ab-conclusion.md)
 * 下流 = Ch. IV「Characterization of PSU(3,q)」(pp. 122–134)
 
 ## 進捗 (2026-07-29 その 2)
@@ -218,7 +218,7 @@ Frobenius `x ↦ x^q` (書籍の `x ↦ x̄`) で書かれるので標数が必�
 
 ⟹ `θ = 1` なら `σ := bar` が Proposition の要求 (`σ|_F = θ = id`, `W₁` 反転) を満たす。
 
-支える体論は [9504](closed/9504-quadratic-frobenius-subfield.md) (closed) に切り出した:
+支える体論は [9504](9504-quadratic-frobenius-subfield.md) (closed) に切り出した:
 `E = 𝔽_{q²}` の bar 作用・位数 `q` の固定部分体 `F`・`Aut(F) → Aut(E)` の延長
 (存在 + ちょうど 2 個)。
 

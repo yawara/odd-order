@@ -11,7 +11,7 @@ created: 2026-08-20
 
 Lean **v4.33.0 final = 2026-08-10 リリース**、mathlib `stable` = tag `v4.33.0` (`db584cd6`)。
 CLAUDE.md の「**v4.33.0 final を待って上げる** (rc に当てない)」という保留条件が満たされた。
-現 pin = `v4.32.2` / `905b95818eb3` (2026-07-28, [issue 0165 相当の commit e20e313e5](../notes/meta/mathlib_v4322_migration.md))。
+現 pin = `v4.32.2` / `905b95818eb3` (2026-07-28, [issue 0165 相当の commit e20e313e5](../../notes/meta/mathlib_v4322_migration.md))。
 
 ### 事前実測 (2026-08-20, 両 tag を展開して機械照合)
 
@@ -99,7 +99,7 @@ info-tree 後処理から tactic elaborator 実装へ変わったため、`show`
 `Ideal.mul_le_left` ↔ `mul_le_right` の名前交換 / `MonoidAlgebra.induction_on` のケース名と
 motive 引数 / `Subgroup.IsComplement'.card_mul` → `card_mul_card` (dot 記法ゆえ静的スキャンの盲点)。
 
-詳細は [`notes/meta/mathlib_v433_migration.md`](../notes/meta/mathlib_v433_migration.md)。
+詳細は [`notes/meta/mathlib_v433_migration.md`](../../notes/meta/mathlib_v433_migration.md)。
 
 ### 繰延
 

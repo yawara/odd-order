@@ -13,7 +13,7 @@ Isaacs Thm 2.20 Lucchini (`A` cyclic 真部分群, `K = core_G(A)` ⇒ `|A:K| < 
 owner chapter 規則により Ch.4 dir に物理配置された:
 
 - Ch.2 内: `lucchini_K_pos_reduction` (K > ⊥ structural reduction, subgroup correspondence のみ) ✅
-- Ch.4 dir 内 ([Ch04_Commutators/ForwardFromCh02.lean](../OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh02.lean)):
+- Ch.4 dir 内 ([Ch04_Commutators/ForwardFromCh02.lean](../../OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh02.lean)):
   - `lucchini_K_bot_aux` (K = ⊥ case) — **private theorem, sorry-free**
   - `lucchini_aux` + `lucchini_index_normalCore_lt_index` (`|G|`-induction wrapper + 本体 theorem)
 
@@ -39,8 +39,8 @@ K = ⊥ branch の完全証明には Ch.4 §4A-§4B の lower central series 加
 
 ## 参照
 
-- [Ch04_Commutators/ForwardFromCh02.lean](../OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh02.lean) (`lucchini_K_bot_aux` 定義)
-- [notes/meta/forward_dep_policy.md](../notes/meta/forward_dep_policy.md)
-- [notes/isaacs/ch02_subnormality.md](../notes/isaacs/ch02_subnormality.md) §2D
-- [notes/isaacs/ch04_commutators.md](../notes/isaacs/ch04_commutators.md) §4A-§4B
+- [Ch04_Commutators/ForwardFromCh02.lean](../../OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh02.lean) (`lucchini_K_bot_aux` 定義)
+- [notes/meta/forward_dep_policy.md](../../notes/meta/forward_dep_policy.md)
+- [notes/isaacs/ch02_subnormality.md](../../notes/isaacs/ch02_subnormality.md) §2D
+- [notes/isaacs/ch04_commutators.md](../../notes/isaacs/ch04_commutators.md) §4A-§4B
 - Isaacs FGT pp.62-63 (Lucchini 証明本体)

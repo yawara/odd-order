@@ -11,8 +11,8 @@ created: 2026-08-13
 
 BG App.C Problem 1 (Péterfalvi 1993) は 2026-08-13 に**紙上で否定的に全面解決**した
 (敵対的検証 6 本全 CONFIRMED・fatal 0)。正本 =
-[`notes/bg/appC_problem1_skew_calculus.md`](../notes/bg/appC_problem1_skew_calculus.md) §6.2 +
-[`notes/bg/appC_problem1_pair_composition.md`](../notes/bg/appC_problem1_pair_composition.md) §9、
+[`notes/bg/appC_problem1_skew_calculus.md`](../../notes/bg/appC_problem1_skew_calculus.md) §6.2 +
+[`notes/bg/appC_problem1_pair_composition.md`](../../notes/bg/appC_problem1_pair_composition.md) §9、
 統合証明文書 = `notes/bg/appC_problem1_resolution.md`。
 Part I ((B2)-elim = 衝突 1 個で witness 排除) は **Lean 化済・axiom-clean**。
 Part II (skew calculus)・Part III (endgame) は紙上のみ。本 issue はその機械検証。

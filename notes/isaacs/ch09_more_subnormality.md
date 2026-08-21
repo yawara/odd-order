@@ -67,7 +67,7 @@
 原典抽出: `references/isaacs/finite-group-theory.mmd` lines 4880-5310.
 ROADMAP 上の位置: **第 3 波 (Ch.2 完了後、並列可)** — 直接前提は Ch.2 (Thm 2.6 minimal normal が subnormal を正規化, socle 概念), 軽く Ch.1 (Fitting, 冪零).
 
-4 視点 framework 適用 (2026-05-23 audit 統合): 詳細クロス参照 [`../meta/ch08_10_audit_2026_05_23.md`](../meta/ch08_10_audit_2026_05_23.md).
+4 視点 framework 適用 (2026-05-23 audit 統合): 詳細クロス参照 [`../meta/ch08_10_audit_2026_05_23.md`](../meta/log/ch08_10_audit_2026_05_23.md).
 
 ## TL;DR — FT 経路ではほぼ全章スキップ可
 
@@ -375,7 +375,7 @@ S9C,S9D}.lean` 階層配置だが **Phase 1 skip** (BG/Peterfalvi 0 件のため
 ## 関連ノート (2026-05-23 audit 統合)
 
 - [`../meta/chapter_investigation_framework.md`](../meta/chapter_investigation_framework.md) — 4 視点 framework template.
-- [`../meta/ch08_10_audit_2026_05_23.md`](../meta/ch08_10_audit_2026_05_23.md) — 本 audit (Ch.8/9/10 統合) doc.
+- [`../meta/ch08_10_audit_2026_05_23.md`](../meta/log/ch08_10_audit_2026_05_23.md) — 本 audit (Ch.8/9/10 統合) doc.
 - [`ch01_sylow.md`](ch01_sylow.md) — Ch.1 依存 (Thm 1.19, 1.26).
 - [`ch02_subnormality.md`](ch02_subnormality.md) — **Ch.2 Thm 2.6 ⭐ 5x dep** (9.3, 9.4, 9.6, 9.17, 9.18 すべての hub).
 - [`ch01_sylow_d_fitting.md`](ch01_sylow_d_fitting.md) — `Subgroup.fitting` (9.6 で利用).

@@ -23,7 +23,7 @@ gate 3/4 は (A) と (B) の**混合**で、純粋な skeleton ではない。�
 
 ## 現状の正確な仕分け（gate ごと）
 
-`exists_typeI_maximal_overNormalizer_U` の 4 gate（[S15_SAndT.lean](OddOrder/Peterfalvi/S15_SAndT.lean) 内）:
+`exists_typeI_maximal_overNormalizer_U` の 4 gate（[S15_SAndT.lean](../../OddOrder/Peterfalvi/S15_SAndT.lean) 内）:
 
 | gate | 必要な事実 | signature 状態 | 種別 |
 |---|---|---|---|
@@ -31,21 +31,21 @@ gate 3/4 は (A) と (B) の**混合**で、純粋な skeleton ではない。�
 | 2 L~S | `Coprime |U| [S:U]` ← `[S:M']=|W₁|`（W₁=κ 同定） | carrier に無い | **F-ask**（issue 2009）。構造論コアは ✅ DONE |
 | 3 L~T | (13.2.a) `basic_structure.UW1_frobenius` | ✅ **存在**（S15_SAndT、sorried producer） | (A) cite 可 |
 | 3 L~T | **`|L_F|=q^p`**（T-side Fitting 位数 / 「L_F は q-群 ⊇ W₁」） | ❌ **未記載** | **(B) 要 statement** |
-| 4 U⊆L_F | (9.1) Wielandt FPF `wielandt_fixedPoint_frobenius` | ✅ **存在**（[CoprimeAction.lean:156](OddOrder/GroupTheory/CoprimeAction.lean:156)、sorried） | (A) cite 可 |
+| 4 U⊆L_F | (9.1) Wielandt FPF `wielandt_fixedPoint_frobenius` | ✅ **存在**（[CoprimeAction.lean:156](../../OddOrder/GroupTheory/CoprimeAction.lean:156)、sorried） | (A) cite 可 |
 | 4 U⊆L_F | **(8.17.a) `|L_F| coprime to pq`** | ⚠ **直接 lemma 無し**（構造体 + producer は存在） | **(B) 要 derivation lemma** |
 
 ### (B) 未記載 signature の詳細
 
 **(B1) gate 3 — T-side Fitting 位数 `|hyp.Q| = q^p`（= `|T_F|=q^p`、転送で `|L_F|=q^p`）**
-- なぜ無い: `basic_structure`（[S15_SAndT:236](OddOrder/Peterfalvi/S15_SAndT.lean:236)、`BasicStructureData`）は **`hyp.S` 専用**で
+- なぜ無い: `basic_structure`（[S15_SAndT:236](../../OddOrder/Peterfalvi/S15_SAndT.lean:236)、`BasicStructureData`）は **`hyp.S` 専用**で
   `|P|=|S_F|=p^q` のみ供給。S↔T 対称版（`|Q|=|T_F|=q^p`）は無い。Hypothesis は S,T 非対称（`one_typeII` 等）ゆえ
   単純な swap で出ない。
 - gate 3 が実際に要するのは「`L_F` は q-群で `W₁ ⊆ L_F`」（→ `U` が `L_F` 正規化 + `Coprime |U| q`[既存 Frobenius] で
   `[U,W₁]⊆L_F∩U=1` → (13.2.a) 矛盾）。最小形は `T_F` が q-群（位数 q^p）であること。
 
 **(B2) gate 4 — (8.17.a) `|L_F| coprime to pq`（type-I L、S/T 非共役）**
-- 構造体 `BGTheoremECoverData`（[S10_MinimalSimpleStructure:287](OddOrder/Peterfalvi/S10_MinimalSimpleStructure.lean:287)）
-  + producer `bgTheoremE_cover_data`（[S10:365](OddOrder/Peterfalvi/S10_MinimalSimpleStructure.lean:365)、**sorried**、
+- 構造体 `BGTheoremECoverData`（[S10_MinimalSimpleStructure:287](../../OddOrder/Peterfalvi/S10_MinimalSimpleStructure.lean:287)）
+  + producer `bgTheoremE_cover_data`（[S10:365](../../OddOrder/Peterfalvi/S10_MinimalSimpleStructure.lean:365)、**sorried**、
   「deliberately does not prove BG Theorem E」）は**存在**。
 - だが **「`|L_F| coprime to pq`」の専用 lemma は未記載**。`primeFactors_disjoint`（π((M_i)_s) 互いに素）から
   **derive 可能**だが、(a) derivation lemma を書く + (b) `bgTheoremE_cover_data`（sorried）を cite、の 2 段が要る。

@@ -16,7 +16,7 @@ created: 2026-08-07
 
 ## 実測ベースライン (2026-08-07)
 
-正本 = [`notes/peterfalvi/full_formalization_census_2026_08_07.md`](../notes/peterfalvi/full_formalization_census_2026_08_07.md)。
+正本 = [`notes/peterfalvi/full_formalization_census_2026_08_07.md`](../../notes/peterfalvi/full_formalization_census_2026_08_07.md)。
 ⚠ 2026-07-16 の 3 冊 survey は**使わない** (降格済 + 3 週間分 stale)。
 
 ### Part I (§1–§16 = 書籍 result 番号 (1.x)–(14.x))
@@ -214,7 +214,7 @@ packaging 差のすべてがゼロ**。
    一次証拠になった。⟹ **注記は必ず実体 (定理の signature) で裏を取る**。
 - **ステップ 3 ✅ 完了 (2026-08-08)**: Part I (§1-§14) の逐条監査を (1.1) から文書順に完了。1 章ぶん終えるごとに census note を更新した。
   - **2026-08-07 時点: §1-§6 完了 (全 63 件)**。
-    正本 = [census note](../notes/peterfalvi/full_formalization_census_2026_08_07.md) §3.5 の各表。
+    正本 = [census note](../../notes/peterfalvi/full_formalization_census_2026_08_07.md) §3.5 の各表。
   - **§6 の補充 3 件 (2026-08-07)**:
     - **(6.7) の第 1 結論 `ψ(z) ∈ ℤ`** — 書籍 p.32 の結論は 2 つだが repo は合同側のみで、整数性は
       「consumer が別途知っている」と file docstring が自認していた。
@@ -361,7 +361,7 @@ App.I Prop 1 の `[IsSolvable D]` 除去 (Feit–Thompson 経由)。
 
 ### 残る作業 (本 issue の外)
 
-- **Q₈ Brauer–Suzuki (`|S| = 8`)** — [issue 0147](0147-q8-brauer-suzuki-navarro.md) (Navarro 1998 経路)。
+- **Q₈ Brauer–Suzuki (`|S| = 8`)** — [issue 0147](0147-q8-modular-char-theory-frozen.md) (Navarro 1998 経路)。
   Peterfalvi の番号付き結果ではなく、lane c の補助定理。
 
 ## 参照

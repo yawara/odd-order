@@ -37,20 +37,20 @@ no-Gorenstein 方針下では **App.B (Puig L(S), Thm B.4) こそが Thm 6.2 の
 スキップ不可。App.B 自体は **完全な証明が BG にあり**(B.1-B.4 written, 実質依存は A.5 のみ、
 B.4 は Isaacs 本人の未公刊証明)。FT-citation-orphan の観察 (L17-18) は正しいが、**「Gorenstein
 依存を断つ代替」という役割を見落とした**のが旧監査の誤り。詳細・依存閉包・J→L 大域置換の検証は
-[`notes/meta/log/bg_s6_appAB_route_2026_05_28.md`](../meta/bg_s6_appAB_route_2026_05_28.md)。
+[`notes/meta/log/bg_s6_appAB_route_2026_05_28.md`](../meta/log/bg_s6_appAB_route_2026_05_28.md)。
 
 ---
 
 ## Audit log (2026-05-23 audit 訂正)
 
-統合 doc: [`notes/meta/log/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).
+統合 doc: [`notes/meta/log/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/log/bg_phase2a_wave1_audit_2026_05_23.md).
 
 - **"Lem B.1-B.5" (L6, 333, 343, 408, 504)** → **誤り. B.5 は存在しない**. App.B 全結果は **Lem B.1, B.2, B.3 + Thm B.4 の 4 つのみ**.
 - **`_overview.md` L95 "App.B は App.A 不要で独立着手可"** → **誤り**. **Lem B.3 (L4666) + Thm B.4 Step 3 (L4735) が Thm A.5 cite**. App.B は App.A 下流.
 - **"J(S) = L(S)" (L76 等)** → **誤り**. **`J(S) ⊆ L(S)` のみ**. `Z(J(S)) ⊆ Z(L(S))` substitutable but **NOT equal**. L 再帰, J 一回最大.
 - **App.B is COMPLETELY ORPHANED in FT path**: §1-§16 + App.C + App.E から 0 cite, Peterfalvi 0 cite. 本文使用箇所は **§6 L1979 (advertisement only)** + **App.D L5014 (FT 無関係 "may substitute")** の 2 箇所のみ.
 - **L374 "A.5 が BG §6-§16 で使わない"** → True, さらに **A.5 自体も App.B 唯一の消費者** ⇒ **A.5 + App.B が共に orphan**.
-- **Recommendation revision**: 既存「optional 補強, Phase 2a 第 6 波」 → **完全に Phase 2a スキップ推奨**. ~570 行, ~10-13 日節約. Phase 4 または mathlib upstream pivot 時に revisit. App.A docstring に skip rationale 残す. **【2026-05-28 再撤回: この skip 推奨は誤り。Isaacs が Z(J) を省くため App.B が 6.2 代替の本線で必須。冒頭 banner + [`bg_s6_appAB_route_2026_05_28.md`](../meta/bg_s6_appAB_route_2026_05_28.md) 参照】**
+- **Recommendation revision**: 既存「optional 補強, Phase 2a 第 6 波」 → **完全に Phase 2a スキップ推奨**. ~570 行, ~10-13 日節約. Phase 4 または mathlib upstream pivot 時に revisit. App.A docstring に skip rationale 残す. **【2026-05-28 再撤回: この skip 推奨は誤り。Isaacs が Z(J) を省くため App.B が 6.2 代替の本線で必須。冒頭 banner + [`bg_s6_appAB_route_2026_05_28.md`](../meta/log/bg_s6_appAB_route_2026_05_28.md) 参照】**
 
 ## TL;DR — J(S) の代替, optional 補強節
 

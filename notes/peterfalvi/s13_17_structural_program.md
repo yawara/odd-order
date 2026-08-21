@@ -6,7 +6,7 @@
 > `typeII_overNormalizer_frobenius` を cite する。(13.17) は gated-endpoint skeleton 化済
 > (`0d99daf1`): `sorry`-free assembly が (12.7) `S14.typeI_frobenius` を cite + 2 faithful
 > obligation に分離。本プログラム = その 2 obligation を**深い §13 構造論**で埋める計画。
-> 正本 issue = `issues/pending/2009-s16-field-normalizer-pole2.md`。
+> 正本 issue = `issues/closed/2009-s16-field-normalizer-pole2.md`。
 
 ## ゴールと分担原則
 

@@ -43,7 +43,7 @@
 3. G が 12.16(a)(b) を §13 側で **実証明** (sorry 無し, sorry'd Prop 12.15 引用) → idle/axiom 無しだが
    §12 仕事を G レーンで抱える + 合流時 relocate (~150-250 行, 非推奨)。
 
-→ 詳細・署名は **issue 8000** (`issues/8000-s13-blocked-cor1216ab.md`)。
+→ 詳細・署名は **issue 8000** (`issues/closed/8000-s13-blocked-cor1216ab.md`)。
 
 ### session 1 進捗 (forward axiom path 採択後)
 

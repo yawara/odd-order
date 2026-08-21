@@ -7,7 +7,7 @@ ROADMAP 上の位置: **Phase 2b 第 1 波** (Phase 1 Isaacs Ch.指標論完成 
 
 ## Audit log (2026-05-23 audit 訂正)
 
-統合 doc: [`notes/meta/log/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
+統合 doc: [`notes/meta/log/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/log/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
 
 - **§3 は dependency-graph leaf**: 内部 self-cite **2 件のみ** ((1.1)→(1.5.e), (1.5.a)→(1.6.a)). 既存「structured」評価は overstate; flat checklist が実態.
 - **内部 hub 訂正**: 既存「(1.4) hub」→ 実は **(1.6) が forward 最多 (7 cites)**. (1.4) は §4 prereq として重要だが overall は (1.6) が上位.
@@ -293,7 +293,7 @@ orthogonality layer separate from the remaining finite induction.
 
 **重要性**: **(1.4) は §4 Dade isometry の主定理 (2.6) への "isometry 構造 lemma"**. これにより、「TI-subset 上の virtual character 等距 → 既約成分への分解保存」が言える.
 
-**2026-05-28 進捗**: (1.4) の証明は bottom-up の 4 層に分解 (詳細は [`issues/0025`](../../issues/0025-peterfalvi-isometry-difference-core.md) の HANDOFF):
+**2026-05-28 進捗**: (1.4) の証明は bottom-up の 4 層に分解 (詳細は [`issues/0025`](../../issues/closed/0025-peterfalvi-isometry-difference-core.md) の HANDOFF):
 **層 1a** `χ(g⁻¹)=conj χ(g)` ✅ 完了 (`RepresentationTheory/CharacterConjugate.lean`, `character_inv`, sorry-free, mathlib ギャップを行列 S-ユニタリ・トリックで充足) → **層 1b** orthonormality discharge (`CharacterTableRowOrthogonality` を定理化、次の着手点) → 層 2 ZIrr Fourier API → 層 3 combinatorial core。
 
 ## Isaacs [Is] 1976 → mathlib 対応 (Phase 1 完成想定)

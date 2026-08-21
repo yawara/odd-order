@@ -9,7 +9,7 @@ created: 2026-07-29
 
 ## 背景
 
-[issue 0162](closed/0162-pf-part2-ch3-theorem-c.md) で **Theorem C** (`Q` は 2-群) が
+[issue 0162](0162-pf-part2-ch3-theorem-c.md) で **Theorem C** (`Q` は 2-群) が
 2026-07-29 に完成 (`7175e6a73`)。文書順の次は同じ Ch.III §1 の **Proposition** (p. 116 下部)。
 
 ### 実測 (2026-07-29) — survey ラベルの棚卸し
@@ -107,7 +107,7 @@ type C / type D なら `S/Q₀` は `𝐅₂[K]`-加群で `S/Q₀ = X ⊕ Y` (`
 - [x] case (3) の `st` 位数 3 パート — **type C/D 側 2026-07-29 完了**
 - [x] case (3) の `st` 位数 3 パート — **type B 側も 2026-07-29 完了 (無条件)**
 - [x] case (3) の PSL 分岐排除 — **2026-07-29 完了** (Frobenius 論法は不要になった)
-- [ ] case (3) の `W ≠ 1` パート — **[issue 0164](../0164-psu3-sylow-normalizer-centralizer.md) に gate**
+- [ ] case (3) の `W ≠ 1` パート — **[issue 0164](../closed/0164-psu3-sylow-normalizer-centralizer.md) に gate**
 - [x] Suzuki 2-群の位数二分法 — **2026-07-29 完了** (`natCard_eq_sq_or_cube_of_isSuzuki2Group`)
 - [x] 3 分岐の組み立て (Proposition 本体) — **2026-07-29 完了** (`W ≠ 1` のみ仮説)
 
@@ -122,8 +122,8 @@ AxiomsCheck に登録されて axiom-clean。フルビルド green + `--strict` 
 
 ## 参照
 
-* 前の結果 = [issue 0162](closed/0162-pf-part2-ch3-theorem-c.md) (Theorem C、2026-07-29 完成)
-* Ch.II Theorem B = [issue 2053](pending/2053-pf-suzuki-theorem-b.md) (2026-07-26 完成)
+* 前の結果 = [issue 0162](0162-pf-part2-ch3-theorem-c.md) (Theorem C、2026-07-29 完成)
+* Ch.II Theorem B = [issue 2053](2053-pf-suzuki-theorem-b.md) (2026-07-26 完成)
 * 書籍 pp. 116–117 = `references/peterfalvi/pages/peterfalvi-p116.png` / `-p117.png`
 * 章 PDF = `references/peterfalvi/pdf/05.5_pp_115_121_The_Structure_of_H.pdf`
 
@@ -473,7 +473,7 @@ Proposition 本体 (3 分岐の disjunction) の組み立てには、書籍が
 
 ### 状態
 
-**残るのは [issue 0164](../0164-psu3-sylow-normalizer-centralizer.md) だけ**なので、
+**残るのは [issue 0164](../closed/0164-psu3-sylow-normalizer-centralizer.md) だけ**なので、
 本 issue は pending に移す。0164 が閉じたら `trichotomy` から `hWcube` 仮説を外して
 close する。
 

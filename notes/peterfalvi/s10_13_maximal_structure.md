@@ -3,7 +3,7 @@
 > ⚠ **2026-07-02 再編**: Lane H は消滅、§10–13 = **lane a** (正本 [`ft_lane_reallocation_2026_06_28.md`](../meta/ft_lane_reallocation_2026_06_28.md))。
 > ただし S10 の §8 Dade-support 宣言群 (`typeII_A_sets_TI`/`typeII_A_sets_normalizer`・
 > `dadeSupportHypotheses_typeI`/`typeP`・`support_mutual_exclusion`) は issue
-> [0096](../../issues/0096-s10-section8-dade-support-carveout-lane-b.md) carve-out で **lane b** —
+> [0096](../../issues/closed/0096-s10-section8-dade-support-carveout-lane-b.md) carve-out で **lane b** —
 > 本 note の「S10→BG§16 wiring を実作業」指示はこの範囲では無効。`support_mutual_exclusion` は
 > **PROVEN** (2026-07-02, lane b)。(8.2.a)/(8.2.b)/(8.8) proven。S08 は sorry-free ((6.8) gate 閉)。
 > census (2026-07-02, comment-strip): S10 8 / S11 4 / S12 4 + Core 0 / S13 10。

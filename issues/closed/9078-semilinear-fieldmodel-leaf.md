@@ -76,7 +76,7 @@ discharge、full build green・AxiomsCheck OK・新 axiom なし。
 ## 参照
 
 - 親裁定: [9077](9077-lane-c-frontier-exhausted-reallocation.md) HUB RULING (B)。
-- scope 元: [9000](9000-sigma-theory-typep-galois-foundation.md) HUB scope note 2026-07-07 item 2 / closed [0098](closed/0098-lane-rebalance-c-reactivation.md)。
+- scope 元: [9000](9000-sigma-theory-typep-galois-foundation.md) HUB scope note 2026-07-07 item 2 / closed [0098](0098-lane-rebalance-c-reactivation.md)。
 - gate map: `notes/peterfalvi/s16_nonexistence_gate_map.md`。
 - 既存 building block: `Appendices/SemilinearField.lean:125/191`、S-side chain S16:2415-2953。
 - 他レーンは着手前に本 issue を scan (claim-before-build、policy 6/8)。

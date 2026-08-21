@@ -9,8 +9,8 @@ created: 2026-05-28
 
 ## 背景
 
-issue [#0041](closed/0041-bg-appa-a2-dim-reduction.md) で A.1 / dim reduction / A.2
-を sorry-free で実装完了 ([`OddOrder/BG/AppA_PStability.lean`](../OddOrder/BG/AppA_PStability.lean))。
+issue [#0041](0041-bg-appa-a2-dim-reduction.md) で A.1 / dim reduction / A.2
+を sorry-free で実装完了 ([`OddOrder/BG/AppA_PStability.lean`](../../OddOrder/BG/AppA_PStability.lean))。
 次は **A.3**(BG mmd L4476, = Gorenstein 3.8.3 の弱化形)で App.A の連鎖を進める:
 
 ```
@@ -18,14 +18,14 @@ Thm 6.2 ⟸ App.B B.4 ⟸ A.5 ⟸ A.4(c) ⟸ A.3 [本 issue] ⟸ A.2 ✅ ⟸ A.1
 ```
 
 依存閉包・ゲート構造は
-[`notes/meta/log/bg_s6_appAB_route_2026_05_28.md`](../notes/meta/log/bg_s6_appAB_route_2026_05_28.md)
+[`notes/meta/log/bg_s6_appAB_route_2026_05_28.md`](../../notes/meta/log/bg_s6_appAB_route_2026_05_28.md)
 §0.2 参照. mini-roadmap は
-[`notes/bg/appA_pstability.md`](../notes/bg/appA_pstability.md).
+[`notes/bg/appA_pstability.md`](../../notes/bg/appA_pstability.md).
 
 ## ✅ 完了 (2026-05-29, HEAD `c06e188` で Case B 完成)
 
 `thmA3` + `IsPStable` def を **sorry-free / axiom-clean** で実装完了
-([`OddOrder/BG/AppA_PStability.lean`](../OddOrder/BG/AppA_PStability.lean))。
+([`OddOrder/BG/AppA_PStability.lean`](../../OddOrder/BG/AppA_PStability.lean))。
 当該ファイルの `sorry` proof-hole は 0、`lake build OddOrder` green (root 3334 jobs)。
 
 - **Case A** (`22e281d`): chain coprime action + 素因数 contradiction。
@@ -182,7 +182,7 @@ Step 5 完成後の Step 6-8 = 約 200-300 行:
 
 ## 現状 (handoff 用、2026-05-29 更新)
 
-[`OddOrder/BG/AppA_PStability.lean`](../OddOrder/BG/AppA_PStability.lean) ~L545-770
+[`OddOrder/BG/AppA_PStability.lean`](../../OddOrder/BG/AppA_PStability.lean) ~L545-770
 に以下を実装済:
 
 - **`IsPStable p G`** def (`b8ab8a9`): alg-closed char-p faithful rep で p-element の
@@ -194,7 +194,7 @@ Step 5 完成後の Step 6-8 = 約 200-300 行:
   - `representation_conj_ne_one`: `ρx ≠ 1 ⇒ ρ(gxg⁻¹) ≠ 1`
   - `isPGroup_zpowers_conj`: `IsPGroup p ⟨x⟩ ⇒ IsPGroup p ⟨gxg⁻¹⟩`
 - **Step 5 用 single-step coprime action** (`96b447e`, 2026-05-29):
-  新 module [`OddOrder/GroupTheory/RepresentationTheory/CoprimeActionTrivial.lean`](../OddOrder/GroupTheory/RepresentationTheory/CoprimeActionTrivial.lean) (147 行)
+  新 module [`OddOrder/GroupTheory/RepresentationTheory/CoprimeActionTrivial.lean`](../../OddOrder/GroupTheory/RepresentationTheory/CoprimeActionTrivial.lean) (147 行)
   に `coprime_action_trivial_step` sorry-free 実装。`G` 有限,
   `(|G| : F) ≠ 0`, `W ≤ V` 上 + `V/W` 上自明 ⇒ `V` 全体に自明。
   Maschke 不要の直接展開 (`T := ρ g - 1`, `(1+T)^(orderOf g) = 1 + (orderOf g) • T`,
@@ -322,8 +322,8 @@ Gorenstein 8.3 proof (mmd L2290–) 翻訳:
 - BG mmd L4476: A.3 statement
 - Gorenstein mmd L2288 (Thm 8.3 statement), L2290+ (proof), L2204 (Thm 8.1 = repo A.2)
 - repo: `OddOrder.BG.AppA.quadratic_two_generated_irreducible_finrank_eq_two`
-  ([AppA_PStability.lean](../OddOrder/BG/AppA_PStability.lean))
+  ([AppA_PStability.lean](../../OddOrder/BG/AppA_PStability.lean))
 - repo: `OddOrder.Isaacs.Ch02.baerSuzuki_pCore` (Ch02 Main.lean L2134)
-- closed issue [#0041](closed/0041-bg-appa-a2-dim-reduction.md)
-- notes: [`appA_pstability.md`](../notes/bg/appA_pstability.md),
-  [`bg_s6_appAB_route_2026_05_28.md`](../notes/meta/log/bg_s6_appAB_route_2026_05_28.md)
+- closed issue [#0041](0041-bg-appa-a2-dim-reduction.md)
+- notes: [`appA_pstability.md`](../../notes/bg/appA_pstability.md),
+  [`bg_s6_appAB_route_2026_05_28.md`](../../notes/meta/log/bg_s6_appAB_route_2026_05_28.md)

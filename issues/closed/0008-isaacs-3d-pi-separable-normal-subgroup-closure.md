@@ -53,7 +53,7 @@ cardinality (π-group ⊓ π'-group = ⊥, 有限群で primeFactors 共通な�
 - [x] AxiomsCheck flagship 維持 (3 標準公理).
 
 `piLength_le_one_of_abelian_pi_hall` は fake `True` placeholder の正式 statement 化を伴うため,
-本 issue から外して [issues/0004](../0004-isaacs-3-22-pilength-placeholder.md) に移管する.
+本 issue から外して [issues/0004](../closed/0004-isaacs-3-22-pilength-placeholder.md) に移管する.
 
 ## 完了条件
 

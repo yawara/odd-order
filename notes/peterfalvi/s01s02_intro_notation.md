@@ -1,7 +1,8 @@
 # Peterfalvi §1+§2: Introduction + Notation — mini-roadmap (合体版)
 
 **スコープ**: Peterfalvi §1 (pp.1-2, 40 行) + §2 (pp.3-4, 40 行). 番号付き結果 0 (前文相当).
-**形式化先** (予定): `OddOrder/Peterfalvi/S01S02_IntroductionNotation.lean` (notation 定義 + docstring)
+**形式化先**: `OddOrder/Peterfalvi/S01_Introduction.lean` + `OddOrder/Peterfalvi/S02_Notation.lean`
+(当初は 1 ファイル `S01S02_IntroductionNotation.lean` の予定だったが 2 分割で実装)
 **ROADMAP 上の位置**: Phase 2b 第 1 波 (前提なし, 並行可)
 **役割**: FT 戦略の明示 + 指標論・加群記号の統一
 

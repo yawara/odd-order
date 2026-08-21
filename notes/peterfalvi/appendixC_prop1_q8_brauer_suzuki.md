@@ -14,7 +14,7 @@
 ## 0. 検証の出所（自分で直接確認 vs secondary）
 
 - **直接確認**: Gorenstein *Finite Groups* Ch.12 Thm 1.1 原文（`references/gorenstein/finite-groups.pdftotext.txt`）/
-  Peterfalvi App.C pp.137–138 原文（`references/peterfalvi/pdftotext/07.0_..._On_Near-Fields.txt`、OCR 語順崩れを再構成）/
+  Peterfalvi App.C pp.137–138 原文（`references/peterfalvi/pdftotext/07.0_pp_137_138_On_Near-Fields.txt`、OCR 語順崩れを再構成）/
   `coq/theories/` の grep（BS・near-field の**不在**を実測）/ repo の `RankOneHypothesis` 定義。
 - **secondary（未直接読）**: Wong 1972 の内部論法・Mousavi (Comptes Rendus 2020s) の証明技法は
   **web 検索要約 + 論文 abstract 経由**（Wong の PDF はスキャン画像で本文抽出不可だった）。

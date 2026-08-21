@@ -1079,7 +1079,7 @@ Proposition|Prop|Hypothesis|App} N.M`、太字・部分ラベル `(a)`/`(d)` 付
 **BG に真に残るもの (4 件)**:
 1. **Lem 2.7** — repo には核心 (`Gorenstein Thm 3.2.3`, `ElemAbelianAutAction.lean`) だけがあり、
    BG の番号での statement は無い。実体があるので着手コストは小さい。
-2. **§16 tamely imbedded 構造** — issue [8005](../../issues/8005-s16-tame-embedding-restore.md) で
+2. **§16 tamely imbedded 構造** — issue [8005](../../issues/closed/8005-s16-tame-embedding-restore.md) で
    **意図的に defer** (Peterfalvi 側の実消費がトリガー、正本 `notes/bg/s15_16_audit.md` §12.3)。
 3. **App.C Rem (II) / (V)** — 小 (Peterfalvi の例と「p, q は奇と仮定してよい」)。
 4. **App.C Rem (IV) / Prob 1** — 文献引用のみ / open problem ⟹ 低優先繰延 (本 note 該当節の裁定どおり)。
@@ -1247,7 +1247,7 @@ work」と明記している。**(5.3)(b) は 2026-07-27 にクローズ済** �
 **残っている特殊化 (実測、着手前に再確認すること)**
 
 1. ~~**(6.6) coherence 半分**~~ — **2026-07-27 完済**
-   (**[issue 0155](../../issues/0155-pf-six-six-general-kernel.md)**)。
+   (**[issue 0155](../../issues/closed/0155-pf-six-six-general-kernel.md)**)。
    `S08_SixSixGeneral.xSet_isCoherent_of_irreducible_X` が一般 `K`・**任意の τ** (Dade 非依存) で
    landing、axiom-clean・AxiomsCheck 登録済:
 
@@ -1306,7 +1306,7 @@ work」と明記している。**(5.3)(b) は 2026-07-27 にクローズ済** �
    しか使っていない (`M ≤ B` なので書籍の `H/M` 冪零から出る)。
    ⟹ 数学的な障害は無く、binder で商型の `Group` instance を作るのに
    `(B.subgroupOf H).Normal` を明示 binder で渡す必要がある点だけが手当て箇所。
-   **[issue 0158](../../issues/0158-six-three-quotient-nilpotent.md)** に手順を記録。】
+   **[issue 0158](../../issues/closed/0158-six-three-quotient-nilpotent.md)** に手順を記録。】
 
 #### (10.11) の実測 (2026-07-27) — **両主張とも書籍強度、AxiomsCheck の注記が stale だった**
 
@@ -1488,7 +1488,7 @@ future proof の target」— どちらも既に証明済)。
 | 書籍 | 内容 | 状態 |
 |---|---|---|
 | ~~**Ch.III §1 Thm C**~~ | `Q` は 2-群 (`Q₁ = 1`) | **✅ 2026-07-29 完成** ([issue 0162 closed](../../issues/closed/0162-pf-part2-ch3-theorem-c.md)、`7175e6a73`) — `SecondCaseHypothesis.{Q1_eq_bot, isPGroup_two_Q}`、axiom-clean |
-| **Ch.III §1 Prop** | 三分律 (a) `S = Q₀` / (b) type A / (c) type B | **未 = 現 frontier** — [issue 0163](../../issues/0163-pf-part2-ch3-s1-trichotomy.md) |
+| **Ch.III §1 Prop** | 三分律 (a) `S = Q₀` / (b) type A / (c) type B | **未 = 現 frontier** — [issue 0163](../../issues/closed/0163-pf-part2-ch3-s1-trichotomy.md) |
 | Ch.III §2 Prop | `st` 位数 5 の場合 `(SK) ∪ (SKtS)` が部分群 | 未 |
 | Ch.III §3 Prop | (C2) の下での明示モデル | 未 |
 | Ch.IV §1 (H1)–(H6) + Lemma | `f, g, h` の BN-pair 形式と一意性 | 未 |

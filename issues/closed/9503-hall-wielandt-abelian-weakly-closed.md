@@ -445,7 +445,7 @@ ChatGPT Pro (reasoning「非常に高い」) に Hall–Wielandt (p 奇 + A 可�
 ## ✅ 2026-07-26 決着 — 証明を入手・検証、Lean 化計画確定
 
 ChatGPT Pro の回答 (16m54s + 2m54s 思考) を**全ステップ独立に検証**し、正しいことを確認した。
-証明本文と検証メモは **[`notes/meta/hall_wielandt_proof.md`](../notes/meta/hall_wielandt_proof.md)**
+証明本文と検証メモは **[`notes/meta/hall_wielandt_proof.md`](../../notes/meta/hall_wielandt_proof.md)**
 (本 issue の正本)。要点:
 
 - **Alperin も Grün II(Z(P) 版) も Burnside 融合も使わない** — Gorenstein p.257 の注記と整合。

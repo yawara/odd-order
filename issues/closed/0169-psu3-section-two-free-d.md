@@ -248,7 +248,7 @@ sorry-free で出る。⟹ Ch. II (`theoremB`) + Ch. III case (a)(b)
 
 * 書籍 = `references/peterfalvi/pdftotext/05.6_pp_122_134_Characterization_of_PSU3_q.txt`
   (§2 Proposition = p.129、§4 冒頭 = p.132)
-* Ch. IV 到達状態 = [`notes/peterfalvi/partII_ch4_section4_state.md`](../notes/peterfalvi/partII_ch4_section4_state.md)
+* Ch. IV 到達状態 = [`notes/peterfalvi/partII_ch4_section4_state.md`](../../notes/peterfalvi/partII_ch4_section4_state.md)
 * 親 issue = [0168](0168-pf-part2-ch4-psu3.md)
 
 ## (4) の実装メモ (2026-08-02 に部品を実測)
@@ -284,7 +284,7 @@ by_cases hfree : hyp.FreeD
 
 ## ✅ (4) 完了 — issue クローズ (2026-08-02)
 
-新 leaf [`PSU3TheoremADichotomy.lean`](../OddOrder/Peterfalvi/Appendices/Suzuki/PSU3TheoremADichotomy.lean)
+新 leaf [`PSU3TheoremADichotomy.lean`](../../OddOrder/Peterfalvi/Appendices/Suzuki/PSU3TheoremADichotomy.lean)
 (409 行)。完了条件を満たし、さらにその先 (case (a)(b) との合流) まで通った。
 
 ### 到達点

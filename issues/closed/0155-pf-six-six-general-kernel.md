@@ -10,7 +10,7 @@ created: 2026-07-27
 ## 背景
 
 **Peterfalvi の残り特殊化債務のうち唯一の深い項目** (survey
-[`three_books_full_survey_2026_07_16.md`](../notes/meta/three_books_full_survey_2026_07_16.md)
+[`three_books_full_survey_2026_07_16.md`](../../notes/meta/three_books_full_survey_2026_07_16.md)
 の「(6.5)/(6.6) の general-`K` 化」節)。書籍 (6.6) (p.31-32):
 
 > Suppose that Hypothesis (6.4) holds with `M = 1`.  Let `Z` be a normal subgroup of `L` such
@@ -49,7 +49,7 @@ Sibley 側の入口 `Xset_isCoherent_from_adjoinSteps_withCover_of_irreducible_X
 **`S04.Hypothesis` (Dade datum) でパラメータ化**され、`τ = dadeIntegralCharacterMap hyp …` に
 固定されている。
 
-⟹ **やること = [issue 0154](closed/0154-pf-weighted-adjoin-abstract-tau.md) とまったく同じ形の一般化**。
+⟹ **やること = [issue 0154](0154-pf-weighted-adjoin-abstract-tau.md) とまったく同じ形の一般化**。
 0154 は加重 (5.6) engine (`xAdjoinStepW`) を `S07.xAdjoinStepW_k_general` へ
 「抽象 τ + (5.2.b) の 2 節 (`hisom` = `A₀`-supported 部分格子上の等長、`htauZ` = 値域 `ℤ[Irr G]`)」
 で一般化した。同じことを `XAdjoinStepInput` / `xChainCoherent` /
@@ -212,8 +212,8 @@ Sibley 側の入口 `Xset_isCoherent_from_adjoinSteps_withCover_of_irreducible_X
   `OddOrder/Peterfalvi/S08_SixFiveGeneral.lean`
 - Sibley 版: `S08_CoherenceBasic.lean` / `S08_CoherenceCorePart2/SibleyBounds.lean` /
   `S08_DegreeSums.lean`
-- 手本: [0154](closed/0154-pf-weighted-adjoin-abstract-tau.md) (加重 (5.6) の τ 一般化),
-  [0153](closed/0153-pf-56-reducible-break.md)
+- 手本: [0154](0154-pf-weighted-adjoin-abstract-tau.md) (加重 (5.6) の τ 一般化),
+  [0153](0153-pf-56-reducible-break.md)
 - 周辺に残る別の特殊化債務 (本 issue の対象外、survey に記録済):
   - repo の (5.7) `coherent_of_constant_degree` が member の**既約性**を要求する
     (書籍の (5.7)/(5.2) は要求しない) — orthonormal な `coherentEqualDegree` builder 由来。

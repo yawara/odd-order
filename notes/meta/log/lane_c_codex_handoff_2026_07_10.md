@@ -1,7 +1,7 @@
 # lane c → codex 5.6 (GPT-5.6) handoff — 2026-07-10
 
 > ユーザー裁定 (2026-07-10): 3 レーンのうち **lane c** の operator を Claude から **codex 5.6** に切替えて trial する。
-> 追跡 issue = [issues/0105](../../issues/0105-lane-c-codex-trial.md)。所有・issue base (3000)・hub 合流ゲートは**不変**
+> 追跡 issue = [issues/0105](../../../issues/closed/0105-lane-c-codex-trial.md)。所有・issue base (3000)・hub 合流ゲートは**不変**
 > (合流チェックはモデル非依存: build green / AxiomsCheck / sorry regression / 範囲逸脱)。
 
 ## なぜ c か (hub 所見の要約)

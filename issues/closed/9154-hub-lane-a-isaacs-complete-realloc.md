@@ -17,7 +17,7 @@ reporter: lane a
 ## 事実: Isaacs は全 349 結果が形式化済 (実 sorry 0)
 
 2026-07-19 に実測で確認した。レーン配分 note
-[`lane_reallocation_2026_07_16.md`](../notes/meta/lane_reallocation_2026_07_16.md) §2 が
+[`lane_reallocation_2026_07_16.md`](../../notes/meta/lane_reallocation_2026_07_16.md) §2 が
 レーン a に割り当てた frontier (Ch.2 → Ch.3 → Ch.4 → Ch.5 → Ch.6 → Ch.9 → 付録、
 および 2026-07-19 裁定で加わった Ch.8 / Ch.10) は**全て消化済**:
 
@@ -113,8 +113,8 @@ subnormal 監査と同じ方式: 番号ごとの悉皆 grep + 実 sorry 実測 +
 
 - 本 session の commit: `7f206f802` (9.26/9.27 subnormal 化) / `b9916f450` (Bartels 完成) /
   `ab487f1bb` (Lem 1.43 等号条件節)
-- [`lane_reallocation_2026_07_16.md`](../notes/meta/lane_reallocation_2026_07_16.md) §1-2
-- [`three_books_full_survey_2026_07_16.md`](../notes/meta/three_books_full_survey_2026_07_16.md)
+- [`lane_reallocation_2026_07_16.md`](../../notes/meta/lane_reallocation_2026_07_16.md) §1-2
+- [`three_books_full_survey_2026_07_16.md`](../../notes/meta/three_books_full_survey_2026_07_16.md)
   (Isaacs 節に警告バナー追加済)
 
 ## ✅ §2 実施結果 (hub, 2026-07-19) — BG/Peterfalvi も 42% が stale

@@ -7,7 +7,7 @@ created: 2026-07-27
 
 # 既約な部分族では (5.2.d)/(5.2.e) を (5.2.b) から導出する
 
-## 背景 — [issue 0155](closed/0155-pf-six-six-general-kernel.md) からの派生
+## 背景 — [issue 0155](0155-pf-six-six-general-kernel.md) からの派生
 
 0155 で Peterfalvi (6.6) の coherence 半分が一般 kernel `K`・任意の τ で完成した
 (`S08_SixSixGeneral.xSet_isCoherent_of_irreducible_X`)。ところが当初立てた完了条件

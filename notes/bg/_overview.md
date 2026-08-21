@@ -100,7 +100,7 @@ App.A は §6-§16 全体の前提として **§6 開始と同時に必要**. Ap
 
 ### 第 1 波 (Phase 1 Isaacs 完了直後、並列可)
 - **§1** (Elementary Properties): solvable / Hall / Prop 1.5-1.6 — Isaacs Ch.1+Ch.3 と mathlib `Solvable`/`SchurZassenhaus` を組み合わせ
-- **§4** (p-Groups Small Rank): rank ≤ 2 p-群構造定理. Isaacs Ch.4 §4D (Cor 3.28 → Thm 4.36) 完成必須 *(2026-05-23 audit 訂正: 「軽前提」ではなく hard gate; 詳細 [`notes/meta/log/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md))*
+- **§4** (p-Groups Small Rank): rank ≤ 2 p-群構造定理. Isaacs Ch.4 §4D (Cor 3.28 → Thm 4.36) 完成必須 *(2026-05-23 audit 訂正: 「軽前提」ではなく hard gate; 詳細 [`notes/meta/log/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/log/bg_phase2a_wave1_audit_2026_05_23.md))*
 - **§5** (Narrow p-Groups): §4 とほぼ独立 *(2026-05-23 audit 訂正: 実は §4 を 6 results cite, 完全独立ではない. Lem 5.1-Cor 5.4 のみ §4 partial 並行可, Thm 5.5-5.7 は §4 完成依存)*
 - **§2** (Representations): 表現論. §3 + App.A の前提 *(2026-05-23 audit 訂正: 「§9 1-2 cite」は誤り, 実測 §3×5 + §4 + §15 + App.A = 8+ cites; Lem 2.3 のみ defer, Thm 2.5/2.6 は FT 中核; **Isaacs Ch.6 §6F Clifford 完成依存**)*
 - ~~**App.B** (Puig L(S)): App.A 不要で独立着手可 (L(S) 定義自体は J(S) と並行)~~ **App.B は Phase 2a スキップ推奨** *(2026-05-23 audit 訂正: B.3+B.4 が Thm A.5 cite で App.A 不要は誤り; さらに App.B 自身が FT-orphan = §1-§16 + App.C + App.E + Peterfalvi 全て 0 cite, 唯一の本文使用は App.D parenthetical のみ. A.5 + App.B 共に skip で ~570 行 / ~10-13 日節約)*

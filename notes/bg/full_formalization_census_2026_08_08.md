@@ -1,6 +1,6 @@
 # BG 完全形式化 — 番号 census と逐条監査 (2026-08-08 開始)
 
-tracker = [issue 0177](../../issues/0177-bg-full-formalization.md)。
+tracker = [issue 0177](../../issues/closed/0177-bg-full-formalization.md)。
 前身 = [0172 Peterfalvi (284 件)](../../issues/closed/0172-peterfalvi-full-formalization.md)
 / [0176 Isaacs (305 件)](../../issues/closed/0176-isaacs-full-formalization.md)、いずれも完了。
 
@@ -880,7 +880,7 @@ theorem absolutely_irreducible_iff_hom_eq_F      ← 列 0 から始まる
 
 | BG | repo | 照合 |
 |---|---|---|
-| **Prop 14.2** ((a)-(g)) | `typeP_structure` + 個別条項 5 本 | 🔴 **(a) 後半と (g) の一部が未形式化** → [issue 0178](../../issues/0178-bg-prop142-regular-u-and-nilpotent-msigma.md) |
+| **Prop 14.2** ((a)-(g)) | `typeP_structure` + 個別条項 5 本 | 🔴 **(a) 後半と (g) の一部が未形式化** → [issue 0178](../../issues/closed/0178-bg-prop142-regular-u-and-nilpotent-msigma.md) |
 | **Thm 14.7** ((a)-(h)) | `typeP_duality` が (b)-(h) を `∃!` で束ね、(a) は `typeP_partner_centralizer_singleton` | ✅ 全条項あり (軽微な分離) |
 | **Lem 14.5** ((a)(b)(c)) | `xRsub_disjoint` / `Mtilde_disjoint` / `sigmaSaturation_Rsub_count` | ✅ |
 | **Cor 14.9** ((a)(b)) | `exists_mem_conjClassSet_Mtilde_or_zTilde_of_ne_one` ほか | ✅ |
@@ -901,7 +901,7 @@ Prop 14.2 は違う: **書籍の主張が repo のどこにも無い**。
    CLAUDE.md が警告する「hard content を未充足の仮説に hoist」そのもの。
    ⟹ **閉じれば下流の仮説を実証明に置換できる**。
 
-⟹ [issue 0178](../../issues/0178-bg-prop142-regular-u-and-nilpotent-msigma.md) を起票。
+⟹ [issue 0178](../../issues/closed/0178-bg-prop142-regular-u-and-nilpotent-msigma.md) を起票。
 
 ### ⚠ この gap は「deferred 注記」に書かれていたが、注記の 8 割は stale だった
 
@@ -989,7 +989,7 @@ repo 対応 (すべて実体あり): `AppA_PStability*` (`thmA1`/`thmA2`/`thmA3`
 | (7) | `M'' ⊆ F(M) = C_M(M_F)M_F`、`K ≠ 1` なら `F(M) ⊆ M'` | Cor 15.5(b)(d) | ✅ |
 | (8) | `M_F ≠ M_σ` なら `U = 1`、`F(M)` が TI、`|K|` 素数 | Thm 15.8 | ✅ |
 
-⟹ **[issue 0178](../../issues/0178-bg-prop142-regular-u-and-nilpotent-msigma.md) の gap は
+⟹ **[issue 0178](../../issues/closed/0178-bg-prop142-regular-u-and-nilpotent-msigma.md) の gap は
 周辺的な条項ではなく、BG の主定理 Theorem A の (3)(4) そのもの**。優先度を上げる根拠になる。
 
 ### ✅ Theorems A-E の完全な対応表 — **書籍自身が依存図で与えていた**

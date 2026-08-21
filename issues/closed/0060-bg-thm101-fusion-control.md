@@ -107,7 +107,7 @@ C_G(X)-非共役 (10.1) は代表元非依存。結論「M₁,M₂ が C_G(X)-�
 旧ノートの「Thm 10.1 が Thm 10.6 (p-length-1) を要し循環?」は **red herring** — 実際は Thm 4.18(e) を使う。
 
 **Target**: `OddOrder.BG.Ch3.S10.fusion_control_of_mem_sigma`
-([S10_MalphaMsigma.lean:256](OddOrder/BG/Ch3_MaximalSubgroups/S10_MalphaMsigma.lean)). mmd L2657-2711。
+([S10_MalphaMsigma.lean:256](../../OddOrder/BG/Ch3_MaximalSubgroups/S10_MalphaMsigma.lean)). mmd L2657-2711。
 
 ## Statement (5 parts, p ∈ σ(M), X 非自明 p-subgroup of G)
 

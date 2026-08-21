@@ -38,7 +38,7 @@ Cor 10.7 → Lem 10.8 / Cor 10.9 / Prop 10.10-10.14。
 
 ## 🔨 2026-06-05 (続) — Thm 10.2 着手 (issue 0061)
 
-`isHall_Msigma_Malpha` = §10 MAIN・gateway。issue `issues/0061-bg-thm102-hall-structure.md` に証明構造
+`isHall_Msigma_Malpha` = §10 MAIN・gateway。issue `issues/closed/0061-bg-thm102-hall-structure.md` に証明構造
 + 依存マップ (Focal/Thm4.20/Hall存在 全て ✅、商 F(M/M_α) の機械が (a)/(b) の最重・要調査)。
 **landed (axiom-clean, target build green)**: 商を要さない foundational lemma 3 本 —
 - `alpha_subset_sigma` (α(M)⊆σ(M), BG step 1): r_p(M)≥3 ⟹ Sylow P̄ で rank≥3 ⟹ Thm 9.6 で P̄∈𝒰 ⟹

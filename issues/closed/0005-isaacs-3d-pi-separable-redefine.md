@@ -9,7 +9,7 @@ created: 2026-05-24
 
 ## 背景
 
-[Ch03_SplitExtensions/Main.lean:1238](../OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean) の `IsPiSeparable` は
+[Ch03_SplitExtensions/Main.lean:1238](../../OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean) の `IsPiSeparable` は
 現状 暫定定義:
 
 ```lean
@@ -41,7 +41,7 @@ mathlib に直接対応無し (`IsSolvable` を `derivedSeries` で定義した�
       Thm 3.20 (π-separable ⇒ Hall π) を新定義下で書き直す
 - [ ] Thm 3.21 Hall-Higman 1.2.3 の証明本体を新定義に対応させる (現行証明は solvable
       しか使っていない可能性が高いので, induction を π-separable で回せば自然に通るはず)
-- [ ] [`notes/isaacs/ch03_split.md`](../notes/isaacs/ch03_split.md) §3D の対応表を更新
+- [ ] [`notes/isaacs/ch03_split.md`](../../notes/isaacs/ch03_split.md) §3D の対応表を更新
 
 ## 完了条件
 
@@ -51,9 +51,9 @@ mathlib に直接対応無し (`IsSolvable` を `derivedSeries` で定義した�
 
 ## 参照
 
-- [Ch03_SplitExtensions/Main.lean:1238](../OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean) (暫定 def)
-- [Ch03_SplitExtensions/Main.lean:1556](../OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean) (`isPiSeparable_of_solvable`)
-- [Ch03_SplitExtensions/Main.lean:1808](../OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean) (`hall_higman_1_2_3`)
-- [notes/isaacs/ch03_split.md](../notes/isaacs/ch03_split.md) §3D
+- [Ch03_SplitExtensions/Main.lean:1238](../../OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean) (暫定 def)
+- [Ch03_SplitExtensions/Main.lean:1556](../../OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean) (`isPiSeparable_of_solvable`)
+- [Ch03_SplitExtensions/Main.lean:1808](../../OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean) (`hall_higman_1_2_3`)
+- [notes/isaacs/ch03_split.md](../../notes/isaacs/ch03_split.md) §3D
 - Isaacs FGT pp.89-95 (§3D)
 - 関連 issue: 0004 (Thm 3.22 fake placeholder; 本 issue が前提)

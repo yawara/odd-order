@@ -672,7 +672,7 @@ free field・旧 `coh.tau1` も free + `tau1_extends_tau_on_S` は opaque `Prop`
 - **§6 は (4.8) の完全 template を持つ** (`certainType_diff_dade_eq` = `(μ_ij−μ_ik)^τ=δ(ω_ij^σ−ω_ik^σ)`, sorry-free)
   が **support が W∖W₂** ゆえ §10 (typePV) には**直 cite 不可** (W₁# の扱いが違う; (10.5) は −nζ で W₁# を消して typePV に落とす)。
   → §10 は parallel な re-derivation。但し部品 (4.3.c/3.2.c/3.8/NC) は §5/§6 と共有。
-- **issue = [1007](../../issues/1007-pf-10-5-dade-image-bridge.md)** (σ↔τ bridge + reconcile linchpin)。
+- **issue = [1007](../../issues/closed/1007-pf-10-5-dade-image-bridge.md)** (σ↔τ bridge + reconcile linchpin)。
 
 ## ★★★ 2026-06-21 更新³ — (10.5) support half 完成 (dade0-free, 自前 sorry 0)
 
@@ -958,7 +958,7 @@ TICyclicHypothesis は **W-level ω/σ** のみ (ω on W, ω^σ on G)。μ_ij (o
    **明示パラメータ `hVti`** で取る (§5 `mapOfInjective` / §6 `toTICyclicHypothesisOfV` と同設計;
    §3b の調査 (i)/(ii) で Dade data も normalizer_V も V_ti を供給しないと確定 → (iii) パラメータ化)。
    ⟹ ω-grid (`omegaGrid`/`omegaSigmaGrid`/`sigmaIntegral`) が §10 で利用可能に。
-   **残 obligation = `hVti` の discharge = [issue 1005](../../issues/1005-typep-ambient-v-ti.md)**
+   **残 obligation = `hVti` の discharge = [issue 1005](../../issues/closed/1005-typep-ambient-v-ti.md)**
    (4.6.b ambient-TI; 上流 BG σ-理論に gate されるか要判定)。
 5. ▶ **次**: `CharacterParameters` de-opaque (§2、S15 模範) — opaque Prop を実恒等式に。
 6. μ-level: M' の certain-type 構造 (§3d) ⟹ `mu`/`alpha` grid 供給。
@@ -1023,7 +1023,7 @@ apparatus が (10.2)/(10.3)/μ-grid をすべて供給**、新規 apparatus buil
   | `W_odd` | `typePData_W_card_odd` 系 | ✅ 易 |
 
   **`card_coprime` (W₁ が M の Hall complement = gcd(|M'|,|W₁|)=1) は param `hHall` 化**: complement だけ
-  では従わない (確認済: C₂×C₂ 反例)、κ-Hall 経由でのみ導出可ゆえ obligation = [issue 1006](../../issues/1006-typep-w1-hall.md)。
+  では従わない (確認済: C₂×C₂ 反例)、κ-Hall 経由でのみ導出可ゆえ obligation = [issue 1006](../../issues/closed/1006-typep-w1-hall.md)。
   他 10 field は subtype (subgroupOf) transport の機械作業で discharge (centralizer は `S03h.centralizer_subgroupOf`)。
 
 **✅✅ bridge DONE (2026-06-20)**: `typePData_toS06Hypothesis` (構造部, 11 field) +
@@ -1032,7 +1032,7 @@ apparatus が (10.2)/(10.3)/μ-grid をすべて供給**、新規 apparatus buil
 
 ### ▶ 次の着手順 (real 進捗順)
 
-1. ✅ **§10→§6 bridge DONE**。残 = `hHall` discharge ([issue 1006](../../issues/1006-typep-w1-hall.md), κ-Hall 経由)。
+1. ✅ **§10→§6 bridge DONE**。残 = `hHall` discharge ([issue 1006](../../issues/closed/1006-typep-w1-hall.md), κ-Hall 経由)。
 2. **▶ (10.2) を §6 Clifford 機構で形式化** (RECON 済 2026-06-20、正確な execution path):
    - **核心定理 = `induce_isIrreducible_of_forall_chiRestrict_ne`** (`S06_CertainTypeClifford:902`):
      `h : Hypothesis L` (or CertainTypeHypothesis), `χ : IrreducibleCharacter ↥h.K`,

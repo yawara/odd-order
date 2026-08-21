@@ -22,7 +22,7 @@ created: 2026-08-07
   - `h2 : ∀ caseA, 2 ≤ #{degree-qa irreducibles in 𝒮(H₀C′)}` (degree-`qa` base coherence)
   - `hrefuteEq : ∀ caseA, CaseAEqualityRefutation caseA …` (maximality refuter)
 
-  実体としては、[closed issue 1045](closed/1045-pf-9-11-section9-level.md) の消化記録が
+  実体としては、[closed issue 1045](1045-pf-9-11-section9-level.md) の消化記録が
   「**開いた carrier はちょうど 1 本 = `CaseASevenEightRefutation`** と §9 dictionary
   パラメータに還元された」と結論している。
 
@@ -120,8 +120,8 @@ Dade 等長そのもの — open mathematics ではない。
 
 ## 参照
 
-- 監査記録: [`notes/peterfalvi/full_formalization_census_2026_08_07.md`](../notes/peterfalvi/full_formalization_census_2026_08_07.md) §3.5 の §9 節
-- 前段の調査: [closed issue 1045](closed/1045-pf-9-11-section9-level.md)
+- 監査記録: [`notes/peterfalvi/full_formalization_census_2026_08_07.md`](../../notes/peterfalvi/full_formalization_census_2026_08_07.md) §3.5 の §9 節
+- 前段の調査: [closed issue 1045](1045-pf-9-11-section9-level.md)
 - landing commit: `9b3b2bc95` (2026-07-20)
 - 書籍: `references/peterfalvi/pages/peterfalvi-p054..p057.png` ((9.11) と (9.11.1)-(9.11.8))
 - Coq 併読: `coq/theories/PFsection9.v`

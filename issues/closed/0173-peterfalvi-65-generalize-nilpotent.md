@@ -115,6 +115,6 @@ weaken は呼び出し側から見て透過的 (下流は無変更で通る)。
 
 ## 参照
 
-- census note: [`notes/peterfalvi/full_formalization_census_2026_08_07.md`](../notes/peterfalvi/full_formalization_census_2026_08_07.md) §6 表
+- census note: [`notes/peterfalvi/full_formalization_census_2026_08_07.md`](../../notes/peterfalvi/full_formalization_census_2026_08_07.md) §6 表
 - 書籍ページ: `references/peterfalvi/pages/peterfalvi-p031.png`
 - 自認箇所: `OddOrder/AxiomsCheck.lean:4141`

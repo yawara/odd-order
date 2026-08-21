@@ -367,9 +367,9 @@ def CentralJHelper (M : Subgroup G) : Subgroup G :=
 ## 参照 & リンク
 
 - **概要**: `notes/bg/_overview.md` (§9 = Phase 2a 中盤, Thm 6.2 で多引用).
-- **§8 ノート**: `notes/bg/s08_fitting.md` (§8 完了後に §9 着手).
+- **§8 ノート**: `notes/bg/s08_fitting_max.md` (§8 完了後に §9 着手).
 - **§7 ノート**: `notes/bg/s07_transitivity.md` (Hypothesis 7.1, Thm 7.4-7.6 の参考).
-- **§10 ノート**: `notes/bg/s10_m_alpha_sigma.md` (§9 後流, Thm 9.6 を引用).
+- **§10 ノート**: `notes/bg/s10_malpha_msigma.md` (§9 後流, Thm 9.6 を引用).
 - **Phase 2 cross-refs**: `notes/meta/phase2_cross_refs.md`.
 - **Peterfalvi overview**: `notes/peterfalvi/_overview.md` (§10 via App.C).
 

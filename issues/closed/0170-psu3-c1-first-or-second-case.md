@@ -9,7 +9,7 @@ created: 2026-08-02
 
 ## 背景
 
-[issue 0169](closed/0169-psu3-section-two-free-d.md) で
+[issue 0169](0169-psu3-section-two-free-d.md) で
 
 ```
 SecondCaseHypothesis.nonempty_theoremAConclusion
@@ -88,7 +88,7 @@ Hypothesis.nonempty_theoremAConclusion_of_V_ne_bot
 
 ## ✅ 完了 (2026-08-02) — ただし Ch. II 由来の `sorry` を継承する
 
-新 leaf [`TheoremANonTrivialV.lean`](../OddOrder/Peterfalvi/Appendices/Suzuki/TheoremANonTrivialV.lean)。
+新 leaf [`TheoremANonTrivialV.lean`](../../OddOrder/Peterfalvi/Appendices/Suzuki/TheoremANonTrivialV.lean)。
 
 ```
 Hypothesis.nonempty_theoremAConclusion_of_V_ne_bot

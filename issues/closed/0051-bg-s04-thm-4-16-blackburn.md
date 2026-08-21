@@ -15,7 +15,7 @@ BG §4 の頂点定理 = **Theorem 4.16 (Blackburn)**。p 奇, R 非自明 p-群
 
 §4 v1 (2026-05-30, `bg-s04-v1-impl` workflow) で **PRank 性質補強 / SCN₃ / Prop 4.4(a) / Lem 4.7⇒ / Lem 4.2 / Lem 4.5(a) 部分 / GL(2,p) 分岐エンジン** が sorry-free 完成。本 issue はその上に Thm 4.16 を載せる。
 
-**詳細な cold-start 着手手順 = [`notes/bg/s04_thm416_handoff.md`](../notes/bg/s04_thm416_handoff.md)** (self-contained)。全体計画 = `notes/bg/s04_implementation_plan_2026_05_30.md`。
+**詳細な cold-start 着手手順 = [`notes/bg/s04_thm416_handoff.md`](../../notes/bg/s04_thm416_handoff.md)** (self-contained)。全体計画 = `notes/bg/s04_implementation_plan_2026_05_30.md`。
 
 ## やること
 
@@ -98,7 +98,7 @@ handoff §6 の sub-issue ロードマップに従う (各々別 issue 化推奨
 
 → **Thm 4.16 Case A の gate (Prop4.11 + Thm4.12) が両方開いた**。Thm4.16 残ゲート = **Lem 4.13/4.14** (q∣\|Aut R\|⇒q∣p²-1, q<p; ⚠ "Lem4.7 and **G** Thm5.4.15" の Gorenstein行間)。
 
-**Thm 4.16 最終ゲート = Gorenstein Thm 4.15 chain (2026-05-31, #9 BLOCKED_DESIGN が map)** — Lem4.13=G Thm4.15(ii) が **precursor(1) `pRank_le_two_of_scn3_empty` (=G Thm4.15(i)=SCN₃=∅⇒pRank≤2, §5共有) + precursor(2) (minimal ψ-inv⇒special exp p=G Thm3.7/3.10)** を消費。底辺補題 (G 3.9(i)/3.12/1.3.4/GL橋) は present。**完全 precursor tree + 実装順 + 7 anti-scaffold trap = [`../notes/bg/s04_lem413_gorenstein_precursors.md`](../notes/bg/s04_lem413_gorenstein_precursors.md)**。自走キュー #8.5→8.6→8.7→9。
+**Thm 4.16 最終ゲート = Gorenstein Thm 4.15 chain (2026-05-31, #9 BLOCKED_DESIGN が map)** — Lem4.13=G Thm4.15(ii) が **precursor(1) `pRank_le_two_of_scn3_empty` (=G Thm4.15(i)=SCN₃=∅⇒pRank≤2, §5共有) + precursor(2) (minimal ψ-inv⇒special exp p=G Thm3.7/3.10)** を消費。底辺補題 (G 3.9(i)/3.12/1.3.4/GL橋) は present。**完全 precursor tree + 実装順 + 7 anti-scaffold trap = [`../notes/bg/s04_lem413_gorenstein_precursors.md`](../../notes/bg/s04_lem413_gorenstein_precursors.md)**。自走キュー #8.5→8.6→8.7→9。
 
 **Gorenstein chain 進捗 (2026-05-31)**: `S04d_GorThm415.lean` に Gorenstein Lemma 4.12/4.13 (inline, commits e0378e9/34f04fb) + **Lemma 4.14** `omega1_centralizer_omega1_eq_omega1_of_maximal_rank`@S04d:857 (commit 17d0c0e) が着地し **S04d 全体 sorry-free**。自走キュー **#8.5 / #8.6 = PASS**。⇒ 残ゲートは **#8.7 precursor(1) `pRank_le_two_of_scn3_empty` (=G Thm4.15(i)=SCN₃=∅⇒pRank≤2; `S04_PGroupsSmallRank.lean:1036` にゲート明記、§5 も開く) → precursor(2) → BG Lem 4.13 (#9) → Thm 4.16 apex (#11, 未 statement)**。Thm 4.16 本体はまだ宣言されていない (docstring 言及のみ)。
 

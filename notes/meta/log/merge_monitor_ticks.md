@@ -786,7 +786,7 @@
 > 満たすレーンを `--no-ff` で自動マージ。満たさなければ `git merge --abort` で報告。合流成立時は最後に
 > `git push origin main`（変化なし/全 abort なら push しない）。
 >
-> **レーン配分の正本 = [`lane_reallocation_2026_07_16.md`](lane_reallocation_2026_07_16.md)**
+> **レーン配分の正本 = [`lane_reallocation_2026_07_16.md`](../lane_reallocation_2026_07_16.md)**
 > (旧 `ft_lane_reallocation_2026_06_28.md` は FT endgame 期の履歴)。
 > 現行 = **3 レーン a/b/c** (2026-07-17 再作成、2026-07-19 11:29 に issue 9154 の恒久配分へ復帰。
 > 暫定裁定 9158 は失効)。本ファイルは hub 側の合流手順 + gotcha 集。
@@ -2386,7 +2386,7 @@
 - **2026-07-07 (夜) — FT endgame 計画制定 (ユーザー依頼の総ざらい)**: 6-agent workflow (wf_4d2d6126) で
   sorry census (87 = on-path 64 / 凍結 23) / opacity (free carrier 残 = TFieldModelData のみ、axiom 0) /
   frontier 幅 (現在 8–9 → 終盤 S16 直列 spine に収束) / velocity / issues を総点検し、
-  **[`ft_endgame_plan_2026_07_07.md`](log/ft_endgame_plan_2026_07_07.md)** を制定。骨子: **3 レーン維持・拡張なし
+  **[`ft_endgame_plan_2026_07_07.md`](ft_endgame_plan_2026_07_07.md)** を制定。骨子: **3 レーン維持・拡張なし
   (E1 条件付き)** / R1 = W2 (9000 instance tail) 直列化解消 (trigger = a の (9.11) 組立 landing or c の 0098
   消化の早い方、基本線 a pivot + W9 を c へ) / R2 = b は 3002 unsound fix を 9013 gate より先に /
   縮小トリガー C2 (幅≤2 で 3→2)・C3 (Wave 3 で実質 1)。issue close: 0099・9017。9071 は d 退役で moot

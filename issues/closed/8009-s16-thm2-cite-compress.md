@@ -9,7 +9,7 @@ created: 2026-06-15
 
 ## 背景
 
-`theoremII_tame_embedding` ([S16_MainResults.lean:458](../OddOrder/BG/Ch4_FamilyOfMaximal/S16_MainResults.lean)) は
+`theoremII_tame_embedding` ([S16_MainResults.lean:458](../../OddOrder/BG/Ch4_FamilyOfMaximal/S16_MainResults.lean)) は
 本体大半が cite 済 (Thm D(4) + Prop 16.1) で、**残 sorry 3 本**:
 
 - **L483 `hDsub : D ⊆ sigmaSharp M`** — `D = {x∈X | x≠1, C_G(x)⊄M}` が `M_σ#` に入る。
@@ -48,7 +48,7 @@ cite するには `K,U` を Hall 因子に pin する必要**がある。
 
 ## やること (当初プラン)
 
-- [ ] **(1) TI ヘルパー (汎用 infra, axiom-clean)**: [TISubset.lean](../OddOrder/GroupTheory/TISubset.lean) の
+- [ ] **(1) TI ヘルパー (汎用 infra, axiom-clean)**: [TISubset.lean](../../OddOrder/GroupTheory/TISubset.lean) の
   `namespace IsTISubset` に追加:
   ```
   theorem centralizer_le (hA : IsTISubset A L) {x : G} (hx : x ∈ A) :
@@ -87,8 +87,8 @@ full build green + AxiomsCheck 非破壊。
 
 - consumer マップ: Thm II は**現状 Pf 未 cite** (issue 8005 §12.1) ⟹ signature 変更は安全。
 - 関連: issue 8005 (faithful 復元, defer)、`notes/bg/s15_16_audit.md` §12.2-12.3。
-- Thm B(5) = [S16_MainResults.lean:179](../OddOrder/BG/Ch4_FamilyOfMaximal/S16_MainResults.lean) conjunct 5、
-  Thm C(9) = [:201](../OddOrder/BG/Ch4_FamilyOfMaximal/S16_MainResults.lean) (`IsTISubset (A0Set M K \ ASet M U) M`)。
+- Thm B(5) = [S16_MainResults.lean:179](../../OddOrder/BG/Ch4_FamilyOfMaximal/S16_MainResults.lean) conjunct 5、
+  Thm C(9) = [:201](../../OddOrder/BG/Ch4_FamilyOfMaximal/S16_MainResults.lean) (`IsTISubset (A0Set M K \ ASet M U) M`)。
 - mmd Thm II proof = L4546-L4552。
 
 ## 🧾 pending 移行 (2026-07-02 hub 全体レビュー)

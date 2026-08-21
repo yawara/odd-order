@@ -9,19 +9,19 @@ created: 2026-08-13
 
 ## 背景
 
-[README.md](../README.md) / [README.ja.md](../README.ja.md) に、その後の 2 つの大きな
+[README.md](../../README.md) / [README.ja.md](../../README.ja.md) に、その後の 2 つの大きな
 マイルストーンが未反映のまま残っている:
 
 1. **BG App.C Problem 1 (Péterfalvi 1993) の否定的全面解決 + 完全機械検証**
-   (2026-08-13、[issue 0180](closed/0180-bg-appc-problem1-p-eq-three.md) /
-   [0181](closed/0181-skew-calculus-lean-formalization.md) closed)。33 年 open だった
+   (2026-08-13、[issue 0180](0180-bg-appc-problem1-p-eq-three.md) /
+   [0181](0181-skew-calculus-lean-formalization.md) closed)。33 年 open だった
    問題への `Problem1.hypothesisB_false` (全 `q`・`G` 無限可・追加仮定ゼロ・axiom-clean)。
    README は「教科書の形式化」としての記述のみで、**プロジェクト発の新規数学的成果**
    (形式化を超えた original result) に一切触れていない。
 2. **3 冊逐条監査の完了** (2026-08-08、全 775 件: Peterfalvi 284 =
-   [0172](closed/0172-peterfalvi-full-formalization.md) / Isaacs 305 =
-   [0176](closed/0176-isaacs-full-formalization.md) / BG 186 =
-   [0177](closed/0177-bg-full-formalization.md)、番号付き結果の真の未形式化 = 0 件)。
+   [0172](0172-peterfalvi-full-formalization.md) / Isaacs 305 =
+   [0176](0176-isaacs-full-formalization.md) / BG 186 =
+   [0177](0177-bg-full-formalization.md)、番号付き結果の真の未形式化 = 0 件)。
    README の Coverage 段落は 2026-07-16 survey (815 件・213 remaining) のスナップショット
    + 「later spot checks found labels unreliable」で止まっており、完了した監査の存在を
    伝えていない。
@@ -33,8 +33,8 @@ created: 2026-08-13
 
 - [ ] **Status 節に Problem 1 の解決を追加**: 何が問題だったか (1 段落)、
       `hypothesisB_false` の statement、正本 =
-      [`notes/bg/appC_problem1_resolution.md`](../notes/bg/appC_problem1_resolution.md)、
-      俯瞰 = [`notes/bg/appC_problem1_summary.md`](../notes/bg/appC_problem1_summary.md)。
+      [`notes/bg/appC_problem1_resolution.md`](../../notes/bg/appC_problem1_resolution.md)、
+      俯瞰 = [`notes/bg/appC_problem1_summary.md`](../../notes/bg/appC_problem1_summary.md)。
       「Beyond the Feit–Thompson theorem」の並びに独立の小節を立てるか Status に追記するかは
       書き手判断 (README の現行トーン = 抑制的・検証可能な事実のみ、に合わせる)。
 - [ ] **Coverage 段落を逐条監査完了に置換**: 監査 3 本 (0172/0176/0177、計 775 件、
@@ -80,12 +80,12 @@ docs-only なのでビルド gate は不要だが、リンク切れが無いこ�
 
 ## 参照
 
-- [issue 0180](closed/0180-bg-appc-problem1-p-eq-three.md) (Problem 1 経緯 + 最終総括) /
-  [0181](closed/0181-skew-calculus-lean-formalization.md) (Lean 化)
-- [`notes/bg/appC_problem1_resolution.md`](../notes/bg/appC_problem1_resolution.md) (統合証明文書) /
-  [`appC_problem1_summary.md`](../notes/bg/appC_problem1_summary.md) (俯瞰まとめ)
-- 逐条監査: [0172](closed/0172-peterfalvi-full-formalization.md) /
-  [0176](closed/0176-isaacs-full-formalization.md) /
-  [0177](closed/0177-bg-full-formalization.md)
+- [issue 0180](0180-bg-appc-problem1-p-eq-three.md) (Problem 1 経緯 + 最終総括) /
+  [0181](0181-skew-calculus-lean-formalization.md) (Lean 化)
+- [`notes/bg/appC_problem1_resolution.md`](../../notes/bg/appC_problem1_resolution.md) (統合証明文書) /
+  [`appC_problem1_summary.md`](../../notes/bg/appC_problem1_summary.md) (俯瞰まとめ)
+- 逐条監査: [0172](0172-peterfalvi-full-formalization.md) /
+  [0176](0176-isaacs-full-formalization.md) /
+  [0177](0177-bg-full-formalization.md)
 - 現行 README の該当箇所: Status 節 (l.12–31) / Coverage 段落 (l.72–79) /
   Repository layout の数値 (l.100) / Building の jobs 数 (l.94)

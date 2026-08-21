@@ -7,7 +7,7 @@ ROADMAP 上の位置: **Phase 2a 第 1 波** (§4 p-groups of small rank と並�
 
 ## Audit log (2026-05-23 audit 訂正)
 
-統合 doc: [`notes/meta/log/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).
+統合 doc: [`notes/meta/log/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/log/bg_phase2a_wave1_audit_2026_05_23.md).
 
 - **"r(R) ≤ 2 or ∃ S ⊆ R..." narrow def** (L13) → 正は **§1 L354 verbatim "no elementary abelian subgroup of order p³, or ∃ R₀, R₁ cyclic, C_R(R₀) = R₀ × R₁"**. "r(R) ≤ 2" は informal restatement. r(R) ≤ 2 ↔ no elem ab of order p³ は Lem 4.7 (非自明).
 - **"§4 とほぼ独立, 並行可" → 誤り**. §5 は §4 を **6 distinct results** で cite (4.5, 4.7, 4.14, 4.16, 4.17, 4.18, Prop 4.4). 実装順序 **§4 → §5 strict**. ただし Lem 5.1-Cor 5.4 は §4 Prop 4.4 + Lem 4.5 + Lem 4.7 で着手可 (partial parallel).

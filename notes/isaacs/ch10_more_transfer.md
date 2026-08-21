@@ -65,7 +65,7 @@
 形式化先: `OddOrder/Isaacs/Ch10_MoreTransfer/` (Lemma 10.3 から実装開始済).
 原典抽出: `references/isaacs/finite-group-theory.mmd` lines 5310-5914.
 ROADMAP 上の位置: **第 5 波 (Ch.6 完了後、Ch.7 と並列)** — Isaacs 本編の最終章. 前提は Ch.4 (Commutators: Thm 4.6, 4.7, 4.8), Ch.5 (Transfer: Thm 5.5, 5.6, Lemma 5.12, Cor 5.22), Ch.6 (Thm 6.11) を軽く参照する程度.
-4 視点 framework 適用 (2026-05-23 audit 統合): 詳細クロス参照 [`../meta/ch08_10_audit_2026_05_23.md`](../meta/ch08_10_audit_2026_05_23.md).
+4 視点 framework 適用 (2026-05-23 audit 統合): 詳細クロス参照 [`../meta/ch08_10_audit_2026_05_23.md`](../meta/log/ch08_10_audit_2026_05_23.md).
 
 ## TL;DR — Isaacs 内では葉、BG/Peterfalvi 直接被引用ゼロ、Phase 1 スキップ推奨
 
@@ -455,7 +455,7 @@ ROADMAP は Ch.6 → (Ch.7 と Ch.10 並列) を提案するが, 実状は:
 ## 関連ノート (2026-05-23 audit 統合)
 
 - [`../meta/chapter_investigation_framework.md`](../meta/chapter_investigation_framework.md) — 4 視点 framework テンプレート
-- [`../meta/ch08_10_audit_2026_05_23.md`](../meta/ch08_10_audit_2026_05_23.md) — 本ノートに統合した audit synthesis doc (Ch.8/9/10 横断)
+- [`../meta/ch08_10_audit_2026_05_23.md`](../meta/log/ch08_10_audit_2026_05_23.md) — 本ノートに統合した audit synthesis doc (Ch.8/9/10 横断)
 - [`ch04_commutators.md`](ch04_commutators.md) — Lem 4.6 (10.3 で使用) / Thm 4.7-4.8 (10.3, 10.15 で使用, **skeleton**) dep
 - [`ch05_transfer.md`](ch05_transfer.md) — Lem 5.5 (10.9) / Thm 5.6 (10.28) / Lem 5.12 + Cor 5.22 (§10A intro) dep
 - [`ch06_frobenius_actions.md`](ch06_frobenius_actions.md) — Thm 6.11 (10.15 で使用, §10B **gating dep**)

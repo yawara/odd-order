@@ -14,7 +14,7 @@ Isaacs Thm 3.17 (Wielandt 1971): `H, K, L ≤ G` の 3 部分群が pairwise cop
 ⇒ G solvable.
 
 owner chapter 規則で Ch.7 (Burnside) ディレクトリの placeholder ファイル
-[`OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean`](../OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean)
+[`OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean`](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean)
 に statement と証明戦略を記載済 (中身は空 namespace のみ).
 
 証明戦略 (Isaacs p.85): `|G|`-induction. 最小反例 G, minimal normal M.
@@ -36,9 +36,9 @@ G simple 場合 (M = G) に Burnside `pᵃqᵇ` 必須.
 
 ## 参照
 
-- [OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean](../OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean) (placeholder)
-- [notes/isaacs/ch03_split.md](../notes/isaacs/ch03_split.md) §3C
-- [notes/meta/forward_dep_policy.md](../notes/meta/forward_dep_policy.md)
+- [OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean) (placeholder)
+- [notes/isaacs/ch03_split.md](../../notes/isaacs/ch03_split.md) §3C
+- [notes/meta/forward_dep_policy.md](../../notes/meta/forward_dep_policy.md)
 - Isaacs FGT p.85 (Thm 3.17)
 - 関連 issue: 0002 (Thm 3.15, 同じく Burnside 依存)
 

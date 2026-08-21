@@ -153,7 +153,7 @@ repo の carrier は 2 元に固定しており、**全 member の既約性を�
 `CharacterDifferenceImage` → `OrthonormalCharacterImageFamily` に**広げる**。
 
 - 既存の witness (Dade 側・§12 μ-grid 側) は 2 元形しか作れない場所があるので、
-  [issue 0156 step 1](pending/0156-five-two-d-from-irreducibility.md) の
+  [issue 0156 step 1](0156-five-two-d-from-irreducibility.md) の
   `CharacterDifferenceImage.toOrthonormalFamily` で持ち上げる (既に landing 済)。
 - `difference_images_orthogonal` も同様に
   `toOrthonormalFamily_orthogonal` 経由で移送できる (これも landing 済)。

@@ -50,8 +50,8 @@ created: 2026-05-24
 
 ## 参照
 
-- [OddOrder/Isaacs/Ch01_Sylow/Main.lean](../OddOrder/Isaacs/Ch01_Sylow/Main.lean)
-- [OddOrder/Isaacs/Ch02_Subnormality/Main.lean](../OddOrder/Isaacs/Ch02_Subnormality/Main.lean)
-- [OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean](../OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean)
-- [OddOrder/Mathlib/Subgroup.lean](../OddOrder/Mathlib/Subgroup.lean)
-- [OddOrder/Mathlib/SchurZassenhausConj.lean](../OddOrder/Mathlib/SchurZassenhausConj.lean)
+- [OddOrder/Isaacs/Ch01_Sylow/Main.lean](../../OddOrder/Isaacs/Ch01_Sylow/Main.lean)
+- [OddOrder/Isaacs/Ch02_Subnormality/Main.lean](../../OddOrder/Isaacs/Ch02_Subnormality/Main.lean)
+- [OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean](../../OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean)
+- [OddOrder/Mathlib/Subgroup.lean](../../OddOrder/Mathlib/Subgroup.lean)
+- [OddOrder/Mathlib/SchurZassenhausConj.lean](../../OddOrder/Mathlib/SchurZassenhausConj.lean)

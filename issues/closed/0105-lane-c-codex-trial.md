@@ -12,7 +12,7 @@ created: 2026-07-10
 - GPT-5.6 (Sol/Terra/Luna) が 2026-07-09 リリースされ Codex にも展開。ユーザー裁定 (2026-07-10):
   3 レーンのうち 1 つを codex 5.6 に任せる trial → hub 所見で **lane c** を選定。
 - 選定理由・kickoff prompt・ユーザー操作手順の正本 =
-  [notes/meta/log/lane_c_codex_handoff_2026_07_10.md](../notes/meta/log/lane_c_codex_handoff_2026_07_10.md)。
+  [notes/meta/log/lane_c_codex_handoff_2026_07_10.md](../../notes/meta/log/lane_c_codex_handoff_2026_07_10.md)。
   要旨: c の現 frontier (landing 済み S-side Dade `8ff313b1` / §14.6 `97a528e0` の T-side dual mirror =
   issue 4004/9013、u-value gate = 9077) が template-mirror 型で、旧 lane d (codex、2026-07-07 退役) の
   実証済みの強みに合致。a (唯一の bare feitThompson sorry) と b (carve-out 最複雑) は不適。

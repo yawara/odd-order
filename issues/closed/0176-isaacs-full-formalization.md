@@ -9,7 +9,7 @@ created: 2026-08-08
 
 ## 位置づけ
 
-[issue 0172](closed/0172-peterfalvi-full-formalization.md) (Peterfalvi 全 284 件) が
+[issue 0172](0172-peterfalvi-full-formalization.md) (Peterfalvi 全 284 件) が
 2026-08-08 に完了したので、**同じ逐条監査を Isaacs に適用する**。3 冊スコープの文書順
 (Isaacs → BG → Peterfalvi) に従い、次は最上流の Isaacs。
 
@@ -77,7 +77,7 @@ repo の `Ch08_PermutationGroups` も既に `IsPreprimitive` を使っている�
 ## 作業手順
 
 - [x] **ステップ 1 ✅ 完了 (2026-08-08)**: cite ゼロ 13 件を分類した。対応表の正本 =
-      [`notes/isaacs/ch08_permutation.md`](../notes/isaacs/ch08_permutation.md)。
+      [`notes/isaacs/ch08_permutation.md`](../../notes/isaacs/ch08_permutation.md)。
 
       | 分類 | 件数 | 内訳 |
       |---|---|---|
@@ -99,7 +99,7 @@ repo の `Ch08_PermutationGroups` も既に `IsPreprimitive` を使っている�
       ⚠ `Z(Sym Ω) = 1` も mathlib に無かった (mathlib の
       `Equiv.Perm.alternatingGroup.center_eq_bot` は**交代群**の中心)。両方 axiom-clean。
 - [x] **census note を新設 (2026-08-08)**:
-      [`notes/isaacs/full_formalization_census_2026_08_08.md`](../notes/isaacs/full_formalization_census_2026_08_08.md)
+      [`notes/isaacs/full_formalization_census_2026_08_08.md`](../../notes/isaacs/full_formalization_census_2026_08_08.md)
 - [ ] **ステップ 2 (進行中)**: Ch.1 から文書順に逐条監査。
       - **Ch.1 の第 1 パス完了 (2026-08-08)**: 46/46 に cite あり。docstring の**アンカー位置**
         (`**Isaacs Thm 1.N**`) に cite が無い 9 件 (1.1, 1.5, 1.6, 1.7, 1.10, 1.11, 1.17,
@@ -163,7 +163,7 @@ repo の `Ch08_PermutationGroups` も既に `IsPreprimitive` を使っている�
 | **合計** | **305** | **5** | **7** |
 
 補充した 5 件はすべて axiom-clean で AxiomsCheck 登録済。
-節別の詳細は [census note](../notes/isaacs/full_formalization_census_2026_08_08.md) §3 が正本。
+節別の詳細は [census note](../../notes/isaacs/full_formalization_census_2026_08_08.md) §3 が正本。
 
 ### ⚠ Isaacs 監査で最も多かった問題 — 自己注記の腐り
 
@@ -191,7 +191,7 @@ repo に実体が無くても被覆済。Ch.8 の cite ゼロ 13 件のうち **
 
 ## 参照
 
-- 前身: [issue 0172](closed/0172-peterfalvi-full-formalization.md) (Peterfalvi、完了)
+- 前身: [issue 0172](0172-peterfalvi-full-formalization.md) (Peterfalvi、完了)
 - 書籍: `references/isaacs/finite-group-theory.pdf` (⚠ **PDF ページ = 書籍ページ + 13**)、
   ページ画像は `references/isaacs/pages/`
 - ⚠ 誤判定様式は 0172 で 9 件検出済 — 番号表記の揺れ / assembly を endpoint と誤認 /

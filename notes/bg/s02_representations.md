@@ -10,7 +10,7 @@
 
 ## Audit log (2026-05-23 audit 訂正)
 
-統合 doc: [`notes/meta/log/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).
+統合 doc: [`notes/meta/log/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/log/bg_phase2a_wave1_audit_2026_05_23.md).
 
 - **"§9 周辺で 1-2 箇所のみ被引用" → 完全に誤り**. 実測 §9 = **0 cites**. 実際: §3 ×5 (Prop 2.1, Prop 2.2 ×2, Thm 2.5, Thm 2.6 ×2 + 別 cite), §4 Lem 4.17, §15 Thm 15.7, **App.A Thm A.1 proof (L4464) で Thm 2.6 cite**. 合計 **8+ cites**, §2 は FT 中核.
 - **"optional 節, 形式化は必要時のみ" / "skip 推奨" → 完全に逆**. §3 + App.A の **前提** ⇒ Phase 2a 第 1 波必須.
@@ -596,7 +596,7 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 
 ### 明示的引用 (2026-05-23 audit)
 
-統合 doc: [`notes/meta/log/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).
+統合 doc: [`notes/meta/log/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/log/bg_phase2a_wave1_audit_2026_05_23.md).
 
 実測:
 - §3: Prop 2.1, Prop 2.2, Thm 2.5, Thm 2.6 の引用が集中.
@@ -648,7 +648,7 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
 - `references/bg/local-analysis.mmd` lines 586–794 (§2 완문)
 - `references/bg/bg.pdf` pp. 9–16 (visual confirm)
 - `notes/bg/_overview.md` (BG overview)
-- `notes/isaacs/ch03_hall.md`, `notes/isaacs/ch07_thompson.md` (참조)
+- `notes/isaacs/ch03_split.md`, `notes/isaacs/ch07_thompson.md` (참조)
 
 **次ステップ**:
 - q=p 分岐で非自明 normal p-subgroup `K` を作る段を小補題化する.
@@ -921,4 +921,4 @@ theorem thm2_6 {G : Type*} [Group G] [Fintype G] [Odd G.card]
   endomorphism から `(i,t)` 成分を切り出す
   `cyclicHomBlockFinProjection` も入った.  次は projection の総和による
   reconstruction と全 block の direct-sum decomposition.
-- 2026-05-26 (本セッション): BG §2 representation theory shared module の skeleton 3 件を追加 ([`AbsolutelyIrreducible.lean`](../../OddOrder/GroupTheory/RepresentationTheory/AbsolutelyIrreducible.lean), [`ExtraspecialFaithful.lean`](../../OddOrder/GroupTheory/RepresentationTheory/ExtraspecialFaithful.lean), [`OddTwoDimRepr.lean`](../../OddOrder/GroupTheory/RepresentationTheory/OddTwoDimRepr.lean)). いずれも namespace + docstring (BG ↔ mathlib mapping + 該当 tracking issue ポインタ #33 / #34 / #35) のみで sorry / 内容なし. Item 6a ("files exist") を満たすため. 内容は issues 経由で follow-up.
+- 2026-05-26 (本セッション): BG §2 representation theory shared module の skeleton 3 件を追加 ([`AbsolutelyIrreducible.lean`](../../OddOrder/GroupTheory/RepresentationTheory/AbsolutelyIrreducible.lean), [`ExtraspecialFaithful.lean`](../../OddOrder/GroupTheory/RepresentationTheory/ExtraspecialFaithful.lean), `OddTwoDimRepr.lean` (後に削除、内容は [`S02_RepresentationsBasic.lean`](../../OddOrder/BG/Ch1_Preliminary/S02_RepresentationsBasic.lean) へ統合)). いずれも namespace + docstring (BG ↔ mathlib mapping + 該当 tracking issue ポインタ #33 / #34 / #35) のみで sorry / 内容なし. Item 6a ("files exist") を満たすため. 内容は issues 経由で follow-up.

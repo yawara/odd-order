@@ -1,6 +1,6 @@
 # Isaacs 完全形式化 — 番号 census と逐条監査 (2026-08-08 開始)
 
-tracker = [issue 0176](../../issues/0176-isaacs-full-formalization.md)。
+tracker = [issue 0176](../../issues/closed/0176-isaacs-full-formalization.md)。
 前身 = [issue 0172](../../issues/closed/0172-peterfalvi-full-formalization.md) (Peterfalvi 全 284 件、完了)。
 
 ## 1. 書籍側の番号 census

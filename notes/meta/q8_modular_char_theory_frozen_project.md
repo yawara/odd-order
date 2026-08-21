@@ -181,7 +181,7 @@ mathlib は char-0 ordinary のみ。以下は全て新設（`OddOrder/GroupTheo
 
 ## 6. 参照
 
-- 追跡 issue: [0147](../../issues/0147-q8-modular-char-theory-frozen.md)（本プロジェクト、2026-07-25 解凍）/
+- 追跡 issue: [0147](../../issues/closed/0147-q8-modular-char-theory-frozen.md)（本プロジェクト、2026-07-25 解凍）/
   [9318](../../issues/closed/9318-brauer-suzuki-theorem.md)（closed、|S|≥16 完了）
 - Q₈ 前提調査: [`appendixC_prop1_q8_brauer_suzuki.md`](../peterfalvi/appendixC_prop1_q8_brauer_suzuki.md)
 - 文献: Brauer–Suzuki 1959（PNAS）/ Suzuki 1962 / Brauer 1964（J.Algebra）/ Dade 1971（Powell–Higman

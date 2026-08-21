@@ -24,7 +24,7 @@ backtrace:
 ```
 
 が **180 回**出る。全て**同一の宣言** `exists_eq_of_columns`
-([Algebra/BrauerSuzukiEndgame.lean:195](../OddOrder/Algebra/BrauerSuzukiEndgame.lean)) 由来で、
+([Algebra/BrauerSuzukiEndgame.lean:195](../../OddOrder/Algebra/BrauerSuzukiEndgame.lean)) 由来で、
 `Lean.Expr.appArg!` と `Lean.Expr.appFn!` が交互に出る。
 
 - **非致命**: `info` レベルで、ビルドは green・警告 0・`#print axioms` も clean。

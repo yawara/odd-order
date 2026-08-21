@@ -292,7 +292,7 @@ Step 9 (任意)     mathlib upstream PR 準備 (Phase 1 完成後)
 ## 8. 関連ノート
 
 - 元 audit: [`ch01_audit_2026_05_23.md`](ch01_audit_2026_05_23.md)
-- 元 ch.1 note: [`../isaacs/ch01_sylow.md`](../isaacs/ch01_sylow.md)
+- 元 ch.1 note: [`../isaacs/ch01_sylow.md`](../../isaacs/ch01_sylow.md)
 - §1F (Brodkey, Chermak-Delgado の corollary): `Ch01_Sylow/Main.lean:2900-3195` 既実装
   (`exists_pair_inf_eq_opCore_of_abelian`, `index_opCore_le_index_sylow_sq`)
 - mathlib 配置慣用: [`forward_dep_policy.md`](../forward_dep_policy.md),

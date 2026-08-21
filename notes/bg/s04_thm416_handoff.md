@@ -2,7 +2,7 @@
 
 > 次セッションが **cold start で D = Thm 4.16 に着手**するための self-contained 手順。
 > 全体計画 = [`notes/bg/s04_implementation_plan_2026_05_30.md`](s04_implementation_plan_2026_05_30.md) (§4 全 20 結果の DAG + ルート決定 + 工数)。本書はその **Thm 4.16 焦点版 + v1 完了後の現状スナップショット**。
-> issue = `issues/0051-bg-s04-thm-4-16-blackburn.md`。
+> issue = `issues/closed/0051-bg-s04-thm-4-16-blackburn.md`。
 
 ## 0. タスク
 

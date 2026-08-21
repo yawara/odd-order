@@ -30,7 +30,7 @@ S08_CaseBCoherence2.lean(と派生 leaf)がいずれも 1,500 行以下、build 
 
 ## 参照
 
-- 手順: [`notes/meta/merge_monitor.md`](../notes/meta/merge_monitor.md) サイズ watch + 分割メカニズム
+- 手順: [`notes/meta/merge_monitor.md`](../../notes/meta/merge_monitor.md) サイズ watch + 分割メカニズム
 - 同型先行例: issue 0067 (`S13_PrimeActionTransition` 2357 行, Lane F frontier)
 - 検出コミット: `7c55fae1` (Merge 'lane-b' seam-1 orthogonality)
 

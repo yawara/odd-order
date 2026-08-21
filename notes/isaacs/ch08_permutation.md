@@ -23,7 +23,7 @@
 形式化先 (予定): `OddOrder/Isaacs/Ch08_Permutation.lean` (未作成).
 原典抽出: `references/isaacs/finite-group-theory.mmd` lines 4059-4878.
 ROADMAP 上の位置: **第 1 波 (前提なし、mathlib 既存資産で薄く)** — Ch.1 のみが軽い前提。
-4 視点 framework 適用 (2026-05-23 audit 統合): 詳細クロス参照 [`../meta/ch08_10_audit_2026_05_23.md`](../meta/ch08_10_audit_2026_05_23.md).
+4 視点 framework 適用 (2026-05-23 audit 統合): 詳細クロス参照 [`../meta/ch08_10_audit_2026_05_23.md`](../meta/log/ch08_10_audit_2026_05_23.md).
 
 ## 章のセクション分割と全 44 定理
 
@@ -432,7 +432,7 @@ A_n general (8.27) が新規実装の中心.
 
 - [`../meta/chapter_investigation_framework.md`](../meta/chapter_investigation_framework.md) —
   4 視点 framework (本ノートの構造ベース).
-- [`../meta/ch08_10_audit_2026_05_23.md`](../meta/ch08_10_audit_2026_05_23.md) —
+- [`../meta/ch08_10_audit_2026_05_23.md`](../meta/log/ch08_10_audit_2026_05_23.md) —
   Ch.8/9/10 横断 audit 統合 doc. 本ノートの視点 3/4 + sharpening の出所.
 - [`ch01_sylow.md`](ch01_sylow.md) — Thm 1.4 (Ch.8 唯一の Ch.1-7 依存) 実装ノート.
 - [`ch07_thompson.md`](ch07_thompson.md) — Phase 1 完成 sibling 章 (Thompson subgroup,
@@ -443,7 +443,7 @@ A_n general (8.27) が新規実装の中心.
 
 ## Isaacs Ch.8 ↔ mathlib 対応表 (issue 0176 ステップ 1、2026-08-08)
 
-[issue 0176](../../issues/0176-isaacs-full-formalization.md) の census で **cite ゼロ 13 件**
+[issue 0176](../../issues/closed/0176-isaacs-full-formalization.md) の census で **cite ゼロ 13 件**
 (8.11-8.15, 8.17, 8.19-8.22, 8.27, 8.28, 8.30) を検出した。実状態を分類した結果、
 **12 件は mathlib 被覆**で、repo に実体が無いのは正しい (CLAUDE.md のラッパー方針: 薄い
 ラッパーを書かず対応を記録する)。⚠ **cite ゼロ ≠ 未形式化**の実例がまた 12 件増えた。

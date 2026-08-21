@@ -14,13 +14,13 @@ ROADMAP 上の位置: **Phase 2b 第 3 波** (§7 Coherence 完成直後).
 
 ## Audit log (2026-05-23 audit 訂正)
 
-統合 doc: [`notes/meta/log/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
+統合 doc: [`notes/meta/log/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/log/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
 
 - **L3 "4 + 2 結果 (6.1)-(6.4), (6.5)-(6.8) は拡張"** → **重大誤認: 実際 8 結果 (6.1)-(6.8) 全て同格 named results**. overview の "4 結果" は `**(N.M)**` grep artifact.
 - **L18, L137, L142, L257 "Sibley 1984 Contemp. Math. 47"** → **完全捏造**. 訂正: Peterfalvi Notes §SS6 (mmd 04.17 L11) 明示「(6.3), (6.5) は **[FT] §11** から; (6.8) only is Sibley」. Sibley 参照は実際 **[Si1] = Sibley 1976 *Illinois J. Math.* 20:434-442** "Coherence in finite groups containing a Frobenius section" + [Si2] unpublished lectures. **"Contemp. Math. 47" は存在しない**.
 - **L20, L158, L181, L261-273 "Reynolds 1965 Duke Math. J."** → **完全捏造**. Reynolds は Peterfalvi 参考文献 (`04.18`) + Notes (`04.17`) **両方に存在せず**. (6.7) は無名 internal lemma. **L261-273 sub-section 全削除推奨**.
 - **L24 "mathlib coverage ~5%"** → (6.7)/(6.8) は **0%**. 既存「statement-level」評価は表面のみ; proof-internal で 10 helper lemma + 2 新規 module 要.
-- **(6.7) は character-class congruence 単独 theorem**, (6.8) Sibley の前段補題. proof で **[Is] p.35 class-sum algebra hom `ω : ZC[G] → C`** (mathlib 不在) + **algebraic integer congruence** (mathlib 不在) + **TI-subset (§4-§5)** + **[Is] Lem 7.7** (§8 で 2 回) 利用. **`OddOrder/RepresentationTheory/ClassSumAlgebraHom.lean` + `AlgInt.cong.lean` 新規** 要.
+- **(6.7) は character-class congruence 単独 theorem**, (6.8) Sibley の前段補題. proof で **[Is] p.35 class-sum algebra hom `ω : ZC[G] → C`** (mathlib 不在) + **algebraic integer congruence** (mathlib 不在) + **TI-subset (§4-§5)** + **[Is] Lem 7.7** (§8 で 2 回) 利用. **`OddOrder/GroupTheory/RepresentationTheory/ClassSumAlgebra.lean` + `AlgInt.cong.lean` 新規** 要.
 - **(6.8) は §9, §12 (Type V), §14 (Type I) の各章 single decisive use** で「全 type を一発で消す」道具. forward は §13=6, §12=3, §9=1, §14=1.
 - **[Is] cites in §8 = 8 件** (Lem 7.7 ×2, Thm 6.34 ×3, Cor 2.30 ×2, p.35 ω, Lem 2.27). 全 proof body cite, mathlib 対応**ゼロ**.
 - **L405-408 "30 days"** → **35-45 days realistic** ((6.7) class-sum module + (6.8) full Sibley apparatus).
@@ -731,7 +731,7 @@ Hypothesis (6.4) + M=1 + Z ⊂ Z(K) non-trivial, X = S - S(Z) ⊂ Irr L なら:
 **数学的意義** ⚠️ audit 訂正 (旧「Reynolds 1965 定理」は捏造帰属):
 - character class congruence: TI-subset + cyclic centralizer ⟹ character が "rigid" (mod |P|)
 - (6.8) Sibley main thm の前準備
-- proof 内で [Is] p.35 class-sum algebra hom `ω : ZC[G] → C` + algebraic integer congruence を使用 (両方 mathlib 不在; 新規 `OddOrder/RepresentationTheory/ClassSumAlgebraHom.lean` + `AlgInt.cong.lean` 要)
+- proof 内で [Is] p.35 class-sum algebra hom `ω : ZC[G] → C` + algebraic integer congruence を使用 (両方 mathlib 不在; 新規 `OddOrder/GroupTheory/RepresentationTheory/ClassSumAlgebra.lean` + `AlgInt.cong.lean` 要)
 
 > **進捗 2026-05-30 (issue 1000 完了)**: class-sum algebra + central character `ω_ρ` の整数性を
 > `OddOrder/GroupTheory/RepresentationTheory/ClassSumAlgebra.lean` に実装済 (unconditional, AxiomsCheck 登録).

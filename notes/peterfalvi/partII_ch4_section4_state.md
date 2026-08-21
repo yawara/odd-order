@@ -1,6 +1,6 @@
 # Peterfalvi Part II, Ch. IV — 到達状態 (2026-08-02: **Ch. III/IV 完了**)
 
-> 正本の作業ログは [issue 0168](../../issues/0168-pf-part2-ch4-psu3.md) (9k 行)。
+> 正本の作業ログは [issue 0168](../../issues/closed/0168-pf-part2-ch4-psu3.md) (9k 行)。
 > 本 note はその §4 部分の**要約と残件**だけを持つ。
 
 ## 何が通ったか
@@ -379,7 +379,7 @@ theoremA : ZassenhausClassification →
 **残るのは 2 つだけ**:
 1. **`ZassenhausClassification`** — 書籍が文献引用で済ませる分類定理。`Prop` 引数として
    明示してあるので境界が型に出ている。低優先繰延。
-2. **[issue 0147](../../issues/0147-q8-modular-char-theory-frozen.md)** — Ch. II が持つ
+2. **[issue 0147](../../issues/closed/0147-q8-modular-char-theory-frozen.md)** — Ch. II が持つ
    唯一の `sorry` (Brauer–Suzuki の `Q₈`、modular character theory)。これが埋まれば
    `V ≠ 1` 側は完全に axiom-clean になる。
 

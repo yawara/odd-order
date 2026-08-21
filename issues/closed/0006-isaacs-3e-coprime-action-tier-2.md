@@ -10,7 +10,7 @@ created: 2026-05-24
 ## 背景
 
 Isaacs §3E (Coprime action, pp.96-104) の Tier 1 は
-[`OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean`](../OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean)
+[`OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean`](../../OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean)
 に既に 9 件 sorry-free 完成 (Lem 3.24 Glauberman, Thm 3.23(a)(b), Cor 3.25, Thm 3.27,
 Cor 3.28, Cor 3.29, Cor 3.30 + helpers). AxiomsCheck flagship 入り.
 
@@ -28,7 +28,7 @@ Tier 2 は **Ch.4 §4C-§4D (`[G, A]` 構造 + coprime action machinery)** 完�
 具体的には Three-Subgroup Lemma + Cor 3.28 ([G,A] = [G,A,A] 型の reduction) を要する.
 
 Hartley-Turull (Thm 3.31) は Isaacs 独自結果で BG/Peterfalvi 直接引用 0 件
-([notes/isaacs/ch03_split.md](../notes/isaacs/ch03_split.md) §3E 参照).
+([notes/isaacs/ch03_split.md](../../notes/isaacs/ch03_split.md) §3E 参照).
 Phase 1 完成度のためには実装するが, FT 経路としての critical 度は低い.
 
 ## やること
@@ -48,10 +48,10 @@ Phase 1 完成度のためには実装するが, FT 経路としての critical 
 
 ## 参照
 
-- [OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean](../OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean) (Tier 1 完成済)
-- [notes/isaacs/ch03_split.md](../notes/isaacs/ch03_split.md) §3E
-- [notes/isaacs/ch04_commutators.md](../notes/isaacs/ch04_commutators.md) §4C-§4D
-- [notes/meta/log/ch04_07_audit_2026_05_22.md](../notes/meta/log/ch04_07_audit_2026_05_22.md)
+- [OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean](../../OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean) (Tier 1 完成済)
+- [notes/isaacs/ch03_split.md](../../notes/isaacs/ch03_split.md) §3E
+- [notes/isaacs/ch04_commutators.md](../../notes/isaacs/ch04_commutators.md) §4C-§4D
+- [notes/meta/log/ch04_07_audit_2026_05_22.md](../../notes/meta/log/ch04_07_audit_2026_05_22.md)
 - Isaacs FGT pp.96-104 (§3E)
 
 > 🧾 (2026-07-02 hub 全体レビュー): 前提の Ch.4 §4C/§4D は **完備** (Ch04 Main.lean §4C/§4D = 完成) — ただし本 issue は off-FT-path につき coverage phase まで park 継続。

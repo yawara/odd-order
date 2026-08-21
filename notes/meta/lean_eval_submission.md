@@ -6,7 +6,7 @@
 > - `lean_eval_candidates_2026_07_19.md` (ready-now 全表・reject 記録・eval 側仕様) → 本 note §3・§6・§7
 > - `lean_eval_forward_list_2026_07_22.md` (3 層・frontier 進捗) → 本 note §3–§5
 >
-> **tracker = [issue 0050](../../issues/0050-lean-eval-submission-candidates.md)** (actionable checklist のみ。
+> **tracker = [issue 0050](../../issues/closed/0050-lean-eval-submission-candidates.md)** (actionable checklist のみ。
 > 候補データは本 note を見る)。個別提出は per-problem sub-issue (0042 型) を切る。
 >
 > lean-eval: <https://github.com/leanprover/lean-eval> / 提出先
@@ -276,7 +276,7 @@ statement 素案は §3 末尾 (各定理を素の scratch file で通した実�
 
 - **issue [9318](../../issues/closed/9318-brauer-suzuki-theorem.md) は 2026-07-23 closed**
   (cyclic + |T|≥16 完成)。残 blocker は **issue
-  [0147](../../issues/0147-q8-modular-char-theory-frozen.md) (Q₈ case、2026-07-25 解凍・Navarro spine)** のみ。
+  [0147](../../issues/closed/0147-q8-modular-char-theory-frozen.md) (Q₈ case、2026-07-25 解凍・Navarro spine)** のみ。
 - **定理**: Brauer–Suzuki (1959)。Sylow-2 が cyclic/一般化四元数 ⟹ `G = O_{2'}(G)·C_G(u)`。
   CFSG 礎石補題。Gorenstein Ch.12 (例外指標論)。
 - **eval**: 既存**未解決** `brauer_suzuki` (solver 0、2026-07-24 実測) に一致 → 完成すれば
@@ -289,7 +289,7 @@ statement 素案は §3 末尾 (各定理を素の scratch file で通した実�
 
 ### §4.2 `feit_sibley_coherence` — Feit–Sibley 定理 (提案候補)
 
-- **issue [1054](../../issues/1054-feit-sibley-theorem-campaign.md)** (lane a、8-step) +分割 [0141](../../issues/0141-feitsibley-theorem-split.md)。
+- **issue [1054](../../issues/closed/1054-feit-sibley-theorem-campaign.md)** (lane a、8-step) +分割 [0141](../../issues/closed/0141-feitsibley-theorem-split.md)。
 - **定理**: Feit–Sibley coherence (Peterfalvi App.IV)。d odd ⟹ 𝒮 が τ=Ind_H^G に関し coherent。
   奇数位数定理の coherence keystone。eval 対応なし → **提案候補**、知名度は niche。
 - **進捗 ≈ 75%** (敵対的検証で survey 85% を下方修正): 原文 8 step + endgame integrator
@@ -300,7 +300,7 @@ statement 素案は §3 末尾 (各定理を素の scratch file で通した実�
 
 ### §4.3 Suzuki Zassenhaus 群分類 (Theorem A) — 遠い提案候補
 
-- **issue [2053](../../issues/2053-pf-suzuki-theorem-b.md)** (lane b) は **Theorem B (First Case) のみ**
+- **issue [2053](../../issues/closed/2053-pf-suzuki-theorem-b.md)** (lane b) は **Theorem B (First Case) のみ**
   産出 = Theorem A への帰納の 1 case、単独 proposal 不可。
 - **proposal 可能な名前付き定理 = Theorem A** (Suzuki 1962: 奇指数正規 L≅PSL(2,q)/Sz(q)/PSU(3,q))。
   自然な eval id = `suzuki_zassenhaus_classification`。
@@ -311,7 +311,7 @@ statement 素案は §3 末尾 (各定理を素の scratch file で通した実�
 
 ### §4.4 (参考) eval 候補で**ない** frontier
 
-- **issue [2052](../../issues/2052-pf-appendix3-e-forward.md)**: Higman Suzuki-2群 App.III (e) 前向き。
+- **issue [2052](../../issues/closed/2052-pf-appendix3-e-forward.md)**: Higman Suzuki-2群 App.III (e) 前向き。
   statement が repo carrier に絡む内部完全性補題 → submittableOnCompletion = false。
 
 ---

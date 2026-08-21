@@ -7,7 +7,7 @@ ROADMAP 上の位置: **Phase 2a 第 1 波** (Phase 1 Ch.1+Ch.3+Ch.4 完成後�
 
 ## Audit log (2026-05-23 audit 訂正)
 
-統合 doc: [`notes/meta/log/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).
+統合 doc: [`notes/meta/log/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/log/bg_phase2a_wave1_audit_2026_05_23.md).
 
 - **Lemma 1.1 "43+ 回引用"** → 実測 **0 in §586+** (§1 内 2 self-cite のみ). 「Peterfalvi `[Is] Lem 1.5` (Schur) と混同」の可能性大.
 - **Prop 1.2 "22 回引用"** → 実測 **6**. 大幅誇張.

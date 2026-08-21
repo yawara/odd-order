@@ -7,7 +7,7 @@ created: 2026-07-27
 
 # Pf (5.8) の μ-column 二分律を Hypothesis (4.6) 一般で述べる
 
-survey [`three_books_full_survey_2026_07_16.md`](../notes/meta/three_books_full_survey_2026_07_16.md)
+survey [`three_books_full_survey_2026_07_16.md`](../../notes/meta/three_books_full_survey_2026_07_16.md)
 の packaging gap 残 8 件のうち **§5 内で最上流**。issue 0159/0160 で (5.3)(b) が
 (4.6) 一般で landing したので、(5.8) の前提はすべて抽象版で揃った。
 
@@ -77,8 +77,8 @@ sorry 非退行。rider は別 step (未達でも二分律が抽象化できれ�
 
 ## 参照
 
-* 前提の抽象版: [issue 0159](closed/0159-five-three-b-general-hypothesis.md) (5.3)(b) 本体 + rider + anchor
-* [issue 0160](closed/0160-five-three-b-downstream-rewiring.md) anchor dedup + §13 bridge + columnR 統合
+* 前提の抽象版: [issue 0159](0159-five-three-b-general-hypothesis.md) (5.3)(b) 本体 + rider + anchor
+* [issue 0160](0160-five-three-b-downstream-rewiring.md) anchor dedup + §13 bridge + columnR 統合
 * 解析コア: `S05_SigmaTrichotomy` / `S05_GridTrichotomy` ((3.7)/(3.8)) は既に
   `TICyclicHypothesis` レベルで完全に一般
 
@@ -164,7 +164,7 @@ pdftotext の壊れた行 (`ft - tf = 4£,(^ -«£)` 等) から復元を書い�
 
 ## ✅ step 4 完了 (2026-07-28) — 一意性 rider も landing、issue クローズ
 
-新 leaf [`S06_CertainTypeColumnUniqueness.lean`](../OddOrder/Peterfalvi/S06_CertainTypeColumnUniqueness.lean)
+新 leaf [`S06_CertainTypeColumnUniqueness.lean`](../../OddOrder/Peterfalvi/S06_CertainTypeColumnUniqueness.lean)
 に **`subsum_eq_column_of_third_column`**。survey が「直接の対応物なし」としていた部分。
 
 書籍の対偶形をそのまま述べる: 列 `χ_ℓ` が `χ_k` とも `χ_k⁻¹` とも異なり同次数の族 member を

@@ -13,8 +13,8 @@ created: 2026-08-08
 
 | 書籍 | 件数 | 状態 | issue |
 |---|---|---|---|
-| Peterfalvi | 284 | ✅ 完了 (補充 ~20、誤判定 9) | [closed/0172](closed/0172-peterfalvi-full-formalization.md) |
-| Isaacs | 305 | ✅ 完了 (補充 5、stale 注記訂正 7) | [closed/0176](closed/0176-isaacs-full-formalization.md) |
+| Peterfalvi | 284 | ✅ 完了 (補充 ~20、誤判定 9) | [closed/0172](0172-peterfalvi-full-formalization.md) |
+| Isaacs | 305 | ✅ 完了 (補充 5、stale 注記訂正 7) | [closed/0176](0176-isaacs-full-formalization.md) |
 | **BG** | 下記 | ⬜ **本 issue** | 0177 |
 
 方法論は 0172 / 0176 と同一:
@@ -95,7 +95,7 @@ pat = re.compile(r'^(Theorem|Proposition|Lemma|Corollary)\s+(\d{1,2})\.(\d{1,2})
         `D` L6669 / `E` L6692)。⚠ `Theorem B.4` (補章 B) と混同しないこと。
       - **補章**: `Kind X.N` が 14 件。⬜ 各補章の `.1` が未発見で要確認。
 - [x] **census note を新設 (2026-08-08)**:
-      [`notes/bg/full_formalization_census_2026_08_08.md`](../notes/bg/full_formalization_census_2026_08_08.md)
+      [`notes/bg/full_formalization_census_2026_08_08.md`](../../notes/bg/full_formalization_census_2026_08_08.md)
 - [ ] **ステップ 2 (進行中)**: §1 から文書順に逐条監査。
       - **§1 監査完了 (2026-08-08)**: 全 22 件被覆・**補充ゼロ**。
         ⚠ **stale 注記 2 件を訂正** — `S01_FrattiniBurnside.lean` の対応表が Thm 1.8 と
@@ -280,7 +280,7 @@ pat = re.compile(r'^(Theorem|Proposition|Lemma|Corollary)\s+(\d{1,2})\.(\d{1,2})
 未形式化」と判定し issue 0178 を起票したが、**実装に入って両方とも packaging 差だと判明**
 (部品は repo に在り、繋ぐ endpoint だけが無かった)。
 ⟹ `S14.typeP2_Msigma_isNilpotent` / `S16.typeP2_exists_regular_abelian_hall` で解消、
-[0178 closed](closed/0178-bg-prop142-regular-u-and-nilpotent-msigma.md)。
+[0178 closed](0178-bg-prop142-regular-u-and-nilpotent-msigma.md)。
 
 🚨 (a) の誤判定の原因 = **grep の hit を「別物」と即断した**
 (`ActsRegularlyOn (E₂ ⊔ E₃) E₁` は返っていたが `E₁ = K`, `E₂⊔E₃ = U` に気づかなかった)。
@@ -365,6 +365,6 @@ BG の全番号付き結果が**書籍強度**の Lean statement を持つか、
 
 ## 参照
 
-- 前身: [issue 0172](closed/0172-peterfalvi-full-formalization.md) / [issue 0176](closed/0176-isaacs-full-formalization.md)
+- 前身: [issue 0172](0172-peterfalvi-full-formalization.md) / [issue 0176](0176-isaacs-full-formalization.md)
 - 書籍: `references/bg/local-analysis.pdf`
 - Coq 併読: `coq/theories/BGsectionN.v` (ファイル名が BG の節構成と 1:1 対応)

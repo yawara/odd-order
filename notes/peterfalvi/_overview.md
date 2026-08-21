@@ -7,7 +7,7 @@ ROADMAP 上の位置: **Phase 2b** (Phase 1 Isaacs 完了後着手, Phase 2a BG 
 
 ## Audit log (2026-05-23 audit 訂正, §3-§8 範囲)
 
-統合 doc: [`notes/meta/log/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
+統合 doc: [`notes/meta/log/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/log/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
 
 **結果数の systematic 誤認 (本文表 L28-44)** — §3 のみ正確、§4-§8 で 2-5 結果欠落:
 

@@ -304,6 +304,6 @@ Type I か II に限られる (`existsUnique_maximal_centralizer_le_typeI_or_typ
 
 ## 参照
 
-- 監査記録: [`notes/peterfalvi/full_formalization_census_2026_08_07.md`](../notes/peterfalvi/full_formalization_census_2026_08_07.md) §3.5 の §8 節
+- 監査記録: [`notes/peterfalvi/full_formalization_census_2026_08_07.md`](../../notes/peterfalvi/full_formalization_census_2026_08_07.md) §3.5 の §8 節
 - 書籍: `references/peterfalvi/pages/peterfalvi-p047.png` ((8.13) 全文)
 - Coq 併読: `coq/theories/PFsection8.v`

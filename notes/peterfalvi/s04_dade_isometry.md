@@ -74,12 +74,12 @@ issue 0040「進捗 (12)」参照.  Möbius の **代数的 spine を全て land
 
 ## Audit log (2026-05-23 audit 訂正)
 
-統合 doc: [`notes/meta/log/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
+統合 doc: [`notes/meta/log/peterfalvi_phase2b_wave1_audit_2026_05_23.md`](../meta/log/peterfalvi_phase2b_wave1_audit_2026_05_23.md).
 
 - **L3, L7, L16, L18 "6 結果 (2.1)-(2.6)"** → **重大誤認: 実際 11 結果 (2.1)-(2.11)** + sub-lemmas (2.10.1)-(2.10.3). 既存表で **(2.7), (2.8), (2.9), (2.10), (2.11) 完全欠落**.
 - (2.7) Adjoint formula は **外部 7 cite** (§7, §9, §12×2, §13, §16×2) で **最重要 forward-export 補題**. 既存「Helper」評価は overstate.
 - (2.1) Coprime decomp は **外部 6 cite** で §4 内部用ではなく **shared primitive**. `OddOrder/GroupTheory/CoprimeAction.lean` (既存) 配置推奨.
-- **L141 "mathlib `ClassFunction` 既存" → 誤り**. `ClassFunction G` 型不在 (only `FDRep.character : G → k`, conj-invariant submodule なし). 新規 `OddOrder/RepresentationTheory/ClassFunction.lean` 要.
+- **L141 "mathlib `ClassFunction` 既存" → 誤り**. `ClassFunction G` 型不在 (only `FDRep.character : G → k`, conj-invariant submodule なし). 新規 `OddOrder/GroupTheory/RepresentationTheory/ClassFunction.lean` 要.
 - **L150 "`MulAction.IsTrivialIntersection` あり" → 誤り**. `Mathlib/GroupTheory/GroupAction/Blocks.lean` の `IsTrivialBlock` は別概念 (subsingleton/univ block, not TI-subset). TI-subset (`A^g ∩ A ≠ ∅ ⇒ g ∈ N_G(A)`) は **mathlib 完全不在**, 新規 `OddOrder/GroupTheory/TISubset.lean` 要.
 - **L213 "Phase 1 Ch.6 (Frobenius) 完成必須" → overstate**. §4 で必要なのは `Subgroup.piCore` (= O_{π'}) facts のみで mathlib-native. **Frobenius kernel nilpotency は §4 で不使用** (Ch.6 dep ゼロ).
 - **"[BG] §1 軽" → 0**. §4 mmd で [BG] cite **0** (intro prose の `[1s] Lem 7.7` は OCR typo of `[Is]`). §4 は **Phase 2a BG 完全独立**.

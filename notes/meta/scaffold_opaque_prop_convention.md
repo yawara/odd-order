@@ -9,7 +9,7 @@ cleanup path をまとめる。**この note が canonical 参照** (各ファ�
 - **パターン**: structure に `field_model : Prop`、`betaS_formula : Prop` 等の抽象 `Prop` field を置き、
   必要なら `_holds : field_model` で「成り立つ」証明 field を付ける。
 - **理由 (gate #3)**: Peterfalvi (3.2)/(3.3)/(4.3) の指標 index 族 **ω_{ij}/η_{ij}/μ_{ij}/ν_{ij}** と
-  補助写像 σ/τ₁/ρ が **S03/S04 に named object として未材料化** (`notes/peterfalvi/scaffold_feasibility_2026_06_01.md`
+  補助写像 σ/τ₁/ρ が **S03/S04 に named object として未材料化** (`notes/bg/scaffold_feasibility_2026_06_01.md`
   の「global gate #3」)。これらを含む文字理論恒等式 (η=τ(ω), norm cascade 等) は faithful に書けないため、
   placeholder で構造だけ通している。plan note は「field carry か `-- TODO`」を推奨し、scaffold は前者を採用。
 

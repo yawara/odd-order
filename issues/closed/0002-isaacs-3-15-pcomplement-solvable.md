@@ -14,7 +14,7 @@ p-complement (= `{p}'`-Hall) を持つならば `G` は solvable.
 
 Isaacs p.84 で「Thm 3.15 in full generality は Burnside `pᵃqᵇ` を仮定すれば容易」と明言.
 owner chapter 規則で Ch.7 (Burnside) ディレクトリの placeholder ファイル
-[`OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean`](../OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean)
+[`OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean`](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean)
 に statement と証明戦略を記載済 (中身は空 namespace のみ).
 
 ## やること
@@ -34,9 +34,9 @@ owner chapter 規則で Ch.7 (Burnside) ディレクトリの placeholder ファ
 
 ## 参照
 
-- [OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean](../OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean) (placeholder)
-- [notes/isaacs/ch03_split.md](../notes/isaacs/ch03_split.md) §3C
-- [notes/meta/forward_dep_policy.md](../notes/meta/forward_dep_policy.md)
+- [OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/ForwardFromCh03.lean) (placeholder)
+- [notes/isaacs/ch03_split.md](../../notes/isaacs/ch03_split.md) §3C
+- [notes/meta/forward_dep_policy.md](../../notes/meta/forward_dep_policy.md)
 - Isaacs FGT p.84 (Thm 3.15)
 - 関連 issue: 0003 (Thm 3.17, 同じく Burnside 依存)
 

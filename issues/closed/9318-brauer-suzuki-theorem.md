@@ -387,7 +387,7 @@ Gorenstein Lem 1.4: `θ = 1_C↑N − ψ̃` について (i) `(θ,θ)_N = 3` (ii
 
 ## HUB 裁定 (2026-07-23): Q₈ = lane c の confirmed primary。BG-remainder 監査で doc-order 繰延失効
 
-**契機**: lane c が [9407](closed/9407-lane-c-prop1-done-next-frontier.md) で「territory 完済・次 frontier 裁定要請」を出し、以後 ~6h stall (自前 commit は 02:59 が最後、以降 merge のみ)。ユーザーが hub に「c 枯渇か / lane b の Higman を分解して c に回せるか」を諮問。hub が 3-agent 並列 fan-out で **BG remainder 全数実測監査**を実施。
+**契機**: lane c が [9407](9407-lane-c-prop1-done-next-frontier.md) で「territory 完済・次 frontier 裁定要請」を出し、以後 ~6h stall (自前 commit は 02:59 が最後、以降 merge のみ)。ユーザーが hub に「c 枯渇か / lane b の Higman を分解して c に回せるか」を諮問。hub が 3-agent 並列 fan-out で **BG remainder 全数実測監査**を実施。
 
 ### 監査結論 (3 agent 実測、survey ラベルでなく repo grep/Read/git log)
 
@@ -398,7 +398,7 @@ Gorenstein Lem 1.4: `θ = 1_C↑N − ψ̃` について (i) `(θ,θ)_N = 3` (ii
 - **§7–§13**: 完成 (表 gap 0)。
 - **§14**: 完成。唯一の残 = **Cor 14.12 M*-pinned surfacing** (残 2 clause は `H∩M*=D` を内部で確立済ゆえ**数学的内容は証明済**、M* を signature に露出していないだけ、consumer 0、effort-S packaging 債務 — genuine な新規数学でない)。Lem 14.13(b) は 07-18 landing 済 (survey stale)。
 - **§15**: 完成 (issue 3022 で Thm 15.7 全 5 条項 book strength)。
-- **§16**: 全 11 結果 (Thm A/B/C/D/E, Prop 16.1, Thm I/II, tamely-imbedded 定義) 完成・sorry-free。Thm A A(6)/(7) は 07-22 close ([0126](closed/0126*.md))。Thm A "unified capstone" は **book gap でなく repo packaging** かつ実質配線済。
+- **§16**: 全 11 結果 (Thm A/B/C/D/E, Prop 16.1, Thm I/II, tamely-imbedded 定義) 完成・sorry-free。Thm A A(6)/(7) は 07-22 close ([0126](0126-bg-thm-a-clause6-gap.md))。Thm A "unified capstone" は **book gap でなく repo packaging** かつ実質配線済。
 - **App.A/App.B**: 完成 (6/6)。
 - **App.C (BG)**: 12 done + 3 specialized 完成 (Thm C/C.1/C.2/C.3, norm-set + Frobenius class sum, axiom-clean)。残は Rem (V) 自明 wlog / Rem (II) SL(2,2^q) 例示 (群構成 infra soft-gated, illustrative) / Rem (IV)・Prob 1 (**文献 pointer / open research problem で本文に証明なし ⟹ 形式化ソース不在、CLAUDE.md 明示の低優先繰延**)。特殊化債務 1 件 (Thm C 抽象形) は一般化 payoff が Rem II 例示のみで低価値。
 - **App.D**: 全 3 結果 (D.1/D.2/3-step dichotomy) 完成 (survey「全 3 partial」は stale、c 自作 axiom-clean・非 contested)。
@@ -501,7 +501,7 @@ Prop 1 のみ (ℒ(F)/F_{r²,2}/Prop 2 は済)。前 BG-remainder audit は「BG
 
 **Q₈（`|S|=8`）ケースは modular character theory を要する別スケールの greenfield ゆえ、ユーザー裁定
 （2026-07-23）で「書籍選定を含む長期プロジェクト」として凍結（→ 2026-07-25 解凍、Navarro spine）**
-→ [issue 0147](../0147-q8-modular-char-theory-frozen.md)
+→ [issue 0147](../closed/0147-q8-modular-char-theory-frozen.md)
 （+ project spec `notes/meta/q8_modular_char_theory_frozen_project.md`）に分離。
 
 ⟹ 2026-07-23 の「Q₈ = c primary」hub 裁定（本 issue 冒頭付近）は**ユーザーの凍結決定で上書き**。

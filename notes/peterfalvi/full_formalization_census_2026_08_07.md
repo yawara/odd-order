@@ -1,6 +1,6 @@
 # Peterfalvi 完全形式化 — カバレッジ census (2026-08-07 起点)
 
-> **これは live な scope 文書**。[issue 0172](../../issues/0172-peterfalvi-full-formalization.md) の
+> **これは live な scope 文書**。[issue 0172](../../issues/closed/0172-peterfalvi-full-formalization.md) の
 > キャンペーン正本。章の監査が終わるたびに更新する。
 >
 > ⚠ **2026-07-16 の 3 冊 survey は使わない**。hub 裁定 9154 で降格済で、さらに 3 週間分 stale
@@ -420,7 +420,7 @@ decompositionPairFromDadeOfIrreducible     CharacterPsiDecomposition τ χ 0 を
 | (8.13)(a)(b)(c1)(c2) | ✅ (a) は台別・(b)(c2) は型一律 | (a) `V^M`-台 / `σ`-sharp 台 / type-`P₁` `A₀` 台の 3 形 (`S10_MinimalSimpleBasic:560,593,731`)。(b) `S10.escapingCentralizers_control` + 型一律 `escaping_typeA_mem_A1`。(c1) の一意極大は同 control 内、(c2) は `coprime_FT_signalizer_centralizerIn_typeA` (型一律) |
 | (8.13)(c4) | ✅ 前半 + 後半とも | 前半「`L` は Type I か II」= `escapingCentralizers_control`。後半「`L` が Type II なら `M` は核 `M_F` の Frobenius 群」= BG Theorem II packaging (`S16_MainResults/TamelyImbedded:141` / `TheoremIIPackaging:393` の `FrobeniusTypeIWithNonTIFitting M`) |
 | (8.13) の `X` の範囲 | ✅ 3 型すべて | 書籍は `X = A(M)`/`A₀(M)` を任意の型で許す。repo は `A₁(M)` (全型) + type-`P₁` の `A₀(M)` (`escapingCentralizers_control`) + type I の `A(M)` (`escaping_typeIA_mem_A1`) + **type II は退化** (2026-08-07 補充): (8.16) より `A(S)`/`A₀(S)` は TI ゆえ `D = ∅` — `A(S)` 級は既存の `typeII_centralizer_le_of_mem_centralizerSupport`、`A₀(S)` 級を `S12.typeII_centralizer_le_of_mem_A0` として追加 |
-| **(8.13)(c3)** | ✅ Type I / Type II の両方 (2026-08-08) → [issue 0174](../../issues/0174-peterfalvi-813-c3-support-membership.md) | `x ∈ A(L) − A₁(L)` (`x ∈ D`, `C_G(x) ⊆ L`)。`S10.escaping_mem_typeA_notMem_A1_of_typeI` / `..._of_typeII`。D(4) が `L` を Type I/II に限るのでこの 2 本で完全被覆。⚠ Type II は **BG 側の弱化解消**が前提だった: repo の Theorem D(4) は第 4 成分を `x ∈ ASet L ⊤ = hatMsigma L` (host `L`) と記録していたが、BG 原文の `A(L)` は型依存 (Type II の host は `L'`)。`BG.Ch4.S16.escaping_mem_ASet_sdiff_Msigma_of_typeP` で型依存版を追加 (D(4) 本体の signature は不変)。鍵は `S14.notMem_kappa_of_mem_tau2` (`κ ∩ τ₂ = ∅`、pRank 1 vs 2) — BG 自身の Cor 15.9 経路 ((15.2)・`K₁ ∩ M_σ = 1`) は**不要**だった |
+| **(8.13)(c3)** | ✅ Type I / Type II の両方 (2026-08-08) → [issue 0174](../../issues/closed/0174-peterfalvi-813-c3-support-membership.md) | `x ∈ A(L) − A₁(L)` (`x ∈ D`, `C_G(x) ⊆ L`)。`S10.escaping_mem_typeA_notMem_A1_of_typeI` / `..._of_typeII`。D(4) が `L` を Type I/II に限るのでこの 2 本で完全被覆。⚠ Type II は **BG 側の弱化解消**が前提だった: repo の Theorem D(4) は第 4 成分を `x ∈ ASet L ⊤ = hatMsigma L` (host `L`) と記録していたが、BG 原文の `A(L)` は型依存 (Type II の host は `L'`)。`BG.Ch4.S16.escaping_mem_ASet_sdiff_Msigma_of_typeP` で型依存版を追加 (D(4) 本体の signature は不変)。鍵は `S14.notMem_kappa_of_mem_tau2` (`κ ∩ τ₂ = ∅`、pRank 1 vs 2) — BG 自身の Cor 15.9 経路 ((15.2)・`K₁ ∩ M_σ = 1`) は**不要**だった |
 | (8.14) 記法 | ✅ | `supportKernel` (`R(x)`: escaping 集合上は BG Theorem-D signalizer、外は `1`) と `thickenedSupport` (`⋃_{x∈X}(xR(x))^G`) |
 | (8.15) | ✅ 3 claim とも | claim 1 = `M = N_G(A)` + (2.2) 成立 (`DadeSupportHypothesisData`、`A = A₁(M)` は全型)、claim 2 = type `𝒫` の (4.6) 成立 (`S12.Hypothesis.toHypothesis46` — `Hypothesis46` の**初の実例**)、claim 3 = subcoherence (`inducedKernelFamily_subcoherent` / 型一律 `inducedNonKernelFamily_subcoherent`) |
 | (8.16) | ✅ **type II の 3 集合とも** | `typeII_centralizerSupport_isTISubset` (`A(S)` の TI、書籍の honest な `A(S) = ⋃_{x∈S_σ^#} C_{S'}(x)^#`)、`typeII_A0_isTISubset` (`A₀(S)`)、`A₁(S) = S_F^#` は carrier の (8.6.a) kernel TI 条項。⚠ **`S10_StructureSetup:910` の「(8.16) RETIRED — false-as-stated」注記は、`A(M) = (M')^#` と誤読した版についてのもの** ((8.10) より `A(M) = (M')^#` は types III/IV/V のみ)。書籍の (8.16) 自体は type II の honest な `A(S)` で成立し、上記のとおり証明済 — **注記だけを見て「(8.16) は無い」と誤診しないこと** |
@@ -434,7 +434,7 @@ decompositionPairFromDadeOfIrreducible     CharacterPsiDecomposition τ χ 0 を
 | (8.18)(b) | ✅ 型一律 | `:753` (+ type-I pair 特殊化 `:856`) |
 | (8.18)(c) | ✅ 型一律 | `:873` (mixed `Ã₁ ∩ Ã` disjointness、+ type-I pair `:932`) |
 
-✅ **§8 は全項目被覆** (2026-08-08 に (8.13)(c3) の Type I/II 両方が landing、[issue 0174](../../issues/0174-peterfalvi-813-c3-support-membership.md))。
+✅ **§8 は全項目被覆** (2026-08-08 に (8.13)(c3) の Type I/II 両方が landing、[issue 0174](../../issues/closed/0174-peterfalvi-813-c3-support-membership.md))。
 
 ### §9 = repo `S11` (書籍 pp.50-57、`pages/peterfalvi-p050..p057.png` 切り出し済) — **監査完了・全項目被覆 (2026-08-08 に (9.11) の「残 1 件」判定を撤回)**
 

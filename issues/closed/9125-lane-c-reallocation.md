@@ -10,7 +10,7 @@ created: 2026-07-18
 ## ⚠ 本 issue は前提が事実誤認だったため撤回 (2026-07-18 自己訂正)
 
 当初「lane c の territory 完了・独立高価値作業が枯渇」として reallocation を要請したが、
-**正本 [`lane_reallocation_2026_07_16.md`](../notes/meta/lane_reallocation_2026_07_16.md) を未読のまま
+**正本 [`lane_reallocation_2026_07_16.md`](../../notes/meta/lane_reallocation_2026_07_16.md) を未読のまま
 stale な claim を信じた事実誤認**だった (verify-port-state-by-number 違反)。訂正:
 
 - **Isaacs Ch.10 は lane c が既に全 28 結果完成済** (commit `a98141fc8` "Ch.10 全 28 結果完成"、

@@ -9,7 +9,7 @@ created: 2026-05-24
 
 ## 背景
 
-[Ch03_SplitExtensions/Main.lean](../OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean) の
+[Ch03_SplitExtensions/Main.lean](../../OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean) の
 `piLength_le_one_of_abelian_pi_hall` は現状 fake placeholder:
 
 ```lean
@@ -26,9 +26,9 @@ theorem piLength_le_one_of_abelian_pi_hall [Finite G] (π : Set ℕ) [IsPiSepara
 「G π-separable + abelian な π-Hall ⇒ `[O_{π',π}(G), O_{π',π}(G)] ≤ O_{π'}(G)`」
 = π-length ≤ 1 と同値.
 
-なお prerequisite だった [`0005`](closed/0005-isaacs-3d-pi-separable-redefine.md)
+なお prerequisite だった [`0005`](0005-isaacs-3d-pi-separable-redefine.md)
 (`IsPiSeparable` 暫定定義の置換) と
-[`0008`](closed/0008-isaacs-3d-pi-separable-normal-subgroup-closure.md)
+[`0008`](0008-isaacs-3d-pi-separable-normal-subgroup-closure.md)
 (normal subgroup 閉包 + Hall-Higman 一般化) は完了済み.
 現在の残りは Thm 3.22 自体の statement / proof 化.
 
@@ -61,8 +61,8 @@ theorem piLength_le_one_of_abelian_pi_hall [Finite G] (π : Set ℕ) [IsPiSepara
 
 ## 参照
 
-- [Ch03_SplitExtensions/Main.lean](../OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean)
-- [notes/isaacs/ch03_split.md](../notes/isaacs/ch03_split.md) §3D
+- [Ch03_SplitExtensions/Main.lean](../../OddOrder/Isaacs/Ch03_SplitExtensions/Main.lean)
+- [notes/isaacs/ch03_split.md](../../notes/isaacs/ch03_split.md) §3D
 - Isaacs FGT p.95 (Thm 3.22)
-- 前提 issue: [`0005`](closed/0005-isaacs-3d-pi-separable-redefine.md),
-  [`0008`](closed/0008-isaacs-3d-pi-separable-normal-subgroup-closure.md)
+- 前提 issue: [`0005`](0005-isaacs-3d-pi-separable-redefine.md),
+  [`0008`](0008-isaacs-3d-pi-separable-normal-subgroup-closure.md)

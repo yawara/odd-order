@@ -22,7 +22,7 @@ Proposition 9 の hypothesis: (A) `q ∤ p − 1`、(B) Frobenius 群 `H = P ⋊
 `p = 2` はこの hypothesis を実現する (Glauberman–Norton Example 10 = `SL(2,2^q)`、
 Example 11 = `Sz(2^q)`)。`p ≥ 5` は GN が Prop 7 で排除している (Prop 7 自体は
 [issue 0179](../../issues/closed/0179-bg-appc-remark-iv-glauberman-norton.md) で形式化済;
-(B) ⟹ `E = E⁻¹` の抽象版は [issue 0151](../../issues/0151-appc-lemma-c3-abstract-hypothesis-b.md) で進行中)。
+(B) ⟹ `E = E⁻¹` の抽象版は [issue 0151](../../issues/closed/0151-appc-lemma-c3-abstract-hypothesis-b.md) で進行中)。
 残っていたのが `p = 3` で、1993 年の提出以来 33 年間、解決を主張する公刊物は無かった
 (OpenAlex / Semantic Scholar の被引用 0 は書籍からの引用を拾わないだけで、BG 1994 自身は
 GN 1993 を引用している)。

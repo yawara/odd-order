@@ -29,7 +29,7 @@ proof body が `:= OddOrder.〈別 namespace〉.SAME_NAME args` の 1 行で, �
 
 参考までに **意図的な特殊化 wrapper** (CLAUDE.md 例外に該当, 削除対象外) は
 docstring で明示的に正当化されている:
-- [S01_Solvable.lean:984](OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean:984)
+- [S01_Solvable.lean:984](../../OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean:984)
   `hall_higman_solvable_specialization` — `IsSolvable G` instance + π = {p}
   specialization と docstring に明記.
 
@@ -40,46 +40,46 @@ docstring で明示的に正当化されている:
 各 wrapper の callsite を 直接呼び出しに置換 → wrapper 本体を削除 → `lake build
 OddOrder` で確認. 1 件 1 commit を推奨 (CLAUDE.md commit 規約).
 
-- [x] **#1** [S01_Solvable.lean:521-525](OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean:521)
+- [x] **#1** [S01_Solvable.lean:521-525](../../OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean:521)
   `quotient_frattini_isElementaryAbelian`
-  → [FrattiniPGroup.lean:161](OddOrder/GroupTheory/FrattiniPGroup.lean:161)
+  → [FrattiniPGroup.lean:161](../../OddOrder/GroupTheory/FrattiniPGroup.lean:161)
   `OddOrder.GroupTheory.IsPGroup.quotient_frattini_isElementaryAbelian`
   - 同一 statement, body は `:= OddOrder.GroupTheory.IsPGroup.quotient_frattini_isElementaryAbelian hR`
   - **caller**: 外部 0 件 (`S01_Solvable.lean` 内でのみ宣言, 同ファイル内に caller
     も無し).
-- [x] **#2** [S01_Solvable.lean:531-535](OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean:531)
+- [x] **#2** [S01_Solvable.lean:531-535](../../OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean:531)
   `isElementaryAbelian_of_frattini_eq_bot`
-  → [FrattiniPGroup.lean:188](OddOrder/GroupTheory/FrattiniPGroup.lean:188)
+  → [FrattiniPGroup.lean:188](../../OddOrder/GroupTheory/FrattiniPGroup.lean:188)
   - 同一 statement, body は 1 行直呼び出し
-  - **caller**: 同ファイル [L558](OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean:558) で 1 回
+  - **caller**: 同ファイル [L558](../../OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean:558) で 1 回
     (`frattini_eq_bot_iff_isElementaryAbelian` 内). 置換要.
-- [x] **#3** [S01_Solvable.lean:569-573](OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean:569)
+- [x] **#3** [S01_Solvable.lean:569-573](../../OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean:569)
   `commutator_sup_pow_closure_le_frattini`
-  → [FrattiniPGroup.lean:211](OddOrder/GroupTheory/FrattiniPGroup.lean:211)
+  → [FrattiniPGroup.lean:211](../../OddOrder/GroupTheory/FrattiniPGroup.lean:211)
   - 同一 statement, body は 1 行直呼び出し
-  - **caller**: 同ファイル [L629](OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean:629) で 1 回
+  - **caller**: 同ファイル [L629](../../OddOrder/BG/Ch1_Preliminary/S01_Solvable.lean:629) で 1 回
     (`commutator_sup_pow_closure_eq_frattini` 内). 置換要.
-- [x] **#4** [S03_PreliminaryCharacter.lean:98-109](OddOrder/Peterfalvi/S03_PreliminaryCharacter.lean:98)
+- [x] **#4** [S03_PreliminaryCharacter.lean:98-109](../../OddOrder/Peterfalvi/S03_PreliminaryCharacter.lean:98)
   `card_realIrreducibleCharacters_eq_one_of_odd_card`
-  → [BrauerPermutation.lean:347](OddOrder/GroupTheory/RepresentationTheory/BrauerPermutation.lean:347)
+  → [BrauerPermutation.lean:347](../../OddOrder/GroupTheory/RepresentationTheory/BrauerPermutation.lean:347)
   `OddOrder.RepresentationTheory.card_realIrreducibleCharacters_eq_one_of_odd_card`
   - 同一 statement, body は 1 行直呼び出し
   - **caller**: 外部 0 件.
-- [x] **#5** [S03_PreliminaryCharacter.lean:115-127](OddOrder/Peterfalvi/S03_PreliminaryCharacter.lean:115)
+- [x] **#5** [S03_PreliminaryCharacter.lean:115-127](../../OddOrder/Peterfalvi/S03_PreliminaryCharacter.lean:115)
   `not_isReal_of_ne_trivial_irreducible_of_odd_card`
-  → [BrauerPermutation.lean:383](OddOrder/GroupTheory/RepresentationTheory/BrauerPermutation.lean:383)
+  → [BrauerPermutation.lean:383](../../OddOrder/GroupTheory/RepresentationTheory/BrauerPermutation.lean:383)
   `OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card`
   - 名前が微妙に違う (`_irreducible_` が挿入されている) が, 仮定・結論ともに完全
     一致. body は 1 行直呼び出し.
   - **caller**: 外部 0 件.
-- [x] **#6** [Ch07/Main.lean:3532-3539](OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean:3532)
+- [x] **#6** [Ch07/Main.lean:3532-3539](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean:3532)
   `normalizer_map_of_coprime_kernel`
-  → [Ch02/Main.lean:2957](OddOrder/Isaacs/Ch02_Subnormality/Main.lean:2957)
+  → [Ch02/Main.lean:2957](../../OddOrder/Isaacs/Ch02_Subnormality/Main.lean:2957)
   `OddOrder.Isaacs.Ch02.normalizer_map_of_coprime_kernel`
   - 同一 statement (Ch02 側は `_hP_neBot` と underscore, Ch07 側は使う形だが
     値は wrapper 内で透過). body は 1 行直呼び出し.
-  - **caller**: 同ファイル 2 箇所 ([L3577](OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean:3577)
-    と [L3644](OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean:3644)). L3577 はすでに
+  - **caller**: 同ファイル 2 箇所 ([L3577](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean:3577)
+    と [L3644](../../OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean:3644)). L3577 はすでに
     Ch02 を直呼びしている (wrapper を経由していない) ので置換不要,
     L3644 のみ Ch07 wrapper 経由. 置換要.
 

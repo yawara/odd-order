@@ -7,7 +7,7 @@ created: 2026-07-27
 
 # Pf (5.3)(b) の下流再配線と anchor dedup
 
-[issue 0159](closed/0159-five-three-b-general-hypothesis.md) で **(5.3)(b) 本体 + rider** が
+[issue 0159](0159-five-three-b-general-hypothesis.md) で **(5.3)(b) 本体 + rider** が
 `S06_CertainTypeSubcoherent.lean` に (4.6) 一般・sorry-free・axiom-clean で landing した。
 本 issue はその**下流側の整理**(0159 の完了条件外だった 2 件)。
 
@@ -159,7 +159,7 @@ AxiomsCheck の `S11.columnRFamily` 項目も除去)。**net −107/+16 行**、
 
 ### (2) の最終形
 
-新 leaf [`S13_ColumnFamilyBridge.lean`](../OddOrder/Peterfalvi/S13_ColumnFamilyBridge.lean):
+新 leaf [`S13_ColumnFamilyBridge.lean`](../../OddOrder/Peterfalvi/S13_ColumnFamilyBridge.lean):
 
 * `colRFamily_imageSet_eq_certainTypeR_imageSet`
 * `memberRFamily_imageSet_eq_certainTypeR_imageSet` (dispatch 版; 既約分岐は両者とも

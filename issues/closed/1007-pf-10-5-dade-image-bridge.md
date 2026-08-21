@@ -13,7 +13,7 @@ Peterfalvi (10.5) の Dade-image 半分 `α_ij^τ = δ(ω_ij^σ − ω_i0^σ) �
 (`S12_MaximalIII_IV_V.lean` の `alpha_tau_image`, sorry)。support 半分は完了
 (`muGrid_alpha_support`, commit a52abf68)。Dade-image 半分の foundation を 2 件 landing 済
 (`CoherentHypothesis` de-opaque + `Hypothesis.tau_apply_of_mem_typePV` cornerstone)。
-正本設計 = [`notes/peterfalvi/s12_s10_character_bridge.md`](../notes/peterfalvi/s12_s10_character_bridge.md)
+正本設計 = [`notes/peterfalvi/s12_s10_character_bridge.md`](../../notes/peterfalvi/s12_s10_character_bridge.md)
 「更新⁴」。原文 = `references/peterfalvi/04.12_*.mmd` (10.5)。
 
 `alpha_tau_image` は現状 statement では**証明不能** (arbitrary `params`/`coh`、`omegaSigma`/`mu` free)。

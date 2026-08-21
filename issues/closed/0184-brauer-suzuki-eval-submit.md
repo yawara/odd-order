@@ -97,6 +97,6 @@ self-contained workspace でビルド green、かつ `#print axioms` が標準 3
 
 ## 参照
 
-- 正本: [`notes/meta/lean_eval_submission.md`](../notes/meta/lean_eval_submission.md) §1.2 / §2.5
+- 正本: [`notes/meta/lean_eval_submission.md`](../../notes/meta/lean_eval_submission.md) §1.2 / §2.5
 - 前例: 0042 (baer_suzuki) / 0120 (feit_thompson leanOptions parity)
-- Q₈: [0147](closed/0147-q8-modular-char-theory-frozen.md) / 9506
+- Q₈: [0147](0147-q8-modular-char-theory-frozen.md) / 9506

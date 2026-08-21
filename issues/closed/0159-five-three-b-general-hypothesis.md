@@ -14,7 +14,7 @@ survey は (5.3)(b)/(5.8) を「真に開いている」に分類しつつ、こ
 > **意図的な設計判断**でもある (固定 2 要素の `R` レコードは可変長 `R` を保持できず、
 > consumer は general-family (5.7) engine を使う)
 
-この制約は **[issue 0157](closed/0157-five-seven-drop-unit-norm.md) で解消済**。
+この制約は **[issue 0157](0157-five-seven-drop-unit-norm.md) で解消済**。
 `S07.GeneralHypothesis` (2026-07-27) の (5.2.d) フィールドは
 
 ```lean
@@ -185,7 +185,7 @@ sorry-free・axiom-clean で landing すること。build green + lint --strict 
 
 ## ✅ landing (2026-07-27) — `Hypothesis46.toGeneralHypothesis` が sorry-free・axiom-clean で成立
 
-新 leaf [`OddOrder/Peterfalvi/S06_CertainTypeSubcoherent.lean`](../OddOrder/Peterfalvi/S06_CertainTypeSubcoherent.lean)。
+新 leaf [`OddOrder/Peterfalvi/S06_CertainTypeSubcoherent.lean`](../../OddOrder/Peterfalvi/S06_CertainTypeSubcoherent.lean)。
 
 | 実装 | 内容 |
 |---|---|

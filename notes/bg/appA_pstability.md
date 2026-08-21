@@ -30,7 +30,7 @@ A.3 / A.4(a/b/c) / A.5 は別 issue で継続(下記表「未実装」を更新�
 [`OddOrder/BG/AppA_PStability.lean`](../../OddOrder/BG/AppA_PStability.lean)
 末尾 (~ L546-768) に **`IsPStable` def + `thmA3` statement + Step 1-3 (witness
 extraction + Baer-Suzuki + y = gxg⁻¹ ∈ K 性質伝播)** を実装。issue
-[#0043](../../issues/0043-bg-appa-a3-pstability.md) 進行中。残 = **Step 4-8
+[#0043](../../issues/closed/0043-bg-appa-a3-pstability.md) 進行中。残 = **Step 4-8
 (合成列 + coprime action + p-group irreducible + A.2 適用)** = `h_two_dvd : 2 ∣ |G|` 1 sorry。
 
 ### 実装済 (commits `b8ab8a9`, `33bb1df`, `7b6158f`, `1921dec`)
@@ -92,7 +92,7 @@ mathlib JordanHolderLattice diamond を `Subrepresentation ρ_H` lattice 上で�
   (素因数分解 + Cauchy + Q := zpowers q + 自明性持ち上げで faithful 矛盾).
 
 Case B (`∃ i, N_i ⊊ ↥H ⇒ A.2 適用 ⇒ 2 ∣ |H| ∣ |G|`) は次セッション (≈ 150-200 行)
-で issue [`#0043`](../../issues/0043-bg-appa-a3-pstability.md) 「残 Case B」節
+で issue [`#0043`](../../issues/closed/0043-bg-appa-a3-pstability.md) 「残 Case B」節
 roadmap に沿って実装.
 
 ### ⛔ 2026-05-29 PM hard block: F[H]-module 合成列構築 (初期試行記録、回避済)
@@ -125,7 +125,7 @@ mathlib 全体検索でも `CompositionSeries (Submodule (MonoidAlgebra ...) _)`
    - 「H 全 simple F[H]-subquotient 自明 ⇒ V 上自明」finrank induction 直接。
 
 合計 Step 5 残 + Step 6-8 = **400-650 行**、本セッション継続不可。詳細
-[`issues/0043-bg-appa-a3-pstability.md`](../../issues/0043-bg-appa-a3-pstability.md)
+[`issues/closed/0043-bg-appa-a3-pstability.md`](../../issues/closed/0043-bg-appa-a3-pstability.md)
 「🚧 2026-05-29 PM」節。
 
 ### 残 (Step 4-8 = Gorenstein 8.3 mmd L2293-L2298)
@@ -156,13 +156,13 @@ mathlib 全体検索でも `CompositionSeries (Submodule (MonoidAlgebra ...) _)`
 - **A.4(b)(= Thm 6.1)も A.4(c) も Gorenstein §6.5 の special case**で、BG App.A は証明本体を書かず "G §6.5 を A.3 で置換し we obtain" とするのみ(A.2/A.3 も "G §3.8 を辿れ")。⇒ **Isaacs import では出ない**。
 - ただし**最深部(SL(2,p) = Dickson/G 3.8.1)は repo に既証**: `Isaacs.Ch07.gl2_pSubgroup_centralizes_of_normalizes`(Lem 7.3)。A.4(b)/(c) は **7.3 を核とする新規 reduction**(bounded)。A.4(c) は **Isaacs 7.5 の系ではない**(兄弟定理、共通核が 7.3)。A.2/A.3/A.4(a) は直接構築すれば**迂回可**。
 - 詳細・依存閉包(App.B 完備、ゲート = A.4(b)+A.4(c))・J→L 大域置換の検証は
-  [`notes/meta/log/bg_s6_appAB_route_2026_05_28.md`](../meta/bg_s6_appAB_route_2026_05_28.md)。
+  [`notes/meta/log/bg_s6_appAB_route_2026_05_28.md`](../meta/log/bg_s6_appAB_route_2026_05_28.md)。
 
 ## ★ 2026-05-28 (late PM) 追補: A.2 = Gorenstein 8.1 翻訳, **Jordan form 不要**
 
 ### 背景の変化
 
-References repo に Gorenstein 1968 _Finite Groups_ が追加された(`references/gorenstein/finite-groups.{pdf,mmd}`)。これで BG App.A が "follow the proof of Theorem 3.8.1 of **G**" と書くだけで省略していた A.2 の証明本体(= Gorenstein Ch.3 §8 Thm 8.1 = mmd L2204+ statement / **L2210–L2240 proof**)が直接読めるようになり、issue [#0041](../../issues/0041-bg-appa-a2-dim-reduction.md) が「証明の再構成」から「Gorenstein 原文の Lean 翻訳」に簡素化された。
+References repo に Gorenstein 1968 _Finite Groups_ が追加された(`references/gorenstein/finite-groups.{pdf,mmd}`)。これで BG App.A が "follow the proof of Theorem 3.8.1 of **G**" と書くだけで省略していた A.2 の証明本体(= Gorenstein Ch.3 §8 Thm 8.1 = mmd L2204+ statement / **L2210–L2240 proof**)が直接読めるようになり、issue [#0041](../../issues/closed/0041-bg-appa-a2-dim-reduction.md) が「証明の再構成」から「Gorenstein 原文の Lean 翻訳」に簡素化された。
 
 ### Gorenstein 8.1 (V dim=2) の 5 ステップ(精読、mmd L2210–L2240)
 
@@ -248,11 +248,11 @@ Module.End.HasEigenvector  -- eigenvector definition
 Submodule.eq_top_of_isSimpleModule_of_ne_bot  -- or similar
 ```
 
-詳細は issue [#0041](../../issues/0041-bg-appa-a2-dim-reduction.md)。
+詳細は issue [#0041](../../issues/closed/0041-bg-appa-a2-dim-reduction.md)。
 
 ## Audit log (2026-05-23 audit 訂正)
 
-統合 doc: [`notes/meta/log/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/bg_phase2a_wave1_audit_2026_05_23.md).
+統合 doc: [`notes/meta/log/bg_phase2a_wave1_audit_2026_05_23.md`](../meta/log/bg_phase2a_wave1_audit_2026_05_23.md).
 
 - **L13-14 "下流被引用 BG Thm 6.1, 6.2"** → **方向逆**. App.A は §6 の **上流**. BG 序文 L4452 "Theorems 6.1 and 6.2 ... are obtained by use of p-stability ... we outline these shorter proofs". 実装順序: BG §1+§2 → **App.A → §6** (並行ではなく §6 直前).
 - **L24 "Isaacs Thm 3.8.1 weakening" / L25 "Isaacs Thm 3.8.3"** → **Isaacs FGT にこれらの番号は存在しない** (Gorenstein 1968 §3.8 番号). Isaacs では Thm 7.3 (GL(2,p)) + Thm 7.5 (normal-P) path で再構築.

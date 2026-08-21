@@ -268,7 +268,7 @@ system」を**実際に構成する**ところまでを本 issue のスコープ
 ## アーキテクチャ地図
 
 leaf の層構造・mathlib 実測 (使えたもの/無かったもの)・設計判断は
-[`notes/meta/modular_representation_theory.md`](../notes/meta/modular_representation_theory.md)
+[`notes/meta/modular_representation_theory.md`](../../notes/meta/modular_representation_theory.md)
 に集約 (本 issue は時系列ログ)。
 
 ## 次の段 (frontier, 2026-08-03)
@@ -632,7 +632,7 @@ Navarro は `C = DᵀD` を**定義**として置く (書籍 p.25) ので、Cart
 ### 次にやること (2026-08-04 時点の frontier)
 
   - [x] **分裂 `p`-modular system の構成** — 完了 (2026-08-04、
-        [issue 9507 closed](closed/9507-splitting-p-modular-system.md))。
+        [issue 9507 closed](9507-splitting-p-modular-system.md))。
         🎯🎯 **`𝓞_ℂ_[p]` = `ℂ_[p]` の付値環**を採用 (mathlib
         `NumberTheory/Padics/Complex.lean` に既存)。商体 `ℂ_[p]` が**代数閉**なので
         `K[G]` の分裂は Wedderburn–Artin で即得られ、**剰余体も代数閉**なので `k[G]` 側も
@@ -2609,7 +2609,7 @@ Problem (3.4) (ブロックの Cartan 行列は分解不能) を使うが、**BS
 
 ### ✅ issue 9508 完了 (2026-08-06) — 上流前提はもう無い
 
-[9508](closed/9508-brauer-characterization-of-characters.md) (Brauer's characterization of
+[9508](9508-brauer-characterization-of-characters.md) (Brauer's characterization of
 characters → Navarro (2.15)/(2.16)/(3.16) → `U` の整数性) を **closed**。9506 に残っていた
 **唯一の本質的な上流前提が消えた**。下流が使える形:
 

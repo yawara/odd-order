@@ -125,7 +125,7 @@ axiom が **使用箇所 0 件** なら, 単に削除して owner chapter ディ
   + solvable ⇒ G solvable. 証明骨子: 単純群場合分けで Burnside 必要.
 
 実装は Phase 4 (Ch.4-Ch.7 全完成後) に着手. それまでこのファイルは意図的に空.
-詳細は [`notes/isaacs/ch07_burnside.md`](../../../../notes/isaacs/ch07_burnside.md).
+詳細は [`notes/isaacs/ch07_thompson.md`](../../../notes/isaacs/ch07_thompson.md).
 -/
 
 namespace OddOrder.Isaacs.Ch07

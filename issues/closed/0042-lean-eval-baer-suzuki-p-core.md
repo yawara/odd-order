@@ -26,7 +26,7 @@ theorem baer_suzuki {G : Type*} [Group G] [Finite G] {p : ℕ}
 > 「単一元 x が `O_p(G)` に属する ⇔ 任意の共役 `gxg⁻¹` と x の生成する閉部分群が p-群」
 
 これは古典 Baer-Suzuki theorem (subset 版) の **単一元への特殊化** で,
-[OddOrder/Isaacs/Ch02_Subnormality/Main.lean:1829](OddOrder/Isaacs/Ch02_Subnormality/Main.lean:1829)
+[OddOrder/Isaacs/Ch02_Subnormality/Main.lean:1829](../../OddOrder/Isaacs/Ch02_Subnormality/Main.lean:1829)
 の `le_fitting_iff_baer_sup_conj_isNilpotent` (Isaacs Thm 2.12, Baer の F(G) iff 形)
 から **系として導出可能** な近縁定理.
 
@@ -62,7 +62,7 @@ Isaacs 2.12: `H ≤ F(G) ⇔ ∀ x ∈ G, ⟨H, H^x⟩` が冪零
    - 無ければ `OddOrder/Isaacs/Ch02_Subnormality/` 内に補題追加 (F(G) は冪零 ⇒
      Sylow p-subgroup unique ⇒ それが O_p(G))
 2. [ ] **p-core 版 statement を Isaacs 2.12 から導出**
-   - 配置: [OddOrder/Isaacs/Ch02_Subnormality/Main.lean](OddOrder/Isaacs/Ch02_Subnormality/Main.lean)
+   - 配置: [OddOrder/Isaacs/Ch02_Subnormality/Main.lean](../../OddOrder/Isaacs/Ch02_Subnormality/Main.lean)
      の 2B section 末尾 (Thm 2.12 iff の直後)
    - repo 内名: `OddOrder.Isaacs.Ch02.baerSuzuki_pCore` 程度. docstring に
      `**Baer-Suzuki Theorem (p-core single-element form)**` と本での呼称を明記
@@ -79,7 +79,7 @@ Isaacs 2.12: `H ≤ F(G) ⇔ ∀ x ∈ G, ⟨H, H^x⟩` が冪零
 
 ## 完了条件
 
-- [OddOrder/Isaacs/Ch02_Subnormality/Main.lean](OddOrder/Isaacs/Ch02_Subnormality/Main.lean)
+- [OddOrder/Isaacs/Ch02_Subnormality/Main.lean](../../OddOrder/Isaacs/Ch02_Subnormality/Main.lean)
   に, lean-eval signature と equivalent な theorem が `sorry`/`axiom` なしで存在
 - `lake build OddOrder` green
 - docstring に Isaacs Thm 2.12 への trace + lean-eval URL を記載
@@ -90,7 +90,7 @@ Isaacs 2.12: `H ≤ F(G) ⇔ ∀ x ∈ G, ⟨H, H^x⟩` が冪零
 
 - lean-eval URL: https://lean-lang.org/eval/problems/baer_suzuki/
 - Isaacs FGT Thm 2.12 (Baer) 原文: `references/isaacs/finite-group-theory.mmd` L1141-1180
-- 既存実装: [OddOrder/Isaacs/Ch02_Subnormality/Main.lean:1829](OddOrder/Isaacs/Ch02_Subnormality/Main.lean:1829)
+- 既存実装: [OddOrder/Isaacs/Ch02_Subnormality/Main.lean:1829](../../OddOrder/Isaacs/Ch02_Subnormality/Main.lean:1829)
   `le_fitting_iff_baer_sup_conj_isNilpotent` (iff 完全形)
 - 関連 wrapper policy: CLAUDE.md "ラッパー方針" — 本 issue は単なる rename ではなく
   F(G) → O_p(G) の真の翻訳を含むので no-wrapper policy には抵触しない

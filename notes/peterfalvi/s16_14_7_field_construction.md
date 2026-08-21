@@ -1,6 +1,6 @@
 # Peterfalvi (14.7) field-normalizer construction — design + roadmap
 
-Lane H, 2026-06-18. Tracks POLE-2 (`issues/pending/2009-s16-field-normalizer-pole2.md`).
+Lane H, 2026-06-18. Tracks POLE-2 (`issues/closed/2009-s16-field-normalizer-pole2.md`).
 
 ## What (14.7) needs (the genuine hard core of POLE-2)
 

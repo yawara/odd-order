@@ -12,8 +12,8 @@
 > memory [[ft-endgame-two-poles]] は現存せず、issue 8012 は closed、issue 7007 も本日
 > (2026-07-02) close。
 > (旧記述 2026-06-20: 「残 = wrapper gate `Q0⊴M` 1 点。live 状況は issue 8012 が正本、
-> 全体地図は [`../meta/ft_master_roadmap_2026_05_29.md`](../meta/ft_master_roadmap_2026_05_29.md) 冒頭 2026-06-20 ヘッダ」)
-> 巨大化 (>1500 行) につき split issue [0071](../../issues/0071-s15-mf-split.md) が capstone 後分割を追跡。
+> 全体地図は [`../meta/ft_master_roadmap_2026_05_29.md`](../meta/log/ft_master_roadmap_2026_05_29.md) 冒頭 2026-06-20 ヘッダ」)
+> 巨大化 (>1500 行) につき split issue [0071](../../issues/closed/0071-s15-mf-split.md) が capstone 後分割を追跡。
 > 以下は当初計画 (歴史的参考) ↓
 
 **スコープ**: BG §15 (pp.117-122), mmd L4086-4255, 9 結果.

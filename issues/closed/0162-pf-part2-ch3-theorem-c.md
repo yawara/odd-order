@@ -368,7 +368,7 @@ sorry 非退行。
 
 ## 参照
 
-* 前章 = [issue 2053](pending/2053-pf-suzuki-theorem-b.md) (Ch.II Theorem B、2026-07-26 完成)
+* 前章 = [issue 2053](2053-pf-suzuki-theorem-b.md) (Ch.II Theorem B、2026-07-26 完成)
 * Appendix IV = issues 1049 / 1053 / 1054 (Feit–Sibley、lane a)
 * survey `notes/meta/three_books_full_survey_2026_07_16.md` L825–L862 (Pf App: Suzuki の表)
 

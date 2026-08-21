@@ -335,7 +335,7 @@ theorem theorem_8_1 (M : Subgroup G) (p : ℕ) (A₀ : Subgroup (fitting_subgrou
   
 - **Phase 1 references**:
   - `notes/isaacs/ch07_thompson.md` (Isaacs Thm 7.6)
-  - `notes/isaacs/ch04_solvable.md` (Thm 4.20, p-length)
+  - `notes/isaacs/ch04_commutators.md` (Thm 4.20, p-length)
 
 - **ROADMAP**: [ROADMAP.md#phase-2a--bender-glauberman](../../ROADMAP.md)
 
