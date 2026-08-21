@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.RepresentationTheory.Basic
 import Mathlib.Algebra.Group.Subgroup.Basic
+import Mathlib.Tactic.Group
 
 /-!
 # The induced representation, as `H`-equivariant functions
@@ -35,11 +36,18 @@ the `Representation` structure clean.
 
 * `OddOrder.RepresentationTheory.indSubmodule` — the submodule of `H`-equivariant functions
 * `OddOrder.RepresentationTheory.indRep` — the induced representation of `G`
+* `OddOrder.RepresentationTheory.coordShift` — the `H`-part of `x` against the chosen
+  representative of the right coset `H x`
+* `OddOrder.RepresentationTheory.indCoordEquiv` — coordinates on the induced space
 
 ## Main results
 
 * `indRep_apply` — the action is right translation
 * `mem_indSubmodule_iff` — membership unfolds to the equivariance identity
+* `coordShift_mul_out` — `x = coordShift x * out ⟦x⟧`
+* `indCoordEquiv` — `indSubmodule H ρ ≃ₗ[k] (H \ G) → W`, so the induced space has
+  `[G : H]` coordinates each a copy of `W`; this is what makes `Module.finrank` (and hence
+  the Brauer character) of the induced module accessible
 -/
 
 namespace OddOrder.RepresentationTheory
@@ -98,5 +106,100 @@ def indRep : Representation k G ↥(indSubmodule H ρ) where
 @[simp] theorem indRep_apply (g : G) (f : ↥(indSubmodule H ρ)) (x : G) :
     ((indRep H ρ g f : G → W)) x = (f : G → W) (x * g) :=
   rfl
+
+/-! ## Coordinates: an equivariant function is its values on a right transversal
+
+An `f ∈ indSubmodule H ρ` satisfies `f (h * x) = ρ h (f x)`, so it is determined by its values
+on the right cosets `H x`.  Reading off those values against `Quotient.out` gives a `k`-linear
+isomorphism with `(H \ G) → W`, which is what makes `Module.finrank` — and hence the Brauer
+character — computable. -/
+
+section Coordinates
+
+variable {H}
+
+/-- For `x : G`, the element of `H` carrying the chosen representative of the right coset `H x`
+to `x`.  By construction `x = coordShift x * Quotient.out ⟦x⟧`. -/
+noncomputable def coordShift (H : Subgroup G) (x : G) : ↥H :=
+  ⟨x * (Quotient.out (Quotient.mk (QuotientGroup.rightRel H) x))⁻¹, by
+    have hout : Quotient.mk (QuotientGroup.rightRel H)
+        (Quotient.out (Quotient.mk (QuotientGroup.rightRel H) x))
+        = Quotient.mk (QuotientGroup.rightRel H) x := Quotient.out_eq _
+    exact QuotientGroup.rightRel_apply.mp (Quotient.exact hout)⟩
+
+theorem coordShift_mul_out (x : G) :
+    ((coordShift H x : G)) * (Quotient.out (Quotient.mk (QuotientGroup.rightRel H) x)) = x := by
+  change (x * (Quotient.out (Quotient.mk (QuotientGroup.rightRel H) x))⁻¹) * _ = x
+  group
+
+/-- Reading an equivariant function off the chosen right-coset representatives. -/
+noncomputable def indCoord (ρ : Representation k ↥H W) :
+    ↥(indSubmodule H ρ) →ₗ[k] (Quotient (QuotientGroup.rightRel H) → W) where
+  toFun f := fun c => (f : G → W) (Quotient.out c)
+  map_add' _ _ := rfl
+  map_smul' _ _ := rfl
+
+@[simp] theorem indCoord_apply (ρ : Representation k ↥H W) (f : ↥(indSubmodule H ρ))
+    (c : Quotient (QuotientGroup.rightRel H)) :
+    indCoord ρ f c = (f : G → W) (Quotient.out c) :=
+  rfl
+
+/-- Rebuilding an equivariant function from its values on the chosen representatives. -/
+noncomputable def indOfCoord (ρ : Representation k ↥H W) :
+    (Quotient (QuotientGroup.rightRel H) → W) →ₗ[k] ↥(indSubmodule H ρ) where
+  toFun v := ⟨fun x => ρ (coordShift H x) (v (Quotient.mk (QuotientGroup.rightRel H) x)), by
+    intro h x
+    have hmk : Quotient.mk (QuotientGroup.rightRel H) ((h : G) * x)
+        = Quotient.mk (QuotientGroup.rightRel H) x := by
+      refine Quotient.sound (QuotientGroup.rightRel_apply.mpr ?_)
+      have hrw : x * ((h : G) * x)⁻¹ = (h : G)⁻¹ := by group
+      rw [hrw]; exact H.inv_mem h.2
+    have hshift : coordShift H ((h : G) * x) = h * coordShift H x := by
+      apply Subtype.ext
+      change (h : G) * x * (Quotient.out (Quotient.mk (QuotientGroup.rightRel H) ((h : G) * x)))⁻¹
+        = (h : G) * (x * (Quotient.out (Quotient.mk (QuotientGroup.rightRel H) x))⁻¹)
+      rw [hmk]; group
+    change (ρ (coordShift H ((h : G) * x)))
+        (v (Quotient.mk (QuotientGroup.rightRel H) ((h : G) * x)))
+      = (ρ h) ((ρ (coordShift H x)) (v (Quotient.mk (QuotientGroup.rightRel H) x)))
+    rw [hmk, hshift, map_mul]
+    rfl⟩
+  map_add' u v := by ext x; simp [map_add]
+  map_smul' c v := by ext x; simp [map_smul]
+
+@[simp] theorem indOfCoord_apply (ρ : Representation k ↥H W)
+    (v : Quotient (QuotientGroup.rightRel H) → W) (x : G) :
+    ((indOfCoord ρ v : G → W)) x
+      = ρ (coordShift H x) (v (Quotient.mk (QuotientGroup.rightRel H) x)) :=
+  rfl
+
+/-- **Coordinates on the induced space.**  An `H`-equivariant function `G → W` is exactly a
+family of elements of `W` indexed by the right cosets `H \ G`. -/
+noncomputable def indCoordEquiv (ρ : Representation k ↥H W) :
+    ↥(indSubmodule H ρ) ≃ₗ[k] (Quotient (QuotientGroup.rightRel H) → W) :=
+  { indCoord ρ with
+    invFun := indOfCoord ρ
+    left_inv := by
+      intro f
+      apply Subtype.ext
+      funext x
+      change ρ (coordShift H x) ((f : G → W)
+        (Quotient.out (Quotient.mk (QuotientGroup.rightRel H) x))) = (f : G → W) x
+      rw [← indSubmodule_apply_mul f (coordShift H x), coordShift_mul_out]
+    right_inv := by
+      intro v
+      funext c
+      change ρ (coordShift H (Quotient.out c)) (v (Quotient.mk (QuotientGroup.rightRel H)
+        (Quotient.out c))) = v c
+      have hout : Quotient.mk (QuotientGroup.rightRel H) (Quotient.out c) = c := Quotient.out_eq _
+      have hshift : coordShift H (Quotient.out c) = 1 := by
+        apply Subtype.ext
+        change Quotient.out c * (Quotient.out (Quotient.mk (QuotientGroup.rightRel H)
+          (Quotient.out c)))⁻¹ = (1 : G)
+        rw [hout]; group
+      rw [hout, hshift, map_one]
+      rfl }
+
+end Coordinates
 
 end OddOrder.RepresentationTheory
