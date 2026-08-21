@@ -4,11 +4,19 @@
 
 このリポジトリ (`odd-order`) は **Feit-Thompson 定理 (奇数位数定理) の Lean 4 完全形式化**を AI エージェント駆動で長期的に進めるプロジェクト。**FT 本体 (`feitThompson`) は 2026-07-15 に axiom-clean で完成** (`propext`/`Classical.choice`/`Quot.sound` のみ、AxiomsCheck 監査済)。現在は下記 3 冊の**全体を形式化するフェーズ (2026-07-16〜)**。詳細な計画とチェックリストは [ROADMAP.md](ROADMAP.md) を参照。
 
-## スコープ: 3 冊を全部形式化する
+## スコープ: 4 冊を全部形式化する
 
-1. **Isaacs**, _Finite Group Theory_ (AMS GSM 92, 2008) — 有限群論の前提一式 (Fitting, Hall, Frobenius, ZJ, transfer, F\*)
-2. **Bender–Glauberman**, _Local Analysis for the Odd Order Theorem_ (LMS LNS 188, 1994) — FT 局所解析 + 最終矛盾
-3. **Peterfalvi**, _Character Theory for the Odd Order Theorem_ (LMS LNS 272, 2000) — FT 指標理論
+1. **Isaacs**, _Finite Group Theory_ (AMS GSM 92, 2008) — 有限群論の前提一式 (Fitting, Hall, Frobenius, ZJ, transfer, F\*) — **完了**
+2. **Bender–Glauberman**, _Local Analysis for the Odd Order Theorem_ (LMS LNS 188, 1994) — FT 局所解析 + 最終矛盾 — **完了**
+3. **Peterfalvi**, _Character Theory for the Odd Order Theorem_ (LMS LNS 272, 2000) — FT 指標理論 — **完了**
+4. **Navarro**, _Characters and Blocks of Finite Groups_ (LMS LNS 250, 1998) — モジュラー表現論 (Brauer 指標・block・3 主定理・`Z*`-定理)
+
+**⚠ Navarro は 2026-08-21 に「行間参照のみ」から形式化対象へ昇格 (ユーザー裁定)**。Ch.1–7 は
+`Z*`-定理までの経路として既に事実上フル形式化されている (Modular infra 151 leaf + `BrauerSuzukiQ8/**`
++ `GlaubermanZStar/**`)。**残りは Ch.8–11 の 100 件** = [issue 0188](issues/0188-navarro-ch8-11-full-formalization.md)。
+ユーザー指示は「**書籍に faithful にしたいが、より一般的な形で述べられるならそうする**」——
+既定は原文どおり、一般化できる箇所は一般化し、docstring に書籍との差を明記する
+([[feedback-generalize-specialized-fully]] と同じ向き)。
 
 **⚠ scope の正本 = `git log` + `issues/` + 実測 grep (2026-07-19 hub 裁定 9154 で降格)**。ギャップ調査 note [`notes/meta/three_books_full_survey_2026_07_16.md`](notes/meta/three_books_full_survey_2026_07_16.md) (3 冊の全 815 番号付き結果を列挙) は **2026-07-16 時点の出発点**として保持するが、**scope の一次情報にしない** — Isaacs だけで Ch.1/2/5/8/9/10 の 6 章が実体と食い違い、"Confirmed missing (slim pass)" のような検証済みを示す文言も無効だった (Ch.8 は「ディレクトリすら無い」と断言していたが実際は 14 leaf / 5,707 行が存在)。**未/部分ラベルは着手前に必ず実測で再確認する** ([[verify-port-state-by-number-not-coq-name]])。レーン配分の正本 = [`notes/meta/lane_reallocation_2026_07_16.md`](notes/meta/lane_reallocation_2026_07_16.md)。
 
@@ -248,7 +256,7 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
 | `bin/` | 雑用スクリプト (`new-issue` / `count-sorry` / `check-warnings` / `check-links` / `check-doc-names`) |
 | `references/` (submodule) | PDF + `pdftotext -layout` 抽出 text — private リポ [`odd-order-references`](https://github.com/yawara/odd-order-references)。取得 = `git submodule update --init references` (CI は fetch しない) |
 | `references/{isaacs,bg,gorenstein}/*.pdf`, `*.pdftotext.txt` | 原典/補助原典と検索用 text (フラット) |
-| `references/navarro/characters-and-blocks.{pdf,pdftotext.txt}` | Navarro 1998 *Characters and Blocks of Finite Groups* (LMS LNS 250)。**Q₈ Brauer–Suzuki (Ch.1–7 前半, issue 0147) と Glauberman `Z*`-定理 (Ch.7 (7.7)–(7.9), issue 0186) の補助原典** (Gorenstein と同じ「行間参照のみ・独立の形式化対象ではない」posture)。⚠ **PDF ページ = 書籍ページ + 10**、数式は OCR 崩れ大 |
+| `references/navarro/characters-and-blocks.{pdf,pdftotext.txt}` | Navarro 1998 *Characters and Blocks of Finite Groups* (LMS LNS 250) — **形式化対象 4 冊目** (2026-08-21 昇格)。Ch.1–7 は済 (issue 0147 / 0186)、残 Ch.8–11 = [issue 0188](issues/0188-navarro-ch8-11-full-formalization.md)。⚠ **PDF ページ = 書籍ページ + 10**、数式は OCR 崩れ大 ⟹ 式の確定は `references/navarro/pages/` のページ画像で |
 | `references/peterfalvi/pdf/*.pdf`, `references/peterfalvi/pdftotext/*.txt` | Peterfalvi だけ章別 PDF/text を各ディレクトリに集約 (text は `references/bin/pdf-glyph-join.py` で再構成) |
 | `references/<book>/pages/*.png` | 切り出したページ画像 (捨てずに残す規約, 2026-07-26) |
 | `references/bin/pdf-glyph-join.py` | グリフ bbox から本文を組み直すツール (Peterfalvi 専用) |
