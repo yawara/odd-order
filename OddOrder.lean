@@ -66,6 +66,7 @@ import OddOrder.Algebra.CommutatorSpanPi
 import OddOrder.Algebra.SplitSemisimpleCount
 import OddOrder.Algebra.ValuationRingFreeModule
 import OddOrder.Algebra.EigenspaceDecomposition
+import OddOrder.Algebra.EigenvalueScaling
 import OddOrder.Algebra.WordExpansion
 import OddOrder.Algebra.LagrangeInterpolationRing
 import OddOrder.Algebra.FiniteIndexAnnihilator
