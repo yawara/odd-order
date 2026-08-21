@@ -383,6 +383,7 @@ import OddOrder.GroupTheory.RepresentationTheory.NonInflatedDegreeSqInterval
 import OddOrder.GroupTheory.RepresentationTheory.InducedInvariantConstituent
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.InducedCosetSum
+import OddOrder.GroupTheory.RepresentationTheory.InducedRepresentation
 import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
 import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 import OddOrder.GroupTheory.RepresentationTheory.IsReal

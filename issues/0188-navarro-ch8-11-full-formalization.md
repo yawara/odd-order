@@ -73,9 +73,18 @@ Ch.8 が直接乗るもの:
       well-definedness (`induceTerm_mul_mem`)・類関数性・正規化ブリッジ
       (`card_filter_mk_eq` / `card_smul_induceCoset` / `induceCoset_eq_induce`) まで完了。
       ⟹ **(8.1) 完了**。
-- [ ] (8.2) Brauer–Nesbitt / (8.3) Cor — 誘導**加群**が要る。mathlib の
-      `Representation.ind` / `coind` は圏論寄りで trace 計算に不向き。`coind` の具体形
-      (`{f : G → A | f(sg) = ρ(s) f(g)}`) が剰余類座標で行列表示できるので有力候補。
+- [~] (8.2) Brauer–Nesbitt / (8.3) Cor — **誘導表現 `indRep` を構成済**
+      (`InducedRepresentation.lean`)。mathlib の `Representation.ind` は coinvariants
+      `(k[H] ⊗ A)_G` で固有値計算に不向きなので、coinduced の具体形
+      `{f : G → W | f(hx) = ρ(h) f(x)}` に右移動作用 `(g·f)(x) = f(xg)` を入れたモデルを採用
+      (選択を含まないので `Representation` 構造が clean)。
+      **残**: (a) 右 transversal 座標での `≃ₗ[k] (H \ G) → W` (finrank 用)、
+      (b) `⟨g⟩` の軌道分解、(c) 軌道長 `ℓ > 1` の寄与が 0 になること
+      (`ℓ` 乗根の総和 = 0)、(d) 組み立て。
+      証明の骨格: `g` を `p`-正則とし `Ind ↓⟨g⟩` を `⟨g⟩` の `H \ G` 上の軌道で分解。
+      固定余類 `t` (`t g t⁻¹ ∈ H`) は `α(t g t⁻¹)` を寄与し、長さ `ℓ > 1` の軌道は
+      固有値が `ℓ` 乗根の完全な組になるので 0。既存の
+      `brauerCharacter_quotient_add_subrepresentation` (短完全列での加法性) に載せる。
 - [ ] (8.4) Nakayama / (8.5) Clifford / (8.6) / (8.7) (8.8) Cor
 - [ ] (8.9) Clifford 対応 / (8.10)
 - [ ] (8.11) Green / (8.12) 巡回商 / (8.13) Dade (coprime 拡張)
