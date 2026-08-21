@@ -33,11 +33,11 @@ invertibility, a field, or characteristic zero.
 The summand here is literally `ClassFunction.induceTerm`, the summand of the repository's
 existing unnormalized `ClassFunction.induceSum`; the only difference is the index set (left
 cosets rather than all of `G`).  Since the summand is constant on left cosets
-(`induceTerm_mul_mem`, proved below), `induceSum = |H| • induceCoset` and hence
-`induceCoset` agrees with the normalized `ClassFunction.induce` wherever the latter is defined.
-
-⚠ Those two bridge lemmas are **not yet formalized** — only the definition and its
-well-definedness are.  They are the immediate next step (issue 0188).
+(`induceTerm_mul_mem`) and each coset has `|H|` elements (`card_filter_mk_eq`), we get
+`induceSum = |H| • induceCoset` (`card_smul_induceCoset`), and hence `induceCoset` agrees with
+the normalized `ClassFunction.induce` wherever the latter is defined
+(`induceCoset_eq_induce`).  So on the book's home ground the two notions coincide, and off it
+only `induceCoset` survives.
 
 ## Restriction to `p`-regular elements is automatic
 
@@ -54,8 +54,11 @@ every conjugate of a `p`-regular element, because conjugation preserves `p`-regu
 
 ## Main results
 
-* `induceTerm_mul_mem` — the summand of `induceSum` is constant on left cosets, which is both
-  what makes `induceCosetTerm` well defined and what will give the normalization bridge
+* `induceTerm_mul_mem` — the summand of `induceSum` is constant on left cosets (this is what
+  makes `induceCosetTerm` well defined)
+* `card_filter_mk_eq` — the fibre of `G → G ⧸ H` over `yH` has `|H|` elements
+* `card_smul_induceCoset` — `|H| • induceCoset H θ = induceSum H θ`
+* `induceCoset_eq_induce` — agreement with `induce` when `|H|` is invertible
 * `induceCosetTerm_mk`, `induceCoset_apply` — computation rules
 -/
 
@@ -145,6 +148,69 @@ noncomputable def induceCoset (θ : ClassFunction ↥H k) : ClassFunction G k wh
 @[simp] theorem induceCoset_apply (θ : ClassFunction ↥H k) (g : G) :
     induceCoset H θ g = ∑ c : G ⧸ H, induceCosetTerm H θ g c :=
   rfl
+
+omit [DecidablePred (· ∈ H)] in
+/-- The fibre of `G → G ⧸ H` over `yH` is the left coset `yH`, of size `|H|`. -/
+theorem card_filter_mk_eq [DecidableEq (G ⧸ H)] (y : G) :
+    (Finset.univ.filter
+        (fun z : G => (QuotientGroup.mk z : G ⧸ H) = QuotientGroup.mk y)).card
+      = Nat.card ↥H := by
+  classical
+  have himg : (Finset.univ.filter
+      (fun z : G => (QuotientGroup.mk z : G ⧸ H) = QuotientGroup.mk y))
+      = Finset.univ.image (fun h : ↥H => y * (h : G)) := by
+    ext z
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_image]
+    constructor
+    · intro hz
+      have hzy : z⁻¹ * y ∈ H := QuotientGroup.eq.mp hz
+      have hmem : y⁻¹ * z ∈ H := by
+        have hinv : (z⁻¹ * y)⁻¹ = y⁻¹ * z := by group
+        rw [← hinv]; exact H.inv_mem hzy
+      exact ⟨⟨y⁻¹ * z, hmem⟩, by change y * (y⁻¹ * z) = z; group⟩
+    · rintro ⟨h, rfl⟩
+      refine QuotientGroup.eq.mpr ?_
+      have hcancel : (y * (h : G))⁻¹ * y = (h : G)⁻¹ := by group
+      rw [hcancel]; exact H.inv_mem h.2
+  rw [himg, Finset.card_image_of_injective _ ?_, Finset.card_univ, Nat.card_eq_fintype_card]
+  intro a b hab
+  exact Subtype.ext (by simpa using hab)
+
+/-- **The normalization bridge.**  The unnormalized `induceSum` is `|H|` copies of
+`induceCoset`: the summand is constant on each of the `[G : H]` left cosets
+(`induceTerm_mul_mem`), and each coset has `|H|` elements (`card_filter_mk_eq`).
+
+This is what makes `induceCoset` the *integral* form of the book's `θ^G`: Navarro divides
+`induceSum` by `|H|`, which is exactly undone here without ever performing the division. -/
+theorem card_smul_induceCoset (θ : ClassFunction ↥H k) (g : G) :
+    (Nat.card ↥H) • induceCoset H θ g = induceSum H θ g := by
+  classical
+  change (Nat.card ↥H) • (∑ c : G ⧸ H, induceCosetTerm H θ g c)
+    = ∑ y : G, induceTerm H θ y g
+  rw [← Finset.sum_fiberwise_of_maps_to (g := fun y : G => (QuotientGroup.mk y : G ⧸ H))
+    (fun y _ => Finset.mem_univ _), Finset.smul_sum]
+  refine Finset.sum_congr rfl ?_
+  rintro c -
+  induction c using QuotientGroup.induction_on with
+  | H y =>
+    have hconst : ∀ z ∈ Finset.univ.filter
+        (fun z : G => (QuotientGroup.mk z : G ⧸ H) = QuotientGroup.mk y),
+        induceTerm H θ z g = induceCosetTerm H θ g (QuotientGroup.mk y) := by
+      intro z hz
+      have hz' : (QuotientGroup.mk z : G ⧸ H) = QuotientGroup.mk y := by simpa using hz
+      rw [← hz', induceCosetTerm_mk]
+    rw [Finset.sum_congr rfl hconst, Finset.sum_const, card_filter_mk_eq (H := H)]
+
+/-- `induceCoset` agrees with the normalized `ClassFunction.induce` wherever the latter is
+defined, i.e. `induceCoset` computes exactly Navarro's `θ^G`. -/
+theorem induceCoset_eq_induce [Invertible (Nat.card ↥H : k)]
+    (θ : ClassFunction ↥H k) (g : G) :
+    induceCoset H θ g = induce H θ g := by
+  have hsum : ((Nat.card ↥H : k)) * induceCoset H θ g = induceSum H θ g := by
+    rw [← nsmul_eq_mul]; exact card_smul_induceCoset H θ g
+  rw [induce_apply]
+  change _ = ⅟(Nat.card ↥H : k) * induceSum H θ g
+  rw [← hsum, ← mul_assoc, invOf_mul_self, one_mul]
 
 end Fin
 

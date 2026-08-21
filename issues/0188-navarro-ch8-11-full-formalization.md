@@ -66,13 +66,13 @@ Ch.8 が直接乗るもの:
 
 ### Ch.8 Brauer Characters as Characters (34)
 
-- [~] **(8.1) DEF 誘導 `α^G`** — `ClassFunction.induceCoset` (`InducedCosetSum.lean`) で
+- [x] **(8.1) DEF 誘導 `α^G`** — `ClassFunction.induceCoset` (`InducedCosetSum.lean`) で
       **除算なしの左剰余類和**として定義。書籍より一般 (任意の可換環 `k`; `|H|` の可逆性・
       体・標数 0 のいずれも不要) — Brauer 指標が値をとる `p`-modular system の付値環 `𝒪` では
       `p ∣ |H|` のとき `|H|` が可逆でないので、既存の正規化済 `ClassFunction.induce` は使えない。
-      well-definedness (`induceTerm_mul_mem`) と類関数性まで証明済。
-      **残**: 正規化ブリッジ `induceSum = |H| • induceCoset` と `induceCoset_eq_induce`
-      (fibre = 左剰余類の濃度計算だけ。次の着手点)。
+      well-definedness (`induceTerm_mul_mem`)・類関数性・正規化ブリッジ
+      (`card_filter_mk_eq` / `card_smul_induceCoset` / `induceCoset_eq_induce`) まで完了。
+      ⟹ **(8.1) 完了**。
 - [ ] (8.2) Brauer–Nesbitt / (8.3) Cor — 誘導**加群**が要る。mathlib の
       `Representation.ind` / `coind` は圏論寄りで trace 計算に不向き。`coind` の具体形
       (`{f : G → A | f(sg) = ρ(s) f(g)}`) が剰余類座標で行列表示できるので有力候補。
