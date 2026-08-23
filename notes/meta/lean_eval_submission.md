@@ -11,6 +11,17 @@
 >
 > lean-eval: <https://github.com/leanprover/lean-eval> / 提出先
 > <https://github.com/leanprover/lean-eval-submissions> / 公開面 <https://lean-lang.org/eval/>
+> (結果リポ <https://github.com/leanprover/lean-eval-leaderboard>、state リポ
+> `leanprover/lean-eval-state` は 2026-08-23 現在非公開)
+>
+> **⛔ 2026-08-20 ユーザー裁定: lean-eval の submission 系は今後の作業対象外**
+> 「submission 系は記録に過ぎないから、今後も触らないで」。`odd-order-submission` の再生成・push、
+> `lean-eval-submissions` への issue 起票、comparator replay は**すべてしない**。marquee 定理が
+> landing しても「lean-eval に出せる」を作業として提案しない。本 note は**過去の候補データと
+> eval 側仕様を読むための reference** として維持する (§3–§5 の候補表は 2026-07 時点の凍結記録)。
+>
+> **⚠ 公開面は 2026-08-20/22 に全面刷新された (凍結セット `v1` + site-data v2) → §7.3 が正本。**
+> それ以前を前提にした記述 (per-account sticky・「未解決」ラベル・問題数) は §7.3 で上書きされる。
 >
 > **用語規約 (2026-07-24, ユーザー指示)**: **「submit / 提出」= proof submit (既存 problem への
 > 解答提出) のみ**を指す。新規 problem の追加は **「proposal / 提案」**と呼び、submit とは言わない。
@@ -20,14 +31,14 @@
 
 ---
 
-## §0. 現況サマリ (2026-07-24 改訂 — proof submit / proposal を分離)
+## §0. 現況サマリ (2026-07-24 改訂 — proof submit / proposal を分離; 2026-08-23 に現況を追記)
 
 **proof submit (既存 problem への解答提出)**:
 
 | | 件数 | 内容 |
 |---|---|---|
 | **済** | 2 | `feit_thompson` (2026-07-16, #828)、`baer_suzuki` (2026-05-29, #118) |
-| **今すぐ可** | 3 | 🎯 **`brauer_suzuki` (未解決・solver 0)** — Q₈ blocker は 2026-08-07 に消滅、2026-08-20 に eval statement を repo から逐語で証明済 (issue 0184)。あと Burnside p^aq^b (`finite_group_isSolvable_of_card_eq_prime_pow_mul_prime_pow`)、`brauer_character_in_cyclotomic` — 後 2 者は他者 solved 済みだが per-account sticky ゆえ候補 (§2.5) |
+| **今すぐ可 (2026-07 時点の評価)** | 3 | `brauer_suzuki` — Q₈ blocker は 2026-08-07 に消滅、2026-08-20 に eval statement を repo から逐語で証明済 (issue 0184)。あと Burnside p^aq^b (`finite_group_isSolvable_of_card_eq_prime_pow_mul_prime_pow`)、`brauer_character_in_cyclotomic` (§2.5) |
 | **経路外** | 残り全部 | Tier C (§5) + repo に証明の無い problem 群 (§2.5 の判定表) |
 
 **problem proposal (新規 problem の提案 PR — submit とは呼ばない)**:
@@ -42,6 +53,19 @@
 proposal (issue 1054/2053 完成時)。Tier C は 3 冊の外側で、別途 modular 表現論等を立てない限り来ない。
 
 ⚠ lean-eval 作業は 3 冊 frontier に対し**オプショナル・トラック** (0042 scope 注記)。
+
+**🔄 2026-08-23 の現況更新 (実測)** — 上の表は 2026-07-24 時点の評価で、以下 2 点が失効した:
+
+1. **⛔ proof submit は 2026-08-20 の裁定で作業対象外** (冒頭バナー)。上の「今すぐ可 3 件」は
+   **実行しない**。価値があったのは repo 側の成果 (一般化・結論形の橋・`O(G)` 対応) の方で、
+   それは既に main に入っている。
+2. **`brauer_suzuki` は他者が解決済み** (初解 2026-07-24 `ivwumupy` / deepseek-v4 and gpt-5.x、
+   以降 Seed Prover 08-02・Humanifa 08-03 の計 3 件)。同様に `glauberman_zStar` (2026-07-27)・
+   `novikov_unsolvable` (07-23)・`higman_infinite_simple` (07-26)・`brauer_splitting_field`
+   (07-28) も解決済。⟹ 本 note の「未解決」ラベルは §7.1/§7.3 の実測表が正本。
+   さらに公開面が刷新され、採点母集団が**凍結セット `v1` (128 問)** に絞られた結果、
+   `feit_thompson`/`baer_suzuki`/`brauer_suzuki` は**いずれも v1 の外**で既定ランキングに載らない
+   (§7.3)。
 
 ---
 
@@ -98,6 +122,10 @@ option 依存ファイルが落ちる。対策 (odd-order 本体側で非依存�
 - private repo から出すなら `lean-eval-bot` GitHub App を install。
 - 結果は `results/<github-login>.json` に記録され **sticky** (一度解けば以後の提出が
   再現しなくても消えない)。現在 30 アカウント分。`yawara.json` に既提出 2 件。
+  ⚠ **2026-08-22 の公開面刷新でランキングの帰属単位が account → canonical credit
+  (申告モデルラベルの正規化) に変わった** (§7.3)。提出結果自体は残るが、「per-account sticky
+  ゆえ他者 solved 済みでも候補」という §0 の論法は、新スコアでは
+  `total` にしか効かない (`first`/`unique` は先着のみ)。
 
 ### §1.5 提案フロー (proposer) → §7.2 に詳細
 
@@ -131,12 +159,15 @@ problem 追加は 2026-06-23 が最新 (解析系 3 件) で、群論系の新�
 | problem | 他者 solved | repo 実体 | 残作業 |
 |---|---|---|---|
 | `finite_group_isSolvable_of_card_eq_prime_pow_mul_prime_pow` (Burnside p^aq^b) | 済 | `Isaacs.Ch07.burnside_p_pow_q_pow` (Ch07_ThompsonSubgroup/Main.lean:917、AxiomsCheck:1687 登録済)。eval より一般 (`p ≠ q` 不要、`Nat.card` + ∃ 形) | statement 橋渡しは数行 (`Fintype.card`→`Nat.card`、`Fact` instance 化)。主作業 = self-contained 化 (§1.2): Ch.7 9-step + normal-J の閉包 vendoring で規模大 (feit_thompson 前例の縮小版) |
-| `brauer_character_in_cyclotomic` | 済 (10 名) | **数学は完全に既済** — `RepresentationTheory.character_mem_adjoin` (`CharacterEigenvalues.lean:103`, AxiomsCheck 登録済): `ω` が原始 `m` 乗根で `g^m = 1` なら `χ_ρ(g) ∈ ℤ[ω]`。任意体上・**`ℤ` 係数**なので `ℚ(ζ)` 版より強い。付随して `character_pow_eq_sum_finrank_smul` (固有値の重複度つき和) もある | `CyclotomicField (Monoid.exponent G) ℚ →+* ℂ` embedding の構成と `φ.range` 所属への packaging **のみ** (中規模 glue、10 名 solved の易問側)。⚠ 2026-08-11 に「数学が無い」と誤読して同内容の leaf を書きかけた — repo 側に新規実装は不要 |
+| `brauer_character_in_cyclotomic` | 済 (14 名、2026-08-23 実測) | **数学は完全に既済** — `RepresentationTheory.character_mem_adjoin` (`CharacterEigenvalues.lean:103`, AxiomsCheck 登録済): `ω` が原始 `m` 乗根で `g^m = 1` なら `χ_ρ(g) ∈ ℤ[ω]`。任意体上・**`ℤ` 係数**なので `ℚ(ζ)` 版より強い。付随して `character_pow_eq_sum_finrank_smul` (固有値の重複度つき和) もある | `CyclotomicField (Monoid.exponent G) ℚ →+* ℂ` embedding の構成と `φ.range` 所属への packaging **のみ** (中規模 glue、14 名 solved の易問側)。⚠ 2026-08-11 に「数学が無い」と誤読して同内容の leaf を書きかけた — repo 側に新規実装は不要 |
 
-### 🎯 `brauer_suzuki` — 数学は完了、残りは self-contained 化のみ (issue 0184)
+### `brauer_suzuki` — 数学は完了 (issue 0184)。⛔ 提出はしない・他者解決済み
 
-`brauer_suzuki` (**未解決・solver 0**、2026-07-24 公開面で実測): eval statement は `n ≥ 3` の
+`brauer_suzuki`: eval statement は `n ≥ 3` の
 一般化四元数 (`QuaternionGroup (2^(n-2))`、**n=3 = Q₈ を含む**)。
+⚠ 旧記載「未解決・solver 0 (2026-07-24 公開面で実測)」は失効 — **同 2026-07-24 に `ivwumupy`
+(deepseek-v4 and gpt-5.x) が初解**、以降 Seed Prover (08-02)・Humanifa (08-03) で計 3 件
+(2026-08-23 実測)。
 
 **2026-08-07** に issue 0147 (Q₈ = 旧唯一の blocker) が閉じ、**2026-08-20** (issue 0184) に
 
@@ -148,7 +179,9 @@ problem 追加は 2026-06-23 が最新 (解析系 3 件) で、群論系の新�
 (`brauerSuzuki_mk_mem_center_oddCore` の適用、`depends on axioms: [propext, Classical.choice,
 Quot.sound]`)。eval の `3 ≤ n` は repo 版が全ての `m` を覆うので不要。
 
-残作業 = self-contained workspace 化 (§1.2 / `odd-order-submission`) **のみ**。
+残作業 = self-contained workspace 化 (§1.2 / `odd-order-submission`) **のみ**だったが、
+**⛔ 2026-08-20 裁定によりこれは実施しない** (冒頭バナー)。repo 側の数学は完了しており、
+それがこの項目の成果。
 
 ### repo に証明が無く候補外 (solved/unsolved を問わず判定理由を記録)
 
@@ -268,20 +301,23 @@ statement 素案は §3 末尾 (各定理を素の scratch file で通した実�
 
 ---
 
-## §4. Tier B — frontier 完成で届く (arrives-on-completion; `brauer_suzuki` のみ proof submit、他は proposal)
+## §4. Tier B — frontier 完成で届く (arrives-on-completion)
+
+⛔ 2026-08-20 裁定により提出・提案とも実施しない。以下は 2026-07 時点の凍結記録。
 
 進捗 % は原文ステップ被覆で測定 (scaffold 数でない)、敵対的検証済。
 
-### §4.1 🎯 `brauer_suzuki` — 唯一の「既存未解決を proof submit」候補 (Q₈ 完成待ち)
+### §4.1 `brauer_suzuki` — (2026-07 時点) 唯一の「既存未解決を proof submit」候補
 
 - **issue [9318](../../issues/closed/9318-brauer-suzuki-theorem.md) は 2026-07-23 closed**
   (cyclic + |T|≥16 完成)。残 blocker は **issue
   [0147](../../issues/closed/0147-q8-modular-char-theory-frozen.md) (Q₈ case、2026-07-25 解凍・Navarro spine)** のみ。
 - **定理**: Brauer–Suzuki (1959)。Sylow-2 が cyclic/一般化四元数 ⟹ `G = O_{2'}(G)·C_G(u)`。
   CFSG 礎石補題。Gorenstein Ch.12 (例外指標論)。
-- **eval**: 既存**未解決** `brauer_suzuki` (solver 0、2026-07-24 実測) に一致 → 完成すれば
-  proposal でなく proof submit。⚠ eval statement は `n ≥ 3` 全体 = **Q₈ (n=3) を含む**ので、
-  Q₈ 完成が前提条件。詳細 = §2.5「Q₈ 完成待ち」。
+- **eval**: `brauer_suzuki` に一致 → 完成すれば proposal でなく proof submit。⚠ eval statement は
+  `n ≥ 3` 全体 = **Q₈ (n=3) を含む**ので、Q₈ 完成が前提条件。詳細 = §2.5。
+  ⚠ **「solver 0」は失効** — 2026-07-24 に他者が初解 (§2.5)。Q₈ 側 (issue 0147) は 2026-08-07 に
+  完成済。
 - **repo 現況**: cyclic 版 `brauerSuzuki_of_isCyclic_sylowTwo` + 四元数 |T|≥16 版
   `brauerSuzuki_of_quaternionSylow` + 組立 `RankOneHypothesis.brauerSuzuki`
   (RankOneAffineModel.lean:313) まで完成。唯一の実 sorry = `brauerSuzuki_quaternionSylow_q8`
@@ -316,18 +352,25 @@ statement 素案は §3 末尾 (各定理を素の scratch file で通した実�
 
 ---
 
-## §5. Tier C — lean-eval 未解決だが 3 冊経路の外 (自然には来ない)
+## §5. Tier C — (2026-07 時点) lean-eval 未解決だが 3 冊経路の外
 
 honest に記録 (安易に「近い」と誤認しない)。
 
+**⚠ 2026-08-23 実測で 3 件中 2 件が失効**: `glauberman_zStar` は **本リポジトリで完全に証明済**
+(`OddOrder/GroupTheory/GlaubermanZStar/Main.lean` の `glauberman_zStar` ほか 5 宣言、Navarro (7.9)
+経由、issue 0186、AxiomsCheck 登録済) で、eval 側でも 2026-07-27 に他者が解決。
+`brauer_splitting_field` も 2026-07-28 に他者が解決。残る真の未解決は `gorenstein_walter` のみ
+(v1 メンバー)。下表は 2026-07 時点の評価として残す。
+
 | problem | 定理 | 3 冊経路との距離 | 実現可能性 |
 |---|---|---|---|
-| `glauberman_zStar` | Glauberman Z*-定理 (孤立対合) | **very large**。p=2 の modular 表現論 (Brauer 指標・principal 2-block・Glauberman 対応) 必須で 3 冊は p-odd/char-0 ordinary のみ。repo に modular rep theory 皆無。同名 `GlaubermanZJ`/`Replacement` は**別定理** (p-odd) で転用不可 | **LOW** |
+| ~~`glauberman_zStar`~~ **失効** | Glauberman Z*-定理 (孤立対合) | 当時「very large、repo に modular rep theory 皆無」と評価したが、**2026-08-20 に Navarro Ch.1–7 経由で完全形式化済** (`GroupTheory/GlaubermanZStar/**`, issue 0186)。eval 側も 2026-07-27 に他者解決。同名 `GlaubermanZJ`/`Replacement` は**別定理** (p-odd) | **達成済** |
 | `gorenstein_walter` | 二面体 Sylow-2 単純群分類 (A₇ or PSL₂(q)) | **enormous**。Bender method + signalizer functor + Z* 必須 (Z* に strictly downstream)。repo は building block (PSL₂(q) 単純性・二面体 2-群基礎) のみ | **LOWEST** |
-| `brauer_splitting_field` | ℚ(ζₙ) は G の分裂体 (RepTheory) | **moderate**。値の半分 (指標値∈ℚ(ζₙ)) は `CyclotomicGaloisAction`/`GaloisCharacter` で既済 (姉妹 `brauer_character_in_cyclotomic` は 10 名 solved)。難しい半分 = Schur index=1 が Brauer 誘導定理 + Schur index 降下を要し、FT は Dade isometry/coherence で回避 → **経路上に来ない** | **MEDIUM** (3 問中最良だが off-path) |
+| `brauer_splitting_field` (他者解決済 2026-07-28) | ℚ(ζₙ) は G の分裂体 (RepTheory) | **moderate**。値の半分 (指標値∈ℚ(ζₙ)) は `CyclotomicGaloisAction`/`GaloisCharacter` で既済 (姉妹 `brauer_character_in_cyclotomic` は 14 名 solved)。難しい半分 = Schur index=1 が Brauer 誘導定理 + Schur index 降下を要し、FT は Dade isometry/coherence で回避 → **経路上に来ない** | **MEDIUM** (3 問中最良だが off-path) |
 
-`schreier_conjecture`/`five_transitive_card_classification` は CFSG 依存、
-`higman_infinite_simple`/`novikov_unsolvable` は組合せ群論で無関係 (着手しない)。
+`schreier_conjecture`/`five_transitive_card_classification` は CFSG 依存 (両者とも v1 メンバーで
+2026-08-23 現在も未解決)、`higman_infinite_simple`/`novikov_unsolvable` は組合せ群論で無関係
+(着手しない; 両者とも 2026-07 に他者解決済)。
 
 ---
 
@@ -363,11 +406,16 @@ generated/<id>/      comparator workspace (CI が自動生成)
   └ Submission.lean / Submission/*.lean                           ← solver 所有 (公開範囲)
 ```
 
-全 problem 数 ≈200。GroupTheory の **未解決** = `glauberman_zStar` / `brauer_suzuki` /
-`gorenstein_walter` / `schreier_conjecture` / `five_transitive_card_classification` /
-`higman_infinite_simple` / `novikov_unsolvable`。RepresentationTheory 未解決 = `brauer_splitting_field`。
+全 problem 数 = **301** (formalization 299 + software-verification 2、2026-08-23 実測。
+旧記載「≈200」は 2026-07 時点)。**GroupTheory の未解決は 3 件のみ**に減った (2026-08-23 実測):
+`gorenstein_walter` / `schreier_conjecture` / `five_transitive_card_classification`
+(3 件とも v1 メンバー)。2026-07 に他者が解いた分 = `novikov_unsolvable` (07-23 hanwenzhu) /
+`brauer_suzuki` (07-24 ivwumupy) / `higman_infinite_simple` (07-26 hanwenzhu) /
+`glauberman_zStar` (07-27 ivwumupy)、RepresentationTheory の `brauer_splitting_field` も
+07-28 (hanwenzhu) に解決済。
 GroupTheory の **solved** = baer_suzuki / feit_thompson / brauer_fowler / frobenius_kernel_isNormal /
-Burnside p^a q^b / commProb_closed / golod_shafarevich / boone_higman_{embedding,simple}。
+Burnside p^a q^b / commProb_closed / golod_shafarevich / boone_higman_{embedding,simple}
++ 上記 4 件。
 ⚠ 全リスト逐語取得は `api.github.com/repos/leanprover/lean-eval/contents/manifests/problems` を
 per_page 付き 2 ページで (1 回の要約 fetch は後半を捏造する事故あり)。
 
@@ -386,9 +434,83 @@ per_page 付き 2 ページで (1 回の要約 fetch は後半を捏造する事
 - キュレーション関心 (`PLAN.md`) = topic/difficulty 網羅性・飽和 easy 問題の retire/差し替え・
   手薄領域の穴埋め。明文の受理基準は無いが「mathlib 既存定義で述べられる」「現行モデルに難しい」が事実上の基準。
 
+### §7.3 公開面 leaderboard の刷新 (2026-08-20 凍結セット / 2026-08-22 site-data v2、2026-08-23 実測)
+
+<https://lean-lang.org/eval/> が全面刷新された。**この節が公開面の現況の正本**で、本 note の
+それ以前の記述 (per-account sticky・「未解決」ラベル・問題数 ≈200) を上書きする。
+旧版は <https://lean-lang.org/eval/legacy/> にアーカイブとして残っている (サーバ生成 1 枚 HTML、
+19 MB)。新版はクライアント側 JS テーブル + `site-data/v2/*.json`
+(`index.json` / `groups/<id>.json` / `problems/<id>.json` / `recent-solutions.{json,xml}`)。
+以下は **2026-08-23 に JSON を自分で取得して実測した数値** (`generated_at` = 2026-08-22T18:19:02Z、
+benchmark commit `b91d4757`)。
+
+**(1) 単一ランキング → 3 トラック + 補助タブ**
+
+| group | 問題数 | 受理解 | 既定 scope | policy |
+|---|---|---|---|---|
+| `formalization-evaluation` | 299 | 1175 | `v1` | private-source 可、公開猶予後に release |
+| `software-verification` | 2 | 0 | `active` | 最初の凍結セットまで暫定 |
+| `open-conjectures` | 0 | 0 | (なし) | **public-source のみ** |
+
+software-verification の 2 問 = `coc_strong_normalization` / `rcf_quantifier_elimination`。
+他に「Recent solutions」タブ (全 1195 件、**RSS** `site-data/v2/recent-solutions.xml`) と
+「Legacy leaderboard」リンク。
+
+**(2) 採点母集団 = 凍結セット「LeanEval v1」(128 問)**
+
+`manifests/sets/v1.toml`: `frozen = true` / `published_at = 2026-08-20` /
+`initial_member_count = 118`、+ 2026-08-21 付 `[[amendments]]` で 10 問追加 = **実効 128 問**。
+凍結後は削除・解凍・差替を CI が禁止し、追加は日付入り append-only の amendment レコードとして
+のみ許される (`manifests/sets/README.md`)。内訳 = `annals_*` (Imperial College London の
+Annals Challenge 由来) 49 問 + Fermat / Kepler / Poincaré / Green–Tao 等 79 問。
+**128 問中 35 問が既解** (うち 24 問は凍結前に解決済)、**93 問が未解決**。
+
+**(3) スコアが 1 本 → 3 本、帰属が account → model**
+
+- 旧: 全 main benchmark 問題に対する「N solved」の単一カウント。
+- 新: **canonical credit** ごとに `unique` / `first` / `total` の 3 値 (既定ソート = `unique`)。
+- canonical credit は **GitHub アカウントではなく「申告モデルラベルを正規化した識別子」**
+  (`model_aliases: []`、公開の `data_limitations` に「査読済み alias ポリシーは未公開」と明記)。
+- ⟹ §1.4 の `results/<login>.json` per-account sticky は**旧モデル**。既解問題への後追い提出は
+  `total` にしか効かない (`first`/`unique` は先着のみ)。
+
+**(4) lifecycle / replay / release の導入**
+
+問題ごとに `status_history` + `statement_revisions`、解ごとに `replay` / `release` の状態を持つ。
+新しい state リポ `leanprover/lean-eval-state` を参照するが、**2026-08-23 現在このリポは非公開**
+(GitHub API 404)。しかも `index.json` の `state.source_event_count = 1` で、公開の
+`data_limitations` どおり実データはほぼ旧 base-results store からの移植 = `replay` は軒並み
+`unavailable / not-materialized`。**器が先行し中身はこれから**の段階。
+
+**(5) ランキング実測 (legacy ↔ 新)**
+
+| | legacy (全問題) | 新 (v1 スコープ) |
+|---|---|---|
+| 掲載モデル数 | 57 | **11** |
+| 1 位 | Humanifa + GPT 5.6 sol — 195 solved | Humanifa + GPT 5.6 sol — unique 7 / first 19 / total 32 |
+| 以下 | Aristotle 162 / Seed Prover 156 / GPT-5.6 112 / Tau 104 / Stealth 104 … | Claude Fable 5・Codex (with human in the loop)・Fable 5 and GPT-5.6 が各 unique 1 |
+
+1175 件の受理解のうち **v1 に入るのは 61 件だけ**。legacy 側の統計は 57 models / 45 submitters /
+31 problem authors / 301 problems。
+
+**(6) 本リポジトリへの影響 (⛔ 提出はしないので、事実の記録のみ)**
+
+- `feit_thompson` / `baer_suzuki` / `brauer_suzuki` は **3 問とも v1 の外** (`sets: []`、
+  status `draft`) ⟹ `yawara` の 2 件の first-solve は**新しい既定ランキングに現れない**
+  (legacy では 34 位「Claude Opus 4.7 + GPT-5.5 (human-in-the-loop)」・46 位「Various models
+  ( with human in the loop )」で各 1 solved)。
+- クレジット自体は保持されている。`problems/feit_thompson/` の解一覧に `submitter: yawara` /
+  `first_solve: true` / `release: released` / 公開 URL `yawara/odd-order-submission@27813a1`
+  (`replay: unavailable`)。`baer_suzuki` も同様。
+- v1 に含まれる群論系はいずれも**未解決**: `bender_suzuki` / `gorenstein_walter` /
+  `ore_conjecture` / `schreier_conjecture` / `five_transitive_card_classification` /
+  `annals_mckay_conjecture`。
+- 提出フロー自体 (submissions リポに issue → comparator → `Submission.lean` オーバーレイ、
+  private repo は `lean-eval-bot` App) は**不変**。
+
 ---
 
-## §8. 次アクション (issue 0050 tracker が正)
+## §8. 次アクション — ⛔ **2026-08-20 裁定により全項目が凍結** (以下は履歴)
 
 1. ✅ **(2026-07-22 完了) AxiomsCheck 未登録の ready-now 10 件を登録** — ZJ / Replacement /
    Galois–Burnside / Jordan / PSL 単純性 / `isCritical_exists` / `transfer_transfer` /
@@ -401,7 +523,9 @@ per_page 付き 2 ページで (1 回の要約 fetch は後半を捏造する事
 5. Tier A proposal PR: Jordan / Chermak–Delgado / Furtwängler / Thompson-FPF + 🆕 B.H.Neumann 位数 3
    + 一般 Hall–Petresco (#16 差替)。proposal merge 後、solver は他者開放 (feit_thompson 前例)。
 6. ✅ **(2026-08-07 / 08-20)** issue 0147 Q₈ 完成 → `brauer_suzuki` の数学は完了 (issue 0184)。
-   残るは self-contained workspace 化のみ = **唯一の既存未解決 problem を落とせる状態**。
+   ⛔ **2026-08-20 裁定でここで打ち切り** — self-contained workspace 化は実施しない。
+   なお「唯一の既存未解決 problem」という当時の評価は 2026-07-24 の他者初解で既に失効していた
+   (§2.5 / §7.1)。
 7. ✅ **(2026-08-11 完了) stale docstring 掃除** — 「未形式化」「TODO」「gated」の陳腐化記述
    12 件と誤引用 1 件を修正 (commit `613559800`、詳細は issue 0050 の該当項目)。特に
    `brauer_permutation_lemma` の「[Isaacs] Thm 6.32」は本リポの `[Isaacs]` = *Finite Group
