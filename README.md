@@ -184,6 +184,32 @@ For the headline theorem, that check has also been performed externally: lean-ev
 accepted this proof against the benchmark's own, independently written statement of the theorem
 (see [Status](#status)).
 
+## Citation
+
+If this formalization is useful to you — the theorem, the surrounding library, or the resolution of
+Problem 1 of Appendix C — please cite the repository. There are no versioned releases (the `v4.x` tags
+mark Lean toolchain bumps, not project versions), so please also record the commit hash you used.
+A machine-readable [`CITATION.cff`](CITATION.cff) is included; GitHub's "Cite this repository" button
+is generated from it.
+
+```bibtex
+@software{ishida2026oddorder,
+  author       = {Ishida, Yawara},
+  title        = {{odd-order}: A formalization of the {Feit--Thompson Odd Order Theorem} in {Lean} 4},
+  year         = {2026},
+  url          = {https://github.com/yawara/odd-order},
+  organization = {A.I.System Research, Inc.},
+  license      = {Apache-2.0}
+}
+```
+
+For the resolution of Problem 1 of Appendix C in particular, the write-up to point at is
+[`notes/bg/appC_problem1_resolution.md`](notes/bg/appC_problem1_resolution.md), and the theorem is
+`hypothesisB_false` in
+[`OddOrder/BG/AppC_Problem1SkewEndgame.lean`](OddOrder/BG/AppC_Problem1SkewEndgame.lean). The author
+of record is the human maintainer, Yawara ISHIDA (A.I.System Research, Inc.); the AI agents that
+wrote most of the code (see [Use of AI](#use-of-ai)) are tools, not authors.
+
 ## License
 
 Apache License 2.0 — see [LICENSE](LICENSE).

@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: >-
+  If you use this formalization, please cite it as below and record the commit
+  hash you used: the repository has no versioned releases (the v4.x tags mark
+  Lean toolchain bumps, not project versions).
+type: software
+title: "odd-order: A formalization of the Feit–Thompson Odd Order Theorem in Lean 4"
+authors:
+  - family-names: Ishida
+    given-names: Yawara
+    affiliation: "A.I.System Research, Inc."
+repository-code: "https://github.com/yawara/odd-order"
+url: "https://github.com/yawara/odd-order"
+license: Apache-2.0
+abstract: >-
+  A complete, axiom-clean formalization of the Feit–Thompson Odd Order Theorem
+  (every finite group of odd order is solvable) in Lean 4 + mathlib, together
+  with the finite group theory it is built on: Isaacs' Finite Group Theory,
+  Bender–Glauberman's Local Analysis for the Odd Order Theorem, and Peterfalvi's
+  Character Theory for the Odd Order Theorem, formalized result by result, plus
+  Higman's classification of Suzuki 2-groups and the block theory of Navarro's
+  Characters and Blocks of Finite Groups (Ch. 1–7). Also contains the resolution
+  of Problem 1 of Bender–Glauberman's Appendix C.
+keywords:
+  - Lean 4
+  - mathlib
+  - formalization
+  - Feit–Thompson theorem
+  - odd order theorem
+  - finite group theory
+  - character theory
