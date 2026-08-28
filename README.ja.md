@@ -68,9 +68,9 @@ Feit–Thompson の証明には、mathlib がまだ持っていない大量の�
   こうした参照が Isaacs や mathlib で既にカバーされていない場合、Gorenstein の証明を
   ここに書き起こしてある (Theorems 3.4, 3.7/3.8/3.10, 4.15, 5.3.9–5.3.13, 7.6.5、
   `|S| ≥ 16` の場合の Brauer–Suzuki など。`OddOrder/BG/` と `OddOrder/GroupTheory/` 配下)。
-  Gorenstein を書物として形式化することは*しない*。
+  Gorenstein を書籍として形式化することは*しない*。
 
-さらに 3 つの証明はこれらの書物の外から来ている: 書物は結果を述べるだけで証明は原典から
+さらに 3 つの証明はこれらの書籍の外から来ている: 書籍は結果を述べるだけで証明は原典から
 取っているため、その原典自体をここで形式化した。
 
 - **Higman**, "Suzuki 2-groups" (*Illinois Journal of Mathematics* 7, 1963)。Peterfalvi の
