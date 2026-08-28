@@ -178,29 +178,20 @@ Lean の宣言がそれが参照する教科書の定理を忠実に写してい
 
 ## 引用
 
-この形式化 — 定理そのもの、周辺の群論ライブラリ、Appendix C の Problem 1 の解決のいずれでも — を
-利用する場合は、このリポジトリを引用してください。バージョン付きリリースは無い (`v4.x` タグは Lean
-toolchain の更新を示すもので、プロジェクトのバージョンではない) ので、使用した commit hash も併記して
-ください。機械可読な [`CITATION.cff`](CITATION.cff) を同梱しており、GitHub の「Cite this repository」
-ボタンはこれから生成される。
+このプロジェクトを利用する場合は、このリポジトリを引用してください。バージョン付きリリースは無い
+(`v4.x` タグは Lean toolchain に追従するもの) ので、使用した commit hash を併記してください。
+[`CITATION.cff`](CITATION.cff) も同梱している。
 
 ```bibtex
 @software{ishida2026oddorder,
   author       = {Ishida, Yawara},
-  title        = {{odd-order}: A formalization of the {Feit--Thompson Odd Order Theorem} in {Lean} 4},
+  title        = {{odd-order}: The {Feit--Thompson} Odd Order Theorem in {Lean} 4},
   year         = {2026},
   url          = {https://github.com/yawara/odd-order},
   organization = {A.I.System Research, Inc.},
   license      = {Apache-2.0}
 }
 ```
-
-特に Appendix C の Problem 1 の解決については、参照先となる write-up は
-[`notes/bg/appC_problem1_resolution.md`](notes/bg/appC_problem1_resolution.md)、定理は
-[`OddOrder/BG/AppC_Problem1SkewEndgame.lean`](OddOrder/BG/AppC_Problem1SkewEndgame.lean) の
-`hypothesisB_false` である。著者は人間のメンテナ Yawara ISHIDA (A.I.System Research, Inc.) で
-ある — コードの大半を書いた AI エージェント (上記「[AI の利用について](#ai-の利用について)」参照)
-はツールであって著者ではない。
 
 ## ライセンス
 

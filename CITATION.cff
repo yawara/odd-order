@@ -1,13 +1,13 @@
 cff-version: 1.2.0
 message: >-
-  If you use this formalization, please cite it as below and record the commit
-  hash you used: the repository has no versioned releases (the v4.x tags mark
-  Lean toolchain bumps, not project versions).
+  If you use this project, please cite it as below and include the commit hash
+  you used (there are no versioned releases; the v4.x tags follow the Lean toolchain).
 type: software
-title: "odd-order: A formalization of the Feit–Thompson Odd Order Theorem in Lean 4"
+title: "odd-order: The Feit–Thompson Odd Order Theorem in Lean 4"
 authors:
   - family-names: Ishida
     given-names: Yawara
+    email: yawara@aisr.dev
     affiliation: "A.I.System Research, Inc."
 repository-code: "https://github.com/yawara/odd-order"
 url: "https://github.com/yawara/odd-order"
