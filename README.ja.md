@@ -48,7 +48,9 @@ theorem feitThompson {G : Type*} [Group G] [Finite G] (hodd : Odd (Nat.card G)) 
 
 > ★ **1993 年から活字の上で未解決だった問題が、この過程で解決された** (2026-08-13):
 > Bender–Glauberman の Appendix C の Problem 1 の答えは否 — ここで発見され、同日中に Lean で
-> 機械検証された。下記「[未解決問題の解決](#未解決問題の解決-appendix-c-の-problem-1)」を参照。
+> 機械検証された。この結果には独立したリポジトリ
+> [yawara/peterfalvi-problem](https://github.com/yawara/peterfalvi-problem) がある。下記
+> 「[未解決問題の解決](#未解決問題の解決-appendix-c-の-problem-1)」を参照。
 
 ## Feit–Thompson の定理のその先へ: 有限群論ライブラリ
 
@@ -113,33 +115,18 @@ mathlib 標準の linter セットの下で非 `sorry` 警告ゼロでビルド�
 Bender–Glauberman の Appendix C (p. 152) の Problem 1 は Péterfalvi が提起した問いで、
 Glauberman–Norton, "On a combinatorial problem associated with the odd order theorem"
 (*Proc. Amer. Math. Soc.* **119** (1993), 1089–1094) の p. 1094 に初めて活字として現れた:
+Proposition 9 の仮定は `p = 3` で満たせるか? 答えは**否**である — すべての `q` について、しかも
+群の有限性を一切仮定せずに。2026-08-13 にここで発見され、同日中に
+[`OddOrder/BG/AppC_Problem1SkewEndgame.lean`](OddOrder/BG/AppC_Problem1SkewEndgame.lean) の
+`hypothesisB_false` として機械検証された。
 
-> Proposition 9 の仮定は `p = 3` で満たせるか?
-
-問われている仮定 — 条件 (B) — が求めるのは、群 `G`、Frobenius 群 `H = P ⋊ U` (`𝔽_{p^q}` の
-加法群にノルム 1 の元の群が作用したもの) から `G` への単射準同型 `σ`、有限可換 `p′`-部分群
-`Q ≤ G`、そして `σ(P₀)` が `Q` を正規化し `σ(P₀)^y` が `σ(U)` を正規化するような元 `y ∈ Q`
-である (`P₀` は `P` の素体直線)。`p = 2` ではこの配置は `SL(2, 2^q)` と Suzuki 群 `Sz(2^q)`
-の中に実現する (論文の Examples 10, 11)。`p ≥ 5` は論文の Proposition 7 が排除する
-(この命題もここで形式化してある)。残る `p = 3` は 1993 年以来未解決で、解決を主張する公刊物は
-無かった。
-
-答えは**否**である — すべての `q` について、しかも `G` の有限性を一切仮定せずに:
-
-```lean
-theorem hypothesisB_false (data : FieldNormalizerData p q G) (hp : p = 3) : False
-```
-
-ここで `FieldNormalizerData p q G` は問題の 2 条件 (A)・(B) をそのまま束ねたものである —
-有限性を仮定するのは `Q` だけで、`G` には仮定しない。証明は 2026-08-13 に紙上で完成し、同日中に
-Lean での機械検証まで終えた。定理は axiom-clean (`propext`, `Classical.choice`, `Quot.sound`
-のみ) で、[`AxiomsCheck.lean`](OddOrder/AxiomsCheck.lean) がビルド時に強制する。最終定理は
-[`OddOrder/BG/AppC_Problem1SkewEndgame.lean`](OddOrder/BG/AppC_Problem1SkewEndgame.lean) にあり、
-この解決のために書かれたコードは 14 ファイル・約 8,700 行にのぼる。数学的な正本 — 主定理・
-完全証明・紙と Lean の対応表 — は
-[`notes/bg/appC_problem1_resolution.md`](notes/bg/appC_problem1_resolution.md)、経緯・方法論・
-検証態勢の俯瞰は
-[`notes/bg/appC_problem1_summary.md`](notes/bg/appC_problem1_summary.md)。
+**この結果には独立したリポジトリがある:
+[yawara/peterfalvi-problem](https://github.com/yawara/peterfalvi-problem)。** Proposition 9 に
+沿った短い主張モジュール、本リポジトリから取り出して簡約した証明、両者の英語による説明を含む。
+結果についてはそちらを参照してほしい。ここの notes は経緯の記録として残す:
+[`notes/bg/appC_problem1_resolution.md`](notes/bg/appC_problem1_resolution.md) は最初に書かれた
+証明、[`notes/bg/appC_problem1_summary.md`](notes/bg/appC_problem1_summary.md) は発見と検証の
+経緯である。
 
 ## ビルド
 

@@ -49,8 +49,9 @@ the path through them that the Odd Order Theorem needs.
 
 > ★ **A question left open in print since 1993 was settled along the way** (2026-08-13): Problem 1
 > of Bender–Glauberman's Appendix C has a negative answer, found here and machine-checked in Lean
-> the same day. See "[An open problem resolved](#an-open-problem-resolved-problem-1-of-appendix-c)"
-> below.
+> the same day. The result now has its own repository,
+> [yawara/peterfalvi-problem](https://github.com/yawara/peterfalvi-problem). See
+> "[An open problem resolved](#an-open-problem-resolved-problem-1-of-appendix-c)" below.
 
 ## Beyond the Feit–Thompson theorem: a finite group theory library
 
@@ -118,34 +119,20 @@ set, enforced as a strict gate in CI.
 This is the one place where the project produced new mathematics rather than formalizing existing
 mathematics. Problem 1 of Bender–Glauberman's Appendix C (p. 152) was posed by Péterfalvi and first
 appeared in print in Glauberman–Norton, "On a combinatorial problem associated with the odd order
-theorem" (*Proc. Amer. Math. Soc.* **119** (1993), 1089–1094, p. 1094):
+theorem" (*Proc. Amer. Math. Soc.* **119** (1993), 1089–1094, p. 1094): can the hypothesis of
+their Proposition 9 be satisfied for `p = 3`? The answer is **no**, for every `q` and with no
+finiteness assumption on the group. It was found and machine-checked here on 2026-08-13, as
+`hypothesisB_false` in
+[`OddOrder/BG/AppC_Problem1SkewEndgame.lean`](OddOrder/BG/AppC_Problem1SkewEndgame.lean).
 
-> Can the hypothesis of Proposition 9 be satisfied for `p = 3`?
-
-The hypothesis in question — condition (B) — asks for a group `G`, an injective homomorphism `σ`
-into `G` from the Frobenius group `H = P ⋊ U` (the additive group of `𝔽_{p^q}` acted on by its
-norm-one units), a finite abelian `p′`-subgroup `Q ≤ G`, and an element `y ∈ Q` such that `σ(P₀)`
-normalizes `Q` and `σ(P₀)^y` normalizes `σ(U)` — `P₀` being the prime-field line of `P`. For
-`p = 2` the configuration is realized in `SL(2, 2^q)` and in the Suzuki groups `Sz(2^q)` (the
-paper's Examples 10 and 11); for `p ≥ 5` the paper's Proposition 7 rules it out (that proposition,
-too, is formalized here). The case `p = 3` had been open since 1993, with no published resolution.
-
-The answer is **no** — for every `q`, and with no finiteness assumption on `G`:
-
-```lean
-theorem hypothesisB_false (data : FieldNormalizerData p q G) (hp : p = 3) : False
-```
-
-where `FieldNormalizerData p q G` packages exactly the problem's two conditions (A) and (B) — only
-`Q` is assumed finite, not `G`. The proof was completed on paper on 2026-08-13 and machine-checked
-in Lean the same day; the theorem is axiom-clean (`propext`, `Classical.choice`, `Quot.sound` only),
-enforced at build time by [`AxiomsCheck.lean`](OddOrder/AxiomsCheck.lean). The final theorem is in
-[`OddOrder/BG/AppC_Problem1SkewEndgame.lean`](OddOrder/BG/AppC_Problem1SkewEndgame.lean), at the top
-of about 8,700 lines across 14 files written for the resolution. The mathematical write-up — the
-theorem, the complete proof, and the paper-to-Lean correspondence — is
-[`notes/bg/appC_problem1_resolution.md`](notes/bg/appC_problem1_resolution.md), with an overview of
-the history, methodology, and verification in
-[`notes/bg/appC_problem1_summary.md`](notes/bg/appC_problem1_summary.md).
+**The result now has its own repository:
+[yawara/peterfalvi-problem](https://github.com/yawara/peterfalvi-problem).** It contains a short
+statement module that follows Proposition 9, the proof extracted from this repository and
+simplified, and an account of both in English. Please refer to it for the result. The notes here
+keep the history: [`notes/bg/appC_problem1_resolution.md`](notes/bg/appC_problem1_resolution.md)
+is the proof as first written (in Japanese), and
+[`notes/bg/appC_problem1_summary.md`](notes/bg/appC_problem1_summary.md) records how it was found
+and checked.
 
 ## Building
 
