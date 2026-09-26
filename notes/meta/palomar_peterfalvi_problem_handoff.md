@@ -16,11 +16,22 @@ BG App.C Problem 1 (= Glauberman–Norton 1993 の "Problem (Péterfalvi)") の�
   「q が奇数」(`q_odd`) だけになった。BG Lemma C.3 の生成元・関係式の機構と「P char PU」は不要に
   なり消した。`Tests/` と `scripts/check.py` は t3 の型を non-module 用に直したもの。
 - **J** = odd-order `5e6fabda4` (README 英日の Problem 1 節と ★ 囲みを新リポへの案内に縮めた)。
-- **残り = I の後半**: CI run `36254471548` (check + comparator) と preflight run `36254706697`
-  (`mode: full`) の結果を確認 → preflight が `status: pass` なら、ユーザーに repo・commit (40 桁)・
-  `comparator.json`・relationship `maintainer` を見せて**明示の同意**を取る → llms.txt の gh 経路
-  5 手順 (submit → tag → secret gist → verify → tag と gist の削除) を 1 回で → 監視 →
-  review をユーザーに見せる → `POST /register` は**ユーザーの判断**でのみ。
+- **I も完了 (2026-09-27 01:25–02:02 JST)**。CI run `36254471548` (check + comparator、3 kernel 受理) と
+  preflight run `36254706697` (`status: pass`、errors/warnings 空) を確認 → ユーザーが提出内容
+  (repo・commit・`comparator.json`・relationship `maintainer`) に明示同意 → gh 経路 5 手順で提出。
+  **submission id = `ycfw25g98032`**。公式検証 run `36255377900` 成功 → 自動査読 (`codex:gpt-6-sol`)
+  = **blocking なし・警告なし・コメントなし** (review digest `aafeb84c…`) → ユーザーが登録を決定 →
+  `POST /register` 受理 (17:02:21 UTC)。
+- **登録待ち**: 17:30 UTC 時点で Palomar 側の処理列に残っている (最後の登録は 13:32 UTC。別提出の
+  登録レンダリングが 10–15 分おきに再試行されている)。こちらでやることは無い。登録されると
+  `https://data.palomar-registry.org/repositories/yawara/peterfalvi-problem.json` が 200 になる。
+- access token は提出セッションの scratchpad にだけある。失ったら**ユーザーが**
+  https://submit.palomar-registry.org/submissions (Find my submissions) から取り直す
+  (エージェントがブラウザ復旧をしてはいけない)。状態確認は `GET /api/submission`
+  (`review-ready` 中は 5 分に 1 回まで)。
+- API の罠: Python urllib の User-Agent は Cloudflare に弾かれる (error 1010、何も消費されない)。
+  curl なら通る。ブラウザの UA は偽装しない。
+- 登録後の候補: 新リポ README (英日) に Palomar ID を載せる (ユーザー確認のうえ)。
 
 ## 1. ユーザー裁定・前提
 
