@@ -4,6 +4,24 @@ BG App.C Problem 1 (= Glauberman–Norton 1993 の "Problem (Péterfalvi)") の�
 (`hypothesisB_false`) を別リポジトリに切り出し、Palomar (palomar-registry.org) に登録する作業の
 引き継ぎ。前セッションは usage limit 直前で中断した。
 
+## 0. 進捗 (2026-09-27 更新 — 後続セッションはここから読む)
+
+- **A–H と J は完了**。新リポ main = `698b7ae` (8 commit) を push 済。ローカルの
+  `python3 scripts/check.py` は全段通過 (metadata・Challenge 本文・build 警告ゼロ・Challenge は
+  `sorry` 2 件のみ・`mk_all --check`・`lake lint`・`Tests/TextLint.lean`・`Tests/Axioms.lean`
+  = 538 宣言が標準 3 axiom のみ)。ライブラリは 19 file・約 5,800 行 (抽出時 7,023 行)。
+- 主定理 = `PeterfalviProblem/Main.lean` の `not_hypothesisB_three` (p = 3 の否定解) と
+  `hypothesisB_two` (GN Example 10、SL(2, 2^q))。`comparator.json` はこの 2 つを選ぶ。
+- 計画からの変更点: 条件 (A) は Witness に `q_not_dvd : ¬ q ∣ p - 1` として持たせ、使うのは
+  「q が奇数」(`q_odd`) だけになった。BG Lemma C.3 の生成元・関係式の機構と「P char PU」は不要に
+  なり消した。`Tests/` と `scripts/check.py` は t3 の型を non-module 用に直したもの。
+- **J** = odd-order `5e6fabda4` (README 英日の Problem 1 節と ★ 囲みを新リポへの案内に縮めた)。
+- **残り = I の後半**: CI run `36254471548` (check + comparator) と preflight run `36254706697`
+  (`mode: full`) の結果を確認 → preflight が `status: pass` なら、ユーザーに repo・commit (40 桁)・
+  `comparator.json`・relationship `maintainer` を見せて**明示の同意**を取る → llms.txt の gh 経路
+  5 手順 (submit → tag → secret gist → verify → tag と gist の削除) を 1 回で → 監視 →
+  review をユーザーに見せる → `POST /register` は**ユーザーの判断**でのみ。
+
 ## 1. ユーザー裁定・前提
 
 - リポジトリ = **`yawara/peterfalvi-problem`** (public、ユーザーが 2026-09-26 に作成)。
