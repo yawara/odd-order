@@ -276,10 +276,12 @@ universe を跨いで量化する羽目になる。代数閉に限れば mathlib
 * ⚠ `set Q := ...` した部分群は**商型 `↥P ⧸ Q.subgroupOf P` の型に現れる**ので
   `rw [hQ]` が motive not type correct で落ちる。membership 補題
   (`hQmem`/`hQcomm`) を先に立てて `Q` を書き換えないで済ませる。
-* ⚠ `k[G]` は `Finsupp` の型シノニムなので `Finsupp.sub_apply` / `finsetSum_apply` の
+* ⚠ (当時の mathlib) `k[G]` は `Finsupp` の型シノニムなので `Finsupp.sub_apply` / `finsetSum_apply` の
   `rw` が型不一致で落ちることがある。`have ... := rfl` / 明示型の `have` で回避。
+  — v4.32.2 以降の `k[G]` は structure (係数は `.coeff`)、[`mathlib_v4322_migration.md`](mathlib_v4322_migration.md)。
 * ⚠ `if` の `Decidable` インスタンスが `Fintype.decidableExistsFintype` と
-  `Classical.propDecidable` で食い違うので、`if_pos`/`if_neg` 済みの 2 本に分けて渡す。
+  `Classical.propDecidable` で食い違うので、`if_pos`/`if_neg` 済みの 2 本に分けて渡す
+  (v4.34 以降の名前は `ite_eq_left`/`ite_eq_right`、[`mathlib_v434_migration.md`](mathlib_v434_migration.md))。
 
 段 89 追加 (`Algebra/BrauerDefect.lean`): 🎯 **`brauerProj_eq_zero_of_forall_not_le`**
 (`b ∈ A^G_D` で `P` がどの `ᵍD` にも入らないなら `Br_P b = 0`) と対偶
