@@ -22,13 +22,15 @@ BG App.C Problem 1 (= Glauberman–Norton 1993 の "Problem (Péterfalvi)") の�
   **submission id = `ycfw25g98032`**。公式検証 run `36255377900` 成功 → 自動査読 (`codex:gpt-6-sol`)
   = **blocking なし・警告なし・コメントなし** (review digest `aafeb84c…`) → ユーザーが登録を決定 →
   `POST /register` 受理 (17:02:21 UTC)。
-- **登録待ち**: 17:30 UTC 時点で Palomar 側の処理列に残っている (最後の登録は 13:32 UTC。別提出の
-  登録レンダリングが 10–15 分おきに再試行されている)。こちらでやることは無い。登録されると
-  `https://data.palomar-registry.org/repositories/yawara/peterfalvi-problem.json` が 200 になる。
-- access token は提出セッションの scratchpad にだけある。失ったら**ユーザーが**
+- **登録完了 = `PALOMAR-2026-09-27-000006` version 1** (2026-09-27 02:24:07 UTC、
+  https://palomar-registry.org/entry.html?id=PALOMAR-2026-09-27-000006&version=1)。
+  Palomar 側の登録工程が 26 日 13:32 UTC から約 11 時間止まっていたため、同意 (17:02) から
+  9 時間余り待った。保存用 fork = `PalomarArchive/yawara--peterfalvi-problem--a99f0c3a84ab`、
+  不変タグ `palomar/PALOMAR-2026-09-27-000006-v1/698b7ae…`。新しい版を出すときは
+  `existing_id: PALOMAR-2026-09-27-000006` を付ける (同じ repo・同じ `comparator.json` パス)。
+- access token は登録完了後に破棄した。再び必要なら**ユーザーが**
   https://submit.palomar-registry.org/submissions (Find my submissions) から取り直す
-  (エージェントがブラウザ復旧をしてはいけない)。状態確認は `GET /api/submission`
-  (`review-ready` 中は 5 分に 1 回まで)。
+  (エージェントがブラウザ復旧をしてはいけない)。状態確認の頻度は `review-ready` 中 5 分に 1 回まで。
 - API の罠: Python urllib の User-Agent は Cloudflare に弾かれる (error 1010、何も消費されない)。
   curl なら通る。ブラウザの UA は偽装しない。
 - 登録後の候補: 新リポ README (英日) に Palomar ID を載せる (ユーザー確認のうえ)。
