@@ -882,7 +882,7 @@ theorem nu_zeta_inner_nu_conj_eq_zero (hodd : Odd (Nat.card G))
     exact data.zeta_ne_conj_at hG hi hodd
   have h := irreducibleCharacter_inner_eq_ite
     (⟨_, hirr_i⟩ : IrreducibleCharacter ↥L) ⟨_, hirr_i'⟩
-  rwa [if_neg (fun heq => hne (congrArg Subtype.val heq))] at h
+  rwa [ite_eq_right (fun heq => hne (congrArg Subtype.val heq))] at h
 
 /-- **Existence of the bundle for any type-I maximal subgroup** (Peterfalvi (12.1) +
 (12.6) + (12.7)): the Dade setup from `exists_typeI_hypothesis`, the Frobenius witness

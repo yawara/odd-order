@@ -1154,7 +1154,7 @@ theorem Hypothesis.columnSum_inner_columnSum_eq_zero [Finite G]
   classical
   rw [OddOrder.Peterfalvi.S06.columnSum_def, OddOrder.Peterfalvi.S06.columnSum_def,
     OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner]
-  exact if_neg hne
+  exact ite_eq_right hne
 
 open scoped FiniteInduce in
 /-- **A nontrivial μ-grid column sum is an induced-family member** (`hdk1`-free form via the

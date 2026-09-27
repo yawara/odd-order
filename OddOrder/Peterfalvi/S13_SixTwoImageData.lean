@@ -247,7 +247,7 @@ theorem memberRFamily_of_irr (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypo
       (⊥ : Subgroup ↥M))
     (hirr : IsIrreducibleCharacter χ) :
     hyp.memberRFamily hG hmu hδpm hδj hzS hz1 hzconj hχ = hyp.irrRFamily hG hχ hirr :=
-  dif_pos hirr
+  dite_eq_left hirr
 
 open scoped Classical in
 theorem memberRFamily_of_red (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
@@ -263,7 +263,7 @@ theorem memberRFamily_of_red (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypo
     (hred : ¬ IsIrreducibleCharacter χ) :
     hyp.memberRFamily hG hmu hδpm hδj hzS hz1 hzconj hχ
       = hyp.colRFamily hG hmu hδpm hδj hzS hz1 hzconj hχ hred :=
-  dif_neg hred
+  dite_eq_right hred
 
 open scoped Classical in
 /-- The reducible branch's `imageSet` is the signed σ-grid column pair. -/
@@ -373,7 +373,7 @@ theorem memberRFamily_orthogonal (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : 
       ClassFunction.inner (hyp.alignedOmegaSigmaGrid hG hG.odd i κ)
         (hyp.alignedOmegaSigmaGrid hG hG.odd i' κ') = 0 := by
     intro i i' κ κ' hκ
-    rw [hyp.alignedOmegaSigmaGrid_inner hG hG.odd i i' κ κ', if_neg (fun hh => hκ hh.2)]
+    rw [hyp.alignedOmegaSigmaGrid_inner hG hG.odd i i' κ κ', ite_eq_right (fun hh => hκ hh.2)]
   by_cases hφirr : IsIrreducibleCharacter φ
   · rw [hyp.memberRFamily_of_irr hG hmu hδpm hδj hzS hz1 hzconj hφ hφirr]
     by_cases hχirr : IsIrreducibleCharacter χ

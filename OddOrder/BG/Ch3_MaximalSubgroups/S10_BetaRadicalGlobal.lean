@@ -371,7 +371,7 @@ theorem isPGroup_le_centralizer_of_isNilpotent {W : Type*} [Group W] [Finite W]
   obtain ⟨Q, hXQ⟩ := hX.exists_le_sylow
   obtain ⟨PW, hPPW⟩ := hP.exists_le_sylow
   have hAllNormal : ∀ (r : ℕ), Fact r.Prime → ∀ (R : Sylow r W), (↑R : Subgroup W).Normal :=
-    ((Group.isNilpotent_of_finite_tfae (G := W)).out 0 3).mp hW
+    ((Group.isNilpotent_of_finite_tfae (G := W)).out 1 4).mp hW
   have hQnorm : (Q : Subgroup W).Normal := hAllNormal q ‹Fact q.Prime› Q
   have hPWnorm : (PW : Subgroup W).Normal := hAllNormal p ‹Fact p.Prime› PW
   have hdis : Disjoint (Q : Subgroup W) (PW : Subgroup W) :=
@@ -411,7 +411,7 @@ theorem isNilpotent_of_normalSylowQ_of_nilpotent_qQuotient {W : Type*} [Group W]
   -- A normal Sylow `p`-subgroup of `W`, built from `N`.
   obtain ⟨PN⟩ := (inferInstance : Nonempty (Sylow p ↥N))
   have hAllNormalN : ∀ (r : ℕ), Fact r.Prime → ∀ (R : Sylow r ↥N), (↑R : Subgroup ↥N).Normal :=
-    ((Group.isNilpotent_of_finite_tfae (G := ↥N)).out 0 3).mp hNnil
+    ((Group.isNilpotent_of_finite_tfae (G := ↥N)).out 1 4).mp hNnil
   have hPNnorm : (PN : Subgroup ↥N).Normal := hAllNormalN p ‹Fact p.Prime› PN
   have hPNchar : (PN : Subgroup ↥N).Characteristic := Sylow.characteristic_of_normal PN hPNnorm
   have hPpcard : Nat.card ↥((PN : Subgroup ↥N).map N.subtype) =
@@ -439,7 +439,7 @@ theorem isNilpotent_of_normalSylowQ_of_nilpotent_qQuotient {W : Type*} [Group W]
       have hPcard : Nat.card ↥(P : Subgroup W) = 1 := by
         rw [Sylow.card_eq_multiplicity P, Nat.factorization_eq_zero_of_not_dvd hr_ndvd, pow_zero]
       rw [Subgroup.card_eq_one.mp hPcard]; infer_instance
-  exact ((Group.isNilpotent_of_finite_tfae (G := W)).out 3 0).mp hAllNormalW
+  exact ((Group.isNilpotent_of_finite_tfae (G := W)).out 4 1).mp hAllNormalW
 
 /-- **Corollary 10.9 核 (W ∩ M' is nilpotent)** (mmd L2860, forward-conditional via Theorem 10.6):
 `M' = derivedInG M` の任意の `β(M)'`-部分群 `V` は nilpotent。

@@ -254,7 +254,7 @@ theorem sum_centralCharacter_mul_character_inv_mul_character_one (ρ : Represent
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   have hNℂ : (Nat.card G : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
   have horth := Representation.char_orthonormal ρ ρ
-  rw [if_pos ⟨Representation.Equiv.refl ρ⟩] at horth
+  rw [ite_eq_left ⟨Representation.Equiv.refl ρ⟩] at horth
   -- Clear the `(Nat.card G)⁻¹` factor: `∑_g χ(g) χ(g⁻¹) = |G|`.
   have hsumG : ∑ g : G, ρ.character g * ρ.character g⁻¹ = (Nat.card G : ℂ) := by
     field_simp at horth

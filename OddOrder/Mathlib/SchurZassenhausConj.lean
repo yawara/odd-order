@@ -994,7 +994,7 @@ private theorem step_caseB
       rw [Nat.factorization_mul h_N_card_ne_zero h_M_bar_card_ne_zero]
       rw [Finsupp.add_apply]
       rw [Nat.factorization_eq_zero_of_not_dvd hp_not_dvd_N, zero_add]
-      rw [hk_eq, hp_prime.factorization_pow, Finsupp.single_apply, if_pos rfl]
+      rw [hk_eq, hp_prime.factorization_pow, Finsupp.single_apply, ite_eq_left rfl]
     -- Step 7: Construct Sylow P_H : Sylow p ↥M.
     have h_MH_subgroupOf_card_eq :
         Nat.card ((M ⊓ H : Subgroup G).subgroupOf M) = Nat.card ↥(M ⊓ H : Subgroup G) :=

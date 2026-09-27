@@ -164,7 +164,7 @@ theorem card_modEq_one [Fintype A] [Fintype N] (h : IsFrobeniusAction A N) :
       ext n; simp
     calc Fintype.card (MulAction.fixedBy N (1 : A))
         = Fintype.card ((Set.univ : Set N) : Type _) :=
-          Fintype.card_congr (Equiv.setCongr h_eq)
+          Fintype.card_congr (Set.equivOfEq h_eq)
       _ = Fintype.card N := Fintype.card_congr (Equiv.Set.univ N)
   have h_other : ∀ a ∈ Finset.univ.erase (1 : A),
       Fintype.card (MulAction.fixedBy N a) = 1 := by
@@ -173,7 +173,7 @@ theorem card_modEq_one [Fintype A] [Fintype N] (h : IsFrobeniusAction A N) :
     have h_eq := fixedBy_eq_singleton_one h ha_ne
     calc Fintype.card (MulAction.fixedBy N a)
         = Fintype.card (({1} : Set N) : Type _) :=
-          Fintype.card_congr (Equiv.setCongr h_eq)
+          Fintype.card_congr (Set.equivOfEq h_eq)
       _ = 1 := by simp
   have hLHS : ∑ a : A, Fintype.card (MulAction.fixedBy N a)
             = Fintype.card N + (Fintype.card A - 1) := by

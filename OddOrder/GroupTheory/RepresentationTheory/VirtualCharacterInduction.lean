@@ -55,10 +55,10 @@ noncomputable def extendByZero (H : Subgroup G) (ψ : ↥H → K) : G → K := f
   if hg : g ∈ H then ψ ⟨g, hg⟩ else 0
 
 theorem extendByZero_of_mem (ψ : ↥H → K) {g : G} (hg : g ∈ H) :
-    extendByZero H ψ g = ψ ⟨g, hg⟩ := dif_pos hg
+    extendByZero H ψ g = ψ ⟨g, hg⟩ := dite_eq_left hg
 
 theorem extendByZero_of_not_mem (ψ : ↥H → K) {g : G} (hg : g ∉ H) :
-    extendByZero H ψ g = 0 := dif_neg hg
+    extendByZero H ψ g = 0 := dite_eq_right hg
 
 theorem extendByZero_add (ψ₁ ψ₂ : ↥H → K) :
     extendByZero H (ψ₁ + ψ₂) = extendByZero H ψ₁ + extendByZero H ψ₂ := by

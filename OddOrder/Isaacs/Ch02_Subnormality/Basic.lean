@@ -83,7 +83,7 @@ def IsMinimalNormal (M : Subgroup G) : Prop :=
 ならば `H < K` で `H ⊴ K` となる `K` が存在する。すると `K ≤ N_G(H)` で `H < N_G(H)`。 -/
 theorem isNilpotent_of_all_isSubnormal [Finite G]
     (h : ∀ H : Subgroup G, H.IsSubnormal) : Group.IsNilpotent G := by
-  refine ((Group.isNilpotent_of_finite_tfae (G := G)).out 1 0).mp ?_
+  refine ((Group.isNilpotent_of_finite_tfae (G := G)).out 2 1).mp ?_
   intro H hHlt
   rcases Subgroup.IsSubnormal.iff_eq_top_or_exists.mp (h H) with hHtop | ⟨K, hHK, _, hKnorm⟩
   · exact absurd hHtop hHlt.ne
@@ -110,7 +110,7 @@ theorem isSubnormal_of_isNilpotent_finite [Finite G] [Group.IsNilpotent G]
     · rw [hHt]; exact Subgroup.IsSubnormal.top
     · -- H < ⊤ via hHt; NormalizerCondition gives H < N_G(H).
       have hNC : NormalizerCondition G :=
-        ((Group.isNilpotent_of_finite_tfae (G := G)).out 0 1).mp ‹_›
+        ((Group.isNilpotent_of_finite_tfae (G := G)).out 1 2).mp ‹_›
       have hHlt : H < ⊤ := lt_top_iff_ne_top.mpr hHt
       have hH_lt_N : H < Subgroup.normalizer (H : Set G) := hNC H hHlt
       -- (normalizer H).index < H.index
@@ -696,7 +696,7 @@ private theorem isSubnormal_sup_aux :
       have hMT : M ≤ Subgroup.normalizer (T : Set G) :=
         isMinimalNormal_le_normalizer_of_isSubnormal hT hM
       have hMnormST : M ≤ Subgroup.normalizer ((S ⊔ T : Subgroup G) : Set G) :=
-        (le_inf hMS hMT).trans (Subgroup.normalizer_inf_normalizer_le_normalizer_sup S T)
+        (le_inf hMS hMT).trans (Subgroup.inf_normalizer_le_normalizer_sup S T)
       -- S ⊔ T ⊴ (S ⊔ T) ⊔ M. Both summands ⊆ N(S ⊔ T).
       have hSupSup_le_norm :
           (S ⊔ T) ⊔ M ≤ Subgroup.normalizer ((S ⊔ T : Subgroup G) : Set G) :=

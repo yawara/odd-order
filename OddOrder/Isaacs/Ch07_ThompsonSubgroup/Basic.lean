@@ -240,7 +240,7 @@ theorem step3_main
     rwa [← hZqH_eq] at h
   have hM_norm_Z : M ≤ Subgroup.normalizer Z :=
     (le_inf hM_norm_ZpH hM_norm_ZqH).trans
-      (Subgroup.normalizer_inf_normalizer_le_normalizer_sup ZpH ZqH)
+      (Subgroup.inf_normalizer_le_normalizer_sup ZpH ZqH)
   -- `Z` is abelian (centers of `O_p,O_q` are commutative and commute), hence nilpotent.
   have hZp_comm : IsMulCommutative Zp := by
     rw [hZp_def]; unfold zCenterOpCoreSubgroup; infer_instance

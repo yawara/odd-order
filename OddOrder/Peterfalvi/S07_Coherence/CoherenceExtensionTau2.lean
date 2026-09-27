@@ -340,9 +340,9 @@ noncomputable def coherentEqualDegree
     intro h
     have hcontra : (0 : ℂ) = 1 :=
       calc (0 : ℂ) = ClassFunction.inner (χ (⟨1, h1n⟩ : Fin n)) (χ 0) := by
-            rw [horthχ, if_neg hi1]
+            rw [horthχ, ite_eq_right hi1]
         _ = ClassFunction.inner (χ 0) (χ 0) := by rw [h]
-        _ = 1 := by rw [horthχ, if_pos rfl]
+        _ = 1 := by rw [horthχ, ite_eq_left rfl]
     exact zero_ne_one hcontra
   · -- extension_inner_eq: pure Parseval on `ℤ[range χ]`.
     intro φ ψ hφ hψ

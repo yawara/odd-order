@@ -193,7 +193,7 @@ theorem inducedKernelFamily_sdiff_eq_irreducible_not_subset_characterKernel
       by_cases hAB : (⟨ClassFunction.induce K (θ : ClassFunction ↥K ℂ), hIndirr⟩ :
           IrreducibleCharacter ↥L) = (⟨φ, hχirr⟩ : IrreducibleCharacter ↥L)
       · exact congrArg Subtype.val hAB
-      · rw [if_neg hAB] at hite
+      · rw [ite_eq_right hAB] at hite
         exact absurd hite hθinner
     rw [← heq]; exact hIndX
 

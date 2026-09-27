@@ -263,18 +263,18 @@ lemma mCycleInv_mCycleFun (hm : m ≤ n) (c : ZMod n) :
   · have hval : (c + 1).val = c.val + 1 := val_add_one_of_lt (by omega)
     have hne : c + 1 ≠ 0 := fun hc => by
       rw [hc] at hval; simp only [ZMod.val_zero] at hval; omega
-    simp only [h1, if_true, hne, if_false, hval]
+    simp only [h1, ite_true, hne, ite_false, hval]
     ring
   · by_cases h2 : c.val + 1 = m
-    · rw [if_neg h1, if_pos h2, if_pos rfl, show m - 1 = c.val by omega,
+    · rw [ite_eq_right h1, ite_eq_left h2, ite_eq_left rfl, show m - 1 = c.val by omega,
         ZMod.natCast_rightInverse c]
-    · rw [if_neg h1, if_neg h2]
+    · rw [ite_eq_right h1, ite_eq_right h2]
       by_cases h0 : c = 0
       · subst h0
         simp only [ZMod.val_zero] at h1 h2
-        rw [if_pos rfl, show m = 0 by omega]
+        rw [ite_eq_left rfl, show m = 0 by omega]
         simp
-      · rw [if_neg h0, if_neg (by omega)]
+      · rw [ite_eq_right h0, ite_eq_right (by omega)]
 
 lemma mCycleFun_mCycleInv (hm : m ≤ n) (c : ZMod n) :
     mCycleFun n m (mCycleInv n m c) = c := by
@@ -285,14 +285,14 @@ lemma mCycleFun_mCycleInv (hm : m ≤ n) (c : ZMod n) :
     rcases Nat.eq_zero_or_pos m with rfl | hmpos
     · simp
     · have hmv : ((m - 1 : ℕ) : ZMod n).val = m - 1 := ZMod.val_natCast_of_lt (by omega)
-      rw [if_pos rfl, hmv, if_neg (by omega), if_pos (by omega)]
-  · rw [if_neg h0]
+      rw [ite_eq_left rfl, hmv, ite_eq_right (by omega), ite_eq_left (by omega)]
+  · rw [ite_eq_right h0]
     by_cases h1 : c.val < m
     · have hval : (c - 1).val = c.val - 1 := val_sub_one_of_ne_zero h0
       have hv : 1 ≤ c.val := Nat.one_le_iff_ne_zero.mpr fun hc => h0 ((ZMod.val_eq_zero c).mp hc)
-      rw [if_pos h1, hval, if_pos (by omega)]
+      rw [ite_eq_left h1, hval, ite_eq_left (by omega)]
       ring
-    · rw [if_neg h1, if_neg (by omega), if_neg (by omega)]
+    · rw [ite_eq_right h1, ite_eq_right (by omega), ite_eq_right (by omega)]
 
 /-- `ZMod n` 上の `m`-巡回 `(0, 1, …, m-1)` (`c.val ≥ m` は固定)。 -/
 def mCycle (n m : ℕ) [NeZero n] (hm : m ≤ n) : Equiv.Perm (ZMod n) where
@@ -309,7 +309,7 @@ def mCycle (n m : ℕ) [NeZero n] (hm : m ≤ n) : Equiv.Perm (ZMod n) where
 
 lemma mCycleFun_of_le {c : ZMod n} (h : m ≤ c.val) : mCycleFun n m c = c := by
   unfold mCycleFun
-  rw [if_neg (by omega), if_neg (by omega)]
+  rw [ite_eq_right (by omega), ite_eq_right (by omega)]
 
 lemma mCycle_apply_of_le (hm : m ≤ n) {c : ZMod n} (h : m ≤ c.val) : mCycle n m hm c = c :=
   mCycleFun_of_le h
@@ -331,11 +331,11 @@ lemma mCycle_pow_apply (hm : m ≤ n) (hm1 : 1 ≤ m) (k : ℕ) {c : ZMod n} (hc
     unfold mCycleFun
     rw [hval]
     by_cases h : (c.val + j) % m + 1 < m
-    · rw [if_pos h, hstep, Nat.mod_eq_of_lt h]
+    · rw [ite_eq_left h, hstep, Nat.mod_eq_of_lt h]
       push_cast
       ring
     · have hm' : (c.val + j) % m + 1 = m := by omega
-      rw [if_neg h, if_pos hm', hstep, hm', Nat.mod_self]
+      rw [ite_eq_right h, ite_eq_left hm', hstep, hm', Nat.mod_self]
       simp
 
 /-- 先頭区間の点は `m`-巡回の冪で `0` から到達できる。 -/
@@ -391,7 +391,7 @@ lemma zPerm_apply_of_lt (hm : m ≤ n) {c : ZMod n} (h : c.val + 1 < m) :
   have hne : c + 1 ≠ 0 := fun hc => by rw [hc, ZMod.val_zero] at hval; omega
   rw [zPerm_apply]
   unfold mCycleInv
-  rw [if_neg hne, if_pos (by omega : (c + 1).val < m)]
+  rw [ite_eq_right hne, ite_eq_left (by omega : (c + 1).val < m)]
   ring
 
 /-- `m - 1 ≤ c.val ≤ n - 2` の点では `z` は `+1`。 -/
@@ -401,14 +401,14 @@ lemma zPerm_apply_of_mem (hm : m ≤ n) {c : ZMod n} (h1 : m ≤ c.val + 1)
   have hne : c + 1 ≠ 0 := fun hc => by rw [hc, ZMod.val_zero] at hval; omega
   rw [zPerm_apply]
   unfold mCycleInv
-  rw [if_neg hne, if_neg (by omega : ¬ (c + 1).val < m)]
+  rw [ite_eq_right hne, ite_eq_right (by omega : ¬ (c + 1).val < m)]
 
 /-- 最後の点 `n-1` は `m-1` に送られる。 -/
 lemma zPerm_apply_top (hm : m ≤ n) {c : ZMod n} (h : c.val + 1 = n) :
     zPerm n m hm c = ((m - 1 : ℕ) : ZMod n) := by
   rw [zPerm_apply, add_one_eq_zero_of_val_succ h]
   unfold mCycleInv
-  rw [if_pos rfl]
+  rw [ite_eq_left rfl]
 
 /-- `z` が動かす点はちょうど `{c | m - 1 ≤ c.val}`。 -/
 lemma zPerm_apply_eq_self_iff (hm : 2 ≤ m) (hmn : m < n) {c : ZMod n} :
@@ -439,12 +439,12 @@ lemma mCycle_apply_eq_self_iff (hm : 2 ≤ m) (hmn : m < n) {c : ZMod n} :
     rw [mCycle_apply] at hfix
     unfold mCycleFun at hfix
     by_cases h1 : c.val + 1 < m
-    · rw [if_pos h1] at hfix
+    · rw [ite_eq_left h1] at hfix
       have := val_add_one_of_lt (show c.val + 1 < n by omega)
       rw [hfix] at this
       omega
     · have h2 : c.val + 1 = m := by omega
-      rw [if_neg h1, if_pos h2] at hfix
+      rw [ite_eq_right h1, ite_eq_left h2] at hfix
       rw [← hfix, ZMod.val_zero] at h2
       omega
   · exact mCycle_apply_of_le hmn.le

@@ -339,7 +339,7 @@ theorem asAlgebraHom_classSum (ρ : Representation ℂ G V) (C : ConjClasses G) 
   rw [classSum, map_sum]
   refine Finset.sum_congr rfl fun g _ => ?_
   by_cases h : ConjClasses.mk g = C
-  · simp only [h, if_true, asAlgebraHom_of]
+  · simp only [h, ite_true, asAlgebraHom_of]
   · simp [h]
 
 omit [FiniteDimensional ℂ V] in
@@ -351,7 +351,7 @@ theorem trace_asAlgebraHom_classSum (ρ : Representation ℂ G V) (C : ConjClass
   rw [asAlgebraHom_classSum, map_sum]
   refine Finset.sum_congr rfl fun g _ => ?_
   by_cases h : ConjClasses.mk g = C
-  · simp only [h, if_true]; rfl
+  · simp only [h, ite_true]; rfl
   · simp [h]
 
 /-- **Evaluation of the central character on a class sum** (Isaacs (3.6); Peterfalvi (6.7.2)):

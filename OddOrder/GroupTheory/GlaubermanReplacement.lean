@@ -296,25 +296,6 @@ theorem commutator_bot_left_eq (H : Subgroup G) :
   rw [Subgroup.mem_bot.mp hg]
   simp
 
-/-- 生成元が pairwise 可換なら closure は abelian. -/
-theorem isMulCommutative_closure_of_forall_commute {S : Set G}
-    (h : ∀ a ∈ S, ∀ b ∈ S, Commute a b) : IsMulCommutative (closure S) := by
-  rw [← le_centralizer_iff_isMulCommutative]
-  have h1 : ∀ g ∈ S, closure S ≤ centralizer ({g} : Set G) := by
-    intro g hg
-    refine (closure_le _).mpr ?_
-    intro a ha
-    rw [SetLike.mem_coe, mem_centralizer_iff]
-    intro w hw
-    rw [Set.mem_singleton_iff.mp hw]
-    exact ((h a ha g hg).symm.eq)
-  refine (closure_le _).mpr ?_
-  intro g hg
-  rw [SetLike.mem_coe, mem_centralizer_iff]
-  intro m hm
-  have h2 : m ∈ centralizer ({g} : Set G) := h1 g hg hm
-  exact (mem_centralizer_iff.mp h2 g (Set.mem_singleton g)).symm
-
 /-- **G Lem 2.5(ii) の半分** (element 形): `⁅k,α⁆` が `k` と可換なら
 `⁅k⁻¹, α⁆ = ⁅k, α⁆⁻¹`. -/
 theorem commutatorElement_inv_left_eq {k α : G} (h : Commute ⁅k, α⁆ k) :
@@ -461,8 +442,8 @@ theorem glauberman_replacement_case_two [Finite G] {B A : Subgroup G} [B.Normal]
   obtain ⟨x, hxB, hnc⟩ := exists_not_le_centralizer_elementCommutator
     (by rw [hiter2] at h2ne ⊢; exact h2ne)
   have hMcomm : IsMulCommutative (elementCommutator x A) := by
-    refine isMulCommutative_closure_of_forall_commute ?_
-    rintro - ⟨a, ha, rfl⟩ - ⟨b, hb, rfl⟩
+    refine Subgroup.isMulCommutative_closure ?_
+    rintro - ⟨a, ha, rfl⟩ - ⟨b, hb, rfl⟩ -
     exact case_two_commute hB' hA.2.1 h3 hodd hxB ha hb
   have hMR : elementCommutator x A ≤ ⁅B, A⁆ := by
     refine (closure_le _).mpr ?_

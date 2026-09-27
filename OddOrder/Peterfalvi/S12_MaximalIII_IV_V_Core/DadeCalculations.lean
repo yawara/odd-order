@@ -38,9 +38,9 @@ theorem Hypothesis.columnRImage_inner [Finite G] (hG : OddOrder.BG.IsMinimalSimp
   · -- (false,false): same column `j`, `δ²·[ip=iq] = [ip=iq]`
     rw [← mul_assoc, hδsq, one_mul]
   · -- (false,true): cross column `j ≠ j'`
-    rw [if_neg (fun hcon => hjj' hcon.2)]; ring
+    rw [ite_eq_right (fun hcon => hjj' hcon.2)]; ring
   · -- (true,false): cross column `j' ≠ j`
-    rw [if_neg (fun hcon => hjj' hcon.2.symm)]; ring
+    rw [ite_eq_right (fun hcon => hjj' hcon.2.symm)]; ring
   · -- (true,true): same column `j'`, `δ²·[ip=iq] = [ip=iq]`
     rw [← mul_assoc, hδsq, one_mul]
 
@@ -53,7 +53,7 @@ theorem Hypothesis.columnRImage_injective [Finite G] (hG : OddOrder.BG.IsMinimal
   intro p q hpq
   by_contra hpqne
   have h0 := hyp.columnRImage_inner hG hodd hδ hjj' p q
-  rw [if_neg hpqne, hpq, hyp.columnRImage_inner hG hodd hδ hjj', if_pos rfl] at h0
+  rw [ite_eq_right hpqne, hpq, hyp.columnRImage_inner hG hodd hδ hjj', ite_eq_left rfl] at h0
   exact one_ne_zero h0
 
 open scoped FiniteInduce in
@@ -115,8 +115,8 @@ noncomputable def Hypothesis.columnImageFamily [Finite G]
     rw [hyp.columnRImage_inner hG hG.odd hδpm hjj']
     by_cases hpq : p = q
     · subst hpq; simp
-    · rw [if_neg hpq,
-        if_neg (fun he => hpq (hyp.columnRImage_injective hG hG.odd hδpm hjj' he))]
+    · rw [ite_eq_right hpq,
+        ite_eq_right (fun he => hpq (hyp.columnRImage_injective hG hG.odd hδpm hjj' he))]
   image_eq := by
     rw [hconj, tau_muGrid_columnSum_diff hG coh hmu hos hzS hz1 hzconj hδpm hδj hj0 hj'0,
       Finset.sum_image (fun p _ q _ hpq => hyp.columnRImage_injective hG hG.odd hδpm hjj' hpq),
@@ -169,8 +169,8 @@ noncomputable def Hypothesis.columnImageFamilyCohFree [Finite G]
     rw [hyp.columnRImage_inner hG hG.odd hδpm hjj']
     by_cases hpq : p = q
     · subst hpq; simp
-    · rw [if_neg hpq,
-        if_neg (fun he => hpq (hyp.columnRImage_injective hG hG.odd hδpm hjj' he))]
+    · rw [ite_eq_right hpq,
+        ite_eq_right (fun he => hpq (hyp.columnRImage_injective hG hG.odd hδpm hjj' he))]
   image_eq := by
     rw [hconj, hyp.tau_muGrid_columnSum_diff_cohFree hG hG.odd hmu hzS hz1 hδpm hδj hj0 hj'0 hjj',
       Finset.sum_image (fun p _ q _ hpq => hyp.columnRImage_injective hG hG.odd hδpm hjj' hpq),
@@ -453,14 +453,14 @@ theorem Hypothesis.muColumn_tau1_pin [Finite G]
         hδstar, star_neg, Prod.mk.injEq, reduceCtorEq, false_and, true_and, and_true,
         ↓reduceIte, neg_mul]
     · -- (false, i'): `δ · [i = i'] − δ · [i = i' ∧ 0 = j] = if i' = i then δ else 0`
-      rw [if_neg (show ¬(i = i' ∧ (0 : Fin hyp.w2) = j) from fun hh => hj0 hh.2.symm),
+      rw [ite_eq_right (show ¬(i = i' ∧ (0 : Fin hyp.w2) = j) from fun hh => hj0 hh.2.symm),
         mul_zero, sub_zero]
       by_cases hii : i = i'
-      · rw [if_pos hii, mul_one, if_pos hii.symm]
-      · rw [if_neg hii, mul_zero, if_neg (fun h => hii h.symm)]
+      · rw [ite_eq_left hii, mul_one, ite_eq_left hii.symm]
+      · rw [ite_eq_right hii, mul_zero, ite_eq_right (fun h => hii h.symm)]
     · -- (true, i'): both columns orthogonal (`j ≠ j'`, `j' ≠ 0`)
-      rw [if_neg (show ¬(i = i' ∧ j = j') from fun hh => hj'j hh.2.symm),
-        if_neg (show ¬(i = i' ∧ (0 : Fin hyp.w2) = j') from fun hh => hj'0 hh.2.symm)]
+      rw [ite_eq_right (show ¬(i = i' ∧ j = j') from fun hh => hj'j hh.2.symm),
+        ite_eq_right (show ¬(i = i' ∧ (0 : Fin hyp.w2) = j') from fun hh => hj'0 hh.2.symm)]
       ring
   -- the (10.6)(a) reduction forces every `(false, i) ∈ T`.
   have hfalseT : ∀ i : Fin hyp.w1, (false, i) ∈ T := by
@@ -472,7 +472,7 @@ theorem Hypothesis.muColumn_tau1_pin [Finite G]
           - hyp.alignedOmegaSigmaGrid hG hG.odd i 0) (R x))
         = if (false, i) ∈ T then (params.delta : ℂ) else 0 by
       rw [Finset.sum_congr rfl (fun x _ => hval i x)]; exact Finset.sum_ite_eq' T (false, i) _,
-      if_neg hni] at hRi
+      ite_eq_right hni] at hRi
     rcases hδpm with h | h <;> rw [h] at hRi <;> norm_num at hRi
   -- `{false} × univ ⊆ T` and `|T| = w₁ = |{false} × univ|`, so `T = {false} × univ`.
   have hFsub : Finset.univ.image (fun i : Fin hyp.w1 => (false, i)) ⊆ T := by
@@ -641,7 +641,7 @@ theorem Hypothesis.tau_inner_trivial [Finite G] {M : Subgroup G} (hyp : Hypothes
         = OddOrder.Peterfalvi.S04.adjointAverageFun hyp.dadeData.dade (trivialClassFunction G)
             ⟨a.1, hyp.dadeData.dade.subset_L a.2⟩ := by
     intro a
-    rw [OddOrder.Peterfalvi.S04.adjointAverageFun, dif_pos a.2]
+    rw [OddOrder.Peterfalvi.S04.adjointAverageFun, dite_eq_left a.2]
     simp only [trivialClassFunction_apply, Finset.sum_const, nsmul_eq_mul, mul_one,
       Finset.card_univ, ← Nat.card_eq_fintype_card]
     rw [inv_mul_cancel₀]
@@ -1097,8 +1097,8 @@ theorem Hypothesis.exists_rowInv_alignedOmegaSigma_conj [Finite G]
     -- `hkey : ω_{j'0}^σ = ω_{i0}^σ`.  Conclude `j' = i` via grid orthonormality.
     by_contra hne
     have hortho := hyp.alignedOmegaSigmaGrid_inner hG hodd j' i 0 0
-    rw [hkey, hyp.alignedOmegaSigmaGrid_inner hG hodd i i 0 0, if_pos ⟨rfl, rfl⟩,
-      if_neg (fun hc => hne hc.1)] at hortho
+    rw [hkey, hyp.alignedOmegaSigmaGrid_inner hG hodd i i 0 0, ite_eq_left ⟨rfl, rfl⟩,
+      ite_eq_right (fun hc => hne hc.1)] at hortho
     exact one_ne_zero hortho
 
 open scoped FiniteInduce in

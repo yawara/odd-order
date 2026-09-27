@@ -233,7 +233,7 @@ theorem false_of_frobenius_exponent (data : FieldNormalizerData p q G) (hp : p =
         = fieldHom data (Multiplicative.ofAdd (Multiplicative.toAdd a ^ 3 ^ j)) := by
     intro a
     have hex : ∃ b, fieldHom data b = fieldHom data a := ⟨a, rfl⟩
-    simp only [hσfdef, dif_pos hex]
+    simp only [hσfdef, dite_eq_left hex]
     have hchoose : Classical.choose hex = a :=
       fieldHom_injective data (Classical.choose_spec hex)
     rw [hchoose]

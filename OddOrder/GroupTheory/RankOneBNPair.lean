@@ -287,9 +287,9 @@ theorem Setup.exists_fgh_one (hS : Setup M Q D t) :
   refine ⟨fun x => if x = 1 then 1 else f x, fun x => if x = 1 then 1 else g x,
     fun x => if x = 1 then 1 else h x, ⟨fun x hxQ hx1 => ?_, fun x hxQ hx1 => ?_⟩,
     by simp, by simp, by simp⟩
-  · simp only [if_neg hx1]
+  · simp only [ite_eq_right hx1]
     exact H.mem x hxQ hx1
-  · simp only [if_neg hx1]
+  · simp only [ite_eq_right hx1]
     exact H.eq x hxQ hx1
 
 /-- **A rank-one setup transports along a group isomorphism.**
@@ -429,7 +429,7 @@ noncomputable def liftMap (K : Subgroup L) (f' : ↥K → ↥K) : L → L := by
 theorem liftMap_apply {K : Subgroup L} (f' : ↥K → ↥K) {x : L} (hx : x ∈ K) :
     liftMap K f' x = (f' ⟨x, hx⟩ : L) := by
   classical
-  exact dif_pos hx
+  exact dite_eq_left hx
 
 /-- **The `f, g, h` of a subgroup, read in the ambient group.**
 

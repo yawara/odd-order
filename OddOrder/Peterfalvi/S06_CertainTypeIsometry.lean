@@ -462,8 +462,9 @@ theorem certainType_diff_dade_inner_self (h : Hypothesis46 A L)
         - ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ)) = 2
   rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
     irreducibleCharacter_inner_eq_ite, irreducibleCharacter_inner_eq_ite,
-    irreducibleCharacter_inner_eq_ite, irreducibleCharacter_inner_eq_ite, if_pos rfl, if_pos rfl,
-    if_neg (h.columnFamily_mu_ne hχ i i), if_neg (h.columnFamily_mu_ne hχ i i).symm]
+    irreducibleCharacter_inner_eq_ite, irreducibleCharacter_inner_eq_ite, ite_eq_left rfl,
+    ite_eq_left rfl, ite_eq_right (h.columnFamily_mu_ne hχ i i),
+    ite_eq_right (h.columnFamily_mu_ne hχ i i).symm]
   ring
 
 set_option backward.isDefEq.respectTransparency false in
@@ -607,26 +608,28 @@ theorem certainType_diff_dade_eq_of_all_sigmaCoeff_zero (h : Hypothesis46 A L)
   -- `⟨φ, ω_ij^σ⟩ = s`, `⟨φ, ω_ik^σ⟩ = −s` from `hall` + the expansion
   have hcij : ClassFunction.inner φ ωij = (s : ℂ) := by
     have he := hall Pij
-    rw [sigmaCoeff_psi_eq, if_pos rfl, if_neg (Ne.symm hPne)] at he
+    rw [sigmaCoeff_psi_eq, ite_eq_left rfl, ite_eq_right (Ne.symm hPne)] at he
     rw [hωijeq]; change (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h) φ Pij = _
     linear_combination he
   have hcik : ClassFunction.inner φ ωik = -(s : ℂ) := by
     have he := hall Pik
-    rw [sigmaCoeff_psi_eq, if_neg hPne, if_pos rfl] at he
+    rw [sigmaCoeff_psi_eq, ite_eq_right hPne, ite_eq_left rfl] at he
     rw [hωikeq]; change (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h) φ Pik = _
     linear_combination he
   -- orthonormality of `ω_ij^σ, ω_ik^σ` and `‖φ‖² = 2`
   have hnorm : ClassFunction.inner φ φ = 2 := certainType_diff_dade_inner_self h hχ hχ₂ hχ₂' i hdeg
   have hii : ClassFunction.inner ωij ωij = 1 := by
-    rw [hωijeq, ((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1, if_pos rfl]
+    rw [hωijeq, ((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1,
+      ite_eq_left rfl]
   have hkk : ClassFunction.inner ωik ωik = 1 := by
-    rw [hωikeq, ((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1, if_pos rfl]
+    rw [hωikeq, ((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1,
+      ite_eq_left rfl]
   have hik : ClassFunction.inner ωij ωik = 0 := by
     rw [hωijeq, hωikeq, ((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1,
-      if_neg hPne]
+      ite_eq_right hPne]
   have hki : ClassFunction.inner ωik ωij = 0 := by
     rw [hωikeq, hωijeq, ((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1,
-      if_neg (Ne.symm hPne)]
+      ite_eq_right (Ne.symm hPne)]
   -- conjugate-symmetric partners `⟨ω_ij^σ, φ⟩ = s`, `⟨ω_ik^σ, φ⟩ = −s`
   have hcji : ClassFunction.inner ωij φ = (s : ℂ) := by
     rw [OddOrder.RepresentationTheory.inner_conj_symm, hcij, star_intCast]
@@ -713,7 +716,8 @@ theorem certainType_diff_dade_eq (h : Hypothesis46 A L)
       by_contra hcon
       simp only [Set.mem_union, Set.mem_ofPred_eq, Set.mem_insert_iff, Set.mem_singleton_iff,
         not_or, not_not] at hcon
-      exact hx (by rw [hae x, hcon.1, if_neg (Ne.symm hcon.2.1), if_neg (Ne.symm hcon.2.2)]; ring)
+      exact hx (by rw [hae x, hcon.1, ite_eq_right (Ne.symm hcon.2.1),
+        ite_eq_right (Ne.symm hcon.2.2)]; ring)
     have hbpair : ({Pij, Pik} : Set _).ncard ≤ 2 :=
       (Set.ncard_insert_le _ _).trans (by rw [Set.ncard_singleton])
     calc {x | a x ≠ 0}.ncard ≤ ({x | G x ≠ 0} ∪ {Pij, Pik}).ncard :=
@@ -936,9 +940,9 @@ theorem certainTypeOmegaSigma_inner (h : Hypothesis46 A L) [NeZero (Nat.card h.W
   rw [(ticVdiff h).sigma_inner rfl (ticVdiffFullDadeApplication h)]
   by_cases hP : omegaProdCharTic h χ₂ i = omegaProdCharTic h χ₂' i'
   · rw [hP, (ticVdiff h).omega_inner_self,
-      if_pos ((omegaProdCharTic_eq_iff h χ₂ χ₂' i i').mp hP)]
+      ite_eq_left ((omegaProdCharTic_eq_iff h χ₂ χ₂' i i').mp hP)]
   · rw [(ticVdiff h).omega_inner_ne hP,
-      if_neg (fun hcon => hP ((omegaProdCharTic_eq_iff h χ₂ χ₂' i i').mpr hcon))]
+      ite_eq_right (fun hcon => hP ((omegaProdCharTic_eq_iff h χ₂ χ₂' i i').mpr hcon))]
 
 open scoped Classical in
 /-- **`σ`-image column-sum orthonormality.**  `⟨∑_i ω_{ij}^σ, ∑_i ω_{ij'}^σ⟩ = w₁·δ_{jj'}`:
@@ -953,17 +957,17 @@ theorem certainTypeOmegaSigma_sum_inner (h : Hypothesis46 A L) [NeZero (Nat.card
   rw [inner_sum_left]
   simp_rw [inner_sum_right, certainTypeOmegaSigma_inner]
   by_cases hc : χ₂ = χ₂'
-  · rw [if_pos hc]
+  · rw [ite_eq_left hc]
     have hrow : ∀ i : Fin (Nat.card h.W1),
         (∑ i' : Fin (Nat.card h.W1), if χ₂ = χ₂' ∧ i = i' then (1 : ℂ) else 0) = 1 := by
       intro i
       rw [Finset.sum_congr rfl (fun i' _ => if_congr (and_iff_right hc) rfl rfl),
-        Finset.sum_ite_eq Finset.univ i (fun _ => (1 : ℂ)), if_pos (Finset.mem_univ i)]
+        Finset.sum_ite_eq Finset.univ i (fun _ => (1 : ℂ)), ite_eq_left (Finset.mem_univ i)]
     rw [Finset.sum_congr rfl (fun i _ => hrow i), Finset.sum_const, Finset.card_univ,
       Fintype.card_fin, nsmul_eq_mul, mul_one]
-  · rw [if_neg hc]
+  · rw [ite_eq_right hc]
     exact Finset.sum_eq_zero (fun i _ =>
-      Finset.sum_eq_zero (fun i' _ => if_neg (fun hcon => hc hcon.1)))
+      Finset.sum_eq_zero (fun i' _ => ite_eq_right (fun hcon => hc hcon.1)))
 
 open scoped Classical in
 /-- **`L`-irreducible column-sum orthonormality.**  `⟨∑_i μ_{ij}, ∑_i μ_{ij'}⟩ = w₁·δ_{jj'}`:
@@ -981,19 +985,19 @@ theorem columnFamily_mu_sum_inner (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)
   simp_rw [inner_sum_right, irreducibleCharacter_inner_eq_ite]
   by_cases hc : χ₂ = χ₂'
   · subst hc
-    rw [if_pos rfl]
+    rw [ite_eq_left rfl]
     have hrow : ∀ i : Fin (Nat.card h.W1),
         (∑ i' : Fin (Nat.card h.W1),
           if (h.columnFamily χ₂).mu i = (h.columnFamily χ₂).mu i' then (1 : ℂ) else 0) = 1 := by
       intro i
       rw [Finset.sum_congr rfl (fun i' _ =>
           if_congr (h.columnFamily χ₂).injective.eq_iff rfl rfl),
-        Finset.sum_ite_eq Finset.univ i (fun _ => (1 : ℂ)), if_pos (Finset.mem_univ i)]
+        Finset.sum_ite_eq Finset.univ i (fun _ => (1 : ℂ)), ite_eq_left (Finset.mem_univ i)]
     rw [Finset.sum_congr rfl (fun i _ => hrow i), Finset.sum_const, Finset.card_univ,
       Fintype.card_fin, nsmul_eq_mul, mul_one]
-  · rw [if_neg hc]
+  · rw [ite_eq_right hc]
     exact Finset.sum_eq_zero (fun i _ =>
-      Finset.sum_eq_zero (fun i' _ => if_neg (h.columnFamily_mu_ne hc i i')))
+      Finset.sum_eq_zero (fun i' _ => ite_eq_right (h.columnFamily_mu_ne hc i i')))
 
 /-- **Peterfalvi (4.9)(b), the isometry property.**  The `σ`-image column sums `∑_i ω_{ij}^σ`
 (in `CF(G)`) and the certain-type column sums `μ_j = ∑_i μ_{ij}` (in `CF(L)`) have the **same**

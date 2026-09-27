@@ -179,8 +179,8 @@ private theorem coord_basis (i l : ι) :
   rw [Module.Basis.coord_apply, Module.Basis.repr_self,
     Finsupp.single_apply]
   rcases eq_or_ne i l with h | h
-  · rw [if_pos h.symm, if_pos h]
-  · rw [if_neg (fun hh => h hh.symm), if_neg h]
+  · rw [ite_eq_left h.symm, ite_eq_left h]
+  · rw [ite_eq_right (fun hh => h hh.symm), ite_eq_right h]
 
 private theorem ofCoords_basis_value (u : {p : ι × ι // p.1 ≤ p.2} → W)
     (l : ι) :
@@ -195,8 +195,8 @@ private theorem ofCoords_basis_value (u : {p : ι × ι // p.1 ≤ p.2} → W)
     rcases eq_or_ne p.1.1 l with h1 | h1
     · rcases eq_or_ne p.1.2 l with h2 | h2
       · exact absurd (Subtype.ext (Prod.ext h1 h2)) hp
-      · rw [if_pos h1, if_neg h2, mul_zero, zero_smul]
-    · rw [if_neg h1, zero_mul, zero_smul]
+      · rw [ite_eq_left h1, ite_eq_right h2, mul_zero, zero_smul]
+    · rw [ite_eq_right h1, zero_mul, zero_smul]
   · intro h
     exact absurd (Finset.mem_univ _) h
 
@@ -227,9 +227,9 @@ private theorem polar_ofCoords_basis (u : {p : ι × ι // p.1 ≤ p.2} → W)
       · have hne3 : ¬ p.1.1 = m := by
           rw [h1]
           exact ne_of_lt hlm
-        rw [if_pos h1, if_neg h2, mul_zero, zero_add, if_neg hne3,
+        rw [ite_eq_left h1, ite_eq_right h2, mul_zero, zero_add, ite_eq_right hne3,
           zero_mul, zero_smul]
-    · rw [if_neg h1, zero_mul, zero_add]
+    · rw [ite_eq_right h1, zero_mul, zero_add]
       rcases eq_or_ne p.1.1 m with h4 | h4
       · -- p.1.1 = m: then p.1.2 ≥ m > l, so coord p.1.2 (b l) = 0
         have h5 : ¬ p.1.2 = l := by
@@ -237,8 +237,8 @@ private theorem polar_ofCoords_basis (u : {p : ι × ι // p.1 ≤ p.2} → W)
           have hle := p.2
           rw [h4, h5] at hle
           exact absurd hle (not_le.mpr hlm)
-        rw [if_pos h4, if_neg h5, mul_zero, zero_smul]
-      · rw [if_neg h4, zero_mul, zero_smul]
+        rw [ite_eq_left h4, ite_eq_right h5, mul_zero, zero_smul]
+      · rw [ite_eq_right h4, zero_mul, zero_smul]
   · intro h
     exact absurd (Finset.mem_univ _) h
 
@@ -255,11 +255,11 @@ noncomputable def coordEquiv :
     rcases eq_or_lt_of_le hlm with heq | hlt
     · change (if l = m then ofCoords (S := S) b u (b l)
         else polar (⇑(ofCoords (S := S) b u)) (b l) (b m)) = _
-      rw [if_pos heq, ofCoords_basis_value]
+      rw [ite_eq_left heq, ofCoords_basis_value]
       exact congrArg u (Subtype.ext (Prod.ext rfl heq))
     · change (if l = m then ofCoords (S := S) b u (b l)
         else polar (⇑(ofCoords (S := S) b u)) (b l) (b m)) = _
-      rw [if_neg (ne_of_lt hlt), polar_ofCoords_basis b u hlt]
+      rw [ite_eq_right (ne_of_lt hlt), polar_ofCoords_basis b u hlt]
   · -- ofCoords ∘ toCoords = id
     refine LinearMap.ext fun Q => ?_
     change ofCoords (S := S) b (toCoords (S := S) b Q) = Q
@@ -267,18 +267,18 @@ noncomputable def coordEquiv :
     · intro l
       rw [ofCoords_basis_value]
       change (if l = l then Q (b l) else _) = Q (b l)
-      rw [if_pos rfl]
+      rw [ite_eq_left rfl]
     · intro i j
       rcases lt_trichotomy i j with h | h | h
       · rw [polar_ofCoords_basis b _ h]
         change (if i = j then _ else polar (⇑Q) (b i) (b j)) = _
-        rw [if_neg (ne_of_lt h)]
+        rw [ite_eq_right (ne_of_lt h)]
       · subst h
         rw [polar_self_eq_zero, polar_self_eq_zero]
       · rw [QuadraticMap.polar_comm, QuadraticMap.polar_comm (⇑Q)]
         rw [polar_ofCoords_basis b _ h]
         change (if j = i then _ else polar (⇑Q) (b j) (b i)) = _
-        rw [if_neg (ne_of_lt h)]
+        rw [ite_eq_right (ne_of_lt h)]
 
 end CoordEquiv
 

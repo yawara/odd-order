@@ -7,6 +7,7 @@ import Mathlib.RepresentationTheory.Irreducible
 import Mathlib.Algebra.MonoidAlgebra.MapDomain
 import Mathlib.RingTheory.SimpleModule.Basic
 import Mathlib.RingTheory.SimpleModule.Isotypic
+import Mathlib.RingTheory.Artinian.Module
 import Mathlib.Algebra.Group.Subgroup.Pointwise
 import Mathlib.Algebra.Module.Submodule.RestrictScalars
 

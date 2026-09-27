@@ -305,7 +305,7 @@ theorem card_orbit_eq_of_normal [IsPretransitive G Ω] {N : Subgroup G} [N.Norma
   obtain ⟨g, rfl⟩ := exists_smul_eq G α β
   rw [← smul_orbit_eq_orbit_smul g α]
   exact Nat.card_congr ((Equiv.Set.image (fun x : Ω => g • x) (orbit N α)
-    (MulAction.injective g)).trans (Equiv.setCongr Set.image_smul))
+    (MulAction.injective g)).trans (Set.equivOfEq Set.image_smul))
 
 /-! ### Problem 8A.9 — 2-transitive 群の非自明な正規部分群は推移的 -/
 

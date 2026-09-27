@@ -165,7 +165,7 @@ theorem coherentIndS_image_inner_eta_eq_zero [Finite G]
   have hcross : ClassFunction.inner (coh.extension ζ) (coh.extension ζ.conj) = 0 := by
     rw [coh.extension_inner_eq ζ ζ.conj (Submodule.subset_span hζ)
       (Submodule.subset_span hζc), OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr.conj,
-      if_neg (fun h => hnoReal hζ h.symm)]
+      ite_eq_right (fun h => hnoReal hζ h.symm)]
   intro i j
   have h := OddOrder.Peterfalvi.S16.eta_orthogonal_of_norm_one_pair_vanish hyp
     hpsiZ hconjZ hpsi1 hconj1 hcross hvanish i j

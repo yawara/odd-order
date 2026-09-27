@@ -269,7 +269,7 @@ theorem sum_character_blockOfIrr_eq_zero (hp : p.Prime) {g h : G}
   have hvanish : ∀ u ∈ pSection p (pPart p g), θ u = 0 := by
     intro u hu
     simp only [hθdef]
-    rw [sum_character_inv_mul_character e h u, if_neg]
+    rw [sum_character_inv_mul_character e h u, ite_eq_right]
     intro hconj
     exact hgh
       (((isConj_pPart hconj).trans (mem_pSection_iff_isConj_pPart.mp hu)).symm)

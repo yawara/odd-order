@@ -239,7 +239,7 @@ theorem cross_inner_extension_diff_right_eq_zero [Finite G]
       rw [hcohX.extension_inner_eq χ χ₁ (Submodule.subset_span hχX)
         (Submodule.subset_span hχ₁X)]
       exact hyp.Sset_pairwiseOrthogonal (hXS hχX) (hXS hχ₁X) hχne
-    rw [hEχ, hEχ₁, h, inner_zsmul_irreducible_eq, if_pos rfl, mul_one] at h0
+    rw [hEχ, hEχ₁, h, inner_zsmul_irreducible_eq, ite_eq_left rfl, mul_one] at h0
     rcases hεχ with rfl | rfl <;> rcases hε₁ with rfl | rfl <;> norm_num at h0
   have hξ'ne : ξ'₂ ≠ ξ'₁ := by
     intro h
@@ -247,7 +247,7 @@ theorem cross_inner_extension_diff_right_eq_zero [Finite G]
       rw [hcohY.extension_inner_eq η₂ η₁ (Submodule.subset_span hη₂Y)
         (Submodule.subset_span hη₁Y)]
       exact hyp.Sset_pairwiseOrthogonal (hYS hη₂Y) (hYS hη₁Y) hηne
-    rw [hE'₂, hE'₁, h, inner_zsmul_irreducible_eq, if_pos rfl, mul_one] at h0
+    rw [hE'₂, hE'₁, h, inner_zsmul_irreducible_eq, ite_eq_left rfl, mul_one] at h0
     rcases hf₂ with rfl | rfl <;> rcases hf₁ with rfl | rfl <;> norm_num at h0
   -- `λ` evaluated at `η₂` equals `λ` evaluated at `η₁`
   have hlam2 : ClassFunction.inner (hcohX.extension χ - (a : ℂ) • hcohX.extension χ₁)
@@ -272,13 +272,13 @@ theorem cross_inner_extension_diff_right_eq_zero [Finite G]
     by_contra hc
     push Not at hc
     apply hlam
-    rw [hE'₁, hval, if_neg hc.1, if_neg hc.2]
+    rw [hE'₁, hval, ite_eq_right hc.1, ite_eq_right hc.2]
     ring
   have hmem₂ : ξχ = ξ'₂ ∨ ξ₁ = ξ'₂ := by
     by_contra hc
     push Not at hc
     apply hlam
-    rw [← hlam2, hE'₂, hval, if_neg hc.1, if_neg hc.2]
+    rw [← hlam2, hE'₂, hval, ite_eq_right hc.1, ite_eq_right hc.2]
     ring
   -- degree data of the `𝒳`-witnesses
   obtain ⟨dχ, hdχpos, hdχeq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast ξχ
@@ -326,8 +326,8 @@ theorem cross_inner_extension_diff_right_eq_zero [Finite G]
   · -- `ξ'₁ = ξχ`, `ξ'₂ = ξ₁`: `λ@η₁ = εχ·f₁`, `λ@η₂ = −a·ε₁·f₂`
     have hL : (εχ : ℂ) * (f₁ : ℂ) = -((a : ℂ) * ((ε₁ : ℂ) * (f₂ : ℂ))) := by
       have h := hlam2
-      rw [hE'₂, hE'₁, hval, hval, if_pos h1, if_neg (fun hh => hξne (hh.trans h2.symm)),
-        if_pos h2, if_neg (fun hh => hξne (h1.trans hh.symm))] at h
+      rw [hE'₂, hE'₁, hval, hval, ite_eq_left h1, ite_eq_right (fun hh => hξne (hh.trans h2.symm)),
+        ite_eq_left h2, ite_eq_right (fun hh => hξne (h1.trans hh.symm))] at h
       linear_combination -h
     have hH3 : (f₂ : ℂ) * (ξ₁ : ClassFunction G ℂ) 1 =
         (f₁ : ℂ) * (ξχ : ClassFunction G ℂ) 1 := by
@@ -337,8 +337,8 @@ theorem cross_inner_extension_diff_right_eq_zero [Finite G]
   · -- `ξ'₁ = ξ₁`, `ξ'₂ = ξχ`: `λ@η₁ = −a·ε₁·f₁`, `λ@η₂ = εχ·f₂`
     have hL : (εχ : ℂ) * (f₂ : ℂ) = -((a : ℂ) * ((ε₁ : ℂ) * (f₁ : ℂ))) := by
       have h := hlam2
-      rw [hE'₂, hE'₁, hval, hval, if_pos h2, if_neg (fun hh => hξne (h2.trans hh.symm)),
-        if_pos h1, if_neg (fun hh => hξne (hh.trans h1.symm))] at h
+      rw [hE'₂, hE'₁, hval, hval, ite_eq_left h2, ite_eq_right (fun hh => hξne (h2.trans hh.symm)),
+        ite_eq_left h1, ite_eq_right (fun hh => hξne (hh.trans h1.symm))] at h
       linear_combination h
     have hH3 : (f₁ : ℂ) * (ξ₁ : ClassFunction G ℂ) 1 =
         (f₂ : ℂ) * (ξχ : ClassFunction G ℂ) 1 := by
@@ -409,17 +409,17 @@ theorem cross_extension_inner_eq_zero [Finite G]
         rw [hcohX.extension_inner_eq χ₂ χ₁ (Submodule.subset_span hχ₂X)
           (Submodule.subset_span hχ₁X)]
         exact hyp.Sset_pairwiseOrthogonal (hXS hχ₂X) (hXS hχ₁X) hχ₂ne
-      rw [hE₂, hE₁, h, inner_zsmul_irreducible_eq, if_pos rfl, mul_one] at h0
+      rw [hE₂, hE₁, h, inner_zsmul_irreducible_eq, ite_eq_left rfl, mul_one] at h0
       rcases hε₂ with rfl | rfl <;> rcases hε₁ with rfl | rfl <;> norm_num at h0
     -- a nonzero anchor pairing forces `ξ' = ξ₁`
     have hξ' : ξ₁ = ξ' := by
       by_contra hcon
       apply ht
-      rw [hE₁, hE', inner_zsmul_irreducible_eq, if_neg hcon, mul_zero]
+      rw [hE₁, hE', inner_zsmul_irreducible_eq, ite_eq_right hcon, mul_zero]
     -- then `⟨E χ₂, E' η⟩ = 0`, so `hlamEta` reads `a₂ · ⟨E χ₁, E' η⟩ = 0`
     have h₂0 : ClassFunction.inner (hcohX.extension χ₂) (hcohY.extension η) = 0 := by
       rw [hE₂, hE', inner_zsmul_irreducible_eq,
-        if_neg (fun hh => hξ₂₁ (hh.trans hξ'.symm)), mul_zero]
+        ite_eq_right (fun hh => hξ₂₁ (hh.trans hξ'.symm)), mul_zero]
     rw [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, h₂0, zero_sub,
       neg_eq_zero, mul_eq_zero] at hlamEta
     rcases hlamEta with h | h
@@ -582,7 +582,7 @@ theorem exists_lambda_norm_identity [Finite G]
       ClassFunction.inner u (hcohY.extension η) = (c η : ℂ) := by
     intro η hη
     rw [hcdef]
-    simp only [dif_pos hη]
+    simp only [dite_eq_left hη]
     exact htz η hη
   -- the common `λ`
   refine ⟨c η₁ + a, ?_, ?_, ?_⟩
@@ -737,8 +737,8 @@ theorem exists_normalized_witness_of_dvd [Finite G]
       exact hη
     set w : ClassFunction ↥hyp.H ℂ → ClassFunction G ℂ :=
       fun η => if η = η₁ then -(hcohY.extension η₂) else -(hcohY.extension η₁) with hw
-    have hwη₁ : w η₁ = -(hcohY.extension η₂) := by rw [hw]; exact if_pos rfl
-    have hwη₂ : w η₂ = -(hcohY.extension η₁) := by rw [hw]; exact if_neg hη₂ne
+    have hwη₁ : w η₁ = -(hcohY.extension η₂) := by rw [hw]; exact ite_eq_left rfl
+    have hwη₂ : w η₂ = -(hcohY.extension η₁) := by rw [hw]; exact ite_eq_right hη₂ne
     refine ⟨w, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · -- (P1) difference relations
       intro η hη
@@ -994,7 +994,7 @@ theorem exists_X_witness_assignment [Finite G]
     rw [hveq, hE₁, inner_zsmul_irreducible_eq]
   by_cases hξ : ξv = ξ₁w
   · -- `(v, e₁) = ±1`
-    rw [if_pos hξ, mul_one] at ht₁
+    rw [ite_eq_left hξ, mul_one] at ht₁
     have hcase : v = hcohX.extension χ₁ ∨
         ClassFunction.inner v (hcohX.extension χ₁) = -1 := by
       rcases hεv with rfl | rfl <;> rcases hε₁ with rfl | rfl
@@ -1018,7 +1018,7 @@ theorem exists_X_witness_assignment [Finite G]
         hyp.coherent_extension_eq_zsmul_irr hcohX hχ₂X (hXS hχ₂X).1
       rw [hveq, hE₂, inner_zsmul_irreducible_eq] at h₂
       by_cases hξ₂ : ξv = ξ₂w
-      · rw [if_pos hξ₂, mul_one] at h₂
+      · rw [ite_eq_left hξ₂, mul_one] at h₂
         have hsq : ((εv : ℂ) * ε₂) ^ 2 = ((a₂ : ℂ) * (-1 - 1)) ^ 2 := by rw [h₂]
         have hεv2 : (εv : ℂ) ^ 2 = 1 := by rcases hεv with rfl | rfl <;> norm_num
         have hε₂2 : (ε₂ : ℂ) ^ 2 = 1 := by rcases hε₂ with rfl | rfl <;> norm_num
@@ -1027,13 +1027,13 @@ theorem exists_X_witness_assignment [Finite G]
           linear_combination (-1 : ℂ) * hsq + (ε₂ : ℂ) ^ 2 * hεv2 + hε₂2
         have h5 : 4 * a₂ ^ 2 = 1 := Nat.cast_injective h4
         nlinarith [ha₂pos, h5]
-      · rw [if_neg hξ₂, mul_zero] at h₂
+      · rw [ite_eq_right hξ₂, mul_zero] at h₂
         have : (a₂ : ℂ) = 0 ∨ (-1 - 1 : ℂ) = 0 := mul_eq_zero.mp h₂.symm
         rcases this with h | h
         · exact ha₂pos.ne' (by exact_mod_cast h)
         · norm_num at h
   · -- **case `(v, e₁) = 0`**: `v = −e'` for every other member; swapped assignment
-    rw [if_neg hξ, mul_zero] at ht₁
+    rw [ite_eq_right hξ, mul_zero] at ht₁
     -- every `χ' ≠ χ₁` has `a' = 1` and `E χ' = −v`
     have hbad : ∀ χ' ∈ X, χ' ≠ χ₁ → ∀ a' : ℕ,
         χ' - a' • χ₁ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥hyp.H) X hyp.A →
@@ -1045,7 +1045,7 @@ theorem exists_X_witness_assignment [Finite G]
         hyp.coherent_extension_eq_zsmul_irr hcohX hχ'X (hXS hχ'X).1
       rw [hveq, hE', inner_zsmul_irreducible_eq] at h'
       by_cases hξ' : ξv = ξ'w
-      · rw [if_pos hξ', mul_one] at h'
+      · rw [ite_eq_left hξ', mul_one] at h'
         -- `εv·ε' = −a'`: squares give `a' = 1`, then the sign gives `E χ' = −v`
         have hεv2 : (εv : ℂ) ^ 2 = 1 := by rcases hεv with rfl | rfl <;> norm_num
         have hε'2 : (ε' : ℂ) ^ 2 = 1 := by rcases hε' with rfl | rfl <;> norm_num
@@ -1066,7 +1066,7 @@ theorem exists_X_witness_assignment [Finite G]
           linear_combination (εv : ℂ) * h'' - (ε' : ℂ) * hεv2
         rw [hE', hveq, ← hξ', ← Int.cast_smul_eq_zsmul ℂ ε',
           ← Int.cast_smul_eq_zsmul ℂ εv, hεε, neg_smul]
-      · rw [if_neg hξ', mul_zero] at h'
+      · rw [ite_eq_right hξ', mul_zero] at h'
         exfalso
         rcases mul_eq_zero.mp h'.symm with h | h
         · obtain ⟨b, hbpos, hsuppb⟩ := hXdiff χ' hχ'X
@@ -1076,11 +1076,11 @@ theorem exists_X_witness_assignment [Finite G]
         · norm_num at h
     set wX : ClassFunction ↥hyp.H ℂ → ClassFunction G ℂ :=
       fun χ' => if χ' = χ₁ then v else -(hcohX.extension χ₁) with hwX
-    have hwXχ₁ : wX χ₁ = v := by rw [hwX]; exact if_pos rfl
+    have hwXχ₁ : wX χ₁ = v := by rw [hwX]; exact ite_eq_left rfl
     have hwXne : ∀ {χ'}, χ' ≠ χ₁ → wX χ' = -(hcohX.extension χ₁) := by
       intro χ' h
       rw [hwX]
-      exact if_neg h
+      exact ite_eq_right h
     refine ⟨wX, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · -- values in `ℤ[Irr G]`
       intro χ' hχ'

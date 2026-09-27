@@ -278,7 +278,7 @@ theorem submodule_iso_of_character_eq [IsAlgClosed k] [FiniteDimensional k V] [F
   have h2 : (Nat.card ↥H : k)⁻¹ * ∑ h : ↥H,
       ((Subrepresentation.ofSubmodule' W).toRepresentation).character h
         * ((Subrepresentation.ofSubmodule' W).toRepresentation).character h⁻¹ = 1 := by
-    rw [Representation.char_orthonormal, if_pos ⟨Representation.Equiv.refl _⟩]
+    rw [Representation.char_orthonormal, ite_eq_left ⟨Representation.Equiv.refl _⟩]
   have key := Representation.char_orthonormal
     ((Subrepresentation.ofSubmodule' (W.map (conjSemilinearEnd (H := H) ρ g))).toRepresentation)
     ((Subrepresentation.ofSubmodule' W).toRepresentation)
@@ -287,7 +287,7 @@ theorem submodule_iso_of_character_eq [IsAlgClosed k] [FiniteDimensional k V] [F
       ((Subrepresentation.ofSubmodule'
         (W.map (conjSemilinearEnd (H := H) ρ g))).toRepresentation)) := by
     by_contra hc
-    rw [if_neg hc] at key
+    rw [ite_eq_right hc] at key
     exact one_ne_zero key
   obtain ⟨φ⟩ := hne
   exact ⟨(subRepAsModuleEquiv (resRep ρ H) W).trans ((equivAsModule φ).trans

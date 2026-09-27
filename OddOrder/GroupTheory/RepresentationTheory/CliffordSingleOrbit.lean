@@ -398,11 +398,11 @@ theorem apply_one_eq_restrictionMultiplicity_mul_index_inertia
           else 0 := by
     intro θ
     by_cases hmem : θ ∈ IrreducibleCharacter.conjByOrbit (G := G) (H := H) θ₀
-    · rw [if_pos hmem]
+    · rw [ite_eq_left hmem]
       obtain ⟨g, rfl⟩ := IrreducibleCharacter.mem_conjByOrbit.mp hmem
       rw [IrreducibleCharacter.HasCommonRestrictionMultiplicity.eq_of_liesOver hcommon
         (IrreducibleCharacter.liesOver_conjBy hθ₀ g) hθ₀, conjBy_apply_one]
-    · rw [if_neg hmem]
+    · rw [ite_eq_right hmem]
       have hm0 : ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ)
           (θ : ClassFunction ↥H ℂ) = 0 := by
         by_contra hm
@@ -482,7 +482,7 @@ theorem coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce
     have hite := irreducibleCharacter_inner_eq_ite
       (⟨ClassFunction.induce I (ψ : ClassFunction ↥I ℂ), hind⟩ : IrreducibleCharacter G) χ
     rw [IrreducibleCharacter.coe_mk] at hite
-    rw [hite, if_neg h]
+    rw [hite, ite_eq_right h]
   rw [← heq, IrreducibleCharacter.coe_mk]
 
 /-- **Clifford correspondence, degree** ([Isaacs] Thm 6.11).  Under the hypotheses of

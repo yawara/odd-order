@@ -250,7 +250,7 @@ theorem algebraMap_irreducibleBrauerCharacter_eq_sum_intBasicSetMatrix {A : ι �
       (character_involution_mul_self hp hyb hωC eC eQ (quotientPi_surjective π hπ hlin hN)
         (quotientPi_smul π hπ hlin hN) hπC hlinC hkerJC hnilC hnilQ hω'C hζ hζk hζK hconv hMp
         hquot S hφ₀ hyb2 hconjall hyb1 hcart hj₀)]
-  · rw [principalBasicSet, if_neg hj, mul_zero, mul_zero]
+  · rw [principalBasicSet, ite_eq_right hj, mul_zero, mul_zero]
 
 /-! ### Navarro p. 141, equations (4) and (5): the orthogonality of the columns -/
 

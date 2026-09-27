@@ -893,7 +893,7 @@ noncomputable def normSqSumQ {H : Type*} [Group H] (A : Finset H) (χ : ClassFun
 theorem normSqSumQ_spec {H : Type*} [Group H] {A : Finset H} {χ : ClassFunction H ℂ}
     (h : ∃ n : ℕ, (n : ℝ) = ∑ x ∈ A, ‖χ x‖ ^ 2) :
     ((normSqSumQ A χ : ℚ) : ℝ) = ∑ x ∈ A, ‖χ x‖ ^ 2 := by
-  rw [normSqSumQ, dif_pos h]
+  rw [normSqSumQ, dite_eq_left h]
   exact_mod_cast Classical.choose_spec h
 
 set_option maxHeartbeats 1600000 in

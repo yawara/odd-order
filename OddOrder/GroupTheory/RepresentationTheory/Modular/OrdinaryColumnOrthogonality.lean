@@ -176,8 +176,8 @@ theorem characterMatrix_mul_characterMatrixInv :
     ring
   rw [Finset.sum_congr rfl fun j _ => hexp j, ← Finset.mul_sum, ← hsum]
   split
-  · next h => rw [if_pos (by rw [h]), inv_mul_cancel₀ hunit]
-  · next h => rw [if_neg (fun hc => h hc.symm), mul_zero]
+  · next h => rw [ite_eq_left (by rw [h]), inv_mul_cancel₀ hunit]
+  · next h => rw [ite_eq_right (fun hc => h hc.symm), mul_zero]
 
 /-- **Second (column) orthogonality, in matrix form**: `W · X = 1`.  The character table is square,
 so the one-sided inverse of `characterMatrix_mul_characterMatrixInv` is two-sided. -/
@@ -254,7 +254,7 @@ theorem sum_character_inv_mul_character (x y : G) :
   have hiff : (j = j') ↔ IsConj x y := by
     rw [hj, hj', Equiv.symm_apply_eq, Equiv.apply_symm_apply, ConjClasses.mk_eq_mk_iff_isConj]
   by_cases h : IsConj x y
-  · rw [if_pos (hiff.mpr h), if_pos h]
-  · rw [if_neg (fun hc => h (hiff.mp hc)), if_neg h]
+  · rw [ite_eq_left (hiff.mpr h), ite_eq_left h]
+  · rw [ite_eq_right (fun hc => h (hiff.mp hc)), ite_eq_right h]
 
 end OddOrder.RepresentationTheory.Modular

@@ -976,7 +976,7 @@ For each prime `p`, the engine `isHall_oPiCore_of_forall_hasNormalPComplement` (
 theorem isNilpotent_of_forall_hasNormalPComplement {H : Type*} [Group H] [Finite H]
     (h : ∀ p : ℕ, p.Prime → p ∈ (Nat.card H).primeFactors → Ch05.HasNormalPComplement p H) :
     Group.IsNilpotent H := by
-  refine ((Group.isNilpotent_of_finite_tfae (G := H)).out 0 3).mpr ?_
+  refine ((Group.isNilpotent_of_finite_tfae (G := H)).out 1 4).mpr ?_
   intro p hp P
   have := hp
   have hHall : Ch03.IsHallSubgroup ({p} : Set ℕ) (Ch03.oPiCore ({p} : Set ℕ) H) :=

@@ -481,7 +481,7 @@ Frattini 部分群の非生成性 (`frattini_nongenerating`) で `N_G(P) = ⊤`�
 正規なので `G` は冪零 (`isNilpotent_of_finite_tfae`)。1D.14 (`Φ(G) ⊆ Z(G) ⟹ 冪零`) を一般化する。 -/
 theorem isNilpotent_of_quotient_frattini_isNilpotent {G : Type*} [Group G] [Finite G]
     [Group.IsNilpotent (G ⧸ frattini G)] : Group.IsNilpotent G := by
-  refine (Group.isNilpotent_of_finite_tfae.out 3 0 rfl rfl).mp ?_
+  refine (Group.isNilpotent_of_finite_tfae.out 4 1 rfl rfl).mp ?_
   intro p hp P
   have := hp
   -- `θ(P)` は `G/Φ(G)` の Sylow `p`-部分群 `Q`
@@ -557,7 +557,7 @@ theorem isNilpotent_of_frattini_le_of_quotient_isNilpotent {G : Type*} [Group G]
     {N : Subgroup G} [N.Normal] (hΦN : frattini G ≤ N)
     (hquot : Group.IsNilpotent (↥N ⧸ (frattini G).subgroupOf N)) :
     Group.IsNilpotent ↥N := by
-  refine (Group.isNilpotent_of_finite_tfae.out 3 0 rfl rfl).mp ?_
+  refine (Group.isNilpotent_of_finite_tfae.out 4 1 rfl rfl).mp ?_
   intro p hp P
   have := hp
   have hinner := sylow_normalizer_sup_eq_top_of_quotient_nilpotent hquot P
@@ -948,13 +948,13 @@ theorem card_orderOf_eq_prime_add_one_modEq_zero {G : Type*} [Group G] [Finite G
         left_inv := fun x => ?_
         right_inv := fun o => ?_ }
     · by_cases h : x.1 = 1
-      · simp only [dif_pos h, Option.elim]; exact Subtype.ext h.symm
-      · simp only [dif_neg h, Option.elim]
+      · simp only [dite_eq_left h, Option.elim]; exact Subtype.ext h.symm
+      · simp only [dite_eq_right h, Option.elim]
     · rcases o with _ | y
-      · simp only [Option.elim, dif_pos]
+      · simp only [Option.elim, dite_eq_left]
       · have hy1 : y.1 ≠ 1 :=
           fun h => hp.out.one_lt.ne' (y.2.symm.trans (orderOf_eq_one_iff.mpr h))
-        simp only [Option.elim, dif_neg hy1]
+        simp only [Option.elim, dite_eq_right hy1]
   rw [hpart] at hmck
   exact hmck
 

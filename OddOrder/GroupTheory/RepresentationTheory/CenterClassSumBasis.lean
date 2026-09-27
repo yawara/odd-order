@@ -106,7 +106,7 @@ theorem center_eq_sum_classSum {z : MonoidAlgebra k G}
   simp only [MonoidAlgebra.coeff_smul_apply, smul_eq_mul, coeff_classSum, mul_ite, mul_one,
     mul_zero]
   rw [Finset.sum_ite_eq Finset.univ (ConjClasses.mk y) (fun C => z.coeff (C.out)),
-    if_pos (Finset.mem_univ _)]
+    ite_eq_left (Finset.mem_univ _)]
   have hmk : ConjClasses.mk ((ConjClasses.mk y).out) = ConjClasses.mk y := by
     rw [← ConjClasses.quotient_mk_eq_mk]; exact Quotient.out_eq _
   exact (coeff_center_of_mk_eq hz hmk).symm

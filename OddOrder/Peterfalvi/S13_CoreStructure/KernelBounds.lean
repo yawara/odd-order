@@ -110,7 +110,7 @@ theorem opCore_map_le_centralizer [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
       = (Nat.card ↥K).factorization q' := by
     rw [hcardK, hcard, Nat.factorization_mul (pow_ne_zero _ hp_prime.pos.ne') Nat.card_pos.ne',
       Finsupp.add_apply, hp_prime.factorization_pow,
-      Finsupp.single_apply, if_neg (fun h => hne h.symm), zero_add]
+      Finsupp.single_apply, ite_eq_right (fun h => hne h.symm), zero_add]
   -- a Sylow `q'` of `K`, lifted to `H`, is a full Sylow `q'` of `H`
   obtain ⟨S'⟩ : Nonempty (Sylow q' ↥K) := inferInstance
   set P' := (S' : Subgroup ↥K).map K.subtype with hP'

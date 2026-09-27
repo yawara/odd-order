@@ -53,9 +53,7 @@ theorem exists_int_of_isIntegral_of_mem_range_rat {α : ℂ} (hα : IsIntegral �
     (hrat : ∃ q : ℚ, (q : ℂ) = α) : ∃ z : ℤ, (z : ℂ) = α := by
   obtain ⟨q, rfl⟩ := hrat
   -- `q` is integral over `ℤ` (the map `ℚ → ℂ` is injective, so integrality descends).
-  have hqℚ : IsIntegral ℤ q := by
-    have hinj : Function.Injective (algebraMap ℚ ℂ) := (algebraMap ℚ ℂ).injective
-    exact (isIntegral_algebraMap_iff hinj).mp hα
+  have hqℚ : IsIntegral ℤ q := isIntegral_algebraMap_iff.mp hα
   -- `ℤ` is integrally closed in `ℚ`, so `q ∈ ℤ`.
   obtain ⟨z, hz⟩ := (IsIntegrallyClosed.isIntegral_iff).mp hqℚ
   refine ⟨z, ?_⟩

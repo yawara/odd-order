@@ -427,15 +427,15 @@ theorem norm_eq_and_X_eq_sum_of_norm_Y_ge
     rw [D.X_eq, hE, Finset.sum_filter]
     refine Finset.sum_congr rfl fun α hα => ?_
     rcases hcoeff01 α hα with h0 | h1
-    · rw [h0, if_neg (by norm_num), Int.cast_zero, zero_smul]
-    · rw [h1, if_pos rfl, Int.cast_one, one_smul]
+    · rw [h0, ite_eq_right (by norm_num), Int.cast_zero, zero_smul]
+    · rw [h1, ite_eq_left rfl, Int.cast_one, one_smul]
   · -- `|E| = ∑ coeff α = ‖χ‖²`: on `R(χ)`, `coeff α = (if coeff α = 1 then 1 else 0)`.
     have hcard : (E.card : ℤ) = ∑ α ∈ D.imageFamily.imageSet, D.coeff α := by
       rw [hE, Finset.card_filter, Nat.cast_sum]
       refine Finset.sum_congr rfl fun α hα => ?_
       rcases hcoeff01 α hα with h0 | h1
-      · rw [h0, if_neg (by norm_num), Nat.cast_zero]
-      · rw [h1, if_pos rfl, Nat.cast_one]
+      · rw [h0, ite_eq_right (by norm_num), Nat.cast_zero]
+      · rw [h1, ite_eq_left rfl, Nat.cast_one]
     rw [D.inner_self_chi_eq_intCast]
     exact_mod_cast hcard
 

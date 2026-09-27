@@ -163,7 +163,7 @@ theorem exists_sigmaBeta (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     intro pq
     rw [ClassFunction.inner_smul_left, (hyp.chiFam_spec hVeq app).2.2.1]
     split_ifs <;> ring
-  simp only [hstep, Finset.sum_ite_eq' Finset.univ rs, Finset.mem_univ, if_true]
+  simp only [hstep, Finset.sum_ite_eq' Finset.univ rs, Finset.mem_univ, ite_true]
   exact sub_self _
 
 /-- **Peterfalvi (3.8)(b), the reconstruction clause**: in the single-column branch,
@@ -431,23 +431,24 @@ theorem eq_smul_chiFam_diff_of_all_sigmaCoeff_zero (hyp : TICyclicHypothesis G) 
   classical
   have hc1 : ClassFunction.inner X (hyp.chiFam hVeq app P1) = (s : ℂ) := by
     have he := hall P1
-    rw [hyp.sigmaCoeff_sub_smul_chiFam_diff hVeq app X s P1 P2 P1, if_pos rfl,
-      if_neg (Ne.symm hPne)] at he
+    rw [hyp.sigmaCoeff_sub_smul_chiFam_diff hVeq app X s P1 P2 P1, ite_eq_left rfl,
+      ite_eq_right (Ne.symm hPne)] at he
     change hyp.sigmaCoeff hVeq app X P1 = _
     linear_combination he
   have hc2 : ClassFunction.inner X (hyp.chiFam hVeq app P2) = -(s : ℂ) := by
     have he := hall P2
-    rw [hyp.sigmaCoeff_sub_smul_chiFam_diff hVeq app X s P1 P2 P2, if_neg hPne, if_pos rfl] at he
+    rw [hyp.sigmaCoeff_sub_smul_chiFam_diff hVeq app X s P1 P2 P2, ite_eq_right hPne,
+      ite_eq_left rfl] at he
     change hyp.sigmaCoeff hVeq app X P2 = _
     linear_combination he
   have h11 : ClassFunction.inner (hyp.chiFam hVeq app P1) (hyp.chiFam hVeq app P1) = 1 := by
-    rw [(hyp.chiFam_spec hVeq app).2.2.1, if_pos rfl]
+    rw [(hyp.chiFam_spec hVeq app).2.2.1, ite_eq_left rfl]
   have h22 : ClassFunction.inner (hyp.chiFam hVeq app P2) (hyp.chiFam hVeq app P2) = 1 := by
-    rw [(hyp.chiFam_spec hVeq app).2.2.1, if_pos rfl]
+    rw [(hyp.chiFam_spec hVeq app).2.2.1, ite_eq_left rfl]
   have h12 : ClassFunction.inner (hyp.chiFam hVeq app P1) (hyp.chiFam hVeq app P2) = 0 := by
-    rw [(hyp.chiFam_spec hVeq app).2.2.1, if_neg hPne]
+    rw [(hyp.chiFam_spec hVeq app).2.2.1, ite_eq_right hPne]
   have h21 : ClassFunction.inner (hyp.chiFam hVeq app P2) (hyp.chiFam hVeq app P1) = 0 := by
-    rw [(hyp.chiFam_spec hVeq app).2.2.1, if_neg (Ne.symm hPne)]
+    rw [(hyp.chiFam_spec hVeq app).2.2.1, ite_eq_right (Ne.symm hPne)]
   have hc1' : ClassFunction.inner (hyp.chiFam hVeq app P1) X = (s : ℂ) := by
     rw [OddOrder.RepresentationTheory.inner_conj_symm, hc1, star_intCast]
   have hc2' : ClassFunction.inner (hyp.chiFam hVeq app P2) X = -(s : ℂ) := by
@@ -512,7 +513,8 @@ theorem eq_smul_chiFam_diff_of_vanishOnV (hyp : TICyclicHypothesis G) [Fintype h
       by_contra hcon
       simp only [Set.mem_union, Set.mem_ofPred_eq, Set.mem_insert_iff, Set.mem_singleton_iff,
         not_or, not_not] at hcon
-      exact hx (by rw [hae x, hcon.1, if_neg (Ne.symm hcon.2.1), if_neg (Ne.symm hcon.2.2)]; ring)
+      exact hx (by rw [hae x, hcon.1, ite_eq_right (Ne.symm hcon.2.1),
+        ite_eq_right (Ne.symm hcon.2.2)]; ring)
     have hbpair : ({P1, P2} : Set _).ncard ≤ 2 :=
       (Set.ncard_insert_le _ _).trans (by rw [Set.ncard_singleton])
     calc {x | a x ≠ 0}.ncard ≤ ({x | Gr x ≠ 0} ∪ {P1, P2}).ncard :=
@@ -608,9 +610,9 @@ theorem eq_sum_sigmaCoeff_smul_chiFam_of_inner_self_eq (hyp : TICyclicHypothesis
     refine Finset.sum_congr rfl fun pq _ => ?_
     rw [Finset.sum_eq_single pq
       (fun ab _ hab => by
-        rw [(hyp.chiFam_spec hVeq app).2.2.1, if_neg (Ne.symm hab), mul_zero])
+        rw [(hyp.chiFam_spec hVeq app).2.2.1, ite_eq_right (Ne.symm hab), mul_zero])
       (fun h => absurd (Finset.mem_univ pq) h),
-      (hyp.chiFam_spec hVeq app).2.2.1, if_pos rfl, mul_one]
+      (hyp.chiFam_spec hVeq app).2.2.1, ite_eq_left rfl, mul_one]
   -- `⟨X, Y⟩ = ∑ s·conj s`.
   have hXY : ClassFunction.inner X Y
       = ∑ pq, hyp.sigmaCoeff hVeq app X pq * star (hyp.sigmaCoeff hVeq app X pq) := by

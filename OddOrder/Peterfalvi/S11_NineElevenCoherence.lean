@@ -494,7 +494,7 @@ theorem inertia_index_eq_q_of_induce_irreducible (data : TypesIIIIIIVSetup M)
       (ClassFunction.induce (huSub data) θ.toClassFunction) = 1 := by
     have h := irreducibleCharacter_inner_eq_ite
       (⟨_, hirr⟩ : IrreducibleCharacter ↥M) ⟨_, hirr⟩
-    rwa [if_pos rfl] at h
+    rwa [ite_eq_left rfl] at h
   have hcard := card_mul_inner_self_induce_eq_card_inertia (G := ↥M) (H := huSub data) θ
   rw [hone, mul_one] at hcard
   have hcardN : Nat.card ↥(huSub data)

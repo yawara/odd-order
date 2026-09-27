@@ -1089,7 +1089,7 @@ theorem Hypothesis.chiRhoNormSq_zeta_ge_line78 [Finite G]
     have hite := irreducibleCharacter_inner_eq_ite
       (⟨params.zeta, params.zeta_irreducible⟩ : IrreducibleCharacter ↥M)
       (⟨params.zeta.conj, params.zeta_irreducible.conj⟩ : IrreducibleCharacter ↥M)
-    rw [if_neg hne_zeta] at hite
+    rw [ite_eq_right hne_zeta] at hite
     simpa using hite
   have hdeg' : ClassFunction.induce K (θ0' : ClassFunction ↥K ℂ) (1 : ↥M)
       = 1 * ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥M) := by

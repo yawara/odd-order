@@ -219,7 +219,7 @@ theorem false_of_exists_involution {v : G} (hv : v ∈ (cfg.P : Subgroup G))
       (Finset.mem_filter.mp hiS).2
     by_cases hcase : (wedderburnRepresentation eG i).character cfg.u
         = (wedderburnRepresentation eG i).character 1
-    · rw [if_pos hcase]
+    · rw [ite_eq_left hcase]
       -- `u` acts trivially, so by Step 3 all of `G` does
       have hu1 : (wedderburnRepresentation eG i) cfg.u = 1 :=
         rep_eq_one_of_character_eq_of_mul_self_eq_one _ cfg.mul_self hcase
@@ -234,7 +234,7 @@ theorem false_of_exists_involution {v : G} (hv : v ∈ (cfg.P : Subgroup G))
       rw [htriv v, htriv cfg.u, htriv 1, Module.finrank_fintype_fun_eq_card]
       push_cast
       ring
-    · rw [if_neg hcase]
+    · rw [ite_eq_right hcase]
       have hstep9 := cfg.character_sq_eq_of_character_ne_zero eG hπG hlinG hnilG hkerJG hv hv2
         hvne hi
       have hfac : ((wedderburnRepresentation eG i).character cfg.u

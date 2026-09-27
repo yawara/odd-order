@@ -87,8 +87,7 @@ theorem latticeBaseChangeEquiv_baseChange (ρ : Representation K G V) {L : Submo
         (LinearMap.baseChange K ((latticeRepresentation ρ hL).asAlgebraHom a) w)
       = ρ.asAlgebraHom (MonoidAlgebra.mapRingHom G (algebraMap 𝒪 K) a)
           (latticeBaseChangeEquiv K L w) := by
-  induction w using TensorProduct.induction_on with
-  | zero => rw [map_zero, map_zero, map_zero]
+  induction w using TensorProduct.inductionOn with
   | tmul c v =>
     rw [LinearMap.baseChange_tmul, latticeBaseChangeEquiv_tmul, latticeBaseChangeEquiv_tmul,
       map_smul]

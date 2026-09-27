@@ -118,6 +118,6 @@ theorem exists_odd_intCast_principalBasicSet
         hζk hζK hconv hNp hquot S hφ₀ hconjall hjB P hPcard hPsing hε.symm) hsign
   refine ⟨basicSetSign eG t j * (Fintype.card (mG j) : ℤ), ?_,
     OddOrder.Algebra.odd_mul_of_eq_one_or_neg_one hsign hodd⟩
-  rw [principalBasicSet, if_pos ⟨hjB, hjne⟩, Int.cast_mul, hε, hone]
+  rw [principalBasicSet, ite_eq_left ⟨hjB, hjne⟩, Int.cast_mul, hε, hone]
 
 end OddOrder.RepresentationTheory.Modular

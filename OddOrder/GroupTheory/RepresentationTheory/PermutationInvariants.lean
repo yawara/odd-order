@@ -96,7 +96,7 @@ theorem repr_smul_eq (b : Basis ι k V) (ρ : Representation k G V)
   simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, hv g, Finsupp.lmapDomain_apply] at hv2
   calc b.repr v (g • i)
       = (Finsupp.mapDomain (g • ·) (b.repr v)) (g • i) := by rw [← hv2]
-    _ = b.repr v i := Finsupp.mapDomain_apply (MulAction.injective g) _ _
+    _ = b.repr v i := Finsupp.mapDomain_apply_of_injective (MulAction.injective g) _ _
 
 /-- The image of `orbitToVec` is **exactly** the `G`-invariants: every invariant vector has
 `b`-coordinates constant on orbits (`repr_smul_eq`), so it is `orbitToVec b h` for the function

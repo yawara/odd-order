@@ -80,7 +80,7 @@ theorem ncard_inner_grid_ne_zero_le_one {Idx : Type*}
       apply hi
       rw [hXrepr, hνrepr, ← Int.cast_smul_eq_zsmul ℂ, ← Int.cast_smul_eq_zsmul ℂ,
         ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
-        irreducibleCharacter_inner_eq_ite, if_neg hne, mul_zero, mul_zero]
+        irreducibleCharacter_inner_eq_ite, ite_eq_right hne, mul_zero, mul_zero]
     rw [hνrepr, hμν]
   by_cases hempty : {i : Idx | ClassFunction.inner X (χ i) ≠ 0} = ∅
   · rw [hempty]; simp
@@ -92,7 +92,7 @@ theorem ncard_inner_grid_ne_zero_le_one {Idx : Type*}
       have hinner : ClassFunction.inner (χ i) (χ i₀) ≠ 0 := by
         rw [hrepr, hrepr₀, ← Int.cast_smul_eq_zsmul ℂ, ← Int.cast_smul_eq_zsmul ℂ,
           ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
-          irreducibleCharacter_inner_eq_ite, if_pos rfl, star_intCast, mul_one]
+          irreducibleCharacter_inner_eq_ite, ite_eq_left rfl, star_intCast, mul_one]
         rcases hδ with rfl | rfl <;> rcases hδ₀ with rfl | rfl <;> norm_num
       by_cases heq : i = i₀
       · exact heq
@@ -124,10 +124,10 @@ theorem ncard_inner_grid_ne_zero_le_two {Idx : Type*} [Finite Idx]
   have hβZ : β ∈ ZIrr G := IrreducibleCharacter.mem_ZIrr (⟨β, hβm⟩ : IrreducibleCharacter G)
   have hα1 : ClassFunction.inner α α = 1 := by
     have := irreducibleCharacter_inner_eq_ite (⟨α, hαm⟩ : IrreducibleCharacter G) ⟨α, hαm⟩
-    rwa [if_pos rfl] at this
+    rwa [ite_eq_left rfl] at this
   have hβ1 : ClassFunction.inner β β = 1 := by
     have := irreducibleCharacter_inner_eq_ite (⟨β, hβm⟩ : IrreducibleCharacter G) ⟨β, hβm⟩
-    rwa [if_pos rfl] at this
+    rwa [ite_eq_left rfl] at this
   have hXαβ : X = (c α : ℂ) • α + (c β : ℂ) • β := by
     rw [hrepr, hs, Finset.sum_pair hαβ]
   refine le_trans (Set.ncard_le_ncard (t :=
@@ -184,14 +184,14 @@ theorem inner_grid_eq_zero_or_pm_one_of_inner_self_two {Idx : Type*}
   by_cases hαe : (⟨α, hαm⟩ : IrreducibleCharacter G) = ν
   · by_cases hβe : (⟨β, hβm⟩ : IrreducibleCharacter G) = ν
     · exact absurd (Subtype.ext_iff.mp (hαe.trans hβe.symm)) hαβ
-    · rw [if_pos hαe, if_neg hβe]
+    · rw [ite_eq_left hαe, ite_eq_right hβe]
       simp only [mul_one, mul_zero, add_zero]
       rcases hcα with hcα | hcα <;> rcases hε with hε | hε <;> rw [hcα, hε] <;> norm_num
   · by_cases hβe : (⟨β, hβm⟩ : IrreducibleCharacter G) = ν
-    · rw [if_neg hαe, if_pos hβe]
+    · rw [ite_eq_right hαe, ite_eq_left hβe]
       simp only [mul_one, mul_zero, zero_add]
       rcases hcβ with hcβ | hcβ <;> rcases hε with hε | hε <;> rw [hcβ, hε] <;> norm_num
-    · rw [if_neg hαe, if_neg hβe]; left; ring
+    · rw [ite_eq_right hαe, ite_eq_right hβe]; left; ring
 
 /-- The difference-grid formula:
 `⟨X − s·(χ_{P₁} − χ_{P₂}), χ pq⟩ = ⟨X, χ pq⟩ − s·([P₁=pq] − [P₂=pq])`.
@@ -236,12 +236,13 @@ theorem eq_smul_grid_diff_of_all_inner_zero {Idx : Type*}
   classical
   have hc1 : ClassFunction.inner X (χ P1) = (s : ℂ) := by
     have he := hall P1
-    rw [inner_sub_smul_grid_diff χ horth_diag horth_off X s P1 P2 P1, if_pos rfl,
-      if_neg (Ne.symm hPne)] at he
+    rw [inner_sub_smul_grid_diff χ horth_diag horth_off X s P1 P2 P1, ite_eq_left rfl,
+      ite_eq_right (Ne.symm hPne)] at he
     linear_combination he
   have hc2 : ClassFunction.inner X (χ P2) = -(s : ℂ) := by
     have he := hall P2
-    rw [inner_sub_smul_grid_diff χ horth_diag horth_off X s P1 P2 P2, if_neg hPne, if_pos rfl] at he
+    rw [inner_sub_smul_grid_diff χ horth_diag horth_off X s P1 P2 P2, ite_eq_right hPne,
+      ite_eq_left rfl] at he
     linear_combination he
   have h11 : ClassFunction.inner (χ P1) (χ P1) = 1 := horth_diag P1
   have h22 : ClassFunction.inner (χ P2) (χ P2) = 1 := horth_diag P2
@@ -318,7 +319,8 @@ theorem orthonormalGrid_diff_rigidity {ι κ : Type*} [Finite ι] [Finite κ]
       by_contra hcon
       simp only [Set.mem_union, Set.mem_ofPred_eq, Set.mem_insert_iff, Set.mem_singleton_iff,
         not_or, not_not] at hcon
-      exact hx (by rw [hae x, hcon.1, if_neg (Ne.symm hcon.2.1), if_neg (Ne.symm hcon.2.2)]; ring)
+      exact hx (by rw [hae x, hcon.1, ite_eq_right (Ne.symm hcon.2.1),
+        ite_eq_right (Ne.symm hcon.2.2)]; ring)
     have hbpair : ({P1, P2} : Set _).ncard ≤ 2 :=
       (Set.ncard_insert_le _ _).trans (by rw [Set.ncard_singleton])
     calc {x | a x ≠ 0}.ncard ≤ ({x | Gr x ≠ 0} ∪ {P1, P2}).ncard :=

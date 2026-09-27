@@ -82,7 +82,7 @@ theorem coeff_classSum_mul_self_eq_zero_of_not_isPRegular (T : Sylow 2 G) {z : G
   classical
   rw [coeff_classSum_mul]
   refine Finset.sum_eq_zero fun v hv => ?_
-  rw [coeff_classSum, if_neg]
+  rw [coeff_classSum, ite_eq_right]
   intro hmk
   -- both factors of `g = v * (v⁻¹ * g)` are conjugates of `t`, hence involutions
   have hvord : orderOf v = 2 :=

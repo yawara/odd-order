@@ -92,7 +92,7 @@ theorem le_normalizer_finsetSup [Finite G] {H : Subgroup G} (T : Finset ℕ) (Z 
     rw [Finset.sup_insert]
     refine (le_inf (h q (Finset.mem_insert_self q T'))
       (ih (fun p hp => h p (Finset.mem_insert_of_mem hp)))).trans ?_
-    exact Subgroup.normalizer_inf_normalizer_le_normalizer_sup _ _
+    exact Subgroup.inf_normalizer_le_normalizer_sup _ _
 
 /-- **Internal direct product, cardinality**: for a `Finset` `T` of primes and `Z p` a `p`-group
 normalized by `H ≥ Z p`, `|T.sup Z| = ∏_{p ∈ T} |Z p|`. By `Finset.induction`, splitting off one

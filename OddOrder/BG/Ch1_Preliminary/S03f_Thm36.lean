@@ -1220,7 +1220,7 @@ private theorem thm36_aux : ∀ (n : ℕ)
           obtain ⟨k, hk⟩ := (hPp.map H.subtype).exists_card_eq
           rw [hAcard, hk, hr_card, Nat.factorization_mul (pow_ne_zero k hp.ne_zero)
             hr_prime.ne_zero, Finsupp.add_apply, hp.factorization_pow,
-            Finsupp.single_apply, if_neg hpr, hr_prime.factorization_self]
+            Finsupp.single_apply, ite_eq_right hpr, hr_prime.factorization_self]
         have hYcard : Nat.card ↥(Subgroup.zpowers yA)
             = r ^ (Nat.card ↥A).factorization r := by
           rw [hfact, pow_one, Nat.card_zpowers, hyA_ord]

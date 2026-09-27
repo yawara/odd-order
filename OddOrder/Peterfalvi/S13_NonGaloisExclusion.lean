@@ -295,8 +295,8 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
     obtain ⟨q, -, rfl⟩ := h1
     rw [hRinner q p]
     by_cases hpq : q = p
-    · rw [if_pos hpq, if_pos (by rw [hpq])]
-    · rw [if_neg hpq, if_neg (fun he => hpq (hRinj he))]
+    · rw [ite_eq_left hpq, ite_eq_left (by rw [hpq])]
+    · rw [ite_eq_right hpq, ite_eq_right (fun he => hpq (hRinj he))]
   -- ### 3. complementarity `⟨c(μ), R p⟩ − ⟨c(μ̄), R p⟩ = 1`
   have hdiffsupp : ((μ - μ.conj : ClassFunction ↥M ℂ)).support ⊆ hyp.base.A0 := by
     rw [show (μ - μ.conj : ClassFunction ↥M ℂ) = -(μ.conj - μ) from by abel,
@@ -312,7 +312,7 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
       Finset.sum_image (fun p _ q _ hpq => hRinj hpq),
       OddOrder.RepresentationTheory.inner_sum_left,
       Finset.sum_congr rfl (fun q _ => hRinner q p),
-      Finset.sum_ite_eq' Finset.univ p (fun _ => (1 : ℂ)), if_pos (Finset.mem_univ p)]
+      Finset.sum_ite_eq' Finset.univ p (fun _ => (1 : ℂ)), ite_eq_left (Finset.mem_univ p)]
   have hcompl : ∀ p, ClassFunction.inner (c.extension μ.conj) (R p)
       = ClassFunction.inner (c.extension μ) (R p) - 1 := by
     intro p
@@ -401,8 +401,8 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
       Finset.sum_ite_eq' E
         (R (!p.1, OddOrder.Peterfalvi.S06.rowInv h46.toHypothesis p.2)) (fun _ => (-1 : ℂ))]
     · by_cases hmem : R (!p.1, OddOrder.Peterfalvi.S06.rowInv h46.toHypothesis p.2) ∈ E
-      · rw [if_pos hmem, if_pos hmem]
-      · rw [if_neg hmem, if_neg hmem, neg_zero]
+      · rw [ite_eq_left hmem, ite_eq_left hmem]
+      · rw [ite_eq_right hmem, ite_eq_right hmem, neg_zero]
     · have h1 := hEsub hα
       rw [hRimg, Finset.mem_image] at h1
       obtain ⟨q, -, rfl⟩ := h1
@@ -411,10 +411,10 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
         hRinner (!q.1, OddOrder.Peterfalvi.S06.rowInv h46.toHypothesis q.2) p]
       -- `J q = p ↔ q = J p` (both `!` and `rowInv` are involutions)
       by_cases hqp : (!q.1, OddOrder.Peterfalvi.S06.rowInv h46.toHypothesis q.2) = p
-      · rw [if_pos hqp, if_pos (show R q
+      · rw [ite_eq_left hqp, ite_eq_left (show R q
             = R (!p.1, OddOrder.Peterfalvi.S06.rowInv h46.toHypothesis p.2) from by
           rw [← hqp, hJJ q])]
-      · rw [if_neg hqp, if_neg (show ¬ R q
+      · rw [ite_eq_right hqp, ite_eq_right (show ¬ R q
             = R (!p.1, OddOrder.Peterfalvi.S06.rowInv h46.toHypothesis p.2) from by
           intro he
           exact hqp (by rw [hRinj he, hJJ p]))]
@@ -523,8 +523,8 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
     rw [hχ₂def, certainTypeOmegaSigma_muColumnChar_eq_aligned hG hyp.base hcw1
       (finCongr hcw1 i') k, hτφdef, hrow0 (finCongr hcw1 i') k]
     by_cases h0 : i' = 0
-    · rw [if_pos ((hfc0 i').mpr h0), if_pos h0]
-    · rw [if_neg (fun h => h0 ((hfc0 i').mp h)), if_neg h0]
+    · rw [ite_eq_left ((hfc0 i').mpr h0), ite_eq_left h0]
+    · rw [ite_eq_right (fun h => h0 ((hfc0 i').mp h)), ite_eq_right h0]
   -- same for the inverse column `χ₂⁻¹ = muColumnChar kinv`
   have hctvalinv : ∀ i' : Fin (Nat.card ↥h46.W1),
       ClassFunction.inner τφ (OddOrder.Peterfalvi.S06.certainTypeOmegaSigma h46 χ₂⁻¹ i')
@@ -535,8 +535,8 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
     rw [certainTypeOmegaSigma_muColumnChar_eq_aligned hG hyp.base hcw1
       (finCongr hcw1 i') kinv, hτφdef, hrow0 (finCongr hcw1 i') kinv]
     by_cases h0 : i' = 0
-    · rw [if_pos ((hfc0 i').mpr h0), if_pos h0]
-    · rw [if_neg (fun h => h0 ((hfc0 i').mp h)), if_neg h0]
+    · rw [ite_eq_left ((hfc0 i').mpr h0), ite_eq_left h0]
+    · rw [ite_eq_right (fun h => h0 ((hfc0 i').mp h)), ite_eq_right h0]
   -- the signed member values
   set δ : ℤ := (h46.columnFamily χ₂).sign with hδdef
   have hδpm : δ = 1 ∨ δ = -1 := (h46.columnFamily χ₂).sign_eq
@@ -583,17 +583,17 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
     · rw [hvalfalse i']
       by_cases h0 : i' = 0
       · subst h0
-        rw [if_pos rfl, if_pos rfl, if_neg hft, add_zero]
-      · rw [if_neg h0,
-          if_neg (fun he => h0 (by simpa using congrArg Prod.snd (hRinj he))),
-          if_neg (fun he => by simpa using congrArg Prod.fst (hRinj he)), add_zero]
+        rw [ite_eq_left rfl, ite_eq_left rfl, ite_eq_right hft, add_zero]
+      · rw [ite_eq_right h0,
+          ite_eq_right (fun he => h0 (by simpa using congrArg Prod.snd (hRinj he))),
+          ite_eq_right (fun he => by simpa using congrArg Prod.fst (hRinj he)), add_zero]
     · rw [hvaltrue i']
       by_cases h0 : i' = 0
       · subst h0
-        rw [if_pos rfl, if_neg hft.symm, if_pos rfl, zero_add]
-      · rw [if_neg h0,
-          if_neg (fun he => by simpa using congrArg Prod.fst (hRinj he)),
-          if_neg (fun he => h0 (by simpa using congrArg Prod.snd (hRinj he))), add_zero]
+        rw [ite_eq_left rfl, ite_eq_right hft.symm, ite_eq_left rfl, zero_add]
+      · rw [ite_eq_right h0,
+          ite_eq_right (fun he => by simpa using congrArg Prod.fst (hRinj he)),
+          ite_eq_right (fun he => h0 (by simpa using congrArg Prod.snd (hRinj he))), add_zero]
   have htval : ClassFunction.inner τφ (c.extension μ)
       = (if R (false, (0 : Fin (Nat.card ↥h46.W1))) ∈ E then ((δ : ℤ) : ℂ) else 0)
         + (if R (true, (0 : Fin (Nat.card ↥h46.W1))) ∈ E then (-((δ : ℤ) : ℂ)) else 0) := by
@@ -636,7 +636,7 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
     rw [hμdef, hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd 0,
       hyp.base.muGrid_columnSum_eq_columnSum hG hG.odd ⟨1, hw2⟩,
       OddOrder.Peterfalvi.S06.columnSum_def, OddOrder.Peterfalvi.S06.columnSum_def,
-      OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_neg ?_]
+      OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, ite_eq_right ?_]
     rw [hyp.base.muColumnChar_zero hG hG.odd]
     intro h
     exact hyp.base.muColumnChar_ne_one hG hG.odd hk1 h.symm
@@ -646,7 +646,7 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
     refine Finset.sum_eq_zero fun r _ => ?_
     rw [irr_cf_inner
       (mem_irreducibleCharacters.mpr (hyp.base.muGrid_isIrreducible hG hG.odd r 0))
-      (mem_irreducibleCharacters.mpr hlamirr), if_neg ?_]
+      (mem_irreducibleCharacters.mpr hlamirr), ite_eq_right ?_]
     intro heq
     have h1 : hyp.base.muGrid hG hG.odd r 0 1 = lam 1 := by rw [heq]
     rw [hyp.base.muGrid_zero_column_apply_one hG hG.odd r, hlamdeg] at h1
@@ -686,19 +686,19 @@ theorem caseA_u_eq_a_of_residual_not_orthogonal [Finite G]
     rw [htval]
     by_cases hf : R (false, (0 : Fin (Nat.card ↥h46.W1))) ∈ E
     · have ht : R (true, (0 : Fin (Nat.card ↥h46.W1))) ∉ E := by
-        rw [if_pos hf] at hone
+        rw [ite_eq_left hf] at hone
         intro hcon
-        rw [if_pos hcon] at hone
+        rw [ite_eq_left hcon] at hone
         omega
       left
-      rw [if_pos hf, if_neg ht, add_zero]
+      rw [ite_eq_left hf, ite_eq_right ht, add_zero]
     · have ht : R (true, (0 : Fin (Nat.card ↥h46.W1))) ∈ E := by
-        rw [if_neg hf] at hone
+        rw [ite_eq_right hf] at hone
         by_contra hcon
-        rw [if_neg hcon] at hone
+        rw [ite_eq_right hcon] at hone
         omega
       right
-      rw [if_neg hf, if_pos ht, zero_add]
+      rw [ite_eq_right hf, ite_eq_left ht, zero_add]
   have hmsδ : (m : ℤ) * s = δ ∨ (m : ℤ) * s = -δ := by
     rcases htpm with h | h
     · left

@@ -496,7 +496,7 @@ theorem normal_sup_sylow_of_quotient_nilpotent {Γ : Type*} [Group Γ] [Finite �
     rw [hQbar, Sylow.coe_ofCard]
   have hAllNormal : ∀ (r : ℕ), Fact r.Prime → ∀ (R : Sylow r (Γ ⧸ N)),
       (↑R : Subgroup (Γ ⧸ N)).Normal :=
-    ((Group.isNilpotent_of_finite_tfae (G := Γ ⧸ N)).out 0 3).mp hNil
+    ((Group.isNilpotent_of_finite_tfae (G := Γ ⧸ N)).out 1 4).mp hNil
   have hQbar_norm : (Qbar : Subgroup (Γ ⧸ N)).Normal := hAllNormal q ‹Fact q.Prime› Qbar
   rw [show N ⊔ (Q : Subgroup Γ) =
       ((Q : Subgroup Γ).map (QuotientGroup.mk' N)).comap (QuotientGroup.mk' N) from
@@ -1009,7 +1009,8 @@ private theorem hypothesis71_of_mem_elemAbelianOfRank_two_of_maximal [Finite G]
       · rw [Set.mem_singleton_iff] at ha; subst ha; exact (hxc b hb).symm
       · rw [Set.mem_singleton_iff] at ha hb; subst ha; subst hb; rfl
     set B : Subgroup G := Subgroup.closure ((A : Set G) ∪ {x}) with hB_def
-    have hBcomm : IsMulCommutative ↥B := Subgroup.isMulCommutative_closure hgen_comm
+    have hBcomm : IsMulCommutative ↥B :=
+      Subgroup.isMulCommutative_closure fun a ha b hb _ => hgen_comm a ha b hb
     have hgen_pow : ∀ w ∈ (A : Set G) ∪ {x}, w ^ p = 1 := by
       rintro w (hw | hw)
       · have := hAelem.2 ⟨w, hw⟩; simpa using congrArg (Subgroup.subtype A) this

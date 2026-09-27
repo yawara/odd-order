@@ -43,7 +43,7 @@ theorem sum_single_diag_eq_one (i : ι) :
   · rw [Matrix.one_apply_ne h, Finset.sum_eq_zero]
     intro j _
     simp only [Matrix.single_apply]
-    rw [if_neg]
+    rw [ite_eq_right]
     rintro ⟨rfl, rfl⟩
     exact h rfl
 

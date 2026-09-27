@@ -242,7 +242,7 @@ theorem exists_base_centralizer_eq [Nontrivial D] (C : Subgroup Q) :
     simp only [smul_eq_mul, mul_one] at hf
     by_contra hg
     have hginv : g⁻¹ ∉ C := fun hc => hg (by simpa using C.inv_mem hc)
-    rw [if_neg hginv, if_pos C.one_mem] at hf
+    rw [ite_eq_right hginv, ite_eq_left C.one_mem] at hf
     exact hd hf.symm
   · intro hg
     refine congrArg inl (funext fun ω => ?_)
@@ -292,7 +292,7 @@ theorem centralizer_range_inl_eq [Nontrivial D] (hD : ∀ a b : D, a * b = b * a
     simp only [smul_eq_mul, inv_mul_cancel] at hf
     have hright : x.right = 1 := by
       by_contra hne
-      rw [if_neg hne] at hf
+      rw [ite_eq_right hne] at hf
       exact hd hf
     exact ⟨x.left, (eq_inl_of_right_eq_one hright).symm⟩
   · -- base group は可換

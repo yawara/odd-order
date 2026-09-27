@@ -52,7 +52,7 @@ noncomputable def oPiCoreOver (π : Set ℕ) (N : Subgroup G) : Subgroup G :=
 theorem oPiCoreOver_of_normal (π : Set ℕ) (N : Subgroup G) [hN : N.Normal] :
     oPiCoreOver π N = Subgroup.comap (QuotientGroup.mk' N) (oPiCore π (G ⧸ N)) := by
   classical
-  rw [oPiCoreOver, dif_pos hN]
+  rw [oPiCoreOver, dite_eq_left hN]
 
 instance oPiCoreOver.normal (π : Set ℕ) (N : Subgroup G) : (oPiCoreOver π N).Normal := by
   classical

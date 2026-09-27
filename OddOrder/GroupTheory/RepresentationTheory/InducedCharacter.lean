@@ -131,14 +131,14 @@ theorem induceTerm_conj (H : Subgroup G) (θ : ClassFunction ↥H k) (x g h : G)
   by_cases hx : x⁻¹ * (h * g * h⁻¹) * x ∈ H
   · have hy : (h⁻¹ * x)⁻¹ * g * (h⁻¹ * x) ∈ H := by
       rwa [heq]
-    rw [dif_pos hx, dif_pos hy]
+    rw [dite_eq_left hx, dite_eq_left hy]
     apply congrArg θ
     apply Subtype.ext
     exact heq.symm
   · have hy : (h⁻¹ * x)⁻¹ * g * (h⁻¹ * x) ∉ H := by
       intro hy
       exact hx (by rwa [← heq])
-    rw [dif_neg hx, dif_neg hy]
+    rw [dite_eq_right hx, dite_eq_right hy]
 
 /-- The induction summand commutes with complex conjugation. -/
 theorem induceTerm_conjStar (H : Subgroup G) (θ : ClassFunction ↥H ℂ) (x g : G) :
@@ -185,10 +185,10 @@ theorem induceTerm_eq_zero_of_not_conjugatesIntoSet {H : Subgroup G} {A : Set �
   classical
   unfold induceTerm
   by_cases hx : x⁻¹ * g * x ∈ H
-  · rw [dif_pos hx]
+  · rw [dite_eq_left hx]
     by_contra hne
     exact hg ⟨x, hx, hθ hne⟩
-  · rw [dif_neg hx]
+  · rw [dite_eq_right hx]
 
 variable [Fintype G]
 
@@ -503,13 +503,13 @@ theorem induceTerm_transportConj (ℓ : G) {H : Subgroup G} (θ : ClassFunction 
   unfold induceTerm
   by_cases hx : x⁻¹ * g * x ∈ H
   · have hy : (x * ℓ⁻¹)⁻¹ * g * (x * ℓ⁻¹) ∈ H.map (e : G →* G) := hcond.mpr hx
-    rw [dif_pos hy, dif_pos hx]
+    rw [dite_eq_left hy, dite_eq_left hx]
     apply congrArg θ
     apply Subtype.ext
     change (e.symm ((x * ℓ⁻¹)⁻¹ * g * (x * ℓ⁻¹)) : G) = x⁻¹ * g * x
     exact key
   · have hy : (x * ℓ⁻¹)⁻¹ * g * (x * ℓ⁻¹) ∉ H.map (e : G →* G) := fun h => hx (hcond.mp h)
-    rw [dif_neg hy, dif_neg hx]
+    rw [dite_eq_right hy, dite_eq_right hx]
 
 /-- **Peterfalvi (2.10.1)** for the unscaled induction sum: the induced class function of a
 conjugate subgroup (with the transported class function) agrees with the original. -/
@@ -843,7 +843,7 @@ theorem induce_trivial_inner_self (H : Subgroup G) [Finite ↥H] [H.Normal]
   have : Fintype ↥H := Fintype.ofFinite ↥H
   rw [inner_induce_eq_inner_restrict, restrict_induce_trivial, inner_smul_right, star_natCast,
     OddOrder.RepresentationTheory.irr_cf_inner trivialClassFunction_isIrreducible
-      trivialClassFunction_isIrreducible, if_pos rfl, mul_one]
+      trivialClassFunction_isIrreducible, ite_eq_left rfl, mul_one]
 
 /-- **Inner product of an induced character with the induced trivial character** for a normal `H`:
 `⟨Ind_H^G φ, Ind_H^G 1_H⟩ = [G:H]·⟨φ, 1_H⟩`.  Frobenius reciprocity + `restrict_induce_trivial`. -/
@@ -863,8 +863,8 @@ theorem induce_inner_induce_trivial_eq_zero_of_irreducible (H : Subgroup G) [Fin
     ClassFunction.inner (induce H φ) (induce H (trivialClassFunction ↥H)) = 0 := by
   have : Fintype ↥H := Fintype.ofFinite ↥H
   rw [induce_inner_induce_trivial,
-    OddOrder.RepresentationTheory.irr_cf_inner hφ trivialClassFunction_isIrreducible, if_neg hφ1,
-    mul_zero]
+    OddOrder.RepresentationTheory.irr_cf_inner hφ trivialClassFunction_isIrreducible,
+    ite_eq_right hφ1, mul_zero]
 
 end InducedTrivialNorm
 
@@ -1037,7 +1037,7 @@ theorem exists_intProjection_of_orthonormal_ZIrr
   -- Key: on `R`, `⟨φ, α⟩ = c α`.
   have hcoeff : ∀ α ∈ R, ClassFunction.inner φ α = (c α : ℂ) := by
     intro α hα
-    rw [hc]; simp only [dif_pos hα]
+    rw [hc]; simp only [dite_eq_left hα]
     exact (inner_mem_ZIrr_int hφ (hZ α hα)).choose_spec
   refine ⟨c, φ - ∑ α ∈ R, (c α : ℂ) • α, hcoeff, by abel, ?_⟩
   -- `⟨Y, α⟩ = ⟨φ, α⟩ − ⟨X, α⟩ = c α − c α = 0`.
@@ -1096,10 +1096,10 @@ theorem induce_mem_ZIrr (H : Subgroup G) [Fintype H] [Invertible (Nat.card H : �
             ClassFunction.inner ((f χ : ℂ) • (χ : ClassFunction G ℂ)) (ψ : ClassFunction G ℂ))
             = (f ψ : ℂ) := by
           rw [Finset.sum_eq_single ψ]
-          · rw [ClassFunction.inner_smul_left, irreducibleCharacter_inner_eq_ite, if_pos rfl,
+          · rw [ClassFunction.inner_smul_left, irreducibleCharacter_inner_eq_ite, ite_eq_left rfl,
               mul_one]
           · intro χ _ hχψ
-            rw [ClassFunction.inner_smul_left, irreducibleCharacter_inner_eq_ite, if_neg hχψ,
+            rw [ClassFunction.inner_smul_left, irreducibleCharacter_inner_eq_ite, ite_eq_right hχψ,
               mul_zero]
           · intro hψ; exact absurd (Finset.mem_univ ψ) hψ
         rw [hsum, sub_self]

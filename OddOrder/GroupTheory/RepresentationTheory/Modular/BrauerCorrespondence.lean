@@ -171,9 +171,11 @@ theorem pi_truncClassSum_eq_centralizerTrunc {p : ℕ} [Fact p.Prime] [CharP k p
     refine Finset.sum_congr rfl fun h _ => ?_
     by_cases hclass : ConjClasses.mk (h : G) = C
     · by_cases hcent : (h : G) ∈ Subgroup.centralizer (P : Set G)
-      · rw [if_pos hclass, if_pos ⟨hclass, hcent⟩, if_neg (by tauto), add_zero, of_apply]
-      · rw [if_pos hclass, if_neg (by tauto), if_pos ⟨hclass, hcent⟩, zero_add, of_apply]
-    · rw [if_neg hclass, if_neg (by tauto), if_neg (by tauto), add_zero]
+      · rw [ite_eq_left hclass, ite_eq_left ⟨hclass, hcent⟩, ite_eq_right (by tauto), add_zero,
+          of_apply]
+      · rw [ite_eq_left hclass, ite_eq_right (by tauto), ite_eq_left ⟨hclass, hcent⟩, zero_add,
+          of_apply]
+    · rw [ite_eq_right hclass, ite_eq_right (by tauto), ite_eq_right (by tauto), add_zero]
   rw [hsplit, map_add, hoff, add_zero]
 
 /-- **Navarro (4.14), first part**, in terms of central characters: `λ_b^G(K̂) = λ_b(Br_P(K̂))`. -/

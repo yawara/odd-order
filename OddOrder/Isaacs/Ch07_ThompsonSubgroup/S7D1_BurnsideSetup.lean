@@ -525,12 +525,13 @@ theorem card_eq_pow_mul_pow_of_dvd {n p q : ℕ}
       Finsupp.single_apply, Finsupp.single_apply]
   by_cases hrp : r = p
   · subst hrp
-    rw [if_pos rfl, if_neg (fun h => hpq h.symm), mul_one, mul_zero, add_zero]
+    rw [ite_eq_left rfl, ite_eq_right (fun h => hpq h.symm), mul_one, mul_zero, add_zero]
   · by_cases hrq : r = q
     · subst hrq
-      rw [if_neg (fun h => hpq h), if_pos rfl, mul_one, mul_zero, zero_add]
+      rw [ite_eq_right (fun h => hpq h), ite_eq_left rfl, mul_one, mul_zero, zero_add]
     · -- r ∉ {p,q}: n.factorization r = 0 and both single-points miss r.
-      rw [if_neg (fun h => hrp h.symm), if_neg (fun h => hrq h.symm), mul_zero, mul_zero, add_zero]
+      rw [ite_eq_right (fun h => hrp h.symm), ite_eq_right (fun h => hrq h.symm), mul_zero,
+        mul_zero, add_zero]
       -- n.factorization r = 0: r is not a prime factor of n.
       by_cases hr_prime : r.Prime
       · exact Nat.factorization_eq_zero_of_not_dvd (fun hdvd_pr => by

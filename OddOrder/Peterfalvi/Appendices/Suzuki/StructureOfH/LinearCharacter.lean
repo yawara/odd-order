@@ -320,7 +320,7 @@ theorem coprime_card_K_V (ind : Hypothesis.TheoremAInductionBelow G Ω)
   set E : Subgroup G := Subgroup.closure ({x, y} : Set G) with hEdef
   have : IsMulCommutative ↥E := by
     refine Subgroup.isMulCommutative_closure ?_
-    rintro a (rfl | rfl) b (rfl | rfl)
+    rintro a (rfl | rfl) b (rfl | rfl) _
     · rfl
     · exact hcomm
     · exact hcomm.symm

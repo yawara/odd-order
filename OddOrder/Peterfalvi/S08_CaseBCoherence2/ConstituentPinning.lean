@@ -78,9 +78,9 @@ theorem inner_self_induce_eq_sum_mul_star {M : Type*} [Group M] [Fintype M]
   rw [induce_eq_sum_inner_restrict_smul φ, OddOrder.Peterfalvi.S05.inner_sum_smul_sum]
   refine Finset.sum_congr rfl (fun θ _ => ?_)
   rw [Finset.sum_eq_single θ]
-  · rw [irreducibleCharacter_inner_eq_ite, if_pos rfl, mul_one]
+  · rw [irreducibleCharacter_inner_eq_ite, ite_eq_left rfl, mul_one]
   · intro θ' _ hne
-    rw [irreducibleCharacter_inner_eq_ite, if_neg (Ne.symm hne), mul_zero]
+    rw [irreducibleCharacter_inner_eq_ite, ite_eq_right (Ne.symm hne), mul_zero]
   · intro h; exact absurd (Finset.mem_univ θ) h
 
 /-- **(6.8.2.3) aggregate: `∑ aᵢ² = |M : N|`** for a central `N ≤ Z(M)` and an irreducible (linear)
@@ -792,7 +792,7 @@ theorem inner_smul_chiFam_eq_zero_of_diff_vanishOnV
   -- Extract `⟨ξ, chiFam pq⟩ = 0`, then `⟨c•ξ, chiFam pq⟩ = 0`.
   obtain ⟨m, hm⟩ := ClassFunction.inner_mem_ZIrr_int hξZ ((hyp.chiFam_spec hVeq app).2.1 pq)
   have hθ : ClassFunction.inner (hyp.chiFam hVeq app pq) (hyp.chiFam hVeq app pq) = 1 := by
-    rw [(hyp.chiFam_spec hVeq app).2.2.1, if_pos rfl]
+    rw [(hyp.chiFam_spec hVeq app).2.2.1, ite_eq_left rfl]
   rw [ClassFunction.inner_smul_left,
     inner_eq_zero_of_smul_sub_smul_orthogonal hξ1 hθ hξξ' hm hc hpsi, mul_zero]
 
@@ -868,9 +868,9 @@ theorem inner_coherent_extension_certainTypeOmegaSigma_eq_zero
   have hξZ : (ξ : ClassFunction G ℂ) ∈ ZIrr G := ξ.2.mem_ZIrr
   have hξ'Z : (ξ' : ClassFunction G ℂ) ∈ ZIrr G := ξ'.2.mem_ZIrr
   have hξ1 : ClassFunction.inner (ξ : ClassFunction G ℂ) (ξ : ClassFunction G ℂ) = 1 := by
-    have h := irreducibleCharacter_inner_eq_ite ξ ξ; rwa [if_pos rfl] at h
+    have h := irreducibleCharacter_inner_eq_ite ξ ξ; rwa [ite_eq_left rfl] at h
   have hξ'1 : ClassFunction.inner (ξ' : ClassFunction G ℂ) (ξ' : ClassFunction G ℂ) = 1 := by
-    have h := irreducibleCharacter_inner_eq_ite ξ' ξ'; rwa [if_pos rfl] at h
+    have h := irreducibleCharacter_inner_eq_ite ξ' ξ'; rwa [ite_eq_left rfl] at h
   have hvanish : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff h46).V,
       ((ε : ℂ) • (ξ : ClassFunction G ℂ) - (ε' : ℂ) • (ξ' : ClassFunction G ℂ)) v = 0 := by
     intro v hv
@@ -906,7 +906,7 @@ theorem inner_coherentYset_extension_certainTypeOmegaSigma_eq_zero
   · have h := irreducibleCharacter_inner_eq_ite
       (⟨η, hyp.isIrreducibleCharacter_of_mem_Yset hη⟩ : IrreducibleCharacter ↥L)
       (⟨η', hyp.isIrreducibleCharacter_of_mem_Yset hη'⟩ : IrreducibleCharacter ↥L)
-    rw [if_neg (fun heq => hne (Subtype.ext_iff.mp heq))] at h
+    rw [ite_eq_right (fun heq => hne (Subtype.ext_iff.mp heq))] at h
     simpa using h
   · exact hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη) (hyp.Yset_subset_S hη')
       ((hyp.Yset_apply_one hη).trans (hyp.Yset_apply_one hη').symm)
@@ -1065,7 +1065,7 @@ theorem inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero
   have hee : ClassFunction.inner η η.conj = 0 := by
     have h := irreducibleCharacter_inner_eq_ite (⟨η, hηirr⟩ : IrreducibleCharacter ↥L)
       (⟨η.conj, hηirr.conj⟩ : IrreducibleCharacter ↥L)
-    rw [if_neg (fun heq => hne (Subtype.ext_iff.mp heq))] at h
+    rw [ite_eq_right (fun heq => hne (Subtype.ext_iff.mp heq))] at h
     simpa using h
   exact inner_certainTypeExtension_columnSum_coherent_extension_eq_zero hyp h46 hHK
     hyp.coherentYset hη hconj hηirr hee
@@ -1110,7 +1110,7 @@ theorem certainType_per_constituent_Y_eq_smul
   have hηnorm : ClassFunction.inner η₁ η₁ = 1 := by
     have h := irreducibleCharacter_inner_eq_ite
       (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L) (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
-    rwa [if_pos rfl] at h
+    rwa [ite_eq_left rfl] at h
   have hYY : ClassFunction.inner (hyp.coherentYset.extension η₁)
       (hyp.coherentYset.extension η₁) = 1 := by
     rw [hyp.coherentYset.extension_inner_eq η₁ η₁

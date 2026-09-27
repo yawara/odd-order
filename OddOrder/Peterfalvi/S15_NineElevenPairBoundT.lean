@@ -452,9 +452,9 @@ theorem Hypothesis.nineElevenPairBoundT [Finite G]
           (((ClassFunction.inner (χmem i) (χmem i)).re : ℝ) : ℂ) 0 := by
     intro i j
     by_cases hij : i = j
-    · subst hij; rw [if_pos rfl]
+    · subst hij; rw [ite_eq_left rfl]
       exact (OddOrder.Peterfalvi.S08.inducedKernelFamily_inner_self_real_pos (hmemfam i)).1
-    · rw [if_neg hij]
+    · rw [ite_eq_right hij]
       exact OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal
         (hmemfam i) (hmemfam j) (fun h => hij (hinj h))
   have hχcnotS₂ : (OddOrder.Peterfalvi.S11.induceHU (hyp.toTypesIIIIIIVSetupT hG hvd)

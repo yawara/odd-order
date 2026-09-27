@@ -364,7 +364,7 @@ theorem chiRhoCF_eq_adjointAverageFun {G : Type*} [Group G] [Fintype G]
       OddOrder.Peterfalvi.S04.adjointAverageFun H71.hyp χ
         ⟨a.1, H71.hyp.subset_L a.2⟩ := by
   simp only [chiRhoCF_apply, OddOrder.Peterfalvi.S04.adjointAverageFun]
-  rw [H71.chiRho_of_mem _ a.2, dif_pos a.2]
+  rw [H71.chiRho_of_mem _ a.2, dite_eq_left a.2]
 
 /-- **Adjoint formula for `chiRho`** (Peterfalvi (2.7) packaged for `chiRhoCF`).
 For `α ∈ CF(L, A)` and `χ ∈ CF(G)`, `⟨τ α, χ⟩_G = ⟨α, χ^ρ⟩_L`. -/
@@ -515,11 +515,11 @@ theorem chiRho_integral_inequality {G : Type*} [Group G] [Fintype G]
         by_cases hg : g ∈ H71.hyp.dadeSupport
         · have hconj : h * g * h⁻¹ ∈ H71.hyp.dadeSupport :=
             H71.hyp.conj_mem_dadeSupport hg
-          rw [if_pos hg, if_pos hconj]
+          rw [ite_eq_left hg, ite_eq_left hconj]
           exact χ.conj_eq g h
         · have hconj : h * g * h⁻¹ ∉ H71.hyp.dadeSupport := fun hin =>
             hg (H71.hyp.mem_dadeSupport_conj_iff.mp hin)
-          rw [if_neg hg, if_neg hconj]⟩ with hχ₁_def
+          rw [ite_eq_right hg, ite_eq_right hconj]⟩ with hχ₁_def
   have hχ₁_apply : ∀ g, (χ₁ : G → ℂ) g =
       if g ∈ H71.hyp.dadeSupport then (χ : G → ℂ) g else 0 := fun _ => rfl
   -- Step 1: `chiRhoCF χ₁ = chiRhoCF χ` (the `ρ` sum sees only `aH(a) ⊆ A^τ`).
@@ -532,7 +532,7 @@ theorem chiRho_integral_inequality {G : Type*} [Group G] [Fintype G]
       refine Finset.sum_congr rfl fun x _ => ?_
       have hmem : (a : G) * (x : G) ∈ H71.hyp.dadeSupport :=
         H71.hyp.mem_dadeSupport_of_mem_hCoset (a := ⟨(a : G), ha⟩) x.2
-      rw [hχ₁_apply, if_pos hmem]
+      rw [hχ₁_apply, ite_eq_left hmem]
     · rw [chiRhoCF_apply, chiRhoCF_apply,
           H71.chiRho_of_not_mem _ ha, H71.chiRho_of_not_mem _ ha]
   -- Step 2: apply (7.2.b) to `χ₁`.
@@ -551,9 +551,9 @@ theorem chiRho_integral_inequality {G : Type*} [Group G] [Fintype G]
     refine Finset.sum_congr rfl fun g _ => ?_
     rw [hχ₁_apply]
     by_cases hg : g ∈ H71.hyp.dadeSupport
-    · rw [if_pos hg, if_pos hg]
+    · rw [ite_eq_left hg, ite_eq_left hg]
       rw [Complex.star_def, Complex.mul_conj, Complex.normSq_eq_norm_sq]
-    · rw [if_neg hg, if_neg hg, star_zero, mul_zero]
+    · rw [ite_eq_right hg, ite_eq_right hg, star_zero, mul_zero]
   rw [h_inner_χ₁] at h72b
   exact h72b
 
@@ -599,11 +599,11 @@ theorem chiRho_integral_eq_iff_constant_on_hCoset {G : Type*} [Group G] [Fintype
         by_cases hg : g ∈ H71.hyp.dadeSupport
         · have hconj : h * g * h⁻¹ ∈ H71.hyp.dadeSupport :=
             H71.hyp.conj_mem_dadeSupport hg
-          rw [if_pos hg, if_pos hconj]
+          rw [ite_eq_left hg, ite_eq_left hconj]
           exact χ.conj_eq g h
         · have hconj : h * g * h⁻¹ ∉ H71.hyp.dadeSupport := fun hin =>
             hg (H71.hyp.mem_dadeSupport_conj_iff.mp hin)
-          rw [if_neg hg, if_neg hconj]⟩ with hχ₁_def
+          rw [ite_eq_right hg, ite_eq_right hconj]⟩ with hχ₁_def
   have hχ₁_apply : ∀ g, (χ₁ : G → ℂ) g =
       if g ∈ H71.hyp.dadeSupport then (χ : G → ℂ) g else 0 := fun _ => rfl
   -- `χ₁^ρ = χ^ρ`.
@@ -616,7 +616,7 @@ theorem chiRho_integral_eq_iff_constant_on_hCoset {G : Type*} [Group G] [Fintype
       refine Finset.sum_congr rfl fun x _ => ?_
       have hmem : (a : G) * (x : G) ∈ H71.hyp.dadeSupport :=
         H71.hyp.mem_dadeSupport_of_mem_hCoset (a := ⟨(a : G), ha⟩) x.2
-      rw [hχ₁_apply, if_pos hmem]
+      rw [hχ₁_apply, ite_eq_left hmem]
     · rw [chiRhoCF_apply, chiRhoCF_apply,
           H71.chiRho_of_not_mem _ ha, H71.chiRho_of_not_mem _ ha]
   -- `‖χ₁‖² = |G|⁻¹ Σ_{A^τ} |χ|²`.
@@ -632,9 +632,9 @@ theorem chiRho_integral_eq_iff_constant_on_hCoset {G : Type*} [Group G] [Fintype
     refine Finset.sum_congr rfl fun g _ => ?_
     rw [hχ₁_apply]
     by_cases hg : g ∈ H71.hyp.dadeSupport
-    · rw [if_pos hg, if_pos hg]
+    · rw [ite_eq_left hg, ite_eq_left hg]
       rw [Complex.star_def, Complex.mul_conj, Complex.normSq_eq_norm_sq]
-    · rw [if_neg hg, if_neg hg, star_zero, mul_zero]
+    · rw [ite_eq_right hg, ite_eq_right hg, star_zero, mul_zero]
   -- Reduce to the (7.2.b) equality case for `χ₁`.
   have hcast : (((Nat.card G : ℂ)⁻¹ *
       ∑ g ∈ Finset.univ.filter (fun x : G => x ∈ H71.hyp.dadeSupport),
@@ -652,13 +652,13 @@ theorem chiRho_integral_eq_iff_constant_on_hCoset {G : Type*} [Group G] [Fintype
     have hval_ah : (χ : G → ℂ) (a.1 * h)
         = (α : ClassFunction L ℂ) ⟨a.1, H71.hyp.mem_L a.2⟩ := by
       have h1 : (χ₁ : G → ℂ) (a.1 * h) = (χ : G → ℂ) (a.1 * h) := by
-        rw [hχ₁_apply, if_pos hmem_ah]
+        rw [hχ₁_apply, ite_eq_left hmem_ah]
       rw [← h1, ← hα]
       exact H71.isDadeMap.map_eq_of_mem_hCoset α a ⟨h, hh, rfl⟩
     have hval_a : (χ : G → ℂ) a.1
         = (α : ClassFunction L ℂ) ⟨a.1, H71.hyp.mem_L a.2⟩ := by
       have h1 : (χ₁ : G → ℂ) a.1 = (χ : G → ℂ) a.1 := by
-        rw [hχ₁_apply, if_pos hmem_a]
+        rw [hχ₁_apply, ite_eq_left hmem_a]
       rw [← h1, ← hα]
       exact H71.isDadeMap.map_eq_of_mem_hCoset α a
         ⟨1, Subgroup.one_mem _, (mul_one _).symm⟩
@@ -692,10 +692,10 @@ theorem chiRho_integral_eq_iff_constant_on_hCoset {G : Type*} [Group G] [Fintype
         obtain ⟨c, hc⟩ := isConj_iff.mp hconj
         rw [← hc, χ.conj_eq, hconst a h hh]
       change H71.τ (H71.chiRhoSupp χ) g = (χ₁ : G → ℂ) g
-      rw [hτ, hrho, hχ₁_apply, if_pos hg, hχg]
+      rw [hτ, hrho, hχ₁_apply, ite_eq_left hg, hχg]
     · change H71.τ (H71.chiRhoSupp χ) g = (χ₁ : G → ℂ) g
       rw [H71.isDadeMap.map_eq_zero_of_not_mem_dadeSupport _ g hg,
-        hχ₁_apply, if_neg hg]
+        hχ₁_apply, ite_eq_right hg]
 
 end Hypothesis71
 
@@ -738,12 +738,12 @@ open scoped Classical in
 theorem chiRho_constOne (H71 : Hypothesis71 G A L) (a : L) :
     H71.chiRho (constOne G) a = if (a : G) ∈ A then 1 else 0 := by
   by_cases ha : (a : G) ∈ A
-  · rw [if_pos ha, H71.chiRho_of_mem _ ha]
+  · rw [ite_eq_left ha, H71.chiRho_of_mem _ ha]
     simp only [constOne_apply, Finset.sum_const, Finset.card_univ,
       ← Nat.card_eq_fintype_card, nsmul_eq_mul, mul_one]
     rw [inv_mul_cancel₀]
     exact_mod_cast (Nat.card_pos (α := H71.hyp.H ⟨(a : G), ha⟩)).ne'
-  · rw [if_neg ha, H71.chiRho_of_not_mem _ ha]
+  · rw [ite_eq_right ha, H71.chiRho_of_not_mem _ ha]
 
 open scoped Classical in
 /-- The Dade image of `chiRhoSupp 1_G` is the indicator of `dadeSupport` on `G`.
@@ -756,12 +756,12 @@ theorem tau_chiRhoSupp_constOne
     H71.τ (H71.chiRhoSupp (constOne G)) g =
       if g ∈ H71.hyp.dadeSupport then 1 else 0 := by
   by_cases hg : g ∈ H71.hyp.dadeSupport
-  · rw [if_pos hg]
+  · rw [ite_eq_left hg]
     rcases H71.hyp.mem_dadeSupport_iff.mp hg with ⟨a, h, hh, hconj⟩
     rw [H71.isDadeMap.map_eq_of_isConj_hCoset _ g a h hh hconj]
     change H71.chiRhoCF (constOne G) ⟨a.1, H71.hyp.subset_L a.2⟩ = 1
-    rw [chiRhoCF_apply, chiRho_constOne, if_pos a.2]
-  · rw [if_neg hg]
+    rw [chiRhoCF_apply, chiRho_constOne, ite_eq_left a.2]
+  · rw [ite_eq_right hg]
     exact H71.isDadeMap.map_eq_zero_of_not_mem_dadeSupport _ g hg
 
 omit [Fintype G] in

@@ -664,15 +664,15 @@ theorem tSide_beta_inner_eta_of_zeroColumn_projection [Finite G]
     · subst j
       rw [Finset.sum_eq_single_of_mem (⟨0, base.q_prime.pos⟩ : Fin base.q)
         (Finset.mem_univ _) (fun i _ hi => by
-          rw [eta_orthonormal, if_neg]
+          rw [eta_orthonormal, ite_eq_right]
           rintro ⟨h, -⟩
           exact hi h.symm)]
-      rw [eta_orthonormal, if_pos ⟨rfl, rfl⟩]
+      rw [eta_orthonormal, ite_eq_left ⟨rfl, rfl⟩]
       simp
-    · simp only [if_neg hj]
+    · simp only [ite_eq_right hj]
       apply Finset.sum_eq_zero
       intro i _
-      rw [eta_orthonormal, if_neg]
+      rw [eta_orthonormal, ite_eq_right]
       exact fun h => hj h.2
   calc
     ClassFunction.inner b (base.eta ⟨0, base.q_prime.pos⟩ j) =

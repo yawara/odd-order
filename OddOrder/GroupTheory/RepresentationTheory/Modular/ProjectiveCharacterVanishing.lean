@@ -120,7 +120,7 @@ theorem projectiveIndecomposableCharacter_eq_zero (φ : ι) {x : G} (hx : ¬ IsP
     refine hinj ?_
     rw [map_zero, map_sum]
     have hcol := sum_character_inv_mul_character e g⁻¹ x
-    rw [inv_inv, if_neg fun hc => hx (isPRegular_of_isConj hg.inv hc)] at hcol
+    rw [inv_inv, ite_eq_right fun hc => hx (isPRegular_of_isConj hg.inv hc)] at hcol
     rw [← hcol]
     exact Finset.sum_congr rfl fun i _ => by
       rw [map_mul, algebraMap_ordinaryCharacter, algebraMap_ordinaryCharacter]

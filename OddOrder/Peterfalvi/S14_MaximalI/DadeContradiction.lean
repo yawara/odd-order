@@ -370,7 +370,7 @@ theorem witness_ftSupportKernel_le_K [Finite G]
         (OddOrder.GroupTheory.maximalSubgroupsContaining
           (Subgroup.centralizer ({data.x} : Set G))).Nonempty := ⟨hgt, hne⟩
     -- `N[x] = M`: the chosen member of the singleton `𝓜(C_G(x)) = {M}`.
-    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase data.x = hcond.2.choose := dif_pos hcond
+    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase data.x = hcond.2.choose := dite_eq_left hcond
     have hch : hcond.2.choose ∈ ({ctr.M} : Set (Subgroup G)) :=
       (Set.ext_iff.mp hsing _).mp hcond.2.choose_spec
     have hbase : OddOrder.BG.Ch4.S16.FT_signalizerBase data.x = ctr.M :=

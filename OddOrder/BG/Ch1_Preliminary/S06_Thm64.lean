@@ -660,7 +660,7 @@ BG が「`H` normalizes `J₁` and `J₂`, hence `H` normalizes `L = ⟨J₁, J�
 theorem le_normalizer_sup {H J₁ J₂ : Subgroup G}
     (h₁ : H ≤ Subgroup.normalizer (J₁ : Set G)) (h₂ : H ≤ Subgroup.normalizer (J₂ : Set G)) :
     H ≤ Subgroup.normalizer ((J₁ ⊔ J₂ : Subgroup G) : Set G) := fun _ hx =>
-  Subgroup.normalizer_inf_normalizer_le_normalizer_sup J₁ J₂ ⟨h₁ hx, h₂ hx⟩
+  Subgroup.inf_normalizer_le_normalizer_sup J₁ J₂ ⟨h₁ hx, h₂ hx⟩
 
 /-- `K` を中心化する元による共役は `K` 上恒等, したがって `K` を保つ。 -/
 theorem conj_smul_eq_self_of_mem_centralizer {K : Subgroup G} {g : G}

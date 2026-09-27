@@ -52,7 +52,7 @@ theorem exists_isDefectGroup {b : A} (hb : ∀ g : G, g • b = b) :
   have htop : b ∈ relTraceIdeal (⊤ : Subgroup G) ⊤ :=
     mem_relTraceIdeal_self.mpr fun g _ => hb g
   obtain ⟨D, hD, hmin⟩ :=
-    (IsWellFounded.wf (r := (· < · : Subgroup G → Subgroup G → Prop))).has_min
+    (wellFounded_lt (α := Subgroup G)).has_min
       {D : Subgroup G | b ∈ relTraceIdeal D ⊤} ⟨⊤, htop⟩
   exact ⟨D, hD, fun E hE hEmem => hmin E hEmem hE⟩
 

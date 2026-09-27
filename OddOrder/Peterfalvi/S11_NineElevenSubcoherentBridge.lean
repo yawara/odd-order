@@ -1172,9 +1172,9 @@ theorem caseA_pairBound [Finite G] {M : Subgroup G} {A : Set G}
     intro i j
     by_cases hij : i = j
     · subst hij
-      rw [if_pos rfl]
+      rw [ite_eq_left rfl]
       exact (OddOrder.Peterfalvi.S08.inducedKernelFamily_inner_self_real_pos (hmemfam i)).1
-    · rw [if_neg hij]
+    · rw [ite_eq_right hij]
       exact OddOrder.Peterfalvi.S08.inducedKernelFamily_pairwise_orthogonal
         (hmemfam i) (hmemfam j) (fun h => hij (hinj h))
   -- cross the two `τ`-forms: `congrMap` keeps `.extension` definitionally.  ⚠ inline, not `have`:

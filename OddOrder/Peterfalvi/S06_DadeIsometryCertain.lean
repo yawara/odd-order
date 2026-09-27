@@ -115,7 +115,7 @@ theorem coprime_card_W1_card_W2 : Nat.Coprime (Nat.card h.W1) (Nat.card h.W2) :=
 other (`commute_of_mem_W1_of_mem_W2`), so the closure of `↑W₁ ∪ ↑W₂` is abelian. -/
 theorem isMulCommutative_sup : IsMulCommutative ↥(h.W1 ⊔ h.W2) := by
   rw [Subgroup.sup_eq_closure]
-  refine Subgroup.isMulCommutative_closure fun x hx y hy => ?_
+  refine Subgroup.isMulCommutative_closure fun x hx y hy _ => ?_
   rcases hx with hx | hx <;> rcases hy with hy | hy
   · exact (commute_of_mem_of_isCyclic h.W1_cyclic hx hy).eq
   · exact (h.commute_of_mem_W1_of_mem_W2 hx hy).eq

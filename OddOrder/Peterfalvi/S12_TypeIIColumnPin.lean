@@ -115,7 +115,7 @@ theorem typeII_T2_extension_columnSum_eq_sum [Finite G]
     rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq,
       OddOrder.Peterfalvi.S06.columnSum_def, OddOrder.Peterfalvi.S06.columnSum_def,
       OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner,
-      if_neg (OddOrder.Peterfalvi.S06.column_inv_ne_self
+      ite_eq_right (OddOrder.Peterfalvi.S06.column_inv_ne_self
         (typeIIHypothesis46 hG hSmax hSII data.typeP) hχ₂ne).symm]
   -- `ν − ν̄` is `ℤ[T2]` and `A₀(S)`-supported
   have hsuppmem : (OddOrder.Peterfalvi.S06.columnSum
@@ -179,7 +179,7 @@ theorem typeII_T2_extension_columnSum_eq_sum [Finite G]
   rw [hDt] at hτ1
   refine ⟨E, hEsub, by rw [← hEsum]; exact hτ1, ?_⟩
   rw [hEcard, OddOrder.Peterfalvi.S06.columnSum_def,
-    OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl]
+    OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, ite_eq_left rfl]
 
 open scoped Classical FiniteInduce in
 /-- **Peterfalvi (5.5) for the irreducible `T2`-member `λ`**: the coherent extension sends `λ`
@@ -239,7 +239,7 @@ theorem typeII_T2_extension_lam_eq_single [Finite G]
   have hlamne : lam ≠ lam.conj := fun h => hr h.symm
   have hχχbar : ClassFunction.inner lam lam.conj = 0 := by
     have h := irreducibleCharacter_inner_eq_ite ⟨lam, hlam_irr⟩ ⟨lam.conj, hlam_irr.conj⟩
-    rwa [if_neg (fun heq => hlamne (congrArg Subtype.val heq))] at h
+    rwa [ite_eq_right (fun heq => hlamne (congrArg Subtype.val heq))] at h
   -- `λ − λ̄ ∈ ℤ[T2, A₀]` and the span bound
   have hsuppmem : (lam - lam.conj) ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
       ({lam, lam.conj, nu, nu.conj} : Set (ClassFunction ↥S ℂ))
@@ -283,7 +283,7 @@ theorem typeII_T2_extension_lam_eq_single [Finite G]
   rw [hDt] at hτ1
   have hlamnorm : ClassFunction.inner lam lam = 1 := by
     have h := irreducibleCharacter_inner_eq_ite ⟨lam, hlam_irr⟩ ⟨lam, hlam_irr⟩
-    rwa [if_pos rfl] at h
+    rwa [ite_eq_left rfl] at h
   have hE1 : E.card = 1 := by
     have : (E.card : ℂ) = 1 := by rw [hEcard, hlamnorm]
     exact_mod_cast this
@@ -390,14 +390,14 @@ theorem typeII_dadeOfDiff_member_inner_chiFam_eq_zero [Finite G]
   have hμZ : cd.muClassFunction ∈ ZIrr G := cd.mu.mem_ZIrr
   have hνZ : cd.nuClassFunction ∈ ZIrr G := cd.nu.mem_ZIrr
   have hμ1 : ClassFunction.inner cd.muClassFunction cd.muClassFunction = 1 := by
-    have h := irreducibleCharacter_inner_eq_ite cd.mu cd.mu; rwa [if_pos rfl] at h
+    have h := irreducibleCharacter_inner_eq_ite cd.mu cd.mu; rwa [ite_eq_left rfl] at h
   have hν1 : ClassFunction.inner cd.nuClassFunction cd.nuClassFunction = 1 := by
-    have h := irreducibleCharacter_inner_eq_ite cd.nu cd.nu; rwa [if_pos rfl] at h
+    have h := irreducibleCharacter_inner_eq_ite cd.nu cd.nu; rwa [ite_eq_left rfl] at h
   have hμν : ClassFunction.inner cd.muClassFunction cd.nuClassFunction = 0 := by
-    have h := irreducibleCharacter_inner_eq_ite cd.mu cd.nu; rwa [if_neg cd.distinct] at h
+    have h := irreducibleCharacter_inner_eq_ite cd.mu cd.nu; rwa [ite_eq_right cd.distinct] at h
   have hνμ : ClassFunction.inner cd.nuClassFunction cd.muClassFunction = 0 := by
     have h := irreducibleCharacter_inner_eq_ite cd.nu cd.mu
-    rwa [if_neg (Ne.symm cd.distinct)] at h
+    rwa [ite_eq_right (Ne.symm cd.distinct)] at h
   have hsignC : (cd.sign : ℂ) ≠ 0 := by rcases cd.sign_eq with h | h <;> simp [h]
   have hnsignC : (-(cd.sign : ℂ)) ≠ 0 := by rcases cd.sign_eq with h | h <;> simp [h]
   have hvanishμν : ∀ v ∈
@@ -464,11 +464,11 @@ theorem ticyclic_full_map_eq_induce [Finite G]
           have := hyp.W_normalizes_V (⟨x, hxW⟩ : ↥hyp.W)⁻¹ hv
           simpa using this
         have hxvW : x⁻¹ * v * x ∈ hyp.W := hyp.V_subset_W hxv
-        rw [ClassFunction.induceTerm_of_mem _ hxvW, if_pos hxW]
+        rw [ClassFunction.induceTerm_of_mem _ hxvW, ite_eq_left hxW]
         -- `x⁻¹vx` is `W`-conjugate to `v`
         exact (α : ClassFunction ↥hyp.W ℂ).of_isConj (isConj_iff.mpr
           ⟨(⟨x, hxW⟩ : ↥hyp.W)⁻¹, Subtype.ext (by simp [mul_assoc])⟩) |>.symm
-      · rw [if_neg hxW]
+      · rw [ite_eq_right hxW]
         by_cases hxvW : x⁻¹ * v * x ∈ hyp.W
         · rw [ClassFunction.induceTerm_of_mem _ hxvW]
           refine hαoff _ (fun hxvV => hxW ?_)
@@ -1031,11 +1031,11 @@ theorem certainTypeR_subsum_dichotomy [Fintype G] [Fintype ↥L]
     cases b
     · dsimp only
       rw [show (bif false then χ₂⁻¹ else χ₂) = χ₂ from rfl,
-        if_neg (fun hP => hpk (((congrArg Prod.snd hP).symm.trans (hsndF i)) : pq.2 = _)),
+        ite_eq_right (fun hP => hpk (((congrArg Prod.snd hP).symm.trans (hsndF i)) : pq.2 = _)),
         mul_zero]
     · dsimp only
       rw [show (bif true then χ₂⁻¹ else χ₂) = χ₂⁻¹ from rfl,
-        if_neg (fun hP => hpj (((congrArg Prod.snd hP).symm.trans (hsndT i)) : pq.2 = _)),
+        ite_eq_right (fun hP => hpj (((congrArg Prod.snd hP).symm.trans (hsndT i)) : pq.2 = _)),
         mul_zero]
   have hk : ∀ p, (OddOrder.Peterfalvi.S06.ticVdiff
         h46).sigmaCoeff rfl
@@ -1073,8 +1073,8 @@ theorem certainTypeR_subsum_dichotomy [Fintype G] [Fintype ↥L]
             _ = _) hkj
       right
       rw [Finset.sum_eq_single x₁ (fun y hyT hyne => by
-        rw [if_neg (fun hP => hyne (hPinj y x₁ (hP.trans hx₁P.symm))), mul_zero])
-        (fun h => absurd hx₁T h), if_pos hx₁P]
+        rw [ite_eq_right (fun hP => hyne (hPinj y x₁ (hP.trans hx₁P.symm))), mul_zero])
+        (fun h => absurd hx₁T h), ite_eq_left hx₁P]
       rcases x₁ with ⟨b, i⟩
       cases b
       · change δ * 1 = δ
@@ -1082,7 +1082,7 @@ theorem certainTypeR_subsum_dichotomy [Fintype G] [Fintype ↥L]
       · exact absurd hx₁b (by simp)
     · left
       refine Finset.sum_eq_zero fun y hyT => ?_
-      rw [if_neg (fun hP => hex ⟨y, hyT, hP⟩), mul_zero]
+      rw [ite_eq_right (fun hP => hex ⟨y, hyT, hP⟩), mul_zero]
   have hj : ∀ p, (OddOrder.Peterfalvi.S06.ticVdiff
         h46).sigmaCoeff rfl
         (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication
@@ -1118,8 +1118,8 @@ theorem certainTypeR_subsum_dichotomy [Fintype G] [Fintype ↥L]
         · rfl
       right
       rw [Finset.sum_eq_single x₁ (fun y hyT hyne => by
-        rw [if_neg (fun hP => hyne (hPinj y x₁ (hP.trans hx₁P.symm))), mul_zero])
-        (fun h => absurd hx₁T h), if_pos hx₁P]
+        rw [ite_eq_right (fun hP => hyne (hPinj y x₁ (hP.trans hx₁P.symm))), mul_zero])
+        (fun h => absurd hx₁T h), ite_eq_left hx₁P]
       rcases x₁ with ⟨b, i⟩
       cases b
       · exact absurd hx₁b (by simp)
@@ -1127,7 +1127,7 @@ theorem certainTypeR_subsum_dichotomy [Fintype G] [Fintype ↥L]
         rw [mul_one]
     · left
       refine Finset.sum_eq_zero fun y hyT => ?_
-      rw [if_neg (fun hP => hex ⟨y, hyT, hP⟩), mul_zero]
+      rw [ite_eq_right (fun hP => hex ⟨y, hyT, hP⟩), mul_zero]
   -- norm and Parseval
   have hcardW1 : (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff
       h46).W1 : ℂ)
@@ -1223,18 +1223,18 @@ theorem certainTypeR_subsum_dichotomy [Fintype G] [Fintype ↥L]
               h46).omegaProdEquiv.symm
             (OddOrder.Peterfalvi.S06.omegaProdCharTic
               h46 (cond x.1 χ₂⁻¹ χ₂) x.2)))
-            (fun pq _ hpqne => by rw [if_neg (fun hh => hpqne hh.symm), mul_zero, mul_zero])
+            (fun pq _ hpqne => by rw [ite_eq_right (fun hh => hpqne hh.symm), mul_zero, mul_zero])
             (fun h => absurd (Finset.mem_univ _) h)]
-          rw [if_pos rfl, mul_one, mul_one, hssq]
+          rw [ite_eq_left rfl, mul_one, mul_one, hssq]
         · -- off-diagonal: `P y ≠ P x` kills every `pq`
           refine Finset.sum_eq_zero fun pq _ => ?_
           by_cases hx : ((OddOrder.Peterfalvi.S06.ticVdiff
               h46).omegaProdEquiv.symm
             (OddOrder.Peterfalvi.S06.omegaProdCharTic
               h46 (cond x.1 χ₂⁻¹ χ₂) x.2)) = pq
-          · rw [if_pos hx, if_neg (fun hy => hyne (hPinj y x (hy.trans hx.symm))),
+          · rw [ite_eq_left hx, ite_eq_right (fun hy => hyne (hPinj y x (hy.trans hx.symm))),
               mul_zero, mul_zero]
-          · rw [if_neg hx, zero_mul, mul_zero]
+          · rw [ite_eq_right hx, zero_mul, mul_zero]
       have hstep : ∀ x ∈ T, (∑ pq, ∑ y ∈ T, ((cond x.1 (-δ) δ) * (cond y.1 (-δ) δ))
           * ((if (OddOrder.Peterfalvi.S06.ticVdiff
               h46).omegaProdEquiv.symm

@@ -407,7 +407,7 @@ theorem exists_min_anchor_dvd [Finite G] [Invertible (Nat.card G : ℂ)]
   have hkof : ∀ χ (hχ : χ ∈ hyp.XsetOf hyp.Sder Z),
       χ (1 : ↥hyp.H) = (hyp.d : ℂ) * ((p ^ kof χ : ℕ) : ℂ) := by
     intro χ hχ
-    simp only [hkofdef, dif_pos hχ]; exact (hpow χ hχ).choose_spec
+    simp only [hkofdef, dite_eq_left hχ]; exact (hpow χ hχ).choose_spec
   obtain ⟨χ₁, hχ₁X1, hχ₁min⟩ := Set.exists_min_image _ kof hX1fin hX1ne
   refine ⟨χ₁, hχ₁X1, fun χ hχ => ?_⟩
   obtain ⟨χθ, tθ, e, hχθX1, htθpos, hepos, hχθdeg, hχdeg⟩ :=

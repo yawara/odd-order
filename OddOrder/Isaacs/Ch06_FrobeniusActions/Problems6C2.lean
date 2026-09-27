@@ -149,34 +149,34 @@ theorem exists_family_subgroups_card_prime {A : Type*} [Group A] [Finite A] {p :
     else Subgroup.zpowers y, ?_, ?_⟩
   · intro i
     by_cases hlt : (i : ℕ) < p
-    · simp only [hlt, if_true]
+    · simp only [hlt, ite_true]
       rw [Nat.card_zpowers]
       refine horder _ ?_
       intro hone
       have := (eq_zero_of_zpow_mul_zpow_eq_one hxord hyord hinf
         (a := 1) (b := ((i : ℕ) : ℤ)) (by rw [zpow_one, zpow_natCast]; exact hone)).1
       exact hp.ne_one (Nat.dvd_one.mp (by exact_mod_cast this))
-    · simp only [hlt, if_false]
+    · simp only [hlt, ite_false]
       rw [Nat.card_zpowers, hyord]
   · intro i j hij
     have hcardi : ∀ k : Fin (p + 1), Nat.card ↥(if (k : ℕ) < p
         then Subgroup.zpowers (x * y ^ (k : ℕ)) else Subgroup.zpowers y) = p := by
       intro k
       by_cases hlt : (k : ℕ) < p
-      · simp only [hlt, if_true]
+      · simp only [hlt, ite_true]
         rw [Nat.card_zpowers]
         refine horder _ ?_
         intro hone
         have := (eq_zero_of_zpow_mul_zpow_eq_one hxord hyord hinf
           (a := 1) (b := (k : ℕ)) (by rw [zpow_one, zpow_natCast]; exact hone)).1
         exact hp.ne_one (Nat.dvd_one.mp (by exact_mod_cast this))
-      · simp only [hlt, if_false]
+      · simp only [hlt, ite_false]
         rw [Nat.card_zpowers, hyord]
     refine hsup _ _ (hcardi i) (hcardi j) ?_
     -- 相異性
     by_cases hi : (i : ℕ) < p
     · by_cases hj : (j : ℕ) < p
-      · simp only [hi, hj, if_true]
+      · simp only [hi, hj, ite_true]
         intro heq
         -- `x y^j ∈ ⟨x y^i⟩` から `j ≡ i (mod p)`
         have hmem : x * y ^ (j : ℕ) ∈ Subgroup.zpowers (x * y ^ (i : ℕ)) := by
@@ -214,7 +214,7 @@ theorem exists_family_subgroups_card_prime {A : Type*} [Group A] [Finite A] {p :
             rw [← ht] at hpge
             linarith
         exact hij (Fin.ext (by exact_mod_cast hzero))
-      · simp only [hi, hj, if_true, if_false]
+      · simp only [hi, hj, ite_true, ite_false]
         intro heq
         -- `x y^i ∈ ⟨y⟩` は `p ∣ 1` を導く
         have hmem : x * y ^ (i : ℕ) ∈ Subgroup.zpowers y := by
@@ -235,7 +235,7 @@ theorem exists_family_subgroups_card_prime {A : Type*} [Group A] [Finite A] {p :
         have hjlt := j.isLt
         by_contra hjc
         exact hij (Fin.ext (by omega))
-      simp only [hi, hj, if_true, if_false]
+      simp only [hi, hj, ite_true, ite_false]
       intro heq
       have hmem : x * y ^ (j : ℕ) ∈ Subgroup.zpowers y := by
         rw [heq]; exact Subgroup.mem_zpowers _

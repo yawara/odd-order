@@ -139,16 +139,16 @@ theorem representationKernel_ne_top {k i₀ : ι'} (hk : k ≠ i₀)
   have h1 : (fun i => if i = i₀ then (wedderburnRepresentation e k).character 1 else 0)
       = ordinaryCoeff e (wedderburnRepresentation e k).character hχ := by
     refine eq_ordinaryCoeff e _ hχ fun g => ?_
-    rw [Finset.sum_eq_single i₀ (fun b _ hb => by rw [if_neg hb, zero_mul])
-        (fun hb => absurd (Finset.mem_univ i₀) hb), if_pos rfl, hi₀ g, mul_one]
+    rw [Finset.sum_eq_single i₀ (fun b _ hb => by rw [ite_eq_right hb, zero_mul])
+        (fun hb => absurd (Finset.mem_univ i₀) hb), ite_eq_left rfl, hi₀ g, mul_one]
     exact (hconst g).symm
   have h2 : (fun i => if i = k then (1 : K) else 0)
       = ordinaryCoeff e (wedderburnRepresentation e k).character hχ := by
     refine eq_ordinaryCoeff e _ hχ fun g => ?_
-    rw [Finset.sum_eq_single k (fun b _ hb => by rw [if_neg hb, zero_mul])
-        (fun hb => absurd (Finset.mem_univ k) hb), if_pos rfl, one_mul]
+    rw [Finset.sum_eq_single k (fun b _ hb => by rw [ite_eq_right hb, zero_mul])
+        (fun hb => absurd (Finset.mem_univ k) hb), ite_eq_left rfl, one_mul]
   have hk' := congrFun (h2.trans h1.symm) k
-  rw [if_pos rfl, if_neg hk] at hk'
+  rw [ite_eq_left rfl, ite_eq_right hk] at hk'
   exact one_ne_zero hk'
 
 set_option linter.unusedFintypeInType false in

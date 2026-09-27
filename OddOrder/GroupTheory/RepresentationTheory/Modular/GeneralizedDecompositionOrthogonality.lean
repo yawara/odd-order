@@ -343,7 +343,7 @@ theorem sum_character_mul_generalizedDecompositionNumber_eq_zero
     _ = 0 := by
         have horth := sum_character_inv_mul_character eG v⁻¹ (y * (w : G))
         rw [inv_inv] at horth
-        rw [horth, if_neg]
+        rw [horth, ite_eq_right]
         intro hc
         refine hv (mem_pSection_iff_isConj_pPart.mpr ?_)
         have hmem : y * (w : G) ∈ pSection p y :=

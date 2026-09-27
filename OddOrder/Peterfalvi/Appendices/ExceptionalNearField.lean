@@ -82,13 +82,13 @@ theorem squareSignChar_apply_of_isSquare {y : Kˣ} (hy : IsSquare ((y : Kˣ) : K
     squareSignChar y = Multiplicative.ofAdd (0 : ZMod 2) := by
   classical
   simp only [squareSignChar, MonoidHom.coe_mk, OneHom.coe_mk]
-  rw [if_pos hy]
+  rw [ite_eq_left hy]
 
 theorem squareSignChar_apply_of_not_isSquare {y : Kˣ} (hy : ¬IsSquare ((y : Kˣ) : K)) :
     squareSignChar y = Multiplicative.ofAdd (1 : ZMod 2) := by
   classical
   simp only [squareSignChar, MonoidHom.coe_mk, OneHom.coe_mk]
-  rw [if_neg hy]
+  rw [ite_eq_right hy]
 
 /-- Squares are preserved and reflected by a ring automorphism. -/
 theorem isSquare_ringAut_iff {K : Type*} [Field K] (σ : RingAut K) {z : K} :
@@ -169,7 +169,7 @@ theorem exceptionalTwistData_twMul_of_isSquare (hcard : Fintype.card K = p ^ (2 
   rcases eq_or_ne y 0 with rfl | hy0
   · rw [TwistData.twMul_zero, mul_zero]
   · have hexp : (exceptionalTwistData K p n hcard).twExp y = 0 := by
-      rw [TwistData.twExp, dif_neg hy0]
+      rw [TwistData.twExp, dite_eq_right hy0]
       have : IsSquare ((Units.mk0 y hy0 : Kˣ) : K) := hy
       rw [show (exceptionalTwistData K p n hcard).χ = squareSignChar from rfl,
         squareSignChar_apply_of_isSquare this]
@@ -185,7 +185,7 @@ theorem exceptionalTwistData_twMul_of_not_isSquare (hcard : Fintype.card K = p ^
     (exceptionalTwistData K p n hcard).twMul x y = x ^ p ^ n * y := by
   have hy0 : y ≠ 0 := fun h => hy (h ▸ ⟨0, (zero_mul 0).symm⟩)
   have hexp : (exceptionalTwistData K p n hcard).twExp y = 1 := by
-    rw [TwistData.twExp, dif_neg hy0]
+    rw [TwistData.twExp, dite_eq_right hy0]
     have : ¬IsSquare ((Units.mk0 y hy0 : Kˣ) : K) := hy
     rw [show (exceptionalTwistData K p n hcard).χ = squareSignChar from rfl,
       squareSignChar_apply_of_not_isSquare this]

@@ -155,18 +155,18 @@ theorem Hypothesis.tau_muColumnZero_sub_zeta_dichotomy_of_orthogonal [Finite G] 
     have : (hyp.w1 : ℕ) = 1 := by exact_mod_cast he.symm
     omega
   have hζζ : ClassFunction.inner ζ ζ = 1 := by
-    rw [irr_cf_inner hζmem hζmem, if_pos rfl]
+    rw [irr_cf_inner hζmem hζmem, ite_eq_left rfl]
   have hζζc : ClassFunction.inner ζ ζ.conj = 0 := by
-    rw [irr_cf_inner hζmem hζcmem, if_neg hζne.symm]
+    rw [irr_cf_inner hζmem hζcmem, ite_eq_right hζne.symm]
   -- `G`-side norm bookkeeping under the orthogonality hypothesis
   have hΩr : ∀ r : Fin hyp.w1,
       ClassFunction.inner (∑ r' : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r' 0)
         (hyp.alignedOmegaSigmaGrid hG hodd r 0) = 1 := by
     intro r
     rw [inner_sum_left, Finset.sum_eq_single r]
-    · rw [hyp.alignedOmegaSigmaGrid_inner hG hodd r r 0 0, if_pos ⟨rfl, rfl⟩]
+    · rw [hyp.alignedOmegaSigmaGrid_inner hG hodd r r 0 0, ite_eq_left ⟨rfl, rfl⟩]
     · intro r' _ hne
-      rw [hyp.alignedOmegaSigmaGrid_inner hG hodd r' r 0 0, if_neg fun h => hne h.1]
+      rw [hyp.alignedOmegaSigmaGrid_inner hG hodd r' r 0 0, ite_eq_right fun h => hne h.1]
     · intro h
       exact absurd (Finset.mem_univ _) h
   have hψr : ∀ r : Fin hyp.w1,
@@ -313,7 +313,7 @@ theorem Hypothesis.tau_muColumnZero_sub_zeta_dichotomy_of_orthogonal [Finite G] 
       omega
     have hlammem : lam ∈ irreducibleCharacters (↥M) := mem_irreducibleCharacters.mpr hlamirr
     have hzetalam : ClassFunction.inner ζ lam = 0 := by
-      rw [irr_cf_inner hζmem hlammem, if_neg (Ne.symm hlamzeta)]
+      rw [irr_cf_inner hζmem hlammem, ite_eq_right (Ne.symm hlamzeta)]
     have hsupplam : (lam - ζ).support ⊆ hyp.A0 :=
       hyp.inducedFamily_sub_support hlamS hζS (by rw [hlam1, hζ1])
     have hGlam : ClassFunction.inner

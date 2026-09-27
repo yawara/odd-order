@@ -129,14 +129,14 @@ theorem certainTypeR_imageSet_orthogonal_dadeOfDiff_of_vanishOnV
   have hμZ : cd.muClassFunction ∈ ZIrr G := cd.mu.mem_ZIrr
   have hνZ : cd.nuClassFunction ∈ ZIrr G := cd.nu.mem_ZIrr
   have hμ1 : ClassFunction.inner cd.muClassFunction cd.muClassFunction = 1 := by
-    have h := irreducibleCharacter_inner_eq_ite cd.mu cd.mu; rwa [if_pos rfl] at h
+    have h := irreducibleCharacter_inner_eq_ite cd.mu cd.mu; rwa [ite_eq_left rfl] at h
   have hν1 : ClassFunction.inner cd.nuClassFunction cd.nuClassFunction = 1 := by
-    have h := irreducibleCharacter_inner_eq_ite cd.nu cd.nu; rwa [if_pos rfl] at h
+    have h := irreducibleCharacter_inner_eq_ite cd.nu cd.nu; rwa [ite_eq_left rfl] at h
   have hμν : ClassFunction.inner cd.muClassFunction cd.nuClassFunction = 0 := by
-    have h := irreducibleCharacter_inner_eq_ite cd.mu cd.nu; rwa [if_neg cd.distinct] at h
+    have h := irreducibleCharacter_inner_eq_ite cd.mu cd.nu; rwa [ite_eq_right cd.distinct] at h
   have hνμ : ClassFunction.inner cd.nuClassFunction cd.muClassFunction = 0 := by
     have h := irreducibleCharacter_inner_eq_ite cd.nu cd.mu
-    rwa [if_neg (Ne.symm cd.distinct)] at h
+    rwa [ite_eq_right (Ne.symm cd.distinct)] at h
   have hsignC : (cd.sign : ℂ) ≠ 0 := by rcases cd.sign_eq with h | h <;> simp [h]
   have hnsignC : (-(cd.sign : ℂ)) ≠ 0 := by rcases cd.sign_eq with h | h <;> simp [h]
   -- Destructure α and β.

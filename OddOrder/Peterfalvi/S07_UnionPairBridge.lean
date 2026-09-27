@@ -397,17 +397,17 @@ theorem exists_bridge_target_of_budget {ι κ : Type*} [DecidableEq ι] [Decidab
     intro j₀ hj₀
     rw [hΓ0L (θ₃ j₀),
       Finset.sum_eq_single j₀
-        (fun j hj hne => by rw [hON₃ j hj j₀ hj₀, if_neg hne, mul_zero])
+        (fun j hj hne => by rw [hON₃ j hj j₀ hj₀, ite_eq_right hne, mul_zero])
         (fun h => absurd hj₀ h),
-      hON₃ j₀ hj₀ j₀ hj₀, if_pos rfl, mul_one]
+      hON₃ j₀ hj₀ j₀ hj₀, ite_eq_left rfl, mul_one]
   have hB0proj : ∀ i₀ ∈ SF, ClassFunction.inner B0 (θ₁ i₀)
       = ClassFunction.inner TB (θ₁ i₀) := by
     intro i₀ hi₀
     rw [hB0L (θ₁ i₀),
       Finset.sum_eq_single i₀
-        (fun i hi hne => by rw [hON₁ i hi i₀ hi₀, if_neg hne, mul_zero])
+        (fun i hi hne => by rw [hON₁ i hi i₀ hi₀, ite_eq_right hne, mul_zero])
         (fun h => absurd hi₀ h),
-      hON₁ i₀ hi₀ i₀ hi₀, if_pos rfl, mul_one]
+      hON₁ i₀ hi₀ i₀ hi₀, ite_eq_left rfl, mul_one]
   have hB0θ₃ : ∀ j ∈ S4F, ClassFunction.inner B0 (θ₃ j) = 0 := by
     intro j hj
     rw [hB0L (θ₃ j)]

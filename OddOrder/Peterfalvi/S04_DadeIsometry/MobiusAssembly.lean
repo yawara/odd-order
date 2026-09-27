@@ -219,7 +219,7 @@ theorem mobiusSummand_conjFinset (l : L) (g : G)
     rw [hset, card_conjFiber_conj_eq]
   · have hBe : ¬ (hyp.conjFinset l B).Nonempty := by
       rw [conjFinset, Finset.image_nonempty]; exact hB
-    simp only [mobiusSummand, dif_neg hBe, dif_neg hB]
+    simp only [mobiusSummand, dite_eq_right hBe, dite_eq_right hB]
 
 /-- **Peterfalvi (2.10), the `𝒫(b)`-sum is `L`-conjugation invariant.**  For `l ∈ L`,
 
@@ -357,12 +357,12 @@ theorem mobiusTermCF_of_nonempty (α : ClassFunction L ℂ)
     (g : G) {B : Finset {a : G // a ∈ A}} (hB : B.Nonempty) :
     hyp.mobiusTermCF α g B
       = (-1 : ℂ) ^ B.card * hyp.induceAlphaBTerm α ⟨B, hB⟩ g := by
-  rw [mobiusTermCF, dif_pos hB]
+  rw [mobiusTermCF, dite_eq_left hB]
 
 theorem mobiusTermCF_of_not_nonempty (α : ClassFunction L ℂ)
     (g : G) {B : Finset {a : G // a ∈ A}} (hB : ¬ B.Nonempty) :
     hyp.mobiusTermCF α g B = 0 := by
-  rw [mobiusTermCF, dif_neg hB]
+  rw [mobiusTermCF, dite_eq_right hB]
 
 /-- The orbit-averaging summand is `L`-conjugacy invariant: `mobiusTermCF (B^l) = mobiusTermCF B`.
 Uses `conjFinset_card` (the sign `(-1)^{|B|}` is `L`-invariant) and `induceAlphaBTerm_conjFinset`
@@ -377,7 +377,7 @@ theorem mobiusTermCF_conjFinset (α : ClassFunction L ℂ)
       hyp.conjFinset_card l B, hyp.induceAlphaBTerm_conjFinset α l hB]
   · have hBe : ¬ (hyp.conjFinset l B).Nonempty := by
       rw [conjFinset, Finset.image_nonempty]; exact hB
-    rw [mobiusTermCF, mobiusTermCF, dif_neg hBe, dif_neg hB]
+    rw [mobiusTermCF, mobiusTermCF, dite_eq_right hBe, dite_eq_right hB]
 
 /-- The `L`-orbit of the support representative `a`, as a `Finset {a : G // a ∈ A}`: the elements
 `b' ∈ A` with `b' = l·a·l⁻¹` for some `l ∈ L`.  This is the fixed (`B`-independent) index over which
@@ -473,12 +473,12 @@ theorem exists_mem_H_isConj_of_mem_aOrbitFinset
 /-- `mobiusSummand` vanishes on the empty subset (no `a`). -/
 theorem mobiusSummand_empty (a : {a : G // a ∈ A}) (g : G) :
     hyp.mobiusSummand a g (∅ : Finset {a : G // a ∈ A}) = 0 := by
-  rw [mobiusSummand, dif_neg (by simp)]
+  rw [mobiusSummand, dite_eq_right (by simp)]
 
 /-- `mobiusTermCF` vanishes on the empty subset. -/
 theorem mobiusTermCF_empty (α : ClassFunction L ℂ) (g : G) :
     hyp.mobiusTermCF α g (∅ : Finset {a : G // a ∈ A}) = 0 := by
-  rw [mobiusTermCF, dif_neg (by simp)]
+  rw [mobiusTermCF, dite_eq_right (by simp)]
 
 /-- **Peterfalvi (2.10), the support-side total.**  For `g ∈ (aH(a))^G` (witnessed by `h ∈ H(a)`,
 `IsConj (a·h) g`), the transversal sum of orbit-averaging summands evaluates to `-α(a)`:

@@ -330,7 +330,7 @@ theorem coprime_centralizer_of_neighbour [Finite G] (hG : OddOrder.BG.IsMinimalS
   have huniqMi : ∀ L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({xi} : Set G)), L = Mi :=
     fun L hL => by rw [hMℳi, Set.mem_singleton_iff] at hL; exact hL
   have hbase : FT_signalizerBase xi = Mi := by
-    rw [show FT_signalizerBase xi = hbr.2.choose from dif_pos hbr]
+    rw [show FT_signalizerBase xi = hbr.2.choose from dite_eq_left hbr]
     exact huniqMi _ hbr.2.choose_spec
   -- `q ∈ π(M)` and Lemma 14.13(a)
   have hqπM : q ∈ S14.piSet M :=

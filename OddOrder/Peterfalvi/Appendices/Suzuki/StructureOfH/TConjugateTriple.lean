@@ -161,7 +161,7 @@ lemma tConjTriple_spec {x : G} (hx : x ∈ hyp.Q) (hx1 : x ≠ 1) :
       hyp.t * x * hyp.t
         = hyp.tConjLeft x * hyp.tConjMiddle x * hyp.t * hyp.tConjRight x := by
   classical
-  rw [tConjLeft, tConjMiddle, tConjRight, tConjTriple, dif_pos ⟨hx, hx1⟩]
+  rw [tConjLeft, tConjMiddle, tConjRight, tConjTriple, dite_eq_left ⟨hx, hx1⟩]
   exact (hyp.existsUnique_tConjTriple hx hx1).choose_spec.1
 
 lemma tConjLeft_mem {x : G} (hx : x ∈ hyp.Q) (hx1 : x ≠ 1) :

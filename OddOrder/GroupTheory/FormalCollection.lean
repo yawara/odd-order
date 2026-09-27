@@ -91,10 +91,10 @@ theorem evalWord_extract (f : X → G) (sel : FormalCommutator X → Bool)
   | cons u t ih =>
       rw [extract_cons] at h
       by_cases hu : sel u
-      · rw [if_pos hu, Option.some.injEq, Prod.mk.injEq] at h
+      · rw [ite_eq_left hu, Option.some.injEq, Prod.mk.injEq] at h
         obtain ⟨rfl, rfl⟩ := h
         rfl
-      · rw [if_neg hu] at h
+      · rw [ite_eq_right hu] at h
         cases hext : extract sel t with
         | none => rw [hext] at h; exact absurd h (by simp)
         | some z =>
@@ -114,8 +114,8 @@ theorem countP_eq_zero_of_extract_eq_none (sel : FormalCommutator X → Bool)
   | cons u t ih =>
       rw [extract_cons] at h
       by_cases hu : sel u
-      · rw [if_pos hu] at h; exact absurd h (by simp)
-      · rw [if_neg hu] at h
+      · rw [ite_eq_left hu] at h; exact absurd h (by simp)
+      · rw [ite_eq_right hu] at h
         cases hext : extract sel t with
         | none => simp [hu, ih hext]
         | some z => rw [hext] at h; exact absurd h (by simp)
@@ -135,11 +135,11 @@ theorem extract_spec (sel : FormalCommutator X → Bool) {P : FormalCommutator X
   | cons u t ih =>
       rw [extract_cons] at h
       by_cases hu : sel u
-      · rw [if_pos hu, Option.some.injEq, Prod.mk.injEq] at h
+      · rw [ite_eq_left hu, Option.some.injEq, Prod.mk.injEq] at h
         obtain ⟨rfl, rfl⟩ := h
         exact ⟨hu, hl u (by simp), fun c hc => hl c (List.mem_cons_of_mem _ hc),
           by simp [hu]⟩
-      · rw [if_neg hu] at h
+      · rw [ite_eq_right hu] at h
         cases hext : extract sel t with
         | none => rw [hext] at h; exact absurd h (by simp)
         | some z =>
@@ -159,7 +159,7 @@ theorem extract_spec (sel : FormalCommutator X → Bool) {P : FormalCommutator X
             · have hbr : sel (u * w) = false := by
                 simpa using hclosed u w hPu hu hselv
               have hu' : sel u = false := by simpa using hu
-              simp only [List.countP_cons, hu', hbr, Bool.false_eq_true, if_false,
+              simp only [List.countP_cons, hu', hbr, Bool.false_eq_true, ite_false,
                 Nat.add_zero]
               omega
 

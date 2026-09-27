@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.LinearAlgebra.Span.Basic
 import Mathlib.RepresentationTheory.Character
 import Mathlib.RepresentationTheory.Irreducible
@@ -139,7 +139,7 @@ theorem trivialClassFunction_isIrreducible :
         rw [hz]
         exact S.toSubmodule.smul_mem (z / y) hyS
   · funext g
-    simp [Representation.character]
+    simp [Representation.character, ρ, Representation.isTrivial_def]
 
 /-- The set of irreducible characters of `G` (Peterfalvi `Irr(G)`). -/
 def irreducibleCharacters (G : Type*) [Group G] : Set (ClassFunction G ℂ) :=

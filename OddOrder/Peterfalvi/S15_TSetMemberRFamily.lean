@@ -69,10 +69,10 @@ noncomputable def Hypothesis.sSet_reducible_memberRFamily_ofRows [Finite G]
     · rw [OddOrder.Peterfalvi.S16.eta_orthonormal hyp r r a b]
       by_cases hab : a = b <;> simp [hab, Sum.inl.injEq]
     · rw [ClassFunction.inner_neg_right, OddOrder.Peterfalvi.S16.eta_orthonormal hyp r s a b,
-        if_neg (fun h => hrs h.1)]
+        ite_eq_right (fun h => hrs h.1)]
       simp
     · rw [ClassFunction.inner_neg_left, OddOrder.Peterfalvi.S16.eta_orthonormal hyp s r a b,
-        if_neg (fun h => hrs h.1.symm)]
+        ite_eq_right (fun h => hrs h.1.symm)]
       simp
     · rw [ClassFunction.inner_neg_left, ClassFunction.inner_neg_right, neg_neg,
         OddOrder.Peterfalvi.S16.eta_orthonormal hyp s s a b]
@@ -80,9 +80,9 @@ noncomputable def Hypothesis.sSet_reducible_memberRFamily_ofRows [Finite G]
   have hg_inj : Function.Injective g := by
     intro x y hxy
     have h1 := hg_inner x y
-    rw [hxy, hg_inner y y, if_pos rfl] at h1
+    rw [hxy, hg_inner y y, ite_eq_left rfl] at h1
     by_contra hne
-    rw [if_neg hne] at h1
+    rw [ite_eq_right hne] at h1
     exact one_ne_zero h1
   exact
     { imageSet := Finset.image g Finset.univ
@@ -100,8 +100,8 @@ noncomputable def Hypothesis.sSet_reducible_memberRFamily_ofRows [Finite G]
         obtain ⟨y, -, rfl⟩ := hβ
         rw [hg_inner x y]
         by_cases hxy : x = y
-        · rw [if_pos hxy, if_pos (by rw [hxy])]
-        · rw [if_neg hxy, if_neg (fun h => hxy (hg_inj h))]
+        · rw [ite_eq_left hxy, ite_eq_left (by rw [hxy])]
+        · rw [ite_eq_right hxy, ite_eq_right (fun h => hxy (hg_inj h))]
       image_eq := by
         rw [hcross, Finset.sum_image (fun x _ y _ h => hg_inj h), Fintype.sum_sum_type]
         simp only [hg, Sum.elim_inl, Sum.elim_inr, Finset.sum_sub_distrib,
@@ -264,7 +264,7 @@ theorem Hypothesis.sSet_memberRFamily_T_imageSet_of_irr [Finite G]
   refine ⟨sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupT hG hvd) (hyp.oddCardT hG) hη,
     hyp.sSet_member_conjDiff_supported_T hG hvd hη, ?_⟩
   unfold Hypothesis.sSet_memberRFamily_T
-  rw [dif_pos hirr]
+  rw [dite_eq_left hirr]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
@@ -297,7 +297,7 @@ theorem Hypothesis.sSet_memberRFamily_T_imageSet_of_red [Finite G]
   rw [show (hyp.sSet_memberRFamily_T hG hnoV pins hvd hTP Tdata hU hW1 hW2 hη).imageSet
         = (hyp.sSet_reducible_memberRFamily_T hG hnoV pins hvd hTP Tdata hU hW1 hW2
             hη hirr).imageSet from by
-    unfold Hypothesis.sSet_memberRFamily_T; rw [dif_neg hirr]]
+    unfold Hypothesis.sSet_memberRFamily_T; rw [dite_eq_right hirr]]
   exact hyp.sSet_reducible_memberRFamily_ofRows_imageSet hG hnoV pins hvd hTP Tdata hU hW1 hW2
     hη
     (hyp.sSet_reducible_eq_nuRowSum hG pins hvd hη hirr).choose_spec.1
@@ -379,16 +379,16 @@ theorem Hypothesis.sSet_irr_memberRFamily_eta_inner_T [Finite G]
   have hνZ : cd.nuClassFunction ∈ ZIrr G := cd.nu.mem_ZIrr
   have hμ1 : ClassFunction.inner cd.muClassFunction cd.muClassFunction = 1 := by
     have h := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite cd.mu cd.mu
-    rwa [if_pos rfl] at h
+    rwa [ite_eq_left rfl] at h
   have hν1 : ClassFunction.inner cd.nuClassFunction cd.nuClassFunction = 1 := by
     have h := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite cd.nu cd.nu
-    rwa [if_pos rfl] at h
+    rwa [ite_eq_left rfl] at h
   have hμν : ClassFunction.inner cd.muClassFunction cd.nuClassFunction = 0 := by
     have h := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite cd.mu cd.nu
-    rwa [if_neg cd.distinct] at h
+    rwa [ite_eq_right cd.distinct] at h
   have hνμ : ClassFunction.inner cd.nuClassFunction cd.muClassFunction = 0 := by
     have h := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite cd.nu cd.mu
-    rwa [if_neg (Ne.symm cd.distinct)] at h
+    rwa [ite_eq_right (Ne.symm cd.distinct)] at h
   have hsign : (cd.sign : ℂ) * (cd.sign : ℂ) = 1 := by
     have := cd.sign_mul_self; exact_mod_cast congrArg (Int.cast : ℤ → ℂ) this
   have hdiffsupp' : ((φ : ClassFunction ↥hyp.T ℂ)
@@ -576,15 +576,15 @@ theorem Hypothesis.sSet_memberRFamily_orthogonal_T [Finite G]
     obtain ⟨x, -, rfl⟩ := hα
     obtain ⟨y, -, rfl⟩ := hβ
     rcases x with a | a <;> rcases y with b | b <;> simp only [Sum.elim_inl, Sum.elim_inr]
-    · rw [OddOrder.Peterfalvi.S16.eta_orthonormal hyp rφ rξ a b, if_neg (fun h => hne1 h.1)]
+    · rw [OddOrder.Peterfalvi.S16.eta_orthonormal hyp rφ rξ a b, ite_eq_right (fun h => hne1 h.1)]
     · rw [ClassFunction.inner_neg_right,
         OddOrder.Peterfalvi.S16.eta_orthonormal hyp rφ sξ a b,
-        if_neg (fun h => hne2 h.1), neg_zero]
+        ite_eq_right (fun h => hne2 h.1), neg_zero]
     · rw [ClassFunction.inner_neg_left,
         OddOrder.Peterfalvi.S16.eta_orthonormal hyp sφ rξ a b,
-        if_neg (fun h => hne3 h.1), neg_zero]
+        ite_eq_right (fun h => hne3 h.1), neg_zero]
     · rw [ClassFunction.inner_neg_left, ClassFunction.inner_neg_right,
-        OddOrder.Peterfalvi.S16.eta_orthonormal hyp sφ sξ a b, if_neg (fun h => hne4 h.1),
+        OddOrder.Peterfalvi.S16.eta_orthonormal hyp sφ sξ a b, ite_eq_right (fun h => hne4 h.1),
         neg_zero, neg_zero]
 
 

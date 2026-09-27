@@ -245,7 +245,7 @@ theorem inner_columnFamily_mu_Yset_eq_zero
     exact hw1 (Nat.dvd_one.mp (by exact_mod_cast hdvd1))
   have hkron := irreducibleCharacter_inner_eq_ite ((h46.columnFamily χ₂).mu i)
     (⟨η, hηirr⟩ : IrreducibleCharacter ↥L)
-  rw [if_neg (fun heq => hne (Subtype.ext_iff.mp heq))] at hkron
+  rw [ite_eq_right (fun heq => hne (Subtype.ext_iff.mp heq))] at hkron
   simpa using hkron
 
 /-- **(6.8.2.3) raw `X ⊥ Y`, column form** — Peterfalvi (4.1).  A whole certain-type column
@@ -390,10 +390,10 @@ theorem constituentWeight_eq_apply_one
     (⟨lam, hlamirr⟩ : IrreducibleCharacter ↥(W2.subgroupOf H))
   by_cases heq : (⟨ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ, hφ'⟩ :
       IrreducibleCharacter ↥(W2.subgroupOf H)) = ⟨lam, hlamirr⟩
-  · rw [if_pos heq] at hkron
+  · rw [ite_eq_left heq] at hkron
     rw [hkron, mul_one] at hspec
     rw [hd]; exact hspec.symm
-  · rw [if_neg heq] at hkron
+  · rw [ite_eq_right heq] at hkron
     rw [hkron, mul_zero] at hspec
     exact absurd hspec.symm (by exact_mod_cast hweight.ne')
 
@@ -619,7 +619,7 @@ theorem caseB_irr_conj_inner
     simpa using h2.symm
   have hkron := irreducibleCharacter_inner_eq_ite (⟨Φ, hirr1⟩ : IrreducibleCharacter ↥L)
     (⟨Φ.conj, hirr1.conj⟩ : IrreducibleCharacter ↥L)
-  rw [if_neg hne] at hkron
+  rw [ite_eq_right hne] at hkron
   simpa using hkron
 
 /-- An irreducible character distinct from a `Y`-member is orthogonal to it (both irreducible, so
@@ -631,7 +631,7 @@ theorem inner_irr_Yset_eq_zero
   have hηirr := hyp.isIrreducibleCharacter_of_mem_Yset hη₁
   have hkron := irreducibleCharacter_inner_eq_ite (⟨φ, hφirr⟩ : IrreducibleCharacter ↥L)
     (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
-  rw [if_neg (fun heq => hne (by
+  rw [ite_eq_right (fun heq => hne (by
     simpa using congrArg (fun c : IrreducibleCharacter ↥L => (c : ClassFunction ↥L ℂ)) heq))]
     at hkron
   simpa using hkron
@@ -673,7 +673,7 @@ theorem inner_Yset_irr_eq_zero
   have hηirr := hyp.isIrreducibleCharacter_of_mem_Yset hη
   have hkron := irreducibleCharacter_inner_eq_ite (⟨η, hηirr⟩ : IrreducibleCharacter ↥L)
     (⟨ψ, hψirr⟩ : IrreducibleCharacter ↥L)
-  rw [if_neg (fun heq => hne (by
+  rw [ite_eq_right (fun heq => hne (by
     simpa using congrArg (fun c : IrreducibleCharacter ↥L => (c : ClassFunction ↥L ℂ)) heq))]
     at hkron
   simpa using hkron
@@ -763,7 +763,7 @@ theorem caseB_hnonlin [Finite ↥H]
       simpa only [IrreducibleCharacter.coe_mk,
         IrreducibleCharacter.coe_trivialIrreducibleCharacter] using h
     rw [hrestrict, ← IrreducibleCharacter.coe_trivialIrreducibleCharacter,
-      ← IrreducibleCharacter.coe_mk _ hφ', irreducibleCharacter_inner_eq_ite, if_neg hne]
+      ← IrreducibleCharacter.coe_mk _ hφ', irreducibleCharacter_inner_eq_ite, ite_eq_right hne]
   exact (constituentWeight_pos_iff hφ' θ).mp hweight hzero
 
 /-- **(6.8.2.3) per-`θ` anchor-vs-constituent orthogonality** (`hirrAnc` of the dispatch).  For a

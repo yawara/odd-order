@@ -140,7 +140,7 @@ theorem exists_quotient_field_coordinate
   have hβval : ∀ (y : G) (hy : y ∈ hyp.Q), β y = α (Additive.ofMul (π ⟨y, hy⟩)) := by
     intro y hy
     rw [hβ]
-    exact dif_pos hy
+    exact dite_eq_left hy
   refine ⟨F, instF, μ.trans (MulEquiv.inv Fˣ), β, ?_, ?_, ?_, ?_⟩
   · -- characteristic `2`
     obtain ⟨u, hu⟩ := exists_ne (1 : M)

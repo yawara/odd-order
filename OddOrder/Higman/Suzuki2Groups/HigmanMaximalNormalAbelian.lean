@@ -425,14 +425,12 @@ private theorem isMulCommutative_sup_of_central_left
     (hAB : A ≤ Subgroup.centralizer (B : Set G)) :
     IsMulCommutative ↥(A ⊔ B) := by
   rw [Subgroup.sup_eq_closure]
-  refine Subgroup.isMulCommutative_closure fun x hx y hy => ?_
+  refine Subgroup.isMulCommutative_closure fun x hx y hy _ => ?_
   rcases hx with hx | hx <;> rcases hy with hy | hy
-  · simpa using congrArg Subtype.val
-      (isMulCommutative_iff.mp hA ⟨x, hx⟩ ⟨y, hy⟩)
+  · exact congrArg Subtype.val (isMulCommutative_iff.mp hA ⟨x, hx⟩ ⟨y, hy⟩)
   · exact (Subgroup.mem_centralizer_iff.mp (hAB hx) y hy).symm
   · exact Subgroup.mem_centralizer_iff.mp (hAB hy) x hx
-  · simpa using congrArg Subtype.val
-      (isMulCommutative_iff.mp hB ⟨x, hx⟩ ⟨y, hy⟩)
+  · exact congrArg Subtype.val (isMulCommutative_iff.mp hB ⟨x, hx⟩ ⟨y, hy⟩)
 
 /-- Endgame of Higman Lemma 9. If the maximal normal invariant abelian
 subgroup has exponent two, every one of its nonidentity elements is a

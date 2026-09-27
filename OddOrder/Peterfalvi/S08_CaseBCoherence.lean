@@ -137,7 +137,7 @@ theorem SibleyDadeHypothesis.inner_tau_indW2_sub_smul_tau_Yset_diff
   rw [hiso, ClassFunction.inner_sub_left,
     hyp.inner_induce_W2_Yset_diff_eq_zero hW2comm φ hη₁ hη',
     ClassFunction.inner_smul_left, ClassFunction.inner_sub_right,
-    hYon η₁ η' hη₁ hη', hYon η₁ η₁ hη₁ hη₁, if_neg (Ne.symm hne), if_pos rfl]
+    hYon η₁ η' hη₁ hη', hYon η₁ η₁ hη₁ hη₁, ite_eq_right (Ne.symm hne), ite_eq_left rfl]
   ring
 
 /-- **(6.8.2.1) coherence agreement `η'^{τ₁} − η₁^{τ₁} = (η' − η₁)^τ`** for `η₁, η' ∈ Y`.  The
@@ -328,11 +328,11 @@ theorem SibleyDadeHypothesis.coeff_eq_neg_or_edge_caseB
     have h0 : ClassFunction.inner (hyp.coherentYset.extension η)
         (hyp.coherentYset.extension η') = 0 := by
       rw [hyp.coherentYset.extension_inner_eq η η' (Submodule.subset_span hη)
-        (Submodule.subset_span hη'), hYon η η' hη hη', if_neg hne]
+        (Submodule.subset_span hη'), hYon η η' hη hη', ite_eq_right hne]
     have h1' : ClassFunction.inner (hyp.coherentYset.extension η)
         (hyp.coherentYset.extension η') = 1 := by
       rw [heq, hyp.coherentYset.extension_inner_eq η' η' (Submodule.subset_span hη')
-        (Submodule.subset_span hη'), hYon η' η' hη' hη', if_pos rfl]
+        (Submodule.subset_span hη'), hYon η' η' hη' hη', ite_eq_left rfl]
     rw [h1'] at h0; exact one_ne_zero h0
   have hcoeff : ∀ η ∈ hyp.Yset,
       ClassFunction.inner (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
@@ -340,8 +340,8 @@ theorem SibleyDadeHypothesis.coeff_eq_neg_or_edge_caseB
         = ((if η = η₁ then bb else bb + (W2.subgroupOf H).index : ℤ) : ℂ) := by
     intro η hη
     by_cases hee : η = η₁
-    · subst hee; rw [if_pos rfl]; exact hbb
-    · rw [if_neg hee]
+    · subst hee; rw [ite_eq_left rfl]; exact hbb
+    · rw [ite_eq_right hee]
       have hconst := hyp.inner_tau_indW2_sub_smul_tau_Yset_diff hW2H hW2comm φ hη₁ hη hee
         ((W2.subgroupOf H).index : ℂ) h1
       rw [← hyp.coherentYset_extension_Yset_diff_eq_tau hη₁ hη,
@@ -364,7 +364,7 @@ theorem SibleyDadeHypothesis.coeff_eq_neg_or_edge_caseB
       (Submodule.subset_span (hmemt.mp hη')), hYon η η' (hmemt.mp hη) (hmemt.mp hη')]
     by_cases hee : η = η'
     · subst hee; simp
-    · rw [if_neg hee, if_neg (fun h => hee (hEinj_t η hη η' hη' h))]
+    · rw [ite_eq_right hee, ite_eq_right (fun h => hee (hEinj_t η hη η' hη' h))]
   have hη₁t : η₁ ∈ hyp.Yset_finite.toFinset := hmemt.mpr hη₁
   have hβval : ∀ ψ ∈ hyp.Yset_finite.toFinset.image hyp.coherentYset.extension,
       ClassFunction.inner (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
@@ -377,7 +377,7 @@ theorem SibleyDadeHypothesis.coeff_eq_neg_or_edge_caseB
     rw [hcoeff η (hmemt.mp hη)]
     by_cases hee : η = η₁
     · subst hee; simp
-    · rw [if_neg hee, if_neg (fun h => hee (hEinj_t η hη η₁ hη₁t h))]
+    · rw [ite_eq_right hee, ite_eq_right (fun h => hee (hEinj_t η hη η₁ hη₁t h))]
   have hbessel := OddOrder.RepresentationTheory.sum_sq_le_inner_self_re horth
     (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
       - ((W2.subgroupOf H).index : ℂ) • η₁)) hβval
@@ -405,13 +405,13 @@ theorem SibleyDadeHypothesis.coeff_eq_neg_or_edge_caseB
       intro η hη
       by_cases hee : η = η₁
       · subst hee; simp
-      · rw [if_neg (fun h => hee (hEinj_t η hη η₁ hη₁t h)), if_neg hee]
-    rw [Finset.sum_congr rfl hsplit, ← Finset.add_sum_erase _ _ hη₁t, if_pos rfl]
+      · rw [ite_eq_right (fun h => hee (hEinj_t η hη η₁ hη₁t h)), ite_eq_right hee]
+    rw [Finset.sum_congr rfl hsplit, ← Finset.add_sum_erase _ _ hη₁t, ite_eq_left rfl]
     have hcrd : (hyp.Yset_finite.toFinset.erase η₁).card = hyp.Yset.ncard - 1 := by
       rw [Finset.card_erase_of_mem hη₁t, ← Set.ncard_eq_toFinset_card _ hyp.Yset_finite]
     have h1le : 1 ≤ hyp.Yset.ncard := by
       rw [Set.ncard_eq_toFinset_card _ hyp.Yset_finite]; exact Finset.one_le_card.mpr ⟨η₁, hη₁t⟩
-    rw [Finset.sum_congr rfl (fun η hη => if_neg (Finset.ne_of_mem_erase hη)),
+    rw [Finset.sum_congr rfl (fun η hη => ite_eq_right (Finset.ne_of_mem_erase hη)),
       Finset.sum_const, nsmul_eq_mul, hcrd, Nat.cast_sub h1le, Nat.cast_one]
   rw [hsum] at hbessel
   have hnorm_ineq : bb ^ 2 + ((hyp.Yset.ncard : ℤ) - 1) * (bb + (W2.subgroupOf H).index) ^ 2
@@ -490,13 +490,13 @@ theorem SibleyDadeHypothesis.orthogonal_tau_indW2_add_extension_caseB
       ClassFunction.inner_sub_right, hgood] at hconst
     linear_combination hconst
   have he₁e₁ : ClassFunction.inner (hyp.coherentYset.extension η₁)
-      (hyp.coherentYset.extension η₁) = 1 := by rw [hYon η₁ η₁ hη₁ hη₁, if_pos rfl]
+      (hyp.coherentYset.extension η₁) = 1 := by rw [hYon η₁ η₁ hη₁ hη₁, ite_eq_left rfl]
   refine ⟨?_, ?_⟩
   · intro η hη
     rw [ClassFunction.inner_add_left, ClassFunction.inner_smul_left]
     by_cases hee : η = η₁
     · subst hee; rw [hgood, he₁e₁]; ring
-    · rw [hcoeff0 η hη hee, hYon η₁ η hη₁ hη, if_neg (Ne.symm hee)]; ring
+    · rw [hcoeff0 η hη hee, hYon η₁ η hη₁ hη, ite_eq_right (Ne.symm hee)]; ring
   · have hsuppX : (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
         - ((W2.subgroupOf H).index : ℂ) • η₁).support
         ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
@@ -604,14 +604,14 @@ theorem SibleyDadeHypothesis.exists_Ycoherence_hgood_caseB
       simp only [IrreducibleCharacter.coe_mk] at h
       rw [h]
       by_cases hpq : ψ = ψ'
-      · rw [if_pos (Subtype.ext hpq), if_pos hpq]
-      · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+      · rw [ite_eq_left (Subtype.ext hpq), ite_eq_left hpq]
+      · rw [ite_eq_right (fun heq => hpq (Subtype.ext_iff.mp heq)), ite_eq_right hpq]
     have hY1irr := hyp.isIrreducibleCharacter_of_mem_Yset hη₁
     have hY2irr := hyp.isIrreducibleCharacter_of_mem_Yset hη₂Y
     have horth : ClassFunction.inner η₁ η₂ = 0 := by
-      rw [hinner η₁ η₂ hY1irr hY2irr, if_neg (Ne.symm hη₂ne)]
-    have hn1 : ClassFunction.inner η₁ η₁ = 1 := by rw [hinner η₁ η₁ hY1irr hY1irr, if_pos rfl]
-    have hn2 : ClassFunction.inner η₂ η₂ = 1 := by rw [hinner η₂ η₂ hY2irr hY2irr, if_pos rfl]
+      rw [hinner η₁ η₂ hY1irr hY2irr, ite_eq_right (Ne.symm hη₂ne)]
+    have hn1 : ClassFunction.inner η₁ η₁ = 1 := by rw [hinner η₁ η₁ hY1irr hY1irr, ite_eq_left rfl]
+    have hn2 : ClassFunction.inner η₂ η₂ = 1 := by rw [hinner η₂ η₂ hY2irr hY2irr, ite_eq_left rfl]
     have hdeg : (η₂ : ↥L → ℂ) 1 = (η₁ : ↥L → ℂ) 1 :=
       (hyp.Yset_apply_one hη₂Y).trans (hyp.Yset_apply_one hη₁).symm
     have hdeg0 : (η₁ : ↥L → ℂ) 1 ≠ 0 := by
@@ -759,14 +759,16 @@ theorem SibleyDadeHypothesis.exists_Ycoherence_hgood_uniform_caseB
           simp only [IrreducibleCharacter.coe_mk] at h
           rw [h]
           by_cases hpq : ψ = ψ'
-          · rw [if_pos (Subtype.ext hpq), if_pos hpq]
-          · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+          · rw [ite_eq_left (Subtype.ext hpq), ite_eq_left hpq]
+          · rw [ite_eq_right (fun heq => hpq (Subtype.ext_iff.mp heq)), ite_eq_right hpq]
         have hY1irr := hyp.isIrreducibleCharacter_of_mem_Yset hη₁
         have hY2irr := hyp.isIrreducibleCharacter_of_mem_Yset hη₂Y
         have horth : ClassFunction.inner η₁ η₂ = 0 := by
-          rw [hinner η₁ η₂ hY1irr hY2irr, if_neg (Ne.symm hη₂ne)]
-        have hn1 : ClassFunction.inner η₁ η₁ = 1 := by rw [hinner η₁ η₁ hY1irr hY1irr, if_pos rfl]
-        have hn2 : ClassFunction.inner η₂ η₂ = 1 := by rw [hinner η₂ η₂ hY2irr hY2irr, if_pos rfl]
+          rw [hinner η₁ η₂ hY1irr hY2irr, ite_eq_right (Ne.symm hη₂ne)]
+        have hn1 : ClassFunction.inner η₁ η₁ = 1 := by
+          rw [hinner η₁ η₁ hY1irr hY1irr, ite_eq_left rfl]
+        have hn2 : ClassFunction.inner η₂ η₂ = 1 := by
+          rw [hinner η₂ η₂ hY2irr hY2irr, ite_eq_left rfl]
         have hdegeq : (η₂ : ↥L → ℂ) 1 = (η₁ : ↥L → ℂ) 1 :=
           (hyp.Yset_apply_one hη₂Y).trans (hyp.Yset_apply_one hη₁).symm
         have hdeg0 : (η₁ : ↥L → ℂ) 1 ≠ 0 := by

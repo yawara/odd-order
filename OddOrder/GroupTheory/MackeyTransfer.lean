@@ -124,11 +124,11 @@ lemma dosetFiberMap_bijective :
       -- the double cosets agree
       have hq : q = q' := by
         have h1 : DoubleCoset.mk K H ((w : G) * q.out) = q := by
-          conv_rhs => rw [← DoubleCoset.out_eq' K H q]
+          conv_rhs => rw [← DoubleCoset.out_eq' q]
           rw [DoubleCoset.eq]
           exact ⟨(w : G)⁻¹, K.inv_mem w.2, 1, H.one_mem, by group⟩
         have h2 : DoubleCoset.mk K H ((w' : G) * q'.out) = q' := by
-          conv_rhs => rw [← DoubleCoset.out_eq' K H q']
+          conv_rhs => rw [← DoubleCoset.out_eq' q']
           rw [DoubleCoset.eq]
           exact ⟨(w' : G)⁻¹, K.inv_mem w'.2, 1, H.one_mem, by group⟩
         rw [← h1, ← h2, DoubleCoset.eq]
@@ -153,7 +153,7 @@ lemma dosetFiberMap_bijective :
   · intro c
     induction c using QuotientGroup.induction_on with
     | H g =>
-      obtain ⟨k₀, h₀, hk₀, hh₀, hout⟩ := DoubleCoset.mk_out_eq_mul K H g
+      obtain ⟨k₀, hk₀, h₀, hh₀, hout⟩ := DoubleCoset.mk_out_eq_mul K H g
       refine ⟨⟨DoubleCoset.mk K H g,
         ((⟨k₀⁻¹, K.inv_mem hk₀⟩ : ↥K) : ↥K ⧸ _)⟩, ?_⟩
       change ((k₀⁻¹ * (DoubleCoset.mk K H g).out : G) : G ⧸ H) = ((g : G) : G ⧸ H)

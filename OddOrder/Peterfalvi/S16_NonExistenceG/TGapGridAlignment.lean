@@ -925,7 +925,7 @@ theorem alignedOmegaEtaGrid_orthonormal [Finite G]
         alignedOmegaProductIndex_injective
           hG base s12 hW hW1 hW2 hodd hpairs
       exact ⟨congrArg Prod.fst hs, congrArg Prod.snd hs⟩
-    rw [if_neg hindex, if_neg h]
+    rw [ite_eq_right hindex, ite_eq_right h]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 set_option backward.isDefEq.respectTransparency false in
@@ -1037,7 +1037,7 @@ theorem eta_pair_diff_rigidity [Finite G]
     (fun pq => eta_mem_ZIrr base pq.1 pq.2)
     (fun a => by simpa using eta_orthonormal base a.1 a.1 a.2 a.2)
     (fun a b hab => by
-      rw [eta_orthonormal base a.1 b.1 a.2 b.2, if_neg]
+      rw [eta_orthonormal base a.1 b.1 a.2 b.2, ite_eq_right]
       rintro ⟨h1, h2⟩
       exact hab (Prod.ext h1 h2))
     (by rw [hcardq]; exact base.three_le_q)
@@ -1172,7 +1172,7 @@ theorem eta_eq_of_norm_one_regular_value_eq [Finite G]
   have hgridOff : ∀ a b : Fin base.q × Fin base.p, a ≠ b →
       ClassFunction.inner (base.eta a.1 a.2) (base.eta b.1 b.2) = 0 :=
     fun a b hab => by
-      rw [eta_orthonormal base a.1 b.1 a.2 b.2, if_neg]
+      rw [eta_orthonormal base a.1 b.1 a.2 b.2, ite_eq_right]
       rintro ⟨h1, h2⟩
       exact hab (Prod.ext h1 h2)
   -- ψ has at most two nonzero grid coefficients

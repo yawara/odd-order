@@ -226,12 +226,12 @@ theorem Hypothesis.muColumn_inner [Finite G] (hyp : Hypothesis (G := G)) (j k : 
     ClassFunction.inner (∑ i : Fin hyp.q, hyp.mu i j) (∑ i : Fin hyp.q, hyp.mu i k)
       = if j = k then (hyp.q : ℂ) else 0 := by
   by_cases hjk : j = k
-  · subst hjk; rw [if_pos rfl]; exact hyp.muColumn_inner_self j
-  · rw [if_neg hjk, OddOrder.RepresentationTheory.inner_sum_left]
+  · subst hjk; rw [ite_eq_left rfl]; exact hyp.muColumn_inner_self j
+  · rw [ite_eq_right hjk, OddOrder.RepresentationTheory.inner_sum_left]
     refine Finset.sum_eq_zero fun i _ => ?_
     rw [OddOrder.RepresentationTheory.inner_sum_right]
     exact Finset.sum_eq_zero fun i' _ => by
-      rw [hyp.mu_orthonormal i i' j k, if_neg (fun h => hjk h.2)]
+      rw [hyp.mu_orthonormal i i' j k, ite_eq_right (fun h => hjk h.2)]
 
 open scoped FiniteInduce in
 /-- **η-column self/cross inner product**: `⟨∑ᵢ η_{ij}, ∑ᵢ η_{ik}⟩ = q·[j = k]`, from the grid
@@ -240,12 +240,12 @@ theorem Hypothesis.etaColumn_inner [Finite G] (hyp : Hypothesis (G := G)) (j k :
     ClassFunction.inner (∑ i : Fin hyp.q, hyp.eta i j) (∑ i : Fin hyp.q, hyp.eta i k)
       = if j = k then (hyp.q : ℂ) else 0 := by
   by_cases hjk : j = k
-  · subst hjk; rw [if_pos rfl]; exact hyp.etaColumn_inner_self j
-  · rw [if_neg hjk, OddOrder.RepresentationTheory.inner_sum_left]
+  · subst hjk; rw [ite_eq_left rfl]; exact hyp.etaColumn_inner_self j
+  · rw [ite_eq_right hjk, OddOrder.RepresentationTheory.inner_sum_left]
     refine Finset.sum_eq_zero fun i _ => ?_
     rw [OddOrder.RepresentationTheory.inner_sum_right]
     exact Finset.sum_eq_zero fun i' _ => by
-      rw [OddOrder.Peterfalvi.S16.eta_orthonormal hyp i i' j k, if_neg (fun h => hjk h.2)]
+      rw [OddOrder.Peterfalvi.S16.eta_orthonormal hyp i i' j k, ite_eq_right (fun h => hjk h.2)]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
@@ -354,10 +354,10 @@ noncomputable def Hypothesis.sSet_reducible_memberRFamily_ofColumns [Finite G]
     · rw [OddOrder.Peterfalvi.S16.eta_orthonormal hyp a b j j]
       by_cases hab : a = b <;> simp [hab, Sum.inl.injEq]
     · rw [ClassFunction.inner_neg_right, OddOrder.Peterfalvi.S16.eta_orthonormal hyp a b j k,
-        if_neg (fun h => hjk h.2)]
+        ite_eq_right (fun h => hjk h.2)]
       simp
     · rw [ClassFunction.inner_neg_left, OddOrder.Peterfalvi.S16.eta_orthonormal hyp a b k j,
-        if_neg (fun h => hjk h.2.symm)]
+        ite_eq_right (fun h => hjk h.2.symm)]
       simp
     · rw [ClassFunction.inner_neg_left, ClassFunction.inner_neg_right, neg_neg,
         OddOrder.Peterfalvi.S16.eta_orthonormal hyp a b k k]
@@ -365,9 +365,9 @@ noncomputable def Hypothesis.sSet_reducible_memberRFamily_ofColumns [Finite G]
   have hg_inj : Function.Injective g := by
     intro x y hxy
     have h1 := hg_inner x y
-    rw [hxy, hg_inner y y, if_pos rfl] at h1
+    rw [hxy, hg_inner y y, ite_eq_left rfl] at h1
     by_contra hne
-    rw [if_neg hne] at h1
+    rw [ite_eq_right hne] at h1
     exact one_ne_zero h1
   exact
     { imageSet := Finset.image g Finset.univ
@@ -385,8 +385,8 @@ noncomputable def Hypothesis.sSet_reducible_memberRFamily_ofColumns [Finite G]
         obtain ⟨y, -, rfl⟩ := hβ
         rw [hg_inner x y]
         by_cases hxy : x = y
-        · rw [if_pos hxy, if_pos (by rw [hxy])]
-        · rw [if_neg hxy, if_neg (fun h => hxy (hg_inj h))]
+        · rw [ite_eq_left hxy, ite_eq_left (by rw [hxy])]
+        · rw [ite_eq_right hxy, ite_eq_right (fun h => hxy (hg_inj h))]
       image_eq := by
         -- `τ_S(η − η̄) = ∑_{α ∈ R(η)} α`.
         rw [hcross, Finset.sum_image (fun x _ y _ h => hg_inj h), Fintype.sum_sum_type]
@@ -597,7 +597,7 @@ theorem Hypothesis.sSet_memberRFamily_imageSet_of_irr [Finite G]
   refine ⟨sSet_hasNoRealCharacters (hyp.toTypesIIIIIIVSetupS hG) (hyp.oddCardS hG) hη,
     hyp.sSet_member_conjDiff_supported hG hη, ?_⟩
   unfold Hypothesis.sSet_memberRFamily
-  rw [dif_pos hirr]
+  rw [dite_eq_left hirr]
 
 open OddOrder.Peterfalvi.S11 in
 open scoped FiniteInduce in
@@ -627,7 +627,7 @@ theorem Hypothesis.sSet_memberRFamily_imageSet_of_red [Finite G]
       (hyp.sSet_reducible_conj_not_irr hirr)).choose_spec.2, ?_⟩
   rw [show (hyp.sSet_memberRFamily hG hnoV hη).imageSet
         = (hyp.sSet_reducible_memberRFamily hG hnoV hη hirr).imageSet from by
-    unfold Hypothesis.sSet_memberRFamily; rw [dif_neg hirr]]
+    unfold Hypothesis.sSet_memberRFamily; rw [dite_eq_right hirr]]
   exact hyp.sSet_reducible_memberRFamily_ofColumns_imageSet hG hnoV hη
     (sSet_closedUnderConjugate (hyp.toTypesIIIIIIVSetupS hG) hη)
     (hyp.sSet_reducible_eq_muColumnSum hG hη hirr).choose_spec.1
@@ -680,16 +680,16 @@ theorem Hypothesis.sSet_irr_memberRFamily_eta_inner [Finite G]
   have hνZ : cd.nuClassFunction ∈ ZIrr G := cd.nu.mem_ZIrr
   have hμ1 : ClassFunction.inner cd.muClassFunction cd.muClassFunction = 1 := by
     have h := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite cd.mu cd.mu
-    rwa [if_pos rfl] at h
+    rwa [ite_eq_left rfl] at h
   have hν1 : ClassFunction.inner cd.nuClassFunction cd.nuClassFunction = 1 := by
     have h := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite cd.nu cd.nu
-    rwa [if_pos rfl] at h
+    rwa [ite_eq_left rfl] at h
   have hμν : ClassFunction.inner cd.muClassFunction cd.nuClassFunction = 0 := by
     have h := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite cd.mu cd.nu
-    rwa [if_neg cd.distinct] at h
+    rwa [ite_eq_right cd.distinct] at h
   have hνμ : ClassFunction.inner cd.nuClassFunction cd.muClassFunction = 0 := by
     have h := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite cd.nu cd.mu
-    rwa [if_neg (Ne.symm cd.distinct)] at h
+    rwa [ite_eq_right (Ne.symm cd.distinct)] at h
   have hsign : (cd.sign : ℂ) * (cd.sign : ℂ) = 1 := by
     have := cd.sign_mul_self; exact_mod_cast congrArg (Int.cast : ℤ → ℂ) this
   -- `φ − φ̄` is `A(S)`-supported (`hs` up to sign), hence `A₀(S)`-supported.
@@ -880,13 +880,13 @@ theorem Hypothesis.sSet_memberRFamily_orthogonal [Finite G]
     obtain ⟨x, -, rfl⟩ := hα
     obtain ⟨y, -, rfl⟩ := hβ
     rcases x with a | a <;> rcases y with b | b <;> simp only [Sum.elim_inl, Sum.elim_inr]
-    · rw [OddOrder.Peterfalvi.S16.eta_orthonormal hyp a b jφ jξ, if_neg (fun h => hne1 h.2)]
+    · rw [OddOrder.Peterfalvi.S16.eta_orthonormal hyp a b jφ jξ, ite_eq_right (fun h => hne1 h.2)]
     · rw [ClassFunction.inner_neg_right, OddOrder.Peterfalvi.S16.eta_orthonormal hyp a b jφ kξ,
-        if_neg (fun h => hne2 h.2), neg_zero]
+        ite_eq_right (fun h => hne2 h.2), neg_zero]
     · rw [ClassFunction.inner_neg_left, OddOrder.Peterfalvi.S16.eta_orthonormal hyp a b kφ jξ,
-        if_neg (fun h => hne3 h.2), neg_zero]
+        ite_eq_right (fun h => hne3 h.2), neg_zero]
     · rw [ClassFunction.inner_neg_left, ClassFunction.inner_neg_right,
-        OddOrder.Peterfalvi.S16.eta_orthonormal hyp a b kφ kξ, if_neg (fun h => hne4 h.2),
+        OddOrder.Peterfalvi.S16.eta_orthonormal hyp a b kφ kξ, ite_eq_right (fun h => hne4 h.2),
         neg_zero, neg_zero]
 
 open OddOrder.Peterfalvi.S11 in

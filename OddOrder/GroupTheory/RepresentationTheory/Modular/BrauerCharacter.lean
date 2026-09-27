@@ -71,7 +71,7 @@ theorem rootLift_spec {c : ResidueField 𝒪} (hc : c ^ n = 1) :
   classical
   have hex : ∃ a : 𝒪, a ^ n = 1 ∧ residue 𝒪 a = c :=
     exists_pow_eq_one_residue_eq (isUnit_natCast_of_not_dvd (p := p) hn) hn0 hc
-  rw [rootLift, dif_pos hex]
+  rw [rootLift, dite_eq_left hex]
   exact hex.choose_spec
 
 theorem rootLift_pow_eq_one {c : ResidueField 𝒪} (hc : c ^ n = 1) :

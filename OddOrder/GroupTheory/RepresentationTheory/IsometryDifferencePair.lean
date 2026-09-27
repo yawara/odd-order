@@ -3,7 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
@@ -67,7 +67,7 @@ theorem irreducibleCharacter_inner_eq_if
     simpa [characterTableRowPairing] using
       CharacterTableRowOrthogonality.diagonal (G := G) characterTableRowOrthogonality (χ i)
   · have hμ : χ i ≠ χ j := fun h => hij (hχ h)
-    rw [if_neg hij]
+    rw [ite_eq_right hij]
     simpa [characterTableRowPairing] using
       CharacterTableRowOrthogonality.offDiagonal (G := G) characterTableRowOrthogonality hμ
 
@@ -526,7 +526,7 @@ theorem classFunction_inner_eq_if
     simpa [classFunction, characterTableRowPairing] using
       CharacterTableRowOrthogonality.diagonal (G := G) characterTableRowOrthogonality (data.mu i)
   · have hμ : data.mu i ≠ data.mu j := fun h => hij (data.injective h)
-    rw [if_neg hij]
+    rw [ite_eq_right hij]
     simpa [classFunction, characterTableRowPairing] using
       CharacterTableRowOrthogonality.offDiagonal (G := G) characterTableRowOrthogonality hμ
 
@@ -680,7 +680,7 @@ theorem irreducibleCharacter_cross_pair_classify
     have hβγ : β ≠ γ := fun h => hαβ (hαγ.trans h.symm)
     by_cases hβδ : β = δ
     · exfalso
-      rw [if_pos hαγ, if_neg hαδ, if_neg hβγ, if_pos hβδ] at h_inner
+      rw [ite_eq_left hαγ, ite_eq_right hαδ, ite_eq_right hβγ, ite_eq_left hβδ] at h_inner
       norm_num at h_inner
     · exact Or.inl ⟨hαγ, hαδ, hβγ, hβδ⟩
   · by_cases hβδ : β = δ
@@ -688,14 +688,14 @@ theorem irreducibleCharacter_cross_pair_classify
       have hβγ : β ≠ γ := fun h => hγδ (h.symm.trans hβδ)
       exact Or.inr ⟨hαγ, hαδ, hβγ, hβδ⟩
     · exfalso
-      rw [if_neg hαγ, if_neg hβδ] at h_inner
+      rw [ite_eq_right hαγ, ite_eq_right hβδ] at h_inner
       by_cases hαδ : α = δ
       · by_cases hβγ : β = γ
-        · rw [if_pos hαδ, if_pos hβγ] at h_inner; norm_num at h_inner
-        · rw [if_pos hαδ, if_neg hβγ] at h_inner; norm_num at h_inner
+        · rw [ite_eq_left hαδ, ite_eq_left hβγ] at h_inner; norm_num at h_inner
+        · rw [ite_eq_left hαδ, ite_eq_right hβγ] at h_inner; norm_num at h_inner
       · by_cases hβγ : β = γ
-        · rw [if_neg hαδ, if_pos hβγ] at h_inner; norm_num at h_inner
-        · rw [if_neg hαδ, if_neg hβγ] at h_inner; norm_num at h_inner
+        · rw [ite_eq_right hαδ, ite_eq_left hβγ] at h_inner; norm_num at h_inner
+        · rw [ite_eq_right hαδ, ite_eq_right hβγ] at h_inner; norm_num at h_inner
 
 /-- **Orthonormal difference-pair structure under isometry**
 ([Peterfalvi §3 (1.4)] abstracted, also used in §5 (3.2), §6 (4.5), §7 (5.6)).
@@ -765,9 +765,9 @@ theorem isometry_difference_pair_structure
   let βFun : Fin n → IrreducibleCharacter G := fun i =>
     if h : i = 0 then trivialIrreducibleCharacter G
     else (key i h).choose_spec.choose
-  have hα_def : ∀ i (hi : i ≠ 0), αFun i = (key i hi).choose := fun i hi => dif_neg hi
+  have hα_def : ∀ i (hi : i ≠ 0), αFun i = (key i hi).choose := fun i hi => dite_eq_right hi
   have hβ_def : ∀ i (hi : i ≠ 0), βFun i = (key i hi).choose_spec.choose :=
-    fun i hi => dif_neg hi
+    fun i hi => dite_eq_right hi
   have hαβFun : ∀ i (hi : i ≠ 0), αFun i ≠ βFun i := by
     intro i hi
     rw [hα_def i hi, hβ_def i hi]
@@ -997,38 +997,38 @@ theorem mu_ne_of_forall_inner_difference_eq_zero
   have h00 : data.mu 0 ≠ data'.mu 0 := by
     intro h00
     have hE11 := hE one one'
-    rw [if_pos h00,
-      if_neg (fun hc : data.mu one = data'.mu 0 =>
+    rw [ite_eq_left h00,
+      ite_eq_right (fun hc : data.mu one = data'.mu 0 =>
         hone (data.injective (hc.trans h00.symm))),
-      if_neg (fun hc : data.mu 0 = data'.mu one' =>
+      ite_eq_right (fun hc : data.mu 0 = data'.mu one' =>
         hone' (data'.injective (h00.symm.trans hc)).symm)] at hE11
     by_cases hx : data.mu one = data'.mu one'
-    · rw [if_pos hx] at hE11; norm_num at hE11
-    · rw [if_neg hx] at hE11; norm_num at hE11
+    · rw [ite_eq_left hx] at hE11; norm_num at hE11
+    · rw [ite_eq_right hx] at hE11; norm_num at hE11
   -- Step 2: no member of `data` hits the anchor of `data'`.
   have hi0 : ∀ i, data.mu i ≠ data'.mu 0 := by
     intro i hc
     by_cases hi : i = 0
     · exact h00 (hi ▸ hc)
     · have hEi := hE i one'
-      rw [if_pos hc, if_neg h00,
-        if_neg (fun ha : data.mu i = data'.mu one' =>
+      rw [ite_eq_left hc, ite_eq_right h00,
+        ite_eq_right (fun ha : data.mu i = data'.mu one' =>
           hone' (data'.injective (ha.symm.trans hc)))] at hEi
       by_cases hx : data.mu 0 = data'.mu one'
-      · rw [if_pos hx] at hEi; norm_num at hEi
-      · rw [if_neg hx] at hEi; norm_num at hEi
+      · rw [ite_eq_left hx] at hEi; norm_num at hEi
+      · rw [ite_eq_right hx] at hEi; norm_num at hEi
   -- Step 3: no member of `data'` hits the anchor of `data`.
   have h0j : ∀ j, data.mu 0 ≠ data'.mu j := by
     intro j hc
     by_cases hj : j = 0
     · exact h00 (hj ▸ hc)
     · have hEj := hE one j
-      rw [if_pos hc, if_neg h00,
-        if_neg (fun ha : data.mu one = data'.mu j =>
+      rw [ite_eq_left hc, ite_eq_right h00,
+        ite_eq_right (fun ha : data.mu one = data'.mu j =>
           hone (data.injective (ha.trans hc.symm)))] at hEj
       by_cases hx : data.mu one = data'.mu 0
-      · rw [if_pos hx] at hEj; norm_num at hEj
-      · rw [if_neg hx] at hEj; norm_num at hEj
+      · rw [ite_eq_left hx] at hEj; norm_num at hEj
+      · rw [ite_eq_right hx] at hEj; norm_num at hEj
   -- Step 4: interior deltas vanish.
   intro i j hc
   by_cases hi : i = 0
@@ -1036,7 +1036,7 @@ theorem mu_ne_of_forall_inner_difference_eq_zero
   by_cases hj : j = 0
   · exact hi0 i (hj ▸ hc)
   have hEij := hE i j
-  rw [if_pos hc, if_neg (hi0 i), if_neg (h0j j), if_neg h00] at hEij
+  rw [ite_eq_left hc, ite_eq_right (hi0 i), ite_eq_right (h0j j), ite_eq_right h00] at hEij
   norm_num at hEij
 
 end SignedIrreducibleDifferenceFamily
@@ -1084,27 +1084,27 @@ theorem irreducibleCharacterFamily_eq_of_difference_eq
     -- Expand `1 = ‖ν_1‖²` through the shift.
     have hνν : ClassFunction.inner (ν one : ClassFunction G ℂ) (ν one : ClassFunction G ℂ)
         = 1 := by
-      rw [irreducibleCharacter_inner_eq_ite, if_pos rfl]
+      rw [irreducibleCharacter_inner_eq_ite, ite_eq_left rfl]
     rw [heq, ClassFunction.inner_add_left, ClassFunction.inner_add_right,
       ClassFunction.inner_add_right, ClassFunction.inner_sub_left,
       ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
       ClassFunction.inner_sub_right, ClassFunction.inner_sub_right] at hνν
-    rw [irreducibleCharacter_inner_eq_ite (ν' one) (ν' one), if_pos rfl,
+    rw [irreducibleCharacter_inner_eq_ite (ν' one) (ν' one), ite_eq_left rfl,
       irreducibleCharacter_inner_eq_ite (ν' one) (ν' 0),
-      if_neg (fun hc => hone (hinj' hc)),
+      ite_eq_right (fun hc => hone (hinj' hc)),
       irreducibleCharacter_inner_eq_ite (ν' 0) (ν' one),
-      if_neg (fun hc => hone (hinj' hc.symm)),
-      irreducibleCharacter_inner_eq_ite (ν 0) (ν 0), if_pos rfl,
-      irreducibleCharacter_inner_eq_ite (ν 0) (ν' 0), if_neg h0,
+      ite_eq_right (fun hc => hone (hinj' hc.symm)),
+      irreducibleCharacter_inner_eq_ite (ν 0) (ν 0), ite_eq_left rfl,
+      irreducibleCharacter_inner_eq_ite (ν 0) (ν' 0), ite_eq_right h0,
       irreducibleCharacter_inner_eq_ite (ν' 0) (ν 0),
-      if_neg (fun hc => h0 hc.symm),
-      irreducibleCharacter_inner_eq_ite (ν' 0) (ν' 0), if_pos rfl,
+      ite_eq_right (fun hc => h0 hc.symm),
+      irreducibleCharacter_inner_eq_ite (ν' 0) (ν' 0), ite_eq_left rfl,
       irreducibleCharacter_inner_eq_ite (ν' one) (ν 0),
       irreducibleCharacter_inner_eq_ite (ν 0) (ν' one)] at hνν
     by_cases hxu : ν' one = ν 0
-    · rw [if_pos hxu, if_pos hxu.symm] at hνν
+    · rw [ite_eq_left hxu, ite_eq_left hxu.symm] at hνν
       norm_num at hνν
-    · rw [if_neg hxu, if_neg (fun hc => hxu hc.symm)] at hνν
+    · rw [ite_eq_right hxu, ite_eq_right (fun hc => hxu hc.symm)] at hνν
       norm_num at hνν
   intro i
   have h := hdiff i

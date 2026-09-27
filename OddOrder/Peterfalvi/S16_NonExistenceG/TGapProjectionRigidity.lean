@@ -418,14 +418,14 @@ theorem etaGrid_coefficients_eq_column_or_row
   · left
     intro i j
     by_cases hj : j = j0
-    · rw [if_pos (by simpa [j0] using hj)]
+    · rw [ite_eq_left (by simpa [j0] using hj)]
       by_cases hi : i = i0
       · rw [hi, hj]
         simpa [i0, j0] using hprincipal
       · rw [hj]
         simpa [i0, j0, i1] using
           (hrow i (by simpa [i0] using hi)).trans hcolumn.1
-    · rw [if_neg (by simpa [j0] using hj)]
+    · rw [ite_eq_right (by simpa [j0] using hj)]
       by_cases hi : i = i0
       · rw [hi]
         simpa [i0, j0, j1] using (hcol j (by simpa [j0] using hj)).trans hcolumn.2.1
@@ -436,14 +436,14 @@ theorem etaGrid_coefficients_eq_column_or_row
   · right
     intro i j
     by_cases hi : i = i0
-    · rw [if_pos (by simpa [i0] using hi)]
+    · rw [ite_eq_left (by simpa [i0] using hi)]
       by_cases hj : j = j0
       · rw [hi, hj]
         simpa [i0, j0] using hprincipal
       · rw [hi]
         simpa [i0, j0, j1] using
           (hcol j (by simpa [j0] using hj)).trans hrowAxis.2.1
-    · rw [if_neg (by simpa [i0] using hi)]
+    · rw [ite_eq_right (by simpa [i0] using hi)]
       by_cases hj : j = j0
       · rw [hj]
         simpa [i0, j0, i1] using (hrow i (by simpa [i0] using hi)).trans hrowAxis.1
@@ -497,13 +497,13 @@ theorem etaGridProjection_inner_eta [Finite G]
     rw [OddOrder.RepresentationTheory.inner_sum_left]
     apply Finset.sum_eq_zero
     intro j _
-    rw [ClassFunction.inner_smul_left, eta_orthonormal, if_neg, mul_zero]
+    rw [ClassFunction.inner_smul_left, eta_orthonormal, ite_eq_right, mul_zero]
     exact fun h => hik h.1)]
   rw [OddOrder.RepresentationTheory.inner_sum_left]
   rw [Finset.sum_eq_single_of_mem l (Finset.mem_univ _) (fun j _ hjl => by
-    rw [ClassFunction.inner_smul_left, eta_orthonormal, if_neg, mul_zero]
+    rw [ClassFunction.inner_smul_left, eta_orthonormal, ite_eq_right, mul_zero]
     exact fun h => hjl h.2)]
-  rw [ClassFunction.inner_smul_left, eta_orthonormal, if_pos ⟨rfl, rfl⟩, mul_one]
+  rw [ClassFunction.inner_smul_left, eta_orthonormal, ite_eq_left ⟨rfl, rfl⟩, mul_one]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- Subtracting the eta-grid projection kills every eta coefficient. -/
@@ -532,10 +532,10 @@ theorem etaGridProjection_eq_zeroRow_of_coefficients_eq_row
     (Finset.mem_univ _) (fun i _ hi => by
       apply Finset.sum_eq_zero
       intro j _
-      rw [hrow, if_neg hi, Int.cast_zero, zero_smul])]
+      rw [hrow, ite_eq_right hi, Int.cast_zero, zero_smul])]
   apply Finset.sum_congr rfl
   intro j _
-  rw [hrow, if_pos rfl, Int.cast_one, one_smul]
+  rw [hrow, ite_eq_left rfl, Int.cast_one, one_smul]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (11.9)(a), the zero-column coefficient shape is the
@@ -577,15 +577,15 @@ theorem etaGrid_zeroColumn_projection_of_coefficients_eq_column [Finite G]
     · subst j
       rw [Finset.sum_eq_single_of_mem (⟨0, base.q_prime.pos⟩ : Fin base.q)
         (Finset.mem_univ _) (fun i _ hi => by
-          rw [eta_orthonormal, if_neg]
+          rw [eta_orthonormal, ite_eq_right]
           rintro ⟨h, -⟩
           exact hi h.symm)]
-      rw [eta_orthonormal, if_pos ⟨rfl, rfl⟩]
+      rw [eta_orthonormal, ite_eq_left ⟨rfl, rfl⟩]
       simp
-    · simp only [if_neg hj]
+    · simp only [ite_eq_right hj]
       apply Finset.sum_eq_zero
       intro i _
-      rw [eta_orthonormal, if_neg]
+      rw [eta_orthonormal, ite_eq_right]
       exact fun h => hj h.2
   exact hleft.trans hright.symm
 

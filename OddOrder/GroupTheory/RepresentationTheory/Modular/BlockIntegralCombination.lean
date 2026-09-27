@@ -126,8 +126,8 @@ theorem exists_int_block_sum_eq_irreducibleBrauerCharacter (hN : N ≠ 0)
   have hdelta : ∀ g : G, irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π μ₀ g
       = ∑ μ : ι, ((if μ = μ₀ then (1 : ℤ) else 0 : ℤ) : 𝒪)
           * irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π μ g := fun g => by
-    rw [Finset.sum_eq_single μ₀ (fun μ _ hμ => by rw [if_neg hμ, Int.cast_zero, zero_mul])
-      (fun h => absurd (Finset.mem_univ μ₀) h), if_pos rfl, Int.cast_one, one_mul]
+    rw [Finset.sum_eq_single μ₀ (fun μ _ hμ => by rw [ite_eq_right hμ, Int.cast_zero, zero_mul])
+      (fun h => absurd (Finset.mem_univ μ₀) h), ite_eq_left rfl, Int.cast_one, one_mul]
   -- (3) linear independence of `IBr` pins the coordinates
   have hcoord : ∀ μ : ι,
       (∑ i : ι', a i * (decompositionMatrix hp hω hω' hπ hlin hkerJ e i μ : ℤ))
@@ -147,7 +147,7 @@ theorem exists_int_block_sum_eq_irreducibleBrauerCharacter (hN : N ≠ 0)
   -- (4) truncating to the block does not change the coordinates
   refine ⟨fun i => if blockOfIrr e hπ hlin hnil i
       = Quotient.mk (MatrixModule.blockSetoid π hπ hlin) μ₀ then a i else 0,
-    fun i hi => if_neg hi, fun g hg => ?_⟩
+    fun i hi => ite_eq_right hi, fun g hg => ?_⟩
   have htrunc : ∀ μ : ι, (∑ i : ι', (if blockOfIrr e hπ hlin hnil i
         = Quotient.mk (MatrixModule.blockSetoid π hπ hlin) μ₀ then a i else 0) *
         (decompositionMatrix hp hω hω' hπ hlin hkerJ e i μ : ℤ))
@@ -160,23 +160,23 @@ theorem exists_int_block_sum_eq_irreducibleBrauerCharacter (hN : N ≠ 0)
       refine Finset.sum_congr rfl fun i _ => ?_
       by_cases hb : blockOfIrr e hπ hlin hnil i
           = Quotient.mk (MatrixModule.blockSetoid π hπ hlin) μ₀
-      · rw [if_pos hb]
-      · rw [if_neg hb, zero_mul]
+      · rw [ite_eq_left hb]
+      · rw [ite_eq_right hb, zero_mul]
         by_cases hd : decompositionMatrix hp hω hω' hπ hlin hkerJ e i μ = 0
         · rw [hd, Nat.cast_zero, mul_zero]
         · exact absurd ((blockOfIrr_eq_of_decompositionMatrix_ne_zero hp hω hω' hπ hlin hkerJ
             hnil e i hd).symm.trans hμ) hb
     · -- outside it: every surviving term has `d_{iμ} = 0`, and the right side is `0` too
-      rw [if_neg (fun hcon => hμ (by rw [hcon]))]
+      rw [ite_eq_right (fun hcon => hμ (by rw [hcon]))]
       refine Finset.sum_eq_zero fun i _ => ?_
       by_cases hb : blockOfIrr e hπ hlin hnil i
           = Quotient.mk (MatrixModule.blockSetoid π hπ hlin) μ₀
-      · rw [if_pos hb]
+      · rw [ite_eq_left hb]
         by_cases hd : decompositionMatrix hp hω hω' hπ hlin hkerJ e i μ = 0
         · rw [hd, Nat.cast_zero, mul_zero]
         · exact absurd ((blockOfIrr_eq_of_decompositionMatrix_ne_zero hp hω hω' hπ hlin hkerJ
             hnil e i hd).trans hb) hμ
-      · rw [if_neg hb, zero_mul]
+      · rw [ite_eq_right hb, zero_mul]
   -- reassemble
   have hO : irreducibleBrauerCharacter (p := p) (𝒪 := 𝒪) π μ₀ g
       = ∑ i : ι', ((if blockOfIrr e hπ hlin hnil i

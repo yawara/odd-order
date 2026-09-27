@@ -210,7 +210,7 @@ theorem finrank_cyclicEigenspaceFin_cyclicShift (T : Module.End F W) (b : Basis 
           Finsupp.smul_single, smul_eq_mul, mul_one, Finsupp.single_apply]
         rw [Finset.sum_eq_single (0 : ZMod h)]
         · simp
-        · intro l _ hl; rw [if_neg hl]
+        · intro l _ hl; rw [ite_eq_right hl]
         · intro h0; exact absurd (Finset.mem_univ _) h0
       rw [hzero] at hcoord
       simp at hcoord

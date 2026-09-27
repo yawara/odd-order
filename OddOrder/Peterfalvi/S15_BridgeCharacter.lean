@@ -66,7 +66,7 @@ theorem P_not_subset_characterKernel_mu [Finite G] (_hG : OddOrder.BG.IsMinimalS
     · have h := irreducibleCharacter_inner_eq_ite
         (⟨hyp.mu i j, hyp.mu_irreducible i j⟩ : IrreducibleCharacter ↥hyp.S)
         ⟨μ0, hyp.mu_irreducible ⟨0, hyp.q_prime.pos⟩ j⟩
-      rw [if_neg (fun heq => hi (hyp.mu_col_injective j
+      rw [ite_eq_right (fun heq => hi (hyp.mu_col_injective j
         (congrArg (fun χ : IrreducibleCharacter ↥hyp.S => (χ : ClassFunction ↥hyp.S ℂ)) heq)))] at h
       exact h
     · have h := irreducibleCharacter_inner_eq_ite
@@ -218,15 +218,15 @@ theorem tauS_mu_row0_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       simp only [IrreducibleCharacter.coe_mk] at h
       rw [h]
       by_cases hpq : φ = ψ
-      · rw [if_pos (Subtype.ext hpq), if_pos hpq]
-      · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+      · rw [ite_eq_left (Subtype.ext hpq), ite_eq_left hpq]
+      · rw [ite_eq_right (fun heq => hpq (Subtype.ext_iff.mp heq)), ite_eq_right hpq]
     have h_ab : ClassFunction.inner (hyp.mu ⟨0, hyp.q_prime.pos⟩ j)
         (hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩) = 0 := by
-      rw [hinner _ _ hμaIrr hμbIrr, if_neg hμne]
+      rw [hinner _ _ hμaIrr hμbIrr, ite_eq_right hμne]
     have h_ba : ClassFunction.inner
         (hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)
         (hyp.mu ⟨0, hyp.q_prime.pos⟩ j) = 0 := by
-      rw [hinner _ _ hμbIrr hμaIrr, if_neg (Ne.symm hμne)]
+      rw [hinner _ _ hμbIrr hμaIrr, ite_eq_right (Ne.symm hμne)]
     have hnorm2 : ClassFunction.inner
         (hyp.mu ⟨0, hyp.q_prime.pos⟩ j
           - hyp.mu ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩)
@@ -284,9 +284,9 @@ theorem tauS_mu_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hμaIrr : IsIrreducibleCharacter (hyp.mu i j1) := hyp.mu_irreducible _ _
   have hμbIrr : IsIrreducibleCharacter (hyp.mu i j2) := hyp.mu_irreducible _ _
   have h_ab : ClassFunction.inner (hyp.mu i j1) (hyp.mu i j2) = 0 := by
-    rw [hyp.mu_orthonormal]; exact if_neg (fun hc => hj12 hc.2)
+    rw [hyp.mu_orthonormal]; exact ite_eq_right (fun hc => hj12 hc.2)
   have h_ba : ClassFunction.inner (hyp.mu i j2) (hyp.mu i j1) = 0 := by
-    rw [hyp.mu_orthonormal]; exact if_neg (fun hc => (Ne.symm hj12) hc.2)
+    rw [hyp.mu_orthonormal]; exact ite_eq_right (fun hc => (Ne.symm hj12) hc.2)
   have hsupp := hyp.tauS_mu_diff_support hG i hj1 hj2
   have hZIrrS : (hyp.mu i j1 - hyp.mu i j2) ∈ ZIrr (↥hyp.S) :=
     (ZIrr (↥hyp.S)).sub_mem hμaIrr.mem_ZIrr hμbIrr.mem_ZIrr
@@ -479,7 +479,7 @@ private theorem gammaGrid_orthogonal_one_aux [Finite G]
         hyp.mu_irreducible ⟨0, hyp.q_prime.pos⟩ ⟨1, by have := hyp.three_le_p; omega⟩⟩ :
         OddOrder.RepresentationTheory.IrreducibleCharacter ↥hyp.S)
       (OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥hyp.S)
-    rw [if_neg hne] at hite
+    rw [ite_eq_right hne] at hite
     exact hite
   -- `⟨τ_S(β_{#1}), 1_G⟩ = 1` via the `'A0`-Dade=Ind bridge + Frobenius reciprocity.
   have htau : ClassFunction.inner (tauSbetaGrid hG hyp)
@@ -509,7 +509,7 @@ private theorem gammaGrid_orthogonal_one_aux [Finite G]
     have horth := OddOrder.Peterfalvi.S16.eta_orthonormal hyp
       ⟨0, hyp.q_prime.pos⟩ ⟨0, hyp.q_prime.pos⟩
       ⟨1, by have := hyp.three_le_p; omega⟩ ⟨0, hyp.p_prime.pos⟩
-    rw [if_neg (by rintro ⟨-, h2⟩; exact absurd (congrArg Fin.val h2) (by norm_num))] at horth
+    rw [ite_eq_right (by rintro ⟨-, h2⟩; exact absurd (congrArg Fin.val h2) (by norm_num))] at horth
     exact horth
   rw [GammaGrid, ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
     OddOrder.Peterfalvi.S09.Hypothesis71.constOne_inner_self_eq_one, htau, heta]
@@ -669,19 +669,19 @@ private theorem gammaGrid_Y_norm_bound_aux [Finite G]
   -- grid orthonormality instances
   have h_11 : ClassFunction.inner η01 η01 = 1 := by
     have h := OddOrder.Peterfalvi.S16.eta_orthonormal hyp i0 i0 j1 j1
-    rw [if_pos ⟨rfl, rfl⟩] at h
+    rw [ite_eq_left ⟨rfl, rfl⟩] at h
     exact h
   have h_1'1 : ClassFunction.inner η01' η01 = 0 := by
     have h := OddOrder.Peterfalvi.S16.eta_orthonormal hyp i0 i0 j' j1
-    rw [if_neg (by rintro ⟨-, h2⟩; exact hj'ne h2)] at h
+    rw [ite_eq_right (by rintro ⟨-, h2⟩; exact hj'ne h2)] at h
     exact h
   have h_11' : ClassFunction.inner η01 η01' = 0 := by
     have h := OddOrder.Peterfalvi.S16.eta_orthonormal hyp i0 i0 j1 j'
-    rw [if_neg (by rintro ⟨-, h2⟩; exact hj'ne h2.symm)] at h
+    rw [ite_eq_right (by rintro ⟨-, h2⟩; exact hj'ne h2.symm)] at h
     exact h
   have h_1'1' : ClassFunction.inner η01' η01' = 1 := by
     have h := OddOrder.Peterfalvi.S16.eta_orthonormal hyp i0 i0 j' j'
-    rw [if_pos ⟨rfl, rfl⟩] at h
+    rw [ite_eq_left ⟨rfl, rfl⟩] at h
     exact h
   -- `1_G = η_{00}` and its orthogonalities
   have hone : OddOrder.Peterfalvi.S09.Hypothesis71.constOne G
@@ -692,7 +692,7 @@ private theorem gammaGrid_Y_norm_bound_aux [Finite G]
       (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 0 := by
     rw [hone]
     have h := OddOrder.Peterfalvi.S16.eta_orthonormal hyp i0 i0 j1 ⟨0, hyp.p_prime.pos⟩
-    rw [if_neg (by
+    rw [ite_eq_right (by
       rintro ⟨-, h2⟩
       exact hj1ne (by simpa using congrArg Fin.val h2))] at h
     exact h
@@ -952,9 +952,9 @@ theorem tauT_nu_cross [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hνaIrr : IsIrreducibleCharacter (hyp.nu r j) := pins.nu_irreducible _ _
   have hνbIrr : IsIrreducibleCharacter (hyp.nu s j) := pins.nu_irreducible _ _
   have h_ab : ClassFunction.inner (hyp.nu r j) (hyp.nu s j) = 0 := by
-    rw [pins.nu_orthonormal]; exact if_neg (fun hc => hrs hc.1)
+    rw [pins.nu_orthonormal]; exact ite_eq_right (fun hc => hrs hc.1)
   have h_ba : ClassFunction.inner (hyp.nu s j) (hyp.nu r j) = 0 := by
-    rw [pins.nu_orthonormal]; exact if_neg (fun hc => (Ne.symm hrs) hc.1)
+    rw [pins.nu_orthonormal]; exact ite_eq_right (fun hc => (Ne.symm hrs) hc.1)
   have hsupp := hyp.tauT_nu_diff_support hG pins Tdata hU hW1 hW2 j hr hs
   have hZIrrT : (hyp.nu r j - hyp.nu s j) ∈ ZIrr (↥hyp.T) :=
     (ZIrr (↥hyp.T)).sub_mem hνaIrr.mem_ZIrr hνbIrr.mem_ZIrr

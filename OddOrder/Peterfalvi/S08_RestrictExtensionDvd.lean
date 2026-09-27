@@ -84,7 +84,7 @@ theorem orthogonal_normOne_tau_scaledDiff_add_extension_general
   have hvv : ClassFunction.inner v v = 1 + (a : ℂ) ^ 2 :=
     hyp.inner_self_tau_scaledDiff_of_frobenius hF hη₁ hχ₁ ha
   have he₁e₁ : ClassFunction.inner (cY.extension η₁)
-      (cY.extension η₁) = 1 := by rw [hYon η₁ η₁ hη₁ hη₁, if_pos rfl]
+      (cY.extension η₁) = 1 := by rw [hYon η₁ η₁ hη₁ hη₁, ite_eq_left rfl]
   have he₁v : ClassFunction.inner (cY.extension η₁) v = -(a : ℂ) := by
     rw [OddOrder.RepresentationTheory.inner_conj_symm v (cY.extension η₁), hgood]
     simp
@@ -95,7 +95,7 @@ theorem orthogonal_normOne_tau_scaledDiff_add_extension_general
     by_cases hee : η = η₁
     · subst hee
       rw [hgood, he₁e₁]; ring
-    · rw [hcoeff0 η hη hee, hYon η₁ η hη₁ hη, if_neg (fun h => hee h.symm)]; ring
+    · rw [hcoeff0 η hη hee, hYon η₁ η hη₁ hη, ite_eq_right (fun h => hee h.symm)]; ring
   · -- norm `⟨X, X⟩ = 1`.
     simp only [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
       ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right]
@@ -175,7 +175,7 @@ theorem orthogonal_normOne_tau_scaledDiff_add_extension_general_c2_caseA
   have hvv : ClassFunction.inner v v = 1 + (a : ℂ) ^ 2 :=
     hyp.inner_self_tau_scaledDiff_c2_caseA hK hW1 hA hη₁ hχ₁ ha
   have he₁e₁ : ClassFunction.inner (cY.extension η₁)
-      (cY.extension η₁) = 1 := by rw [hYon η₁ η₁ hη₁ hη₁, if_pos rfl]
+      (cY.extension η₁) = 1 := by rw [hYon η₁ η₁ hη₁ hη₁, ite_eq_left rfl]
   have he₁v : ClassFunction.inner (cY.extension η₁) v = -(a : ℂ) := by
     rw [OddOrder.RepresentationTheory.inner_conj_symm v (cY.extension η₁), hgood]
     simp
@@ -186,7 +186,7 @@ theorem orthogonal_normOne_tau_scaledDiff_add_extension_general_c2_caseA
     by_cases hee : η = η₁
     · subst hee
       rw [hgood, he₁e₁]; ring
-    · rw [hcoeff0 η hη hee, hYon η₁ η hη₁ hη, if_neg (fun h => hee h.symm)]; ring
+    · rw [hcoeff0 η hη hee, hYon η₁ η hη₁ hη, ite_eq_right (fun h => hee h.symm)]; ring
   · -- norm `⟨X, X⟩ = 1`.
     simp only [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
       ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right]
@@ -315,7 +315,7 @@ theorem inner_tau_scaledDiff_tau_Xset_diff_of_frobenius
   rw [ClassFunction.inner_sub_right, ClassFunction.inner_sub_left, ClassFunction.inner_sub_left,
     ← Nat.cast_smul_eq_nsmul ℂ a η₁, ClassFunction.inner_smul_left, ClassFunction.inner_smul_left,
     hXon χ₁ χ₂ hχ₁ hχ₂, hXon χ₁ χ₁ hχ₁ hχ₁, hYXz χ₂ hχ₂, hYXz χ₁ hχ₁,
-    if_neg (Ne.symm hne), if_pos rfl]
+    ite_eq_right (Ne.symm hne), ite_eq_left rfl]
   ring
 
 /-- **(6.8.1) `X`-difference isometry**, case (A) / c2 mirror of
@@ -376,7 +376,7 @@ theorem inner_tau_scaledDiff_tau_Xset_diff_c2_caseA
   rw [ClassFunction.inner_sub_right, ClassFunction.inner_sub_left, ClassFunction.inner_sub_left,
     ← Nat.cast_smul_eq_nsmul ℂ a η₁, ClassFunction.inner_smul_left, ClassFunction.inner_smul_left,
     hXon χ₁ χ₂ hχ₁ hχ₂, hXon χ₁ χ₁ hχ₁ hχ₁, hYXz χ₂ hχ₂, hYXz χ₁ hχ₁,
-    if_neg (Ne.symm hne), if_pos rfl]
+    ite_eq_right (Ne.symm hne), ite_eq_left rfl]
   ring
 
 open scoped Classical in
@@ -581,11 +581,11 @@ theorem extension_eq_or_eq_neg_general
       (⟨ψ', hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hψ'⟩ : IrreducibleCharacter ↥L)
     simpa using h
   have hX1norm : ClassFunction.inner (hXc.extension χ₁) (hXc.extension χ₁) = 1 := by
-    rw [hXon χ₁ χ₁ hχ₁ hχ₁, if_pos rfl]
+    rw [hXon χ₁ χ₁ hχ₁ hχ₁, ite_eq_left rfl]
   have hX2norm : ClassFunction.inner (hXc.extension χ₂) (hXc.extension χ₂) = 1 := by
-    rw [hXon χ₂ χ₂ hχ₂ hχ₂, if_pos rfl]
+    rw [hXon χ₂ χ₂ hχ₂ hχ₂, ite_eq_left rfl]
   have hX12 : ClassFunction.inner (hXc.extension χ₁) (hXc.extension χ₂) = 0 := by
-    rw [hXon χ₁ χ₂ hχ₁ hχ₂, if_neg (Ne.symm hne)]
+    rw [hXon χ₁ χ₂ hχ₁ hχ₂, ite_eq_right (Ne.symm hne)]
   have hX1ne2 : hXc.extension χ₁ ≠ hXc.extension χ₂ := by
     intro heq; rw [heq, hX2norm] at hX12; exact one_ne_zero hX12
   -- integer coefficients `c₁ = ⟨X,χ₁^{τ₂}⟩`, `c₂ = ⟨X,χ₂^{τ₂}⟩`.
@@ -694,11 +694,11 @@ theorem extension_eq_or_eq_neg_general_c2_caseA
           ↥L)
     simpa using h
   have hX1norm : ClassFunction.inner (hXc.extension χ₁) (hXc.extension χ₁) = 1 := by
-    rw [hXon χ₁ χ₁ hχ₁ hχ₁, if_pos rfl]
+    rw [hXon χ₁ χ₁ hχ₁ hχ₁, ite_eq_left rfl]
   have hX2norm : ClassFunction.inner (hXc.extension χ₂) (hXc.extension χ₂) = 1 := by
-    rw [hXon χ₂ χ₂ hχ₂ hχ₂, if_pos rfl]
+    rw [hXon χ₂ χ₂ hχ₂ hχ₂, ite_eq_left rfl]
   have hX12 : ClassFunction.inner (hXc.extension χ₁) (hXc.extension χ₂) = 0 := by
-    rw [hXon χ₁ χ₂ hχ₁ hχ₂, if_neg (Ne.symm hne)]
+    rw [hXon χ₁ χ₂ hχ₁ hχ₂, ite_eq_right (Ne.symm hne)]
   have hX1ne2 : hXc.extension χ₁ ≠ hXc.extension χ₂ := by
     intro heq; rw [heq, hX2norm] at hX12; exact one_ne_zero hX12
   -- integer coefficients `c₁ = ⟨X,χ₁^{τ₂}⟩`, `c₂ = ⟨X,χ₂^{τ₂}⟩`.

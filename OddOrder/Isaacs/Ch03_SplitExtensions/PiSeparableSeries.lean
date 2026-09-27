@@ -117,8 +117,8 @@ theorem isPiSeparable_of_isPiGroup [Finite G] {π : Set ℕ} (hG : IsPiGroup π 
   have hnorm : ∀ i, (K i).Normal := by
     intro i
     rcases Nat.eq_zero_or_pos i with h | h
-    · simp only [hK, h, if_pos]; infer_instance
-    · simp only [hK, Nat.pos_iff_ne_zero.mp h, if_false]; infer_instance
+    · simp only [hK, h, ite_eq_left]; infer_instance
+    · simp only [hK, Nat.pos_iff_ne_zero.mp h, ite_false]; infer_instance
   refine isPiSeparable_of_normal_ladder π (r := 1) hnorm ?_ ?_ ?_
   · simp [hK]
   · simp [hK]
@@ -127,11 +127,12 @@ theorem isPiSeparable_of_isPiGroup [Finite G] {π : Set ℕ} (hG : IsPiGroup π 
     rcases Nat.eq_zero_or_pos i with h | h
     · subst h
       intro p hp
-      simp only [hK, if_pos rfl, if_neg (by omega : ¬ (0 + 1 = 0)),
+      simp only [hK, ite_eq_left rfl, ite_eq_right (by omega : ¬ (0 + 1 = 0)),
         Subgroup.relIndex_bot_left, Subgroup.card_top] at hp
       exact hG p hp
     · intro p hp
-      simp only [hK, if_neg (Nat.pos_iff_ne_zero.mp h), if_neg (by omega : ¬ (i + 1 = 0)),
+      simp only [hK, ite_eq_right (Nat.pos_iff_ne_zero.mp h),
+        ite_eq_right (by omega : ¬ (i + 1 = 0)),
         Subgroup.relIndex_self, Nat.primeFactors_one] at hp
       exact absurd hp (Finset.notMem_empty p)
 
@@ -162,15 +163,15 @@ theorem exists_normal_ladder_of_isPiSeparable [Finite G] (π : Set ℕ)
   · -- 正規性.
     intro i
     by_cases h : i % 2 = 0
-    · simpa only [if_pos h] using piFittingSeries.normal π G (i / 2)
-    · simp only [if_neg h]
+    · simpa only [ite_eq_left h] using piFittingSeries.normal π G (i / 2)
+    · simp only [ite_eq_right h]
       exact Subgroup.Normal.comap inferInstance _
   · -- 単調性.
     intro i
     by_cases h : i % 2 = 0
     · have h1 : (i + 1) % 2 ≠ 0 := by omega
       have h2 : (i + 1) / 2 = i / 2 := by omega
-      simp only [if_pos h, if_neg h1, h2]
+      simp only [ite_eq_left h, ite_eq_right h1, h2]
       -- Fₘ = ker (mk' Fₘ) ≤ comap (mk' Fₘ) (O_π).
       intro g hg
       rw [piHalfStep, Subgroup.mem_comap,
@@ -179,7 +180,7 @@ theorem exists_normal_ladder_of_isPiSeparable [Finite G] (π : Set ℕ)
       exact Subgroup.one_mem _
     · have h1 : (i + 1) % 2 = 0 := by omega
       have h2 : (i + 1) / 2 = i / 2 + 1 := by omega
-      simp only [if_neg h, if_pos h1, h2]
+      simp only [ite_eq_right h, ite_eq_left h1, h2]
       rw [piHalfStep, piFittingSeries_succ]
       exact Subgroup.comap_mono le_sup_left
   · -- K 0 = ⊥.
@@ -187,7 +188,7 @@ theorem exists_normal_ladder_of_isPiSeparable [Finite G] (π : Set ℕ)
   · -- K (2n) = ⊤.
     have h1 : 2 * n % 2 = 0 := by omega
     have h2 : 2 * n / 2 = n := by omega
-    simp only [if_pos h1, h2]
+    simp only [ite_eq_left h1, h2]
     exact hn
   · -- 因子の π/π' 性.
     intro i
@@ -200,7 +201,7 @@ theorem exists_normal_ladder_of_isPiSeparable [Finite G] (π : Set ℕ)
       left
       have h1 : (i + 1) % 2 ≠ 0 := by omega
       have h2 : (i + 1) / 2 = m := by omega
-      simp only [if_pos h, if_neg h1, h2]
+      simp only [ite_eq_left h, ite_eq_right h1, h2]
       intro p hp
       have hcomp : piFittingSeries π G m = Subgroup.comap f ⊥ := by
         rw [MonoidHom.comap_bot, QuotientGroup.ker_mk']
@@ -211,7 +212,7 @@ theorem exists_normal_ladder_of_isPiSeparable [Finite G] (π : Set ℕ)
       right
       have h1 : (i + 1) % 2 = 0 := by omega
       have h2 : (i + 1) / 2 = m + 1 := by omega
-      simp only [if_neg h, if_pos h1, h2]
+      simp only [ite_eq_right h, ite_eq_left h1, h2]
       intro p hp
       set O : Subgroup (G ⧸ piFittingSeries π G m) :=
         oPiCore π (G ⧸ piFittingSeries π G m) with hO

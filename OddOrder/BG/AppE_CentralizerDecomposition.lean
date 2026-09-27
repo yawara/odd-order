@@ -202,7 +202,7 @@ theorem RegularOperatorSetup.card_centralizer_R₀ [Finite R]
     exact Subgroup.card_bot
   rw [hinf, mul_one, hyp.R₀_card] at hprod
   rw [hyp.centralizer_eq]
-  exact (Nat.card_congr (Equiv.setCongr hcoe)).trans hprod
+  exact (Nat.card_congr (Set.equivOfEq hcoe)).trans hprod
 
 /-- **`r(C_R(R₀)) ≤ 2`.**
 
@@ -464,7 +464,7 @@ theorem RegularOperatorSetup.centralizer_inf_eq_sup_omega1Center [Finite R]
     have hprod := Subgroup.card_HK_mul_card_inf_eq_card_mul_card hyp.R₀ Z
     rw [hinf, Subgroup.card_bot, mul_one, hyp.R₀_card, hZcard] at hprod
     have hcong : Nat.card ↥(hyp.R₀ ⊔ Z) = Nat.card ↥((hyp.R₀ : Set R) * (Z : Set R)) :=
-      Nat.card_congr (Equiv.setCongr hcoe)
+      Nat.card_congr (Set.equivOfEq hcoe)
     rw [hcong, hprod]; ring
   -- `R₀ Z ≤ C_S(R₀)`.
   have hle : hyp.R₀ ⊔ Z ≤ S ⊓ C := by
@@ -547,7 +547,7 @@ theorem RegularOperatorSetup.card_centralizer_inf_centralizer_eq [Finite R]
   rw [hinfbot, Subgroup.card_bot, mul_one, hyp.card_R₀_subgroupOf hR₀S] at hprod
   have hcong : Nat.card ↥(R₀' ⊔ (CS ⊓ T)) =
       Nat.card ↥((R₀' : Set ↥S) * ((CS ⊓ T : Subgroup ↥S) : Set ↥S)) :=
-    Nat.card_congr (Equiv.setCongr hcoe)
+    Nat.card_congr (Set.equivOfEq hcoe)
   rw [← hdecomp, hCScard, hprod] at hcong
   have hmul : p * p = p * Nat.card ↥(CS ⊓ T) := by rw [← sq]; exact hcong
   exact (Nat.eq_of_mul_eq_mul_left hyp.p_prime.pos hmul).symm

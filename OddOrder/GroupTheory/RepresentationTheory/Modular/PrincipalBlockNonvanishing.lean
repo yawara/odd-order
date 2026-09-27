@@ -90,7 +90,7 @@ theorem forall_apply_eq_of_invariants_ne_bot
       rw [Finset.sum_congr rfl fun j' (_ : j' ∈ Finset.univ) =>
         show M l j' * v j' = if j' = j then w l * v j' else 0 by
           rw [hM]; split <;> simp_all]
-      rw [Finset.sum_ite_eq' Finset.univ j fun j' => w l * v j', if_pos (Finset.mem_univ _)]
+      rw [Finset.sum_ite_eq' Finset.univ j fun j' => w l * v j', ite_eq_left (Finset.mem_univ _)]
       ring
     obtain ⟨a, ha⟩ : ∃ a : MonoidAlgebra K G, e a i = M :=
       ⟨e.symm (Pi.single i M), by rw [AlgEquiv.apply_symm_apply, Pi.single_eq_same]⟩
@@ -156,8 +156,8 @@ theorem exists_trivial_wedderburn_index [Finite G] :
   have hj := congrFun hcol j
   rw [ha] at hj
   simp only [Matrix.mulVec, dotProduct, Pi.single_apply, Pi.smul_apply, smul_eq_mul,
-    mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true] at hj
-  rw [Matrix.single_apply_same, if_neg hne] at hj
+    mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, ite_true] at hj
+  rw [Matrix.single_apply_same, ite_eq_right hne] at hj
   exact one_ne_zero hj
 
 end Invariants

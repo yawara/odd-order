@@ -812,7 +812,7 @@ theorem caseB_coherent_sOf_H0Cprime [Finite G]
       OddOrder.Peterfalvi.S08.inducedKernelFamily_hasNoRealCharacters hModd _ (hIKF ha) h.symm)
     ⟨Nat.card (hyp.base.toHypothesis46 hG hG.odd).W1, by
       rw [hμ₁def, OddOrder.Peterfalvi.S06.columnSum_def,
-        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl]⟩
+        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, ite_eq_left rfl]⟩
     (fun {φ ψ} hφ hψ =>
       hyp.base.tau_inner_eq_of_supported
         (OddOrder.Peterfalvi.S07.support_subset_of_mem_zSupportedSpan hφ)

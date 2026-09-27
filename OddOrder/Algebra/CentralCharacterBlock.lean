@@ -90,7 +90,7 @@ theorem existsUnique_blockCharacter_eq
       simp only [Finset.sum_apply, map_smul, hval, Pi.smul_apply, Pi.single_apply, smul_eq_mul,
         mul_ite, mul_one, mul_zero]
       rw [Finset.sum_ite_eq Finset.univ c' (fun c => blockCharacter π hπ hlin c z),
-        if_pos (Finset.mem_univ _), blockCharacterPi_apply]
+        ite_eq_left (Finset.mem_univ _), blockCharacterPi_apply]
     have hlamzw : lam (z - w) = 0 := ((hnil _ (by rw [map_sub, hΦw, sub_self])).map lam).eq_zero
     have hlamw : lam w = blockCharacter π hπ hlin c₀ z := by
       rw [hw, map_sum]
@@ -100,11 +100,11 @@ theorem existsUnique_blockCharacter_eq
         intro c
         rw [map_smul, smul_eq_mul]
         by_cases h : c = c₀
-        · rw [h, hc₀, mul_one, if_pos rfl]
-        · rw [hzero c h, mul_zero, if_neg h]
+        · rw [h, hc₀, mul_one, ite_eq_left rfl]
+        · rw [hzero c h, mul_zero, ite_eq_right h]
       rw [Finset.sum_congr rfl fun c _ => hterm c,
         Finset.sum_ite_eq' Finset.univ c₀ (fun _ => blockCharacter π hπ hlin c₀ z),
-        if_pos (Finset.mem_univ _)]
+        ite_eq_left (Finset.mem_univ _)]
     have hsub : lam z - lam w = 0 := by rw [← map_sub]; exact hlamzw
     rw [sub_eq_zero.mp hsub]
     exact hlamw

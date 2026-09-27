@@ -110,8 +110,8 @@ theorem inner_extension_Xset_centralCommutator_Yset_eq_zero_general
     simp only [IrreducibleCharacter.coe_mk] at h
     rw [h]
     by_cases hpq : φ = ψ
-    · rw [if_pos (Subtype.ext hpq), if_pos hpq]
-    · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+    · rw [ite_eq_left (Subtype.ext hpq), ite_eq_left hpq]
+    · rw [ite_eq_right (fun heq => hpq (Subtype.ext_iff.mp heq)), ite_eq_right hpq]
   -- distinct references (n, m ≥ 2)
   have hXne : (hyp.Xset hyp.centralCommutator).Nonempty := ⟨χ, hχ⟩
   have hXfin : (hyp.Xset hyp.centralCommutator).Finite := hyp.xSet_finite_of_irreducible_X hXirr
@@ -176,19 +176,21 @@ theorem inner_extension_Xset_centralCommutator_Yset_eq_zero_general
     (u := (d' : ℝ)) (v := (d : ℝ))
     (by exact_mod_cast hd'_pos.ne') (by exact_mod_cast hd_pos.ne')
     (hYc.extension_mem_ZIrr η hηs)
-    (by rw [hYc.extension_inner_eq η η hηs hηs, hinner η η (hYirr η hη) (hYirr η hη), if_pos rfl])
+    (by rw [hYc.extension_inner_eq η η hηs hηs, hinner η η (hYirr η hη) (hYirr η hη),
+      ite_eq_left rfl])
     (hYc.extension_mem_ZIrr η' hη's)
     (by rw [hYc.extension_inner_eq η' η' hη's hη's, hinner η' η' (hYirr η' hη'Y) (hYirr η' hη'Y),
-        if_pos rfl])
+        ite_eq_left rfl])
     (hXc.extension_mem_ZIrr χ hχs)
-    (by rw [hXc.extension_inner_eq χ χ hχs hχs, hinner χ χ (hXirr χ hχ) (hXirr χ hχ), if_pos rfl])
+    (by rw [hXc.extension_inner_eq χ χ hχs hχs, hinner χ χ (hXirr χ hχ) (hXirr χ hχ),
+      ite_eq_left rfl])
     (hXc.extension_mem_ZIrr χ' hχ's)
     (by rw [hXc.extension_inner_eq χ' χ' hχ's hχ's, hinner χ' χ' (hXirr χ' hχ'X) (hXirr χ' hχ'X),
-        if_pos rfl])
+        ite_eq_left rfl])
     (by rw [hYc.extension_inner_eq η η' hηs hη's, hinner η η' (hYirr η hη) (hYirr η' hη'Y),
-        if_neg (fun h => hη'ne h.symm)])
+        ite_eq_right (fun h => hη'ne h.symm)])
     (by rw [hXc.extension_inner_eq χ χ' hχs hχ's, hinner χ χ' (hXirr χ hχ) (hXirr χ' hχ'X),
-        if_neg (fun h => hχ'ne h.symm)])
+        ite_eq_right (fun h => hχ'ne h.symm)])
     (by -- hdiff
       rw [hXeq, hYeq, inner_conj_symm (hXc.extension xdiff) (hYc.extension ydiff),
         inner_extension_eq_inner_of_supported hyp.dade hXc hYc hx_supp hy_supp,
@@ -233,8 +235,8 @@ theorem inner_extension_Xset_centralCommutator_Yset_eq_zero_general_c2_caseA
     simp only [IrreducibleCharacter.coe_mk] at h
     rw [h]
     by_cases hpq : φ = ψ
-    · rw [if_pos (Subtype.ext hpq), if_pos hpq]
-    · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+    · rw [ite_eq_left (Subtype.ext hpq), ite_eq_left hpq]
+    · rw [ite_eq_right (fun heq => hpq (Subtype.ext_iff.mp heq)), ite_eq_right hpq]
   -- distinct references (n, m ≥ 2)
   have hXne : (hyp.Xset hyp.centralCommutator).Nonempty := ⟨χ, hχ⟩
   have hXfin : (hyp.Xset hyp.centralCommutator).Finite := hyp.xSet_finite_of_irreducible_X hXirr
@@ -299,19 +301,21 @@ theorem inner_extension_Xset_centralCommutator_Yset_eq_zero_general_c2_caseA
     (u := (d' : ℝ)) (v := (d : ℝ))
     (by exact_mod_cast hd'_pos.ne') (by exact_mod_cast hd_pos.ne')
     (hYc.extension_mem_ZIrr η hηs)
-    (by rw [hYc.extension_inner_eq η η hηs hηs, hinner η η (hYirr η hη) (hYirr η hη), if_pos rfl])
+    (by rw [hYc.extension_inner_eq η η hηs hηs, hinner η η (hYirr η hη) (hYirr η hη),
+      ite_eq_left rfl])
     (hYc.extension_mem_ZIrr η' hη's)
     (by rw [hYc.extension_inner_eq η' η' hη's hη's, hinner η' η' (hYirr η' hη'Y) (hYirr η' hη'Y),
-        if_pos rfl])
+        ite_eq_left rfl])
     (hXc.extension_mem_ZIrr χ hχs)
-    (by rw [hXc.extension_inner_eq χ χ hχs hχs, hinner χ χ (hXirr χ hχ) (hXirr χ hχ), if_pos rfl])
+    (by rw [hXc.extension_inner_eq χ χ hχs hχs, hinner χ χ (hXirr χ hχ) (hXirr χ hχ),
+      ite_eq_left rfl])
     (hXc.extension_mem_ZIrr χ' hχ's)
     (by rw [hXc.extension_inner_eq χ' χ' hχ's hχ's, hinner χ' χ' (hXirr χ' hχ'X) (hXirr χ' hχ'X),
-        if_pos rfl])
+        ite_eq_left rfl])
     (by rw [hYc.extension_inner_eq η η' hηs hη's, hinner η η' (hYirr η hη) (hYirr η' hη'Y),
-        if_neg (fun h => hη'ne h.symm)])
+        ite_eq_right (fun h => hη'ne h.symm)])
     (by rw [hXc.extension_inner_eq χ χ' hχs hχ's, hinner χ χ' (hXirr χ hχ) (hXirr χ' hχ'X),
-        if_neg (fun h => hχ'ne h.symm)])
+        ite_eq_right (fun h => hχ'ne h.symm)])
     (by -- hdiff
       rw [hXeq, hYeq, inner_conj_symm (hXc.extension xdiff) (hYc.extension ydiff),
         inner_extension_eq_inner_of_supported hyp.dade hXc hYc hx_supp hy_supp,
@@ -817,8 +821,8 @@ noncomputable def coherentXunionYset_centralCommutator_of_himg_ortho
     simp only [IrreducibleCharacter.coe_mk] at h
     rw [h]
     by_cases hpq : φ = ψ
-    · rw [if_pos (Subtype.ext hpq), if_pos hpq]
-    · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+    · rw [ite_eq_left (Subtype.ext hpq), ite_eq_left hpq]
+    · rw [ite_eq_right (fun heq => hpq (Subtype.ext_iff.mp heq)), ite_eq_right hpq]
   have hXirr : ∀ φ ∈ hyp.Xset hyp.centralCommutator, IsIrreducibleCharacter φ :=
     fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ
   have hYirr : ∀ φ ∈ hyp.Yset, IsIrreducibleCharacter φ :=
@@ -831,7 +835,7 @@ noncomputable def coherentXunionYset_centralCommutator_of_himg_ortho
   have hXY : ∀ x ∈ hyp.Xset hyp.centralCommutator, ∀ y ∈ hyp.Yset,
       ClassFunction.inner x y = 0 := fun x hx y hy => by
     rw [hinner x y (hXirr x hx) (hYirr y hy),
-      if_neg (by intro h; exact Set.disjoint_left.mp hdisj hx (h ▸ hy))]
+      ite_eq_right (by intro h; exact Set.disjoint_left.mp hdisj hx (h ▸ hy))]
   have hglue :=
     OddOrder.Peterfalvi.S07.IntegralCharacterMap.exists_integralCharacterMap_glue_of_orthonormal
       (hyp.Xset_finite hyp.centralCommutator) hyp.Yset_finite

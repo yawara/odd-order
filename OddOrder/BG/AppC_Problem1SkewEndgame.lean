@@ -196,10 +196,10 @@ noncomputable def sqSelect (x lamP lamM : GaloisField p q) : GaloisField p q :=
   if IsSquare x then lamP else lamM
 
 theorem sqSelect_of_isSquare {x lamP lamM : GaloisField p q} (h : IsSquare x) :
-    sqSelect x lamP lamM = lamP := if_pos h
+    sqSelect x lamP lamM = lamP := ite_eq_left h
 
 theorem sqSelect_of_not_isSquare {x lamP lamM : GaloisField p q} (h : ¬IsSquare x) :
-    sqSelect x lamP lamM = lamM := if_neg h
+    sqSelect x lamP lamM = lamM := ite_eq_right h
 
 open scoped Classical in
 /-- Evaluating `sqSelect` with values branched on the sign of a reference `A₀`, at an element
@@ -212,11 +212,11 @@ private theorem sqSelect_ite_same {A₀ x vS vO : GaloisField p q} (hA₀ : A₀
   · have hxsq : IsSquare x := by
       rw [show x = x * A₀⁻¹ * A₀ by field_simp]
       exact hxs.mul hA
-    rw [sqSelect_of_isSquare hxsq, if_pos hA]
+    rw [sqSelect_of_isSquare hxsq, ite_eq_left hA]
   · have hxsq : ¬IsSquare x := by
       intro hxq
       exact hA (by rw [show A₀ = x * (x * A₀⁻¹)⁻¹ by field_simp]; exact hxq.mul hxs.inv)
-    rw [sqSelect_of_not_isSquare hxsq, if_neg hA]
+    rw [sqSelect_of_not_isSquare hxsq, ite_eq_right hA]
 
 open scoped Classical in
 /-- Evaluating `sqSelect` with values branched on the sign of a reference `A₀`, at an element
@@ -231,12 +231,12 @@ private theorem sqSelect_ite_opp {A₀ x vS vO : GaloisField p q}
       refine not_isSquare_of_isSquare_neg hneg1 hx0 ?_
       rw [show -x = -(x * A₀⁻¹) * A₀ by field_simp]
       exact hxs.mul hA
-    rw [sqSelect_of_not_isSquare hxsq, if_pos hA]
+    rw [sqSelect_of_not_isSquare hxsq, ite_eq_left hA]
   · have hAneg : IsSquare (-A₀) := hdichA.resolve_left hA
     have hxsq : IsSquare x := by
       rw [show x = -(x * A₀⁻¹) * -A₀ by field_simp]
       exact hxs.mul hAneg
-    rw [sqSelect_of_isSquare hxsq, if_neg hA]
+    rw [sqSelect_of_isSquare hxsq, ite_eq_right hA]
 
 /-- **The master formula**: `K(p) = λ_{χ(δ₀)}·δ₀ᵉ - λ_{χ(δ₁)}·δ₁ᵉ` for every ordered pair
 of distinct Paley points.  (The pair `(r, p)` recovers the `K(r)`-equation, so one component

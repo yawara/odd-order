@@ -596,7 +596,6 @@ theorem algebraMap_surjective_of_isIrreducible_baseChangeRepresentation
       have hzero : ∀ z : K ⊗[F] V, z = 0 := by
         intro z
         induction z with
-        | zero => rfl
         | tmul a v => rw [Subsingleton.elim v 0, TensorProduct.tmul_zero]
         | add x y ihx ihy => rw [ihx, ihy, add_zero]
       rw [hzero x, hzero y]
@@ -608,7 +607,6 @@ theorem algebraMap_surjective_of_isIrreducible_baseChangeRepresentation
         = baseChangeRepresentation K ρ g (LinearMap.baseChange K f.toLinearMap x) := by
     intro g x
     induction x with
-    | zero => simp
     | tmul a v =>
       rw [baseChangeRepresentation_apply_tmul, LinearMap.baseChange_tmul,
         LinearMap.baseChange_tmul, baseChangeRepresentation_apply_tmul]

@@ -134,7 +134,7 @@ theorem stepElevenSeq_succ_of_ne (ζ y : G) (i : ℕ)
             (hyp.stepElevenSeq ζ y i).2.2 * ζ * (a⁻¹) ^ 2) := by
   classical
   refine ⟨hex.choose, hex.choose_spec.1, hex.choose_spec.2, ?_⟩
-  rw [hyp.stepElevenSeq_succ, stepElevenNext, dif_pos hex]
+  rw [hyp.stepElevenSeq_succ, stepElevenNext, dite_eq_left hex]
 
 /-- The entries of the sequence stay where they should: `z_i, w_i ∈ Q₀` and `d_i ∈ D`.
 
@@ -154,14 +154,14 @@ theorem stepElevenSeq_mem {ζ y : G} (hζ : ζ ∈ hyp.W) (hyQ0 : y ∈ hyp.Q0) 
     rw [hyp.stepElevenSeq_succ, stepElevenNext]
     by_cases hex : ∃ a ∈ hyp.K, a * hyp.distinguishedInvolution * a⁻¹
         = y * (hyp.stepElevenSeq ζ y k).1
-    · rw [dif_pos hex]
+    · rw [dite_eq_left hex]
       have haD : hex.choose ∈ hyp.D := hyp.K_le_D hex.choose_spec.1
       have hsa : (hex.choose)⁻¹ * hyp.distinguishedInvolution * hex.choose ∈ hyp.Q0 := by
         have hmem := hyp.conj_mem_Q0_of_mem_D (hyp.D.inv_mem haD) hsQ0
         rwa [inv_inv] at hmem
       exact ⟨hsa, hyp.Q0.mul_mem hw (hyp.conj_mem_Q0_of_mem_D hd hsa),
         hyp.D.mul_mem (hyp.D.mul_mem hd hζD) (pow_mem (hyp.D.inv_mem haD) 2)⟩
-    · rw [dif_neg hex]
+    · rw [dite_eq_right hex]
       exact ⟨hz, hw, hd⟩
 
 /-- **The conjugators of (11) lie in `K W`** (Peterfalvi Part II, p. 125: "`d_i ∈ K W`").
@@ -180,7 +180,7 @@ theorem stepElevenSeq_mem_KW {ζ y : G} (hζ : ζ ∈ hyp.W) (i : ℕ) :
     rw [hyp.stepElevenSeq_succ, stepElevenNext]
     by_cases hex : ∃ a ∈ hyp.K, a * hyp.distinguishedInvolution * a⁻¹
         = y * (hyp.stepElevenSeq ζ y n).1
-    · rw [dif_pos hex]
+    · rw [dite_eq_left hex]
       have haK : (hex.choose)⁻¹ ^ 2 ∈ hyp.K := pow_mem (hyp.K.inv_mem hex.choose_spec.1) 2
       refine ⟨k₀ * (hex.choose)⁻¹ ^ 2, hyp.K.mul_mem hk₀ haK, v₀ * ζ,
         hyp.W.mul_mem hv₀ hζ, ?_⟩
@@ -190,7 +190,7 @@ theorem stepElevenSeq_mem_KW {ζ y : G} (hζ : ζ ∈ hyp.W) (i : ℕ) :
           = k₀ * (v₀ * ζ * (hex.choose)⁻¹ ^ 2) := by rw [hd]; group
         _ = k₀ * ((hex.choose)⁻¹ ^ 2 * (v₀ * ζ)) := by rw [hcm]
         _ = k₀ * (hex.choose)⁻¹ ^ 2 * (v₀ * ζ) := by group
-    · rw [dif_neg hex]
+    · rw [dite_eq_right hex]
       exact ⟨k₀, hk₀, v₀, hv₀, hd⟩
 
 /-- **Step (11)** (Peterfalvi Part II, p. 125): the sequence carries the invariant
@@ -222,10 +222,10 @@ theorem stepElevenSeq_spec (H : IsFGH hyp.H hyp.Q hyp.D hyp.t f g h)
     rw [hyp.stepElevenSeq_succ, stepElevenNext]
     by_cases hex : ∃ a ∈ hyp.K, a * hyp.distinguishedInvolution * a⁻¹
         = y * (hyp.stepElevenSeq ζ y k).1
-    · rw [dif_pos hex]
+    · rw [dite_eq_left hex]
       obtain ⟨haK, ha⟩ := hex.choose_spec
       exact hyp.stepEleven_step H hC2 hζ hωQ hωQ0 hyQ0 haK hfω ha ih
-    · rw [dif_neg hex]
+    · rw [dite_eq_right hex]
       exact ih
 
 /-- **The `K`-coset of `d_i` is `ζ^i K`** (Peterfalvi Part II, p. 126, behind step (15)).

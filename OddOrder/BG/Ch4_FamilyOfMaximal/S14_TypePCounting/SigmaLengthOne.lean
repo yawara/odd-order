@@ -792,8 +792,8 @@ theorem Rsub_conj [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       exact hmem
     rw [hReq', hReq, Subgroup.smul_inf, ← Msigma_conj_smul, smul_centralizer_singleton, hNconj]
   · have h1 : Rsub hG D (g * x * g⁻¹) = ⊥ := by
-      rw [Rsub, dif_neg (fun h => hcase (hcond_iff.mp h))]
-    have h2 : Rsub hG D x = ⊥ := by rw [Rsub, dif_neg hcase]
+      rw [Rsub, dite_eq_right (fun h => hcase (hcond_iff.mp h))]
+    have h2 : Rsub hG D x = ⊥ := by rw [Rsub, dite_eq_right hcase]
     rw [h1, h2, Subgroup.smul_bot]
 
 /-- The left coset `x R(x)` as a pointwise scalar action: `x • R = { x r | r ∈ R }`.  Bridges
@@ -985,7 +985,7 @@ theorem not_type1_of_type2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         (OddOrder.GroupTheory.isPiElement_one _) hxPiMc hgeq.symm hcomm hyPi hy'Pi).1.symm
   have hgtx : 1 < (maximalSigmaSubgroupsOfElement x).ncard := by
     by_contra h
-    rw [Rsub, dif_neg (fun hc => h hc.2.2), Subgroup.mem_bot] at hx'R
+    rw [Rsub, dite_eq_right (fun hc => h hc.2.2), Subgroup.mem_bot] at hx'R
     exact hx'1 hx'R
   obtain ⟨N, hNmax, hCxN, hReqN, hπτ2N, _⟩ := exists_neighbor_eq_Rsub hG D hlx hgtx
   have hxN : x ∈ N := hCxN (Subgroup.mem_centralizer_iff.mpr fun z hz => by

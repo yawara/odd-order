@@ -78,9 +78,9 @@ theorem classFunction_span_irreducibleCharacter_eq_top [Finite G] [Invertible (N
     have hδ : (∑ χ : IrreducibleCharacter G, ClassFunction.inner f (χ : ClassFunction G ℂ)
         * ClassFunction.inner (χ : ClassFunction G ℂ) ψ) = ClassFunction.inner f ψ := by
       rw [Finset.sum_eq_single ψ
-        (fun χ _ hχ => by rw [irreducibleCharacter_inner_eq_ite χ ψ, if_neg hχ, mul_zero])
+        (fun χ _ hχ => by rw [irreducibleCharacter_inner_eq_ite χ ψ, ite_eq_right hχ, mul_zero])
         (fun h => absurd (Finset.mem_univ ψ) h),
-        irreducibleCharacter_inner_eq_ite ψ ψ, if_pos rfl, mul_one]
+        irreducibleCharacter_inner_eq_ite ψ ψ, ite_eq_left rfl, mul_one]
     rw [hδ, sub_self]
   rw [key]
   exact Submodule.sum_mem _ fun χ _ =>
@@ -165,7 +165,7 @@ theorem alphaCF_inner (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     hyp.omega_omegaProdChar_inner]
   -- Kill the cross-type matches (any condition forcing a nontrivial character to be `1`).
   simp only [hp₁, hp₂, hq₁.symm, hq₂.symm,
-    false_and, and_false, if_false, if_true, true_and, and_true]
+    false_and, and_false, ite_false, ite_true, true_and, and_true]
   ring
 
 end TICyclicHypothesis
@@ -208,7 +208,7 @@ theorem induceTerm_eq_of_mem_V (hyp : TICyclicHypothesis G)
     ClassFunction.induceTerm hyp.W (α : ClassFunction hyp.W k) x a =
       if x ∈ hyp.W then (α : ClassFunction hyp.W k) ⟨a, hyp.V_subset_W ha⟩ else 0 := by
   by_cases hx : x ∈ hyp.W
-  · rw [if_pos hx]
+  · rw [ite_eq_left hx]
     have haxV : x⁻¹ * a * x ∈ hyp.V := by
       have h := hyp.W_normalizes_V ⟨x⁻¹, hyp.W.inv_mem hx⟩ ha
       simpa using h
@@ -220,7 +220,7 @@ theorem induceTerm_eq_of_mem_V (hyp : TICyclicHypothesis G)
       simp [inv_inv]
     rw [harg]
     exact (α : ClassFunction hyp.W k).conj_eq ⟨a, hyp.V_subset_W ha⟩ ⟨x⁻¹, hyp.W.inv_mem hx⟩
-  · rw [if_neg hx]
+  · rw [ite_eq_right hx]
     by_cases hax : x⁻¹ * a * x ∈ hyp.W
     · rw [ClassFunction.induceTerm_of_mem _ hax]
       have hnotV : x⁻¹ * a * x ∉ hyp.V := by
@@ -324,7 +324,7 @@ theorem alphaCF_inner_omega_one (hyp : TICyclicHypothesis G) [Fintype hyp.W]
   rw [hyp.alphaCF_eq_omegaProdChar_combination p₁ p₂]
   simp only [ClassFunction.inner_sub_left, ClassFunction.inner_add_left,
     hyp.omega_omegaProdChar_inner]
-  simp only [hp₁, hp₂, and_false, if_false, if_true, and_true]
+  simp only [hp₁, hp₂, and_false, ite_false, ite_true, and_true]
   ring
 
 /-- **Peterfalvi (3.5.1)** (Frobenius reciprocity): `⟨Ind_W^G α_{ij}, 1_G⟩ = ⟨α_{ij}, 1_W⟩ = 1`
@@ -363,6 +363,6 @@ theorem inner_trivialClassFunction_self (G : Type*) [Group G] [Fintype G]
     [Invertible (Nat.card G : ℂ)] :
     ClassFunction.inner (trivialClassFunction G) (trivialClassFunction G) = 1 := by
   rw [← IrreducibleCharacter.coe_trivialIrreducibleCharacter, irreducibleCharacter_inner,
-    if_pos rfl]
+    ite_eq_left rfl]
 
 end OddOrder.Peterfalvi.S05

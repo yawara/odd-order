@@ -161,7 +161,7 @@ theorem typeI_caseC_parity_of_c_eq_one [Finite G]
         = hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨0, hyp.p_prime.pos⟩ := by
       rw [OddOrder.Peterfalvi.S16.eta_principal_eq_trivial hyp]; rfl
     rw [h00, OddOrder.Peterfalvi.S16.eta_orthonormal hyp,
-      if_neg (by rintro ⟨-, h2⟩; exact absurd (congrArg Fin.val h2) (by simp))]
+      ite_eq_right (by rintro ⟨-, h2⟩; exact absurd (congrArg Fin.val h2) (by simp))]
   have hone_one : ClassFunction.inner (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G)
       (OddOrder.Peterfalvi.S09.Hypothesis71.constOne G) = 1 :=
     OddOrder.Peterfalvi.S09.Hypothesis71.constOne_inner_self_eq_one
@@ -274,7 +274,7 @@ theorem typeI_caseC_bound_c2_of_c_eq_one [Finite G]
           = hyp.eta ⟨0, hyp.q_prime.pos⟩ ⟨0, hyp.p_prime.pos⟩ by
         rw [OddOrder.Peterfalvi.S16.eta_principal_eq_trivial hyp]; rfl,
         OddOrder.Peterfalvi.S16.eta_orthonormal hyp,
-        if_neg (by rintro ⟨-, h2⟩; exact hj (congrArg Fin.val h2).symm)]
+        ite_eq_right (by rintro ⟨-, h2⟩; exact hj (congrArg Fin.val h2).symm)]
     -- `⟨ζ_0^{τ₁}, η_{0j}⟩ = 0`  (coherent image `⊥ η`).
     have hζη : ClassFunction.inner
         ((dataL.h78 hG).nu ((dataL.h78 hG).hyp76.zeta ((dataL.h78 hG).zetaDistinct)))
@@ -319,8 +319,8 @@ theorem typeI_caseC_bound_c2_of_c_eq_one [Finite G]
     (fun i _ j _ => by
       rw [OddOrder.Peterfalvi.S16.eta_orthonormal hyp]
       by_cases hij : i = j
-      · rw [if_pos ⟨rfl, hij⟩, if_pos hij]; norm_num
-      · rw [if_neg (fun h => hij h.2), if_neg hij])
+      · rw [ite_eq_left ⟨rfl, hij⟩, ite_eq_left hij]; norm_num
+      · rw [ite_eq_right (fun h => hij h.2), ite_eq_right hij])
     (fun j hj => by
       have hj0 : (j : ℕ) ≠ 0 := by
         rintro h0; exact (Finset.mem_erase.mp hj).1 (Fin.ext h0)
@@ -328,9 +328,9 @@ theorem typeI_caseC_bound_c2_of_c_eq_one [Finite G]
         Finset.sum_eq_single_of_mem j hj (fun k _ hkj => by
           rw [ClassFunction.inner_smul_left,
             OddOrder.Peterfalvi.S16.eta_orthonormal hyp,
-            if_neg (by rintro ⟨-, h2⟩; exact hkj h2), mul_zero]),
+            ite_eq_right (by rintro ⟨-, h2⟩; exact hkj h2), mul_zero]),
         ClassFunction.inner_smul_left,
-        OddOrder.Peterfalvi.S16.eta_orthonormal hyp, if_pos ⟨rfl, rfl⟩, mul_one,
+        OddOrder.Peterfalvi.S16.eta_orthonormal hyp, ite_eq_left ⟨rfl, rfl⟩, mul_one,
         hXη j hj0]
       push_cast; ring)
     (fun _ _ => by norm_num)
@@ -591,10 +591,10 @@ theorem typeI_caseC_bound_c1_of_c_eq_one [Finite G]
     rw [dataL.nu_isometry i j (Finset.mem_erase.mp hi).1 (Finset.mem_erase.mp hj).1]
     by_cases hij : i = j
     · subst hij
-      rw [if_pos rfl]
+      rw [ite_eq_left rfl]
       exact IsIrreducibleCharacter.inner_self_eq_one
         (dataL.zeta_irreducible_at hG (Finset.mem_erase.mp hi).1)
-    · rw [if_neg hij]
+    · rw [ite_eq_right hij]
       exact OddOrder.Peterfalvi.S09.Cert.induce_family_orthogonal_of_injective dataL.kernelIn
           dataL.θ dataL.inj i j hij
   -- `⟨v, v⟩ = Σ d_i²`.
@@ -605,8 +605,8 @@ theorem typeI_caseC_bound_c1_of_c_eq_one [Finite G]
     rw [ClassFunction.inner_smul_left, inner_sum_right,
       Finset.sum_eq_single_of_mem i hi (fun j hj hji => by
         rw [OddOrder.RepresentationTheory.inner_smul_right, hON i hi j hj,
-          if_neg (Ne.symm hji), mul_zero]),
-      OddOrder.RepresentationTheory.inner_smul_right, hON i hi i hi, if_pos rfl,
+          ite_eq_right (Ne.symm hji), mul_zero]),
+      OddOrder.RepresentationTheory.inner_smul_right, hON i hi i hi, ite_eq_left rfl,
       dataL.d_star, mul_one, sq]
   -- `Σ d_i² = (|kernelIn| − 1)/e`  (degree-square sum).
   have hidx_ne : ((dataL.kernelIn).index : ℂ) ≠ 0 :=

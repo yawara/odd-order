@@ -125,9 +125,9 @@ theorem card_fiber_eq_of_card_eq {α β : Type*} [Finite α] [Finite β]
       (Finset.univ.filter fun a => Φ a = b).card ≤ g b := by
     intro b _
     by_cases h : b = b₀
-    · simp only [hg, if_pos h]
+    · simp only [hg, ite_eq_left h]
       exact h ▸ hb₀
-    · simp only [hg, if_neg h]
+    · simp only [hg, ite_eq_right h]
       exact hle b
   have hsumf : ∑ b : β, (Finset.univ.filter fun a => Φ a = b).card = Fintype.card α := by
     rw [← Finset.card_eq_sum_card_fiberwise (fun a _ => Finset.mem_univ (Φ a))]
@@ -137,12 +137,12 @@ theorem card_fiber_eq_of_card_eq {α β : Type*} [Finite α] [Finite β]
       (Finset.sum_erase_add _ _ (Finset.mem_univ b₀)).symm
     have hconst : ∀ b ∈ Finset.univ.erase b₀, g b = M := by
       intro b hb
-      simp only [hg, if_neg (Finset.ne_of_mem_erase hb)]
+      simp only [hg, ite_eq_right (Finset.ne_of_mem_erase hb)]
     have herase : ∑ b ∈ Finset.univ.erase b₀, g b = (Fintype.card β - 1) * M := by
       rw [Finset.sum_congr rfl hconst, Finset.sum_const,
         Finset.card_erase_of_mem (Finset.mem_univ b₀), Finset.card_univ, smul_eq_mul]
     rw [hsplit, herase]
-    simp only [hg, if_pos rfl]
+    simp only [hg, ite_eq_left rfl]
     have hpos : 1 ≤ Fintype.card β := Fintype.card_pos_iff.mpr ⟨b₀⟩
     obtain ⟨k, hk⟩ : ∃ k, Fintype.card β = k + 1 := ⟨Fintype.card β - 1, by omega⟩
     rw [hk, Nat.add_sub_cancel, add_mul, one_mul]
@@ -154,9 +154,9 @@ theorem card_fiber_eq_of_card_eq {α β : Type*} [Finite α] [Finite β]
     fun b => (Finset.sum_eq_sum_iff_of_le hpt).mp heq b (Finset.mem_univ b)
   refine ⟨fun b hb => ?_, ?_⟩
   · rw [hconv b, key b]
-    simp only [hg, if_neg hb]
+    simp only [hg, ite_eq_right hb]
   · rw [hconv b₀, key b₀]
-    simp only [hg, if_pos rfl]
+    simp only [hg, ite_eq_left rfl]
 
 /-! ### The book's `u^{1+θ}` (p. 125)
 

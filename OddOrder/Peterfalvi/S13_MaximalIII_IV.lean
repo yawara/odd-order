@@ -509,7 +509,7 @@ theorem caseB_sOf_memberRFamily_imageSet_of_irr [Finite G]
     OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support
       hyp.base.mderivSharp_subset_A0 hηIKF0, ?_⟩
   unfold caseB_sOf_memberRFamily
-  rw [dif_pos hirr]
+  rw [dite_eq_left hirr]
 
 set_option backward.isDefEq.respectTransparency false in
 /-- **`caseB_sOf_memberRFamily` reduction, column case**: for a reducible member `η`, the dispatched
@@ -538,7 +538,7 @@ theorem caseB_sOf_memberRFamily_imageSet_of_col [Finite G]
   have hex := (caseB_sOf_member_dichotomy hG hyp d hunif hη).resolve_left (fun h => hcol h.2.1)
   refine ⟨hex.choose, hex.choose_spec.1, hex.choose_spec.2, ?_⟩
   unfold caseB_sOf_memberRFamily
-  rw [dif_neg hcol]
+  rw [dite_eq_right hcol]
   rfl
 
 set_option maxHeartbeats 1600000 in
@@ -670,7 +670,7 @@ theorem caseB_sOf_memberRFamily_orthogonal [Finite G]
       intro heq
       have hφξ : φ = ξ := by rw [hkφeq, hkξeq, heq]
       rw [hφξ, hkξeq, OddOrder.Peterfalvi.S06.columnSum_def,
-        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl] at h1
+        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, ite_eq_left rfl] at h1
       exact hw1ne h1
     -- `χ₂ ≠ χ₂'⁻¹`: else `φ = ξ̄` and `⟨φ, ξ̄⟩ = w₁ ≠ 0` contradicts `h2`
     have hne2 : hyp.base.muColumnChar hG hG.odd kφ ≠ (hyp.base.muColumnChar hG hG.odd kξ)⁻¹ := by
@@ -679,7 +679,7 @@ theorem caseB_sOf_memberRFamily_orthogonal [Finite G]
         rw [hkφeq, heq, ← OddOrder.Peterfalvi.S06.columnSum_conj_eq, hkξeq]
       rw [hφξc, hkξeq, OddOrder.Peterfalvi.S06.columnSum_conj_eq,
         OddOrder.Peterfalvi.S06.columnSum_def,
-        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl] at h2
+        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, ite_eq_left rfl] at h2
       exact hw1ne h2
     exact OddOrder.Peterfalvi.S06.certainTypeR_imageSet_orthogonal_certainTypeR h46
       (hyp.base.muColumnChar_ne_one hG hG.odd hkφ0) (hyp.base.muColumnChar_ne_one hG hG.odd hkξ0)
@@ -880,7 +880,7 @@ theorem caseBPair_of_lt [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
          (hyp.base.muColumnChar hG hG.odd ⟨j + 1, h⟩),
        (OddOrder.Peterfalvi.S06.columnSum (hyp.base.toHypothesis46 hG hG.odd)
          (hyp.base.muColumnChar hG hG.odd ⟨j + 1, h⟩)).conj) :=
-  dif_pos h
+  dite_eq_left h
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- The `j`-th adjoined pair, as the two-element set `{μ_{j+1}, μ̄_{j+1}}` (the `pairSet` form

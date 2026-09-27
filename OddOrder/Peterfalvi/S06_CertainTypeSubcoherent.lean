@@ -191,7 +191,7 @@ theorem inducedR_imageSet_of_irreducible [NeZero (Nat.card h.W1)]
     (inducedR h hθ hχθ hreal hdiffsupp).imageSet
       = (S07.dadeOrthonormalCharacterImageFamilyOfDiff h.dade0
           (⟨χ, hirr⟩ : IrreducibleCharacter ↥L) hreal hdiffsupp).imageSet := by
-  rw [inducedR, dif_pos hirr]
+  rw [inducedR, dite_eq_left hirr]
 
 open scoped Classical in
 set_option backward.isDefEq.respectTransparency false in
@@ -213,7 +213,7 @@ theorem inducedR_imageSet_of_not_irreducible [NeZero (Nat.card h.W1)]
     (hcol : χ = columnSum h χ₂) :
     (inducedR h hθ hχθ hreal hdiffsupp).imageSet
       = (certainTypeR h hχ₂ (columnSum_inv_apply_one h χ₂).symm).imageSet := by
-  rw [inducedR, dif_neg hirr]
+  rw [inducedR, dite_eq_right hirr]
   exact columnR_imageSet_congr h _ hχ₂ _ hcol
 
 end
@@ -582,14 +582,14 @@ theorem dadeOfDiff_imageSet_orthogonal_chiFam
   have hμZ : cd.muClassFunction ∈ ZIrr G := cd.mu.mem_ZIrr
   have hνZ : cd.nuClassFunction ∈ ZIrr G := cd.nu.mem_ZIrr
   have hμ1 : ClassFunction.inner cd.muClassFunction cd.muClassFunction = 1 := by
-    have hx := irreducibleCharacter_inner_eq_ite cd.mu cd.mu; rwa [if_pos rfl] at hx
+    have hx := irreducibleCharacter_inner_eq_ite cd.mu cd.mu; rwa [ite_eq_left rfl] at hx
   have hν1 : ClassFunction.inner cd.nuClassFunction cd.nuClassFunction = 1 := by
-    have hx := irreducibleCharacter_inner_eq_ite cd.nu cd.nu; rwa [if_pos rfl] at hx
+    have hx := irreducibleCharacter_inner_eq_ite cd.nu cd.nu; rwa [ite_eq_left rfl] at hx
   have hμν : ClassFunction.inner cd.muClassFunction cd.nuClassFunction = 0 := by
-    have hx := irreducibleCharacter_inner_eq_ite cd.mu cd.nu; rwa [if_neg cd.distinct] at hx
+    have hx := irreducibleCharacter_inner_eq_ite cd.mu cd.nu; rwa [ite_eq_right cd.distinct] at hx
   have hνμ : ClassFunction.inner cd.nuClassFunction cd.muClassFunction = 0 := by
     have hx := irreducibleCharacter_inner_eq_ite cd.nu cd.mu
-    rwa [if_neg (Ne.symm cd.distinct)] at hx
+    rwa [ite_eq_right (Ne.symm cd.distinct)] at hx
   have hsignC : (cd.sign : ℂ) ≠ 0 := by rcases cd.sign_eq with hs | hs <;> simp [hs]
   have hnsignC : (-(cd.sign : ℂ)) ≠ 0 := by rcases cd.sign_eq with hs | hs <;> simp [hs]
   -- the anchor, in the two signed orientations

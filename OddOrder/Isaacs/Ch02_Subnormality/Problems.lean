@@ -371,7 +371,7 @@ private theorem le_normalizer_of_isSubnormal_aux :
           have h := Ch01.card_mul_card_inf S H
           rw [hSH_bot, Subgroup.card_bot, mul_one] at h
           rw [← h]
-          exact Nat.card_congr (Equiv.setCongr hKset)
+          exact Nat.card_congr (Set.equivOfEq hKset)
         have hprod := Ch01.card_mul_card_inf (S.subgroupOf (S ⊔ H)) M
         rw [hSM, Subgroup.card_bot, mul_one] at hprod
         have hle_amb : Nat.card

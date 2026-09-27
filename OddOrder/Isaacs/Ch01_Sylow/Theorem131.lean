@@ -46,7 +46,7 @@ lemma card_sylow_q_of_card_eq_sq_mul_prime
       Nat.factorization_mul hpne hqne, Finsupp.add_apply,
       Nat.Prime.factorization_pow hp.out, hq.out.factorization,
       Finsupp.single_apply, Finsupp.single_apply,
-      if_neg hpq, if_pos rfl, zero_add, pow_one]
+      ite_eq_right hpq, ite_eq_left rfl, zero_add, pow_one]
 
 /-- Helper: For `|G| = p² · q` with `p, q` distinct primes,
 the cardinality of any Sylow `p`-subgroup is `p²`. -/
@@ -60,7 +60,7 @@ lemma card_sylow_p_of_card_eq_sq_mul_prime
       Nat.factorization_mul hpne hqne, Finsupp.add_apply,
       Nat.Prime.factorization_pow hp.out, hq.out.factorization,
       Finsupp.single_apply, Finsupp.single_apply,
-      if_pos rfl, if_neg (Ne.symm hpq), add_zero]
+      ite_eq_left rfl, ite_eq_right (Ne.symm hpq), add_zero]
 
 /-- Helper: For `|G| = p² · q` with `p, q` distinct primes,
 the index of any Sylow `q`-subgroup is `p²`. -/
@@ -573,7 +573,7 @@ theorem card_sylow_p_of_card_eq_cube_mul_prime
       Nat.Prime.factorization_pow (Fact.out (p := p.Prime))] at hmul
   simp only [Finsupp.coe_add, Pi.add_apply,
              (Fact.out (p := q.Prime)).factorization, Finsupp.single_apply,
-             if_neg (Ne.symm hpq)] at hmul
+             ite_eq_right (Ne.symm hpq)] at hmul
   simpa using hmul
 
 /-- For `|G| = p^3 · q` (p, q distinct primes), any Sylow `q` subgroup has order `q`. -/
@@ -587,7 +587,7 @@ theorem card_sylow_q_of_card_eq_cube_mul_prime
   rw [hcard, Nat.factorization_mul hpne hqne,
       Nat.Prime.factorization_pow (Fact.out (p := p.Prime))] at hmul
   simp only [Finsupp.coe_add, Pi.add_apply,
-             Finsupp.single_apply, if_neg hpq] at hmul
+             Finsupp.single_apply, ite_eq_right hpq] at hmul
   simpa [(Fact.out (p := q.Prime)).factorization_self] using hmul
 
 /-- For `|G| = p^3 · q` (p, q distinct primes), any Sylow `p` subgroup has index `q`. -/

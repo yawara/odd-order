@@ -928,7 +928,7 @@ theorem four_mul_card_Kprime_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
   have hmod := hApG.card_modEq_card_fixedPoints (↥ctr.K ⧸ commutator ↥ctr.K)
   have hfixcard : Nat.card (MulAction.fixedPoints ↥(Subgroup.zpowers u)
       (↥ctr.K ⧸ commutator ↥ctr.K)) = 1 := by
-    rw [Nat.card_congr (Equiv.setCongr hfix_eq)]
+    rw [Nat.card_congr (Set.equivOfEq hfix_eq)]
     exact Nat.card_unique
   have hQmod : Nat.card (↥ctr.K ⧸ commutator ↥ctr.K) % ctr.p = 1 % ctr.p := by
     have h2 := hmod

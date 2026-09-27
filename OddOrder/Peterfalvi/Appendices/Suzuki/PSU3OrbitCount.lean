@@ -577,7 +577,7 @@ theorem exists_witness_coset_eq {m : ℕ} (M : hyp.QuotientFieldModel m)
   set A' : G → ↥hyp.D := fun z => if hh : A z ∈ hyp.D then ⟨A z, hh⟩ else 1 with hA'def
   have hA'val : ∀ z ∈ S, (A' z : G) = A z := by
     intro z hz
-    simp only [hA'def, dif_pos (hAD z hz)]
+    simp only [hA'def, dite_eq_left (hAD z hz)]
   set Ψ : G → ↥hyp.D ⧸ hyp.K.subgroupOf hyp.D := fun z => QuotientGroup.mk (A' z)
     with hΨdef
   have hinjOn : Set.InjOn Ψ S := by

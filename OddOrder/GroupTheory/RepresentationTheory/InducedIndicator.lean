@@ -74,7 +74,7 @@ theorem induceFun_indicator (S : Set G) (hS : S ⊆ (H : Set G)) (c : K) (y : G)
     intro g
     by_cases hg : g ∈ H
     · rw [extendByZero_of_mem _ hg]
-    · rw [extendByZero_of_not_mem _ hg, if_neg fun hc => hg (hS hc)]
+    · rw [extendByZero_of_not_mem _ hg, ite_eq_right fun hc => hg (hS hc)]
   have hreindex : (∑ x : G, extendByZero H
         (fun h : ↥H => if (h : G) ∈ S then c else 0) (x * y * x⁻¹))
       = ∑ x : G, extendByZero H (fun h : ↥H => if (h : G) ∈ S then c else 0) (x⁻¹ * y * x) :=

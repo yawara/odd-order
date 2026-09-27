@@ -300,8 +300,8 @@ theorem inner_induce_trivial_self_mul_card_sq [Invertible (Nat.card Γ : ℂ)]
     rw [← Finset.sum_boole]
     refine Finset.sum_congr rfl fun x _ => ?_
     by_cases hx : x⁻¹ * (y : Γ) * x ∈ K
-    · rw [ClassFunction.induceTerm_of_mem _ hx, if_pos hx, trivialClassFunction_apply]
-    · rw [ClassFunction.induceTerm_of_not_mem _ hx, if_neg hx]
+    · rw [ClassFunction.induceTerm_of_mem _ hx, ite_eq_left hx, trivialClassFunction_apply]
+    · rw [ClassFunction.induceTerm_of_not_mem _ hx, ite_eq_right hx]
   -- Frobenius reciprocity and the `y`-sum
   rw [ClassFunction.inner_induce_eq_inner_restrict,
     ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum]

@@ -372,7 +372,7 @@ theorem constituentDiff_tau_inner_eq_zero_of_ne {L : Subgroup G} [Finite G]
     ← OddOrder.Peterfalvi.S07.coe_conjIrreducibleCharacter (L := ↥L) φ,
     ← OddOrder.Peterfalvi.S07.coe_conjIrreducibleCharacter (L := ↥L) φ',
     hcross φ φ', hcross φ _, hcross _ φ', hcross _ _,
-    if_neg hne, if_neg h2, if_neg h3, if_neg h4]
+    ite_eq_right hne, ite_eq_right h2, ite_eq_right h3, ite_eq_right h4]
   norm_num
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -432,7 +432,7 @@ theorem constituentDiff_tau_inner_eq_zero_of_ne_across {L : Subgroup G} [Finite 
     ← OddOrder.Peterfalvi.S07.coe_conjIrreducibleCharacter (L := ↥L) φ,
     ← OddOrder.Peterfalvi.S07.coe_conjIrreducibleCharacter (L := ↥L) φ',
     hcross φ φ', hcross φ _, hcross _ φ', hcross _ _,
-    if_neg hne, if_neg h2, if_neg h3, if_neg h4]
+    ite_eq_right hne, ite_eq_right h2, ite_eq_right h3, ite_eq_right h4]
   norm_num
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -564,7 +564,7 @@ theorem constituent_diffImage_inner_zero_of_disjoint {L1 L2 : Subgroup G} [Finit
       · exact Or.inr (congrArg (fun c : IrreducibleCharacter G =>
           (c : ClassFunction G ℂ)) hc2)
       exfalso
-      exact hsub (by rw [hcrossG a _, hcrossG a _, if_neg hc1, if_neg hc2, sub_zero])
+      exact hsub (by rw [hcrossG a _, hcrossG a _, ite_eq_right hc1, ite_eq_right hc2, sub_zero])
     have hmem2 := hmem φ2 hφ2 ht2
     have hothers : ∀ φ' ∈ data2.constituents, φ' ≠ φ2 →
         ClassFunction.inner (a : ClassFunction G ℂ)
@@ -579,7 +579,7 @@ theorem constituent_diffImage_inner_zero_of_disjoint {L1 L2 : Subgroup G} [Finit
         exact constituentDiff_tau_inner_eq_zero_of_ne data2 hm' hφ2 hne'
       have hcontra := inner_eq_zero_of_signedDifference_inner_zero_of_mem
         (R1cdi data2 hm') (R1cdi data2 hφ2) hsd hmem' hmem2
-      rw [hcrossG a a, if_pos rfl] at hcontra
+      rw [hcrossG a a, ite_eq_left rfl] at hcontra
       exact one_ne_zero hcontra
     have hsum0 : ∑ φ' ∈ data2.constituents,
         ClassFunction.inner (a : ClassFunction G ℂ)
@@ -725,32 +725,32 @@ theorem irreducibleCharacter_signed_difference_uniqueness [Finite G]
   -- Evaluate at `a`: `s = t·([c=a] − [d=a])`.
   have ka : s = t * ((if c = a then (1 : ℂ) else 0) - (if d = a then 1 else 0)) := by
     have hka := key a
-    rwa [if_pos rfl, if_neg hba, sub_zero, mul_one] at hka
+    rwa [ite_eq_left rfl, ite_eq_right hba, sub_zero, mul_one] at hka
   -- Evaluate at `b`: `−s = t·([c=b] − [d=b])`.
   have kb : -s = t * ((if c = b then (1 : ℂ) else 0) - (if d = b then 1 else 0)) := by
     have hkb := key b
-    rwa [if_neg hab, if_pos rfl, zero_sub, mul_neg_one] at hkb
+    rwa [ite_eq_right hab, ite_eq_left rfl, zero_sub, mul_neg_one] at hkb
   by_cases hca : c = a
   · -- Orientation A: `c = a`, hence `d ≠ a`, and `ka` collapses to `s = t`.
     have hda : d ≠ a := fun he => hcd (hca.trans he.symm)
-    rw [if_pos hca, if_neg hda, sub_zero, mul_one] at ka
+    rw [ite_eq_left hca, ite_eq_right hda, sub_zero, mul_one] at ka
     have hcb : c ≠ b := fun he => hab (hca.symm.trans he)
-    rw [if_neg hcb, zero_sub, mul_neg] at kb
+    rw [ite_eq_right hcb, zero_sub, mul_neg] at kb
     by_cases hdb : d = b
     · exact Or.inl ⟨hca.symm, hdb.symm, ka⟩
-    · rw [if_neg hdb, mul_zero, neg_zero] at kb
+    · rw [ite_eq_right hdb, mul_zero, neg_zero] at kb
       exact absurd (neg_eq_zero.mp kb) hs
   · by_cases hda : d = a
     · -- Orientation B: `c ≠ a`, `d = a`, and `ka` collapses to `s = −t`.
-      rw [if_neg hca, if_pos hda, zero_sub, mul_neg_one] at ka
+      rw [ite_eq_right hca, ite_eq_left hda, zero_sub, mul_neg_one] at ka
       have hdb : d ≠ b := fun he => hab (hda.symm.trans he)
-      rw [if_neg hdb, sub_zero] at kb
+      rw [ite_eq_right hdb, sub_zero] at kb
       by_cases hcb : c = b
       · exact Or.inr ⟨hda.symm, hcb.symm, ka⟩
-      · rw [if_neg hcb, mul_zero] at kb
+      · rw [ite_eq_right hcb, mul_zero] at kb
         exact absurd (neg_eq_zero.mp kb) hs
     · -- Neither: `ka` forces `s = 0`, contradiction.
-      rw [if_neg hca, if_neg hda, sub_zero, mul_zero] at ka
+      rw [ite_eq_right hca, ite_eq_right hda, sub_zero, mul_zero] at ka
       exact absurd ka hs
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -907,7 +907,7 @@ theorem exists_uniform_image_of_constituents {L : Subgroup G} [Finite G] (hyp : 
     intro x hx y hy hxy
     have hxT : x ∈ T := Finset.mem_coe.mp hx
     have hyT : y ∈ T := Finset.mem_coe.mp hy
-    simp only [dif_pos hxT, dif_pos hyT] at hxy
+    simp only [dite_eq_left hxT, dite_eq_left hyT] at hxy
     exact Subtype.ext_iff.mp (T.equivFin.injective (sdf.injective hxy))
   · -- the pair relation
     intro α hα β hβ
@@ -937,7 +937,7 @@ theorem exists_uniform_image_of_constituents {L : Subgroup G} [Finite G] (hyp : 
           - ((β : ClassFunction ↥L ℂ) - (fam 0 : ClassFunction ↥L ℂ)) := by abel
     rw [hsub, map_sub, key α hαT, key β hβT, ← smul_sub]
     congr 1
-    simp only [dif_pos hαT, dif_pos hβT]
+    simp only [dite_eq_left hαT, dite_eq_left hβT]
     abel
 
 end OddOrder.Peterfalvi.S14

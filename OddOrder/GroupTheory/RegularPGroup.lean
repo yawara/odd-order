@@ -209,7 +209,7 @@ theorem pow_mul_eq_one_of_class_lt {p : ℕ} (hp : p.Prime) :
             Subgroup.nilpotent_iff_lowerCentralSeries.mpr ⟨p - 1, hgamma⟩
           obtain ⟨M, hMco, hyM⟩ :=
             (IsCoatomic.eq_top_or_exists_le_coatom (Subgroup.zpowers y)).resolve_left hycyc
-          have htfae := (Group.isNilpotent_of_finite_tfae (G := R)).out 0 2
+          have htfae := (Group.isNilpotent_of_finite_tfae (G := R)).out 1 3
           have : M.Normal := htfae.mp hnil M hMco
           have hcardM : Nat.card ↥M < Nat.card R := card_lt_card_of_lt_top hMco.1
           have hMclosed : ∀ a b : R, a ∈ M → b ∈ M → a ^ p = 1 → b ^ p = 1 →

@@ -520,12 +520,12 @@ theorem typeI_induced_char_constituents [Finite G]
       have hzero : ClassFunction.inner chi (φ : ClassFunction ↥L ℂ) = 0 := by
         rw [hchi_eq, ClassFunction.inner_induce_eq_inner_restrict, hrestrict,
           OddOrder.RepresentationTheory.inner_smul_right, irreducibleCharacter_inner,
-          if_neg hθ_ne, mul_zero]
+          ite_eq_right hθ_ne, mul_zero]
       have hone : ClassFunction.inner chi (φ : ClassFunction ↥L ℂ) = 1 := by
         rw [hchisum, inner_sum_left,
           Finset.sum_eq_single_of_mem φ hφ (fun φ' _ hne => by
-            rw [irreducibleCharacter_inner, if_neg hne]),
-          irreducibleCharacter_inner, if_pos rfl]
+            rw [irreducibleCharacter_inner, ite_eq_right hne]),
+          irreducibleCharacter_inner, ite_eq_left rfl]
       rw [hone] at hzero; exact one_ne_zero hzero
     -- (b) `C_H(x) = ⊥` would give `φ(x) = 0` (Pf (1.2)); so `C_H(x) ≠ ⊥`, i.e. `(x:G) ∈ A(L)`
     by_contra hxA
@@ -575,11 +575,11 @@ theorem frobenius_induce_char_singleton {Γ : Type*} [Group Γ] [Fintype Γ]
     have hzero : ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
         (trivialIrreducibleCharacter Γ : ClassFunction Γ ℂ) = 0 := by
       rw [ClassFunction.inner_induce_eq_inner_restrict, hrestrict,
-        irreducibleCharacter_inner_eq_ite, if_neg hθ]
+        irreducibleCharacter_inner_eq_ite, ite_eq_right hθ]
     have hcf : ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
         = (trivialIrreducibleCharacter Γ : ClassFunction Γ ℂ) :=
       congrArg (fun c : IrreducibleCharacter Γ => (c : ClassFunction Γ ℂ)) h
-    rw [hcf, irreducibleCharacter_inner_eq_ite, if_pos rfl] at hzero
+    rw [hcf, irreducibleCharacter_inner_eq_ite, ite_eq_left rfl] at hzero
     exact one_ne_zero hzero
   refine ⟨⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), hirr⟩, rfl,
     not_isReal_of_ne_trivial_of_odd_card' hodd hne_triv, ?_⟩

@@ -91,8 +91,8 @@ theorem linearIndependent_irreducibleCharacter [Finite G] :
   refine LinearIndependent.of_pairwise_dual_eq_zero_one _
     (fun ψ => innerDual (ψ : ClassFunction G ℂ)) (fun χ ψ hχψ => ?_) (fun χ => ?_)
   · simp only [innerDual_apply, irreducibleCharacter_inner]
-    rw [if_neg (Ne.symm hχψ)]
-  · simp only [innerDual_apply, irreducibleCharacter_inner, if_true]
+    rw [ite_eq_right (Ne.symm hχψ)]
+  · simp only [innerDual_apply, irreducibleCharacter_inner, ite_true]
 
 /-- **There are finitely many irreducible characters** of a finite group. -/
 theorem finite_irreducibleCharacter [Finite G] : Finite (IrreducibleCharacter G) :=

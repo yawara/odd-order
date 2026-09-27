@@ -89,8 +89,8 @@ theorem pi_sum_ite_single_eq_zero {p : ℕ} [Fact p.Prime] [CharP k p]
     refine Finset.sum_congr rfl fun g _ => ?_
     rw [hFapply]
     by_cases hg : S g
-    · rw [if_pos hg, if_pos hg]
-    · rw [if_neg hg, if_neg hg, map_zero, Pi.zero_apply]
+    · rw [ite_eq_left hg, ite_eq_left hg]
+    · rw [ite_eq_right hg, ite_eq_right hg, map_zero, Pi.zero_apply]
   -- `p` annihilates the matrix ring.
   have hchar' : ∀ a : Matrix (nn i) (nn i) k, p • a = 0 := by
     intro a
@@ -116,7 +116,7 @@ theorem pi_sum_ite_single_eq_zero {p : ℕ} [Fact p.Prime] [CharP k p]
   refine Finset.sum_eq_zero fun g hg => ?_
   have hgc : g ∈ Subgroup.centralizer (N : Set G) := by
     simpa [hD] using hg
-  rw [hFapply, if_neg fun hS => hdisj g hS hgc]
+  rw [hFapply, ite_eq_right fun hS => hdisj g hS hgc]
 
 /-- **Navarro (4.7).**  If `N ⊴ G` is a `p`-subgroup, `char k = p`, and the conjugacy class `C`
 avoids `C_G(N)`, then `π` kills the class sum `Ĉ`. -/

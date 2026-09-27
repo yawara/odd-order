@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.RepresentationTheory.Irreducible
 import Mathlib.Algebra.MonoidAlgebra.MapDomain
 import Mathlib.RingTheory.SimpleModule.Basic
@@ -518,7 +518,7 @@ theorem induceSum_conjBy_eq [Fintype G] [hH : H.Normal] (g : G) (θ : ClassFunct
       have hmem : g⁻¹ * (x'⁻¹ * g₀ * x') * g⁻¹⁻¹ ∈ H := hH.conj_mem _ hx g⁻¹
       have heq : g⁻¹ * (x'⁻¹ * g₀ * x') * g⁻¹⁻¹ = (x' * g)⁻¹ * g₀ * (x' * g) := by group
       rwa [heq] at hmem
-    rw [dif_pos hx, dif_pos hxg, conjBy_apply]
+    rw [dite_eq_left hx, dite_eq_left hxg, conjBy_apply]
     refine congrArg (θ : ↥H → ℂ) (Subtype.ext ?_)
     change (x'⁻¹ * g₀ * x' : G) = g * ((x' * g)⁻¹ * g₀ * (x' * g)) * g⁻¹
     group
@@ -528,7 +528,7 @@ theorem induceSum_conjBy_eq [Fintype G] [hH : H.Normal] (g : G) (θ : ClassFunct
       have hmem : g * ((x' * g)⁻¹ * g₀ * (x' * g)) * g⁻¹ ∈ H := hH.conj_mem _ hxg g
       have heq : g * ((x' * g)⁻¹ * g₀ * (x' * g)) * g⁻¹ = x'⁻¹ * g₀ * x' := by group
       rwa [heq] at hmem
-    rw [dif_neg hx, dif_neg hxg]
+    rw [dite_eq_right hx, dite_eq_right hxg]
 
 omit [Fintype H] in
 /-- Conjugating the inducing class function by an ambient `g : G` does not change the

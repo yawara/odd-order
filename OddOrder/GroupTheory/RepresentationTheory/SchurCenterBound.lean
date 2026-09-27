@@ -128,7 +128,7 @@ theorem sum_normSq_char_eq_card (ρ : Representation ℂ G V) [IsIrreducible ρ]
     exact Invertible.ne_zero _
   -- `char_orthonormal` (ρ = ρ): `(|G|)⁻¹ * ∑ χ g · χ g⁻¹ = 1`.
   have horth := ρ.char_orthonormal (σ := ρ)
-  rw [if_pos ⟨Representation.Equiv.refl ρ⟩] at horth
+  rw [ite_eq_left ⟨Representation.Equiv.refl ρ⟩] at horth
   -- so `∑ χ g · χ g⁻¹ = |G|`
   have hsumC : ∑ g : G, ρ.character g * ρ.character g⁻¹ = (Nat.card G : ℂ) := by
     have h : (Nat.card G : ℂ) * ((Nat.card G : ℂ)⁻¹ *

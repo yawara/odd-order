@@ -279,7 +279,7 @@ theorem escaping_sigmaSharp_disjoint_centralizer_of_witness [Finite G]
         (maximalSubgroupsContaining (Subgroup.centralizer ({z} : Set G))).Nonempty :=
       ⟨hgt, ⟨N₀, by rw [hN₀]; rfl⟩⟩
     have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase z = hbr.2.choose :=
-      dif_pos hbr
+      dite_eq_left hbr
     rw [hb]
     exact (mem_maximalSubgroupsContaining.mp hbr.2.choose_spec).1
   have hconj : ∃ g : G, MulAut.conj g • OddOrder.BG.Ch4.S16.FT_signalizerBase z = S := by
@@ -301,7 +301,7 @@ theorem escaping_sigmaSharp_disjoint_centralizer_of_witness [Finite G]
     have hbr : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement z).ncard ∧
         (maximalSubgroupsContaining (Subgroup.centralizer ({z} : Set G))).Nonempty :=
       ⟨hgt, ⟨N₀, by rw [hN₀]; rfl⟩⟩
-    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase z = hbr.2.choose := dif_pos hbr
+    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase z = hbr.2.choose := dite_eq_left hbr
     rw [hb, huniq _ hbr.2.choose_spec,
       huniq Nstr (mem_maximalSubgroupsContaining.mpr ⟨hNstr_max, hNstr_C⟩)]
   -- a prime of `orderOf z` lies in `τ₂(N[z]) = τ₂(S) = ∅`, but `z ≠ 1` — contradiction.
@@ -447,7 +447,7 @@ theorem escaping_sigmaSharp_signalizer_structure [Finite G]
       (maximalSubgroupsContaining (Subgroup.centralizer ({a} : Set G))).Nonempty :=
     ⟨hgt, ⟨N₀, by rw [hN₀]; rfl⟩⟩
   have hbase : OddOrder.BG.Ch4.S16.FT_signalizerBase a = N₀ := by
-    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase a = hbr.2.choose := dif_pos hbr
+    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase a = hbr.2.choose := dite_eq_left hbr
     rw [hb]
     exact huniq _ hbr.2.choose_spec
   obtain ⟨Nstr, ⟨hNstr_max, hNstr_C, -, -, -, -, hNstr_all⟩, -⟩ :=
@@ -566,7 +566,7 @@ theorem escaping_typeIA_signalizer_structure [Finite G]
       (maximalSubgroupsContaining (Subgroup.centralizer ({a} : Set G))).Nonempty :=
     ⟨hgt, ⟨N₀, by rw [hN₀]; rfl⟩⟩
   have hbase : OddOrder.BG.Ch4.S16.FT_signalizerBase a = N₀ := by
-    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase a = hbr.2.choose := dif_pos hbr
+    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase a = hbr.2.choose := dite_eq_left hbr
     rw [hb]
     exact huniq _ hbr.2.choose_spec
   -- unfold `R(a) = (N₀)_σ ⊓ C_G(a)` for the coprimality step.

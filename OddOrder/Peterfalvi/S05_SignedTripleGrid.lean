@@ -143,9 +143,9 @@ theorem caseII_false (hG : IsSignedTripleGrid A) {i₁ i₂ i₃ i₄ : ι} {j�
     hnoNeg _ hm (by rw [neg_neg, hset1]
                     exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem
                       (Finset.mem_singleton_self _)))
-  rw [if_neg hp1] at hO2
-  rw [if_neg hp2] at hO3
-  rw [if_neg hp3] at hO4
+  rw [ite_eq_right hp1] at hO2
+  rw [ite_eq_right hp2] at hO3
+  rw [ite_eq_right hp3] at hO4
   -- Atomise the indicators and finish by parity (sum of the three `O`s is `odd = even`).
   set n1 := (if χ1 ∈ A i₁ j₁ then 1 else 0 : ℕ)
   set n2 := (if χ2 ∈ A i₁ j₁ then 1 else 0 : ℕ)
@@ -219,7 +219,7 @@ theorem oStep (hG : IsSignedTripleGrid A) {i i' : ι} {j j' : κ} (hii : i ≠ i
   classical
   have hO := hG.inter_O i i' j j' hii hjj
   rw [hC, card_inter_triple _ hχu hχv huv, card_filter_neg_triple _ hχu hχv huv,
-    if_pos hχB, if_neg hnegχ] at hO
+    ite_eq_left hχB, ite_eq_right hnegχ] at hO
   set au := (if u ∈ A i j then (1 : ℕ) else 0) with hau
   set av := (if v ∈ A i j then (1 : ℕ) else 0) with hav
   set bu := (if -u ∈ A i j then (1 : ℕ) else 0) with hbu
@@ -230,19 +230,19 @@ theorem oStep (hG : IsSignedTripleGrid A) {i i' : ι} {j j' : κ} (hii : i ≠ i
   have hbv1 : bv ≤ 1 := by rw [hbv]; split <;> omega
   have cu : au + bu ≤ 1 := by
     rw [hau, hbu]; by_cases h : u ∈ A i j
-    · rw [if_pos h, if_neg (hG.neg_not_mem_self h)]
-    · rw [if_neg h]; split <;> omega
+    · rw [ite_eq_left h, ite_eq_right (hG.neg_not_mem_self h)]
+    · rw [ite_eq_right h]; split <;> omega
   have cv : av + bv ≤ 1 := by
     rw [hav, hbv]; by_cases h : v ∈ A i j
-    · rw [if_pos h, if_neg (hG.neg_not_mem_self h)]
-    · rw [if_neg h]; split <;> omega
+    · rw [ite_eq_left h, ite_eq_right (hG.neg_not_mem_self h)]
+    · rw [ite_eq_right h]; split <;> omega
   obtain ⟨hau0, hav0, hsum⟩ : au = 0 ∧ av = 0 ∧ bu + bv = 1 := by omega
   refine ⟨?_, ?_, ?_⟩
-  · intro h; rw [hau, if_pos h] at hau0; exact one_ne_zero hau0
-  · intro h; rw [hav, if_pos h] at hav0; exact one_ne_zero hav0
+  · intro h; rw [hau, ite_eq_left h] at hau0; exact one_ne_zero hau0
+  · intro h; rw [hav, ite_eq_left h] at hav0; exact one_ne_zero hav0
   · constructor
-    · intro h hnv'; rw [hbu, if_pos h, hbv, if_pos hnv'] at hsum; omega
-    · intro h; by_contra h'; rw [hbu, if_neg h', hbv, if_neg h] at hsum; omega
+    · intro h hnv'; rw [hbu, ite_eq_left h, hbv, ite_eq_left hnv'] at hsum; omega
+    · intro h; by_contra h'; rw [hbu, ite_eq_right h', hbv, ite_eq_right h] at hsum; omega
 
 open scoped Classical in
 /-- **(3.5.4) O-step (all-out)**: if `B = A i j` and `A i' j' = {x, y, z}` are `O`-related and
@@ -256,11 +256,11 @@ theorem oStep_out (hG : IsSignedTripleGrid A) {i i' : ι} {j j' : κ} (hii : i �
   classical
   have hO := hG.inter_O i i' j j' hii hjj
   rw [hC, card_inter_triple _ hxy hxz hyz, card_filter_neg_triple _ hxy hxz hyz,
-    if_neg hx, if_neg hy, if_neg hz] at hO
+    ite_eq_right hx, ite_eq_right hy, ite_eq_right hz] at hO
   refine ⟨?_, ?_, ?_⟩ <;> intro h
-  · rw [if_pos h] at hO; omega
-  · rw [if_pos h] at hO; omega
-  · rw [if_pos h] at hO; omega
+  · rw [ite_eq_left h] at hO; omega
+  · rw [ite_eq_left h] at hO; omega
+  · rw [ite_eq_left h] at hO; omega
 
 /-- Two members of the *same* cell are never negatives of each other. -/
 theorem ne_neg_of_mem_same (hG : IsSignedTripleGrid A) {i : ι} {j : κ}
@@ -277,9 +277,9 @@ theorem oStep_force (hG : IsSignedTripleGrid A) {i i' : ι} {j j' : κ} (hii : i
   classical
   have hO := hG.inter_O i i' j j' hii hjj
   rw [hC, card_inter_triple _ hxy hxz hyz, card_filter_neg_triple _ hxy hxz hyz,
-    if_neg hx, if_neg hy, if_pos hnx] at hO
+    ite_eq_right hx, ite_eq_right hy, ite_eq_left hnx] at hO
   by_contra hz
-  rw [if_neg hz] at hO; omega
+  rw [ite_eq_right hz] at hO; omega
 
 open scoped Classical in
 /-- **(3.5.4) O-step (both-out)**: if `B = A i j` and `A i' j' = {x, y, z}` are `O`-related with
@@ -294,11 +294,11 @@ theorem oStep_both_out (hG : IsSignedTripleGrid A) {i i' : ι} {j j' : κ}
   classical
   have hO := hG.inter_O i i' j j' hii hjj
   rw [hC, card_inter_triple _ hxy hxz hyz, card_filter_neg_triple _ hxy hxz hyz,
-    if_neg hx, if_neg hy, if_neg hnx, if_neg hny] at hO
+    ite_eq_right hx, ite_eq_right hy, ite_eq_right hnx, ite_eq_right hny] at hO
   refine ⟨?_, ?_⟩
-  · intro hz; rw [if_pos hz, if_neg (hG.neg_not_mem_self hz)] at hO; omega
+  · intro hz; rw [ite_eq_left hz, ite_eq_right (hG.neg_not_mem_self hz)] at hO; omega
   · intro hnz
-    rw [if_neg (fun hz => hG.neg_not_mem_self hz hnz), if_pos hnz] at hO; omega
+    rw [ite_eq_right (fun hz => hG.neg_not_mem_self hz hnz), ite_eq_left hnz] at hO; omega
 
 open scoped Classical in
 /-- **(3.5.4) L-step (third)**: in an `L`-linked cell `{x, y, z}` with `x, y ∉ B`, the unique
@@ -309,8 +309,8 @@ theorem lStep_third (hG : IsSignedTripleGrid A) {i i' : ι} {j j' : κ}
     (hx : x ∉ A i j) (hy : y ∉ A i j) : z ∈ A i j := by
   classical
   have hcard := hG.inter_L i i' j j' h
-  rw [hC, card_inter_triple _ hxy hxz hyz, if_neg hx, if_neg hy] at hcard
-  by_contra hz; rw [if_neg hz] at hcard; omega
+  rw [hC, card_inter_triple _ hxy hxz hyz, ite_eq_right hx, ite_eq_right hy] at hcard
+  by_contra hz; rw [ite_eq_right hz] at hcard; omega
 
 /-- Two distinct elements cannot both be shared by an `L`-linked pair of cells (`|A ∩ A'| = 1`). -/
 theorem not_two_shared (hG : IsSignedTripleGrid A) {i i' : ι} {j j' : κ}
@@ -602,8 +602,8 @@ theorem caseI_tail (hG : IsSignedTripleGrid A) {ra rb rc rt : ι} {j₀ j₁ : �
     have hfaB2 : fa ∈ A rb j₁ := by
       have hO := hG.inter_O rb ra j₁ j₀ hab.symm hj.symm
       rw [hLa, card_inter_triple _ dχma dχfa dmafa, card_filter_neg_triple _ dχma dχfa dmafa,
-        if_neg hχ_nB2, if_neg hma_nB2, if_pos hnfa] at hO
-      by_contra h; rw [if_neg h] at hO; omega
+        ite_eq_right hχ_nB2, ite_eq_right hma_nB2, ite_eq_left hnfa] at hO
+      by_contra h; rw [ite_eq_right h] at hO; omega
     exact hG.neg_not_mem_self hfaB2 hnfa
   have hχ8B2 : χ8 ∈ A rb j₁ :=
     lStep_third hG (Or.inr ⟨hbt, rfl⟩) hB3 dma_negfa dma_χ8 dnegfa_χ8 hma_nB2 hnegfa_nB2
@@ -625,17 +625,18 @@ theorem caseI_tail (hG : IsSignedTripleGrid A) {ra rb rc rt : ι} {j₀ j₁ : �
     have hnegfaB4 : -fa ∈ A rc j₁ := by
       have hO := hG.inter_O rc ra j₁ j₀ hac.symm hj.symm
       rw [hLa, card_inter_triple _ dχma dχfa dmafa, card_filter_neg_triple _ dχma dχfa dmafa,
-        if_neg hχ_nB4, if_pos hma, if_neg hnegχ_nB4, if_neg (hG.neg_not_mem_self hma)] at hO
-      by_contra h; rw [if_neg h] at hO; omega
+        ite_eq_right hχ_nB4, ite_eq_left hma, ite_eq_right hnegχ_nB4,
+        ite_eq_right (hG.neg_not_mem_self hma)] at hO
+      by_contra h; rw [ite_eq_right h] at hO; omega
     exact not_two_shared hG (Or.inr ⟨hct, rfl⟩) hma hmaB3 hnegfaB4 hnegfaB3 dma_negfa
   have hnegfa_nB4 : -fa ∉ A rc j₁ := by
     intro hnfa
     have hmaB4 : ma ∈ A rc j₁ := by
       have hO := hG.inter_O rc ra j₁ j₀ hac.symm hj.symm
       rw [hLa, card_inter_triple _ dχma dχfa dmafa, card_filter_neg_triple _ dχma dχfa dmafa,
-        if_neg hχ_nB4, if_neg (fun hfa => hG.neg_not_mem_self hfa hnfa), if_neg hnegχ_nB4,
-        if_pos hnfa] at hO
-      by_contra h; rw [if_neg h] at hO; omega
+        ite_eq_right hχ_nB4, ite_eq_right (fun hfa => hG.neg_not_mem_self hfa hnfa),
+        ite_eq_right hnegχ_nB4, ite_eq_left hnfa] at hO
+      by_contra h; rw [ite_eq_right h] at hO; omega
     exact hma_nB4 hmaB4
   have hχ8B4 : χ8 ∈ A rc j₁ :=
     lStep_third hG (Or.inr ⟨hct, rfl⟩) hB3 dma_negfa dma_χ8 dnegfa_χ8 hma_nB4 hnegfa_nB4
@@ -648,8 +649,8 @@ theorem caseI_tail (hG : IsSignedTripleGrid A) {ra rb rc rt : ι} {j₀ j₁ : �
       hma_nB4 hfb_nB4
   have hO := hG.inter_O rc rb j₁ j₀ hbc.symm hj.symm
   rw [hLb, card_inter_triple _ dχmb dχfb dmbfb, card_filter_neg_triple _ dχmb dχfb dmbfb,
-    if_neg hχ_nB4, if_neg hfb_nB4, if_pos hnegmbB4] at hO
-  have hmbB4 : mb ∈ A rc j₁ := by by_contra h; rw [if_neg h] at hO; omega
+    ite_eq_right hχ_nB4, ite_eq_right hfb_nB4, ite_eq_left hnegmbB4] at hO
+  have hmbB4 : mb ∈ A rc j₁ := by by_contra h; rw [ite_eq_right h] at hO; omega
   exact hG.neg_not_mem_self hmbB4 hnegmbB4
 
 open scoped Classical in
@@ -1336,8 +1337,8 @@ theorem two_col_orthonormal_family_reindexed [Fintype ι] [Fintype κ] (hG : IsS
     intro a b
     rw [hgfeq a, hgfeq b]
     split_ifs with hab
-    · subst hab; rw [hortho (E a) (E a), if_pos rfl]
-    · rw [hortho (E a) (E b), if_neg (fun h => hab (E.injective h))]
+    · subst hab; rw [hortho (E a) (E a), ite_eq_left rfl]
+    · rw [hortho (E a) (E b), ite_eq_right (fun h => hab (E.injective h))]
 
 end IsSignedTripleGrid
 

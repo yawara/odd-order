@@ -1378,7 +1378,7 @@ theorem typeP2_exists_regular_abelian_hall [Finite G] (hG : OddOrder.BG.IsMinima
         Subgroup.normalizer
           (((E₂ ⊔ E₃) ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) :=
       sup_le (le_trans le_sup_right Subgroup.le_normalizer) (fun e he =>
-        Subgroup.normalizer_inf_normalizer_le_normalizer_sup _ _
+        Subgroup.inf_normalizer_le_normalizer_sup _ _
           ⟨(hsetup.E23_normal hG) he, hMnormMσ (hsetup.E_le he)⟩)
     rwa [hsetup.E_compl_sup] at key
   · -- `K₀ ⊓ (U M_σ) = ⊥`: `E₁` is a `κ(M)`-group while `|U M_σ| = |U|·|M_σ|` is a `κ(M)'`-number

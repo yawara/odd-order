@@ -255,8 +255,8 @@ theorem chiRho_sub_chiRhoLinearCombo_apply (H76 : Hypothesis76 G A L)
       H76.hyp71.chiRho_of_not_mem χ (by
         rw [show ((1 : L) : G) = (1 : G) from rfl]
         exact H76.one_not_mem_A)
-    rw [h_chiRho_one, if_pos rfl, zero_sub]
-  · rw [if_neg hx1]
+    rw [h_chiRho_one, ite_eq_left rfl, zero_sub]
+  · rw [ite_eq_right hx1]
     by_cases hxH : (x : G) ∈ H76.H
     · -- (x : G) ∈ H and x ≠ 1, so we need (x : G) ≠ 1
       have hx_coe_ne_one : (x : G) ≠ 1 := by
@@ -295,8 +295,8 @@ theorem innerSum_chiRho_eq (H76 : Hypothesis76 G A L) (χ : ClassFunction G ℂ)
         H76.hyp71.chiRho_of_not_mem χ (by
           rw [show ((1 : L) : G) = (1 : G) from rfl]
           exact H76.one_not_mem_A)
-      rw [h_chi, star_zero, mul_zero, if_pos rfl, sub_self]
-    · rw [if_neg hx1]
+      rw [h_chi, star_zero, mul_zero, ite_eq_left rfl, sub_self]
+    · rw [ite_eq_right hx1]
       by_cases hxH : (x : G) ∈ H76.H
       · have hx_coe_ne_one : (x : G) ≠ 1 := by
           intro h
@@ -321,7 +321,7 @@ theorem innerSum_chiRho_eq (H76 : Hypothesis76 G A L) (χ : ClassFunction G ℂ)
   congr 1
   rw [Finset.sum_ite_eq' Finset.univ (1 : L) (fun _ =>
     H76.chiRhoLinearCombo χ 1 * star (H76.chiRhoLinearCombo χ 1))]
-  rw [if_pos (Finset.mem_univ _)]
+  rw [ite_eq_left (Finset.mem_univ _)]
 
 /-- **Inner-product of `S_χ` with itself** as a double sum over `i, j ≥ 1`:
 `(S_χ, S_χ) = Σ_{i, j ≥ 1} (c̄_i c_j / (‖ζ_i‖² ‖ζ_j‖²)) · (ζ_i, ζ_j)`.

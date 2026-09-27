@@ -245,7 +245,7 @@ theorem isPGroup_of_isNilpotent_of_isPGroup_abelianization {p : ℕ} [Fact p.Pri
   classical
   obtain ⟨P⟩ : Nonempty (Sylow p Γ) := inferInstance
   have hPnormal : (↑P : Subgroup Γ).Normal := by
-    have htfae := (Group.isNilpotent_of_finite_tfae (G := Γ)).out 0 3
+    have htfae := (Group.isNilpotent_of_finite_tfae (G := Γ)).out 1 4
     exact htfae.mp ‹_› p ‹_› P
   -- `Abelianization Q` is a `p`-group (image of `Abelianization Γ`).
   have hQab_p : IsPGroup p (Abelianization (Γ ⧸ (↑P : Subgroup Γ))) :=

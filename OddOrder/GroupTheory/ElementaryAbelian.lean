@@ -594,7 +594,7 @@ theorem IsElementaryAbelian.sup_of_le_centralizer {p : ℕ} {H K : Subgroup G}
       · exact hHK hyH x hxK
       · exact congrArg Subtype.val (hK.comm ⟨x, hxK⟩ ⟨y, hyK⟩)
   have hclosure_comm : IsMulCommutative (Subgroup.closure S) :=
-    Subgroup.isMulCommutative_closure hgen_comm
+    Subgroup.isMulCommutative_closure fun x hx y hy _ => hgen_comm x hx y hy
   refine ⟨?_, ?_⟩
   · intro x y
     have hx : (x : G) ∈ Subgroup.closure S := by

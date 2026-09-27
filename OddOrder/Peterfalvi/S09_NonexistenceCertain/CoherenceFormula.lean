@@ -429,8 +429,8 @@ theorem sourceZeta_orthogonal_of_irreducible_distinct (H78 : Hypothesis78 G A L)
           else 0 := by
   intro i hi j hj
   by_cases hij : i = j
-  · rw [if_pos hij, hij]
-  · rw [if_neg hij]
+  · rw [ite_eq_left hij, hij]
+  · rw [ite_eq_right hij]
     let χ : OddOrder.RepresentationTheory.IrreducibleCharacter L :=
       ⟨H78.hyp76.zeta i, hirr i hi⟩
     let ψ : OddOrder.RepresentationTheory.IrreducibleCharacter L :=
@@ -467,7 +467,7 @@ theorem sourceZeta_inner_zetaDistinct_eq_ite_of_irreducible_distinct
   rw [horth i hi H78.zetaDistinct hzeta_mem]
   by_cases hiz : i = H78.zetaDistinct
   · subst i
-    rw [if_pos rfl, if_pos rfl]
+    rw [ite_eq_left rfl, ite_eq_left rfl]
     exact hzeta_norm
   · simp [hiz]
 
@@ -522,15 +522,15 @@ theorem weightedNuSum_inner_zetaImage_eq_one (H78 : Hypothesis78 G A L)
       H78.nu_isometry i H78.zetaDistinct (Finset.ne_of_mem_erase (hs ▸ hi))
         H78.zetaDistinct_ne_ind1H, horth i hi]
     by_cases hiz : i = H78.zetaDistinct
-    · rw [if_pos hiz, if_pos hiz, mul_one]
-    · rw [if_neg hiz, if_neg hiz, mul_zero]
+    · rw [ite_eq_left hiz, ite_eq_left hiz, mul_one]
+    · rw [ite_eq_right hiz, ite_eq_right hiz, mul_zero]
   rw [hsum, Finset.sum_ite_eq' s H78.zetaDistinct
     (fun i =>
       H78.hyp76.zeta i (1 : L) /
         (H78.hyp76.zeta H78.zetaDistinct (1 : L) *
           ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i))),
-    if_pos hzeta_mem, horth H78.zetaDistinct hzeta_mem]
-  rw [if_pos rfl]
+    ite_eq_left hzeta_mem, horth H78.zetaDistinct hzeta_mem]
+  rw [ite_eq_left rfl]
   field_simp [hzeta_one_ne_zero]
 
 /-- Natural source-data version of `weightedNuSum_inner_zetaImage_eq_one`. -/
@@ -613,11 +613,11 @@ theorem weightedNuSum_inner_self_eq_of_source_orthogonal
     have hine : i ≠ H78.ind1H := Finset.ne_of_mem_erase (hs ▸ hi)
     rw [Finset.sum_eq_single i]
     · rw [H78.nu_isometry i i hine hine,
-        horth i (by simpa [hs] using hi) i (by simpa [hs] using hi), if_pos rfl]
+        horth i (by simpa [hs] using hi) i (by simpa [hs] using hi), ite_eq_left rfl]
     · intro j hj hji
       rw [H78.nu_isometry i j hine (Finset.ne_of_mem_erase (hs ▸ hj)),
         horth i (by simpa [hs] using hi) j (by simpa [hs] using hj),
-        if_neg (Ne.symm hji), mul_zero]
+        ite_eq_right (Ne.symm hji), mul_zero]
     · intro hnot
       exact False.elim (hnot hi)
   have hdiag :
@@ -690,8 +690,8 @@ theorem betaNormSq_eq_of_source_orthogonal
     have hi_s : i ∈ s := by simpa [hs] using hi
     rw [horth i hi H78.zetaDistinct (by simpa [hs] using hzeta_mem)]
     by_cases hiz : i = H78.zetaDistinct
-    · rw [if_pos hiz, if_pos hiz, hiz, hzeta_src_norm]
-    · rw [if_neg hiz, if_neg hiz]
+    · rw [ite_eq_left hiz, ite_eq_left hiz, hiz, hzeta_src_norm]
+    · rw [ite_eq_right hiz, ite_eq_right hiz]
   have hzeta_one_ne_zero : H78.hyp76.zeta H78.zetaDistinct (1 : L) ≠ 0 := by
     rw [hzeta_degree]
     exact_mod_cast H78.complementIndex_pos.ne'
@@ -1081,9 +1081,9 @@ theorem chiRho_norm_sq_eq_card_ratio_mul (H78 : Hypothesis78 G A L)
     intro l
     rw [Hypothesis71.chiRhoCF_apply]
     by_cases hl : (l : G) ∈ A
-    · rw [if_pos hl,
+    · rw [ite_eq_left hl,
           H78.chiRho_eq_inner_beta_on_A χ hχ_irr hχ_orth hl, star_star]
-    · rw [if_neg hl, H78.hyp76.hyp71.chiRho_of_not_mem χ hl, star_zero,
+    · rw [ite_eq_right hl, H78.hyp76.hyp71.chiRho_of_not_mem χ hl, star_zero,
           mul_zero]
   -- Aggregate the pointwise rewrite, then convert the indicator sum to a count.
   rw [show ∑ l : L,

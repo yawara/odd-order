@@ -548,7 +548,7 @@ theorem forall_mem_ne_trivial_of_induce_eq_sum
   have hzero : ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
       (trivialIrreducibleCharacter L : ClassFunction L ℂ) = 0 := by
     rw [ClassFunction.inner_induce_eq_inner_restrict, hrestrict,
-      irreducibleCharacter_inner_eq_ite, if_neg hθne]
+      irreducibleCharacter_inner_eq_ite, ite_eq_right hθne]
   rw [hsum, inner_sum_left] at hzero
   simp_rw [irreducibleCharacter_inner_eq_ite] at hzero
   rw [Finset.sum_boole] at hzero

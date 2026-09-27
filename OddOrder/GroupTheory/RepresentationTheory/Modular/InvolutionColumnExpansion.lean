@@ -238,7 +238,7 @@ theorem character_eq_add_add_basicDecompositionNumber {A : ι → κ → ℤ}
         (quotientPi_smul π hπ hlin hN) hnilQ φ
       = principalBlock (quotientPi π hπ hlin hN).toRingHom (quotientPi_surjective π hπ hlin hN)
           (quotientPi_smul π hπ hlin hN) hnilQ)
-    (fun φ hφ => by rw [principalBasicSet, if_neg hφ]) henum h01 h02 h12
+    (fun φ hφ => by rw [principalBasicSet, ite_eq_right hφ]) henum h01 h02 h12
   rw [show ((1 : ↥(centralizerOf x)) : G) = 1 from rfl, mul_one] at key
   rw [show (QuotientGroup.mk (1 : ↥(centralizerOf x)) : ↥(centralizerOf x) ⧸ N) = 1 from rfl,
     principalBasicSet_eq_one_of_trivial eQ (quotientPi_surjective π hπ hlin hN)
@@ -536,8 +536,8 @@ theorem exists_intColumns_basicDecompositionNumber {A : ι → κ → ℤ}
       (hconjall := hconjall) (hyb1 := hyb1) (hcart := hcart) (hj₀ := hj₀) (hjB := huB)
       (hjne := hune) (hkB := hvB) (hkne := hvne), hcardN]
     by_cases huv : u = v
-    · rw [if_pos huv, if_pos huv]; push_cast; ring
-    · rw [if_neg huv, if_neg huv]; push_cast; ring
+    · rw [ite_eq_left huv, ite_eq_left huv]; push_cast; ring
+    · rw [ite_eq_right huv, ite_eq_right huv]; push_cast; ring
   -- Navarro's equation (5): the degree column is orthogonal to every basic-set column
   have hdeg : ∀ u : κ, (∑ i : J, gdeg i * col u i) = 0 := fun u =>
     sum_mul_eq_of_intCast (fun i => (hgdeg i).symm) (fun i => hcol u i) (by
@@ -564,8 +564,8 @@ theorem exists_intColumns_basicDecompositionNumber {A : ι → κ → ℤ}
       (hconjall := hconjall) (hyb1 := hyb1) (hcart := hcart) (hi₀B := hi₀B) (hi₀ := hi₀)
       (hj₀ := hj₀) (hl₀B := hl₀B) (hl₀ := hl₀) (hl₀ne := hl₀ne) (hjB := huB) (hjne := hune)]
     by_cases hu : u = l₀
-    · rw [if_pos hu, if_pos hu, Int.cast_one]
-    · rw [if_neg hu, if_neg hu, Int.cast_zero]
+    · rw [ite_eq_left hu, ite_eq_left hu, Int.cast_one]
+    · rw [ite_eq_right hu, ite_eq_right hu, Int.cast_zero]
   -- off `Irr(B_0(G))` the columns vanish
   have hvan : ∀ (u : κ), blockOfIrr eQ (quotientPi_surjective π hπ hlin hN)
         (quotientPi_smul π hπ hlin hN) hnilQ u

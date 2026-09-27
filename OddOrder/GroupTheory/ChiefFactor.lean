@@ -278,9 +278,9 @@ theorem maxProperNormalOrBot_normal (K : Subgroup G) :
   classical
   unfold maxProperNormalOrBot
   by_cases h : ∃ L : Subgroup G, L.Normal ∧ L < K
-  · rw [dif_pos h]
+  · rw [dite_eq_left h]
     exact (maxProperNormalOrBot_choose_spec h).1
-  · rw [dif_neg h]
+  · rw [dite_eq_right h]
     exact inferInstance
 
 instance maxProperNormalOrBot_instNormal (K : Subgroup G) :
@@ -291,9 +291,9 @@ theorem maxProperNormalOrBot_le (K : Subgroup G) :
   classical
   unfold maxProperNormalOrBot
   by_cases h : ∃ L : Subgroup G, L.Normal ∧ L < K
-  · rw [dif_pos h]
+  · rw [dite_eq_left h]
     exact (maxProperNormalOrBot_choose_spec h).2.1.le
-  · rw [dif_neg h]
+  · rw [dite_eq_right h]
     exact bot_le
 
 theorem maxProperNormalOrBot_lt_of_ne_bot {K : Subgroup G} (hK : K ≠ ⊥) :
@@ -302,7 +302,7 @@ theorem maxProperNormalOrBot_lt_of_ne_bot {K : Subgroup G} (hK : K ≠ ⊥) :
   have h_exists : ∃ L : Subgroup G, L.Normal ∧ L < K :=
     ⟨⊥, inferInstance, bot_lt_iff_ne_bot.mpr hK⟩
   unfold maxProperNormalOrBot
-  rw [dif_pos h_exists]
+  rw [dite_eq_left h_exists]
   exact (maxProperNormalOrBot_choose_spec h_exists).2.1
 
 theorem isChiefFactor_maxProperNormalOrBot
@@ -321,7 +321,7 @@ theorem isChiefFactor_maxProperNormalOrBot
     have hV_max : ∀ W' : Subgroup G, W'.Normal → W' < K →
         maxProperNormalOrBot K ≤ W' → W' ≤ maxProperNormalOrBot K := by
       unfold maxProperNormalOrBot
-      rw [dif_pos h_exists]
+      rw [dite_eq_left h_exists]
       exact (maxProperNormalOrBot_choose_spec h_exists).2.2
     exact le_antisymm (hV_max W hW_normal h_WK_lt hVW) hVW
   · right

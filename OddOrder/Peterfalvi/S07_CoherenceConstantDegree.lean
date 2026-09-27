@@ -279,16 +279,16 @@ noncomputable def isCoherent_pair_of_differenceImage
         pairExtension_chiConj hχ hχbar hortho']
     have hμμ0 : ClassFunction.inner (hχ.mu : ClassFunction G ℂ) (hχ.mu : ClassFunction G ℂ)
         = 1 := by
-      rw [irreducibleCharacter_inner, if_pos rfl]
+      rw [irreducibleCharacter_inner, ite_eq_left rfl]
     have hμν0 : ClassFunction.inner (hχ.mu : ClassFunction G ℂ) (hχ.nu : ClassFunction G ℂ)
         = 0 := by
-      rw [irreducibleCharacter_inner, if_neg hχ.distinct]
+      rw [irreducibleCharacter_inner, ite_eq_right hχ.distinct]
     have hνμ0 : ClassFunction.inner (hχ.nu : ClassFunction G ℂ) (hχ.mu : ClassFunction G ℂ)
         = 0 := by
-      rw [irreducibleCharacter_inner, if_neg (Ne.symm hχ.distinct)]
+      rw [irreducibleCharacter_inner, ite_eq_right (Ne.symm hχ.distinct)]
     have hνν0 : ClassFunction.inner (hχ.nu : ClassFunction G ℂ) (hχ.nu : ClassFunction G ℂ)
         = 1 := by
-      rw [irreducibleCharacter_inner, if_pos rfl]
+      rw [irreducibleCharacter_inner, ite_eq_left rfl]
     rw [hextφ, hextψ]
     simp only [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
       ← Int.cast_smul_eq_zsmul ℂ, ClassFunction.inner_smul_left, ClassFunction.inner_smul_right,

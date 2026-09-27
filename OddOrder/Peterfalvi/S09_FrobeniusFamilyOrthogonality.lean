@@ -297,7 +297,7 @@ theorem hypothesis78_nu_zeta_inner_conj_eq_zero_at
     exact F.hypothesis78_zeta_ne_conj_at i hodd hnilp C hFrob hr
   have h := irreducibleCharacter_inner_eq_ite
     (⟨_, hirr_r⟩ : IrreducibleCharacter ↥(F.L i)) ⟨_, hirr_r'⟩
-  rwa [if_neg (fun heq => hne (congrArg Subtype.val heq))] at h
+  rwa [ite_eq_right (fun heq => hne (congrArg Subtype.val heq))] at h
 
 end GeneralIndex
 
@@ -466,8 +466,8 @@ theorem hypothesis78_weightedNuSum_inner_self_eq :
           else 0 := by
     intro r _ s _
     by_cases hrs : r = s
-    · rw [if_pos hrs, hrs]
-    · rw [if_neg hrs, congrFun hzeta r, congrFun hzeta s]
+    · rw [ite_eq_left hrs, hrs]
+    · rw [ite_eq_right hrs, congrFun hzeta r, congrFun hzeta s]
       exact Cert.induce_family_orthogonal_of_injective
         ((F.H i).subgroupOf (F.L i)) pf.θ pf.inj r s hrs
   have hnorm_ne : ∀ r ∈ (Finset.univ.erase H78.ind1H),

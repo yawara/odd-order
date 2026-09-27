@@ -233,9 +233,9 @@ theorem mem_inducedVirtualCharacters_of_mem_adjoinSpan {θ : G → K}
       intro j
       by_cases hjj : j = j₀
       · subst hjj
-        rw [if_pos rfl, if_pos rfl, Int.cast_sub, sub_mul, hj₀]
+        rw [ite_eq_left rfl, ite_eq_left rfl, Int.cast_sub, sub_mul, hj₀]
         norm_num
-      · rw [if_neg hjj, if_neg hjj, sub_zero]
+      · rw [ite_eq_right hjj, ite_eq_right hjj, sub_zero]
     rw [Finset.sum_congr rfl fun j (_ : j ∈ Finset.univ) => hexp j, Finset.sum_sub_distrib, hsum]
     simp
   -- so `u j₀` and `θ` pair identically against every block character
@@ -243,7 +243,7 @@ theorem mem_inducedVirtualCharacters_of_mem_adjoinSpan {θ : G → K}
     refine eq_of_charPairing_eq e (fun g h => virtualCharacters_conj hchθ g h)
       (fun g h => virtualCharacters_conj (huch j₀) g h) fun i => ?_
     have h0 := hzero i j₀
-    rw [if_pos rfl, sub_eq_zero] at h0
+    rw [ite_eq_left rfl, sub_eq_zero] at h0
     rw [← ha i, ← hb j₀ i, h0]
   rw [hEq]
   exact hu j₀

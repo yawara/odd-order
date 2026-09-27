@@ -115,9 +115,9 @@ theorem centralScalar_ordinaryIdempotent (j : ι') :
     exact Finset.sum_congr rfl fun g _ => mul_comm _ _]
   by_cases hij : i = j
   · subst hij
-    rw [if_pos rfl, if_pos rfl, one_mul]
+    rw [ite_eq_left rfl, ite_eq_left rfl, one_mul]
     rw [mul_comm (⅟(Nat.card G : K)) _, mul_assoc, invOf_mul_self, mul_one]
-  · rw [if_neg hij, if_neg hij, mul_zero, zero_mul]
+  · rw [ite_eq_right hij, ite_eq_right hij, mul_zero, zero_mul]
 
 /-- **`e(e_{χ_i}) = Pi.single i 1`**: the `i`-th block sees `e_{χ_i}` as the identity, the others
 as zero. -/
@@ -133,12 +133,12 @@ theorem apply_ordinaryIdempotent : e (ordinaryIdempotent e i) = Pi.single i 1 :=
   rw [hscal, centralScalar_ordinaryIdempotent]
   by_cases hij : i = j
   · subst hij
-    rw [if_pos rfl, Pi.single_eq_same]
+    rw [ite_eq_left rfl, Pi.single_eq_same]
     ext a b
     by_cases hab : a = b
     · subst hab; simp [Matrix.scalar_apply, Matrix.one_apply_eq]
     · simp [Matrix.scalar_apply, Matrix.diagonal_apply_ne _ hab, Matrix.one_apply_ne hab]
-  · rw [if_neg hij, Pi.single_eq_of_ne (Ne.symm hij)]
+  · rw [ite_eq_right hij, Pi.single_eq_of_ne (Ne.symm hij)]
     simp
 
 /-! ### The `e_{χ_i}` form a complete orthogonal family -/
@@ -150,12 +150,12 @@ theorem ordinaryIdempotent_mul (j : ι') :
   rw [map_mul, apply_ordinaryIdempotent, apply_ordinaryIdempotent, apply_ite e, map_zero]
   by_cases hij : i = j
   · subst hij
-    rw [if_pos rfl, apply_ordinaryIdempotent]
+    rw [ite_eq_left rfl, apply_ordinaryIdempotent]
     funext a
     by_cases ha : a = i
     · subst ha; simp
     · simp [Pi.single_eq_of_ne ha]
-  · rw [if_neg hij]
+  · rw [ite_eq_right hij]
     funext a
     by_cases ha : a = i
     · subst ha
@@ -167,7 +167,7 @@ theorem isIdempotentElem_ordinaryIdempotent :
     IsIdempotentElem (ordinaryIdempotent e i) := by
   classical
   have h := ordinaryIdempotent_mul e i i
-  rwa [if_pos rfl] at h
+  rwa [ite_eq_left rfl] at h
 
 variable [Fintype ι']
 

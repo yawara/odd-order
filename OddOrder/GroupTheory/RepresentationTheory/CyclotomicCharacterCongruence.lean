@@ -72,7 +72,7 @@ theorem int_dvd_of_intCast_eq_mul_isIntegral {a b : ℤ} (hb : b ≠ 0) {W : ℂ
   have hWeq : W = algebraMap ℚ ℂ ((a : ℚ) / (b : ℚ)) := by
     rw [map_div₀, map_intCast, map_intCast, eq_div_iff hb', mul_comm]; exact h.symm
   have hqInt : IsIntegral ℤ ((a : ℚ) / (b : ℚ)) :=
-    (isIntegral_algebraMap_iff (algebraMap ℚ ℂ).injective).mp (hWeq ▸ hW)
+    isIntegral_algebraMap_iff.mp (hWeq ▸ hW)
   obtain ⟨m, hm⟩ := IsIntegrallyClosed.isIntegral_iff.mp hqInt
   refine ⟨m, ?_⟩
   have key : (a : ℚ) = (b : ℚ) * (m : ℚ) := by
@@ -247,7 +247,7 @@ theorem exists_integral_apply_sub_of_commute {p : ℕ} (hp : 0 < p) {ε : ℂ}
     ∃ z : ℂ, IsIntegral ℤ z ∧ ψ (x * y) - ψ y = (1 - ε) * z := by
   set A := Subgroup.closure ({x, y} : Set G) with hA
   have : IsMulCommutative ↥A := by
-    refine Subgroup.isMulCommutative_closure (fun a ha b hb => ?_)
+    refine Subgroup.isMulCommutative_closure (fun a ha b hb _ => ?_)
     simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at ha hb
     rcases ha with rfl | rfl <;> rcases hb with rfl | rfl
     · exact Commute.refl _

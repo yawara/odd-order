@@ -739,7 +739,7 @@ theorem fiber_regroup (hyp : Hypothesis G A L) (a : {a : G // a ∈ A})
   apply Finset.sum_congr rfl
   intro b _
   by_cases hQ : ∃ x ∈ hyp.H a, IsConj (a.1 * x) b
-  · rw [if_pos hQ]
+  · rw [ite_eq_left hQ]
     obtain ⟨x₀, hx₀, hx₀conj⟩ := hQ
     have hcard : (Finset.univ.filter (fun p : (hyp.H a) × G => ν p = b)).card
         = Nat.card (Subgroup.centralizer ({a.1} : Set G)) := by
@@ -759,7 +759,7 @@ theorem fiber_regroup (hyp : Hypothesis G A L) (a : {a : G // a ∈ A})
           Finset.sum_const _
       _ = (Nat.card (Subgroup.centralizer ({a.1} : Set G)) : ℂ) * F b := by
           rw [hcard, nsmul_eq_mul]
-  · rw [if_neg hQ]
+  · rw [ite_eq_right hQ]
     apply Finset.sum_eq_zero
     intro p hp
     exact absurd ⟨p.1, p.1.2, by

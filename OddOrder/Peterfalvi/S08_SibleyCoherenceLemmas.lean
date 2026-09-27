@@ -121,7 +121,8 @@ theorem crux_of_third_anchor_general
     have hrel3 := hyp.inner_extension_Xset_sub_eq_neg_one_general hF cX cY
       hη₁ hχ₁ hχ₃ hne₃₁ ha hdeg3
     rw [← hXc_def, h, ClassFunction.inner_neg_left, ClassFunction.inner_neg_left,
-      hXon χ₂ χ₃ hχ₂ hχ₃, if_neg (Ne.symm hne₃₂), hXon χ₂ χ₁ hχ₂ hχ₁, if_neg hne₂] at hrel3
+      hXon χ₂ χ₃ hχ₂ hχ₃, ite_eq_right (Ne.symm hne₃₂), hXon χ₂ χ₁ hχ₂ hχ₁,
+      ite_eq_right hne₂] at hrel3
     norm_num at hrel3
 
 open scoped Classical in
@@ -171,7 +172,8 @@ theorem crux_of_third_anchor_general_c2_caseA
     have hrel3 := hyp.inner_extension_Xset_sub_eq_neg_one_general_c2_caseA hK hW1 hA cX cY
       hη₁ hχ₁ hχ₃ hne₃₁ ha hdeg3
     rw [← hXc_def, h, ClassFunction.inner_neg_left, ClassFunction.inner_neg_left,
-      hXon χ₂ χ₃ hχ₂ hχ₃, if_neg (Ne.symm hne₃₂), hXon χ₂ χ₁ hχ₂ hχ₁, if_neg hne₂] at hrel3
+      hXon χ₂ χ₃ hχ₂ hχ₃, ite_eq_right (Ne.symm hne₃₂), hXon χ₂ χ₁ hχ₂ hχ₁,
+      ite_eq_right hne₂] at hrel3
     norm_num at hrel3
 
 /-- **(6.8.1) crux (`n ≥ 3` case)** at the fixed witnesses (specialization of
@@ -570,8 +572,8 @@ theorem inner_tau_scaledDiff_tau_Xset_scaledDiff_of_frobenius
       inner_eq_zero_of_mem_span_of_disjoint_irreducible (fun φ hφ => hXirr φ hφ)
         (fun φ hφ => hYirr φ hφ) hdisj ψ (Submodule.subset_span hψ) η₁ (Submodule.subset_span hη₁),
       star_zero]
-  have e13 : ClassFunction.inner χ₁ χ₃ = 0 := by rw [hXon χ₁ χ₃ hχ₁ hχ₃, if_neg (Ne.symm hne)]
-  have e11 : ClassFunction.inner χ₁ χ₁ = 1 := by rw [hXon χ₁ χ₁ hχ₁ hχ₁, if_pos rfl]
+  have e13 : ClassFunction.inner χ₁ χ₃ = 0 := by rw [hXon χ₁ χ₃ hχ₁ hχ₃, ite_eq_right (Ne.symm hne)]
+  have e11 : ClassFunction.inner χ₁ χ₁ = 1 := by rw [hXon χ₁ χ₁ hχ₁ hχ₁, ite_eq_left rfl]
   have ey3 : ClassFunction.inner η₁ χ₃ = 0 := hYXz χ₃ hχ₃
   have ey1 : ClassFunction.inner η₁ χ₁ = 0 := hYXz χ₁ hχ₁
   rw [hiso, ← Nat.cast_smul_eq_nsmul ℂ a η₁, ← Nat.cast_smul_eq_nsmul ℂ d χ₁]
@@ -635,8 +637,8 @@ theorem inner_tau_scaledDiff_tau_Xset_scaledDiff_c2_caseA
       inner_eq_zero_of_mem_span_of_disjoint_irreducible (fun φ hφ => hXirr φ hφ)
         (fun φ hφ => hYirr φ hφ) hdisj ψ (Submodule.subset_span hψ) η₁ (Submodule.subset_span hη₁),
       star_zero]
-  have e13 : ClassFunction.inner χ₁ χ₃ = 0 := by rw [hXon χ₁ χ₃ hχ₁ hχ₃, if_neg (Ne.symm hne)]
-  have e11 : ClassFunction.inner χ₁ χ₁ = 1 := by rw [hXon χ₁ χ₁ hχ₁ hχ₁, if_pos rfl]
+  have e13 : ClassFunction.inner χ₁ χ₃ = 0 := by rw [hXon χ₁ χ₃ hχ₁ hχ₃, ite_eq_right (Ne.symm hne)]
+  have e11 : ClassFunction.inner χ₁ χ₁ = 1 := by rw [hXon χ₁ χ₁ hχ₁ hχ₁, ite_eq_left rfl]
   have ey3 : ClassFunction.inner η₁ χ₃ = 0 := hYXz χ₃ hχ₃
   have ey1 : ClassFunction.inner η₁ χ₁ = 0 := hYXz χ₁ hχ₁
   rw [hiso, ← Nat.cast_smul_eq_nsmul ℂ a η₁, ← Nat.cast_smul_eq_nsmul ℂ d χ₁]

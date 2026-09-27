@@ -702,7 +702,7 @@ theorem typeII_T2_memberRFamily_imageSet_of_irr [Finite G]
     obtain ⟨n, -, hn⟩ := typeII_sOf_apply_one_eq_pos_natCast data hlam_mem
     rw [hn, star_natCast]
   · unfold typeII_T2_memberRFamily
-    rw [dif_pos hirr]
+    rw [dite_eq_left hirr]
 
 open scoped Classical FiniteInduce in
 set_option backward.isDefEq.respectTransparency false in
@@ -741,7 +741,7 @@ theorem typeII_T2_memberRFamily_imageSet_of_col [Finite G]
     hηIKF hcol
   refine ⟨hex.choose, hex.choose_spec.1, hex.choose_spec.2, ?_⟩
   unfold typeII_T2_memberRFamily
-  rw [dif_neg hcol]
+  rw [dite_eq_right hcol]
   rfl
 
 set_option maxHeartbeats 1600000 in
@@ -845,7 +845,7 @@ theorem typeII_T2_memberRFamily_orthogonal [Finite G]
       intro heq
       have hφξ : φ = ξ := by rw [hkφeq, hkξeq, heq]
       rw [hφξ, hkξeq, OddOrder.Peterfalvi.S06.columnSum_def,
-        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl] at h1
+        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, ite_eq_left rfl] at h1
       exact hw1ne h1
     have hne2 : kφ ≠ kξ⁻¹ := by
       intro heq
@@ -853,7 +853,7 @@ theorem typeII_T2_memberRFamily_orthogonal [Finite G]
         rw [hkφeq, heq, ← OddOrder.Peterfalvi.S06.columnSum_conj_eq, hkξeq]
       rw [hφξc, hkξeq, OddOrder.Peterfalvi.S06.columnSum_conj_eq,
         OddOrder.Peterfalvi.S06.columnSum_def,
-        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl] at h2
+        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, ite_eq_left rfl] at h2
       exact hw1ne h2
     exact OddOrder.Peterfalvi.S06.certainTypeR_imageSet_orthogonal_certainTypeR
       (typeIIHypothesis46 hG hSmax hSII data.typeP) hkφ0 hkξ0
@@ -928,7 +928,7 @@ theorem typeII_T2_coherent [Finite G]
         (Y.subgroupOf S) (hT2IKF a ha) h.symm)
     ⟨1, by
       have h := irreducibleCharacter_inner_eq_ite ⟨lam, hlam_irr⟩ ⟨lam, hlam_irr⟩
-      rw [if_pos rfl] at h
+      rw [ite_eq_left rfl] at h
       simpa using h⟩
     (fun {φ ψ} hφ hψ =>
       OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_of_supported
@@ -1105,13 +1105,13 @@ theorem TypeIICrossIsometryData.elim [Finite G]
       rw [OddOrder.RepresentationTheory.inner_sum_right]
       by_cases hir : i = pkg.r'
       · subst hir
-        rw [if_pos rfl, Finset.sum_eq_single s]
+        rw [ite_eq_left rfl, Finset.sum_eq_single s]
         · rw [heta_def, hyp.alignedOmegaSigmaGrid_inner]; simp
         · intro j _ hjs
           rw [heta_def, hyp.alignedOmegaSigmaGrid_inner]
           simp [Ne.symm hjs]
         · intro h; exact absurd (Finset.mem_univ s) h
-      · rw [if_neg hir]
+      · rw [ite_eq_right hir]
         refine Finset.sum_eq_zero fun j _ => ?_
         rw [heta_def, hyp.alignedOmegaSigmaGrid_inner]
         simp [hir]

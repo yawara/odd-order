@@ -144,9 +144,9 @@ theorem card_mul_cartanMatrix_principalBlock :
     simp only [cartanMatrix, Nat.cast_sum, Nat.cast_mul, Finset.sum_filter]
     refine Finset.sum_congr rfl fun i _ => ?_
     by_cases hi : blockOfIrr e hπ hlin hnil i = principalBlock π hπ hlin hnil
-    · rw [if_pos hi, decompositionMatrix_principalBlock_eq_card hp hω hω' hπ hlin hkerJ hnil e
+    · rw [ite_eq_left hi, decompositionMatrix_principalBlock_eq_card hp hω hω' hπ hlin hkerJ hnil e
         hNp hquot S hφ₀ hi, sq]
-    · rw [if_neg hi, decompositionMatrix_principalBlock_eq_zero hp hω hω' hπ hlin hkerJ hnil e
+    · rw [ite_eq_right hi, decompositionMatrix_principalBlock_eq_zero hp hω hω' hπ hlin hkerJ hnil e
         hφ₀ hi, Nat.cast_zero, mul_zero]
   rw [hsum]
   exact card_mul_sum_sq_principalBlock e hπ hlin hnil ‹N.Normal› hNp S.isPGroup'

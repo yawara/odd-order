@@ -137,8 +137,8 @@ theorem induce_trivial_stabilizer_apply (ω₀ : Ω) [IsPretransitive G Ω]
     have hmem : x⁻¹ * g * x ∈ stabilizer G ω₀ ↔ g • (x • ω₀) = x • ω₀ := by
       rw [mem_stabilizer_iff, mul_smul, mul_smul, inv_smul_eq_iff, eq_comm]
     by_cases hx : g • (x • ω₀) = x • ω₀
-    · rw [induceTerm_of_mem _ (hmem.mpr hx), trivialClassFunction_apply, if_pos hx]
-    · rw [induceTerm_of_not_mem _ (fun h => hx (hmem.mp h)), if_neg hx]
+    · rw [induceTerm_of_mem _ (hmem.mpr hx), trivialClassFunction_apply, ite_eq_left hx]
+    · rw [induceTerm_of_not_mem _ (fun h => hx (hmem.mp h)), ite_eq_right hx]
   rw [Finset.sum_congr rfl fun x _ => hterm x, Finset.sum_boole]
   have hcount : (Finset.univ.filter fun x : G => g • (x • ω₀) = x • ω₀).card
       = Nat.card (fixedBy Ω g) * Nat.card (stabilizer G ω₀) := by

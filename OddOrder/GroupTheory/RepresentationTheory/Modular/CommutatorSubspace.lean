@@ -130,14 +130,14 @@ theorem classCoeffSum_single (C : ConjClasses G) (a : G) (c : k) :
   classical
   rw [classCoeffSum_apply]
   by_cases h : ConjClasses.mk a = C
-  · rw [if_pos h]
+  · rw [ite_eq_left h]
     rw [Finset.sum_eq_single a]
     · simp
     · intro b _ hb
       simp [Ne.symm hb]
     · intro hmem
       exact absurd (Finset.mem_filter.mpr ⟨Finset.mem_univ a, h⟩) hmem
-  · rw [if_neg h, Finset.sum_eq_zero]
+  · rw [ite_eq_right h, Finset.sum_eq_zero]
     intro b hb
     have hbC : ConjClasses.mk b = C := (Finset.mem_filter.mp hb).2
     have hab : a ≠ b := fun hEq => h (hEq ▸ hbC)

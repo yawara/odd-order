@@ -105,8 +105,8 @@ theorem projMatrix_mul_brauerMatrix :
     ring
   rw [Finset.sum_congr rfl fun φ _ => hexp φ, ← Finset.mul_sum, hrel]
   by_cases h : j = j'
-  · rw [if_pos h, if_pos (by rw [h]), inv_mul_cancel₀ hunit.ne_zero]
-  · rw [if_neg h, if_neg fun hc =>
+  · rw [ite_eq_left h, ite_eq_left (by rw [h]), inv_mul_cancel₀ hunit.ne_zero]
+  · rw [ite_eq_right h, ite_eq_right fun hc =>
       h ((pRegularRep_isConj_iff hp hπ hlin hkerJ j' j).mp hc).symm, mul_zero]
 
 /-- **`B · A = 1`** — the character table of the `p`-regular classes is square (`|IBr(G)| =
@@ -172,16 +172,16 @@ theorem sum_pRegular_eq_sum_pRegularRep [Fintype G] {M : Type*} [AddCommMonoid M
       (if IsPRegular p g then f g else 0) = (if IsPRegular p h then f h else 0) := by
     intro g h hc
     by_cases hg : IsPRegular p g
-    · rw [if_pos hg, if_pos (isPRegular_of_isConj hg hc), hf _ _ hc]
-    · rw [if_neg hg, if_neg fun hh => hg (isPRegular_of_isConj hh hc.symm)]
+    · rw [ite_eq_left hg, ite_eq_left (isPRegular_of_isConj hg hc), hf _ _ hc]
+    · rw [ite_eq_right hg, ite_eq_right fun hh => hg (isPRegular_of_isConj hh hc.symm)]
   have hvan : ∀ g : G, ¬ IsPRegular p g → (if IsPRegular p g then f g else 0) = 0 :=
-    fun g hg => if_neg hg
+    fun g hg => ite_eq_right hg
   have hkey := sum_eq_sum_pRegularRep hp hπ hlin hkerJ
     (fun g => if IsPRegular p g then f g else 0) hclass hvan
   rw [← Finset.sum_filter] at hkey
   rw [hkey]
   exact Finset.sum_congr rfl fun j _ => by
-    rw [if_pos (isPRegular_pRegularRep hp hπ hlin hkerJ j)]
+    rw [ite_eq_left (isPRegular_pRegularRep hp hπ hlin hkerJ j)]
 
 /-- **`[Φ_θ, φ]⁰ = δ_{φθ}`, as a sum over the `p`-regular classes** — the matrix content of
 Navarro (2.13). -/
@@ -323,7 +323,7 @@ theorem sum_projectiveIndecomposableCharacter_mul_eq (μ : ι)
         exact Finset.sum_congr rfl fun τ _ => by rw [← Finset.mul_sum, hpair τ]
     _ = (Nat.card G : K) * d μ := by
         simp only [mul_ite, mul_one, mul_zero, Finset.sum_ite_eq' Finset.univ μ,
-          Finset.mem_univ, if_true]
+          Finset.mem_univ, ite_true]
         ring
 
 include hp hπ hlin hkerJ in
@@ -391,7 +391,7 @@ theorem exists_decompositionMatrix_ne_zero (φ : ι) :
     refine Finset.sum_eq_zero fun i _ => ?_
     rw [hall i, Nat.cast_zero, zero_mul]
   have h1 := sum_brauer_mul_projectiveIndecomposableCharacter hp hω hω' hπ hlin hkerJ e φ φ
-  rw [if_pos rfl] at h1
+  rw [ite_eq_left rfl] at h1
   rw [Finset.sum_congr rfl fun j _ => by rw [hΦ, mul_zero, map_zero, mul_zero],
     Finset.sum_const_zero] at h1
   exact zero_ne_one h1

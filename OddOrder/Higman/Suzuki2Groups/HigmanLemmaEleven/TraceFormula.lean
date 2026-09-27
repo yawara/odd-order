@@ -85,9 +85,9 @@ theorem twice_gap_ne_zero_of_odd_degree
     rw [Fin.val_add_eq_ite] at hval
     simp only [Fin.val_zero] at hval
     by_cases hwrap : m ≤ r.val + r.val
-    · rw [if_pos hwrap] at hval
+    · rw [ite_eq_left hwrap] at hval
       omega
-    · rw [if_neg hwrap] at hval
+    · rw [ite_eq_right hwrap] at hval
       omega
   let : Fintype L := Fintype.ofFinite L
   have hcard : Fintype.card L = 2 ^ m := by
@@ -243,7 +243,6 @@ private theorem sum_upperTriangle_eq_sum_permEdges
     simp only [U, Finset.sum_filter]
     convert (Finset.sum_product (Finset.univ : Finset alpha) Finset.univ
       (fun p : alpha × alpha => if p.1 < p.2 then F p.1 p.2 else 0)).symm
-    congr 1
   exact (hflatten.trans hEU_sum.symm).trans hdirected.symm
 
 /-- Reduction of a natural index modulo the absolute first-layer degree. -/

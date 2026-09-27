@@ -425,8 +425,8 @@ theorem card_not_mem_conj_ge {G : Type*} [Group G] [Finite G] {H : Subgroup G} (
       rw [Finset.card_eq_sum_ones]
       exact Finset.sum_le_sum fun g _ => by
         by_cases h : f g = 0
-        · rw [if_pos h]; omega
-        · rw [if_neg h]; omega
+        · rw [ite_eq_left h]; omega
+        · rw [ite_eq_right h]; omega
     refine hle.trans ?_
     rw [Finset.sum_add_distrib, Finset.sum_boole]
     gcongr

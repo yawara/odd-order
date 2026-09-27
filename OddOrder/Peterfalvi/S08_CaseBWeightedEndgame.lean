@@ -385,8 +385,8 @@ theorem S_hasNoRealCharacters_caseB
     rw [ClassFunction.IsReal, ← hcol, OddOrder.Peterfalvi.S06.columnSum_conj_eq] at hreal
     have hgram_self := OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner h46 χ₂ χ₂
     have hgram_cross := OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner h46 χ₂ χ₂⁻¹
-    rw [if_pos rfl] at hgram_self
-    rw [if_neg (OddOrder.Peterfalvi.S06.column_inv_ne_self h46 hχ₂).symm] at hgram_cross
+    rw [ite_eq_left rfl] at hgram_self
+    rw [ite_eq_right (OddOrder.Peterfalvi.S06.column_inv_ne_self h46 hχ₂).symm] at hgram_cross
     simp only [← OddOrder.Peterfalvi.S06.columnSum_def] at hgram_self hgram_cross
     rw [hreal] at hgram_cross
     have hcontra : (Nat.card h46.W1 : ℂ) = 0 := hgram_self.symm.trans hgram_cross

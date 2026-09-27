@@ -224,8 +224,7 @@ theorem frobeniusTensorCoordinates_baseChange_lmul_apply
     frobeniusTensorCoordinates K
         ((Algebra.lmul (ZMod 2) K u).baseChange K z) i =
       u ^ (2 ^ i.val) * frobeniusTensorCoordinates K z i := by
-  induction z using TensorProduct.induction_on with
-  | zero => simp
+  induction z using TensorProduct.inductionOn with
   | tmul a x =>
       simp [mul_pow, mul_left_comm]
   | add x y hx hy =>
@@ -286,8 +285,7 @@ theorem baseChange_intertwine_of_linearEquiv_mul_compat
     (e.baseChange (ZMod 2) K V K) (T.baseChange K z) =
       (Algebra.lmul (ZMod 2) K u).baseChange K
         ((e.baseChange (ZMod 2) K V K) z) := by
-  induction z using TensorProduct.induction_on with
-  | zero => simp
+  induction z using TensorProduct.inductionOn with
   | tmul a v => simp [hcompat]
   | add x y hx hy => simp only [map_add, hx, hy]
 
@@ -471,8 +469,7 @@ theorem baseChange_intertwine_of_linearEquiv_mul_compat_along
     (e.baseChange (ZMod 2) L V K) (T.baseChange L z) =
       (Algebra.lmul (ZMod 2) K u).baseChange L
         ((e.baseChange (ZMod 2) L V K) z) := by
-  induction z using TensorProduct.induction_on with
-  | zero => simp
+  induction z using TensorProduct.inductionOn with
   | tmul a v => simp [hcompat]
   | add x y hx hy => simp only [map_add, hx, hy]
 
@@ -486,8 +483,7 @@ theorem frobeniusTensorCoordinatesAlong_baseChange_lmul_apply
         ((Algebra.lmul (ZMod 2) K u).baseChange L z) i =
       iota (u ^ (2 ^ i.val)) *
         frobeniusTensorCoordinatesAlong K L iota z i := by
-  induction z using TensorProduct.induction_on with
-  | zero => simp
+  induction z using TensorProduct.inductionOn with
   | tmul a x => simp [mul_pow, map_mul, mul_left_comm]
   | add x y hx hy => simp only [map_add, Pi.add_apply, hx, hy, mul_add]
 
@@ -582,8 +578,7 @@ theorem frobeniusTensorCoordinatesAlong_frobeniusScalarBaseChange
       (frobeniusTensorCoordinatesAlong K L iota z i) ^ 2 := by
   let : CharP L 2 :=
     charP_of_injective_algebraMap (algebraMap (ZMod 2) L).injective 2
-  induction z using TensorProduct.induction_on with
-  | zero => simp
+  induction z using TensorProduct.inductionOn with
   | tmul a x =>
       simp only [frobeniusScalarBaseChange_tmul,
         frobeniusTensorCoordinatesAlong_tmul]
@@ -644,8 +639,7 @@ theorem baseChange_intertwine_frobeniusScalarBaseChange
     (e.baseChange (ZMod 2) L V K) (frobeniusScalarBaseChange L z) =
       frobeniusScalarBaseChange L
         ((e.baseChange (ZMod 2) L V K) z) := by
-  induction z using TensorProduct.induction_on with
-  | zero => simp
+  induction z using TensorProduct.inductionOn with
   | tmul a v =>
       simp only [frobeniusScalarBaseChange_tmul,
         LinearEquiv.baseChange_tmul]
@@ -1227,12 +1221,12 @@ theorem dvd_add_one_pow_div_sub_one_of_primeFactors_dvd
       have hLTE := Nat.emultiplicity_pow_sub_pow hp hpodd
         (x := a + 1) (y := 1) (by simpa using hpa) hpnext (N / a)
       have hfa : a.factorization p = multiplicity p a :=
-        (Nat.multiplicity_eq_factorization hp ha.ne').symm
+        (Nat.multiplicity_eq_factorization hp).symm
       have hfk : (N / a).factorization p = multiplicity p (N / a) :=
-        (Nat.multiplicity_eq_factorization hp hkpos.ne').symm
+        (Nat.multiplicity_eq_factorization hp).symm
       have hft : ((a + 1) ^ (N / a) - 1).factorization p =
           multiplicity p ((a + 1) ^ (N / a) - 1) :=
-        (Nat.multiplicity_eq_factorization hp htargetpos.ne').symm
+        (Nat.multiplicity_eq_factorization hp).symm
       have hfN : N.factorization p =
           a.factorization p + (N / a).factorization p := by
         calc

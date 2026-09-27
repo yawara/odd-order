@@ -537,9 +537,9 @@ theorem Hypothesis.muGridAlpha_inner_zeta_sub_conj [Finite G]
   have hμi0ζc : ClassFunction.inner (hyp.muGrid hG hodd i 0) ζ.conj = 0 :=
     hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i 0 hconjirr (by rw [hconj1]; exact h0ζ)
   have hζζ : ClassFunction.inner ζ ζ = 1 := by
-    rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, if_pos rfl]
+    rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, ite_eq_left rfl]
   have hζζc : ClassFunction.inner ζ ζ.conj = 0 := by
-    rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hconjirr, if_neg (Ne.symm hζne)]
+    rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hconjirr, ite_eq_right (Ne.symm hζne)]
   simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
     ClassFunction.inner_smul_left, hμijζ, hμi0ζ, hμijζc, hμi0ζc, hζζ, hζζc,
     mul_zero, sub_zero, zero_sub, mul_one]
@@ -576,9 +576,9 @@ theorem Hypothesis.muGridAlpha_inner_zeta_sub_irr [Finite G]
   have hμi0η : ClassFunction.inner (hyp.muGrid hG hodd i 0) η = 0 :=
     hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i 0 hηirr (by rw [hη1]; exact h0ζ)
   have hζζ : ClassFunction.inner ζ ζ = 1 := by
-    rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, if_pos rfl]
+    rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, ite_eq_left rfl]
   have hζη : ClassFunction.inner ζ η = 0 := by
-    rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hηirr, if_neg (Ne.symm hηne)]
+    rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hηirr, ite_eq_right (Ne.symm hηne)]
   simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
     ClassFunction.inner_smul_left, hμijζ, hμi0ζ, hμijη, hμi0η, hζζ, hζη,
     mul_zero, sub_zero, zero_sub, mul_one]
@@ -617,7 +617,7 @@ theorem Hypothesis.muGridAlpha_inner_muColumn_sub_conj [Finite G]
     have a2 := hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i 0 hconjirr (by rw [hconj1]; exact
         h0ζ)
     have a3 : ClassFunction.inner ζ ζ.conj = 0 := by
-      rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hconjirr, if_neg (Ne.symm hζne)]
+      rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hconjirr, ite_eq_right (Ne.symm hζne)]
     simp only [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, a1, a2, a3,
       mul_zero, sub_zero]
   -- `(α_{ij}, μ_{i'k}) = 0` for each `i'`: cross-column (`k ≠ j`, `k ≠ 0`) + degree (`k`-column ≠
@@ -671,7 +671,7 @@ theorem Hypothesis.muGridAlpha_inner_muColumn_self_sub_conj [Finite G]
     have a2 := hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i 0 hconjirr
       (by rw [hconj1]; exact h0ζ)
     have a3 : ClassFunction.inner ζ ζ.conj = 0 := by
-      rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hconjirr, if_neg (Ne.symm hζne)]
+      rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hconjirr, ite_eq_right (Ne.symm hζne)]
     simp only [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, a1, a2, a3,
       mul_zero, sub_zero]
   -- `(α_{ij}, μ_{i'j}) = δ_{i,i'}`: within-column orthonormal; `μ_{i0}, ζ` off column `j`.
@@ -682,8 +682,8 @@ theorem Hypothesis.muGridAlpha_inner_muColumn_self_sub_conj [Finite G]
     have h1 : ClassFunction.inner (hyp.muGrid hG hodd i j) (hyp.muGrid hG hodd i' j)
         = (if i = i' then (1 : ℂ) else 0) := by
       by_cases hii' : i = i'
-      · rw [if_pos hii', ← hii']; exact hyp.muGrid_inner_self hG hodd i j
-      · rw [if_neg hii']; exact hyp.muGrid_inner_within_column hG hodd j hii'
+      · rw [ite_eq_left hii', ← hii']; exact hyp.muGrid_inner_self hG hodd i j
+      · rw [ite_eq_right hii']; exact hyp.muGrid_inner_within_column hG hodd j hii'
     have h2 := hyp.muGrid_inner_cross_column hG hodd i i' (Ne.symm hj0)
     have h3 : ClassFunction.inner ζ (hyp.muGrid hG hodd i' j) = 0 := by
       rw [OddOrder.RepresentationTheory.inner_conj_symm (hyp.muGrid hG hodd i' j) ζ,
@@ -726,7 +726,7 @@ theorem Hypothesis.muGridAlpha_inner_zeroColumnSum_sub_zeta [Finite G]
     have a1 := hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i j hζirr hdζ
     have a2 := hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i 0 hζirr h0ζ
     have a3 : ClassFunction.inner ζ ζ = 1 := by
-      rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, if_pos rfl]
+      rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, ite_eq_left rfl]
     simp only [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, a1, a2, a3,
       mul_zero, sub_zero, mul_one, zero_sub]
   -- `(α_{ij}, μ_{i'0}) = −δ·[i = i']`.
@@ -738,8 +738,8 @@ theorem Hypothesis.muGridAlpha_inner_zeroColumnSum_sub_zeta [Finite G]
     have h2 : ClassFunction.inner (hyp.muGrid hG hodd i 0) (hyp.muGrid hG hodd i' 0)
         = (if i = i' then (1 : ℂ) else 0) := by
       by_cases hii' : i = i'
-      · rw [if_pos hii', ← hii']; exact hyp.muGrid_inner_self hG hodd i 0
-      · rw [if_neg hii']; exact hyp.muGrid_inner_within_column hG hodd 0 hii'
+      · rw [ite_eq_left hii', ← hii']; exact hyp.muGrid_inner_self hG hodd i 0
+      · rw [ite_eq_right hii']; exact hyp.muGrid_inner_within_column hG hodd 0 hii'
     have h3 : ClassFunction.inner ζ (hyp.muGrid hG hodd i' 0) = 0 := by
       rw [OddOrder.RepresentationTheory.inner_conj_symm (hyp.muGrid hG hodd i' 0) ζ,
         hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i' 0 hζirr (hcol0ζ i'), star_zero]
@@ -747,7 +747,7 @@ theorem Hypothesis.muGridAlpha_inner_zeroColumnSum_sub_zeta [Finite G]
       mul_zero, zero_sub, sub_zero]
     by_cases hii' : i = i' <;> simp [hii']
   rw [ClassFunction.inner_sub_right, hαζ, OddOrder.RepresentationTheory.inner_sum_right,
-    Finset.sum_congr rfl (fun i' _ => hrow i'), Finset.sum_ite_eq, if_pos (Finset.mem_univ i)]
+    Finset.sum_congr rfl (fun i' _ => hrow i'), Finset.sum_ite_eq, ite_eq_left (Finset.mem_univ i)]
   ring
 
 open scoped FiniteInduce in

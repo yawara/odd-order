@@ -282,7 +282,8 @@ theorem invariant_sylow_disjoint [Finite G] (hG : IsMinimalSimpleOdd G)
         · rw [Set.mem_singleton_iff] at ha; subst ha; exact (hxc b hb).symm
         · rw [Set.mem_singleton_iff] at ha hb; subst ha; subst hb; rfl
       set B : Subgroup G := Subgroup.closure ((A : Set G) ∪ {x}) with hB_def
-      have hBcomm : IsMulCommutative ↥B := Subgroup.isMulCommutative_closure hgen_comm
+      have hBcomm : IsMulCommutative ↥B :=
+        Subgroup.isMulCommutative_closure fun a ha b hb _ => hgen_comm a ha b hb
       -- Every generator is `p`-torsion; in the commutative `B`, so is every element.
       have hgen_pow : ∀ w ∈ (A : Set G) ∪ {x}, w ^ p = 1 := by
         rintro w (hw | hw)

@@ -181,7 +181,7 @@ theorem Hypothesis.exists_colInv_alignedOmegaSigma_conj [Finite G]
     have hI := congrArg (fun φ => ClassFunction.inner φ
       (((h.columnFamily ((χ₂ j)⁻¹)).mu (OddOrder.Peterfalvi.S06.rowInv h
         (finCongr hcardW1.symm 0))) : ClassFunction ↥M ℂ)) hbr
-    simp only [ClassFunction.inner_smul_left, irreducibleCharacter_inner_eq_ite, if_true,
+    simp only [ClassFunction.inner_smul_left, irreducibleCharacter_inner_eq_ite, ite_true,
       mul_one] at hI
     rw [esk, esj, hχ₂k]
     exact_mod_cast hI.symm
@@ -448,7 +448,7 @@ theorem Hypothesis.SHC_extension_inner_alignedOmegaSigma_eq_zero [Finite G] {M :
     rw [← hyp.tau_zeta_sub_conj_eq_SHC_extension hG coh hodd hζS hζirr hζ1]; exact hL3
   have hsZ : tic.chiFam hVeq app (P j) ∈ ZIrr G := (tic.chiFam_spec hVeq app).2.1 (P j)
   have hs1 : ClassFunction.inner (tic.chiFam hVeq app (P j)) (tic.chiFam hVeq app (P j)) = 1 := by
-    rw [(tic.chiFam_spec hVeq app).2.2.1, if_pos rfl]
+    rw [(tic.chiFam_spec hVeq app).2.2.1, ite_eq_left rfl]
   exact inner_left_eq_zero_of_inner_sub_eq_zero haZ hsZ ha1 hb1 hs1 hab hdiff
 
 open scoped FiniteInduce in
@@ -540,7 +540,7 @@ theorem Hypothesis.SHC_tau1_zeta_vanishes_on_typePV [Finite G] {M : Subgroup G}
   have hsZ : tic.chiFam hVeq app (a', b') ∈ ZIrr G := (tic.chiFam_spec hVeq app).2.1 (a', b')
   have hs1 : ClassFunction.inner (tic.chiFam hVeq app (a', b')) (tic.chiFam hVeq app (a', b')) =
       1 := by
-    rw [(tic.chiFam_spec hVeq app).2.2.1, if_pos rfl]
+    rw [(tic.chiFam_spec hVeq app).2.2.1, ite_eq_left rfl]
   exact inner_left_eq_zero_of_inner_sub_eq_zero haZ hsZ ha1 hb1 hs1 hab hdiff
 
 open scoped FiniteInduce in
@@ -818,13 +818,13 @@ theorem Hypothesis.exists_SHC_extension_orthonormal [Finite G] {M : Subgroup G}
     obtain ⟨χ', hχ's, rfl⟩ := hβ
     rw [hs, Finset.mem_filter] at hχs hχ's
     by_cases hχχ' : χ = χ'
-    · subst hχχ'; rw [if_pos rfl]
+    · subst hχχ'; rw [ite_eq_left rfl]
       exact coh.inner_extension_self_eq_one ⟨hχs.2.1, χ.2, hχs.2.2⟩ χ.2
     · have hne : (χ : ClassFunction ↥M ℂ) ≠ (χ' : ClassFunction ↥M ℂ) :=
         fun h => hχχ' (Subtype.ext h)
       rw [coh.inner_extension_eq_zero_of_ne ⟨hχs.2.1, χ.2, hχs.2.2⟩ χ.2 ⟨hχ's.2.1, χ'.2, hχ's.2.2⟩
           χ'.2 hne,
-        if_neg (fun hαβ => hχχ' (Subtype.ext
+        ite_eq_right (fun hαβ => hχχ' (Subtype.ext
           (hyp.SHC_extension_inj hG coh hχs.2.1 χ.2 hχs.2.2 hχ's.2.1 χ'.2 hχ's.2.2 hαβ)))]
   · intro φ hφS hφirr hφ1
     rw [Finset.mem_image]
@@ -1158,12 +1158,12 @@ theorem Hypothesis.alignedOmegaSigma_diff_inner_zeroColumnSum [Finite G]
     OddOrder.RepresentationTheory.inner_sum_right]
   have h1 : ∀ r : Fin hyp.w1, ClassFunction.inner (hyp.alignedOmegaSigmaGrid hG hodd i j)
       (hyp.alignedOmegaSigmaGrid hG hodd r 0) = 0 := fun r => by
-    rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i r j 0, if_neg]; rintro ⟨_, h⟩; exact hj0 h
+    rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i r j 0, ite_eq_right]; rintro ⟨_, h⟩; exact hj0 h
   have h2 : ∀ r : Fin hyp.w1, ClassFunction.inner (hyp.alignedOmegaSigmaGrid hG hodd i 0)
       (hyp.alignedOmegaSigmaGrid hG hodd r 0) = (if i = r then (1 : ℂ) else 0) := fun r => by
     rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i r 0 0]; simp
   rw [Finset.sum_congr rfl (fun r _ => h1 r), Finset.sum_congr rfl (fun r _ => h2 r),
-    Finset.sum_const_zero, Finset.sum_ite_eq, if_pos (Finset.mem_univ i)]
+    Finset.sum_const_zero, Finset.sum_ite_eq, ite_eq_left (Finset.mem_univ i)]
   ring
 
 open scoped FiniteInduce in

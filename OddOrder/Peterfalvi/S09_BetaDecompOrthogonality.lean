@@ -84,7 +84,7 @@ theorem inner_induce_constOne_eq_zero (K : Subgroup L) [Finite ↥K]
     show ClassFunction.restrict K (Hypothesis71.constOne L)
         = (trivialIrreducibleCharacter ↥K : ClassFunction ↥K ℂ) from by
       ext h; rw [ClassFunction.restrict_apply]; rfl,
-    irreducibleCharacter_inner_eq_ite, if_neg hθ]
+    irreducibleCharacter_inner_eq_ite, ite_eq_right hθ]
 
 /-- **The induced principal character has inner product `1` with `1_L`** (Peterfalvi (7.8.a)).
 `⟨Ind_K^L 1_K, 1_L⟩ = ⟨1_K, 1_K⟩ = 1` by Frobenius reciprocity.  Supplies `⟨β, 1_G⟩ = ⟨Ind 1_K − ζ,
@@ -99,7 +99,7 @@ theorem inner_induce_trivialChar_constOne_eq_one (K : Subgroup L) [Finite ↥K]
     show ClassFunction.restrict K (Hypothesis71.constOne L)
         = (trivialIrreducibleCharacter ↥K : ClassFunction ↥K ℂ) from by
       ext h; rw [ClassFunction.restrict_apply]; rfl,
-    irreducibleCharacter_inner_eq_ite, if_pos rfl]
+    irreducibleCharacter_inner_eq_ite, ite_eq_left rfl]
 
 /-- **An induced nonprincipal character differs from the induced principal** (the irreducible-vs-
 permutation-character distinction).  `Ind_K^L θ ≠ Ind_K^L 1_K` for `θ ≠ 1_K`, since they have
@@ -132,7 +132,7 @@ theorem inner_tau_supported_constOne {G : Type*} [Group G] [Fintype G] {A : Set 
   have hgA : (g : G) ∈ A := by
     have h := (ClassFunction.mem_supportedSubmodule.mp α.2) (ClassFunction.mem_support.mpr hg)
     rwa [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at h
-  rw [H71.chiRhoCF_apply, H71.chiRho_constOne, if_pos hgA, Hypothesis71.constOne_apply]
+  rw [H71.chiRhoCF_apply, H71.chiRho_constOne, ite_eq_left hgA, Hypothesis71.constOne_apply]
 
 /-- **Peterfalvi (7.8.a), `S^ν ⊥ 1_G`, generic family form.**  Abstracted over an arbitrary family
 `ζ : Fin (n+1) → CF(L)` (not necessarily induced), with the coherence agreement

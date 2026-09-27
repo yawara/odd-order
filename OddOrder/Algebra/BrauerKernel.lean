@@ -61,7 +61,7 @@ theorem brauerProj_relTrace_eq_zero [Finite G] (hchar : (p : k) = 0) {P Q : Subg
   ext n
   rw [coeff_brauerProj]
   by_cases hn : n ∈ Subgroup.centralizer (P : Set G)
-  · rw [if_pos hn]
+  · rw [ite_eq_left hn]
     set rep : ↥P ⧸ Q.subgroupOf P → G := fun x => ((x.out : ↥P) : G) with hrep
     have hR : GAlgebra.relTrace Q P a = ∑ x : ↥P ⧸ Q.subgroupOf P, rep x • a := rfl
     have hsplit : (∑ x : ↥P ⧸ Q.subgroupOf P, rep x • a).coeff n
@@ -79,7 +79,7 @@ theorem brauerProj_relTrace_eq_zero [Finite G] (hchar : (p : k) = 0) {P Q : Subg
     have : (Nat.card (↥P ⧸ Q.subgroupOf P) : k) = 0 := hindex
     rw [this, zero_mul]
     rfl
-  · rw [if_neg hn]
+  · rw [ite_eq_right hn]
     rfl
 
 open scoped Classical in
@@ -132,12 +132,12 @@ theorem brauerProj_eq_zero_iff [Finite G] [Fact p.Prime] (hchar : (p : k) = 0)
         let := Fintype.ofFinite G
         intro n horb
         have h := coeff_relTrace_single P g (c.coeff g) n
-        rwa [if_pos horb] at h
+        rwa [ite_eq_left horb] at h
       have htapp_neg : ∀ n : G, ¬ (∃ u ∈ P, u * g * u⁻¹ = n) → t.coeff n = 0 := by
         let := Fintype.ofFinite G
         intro n horb
         have h := coeff_relTrace_single P g (c.coeff g) n
-        rwa [if_neg horb] at h
+        rwa [ite_eq_right horb] at h
       -- `c - t` is still fixed, still killed by `Br_P`, and has a smaller support.
       have hdfix : ∀ u ∈ P, u • (c - t) = c - t := by
         intro u hu

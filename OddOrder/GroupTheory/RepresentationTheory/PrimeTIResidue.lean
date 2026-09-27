@@ -229,15 +229,15 @@ theorem cfdot_prTIirr_red (i : Fin q) (j k : Fin p) :
   rw [Finset.sum_congr rfl fun i' _ => hval i']
   by_cases hjk : j = k
   · -- only the `i' = i` term survives
-    rw [if_pos hjk]
+    rw [ite_eq_left hjk]
     have hcond : ∀ i' : Fin q, (i = i' ∧ j = k) ↔ i = i' := fun i' => by
       simp [hjk]
     simp only [hcond]
-    rw [Finset.sum_ite_eq Finset.univ i (fun _ => (1 : ℂ)), if_pos (Finset.mem_univ i)]
+    rw [Finset.sum_ite_eq Finset.univ i (fun _ => (1 : ℂ)), ite_eq_left (Finset.mem_univ i)]
   · -- every term vanishes
-    rw [if_neg hjk]
+    rw [ite_eq_right hjk]
     refine Finset.sum_eq_zero fun i' _ => ?_
-    rw [if_neg fun h => hjk h.2]
+    rw [ite_eq_right fun h => hjk h.2]
 
 /-- **`cfdot_prTIred`** (Coq `PFsection4.v:459`): `⟨μ_{j₁}, μ_{j₂}⟩ = [j₁ = j₂] · q`. -/
 theorem cfdot_prTIred (j₁ j₂ : Fin p) :
@@ -249,13 +249,13 @@ theorem cfdot_prTIred (j₁ j₂ : Fin p) :
   rw [Finset.sum_congr rfl fun i _ => D.cfdot_prTIirr_red i j₁ j₂]
   rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin]
   by_cases hjk : j₁ = j₂
-  · rw [if_pos hjk, if_pos hjk, nsmul_eq_mul, mul_one]
-  · rw [if_neg hjk, if_neg hjk, nsmul_eq_mul, mul_zero]
+  · rw [ite_eq_left hjk, ite_eq_left hjk, nsmul_eq_mul, mul_one]
+  · rw [ite_eq_right hjk, ite_eq_right hjk, nsmul_eq_mul, mul_zero]
 
 /-- **`cfnorm_prTIred`** (Coq `PFsection4.v:465`): `⟨μ_j⟩ = q = #|W1|`. -/
 theorem cfnorm_prTIred (j : Fin p) :
     ClassFunction.inner (D.primeTIred j) (D.primeTIred j) = (q : ℂ) := by
-  rw [cfdot_prTIred, if_pos rfl]
+  rw [cfdot_prTIred, ite_eq_left rfl]
 
 /-- **`prTIred_neq0`** (Coq `PFsection4.v:468`): `μ_j ≠ 0`.  Its norm `q` is nonzero. -/
 theorem prTIred_neq0 (j : Fin p) : D.primeTIred j ≠ 0 := by
@@ -287,7 +287,7 @@ theorem prTIred_inj (hq : q ≠ 0) : Function.Injective D.primeTIred := by
   intro j₁ j₂ hj
   by_contra hne
   have h0 : ClassFunction.inner (D.primeTIred j₁) (D.primeTIred j₂) = 0 := by
-    rw [cfdot_prTIred, if_neg hne]
+    rw [cfdot_prTIred, ite_eq_right hne]
   rw [hj, D.cfnorm_prTIred j₂] at h0
   exact hq (by exact_mod_cast h0)
 
@@ -302,8 +302,8 @@ theorem mu2_ne {i i' : Fin q} {j j' : Fin p} (h : ¬ (i = i' ∧ j = j')) :
     (D.mu2 i j : ClassFunction S ℂ) ≠ (D.mu2 i' j' : ClassFunction S ℂ) := by
   intro heq
   have h1 := D.mu2_orthonormal i i' j j'
-  rw [if_neg h] at h1
-  rw [heq, D.mu2_orthonormal i' i' j' j', if_pos ⟨rfl, rfl⟩] at h1
+  rw [ite_eq_right h] at h1
+  rw [heq, D.mu2_orthonormal i' i' j' j', ite_eq_left ⟨rfl, rfl⟩] at h1
   exact one_ne_zero h1
 
 /-! ### The residue `chi_ 0` and `μ_0` -/
@@ -644,10 +644,11 @@ noncomputable def _root_.OddOrder.RepresentationTheory.PrimeTIResidueData.ofS06H
       · subst hjj'
         by_cases hii' : i = i'
         · subst hii'; simp
-        · rw [if_neg (fun hc => hii' ((h.columnFamily (h.charGroupW2Equiv j)).injective hc)),
-            if_neg (by simp [hii'])]
-      · rw [if_neg (h.columnFamily_mu_ne (fun hc => hjj' (h.charGroupW2Equiv.injective hc)) i i'),
-          if_neg (by simp [hjj'])]
+        · rw [ite_eq_right (fun hc => hii' ((h.columnFamily (h.charGroupW2Equiv j)).injective hc)),
+            ite_eq_right (by simp [hii'])]
+      · rw [ite_eq_right
+            (h.columnFamily_mu_ne (fun hc => hjj' (h.charGroupW2Equiv.injective hc)) i i'),
+          ite_eq_right (by simp [hjj'])]
     chi_res := fun j => h.coe_chiRestrict (h.charGroupW2Equiv j)
     ind_chi := fun j => by
       rw [h.coe_chiRestrict (h.charGroupW2Equiv j),
@@ -741,7 +742,7 @@ theorem exists_sign_smul_irr_of_sigma_omega (hyp : TICyclicHypothesis G) [Fintyp
   have hσ1 : ClassFunction.inner (hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ))
       (hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ)) = 1 := by
     rw [hyp.sigma_inner_irreducibleCharacter hVeq app, irreducibleCharacter_inner_eq_ite,
-      if_pos rfl]
+      ite_eq_left rfl]
   exact exists_zsmul_irreducibleCharacter_of_inner_self_one hσZ hσ1
 
 /-- **Peterfalvi §4 `dirr` step, grid form**: the extracted prime-TI irreducible `μ = mu2Grid ω`
@@ -822,7 +823,7 @@ theorem apply_eq_zero_of_mem_V_of_not_mem_range_sigma (hyp : TICyclicHypothesis 
   rw [hbridge, hyp.sigma_omega_eq_mu2GridSign_smul_mu2Grid hVeq app ω,
     ← Int.cast_smul_eq_zsmul ℂ (hyp.mu2GridSign hVeq app ω)
       (hyp.mu2Grid hVeq app ω : ClassFunction G ℂ),
-    ClassFunction.inner_smul_right, irreducibleCharacter_inner_eq_ite, if_neg hne, mul_zero]
+    ClassFunction.inner_smul_right, irreducibleCharacter_inner_eq_ite, ite_eq_right hne, mul_zero]
 
 open scoped Classical in
 /-- **Peterfalvi (4.3.b) / Coq `cfdot_prTIirr`** (extraction form): the prime-TI irreducibles
@@ -839,21 +840,21 @@ theorem mu2Grid_orthonormal (hyp : TICyclicHypothesis G) [Fintype hyp.W]
       = if ω = ω' then 1 else 0 := by
   by_cases hωω' : ω = ω'
   · subst hωω'
-    rw [if_pos rfl, irreducibleCharacter_inner_eq_ite, if_pos rfl]
-  · rw [if_neg hωω', irreducibleCharacter_inner_eq_ite]
+    rw [ite_eq_left rfl, irreducibleCharacter_inner_eq_ite, ite_eq_left rfl]
+  · rw [ite_eq_right hωω', irreducibleCharacter_inner_eq_ite]
     -- Off-diagonal: show `mu2Grid ω ≠ mu2Grid ω'`, hence the `ite` is `0`.
-    rw [if_neg ?_]
+    rw [ite_eq_right ?_]
     intro hμ
     -- If the extracted irreducibles coincide, `⟨ω^σ, ω'^σ⟩` is a nonzero sign, but it is `0`.
     have hcross : ClassFunction.inner (hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ))
         (hyp.sigma hVeq app (ω' : ClassFunction hyp.W ℂ)) = 0 := by
       rw [hyp.sigma_inner_irreducibleCharacter hVeq app, irreducibleCharacter_inner_eq_ite,
-        if_neg hωω']
+        ite_eq_right hωω']
     rw [hyp.sigma_omega_eq_mu2GridSign_smul_mu2Grid hVeq app ω,
       hyp.sigma_omega_eq_mu2GridSign_smul_mu2Grid hVeq app ω', hμ,
       ← Int.cast_smul_eq_zsmul ℂ, ← Int.cast_smul_eq_zsmul ℂ,
       ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
-      irreducibleCharacter_inner_eq_ite, if_pos rfl, mul_one, star_intCast] at hcross
+      irreducibleCharacter_inner_eq_ite, ite_eq_left rfl, mul_one, star_intCast] at hcross
     -- `hcross : (δ_ω : ℂ) * (δ_ω' : ℂ) = 0`, impossible for signs `±1`.
     rcases hyp.mu2GridSign_eq hVeq app ω with hδ | hδ <;>
       rcases hyp.mu2GridSign_eq hVeq app ω' with hδ' | hδ' <;>
@@ -868,7 +869,7 @@ theorem mu2Grid_injective (hyp : TICyclicHypothesis G) [Fintype hyp.W]
   intro ω ω' hμ
   by_contra hne
   have h := hyp.mu2Grid_orthonormal hVeq app ω ω'
-  rw [hμ, irreducibleCharacter_inner_eq_ite, if_pos rfl, if_neg hne] at h
+  rw [hμ, irreducibleCharacter_inner_eq_ite, ite_eq_left rfl, ite_eq_right hne] at h
   exact one_ne_zero h
 
 end OddOrder.Peterfalvi.S05.TICyclicHypothesis

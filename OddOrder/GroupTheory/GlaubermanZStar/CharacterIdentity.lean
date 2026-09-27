@@ -89,8 +89,8 @@ theorem sum_coeff_classSum_mul_classSum_mul (C D : ConjClasses G) (c : K)
           intro y
           rw [coeff_classSum]
           by_cases hy : ConjClasses.mk y = D
-          · rw [if_pos hy, if_pos hy, one_mul, hconst v y hvC hy]
-          · rw [if_neg hy, if_neg hy, zero_mul]
+          · rw [ite_eq_left hy, ite_eq_left hy, one_mul, hconst v y hvC hy]
+          · rw [ite_eq_right hy, ite_eq_right hy, zero_mul]
         rw [Finset.sum_congr rfl fun y _ => hterm y, Finset.sum_ite, Finset.sum_const_zero,
           add_zero, Finset.sum_const, nsmul_eq_mul, card_filter_eq_conjugacyClassSize]
     _ = (conjugacyClassSize C : K) * ((conjugacyClassSize D : K) * c) := by

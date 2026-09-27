@@ -97,7 +97,7 @@ theorem IsRegularPGroup.quotient {p : ℕ} (hP : IsRegularPGroup p P) (N : Subgr
       rw [MonoidHom.map_closure]
       congr 1
       ext z
-      simp [Set.mem_image, eq_comm]
+      simp
     have hle := Subgroup.map_commutator (H₁ := Subgroup.closure ({x, y} : Set P))
       (H₂ := Subgroup.closure ({x, y} : Set P)) (QuotientGroup.mk' N)
     rw [hmap] at hle
@@ -250,7 +250,7 @@ theorem IsRegularPGroup.subgroup {p : ℕ} (hP : IsRegularPGroup p P) (H : Subgr
     rw [MonoidHom.map_closure]
     congr 1
     ext z
-    simp [Set.mem_image, eq_comm]
+    simp
   have hmapc := Subgroup.map_commutator (H₁ := Subgroup.closure ({x, y} : Set ↥H))
     (H₂ := Subgroup.closure ({x, y} : Set ↥H)) H.subtype
   rw [hmapclose] at hmapc
@@ -399,7 +399,7 @@ private theorem pow_mul_eq_one_of_isRegularPGroup_aux.{u} (p : ℕ) [Fact p.Prim
           rw [MonoidHom.map_closure]
           congr 1
           ext z
-          simp [Set.mem_image, eq_comm]
+          simp
         rw [← hmap]
         exact ⟨w', htop ▸ Subgroup.mem_top w', rfl⟩
       have hcomm : (x : P ⧸ Ω) * (y : P ⧸ Ω) = (y : P ⧸ Ω) * (x : P ⧸ Ω) := by

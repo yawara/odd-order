@@ -217,10 +217,10 @@ theorem orthogonality_of_w1_lt_w2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     rw [Finset.sum_eq_single i]
     · rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i i 0 j]
       by_cases hj : j = 0
-      · rw [if_pos ⟨rfl, hj.symm⟩, if_pos hj]
-      · rw [if_neg (fun hh => hj hh.2.symm), if_neg hj]
+      · rw [ite_eq_left ⟨rfl, hj.symm⟩, ite_eq_left hj]
+      · rw [ite_eq_right (fun hh => hj hh.2.symm), ite_eq_right hj]
     · intro i' _ hi'
-      rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i' i 0 j, if_neg (fun hh => hi' hh.1)]
+      rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i' i 0 j, ite_eq_right (fun hh => hi' hh.1)]
     · intro h; exact absurd (Finset.mem_univ _) h
   -- `a_{00} = 1`: `⟨ψ, ω_{00}^σ⟩ = ⟨ψ, 1_G⟩ = ⟨μ_0 − ζ, 1_M⟩ = 1`.
   have hsupp : ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - params.zeta).support ⊆ hyp.A0 :=
@@ -230,7 +230,7 @@ theorem orthogonality_of_w1_lt_w2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
       mem_irreducibleCharacters.mpr params.zeta_irreducible
     have htmem : trivialClassFunction (↥M) ∈ irreducibleCharacters (↥M) :=
       mem_irreducibleCharacters.mpr trivialClassFunction_isIrreducible
-    rw [irr_cf_inner hzmem htmem, if_neg ?_]
+    rw [irr_cf_inner hzmem htmem, ite_eq_right ?_]
     intro hcontra
     have h1 : params.zeta 1 = trivialClassFunction (↥M) 1 :=
       congrArg (fun f : ClassFunction (↥M) ℂ => (f : (↥M) → ℂ) 1) hcontra
@@ -287,7 +287,7 @@ theorem orthogonality_of_w1_lt_w2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
       rw [hprod i' 0,
         show ClassFunction.inner (tic.chiFam hVeq app (ρ i', κ 0)) (tic.chiFam hVeq app pq)
           = if (ρ i', κ 0) = pq then (1 : ℂ) else 0 from (tic.chiFam_spec hVeq app).2.2.1 _ _,
-        if_neg (fun he => hcon.1 i' he)]
+        ite_eq_right (fun he => hcon.1 i' he)]
     have hS0card : S0.ncard ≤ hyp.w1 := by
       rw [hS0, show (Set.range (fun i : Fin hyp.w1 => (ρ i, κ 0)))
           = (fun i : Fin hyp.w1 => (ρ i, κ 0)) '' Set.univ from by rw [Set.image_univ]]
@@ -327,8 +327,8 @@ theorem orthogonality_of_w1_lt_w2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     -- `a(ρ i, κ j) = if κ j = j₀ then c else 0 = if j = 0 then 1 else 0`.
     have hval : tic.sigmaCoeff hVeq app ψ (ρ i, κ j) = (if j = 0 then (1 : ℂ) else 0) := by
       by_cases hj : j = 0
-      · subst hj; rw [hκ0, hcol (ρ i), hc1, if_pos rfl]
-      · rw [hrest (ρ i) (κ j) (fun he => hj (hκinj (he.trans hκ0.symm))), if_neg hj]
+      · subst hj; rw [hκ0, hcol (ρ i), hc1, ite_eq_left rfl]
+      · rw [hrest (ρ i) (κ j) (fun he => hj (hκinj (he.trans hκ0.symm))), ite_eq_right hj]
     -- combine with `⟨ψ, ω_{ij}^σ⟩ = (if j=0 then 1 else 0) − ⟨ζ^{τ₁}, ω_{ij}^σ⟩`.
     have h2 := hcoeff_prod i j
     rw [hval, hpsiOmega i j] at h2
@@ -358,7 +358,7 @@ theorem orthogonality_of_w1_lt_w2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
       have hacoeff : tic.sigmaCoeff hVeq app ψ (ρ 0, κ j) = 1 := by
         rw [hi0, hrow (κ j), hc1]
       have h2 := hcoeff_prod 0 j
-      rw [hacoeff, hpsiOmega 0 j, if_neg hj] at h2
+      rw [hacoeff, hpsiOmega 0 j, ite_eq_right hj] at h2
       -- `1 = -⟨ζ^{τ₁}, ω_{0j}^σ⟩`, and `ω_{0j}^σ = χ_{(ρ 0, κ j)}`.
       have h3 : ClassFunction.inner (coh.tau1 params.zeta)
           (hyp.alignedOmegaSigmaGrid hG hodd 0 j) = -1 := by linear_combination h2
@@ -408,7 +408,7 @@ theorem inner_muColumnZero_sub_zeta_self [Finite G] (hG : OddOrder.BG.IsMinimalS
     rw [OddOrder.RepresentationTheory.inner_conj_symm, hμ0perp, star_zero]
   have hζζ : ClassFunction.inner ζ ζ = 1 := by
     have hzmem : ζ ∈ irreducibleCharacters (↥M) := mem_irreducibleCharacters.mpr hzirr
-    rw [irr_cf_inner hzmem hzmem, if_pos rfl]
+    rw [irr_cf_inner hzmem hzmem, ite_eq_left rfl]
   rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
     hyp.muGrid_column_sum_inner_self hG hodd 0, hμ0perp, hζμ0, hζζ]
   push_cast; ring
@@ -467,7 +467,7 @@ theorem inner_tau_muColumnZero_sub_zeta_alignedOmegaSigma_of_w1_lt_w2 [Finite G]
     have hzmem : ζ ∈ irreducibleCharacters (↥M) := mem_irreducibleCharacters.mpr hzirr
     have htmem : trivialClassFunction (↥M) ∈ irreducibleCharacters (↥M) :=
       mem_irreducibleCharacters.mpr trivialClassFunction_isIrreducible
-    rw [irr_cf_inner hzmem htmem, if_neg ?_]
+    rw [irr_cf_inner hzmem htmem, ite_eq_right ?_]
     intro hcontra
     have h1 : ζ 1 = trivialClassFunction (↥M) 1 :=
       congrArg (fun f : ClassFunction (↥M) ℂ => (f : (↥M) → ℂ) 1) hcontra
@@ -541,8 +541,8 @@ theorem inner_tau_muColumnZero_sub_zeta_alignedOmegaSigma_of_w1_lt_w2 [Finite G]
     intro i j
     have hval : tic.sigmaCoeff hVeq app ψ (ρ i, κ j) = (if j = 0 then (1 : ℂ) else 0) := by
       by_cases hj : j = 0
-      · subst hj; rw [hκ0, hcol (ρ i), hc1, if_pos rfl]
-      · rw [hrest (ρ i) (κ j) (fun he => hj (hκinj (he.trans hκ0.symm))), if_neg hj]
+      · subst hj; rw [hκ0, hcol (ρ i), hc1, ite_eq_left rfl]
+      · rw [hrest (ρ i) (κ j) (fun he => hj (hκinj (he.trans hκ0.symm))), ite_eq_right hj]
     rw [← hcoeff_prod i j, hval]
   · -- single-row branch: a full `i₀`-row has `w₂` nonzero coefficients, so `NC ≥ w₂ > w₁ + 1`.
     exfalso
@@ -588,9 +588,9 @@ theorem residual_alignedOmegaSigma_inner_eq_zero_of_w1_lt_w2 [Finite G]
   · rw [hyp.alignedOmegaSigmaGrid_inner hG hG.odd i i 0 j]
     by_cases hj : j = 0
     · subst hj; simp
-    · rw [if_neg hj, if_neg (fun hh => hj hh.2.symm), sub_zero]
+    · rw [ite_eq_right hj, ite_eq_right (fun hh => hj hh.2.symm), sub_zero]
   · intro i' _ hi'
-    rw [hyp.alignedOmegaSigmaGrid_inner hG hG.odd i' i 0 j, if_neg (fun hh => hi' hh.1)]
+    rw [hyp.alignedOmegaSigmaGrid_inner hG hG.odd i' i 0 j, ite_eq_right (fun hh => hi' hh.1)]
   · intro h; exact absurd (Finset.mem_univ _) h
 
 open scoped FiniteInduce in
@@ -653,9 +653,9 @@ theorem exists_residual_of_w1_lt_w2 [Finite G]
       ClassFunction.inner Ω (hyp.alignedOmegaSigmaGrid hG hodd r 0) = 1 := by
     intro r
     rw [hΩ, inner_sum_left, Finset.sum_eq_single r]
-    · rw [hyp.alignedOmegaSigmaGrid_inner hG hodd r r 0 0, if_pos ⟨rfl, rfl⟩]
+    · rw [hyp.alignedOmegaSigmaGrid_inner hG hodd r r 0 0, ite_eq_left ⟨rfl, rfl⟩]
     · intro r' _ hne
-      rw [hyp.alignedOmegaSigmaGrid_inner hG hodd r' r 0 0, if_neg fun h => hne h.1]
+      rw [hyp.alignedOmegaSigmaGrid_inner hG hodd r' r 0 0, ite_eq_right fun h => hne h.1]
     · intro h; exact absurd (Finset.mem_univ _) h
   have hsum1 : ∑ _r : Fin hyp.w1, (1 : ℂ) = (hyp.w1 : ℂ) := by
     rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one]
@@ -667,7 +667,7 @@ theorem exists_residual_of_w1_lt_w2 [Finite G]
       ClassFunction.inner ψ (hyp.alignedOmegaSigmaGrid hG hodd r 0) = 1 := fun r => by
     have h := inner_tau_muColumnZero_sub_zeta_alignedOmegaSigma_of_w1_lt_w2 hG hyp hzS hzirr hz1
       hw r 0
-    rwa [if_pos rfl] at h
+    rwa [ite_eq_left rfl] at h
   have hψΩ : ClassFunction.inner ψ Ω = (hyp.w1 : ℂ) := by
     rw [hΩ, OddOrder.RepresentationTheory.inner_sum_right]
     rw [Finset.sum_congr rfl fun r _ => hψr r, hsum1]
@@ -1051,7 +1051,7 @@ theorem _root_.OddOrder.Peterfalvi.S07.IsCoherent.inner_extension_self_eq_one
     {ζ : ClassFunction L ℂ} (hζS : ζ ∈ S) (hζirr : IsIrreducibleCharacter ζ) :
     ClassFunction.inner (coh.extension ζ) (coh.extension ζ) = 1 := by
   rw [coh.extension_inner_eq _ _ (Submodule.subset_span hζS) (Submodule.subset_span hζS),
-    OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, if_pos rfl]
+    OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, ite_eq_left rfl]
 
 /-- **Generic orthogonality of coherent images of distinct irreducibles**: for a coherent extension
 `coh` over `S`, distinct irreducibles `φ, ψ ∈ S` have `⟨coh φ, coh ψ⟩ = ⟨φ, ψ⟩ = 0`.  The
@@ -1066,7 +1066,7 @@ theorem _root_.OddOrder.Peterfalvi.S07.IsCoherent.inner_extension_eq_zero_of_ne
     (hψS : ψ ∈ S) (hψirr : IsIrreducibleCharacter ψ) (hne : φ ≠ ψ) :
     ClassFunction.inner (coh.extension φ) (coh.extension ψ) = 0 := by
   rw [coh.extension_inner_eq _ _ (Submodule.subset_span hφS) (Submodule.subset_span hψS),
-    OddOrder.RepresentationTheory.irr_cf_inner hφirr hψirr, if_neg hne]
+    OddOrder.RepresentationTheory.irr_cf_inner hφirr hψirr, ite_eq_right hne]
 
 open scoped FiniteInduce in
 /-- **`‖ζ^{τ₁}‖² = 1` for the `S(HC)`-coherent extension** (α-grid `S₁`-`τ₁` input to (11.8.2)).

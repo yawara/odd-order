@@ -11,6 +11,7 @@ import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
 import Mathlib.RepresentationTheory.Subrepresentation
 import Mathlib.Order.OrderIsoNat
+import Mathlib.RingTheory.Artinian.Module
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S02_Representations
 import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector

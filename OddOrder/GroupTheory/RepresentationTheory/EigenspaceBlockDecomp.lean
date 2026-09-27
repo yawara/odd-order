@@ -185,7 +185,7 @@ theorem trace_eq_sum_finrank_smul_of_isInternal {ι : Type*} [Fintype ι] [Decid
   have hdiag : ∀ j : Σ i, Fin (finrank F (E i)), LinearMap.toMatrix b b f j j = c j.1 := by
     intro j
     rw [LinearMap.toMatrix_apply, hf j.1 (b j) (by rw [hb]; exact hE.collectedBasis_mem _ j),
-      map_smul, Finsupp.smul_apply, b.repr_self_apply, if_pos rfl, smul_eq_mul, mul_one]
+      map_smul, Finsupp.smul_apply, b.repr_self_apply, ite_eq_left rfl, smul_eq_mul, mul_one]
   rw [LinearMap.trace_eq_matrix_trace F b f, Matrix.trace]
   simp_rw [Matrix.diag_apply, hdiag]
   rw [Fintype.sum_sigma]

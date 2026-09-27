@@ -198,7 +198,7 @@ noncomputable def Hypothesis.dadeValue (hyp : Hypothesis G A L)
 theorem Hypothesis.dadeValue_of_not_mem_dadeSupport (hyp : Hypothesis G A L)
     (α : SupportedClassFunctions (G := G) k A L) {g : G} (hg : g ∉ hyp.dadeSupport) :
     hyp.dadeValue α g = 0 := by
-  rw [Hypothesis.dadeValue, dif_neg hg]
+  rw [Hypothesis.dadeValue, dite_eq_right hg]
 
 /-- **Peterfalvi (2.5), well-definedness.**  `α^τ(g) = α(a)` whenever `g` is
 `G`-conjugate to an element of `aH(a)`.  Two such base points `a, a'` are
@@ -209,7 +209,7 @@ theorem Hypothesis.dadeValue_eq (hyp : Hypothesis G A L)
     hyp.dadeValue α g = (α : ClassFunction L k) ⟨a.1, hyp.mem_L a.2⟩ := by
   classical
   have hg : g ∈ hyp.dadeSupport := hyp.mem_dadeSupport_iff.mpr ⟨a, h, hh, hga⟩
-  rw [Hypothesis.dadeValue, dif_pos hg]
+  rw [Hypothesis.dadeValue, dite_eq_left hg]
   set a₀ := (hyp.mem_dadeSupport_iff.mp hg).choose with ha₀
   obtain ⟨h₀, hh₀, hga₀⟩ := (hyp.mem_dadeSupport_iff.mp hg).choose_spec
   obtain ⟨l, hl⟩ := hyp.isConj_in_L_of_mul_H a₀.2 a.2 hh₀ hh (hga₀.trans hga.symm)
@@ -600,7 +600,7 @@ theorem adjoint_formula
     intro a
     rw [hψ a]
     simp only [adjointAverageFun]
-    rw [dif_pos a.2]
+    rw [dite_eq_left a.2]
   -- support reindexing of the L-inner sum
   have hISL : ClassFunction.innerSum (α : ClassFunction L ℂ) ψ
       = ∑ a : {a : G // a ∈ A}, aα a * star (ψ ⟨a.1, hyp.subset_L a.2⟩) := by
@@ -742,7 +742,7 @@ theorem adjoint_formula_restrict
   refine adjoint_formula hyp τ hτ α χ (ClassFunction.restrict L χ) fun a => ?_
   -- The average of a constant is that constant.
   simp only [adjointAverageFun, ClassFunction.restrict_apply]
-  rw [dif_pos a.2]
+  rw [dite_eq_left a.2]
   have hHne : (Nat.card (hyp.H ⟨a.1, a.2⟩) : ℂ) ≠ 0 := by
     have : 0 < Nat.card (hyp.H ⟨a.1, a.2⟩) := Nat.card_pos
     exact_mod_cast this.ne'
@@ -765,7 +765,7 @@ theorem adjointAverageFun_dadeMap_eq
   classical
   -- unfold the averaging map at `a`
   simp only [adjointAverageFun]
-  rw [dif_pos a.2]
+  rw [dite_eq_left a.2]
   -- `τ β` is constant `= β(a)` on the coset `a · H(a)`
   have hconst : ∀ x : ↥(hyp.H ⟨a.1, a.2⟩),
       (τ β) (a.1 * (x : G)) = (β : ClassFunction L ℂ) ⟨a.1, hyp.subset_L a.2⟩ := by

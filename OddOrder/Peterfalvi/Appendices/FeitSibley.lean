@@ -156,7 +156,7 @@ theorem restrictionMultiplicity_eq_zero_of_forall_eq_one
     exact hconst x
   rw [ClassFunction.restrictionMultiplicity_def, hres, ClassFunction.inner_smul_left,
     ← IrreducibleCharacter.coe_trivialIrreducibleCharacter,
-    irreducibleCharacter_inner_eq_ite, if_neg (fun h => hθ h.symm), mul_zero]
+    irreducibleCharacter_inner_eq_ite, ite_eq_right (fun h => hθ h.symm), mul_zero]
 
 /-- **An irreducible constituent passes through an intermediate subgroup**: if `θ` occurs in
 `Res_N χ` and `N ≤ T`, then some `ψ ∈ Irr(T)` occurs in `Res_T χ` such that `θ` (transported
@@ -914,7 +914,7 @@ theorem Sset_eq_induced_of_Q [Finite G] :
       have hite := irreducibleCharacter_inner_eq_ite (G := ↥hyp.H)
         (⟨_, hindirr⟩ : IrreducibleCharacter ↥hyp.H)
         (⟨χ, hχirr⟩ : IrreducibleCharacter ↥hyp.H)
-      rw [if_neg hneq] at hite
+      rw [ite_eq_right hneq] at hite
       simp only [IrreducibleCharacter.coe_mk] at hite
       exact hinner hite
     refine ⟨(ψ : ClassFunction ↥(hyp.Q.subgroupOf hyp.H) ℂ), ⟨ψ.isIrreducible, ?_⟩, ?_⟩
@@ -999,7 +999,7 @@ theorem Sset_eq_induced_of_Q [Finite G] :
         IrreducibleCharacter ↥hyp.H)
       (⟨ClassFunction.induce (hyp.Q.subgroupOf hyp.H) φ, hindirr⟩ :
         IrreducibleCharacter ↥hyp.H)
-    rw [if_pos rfl] at hself
+    rw [ite_eq_left rfl] at hself
     simp only [IrreducibleCharacter.coe_mk] at hfrob hself
     have hfirst := hfrob.symm.trans hself
     have hbound := restrictionMultiplicity_mul_le_restrictionMultiplicity (G := ↥hyp.H) hHT

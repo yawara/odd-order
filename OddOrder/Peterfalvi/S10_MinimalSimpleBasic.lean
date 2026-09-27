@@ -163,7 +163,7 @@ theorem FT_signalizer_conj_smul_of_escaping [Finite G]
     rw [hN', Set.mem_singleton_iff] at hL
     exact hL
   have hbase : OddOrder.BG.Ch4.S16.FT_signalizerBase a = N := by
-    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase a = hbr.2.choose := dif_pos hbr
+    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase a = hbr.2.choose := dite_eq_left hbr
     rw [hb]
     exact huniq _ hbr.2.choose_spec
   have hCconj : Subgroup.centralizer ({m * a * m⁻¹} : Set G)
@@ -171,7 +171,7 @@ theorem FT_signalizer_conj_smul_of_escaping [Finite G]
     (conj_smul_centralizer_singleton' m a).symm
   have hbase' : OddOrder.BG.Ch4.S16.FT_signalizerBase (m * a * m⁻¹) = MulAut.conj m • N := by
     have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase (m * a * m⁻¹) = hbr'.2.choose :=
-      dif_pos hbr'
+      dite_eq_left hbr'
     have hmemN' : MulAut.conj m • N ∈
         maximalSubgroupsContaining (Subgroup.centralizer ({m * a * m⁻¹} : Set G)) := by
       rw [mem_maximalSubgroupsContaining]
@@ -1018,7 +1018,7 @@ theorem FT_signalizer_conj_smul_of_escaping_sigmaSharp [Finite G]
     rw [hN', Set.mem_singleton_iff] at hL
     exact hL
   have hbase : OddOrder.BG.Ch4.S16.FT_signalizerBase a = N := by
-    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase a = hbr.2.choose := dif_pos hbr
+    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase a = hbr.2.choose := dite_eq_left hbr
     rw [hb]
     exact huniq _ hbr.2.choose_spec
   have hCconj : Subgroup.centralizer ({m * a * m⁻¹} : Set G)
@@ -1026,7 +1026,7 @@ theorem FT_signalizer_conj_smul_of_escaping_sigmaSharp [Finite G]
     (conj_smul_centralizer_singleton' m a).symm
   have hbase' : OddOrder.BG.Ch4.S16.FT_signalizerBase (m * a * m⁻¹) = MulAut.conj m • N := by
     have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase (m * a * m⁻¹) = hbr'.2.choose :=
-      dif_pos hbr'
+      dite_eq_left hbr'
     have hmemN' : MulAut.conj m • N ∈
         maximalSubgroupsContaining (Subgroup.centralizer ({m * a * m⁻¹} : Set G)) := by
       rw [mem_maximalSubgroupsContaining]

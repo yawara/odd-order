@@ -147,8 +147,8 @@ theorem Hypothesis.sum_alignedOmegaSigma_zeroColumn_isReal [Finite G]
     intro a b hab
     by_contra hne
     have hii := hyp.alignedOmegaSigmaGrid_inner hG hodd a b 0 0
-    rw [← hab, hyp.alignedOmegaSigmaGrid_inner hG hodd a a 0 0, if_pos ⟨rfl, rfl⟩,
-      if_neg (fun h => hne h.1)] at hii
+    rw [← hab, hyp.alignedOmegaSigmaGrid_inner hG hodd a a 0 0, ite_eq_left ⟨rfl, rfl⟩,
+      ite_eq_right (fun h => hne h.1)] at hii
     exact one_ne_zero hii
   have hσinv : Function.Involutive σ := fun r => by
     apply hgridinj
@@ -235,7 +235,7 @@ theorem Hypothesis.beta_inner_trivial [Finite G] {M : Subgroup G}
     rw [← hyp.alignedOmegaSigmaGrid_zero_zero hG hodd, ClassFunction.inner_sub_left,
       hyp.alignedOmegaSigmaGrid_inner hG hodd i 0 j 0,
       hyp.alignedOmegaSigmaGrid_inner hG hodd i 0 0 0,
-      if_neg (fun h => hi0 h.1), if_neg (fun h => hi0 h.1), sub_zero]
+      ite_eq_right (fun h => hi0 h.1), ite_eq_right (fun h => hi0 h.1), sub_zero]
   have hζτ1 : ClassFunction.inner (coh.extension ζ)
       (trivialClassFunction G) = 0 := by
     rw [← hyp.alignedOmegaSigmaGrid_zero_zero hG hodd]
@@ -296,7 +296,7 @@ theorem Hypothesis.muGridAlpha_inner_trivial_M [Finite G] {M : Subgroup G}
     have hzmem : ζ ∈ irreducibleCharacters (↥M) := mem_irreducibleCharacters.mpr hζirr
     have htmem : trivialClassFunction (↥M) ∈ irreducibleCharacters (↥M) :=
       mem_irreducibleCharacters.mpr trivialClassFunction_isIrreducible
-    rw [irr_cf_inner hzmem htmem, if_neg ?_]
+    rw [irr_cf_inner hzmem htmem, ite_eq_right ?_]
     intro hcontra
     have h1 : ζ 1 = trivialClassFunction (↥M) 1 :=
       congrArg (fun f : ClassFunction (↥M) ℂ => (f : (↥M) → ℂ) 1) hcontra
@@ -681,9 +681,9 @@ theorem Hypothesis.exists_coherentImage_SHC [Finite G] {M : Subgroup G}
   have hinjOn : ∀ χ ∈ s, ∀ χ' ∈ s, f χ = f χ' → χ = χ' := by
     intro χ hχ χ' hχ' hfeq
     by_contra hne
-    have h1 : ClassFunction.inner (f χ) (f χ') = 0 := by rw [hiso χ χ' hχ hχ', if_neg hne]
+    have h1 : ClassFunction.inner (f χ) (f χ') = 0 := by rw [hiso χ χ' hχ hχ', ite_eq_right hne]
     have h2 : ClassFunction.inner (f χ) (f χ') = 1 := by
-      rw [hfeq, hiso χ' χ' hχ' hχ', if_pos rfl]
+      rw [hfeq, hiso χ' χ' hχ' hχ', ite_eq_left rfl]
     rw [h1] at h2; exact one_ne_zero h2.symm
   refine ⟨s.image f, ?_, ?_, ?_, ?_, ?_⟩
   · -- hZ
@@ -696,8 +696,8 @@ theorem Hypothesis.exists_coherentImage_SHC [Finite G] {M : Subgroup G}
     obtain ⟨χ', hχ', rfl⟩ := Finset.mem_image.mp hβ
     rw [hiso χ χ' hχ hχ']
     by_cases hc : χ = χ'
-    · rw [if_pos hc, if_pos (by rw [hc])]
-    · rw [if_neg hc, if_neg (fun h => hc (hinjOn χ hχ χ' hχ' h))]
+    · rw [ite_eq_left hc, ite_eq_left (by rw [hc])]
+    · rw [ite_eq_right hc, ite_eq_right (fun h => hc (hinjOn χ hχ χ' hχ' h))]
   · -- hRmem
     intro φ hφS hφirr hφ1
     exact Finset.mem_image.mpr ⟨⟨φ, hφirr⟩, (hmem_s _).mpr ⟨hφS, hφ1⟩, rfl⟩

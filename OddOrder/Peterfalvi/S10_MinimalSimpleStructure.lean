@@ -58,7 +58,7 @@ theorem FT_signalizer_eq_Rsub_of_escape [Finite G] (hG : OddOrder.BG.IsMinimalSi
   have hbase_eq : OddOrder.BG.Ch4.S16.FT_signalizerBase x = N := by
     have hmem : OddOrder.BG.Ch4.S16.FT_signalizerBase x
         ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) := by
-      rw [show OddOrder.BG.Ch4.S16.FT_signalizerBase x = hbranch.2.choose from dif_pos hbranch]
+      rw [show OddOrder.BG.Ch4.S16.FT_signalizerBase x = hbranch.2.choose from dite_eq_left hbranch]
       exact hbranch.2.choose_spec
     rw [hsingle, Set.mem_singleton_iff] at hmem
     exact hmem
@@ -470,7 +470,7 @@ theorem supported_sigma_coprime_typeA [Finite G] (hG : OddOrder.BG.IsMinimalSimp
       (maximalSubgroupsContaining (Subgroup.centralizer ({z} : Set G))).Nonempty :=
     ⟨hgt, ⟨N₀, by rw [hN₀]; rfl⟩⟩
   have hbase : OddOrder.BG.Ch4.S16.FT_signalizerBase z = N₀ := by
-    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase z = hbr.2.choose := dif_pos hbr
+    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase z = hbr.2.choose := dite_eq_left hbr
     rw [hb]
     exact huniq _ hbr.2.choose_spec
   have hNN₀ : N = N₀ :=
@@ -1175,7 +1175,7 @@ theorem Rsub_eq_bot_of_centralizer_le [Finite G] (hG : OddOrder.BG.IsMinimalSimp
     obtain ⟨L, hL, hLM⟩ := hnt.exists_ne M
     exact hLM (eq_of_mem_maximalSigmaSubgroupsOfElement_of_centralizer_le hG D hx1
       hM hL hc).symm
-  rw [OddOrder.BG.Ch4.S14.Rsub, dif_neg hnot]
+  rw [OddOrder.BG.Ch4.S14.Rsub, dite_eq_right hnot]
 
 /-- **The no-escaping collapse `M̃ = M_σ#`** (the (12.17)-case degeneration of the faithful BG
 Theorem E cover): if no centralizer of an `M_σ#`-element escapes `M`, every signalizer `R(x)`

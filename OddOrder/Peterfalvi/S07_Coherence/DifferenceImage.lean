@@ -738,25 +738,25 @@ theorem inner_eq_zero_of_signedDifference_inner_zero_of_mem
       intro h
       have hμν' : μ ≠ ν' := fun he => hμ'ν' (h ▸ he)
       have hνμ' : ν ≠ μ' := fun he => hμν (he.trans h.symm).symm
-      rw [if_pos h, if_neg hμν', if_neg hνμ'] at hbracket
+      rw [ite_eq_left h, ite_eq_right hμν', ite_eq_right hνμ'] at hbracket
       revert hbracket; split_ifs <;> intro hb <;> norm_num at hb
     · -- `μ = ν'`: then `μ ≠ μ'` (else `μ' = ν'`), `ν ≠ ν'` (else `ν = μ`); bracket `= −1 − [ν=μ']`.
       intro h
       have hμμ' : μ ≠ μ' := fun he => hμ'ν' (he.symm.trans h)
       have hνν' : ν ≠ ν' := fun he => hμν (he.trans h.symm).symm
-      rw [if_pos h, if_neg hμμ', if_neg hνν'] at hbracket
+      rw [ite_eq_left h, ite_eq_right hμμ', ite_eq_right hνν'] at hbracket
       revert hbracket; split_ifs <;> intro hb <;> norm_num at hb
     · -- `ν = μ'`: then `ν ≠ ν'` (else `μ' = ν'`), `μ ≠ μ'` (else `μ = ν`); bracket `= −1 − [μ=ν']`.
       intro h
       have hνν' : ν ≠ ν' := fun he => hμ'ν' (h ▸ he)
       have hμμ' : μ ≠ μ' := fun he => hμν (he.trans h.symm)
-      rw [if_pos h, if_neg hνν', if_neg hμμ'] at hbracket
+      rw [ite_eq_left h, ite_eq_right hνν', ite_eq_right hμμ'] at hbracket
       revert hbracket; split_ifs <;> intro hb <;> norm_num at hb
     · -- `ν = ν'`: then `ν ≠ μ'` (else `μ' = ν'`), `μ ≠ ν'` (else `μ = ν`); bracket `= 1 + [μ=μ']`.
       intro h
       have hνμ' : ν ≠ μ' := fun he => hμ'ν' (he.symm.trans h)
       have hμν' : μ ≠ ν' := fun he => hμν (he.trans h.symm)
-      rw [if_pos h, if_neg hνμ', if_neg hμν'] at hbracket
+      rw [ite_eq_left h, ite_eq_right hνμ', ite_eq_right hμν'] at hbracket
       revert hbracket; split_ifs <;> intro hb <;> norm_num at hb
   -- Conclude: the chosen members `a ∈ R(χ)`, `b ∈ R(ψ)` are orthogonal.
   rw [hχ.mem_imageSet_iff] at ha
@@ -764,10 +764,10 @@ theorem inner_eq_zero_of_signedDifference_inner_zero_of_mem
   obtain ⟨h1, h2, h3, h4⟩ := key
   rcases ha with rfl | rfl <;> rcases hb with rfl | rfl <;>
     simp only [muClassFunction, nuClassFunction]
-  · rw [hcross μ μ', if_neg h1]
-  · rw [hcross μ ν', if_neg h2]
-  · rw [hcross ν μ', if_neg h3]
-  · rw [hcross ν ν', if_neg h4]
+  · rw [hcross μ μ', ite_eq_right h1]
+  · rw [hcross μ ν', ite_eq_right h2]
+  · rw [hcross ν μ', ite_eq_right h3]
+  · rw [hcross ν ν', ite_eq_right h4]
 
 /-- **Peterfalvi (5.2.e)/(4.1) same-domain form** (`R(χ).Orthogonal R(ψ)` for `χ, ψ` over the same
 `L`): the `CharacterDifferenceImage.Orthogonal`-facing wrapper of the cross-domain member lemma
@@ -923,13 +923,13 @@ def congrTau {τ₁ τ₂ : IntegralCharacterMap L G} (h : τ₁ = τ₂)
 theorem inner_self_of_mem (R : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
     {α : ClassFunction G ℂ} (hα : α ∈ R.imageSet) :
     ClassFunction.inner α α = 1 := by
-  rw [R.orthonormal α hα α hα, if_pos rfl]
+  rw [R.orthonormal α hα α hα, ite_eq_left rfl]
 
 /-- Distinct members of `R(χ)` are orthogonal. -/
 theorem inner_eq_zero_of_ne (R : OrthonormalCharacterImageFamily (L := L) (G := G) τ χ)
     {α β : ClassFunction G ℂ} (hα : α ∈ R.imageSet) (hβ : β ∈ R.imageSet) (hαβ : α ≠ β) :
     ClassFunction.inner α β = 0 := by
-  rw [R.orthonormal α hα β hβ, if_neg hαβ]
+  rw [R.orthonormal α hα β hβ, ite_eq_right hαβ]
 
 /-- The image equation in `conjugateDifference` form: `τ (χ - χ̄) = ∑_{α ∈ R(χ)} α`. -/
 theorem image_conjugateDifference
@@ -999,10 +999,10 @@ theorem inner_signSmul_pair_eq_ite
     have hμν_ne : hχ.muClassFunction ≠ hχ.nuClassFunction :=
       hχ.muClassFunction_ne_nuClassFunction
     rcases ha with rfl | rfl <;> rcases hb with rfl | rfl
-    · rw [hμμ, if_pos rfl]
-    · rw [hμν, if_neg hμν_ne]
-    · rw [hνμ, if_neg (Ne.symm hμν_ne)]
-    · rw [hνν, if_pos rfl]
+    · rw [hμμ, ite_eq_left rfl]
+    · rw [hμν, ite_eq_right hμν_ne]
+    · rw [hνμ, ite_eq_right (Ne.symm hμν_ne)]
+    · rw [hνν, ite_eq_left rfl]
   rw [← Int.cast_smul_eq_zsmul ℂ s a, ← Int.cast_smul_eq_zsmul ℂ t b,
     ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
     hpair, star_intCast]
@@ -1019,8 +1019,8 @@ theorem signMu_ne_negSignNu [Finite G] (hχ : CharacterDifferenceImage (L := L) 
     (a := hχ.muClassFunction) (b := hχ.muClassFunction) (Or.inl rfl) (Or.inl rfl)
   have hcross := hχ.inner_signSmul_pair_eq_ite (s := hχ.sign) (t := -hχ.sign)
     (a := hχ.muClassFunction) (b := hχ.nuClassFunction) (Or.inl rfl) (Or.inr rfl)
-  rw [if_pos rfl, mul_one] at hself
-  rw [if_neg hχ.muClassFunction_ne_nuClassFunction, mul_zero] at hcross
+  rw [ite_eq_left rfl, mul_one] at hself
+  rw [ite_eq_right hχ.muClassFunction_ne_nuClassFunction, mul_zero] at hcross
   have hsign : (hχ.sign : ℂ) * (hχ.sign : ℂ) = 1 := by
     have := hχ.sign_mul_self; exact_mod_cast congrArg (Int.cast : ℤ → ℂ) this
   rw [hsign] at hself
@@ -1051,14 +1051,14 @@ noncomputable def toOrthonormalImage
     intro α hα β hβ
     simp only [Finset.mem_insert, Finset.mem_singleton] at hα hβ
     rcases hα with rfl | rfl <;> rcases hβ with rfl | rfl
-    · rw [if_pos rfl, hχ.inner_signSmul_pair_eq_ite (Or.inl rfl) (Or.inl rfl),
-        if_pos rfl, mul_one, hsign]
-    · rw [if_neg hne, hχ.inner_signSmul_pair_eq_ite (Or.inl rfl) (Or.inr rfl),
-        if_neg hχ.muClassFunction_ne_nuClassFunction, mul_zero]
-    · rw [if_neg (Ne.symm hne), hχ.inner_signSmul_pair_eq_ite (Or.inr rfl) (Or.inl rfl),
-        if_neg (Ne.symm hχ.muClassFunction_ne_nuClassFunction), mul_zero]
-    · rw [if_pos rfl, hχ.inner_signSmul_pair_eq_ite (Or.inr rfl) (Or.inr rfl),
-        if_pos rfl, mul_one]
+    · rw [ite_eq_left rfl, hχ.inner_signSmul_pair_eq_ite (Or.inl rfl) (Or.inl rfl),
+        ite_eq_left rfl, mul_one, hsign]
+    · rw [ite_eq_right hne, hχ.inner_signSmul_pair_eq_ite (Or.inl rfl) (Or.inr rfl),
+        ite_eq_right hχ.muClassFunction_ne_nuClassFunction, mul_zero]
+    · rw [ite_eq_right (Ne.symm hne), hχ.inner_signSmul_pair_eq_ite (Or.inr rfl) (Or.inl rfl),
+        ite_eq_right (Ne.symm hχ.muClassFunction_ne_nuClassFunction), mul_zero]
+    · rw [ite_eq_left rfl, hχ.inner_signSmul_pair_eq_ite (Or.inr rfl) (Or.inr rfl),
+        ite_eq_left rfl, mul_one]
       push_cast
       rw [neg_mul_neg, hsign]
   image_eq := by
@@ -1312,7 +1312,7 @@ theorem CharacterDifferenceImage.nu_eq_mu_conj
     rw [← hcoe, ClassFunction.conj_conj]
   · -- Otherwise the pairing equation reads `[μ̄ = μ] − 0 = 0 − 1`, impossible.
     exfalso
-    rw [if_neg hcase, if_neg (Ne.symm hχ.distinct), if_pos rfl] at hinner
+    rw [ite_eq_right hcase, ite_eq_right (Ne.symm hχ.distinct), ite_eq_left rfl] at hinner
     revert hinner
     split_ifs <;> intro h <;> norm_num at h
 

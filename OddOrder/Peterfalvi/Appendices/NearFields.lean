@@ -517,7 +517,7 @@ theorem twAut_add (a b : ZMod 2) : d.twAut (a + b) = d.twAut a * d.twAut b := by
 @[simp] theorem twExp_zero : d.twExp 0 = 0 := by simp [twExp]
 
 @[simp] theorem twExp_one : d.twExp 1 = 0 := by
-  rw [twExp, dif_neg one_ne_zero, show Units.mk0 (1 : K) one_ne_zero = 1 from Units.ext rfl,
+  rw [twExp, dite_eq_right one_ne_zero, show Units.mk0 (1 : K) one_ne_zero = 1 from Units.ext rfl,
     map_one, toAdd_one]
 
 @[simp] theorem twMul_zero (x : K) : d.twMul x 0 = 0 := by simp [twMul]
@@ -548,14 +548,14 @@ theorem twAut_twAut (a b : ZMod 2) (x : K) : d.twAut a (d.twAut b x) = d.twAut (
 theorem twExp_mul {y z : K} (hy : y ≠ 0) (hz : z ≠ 0) :
     d.twExp (y * z) = d.twExp y + d.twExp z := by
   have hyz : y * z ≠ 0 := mul_ne_zero hy hz
-  rw [twExp, dif_neg hyz, twExp, dif_neg hy, twExp, dif_neg hz,
+  rw [twExp, dite_eq_right hyz, twExp, dite_eq_right hy, twExp, dite_eq_right hz,
     show Units.mk0 (y * z) hyz = Units.mk0 y hy * Units.mk0 z hz from Units.ext rfl,
     map_mul, toAdd_mul]
 
 /-- `twExp` is `σ`-invariant on nonzero elements: `twExp (σ y) = twExp y`. -/
 theorem twExp_σ {y : K} (hy : y ≠ 0) : d.twExp (d.σ y) = d.twExp y := by
   have hσy : d.σ y ≠ 0 := by rw [ne_eq, EmbeddingLike.map_eq_zero_iff]; exact hy
-  rw [twExp, dif_neg hσy, twExp, dif_neg hy,
+  rw [twExp, dite_eq_right hσy, twExp, dite_eq_right hy,
     show Units.mk0 (d.σ y) hσy = Units.map (d.σ : K →* K) (Units.mk0 y hy) from Units.ext rfl,
     d.χ_σ]
 
@@ -592,7 +592,7 @@ theorem twMul_assoc (x y z : K) : d.twMul (d.twMul x y) z = d.twMul x (d.twMul y
 /-- The twist exponent is inversion-invariant on nonzero elements (`χ(y⁻¹) = χ(y)` in `ℤ/2`). -/
 theorem twExp_inv {y : K} (hy : y ≠ 0) : d.twExp y⁻¹ = d.twExp y := by
   have hy' : y⁻¹ ≠ 0 := inv_ne_zero hy
-  rw [twExp, dif_neg hy', twExp, dif_neg hy,
+  rw [twExp, dite_eq_right hy', twExp, dite_eq_right hy,
     show Units.mk0 y⁻¹ hy' = (Units.mk0 y hy)⁻¹ from Units.ext rfl, map_inv, toAdd_inv]
   exact (by decide : ∀ a : ZMod 2, -a = a) _
 
@@ -1077,7 +1077,7 @@ theorem cyclic_index_two_nearField_classification.{u} {F : Type u} [NearField F]
       rcases eq_or_ne c 0 with rfl | hc
       · rw [map_zero, mul_zero, TwistData.twMul_zero, map_zero]
       · have hexp : d.twExp c = Multiplicative.toAdd (χ (Units.mk0 c hc)) := by
-          unfold TwistData.twExp; rw [dif_neg hc]
+          unfold TwistData.twExp; rw [dite_eq_right hc]
         by_cases hmem : ∃ a' : ↥A, ((a' : Fˣ) : F) = Θ c
         · obtain ⟨a', ha'⟩ := hmem
           have hχ1 : χ (Units.mk0 c hc) = 1 := (hχone _).mpr ((hBA c hc).mpr ⟨a', ha'⟩)
@@ -1128,13 +1128,13 @@ theorem cyclic_index_two_nearField_classification.{u} {F : Type u} [NearField F]
     have htwB : ∀ (a c : K) (hc : c ≠ 0), Units.mk0 c hc ∈ B → d.twMul a c = a * c := by
       intro a c hc hcB
       have hexp : d.twExp c = 0 := by
-        unfold TwistData.twExp; rw [dif_neg hc, (hχone _).mpr hcB, toAdd_one]
+        unfold TwistData.twExp; rw [dite_eq_right hc, (hχone _).mpr hcB, toAdd_one]
       change d.twAut (d.twExp c) a * c = a * c
       rw [hexp, TwistData.twAut_zero]; rfl
     have htwNB : ∀ (a c : K) (hc : c ≠ 0), Units.mk0 c hc ∉ B → d.twMul a c = σ a * c := by
       intro a c hc hcB
       have hexp : d.twExp c = 1 := by
-        unfold TwistData.twExp; rw [dif_neg hc]
+        unfold TwistData.twExp; rw [dite_eq_right hc]
         exact hZ2 _ (fun h => hcB ((hχone _).mp (Multiplicative.toAdd.injective
           (h.trans toAdd_one.symm))))
       change d.twAut (d.twExp c) a * c = σ a * c

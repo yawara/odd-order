@@ -56,9 +56,10 @@ theorem classFunction_eq_sum_inner_smul (φ : ClassFunction Γ ℂ) :
         (ClassFunction.inner φ (a : ClassFunction Γ ℂ) • (a : ClassFunction Γ ℂ))
         (b : ClassFunction Γ ℂ)) = ClassFunction.inner φ (b : ClassFunction Γ ℂ) := by
     rw [Finset.sum_eq_single b]
-    · rw [ClassFunction.inner_smul_left, irreducibleCharacter_inner_eq_ite b b, if_pos rfl, mul_one]
+    · rw [ClassFunction.inner_smul_left, irreducibleCharacter_inner_eq_ite b b, ite_eq_left rfl,
+        mul_one]
     · intro a _ hab
-      rw [ClassFunction.inner_smul_left, irreducibleCharacter_inner_eq_ite a b, if_neg hab,
+      rw [ClassFunction.inner_smul_left, irreducibleCharacter_inner_eq_ite a b, ite_eq_right hab,
           mul_zero]
     · intro hb; exact absurd (Finset.mem_univ b) hb
   rw [hstep, sub_self]
@@ -188,7 +189,7 @@ theorem characterKernel_subset_of_natFinsupp_eq_sum {Γ : Type*} [Group Γ] [Fin
       else trivialIrreducibleCharacter Γ with hχfam_def
   have hfam : ∀ a, IsIrreducibleCharacter a →
       ((χfam a : IrreducibleCharacter Γ) : ClassFunction Γ ℂ) = a := by
-    intro a h; simp only [hχfam_def, dif_pos h]
+    intro a h; simp only [hχfam_def, dite_eq_left h]
   have hirr : ∀ a ∈ m.support, IsIrreducibleCharacter a := fun a ha =>
     mem_irreducibleCharacters.mp (hsupp (Finset.mem_coe.mpr ha))
   set d : ClassFunction Γ ℂ → ℕ :=
@@ -198,7 +199,7 @@ theorem characterKernel_subset_of_natFinsupp_eq_sum {Γ : Type*} [Group Γ] [Fin
     intro a ha
     have h := hirr a ha
     rw [hfam a h]
-    simp only [hd_def, dif_pos h]
+    simp only [hd_def, dite_eq_left h]
     exact (h.exists_natDegree_charValue_one_dvd_card).choose_spec.2.1
   have hsumapp : ∀ x : Γ, ψ x = ∑ a ∈ m.support, (m a : ℂ) * a x := by
     intro x
@@ -356,7 +357,7 @@ theorem adjointAverageFun_eq_of_H_eq_bot
     OddOrder.Peterfalvi.S04.adjointAverageFun hyp χ ⟨a.1, hyp.subset_L a.2⟩ = χ a.1 := by
   classical
   simp only [OddOrder.Peterfalvi.S04.adjointAverageFun]
-  rw [dif_pos a.2]
+  rw [dite_eq_left a.2]
   have hHa : hyp.H ⟨a.1, a.2⟩ = ⊥ := hH
   have hconst : ∀ x : ↥(hyp.H ⟨a.1, a.2⟩), χ (a.1 * (x : G)) = χ a.1 := by
     intro x
@@ -732,7 +733,7 @@ theorem exists_conjugatePairCover {Γ : Type*} [Group Γ]
   let pair : ℕ → ClassFunction Γ ℂ × ClassFunction Γ ℂ := fun j =>
     if hj : j < T.card then (e (t ⟨j, hj⟩), (e (t ⟨j, hj⟩)).conj) else (0, 0)
   have hpair_eq : ∀ (j : ℕ) (hj : j < T.card),
-      pair j = (e (t ⟨j, hj⟩), (e (t ⟨j, hj⟩)).conj) := fun j hj => dif_pos hj
+      pair j = (e (t ⟨j, hj⟩), (e (t ⟨j, hj⟩)).conj) := fun j hj => dite_eq_left hj
   have hfst : ∀ (j : ℕ) (hj : j < T.card), (pair j).1 = e (t ⟨j, hj⟩) := by
     intro j hj; rw [hpair_eq j hj]
   have hsnd : ∀ (j : ℕ) (hj : j < T.card), (pair j).2 = e (cidx (t ⟨j, hj⟩)) := by
@@ -869,7 +870,7 @@ theorem exists_conjugatePairCover_general {Γ : Type*} [Group Γ]
   let pair : ℕ → ClassFunction Γ ℂ × ClassFunction Γ ℂ := fun j =>
     if hj : j < T.card then (e (t ⟨j, hj⟩), (e (t ⟨j, hj⟩)).conj) else (0, 0)
   have hpair_eq : ∀ (j : ℕ) (hj : j < T.card),
-      pair j = (e (t ⟨j, hj⟩), (e (t ⟨j, hj⟩)).conj) := fun j hj => dif_pos hj
+      pair j = (e (t ⟨j, hj⟩), (e (t ⟨j, hj⟩)).conj) := fun j hj => dite_eq_left hj
   have hfst : ∀ (j : ℕ) (hj : j < T.card), (pair j).1 = e (t ⟨j, hj⟩) := by
     intro j hj; rw [hpair_eq j hj]
   have hsnd : ∀ (j : ℕ) (hj : j < T.card), (pair j).2 = e (cidx (t ⟨j, hj⟩)) := by

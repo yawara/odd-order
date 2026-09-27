@@ -351,13 +351,13 @@ theorem vecMul_single (v : Fin n → F) (i j : Fin n) (c : F) :
   rw [hsum, Pi.single_apply]
   by_cases hk : k = j
   · subst hk
-    rw [if_pos rfl, Finset.sum_eq_single i
-      (fun l _ hl => by rw [Matrix.single_apply, if_neg (by rintro ⟨rfl, -⟩; exact hl rfl),
+    rw [ite_eq_left rfl, Finset.sum_eq_single i
+      (fun l _ hl => by rw [Matrix.single_apply, ite_eq_right (by rintro ⟨rfl, -⟩; exact hl rfl),
         mul_zero])
       (fun h => absurd (Finset.mem_univ i) h), Matrix.single_apply_same]
-  · rw [if_neg hk]
+  · rw [ite_eq_right hk]
     refine Finset.sum_eq_zero fun l _ => ?_
-    rw [Matrix.single_apply, if_neg (by rintro ⟨-, rfl⟩; exact hk rfl), mul_zero]
+    rw [Matrix.single_apply, ite_eq_right (by rintro ⟨-, rfl⟩; exact hk rfl), mul_zero]
 
 /-- transvection の行ベクトルへの右作用: `v ᵥ* (1 + c·E_{i,j}) = v + (v i * c) · e_j`。 -/
 theorem vecMul_transvectionGL {i j : Fin n} (hij : i ≠ j) (c : F) (v : Fin n → F) :
@@ -399,9 +399,9 @@ theorem single_mem_of_isRowInvariant {W : Submodule F (Fin n → F)}
         simp
       rw [Pi.sub_apply, hsum, Pi.single_apply]
       rcases lt_trichotomy k i₀ with hk | rfl | hk
-      · rw [hlow k hk, if_neg (asymm hk), if_neg (ne_of_lt hk), sub_zero]
-      · rw [if_neg (lt_irrefl _), if_pos rfl, sub_zero]
-      · rw [if_pos hk, if_neg (ne_of_gt hk), sub_self]
+      · rw [hlow k hk, ite_eq_right (asymm hk), ite_eq_right (ne_of_lt hk), sub_zero]
+      · rw [ite_eq_right (lt_irrefl _), ite_eq_left rfl, sub_zero]
+      · rw [ite_eq_left hk, ite_eq_right (ne_of_gt hk), sub_self]
     have hmem : Pi.single i₀ (v i₀) ∈ W := hdiff ▸ W.sub_mem hv hu
     intro c
     have hscale := W.smul_mem (c / v i₀) hmem

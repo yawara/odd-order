@@ -68,7 +68,8 @@ theorem crux_general_of_higher_anchor
     have hrel3 := hyp.inner_extension_Xset_scaledSub_eq_neg_general hF cX cY hη₁ hχ₁X hχ₃ hne₃₁
       ha hd
     rw [h, ClassFunction.inner_neg_left, ClassFunction.inner_neg_left,
-      hXon χ₂ χ₃ hχ₂ hχ₃, if_neg (Ne.symm hne₃₂), hXon χ₂ χ₁ hχ₂ hχ₁X, if_neg hne₂] at hrel3
+      hXon χ₂ χ₃ hχ₂ hχ₃, ite_eq_right (Ne.symm hne₃₂), hXon χ₂ χ₁ hχ₂ hχ₁X,
+      ite_eq_right hne₂] at hrel3
     have hd0 : (d : ℂ) = 0 := by linear_combination hrel3
     rw [Nat.cast_eq_zero] at hd0
     omega
@@ -118,7 +119,8 @@ theorem crux_general_of_higher_anchor_c2_caseA
     have hrel3 := hyp.inner_extension_Xset_scaledSub_eq_neg_general_c2_caseA hK hW1 hA cX cY hη₁
       hχ₁X hχ₃ hne₃₁ ha hd
     rw [h, ClassFunction.inner_neg_left, ClassFunction.inner_neg_left,
-      hXon χ₂ χ₃ hχ₂ hχ₃, if_neg (Ne.symm hne₃₂), hXon χ₂ χ₁ hχ₂ hχ₁X, if_neg hne₂] at hrel3
+      hXon χ₂ χ₃ hχ₂ hχ₃, ite_eq_right (Ne.symm hne₃₂), hXon χ₂ χ₁ hχ₂ hχ₁X,
+      ite_eq_right hne₂] at hrel3
     have hd0 : (d : ℂ) = 0 := by linear_combination hrel3
     rw [Nat.cast_eq_zero] at hd0
     omega
@@ -165,14 +167,14 @@ theorem exists_Ycoherence_hgood_of_frobenius
       simp only [IrreducibleCharacter.coe_mk] at h
       rw [h]
       by_cases hpq : φ = ψ
-      · rw [if_pos (Subtype.ext hpq), if_pos hpq]
-      · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+      · rw [ite_eq_left (Subtype.ext hpq), ite_eq_left hpq]
+      · rw [ite_eq_right (fun heq => hpq (Subtype.ext_iff.mp heq)), ite_eq_right hpq]
     have hY1irr := hyp.isIrreducibleCharacter_of_mem_Yset hη₁
     have hY2irr := hyp.isIrreducibleCharacter_of_mem_Yset hη₂Y
     have horth : ClassFunction.inner η₁ η₂ = 0 := by
-      rw [hinner η₁ η₂ hY1irr hY2irr, if_neg (Ne.symm hη₂ne)]
-    have hn1 : ClassFunction.inner η₁ η₁ = 1 := by rw [hinner η₁ η₁ hY1irr hY1irr, if_pos rfl]
-    have hn2 : ClassFunction.inner η₂ η₂ = 1 := by rw [hinner η₂ η₂ hY2irr hY2irr, if_pos rfl]
+      rw [hinner η₁ η₂ hY1irr hY2irr, ite_eq_right (Ne.symm hη₂ne)]
+    have hn1 : ClassFunction.inner η₁ η₁ = 1 := by rw [hinner η₁ η₁ hY1irr hY1irr, ite_eq_left rfl]
+    have hn2 : ClassFunction.inner η₂ η₂ = 1 := by rw [hinner η₂ η₂ hY2irr hY2irr, ite_eq_left rfl]
     have hdeg : (η₂ : ↥L → ℂ) 1 = (η₁ : ↥L → ℂ) 1 :=
       (hyp.Yset_apply_one hη₂Y).trans (hyp.Yset_apply_one hη₁).symm
     have hdeg0 : (η₁ : ↥L → ℂ) 1 ≠ 0 := by
@@ -241,14 +243,14 @@ theorem exists_Ycoherence_hgood_c2_caseA
       simp only [IrreducibleCharacter.coe_mk] at h
       rw [h]
       by_cases hpq : φ = ψ
-      · rw [if_pos (Subtype.ext hpq), if_pos hpq]
-      · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+      · rw [ite_eq_left (Subtype.ext hpq), ite_eq_left hpq]
+      · rw [ite_eq_right (fun heq => hpq (Subtype.ext_iff.mp heq)), ite_eq_right hpq]
     have hY1irr := hyp.isIrreducibleCharacter_of_mem_Yset hη₁
     have hY2irr := hyp.isIrreducibleCharacter_of_mem_Yset hη₂Y
     have horth : ClassFunction.inner η₁ η₂ = 0 := by
-      rw [hinner η₁ η₂ hY1irr hY2irr, if_neg (Ne.symm hη₂ne)]
-    have hn1 : ClassFunction.inner η₁ η₁ = 1 := by rw [hinner η₁ η₁ hY1irr hY1irr, if_pos rfl]
-    have hn2 : ClassFunction.inner η₂ η₂ = 1 := by rw [hinner η₂ η₂ hY2irr hY2irr, if_pos rfl]
+      rw [hinner η₁ η₂ hY1irr hY2irr, ite_eq_right (Ne.symm hη₂ne)]
+    have hn1 : ClassFunction.inner η₁ η₁ = 1 := by rw [hinner η₁ η₁ hY1irr hY1irr, ite_eq_left rfl]
+    have hn2 : ClassFunction.inner η₂ η₂ = 1 := by rw [hinner η₂ η₂ hY2irr hY2irr, ite_eq_left rfl]
     have hdeg : (η₂ : ↥L → ℂ) 1 = (η₁ : ↥L → ℂ) 1 :=
       (hyp.Yset_apply_one hη₂Y).trans (hyp.Yset_apply_one hη₁).symm
     have hdeg0 : (η₁ : ↥L → ℂ) 1 ≠ 0 := by
@@ -315,14 +317,14 @@ theorem exists_Xcoherence_crux_of_card_two_of_frobenius
       simp only [IrreducibleCharacter.coe_mk] at hh
       rw [hh]
       by_cases hpq : φ = ψ
-      · rw [if_pos (Subtype.ext hpq), if_pos hpq]
-      · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+      · rw [ite_eq_left (Subtype.ext hpq), ite_eq_left hpq]
+      · rw [ite_eq_right (fun heq => hpq (Subtype.ext_iff.mp heq)), ite_eq_right hpq]
     have hX1irr := hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχ₁
     have hX2irr := hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχ₂
     have horth : ClassFunction.inner χ₁ χ₂ = 0 := by
-      rw [hinner χ₁ χ₂ hX1irr hX2irr, if_neg (Ne.symm hne)]
-    have hn1 : ClassFunction.inner χ₁ χ₁ = 1 := by rw [hinner χ₁ χ₁ hX1irr hX1irr, if_pos rfl]
-    have hn2 : ClassFunction.inner χ₂ χ₂ = 1 := by rw [hinner χ₂ χ₂ hX2irr hX2irr, if_pos rfl]
+      rw [hinner χ₁ χ₂ hX1irr hX2irr, ite_eq_right (Ne.symm hne)]
+    have hn1 : ClassFunction.inner χ₁ χ₁ = 1 := by rw [hinner χ₁ χ₁ hX1irr hX1irr, ite_eq_left rfl]
+    have hn2 : ClassFunction.inner χ₂ χ₂ = 1 := by rw [hinner χ₂ χ₂ hX2irr hX2irr, ite_eq_left rfl]
     have hdeg0 : (χ₁ : ↥L → ℂ) 1 ≠ 0 := by
       obtain ⟨d, hdpos, hdeq⟩ :=
         irreducibleCharacter_apply_one_eq_pos_natCast (⟨χ₁, hX1irr⟩ : IrreducibleCharacter ↥L)
@@ -383,14 +385,14 @@ theorem exists_Xcoherence_crux_of_card_two_c2_caseA
       simp only [IrreducibleCharacter.coe_mk] at hh
       rw [hh]
       by_cases hpq : φ = ψ
-      · rw [if_pos (Subtype.ext hpq), if_pos hpq]
-      · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+      · rw [ite_eq_left (Subtype.ext hpq), ite_eq_left hpq]
+      · rw [ite_eq_right (fun heq => hpq (Subtype.ext_iff.mp heq)), ite_eq_right hpq]
     have hX1irr := hyp.isIrreducibleCharacter_of_mem_Xset_c2_caseA hK hW1 hA hχ₁
     have hX2irr := hyp.isIrreducibleCharacter_of_mem_Xset_c2_caseA hK hW1 hA hχ₂
     have horth : ClassFunction.inner χ₁ χ₂ = 0 := by
-      rw [hinner χ₁ χ₂ hX1irr hX2irr, if_neg (Ne.symm hne)]
-    have hn1 : ClassFunction.inner χ₁ χ₁ = 1 := by rw [hinner χ₁ χ₁ hX1irr hX1irr, if_pos rfl]
-    have hn2 : ClassFunction.inner χ₂ χ₂ = 1 := by rw [hinner χ₂ χ₂ hX2irr hX2irr, if_pos rfl]
+      rw [hinner χ₁ χ₂ hX1irr hX2irr, ite_eq_right (Ne.symm hne)]
+    have hn1 : ClassFunction.inner χ₁ χ₁ = 1 := by rw [hinner χ₁ χ₁ hX1irr hX1irr, ite_eq_left rfl]
+    have hn2 : ClassFunction.inner χ₂ χ₂ = 1 := by rw [hinner χ₂ χ₂ hX2irr hX2irr, ite_eq_left rfl]
     have hdeg0 : (χ₁ : ↥L → ℂ) 1 ≠ 0 := by
       obtain ⟨d, hdpos, hdeq⟩ :=
         irreducibleCharacter_apply_one_eq_pos_natCast (⟨χ₁, hX1irr⟩ : IrreducibleCharacter ↥L)
@@ -440,8 +442,8 @@ noncomputable def coherentXunionYset_centralCommutator_diagonal_general
     simp only [IrreducibleCharacter.coe_mk] at h
     rw [h]
     by_cases hpq : φ = ψ
-    · rw [if_pos (Subtype.ext hpq), if_pos hpq]
-    · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+    · rw [ite_eq_left (Subtype.ext hpq), ite_eq_left hpq]
+    · rw [ite_eq_right (fun heq => hpq (Subtype.ext_iff.mp heq)), ite_eq_right hpq]
   have hXirr : ∀ φ ∈ hyp.Xset hyp.centralCommutator, IsIrreducibleCharacter φ :=
     fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ
   have hYirr : ∀ φ ∈ hyp.Yset, IsIrreducibleCharacter φ :=
@@ -454,7 +456,7 @@ noncomputable def coherentXunionYset_centralCommutator_diagonal_general
   have hXY : ∀ x ∈ hyp.Xset hyp.centralCommutator, ∀ y ∈ hyp.Yset,
       ClassFunction.inner x y = 0 := fun x hx y hy => by
     rw [hinner x y (hXirr x hx) (hYirr y hy),
-      if_neg (by intro h; exact Set.disjoint_left.mp hdisj hx (h ▸ hy))]
+      ite_eq_right (by intro h; exact Set.disjoint_left.mp hdisj hx (h ▸ hy))]
   have hglue :=
     OddOrder.Peterfalvi.S07.IntegralCharacterMap.exists_integralCharacterMap_glue_of_orthonormal
       (hyp.Xset_finite hyp.centralCommutator) hyp.Yset_finite
@@ -508,8 +510,8 @@ noncomputable def coherentXunionYset_centralCommutator_diagonal_general_c2_caseA
     simp only [IrreducibleCharacter.coe_mk] at h
     rw [h]
     by_cases hpq : φ = ψ
-    · rw [if_pos (Subtype.ext hpq), if_pos hpq]
-    · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+    · rw [ite_eq_left (Subtype.ext hpq), ite_eq_left hpq]
+    · rw [ite_eq_right (fun heq => hpq (Subtype.ext_iff.mp heq)), ite_eq_right hpq]
   have hXirr : ∀ φ ∈ hyp.Xset hyp.centralCommutator, IsIrreducibleCharacter φ :=
     fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_c2_caseA hK hW1 hA hφ
   have hYirr : ∀ φ ∈ hyp.Yset, IsIrreducibleCharacter φ :=
@@ -522,7 +524,7 @@ noncomputable def coherentXunionYset_centralCommutator_diagonal_general_c2_caseA
   have hXY : ∀ x ∈ hyp.Xset hyp.centralCommutator, ∀ y ∈ hyp.Yset,
       ClassFunction.inner x y = 0 := fun x hx y hy => by
     rw [hinner x y (hXirr x hx) (hYirr y hy),
-      if_neg (by intro h; exact Set.disjoint_left.mp hdisj hx (h ▸ hy))]
+      ite_eq_right (by intro h; exact Set.disjoint_left.mp hdisj hx (h ▸ hy))]
   have hglue :=
     OddOrder.Peterfalvi.S07.IntegralCharacterMap.exists_integralCharacterMap_glue_of_orthonormal
       (hyp.Xset_finite hyp.centralCommutator) hyp.Yset_finite

@@ -159,7 +159,7 @@ theorem sOf_H0Cprime_memberRFamily_imageSet_of_irr
     OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support
       hyp.base.mderivSharp_subset_A0 hηIKF0, ?_⟩
   unfold sOf_H0Cprime_memberRFamily
-  rw [dif_pos hirr]
+  rw [dite_eq_left hirr]
 
 set_option backward.isDefEq.respectTransparency false in
 /-- **`sOf_H0Cprime_memberRFamily` reduction, column case** (mirror of
@@ -182,7 +182,7 @@ theorem sOf_H0Cprime_memberRFamily_imageSet_of_col
   have hex := sOf_H0Cprime_reducible_eq_columnSum hG hyp hη hcol
   refine ⟨hex.choose, hex.choose_spec.1, hex.choose_spec.2, ?_⟩
   unfold sOf_H0Cprime_memberRFamily
-  rw [dif_neg hcol]
+  rw [dite_eq_right hcol]
   rfl
 
 set_option maxHeartbeats 1600000 in
@@ -266,7 +266,7 @@ theorem sOf_H0Cprime_memberRFamily_orthogonal
       intro heq
       have hφξ : φ = ξ := by rw [hkφeq, hkξeq, heq]
       rw [hφξ, hkξeq, OddOrder.Peterfalvi.S06.columnSum_def,
-        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl] at h1
+        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, ite_eq_left rfl] at h1
       exact hw1ne h1
     have hne2 : hyp.base.muColumnChar hG hG.odd kφ
         ≠ (hyp.base.muColumnChar hG hG.odd kξ)⁻¹ := by
@@ -275,7 +275,7 @@ theorem sOf_H0Cprime_memberRFamily_orthogonal
         rw [hkφeq, heq, ← OddOrder.Peterfalvi.S06.columnSum_conj_eq, hkξeq]
       rw [hφξc, hkξeq, OddOrder.Peterfalvi.S06.columnSum_conj_eq,
         OddOrder.Peterfalvi.S06.columnSum_def,
-        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl] at h2
+        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, ite_eq_left rfl] at h2
       exact hw1ne h2
     exact OddOrder.Peterfalvi.S06.certainTypeR_imageSet_orthogonal_certainTypeR h46
       (hyp.base.muColumnChar_ne_one hG hG.odd hkφ0) (hyp.base.muColumnChar_ne_one hG hG.odd hkξ0)
@@ -383,7 +383,7 @@ theorem SOf_memberRFamily_imageSet_of_irr
     OddOrder.Peterfalvi.S08.inducedKernelFamily_conjDiff_support
       hyp.base.mderivSharp_subset_A0 hηIKF0, ?_⟩
   unfold SOf_memberRFamily
-  rw [dif_pos hirr]
+  rw [dite_eq_left hirr]
 
 set_option backward.isDefEq.respectTransparency false in
 /-- **`SOf_memberRFamily` reduction, column case**. -/
@@ -404,7 +404,7 @@ theorem SOf_memberRFamily_imageSet_of_col
   have hex := SOf_reducible_eq_columnSum hG hyp hη hcol
   refine ⟨hex.choose, hex.choose_spec.1, hex.choose_spec.2, ?_⟩
   unfold SOf_memberRFamily
-  rw [dif_neg hcol]
+  rw [dite_eq_right hcol]
   rfl
 
 set_option maxHeartbeats 1600000 in
@@ -488,7 +488,7 @@ theorem SOf_memberRFamily_orthogonal
       intro heq
       have hφξ : φ = ξ := by rw [hkφeq, hkξeq, heq]
       rw [hφξ, hkξeq, OddOrder.Peterfalvi.S06.columnSum_def,
-        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl] at h1
+        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, ite_eq_left rfl] at h1
       exact hw1ne h1
     have hne2 : hyp.base.muColumnChar hG hG.odd kφ
         ≠ (hyp.base.muColumnChar hG hG.odd kξ)⁻¹ := by
@@ -497,7 +497,7 @@ theorem SOf_memberRFamily_orthogonal
         rw [hkφeq, heq, ← OddOrder.Peterfalvi.S06.columnSum_conj_eq, hkξeq]
       rw [hφξc, hkξeq, OddOrder.Peterfalvi.S06.columnSum_conj_eq,
         OddOrder.Peterfalvi.S06.columnSum_def,
-        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl] at h2
+        OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, ite_eq_left rfl] at h2
       exact hw1ne h2
     exact OddOrder.Peterfalvi.S06.certainTypeR_imageSet_orthogonal_certainTypeR h46
       (hyp.base.muColumnChar_ne_one hG hG.odd hkφ0) (hyp.base.muColumnChar_ne_one hG hG.odd hkξ0)

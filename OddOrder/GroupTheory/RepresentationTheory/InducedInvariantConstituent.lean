@@ -112,7 +112,7 @@ theorem induce_invariant_constituent_apply_one_eq [Finite K] [Fintype K] [Fintyp
   have hsum_ne : (∑ β : (K ⧸ H) →* ℂˣ, (if Φ β = φ then (1 : ℂ) else 0)) ≠ 0 := by
     rw [← hkey]; exact mul_ne_zero he hφ
   obtain ⟨β, _, hβ⟩ := Finset.exists_ne_zero_of_sum_ne_zero hsum_ne
-  have hΦβ : Φ β = φ := by by_contra h; rw [if_neg h] at hβ; exact hβ rfl
+  have hΦβ : Φ β = φ := by by_contra h; rw [ite_eq_right h] at hβ; exact hβ rfl
   -- Read off the degree: `φ(1) = (ψ·Inf β)(1) = ψ(1) · 1 = ψ(1)`.
   have hcoe : (φ : ClassFunction K ℂ)
       = (ψ : ClassFunction K ℂ) * linearClassFunction (β.comp (QuotientGroup.mk' H)) := by
@@ -425,7 +425,7 @@ theorem induce_inertia_constituent_apply_one_eq
   have hsum_ne : (∑ β : (↥T ⧸ N.subgroupOf T) →* ℂˣ, (if Φ β = φ then (1 : ℂ) else 0)) ≠ 0 := by
     rw [← hkey]; exact mul_ne_zero hover hφ
   obtain ⟨β, _, hβ⟩ := Finset.exists_ne_zero_of_sum_ne_zero hsum_ne
-  have hΦβ : Φ β = φ := by by_contra h; rw [if_neg h] at hβ; exact hβ rfl
+  have hΦβ : Φ β = φ := by by_contra h; rw [ite_eq_right h] at hβ; exact hβ rfl
   have hcoe : (φ : ClassFunction L ℂ) = ClassFunction.induce T ((ψ : ClassFunction ↥T ℂ) *
       linearClassFunction (β.comp (QuotientGroup.mk' (N.subgroupOf T)))) := by rw [← hΦβ]
   rw [hcoe, ClassFunction.induce_apply_one, ClassFunction.mul_apply, linearClassFunction_apply,

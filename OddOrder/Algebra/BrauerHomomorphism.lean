@@ -66,12 +66,12 @@ theorem coeff_brauerProj (P : Subgroup G) (x : MonoidAlgebra k G) (g : G) :
 theorem coeff_brauerProj_of_mem {P : Subgroup G} {g : G}
     (hg : g ∈ Subgroup.centralizer (P : Set G)) (x : MonoidAlgebra k G) :
     (brauerProj P x).coeff g = x.coeff g := by
-  classical rw [coeff_brauerProj, if_pos hg]
+  classical rw [coeff_brauerProj, ite_eq_left hg]
 
 theorem coeff_brauerProj_of_notMem {P : Subgroup G} {g : G}
     (hg : g ∉ Subgroup.centralizer (P : Set G)) (x : MonoidAlgebra k G) :
     (brauerProj P x).coeff g = 0 := by
-  classical rw [coeff_brauerProj, if_neg hg]
+  classical rw [coeff_brauerProj, ite_eq_right hg]
 
 @[simp]
 theorem brauerProj_zero (P : Subgroup G) : brauerProj P (0 : MonoidAlgebra k G) = 0 := by
@@ -101,8 +101,9 @@ theorem brauerProj_one (P : Subgroup G) : brauerProj P (1 : MonoidAlgebra k G) =
   ext g
   rw [coeff_brauerProj]
   by_cases hg : g ∈ Subgroup.centralizer (P : Set G)
-  · rw [if_pos hg]
-  · rw [if_neg hg, MonoidAlgebra.one_def, MonoidAlgebra.coeff_single, Finsupp.single_apply, if_neg]
+  · rw [ite_eq_left hg]
+  · rw [ite_eq_right hg, MonoidAlgebra.one_def, MonoidAlgebra.coeff_single, Finsupp.single_apply,
+      ite_eq_right]
     rintro rfl
     exact hg (Subgroup.centralizer (P : Set G)).one_mem
 
@@ -152,8 +153,8 @@ theorem brauerProj_eq_self {P : Subgroup G} {x : MonoidAlgebra k G}
   ext g
   rw [coeff_brauerProj]
   by_cases hg : g ∈ Subgroup.centralizer (P : Set G)
-  · rw [if_pos hg]
-  · rw [if_neg hg, hx g hg]
+  · rw [ite_eq_left hg]
+  · rw [ite_eq_right hg, hx g hg]
 
 /-- `Br_P` is idempotent. -/
 theorem brauerProj_brauerProj (P : Subgroup G) (x : MonoidAlgebra k G) :
@@ -175,8 +176,8 @@ theorem brauerProj_conj_smul {P : Subgroup G} {n : G} (hn : n ∈ Subgroup.norma
   ext c
   rw [coeff_brauerProj, coeff_conj_smul, coeff_conj_smul, coeff_brauerProj]
   by_cases hc : c ∈ Subgroup.centralizer (P : Set G)
-  · rw [if_pos hc, if_pos ((conj_mem_centralizer_iff hn c).mpr hc)]
-  · rw [if_neg hc, if_neg fun h => hc ((conj_mem_centralizer_iff hn c).mp h)]
+  · rw [ite_eq_left hc, ite_eq_left ((conj_mem_centralizer_iff hn c).mpr hc)]
+  · rw [ite_eq_right hc, ite_eq_right fun h => hc ((conj_mem_centralizer_iff hn c).mp h)]
 
 end Section
 
@@ -234,9 +235,9 @@ theorem brauerProj_mul_of_invariant [Finite G] (hp : p.Prime) (hchar : (p : k) =
       by_cases ha : a ∈ Subgroup.centralizer (P : Set G)
       · have hac : a⁻¹ * c ∈ Subgroup.centralizer (P : Set G) :=
           Subgroup.mul_mem _ (Subgroup.inv_mem _ ha) hc
-        rw [coeff_brauerProj_of_mem ha, coeff_brauerProj_of_mem hac, if_pos]
+        rw [coeff_brauerProj_of_mem ha, coeff_brauerProj_of_mem hac, ite_eq_left]
         simpa [hC] using ha
-      · rw [coeff_brauerProj_of_notMem ha, zero_mul, if_neg]
+      · rw [coeff_brauerProj_of_notMem ha, zero_mul, ite_eq_right]
         simpa [hC] using ha
     rw [Finset.sum_congr rfl fun a _ => hRHS a, Finset.sum_ite_mem, Finset.univ_inter]
     -- Now apply the orbit-counting lemma.

@@ -82,11 +82,11 @@ theorem nonempty_equiv_conjRep_of_character_eq [Finite ↥H] [Invertible (Nat.ca
   have : Fintype ↥H := Fintype.ofFinite _
   have := isIrreducible_conjRep ρ g
   have h1 : (Nat.card ↥H : ℂ)⁻¹ * ∑ h : ↥H, ρ.character h * ρ.character h⁻¹ = 1 := by
-    rw [Representation.char_orthonormal, if_pos ⟨Representation.Equiv.refl _⟩]
+    rw [Representation.char_orthonormal, ite_eq_left ⟨Representation.Equiv.refl _⟩]
   have key := Representation.char_orthonormal (conjRep ρ g) ρ
   rw [hinv, h1] at key
   by_contra hc
-  rw [if_neg hc] at key
+  rw [ite_eq_right hc] at key
   exact one_ne_zero key
 
 /-- **The conjugation unit** (step 1, unit form).  For an irreducible `ρ` whose character is

@@ -70,8 +70,8 @@ theorem coeff_brauerTrunc (x : MonoidAlgebra k G) (y : ↥H) :
     rw [apply_ite (fun f : MonoidAlgebra k ↥H => f.coeff y), MonoidAlgebra.coeff_single,
       Finsupp.single_apply, hzero]
     by_cases hh : h = y
-    · rw [if_pos hh, if_pos hh]
-    · rw [if_neg hh, if_neg hh, ite_self]
+    · rw [ite_eq_left hh, ite_eq_left hh]
+    · rw [ite_eq_right hh, ite_eq_right hh, ite_self]
   rw [hsum, Finset.sum_congr rfl (fun h _ => hterm h),
     Finset.sum_ite_eq' Finset.univ y
       (fun h : ↥H => if (h : G) ∈ Subgroup.centralizer (P : Set G) then x.coeff (h : G) else 0)]
@@ -92,8 +92,8 @@ theorem brauerTrunc_add (x y : MonoidAlgebra k G) :
       = (brauerTrunc P H x).coeff n + (brauerTrunc P H y).coeff n from rfl,
     coeff_brauerTrunc, coeff_brauerTrunc, coeff_brauerTrunc]
   by_cases hn : (n : G) ∈ Subgroup.centralizer (P : Set G)
-  · rw [if_pos hn, if_pos hn, if_pos hn]; rfl
-  · rw [if_neg hn, if_neg hn, if_neg hn, add_zero]
+  · rw [ite_eq_left hn, ite_eq_left hn, ite_eq_left hn]; rfl
+  · rw [ite_eq_right hn, ite_eq_right hn, ite_eq_right hn, add_zero]
 
 theorem brauerTrunc_smul (c : k) (x : MonoidAlgebra k G) :
     brauerTrunc P H (c • x) = c • brauerTrunc P H x := by
@@ -101,8 +101,8 @@ theorem brauerTrunc_smul (c : k) (x : MonoidAlgebra k G) :
   rw [MonoidAlgebra.coeff_smul_apply, coeff_brauerTrunc, coeff_brauerTrunc,
     MonoidAlgebra.coeff_smul_apply]
   by_cases hn : (n : G) ∈ Subgroup.centralizer (P : Set G)
-  · rw [if_pos hn, if_pos hn]
-  · rw [if_neg hn, if_neg hn, smul_zero]
+  · rw [ite_eq_left hn, ite_eq_left hn]
+  · rw [ite_eq_right hn, ite_eq_right hn, smul_zero]
 
 @[simp]
 theorem brauerTrunc_one : brauerTrunc P H (1 : MonoidAlgebra k G) = 1 := by
@@ -113,19 +113,19 @@ theorem brauerTrunc_one : brauerTrunc P H (1 : MonoidAlgebra k G) = 1 := by
     intro m
     rw [MonoidAlgebra.one_def, MonoidAlgebra.coeff_single, Finsupp.single_apply]
     by_cases hm : m = 1
-    · rw [if_pos hm, if_pos hm.symm]
-    · rw [if_neg hm, if_neg fun h => hm h.symm]
+    · rw [ite_eq_left hm, ite_eq_left hm.symm]
+    · rw [ite_eq_right hm, ite_eq_right fun h => hm h.symm]
   have honeH : (1 : MonoidAlgebra k ↥H).coeff n = if n = 1 then (1 : k) else 0 := by
     rw [MonoidAlgebra.one_def, MonoidAlgebra.coeff_single, Finsupp.single_apply]
     by_cases hn : n = 1
-    · rw [if_pos hn, if_pos hn.symm]
-    · rw [if_neg hn, if_neg fun h => hn h.symm]
+    · rw [ite_eq_left hn, ite_eq_left hn.symm]
+    · rw [ite_eq_right hn, ite_eq_right fun h => hn h.symm]
   rw [hone, honeH]
   by_cases hn : n = 1
   · subst hn
     simp
   · have hn' : (n : G) ≠ 1 := fun h => hn (Subtype.ext h)
-    rw [if_neg hn', if_neg hn, ite_self]
+    rw [ite_eq_right hn', ite_eq_right hn, ite_self]
 
 /-! ### Comparison with `brauerProj` through the inclusion `k[H] ↪ k[G]`
 
@@ -139,11 +139,11 @@ theorem inclusionHom_brauerTrunc (hCH : Subgroup.centralizer (P : Set G) ≤ H)
   classical
   refine MonoidAlgebra.ext (Finsupp.ext fun n => ?_)
   by_cases hn : n ∈ Subgroup.centralizer (P : Set G)
-  · rw [coeff_inclusionHom_of_mem (hCH hn), coeff_brauerTrunc, if_pos hn,
+  · rw [coeff_inclusionHom_of_mem (hCH hn), coeff_brauerTrunc, ite_eq_left hn,
       coeff_brauerProj_of_mem hn]
   · rw [coeff_brauerProj_of_notMem hn]
     by_cases hnH : n ∈ H
-    · rw [coeff_inclusionHom_of_mem hnH, coeff_brauerTrunc, if_neg hn]
+    · rw [coeff_inclusionHom_of_mem hnH, coeff_brauerTrunc, ite_eq_right hn]
     · rw [coeff_inclusionHom_of_notMem hnH]
 
 /-! ### Centrality and multiplicativity -/
@@ -207,11 +207,11 @@ theorem brauerTrunc_classSum (C : ConjClasses G) :
   rw [brauerTrunc, centralizerTruncClassSum]
   refine Finset.sum_congr rfl fun h _ => ?_
   by_cases hcent : (h : G) ∈ Subgroup.centralizer (P : Set G)
-  · rw [if_pos hcent, coeff_classSum]
+  · rw [ite_eq_left hcent, coeff_classSum]
     by_cases hclass : ConjClasses.mk (h : G) = C
-    · rw [if_pos hclass, if_pos ⟨hclass, hcent⟩, MonoidAlgebra.of_apply]
-    · rw [if_neg hclass, if_neg (by tauto)]
+    · rw [ite_eq_left hclass, ite_eq_left ⟨hclass, hcent⟩, MonoidAlgebra.of_apply]
+    · rw [ite_eq_right hclass, ite_eq_right (by tauto)]
       exact MonoidAlgebra.single_zero h
-  · rw [if_neg hcent, if_neg (by tauto)]
+  · rw [ite_eq_right hcent, ite_eq_right (by tauto)]
 
 end OddOrder.RepresentationTheory.Modular

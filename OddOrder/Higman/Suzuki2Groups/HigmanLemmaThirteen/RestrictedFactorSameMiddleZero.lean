@@ -128,12 +128,10 @@ theorem
   let : CommGroup (frattini P) :=
     { (inferInstance : Group (frattini P)) with
       mul_comm := hPhiComm.is_comm.comm }
-  induction x using TensorProduct.induction_on with
-  | zero => simp
+  induction x using TensorProduct.inductionOn with
   | tmul a u =>
       simp only [LinearMap.baseChange_tmul]
-      induction y using TensorProduct.induction_on with
-      | zero => simp
+      induction y using TensorProduct.inductionOn with
       | tmul b v =>
           simp only [LinearMap.baseChange_tmul,
             frattiniMiddleCommutatorBilinearBaseChange_tmul]

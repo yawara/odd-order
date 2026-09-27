@@ -224,11 +224,11 @@ variable {G}
 @[simp] theorem chainAux_zero (m j : ℕ) : chainAux G m 0 j = ⊤ := rfl
 
 theorem chainAux_succ_of_le {m k j : ℕ} (h : k + 1 ≤ j) : chainAux G m (k + 1) j = ⊤ := by
-  rw [chainAux, if_pos h]
+  rw [chainAux, ite_eq_left h]
 
 theorem chainAux_succ_of_lt {m k j : ℕ} (h : j < k + 1) :
     chainAux G m (k + 1) j = (chainAux G m k j).map (autTowerStep G (m + k)) := by
-  rw [chainAux, if_neg (Nat.not_le.mpr h)]
+  rw [chainAux, ite_eq_right (Nat.not_le.mpr h)]
 
 /-- 鎖の上端は `⊤` (9.12 の `S r = ⊤`). -/
 @[simp] theorem chainAux_self (m k : ℕ) : chainAux G m k k = ⊤ := by

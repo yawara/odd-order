@@ -454,7 +454,7 @@ theorem IsPGroup.normal_inf_center_nontrivial {P : Type*} [Group P] [Finite P]
 `Group.isNilpotent_of_finite_tfae` 全体に対応する (Thm 1.26 慣用名
 `isNilpotent_iff_forall_sylow_normal` で扱う).
 
-**Thm 1.20** (冪零 ⇔ NormalizerCondition) は `Group.isNilpotent_of_finite_tfae.out 0 1`,
+**Thm 1.20** (冪零 ⇔ NormalizerCondition) は `Group.isNilpotent_of_finite_tfae.out 1 2`,
 **Thm 1.21** (`upperCentralSeries G (nilpotencyClass G) = ⊤`) は
 `upperCentralSeries_nilpotencyClass` を直接呼ぶ. -/
 
@@ -746,13 +746,13 @@ theorem exists_normal_sylow_of_characteristic_card_eq_sylow [Finite G]
 /-- **Isaacs Thm 1.26 (1) ⇔ (4)**.  有限群 `G` について「`G` が冪零」と
 「`G` の任意の Sylow 部分群が正規」は同値.
 
-mathlib `Group.isNilpotent_of_finite_tfae` の (0) ⇔ (3) の抽出ラッパー.  Isaacs 流 5 条件
+mathlib `Group.isNilpotent_of_finite_tfae` の (1) ⇔ (4) の抽出ラッパー.  Isaacs 流 5 条件
 ((1)冪零, (2)`H<G ⇒ N_G(H)>H`, (3) 全極大正規, (4) 全 Sylow 正規, (5) Sylow 内部直積)
 は TFAE 全体 (`Group.isNilpotent_of_finite_tfae`) で確保される. -/
 theorem isNilpotent_iff_forall_sylow_normal [Finite G] :
     Group.IsNilpotent G ↔
       ∀ (p : ℕ) [Fact p.Prime] (P : Sylow p G), (↑P : Subgroup G).Normal :=
-  Group.isNilpotent_of_finite_tfae.out 0 3
+  Group.isNilpotent_of_finite_tfae.out 1 4
 
 /-! **Isaacs Thm 1.26 (4) ⇒ (1)** (全 Sylow 正規 ⇒ 冪零) は呼出側で
 `isNilpotent_iff_forall_sylow_normal.mpr` を直接呼ぶ. -/
@@ -1314,7 +1314,7 @@ theorem sylow_p_subsingleton_of_card_eq_mul_prime_lt
     simp only [Finsupp.coe_add, Pi.add_apply,
                Nat.Prime.factorization_self (Fact.out (p := p.Prime)),
                (Fact.out (p := q.Prime)).factorization,
-               Finsupp.single_apply, if_neg hqp.ne] at hmul
+               Finsupp.single_apply, ite_eq_right hqp.ne] at hmul
     simpa using hmul
   have hPindex : (P : Subgroup G).index = q := by
     have h1 : Nat.card (P : Subgroup G) * (P : Subgroup G).index = Nat.card G :=

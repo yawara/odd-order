@@ -302,10 +302,10 @@ theorem sMember_characterFacts (hyp : SibleyDadeHypothesis G L H)
         ⟨χ.conj, hconjirr⟩
   · have h := irreducibleCharacter_inner_eq_ite (⟨χ.conj, hconjirr⟩ : IrreducibleCharacter ↥L)
       ⟨χ, hirr⟩
-    rwa [if_neg hbi_ne] at h
+    rwa [ite_eq_right hbi_ne] at h
   · have h := irreducibleCharacter_inner_eq_ite (⟨χ, hirr⟩ : IrreducibleCharacter ↥L)
       ⟨χ.conj, hconjirr⟩
-    rwa [if_neg (fun h => hbi_ne h.symm)] at h
+    rwa [ite_eq_right (fun h => hbi_ne h.symm)] at h
 
 /-- **`S`-member conjugate-difference support** (any irreducible `χ ∈ S`): `χ̄ − χ` is supported on
 `H^# = sharpImage H`.  Since `χ = Ind_H^L θ` with `H ⊴ L`, `support χ ⊆ H`, and `χ̄ − χ` vanishes at
@@ -560,10 +560,10 @@ theorem xMember_characterFacts_of_irreducible_X (hyp : SibleyDadeHypothesis G L 
         ⟨χ.conj, hconjirr⟩
   · have h := irreducibleCharacter_inner_eq_ite (⟨χ.conj, hconjirr⟩ : IrreducibleCharacter ↥L)
       ⟨χ, hirr⟩
-    rwa [if_neg hbi_ne] at h
+    rwa [ite_eq_right hbi_ne] at h
   · have h := irreducibleCharacter_inner_eq_ite (⟨χ, hirr⟩ : IrreducibleCharacter ↥L)
       ⟨χ.conj, hconjirr⟩
-    rwa [if_neg (fun h => hbi_ne h.symm)] at h
+    rwa [ite_eq_right (fun h => hbi_ne h.symm)] at h
 
 /-- **(T8 leaf 1) `X`-member character facts** (Frobenius case). -/
 theorem xMember_characterFacts (hyp : SibleyDadeHypothesis G L H)

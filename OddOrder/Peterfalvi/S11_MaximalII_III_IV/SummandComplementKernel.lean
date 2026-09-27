@@ -300,7 +300,8 @@ theorem hcuZetaPair_liesOver_hInHu [Finite G] {M : Subgroup G}
     rw [← OddOrder.RepresentationTheory.IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver]
     have hcoe : (ζ : ClassFunction ↥(huSub data) ℂ) = ClassFunction.induce
         (hInHu data ⊔ cuInHu caseA) (hcuPsiPair caseA θ hinv lam) := by rw [hζdef]
-    rw [← hcoe, OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite ζ ζ, if_pos rfl]
+    rw [← hcoe, OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite ζ ζ,
+      ite_eq_left rfl]
     exact one_ne_zero
   -- `ψ` restricts on `hInHu` to the inflation `θ₀` (single irreducible), so `ψ` lies over `θ₀`.
   set θ'irr : IrreducibleCharacter ↥((hInHu data).subgroupOf (hInHu data ⊔ cuInHu caseA)) :=
@@ -319,7 +320,7 @@ theorem hcuZetaPair_liesOver_hInHu [Finite G] {M : Subgroup G}
         = (θ'irr : ClassFunction ↥((hInHu data).subgroupOf (hInHu data ⊔ cuInHu caseA)) ℂ) :=
       hcuPsiPair_restrict_hInHu_subgroupOf caseA θ hinv lam
     rw [hres, OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite θ'irr θ'irr,
-      if_pos rfl]
+      ite_eq_left rfl]
     exact one_ne_zero
   exact liesOver_of_liesOver_liesOver_subgroupOf (le_sup_left :
     hInHu data ≤ hInHu data ⊔ cuInHu caseA) ζ (hcuPsiPair caseA θ hinv lam)
@@ -930,7 +931,7 @@ theorem eq_of_liesOver_of_restrict_eq_irr {Γ : Type*} [Group Γ] [Finite Γ]
     ClassFunction.restrictionMultiplicity_def, hres] at hover
   by_contra h
   exact hover (by rw [OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite η θ,
-    if_neg h])
+    ite_eq_right h])
 
 /-- **The seed is determined by the `hInHu`-restriction of `hcPsi`**: if `hcPsi θ₁` restricted to
 `hInHu.subgroupOf HC` equals the transported inflation of `θ₂`, then `θ₁ = θ₂`.  By

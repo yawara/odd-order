@@ -942,12 +942,12 @@ theorem isMulCommutative_sup_of_le_centralizer {A B : Subgroup G}
     (hAB : A ≤ Subgroup.centralizer (B : Set G)) :
     IsMulCommutative ↥(A ⊔ B) := by
   rw [Subgroup.sup_eq_closure]
-  refine Subgroup.isMulCommutative_closure fun x hx y hy => ?_
+  refine Subgroup.isMulCommutative_closure fun x hx y hy _ => ?_
   rcases hx with hx | hx <;> rcases hy with hy | hy
-  · simpa using congrArg Subtype.val (isMulCommutative_iff.mp hA ⟨x, hx⟩ ⟨y, hy⟩)
+  · exact congrArg Subtype.val (isMulCommutative_iff.mp hA ⟨x, hx⟩ ⟨y, hy⟩)
   · exact (Subgroup.mem_centralizer_iff.mp (hAB hx) y hy).symm
   · exact Subgroup.mem_centralizer_iff.mp (hAB hy) x hx
-  · simpa using congrArg Subtype.val (isMulCommutative_iff.mp hB ⟨x, hx⟩ ⟨y, hy⟩)
+  · exact congrArg Subtype.val (isMulCommutative_iff.mp hB ⟨x, hx⟩ ⟨y, hy⟩)
 
 /-- **A finite commutative group of odd order and rank `≤ 1` is cyclic** (additive converse of
 mathcomp's `abelian_rank1_cyclic`).  Each Sylow `q`-subgroup is an abelian `q`-group whose `pRank`

@@ -165,8 +165,8 @@ theorem generalizedDecompositionNumberInv_principalBlock_eq
         (fun _ _ hgh => character_eq_of_isConj _ hgh) := by
     refine eq_generalizedDecompositionNumberInv hp hω' hπ hlin hkerJ _ _ fun w hw => ?_
     -- the left side collapses to `d · φ_0(w) = d`
-    rw [Finset.sum_eq_single φ₀ (fun τ _ hne => by rw [if_neg hne, zero_mul])
-        (fun h => absurd (Finset.mem_univ φ₀) h), if_pos rfl,
+    rw [Finset.sum_eq_single φ₀ (fun τ _ hne => by rw [ite_eq_right hne, zero_mul])
+        (fun h => absurd (Finset.mem_univ φ₀) h), ite_eq_left rfl,
       irreducibleBrauerCharacter_principalBlock_eq_one hπ hlin hnil hp hω' hNp hquot S hφ₀ hw,
       map_one, mul_one]
     -- the right side is `χ(t · c⁻¹ w c)`, a `p`-section value
@@ -805,7 +805,7 @@ theorem eq_zero_of_vanishing_on_pRegular_of_apply_eq_zero
       then (wedderburnRepresentation eG j).character t else 0 with ha'
   have hsupp' : ∀ j : κ,
       blockOfIrr eG hπG hlinG hnilG j ≠ principalBlock πG hπG hlinG hnilG → a' j = 0 :=
-    fun j hj => by rw [ha']; exact if_neg hj
+    fun j hj => by rw [ha']; exact ite_eq_right hj
   have hfil : ∀ (f : κ → K),
       (∑ j : κ, a' j * f j)
         = ∑ j ∈ Finset.univ.filter
@@ -818,7 +818,7 @@ theorem eq_zero_of_vanishing_on_pRegular_of_apply_eq_zero
           zero_mul])]
     refine Finset.sum_congr rfl fun j hj => ?_
     simp only [ha']
-    rw [if_pos (Finset.mem_filter.mp hj).2]
+    rw [ite_eq_left (Finset.mem_filter.mp hj).2]
   have hvan' : ∀ g : G, IsPRegular p g →
       (∑ j : κ, a' j * (wedderburnRepresentation eG j).character g) = 0 := by
     intro g hg
@@ -839,7 +839,7 @@ theorem eq_zero_of_vanishing_on_pRegular_of_apply_eq_zero
   -- evaluate at `j₀`
   have hj₀val := congrFun hprop j₀
   simp only [Pi.smul_apply, smul_eq_mul, ha₀, mul_zero, ha'] at hj₀val
-  rw [if_pos hj₀] at hj₀val
+  rw [ite_eq_left hj₀] at hj₀val
   have hne := generalizedDecompositionNumber_ne_zero_of_blockOfIrr_principal hp hx hω e eG hπG
     hlinG hπ hlin hkerJ hnil hnilG hω' hζ hζk hζK hconv hNp hquot S hφ₀ hconjall ht1 hj₀
   have hchi : (wedderburnRepresentation eG j₀).character t ≠ 0 := by

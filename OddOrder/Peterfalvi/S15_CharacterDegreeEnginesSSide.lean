@@ -375,7 +375,7 @@ theorem Hypothesis.tau1S_ofHonest_zSpan_inner_eta_col_zero [Finite G]
         rcases hyp.tau1S_ofHonest_muColumn_formula hG hnoV chief with hclean | ⟨-, hflip⟩
         · rw [hclean j hj, OddOrder.RepresentationTheory.inner_sum_left]
           refine Finset.sum_eq_zero fun l _ => ?_
-          rw [hyp.eta_orthonormal l i j ⟨0, hyp.p_prime.pos⟩, if_neg (fun h => hj h.2)]
+          rw [hyp.eta_orthonormal l i j ⟨0, hyp.p_prime.pos⟩, ite_eq_right (fun h => hj h.2)]
         · have h2lt : 2 < hyp.p := by have := hyp.three_le_p; omega
           set j1 : Fin hyp.p := ⟨1, hyp.p_prime.one_lt⟩ with hj1
           set j2 : Fin hyp.p := ⟨2, h2lt⟩ with hj2
@@ -393,7 +393,7 @@ theorem Hypothesis.tau1S_ofHonest_zSpan_inner_eta_col_zero [Finite G]
             OddOrder.RepresentationTheory.ClassFunction.inner_neg_left,
             OddOrder.RepresentationTheory.inner_sum_left]
           rw [Finset.sum_eq_zero fun l _ => by
-            rw [hyp.eta_orthonormal l i j' ⟨0, hyp.p_prime.pos⟩, if_neg (fun h => hj'0 h.2)]]
+            rw [hyp.eta_orthonormal l i j' ⟨0, hyp.p_prime.pos⟩, ite_eq_right (fun h => hj'0 h.2)]]
           exact neg_zero
   | zero => rw [map_zero, OddOrder.RepresentationTheory.ClassFunction.inner_zero_left]
   | add x y _ _ hx hy =>

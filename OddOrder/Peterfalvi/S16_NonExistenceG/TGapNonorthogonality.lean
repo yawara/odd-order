@@ -152,18 +152,18 @@ theorem Hypothesis.tau_muColumnZero_sub_zeta_dichotomy_of_grid_orthogonal [Finit
     have : (hyp.w1 : ℕ) = 1 := by exact_mod_cast he.symm
     omega
   have hζζ : ClassFunction.inner ζ ζ = 1 := by
-    rw [irr_cf_inner hζmem hζmem, if_pos rfl]
+    rw [irr_cf_inner hζmem hζmem, ite_eq_left rfl]
   have hζζc : ClassFunction.inner ζ ζ.conj = 0 := by
-    rw [irr_cf_inner hζmem hζcmem, if_neg hζne.symm]
+    rw [irr_cf_inner hζmem hζcmem, ite_eq_right hζne.symm]
   -- `G`-side norm bookkeeping under the orthogonality hypothesis
   have hΩr : ∀ r : Fin hyp.w1,
       ClassFunction.inner (∑ r' : Fin hyp.w1, grid r' 0)
         (grid r 0) = 1 := by
     intro r
     rw [inner_sum_left, Finset.sum_eq_single r]
-    · rw [hgridInner r 0 r 0, if_pos ⟨rfl, rfl⟩]
+    · rw [hgridInner r 0 r 0, ite_eq_left ⟨rfl, rfl⟩]
     · intro r' _ hne
-      rw [hgridInner r' 0 r 0, if_neg fun h => hne h.1]
+      rw [hgridInner r' 0 r 0, ite_eq_right fun h => hne h.1]
     · intro h
       exact absurd (Finset.mem_univ _) h
   have hψr : ∀ r : Fin hyp.w1,
@@ -308,7 +308,7 @@ theorem Hypothesis.tau_muColumnZero_sub_zeta_dichotomy_of_grid_orthogonal [Finit
       omega
     have hlammem : lam ∈ irreducibleCharacters (↥M) := mem_irreducibleCharacters.mpr hlamirr
     have hzetalam : ClassFunction.inner ζ lam = 0 := by
-      rw [irr_cf_inner hζmem hlammem, if_neg (Ne.symm hlamzeta)]
+      rw [irr_cf_inner hζmem hlammem, ite_eq_right (Ne.symm hlamzeta)]
     have hsupplam : (lam - ζ).support ⊆ hyp.A0 :=
       hyp.inducedFamily_sub_support hlamS hζS (by rw [hlam1, hζ1])
     have hGlam : ClassFunction.inner
@@ -495,7 +495,7 @@ theorem grid_diff_inner_zeroColumnSum [Finite G] {w1 w2 : ℕ} [NeZero w2]
     OddOrder.RepresentationTheory.inner_sum_right]
   have h1 : ∀ r : Fin w1, ClassFunction.inner (grid i j) (grid r 0) = 0 :=
     fun r => by
-      rw [hgridInner i j r 0, if_neg]
+      rw [hgridInner i j r 0, ite_eq_right]
       rintro ⟨_, h⟩
       exact hj0 h
   have h2 : ∀ r : Fin w1,
@@ -505,7 +505,7 @@ theorem grid_diff_inner_zeroColumnSum [Finite G] {w1 w2 : ℕ} [NeZero w2]
     simp
   rw [Finset.sum_congr rfl (fun r _ => h1 r),
     Finset.sum_congr rfl (fun r _ => h2 r), Finset.sum_const_zero,
-    Finset.sum_ite_eq, if_pos (Finset.mem_univ i)]
+    Finset.sum_ite_eq, ite_eq_left (Finset.mem_univ i)]
   ring
 
 open scoped FiniteInduce in
@@ -824,7 +824,7 @@ theorem eta_column_diff_rigidity [Finite G]
     (fun pq => eta_mem_ZIrr base pq.1 pq.2)
     (fun a => by simpa using eta_orthonormal base a.1 a.1 a.2 a.2)
     (fun a b hab => by
-      rw [eta_orthonormal base a.1 b.1 a.2 b.2, if_neg]
+      rw [eta_orthonormal base a.1 b.1 a.2 b.2, ite_eq_right]
       rintro ⟨h1, h2⟩
       exact hab (Prod.ext h1 h2))
     (by rw [hcardq]; exact base.three_le_q)
@@ -950,8 +950,8 @@ theorem omegaMonoidHom_bijective [Finite G]
       base.tau3_isometry.inner_eq, hcf] at h1
     have h2 := base.omega_orthonormal k k l l
     have hcond : ¬ (i = k ∧ j = l) := fun ⟨hi, hj⟩ => hne (by rw [hi, hj])
-    rw [if_neg hcond] at h1
-    rw [if_pos (⟨rfl, rfl⟩ : k = k ∧ l = l)] at h2
+    rw [ite_eq_right hcond] at h1
+    rw [ite_eq_left (⟨rfl, rfl⟩ : k = k ∧ l = l)] at h2
     exact zero_ne_one (h1.symm.trans h2)
   have : Fintype (↥base.W →* ℂˣ) := Fintype.ofFinite _
   have : IsCyclic ↥base.W := base.W_cyclic

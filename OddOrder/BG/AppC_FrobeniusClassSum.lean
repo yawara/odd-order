@@ -837,7 +837,7 @@ theorem normOneFrobenius_nonKernelCharacter_apply_one_eq_normOneUnits_card
     have hinner := irreducibleCharacter_inner_eq_ite ψ χ
     by_cases hψχ : ψ = χ
     · exact hψχ
-    · rw [if_neg hψχ] at hinner
+    · rw [ite_eq_right hψχ] at hinner
       exact absurd hinner hθinner
   have hcf : ClassFunction.induce K (θ : ClassFunction K ℂ) =
       (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ) :=

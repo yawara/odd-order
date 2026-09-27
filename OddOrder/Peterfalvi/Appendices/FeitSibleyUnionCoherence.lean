@@ -100,8 +100,8 @@ noncomputable def union_coherent_of_lambda_dvd [Finite G]
   -- **the combined assignment** `W`
   set W : ClassFunction ↥hyp.H ℂ → ClassFunction G ℂ :=
     fun μ => if μ ∈ X then wX μ else w μ with hWdef
-  have hWX : ∀ μ ∈ X, W μ = wX μ := fun μ hμ => if_pos hμ
-  have hWY : ∀ μ ∈ Y, W μ = w μ := fun μ hμ => if_neg (fun h => hdisj μ h hμ)
+  have hWX : ∀ μ ∈ X, W μ = wX μ := fun μ hμ => ite_eq_left hμ
+  have hWY : ∀ μ ∈ Y, W μ = w μ := fun μ hμ => ite_eq_right (fun h => hdisj μ h hμ)
   have hWanchor : W η₁ = w η₁ := hWY η₁ hη₁Y
   -- membership and orthonormality of the members
   have hSset : ∀ μ ∈ X ∪ Y, μ ∈ hyp.Sset := by

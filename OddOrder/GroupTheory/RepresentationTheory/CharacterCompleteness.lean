@@ -729,10 +729,10 @@ theorem sum_inner_irreducibleCharacter_smul [Fintype G]
         ClassFunction.inner f (ψ : ClassFunction G ℂ)
       rw [map_sum]
       rw [Finset.sum_eq_single ψ]
-      · rw [map_smul, innerDual_apply, irreducibleCharacter_inner, if_pos rfl, smul_eq_mul,
+      · rw [map_smul, innerDual_apply, irreducibleCharacter_inner, ite_eq_left rfl, smul_eq_mul,
           mul_one]
       · intro χ _ hχψ
-        rw [map_smul, innerDual_apply, irreducibleCharacter_inner, if_neg hχψ, smul_eq_mul,
+        rw [map_smul, innerDual_apply, irreducibleCharacter_inner, ite_eq_right hχψ, smul_eq_mul,
           mul_zero]
       · intro hψ
         exact (hψ (Finset.mem_univ ψ)).elim

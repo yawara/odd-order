@@ -225,8 +225,8 @@ noncomputable def Hypothesis.swap [Finite G] (hyp : Hypothesis (G := G))
   mu_orthonormal := fun i k j l => by
     rw [pins.nu_orthonormal j l i k]
     by_cases h : j = l ∧ i = k
-    · rw [if_pos h, if_pos ⟨h.2, h.1⟩]
-    · rw [if_neg h, if_neg fun h' => h ⟨h'.2, h'.1⟩]
+    · rw [ite_eq_left h, ite_eq_left ⟨h.2, h.1⟩]
+    · rw [ite_eq_right h, ite_eq_right fun h' => h ⟨h'.2, h'.1⟩]
   mu_colSum_eq_induce := pins.nu_rowSum_eq_induce
   mu_reducible_dichotomy := pins.nu_reducible_dichotomy
   nu_definition := fun i j => hyp.mu_definition j i
@@ -252,8 +252,8 @@ noncomputable def Hypothesis.swap [Finite G] (hyp : Hypothesis (G := G))
   omega_orthonormal := fun i k j l => by
     rw [hyp.omega_orthonormal j l i k]
     by_cases h : j = l ∧ i = k
-    · rw [if_pos h, if_pos ⟨h.2, h.1⟩]
-    · rw [if_neg h, if_neg fun h' => h ⟨h'.2, h'.1⟩]
+    · rw [ite_eq_left h, ite_eq_left ⟨h.2, h.1⟩]
+    · rw [ite_eq_right h, ite_eq_right fun h' => h ⟨h'.2, h'.1⟩]
   omega_apply_one := fun i j => hyp.omega_apply_one j i
   omega_mem_ZIrr := fun i j => hyp.omega_mem_ZIrr j i
   omega_mul := fun i j w w' => hyp.omega_mul j i w w'

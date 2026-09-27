@@ -149,7 +149,7 @@ private theorem exists_isCarterSubgroup_aux : ∀ (n : ℕ) {G : Type u} [Group 
         exact Group.nilpotent_of_mulEquiv Subgroup.topEquiv
       obtain ⟨M, hMcoatom, hMnn⟩ : ∃ M : Subgroup G, IsCoatom M ∧ ¬ M.Normal := by
         by_contra hcon
-        refine hnil (((Group.isNilpotent_of_finite_tfae (G := G)).out 2 0).mp ?_)
+        refine hnil (((Group.isNilpotent_of_finite_tfae (G := G)).out 3 1).mp ?_)
         intro H hH
         by_contra hHn
         exact hcon ⟨H, hH, hHn⟩
@@ -195,7 +195,7 @@ private theorem exists_isCarterSubgroup_aux : ∀ (n : ℕ) {G : Type u} [Group 
       have hgK : g ∈ K := by
         have hstep : Subgroup.normalizer ((C'.map K.subtype : Subgroup G) : Set G)
             ≤ Subgroup.normalizer ((N ⊔ C'.map K.subtype : Subgroup G) : Set G) := fun a ha =>
-          Subgroup.normalizer_inf_normalizer_le_normalizer_sup N (C'.map K.subtype)
+          Subgroup.inf_normalizer_le_normalizer_sup N (C'.map K.subtype)
             ⟨by rw [Subgroup.normalizer_eq_top (H := N)]; trivial, ha⟩
         rw [hNCK, hKself] at hstep
         exact hstep hg

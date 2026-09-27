@@ -156,7 +156,7 @@ theorem FT_signalizer_eq_bot_of_not_branch {x : G}
     (h : ¬ (1 < (maximalSigmaSubgroupsOfElement x).ncard ∧
       (maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G))).Nonempty)) :
     FT_signalizer x = ⊥ := by
-  have hb : FT_signalizerBase x = ⊥ := dif_neg h
+  have hb : FT_signalizerBase x = ⊥ := dite_eq_right h
   simp only [FT_signalizer, hb, le_bot_iff.mp (OddOrder.BG.Ch3.S10.Msigma_le ⊥), bot_inf_eq]
 
 /-- In the nontrivial branch, `N[x]` is a maximal subgroup containing `C_G(x)`. -/
@@ -164,7 +164,7 @@ theorem centralizer_le_FT_signalizerBase {x : G}
     (h : 1 < (maximalSigmaSubgroupsOfElement x).ncard ∧
       (maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G))).Nonempty) :
     Subgroup.centralizer ({x} : Set G) ≤ FT_signalizerBase x := by
-  have hb : FT_signalizerBase x = h.2.choose := dif_pos h
+  have hb : FT_signalizerBase x = h.2.choose := dite_eq_left h
   rw [hb]
   exact (mem_maximalSubgroupsContaining.mp h.2.choose_spec).2
 
@@ -231,7 +231,7 @@ theorem FT_signalizer_isHall [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) 
     Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma (FT_signalizerBase x))
       ((FT_signalizer x).subgroupOf (Subgroup.centralizer ({x} : Set G))) := by
   have hbasemax : FT_signalizerBase x ∈ maximalSubgroups G := by
-    have hb : FT_signalizerBase x = h.2.choose := dif_pos h
+    have hb : FT_signalizerBase x = h.2.choose := dite_eq_left h
     rw [hb]; exact mem_maximalSubgroups.mpr (mem_maximalSubgroupsContaining.mp h.2.choose_spec).1
   have hnorm : ((OddOrder.BG.Ch3.S10.Msigma (FT_signalizerBase x)).subgroupOf
       (FT_signalizerBase x)).Normal := by

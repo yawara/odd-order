@@ -5,7 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Data.Fintype.Pi
-import Mathlib.Data.Finite.Prod
+import Mathlib.Basic.Finite.Prod
 import Mathlib.Algebra.Order.Monoid.Unbundled.Pow
 import Mathlib.GroupTheory.Coset.Card
 

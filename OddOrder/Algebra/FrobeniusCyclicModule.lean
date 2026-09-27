@@ -133,8 +133,8 @@ theorem exists_frobenius_cyclic_vector (hq0 : q ≠ 0) :
     have hci := congrArg (fun r => coeff r (i : ℕ)) hc0
     simp only [hc, finsetSum_coeff, coeff_C_mul_X_pow, coeff_zero] at hci
     rwa [Finset.sum_eq_single i (fun j _ hji =>
-        if_neg fun h => hji (Fin.val_injective h.symm))
-      (fun h => absurd (Finset.mem_univ i) h), if_pos rfl] at hci
+        ite_eq_right fun h => hji (Fin.val_injective h.symm))
+      (fun h => absurd (Finset.mem_univ i) h), ite_eq_left rfl] at hci
   have hcard : Fintype.card (Fin q) = Module.finrank (ZMod p) (GaloisField p q) := by
     rw [Fintype.card_fin, GaloisField.finrank p hq0]
   have : Nonempty (Fin q) := ⟨⟨0, Nat.pos_of_ne_zero hq0⟩⟩
