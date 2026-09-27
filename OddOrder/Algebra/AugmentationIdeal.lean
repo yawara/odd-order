@@ -19,8 +19,8 @@ import Mathlib.GroupTheory.Complement
 
 Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) §10C (pp. 307-324) の基盤:
 principal ideal theorem (Thm 10.18, Furtwängler) と Alperin-Kuo (Cor 10.28) が
-この API の上に立つ。mathlib v4.30.0-rc2 に群環の augmentation ideal は未収載
-(claim = issue 9108; 将来 upstream 候補)。
+この API の上に立つ。mathlib v4.34.1 にも群環の augmentation ideal は未収載 (あるのは汎用の
+`Ideal.IsAugmentation` 述語まで; claim = issue 9108; 将来 upstream 候補)。
 
 ## Main definitions
 

@@ -11,7 +11,7 @@ import OddOrder.Mathlib.Subgroup
 /-!
 # Schur-Zassenhaus conjugacy (Isaacs Thm 3.12)
 
-mathlib v4.29.1 provides existence (`Subgroup.exists_right_complement'_of_coprime`)
+mathlib (re-checked at v4.34.1) provides existence (`Subgroup.exists_right_complement'_of_coprime`)
 and abelian-case conjugacy (`Subgroup.exists_smul_eq` via `QuotientDiff`).
 This file fills the **general-case conjugacy** assuming `N` or `G/N` is solvable
 (Isaacs FGT Thm 3.12, mmd lines 1605-1665).
@@ -411,7 +411,7 @@ private theorem step_factor
 
 omit [Finite G] in
 /-- Isaacs Lem 3.11: minimal `G`-normal of solvable group is commutative.
-mathlib v4.29.1 にこの形の lemma がないため自前. -/
+mathlib (v4.34.1 で再確認) にこの形の lemma がないため自前. -/
 private theorem minimal_normal_isCommutative_of_solvable
     {N L : Subgroup G} [N.Normal] [L.Normal] (hL_le : L ≤ N) (hL_ne : L ≠ ⊥)
     (hL_min : ∀ L' : Subgroup G, L'.Normal → L' ≤ L → L' ≠ ⊥ → L' = L)

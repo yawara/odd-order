@@ -26,7 +26,7 @@ largest normal `π`-subgroup of `G`.
 BG §1 Prop 1.4 (`A` coprime auto faithful on `F(G)`) and §6 (Thm 6.4) rely on
 the `O_π` machinery generalizing the single-prime `OddOrder.Isaacs.Ch01.opCore p`.
 
-mathlib v4.29.1 does not define `O_π` for prime sets; this file adds the
+mathlib (re-checked at v4.34.1) does not define `O_π` for prime sets; this file adds the
 foundational definitions.  Stronger lemmas (Sylow decomposition of `opPi`,
 disjointness with `opPi πᶜ`, etc.) are deferred to follow-up commits.
 -/

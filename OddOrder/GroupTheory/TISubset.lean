@@ -31,10 +31,10 @@ Peterfalvi の典型 setup は `A = H \ {1}` で, ホスト `L = N_G(H)` に対�
 
 ## mathlib カバレッジ
 
-mathlib v4.29.1 で TI-subset 概念は **完全不在**:
-- `Mathlib.GroupTheory.GroupAction.Blocks.IsTrivialBlock` は **別概念**
+mathlib (v4.34.1 で再確認) で TI-subset 概念は **完全不在**:
+- `MulAction.IsTrivialBlock` (`Mathlib/GroupTheory/GroupAction/Blocks.lean`) は **別概念**
   (block の singleton/univ 性であって TI とは無関係)
-- `Subgroup.normalizer` は subgroup 用 (set 上の集合-正規化群ではない)
+- 集合の正規化群は `Subgroup.normalizer (s : Set G)` として既存 (本 module もこれを使う)
 
 そのため本 module で新規定義. (audit 訂正前の per-section ノートで
 `MulAction.IsTrivialIntersection` 既存と誤記されていたが該当 API 不在を確認済.)

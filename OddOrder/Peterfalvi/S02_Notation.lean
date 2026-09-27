@@ -24,6 +24,7 @@ Peterfalvi §2 は本書全 16 節 + 5 付録の **記号・用語の統一辞�
 部分群構造に関わる 40+ の記号を定義. 本ファイルは:
 
 1. **記号対応表** (Peterfalvi ↔ mathlib v4.29.1 ↔ 本プロジェクト Wave 1a) を提示
+   (mathlib 欄は v4.29.1 時点の監査。2026-09-27 に v4.34.1 で再確認し、下記の誤記 2 件を訂正した)
 2. **直接対応可能な notation alias** を提供 (mathlib API が揃っている場合のみ)
 3. **新規定義は Wave 1a shared modules または §3 以降に委ねる** (定義 location 統一)
 
@@ -125,8 +126,9 @@ Peterfalvi:
   O_p(G), O_{p'}(G) : maximal normal p-(p'-)subgroup
 ```
 
-- **mathlib v4.29.1**: `Subgroup.piCore` (= O_{π'}) はある. `Fitting subgroup`
-  そのものは Phase 1 Isaacs Ch.2 で実装中.
+- **mathlib v4.29.1**: `O_π` / `O_{π'}` も Fitting subgroup も**不在** (旧記載の
+  「`Subgroup.piCore` はある」は誤り — どの版にもそのような宣言は無い)。本 repo で実装済
+  (`OddOrder.Isaacs.Ch01.fitting` / `OddOrder.Isaacs.Ch01.opCore` 等).
 
 ### TI-subset
 
@@ -134,7 +136,7 @@ Peterfalvi:
 Peterfalvi: A ⊂ G が TI ⟺ ∀ g ∈ G, A^g ∩ A ≠ ∅ ⟹ g ∈ N_G(A)
 ```
 
-- **mathlib v4.29.1**: ⚠️ audit 訂正: `MulAction.IsBlock.IsTrivialBlock` は別概念.
+- **mathlib v4.29.1**: ⚠️ audit 訂正: `MulAction.IsTrivialBlock` は別概念.
   TI-subset 概念は **完全不在**.
 - **Wave 1a**: [`OddOrder.GroupTheory.IsTISubset`](../GroupTheory/TISubset.lean)
   ✅ **新規実装完了** (本 commit / 別 commit) — Phase 2b 第 1 波最初の shared module.

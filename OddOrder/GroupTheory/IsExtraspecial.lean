@@ -16,7 +16,7 @@ import OddOrder.GroupTheory.FrattiniPGroup
 
 `OddOrder.GroupTheory` shared module: 'extraspecial p-group' の概念.
 
-mathlib v4.29.1 に `IsExtraspecial` 不在を確認済 (0 hits in `Mathlib/`,
+mathlib v4.34.1 に `IsExtraspecial` 不在を確認済 (0 hits in `Mathlib/`,
 `RootSystem/GeckConstruction/Basic.lean` の "extraspecial pair" は別概念).
 
 **BG §2 Thm 2.5** (faithful irreducible FG-module of extraspecial group), **BG §4 Lem 4.15**

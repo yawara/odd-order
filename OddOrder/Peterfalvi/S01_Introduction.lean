@@ -68,7 +68,7 @@ Peterfalvi が前提とする [Is] (Character Theory 1976) の章節:
 - **Ch.7 (7.1)-(7.7)**: Thompson 定理 + normal p-complement
 - **Problem 2.2**: `χ^σ` (σ ∈ Aut(Q_n)) が既約指標
 
-⚠️ audit 訂正 (2026-05-23): mathlib v4.29.1 character theory infrastructure は
+⚠️ audit 訂正 (2026-05-23、v4.34.1 で再確認 2026-09-27): mathlib の character theory infrastructure は
 これらの大部分を **カバーしていない**:
 - `ClassFunction G` 型不在
 - Classical induced character `(Ind χ)(g)` formula 不在 (categorical `IndV`

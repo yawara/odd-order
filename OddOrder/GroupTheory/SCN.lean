@@ -15,7 +15,7 @@ import OddOrder.GroupTheory.PRank
 `OddOrder.GroupTheory` shared module: 'SCN subgroup' (Self-Centralizing Normal abelian
 subgroup) の概念.
 
-mathlib v4.30.0-rc2 に `IsSCN` / `SCN` 不在 (0 hits). BG / Isaacs FGT における基本概念で,
+mathlib v4.34.1 に `IsSCN` / `SCN` 不在 (0 hits). BG / Isaacs FGT における基本概念で,
 **BG §4 Prop 4.4** (existence of `SCN` in p-群), **BG §4 Lem 4.7** (rank ≥ 3 ⇔ `SCN_3` 非空),
 **BG §5 Lem 5.1** (SCN₃ argument), **Isaacs Ch.7** (J(P) 関連) で必要.
 

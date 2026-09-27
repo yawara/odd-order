@@ -19,7 +19,7 @@ import Mathlib.SetTheory.Cardinal.Finite
 A **class function** on a group `G` valued in a commutative ring `k` is a function
 `G → k` that is constant on conjugacy classes: `f (h * g * h⁻¹) = f g`.
 
-## mathlib v4.29.1 状況
+## mathlib 状況 (v4.34.1 で再確認)
 
 mathlib に `ClassFunction G k` という型は **存在しない** (Peterfalvi audit 2026-05-23).
 `Mathlib/RepresentationTheory/Character.lean` の `Representation.character` は単に関数

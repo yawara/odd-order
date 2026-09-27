@@ -25,7 +25,7 @@ Wielandt automorphism tower theorem (Thm 9.10) に向けた §9B 前半の下部
 ## 実装ノート
 
 - 書籍の `S^∞` は「`S/N` が nilpotent となる最小の `N ◁ S`」(lower central series の
-  final term). mathlib v4.30 系の ambient-valued
+  final term). mathlib (v4.31 以降) の ambient-valued
   `Subgroup.lowerCentralSeries : Subgroup G → ℕ → Subgroup G` の上で `⨅ n` として
   定義すると, Isaacs の部分群レベルの操作 (9.15 の `M = S(F ∩ M)` 等) が型を跨がずに
   書ける. `↥S` 側の定義との一致は `map_nilpotentResidual` (有限性から系列が安定する

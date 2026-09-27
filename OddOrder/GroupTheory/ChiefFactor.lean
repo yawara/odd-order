@@ -19,7 +19,7 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
 `OddOrder.GroupTheory` shared module for chief factors `U/V` of a finite group.
 
 BG §1 Prop. 1.2 uses intersections of centralizers `C_{G*}(U/V)` over all chief
-factors.  mathlib v4.29.1 has an abstract `Order.JordanHolder.CompositionSeries`,
+factors.  mathlib (re-checked at v4.34.1) has an abstract `CompositionSeries`,
 but it does not provide the group-level chief-factor centralizer API needed here.
 
 ## Main definitions
