@@ -359,7 +359,7 @@ theorem normalizer_V_inf_W1_le_centralizer_W1 [Finite G]
   have hNnorm : N.Normal := by
     refine ⟨fun n _ g => ?_⟩
     have hc : g * n * g⁻¹ = n := by rw [mul_comm' g n, mul_inv_cancel_right]
-    rw [hc]; assumption
+    rwa [hc]
   -- coprimality `(|W₂|, |V|) = 1`.
   have hCop : Nat.Coprime (Nat.card ↥hyp.W2) (Nat.card ↥hyp.V) := by
     have hk := hfrob.coprime_card_kernel_complement
@@ -501,7 +501,7 @@ theorem normalizer_V_inf_W1_eq_bot_of_data [Finite G]
   have hKnormalV : (K.subgroupOf hyp.V).Normal := by
     refine ⟨fun n _ g => ?_⟩
     have hc : g * n * g⁻¹ = n := by rw [mul_comm' g n, mul_inv_cancel_right]
-    rw [hc]; assumption
+    rwa [hc]
   have hV_norm_K : hyp.V ≤ Subgroup.normalizer (K : Set G) :=
     Subgroup.le_normalizer_of_normal_subgroupOf hK_le_V
   -- `W₂ ≤ N(K)` (`W₂ ≤ N(V)` and `W₂ ≤ N(N(W₁))`).

@@ -762,7 +762,7 @@ theorem H_sharp_inv_normSq_restrict_zeta_mem_ZIrr [Fintype G] [Invertible (Nat.c
 
 /-- **`H = PC` is abelian** (Peterfalvi (13.2.a,b)): `P` is (elementary) abelian
 (`basic_structure`), `C ≤ U` is abelian (`S_U_commutative`), and `C` centralizes `P`
-(`C = U ⊓ C_S(P)`), so the join is abelian (`isMulCommutative_sup_of_le_centralizer`).
+(`C = U ⊓ C_S(P)`), so the join is abelian (`Subgroup.isMulCommutative_sup_of_le_centralizer`).
 The `habelian` input of the (13.7) Parseval bookkeeping. -/
 theorem Hypothesis.H_mulCommutative [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) : IsMulCommutative ↥hyp.H := by
@@ -777,7 +777,7 @@ theorem Hypothesis.H_mulCommutative [Finite G] (hG : OddOrder.BG.IsMinimalSimple
   have hCP : hyp.C ≤ Subgroup.centralizer (hyp.P : Set G) := hyp.C_eq ▸ inf_le_right
   change IsMulCommutative ↥(hyp.P ⊔ hyp.C)
   rw [sup_comm]
-  exact OddOrder.BG.Ch4.S15.isMulCommutative_sup_of_le_centralizer hCab hPab hCP
+  exact Subgroup.isMulCommutative_sup_of_le_centralizer hCab hPab hCP
 
 /-- **`P` centralizes every element of `H = PC`** (Peterfalvi (13.4), disjointness ingredient):
 for `x ∈ H`, `P ≤ C_G(x)`.  Immediate from `H` abelian (`H_mulCommutative`) and `P ≤ H`.  This is

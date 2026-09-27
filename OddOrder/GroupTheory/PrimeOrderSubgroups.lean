@@ -7,24 +7,25 @@ import Mathlib.GroupTheory.PGroup
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
 
 /-!
-# Subgroups of prime order: centrality and uniqueness
+# Normal subgroups of prime order in `p`-groups are central
 
 `OddOrder.GroupTheory` shared module: 位数 `p` の部分群まわりの基礎補題。
 
 * `normal_le_center_of_card_eq_prime`: 有限 `p`-群の位数 `p` **正規**部分群は中心に
   含まれる。共役準同型 `P →* MulAut Y` の像は `p`-群だが、`Y` は位数 `p` の巡回群で
   `|MulAut Y| = p - 1` は `p` と互いに素、ゆえに像は自明。
-* `subgroup_eq_of_card_eq_prime_of_isCyclic`: 巡回群の位数 `p` 部分群は一意 (2 つ
-  あれば一致)。両者の元は全て `x ^ p = 1` を満たし、巡回群にその解は高々 `p` 個
-  (`IsCyclic.card_pow_eq_one_le`)。
 
-mathlib v4.30.0-rc2 時点で両者とも未収載 (`Mathlib/GroupTheory/PGroup.lean`,
-`Mathlib/GroupTheory/SpecificGroups/Cyclic.lean` を確認, 2026-07-17)。
+mathlib v4.34.1 時点で未収載 (`Mathlib/GroupTheory/PGroup.lean` / `Nilpotent.lean` を確認,
+2026-09-27)。近いのは `Group.IsNilpotent.inf_center_ne_bot_of_normal` (`H ⊓ Z(G) ≠ ⊥`) まで。
+
+かつて同居していた「巡回群の位数 `p` 部分群の一意性」(`subgroup_eq_of_card_eq_prime_of_isCyclic`)
+は、mathlib v4.34.0 の `IsCyclic.subgroup_eq_iff_card_eq` (位数が等しい部分群は一致、
+素数位数に限らない) に置き換えて削除した (issue 0189)。
 
 ## 用途
 
-Isaacs Thm 10.15 (Huppert metacyclic; issue 3007) の「`|P'| = p` ⇒ `P' ≤ Z(P)`」
-「cyclic `P'` の位数 `p` 部分群の一意性」ステップ。claim = issue 9107。
+Isaacs Thm 10.15 (Huppert metacyclic; issue 3007) の「`|P'| = p` ⇒ `P' ≤ Z(P)`」ステップ
+(同じ証明の「cyclic `P'` の位数 `p` 部分群の一意性」ステップは mathlib で賄う)。claim = issue 9107。
 -/
 
 namespace OddOrder.GroupTheory
@@ -73,43 +74,5 @@ theorem normal_le_center_of_card_eq_prime {P : Type*} [Group P] [Finite P]
     simpa [hφ_def] using this
   calc g * y = g * y * g⁻¹ * g := by group
     _ = y * g := by rw [hconj]
-
-/-- In a finite cyclic group, subgroups of prime order `p` are unique: all their
-elements satisfy `x ^ p = 1`, and a cyclic group has at most `p` such elements
-(`IsCyclic.card_pow_eq_one_le`), so two order-`p` subgroups both fill up the
-solution set. -/
-theorem subgroup_eq_of_card_eq_prime_of_isCyclic {H : Type*} [Group H] [Finite H]
-    [IsCyclic H] {K L : Subgroup H} (hK : Nat.card K = p) (hL : Nat.card L = p) :
-    K = L := by
-  classical
-  have hp_prime : p.Prime := hp.out
-  let : Fintype H := Fintype.ofFinite H
-  -- the solution set of `x ^ p = 1`
-  set S : Finset H := Finset.univ.filter (fun a : H => a ^ p = 1) with hS_def
-  have hS_card : S.card ≤ p := IsCyclic.card_pow_eq_one_le hp_prime.pos
-  -- an order-`p` subgroup, as a finset, sits inside `S` and has full size `p`
-  have key : ∀ M : Subgroup H, Nat.card M = p → (M : Set H).toFinset = S := by
-    intro M hM
-    have hsub : (M : Set H).toFinset ⊆ S := by
-      intro x hx
-      rw [Set.mem_toFinset] at hx
-      rw [hS_def, Finset.mem_filter]
-      refine ⟨Finset.mem_univ x, ?_⟩
-      have h1 : (⟨x, hx⟩ : ↥M) ^ p = 1 := by
-        rw [← hM]
-        exact pow_card_eq_one'
-      simpa using congrArg (fun z : ↥M => (z : H)) h1
-    have hcard : S.card ≤ (M : Set H).toFinset.card := by
-      rw [Set.toFinset_card]
-      have : Fintype.card (M : Set H) = p := by
-        rw [← Nat.card_eq_fintype_card]
-        simpa using hM
-      omega
-    exact Finset.eq_of_subset_of_card_le hsub hcard
-  have hKL : (K : Set H).toFinset = (L : Set H).toFinset := by
-    rw [key K hK, key L hL]
-  ext x
-  have := Finset.ext_iff.mp hKL x
-  simpa [Set.mem_toFinset] using this
 
 end OddOrder.GroupTheory

@@ -1279,7 +1279,7 @@ theorem nLStabilizerIn_conjFinset (hyp : Hypothesis G A L) (l : L)
       L.mul_mem (L.mul_mem (L.inv_mem l.2) hxL) l.2
     refine ⟨hconjL, ?_⟩
     have : (⟨(l : G)⁻¹ * x * (l : G), hconjL⟩ : L) = l⁻¹ * ⟨x, hxL⟩ * l := by
-      apply Subtype.ext; push_cast; ring
+      apply Subtype.ext; push_cast; rfl
     rw [this]
     exact (hyp.mem_setLStabilizer_conjFinset l ⟨x, hxL⟩).mp hxN
   · rintro ⟨hconjL, hxN⟩
@@ -1289,7 +1289,7 @@ theorem nLStabilizerIn_conjFinset (hyp : Hypothesis G A L) (l : L)
     refine ⟨hxL, ?_⟩
     rw [hyp.mem_setLStabilizer_conjFinset l ⟨x, hxL⟩]
     have : (l⁻¹ * ⟨x, hxL⟩ * l : L) = ⟨(l : G)⁻¹ * x * (l : G), hconjL⟩ := by
-      apply Subtype.ext; push_cast; ring
+      apply Subtype.ext; push_cast; rfl
     rw [this]; exact hxN
 
 /-- **Peterfalvi (2.10.1), `M(B^x) = M(B)^x`.**  Conjugation by `l ∈ L` carries `M(B)` to

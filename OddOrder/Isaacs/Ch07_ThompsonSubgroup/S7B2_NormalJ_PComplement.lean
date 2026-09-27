@@ -23,31 +23,6 @@ variable {G : Type*} [Group G]
 
 open scoped commutatorElement
 
-/-- centralizer ⊆ normalizer (mathlib v4.29.1 に直接の lemma 無し). -/
-theorem centralizer_le_normalizer {G : Type*} [Group G] (H : Subgroup G) :
-    Subgroup.centralizer (H : Set G) ≤ Subgroup.normalizer H := by
-  intro x hx
-  rw [Subgroup.mem_normalizer_iff]
-  intro y
-  have hcomm : ∀ z ∈ H, z * x = x * z := Subgroup.mem_centralizer_iff.mp hx
-  have hx_inv_mem : x⁻¹ ∈ Subgroup.centralizer (H : Set G) :=
-    Subgroup.inv_mem _ hx
-  have hcomm_inv : ∀ z ∈ H, z * x⁻¹ = x⁻¹ * z :=
-    Subgroup.mem_centralizer_iff.mp hx_inv_mem
-  refine ⟨fun hy => ?_, fun hxyx => ?_⟩
-  · -- y ∈ H ⇒ xyx⁻¹ = y ∈ H
-    have hxy : x * y = y * x := (hcomm y hy).symm
-    have : x * y * x⁻¹ = y := by rw [hxy]; group
-    rw [this]; exact hy
-  · -- xyx⁻¹ ∈ H ⇒ y = xyx⁻¹ ∈ H
-    have hcomm_z : (x * y * x⁻¹) * x⁻¹ = x⁻¹ * (x * y * x⁻¹) :=
-      hcomm_inv (x * y * x⁻¹) hxyx
-    -- 計算: (xyx⁻¹) * x⁻¹ = x⁻¹*(xyx⁻¹) ⇒ y = xyx⁻¹
-    have h_eq : y * x⁻¹ = (x * y * x⁻¹) * x⁻¹ := by
-      rw [hcomm_z]; group
-    have hy_eq : y = x * y * x⁻¹ := mul_right_cancel h_eq
-    rw [hy_eq]; exact hxyx
-
 /-! **Isaacs Lem 7.7 (a)** (image of normalizer under p'-quotient).
 
 `N ⊴ G` で `p ∤ |N|`, `P` が `G` の非自明 `p`-部分群とすると, `f := mk' N` について
@@ -89,7 +64,8 @@ theorem centralizer_map_of_coprime_kernel [Finite G] {N : Subgroup G} [N.Normal]
   refine le_antisymm ?_ ?_
   · -- ⊆ direction (hard)
     -- Cbar ≤ Nbar
-    have hCbar_le_Nbar : Cbar ≤ Subgroup.normalizer Pbar := centralizer_le_normalizer Pbar
+    have hCbar_le_Nbar : Cbar ≤ Subgroup.normalizer Pbar :=
+      Subgroup.centralizer_le_normalizer (Pbar : Set (G ⧸ N))
     -- Nbar = (N_G(P)).map f by Lem 2.17 (a)
     have hN_eq : Subgroup.normalizer Pbar = (Subgroup.normalizer P).map f := by
       rw [hPbar_def, hf_def]

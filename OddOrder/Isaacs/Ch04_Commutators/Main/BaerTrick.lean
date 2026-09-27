@@ -767,7 +767,7 @@ theorem oPiCore_compl_normalizer_le_centralizer_opCore
         _ = (u : G) * x := by rw [hxconj]
     have huH : (u : G) ∈ H := by
       rw [hH_def]
-      exact centralizer_le_normalizer_subgroup P hu_cent
+      exact Subgroup.centralizer_le_normalizer _ hu_cent
     let uH : H := ⟨u, huH⟩
     set UH : Subgroup H := U.subgroupOf H with hUH_def
     have hUH_normal : UH.Normal := by

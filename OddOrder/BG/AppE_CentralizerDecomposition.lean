@@ -172,7 +172,7 @@ theorem RegularOperatorSetup.R₀_le_centralizer_R₁ (hyp : RegularOperatorSetu
 
 `R₀` has order `p`, hence is cyclic, and `R₁` is cyclic by hypothesis; the two
 centralize each other, so their join is abelian
-(`Ch4.S15.isMulCommutative_sup_of_le_centralizer`). -/
+(`Subgroup.isMulCommutative_sup_of_le_centralizer`). -/
 theorem RegularOperatorSetup.isMulCommutative_centralizer_R₀
     (hyp : RegularOperatorSetup R B p q) :
     IsMulCommutative ↥(Subgroup.centralizer (hyp.R₀ : Set R)) := by
@@ -180,7 +180,7 @@ theorem RegularOperatorSetup.isMulCommutative_centralizer_R₀
   have : IsCyclic ↥hyp.R₀ := isCyclic_of_prime_card hyp.R₀_card
   have : IsCyclic ↥hyp.R₁ := hyp.R₁_cyclic
   rw [hyp.centralizer_eq]
-  exact OddOrder.BG.Ch4.S15.isMulCommutative_sup_of_le_centralizer
+  exact Subgroup.isMulCommutative_sup_of_le_centralizer
     IsCyclic.isMulCommutative IsCyclic.isMulCommutative hyp.R₀_le_centralizer_R₁
 
 /-- **`|C_R(R₀)| = p · |R₁|`**, the cardinality form of the direct decomposition

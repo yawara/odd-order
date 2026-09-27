@@ -156,7 +156,7 @@ theorem inner_extension_Xset_centralCommutator_Yset_eq_zero_general
       ← Nat.cast_smul_eq_nsmul ℂ d' (hXc.extension χ),
       ← Nat.cast_smul_eq_nsmul ℂ d (hXc.extension χ')]
     push_cast
-    ring
+    ring_nf
   have hYeq : hYc.extension η - hYc.extension η' = hYc.extension ydiff := by
     rw [hydiff_def, map_sub]
   -- disjointness `X(Zc) ⊥ Y` and the source orthogonality `⟨xdiff, ydiff⟩ = 0`
@@ -281,7 +281,7 @@ theorem inner_extension_Xset_centralCommutator_Yset_eq_zero_general_c2_caseA
       ← Nat.cast_smul_eq_nsmul ℂ d' (hXc.extension χ),
       ← Nat.cast_smul_eq_nsmul ℂ d (hXc.extension χ')]
     push_cast
-    ring
+    ring_nf
   have hYeq : hYc.extension η - hYc.extension η' = hYc.extension ydiff := by
     rw [hydiff_def, map_sub]
   -- disjointness `X(Zc) ⊥ Y` and the source orthogonality `⟨xdiff, ydiff⟩ = 0`

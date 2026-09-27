@@ -202,7 +202,8 @@ theorem step8_centralizer_center_eq_sylow
       have hcomm := (Subgroup.mem_center_iff.mp hx_center) ⟨v, hv_PH⟩
       have := congrArg (Subgroup.subtype (PH : Subgroup H)) hcomm
       simpa [Subgroup.coe_mul] using this
-    have hx_in_NV : x ∈ Subgroup.normalizer V := centralizer_le_normalizer V hx_centralizes_V
+    have hx_in_NV : x ∈ Subgroup.normalizer V :=
+      Subgroup.centralizer_le_normalizer _ hx_centralizes_V
     have hx_in_M : x ∈ M := hM_eq_NV ▸ hx_in_NV
     -- (vi) `S = PH.subgroupOf M` (a `p`-subgroup of `↥M` containing the Sylow `S`).
     set xM : ↥M := ⟨x, hx_in_M⟩ with hxM_def
@@ -248,7 +249,7 @@ theorem step8_centralizer_center_eq_sylow
       simpa [hxM_def] using this
     -- (ix) `x` centralizes `↑yM`, hence `x ∈ N_H(YH)`.
     have hx_norm_YH : x ∈ Subgroup.normalizer YH := by
-      apply centralizer_le_normalizer YH
+      apply Subgroup.centralizer_le_normalizer
       rw [Subgroup.mem_centralizer_iff]
       intro w hw
       rw [hYH_def] at hw
@@ -694,7 +695,8 @@ theorem step9_core
   obtain ⟨x, hx_pcentral, hx_comm⟩ := exists_isPCentral_centralizing hp_dvd D hD_pgroup
   have hx_in_CD : x ∈ Subgroup.centralizer (D : Set H) := by
     rw [Subgroup.mem_centralizer_iff]; intro v hv; exact (hx_comm v hv).symm
-  have hx_in_ND : x ∈ Subgroup.normalizer (D : Set H) := centralizer_le_normalizer D hx_in_CD
+  have hx_in_ND : x ∈ Subgroup.normalizer (D : Set H) :=
+    Subgroup.centralizer_le_normalizer _ hx_in_CD
   have hx_in_M : x ∈ M := hND_le hx_in_ND
   have hM_pType : IsPType p M := by
     rcases maximal_isPType_xor_isQType hpq hH_card hSubgroupsSolvable hM_max hM_ne_bot with h | h

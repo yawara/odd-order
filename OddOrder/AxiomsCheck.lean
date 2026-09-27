@@ -7070,7 +7070,7 @@ set_option linter.style.longLine false in
 -- 15.7(e) conjunct B (Coq `cycHp'`): `cyclic O_{p'}(M_F)` for non-abelian `M_F`, plus the two
 -- reusable group-theory lemmas it rests on (commuting commutative join is commutative; an odd
 -- commutative group of rank ≤ 1 is cyclic, via the `Z`-group `exponent = card` route).
-#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.isMulCommutative_sup_of_le_centralizer
+#assert_only_allowed_axioms Subgroup.isMulCommutative_sup_of_le_centralizer
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.isCyclic_of_isMulCommutative_of_rank_le_one
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.typeF_nonabelian_cyclic_opiCore_compl
 -- 15.7(e) shared "`O_p(M_F)` non-abelian" step (Coq `not_cPP`), and the completed per-prime witness

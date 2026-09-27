@@ -589,7 +589,7 @@ theorem inner_extension_caseB_Xset_Yset_eq_zero_of_irreducible
       ← Nat.cast_smul_eq_nsmul ℂ d' (cX.extension χ),
       ← Nat.cast_smul_eq_nsmul ℂ d (cX.extension χ.conj)]
     push_cast
-    ring
+    ring_nf
   have hYeq : cY.extension η - cY.extension η' = cY.extension ydiff := by
     rw [hydiff_def, map_sub]
   have hsrc0 : ClassFunction.inner xdiff ydiff = 0 :=

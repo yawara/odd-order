@@ -1245,7 +1245,7 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           orderOf_eq_card_of_forall_mem_zpowers hb]
       have hMFnorm_Y : MF M ≤ Subgroup.normalizer (Y : Set G) :=
         (Subgroup.commutator_eq_bot_iff_le_centralizer.mp hMFY_comm).trans
-          (OddOrder.Isaacs.Ch07.centralizer_le_normalizer Y)
+          (Subgroup.centralizer_le_normalizer (Y : Set G))
       have hcardsup : Nat.card ↥(MF M ⊔ Y) = Nat.card ↥(MF M) * Nat.card ↥Y := by
         have hprod := Subgroup.card_HK_mul_card_inf_eq_card_mul_card (MF M) Y
         rw [hMFY_inf, Subgroup.card_bot, mul_one] at hprod

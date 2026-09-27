@@ -45,14 +45,6 @@ namespace OddOrder.GroupTheory
 variable {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
 
 omit [Finite R] in
-/-- A subgroup of the centre is normal. -/
-private theorem normal_of_le_center {H : Subgroup R} (hH : H ≤ Subgroup.center R) :
-    H.Normal :=
-  ⟨fun n hn g => by
-    rw [(Subgroup.mem_center_iff.mp (hH hn) g), mul_assoc, mul_inv_cancel, mul_one]
-    exact hn⟩
-
-omit [Finite R] in
 /-- An element of order dividing `p`, if nontrivial, generates a subgroup of order
 `p`. -/
 private theorem card_zpowers_eq_prime_of_pow {z : R} (hzp : z ^ p = 1) (hz1 : z ≠ 1) :
@@ -88,7 +80,7 @@ theorem exists_normal_isElementaryAbelian_card_prime_sq_le_of_normal
   set Z : Subgroup R := Subgroup.zpowers z with hZdef
   have hZleV : Z ≤ V := (Subgroup.zpowers_le).mpr hzV
   have hZleC : Z ≤ Subgroup.center R := (Subgroup.zpowers_le).mpr hzC
-  have hZnormal : Z.Normal := normal_of_le_center hZleC
+  have hZnormal : Z.Normal := Subgroup.normal_of_le_center hZleC
   have hZcard : Nat.card Z = p := card_zpowers_eq_prime_of_pow hzp hz1
   -- (2) pass to `Q = R/Z`; the image of `V` is a nontrivial normal subgroup.
   let mk : R →* R ⧸ Z := QuotientGroup.mk' Z

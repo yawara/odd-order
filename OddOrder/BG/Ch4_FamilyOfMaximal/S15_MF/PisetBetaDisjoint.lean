@@ -932,23 +932,6 @@ theorem card_dvd_sub_one_of_isFrobeniusAction {A N : Type*} [Group A] [Finite A]
     simpa only [Nat.card_eq_fintype_card] using h.card_modEq_one
   exact (Nat.modEq_iff_dvd' Nat.card_pos).mp hmod.symm
 
-/-- **The join of two commuting commutative subgroups is commutative.**  Writing `A ⊔ B` as the
-closure of `↑A ∪ ↑B`, generators commute: two from `A` (abelian), two from `B` (abelian), or one of
-each (they centralize each other, `A ≤ C_G(B)`).  Used for `not_cPP` in BG Theorem 15.7(e): were
-`O_p(M_F)` abelian, then `M_F = O_p(M_F) ⊔ O_{p'}(M_F)` would be abelian (the `p'`-core is abelian
-and centralizes the `p`-core), contradicting non-abelianness of `M_F`. -/
-theorem isMulCommutative_sup_of_le_centralizer {A B : Subgroup G}
-    (hA : IsMulCommutative ↥A) (hB : IsMulCommutative ↥B)
-    (hAB : A ≤ Subgroup.centralizer (B : Set G)) :
-    IsMulCommutative ↥(A ⊔ B) := by
-  rw [Subgroup.sup_eq_closure]
-  refine Subgroup.isMulCommutative_closure fun x hx y hy _ => ?_
-  rcases hx with hx | hx <;> rcases hy with hy | hy
-  · exact congrArg Subtype.val (isMulCommutative_iff.mp hA ⟨x, hx⟩ ⟨y, hy⟩)
-  · exact (Subgroup.mem_centralizer_iff.mp (hAB hx) y hy).symm
-  · exact Subgroup.mem_centralizer_iff.mp (hAB hy) x hx
-  · exact congrArg Subtype.val (isMulCommutative_iff.mp hB ⟨x, hx⟩ ⟨y, hy⟩)
-
 /-- **A finite commutative group of odd order and rank `≤ 1` is cyclic** (additive converse of
 mathcomp's `abelian_rank1_cyclic`).  Each Sylow `q`-subgroup is an abelian `q`-group whose `pRank`
 is at most `rank N ≤ 1`, hence cyclic (contrapositive of
@@ -1027,7 +1010,7 @@ theorem opiCore_singleton_not_isMulCommutative_of_witness [Finite G]
         (isMulCommutative_iff.mp hC1ab ⟨(x : G), hRC1 x.2⟩ ⟨(y : G), hRC1 y.2⟩))
   have hPRsup : P ⊔ R = MF M := opiCoreInG_sup_compl_eq_of_isNilpotent ({p} : Set ℕ)
   intro hPab
-  refine hnab (hPRsup ▸ isMulCommutative_sup_of_le_centralizer hPab ?_ ?_)
+  refine hnab (hPRsup ▸ Subgroup.isMulCommutative_sup_of_le_centralizer hPab ?_ ?_)
   · exact isMulCommutative_iff.mpr hRab
   · rw [Subgroup.commutator_comm] at hcomm
     exact Subgroup.commutator_eq_bot_iff_le_centralizer.mp hcomm
@@ -1040,7 +1023,8 @@ non-abelian Fitting subgroup `M_F`, the `p'`-core `O_{p'}(M_F)` is cyclic.
 maximal (`not_isUniquelyMaximal_mf_inf_centralizer_of_not_le`).  The `p'`-core `R = O_{p'}(M_F)`
 centralizes the `p`-core `P = O_p(M_F) ⊇ X₁` (`opiCoreInG_commutator_compl_eq_bot`), so `R ≤ C₁`,
 hence `R` is abelian.  `P` is non-abelian (else `M_F = P ⊔ R` would be abelian,
-`isMulCommutative_sup_of_le_centralizer`), so `P ∈ 𝒰` (`nonabelian_pgroup_isUniquelyMaximal`).
+`Subgroup.isMulCommutative_sup_of_le_centralizer`), so `P ∈ 𝒰`
+(`nonabelian_pgroup_isUniquelyMaximal`).
 Were `rank R ≥ 2`, then `D = M_F ⊓ C_G(P) ⊇ R` would have `rank ≥ 2` and lie in `C_G(P)`, so
 `D ∈ 𝒰` (BG Corollary 9.2) and hence `C₁ ⊇ D` would be uniquely maximal — contradiction.  Thus
 `rank R ≤ 1`, and the odd abelian `R` is cyclic (`isCyclic_of_isMulCommutative_of_rank_le_one`). -/
@@ -1086,7 +1070,7 @@ theorem typeF_nonabelian_cyclic_opiCore_compl [Finite G]
   have hPRsup : P ⊔ R = MF M := opiCoreInG_sup_compl_eq_of_isNilpotent ({p} : Set ℕ)
   have hPnab : ¬ IsMulCommutative ↥P := by
     intro hPab
-    refine hnab (hPRsup ▸ isMulCommutative_sup_of_le_centralizer hPab ?_ ?_)
+    refine hnab (hPRsup ▸ Subgroup.isMulCommutative_sup_of_le_centralizer hPab ?_ ?_)
     · exact isMulCommutative_iff.mpr hRab
     · rw [Subgroup.commutator_comm] at hcomm
       exact Subgroup.commutator_eq_bot_iff_le_centralizer.mp hcomm

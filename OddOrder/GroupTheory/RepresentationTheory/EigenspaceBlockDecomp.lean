@@ -295,6 +295,6 @@ theorem sum_sq_sub_finrank_cyclicEndConjEigenspaceFin {epsilon : F}
   push_cast
   simp_rw [add_zero]
   simp only [ha]
-  ring
+  ring_nf
 
 end OddOrder.RepresentationTheory

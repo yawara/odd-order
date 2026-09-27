@@ -146,14 +146,6 @@ theorem le_oPiCore_compl_of_sylow_le_normalizer [Finite G] {p : ℕ} [Fact p.Pri
     rwa [hbot, Subgroup.mem_bot] at this
   rwa [hf, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at this
 
-/-- 中心に含まれる部分群は正規。 -/
-theorem normal_of_le_center {A : Subgroup G} (hA : A ≤ Subgroup.center G) : A.Normal := by
-  refine ⟨fun n hn g => ?_⟩
-  have hc : g * n = n * g := Subgroup.mem_center_iff.mp (hA hn) g
-  have heq : g * n * g⁻¹ = n := by rw [hc]; group
-  rw [heq]
-  exact hn
-
 /-- `A ≤ K` のとき `|A| · [K : A] = |K|`。 -/
 theorem card_mul_relIndex [Finite G] {A K : Subgroup G} (hAK : A ≤ K) :
     Nat.card ↥A * A.relIndex K = Nat.card ↥K := by
@@ -206,7 +198,7 @@ theorem oPiCore_quotient_center_eq_map [Finite G] {Z : Subgroup G} [Z.Normal]
   -- `Z` の `π`/`π'`-部分
   have hZp := isHallPart_nilPiPart (N := Z) π hZnil
   have hZc := isHallPart_nilPiPart (N := Z) (πᶜ) hZnil
-  have hZcN : (nilPiPart Z πᶜ).Normal := normal_of_le_center (hZc.1.trans hZ)
+  have hZcN : (nilPiPart Z πᶜ).Normal := Subgroup.normal_of_le_center (hZc.1.trans hZ)
   have hinfZ : nilPiPart Z π ⊓ nilPiPart Z πᶜ = ⊥ := by
     refine (Subgroup.eq_bot_iff_card _).mpr ?_
     by_contra hne

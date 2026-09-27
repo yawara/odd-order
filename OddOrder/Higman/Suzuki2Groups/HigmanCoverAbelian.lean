@@ -35,14 +35,6 @@ variable {G X : Type*} [Group G] [Group X]
 
 namespace NormalInvariantCover
 
-private theorem normal_of_le_center
-    {Q : Type*} [Group Q] {H : Subgroup Q}
-    (hH : H ≤ Subgroup.center Q) : H.Normal :=
-  ⟨fun n hn g => by
-    rw [(Subgroup.mem_center_iff.mp (hH hn) g), mul_assoc,
-      mul_inv_cancel, mul_one]
-    exact hn⟩
-
 /-- A normal actor-invariant cover in a finite `p`-group is central modulo
 its lower endpoint.
 
@@ -151,7 +143,7 @@ theorem invariant_subgroup_quotient_eq_bot_or_top
       aInvariant_map_subtype_of_restrict hCbarInv hU
   have hUbarCenter : Ubar ≤ Subgroup.center (G ⧸ A) :=
     (Subgroup.map_subtype_le U).trans (h.map_quotient_le_center hG)
-  have : Ubar.Normal := normal_of_le_center hUbarCenter
+  have : Ubar.Normal := Subgroup.normal_of_le_center hUbarCenter
   let D : Subgroup G := Ubar.comap q
   have hDInv : IsAInvariant act D := by
     simpa [D, q] using h.left.2.comap_quotient hUbarInv

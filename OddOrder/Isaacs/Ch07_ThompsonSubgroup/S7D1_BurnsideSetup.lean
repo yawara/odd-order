@@ -1241,11 +1241,11 @@ theorem step1_unique_maximal_containing_nilpotent
     have hLq_le_M : Lq ≤ M :=
       le_trans hLq_le_centLp (le_trans
         (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hLp_extract))
-        (by rw [← hM_eq_NKp]; exact centralizer_le_normalizer Kp))
+        (by rw [← hM_eq_NKp]; exact Subgroup.centralizer_le_normalizer (Kp : Set H)))
     have hLp_le_M : Lp ≤ M :=
       le_trans hLp_le_centLq (le_trans
         (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hLq_extract))
-        (by rw [← hM_eq_NKq]; exact centralizer_le_normalizer Kq))
+        (by rw [← hM_eq_NKq]; exact Subgroup.centralizer_le_normalizer (Kq : Set H)))
     have hL_le_M : L ≤ M := sup_le hLp_le_M hLq_le_M
     -- Both cases (`K < L` and `K = L`) give `X = M`.
     rcases eq_or_lt_of_le hK_le_L with hKL_eq | hKL_lt

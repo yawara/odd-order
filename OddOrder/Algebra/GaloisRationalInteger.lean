@@ -48,17 +48,15 @@ namespace OddOrder.Algebra
 open Polynomial IntermediateField
 
 /-- A rational algebraic integer is a rational integer: if `α : ℂ` is integral over `ℤ` and lies in
-the image of `ℚ`, then `α` is the image of an integer. -/
+the image of `ℚ`, then `α` is the image of an integer.
+
+This is `OddOrder.RepresentationTheory.isIntegral_rat_imp_int` repackaged with the rationality
+of `α` as a hypothesis (formerly a second, independent proof of the same fact). -/
 theorem exists_int_of_isIntegral_of_mem_range_rat {α : ℂ} (hα : IsIntegral ℤ α)
     (hrat : ∃ q : ℚ, (q : ℂ) = α) : ∃ z : ℤ, (z : ℂ) = α := by
   obtain ⟨q, rfl⟩ := hrat
-  -- `q` is integral over `ℤ` (the map `ℚ → ℂ` is injective, so integrality descends).
-  have hqℚ : IsIntegral ℤ q := isIntegral_algebraMap_iff.mp hα
-  -- `ℤ` is integrally closed in `ℚ`, so `q ∈ ℤ`.
-  obtain ⟨z, hz⟩ := (IsIntegrallyClosed.isIntegral_iff).mp hqℚ
-  refine ⟨z, ?_⟩
-  rw [← hz]
-  simp
+  obtain ⟨z, hz⟩ := OddOrder.RepresentationTheory.isIntegral_rat_imp_int hα
+  exact ⟨z, hz.symm⟩
 
 /-- **Isaacs 3.14 core.** An algebraic integer `α : ℂ` fixed by every ring automorphism of `ℂ`
 is a rational integer. -/
