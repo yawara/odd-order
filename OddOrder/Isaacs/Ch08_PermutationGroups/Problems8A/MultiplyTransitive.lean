@@ -125,7 +125,6 @@ theorem card_le_four_of_regular_normal_of_stabilizer_three_transitive
       _ = (n' : G) • α := by rw [hginv, hc]
   exact ⟨MulAut.conjNormal (H := N) g, key x x' hg1, key y y' hg2, key z z' hg3⟩
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **Isaacs Problem 8A.10** (p. 236) の主内容: **可解な 4-transitive 置換群の次数は 4**。
 
 書籍 hint どおり極小正規部分群 `N` を取る。`N` は忠実性から非自明に作用するので **8A.9**

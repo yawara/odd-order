@@ -239,7 +239,6 @@ lemma bijective_smulBase_of_normal_of_comm [FaithfulSMul G Ω] {N : Subgroup G} 
           Subgroup.mem_centralizer_iff.mpr fun y hy => hcomm y hy x hx
     _ = ⊥ := centralizer_inf_stabilizer_eq_bot (H := N) α
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **Isaacs Problem 8B.4** (p. 248) 🎉: **可解**な原始置換群 `G` について,
 次数 `|Ω|` は**素数冪**であり, `G` の極小正規部分群は**ただ一つ**。
 

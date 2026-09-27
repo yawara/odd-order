@@ -119,7 +119,6 @@ theorem subRep_coe_smul (N : Submodule k[J] σ.asModule) (c : k[J])
   | add x y hx hy => rw [add_smul, add_smul, AddSubmonoid.coe_add, hx, hy]
   | single g a => rw [Representation.single_smul, Representation.single_smul]; rfl
 
-set_option backward.isDefEq.respectTransparency false in
 /-- A `k[J]`-submodule `N` of `σ.asModule`, viewed as `ofSubmodule' N`, has its `asModule`
 `k[J]`-linearly isomorphic to `N` (identity on the shared carrier). -/
 noncomputable def subRepAsModuleEquiv (N : Submodule k[J] σ.asModule) :
@@ -134,7 +133,6 @@ noncomputable def subRepAsModuleEquiv (N : Submodule k[J] σ.asModule) :
     rw [RingHom.id_apply, Submodule.coe_smul]
     exact (subRep_coe_smul σ N c v).symm
 
-set_option backward.isDefEq.respectTransparency false in
 /-- For a simple `k[J]`-submodule `N`, the subrepresentation `ofSubmodule' N` is irreducible. -/
 theorem subRep_isIrreducible (N : Submodule k[J] σ.asModule) [IsSimpleModule k[J] (↥N)] :
     Representation.IsIrreducible (Subrepresentation.ofSubmodule' N).toRepresentation := by
@@ -389,7 +387,6 @@ theorem extraspecial_constituent_faithful {p : ℕ} [Fact p.Prime] [ρ.IsIrreduc
   have hz1 : (z₀ : G) = 1 := hρf (show ρ ((z₀ : G)) = ρ 1 by rw [hVtriv', map_one])
   exact hz₀ne (OneMemClass.coe_eq_one.mp hz1)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **BG Prop 2.2(a), materialised** (the `hVP` input to the group-level Theorem 2.5).  If `ρ` is a
 faithful-type irreducible representation over an algebraically closed field with `char k ∤ |H|`,
 `G = ⟨H, x⟩`, `H` has nilpotency class `≤ 2`, `x` centralises `Z(H)`, and *every* nonzero simple
@@ -423,7 +420,6 @@ theorem restriction_isIrreducible_of_faithful_constituents [ρ.IsIrreducible] [I
     conjugate_submodule_iso ρ W (hf W hWne hWs) hcl g
       (fun z hz => conjNormalMulAut_center_eq_of_closure x hxZ hgen g⁻¹ hz))
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **BG Theorem 2.5's `hVP`, fully materialised for an extraspecial `H`.**  If `ρ` is faithful and
 irreducible over an algebraically closed field with `char k ∤ |H|`, `G = ⟨H, x⟩`, `H` is
 extraspecial of prime-order centre, and `x` centralises `Z(H)`, then the restriction `Res^G_H ρ` is

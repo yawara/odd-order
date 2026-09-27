@@ -247,7 +247,6 @@ theorem cliffordConj_fixed_imp_scalar [ρ.IsIrreducible] [IsAlgClosed k] [Module
   rw [Algebra.algebraMap_eq_smul_one, LinearMap.smul_apply, Module.End.one_apply]
   exact hfw.symm
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **The restriction is irreducible** (Bender–Glauberman Proposition 2.2(a), the multiplicity-one
 finish).  Assume `G = ⟨H, x⟩`, `ρ` is irreducible over an algebraically closed field `k` with `V`
 finite-dimensional and nontrivial, `H` is finite with `char k ∤ |H|`, and a nonzero simple
@@ -312,7 +311,6 @@ theorem restriction_isSimpleModule [ρ.IsIrreducible] [IsAlgClosed k] [Module.Fi
     e.trans (LinearEquiv.funUnique (Fin 1) k[↥H] ↥W)
   exact IsSimpleModule.congr e1
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **Bender–Glauberman Proposition 2.2(a)**, in the form consumed by the group-level Theorem 2.5
 (`finrank_modEq_of_faithful_irreducible`): the restriction representation `Res^G_H ρ` is
 irreducible.  This repackages `restriction_isSimpleModule` through

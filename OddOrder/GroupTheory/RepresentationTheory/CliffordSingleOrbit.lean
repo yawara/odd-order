@@ -37,7 +37,6 @@ variable {k : Type*} [Field k]
 variable {V : Type*} [AddCommGroup V] [Module k V]
 variable (ρ : Representation k G V)
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **Clifford single-orbit, module level.**  For a `G`-irreducible representation `ρ` and a normal
 subgroup `H ⊴ G`, any two simple `k[H]`-submodules `N`, `N'` of the restriction `Res^G_H ρ` have
 conjugate characters: there is `g : G` with `χ_{N'}(h) = χ_N(g⁻¹ h g)` for all `h ∈ H`.
@@ -77,7 +76,6 @@ theorem character_conj_of_simpleSubmodule [ρ.IsIrreducible] [FiniteDimensional 
   funext h
   exact character_subRep_conj ρ N g h
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **A nonzero intertwiner yields a simple constituent submodule** (the module side of the
 constituent ⟺ submodule bridge).  If `σ` is an irreducible `k[H]`-representation and there is a
 nonzero `H`-equivariant map `f : σ → Res^G_H ρ`, then `Res^G_H ρ` has a simple `k[H]`-submodule `N`
@@ -106,7 +104,6 @@ theorem exists_simpleSubmodule_character_eq_of_ne_zero_intertwiner [FiniteDimens
         ((subRepAsModuleEquiv (resRep ρ H) (LinearMap.range fam)).symm.trans
           (LinearEquiv.ofInjective fam hinj).symm))
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **Clifford's theorem, single-orbit (character level)** ([Isaacs] Thm 6.5, first clause): for a
 `G`-irreducible character `χ` and a normal subgroup `H ⊴ G`, the irreducible constituents of
 `Res^G_H χ` form a single `G`-conjugation orbit.  This discharges the
@@ -361,7 +358,6 @@ theorem restrict_eq_restrictionMultiplicity_smul_of_invariant
   · intro h
     exact absurd (Finset.mem_univ θ) h
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **Clifford's theorem, degree formula** ([Isaacs] Thm 6.5).  For a `G`-irreducible character `χ`,
 a normal subgroup `H ⊴ G`, and a constituent `θ₀` of `Res^G_H χ`, the degree factors as
 `χ(1) = ⟨Res χ, θ₀⟩ · [G : I_G(θ₀)] · θ₀(1)`.  Assembles the degree expansion

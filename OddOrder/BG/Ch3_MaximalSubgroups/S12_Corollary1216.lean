@@ -108,7 +108,6 @@ private theorem derivedInG_mono {H K : Subgroup G} (hHK : H ≤ K) :
     show derivedInG K = ⁅(K : Subgroup G), K⁆ from Subgroup.map_subtype_commutator K]
   exact Subgroup.commutator_mono hHK hHK
 
-set_option backward.isDefEq.respectTransparency false in
 /-- The order of `(g • K)'` equals that of `K'` (conjugation is `G`-card-preserving:
 `derivedInG (g • K) = (derivedInG K).map (conj g)`). -/
 private theorem card_derivedInG_conj (g : G) (K : Subgroup G) :

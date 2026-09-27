@@ -167,7 +167,6 @@ section MainTheorem
 
 variable (ρ : Representation k G V) {H : Subgroup G} [H.Normal]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **BG Lemma 2.3, case (ii): the "dimension brick".**  Over an algebraically closed field `k`,
 let `ρ` be an irreducible representation of a finite group `G`, `V` finite-dimensional and
 nontrivial, `H ⊴ G` of prime index with `G = ⟨H, x⟩`, and `W` a nonzero simple `k[H]`-submodule of

@@ -127,7 +127,6 @@ open scoped MonoidAlgebra
 variable {F : Type*} [Field F]
 variable {G : Type*} [Monoid G] {V : Type*} [AddCommGroup V] [Module F V]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **Burnside's theorem** (BG Prop 2.1(b), representation form, general
 field): for a finite-dimensional irreducible representation `ρ` of `G` over a
 field `F` with `Hom_FG(V, V) = F` (every self-intertwiner is a scalar), the

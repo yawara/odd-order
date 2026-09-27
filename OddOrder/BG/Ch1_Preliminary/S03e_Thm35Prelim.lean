@@ -511,7 +511,6 @@ theorem not_nonempty_linearEquiv_pow_of_not_generator
     (nonempty_linearEquiv_forall_of_iso_generator ρ hHchar M (x ^ j) hgenj' hiso x)
 
 open OddOrder.RepresentationTheory in
-set_option backward.isDefEq.respectTransparency false in
 /-- **(P) disjointness** (NONISO branch of step 9).  Let `R = ⟨x⟩` be of prime order `p` with
 `G = ⟨H, x⟩`.  If `M` is a simple `F[H]`-constituent not isomorphic to its conjugate `M^x`, then `M`
 meets the sum of the *other* conjugates `M^{x^i}` (`1 ≤ i < p`) trivially.
@@ -1059,7 +1058,6 @@ theorem invariants_ne_bot_of_not_irreducible_sup [Finite G] [FiniteDimensional F
   · exact hmemInv B hBne hB
 
 open OddOrder.RepresentationTheory in
-set_option backward.isDefEq.respectTransparency false in
 /-- **The single-weight (ISO) case of step 9's `K'`-analysis.**  Suppose `ρ` restricted to `K' ⊔ R`
 is irreducible, `K'` is abelian and normal, `R = ⟨x⟩`, and there is a character `χ` with nonzero
 weight space that is *fixed* by `x` (`conjChar x χ = χ`).  Then `W` is one-dimensional.

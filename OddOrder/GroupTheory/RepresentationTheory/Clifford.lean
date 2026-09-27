@@ -223,7 +223,6 @@ theorem conjBySimpleSemilinear_bijective (g : G) :
     Function.Bijective (conjBySimpleSemilinear (H := H) ρ g) :=
   ρ.apply_bijective g
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Membership in the image submodule `N.map (conjBySimpleSemilinear ρ g)` is exactly being
 of the form `ρ g v` for some `v ∈ N`.  This confirms that the simple `ℂ[H]`-submodule produced
 by `isSimpleModule_map_conjBySimpleSemilinear` is, as a set, the `ρ g`-translate of `N`, carrying
@@ -234,7 +233,6 @@ theorem mem_map_conjBySimpleSemilinear (g : G)
       ∃ v ∈ N, (show (restrictRep ρ H).asModule from ρ g v) = w := by
   simp only [Submodule.mem_map, conjBySimpleSemilinear_apply]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **Clifford BLOCKER A** (module-theoretic core of [Is] Thm 6.5 / Peterfalvi §3 (1.5)).
 For `ρ : Representation ℂ G V`, `H ⊴ G`, a simple `ℂ[H]`-submodule `N` of the restricted
 module `(restrictRep ρ H).asModule`, and any `g : G`, the image of `N` under `ρ g` is again

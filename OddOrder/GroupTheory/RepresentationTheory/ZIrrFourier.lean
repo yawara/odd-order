@@ -566,7 +566,6 @@ theorem exists_orthogonalProjection_of_orthogonal_family {ι : Type*} (s : Finse
   have hmj : (m j : ℂ) ≠ 0 := by exact_mod_cast hm j hj
   rw [div_mul_cancel₀ _ hmj, sub_self]
 
-set_option backward.isDefEq.respectTransparency false in
 omit [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)] in
 /-- An irreducible representation has positive dimension. -/
 theorem finrank_pos_of_isIrreducible {V : Type} [AddCommGroup V] [Module ℂ V]

@@ -38,7 +38,6 @@ section /- Problem 4B.5 (p. 131) -/
 
 variable {G : Type*} [Group G]
 
-set_option backward.isDefEq.respectTransparency false in
 /-- **超可解群の極大可換正規部分群は自己中心化する**.
 
 したがって超可解群は Theorem 4.15 の仮説を満たす. -/
